@@ -2,94 +2,104 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A55613B2202
-	for <lists+kvm@lfdr.de>; Wed, 23 Jun 2021 22:47:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0082C3B2203
+	for <lists+kvm@lfdr.de>; Wed, 23 Jun 2021 22:48:07 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229812AbhFWUuA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 23 Jun 2021 16:50:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60284 "EHLO
+        id S229844AbhFWUuX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 23 Jun 2021 16:50:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60382 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229688AbhFWUt7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 23 Jun 2021 16:49:59 -0400
-Received: from mail-ot1-x32b.google.com (mail-ot1-x32b.google.com [IPv6:2607:f8b0:4864:20::32b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F2366C061574
-        for <kvm@vger.kernel.org>; Wed, 23 Jun 2021 13:47:40 -0700 (PDT)
-Received: by mail-ot1-x32b.google.com with SMTP id 6-20020a9d07860000b02903e83bf8f8fcso3282879oto.12
-        for <kvm@vger.kernel.org>; Wed, 23 Jun 2021 13:47:40 -0700 (PDT)
+        with ESMTP id S229688AbhFWUuX (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 23 Jun 2021 16:50:23 -0400
+Received: from mail-pl1-x62b.google.com (mail-pl1-x62b.google.com [IPv6:2607:f8b0:4864:20::62b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BDE33C061756
+        for <kvm@vger.kernel.org>; Wed, 23 Jun 2021 13:48:04 -0700 (PDT)
+Received: by mail-pl1-x62b.google.com with SMTP id f10so1817480plg.0
+        for <kvm@vger.kernel.org>; Wed, 23 Jun 2021 13:48:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=jIKGdZneSKaUNLACnmOaJDKvcXdM8mWNUUPaWnGsATk=;
-        b=Nw5Vc0HAWfdvfs0v7ercnzlGpS11kFec7T5YSYKTaelvNawYb4kRldw6Nf61q6TdXk
-         Z74nMnXgKhWOX6J8yHMnimH4Mi7IYw7aSg3u4c/lqk99yO85em5IzWRvIdjWD9Df+xjv
-         vG4Uc2SLk7f+fV4b0/Fpmjo2BnxEAJ+ZlcGkadu2zZwQLBclyVSTwONpCbJFFIIiZsfv
-         xiczLWd2MFFGMPtObxWOYcraJWKKqiKjGe92TOqhIWDOJIGYrUjwnGCqfZi8iL9s2HI2
-         6wejFNdC2q8J1vc590RPbdqZ5UBJDFit4nNW1UOk6Sr+qXxMCv7IpfkwSILHy2NfYh70
-         MLAw==
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=KPQttoS4IMq2aybrhdSAm6wEH6LRGO37mRcOcCH2GA8=;
+        b=rVe8KpaPY6kuM41sXjMWkWWA8fPUg7oZ5+RvsxBdHwA2VILv0xeGl+zEVx6WWIqYB2
+         b8W3o+cQbjq/CkIkuSvSoppk9qaxXQ3n6wivXVRhiULHDlnUUbnvzACC8Hzeu344fmCe
+         +MRYbs7TXP1gO/WcFMG4gkeDal78jioeE/CKgLPs7axUTDDkXGJ4OEhHk3Y6TYqhkA35
+         BMNjGZzUsjtVfNQ/F/imdW+cPbNqGRkYzxnoquOEDzpJvXLh00fl51wuI2Z4Hqm4JOpz
+         UMK39lBFhtyhPnOIHJelnWA8ESS7YencEm3AIAv6HvDumgirDhpf2PiqI8xH3ChuNPRq
+         5x9A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=jIKGdZneSKaUNLACnmOaJDKvcXdM8mWNUUPaWnGsATk=;
-        b=SlVZQC0Te/tIykqKz+DsXI4rz5yuvMbK7djVzF1SBUI7XvMWMwxGv6P/3U4S8qtcjk
-         y6wIJByYbLqexEH+l0dRDim1/umafC7Ci3O++L+PXijrwJsGRc4hpJaaErEFQr7wayhn
-         AHh4iJy6xVJwYLtlj1LnqC9Ie3nAfikt87YAgkeZ2lbFNOnzs1qxCZFqcUA01tmEJfns
-         o61c3WyLV3IxLPfIYovcEUHqTrhy4DVn2NMFajGrVNZQvAfbMd/hG1QlKtqf0Y+dimZt
-         /GcHoNAf00Vh1KGxAbhzO6MJfmA4+M2eS63Sx25r2KylvAVIJSmNn1WLyouHgp4KOVkU
-         Xf/Q==
-X-Gm-Message-State: AOAM531bXjmFXdlL9xkpEG6+FqpF7s1tYPMAIbsm1bjJRaLqS+X9hHCa
-        640EspJtnrYtUW5EgFF7Fsp+qlePAJkHf8tX0gtJ9g==
-X-Google-Smtp-Source: ABdhPJwkKSWvUPd+BlAlj4YgekreAllWw+PAzn/RTwQtzzgs1D2mYFKm1K7IZ7v5z6HJcn9krPM0tkj3fusWcPQWU/Q=
-X-Received: by 2002:a9d:550e:: with SMTP id l14mr1615921oth.241.1624481260046;
- Wed, 23 Jun 2021 13:47:40 -0700 (PDT)
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=KPQttoS4IMq2aybrhdSAm6wEH6LRGO37mRcOcCH2GA8=;
+        b=LX3tP5Qx3ATwkn4rW62WNfXCRJ3AsR7kOUTPgOJ+96iPv3jrUiFrMRgQTar/VSfRKj
+         dFt+Fm9QBcCfvLHEQYRAbYkfTMYofyyPhtWi9PH0MlQILJRa9ZpU8qXQnoj8KxE/kGfo
+         22RTNnjYw6bgR6yCE8sERRxerpnKwNOXHnMc6V4UnYvb9gx63xhgSbm6xZPX6xIJuohd
+         6jchYQ3ZaSbREtoBPEW5etRP5PlnZd2CqUTry3zx9q4ziTOTxq41eNBFHOUeq1HAXlmI
+         XcE1S5uuytdOgpm1EEXTl94IIh4hAGD5MgaToHW1LPu2pUoD4OsFiGtWCBIn6FuE9l+3
+         XDrg==
+X-Gm-Message-State: AOAM532iNRKexyaGiVlaXFY4zpu74wpXxoFWZ8K2Zqe3ME0TW2kqVVxl
+        FJdb9ql6YHijpst3WHJvAcRA9g==
+X-Google-Smtp-Source: ABdhPJzfKt5rhw5CZw6QaYPIr2PW/BBph0kOlQHC2t7P/nr5KdNQk+VU29QNNta8gNtKaLlWXe4Haw==
+X-Received: by 2002:a17:90a:7381:: with SMTP id j1mr11247671pjg.29.1624481284023;
+        Wed, 23 Jun 2021 13:48:04 -0700 (PDT)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id q18sm25708pgj.8.2021.06.23.13.48.03
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 23 Jun 2021 13:48:03 -0700 (PDT)
+Date:   Wed, 23 Jun 2021 20:47:59 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Yu Zhang <yu.c.zhang@linux.intel.com>,
+        Maxim Levitsky <mlevitsk@redhat.com>
+Subject: Re: [PATCH 25/54] KVM: x86/mmu: Add helpers to query mmu_role bits
+Message-ID: <YNOd/0RxSnqmDBvd@google.com>
+References: <20210622175739.3610207-1-seanjc@google.com>
+ <20210622175739.3610207-26-seanjc@google.com>
+ <1babfd1c-bee1-12e5-a9d9-9507891efdfd@redhat.com>
 MIME-Version: 1.0
-References: <20210623203426.1891402-1-aaronlewis@google.com>
-In-Reply-To: <20210623203426.1891402-1-aaronlewis@google.com>
-From:   Jim Mattson <jmattson@google.com>
-Date:   Wed, 23 Jun 2021 13:47:28 -0700
-Message-ID: <CALMp9eRHR1x=+diFKM+FbO1_h-Vk+tNN9_ECuNc3THot4shrdg@mail.gmail.com>
-Subject: Re: [PATCH] kvm: x86: disable the narrow guest module parameter on unload
-To:     Aaron Lewis <aaronlewis@google.com>
-Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, mgamal@redhat.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1babfd1c-bee1-12e5-a9d9-9507891efdfd@redhat.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jun 23, 2021 at 1:35 PM Aaron Lewis <aaronlewis@google.com> wrote:
->
-> When the kvm_intel module unloads the module parameter
-> 'allow_smaller_maxphyaddr' is not cleared because it is also used in the
+On Wed, Jun 23, 2021, Paolo Bonzini wrote:
+> On 22/06/21 19:57, Sean Christopherson wrote:
+> > +static inline bool is_##reg##_##name(struct kvm_mmu *mmu)	\
+> 
+> What do you think about calling these is_mmu_##name?  The point of having
+> these helpers is that the register doesn't count, and they return the
+> effective value (e.g. false in most EPT cases).
 
-...because the backing variable is defined in the
+I strongly prefer to keep <reg> in the name, both to match the mmu_role bits and
+to make it a bit more clear that it's reflective (modified) register state, as
+opposed to PTEs or even something else entirely.  E.g. I always struggled to
+remember the purpose of mmu->nx flag.
 
-(Or something like that.)
+I wouldn't be opposed to is_mmu_##reg##_##name() though.  I omitted the "mmu"
+part because it was loosely implied by the "struct kvm_mmu" param, and to keep
+line lengths short.  But being explicit is usually a good thing, and looking at
+the code I don't see any lines that would wrap if "mmu" were added.
 
-> kvm module.  As a result, if the module parameter's state was set before
-> kvm_intel unloads, it will also be set when it reloads.  Explicitly
-> clear the state in vmx_exit() to prevent this from happening.
->
-> Signed-off-by: Aaron Lewis <aaronlewis@google.com>
-> ---
->  arch/x86/kvm/vmx/vmx.c | 2 ++
->  1 file changed, 2 insertions(+)
->
-> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> index c2a779b688e6..fd161c9a83fd 100644
-> --- a/arch/x86/kvm/vmx/vmx.c
-> +++ b/arch/x86/kvm/vmx/vmx.c
-> @@ -7996,6 +7996,8 @@ static void vmx_exit(void)
->         }
->  #endif
->         vmx_cleanup_l1d_flush();
-> +
-> +       allow_smaller_maxphyaddr = false;
->  }
->  module_exit(vmx_exit);
-
-This seems reasonable to me. Another option is to move the backing
-variable to the kvm_intel module, given the recent suggestion that it
-should never be enabled for AMD.
-
-Reviewed-by: Jim Mattson <jmattson@google.com>
+> > +{								\
+> > +	return !!(mmu->mmu_role. base_or_ext . reg##_##name);	\
+> > +}
+> > +BUILD_MMU_ROLE_ACCESSOR(ext,  cr0, pg);
+> > +BUILD_MMU_ROLE_ACCESSOR(base, cr0, wp);
+> > +BUILD_MMU_ROLE_ACCESSOR(ext,  cr4, pse);
+> > +BUILD_MMU_ROLE_ACCESSOR(ext,  cr4, pae);
+> > +BUILD_MMU_ROLE_ACCESSOR(ext,  cr4, smep);
+> > +BUILD_MMU_ROLE_ACCESSOR(ext,  cr4, smap);
+> > +BUILD_MMU_ROLE_ACCESSOR(ext,  cr4, pke);
+> > +BUILD_MMU_ROLE_ACCESSOR(ext,  cr4, la57);
+> > +BUILD_MMU_ROLE_ACCESSOR(base, efer, nx);
+> > +
+> >   struct kvm_mmu_role_regs vcpu_to_role_regs(struct kvm_vcpu *vcpu)
+> 
