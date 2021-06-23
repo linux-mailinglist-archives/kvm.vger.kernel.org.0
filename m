@@ -2,112 +2,79 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A037D3B160D
-	for <lists+kvm@lfdr.de>; Wed, 23 Jun 2021 10:41:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8A74F3B164B
+	for <lists+kvm@lfdr.de>; Wed, 23 Jun 2021 10:56:42 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229930AbhFWInS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 23 Jun 2021 04:43:18 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:37093 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229833AbhFWInR (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 23 Jun 2021 04:43:17 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1624437659;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=Ld36iI6CJbK052bnFVTBuWxw3HHNZj3O8BLNvtmlPXo=;
-        b=KCtocj1/LSdaHjkjtd4dR0NTqqbLbH7Pky1OXEHLTkWcq+qbvdBl0y7k9BcLgSl+TDMa2H
-        tW678P+mkIkgrb8l8O9cFNKv2qr2vq5i3hv2EQnyBGKJBGGdpu8Cwnm42ZJjxdjKZ7KTHy
-        KQRHXRWuAfXsom/xtJ3Ec+7YEInx2+g=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-478-CneUkXjMM7uncHnEilyu7g-1; Wed, 23 Jun 2021 04:40:58 -0400
-X-MC-Unique: CneUkXjMM7uncHnEilyu7g-1
-Received: by mail-wm1-f71.google.com with SMTP id m6-20020a7bce060000b02901d2a0c361bfso1284177wmc.4
-        for <kvm@vger.kernel.org>; Wed, 23 Jun 2021 01:40:58 -0700 (PDT)
+        id S230001AbhFWI66 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 23 Jun 2021 04:58:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40442 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229952AbhFWI65 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 23 Jun 2021 04:58:57 -0400
+Received: from mail-ed1-x544.google.com (mail-ed1-x544.google.com [IPv6:2a00:1450:4864:20::544])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ABBD3C061574
+        for <kvm@vger.kernel.org>; Wed, 23 Jun 2021 01:56:40 -0700 (PDT)
+Received: by mail-ed1-x544.google.com with SMTP id r7so2336836edv.12
+        for <kvm@vger.kernel.org>; Wed, 23 Jun 2021 01:56:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:reply-to:from:date:message-id:subject:to
+         :content-transfer-encoding;
+        bh=Y3KUStx0A4jVKAR7a8xL34Lc8keAWBoUl4dKhJUYwUY=;
+        b=ZtINz4/JfzOgd8SFrsrjMzBEurNQj6nW15IOvuCu73wX/jeCqqciVevmqENg6Xb+bT
+         rkhP/JyfSvOice2FXg2npNZMHCNPffdEskiBWlBskrAf9q1ByZwe+FWqrr9kjpKWXhF9
+         +Q54LUTsXSTwAn5Xd1g0U00RnoXiKp7N8urJrLBluNs0zErvFcT0CFTo2SCfi6jEf9Hx
+         W0szdPWV7q/ISVniyNb9dqkzMkp/NoV6xOzYx18X8TV1X6rxCLok/13AFGec5IaqX4o3
+         JiTWjw1TYYnDzVxHDe7Plr5qXB5hWcV1cKed6kXEZLgczHuMGZ/W4TA7AuKlMvTBqrPO
+         jH1A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=Ld36iI6CJbK052bnFVTBuWxw3HHNZj3O8BLNvtmlPXo=;
-        b=DiyJt8VjVvtm1SIW6zr1UlvoufT/UvFK1o0kn4QaKhYlIVzFcFbggT9u8XxcOXJKsT
-         Qy9ulahIe3oAFMS8pvIZ1ErpiGIok9MWr/0XVTXRsjDtyNht5eEBKYveyyl639cx7L2z
-         diP2xtGV9SRzwAFZTS88kj5bKHLqacMzk8Ls6DTaF7FVd6vK5ffaD6CTTixRQAFBaky/
-         qMLYYM5o6FbqlbCSVYagwRMpeEb0koVgfmEYcfT/CjzmllDJ1jgDZhuAU3nr189dirIj
-         0mYLJCAEYuUQM5O4O+rc3FfgLQF0FRyTJ0+zLh5+3CtHdvl07cav8J43daKQ3kSafGB3
-         1a2Q==
-X-Gm-Message-State: AOAM533NXbKVW1iBQaxZXvCkDTyhJJkiS9i37/+FPZOLCrgKD2lb8uZc
-        cdQXrLF8oE3zfGhHMIMzpCmp+QAkyKvuGt/NdDWDby1t2h/N3fD5dHBlToqmO6dDivbbU4Q4WKp
-        YDmpRs2/iF5qT4C2rdTSiEcJoFHDH2UwNoF5BnJW0tgttqeIHli90+vdl8YtoCRgN
-X-Received: by 2002:a7b:c24f:: with SMTP id b15mr9429506wmj.96.1624437657029;
-        Wed, 23 Jun 2021 01:40:57 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwSscuwfwiI47KY2nibL6R0QqrX+7l1qj+KjrZIJUIEukNJtCFkKVyJXopwV/cIGxSYf2yU3A==
-X-Received: by 2002:a7b:c24f:: with SMTP id b15mr9429493wmj.96.1624437656848;
-        Wed, 23 Jun 2021 01:40:56 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id w13sm2272239wrc.31.2021.06.23.01.40.55
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 23 Jun 2021 01:40:56 -0700 (PDT)
-Subject: Re: [kvm-unit-tests PATCH] x86: svm: Skip NPT-only part of guest CR3
- tests when NPT is disabled
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     kvm@vger.kernel.org
-References: <20210422025448.3475200-1-seanjc@google.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <5f740edc-4c5b-97d0-65eb-58d13f8ee245@redhat.com>
-Date:   Wed, 23 Jun 2021 10:40:55 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.10.1
+        h=x-gm-message-state:mime-version:reply-to:from:date:message-id
+         :subject:to:content-transfer-encoding;
+        bh=Y3KUStx0A4jVKAR7a8xL34Lc8keAWBoUl4dKhJUYwUY=;
+        b=fWA3CIudvQKZmlWOIW8sJk8dVSp/twyTKm5WB03aavO1i3LfLDtZz4DR3EG+jOomb2
+         IE1++I2+yhTblUZZHIsQW5rmWcXM37KE83X3Yx8bMBCdmnSYcdmZ+dLGikwqzZf4bhCu
+         S3lN8bobqrHhzkHG8S1j5APiG0jLvEClyks7fb7WgNvS6ZnSnKMBoR6JDTvnVt6qSq9G
+         YRPAvJYVOIJtKlxbbZv81eVm7Ox1A2DetZ8v9hVb/BCuGpOWdqw5W/J9BWFhEqcUyDuI
+         rTLt3MvcP0oAfkUxE3qykJwdA78BmCBs7LikUlk2tBDlhtTNESNMfB0YbsT0vfyfMZuM
+         PTjQ==
+X-Gm-Message-State: AOAM531X1QfJK9dRbp74y8C4eiebHSMPWH83v1g0fmxeKlAEtAGd9nKl
+        cEijlE4BEAcn2dt8zRuZcwVAGgGoDH50vBDNjA==
+X-Google-Smtp-Source: ABdhPJzF5kN34oeOevpV/n9foOtRuie9BTdJAOXEdTzUmJn5UZ/NHEb0NQe2OqMSCXRLzE50dWpWcg+s6NPFF4RNpi8=
+X-Received: by 2002:aa7:d7d3:: with SMTP id e19mr10560199eds.46.1624438599347;
+ Wed, 23 Jun 2021 01:56:39 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20210422025448.3475200-1-seanjc@google.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Received: by 2002:aa7:de95:0:0:0:0:0 with HTTP; Wed, 23 Jun 2021 01:56:39
+ -0700 (PDT)
+Reply-To: daveli2011@outlook.com
+From:   DAVID ELVIS <davelsms01@gmail.com>
+Date:   Wed, 23 Jun 2021 08:56:39 +0000
+Message-ID: <CAFevh3SSuRVGjZHZi2+eXbQ9x1H1QrvR_FZS_OaL9cbomA-WKw@mail.gmail.com>
+Subject: My Dear friend,
+To:     undisclosed-recipients:;
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 22/04/21 04:54, Sean Christopherson wrote:
-> Skip the sub-tests for guest CR3 that rely on NPT, unsurprisingly they
-> fail when running with NPT disabled.  Alternatively, the test could be
-> modified to poke into the legacy page tables, but obviously no one
-> actually cares that much about shadow paging.
-> 
-> Fixes: 6d0ecbf ("nSVM: Test non-MBZ reserved bits in CR3 in long mode and legacy PAE mode")
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
-> ---
->   x86/svm_tests.c | 5 +++++
->   1 file changed, 5 insertions(+)
-> 
-> diff --git a/x86/svm_tests.c b/x86/svm_tests.c
-> index 29a0b59..353ab6b 100644
-> --- a/x86/svm_tests.c
-> +++ b/x86/svm_tests.c
-> @@ -2237,6 +2237,9 @@ static void test_cr3(void)
->   
->   	vmcb->save.cr4 = cr4_saved & ~X86_CR4_PCIDE;
->   
-> +	if (!npt_supported())
-> +		goto skip_npt_only;
-> +
->   	/* Clear P (Present) bit in NPT in order to trigger #NPF */
->   	pdpe[0] &= ~1ULL;
->   
-> @@ -2255,6 +2258,8 @@ static void test_cr3(void)
->   	    SVM_CR3_PAE_LEGACY_RESERVED_MASK, SVM_EXIT_NPF, "(PAE) ");
->   
->   	pdpe[0] |= 1ULL;
-> +
-> +skip_npt_only:
->   	vmcb->save.cr3 = cr3_saved;
->   	vmcb->save.cr4 = cr4_saved;
->   }
-> 
+--=20
+My Dear friend,
 
-Queued now, thanks!
+I am David ELVIS, the only Son of late Mr. John ELVIS. I need your
+help to retrived a fund deposit made by my late Father with a bank
+here and to transfer the fund my father left for me in the bank before
+he died into your bank account.
 
-Paolo
+I want to invest the fund in your country and continue my studies. The
+fund is ($ 4.5 million) I will compensate you with 25% of the total
+money for your help. I assure you in the name of the almighty God and
+I will tell you more Once you get back to me and also send you the
+documents of the fund deposit. I am awaiting your reply in my private
+email address for more d=C3=A9tails ( daveli2011@outlook.com )
 
+Thanks and God bless you.
+
+Yours Sincerely
+
+David ELVIS,
