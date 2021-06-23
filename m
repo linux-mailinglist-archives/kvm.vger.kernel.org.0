@@ -2,143 +2,118 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id DEF2B3B1AFB
-	for <lists+kvm@lfdr.de>; Wed, 23 Jun 2021 15:21:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 381863B1B0F
+	for <lists+kvm@lfdr.de>; Wed, 23 Jun 2021 15:26:41 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230429AbhFWNYM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 23 Jun 2021 09:24:12 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:44154 "EHLO
+        id S230283AbhFWN2z (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 23 Jun 2021 09:28:55 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:24829 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230263AbhFWNYJ (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 23 Jun 2021 09:24:09 -0400
+        by vger.kernel.org with ESMTP id S230163AbhFWN2y (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 23 Jun 2021 09:28:54 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1624454511;
+        s=mimecast20190719; t=1624454797;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=Rp1O/CPJY4l8FkaCBOTzb4x+CQmYngEXaAEL0v+9OoY=;
-        b=J5eFVMDN0aGa5+iTV1JLsHv9FDurQt0Ky3XcRe9F3q60ZOPnUVURWPC5XCs4w093Irxt8z
-        iHBpp3yzgJgYlFGIxeH8m335yKdUVct95m9gTHR8uJqL+wSR+qMtt2n1lfIhCLLuBbmksH
-        e4SfUM3Y0X0fzgcHV/fhRBq6OV9//iM=
-Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
- [209.85.218.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-299-EXG66mM2NPGY60g2UQfOsQ-1; Wed, 23 Jun 2021 09:21:50 -0400
-X-MC-Unique: EXG66mM2NPGY60g2UQfOsQ-1
-Received: by mail-ej1-f71.google.com with SMTP id ci22-20020a170906c356b0290492ca430d87so966921ejb.14
-        for <kvm@vger.kernel.org>; Wed, 23 Jun 2021 06:21:49 -0700 (PDT)
+        bh=Jein3OgAGJf2ndq/BFeAbkmeJx56zKLxIWuxbrPBB4M=;
+        b=AQfgYJd5hErQjZbJFMvCHfF1anIHEk5B+0Q99IkbetU6tHmq4E5iz4i14NOHwoukYkvOUm
+        UFAIjd8olP0RqNHmjjTlssyjDweJFpapjrvVaoYHXKdJgVyWYJfj5v3hNK5uhHstlHh47d
+        ykzj2JfUB4RlxG/sLfg05wq1c6IGq3M=
+Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
+ [209.85.208.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-587-vzNs22m1MHeBTNd40Fk1cQ-1; Wed, 23 Jun 2021 09:26:35 -0400
+X-MC-Unique: vzNs22m1MHeBTNd40Fk1cQ-1
+Received: by mail-ed1-f72.google.com with SMTP id w1-20020a0564022681b0290394cedd8a6aso1292606edd.14
+        for <kvm@vger.kernel.org>; Wed, 23 Jun 2021 06:26:35 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:to:cc:references:from:subject:message-id:date
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=Rp1O/CPJY4l8FkaCBOTzb4x+CQmYngEXaAEL0v+9OoY=;
-        b=Xf6eBvPuQ2N86B0PvvMs5oftD+BKIqk5V1Y/ogGHQZxXdWqoK6Laix4OYHuGrskop9
-         /xF+zF2JYiLFUXs7cDe8dZHjYTfiQny5eOvrYqPwDIJu5ukYJMev/hTx784U3K+igtqm
-         zRouCYC+X7fvl9xAPhtS1U9hbONoE7+JTvKo5HiQaeqgVyULXS/aDzuiZxl1ngoLAHWv
-         rmDVoxBOqhSuEWt7//9rAKgoUZkJ5dGmnVUBZ1Qf/JfG3C2aLeh+57A4ML61BYORP0A4
-         s9aVw3fB1j6SeEW4u99JBd1m7YcxRCKv8d0AMFmqb065F3ex5dvKyvme4oe2eC0yuMWR
-         sFnA==
-X-Gm-Message-State: AOAM531+coJ02eAVrsaU5RVdJGBQeSmMPMJfbaNDN1WQoYUrugvbzqp1
-        3ACAP0RQUWk5qtetqOke7tE7a4D57+lDbFm6VYJG+v8Mly1ad6PHpJb06B3OUJjXTomUmlMEp7v
-        HiW9gCZk7lAmE
-X-Received: by 2002:aa7:d799:: with SMTP id s25mr12305636edq.161.1624454509049;
-        Wed, 23 Jun 2021 06:21:49 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyNlMRKDyVnNR+FKglMhJfZuFx+DjO1x2/9lay/i/uFnPMprFz11Nu8jKDmqkQkNrVWKQahmg==
-X-Received: by 2002:aa7:d799:: with SMTP id s25mr12305593edq.161.1624454508854;
-        Wed, 23 Jun 2021 06:21:48 -0700 (PDT)
+        bh=Jein3OgAGJf2ndq/BFeAbkmeJx56zKLxIWuxbrPBB4M=;
+        b=CUB5z9clbKHL6ea8VxA+bUEk3BLu3p4R6y5PwL/h3w1Y/WlU7E16ejZsY7pL8va9Au
+         zGGTWSqKeJS3MIUwrh2tMn3CqsY490pdbZALQmK30YpxLfPDBZGTJr2ch3O8Izf+V/U7
+         TgtDbVX/2DEI3/9m2jxzQKKWRLsRaQWOhIuITKKq4Ag1KvHol8C3HGAqXgR8q1XIK5MT
+         Uz7rbM638XoHfGRBZ++32QJF1tB/FPfh9o4m4HoMY6mOJaW5gpUKSQRRE5ra/QpGdypZ
+         vhDqsG2KfZcqNEQbGw48e5hSsOBjAsNT0QrucwerNaZSnT6t/nloF/SBDPUEA4HwCeyI
+         5wlw==
+X-Gm-Message-State: AOAM533Y5hIY6FqHwcxpb5T0qoTx178sgVPDH7Nzc157kLHUGgWRtEZh
+        ItxIZfAwbs8wAUWS9Pki+7hdHeuLJwX0h7tz7Stt3/Y+OJR8iWTU443DRt+6Kl6Lb5ZYAb/b/83
+        sfJTiFDWMF7Z1
+X-Received: by 2002:a05:6402:3487:: with SMTP id v7mr12194106edc.378.1624454794585;
+        Wed, 23 Jun 2021 06:26:34 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzzlSOxb7lbpcotdS4uDG5xrI8FxTSTF/ULhHzfoh+poh7JEazeDY32Kvg1DyKRveBLBSH1ww==
+X-Received: by 2002:a05:6402:3487:: with SMTP id v7mr12194086edc.378.1624454794437;
+        Wed, 23 Jun 2021 06:26:34 -0700 (PDT)
 Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id ml22sm5967065ejb.93.2021.06.23.06.21.47
+        by smtp.gmail.com with ESMTPSA id mm27sm5462669ejb.67.2021.06.23.06.26.33
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 23 Jun 2021 06:21:48 -0700 (PDT)
-To:     Maxim Levitsky <mlevitsk@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>, kvm@vger.kernel.org
-Cc:     Sean Christopherson <seanjc@google.com>,
+        Wed, 23 Jun 2021 06:26:33 -0700 (PDT)
+Subject: Re: [PATCH] KVM: x86/mmu: Don't WARN on a NULL shadow page in TDP MMU
+ check
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Cathy Avery <cavery@redhat.com>,
-        Emanuele Giuseppe Esposito <eesposit@redhat.com>,
-        linux-kernel@vger.kernel.org
-References: <20210623074427.152266-1-vkuznets@redhat.com>
- <a3918bfa-7b4f-c31a-448a-aa22a44d4dfd@redhat.com>
- <53a9f893cb895f4b52e16c374cbe988607925cdf.camel@redhat.com>
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, David Matlack <dmatlack@google.com>
+References: <20210622072454.3449146-1-seanjc@google.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH RFC] KVM: nSVM: Fix L1 state corruption upon return from
- SMM
-Message-ID: <01564b34-2476-2098-7ec8-47336922afda@redhat.com>
-Date:   Wed, 23 Jun 2021 15:21:47 +0200
+Message-ID: <acb21d4b-679c-69ee-584a-85a6723ace96@redhat.com>
+Date:   Wed, 23 Jun 2021 15:26:32 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.10.1
 MIME-Version: 1.0
-In-Reply-To: <53a9f893cb895f4b52e16c374cbe988607925cdf.camel@redhat.com>
+In-Reply-To: <20210622072454.3449146-1-seanjc@google.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 23/06/21 15:01, Maxim Levitsky wrote:
-> I did some homework on this now and I would like to share few my thoughts on this:
+On 22/06/21 09:24, Sean Christopherson wrote:
+> Treat a NULL shadow page in the "is a TDP MMU" check as valid, non-TDP
+> root.  KVM uses a "direct" PAE paging MMU when TDP is disabled and the
+> guest is running with paging disabled.  In that case, root_hpa points at
+> the pae_root page (of which only 32 bytes are used), not a standard
+> shadow page, and the WARN fires (a lot).
 > 
-> First of all my attention caught the way we intercept the #SMI
-> (this isn't 100% related to the bug but still worth talking about IMHO)
-> 
-> A. Bare metal: Looks like SVM allows to intercept SMI, with SVM_EXIT_SMI,
->   with an intention of then entering the BIOS SMM handler manually using the SMM_CTL msr.
+> Fixes: 0b873fd7fb53 ("KVM: x86/mmu: Remove redundant is_tdp_mmu_enabled check")
+> Cc: David Matlack <dmatlack@google.com>
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
+> ---
+>   arch/x86/kvm/mmu/tdp_mmu.h | 10 ++++++----
+>   1 file changed, 6 insertions(+), 4 deletions(-)
 
-... or just using STGI, which is what happens for KVM.  This is in the 
-manual: "The hypervisor may respond to the #VMEXIT(SMI) by executing the 
-STGI instruction, which causes the pending SMI to be taken immediately".
-
-It *should* work for KVM to just not intercept SMI, but it adds more 
-complexity for no particular gain.
-
->   On bare metal we do set the INTERCEPT_SMI but we emulate the exit as a nop.
->   I guess on bare metal there are some undocumented bits that BIOS set which
->   make the CPU to ignore that SMI intercept and still take the #SMI handler,
->   normally but I wonder if we could still break some motherboard
->   code due to that.
-> 
-> B. Nested: If #SMI is intercepted, then it causes nested VMEXIT.
->   Since KVM does enable SMI intercept, when it runs nested it means that all SMIs
->   that nested KVM gets are emulated as NOP, and L1's SMI handler is not run.
-
-No, this is incorrect.  Note that svm_check_nested_events does not clear 
-smi_pending the way vmx_check_nested_events does it for nmi_pending.  So 
-the interrupt is still there and will be injected on the next STGI.
+Queued, thanks.
 
 Paolo
 
 > 
-> About the issue that was fixed in this patch. Let me try to understand how
-> it would work on bare metal:
-> 
-> 1. A guest is entered. Host state is saved to VM_HSAVE_PA area (or stashed somewhere
->    in the CPU)
-> 
-> 2. #SMI (without intercept) happens
-> 
-> 3. CPU has to exit SVM, and start running the host SMI handler, it loads the SMM
->      state without touching the VM_HSAVE_PA runs the SMI handler, then once it RSMs,
->      it restores the guest state from SMM area and continues the guest
-> 
-> 4. Once a normal VMexit happens, the host state is restored from VM_HSAVE_PA
-> 
-> So host state indeed can't be saved to VMC01.
-> 
-> I to be honest think would prefer not to use the L1's hsave area but rather add back our
-> 'hsave' in KVM and store there the L1 host state on the nested entry always.
-> 
-> This way we will avoid touching the vmcb01 at all and both solve the issue and
-> reduce code complexity.
-> (copying of L1 host state to what basically is L1 guest state area and back
-> even has a comment to explain why it (was) possible to do so.
-> (before you discovered that this doesn't work with SMM).
-> 
-> Thanks again for fixing this bug!
-> 
-> Best regards,
-> 	Maxim Levitsky
+> diff --git a/arch/x86/kvm/mmu/tdp_mmu.h b/arch/x86/kvm/mmu/tdp_mmu.h
+> index b981a044ab55..1cae4485b3bc 100644
+> --- a/arch/x86/kvm/mmu/tdp_mmu.h
+> +++ b/arch/x86/kvm/mmu/tdp_mmu.h
+> @@ -94,11 +94,13 @@ static inline bool is_tdp_mmu(struct kvm_mmu *mmu)
+>   	if (WARN_ON(!VALID_PAGE(hpa)))
+>   		return false;
+>   
+> +	/*
+> +	 * A NULL shadow page is legal when shadowing a non-paging guest with
+> +	 * PAE paging, as the MMU will be direct with root_hpa pointing at the
+> +	 * pae_root page, not a shadow page.
+> +	 */
+>   	sp = to_shadow_page(hpa);
+> -	if (WARN_ON(!sp))
+> -		return false;
+> -
+> -	return is_tdp_mmu_page(sp) && sp->root_count;
+> +	return sp && is_tdp_mmu_page(sp) && sp->root_count;
+>   }
+>   #else
+>   static inline bool kvm_mmu_init_tdp_mmu(struct kvm *kvm) { return false; }
 > 
 
