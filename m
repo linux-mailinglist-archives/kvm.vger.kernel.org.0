@@ -2,79 +2,125 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8A74F3B164B
-	for <lists+kvm@lfdr.de>; Wed, 23 Jun 2021 10:56:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A45F03B1666
+	for <lists+kvm@lfdr.de>; Wed, 23 Jun 2021 11:03:31 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230001AbhFWI66 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 23 Jun 2021 04:58:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40442 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229952AbhFWI65 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 23 Jun 2021 04:58:57 -0400
-Received: from mail-ed1-x544.google.com (mail-ed1-x544.google.com [IPv6:2a00:1450:4864:20::544])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ABBD3C061574
-        for <kvm@vger.kernel.org>; Wed, 23 Jun 2021 01:56:40 -0700 (PDT)
-Received: by mail-ed1-x544.google.com with SMTP id r7so2336836edv.12
-        for <kvm@vger.kernel.org>; Wed, 23 Jun 2021 01:56:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:reply-to:from:date:message-id:subject:to
-         :content-transfer-encoding;
-        bh=Y3KUStx0A4jVKAR7a8xL34Lc8keAWBoUl4dKhJUYwUY=;
-        b=ZtINz4/JfzOgd8SFrsrjMzBEurNQj6nW15IOvuCu73wX/jeCqqciVevmqENg6Xb+bT
-         rkhP/JyfSvOice2FXg2npNZMHCNPffdEskiBWlBskrAf9q1ByZwe+FWqrr9kjpKWXhF9
-         +Q54LUTsXSTwAn5Xd1g0U00RnoXiKp7N8urJrLBluNs0zErvFcT0CFTo2SCfi6jEf9Hx
-         W0szdPWV7q/ISVniyNb9dqkzMkp/NoV6xOzYx18X8TV1X6rxCLok/13AFGec5IaqX4o3
-         JiTWjw1TYYnDzVxHDe7Plr5qXB5hWcV1cKed6kXEZLgczHuMGZ/W4TA7AuKlMvTBqrPO
-         jH1A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:reply-to:from:date:message-id
-         :subject:to:content-transfer-encoding;
-        bh=Y3KUStx0A4jVKAR7a8xL34Lc8keAWBoUl4dKhJUYwUY=;
-        b=fWA3CIudvQKZmlWOIW8sJk8dVSp/twyTKm5WB03aavO1i3LfLDtZz4DR3EG+jOomb2
-         IE1++I2+yhTblUZZHIsQW5rmWcXM37KE83X3Yx8bMBCdmnSYcdmZ+dLGikwqzZf4bhCu
-         S3lN8bobqrHhzkHG8S1j5APiG0jLvEClyks7fb7WgNvS6ZnSnKMBoR6JDTvnVt6qSq9G
-         YRPAvJYVOIJtKlxbbZv81eVm7Ox1A2DetZ8v9hVb/BCuGpOWdqw5W/J9BWFhEqcUyDuI
-         rTLt3MvcP0oAfkUxE3qykJwdA78BmCBs7LikUlk2tBDlhtTNESNMfB0YbsT0vfyfMZuM
-         PTjQ==
-X-Gm-Message-State: AOAM531X1QfJK9dRbp74y8C4eiebHSMPWH83v1g0fmxeKlAEtAGd9nKl
-        cEijlE4BEAcn2dt8zRuZcwVAGgGoDH50vBDNjA==
-X-Google-Smtp-Source: ABdhPJzF5kN34oeOevpV/n9foOtRuie9BTdJAOXEdTzUmJn5UZ/NHEb0NQe2OqMSCXRLzE50dWpWcg+s6NPFF4RNpi8=
-X-Received: by 2002:aa7:d7d3:: with SMTP id e19mr10560199eds.46.1624438599347;
- Wed, 23 Jun 2021 01:56:39 -0700 (PDT)
+        id S230004AbhFWJFr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 23 Jun 2021 05:05:47 -0400
+Received: from szxga03-in.huawei.com ([45.249.212.189]:8313 "EHLO
+        szxga03-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229833AbhFWJFq (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 23 Jun 2021 05:05:46 -0400
+Received: from dggemv704-chm.china.huawei.com (unknown [172.30.72.57])
+        by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4G8xyw54PYz71gv;
+        Wed, 23 Jun 2021 16:59:20 +0800 (CST)
+Received: from dggema764-chm.china.huawei.com (10.1.198.206) by
+ dggemv704-chm.china.huawei.com (10.3.19.47) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256) id
+ 15.1.2176.2; Wed, 23 Jun 2021 17:03:27 +0800
+Received: from [10.174.185.179] (10.174.185.179) by
+ dggema764-chm.china.huawei.com (10.1.198.206) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
+ 15.1.2176.2; Wed, 23 Jun 2021 17:03:26 +0800
+Subject: Re: [PATCH] KVM: selftests: Speed up set_memory_region_test
+To:     Vitaly Kuznetsov <vkuznets@redhat.com>
+CC:     <kvm@vger.kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
+        "Sean Christopherson" <seanjc@google.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        "Jim Mattson" <jmattson@google.com>,
+        kernel test robot <oliver.sang@intel.com>,
+        <linux-kernel@vger.kernel.org>, <wanghaibin.wang@huawei.com>
+References: <20210426130121.758229-1-vkuznets@redhat.com>
+From:   Zenghui Yu <yuzenghui@huawei.com>
+Message-ID: <91a2d145-fd3c-6e8d-6478-60f62dff07fe@huawei.com>
+Date:   Wed, 23 Jun 2021 17:03:25 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.9.0
 MIME-Version: 1.0
-Received: by 2002:aa7:de95:0:0:0:0:0 with HTTP; Wed, 23 Jun 2021 01:56:39
- -0700 (PDT)
-Reply-To: daveli2011@outlook.com
-From:   DAVID ELVIS <davelsms01@gmail.com>
-Date:   Wed, 23 Jun 2021 08:56:39 +0000
-Message-ID: <CAFevh3SSuRVGjZHZi2+eXbQ9x1H1QrvR_FZS_OaL9cbomA-WKw@mail.gmail.com>
-Subject: My Dear friend,
-To:     undisclosed-recipients:;
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20210426130121.758229-1-vkuznets@redhat.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.174.185.179]
+X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
+ dggema764-chm.china.huawei.com (10.1.198.206)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
---=20
-My Dear friend,
+On 2021/4/26 21:01, Vitaly Kuznetsov wrote:
+> After commit 4fc096a99e01 ("KVM: Raise the maximum number of user memslots")
+> set_memory_region_test may take too long, reports are that the default
+> timeout value we have (120s) may not be enough even on a physical host.
+> 
+> Speed things up a bit by throwing away vm_userspace_mem_region_add() usage
+> from test_add_max_memory_regions(), we don't really need to do the majority
+> of the stuff it does for the sake of this test.
+> 
+> On my AMD EPYC 7401P, # time ./set_memory_region_test
+> pre-patch:
+>  Testing KVM_RUN with zero added memory regions
+>  Allowed number of memory slots: 32764
+>  Adding slots 0..32763, each memory region with 2048K size
+>  Testing MOVE of in-use region, 10 loops
+>  Testing DELETE of in-use region, 10 loops
+> 
+>  real	0m44.917s
+>  user	0m7.416s
+>  sys	0m34.601s
+> 
+> post-patch:
+>  Testing KVM_RUN with zero added memory regions
+>  Allowed number of memory slots: 32764
+>  Adding slots 0..32763, each memory region with 2048K size
+>  Testing MOVE of in-use region, 10 loops
+>  Testing DELETE of in-use region, 10 loops
+> 
+>  real	0m20.714s
+>  user	0m0.109s
+>  sys	0m18.359s
+> 
+> Reported-by: kernel test robot <oliver.sang@intel.com>
+> Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
 
-I am David ELVIS, the only Son of late Mr. John ELVIS. I need your
-help to retrived a fund deposit made by my late Father with a bank
-here and to transfer the fund my father left for me in the bank before
-he died into your bank account.
+I've seen the failure on my arm64 server, # ./set_memory_region_test
 
-I want to invest the fund in your country and continue my studies. The
-fund is ($ 4.5 million) I will compensate you with 25% of the total
-money for your help. I assure you in the name of the almighty God and
-I will tell you more Once you get back to me and also send you the
-documents of the fund deposit. I am awaiting your reply in my private
-email address for more d=C3=A9tails ( daveli2011@outlook.com )
+Allowed number of memory slots: 32767
+Adding slots 0..32766, each memory region with 2048K size
+==== Test Assertion Failure ====
+   set_memory_region_test.c:391: ret == 0
+   pid=42696 tid=42696 errno=22 - Invalid argument
+      1	0x00000000004015a7: test_add_max_memory_regions at 
+set_memory_region_test.c:389
+      2	 (inlined by) main at set_memory_region_test.c:426
+      3	0x0000ffffb7c63bdf: ?? ??:0
+      4	0x00000000004016db: _start at :?
+   KVM_SET_USER_MEMORY_REGION IOCTL failed,
+   rc: -1 errno: 22 slot: 2624
 
-Thanks and God bless you.
+> +	mem = mmap(NULL, MEM_REGION_SIZE * max_mem_slots + alignment,
 
-Yours Sincerely
+The problem is that max_mem_slots is declared as uint32_t, the result
+of (MEM_REGION_SIZE * max_mem_slots) is unexpectedly truncated to be
+0xffe00000.
 
-David ELVIS,
+> +		   PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
+> +	TEST_ASSERT(mem != MAP_FAILED, "Failed to mmap() host");
+> +	mem_aligned = (void *)(((size_t) mem + alignment - 1) & ~(alignment - 1));
+> +
+>  	for (slot = 0; slot < max_mem_slots; slot++) {
+> -		vm_userspace_mem_region_add(vm, VM_MEM_SRC_ANONYMOUS,
+> -					    guest_addr, slot, mem_reg_npages,
+> -					    0);
+> -		guest_addr += MEM_REGION_SIZE;
+> +		ret = test_memory_region_add(vm, mem_aligned +
+> +					     ((uint64_t)slot * MEM_REGION_SIZE),
+
+These unmapped VAs got caught by access_ok() checker in
+__kvm_set_memory_region() as they happen to go beyond the task's
+address space on arm64. Casting max_mem_slots to size_t in both
+mmap() and munmap() fixes the issue for me.
+
+Thanks,
+Zenghui
