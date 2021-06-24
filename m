@@ -2,56 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C04403B2BAC
-	for <lists+kvm@lfdr.de>; Thu, 24 Jun 2021 11:42:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5552D3B2BB2
+	for <lists+kvm@lfdr.de>; Thu, 24 Jun 2021 11:43:40 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232024AbhFXJpE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 24 Jun 2021 05:45:04 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:37305 "EHLO
+        id S232041AbhFXJp5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 24 Jun 2021 05:45:57 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:30783 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231991AbhFXJo7 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 24 Jun 2021 05:44:59 -0400
+        by vger.kernel.org with ESMTP id S232003AbhFXJp4 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 24 Jun 2021 05:45:56 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1624527759;
+        s=mimecast20190719; t=1624527817;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=jyD4vH5kMZavgg+0al23ybbW1mNcrfB3c+Wxr6kYX38=;
-        b=Dg09Q1JBF1FT2yGNlpUzg5ZmMVjnOBAvUUr/3l3rEgNzCEWl6NxXAbpZOaTky7eftJRdKJ
-        oLpHNwtWiHd3s5w1WybrIvw/U5xAXkcr7IYk7Yf6x3VaO8BxsZglrteqpEmK2bmTaeJjz8
-        YWZIaYY8hOjiyj/sr/s0Lnv4p8Zlgy0=
-Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
- [209.85.208.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-278-yPgZ38j0MnmhUpr0AiEOVA-1; Thu, 24 Jun 2021 05:42:38 -0400
-X-MC-Unique: yPgZ38j0MnmhUpr0AiEOVA-1
-Received: by mail-ed1-f70.google.com with SMTP id ee28-20020a056402291cb0290394a9a0bfaeso3033714edb.6
-        for <kvm@vger.kernel.org>; Thu, 24 Jun 2021 02:42:37 -0700 (PDT)
+        bh=qkxHw284a/HcUQKczqJcr3hZxs0a/eNZzaMIqcieCR4=;
+        b=N2dmpoXd8h1tJ/1jVQ8EadWoXvdJ00hsKd76ingRURI7ArP7YM3OVAqgd5iCcGtLbxK3C7
+        J0rwSiQGm1W62yubsHJcsSZWAiwG+R6YTX3bMtLXDw+7oAc+B11Z/3FqYtBXdPD45Pcc9x
+        UB6haCnVbw5AnTQduuhTYeNyrGJRGKk=
+Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
+ [209.85.208.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-63-7enqFs0UMDuHnp73X09IRw-1; Thu, 24 Jun 2021 05:43:36 -0400
+X-MC-Unique: 7enqFs0UMDuHnp73X09IRw-1
+Received: by mail-ed1-f72.google.com with SMTP id g13-20020a056402090db02903935a4cb74fso3050241edz.1
+        for <kvm@vger.kernel.org>; Thu, 24 Jun 2021 02:43:36 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=jyD4vH5kMZavgg+0al23ybbW1mNcrfB3c+Wxr6kYX38=;
-        b=q95WvIjYRqCh6p1m+OHgzy+aObXd6/Yv31FRyrmIRD4AK5aCEtywEnoVDFHyLPTE6E
-         STkXFmF0TC6akrXls1sJ/oLWLZlVpWFtXwbdGuUF5g2xm+erqiO+HBsgE7MLWoeE0uLN
-         YqvBLoacMMal6JY2BFVUyvgQlhMgcqP8pAuvEe7jndfXindY3qT5gvw6Z4wWpJZK0/zi
-         qbFcIdGryupb6kQceiXYJT5/nMF9FmB5K9UVZ5Cq8/9q9QGfM30kEb/udtRSOItpC3ab
-         snxNpoDx3IRXtHyv9Kq/3TRghTRXNm5Q3EZtffV+dcxPVn709Jukha8AFt3sUQOk5N3a
-         weeg==
-X-Gm-Message-State: AOAM532IEP0PKbBJq4hjt4B9yaJTk8i8rg+qaJBm7JsueSOyxQmXcEA7
-        ogCBYHYR9Yf73akkRBVCvpk6NggjBNMfIHoci/sB6vNWDddpKA8le2Z1bIo6Zc77MfMTEz9KACC
-        tBk8Z7iwgMFcu
-X-Received: by 2002:a05:6402:54c:: with SMTP id i12mr5909977edx.64.1624527756950;
-        Thu, 24 Jun 2021 02:42:36 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzUADYaxbQu5a0ZM6V5UX0tysDgP0Lb+XMxpzsUfVTNQ4yl7MEG7UQrmtC4bLiXvUVljS3Ohw==
-X-Received: by 2002:a05:6402:54c:: with SMTP id i12mr5909945edx.64.1624527756727;
-        Thu, 24 Jun 2021 02:42:36 -0700 (PDT)
+        bh=qkxHw284a/HcUQKczqJcr3hZxs0a/eNZzaMIqcieCR4=;
+        b=huMFhdruAjdhTShfx+cL/U8mIzgCzi8wfDDOFTSDPkeRRTlLUgP8bzUB12j2vq+J7/
+         Czn4C/KFb+j8eOuzsI0cBs2yJ4Zwf+Cc0+RFc+c1EapFvwreiUb0yRWvcDs7Z//pRy4k
+         w5CGez5DTYiJ4zfM4yD/+I3uu0uYtUQgmR+kUbtZ+PpTJLM3kmmrks1FhyYtxg2hSNdT
+         ++lkmwwx/3APCE4qXHynHEAqJzZA2Q4nbcHJ2qs/v4w2U+Zrn5bvPT8t0VC4dlxws4mk
+         eQK0z8sTr0mmrBVOqWTeH9MPtJ8SdPu7aq1u1WSeSinBYOw/Udc7p0O/7TnRWZNCY6Q1
+         D/Ig==
+X-Gm-Message-State: AOAM533kEtStbVc7CcnVzNSnGp9sCO6N0hQeQkLmh+ZpjTENQK6SVhpU
+        1LPBSr75FcoiTH2vaiW6hypiEP8H5Xefq0Bd70Jwog9MsbXrDa+UrTv4s+/lmpARaAaKSRJLOO8
+        z60D1qbyPmPmu
+X-Received: by 2002:a05:6402:944:: with SMTP id h4mr5798145edz.76.1624527815210;
+        Thu, 24 Jun 2021 02:43:35 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwD6cFFU4Uspcy5dTYBfn7A0VR+4loxnlaoo/QjHY9IN1nmjQ4mSQ+4egclMkG5+RC1oGdqOg==
+X-Received: by 2002:a05:6402:944:: with SMTP id h4mr5798117edz.76.1624527814999;
+        Thu, 24 Jun 2021 02:43:34 -0700 (PDT)
 Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id jz27sm944475ejc.33.2021.06.24.02.42.34
+        by smtp.gmail.com with ESMTPSA id t17sm1544705edv.75.2021.06.24.02.43.32
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 24 Jun 2021 02:42:35 -0700 (PDT)
-Subject: Re: [PATCH 2/6] KVM: mmu: also return page from gfn_to_pfn
+        Thu, 24 Jun 2021 02:43:34 -0700 (PDT)
+Subject: Re: [PATCH 1/6] KVM: x86/mmu: release audited pfns
 To:     Nicholas Piggin <npiggin@gmail.com>,
         Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
         Huacai Chen <chenhuacai@kernel.org>,
@@ -75,15 +75,15 @@ Cc:     Alexandru Elisei <alexandru.elisei@arm.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Will Deacon <will@kernel.org>
 References: <20210624035749.4054934-1-stevensd@google.com>
- <20210624035749.4054934-3-stevensd@google.com>
- <1624524331.zsin3qejl9.astroid@bobo.none>
+ <20210624035749.4054934-2-stevensd@google.com>
+ <1624524156.04etgk7zmz.astroid@bobo.none>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <201b68a7-10ea-d656-0c1e-5511b1f22674@redhat.com>
-Date:   Thu, 24 Jun 2021 11:42:33 +0200
+Message-ID: <4816287a-b9a9-d3f4-f844-06922d696e06@redhat.com>
+Date:   Thu, 24 Jun 2021 11:43:32 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.10.1
 MIME-Version: 1.0
-In-Reply-To: <1624524331.zsin3qejl9.astroid@bobo.none>
+In-Reply-To: <1624524156.04etgk7zmz.astroid@bobo.none>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -91,19 +91,43 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 24/06/21 10:52, Nicholas Piggin wrote:
->> For now, wrap all calls to gfn_to_pfn functions in the new helper
->> function. Callers which don't need the page struct will be updated in
->> follow-up patches.
-> Hmm. You mean callers that do need the page will be updated? Normally
-> if there will be leftover users that don't need the struct page then
-> you would go the other way and keep the old call the same, and add a new
-> one (gfn_to_pfn_page) just for those that need it.
+On 24/06/21 10:43, Nicholas Piggin wrote:
+> Excerpts from David Stevens's message of June 24, 2021 1:57 pm:
+>> From: David Stevens <stevensd@chromium.org>
+> 
+> Changelog? This looks like a bug, should it have a Fixes: tag?
 
-Needing kvm_pfn_page_unwrap is a sign that something might be buggy, so 
-it's a good idea to move the short name to the common case and the ugly 
-kvm_pfn_page_unwrap(gfn_to_pfn(...)) for the weird one.  In fact I'm not 
-sure there should be any kvm_pfn_page_unwrap in the end.
+Probably has been there forever... The best way to fix the bug would be 
+to nuke mmu_audit.c, which I've threatened to do many times but never 
+followed up on.
 
 Paolo
+
+> Thanks,
+> Nick
+> 
+>>
+>> Signed-off-by: David Stevens <stevensd@chromium.org>
+>> ---
+>>   arch/x86/kvm/mmu/mmu_audit.c | 2 ++
+>>   1 file changed, 2 insertions(+)
+>>
+>> diff --git a/arch/x86/kvm/mmu/mmu_audit.c b/arch/x86/kvm/mmu/mmu_audit.c
+>> index cedc17b2f60e..97ff184084b4 100644
+>> --- a/arch/x86/kvm/mmu/mmu_audit.c
+>> +++ b/arch/x86/kvm/mmu/mmu_audit.c
+>> @@ -121,6 +121,8 @@ static void audit_mappings(struct kvm_vcpu *vcpu, u64 *sptep, int level)
+>>   		audit_printk(vcpu->kvm, "levels %d pfn %llx hpa %llx "
+>>   			     "ent %llxn", vcpu->arch.mmu->root_level, pfn,
+>>   			     hpa, *sptep);
+>> +
+>> +	kvm_release_pfn_clean(pfn);
+>>   }
+>>   
+>>   static void inspect_spte_has_rmap(struct kvm *kvm, u64 *sptep)
+>> -- 
+>> 2.32.0.93.g670b81a890-goog
+>>
+>>
+> 
 
