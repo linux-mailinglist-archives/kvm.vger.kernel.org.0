@@ -2,140 +2,171 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 884DC3B2ED9
-	for <lists+kvm@lfdr.de>; Thu, 24 Jun 2021 14:22:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 01CBF3B2F17
+	for <lists+kvm@lfdr.de>; Thu, 24 Jun 2021 14:36:23 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231292AbhFXMYw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 24 Jun 2021 08:24:52 -0400
-Received: from mga11.intel.com ([192.55.52.93]:41405 "EHLO mga11.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229573AbhFXMYv (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 24 Jun 2021 08:24:51 -0400
-IronPort-SDR: MLuoo6qtTpJWerVSRRDnjVSe9fry8hx4W29I3IzSOKVrE+09o6NjUADfcfKQFH2jd1Afn28fgA
- R5BGeRmvUPbg==
-X-IronPort-AV: E=McAfee;i="6200,9189,10024"; a="204450313"
-X-IronPort-AV: E=Sophos;i="5.83,296,1616482800"; 
-   d="scan'208";a="204450313"
-Received: from orsmga001.jf.intel.com ([10.7.209.18])
-  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Jun 2021 05:22:24 -0700
-IronPort-SDR: q7SXO0zUj+MLdVTAzPX5Ffcx7ypQVhI54W2wkx/ktyNNnEWHQjIqGctUmmQL2fRKVQbSq4Cdee
- JUv8iZfyRIhQ==
-X-IronPort-AV: E=Sophos;i="5.83,296,1616482800"; 
-   d="scan'208";a="487737745"
-Received: from blu2-mobl3.ccr.corp.intel.com (HELO [10.254.211.177]) ([10.254.211.177])
-  by orsmga001-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Jun 2021 05:22:18 -0700
-Cc:     baolu.lu@linux.intel.com, Jason Gunthorpe <jgg@nvidia.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Jean-Philippe Brucker <jean-philippe@linaro.org>,
-        Jason Wang <jasowang@redhat.com>,
-        "parav@mellanox.com" <parav@mellanox.com>,
-        "Enrico Weigelt, metux IT consult" <lkml@metux.net>,
+        id S231453AbhFXMhz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 24 Jun 2021 08:37:55 -0400
+Received: from mail-bn1nam07on2085.outbound.protection.outlook.com ([40.107.212.85]:7394
+        "EHLO NAM02-BN1-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S230136AbhFXMhv (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 24 Jun 2021 08:37:51 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=k4GdFBhMWpbQXamQBzSrmPKUB9cnHrvYdifioGFhRUMOVyseukFzIb4Pibp/QB/ly0OlKpMH6GZAsVdhOC5ZwTpVIXokNV0Ejm6egVKGkiQUvfLcmCiwFB3qKli9ykoF/AogMlWhS+byPm6gREbBP+n5+gkIvZIH2tX6+nrjp3jfwVLO4kRYLbQ6tmL6+Q5IIri0q6dUPlIMIuTUhC+jyRpgKTLA+Exr7DUDD1gu9KOEGGy/Gy8s4Rj/Z5Qypxc/f/Gs1XJ4ZdGHTmIDv7D/iLA3WsDM7668O1hrzk9cHVr+H7xwwKpF1GTmpWL7hfLgFHRhVEu5PRYDUIqm/r5y8A==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=QnZ9X3iL/DjP2dADOISDKhE/sVoXiojEnP7BkOTOZCg=;
+ b=IIC32QrcsEQD+OltUlFPZ9oe5zB9JlcrZKKkEVz+tETcdU2daq8h2Z2ZJB5UV1yCLfLz0dnEj7xGw3Xjo9o+g6xnXgicIrrNOWSIiLDTXQy61tlV2LIi6jRxOu05mP+JW8uf5n4QTWszhA5JUwBQ01maN2ILcp8O9LcIhjqO/7IX0KmJrMiQYg/k5vOe0I1RbmpB8ijBfSYOStvVmT2LCtW/976jn+ecugnjX4khX6pNx2nKub9ezjkcjprTGj3ZeLub7P8L9hnmafhKYWHxqUbq4aUnAAbKkqDAx1YRpsB0vd9m61HfcL7Tf6+q8ErhR/c9sAHmSKdJNG0IOf7wcA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=QnZ9X3iL/DjP2dADOISDKhE/sVoXiojEnP7BkOTOZCg=;
+ b=2OXO9XzJRJU7xIgiyPIGFawwOlTQu5a9iMhT8Ja7NYoWcqJ/kKc0gHBpabTnX3oCXNRt+S3DUNwHZ5l9/yWJf+WO+r9aexieyDcKp5sxF70tPvqv+1hRKKNjXg5khSLo/p4YtmfS2AAWHmjxKhNpngmUgIfWTjkL27YB1mvimVo=
+Authentication-Results: alien8.de; dkim=none (message not signed)
+ header.d=none;alien8.de; dmarc=none action=none header.from=amd.com;
+Received: from CH2PR12MB4133.namprd12.prod.outlook.com (2603:10b6:610:7a::13)
+ by CH2PR12MB3845.namprd12.prod.outlook.com (2603:10b6:610:29::27) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4264.18; Thu, 24 Jun
+ 2021 12:35:29 +0000
+Received: from CH2PR12MB4133.namprd12.prod.outlook.com
+ ([fe80::181:e51d:a4f7:af62]) by CH2PR12MB4133.namprd12.prod.outlook.com
+ ([fe80::181:e51d:a4f7:af62%5]) with mapi id 15.20.4264.020; Thu, 24 Jun 2021
+ 12:35:29 +0000
+Date:   Thu, 24 Jun 2021 07:26:55 -0500
+From:   Michael Roth <michael.roth@amd.com>
+To:     Borislav Petkov <bp@alien8.de>
+Cc:     "Kuppuswamy, Sathyanarayanan" 
+        <sathyanarayanan.kuppuswamy@linux.intel.com>,
+        Dave Hansen <dave.hansen@intel.com>,
+        Brijesh Singh <brijesh.singh@amd.com>, x86@kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
+        linux-coco@lists.linux.dev, linux-mm@kvack.org,
+        linux-crypto@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        Shenming Lu <lushenming@huawei.com>,
-        Eric Auger <eric.auger@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        "Raj, Ashok" <ashok.raj@intel.com>,
-        "Liu, Yi L" <yi.l.liu@intel.com>, "Wu, Hao" <hao.wu@intel.com>,
-        "Jiang, Dave" <dave.jiang@intel.com>,
-        Jacob Pan <jacob.jun.pan@linux.intel.com>,
-        Kirti Wankhede <kwankhede@nvidia.com>,
-        Robin Murphy <robin.murphy@arm.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
-        David Woodhouse <dwmw2@infradead.org>,
-        LKML <linux-kernel@vger.kernel.org>
-To:     David Gibson <david@gibson.dropbear.id.au>,
-        "Tian, Kevin" <kevin.tian@intel.com>
-References: <20210614140711.GI1002214@nvidia.com>
- <20210614102814.43ada8df.alex.williamson@redhat.com>
- <MWHPR11MB1886239C82D6B66A732830B88C309@MWHPR11MB1886.namprd11.prod.outlook.com>
- <20210615101215.4ba67c86.alex.williamson@redhat.com>
- <MWHPR11MB188692A6182B1292FADB3BDB8C0F9@MWHPR11MB1886.namprd11.prod.outlook.com>
- <20210616133937.59050e1a.alex.williamson@redhat.com>
- <MWHPR11MB18865DF9C50F295820D038798C0E9@MWHPR11MB1886.namprd11.prod.outlook.com>
- <20210617151452.08beadae.alex.williamson@redhat.com>
- <20210618001956.GA1987166@nvidia.com>
- <MWHPR11MB1886A17124605251DF394E888C0D9@MWHPR11MB1886.namprd11.prod.outlook.com>
- <YNQJY2Ji+KOBYWbt@yekko>
-From:   Lu Baolu <baolu.lu@linux.intel.com>
-Subject: Re: Plan for /dev/ioasid RFC v2
-Message-ID: <8e55d3c2-82ac-9be6-5c15-181b459c7893@linux.intel.com>
-Date:   Thu, 24 Jun 2021 20:22:16 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.11.0
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        David Rientjes <rientjes@google.com>, tony.luck@intel.com,
+        npmccallum@redhat.com
+Subject: Re: [PATCH Part1 RFC v3 20/22] x86/boot: Add Confidential Computing
+ address to setup_header
+Message-ID: <20210624122655.cx3rugg5uvbeib5r@amd.com>
+References: <20210602140416.23573-1-brijesh.singh@amd.com>
+ <20210602140416.23573-21-brijesh.singh@amd.com>
+ <YMw4UZn6AujpPSZO@zn.tnic>
+ <15568c80-c9a9-5602-d940-264af87bed98@amd.com>
+ <YMy2OGwsRzrR5bwD@zn.tnic>
+ <162442264313.98837.16983159316116149849@amd.com>
+ <YNMLX6fbB3PQwSpv@zn.tnic>
+ <20210624031911.eznpkbgjt4e445xj@amd.com>
+ <YNQz7ZxEaSWjcjO2@zn.tnic>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <YNQz7ZxEaSWjcjO2@zn.tnic>
+X-Originating-IP: [165.204.77.11]
+X-ClientProxiedBy: SA9PR13CA0002.namprd13.prod.outlook.com
+ (2603:10b6:806:21::7) To CH2PR12MB4133.namprd12.prod.outlook.com
+ (2603:10b6:610:7a::13)
 MIME-Version: 1.0
-In-Reply-To: <YNQJY2Ji+KOBYWbt@yekko>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from localhost (165.204.77.11) by SA9PR13CA0002.namprd13.prod.outlook.com (2603:10b6:806:21::7) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4264.9 via Frontend Transport; Thu, 24 Jun 2021 12:35:28 +0000
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 2cda64e2-6ed0-4689-b063-08d9370c8c70
+X-MS-TrafficTypeDiagnostic: CH2PR12MB3845:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <CH2PR12MB3845329D2C36529A0A0139BA95079@CH2PR12MB3845.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:8882;
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: m1bEmPTkwt8xwZsn9aB2Q/AaDswaNj024GBjpOSc3g9AHGBCiO/hkFICiPALL/9ozFe/G6SgKfRGkFiBV5MS4r4tp5XBRZQbiEpwDEkFC56tC3S1644dGo6TTvN5te7kyYzupS+eCJfhFrEIZnE4rxgWtUBgwOOkOM7lglXTado6BE43P+JVNv1Vqx6jAzmw7wXlT2OVYVCkAF6Ha2HDhcTPNNnkqMcqXKBlPA+f75PSc0d2+NNnfBoU58hyiNdE/T32jT8OuM56CoeH+2XS8sEpuLeZCfrOr9tgNQeWLKLZqVm2h3ezAjjT+wMAlGJCs0pq9dsvrjxTligl4gJYc+8qplb2ROfRpLVuYd1YnXh6KVIMF6YXNf1NY3XJ4e2LJsRm1vuuXJNMbSClJSJ2S4zBPckL/go1O7Vxs8sW8YZwNdTNdEVR5PSxAkA5kOdoFJS7OlIyH8DbgZ5GmExw4OCVgNjXIi8g/bNg2t9HpyQCfwIHY4MxiGY10X/48ibrvQjYrBAn28vLrwQ/70f/WT0uwFNubRXpbExCeN5t8WiDhpUpRFx1lw3rTxYchl8aq5k4BJn1jA+bDxAjFLr56St5bhT/PRAmnfHnIybRs52230LIxKCWgAc8lz8oHyjiqLP+YfGSrLealUU/LKlgC+J83e0VMa/NOLeCzPFuV4sMfRkvxV9bXTJ8vLCCoI+gnbW2bFhqd/QqJ3vv/kyugkZ9aCHsquhXwD6HHsl7+59lpLp6mzwqVKR3B5vsa303VDWtBi1+j4pC21WZwpfSfO1vVbARGnB9bwUGpYD9kMA0QPGvkddPsMO+DYKZENM5hx4XNeTwdCTfdG4/g36LIQ==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH2PR12MB4133.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(376002)(39850400004)(346002)(136003)(396003)(2616005)(956004)(5660300002)(52116002)(44832011)(316002)(6916009)(6666004)(36756003)(4326008)(6496006)(38100700002)(8676002)(66556008)(66946007)(2906002)(38350700002)(8936002)(66476007)(1076003)(45080400002)(966005)(7416002)(16526019)(186003)(26005)(6486002)(86362001)(54906003)(478600001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?IeLbMV8qmhnjtsOJgWF0rjW63fc9Fm1r3uPTZ5sPGhEODGhn0roJGy6RSVoR?=
+ =?us-ascii?Q?yN9RO02GvlJbYpbjEEafO9cnoyzdnbiru27K9UwOGIHNIJkTDPULo9+36fwL?=
+ =?us-ascii?Q?WumLUNG/i5SLYI3XSiw494uvemxvZzfRi61QLNRRmgQRtfODtQFzmZl4gc8W?=
+ =?us-ascii?Q?a4r3LvqxaHPHKtkTCaqJhupt+t97/VwoFF0jHl9FODNGu3kpsoSjX/R6l5j7?=
+ =?us-ascii?Q?lj/ngrDFo2O8cXw86s55tOYQXWeyLltYkvcErzeHXgoH0ErpxF+LhmaUmsex?=
+ =?us-ascii?Q?zM5l0R9/SO29pyFl/1FfukrO8HVkZcNCIzzp+TAzJ/+7msF61G3dpVrV4DyK?=
+ =?us-ascii?Q?hwFHmigBOerxPv0lRZf9o0hKYOk7q1R0AJlWQaWnCRXR0GE7b8hERrljWRVT?=
+ =?us-ascii?Q?3en+rgFvwtWm/N0zHbHFHZ5AHRmwjxABqOMVKRxdntdbhwXVQmFty/U4urPh?=
+ =?us-ascii?Q?gVwhPAZHZQplz4bZyt+cgDhqPMUIl8xV82hcvG3/LjKMXyH4AF7u9LafR3mh?=
+ =?us-ascii?Q?INB5UCDJfKRiTtcp/sRWpLE5VmuYE/xQc2ItrZ3t/6kSJOk8KtGUz4J4vft6?=
+ =?us-ascii?Q?Wt+qgoW0Dg8koZO1O0jP2ZIFLLDWi5oWjyiE7OKL6y0BeAuxPOZE6/Dt/p2J?=
+ =?us-ascii?Q?ackcMbgv0wi4/F2k1jHypXhRT/l91287zJL4uw9pN++gbLoT/V1gu6/W6krR?=
+ =?us-ascii?Q?k6sy+JH7K7Xu0n9LMUWCECR8D17dFty3jBBmed8GD5lfkLgC98HWs59yIexV?=
+ =?us-ascii?Q?gjotA0ErgaLTMY7o9OkqCkXmXXNjUwBKcNgQgVsXJF7YZ+76a97kcAekmR5d?=
+ =?us-ascii?Q?Z5fiv5hy71jX9emr5kK2K0q54bjyRtZq/ZNDeJEQhJkRwOeTultWaeEL7+Vo?=
+ =?us-ascii?Q?VBoCwWx59HMYFYKE38ReD+OEGJQuBL3tFK0z0L1HOai68DgYUz6YpLIv4Xta?=
+ =?us-ascii?Q?DOC36/sokJR5G4wesx5RBRmSJn74MQOipbYH/gekQMEX6P+R3Nf9Whs0IdRL?=
+ =?us-ascii?Q?B/Vc2WuuMLFgrZ9WWSlqPK6i4akqgycpHXuV/qhrQm8/XCSiphVY275uH+Nw?=
+ =?us-ascii?Q?m4K8zYU3eX5rtz+aLzER4CV2fG/SB1d8+PI+PxBq2KHJuz0vHVlFnQjXkVHj?=
+ =?us-ascii?Q?PWBcl/3x17SscarQragkiQDWfn3SGjiPTQfew31rV3hnFtykSeH+7llU7drl?=
+ =?us-ascii?Q?P1K4VyLCw/3rYUvirYLq37XuUvxU2WqgFCSXkRX+psURF7E/QcWv2izIOmPY?=
+ =?us-ascii?Q?oC2dLxxFBc1dydgYO4ah1djwRQnX9b5uljM0jR+69ZSe0W42a2OXesgQRaUU?=
+ =?us-ascii?Q?z8qMInQ6IcrFdQhM7EQFAoEt?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 2cda64e2-6ed0-4689-b063-08d9370c8c70
+X-MS-Exchange-CrossTenant-AuthSource: CH2PR12MB4133.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Jun 2021 12:35:28.8421
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: /5NO41dGR6e3vaCXphAwdSAD4yfIXiDh5WopJG+hyHVS+ReSvRpZiCt8qH4kRLosrHPDKp83h7B2wiLEf/CmAw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH2PR12MB3845
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2021/6/24 12:26, David Gibson wrote:
-> On Fri, Jun 18, 2021 at 04:57:40PM +0000, Tian, Kevin wrote:
->>> From: Jason Gunthorpe <jgg@nvidia.com>
->>> Sent: Friday, June 18, 2021 8:20 AM
->>>
->>> On Thu, Jun 17, 2021 at 03:14:52PM -0600, Alex Williamson wrote:
->>>
->>>> I've referred to this as a limitation of type1, that we can't put
->>>> devices within the same group into different address spaces, such as
->>>> behind separate vRoot-Ports in a vIOMMU config, but really, who cares?
->>>> As isolation support improves we see fewer multi-device groups, this
->>>> scenario becomes the exception.  Buy better hardware to use the devices
->>>> independently.
->>>
->>> This is basically my thinking too, but my conclusion is that we should
->>> not continue to make groups central to the API.
->>>
->>> As I've explained to David this is actually causing functional
->>> problems and mess - and I don't see a clean way to keep groups central
->>> but still have the device in control of what is happening. We need
->>> this device <-> iommu connection to be direct to robustly model all
->>> the things that are in the RFC.
->>>
->>> To keep groups central someone needs to sketch out how to solve
->>> today's mdev SW page table and mdev PASID issues in a clean
->>> way. Device centric is my suggestion on how to make it clean, but I
->>> haven't heard an alternative??
->>>
->>> So, I view the purpose of this discussion to scope out what a
->>> device-centric world looks like and then if we can securely fit in the
->>> legacy non-isolated world on top of that clean future oriented
->>> API. Then decide if it is work worth doing or not.
->>>
->>> To my mind it looks like it is not so bad, granted not every detail is
->>> clear, and no code has be sketched, but I don't see a big scary
->>> blocker emerging. An extra ioctl or two, some special logic that
->>> activates for >1 device groups that looks a lot like VFIO's current
->>> logic..
->>>
->>> At some level I would be perfectly fine if we made the group FD part
->>> of the API for >1 device groups - except that complexifies every user
->>> space implementation to deal with that. It doesn't feel like a good
->>> trade off.
->>>
->>
->> Would it be an acceptable tradeoff by leaving >1 device groups
->> supported only via legacy VFIO (which is anyway kept for backward
->> compatibility), if we think such scenario is being deprecated over
->> time (thus little value to add new features on it)? Then all new
->> sub-systems including vdpa and new vfio only support singleton
->> device group via /dev/iommu...
+On Thu, Jun 24, 2021 at 09:27:41AM +0200, Borislav Petkov wrote:
+> On Wed, Jun 23, 2021 at 10:19:11PM -0500, Michael Roth wrote:
+> > One downside to this is we still need something in the boot protocol,
+> > either via setup_data, or setup_header directly.
 > 
-> The case that worries me here is if you *thought* you had 1 device
-> groups, but then discover a hardware bug which means two things aren't
-> as isolated as you thought they were.  What do you do then?
+> Huh, now I'm confused. You gave the acpi_rsdp_addr example and I thought
+> that should be enough, that's why I suggested boot_params.
+
+Well, that's enough for the boot/compressed->uncompressed parameter
+passing, but would a bootloader be allowed to use that same approach to
+pass in the CC blob (for things like non-EFI/containers)? I was under the
+impression that for that case we'd still want something in
+setup_header/setup_data for bootloaders to use, and that using boot_params
+directly is more of a legacy/ad-hoc thing. Is that accurate?
+
 > 
+> Maybe you should point me to the code which does what you need so that I
+> can get a better idea...
+> 
+> > Having it in setup_header avoids the need to also have to add a field
+> > to boot_params for the boot/compressed->uncompressed passing, but
+> > maybe that's not a good enough justification. Perhaps if the TDX folks
+> > have similar needs though.
+> 
+> Yes, reportedly they do so I guess the solution should be
+> vendor-agnostic. Let's see what they need first.
 
-Normally a hardware bug/quirk is identified during boot. For above case,
-iommu core should put these two devices in a same iommu_group during
-iommu_probe_device() phase. Any runtime hardware bug should be reported
-to the OS through various methods so that the device could be quiet
-and isolated. I don't think two devices could be in different groups
-initially and then be moved to a single one.
+Ok, good to know.
 
-Best regards,
-baolu
+> 
+> Thx.
+> 
+> -- 
+> Regards/Gruss,
+>     Boris.
+> 
+> https://nam11.safelinks.protection.outlook.com/?url=https%3A%2F%2Fpeople.kernel.org%2Ftglx%2Fnotes-about-netiquette&amp;data=04%7C01%7Cmichael.roth%40amd.com%7C876d84222a2d4c2fc14008d936e19194%7C3dd8961fe4884e608e11a82d994e183d%7C0%7C0%7C637601164763100440%7CUnknown%7CTWFpbGZsb3d8eyJWIjoiMC4wLjAwMDAiLCJQIjoiV2luMzIiLCJBTiI6Ik1haWwiLCJXVCI6Mn0%3D%7C1000&amp;sdata=XIsAM9LxAOr7LlsJBkT33OuxywezofF%2Bq7%2FEqxpJOVk%3D&amp;reserved=0
