@@ -2,185 +2,286 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D23E73B268E
-	for <lists+kvm@lfdr.de>; Thu, 24 Jun 2021 06:53:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 535D33B269A
+	for <lists+kvm@lfdr.de>; Thu, 24 Jun 2021 06:53:44 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230342AbhFXEy7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 24 Jun 2021 00:54:59 -0400
-Received: from bilbo.ozlabs.org ([203.11.71.1]:35245 "EHLO ozlabs.org"
+        id S231248AbhFXE4B (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 24 Jun 2021 00:56:01 -0400
+Received: from mga17.intel.com ([192.55.52.151]:43409 "EHLO mga17.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S230121AbhFXEyv (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 24 Jun 2021 00:54:51 -0400
-Received: by ozlabs.org (Postfix, from userid 1007)
-        id 4G9SRT5RZJz9t1s; Thu, 24 Jun 2021 14:52:21 +1000 (AEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-        d=gibson.dropbear.id.au; s=201602; t=1624510341;
-        bh=CUOvolS00mt6fsyyOcaBeHpDD1l35MwCPi+iWoJuI20=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=e+t14wM8FUhdgZVe3bPvZMI676YD8wnW8ic6Am/0whGW4VYhlxJ2x750ZLghvljKa
-         pYU9Vmqh+k0qSi+vs9n+kCUu6e4pjtqwaMMUw1A0otHxPj0N10CtjgTB4tg+0kutjy
-         TWZMThky96oa00b4SxnlTGrcqPApbZCJf2wwIb5E=
-Date:   Thu, 24 Jun 2021 14:50:45 +1000
-From:   David Gibson <david@gibson.dropbear.id.au>
-To:     "Tian, Kevin" <kevin.tian@intel.com>
-Cc:     Jason Gunthorpe <jgg@nvidia.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Jean-Philippe Brucker <jean-philippe@linaro.org>,
-        Jason Wang <jasowang@redhat.com>,
-        "parav@mellanox.com" <parav@mellanox.com>,
-        "Enrico Weigelt, metux IT consult" <lkml@metux.net>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Shenming Lu <lushenming@huawei.com>,
-        Eric Auger <eric.auger@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        "Raj, Ashok" <ashok.raj@intel.com>,
-        "Liu, Yi L" <yi.l.liu@intel.com>, "Wu, Hao" <hao.wu@intel.com>,
-        "Jiang, Dave" <dave.jiang@intel.com>,
-        Jacob Pan <jacob.jun.pan@linux.intel.com>,
-        Kirti Wankhede <kwankhede@nvidia.com>,
-        Robin Murphy <robin.murphy@arm.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
-        David Woodhouse <dwmw2@infradead.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Lu Baolu <baolu.lu@linux.intel.com>
-Subject: Re: Plan for /dev/ioasid RFC v2
-Message-ID: <YNQPJfNixs23RaJm@yekko>
-References: <YMDjfmJKUDSrbZbo@8bytes.org>
- <20210609101532.452851eb.alex.williamson@redhat.com>
- <20210609102722.5abf62e1.alex.williamson@redhat.com>
- <20210609184940.GH1002214@nvidia.com>
- <20210610093842.6b9a4e5b.alex.williamson@redhat.com>
- <BN6PR11MB187579A2F88C77ED2131CEF08C349@BN6PR11MB1875.namprd11.prod.outlook.com>
- <20210611153850.7c402f0b.alex.williamson@redhat.com>
- <MWHPR11MB1886C2A0A8AA3000EBD5F8E18C319@MWHPR11MB1886.namprd11.prod.outlook.com>
- <20210614133819.GH1002214@nvidia.com>
- <MWHPR11MB1886A6B3AC4AD249405E5B178C309@MWHPR11MB1886.namprd11.prod.outlook.com>
+        id S230391AbhFXEzl (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 24 Jun 2021 00:55:41 -0400
+IronPort-SDR: HHfOKoFfdDSJlKyP6zs0D+0QZ0S7gx8zGC0sEmi+sLU7EEZsHzzpDfnf8fba1jVdeCxAi40VqI
+ mqdu7Qv6L6xQ==
+X-IronPort-AV: E=McAfee;i="6200,9189,10024"; a="187776577"
+X-IronPort-AV: E=Sophos;i="5.83,295,1616482800"; 
+   d="scan'208";a="187776577"
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Jun 2021 21:53:01 -0700
+IronPort-SDR: lCeSrgwKYqnDlhuOooxYB7ndAmquPjJXx0Ge0cBmoh+wXcLflrRKIh6W/9TiWRfMR7mFw5oV5/
+ ek6OwgpLVlSA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.83,295,1616482800"; 
+   d="scan'208";a="453277581"
+Received: from shzintpr02.sh.intel.com (HELO [0.0.0.0]) ([10.109.19.68])
+  by orsmga008.jf.intel.com with ESMTP; 23 Jun 2021 21:52:58 -0700
+Subject: Re: [PATCH v2] KVM: VMX: Enable Notify VM exit
+To:     pbonzini@redhat.com, seanjc@google.com, vkuznets@redhat.com,
+        wanpengli@tencent.com, jmattson@google.com, joro@8bytes.org,
+        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, hpa@zytor.com
+Cc:     x86@kernel.org, kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Xiaoyao Li <xiaoyao.li@intel.com>
+References: <20210525051204.1480610-1-tao3.xu@intel.com>
+From:   Tao Xu <tao3.xu@intel.com>
+Message-ID: <82581937-d8b9-1d02-6701-6ad86c19fcc6@intel.com>
+Date:   Thu, 24 Jun 2021 12:52:57 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.8.1
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="eoUsj9hAKr/fBY8i"
-Content-Disposition: inline
-In-Reply-To: <MWHPR11MB1886A6B3AC4AD249405E5B178C309@MWHPR11MB1886.namprd11.prod.outlook.com>
+In-Reply-To: <20210525051204.1480610-1-tao3.xu@intel.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Hi,
 
---eoUsj9hAKr/fBY8i
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Ping for comments.
 
-On Tue, Jun 15, 2021 at 01:21:35AM +0000, Tian, Kevin wrote:
-> > From: Jason Gunthorpe <jgg@nvidia.com>
-> > Sent: Monday, June 14, 2021 9:38 PM
-> >=20
-> > On Mon, Jun 14, 2021 at 03:09:31AM +0000, Tian, Kevin wrote:
-> >=20
-> > > If a device can be always blocked from accessing memory in the IOMMU
-> > > before it's bound to a driver or more specifically before the driver
-> > > moves it to a new security context, then there is no need for VFIO
-> > > to track whether IOASIDfd has taken over ownership of the DMA
-> > > context for all devices within a group.
-> >=20
-> > I've been assuming we'd do something like this, where when a device is
-> > first turned into a VFIO it tells the IOMMU layer that this device
-> > should be DMA blocked unless an IOASID is attached to
-> > it. Disconnecting an IOASID returns it to blocked.
->=20
-> Or just make sure a device is in block-DMA when it's unbound from a
-> driver or a security context.
+Thank you!
 
-So I'm not entirely clear here if you're envisaging putting the device
-into no-DMA mode by altering the IOMMU setup or by quiescing it at the
-register level (e.g. by resetting it).  But, neither approach allows
-you to safely put a device into no-DMA mode if users have access to
-another device in the group.
-
-The IOMMU approach doesn't work, because the IOMMU may not be able to
-distinguish the two devices from each other.
-
-The register approach doesn't work, because even if you successfully
-quiesce the device, the user could poke it indirectly via the other
-device in the group, pulling it out of quiescent mode.
-
-> Then no need to explicitly tell IOMMU layer=20
-> to do so when it's bound to a new driver.
->=20
-> Currently the default domain type applies even when a device is not
-> bound. This implies that if iommu=3Dpassthrough a device is always=20
-> allowed to access arbitrary system memory with or without a driver.
-> I feel the current domain type (identity, dma, unmanged) should apply
-> only when a driver is loaded...
-
-A whole group has to be in the same DMA context at the same time.
-That's the definition of a group.
-
-> > > If this works I didn't see the need for vfio to keep the sequence.
-> > > VFIO still keeps group fd to claim ownership of all devices in a
-> > > group.
-> >=20
-> > As Alex says you still have to deal with the problem that device A in
-> > a group can gain control of device B in the same group.
->=20
-> There is no isolation in the group then how could vfio prevent device
-> A from gaining control of device B? for example when both are attached
-> to the same GPA address space with device MMIO bar included, devA
-> can do p2p to devB. It's all user's policy how to deal with devices within
-> the group.=20
->=20
-> >=20
-> > This means device A and B can not be used from to two different
-> > security contexts.
->=20
-> It depends on how the security context is defined. From iommu layer
-> p.o.v, an IOASID is a security context which isolates a device from
-> the rest of the system (but not the sibling in the same group). As you
-> suggested earlier, it's completely sane if an user wants to attach
-> devices in a group to different IOASIDs. Here I just talk about this fact.
->=20
-> >=20
-> > If the /dev/iommu FD is the security context then the tracking is
-> > needed there.
-> >=20
->=20
-> As I replied to Alex, my point is that VFIO doesn't need to know the
-> attaching status of each device in a group before it can allow user to
-> access a device. As long as a device in a group either in block DMA
-> or switch to a new address space created via /dev/iommu FD, there's
-> no problem to allow user accessing it. User cannot do harm to the
-> world outside of the group. User knows there is no isolation within
-> the group. that is it.
->=20
-> Thanks
-> Kevin
->=20
-
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---eoUsj9hAKr/fBY8i
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAmDUDyMACgkQbDjKyiDZ
-s5KjaA/9EPMEsLemYo6QFgWL2LNDDKTanMJQkWieLTfB4rSTop8+qdgEyXKOIOZu
-Iv8nkPNdJy3ylIYKWWYi2mxMNaTR+qHDGFRLc9WK1m++oqM3Q7laNOt39QZ5Uy1P
-VCDc9dYIvKz+XAL9ihYV/i07LDHhec/0CvbEC7EDRnCQRoTZTEaPW7zsQmB4juR/
-X3WLPrrvQJKIT9s49MJd7ZSLwBVn9+sdXU+DjqmhuZZBTyFTdesNvGCd5lpbCM9D
-vKDKufOB8jRe1CyXuVfFPiIWpj5y8ixRvgOpGvt2DPODwurIWl0yDhLHAezyhoW7
-6igINNFVQhk0cVEHuyBUFUknzLg4gdoxgcGeNhYRkRsGLbFyiCIyxzTLVPQJ5/NS
-EQvt7zAIMjgYIFVL8QDimf+QZbD3NtGr8DiDMYGJtb2LCDpdbHQ8BG4Zk7D1Gdd0
-M1Dw5xiuUHsOVr+FLal2KUybESDq104z432KhmPo2Cj3zUrjp57M9FmrN3CWmXAG
-/+Gu6O+k2xvQwR4tFag7dGtAr4BlxUf4ja2DThPGVkmTe/EKYaRZ5YEWuozI62oR
-rJSJLbR4mnqf8mcQzawrBwp37SJlypo2m/1FtgYnuPHUjUJf21uvGHw3v4KD9rO/
-iX5lcN/pPE+j7WvY0WfK9tv9HlTbLn57EoQm97z9k3j7s6Az0oY=
-=log0
------END PGP SIGNATURE-----
-
---eoUsj9hAKr/fBY8i--
+On 5/25/21 1:12 PM, Tao Xu wrote:
+> There are some cases that malicious virtual machines can cause CPU stuck
+> (event windows don't open up), e.g., infinite loop in microcode when
+> nested #AC (CVE-2015-5307). No event window obviously means no events,
+> e.g. NMIs, SMIs, and IRQs will all be blocked, may cause the related
+> hardware CPU can't be used by host or other VM.
+> 
+> To resolve those cases, it can enable a notify VM exit if no event
+> window occur in VMX non-root mode for a specified amount of time
+> (notify window). Since CPU is first observed the risk of not causing
+> forward progress, after notify window time in a units of crystal clock,
+> Notify VM exit will happen. Notify VM exit can happen incident to delivery
+> of a vectored event.
+> 
+> Expose a module param for configuring notify window, which is in unit of
+> crystal clock cycle.
+> - A negative value (e.g. -1) is to disable this feature.
+> - Make the default as 0. It is safe because an internal threshold is added
+> to notify window to ensure all the normal instructions being coverd.
+> - User can set it to a large value when they want to give more cycles to
+> wait for some reasons, e.g., silicon wrongly kill some normal instruction
+> due to internal threshold is too small.
+> 
+> Notify VM exit is defined in latest Intel Architecture Instruction Set
+> Extensions Programming Reference, chapter 9.2.
+> 
+> Co-developed-by: Xiaoyao Li <xiaoyao.li@intel.com>
+> Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
+> Signed-off-by: Tao Xu <tao3.xu@intel.com>
+> ---
+> 
+> Changelog:
+> v2:
+>       Default set notify window to 0, less than 0 to disable.
+>       Add more description in commit message.
+> ---
+>   arch/x86/include/asm/vmx.h         |  7 +++++
+>   arch/x86/include/asm/vmxfeatures.h |  1 +
+>   arch/x86/include/uapi/asm/vmx.h    |  4 ++-
+>   arch/x86/kvm/vmx/capabilities.h    |  6 +++++
+>   arch/x86/kvm/vmx/vmx.c             | 42 ++++++++++++++++++++++++++++--
+>   include/uapi/linux/kvm.h           |  2 ++
+>   6 files changed, 59 insertions(+), 3 deletions(-)
+> 
+> diff --git a/arch/x86/include/asm/vmx.h b/arch/x86/include/asm/vmx.h
+> index 0ffaa3156a4e..9104c85a973f 100644
+> --- a/arch/x86/include/asm/vmx.h
+> +++ b/arch/x86/include/asm/vmx.h
+> @@ -74,6 +74,7 @@
+>   #define SECONDARY_EXEC_TSC_SCALING              VMCS_CONTROL_BIT(TSC_SCALING)
+>   #define SECONDARY_EXEC_ENABLE_USR_WAIT_PAUSE	VMCS_CONTROL_BIT(USR_WAIT_PAUSE)
+>   #define SECONDARY_EXEC_BUS_LOCK_DETECTION	VMCS_CONTROL_BIT(BUS_LOCK_DETECTION)
+> +#define SECONDARY_EXEC_NOTIFY_VM_EXITING	VMCS_CONTROL_BIT(NOTIFY_VM_EXITING)
+>   
+>   #define PIN_BASED_EXT_INTR_MASK                 VMCS_CONTROL_BIT(INTR_EXITING)
+>   #define PIN_BASED_NMI_EXITING                   VMCS_CONTROL_BIT(NMI_EXITING)
+> @@ -269,6 +270,7 @@ enum vmcs_field {
+>   	SECONDARY_VM_EXEC_CONTROL       = 0x0000401e,
+>   	PLE_GAP                         = 0x00004020,
+>   	PLE_WINDOW                      = 0x00004022,
+> +	NOTIFY_WINDOW                   = 0x00004024,
+>   	VM_INSTRUCTION_ERROR            = 0x00004400,
+>   	VM_EXIT_REASON                  = 0x00004402,
+>   	VM_EXIT_INTR_INFO               = 0x00004404,
+> @@ -555,6 +557,11 @@ enum vm_entry_failure_code {
+>   #define EPT_VIOLATION_EXECUTABLE	(1 << EPT_VIOLATION_EXECUTABLE_BIT)
+>   #define EPT_VIOLATION_GVA_TRANSLATED	(1 << EPT_VIOLATION_GVA_TRANSLATED_BIT)
+>   
+> +/*
+> + * Exit Qualifications for NOTIFY VM EXIT
+> + */
+> +#define NOTIFY_VM_CONTEXT_INVALID     BIT(0)
+> +
+>   /*
+>    * VM-instruction error numbers
+>    */
+> diff --git a/arch/x86/include/asm/vmxfeatures.h b/arch/x86/include/asm/vmxfeatures.h
+> index d9a74681a77d..15f0f2ab4f95 100644
+> --- a/arch/x86/include/asm/vmxfeatures.h
+> +++ b/arch/x86/include/asm/vmxfeatures.h
+> @@ -84,5 +84,6 @@
+>   #define VMX_FEATURE_USR_WAIT_PAUSE	( 2*32+ 26) /* Enable TPAUSE, UMONITOR, UMWAIT in guest */
+>   #define VMX_FEATURE_ENCLV_EXITING	( 2*32+ 28) /* "" VM-Exit on ENCLV (leaf dependent) */
+>   #define VMX_FEATURE_BUS_LOCK_DETECTION	( 2*32+ 30) /* "" VM-Exit when bus lock caused */
+> +#define VMX_FEATURE_NOTIFY_VM_EXITING	( 2*32+ 31) /* VM-Exit when no event windows after notify window */
+>   
+>   #endif /* _ASM_X86_VMXFEATURES_H */
+> diff --git a/arch/x86/include/uapi/asm/vmx.h b/arch/x86/include/uapi/asm/vmx.h
+> index 946d761adbd3..ef4c80f6553e 100644
+> --- a/arch/x86/include/uapi/asm/vmx.h
+> +++ b/arch/x86/include/uapi/asm/vmx.h
+> @@ -91,6 +91,7 @@
+>   #define EXIT_REASON_UMWAIT              67
+>   #define EXIT_REASON_TPAUSE              68
+>   #define EXIT_REASON_BUS_LOCK            74
+> +#define EXIT_REASON_NOTIFY              75
+>   
+>   #define VMX_EXIT_REASONS \
+>   	{ EXIT_REASON_EXCEPTION_NMI,         "EXCEPTION_NMI" }, \
+> @@ -153,7 +154,8 @@
+>   	{ EXIT_REASON_XRSTORS,               "XRSTORS" }, \
+>   	{ EXIT_REASON_UMWAIT,                "UMWAIT" }, \
+>   	{ EXIT_REASON_TPAUSE,                "TPAUSE" }, \
+> -	{ EXIT_REASON_BUS_LOCK,              "BUS_LOCK" }
+> +	{ EXIT_REASON_BUS_LOCK,              "BUS_LOCK" }, \
+> +	{ EXIT_REASON_NOTIFY,                "NOTIFY"}
+>   
+>   #define VMX_EXIT_REASON_FLAGS \
+>   	{ VMX_EXIT_REASONS_FAILED_VMENTRY,	"FAILED_VMENTRY" }
+> diff --git a/arch/x86/kvm/vmx/capabilities.h b/arch/x86/kvm/vmx/capabilities.h
+> index 8dee8a5fbc17..8527f34a84ac 100644
+> --- a/arch/x86/kvm/vmx/capabilities.h
+> +++ b/arch/x86/kvm/vmx/capabilities.h
+> @@ -407,4 +407,10 @@ static inline u64 vmx_supported_debugctl(void)
+>   	return debugctl;
+>   }
+>   
+> +static inline bool cpu_has_notify_vm_exiting(void)
+> +{
+> +	return vmcs_config.cpu_based_2nd_exec_ctrl &
+> +		SECONDARY_EXEC_NOTIFY_VM_EXITING;
+> +}
+> +
+>   #endif /* __KVM_X86_VMX_CAPS_H */
+> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+> index 4bceb5ca3a89..c0ad01c88dac 100644
+> --- a/arch/x86/kvm/vmx/vmx.c
+> +++ b/arch/x86/kvm/vmx/vmx.c
+> @@ -205,6 +205,10 @@ module_param(ple_window_max, uint, 0444);
+>   int __read_mostly pt_mode = PT_MODE_SYSTEM;
+>   module_param(pt_mode, int, S_IRUGO);
+>   
+> +/* Default is 0, less than 0 (for example, -1) disables notify window. */
+> +static int __read_mostly notify_window;
+> +module_param(notify_window, int, 0644);
+> +
+>   static DEFINE_STATIC_KEY_FALSE(vmx_l1d_should_flush);
+>   static DEFINE_STATIC_KEY_FALSE(vmx_l1d_flush_cond);
+>   static DEFINE_MUTEX(vmx_l1d_flush_mutex);
+> @@ -2539,7 +2543,8 @@ static __init int setup_vmcs_config(struct vmcs_config *vmcs_conf,
+>   			SECONDARY_EXEC_PT_USE_GPA |
+>   			SECONDARY_EXEC_PT_CONCEAL_VMX |
+>   			SECONDARY_EXEC_ENABLE_VMFUNC |
+> -			SECONDARY_EXEC_BUS_LOCK_DETECTION;
+> +			SECONDARY_EXEC_BUS_LOCK_DETECTION |
+> +			SECONDARY_EXEC_NOTIFY_VM_EXITING;
+>   		if (cpu_has_sgx())
+>   			opt2 |= SECONDARY_EXEC_ENCLS_EXITING;
+>   		if (adjust_vmx_controls(min2, opt2,
+> @@ -4376,6 +4381,9 @@ static void vmx_compute_secondary_exec_control(struct vcpu_vmx *vmx)
+>   	if (!vcpu->kvm->arch.bus_lock_detection_enabled)
+>   		exec_control &= ~SECONDARY_EXEC_BUS_LOCK_DETECTION;
+>   
+> +	if (cpu_has_notify_vm_exiting() && notify_window < 0)
+> +		exec_control &= ~SECONDARY_EXEC_NOTIFY_VM_EXITING;
+> +
+>   	vmx->secondary_exec_control = exec_control;
+>   }
+>   
+> @@ -4423,6 +4431,9 @@ static void init_vmcs(struct vcpu_vmx *vmx)
+>   		vmx->ple_window_dirty = true;
+>   	}
+>   
+> +	if (cpu_has_notify_vm_exiting() && notify_window >= 0)
+> +		vmcs_write32(NOTIFY_WINDOW, notify_window);
+> +
+>   	vmcs_write32(PAGE_FAULT_ERROR_CODE_MASK, 0);
+>   	vmcs_write32(PAGE_FAULT_ERROR_CODE_MATCH, 0);
+>   	vmcs_write32(CR3_TARGET_COUNT, 0);           /* 22.2.1 */
+> @@ -5642,6 +5653,31 @@ static int handle_bus_lock_vmexit(struct kvm_vcpu *vcpu)
+>   	return 0;
+>   }
+>   
+> +static int handle_notify(struct kvm_vcpu *vcpu)
+> +{
+> +	unsigned long exit_qual = vmx_get_exit_qual(vcpu);
+> +
+> +	if (!(exit_qual & NOTIFY_VM_CONTEXT_INVALID)) {
+> +		/*
+> +		 * Notify VM exit happened while executing iret from NMI,
+> +		 * "blocked by NMI" bit has to be set before next VM entry.
+> +		 */
+> +		if (enable_vnmi &&
+> +		    (exit_qual & INTR_INFO_UNBLOCK_NMI))
+> +			vmcs_set_bits(GUEST_INTERRUPTIBILITY_INFO,
+> +				      GUEST_INTR_STATE_NMI);
+> +
+> +		return 1;
+> +	}
+> +
+> +	vcpu->run->exit_reason = KVM_EXIT_INTERNAL_ERROR;
+> +	vcpu->run->internal.suberror = KVM_INTERNAL_ERROR_NO_EVENT_WINDOW;
+> +	vcpu->run->internal.ndata = 1;
+> +	vcpu->run->internal.data[0] = exit_qual;
+> +
+> +	return 0;
+> +}
+> +
+>   /*
+>    * The exit handlers return 1 if the exit was handled fully and guest execution
+>    * may resume.  Otherwise they set the kvm_run parameter to indicate what needs
+> @@ -5699,6 +5735,7 @@ static int (*kvm_vmx_exit_handlers[])(struct kvm_vcpu *vcpu) = {
+>   	[EXIT_REASON_PREEMPTION_TIMER]	      = handle_preemption_timer,
+>   	[EXIT_REASON_ENCLS]		      = handle_encls,
+>   	[EXIT_REASON_BUS_LOCK]                = handle_bus_lock_vmexit,
+> +	[EXIT_REASON_NOTIFY]		      = handle_notify,
+>   };
+>   
+>   static const int kvm_vmx_max_exit_handlers =
+> @@ -6042,7 +6079,8 @@ static int __vmx_handle_exit(struct kvm_vcpu *vcpu, fastpath_t exit_fastpath)
+>   	     exit_reason.basic != EXIT_REASON_EPT_VIOLATION &&
+>   	     exit_reason.basic != EXIT_REASON_PML_FULL &&
+>   	     exit_reason.basic != EXIT_REASON_APIC_ACCESS &&
+> -	     exit_reason.basic != EXIT_REASON_TASK_SWITCH)) {
+> +	     exit_reason.basic != EXIT_REASON_TASK_SWITCH &&
+> +	     exit_reason.basic != EXIT_REASON_NOTIFY)) {
+>   		int ndata = 3;
+>   
+>   		vcpu->run->exit_reason = KVM_EXIT_INTERNAL_ERROR;
+> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+> index 3fd9a7e9d90c..bb3b49b1fb0d 100644
+> --- a/include/uapi/linux/kvm.h
+> +++ b/include/uapi/linux/kvm.h
+> @@ -278,6 +278,8 @@ struct kvm_xen_exit {
+>   #define KVM_INTERNAL_ERROR_DELIVERY_EV	3
+>   /* Encounter unexpected vm-exit reason */
+>   #define KVM_INTERNAL_ERROR_UNEXPECTED_EXIT_REASON	4
+> +/* Encounter notify vm-exit */
+> +#define KVM_INTERNAL_ERROR_NO_EVENT_WINDOW   5
+>   
+>   /* for KVM_RUN, returned by mmap(vcpu_fd, offset=0) */
+>   struct kvm_run {
+> 
