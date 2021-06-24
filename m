@@ -2,126 +2,125 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id CAC4D3B2C91
-	for <lists+kvm@lfdr.de>; Thu, 24 Jun 2021 12:38:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7513A3B2CA1
+	for <lists+kvm@lfdr.de>; Thu, 24 Jun 2021 12:42:19 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232208AbhFXKkg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 24 Jun 2021 06:40:36 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:60022 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232125AbhFXKkf (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 24 Jun 2021 06:40:35 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1624531095;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=+8zOkEqDmKxv2wc98jEmrwn1/qGX8Rt7M/G4D1QmCCQ=;
-        b=Li1ctAfTKPjmx28/2Au4q7t43mI/lOhwDX+pOY3pNG/mQZdQgc6OVcJuGvCUYR1han4VxK
-        wu24rs2HqEykUxa/AoHV6ZLd+mAPmB0vdlDz96GUzKOeltUbnYlDRlTrg2bKaLG0sF8cQx
-        93w21diNAGcQFD4OHArCVqnXyCrWGys=
-Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
- [209.85.208.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-388-xnNjForQOWayEk7zUXCXXg-1; Thu, 24 Jun 2021 06:38:14 -0400
-X-MC-Unique: xnNjForQOWayEk7zUXCXXg-1
-Received: by mail-ed1-f72.google.com with SMTP id t11-20020a056402524bb029038ffacf1cafso3111676edd.5
-        for <kvm@vger.kernel.org>; Thu, 24 Jun 2021 03:38:13 -0700 (PDT)
+        id S232228AbhFXKog (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 24 Jun 2021 06:44:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48574 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230008AbhFXKof (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 24 Jun 2021 06:44:35 -0400
+Received: from mail-pg1-x535.google.com (mail-pg1-x535.google.com [IPv6:2607:f8b0:4864:20::535])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 07C19C061574;
+        Thu, 24 Jun 2021 03:42:15 -0700 (PDT)
+Received: by mail-pg1-x535.google.com with SMTP id v7so4395729pgl.2;
+        Thu, 24 Jun 2021 03:42:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=date:from:subject:to:cc:references:in-reply-to:mime-version
+         :message-id:content-transfer-encoding;
+        bh=NfjdhOW72m4TGpvzWGEQF11KzSsneVbaVBvFK0bGPzo=;
+        b=Kt+9hz5Z8hf17MTaP2NEbCNsixEB/2vtcneDIWMxInZE3wFpBTCY4arVW85yk4tRHF
+         qWXnzq5TbY8JfmQrKqxmZnou8HmT8i1seCjd1BlC3DaEQNjDAwV+HQjRqrh2wSC5wL59
+         gRrb2rxjfZldQEn+6eMb0tmL7unUZmTBjbxFxwf6fUug4isZHK1CcpQ0getq8GAd87FC
+         3RcDqKD/Mv0yWnn2UAF2jMZ1K/PXC5Gqwy+wDcve3LXPzWTqm+dcHR3tVukvmCrbGHtj
+         N0va4eRcYEBOnrKc/XVLBME0xL1myho/N5KENcJl2Jx0DUZHv582U2/2wqKp+nzNi87p
+         llKg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=+8zOkEqDmKxv2wc98jEmrwn1/qGX8Rt7M/G4D1QmCCQ=;
-        b=bC5EyRJ/OWa931VZ/XrunfIXKlxDxxfMzjxQivjZKKglAGaXCXdQqP4XAjAa7tQog2
-         qgWu8DV4V/R2cFl60b3H7q4x/Y2rk1puL/LPT3xpPCUehBwOBstNCbQm1axFVde9cqkr
-         85Kh2/iVX8iewyee3aBQMo8z3jn/2ZfZQdJDbgGgv6n75INZEKMqcf2jIDBCiYdAudMm
-         sIYqewYxwN7LP4Jso7Yz3i1jURVKAQA11ZPyq6l26am+Z/DnTmieKj50PxdOBuuFVeRE
-         YM4d1SuPayQGn1hWR6g25KmyYA9tyZ6lTRoavxjDf+w2fkMmKvYhcjURbD8W5XCwDTiA
-         z53w==
-X-Gm-Message-State: AOAM533YzyncJxlyxWSm2/+gXz5olyNr6mFbtblgbhrs2LsD2u9fULs+
-        V6vC1242+BVuXUjt+F3Gx/4nHEIvhszCU5OXnBvgdxW34TbaVdXLBXlw0X7oioZH0npf3VnVAA7
-        xi8IfYZ3JlWX4
-X-Received: by 2002:a05:6402:1d08:: with SMTP id dg8mr6303341edb.299.1624531093045;
-        Thu, 24 Jun 2021 03:38:13 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwI+JaqzEU3/RzVF63EQukSLbrjwL8GzIunmYBe8RjRpEpadfN+nfLVG7sxB/MR0xBEwblQQg==
-X-Received: by 2002:a05:6402:1d08:: with SMTP id dg8mr6303320edb.299.1624531092822;
-        Thu, 24 Jun 2021 03:38:12 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id l22sm1595366edr.15.2021.06.24.03.38.11
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 24 Jun 2021 03:38:12 -0700 (PDT)
-Subject: Re: [PATCH RFC] KVM: nSVM: Fix L1 state corruption upon return from
- SMM
-To:     Maxim Levitsky <mlevitsk@redhat.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Michael Roth <mdroth@linux.vnet.ibm.com>
-Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
+        h=x-gm-message-state:date:from:subject:to:cc:references:in-reply-to
+         :mime-version:message-id:content-transfer-encoding;
+        bh=NfjdhOW72m4TGpvzWGEQF11KzSsneVbaVBvFK0bGPzo=;
+        b=EKM9Hoz1AkYt7M5Z8lb96YYyA8+ChZoTU3UvnS28Ve0OHmzOAGr5v6nmUUxx5d4k/C
+         A2rixeFSTZ2Ogos1U17EGbCwRGslN0y/n7IbXBTDUHIgYGjppLHFyLJQBBSZRpOcOoyL
+         OC6hmX6XZ+FW9VgxolIgj38mbp94pFIZxMdpGBJQ1/+W8u/6560BOY6MiYAwbeWlkTEM
+         4iFjxyo1oj1ItoDcVyH6LoZwH5ceFIV5HmgUs7Gf1uScUZP+Yr/GRDlYYNSLP3PFWiY5
+         SFenRUUJV17Et/DP0Idohjsc4gHD3fuhR5EZw51dNRb59av/vJjrg91mS0eH95D01ycm
+         atzA==
+X-Gm-Message-State: AOAM533y2vDZ/uDrjEl52nQ0ExR1bqpZlwUZpZoBve0t9NTP5OvWE6qJ
+        M7P+jzPzjuLEb086POtGg9I=
+X-Google-Smtp-Source: ABdhPJx+bbBfj2pzk/mB2ERG+jW9T31gVCsxpF6k7D325eLHwjfeRucb+BobnHJ3y5XGrFTWG6Ebcw==
+X-Received: by 2002:a63:586:: with SMTP id 128mr4140080pgf.366.1624531334522;
+        Thu, 24 Jun 2021 03:42:14 -0700 (PDT)
+Received: from localhost (60-242-147-73.tpgi.com.au. [60.242.147.73])
+        by smtp.gmail.com with ESMTPSA id i8sm2522609pfq.165.2021.06.24.03.42.13
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 24 Jun 2021 03:42:14 -0700 (PDT)
+Date:   Thu, 24 Jun 2021 20:42:08 +1000
+From:   Nicholas Piggin <npiggin@gmail.com>
+Subject: Re: [PATCH 2/6] KVM: mmu: also return page from gfn_to_pfn
+To:     Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+        Huacai Chen <chenhuacai@kernel.org>,
+        Marc Zyngier <maz@kernel.org>,
+        Paul Mackerras <paulus@ozlabs.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        David Stevens <stevensd@chromium.org>,
+        Zhenyu Wang <zhenyuw@linux.intel.com>,
+        Zhi Wang <zhi.a.wang@intel.com>
+Cc:     Alexandru Elisei <alexandru.elisei@arm.com>,
+        dri-devel@lists.freedesktop.org, intel-gfx@lists.freedesktop.org,
+        intel-gvt-dev@lists.freedesktop.org,
+        James Morse <james.morse@arm.com>,
         Jim Mattson <jmattson@google.com>,
-        Cathy Avery <cavery@redhat.com>,
-        Emanuele Giuseppe Esposito <eesposit@redhat.com>,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        Sean Christopherson <seanjc@google.com>
-References: <20210623074427.152266-1-vkuznets@redhat.com>
- <a3918bfa-7b4f-c31a-448a-aa22a44d4dfd@redhat.com>
- <53a9f893cb895f4b52e16c374cbe988607925cdf.camel@redhat.com>
- <ac98150acd77f4c09167bc1bb1c552db68925cf2.camel@redhat.com>
- <87pmwc4sh4.fsf@vitty.brq.redhat.com>
- <5fc502b70a89e18034716166abc65caec192c19b.camel@redhat.com>
- <YNNc9lKIzM6wlDNf@google.com> <YNNfnLsc+3qMsdlN@google.com>
- <82327cd1-92ca-9f6b-3af0-8215e9d21eae@redhat.com>
- <83affeedb9a3d091bece8f5fdd5373342298dcd3.camel@redhat.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <a8945898-9fcb-19f1-1ba1-c9be55e04580@redhat.com>
-Date:   Thu, 24 Jun 2021 12:38:11 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.10.1
+        Joerg Roedel <joro@8bytes.org>, kvmarm@lists.cs.columbia.edu,
+        kvm-ppc@vger.kernel.org, kvm@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+        linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+        Sean Christopherson <seanjc@google.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Will Deacon <will@kernel.org>
+References: <20210624035749.4054934-1-stevensd@google.com>
+        <20210624035749.4054934-3-stevensd@google.com>
+        <1624524331.zsin3qejl9.astroid@bobo.none>
+        <201b68a7-10ea-d656-0c1e-5511b1f22674@redhat.com>
+        <1624528342.s2ezcyp90x.astroid@bobo.none>
+        <1624529635.75a1ann91v.astroid@bobo.none>
+        <fc2a88ed-6a98-857d-bb1f-73260b01ac30@redhat.com>
+In-Reply-To: <fc2a88ed-6a98-857d-bb1f-73260b01ac30@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <83affeedb9a3d091bece8f5fdd5373342298dcd3.camel@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Message-Id: <1624531085.fax3fcqpgc.astroid@bobo.none>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 24/06/21 10:20, Maxim Levitsky wrote:
-> Something else to note, just for our information is that KVM
-> these days does vmsave/vmload to VM_HSAVE_PA to store/restore
-> the additional host state, something that is frowned upon in the spec,
-> but there is some justification of doing this in the commit message,
-> citing an old spec which allowed this.
+Excerpts from Paolo Bonzini's message of June 24, 2021 8:21 pm:
+> On 24/06/21 12:17, Nicholas Piggin wrote:
+>>> If all callers were updated that is one thing, but from the changelog
+>>> it sounds like that would not happen and there would be some gfn_to_pfn
+>>> users left over.
+>>>
+>>> But yes in the end you would either need to make gfn_to_pfn never retur=
+n
+>>> a page found via follow_pte, or change all callers to the new way. If
+>>> the plan is for the latter then I guess that's fine.
+>>
+>> Actually in that case anyway I don't see the need -- the existence of
+>> gfn_to_pfn is enough to know it might be buggy. It can just as easily
+>> be grepped for as kvm_pfn_page_unwrap.
+>=20
+> Sure, but that would leave us with longer function names=20
+> (gfn_to_pfn_page* instead of gfn_to_pfn*).  So the "safe" use is the one=20
+> that looks worse and the unsafe use is the one that looks safe.
 
-True that.  And there is no mention in the specification for VMRUN that 
-the host state-save area is a subset of the VMCB format (i.e., that it 
-uses VMCB offsets for whatever subset of the state it saves in the 
-VMCB), so the spec reference in the commit message is incorrect.  It 
-would be nice if the spec guaranteed that.  Michael, Tom?
+The churn isn't justified because of function name length. Choose g2pp()=20
+if you want a non-descriptive but short name.
 
-In fact, Vitaly's patch *will* overwrite the vmsave/vmload parts of 
-VM_HSAVE_PA, and it will store the L2 values rather than the L1 values, 
-because KVM always does its vmload/vmrun/vmsave sequence using 
-vmload(vmcs01) and vmsave(vmcs01)!  So that has to be changed to use 
-code similar to svm_set_nested_state (which can be moved to a separate 
-function and reused):
+The existing name isn't good anyway because it not only looks up a pfn=20
+but also a page, and more importantly it gets a ref on the page. The
+name should be changed if you introduce a new API.
 
-         dest->es = src->es;
-         dest->cs = src->cs;
-         dest->ss = src->ss;
-         dest->ds = src->ds;
-         dest->gdtr = src->gdtr;
-         dest->idtr = src->idtr;
-         dest->rflags = src->rflags | X86_EFLAGS_FIXED;
-         dest->efer = src->efer;
-         dest->cr0 = src->cr0;
-         dest->cr3 = src->cr3;
-         dest->cr4 = src->cr4;
-         dest->rax = src->rax;
-         dest->rsp = src->rsp;
-         dest->rip = src->rip;
-         dest->cpl = 0;
+>> And are gfn_to_page cases also
+>> vulernable to the same issue?
+>=20
+> No, they're just broken for the VM_IO|VM_PFNMAP case.
 
+No they aren't vulnerable, or they are vunlerable but also broken in=20
+other cases?
 
-Paolo
-
+Thanks,
+Nick
