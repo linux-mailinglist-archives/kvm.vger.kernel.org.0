@@ -2,196 +2,185 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4155C3B2670
-	for <lists+kvm@lfdr.de>; Thu, 24 Jun 2021 06:46:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D23E73B268E
+	for <lists+kvm@lfdr.de>; Thu, 24 Jun 2021 06:53:19 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230082AbhFXEtC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 24 Jun 2021 00:49:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53450 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229465AbhFXEtC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 24 Jun 2021 00:49:02 -0400
-Received: from mail-ej1-x62e.google.com (mail-ej1-x62e.google.com [IPv6:2a00:1450:4864:20::62e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 35D5EC061756
-        for <kvm@vger.kernel.org>; Wed, 23 Jun 2021 21:46:43 -0700 (PDT)
-Received: by mail-ej1-x62e.google.com with SMTP id nb6so7380740ejc.10
-        for <kvm@vger.kernel.org>; Wed, 23 Jun 2021 21:46:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance-com.20150623.gappssmtp.com; s=20150623;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=qV+mylXL/2SS4mJCMLehWyslEuC3Qq8x/PXCguBgY/I=;
-        b=yLsRfVae0FF0DXCc80Qe7rbCzVIrdmQDyeaVXSgU7731bg1QMqw4lgqLCxjyZUZjwu
-         TDH7cb0lIajOurwizpXzJMb1Ld/YEZ/vOZ/tKUWon1ytyFmk7qtEyniUaT9wfomHXaCZ
-         Q5k7DOlqy4oW2+TRbKidZkfTZk1foP9dbr9CEZLKOgBzOUjNXSWZEPhSFmyl+eKMt16P
-         UetkLAJ4Ll73DccWxMTSvwQYbyiWwHF4SXeF68p10765hT8FeXCxeTOqWo6XDYYUASaW
-         U0fLxWjMmOWM2r455SZayrz6m1rBoWQox1axwCaI6sMaC6VcTv4xi2V6T6wMsgxpGUUR
-         4qsA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=qV+mylXL/2SS4mJCMLehWyslEuC3Qq8x/PXCguBgY/I=;
-        b=uisOv7Bicyk9DQX1SMChY74pQKTqH7TCg3l1oyGlGQWA06o0nie3tfzJ2+XTCeFhlO
-         ect3PzaZxUcAEUe7mlWSbXr+sTOiKNMtXykHSlSa+0SuU80C4WMll2gAtFmWdwVrnWGm
-         fy4dqegQLys4hoYITe24DIk/draRowNA/6rGZuqlCx1IeECwQn8MCLHptu7rgzaSEbWQ
-         AXZnhLCNRAb6A0E8ps+ZooNV36iy8nLtgFRRMNKQ8+w3+U0aLVFIQxkj10W5sDC6pn4l
-         +pFi2vRCLgM/xwnzL79Q3tPHqexZPEBnYq7e3HeQGEHsktmHUJ7WNYt9GEU3XtivsUL9
-         zmAw==
-X-Gm-Message-State: AOAM530TXKpSEFJMWcnFF/mSXyLRNHD/q0K0wkDcl89Dpg8KW5AVchmP
-        +QRdoSHRb4ccCHDaw4dnDeNTYl+etQ5HvLh5e8Fb
-X-Google-Smtp-Source: ABdhPJxLv6gMYjF4IzwXDzBGPms1QJcwsfrq54qSD0tH6LJ386sUw0R2U1ERHQHkfRm0DArekdU8YwZzZP3+ubsA+P4=
-X-Received: by 2002:a17:906:3c4a:: with SMTP id i10mr3283231ejg.372.1624510001769;
- Wed, 23 Jun 2021 21:46:41 -0700 (PDT)
-MIME-Version: 1.0
-References: <20210615141331.407-1-xieyongji@bytedance.com> <20210615141331.407-10-xieyongji@bytedance.com>
- <adfb2be9-9ed9-ca37-ac37-4cd00bdff349@redhat.com> <CACycT3tAON+-qZev+9EqyL2XbgH5HDspOqNt3ohQLQ8GqVK=EA@mail.gmail.com>
- <1bba439f-ffc8-c20e-e8a4-ac73e890c592@redhat.com> <CACycT3uzMJS7vw6MVMOgY4rb=SPfT2srV+8DPdwUVeELEiJgbA@mail.gmail.com>
- <0aeb7cb7-58e5-1a95-d830-68edd7e8ec2e@redhat.com> <CACycT3uuooKLNnpPHewGZ=q46Fap2P4XCFirdxxn=FxK+X1ECg@mail.gmail.com>
- <e4cdee72-b6b4-d055-9aac-3beae0e5e3e1@redhat.com> <CACycT3u8=_D3hCtJR+d5BgeUQMce6S7c_6P3CVfvWfYhCQeXFA@mail.gmail.com>
- <d2334f66-907c-2e9c-ea4f-f912008e9be8@redhat.com>
-In-Reply-To: <d2334f66-907c-2e9c-ea4f-f912008e9be8@redhat.com>
-From:   Yongji Xie <xieyongji@bytedance.com>
-Date:   Thu, 24 Jun 2021 12:46:30 +0800
-Message-ID: <CACycT3uCSLUDVpQHdrmuxSuoBDg-4n22t+N-Jm2GoNNp9JYB2w@mail.gmail.com>
-Subject: Re: Re: [PATCH v8 09/10] vduse: Introduce VDUSE - vDPA Device in Userspace
-To:     Jason Wang <jasowang@redhat.com>
-Cc:     "Michael S. Tsirkin" <mst@redhat.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Stefano Garzarella <sgarzare@redhat.com>,
-        Parav Pandit <parav@nvidia.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Christian Brauner <christian.brauner@canonical.com>,
-        Randy Dunlap <rdunlap@infradead.org>,
-        Matthew Wilcox <willy@infradead.org>,
-        Al Viro <viro@zeniv.linux.org.uk>,
-        Jens Axboe <axboe@kernel.dk>, bcrl@kvack.org,
+        id S230342AbhFXEy7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 24 Jun 2021 00:54:59 -0400
+Received: from bilbo.ozlabs.org ([203.11.71.1]:35245 "EHLO ozlabs.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S230121AbhFXEyv (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 24 Jun 2021 00:54:51 -0400
+Received: by ozlabs.org (Postfix, from userid 1007)
+        id 4G9SRT5RZJz9t1s; Thu, 24 Jun 2021 14:52:21 +1000 (AEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+        d=gibson.dropbear.id.au; s=201602; t=1624510341;
+        bh=CUOvolS00mt6fsyyOcaBeHpDD1l35MwCPi+iWoJuI20=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=e+t14wM8FUhdgZVe3bPvZMI676YD8wnW8ic6Am/0whGW4VYhlxJ2x750ZLghvljKa
+         pYU9Vmqh+k0qSi+vs9n+kCUu6e4pjtqwaMMUw1A0otHxPj0N10CtjgTB4tg+0kutjy
+         TWZMThky96oa00b4SxnlTGrcqPApbZCJf2wwIb5E=
+Date:   Thu, 24 Jun 2021 14:50:45 +1000
+From:   David Gibson <david@gibson.dropbear.id.au>
+To:     "Tian, Kevin" <kevin.tian@intel.com>
+Cc:     Jason Gunthorpe <jgg@nvidia.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Jean-Philippe Brucker <jean-philippe@linaro.org>,
+        Jason Wang <jasowang@redhat.com>,
+        "parav@mellanox.com" <parav@mellanox.com>,
+        "Enrico Weigelt, metux IT consult" <lkml@metux.net>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Shenming Lu <lushenming@huawei.com>,
+        Eric Auger <eric.auger@redhat.com>,
         Jonathan Corbet <corbet@lwn.net>,
-        =?UTF-8?Q?Mika_Penttil=C3=A4?= <mika.penttila@nextfour.com>,
-        Dan Carpenter <dan.carpenter@oracle.com>, joro@8bytes.org,
-        Greg KH <gregkh@linuxfoundation.org>, songmuchun@bytedance.com,
-        virtualization <virtualization@lists.linux-foundation.org>,
-        netdev@vger.kernel.org, kvm <kvm@vger.kernel.org>,
-        linux-fsdevel@vger.kernel.org, iommu@lists.linux-foundation.org,
-        linux-kernel <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+        "Raj, Ashok" <ashok.raj@intel.com>,
+        "Liu, Yi L" <yi.l.liu@intel.com>, "Wu, Hao" <hao.wu@intel.com>,
+        "Jiang, Dave" <dave.jiang@intel.com>,
+        Jacob Pan <jacob.jun.pan@linux.intel.com>,
+        Kirti Wankhede <kwankhede@nvidia.com>,
+        Robin Murphy <robin.murphy@arm.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
+        David Woodhouse <dwmw2@infradead.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Lu Baolu <baolu.lu@linux.intel.com>
+Subject: Re: Plan for /dev/ioasid RFC v2
+Message-ID: <YNQPJfNixs23RaJm@yekko>
+References: <YMDjfmJKUDSrbZbo@8bytes.org>
+ <20210609101532.452851eb.alex.williamson@redhat.com>
+ <20210609102722.5abf62e1.alex.williamson@redhat.com>
+ <20210609184940.GH1002214@nvidia.com>
+ <20210610093842.6b9a4e5b.alex.williamson@redhat.com>
+ <BN6PR11MB187579A2F88C77ED2131CEF08C349@BN6PR11MB1875.namprd11.prod.outlook.com>
+ <20210611153850.7c402f0b.alex.williamson@redhat.com>
+ <MWHPR11MB1886C2A0A8AA3000EBD5F8E18C319@MWHPR11MB1886.namprd11.prod.outlook.com>
+ <20210614133819.GH1002214@nvidia.com>
+ <MWHPR11MB1886A6B3AC4AD249405E5B178C309@MWHPR11MB1886.namprd11.prod.outlook.com>
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha256;
+        protocol="application/pgp-signature"; boundary="eoUsj9hAKr/fBY8i"
+Content-Disposition: inline
+In-Reply-To: <MWHPR11MB1886A6B3AC4AD249405E5B178C309@MWHPR11MB1886.namprd11.prod.outlook.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jun 24, 2021 at 11:35 AM Jason Wang <jasowang@redhat.com> wrote:
->
->
-> =E5=9C=A8 2021/6/23 =E4=B8=8B=E5=8D=881:50, Yongji Xie =E5=86=99=E9=81=93=
-:
-> > On Wed, Jun 23, 2021 at 11:31 AM Jason Wang <jasowang@redhat.com> wrote=
-:
-> >>
-> >> =E5=9C=A8 2021/6/22 =E4=B8=8B=E5=8D=884:14, Yongji Xie =E5=86=99=E9=81=
-=93:
-> >>> On Tue, Jun 22, 2021 at 3:50 PM Jason Wang <jasowang@redhat.com> wrot=
-e:
-> >>>> =E5=9C=A8 2021/6/22 =E4=B8=8B=E5=8D=883:22, Yongji Xie =E5=86=99=E9=
-=81=93:
-> >>>>>> We need fix a way to propagate the error to the userspace.
-> >>>>>>
-> >>>>>> E.g if we want to stop the deivce, we will delay the status reset =
-until
-> >>>>>> we get respose from the userspace?
-> >>>>>>
-> >>>>> I didn't get how to delay the status reset. And should it be a DoS
-> >>>>> that we want to fix if the userspace doesn't give a response foreve=
-r?
-> >>>> You're right. So let's make set_status() can fail first, then propag=
-ate
-> >>>> its failure via VHOST_VDPA_SET_STATUS.
-> >>>>
-> >>> OK. So we only need to propagate the failure in the vhost-vdpa case, =
-right?
-> >>
-> >> I think not, we need to deal with the reset for virtio as well:
-> >>
-> >> E.g in register_virtio_devices(), we have:
-> >>
-> >>           /* We always start by resetting the device, in case a previo=
-us
-> >>            * driver messed it up.  This also tests that code path a
-> >> little. */
-> >>         dev->config->reset(dev);
-> >>
-> >> We probably need to make reset can fail and then fail the
-> >> register_virtio_device() as well.
-> >>
-> > OK, looks like virtio_add_status() and virtio_device_ready()[1] should
-> > be also modified if we need to propagate the failure in the
-> > virtio-vdpa case. Or do we only need to care about the reset case?
-> >
-> > [1] https://lore.kernel.org/lkml/20210517093428.670-1-xieyongji@bytedan=
-ce.com/
->
->
-> My understanding is DRIVER_OK is not something that needs to be validated=
-:
->
-> "
->
-> DRIVER_OK (4)
-> Indicates that the driver is set up and ready to drive the device.
->
-> "
->
-> Since the spec doesn't require to re-read the and check if DRIVER_OK is
-> set in 3.1.1 Driver Requirements: Device Initialization.
->
-> It's more about "telling the device that driver is ready."
->
-> But we don have some status bit that requires the synchronization with
-> the device.
->
-> 1) FEATURES_OK, spec requires to re-read the status bit to check whether
-> or it it was set by the device:
->
-> "
->
-> Re-read device status to ensure the FEATURES_OK bit is still set:
-> otherwise, the device does not support our subset of features and the
-> device is unusable.
->
-> "
->
-> This is useful for some device which can only support a subset of the
-> features. E.g a device that can only work for packed virtqueue. This
-> means the current design of set_features won't work, we need either:
->
-> 1a) relay the set_features request to userspace
->
-> or
->
-> 1b) introduce a mandated_device_features during device creation and
-> validate the driver features during the set_features(), and don't set
-> FEATURES_OK if they don't match.
->
->
-> 2) Some transports (PCI) requires to re-read the status to ensure the
-> synchronization.
->
-> "
->
-> After writing 0 to device_status, the driver MUST wait for a read of
-> device_status to return 0 before reinitializing the device.
->
-> "
->
-> So we need to deal with both FEATURES_OK and reset, but probably not
-> DRIVER_OK.
->
 
-OK, I see. Thanks for the explanation. One more question is how about
-clearing the corresponding status bit in get_status() rather than
-making set_status() fail. Since the spec recommends this way for
-validation which is done in virtio_dev_remove() and
-virtio_finalize_features().
+--eoUsj9hAKr/fBY8i
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Thanks,
-Yongji
+On Tue, Jun 15, 2021 at 01:21:35AM +0000, Tian, Kevin wrote:
+> > From: Jason Gunthorpe <jgg@nvidia.com>
+> > Sent: Monday, June 14, 2021 9:38 PM
+> >=20
+> > On Mon, Jun 14, 2021 at 03:09:31AM +0000, Tian, Kevin wrote:
+> >=20
+> > > If a device can be always blocked from accessing memory in the IOMMU
+> > > before it's bound to a driver or more specifically before the driver
+> > > moves it to a new security context, then there is no need for VFIO
+> > > to track whether IOASIDfd has taken over ownership of the DMA
+> > > context for all devices within a group.
+> >=20
+> > I've been assuming we'd do something like this, where when a device is
+> > first turned into a VFIO it tells the IOMMU layer that this device
+> > should be DMA blocked unless an IOASID is attached to
+> > it. Disconnecting an IOASID returns it to blocked.
+>=20
+> Or just make sure a device is in block-DMA when it's unbound from a
+> driver or a security context.
+
+So I'm not entirely clear here if you're envisaging putting the device
+into no-DMA mode by altering the IOMMU setup or by quiescing it at the
+register level (e.g. by resetting it).  But, neither approach allows
+you to safely put a device into no-DMA mode if users have access to
+another device in the group.
+
+The IOMMU approach doesn't work, because the IOMMU may not be able to
+distinguish the two devices from each other.
+
+The register approach doesn't work, because even if you successfully
+quiesce the device, the user could poke it indirectly via the other
+device in the group, pulling it out of quiescent mode.
+
+> Then no need to explicitly tell IOMMU layer=20
+> to do so when it's bound to a new driver.
+>=20
+> Currently the default domain type applies even when a device is not
+> bound. This implies that if iommu=3Dpassthrough a device is always=20
+> allowed to access arbitrary system memory with or without a driver.
+> I feel the current domain type (identity, dma, unmanged) should apply
+> only when a driver is loaded...
+
+A whole group has to be in the same DMA context at the same time.
+That's the definition of a group.
+
+> > > If this works I didn't see the need for vfio to keep the sequence.
+> > > VFIO still keeps group fd to claim ownership of all devices in a
+> > > group.
+> >=20
+> > As Alex says you still have to deal with the problem that device A in
+> > a group can gain control of device B in the same group.
+>=20
+> There is no isolation in the group then how could vfio prevent device
+> A from gaining control of device B? for example when both are attached
+> to the same GPA address space with device MMIO bar included, devA
+> can do p2p to devB. It's all user's policy how to deal with devices within
+> the group.=20
+>=20
+> >=20
+> > This means device A and B can not be used from to two different
+> > security contexts.
+>=20
+> It depends on how the security context is defined. From iommu layer
+> p.o.v, an IOASID is a security context which isolates a device from
+> the rest of the system (but not the sibling in the same group). As you
+> suggested earlier, it's completely sane if an user wants to attach
+> devices in a group to different IOASIDs. Here I just talk about this fact.
+>=20
+> >=20
+> > If the /dev/iommu FD is the security context then the tracking is
+> > needed there.
+> >=20
+>=20
+> As I replied to Alex, my point is that VFIO doesn't need to know the
+> attaching status of each device in a group before it can allow user to
+> access a device. As long as a device in a group either in block DMA
+> or switch to a new address space created via /dev/iommu FD, there's
+> no problem to allow user accessing it. User cannot do harm to the
+> world outside of the group. User knows there is no isolation within
+> the group. that is it.
+>=20
+> Thanks
+> Kevin
+>=20
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--eoUsj9hAKr/fBY8i
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAmDUDyMACgkQbDjKyiDZ
+s5KjaA/9EPMEsLemYo6QFgWL2LNDDKTanMJQkWieLTfB4rSTop8+qdgEyXKOIOZu
+Iv8nkPNdJy3ylIYKWWYi2mxMNaTR+qHDGFRLc9WK1m++oqM3Q7laNOt39QZ5Uy1P
+VCDc9dYIvKz+XAL9ihYV/i07LDHhec/0CvbEC7EDRnCQRoTZTEaPW7zsQmB4juR/
+X3WLPrrvQJKIT9s49MJd7ZSLwBVn9+sdXU+DjqmhuZZBTyFTdesNvGCd5lpbCM9D
+vKDKufOB8jRe1CyXuVfFPiIWpj5y8ixRvgOpGvt2DPODwurIWl0yDhLHAezyhoW7
+6igINNFVQhk0cVEHuyBUFUknzLg4gdoxgcGeNhYRkRsGLbFyiCIyxzTLVPQJ5/NS
+EQvt7zAIMjgYIFVL8QDimf+QZbD3NtGr8DiDMYGJtb2LCDpdbHQ8BG4Zk7D1Gdd0
+M1Dw5xiuUHsOVr+FLal2KUybESDq104z432KhmPo2Cj3zUrjp57M9FmrN3CWmXAG
+/+Gu6O+k2xvQwR4tFag7dGtAr4BlxUf4ja2DThPGVkmTe/EKYaRZ5YEWuozI62oR
+rJSJLbR4mnqf8mcQzawrBwp37SJlypo2m/1FtgYnuPHUjUJf21uvGHw3v4KD9rO/
+iX5lcN/pPE+j7WvY0WfK9tv9HlTbLn57EoQm97z9k3j7s6Az0oY=
+=log0
+-----END PGP SIGNATURE-----
+
+--eoUsj9hAKr/fBY8i--
