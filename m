@@ -2,191 +2,112 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 08C833B2F3D
-	for <lists+kvm@lfdr.de>; Thu, 24 Jun 2021 14:41:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B20B93B2F72
+	for <lists+kvm@lfdr.de>; Thu, 24 Jun 2021 14:54:53 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231811AbhFXMnq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 24 Jun 2021 08:43:46 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:30089 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231819AbhFXMnp (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 24 Jun 2021 08:43:45 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1624538486;
+        id S231707AbhFXM5K (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 24 Jun 2021 08:57:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51154 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231262AbhFXM5J (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 24 Jun 2021 08:57:09 -0400
+Received: from mail.skyhub.de (mail.skyhub.de [IPv6:2a01:4f8:190:11c2::b:1457])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4BC5FC061574;
+        Thu, 24 Jun 2021 05:54:50 -0700 (PDT)
+Received: from zn.tnic (p200300ec2f0c1e00b0ee742129e64455.dip0.t-ipconnect.de [IPv6:2003:ec:2f0c:1e00:b0ee:7421:29e6:4455])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 935E01EC034B;
+        Thu, 24 Jun 2021 14:54:48 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
+        t=1624539288;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=Ao/aik86DETd7ceeMOwWvzTcaJv+rZayOURU+D31sn8=;
-        b=GjvelJK9NqzwPH+wQt4p2rrMHQ+NmPcPSNVXrH2f0EGBGBkRWu28p8uhXdnkGg+jIxxi35
-        K18CZYpwAQXIXJe/qoc0AAtBS6Xqn7n7gbbZtzOsuIr22LchymDudqsIDKQkzI+6dF6VBX
-        PM/RTYHUvoAjjDy3wrUPGHfG0iT5m+I=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-514-50AWQ2pGOZalxGhPM04L6w-1; Thu, 24 Jun 2021 08:41:25 -0400
-X-MC-Unique: 50AWQ2pGOZalxGhPM04L6w-1
-Received: by mail-wr1-f69.google.com with SMTP id u16-20020a5d51500000b029011a6a17cf62so2137997wrt.13
-        for <kvm@vger.kernel.org>; Thu, 24 Jun 2021 05:41:25 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=Ao/aik86DETd7ceeMOwWvzTcaJv+rZayOURU+D31sn8=;
-        b=MUjPeh7/rX1SU2bokrZpDtSuJwl3BsiD8uKTW0vRbZJg3r6I/mlMvEIZANpPrX5Idx
-         3YC5LFH++FNRZ2mdADHfPJsEZ4OAqw8A+4klHM+XDBDanKfAva4lw/NusvYQbOhtAHWC
-         FJ/XdqrJUHnbWwbUJgkfUuo7C5XutmeyTvt10ro+s0T0t3ILH3/m+lVm+WnaYvqa4INL
-         VHfwuHocHvF0swKAHyzC9G9aea4JV2/0oXkBn+xFnZV85cdUw81ug8P/ilpiy2ObpfPb
-         8OO9HH/dj3R5wkD54C3+vtn4B2QK3FZnMy3c5k+IsZae/eDqAvT4az5BaBFbv9Gmz1jF
-         djRQ==
-X-Gm-Message-State: AOAM530pWzOdYZho+luO0kY00i66DNnS4GUycDqrpY8USs77z+fAzBDB
-        F8WTjcNzU1UsydYmMNdWh3JGnvKzU+Dd5Iip09w/JeQF5WpCHVI+96Sygoqu9Ogf4PCEr5/ltST
-        bggN49kUiTAqi
-X-Received: by 2002:adf:f88e:: with SMTP id u14mr4211977wrp.391.1624538484097;
-        Thu, 24 Jun 2021 05:41:24 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxX2C4aDAGP4h4xfzWoN2DoJE9Xd7OTVDMCCB2JExPqVzxr2MgGsOeSZupCF70+GqEZaJi1OA==
-X-Received: by 2002:adf:f88e:: with SMTP id u14mr4211952wrp.391.1624538483934;
-        Thu, 24 Jun 2021 05:41:23 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id 22sm2818691wmi.4.2021.06.24.05.41.22
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 24 Jun 2021 05:41:23 -0700 (PDT)
-Subject: Re: [PATCH 0/6] KVM: Remove uses of struct page from x86 and arm64
- MMU
-To:     Nicholas Piggin <npiggin@gmail.com>,
-        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
-        Huacai Chen <chenhuacai@kernel.org>,
-        Marc Zyngier <maz@kernel.org>,
-        Paul Mackerras <paulus@ozlabs.org>,
-        David Stevens <stevensd@chromium.org>,
-        Zhenyu Wang <zhenyuw@linux.intel.com>,
-        Zhi Wang <zhi.a.wang@intel.com>
-Cc:     Alexandru Elisei <alexandru.elisei@arm.com>,
-        dri-devel@lists.freedesktop.org, intel-gfx@lists.freedesktop.org,
-        intel-gvt-dev@lists.freedesktop.org,
-        James Morse <james.morse@arm.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvmarm@lists.cs.columbia.edu,
-        kvm-ppc@vger.kernel.org, kvm@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-        linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
+        bh=exWGaN5nlDIIfjw6LKdL5i6bEdP3AlfmgKU5Qi35VZs=;
+        b=OH1tJ1FWIwOyqk5pV85F5ISFN32aCDPduQ56E4e2jBVYcAbLhc0k5JTE+UAy+Gb/l4bjer
+        2TbZqRl2XDUp7GrXFn0hfpBqzyIwDdJKoBHOLDBPQ3gyuslhsDz2N/IZaxZ/JW9Kqam6h6
+        qOAkZxpCS9rabjOWu5AiS3lx0aUfhL0=
+Date:   Thu, 24 Jun 2021 14:54:44 +0200
+From:   Borislav Petkov <bp@alien8.de>
+To:     Michael Roth <michael.roth@amd.com>
+Cc:     "Kuppuswamy, Sathyanarayanan" 
+        <sathyanarayanan.kuppuswamy@linux.intel.com>,
+        Dave Hansen <dave.hansen@intel.com>,
+        Brijesh Singh <brijesh.singh@amd.com>, x86@kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
+        linux-coco@lists.linux.dev, linux-mm@kvack.org,
+        linux-crypto@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
         Sean Christopherson <seanjc@google.com>,
-        David Stevens <stevensd@google.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
-        Will Deacon <will@kernel.org>
-References: <20210624035749.4054934-1-stevensd@google.com>
- <1624530624.8jff1f4u11.astroid@bobo.none>
- <1624534759.nj0ylor2eh.astroid@bobo.none>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <0d3a699a-15eb-9f1b-0735-79d14736f38c@redhat.com>
-Date:   Thu, 24 Jun 2021 14:41:21 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.10.1
+        Jim Mattson <jmattson@google.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        David Rientjes <rientjes@google.com>, tony.luck@intel.com,
+        npmccallum@redhat.com
+Subject: Re: [PATCH Part1 RFC v3 20/22] x86/boot: Add Confidential Computing
+ address to setup_header
+Message-ID: <YNSAlJnXMjigpqu1@zn.tnic>
+References: <20210602140416.23573-1-brijesh.singh@amd.com>
+ <20210602140416.23573-21-brijesh.singh@amd.com>
+ <YMw4UZn6AujpPSZO@zn.tnic>
+ <15568c80-c9a9-5602-d940-264af87bed98@amd.com>
+ <YMy2OGwsRzrR5bwD@zn.tnic>
+ <162442264313.98837.16983159316116149849@amd.com>
+ <YNMLX6fbB3PQwSpv@zn.tnic>
+ <20210624031911.eznpkbgjt4e445xj@amd.com>
+ <YNQz7ZxEaSWjcjO2@zn.tnic>
+ <20210624123447.zbfkohbtdusey66w@amd.com>
 MIME-Version: 1.0
-In-Reply-To: <1624534759.nj0ylor2eh.astroid@bobo.none>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20210624123447.zbfkohbtdusey66w@amd.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 24/06/21 13:42, Nicholas Piggin wrote:
-> Excerpts from Nicholas Piggin's message of June 24, 2021 8:34 pm:
->> Excerpts from David Stevens's message of June 24, 2021 1:57 pm:
->>> KVM supports mapping VM_IO and VM_PFNMAP memory into the guest by using
->>> follow_pte in gfn_to_pfn. However, the resolved pfns may not have
->>> assoicated struct pages, so they should not be passed to pfn_to_page.
->>> This series removes such calls from the x86 and arm64 secondary MMU. To
->>> do this, this series modifies gfn_to_pfn to return a struct page in
->>> addition to a pfn, if the hva was resolved by gup. This allows the
->>> caller to call put_page only when necessated by gup.
->>>
->>> This series provides a helper function that unwraps the new return type
->>> of gfn_to_pfn to provide behavior identical to the old behavior. As I
->>> have no hardware to test powerpc/mips changes, the function is used
->>> there for minimally invasive changes. Additionally, as gfn_to_page and
->>> gfn_to_pfn_cache are not integrated with mmu notifier, they cannot be
->>> easily changed over to only use pfns.
->>>
->>> This addresses CVE-2021-22543 on x86 and arm64.
->>
->> Does this fix the problem? (untested I don't have a POC setup at hand,
->> but at least in concept)
-> 
-> This one actually compiles at least. Unfortunately I don't have much
-> time in the near future to test, and I only just found out about this
-> CVE a few hours ago.
+On Thu, Jun 24, 2021 at 07:34:47AM -0500, Michael Roth wrote:
+> Well, that's sufficient for the boot/compressed->uncompressed parameter
+> passing, but wouldn't actual bootloaders still need something in
+> setup_data/setup_header to pass in the CC blob (for things like non-EFI
+> environments/containers)? I was under the impression that using
+> boot_params directly was more of a legacy/ad-hoc thing, is that
+> accurate?
 
-And it also works (the reproducer gets an infinite stream of userspace 
-exits and especially does not crash).  We can still go for David's 
-solution later since MMU notifiers are able to deal with this pages, but 
-it's a very nice patch for stable kernels.
+/me goes and rereads your early mail.
 
-If you provide a Signed-off-by, I can integrate it.
+I'm more confused.
 
-Paolo
+You're talking about parsing an EFI table early which contains the
+ccblob and in it is the CPUID page.
 
-> ---
-> 
-> 
-> It's possible to create a region which maps valid but non-refcounted
-> pages (e.g., tail pages of non-compound higher order allocations). These
-> host pages can then be returned by gfn_to_page, gfn_to_pfn, etc., family
-> of APIs, which take a reference to the page, which takes it from 0 to 1.
-> When the reference is dropped, this will free the page incorrectly.
-> 
-> Fix this by only taking a reference on the page if it was non-zero,
-> which indicates it is participating in normal refcounting (and can be
-> released with put_page).
-> 
-> ---
->   virt/kvm/kvm_main.c | 19 +++++++++++++++++--
->   1 file changed, 17 insertions(+), 2 deletions(-)
-> 
-> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> index 6a6bc7af0e28..46fb042837d2 100644
-> --- a/virt/kvm/kvm_main.c
-> +++ b/virt/kvm/kvm_main.c
-> @@ -2055,6 +2055,13 @@ static bool vma_is_valid(struct vm_area_struct *vma, bool write_fault)
->   	return true;
->   }
->   
-> +static int kvm_try_get_pfn(kvm_pfn_t pfn)
-> +{
-> +	if (kvm_is_reserved_pfn(pfn))
-> +		return 1;
-> +	return get_page_unless_zero(pfn_to_page(pfn));
-> +}
-> +
->   static int hva_to_pfn_remapped(struct vm_area_struct *vma,
->   			       unsigned long addr, bool *async,
->   			       bool write_fault, bool *writable,
-> @@ -2104,13 +2111,21 @@ static int hva_to_pfn_remapped(struct vm_area_struct *vma,
->   	 * Whoever called remap_pfn_range is also going to call e.g.
->   	 * unmap_mapping_range before the underlying pages are freed,
->   	 * causing a call to our MMU notifier.
-> +	 *
-> +	 * Certain IO or PFNMAP mappings can be backed with valid
-> +	 * struct pages, but be allocated without refcounting e.g.,
-> +	 * tail pages of non-compound higher order allocations, which
-> +	 * would then underflow the refcount when the caller does the
-> +	 * required put_page. Don't allow those pages here.
->   	 */
-> -	kvm_get_pfn(pfn);
-> +	if (!kvm_try_get_pfn(pfn))
-> +		r = -EFAULT;
->   
->   out:
->   	pte_unmap_unlock(ptep, ptl);
->   	*p_pfn = pfn;
-> -	return 0;
-> +
-> +	return r;
->   }
->   
->   /*
-> 
+Now above you say, "non-EFI environments".
 
+I'm guessing you want to support both so you want to either parse an EFI
+table on EFI environments or pass the blob in a different way in non-EFI
+envs. Yes, no?
+
+Also, you want to pass the previously parsed CPUID page address to
+kernel proper. For that I suggested to use boot_params.
+
+What else?
+
+How about you explain in a lot more detail what exactly the requirements
+and the use cases are so that we can have a common base to discuss it
+on.
+
+Thx.
+
+-- 
+Regards/Gruss,
+    Boris.
+
+https://people.kernel.org/tglx/notes-about-netiquette
