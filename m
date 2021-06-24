@@ -2,34 +2,30 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 240743B2676
-	for <lists+kvm@lfdr.de>; Thu, 24 Jun 2021 06:52:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id AFF403B2692
+	for <lists+kvm@lfdr.de>; Thu, 24 Jun 2021 06:53:41 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230110AbhFXEyt (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        id S230272AbhFXEy4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 24 Jun 2021 00:54:56 -0400
+Received: from bilbo.ozlabs.org ([203.11.71.1]:37373 "EHLO ozlabs.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S230020AbhFXEyt (ORCPT <rfc822;kvm@vger.kernel.org>);
         Thu, 24 Jun 2021 00:54:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54720 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229853AbhFXEys (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 24 Jun 2021 00:54:48 -0400
-Received: from ozlabs.org (ozlabs.org [IPv6:2401:3900:2:1::2])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BE6F0C061574;
-        Wed, 23 Jun 2021 21:52:26 -0700 (PDT)
 Received: by ozlabs.org (Postfix, from userid 1007)
-        id 4G9SRT2dt1z9sfG; Thu, 24 Jun 2021 14:52:21 +1000 (AEST)
+        id 4G9SRT3YPMz9srZ; Thu, 24 Jun 2021 14:52:21 +1000 (AEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
         d=gibson.dropbear.id.au; s=201602; t=1624510341;
-        bh=dJmtGU8dyFvnuijTR+utYBYOnB0dad5+eqhQA+Q/4VM=;
+        bh=EHvfXmcln2cuvHUfIp1Ef7p8K3ajzOq94RDeey096tE=;
         h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=PXvCCED61+4o52RipA/ySvoJHmgY3IsIa02nvqbsk5D9selJjQaQuKaYtSn6toF3F
-         TFTyprAcBeH7dZeYLrIyoJFQ6ELtZej0ogUD3HfwY1GamA24IWCXn4J33PvZ18WH9j
-         bES4cWqgmH9Pr5GSKZEC9k/Jl5FSMWle2bLobhlQ=
-Date:   Thu, 24 Jun 2021 14:07:01 +1000
+        b=TLx424KuLQp4RlGrMdd/XU1zskLB9aQBL7f+kySPUHLCC3lqX9LWrh12zvpA+TcOr
+         0StJ/pb2zu0SG9Y0IiFFtsyzTFOs8YMMnsQ7Xl5Oy/8tVeSv8nw3Nz8qwSpgUoHTfg
+         JWwQ8QJOV4hokfVSaRLQ1EUzu8E+KejVDr94Jz50=
+Date:   Thu, 24 Jun 2021 14:23:36 +1000
 From:   David Gibson <david@gibson.dropbear.id.au>
-To:     Jason Gunthorpe <jgg@nvidia.com>
-Cc:     Joerg Roedel <joro@8bytes.org>,
-        "Tian, Kevin" <kevin.tian@intel.com>,
-        "Alex Williamson (alex.williamson@redhat.com)" 
-        <alex.williamson@redhat.com>,
+To:     Alex Williamson <alex.williamson@redhat.com>
+Cc:     "Tian, Kevin" <kevin.tian@intel.com>,
+        Jason Gunthorpe <jgg@nvidia.com>,
+        Joerg Roedel <joro@8bytes.org>,
         Jean-Philippe Brucker <jean-philippe@linaro.org>,
         Jason Wang <jasowang@redhat.com>,
         "parav@mellanox.com" <parav@mellanox.com>,
@@ -50,101 +46,127 @@ Cc:     Joerg Roedel <joro@8bytes.org>,
         LKML <linux-kernel@vger.kernel.org>,
         Lu Baolu <baolu.lu@linux.intel.com>
 Subject: Re: Plan for /dev/ioasid RFC v2
-Message-ID: <YNQE5b+JODrVH/L6@yekko>
-References: <MWHPR11MB188699D0B9C10EB51686C4138C389@MWHPR11MB1886.namprd11.prod.outlook.com>
- <YMCy48Xnt/aphfh3@8bytes.org>
- <20210609123919.GA1002214@nvidia.com>
- <YMrTeuUoqgzmSplL@yekko>
- <20210617231004.GA1002214@nvidia.com>
+Message-ID: <YNQIyP4RR0PmVtLo@yekko>
+References: <20210612012846.GC1002214@nvidia.com>
+ <20210612105711.7ac68c83.alex.williamson@redhat.com>
+ <20210614140711.GI1002214@nvidia.com>
+ <20210614102814.43ada8df.alex.williamson@redhat.com>
+ <MWHPR11MB1886239C82D6B66A732830B88C309@MWHPR11MB1886.namprd11.prod.outlook.com>
+ <20210615101215.4ba67c86.alex.williamson@redhat.com>
+ <MWHPR11MB188692A6182B1292FADB3BDB8C0F9@MWHPR11MB1886.namprd11.prod.outlook.com>
+ <20210616133937.59050e1a.alex.williamson@redhat.com>
+ <MWHPR11MB18865DF9C50F295820D038798C0E9@MWHPR11MB1886.namprd11.prod.outlook.com>
+ <20210617151452.08beadae.alex.williamson@redhat.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="FVXvcr5GttEpzKAT"
+        protocol="application/pgp-signature"; boundary="VbemreCsSMMcmVQr"
 Content-Disposition: inline
-In-Reply-To: <20210617231004.GA1002214@nvidia.com>
+In-Reply-To: <20210617151452.08beadae.alex.williamson@redhat.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
---FVXvcr5GttEpzKAT
+--VbemreCsSMMcmVQr
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Jun 17, 2021 at 08:10:04PM -0300, Jason Gunthorpe wrote:
-> On Thu, Jun 17, 2021 at 02:45:46PM +1000, David Gibson wrote:
-> > On Wed, Jun 09, 2021 at 09:39:19AM -0300, Jason Gunthorpe wrote:
-> > > On Wed, Jun 09, 2021 at 02:24:03PM +0200, Joerg Roedel wrote:
-> > > > On Mon, Jun 07, 2021 at 02:58:18AM +0000, Tian, Kevin wrote:
-> > > > > -   Device-centric (Jason) vs. group-centric (David) uAPI. David =
-is not fully
-> > > > >     convinced yet. Based on discussion v2 will continue to have i=
-oasid uAPI
-> > > > >     being device-centric (but it's fine for vfio to be group-cent=
-ric). A new
-> > > > >     section will be added to elaborate this part;
-> > > >=20
-> > > > I would vote for group-centric here. Or do the reasons for which VF=
-IO is
-> > > > group-centric not apply to IOASID? If so, why?
-> > >=20
-> > > VFIO being group centric has made it very ugly/difficult to inject
-> > > device driver specific knowledge into the scheme.
-> > >=20
-> > > The device driver is the only thing that knows to ask:
-> > >  - I need a SW table for this ioasid because I am like a mdev
-> > >  - I will issue TLPs with PASID
-> > >  - I need a IOASID linked to a PASID
-> > >  - I am a devices that uses ENQCMD and vPASID
-> > >  - etc in future
-> >=20
-> > mdev drivers might know these, but shim drivers, like basic vfio-pci
-> > often won't.
->=20
-> The generic drivers say 'I will do every kind of DMA possible', which
-> is in-of-itself a special kind of information to convey.
->=20
-> There are alot of weird corners to think about here, like what if the
-> guest asks for a PASID on a mdev that doesn't support PASID, but
-> hooked to a RID that does or other quite nonsense combinations. These
-> need to be blocked/handled/whatever properly, which is made much
-> easier if the common code actually knows detail about what is going
-> on.
->=20
-> > I still think you're having a tendency to partially conflate several
-> > meanings of "group":
-> > 	1. the unavoidable hardware unit of non-isolation
-> > 	2. the kernel internal concept and interface to it
-> > 	3. the user visible fd and interface
->=20
-> I think I have those pretty clearly seperated :)
-> =20
-> > We can't avoid having (1) somewhere, (3) and to a lesser extent (2)
-> > are what you object to.
->=20
-> I don't like (3) either, and am yet to hear a definitive reason why we
-> must have it..
+On Thu, Jun 17, 2021 at 03:14:52PM -0600, Alex Williamson wrote:
+> On Thu, 17 Jun 2021 07:31:03 +0000
+> "Tian, Kevin" <kevin.tian@intel.com> wrote:
+> > > From: Alex Williamson <alex.williamson@redhat.com>
+> > > Sent: Thursday, June 17, 2021 3:40 AM
+> > > On Wed, 16 Jun 2021 06:43:23 +0000
+> > > "Tian, Kevin" <kevin.tian@intel.com> wrote:
+> > > > > From: Alex Williamson <alex.williamson@redhat.com>
+> > > > > Sent: Wednesday, June 16, 2021 12:12 AM
+> > > > > On Tue, 15 Jun 2021 02:31:39 +0000
+> > > > > "Tian, Kevin" <kevin.tian@intel.com> wrote:
+> > > > > > > From: Alex Williamson <alex.williamson@redhat.com>
+> > > > > > > Sent: Tuesday, June 15, 2021 12:28 AM
+[snip]
 
-I don't know that there's a "definitive" reason.  My concern (and I
-think Alex's as well) is that if there's no (3), it tends to lead to a
-lack of (2), and lack of (2) tends to make people sloppily forget
-about (1) and lead to breakage.
-
-> > > The current approach has the group try to guess the device driver
-> > > intention in the vfio type 1 code.
+> > > > > 3) A dual-function conventional PCI e1000 NIC where the functions=
+ are
+> > > > >    grouped together due to shared RID.
+> > > > >
+> > > > >    a) Repeat 2.a) and 2.b) such that we have a valid, user access=
+ible
+> > > > >       devices in the same IOMMU context.
+> > > > >
+> > > > >    b) Function 1 is detached from the IOASID.
+> > > > >
+> > > > >    I think function 1 cannot be placed into a different IOMMU con=
+text
+> > > > >    here, does the detach work?  What's the IOMMU context now? =20
+> > > >
+> > > > Yes. Function 1 is back to block-DMA. Since both functions share RI=
+D,
+> > > > essentially it implies function 0 is in block-DMA state too (though=
+ its
+> > > > tracking state may not change yet) since the shared IOMMU context
+> > > > entry blocks DMA now. In IOMMU fd function 0 is still attached to t=
+he
+> > > > IOASID thus the user still needs do an explicit detach to clear the
+> > > > tracking state for function 0.
+> > > > =20
+> > > > >
+> > > > >    c) A new IOASID is alloc'd within the existing iommu_fd and fu=
+nction
+> > > > >       1 is attached to the new IOASID.
+> > > > >
+> > > > >    Where, how, by whom does this fail? =20
+> > > >
+> > > > No need to fail. It can succeed since doing so just hurts user's ow=
+n foot.
+> > > >
+> > > > The only question is how user knows the fact that a group of devices
+> > > > share RID thus avoid such thing. I'm curious how it is communicated
+> > > > with today's VFIO mechanism. Yes the group-centric VFIO uAPI preven=
+ts
+> > > > a group of devices from attaching to multiple IOMMU contexts, but
+> > > > suppose we still need a way to tell the user to not do so. Especial=
+ly
+> > > > such knowledge would be also reflected in the virtual PCI topology
+> > > > when the entire group is assigned to the guest which needs to know
+> > > > this fact when vIOMMU is exposed. I haven't found time to investiga=
+te
+> > > > it but suppose if such channel exists it could be reused, or in the=
+ worst
+> > > > case we may have the new device capability interface to convey... =
+=20
+> > >=20
+> > > No such channel currently exists, it's not an issue today, IOMMU
+> > > context is group-based. =20
 > >=20
-> > I agree this has gotten ugly.  What I'm not yet convinced of is that
-> > reworking groups to make this not-ugly necessarily requires totally
-> > minimizing the importance of groups.
+> > Interesting... If such group of devices are assigned to a guest, how do=
+es
+> > Qemu decide the virtual PCI topology for them? Do they have same
+> > vRID or different?
 >=20
-> I think it does - we can't have the group in the middle and still put
-> the driver in chrage, it doesn't really work.
+> That's the beauty of it, it doesn't matter how many RIDs exist in the
+> group, or which devices have aliases, the group is the minimum
+> granularity of a container where QEMU knows that a container provides
+> a single address space.  Therefore a container must exist in a single
+> address space in the PCI topology.  In a conventional or non-vIOMMU
+> topology, the PCI address space is equivalent to the system memory
+> address space.  When vIOMMU gets involved, multiple devices within the
+> same group must exist in the same address space.  A vPCIe-to-PCI bridge
+> can be used to create that shared address space.
 >=20
-> At least if someone can see an arrangement otherwise lets hear it -
-> start with how to keep groups and remove the mdev hackery from type1..
->=20
-> Jason
->=20
+> I've referred to this as a limitation of type1, that we can't put
+> devices within the same group into different address spaces, such as
+> behind separate vRoot-Ports in a vIOMMU config, but really, who cares?
+> As isolation support improves we see fewer multi-device groups, this
+> scenario becomes the exception.  Buy better hardware to use the devices
+> independently.
+
+Also, that limitation is fundamental.  Groups in a guest must always
+be the same or strictly bigger than groups in the host, because if the
+real hardware can't isolate them, then the virtual hardware certainly
+can't and the guest kernel shouldn't be given the impression that it
+can separate them.
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -152,24 +174,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---FVXvcr5GttEpzKAT
+--VbemreCsSMMcmVQr
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAmDUBOUACgkQbDjKyiDZ
-s5KpSxAA3vN27+lMzXDPk2S7zvYdJ4d7zhPTOEnCEKHln4itOdXVtQI0jRsSXrQ+
-DFVxgT59hCmxsrXHdpFi4rHAEYFUSEt7oItLnAT9IwtctYN04bQ/1XhaFXht4Kni
-D7gxQRDNNnbfJL3jlQxzriy9u8S9pjh5JR4wZodZibtdq6o2c3BecO5Q8h43nmlL
-wWhZGdpPnw4h3+htnzZg8Irb5PBzI3Bj0m+NXOJQ8Iz/wb1mrSOjlkuhY4gVG7iw
-9ui6DaXYB3iWVhtuK8JdjG4o0ZW62H6L65O12cU5dojfIg4syMsXX1QhK+QuD9yX
-YCnP6COhShRNekntOqx8WfemR+RbsDzA2teshdb3CKAw8z1teAImo81BcShG57xh
-kO3DwKQvVTxk8DrMsSYDSbhAnexu/tPmqcZMpfZCL4OwTF9+tHgynmTxX2/CaLk9
-Aw2TATLwZf350GB3QJfewuWowzOpAkcx5d0/oQj6RiTIQFKdz63sAkH/JoPOd+al
-IKQhxghAt/pB1/h60m+MV2xe8PMipNX+NSzxn8PuxQIO7XVG38Kyl+spNjpaPPKP
-okYLV9ofNdCN59neveMlffNtmogXYC2Ub1Xrh7B0T31G/mGmBeyqv8LXlpjmuYH9
-GjCXzbmHQKam8cq7szI2ILHk3d+ToJPzERxCbu41kPLNpz5Eb1E=
-=q9i0
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAmDUCMYACgkQbDjKyiDZ
+s5IbcQ//RRnk6578Dd3RoItAw/ouSkamizbOnDMKW7uaqK9YsPPO02q6NleujshT
+GRaG2DwHv5YMH3GGLpS7zFa9iitJezuIC/0WuLH/Ypq735SPTU7NVbRpsB5ijbUR
+HW06YH5mmYETGwtp+vb8zxq7AWcKk7KqlHYBjvwK8nU5Klr27m8gqth7qW5DqB0k
+9uhcJZXOaFCDYMdVX1DTaOQ3TdJLf7+Rwf8gfVM3Ma1sq0jgv3rzxCz6tLqoJ0pe
+pQW/yd0/iwz/tIYYWK8xB6YnT+u+ozEFJHqehdxY5yaC+c/GN8tzd4UNCJv5F0is
+CTdwipKta3C9Mxzv4x1s74NkDnT6b1SSN0ZjyVA/md10KLnyRFjSxVoYh7Ab/ODk
++u70Zl2lBBScUksTyeqG5QDVa/y0T8O9b6yTsh4aY4XdtpR2FZSY/kVS6gyq0uyr
+1Epw5S1E9JSmYaGuYcdaAHD3b8+HxTVvn1RfdWXcfNvhSjDrmPtmUyWnqWTo64OV
+PEWuw4FcaSPDMLZMqvFFMWE2heNyWfLpzvU9ym+cgj4L6bImaY8k6jAaEu3HfWQZ
+25XxtcXaWhBHrCT66YWjeqPtMZypAZCaiabGEt29+ijNqBRiaO8+tGwBtAuYiWvK
+K9v+f84XO3+e+kCvEdIf0a5+Xn2N04QDnb6fs41xkCE8hasvUVQ=
+=Tqsh
 -----END PGP SIGNATURE-----
 
---FVXvcr5GttEpzKAT--
+--VbemreCsSMMcmVQr--
