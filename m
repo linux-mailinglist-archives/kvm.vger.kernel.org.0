@@ -2,30 +2,30 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 88F483B246D
-	for <lists+kvm@lfdr.de>; Thu, 24 Jun 2021 03:17:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8C2473B247B
+	for <lists+kvm@lfdr.de>; Thu, 24 Jun 2021 03:20:38 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229844AbhFXBTh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 23 Jun 2021 21:19:37 -0400
-Received: from mga14.intel.com ([192.55.52.115]:40314 "EHLO mga14.intel.com"
+        id S229882AbhFXBWz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 23 Jun 2021 21:22:55 -0400
+Received: from mga18.intel.com ([134.134.136.126]:23743 "EHLO mga18.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229758AbhFXBTh (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 23 Jun 2021 21:19:37 -0400
-IronPort-SDR: Iqz2jjuCPKNrnDXAJniKHmCEnESYRGUFj4x+6vL463WUHF+e93zm38VZqtFJmdk6xTVq48yB0G
- k4zpq2pBceCA==
-X-IronPort-AV: E=McAfee;i="6200,9189,10024"; a="207190800"
+        id S229759AbhFXBWy (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 23 Jun 2021 21:22:54 -0400
+IronPort-SDR: Rp3uolIvG4kSR8A0qwJuUEj5I4iwMU5PhV9nXrYVpyGOlD0iHuq4MLquymIJr+1mbt1r5YIP6p
+ YdbxoylfX9zg==
+X-IronPort-AV: E=McAfee;i="6200,9189,10024"; a="194676400"
 X-IronPort-AV: E=Sophos;i="5.83,295,1616482800"; 
-   d="scan'208";a="207190800"
-Received: from fmsmga002.fm.intel.com ([10.253.24.26])
-  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Jun 2021 18:17:18 -0700
-IronPort-SDR: NR2Gye2FEa7sQSnQC5PG3Ds95YPz3GHN/2KXN/B2xht+EijZK05K2qEC9eUynuA4yZYjLIcBeL
- TGSuaWtk/aFA==
+   d="scan'208";a="194676400"
+Received: from fmsmga001.fm.intel.com ([10.253.24.23])
+  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Jun 2021 18:20:36 -0700
+IronPort-SDR: tac5mdNb3TRW2zCX7aYeaEw/PrSAYMm4FPomcKXiPCsXeARGJjj/ei0UhvRMipfXkfRn6aXZ8J
+ FFhGHxLxycXw==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.83,295,1616482800"; 
-   d="scan'208";a="490922753"
+   d="scan'208";a="557156873"
 Received: from michael-optiplex-9020.sh.intel.com (HELO localhost) ([10.239.159.182])
-  by fmsmga002.fm.intel.com with ESMTP; 23 Jun 2021 18:17:15 -0700
-Date:   Thu, 24 Jun 2021 09:31:53 +0800
+  by fmsmga001.fm.intel.com with ESMTP; 23 Jun 2021 18:20:32 -0700
+Date:   Thu, 24 Jun 2021 09:35:10 +0800
 From:   Yang Weijiang <weijiang.yang@intel.com>
 To:     Jim Mattson <jmattson@google.com>
 Cc:     Like Xu <like.xu@linux.intel.com>,
@@ -38,60 +38,44 @@ Cc:     Like Xu <like.xu@linux.intel.com>,
         Wei Wang <wei.w.wang@intel.com>,
         kvm list <kvm@vger.kernel.org>,
         LKML <linux-kernel@vger.kernel.org>
-Subject: Re: [RESEND PATCH v4 03/10] KVM: vmx/pmu: Add MSR_ARCH_LBR_DEPTH
+Subject: Re: [RESEND PATCH v4 04/10] KVM: vmx/pmu: Add MSR_ARCH_LBR_CTL
  emulation for Arch LBR
-Message-ID: <20210624013153.GA15841@intel.com>
+Message-ID: <20210624013510.GB15841@intel.com>
 References: <20210510081535.94184-1-like.xu@linux.intel.com>
- <20210510081535.94184-4-like.xu@linux.intel.com>
- <CALMp9eT-KL-xDgV9p31NgnbW2tnwPes7r6GhJbMedim5e9Ab4g@mail.gmail.com>
+ <20210510081535.94184-5-like.xu@linux.intel.com>
+ <CALMp9eQG+JLnHe4zRKg0sHtxynSiGGKPw--5J+cY2-f3QWRW2A@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CALMp9eT-KL-xDgV9p31NgnbW2tnwPes7r6GhJbMedim5e9Ab4g@mail.gmail.com>
+In-Reply-To: <CALMp9eQG+JLnHe4zRKg0sHtxynSiGGKPw--5J+cY2-f3QWRW2A@mail.gmail.com>
 User-Agent: Mutt/1.5.24 (2015-08-30)
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jun 23, 2021 at 11:03:39AM -0700, Jim Mattson wrote:
+On Wed, Jun 23, 2021 at 11:29:08AM -0700, Jim Mattson wrote:
 > On Mon, May 10, 2021 at 1:16 AM Like Xu <like.xu@linux.intel.com> wrote:
 > >
-> > The number of Arch LBR entries available for recording operations
-> > is dictated by the value in MSR_ARCH_LBR_DEPTH.DEPTH. The supported
-> > LBR depth values can be found in CPUID.(EAX=01CH, ECX=0):EAX[7:0]
-> > and for each bit "n" set in this field, the MSR_ARCH_LBR_DEPTH.DEPTH
-> > value of "8*(n+1)" is supported.
+> > Arch LBRs are enabled by setting MSR_ARCH_LBR_CTL.LBREn to 1. A new guest
+> > state field named "Guest IA32_LBR_CTL" is added to enhance guest LBR usage.
+> > When guest Arch LBR is enabled, a guest LBR event will be created like the
+> > model-specific LBR does.
 > >
-> > On a guest write to MSR_ARCH_LBR_DEPTH, all LBR entries are reset to 0.
-> > KVM emulates the reset behavior by introducing lbr_desc->arch_lbr_reset.
-> > KVM writes the guest requested value to the native ARCH_LBR_DEPTH MSR
-> > (this is safe because the two values will be the same) when the Arch LBR
-> > records MSRs are pass-through to the guest.
+> > On processors that support Arch LBR, MSR_IA32_DEBUGCTLMSR[bit 0] has no
+> > meaning. It can be written to 0 or 1, but reads will always return 0.
+> > Like IA32_DEBUGCTL, IA32_ARCH_LBR_CTL msr is also reserved on INIT.
 > >
 > > Signed-off-by: Like Xu <like.xu@linux.intel.com>
 > > ---
-> >  arch/x86/kvm/vmx/pmu_intel.c | 43 ++++++++++++++++++++++++++++++++++++
-> >  arch/x86/kvm/vmx/vmx.h       |  3 +++
-> >  2 files changed, 46 insertions(+)
+> >  arch/x86/events/intel/lbr.c      |  2 --
+> >  arch/x86/include/asm/msr-index.h |  1 +
+> >  arch/x86/include/asm/vmx.h       |  2 ++
+> >  arch/x86/kvm/vmx/pmu_intel.c     | 31 ++++++++++++++++++++++++++-----
+> >  arch/x86/kvm/vmx/vmx.c           |  9 +++++++++
+> >  5 files changed, 38 insertions(+), 7 deletions(-)
 > >
-> > diff --git a/arch/x86/kvm/vmx/pmu_intel.c b/arch/x86/kvm/vmx/pmu_intel.c
-> > index 9efc1a6b8693..d9c9cb6c9a4b 100644
-> > --- a/arch/x86/kvm/vmx/pmu_intel.c
-> > +++ b/arch/x86/kvm/vmx/pmu_intel.c
-> > @@ -220,6 +220,9 @@ static bool intel_is_valid_msr(struct kvm_vcpu *vcpu, u32 msr)
-> >         case MSR_CORE_PERF_GLOBAL_OVF_CTRL:
-> >                 ret = pmu->version > 1;
-> >                 break;
-> > +       case MSR_ARCH_LBR_DEPTH:
-> > +               ret = guest_cpuid_has(vcpu, X86_FEATURE_ARCH_LBR);
-> > +               break;
-> 
-> This doesn't seem like a very safe test, since userspace can provide
-> whatever CPUID tables it likes. You should definitely think about
-> hardening this code against a malicious userspace.
-> 
-> When you add a new guest MSR, it should be enumerated by
-> KVM_GET_MSR_INDEX_LIST. Otherwise, userspace will not save/restore the
-> MSR value on suspend/resume.
+> Same comments as on the previous patch. Your guard for ensuring that
+> the new VMCS fields exist can be spoofed by a malicious userspace, and
+> the new MSR has to be enumerated by KVM_GET_MSR_INDEX_LIST.
 
-Thanks Jim! Will improve this part in next version.
+OK, will modify the code, thanks!
