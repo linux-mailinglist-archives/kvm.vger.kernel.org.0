@@ -2,98 +2,187 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id EF3D63B32BB
-	for <lists+kvm@lfdr.de>; Thu, 24 Jun 2021 17:36:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 106DB3B32D7
+	for <lists+kvm@lfdr.de>; Thu, 24 Jun 2021 17:50:11 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232390AbhFXPjG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 24 Jun 2021 11:39:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59786 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232003AbhFXPjE (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 24 Jun 2021 11:39:04 -0400
-Received: from mail-pl1-x62b.google.com (mail-pl1-x62b.google.com [IPv6:2607:f8b0:4864:20::62b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 73D6EC061574
-        for <kvm@vger.kernel.org>; Thu, 24 Jun 2021 08:36:45 -0700 (PDT)
-Received: by mail-pl1-x62b.google.com with SMTP id c15so3134352pls.13
-        for <kvm@vger.kernel.org>; Thu, 24 Jun 2021 08:36:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=oSmcLkLaYmb30K4x2o5V0PgF5sReFf2n8jT9UaERRsg=;
-        b=bSQo4DhU2KuL3CjUZN64j4WcwdggQch/R7XnEdix2NVuOf40qPGfYHBno8Xm619GAr
-         wg2kvoNy4VPNerE1UJQqTO/mn+wSl2WW8B9f7dL8xOzOgdg74JEfehGKdbWSQ0+1rr/t
-         2LEY4HKbsscIOGINiR9uO5OVpBxOglyxXqSvwqqzzZpKt1BhIehu/QDEuFSbgcAbmd1A
-         2Vn5BfcWryEpw7ny/6e9BAwB13V5uLq3/TeIlPL3nNBaDSZ9vfocg3yuStOuQjDnW2a3
-         vbLINUOPqFtht9Zb0kQj2xFTxtidhP/wmPjkGUm290ZvEfhGiSSc1t+MN7azCayA+NIy
-         PYiw==
+        id S230267AbhFXPw2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 24 Jun 2021 11:52:28 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:58071 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S230008AbhFXPw1 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 24 Jun 2021 11:52:27 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1624549807;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=1cyU0gxyx5x4nyoLMr8QSHN09Zeplw7HF9KeUyPYMbo=;
+        b=dOZ1+4pWRIx2RjFkeBuT8XhMmqJLRQ7DcoGq2W1v/K/iiStnt+czgZOa1mPUTadhzqwqb0
+        WTvwRU+9Yky6TVeZTcRwHYy/UsbhBK91kCzA0MmYa23+vMKWsBBRcQRF2te5/fz/rO3VA0
+        S/ROXg7dXiQDIRiyeS6WFQjXgioxJnM=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-203-d2FcSDMOPkuafvKP7Nk1Ww-1; Thu, 24 Jun 2021 11:49:57 -0400
+X-MC-Unique: d2FcSDMOPkuafvKP7Nk1Ww-1
+Received: by mail-wm1-f69.google.com with SMTP id f22-20020a1c6a160000b029018f49a7efb7so3236221wmc.1
+        for <kvm@vger.kernel.org>; Thu, 24 Jun 2021 08:49:56 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=oSmcLkLaYmb30K4x2o5V0PgF5sReFf2n8jT9UaERRsg=;
-        b=Bx4KTOcRwgJS5iQdEffSGEYDvwMjUrmvzp8vtNywghlQbMK7w9q1lCrmF/HTxEYsVU
-         ztjr2tpElC+x/ufSKJQIqpPOPf2MWTexjYLU0F6SLQ18YweKmC5n/en9Rba8pnFG68VG
-         UCVrrxfCyl+uuBQIhmxraQj9zOhFsH74IjhkfDiEyEYtyEk27s6QfkUwz2BCFfGIrWtq
-         OW8PYQPQkMEwoyHg+gFy5qzPUtngq7Oi6I6wOjAemj/XnI+8JDOuelSNy8mthS74PfP6
-         nL9AI7N0VufeWzaMvCOKX1U5qecMaQEvOtb/PtePFJpzHlUK9zcYIDP/ZRUf/EJvGAF/
-         fWAw==
-X-Gm-Message-State: AOAM5329Z5GBfjb/DAZAIrz6Rv/0+/EnZi/pfN//uMJqoII8Yv2qEWLa
-        qW0jA6N6QNjsCbg/m7LQx/SvuQ==
-X-Google-Smtp-Source: ABdhPJxfmbtVti63yi0rwniZ/V3vp7ddChowhbbwk916pZwapRYWPu+wwBqr+2N8fYjWJaOb0U93+Q==
-X-Received: by 2002:a17:90a:8542:: with SMTP id a2mr14115924pjw.185.1624549004763;
-        Thu, 24 Jun 2021 08:36:44 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id p1sm3132065pfp.137.2021.06.24.08.36.43
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 24 Jun 2021 08:36:44 -0700 (PDT)
-Date:   Thu, 24 Jun 2021 15:36:40 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Nicholas Piggin <npiggin@gmail.com>,
-        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
-        Huacai Chen <chenhuacai@kernel.org>,
-        Marc Zyngier <maz@kernel.org>,
-        Paul Mackerras <paulus@ozlabs.org>,
-        David Stevens <stevensd@chromium.org>,
-        Zhenyu Wang <zhenyuw@linux.intel.com>,
-        Zhi Wang <zhi.a.wang@intel.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        dri-devel@lists.freedesktop.org, intel-gfx@lists.freedesktop.org,
-        intel-gvt-dev@lists.freedesktop.org,
-        James Morse <james.morse@arm.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvmarm@lists.cs.columbia.edu,
-        kvm-ppc@vger.kernel.org, kvm@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-        linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Will Deacon <will@kernel.org>
-Subject: Re: [PATCH 1/6] KVM: x86/mmu: release audited pfns
-Message-ID: <YNSmiOsmJin4UPcG@google.com>
-References: <20210624035749.4054934-1-stevensd@google.com>
- <20210624035749.4054934-2-stevensd@google.com>
- <1624524156.04etgk7zmz.astroid@bobo.none>
- <4816287a-b9a9-d3f4-f844-06922d696e06@redhat.com>
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=1cyU0gxyx5x4nyoLMr8QSHN09Zeplw7HF9KeUyPYMbo=;
+        b=MfjoY9TbLBUKygnc1opHeTeDUCvqzFVEVsAquPOeG80RX1wEiJrzKrkIBsJo6nHdSm
+         vbm2dLr91b5J7TjPyIN/jLM95nuxuu1Zqmy7Vy85Jh/KaRDmW3Xn9HvJk4E0qQn6mZXP
+         o4l/dlhk/AGJ/3YJVnCb526BfOvUH5wQjpWFiFNcGCiJ8KzVamRbN+9wUxdLNLap2EUq
+         PU3v8qxr0uXF9Yfr8UPYbeGQxlKrV01pvSoCAEdJDuJE1gE55eFervPv7UF2CHRrLxgJ
+         f3Oj7fq3ZD3V5ngCGJ9TDq6eaTe0OWz76OmnySro2fEmVhhi7BLEa6JW5hmXhHcKB4Cj
+         sJHQ==
+X-Gm-Message-State: AOAM531V4g+ug2xBVGsRqA51bx44izjwZEJOCX02GbCbhDs74tsbPBbA
+        imrS4bpOdqXbiZW4WwwnupB45X/yM7kORdQHlKqmD8E3yrrrfQvXEo3ymlUqSnu4qw2nrYN2SK2
+        mmbfhVt0zfDA9
+X-Received: by 2002:a1c:9ac6:: with SMTP id c189mr5092256wme.149.1624549795616;
+        Thu, 24 Jun 2021 08:49:55 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzCqsH//+fCWJ9o/ZxJtQm10IWLQFKx8B4s0/fNmn477yVr6o5E/hX4cm3t3zfhdJwSoJ+2xg==
+X-Received: by 2002:a1c:9ac6:: with SMTP id c189mr5092237wme.149.1624549795445;
+        Thu, 24 Jun 2021 08:49:55 -0700 (PDT)
+Received: from thuth.remote.csb (pd9575c8c.dip0.t-ipconnect.de. [217.87.92.140])
+        by smtp.gmail.com with ESMTPSA id f19sm3481801wre.48.2021.06.24.08.49.54
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 24 Jun 2021 08:49:55 -0700 (PDT)
+Subject: Re: [PATCH 1/3] s390x: snippets: Add gitignore as well as linker
+ script and start assembly
+To:     Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org
+Cc:     linux-s390@vger.kernel.org, imbrenda@linux.ibm.com,
+        david@redhat.com, cohuck@redhat.com, seiden@linux.ibm.com
+References: <20210624120152.344009-1-frankja@linux.ibm.com>
+ <20210624120152.344009-2-frankja@linux.ibm.com>
+From:   Thomas Huth <thuth@redhat.com>
+Message-ID: <cd6d6ff0-82f1-269f-f826-56000431c5fb@redhat.com>
+Date:   Thu, 24 Jun 2021 17:49:53 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.11.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <4816287a-b9a9-d3f4-f844-06922d696e06@redhat.com>
+In-Reply-To: <20210624120152.344009-2-frankja@linux.ibm.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jun 24, 2021, Paolo Bonzini wrote:
-> On 24/06/21 10:43, Nicholas Piggin wrote:
-> > Excerpts from David Stevens's message of June 24, 2021 1:57 pm:
-> > > From: David Stevens <stevensd@chromium.org>
-> > 
-> > Changelog? This looks like a bug, should it have a Fixes: tag?
+On 24/06/2021 14.01, Janosch Frank wrote:
+> Snippets are small guests That can be run under a unit test as the
+> hypervisor. They can be written in C or assembly. The C code needs a
+> linker script and a start assembly file that jumps to main to work
+> properly. So let's add that as well as a gitignore entry for the new
+> files.
 > 
-> Probably has been there forever... The best way to fix the bug would be to
-> nuke mmu_audit.c, which I've threatened to do many times but never followed
-> up on.
+> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+> ---
+>   .gitignore                |  1 +
+>   s390x/snippets/c/cstart.S | 15 ++++++++++++
+>   s390x/snippets/c/flat.lds | 51 +++++++++++++++++++++++++++++++++++++++
+>   3 files changed, 67 insertions(+)
+>   create mode 100644 s390x/snippets/c/cstart.S
+>   create mode 100644 s390x/snippets/c/flat.lds
+> 
+> diff --git a/.gitignore b/.gitignore
+> index 8534fb7..b3cf2cb 100644
+> --- a/.gitignore
+> +++ b/.gitignore
+> @@ -23,3 +23,4 @@ cscope.*
+>   /api/dirty-log
+>   /api/dirty-log-perf
+>   /s390x/*.bin
+> +/s390x/snippets/*/*.gbin
+> diff --git a/s390x/snippets/c/cstart.S b/s390x/snippets/c/cstart.S
+> new file mode 100644
+> index 0000000..d7f6525
+> --- /dev/null
+> +++ b/s390x/snippets/c/cstart.S
+> @@ -0,0 +1,15 @@
+> +#include <asm/sigp.h>
+> +
+> +.section .init
+> +	.globl start
+> +start:
+> +	/* XOR all registers with themselves to clear them fully. */
+> +	.irp i, 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15
+> +	xgr \i,\i
+> +	.endr
+> +	/* 0x3000 is the stack page for now */
+> +	lghi	%r15, 0x4000 - 160
+> +	brasl	%r14, main
+> +	/* For now let's only use cpu 0 in snippets so this will always work. */
+> +	xgr	%r0, %r0
+> +	sigp    %r2, %r0, SIGP_STOP
+> diff --git a/s390x/snippets/c/flat.lds b/s390x/snippets/c/flat.lds
+> new file mode 100644
+> index 0000000..5e70732
+> --- /dev/null
+> +++ b/s390x/snippets/c/flat.lds
+> @@ -0,0 +1,51 @@
+> +SECTIONS
+> +{
+> +	.lowcore : {
+> +		/*
+> +		 * Initial short psw for disk boot, with 31 bit addressing for
+> +		 * non z/Arch environment compatibility and the instruction
+> +		 * address 0x10000 (cstart64.S .init).
 
-Yar.  It has only survived because it hasn't required any maintenance.
+I think this comment needs some adjustments (0x10000 => 0x4000 and do not 
+talk about cstart64.S)?
+
+Also, what about switching to 64-bit mode in the snippets?
+
+  Thomas
+
+
+> +		 */
+> +		. = 0;
+> +		 LONG(0x00080000)
+> +		 LONG(0x80004000)
+> +		 /* Restart new PSW for booting via PSW restart. */
+> +		 . = 0x1a0;
+> +		 QUAD(0x0000000180000000)
+> +		 QUAD(0x0000000000004000)
+> +	}
+> +	. = 0x4000;
+> +	.text : {
+> +		*(.init)
+> +		*(.text)
+> +		*(.text.*)
+> +	}
+> +	. = ALIGN(64K);
+> +	etext = .;
+> +	.opd : { *(.opd) }
+> +	. = ALIGN(16);
+> +	.dynamic : {
+> +		dynamic_start = .;
+> +		*(.dynamic)
+> +	}
+> +	.dynsym : {
+> +		dynsym_start = .;
+> +		*(.dynsym)
+> +	}
+> +	.rela.dyn : { *(.rela*) }
+> +	. = ALIGN(16);
+> +	.data : {
+> +		*(.data)
+> +		*(.data.rel*)
+> +	}
+> +	. = ALIGN(16);
+> +	.rodata : { *(.rodata) *(.rodata.*) }
+> +	. = ALIGN(16);
+> +	__bss_start = .;
+> +	.bss : { *(.bss) }
+> +	__bss_end = .;
+> +	. = ALIGN(64K);
+> +	edata = .;
+> +	. += 64K;
+> +	. = ALIGN(64K);
+> +}
+> 
+
