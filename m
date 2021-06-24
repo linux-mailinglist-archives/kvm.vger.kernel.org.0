@@ -2,29 +2,32 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id AFF403B2692
-	for <lists+kvm@lfdr.de>; Thu, 24 Jun 2021 06:53:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0C2D63B2693
+	for <lists+kvm@lfdr.de>; Thu, 24 Jun 2021 06:53:42 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230272AbhFXEy4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 24 Jun 2021 00:54:56 -0400
-Received: from bilbo.ozlabs.org ([203.11.71.1]:37373 "EHLO ozlabs.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S230020AbhFXEyt (ORCPT <rfc822;kvm@vger.kernel.org>);
+        id S230321AbhFXEy6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 24 Jun 2021 00:54:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54728 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230046AbhFXEyt (ORCPT <rfc822;kvm@vger.kernel.org>);
         Thu, 24 Jun 2021 00:54:49 -0400
+Received: from ozlabs.org (ozlabs.org [IPv6:2401:3900:2:1::2])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1A303C061574;
+        Wed, 23 Jun 2021 21:52:31 -0700 (PDT)
 Received: by ozlabs.org (Postfix, from userid 1007)
-        id 4G9SRT3YPMz9srZ; Thu, 24 Jun 2021 14:52:21 +1000 (AEST)
+        id 4G9SRT4N9jz9t0G; Thu, 24 Jun 2021 14:52:21 +1000 (AEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
         d=gibson.dropbear.id.au; s=201602; t=1624510341;
-        bh=EHvfXmcln2cuvHUfIp1Ef7p8K3ajzOq94RDeey096tE=;
+        bh=IQ9z+FM1iAU3YGel/DdKjNbW4g2/iGQc7u1SOhwdQ0s=;
         h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=TLx424KuLQp4RlGrMdd/XU1zskLB9aQBL7f+kySPUHLCC3lqX9LWrh12zvpA+TcOr
-         0StJ/pb2zu0SG9Y0IiFFtsyzTFOs8YMMnsQ7Xl5Oy/8tVeSv8nw3Nz8qwSpgUoHTfg
-         JWwQ8QJOV4hokfVSaRLQ1EUzu8E+KejVDr94Jz50=
-Date:   Thu, 24 Jun 2021 14:23:36 +1000
+        b=XrQJxQdJWPhjxVgCbCvSQiloi3rkVpfm2OknyTuLr5aJEyPSYbjaSQbwKTATK4Dh1
+         a8jj2iFI0crcsm/IlvkPOx3yxN07wQw4ubXDYMVa3Ozx7AM41RbF2ER1ENOkGosarx
+         VynjZgaWVK3oVxha+EdKVz8Phcc0ery4TQpvqyqE=
+Date:   Thu, 24 Jun 2021 14:26:11 +1000
 From:   David Gibson <david@gibson.dropbear.id.au>
-To:     Alex Williamson <alex.williamson@redhat.com>
-Cc:     "Tian, Kevin" <kevin.tian@intel.com>,
-        Jason Gunthorpe <jgg@nvidia.com>,
+To:     "Tian, Kevin" <kevin.tian@intel.com>
+Cc:     Jason Gunthorpe <jgg@nvidia.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
         Joerg Roedel <joro@8bytes.org>,
         Jean-Philippe Brucker <jean-philippe@linaro.org>,
         Jason Wang <jasowang@redhat.com>,
@@ -46,10 +49,8 @@ Cc:     "Tian, Kevin" <kevin.tian@intel.com>,
         LKML <linux-kernel@vger.kernel.org>,
         Lu Baolu <baolu.lu@linux.intel.com>
 Subject: Re: Plan for /dev/ioasid RFC v2
-Message-ID: <YNQIyP4RR0PmVtLo@yekko>
-References: <20210612012846.GC1002214@nvidia.com>
- <20210612105711.7ac68c83.alex.williamson@redhat.com>
- <20210614140711.GI1002214@nvidia.com>
+Message-ID: <YNQJY2Ji+KOBYWbt@yekko>
+References: <20210614140711.GI1002214@nvidia.com>
  <20210614102814.43ada8df.alex.williamson@redhat.com>
  <MWHPR11MB1886239C82D6B66A732830B88C309@MWHPR11MB1886.namprd11.prod.outlook.com>
  <20210615101215.4ba67c86.alex.williamson@redhat.com>
@@ -57,116 +58,78 @@ References: <20210612012846.GC1002214@nvidia.com>
  <20210616133937.59050e1a.alex.williamson@redhat.com>
  <MWHPR11MB18865DF9C50F295820D038798C0E9@MWHPR11MB1886.namprd11.prod.outlook.com>
  <20210617151452.08beadae.alex.williamson@redhat.com>
+ <20210618001956.GA1987166@nvidia.com>
+ <MWHPR11MB1886A17124605251DF394E888C0D9@MWHPR11MB1886.namprd11.prod.outlook.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="VbemreCsSMMcmVQr"
+        protocol="application/pgp-signature"; boundary="BSFjbAhaUqNWeFX5"
 Content-Disposition: inline
-In-Reply-To: <20210617151452.08beadae.alex.williamson@redhat.com>
+In-Reply-To: <MWHPR11MB1886A17124605251DF394E888C0D9@MWHPR11MB1886.namprd11.prod.outlook.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
---VbemreCsSMMcmVQr
+--BSFjbAhaUqNWeFX5
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Jun 17, 2021 at 03:14:52PM -0600, Alex Williamson wrote:
-> On Thu, 17 Jun 2021 07:31:03 +0000
-> "Tian, Kevin" <kevin.tian@intel.com> wrote:
-> > > From: Alex Williamson <alex.williamson@redhat.com>
-> > > Sent: Thursday, June 17, 2021 3:40 AM
-> > > On Wed, 16 Jun 2021 06:43:23 +0000
-> > > "Tian, Kevin" <kevin.tian@intel.com> wrote:
-> > > > > From: Alex Williamson <alex.williamson@redhat.com>
-> > > > > Sent: Wednesday, June 16, 2021 12:12 AM
-> > > > > On Tue, 15 Jun 2021 02:31:39 +0000
-> > > > > "Tian, Kevin" <kevin.tian@intel.com> wrote:
-> > > > > > > From: Alex Williamson <alex.williamson@redhat.com>
-> > > > > > > Sent: Tuesday, June 15, 2021 12:28 AM
-[snip]
-
-> > > > > 3) A dual-function conventional PCI e1000 NIC where the functions=
- are
-> > > > >    grouped together due to shared RID.
-> > > > >
-> > > > >    a) Repeat 2.a) and 2.b) such that we have a valid, user access=
-ible
-> > > > >       devices in the same IOMMU context.
-> > > > >
-> > > > >    b) Function 1 is detached from the IOASID.
-> > > > >
-> > > > >    I think function 1 cannot be placed into a different IOMMU con=
-text
-> > > > >    here, does the detach work?  What's the IOMMU context now? =20
-> > > >
-> > > > Yes. Function 1 is back to block-DMA. Since both functions share RI=
-D,
-> > > > essentially it implies function 0 is in block-DMA state too (though=
- its
-> > > > tracking state may not change yet) since the shared IOMMU context
-> > > > entry blocks DMA now. In IOMMU fd function 0 is still attached to t=
-he
-> > > > IOASID thus the user still needs do an explicit detach to clear the
-> > > > tracking state for function 0.
-> > > > =20
-> > > > >
-> > > > >    c) A new IOASID is alloc'd within the existing iommu_fd and fu=
-nction
-> > > > >       1 is attached to the new IOASID.
-> > > > >
-> > > > >    Where, how, by whom does this fail? =20
-> > > >
-> > > > No need to fail. It can succeed since doing so just hurts user's ow=
-n foot.
-> > > >
-> > > > The only question is how user knows the fact that a group of devices
-> > > > share RID thus avoid such thing. I'm curious how it is communicated
-> > > > with today's VFIO mechanism. Yes the group-centric VFIO uAPI preven=
-ts
-> > > > a group of devices from attaching to multiple IOMMU contexts, but
-> > > > suppose we still need a way to tell the user to not do so. Especial=
-ly
-> > > > such knowledge would be also reflected in the virtual PCI topology
-> > > > when the entire group is assigned to the guest which needs to know
-> > > > this fact when vIOMMU is exposed. I haven't found time to investiga=
-te
-> > > > it but suppose if such channel exists it could be reused, or in the=
- worst
-> > > > case we may have the new device capability interface to convey... =
-=20
-> > >=20
-> > > No such channel currently exists, it's not an issue today, IOMMU
-> > > context is group-based. =20
+On Fri, Jun 18, 2021 at 04:57:40PM +0000, Tian, Kevin wrote:
+> > From: Jason Gunthorpe <jgg@nvidia.com>
+> > Sent: Friday, June 18, 2021 8:20 AM
 > >=20
-> > Interesting... If such group of devices are assigned to a guest, how do=
+> > On Thu, Jun 17, 2021 at 03:14:52PM -0600, Alex Williamson wrote:
+> >=20
+> > > I've referred to this as a limitation of type1, that we can't put
+> > > devices within the same group into different address spaces, such as
+> > > behind separate vRoot-Ports in a vIOMMU config, but really, who cares?
+> > > As isolation support improves we see fewer multi-device groups, this
+> > > scenario becomes the exception.  Buy better hardware to use the devic=
 es
-> > Qemu decide the virtual PCI topology for them? Do they have same
-> > vRID or different?
+> > > independently.
+> >=20
+> > This is basically my thinking too, but my conclusion is that we should
+> > not continue to make groups central to the API.
+> >=20
+> > As I've explained to David this is actually causing functional
+> > problems and mess - and I don't see a clean way to keep groups central
+> > but still have the device in control of what is happening. We need
+> > this device <-> iommu connection to be direct to robustly model all
+> > the things that are in the RFC.
+> >=20
+> > To keep groups central someone needs to sketch out how to solve
+> > today's mdev SW page table and mdev PASID issues in a clean
+> > way. Device centric is my suggestion on how to make it clean, but I
+> > haven't heard an alternative??
+> >=20
+> > So, I view the purpose of this discussion to scope out what a
+> > device-centric world looks like and then if we can securely fit in the
+> > legacy non-isolated world on top of that clean future oriented
+> > API. Then decide if it is work worth doing or not.
+> >=20
+> > To my mind it looks like it is not so bad, granted not every detail is
+> > clear, and no code has be sketched, but I don't see a big scary
+> > blocker emerging. An extra ioctl or two, some special logic that
+> > activates for >1 device groups that looks a lot like VFIO's current
+> > logic..
+> >=20
+> > At some level I would be perfectly fine if we made the group FD part
+> > of the API for >1 device groups - except that complexifies every user
+> > space implementation to deal with that. It doesn't feel like a good
+> > trade off.
+> >=20
 >=20
-> That's the beauty of it, it doesn't matter how many RIDs exist in the
-> group, or which devices have aliases, the group is the minimum
-> granularity of a container where QEMU knows that a container provides
-> a single address space.  Therefore a container must exist in a single
-> address space in the PCI topology.  In a conventional or non-vIOMMU
-> topology, the PCI address space is equivalent to the system memory
-> address space.  When vIOMMU gets involved, multiple devices within the
-> same group must exist in the same address space.  A vPCIe-to-PCI bridge
-> can be used to create that shared address space.
->=20
-> I've referred to this as a limitation of type1, that we can't put
-> devices within the same group into different address spaces, such as
-> behind separate vRoot-Ports in a vIOMMU config, but really, who cares?
-> As isolation support improves we see fewer multi-device groups, this
-> scenario becomes the exception.  Buy better hardware to use the devices
-> independently.
+> Would it be an acceptable tradeoff by leaving >1 device groups=20
+> supported only via legacy VFIO (which is anyway kept for backward=20
+> compatibility), if we think such scenario is being deprecated over=20
+> time (thus little value to add new features on it)? Then all new=20
+> sub-systems including vdpa and new vfio only support singleton=20
+> device group via /dev/iommu...
 
-Also, that limitation is fundamental.  Groups in a guest must always
-be the same or strictly bigger than groups in the host, because if the
-real hardware can't isolate them, then the virtual hardware certainly
-can't and the guest kernel shouldn't be given the impression that it
-can separate them.
+The case that worries me here is if you *thought* you had 1 device
+groups, but then discover a hardware bug which means two things aren't
+as isolated as you thought they were.  What do you do then?
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -174,24 +137,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---VbemreCsSMMcmVQr
+--BSFjbAhaUqNWeFX5
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAmDUCMYACgkQbDjKyiDZ
-s5IbcQ//RRnk6578Dd3RoItAw/ouSkamizbOnDMKW7uaqK9YsPPO02q6NleujshT
-GRaG2DwHv5YMH3GGLpS7zFa9iitJezuIC/0WuLH/Ypq735SPTU7NVbRpsB5ijbUR
-HW06YH5mmYETGwtp+vb8zxq7AWcKk7KqlHYBjvwK8nU5Klr27m8gqth7qW5DqB0k
-9uhcJZXOaFCDYMdVX1DTaOQ3TdJLf7+Rwf8gfVM3Ma1sq0jgv3rzxCz6tLqoJ0pe
-pQW/yd0/iwz/tIYYWK8xB6YnT+u+ozEFJHqehdxY5yaC+c/GN8tzd4UNCJv5F0is
-CTdwipKta3C9Mxzv4x1s74NkDnT6b1SSN0ZjyVA/md10KLnyRFjSxVoYh7Ab/ODk
-+u70Zl2lBBScUksTyeqG5QDVa/y0T8O9b6yTsh4aY4XdtpR2FZSY/kVS6gyq0uyr
-1Epw5S1E9JSmYaGuYcdaAHD3b8+HxTVvn1RfdWXcfNvhSjDrmPtmUyWnqWTo64OV
-PEWuw4FcaSPDMLZMqvFFMWE2heNyWfLpzvU9ym+cgj4L6bImaY8k6jAaEu3HfWQZ
-25XxtcXaWhBHrCT66YWjeqPtMZypAZCaiabGEt29+ijNqBRiaO8+tGwBtAuYiWvK
-K9v+f84XO3+e+kCvEdIf0a5+Xn2N04QDnb6fs41xkCE8hasvUVQ=
-=Tqsh
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAmDUCWMACgkQbDjKyiDZ
+s5JgnBAAijxDul/b69WVeLvr273k1oikuFzryDz0SoUd6u2u3P7j6lAs+Dcv8JhT
+1axAxKuR0AVeuXynUT+3495hpYmgk0oxgnVqv6aJN8mnClivsB8Np6X01ECSNvWE
+sZCjNghU0iexB3mykPf3yNTT0GCOnLmSooAIuBd+EihcYCdMYWkCJlMzJFs5Q10f
+BdHdbSft/nr+anGf7JNI5d+S5iZ/IadIU9/0Csz2jz52SmdYTTfp2aEPB8PTPcf+
++bF6xw1afgI+YvUn87Ortey5Vh1yvXWMoVNHD1YsY+/gtXeacONIYAewina44dim
+nSzeeLRZH9lumHDaOl5Aa59cePtQ+1N5hSfSTTK9MNzutkVn7vmHivE9XugJ3lUO
+NdrDbEhs5shVc/g4Te7yCagVc6F61z4onbsSCsJAw9s1IJcgqh9lytXPo91BoKM3
+5RM/TV4Jp8Xege18mnEcv6rVcTp9FrBswbWR6cZG3gakVdF2KAvMFyqYHqzGRz9f
+GaBPSkCddBxbghmHnDhCbU9nWZgoR2ieCCFEeqxj42vZj5sW9Jm5gVpzEQv1Wqem
+vb4FjnRyiK14bx9P/mcZFwyWYcu8pZ/KZst6aKLB2mS62GzvnTJO8gnWzvHyer7s
+Uw0G0wSCHLFFm4ubP01I7xv+Fa0h7R4hSrmUitr5aFYfMMF7bUY=
+=v6Yg
 -----END PGP SIGNATURE-----
 
---VbemreCsSMMcmVQr--
+--BSFjbAhaUqNWeFX5--
