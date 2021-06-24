@@ -2,80 +2,92 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8C2473B247B
-	for <lists+kvm@lfdr.de>; Thu, 24 Jun 2021 03:20:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BE9F53B248C
+	for <lists+kvm@lfdr.de>; Thu, 24 Jun 2021 03:36:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229882AbhFXBWz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 23 Jun 2021 21:22:55 -0400
-Received: from mga18.intel.com ([134.134.136.126]:23743 "EHLO mga18.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229759AbhFXBWy (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 23 Jun 2021 21:22:54 -0400
-IronPort-SDR: Rp3uolIvG4kSR8A0qwJuUEj5I4iwMU5PhV9nXrYVpyGOlD0iHuq4MLquymIJr+1mbt1r5YIP6p
- YdbxoylfX9zg==
-X-IronPort-AV: E=McAfee;i="6200,9189,10024"; a="194676400"
-X-IronPort-AV: E=Sophos;i="5.83,295,1616482800"; 
-   d="scan'208";a="194676400"
-Received: from fmsmga001.fm.intel.com ([10.253.24.23])
-  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Jun 2021 18:20:36 -0700
-IronPort-SDR: tac5mdNb3TRW2zCX7aYeaEw/PrSAYMm4FPomcKXiPCsXeARGJjj/ei0UhvRMipfXkfRn6aXZ8J
- FFhGHxLxycXw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.83,295,1616482800"; 
-   d="scan'208";a="557156873"
-Received: from michael-optiplex-9020.sh.intel.com (HELO localhost) ([10.239.159.182])
-  by fmsmga001.fm.intel.com with ESMTP; 23 Jun 2021 18:20:32 -0700
-Date:   Thu, 24 Jun 2021 09:35:10 +0800
-From:   Yang Weijiang <weijiang.yang@intel.com>
-To:     Jim Mattson <jmattson@google.com>
-Cc:     Like Xu <like.xu@linux.intel.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Yang Weijiang <weijiang.yang@intel.com>,
-        Wei Wang <wei.w.wang@intel.com>,
-        kvm list <kvm@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>
-Subject: Re: [RESEND PATCH v4 04/10] KVM: vmx/pmu: Add MSR_ARCH_LBR_CTL
- emulation for Arch LBR
-Message-ID: <20210624013510.GB15841@intel.com>
-References: <20210510081535.94184-1-like.xu@linux.intel.com>
- <20210510081535.94184-5-like.xu@linux.intel.com>
- <CALMp9eQG+JLnHe4zRKg0sHtxynSiGGKPw--5J+cY2-f3QWRW2A@mail.gmail.com>
+        id S229800AbhFXBi2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 23 Jun 2021 21:38:28 -0400
+Received: from Galois.linutronix.de ([193.142.43.55]:41142 "EHLO
+        galois.linutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229774AbhFXBi0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 23 Jun 2021 21:38:26 -0400
+From:   Thomas Gleixner <tglx@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+        s=2020; t=1624498567;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=6Agt8zrKs/F4N1ClKsmnKuU3iQuaV8RIz8HGNILY824=;
+        b=r6nZ0D+TDAABUcuiRXUXXjAPUgIo5ABoa3CP8Z9rO92u1p6M/G+rRRrJ3LsUB7iW0bioDf
+        uV9QtqUhNXszmdgWL/zreyN4OUgkk9E7tFjRhpc6cF1Pz93SkgWONIHWncxizxLU4WPLpZ
+        9OnC0laLO11hfUF8SnoCKXsj/KaTYSnl119r9Nsa25jYEBBEWswzD+YMHg3usE/JMes+2W
+        kp4hhV7zMo4D8RjDbuiUSS0+vg6gBHX/HYx5N9SrFX6biLxykbDhgoD2/EN6qaFajq8yM1
+        j/zWi4X7c9SdfrT0i0mmos/k8VcGd8OowSlqfXkZR/JyY+7JvEOBXFv+89UB2A==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+        s=2020e; t=1624498567;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=6Agt8zrKs/F4N1ClKsmnKuU3iQuaV8RIz8HGNILY824=;
+        b=y8FPE18Zp85WPUYsfkJjRINkv8U883vG42wRCe7SBCrRwuvnO7QJEtKTwloCWOmm4Bfa8s
+        Q4sF4oAYK0MzoQBw==
+To:     "Tian\, Kevin" <kevin.tian@intel.com>,
+        Alex Williamson <alex.williamson@redhat.com>
+Cc:     Jason Gunthorpe <jgg@nvidia.com>,
+        "Dey\, Megha" <megha.dey@intel.com>,
+        "Raj\, Ashok" <ashok.raj@intel.com>,
+        "Pan\, Jacob jun" <jacob.jun.pan@intel.com>,
+        "Jiang\, Dave" <dave.jiang@intel.com>,
+        "Liu\, Yi L" <yi.l.liu@intel.com>,
+        "Lu\, Baolu" <baolu.lu@intel.com>,
+        "Williams\, Dan J" <dan.j.williams@intel.com>,
+        "Luck\, Tony" <tony.luck@intel.com>,
+        "Kumar\, Sanjay K" <sanjay.k.kumar@intel.com>,
+        LKML <linux-kernel@vger.kernel.org>, KVM <kvm@vger.kernel.org>,
+        Kirti Wankhede <kwankhede@nvidia.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Marc Zyngier <maz@kernel.org>,
+        Bjorn Helgaas <helgaas@kernel.org>
+Subject: RE: Virtualizing MSI-X on IMS via VFIO
+In-Reply-To: <MWHPR11MB18864420ACE88E060203F7818C079@MWHPR11MB1886.namprd11.prod.outlook.com>
+References: <20210622131217.76b28f6f.alex.williamson@redhat.com> <87o8bxcuxv.ffs@nanos.tec.linutronix.de> <20210623091935.3ab3e378.alex.williamson@redhat.com> <MWHPR11MB18864420ACE88E060203F7818C079@MWHPR11MB1886.namprd11.prod.outlook.com>
+Date:   Thu, 24 Jun 2021 03:36:07 +0200
+Message-ID: <87r1gsavso.ffs@nanos.tec.linutronix.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CALMp9eQG+JLnHe4zRKg0sHtxynSiGGKPw--5J+cY2-f3QWRW2A@mail.gmail.com>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jun 23, 2021 at 11:29:08AM -0700, Jim Mattson wrote:
-> On Mon, May 10, 2021 at 1:16 AM Like Xu <like.xu@linux.intel.com> wrote:
-> >
-> > Arch LBRs are enabled by setting MSR_ARCH_LBR_CTL.LBREn to 1. A new guest
-> > state field named "Guest IA32_LBR_CTL" is added to enhance guest LBR usage.
-> > When guest Arch LBR is enabled, a guest LBR event will be created like the
-> > model-specific LBR does.
-> >
-> > On processors that support Arch LBR, MSR_IA32_DEBUGCTLMSR[bit 0] has no
-> > meaning. It can be written to 0 or 1, but reads will always return 0.
-> > Like IA32_DEBUGCTL, IA32_ARCH_LBR_CTL msr is also reserved on INIT.
-> >
-> > Signed-off-by: Like Xu <like.xu@linux.intel.com>
-> > ---
-> >  arch/x86/events/intel/lbr.c      |  2 --
-> >  arch/x86/include/asm/msr-index.h |  1 +
-> >  arch/x86/include/asm/vmx.h       |  2 ++
-> >  arch/x86/kvm/vmx/pmu_intel.c     | 31 ++++++++++++++++++++++++++-----
-> >  arch/x86/kvm/vmx/vmx.c           |  9 +++++++++
-> >  5 files changed, 38 insertions(+), 7 deletions(-)
-> >
-> Same comments as on the previous patch. Your guard for ensuring that
-> the new VMCS fields exist can be spoofed by a malicious userspace, and
-> the new MSR has to be enumerated by KVM_GET_MSR_INDEX_LIST.
+Kevin,
 
-OK, will modify the code, thanks!
+On Thu, Jun 24 2021 at 00:00, Kevin Tian wrote:
+>> From: Alex Williamson <alex.williamson@redhat.com>
+>> Sent: Wednesday, June 23, 2021 11:20 PM
+>>
+> [...]
+>  > > So the only downside today of allocating more MSI-X vectors than
+>> > necessary is memory consumption for the irq descriptors.
+>> 
+>> As above, this is a QEMU policy of essentially trying to be a good
+>> citizen and allocate only what we can infer the guest is using.  What's
+>> a good way for QEMU, or any userspace, to know it's running on a host
+>> where vector exhaustion is not an issue?
+>
+> In my proposal a new command (VFIO_DEVICE_ALLOC_IRQS) is
+> introduced to separate allocation from enabling. The availability
+> of this command could be the indicator whether vector 
+> exhaustion is not an issue now?
+
+Your proposal still does not address the fundamental issue of a missing
+feedback to the guest and you can invent a gazillion more IOCTL commands
+and none of them will solve that issue. A hypercall/paravirt interface is
+the only reasonable solution.
+
+The time you are wasting to come up with non-solutions would have surely
+been better spent implementing the already known and obvious proper
+solution. You might be halfways done already with that.
+
+Thanks,
+
+        tglx
