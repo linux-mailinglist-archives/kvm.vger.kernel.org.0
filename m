@@ -2,48 +2,48 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E034B3B25EC
-	for <lists+kvm@lfdr.de>; Thu, 24 Jun 2021 06:00:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 412793B25EF
+	for <lists+kvm@lfdr.de>; Thu, 24 Jun 2021 06:00:08 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229906AbhFXECR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 24 Jun 2021 00:02:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43118 "EHLO
+        id S230103AbhFXECY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 24 Jun 2021 00:02:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43142 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230135AbhFXECN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 24 Jun 2021 00:02:13 -0400
-Received: from mail-pf1-x429.google.com (mail-pf1-x429.google.com [IPv6:2607:f8b0:4864:20::429])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 940CFC061768
-        for <kvm@vger.kernel.org>; Wed, 23 Jun 2021 20:59:50 -0700 (PDT)
-Received: by mail-pf1-x429.google.com with SMTP id x16so4018196pfa.13
-        for <kvm@vger.kernel.org>; Wed, 23 Jun 2021 20:59:50 -0700 (PDT)
+        with ESMTP id S230123AbhFXECQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 24 Jun 2021 00:02:16 -0400
+Received: from mail-pl1-x629.google.com (mail-pl1-x629.google.com [IPv6:2607:f8b0:4864:20::629])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 217F7C0617A8
+        for <kvm@vger.kernel.org>; Wed, 23 Jun 2021 20:59:57 -0700 (PDT)
+Received: by mail-pl1-x629.google.com with SMTP id f10so2274885plg.0
+        for <kvm@vger.kernel.org>; Wed, 23 Jun 2021 20:59:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=chromium.org; s=google;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=cmGok1KP9mkQUahLNaNswnkRk+BZZNd8A6VDpCy6mq0=;
-        b=Puw+zuEB547BUNk23be4KLF8wOVKHFDwynxb4lruaPyNnXdjflBU2IzSDSn7Mmy/gI
-         GmMEkygbtUT0U9MSVI1A6lkcjDvFwvTTnQG/iiZY4thta8fK1I/CMV1Jn3JYfI6nzDB9
-         oH6xXVSDsNDRtnT8PT8KZIDcpOdIdD4cCiLRs=
+        bh=XjEayNMlIwhFhTFpVTjls3Ls2951L1asvLWBRAdhY3Y=;
+        b=G77WVjqExeZDMfTQpHWKdkz3bcIMpyywk0hn2DFzio98Q3inTQhorfjwOkm4iuNKJU
+         mxuBNfP0KjCiAis8RQ+zA3fZcUX2BaLJIDg/t4p3OFlFZkwuDfR2Fh5iQuxQZe1h4JMA
+         4ph+TptUQPX0BjwZV6XTittsxQASh9OxDag80=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=cmGok1KP9mkQUahLNaNswnkRk+BZZNd8A6VDpCy6mq0=;
-        b=O6kRUaKqOFGA4FwSZIg8MpGFknxvQ8BnXP/tyyxIWkP+6QXzoIQfKSxc1F6yefBSiQ
-         EstmFR6m8jTRlMEO0AV1pd8u4LzNXMnTUBjDoJCh4wyqXE/rDNub4nCpbp+HwtnGZOFw
-         faZDIRuby0nFYjpC1GzdcLTouTzYGinjawJUTdDIeBN9rJrCRUqXxuXcmwdTDmiP4Mef
-         7jMrkh7q/b314d2hcUPGq+YG4Wi3v1vuTsadmsYiqHBYMLEmnhwBuaQ6SC6cLcI6lyR3
-         52CsC/5fq+984uw3n6HmT6gxq/z7VVmLUTjkK/NZ9z51o9elZPpUlV7YxjV3lwVqGi9d
-         TnsQ==
-X-Gm-Message-State: AOAM530wruZsVbcc/YkOMCFC5h1UR9lNGt3Ilr4n4jwvkXDlN0cF0J90
-        blravoRQuXhmYHUuuo82aSqsUw==
-X-Google-Smtp-Source: ABdhPJwdqYHO15pKuqB3WHvaFPDIGe3ZMDHFKd80sEGqz3qF8TpcI89MlzrarjtQsVeWDyea1kRTqQ==
-X-Received: by 2002:a63:d0d:: with SMTP id c13mr2893248pgl.384.1624507190102;
-        Wed, 23 Jun 2021 20:59:50 -0700 (PDT)
+        bh=XjEayNMlIwhFhTFpVTjls3Ls2951L1asvLWBRAdhY3Y=;
+        b=d8zE5ruYn/slETqP5melqsk/IARGXh2nH2Pju+jIKhY9htnmXW3IZrc6Ab7fD7Dvzf
+         f+tIrY8WAR4JEXaaH5S5mjX8CpFQKQxrfFeIZ83GN+VHz0fQ/0UNtriB4FuISb85ofXy
+         bD9wAgyvoKCUPm4SFkZFTtYFYcj2ky4cQDkB2vNWiot5DlikqRnTeOUdl9oh4C5MAZ7T
+         n3sc23waQXEDhrsoWS25TcGsaOQNK2PZi7h9uj0Jgmf7hohSzUh2B50lnj0Xl87gL93v
+         08G/05aMWtEAbcIAhsz4aZLN0ZS3a0zBYbOJLeoDDIQFAOOeHZF51zuDqR784BpyAth0
+         6fgw==
+X-Gm-Message-State: AOAM531e/5qRDmSEQu3rlduKTHW4dehuGMFjT/ECkp8XxoRFyQPPE3fK
+        vTV8ksOisZpnTRZY/yd1jwa9rA==
+X-Google-Smtp-Source: ABdhPJwBjKIdwJ67nTn5zGrOIiHK3SFb/S1q0kw7SUwOmlUsMSXtCkZWszp3zgRP4jaoChbAevZVNg==
+X-Received: by 2002:a17:902:9006:b029:107:394a:387 with SMTP id a6-20020a1709029006b0290107394a0387mr2507432plp.35.1624507196693;
+        Wed, 23 Jun 2021 20:59:56 -0700 (PDT)
 Received: from localhost ([2401:fa00:8f:203:5038:6344:7f10:3690])
-        by smtp.gmail.com with UTF8SMTPSA id a6sm1134854pfo.212.2021.06.23.20.59.45
+        by smtp.gmail.com with UTF8SMTPSA id x5sm1155975pff.37.2021.06.23.20.59.51
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 23 Jun 2021 20:59:49 -0700 (PDT)
+        Wed, 23 Jun 2021 20:59:56 -0700 (PDT)
 From:   David Stevens <stevensd@chromium.org>
 X-Google-Original-From: David Stevens <stevensd@google.com>
 To:     Marc Zyngier <maz@kernel.org>, Huacai Chen <chenhuacai@kernel.org>,
@@ -66,10 +66,10 @@ Cc:     James Morse <james.morse@arm.com>,
         kvm@vger.kernel.org, kvm-ppc@vger.kernel.org,
         linuxppc-dev@lists.ozlabs.org, intel-gvt-dev@lists.freedesktop.org,
         intel-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
-        David Stevens <stevensd@chromium.org>
-Subject: [PATCH 5/6] KVM: mmu: remove over-aggressive warnings
-Date:   Thu, 24 Jun 2021 12:57:48 +0900
-Message-Id: <20210624035749.4054934-6-stevensd@google.com>
+        David Stevens <stevensd@google.com>
+Subject: [PATCH 6/6] drm/i915/gvt: use gfn_to_pfn's page instead of pfn
+Date:   Thu, 24 Jun 2021 12:57:49 +0900
+Message-Id: <20210624035749.4054934-7-stevensd@google.com>
 X-Mailer: git-send-email 2.32.0.93.g670b81a890-goog
 In-Reply-To: <20210624035749.4054934-1-stevensd@google.com>
 References: <20210624035749.4054934-1-stevensd@google.com>
@@ -79,48 +79,129 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: David Stevens <stevensd@chromium.org>
+Return struct page instead of pfn from gfn_to_mfn. This function is only
+used to determine if the page is a transparent hugepage, to enable 2MB
+huge gtt shadowing. Returning the page directly avoids the risk of
+calling pfn_to_page on a VM_IO|VM_PFNMAP pfn.
 
-Remove two warnings that require ref counts for pages to be non-zero, as
-mapped pfns from follow_pfn may not have an initialized ref count.
+This change also properly releases the reference on the page returned by
+gfn_to_pfn.
 
-Signed-off-by: David Stevens <stevensd@chromium.org>
+Signed-off-by: David Stevens <stevensd@google.com>
 ---
- arch/x86/kvm/mmu/mmu.c | 7 -------
- virt/kvm/kvm_main.c    | 2 +-
- 2 files changed, 1 insertion(+), 8 deletions(-)
+ drivers/gpu/drm/i915/gvt/gtt.c       | 12 ++++++++----
+ drivers/gpu/drm/i915/gvt/hypercall.h |  3 ++-
+ drivers/gpu/drm/i915/gvt/kvmgt.c     | 12 ++++--------
+ drivers/gpu/drm/i915/gvt/mpt.h       |  8 ++++----
+ 4 files changed, 18 insertions(+), 17 deletions(-)
 
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index 8fa4a4a411ba..19249ad4b5b8 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -546,13 +546,6 @@ static int mmu_spte_clear_track_bits(u64 *sptep)
+diff --git a/drivers/gpu/drm/i915/gvt/gtt.c b/drivers/gpu/drm/i915/gvt/gtt.c
+index 9478c132d7b6..b2951c560582 100644
+--- a/drivers/gpu/drm/i915/gvt/gtt.c
++++ b/drivers/gpu/drm/i915/gvt/gtt.c
+@@ -1160,16 +1160,20 @@ static int is_2MB_gtt_possible(struct intel_vgpu *vgpu,
+ 	struct intel_gvt_gtt_entry *entry)
+ {
+ 	struct intel_gvt_gtt_pte_ops *ops = vgpu->gvt->gtt.pte_ops;
+-	unsigned long pfn;
++	struct page *page;
++	bool is_trans_huge;
  
- 	pfn = spte_to_pfn(old_spte);
+ 	if (!HAS_PAGE_SIZES(vgpu->gvt->gt->i915, I915_GTT_PAGE_SIZE_2M))
+ 		return 0;
  
--	/*
--	 * KVM does not hold the refcount of the page used by
--	 * kvm mmu, before reclaiming the page, we should
--	 * unmap it from mmu first.
--	 */
--	WARN_ON(!kvm_is_reserved_pfn(pfn) && !page_count(pfn_to_page(pfn)));
+-	pfn = intel_gvt_hypervisor_gfn_to_mfn(vgpu, ops->get_pfn(entry));
+-	if (pfn == INTEL_GVT_INVALID_ADDR)
++	page = intel_gvt_hypervisor_gfn_to_mfn_page(vgpu, ops->get_pfn(entry));
++	if (!page)
+ 		return -EINVAL;
+ 
+-	return PageTransHuge(pfn_to_page(pfn));
++	is_trans_huge = PageTransHuge(page);
++	put_page(page);
++
++	return is_trans_huge;
+ }
+ 
+ static int split_2MB_gtt_entry(struct intel_vgpu *vgpu,
+diff --git a/drivers/gpu/drm/i915/gvt/hypercall.h b/drivers/gpu/drm/i915/gvt/hypercall.h
+index b79da5124f83..017190ff52d5 100644
+--- a/drivers/gpu/drm/i915/gvt/hypercall.h
++++ b/drivers/gpu/drm/i915/gvt/hypercall.h
+@@ -60,7 +60,8 @@ struct intel_gvt_mpt {
+ 			unsigned long len);
+ 	int (*write_gpa)(unsigned long handle, unsigned long gpa, void *buf,
+ 			 unsigned long len);
+-	unsigned long (*gfn_to_mfn)(unsigned long handle, unsigned long gfn);
++	struct page *(*gfn_to_mfn_page)(unsigned long handle,
++					unsigned long gfn);
+ 
+ 	int (*dma_map_guest_page)(unsigned long handle, unsigned long gfn,
+ 				  unsigned long size, dma_addr_t *dma_addr);
+diff --git a/drivers/gpu/drm/i915/gvt/kvmgt.c b/drivers/gpu/drm/i915/gvt/kvmgt.c
+index b829ff67e3d9..1e97ae813ed0 100644
+--- a/drivers/gpu/drm/i915/gvt/kvmgt.c
++++ b/drivers/gpu/drm/i915/gvt/kvmgt.c
+@@ -1928,21 +1928,17 @@ static int kvmgt_inject_msi(unsigned long handle, u32 addr, u16 data)
+ 	return -EFAULT;
+ }
+ 
+-static unsigned long kvmgt_gfn_to_pfn(unsigned long handle, unsigned long gfn)
++static struct page *kvmgt_gfn_to_page(unsigned long handle, unsigned long gfn)
+ {
+ 	struct kvmgt_guest_info *info;
+ 	kvm_pfn_t pfn;
+ 
+ 	if (!handle_valid(handle))
+-		return INTEL_GVT_INVALID_ADDR;
++		return NULL;
+ 
+ 	info = (struct kvmgt_guest_info *)handle;
+ 
+-	pfn = kvm_pfn_page_unwrap(gfn_to_pfn(info->kvm, gfn));
+-	if (is_error_noslot_pfn(pfn))
+-		return INTEL_GVT_INVALID_ADDR;
 -
- 	if (is_accessed_spte(old_spte))
- 		kvm_set_pfn_accessed(pfn);
+-	return pfn;
++	return gfn_to_pfn(info->kvm, gfn).page;
+ }
  
-diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index 898e90be4d0e..671361f30476 100644
---- a/virt/kvm/kvm_main.c
-+++ b/virt/kvm/kvm_main.c
-@@ -168,7 +168,7 @@ bool kvm_is_zone_device_pfn(kvm_pfn_t pfn)
- 	 * the device has been pinned, e.g. by get_user_pages().  WARN if the
- 	 * page_count() is zero to help detect bad usage of this helper.
- 	 */
--	if (!pfn_valid(pfn) || WARN_ON_ONCE(!page_count(pfn_to_page(pfn))))
-+	if (!pfn_valid(pfn) || !page_count(pfn_to_page(pfn)))
- 		return false;
+ static int kvmgt_dma_map_guest_page(unsigned long handle, unsigned long gfn,
+@@ -2112,7 +2108,7 @@ static const struct intel_gvt_mpt kvmgt_mpt = {
+ 	.disable_page_track = kvmgt_page_track_remove,
+ 	.read_gpa = kvmgt_read_gpa,
+ 	.write_gpa = kvmgt_write_gpa,
+-	.gfn_to_mfn = kvmgt_gfn_to_pfn,
++	.gfn_to_mfn_page = kvmgt_gfn_to_page,
+ 	.dma_map_guest_page = kvmgt_dma_map_guest_page,
+ 	.dma_unmap_guest_page = kvmgt_dma_unmap_guest_page,
+ 	.dma_pin_guest_page = kvmgt_dma_pin_guest_page,
+diff --git a/drivers/gpu/drm/i915/gvt/mpt.h b/drivers/gpu/drm/i915/gvt/mpt.h
+index 550a456e936f..9169b83cf0f6 100644
+--- a/drivers/gpu/drm/i915/gvt/mpt.h
++++ b/drivers/gpu/drm/i915/gvt/mpt.h
+@@ -214,17 +214,17 @@ static inline int intel_gvt_hypervisor_write_gpa(struct intel_vgpu *vgpu,
+ }
  
- 	return is_zone_device_page(pfn_to_page(pfn));
+ /**
+- * intel_gvt_hypervisor_gfn_to_mfn - translate a GFN to MFN
++ * intel_gvt_hypervisor_gfn_to_mfn_page - translate a GFN to MFN page
+  * @vgpu: a vGPU
+  * @gpfn: guest pfn
+  *
+  * Returns:
+- * MFN on success, INTEL_GVT_INVALID_ADDR if failed.
++ * struct page* on success, NULL if failed.
+  */
+-static inline unsigned long intel_gvt_hypervisor_gfn_to_mfn(
++static inline unsigned long intel_gvt_hypervisor_gfn_to_mfn_page(
+ 		struct intel_vgpu *vgpu, unsigned long gfn)
+ {
+-	return intel_gvt_host.mpt->gfn_to_mfn(vgpu->handle, gfn);
++	return intel_gvt_host.mpt->gfn_to_mfn_page(vgpu->handle, gfn);
+ }
+ 
+ /**
 -- 
 2.32.0.93.g670b81a890-goog
 
