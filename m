@@ -2,63 +2,63 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7499F3B356A
-	for <lists+kvm@lfdr.de>; Thu, 24 Jun 2021 20:14:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 419E53B356C
+	for <lists+kvm@lfdr.de>; Thu, 24 Jun 2021 20:14:32 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232630AbhFXSQ2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 24 Jun 2021 14:16:28 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:42508 "EHLO
+        id S232655AbhFXSQb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 24 Jun 2021 14:16:31 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:54843 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232602AbhFXSQ0 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 24 Jun 2021 14:16:26 -0400
+        by vger.kernel.org with ESMTP id S232618AbhFXSQ2 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 24 Jun 2021 14:16:28 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1624558446;
+        s=mimecast20190719; t=1624558448;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=2ny4N/dv5g7DO3oaKKsT3k5Lo/RLroZYI+1qWA8iS2Y=;
-        b=i4hQ4JNrDXb07Ey5sILHPCkpkCzZR3IFYcMcDJ/Fcfss7e3wcjhInZarDw4mfZuvbH5sc1
-        NF2SWijnKUlmjf9KqMOGye7cjwDNnseM+c7dJhmiMRCOgiwkECXwc0k8nDDlADntilZs8U
-        Lh9mSHThnwztZwRdy6adu5ES0rke++A=
-Received: from mail-qk1-f197.google.com (mail-qk1-f197.google.com
- [209.85.222.197]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-165-IOOgXmztP4OrDJWaZNQB6A-1; Thu, 24 Jun 2021 14:14:05 -0400
-X-MC-Unique: IOOgXmztP4OrDJWaZNQB6A-1
-Received: by mail-qk1-f197.google.com with SMTP id y206-20020a3764d70000b02903b2ff4c81b1so6543402qkb.21
-        for <kvm@vger.kernel.org>; Thu, 24 Jun 2021 11:14:05 -0700 (PDT)
+        bh=nhjhdzRJGuZzb8Uq4F9J7OQePoxIE2i+1r2VEiCpXU8=;
+        b=DYT1DXMznO/hHwYtbY5UN5sa+Qoc/SstcTqB5NiPHqCWDxnGq2Zi1ouV/xJZqBvDwEBiol
+        Wth08y5mtwpSESirbhfOqmcyemrjzUCsdlXT/4sR5JshdxsE/sDQ6BGEnj4hxw57W+VGjJ
+        JxBPJocbNWuCl4+4zY5zoS07PYFFv9c=
+Received: from mail-qv1-f72.google.com (mail-qv1-f72.google.com
+ [209.85.219.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-188-vAZyZzScOPSBKuCua49sQg-1; Thu, 24 Jun 2021 14:14:07 -0400
+X-MC-Unique: vAZyZzScOPSBKuCua49sQg-1
+Received: by mail-qv1-f72.google.com with SMTP id es19-20020a0562141933b029023930e98a57so7875995qvb.18
+        for <kvm@vger.kernel.org>; Thu, 24 Jun 2021 11:14:07 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=2ny4N/dv5g7DO3oaKKsT3k5Lo/RLroZYI+1qWA8iS2Y=;
-        b=i3ZudLv4I4pbWn4wj5AuIVm0Q4wiGXXxuRX8udwRkxRO71pYasQAYDxJieDHSNBdh9
-         WVVxdCqS1HwBdduc4vo/cOq+yQYk8pd1E93OfmgPnEKeSJRTfm4B/zrxRtMkl70t3kWk
-         qF5xKCIl6/I9r0IzseoamYM40bMdDyaTb6SRljavXNpyNdfytihC2vMGZRIS0/7ffUzz
-         PNAjDrKeDCFpHF1qcGk2ZFv5miRx6YBOAdV9mNjNOOBMBw9LL7uNKaummeGOZbJ/pJJl
-         7FJC9bcOaAUFSE1CfEkGcZm/WhBy1XfR1eEi6oOMcmC4ias8goIvR26fzwXBDpgZ5o6y
-         L+Mg==
-X-Gm-Message-State: AOAM533nkfzHauu5U+JJDsJvtaBwcW1A2fGUaCTO8QILwuOCibAb93IA
-        BQNA+ls3hKVn2agWhndDyrGv1ggtZdBmbGNj0xGMQH1mgpGq8RSBBRoHlfJmYphzx4FFthe7hv6
-        QjqhaQYZsGnXzmYeB/jzk50hOMtxWEvfdL/jfkj2u3xA507XVILRmzjwADn+gWg==
-X-Received: by 2002:a37:f510:: with SMTP id l16mr7017498qkk.205.1624558444897;
-        Thu, 24 Jun 2021 11:14:04 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJw5xeg8fkVzCvznQIXVQuhoVQJFpwIzM0cNNpma6+xzwHDzRQWv3casplWNqC4T8UNyOmhZfQ==
-X-Received: by 2002:a37:f510:: with SMTP id l16mr7017476qkk.205.1624558444679;
-        Thu, 24 Jun 2021 11:14:04 -0700 (PDT)
+        bh=nhjhdzRJGuZzb8Uq4F9J7OQePoxIE2i+1r2VEiCpXU8=;
+        b=UllBbehs7pxB8xQ+XiSl0SBAHS7FMaVuOpzvrp5NK8l9OJ9C6KM28CHEBwZ26v2ulR
+         XwbjrueZPe0mAhgv/8ekCujZzjc1NrN2cbgnP02LbiaAA59lZpIQSs07pJcAyPDmLWsA
+         FOafRH/z7dIFkKE8JYgAsAkIKfEQdCzGmBRkCjf8DqMSj1OQGiXL72tWWMmIX8uj93Oo
+         36gXkV/w7CLtx4vqHYsWm85vUvJfNfalcXU7nPH8gS1pLzV+4QUHguRNQO6uasBS+dBW
+         v8wrBgW4J7M6FNRSSxTf3jWX02G5ydXdqgnW7DbW6FRHlNmdFfP+yeL+Lau57f8rtYbi
+         2F4A==
+X-Gm-Message-State: AOAM531XdgOGYnPzwK2uJvJgaooFWQ0mWkMOdzeWoPJDsO9qLyQDtXiz
+        DH0EBnIXQjxCYc7nxCU380Hj1fo4DoVqxuL4KFVjWQbGECcb1FiCC7/SgOeGZLgOaGVsX6gIIBh
+        3OqJbPU/cfYZfpiAuKJy3SaJsAQgDoGqREjkv35F4meX77UPI6Z0X+P8bJg3jFw==
+X-Received: by 2002:a37:b947:: with SMTP id j68mr7058574qkf.486.1624558446728;
+        Thu, 24 Jun 2021 11:14:06 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzyi77u9hQpo3cu5comp042O3ws2nw3qgLSs4sLThHjFTBtBf8S3k7Or4hGpuETo3oZS4Dx5w==
+X-Received: by 2002:a37:b947:: with SMTP id j68mr7058543qkf.486.1624558446472;
+        Thu, 24 Jun 2021 11:14:06 -0700 (PDT)
 Received: from t490s.redhat.com (bras-base-toroon474qw-grc-65-184-144-111-238.dsl.bell.ca. [184.144.111.238])
-        by smtp.gmail.com with ESMTPSA id b7sm2529301qti.21.2021.06.24.11.14.03
+        by smtp.gmail.com with ESMTPSA id b7sm2529301qti.21.2021.06.24.11.14.04
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 24 Jun 2021 11:14:04 -0700 (PDT)
+        Thu, 24 Jun 2021 11:14:05 -0700 (PDT)
 From:   Peter Xu <peterx@redhat.com>
 To:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
 Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Maxim Levitsky <mlevitsk@redhat.com>, peterx@redhat.com,
         Sean Christopherson <seanjc@google.com>
-Subject: [PATCH 4/9] KVM: X86: Introduce pte_list_count() helper
-Date:   Thu, 24 Jun 2021 14:13:51 -0400
-Message-Id: <20210624181356.10235-5-peterx@redhat.com>
+Subject: [PATCH 5/9] KVM: X86: Introduce kvm_mmu_slot_lpages() helpers
+Date:   Thu, 24 Jun 2021 14:13:52 -0400
+Message-Id: <20210624181356.10235-6-peterx@redhat.com>
 X-Mailer: git-send-email 2.31.1
 In-Reply-To: <20210624181356.10235-1-peterx@redhat.com>
 References: <20210624181356.10235-1-peterx@redhat.com>
@@ -68,59 +68,51 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This helper is used to count the number of rmap entries in the rmap list
-pointed by the kvm_rmap_head.
+Introduce kvm_mmu_slot_lpages() to calculcate lpage_info and rmap array size.
+The other __kvm_mmu_slot_lpages() can take an extra parameter of npages rather
+than fetching from the memslot pointer.  Start to use the latter one in
+kvm_alloc_memslot_metadata().
 
 Signed-off-by: Peter Xu <peterx@redhat.com>
 ---
- arch/x86/kvm/mmu/mmu.c          | 21 +++++++++++++++++++++
- arch/x86/kvm/mmu/mmu_internal.h |  1 +
- 2 files changed, 22 insertions(+)
+ arch/x86/kvm/x86.c | 17 +++++++++++++++--
+ 1 file changed, 15 insertions(+), 2 deletions(-)
 
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index 6dd338738118..80263ecb1de3 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -927,6 +927,27 @@ static void pte_list_remove(struct kvm_rmap_head *rmap_head, u64 *sptep)
- 	__pte_list_remove(sptep, rmap_head);
- }
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 4aa3cc6ae5d4..d2acbea2f3b5 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -269,6 +269,20 @@ static struct kmem_cache *x86_fpu_cache;
  
-+unsigned int pte_list_count(struct kvm_rmap_head *rmap_head)
+ static struct kmem_cache *x86_emulator_cache;
+ 
++static inline unsigned long
++__kvm_mmu_slot_lpages(struct kvm_memory_slot *slot, unsigned long npages,
++		      int level)
 +{
-+	struct pte_list_desc *desc;
-+	unsigned int i, count = 0;
-+
-+	if (!rmap_head->val)
-+		return 0;
-+	else if (!(rmap_head->val & 1))
-+		return 1;
-+
-+	desc = (struct pte_list_desc *)(rmap_head->val & ~1ul);
-+
-+	while (desc) {
-+		for (i = 0; (i < PTE_LIST_EXT) && desc->sptes[i]; i++)
-+			count++;
-+		desc = desc->more;
-+	}
-+
-+	return count;
++	return gfn_to_index(slot->base_gfn + npages - 1,
++			    slot->base_gfn, level) + 1;
 +}
 +
- static struct kvm_rmap_head *__gfn_to_rmap(gfn_t gfn, int level,
- 					   struct kvm_memory_slot *slot)
- {
-diff --git a/arch/x86/kvm/mmu/mmu_internal.h b/arch/x86/kvm/mmu/mmu_internal.h
-index d64ccb417c60..3cd1a878ffeb 100644
---- a/arch/x86/kvm/mmu/mmu_internal.h
-+++ b/arch/x86/kvm/mmu/mmu_internal.h
-@@ -126,6 +126,7 @@ bool kvm_mmu_slot_gfn_write_protect(struct kvm *kvm,
- 				    struct kvm_memory_slot *slot, u64 gfn);
- void kvm_flush_remote_tlbs_with_address(struct kvm *kvm,
- 					u64 start_gfn, u64 pages);
-+unsigned int pte_list_count(struct kvm_rmap_head *rmap_head);
- 
++static inline unsigned long
++kvm_mmu_slot_lpages(struct kvm_memory_slot *slot, int level)
++{
++	return __kvm_mmu_slot_lpages(slot, slot->npages, level);
++}
++
  /*
-  * Return values of handle_mmio_page_fault, mmu.page_fault, and fast_page_fault().
+  * When called, it means the previous get/set msr reached an invalid msr.
+  * Return true if we want to ignore/silent this failed msr access.
+@@ -10933,8 +10947,7 @@ static int kvm_alloc_memslot_metadata(struct kvm_memory_slot *slot,
+ 		int lpages;
+ 		int level = i + 1;
+ 
+-		lpages = gfn_to_index(slot->base_gfn + npages - 1,
+-				      slot->base_gfn, level) + 1;
++		lpages = __kvm_mmu_slot_lpages(slot, npages, level);
+ 
+ 		slot->arch.rmap[i] =
+ 			kvcalloc(lpages, sizeof(*slot->arch.rmap[i]),
 -- 
 2.31.1
 
