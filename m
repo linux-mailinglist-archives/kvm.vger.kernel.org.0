@@ -2,95 +2,58 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A60D23B2856
-	for <lists+kvm@lfdr.de>; Thu, 24 Jun 2021 09:09:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id AB1143B286E
+	for <lists+kvm@lfdr.de>; Thu, 24 Jun 2021 09:18:21 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231648AbhFXHMC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 24 Jun 2021 03:12:02 -0400
-Received: from szxga02-in.huawei.com ([45.249.212.188]:8436 "EHLO
-        szxga02-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231722AbhFXHLz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 24 Jun 2021 03:11:55 -0400
-Received: from dggemv711-chm.china.huawei.com (unknown [172.30.72.54])
-        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4G9WQK1F5nzZklD;
-        Thu, 24 Jun 2021 15:06:33 +0800 (CST)
+        id S231439AbhFXHUi (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 24 Jun 2021 03:20:38 -0400
+Received: from szxga03-in.huawei.com ([45.249.212.189]:8319 "EHLO
+        szxga03-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230132AbhFXHUh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 24 Jun 2021 03:20:37 -0400
+Received: from dggemv704-chm.china.huawei.com (unknown [172.30.72.53])
+        by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4G9Wb46W9Zz725G;
+        Thu, 24 Jun 2021 15:14:08 +0800 (CST)
 Received: from dggema764-chm.china.huawei.com (10.1.198.206) by
- dggemv711-chm.china.huawei.com (10.1.198.66) with Microsoft SMTP Server
+ dggemv704-chm.china.huawei.com (10.3.19.47) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256) id
- 15.1.2176.2; Thu, 24 Jun 2021 15:09:34 +0800
-Received: from DESKTOP-8RFUVS3.china.huawei.com (10.174.185.179) by
+ 15.1.2176.2; Thu, 24 Jun 2021 15:18:16 +0800
+Received: from [10.174.185.179] (10.174.185.179) by
  dggema764-chm.china.huawei.com (10.1.198.206) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
- 15.1.2176.2; Thu, 24 Jun 2021 15:09:34 +0800
+ 15.1.2176.2; Thu, 24 Jun 2021 15:18:15 +0800
+Subject: Re: [PATCH] KVM: selftests: Speed up set_memory_region_test
+To:     Paolo Bonzini <pbonzini@redhat.com>
+CC:     Vitaly Kuznetsov <vkuznets@redhat.com>, <kvm@vger.kernel.org>,
+        "Sean Christopherson" <seanjc@google.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        "Jim Mattson" <jmattson@google.com>,
+        kernel test robot <oliver.sang@intel.com>,
+        <linux-kernel@vger.kernel.org>, <wanghaibin.wang@huawei.com>
+References: <20210426130121.758229-1-vkuznets@redhat.com>
+ <91a2d145-fd3c-6e8d-6478-60f62dff07fe@huawei.com>
+ <3dc9bd69-f38a-daed-4ac3-84b280ef5901@redhat.com>
 From:   Zenghui Yu <yuzenghui@huawei.com>
-To:     <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <pbonzini@redhat.com>, <vkuznets@redhat.com>
-CC:     <wanghaibin.wang@huawei.com>, Zenghui Yu <yuzenghui@huawei.com>
-Subject: [PATCH] KVM: selftests: Fix mapping length truncation in m{,un}map()
-Date:   Thu, 24 Jun 2021 15:09:31 +0800
-Message-ID: <20210624070931.565-1-yuzenghui@huawei.com>
-X-Mailer: git-send-email 2.23.0.windows.1
+Message-ID: <941fc912-e773-8a04-a8f3-7426596d97b1@huawei.com>
+Date:   Thu, 24 Jun 2021 15:18:14 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.9.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7BIT
-Content-Type:   text/plain; charset=US-ASCII
+In-Reply-To: <3dc9bd69-f38a-daed-4ac3-84b280ef5901@redhat.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 X-Originating-IP: [10.174.185.179]
-X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
+X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
  dggema764-chm.china.huawei.com (10.1.198.206)
 X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-max_mem_slots is now declared as uint32_t. The result of (0x200000 * 32767)
-is unexpectedly truncated to be 0xffe00000, whilst we actually need to
-allocate about, 63GB. Cast max_mem_slots to size_t in both mmap() and
-munmap() to fix the length truncation.
+On 2021/6/24 5:45, Paolo Bonzini wrote:
+> Can you provide a patch for both?
 
-We'll otherwise see the failure on arm64 thanks to the access_ok() checking
-in __kvm_set_memory_region(), as the unmapped VA happen to go beyond the
-task's allowed address space.
+Sent now.
 
- # ./set_memory_region_test
-Allowed number of memory slots: 32767
-Adding slots 0..32766, each memory region with 2048K size
-==== Test Assertion Failure ====
-  set_memory_region_test.c:391: ret == 0
-  pid=94861 tid=94861 errno=22 - Invalid argument
-     1	0x00000000004015a7: test_add_max_memory_regions at set_memory_region_test.c:389
-     2	 (inlined by) main at set_memory_region_test.c:426
-     3	0x0000ffffb8e67bdf: ?? ??:0
-     4	0x00000000004016db: _start at :?
-  KVM_SET_USER_MEMORY_REGION IOCTL failed,
-  rc: -1 errno: 22 slot: 2615
-
-Fixes: 3bf0fcd75434 ("KVM: selftests: Speed up set_memory_region_test")
-Signed-off-by: Zenghui Yu <yuzenghui@huawei.com>
----
- tools/testing/selftests/kvm/set_memory_region_test.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/tools/testing/selftests/kvm/set_memory_region_test.c b/tools/testing/selftests/kvm/set_memory_region_test.c
-index d79d58eada9f..85b18bb8f762 100644
---- a/tools/testing/selftests/kvm/set_memory_region_test.c
-+++ b/tools/testing/selftests/kvm/set_memory_region_test.c
-@@ -376,7 +376,7 @@ static void test_add_max_memory_regions(void)
- 	pr_info("Adding slots 0..%i, each memory region with %dK size\n",
- 		(max_mem_slots - 1), MEM_REGION_SIZE >> 10);
- 
--	mem = mmap(NULL, MEM_REGION_SIZE * max_mem_slots + alignment,
-+	mem = mmap(NULL, (size_t)max_mem_slots * MEM_REGION_SIZE + alignment,
- 		   PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
- 	TEST_ASSERT(mem != MAP_FAILED, "Failed to mmap() host");
- 	mem_aligned = (void *)(((size_t) mem + alignment - 1) & ~(alignment - 1));
-@@ -401,7 +401,7 @@ static void test_add_max_memory_regions(void)
- 	TEST_ASSERT(ret == -1 && errno == EINVAL,
- 		    "Adding one more memory slot should fail with EINVAL");
- 
--	munmap(mem, MEM_REGION_SIZE * max_mem_slots + alignment);
-+	munmap(mem, (size_t)max_mem_slots * MEM_REGION_SIZE + alignment);
- 	munmap(mem_extra, MEM_REGION_SIZE);
- 	kvm_vm_free(vm);
- }
--- 
-2.19.1
-
+Zenghui
