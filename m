@@ -2,40 +2,40 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B6E853B29E7
-	for <lists+kvm@lfdr.de>; Thu, 24 Jun 2021 10:07:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EC89F3B2A1E
+	for <lists+kvm@lfdr.de>; Thu, 24 Jun 2021 10:13:27 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231854AbhFXIJe (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 24 Jun 2021 04:09:34 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:30122 "EHLO
+        id S231855AbhFXIPp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 24 Jun 2021 04:15:45 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:57284 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231757AbhFXIJc (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 24 Jun 2021 04:09:32 -0400
+        by vger.kernel.org with ESMTP id S231804AbhFXIPo (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 24 Jun 2021 04:15:44 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1624522032;
+        s=mimecast20190719; t=1624522405;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=Lg6FsVmW6Dwu+F5jAmgn4jE+j0Socukp7qnrsHN3PZo=;
-        b=BkIbqmjQNKnMe7XRD/xrfCuHqFCiPHMuCPMY6H+J2ELCZy/fwLl+j/8ZhkUZ+OiWHlGgmv
-        lS09Lj8pVj+1TpC1kR/f3GpaxnM0il8idWTgAROI39pLedQ1O4yz0iOpTERoB/NKfaOweq
-        SKf25bSKfKtz+SE14ILuBYTgjY87cKk=
+        bh=93B83MuKOnXGcqD1yFOtENeDWjr0pRle6LMuQcAX/kM=;
+        b=VkymZTh1tKzXqrudqv1fH5n9AFS6+vGQOTJthOvgRgqu4U0GETHE7szEDojmEchQsvMCSr
+        FcYkM2169he6SMssKra2mF+6RoswaGa0lX1/Tj2Oe34kdEknEz8Duc0Z6Rg+kQocruLxJE
+        dkwZgJl7RiR5blNAOmRBDvWH+y54EJI=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-237-SgRoSPBvNjW5cni_-eyb5w-1; Thu, 24 Jun 2021 04:07:11 -0400
-X-MC-Unique: SgRoSPBvNjW5cni_-eyb5w-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+ us-mta-488-J-l8AB2jOXa24-G9obNLqA-1; Thu, 24 Jun 2021 04:13:24 -0400
+X-MC-Unique: J-l8AB2jOXa24-G9obNLqA-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7F9491084F54;
-        Thu, 24 Jun 2021 08:07:08 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 80E485074B;
+        Thu, 24 Jun 2021 08:13:22 +0000 (UTC)
 Received: from starship (unknown [10.40.192.10])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id CCBA35D6A1;
-        Thu, 24 Jun 2021 08:07:03 +0000 (UTC)
-Message-ID: <43ef1a1ea488977db11d40ec9672b524ec816112.camel@redhat.com>
-Subject: Re: [PATCH 02/10] KVM: x86: APICv: fix race in
- kvm_request_apicv_update on SVM
+        by smtp.corp.redhat.com (Postfix) with ESMTP id EC8DE5D9F0;
+        Thu, 24 Jun 2021 08:13:18 +0000 (UTC)
+Message-ID: <153cf16c78578079d168c754ef451b1f3ecd5220.camel@redhat.com>
+Subject: Re: [PATCH 04/10] KVM: SVM: add warning for mistmatch between AVIC
+ state and AVIC access page state
 From:   Maxim Levitsky <mlevitsk@redhat.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
 Cc:     Thomas Gleixner <tglx@linutronix.de>,
@@ -48,221 +48,67 @@ Cc:     Thomas Gleixner <tglx@linutronix.de>,
         <linux-kernel@vger.kernel.org>,
         "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
         Jim Mattson <jmattson@google.com>
-Date:   Thu, 24 Jun 2021 11:07:02 +0300
-In-Reply-To: <6c4a69ce-595e-d5a1-7b4e-e6ce1afe1252@redhat.com>
+Date:   Thu, 24 Jun 2021 11:13:17 +0300
+In-Reply-To: <6617e1f2-23dd-9132-d866-7780663533c3@redhat.com>
 References: <20210623113002.111448-1-mlevitsk@redhat.com>
-         <20210623113002.111448-3-mlevitsk@redhat.com>
-         <6c4a69ce-595e-d5a1-7b4e-e6ce1afe1252@redhat.com>
+         <20210623113002.111448-5-mlevitsk@redhat.com>
+         <6617e1f2-23dd-9132-d866-7780663533c3@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
 User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 2021-06-23 at 23:50 +0200, Paolo Bonzini wrote:
+On Wed, 2021-06-23 at 23:53 +0200, Paolo Bonzini wrote:
 > On 23/06/21 13:29, Maxim Levitsky wrote:
-> > +	kvm_block_guest_entries(kvm);
+> > It is never a good idea to enter a guest when the AVIC state doesn't match
+> > the state of the AVIC MMIO memory slot.
+> > 
+> > Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
+> > ---
+> >   arch/x86/kvm/svm/svm.c | 3 +++
+> >   1 file changed, 3 insertions(+)
+> > 
+> > diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+> > index 12c06ea28f5c..50405c561394 100644
+> > --- a/arch/x86/kvm/svm/svm.c
+> > +++ b/arch/x86/kvm/svm/svm.c
+> > @@ -3780,6 +3780,9 @@ static __no_kcsan fastpath_t svm_vcpu_run(struct kvm_vcpu *vcpu)
+> >   
+> >   	pre_svm_run(vcpu);
+> >   
+> > +	WARN_ON_ONCE(vcpu->kvm->arch.apic_access_memslot_enabled !=
+> > +		     kvm_vcpu_apicv_active(vcpu));
 > > +
-> >   	trace_kvm_apicv_update_request(activate, bit);
-> >   	if (kvm_x86_ops.pre_update_apicv_exec_ctrl)
-> >   		static_call(kvm_x86_pre_update_apicv_exec_ctrl)(kvm, activate);
-> > @@ -9243,6 +9245,8 @@ void kvm_request_apicv_update(struct kvm *kvm, bool activate, ulong bit)
-> >   	except = kvm_get_running_vcpu();
-> >   	kvm_make_all_cpus_request_except(kvm, KVM_REQ_APICV_UPDATE,
-> >   					 except);
-> > +
-> > +	kvm_allow_guest_entries(kvm);
+> >   	sync_lapic_to_cr8(vcpu);
+> >   
+> >   	if (unlikely(svm->asid != svm->vmcb->control.asid)) {
+> > 
 > 
-> Doesn't this cause a busy loop during synchronize_rcu?
-
-Hi,
-
-If you mean busy loop on other vcpus, then the answer is sadly yes.
-Other option is to use a mutex, which is what I did in a former
-version of this patch, but at last minute I decided that this
-way it was done in this patch would be simplier. 
-AVIC updates don't happen often.
-Also with a request, the KVM_REQ_APICV_UPDATE can be handled in parallel,
-while mutex enforces unneeded mutual execution of it.
-
-
->   It should be 
-> possible to request the vmexit of other CPUs from 
-> avic_update_access_page, and do a lock/unlock of kvm->slots_lock to wait 
-> for the memslot to be updated.
-
-This would still keep the race. The other vCPUs must not enter the guest mode
-from the moment the memslot update was started and until the KVM_REQ_APICV_UPDATE
-is raised.
- 
-If I were to do any kind of synchronization in avic_update_access_page, then I will
-have to drop the lock/request there, and from this point and till the common code
-raises the KVM_REQ_APICV_UPDATE there is a possibility of a vCPU reentering the
-guest mode without updating its AVIC.
- 
- 
-Here is an older version of this patch that does use mutex instead. 
-Please let me know if you prefer it.
-
-I copy pasted it here, thus its likely not to apply as my email client
-probably destroys whitespace.
-  
-Thanks for the review,
-	Best regards,
-		Maxim Levitsky
-
-
---
-
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index fdc6b8a4348f..b7dc7fd7b63d 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -9183,11 +9183,8 @@ void kvm_make_scan_ioapic_request(struct kvm *kvm)
- 	kvm_make_all_cpus_request(kvm, KVM_REQ_SCAN_IOAPIC);
- }
- 
--void kvm_vcpu_update_apicv(struct kvm_vcpu *vcpu)
-+void __kvm_vcpu_update_apicv(struct kvm_vcpu *vcpu)
- {
--	if (!lapic_in_kernel(vcpu))
--		return;
--
- 	vcpu->arch.apicv_active = kvm_apicv_activated(vcpu->kvm);
- 	kvm_apic_update_apicv(vcpu);
- 	static_call(kvm_x86_refresh_apicv_exec_ctrl)(vcpu);
-@@ -9201,6 +9198,16 @@ void kvm_vcpu_update_apicv(struct kvm_vcpu *vcpu)
- 	if (!vcpu->arch.apicv_active)
- 		kvm_make_request(KVM_REQ_EVENT, vcpu);
- }
-+
-+void kvm_vcpu_update_apicv(struct kvm_vcpu *vcpu)
-+{
-+	if (!lapic_in_kernel(vcpu))
-+		return;
-+
-+	mutex_lock(&vcpu->kvm->apicv_update_lock);
-+	__kvm_vcpu_update_apicv(vcpu);
-+	mutex_unlock(&vcpu->kvm->apicv_update_lock);
-+}
- EXPORT_SYMBOL_GPL(kvm_vcpu_update_apicv);
- 
- /*
-@@ -9213,30 +9220,26 @@ EXPORT_SYMBOL_GPL(kvm_vcpu_update_apicv);
- void kvm_request_apicv_update(struct kvm *kvm, bool activate, ulong bit)
- {
- 	struct kvm_vcpu *except;
--	unsigned long old, new, expected;
-+	unsigned long old, new;
- 
- 	if (!kvm_x86_ops.check_apicv_inhibit_reasons ||
- 	    !static_call(kvm_x86_check_apicv_inhibit_reasons)(bit))
- 		return;
- 
--	old = READ_ONCE(kvm->arch.apicv_inhibit_reasons);
--	do {
--		expected = new = old;
--		if (activate)
--			__clear_bit(bit, &new);
--		else
--			__set_bit(bit, &new);
--		if (new == old)
--			break;
--		old = cmpxchg(&kvm->arch.apicv_inhibit_reasons, expected, new);
--	} while (old != expected);
-+	mutex_lock(&kvm->apicv_update_lock);
-+
-+	old = new = kvm->arch.apicv_inhibit_reasons;
-+	if (activate)
-+		__clear_bit(bit, &new);
-+	else
-+		__set_bit(bit, &new);
-+
-+	WRITE_ONCE(kvm->arch.apicv_inhibit_reasons, new);
- 
- 	if (!!old == !!new)
--		return;
-+		goto out;
- 
- 	trace_kvm_apicv_update_request(activate, bit);
--	if (kvm_x86_ops.pre_update_apicv_exec_ctrl)
--		static_call(kvm_x86_pre_update_apicv_exec_ctrl)(kvm, activate);
- 
- 	/*
- 	 * Sending request to update APICV for all other vcpus,
-@@ -9244,10 +9247,24 @@ void kvm_request_apicv_update(struct kvm *kvm, bool activate, ulong bit)
- 	 * waiting for another #VMEXIT to handle the request.
- 	 */
- 	except = kvm_get_running_vcpu();
-+
-+	/*
-+	 * on SVM, raising the KVM_REQ_APICV_UPDATE request while holding the
-+	 *  apicv_update_lock ensures that we kick all vCPUs out of the
-+	 *  guest mode and let them wait until the AVIC memslot update
-+	 *  has completed.
-+	 */
-+
- 	kvm_make_all_cpus_request_except(kvm, KVM_REQ_APICV_UPDATE,
- 					 except);
-+
-+	if (kvm_x86_ops.pre_update_apicv_exec_ctrl)
-+		static_call(kvm_x86_pre_update_apicv_exec_ctrl)(kvm, activate);
-+
- 	if (except)
--		kvm_vcpu_update_apicv(except);
-+		__kvm_vcpu_update_apicv(except);
-+out:
-+	mutex_unlock(&kvm->apicv_update_lock);
- }
- EXPORT_SYMBOL_GPL(kvm_request_apicv_update);
- 
-@@ -9454,8 +9471,11 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
- 		 */
- 		if (kvm_check_request(KVM_REQ_HV_STIMER, vcpu))
- 			kvm_hv_process_stimers(vcpu);
--		if (kvm_check_request(KVM_REQ_APICV_UPDATE, vcpu))
-+		if (kvm_check_request(KVM_REQ_APICV_UPDATE, vcpu)) {
-+			srcu_read_unlock(&vcpu->kvm->srcu, vcpu->srcu_idx);
- 			kvm_vcpu_update_apicv(vcpu);
-+			vcpu->srcu_idx = srcu_read_lock(&vcpu->kvm->srcu);
-+		}
- 		if (kvm_check_request(KVM_REQ_APF_READY, vcpu))
- 			kvm_check_async_pf_completion(vcpu);
- 		if (kvm_check_request(KVM_REQ_MSR_FILTER_CHANGED, vcpu))
-diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-index 37cbb56ccd09..0364d35d43dc 100644
---- a/include/linux/kvm_host.h
-+++ b/include/linux/kvm_host.h
-@@ -524,6 +524,7 @@ struct kvm {
- #endif /* KVM_HAVE_MMU_RWLOCK */
- 
- 	struct mutex slots_lock;
-+	struct mutex apicv_update_lock;
- 
- 	/*
- 	 * Protects the arch-specific fields of struct kvm_memory_slots in
-diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index ed4d1581d502..ba5d5d9ebc64 100644
---- a/virt/kvm/kvm_main.c
-+++ b/virt/kvm/kvm_main.c
-@@ -943,6 +943,7 @@ static struct kvm *kvm_create_vm(unsigned long type)
- 	mutex_init(&kvm->irq_lock);
- 	mutex_init(&kvm->slots_lock);
- 	mutex_init(&kvm->slots_arch_lock);
-+	mutex_init(&kvm->apicv_update_lock);
- 	INIT_LIST_HEAD(&kvm->devices);
- 
- 	BUILD_BUG_ON(KVM_MEM_SLOTS_NUM > SHRT_MAX);
-
-
-
-> 
-> (As an aside, I'd like to get rid of KVM_REQ_MCLOCK_IN_PROGRESS in 5.15...).
+> For patches 4-6, can the warnings actually fire without the fix in patch 2?
 > 
 > Paolo
 > 
 
+Hi!
+
+The warning in patch 4 does fire, not often but it does. Patch 2 fixes it.
+The guest usually boots though few lost APIC writes don't always cause it to hang.
+
+Plus the warning is also triggered when the AVIC state is mismatched the other way
+around, that is when AVIC is enabled but memslot is disabled, which probably
+doesn't cause issues.
+
+Warning in patch 5 is mostly theoretical, until patch 8 is applied.
+They can happen if AVIC is toggled on one vCPU for some reason, while another vCPU
+asks for an interrupt window.
+
+Patch 6 doesn't fix a warning, but rather a case which most likely can't happen
+till patch 8 is applied, but still is correct.
+
+Best regards,
+	Maxim Levitsky
 
