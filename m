@@ -2,197 +2,129 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 880EF3B2583
-	for <lists+kvm@lfdr.de>; Thu, 24 Jun 2021 05:35:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id F31093B25C4
+	for <lists+kvm@lfdr.de>; Thu, 24 Jun 2021 05:59:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229970AbhFXDhX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 23 Jun 2021 23:37:23 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:20288 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229831AbhFXDhU (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 23 Jun 2021 23:37:20 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1624505701;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=5QohIO9QZ56POeZsL8ywMd6mageIeyr6m/mT20FPwPo=;
-        b=IvnMUpI8ARjUQ2px4raVHAzkZtw8Xe8nNM9kftL3XfBjKTJcrecktPUp7p9IcpR5MXDNGR
-        DE5AgIzEme5gS3gO8raxa67tqctDueaqX9ZfAub2jdg0bSe8pbw5yfGlIiIvz+ic3rtRao
-        E5g34nLDd19n6b7XaBsRfiqUYH2+tX8=
-Received: from mail-pf1-f200.google.com (mail-pf1-f200.google.com
- [209.85.210.200]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-544-XBTw8yBYPD6tqfwpfp5FYw-1; Wed, 23 Jun 2021 23:34:59 -0400
-X-MC-Unique: XBTw8yBYPD6tqfwpfp5FYw-1
-Received: by mail-pf1-f200.google.com with SMTP id g4-20020aa787440000b02903020544da0fso3016967pfo.20
-        for <kvm@vger.kernel.org>; Wed, 23 Jun 2021 20:34:59 -0700 (PDT)
+        id S229474AbhFXEBk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 24 Jun 2021 00:01:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42912 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229379AbhFXEBh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 24 Jun 2021 00:01:37 -0400
+Received: from mail-pg1-x534.google.com (mail-pg1-x534.google.com [IPv6:2607:f8b0:4864:20::534])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1852BC061574
+        for <kvm@vger.kernel.org>; Wed, 23 Jun 2021 20:59:18 -0700 (PDT)
+Received: by mail-pg1-x534.google.com with SMTP id y14so3588041pgs.12
+        for <kvm@vger.kernel.org>; Wed, 23 Jun 2021 20:59:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=BxIaFDPbAuZHR6J/S83W0A67K8R9coNY4bId9HsipsE=;
+        b=RBtU16Scd9URJKreXZFwanEfHJ1XRZJXhO4qEt4uU8YvBtSRsG8M0Msq7z7U3gBGbw
+         UdDX7s8F5odJ8nqB9b8EVGbHLmPHB74/ZvZg8RK4YeZb6UMq7MIYumlvjDcfnL6WHIaV
+         l3qHnUTf57CgLtDUOfr/2EStz1LFXjnziJK6o=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-transfer-encoding
-         :content-language;
-        bh=5QohIO9QZ56POeZsL8ywMd6mageIeyr6m/mT20FPwPo=;
-        b=o0dr2U+VPUv9ZLVDlAmZkeXytG24SeJCckRr6o7HdRnmPcd8a1sv7rdyYSTVChhwZr
-         enh+xw8JRwm9qADTv4i5XDxXQhVGMOoHgHbejHzJ5eTiGDPuGIbtU5LVBEeCLLUFT9hD
-         kkhFbFsbRQltDccvruJGhHSHDnA2SDcSz2LoU1Xfrys6Ktpa6hJSUYV+cssblFemDj2D
-         MmgZ4TKvZH8539CcyIBBr8KbJxrouWDXS6JzMrCHiS2/MRITfAsb+WgDvLZ9AckHgMQC
-         SnZ8ux5Op/excjziqucJ2mtCB6q87i4sJGOT45ckgQ135uaVwJn7B2ZDsI6QrCcZbTTE
-         IN8Q==
-X-Gm-Message-State: AOAM531CM5/QRU48i8rRX4mw0G0iBQaW8K6BmEAjioEH80AL7zO86CAn
-        4kkLBCSeEbJUcxLR4KovGIMnaNYe8C68vgjj5Tfm6lVUnm4hyPS5JLe/UErOQJcHncxzKgTItsX
-        TkUbsGUr+hMCU
-X-Received: by 2002:a17:90b:1191:: with SMTP id gk17mr2989105pjb.95.1624505698638;
-        Wed, 23 Jun 2021 20:34:58 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxoEDvRxknwye7AvfyEaKP6cKcvSDe8Ou4kXVMU8NQ9OSeQD22thwiDze8XxBwVGv+OJzWxjg==
-X-Received: by 2002:a17:90b:1191:: with SMTP id gk17mr2989081pjb.95.1624505698416;
-        Wed, 23 Jun 2021 20:34:58 -0700 (PDT)
-Received: from wangxiaodeMacBook-Air.local ([209.132.188.80])
-        by smtp.gmail.com with ESMTPSA id a15sm1101133pff.128.2021.06.23.20.34.51
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=BxIaFDPbAuZHR6J/S83W0A67K8R9coNY4bId9HsipsE=;
+        b=c3ag2gFcBCUCQ0noeZ01gejVtWjVmsNQ2xcyU+yYnJNthKDQZ3PjTpcwTk1ULtQn3T
+         TToHsQDBT8C1dzpU6r5M+ii7OozT87eaU6cN9MmuSO+zSl2II5uHy+zSirM2gahLtlIh
+         ZUdvf5LjoW4GqaB8vyoYCToJls3G1FULTLsg4B/8XifR4fjodEdwsuOXz736clp7kmXK
+         N1PPO72/Jy9CGPkI/45dqmVMmUW5hc+8InB3vXOweyrnaH5bnO6ikz5170SOmBSZRaJM
+         11RHYn/k2F0BSocf533SvAXi6z30bG0e1xAtKwV2hrlSN8y1hyDsgx+w17LVkmzRQL9V
+         Whig==
+X-Gm-Message-State: AOAM531dIiH5dg62jO6Y2zare54MSy1oWwh6aFGrxsBL4x9rIYBCVLqI
+        DErtCua1AqhErfO0qRWHtVIx6Q==
+X-Google-Smtp-Source: ABdhPJw/0bUD4wxiHYbbe+W1J6aaPXVUUYjx3vGkULT22ezX3dEs1tG4sWixYLws/tdmOS++kmqsRg==
+X-Received: by 2002:aa7:96fc:0:b029:2e9:e827:928f with SMTP id i28-20020aa796fc0000b02902e9e827928fmr2818805pfq.49.1624507157546;
+        Wed, 23 Jun 2021 20:59:17 -0700 (PDT)
+Received: from localhost ([2401:fa00:8f:203:5038:6344:7f10:3690])
+        by smtp.gmail.com with UTF8SMTPSA id j15sm1163260pfh.194.2021.06.23.20.59.11
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 23 Jun 2021 20:34:57 -0700 (PDT)
-Subject: Re: [PATCH v8 09/10] vduse: Introduce VDUSE - vDPA Device in
- Userspace
-To:     Yongji Xie <xieyongji@bytedance.com>
-Cc:     "Michael S. Tsirkin" <mst@redhat.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Stefano Garzarella <sgarzare@redhat.com>,
-        Parav Pandit <parav@nvidia.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Christian Brauner <christian.brauner@canonical.com>,
-        Randy Dunlap <rdunlap@infradead.org>,
-        Matthew Wilcox <willy@infradead.org>,
-        Al Viro <viro@zeniv.linux.org.uk>,
-        Jens Axboe <axboe@kernel.dk>, bcrl@kvack.org,
-        Jonathan Corbet <corbet@lwn.net>,
-        =?UTF-8?Q?Mika_Penttil=c3=a4?= <mika.penttila@nextfour.com>,
-        Dan Carpenter <dan.carpenter@oracle.com>, joro@8bytes.org,
-        Greg KH <gregkh@linuxfoundation.org>, songmuchun@bytedance.com,
-        virtualization <virtualization@lists.linux-foundation.org>,
-        netdev@vger.kernel.org, kvm <kvm@vger.kernel.org>,
-        linux-fsdevel@vger.kernel.org, iommu@lists.linux-foundation.org,
-        linux-kernel <linux-kernel@vger.kernel.org>
-References: <20210615141331.407-1-xieyongji@bytedance.com>
- <20210615141331.407-10-xieyongji@bytedance.com>
- <adfb2be9-9ed9-ca37-ac37-4cd00bdff349@redhat.com>
- <CACycT3tAON+-qZev+9EqyL2XbgH5HDspOqNt3ohQLQ8GqVK=EA@mail.gmail.com>
- <1bba439f-ffc8-c20e-e8a4-ac73e890c592@redhat.com>
- <CACycT3uzMJS7vw6MVMOgY4rb=SPfT2srV+8DPdwUVeELEiJgbA@mail.gmail.com>
- <0aeb7cb7-58e5-1a95-d830-68edd7e8ec2e@redhat.com>
- <CACycT3uuooKLNnpPHewGZ=q46Fap2P4XCFirdxxn=FxK+X1ECg@mail.gmail.com>
- <e4cdee72-b6b4-d055-9aac-3beae0e5e3e1@redhat.com>
- <CACycT3u8=_D3hCtJR+d5BgeUQMce6S7c_6P3CVfvWfYhCQeXFA@mail.gmail.com>
-From:   Jason Wang <jasowang@redhat.com>
-Message-ID: <d2334f66-907c-2e9c-ea4f-f912008e9be8@redhat.com>
-Date:   Thu, 24 Jun 2021 11:34:46 +0800
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0)
- Gecko/20100101 Thunderbird/78.11.0
+        Wed, 23 Jun 2021 20:59:16 -0700 (PDT)
+From:   David Stevens <stevensd@chromium.org>
+X-Google-Original-From: David Stevens <stevensd@google.com>
+To:     Marc Zyngier <maz@kernel.org>, Huacai Chen <chenhuacai@kernel.org>,
+        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+        Paul Mackerras <paulus@ozlabs.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Zhenyu Wang <zhenyuw@linux.intel.com>,
+        Zhi Wang <zhi.a.wang@intel.com>
+Cc:     James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Will Deacon <will@kernel.org>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        linux-kernel@vger.kernel.org, linux-mips@vger.kernel.org,
+        kvm@vger.kernel.org, kvm-ppc@vger.kernel.org,
+        linuxppc-dev@lists.ozlabs.org, intel-gvt-dev@lists.freedesktop.org,
+        intel-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
+        David Stevens <stevensd@google.com>
+Subject: [PATCH 0/6] KVM: Remove uses of struct page from x86 and arm64 MMU
+Date:   Thu, 24 Jun 2021 12:57:43 +0900
+Message-Id: <20210624035749.4054934-1-stevensd@google.com>
+X-Mailer: git-send-email 2.32.0.93.g670b81a890-goog
 MIME-Version: 1.0
-In-Reply-To: <CACycT3u8=_D3hCtJR+d5BgeUQMce6S7c_6P3CVfvWfYhCQeXFA@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
-Content-Language: en-US
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+KVM supports mapping VM_IO and VM_PFNMAP memory into the guest by using
+follow_pte in gfn_to_pfn. However, the resolved pfns may not have
+assoicated struct pages, so they should not be passed to pfn_to_page.
+This series removes such calls from the x86 and arm64 secondary MMU. To
+do this, this series modifies gfn_to_pfn to return a struct page in
+addition to a pfn, if the hva was resolved by gup. This allows the
+caller to call put_page only when necessated by gup.
 
-在 2021/6/23 下午1:50, Yongji Xie 写道:
-> On Wed, Jun 23, 2021 at 11:31 AM Jason Wang <jasowang@redhat.com> wrote:
->>
->> 在 2021/6/22 下午4:14, Yongji Xie 写道:
->>> On Tue, Jun 22, 2021 at 3:50 PM Jason Wang <jasowang@redhat.com> wrote:
->>>> 在 2021/6/22 下午3:22, Yongji Xie 写道:
->>>>>> We need fix a way to propagate the error to the userspace.
->>>>>>
->>>>>> E.g if we want to stop the deivce, we will delay the status reset until
->>>>>> we get respose from the userspace?
->>>>>>
->>>>> I didn't get how to delay the status reset. And should it be a DoS
->>>>> that we want to fix if the userspace doesn't give a response forever?
->>>> You're right. So let's make set_status() can fail first, then propagate
->>>> its failure via VHOST_VDPA_SET_STATUS.
->>>>
->>> OK. So we only need to propagate the failure in the vhost-vdpa case, right?
->>
->> I think not, we need to deal with the reset for virtio as well:
->>
->> E.g in register_virtio_devices(), we have:
->>
->>           /* We always start by resetting the device, in case a previous
->>            * driver messed it up.  This also tests that code path a
->> little. */
->>         dev->config->reset(dev);
->>
->> We probably need to make reset can fail and then fail the
->> register_virtio_device() as well.
->>
-> OK, looks like virtio_add_status() and virtio_device_ready()[1] should
-> be also modified if we need to propagate the failure in the
-> virtio-vdpa case. Or do we only need to care about the reset case?
->
-> [1] https://lore.kernel.org/lkml/20210517093428.670-1-xieyongji@bytedance.com/
+This series provides a helper function that unwraps the new return type
+of gfn_to_pfn to provide behavior identical to the old behavior. As I
+have no hardware to test powerpc/mips changes, the function is used
+there for minimally invasive changes. Additionally, as gfn_to_page and
+gfn_to_pfn_cache are not integrated with mmu notifier, they cannot be
+easily changed over to only use pfns.
 
+This addresses CVE-2021-22543 on x86 and arm64.
 
-My understanding is DRIVER_OK is not something that needs to be validated:
+David Stevens (6):
+  KVM: x86/mmu: release audited pfns
+  KVM: mmu: also return page from gfn_to_pfn
+  KVM: x86/mmu: avoid struct page in MMU
+  KVM: arm64/mmu: avoid struct page in MMU
+  KVM: mmu: remove over-aggressive warnings
+  drm/i915/gvt: use gfn_to_pfn's page instead of pfn
 
-"
+ arch/arm64/kvm/mmu.c                   |  42 +++++----
+ arch/mips/kvm/mmu.c                    |   3 +-
+ arch/powerpc/kvm/book3s.c              |   3 +-
+ arch/powerpc/kvm/book3s_64_mmu_hv.c    |   5 +-
+ arch/powerpc/kvm/book3s_64_mmu_radix.c |   5 +-
+ arch/powerpc/kvm/book3s_hv_uvmem.c     |   4 +-
+ arch/powerpc/kvm/e500_mmu_host.c       |   2 +-
+ arch/x86/kvm/mmu/mmu.c                 |  60 ++++++------
+ arch/x86/kvm/mmu/mmu_audit.c           |  13 ++-
+ arch/x86/kvm/mmu/mmu_internal.h        |   3 +-
+ arch/x86/kvm/mmu/paging_tmpl.h         |  36 +++++---
+ arch/x86/kvm/mmu/tdp_mmu.c             |   7 +-
+ arch/x86/kvm/mmu/tdp_mmu.h             |   4 +-
+ arch/x86/kvm/x86.c                     |   9 +-
+ drivers/gpu/drm/i915/gvt/gtt.c         |  12 ++-
+ drivers/gpu/drm/i915/gvt/hypercall.h   |   3 +-
+ drivers/gpu/drm/i915/gvt/kvmgt.c       |  12 +--
+ drivers/gpu/drm/i915/gvt/mpt.h         |   8 +-
+ include/linux/kvm_host.h               |  27 ++++--
+ include/linux/kvm_types.h              |   5 +
+ virt/kvm/kvm_main.c                    | 123 +++++++++++++------------
+ 21 files changed, 212 insertions(+), 174 deletions(-)
 
-DRIVER_OK (4)
-Indicates that the driver is set up and ready to drive the device.
-
-"
-
-Since the spec doesn't require to re-read the and check if DRIVER_OK is 
-set in 3.1.1 Driver Requirements: Device Initialization.
-
-It's more about "telling the device that driver is ready."
-
-But we don have some status bit that requires the synchronization with 
-the device.
-
-1) FEATURES_OK, spec requires to re-read the status bit to check whether 
-or it it was set by the device:
-
-"
-
-Re-read device status to ensure the FEATURES_OK bit is still set: 
-otherwise, the device does not support our subset of features and the 
-device is unusable.
-
-"
-
-This is useful for some device which can only support a subset of the 
-features. E.g a device that can only work for packed virtqueue. This 
-means the current design of set_features won't work, we need either:
-
-1a) relay the set_features request to userspace
-
-or
-
-1b) introduce a mandated_device_features during device creation and 
-validate the driver features during the set_features(), and don't set 
-FEATURES_OK if they don't match.
-
-
-2) Some transports (PCI) requires to re-read the status to ensure the 
-synchronization.
-
-"
-
-After writing 0 to device_status, the driver MUST wait for a read of 
-device_status to return 0 before reinitializing the device.
-
-"
-
-So we need to deal with both FEATURES_OK and reset, but probably not 
-DRIVER_OK.
-
-Thanks
-
-
->
-> Thanks,
-> Yongji
->
+-- 
+2.32.0.93.g670b81a890-goog
 
