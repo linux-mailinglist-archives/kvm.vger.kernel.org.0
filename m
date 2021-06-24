@@ -2,128 +2,196 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C5A983B268B
-	for <lists+kvm@lfdr.de>; Thu, 24 Jun 2021 06:53:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4155C3B2670
+	for <lists+kvm@lfdr.de>; Thu, 24 Jun 2021 06:46:53 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230239AbhFXEyz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 24 Jun 2021 00:54:55 -0400
-Received: from bilbo.ozlabs.org ([203.11.71.1]:58469 "EHLO ozlabs.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229448AbhFXEyu (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 24 Jun 2021 00:54:50 -0400
-Received: by ozlabs.org (Postfix, from userid 1007)
-        id 4G9SRT58RKz9t0p; Thu, 24 Jun 2021 14:52:21 +1000 (AEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-        d=gibson.dropbear.id.au; s=201602; t=1624510341;
-        bh=Sm55XzzGfIQHnANDiUMDuvbZ7IYjUCtojFRRcEiqmdw=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=ZuxeZjTQrfzT56BXV29tLxlyIOHOXy7GQrcr5dBHMdRwtRLepAJHBZ5QOStm+KtB9
-         y/cqy+JBpGt3PhpRnK8A4w9a+1QeLo6AY7yDNB6p+zQ7fzd3+URtYF1LoCqsBD7qyE
-         RJM+qZc3B2GADxb/auGsSb1b+o/5v4GHaOrRSSXE=
-Date:   Thu, 24 Jun 2021 14:37:31 +1000
-From:   David Gibson <david@gibson.dropbear.id.au>
-To:     Jason Gunthorpe <jgg@nvidia.com>
-Cc:     Alex Williamson <alex.williamson@redhat.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        "Tian, Kevin" <kevin.tian@intel.com>,
-        Jean-Philippe Brucker <jean-philippe@linaro.org>,
-        Jason Wang <jasowang@redhat.com>,
-        "parav@mellanox.com" <parav@mellanox.com>,
-        "Enrico Weigelt, metux IT consult" <lkml@metux.net>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Shenming Lu <lushenming@huawei.com>,
-        Eric Auger <eric.auger@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        "Raj, Ashok" <ashok.raj@intel.com>,
-        "Liu, Yi L" <yi.l.liu@intel.com>, "Wu, Hao" <hao.wu@intel.com>,
-        "Jiang, Dave" <dave.jiang@intel.com>,
-        Jacob Pan <jacob.jun.pan@linux.intel.com>,
-        Kirti Wankhede <kwankhede@nvidia.com>,
-        Robin Murphy <robin.murphy@arm.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
-        David Woodhouse <dwmw2@infradead.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Lu Baolu <baolu.lu@linux.intel.com>
-Subject: Re: Plan for /dev/ioasid RFC v2
-Message-ID: <YNQMC4GcV3gxjerb@yekko>
-References: <MWHPR11MB188699D0B9C10EB51686C4138C389@MWHPR11MB1886.namprd11.prod.outlook.com>
- <YMCy48Xnt/aphfh3@8bytes.org>
- <20210609123919.GA1002214@nvidia.com>
- <YMDC8tOMvw4FtSek@8bytes.org>
- <20210609150009.GE1002214@nvidia.com>
- <YMDjfmJKUDSrbZbo@8bytes.org>
- <20210609101532.452851eb.alex.williamson@redhat.com>
- <YMrXaWfAyLBnI3eP@yekko>
- <20210617230438.GZ1002214@nvidia.com>
+        id S230082AbhFXEtC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 24 Jun 2021 00:49:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53450 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229465AbhFXEtC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 24 Jun 2021 00:49:02 -0400
+Received: from mail-ej1-x62e.google.com (mail-ej1-x62e.google.com [IPv6:2a00:1450:4864:20::62e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 35D5EC061756
+        for <kvm@vger.kernel.org>; Wed, 23 Jun 2021 21:46:43 -0700 (PDT)
+Received: by mail-ej1-x62e.google.com with SMTP id nb6so7380740ejc.10
+        for <kvm@vger.kernel.org>; Wed, 23 Jun 2021 21:46:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=bytedance-com.20150623.gappssmtp.com; s=20150623;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=qV+mylXL/2SS4mJCMLehWyslEuC3Qq8x/PXCguBgY/I=;
+        b=yLsRfVae0FF0DXCc80Qe7rbCzVIrdmQDyeaVXSgU7731bg1QMqw4lgqLCxjyZUZjwu
+         TDH7cb0lIajOurwizpXzJMb1Ld/YEZ/vOZ/tKUWon1ytyFmk7qtEyniUaT9wfomHXaCZ
+         Q5k7DOlqy4oW2+TRbKidZkfTZk1foP9dbr9CEZLKOgBzOUjNXSWZEPhSFmyl+eKMt16P
+         UetkLAJ4Ll73DccWxMTSvwQYbyiWwHF4SXeF68p10765hT8FeXCxeTOqWo6XDYYUASaW
+         U0fLxWjMmOWM2r455SZayrz6m1rBoWQox1axwCaI6sMaC6VcTv4xi2V6T6wMsgxpGUUR
+         4qsA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=qV+mylXL/2SS4mJCMLehWyslEuC3Qq8x/PXCguBgY/I=;
+        b=uisOv7Bicyk9DQX1SMChY74pQKTqH7TCg3l1oyGlGQWA06o0nie3tfzJ2+XTCeFhlO
+         ect3PzaZxUcAEUe7mlWSbXr+sTOiKNMtXykHSlSa+0SuU80C4WMll2gAtFmWdwVrnWGm
+         fy4dqegQLys4hoYITe24DIk/draRowNA/6rGZuqlCx1IeECwQn8MCLHptu7rgzaSEbWQ
+         AXZnhLCNRAb6A0E8ps+ZooNV36iy8nLtgFRRMNKQ8+w3+U0aLVFIQxkj10W5sDC6pn4l
+         +pFi2vRCLgM/xwnzL79Q3tPHqexZPEBnYq7e3HeQGEHsktmHUJ7WNYt9GEU3XtivsUL9
+         zmAw==
+X-Gm-Message-State: AOAM530TXKpSEFJMWcnFF/mSXyLRNHD/q0K0wkDcl89Dpg8KW5AVchmP
+        +QRdoSHRb4ccCHDaw4dnDeNTYl+etQ5HvLh5e8Fb
+X-Google-Smtp-Source: ABdhPJxLv6gMYjF4IzwXDzBGPms1QJcwsfrq54qSD0tH6LJ386sUw0R2U1ERHQHkfRm0DArekdU8YwZzZP3+ubsA+P4=
+X-Received: by 2002:a17:906:3c4a:: with SMTP id i10mr3283231ejg.372.1624510001769;
+ Wed, 23 Jun 2021 21:46:41 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="yoFsgJzPurSq8+17"
-Content-Disposition: inline
-In-Reply-To: <20210617230438.GZ1002214@nvidia.com>
+References: <20210615141331.407-1-xieyongji@bytedance.com> <20210615141331.407-10-xieyongji@bytedance.com>
+ <adfb2be9-9ed9-ca37-ac37-4cd00bdff349@redhat.com> <CACycT3tAON+-qZev+9EqyL2XbgH5HDspOqNt3ohQLQ8GqVK=EA@mail.gmail.com>
+ <1bba439f-ffc8-c20e-e8a4-ac73e890c592@redhat.com> <CACycT3uzMJS7vw6MVMOgY4rb=SPfT2srV+8DPdwUVeELEiJgbA@mail.gmail.com>
+ <0aeb7cb7-58e5-1a95-d830-68edd7e8ec2e@redhat.com> <CACycT3uuooKLNnpPHewGZ=q46Fap2P4XCFirdxxn=FxK+X1ECg@mail.gmail.com>
+ <e4cdee72-b6b4-d055-9aac-3beae0e5e3e1@redhat.com> <CACycT3u8=_D3hCtJR+d5BgeUQMce6S7c_6P3CVfvWfYhCQeXFA@mail.gmail.com>
+ <d2334f66-907c-2e9c-ea4f-f912008e9be8@redhat.com>
+In-Reply-To: <d2334f66-907c-2e9c-ea4f-f912008e9be8@redhat.com>
+From:   Yongji Xie <xieyongji@bytedance.com>
+Date:   Thu, 24 Jun 2021 12:46:30 +0800
+Message-ID: <CACycT3uCSLUDVpQHdrmuxSuoBDg-4n22t+N-Jm2GoNNp9JYB2w@mail.gmail.com>
+Subject: Re: Re: [PATCH v8 09/10] vduse: Introduce VDUSE - vDPA Device in Userspace
+To:     Jason Wang <jasowang@redhat.com>
+Cc:     "Michael S. Tsirkin" <mst@redhat.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Stefano Garzarella <sgarzare@redhat.com>,
+        Parav Pandit <parav@nvidia.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Christian Brauner <christian.brauner@canonical.com>,
+        Randy Dunlap <rdunlap@infradead.org>,
+        Matthew Wilcox <willy@infradead.org>,
+        Al Viro <viro@zeniv.linux.org.uk>,
+        Jens Axboe <axboe@kernel.dk>, bcrl@kvack.org,
+        Jonathan Corbet <corbet@lwn.net>,
+        =?UTF-8?Q?Mika_Penttil=C3=A4?= <mika.penttila@nextfour.com>,
+        Dan Carpenter <dan.carpenter@oracle.com>, joro@8bytes.org,
+        Greg KH <gregkh@linuxfoundation.org>, songmuchun@bytedance.com,
+        virtualization <virtualization@lists.linux-foundation.org>,
+        netdev@vger.kernel.org, kvm <kvm@vger.kernel.org>,
+        linux-fsdevel@vger.kernel.org, iommu@lists.linux-foundation.org,
+        linux-kernel <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Thu, Jun 24, 2021 at 11:35 AM Jason Wang <jasowang@redhat.com> wrote:
+>
+>
+> =E5=9C=A8 2021/6/23 =E4=B8=8B=E5=8D=881:50, Yongji Xie =E5=86=99=E9=81=93=
+:
+> > On Wed, Jun 23, 2021 at 11:31 AM Jason Wang <jasowang@redhat.com> wrote=
+:
+> >>
+> >> =E5=9C=A8 2021/6/22 =E4=B8=8B=E5=8D=884:14, Yongji Xie =E5=86=99=E9=81=
+=93:
+> >>> On Tue, Jun 22, 2021 at 3:50 PM Jason Wang <jasowang@redhat.com> wrot=
+e:
+> >>>> =E5=9C=A8 2021/6/22 =E4=B8=8B=E5=8D=883:22, Yongji Xie =E5=86=99=E9=
+=81=93:
+> >>>>>> We need fix a way to propagate the error to the userspace.
+> >>>>>>
+> >>>>>> E.g if we want to stop the deivce, we will delay the status reset =
+until
+> >>>>>> we get respose from the userspace?
+> >>>>>>
+> >>>>> I didn't get how to delay the status reset. And should it be a DoS
+> >>>>> that we want to fix if the userspace doesn't give a response foreve=
+r?
+> >>>> You're right. So let's make set_status() can fail first, then propag=
+ate
+> >>>> its failure via VHOST_VDPA_SET_STATUS.
+> >>>>
+> >>> OK. So we only need to propagate the failure in the vhost-vdpa case, =
+right?
+> >>
+> >> I think not, we need to deal with the reset for virtio as well:
+> >>
+> >> E.g in register_virtio_devices(), we have:
+> >>
+> >>           /* We always start by resetting the device, in case a previo=
+us
+> >>            * driver messed it up.  This also tests that code path a
+> >> little. */
+> >>         dev->config->reset(dev);
+> >>
+> >> We probably need to make reset can fail and then fail the
+> >> register_virtio_device() as well.
+> >>
+> > OK, looks like virtio_add_status() and virtio_device_ready()[1] should
+> > be also modified if we need to propagate the failure in the
+> > virtio-vdpa case. Or do we only need to care about the reset case?
+> >
+> > [1] https://lore.kernel.org/lkml/20210517093428.670-1-xieyongji@bytedan=
+ce.com/
+>
+>
+> My understanding is DRIVER_OK is not something that needs to be validated=
+:
+>
+> "
+>
+> DRIVER_OK (4)
+> Indicates that the driver is set up and ready to drive the device.
+>
+> "
+>
+> Since the spec doesn't require to re-read the and check if DRIVER_OK is
+> set in 3.1.1 Driver Requirements: Device Initialization.
+>
+> It's more about "telling the device that driver is ready."
+>
+> But we don have some status bit that requires the synchronization with
+> the device.
+>
+> 1) FEATURES_OK, spec requires to re-read the status bit to check whether
+> or it it was set by the device:
+>
+> "
+>
+> Re-read device status to ensure the FEATURES_OK bit is still set:
+> otherwise, the device does not support our subset of features and the
+> device is unusable.
+>
+> "
+>
+> This is useful for some device which can only support a subset of the
+> features. E.g a device that can only work for packed virtqueue. This
+> means the current design of set_features won't work, we need either:
+>
+> 1a) relay the set_features request to userspace
+>
+> or
+>
+> 1b) introduce a mandated_device_features during device creation and
+> validate the driver features during the set_features(), and don't set
+> FEATURES_OK if they don't match.
+>
+>
+> 2) Some transports (PCI) requires to re-read the status to ensure the
+> synchronization.
+>
+> "
+>
+> After writing 0 to device_status, the driver MUST wait for a read of
+> device_status to return 0 before reinitializing the device.
+>
+> "
+>
+> So we need to deal with both FEATURES_OK and reset, but probably not
+> DRIVER_OK.
+>
 
---yoFsgJzPurSq8+17
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+OK, I see. Thanks for the explanation. One more question is how about
+clearing the corresponding status bit in get_status() rather than
+making set_status() fail. Since the spec recommends this way for
+validation which is done in virtio_dev_remove() and
+virtio_finalize_features().
 
-On Thu, Jun 17, 2021 at 08:04:38PM -0300, Jason Gunthorpe wrote:
-> On Thu, Jun 17, 2021 at 03:02:33PM +1000, David Gibson wrote:
->=20
-> > In other words, do we really have use cases where we need to identify
-> > different devices IDs, even though we know they're not isolated.
->=20
-> I think when PASID is added in and all the complexity that brings, it
-> does become more important, yes.
->=20
-> At the minimum we should scope the complexity.
->=20
-> I'm not convinced it is so complicated, really it is just a single bit
-> of information toward userspace: 'all devices in this group must use
-> the same IOASID'
-
-Um.. no?  You could have devA and devB sharing a RID, but then also
-sharing a group but not a RID with devC because of different isolation
-issues.  So you now have (at least) two levels of group structure to
-expose somehow.
-
->=20
-> Something like qemu consumes this bit and creates the pci/pcie bridge
-> to model this to the guest and so on.
->=20
-> Something like dpdk just doesn't care (same as today).
->=20
-> Jason
->=20
-
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---yoFsgJzPurSq8+17
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAmDUDAsACgkQbDjKyiDZ
-s5K4XA//Y4QIGGAGVVbJfKrlf5JkN2/2a7VHx4vaUfc4NR5mVhkNYwvGbSYutZQ7
-AjjTm5pfpoAem4nB8Q6U3GfaFTsj2YUg6Vodt8xJhSilvNHENa04nCVQMhACfYUn
-SaQAMbx4gnuxaL02rl5NzWe5u5j1Vm1L485cfpMvdDae0Huq4qiMV4zCASCxGkO3
-vIRkdPSdp8legFimjVdQJPLVnAIFG1nJk/9toYcNpXp0esbOxYMHszvcXkMM3F2l
-1qyY4HbXOHBGQTvuAAAATYZve/p9YqYQ8ePzuYuLo8q4HAzL3V1uB9Dy9sGgXhFL
-g46MfO3FKjnjrMxpanmv6ztsnoY4WOxMJundhPQ1ANayPNAPVSn3KaCSzX7hcfQH
-xSOX8kjr5RDi1F3BYKPmOOGRK0dmGMRaWlCapWSLkobKzUUAaUT43jMa2843gP9O
-b9PSXzODLGUu3fIUITRoMLGI881jigBWg/gmtV1egbi0s/qngiheJFzP9mptbzfw
-eciggSqjH/4ZBuBpRhNDnICQNNF/39/r9qOeWeiBicfW+8HciMvcsjvcWVgOnAhl
-/nIFGSMu6uTSWnSP6WR4fYDy7WRlsQM+GUk58WekBW19yzvoaoubmBXRCHq5eHmF
-hKf3A9OxFZRJNs0G8wp6e6R3RSp67s+4+AUyEmEdzsJ6863Z9xw=
-=1/9P
------END PGP SIGNATURE-----
-
---yoFsgJzPurSq8+17--
+Thanks,
+Yongji
