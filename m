@@ -2,122 +2,116 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D1CBB3B2A3F
-	for <lists+kvm@lfdr.de>; Thu, 24 Jun 2021 10:20:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id ED1C13B2A93
+	for <lists+kvm@lfdr.de>; Thu, 24 Jun 2021 10:43:09 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231852AbhFXIW4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 24 Jun 2021 04:22:56 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:36810 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231713AbhFXIWu (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 24 Jun 2021 04:22:50 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1624522831;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=yzCIhgWSWB1sGxIlTQQBY+Zll9G7G2k/fD0vgf07hXQ=;
-        b=QhjDroefQcTiQLipjoThTmLc/Mnv0cybC5SxrGjb/GkQt5Qv9BgdNGyaVWWbxk7mXyTlh9
-        yoPam/i8WGDRXMfW+A8MgtcEgsoFkz7VYRTxkrjJjCHUEclCXNRngtPizhsKALNYC8NROM
-        2eHeckQKSUoGQU9APOxv6lCaJE247ZA=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-276-f1BdehLZN8ywnuYFBfwzeA-1; Thu, 24 Jun 2021 04:20:30 -0400
-X-MC-Unique: f1BdehLZN8ywnuYFBfwzeA-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E72B21054F9A;
-        Thu, 24 Jun 2021 08:20:28 +0000 (UTC)
-Received: from starship (unknown [10.40.192.10])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 189FC1001281;
-        Thu, 24 Jun 2021 08:20:25 +0000 (UTC)
-Message-ID: <83affeedb9a3d091bece8f5fdd5373342298dcd3.camel@redhat.com>
-Subject: Re: [PATCH RFC] KVM: nSVM: Fix L1 state corruption upon return from
- SMM
-From:   Maxim Levitsky <mlevitsk@redhat.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>
-Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
+        id S229955AbhFXIp1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 24 Jun 2021 04:45:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49760 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229890AbhFXIp0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 24 Jun 2021 04:45:26 -0400
+Received: from mail-pl1-x636.google.com (mail-pl1-x636.google.com [IPv6:2607:f8b0:4864:20::636])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DFD76C061574;
+        Thu, 24 Jun 2021 01:43:06 -0700 (PDT)
+Received: by mail-pl1-x636.google.com with SMTP id u2so2596436plf.3;
+        Thu, 24 Jun 2021 01:43:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=date:from:subject:to:cc:references:in-reply-to:mime-version
+         :message-id:content-transfer-encoding;
+        bh=yhvFMq52QAZ9Grg2JNZMftQHgs3RA/23cRzSXZS17k0=;
+        b=gAOPVlMk/C7twisLQPwKCNWWewikvdh3rxAsE3ZtniqnTTajI/NMXYxiFGdNgFsAb5
+         HygkoSZIJ35Gv0csn5ROrHrh88J/UJu+eQftLB0ieYLqxUsTshCjLCXS6gCtoawRaivr
+         09ywa3Xbj5hpxhL9dwXklJBlZskMpYTiquDzecxyLb9cNgD5q6A07FqSvRwXDFm8rCjX
+         BNwM+/+ntQwzLzmsj9QUq7rwCh6LY1EpIQpDwzEMVK8zxcfbTYEjGD1dfARZQBO2ATzQ
+         bXhbvn6/C4gpLxmOLhsNYYF/nPrsfEvzkHwVbcZduLr1uAs8pjNAgfhm1dhPRaqpCZmK
+         qi+A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:subject:to:cc:references:in-reply-to
+         :mime-version:message-id:content-transfer-encoding;
+        bh=yhvFMq52QAZ9Grg2JNZMftQHgs3RA/23cRzSXZS17k0=;
+        b=BU3nHJhNpbqzNyn2Kk9HrmtaroFtkm9XNqK5e5rbR+Z/NMmGxaFRQCbSavR9e0lgxi
+         Fto6wNZ7gHIXsYpSxP7JsWapZEHQ7HstMj4Mok7pyhxT6U0JvAV4VjCJ8v1RPRUoUtaa
+         QdA0PE126I/bgM2S3EOjE2wcFy9mVGyhCrymp5kPkN8rGn6AhtPYFFQUtDBce5xyhlpA
+         HfRQsknWKQWdXZYWvm7l7SzIADJtcUP+wr4aZYOzjWrbBw2lg898vMPB+7nLlVOlc8hX
+         yS4kaHsTLtjhHRdHBz5UNjEAlDm3mHWI41vcsDCosfydV+awa5iNsebEytBkmAfEvrQ7
+         R4Lw==
+X-Gm-Message-State: AOAM530FY2fKReHTCME6EoyzKwO3TJNySRwRM0XlkEd8kn6DDgZAo7Bc
+        jhQpyZRVnO8q12Jf13WlELw=
+X-Google-Smtp-Source: ABdhPJxPYtDJj0lFNs0Ok5TeYJmivmtsbDnnr/kiA2/ldwDSYWrbmF8IsiSMPIQHeLM0imoUnt26JQ==
+X-Received: by 2002:a17:90b:793:: with SMTP id l19mr14007232pjz.111.1624524186360;
+        Thu, 24 Jun 2021 01:43:06 -0700 (PDT)
+Received: from localhost (60-242-147-73.tpgi.com.au. [60.242.147.73])
+        by smtp.gmail.com with ESMTPSA id 23sm1841779pjw.28.2021.06.24.01.43.05
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 24 Jun 2021 01:43:06 -0700 (PDT)
+Date:   Thu, 24 Jun 2021 18:43:00 +1000
+From:   Nicholas Piggin <npiggin@gmail.com>
+Subject: Re: [PATCH 1/6] KVM: x86/mmu: release audited pfns
+To:     Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+        Huacai Chen <chenhuacai@kernel.org>,
+        Marc Zyngier <maz@kernel.org>,
+        Paul Mackerras <paulus@ozlabs.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        David Stevens <stevensd@chromium.org>,
+        Zhenyu Wang <zhenyuw@linux.intel.com>,
+        Zhi Wang <zhi.a.wang@intel.com>
+Cc:     Alexandru Elisei <alexandru.elisei@arm.com>,
+        dri-devel@lists.freedesktop.org, intel-gfx@lists.freedesktop.org,
+        intel-gvt-dev@lists.freedesktop.org,
+        James Morse <james.morse@arm.com>,
         Jim Mattson <jmattson@google.com>,
-        Cathy Avery <cavery@redhat.com>,
-        Emanuele Giuseppe Esposito <eesposit@redhat.com>,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Date:   Thu, 24 Jun 2021 11:20:24 +0300
-In-Reply-To: <82327cd1-92ca-9f6b-3af0-8215e9d21eae@redhat.com>
-References: <20210623074427.152266-1-vkuznets@redhat.com>
-         <a3918bfa-7b4f-c31a-448a-aa22a44d4dfd@redhat.com>
-         <53a9f893cb895f4b52e16c374cbe988607925cdf.camel@redhat.com>
-         <ac98150acd77f4c09167bc1bb1c552db68925cf2.camel@redhat.com>
-         <87pmwc4sh4.fsf@vitty.brq.redhat.com>
-         <5fc502b70a89e18034716166abc65caec192c19b.camel@redhat.com>
-         <YNNc9lKIzM6wlDNf@google.com> <YNNfnLsc+3qMsdlN@google.com>
-         <82327cd1-92ca-9f6b-3af0-8215e9d21eae@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
+        Joerg Roedel <joro@8bytes.org>, kvmarm@lists.cs.columbia.edu,
+        kvm-ppc@vger.kernel.org, kvm@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+        linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+        Sean Christopherson <seanjc@google.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Will Deacon <will@kernel.org>
+References: <20210624035749.4054934-1-stevensd@google.com>
+        <20210624035749.4054934-2-stevensd@google.com>
+In-Reply-To: <20210624035749.4054934-2-stevensd@google.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+Message-Id: <1624524156.04etgk7zmz.astroid@bobo.none>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 2021-06-23 at 22:37 +0200, Paolo Bonzini wrote:
-> On 23/06/21 18:21, Sean Christopherson wrote:
-> > On Wed, Jun 23, 2021, Sean Christopherson wrote:
-> > > And I believe this hackery is necessary only because nested_svm_vmexit() isn't
-> > > following the architcture in the first place.  I.e. using vmcb01 to restore
-> > > host state is flat out wrong.
-> > 
-> > Ah, that's not true, using vmcb01 is allowed by "may store some or all host state
-> > in hidden on-chip memory".
-> 
-> And also, "Different implementations may choose to save the hidden parts 
-> of the host’s segment registers as well as the selectors".
-> 
-> >  From a performance perspective, I do like the SMI/RSM shenanigans.  I'm not
-> > totally opposed to the trickery since I think it will break a guest if and only
-> > if the L1 guest is also violating the APM.  And we're not fudging the spec thaat
-> > much :-)
-> 
-> Yeah, that was my reasoning as well.  Any reference to "hidden on-chip 
-> memory", plus the forbidding modifications of the host save area, sort 
-> of implies that the processor can actually flush that hidden on-chip 
-> memory for whatever reason (such as on some sleep states?!?).
-> 
-> Paolo
-> 
+Excerpts from David Stevens's message of June 24, 2021 1:57 pm:
+> From: David Stevens <stevensd@chromium.org>
 
-Let me explain my thoughts about this again, now that I hopefully
-understand this correctly:
+Changelog? This looks like a bug, should it have a Fixes: tag?
 
-L1 register state is stored in VMCB01 since the CPU stores it there,
-every time L1 VMexits.
+Thanks,
+Nick
 
-Now L1 is a host for L2, and therefore this is also L1 "host" state.
-
-When we switch to L2, it is therefore natural to keep that state in
-vmcb01, and not copy it to VM_HSAVE_PA area.
-
-So when running SMM code in L1, since we must not corrupt this state,
-It makes sense to back it up somewhere,
-but as I said I prefer to store/migrate it out of band instead of
-saving it in the guest memory, although Paolo's reasoning that CPU
-might *sometimes* write VM_HSAVE_PA and that *sometimes* is allowed to be
-when we enter SMM,  does make sense.
-Thus I don't have a strong opinion on this anymore, as long as it works.
-
-Something else to note, just for our information is that KVM 
-these days does vmsave/vmload to VM_HSAVE_PA to store/restore 
-the additional host state, something that is frowned upon in the spec, 
-but there is some justification of doing this in the commit message,
-citing an old spec which allowed this.
-This shoudn't affect anything, but just FYI.
-
-https://patchwork.kernel.org/project/kvm/patch/20201210174814.1122585-1-michael.roth@amd.com/
-
-Best regards,
-	Maxim Levitsky
-
+>=20
+> Signed-off-by: David Stevens <stevensd@chromium.org>
+> ---
+>  arch/x86/kvm/mmu/mmu_audit.c | 2 ++
+>  1 file changed, 2 insertions(+)
+>=20
+> diff --git a/arch/x86/kvm/mmu/mmu_audit.c b/arch/x86/kvm/mmu/mmu_audit.c
+> index cedc17b2f60e..97ff184084b4 100644
+> --- a/arch/x86/kvm/mmu/mmu_audit.c
+> +++ b/arch/x86/kvm/mmu/mmu_audit.c
+> @@ -121,6 +121,8 @@ static void audit_mappings(struct kvm_vcpu *vcpu, u64=
+ *sptep, int level)
+>  		audit_printk(vcpu->kvm, "levels %d pfn %llx hpa %llx "
+>  			     "ent %llxn", vcpu->arch.mmu->root_level, pfn,
+>  			     hpa, *sptep);
+> +
+> +	kvm_release_pfn_clean(pfn);
+>  }
+> =20
+>  static void inspect_spte_has_rmap(struct kvm *kvm, u64 *sptep)
+> --=20
+> 2.32.0.93.g670b81a890-goog
+>=20
+>=20
