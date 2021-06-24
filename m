@@ -2,191 +2,176 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3954B3B2FCF
-	for <lists+kvm@lfdr.de>; Thu, 24 Jun 2021 15:09:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 90F133B304F
+	for <lists+kvm@lfdr.de>; Thu, 24 Jun 2021 15:42:49 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231270AbhFXNL4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 24 Jun 2021 09:11:56 -0400
-Received: from mga01.intel.com ([192.55.52.88]:7195 "EHLO mga01.intel.com"
+        id S231712AbhFXNpG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 24 Jun 2021 09:45:06 -0400
+Received: from mga17.intel.com ([192.55.52.151]:58487 "EHLO mga17.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229945AbhFXNLy (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 24 Jun 2021 09:11:54 -0400
-IronPort-SDR: dd5904ovP9yVDVEZQeku83TqRhYhQstyOPb3ld1j/hXq7iBOWZ3HXeLeGNkHLc7iywMlFmOYbH
- k2gLoC7N3OOw==
-X-IronPort-AV: E=McAfee;i="6200,9189,10024"; a="229049274"
+        id S229995AbhFXNpG (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 24 Jun 2021 09:45:06 -0400
+IronPort-SDR: nn2MIhyhL5NW5Z3V+3vCPOP44a8ipYAGb/z5z9Lji5smoldhBVlA/M2MmhonH9tj5pcQg6UQ1i
+ 6apbTg/OyHhw==
+X-IronPort-AV: E=McAfee;i="6200,9189,10024"; a="187849764"
 X-IronPort-AV: E=Sophos;i="5.83,296,1616482800"; 
-   d="scan'208";a="229049274"
+   d="scan'208";a="187849764"
 Received: from orsmga001.jf.intel.com ([10.7.209.18])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Jun 2021 06:09:32 -0700
-IronPort-SDR: HxzSTYXQksPgutqeSE3iKfp9Xrj592UZplSuYL2yf9w+lHbS62QYhzBJO10kJz62rm97NrSuSm
- rFnbbRcQ70VA==
+  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Jun 2021 06:42:45 -0700
+IronPort-SDR: YVydjBX0YkVAhLh+YMD18XTmbFpHR21zKnhNrxE0oaEHiBi9/M3tMpJYUok7tlhXE14j+MwZ07
+ jTfscbHMjaxA==
 X-IronPort-AV: E=Sophos;i="5.83,296,1616482800"; 
-   d="scan'208";a="487748748"
-Received: from llvujovi-mobl.amr.corp.intel.com (HELO skuppusw-mobl5.amr.corp.intel.com) ([10.255.82.142])
-  by orsmga001-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Jun 2021 06:09:30 -0700
-Subject: Re: [PATCH Part1 RFC v3 20/22] x86/boot: Add Confidential Computing
- address to setup_header
-To:     Michael Roth <michael.roth@amd.com>, Borislav Petkov <bp@alien8.de>
-Cc:     Dave Hansen <dave.hansen@intel.com>,
-        Brijesh Singh <brijesh.singh@amd.com>, x86@kernel.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
-        linux-coco@lists.linux.dev, linux-mm@kvack.org,
-        linux-crypto@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
+   d="scan'208";a="487758610"
+Received: from blu2-mobl3.ccr.corp.intel.com (HELO [10.254.211.177]) ([10.254.211.177])
+  by orsmga001-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Jun 2021 06:42:38 -0700
+Cc:     baolu.lu@linux.intel.com, Jason Gunthorpe <jgg@nvidia.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        "Tian, Kevin" <kevin.tian@intel.com>,
+        "Alex Williamson (alex.williamson@redhat.com)" 
+        <alex.williamson@redhat.com>,
+        Jean-Philippe Brucker <jean-philippe@linaro.org>,
+        Jason Wang <jasowang@redhat.com>,
+        "parav@mellanox.com" <parav@mellanox.com>,
+        "Enrico Weigelt, metux IT consult" <lkml@metux.net>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
-        David Rientjes <rientjes@google.com>, tony.luck@intel.com,
-        npmccallum@redhat.com, Andi Kleen <ak@linux.intel.com>,
-        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-References: <20210602140416.23573-1-brijesh.singh@amd.com>
- <20210602140416.23573-21-brijesh.singh@amd.com> <YMw4UZn6AujpPSZO@zn.tnic>
- <15568c80-c9a9-5602-d940-264af87bed98@amd.com> <YMy2OGwsRzrR5bwD@zn.tnic>
- <162442264313.98837.16983159316116149849@amd.com> <YNMLX6fbB3PQwSpv@zn.tnic>
- <20210624031911.eznpkbgjt4e445xj@amd.com>
-From:   "Kuppuswamy, Sathyanarayanan" 
-        <sathyanarayanan.kuppuswamy@linux.intel.com>
-Message-ID: <5706421e-c88e-bcda-e637-610b5db297d0@linux.intel.com>
-Date:   Thu, 24 Jun 2021 06:09:28 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+        Shenming Lu <lushenming@huawei.com>,
+        Eric Auger <eric.auger@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        "Raj, Ashok" <ashok.raj@intel.com>,
+        "Liu, Yi L" <yi.l.liu@intel.com>, "Wu, Hao" <hao.wu@intel.com>,
+        "Jiang, Dave" <dave.jiang@intel.com>,
+        Jacob Pan <jacob.jun.pan@linux.intel.com>,
+        Kirti Wankhede <kwankhede@nvidia.com>,
+        Robin Murphy <robin.murphy@arm.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
+        David Woodhouse <dwmw2@infradead.org>,
+        LKML <linux-kernel@vger.kernel.org>
+To:     David Gibson <david@gibson.dropbear.id.au>
+References: <MWHPR11MB188699D0B9C10EB51686C4138C389@MWHPR11MB1886.namprd11.prod.outlook.com>
+ <YMCy48Xnt/aphfh3@8bytes.org> <20210609123919.GA1002214@nvidia.com>
+ <14d884a8-13bc-b2ba-7020-94b219e3e2d9@linux.intel.com>
+ <YMrcLcTL+cUKd1a5@yekko>
+ <b9c48526-8b8f-ff9e-4ece-4a39f476e3b7@linux.intel.com>
+ <YNQEClb1nptFBIRB@yekko>
+From:   Lu Baolu <baolu.lu@linux.intel.com>
+Subject: Re: Plan for /dev/ioasid RFC v2
+Message-ID: <b77b9ffc-166e-3019-0328-59d20a437fd5@linux.intel.com>
+Date:   Thu, 24 Jun 2021 21:42:36 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
  Thunderbird/78.11.0
 MIME-Version: 1.0
-In-Reply-To: <20210624031911.eznpkbgjt4e445xj@amd.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <YNQEClb1nptFBIRB@yekko>
+Content-Type: text/plain; charset=windows-1252; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-+ Andi, Kirill (For TDX specific review)
+On 2021/6/24 12:03, David Gibson wrote:
+> On Fri, Jun 18, 2021 at 01:21:47PM +0800, Lu Baolu wrote:
+>> Hi David,
+>>
+>> On 6/17/21 1:22 PM, David Gibson wrote:
+>>>> The iommu_group can guarantee the isolation among different physical
+>>>> devices (represented by RIDs). But when it comes to sub-devices (ex. mdev or
+>>>> vDPA devices represented by RID + SSID), we have to rely on the
+>>>> device driver for isolation. The devices which are able to generate sub-
+>>>> devices should either use their own on-device mechanisms or use the
+>>>> platform features like Intel Scalable IOV to isolate the sub-devices.
+>>> This seems like a misunderstanding of groups.  Groups are not tied to
+>>> any PCI meaning.  Groups are the smallest unit of isolation, no matter
+>>> what is providing that isolation.
+>>>
+>>> If mdevs are isolated from each other by clever software, even though
+>>> they're on the same PCI device they are in different groups from each
+>>> other*by definition*.  They are also in a different group from their
+>>> parent device (however the mdevs only exist when mdev driver is
+>>> active, which implies that the parent device's group is owned by the
+>>> kernel).
+>>
+>> You are right. This is also my understanding of an "isolation group".
+>>
+>> But, as I understand it, iommu_group is only the isolation group visible
+>> to IOMMU. When we talk about sub-devices (sw-mdev or mdev w/ pasid),
+>> only the device and device driver knows the details of isolation, hence
+>> iommu_group could not be extended to cover them. The device drivers
+>> should define their own isolation groups.
+> So, "iommu group" isn't a perfect name.  It came about because
+> originally the main mechanism for isolation was the IOMMU, so it was
+> typically the IOMMU's capabilities that determined if devices were
+> isolated.  However it was always known that there could be other
+> reasons for failure of isolation.  To simplify the model we decided
+> that we'd put things into the same group if they were non-isolated for
+> any reason.
 
-On 6/23/21 8:19 PM, Michael Roth wrote:
-> On Wed, Jun 23, 2021 at 12:22:23PM +0200, Borislav Petkov wrote:
->> On Tue, Jun 22, 2021 at 11:30:43PM -0500, Michael Roth wrote:
->>> Quoting Borislav Petkov (2021-06-18 10:05:28)
->>>> On Fri, Jun 18, 2021 at 08:57:12AM -0500, Brijesh Singh wrote:
->>>>> Don't have any strong reason to keep it separate, I can define a new
->>>>> type and use the setup_data to pass this information.
->>>>
->>>> setup_data is exactly for use cases like that - pass a bunch of data
->>>> to the kernel. So there's no need for a separate thing. Also see that
->>>> kernel_info thing which got added recently for read_only data.
->>>
->>> Hi Boris,
->>>
->>> There's one side-effect to this change WRT the CPUID page (which I think
->>> we're hoping to include in RFC v4).
->>>
->>> With CPUID page we need to access it very early in boot, for both
->>> boot/compressed kernel, and the uncompressed kernel. At first this was
->>> implemented by moving the early EFI table parsing code from
->>> arch/x86/kernel/boot/compressed/acpi.c into a little library to handle early
->>> EFI table parsing to fetch the Confidential Computing blob to get the CPUID
->>> page address.
->>>
->>> This was a bit messy since we needed to share that library between
->>> boot/compressed and uncompressed, and at that early stage things like
->>> fixup_pointer() are needed in some places, else even basic things like
->>> accessing EFI64_LOADER_SIGNATURE and various EFI helper functions could crash
->>> in uncompressed otherwise, so the library code needed to be fixed up
->>> accordingly.
->>>
->>> To simplify things we ended up simply keeping the early EFI table parsing in
->>> boot/compressed, and then having boot/compressed initialize
->>> setup_data.cc_blob_address so that the uncompressed kernel could access it
->>> from there (acpi does something similar with rdsp address).
->>
->> Yes, except the rsdp address is not vendor-specific but an x86 ACPI
->> thing, so pretty much omnipresent.
->>
->> Also, acpi_rsdp_addr is part of boot_params and that struct is full
->> of padding holes and obsolete members so reusing a u32 there is a lot
->> "easier" than changing the setup_header. So can you put that address in
->> boot_params instead?
-> 
-> Thanks for the suggestion! I tried something like the below and that seems to
-> work pretty well. I'm not sure if that's the best spot or not though, it
-> seems like it might be a good idea to leave some padding after eddbuf in
-> case it needs to grow in the future. I'll look into that a bit more.
-> 
-> One downside to this is we still need something in the boot protocol,
-> either via setup_data, or setup_header directly. Having it in
-> setup_header avoids the need to also have to add a field to boot_params
-> for the boot/compressed->uncompressed passing, but maybe that's not a good
-> enough justification. Perhaps if the TDX folks have similar needs though.
-> 
-> diff --git a/arch/x86/include/uapi/asm/bootparam.h b/arch/x86/include/uapi/asm/bootparam.h
-> index 1ac5acca72ce..0824c8646861 100644
-> --- a/arch/x86/include/uapi/asm/bootparam.h
-> +++ b/arch/x86/include/uapi/asm/bootparam.h
-> @@ -218,7 +218,8 @@ struct boot_params {
->          struct boot_e820_entry e820_table[E820_MAX_ENTRIES_ZEROPAGE]; /* 0x2d0 */
->          __u8  _pad8[48];                                /* 0xcd0 */
->          struct edd_info eddbuf[EDDMAXNR];               /* 0xd00 */
-> -       __u8  _pad9[276];                               /* 0xeec */
-> +       __u32 cc_blob_address;							/* 0xeec */
-> +       __u8  _pad9[272];                               /* 0xef0 */
->   } __attribute__((packed));
-> 
-> diff --git a/arch/x86/include/asm/bootparam_utils.h b/arch/x86/include/asm/bootparam_utils.h
-> index 981fe923a59f..53e9b0620d96 100644
-> --- a/arch/x86/include/asm/bootparam_utils.h
-> +++ b/arch/x86/include/asm/bootparam_utils.h
-> @@ -74,6 +74,7 @@ static void sanitize_boot_params(struct boot_params *boot_params)
->                          BOOT_PARAM_PRESERVE(hdr),
->                          BOOT_PARAM_PRESERVE(e820_table),
->                          BOOT_PARAM_PRESERVE(eddbuf),
-> +                       BOOT_PARAM_PRESERVE(cc_blob_address),
->                  };
-> 
->                  memset(&scratch, 0, sizeof(scratch));
-> 
->>
->>> Now that we're moving it to setup_data, this becomes a bit more awkward,
->>> since we need to reserve memory in boot/compressed to store the setup_data
->>> entry, then add it to the linked list to pass along to uncompressed kernel.
->>> In turn that also means we need to add an identity mapping for this in
->>> ident_map_64.c, so I'm not sure that's the best approach.
->>>
->>> So just trying to pin what the best approach is:
->>>
->>> a) move cc_blob to setup_data, and do the above-described to pass
->>>     cc_blob_address from boot/compressed to uncompressed to avoid early
->>>     EFI parsing in uncompressed
->>> b) move cc_blob to setup_data, and do the EFI table parsing in both
->>>     boot/compressed. leave setup_data allocation/init for BIOS/bootloader
->>> c) keep storing cc_blob_address in setup_header.cc_blob_address
->>> d) something else?
->>
->> Leaving in the whole text for newly CCed TDX folks in case they're going
->> to need something like that.
->>
->> And if so, then both vendors should even share the field definition.
->>
->> Dave, Sathya, you can find the whole subthread here:
->>
->> https://nam11.safelinks.protection.outlook.com/?url=https%3A%2F%2Flkml.kernel.org%2Fr%2F20210602140416.23573-21-brijesh.singh%40amd.com&amp;data=04%7C01%7Cmichael.roth%40amd.com%7C3b352c4b944c4d95bbdb08d93630d0eb%7C3dd8961fe4884e608e11a82d994e183d%7C0%7C0%7C637600405622460196%7CUnknown%7CTWFpbGZsb3d8eyJWIjoiMC4wLjAwMDAiLCJQIjoiV2luMzIiLCJBTiI6Ik1haWwiLCJXVCI6Mn0%3D%7C1000&amp;sdata=464O7JxibsbjC3bc0LkGcztdb4kCYH7kcQAcqohJhug%3D&amp;reserved=0
->>
->> in case you need background info on the topic at hand.
->>
->> Thx.
->>
->> -- 
->> Regards/Gruss,
->>      Boris.
->>
->> https://nam11.safelinks.protection.outlook.com/?url=https%3A%2F%2Fpeople.kernel.org%2Ftglx%2Fnotes-about-netiquette&amp;data=04%7C01%7Cmichael.roth%40amd.com%7C3b352c4b944c4d95bbdb08d93630d0eb%7C3dd8961fe4884e608e11a82d994e183d%7C0%7C0%7C637600405622460196%7CUnknown%7CTWFpbGZsb3d8eyJWIjoiMC4wLjAwMDAiLCJQIjoiV2luMzIiLCJBTiI6Ik1haWwiLCJXVCI6Mn0%3D%7C1000&amp;sdata=ruCM7CNgPCNPkrOoiNts1ZKi5k7JSUumln7qQMP%2BMi0%3D&amp;reserved=0
+Yes.
 
--- 
-Sathyanarayanan Kuppuswamy
-Linux Kernel Developer
+> 
+> The kernel has no notion of "isolation group" as distinct from "iommu
+> group".  What are called iommu groups in the kernel now*are*
+> "isolation groups" and that was always the intention - it's just not a
+> great name.
+
+Fair enough.
+
+> 
+>> Otherwise, the device driver has to fake an iommu_group and add hacky
+>> code to link the related IOMMU elements (iommu device, domain, group
+>> etc.) together. Actually this is part of the problem that this proposal
+>> tries to solve.
+> Yeah, that's not ideal.
+> 
+>>>> Under above conditions, different sub-device from a same RID device
+>>>> could be able to use different IOASID. This seems to means that we can't
+>>>> support mixed mode where, for example, two RIDs share an iommu_group and
+>>>> one (or both) of them have sub-devices.
+>>> That doesn't necessarily follow.  mdevs which can be successfully
+>>> isolated by their mdev driver are in a different group from their
+>>> parent device, and therefore need not be affected by whether the
+>>> parent device shares a group with some other physical device.  They
+>>> *might*   be, but that's up to the mdev driver to determine based on
+>>> what it can safely isolate.
+>>>
+>> If we understand it as multiple levels of isolation, can we classify the
+>> devices into the following categories?
+>>
+>> 1) Legacy devices
+>>     - devices without device-level isolation
+>>     - multiple devices could sit in a single iommu_group
+>>     - only a single I/O address space could be bound to IOMMU
+> I'm not really clear on what that last statement means.
+
+I mean a single iommu_domain should be used by all devices sharing a
+single iommu_group.
+
+> 
+>> 2) Modern devices
+>>     - devices capable of device-level isolation
+> This will*typically*  be true of modern devices, but I don't think we
+> can really make it a hard API distinction.  Legacy or buggy bridges
+> can force modern devices into the same group as each other.  Modern
+> devices are not immune from bugs which would force lack of isolation
+> (e.g. forgotten debug registers on function 0 which affect other
+> functions).
+> 
+
+Yes.
+
+I am thinking whether it's feasible to change "bind/attach a device to
+an IOASID" to "bind/attach an isolated unit to an IOASID". An isolated
+unit could be
+
+1) an iommu_ group including single or multiple devices;
+2) a physical device which have a 1-device iommu group + device ID
+    (PASID/subStreamID) which represents an isolated subdevice inside the
+    physical one.
+3) anything that we might have in the future.
+
+A handler which represents the connection between device and iommu is
+returned on any successful binding. This handler could be used to
+GET_INFO and attach/detach after binding.
+
+Best regards,
+baolu
