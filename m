@@ -2,98 +2,105 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9E3B63B2899
-	for <lists+kvm@lfdr.de>; Thu, 24 Jun 2021 09:27:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6B5063B2954
+	for <lists+kvm@lfdr.de>; Thu, 24 Jun 2021 09:31:23 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231512AbhFXHaJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 24 Jun 2021 03:30:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32898 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231434AbhFXHaI (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 24 Jun 2021 03:30:08 -0400
-Received: from mail.skyhub.de (mail.skyhub.de [IPv6:2a01:4f8:190:11c2::b:1457])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B3558C061574;
-        Thu, 24 Jun 2021 00:27:49 -0700 (PDT)
-Received: from zn.tnic (p200300ec2f0c1e0051d60f689d4f0453.dip0.t-ipconnect.de [IPv6:2003:ec:2f0c:1e00:51d6:f68:9d4f:453])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 2CEBD1EC0253;
-        Thu, 24 Jun 2021 09:27:47 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
-        t=1624519667;
+        id S231463AbhFXHdk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 24 Jun 2021 03:33:40 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:27019 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S231531AbhFXHdg (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 24 Jun 2021 03:33:36 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1624519877;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
-        bh=Tk8bS/1GVIXPT0HJ7nIwptwsGI5hts/jHchSoFxDYwk=;
-        b=LI0h9MmccHlICbtRqQhCC3gRJh4OKEODp3Chzd+32gPVF3K9RZOvUCpqfOF7Ds7k0dTR42
-        Pu2uxB3uG0wcizcYUsLG3RGmRR66qZaNYd+x9mNYFTvgAEy+OiP+lpgWjJjEGUkO7KQz33
-        qu3nAYVYpp+HzJ3neF4aZ/ZyH67DiO8=
-Date:   Thu, 24 Jun 2021 09:27:41 +0200
-From:   Borislav Petkov <bp@alien8.de>
-To:     Michael Roth <michael.roth@amd.com>
-Cc:     "Kuppuswamy, Sathyanarayanan" 
-        <sathyanarayanan.kuppuswamy@linux.intel.com>,
-        Dave Hansen <dave.hansen@intel.com>,
-        Brijesh Singh <brijesh.singh@amd.com>, x86@kernel.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
-        linux-coco@lists.linux.dev, linux-mm@kvack.org,
-        linux-crypto@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=1ummzXLEBVOW6zJVjd9RvyjdRwJ4z9g5ls7IEU8SqM4=;
+        b=R/y7rJsvxaZ3LSb3r3KagQkRBukpodq6YsNcoQIJnDM1numaIMAHqf3h70No+idSjOo8ZZ
+        cFShiMbzitDaIXAVmFLGu8uy+kGfKmvwUSEA63DlvGASqXMyU1IXIyPBjeLQKmbLSk6uXP
+        QiyL3qQK4UNEbR/Kd6vj/QVgGib5pwg=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-540-3n1xiNxAOVK8azJ9awYVmg-1; Thu, 24 Jun 2021 03:31:15 -0400
+X-MC-Unique: 3n1xiNxAOVK8azJ9awYVmg-1
+Received: by mail-wr1-f71.google.com with SMTP id b3-20020a05600018a3b029011a84f85e1cso1865611wri.10
+        for <kvm@vger.kernel.org>; Thu, 24 Jun 2021 00:31:14 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=1ummzXLEBVOW6zJVjd9RvyjdRwJ4z9g5ls7IEU8SqM4=;
+        b=iqgBimf7TU8HArdjXQpENtpj1IBenhDlF766fGLTgvwpBtyPrO2uUD00WF3vzRgPsy
+         v8xNR9Feq0HHVf+46pwG+kt5mKQ+8a9yJJV3TpBLRTwJom/I5IWU2W99WUKi0912UHZ5
+         FAQtRJaFh2je6gO6bnybUrEr9gxrpCE089NkWY6yaQXhrEPJ1wNsPnQQD7EyJ4ZNtjZ7
+         +C1I42mjjo9gyEfaRGYd/uY1P3gRc+6MeWH+Yhp2canOcc51yZxObzUjSGQ7zB94Sn4k
+         hpWz1T7yBxFyuDmh8YqRnbR+Iv8Cz4flIPef54TkR5hARErebgKD1VFVvLpQfuTQj4y5
+         4oUA==
+X-Gm-Message-State: AOAM531ABA2kxNJkagzQ/OC+zOep4v+D8o9vnZexDbW9FYQ4y5PGbMuf
+        4BJAxbXshYDB16iIFg4Derx9OkTSbaUBMkCd6saeN71DJhPQQP4a5QpFXJshukPrylsKu3xLi2B
+        sQxxazB5oIY3b
+X-Received: by 2002:adf:f88e:: with SMTP id u14mr2674309wrp.391.1624519873869;
+        Thu, 24 Jun 2021 00:31:13 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwmU2A8muf7XixWmRWMn8O50eJCa1GKEjZYZIlN1VsKBfgiuuBfyX9v0BcxFt1KFEfxAoHypw==
+X-Received: by 2002:adf:f88e:: with SMTP id u14mr2674272wrp.391.1624519873717;
+        Thu, 24 Jun 2021 00:31:13 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+        by smtp.gmail.com with ESMTPSA id f19sm2269746wre.48.2021.06.24.00.31.12
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 24 Jun 2021 00:31:13 -0700 (PDT)
+Subject: Re: [PATCH 3/6] KVM: x86/mmu: avoid struct page in MMU
+To:     David Stevens <stevensd@chromium.org>,
+        Marc Zyngier <maz@kernel.org>,
+        Huacai Chen <chenhuacai@kernel.org>,
+        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+        Paul Mackerras <paulus@ozlabs.org>,
+        Zhenyu Wang <zhenyuw@linux.intel.com>,
+        Zhi Wang <zhi.a.wang@intel.com>
+Cc:     James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Will Deacon <will@kernel.org>,
         Sean Christopherson <seanjc@google.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
-        David Rientjes <rientjes@google.com>, tony.luck@intel.com,
-        npmccallum@redhat.com
-Subject: Re: [PATCH Part1 RFC v3 20/22] x86/boot: Add Confidential Computing
- address to setup_header
-Message-ID: <YNQz7ZxEaSWjcjO2@zn.tnic>
-References: <20210602140416.23573-1-brijesh.singh@amd.com>
- <20210602140416.23573-21-brijesh.singh@amd.com>
- <YMw4UZn6AujpPSZO@zn.tnic>
- <15568c80-c9a9-5602-d940-264af87bed98@amd.com>
- <YMy2OGwsRzrR5bwD@zn.tnic>
- <162442264313.98837.16983159316116149849@amd.com>
- <YNMLX6fbB3PQwSpv@zn.tnic>
- <20210624031911.eznpkbgjt4e445xj@amd.com>
+        Joerg Roedel <joro@8bytes.org>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        linux-kernel@vger.kernel.org, linux-mips@vger.kernel.org,
+        kvm@vger.kernel.org, kvm-ppc@vger.kernel.org,
+        linuxppc-dev@lists.ozlabs.org, intel-gvt-dev@lists.freedesktop.org,
+        intel-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org
+References: <20210624035749.4054934-1-stevensd@google.com>
+ <20210624035749.4054934-4-stevensd@google.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <49504c79-2cd4-1707-a0a5-79b679a4b214@redhat.com>
+Date:   Thu, 24 Jun 2021 09:31:11 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.10.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20210624031911.eznpkbgjt4e445xj@amd.com>
+In-Reply-To: <20210624035749.4054934-4-stevensd@google.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jun 23, 2021 at 10:19:11PM -0500, Michael Roth wrote:
-> One downside to this is we still need something in the boot protocol,
-> either via setup_data, or setup_header directly.
+On 24/06/21 05:57, David Stevens wrote:
+>   static int __direct_map(struct kvm_vcpu *vcpu, gpa_t gpa, u32 error_code,
+> -			int map_writable, int max_level, kvm_pfn_t pfn,
+> +			int map_writable, int max_level,
+> +			const struct kvm_pfn_page *pfnpg,
+>   			bool prefault, bool is_tdp)
+>   {
+>   	bool nx_huge_page_workaround_enabled = is_nx_huge_pa
 
-Huh, now I'm confused. You gave the acpi_rsdp_addr example and I thought
-that should be enough, that's why I suggested boot_params.
+So the main difference with my tentative patches is that here I was 
+passing the struct by value.  I'll try to clean this up for 5.15, but 
+for now it's all good like this.  Thanks again!
 
-Maybe you should point me to the code which does what you need so that I
-can get a better idea...
+Paolo
 
-> Having it in setup_header avoids the need to also have to add a field
-> to boot_params for the boot/compressed->uncompressed passing, but
-> maybe that's not a good enough justification. Perhaps if the TDX folks
-> have similar needs though.
-
-Yes, reportedly they do so I guess the solution should be
-vendor-agnostic. Let's see what they need first.
-
-Thx.
-
--- 
-Regards/Gruss,
-    Boris.
-
-https://people.kernel.org/tglx/notes-about-netiquette
