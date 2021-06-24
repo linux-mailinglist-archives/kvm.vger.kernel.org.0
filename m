@@ -2,116 +2,107 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 037B13B2CB0
-	for <lists+kvm@lfdr.de>; Thu, 24 Jun 2021 12:43:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 076153B2D32
+	for <lists+kvm@lfdr.de>; Thu, 24 Jun 2021 13:06:19 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232273AbhFXKp4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 24 Jun 2021 06:45:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48914 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232253AbhFXKpy (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 24 Jun 2021 06:45:54 -0400
-Received: from mail-pj1-x1034.google.com (mail-pj1-x1034.google.com [IPv6:2607:f8b0:4864:20::1034])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 09BA0C061574;
-        Thu, 24 Jun 2021 03:43:36 -0700 (PDT)
-Received: by mail-pj1-x1034.google.com with SMTP id pf4-20020a17090b1d84b029016f6699c3f2so5658934pjb.0;
-        Thu, 24 Jun 2021 03:43:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=date:from:subject:to:cc:references:in-reply-to:mime-version
-         :message-id:content-transfer-encoding;
-        bh=Ntmvbr4Rsn/lopxAADIIDgcNErNmU/zbadQcByBiYK4=;
-        b=Uzc43caEhY2Ti31+lpHHW0AZ5sLCVj6W+n4t/ez5IgVzQkVZOibK2DIWQ0+CAuzt9U
-         PpuIA4kDsyK3chDvHhxE+YawXhAPb2eWGecCvYilJeif5bW1AWaPBDm7W4vYjxTYq4eX
-         vsAbVyUYfQJDK46zRrnjfoRU3RdSuUfndWfij+20vPjPzE9a8Ky+gzwBiWuGHYujrH97
-         b1g8G9j+MqQ6oKRgvSqRRvZdf9oww+7IytooiBQtjKLAdCQfMAXpO/dc/FMWyHkr12JS
-         ZqabhMCopqc94H8G+WPpptqvIqeO4Wfi2qlPKFQXomh5RWpLJ4WGRgIbJ4SL7OebaZ9b
-         Cu7A==
+        id S232282AbhFXLIf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 24 Jun 2021 07:08:35 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:48274 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S232220AbhFXLIe (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 24 Jun 2021 07:08:34 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1624532774;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=U4CLu2lLUkZR70TNkgrROGO5qBpUhzA4ASPhaRYEcys=;
+        b=g9eKwwZRHmWp9NDsyMJqpDkTpi+1e2PiZOru0cDdq77vIG237uWKufs6Dt785cTrehWIo7
+        xFP6FYlghtfq+tbhSIfvP1FRxKJzpYWJ701Zng1iQc+CwQUoblmdcLtLnGdw3Qf7Q1psvD
+        hALaaSYqfPIcNij8AYMBJ2ZcjgHB9KQ=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-429-1_ZU0xG9MUu_Fy2PNTsuMQ-1; Thu, 24 Jun 2021 07:06:13 -0400
+X-MC-Unique: 1_ZU0xG9MUu_Fy2PNTsuMQ-1
+Received: by mail-wm1-f69.google.com with SMTP id v2-20020a7bcb420000b0290146b609814dso1500121wmj.0
+        for <kvm@vger.kernel.org>; Thu, 24 Jun 2021 04:06:13 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:subject:to:cc:references:in-reply-to
-         :mime-version:message-id:content-transfer-encoding;
-        bh=Ntmvbr4Rsn/lopxAADIIDgcNErNmU/zbadQcByBiYK4=;
-        b=eFyxICiHRI7bWqzwL/86eToP3VqrqX/XH9cZ9pfZrrc4HrpvyX09PGs8Q8iZakxK5f
-         OcAmkDRzYGQ1t558DgOX3HCKGbdKme0AvcZa2nNJPsc9vdohgZqBBc6W2agfv4k5xgAh
-         Nsq+Pb2vYB+D48bJv2fb/51+mcVVJUrS+sUZcq4XM0z/nYqFc9ocphXL6N1bZLiIjeZW
-         iZYA1EXhGC8lB16+tNZrn+E4r0xA1tHHehrfzoLo/2wbpaGXE0llHEX2QANsTCFlnjiG
-         ueYZTCItJ1vIbycJ6plOilans8J3qBidR9lPHVIT6F37GO5n6y8PhsDeUEJBHU+VeRuj
-         3SgA==
-X-Gm-Message-State: AOAM531ugFbTbb8f5C74MnWI6Tc/L6Ak47WBDQB9gNY0dfn1iheLj8ML
-        EQLKMUz856uli34pERus2Cc=
-X-Google-Smtp-Source: ABdhPJwSbcPeLeFEknq5SPs1K9/7wAZ9//Y8XUJsBm0HOgxDXNJ+d8W1kIX2/TWCimMS0wf9W28w6Q==
-X-Received: by 2002:a17:90a:ce87:: with SMTP id g7mr14492750pju.189.1624531415692;
-        Thu, 24 Jun 2021 03:43:35 -0700 (PDT)
-Received: from localhost (60-242-147-73.tpgi.com.au. [60.242.147.73])
-        by smtp.gmail.com with ESMTPSA id n12sm2540624pfu.5.2021.06.24.03.43.34
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 24 Jun 2021 03:43:35 -0700 (PDT)
-Date:   Thu, 24 Jun 2021 20:43:29 +1000
-From:   Nicholas Piggin <npiggin@gmail.com>
-Subject: Re: [PATCH 3/6] KVM: x86/mmu: avoid struct page in MMU
-To:     Marc Zyngier <maz@kernel.org>
-Cc:     Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Huacai Chen <chenhuacai@kernel.org>,
-        dri-devel@lists.freedesktop.org, intel-gfx@lists.freedesktop.org,
-        intel-gvt-dev@lists.freedesktop.org,
-        James Morse <james.morse@arm.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvmarm@lists.cs.columbia.edu,
-        kvm-ppc@vger.kernel.org, kvm@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-        linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-        Paul Mackerras <paulus@ozlabs.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        David Stevens <stevensd@chromium.org>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Will Deacon <will@kernel.org>,
-        Zhenyu Wang <zhenyuw@linux.intel.com>,
-        Zhi Wang <zhi.a.wang@intel.com>
-References: <20210624035749.4054934-1-stevensd@google.com>
-        <20210624035749.4054934-4-stevensd@google.com>
-        <1624524744.2sr7o7ix86.astroid@bobo.none> <87mtrfinks.wl-maz@kernel.org>
-In-Reply-To: <87mtrfinks.wl-maz@kernel.org>
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=U4CLu2lLUkZR70TNkgrROGO5qBpUhzA4ASPhaRYEcys=;
+        b=pEwDMAnmC3KQEV97arkS/LoDkgjOCr7WfcyQ4k+VVaXYpocL+MLAaMWzX/DzUdQ+Ed
+         vmhYxrML6DuMnMmqx82EbKJ4mLVQ50UC6ipEcgbDHe//OhDypLWihIjIn47WITyCSVog
+         NLy+Wq/CNPYYpZeX2unra4DymZhQv48khdE/rcPpZi1lTkdzTo5C8s/X0unCH8kcDbYx
+         eEviR68K4fM9M2XZREbewlYdXLat/2+1Idhr5E2mh3HWVo2FYp92tPu1Cj9EghwkQLnW
+         Fs2CsNGHokNfOmgTiqOAe9aZLID/9l9M+SU2amTAqlwtfGHu6tN5EXUMjBnFwQE7PQ7a
+         avkA==
+X-Gm-Message-State: AOAM530AWhSxpXepIi/lFBS+FSjA3Yp4zog3nOG1dx84bByotEJ/WNHu
+        F9UhfSI+cd7oPdmli5KywZCzgC6TrB2Xdv7BK6tmajYQPZvzN/BI1QYB73cqu9AEQX/lJdAf9u5
+        iiZMlyhgpRb3V
+X-Received: by 2002:adf:f688:: with SMTP id v8mr3759194wrp.209.1624532772446;
+        Thu, 24 Jun 2021 04:06:12 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyQ6JAQ/geg6p7DEfdGt8VJkL4A926Upld+wizuc/AIEcDJiSC15mwuf4BquwbrdXS/zwVnRg==
+X-Received: by 2002:adf:f688:: with SMTP id v8mr3759172wrp.209.1624532772251;
+        Thu, 24 Jun 2021 04:06:12 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+        by smtp.gmail.com with ESMTPSA id n8sm9456581wmc.45.2021.06.24.04.06.10
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 24 Jun 2021 04:06:11 -0700 (PDT)
+Subject: Re: [kvm-unit-tests PATCH 05/12] nSVM: Remove NPT reserved bits tests
+ (new one on the way)
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     kvm@vger.kernel.org, Maxim Levitsky <mlevitsk@redhat.com>
+References: <20210622210047.3691840-1-seanjc@google.com>
+ <20210622210047.3691840-6-seanjc@google.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <2f1c2605-e588-2eea-d2c1-ab2f4fdc531d@redhat.com>
+Date:   Thu, 24 Jun 2021 13:06:10 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.10.1
 MIME-Version: 1.0
-Message-Id: <1624531381.4bht02wxsj.astroid@bobo.none>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20210622210047.3691840-6-seanjc@google.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Excerpts from Marc Zyngier's message of June 24, 2021 8:06 pm:
-> On Thu, 24 Jun 2021 09:58:00 +0100,
-> Nicholas Piggin <npiggin@gmail.com> wrote:
->>=20
->> Excerpts from David Stevens's message of June 24, 2021 1:57 pm:
->> > From: David Stevens <stevensd@chromium.org>
->> >  out_unlock:
->> >  	if (is_tdp_mmu_root(vcpu->kvm, vcpu->arch.mmu->root_hpa))
->> >  		read_unlock(&vcpu->kvm->mmu_lock);
->> >  	else
->> >  		write_unlock(&vcpu->kvm->mmu_lock);
->> > -	kvm_release_pfn_clean(pfn);
->> > +	if (pfnpg.page)
->> > +		put_page(pfnpg.page);
->> >  	return r;
->> >  }
->>=20
->> How about
->>=20
->>   kvm_release_pfn_page_clean(pfnpg);
->=20
-> I'm not sure. I always found kvm_release_pfn_clean() ugly, because it
-> doesn't mark the page 'clean'. I find put_page() more correct.
->=20
-> Something like 'kvm_put_pfn_page()' would make more sense, but I'm so
-> bad at naming things that I could just as well call it 'bob()'.
+On 22/06/21 23:00, Sean Christopherson wrote:
+> Remove two of nSVM's NPT reserved bits test, a soon-to-be-added test will
+> provide a superset of their functionality, e.g. the current tests are
+> limited in the sense that they test a single entry and a single bit,
+> e.g. don't test conditionally-reserved bits.
+> 
+> The npt_rsvd test in particular is quite nasty as it subtly relies on
+> EFER.NX=1; dropping the test will allow cleaning up the EFER.NX weirdness
+> (it's forced for_all_  tests, presumably to get the desired PFEC.FETCH=1
+> for this one test).
+> 
+> Signed-off-by: Sean Christopherson<seanjc@google.com>
+> ---
+>   x86/svm_tests.c | 45 ---------------------------------------------
+>   1 file changed, 45 deletions(-)
 
-That seems like a fine name to me. A little better than bob.
+This exposes a KVM bug, reproducible with
 
-Thanks,
-Nick
+	./x86/run x86/svm.flat -smp 2 -cpu max,+svm -m 4g \
+		-append 'npt_rw npt_rw_pfwalk'
+
+While running npt_rw_pfwalk, the #NPF gets an incorrect EXITINFO2
+(address for the NPF location; on my machine it gets 0xbfede6f0 instead of
+0xbfede000).  The same tests work with QEMU from git.
+
+I didn't quite finish analyzing it, but my current theory is
+that KVM receives a pagewalk NPF for a *different* page walk that is caused
+by read-only page tables; then it finds that the page walk to 0xbfede6f0
+*does fail* (after all the correct and wrong EXITINFO2 belong to the same pfn)
+and therefore injects it anyway.  This theory is because the 0x6f0 offset in
+the page table corresponds to the 0xde000 part of the faulting address.
+Maxim will look into it while I'm away.
+
+Paolo
+
