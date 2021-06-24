@@ -2,61 +2,60 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2B1E63B2C53
-	for <lists+kvm@lfdr.de>; Thu, 24 Jun 2021 12:21:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E9C723B2C82
+	for <lists+kvm@lfdr.de>; Thu, 24 Jun 2021 12:34:38 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232095AbhFXKX1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 24 Jun 2021 06:23:27 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:58649 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232055AbhFXKX0 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 24 Jun 2021 06:23:26 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1624530067;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=oKXkBJKG47HF5zZ+T34yALxUp2DCGSnnk7HiRaaGJBk=;
-        b=OyOYIhkFlD72RXa4ApycBznJ8h/A4rxQkZYFz4zqo5MtkH1geetKyPWMfBX0ch0jh7q3Lg
-        qnz7zGgvlyQUIzPbypEimxNaD0+gpIcj0/R+UxQuP9AGOacLVchr1yQsGXdxC66zyvRmgz
-        DHDojJLPq7Dlhzp9U4RjDK0rp/NxRo4=
-Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
- [209.85.208.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-426-zthT_rR0MdSaaazrMOwMIw-1; Thu, 24 Jun 2021 06:21:05 -0400
-X-MC-Unique: zthT_rR0MdSaaazrMOwMIw-1
-Received: by mail-ed1-f70.google.com with SMTP id dy23-20020a05640231f7b0290394996f1452so3095684edb.18
-        for <kvm@vger.kernel.org>; Thu, 24 Jun 2021 03:21:05 -0700 (PDT)
+        id S232084AbhFXKgz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 24 Jun 2021 06:36:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46770 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231517AbhFXKgv (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 24 Jun 2021 06:36:51 -0400
+Received: from mail-pj1-x1029.google.com (mail-pj1-x1029.google.com [IPv6:2607:f8b0:4864:20::1029])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5EA4EC061574;
+        Thu, 24 Jun 2021 03:34:32 -0700 (PDT)
+Received: by mail-pj1-x1029.google.com with SMTP id h23so3215831pjv.2;
+        Thu, 24 Jun 2021 03:34:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=date:from:subject:to:cc:references:in-reply-to:mime-version
+         :message-id:content-transfer-encoding;
+        bh=ISlLS/Bnqpf/oAWEGOJgKBZ0Rb18u3bU0Ep0kv2LMg0=;
+        b=ItVpaR72A3eWg+6QNdd9RNw76aFcKOXvgi86A4U+ygjRobuSVtqGLn83lJQMbfCPA4
+         LQIa3P9bWqZxWn65q97p0mTXZfMJxza4XBkddIpoDzA0Y1gz2b4OTCDChEW1fNnXNMtx
+         Fd/HR/h+M9YqDeioWNf5AArKjGRkQ+rrWucptSeSf/UUf6QUwL4Nowo/4rEimVbdxS4Q
+         CrrkCNn+4rsxvoMWh2fX66Avx4PzjnR2opDju0qKu/sbanWcGLqwESvvdl5Yw6PwyCya
+         zQM4h5g6tjIbnWhNNgTE1fjofoOSBjtXdTRyzTMD0NSsHlc5YkGJ7hehN9KlI5q5bxjS
+         Pecg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=oKXkBJKG47HF5zZ+T34yALxUp2DCGSnnk7HiRaaGJBk=;
-        b=Qxr9Y/PSlxPlP6Ci/7CWJYI+Mx/nb+8t2mIERYEh94Oh15y3HtidnLsuYB0zlM91Ru
-         lFJoeUKhvcCl3B8fN6pOphqacEDdcZq1lVx8zWL4qfGomjd95rovm+qdHfnyKoX558Ke
-         h03CuekMWdKdTe/CpQHcI/aupXBmQtTiRjYtFVWyzJF7jAF8xKQ6hg0AKN6n3UYz93Iu
-         dzBP5zrn5sw/fWokxq6Lha0YUJF0iaJqpqk/vslIoipkypI8YhhVfets5suPQ79dBIGe
-         FK5rGPh+gxImlbW74ys4Zy4JzeK5viGeDhc8vRAB5WfvbqvIz7MyTDRyRSc9H9H2jkt2
-         puGw==
-X-Gm-Message-State: AOAM532ot0Ox9COD8dPiPBKIDzXN7usFpEkYocYDNr/iAXIc1jp6fvh0
-        It9LfuWafE2I95ssLWz2qlIIvgEQTD6PpAnOanneEkHtB84Yri9doDeVlbLMmDu208DCDzyRDD+
-        sRoLw+Oe9qFlP
-X-Received: by 2002:a05:6402:220d:: with SMTP id cq13mr6001630edb.214.1624530064584;
-        Thu, 24 Jun 2021 03:21:04 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzs51nnE9ArY9tBUvtcT3K4P6rQ2AL9pfX67ccTlvEZ5+BaJldlaSdGdhR+tmPYnfTJgtakmA==
-X-Received: by 2002:a05:6402:220d:: with SMTP id cq13mr6001609edb.214.1624530064420;
-        Thu, 24 Jun 2021 03:21:04 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id e7sm493571ejm.93.2021.06.24.03.21.02
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 24 Jun 2021 03:21:03 -0700 (PDT)
-Subject: Re: [PATCH 2/6] KVM: mmu: also return page from gfn_to_pfn
-To:     Nicholas Piggin <npiggin@gmail.com>,
-        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+        h=x-gm-message-state:date:from:subject:to:cc:references:in-reply-to
+         :mime-version:message-id:content-transfer-encoding;
+        bh=ISlLS/Bnqpf/oAWEGOJgKBZ0Rb18u3bU0Ep0kv2LMg0=;
+        b=Hezz3ebUHoSHT+bopgVUHx/c8T4ndsIUar1WwRM4WfZuwu4GCK1OuqND0rODfwRyd1
+         mQzMIoMBp+FwpBogFm3oeQCOjD/TNINfqwsGXyuLhY72LIOm6mWgUr0cN9p4iB+uNfyA
+         6Uwkqnt5SGYG3CwwoCHawPAeKgez/p5fWQiHL2WQlwFzvfhzxm+HcvgHUNbX6SnTzjd3
+         zzX7fAvjnPqbaUskzSjDYLIEynKjfGLd6ThxA+99/9SVFYDF0VKGvxrf0p8PP0CyBe4a
+         5n0olmGtOBiy916b8T7R5aKGZDgQkWdXpD757kPXp0TZ2mOgjNwqESMqFYd2+HE/BFXo
+         XCzQ==
+X-Gm-Message-State: AOAM532j7yn3LTaM9ztUHOLwElTJdzZluluInuGXIgkg7iCMhdNRcj+e
+        IND381CjxNrMejvdVdfMYyo=
+X-Google-Smtp-Source: ABdhPJy6kajrzF0OadUDC6nHAS6U7gmSDYSh4DBdORcOqITOBjGnDhRDrYwGVGZv+udz0pGSetXg8w==
+X-Received: by 2002:a17:90b:4ac6:: with SMTP id mh6mr15043416pjb.210.1624530871905;
+        Thu, 24 Jun 2021 03:34:31 -0700 (PDT)
+Received: from localhost (60-242-147-73.tpgi.com.au. [60.242.147.73])
+        by smtp.gmail.com with ESMTPSA id k63sm7664839pjh.13.2021.06.24.03.34.30
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 24 Jun 2021 03:34:31 -0700 (PDT)
+Date:   Thu, 24 Jun 2021 20:34:25 +1000
+From:   Nicholas Piggin <npiggin@gmail.com>
+Subject: Re: [PATCH 0/6] KVM: Remove uses of struct page from x86 and arm64
+ MMU
+To:     Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
         Huacai Chen <chenhuacai@kernel.org>,
         Marc Zyngier <maz@kernel.org>,
         Paul Mackerras <paulus@ozlabs.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
         David Stevens <stevensd@chromium.org>,
         Zhenyu Wang <zhenyuw@linux.intel.com>,
         Zhi Wang <zhi.a.wang@intel.com>
@@ -70,55 +69,93 @@ Cc:     Alexandru Elisei <alexandru.elisei@arm.com>,
         linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
         linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
         Sean Christopherson <seanjc@google.com>,
+        David Stevens <stevensd@google.com>,
         Suzuki K Poulose <suzuki.poulose@arm.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Will Deacon <will@kernel.org>
 References: <20210624035749.4054934-1-stevensd@google.com>
- <20210624035749.4054934-3-stevensd@google.com>
- <1624524331.zsin3qejl9.astroid@bobo.none>
- <201b68a7-10ea-d656-0c1e-5511b1f22674@redhat.com>
- <1624528342.s2ezcyp90x.astroid@bobo.none>
- <1624529635.75a1ann91v.astroid@bobo.none>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <fc2a88ed-6a98-857d-bb1f-73260b01ac30@redhat.com>
-Date:   Thu, 24 Jun 2021 12:21:01 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.10.1
+In-Reply-To: <20210624035749.4054934-1-stevensd@google.com>
 MIME-Version: 1.0
-In-Reply-To: <1624529635.75a1ann91v.astroid@bobo.none>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Message-Id: <1624530624.8jff1f4u11.astroid@bobo.none>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 24/06/21 12:17, Nicholas Piggin wrote:
->> If all callers were updated that is one thing, but from the changelog
->> it sounds like that would not happen and there would be some gfn_to_pfn
->> users left over.
->>
->> But yes in the end you would either need to make gfn_to_pfn never return
->> a page found via follow_pte, or change all callers to the new way. If
->> the plan is for the latter then I guess that's fine.
->
-> Actually in that case anyway I don't see the need -- the existence of
-> gfn_to_pfn is enough to know it might be buggy. It can just as easily
-> be grepped for as kvm_pfn_page_unwrap.
+Excerpts from David Stevens's message of June 24, 2021 1:57 pm:
+> KVM supports mapping VM_IO and VM_PFNMAP memory into the guest by using
+> follow_pte in gfn_to_pfn. However, the resolved pfns may not have
+> assoicated struct pages, so they should not be passed to pfn_to_page.
+> This series removes such calls from the x86 and arm64 secondary MMU. To
+> do this, this series modifies gfn_to_pfn to return a struct page in
+> addition to a pfn, if the hva was resolved by gup. This allows the
+> caller to call put_page only when necessated by gup.
+>=20
+> This series provides a helper function that unwraps the new return type
+> of gfn_to_pfn to provide behavior identical to the old behavior. As I
+> have no hardware to test powerpc/mips changes, the function is used
+> there for minimally invasive changes. Additionally, as gfn_to_page and
+> gfn_to_pfn_cache are not integrated with mmu notifier, they cannot be
+> easily changed over to only use pfns.
+>=20
+> This addresses CVE-2021-22543 on x86 and arm64.
 
-Sure, but that would leave us with longer function names 
-(gfn_to_pfn_page* instead of gfn_to_pfn*).  So the "safe" use is the one 
-that looks worse and the unsafe use is the one that looks safe.
+Does this fix the problem? (untested I don't have a POC setup at hand,
+but at least in concept)
 
-> And are gfn_to_page cases also
-> vulernable to the same issue?
+I have no problem with improving the API and probably in the direction=20
+of your series is good. But there seems to be a lot of unfixed arch code=20
+and broken APIs remaining left to do after your series too. This might=20
+be most suitable to backport and as a base for your series that can take
+more time to convert to new APIs.
 
-No, they're just broken for the VM_IO|VM_PFNMAP case.
+Thanks,
+Nick
 
-Paolo
+---
 
-> So I think it could be marked deprecated or something if not everything
-> will be converted in the one series, and don't need to touch all that
-> arch code with this patch.
-
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index 6a6bc7af0e28..e208c279d903 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -2104,13 +2104,21 @@ static int hva_to_pfn_remapped(struct vm_area_struc=
+t *vma,
+ 	 * Whoever called remap_pfn_range is also going to call e.g.
+ 	 * unmap_mapping_range before the underlying pages are freed,
+ 	 * causing a call to our MMU notifier.
++	 *
++	 * Certain IO or PFNMAP mappings can be backed with valid
++	 * struct pages, but be allocated without refcounting e.g.,
++	 * tail pages of non-compound higher order allocations, which
++	 * would then underflow the refcount when the caller does the
++	 * required put_page. Don't allow those pages here.
+ 	 */=20
+-	kvm_get_pfn(pfn);
++	if (!kvm_try_get_pfn(pfn))
++		r =3D -EFAULT;
+=20
+ out:
+ 	pte_unmap_unlock(ptep, ptl);
+ 	*p_pfn =3D pfn;
+-	return 0;
++
++	return r;
+ }
+=20
+ /*
+@@ -2487,6 +2495,13 @@ void kvm_set_pfn_accessed(kvm_pfn_t pfn)
+ }
+ EXPORT_SYMBOL_GPL(kvm_set_pfn_accessed);
+=20
++static int kvm_try_get_pfn(kvm_pfn_t pfn)
++{
++	if (kvm_is_reserved_pfn(pfn))
++		return 1;
++	return get_page_unless_zero(pfn_to_page(pfn));
++}
++
+ void kvm_get_pfn(kvm_pfn_t pfn)
+ {
+ 	if (!kvm_is_reserved_pfn(pfn))
