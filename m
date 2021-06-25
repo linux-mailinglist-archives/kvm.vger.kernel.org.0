@@ -2,176 +2,181 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 598F43B468C
-	for <lists+kvm@lfdr.de>; Fri, 25 Jun 2021 17:24:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9E9413B46A1
+	for <lists+kvm@lfdr.de>; Fri, 25 Jun 2021 17:32:21 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229776AbhFYP0c (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 25 Jun 2021 11:26:32 -0400
-Received: from mail-dm6nam11on2069.outbound.protection.outlook.com ([40.107.223.69]:40096
-        "EHLO NAM11-DM6-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S229445AbhFYP0b (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 25 Jun 2021 11:26:31 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=hEhiGSn1hbwaWWdE9gCiJOSV38LKRiiVcNs71PXz0NrVQnST7YbreyjahC/2QbrboFL4XeJEDzf5eKdC2lLEYhLoeo3PCQEygw4qkNfwFI8wZ4v3VYq9p13voGPMvOWlSz/1E0xjbSZMSH9NbTa27gePCywZJ5NZUcOkcI5u+gtCNTeLchT4Q+5WWjlaRVeUWk9KtYbKKThDRjdtHYX0l3juOpVFvkGgot806eLMoDkZt9qZmIA1pSNIfx9oOt5cIhi0UezCgctCHzpuR9kjtLTAU2fXHj43v5rW78hO9Hhsp34dFCDfkoi3bfrmcnU7AV1Cv5SnwnMU6s3VMcZyWg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=kCT/WEI2tnuui5H5cnSBt74NZ+EI44YlTu4BSMm8JOo=;
- b=MISsC3f/FrU+z0H8O1X6OmXzoLtB3h4dq1M9J7kWDr7rrEPlOAor436jR1juyNidQqRdNd5yDIPkE2Yk9cbVAbtXuMBLI+xwKZ2yGzz91PoxuYOBViPn1vqZUktTBeOiHmAGqqIgD0ZIob5+cPMrLU4Hnybxgj2EZ8YAtcS2D2CLb+bu+pD4IyPauhM4IhQSgJHgZKEyfC7qZ3uqX4cmGSYoLApZqN0Uzs/XALSurLIXsmAp/psOGnZx+CgPJIBHr31rsvsnocw4mgPLO+x7EYM0R0I6DPBHTTROzwiG3MxsBS+dTtDOZvgxdSOk8Ar0XDUBq0XHTBUw3lFBPR0yMA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=kCT/WEI2tnuui5H5cnSBt74NZ+EI44YlTu4BSMm8JOo=;
- b=OJr06ydFSzZm0lzRqNumKoblctRdyrzpP3gdrT1TTD+0QMqi15H7W3hq30fh+ODM0xh02wW1JiBuATrcg10F+RBcmzIxOgXE2x+khFKqJ5jFqalO2P5VKtWVM/10QraVV8XNUdnNg6jxcMt6ysQm8z2Bv/tTSPZ6934u8ri4czA=
-Authentication-Results: redhat.com; dkim=none (message not signed)
- header.d=none;redhat.com; dmarc=none action=none header.from=amd.com;
-Received: from DM6PR12MB2714.namprd12.prod.outlook.com (2603:10b6:5:42::18) by
- DM6PR12MB2924.namprd12.prod.outlook.com (2603:10b6:5:183::23) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.4264.23; Fri, 25 Jun 2021 15:24:07 +0000
-Received: from DM6PR12MB2714.namprd12.prod.outlook.com
- ([fe80::7df8:b0cd:fe1b:ae7b]) by DM6PR12MB2714.namprd12.prod.outlook.com
- ([fe80::7df8:b0cd:fe1b:ae7b%5]) with mapi id 15.20.4242.023; Fri, 25 Jun 2021
- 15:24:07 +0000
-Cc:     brijesh.singh@amd.com,
-        "Kuppuswamy, Sathyanarayanan" 
-        <sathyanarayanan.kuppuswamy@linux.intel.com>,
-        Dave Hansen <dave.hansen@intel.com>, x86@kernel.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
-        linux-coco@lists.linux.dev, linux-mm@kvack.org,
-        linux-crypto@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
+        id S229929AbhFYPek (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 25 Jun 2021 11:34:40 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:57264 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229890AbhFYPek (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 25 Jun 2021 11:34:40 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1624635139;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=ItRg8jkcuxeEzGWTWK3XoenthbGrIhvCHt+k1314tFE=;
+        b=XGc93YOka2gnnTD2XZ13W/EKmSr/+VH3VxMyPsMPBmiIs9ZKWWbAs0FxkxBT0yNTklQ1IH
+        njWE2f5IMV3bGtU5rKo4Y4mg2Ibv0mUNOQwCWxreFZvGhBnauRCkNBi6h5io1+HwajOD+o
+        5+eDLYeVZAcpfwsG3sRS663SV/hEWKo=
+Received: from mail-io1-f69.google.com (mail-io1-f69.google.com
+ [209.85.166.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-525-wbThIoWeOTORmteGDKD64Q-1; Fri, 25 Jun 2021 11:32:17 -0400
+X-MC-Unique: wbThIoWeOTORmteGDKD64Q-1
+Received: by mail-io1-f69.google.com with SMTP id v21-20020a5d90550000b0290439ea50822eso7253688ioq.9
+        for <kvm@vger.kernel.org>; Fri, 25 Jun 2021 08:32:17 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=ItRg8jkcuxeEzGWTWK3XoenthbGrIhvCHt+k1314tFE=;
+        b=jE+qpQHM75fl6W8Tc7J8vw9fqKkC86S4dP4BiJMURfZ0XDNV6B/K8ZyXtg+l1RTXfz
+         Xs9CqO9uMaqrDggMyi4gezOsqVmIf1ZyLLqnaPfLnVQRd/1zInOTqvYrZ7n5XVNUmt7u
+         Zv4j52pLbcUmMGeQG4FFUNr/rDHjAZZgCwS2cDJd2R/7GE7iRZhka43Zc4J5JdCrgjyf
+         Tl4g6vZJIFxC8z0GRRXne/bbanegLH5ELXUIoten3E0vK2uWR76sGFkkptYpu9MEJYZc
+         obMSup3UNL14vrNOw9P0KHDAVMf7QicQxEA7zbeBuMcHBPIgsGMck2z7xahzqh4F91Sp
+         JOgw==
+X-Gm-Message-State: AOAM531CczHF4xJ3xMR9lUqYlwhnVG/1ovvlg5A09m8LNkBI4A3aBzJ7
+        CQvRv8ZqadD8SfcdHnCccRD7m8fPcUiV2cVq/l+JHtGZiV0q4cdF5A58OvvaqJh1ruMiLtJ7uVw
+        gvGMb730Ss+JC
+X-Received: by 2002:a6b:b215:: with SMTP id b21mr8939071iof.165.1624635136859;
+        Fri, 25 Jun 2021 08:32:16 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJy57ROZRgcj3/oPzMmmF/73LyGB+DwoPD927WJAedYRtWlcrmifhtRMLdmkY8DZuHdCB48mYA==
+X-Received: by 2002:a6b:b215:: with SMTP id b21mr8939052iof.165.1624635136596;
+        Fri, 25 Jun 2021 08:32:16 -0700 (PDT)
+Received: from t490s.redhat.com (bras-base-toroon474qw-grc-65-184-144-111-238.dsl.bell.ca. [184.144.111.238])
+        by smtp.gmail.com with ESMTPSA id s8sm3668772ilj.51.2021.06.25.08.32.15
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 25 Jun 2021 08:32:15 -0700 (PDT)
+From:   Peter Xu <peterx@redhat.com>
+To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
-        David Rientjes <rientjes@google.com>, tony.luck@intel.com,
-        npmccallum@redhat.com
-Subject: Re: [PATCH Part1 RFC v3 20/22] x86/boot: Add Confidential Computing
- address to setup_header
-To:     Borislav Petkov <bp@alien8.de>, Michael Roth <michael.roth@amd.com>
-References: <YMw4UZn6AujpPSZO@zn.tnic>
- <15568c80-c9a9-5602-d940-264af87bed98@amd.com> <YMy2OGwsRzrR5bwD@zn.tnic>
- <162442264313.98837.16983159316116149849@amd.com> <YNMLX6fbB3PQwSpv@zn.tnic>
- <20210624031911.eznpkbgjt4e445xj@amd.com> <YNQz7ZxEaSWjcjO2@zn.tnic>
- <20210624123447.zbfkohbtdusey66w@amd.com> <YNSAlJnXMjigpqu1@zn.tnic>
- <20210624141111.pzvb6gk5lzfelx26@amd.com> <YNXs1XRu31dFiR2Z@zn.tnic>
-From:   Brijesh Singh <brijesh.singh@amd.com>
-Message-ID: <8faad91a-f229-dee3-0e1f-0b613596db17@amd.com>
-Date:   Fri, 25 Jun 2021 10:24:01 -0500
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.11.0
-In-Reply-To: <YNXs1XRu31dFiR2Z@zn.tnic>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [165.204.84.11]
-X-ClientProxiedBy: BLAP220CA0012.NAMP220.PROD.OUTLOOK.COM
- (2603:10b6:208:32c::17) To DM6PR12MB2714.namprd12.prod.outlook.com
- (2603:10b6:5:42::18)
+        Sean Christopherson <seanjc@google.com>, peterx@redhat.com,
+        Maxim Levitsky <mlevitsk@redhat.com>
+Subject: [PATCH v2 0/9] KVM: X86: Some light optimizations on rmap logic
+Date:   Fri, 25 Jun 2021 11:32:05 -0400
+Message-Id: <20210625153214.43106-1-peterx@redhat.com>
+X-Mailer: git-send-email 2.31.1
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from [10.254.35.102] (165.204.84.11) by BLAP220CA0012.NAMP220.PROD.OUTLOOK.COM (2603:10b6:208:32c::17) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4264.18 via Frontend Transport; Fri, 25 Jun 2021 15:24:03 +0000
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: c86b0849-49b0-4304-d93e-08d937ed4608
-X-MS-TrafficTypeDiagnostic: DM6PR12MB2924:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <DM6PR12MB29246DCC2EE08A62A25343A7E5069@DM6PR12MB2924.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:8273;
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: ePLoVwLB88PLosNOduGp2J49H/F28Enk8Oz91J4ZV2l6WUMG/TEXuQvSVU5JFMxJ4JK9b+aeVSEjHsfCFiLKYLV/6apQyqKH7N7k2WCGw3DN5sQfqxrWTjQvoZEcCd8ZoJnCYTh/YbYqYxc79Qw2GD5Vx7xo3eEZzLm+yCRvbKYY3vJmSiuyzfunX5wtlcQQhmaSXa2F8+YssOmmkBx5cPmFJAFa9xW9+4ch3XKFBFeQWv2hYYYHVFstZxyMjfvpMO6x2BRufHeZME7Y8jSt9CwPHctc6BEBYbStfLfrfqhxCR2kP1cYUQnoY9wZjTon2rUnSOFR4IOZMIfvS95flSRNj/gBtMLxaSeQkwI1hFJamCnGEi9Rve2NDhH7eYlJrpnmdTc9/Ta1ALwxhatkw+h8CaKQ2FiXIFvcdQLJAa6okAET521CBwADkZo63aBVLD3rE3r8jd8JUqRL47j007DmiCoIphX0FLakFZU0K172nMNiDUZhKDUwV6YC7j9LWR1PHVBQe0XlTOn4yI8WH+6YGGiy5VhMy8EEwzH2/PeVFnt5kepTOdkP9LTqY60CYOspy3615aRxp6bdnm11mDbqbgnuwxhu2mdu35elfuBw/q73VQJ918OGof1RPdkB7OcRlCAW1l/wUDIzRZEBsgO1estE0vNwLj5zzTDKDweCL5zwWo/vHQuPQ49EOb5olF3ZGrm7cD3vD/ynhvX0KA==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR12MB2714.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(39860400002)(366004)(376002)(136003)(396003)(346002)(31686004)(31696002)(38100700002)(38350700002)(956004)(7416002)(478600001)(52116002)(8936002)(8676002)(2616005)(44832011)(5660300002)(4326008)(16526019)(86362001)(66556008)(66476007)(53546011)(6636002)(26005)(66946007)(316002)(36756003)(54906003)(6486002)(186003)(2906002)(16576012)(110136005)(45980500001)(43740500002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?NTFDNi9iUmJLWWhleTJ0UWtreDM5dEovTkU3NGs5RHBlSy9rbUJTc1JxSDVs?=
- =?utf-8?B?OWtyb0Nadm9XODZrQlM2cThodjNwNE90TjZleFF2STVpS05FZlhvZXVGODBl?=
- =?utf-8?B?MHJleTlWbE5ha2xlVHc0SWVTL1g2NHVleUpmUGVvMDBCdWVUaGEzUWl3VnZm?=
- =?utf-8?B?OXJEcW1FdXFvb3h6SkZMQkh0RkRNYk5rM3dkREgySUVrZkljYy91bGxweWhu?=
- =?utf-8?B?YlY5ZmlvVEVzUjdYN3dwS05UV0E3MVJzQkFQMVVOWXRkNi9LQWltSUZZd2lm?=
- =?utf-8?B?dkVJRkdaZmhPOXQ5VHpBOW1wblFFZmFUajlpdGFFRFdsdUJ5UmhHSDNOdDlr?=
- =?utf-8?B?b1hZTnROM2g4ZHNsZVlteFF4ekdQaGF1cFc0cGd3OFhmbk5FWXdFTGFjRHg2?=
- =?utf-8?B?YmYxZ3NXSUdYZUFxdXlqaWRyYng5YWN0c0lWR3BXTWdqdThBYzdYZnhZR2dx?=
- =?utf-8?B?cW1IRzlQaXNmbmk4YkFFTkx5QWlVSzBOODhJaU9CaGtSdUFqUHA2MjJIaE5l?=
- =?utf-8?B?bERqYnR1RjRVcTJpZFlXQ1dsQ0pRTWhCQjVQQWo3NzU3aWlTQ1FQeFBBVk44?=
- =?utf-8?B?SGladm5mQVdGMlhVdjhrbkdsZFVWZ2d6bWVrTHhXM2pxS29rc0hzQkFNbWZK?=
- =?utf-8?B?dGdvckE3dUtOZHJ3KzR3S3l5c1BTcG5scjROYURQSkk1T0tRZGU0TXQ3U29J?=
- =?utf-8?B?eW1BMG5WcjR3SUlDMnV5RHNqcXkvOEVGMTB6NjR1MXY3RmU2WnpoV3RxVGlZ?=
- =?utf-8?B?dFhBTG91eG9KZlY0aWNqa29pVnQzaGlqMFRtdlFONDczcWRML3dUMk9JRVdB?=
- =?utf-8?B?dURUSUVVVVFiUnB1aVk4UjZJN0lmS1ByRW1wWjdOSlEzUjExTWdmR1diMFNo?=
- =?utf-8?B?NFVBMHlrUTMweGtSdm4yUUE1aGxJVnd0eGZIT1Fsa1gyRS9OYUJxTGJPVGhZ?=
- =?utf-8?B?T253UElkRklkRk80aFZHU3JpOTByWVlrRnNITFQvQ2ZqYUdnQSs2K2tKb0E0?=
- =?utf-8?B?T01pL2pvc09vYk5VYzJCM1dQRVdDeG1aQUVVYXZwTE91WFN3Zk5XQzdtZElX?=
- =?utf-8?B?R0tOTUpXajU0T25SQUx2SGlpNTZnT0RDUVU5cGNaZ0t1UFZqcFR0dE1DYWFH?=
- =?utf-8?B?TlZWdVo3NkJYZU5tVDVOcFVGdk5IUnpvZ2duWCtNY0RMTWtGN0ZyQ1lCSWts?=
- =?utf-8?B?ZjBHOWxzd1dqVFIrdnJEYmJvcVlGY0NMem1maXljdHl0Y0xpVzU4ZWlZM3hz?=
- =?utf-8?B?WElFZ1hjZ1doREpMZm5yNlJaYzEwZDIxekpJOHkzN0p5aU9wOWVjMW9HTEVM?=
- =?utf-8?B?ckV1UjN2VXJ3elpLenpHR1JZQWhCajdyMllQUjVvczdCclQ1MkIweUhoSjRY?=
- =?utf-8?B?dUNDQ0RPbm5XbHBWUU96bE9EWFhadzh6YVlrMUhQUi81ZStDZVNUU0E1NUZI?=
- =?utf-8?B?bGJoVlpGZVlSaThMeTRYYlEwVTJOdjJHMitONFB4bWFsOVVuTTMwajdLc2pt?=
- =?utf-8?B?cGh2d2RpRlJBRGt5M2tyOU5lTko4N0h4VyttWjZxSitZbEZqOVpTL3dXMFgz?=
- =?utf-8?B?dHBCYXBsYWgrbTlpUUlVUnBuaGlIV2ovcDAweUZhVGwxUFhReDFJd2VOTU9R?=
- =?utf-8?B?b24rZ0wvRGU4NkJOdG9xMzdXOERkL1lOdWNrMERPYTJoTFEyUjM5RzMyc3Fx?=
- =?utf-8?B?WUUvYndoUXF0VEVyUGxwak16SURQbjRmUVdsbHZqZFIyZUJicHFXNmpFR1FN?=
- =?utf-8?Q?bhCG4gtoIvx5QxR2Ks795XTyekv7WJJ+LrlUydW?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: c86b0849-49b0-4304-d93e-08d937ed4608
-X-MS-Exchange-CrossTenant-AuthSource: DM6PR12MB2714.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Jun 2021 15:24:07.7074
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: mjZf/mwXrACXExbwfQd5u/OE+izECV2R7LsevK89dcNbXVqsFQaFdXmOPJY6tL/kWj63XWwRE4a/G82z8WVNPw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB2924
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+v2:=0D
+- Rebased to kvm-queue since I found quite a few conflicts already=0D
+- Add an example into patch commit message of "KVM: X86: Introduce=0D
+  mmu_rmaps_stat per-vm debugfs file"=0D
+- Cleanup more places in patch "KVM: X86: Optimize pte_list_desc with per-a=
+rray=0D
+  counter" and squashed=0D
+=0D
+All things started from patch 1, which introduced a new statistic to keep "=
+max=0D
+rmap entry count per vm".  At that time I was just curious about how many r=
+map=0D
+is there normally for a guest, and it surprised me a bit.=0D
+=0D
+For TDP mappings it's all fine as mostly rmap of a page is either 0 or 1=0D
+depending on faulted or not.  It turns out with EPT=3DN there seems to be a=
+ huge=0D
+number of pages that can have tens or hundreds of rmap entries even for an =
+idle=0D
+guest.  Then I continued with the rest.=0D
+=0D
+To understand better on "how much of those pages", I did patch 2-6 which=0D
+introduced the idea of per-arch per-vm debugfs nodes, and added a debug fil=
+e to=0D
+do statistics for rmap, which is similar to kvm_arch_create_vcpu_debugfs() =
+but=0D
+for vm not vcpu.=0D
+=0D
+I did notice this should be the clean approach as I also see other archs=0D
+randomly create some per-vm debugfs nodes there:=0D
+=0D
+---8<---=0D
+*** arch/arm64/kvm/vgic/vgic-debug.c:=0D
+vgic_debug_init[274]           debugfs_create_file("vgic-state", 0444, kvm-=
+>debugfs_dentry, kvm,=0D
+=0D
+*** arch/powerpc/kvm/book3s_64_mmu_hv.c:=0D
+kvmppc_mmu_debugfs_init[2115]  debugfs_create_file("htab", 0400, kvm->arch.=
+debugfs_dir, kvm,=0D
+=0D
+*** arch/powerpc/kvm/book3s_64_mmu_radix.c:=0D
+kvmhv_radix_debugfs_init[1434] debugfs_create_file("radix", 0400, kvm->arch=
+.debugfs_dir, kvm,=0D
+=0D
+*** arch/powerpc/kvm/book3s_hv.c:=0D
+debugfs_vcpu_init[2395]        debugfs_create_file("timings", 0444, vcpu->a=
+rch.debugfs_dir, vcpu,=0D
+=0D
+*** arch/powerpc/kvm/book3s_xics.c:=0D
+xics_debugfs_init[1027]        xics->dentry =3D debugfs_create_file(name, 0=
+444, powerpc_debugfs_root,=0D
+=0D
+*** arch/powerpc/kvm/book3s_xive.c:=0D
+xive_debugfs_init[2236]        xive->dentry =3D debugfs_create_file(name, S=
+_IRUGO, powerpc_debugfs_root,=0D
+=0D
+*** arch/powerpc/kvm/timing.c:=0D
+kvmppc_create_vcpu_debugfs[214] debugfs_file =3D debugfs_create_file(dbg_fn=
+ame, 0666, kvm_debugfs_dir,=0D
+---8<---=0D
+=0D
+PPC even has its own per-vm dir for that.  I think if patch 2-6 can be=0D
+considered to be accepted then the next thing to consider is to merge all t=
+hese=0D
+usages to be under the same existing per-vm dentry with their per-arch hook=
+s=0D
+introduced.=0D
+=0D
+The last 3 patches (patch 7-9) are a few optimizations of existing rmap log=
+ic.=0D
+The major test case I used is rmap_fork [1], however it's not really the id=
+eal=0D
+one to show their effect for sure as that test I wrote covers both=0D
+rmap_add/remove, while I don't have good idea on optimizing rmap_remove wit=
+hout=0D
+changing the array structure or adding much overhead (e.g. sort the array, =
+or=0D
+making a tree-like structure somehow to replace the array list).  However i=
+t=0D
+already shows some benefit with those changes, so I post them out.=0D
+=0D
+Applying patch 7-8 will bring a summary of 38% perf boost when I fork 500=0D
+childs with the test I used.  Didn't run perf test on patch 9.  More in the=
+=0D
+commit log.=0D
+=0D
+Please review, thanks.=0D
+=0D
+[1] https://github.com/xzpeter/clibs/commit/825436f825453de2ea5aaee4bdb1c92=
+281efe5b3=0D
+=0D
+Peter Xu (9):=0D
+  KVM: X86: Add per-vm stat for max rmap list size=0D
+  KVM: Introduce kvm_get_kvm_safe()=0D
+  KVM: Allow to have arch-specific per-vm debugfs files=0D
+  KVM: X86: Introduce pte_list_count() helper=0D
+  KVM: X86: Introduce kvm_mmu_slot_lpages() helpers=0D
+  KVM: X86: Introduce mmu_rmaps_stat per-vm debugfs file=0D
+  KVM: X86: MMU: Tune PTE_LIST_EXT to be bigger=0D
+  KVM: X86: Optimize pte_list_desc with per-array counter=0D
+  KVM: X86: Optimize zapping rmap=0D
+=0D
+ arch/x86/include/asm/kvm_host.h |   1 +=0D
+ arch/x86/kvm/mmu/mmu.c          |  97 +++++++++++++++++------=0D
+ arch/x86/kvm/mmu/mmu_internal.h |   1 +=0D
+ arch/x86/kvm/x86.c              | 131 +++++++++++++++++++++++++++++++-=0D
+ include/linux/kvm_host.h        |   2 +=0D
+ virt/kvm/kvm_main.c             |  37 +++++++--=0D
+ 6 files changed, 235 insertions(+), 34 deletions(-)=0D
+=0D
+-- =0D
+2.31.1=0D
+=0D
 
-
-On 6/25/2021 9:48 AM, Borislav Petkov wrote:
->> For non-EFI case:
->>
->>   We need a "proper" mechanism that bootloaders can use. My
->>   understanding is this would generally be via setup_data or
->>   setup_header, and that a direct boot_params field would be frowned
->>   upon.
-> 
-> So, you need to pass only an address, right?
-> 
-> How workable would it be if you had a cmdline option:
-> 
-> 	cc_blob_address=0xb1a
-> 
-> with which you tell the kernel where that thing is?
-> 
-> Because then you can use this in both cases - EFI and !EFI.
-> 
-
-In the case of EFI, the CC blob structure is dynamically allocated
-and passed through the EFI configuration table. The grub will not
-know what value to pass in the cmdline unless we improve it to read
-the EFI configuration table and rebuild the cmdline.
-
-
-> Or is this blob platform-dependent and the EFI table contains it and
-> something needs to get it out of there, even if it were a user to
-> type in the cmdline cc_blob_address or some script when it comes to
-> containers...?
-> 
-> In any case, setup_data is kinda the generic way to pass arbitrary data
-> to the kernel so in this case, you can prioritize the EFI table in the
-> EFI case and fall back to setup_data if there's no EFI table...
-> 
