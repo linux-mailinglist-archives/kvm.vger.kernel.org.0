@@ -2,284 +2,208 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 89ABE3B44B1
-	for <lists+kvm@lfdr.de>; Fri, 25 Jun 2021 15:44:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1ABE53B45AE
+	for <lists+kvm@lfdr.de>; Fri, 25 Jun 2021 16:36:22 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230088AbhFYNqu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 25 Jun 2021 09:46:50 -0400
-Received: from mail.kernel.org ([198.145.29.99]:45844 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229498AbhFYNqu (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 25 Jun 2021 09:46:50 -0400
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id B0882617ED;
-        Fri, 25 Jun 2021 13:44:29 +0000 (UTC)
-Received: from sofa.misterjones.org ([185.219.108.64] helo=why.lan)
-        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-        (Exim 4.94.2)
-        (envelope-from <maz@kernel.org>)
-        id 1lwm8B-009pWm-KJ; Fri, 25 Jun 2021 14:44:27 +0100
-From:   Marc Zyngier <maz@kernel.org>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Alexandru Elisei <alexandru.elisei@arm.com>,
-        Andrew Jones <drjones@redhat.com>,
-        Ard Biesheuvel <ardb@kernel.org>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Fuad Tabba <tabba@google.com>, Jinank Jain <jinankj@amazon.de>,
-        Keqian Zhu <zhukeqian1@huawei.com>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Quentin Perret <qperret@google.com>,
-        Ricardo Koller <ricarkol@google.com>,
-        Steven Price <steven.price@arm.com>,
-        Will Deacon <will@kernel.org>,
-        Yanan Wang <wangyanan55@huawei.com>,
-        James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        kvm@vger.kernel.org, kernel-team@android.com
-Subject: [GIT PULL] KVM/arm64 updates for 5.14
-Date:   Fri, 25 Jun 2021 14:43:57 +0100
-Message-Id: <20210625134357.12804-1-maz@kernel.org>
-X-Mailer: git-send-email 2.30.2
+        id S231354AbhFYOik (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 25 Jun 2021 10:38:40 -0400
+Received: from mail-mw2nam10on2064.outbound.protection.outlook.com ([40.107.94.64]:20832
+        "EHLO NAM10-MW2-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S229940AbhFYOij (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 25 Jun 2021 10:38:39 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=n1nzON9ILXEaCxuJCI0yq9ejYOzlsCdFc1zzFV9iB3liMVxaQ6HAhUxb97iwyPG5cTpvoQWpa8DKYd383eTL+J/z/b2umlh/NFCN6BXDmuENT2NQF26QasVZlFColJxm43PM9xZbeuA06toGePmQB0xsKT/SPYXYJv2wSaDnp/J381MA5LXFM8rMd9WdPzqczpXXs25fdac8EJ1IhfWYVNE9dGUYmcSYB3NYg8y2/IL+8v88UL7JGFGHEMytQ1+Oj6C+eaDR/J4xbYKB/C39ySDMgX7dvyjgJ0q8Bu6BISi0pHUD3w1Dl44zuWiqJ2efdoCTVPaiwI0Bs2+fCD+4wQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=UOyIbOl699TjlYnCWB7KFn411bbKptDy0onYdCb0QQ8=;
+ b=BNXngiYHLi7UYPxRaUzeEViKTat1mvD2gpCno5T+JG991y+1Ly3qqu7H8Z8pPdsrjpchVoRNDzXqFCk2+d2SDXmPw2UK/Q+ulSWps+8KiZiWRCELXg+GIJLdHLXMZIoWZiY9fxeGulnXEwSsZdS5juZtQvNRuJ76XBONAs6mLJUtfKWk3p01bG15jcDkWBvvajolj9AcmM8igC/RKex/bDxBCycChOlQbKFk0jZiHGSQOLed4vpabaPWqJx3+aBGnv/KfYR3vjsN99Y8ZMmImjaQm7d68mh+6nU8alkmRYQho5hDdY22NzCuG0wLyBveckeXs+UBxlL391WgEAQ8mQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=UOyIbOl699TjlYnCWB7KFn411bbKptDy0onYdCb0QQ8=;
+ b=dJlPwco/i2WA3Zb9oe2FwL7kEKaLeyXG6PQ8y2tBcbFMiW9W3NE6LVo7w//kLVLEOCjvq9312dOyw6Qk+Th0feGK2J701zVyuYbSnaQ1ARzX0kYf1FBakldvUlW81dlxprjTzKwaODdRYiDKK7YqBpnKzbXZny1g8R5kaCB9FPMzXPFk3J+Cl1uzuytjJjj/nI5WQNXdvPbWuPExEvQUEQ03f7SQqs+E96uKe647GiRAYw+A+5MLeB7VeNzjiXsezPdv54GMwL7xB1IcRBjpwudyG/VWf+VLAzTYSIRh5be+RQ79RqavBtG1F+6Ipe5+mB+CzPRESv2UaEH1jZn+HQ==
+Authentication-Results: intel.com; dkim=none (message not signed)
+ header.d=none;intel.com; dmarc=none action=none header.from=nvidia.com;
+Received: from BL0PR12MB5506.namprd12.prod.outlook.com (2603:10b6:208:1cb::22)
+ by BL1PR12MB5141.namprd12.prod.outlook.com (2603:10b6:208:309::7) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4264.19; Fri, 25 Jun
+ 2021 14:36:17 +0000
+Received: from BL0PR12MB5506.namprd12.prod.outlook.com
+ ([fe80::3d51:a3b9:8611:684e]) by BL0PR12MB5506.namprd12.prod.outlook.com
+ ([fe80::3d51:a3b9:8611:684e%8]) with mapi id 15.20.4264.023; Fri, 25 Jun 2021
+ 14:36:17 +0000
+Date:   Fri, 25 Jun 2021 11:36:16 -0300
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     "Tian, Kevin" <kevin.tian@intel.com>
+Cc:     "Alex Williamson (alex.williamson@redhat.com)" 
+        <alex.williamson@redhat.com>, Joerg Roedel <joro@8bytes.org>,
+        Jean-Philippe Brucker <jean-philippe@linaro.org>,
+        David Gibson <david@gibson.dropbear.id.au>,
+        Jason Wang <jasowang@redhat.com>,
+        "parav@mellanox.com" <parav@mellanox.com>,
+        "Enrico Weigelt, metux IT consult" <lkml@metux.net>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Shenming Lu <lushenming@huawei.com>,
+        Eric Auger <eric.auger@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        "Raj, Ashok" <ashok.raj@intel.com>,
+        "Liu, Yi L" <yi.l.liu@intel.com>, "Wu, Hao" <hao.wu@intel.com>,
+        "Jiang, Dave" <dave.jiang@intel.com>,
+        Jacob Pan <jacob.jun.pan@linux.intel.com>,
+        Kirti Wankhede <kwankhede@nvidia.com>,
+        Robin Murphy <robin.murphy@arm.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
+        David Woodhouse <dwmw2@infradead.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Lu Baolu <baolu.lu@linux.intel.com>
+Subject: Re: Plan for /dev/ioasid RFC v2
+Message-ID: <20210625143616.GT2371267@nvidia.com>
+References: <MWHPR11MB1886239C82D6B66A732830B88C309@MWHPR11MB1886.namprd11.prod.outlook.com>
+ <20210615101215.4ba67c86.alex.williamson@redhat.com>
+ <MWHPR11MB188692A6182B1292FADB3BDB8C0F9@MWHPR11MB1886.namprd11.prod.outlook.com>
+ <20210616133937.59050e1a.alex.williamson@redhat.com>
+ <MWHPR11MB18865DF9C50F295820D038798C0E9@MWHPR11MB1886.namprd11.prod.outlook.com>
+ <20210617151452.08beadae.alex.williamson@redhat.com>
+ <20210618001956.GA1987166@nvidia.com>
+ <MWHPR11MB1886A17124605251DF394E888C0D9@MWHPR11MB1886.namprd11.prod.outlook.com>
+ <20210618182306.GI1002214@nvidia.com>
+ <BN9PR11MB5433B9C0577CF0BD8EFCC9BC8C069@BN9PR11MB5433.namprd11.prod.outlook.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <BN9PR11MB5433B9C0577CF0BD8EFCC9BC8C069@BN9PR11MB5433.namprd11.prod.outlook.com>
+X-Originating-IP: [47.55.113.94]
+X-ClientProxiedBy: MN2PR22CA0016.namprd22.prod.outlook.com
+ (2603:10b6:208:238::21) To BL0PR12MB5506.namprd12.prod.outlook.com
+ (2603:10b6:208:1cb::22)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: pbonzini@redhat.com, alexandru.elisei@arm.com, drjones@redhat.com, ardb@kernel.org, catalin.marinas@arm.com, tabba@google.com, jinankj@amazon.de, zhukeqian1@huawei.com, mark.rutland@arm.com, qperret@google.com, ricarkol@google.com, steven.price@arm.com, will@kernel.org, wangyanan55@huawei.com, james.morse@arm.com, suzuki.poulose@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, kernel-team@android.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from mlx.ziepe.ca (47.55.113.94) by MN2PR22CA0016.namprd22.prod.outlook.com (2603:10b6:208:238::21) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4264.18 via Frontend Transport; Fri, 25 Jun 2021 14:36:17 +0000
+Received: from jgg by mlx with local (Exim 4.94)        (envelope-from <jgg@nvidia.com>)        id 1lwmwK-00CZsu-9n; Fri, 25 Jun 2021 11:36:16 -0300
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 4623085b-1004-4281-c59d-08d937e6976d
+X-MS-TrafficTypeDiagnostic: BL1PR12MB5141:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <BL1PR12MB5141919F6011DC2A4ADEAAF0C2069@BL1PR12MB5141.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:8273;
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: hhhSOARGWS+BRMOZVWQkWJXwADzMUCnU1pY2MwIBlaXdVqSpYfbY9kYKSeOc6rdCGGZa1LyAXBRq5NKi0LSUYNE0E2TJwI6E/eLZh8ZeO3WBtqhUOPRMtAHSO8Om/pHAxkxbJ5cRF46/9abfaXPEkjdHYen58u/FFt5Bewpx5CX10TJgccBDGtppzzflp6GNa/yT7QHfeS4Pe11DjPPBkUwYD79L8AxczzoIFpdo0jAQwWzP3rWAxXUHaQLiw63zZWGDcgr+0cI9tb51EO/OslJ3DcTwspHlPaGT5NEDUxSLYVUBFjWAGcwAKrtlOL7sz0e8D6itAsPqXXRGxzoHVAJADGUi420DMmkzSRPLwI+UmeWbv4YXItK/Zylnxs9K5NUbsqPFOaPxaLvCUFKWRcOCNXlgQXrJJzFmeIfuEt1TjM5fNv32MkxljtGA6qAQzdK/YCsLW0jMMFNXXKYafPGmfptq8r97HCrpGLeMbAnrxUd+GUUS8Yjw4p+kR6B83gjklmV69thAg4ohMfFFJMCqD5gt4Gi+ZGPkD6bSyJT4kOCh9tjVtTd/4XDCQyKDyuvh7mKBEIygRbnoxeEF4teZqQpdAVXknIGpjIft7s15ihq6Nu9mqKSz9ytjlWjvBm0s8JtLpa2q0rcDKy8eRQ==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL0PR12MB5506.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(376002)(136003)(346002)(366004)(39860400002)(396003)(9786002)(316002)(9746002)(6916009)(33656002)(54906003)(2906002)(7416002)(478600001)(86362001)(4326008)(83380400001)(38100700002)(426003)(26005)(5660300002)(66946007)(66476007)(66556008)(36756003)(8676002)(2616005)(1076003)(186003)(8936002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?3CesEwvRv1tcs+Bfo8FUAZR0pf3wbGPmkJk3cYeVU9yrD/+lQkGvo2IxBfDL?=
+ =?us-ascii?Q?oCyPGvod/Q+dyiPGGG/nBrOBWnOlafRNI0BMBthhP8f0vzCX48hrUhTeTApm?=
+ =?us-ascii?Q?jxZReIQ4fpw2M520Tjzq8z92TthtLeTv7P++O61+uPaPE2SoqgXtEWoRAzma?=
+ =?us-ascii?Q?DO9LFLlC688FgCNThzmLEr571VQXQ6S+o1ISyaFrGlOpoXlh7lJQNQjIzjwn?=
+ =?us-ascii?Q?sRPr4qPa5yNr9zlZok//apFlXrL5B+QJkGEZ5yLLSgf3hqPksdsFX8WNMsoQ?=
+ =?us-ascii?Q?4D9kGHNMeKonz51roaA53Uf0I42OW+u+gB2CGV7owp2YlnLkzjD8lLo6E2zk?=
+ =?us-ascii?Q?7H/YEScq4awV3H7Y3o9NQULeS+gzhR4kQ7fTcgzl3/0w5EmzMVE6gD+C9NCH?=
+ =?us-ascii?Q?fYTSvZHUwTcwK36Bcd6dschY/EEcFFD4alh/2vyhjxUzEsLNvv9WkBSE3N2O?=
+ =?us-ascii?Q?VrEcgX+08t7iqfHGsInmfuTYxd0sln7uK+bVlI1U5PHWRCWP0C4FmSfSMFxB?=
+ =?us-ascii?Q?ZiB/6Q9a94lT6RlMAix2awbP4BhTxZDGqb6uT1o6sofxR1jXdAjS0ytwI4+3?=
+ =?us-ascii?Q?bXHK56A4uL4Hv3JeU+kHNwYzbewNoqvtoj3FeunDLPRTwM7jzsA8VSik+9Oj?=
+ =?us-ascii?Q?mba0S3xjcRWeww5irJio/usbMcTdJFtgyDxOQVthg8OdM6I2z68Ih/kT/Wd7?=
+ =?us-ascii?Q?h6uw+kJ0O9EsMYIOV2Vcy2ECGbwowmRgwONwY0NBXRHzVxjl6FejbyDhG4ox?=
+ =?us-ascii?Q?WM4B3pQeGrnsTw5FohSClSfAolVOBvMNdWCXYzXodhXlAleHoProYQJ57B1S?=
+ =?us-ascii?Q?avyTZZns1kqk9oinnT6xASrub3ADwy7ujxv4K3x9yWqdBo9TEXMlZ8al2i5E?=
+ =?us-ascii?Q?uJd36G27+ldeWvLdAFzshvSO1pZxXR+Sob1REayMsc7fNsoFC+Y4hL79i7cj?=
+ =?us-ascii?Q?t1rpwKHsAY400vxY7qjeF1/XJlaH54tSKNxy2ajkNUY5B1GM6jc2whj79yKf?=
+ =?us-ascii?Q?hV6fP0WOpKdZetXgLuGPtZJCf0Abpo465NRlTCfJ5Dug8k4eBuO722w191w8?=
+ =?us-ascii?Q?XSyTufY6gZiJ8htWvie/V9pP2iZu8coIhhey8+cvS/UZcd1pmyTGxLUGi7Mg?=
+ =?us-ascii?Q?OSsfSeLNfqaJSIVTs+JJRRJVXIOw4TF4c4MQchO+VcH4Lvbito30SbeTL08K?=
+ =?us-ascii?Q?Qwdz2bP6Vypow0MnX6BfmydyDTKEhXoOt7ntoffXqGWRjk0t+s/KVcjtyLmR?=
+ =?us-ascii?Q?biuUagqKMKUHjRVqggq7b95zh4oYRULNrsU+s7VQwpWdJ+FstS9pcBiFau51?=
+ =?us-ascii?Q?9ERw14mVZxmJo88L/H8CflGb?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 4623085b-1004-4281-c59d-08d937e6976d
+X-MS-Exchange-CrossTenant-AuthSource: BL0PR12MB5506.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Jun 2021 14:36:17.5261
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: Cg58ErIFco73peroYGBhhu6nlbI4pKtoPcalY14o5jokXtFjCoZ2q2n6Zq+RBN1n
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL1PR12MB5141
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Paolo,
+On Fri, Jun 25, 2021 at 10:27:18AM +0000, Tian, Kevin wrote:
 
-Here's the 5.14 pull request for 5.14. This round, plenty of changes
-in the mm department (MTE, CMOs, device mappings, host S2), but also
-a lot of work in the selftest infrastructure. On top of that, a few
-PMU fixes, and the ability to run guests on the M1...
+> -   When receiving the binding call for the 1st device in a group, iommu_fd 
+>     calls iommu_group_set_block_dma(group, dev->driver) which does 
+>     several things:
 
-Note that we carry a branch (arm64/for-next/caches) shared with the
-arm64 tree in order to avoid ugly conflicts. You will still get a few
-minor ones with the PPC tree, but the resolution is obvious.
+The whole problem here is trying to match this new world where we want
+devices to be in charge of their own IOMMU configuration and the old
+world where groups are in charge.
 
-Oh, and each merge commit has a full description of what they contain.
-Hopefully we won't get yelled at this time.
+Inserting the group fd and then calling a device-centric
+VFIO_GROUP_GET_DEVICE_FD_NEW doesn't solve this conflict, and isn't
+necessary. We can always get the group back from the device at any
+point in the sequence do to a group wide operation.
 
-Please pull,
+What I saw as the appeal of the sort of idea was to just completely
+leave all the difficult multi-device-group scenarios behind on the old
+group centric API and then we don't have to deal with them at all, or
+least not right away.
 
-	M.
+I'd see some progression where iommu_fd only works with 1:1 groups at
+the start. Other scenarios continue with the old API.
 
-The following changes since commit 8124c8a6b35386f73523d27eacb71b5364a68c4c:
+Then maybe groups where all devices use the same IOASID.
 
-  Linux 5.13-rc4 (2021-05-30 11:58:25 -1000)
+Then 1:N groups if the source device is reliably identifiable, this
+requires iommu subystem work to attach domains to sub-group objects -
+not sure it is worthwhile.
 
-are available in the Git repository at:
+But at least we can talk about each step with well thought out patches
 
-  git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kvmarm-5.14
+The only thing that needs to be done to get the 1:1 step is to broadly
+define how the other two cases will work so we don't get into trouble
+and set some way to exclude the problematic cases from even getting to
+iommu_fd in the first place.
 
-for you to fetch changes up to 188982cda00ebfe28b50c2905d9bbaa2e9a001b9:
+For instance if we go ahead and create /dev/vfio/device nodes we could
+do this only if the group was 1:1, otherwise the group cdev has to be
+used, along with its API.
 
-  Merge branch kvm-arm64/mmu/mte into kvmarm-master/next (2021-06-25 14:25:56 +0100)
+>         a) Check group viability. A group is viable only when all devices in
+>             the group are in one of below states:
+> 
+>                 * driver-less
+>                 * bound to a driver which is same as dev->driver (vfio in this case)
+>                 * bound to an otherwise allowed driver (same list as in vfio)
 
-----------------------------------------------------------------
-KVM/arm64 updates for v5.14.
+This really shouldn't use hardwired driver checks. Attached drivers
+should generically indicate to the iommu layer that they are safe for
+iommu_fd usage by calling some function around probe()
 
-- Add MTE support in guests, complete with tag save/restore interface
-- Reduce the impact of CMOs by moving them in the page-table code
-- Allow device block mappings at stage-2
-- Reduce the footprint of the vmemmap in protected mode
-- Support the vGIC on dumb systems such as the Apple M1
-- Add selftest infrastructure to support multiple configuration
-  and apply that to PMU/non-PMU setups
-- Add selftests for the debug architecture
-- The usual crop of PMU fixes
+Thus a group must contain only iommu_fd safe drivers, or drivers-less
+devices before any of it can be used. It is the more general
+refactoring of what VFIO is doing.
 
-----------------------------------------------------------------
-Alexandru Elisei (1):
-      KVM: arm64: Don't zero the cycle count register when PMCR_EL0.P is set
+>         c) The iommu layer also verifies group viability on BUS_NOTIFY_
+>             BOUND_DRIVER event. BUG_ON if viability is broken while block_dma
+>             is set.
 
-Andrew Jones (5):
-      KVM: arm64: selftests: get-reg-list: Introduce vcpu configs
-      KVM: arm64: selftests: get-reg-list: Prepare to run multiple configs at once
-      KVM: arm64: selftests: get-reg-list: Provide config selection option
-      KVM: arm64: selftests: get-reg-list: Remove get-reg-list-sve
-      KVM: arm64: selftests: get-reg-list: Split base and pmu registers
+And with this concept of iommu_fd safety being first-class maybe we
+can somehow eliminate this gross BUG_ON (and the 100's of lines of
+code that are used to create it) by denying probe to non-iommu-safe
+drivers, somehow.
 
-Fuad Tabba (16):
-      arm64: Apply errata to swsusp_arch_suspend_exit
-      arm64: Do not enable uaccess for flush_icache_range
-      arm64: Do not enable uaccess for invalidate_icache_range
-      arm64: Downgrade flush_icache_range to invalidate
-      arm64: assembler: remove user_alt
-      arm64: Move documentation of dcache_by_line_op
-      arm64: Fix comments to refer to correct function __flush_icache_range
-      arm64: __inval_dcache_area to take end parameter instead of size
-      arm64: dcache_by_line_op to take end parameter instead of size
-      arm64: __flush_dcache_area to take end parameter instead of size
-      arm64: __clean_dcache_area_poc to take end parameter instead of size
-      arm64: __clean_dcache_area_pop to take end parameter instead of size
-      arm64: __clean_dcache_area_pou to take end parameter instead of size
-      arm64: sync_icache_aliases to take end parameter instead of size
-      arm64: Fix cache maintenance function comments
-      arm64: Rename arm64-internal cache maintenance functions
+> -   Binding other devices in the group to iommu_fd just succeeds since 
+>     the group is already in block_dma.
 
-Keqian Zhu (2):
-      KVM: arm64: Remove the creation time's mapping of MMIO regions
-      KVM: arm64: Try stage2 block mapping for host device MMIO
+I think the rest of this more or less describes the device centric
+logic for multi-device groups we've already talked about. I don't
+think it benifits from having the group fd
 
-Marc Zyngier (22):
-      irqchip/gic: Split vGIC probing information from the GIC code
-      KVM: arm64: Handle physical FIQ as an IRQ while running a guest
-      KVM: arm64: vgic: Be tolerant to the lack of maintenance interrupt masking
-      KVM: arm64: vgic: Let an interrupt controller advertise lack of HW deactivation
-      KVM: arm64: vgic: move irq->get_input_level into an ops structure
-      KVM: arm64: vgic: Implement SW-driven deactivation
-      KVM: arm64: timer: Refactor IRQ configuration
-      KVM: arm64: timer: Add support for SW-based deactivation
-      irqchip/apple-aic: Advertise some level of vGICv3 compatibility
-      Merge branch kvm-arm64/m1 into kvmarm-master/next
-      Merge branch kvm-arm64/mmu/MMIO-block-mapping into kvmarm-master/next
-      Merge branch kvm-arm64/mmu/reduce-vmemmap-overhead into kvmarm-master/next
-      Merge branch kvm-arm64/selftest/debug into kvmarm-master/next
-      Merge branch kvm-arm64/mmu/stage2-cmos into kvmarm-master/next
-      KVM: arm64: Restore PMU configuration on first run
-      Merge branch kvm-arm64/pmu-fixes into kvmarm-master/next
-      Merge branch arm64/for-next/caches into kvmarm-master/next
-      KVM: arm64: Update MAINTAINERS to include selftests
-      Merge branch kvm-arm64/selftest/sysreg-list-fix into kvmarm-master/next
-      Merge branch kvm-arm64/mmu/mte into kvmarm-master/next
-      KVM: arm64: Set the MTE tag bit before releasing the page
-      Merge branch kvm-arm64/mmu/mte into kvmarm-master/next
-
-Mark Rutland (2):
-      arm64: assembler: replace `kaddr` with `addr`
-      arm64: assembler: add conditional cache fixups
-
-Quentin Perret (7):
-      KVM: arm64: Move hyp_pool locking out of refcount helpers
-      KVM: arm64: Use refcount at hyp to check page availability
-      KVM: arm64: Remove list_head from hyp_page
-      KVM: arm64: Unify MMIO and mem host stage-2 pools
-      KVM: arm64: Remove hyp_pool pointer from struct hyp_page
-      KVM: arm64: Use less bits for hyp_page order
-      KVM: arm64: Use less bits for hyp_page refcount
-
-Ricardo Koller (6):
-      KVM: selftests: Rename vm_handle_exception
-      KVM: selftests: Complete x86_64/sync_regs_test ucall
-      KVM: selftests: Introduce UCALL_UNHANDLED for unhandled vector reporting
-      KVM: selftests: Move GUEST_ASSERT_EQ to utils header
-      KVM: selftests: Add exception handling support for aarch64
-      KVM: selftests: Add aarch64/debug-exceptions test
-
-Steven Price (6):
-      arm64: mte: Sync tags for pages where PTE is untagged
-      KVM: arm64: Introduce MTE VM feature
-      KVM: arm64: Save/restore MTE registers
-      KVM: arm64: Expose KVM_ARM_CAP_MTE
-      KVM: arm64: Add ioctl to fetch/store tags in a guest
-      KVM: arm64: Document MTE capability and ioctl
-
-Yanan Wang (4):
-      KVM: arm64: Introduce two cache maintenance callbacks
-      KVM: arm64: Introduce mm_ops member for structure stage2_attr_data
-      KVM: arm64: Tweak parameters of guest cache maintenance functions
-      KVM: arm64: Move guest CMOs to the fault handlers
-
- Documentation/virt/kvm/api.rst                     |  61 +++
- MAINTAINERS                                        |   2 +
- arch/arm64/include/asm/alternative-macros.h        |   5 -
- arch/arm64/include/asm/arch_gicv3.h                |   3 +-
- arch/arm64/include/asm/assembler.h                 |  80 ++--
- arch/arm64/include/asm/cacheflush.h                |  71 ++--
- arch/arm64/include/asm/efi.h                       |   2 +-
- arch/arm64/include/asm/kvm_arm.h                   |   3 +-
- arch/arm64/include/asm/kvm_emulate.h               |   3 +
- arch/arm64/include/asm/kvm_host.h                  |  14 +
- arch/arm64/include/asm/kvm_mmu.h                   |  17 +-
- arch/arm64/include/asm/kvm_mte.h                   |  66 ++++
- arch/arm64/include/asm/kvm_pgtable.h               |  42 +-
- arch/arm64/include/asm/mte-def.h                   |   1 +
- arch/arm64/include/asm/mte.h                       |   4 +-
- arch/arm64/include/asm/pgtable.h                   |  22 +-
- arch/arm64/include/asm/sysreg.h                    |   3 +-
- arch/arm64/include/uapi/asm/kvm.h                  |  11 +
- arch/arm64/kernel/alternative.c                    |   2 +-
- arch/arm64/kernel/asm-offsets.c                    |   2 +
- arch/arm64/kernel/efi-entry.S                      |   9 +-
- arch/arm64/kernel/head.S                           |  13 +-
- arch/arm64/kernel/hibernate-asm.S                  |   7 +-
- arch/arm64/kernel/hibernate.c                      |  20 +-
- arch/arm64/kernel/idreg-override.c                 |   3 +-
- arch/arm64/kernel/image-vars.h                     |   2 +-
- arch/arm64/kernel/insn.c                           |   2 +-
- arch/arm64/kernel/kaslr.c                          |  12 +-
- arch/arm64/kernel/machine_kexec.c                  |  30 +-
- arch/arm64/kernel/mte.c                            |  18 +-
- arch/arm64/kernel/probes/uprobes.c                 |   2 +-
- arch/arm64/kernel/smp.c                            |   8 +-
- arch/arm64/kernel/smp_spin_table.c                 |   7 +-
- arch/arm64/kernel/sys_compat.c                     |   2 +-
- arch/arm64/kvm/arch_timer.c                        | 162 ++++++--
- arch/arm64/kvm/arm.c                               |  22 +-
- arch/arm64/kvm/guest.c                             |  86 ++++
- arch/arm64/kvm/hyp/entry.S                         |   7 +
- arch/arm64/kvm/hyp/exception.c                     |   3 +-
- arch/arm64/kvm/hyp/hyp-entry.S                     |   6 +-
- arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h         |  21 +
- arch/arm64/kvm/hyp/include/nvhe/gfp.h              |  45 +--
- arch/arm64/kvm/hyp/include/nvhe/mem_protect.h      |   2 +-
- arch/arm64/kvm/hyp/include/nvhe/memory.h           |   7 +-
- arch/arm64/kvm/hyp/include/nvhe/mm.h               |  13 +-
- arch/arm64/kvm/hyp/nvhe/cache.S                    |   4 +-
- arch/arm64/kvm/hyp/nvhe/mem_protect.c              |  60 +--
- arch/arm64/kvm/hyp/nvhe/page_alloc.c               | 112 ++++--
- arch/arm64/kvm/hyp/nvhe/setup.c                    |  33 +-
- arch/arm64/kvm/hyp/nvhe/tlb.c                      |   2 +-
- arch/arm64/kvm/hyp/pgtable.c                       |  61 ++-
- arch/arm64/kvm/hyp/reserved_mem.c                  |   3 +-
- arch/arm64/kvm/mmu.c                               | 196 ++++++---
- arch/arm64/kvm/pmu-emul.c                          |   4 +
- arch/arm64/kvm/reset.c                             |   4 +
- arch/arm64/kvm/sys_regs.c                          |  32 +-
- arch/arm64/kvm/vgic/vgic-init.c                    |  36 +-
- arch/arm64/kvm/vgic/vgic-v2.c                      |  19 +-
- arch/arm64/kvm/vgic/vgic-v3.c                      |  19 +-
- arch/arm64/kvm/vgic/vgic.c                         |  14 +-
- arch/arm64/lib/uaccess_flushcache.c                |   4 +-
- arch/arm64/mm/cache.S                              | 158 ++++----
- arch/arm64/mm/flush.c                              |  29 +-
- drivers/irqchip/irq-apple-aic.c                    |   9 +
- drivers/irqchip/irq-gic-common.c                   |  13 -
- drivers/irqchip/irq-gic-common.h                   |   2 -
- drivers/irqchip/irq-gic-v3.c                       |   6 +-
- drivers/irqchip/irq-gic.c                          |   6 +-
- include/kvm/arm_vgic.h                             |  41 +-
- include/linux/irqchip/arm-gic-common.h             |  25 +-
- include/linux/irqchip/arm-vgic-info.h              |  45 +++
- include/uapi/linux/kvm.h                           |   2 +
- tools/testing/selftests/kvm/.gitignore             |   2 +-
- tools/testing/selftests/kvm/Makefile               |   4 +-
- .../selftests/kvm/aarch64/debug-exceptions.c       | 250 ++++++++++++
- .../selftests/kvm/aarch64/get-reg-list-sve.c       |   3 -
- tools/testing/selftests/kvm/aarch64/get-reg-list.c | 439 +++++++++++++++------
- .../selftests/kvm/include/aarch64/processor.h      |  83 +++-
- tools/testing/selftests/kvm/include/kvm_util.h     |  23 +-
- .../selftests/kvm/include/x86_64/processor.h       |   4 +-
- tools/testing/selftests/kvm/lib/aarch64/handlers.S | 126 ++++++
- .../testing/selftests/kvm/lib/aarch64/processor.c  |  97 +++++
- tools/testing/selftests/kvm/lib/x86_64/processor.c |  23 +-
- tools/testing/selftests/kvm/x86_64/evmcs_test.c    |   4 +-
- tools/testing/selftests/kvm/x86_64/kvm_pv_test.c   |   2 +-
- .../testing/selftests/kvm/x86_64/sync_regs_test.c  |   7 +-
- tools/testing/selftests/kvm/x86_64/tsc_msrs_test.c |   9 -
- .../selftests/kvm/x86_64/userspace_msr_exit_test.c |   8 +-
- .../testing/selftests/kvm/x86_64/xapic_ipi_test.c  |   2 +-
- 89 files changed, 2208 insertions(+), 740 deletions(-)
- create mode 100644 arch/arm64/include/asm/kvm_mte.h
- create mode 100644 include/linux/irqchip/arm-vgic-info.h
- create mode 100644 tools/testing/selftests/kvm/aarch64/debug-exceptions.c
- delete mode 100644 tools/testing/selftests/kvm/aarch64/get-reg-list-sve.c
- create mode 100644 tools/testing/selftests/kvm/lib/aarch64/handlers.S
+Jason
