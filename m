@@ -2,131 +2,101 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E612E3B39DB
-	for <lists+kvm@lfdr.de>; Fri, 25 Jun 2021 01:48:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6FA9F3B3A1D
+	for <lists+kvm@lfdr.de>; Fri, 25 Jun 2021 02:19:03 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232958AbhFXXuW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 24 Jun 2021 19:50:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58016 "EHLO
+        id S232957AbhFYAVV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 24 Jun 2021 20:21:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36716 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232300AbhFXXuS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 24 Jun 2021 19:50:18 -0400
-Received: from mail-pj1-x1036.google.com (mail-pj1-x1036.google.com [IPv6:2607:f8b0:4864:20::1036])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 49B4AC061574
-        for <kvm@vger.kernel.org>; Thu, 24 Jun 2021 16:47:58 -0700 (PDT)
-Received: by mail-pj1-x1036.google.com with SMTP id p4-20020a17090a9304b029016f3020d867so4464369pjo.3
-        for <kvm@vger.kernel.org>; Thu, 24 Jun 2021 16:47:58 -0700 (PDT)
+        with ESMTP id S232933AbhFYAVU (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 24 Jun 2021 20:21:20 -0400
+Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4D2AFC061756
+        for <kvm@vger.kernel.org>; Thu, 24 Jun 2021 17:18:59 -0700 (PDT)
+Received: by mail-yb1-xb4a.google.com with SMTP id l12-20020a25ad4c0000b029055444b6e99bso1708899ybe.5
+        for <kvm@vger.kernel.org>; Thu, 24 Jun 2021 17:18:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=3TTTSx9oGUkYkJu7+ALA0wTUTD3ZhTwQcOChtOj/Zk4=;
-        b=dcIRON5mUNGGXsf2qIr0RoyLHTz85BI5k4nQGGFwzXCBXEB42N+25XKBb545MiCh3n
-         X333TJJd8CA4KI/l8oLU2FXmJikjTnS6jtwgwOm6EdOj8jCE7Ngospb91nsnjDN3vTdK
-         Gm/Q6MidDco7j/BnrWV3jeDWdYp2T6ieCy59xZyGulffeuufjD4EP2Utcme5V8XUtWap
-         xMjqyYVxaRbhvRfbPYnGpw2YEpquVd3V1g8HsD4LwCJNgyd/pto8Ok5edEEJ9TZKMBj9
-         eJiujwLn/t/g1xBc0xs/JJxKrIuFVN8g3MsNqzmK6FC9GedID/DrTRn8iujNY/Ey5D0A
-         eicg==
+        h=reply-to:date:message-id:mime-version:subject:from:to:cc;
+        bh=6fjzUtku/PtRujaCxglb2g16yONAmo5V2De3zOjXjoc=;
+        b=qpcFFW0RGwSColAnhc/3Iy3uEck2HZTjVCBNLgz4JdCOAAd/9YXF7I2xAPgKIazivh
+         4AJPvqK51r9HiW1ZqGa/sHvXsLYOoerJv7r0D33alsqvPpjqtMIJfLgDiTSOa1leGXSy
+         BcjwmikeAthbKD6Mwe9T/XGoPNDeWXWg3jwqFfVpta6+1b0cQpwJsVGAhT5+bk8z+gpt
+         sczX8FKOW044HHSuLV9VdbfjjE8Qw3xVIne4RypNx5bRpbF+2mJUbUWXq1fojtEPOL4l
+         a8B1JTKN4F4bEbkUiByeI+c05DTMgIuI/01b+5vEn/9I24QLogLql9GqAFYaxMll/CcL
+         GcFQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=3TTTSx9oGUkYkJu7+ALA0wTUTD3ZhTwQcOChtOj/Zk4=;
-        b=JYfc+A8im2gl3Si14rd0qaPrf5ogvpfae8fZsV3CkZ5SJJqffeQnHewwPzjHiCMngM
-         t6TKAeANQK1u+LUOZd1hG3ctp89hgBB7VLv8jhDO9NRapUqOj8XJN/rX6zGZ8ODq4KgC
-         6n9tTKj6yT23Uvh1VIl1BQikvuqnmue0A4EL+1d4K7TDTASutuvtSNdJDin3ZiZ2xy/F
-         mgELUFQppStX2S+XUt+CTsZnkNkhju4rxs76W4Q1KsRqbnAEdEIUM4RE0B0bAxUKLK8A
-         nodBU7fTT1QwZqT7y4tVfrFxxxSt3hhVEtOZBFoEsexXgWgd4dEMxC42MSeDmn+iboTZ
-         tsdA==
-X-Gm-Message-State: AOAM5310kUq0RTIbnFajpb0dlgO3/6xgqRS7+UdswFrN1cryl4KWTwDD
-        vcw4FvxNx9E/SiFpsYocUCkDSQ==
-X-Google-Smtp-Source: ABdhPJxbrYHlucGt9IM/FGL//GXHXhmKX1X4kkHmCVcpQUo2hMtRCP8UQRXgeap/GV6eKwcSeaIgZA==
-X-Received: by 2002:a17:902:d50b:b029:121:b5c8:b246 with SMTP id b11-20020a170902d50bb0290121b5c8b246mr6347367plg.51.1624578477622;
-        Thu, 24 Jun 2021 16:47:57 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id d129sm2648854pfd.218.2021.06.24.16.47.56
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 24 Jun 2021 16:47:57 -0700 (PDT)
-Date:   Thu, 24 Jun 2021 23:47:53 +0000
+        h=x-gm-message-state:reply-to:date:message-id:mime-version:subject
+         :from:to:cc;
+        bh=6fjzUtku/PtRujaCxglb2g16yONAmo5V2De3zOjXjoc=;
+        b=bnnn2KV9KSI4lwsa3d9pBx75RD/tduQj/gh2j7WUwbllWNna9Syf5viYEQTifCWeQ2
+         Uyj3Wr9DdVwu6ToEGpmU+hUqwXd5tJ9P1OJO1uvRROLMrR4+l4iZp6faF+MK3fPaUBwN
+         7jHZ2ZfychRrYsiEsepfC/q30KitDjinYd8AaNZD+jYTEFvzsPrrcL68Z7DHH0WANzi4
+         QTE8nljslDD9FWewzUsdT3nkps2bO1ha2L07yrrGR3zABNWaDBvIkx5TBT9avpcm14We
+         OC/ou+rx/Wi9zBDaigdTJK6DUvU1qtJO0axAXiemM5h2DJjvUZJfdfSLfPKNOOP3WS0Y
+         T9lA==
+X-Gm-Message-State: AOAM531E/FLiqXTX/2cr3X1ch6OvySUB185tHTCRKDx5o4zcCIAAz1Pd
+        fHhesMyL+wH23ZHgwBxm9Wr5qcZOBas=
+X-Google-Smtp-Source: ABdhPJymk4k2ITDoivLr/PI7hmMnTloV0UNdYLa/stFT1YkFD9JtUH1c4jIUTrrEu0OrsZQOJWxIjbc4PAI=
+X-Received: from seanjc798194.pdx.corp.google.com ([2620:15c:f:10:7c83:7704:b3b6:754c])
+ (user=seanjc job=sendgmr) by 2002:a25:74cc:: with SMTP id p195mr9042062ybc.109.1624580338507;
+ Thu, 24 Jun 2021 17:18:58 -0700 (PDT)
+Reply-To: Sean Christopherson <seanjc@google.com>
+Date:   Thu, 24 Jun 2021 17:18:53 -0700
+Message-Id: <20210625001853.318148-1-seanjc@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.32.0.93.g670b81a890-goog
+Subject: [PATCH] Revert "KVM: x86: WARN and reject loading KVM if NX is
+ supported but not enabled"
 From:   Sean Christopherson <seanjc@google.com>
-To:     Tom Lendacky <thomas.lendacky@amd.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Sean Christopherson <seanjc@google.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
         Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Peter Gonda <pgonda@google.com>,
-        Brijesh Singh <brijesh.singh@amd.com>
-Subject: Re: [PATCH 0/7] KVM: x86: guest MAXPHYADDR and C-bit fixes
-Message-ID: <YNUZqRK3ZMdsNdt4@google.com>
-References: <20210623230552.4027702-1-seanjc@google.com>
- <324a95ee-b962-acdf-9bd7-b8b23b9fb991@amd.com>
- <c2d7a69a-386e-6f44-71c2-eb9a243c3a78@amd.com>
- <YNTBdvWxwyx3T+Cs@google.com>
- <2b79e962-b7de-4617-000d-f85890b7ea2c@amd.com>
- <7e3a90c0-75a1-b8fe-dbcf-bda16502ace9@amd.com>
- <YNUEA8n61WO89voW@google.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <YNUEA8n61WO89voW@google.com>
+        linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jun 24, 2021, Sean Christopherson wrote:
-> On Thu, Jun 24, 2021, Tom Lendacky wrote:
-> > On 6/24/21 12:39 PM, Tom Lendacky wrote:
-> > > 
-> > > 
-> > > On 6/24/21 12:31 PM, Sean Christopherson wrote:
-> > >> On Thu, Jun 24, 2021, Tom Lendacky wrote:
-> > >>>>
-> > >>>> Here's an explanation of the physical address reduction for bare-metal and
-> > >>>> guest.
-> > >>>>
-> > >>>> With MSR 0xC001_0010[SMEE] = 0:
-> > >>>>   No reduction in host or guest max physical address.
-> > >>>>
-> > >>>> With MSR 0xC001_0010[SMEE] = 1:
-> > >>>> - Reduction in the host is enumerated by CPUID 0x8000_001F_EBX[11:6],
-> > >>>>   regardless of whether SME is enabled in the host or not. So, for example
-> > >>>>   on EPYC generation 2 (Rome) you would see a reduction from 48 to 43.
-> > >>>> - There is no reduction in physical address in a legacy guest (non-SEV
-> > >>>>   guest), so the guest can use a 48-bit physical address
-> > >>
-> > >> So the behavior I'm seeing is either a CPU bug or user error.  Can you verify
-> > >> the unexpected #PF behavior to make sure I'm not doing something stupid?
-> > > 
-> > > Yeah, I saw that in patch #3. Let me see what I can find out. I could just
-> > > be wrong on that myself - it wouldn't be the first time.
-> > 
-> > From patch #3:
-> >   SVM: KVM: CPU #PF @ rip = 0x409ca4, cr2 = 0xc0000000, pfec = 0xb
-> >   KVM: guest PTE = 0x181023 @ GPA = 0x180000, level = 4
-> >   KVM: guest PTE = 0x186023 @ GPA = 0x181000, level = 3
-> >   KVM: guest PTE = 0x187023 @ GPA = 0x186000, level = 2
-> >   KVM: guest PTE = 0xffffbffff003 @ GPA = 0x187000, level = 1
-> >   SVM: KVM: GPA = 0x7fffbffff000
-> > 
-> > I think you may be hitting a special HT region that is at the top 12GB of
-> > the 48-bit memory range and is reserved, even for GPAs. Can you somehow
-> > get the test to use an address below 0xfffd_0000_0000? That would show
-> > that bit 47 is valid for the legacy guest while staying out of the HT region.
-> 
-> I can make that happen.
+Let KVM load if EFER.NX=0 even if NX is supported, the analysis and
+testing (or lack thereof) for the non-PAE host case was garbage.
 
-Ah, hilarious.  That indeed does the trick.  0xfffd00000000 = #PF,
-0xfffcfffff000 = good.
+If the kernel won't be using PAE paging, .Ldefault_entry in head_32.S
+skips over the entire EFER sequence.  Hopefully that can be changed in
+the future to allow KVM to require EFER.NX, but the motivation behind
+KVM's requirement isn't yet merged.  Reverting and revisiting the mess
+at a later date is by far the safest approach.
 
-I'll send a revert shortly.  There's another C-bit bug that needs fixing, too :-/
-The unconditional __sme_clr() in npf_interception() is wrong and breaks non-SEV
-guests.  Based on this from the APM
+This reverts commit 8bbed95d2cb6e5de8a342d761a89b0a04faed7be.
 
-  If the C-bit is an address bit, this bit is masked from the guest
-  physical address when it is translated through the nested page tables.
-  Consequently, the hypervisor does not need to be aware of which pages
-  the guest has chosen to mark private.
+Fixes: 8bbed95d2cb6 ("KVM: x86: WARN and reject loading KVM if NX is supported but not enabled")
+Signed-off-by: Sean Christopherson <seanjc@google.com>
+---
 
-I assume it's not needed for SEV either?  I'm about to find out shortly, but if
-you happen to know for sure... :-)
+Hopefully it's not too late to just drop the original patch...
+
+ arch/x86/kvm/x86.c | 3 ---
+ 1 file changed, 3 deletions(-)
+
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 4a597aafe637..1cc02a3685d0 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -10981,9 +10981,6 @@ int kvm_arch_hardware_setup(void *opaque)
+ 	int r;
+ 
+ 	rdmsrl_safe(MSR_EFER, &host_efer);
+-	if (WARN_ON_ONCE(boot_cpu_has(X86_FEATURE_NX) &&
+-			 !(host_efer & EFER_NX)))
+-		return -EIO;
+ 
+ 	if (boot_cpu_has(X86_FEATURE_XSAVES))
+ 		rdmsrl(MSR_IA32_XSS, host_xss);
+-- 
+2.32.0.93.g670b81a890-goog
+
