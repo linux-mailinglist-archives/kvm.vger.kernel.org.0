@@ -2,122 +2,106 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6C3FA3B3A21
-	for <lists+kvm@lfdr.de>; Fri, 25 Jun 2021 02:20:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A06003B3A46
+	for <lists+kvm@lfdr.de>; Fri, 25 Jun 2021 02:57:14 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232921AbhFYAXA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 24 Jun 2021 20:23:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37092 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229521AbhFYAW6 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 24 Jun 2021 20:22:58 -0400
-Received: from mail-pf1-x42f.google.com (mail-pf1-x42f.google.com [IPv6:2607:f8b0:4864:20::42f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F2A00C061574;
-        Thu, 24 Jun 2021 17:20:37 -0700 (PDT)
-Received: by mail-pf1-x42f.google.com with SMTP id a127so6605260pfa.10;
-        Thu, 24 Jun 2021 17:20:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=date:from:subject:to:cc:references:in-reply-to:mime-version
-         :message-id:content-transfer-encoding;
-        bh=QS1Ns1WqNL5is+0vi/ZTUFuxlVcqVbsqm8g6SHrti5w=;
-        b=esFkhH15NMc8wS4V/cwcupYK/DM+pO31de2/rn7330Vbdh9CSH9nvb+7DxAuWpBq5q
-         I7HhRjIAf3sfraAsSUg5Y3qXSa9eVE9+YVQ00KJALtXy9kkDyH52E89nrtf01dGKriH8
-         b00IMLN+V/HOLpi8TtU0LZ1hk9cAx0kkRlMaPdbbDzt+jClVFu+NXDMdkVwZY7xsN+Pb
-         tP4yZoVaJBNxRaG8tctEZTIYWsIItqZBewSg9WSZ8LdCnbR+ioG4SZD7hACLKDcVik91
-         hFNd/jFL7BVxEVmattHQ7LktCFlqiNNlX/MEUpDQB/QeQIQwm0YNoc++AkYkd7w7Rqkx
-         Ypjg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:subject:to:cc:references:in-reply-to
-         :mime-version:message-id:content-transfer-encoding;
-        bh=QS1Ns1WqNL5is+0vi/ZTUFuxlVcqVbsqm8g6SHrti5w=;
-        b=YgkVjfNbEdDHP7YVXaHLq02YZdUEBIafBn0lGy/Gdvciz30U+C+2dAnVJxJ1ZO62NL
-         C2+eLE0cmR6nUeElURkBDox785SxTQskNEiWYPyPB1yP1eUvqUyrZIZAHfnacwizzSQC
-         Dhjlix84TV0axSeTb6xDuSlEe0W16TO19IUiv8naWKicpVW9zfrmL4MY+JKJ+dw8CGGn
-         Z0P42M8Snchw2QMzjHTUxIKFplLSU37xaefcLYtcZvaL/fLOHVeM002SPchKgRDIUECB
-         362N5X6kAl5dAjl0i6tHWRWmEc5En+T2pQan3/f8GnQReZFTOMzJdWFAZrImKuiA8btu
-         a9rA==
-X-Gm-Message-State: AOAM533q+Rh9wMMUrSVkFjesz4Mprw7pkSSRXpqi+ONRh1ZKuRoOOoCz
-        LFbIY6cKcRlotgxW8GpD5TI=
-X-Google-Smtp-Source: ABdhPJxQU7+bPuGhEylfTnovn9GkVLr4KlmlOjHYTX0Un3AOHd4dWxP2gfr/obThDIjB30qffkhRJQ==
-X-Received: by 2002:a62:2fc1:0:b029:305:fd1e:e3f4 with SMTP id v184-20020a622fc10000b0290305fd1ee3f4mr4774381pfv.17.1624580437511;
-        Thu, 24 Jun 2021 17:20:37 -0700 (PDT)
-Received: from localhost (60-242-147-73.tpgi.com.au. [60.242.147.73])
-        by smtp.gmail.com with ESMTPSA id z18sm3630623pfe.214.2021.06.24.17.20.36
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 24 Jun 2021 17:20:37 -0700 (PDT)
-Date:   Fri, 25 Jun 2021 10:20:32 +1000
-From:   Nicholas Piggin <npiggin@gmail.com>
-Subject: Re: [PATCH 0/6] KVM: Remove uses of struct page from x86 and arm64
- MMU
-To:     Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
-        Huacai Chen <chenhuacai@kernel.org>,
-        Marc Zyngier <maz@kernel.org>,
-        Paul Mackerras <paulus@ozlabs.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        David Stevens <stevensd@chromium.org>,
-        Zhenyu Wang <zhenyuw@linux.intel.com>,
-        Zhi Wang <zhi.a.wang@intel.com>
-Cc:     Alexandru Elisei <alexandru.elisei@arm.com>,
-        dri-devel@lists.freedesktop.org, intel-gfx@lists.freedesktop.org,
-        intel-gvt-dev@lists.freedesktop.org,
-        James Morse <james.morse@arm.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvmarm@lists.cs.columbia.edu,
-        kvm-ppc@vger.kernel.org, kvm@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-        linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-        Sean Christopherson <seanjc@google.com>,
-        David Stevens <stevensd@google.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Will Deacon <will@kernel.org>
-References: <20210624035749.4054934-1-stevensd@google.com>
-        <1624530624.8jff1f4u11.astroid@bobo.none>
-        <1624534759.nj0ylor2eh.astroid@bobo.none>
-        <0d3a699a-15eb-9f1b-0735-79d14736f38c@redhat.com>
-        <1624539354.6zggpdrdbw.astroid@bobo.none>
-        <81d99029-ec40-19c5-5647-20607d78dab0@redhat.com>
-In-Reply-To: <81d99029-ec40-19c5-5647-20607d78dab0@redhat.com>
+        id S232922AbhFYA72 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 24 Jun 2021 20:59:28 -0400
+Received: from smtp.bonedaddy.net ([45.33.94.42]:40130 "EHLO
+        smtp.bonedaddy.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229521AbhFYA71 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 24 Jun 2021 20:59:27 -0400
+X-Greylist: delayed 354 seconds by postgrey-1.27 at vger.kernel.org; Thu, 24 Jun 2021 20:59:27 EDT
+Received: from [192.168.1.209] (n175-38-129-149.per2.wa.optusnet.com.au [175.38.129.149])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange ECDHE (P-256) server-signature RSA-PSS (2048 bits) server-digest SHA256)
+        (No client certificate requested)
+        (Authenticated sender: pabs3@bonedaddy.net)
+        by smtp.bonedaddy.net (Postfix) with ESMTPSA id ED574180045;
+        Thu, 24 Jun 2021 20:51:59 -0400 (EDT)
+Authentication-Results: smtp.bonedaddy.net; dmarc=fail (p=none dis=none) header.from=bonedaddy.net
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bonedaddy.net;
+        s=mail; t=1624582325;
+        bh=zXuCZMd9zz98b+NCH+tpPpN/tUHyuBhG6l57d8TmYeQ=;
+        h=Subject:From:To:Cc:In-Reply-To:References:Date;
+        b=oG5DKZJw6f4PiGCpuQDdwTx31bY6q34/dz4Jk86xbEFgZ844cWjggZkd1i9v7B2Hz
+         xQ+j4olt+FJeQwuGpvDkPPqGDVEFKrEV4uAikMiR5wCzSzuh8zTRq+j8JmzQIeyjcD
+         +B566Ayg2nh5TG9bfGw4NwCc/mkMRIch8nuTLzdytu6Ui7FU9T0KxTOaBDdCLrHrge
+         WQbmx7Km/FbS/7+0PSDLMNHaV7lfiHKqxSmXsdce3d0eGGq+zrLc/IuMynyHFzsYgr
+         J9DFgzQ0jV6HJk+uXz+/+e9ZFVo2+DWh+XZlGthobUCnKrTvpQhKKCN5ykJLmUNexb
+         f+Pts58pqb5iA==
+Message-ID: <466172bd9e2e3e223685ea3fa11cb1f990113e6e.camel@bonedaddy.net>
+Subject: Re: [PATCH 0/6] sched,delayacct: Some cleanups
+From:   Paul Wise <pabs3@bonedaddy.net>
+To:     Mel Gorman <mgorman@suse.de>, Balbir Singh <bsingharora@gmail.com>
+Cc:     Peter Zijlstra <peterz@infradead.org>, tglx@linutronix.de,
+        mingo@kernel.org, juri.lelli@redhat.com,
+        vincent.guittot@linaro.org, dietmar.eggemann@arm.com,
+        rostedt@goodmis.org, bsegall@google.com, bristot@redhat.com,
+        pbonzini@redhat.com, maz@kernel.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, riel@surriel.com, hannes@cmpxchg.org
+In-Reply-To: <20210512113419.GF3672@suse.de>
+References: <20210505105940.190490250@infradead.org>
+         <20210505222940.GA4236@balbir-desktop>
+         <YJOzUAg30LZWSHcI@hirez.programming.kicks-ass.net>
+         <20210507123810.GB4236@balbir-desktop> <20210512113419.GF3672@suse.de>
+Content-Type: multipart/signed; micalg="pgp-sha512";
+        protocol="application/pgp-signature"; boundary="=-ChuWidyUdrci/irWU01F"
+Date:   Fri, 25 Jun 2021 08:50:55 +0800
 MIME-Version: 1.0
-Message-Id: <1624580015.hf7udh0vc3.astroid@bobo.none>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.40.2-1 
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Excerpts from Paolo Bonzini's message of June 25, 2021 1:35 am:
-> On 24/06/21 14:57, Nicholas Piggin wrote:
->> KVM: Fix page ref underflow for regions with valid but non-refcounted pa=
-ges
->=20
-> It doesn't really fix the underflow, it disallows mapping them in the=20
-> first place.  Since in principle things can break, I'd rather be=20
-> explicit, so let's go with "KVM: do not allow mapping valid but=20
-> non-reference-counted pages".
->=20
->> It's possible to create a region which maps valid but non-refcounted
->> pages (e.g., tail pages of non-compound higher order allocations). These
->> host pages can then be returned by gfn_to_page, gfn_to_pfn, etc., family
->> of APIs, which take a reference to the page, which takes it from 0 to 1.
->> When the reference is dropped, this will free the page incorrectly.
->>=20
->> Fix this by only taking a reference on the page if it was non-zero,
->=20
-> s/on the page/on valid pages/ (makes clear that invalid pages are fine=20
-> without refcounting).
 
-That seems okay, you can adjust the title or changelog as you like.
+--=-ChuWidyUdrci/irWU01F
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-> Thank you *so* much, I'm awful at Linux mm.
+On Wed, 2021-05-12 at 12:34 +0100, Mel Gorman wrote:
 
-Glad to help. Easy to see why you were taking this approach because the=20
-API really does need to be improved and even a pretty intwined with mm=20
-subsystem like KVM shouldn't _really_ be doing this kind of trick (and
-it should go away when old API is removed).
+> Alternatively, I've added Paul Wise to the cc who is the latest
+> committer to iotop.=C2=A0 Maybe he knows who could add/commit a check for
+> sysctl.sched_delayacct and if it exists then check if it's 1 and display
+> an error suggesting corrective action (add delayacct to the kernel comman=
+d
+> line or sysctl sched.sched_delayacct=3D1). iotop appears to be in mainten=
+ance
+> mode but gets occasional commits even if it has not had a new version
+> since 2013 so maybe it could get a 0.7 tag if such a check was added.
 
-Thanks,
-Nick
+Did the proposed changes get merged?
+
+If so, please let me know the details of what needs to happen in iotop
+and iotop-c to cope with the changes in the Linux kernel.
+
+--=20
+bye,
+pabs
+
+https://bonedaddy.net/pabs3/
+
+--=-ChuWidyUdrci/irWU01F
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: This is a digitally signed message part
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAABCgAdFiEEYQsotVz8/kXqG1Y7MRa6Xp/6aaMFAmDVKGwACgkQMRa6Xp/6
+aaO8XQ/7BncsdOw1sINDr8GaBKzEocFNtwiEgN1V7sffj4clK7ZOvheQy8yIjFr3
+mKDWLGQ68AfgVNeMnERlxyaxlFp+/rzJt1vhUdHNs/3BPY++HqcdwKVx2Ay/IHC4
+PDtYcr/9hx0UwpImqzPckVgA5q5TqGgjP6AH5POOhrmn25FEvcRoEla8BwiIutWE
+aFO00+4nFsR0t5ALbv3vH8yH0iFCIWK14Datd9iorDnU2Kghm1cNEgURjk1zU3Iq
+0AQMn54+kxpHUUBzB9iasGrund3Tcs6aVcDprV/iVcWbMkGby5jQs3yfupJAgKI8
+nA/SUQikwPnyV1i5W0CtRD4HV9PxPYiMhCM07+nMc2Q9wq/IKWXyzLwsZePwcxiS
+zLwO0s/108ULzNxDC4nrcdWXR6tNpdkxi3dwGntjsMv0e5oYpDF0Vg3Zp6XjT7js
+vRXDjZ39TUKQBupkzhQuj8z8AxOttfOKPAZIoaHBqboeTLaSFb+Ga3LRIvUU4Ohg
+0sL4AemLw6UlK13UvjCtg54Q1UD5vvCkchzpFwR9mZGa0zowNPe5AzRuCu5Ci9QN
+KRY+RrIIaArRPWfi8vSxSJJ1Avyd7XlthnJMnbq4qJtGtpPgorNeztnffo5dmuZt
+hZzwkTha5vBjVE0wm5x0g/aYjMFO6J9JmYkV4FvRjQWgChnaW60=
+=QHXq
+-----END PGP SIGNATURE-----
+
+--=-ChuWidyUdrci/irWU01F--
+
