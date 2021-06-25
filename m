@@ -2,96 +2,112 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6E4473B417F
-	for <lists+kvm@lfdr.de>; Fri, 25 Jun 2021 12:21:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 49F3A3B4190
+	for <lists+kvm@lfdr.de>; Fri, 25 Jun 2021 12:24:36 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231474AbhFYKXq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 25 Jun 2021 06:23:46 -0400
-Received: from mx0a-00069f02.pphosted.com ([205.220.165.32]:56106 "EHLO
-        mx0a-00069f02.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231433AbhFYKXp (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 25 Jun 2021 06:23:45 -0400
-Received: from pps.filterd (m0246627.ppops.net [127.0.0.1])
-        by mx0b-00069f02.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 15PAAQ20021247;
-        Fri, 25 Jun 2021 10:21:23 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=date : from : to : cc
- : subject : message-id : mime-version : content-type; s=corp-2020-01-29;
- bh=7a8ybzaKrAeCYOUXrDmQnWtnkWFb420VNKkKH/d1fjk=;
- b=sdUFCaacMV/Bqq9YOELwA0eY1gNdXXxWwaa97L+VE+rmF5b++d+yAXoNsh92yoLiOcSf
- LnRgY/GugSSqTPkWlZNpAMt9zvxn0YZ1IrAzidmny3mYw80Hs5YqqpNoPFY6xI55JKXf
- URfcSyZ/oKr4Za9Vw+jbmJ2TgfwHp4KRv9K6lLOKuhYLJvteFmas7qqVzp7c6sxmQEIR
- nvHrXvNBexmZufo0f+a8tQgoiOSBx9o2EdN97VAeKNushGDIcy/5cwyICrFnZx/ytf6L
- 2BN7fkrkewwBk+EDrXSi+vs1PEoVdybXlnmOezpYaenHI1MSMciPRVnOR+f/4HNvbTdz +w== 
-Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
-        by mx0b-00069f02.pphosted.com with ESMTP id 39d27es1ff-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 25 Jun 2021 10:21:23 +0000
-Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
-        by aserp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 15PA9lgR012235;
-        Fri, 25 Jun 2021 10:21:22 GMT
-Received: from pps.reinject (localhost [127.0.0.1])
-        by aserp3030.oracle.com with ESMTP id 39d2py08vf-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 25 Jun 2021 10:21:22 +0000
-Received: from aserp3030.oracle.com (aserp3030.oracle.com [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 15PAI0Pt036252;
-        Fri, 25 Jun 2021 10:21:22 GMT
-Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
-        by aserp3030.oracle.com with ESMTP id 39d2py08uq-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 25 Jun 2021 10:21:21 +0000
-Received: from abhmp0016.oracle.com (abhmp0016.oracle.com [141.146.116.22])
-        by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 15PALKmH020798;
-        Fri, 25 Jun 2021 10:21:20 GMT
-Received: from mwanda (/102.222.70.252)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Fri, 25 Jun 2021 03:21:20 -0700
-Date:   Fri, 25 Jun 2021 13:21:14 +0300
-From:   Dan Carpenter <dan.carpenter@oracle.com>
-To:     viremana@linux.microsoft.com
-Cc:     kvm@vger.kernel.org
-Subject: [bug report] KVM: SVM: hyper-v: Enlightened MSR-Bitmap support
-Message-ID: <YNWuGlKfZwZeN8CR@mwanda>
+        id S231398AbhFYK0y (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 25 Jun 2021 06:26:54 -0400
+Received: from smtp-fw-9102.amazon.com ([207.171.184.29]:62675 "EHLO
+        smtp-fw-9102.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229956AbhFYK0s (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 25 Jun 2021 06:26:48 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.de; i=@amazon.de; q=dns/txt; s=amazon201209;
+  t=1624616668; x=1656152668;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version;
+  bh=emG7j8fZPGMdCYAjeHFKGkXfq8HitffOpSus8mjL/7E=;
+  b=HUbyySQdeH/vG8yyP4FMVFRrFV5NeO4N3+RmWCVFFqBcHTIJlAngs1vV
+   Duirf9i14S74T4BHDsCLnnF+UxSzh3x4a8kms+1VYckOD+Tyg7MnhgaTS
+   Iutyf6zJuhaFJ/l2TBwWtW6T9U3mwqmhAk3HbCoYb3sf0GnOuaM88Mekb
+   4=;
+X-IronPort-AV: E=Sophos;i="5.83,298,1616457600"; 
+   d="scan'208";a="142145158"
+Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO email-inbound-relay-2b-859fe132.us-west-2.amazon.com) ([10.25.36.214])
+  by smtp-border-fw-9102.sea19.amazon.com with ESMTP; 25 Jun 2021 10:24:21 +0000
+Received: from EX13D28EUC003.ant.amazon.com (pdx1-ws-svc-p6-lb9-vlan2.pdx.amazon.com [10.236.137.194])
+        by email-inbound-relay-2b-859fe132.us-west-2.amazon.com (Postfix) with ESMTPS id BA5A3220122;
+        Fri, 25 Jun 2021 10:24:20 +0000 (UTC)
+Received: from uc8bbc9586ea454.ant.amazon.com (10.43.161.183) by
+ EX13D28EUC003.ant.amazon.com (10.43.164.43) with Microsoft SMTP Server (TLS)
+ id 15.0.1497.18; Fri, 25 Jun 2021 10:24:16 +0000
+From:   Siddharth Chandrasekaran <sidcha@amazon.de>
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        Marcelo Tosatti <mtosatti@redhat.com>
+CC:     Siddharth Chandrasekaran <sidcha@amazon.de>,
+        Siddharth Chandrasekaran <sidcha.dev@gmail.com>,
+        Alexander Graf <graf@amazon.com>,
+        Evgeny Iakovlev <eyakovl@amazon.de>,
+        Liran Alon <liran@amazon.com>,
+        Ioannis Aslanidis <iaslan@amazon.de>, <qemu-devel@nongnu.org>,
+        <kvm@vger.kernel.org>
+Subject: [PATCH v2 4/6] kvm/i386: Avoid multiple calls to check_extension(KVM_CAP_HYPERV)
+Date:   Fri, 25 Jun 2021 12:23:29 +0200
+Message-ID: <c11046833369b3bc006ce4fb95d9657b2d7dbad4.1624615713.git.sidcha@amazon.de>
+X-Mailer: git-send-email 2.17.1
+In-Reply-To: <cover.1624615713.git.sidcha@amazon.de>
+References: <cover.1624615713.git.sidcha@amazon.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-X-Proofpoint-GUID: GWXPBTAyiAe85JTbiMyZbZ5Vy7e2FXTl
-X-Proofpoint-ORIG-GUID: GWXPBTAyiAe85JTbiMyZbZ5Vy7e2FXTl
+Content-Type: text/plain
+X-Originating-IP: [10.43.161.183]
+X-ClientProxiedBy: EX13D05UWC004.ant.amazon.com (10.43.162.223) To
+ EX13D28EUC003.ant.amazon.com (10.43.164.43)
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hello Vineeth Pillai,
+KVM_CAP_HYPERV is a VM ioctl and can be cached at kvm_arch_init()
+instead of performing an ioctl each time in hyperv_enabled() which is
+called foreach vCPU. Apart from that, this variable will come in handy
+in a subsequent patch.
 
-This is a semi-automatic email about new static checker warnings.
+Signed-off-by: Siddharth Chandrasekaran <sidcha@amazon.de>
+---
+ target/i386/kvm/kvm.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-The patch c4327f15dfc7: "KVM: SVM: hyper-v: Enlightened MSR-Bitmap 
-support" from Jun 3, 2021, leads to the following Smatch complaint:
+diff --git a/target/i386/kvm/kvm.c b/target/i386/kvm/kvm.c
+index 03202bd06b..bcf1b4f2d0 100644
+--- a/target/i386/kvm/kvm.c
++++ b/target/i386/kvm/kvm.c
+@@ -93,6 +93,7 @@ static bool has_msr_misc_enable;
+ static bool has_msr_smbase;
+ static bool has_msr_bndcfgs;
+ static int lm_capable_kernel;
++static bool has_hyperv;
+ static bool has_msr_hv_hypercall;
+ static bool has_msr_hv_crash;
+ static bool has_msr_hv_reset;
+@@ -716,7 +717,7 @@ unsigned long kvm_arch_vcpu_id(CPUState *cs)
+ 
+ static bool hyperv_enabled(X86CPU *cpu)
+ {
+-    return kvm_check_extension(kvm_state, KVM_CAP_HYPERV) > 0 &&
++    return has_hyperv &&
+         ((cpu->hyperv_spinlock_attempts != HYPERV_SPINLOCK_NEVER_NOTIFY) ||
+          cpu->hyperv_features || cpu->hyperv_passthrough);
+ }
+@@ -2216,6 +2217,7 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
+     has_xsave = kvm_check_extension(s, KVM_CAP_XSAVE);
+     has_xcrs = kvm_check_extension(s, KVM_CAP_XCRS);
+     has_pit_state2 = kvm_check_extension(s, KVM_CAP_PIT_STATE2);
++    has_hyperv = kvm_check_extension(s, KVM_CAP_HYPERV);
+ 
+     hv_vpindex_settable = kvm_check_extension(s, KVM_CAP_HYPERV_VP_INDEX);
+ 
+-- 
+2.17.1
 
-    arch/x86/kvm/svm/svm_onhyperv.h:92 svm_hv_vmcb_dirty_nested_enlightenments()
-    warn: variable dereferenced before check 'vmcb' (see line 84)
 
-arch/x86/kvm/svm/svm_onhyperv.h
-    83		struct hv_enlightenments *hve =
-    84			(struct hv_enlightenments *)vmcb->control.reserved_sw;
-                                                    ^^^^^^^^^^^^^^^^^^^^^^^^^
-Dereferenced
 
-    85	
-    86		/*
-    87		 * vmcb can be NULL if called during early vcpu init.
-                   ^^^^^^^^^^^^^^^^
-Probably shouldn't be Dereferenced
 
-    88		 * And its okay not to mark vmcb dirty during vcpu init
-    89		 * as we mark it dirty unconditionally towards end of vcpu
-    90		 * init phase.
-    91		 */
-    92		if (vmcb && vmcb_is_clean(vmcb, VMCB_HV_NESTED_ENLIGHTENMENTS) &&
-                    ^^^^
+Amazon Development Center Germany GmbH
+Krausenstr. 38
+10117 Berlin
+Geschaeftsfuehrung: Christian Schlaeger, Jonathan Weiss
+Eingetragen am Amtsgericht Charlottenburg unter HRB 149173 B
+Sitz: Berlin
+Ust-ID: DE 289 237 879
 
-    93		    hve->hv_enlightenments_control.msr_bitmap)
-    94			vmcb_mark_dirty(vmcb, VMCB_HV_NESTED_ENLIGHTENMENTS);
 
-regards,
-dan carpenter
+
