@@ -2,38 +2,38 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 05DCE3B3F4F
-	for <lists+kvm@lfdr.de>; Fri, 25 Jun 2021 10:29:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2515E3B3FA7
+	for <lists+kvm@lfdr.de>; Fri, 25 Jun 2021 10:43:16 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230108AbhFYIby (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 25 Jun 2021 04:31:54 -0400
-Received: from Galois.linutronix.de ([193.142.43.55]:60168 "EHLO
+        id S229974AbhFYIpf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 25 Jun 2021 04:45:35 -0400
+Received: from Galois.linutronix.de ([193.142.43.55]:60236 "EHLO
         galois.linutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229839AbhFYIbx (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 25 Jun 2021 04:31:53 -0400
+        with ESMTP id S229839AbhFYIpe (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 25 Jun 2021 04:45:34 -0400
 From:   Thomas Gleixner <tglx@linutronix.de>
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020; t=1624609771;
+        s=2020; t=1624610593;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=Fn6G/qgwKubMixi1h+nQ51xRNKf4+bW+OOidmseH19Y=;
-        b=jfJwCVJ2f3aHzGfs0V3+zxEgmszn8DhAXnBfJHs8FNXfWvysxHkkykm003xaRuoHGJcpCF
-        vIKv2E59rItp+CbOkae9rFiO0r9iXQEsc6b2sw9a5ZPixR6uDkoOJgz9WQKrj4hkoyQd4y
-        d1seNB7ChiWZp5OexCg2Si7T8HSSgRthO//hI8d0Fc0k1ISwKM6iB2pu1FwKENSCGMeUM2
-        RWpcc2D2uz84IDJiISuLmYuTAXJ6/RrzQDWXakkBoTsuNshJnOsR+BVRt68Vs+tGQwLRxO
-        4SOzl/xBMqaieT/Hl6hP3NvIUeLtqy+TxxKBgOGJ42G6rQdtABDWNEwuOnDkJA==
+        bh=LmSyoyyEMIJp4af9Gw12TH4tDtwX0VdKMNAYZNcVDm4=;
+        b=AHhjaAphGowU0pTeCjnJZBJhc7RMpOXvnz7Jt+/Cir61tfBTJQHV8RmcP+0Sd4I5165grH
+        8KPyOWmPcsw8G3AGa6FJsrR/FnrWZMyDl5ug54a4N/NTgAQbCtBXH0pieKNXdhB7QKktJZ
+        RInPKgF+l4oR+s6OUsdOU2DeLmSD0l3PtWP+8vcmF+TMxxpVD2aQ4OgAsERGHXb0DwblZw
+        LhW16coCVxJuWrccmqvp4bcJSIeKjdP/P7Pt/9eTtOyxoGYiIiPrBYeILh44OtLnZDZtUL
+        g56JUPauHwhIaSE0C31xFnmZgXRsLXfDIlXNwnqClstL6soTQpkr0dsIB85o5Q==
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020e; t=1624609771;
+        s=2020e; t=1624610593;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=Fn6G/qgwKubMixi1h+nQ51xRNKf4+bW+OOidmseH19Y=;
-        b=cDGbcBEaYI4Ay7EQ5MEQt2JuWlC9e+0ZeBTseXnxTx2zEUajia4GWqeRpOQr3O66c/gSUz
-        /Gd6k0zA4jmS4DDg==
-To:     Alex Williamson <alex.williamson@redhat.com>
-Cc:     "Tian\, Kevin" <kevin.tian@intel.com>,
-        Jason Gunthorpe <jgg@nvidia.com>,
+        bh=LmSyoyyEMIJp4af9Gw12TH4tDtwX0VdKMNAYZNcVDm4=;
+        b=gHFW4IDg4490PWojrbqW+tDv1+7J+vzUU1hputd/LpqH1bHZNkjSAETMfcWItcvT6bTHPR
+        NLKzY4/iKpkbtwBA==
+To:     "Tian\, Kevin" <kevin.tian@intel.com>,
+        Alex Williamson <alex.williamson@redhat.com>
+Cc:     Jason Gunthorpe <jgg@nvidia.com>,
         "Dey\, Megha" <megha.dey@intel.com>,
         "Raj\, Ashok" <ashok.raj@intel.com>,
         "Pan\, Jacob jun" <jacob.jun.pan@intel.com>,
@@ -48,94 +48,75 @@ Cc:     "Tian\, Kevin" <kevin.tian@intel.com>,
         Peter Zijlstra <peterz@infradead.org>,
         Marc Zyngier <maz@kernel.org>,
         Bjorn Helgaas <helgaas@kernel.org>
-Subject: Re: Virtualizing MSI-X on IMS via VFIO
-In-Reply-To: <20210624154434.11809b8f.alex.williamson@redhat.com>
-References: <MWHPR11MB1886E14C57689A253D9B40C08C079@MWHPR11MB1886.namprd11.prod.outlook.com> <8735t7wazk.ffs@nanos.tec.linutronix.de> <20210624154434.11809b8f.alex.williamson@redhat.com>
-Date:   Fri, 25 Jun 2021 10:29:30 +0200
-Message-ID: <87r1gquz2t.ffs@nanos.tec.linutronix.de>
+Subject: RE: Virtualizing MSI-X on IMS via VFIO
+In-Reply-To: <BN9PR11MB5433063F826F5CEC93BCE0E38C069@BN9PR11MB5433.namprd11.prod.outlook.com>
+References: <MWHPR11MB1886E14C57689A253D9B40C08C079@MWHPR11MB1886.namprd11.prod.outlook.com> <8735t7wazk.ffs@nanos.tec.linutronix.de> <20210624154434.11809b8f.alex.williamson@redhat.com> <BN9PR11MB5433063F826F5CEC93BCE0E38C069@BN9PR11MB5433.namprd11.prod.outlook.com>
+Date:   Fri, 25 Jun 2021 10:43:13 +0200
+Message-ID: <87o8buuyfy.ffs@nanos.tec.linutronix.de>
 MIME-Version: 1.0
 Content-Type: text/plain
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Alex!
-
-On Thu, Jun 24 2021 at 15:44, Alex Williamson wrote:
-> On Thu, 24 Jun 2021 17:14:39 +0200
-> Thomas Gleixner <tglx@linutronix.de> wrote:
+On Fri, Jun 25 2021 at 05:21, Kevin Tian wrote:
+>> From: Alex Williamson <alex.williamson@redhat.com>
+>> So caching/latching occurs on unmask for MSI-X, but I can't find
+>> similar statements for MSI.  If you have, please note them.  It's
+>> possible MSI is per interrupt.
 >
->> After studying the MSI-X specification again, I think there is another
->> option to solve this for MSI-X, i.e. the dynamic sizing part:
->> 
->> MSI requires to disable MSI in order to update the number of enabled
->> vectors in the control word.
+> I checked PCI Local Bus Specification rev3.0. At that time MSI and
+> MSI-X were described/compared together in almost every paragraph 
+> in 6.8.3.4 (Per-vector Masking and Function Masking). The paragraph
+> that you cited is the last one in that section. It's a pity that MSI is
+> not clarified in this paragraph but it gives me the impression that 
+> MSI function is not permitted to cache address and data values. 
+> Later after MSI and MSI-X descriptions were split into separate 
+> sections in PCIe spec, this impression is definitely weakened a lot.
 >
-> Exactly what part of the spec requires this?  This is generally the
-> convention I expect too, and there are complications around contiguous
-> vectors and data field alignment, but I'm not actually able to find a
-> requirement in the spec that MSI Enable must be 0 when modifying other
-> writable fields or that writable fields are latched when MSI Enable is
-> set.
+> If true, this even implies that software is free to change data/addr
+> when MSI is unmasked, which is sort of counter-intuitive to most
+> people.
 
-There is nothing in the spec which mandates that, but based on
-experience I know that devices latch the number of vectors field when
-the enable bit goes from 0 to 1, which makes sense. Devices derive their
-internal interrupt routing from that.
+Yes, software is free to do that and it has to deal with the
+consequences. See arch/x86/kernel/apic/msi.c::msi_set_affinity().
 
->> which means that the function must reread the table entry when the mask
->> bit in the vector control word is cleared.
+> Then I further found below thread:
 >
-> What is a "valid" message as far as the device is concerned?  "Valid"
-> is meaningful to system software and hardware, the device doesn't
-> care.
+> https://lore.kernel.org/lkml/1468426713-31431-1-git-send-email-marc.zyngier@arm.com/
+>
+> It identified a device which does latch the message content in a
+> MSI-capable device, forcing the kernel to startup irq early before
+> enabling MSI capability.
+>
+> So, no answer and let's see whether Thomas can help identify
+> a better proof.
 
-That's correct, it uses whatever is there.
+As I said to Alex: The MSI specification is and always was blury and the
+behaviour in detail is implementation defined. IOW, what might work on
+device A is not guaranteed to work on device B.
 
-> So caching/latching occurs on unmask for MSI-X, but I can't find
-> similar statements for MSI.  If you have, please note them.  It's
-> possible MSI is per interrupt.
+> p.s. one question to Thomas. As Alex cited above, software must 
+> not modify the Address, Data, or Steering Tag fields of an MSI-X
+> entry while it is unmasked. However this rule might be violated
+> today in below flow:
+>
+> request_irq()
+>     __setup_irq()
+>         irq_startup()
+>             __irq_startup()
+>                 irq_enable()
+>                     unmask_irq() <<<<<<<<<<<<<
+>         irq_setup_affinity()
+>             irq_do_set_affinity()
+>                 msi_set_affinity() // when IR is disabled
+>                     irq_msi_update_msg()
+>                         pci_msi_domain_write_msg() <<<<<<<<<<<<<<
+>
+> Isn't above have msi-x entry updated after it's unmasked? 
 
-MSI is mostly implementation defined due to the blury specification.
-
-Also the fact that MSI masking is optional does not make it any
-better. Most devices (even new ones) do not have MSI masking.
-
-> Anyway, at least MSI-X if not also MSI could have a !NORESIZE
-> implementation, which is why this flag exists in vfio.
-
-MSI-X yes with a pretty large surgery.
-
-MSI, no way. Contrary to MSI-X you cannot just update the $N entry in
-the table because there is no table. MSI has a base message and derives
-the $Nth vector message from it by modifying the lower bits of the data
-word.
-
-So without masking updating the base message for multi-msi is close
-to impossible. Look at the dance we have to do in msi_set_affinity().
-
-But even with masking there is still the issue of the 'number of
-vectors' field and you can't set that to maximum at init time either
-because some devices derive from that how interrupts are routed and you
-surely don't want to change that behaviour while devices are active.
-
-Even if that'd be possible, then we'd need to allocate the full IRTE
-space, which would be just another corner case and require extra
-handling.
-
-MSI is a badly specified trainwreck and we already have enough horrible
-code dealing with it. No need to add more of that which is going to
-cause more problems than it solves.
-
-The sad thing is that despite the fact that the problems of MSI are
-known for more than a decade MSI is still widely used in new silicon
-and most of the time even without masking.
-
-> Anyway, at least MSI-X if not also MSI could have a !NORESIZE
-> implementation, which is why this flag exists in vfio.
-
-Right, it's there to be ignored for MSI-X in the current implementation
-of QEMU and VFIO/PCI.
+Dammit, I could swear that we had masking at the core or PCI level at
+some point. Let me dig into this.
 
 Thanks,
 
