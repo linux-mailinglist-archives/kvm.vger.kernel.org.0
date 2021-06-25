@@ -2,76 +2,135 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 88B303B4609
-	for <lists+kvm@lfdr.de>; Fri, 25 Jun 2021 16:47:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 455843B4619
+	for <lists+kvm@lfdr.de>; Fri, 25 Jun 2021 16:49:02 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231283AbhFYOtz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 25 Jun 2021 10:49:55 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:57832 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229653AbhFYOtz (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 25 Jun 2021 10:49:55 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1624632454;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=HetBqryaCtuqSOesjWS+ekhM/U9bvM+uJkprgmLod24=;
-        b=M9crMfgjbo+SNNMakY57W5y7E3Jks0jyYNHCGnyYr8iK78LIEvOicfTnSDXFgXVXIor+h0
-        uaXiI6wRt9fLRp/rpdY8fPerw6VxDz0PmZFlx8Ib93Ux5e9LF5IsBGbUzlGi+iNVbj/SeY
-        QV9tKhWKH2X6yY+tSzk/Hp1yCQEa5NY=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-311-MKuWO-NCMtCw5hL63jBO9A-1; Fri, 25 Jun 2021 10:47:32 -0400
-X-MC-Unique: MKuWO-NCMtCw5hL63jBO9A-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        id S231810AbhFYOvU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 25 Jun 2021 10:51:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33680 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229940AbhFYOvU (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 25 Jun 2021 10:51:20 -0400
+Received: from mail.skyhub.de (mail.skyhub.de [IPv6:2a01:4f8:190:11c2::b:1457])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5A4BBC061574;
+        Fri, 25 Jun 2021 07:48:59 -0700 (PDT)
+Received: from zn.tnic (p200300ec2f0dae0049fb297996de39ad.dip0.t-ipconnect.de [IPv6:2003:ec:2f0d:ae00:49fb:2979:96de:39ad])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 32DDB804140;
-        Fri, 25 Jun 2021 14:47:31 +0000 (UTC)
-Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id D407E5D6A8;
-        Fri, 25 Jun 2021 14:47:30 +0000 (UTC)
-From:   Paolo Bonzini <pbonzini@redhat.com>
-To:     torvalds@linux-foundation.org
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Subject: [GIT PULL] Final batch of KVM changes for Linux 5.13
-Date:   Fri, 25 Jun 2021 10:47:30 -0400
-Message-Id: <20210625144730.32703-1-pbonzini@redhat.com>
+        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id C72C91EC0595;
+        Fri, 25 Jun 2021 16:48:57 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
+        t=1624632537;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
+        bh=ENHDjrvHsrLVlBAdGgAmMkR2KuwDaPAvXCPilbbBf7A=;
+        b=LSXOwsdhUEbhG7vaRlM3tlHXlIL2v/KBN+RiZWsEAiLf8BjJ9w+dKv3EgevZlFNctBQ91L
+        kihWVCGWyB74ZmIbVG0UFqLQZu5TOOgdIAz2KLjcURGT5bgtWTYQC9esnD34CSJRSM4rZm
+        Ez3S06oseaAAUrkfLls9v8mOe0j+Sqk=
+Date:   Fri, 25 Jun 2021 16:48:53 +0200
+From:   Borislav Petkov <bp@alien8.de>
+To:     Michael Roth <michael.roth@amd.com>
+Cc:     "Kuppuswamy, Sathyanarayanan" 
+        <sathyanarayanan.kuppuswamy@linux.intel.com>,
+        Dave Hansen <dave.hansen@intel.com>,
+        Brijesh Singh <brijesh.singh@amd.com>, x86@kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
+        linux-coco@lists.linux.dev, linux-mm@kvack.org,
+        linux-crypto@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        David Rientjes <rientjes@google.com>, tony.luck@intel.com,
+        npmccallum@redhat.com
+Subject: Re: [PATCH Part1 RFC v3 20/22] x86/boot: Add Confidential Computing
+ address to setup_header
+Message-ID: <YNXs1XRu31dFiR2Z@zn.tnic>
+References: <YMw4UZn6AujpPSZO@zn.tnic>
+ <15568c80-c9a9-5602-d940-264af87bed98@amd.com>
+ <YMy2OGwsRzrR5bwD@zn.tnic>
+ <162442264313.98837.16983159316116149849@amd.com>
+ <YNMLX6fbB3PQwSpv@zn.tnic>
+ <20210624031911.eznpkbgjt4e445xj@amd.com>
+ <YNQz7ZxEaSWjcjO2@zn.tnic>
+ <20210624123447.zbfkohbtdusey66w@amd.com>
+ <YNSAlJnXMjigpqu1@zn.tnic>
+ <20210624141111.pzvb6gk5lzfelx26@amd.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20210624141111.pzvb6gk5lzfelx26@amd.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Linus,
+On Thu, Jun 24, 2021 at 09:11:11AM -0500, Michael Roth wrote:
+>   We don't need anything in setup_data/setup_header. We can access the
+>   CC blob table via EFI config table. However, parsing EFI config table
+>   early in uncompressed/proper kernel has the complications I mentioned in my
+>   initial response.
 
-The following changes since commit 13311e74253fe64329390df80bed3f07314ddd61:
+So since you want to parse the EFI table in the boot stage, that tells
+me that you need the blob in the early, boot kernel too, correct?
 
-  Linux 5.13-rc7 (2021-06-20 15:03:15 -0700)
+> This is where using a new boot_params field comes into
+>   play (similar to acpi_rsdp_addr), so boot/compressed can pass
+>   uncompressed/proper kernel a pointer to the pre-parsed CC blob so it doesn't
+>   need to re-parse EFI config table during early boot.
 
-are available in the Git repository at:
+Ack.
 
-  https://git.kernel.org/pub/scm/virt/kvm/kvm.git tags/for-linus-urgent
+> For non-EFI case:
+> 
+>   We need a "proper" mechanism that bootloaders can use. My
+>   understanding is this would generally be via setup_data or
+>   setup_header, and that a direct boot_params field would be frowned
+>   upon.
 
-for you to fetch changes up to f8be156be163a052a067306417cd0ff679068c97:
+So, you need to pass only an address, right?
 
-  KVM: do not allow mapping valid but non-reference-counted pages (2021-06-24 11:55:11 -0400)
+How workable would it be if you had a cmdline option:
 
-----------------------------------------------------------------
-A selftests fix for ARM, and the fix for page reference count underflow.
-This is a very small fix that was provided by Nick Piggin and tested
-by myself.
+	cc_blob_address=0xb1a
 
-----------------------------------------------------------------
-Nicholas Piggin (1):
-      KVM: do not allow mapping valid but non-reference-counted pages
+with which you tell the kernel where that thing is?
 
-Zenghui Yu (1):
-      KVM: selftests: Fix mapping length truncation in m{,un}map()
+Because then you can use this in both cases - EFI and !EFI.
 
- tools/testing/selftests/kvm/set_memory_region_test.c |  4 ++--
- virt/kvm/kvm_main.c                                  | 19 +++++++++++++++++--
- 2 files changed, 19 insertions(+), 4 deletions(-)
+Or is this blob platform-dependent and the EFI table contains it and
+something needs to get it out of there, even if it were a user to
+type in the cmdline cc_blob_address or some script when it comes to
+containers...?
 
+In any case, setup_data is kinda the generic way to pass arbitrary data
+to the kernel so in this case, you can prioritize the EFI table in the
+EFI case and fall back to setup_data if there's no EFI table...
+
+> So your understanding of the situation seems correct.
+> 
+> By bringing up the non-EFI case I only meant to point out that by using a
+> field in setup_header, we could re-use that field for the EFI case as well,
+> and wouldn't need a seperate boot_params field to handle the
+> boot/compressed->uncompressed passing of the pre-parsed CC blob address
+> in the EFI case. But I don't think it makes a big difference as far as
+> my stuff goes at least. Maybe for TDX though this needs more thought.
+
+Yah, let's see what requirements they'd come back with.
+
+Thx.
+
+-- 
+Regards/Gruss,
+    Boris.
+
+https://people.kernel.org/tglx/notes-about-netiquette
