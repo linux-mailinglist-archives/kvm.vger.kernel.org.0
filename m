@@ -2,131 +2,212 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3D6C23B3C37
-	for <lists+kvm@lfdr.de>; Fri, 25 Jun 2021 07:24:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1EAE73B3D68
+	for <lists+kvm@lfdr.de>; Fri, 25 Jun 2021 09:32:02 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233148AbhFYF0g (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 25 Jun 2021 01:26:36 -0400
-Received: from bilbo.ozlabs.org ([203.11.71.1]:55485 "EHLO ozlabs.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S233133AbhFYF0f (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 25 Jun 2021 01:26:35 -0400
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-        (No client certificate requested)
-        by mail.ozlabs.org (Postfix) with ESMTPSA id 4GB55n6sXKz9sT6;
-        Fri, 25 Jun 2021 15:24:13 +1000 (AEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=canb.auug.org.au;
-        s=201702; t=1624598654;
-        bh=Zp3z90qF7a58nx5/paNfizx5wb5txzLsiWbTxfjPssc=;
-        h=Date:From:To:Cc:Subject:From;
-        b=iFavLbji2HMdUGx1o3Fmi0LENvDUQFTJHzwBrUVG9KT4Cf8vQjQmCrZJnzLpc0DBX
-         zW3pKzxBBAx3arBQAegX+om1ld+FYA1Y/z4X/tjMAOa5WdLjDXa+ZE4DHEku0Mvoqv
-         9qwyv1KX+UUBmJVdHa+Y6H7Hrv4oux0EtInM8ZOUbNgPmLl8odSuxV0feW4JEakkp1
-         UhPKCyqJXOg+B4uUc5hn4iOdb8VcQPQO+BRplt19GZucDLuX9ALYBKTuUWk2vCARLm
-         ffEGXxwnpYETBapWnBCgVijhIGbBYAPnVGMs1OouQQAhx4GkEykDZlmj4zNvjNMOGT
-         WKERZ0w2Rq2+A==
-Date:   Fri, 25 Jun 2021 15:24:12 +1000
-From:   Stephen Rothwell <sfr@canb.auug.org.au>
-To:     Christoffer Dall <cdall@cs.columbia.edu>,
-        Marc Zyngier <maz@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>, KVM <kvm@vger.kernel.org>
-Cc:     Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Linux Next Mailing List <linux-next@vger.kernel.org>,
-        Ricardo Koller <ricarkol@google.com>,
-        Sean Christopherson <seanjc@google.com>
-Subject: linux-next: manual merge of the kvm-arm tree with the kvm tree
-Message-ID: <20210625152412.11924d50@canb.auug.org.au>
+        id S229878AbhFYHeU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 25 Jun 2021 03:34:20 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:63048 "EHLO
+        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229616AbhFYHeU (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 25 Jun 2021 03:34:20 -0400
+Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 15P7Dxh5155164;
+        Fri, 25 Jun 2021 03:31:59 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=to : cc : references :
+ from : subject : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=IDse4mlKn3O1DilpW8Yn7wclC4QtKt4xUL+IMX9o84o=;
+ b=VbZ6bJcyRyNUFKFZrxMKcMv6J/ifpKyEr2vkhZLPVXMGvhStAL/m4kEIpf35SUlyXCyP
+ D92ERaJTymWGjwqNOkQSdnR9ihTJSsp2f+IW2RKXOu0TddunOP6mpSCvdt5vqGSNrL2Z
+ XaqBmoMz5Pqu5D0ANjN5u3f6OCUOD+9Mx6QZvFBOa0jlX6h8xKGsPLL2a/qpuVwvfzvm
+ KlLffMuO/dKBzMMo4FWk5SM9+upEgLMGSqqhFfI4HTGFz3T5piaf3eKVOXMQ8gA8P3wm
+ quzxHgJ3dy5H3pr/ulpCY36xgeRTLhFvAQX5qRM7fdw6FVf29QaByPFU/JRWkyuNfCAG Gg== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 39daju0kb2-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 25 Jun 2021 03:31:59 -0400
+Received: from m0098421.ppops.net (m0098421.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 15P7Ofwm002980;
+        Fri, 25 Jun 2021 03:31:59 -0400
+Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 39daju0kah-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 25 Jun 2021 03:31:58 -0400
+Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
+        by ppma06ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 15P6wMel013434;
+        Fri, 25 Jun 2021 07:04:09 GMT
+Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
+        by ppma06ams.nl.ibm.com with ESMTP id 3997uhavje-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 25 Jun 2021 07:04:09 +0000
+Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
+        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 15P746JN29032784
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 25 Jun 2021 07:04:06 GMT
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 641534C05A;
+        Fri, 25 Jun 2021 07:04:06 +0000 (GMT)
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 037024C058;
+        Fri, 25 Jun 2021 07:04:06 +0000 (GMT)
+Received: from localhost.localdomain (unknown [9.145.46.136])
+        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Fri, 25 Jun 2021 07:04:05 +0000 (GMT)
+To:     Thomas Huth <thuth@redhat.com>, kvm@vger.kernel.org
+Cc:     linux-s390@vger.kernel.org, imbrenda@linux.ibm.com,
+        david@redhat.com, cohuck@redhat.com, seiden@linux.ibm.com
+References: <20210624120152.344009-1-frankja@linux.ibm.com>
+ <20210624120152.344009-2-frankja@linux.ibm.com>
+ <cd6d6ff0-82f1-269f-f826-56000431c5fb@redhat.com>
+From:   Janosch Frank <frankja@linux.ibm.com>
+Subject: Re: [PATCH 1/3] s390x: snippets: Add gitignore as well as linker
+ script and start assembly
+Message-ID: <e0f1610e-efb9-e702-b45f-29f50bdf6a9e@linux.ibm.com>
+Date:   Fri, 25 Jun 2021 09:04:05 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.10.1
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/id3G_mYGCmp0nVq7PpI6QaM";
- protocol="application/pgp-signature"; micalg=pgp-sha256
+In-Reply-To: <cd6d6ff0-82f1-269f-f826-56000431c5fb@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: qK_VHfVh9wTsmIDde4nxOI2Hf1dg1xGZ
+X-Proofpoint-ORIG-GUID: jJ6bq0u2XFy1JZjvBULY6wZdQmD95z6Y
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.790
+ definitions=2021-06-25_02:2021-06-24,2021-06-25 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0
+ lowpriorityscore=0 spamscore=0 clxscore=1015 adultscore=0 phishscore=0
+ mlxlogscore=999 malwarescore=0 priorityscore=1501 bulkscore=0
+ suspectscore=0 mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2104190000 definitions=main-2106250040
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
---Sig_/id3G_mYGCmp0nVq7PpI6QaM
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+On 6/24/21 5:49 PM, Thomas Huth wrote:
+> On 24/06/2021 14.01, Janosch Frank wrote:
+>> Snippets are small guests That can be run under a unit test as the
+>> hypervisor. They can be written in C or assembly. The C code needs a
+>> linker script and a start assembly file that jumps to main to work
+>> properly. So let's add that as well as a gitignore entry for the new
+>> files.
+>>
+>> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+>> ---
+>>   .gitignore                |  1 +
+>>   s390x/snippets/c/cstart.S | 15 ++++++++++++
+>>   s390x/snippets/c/flat.lds | 51 +++++++++++++++++++++++++++++++++++++++
+>>   3 files changed, 67 insertions(+)
+>>   create mode 100644 s390x/snippets/c/cstart.S
+>>   create mode 100644 s390x/snippets/c/flat.lds
+>>
+>> diff --git a/.gitignore b/.gitignore
+>> index 8534fb7..b3cf2cb 100644
+>> --- a/.gitignore
+>> +++ b/.gitignore
+>> @@ -23,3 +23,4 @@ cscope.*
+>>   /api/dirty-log
+>>   /api/dirty-log-perf
+>>   /s390x/*.bin
+>> +/s390x/snippets/*/*.gbin
+>> diff --git a/s390x/snippets/c/cstart.S b/s390x/snippets/c/cstart.S
+>> new file mode 100644
+>> index 0000000..d7f6525
+>> --- /dev/null
+>> +++ b/s390x/snippets/c/cstart.S
+>> @@ -0,0 +1,15 @@
+>> +#include <asm/sigp.h>
+>> +
+>> +.section .init
+>> +	.globl start
+>> +start:
+>> +	/* XOR all registers with themselves to clear them fully. */
+>> +	.irp i, 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15
+>> +	xgr \i,\i
+>> +	.endr
+>> +	/* 0x3000 is the stack page for now */
+>> +	lghi	%r15, 0x4000 - 160
+>> +	brasl	%r14, main
+>> +	/* For now let's only use cpu 0 in snippets so this will always work. */
+>> +	xgr	%r0, %r0
+>> +	sigp    %r2, %r0, SIGP_STOP
+>> diff --git a/s390x/snippets/c/flat.lds b/s390x/snippets/c/flat.lds
+>> new file mode 100644
+>> index 0000000..5e70732
+>> --- /dev/null
+>> +++ b/s390x/snippets/c/flat.lds
+>> @@ -0,0 +1,51 @@
+>> +SECTIONS
+>> +{
+>> +	.lowcore : {
+>> +		/*
+>> +		 * Initial short psw for disk boot, with 31 bit addressing for
+>> +		 * non z/Arch environment compatibility and the instruction
+>> +		 * address 0x10000 (cstart64.S .init).
+> 
+> I think this comment needs some adjustments (0x10000 => 0x4000 and do not 
+> talk about cstart64.S)?
 
-Hi all,
+Right, will do
 
-Today's linux-next merge of the kvm-arm tree got a conflict in:
+> 
+> Also, what about switching to 64-bit mode in the snippets?
 
-  tools/testing/selftests/kvm/include/x86_64/processor.h
+I thought about that for some time a while ago.
+It's not really necessary since the host test can also decide which
+guest PSW is used to start the snippet but it also doesn't hurt so I
+just added a sam64.
 
-between commit:
+> 
+>   Thomas
+> 
+> 
+>> +		 */
+>> +		. = 0;
+>> +		 LONG(0x00080000)
+>> +		 LONG(0x80004000)
+>> +		 /* Restart new PSW for booting via PSW restart. */
+>> +		 . = 0x1a0;
+>> +		 QUAD(0x0000000180000000)
+>> +		 QUAD(0x0000000000004000)
+>> +	}
+>> +	. = 0x4000;
+>> +	.text : {
+>> +		*(.init)
+>> +		*(.text)
+>> +		*(.text.*)
+>> +	}
+>> +	. = ALIGN(64K);
+>> +	etext = .;
+>> +	.opd : { *(.opd) }
+>> +	. = ALIGN(16);
+>> +	.dynamic : {
+>> +		dynamic_start = .;
+>> +		*(.dynamic)
+>> +	}
+>> +	.dynsym : {
+>> +		dynsym_start = .;
+>> +		*(.dynsym)
+>> +	}
+>> +	.rela.dyn : { *(.rela*) }
+>> +	. = ALIGN(16);
+>> +	.data : {
+>> +		*(.data)
+>> +		*(.data.rel*)
+>> +	}
+>> +	. = ALIGN(16);
+>> +	.rodata : { *(.rodata) *(.rodata.*) }
+>> +	. = ALIGN(16);
+>> +	__bss_start = .;
+>> +	.bss : { *(.bss) }
+>> +	__bss_end = .;
+>> +	. = ALIGN(64K);
+>> +	edata = .;
+>> +	. += 64K;
+>> +	. = ALIGN(64K);
+>> +}
+>>
+> 
 
-  ef6a74b2e55e ("KVM: sefltests: Add x86-64 test to verify MMU reacts to CP=
-UID updates")
-
-from the kvm tree and commit:
-
-  75275d7fbef4 ("KVM: selftests: Introduce UCALL_UNHANDLED for unhandled ve=
-ctor reporting")
-
-from the kvm-arm tree.
-
-I fixed it up (see below) and can carry the fix as necessary. This
-is now fixed as far as linux-next is concerned, but any non trivial
-conflicts should be mentioned to your upstream maintainer when your tree
-is submitted for merging.  You may also want to consider cooperating
-with the maintainer of the conflicting tree to minimise any particularly
-complex conflicts.
-
---=20
-Cheers,
-Stephen Rothwell
-
-diff --cc tools/testing/selftests/kvm/include/x86_64/processor.h
-index 6d27a5435971,92a62c6999bc..000000000000
---- a/tools/testing/selftests/kvm/include/x86_64/processor.h
-+++ b/tools/testing/selftests/kvm/include/x86_64/processor.h
-@@@ -55,11 -53,6 +55,9 @@@
-  #define CPUID_PKU		(1ul << 3)
-  #define CPUID_LA57		(1ul << 16)
- =20
- +/* CPUID.0x8000_0001.EDX */
- +#define CPUID_GBPAGES		(1ul << 26)
- +
-- #define UNEXPECTED_VECTOR_PORT 0xfff0u
--=20
-  /* General Registers in 64-Bit Mode */
-  struct gpr64_regs {
-  	u64 rax;
-@@@ -396,13 -389,9 +394,13 @@@ struct ex_regs=20
- =20
-  void vm_init_descriptor_tables(struct kvm_vm *vm);
-  void vcpu_init_descriptor_tables(struct kvm_vm *vm, uint32_t vcpuid);
-- void vm_handle_exception(struct kvm_vm *vm, int vector,
-+ void vm_install_exception_handler(struct kvm_vm *vm, int vector,
-  			void (*handler)(struct ex_regs *));
- =20
- +uint64_t vm_get_page_table_entry(struct kvm_vm *vm, int vcpuid, uint64_t =
-vaddr);
- +void vm_set_page_table_entry(struct kvm_vm *vm, int vcpuid, uint64_t vadd=
-r,
- +			     uint64_t pte);
- +
-  /*
-   * set_cpuid() - overwrites a matching cpuid entry with the provided valu=
-e.
-   *		 matches based on ent->function && ent->index. returns true
-
---Sig_/id3G_mYGCmp0nVq7PpI6QaM
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmDVaHwACgkQAVBC80lX
-0GxwGggAj9aYiCGLhKwt4HasTRtwkzwInvP6BK5UfFN9u6/Oaez+JrJFeOU7c7Kg
-oc/8TRjI+XcCtmmRewZkNOM9zVIJL9FgES3cMPFOkdPEN1HptZ47arXH71dwAm2k
-jgZ/ixUjNdEEvGdXEI4j+Pk6YER53QDYyfP+Qaymhf1GibgVK2l78BYqP0E4WYlL
-wLE0+5PjWNgypW9eqjXywwwTuErHtVOno9XFt7YR95FtZcToKIahegOBTg1BvlZV
-bn3QQGoht8djJbEn4h5qPrjyzl+1lCPVPZaBNQemR+dvEjHBT6N1O8r3mpnKgbqz
-yPruy2RcfCi34kQNFBbcUiTRTiyAog==
-=WHdn
------END PGP SIGNATURE-----
-
---Sig_/id3G_mYGCmp0nVq7PpI6QaM--
