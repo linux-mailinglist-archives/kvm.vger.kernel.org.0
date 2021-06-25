@@ -2,106 +2,93 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A06003B3A46
-	for <lists+kvm@lfdr.de>; Fri, 25 Jun 2021 02:57:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 805FA3B3AB3
+	for <lists+kvm@lfdr.de>; Fri, 25 Jun 2021 04:04:02 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232922AbhFYA72 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 24 Jun 2021 20:59:28 -0400
-Received: from smtp.bonedaddy.net ([45.33.94.42]:40130 "EHLO
-        smtp.bonedaddy.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229521AbhFYA71 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 24 Jun 2021 20:59:27 -0400
-X-Greylist: delayed 354 seconds by postgrey-1.27 at vger.kernel.org; Thu, 24 Jun 2021 20:59:27 EDT
-Received: from [192.168.1.209] (n175-38-129-149.per2.wa.optusnet.com.au [175.38.129.149])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange ECDHE (P-256) server-signature RSA-PSS (2048 bits) server-digest SHA256)
-        (No client certificate requested)
-        (Authenticated sender: pabs3@bonedaddy.net)
-        by smtp.bonedaddy.net (Postfix) with ESMTPSA id ED574180045;
-        Thu, 24 Jun 2021 20:51:59 -0400 (EDT)
-Authentication-Results: smtp.bonedaddy.net; dmarc=fail (p=none dis=none) header.from=bonedaddy.net
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bonedaddy.net;
-        s=mail; t=1624582325;
-        bh=zXuCZMd9zz98b+NCH+tpPpN/tUHyuBhG6l57d8TmYeQ=;
-        h=Subject:From:To:Cc:In-Reply-To:References:Date;
-        b=oG5DKZJw6f4PiGCpuQDdwTx31bY6q34/dz4Jk86xbEFgZ844cWjggZkd1i9v7B2Hz
-         xQ+j4olt+FJeQwuGpvDkPPqGDVEFKrEV4uAikMiR5wCzSzuh8zTRq+j8JmzQIeyjcD
-         +B566Ayg2nh5TG9bfGw4NwCc/mkMRIch8nuTLzdytu6Ui7FU9T0KxTOaBDdCLrHrge
-         WQbmx7Km/FbS/7+0PSDLMNHaV7lfiHKqxSmXsdce3d0eGGq+zrLc/IuMynyHFzsYgr
-         J9DFgzQ0jV6HJk+uXz+/+e9ZFVo2+DWh+XZlGthobUCnKrTvpQhKKCN5ykJLmUNexb
-         f+Pts58pqb5iA==
-Message-ID: <466172bd9e2e3e223685ea3fa11cb1f990113e6e.camel@bonedaddy.net>
-Subject: Re: [PATCH 0/6] sched,delayacct: Some cleanups
-From:   Paul Wise <pabs3@bonedaddy.net>
-To:     Mel Gorman <mgorman@suse.de>, Balbir Singh <bsingharora@gmail.com>
-Cc:     Peter Zijlstra <peterz@infradead.org>, tglx@linutronix.de,
-        mingo@kernel.org, juri.lelli@redhat.com,
-        vincent.guittot@linaro.org, dietmar.eggemann@arm.com,
-        rostedt@goodmis.org, bsegall@google.com, bristot@redhat.com,
-        pbonzini@redhat.com, maz@kernel.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, riel@surriel.com, hannes@cmpxchg.org
-In-Reply-To: <20210512113419.GF3672@suse.de>
-References: <20210505105940.190490250@infradead.org>
-         <20210505222940.GA4236@balbir-desktop>
-         <YJOzUAg30LZWSHcI@hirez.programming.kicks-ass.net>
-         <20210507123810.GB4236@balbir-desktop> <20210512113419.GF3672@suse.de>
-Content-Type: multipart/signed; micalg="pgp-sha512";
-        protocol="application/pgp-signature"; boundary="=-ChuWidyUdrci/irWU01F"
-Date:   Fri, 25 Jun 2021 08:50:55 +0800
-MIME-Version: 1.0
-User-Agent: Evolution 3.40.2-1 
+        id S233030AbhFYCGU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 24 Jun 2021 22:06:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59726 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S233018AbhFYCGT (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 24 Jun 2021 22:06:19 -0400
+Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BD44CC061574
+        for <kvm@vger.kernel.org>; Thu, 24 Jun 2021 19:03:58 -0700 (PDT)
+Received: by mail-yb1-xb49.google.com with SMTP id j7-20020a258b870000b029052360b1e3e2so2097719ybl.8
+        for <kvm@vger.kernel.org>; Thu, 24 Jun 2021 19:03:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=reply-to:date:message-id:mime-version:subject:from:to:cc;
+        bh=xQRDM6/J2D4eDADoGmWzKeEbXMNF9GLnRB8eAq3RHPE=;
+        b=U5LvPm3bp1NKN6H3GMMQT9XJ0K6wZ3vwy+JMC7eEyamYwnI68QEd1BhYqcDd1vrSYn
+         b64fVO7ofcgGi5UUoSGZn1wSkljmXULS20gnLAANmN2yldn/LZQV+XcIXLw8+262sQaP
+         FUsoMpGgfFHIomPsTeJtOmT+cLHsyyS+fARVocczVg4m8qoRmeBYytRIVp/vM4h0It8y
+         TG2lzpnXKyLuQrTz8Wl2M0jSBDjhgCyFc1tQDq/vA171D0oQYBhokkeQk4RY19szjvnn
+         4uOj6BUqJHNe5NsFE3ZQVhlzBz3D/ZOrXNXCJiJbRMkuHHOOq0D+IU63e20QVApilkFT
+         w7jw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:reply-to:date:message-id:mime-version:subject
+         :from:to:cc;
+        bh=xQRDM6/J2D4eDADoGmWzKeEbXMNF9GLnRB8eAq3RHPE=;
+        b=prZ69RBhZdSz/jRHL01kHERAuIHlXU+ut0MtHnKTePs9lRBEybP4AF54kLtSAgtzXk
+         nSN24Ew+m9eVsKCMgCOU69BQ1FmBeCm7wLYe6Ic1I1eLkodJe4xkYaU7FTeh/i76zS09
+         83dcXsrh5PHliY0zp5sqLQpJ5xhZDa6xfRs5mltqztm4xXxaTPLagai29DCuC28BKbTV
+         77olLfnt3J1tkGTN0P8sHaYDu6rXdj4CiYxF28Pp7uXqyFuj3fjTSWPrq8ipkSD7SKl1
+         CruXgcFCpJFKLt95fBzToyFc+yJBxLM1ErUjQMkc4l+CelEvcLzWo+ypntdK/9PQPLM5
+         bJhA==
+X-Gm-Message-State: AOAM533iPXhx2m4gYHTJyDMqUKeecuFhIr93MoyAPSeV97ruOBhWU9K6
+        8oSl0sImQNOPAcTAkuxPwpnmi3aPTb0=
+X-Google-Smtp-Source: ABdhPJy/Gqwyphk/X48gqsBM/guV09WcDi/cUCG5i7HMh91SdRbyKlGX41wot4Btfr5RxqYWpPYutt0F5/4=
+X-Received: from seanjc798194.pdx.corp.google.com ([2620:15c:f:10:7c83:7704:b3b6:754c])
+ (user=seanjc job=sendgmr) by 2002:a25:2612:: with SMTP id m18mr5009365ybm.183.1624586637944;
+ Thu, 24 Jun 2021 19:03:57 -0700 (PDT)
+Reply-To: Sean Christopherson <seanjc@google.com>
+Date:   Thu, 24 Jun 2021 19:03:52 -0700
+Message-Id: <20210625020354.431829-1-seanjc@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.32.0.93.g670b81a890-goog
+Subject: [PATCH 0/2] KVM: SVM: Final C-bit fixes?
+From:   Sean Christopherson <seanjc@google.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Peter Gonda <pgonda@google.com>,
+        Brijesh Singh <brijesh.singh@amd.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Patch 01 reverts the C-bit truncation patch as the reserved #PF was
+confirmed to be due to a magic HyperTransport region (how many magic
+addresses are there!?!).  Hopefully the original patch simply be dropped,
+but just in case...
 
---=-ChuWidyUdrci/irWU01F
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Patch 02 reverts the C-bit clearing in the #NPF handler.  If that somehow
+turns out to be incorrect, i.e. there are flows where the CPU doesn't
+mask off the C-bit, then it can be conditional on a SEV guest.
 
-On Wed, 2021-05-12 at 12:34 +0100, Mel Gorman wrote:
+I'll be offline for the next two weeks, fingers crossed I've undone all
+the damage.  :-)
 
-> Alternatively, I've added Paul Wise to the cc who is the latest
-> committer to iotop.=C2=A0 Maybe he knows who could add/commit a check for
-> sysctl.sched_delayacct and if it exists then check if it's 1 and display
-> an error suggesting corrective action (add delayacct to the kernel comman=
-d
-> line or sysctl sched.sched_delayacct=3D1). iotop appears to be in mainten=
-ance
-> mode but gets occasional commits even if it has not had a new version
-> since 2013 so maybe it could get a 0.7 tag if such a check was added.
+Thanks!
 
-Did the proposed changes get merged?
+Sean Christopherson (2):
+  Revert "KVM: x86: Truncate reported guest MAXPHYADDR to C-bit if SEV
+    is supported"
+  KVM: SVM: Revert clearing of C-bit on GPA in #NPF handler
 
-If so, please let me know the details of what needs to happen in iotop
-and iotop-c to cope with the changes in the Linux kernel.
+ arch/x86/kvm/cpuid.c   | 11 -----------
+ arch/x86/kvm/svm/svm.c | 39 +++++++++------------------------------
+ arch/x86/kvm/x86.c     |  3 ---
+ arch/x86/kvm/x86.h     |  1 -
+ 4 files changed, 9 insertions(+), 45 deletions(-)
 
---=20
-bye,
-pabs
-
-https://bonedaddy.net/pabs3/
-
---=-ChuWidyUdrci/irWU01F
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: This is a digitally signed message part
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAABCgAdFiEEYQsotVz8/kXqG1Y7MRa6Xp/6aaMFAmDVKGwACgkQMRa6Xp/6
-aaO8XQ/7BncsdOw1sINDr8GaBKzEocFNtwiEgN1V7sffj4clK7ZOvheQy8yIjFr3
-mKDWLGQ68AfgVNeMnERlxyaxlFp+/rzJt1vhUdHNs/3BPY++HqcdwKVx2Ay/IHC4
-PDtYcr/9hx0UwpImqzPckVgA5q5TqGgjP6AH5POOhrmn25FEvcRoEla8BwiIutWE
-aFO00+4nFsR0t5ALbv3vH8yH0iFCIWK14Datd9iorDnU2Kghm1cNEgURjk1zU3Iq
-0AQMn54+kxpHUUBzB9iasGrund3Tcs6aVcDprV/iVcWbMkGby5jQs3yfupJAgKI8
-nA/SUQikwPnyV1i5W0CtRD4HV9PxPYiMhCM07+nMc2Q9wq/IKWXyzLwsZePwcxiS
-zLwO0s/108ULzNxDC4nrcdWXR6tNpdkxi3dwGntjsMv0e5oYpDF0Vg3Zp6XjT7js
-vRXDjZ39TUKQBupkzhQuj8z8AxOttfOKPAZIoaHBqboeTLaSFb+Ga3LRIvUU4Ohg
-0sL4AemLw6UlK13UvjCtg54Q1UD5vvCkchzpFwR9mZGa0zowNPe5AzRuCu5Ci9QN
-KRY+RrIIaArRPWfi8vSxSJJ1Avyd7XlthnJMnbq4qJtGtpPgorNeztnffo5dmuZt
-hZzwkTha5vBjVE0wm5x0g/aYjMFO6J9JmYkV4FvRjQWgChnaW60=
-=QHXq
------END PGP SIGNATURE-----
-
---=-ChuWidyUdrci/irWU01F--
+-- 
+2.32.0.93.g670b81a890-goog
 
