@@ -2,171 +2,485 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 59AE13B3B76
-	for <lists+kvm@lfdr.de>; Fri, 25 Jun 2021 06:19:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 865AB3B3C06
+	for <lists+kvm@lfdr.de>; Fri, 25 Jun 2021 07:15:19 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230418AbhFYEVt (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 25 Jun 2021 00:21:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32830 "EHLO
+        id S230359AbhFYFRi (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 25 Jun 2021 01:17:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45128 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230282AbhFYEVs (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 25 Jun 2021 00:21:48 -0400
-Received: from mail-ej1-x62a.google.com (mail-ej1-x62a.google.com [IPv6:2a00:1450:4864:20::62a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 652CBC061574
-        for <kvm@vger.kernel.org>; Thu, 24 Jun 2021 21:19:27 -0700 (PDT)
-Received: by mail-ej1-x62a.google.com with SMTP id nb6so12970109ejc.10
-        for <kvm@vger.kernel.org>; Thu, 24 Jun 2021 21:19:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance-com.20150623.gappssmtp.com; s=20150623;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=q34vFqngnB3t5A6Nz3+eYIAGYGv8OAQnO0GJ9ith6+k=;
-        b=YyvepM16teRAmW69CrgpPvH41Kv8BofJj0cnZwPg1pUt8Kynigzda5WiVGgo+EUKSl
-         MmN7Bs8/AinjxpLcVb8drAzPGwoEC/8SqEctQaOrgknExBKqugTu3nDd7XqY74F2MnUL
-         +aOfvmk2a2zM5gOZvVHKyqfJUj9GoDM5evNKgotF30eKzWH9zKild6AjUCaJxDdxo3/0
-         JIVSRc7orj7IUOn29Px1/HUAF2D7/UPboHOswMrNZPwXJ0Ib9KZYxz+XAxuLo/GeSNS5
-         6Ws2t1iATvhbQUuJEkMXTiXk+zAp+ud2KhPhyz3bAmKGDboR4fY7Tvr/053rCSMrbt+9
-         gKOg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=q34vFqngnB3t5A6Nz3+eYIAGYGv8OAQnO0GJ9ith6+k=;
-        b=UCAC0RABSzkdt0by7FWQkQS0WILFo/BjkOmN34Zx8NvzFYnIpJaOGmmuw1Iu1vk0wg
-         3QueLpaO7Yo50SJEjNmoSY8GTeMTKJ7GZfeEQB52ubYR/kkXVZBpxz3KCMfgRy7Hsyje
-         Im0XYDGGMgti2jZCHruSjDkzrHGq4EOSbXmbY9YlK4D8JO+KPh8YC8wv+VKBxXnQSNTu
-         zX9GjjmKBMfLm2OwKPjLlc06VyX7cwm4dmDqwmNwnFKShzCZg9X7ic3zMzMKsQYO4MPW
-         az3WnJY6157sC4p02oirPyE6Fresv28lemKoJ6v2+DK0uXaQHIZaUNrG6K7P1FRdR5iI
-         YyKg==
-X-Gm-Message-State: AOAM533OkZ2TfJX682ZBe1GMBPjUP5bXnjwuCEimLyvfiw1DMsK5WOMA
-        gjGqqWucc7n7HJsWvyoJRR5N+Wkr3Ufi/lF154p/
-X-Google-Smtp-Source: ABdhPJwWo7LxCs+JJy5P3HQmX5kV8JvQwPmXrDO588SF0T6G/cjPM3gzbPTywA6iLqaSgqpcRjYDZsFvg/0Ua/XTQNc=
-X-Received: by 2002:a17:906:7142:: with SMTP id z2mr8520729ejj.427.1624594765939;
- Thu, 24 Jun 2021 21:19:25 -0700 (PDT)
+        with ESMTP id S230097AbhFYFRh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 25 Jun 2021 01:17:37 -0400
+Received: from ozlabs.org (ozlabs.org [IPv6:2401:3900:2:1::2])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4FD25C061574;
+        Thu, 24 Jun 2021 22:15:17 -0700 (PDT)
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+        (No client certificate requested)
+        by mail.ozlabs.org (Postfix) with ESMTPSA id 4GB4vN6kRCz9sWw;
+        Fri, 25 Jun 2021 15:15:12 +1000 (AEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=canb.auug.org.au;
+        s=201702; t=1624598113;
+        bh=n4nmdvprxAbipxGmyKseNuAj2NmWFpDgkSLoT8FEcBA=;
+        h=Date:From:To:Cc:Subject:From;
+        b=lGYhwFg4Dr629JPLRDZJgD5AE984VPYZXbkqQOgo9VRehyqYQKoNj/HL3kooNVG/E
+         b9ovJJBGXfPlkvfKBw5B1zkyirlYQTs0i8iG1J8g0DHBnhgDhcMH256vcgf6ae3bbJ
+         Vt8nek/1gGZWqSshN5BJ7iYxg1FC0yLKGA2iQ8WrvMs1QXpioPTIyzn6v3llpTT36X
+         kFKD6SFeJslby7vcJsP6n3epCKneG4xeFPHW9xCVKmL6fK1CNmGmKPNTs/BdZkOJdx
+         iLA3bNtjh3QHm5wWvZYDSQkL09WXRxAe91RDj3UD/umJGh1odcjZAigJEWEXxxxGh0
+         xhQyIOBFDl+3A==
+Date:   Fri, 25 Jun 2021 15:15:11 +1000
+From:   Stephen Rothwell <sfr@canb.auug.org.au>
+To:     Christoffer Dall <cdall@cs.columbia.edu>,
+        Marc Zyngier <maz@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>, KVM <kvm@vger.kernel.org>
+Cc:     Jing Zhang <jingzhangos@google.com>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Linux Next Mailing List <linux-next@vger.kernel.org>,
+        Steven Price <steven.price@arm.com>
+Subject: linux-next: manual merge of the kvm-arm tree with the kvm tree
+Message-ID: <20210625151511.270c1611@canb.auug.org.au>
 MIME-Version: 1.0
-References: <20210615141331.407-1-xieyongji@bytedance.com> <20210615141331.407-10-xieyongji@bytedance.com>
- <adfb2be9-9ed9-ca37-ac37-4cd00bdff349@redhat.com> <CACycT3tAON+-qZev+9EqyL2XbgH5HDspOqNt3ohQLQ8GqVK=EA@mail.gmail.com>
- <1bba439f-ffc8-c20e-e8a4-ac73e890c592@redhat.com> <CACycT3uzMJS7vw6MVMOgY4rb=SPfT2srV+8DPdwUVeELEiJgbA@mail.gmail.com>
- <0aeb7cb7-58e5-1a95-d830-68edd7e8ec2e@redhat.com> <CACycT3uuooKLNnpPHewGZ=q46Fap2P4XCFirdxxn=FxK+X1ECg@mail.gmail.com>
- <e4cdee72-b6b4-d055-9aac-3beae0e5e3e1@redhat.com> <CACycT3u8=_D3hCtJR+d5BgeUQMce6S7c_6P3CVfvWfYhCQeXFA@mail.gmail.com>
- <d2334f66-907c-2e9c-ea4f-f912008e9be8@redhat.com> <CACycT3uCSLUDVpQHdrmuxSuoBDg-4n22t+N-Jm2GoNNp9JYB2w@mail.gmail.com>
- <48cab125-093b-2299-ff9c-3de8c7c5ed3d@redhat.com> <CACycT3tS=10kcUCNGYm=dUZsK+vrHzDvB3FSwAzuJCu3t+QuUQ@mail.gmail.com>
- <b10b3916-74d4-3171-db92-be0afb479a1c@redhat.com>
-In-Reply-To: <b10b3916-74d4-3171-db92-be0afb479a1c@redhat.com>
-From:   Yongji Xie <xieyongji@bytedance.com>
-Date:   Fri, 25 Jun 2021 12:19:15 +0800
-Message-ID: <CACycT3vpMFbc9Fzuo9oksMaA-pVb1dEVTEgjNoft16voryPSWQ@mail.gmail.com>
-Subject: Re: Re: [PATCH v8 09/10] vduse: Introduce VDUSE - vDPA Device in Userspace
-To:     Jason Wang <jasowang@redhat.com>
-Cc:     "Michael S. Tsirkin" <mst@redhat.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Stefano Garzarella <sgarzare@redhat.com>,
-        Parav Pandit <parav@nvidia.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Christian Brauner <christian.brauner@canonical.com>,
-        Randy Dunlap <rdunlap@infradead.org>,
-        Matthew Wilcox <willy@infradead.org>,
-        Al Viro <viro@zeniv.linux.org.uk>,
-        Jens Axboe <axboe@kernel.dk>, bcrl@kvack.org,
-        Jonathan Corbet <corbet@lwn.net>,
-        =?UTF-8?Q?Mika_Penttil=C3=A4?= <mika.penttila@nextfour.com>,
-        Dan Carpenter <dan.carpenter@oracle.com>, joro@8bytes.org,
-        Greg KH <gregkh@linuxfoundation.org>, songmuchun@bytedance.com,
-        virtualization <virtualization@lists.linux-foundation.org>,
-        netdev@vger.kernel.org, kvm <kvm@vger.kernel.org>,
-        linux-fsdevel@vger.kernel.org, iommu@lists.linux-foundation.org,
-        linux-kernel <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: multipart/signed; boundary="Sig_/gwKE2lCexLJCH9FZ6ULz/Km";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Jun 25, 2021 at 11:09 AM Jason Wang <jasowang@redhat.com> wrote:
->
->
-> =E5=9C=A8 2021/6/24 =E4=B8=8B=E5=8D=885:16, Yongji Xie =E5=86=99=E9=81=93=
-:
-> > On Thu, Jun 24, 2021 at 4:14 PM Jason Wang <jasowang@redhat.com> wrote:
-> >>
-> >> =E5=9C=A8 2021/6/24 =E4=B8=8B=E5=8D=8812:46, Yongji Xie =E5=86=99=E9=
-=81=93:
-> >>>> So we need to deal with both FEATURES_OK and reset, but probably not
-> >>>> DRIVER_OK.
-> >>>>
-> >>> OK, I see. Thanks for the explanation. One more question is how about
-> >>> clearing the corresponding status bit in get_status() rather than
-> >>> making set_status() fail. Since the spec recommends this way for
-> >>> validation which is done in virtio_dev_remove() and
-> >>> virtio_finalize_features().
-> >>>
-> >>> Thanks,
-> >>> Yongji
-> >>>
-> >> I think you can. Or it would be even better that we just don't set the
-> >> bit during set_status().
-> >>
-> > Yes, that's what I mean.
-> >
-> >> I just realize that in vdpa_reset() we had:
-> >>
-> >> static inline void vdpa_reset(struct vdpa_device *vdev)
-> >> {
-> >>           const struct vdpa_config_ops *ops =3D vdev->config;
-> >>
-> >>           vdev->features_valid =3D false;
-> >>           ops->set_status(vdev, 0);
-> >> }
-> >>
-> >> We probably need to add the synchronization here. E.g re-read with a
-> >> timeout.
-> >>
-> > Looks like the timeout is already in set_status().
->
->
-> Do you mean the VDUSE's implementation?
->
+--Sig_/gwKE2lCexLJCH9FZ6ULz/Km
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-Yes.
+Hi all,
 
->
-> >   Do we really need a
-> > duplicated one here?
->
->
-> 1) this is the timeout at the vDPA layer instead of the VDUSE layer.
+Today's linux-next merge of the kvm-arm tree got a conflict in:
 
-OK, I get it.
+  Documentation/virt/kvm/api.rst
 
-> 2) it really depends on what's the meaning of the timeout for set_status
-> of VDUSE.
->
-> Do we want:
->
-> 2a) for set_status(): relay the message to userspace and wait for the
-> userspace to quiescence the datapath
->
-> or
->
-> 2b) for set_status(): simply relay the message to userspace, reply is no
-> needed. Userspace will use a command to update the status when the
-> datapath is stop. The the status could be fetched via get_stats().
->
-> 2b looks more spec complaint.
->
+between commit:
 
-Looks good to me. And I think we can use the reply of the message to
-update the status instead of introducing a new command.
+  fdc09ddd4064 ("KVM: stats: Add documentation for binary statistics interf=
+ace")
 
-> > And how to handle failure? Adding a return value
-> > to virtio_config_ops->reset() and passing the error to the upper
-> > layer?
->
->
-> Something like this.
->
+from the kvm tree and commit:
 
-OK.
+  04c02c201d7e ("KVM: arm64: Document MTE capability and ioctl")
 
-Thanks,
-Yongji
+from the kvm-arm tree.
+
+I fixed it up (see below) and can carry the fix as necessary. This
+is now fixed as far as linux-next is concerned, but any non trivial
+conflicts should be mentioned to your upstream maintainer when your tree
+is submitted for merging.  You may also want to consider cooperating
+with the maintainer of the conflicting tree to minimise any particularly
+complex conflicts.
+
+--=20
+Cheers,
+Stephen Rothwell
+
+diff --cc Documentation/virt/kvm/api.rst
+index aba27461edec,97661a97943f..000000000000
+--- a/Documentation/virt/kvm/api.rst
++++ b/Documentation/virt/kvm/api.rst
+@@@ -5039,224 -5034,43 +5039,260 @@@ see KVM_XEN_VCPU_SET_ATTR above
+  The KVM_XEN_VCPU_ATTR_TYPE_RUNSTATE_ADJUST type may not be used
+  with the KVM_XEN_VCPU_GET_ATTR ioctl.
+ =20
++ 4.130 KVM_ARM_MTE_COPY_TAGS
++ ---------------------------
++=20
++ :Capability: KVM_CAP_ARM_MTE
++ :Architectures: arm64
++ :Type: vm ioctl
++ :Parameters: struct kvm_arm_copy_mte_tags
++ :Returns: number of bytes copied, < 0 on error (-EINVAL for incorrect
++           arguments, -EFAULT if memory cannot be accessed).
++=20
++ ::
++=20
++   struct kvm_arm_copy_mte_tags {
++ 	__u64 guest_ipa;
++ 	__u64 length;
++ 	void __user *addr;
++ 	__u64 flags;
++ 	__u64 reserved[2];
++   };
++=20
++ Copies Memory Tagging Extension (MTE) tags to/from guest tag memory. The
++ ``guest_ipa`` and ``length`` fields must be ``PAGE_SIZE`` aligned. The ``=
+addr``
++ field must point to a buffer which the tags will be copied to or from.
++=20
++ ``flags`` specifies the direction of copy, either ``KVM_ARM_TAGS_TO_GUEST=
+`` or
++ ``KVM_ARM_TAGS_FROM_GUEST``.
++=20
++ The size of the buffer to store the tags is ``(length / 16)`` bytes
++ (granules in MTE are 16 bytes long). Each byte contains a single tag
++ value. This matches the format of ``PTRACE_PEEKMTETAGS`` and
++ ``PTRACE_POKEMTETAGS``.
++=20
++ If an error occurs before any data is copied then a negative error code is
++ returned. If some tags have been copied before an error occurs then the n=
+umber
++ of bytes successfully copied is returned. If the call completes successfu=
+lly
++ then ``length`` is returned.
+ =20
+ +4.131 KVM_GET_SREGS2
+ +------------------
+ +
+ +:Capability: KVM_CAP_SREGS2
+ +:Architectures: x86
+ +:Type: vcpu ioctl
+ +:Parameters: struct kvm_sregs2 (out)
+ +:Returns: 0 on success, -1 on error
+ +
+ +Reads special registers from the vcpu.
+ +This ioctl (when supported) replaces the KVM_GET_SREGS.
+ +
+ +::
+ +
+ +struct kvm_sregs2 {
+ +	/* out (KVM_GET_SREGS2) / in (KVM_SET_SREGS2) */
+ +	struct kvm_segment cs, ds, es, fs, gs, ss;
+ +	struct kvm_segment tr, ldt;
+ +	struct kvm_dtable gdt, idt;
+ +	__u64 cr0, cr2, cr3, cr4, cr8;
+ +	__u64 efer;
+ +	__u64 apic_base;
+ +	__u64 flags;
+ +	__u64 pdptrs[4];
+ +};
+ +
+ +flags values for ``kvm_sregs2``:
+ +
+ +``KVM_SREGS2_FLAGS_PDPTRS_VALID``
+ +
+ +  Indicates thats the struct contain valid PDPTR values.
+ +
+ +
+ +4.132 KVM_SET_SREGS2
+ +------------------
+ +
+ +:Capability: KVM_CAP_SREGS2
+ +:Architectures: x86
+ +:Type: vcpu ioctl
+ +:Parameters: struct kvm_sregs2 (in)
+ +:Returns: 0 on success, -1 on error
+ +
+ +Writes special registers into the vcpu.
+ +See KVM_GET_SREGS2 for the data structures.
+ +This ioctl (when supported) replaces the KVM_SET_SREGS.
+ +
+ +4.133 KVM_GET_STATS_FD
+ +----------------------
+ +
+ +:Capability: KVM_CAP_STATS_BINARY_FD
+ +:Architectures: all
+ +:Type: vm ioctl, vcpu ioctl
+ +:Parameters: none
+ +:Returns: statistics file descriptor on success, < 0 on error
+ +
+ +Errors:
+ +
+ +  =3D=3D=3D=3D=3D=3D     =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+ +  ENOMEM     if the fd could not be created due to lack of memory
+ +  EMFILE     if the number of opened files exceeds the limit
+ +  =3D=3D=3D=3D=3D=3D     =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+ +
+ +The returned file descriptor can be used to read VM/vCPU statistics data =
+in
+ +binary format. The data in the file descriptor consists of four blocks
+ +organized as follows:
+ +
+ ++-------------+
+ +|   Header    |
+ ++-------------+
+ +|  id string  |
+ ++-------------+
+ +| Descriptors |
+ ++-------------+
+ +| Stats Data  |
+ ++-------------+
+ +
+ +Apart from the header starting at offset 0, please be aware that it is
+ +not guaranteed that the four blocks are adjacent or in the above order;
+ +the offsets of the id, descriptors and data blocks are found in the
+ +header.  However, all four blocks are aligned to 64 bit offsets in the
+ +file and they do not overlap.
+ +
+ +All blocks except the data block are immutable.  Userspace can read them
+ +only one time after retrieving the file descriptor, and then use ``pread`=
+` or
+ +``lseek`` to read the statistics repeatedly.
+ +
+ +All data is in system endianness.
+ +
+ +The format of the header is as follows::
+ +
+ +	struct kvm_stats_header {
+ +		__u32 flags;
+ +		__u32 name_size;
+ +		__u32 num_desc;
+ +		__u32 id_offset;
+ +		__u32 desc_offset;
+ +		__u32 data_offset;
+ +	};
+ +
+ +The ``flags`` field is not used at the moment. It is always read as 0.
+ +
+ +The ``name_size`` field is the size (in byte) of the statistics name stri=
+ng
+ +(including trailing '\0') which is contained in the "id string" block and
+ +appended at the end of every descriptor.
+ +
+ +The ``num_desc`` field is the number of descriptors that are included in =
+the
+ +descriptor block.  (The actual number of values in the data block may be
+ +larger, since each descriptor may comprise more than one value).
+ +
+ +The ``id_offset`` field is the offset of the id string from the start of =
+the
+ +file indicated by the file descriptor. It is a multiple of 8.
+ +
+ +The ``desc_offset`` field is the offset of the Descriptors block from the=
+ start
+ +of the file indicated by the file descriptor. It is a multiple of 8.
+ +
+ +The ``data_offset`` field is the offset of the Stats Data block from the =
+start
+ +of the file indicated by the file descriptor. It is a multiple of 8.
+ +
+ +The id string block contains a string which identifies the file descripto=
+r on
+ +which KVM_GET_STATS_FD was invoked.  The size of the block, including the
+ +trailing ``'\0'``, is indicated by the ``name_size`` field in the header.
+ +
+ +The descriptors block is only needed to be read once for the lifetime of =
+the
+ +file descriptor contains a sequence of ``struct kvm_stats_desc``, each fo=
+llowed
+ +by a string of size ``name_size``.
+ +
+ +	#define KVM_STATS_TYPE_SHIFT		0
+ +	#define KVM_STATS_TYPE_MASK		(0xF << KVM_STATS_TYPE_SHIFT)
+ +	#define KVM_STATS_TYPE_CUMULATIVE	(0x0 << KVM_STATS_TYPE_SHIFT)
+ +	#define KVM_STATS_TYPE_INSTANT		(0x1 << KVM_STATS_TYPE_SHIFT)
+ +	#define KVM_STATS_TYPE_PEAK		(0x2 << KVM_STATS_TYPE_SHIFT)
+ +
+ +	#define KVM_STATS_UNIT_SHIFT		4
+ +	#define KVM_STATS_UNIT_MASK		(0xF << KVM_STATS_UNIT_SHIFT)
+ +	#define KVM_STATS_UNIT_NONE		(0x0 << KVM_STATS_UNIT_SHIFT)
+ +	#define KVM_STATS_UNIT_BYTES		(0x1 << KVM_STATS_UNIT_SHIFT)
+ +	#define KVM_STATS_UNIT_SECONDS		(0x2 << KVM_STATS_UNIT_SHIFT)
+ +	#define KVM_STATS_UNIT_CYCLES		(0x3 << KVM_STATS_UNIT_SHIFT)
+ +
+ +	#define KVM_STATS_BASE_SHIFT		8
+ +	#define KVM_STATS_BASE_MASK		(0xF << KVM_STATS_BASE_SHIFT)
+ +	#define KVM_STATS_BASE_POW10		(0x0 << KVM_STATS_BASE_SHIFT)
+ +	#define KVM_STATS_BASE_POW2		(0x1 << KVM_STATS_BASE_SHIFT)
+ +
+ +	struct kvm_stats_desc {
+ +		__u32 flags;
+ +		__s16 exponent;
+ +		__u16 size;
+ +		__u32 offset;
+ +		__u32 unused;
+ +		char name[];
+ +	};
+ +
+ +The ``flags`` field contains the type and unit of the statistics data des=
+cribed
+ +by this descriptor. Its endianness is CPU native.
+ +The following flags are supported:
+ +
+ +Bits 0-3 of ``flags`` encode the type:
+ +  * ``KVM_STATS_TYPE_CUMULATIVE``
+ +    The statistics data is cumulative. The value of data can only be incr=
+eased.
+ +    Most of the counters used in KVM are of this type.
+ +    The corresponding ``size`` field for this type is always 1.
+ +    All cumulative statistics data are read/write.
+ +  * ``KVM_STATS_TYPE_INSTANT``
+ +    The statistics data is instantaneous. Its value can be increased or
+ +    decreased. This type is usually used as a measurement of some resourc=
+es,
+ +    like the number of dirty pages, the number of large pages, etc.
+ +    All instant statistics are read only.
+ +    The corresponding ``size`` field for this type is always 1.
+ +  * ``KVM_STATS_TYPE_PEAK``
+ +    The statistics data is peak. The value of data can only be increased,=
+ and
+ +    represents a peak value for a measurement, for example the maximum nu=
+mber
+ +    of items in a hash table bucket, the longest time waited and so on.
+ +    The corresponding ``size`` field for this type is always 1.
+ +
+ +Bits 4-7 of ``flags`` encode the unit:
+ +  * ``KVM_STATS_UNIT_NONE``
+ +    There is no unit for the value of statistics data. This usually means=
+ that
+ +    the value is a simple counter of an event.
+ +  * ``KVM_STATS_UNIT_BYTES``
+ +    It indicates that the statistics data is used to measure memory size,=
+ in the
+ +    unit of Byte, KiByte, MiByte, GiByte, etc. The unit of the data is
+ +    determined by the ``exponent`` field in the descriptor.
+ +  * ``KVM_STATS_UNIT_SECONDS``
+ +    It indicates that the statistics data is used to measure time or late=
+ncy.
+ +  * ``KVM_STATS_UNIT_CYCLES``
+ +    It indicates that the statistics data is used to measure CPU clock cy=
+cles.
+ +
+ +Bits 8-11 of ``flags``, together with ``exponent``, encode the scale of t=
+he
+ +unit:
+ +  * ``KVM_STATS_BASE_POW10``
+ +    The scale is based on power of 10. It is used for measurement of time=
+ and
+ +    CPU clock cycles.  For example, an exponent of -9 can be used with
+ +    ``KVM_STATS_UNIT_SECONDS`` to express that the unit is nanoseconds.
+ +  * ``KVM_STATS_BASE_POW2``
+ +    The scale is based on power of 2. It is used for measurement of memor=
+y size.
+ +    For example, an exponent of 20 can be used with ``KVM_STATS_UNIT_BYTE=
+S`` to
+ +    express that the unit is MiB.
+ +
+ +The ``size`` field is the number of values of this statistics data. Its
+ +value is usually 1 for most of simple statistics. 1 means it contains an
+ +unsigned 64bit data.
+ +
+ +The ``offset`` field is the offset from the start of Data Block to the st=
+art of
+ +the corresponding statistics data.
+ +
+ +The ``unused`` field is reserved for future support for other types of
+ +statistics data, like log/linear histogram. Its value is always 0 for the=
+ types
+ +defined above.
+ +
+ +The ``name`` field is the name string of the statistics data. The name st=
+ring
+ +starts at the end of ``struct kvm_stats_desc``.  The maximum length inclu=
+ding
+ +the trailing ``'\0'``, is indicated by ``name_size`` in the header.
+ +
+ +The Stats Data block contains an array of 64-bit values in the same order
+ +as the descriptors in Descriptors block.
+ +
+  5. The kvm_run structure
+  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+ =20
+@@@ -6584,45 -6397,32 +6620,69 @@@ system fingerprint.  To prevent userspa
+  by running an enclave in a VM, KVM prevents access to privileged attribut=
+es by
+  default.
+ =20
+ -See Documentation/x86/sgx/2.Kernel-internals.rst for more details.
+ +See Documentation/x86/sgx.rst for more details.
+ +
+ +7.26 KVM_CAP_PPC_RPT_INVALIDATE
+ +-------------------------------
+ +
+ +:Capability: KVM_CAP_PPC_RPT_INVALIDATE
+ +:Architectures: ppc
+ +:Type: vm
+ +
+ +This capability indicates that the kernel is capable of handling
+ +H_RPT_INVALIDATE hcall.
+ +
+ +In order to enable the use of H_RPT_INVALIDATE in the guest,
+ +user space might have to advertise it for the guest. For example,
+ +IBM pSeries (sPAPR) guest starts using it if "hcall-rpt-invalidate" is
+ +present in the "ibm,hypertas-functions" device-tree property.
+ +
+ +This capability is enabled for hypervisors on platforms like POWER9
+ +that support radix MMU.
+ +
+ +7.27 KVM_CAP_EXIT_ON_EMULATION_FAILURE
+ +--------------------------------------
+ +
+ +:Architectures: x86
+ +:Parameters: args[0] whether the feature should be enabled or not
+ +
+ +When this capability is enabled, an emulation failure will result in an e=
+xit
+ +to userspace with KVM_INTERNAL_ERROR (except when the emulator was invoked
+ +to handle a VMware backdoor instruction). Furthermore, KVM will now provi=
+de up
+ +to 15 instruction bytes for any exit to userspace resulting from an emula=
+tion
+ +failure.  When these exits to userspace occur use the emulation_failure s=
+truct
+ +instead of the internal struct.  They both have the same layout, but the
+ +emulation_failure struct matches the content better.  It also explicitly
+ +defines the 'flags' field which is used to describe the fields in the str=
+uct
+ +that are valid (ie: if KVM_INTERNAL_ERROR_EMULATION_FLAG_INSTRUCTION_BYTE=
+S is
+ +set in the 'flags' field then both 'insn_size' and 'insn_bytes' have vali=
+d data
+ +in them.)
+ +
+ =20
++ 7.26 KVM_CAP_ARM_MTE
++ --------------------
++=20
++ :Architectures: arm64
++ :Parameters: none
++=20
++ This capability indicates that KVM (and the hardware) supports exposing t=
+he
++ Memory Tagging Extensions (MTE) to the guest. It must also be enabled by =
+the
++ VMM before creating any VCPUs to allow the guest access. Note that MTE is=
+ only
++ available to a guest running in AArch64 mode and enabling this capability=
+ will
++ cause attempts to create AArch32 VCPUs to fail.
++=20
++ When enabled the guest is able to access tags associated with any memory =
+given
++ to the guest. KVM will ensure that the tags are maintained during swap or
++ hibernation of the host; however the VMM needs to manually save/restore t=
+he
++ tags as appropriate if the VM is migrated.
++=20
++ When this capability is enabled all memory in memslots must be mapped as
++ not-shareable (no MAP_SHARED), attempts to create a memslot with a
++ MAP_SHARED mmap will result in an -EINVAL return.
++=20
++ When enabled the VMM may make use of the ``KVM_ARM_MTE_COPY_TAGS`` ioctl =
+to
++ perform a bulk copy of tags to/from the guest.
++=20
+  8. Other capabilities.
+  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+ =20
+
+--Sig_/gwKE2lCexLJCH9FZ6ULz/Km
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmDVZl8ACgkQAVBC80lX
+0GxMYwgAkDwigCyAeUpjBDEoSHVcSNLaz72C3ydTgtD9Zo5USqsQiuqA82h16GaO
+q7U2wRZrgYzebq5FfEmtHvLN6FRAueICOC6xDcziiTXuyKQTkXCn85hF679frfnT
+Hrd0ibkY6US0BzFIlDniwAD9D0yN8D59Ad1DD3AtF9jn8FRCxj3zsMrZyq05De7P
+xpFU2bOLLAEweYIRzlVDO7qy71ETfGieeFLV9GUWmplWtVzZUoIe1RL+2/z7q/nU
+b5ZRaId8jmOvqZYZ6DwrVTt3RwwvM6eVaByiQGB1sG/eKXhzuJbfWnaSucK/UsZv
+cauSU5eLd9gmaYTVnH4Rh6WHDva9Wg==
+=4sdC
+-----END PGP SIGNATURE-----
+
+--Sig_/gwKE2lCexLJCH9FZ6ULz/Km--
