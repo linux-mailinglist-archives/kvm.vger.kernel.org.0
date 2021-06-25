@@ -2,96 +2,141 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6CA2C3B3E61
-	for <lists+kvm@lfdr.de>; Fri, 25 Jun 2021 10:20:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 05DCE3B3F4F
+	for <lists+kvm@lfdr.de>; Fri, 25 Jun 2021 10:29:37 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229945AbhFYIXO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 25 Jun 2021 04:23:14 -0400
-Received: from mx0a-00069f02.pphosted.com ([205.220.165.32]:1454 "EHLO
-        mx0a-00069f02.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229799AbhFYIXN (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 25 Jun 2021 04:23:13 -0400
-Received: from pps.filterd (m0246617.ppops.net [127.0.0.1])
-        by mx0b-00069f02.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 15P8I3VZ013825;
-        Fri, 25 Jun 2021 08:20:53 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=date : from : to : cc
- : subject : message-id : mime-version : content-type; s=corp-2020-01-29;
- bh=4GSlOqBzMi6ZvKcdjof/bFT97MKGX+sEIaqyog7N84E=;
- b=DKV4PoH+KYVAFh3URyu5VG6RApRYUKmp/1Zl0T4QBmUD+lm8XJxndntAbBrx2sxOdo5a
- 0eF1SsuywBiQ1dd6MsdsEqnZ4Ed/RWIgxa+yqBz0ODIT6eK2zaqwZcBfmNsc1j7QvkRO
- l1F9zCCpaT+BvpYnTEbZ2wxeqwb4cntayC9DgwvYj0TuvrGcgqIXwvnUDnZnshvyRzqx
- I1KoS2FlSDabETjkQnbAOl92IsczzYiVB+QcCO1UexJ3hFEOMP8dKP30YDyzU0uG5BCe
- n8fNxWt8hXAJsfYTCjj7bUJo+3q5c+2S0fuGLH2JTQbyd0fypaXqMcxlq4qsnxH8bvtO 9A== 
-Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
-        by mx0b-00069f02.pphosted.com with ESMTP id 39d2pe8qyd-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 25 Jun 2021 08:20:53 +0000
-Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
-        by aserp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 15P8FmPM101835;
-        Fri, 25 Jun 2021 08:20:52 GMT
-Received: from pps.reinject (localhost [127.0.0.1])
-        by aserp3030.oracle.com with ESMTP id 39d2pxv08w-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 25 Jun 2021 08:20:52 +0000
-Received: from aserp3030.oracle.com (aserp3030.oracle.com [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 15P8IkOB109476;
-        Fri, 25 Jun 2021 08:20:52 GMT
-Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
-        by aserp3030.oracle.com with ESMTP id 39d2pxv08a-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 25 Jun 2021 08:20:52 +0000
-Received: from abhmp0011.oracle.com (abhmp0011.oracle.com [141.146.116.17])
-        by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 15P8KoOn011748;
-        Fri, 25 Jun 2021 08:20:50 GMT
-Received: from mwanda (/102.222.70.252)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Fri, 25 Jun 2021 01:20:49 -0700
-Date:   Fri, 25 Jun 2021 11:20:44 +0300
-From:   Dan Carpenter <dan.carpenter@oracle.com>
-To:     jgg@ziepe.ca
-Cc:     kvm@vger.kernel.org
-Subject: [bug report] vfio/mtty: Convert to use vfio_register_group_dev()
-Message-ID: <YNWR3PwALrq98NNU@mwanda>
+        id S230108AbhFYIby (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 25 Jun 2021 04:31:54 -0400
+Received: from Galois.linutronix.de ([193.142.43.55]:60168 "EHLO
+        galois.linutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229839AbhFYIbx (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 25 Jun 2021 04:31:53 -0400
+From:   Thomas Gleixner <tglx@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+        s=2020; t=1624609771;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=Fn6G/qgwKubMixi1h+nQ51xRNKf4+bW+OOidmseH19Y=;
+        b=jfJwCVJ2f3aHzGfs0V3+zxEgmszn8DhAXnBfJHs8FNXfWvysxHkkykm003xaRuoHGJcpCF
+        vIKv2E59rItp+CbOkae9rFiO0r9iXQEsc6b2sw9a5ZPixR6uDkoOJgz9WQKrj4hkoyQd4y
+        d1seNB7ChiWZp5OexCg2Si7T8HSSgRthO//hI8d0Fc0k1ISwKM6iB2pu1FwKENSCGMeUM2
+        RWpcc2D2uz84IDJiISuLmYuTAXJ6/RrzQDWXakkBoTsuNshJnOsR+BVRt68Vs+tGQwLRxO
+        4SOzl/xBMqaieT/Hl6hP3NvIUeLtqy+TxxKBgOGJ42G6rQdtABDWNEwuOnDkJA==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+        s=2020e; t=1624609771;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=Fn6G/qgwKubMixi1h+nQ51xRNKf4+bW+OOidmseH19Y=;
+        b=cDGbcBEaYI4Ay7EQ5MEQt2JuWlC9e+0ZeBTseXnxTx2zEUajia4GWqeRpOQr3O66c/gSUz
+        /Gd6k0zA4jmS4DDg==
+To:     Alex Williamson <alex.williamson@redhat.com>
+Cc:     "Tian\, Kevin" <kevin.tian@intel.com>,
+        Jason Gunthorpe <jgg@nvidia.com>,
+        "Dey\, Megha" <megha.dey@intel.com>,
+        "Raj\, Ashok" <ashok.raj@intel.com>,
+        "Pan\, Jacob jun" <jacob.jun.pan@intel.com>,
+        "Jiang\, Dave" <dave.jiang@intel.com>,
+        "Liu\, Yi L" <yi.l.liu@intel.com>,
+        "Lu\, Baolu" <baolu.lu@intel.com>,
+        "Williams\, Dan J" <dan.j.williams@intel.com>,
+        "Luck\, Tony" <tony.luck@intel.com>,
+        "Kumar\, Sanjay K" <sanjay.k.kumar@intel.com>,
+        LKML <linux-kernel@vger.kernel.org>, KVM <kvm@vger.kernel.org>,
+        Kirti Wankhede <kwankhede@nvidia.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Marc Zyngier <maz@kernel.org>,
+        Bjorn Helgaas <helgaas@kernel.org>
+Subject: Re: Virtualizing MSI-X on IMS via VFIO
+In-Reply-To: <20210624154434.11809b8f.alex.williamson@redhat.com>
+References: <MWHPR11MB1886E14C57689A253D9B40C08C079@MWHPR11MB1886.namprd11.prod.outlook.com> <8735t7wazk.ffs@nanos.tec.linutronix.de> <20210624154434.11809b8f.alex.williamson@redhat.com>
+Date:   Fri, 25 Jun 2021 10:29:30 +0200
+Message-ID: <87r1gquz2t.ffs@nanos.tec.linutronix.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-X-Proofpoint-GUID: fbtR8yMVKjZ8FI-wL4PhA1-HyPrYqOAI
-X-Proofpoint-ORIG-GUID: fbtR8yMVKjZ8FI-wL4PhA1-HyPrYqOAI
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hello Jason Gunthorpe,
+Alex!
 
-The patch 09177ac91921: "vfio/mtty: Convert to use
-vfio_register_group_dev()" from Jun 17, 2021, leads to the following
-static checker warning:
+On Thu, Jun 24 2021 at 15:44, Alex Williamson wrote:
+> On Thu, 24 Jun 2021 17:14:39 +0200
+> Thomas Gleixner <tglx@linutronix.de> wrote:
+>
+>> After studying the MSI-X specification again, I think there is another
+>> option to solve this for MSI-X, i.e. the dynamic sizing part:
+>> 
+>> MSI requires to disable MSI in order to update the number of enabled
+>> vectors in the control word.
+>
+> Exactly what part of the spec requires this?  This is generally the
+> convention I expect too, and there are complications around contiguous
+> vectors and data field alignment, but I'm not actually able to find a
+> requirement in the spec that MSI Enable must be 0 when modifying other
+> writable fields or that writable fields are latched when MSI Enable is
+> set.
 
-	samples/vfio-mdev/mtty.c:742 mtty_probe()
-	warn: '&mdev_state->next' not removed from list
+There is nothing in the spec which mandates that, but based on
+experience I know that devices latch the number of vectors field when
+the enable bit goes from 0 to 1, which makes sense. Devices derive their
+internal interrupt routing from that.
 
-samples/vfio-mdev/mtty.c
-   730  
-   731          mutex_init(&mdev_state->ops_lock);
-   732          mdev_state->mdev = mdev;
-   733  
-   734          mtty_create_config_space(mdev_state);
-   735  
-   736          mutex_lock(&mdev_list_lock);
-   737          list_add(&mdev_state->next, &mdev_devices_list);
-                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-   738          mutex_unlock(&mdev_list_lock);
-   739  
-   740          ret = vfio_register_group_dev(&mdev_state->vdev);
-   741          if (ret) {
-   742                  kfree(mdev_state);
-                              ^^^^^^^^^^
-This is still on the list so it will lead to a user after free.
+>> which means that the function must reread the table entry when the mask
+>> bit in the vector control word is cleared.
+>
+> What is a "valid" message as far as the device is concerned?  "Valid"
+> is meaningful to system software and hardware, the device doesn't
+> care.
 
-   743                  return ret;
-   744          }
-   745          dev_set_drvdata(&mdev->dev, mdev_state);
-   746          return 0;
+That's correct, it uses whatever is there.
 
-regards,
-dan carpenter
+> So caching/latching occurs on unmask for MSI-X, but I can't find
+> similar statements for MSI.  If you have, please note them.  It's
+> possible MSI is per interrupt.
+
+MSI is mostly implementation defined due to the blury specification.
+
+Also the fact that MSI masking is optional does not make it any
+better. Most devices (even new ones) do not have MSI masking.
+
+> Anyway, at least MSI-X if not also MSI could have a !NORESIZE
+> implementation, which is why this flag exists in vfio.
+
+MSI-X yes with a pretty large surgery.
+
+MSI, no way. Contrary to MSI-X you cannot just update the $N entry in
+the table because there is no table. MSI has a base message and derives
+the $Nth vector message from it by modifying the lower bits of the data
+word.
+
+So without masking updating the base message for multi-msi is close
+to impossible. Look at the dance we have to do in msi_set_affinity().
+
+But even with masking there is still the issue of the 'number of
+vectors' field and you can't set that to maximum at init time either
+because some devices derive from that how interrupts are routed and you
+surely don't want to change that behaviour while devices are active.
+
+Even if that'd be possible, then we'd need to allocate the full IRTE
+space, which would be just another corner case and require extra
+handling.
+
+MSI is a badly specified trainwreck and we already have enough horrible
+code dealing with it. No need to add more of that which is going to
+cause more problems than it solves.
+
+The sad thing is that despite the fact that the problems of MSI are
+known for more than a decade MSI is still widely used in new silicon
+and most of the time even without masking.
+
+> Anyway, at least MSI-X if not also MSI could have a !NORESIZE
+> implementation, which is why this flag exists in vfio.
+
+Right, it's there to be ignored for MSI-X in the current implementation
+of QEMU and VFIO/PCI.
+
+Thanks,
+
+        tglx
