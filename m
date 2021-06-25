@@ -2,96 +2,74 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 086E33B3FEE
-	for <lists+kvm@lfdr.de>; Fri, 25 Jun 2021 11:05:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 33D073B4080
+	for <lists+kvm@lfdr.de>; Fri, 25 Jun 2021 11:29:12 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230449AbhFYJH2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 25 Jun 2021 05:07:28 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:58080 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229839AbhFYJHZ (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 25 Jun 2021 05:07:25 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1624611905;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=3Vf7eQafJpn+Km6dnUrld2h7erdnsGXaWtmQA8sYWrM=;
-        b=SBX0uACWf3C6b4SAISY2Mgz6snDj7ua9rw3CqpRLu9Znep7Vq+ciApAOC6dVvgA5FQ3VUo
-        c5XMFGgjpRZEMikObEvrJLxEJH04W/4sygFBW9DWjEsGN3R/BHxCjSy7ReYft6sg2iJdhZ
-        0XlG+cdENOL57eF5U4Y3W1lGSaxtU84=
-Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
- [209.85.218.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-284-jfFwOt-YNDOQC4cZPvnNmw-1; Fri, 25 Jun 2021 05:05:02 -0400
-X-MC-Unique: jfFwOt-YNDOQC4cZPvnNmw-1
-Received: by mail-ej1-f71.google.com with SMTP id g6-20020a1709064e46b02903f57f85ac45so2868525ejw.15
-        for <kvm@vger.kernel.org>; Fri, 25 Jun 2021 02:05:02 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=3Vf7eQafJpn+Km6dnUrld2h7erdnsGXaWtmQA8sYWrM=;
-        b=PAWbgpFWjWiMNJmDP2OaCuk2lbGgHoG/YvNHtQMETywF4VzClKWrgNR/m6JKnMDJQW
-         7jdTxTs0QWv+prmoJqCrV166sltlhodZau6Ncl5K7Lsv5AdIefpxLsdM5iGsA0IZQfFC
-         iduyBFzBCZJW3Dat9zeiacmlICkiVXT3cF1XcwKPaRtSeUAdzHESBm2Ud6R+Rpg+pzVx
-         xBzMNRIX9UljsZTlmAzN+ktVOcC3Udrq3m/AkPiohvoK5M151kcWeKZljtGp1Fe4Ng06
-         rl4O5PoNOprywCbMfj3C3aGAJw4b6Jp2Aagmw8OFR6kthzKy9/e3l6xHAYaxl54dOt5/
-         hDxA==
-X-Gm-Message-State: AOAM533WueT8RcJhLRrY903UCA74Ur81dAbL4ad1sIWsMQVji/6G5Gd6
-        KM4ApYVogizqeq8xL1FG/5aESdhhoAqG9o8sl+7iNOywcWcd8TDI4Ojg539jXTd/KksU/y9odEV
-        MPXlBI5Y47t0r
-X-Received: by 2002:a17:906:b215:: with SMTP id p21mr10141807ejz.237.1624611901530;
-        Fri, 25 Jun 2021 02:05:01 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzfEt+Mcicq18UzSdQy2+ca/CS9XiyaFqrwUOm+ZVOjBEnrIF6U+hhzb0ccOUQ+FYXzVWitZQ==
-X-Received: by 2002:a17:906:b215:: with SMTP id p21mr10141785ejz.237.1624611901306;
-        Fri, 25 Jun 2021 02:05:01 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id jl21sm2423410ejc.42.2021.06.25.02.05.00
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 25 Jun 2021 02:05:00 -0700 (PDT)
-Subject: Re: [PATCH 3/4] KVM: x86: WARN and reject loading KVM if NX is
- supported but not enabled
-To:     Sean Christopherson <seanjc@google.com>,
+        id S231279AbhFYJba (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 25 Jun 2021 05:31:30 -0400
+Received: from mga18.intel.com ([134.134.136.126]:45141 "EHLO mga18.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S230217AbhFYJb3 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 25 Jun 2021 05:31:29 -0400
+IronPort-SDR: dleT7UTL/dM7xS07NuxzoiRt2oHlrE9bYL3svqXyE8xdDrTxtj4F0f0J2tvXukUK62z9cAiMPa
+ jNtI/t4t3gtQ==
+X-IronPort-AV: E=McAfee;i="6200,9189,10025"; a="194934721"
+X-IronPort-AV: E=Sophos;i="5.83,298,1616482800"; 
+   d="scan'208";a="194934721"
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Jun 2021 02:29:08 -0700
+IronPort-SDR: kUTDCduX01Qi/Pr7H1QfMHw8nhF3ptuEP/84jT1JJGZHNzgDfKJ09QrWcrh3dX7gW3kdWHQjyy
+ j4g9oyjw/VAQ==
+X-IronPort-AV: E=Sophos;i="5.83,298,1616482800"; 
+   d="scan'208";a="453751946"
+Received: from junyuton-mobl.ccr.corp.intel.com (HELO localhost) ([10.249.170.209])
+  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Jun 2021 02:29:05 -0700
+Date:   Fri, 25 Jun 2021 17:29:02 +0800
+From:   Yu Zhang <yu.c.zhang@linux.intel.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Sean Christopherson <seanjc@google.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
         Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-References: <20210615164535.2146172-1-seanjc@google.com>
- <20210615164535.2146172-4-seanjc@google.com> <YNUITW5fsaQe4JSo@google.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <ad85c5db-c780-bd13-c6ce-e3478838acbe@redhat.com>
-Date:   Fri, 25 Jun 2021 11:04:59 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.10.1
+        linux-kernel@vger.kernel.org, Maxim Levitsky <mlevitsk@redhat.com>
+Subject: Re: [PATCH 05/54] Revert "KVM: x86/mmu: Drop
+ kvm_mmu_extended_role.cr4_la57 hack"
+Message-ID: <20210625092902.o4kqx67zvvbudggh@linux.intel.com>
+References: <20210622175739.3610207-1-seanjc@google.com>
+ <20210622175739.3610207-6-seanjc@google.com>
+ <20210625084644.ort4oojvd27oy4ca@linux.intel.com>
+ <09a49caf-6ff5-295b-d1ab-023549f6a23b@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <YNUITW5fsaQe4JSo@google.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <09a49caf-6ff5-295b-d1ab-023549f6a23b@redhat.com>
+User-Agent: NeoMutt/20171215
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 25/06/21 00:33, Sean Christopherson wrote:
-> On Tue, Jun 15, 2021, Sean Christopherson wrote:
->> WARN if NX is reported as supported but not enabled in EFER.  All flavors
->> of the kernel, including non-PAE 32-bit kernels, set EFER.NX=1 if NX is
->> supported, even if NX usage is disable via kernel command line.
+On Fri, Jun 25, 2021 at 10:57:51AM +0200, Paolo Bonzini wrote:
+> On 25/06/21 10:47, Yu Zhang wrote:
+> > > But if L1 is crafty, it can load a new CR4 on VM-Exit and toggle LA57
+> > > without having to bounce through an unpaged section.  L1 can also load a
+> > 
+> > May I ask how this is done by the guest? Thanks!
 > 
-> Ugh, I misread .Ldefault_entry in head_32.S, it skips over the entire EFER code
-> if PAE=0.  Apparently I didn't test this with non-PAE paging and EPT?
+> It can set HOST_CR3 and HOST_CR4 to a value that is different from the one
+> on vmentry.
+
+Thanks, Paolo.
+
+Do you mean the L1 can modify its paging mode by setting HOST_CR3 as root of
+a PML5 table in VMCS12 and HOST_CR4 with LA57 flipped in VMCS12, causing the
+GUEST_CR3/4 being changed in VMCS01, and eventually updating the CR3/4 when 
+L0 is injecting a VM Exit from L2? 
+
+B.R.
+Yu
+
+  
+
+> Paolo
 > 
-> Paolo, I'll send a revert since it's in kvm/next, but even better would be if
-> you can drop the patch :-)  Lucky for me you didn't pick up patch 4/4 that
-> depends on this...
-> 
-> I'll revisit this mess in a few weeks.
-
-Rather, let's keep this, see if anyone complains and possibly add a 
-"depends on X86_PAE || X86_64" to KVM.
-
-Paolo
-
