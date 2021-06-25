@@ -2,146 +2,190 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id EA4B83B46B7
-	for <lists+kvm@lfdr.de>; Fri, 25 Jun 2021 17:34:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 861643B4712
+	for <lists+kvm@lfdr.de>; Fri, 25 Jun 2021 17:56:08 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230064AbhFYPgt (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 25 Jun 2021 11:36:49 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:28350 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229884AbhFYPgq (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 25 Jun 2021 11:36:46 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1624635265;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=YjcyYxrINnzSou8d5xoDOd+Q0j+eHgX3Un7gw5UoKHs=;
-        b=SLDnNfrFLu25XkZgpdqr93BaJ+kgGnqekCtt3nK0Dd1t6Y4KQxAsohZSqOWfdvS7oK0w8Q
-        5DBhU9+1MIveailE07PgPKxNm2Hxk+btGIAEeq0r2tYOurIBi4ahCV230KEqND2p6Zprvo
-        h8oiuHOMliefeCN/Kl9I4UvMeJitfJ4=
-Received: from mail-io1-f70.google.com (mail-io1-f70.google.com
- [209.85.166.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-154-AQkvYzYHM7iFj7fhtMlNpQ-1; Fri, 25 Jun 2021 11:34:21 -0400
-X-MC-Unique: AQkvYzYHM7iFj7fhtMlNpQ-1
-Received: by mail-io1-f70.google.com with SMTP id w22-20020a5ed6160000b02904f28b1d759dso206708iom.8
-        for <kvm@vger.kernel.org>; Fri, 25 Jun 2021 08:34:21 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=YjcyYxrINnzSou8d5xoDOd+Q0j+eHgX3Un7gw5UoKHs=;
-        b=P2+peqSPn9Uc3HlhF5W+cIgIr8cocVgDnCA5y3DyKKmbieLnUHuvFpV0IG1lwIKFum
-         neJ8KYYr4qcjN/GpXJPlwBLNXQ9xlrC1paWm5TnvOKL5xrbbeQ+DDFZj/kpxkjcMdq/F
-         31oz3VZAhfanqp1f/m6kyF9tnGuhBNA2AR6UPOwJgtoIyaZeRVy+1MSRR62dZvwd/tqX
-         H4v/QdE7DNXkkvEwdAoQ2Ji4/1591DeugXYxEVoXTnCB+ufb+5Rv0BZ11ZQFc/j3yxSD
-         Y8IVS5z+xRVU9r0lZfRjNNDsLRJ5IQfd9zs9QYKirgMmByiedrrkCo/xDPVEvJA7tLdG
-         9ceg==
-X-Gm-Message-State: AOAM530pHDo1kp/1l0yI75x6o/GriVOUy9/E1uzZV8K36OdVOg8uc/e4
-        ZYtOsJt8e1GB4hDGAvWyperWsjHq0h9avCPDnIObjHk+MwdjCksBFz05Z71cUu2ZkvE/m90aOKj
-        iv6b9yekgogEG
-X-Received: by 2002:a6b:2b44:: with SMTP id r65mr8803099ior.99.1624635261303;
-        Fri, 25 Jun 2021 08:34:21 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzDrcMjN0grhcN1xdY2Kguub8DNog6SwRyubFGgLe1lkSEeK2CSuD5j9rsyWmXrReWuXadcJg==
-X-Received: by 2002:a6b:2b44:: with SMTP id r65mr8803084ior.99.1624635261102;
-        Fri, 25 Jun 2021 08:34:21 -0700 (PDT)
-Received: from t490s.redhat.com (bras-base-toroon474qw-grc-65-184-144-111-238.dsl.bell.ca. [184.144.111.238])
-        by smtp.gmail.com with ESMTPSA id 67sm3126275iob.15.2021.06.25.08.34.19
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 25 Jun 2021 08:34:20 -0700 (PDT)
-From:   Peter Xu <peterx@redhat.com>
-To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc:     peterx@redhat.com, Maxim Levitsky <mlevitsk@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Subject: [PATCH v2 9/9] KVM: X86: Optimize zapping rmap
-Date:   Fri, 25 Jun 2021 11:34:19 -0400
-Message-Id: <20210625153419.43671-1-peterx@redhat.com>
-X-Mailer: git-send-email 2.31.1
-In-Reply-To: <20210625153214.43106-1-peterx@redhat.com>
-References: <20210625153214.43106-1-peterx@redhat.com>
-MIME-Version: 1.0
+        id S230014AbhFYP62 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 25 Jun 2021 11:58:28 -0400
+Received: from mail-co1nam11on2085.outbound.protection.outlook.com ([40.107.220.85]:23817
+        "EHLO NAM11-CO1-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S229738AbhFYP61 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 25 Jun 2021 11:58:27 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=ioO9kwu559z8IJ/tmFv7G7B30MabXeq4ZdypDpjEsFySYjrsBCRheiXTpUV61ayWIBjPXEgH60X+YozAI8f0xEhD+QoFFsh0NnVWT1OQstuAZEGI4WTWFSEC11Hwki/on9FEp/Jo4ZsfU6//zOXvYEvy/Lrsipl2wKHmQATGnCFlr3JFBkbuMXBbjdDFUioPFpUY4ZdYDzrcVccosL0DXK5sF8Ixb+MVbgVXxC3UDSg3ma6v/8gnlV9aL3DuP8lexioNPDVLBgsMOAhaRPp8FA4ExeR3SzNGkhN5ZTRu+3vlog6o3RBaITNUEoL5xrav6Eh+Dsl7tKci/jLtuvTvMQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=ZuhY4+w/fEvLlZPmsEG04J8yryrcgTrM0Vnpd4OA9ws=;
+ b=iIKrGmphqtdQ0/KjR7dNl3sqLkS4F2F6/qtZkrOSOGA3/hnOcS8tiS0QbvgWO+1QPJ7pLmgI4IN6L9yvWdf5s8NkrEsd2k/zGjCf8NxjHoDGNkVs7F9BQbaf13aEqFiV+bskWtnnm2VIn5hTCkb/n6Hprk8/7f15ONd/1tXL6T4lgqfGkE7FW+D7b4DJRQAp9jnA/1qwsxMx4NRxqQi0DMD7C2HjdNR5LvMZsDaYEzqY2ZsuUwoDn3ADZGKfCHn7ZTmNP5UJHgWBQ9tUOomipYs7RtjqnGfOLQDgz2dvEpiE1+fvI4vQKxDgH+bRKCAYLc87fM8LTPnpPnE/QhG3Yw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=ZuhY4+w/fEvLlZPmsEG04J8yryrcgTrM0Vnpd4OA9ws=;
+ b=SK9ngy4sUK/XDNYWSXVuVASl/s3jCjsD0aL35scIOinTBYhnSgG9QJ3LjP9/YG7qFzFgY4YQj1BCGPvqYC0QOeGEFZ+Mkvi4JbHJhliXGRH0dbndtdd9wMmuVvwWqvqKVjHnUXP4U9ZoigHmBmHV0WghxEz0afZo33ALh7Ook+cwDoTaMZv4wsdu0vmRquEQM/UFCrEtHb+eehYGs1yjaedCYnGDur00V4pTiW//QWAD2LRXGol8Tiv5qZC28uL+fTlAVfQZ/PbLiCcfUBtqUGND23M5sHrf3fRW1sS0PFHncjeWt5MHXRMVAdfbEJ36H2ze67JtQwy4M/RzeIRC+w==
+Authentication-Results: vger.kernel.org; dkim=none (message not signed)
+ header.d=none;vger.kernel.org; dmarc=none action=none header.from=nvidia.com;
+Received: from BL0PR12MB5506.namprd12.prod.outlook.com (2603:10b6:208:1cb::22)
+ by BL1PR12MB5287.namprd12.prod.outlook.com (2603:10b6:208:317::12) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4264.19; Fri, 25 Jun
+ 2021 15:56:05 +0000
+Received: from BL0PR12MB5506.namprd12.prod.outlook.com
+ ([fe80::3d51:a3b9:8611:684e]) by BL0PR12MB5506.namprd12.prod.outlook.com
+ ([fe80::3d51:a3b9:8611:684e%8]) with mapi id 15.20.4264.023; Fri, 25 Jun 2021
+ 15:56:05 +0000
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     kvm@vger.kernel.org, Alex Williamson <alex.williamson@redhat.com>
+Cc:     Dan Carpenter <dan.carpenter@oracle.com>
+Subject: [PATCH] vfio/mtty: Delete mdev_devices_list
+Date:   Fri, 25 Jun 2021 12:56:04 -0300
+Message-Id: <0-v1-0bc56b362ca7+62-mtty_used_ports_jgg@nvidia.com>
 Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Originating-IP: [47.55.113.94]
+X-ClientProxiedBy: BLAPR03CA0093.namprd03.prod.outlook.com
+ (2603:10b6:208:32a::8) To BL0PR12MB5506.namprd12.prod.outlook.com
+ (2603:10b6:208:1cb::22)
+MIME-Version: 1.0
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from mlx.ziepe.ca (47.55.113.94) by BLAPR03CA0093.namprd03.prod.outlook.com (2603:10b6:208:32a::8) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4264.21 via Frontend Transport; Fri, 25 Jun 2021 15:56:05 +0000
+Received: from jgg by mlx with local (Exim 4.94)        (envelope-from <jgg@nvidia.com>)        id 1lwoBY-00CkSu-Cw; Fri, 25 Jun 2021 12:56:04 -0300
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 0572398b-ac58-493d-99c4-08d937f1bd7f
+X-MS-TrafficTypeDiagnostic: BL1PR12MB5287:
+X-Microsoft-Antispam-PRVS: <BL1PR12MB528706E1AA9533B28D055F22C2069@BL1PR12MB5287.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:4714;
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: MoK4Q74WK1T3n5L9ICaLDxfuZDEXFifVuPToa6JU267LA5ixE6vR1ltIDL2v0Ex3XJOpaiSIkybUIjHRtvim/hBLAyylLRobShkFBsv/s7NwfoCmWwberj7Wv4Wro9NEadfLwvQy1a2n30L4tCYhFDSS7SgG+QilkkbNNjpuKOyDVAFmsg0JbyXb0iNZde8Q5rtgibi+5uR2In6/A423AIWCkqGfS+j4sLgffGLgpqbHIceL2teC0N55dFGmGEeZyg1SI1XFScSmNPWlPnJ1xElza26IYeU2OYZ14DTf9yx0kGA0j/i4vN3eXCmkZks0ND96OPNo/ITZkuCMWKZspHVEVuV9qvpDKNMn6ZcG7VW2k4CYuQkOqGlwl5y/te6q757wZ8eOJyR3h9Z0/fQilbHhFCR2J8IWyWRCyZ1MyzpBAIttFh7AFnPM2JCv3W6imepZ/PAnJPIqw7jIF3caK0r0sQoqw6IozlitLVQPokTEHzOxSj7rjCWFAiyk51YMT26grZfCl5hTSS/o9rAYP4u6j+pHOSmJbo13z8v13xzaWlPQFF+/O5+aTQH7sXkaNjmzdnPMyrFKv+WgZxj+GESTrPA9+F8fto6XTRMs6l86n4uPY7IuMHOnBKQ3VahLffqMt/ZvNYLnqngdPOCaDg==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL0PR12MB5506.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(346002)(136003)(39860400002)(366004)(376002)(396003)(8676002)(26005)(5660300002)(2906002)(186003)(66476007)(66556008)(426003)(38100700002)(86362001)(36756003)(6916009)(8936002)(2616005)(83380400001)(66946007)(316002)(9786002)(4326008)(9746002)(478600001)(4216001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?wiI17njn830Obo9AT07PUIlkPXca9KGYzvjkxZD2LnWg/5c1F9XTD4pCJo1M?=
+ =?us-ascii?Q?u9MDWaT7Ct8xp4RIDKFjqTMaOSe67GWtsIkkESHUqGpBT3U9wwTuYZRr3ZRx?=
+ =?us-ascii?Q?3v/TJIAVrMfiqU5YjIirXVR4KTm4ojBd2HSIbVzMEMBb05T072175J1D7uBk?=
+ =?us-ascii?Q?7FNj5AvnDCkSa+1uXe0+qRrlmCpU1WHDcG4YDPGnJuP52dZOEoeQB/MO9K2j?=
+ =?us-ascii?Q?ZgNcMgeCwkCzmhFTD4RwNRb8ivo38Rx08emLFrcISUVXsof+SdWrVpLxXuaQ?=
+ =?us-ascii?Q?KMmn2KD5J5FftqY+dAZznjw+2xly8yEX+dJ0HSiXCjkUnYZpFfNycaLf+lmu?=
+ =?us-ascii?Q?g2jAVLk00d29ufV2+SjPkLD7LFEsE1MY970pasv0V3JAqi3BxOMJXRxIykeA?=
+ =?us-ascii?Q?Z8Yf6346+Q/2r2aCt20D4DFsYbYBf7vd4OLP1HgYHf92+RXtHX8bu47++p5L?=
+ =?us-ascii?Q?FUgPfRcLtbXaVuRIl/oegHKHt1UGrNpLtKBHi+dgMOzbdPVZqPWOvFS3PARb?=
+ =?us-ascii?Q?cEkjwGDntQVqwT0hqAZHxHBms1gywJXQLd1j/x3nV4YY3hMk4mIX8ds0lEHY?=
+ =?us-ascii?Q?3Lg3YCFYnprFhojUdVocfVbQyAtEyvXD+gWfCONIicpsY9Fhzxouuul+lgG1?=
+ =?us-ascii?Q?rI/o9kbIphV26w/+lZvEeqzxj9s6deCgaAAAZcHxevoIr6mUkpg5oQbgKs2A?=
+ =?us-ascii?Q?6H89fsN7Lt7jbM968kkitU36uu5roIzoA6nQaXBg5DzuwockDeQ6yRZCJgul?=
+ =?us-ascii?Q?xZHtpWnMRgtd/9LxaieSbIj48t/jdLOjTHMF0zb31VI4vWApyYkxUAoW4IOL?=
+ =?us-ascii?Q?OylwEIQWf9s1edG1RyT9hfAxy81I3w5f6deh4W0qGIxjRO9IJSz0sicwWKBF?=
+ =?us-ascii?Q?BaUPfD4Y03ot8KTHT6L7+Em8iaJoYJ5fe+OaleqLLdHq8jpOlPLrxw77FHd2?=
+ =?us-ascii?Q?PqkTmjlUjKU0uuTwYIM6N7EjivKj5jeZRJunn3tnF3Nr/OMR+3dV3PHMUcxr?=
+ =?us-ascii?Q?OWWhBBf8RhNYyVtCHCM6QOeHt8yGpR2N8MEEzByfGF327twlgdNunLLr7ZyN?=
+ =?us-ascii?Q?7aZ0vRbwD25crAN9x/+kUXBrmtf81WGLcHZgFUn6JCpF0ZsIFT1s/W9GWOou?=
+ =?us-ascii?Q?jkoC3Inq+WBMXmbz+aKmuK27LGjYIlgAyt5k+xeBu5ZzH6NN4NVczy/XCz25?=
+ =?us-ascii?Q?pR41Z3gfZZ/ApeOE+Gg1HbYlT+CY/MhDF/Ahei6J1K+InFmFfbyoqZ68s5Nq?=
+ =?us-ascii?Q?T0zfqXXHuuwrPtUMCfRju9ZZTzbJUdZSHo1V122wBZq59tuNmS4OmTDP/OoX?=
+ =?us-ascii?Q?u2LzIrjau9XnXhWKCByWSh60?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 0572398b-ac58-493d-99c4-08d937f1bd7f
+X-MS-Exchange-CrossTenant-AuthSource: BL0PR12MB5506.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Jun 2021 15:56:05.6294
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: G0CO1LEwIQI+uWF5KHWG5bJbiTWHZ/Z6sJB19IkPCtagfvWhZSAJrVqUQ4X6KC+K
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL1PR12MB5287
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Using rmap_get_first() and rmap_remove() for zapping a huge rmap list could be
-slow.  The easy way is to travers the rmap list, collecting the a/d bits and
-free the slots along the way.
+Dan points out that an error case left things on this list. It is also
+missing locking in available_instances_show().
 
-Provide a pte_list_destroy() and do exactly that.
+Further study shows the list isn't needed at all, just store the total
+ports in use in an atomic and delete the whole thing.
 
-Signed-off-by: Peter Xu <peterx@redhat.com>
+Reported-by: Dan Carpenter <dan.carpenter@oracle.com>
+Fixes: 09177ac91921 ("vfio/mtty: Convert to use vfio_register_group_dev()")
+Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
 ---
- arch/x86/kvm/mmu/mmu.c | 45 +++++++++++++++++++++++++++++++-----------
- 1 file changed, 33 insertions(+), 12 deletions(-)
+ samples/vfio-mdev/mtty.c | 24 ++++++------------------
+ 1 file changed, 6 insertions(+), 18 deletions(-)
 
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index ba0258bdebc4..45aac78dcabc 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -1014,6 +1014,38 @@ unsigned int pte_list_count(struct kvm_rmap_head *rmap_head)
- 	return count;
+diff --git a/samples/vfio-mdev/mtty.c b/samples/vfio-mdev/mtty.c
+index faf9b8e8873a5b..ffbaf07a17eaee 100644
+--- a/samples/vfio-mdev/mtty.c
++++ b/samples/vfio-mdev/mtty.c
+@@ -144,8 +144,7 @@ struct mdev_state {
+ 	int nr_ports;
+ };
+ 
+-static struct mutex mdev_list_lock;
+-static struct list_head mdev_devices_list;
++static atomic_t mdev_used_ports;
+ 
+ static const struct file_operations vd_fops = {
+ 	.owner          = THIS_MODULE,
+@@ -733,15 +732,13 @@ static int mtty_probe(struct mdev_device *mdev)
+ 
+ 	mtty_create_config_space(mdev_state);
+ 
+-	mutex_lock(&mdev_list_lock);
+-	list_add(&mdev_state->next, &mdev_devices_list);
+-	mutex_unlock(&mdev_list_lock);
+-
+ 	ret = vfio_register_group_dev(&mdev_state->vdev);
+ 	if (ret) {
+ 		kfree(mdev_state);
+ 		return ret;
+ 	}
++	atomic_add(mdev_state->nr_ports, &mdev_used_ports);
++
+ 	dev_set_drvdata(&mdev->dev, mdev_state);
+ 	return 0;
+ }
+@@ -750,10 +747,8 @@ static void mtty_remove(struct mdev_device *mdev)
+ {
+ 	struct mdev_state *mdev_state = dev_get_drvdata(&mdev->dev);
+ 
++	atomic_sub(mdev_state->nr_ports, &mdev_used_ports);
+ 	vfio_unregister_group_dev(&mdev_state->vdev);
+-	mutex_lock(&mdev_list_lock);
+-	list_del(&mdev_state->next);
+-	mutex_unlock(&mdev_list_lock);
+ 
+ 	kfree(mdev_state->vconfig);
+ 	kfree(mdev_state);
+@@ -1274,14 +1269,10 @@ static ssize_t available_instances_show(struct mdev_type *mtype,
+ 					struct mdev_type_attribute *attr,
+ 					char *buf)
+ {
+-	struct mdev_state *mds;
+ 	unsigned int ports = mtype_get_type_group_id(mtype) + 1;
+-	int used = 0;
+ 
+-	list_for_each_entry(mds, &mdev_devices_list, next)
+-		used += mds->nr_ports;
+-
+-	return sprintf(buf, "%d\n", (MAX_MTTYS - used)/ports);
++	return sprintf(buf, "%d\n",
++		       (MAX_MTTYS - atomic_read(&mdev_used_ports)) / ports);
  }
  
-+/* Return true if rmap existed and callback called, false otherwise */
-+static bool pte_list_destroy(struct kvm_rmap_head *rmap_head,
-+			     int (*callback)(u64 *sptep))
-+{
-+	struct pte_list_desc *desc, *next;
-+	int i;
-+
-+	if (!rmap_head->val)
-+		return false;
-+
-+	if (!(rmap_head->val & 1)) {
-+		if (callback)
-+			callback((u64 *)rmap_head->val);
-+		goto out;
-+	}
-+
-+	desc = (struct pte_list_desc *)(rmap_head->val & ~1ul);
-+
-+	while (desc) {
-+		if (callback)
-+			for (i = 0; i < desc->spte_count; i++)
-+				callback(desc->sptes[i]);
-+		next = desc->more;
-+		mmu_free_pte_list_desc(desc);
-+		desc = next;
-+	}
-+out:
-+	/* rmap_head is meaningless now, remember to reset it */
-+	rmap_head->val = 0;
-+	return true;
-+}
-+
- static struct kvm_rmap_head *__gfn_to_rmap(gfn_t gfn, int level,
- 					   struct kvm_memory_slot *slot)
- {
-@@ -1403,18 +1435,7 @@ static bool rmap_write_protect(struct kvm_vcpu *vcpu, u64 gfn)
- static bool kvm_zap_rmapp(struct kvm *kvm, struct kvm_rmap_head *rmap_head,
- 			  struct kvm_memory_slot *slot)
- {
--	u64 *sptep;
--	struct rmap_iterator iter;
--	bool flush = false;
+ static MDEV_TYPE_ATTR_RO(available_instances);
+@@ -1395,9 +1386,6 @@ static int __init mtty_dev_init(void)
+ 	ret = mdev_register_device(&mtty_dev.dev, &mdev_fops);
+ 	if (ret)
+ 		goto err_device;
 -
--	while ((sptep = rmap_get_first(rmap_head, &iter))) {
--		rmap_printk("spte %p %llx.\n", sptep, *sptep);
--
--		pte_list_remove(rmap_head, sptep);
--		flush = true;
--	}
--
--	return flush;
-+	return pte_list_destroy(rmap_head, mmu_spte_clear_track_bits);
- }
+-	mutex_init(&mdev_list_lock);
+-	INIT_LIST_HEAD(&mdev_devices_list);
+ 	return 0;
  
- static bool kvm_unmap_rmapp(struct kvm *kvm, struct kvm_rmap_head *rmap_head,
+ err_device:
 -- 
-2.31.1
+2.32.0
 
