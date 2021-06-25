@@ -2,350 +2,93 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E4C393B4194
-	for <lists+kvm@lfdr.de>; Fri, 25 Jun 2021 12:24:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 124B63B419C
+	for <lists+kvm@lfdr.de>; Fri, 25 Jun 2021 12:25:53 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231348AbhFYK1B (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 25 Jun 2021 06:27:01 -0400
-Received: from smtp-fw-6002.amazon.com ([52.95.49.90]:18771 "EHLO
-        smtp-fw-6002.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231404AbhFYK07 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 25 Jun 2021 06:26:59 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.de; i=@amazon.de; q=dns/txt; s=amazon201209;
-  t=1624616679; x=1656152679;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version;
-  bh=92xTIyz5g5W9oyuktdQVwvkkdrVToLiu7+iyaniqZKg=;
-  b=u31ZHHk87DcIekjNpTPJcOTW7d85y7+Lf43n2Q2PMmM9fAA1zt9aaHme
-   U5InE6f8wOzJfwFp8Fx5CozADUPA9BLlI2l6dNWhLpjZGVluVjY5YLg6N
-   tvS+Ept1OoGFhG5UH/tM28wCltKLDP/Rh3OiuzphTYPDVGTS705meqSH7
-   8=;
-X-IronPort-AV: E=Sophos;i="5.83,298,1616457600"; 
-   d="scan'208";a="121287971"
-Received: from iad12-co-svc-p1-lb1-vlan2.amazon.com (HELO email-inbound-relay-2a-22cc717f.us-west-2.amazon.com) ([10.43.8.2])
-  by smtp-border-fw-6002.iad6.amazon.com with ESMTP; 25 Jun 2021 10:24:38 +0000
-Received: from EX13D28EUC003.ant.amazon.com (pdx1-ws-svc-p6-lb9-vlan3.pdx.amazon.com [10.236.137.198])
-        by email-inbound-relay-2a-22cc717f.us-west-2.amazon.com (Postfix) with ESMTPS id 4AB96A1D20;
-        Fri, 25 Jun 2021 10:24:37 +0000 (UTC)
-Received: from uc8bbc9586ea454.ant.amazon.com (10.43.161.183) by
- EX13D28EUC003.ant.amazon.com (10.43.164.43) with Microsoft SMTP Server (TLS)
- id 15.0.1497.18; Fri, 25 Jun 2021 10:24:32 +0000
-From:   Siddharth Chandrasekaran <sidcha@amazon.de>
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        Marcelo Tosatti <mtosatti@redhat.com>
-CC:     Siddharth Chandrasekaran <sidcha@amazon.de>,
-        Siddharth Chandrasekaran <sidcha.dev@gmail.com>,
-        Alexander Graf <graf@amazon.com>,
-        Evgeny Iakovlev <eyakovl@amazon.de>,
-        Liran Alon <liran@amazon.com>,
-        Ioannis Aslanidis <iaslan@amazon.de>, <qemu-devel@nongnu.org>,
-        <kvm@vger.kernel.org>
-Subject: [PATCH v2 6/6] hyper-v: Handle hypercall code page as an overlay page
-Date:   Fri, 25 Jun 2021 12:23:31 +0200
-Message-ID: <451360b22145157b660802af9ff8beb67440b4cd.1624615713.git.sidcha@amazon.de>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <cover.1624615713.git.sidcha@amazon.de>
-References: <cover.1624615713.git.sidcha@amazon.de>
+        id S231365AbhFYK2L (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 25 Jun 2021 06:28:11 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:60514 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S230496AbhFYK2L (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 25 Jun 2021 06:28:11 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1624616750;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=fG0be8Kc2dwTF6j8KtChCzsOlmu137hmqe59tyGCHkE=;
+        b=P0tELQllzabz6XY2FG0nPf8smHAEZ5pJVdARUVkFYKNZwUsPKFmJjwnGTwr/Jl29c6iv04
+        pfGSlig1ANmLNTYI7IrqhMWF/UDXIhhf0nbZehqCwLPlEDpt+KTKfj0IJAZHTNA9tlT949
+        3nlJXP51b9aPvfn+NF1fw44VYMvBeF4=
+Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
+ [209.85.218.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-595-zLTCv0UyMwadrEQAN_WAqw-1; Fri, 25 Jun 2021 06:25:49 -0400
+X-MC-Unique: zLTCv0UyMwadrEQAN_WAqw-1
+Received: by mail-ej1-f70.google.com with SMTP id w22-20020a17090652d6b029048a3391d9f6so2972643ejn.12
+        for <kvm@vger.kernel.org>; Fri, 25 Jun 2021 03:25:48 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=fG0be8Kc2dwTF6j8KtChCzsOlmu137hmqe59tyGCHkE=;
+        b=cgEgzCx8jlV0A3hPFb4iXeJqU7ZobYCWcE0Q1RzEZDMzPeLPUBao2JfDSwuILEKWY6
+         CIhW8Gax1FyxotErtYXP/lkISsAagBx3/lH/KT8IhhQHYbez/86Sh4trPW8JrBuiSnLM
+         wEpbJbBWli3MzYWPxdAWVO/a0zV/cktoP7r6TLuzyMfqVUFkSbOxYbLvW6E0p985hgCT
+         VFueMCcjh7B1pP6TCe3SS/amqBcdkW5F/Xmk9kV8AsD4v5nT3glCWtFRdpoYtc+MlIhm
+         jlx+XSKc2a6+xjgFU1qG9StehP4+BLMPxcJ5Bu6RnubLkVYu+7lLCfct5/ZdWcB4EtOa
+         6Vtg==
+X-Gm-Message-State: AOAM53298nny9IZJqTmGIxBaYbFESbOL3jnAZCFuz5dfsZuDydOS9cbm
+        biHSJMJnJjvXMvrxn6waVQzCbAWd2vL9QcnBVhvT/9XHSNTMuzzUvAlDeatJe5cG5s+o3zEQYPh
+        5OsmRzBzouRgj
+X-Received: by 2002:a17:906:60d3:: with SMTP id f19mr10301198ejk.413.1624616747783;
+        Fri, 25 Jun 2021 03:25:47 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyWbFg9dFBgEY7PpCIE0Ayv1y0K1VX63+CfNjzZnkmZBL77UmQqvCJ5vh1nGchYaKorPdoArg==
+X-Received: by 2002:a17:906:60d3:: with SMTP id f19mr10301190ejk.413.1624616747644;
+        Fri, 25 Jun 2021 03:25:47 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+        by smtp.gmail.com with ESMTPSA id j19sm3631248edw.43.2021.06.25.03.25.46
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 25 Jun 2021 03:25:47 -0700 (PDT)
+Subject: Re: [PATCH 05/54] Revert "KVM: x86/mmu: Drop
+ kvm_mmu_extended_role.cr4_la57 hack"
+To:     Yu Zhang <yu.c.zhang@linux.intel.com>
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Maxim Levitsky <mlevitsk@redhat.com>
+References: <20210622175739.3610207-1-seanjc@google.com>
+ <20210622175739.3610207-6-seanjc@google.com>
+ <20210625084644.ort4oojvd27oy4ca@linux.intel.com>
+ <09a49caf-6ff5-295b-d1ab-023549f6a23b@redhat.com>
+ <20210625092902.o4kqx67zvvbudggh@linux.intel.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <885018ab-206b-35c7-a75a-e4fccb663fc3@redhat.com>
+Date:   Fri, 25 Jun 2021 12:25:46 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.10.1
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.43.161.183]
-X-ClientProxiedBy: EX13D05UWC004.ant.amazon.com (10.43.162.223) To
- EX13D28EUC003.ant.amazon.com (10.43.164.43)
+In-Reply-To: <20210625092902.o4kqx67zvvbudggh@linux.intel.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hypercall code page is specified in the Hyper-V TLFS to be an overlay
-page, ie., guest chooses a GPA and the host _places_ a page at that
-location, making it visible to the guest and the existing page becomes
-inaccessible. Similarly when disabled, the host should _remove_ the
-overlay and the old page should become visible to the guest.
+On 25/06/21 11:29, Yu Zhang wrote:
+> Thanks, Paolo.
+> 
+> Do you mean the L1 can modify its paging mode by setting HOST_CR3 as root of
+> a PML5 table in VMCS12 and HOST_CR4 with LA57 flipped in VMCS12, causing the
+> GUEST_CR3/4 being changed in VMCS01, and eventually updating the CR3/4 when
+> L0 is injecting a VM Exit from L2?
 
-Until now, KVM patched the hypercall code directly into the guest
-chosen GPA which is incorrect; instead, use the new user space MSR
-filtering feature to trap hypercall page MSR writes, overlay it as
-requested and then invoke a KVM_SET_MSR from user space to bounce back
-control KVM. This bounce back is needed as KVM may have to write data
-into the newly overlaid page.
+Yes, you can even do that without a "full" vmentry by setting invalid 
+guest state in vmcs12. :)
 
-Signed-off-by: Siddharth Chandrasekaran <sidcha@amazon.de>
----
- hw/hyperv/hyperv.c         | 10 ++++-
- include/hw/hyperv/hyperv.h |  5 +++
- target/i386/kvm/hyperv.c   | 91 ++++++++++++++++++++++++++++++++++++++
- target/i386/kvm/hyperv.h   |  4 ++
- target/i386/kvm/kvm.c      | 49 +++++++++++++++++++-
- 5 files changed, 156 insertions(+), 3 deletions(-)
-
-diff --git a/hw/hyperv/hyperv.c b/hw/hyperv/hyperv.c
-index ac45e8e139..aa5ac5226e 100644
---- a/hw/hyperv/hyperv.c
-+++ b/hw/hyperv/hyperv.c
-@@ -36,6 +36,7 @@ struct SynICState {
- OBJECT_DECLARE_SIMPLE_TYPE(SynICState, SYNIC)
- 
- static bool synic_enabled;
-+struct hyperv_overlay_page hcall_page;
- 
- static void alloc_overlay_page(struct hyperv_overlay_page *overlay,
-                                Object *owner, const char *name)
-@@ -50,7 +51,7 @@ static void alloc_overlay_page(struct hyperv_overlay_page *overlay,
-  * This method must be called with iothread lock taken as it modifies
-  * the memory hierarchy.
-  */
--static void hyperv_overlay_update(struct hyperv_overlay_page *overlay, hwaddr addr)
-+void hyperv_overlay_update(struct hyperv_overlay_page *overlay, hwaddr addr)
- {
-     if (addr != HYPERV_INVALID_OVERLAY_GPA) {
-         /* check if overlay page is enabled */
-@@ -70,6 +71,13 @@ static void hyperv_overlay_update(struct hyperv_overlay_page *overlay, hwaddr ad
-     }
- }
- 
-+void hyperv_overlay_init(void)
-+{
-+    memory_region_init_ram(&hcall_page.mr, NULL, "hyperv.hcall_page",
-+                           qemu_real_host_page_size, &error_abort);
-+    hcall_page.addr = HYPERV_INVALID_OVERLAY_GPA;
-+}
-+
- static void synic_update(SynICState *synic, bool enable,
-                          hwaddr msg_page_addr, hwaddr event_page_addr)
- {
-diff --git a/include/hw/hyperv/hyperv.h b/include/hw/hyperv/hyperv.h
-index d989193e84..f444431a81 100644
---- a/include/hw/hyperv/hyperv.h
-+++ b/include/hw/hyperv/hyperv.h
-@@ -85,6 +85,11 @@ static inline uint32_t hyperv_vp_index(CPUState *cs)
-     return cs->cpu_index;
- }
- 
-+extern struct hyperv_overlay_page hcall_page;
-+
-+void hyperv_overlay_init(void);
-+void hyperv_overlay_update(struct hyperv_overlay_page *page, hwaddr addr);
-+
- void hyperv_synic_add(CPUState *cs);
- void hyperv_synic_reset(CPUState *cs);
- void hyperv_synic_update(CPUState *cs, bool enable,
-diff --git a/target/i386/kvm/hyperv.c b/target/i386/kvm/hyperv.c
-index f49ed2621d..d5eb47b8b0 100644
---- a/target/i386/kvm/hyperv.c
-+++ b/target/i386/kvm/hyperv.c
-@@ -16,6 +16,83 @@
- #include "hyperv.h"
- #include "hw/hyperv/hyperv.h"
- #include "hyperv-proto.h"
-+#include "kvm_i386.h"
-+
-+struct x86_hv_overlay {
-+    struct hyperv_overlay_page *page;
-+    uint32_t msr;
-+    hwaddr gpa;
-+};
-+
-+static void async_overlay_update(CPUState *cs, run_on_cpu_data data)
-+{
-+    X86CPU *cpu = X86_CPU(cs);
-+    struct x86_hv_overlay *overlay = data.host_ptr;
-+
-+    qemu_mutex_lock_iothread();
-+    hyperv_overlay_update(overlay->page, overlay->gpa);
-+    qemu_mutex_unlock_iothread();
-+
-+    /**
-+     * Call KVM so it can keep a copy of the MSR data and do other post-overlay
-+     * actions such as filling the overlay page contents before returning to
-+     * guest. This works because MSR filtering is inactive for KVM_SET_MSRS
-+     */
-+    kvm_put_one_msr(cpu, overlay->msr, overlay->gpa);
-+
-+    g_free(overlay);
-+}
-+
-+static void do_overlay_update(X86CPU *cpu, struct hyperv_overlay_page *page,
-+                              uint32_t msr, uint64_t data)
-+{
-+    struct x86_hv_overlay *overlay = g_malloc(sizeof(struct x86_hv_overlay));
-+
-+    *overlay = (struct x86_hv_overlay) {
-+        .page = page,
-+        .msr = msr,
-+        .gpa = data
-+    };
-+
-+    /**
-+     * This will run in this cpu thread before it returns to KVM, but in a
-+     * safe environment (i.e. when all cpus are quiescent) -- this is
-+     * necessary because memory hierarchy is being changed
-+     */
-+    async_safe_run_on_cpu(CPU(cpu), async_overlay_update,
-+                          RUN_ON_CPU_HOST_PTR(overlay));
-+}
-+
-+static void overlay_update(X86CPU *cpu, uint32_t msr, uint64_t data)
-+{
-+    CPUX86State *env = &cpu->env;
-+
-+    switch (msr) {
-+    case HV_X64_MSR_GUEST_OS_ID:
-+        /**
-+         * When GUEST_OS_ID is cleared, hypercall overlay should be removed;
-+         * otherwise it is a NOP. We still need to do a SET_MSR here as the
-+         * kernel need to keep a copy of data.
-+         */
-+        env->msr_hv_guest_os_id = data;
-+        if (data != 0) {
-+            kvm_put_one_msr(cpu, msr, data);
-+            return;
-+        }
-+        /* Fake a zero write to the overlay page hcall to invalidate the mapping */
-+        do_overlay_update(cpu, &hcall_page, msr, 0);
-+        break;
-+    case HV_X64_MSR_HYPERCALL:
-+        if (env->msr_hv_guest_os_id == 0) {
-+            /* This is a NOP in KVM too so we don't need to write back the MSR */
-+            return;
-+        }
-+        do_overlay_update(cpu, &hcall_page, msr, data);
-+        break;
-+    default:
-+        return;
-+    }
-+}
- 
- int hyperv_x86_synic_add(X86CPU *cpu)
- {
-@@ -44,6 +121,20 @@ static void async_synic_update(CPUState *cs, run_on_cpu_data data)
-     qemu_mutex_unlock_iothread();
- }
- 
-+int kvm_hv_handle_wrmsr(X86CPU *cpu, uint32_t msr, uint64_t data)
-+{
-+    switch (msr) {
-+    case HV_X64_MSR_GUEST_OS_ID:
-+    case HV_X64_MSR_HYPERCALL:
-+        overlay_update(cpu, msr, data);
-+        break;
-+    default:
-+        return 1;
-+    }
-+
-+    return 0;
-+}
-+
- int kvm_hv_handle_exit(X86CPU *cpu, struct kvm_hyperv_exit *exit)
- {
-     CPUX86State *env = &cpu->env;
-diff --git a/target/i386/kvm/hyperv.h b/target/i386/kvm/hyperv.h
-index 67543296c3..8e90fa949f 100644
---- a/target/i386/kvm/hyperv.h
-+++ b/target/i386/kvm/hyperv.h
-@@ -20,8 +20,12 @@
- 
- #ifdef CONFIG_KVM
- int kvm_hv_handle_exit(X86CPU *cpu, struct kvm_hyperv_exit *exit);
-+int kvm_hv_handle_wrmsr(X86CPU *cpu, uint32_t msr, uint64_t data);
-+
- #endif
- 
-+void hyperv_x86_hcall_page_update(X86CPU *cpu);
-+
- int hyperv_x86_synic_add(X86CPU *cpu);
- void hyperv_x86_synic_reset(X86CPU *cpu);
- void hyperv_x86_synic_update(X86CPU *cpu);
-diff --git a/target/i386/kvm/kvm.c b/target/i386/kvm/kvm.c
-index b89b343acc..c279c13437 100644
---- a/target/i386/kvm/kvm.c
-+++ b/target/i386/kvm/kvm.c
-@@ -2207,11 +2207,30 @@ static void kvm_set_msr_filter_range(struct kvm_msr_filter_range *range, uint32_
- 
- static int kvm_set_msr_filters(KVMState *s)
- {
--    int r;
-+    int r, nmsrs, nfilt = 0, bitmap_pos = 0;
-     struct kvm_msr_filter filter = { };
-+    struct kvm_msr_filter_range *range;
-+    uint8_t bitmap_buf[KVM_MSR_FILTER_MAX_RANGES * 8] = {0};
- 
-     filter.flags = KVM_MSR_FILTER_DEFAULT_ALLOW;
- 
-+    if (has_hyperv) {
-+        /*
-+         * Set filter on WRMSR to trap HV_X64_MSR_GUEST_OS_ID and
-+         * HV_X64_MSR_HYPERCALL to userspace. These will be used to
-+         * handle overlay requests.
-+         */
-+        nmsrs = 2;
-+        range = &filter.ranges[nfilt++];
-+        range->bitmap = &bitmap_buf[bitmap_pos];
-+        kvm_set_msr_filter_range(range, KVM_MSR_FILTER_WRITE,
-+                                 HV_X64_MSR_GUEST_OS_ID, nmsrs,
-+                                 true, /* HV_X64_MSR_GUEST_OS_ID */
-+                                 true  /* HV_X64_MSR_HYPERCALL */);
-+        bitmap_pos += ROUND_UP(nmsrs, 8) / 8;
-+        assert(bitmap_pos < sizeof(bitmap_buf));
-+    }
-+
-     r = kvm_vm_ioctl(s, KVM_X86_SET_MSR_FILTER, &filter);
-     if (r != 0) {
-         error_report("kvm: failed to set MSR filters");
-@@ -2363,6 +2382,10 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
-         }
-     }
- 
-+    if (has_hyperv && msr_filters_active) {
-+        hyperv_overlay_init();
-+    }
-+
-     return 0;
- }
- 
-@@ -4644,7 +4667,29 @@ static int kvm_handle_rdmsr(X86CPU *cpu, struct kvm_run *run)
- 
- static int kvm_handle_wrmsr(X86CPU *cpu, struct kvm_run *run)
- {
--    run->msr.error = 1;
-+    int r = 1;
-+    uint32_t msr;
-+    uint64_t data;
-+
-+    if (run->msr.reason != KVM_MSR_EXIT_REASON_FILTER) {
-+        error_report("MSR exit without exit reason FILTER");
-+        goto error;
-+    }
-+
-+    msr = run->msr.index;
-+    data = run->msr.data;
-+
-+    switch (msr) {
-+    case HV_X64_MSR_GUEST_OS_ID:
-+    case HV_X64_MSR_HYPERCALL:
-+        r = kvm_hv_handle_wrmsr(cpu, msr, data);
-+        break;
-+    default:
-+        error_report("Unknown MSR exit");
-+    }
-+
-+error:
-+    run->msr.error = r;
-     return 0;
- }
- 
--- 
-2.17.1
-
-
-
-
-Amazon Development Center Germany GmbH
-Krausenstr. 38
-10117 Berlin
-Geschaeftsfuehrung: Christian Schlaeger, Jonathan Weiss
-Eingetragen am Amtsgericht Charlottenburg unter HRB 149173 B
-Sitz: Berlin
-Ust-ID: DE 289 237 879
-
-
+Paolo
 
