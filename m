@@ -2,36 +2,36 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7DDE03B4EDB
-	for <lists+kvm@lfdr.de>; Sat, 26 Jun 2021 16:03:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 64B863B5050
+	for <lists+kvm@lfdr.de>; Sat, 26 Jun 2021 23:50:43 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230031AbhFZOFq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 26 Jun 2021 10:05:46 -0400
-Received: from forward100p.mail.yandex.net ([77.88.28.100]:60816 "EHLO
-        forward100p.mail.yandex.net" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229518AbhFZOFp (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Sat, 26 Jun 2021 10:05:45 -0400
+        id S230215AbhFZVxB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 26 Jun 2021 17:53:01 -0400
+Received: from forward104p.mail.yandex.net ([77.88.28.107]:45924 "EHLO
+        forward104p.mail.yandex.net" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229794AbhFZVxB (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Sat, 26 Jun 2021 17:53:01 -0400
 Received: from forward103q.mail.yandex.net (forward103q.mail.yandex.net [IPv6:2a02:6b8:c0e:50:0:640:b21c:d009])
-        by forward100p.mail.yandex.net (Yandex) with ESMTP id C89DE5981D74;
-        Sat, 26 Jun 2021 17:03:21 +0300 (MSK)
-Received: from vla1-d30fdea44965.qloud-c.yandex.net (vla1-d30fdea44965.qloud-c.yandex.net [IPv6:2a02:6b8:c0d:131b:0:640:d30f:dea4])
-        by forward103q.mail.yandex.net (Yandex) with ESMTP id C5E4F61E0002;
-        Sat, 26 Jun 2021 17:03:21 +0300 (MSK)
-Received: from vla1-719694b86d9e.qloud-c.yandex.net (vla1-719694b86d9e.qloud-c.yandex.net [2a02:6b8:c0d:3495:0:640:7196:94b8])
-        by vla1-d30fdea44965.qloud-c.yandex.net (mxback/Yandex) with ESMTP id Tl4wGTrC9d-3LHiirfh;
-        Sat, 26 Jun 2021 17:03:21 +0300
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex.ru; s=mail; t=1624716201;
-        bh=TCLJUbm5foo9nartojCnuS9tI3bhlkTdI8cS9RROzyc=;
+        by forward104p.mail.yandex.net (Yandex) with ESMTP id B64B94B01915;
+        Sun, 27 Jun 2021 00:50:36 +0300 (MSK)
+Received: from vla5-4a733ba05de7.qloud-c.yandex.net (vla5-4a733ba05de7.qloud-c.yandex.net [IPv6:2a02:6b8:c18:3514:0:640:4a73:3ba0])
+        by forward103q.mail.yandex.net (Yandex) with ESMTP id B359061E0004;
+        Sun, 27 Jun 2021 00:50:36 +0300 (MSK)
+Received: from vla5-445dc1c4c112.qloud-c.yandex.net (vla5-445dc1c4c112.qloud-c.yandex.net [2a02:6b8:c18:3609:0:640:445d:c1c4])
+        by vla5-4a733ba05de7.qloud-c.yandex.net (mxback/Yandex) with ESMTP id QufcQ2W4bJ-oaHaBJAj;
+        Sun, 27 Jun 2021 00:50:36 +0300
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex.ru; s=mail; t=1624744236;
+        bh=PhqJl6gIweaTPn2VygJ3bi52oNz9OKGzeUaSpk/WS+0=;
         h=In-Reply-To:From:Date:References:To:Subject:Message-ID:Cc;
-        b=PoUFVaSj7WDHI6H7sQJIrG3o8rayCImhORJO+9IgAtlkQRXuiImOK1l6q+L0rghIK
-         7LhxgTPTqaXSpuoilmHofyA0Ssx3DNh2jWKKZBt1nZhnYgU5jwAyGL4iUeCJ0c8Suw
-         qt/S9On2Fa7xFl/zY8z0Daa3hMGDAbXcYgGzoRa8=
-Authentication-Results: vla1-d30fdea44965.qloud-c.yandex.net; dkim=pass header.i=@yandex.ru
-Received: by vla1-719694b86d9e.qloud-c.yandex.net (smtp/Yandex) with ESMTPSA id UHoh6rPqG1-3L202goS;
-        Sat, 26 Jun 2021 17:03:21 +0300
+        b=hGkUK+mvOFo1Rgc8qKJ197gqWWjkglPlO09RQztGbyXJ3pBNNa9dzFJG7oFF4FmUk
+         ebbXwGwiJYaYcVwTCmsOwcFfw3uq5NGYuPLJ1P6f2xhQP80kqvkSA/xH6RCTPHvJx9
+         hI1jZscc9P2BteQeiBKDg+iKiggcaiyEVmmJiPkI=
+Authentication-Results: vla5-4a733ba05de7.qloud-c.yandex.net; dkim=pass header.i=@yandex.ru
+Received: by vla5-445dc1c4c112.qloud-c.yandex.net (smtp/Yandex) with ESMTPSA id JHG95TzntA-oa3SrupZ;
+        Sun, 27 Jun 2021 00:50:36 +0300
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
         (Client certificate not present)
-Subject: Re: exception vs SIGALRM race (another patch)
+Subject: Re: exception vs SIGALRM race on core2 CPUs (with fix!)
 To:     Jim Mattson <jmattson@google.com>
 Cc:     Sean Christopherson <seanjc@google.com>, kvm@vger.kernel.org
 References: <bd4a2d30-5fb4-3612-c855-946d97068b9a@yandex.ru>
@@ -42,13 +42,19 @@ References: <bd4a2d30-5fb4-3612-c855-946d97068b9a@yandex.ru>
  <CALMp9eSpJ8=O=6YExpOtdnA=gQkWfQJ+oz0bBcV4gOPFdnciVA@mail.gmail.com>
  <d5bf20f4-9aef-8e7e-8a8f-47d10510724e@yandex.ru>
  <CALMp9eQANi7SPAvue5VQazG7A0=b_2vkUxYK+GMLbzNkxbXM5w@mail.gmail.com>
+ <4f40a6e8-07ce-ba12-b3e6-5975ad19a2ff@yandex.ru>
+ <cbaa0b83-fc3a-5732-4246-386a0a0ff9b8@yandex.ru>
+ <60ae8b9f-89af-e8b3-13c4-99ddea1ced90@yandex.ru>
+ <19022e7d-e1f5-06b5-f059-27172ca50011@yandex.ru>
+ <f09d851d-bda1-7a99-41cb-a14ea51e1237@yandex.ru>
+ <CALMp9eQWKa1vL+jj5HXO1bm+oMo6gQLNw44P7y6ZaF8_WQfukw@mail.gmail.com>
 From:   stsp <stsp2@yandex.ru>
-Message-ID: <ba685c8f-1916-ed45-8455-90a272c98940@yandex.ru>
-Date:   Sat, 26 Jun 2021 17:03:20 +0300
+Message-ID: <a18ea3f1-2d7a-fee4-aa20-bb26c44baf19@yandex.ru>
+Date:   Sun, 27 Jun 2021 00:50:35 +0300
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.11.0
 MIME-Version: 1.0
-In-Reply-To: <CALMp9eQANi7SPAvue5VQazG7A0=b_2vkUxYK+GMLbzNkxbXM5w@mail.gmail.com>
+In-Reply-To: <CALMp9eQWKa1vL+jj5HXO1bm+oMo6gQLNw44P7y6ZaF8_WQfukw@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
 Content-Language: en-US
@@ -56,41 +62,47 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-22.06.2021 01:33, Jim Mattson пишет:
-> Maybe what you want is run->ready_for_interrupt_injection? And, if
+26.06.2021 03:15, Jim Mattson пишет:
+> If the squashed exception was a trap, it's now lost.
 
-I implemented this suggestion with
-the patch below:
+OK, below are 2 more patches, each of
+them alone is fixing the problem.
 
 ---
 
 --- x86.c.old   2021-03-20 12:51:14.000000000 +0300
-+++ x86.c       2021-06-26 16:51:17.366592310 +0300
-@@ -4109,7 +4109,9 @@
-  static int kvm_vcpu_ready_for_interrupt_injection(struct kvm_vcpu *vcpu)
-  {
-         return kvm_arch_interrupt_allowed(vcpu) &&
--               kvm_cpu_accept_dm_intr(vcpu);
-+               kvm_cpu_accept_dm_intr(vcpu) &&
-+               !vcpu->arch.exception.pending &&
-+               !vcpu->arch.exception.injected;
-  }
++++ x86.c       2021-06-27 00:38:45.547355116 +0300
+@@ -9094,6 +9094,7 @@
+         if (req_immediate_exit)
+                 kvm_make_request(KVM_REQ_EVENT, vcpu);
+         kvm_x86_ops.cancel_injection(vcpu);
++       kvm_clear_exception_queue(vcpu);
+         if (unlikely(vcpu->arch.apic_attention))
+                 kvm_lapic_sync_from_vapic(vcpu);
+  out:
+---
 
-  static int kvm_vcpu_ioctl_interrupt(struct kvm_vcpu *vcpu,
+
+Or:
+
+---
+
+--- x86.c.old   2021-03-20 12:51:14.000000000 +0300
++++ x86.c       2021-06-27 00:47:06.958618185 +0300
+@@ -1783,8 +1783,7 @@
+  bool kvm_vcpu_exit_request(struct kvm_vcpu *vcpu)
+  {
+         xfer_to_guest_mode_prepare();
+-       return vcpu->mode == EXITING_GUEST_MODE || 
+kvm_request_pending(vcpu) ||
+-               xfer_to_guest_mode_work_pending();
++       return vcpu->mode == EXITING_GUEST_MODE || 
+kvm_request_pending(vcpu);
+  }
+  EXPORT_SYMBOL_GPL(kvm_vcpu_exit_request);
 
 ---
 
 
-With that change I indeed can
-look into run->ready_for_interrupt_injection
-and avoid the race.
-That means a cpu-specific work-around
-in my code, but at least that works.
-But without this change,
-run->ready_for_interrupt_injection
-just lies.
-
-Does this bring us any closer to the
-understanding of what's going on?
-If not, what should I find out next?
+Still not a clue?
 
