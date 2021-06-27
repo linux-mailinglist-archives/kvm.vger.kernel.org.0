@@ -2,33 +2,30 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 64B863B5050
-	for <lists+kvm@lfdr.de>; Sat, 26 Jun 2021 23:50:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0E3B43B5342
+	for <lists+kvm@lfdr.de>; Sun, 27 Jun 2021 14:13:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230215AbhFZVxB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 26 Jun 2021 17:53:01 -0400
-Received: from forward104p.mail.yandex.net ([77.88.28.107]:45924 "EHLO
-        forward104p.mail.yandex.net" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229794AbhFZVxB (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Sat, 26 Jun 2021 17:53:01 -0400
-Received: from forward103q.mail.yandex.net (forward103q.mail.yandex.net [IPv6:2a02:6b8:c0e:50:0:640:b21c:d009])
-        by forward104p.mail.yandex.net (Yandex) with ESMTP id B64B94B01915;
-        Sun, 27 Jun 2021 00:50:36 +0300 (MSK)
-Received: from vla5-4a733ba05de7.qloud-c.yandex.net (vla5-4a733ba05de7.qloud-c.yandex.net [IPv6:2a02:6b8:c18:3514:0:640:4a73:3ba0])
-        by forward103q.mail.yandex.net (Yandex) with ESMTP id B359061E0004;
-        Sun, 27 Jun 2021 00:50:36 +0300 (MSK)
-Received: from vla5-445dc1c4c112.qloud-c.yandex.net (vla5-445dc1c4c112.qloud-c.yandex.net [2a02:6b8:c18:3609:0:640:445d:c1c4])
-        by vla5-4a733ba05de7.qloud-c.yandex.net (mxback/Yandex) with ESMTP id QufcQ2W4bJ-oaHaBJAj;
-        Sun, 27 Jun 2021 00:50:36 +0300
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex.ru; s=mail; t=1624744236;
-        bh=PhqJl6gIweaTPn2VygJ3bi52oNz9OKGzeUaSpk/WS+0=;
+        id S229854AbhF0MPa (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 27 Jun 2021 08:15:30 -0400
+Received: from forward105p.mail.yandex.net ([77.88.28.108]:50810 "EHLO
+        forward105p.mail.yandex.net" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229761AbhF0MP2 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Sun, 27 Jun 2021 08:15:28 -0400
+Received: from myt6-9cfe67cfd141.qloud-c.yandex.net (myt6-9cfe67cfd141.qloud-c.yandex.net [IPv6:2a02:6b8:c12:25a9:0:640:9cfe:67cf])
+        by forward105p.mail.yandex.net (Yandex) with ESMTP id 3FE284D40856;
+        Sun, 27 Jun 2021 15:13:03 +0300 (MSK)
+Received: from myt6-016ca1315a73.qloud-c.yandex.net (myt6-016ca1315a73.qloud-c.yandex.net [2a02:6b8:c12:4e0e:0:640:16c:a131])
+        by myt6-9cfe67cfd141.qloud-c.yandex.net (mxback/Yandex) with ESMTP id BCvMn3rtlB-D3HK6bK5;
+        Sun, 27 Jun 2021 15:13:03 +0300
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex.ru; s=mail; t=1624795983;
+        bh=Z7IY8jVs5UtGEDbOY34LK+fK8gW7jt7RvS+mzcezbro=;
         h=In-Reply-To:From:Date:References:To:Subject:Message-ID:Cc;
-        b=hGkUK+mvOFo1Rgc8qKJ197gqWWjkglPlO09RQztGbyXJ3pBNNa9dzFJG7oFF4FmUk
-         ebbXwGwiJYaYcVwTCmsOwcFfw3uq5NGYuPLJ1P6f2xhQP80kqvkSA/xH6RCTPHvJx9
-         hI1jZscc9P2BteQeiBKDg+iKiggcaiyEVmmJiPkI=
-Authentication-Results: vla5-4a733ba05de7.qloud-c.yandex.net; dkim=pass header.i=@yandex.ru
-Received: by vla5-445dc1c4c112.qloud-c.yandex.net (smtp/Yandex) with ESMTPSA id JHG95TzntA-oa3SrupZ;
-        Sun, 27 Jun 2021 00:50:36 +0300
+        b=aO61mykCxoJXFu3t1govmImGPAnjNIQRUfKHGHeaohWQSqAdPcVVgGAGiGvKGhZtb
+         WkzifUVKT7Vbmscyst9Kx4yognHu2KivmZBMzBF+4AgOqp+SCx+r8XeV7iSHLScBjk
+         HmclKCRSCkd2tv6anRGapZ8uwuKrUCW2vMOaP37A=
+Authentication-Results: myt6-9cfe67cfd141.qloud-c.yandex.net; dkim=pass header.i=@yandex.ru
+Received: by myt6-016ca1315a73.qloud-c.yandex.net (smtp/Yandex) with ESMTPSA id etYfqOm4kg-D23Gi8Nq;
+        Sun, 27 Jun 2021 15:13:02 +0300
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
         (Client certificate not present)
 Subject: Re: exception vs SIGALRM race on core2 CPUs (with fix!)
@@ -49,8 +46,8 @@ References: <bd4a2d30-5fb4-3612-c855-946d97068b9a@yandex.ru>
  <f09d851d-bda1-7a99-41cb-a14ea51e1237@yandex.ru>
  <CALMp9eQWKa1vL+jj5HXO1bm+oMo6gQLNw44P7y6ZaF8_WQfukw@mail.gmail.com>
 From:   stsp <stsp2@yandex.ru>
-Message-ID: <a18ea3f1-2d7a-fee4-aa20-bb26c44baf19@yandex.ru>
-Date:   Sun, 27 Jun 2021 00:50:35 +0300
+Message-ID: <6d34acc1-b8cf-b734-c083-dfa446d0a66c@yandex.ru>
+Date:   Sun, 27 Jun 2021 15:13:01 +0300
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.11.0
 MIME-Version: 1.0
@@ -65,44 +62,46 @@ X-Mailing-List: kvm@vger.kernel.org
 26.06.2021 03:15, Jim Mattson пишет:
 > If the squashed exception was a trap, it's now lost.
 
-OK, below are 2 more patches, each of
-them alone is fixing the problem.
+I am pretty sure this will do it:
 
 ---
 
 --- x86.c.old   2021-03-20 12:51:14.000000000 +0300
-+++ x86.c       2021-06-27 00:38:45.547355116 +0300
-@@ -9094,6 +9094,7 @@
++++ x86.c       2021-06-27 15:02:45.126161812 +0300
+@@ -9093,7 +9093,11 @@
+  cancel_injection:
          if (req_immediate_exit)
                  kvm_make_request(KVM_REQ_EVENT, vcpu);
-         kvm_x86_ops.cancel_injection(vcpu);
-+       kvm_clear_exception_queue(vcpu);
+-       kvm_x86_ops.cancel_injection(vcpu);
++       if (vcpu->arch.exception.injected) {
++               kvm_x86_ops.cancel_injection(vcpu);
++               vcpu->arch.exception.injected = false;
++               vcpu->arch.exception.pending = true;
++       }
          if (unlikely(vcpu->arch.apic_attention))
                  kvm_lapic_sync_from_vapic(vcpu);
   out:
+@@ -9464,6 +9468,7 @@
+         kvm_rip_write(vcpu, regs->rip);
+         kvm_set_rflags(vcpu, regs->rflags | X86_EFLAGS_FIXED);
+
++       WARN_ON_ONCE(vcpu->arch.exception.injected);
+         vcpu->arch.exception.pending = false;
+
+         kvm_make_request(KVM_REQ_EVENT, vcpu);
 ---
 
 
-Or:
+In cancel_injection, the injected/pending
+members were getting out of sync with
+vmcs.
+We need to move it back to pending,
+and if user-space does SET_REGS, then
+it is cleared (not sure why SET_SREGS
+doesn't clear it also).
+But if the .injected member is stuck,
+then its not cleared by SET_REGS, and
+I added WARN_ON_ONCE() for that case.
 
----
-
---- x86.c.old   2021-03-20 12:51:14.000000000 +0300
-+++ x86.c       2021-06-27 00:47:06.958618185 +0300
-@@ -1783,8 +1783,7 @@
-  bool kvm_vcpu_exit_request(struct kvm_vcpu *vcpu)
-  {
-         xfer_to_guest_mode_prepare();
--       return vcpu->mode == EXITING_GUEST_MODE || 
-kvm_request_pending(vcpu) ||
--               xfer_to_guest_mode_work_pending();
-+       return vcpu->mode == EXITING_GUEST_MODE || 
-kvm_request_pending(vcpu);
-  }
-  EXPORT_SYMBOL_GPL(kvm_vcpu_exit_request);
-
----
-
-
-Still not a clue?
+Does this make sense?
 
