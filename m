@@ -2,68 +2,159 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id ABB553B60B3
-	for <lists+kvm@lfdr.de>; Mon, 28 Jun 2021 16:28:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 11BAA3B6156
+	for <lists+kvm@lfdr.de>; Mon, 28 Jun 2021 16:33:31 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233086AbhF1O2T (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 28 Jun 2021 10:28:19 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:21630 "EHLO
+        id S234633AbhF1Ofb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 28 Jun 2021 10:35:31 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:44374 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S233386AbhF1O0P (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 28 Jun 2021 10:26:15 -0400
+        by vger.kernel.org with ESMTP id S233720AbhF1Oca (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 28 Jun 2021 10:32:30 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1624890229;
+        s=mimecast20190719; t=1624890602;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=gS97gb30cUD6A4GFBfFHF0i2JBykL2d9ZYSKCC/RISc=;
-        b=fOs6PnbEn2MbLCZWRamMdPCsvnGnxOwh7wVZXYNHylK0Z3fQsy+oR6Dhc8yh5g8CeJV4w4
-        cdyzX4bMi3t+zkQN0SZdnxSHBfNIAE0syssdtJLKAc2LbCfUyUXvO/O14zdVSMIt4K6sLA
-        GFXBz6A2RDMQPt8kTptZ1k6ylibCTFA=
+        bh=e5iye/ixu7FQ7xezRIk3x1grUzP9ni471MRjTDHPm9w=;
+        b=iroa8Vv8v39aSU0S00gBYHn0hCDWH8JyGYE35+G2WLoel8+GWM+spBy3hVaYFAWdoYQ6Dt
+        e/oAv+NoNv3Rb1AeBZpIm90VssINPqvWexbDFcLCX42BdV2XgHzOXoerUljr70wHXZou6q
+        uXjDn7Kcedv7WKPTzWeBXn8WHI7iFQk=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-276-uRlX0CkpPIC1JOWAJN4THw-1; Mon, 28 Jun 2021 10:23:37 -0400
-X-MC-Unique: uRlX0CkpPIC1JOWAJN4THw-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+ us-mta-548-NNHEFzPvMgWvH0RDgTmw_w-1; Mon, 28 Jun 2021 10:30:00 -0400
+X-MC-Unique: NNHEFzPvMgWvH0RDgTmw_w-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CA0DD81CCB4;
-        Mon, 28 Jun 2021 14:23:05 +0000 (UTC)
-Received: from localhost (ovpn-112-191.ams2.redhat.com [10.36.112.191])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 6DBFD5C1D0;
-        Mon, 28 Jun 2021 14:23:05 +0000 (UTC)
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Alex Williamson <alex.williamson@redhat.com>,
-        alex.williamson@redhat.com
-Cc:     kwankhede@nvidia.com, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, jgg@nvidia.com
-Subject: Re: [PATCH] vfio/mtty: Enforce available_instances
-In-Reply-To: <162465624894.3338367.12935940647049917981.stgit@omen>
-Organization: Red Hat GmbH
-References: <162465624894.3338367.12935940647049917981.stgit@omen>
-User-Agent: Notmuch/0.32.1 (https://notmuchmail.org)
-Date:   Mon, 28 Jun 2021 16:23:03 +0200
-Message-ID: <875yxym5ko.fsf@redhat.com>
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 01C7D1083FA0;
+        Mon, 28 Jun 2021 14:29:59 +0000 (UTC)
+Received: from starship (unknown [10.40.192.10])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 4A9C05B826;
+        Mon, 28 Jun 2021 14:29:54 +0000 (UTC)
+Message-ID: <32451d4990cad450f6c8269dbd5fa6a59d126221.camel@redhat.com>
+Subject: Re: [PATCH v2] KVM: X86: Fix exception untrigger on ret to user
+From:   Maxim Levitsky <mlevitsk@redhat.com>
+To:     Stas Sergeev <stsp2@yandex.ru>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Jan Kiszka <jan.kiszka@siemens.com>, x86@kernel.org,
+        "H. Peter Anvin" <hpa@zytor.com>, kvm@vger.kernel.org
+Date:   Mon, 28 Jun 2021 17:29:53 +0300
+In-Reply-To: <20210628124814.1001507-1-stsp2@yandex.ru>
+References: <20210628124814.1001507-1-stsp2@yandex.ru>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Jun 25 2021, Alex Williamson <alex.williamson@redhat.com> wrote:
+On Mon, 2021-06-28 at 15:48 +0300, Stas Sergeev wrote:
+> When returning to user, the special care is taken about the
+> exception that was already injected to VMCS but not yet to guest.
+> cancel_injection removes such exception from VMCS. It is set as
+> pending, and if the user does KVM_SET_REGS, it gets completely canceled.
+> 
+> This didn't happen though, because the vcpu->arch.exception.injected
+> and vcpu->arch.exception.pending were forgotten to update in
+> cancel_injection. As the result, KVM_SET_REGS didn't cancel out
+> anything, and the exception was re-injected on the next KVM_RUN,
+> even though the guest registers (like EIP) were already modified.
+> This was leading to an exception coming from the "wrong place".
+> 
+> This patch makes sure the vcpu->arch.exception.injected and
+> vcpu->arch.exception.pending are in sync with the reality (and
+> with VMCS). Also it adds clearing of pending exception to
+> __set_sregs() the same way it is in __set_regs(). See patch
+> b4f14abd9 that added it to __set_regs().
+> 
+> How to trigger the buggy scenario (that is, without this patch):
+> - Make sure you have the old CPU where shadow page tables
+> are used. Core2 family should be fine for the task. In this
+> case, all PF exceptions produce the exit to monitor.
+> - You need the _TIF_SIGPENDING flag set at the right moment
+> to get kvm_vcpu_exit_request() to return true when the PF
+> exception was just injected. In that case the cancel_injection
+> path is executed.
+> - You need the "unlucky" user-space that executes KVM_SET_REGS
+> at the right moment. This leads to KVM_SET_REGS not clearing
+> the exception, but instead corrupting its context.
+> 
+> v2 changes:
+> - do not add WARN_ON_ONCE() to __set_regs(). As explained by
+> Vitaly Kuznetsov, it can be user-triggerable.
+> - clear pending exception also in __set_sregs().
+> - update description with the bug-triggering scenario.
 
-> The sample mtty mdev driver doesn't actually enforce the number of
-> device instances it claims are available.  Implement this properly.
->
-> Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
+I used to know that area very very well, and I basically combed
+the whole thing back and forth, 
+and I have patch series to decouple injected and
+pending exceptions. 
+
+I'll refresh my memory on this and then I'll review your patch.
+
+My gut feeling is that you discovered too that injections of
+exceptions from userspace is kind of broken and only works
+because Qemu doesn't really inject much (only some #MC exceptions
+which are mostly fatal anyway, and #DB/#BP which only happen
+when guest debugging is enabled which is not a standard feature).
+
+Best regards,
+	Maxim Levitsky
+
+> 
+> Signed-off-by: Stas Sergeev <stsp2@yandex.ru>
+> 
+> CC: Paolo Bonzini <pbonzini@redhat.com>
+> CC: Sean Christopherson <seanjc@google.com>
+> CC: Vitaly Kuznetsov <vkuznets@redhat.com>
+> CC: Jim Mattson <jmattson@google.com>
+> CC: Joerg Roedel <joro@8bytes.org>
+> CC: Thomas Gleixner <tglx@linutronix.de>
+> CC: Ingo Molnar <mingo@redhat.com>
+> CC: Borislav Petkov <bp@alien8.de>
+> CC: Jan Kiszka <jan.kiszka@siemens.com>
+> CC: x86@kernel.org
+> CC: "H. Peter Anvin" <hpa@zytor.com>
+> CC: kvm@vger.kernel.org
 > ---
->
-> Applies to vfio next branch + Jason's atomic conversion
->
->  samples/vfio-mdev/mtty.c |   22 ++++++++++++++++------
->  1 file changed, 16 insertions(+), 6 deletions(-)
->
+>  arch/x86/kvm/x86.c | 8 +++++++-
+>  1 file changed, 7 insertions(+), 1 deletion(-)
+> 
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index e0f4a46649d7..d1026e9216e4 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -9450,7 +9450,11 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
+>  cancel_injection:
+>  	if (req_immediate_exit)
+>  		kvm_make_request(KVM_REQ_EVENT, vcpu);
+> -	static_call(kvm_x86_cancel_injection)(vcpu);
+> +	if (vcpu->arch.exception.injected) {
+> +		static_call(kvm_x86_cancel_injection)(vcpu);
+> +		vcpu->arch.exception.injected = false;
+> +		vcpu->arch.exception.pending = true;
+> +	}
+>  	if (unlikely(vcpu->arch.apic_attention))
+>  		kvm_lapic_sync_from_vapic(vcpu);
+>  out:
+> @@ -10077,6 +10081,8 @@ static int __set_sregs(struct kvm_vcpu *vcpu, struct kvm_sregs *sregs)
+>  		pr_debug("Set back pending irq %d\n", pending_vec);
+>  	}
+>  
+> +	vcpu->arch.exception.pending = false;
+> +
+>  	kvm_make_request(KVM_REQ_EVENT, vcpu);
+>  
+>  	ret = 0;
 
-Reviewed-by: Cornelia Huck <cohuck@redhat.com>
 
