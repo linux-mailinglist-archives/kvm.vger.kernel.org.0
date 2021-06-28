@@ -2,93 +2,111 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id DA9903B5E9F
-	for <lists+kvm@lfdr.de>; Mon, 28 Jun 2021 15:02:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0B3BA3B5F47
+	for <lists+kvm@lfdr.de>; Mon, 28 Jun 2021 15:43:46 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233146AbhF1NFE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 28 Jun 2021 09:05:04 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:27280 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S233144AbhF1NE6 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 28 Jun 2021 09:04:58 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1624885352;
+        id S232088AbhF1NqI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 28 Jun 2021 09:46:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54152 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232058AbhF1NqH (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 28 Jun 2021 09:46:07 -0400
+Received: from mail.skyhub.de (mail.skyhub.de [IPv6:2a01:4f8:190:11c2::b:1457])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B7851C061574;
+        Mon, 28 Jun 2021 06:43:41 -0700 (PDT)
+Received: from zn.tnic (p200300ec2f0ad700491bef6a2c18e575.dip0.t-ipconnect.de [IPv6:2003:ec:2f0a:d700:491b:ef6a:2c18:e575])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id F2FA21EC0473;
+        Mon, 28 Jun 2021 15:43:38 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
+        t=1624887819;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=fndY61EcgfzsXcmaCK7BMnLfNMbphujT+QMr+Pswt68=;
-        b=X6T/iuKD+AFk+X80dNVL+1r5wBU2fX3r/iDCep2iLs8kj1k2nmsfWugdrTV9q6+ZMIaevf
-        aC1kqZnVSROO1VyYvioQBdcpVcYlCa/mHgq6/zW5ECQTJeg0qvJTbMMdaz/+8D3ZiYpiXs
-        AnaOmWKpmGcY6qbAK2Eukrj+wI+eOjQ=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-128-lJbSiAWjOGCgZVrmUVHPPA-1; Mon, 28 Jun 2021 09:02:28 -0400
-X-MC-Unique: lJbSiAWjOGCgZVrmUVHPPA-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 88C80800C78;
-        Mon, 28 Jun 2021 13:02:25 +0000 (UTC)
-Received: from localhost (ovpn-112-170.ams2.redhat.com [10.36.112.170])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 7AFA969CB6;
-        Mon, 28 Jun 2021 13:02:03 +0000 (UTC)
-Date:   Thu, 24 Jun 2021 16:12:09 +0100
-From:   Stefan Hajnoczi <stefanha@redhat.com>
-To:     Xie Yongji <xieyongji@bytedance.com>
-Cc:     mst@redhat.com, jasowang@redhat.com, sgarzare@redhat.com,
-        parav@nvidia.com, hch@infradead.org,
-        christian.brauner@canonical.com, rdunlap@infradead.org,
-        willy@infradead.org, viro@zeniv.linux.org.uk, axboe@kernel.dk,
-        bcrl@kvack.org, corbet@lwn.net, mika.penttila@nextfour.com,
-        dan.carpenter@oracle.com, joro@8bytes.org,
-        gregkh@linuxfoundation.org, songmuchun@bytedance.com,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        kvm@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        iommu@lists.linux-foundation.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v8 00/10] Introduce VDUSE - vDPA Device in Userspace
-Message-ID: <YNSgyTHpNjxdKLLR@stefanha-x1.localdomain>
-References: <20210615141331.407-1-xieyongji@bytedance.com>
+         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
+        bh=oaTWoMIR/8kJ1vrSQ/YRM/leTg1aNhhSfH9Oxbdei28=;
+        b=CcGIVm4bSbzMzC10uwvsiurej2wJd+CPm1Arml3UbITXCUfouCbJT706JeVxr6NOxOmjwo
+        Bv7E2wkMLBJ3qDqFg3z4uKMvcXyXgLKEw3LFgtzRCZDU2rPJBwZVy9us4eNCpqb3a3lL7u
+        oZVemIo605NkzDqx5AiWPvSFPd0d4X8=
+Date:   Mon, 28 Jun 2021 15:43:34 +0200
+From:   Borislav Petkov <bp@alien8.de>
+To:     Michael Roth <michael.roth@amd.com>
+Cc:     Brijesh Singh <brijesh.singh@amd.com>,
+        "Kuppuswamy, Sathyanarayanan" 
+        <sathyanarayanan.kuppuswamy@linux.intel.com>,
+        Dave Hansen <dave.hansen@intel.com>, x86@kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
+        linux-coco@lists.linux.dev, linux-mm@kvack.org,
+        linux-crypto@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        David Rientjes <rientjes@google.com>, tony.luck@intel.com,
+        npmccallum@redhat.com
+Subject: Re: [PATCH Part1 RFC v3 20/22] x86/boot: Add Confidential Computing
+ address to setup_header
+Message-ID: <YNnSBl5asXjXIvfy@zn.tnic>
+References: <YNMLX6fbB3PQwSpv@zn.tnic>
+ <20210624031911.eznpkbgjt4e445xj@amd.com>
+ <YNQz7ZxEaSWjcjO2@zn.tnic>
+ <20210624123447.zbfkohbtdusey66w@amd.com>
+ <YNSAlJnXMjigpqu1@zn.tnic>
+ <20210624141111.pzvb6gk5lzfelx26@amd.com>
+ <YNXs1XRu31dFiR2Z@zn.tnic>
+ <8faad91a-f229-dee3-0e1f-0b613596db17@amd.com>
+ <YNYMAkoSoMnfhBnJ@zn.tnic>
+ <20210625181417.kaylo56pz4rlwwqr@amd.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="Bv+EGssEb3iM6ws2"
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20210615141331.407-1-xieyongji@bytedance.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+In-Reply-To: <20210625181417.kaylo56pz4rlwwqr@amd.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Fri, Jun 25, 2021 at 01:14:17PM -0500, Michael Roth wrote:
+> So non-EFI case would rely purely on the setup_data entry for both (though
+> we could still use boot_params->cc_blob_address to avoid the need to scan
+> setup_data list in proper kernel as well, but scanning it early on doesn't
+> have the same issues as with EFI config table so it's not really
+> necessary there).
 
---Bv+EGssEb3iM6ws2
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Yeah, sure, we can simply always use boot_params->cc_blob_address just
+like acpi_rsdp_addr and always put the CC blob address there.
 
-On Tue, Jun 15, 2021 at 10:13:21PM +0800, Xie Yongji wrote:
-> This series introduces a framework that makes it possible to implement
-> software-emulated vDPA devices in userspace. And to make it simple, the
-> emulated vDPA device's control path is handled in the kernel and only the
-> data path is implemented in the userspace.
+> I opted to give setup_data precedence over EFI, since if a bootloader goes
+> the extra mile of packaging up a setup_data argument instead of just leaving
+> it to firmware/EFI config table, it might be out of some extra need.  For
+> example, if we do have a shared definition for both SEV and TDX, maybe the
+> bootloader needs to synthesize multiple EFI table entries, and a unified
+> setup_data will be easier for the kernel to consume than replicating that same
+> work, and maybe over time the fallback can be deprecated. And containers will
+> more than likely prefer setup_data approach, which might drive future changes
+> that aren't in lockstep with EFI definitions as well.
 
-This looks interesting. Unfortunately I don't have enough time to do a
-full review, but I looked at the documentation and uapi header file to
-give feedback on the userspace ABI.
+Yah, that makes perfect sense. And you/Brijesh should put the gist of
+that in a comment over the code so that people are aware. The less we
+rely on firmware, the better.
 
-Stefan
+> Brijesh can correct me if I'm wrong, but I believe that's the intent, and the
+> setup_data approach definitely seems workable for that aspect.
 
---Bv+EGssEb3iM6ws2
-Content-Type: application/pgp-signature; name="signature.asc"
+Oki doki, I think we're all on the same page then. :-)
 
------BEGIN PGP SIGNATURE-----
+Thx.
 
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAmDUoMkACgkQnKSrs4Gr
-c8i9mAf/TQBs0m0AVmZZD8+mPJMwfeWR4pxCS+XbMMUr1xqCc7eSxhjMY6H1LNO6
-3r+wPajMdIuXEW16AsGRAplQmvTNAdUMjcDnSeS/Y1LBecoKKAnKOYuvRZ1HCaqk
-Ye3vT+jpDz+X/+miO5LiIenkJB9bouoqAxeNXIXQL5jOMw+pW7R2CD3YUK0k4AMn
-+X179rAMEOsPG+jyOlWDU1MDbdy1vZEIRQ7MoqrMqsHq/O+AnBXFyZISDwrUttZw
-HoXWFEeLdyh0mKaniHbsEvSQaAXrG+UBg5xqpYw9RNmbJ7ax+qQ4sUZHbkZlsXXe
-p++cvUCG1Xk7kOv1o28B3KBn/lyQQA==
-=Kg3j
------END PGP SIGNATURE-----
+-- 
+Regards/Gruss,
+    Boris.
 
---Bv+EGssEb3iM6ws2--
-
+https://people.kernel.org/tglx/notes-about-netiquette
