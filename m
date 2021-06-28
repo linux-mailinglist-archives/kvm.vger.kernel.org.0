@@ -2,169 +2,135 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7E48F3B67D3
-	for <lists+kvm@lfdr.de>; Mon, 28 Jun 2021 19:41:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0A71E3B67E9
+	for <lists+kvm@lfdr.de>; Mon, 28 Jun 2021 19:44:29 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234555AbhF1RnZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 28 Jun 2021 13:43:25 -0400
-Received: from forward3-smtp.messagingengine.com ([66.111.4.237]:47081 "EHLO
-        forward3-smtp.messagingengine.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232719AbhF1RnY (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 28 Jun 2021 13:43:24 -0400
-X-Greylist: delayed 539 seconds by postgrey-1.27 at vger.kernel.org; Mon, 28 Jun 2021 13:43:24 EDT
-Received: from compute1.internal (compute1.nyi.internal [10.202.2.41])
-        by mailforward.nyi.internal (Postfix) with ESMTP id B0F1019408F3;
-        Mon, 28 Jun 2021 13:32:03 -0400 (EDT)
-Received: from mailfrontend1 ([10.202.2.162])
-  by compute1.internal (MEProxy); Mon, 28 Jun 2021 13:32:03 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-        messagingengine.com; h=cc:content-transfer-encoding:date:from
-        :in-reply-to:message-id:mime-version:references:subject:to
-        :x-me-proxy:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=
-        fm3; bh=GWKq2EyJGwGZbgi4ujs6lIVnpbb6K31l1aQySTXp12c=; b=hC/hWktO
-        AKMbHlUg1ay7CUnrkVH9nFt3Dg3L+QPhHGGNmKdG6a3y1xQ+KBCEZBbcBK68kvpf
-        WdM9rn2uhZt3fNnVy0iOHszi+GXQAcHKhItX9PczqhtJE9g4ER2nH4lF2lgjmSwP
-        fvgs2UCKohL4878EUKTUU+75qcCvjuC2LsTC7fCukKNAaLg5bkhLccwzubJGXhsP
-        bAgueFkxavCy4K+mGHuBx4e+7JKfEd1mCgU9j6N7zLOimIr1JJNuWW+HF1wrnyim
-        T94Mqi/zUqH8t3xv62tMDNhUTJkyRNXpdsDzY3Opvxp6dHiLTf6I4xJgeMLQ/ABo
-        YwQcGD/njiVgrg==
-X-ME-Sender: <xms:kAfaYDECftFZM83hJLYUV4M5iSdTioQ83aB8JfbGsyM8D3hqn37s0Q>
-    <xme:kAfaYAURwTPBhlVMjY13A8UtXsrQwNsmDiM-54X_OKHe95rdbke4Wc-KS3rvTEFpo
-    9aUSUv31T3blcndexg>
-X-ME-Received: <xmr:kAfaYFIVe3wA3Ec1G7mhMgbJYHmekUtroB0FV0QxIyMUYRu79Bu5BsyviPDT0c0Gdlv6A0WC8Vr5S_djah4ceKrv5t2B6RlhZvdvLSqej0c>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeduledrfeehgedguddufecutefuodetggdotefrod
-    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfgh
-    necuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
-    enucfjughrpefhvffufffkofgjfhgggfestdekredtredttdenucfhrhhomhepffgrvhhi
-    ugcugfgumhhonhgushhonhcuoegurghvihgurdgvughmohhnughsohhnsehorhgrtghlvg
-    drtghomheqnecuggftrfgrthhtvghrnhepudefteejgfefhfdtjefhhedtffethfetkeeh
-    gfelheffhfeihfeglefgjedtheeknecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrg
-    hmpehmrghilhhfrhhomhepuggrvhhiugdrvggumhhonhgushhonhesohhrrggtlhgvrdgt
-    ohhm
-X-ME-Proxy: <xmx:kAfaYBEsC54ZY4eqI7Fm1K0j5uwogr18yWOXd2Hny7QF5W4cE96lYQ>
-    <xmx:kAfaYJXNSO42acLSvmEDNreHuXUHOtXODke6qZqSB93XSjV7D-XWww>
-    <xmx:kAfaYMMC9hk1u2m9stR8p4g-z0DcWZYqNBOl1k6nVRxRWvOJ92bHPw>
-    <xmx:kwfaYCPvAaotylDdxU-IVKkQRTHp1Zt31zYZc3d3V77kZOhzBsi6UcrLqyo>
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Mon,
- 28 Jun 2021 13:31:59 -0400 (EDT)
-Received: from localhost (disaster-area.hh.sledj.net [local])
-        by disaster-area.hh.sledj.net (OpenSMTPD) with ESMTPA id 9a1db742;
-        Mon, 28 Jun 2021 17:31:52 +0000 (UTC)
-From:   David Edmondson <david.edmondson@oracle.com>
-To:     linux-kernel@vger.kernel.org
-Cc:     kvm@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
-        Borislav Petkov <bp@alien8.de>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Joerg Roedel <joro@8bytes.org>, Ingo Molnar <mingo@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Paolo Bonzini <pbonzini@redhat.com>, x86@kernel.org,
-        David Edmondson <david.edmondson@oracle.com>,
-        Joao Martins <joao.m.martins@oracle.com>
-Subject: [PATCH 2/2] KVM: x86: On emulation failure, convey the exit reason to userspace
-Date:   Mon, 28 Jun 2021 18:31:52 +0100
-Message-Id: <20210628173152.2062988-3-david.edmondson@oracle.com>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20210628173152.2062988-1-david.edmondson@oracle.com>
-References: <20210628173152.2062988-1-david.edmondson@oracle.com>
+        id S233778AbhF1Rqy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 28 Jun 2021 13:46:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52078 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S233327AbhF1Rqx (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 28 Jun 2021 13:46:53 -0400
+Received: from mail-ot1-x331.google.com (mail-ot1-x331.google.com [IPv6:2607:f8b0:4864:20::331])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 83D2EC061574
+        for <kvm@vger.kernel.org>; Mon, 28 Jun 2021 10:44:27 -0700 (PDT)
+Received: by mail-ot1-x331.google.com with SMTP id o13-20020a9d404d0000b0290466630039caso4431181oti.6
+        for <kvm@vger.kernel.org>; Mon, 28 Jun 2021 10:44:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=hteoZM+GD4ovVieM4M7OVaRDXGJH7guuG69T9/rMvbI=;
+        b=D7VXTVjQW1c31E/cloKCNnF8KDdXxJMFKQfK1yf5wke0UjHmbbMO4jaPOSIKH6ul25
+         AJydFoCP59kLedS6dBni73tnqAfj13Bd9IHCP8bab+0kdlKQpOynb0Gz3ETNllElHmz3
+         QT+xp+SXT+GyKx44njbaBnwWd8t5eP0drH6ghJwdzjEPanfX5WpnfBpN0bY3TCXtVR+C
+         IvcGLGTzB5o5Kue0UyK2Vpym9DLLPADiJ2yA8FTLea0uQ0vkjURzhpPCAJnVTW085FHQ
+         HJJBUWjMbEfKF6JhEQQhopgy/A7i2tani4oGCbzW2Qx2NpHr8jqOUndEd6myiPh8BW3J
+         3ujQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=hteoZM+GD4ovVieM4M7OVaRDXGJH7guuG69T9/rMvbI=;
+        b=rEHVrtS1Rp4vLYKEuZApKl1/MXOQVo390RuOBKitnaA0K92qjathgOzZ+JiO6Wo7KQ
+         x9v2h18Wr6URSnTa7Qc/vm/d1dNYE9b/0yNgc4o9IWf2TsxZhwej7FQJnj5kHj2r/zsB
+         dce2i3WZu9Boad8mfyORCUjnQz2FfA3RoQyJod3awlTnw7+P0vYcsG4/MnlMV+WDRJMz
+         bSvVHZaBZpZA4QcPJvZwJyHBfvXNgYjWGKYn8h8UewRZva+iPCbcNQ9V9cbhJ//nZYmt
+         NN4VNYc473Wq+t2GK/iqv69+rFZQq+kYsOE9/gyWeioQk7Gzf/v7c99j0D3Fi6Aw4FrB
+         9FSw==
+X-Gm-Message-State: AOAM532aP3lJj127svs4N1ET2VFqKLtVOhanoPIg/tDWn7+Yz+MH1MXw
+        qNt38zD+fVK3FpIzQUss0ftxjDbuN1m4etTDkT2BMQ==
+X-Google-Smtp-Source: ABdhPJxRSSxVJjj3DO8+QgGyH7Q4bsKQxGEaReR7Qa3bv3NLQpACxQt1u7YuoOt8vwYSVeEVbQLzoY2Fm6Zf+0EcmaI=
+X-Received: by 2002:a9d:550e:: with SMTP id l14mr622966oth.241.1624902266567;
+ Mon, 28 Jun 2021 10:44:26 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20210627233819.857906-1-stsp2@yandex.ru> <CALMp9eQdxTy4w6NBPbXbJEpyatYB_zhiwykRKCpeoC9Cbuv5gw@mail.gmail.com>
+ <a6a8fe0b-1bd3-6a1a-22bb-bfc493f2a195@yandex.ru>
+In-Reply-To: <a6a8fe0b-1bd3-6a1a-22bb-bfc493f2a195@yandex.ru>
+From:   Jim Mattson <jmattson@google.com>
+Date:   Mon, 28 Jun 2021 10:44:15 -0700
+Message-ID: <CALMp9eSfC0LC4qCUNHv4qfvP=HhErQmVNqmnzfzebpOOMCLjeQ@mail.gmail.com>
+Subject: Re: [PATCH] KVM: X86: Fix exception untrigger on ret to user
+To:     stsp <stsp2@yandex.ru>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
+        kvm@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-To aid in debugging.
+On Mon, Jun 28, 2021 at 10:06 AM stsp <stsp2@yandex.ru> wrote:
+>
+> 28.06.2021 19:19, Jim Mattson =D0=BF=D0=B8=D1=88=D0=B5=D1=82:
+> > This doesn't work. Kvm has no facilities for converting an injected
+> > exception back into a pending exception.
+>
+> What is the purpose of the
+> cancel_injection then?
 
-Suggested-by: Joao Martins <joao.m.martins@oracle.com>
-Signed-off-by: David Edmondson <david.edmondson@oracle.com>
----
- arch/x86/kvm/x86.c       | 23 +++++++++++++++++------
- include/uapi/linux/kvm.h |  2 ++
- 2 files changed, 19 insertions(+), 6 deletions(-)
+I believe cancel_injection exists for serializing the vCPU state. If
+the vCPU is saved and restored, then you don't want to lose the
+'injected' event that is sitting in the VMCS.
 
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 8166ad113fb2..48ef0dc68faf 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -7455,7 +7455,7 @@ void kvm_inject_realmode_interrupt(struct kvm_vcpu *vcpu, int irq, int inc_eip)
- }
- EXPORT_SYMBOL_GPL(kvm_inject_realmode_interrupt);
- 
--static void prepare_emulation_failure_exit(struct kvm_vcpu *vcpu)
-+static void prepare_emulation_failure_exit(struct kvm_vcpu *vcpu, uint64_t flags)
- {
- 	struct x86_emulate_ctxt *ctxt = vcpu->arch.emulate_ctxt;
- 	u32 insn_size = ctxt->fetch.end - ctxt->fetch.data;
-@@ -7466,7 +7466,8 @@ static void prepare_emulation_failure_exit(struct kvm_vcpu *vcpu)
- 	run->emulation_failure.ndata = 0;
- 	run->emulation_failure.flags = 0;
- 
--	if (insn_size) {
-+	if (insn_size &&
-+	    (flags & KVM_INTERNAL_ERROR_EMULATION_FLAG_INSTRUCTION_BYTES)) {
- 		run->emulation_failure.ndata = 3;
- 		run->emulation_failure.flags |=
- 			KVM_INTERNAL_ERROR_EMULATION_FLAG_INSTRUCTION_BYTES;
-@@ -7476,6 +7477,14 @@ static void prepare_emulation_failure_exit(struct kvm_vcpu *vcpu)
- 		memcpy(run->emulation_failure.insn_bytes,
- 		       ctxt->fetch.data, insn_size);
- 	}
-+
-+	if (flags & KVM_INTERNAL_ERROR_EMULATION_FLAG_EXIT_REASON) {
-+		run->emulation_failure.ndata = 4;
-+		run->emulation_failure.flags |=
-+			KVM_INTERNAL_ERROR_EMULATION_FLAG_EXIT_REASON;
-+		run->emulation_failure.exit_reason =
-+			static_call(kvm_x86_get_exit_reason)(vcpu);
-+	}
- }
- 
- static int handle_emulation_failure(struct kvm_vcpu *vcpu, int emulation_type)
-@@ -7492,16 +7501,18 @@ static int handle_emulation_failure(struct kvm_vcpu *vcpu, int emulation_type)
- 
- 	if (kvm->arch.exit_on_emulation_error ||
- 	    (emulation_type & EMULTYPE_SKIP)) {
--		prepare_emulation_failure_exit(vcpu);
-+		prepare_emulation_failure_exit(
-+			vcpu,
-+			KVM_INTERNAL_ERROR_EMULATION_FLAG_INSTRUCTION_BYTES |
-+			KVM_INTERNAL_ERROR_EMULATION_FLAG_EXIT_REASON);
- 		return 0;
- 	}
- 
- 	kvm_queue_exception(vcpu, UD_VECTOR);
- 
- 	if (!is_guest_mode(vcpu) && static_call(kvm_x86_get_cpl)(vcpu) == 0) {
--		vcpu->run->exit_reason = KVM_EXIT_INTERNAL_ERROR;
--		vcpu->run->internal.suberror = KVM_INTERNAL_ERROR_EMULATION;
--		vcpu->run->internal.ndata = 0;
-+		prepare_emulation_failure_exit(
-+			vcpu, KVM_INTERNAL_ERROR_EMULATION_FLAG_EXIT_REASON);
- 		return 0;
- 	}
- 
-diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-index 68c9e6d8bbda..3e4126652a67 100644
---- a/include/uapi/linux/kvm.h
-+++ b/include/uapi/linux/kvm.h
-@@ -282,6 +282,7 @@ struct kvm_xen_exit {
- 
- /* Flags that describe what fields in emulation_failure hold valid data. */
- #define KVM_INTERNAL_ERROR_EMULATION_FLAG_INSTRUCTION_BYTES (1ULL << 0)
-+#define KVM_INTERNAL_ERROR_EMULATION_FLAG_EXIT_REASON       (1ULL << 1)
- 
- /* for KVM_RUN, returned by mmap(vcpu_fd, offset=0) */
- struct kvm_run {
-@@ -404,6 +405,7 @@ struct kvm_run {
- 			__u64 flags;
- 			__u8  insn_size;
- 			__u8  insn_bytes[15];
-+			__u64 exit_reason;
- 		} emulation_failure;
- 		/* KVM_EXIT_OSI */
- 		struct {
--- 
-2.30.2
+>
+> >   In particular, if the
+> > exception has side effects, such as a #PF which sets CR2, those side
+> > effects have already taken place. Once kvm sets the VM-entry
+> > interruption-information field, the next VM-entry must deliver that
+> > exception. You could arrange to back it out, but you would also have
+> > to back out the changes to CR2 (for #PF) or DR6 (for #DB).
+> >
+> > Cancel_injection *should* leave the exception in the 'injected' state,
+>
+> But it removes it from VMCS, no?
+> I thought "injected=3Dtrue" means
+> "injected to VMCS". What is the
+> difference between "injected" and
+> "pending" if both may or may not
+> mean "already in VMCS"?
 
+Pending events have not yet been subject to interception by L1 (if L2
+is active). Their side effects have not yet been applied. When a
+pending event is processed, if L2 is active, kvm checks L1's exception
+bitmap to see if the event should cause an emulated VM-exit from L2 to
+L1. If not, the pending event transitions to an injected event and the
+side effects are applied. (At this point, the event is essentially
+committed.) The event is then written to the VM-entry
+interruption-information field to take advantage of hardware
+assistance for vectoring through the IDT.
+
+Perhaps 'committed' would have been a better term than 'injected.'
+
+> > and KVM_SET_REGS *should not* clear an injected exception. (I don't
+> > think it's right to clear a pending exception either, if that
+> > exception happens to be a trap, but that's a different discussion).
+> >
+> > It seems to me that the crux of the problem here is that
+> > run->ready_for_interrupt_injection returns true when it should return
+> > false. That's probably where you should focus your efforts.
+>
+> I tried that already, and showed
+> the results to you. :) Alas, you didn't
+> reply to those.
+
+I haven't had the time. I was hoping that someone else on the kvm list
+would help you.
+
+> But why do you suggest the cpu-specific
+> approach? All other CPUs exit to user-space
+> only when the exception is _really_ injected,
+> i.e. CS/EIP points to the IDT handler.
+> I don't see why it should be non-atomic
+> just for one CPU. Shouldn't that be atomic
+> for all CPUs?
+
+This isn't CPU-specific. Even when using EPT, you can potentially end
+up in this state after an EPT violation during IDT vectoring.
