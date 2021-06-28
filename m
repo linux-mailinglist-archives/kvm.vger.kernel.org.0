@@ -2,33 +2,33 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 926C83B5E58
-	for <lists+kvm@lfdr.de>; Mon, 28 Jun 2021 14:46:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CB9653B5E5E
+	for <lists+kvm@lfdr.de>; Mon, 28 Jun 2021 14:48:21 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232991AbhF1MtF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 28 Jun 2021 08:49:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41406 "EHLO
+        id S233046AbhF1Muq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 28 Jun 2021 08:50:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41808 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232926AbhF1MtD (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 28 Jun 2021 08:49:03 -0400
-Received: from forward106o.mail.yandex.net (forward106o.mail.yandex.net [IPv6:2a02:6b8:0:1a2d::609])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 95DC0C061574
-        for <kvm@vger.kernel.org>; Mon, 28 Jun 2021 05:46:37 -0700 (PDT)
-Received: from iva1-cf747c9a36c8.qloud-c.yandex.net (iva1-cf747c9a36c8.qloud-c.yandex.net [IPv6:2a02:6b8:c0c:9282:0:640:cf74:7c9a])
-        by forward106o.mail.yandex.net (Yandex) with ESMTP id 0210D506268B;
-        Mon, 28 Jun 2021 15:46:35 +0300 (MSK)
-Received: from iva3-dd2bb2ff2b5f.qloud-c.yandex.net (iva3-dd2bb2ff2b5f.qloud-c.yandex.net [2a02:6b8:c0c:7611:0:640:dd2b:b2ff])
-        by iva1-cf747c9a36c8.qloud-c.yandex.net (mxback/Yandex) with ESMTP id fuEENI93Yv-kYHiSd0u;
-        Mon, 28 Jun 2021 15:46:34 +0300
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex.ru; s=mail; t=1624884394;
+        with ESMTP id S232889AbhF1Muo (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 28 Jun 2021 08:50:44 -0400
+Received: from forward104o.mail.yandex.net (forward104o.mail.yandex.net [IPv6:2a02:6b8:0:1a2d::607])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2703AC061574
+        for <kvm@vger.kernel.org>; Mon, 28 Jun 2021 05:48:19 -0700 (PDT)
+Received: from myt6-61e9e731de9c.qloud-c.yandex.net (myt6-61e9e731de9c.qloud-c.yandex.net [IPv6:2a02:6b8:c12:4ca0:0:640:61e9:e731])
+        by forward104o.mail.yandex.net (Yandex) with ESMTP id 5B5289417FB;
+        Mon, 28 Jun 2021 15:48:16 +0300 (MSK)
+Received: from myt6-efff10c3476a.qloud-c.yandex.net (myt6-efff10c3476a.qloud-c.yandex.net [2a02:6b8:c12:13a3:0:640:efff:10c3])
+        by myt6-61e9e731de9c.qloud-c.yandex.net (mxback/Yandex) with ESMTP id YKmTjDflVM-mGH4vt5d;
+        Mon, 28 Jun 2021 15:48:16 +0300
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex.ru; s=mail; t=1624884496;
         bh=MXNIktVnLvg3iLfiytyT0Mz6xWZ11yPrq2AeNMBm0q0=;
         h=Subject:To:From:Message-Id:Cc:Date;
-        b=HKV21HIbqGpLeTgc/mlTvJ2i8Kc3b3bc/RV2+H9nL3C7M4MT3acE2zHXa7Fc7N9sI
-         CR2A2ebJxBtWSYagCr5SekOphDr1GliT5LXZRhoqjoHc8kIAHo+MbGUU8MyJI15ReB
-         opE18Y4HtXH4vQx3GaisnPb6fiUuzhIlm6PPGn/A=
-Authentication-Results: iva1-cf747c9a36c8.qloud-c.yandex.net; dkim=pass header.i=@yandex.ru
-Received: by iva3-dd2bb2ff2b5f.qloud-c.yandex.net (smtp/Yandex) with ESMTPSA id cMbTfmbVkf-kX24W3VO;
-        Mon, 28 Jun 2021 15:46:33 +0300
+        b=jTUleteRy+KgIYcY6o8OLpp9EcxHIy9RcykHn5yIrPicVPVzipQRrJWvbchTuAilm
+         qINn4hevNZX4nhzIEY63LCbSTgdod+Mjs+I/M9EmpCq4yg0/Bkv8GJEq+f28pfMzqd
+         dAu2rivY1Wo1oW8CfOqmaaqrnhZ2aOJ1irBBDsjA=
+Authentication-Results: myt6-61e9e731de9c.qloud-c.yandex.net; dkim=pass header.i=@yandex.ru
+Received: by myt6-efff10c3476a.qloud-c.yandex.net (smtp/Yandex) with ESMTPSA id DVoVBENo2Z-mF28pnua;
+        Mon, 28 Jun 2021 15:48:15 +0300
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
         (Client certificate not present)
 From:   Stas Sergeev <stsp2@yandex.ru>
@@ -42,9 +42,9 @@ Cc:     Stas Sergeev <stsp2@yandex.ru>,
         Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
         Jan Kiszka <jan.kiszka@siemens.com>, x86@kernel.org,
         "H. Peter Anvin" <hpa@zytor.com>, kvm@vger.kernel.org
-Subject: [PATCH] KVM: X86: Fix exception untrigger on ret to user
-Date:   Mon, 28 Jun 2021 15:46:28 +0300
-Message-Id: <20210628124628.1001133-1-stsp2@yandex.ru>
+Subject: [PATCH v2] KVM: X86: Fix exception untrigger on ret to user
+Date:   Mon, 28 Jun 2021 15:48:14 +0300
+Message-Id: <20210628124814.1001507-1-stsp2@yandex.ru>
 X-Mailer: git-send-email 2.32.0
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
