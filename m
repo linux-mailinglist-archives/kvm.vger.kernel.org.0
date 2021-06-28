@@ -2,176 +2,222 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2A6513B6B39
-	for <lists+kvm@lfdr.de>; Tue, 29 Jun 2021 01:13:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 55E0E3B6B55
+	for <lists+kvm@lfdr.de>; Tue, 29 Jun 2021 01:26:31 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236696AbhF1XQD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 28 Jun 2021 19:16:03 -0400
-Received: from mail-mw2nam10on2059.outbound.protection.outlook.com ([40.107.94.59]:50272
+        id S232976AbhF1X2z (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 28 Jun 2021 19:28:55 -0400
+Received: from mail-mw2nam10on2073.outbound.protection.outlook.com ([40.107.94.73]:18529
         "EHLO NAM10-MW2-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S235349AbhF1XP6 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 28 Jun 2021 19:15:58 -0400
+        id S231723AbhF1X2y (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 28 Jun 2021 19:28:54 -0400
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=dv28IIyQ8vRJlnw1IApcXNUd+UNECNdOLxJia6iCNcHJJNlwa4A6ut8bU54YVgYw+5hohxgx6aw3i5JFQLdmiXz9hGITcVoJ6fCvHb5kzI6XCrXhJC526dQMt/af3bb0n+WzgjreHEoy4WOfhCuVTlhgpwCpp4Lv/Qn/pmXiGwpEMLQ45TRpSlqIM8aWMsz0FY0ikVCoT81a822KKZkKJXU2Ad/0p1x0BoUzajBd3OEFps27YjwG3VpYAx0UDGL/sk2HFTmixOBhBUHLx48K7t5O4XNOjBzYMArUyIEHKk1oV5JhBamIZFcm3kkrAzCNDOTr51ARUEC6tDful3Lq2w==
+ b=oOFi0EJs6MPKQovMqvinDuiZMpn5+I5o+2dY+TSD5CBSnzyN8bW07amXWWWtVE3eY5cBNBKC7hnTUQ+U/a9hA3m2JXCty7nWVksxi+5KbxWr0VkyYKT+m1hlK5t6khgma8yHBH4OIqrK7cymK/vYs1iociNYYt1niFI4t9L48df4Mi1cVzisygjbLNdyw3l+HSxky7Y/O0egxJGcA3bY8Znv5dqJPypJM9QPiyicqSpvchlByKN7TFwiivXE385wbu6+Wskr3RTDbeAcQcByVL3ZhY32I2U34FP/Y0PepZXQKh7aRDebCg17eK0p3IE3GYOTbzkefCk1OZG2j1OmVA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=CLfXmaJAB9AzxsUp0XgMnMUx7yuHqAXuIdEON9FZ8Uo=;
- b=HJReHFmh73FRbnHgKHcjlIgHm9/QEww7I70OW+Is3q8JCVJy73DfDBBvSYAqvOccMm6Y5p5MOD0GzObM/R4/q80ewhFPgSu6yiS2mF4vwp0Sugy9s5OQfEbEfOJkCwDVoiFfAE0EE8tGrMtl7TrahF+7uICSUzft6kmPY8SqgnsDRCnaaamU9ztxw9Um+oij9jps2R1YTek9KaCGls+KkuExwEJZUdjUU2QnHtHtx7zpQn/ay/GFa9alXGAN7LEcSpn5D5c2u+Mh1xY+6BNfWNIi/asInYQJ1fqAfPC+ZlDC3Wh9VWwrjnAM7fg3D6kSJ2qf8+xYqpIg4URPMf17Aw==
+ bh=nzEmHoCHNQjVh4JL46pHJQfJwi+GT+Ox1Ui0YqSFXgQ=;
+ b=NhECLk0e6k9RymLzUTjz1rmaTpGRey63Qh8wMjDODZy563PE6J3wscpiBxZ4dQcYDxKsnC2esA1bcBeVBPP5Im4Glp3aQx2BblwdPuwxtmY60y97KBfUp7/k0G/wevJtr/wGTt6t7papfC4nJOX3U+FrhBD+5CWkZd4I1D8Xjj4m9X31gyf8I0R+dgJWoBOT5Q+33ZIMeAtulXIdimh0N3OrQf8NehdOKxNqb5/laq0G7wzmfYQcx7rmJ9cMGnlUbhLeL6nEgqEVmEYvjb1A4nilKoNI8urA0wPJVL4jThXKKvj6cMEf99ya3KqkpSi1ky+S+Mqes/K7IVhTPg1XBQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
  dkim=pass header.d=nvidia.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=CLfXmaJAB9AzxsUp0XgMnMUx7yuHqAXuIdEON9FZ8Uo=;
- b=KGE+eDEQXbROnhwtcOXmXNPPqnQfhew/G5lZlT9Ig+EhnjeNc5s3nrJSf0XsCqVoZNgNApy+l0glkvLwHuThAvgFgag9ptakoZmPVCIrcwTaHO/TC2yOhBUeYQgx+ULFdY6T2iPtVDPirdHG+TTUNIT+Ue5CsCgaW5mMwkb/r41gaIF3xhAyWwT1p6gr+qpQxygF35dDonuVGRkbPtWcT6gU84Vh7HCSKjJGRgL2havq5NE+HDSiR7qoTPohdFWmygRFUef0Y5Te0aEZrhX2nLrHjZorm4D4FyN7D8Co8Dyfvtx+9ZQR9Ad5YRQaDtuZ8K5KtD1S64JT2vFNoMi9Zg==
+ bh=nzEmHoCHNQjVh4JL46pHJQfJwi+GT+Ox1Ui0YqSFXgQ=;
+ b=SocGpWFHR6D9vl8uI77QVx1KWdq+k38sQq+XDWFtjVeOtE/YcdgSH6cK0czK45Yq7cj+WuOqgANZEQDcEa/mCLgRshLexsn4/8yyGYPuaTaguuStxFm0WqR6LPhWZ0bXq2QuHHwIRE1J/MbbJLcV2mr2QrK0q8MGL11SbFOzu7S3Pgg+7/Tz785y2NI62pAhaBRytMBxsoOaDPEAMKTEetoX4ddQMlXH3HCeQu1yxUGoeuAiyJnM7boxY4+3ZFNPajXI+BJoXkBb16IpWXBPfw6pntO4x09BgwPxNneQ1j9pTNVXFs5RL7oStIuCrNSbKE/7THl7b14sJbZklRwXvQ==
 Authentication-Results: redhat.com; dkim=none (message not signed)
  header.d=none;redhat.com; dmarc=none action=none header.from=nvidia.com;
 Received: from BL0PR12MB5506.namprd12.prod.outlook.com (2603:10b6:208:1cb::22)
- by BL1PR12MB5286.namprd12.prod.outlook.com (2603:10b6:208:31d::6) with
+ by BL1PR12MB5302.namprd12.prod.outlook.com (2603:10b6:208:31d::13) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4264.18; Mon, 28 Jun
- 2021 23:13:30 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4264.20; Mon, 28 Jun
+ 2021 23:26:26 +0000
 Received: from BL0PR12MB5506.namprd12.prod.outlook.com
  ([fe80::3d51:a3b9:8611:684e]) by BL0PR12MB5506.namprd12.prod.outlook.com
  ([fe80::3d51:a3b9:8611:684e%8]) with mapi id 15.20.4264.026; Mon, 28 Jun 2021
- 23:13:30 +0000
-Date:   Mon, 28 Jun 2021 20:13:28 -0300
+ 23:26:26 +0000
+Date:   Mon, 28 Jun 2021 20:26:25 -0300
 From:   Jason Gunthorpe <jgg@nvidia.com>
 To:     Alex Williamson <alex.williamson@redhat.com>
-Cc:     "Tian, Kevin" <kevin.tian@intel.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Jean-Philippe Brucker <jean-philippe@linaro.org>,
-        David Gibson <david@gibson.dropbear.id.au>,
-        Jason Wang <jasowang@redhat.com>,
-        "parav@mellanox.com" <parav@mellanox.com>,
-        "Enrico Weigelt, metux IT consult" <lkml@metux.net>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Shenming Lu <lushenming@huawei.com>,
-        Eric Auger <eric.auger@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        "Raj, Ashok" <ashok.raj@intel.com>,
-        "Liu, Yi L" <yi.l.liu@intel.com>, "Wu, Hao" <hao.wu@intel.com>,
-        "Jiang, Dave" <dave.jiang@intel.com>,
-        Jacob Pan <jacob.jun.pan@linux.intel.com>,
-        Kirti Wankhede <kwankhede@nvidia.com>,
-        Robin Murphy <robin.murphy@arm.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
-        David Woodhouse <dwmw2@infradead.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Lu Baolu <baolu.lu@linux.intel.com>
-Subject: Re: Plan for /dev/ioasid RFC v2
-Message-ID: <20210628231328.GK4459@nvidia.com>
-References: <20210617151452.08beadae.alex.williamson@redhat.com>
- <20210618001956.GA1987166@nvidia.com>
- <MWHPR11MB1886A17124605251DF394E888C0D9@MWHPR11MB1886.namprd11.prod.outlook.com>
- <20210618182306.GI1002214@nvidia.com>
- <BN9PR11MB5433B9C0577CF0BD8EFCC9BC8C069@BN9PR11MB5433.namprd11.prod.outlook.com>
- <20210625143616.GT2371267@nvidia.com>
- <BN9PR11MB5433D40116BC1939B6B297EA8C039@BN9PR11MB5433.namprd11.prod.outlook.com>
- <20210628163145.1a21cca9.alex.williamson@redhat.com>
- <20210628224818.GJ4459@nvidia.com>
- <20210628170902.61c0aa1d.alex.williamson@redhat.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        peterx@redhat.com, prime.zeng@hisilicon.com, cohuck@redhat.com
+Subject: Re: [PATCH v2] vfio/pci: Handle concurrent vma faults
+Message-ID: <20210628232625.GM4459@nvidia.com>
+References: <161540257788.10151.6284852774772157400.stgit@gimli.home>
+ <20210628104653.4ca65921.alex.williamson@redhat.com>
+ <20210628173028.GF4459@nvidia.com>
+ <20210628123621.7fd36a1b.alex.williamson@redhat.com>
+ <20210628185242.GI4459@nvidia.com>
+ <20210628133019.6a246fec.alex.williamson@redhat.com>
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20210628170902.61c0aa1d.alex.williamson@redhat.com>
+In-Reply-To: <20210628133019.6a246fec.alex.williamson@redhat.com>
 X-Originating-IP: [47.55.113.94]
-X-ClientProxiedBy: BLAPR03CA0053.namprd03.prod.outlook.com
- (2603:10b6:208:32d::28) To BL0PR12MB5506.namprd12.prod.outlook.com
+X-ClientProxiedBy: BL1PR13CA0103.namprd13.prod.outlook.com
+ (2603:10b6:208:2b9::18) To BL0PR12MB5506.namprd12.prod.outlook.com
  (2603:10b6:208:1cb::22)
 MIME-Version: 1.0
 X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from mlx.ziepe.ca (47.55.113.94) by BLAPR03CA0053.namprd03.prod.outlook.com (2603:10b6:208:32d::28) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4264.18 via Frontend Transport; Mon, 28 Jun 2021 23:13:29 +0000
-Received: from jgg by mlx with local (Exim 4.94)        (envelope-from <jgg@nvidia.com>)        id 1ly0RV-000m0Z-0Q; Mon, 28 Jun 2021 20:13:29 -0300
+Received: from mlx.ziepe.ca (47.55.113.94) by BL1PR13CA0103.namprd13.prod.outlook.com (2603:10b6:208:2b9::18) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4287.8 via Frontend Transport; Mon, 28 Jun 2021 23:26:26 +0000
+Received: from jgg by mlx with local (Exim 4.94)        (envelope-from <jgg@nvidia.com>)        id 1ly0e1-000mCa-PS; Mon, 28 Jun 2021 20:26:25 -0300
 X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 6313f32a-5f42-4858-a466-08d93a8a5783
-X-MS-TrafficTypeDiagnostic: BL1PR12MB5286:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <BL1PR12MB5286D714C5FC1A7945D1A541C2039@BL1PR12MB5286.namprd12.prod.outlook.com>
+X-MS-Office365-Filtering-Correlation-Id: 1455c026-8e85-443e-a80e-08d93a8c267d
+X-MS-TrafficTypeDiagnostic: BL1PR12MB5302:
+X-Microsoft-Antispam-PRVS: <BL1PR12MB5302FD289AC42C313DDA101FC2039@BL1PR12MB5302.namprd12.prod.outlook.com>
 X-MS-Oob-TLC-OOBClassifiers: OLM:10000;
 X-MS-Exchange-SenderADCheck: 1
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: ZqEnawq3Z+9maUZQ/DvNp9Mp5umCPwxJAGja0kaALKErVr4VoPjtTnVhldg2wtbHmi/ocwZ6wfiR4vIpVtJRDX0Jf5p5tyqs6KMcDyLYXvJnL9DaL+bTKVfi2xg1pCy7UP2Pnff95kfU3mp/FM3J+HDwr6f3qNezgs2P2fWAYchWrKGG7bZ7DIC3Q78qzXIG10WGzfZd+aI9aJ5s4L2r/RILW5fuQ4mXzzMsuOXM4JwIIvz10YOFQpIpGkJneqmj87WD2K974iRpqrrcbaYuEZYeYyiQa5k/u77zXWFt0w14qwq/rTuaa2hjMgWzdWfi5rhqXrblihUDCdq7ORykOlMdL4pxhCPE88LVUM8sE0KNFG/ga8mWiipTPsFKDBndej1FzBjeMHMgCpHfQEOzvDDUx1yse56kMOW6Q8hjOmCAlbFIkh3qXx0FeketfQLXzt8/aAyIiZ7q7Hyq0WUuYZRPXuxYf9EDkH72WgCclYr4Q6gVf+qGX3rSTRSSyURZFIrZlk3Jhbo+YGdiyFt6M0JkeJ+J9FKpqDEC+6Dv4ey/E5ae5EIsUwACoamg1+1tseRFqQTbYCBbuaFzP4HiLeLt/qdsu/kfPBSgN4PaHOk53gapNOSBLpJk8aHcZF7Qwk20DGmNv8RL2MLYbzYNwQ==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL0PR12MB5506.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(376002)(346002)(39860400002)(396003)(366004)(136003)(54906003)(478600001)(4326008)(186003)(86362001)(1076003)(36756003)(316002)(26005)(2906002)(426003)(6916009)(7416002)(9746002)(9786002)(8936002)(8676002)(66556008)(66476007)(38100700002)(66946007)(5660300002)(2616005)(33656002);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam-Message-Info: NGuCZ1T8qRaX9rDiGmooSTB8wqpLK0R1c5QfrVKiN1qvXbQZ0Ppaj3ZVd7P4m/lz5ioDZHOD1c/JPFLGGGJguPr0C/hd0jEbi8DxAVilFT0RgiW+dAobapGxjYQll3IMVpo0ZXRnbXMSDnWDsP4ry08sCM91QuuvkhpG3/2t3eYdGLbr40GHHiiR/6lH/VTH3AXt4fHuj5/MFPGFhWvKoy+AuUy7C6j6CvGoST9lc/ZFrFvFkDCRCA5Slptwm8VRTZCePyc9XuA3eUjPF3/Lcaif0C7/cB4QXWUyMO3oUCzEzRh7MsDgRL0Nalddjo7mC6Ld6cDhnoKMTI6ED2WsckaC9DCyPVzC5PW0Nm6UlErN5U1BV34Mhr6UhRaXhdk5XYfZln25LENgIFh6vT3g/ojK/UP2DcoAWIbvYJ3WEYqdibUXVxQhuiH6HrMs37WGUqVgc/vbLWclPpjdgkZ3au4xeA2/x9EKCFchWR9hVlBT4yMvZA0PykVKs4sIYuaw3upqa49bEzzB0XqzVB1+j8CGep6KN/S71coQKFfJYTPsByujGue1wGnqETwALdWCgokW0a8HFEHfv0l1GKEbMxwNqFVdI1nxBoE7LTMp/XKdudHktF8p3wYhT5MpbgyEOYS/4kceWSSHUTxoBCxUiw==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL0PR12MB5506.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(396003)(136003)(346002)(39860400002)(366004)(376002)(86362001)(26005)(6916009)(8676002)(4326008)(2906002)(186003)(2616005)(83380400001)(9746002)(5660300002)(36756003)(38100700002)(1076003)(316002)(478600001)(8936002)(9786002)(66476007)(33656002)(66556008)(66946007)(426003);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?jqZnnxBz9Oqxc7k0zklv25QFCu9kYgS9qEw1/f9ZBjkIjic3hwLrdYnth89x?=
- =?us-ascii?Q?yfTYBClvrEFEhi2DMsD8lmOY7quVVH9XcT43KcvpKMC4kOmblt2iVEVnUZA0?=
- =?us-ascii?Q?TQB+l+re7ok3Wgh3J+RjJ8qWab6DhuDAuTS3h8ikON3JYxn4SYLXpYRuXZ99?=
- =?us-ascii?Q?oO/00fp5v8zhYQrKIv62QnsmLGbdFEyZRQCPjvO8CW2en/qXHK7Gug6k7RXj?=
- =?us-ascii?Q?SzKypi444cGpR6GOP4LeDhUBmxoufmDXgUde4rZ30RceCSxFQhAj5WaXt4Yr?=
- =?us-ascii?Q?PqxAX9BeJ6+lL11NyU40rBP/1NUX3zN/TCsnZOSMjDd8Ehgl5zDCVcThHTRz?=
- =?us-ascii?Q?TDIg5wGu9WKnEIkCg5tgIxz04bZmEPmlEjhZ/LMZo81kYJZR+gnSt+J7bg6n?=
- =?us-ascii?Q?ynVHy7Sk/neVKbj3aD8WzAD+srReDlS/VFcm0UTdC5nQNfdfzC/Aw22hg1cA?=
- =?us-ascii?Q?j+5hmfZa/10yD4PqhqGBSO4Lq0zfnXO3QEC7XzIiK85j1uzClH/ujN/LayXM?=
- =?us-ascii?Q?VOe6nQ8fTLm8TVcHDEtTpC14G7uo0QriesESMTyo1lv9ul5QVadzDTfcQ3bE?=
- =?us-ascii?Q?g8K590NErCjzRwWUG7CFjTpTTH3OgOGFUj6rEIcNusjXm7jeSjX65Z72JXAC?=
- =?us-ascii?Q?ij84kokbNfMz+WY67EWxImwksqaI+LZuDMGD5Jb8ksbCwRbr9r4topOnsDYj?=
- =?us-ascii?Q?eNtFXD5SSLCnBAyxBOXKEnHshkEoQgC8XJXO7zkJFAmlr/0qFheA7tlTpnIe?=
- =?us-ascii?Q?LaY3VPT/R0cWaiUXxLWXRpemytzHqmOC5CIRf5kFfyrHyaF4Youo9iMcddN1?=
- =?us-ascii?Q?tZ+Cc1uzHvZTU+tVGLMBkFl2l+ELAhxaIP4sLhAc/I8ATebMC8CVGXIlsImg?=
- =?us-ascii?Q?inRLFk7EtxqsrUXxduF54qaUw31ILN/dz8RaQ5fhuyVvhl8Bcgvvt+cgLkIa?=
- =?us-ascii?Q?ySqijokFW1STq6JQgOU3CBt2+fMHWmj5R2rQgrCLjbTyj8SdSeFhCIsn9UFc?=
- =?us-ascii?Q?pcDZdzQgKLlnScN/8x7NVDdo++1AlWT2R+WdSjWmkGrmcZGRNK3OGdlSXTaI?=
- =?us-ascii?Q?80NOdMposVs638ajhkLbeanaDvVVJdWcZwMF4bpKsCvPt+Bcnulq6l9SfBmg?=
- =?us-ascii?Q?Uj6z2FiUCPg0q13qyxb7alGZxLAIF3zjslINenY2bx6aBGPcMyaFu8kDIT6E?=
- =?us-ascii?Q?3Af6C5Svk1UNrtI7pTyNHLbbG1Nu5o5mPsG40FMLXMtJY/N1htt5tCeZBklu?=
- =?us-ascii?Q?lkwSoRNDbwlNvlCPlBB+InbmW3dZceWSTLqiDGdrxMsLzxSCqvkrK9rMJGzi?=
- =?us-ascii?Q?CgeF272SWsAB7yDO9B8uf64S?=
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?WHSLfPf1PCqfVQnV/hShN2ArELO1PAgBkLEEJeBN9ENKgjmYhcZWQBcww7fc?=
+ =?us-ascii?Q?09pSgZ2503hTQSP6G3DuCR0xTv0ZAXsLBJYVcSB4NJVNO6RVM3vqFiO/F+DA?=
+ =?us-ascii?Q?SinjQbRhEUB7ETA+b+TUFkWuATx7tCLXER9M4iLGxK15frCJlJFLwByOiZiL?=
+ =?us-ascii?Q?EqeaBQzDsRDtMTUski/+Y/xQ6Ch4E8cu8jbN8nS4RQdqrdozAdYSRRfojVxB?=
+ =?us-ascii?Q?GL5vvheYNMcLrEdH/3/aLjoVJgLY8dRs5Wky4Q+p+xzM8ueKmM/YlVJCOAYa?=
+ =?us-ascii?Q?nAvmYtfyvYJxHS5kseSlZABvfKg/dbxs11UpDQcainP1A++kBA7L8mRjPRSZ?=
+ =?us-ascii?Q?LWKXLc0BLuE49lYzJ9emHxKo8/5F+X2d0Ey1OJLmMvodZckZURcE/rLMizuI?=
+ =?us-ascii?Q?9Yozc61sQ/VClOnwrnviWm65GbGssrUWYVkZZ/Xzgi7CwrPBDm498R8NwVZm?=
+ =?us-ascii?Q?v9aW/B2SzFzpc6GaHJyw2ebv8CSGu6orM1Nx32pCqpz3cm2a/VwNSFhpO0A5?=
+ =?us-ascii?Q?n+XCLni2WpQhN/sugsro2r9nYQXszlfvAwabiLj0UtU39p3yI2PJEy5p2lm7?=
+ =?us-ascii?Q?YXclWCLukeMhOhvqDAiXtJQ3RYj5zkA+6EqEqETj3bw+2IUcztCTDAFIJj8o?=
+ =?us-ascii?Q?eD1ZOxbsmAq4VrtBQnlDjVY0BQWte89+lig78k7gMSYdm90Zw8mFmA9S61J6?=
+ =?us-ascii?Q?l5Iarkg5QUnkO6QN9InaQ5li+uHnoYEkGHpAKwYwEtA01f4i8OHMR6Zp5d/C?=
+ =?us-ascii?Q?zBZVYmnOJZjzopjEDiizb5UDbvg9Ei1IaHAdtSRgvezSt19EzM+KWgLaOSDL?=
+ =?us-ascii?Q?4NDRum4sax1bz8EeN+MNEEwopKRyrxKuCCozsUIPu4qZNlosZHoG8fQDtLpA?=
+ =?us-ascii?Q?KmTjoriE3gWtXihcR34p3CWXsnrNXvjEGy9I5FiMTTN4CXZ5tr4CRY8aEowq?=
+ =?us-ascii?Q?H+6uMQrhwuBx0jD5IN99QwaZ3KoqRjB+78rRa/SWXW4xaHrtYkPRk3R3Hajp?=
+ =?us-ascii?Q?9tWuZuFblJWuX9s/nRNkZKItJpgMY1ifmMwrS4Brmi7IqmgqVHuVzAfVesnB?=
+ =?us-ascii?Q?rJ/Bbl5tOwlBfaUbZY7yAN4BWnpXqqSDQC9XueM86TL34kyUndxlDtTdHGo3?=
+ =?us-ascii?Q?AhwhAUbV94/Y6+fNhxAH0PnxKN6DWNM7utkbg5Fhhtl4yFoAEdlz6xBe0Jh7?=
+ =?us-ascii?Q?SDOJq5iqnVEpI/ej5GwgkulVIbkaGOpphmCu0/mpUsmlBqcv1TdSk3iWkmFX?=
+ =?us-ascii?Q?KGAq/vlwyKRemFdVkNW7KCuX3kc0ogWUAX5mi7PG0SGk77U50a3KgH+NNkLi?=
+ =?us-ascii?Q?xnDtAQIlvbFwSZw6zZrDE+OW?=
 X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 6313f32a-5f42-4858-a466-08d93a8a5783
+X-MS-Exchange-CrossTenant-Network-Message-Id: 1455c026-8e85-443e-a80e-08d93a8c267d
 X-MS-Exchange-CrossTenant-AuthSource: BL0PR12MB5506.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 Jun 2021 23:13:30.0218
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 Jun 2021 23:26:26.6820
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: Bhm85INimm8QOY7zDRnf08QzpS6QsL73ScFbZWa41EhME5c6iYtzmh6LCbfYI6mA
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL1PR12MB5286
+X-MS-Exchange-CrossTenant-UserPrincipalName: fwNBAgcbMsHDnsMAjNz9kl1FISyQg/1mBvBqm7ovbacZBqC5fVir9fRZsUxB2JQD
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL1PR12MB5302
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Jun 28, 2021 at 05:09:02PM -0600, Alex Williamson wrote:
-> On Mon, 28 Jun 2021 19:48:18 -0300
+On Mon, Jun 28, 2021 at 01:30:19PM -0600, Alex Williamson wrote:
+> On Mon, 28 Jun 2021 15:52:42 -0300
 > Jason Gunthorpe <jgg@nvidia.com> wrote:
 > 
-> > On Mon, Jun 28, 2021 at 04:31:45PM -0600, Alex Williamson wrote:
+> > On Mon, Jun 28, 2021 at 12:36:21PM -0600, Alex Williamson wrote:
+> > > On Mon, 28 Jun 2021 14:30:28 -0300
+> > > Jason Gunthorpe <jgg@nvidia.com> wrote:
+> > >   
+> > > > On Mon, Jun 28, 2021 at 10:46:53AM -0600, Alex Williamson wrote:  
+> > > > > On Wed, 10 Mar 2021 11:58:07 -0700
+> > > > > Alex Williamson <alex.williamson@redhat.com> wrote:
+> > > > >     
+> > > > > > vfio_pci_mmap_fault() incorrectly makes use of io_remap_pfn_range()
+> > > > > > from within a vm_ops fault handler.  This function will trigger a
+> > > > > > BUG_ON if it encounters a populated pte within the remapped range,
+> > > > > > where any fault is meant to populate the entire vma.  Concurrent
+> > > > > > inflight faults to the same vma will therefore hit this issue,
+> > > > > > triggering traces such as:    
+> > > > 
+> > > > If it is just about concurrancy can the vma_lock enclose
+> > > > io_remap_pfn_range() ?  
+> > > 
+> > > We could extend vma_lock around io_remap_pfn_range(), but that alone
+> > > would just block the concurrent faults to the same vma and once we
+> > > released them they'd still hit the BUG_ON in io_remap_pfn_range()
+> > > because the page is no longer pte_none().  We'd need to combine that
+> > > with something like __vfio_pci_add_vma() returning -EEXIST to skip the
+> > > io_remap_pfn_range(), but I've been advised that we shouldn't be
+> > > calling io_remap_pfn_range() from within the fault handler anyway, we
+> > > should be using something like vmf_insert_pfn() instead, which I
+> > > understand can be called safely in the same situation.  That's rather
+> > > the testing I was hoping someone who reproduced the issue previously
+> > > could validate.  
 > > 
-> > > I'd expect that /dev/iommu will be used by multiple subsystems.  All
-> > > will want to bind devices to address spaces, so shouldn't binding a
-> > > device to an iommufd be an ioctl on the iommufd, ie.
-> > > IOMMU_BIND_VFIO_DEVICE_FD.  Maybe we don't even need "VFIO" in there and
-> > > the iommufd code can figure it out internally.  
+> > Yes, using the vmf_ stuff is 'righter' for sure, but there isn't
+> > really a vmf for IO mappings..
 > > 
-> > It wants to be the other way around because iommu_fd is the lower
-> > level subsystem. We don't/can't teach iommu_fd how to convert a fd
-> > number to a vfio/vdpa/etc/etc, we teach all the things building on
-> > iommu_fd how to change a fd number to an iommu - they already
-> > necessarily have an inter-module linkage.
+> > > > I assume there is a reason why vm_lock can't be used here, so I
+> > > > wouldn't object, though I don't especially like the loss of tracking
+> > > > either.  
+> > > 
+> > > There's no loss of tracking here, we were only expecting a single fault
+> > > per vma to add the vma to our list.  This just skips adding duplicates
+> > > in these cases where we can have multiple faults in-flight.  Thanks,  
+> > 
+> > I mean the arch tracking of IO maps that is hidden inside ioremap_pfn
 > 
-> These seem like peer subsystems, like vfio and kvm.  vfio shouldn't
-> have any hard dependencies on the iommufd module, especially so long as
-> we have the legacy type1 code.
+> Ok, so I take it you'd feel more comfortable with something like this,
+> right?  Thanks,
 
-It does, the vfio_device implementation has to tell the iommu subsystem
-what kind of device behavior it has and possibly interact with the
-iommu subsystem with it in cases like PASID. This was outlined in part
-of the RFC.
+I think so, it doesn't abuse the arch code, but it does abuse not
+using vmf_* in a fault handler.
 
-In any event a module dependency from vfio to iommu is not bothersome,
-while the other way certainly is.
+> index 759dfb118712..74fc66cf9cf4 100644
+> +++ b/drivers/vfio/pci/vfio_pci.c
+> @@ -1584,6 +1584,7 @@ static vm_fault_t vfio_pci_mmap_fault(struct vm_fault *vmf)
+>  {
+>  	struct vm_area_struct *vma = vmf->vma;
+>  	struct vfio_pci_device *vdev = vma->vm_private_data;
+> +	struct vfio_pci_mmap_vma *mmap_vma;
+>  	vm_fault_t ret = VM_FAULT_NOPAGE;
+>  
+>  	mutex_lock(&vdev->vma_lock);
+> @@ -1591,24 +1592,33 @@ static vm_fault_t vfio_pci_mmap_fault(struct vm_fault *vmf)
+>  
+>  	if (!__vfio_pci_memory_enabled(vdev)) {
+>  		ret = VM_FAULT_SIGBUS;
+> -		mutex_unlock(&vdev->vma_lock);
+>  		goto up_out;
+>  	}
+>  
+> -	if (__vfio_pci_add_vma(vdev, vma)) {
+> -		ret = VM_FAULT_OOM;
+> -		mutex_unlock(&vdev->vma_lock);
+> -		goto up_out;
 
-> Likewise iommufd shouldn't have any on vfio.  As much as you
-> dislike the symbol_get hack of the kvm-vfio device, it would be
-> reasonable for iommufd to reach for a vfio symbol when an
-> IOMMU_BIND_VFIO_DEVICE_FD ioctl is called.
 
-We'd have to add a special ioctl to iommu for every new subsystem, it
-doesn't scale. iommu is a core subsystem, vfio is a driver subsystem.
-The direction of dependency is clear, I think.
+> +	/*
+> +	 * Skip existing vmas, assume concurrent in-flight faults to avoid
+> +	 * BUG_ON from io_remap_pfn_range() hitting !pte_none() pages.
+> +	 */
+> +	list_for_each_entry(mmap_vma, &vdev->vma_list, vma_next) {
+> +		if (mmap_vma->vma == vma)
+> +			goto up_out;
+>  	}
+>  
+> -	mutex_unlock(&vdev->vma_lock);
+> -
+>  	if (io_remap_pfn_range(vma, vma->vm_start, vma->vm_pgoff,
+> -			       vma->vm_end - vma->vm_start, vma->vm_page_prot))
+> +			       vma->vm_end - vma->vm_start,
+> +			       vma->vm_page_prot)) {
+>  		ret = VM_FAULT_SIGBUS;
+> +		goto up_out;
+> +	}
+
+I suppose io_remap_pfn_range can fail inside after partially
+populating the range, ie if it fails to allocate another pte table or
+something.
+
+Since partial allocations are not allowed we'd have to zap it here
+too.
+
+I suppose the other idea is to do the io_remap_pfn_range() when the
+mmap becomes valid and the zap when it becomes invalid and just have
+the fault handler always fail. That way we don't abuse anything.
+
+Was there some tricky locking reason why this didn't work? Does it get
+better with the address_space?
 
 Jason
