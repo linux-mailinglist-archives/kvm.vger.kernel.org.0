@@ -2,137 +2,137 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 11FCE3B5D1F
-	for <lists+kvm@lfdr.de>; Mon, 28 Jun 2021 13:28:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 926C83B5E58
+	for <lists+kvm@lfdr.de>; Mon, 28 Jun 2021 14:46:42 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232830AbhF1La0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 28 Jun 2021 07:30:26 -0400
-Received: from forward105j.mail.yandex.net ([5.45.198.248]:32813 "EHLO
-        forward105j.mail.yandex.net" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232767AbhF1LaZ (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 28 Jun 2021 07:30:25 -0400
-Received: from myt6-9503d8936a58.qloud-c.yandex.net (myt6-9503d8936a58.qloud-c.yandex.net [IPv6:2a02:6b8:c12:4684:0:640:9503:d893])
-        by forward105j.mail.yandex.net (Yandex) with ESMTP id 73E93B2251B;
-        Mon, 28 Jun 2021 14:27:58 +0300 (MSK)
-Received: from myt6-9bdf92ffd111.qloud-c.yandex.net (myt6-9bdf92ffd111.qloud-c.yandex.net [2a02:6b8:c12:468a:0:640:9bdf:92ff])
-        by myt6-9503d8936a58.qloud-c.yandex.net (mxback/Yandex) with ESMTP id ofYBvQQk8P-RvIq4QFv;
-        Mon, 28 Jun 2021 14:27:58 +0300
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex.ru; s=mail; t=1624879678;
-        bh=lNTsgqdhzvi2ZHIHNTN6BquAeDuXnhG5in4TLQkUGRo=;
-        h=In-Reply-To:From:Date:References:To:Subject:Message-ID:Cc;
-        b=Kt2GoNA0f9aH2tCGQpi4PLrPSSLepWU8/CGHEP2/xzK/c68lM7UKIsS8BgCbcJkIh
-         pC/xq0kXyqiLRK9bk9sh1JUFMwMLT0gEoAN0kO6X7/j8lZrJUGLWMV+oyDjdrvekO2
-         uk7sDB3L0btvVYVULlFMb7/FVR3OVoQK7TvuexMc=
-Authentication-Results: myt6-9503d8936a58.qloud-c.yandex.net; dkim=pass header.i=@yandex.ru
-Received: by myt6-9bdf92ffd111.qloud-c.yandex.net (smtp/Yandex) with ESMTPSA id 4opb6EslvG-RvP4pSPb;
-        Mon, 28 Jun 2021 14:27:57 +0300
+        id S232991AbhF1MtF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 28 Jun 2021 08:49:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41406 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232926AbhF1MtD (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 28 Jun 2021 08:49:03 -0400
+Received: from forward106o.mail.yandex.net (forward106o.mail.yandex.net [IPv6:2a02:6b8:0:1a2d::609])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 95DC0C061574
+        for <kvm@vger.kernel.org>; Mon, 28 Jun 2021 05:46:37 -0700 (PDT)
+Received: from iva1-cf747c9a36c8.qloud-c.yandex.net (iva1-cf747c9a36c8.qloud-c.yandex.net [IPv6:2a02:6b8:c0c:9282:0:640:cf74:7c9a])
+        by forward106o.mail.yandex.net (Yandex) with ESMTP id 0210D506268B;
+        Mon, 28 Jun 2021 15:46:35 +0300 (MSK)
+Received: from iva3-dd2bb2ff2b5f.qloud-c.yandex.net (iva3-dd2bb2ff2b5f.qloud-c.yandex.net [2a02:6b8:c0c:7611:0:640:dd2b:b2ff])
+        by iva1-cf747c9a36c8.qloud-c.yandex.net (mxback/Yandex) with ESMTP id fuEENI93Yv-kYHiSd0u;
+        Mon, 28 Jun 2021 15:46:34 +0300
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex.ru; s=mail; t=1624884394;
+        bh=MXNIktVnLvg3iLfiytyT0Mz6xWZ11yPrq2AeNMBm0q0=;
+        h=Subject:To:From:Message-Id:Cc:Date;
+        b=HKV21HIbqGpLeTgc/mlTvJ2i8Kc3b3bc/RV2+H9nL3C7M4MT3acE2zHXa7Fc7N9sI
+         CR2A2ebJxBtWSYagCr5SekOphDr1GliT5LXZRhoqjoHc8kIAHo+MbGUU8MyJI15ReB
+         opE18Y4HtXH4vQx3GaisnPb6fiUuzhIlm6PPGn/A=
+Authentication-Results: iva1-cf747c9a36c8.qloud-c.yandex.net; dkim=pass header.i=@yandex.ru
+Received: by iva3-dd2bb2ff2b5f.qloud-c.yandex.net (smtp/Yandex) with ESMTPSA id cMbTfmbVkf-kX24W3VO;
+        Mon, 28 Jun 2021 15:46:33 +0300
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
         (Client certificate not present)
-Subject: Re: [PATCH] KVM: X86: Fix exception untrigger on ret to user
-To:     Vitaly Kuznetsov <vkuznets@redhat.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+From:   Stas Sergeev <stsp2@yandex.ru>
+Cc:     Stas Sergeev <stsp2@yandex.ru>,
+        Paolo Bonzini <pbonzini@redhat.com>,
         Sean Christopherson <seanjc@google.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
         Jim Mattson <jmattson@google.com>,
         Joerg Roedel <joro@8bytes.org>,
         Thomas Gleixner <tglx@linutronix.de>,
         Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
-        kvm@vger.kernel.org
-References: <20210627233819.857906-1-stsp2@yandex.ru>
- <87zgva3162.fsf@vitty.brq.redhat.com>
- <b3ee97c8-318a-3134-07c7-75114e96b7cf@yandex.ru>
- <87o8bq2tfm.fsf@vitty.brq.redhat.com>
- <b08399e2-ce68-e895-ed0d-b97920f721ce@yandex.ru>
- <87lf6u2r6v.fsf@vitty.brq.redhat.com>
-From:   stsp <stsp2@yandex.ru>
-Message-ID: <17c7da34-7a54-017e-1c2f-870d7e2c5ed7@yandex.ru>
-Date:   Mon, 28 Jun 2021 14:27:56 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.11.0
+        Jan Kiszka <jan.kiszka@siemens.com>, x86@kernel.org,
+        "H. Peter Anvin" <hpa@zytor.com>, kvm@vger.kernel.org
+Subject: [PATCH] KVM: X86: Fix exception untrigger on ret to user
+Date:   Mon, 28 Jun 2021 15:46:28 +0300
+Message-Id: <20210628124628.1001133-1-stsp2@yandex.ru>
+X-Mailer: git-send-email 2.32.0
 MIME-Version: 1.0
-In-Reply-To: <87lf6u2r6v.fsf@vitty.brq.redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
-Content-Language: en-US
+To:     unlisted-recipients:; (no To-header on input)
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-28.06.2021 13:56, Vitaly Kuznetsov пишет:
-> stsp <stsp2@yandex.ru> writes:
->
->> Yes, cancel_injection is supposed to
->> be always broken indeed. But there
->> are a few more things to it.
->> Namely:
->> - Other CPUs do not seem to exhibit
->> that path. My guess here is that they
->> just handle the exception in hardware,
->> without returning to KVM for that. I
->> am not sure why Core2 vmexits per
->> each page fault. Is it incapable of
->> handling the PF in hardware, or maybe
->> some other bug is around?
-> Wild guess: no EPT support and running on shadow pages?
+When returning to user, the special care is taken about the
+exception that was already injected to VMCS but not yet to guest.
+cancel_injection removes such exception from VMCS. It is set as
+pending, and if the user does KVM_SET_REGS, it gets completely canceled.
 
-That's something you should tell
-me, and not the other way around. :)
-I am just working with kvm as a user.
+This didn't happen though, because the vcpu->arch.exception.injected
+and vcpu->arch.exception.pending were forgotten to update in
+cancel_injection. As the result, KVM_SET_REGS didn't cancel out
+anything, and the exception was re-injected on the next KVM_RUN,
+even though the guest registers (like EIP) were already modified.
+This was leading to an exception coming from the "wrong place".
 
+This patch makes sure the vcpu->arch.exception.injected and
+vcpu->arch.exception.pending are in sync with the reality (and
+with VMCS). Also it adds clearing of pending exception to
+__set_sregs() the same way it is in __set_regs(). See patch
+b4f14abd9 that added it to __set_regs().
 
->> - Even if you followed the broken
->> path, in most cases everything is still
->> fine: the exception will just be re-injected.
->> The unfortunate scenario is when you
->> have _TIF_SIGPENDING at exactly
->> right place. Then you go to user-space,
->> and the user-space is unlucky to use
->> SET_REGS right here. These conditions
->> are not very likely to happen. I wrote a
->> test-case for it, but it involves the entire
->> buildroot setup and you need to wait
->> a bit while it is trying to trigger the race.
-> Maybe there's an easier way to trigger imminent exit to userspace which
-> doesn't involve
+How to trigger the buggy scenario (that is, without this patch):
+- Make sure you have the old CPU where shadow page tables
+are used. Core2 family should be fine for the task. In this
+case, all PF exceptions produce the exit to monitor.
+- You need the _TIF_SIGPENDING flag set at the right moment
+to get kvm_vcpu_exit_request() to return true when the PF
+exception was just injected. In that case the cancel_injection
+path is executed.
+- You need the "unlucky" user-space that executes KVM_SET_REGS
+at the right moment. This leads to KVM_SET_REGS not clearing
+the exception, but instead corrupting its context.
 
-Any API to intercept all guest exceptions?
-But even if there is, I am afraid in that
-case cancel_injection is not going to be
-executed. It is executed only when
-kvm_vcpu_exit_request(vcpu) returns true.
+v2 changes:
+- do not add WARN_ON_ONCE() to __set_regs(). As explained by
+Vitaly Kuznetsov, it can be user-triggerable.
+- clear pending exception also in __set_sregs().
+- update description with the bug-triggering scenario.
 
+Signed-off-by: Stas Sergeev <stsp2@yandex.ru>
 
->> ... which makes such scenario valid?
->>
-> We should not add userspace-triggerable WARNs in kernel, right. I was
-> not sure if the WARN you add stays triggerable post-patch.
+CC: Paolo Bonzini <pbonzini@redhat.com>
+CC: Sean Christopherson <seanjc@google.com>
+CC: Vitaly Kuznetsov <vkuznets@redhat.com>
+CC: Jim Mattson <jmattson@google.com>
+CC: Joerg Roedel <joro@8bytes.org>
+CC: Thomas Gleixner <tglx@linutronix.de>
+CC: Ingo Molnar <mingo@redhat.com>
+CC: Borislav Petkov <bp@alien8.de>
+CC: Jan Kiszka <jan.kiszka@siemens.com>
+CC: x86@kernel.org
+CC: "H. Peter Anvin" <hpa@zytor.com>
+CC: kvm@vger.kernel.org
+---
+ arch/x86/kvm/x86.c | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
 
-I thought its not - at least not when
-the exceptions are coming from the
-guest. Maybe WARN_ON() can somehow
-check if the exception was injected by
-user-space, like by checking the events
-bitmask?
-Or I'll just remove it.
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index e0f4a46649d7..d1026e9216e4 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -9450,7 +9450,11 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
+ cancel_injection:
+ 	if (req_immediate_exit)
+ 		kvm_make_request(KVM_REQ_EVENT, vcpu);
+-	static_call(kvm_x86_cancel_injection)(vcpu);
++	if (vcpu->arch.exception.injected) {
++		static_call(kvm_x86_cancel_injection)(vcpu);
++		vcpu->arch.exception.injected = false;
++		vcpu->arch.exception.pending = true;
++	}
+ 	if (unlikely(vcpu->arch.apic_attention))
+ 		kvm_lapic_sync_from_vapic(vcpu);
+ out:
+@@ -10077,6 +10081,8 @@ static int __set_sregs(struct kvm_vcpu *vcpu, struct kvm_sregs *sregs)
+ 		pr_debug("Set back pending irq %d\n", pending_vec);
+ 	}
+ 
++	vcpu->arch.exception.pending = false;
++
+ 	kvm_make_request(KVM_REQ_EVENT, vcpu);
+ 
+ 	ret = 0;
+-- 
+2.32.0
 
-
-> Maybe the huge amount of injected #PFs (which are triggered because
-> there's no EPT) contribute to the easiness of the reproduction? Purely
-> from from looking at the code of your patch, the issue should also
-> happen with other exceptions, KVM just doesn't inject them that
-> often.
-I haven't seen the same race with
-any other exception, like with GP.
-I suspect there is no vmexit
-for GP, so it will just be injected in
-hardware. I think only PF makes
-the problem because of the shadow
-page tables, as you pointed before.
-While I haven't made a specific
-test-case to try GP, I am quite sure
-it would have been observed long
-ago because GPs in our usage
-scenarios are much more frequent
-than PFs. But the race was never
-observed with GP.
