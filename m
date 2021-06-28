@@ -2,275 +2,118 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 71CC83B6CB6
-	for <lists+kvm@lfdr.de>; Tue, 29 Jun 2021 05:00:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1FC8F3B6CD8
+	for <lists+kvm@lfdr.de>; Tue, 29 Jun 2021 05:11:29 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231847AbhF2DCd (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 28 Jun 2021 23:02:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33778 "EHLO
+        id S231949AbhF2DNt (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 28 Jun 2021 23:13:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36324 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231682AbhF2DCb (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 28 Jun 2021 23:02:31 -0400
-Received: from mail-ed1-x532.google.com (mail-ed1-x532.google.com [IPv6:2a00:1450:4864:20::532])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1BD64C061760
-        for <kvm@vger.kernel.org>; Mon, 28 Jun 2021 20:00:04 -0700 (PDT)
-Received: by mail-ed1-x532.google.com with SMTP id h2so29134431edt.3
-        for <kvm@vger.kernel.org>; Mon, 28 Jun 2021 20:00:04 -0700 (PDT)
+        with ESMTP id S231700AbhF2DNt (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 28 Jun 2021 23:13:49 -0400
+Received: from mail-pl1-x62c.google.com (mail-pl1-x62c.google.com [IPv6:2607:f8b0:4864:20::62c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 14916C061574;
+        Mon, 28 Jun 2021 20:11:23 -0700 (PDT)
+Received: by mail-pl1-x62c.google.com with SMTP id b1so3608109pls.5;
+        Mon, 28 Jun 2021 20:11:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance-com.20150623.gappssmtp.com; s=20150623;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=tC8+eycXVZtpiOsN/AMjjNqu/G/aFD3wjzDfuO22bFA=;
-        b=bh0RUiARewsKN3Hk1A5XuOHjErIfF3IJybc5hLJYfbWfR4avSK5I7hdl76VNLcFu7q
-         8088kCiIqV50Zrxug6TOBHKzv4OP9W7BbMhVTNhAk6ocCnWhAIqqnTT10FM8YaafrMCS
-         fobCNy4GG347XSHq5u7Sf803O0qFzJMLrz+vnGfYFFr/klFuR3RPi3Iak6Rw9TnxzkvS
-         jm4cY1IhMqRmgfKwUNeapZTIbX9ZLISiGEUmAI75ltfyEpKq4cYArVE4ODOc/u0hrevV
-         InesZfRLmS4f95S2/JcbikR32ocp9dRZ0Fyc+5Csa59s/feSzPNRPU4jOKrG7kq+cB/e
-         t+nA==
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=CrRfjlffFTsErYpyxRU8qsAnfz33rhUg5wGpylT7ibU=;
+        b=Px3WCVFBTtBJ58YYng2zaDvLYyFK8jNjPzLmPztobD/ogV6koyfjdzqWonDUQXrg+V
+         H87SNvbz6iCahm8x+izb2bKXKGQrH2HHabUfLE+t9h6sGL91L/uVBdlt3NbSeHcEe3Hm
+         6fBpk0HmN6jK3PXvGgeQscHOgOB0/sUI8OJFbG/WKGyDa1rJjohbkHgsbnrmekfBurKP
+         jDlOmNc2fHGlHibewQPQleRonn4rJR6bAQmT8ssqJnXXIvvd4Gktb59wqGQl7mF44itv
+         WkZ5S+m4o/cH1FR8BS+bRdzejGukCuSidsh8sxixFcWP3URo3csUKKqWfPbRaDMZ7LRO
+         E8Gg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=tC8+eycXVZtpiOsN/AMjjNqu/G/aFD3wjzDfuO22bFA=;
-        b=aGyErka18D4RxZBKQfcai+zPnI4g8REPz9A/zTmRuzN+AezUsIxTlQqeXfri7QHAy2
-         +V0y0+S/tW7zJUKqCWpHL2F5naSJ6NmEiH5nXhWqXryBH8C/qRF4WFx6Vu9GPGuNsfTu
-         GqQoQiMYt4P2Di4eqClEQkIzrHuTH3o2YbwBEMSA2scHY6+JKt4helcWKIr/L4P64CEc
-         M1ouR52n5dIwtaQpEX+f23X1vwe5hQbMk91DaUPFOcaMO+xggCaBkNdbTsUsCwuloFQu
-         UXlYxVwKWa5Y6iclVVDgyiVprlPAqBIHccihP0puE37yZuU4yzsjQlPAY8SGL3Od3lZk
-         x9zQ==
-X-Gm-Message-State: AOAM532t1gLDr5Wf+SQvdtgWS22/Qbrv+kOJP1ejZMReGFDM9kVotIcT
-        hf2JoVJFP5XKPJEmmk+R6X0GdoIClTrkuXadncsH
-X-Google-Smtp-Source: ABdhPJzg96tWiFpzAbCVxt+xiS/U5xotludj60TImfwJQUK2KdEwY2E/dV2mAC5D/i1Omtd+LCI76RG3K5V1lZFzRC8=
-X-Received: by 2002:a50:ff01:: with SMTP id a1mr36653348edu.253.1624935602535;
- Mon, 28 Jun 2021 20:00:02 -0700 (PDT)
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=CrRfjlffFTsErYpyxRU8qsAnfz33rhUg5wGpylT7ibU=;
+        b=XiMAuRZ4usRu3B45d+OdG2tFjjfw40OD35lhSUn8Q8as0GYgPWgMk3ln6tgtL20P1g
+         66+/0l4FRnlXNLP0bKlBpJqY3OAHw9CdCj2oaY7gBguNxrzyNlD7h+6oHENzMo5Umbrv
+         zpIhWy2Z2z9U7jkiIin1QK7myPMEXynwsGf9+vNSg3Y5BGxBM4jTlmOKIqiqXmPgeV7U
+         UOpVmPeoam+K8lwQpyxAUelUUfpDUNC/vaPHPp9EV3QB4GeC0L/oK2EQSZUbmI9P45Xt
+         XGiwHKVbA8bbPnxEhTjsnEsiBbEPhd6UmbHqvb8ImJ7ooGUaBzQfBBr7TlnnIs87UyuV
+         NhoA==
+X-Gm-Message-State: AOAM530Spdh6xP3/YRdDW/1LSj/7STbtlkeK9HeBqwGDX8khrv7CETTy
+        77ksiKcddhlgVwetofpY7JahYOxgVyc=
+X-Google-Smtp-Source: ABdhPJyMfjaNe7KKQQx2C/XWHqq8R9M5Cx3D2fMYaRDOJSzPCH4mP40rEGAgYsIMlugTXaCldZTN0g==
+X-Received: by 2002:a17:90a:10c8:: with SMTP id b8mr40953510pje.147.1624936282502;
+        Mon, 28 Jun 2021 20:11:22 -0700 (PDT)
+Received: from localhost ([47.251.4.198])
+        by smtp.gmail.com with ESMTPSA id pj4sm964048pjb.18.2021.06.28.20.11.21
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Mon, 28 Jun 2021 20:11:22 -0700 (PDT)
+From:   Lai Jiangshan <jiangshanlai@gmail.com>
+To:     linux-kernel@vger.kernel.org
+Cc:     Lai Jiangshan <laijs@linux.alibaba.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
+        kvm@vger.kernel.org
+Subject: [PATCH] KVM: X86: Also reload the debug registers before kvm_x86->run() when the host is using them
+Date:   Tue, 29 Jun 2021 01:26:32 +0800
+Message-Id: <20210628172632.81029-1-jiangshanlai@gmail.com>
+X-Mailer: git-send-email 2.19.1.6.gb485710b
 MIME-Version: 1.0
-References: <20210615141331.407-1-xieyongji@bytedance.com> <20210615141331.407-10-xieyongji@bytedance.com>
- <YNSatrDFsg+4VvH4@stefanha-x1.localdomain>
-In-Reply-To: <YNSatrDFsg+4VvH4@stefanha-x1.localdomain>
-From:   Yongji Xie <xieyongji@bytedance.com>
-Date:   Tue, 29 Jun 2021 10:59:51 +0800
-Message-ID: <CACycT3vaXQ4dxC9QUzXXJs7og6TVqqVGa8uHZnTStacsYAiFwQ@mail.gmail.com>
-Subject: Re: Re: [PATCH v8 09/10] vduse: Introduce VDUSE - vDPA Device in Userspace
-To:     Stefan Hajnoczi <stefanha@redhat.com>
-Cc:     "Michael S. Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Stefano Garzarella <sgarzare@redhat.com>,
-        Parav Pandit <parav@nvidia.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Christian Brauner <christian.brauner@canonical.com>,
-        Randy Dunlap <rdunlap@infradead.org>,
-        Matthew Wilcox <willy@infradead.org>,
-        Al Viro <viro@zeniv.linux.org.uk>,
-        Jens Axboe <axboe@kernel.dk>, bcrl@kvack.org,
-        Jonathan Corbet <corbet@lwn.net>,
-        =?UTF-8?Q?Mika_Penttil=C3=A4?= <mika.penttila@nextfour.com>,
-        Dan Carpenter <dan.carpenter@oracle.com>, joro@8bytes.org,
-        Greg KH <gregkh@linuxfoundation.org>, songmuchun@bytedance.com,
-        virtualization <virtualization@lists.linux-foundation.org>,
-        netdev@vger.kernel.org, kvm <kvm@vger.kernel.org>,
-        linux-fsdevel@vger.kernel.org, iommu@lists.linux-foundation.org,
-        linux-kernel <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Jun 28, 2021 at 9:02 PM Stefan Hajnoczi <stefanha@redhat.com> wrote:
->
-> On Tue, Jun 15, 2021 at 10:13:30PM +0800, Xie Yongji wrote:
-> > diff --git a/include/uapi/linux/vduse.h b/include/uapi/linux/vduse.h
-> > new file mode 100644
-> > index 000000000000..f21b2e51b5c8
-> > --- /dev/null
-> > +++ b/include/uapi/linux/vduse.h
-> > @@ -0,0 +1,143 @@
-> > +/* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
-> > +#ifndef _UAPI_VDUSE_H_
-> > +#define _UAPI_VDUSE_H_
-> > +
-> > +#include <linux/types.h>
-> > +
-> > +#define VDUSE_API_VERSION    0
-> > +
-> > +#define VDUSE_NAME_MAX       256
-> > +
-> > +/* the control messages definition for read/write */
-> > +
-> > +enum vduse_req_type {
-> > +     /* Get the state for virtqueue from userspace */
-> > +     VDUSE_GET_VQ_STATE,
-> > +     /* Notify userspace to start the dataplane, no reply */
-> > +     VDUSE_START_DATAPLANE,
-> > +     /* Notify userspace to stop the dataplane, no reply */
-> > +     VDUSE_STOP_DATAPLANE,
-> > +     /* Notify userspace to update the memory mapping in device IOTLB */
-> > +     VDUSE_UPDATE_IOTLB,
-> > +};
-> > +
-> > +struct vduse_vq_state {
-> > +     __u32 index; /* virtqueue index */
-> > +     __u32 avail_idx; /* virtqueue state (last_avail_idx) */
-> > +};
-> > +
-> > +struct vduse_iova_range {
-> > +     __u64 start; /* start of the IOVA range */
-> > +     __u64 last; /* end of the IOVA range */
->
-> Please clarify whether this describes a closed range [start, last] or an
-> open range [start, last).
->
+From: Lai Jiangshan <laijs@linux.alibaba.com>
 
-OK.
+When the host is using debug registers but the guest is not using them
+nor is the guest in guest-debug state, the kvm code does not reset
+the host debug registers before kvm_x86->run().  Rather, it relies on
+the hardware vmentry instruction to automatically reset the dr7 registers
+which ensures that the host breakpoints do not affect the guest.
 
-> > +};
-> > +
-> > +struct vduse_dev_request {
-> > +     __u32 type; /* request type */
-> > +     __u32 request_id; /* request id */
-> > +#define VDUSE_REQ_FLAGS_NO_REPLY     (1 << 0) /* No need to reply */
-> > +     __u32 flags; /* request flags */
-> > +     __u32 reserved; /* for future use */
-> > +     union {
-> > +             struct vduse_vq_state vq_state; /* virtqueue state */
-> > +             struct vduse_iova_range iova; /* iova range for updating */
-> > +             __u32 padding[16]; /* padding */
-> > +     };
-> > +};
-> > +
-> > +struct vduse_dev_response {
-> > +     __u32 request_id; /* corresponding request id */
-> > +#define VDUSE_REQ_RESULT_OK  0x00
-> > +#define VDUSE_REQ_RESULT_FAILED      0x01
-> > +     __u32 result; /* the result of request */
-> > +     __u32 reserved[2]; /* for future use */
-> > +     union {
-> > +             struct vduse_vq_state vq_state; /* virtqueue state */
-> > +             __u32 padding[16]; /* padding */
-> > +     };
-> > +};
-> > +
-> > +/* ioctls */
-> > +
-> > +struct vduse_dev_config {
-> > +     char name[VDUSE_NAME_MAX]; /* vduse device name */
-> > +     __u32 vendor_id; /* virtio vendor id */
-> > +     __u32 device_id; /* virtio device id */
-> > +     __u64 features; /* device features */
-> > +     __u64 bounce_size; /* bounce buffer size for iommu */
-> > +     __u16 vq_size_max; /* the max size of virtqueue */
->
-> The VIRTIO specification allows per-virtqueue sizes. A device can have
-> two virtqueues, where the first one allows up to 1024 descriptors and
-> the second one allows only 128 descriptors, for example.
->
+But there are still problems:
+	o The addresses of the host breakpoints can leak into the guest
+	  and the guest may use these information to attack the host.
 
-Good point! But it looks like virtio-vdpa/virtio-pci doesn't support
-that now. All virtqueues have the same maximum size.
+	o It violates the non-instrumentable nature around VM entry and
+	  exit.  For example, when a host breakpoint is set on
+	  vcpu->arch.cr2, #DB will hit aftr kvm_guest_enter_irqoff().
 
-> This constant seems to impose the constraint that all virtqueues have
-> the same maximum size. Is this really necessary?
->
+Beside the problems, the logic is not consistent either. When the guest
+debug registers are active, the host breakpoints are reset before
+kvm_x86->run(). But when the guest debug registers are inactive, the
+host breakpoints are delayed to be disabled.  The host tracing tools may
+see different results depending on there is any guest running or not.
 
-This will be used by vring_create_virtqueue(). We need to specify the
-maximum queue size supported by the device.
+To fix the problems, we also reload the debug registers before
+kvm_x86->run() when the host is using them whenever the guest is using
+them or not.
 
-> > +     __u16 padding; /* padding */
-> > +     __u32 vq_num; /* the number of virtqueues */
-> > +     __u32 vq_align; /* the allocation alignment of virtqueue's metadata */
->
-> I'm not sure what this is?
->
+Signed-off-by: Lai Jiangshan <laijs@linux.alibaba.com>
+---
+ arch/x86/kvm/x86.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
- This will be used by vring_create_virtqueue() too.
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index b594275d49b5..cce316655d3c 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -9320,7 +9320,7 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
+ 	if (test_thread_flag(TIF_NEED_FPU_LOAD))
+ 		switch_fpu_return();
+ 
+-	if (unlikely(vcpu->arch.switch_db_regs)) {
++	if (unlikely(vcpu->arch.switch_db_regs || hw_breakpoint_active())) {
+ 		set_debugreg(0, 7);
+ 		set_debugreg(vcpu->arch.eff_db[0], 0);
+ 		set_debugreg(vcpu->arch.eff_db[1], 1);
+-- 
+2.19.1.6.gb485710b
 
-> > +     __u32 config_size; /* the size of the configuration space */
-> > +     __u32 reserved[15]; /* for future use */
-> > +     __u8 config[0]; /* the buffer of the configuration space */
-> > +};
-> > +
-> > +struct vduse_iotlb_entry {
-> > +     __u64 offset; /* the mmap offset on fd */
-> > +     __u64 start; /* start of the IOVA range */
-> > +     __u64 last; /* last of the IOVA range */
->
-> Same here, please specify whether this is an open range or a closed
-> range.
->
-
-Sure.
-
-> > +#define VDUSE_ACCESS_RO 0x1
-> > +#define VDUSE_ACCESS_WO 0x2
-> > +#define VDUSE_ACCESS_RW 0x3
-> > +     __u8 perm; /* access permission of this range */
-> > +};
-> > +
-> > +struct vduse_config_update {
-> > +     __u32 offset; /* offset from the beginning of configuration space */
-> > +     __u32 length; /* the length to write to configuration space */
-> > +     __u8 buffer[0]; /* buffer used to write from */
-> > +};
-> > +
-> > +struct vduse_vq_info {
-> > +     __u32 index; /* virtqueue index */
-> > +     __u32 avail_idx; /* virtqueue state (last_avail_idx) */
-> > +     __u64 desc_addr; /* address of desc area */
-> > +     __u64 driver_addr; /* address of driver area */
-> > +     __u64 device_addr; /* address of device area */
-> > +     __u32 num; /* the size of virtqueue */
-> > +     __u8 ready; /* ready status of virtqueue */
-> > +};
-> > +
-> > +struct vduse_vq_eventfd {
-> > +     __u32 index; /* virtqueue index */
-> > +#define VDUSE_EVENTFD_DEASSIGN -1
-> > +     int fd; /* eventfd, -1 means de-assigning the eventfd */
-> > +};
-> > +
-> > +#define VDUSE_BASE   0x81
-> > +
-> > +/* Get the version of VDUSE API. This is used for future extension */
-> > +#define VDUSE_GET_API_VERSION        _IOR(VDUSE_BASE, 0x00, __u64)
-> > +
-> > +/* Set the version of VDUSE API. */
-> > +#define VDUSE_SET_API_VERSION        _IOW(VDUSE_BASE, 0x01, __u64)
-> > +
-> > +/* Create a vduse device which is represented by a char device (/dev/vduse/<name>) */
-> > +#define VDUSE_CREATE_DEV     _IOW(VDUSE_BASE, 0x02, struct vduse_dev_config)
-> > +
-> > +/* Destroy a vduse device. Make sure there are no references to the char device */
-> > +#define VDUSE_DESTROY_DEV    _IOW(VDUSE_BASE, 0x03, char[VDUSE_NAME_MAX])
-> > +
-> > +/*
-> > + * Get a file descriptor for the first overlapped iova region,
-> > + * -EINVAL means the iova region doesn't exist.
-> > + */
-> > +#define VDUSE_IOTLB_GET_FD   _IOWR(VDUSE_BASE, 0x04, struct vduse_iotlb_entry)
-> > +
-> > +/* Get the negotiated features */
-> > +#define VDUSE_DEV_GET_FEATURES       _IOR(VDUSE_BASE, 0x05, __u64)
-> > +
-> > +/* Update the configuration space */
-> > +#define VDUSE_DEV_UPDATE_CONFIG      _IOW(VDUSE_BASE, 0x06, struct vduse_config_update)
-> > +
-> > +/* Get the specified virtqueue's information */
-> > +#define VDUSE_VQ_GET_INFO    _IOWR(VDUSE_BASE, 0x07, struct vduse_vq_info)
-> > +
-> > +/* Setup an eventfd to receive kick for virtqueue */
-> > +#define VDUSE_VQ_SETUP_KICKFD        _IOW(VDUSE_BASE, 0x08, struct vduse_vq_eventfd)
-> > +
-> > +/* Inject an interrupt for specific virtqueue */
-> > +#define VDUSE_VQ_INJECT_IRQ  _IOW(VDUSE_BASE, 0x09, __u32)
->
-> There is not enough documentation to use this header file. For example,
-> which ioctls are used with /dev/vduse and which are used with
-> /dev/vduse/<name>?
->
-> Please document that ioctl API fully. It will not only help userspace
-> developers but also define what is part of the interface and what is an
-> implementation detail that can change in the future.
-
-OK, I will try to add more details.
-
-Thanks,
-Yongji
