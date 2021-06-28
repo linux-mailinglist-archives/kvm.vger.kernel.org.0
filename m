@@ -2,153 +2,192 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6070F3B68B6
-	for <lists+kvm@lfdr.de>; Mon, 28 Jun 2021 20:53:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3ED803B68C0
+	for <lists+kvm@lfdr.de>; Mon, 28 Jun 2021 20:56:11 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234182AbhF1SzL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 28 Jun 2021 14:55:11 -0400
-Received: from mail-co1nam11on2042.outbound.protection.outlook.com ([40.107.220.42]:36896
-        "EHLO NAM11-CO1-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S233768AbhF1SzK (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 28 Jun 2021 14:55:10 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Xat6Sm7Nry/wVsas+eZoUUTJZRdWEz5OOyfIePuq/Ky0ISjL6LFDQB2wyA9+A+QkJ361NcOChPd6cp17dseCCrP4WQ2HMGRLdZmsKEey/vMbKgGdBsaNx4vsL/9W0YX9uwTiyQhjiUz4HIExr8gGuDSKeN3ARKy52ScB2DajBlqfR119uGme4pffCzSxdMnfJkjQ63eQb189QFpTJch4SNu4NmX08JJXFMsKRgGtWbkXIV2E3AEWp2NjcReBcAJZQsBMWjixlum4UFyjH3XVobYklmht947gJy3ydErtw4sTm10H0bxlwiIwRJrP3V2VzFyoIpXm1ks4tXAa/nrfyQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=YCW+SWkA0FFfLpVpAaPNaBue7rnLOQmKcUqHSoQGt6c=;
- b=DwOq7xb+WpwD6Wwx5pqgPA/04eVotIljOrz47b+onj3+8EiSBWAv1FfYv9xo/4TjHvTn1Op0pohwTK/aq+q3LN6mM/K4Y5EsehNVmZsjouuWg/uWYmIramUJ80h5/a0/PlfKkYcBzz71dL51RPMKeUJhnRmhFVjnc+Ad855phMCZMfBML3FQOLzbHj+ITMkn/CZEBwe7zogI+ODGeDsb6q2qu3Fp7xkMn8GGoi1mFJ7P5+B6nstAAR8Gf83dHql3wDrs5w0WZzl8uuOK59LR3gskEd7H73v6DpsZkYyDJj1HMHbsVqv7EfV4WDVjpDMqFaAg//uo01gaZ7TAt45YMQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=YCW+SWkA0FFfLpVpAaPNaBue7rnLOQmKcUqHSoQGt6c=;
- b=YuWYallSXAE8xcGChvypy/B3VhRrQg/E+6G45fE/6NlCSs1sMsAPWIyB+65mjBLSDo7vmfd7YwOhf2MN1iT+oQZ06MkrBj128HgqMW1aiyKdx7oCSEX7DmNQzkYWclwjaFqy0D1e+gUcvLt6iu191WYK9iCUj057bkq93qbEC+DmcRCLmfKoQ9phIlaL0T73JF37rLdQV1VkbzCSZ2IwQ6GyYcZB8T8RVZ2QhjfNoNuHCYLKKhvaFSUcuAd4ZuHSCvunAvIgtUzre/8RX4fPwcHf41TGN4N7R8x1Jfm+5ZMfIPVBg7bPe9qgQXHVJZGqMVS4klMG5zJCtbhYzN6Rsw==
-Authentication-Results: redhat.com; dkim=none (message not signed)
- header.d=none;redhat.com; dmarc=none action=none header.from=nvidia.com;
-Received: from BL0PR12MB5506.namprd12.prod.outlook.com (2603:10b6:208:1cb::22)
- by BL1PR12MB5379.namprd12.prod.outlook.com (2603:10b6:208:317::15) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4264.20; Mon, 28 Jun
- 2021 18:52:43 +0000
-Received: from BL0PR12MB5506.namprd12.prod.outlook.com
- ([fe80::3d51:a3b9:8611:684e]) by BL0PR12MB5506.namprd12.prod.outlook.com
- ([fe80::3d51:a3b9:8611:684e%8]) with mapi id 15.20.4264.026; Mon, 28 Jun 2021
- 18:52:43 +0000
-Date:   Mon, 28 Jun 2021 15:52:42 -0300
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     Alex Williamson <alex.williamson@redhat.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        peterx@redhat.com, prime.zeng@hisilicon.com, cohuck@redhat.com
-Subject: Re: [PATCH v2] vfio/pci: Handle concurrent vma faults
-Message-ID: <20210628185242.GI4459@nvidia.com>
-References: <161540257788.10151.6284852774772157400.stgit@gimli.home>
- <20210628104653.4ca65921.alex.williamson@redhat.com>
- <20210628173028.GF4459@nvidia.com>
- <20210628123621.7fd36a1b.alex.williamson@redhat.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210628123621.7fd36a1b.alex.williamson@redhat.com>
-X-Originating-IP: [47.55.113.94]
-X-ClientProxiedBy: BL1PR13CA0009.namprd13.prod.outlook.com
- (2603:10b6:208:256::14) To BL0PR12MB5506.namprd12.prod.outlook.com
- (2603:10b6:208:1cb::22)
+        id S235621AbhF1S6e (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 28 Jun 2021 14:58:34 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:44177 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S233789AbhF1S6d (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 28 Jun 2021 14:58:33 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1624906567;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=ECyZepa63nlv7FQfDjXLVtw4C+haeQFo0Jc6XzQeZsE=;
+        b=dXUulOkOm/OOlyPp3gCcoPMPFSEWiP3s/jqIvQFNbAJ0PYQDpNe0pn/FlikZ3raF7WG+3e
+        gCdBAQtP/LdxaNRzlNiexbMG6PV+L/jywtCMiTXlBaH2+8xPxGK7xkrO+MvhjZaowKrfNJ
+        JhjewBVVyDYA1uP3ROUUqxWftdWMeQk=
+Received: from mail-oi1-f197.google.com (mail-oi1-f197.google.com
+ [209.85.167.197]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-222-xU4g7A82Np2K7TsjBOmg1w-1; Mon, 28 Jun 2021 14:56:05 -0400
+X-MC-Unique: xU4g7A82Np2K7TsjBOmg1w-1
+Received: by mail-oi1-f197.google.com with SMTP id b18-20020acafd120000b029023d714b710fso6009154oii.4
+        for <kvm@vger.kernel.org>; Mon, 28 Jun 2021 11:56:05 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=ECyZepa63nlv7FQfDjXLVtw4C+haeQFo0Jc6XzQeZsE=;
+        b=gcLuDV+lyTLDEcpivw2iZx9e6ZvBnVEFRaXWRNI+6S0JctatNdB9mqDhbheT6RP/ti
+         dF8lHJlvBaJ3AZ6Lh7a2OJ0j2Rrgy1EIyOOThBv8Mc0fJCylDk/rGS264AZJGZQdX4Lx
+         XKOftiTLxUM6x8o7usOj3O/n/zHEkDeekg2/XWNQqwsvrttwh2wKRfiwXdMS1vYaeL/F
+         BbFgpNdt5g1/nRCaM6qaTNyQevQtMh4qqcytcq+ZpHibbsJSDD834GU2+dR31E9pC5ul
+         Ng6NA6VbioneK2e1JSI1/y/eCVhx/XFGOvk1EaYWtH0w+hW415SM2XNdsTYajR+Sy/Kq
+         3+ng==
+X-Gm-Message-State: AOAM532aJ6eZ616eG9WgsuTgGmJ9c9hheHjJdsibM28oHElZySfP2/Lv
+        0T8Z+BfaY1Edw5E9kgeHdEOp3llr/Hfv6iXl5gWdBTBlO8erRlrWYBsz7TeED84tE4alowrH0Ka
+        0BPUy63S+Z7MB
+X-Received: by 2002:a4a:9644:: with SMTP id r4mr745809ooi.52.1624906564641;
+        Mon, 28 Jun 2021 11:56:04 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJz+tWMyISY1yeEpZ9LNbIsGyIkCItlWIyGFb4Yoh05L8iUj6egVfko/ubXmKIYKG3lf81/DXQ==
+X-Received: by 2002:a4a:9644:: with SMTP id r4mr745775ooi.52.1624906564120;
+        Mon, 28 Jun 2021 11:56:04 -0700 (PDT)
+Received: from redhat.com ([198.99.80.109])
+        by smtp.gmail.com with ESMTPSA id u10sm3756394otj.75.2021.06.28.11.56.03
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 28 Jun 2021 11:56:03 -0700 (PDT)
+Date:   Mon, 28 Jun 2021 12:56:02 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Kirti Wankhede <kwankhede@nvidia.com>
+Cc:     <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <cohuck@redhat.com>, <jgg@nvidia.com>
+Subject: Re: [PATCH] vfio/mtty: Enforce available_instances
+Message-ID: <20210628125602.5b07388e.alex.williamson@redhat.com>
+In-Reply-To: <ee949a98-6998-2032-eb17-00ef8b8d911c@nvidia.com>
+References: <162465624894.3338367.12935940647049917981.stgit@omen>
+        <ee949a98-6998-2032-eb17-00ef8b8d911c@nvidia.com>
+X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from mlx.ziepe.ca (47.55.113.94) by BL1PR13CA0009.namprd13.prod.outlook.com (2603:10b6:208:256::14) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4287.15 via Frontend Transport; Mon, 28 Jun 2021 18:52:43 +0000
-Received: from jgg by mlx with local (Exim 4.94)        (envelope-from <jgg@nvidia.com>)        id 1lxwN8-000iVd-D4; Mon, 28 Jun 2021 15:52:42 -0300
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 4e561715-939c-46c7-3e69-08d93a65e967
-X-MS-TrafficTypeDiagnostic: BL1PR12MB5379:
-X-Microsoft-Antispam-PRVS: <BL1PR12MB5379A27A6A23CFD28DACF535C2039@BL1PR12MB5379.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:9508;
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: mbFML/J4f29gs8fVmycNxU6mBpKX5grseR2DrtHKz0mgE9mMLehJHMuqoxmGIqvXSwzvkQtozbSGScjmJagSCMLz5dTinqDc9evE4+dknE04J3yfEqVWov6g2y5UNDonPEkf6Cwyn+Z6kZwmFyI2vvoYMGMtAq/YmXoNkiNIJbDh53YiDS1a9m5ZXseHZmwhHkA6KHRZDteATQO7kIrfhEHH9ueG2gQyis6aoMe6qiXPWZHSO8DELhTbHNpDfQ0WKUjmSOf3+GkGJjqyYJyZ/SLIK0TFrozI3Xen0qX6PsyfKTl2d05obU+2ayqn8TLszEYq9KCUpNqxW/tCv3YiymnZ3hGrSlsS0YFdsNNQp1WHYMFksU+ac2bJyzscJWjJ1jtvknEAAYAaPJX4e1CF/fqglBtkacVuHizq7dUgwMjvIXRkeAF7ANWH9cddxcCIfcJfSWQfYhBpXqoSQRYDtZvouTyKYY981bgXNJu91+DzftQ0oKMp77ihH3yD2zGUkHQjnofHQTBI8vkwtvJTk8bY2ycpSui3QK5KozrphnVo6nBlPLKR2Kp0GtzFEF5sdXVlNskZFjfd2PyxTkDtFLAuyZkjU06nZmIDzstEcsxPR76QewjG4M4+Tog+f9nqjy/VaqiCG7nA0/5/iu4cfg==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL0PR12MB5506.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(136003)(346002)(376002)(39860400002)(396003)(478600001)(66946007)(9786002)(9746002)(316002)(38100700002)(2906002)(4326008)(8936002)(2616005)(36756003)(1076003)(6916009)(66476007)(8676002)(83380400001)(186003)(5660300002)(86362001)(66556008)(26005)(426003)(33656002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?2BJnBDdGvEwlfbXJiWNfc09c1KILxScYA4xYgz8Obb7l2aTsAf83skMvpl6c?=
- =?us-ascii?Q?no1UD+6Nr3AtW3VOUW2Ne3ylGCg6xnc69Fno7wmaHNapu+vayDYND3TK+if0?=
- =?us-ascii?Q?xF+teBvR4emlFATbLTuPgSnSvuQ9/GUBZ2q318Ge6F+zw3VFifXTrF9SOGJR?=
- =?us-ascii?Q?6K9m2S8UdRvKfx0QJ5rpqJQf7K5kYh9ZTzdVdYT1xSY2fktg6PenkgRA7Ex8?=
- =?us-ascii?Q?FeF5w0cuzaiAFTF/pReVDOrwX8NMJHabO/aEStD7yV5Fulco/X2SmqVTDrWp?=
- =?us-ascii?Q?aqQ47ckXPtxTCB9rJ+F+f4MxviRi5isM5++Jk8Y0mrzOJ+5+uT7d0ASGhbY8?=
- =?us-ascii?Q?Qok5j0XysfvABvUIZ/E0xB007iXuc6bMn5NurpYg4BWnxqfJpMves+Z+ti2C?=
- =?us-ascii?Q?IOCbxsYkkxTpRgoYg8fVPi+qYui0UQpREZ+Ko0/ijGSS1kLsMByw8Jig7QUB?=
- =?us-ascii?Q?1MFcs0k+aWtyjtTm0zsWE7ElUOdhY4z6JbqRBJAvYXKNSrgs27Yfaa4mF8Id?=
- =?us-ascii?Q?IFWa415qVQxa8dxdqDH0WMoyeupfzgZB/rNs/8gCbEDlPgASXcjIgzr1FhBL?=
- =?us-ascii?Q?mjIh8eCSkDeHvHaAapVtzW8amcksIs73TEQWYUVwxtVpQBnnHfO+LYHzr4Xq?=
- =?us-ascii?Q?/vP+ux5dyW7OX6sUoVuJhBJQ/SHzUw3GlZ9yq2+V1+Q0GTLP0lING8TBedOy?=
- =?us-ascii?Q?bD3l/n9NpciK8gwTNx7gfa0xRTmPsaPbSPAgfSsjo9+xv9NVWI0kqXTU+Nmv?=
- =?us-ascii?Q?iIzP2p9AkhIUnCZ6D5FuTi1CIt4GW6D3jmuJyuDCtOfVw/PSQGKeGSykQFRx?=
- =?us-ascii?Q?COeQ7dI/g0fzBbzNtPnErQ6vBgPH/oxYz/VO2/O2DY9zhJ2Bv7F6QIKKTlXq?=
- =?us-ascii?Q?HwKqS1PGSGF74uXJEpuZBX4Jz7z28UJlaw150jxWz6KxssNb9bkhpyQOaH1P?=
- =?us-ascii?Q?eP3s1u762n97eV6i1tp7nARWTh2zqKlqRxRXFDP7hemRUlVwAv+C/mu/TkDp?=
- =?us-ascii?Q?UQtP8lmluzgcWiwtpjG3rJIAeZrDIVgm8yz2EUl4oIspm9ncGWwvgZ7C2g4l?=
- =?us-ascii?Q?N9CN4q9+sP3v3+TB+cYy0S4PQSk5/Y99t9AFupa3VgxRBKQELC5uZ7S8HL31?=
- =?us-ascii?Q?MYq/tBbnYAHqaomrb6hcXmuOGJCMHR947adSUztnYMkeCwOeV1X2lq10lkUb?=
- =?us-ascii?Q?E0FS73RaqfvGJZwSWXKAbT/eEbBUasiKkWU3gQpKZSOEIHNNd//1JuOLvVuv?=
- =?us-ascii?Q?WYyiZJCUNOfd4O5jCoIi2f1APQbDBfi7cnoqSjAZG3fcE8+KEErH0zr47z0j?=
- =?us-ascii?Q?DE80QRmhN6qGYnqkbf94gWmw?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 4e561715-939c-46c7-3e69-08d93a65e967
-X-MS-Exchange-CrossTenant-AuthSource: BL0PR12MB5506.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 Jun 2021 18:52:43.4379
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: xsR4lS/RNg2UE01NI5V9RigBYaMgsmWQTc1FV/vMmb1EBB47I9YQTn9pOYOTaclQ
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL1PR12MB5379
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Jun 28, 2021 at 12:36:21PM -0600, Alex Williamson wrote:
-> On Mon, 28 Jun 2021 14:30:28 -0300
-> Jason Gunthorpe <jgg@nvidia.com> wrote:
-> 
-> > On Mon, Jun 28, 2021 at 10:46:53AM -0600, Alex Williamson wrote:
-> > > On Wed, 10 Mar 2021 11:58:07 -0700
-> > > Alex Williamson <alex.williamson@redhat.com> wrote:
-> > >   
-> > > > vfio_pci_mmap_fault() incorrectly makes use of io_remap_pfn_range()
-> > > > from within a vm_ops fault handler.  This function will trigger a
-> > > > BUG_ON if it encounters a populated pte within the remapped range,
-> > > > where any fault is meant to populate the entire vma.  Concurrent
-> > > > inflight faults to the same vma will therefore hit this issue,
-> > > > triggering traces such as:  
+On Mon, 28 Jun 2021 23:19:54 +0530
+Kirti Wankhede <kwankhede@nvidia.com> wrote:
+
+> On 6/26/2021 2:56 AM, Alex Williamson wrote:
+> > The sample mtty mdev driver doesn't actually enforce the number of
+> > device instances it claims are available.  Implement this properly.
 > > 
-> > If it is just about concurrancy can the vma_lock enclose
-> > io_remap_pfn_range() ?
+> > Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
+> > ---
+> > 
+> > Applies to vfio next branch + Jason's atomic conversion
+> >   
 > 
-> We could extend vma_lock around io_remap_pfn_range(), but that alone
-> would just block the concurrent faults to the same vma and once we
-> released them they'd still hit the BUG_ON in io_remap_pfn_range()
-> because the page is no longer pte_none().  We'd need to combine that
-> with something like __vfio_pci_add_vma() returning -EEXIST to skip the
-> io_remap_pfn_range(), but I've been advised that we shouldn't be
-> calling io_remap_pfn_range() from within the fault handler anyway, we
-> should be using something like vmf_insert_pfn() instead, which I
-> understand can be called safely in the same situation.  That's rather
-> the testing I was hoping someone who reproduced the issue previously
-> could validate.
-
-Yes, using the vmf_ stuff is 'righter' for sure, but there isn't
-really a vmf for IO mappings..
-
-> > I assume there is a reason why vm_lock can't be used here, so I
-> > wouldn't object, though I don't especially like the loss of tracking
-> > either.
 > 
-> There's no loss of tracking here, we were only expecting a single fault
-> per vma to add the vma to our list.  This just skips adding duplicates
-> in these cases where we can have multiple faults in-flight.  Thanks,
+> Does this need to be on top of Jason's patch?
 
-I mean the arch tracking of IO maps that is hidden inside ioremap_pfn
+Yes, see immediately above.
 
-Jason
+> Patch to use mdev_used_ports is reverted here, can it be changed from 
+> mdev_devices_list to mdev_avail_ports atomic variable?
+
+It doesn't revert Jason's change, it builds on it.  The patches could
+we squashed, but there's no bug in Jason's patch that we're trying to
+avoid exposing, so I don't see why we'd do that.
+
+> Change here to use atomic variable looks good to me.
+> 
+> Reviewed by: Kirti Wankhede <kwankhede@nvidia.com>
+
+Thanks!  It was Jason's patch[1] that converted to use an atomic
+though, so I'm slightly confused if this R-b is for the patch below,
+Jason's patch, or both.  Thanks,
+
+Alex
+
+[1]https://lore.kernel.org/kvm/0-v1-0bc56b362ca7+62-mtty_used_ports_jgg@nvidia.com/
+
+> >   samples/vfio-mdev/mtty.c |   22 ++++++++++++++++------
+> >   1 file changed, 16 insertions(+), 6 deletions(-)
+> > 
+> > diff --git a/samples/vfio-mdev/mtty.c b/samples/vfio-mdev/mtty.c
+> > index ffbaf07a17ea..8b26fecc4afe 100644
+> > --- a/samples/vfio-mdev/mtty.c
+> > +++ b/samples/vfio-mdev/mtty.c
+> > @@ -144,7 +144,7 @@ struct mdev_state {
+> >   	int nr_ports;
+> >   };
+> >   
+> > -static atomic_t mdev_used_ports;
+> > +static atomic_t mdev_avail_ports = ATOMIC_INIT(MAX_MTTYS);
+> >   
+> >   static const struct file_operations vd_fops = {
+> >   	.owner          = THIS_MODULE,
+> > @@ -707,11 +707,20 @@ static int mtty_probe(struct mdev_device *mdev)
+> >   {
+> >   	struct mdev_state *mdev_state;
+> >   	int nr_ports = mdev_get_type_group_id(mdev) + 1;
+> > +	int avail_ports = atomic_read(&mdev_avail_ports);
+> >   	int ret;
+> >   
+> > +	do {
+> > +		if (avail_ports < nr_ports)
+> > +			return -ENOSPC;
+> > +	} while (!atomic_try_cmpxchg(&mdev_avail_ports,
+> > +				     &avail_ports, avail_ports - nr_ports));
+> > +
+> >   	mdev_state = kzalloc(sizeof(struct mdev_state), GFP_KERNEL);
+> > -	if (mdev_state == NULL)
+> > +	if (mdev_state == NULL) {
+> > +		atomic_add(nr_ports, &mdev_avail_ports);
+> >   		return -ENOMEM;
+> > +	}
+> >   
+> >   	vfio_init_group_dev(&mdev_state->vdev, &mdev->dev, &mtty_dev_ops);
+> >   
+> > @@ -724,6 +733,7 @@ static int mtty_probe(struct mdev_device *mdev)
+> >   
+> >   	if (mdev_state->vconfig == NULL) {
+> >   		kfree(mdev_state);
+> > +		atomic_add(nr_ports, &mdev_avail_ports);
+> >   		return -ENOMEM;
+> >   	}
+> >   
+> > @@ -735,9 +745,9 @@ static int mtty_probe(struct mdev_device *mdev)
+> >   	ret = vfio_register_group_dev(&mdev_state->vdev);
+> >   	if (ret) {
+> >   		kfree(mdev_state);
+> > +		atomic_add(nr_ports, &mdev_avail_ports);
+> >   		return ret;
+> >   	}
+> > -	atomic_add(mdev_state->nr_ports, &mdev_used_ports);
+> >   
+> >   	dev_set_drvdata(&mdev->dev, mdev_state);
+> >   	return 0;
+> > @@ -746,12 +756,13 @@ static int mtty_probe(struct mdev_device *mdev)
+> >   static void mtty_remove(struct mdev_device *mdev)
+> >   {
+> >   	struct mdev_state *mdev_state = dev_get_drvdata(&mdev->dev);
+> > +	int nr_ports = mdev_state->nr_ports;
+> >   
+> > -	atomic_sub(mdev_state->nr_ports, &mdev_used_ports);
+> >   	vfio_unregister_group_dev(&mdev_state->vdev);
+> >   
+> >   	kfree(mdev_state->vconfig);
+> >   	kfree(mdev_state);
+> > +	atomic_add(nr_ports, &mdev_avail_ports);
+> >   }
+> >   
+> >   static int mtty_reset(struct mdev_state *mdev_state)
+> > @@ -1271,8 +1282,7 @@ static ssize_t available_instances_show(struct mdev_type *mtype,
+> >   {
+> >   	unsigned int ports = mtype_get_type_group_id(mtype) + 1;
+> >   
+> > -	return sprintf(buf, "%d\n",
+> > -		       (MAX_MTTYS - atomic_read(&mdev_used_ports)) / ports);
+> > +	return sprintf(buf, "%d\n", atomic_read(&mdev_avail_ports) / ports);
+> >   }
+> >   
+> >   static MDEV_TYPE_ATTR_RO(available_instances);
+> > 
+> >   
+> 
+
