@@ -2,116 +2,82 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E675F3B697B
-	for <lists+kvm@lfdr.de>; Mon, 28 Jun 2021 22:10:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1E65C3B69C3
+	for <lists+kvm@lfdr.de>; Mon, 28 Jun 2021 22:38:26 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236913AbhF1UM0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 28 Jun 2021 16:12:26 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:20437 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S233112AbhF1UMZ (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 28 Jun 2021 16:12:25 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1624910998;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=GcUi3W4j9bCnAK214Ds5fcL7OghjM76ZAY3mDl17NWE=;
-        b=KNogKfXcS/gVYIHoV9f9x2WpdTqBSDbbQbebDN0ECvlQSwWbnqLvnizQBTHIHQEMQAZoga
-        2yzxlCWSmqVoOZRTsUC3z0aVv3wvHborXt/F8L7ywyGMX3LM+dS+qz4TstwQOSh58lW6bC
-        thJyTG3ldzRnadQnV3ARj8504/STjFc=
-Received: from mail-oi1-f199.google.com (mail-oi1-f199.google.com
- [209.85.167.199]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-603-FQVhjGFnNAawEpHy67q0yQ-1; Mon, 28 Jun 2021 16:09:57 -0400
-X-MC-Unique: FQVhjGFnNAawEpHy67q0yQ-1
-Received: by mail-oi1-f199.google.com with SMTP id q31-20020a056808201fb02902242061b668so9500668oiw.8
-        for <kvm@vger.kernel.org>; Mon, 28 Jun 2021 13:09:57 -0700 (PDT)
+        id S235042AbhF1Uku (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 28 Jun 2021 16:40:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34416 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S234575AbhF1Ukt (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 28 Jun 2021 16:40:49 -0400
+Received: from mail-io1-xd2f.google.com (mail-io1-xd2f.google.com [IPv6:2607:f8b0:4864:20::d2f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 119F2C061760
+        for <kvm@vger.kernel.org>; Mon, 28 Jun 2021 13:38:23 -0700 (PDT)
+Received: by mail-io1-xd2f.google.com with SMTP id k11so23927941ioa.5
+        for <kvm@vger.kernel.org>; Mon, 28 Jun 2021 13:38:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=S2IN8Z+sIZlGv6g5jbxKMc3TDU/gH2bfUrQ5chPxP8A=;
+        b=Ie/uAPjKe+SAVEb99c07SDXehZOV7xkesFAzpljdesiolQA7N5HAv3IcaRFVrIqKGk
+         MkYTKeZuoz5X6xafhC4e82mT9IzBdZwskrLqKSDTHwRsVnX1KAJgVyea++4VZ3qaXFzD
+         4WvEXmUqC4LVXKm/1zUlS9/6ZgzZw3fzil+Ap7H47nFxhwh5P1W3+yA3wSRDJ6e3IoUu
+         yjWA4OK2QnQrLO9X6l2hNmIYqSHJ7KtzFsk9iAjijOzornnVc/twfE+T1vDmtkAQi89M
+         C676feJP+sSR7/YNZgMtny4d7wkrArgGVWD79Ad5mgtoh+nGY4XeiVx/Qe9aSzHBl/TF
+         JmBg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=GcUi3W4j9bCnAK214Ds5fcL7OghjM76ZAY3mDl17NWE=;
-        b=cKTnynlrLgrYZ+pf6DOiKFv3FiHjWNchCrIQBvfKPU4bZUJs2B9nporDqZhgPUdwOq
-         TFfZ6S6PRwCZGCRjeH1mhDuo8ZuKUU8YBYGPbvs9tEhVhzY0hvrwVPIXp0+N5eZ1vXYV
-         Z+e/76Z4c7rKxpxS/FreenKB8s9rkohdvE3dad8hiSXHtuv417cfsSyIlDBn4av5qccy
-         062bLedQaEqTZL3YNiCmogK63IN+0uuYP6Qouf150IdhIcDX5MIZ1QG2C8q+VXeD0g5G
-         L51qU8FCKO+skXS41gjLIjNofdTrXiSslJz06PXp6LVD+y+t/VopH3V/U3LXhQlOHhM/
-         fo5Q==
-X-Gm-Message-State: AOAM531fB3hsKWiW4dYxtUvEHMVZZZPXN475lE05AhDmMmObgXT51Cpv
-        4cj3u4QF17359wVq97dBUHDvBmeqYo7qov3lis8PqPyCF1VKCIu5yi49g8AZL/s8AnPyySmAX/x
-        wvRmDSchY6HhM
-X-Received: by 2002:a9d:2eb:: with SMTP id 98mr1117112otl.297.1624910996800;
-        Mon, 28 Jun 2021 13:09:56 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwxvgkuJCkP8FaMaWBqXZ3yhxO6gzSOe/UIQ9vZvArYTVkEENW1WrRNMhzfo7YDVfxnVPh6pg==
-X-Received: by 2002:a9d:2eb:: with SMTP id 98mr1117096otl.297.1624910996562;
-        Mon, 28 Jun 2021 13:09:56 -0700 (PDT)
-Received: from redhat.com ([198.99.80.109])
-        by smtp.gmail.com with ESMTPSA id o24sm3636373otp.13.2021.06.28.13.09.55
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 28 Jun 2021 13:09:56 -0700 (PDT)
-Date:   Mon, 28 Jun 2021 14:09:55 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Kirti Wankhede <kwankhede@nvidia.com>
-Cc:     <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <cohuck@redhat.com>, <jgg@nvidia.com>
-Subject: Re: [PATCH] vfio/mtty: Enforce available_instances
-Message-ID: <20210628140955.17e770ec.alex.williamson@redhat.com>
-In-Reply-To: <641a865f-a45b-10ed-8287-3759191a9686@nvidia.com>
-References: <162465624894.3338367.12935940647049917981.stgit@omen>
-        <ee949a98-6998-2032-eb17-00ef8b8d911c@nvidia.com>
-        <20210628125602.5b07388e.alex.williamson@redhat.com>
-        <641a865f-a45b-10ed-8287-3759191a9686@nvidia.com>
-X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=S2IN8Z+sIZlGv6g5jbxKMc3TDU/gH2bfUrQ5chPxP8A=;
+        b=mut1Af90663o/8vYpRv0HufXAZ99EIAIYGGnbb8Io/ijrE5LYh3EhaxF1I5CzEoP05
+         fETKrn82TTzFnhjaItYibohbruvkzpy7iy1c5r7LGKXRuRkeNruuwBT2BH7F94nte3FV
+         PnRyIXqWZas5QqWmSZ739XawZdxffxvFxJ8peOmzY6S08urdij2LjyRGZsipLpqK/ukc
+         Bug2V9cKu7AlMN+A3k8xeSbZuSRnVOrrCBk1ej00IxUQl5wz8oNNssDNDDV3hi/EeuX8
+         aHc/IzEhCSh0zVKEfjkWpnWIvSqztGjXLGIlXNqhv4QixTnCeHSJSIyslMUgTVGUn9/0
+         yrXQ==
+X-Gm-Message-State: AOAM533zKlYZUUl1hE1295PvFTjoY38Bq/79tW3DF4Kg28eRWDvs5L4J
+        M1dL28lzteGXlf9MAeoOt2SIVaBMUSIsqOwELYR4wQ==
+X-Google-Smtp-Source: ABdhPJy4bIpkvfhQXmKg7hXoiT4mdXx5NrgDmTmRoIgofDOHTgMABtx/f8l6gLuZgi/rTHFgJiBsY6n8wqEKbURXFuw=
+X-Received: by 2002:a02:77d1:: with SMTP id g200mr1248012jac.132.1624912702185;
+ Mon, 28 Jun 2021 13:38:22 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+References: <cover.1623421410.git.ashish.kalra@amd.com> <8c581834c77284d5b9465b3388f07fa100f9fc4e.1623421410.git.ashish.kalra@amd.com>
+ <CABayD+ckOsM4+sab00SggrH3_iFaiV-7h9tHHuL1J-o6_YQVKA@mail.gmail.com>
+ <YNZXPEPxv54UmzNj@zn.tnic> <20210628193441.GB23232@ashkalra_ubuntu_server>
+In-Reply-To: <20210628193441.GB23232@ashkalra_ubuntu_server>
+From:   Steve Rutherford <srutherford@google.com>
+Date:   Mon, 28 Jun 2021 13:37:46 -0700
+Message-ID: <CABayD+e2n+7YB5a9he2VKLKSA80kXVteBMFQgtTG2-oNqqPDYA@mail.gmail.com>
+Subject: Re: [PATCH v4 5/5] x86/kvm: Add guest support for detecting and
+ enabling SEV Live Migration feature.
+To:     Ashish Kalra <Ashish.Kalra@amd.com>
+Cc:     Borislav Petkov <bp@alien8.de>, pbonzini@redhat.com,
+        seanjc@google.com, tglx@linutronix.de, mingo@redhat.com,
+        hpa@zytor.com, joro@8bytes.org, thomas.lendacky@amd.com,
+        x86@kernel.org, kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        brijesh.singh@amd.com
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 29 Jun 2021 01:22:00 +0530
-Kirti Wankhede <kwankhede@nvidia.com> wrote:
+On Mon, Jun 28, 2021 at 12:34 PM Ashish Kalra <ashish.kalra@amd.com> wrote:
+>
+> Hello Steve,
+>
+> Do you have any final thoughts on this ?
 
-> On 6/29/2021 12:26 AM, Alex Williamson wrote:
-> > On Mon, 28 Jun 2021 23:19:54 +0530
-> > Kirti Wankhede <kwankhede@nvidia.com> wrote:
-> >   
-> >> On 6/26/2021 2:56 AM, Alex Williamson wrote:  
-> >>> The sample mtty mdev driver doesn't actually enforce the number of
-> >>> device instances it claims are available.  Implement this properly.
-> >>>
-> >>> Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
-> >>> ---
-> >>>
-> >>> Applies to vfio next branch + Jason's atomic conversion
-> >>>      
-> >>
-> >>
-> >> Does this need to be on top of Jason's patch?  
-> > 
-> > Yes, see immediately above.
-> >   
-> >> Patch to use mdev_used_ports is reverted here, can it be changed from
-> >> mdev_devices_list to mdev_avail_ports atomic variable?  
-> > 
-> > It doesn't revert Jason's change, it builds on it.  The patches could
-> > we squashed, but there's no bug in Jason's patch that we're trying to
-> > avoid exposing, so I don't see why we'd do that.
-> >  
-> 
-> 'Squashed' is the correct word that 'revert', my bad.
-> 
-> >> Change here to use atomic variable looks good to me.
-> >>
-> >> Reviewed by: Kirti Wankhede <kwankhede@nvidia.com>  
-> > 
-> > Thanks!  It was Jason's patch[1] that converted to use an atomic
-> > though, so I'm slightly confused if this R-b is for the patch below,
-> > Jason's patch, or both.  Thanks,  
-> 
-> I liked 'mdev_avail_ports' approach than 'mdev_used_ports' approach 
-> here. This R-b is for below patch.
+Hi Ashish,
 
-Got it, added.  Thanks Kirti!
+Don't block this because of my lack of understanding.  I'm still
+curious about the interactions between SEV and kexec
+--preserved-state. If you have concerns about --preserved-state
+breaking live-migration (when returning to the original kernel), you
+could have kexec's with that flag return an error on Live Migratable
+SEV kernels.
 
+Thanks,
+Steve
