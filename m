@@ -2,101 +2,96 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 032563B59F5
-	for <lists+kvm@lfdr.de>; Mon, 28 Jun 2021 09:44:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 746183B5A06
+	for <lists+kvm@lfdr.de>; Mon, 28 Jun 2021 09:49:46 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232433AbhF1Hqr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 28 Jun 2021 03:46:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58522 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232103AbhF1Hqq (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 28 Jun 2021 03:46:46 -0400
-Received: from mail-pg1-x52a.google.com (mail-pg1-x52a.google.com [IPv6:2607:f8b0:4864:20::52a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9D288C061574;
-        Mon, 28 Jun 2021 00:44:20 -0700 (PDT)
-Received: by mail-pg1-x52a.google.com with SMTP id e22so14741992pgv.10;
-        Mon, 28 Jun 2021 00:44:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=KS1knKUidrLccDLlGBOty0Yju70nzZmvxoRoS1cSJVE=;
-        b=nRd3J1xMnY6Xmw0GJVc0BWZ7l/pv3U9rgVw4iBoKDGvq8ANN2Obcu5daAIjBvi/zsX
-         sqlmgvPeh13khN48H4yEVRbNlLY3PBH4Z5r8UoAQFy6J5uZWPzBwlcVgJJcD6U8odJ/h
-         bUraAVbfiazQycaeDbviXSJSVFAg5R7ENG6vUbP6b7TQOW23vLQBWb8eYWA1zgdZ6cah
-         pQAN0AfSuhxtebZWwwP89Kst2RnpfYuY+hL38B9yzhiHz/LETwx2cicuVq/4vKjeSrmS
-         ofKXYhlby4z5Re14WPhlUxbe23Z7V8MSE3I8N8ORqazoYxe+/lLbS4ZMPs+8jhrcRS/b
-         GdWg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=KS1knKUidrLccDLlGBOty0Yju70nzZmvxoRoS1cSJVE=;
-        b=GjqH6wmnKJI0gBy3PgZ52DN+C+ZqzfeIgBGuGKgmpyy750WQQsEykVrnAGBxebnwBB
-         G6CaFQ9E37cz1jrnBk57/CKgk1a/LY9zaKrDI/w+08hG4CgMUOVRapkrCPWZD46GnHpK
-         y7e2kdMKvltyWZpNZdR/Ppx/a4llJadpFpsZ1ZAewIjOIaZGxxn6HUq77PZs20o0kxkh
-         kEpZH2mT4g/yQGFxCFZgvgkzy6ghImt5cmSADs00MJ1maHfVK+N7OLMc1MsYqnvrWkrJ
-         gwEpS5LBD9nYRLN4zWJbwWrbz83JVVVV0sb33jsp362bwq0AF3j0duKY4V+GnNJrS8tW
-         KfDg==
-X-Gm-Message-State: AOAM530Dl4kEgC6CFcVS1dNQLNXHIvwiOpycSbLRff9T3EKVhXCK97SJ
-        fGrbr1BdMWv9nU0V9LGgRjQ=
-X-Google-Smtp-Source: ABdhPJydhq4EWutI0RUsW02q2keZzoybl7UllfYxVKqZbLAM8pco2qa1sne4FC1Vc1sjobfNReJ7FA==
-X-Received: by 2002:a62:768c:0:b029:2ff:2002:d3d0 with SMTP id r134-20020a62768c0000b02902ff2002d3d0mr23409719pfc.70.1624866260185;
-        Mon, 28 Jun 2021 00:44:20 -0700 (PDT)
-Received: from localhost.localdomain ([103.7.29.32])
-        by smtp.gmail.com with ESMTPSA id l10sm19016634pjg.26.2021.06.28.00.44.17
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 28 Jun 2021 00:44:19 -0700 (PDT)
-From:   Like Xu <like.xu.linux@gmail.com>
-X-Google-Original-From: Like Xu <likexu@tencent.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Stephane Eranian <eranian@google.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Borislav Petkov <bp@alien8.de>, x86@kernel.org,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH] KVM: x86/pmu: Clear anythread deprecated bit when 0xa leaf is unsupported on the SVM
-Date:   Mon, 28 Jun 2021 15:43:54 +0800
-Message-Id: <20210628074354.33848-1-likexu@tencent.com>
-X-Mailer: git-send-email 2.32.0
+        id S232322AbhF1HwI convert rfc822-to-8bit (ORCPT
+        <rfc822;lists+kvm@lfdr.de>); Mon, 28 Jun 2021 03:52:08 -0400
+Received: from mga18.intel.com ([134.134.136.126]:13892 "EHLO mga18.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229911AbhF1HwI (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 28 Jun 2021 03:52:08 -0400
+X-IronPort-AV: E=McAfee;i="6200,9189,10028"; a="195201585"
+X-IronPort-AV: E=Sophos;i="5.83,305,1616482800"; 
+   d="scan'208";a="195201585"
+Received: from fmsmga005.fm.intel.com ([10.253.24.32])
+  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Jun 2021 00:49:42 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.83,305,1616482800"; 
+   d="scan'208";a="643249871"
+Received: from fmsmsx606.amr.corp.intel.com ([10.18.126.86])
+  by fmsmga005.fm.intel.com with ESMTP; 28 Jun 2021 00:49:41 -0700
+Received: from shsmsx602.ccr.corp.intel.com (10.109.6.142) by
+ fmsmsx606.amr.corp.intel.com (10.18.126.86) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2242.4; Mon, 28 Jun 2021 00:49:40 -0700
+Received: from shsmsx601.ccr.corp.intel.com (10.109.6.141) by
+ SHSMSX602.ccr.corp.intel.com (10.109.6.142) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2242.4; Mon, 28 Jun 2021 15:49:39 +0800
+Received: from shsmsx601.ccr.corp.intel.com ([10.109.6.141]) by
+ SHSMSX601.ccr.corp.intel.com ([10.109.6.141]) with mapi id 15.01.2242.008;
+ Mon, 28 Jun 2021 15:49:39 +0800
+From:   "Wang, Wei W" <wei.w.wang@intel.com>
+To:     "Zhu, Lingshan" <lingshan.zhu@intel.com>,
+        Liuxiangdong <liuxiangdong5@huawei.com>,
+        "peterz@infradead.org" <peterz@infradead.org>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>
+CC:     "bp@alien8.de" <bp@alien8.de>,
+        "seanjc@google.com" <seanjc@google.com>,
+        "vkuznets@redhat.com" <vkuznets@redhat.com>,
+        "wanpengli@tencent.com" <wanpengli@tencent.com>,
+        "jmattson@google.com" <jmattson@google.com>,
+        "joro@8bytes.org" <joro@8bytes.org>,
+        "Yang, Weijiang" <weijiang.yang@intel.com>,
+        "kan.liang@linux.intel.com" <kan.liang@linux.intel.com>,
+        "ak@linux.intel.com" <ak@linux.intel.com>,
+        "eranian@google.com" <eranian@google.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "x86@kernel.org" <x86@kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "like.xu.linux@gmail.com" <like.xu.linux@gmail.com>,
+        "Fangyi (Eric)" <eric.fangyi@huawei.com>,
+        Xiexiangyou <xiexiangyou@huawei.com>
+Subject: RE: [PATCH V7 00/18] KVM: x86/pmu: Add *basic* support to enable
+ guest PEBS via DS
+Thread-Topic: [PATCH V7 00/18] KVM: x86/pmu: Add *basic* support to enable
+ guest PEBS via DS
+Thread-Index: AQHXZ0sJOaQRU0kevEaMGb3MISkcPqsj94qAgAABoACABRh78A==
+Date:   Mon, 28 Jun 2021 07:49:38 +0000
+Message-ID: <81530ac3ebe74ada9b5d1dc8092c1a31@intel.com>
+References: <20210622094306.8336-1-lingshan.zhu@intel.com>
+ <60D5A487.8020507@huawei.com>
+ <37832cc0-788d-91b9-dc95-147eca133842@intel.com>
+In-Reply-To: <37832cc0-788d-91b9-dc95-147eca133842@intel.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+dlp-product: dlpe-windows
+dlp-reaction: no-action
+dlp-version: 11.5.1.3
+x-originating-ip: [10.239.127.36]
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 8BIT
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The AMD platform does not support the functions Ah CPUID leaf. The returned
-results for this entry should all remain zero just like the native does:
+On Friday, June 25, 2021 5:46 PM, Zhu, Lingshan wrote:
+> > Only on the host?
+> > I cannot use pebs unless try with "echo 0 > /proc/sys/kernel/watchdog"
+> > both on the host and guest on ICX.
+> Hi Xiangdong
+> 
+> I guess you may run into the "cross-map" case(slow path below), so I think you
+> can disable them both in host and guest to make PEBS work.
+> 
 
-AMD host:
-   0x0000000a 0x00: eax=0x00000000 ebx=0x00000000 ecx=0x00000000 edx=0x00000000
-(uncanny) AMD guest:
-   0x0000000a 0x00: eax=0x00000000 ebx=0x00000000 ecx=0x00000000 edx=0x00008000
+Hi Lingshan, could we also reproduce this issue?
 
-Fixes: cadbaa039b99 ("perf/x86/intel: Make anythread filter support conditional")
-Signed-off-by: Like Xu <likexu@tencent.com>
----
- arch/x86/kvm/cpuid.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+If the guest's watchdog takes away the virtual fixed counter, this will schedule the guest PEBS to use virtual PMC0. With the fast path (1:1 mapping), I think physical PMC0 is likely to be available for the guest PEBS emulation if no other host perf events are running.
 
-diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-index 0edda1fc4fe7..b1808e4fc7d5 100644
---- a/arch/x86/kvm/cpuid.c
-+++ b/arch/x86/kvm/cpuid.c
-@@ -765,7 +765,8 @@ static inline int __do_cpuid_func(struct kvm_cpuid_array *array, u32 function)
- 
- 		edx.split.num_counters_fixed = min(cap.num_counters_fixed, MAX_FIXED_COUNTERS);
- 		edx.split.bit_width_fixed = cap.bit_width_fixed;
--		edx.split.anythread_deprecated = 1;
-+		if (cap.version)
-+			edx.split.anythread_deprecated = 1;
- 		edx.split.reserved1 = 0;
- 		edx.split.reserved2 = 0;
- 
--- 
-2.32.0
-
+Best,
+Wei
