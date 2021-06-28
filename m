@@ -2,135 +2,202 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0A71E3B67E9
-	for <lists+kvm@lfdr.de>; Mon, 28 Jun 2021 19:44:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8C4113B67F3
+	for <lists+kvm@lfdr.de>; Mon, 28 Jun 2021 19:50:08 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233778AbhF1Rqy (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 28 Jun 2021 13:46:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52078 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233327AbhF1Rqx (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 28 Jun 2021 13:46:53 -0400
-Received: from mail-ot1-x331.google.com (mail-ot1-x331.google.com [IPv6:2607:f8b0:4864:20::331])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 83D2EC061574
-        for <kvm@vger.kernel.org>; Mon, 28 Jun 2021 10:44:27 -0700 (PDT)
-Received: by mail-ot1-x331.google.com with SMTP id o13-20020a9d404d0000b0290466630039caso4431181oti.6
-        for <kvm@vger.kernel.org>; Mon, 28 Jun 2021 10:44:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=hteoZM+GD4ovVieM4M7OVaRDXGJH7guuG69T9/rMvbI=;
-        b=D7VXTVjQW1c31E/cloKCNnF8KDdXxJMFKQfK1yf5wke0UjHmbbMO4jaPOSIKH6ul25
-         AJydFoCP59kLedS6dBni73tnqAfj13Bd9IHCP8bab+0kdlKQpOynb0Gz3ETNllElHmz3
-         QT+xp+SXT+GyKx44njbaBnwWd8t5eP0drH6ghJwdzjEPanfX5WpnfBpN0bY3TCXtVR+C
-         IvcGLGTzB5o5Kue0UyK2Vpym9DLLPADiJ2yA8FTLea0uQ0vkjURzhpPCAJnVTW085FHQ
-         HJJBUWjMbEfKF6JhEQQhopgy/A7i2tani4oGCbzW2Qx2NpHr8jqOUndEd6myiPh8BW3J
-         3ujQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=hteoZM+GD4ovVieM4M7OVaRDXGJH7guuG69T9/rMvbI=;
-        b=rEHVrtS1Rp4vLYKEuZApKl1/MXOQVo390RuOBKitnaA0K92qjathgOzZ+JiO6Wo7KQ
-         x9v2h18Wr6URSnTa7Qc/vm/d1dNYE9b/0yNgc4o9IWf2TsxZhwej7FQJnj5kHj2r/zsB
-         dce2i3WZu9Boad8mfyORCUjnQz2FfA3RoQyJod3awlTnw7+P0vYcsG4/MnlMV+WDRJMz
-         bSvVHZaBZpZA4QcPJvZwJyHBfvXNgYjWGKYn8h8UewRZva+iPCbcNQ9V9cbhJ//nZYmt
-         NN4VNYc473Wq+t2GK/iqv69+rFZQq+kYsOE9/gyWeioQk7Gzf/v7c99j0D3Fi6Aw4FrB
-         9FSw==
-X-Gm-Message-State: AOAM532aP3lJj127svs4N1ET2VFqKLtVOhanoPIg/tDWn7+Yz+MH1MXw
-        qNt38zD+fVK3FpIzQUss0ftxjDbuN1m4etTDkT2BMQ==
-X-Google-Smtp-Source: ABdhPJxRSSxVJjj3DO8+QgGyH7Q4bsKQxGEaReR7Qa3bv3NLQpACxQt1u7YuoOt8vwYSVeEVbQLzoY2Fm6Zf+0EcmaI=
-X-Received: by 2002:a9d:550e:: with SMTP id l14mr622966oth.241.1624902266567;
- Mon, 28 Jun 2021 10:44:26 -0700 (PDT)
+        id S233866AbhF1Rwb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 28 Jun 2021 13:52:31 -0400
+Received: from mail-dm6nam11on2045.outbound.protection.outlook.com ([40.107.223.45]:17089
+        "EHLO NAM11-DM6-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S232586AbhF1Rw2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 28 Jun 2021 13:52:28 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=YgAhWMxTH7JSRImavUA1DoCTeeOTIy4TgQrtYRbcB0S+xBFkW4OeH7THVyxbLjjE3dwrqPswwQFLGpKXvUiuxffd4bvUujJbfASmPe3bwOFZ0j8bYGzQrpIRvx4J0SadpkOYxwxV1pTsD9Fp2m/jySLQ4Z87BAIaUfdiv1POsSNlCBoxJ1r65RWhc/49t3hKxHm3kwMTuP/uiSNAmvzOVBva5XojueB2f5ZcHk1aZ1xRxpoZSGhBf2S+ERsjcbs0pYKj8KhQOk6o97zdnChm6czxSDYaZEYFWFL4Iz1XcLZ7nAQSVPNtG8jZxru+R0rUk/Eq4bdGqI4W4pCZPiYReg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=nekbzmKwJ3Bk6NSu17oV6TU+d5YRaSpebmDh3r8i3/c=;
+ b=L4fqxTzXem8EqO3yFwTPeBYmKGfAl+870XpM90U8gTuQfTq3rZXNyM/ThPc9GSYpfwhmE4Ye/p/PMPKt6fVZG8Olva+AOCYTDs8eyharL6oUa5biHLHhXYHG/DLKd2CvQXVq6HlJr8kmIvnKBsK7qMks9qPrTAZdYRQh+/XHqE1iCa2FXjP9gm4DWI152a4WsA1uzHfA2cIfsAoJXD0iC0NHvCAbsjYuuLL5Ks2KMg0Gpt8Da5awvKWfoNfIgaZEdLOT6wnicetY9nZ20Yphkxcfmyekp78q12PZ6D7El0D6cWgXjREIPZKyU6jZlp2XSzfapvEnJqKQeWltZ2Baxg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.112.34) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=none sp=none pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=nekbzmKwJ3Bk6NSu17oV6TU+d5YRaSpebmDh3r8i3/c=;
+ b=SbwKWLwkzxdYJU+kqENv8JHbL265OoChMR3CPoQd4oZcw+3dv7MgBPdjJt7fLqrblaN02fU+9EZYoY510twoBFuoE/fzdG4g52gkBLcDP6lQMXskaxCHTE4+zJPviKxCGyMrEA/UxOqwdELQehwC5cBtDtKcIbxXbF3C6WdkiS56NUFjtyERJa5b3nRmpug4Xql99Qx8H3sTunif+GQkPTp4+iV9vKlg+pEWnGy95YBHhf4BMf2s6UDn/yTfk9kMVZ/0hjk6GlJ3oCXX6hMuKprCNt8z5tEKQgHdgV4M/F/sopwJmhtRBX1RavvBa/V7XpLncmNb86+eyLSvyZYX3A==
+Received: from BN0PR03CA0028.namprd03.prod.outlook.com (2603:10b6:408:e6::33)
+ by DM5PR1201MB2488.namprd12.prod.outlook.com (2603:10b6:3:e1::15) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4242.22; Mon, 28 Jun
+ 2021 17:50:01 +0000
+Received: from BN8NAM11FT018.eop-nam11.prod.protection.outlook.com
+ (2603:10b6:408:e6:cafe::dc) by BN0PR03CA0028.outlook.office365.com
+ (2603:10b6:408:e6::33) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4264.18 via Frontend
+ Transport; Mon, 28 Jun 2021 17:50:01 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.112.34)
+ smtp.mailfrom=nvidia.com; vger.kernel.org; dkim=none (message not signed)
+ header.d=none;vger.kernel.org; dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.112.34 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.112.34; helo=mail.nvidia.com;
+Received: from mail.nvidia.com (216.228.112.34) by
+ BN8NAM11FT018.mail.protection.outlook.com (10.13.176.89) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
+ 15.20.4264.18 via Frontend Transport; Mon, 28 Jun 2021 17:50:00 +0000
+Received: from [10.40.101.220] (172.20.187.6) by HQMAIL107.nvidia.com
+ (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1497.2; Mon, 28 Jun
+ 2021 17:49:57 +0000
+Subject: Re: [PATCH] vfio/mtty: Enforce available_instances
+To:     Alex Williamson <alex.williamson@redhat.com>
+CC:     <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <cohuck@redhat.com>, <jgg@nvidia.com>
+References: <162465624894.3338367.12935940647049917981.stgit@omen>
+X-Nvconfidentiality: public
+From:   Kirti Wankhede <kwankhede@nvidia.com>
+Message-ID: <ee949a98-6998-2032-eb17-00ef8b8d911c@nvidia.com>
+Date:   Mon, 28 Jun 2021 23:19:54 +0530
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.11.0
 MIME-Version: 1.0
-References: <20210627233819.857906-1-stsp2@yandex.ru> <CALMp9eQdxTy4w6NBPbXbJEpyatYB_zhiwykRKCpeoC9Cbuv5gw@mail.gmail.com>
- <a6a8fe0b-1bd3-6a1a-22bb-bfc493f2a195@yandex.ru>
-In-Reply-To: <a6a8fe0b-1bd3-6a1a-22bb-bfc493f2a195@yandex.ru>
-From:   Jim Mattson <jmattson@google.com>
-Date:   Mon, 28 Jun 2021 10:44:15 -0700
-Message-ID: <CALMp9eSfC0LC4qCUNHv4qfvP=HhErQmVNqmnzfzebpOOMCLjeQ@mail.gmail.com>
-Subject: Re: [PATCH] KVM: X86: Fix exception untrigger on ret to user
-To:     stsp <stsp2@yandex.ru>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
-        kvm@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <162465624894.3338367.12935940647049917981.stgit@omen>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [172.20.187.6]
+X-ClientProxiedBy: HQMAIL105.nvidia.com (172.20.187.12) To
+ HQMAIL107.nvidia.com (172.20.187.13)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 8a1f68ae-1d32-4b0b-474b-08d93a5d26e8
+X-MS-TrafficTypeDiagnostic: DM5PR1201MB2488:
+X-Microsoft-Antispam-PRVS: <DM5PR1201MB248864C43E2A829AFAEEFE4EDC039@DM5PR1201MB2488.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:813;
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: 013SONLqPig+vShhFQyZeR82+VYVOfnnzBC46r0d1dOym4QqK6Kdfip/d+CUb01y5bzn7a528gqu1gsQ+REgm8KX9njhNybGnQyIjUhOIaXVQx5felUSzxkdoc93fV+NusdsCMMax8F6WxdeBT66zM8/vOo23+dyYqrPPDHLSPO4QYAEvhKb13GmHUP8v1aeQGRUstiZamTDArC4WqiJrOvNWoya2M7U7saUWHKC6COwMx0tf2z7lJNeobD5oD7THt2h75E/NLGg0OTl44E6VwrMKSsVu59pksXyAbdyyfIPtVhaTLlBAYkjw+rWxcn5kViYKDsDVSe7wVxr8PgI3uL6nXLt4XbSQKGi6pht7xPnJbg3QX/hD4hCptTo3Z0cmPXfbKrdMsRCq/XpBrT68x/yEjyLKRDIzyp9gazBenTJ14gDHpRDalCwVpNBCHcdMJljecziX6VWkepB1DDOIzE4Ukl2pxxpVwqaiavQJcGZOlzoBnmLxSVoijBeA0tn7C80H+5RDhhvxGU6EOulMOgou2cCfbmrCxIX/msAIILjVqlGeQbxtNvfYCMg+AtS9333Xu/ZHjh4Sg+m8ve26ZiOWr/yQX1twJPatTHT1s3N0Sh8BJDAFq670WTB6j8aCKm1elvkLg99H7e8RuEIkeWVqH06otp7mcimOAye4ymJMFiXodzIUtRs5GA5GeVRCvQH1LdFeE1ZqobIgBiYX0s1i7h4j8Q7EL2qm0uwLpH74w6cRzDC6WhtSNYh4I4KThwHjUAPkWEWtCNx9CBwFQ==
+X-Forefront-Antispam-Report: CIP:216.228.112.34;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:schybrid03.nvidia.com;CAT:NONE;SFS:(4636009)(346002)(396003)(39860400002)(376002)(136003)(46966006)(36840700001)(7636003)(356005)(478600001)(6916009)(31686004)(36756003)(6666004)(336012)(4326008)(70586007)(54906003)(26005)(83380400001)(426003)(316002)(2616005)(70206006)(47076005)(86362001)(8676002)(82740400003)(2906002)(5660300002)(16576012)(36860700001)(53546011)(107886003)(186003)(31696002)(16526019)(8936002)(82310400003)(131093003)(43740500002);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 Jun 2021 17:50:00.6993
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 8a1f68ae-1d32-4b0b-474b-08d93a5d26e8
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.112.34];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource: BN8NAM11FT018.eop-nam11.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM5PR1201MB2488
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Jun 28, 2021 at 10:06 AM stsp <stsp2@yandex.ru> wrote:
->
-> 28.06.2021 19:19, Jim Mattson =D0=BF=D0=B8=D1=88=D0=B5=D1=82:
-> > This doesn't work. Kvm has no facilities for converting an injected
-> > exception back into a pending exception.
->
-> What is the purpose of the
-> cancel_injection then?
 
-I believe cancel_injection exists for serializing the vCPU state. If
-the vCPU is saved and restored, then you don't want to lose the
-'injected' event that is sitting in the VMCS.
 
->
-> >   In particular, if the
-> > exception has side effects, such as a #PF which sets CR2, those side
-> > effects have already taken place. Once kvm sets the VM-entry
-> > interruption-information field, the next VM-entry must deliver that
-> > exception. You could arrange to back it out, but you would also have
-> > to back out the changes to CR2 (for #PF) or DR6 (for #DB).
-> >
-> > Cancel_injection *should* leave the exception in the 'injected' state,
->
-> But it removes it from VMCS, no?
-> I thought "injected=3Dtrue" means
-> "injected to VMCS". What is the
-> difference between "injected" and
-> "pending" if both may or may not
-> mean "already in VMCS"?
+On 6/26/2021 2:56 AM, Alex Williamson wrote:
+> The sample mtty mdev driver doesn't actually enforce the number of
+> device instances it claims are available.  Implement this properly.
+> 
+> Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
+> ---
+> 
+> Applies to vfio next branch + Jason's atomic conversion
+> 
 
-Pending events have not yet been subject to interception by L1 (if L2
-is active). Their side effects have not yet been applied. When a
-pending event is processed, if L2 is active, kvm checks L1's exception
-bitmap to see if the event should cause an emulated VM-exit from L2 to
-L1. If not, the pending event transitions to an injected event and the
-side effects are applied. (At this point, the event is essentially
-committed.) The event is then written to the VM-entry
-interruption-information field to take advantage of hardware
-assistance for vectoring through the IDT.
 
-Perhaps 'committed' would have been a better term than 'injected.'
+Does this need to be on top of Jason's patch?
+Patch to use mdev_used_ports is reverted here, can it be changed from 
+mdev_devices_list to mdev_avail_ports atomic variable?
 
-> > and KVM_SET_REGS *should not* clear an injected exception. (I don't
-> > think it's right to clear a pending exception either, if that
-> > exception happens to be a trap, but that's a different discussion).
-> >
-> > It seems to me that the crux of the problem here is that
-> > run->ready_for_interrupt_injection returns true when it should return
-> > false. That's probably where you should focus your efforts.
->
-> I tried that already, and showed
-> the results to you. :) Alas, you didn't
-> reply to those.
+Change here to use atomic variable looks good to me.
 
-I haven't had the time. I was hoping that someone else on the kvm list
-would help you.
+Reviewed by: Kirti Wankhede <kwankhede@nvidia.com>
 
-> But why do you suggest the cpu-specific
-> approach? All other CPUs exit to user-space
-> only when the exception is _really_ injected,
-> i.e. CS/EIP points to the IDT handler.
-> I don't see why it should be non-atomic
-> just for one CPU. Shouldn't that be atomic
-> for all CPUs?
 
-This isn't CPU-specific. Even when using EPT, you can potentially end
-up in this state after an EPT violation during IDT vectoring.
+
+>   samples/vfio-mdev/mtty.c |   22 ++++++++++++++++------
+>   1 file changed, 16 insertions(+), 6 deletions(-)
+> 
+> diff --git a/samples/vfio-mdev/mtty.c b/samples/vfio-mdev/mtty.c
+> index ffbaf07a17ea..8b26fecc4afe 100644
+> --- a/samples/vfio-mdev/mtty.c
+> +++ b/samples/vfio-mdev/mtty.c
+> @@ -144,7 +144,7 @@ struct mdev_state {
+>   	int nr_ports;
+>   };
+>   
+> -static atomic_t mdev_used_ports;
+> +static atomic_t mdev_avail_ports = ATOMIC_INIT(MAX_MTTYS);
+>   
+>   static const struct file_operations vd_fops = {
+>   	.owner          = THIS_MODULE,
+> @@ -707,11 +707,20 @@ static int mtty_probe(struct mdev_device *mdev)
+>   {
+>   	struct mdev_state *mdev_state;
+>   	int nr_ports = mdev_get_type_group_id(mdev) + 1;
+> +	int avail_ports = atomic_read(&mdev_avail_ports);
+>   	int ret;
+>   
+> +	do {
+> +		if (avail_ports < nr_ports)
+> +			return -ENOSPC;
+> +	} while (!atomic_try_cmpxchg(&mdev_avail_ports,
+> +				     &avail_ports, avail_ports - nr_ports));
+> +
+>   	mdev_state = kzalloc(sizeof(struct mdev_state), GFP_KERNEL);
+> -	if (mdev_state == NULL)
+> +	if (mdev_state == NULL) {
+> +		atomic_add(nr_ports, &mdev_avail_ports);
+>   		return -ENOMEM;
+> +	}
+>   
+>   	vfio_init_group_dev(&mdev_state->vdev, &mdev->dev, &mtty_dev_ops);
+>   
+> @@ -724,6 +733,7 @@ static int mtty_probe(struct mdev_device *mdev)
+>   
+>   	if (mdev_state->vconfig == NULL) {
+>   		kfree(mdev_state);
+> +		atomic_add(nr_ports, &mdev_avail_ports);
+>   		return -ENOMEM;
+>   	}
+>   
+> @@ -735,9 +745,9 @@ static int mtty_probe(struct mdev_device *mdev)
+>   	ret = vfio_register_group_dev(&mdev_state->vdev);
+>   	if (ret) {
+>   		kfree(mdev_state);
+> +		atomic_add(nr_ports, &mdev_avail_ports);
+>   		return ret;
+>   	}
+> -	atomic_add(mdev_state->nr_ports, &mdev_used_ports);
+>   
+>   	dev_set_drvdata(&mdev->dev, mdev_state);
+>   	return 0;
+> @@ -746,12 +756,13 @@ static int mtty_probe(struct mdev_device *mdev)
+>   static void mtty_remove(struct mdev_device *mdev)
+>   {
+>   	struct mdev_state *mdev_state = dev_get_drvdata(&mdev->dev);
+> +	int nr_ports = mdev_state->nr_ports;
+>   
+> -	atomic_sub(mdev_state->nr_ports, &mdev_used_ports);
+>   	vfio_unregister_group_dev(&mdev_state->vdev);
+>   
+>   	kfree(mdev_state->vconfig);
+>   	kfree(mdev_state);
+> +	atomic_add(nr_ports, &mdev_avail_ports);
+>   }
+>   
+>   static int mtty_reset(struct mdev_state *mdev_state)
+> @@ -1271,8 +1282,7 @@ static ssize_t available_instances_show(struct mdev_type *mtype,
+>   {
+>   	unsigned int ports = mtype_get_type_group_id(mtype) + 1;
+>   
+> -	return sprintf(buf, "%d\n",
+> -		       (MAX_MTTYS - atomic_read(&mdev_used_ports)) / ports);
+> +	return sprintf(buf, "%d\n", atomic_read(&mdev_avail_ports) / ports);
+>   }
+>   
+>   static MDEV_TYPE_ATTR_RO(available_instances);
+> 
+> 
