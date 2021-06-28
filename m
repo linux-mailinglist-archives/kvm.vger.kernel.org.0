@@ -2,35 +2,36 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 993A33B67D6
-	for <lists+kvm@lfdr.de>; Mon, 28 Jun 2021 19:41:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7E48F3B67D3
+	for <lists+kvm@lfdr.de>; Mon, 28 Jun 2021 19:41:01 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234726AbhF1Rn3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 28 Jun 2021 13:43:29 -0400
-Received: from forward3-smtp.messagingengine.com ([66.111.4.237]:59847 "EHLO
+        id S234555AbhF1RnZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 28 Jun 2021 13:43:25 -0400
+Received: from forward3-smtp.messagingengine.com ([66.111.4.237]:47081 "EHLO
         forward3-smtp.messagingengine.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S234120AbhF1RnZ (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 28 Jun 2021 13:43:25 -0400
-Received: from compute4.internal (compute4.nyi.internal [10.202.2.44])
-        by mailforward.nyi.internal (Postfix) with ESMTP id A277819403E0;
-        Mon, 28 Jun 2021 13:32:00 -0400 (EDT)
-Received: from mailfrontend2 ([10.202.2.163])
-  by compute4.internal (MEProxy); Mon, 28 Jun 2021 13:32:00 -0400
+        by vger.kernel.org with ESMTP id S232719AbhF1RnY (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 28 Jun 2021 13:43:24 -0400
+X-Greylist: delayed 539 seconds by postgrey-1.27 at vger.kernel.org; Mon, 28 Jun 2021 13:43:24 EDT
+Received: from compute1.internal (compute1.nyi.internal [10.202.2.41])
+        by mailforward.nyi.internal (Postfix) with ESMTP id B0F1019408F3;
+        Mon, 28 Jun 2021 13:32:03 -0400 (EDT)
+Received: from mailfrontend1 ([10.202.2.162])
+  by compute1.internal (MEProxy); Mon, 28 Jun 2021 13:32:03 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
         messagingengine.com; h=cc:content-transfer-encoding:date:from
         :in-reply-to:message-id:mime-version:references:subject:to
         :x-me-proxy:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=
-        fm3; bh=m5RQYIIxEWRaScv2dRV3lT42yMImRSZYD3RHWfud8VE=; b=vg2O7wc8
-        tE8Nc4RD5fbxvgPjFhJH8BltktiCvcOyfC3vAQPdt/8wzoZgTMWvUMpsd6pM2AKk
-        NOdN/4JVLjX1O5Nr18UGF3gXA1m6kTU8F+94r9wFALMRiVG9N5oJM6E1S6RswOYV
-        fRlgmvYyhj9o6+F5ZL3rqzumQy6718lKPhOxLh7x8NIafgXOw5UCtNYqCt1aN95G
-        KhscIhITMSoBAR0RCEMNKw9euh081MaWeKofLBLiPgKgniRciMmof22XwnC6bL1F
-        YPbBb+ZylQu5im5eowsdqClotyWq3he3/5PD1VAr29ym7OzHxrdxC0Q6LA8vu19y
-        l5UC3ZhBu/w9qQ==
-X-ME-Sender: <xms:jAfaYBDpb-paINkTJu5Psjz70Pb3a9y_oL7RXf0CoWjcNYu36nFOcA>
-    <xme:jAfaYPi3wF_fe2iQrSeYSWnxotuPu_yAG4IniN6KbAdIe504xnp582auKHn4Hw2FW
-    UCG14Nj9cEEvHQqcVg>
-X-ME-Received: <xmr:jAfaYMl8V4qoiD-6is_MOPWysCH8tX_1lsKgbHI9_xHjZ1KlH_dVATa37RXaSxQWuT5aD49JSlMaqKrR_7O5fpC-XMGxniLZV01gdK0DAvI>
+        fm3; bh=GWKq2EyJGwGZbgi4ujs6lIVnpbb6K31l1aQySTXp12c=; b=hC/hWktO
+        AKMbHlUg1ay7CUnrkVH9nFt3Dg3L+QPhHGGNmKdG6a3y1xQ+KBCEZBbcBK68kvpf
+        WdM9rn2uhZt3fNnVy0iOHszi+GXQAcHKhItX9PczqhtJE9g4ER2nH4lF2lgjmSwP
+        fvgs2UCKohL4878EUKTUU+75qcCvjuC2LsTC7fCukKNAaLg5bkhLccwzubJGXhsP
+        bAgueFkxavCy4K+mGHuBx4e+7JKfEd1mCgU9j6N7zLOimIr1JJNuWW+HF1wrnyim
+        T94Mqi/zUqH8t3xv62tMDNhUTJkyRNXpdsDzY3Opvxp6dHiLTf6I4xJgeMLQ/ABo
+        YwQcGD/njiVgrg==
+X-ME-Sender: <xms:kAfaYDECftFZM83hJLYUV4M5iSdTioQ83aB8JfbGsyM8D3hqn37s0Q>
+    <xme:kAfaYAURwTPBhlVMjY13A8UtXsrQwNsmDiM-54X_OKHe95rdbke4Wc-KS3rvTEFpo
+    9aUSUv31T3blcndexg>
+X-ME-Received: <xmr:kAfaYFIVe3wA3Ec1G7mhMgbJYHmekUtroB0FV0QxIyMUYRu79Bu5BsyviPDT0c0Gdlv6A0WC8Vr5S_djah4ceKrv5t2B6RlhZvdvLSqej0c>
 X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeduledrfeehgedguddufecutefuodetggdotefrod
     ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfgh
     necuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
@@ -40,14 +41,14 @@ X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeduledrfeehgedguddufecutefuodetgg
     gfelheffhfeihfeglefgjedtheeknecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrg
     hmpehmrghilhhfrhhomhepuggrvhhiugdrvggumhhonhgushhonhesohhrrggtlhgvrdgt
     ohhm
-X-ME-Proxy: <xmx:jAfaYLwjjB0iWJMDDKgT1PKdLVcdryfUuO5n-mrMzMJxf2hbfr59QA>
-    <xmx:jAfaYGTjWbKac7BXTPsd338YGaqb77jZ6ADpPUhQXRKpxRg1UiUXOg>
-    <xmx:jAfaYOZFqIvwbwu-RU2uDTGQpvlfQhWG4cks_yIIX4u_3PCTDzN1HQ>
-    <xmx:kAfaYLIWUBZQCvKQo30Y4V7CogAbujFGVLh2NTqMWvwNmWEROQhYQeH2FeI>
+X-ME-Proxy: <xmx:kAfaYBEsC54ZY4eqI7Fm1K0j5uwogr18yWOXd2Hny7QF5W4cE96lYQ>
+    <xmx:kAfaYJXNSO42acLSvmEDNreHuXUHOtXODke6qZqSB93XSjV7D-XWww>
+    <xmx:kAfaYMMC9hk1u2m9stR8p4g-z0DcWZYqNBOl1k6nVRxRWvOJ92bHPw>
+    <xmx:kwfaYCPvAaotylDdxU-IVKkQRTHp1Zt31zYZc3d3V77kZOhzBsi6UcrLqyo>
 Received: by mail.messagingengine.com (Postfix) with ESMTPA; Mon,
- 28 Jun 2021 13:31:55 -0400 (EDT)
+ 28 Jun 2021 13:31:59 -0400 (EDT)
 Received: from localhost (disaster-area.hh.sledj.net [local])
-        by disaster-area.hh.sledj.net (OpenSMTPD) with ESMTPA id ca97c4c1;
+        by disaster-area.hh.sledj.net (OpenSMTPD) with ESMTPA id 9a1db742;
         Mon, 28 Jun 2021 17:31:52 +0000 (UTC)
 From:   David Edmondson <david.edmondson@oracle.com>
 To:     linux-kernel@vger.kernel.org
@@ -60,10 +61,11 @@ Cc:     kvm@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
         Jim Mattson <jmattson@google.com>,
         "H. Peter Anvin" <hpa@zytor.com>,
         Paolo Bonzini <pbonzini@redhat.com>, x86@kernel.org,
-        David Edmondson <david.edmondson@oracle.com>
-Subject: [PATCH 1/2] KVM: x86: Add kvm_x86_ops.get_exit_reason
-Date:   Mon, 28 Jun 2021 18:31:51 +0100
-Message-Id: <20210628173152.2062988-2-david.edmondson@oracle.com>
+        David Edmondson <david.edmondson@oracle.com>,
+        Joao Martins <joao.m.martins@oracle.com>
+Subject: [PATCH 2/2] KVM: x86: On emulation failure, convey the exit reason to userspace
+Date:   Mon, 28 Jun 2021 18:31:52 +0100
+Message-Id: <20210628173152.2062988-3-david.edmondson@oracle.com>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20210628173152.2062988-1-david.edmondson@oracle.com>
 References: <20210628173152.2062988-1-david.edmondson@oracle.com>
@@ -73,88 +75,96 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-For later use.
+To aid in debugging.
 
+Suggested-by: Joao Martins <joao.m.martins@oracle.com>
 Signed-off-by: David Edmondson <david.edmondson@oracle.com>
 ---
- arch/x86/include/asm/kvm-x86-ops.h | 1 +
- arch/x86/include/asm/kvm_host.h    | 1 +
- arch/x86/kvm/svm/svm.c             | 6 ++++++
- arch/x86/kvm/vmx/vmx.c             | 6 ++++++
- 4 files changed, 14 insertions(+)
+ arch/x86/kvm/x86.c       | 23 +++++++++++++++++------
+ include/uapi/linux/kvm.h |  2 ++
+ 2 files changed, 19 insertions(+), 6 deletions(-)
 
-diff --git a/arch/x86/include/asm/kvm-x86-ops.h b/arch/x86/include/asm/kvm-x86-ops.h
-index a12a4987154e..afb0917497c1 100644
---- a/arch/x86/include/asm/kvm-x86-ops.h
-+++ b/arch/x86/include/asm/kvm-x86-ops.h
-@@ -85,6 +85,7 @@ KVM_X86_OP_NULL(sync_pir_to_irr)
- KVM_X86_OP(set_tss_addr)
- KVM_X86_OP(set_identity_map_addr)
- KVM_X86_OP(get_mt_mask)
-+KVM_X86_OP(get_exit_reason)
- KVM_X86_OP(load_mmu_pgd)
- KVM_X86_OP_NULL(has_wbinvd_exit)
- KVM_X86_OP(get_l2_tsc_offset)
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index 974cbfb1eefe..0ee580c68839 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -1365,6 +1365,7 @@ struct kvm_x86_ops {
- 	int (*set_tss_addr)(struct kvm *kvm, unsigned int addr);
- 	int (*set_identity_map_addr)(struct kvm *kvm, u64 ident_addr);
- 	u64 (*get_mt_mask)(struct kvm_vcpu *vcpu, gfn_t gfn, bool is_mmio);
-+	u64 (*get_exit_reason)(struct kvm_vcpu *vcpu);
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 8166ad113fb2..48ef0dc68faf 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -7455,7 +7455,7 @@ void kvm_inject_realmode_interrupt(struct kvm_vcpu *vcpu, int irq, int inc_eip)
+ }
+ EXPORT_SYMBOL_GPL(kvm_inject_realmode_interrupt);
  
- 	void (*load_mmu_pgd)(struct kvm_vcpu *vcpu, hpa_t root_hpa,
- 			     int root_level);
-diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index 616b9679ddcc..408c854b4ac9 100644
---- a/arch/x86/kvm/svm/svm.c
-+++ b/arch/x86/kvm/svm/svm.c
-@@ -4009,6 +4009,11 @@ static u64 svm_get_mt_mask(struct kvm_vcpu *vcpu, gfn_t gfn, bool is_mmio)
- 	return 0;
+-static void prepare_emulation_failure_exit(struct kvm_vcpu *vcpu)
++static void prepare_emulation_failure_exit(struct kvm_vcpu *vcpu, uint64_t flags)
+ {
+ 	struct x86_emulate_ctxt *ctxt = vcpu->arch.emulate_ctxt;
+ 	u32 insn_size = ctxt->fetch.end - ctxt->fetch.data;
+@@ -7466,7 +7466,8 @@ static void prepare_emulation_failure_exit(struct kvm_vcpu *vcpu)
+ 	run->emulation_failure.ndata = 0;
+ 	run->emulation_failure.flags = 0;
+ 
+-	if (insn_size) {
++	if (insn_size &&
++	    (flags & KVM_INTERNAL_ERROR_EMULATION_FLAG_INSTRUCTION_BYTES)) {
+ 		run->emulation_failure.ndata = 3;
+ 		run->emulation_failure.flags |=
+ 			KVM_INTERNAL_ERROR_EMULATION_FLAG_INSTRUCTION_BYTES;
+@@ -7476,6 +7477,14 @@ static void prepare_emulation_failure_exit(struct kvm_vcpu *vcpu)
+ 		memcpy(run->emulation_failure.insn_bytes,
+ 		       ctxt->fetch.data, insn_size);
+ 	}
++
++	if (flags & KVM_INTERNAL_ERROR_EMULATION_FLAG_EXIT_REASON) {
++		run->emulation_failure.ndata = 4;
++		run->emulation_failure.flags |=
++			KVM_INTERNAL_ERROR_EMULATION_FLAG_EXIT_REASON;
++		run->emulation_failure.exit_reason =
++			static_call(kvm_x86_get_exit_reason)(vcpu);
++	}
  }
  
-+static u64 svm_get_exit_reason(struct kvm_vcpu *vcpu)
-+{
-+	return to_svm(vcpu)->vmcb->control.exit_code;
-+}
-+
- static void svm_vcpu_after_set_cpuid(struct kvm_vcpu *vcpu)
- {
- 	struct vcpu_svm *svm = to_svm(vcpu);
-@@ -4573,6 +4578,7 @@ static struct kvm_x86_ops svm_x86_ops __initdata = {
- 	.set_tss_addr = svm_set_tss_addr,
- 	.set_identity_map_addr = svm_set_identity_map_addr,
- 	.get_mt_mask = svm_get_mt_mask,
-+	.get_exit_reason = svm_get_exit_reason,
+ static int handle_emulation_failure(struct kvm_vcpu *vcpu, int emulation_type)
+@@ -7492,16 +7501,18 @@ static int handle_emulation_failure(struct kvm_vcpu *vcpu, int emulation_type)
  
- 	.get_exit_info = svm_get_exit_info,
+ 	if (kvm->arch.exit_on_emulation_error ||
+ 	    (emulation_type & EMULTYPE_SKIP)) {
+-		prepare_emulation_failure_exit(vcpu);
++		prepare_emulation_failure_exit(
++			vcpu,
++			KVM_INTERNAL_ERROR_EMULATION_FLAG_INSTRUCTION_BYTES |
++			KVM_INTERNAL_ERROR_EMULATION_FLAG_EXIT_REASON);
+ 		return 0;
+ 	}
  
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index 927a552393b9..a19b006c287a 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -6997,6 +6997,11 @@ static u64 vmx_get_mt_mask(struct kvm_vcpu *vcpu, gfn_t gfn, bool is_mmio)
- 	return (cache << VMX_EPT_MT_EPTE_SHIFT) | ipat;
- }
+ 	kvm_queue_exception(vcpu, UD_VECTOR);
  
-+static u64 vmx_get_exit_reason(struct kvm_vcpu *vcpu)
-+{
-+	return to_vmx(vcpu)->exit_reason.basic;
-+}
-+
- static void vmcs_set_secondary_exec_control(struct vcpu_vmx *vmx)
- {
- 	/*
-@@ -7613,6 +7618,7 @@ static struct kvm_x86_ops vmx_x86_ops __initdata = {
- 	.set_tss_addr = vmx_set_tss_addr,
- 	.set_identity_map_addr = vmx_set_identity_map_addr,
- 	.get_mt_mask = vmx_get_mt_mask,
-+	.get_exit_reason = vmx_get_exit_reason,
+ 	if (!is_guest_mode(vcpu) && static_call(kvm_x86_get_cpl)(vcpu) == 0) {
+-		vcpu->run->exit_reason = KVM_EXIT_INTERNAL_ERROR;
+-		vcpu->run->internal.suberror = KVM_INTERNAL_ERROR_EMULATION;
+-		vcpu->run->internal.ndata = 0;
++		prepare_emulation_failure_exit(
++			vcpu, KVM_INTERNAL_ERROR_EMULATION_FLAG_EXIT_REASON);
+ 		return 0;
+ 	}
  
- 	.get_exit_info = vmx_get_exit_info,
+diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+index 68c9e6d8bbda..3e4126652a67 100644
+--- a/include/uapi/linux/kvm.h
++++ b/include/uapi/linux/kvm.h
+@@ -282,6 +282,7 @@ struct kvm_xen_exit {
  
+ /* Flags that describe what fields in emulation_failure hold valid data. */
+ #define KVM_INTERNAL_ERROR_EMULATION_FLAG_INSTRUCTION_BYTES (1ULL << 0)
++#define KVM_INTERNAL_ERROR_EMULATION_FLAG_EXIT_REASON       (1ULL << 1)
+ 
+ /* for KVM_RUN, returned by mmap(vcpu_fd, offset=0) */
+ struct kvm_run {
+@@ -404,6 +405,7 @@ struct kvm_run {
+ 			__u64 flags;
+ 			__u8  insn_size;
+ 			__u8  insn_bytes[15];
++			__u64 exit_reason;
+ 		} emulation_failure;
+ 		/* KVM_EXIT_OSI */
+ 		struct {
 -- 
 2.30.2
 
