@@ -2,608 +2,348 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1A0663B58C4
-	for <lists+kvm@lfdr.de>; Mon, 28 Jun 2021 07:54:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B21CC3B593C
+	for <lists+kvm@lfdr.de>; Mon, 28 Jun 2021 08:45:28 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232174AbhF1F5Q (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 28 Jun 2021 01:57:16 -0400
-Received: from mga17.intel.com ([192.55.52.151]:30749 "EHLO mga17.intel.com"
+        id S232158AbhF1Grw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 28 Jun 2021 02:47:52 -0400
+Received: from mga12.intel.com ([192.55.52.136]:46648 "EHLO mga12.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229692AbhF1F5P (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 28 Jun 2021 01:57:15 -0400
-X-IronPort-AV: E=McAfee;i="6200,9189,10028"; a="188271432"
+        id S230148AbhF1Grv (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 28 Jun 2021 02:47:51 -0400
+X-IronPort-AV: E=McAfee;i="6200,9189,10028"; a="187583864"
 X-IronPort-AV: E=Sophos;i="5.83,305,1616482800"; 
-   d="scan'208";a="188271432"
-Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Jun 2021 22:54:46 -0700
+   d="scan'208";a="187583864"
+Received: from orsmga004.jf.intel.com ([10.7.209.38])
+  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Jun 2021 23:45:26 -0700
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.83,305,1616482800"; 
-   d="scan'208";a="446426334"
-Received: from orsmsx606.amr.corp.intel.com ([10.22.229.19])
-  by orsmga007.jf.intel.com with ESMTP; 27 Jun 2021 22:54:46 -0700
-Received: from orsmsx605.amr.corp.intel.com (10.22.229.18) by
- ORSMSX606.amr.corp.intel.com (10.22.229.19) with Microsoft SMTP Server
+   d="scan'208";a="557459933"
+Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
+  by orsmga004.jf.intel.com with ESMTP; 27 Jun 2021 23:45:26 -0700
+Received: from orsmsx601.amr.corp.intel.com (10.22.229.14) by
+ ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2242.4; Sun, 27 Jun 2021 22:54:45 -0700
-Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
- orsmsx605.amr.corp.intel.com (10.22.229.18) with Microsoft SMTP Server
+ 15.1.2242.4; Sun, 27 Jun 2021 23:45:25 -0700
+Received: from ORSEDG602.ED.cps.intel.com (10.7.248.7) by
+ orsmsx601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2242.4
- via Frontend Transport; Sun, 27 Jun 2021 22:54:45 -0700
-Received: from NAM12-DM6-obe.outbound.protection.outlook.com (104.47.59.177)
- by edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
+ via Frontend Transport; Sun, 27 Jun 2021 23:45:25 -0700
+Received: from NAM12-MW2-obe.outbound.protection.outlook.com (104.47.66.48) by
+ edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2242.4; Sun, 27 Jun 2021 22:54:43 -0700
+ 15.1.2242.4; Sun, 27 Jun 2021 23:45:25 -0700
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=mmy79+gma4XYcMd82AG/z4TYmACwbqqZcnJxukQMBxBv1RVCPHRC4qyko7w5XMxC56c+x0AbpIhQl9w2HziY2ath5B0XmnXciqkr2gL4j8AXN2ziPlG702RKWegIZDqWd+FR+7v60YZ8391bpaZ3Cg6nJ4WLDBGHcWw58H9XcwDnNgH94GI+DCKSacvkhlD7tGIfYD+qUr2NVNrsOK04wmhr9yXIEha4wHVRBLq38ZQw6+/viIEiWFY8aUkcgrZMJ18mvdGIgRIOKr/ymUtNil8H9shvhjBKitcT3R3l7yQaYe3KZrpAOTNTrxwALa+BfXTkpAVwv9/RoNCO0qZPgA==
+ b=TwgyMeXL5/bjyQacuSDgL/Ft4kp5OrDMdyNxrrVA9MMdloo2wxQdNU7Uqa+fwTa1LN3yyQNnp45hI8Fc//PjI+FfRwDmXsPMfce4rfWCgy6HPyev6KEJvsCDR03oxpgn6XSoJ9FDthr5xG+KcHetzM6vpJ5R5qYbaL/ggw917sXmobtpZPhfQOxrfcfN6gmFLrro8lz1BVknNBY4HVcQ3/1rLm5KlYoUTcMuMDj98lLjz2o33GOcsT57RcJuizUA739z470BDzTIVKtRnIkaTTijPpBYt1QNe6N3Li1vrSYX3mpmPGvSNKPAaRV1vJTgl7EeCUqvR84spD//0eSyFA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=KHu4ubxfy0C1nqBE6CjuXn65kuW2V86UBUx6rJIjlSE=;
- b=HrxErLv1AiVmthSaX8NCzHHKLE9YwGnv5/Hrcoe8W+fmBC13EGxLjC+7leAcgXE51JmFJWyZ8nZ5u6tSKpb1GTaXmMGfba6hqRdtvBwtx5ccmiE2cfmPtzwirXrlz70LC1/b67qqkFlKK6gYyEOh0TMNRRSxNP4l4YOswzPfhP/hTEz6GlTY+gO70Iw+VRSO0kG3NVgijErxMemDlykcV1TrqN7CSsOw+Oks8ep6JqMOzGVlsIH9UtePc6evxSiRKPBqv6+QdNBjYnsk7Fm+bbMCb6qY3T5I0qVZkaWl+eHP8uldKDirV1SsFK4LfdTRj2zFRnR8oQm0P9jEFt/qNw==
+ bh=putVtxkI7JmrY53+kNdOd93BXL8RUe1E5lkLqOIxx3k=;
+ b=OJNwJqBAxBLdhSFvV+b5jAYGStqv7RtwoWlf2GIE/+qAWFs3I/nRjvIhfA7/tQrrwft15ZasSZk0auQFKC+dovavp1g0v3Navloot+cF7FPmdW7cRYVPGDNp0Xu6RCykstetbswzHpjSUjtnG6OIJMtFQWLy/RFg4oMP9gbJLHp3Ka3UJ8qqH/uYcAJv/8blV9l1Fn/aeaYtupzRxjFu158vFEjGqUgZLOUihm2RrNQSyXthFxc7IfIjIl/wf/GukJdobShvU0oHbw4e1bXpUoGYaKywBJmtZvIIPShB2guMIzHz1ZTqjaiXig6+RyJmZWA1i6VzTNIRjMyDKNR3iw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
  dkim=pass header.d=intel.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=intel.onmicrosoft.com;
  s=selector2-intel-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=KHu4ubxfy0C1nqBE6CjuXn65kuW2V86UBUx6rJIjlSE=;
- b=mhZFlkZtkq8ec3GCiFnwSl7kGhPy1VV3I0KPL14WH4Zb891VhI8WFvn/t47Y6cQNzvWRI3x+s9bNTQ2XwPu9tPnIL5YWgERdfNgX+WZRM+y/K6dg9zTn2ezO0Nhu9gsJ/vCxoboaENj6Puk/yT5yTZGvKXg59tvqdG2EBEGCmHA=
-Received: from BYAPR11MB2662.namprd11.prod.outlook.com (2603:10b6:a02:c8::24)
- by BY5PR11MB4165.namprd11.prod.outlook.com (2603:10b6:a03:18c::26) with
+ bh=putVtxkI7JmrY53+kNdOd93BXL8RUe1E5lkLqOIxx3k=;
+ b=D3ha87ja1WbTxZkGhP+wj06XS3kFUZZ2gCYJGmulDqwQqIVHmtj58gL81g8XdR2gRd0RvxIZOYsNgfmJ4uaXNcsxMkUxB9bjwYIQ/QpUgNjTTLygjrCyuwJXGKL3zbUYD6PoTnCUxpCbe82DjNjz/+sm/UXvvDj3YA7cCZAweSQ=
+Received: from BN9PR11MB5433.namprd11.prod.outlook.com (2603:10b6:408:11e::13)
+ by BN6PR1101MB2338.namprd11.prod.outlook.com (2603:10b6:404:9c::18) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4264.19; Mon, 28 Jun
- 2021 05:54:42 +0000
-Received: from BYAPR11MB2662.namprd11.prod.outlook.com
- ([fe80::103d:74b9:605e:b05b]) by BYAPR11MB2662.namprd11.prod.outlook.com
- ([fe80::103d:74b9:605e:b05b%6]) with mapi id 15.20.4264.026; Mon, 28 Jun 2021
- 05:54:42 +0000
-From:   "Liu, Xiaodong" <xiaodong.liu@intel.com>
-To:     Jason Wang <jasowang@redhat.com>,
-        Xie Yongji <xieyongji@bytedance.com>,
-        "mst@redhat.com" <mst@redhat.com>,
-        "stefanha@redhat.com" <stefanha@redhat.com>,
-        "sgarzare@redhat.com" <sgarzare@redhat.com>,
-        "parav@nvidia.com" <parav@nvidia.com>,
-        "hch@infradead.org" <hch@infradead.org>,
-        "christian.brauner@canonical.com" <christian.brauner@canonical.com>,
-        "rdunlap@infradead.org" <rdunlap@infradead.org>,
-        "willy@infradead.org" <willy@infradead.org>,
-        "viro@zeniv.linux.org.uk" <viro@zeniv.linux.org.uk>,
-        "axboe@kernel.dk" <axboe@kernel.dk>,
-        "bcrl@kvack.org" <bcrl@kvack.org>,
-        "corbet@lwn.net" <corbet@lwn.net>,
-        "mika.penttila@nextfour.com" <mika.penttila@nextfour.com>,
-        "dan.carpenter@oracle.com" <dan.carpenter@oracle.com>,
-        "joro@8bytes.org" <joro@8bytes.org>,
-        "gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>
-CC:     "songmuchun@bytedance.com" <songmuchun@bytedance.com>,
-        "virtualization@lists.linux-foundation.org" 
-        <virtualization@lists.linux-foundation.org>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4264.23; Mon, 28 Jun
+ 2021 06:45:23 +0000
+Received: from BN9PR11MB5433.namprd11.prod.outlook.com
+ ([fe80::2539:bbbd:5109:e36a]) by BN9PR11MB5433.namprd11.prod.outlook.com
+ ([fe80::2539:bbbd:5109:e36a%5]) with mapi id 15.20.4264.026; Mon, 28 Jun 2021
+ 06:45:23 +0000
+From:   "Tian, Kevin" <kevin.tian@intel.com>
+To:     Jason Gunthorpe <jgg@nvidia.com>
+CC:     "Alex Williamson (alex.williamson@redhat.com)" 
+        <alex.williamson@redhat.com>, Joerg Roedel <joro@8bytes.org>,
+        "Jean-Philippe Brucker" <jean-philippe@linaro.org>,
+        David Gibson <david@gibson.dropbear.id.au>,
+        Jason Wang <jasowang@redhat.com>,
+        "parav@mellanox.com" <parav@mellanox.com>,
+        "Enrico Weigelt, metux IT consult" <lkml@metux.net>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Shenming Lu <lushenming@huawei.com>,
+        Eric Auger <eric.auger@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        "Raj, Ashok" <ashok.raj@intel.com>,
+        "Liu, Yi L" <yi.l.liu@intel.com>, "Wu, Hao" <hao.wu@intel.com>,
+        "Jiang, Dave" <dave.jiang@intel.com>,
+        Jacob Pan <jacob.jun.pan@linux.intel.com>,
+        "Kirti Wankhede" <kwankhede@nvidia.com>,
+        Robin Murphy <robin.murphy@arm.com>,
         "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
         "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: RE: [PATCH v8 00/10] Introduce VDUSE - vDPA Device in Userspace
-Thread-Topic: [PATCH v8 00/10] Introduce VDUSE - vDPA Device in Userspace
-Thread-Index: AQHXa8kUCtmikoHekUKCGV4xYFF/O6so1l4AgAANryA=
-Date:   Mon, 28 Jun 2021 05:54:42 +0000
-Message-ID: <BYAPR11MB2662FFF6140A4C634648BB2E8C039@BYAPR11MB2662.namprd11.prod.outlook.com>
-References: <20210615141331.407-1-xieyongji@bytedance.com>
- <20210628103309.GA205554@storage2.sh.intel.com>
- <bdbe3a79-e5ce-c3a5-4c68-c11c65857377@redhat.com>
-In-Reply-To: <bdbe3a79-e5ce-c3a5-4c68-c11c65857377@redhat.com>
-Accept-Language: zh-CN, en-US
+        "David Woodhouse" <dwmw2@infradead.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        "Lu Baolu" <baolu.lu@linux.intel.com>
+Subject: RE: Plan for /dev/ioasid RFC v2
+Thread-Topic: Plan for /dev/ioasid RFC v2
+Thread-Index: AddbO/WEUAFl3MPnRsG8exiH8bwEagB7l+uAAACIfoAAAdwYAAADDw6AAAHKgwAAANd4AAAAacwAAAT4QwAAK587AAA0n7GAAAYKlwAADDvuAAAgbLGAAF6lSYAABO0WAAATSRtQAB5ymYAAEyKHQAAmZhSAAAo/ocAAK16TAAAGdqAAACJdiVAAA3a7AAEa314AAD0+zwAAfvU98A==
+Date:   Mon, 28 Jun 2021 06:45:23 +0000
+Message-ID: <BN9PR11MB543382665D34E58155A9593C8C039@BN9PR11MB5433.namprd11.prod.outlook.com>
+References: <MWHPR11MB1886239C82D6B66A732830B88C309@MWHPR11MB1886.namprd11.prod.outlook.com>
+ <20210615101215.4ba67c86.alex.williamson@redhat.com>
+ <MWHPR11MB188692A6182B1292FADB3BDB8C0F9@MWHPR11MB1886.namprd11.prod.outlook.com>
+ <20210616133937.59050e1a.alex.williamson@redhat.com>
+ <MWHPR11MB18865DF9C50F295820D038798C0E9@MWHPR11MB1886.namprd11.prod.outlook.com>
+ <20210617151452.08beadae.alex.williamson@redhat.com>
+ <20210618001956.GA1987166@nvidia.com>
+ <MWHPR11MB1886A17124605251DF394E888C0D9@MWHPR11MB1886.namprd11.prod.outlook.com>
+ <20210618182306.GI1002214@nvidia.com>
+ <BN9PR11MB5433B9C0577CF0BD8EFCC9BC8C069@BN9PR11MB5433.namprd11.prod.outlook.com>
+ <20210625143616.GT2371267@nvidia.com>
+In-Reply-To: <20210625143616.GT2371267@nvidia.com>
+Accept-Language: en-US
 Content-Language: en-US
 X-MS-Has-Attach: 
 X-MS-TNEF-Correlator: 
 dlp-version: 11.5.1.3
 dlp-product: dlpe-windows
 dlp-reaction: no-action
-authentication-results: redhat.com; dkim=none (message not signed)
- header.d=none;redhat.com; dmarc=none action=none header.from=intel.com;
-x-originating-ip: [192.55.46.52]
+authentication-results: nvidia.com; dkim=none (message not signed)
+ header.d=none;nvidia.com; dmarc=none action=none header.from=intel.com;
+x-originating-ip: [192.198.143.21]
 x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: b9fc8719-43e9-4156-12da-08d939f93962
-x-ms-traffictypediagnostic: BY5PR11MB4165:
-x-microsoft-antispam-prvs: <BY5PR11MB4165BAA95149EDDDC27109F48C039@BY5PR11MB4165.namprd11.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:10000;
+x-ms-office365-filtering-correlation-id: 1c338813-b04f-4d14-aff5-08d93a004e4c
+x-ms-traffictypediagnostic: BN6PR1101MB2338:
+x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+x-ms-exchange-transport-forked: True
+x-microsoft-antispam-prvs: <BN6PR1101MB2338D116286CB8A2E1C7BCFC8C039@BN6PR1101MB2338.namprd11.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:9508;
 x-ms-exchange-senderadcheck: 1
 x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: x4yYlIXkkcQ9W0zD1SujJfxeqCjJQQtkrGc3x6rOArUZd/Yh+t8JJ42GbA5mtc8Ltt18XYg/vY9RdQZf2wJ3LowUpNxVZNaCTEik7v09y6H3qeFGsKHPujGc+lJH7JQVaiITxwakqdYzlihtu5L18KeZOnD6fL95DoXTMKIqV9i/oUCqyT8OmPDLYBOCoHFsj4QVLnEe4EkKmkkbL22WUPpUtlpU6tQ2wdzoyOM3TJXNGAxSXmOpyBTPWDT4MPz8GmdRLHydw0koo7nV1KWqhrF5DPfd9uvinJWpcHADR9jbI6oj85qg4v+F4po72WDW5A7Dwe+aGQ/LVBTFKCAp/ttLKLL13rCtrY0bAtRJW0Wg6z/QNPPcW18jzY1H9zOB5wYYQy/vw8JOTycWjt5XkA/KyMDK/ihv5UnWRB5I/9FjbKS4BiJ1av8fPfbznYDw/QKX0aF5488RSmY/9dfktXeL1Vkn6MPrvmSM0rFVfBhFQ8KqLkoMcLoPnRXv9fEbv6ZqrG+uoNQUqFEYSFmuRbF0Sh+q37BmZzRWBSR3UcThe1Yi48u+mPTtBDnlB8FTqz2HzMkbaH7Vm/TOkQXm1bz7qOKSyz0p52ZWdfqSeeWLzfOezF6ClM/ZEw0IhbHFsH3zqMFdPYsKaCpLguZIXL1zvqByO161cQhJgBgVVmVwVMnu/gBDMvQnCV1/yKPiHesW0gIa+gBKahR79J5JKiqBrtGVyYAxa9vkgIYgc0O3D/vuhdjRrnY7d1iXpjBCwJ7o/41ycgzILq+u4gg9VkfkxhaxuJocX1+rmnP6+U6SQJuzBU4lfUw68X2l9flJ
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BYAPR11MB2662.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(39860400002)(376002)(346002)(136003)(366004)(396003)(966005)(316002)(33656002)(54906003)(122000001)(38100700002)(8936002)(2906002)(7416002)(110136005)(76116006)(478600001)(26005)(4326008)(66476007)(86362001)(66446008)(64756008)(66556008)(66946007)(921005)(71200400001)(9686003)(7696005)(5660300002)(186003)(83380400001)(52536014)(30864003)(6506007)(55016002)(8676002);DIR:OUT;SFP:1102;
+x-microsoft-antispam-message-info: IAPf63ooUrV53xV6KygKKwYZ+7+D5qBYJBoqH4QkyqLbph8JOBA2yUBClpZe6CDxCrCDH+A2klpx3Psnw+8SkTp9adYZ5eWv/p+8a/yxWq6CtxdnoI2TehacGnl4M7G47lSd/iuxTtg4DId5vobRRa/fFX1vlLl+3XYP+qG+3iwJRGJXHlio7G+ddkwgHwDgNMUGjdgK6xzUZK1wgpGUSp4z4a44N6/c/RUlMJh2al58WJmEhvamwc/4NNlXxThSCFBxjZTktSMF+zwuAf1ubtcOXEOvS0gj5UX+jum2s2UxCeQOEuWoaRmBr9gYoWDbRteQIoWyUsji6rBmxS0jNubm+T4VoYi62a7x5bRyb/7zniLUNIt9cipRi3btN6Ba8VcWo6fHw8MrMbIV2gFOSkeIYAkUIXvgyw1NcpeZ1yfdMuKDW6MSS22519oFx+c70lLHRCUu5b83/mNS/uFz+0bC6JCsbe0EdRzSuY4PRWlTmpEjjGVX4vIy5En97cVO1I2XezctgYhv8AxDKYRrNSDGSOCi3fQD1z1Ly/uR9hcZwnSULerUB3o53Bx9osge7ZJEJhgRpsebE+GaoGzICetV9si6umYljAtk3fBlHYE=
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BN9PR11MB5433.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(366004)(39860400002)(376002)(396003)(346002)(136003)(66446008)(6916009)(64756008)(52536014)(71200400001)(66476007)(26005)(66946007)(66556008)(122000001)(55016002)(76116006)(33656002)(186003)(6506007)(9686003)(83380400001)(8936002)(7696005)(8676002)(86362001)(38100700002)(2906002)(5660300002)(4326008)(7416002)(478600001)(54906003)(316002);DIR:OUT;SFP:1102;
 x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?iso-2022-jp?B?QkRzcm5iblh6NFhHb2pPR3RJWmVjekxiYWMrQWdNcHVnenI1TGtmRnQy?=
- =?iso-2022-jp?B?Zk9Pdk1Gcit1bVgwWmp2ZHgwN0ZoN0RXUnZkNVBtTEd0SEtPbnJIdkYy?=
- =?iso-2022-jp?B?cUNDbUdHejgvZDJrWm1zNzBJZ0YwVUdNWXRIUVR5bzRDMUhLdTh4bUVW?=
- =?iso-2022-jp?B?Z1NYZWpFWHdmTHpWYUhVeGxpczluZ2JjZTI0ZEhJcTA0TXB3VDcxejlm?=
- =?iso-2022-jp?B?L0QyUjhHQU5qM2g4VXZjWnZrNHZ4WHROTTFXY2hKQ1FBaEVQUk5VZklu?=
- =?iso-2022-jp?B?N0lhWWFBaDdvaWV6QlFSRmZpdDhqbDhwRzhQV0dBYjczLzlGQnNvTDFL?=
- =?iso-2022-jp?B?Tk1xeTd1Z1ZlQ212QVBIem1EMjhMazBaVllLLzFaVGZNVGFjWHBCbkto?=
- =?iso-2022-jp?B?N21MSVZjS2c2N1dYTnoycTRsc3IwMUNERVdYYjI4WWU1VytiTlNxeUhv?=
- =?iso-2022-jp?B?UjVkOFkxMllkajBmYW5ERkZ1dXhBL2RSbXVpZVVSYU8wUG9WTUxmbTR0?=
- =?iso-2022-jp?B?cWZwTU1mWGJSeGlXODd5SHU5d1l2YjhPMnl4NFFEK2dwdjRQY0lxeUR3?=
- =?iso-2022-jp?B?aWRnRDZYZ2k2Y0VCUFc0L2FHV0pScUJGVWFKNXk3clRIVGRjLzNFaXVF?=
- =?iso-2022-jp?B?RURKRmpsb3R1dEdzS1lobTR5QldNTFMzbklOSDY0UnJ2emVaRmZHNnAz?=
- =?iso-2022-jp?B?czZIdG5ybzc3R2w2VkZmMGNWd2N3b0l3dzJYQXJXRVdjVzROSUdpR01T?=
- =?iso-2022-jp?B?d05TaEJtZklSNi9ZalFIQlpGaUQ2dW5DNUwxY0JLeXBMQnNUNHMrRFEw?=
- =?iso-2022-jp?B?TVRSaUEvQzArdm9qUGRRM1ViMnR4K0k1WVg5cElqTXhJYnBpbis4RmJT?=
- =?iso-2022-jp?B?cU05bk56N0MxRFdwNTM3WWlRb2l6RS82QzJLckFrV3pncDFoS2VWc0FW?=
- =?iso-2022-jp?B?RDd1R2U5MEFaaisrMzRQZkdMRDZPeWRSek9JRmZXWWhNL2lOczFKY2JI?=
- =?iso-2022-jp?B?ZG9JR3Jpc1NrWjc0enNucVZpZW0wQUs1cUczREZiYmhGME9VZis5YzBj?=
- =?iso-2022-jp?B?VTdWejdRRGErYWZSODJ1RXNWWUxLK1hrUVhoYXFXOS9GRmRCVUJ6VnhI?=
- =?iso-2022-jp?B?dGsreGNjV1hOdUpCc3R5eGNobWozUUVZRDhhK3FkL2dld1VlK245aVFm?=
- =?iso-2022-jp?B?eEZPUzhXNHBBcGdQL2pYWnZoaFpXMXR3QWVkYVBaNnBkbDNkZEJ6UHNz?=
- =?iso-2022-jp?B?S2dGdXRJQ004TURTUXR2WFlhdkVzaGtkTXhmY3A5eTZTRkpUbk9YblFS?=
- =?iso-2022-jp?B?NG1OYi9WNWVBWThCSE54NDdqZzJDamhqMEZsWXlaV0s5N04rTFJDSmtZ?=
- =?iso-2022-jp?B?VW9JODh1OUhxUVZLVzNMTDFScXUzMjdteVVwZ1FwSWVPYVlzS2ZGaEFZ?=
- =?iso-2022-jp?B?ZWNtN2prbVVialo1U0Q5b2dOQ3gxSm9lMURjSFlSTVlCSXdISXhXUmY2?=
- =?iso-2022-jp?B?MFNML0E2L0RWcDlNT2lWaW4yNXpWVW1RelZteFhIbkRtdTdCK3dJUFNK?=
- =?iso-2022-jp?B?clFuN0lNTzFFb1dRY2lPcU9HK2JwZzhEQ3IrYkRTZS9IbjNkbk5oK3BM?=
- =?iso-2022-jp?B?TFZxN3FsbUJWSkxOejNDZEg3T1VYa3hGRGRiRTRVTEp3STdXU001OTlY?=
- =?iso-2022-jp?B?MWlYU0ZaemhxeVkwOTJ1YWx6Rm4rYWFUSkNOQXR1WXNvdlowNlVyY3JJ?=
- =?iso-2022-jp?B?UStRSEtpb1BMelpDUGRjdnhHWUhNWEhOVHgzUXB4TWs4dlZneUduYUd1?=
- =?iso-2022-jp?B?SnNNT1U1QkxkajlyK2tHTXhrZndxSVpza0w1OTltSmVLaUZudGJDMkNr?=
- =?iso-2022-jp?B?NW1Nb09YZTZpSGl6dzg1VmZ6Y20wPQ==?=
-x-ms-exchange-transport-forked: True
-Content-Type: text/plain; charset="iso-2022-jp"
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?oq6k0wcs6u4hkuJiFiS8t+qp0m8NUnr1ZVHh9I+W4PIpA6RdYkRQfhcMBAFh?=
+ =?us-ascii?Q?X/c1b9qLVLQLXGs/mApJsNvZOH7OYbQIjj7SOogdlaicYuIulZ3RBbLMqZ88?=
+ =?us-ascii?Q?z9O8sqQmLajBuRNXoLzn8usNp/VP9dH8ZK9QD10mOkMM4lZUQjDzzkT3RqcZ?=
+ =?us-ascii?Q?4JVu9YxjEDNq+BngLEDAPYT5zpb1+QaXJupz/8S0H16E5PJLVmryQ9TDvpZ/?=
+ =?us-ascii?Q?Gy9siuKJ9RyTMYpySTYyh1Xi9fULegB6eQ77TkT7fLFg+n/Bs+ZEjxisjYiO?=
+ =?us-ascii?Q?hZj3KOTQAaeiNjMmTc6fL8kwILlq+E24+o3Kj8gqyVAJjtrlcRaOfnpT8oKQ?=
+ =?us-ascii?Q?vXDdU5Pn3x3T3vmQehShTX1UiEO0iR5V3oPNA1/ktu9IeXvwEqvVp2or777i?=
+ =?us-ascii?Q?D0NObLo2JH+L3Z+PTq+X6GKR66vRdIQ3zRJ91Fsa1cEzlETLRcvWd3y2rAfw?=
+ =?us-ascii?Q?+7NBeHlehC+RbQqa2UuN61SfTo5Dt6Hnk+HwF4537TpK/wp64a4VnsuM/Ruh?=
+ =?us-ascii?Q?CsVmwHvMjDoNPE1ltyN3CcTEt8BRdmo/vJAiNrr3NmrBh1JEsaW4RfPcNNIZ?=
+ =?us-ascii?Q?g+FNXoU4ojXhUqKutUD9p6ggY8bSkV732l9X2cs6AfXYsLwS6xwufzFIe4Uj?=
+ =?us-ascii?Q?yf5W5W0+HhU6Nm0Vu1XzM/xjneB1EtnPv8+k9RbNRwSx1TB0uYkIDZYC+bJL?=
+ =?us-ascii?Q?ek7/wJ/GlTkvxYcGbDobvXp1wEwd0RJQq8hv97qiYDLukv1+XWDuW5QtAhep?=
+ =?us-ascii?Q?jhfErHWPTRF7Z4wI4yI7U8O2a0FkYi36LV33xXzirMGF2PA4665Y+nAvr9oA?=
+ =?us-ascii?Q?xR2IzE4vG8zwbuDEfrhKcXjm8KQm37D+XykiE1cyZ4Tq7S79xFTCX8Mf+ydD?=
+ =?us-ascii?Q?KtNDm98Xyfs3hc1KJ/PFkkd4ISLpnVY5kVTy3novZEj7DQCcZ66rH/22dBF6?=
+ =?us-ascii?Q?74AecOAW67XMzYUoPRVOlRPLb+SYGnzy3k/2KKctGS0qvXWSiPAP5HmDOIy6?=
+ =?us-ascii?Q?JUUdZPBz0Jm6OaKwOxZpsS82YW7QHaZV42tGXPJaubbU9wE0Fuxzy5oO4DLy?=
+ =?us-ascii?Q?c4Yz8liexNzFai9MYhjKtdT9Zyi4uHUMED1dBz7O9RnaU6yF83EJSA+6oKTB?=
+ =?us-ascii?Q?z5DLjnI/Tn3/93FikHTG92er+oUyNUMy1T/QbVzAiAZCTu8qA6pm8yJ9dmsi?=
+ =?us-ascii?Q?VsOSL1aq/XuwqqPtZmKc8y8FFsfh3i2Wn4d6YZ7pwPeDs5Fwa+5XVqsOHY7M?=
+ =?us-ascii?Q?Evxjf6Zf5+hQCHEecSUr1pGyZbKYiXV8Zsth7rwWVVqXcardE5NePkNyE8TS?=
+ =?us-ascii?Q?2becw7Kn1yzGHOHoTRfAspD8?=
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: BYAPR11MB2662.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: b9fc8719-43e9-4156-12da-08d939f93962
-X-MS-Exchange-CrossTenant-originalarrivaltime: 28 Jun 2021 05:54:42.0705
+X-MS-Exchange-CrossTenant-AuthSource: BN9PR11MB5433.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 1c338813-b04f-4d14-aff5-08d93a004e4c
+X-MS-Exchange-CrossTenant-originalarrivaltime: 28 Jun 2021 06:45:23.6809
  (UTC)
 X-MS-Exchange-CrossTenant-fromentityheader: Hosted
 X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
 X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: /5XxtfexUDb10n4yZtthvcl4BEuwRnL8cm0gBUFLO1/N2tcaEC0MSjXAp1ttr2FkokPZmH8Q8DS5fqSuIXjUlQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BY5PR11MB4165
+X-MS-Exchange-CrossTenant-userprincipalname: oVeZAFuno42Rs+vvy+Naj+KQ0htIPdfQpJ2QjGemnWl19iXVa0Uekf9XSB7ayM1ldMcULckTTG21YKJHfU/YQA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN6PR1101MB2338
 X-OriginatorOrg: intel.com
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+> From: Jason Gunthorpe <jgg@nvidia.com>
+> Sent: Friday, June 25, 2021 10:36 PM
+>=20
+> On Fri, Jun 25, 2021 at 10:27:18AM +0000, Tian, Kevin wrote:
+>=20
+> > -   When receiving the binding call for the 1st device in a group, iomm=
+u_fd
+> >     calls iommu_group_set_block_dma(group, dev->driver) which does
+> >     several things:
+>=20
+> The whole problem here is trying to match this new world where we want
+> devices to be in charge of their own IOMMU configuration and the old
+> world where groups are in charge.
+>=20
+> Inserting the group fd and then calling a device-centric
+> VFIO_GROUP_GET_DEVICE_FD_NEW doesn't solve this conflict, and isn't
+> necessary. We can always get the group back from the device at any
+> point in the sequence do to a group wide operation.
+>=20
+> What I saw as the appeal of the sort of idea was to just completely
+> leave all the difficult multi-device-group scenarios behind on the old
+> group centric API and then we don't have to deal with them at all, or
+> least not right away.
+>=20
+> I'd see some progression where iommu_fd only works with 1:1 groups at
+> the start. Other scenarios continue with the old API.
+>=20
+> Then maybe groups where all devices use the same IOASID.
+>=20
+> Then 1:N groups if the source device is reliably identifiable, this
+> requires iommu subystem work to attach domains to sub-group objects -
+> not sure it is worthwhile.
+>=20
+> But at least we can talk about each step with well thought out patches
+>=20
+> The only thing that needs to be done to get the 1:1 step is to broadly
+> define how the other two cases will work so we don't get into trouble
+> and set some way to exclude the problematic cases from even getting to
+> iommu_fd in the first place.
+>=20
+> For instance if we go ahead and create /dev/vfio/device nodes we could
+> do this only if the group was 1:1, otherwise the group cdev has to be
+> used, along with its API.
+>=20
 
+Thinking more along your direction, here is an updated sketch:
 
->-----Original Message-----
->From: Jason Wang <jasowang@redhat.com>
->Sent: Monday, June 28, 2021 12:35 PM
->To: Liu, Xiaodong <xiaodong.liu@intel.com>; Xie Yongji
-><xieyongji@bytedance.com>; mst@redhat.com; stefanha@redhat.com;
->sgarzare@redhat.com; parav@nvidia.com; hch@infradead.org;
->christian.brauner@canonical.com; rdunlap@infradead.org; willy@infradead.or=
-g;
->viro@zeniv.linux.org.uk; axboe@kernel.dk; bcrl@kvack.org; corbet@lwn.net;
->mika.penttila@nextfour.com; dan.carpenter@oracle.com; joro@8bytes.org;
->gregkh@linuxfoundation.org
->Cc: songmuchun@bytedance.com; virtualization@lists.linux-foundation.org;
->netdev@vger.kernel.org; kvm@vger.kernel.org; linux-fsdevel@vger.kernel.org=
-;
->iommu@lists.linux-foundation.org; linux-kernel@vger.kernel.org
->Subject: Re: [PATCH v8 00/10] Introduce VDUSE - vDPA Device in Userspace
->
->
->=1B$B:_=1B(B 2021/6/28 =1B$B2<8a=1B(B6:33, Liu Xiaodong =1B$B<LF;=1B(B:
->> On Tue, Jun 15, 2021 at 10:13:21PM +0800, Xie Yongji wrote:
->>> This series introduces a framework that makes it possible to
->>> implement software-emulated vDPA devices in userspace. And to make it
->>> simple, the emulated vDPA device's control path is handled in the
->>> kernel and only the data path is implemented in the userspace.
->>>
->>> Since the emuldated vDPA device's control path is handled in the
->>> kernel, a message mechnism is introduced to make userspace be aware
->>> of the data path related changes. Userspace can use read()/write() to
->>> receive/reply the control messages.
->>>
->>> In the data path, the core is mapping dma buffer into VDUSE daemon's
->>> address space, which can be implemented in different ways depending
->>> on the vdpa bus to which the vDPA device is attached.
->>>
->>> In virtio-vdpa case, we implements a MMU-based on-chip IOMMU driver
->>> with bounce-buffering mechanism to achieve that. And in vhost-vdpa
->>> case, the dma buffer is reside in a userspace memory region which can
->>> be shared to the VDUSE userspace processs via transferring the shmfd.
->>>
->>> The details and our user case is shown below:
->>>
->>> ------------------------    -------------------------   ---------------=
----------------------------
->----
->>> |            Container |    |              QEMU(VM) |   |              =
-                 VDUSE daemon
->|
->>> |       ---------      |    |  -------------------  |   | -------------=
------------- ---------------- |
->>> |       |dev/vdx|      |    |  |/dev/vhost-vdpa-x|  |   | | vDPA device=
- emulation | |
->block driver | |
->>> ------------+-----------     -----------+------------   -------------+-=
----------------------+---
->------
->>>              |                           |                            |=
-                      |
->>>              |                           |                            |=
-                      |
->>> ------------+---------------------------+----------------------------+-=
----------------------
->+---------
->>> |    | block device |           |  vhost device |            | vduse dr=
-iver |          | TCP/IP |
->|
->>> |    -------+--------           --------+--------            -------+--=
-------          -----+----    |
->>> |           |                           |                           |  =
-                     |        |
->>> | ----------+----------       ----------+-----------         -------+--=
------                |        |
->>> | | virtio-blk driver |       |  vhost-vdpa driver |         | vdpa dev=
-ice |                |
->|
->>> | ----------+----------       ----------+-----------         -------+--=
------                |        |
->>> |           |      virtio bus           |                           |  =
-                     |        |
->>> |   --------+----+-----------           |                           |  =
-                     |        |
->>> |                |                      |                           |  =
-                     |        |
->>> |      ----------+----------            |                           |  =
-                     |        |
->>> |      | virtio-blk device |            |                           |  =
-                     |        |
->>> |      ----------+----------            |                           |  =
-                     |        |
->>> |                |                      |                           |  =
-                     |        |
->>> |     -----------+-----------           |                           |  =
-                     |        |
->>> |     |  virtio-vdpa driver |           |                           |  =
-                     |        |
->>> |     -----------+-----------           |                           |  =
-                     |        |
->>> |                |                      |                           |  =
-  vdpa bus           |        |
->>> |     -----------+----------------------+---------------------------+--=
-----------           |
->|
->>> |                                                                      =
-                  ---+---     |
->>> -----------------------------------------------------------------------=
-------------------| NIC
->|------
->>>                                                                        =
-                   ---+---
->>>                                                                        =
-                      |
->>>                                                                        =
-             ---------+---------
->>>                                                                        =
-             | Remote Storages |
->>>
->>> -------------------
->>>
->>> We make use of it to implement a block device connecting to our
->>> distributed storage, which can be used both in containers and VMs.
->>> Thus, we can have an unified technology stack in this two cases.
->>>
->>> To test it with null-blk:
->>>
->>>    $ qemu-storage-daemon \
->>>        --chardev socket,id=3Dcharmonitor,path=3D/tmp/qmp.sock,server,no=
-wait \
->>>        --monitor chardev=3Dcharmonitor \
->>>        --blockdev
->driver=3Dhost_device,cache.direct=3Don,aio=3Dnative,filename=3D/dev/nullb0=
-,node-
->name=3Ddisk0 \
->>>        --export
->>> type=3Dvduse-blk,id=3Dtest,node-name=3Ddisk0,writable=3Don,name=3Dvduse=
--null,nu
->>> m-queues=3D16,queue-size=3D128
->>>
->>> The qemu-storage-daemon can be found at
->>> https://github.com/bytedance/qemu/tree/vduse
->>>
->>> To make the userspace VDUSE processes such as qemu-storage-daemon
->>> able to be run by an unprivileged user. We did some works on virtio
->>> driver to avoid trusting device, including:
->>>
->>>    - validating the used length:
->>>
->>>      * https://lore.kernel.org/lkml/20210531135852.113-1-
->xieyongji@bytedance.com/
->>>      *
->>> https://lore.kernel.org/lkml/20210525125622.1203-1-xieyongji@bytedanc
->>> e.com/
->>>
->>>    - validating the device config:
->>>
->>>      *
->>> https://lore.kernel.org/lkml/20210615104810.151-1-xieyongji@bytedance
->>> .com/
->>>
->>>    - validating the device response:
->>>
->>>      *
->>> https://lore.kernel.org/lkml/20210615105218.214-1-xieyongji@bytedance
->>> .com/
->>>
->>> Since I'm not sure if I missing something during auditing, especially
->>> on some virtio device drivers that I'm not familiar with, we limit
->>> the supported device type to virtio block device currently. The
->>> support for other device types can be added after the security issue
->>> of corresponding device driver is clarified or fixed in the future.
->>>
->>> Future work:
->>>    - Improve performance
->>>    - Userspace library (find a way to reuse device emulation code in qe=
-mu/rust-
->vmm)
->>>    - Support more device types
->>>
->>> V7 to V8:
->>> - Rebased to newest kernel tree
->>> - Rework VDUSE driver to handle the device's control path in kernel
->>> - Limit the supported device type to virtio block device
->>> - Export free_iova_fast()
->>> - Remove the virtio-blk and virtio-scsi patches (will send them
->>> alone)
->>> - Remove all module parameters
->>> - Use the same MAJOR for both control device and VDUSE devices
->>> - Avoid eventfd cleanup in vduse_dev_release()
->>>
->>> V6 to V7:
->>> - Export alloc_iova_fast()
->>> - Add get_config_size() callback
->>> - Add some patches to avoid trusting virtio devices
->>> - Add limited device emulation
->>> - Add some documents
->>> - Use workqueue to inject config irq
->>> - Add parameter on vq irq injecting
->>> - Rename vduse_domain_get_mapping_page() to
->>> vduse_domain_get_coherent_page()
->>> - Add WARN_ON() to catch message failure
->>> - Add some padding/reserved fields to uAPI structure
->>> - Fix some bugs
->>> - Rebase to vhost.git
->>>
->>> V5 to V6:
->>> - Export receive_fd() instead of __receive_fd()
->>> - Factor out the unmapping logic of pa and va separatedly
->>> - Remove the logic of bounce page allocation in page fault handler
->>> - Use PAGE_SIZE as IOVA allocation granule
->>> - Add EPOLLOUT support
->>> - Enable setting API version in userspace
->>> - Fix some bugs
->>>
->>> V4 to V5:
->>> - Remove the patch for irq binding
->>> - Use a single IOTLB for all types of mapping
->>> - Factor out vhost_vdpa_pa_map()
->>> - Add some sample codes in document
->>> - Use receice_fd_user() to pass file descriptor
->>> - Fix some bugs
->>>
->>> V3 to V4:
->>> - Rebase to vhost.git
->>> - Split some patches
->>> - Add some documents
->>> - Use ioctl to inject interrupt rather than eventfd
->>> - Enable config interrupt support
->>> - Support binding irq to the specified cpu
->>> - Add two module parameter to limit bounce/iova size
->>> - Create char device rather than anon inode per vduse
->>> - Reuse vhost IOTLB for iova domain
->>> - Rework the message mechnism in control path
->>>
->>> V2 to V3:
->>> - Rework the MMU-based IOMMU driver
->>> - Use the iova domain as iova allocator instead of genpool
->>> - Support transferring vma->vm_file in vhost-vdpa
->>> - Add SVA support in vhost-vdpa
->>> - Remove the patches on bounce pages reclaim
->>>
->>> V1 to V2:
->>> - Add vhost-vdpa support
->>> - Add some documents
->>> - Based on the vdpa management tool
->>> - Introduce a workqueue for irq injection
->>> - Replace interval tree with array map to store the iova_map
->>>
->>> Xie Yongji (10):
->>>    iova: Export alloc_iova_fast() and free_iova_fast();
->>>    file: Export receive_fd() to modules
->>>    eventfd: Increase the recursion depth of eventfd_signal()
->>>    vhost-iotlb: Add an opaque pointer for vhost IOTLB
->>>    vdpa: Add an opaque pointer for vdpa_config_ops.dma_map()
->>>    vdpa: factor out vhost_vdpa_pa_map() and vhost_vdpa_pa_unmap()
->>>    vdpa: Support transferring virtual addressing during DMA mapping
->>>    vduse: Implement an MMU-based IOMMU driver
->>>    vduse: Introduce VDUSE - vDPA Device in Userspace
->>>    Documentation: Add documentation for VDUSE
->>>
->>>   Documentation/userspace-api/index.rst              |    1 +
->>>   Documentation/userspace-api/ioctl/ioctl-number.rst |    1 +
->>>   Documentation/userspace-api/vduse.rst              |  222 +++
->>>   drivers/iommu/iova.c                               |    2 +
->>>   drivers/vdpa/Kconfig                               |   10 +
->>>   drivers/vdpa/Makefile                              |    1 +
->>>   drivers/vdpa/ifcvf/ifcvf_main.c                    |    2 +-
->>>   drivers/vdpa/mlx5/net/mlx5_vnet.c                  |    2 +-
->>>   drivers/vdpa/vdpa.c                                |    9 +-
->>>   drivers/vdpa/vdpa_sim/vdpa_sim.c                   |    8 +-
->>>   drivers/vdpa/vdpa_user/Makefile                    |    5 +
->>>   drivers/vdpa/vdpa_user/iova_domain.c               |  545 ++++++++
->>>   drivers/vdpa/vdpa_user/iova_domain.h               |   73 +
->>>   drivers/vdpa/vdpa_user/vduse_dev.c                 | 1453
->++++++++++++++++++++
->>>   drivers/vdpa/virtio_pci/vp_vdpa.c                  |    2 +-
->>>   drivers/vhost/iotlb.c                              |   20 +-
->>>   drivers/vhost/vdpa.c                               |  148 +-
->>>   fs/eventfd.c                                       |    2 +-
->>>   fs/file.c                                          |    6 +
->>>   include/linux/eventfd.h                            |    5 +-
->>>   include/linux/file.h                               |    7 +-
->>>   include/linux/vdpa.h                               |   21 +-
->>>   include/linux/vhost_iotlb.h                        |    3 +
->>>   include/uapi/linux/vduse.h                         |  143 ++
->>>   24 files changed, 2641 insertions(+), 50 deletions(-)
->>>   create mode 100644 Documentation/userspace-api/vduse.rst
->>>   create mode 100644 drivers/vdpa/vdpa_user/Makefile
->>>   create mode 100644 drivers/vdpa/vdpa_user/iova_domain.c
->>>   create mode 100644 drivers/vdpa/vdpa_user/iova_domain.h
->>>   create mode 100644 drivers/vdpa/vdpa_user/vduse_dev.c
->>>   create mode 100644 include/uapi/linux/vduse.h
->>>
->>> --
->>> 2.11.0
->> Hi, Yongji
->>
->> Great work! your method is really wise that implements a software
->> IOMMU so that data path gets processed by userspace application efficien=
-tly.
->> Sorry, I've just realized your work and patches.
->>
->>
->> I was working on a similar thing aiming to get vhost-user-blk device
->> from SPDK vhost-target to be exported as local host kernel block device.
->> It's diagram is like this:
->>
->>
->>                                  -----------------------------
->> ------------------------        |    -----------------      |    -------=
--------------------------------
->-
->> |   <RunC Container>   |     <<<<<<<<| Shared-Memory
->|>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>        |
->> |       ---------      |     v  |    -----------------      |    |      =
-                      v        |
->> |       |dev/vdx|      |     v  |   <virtio-local-agent>    |    |      =
-<Vhost-user Target>
->v        |
->> ------------+-----------     v  | ------------------------  |    |  ----=
-----------------------v-----
->-  |
->>              |                v  | |/dev/virtio-local-ctrl|  |    |  | u=
-nix socket |   |block driver
->|  |
->>              |                v  ------------+----------------    ------=
---+--------------------v---------
->>              |                v              |                          =
-  |                    v
->> ------------+----------------v--------------+---------------------------=
--+--------------------
->v--------|
->> |    | block device |        v      |  Misc device |                    =
- |                    v        |
->> |    -------+--------        v      --------+-------                    =
- |                    v        |
->> |           |                v              |                           =
- |                    v        |
->> | ----------+----------      v              |                           =
- |                    v        |
->> | | virtio-blk driver |      v              |                           =
- |                    v        |
->> | ----------+----------      v              |                           =
- |                    v        |
->> |           | virtio bus     v              |                           =
- |                    v        |
->> |   --------+---+-------     v              |                           =
- |                    v        |
->> |               |            v              |                           =
- |                    v        |
->> |               |            v              |                           =
- |                    v        |
->> |     ----------+----------  v     ---------+-----------                =
- |                    v        |
->> |     | virtio-blk device |--<----| virtio-local driver |---------------=
--<                    v
->|
->> |     ----------+----------       ----------+-----------                =
-                      v        |
->> |
->> | ---------+--------|
->> ------------------------------------------------------------------------=
--------------| RNIC |--
->| PCIe |-
->>                                                                         =
-              ----+---  | NVMe |
->>                                                                         =
-                  |     --------
->>                                                                         =
-         ---------+---------
->>                                                                         =
-         | Remote Storages |
->>
->> -------------------
->>
->>
->> I just draft out an initial proof version. When seeing your RFC mail,
->> I'm thinking that SPDK target may depends on your work, so I could
->> directly drop mine.
->> But after a glance of the RFC patches, seems it is not so easy or
->> efficient to get vduse leveraged by SPDK.
->> (Please correct me, if I get wrong understanding on vduse. :) )
->>
->> The large barrier is bounce-buffer mapping: SPDK requires hugepages
->> for NVMe over PCIe and RDMA, so take some preallcoated hugepages to
->> map as bounce buffer is necessary. Or it's hard to avoid an extra
->> memcpy from bounce-buffer to hugepage.
->> If you can add an option to map hugepages as bounce-buffer, then SPDK
->> could also be a potential user of vduse.
->
->
->Several issues:
->
->- VDUSE needs to limit the total size of the bounce buffers (64M if I was =
-not
->wrong). Does it work for SPDK?
+[Stage-1]
 
-Yes, Jason. It is enough and works for SPDK.
-Since it's a kind of bounce buffer mainly for in-flight IO, so limited size=
- like
-64MB is enough.
+Multi-devices group (1:N) is handled by existing vfio group fd and=20
+vfio_iommu_type1 driver.
 
->- VDUSE can use hugepages but I'm not sure we can mandate hugepages (or we
->need introduce new flags for supporting this)
+Singleton group (1:1) is handled via a new device-centric protocol:
 
-Same with your worry, I'm afraid too that it is a hard for a kernel module
-to directly preallocate hugepage internal.
-What I tried is that:
-1. A simple agent daemon (represents for one device)  `preallocates` and ma=
-ps
-    dozens of 2MB hugepages (like 64MB) for one device.
-2. The daemon passes its mapping addr&len and hugepage fd to kernel
-    module through created IOCTL.
-3. Kernel module remaps the hugepages inside kernel.
-4. Vhost user target gets and maps hugepage fd from kernel module
-    in vhost-user msg through Unix Domain Socket cmsg.
-Then kernel module and target map on the same hugepage based
-bounce buffer for in-flight IO.
+1)   /dev/vfio/device nodes are created for devices in singleton group
+       or devices w/o group (mdev)
 
-If there is one option in VDUSE to map userspace preallocated memory, then
-VDUSE should be able to mandate it even it is hugepage based.
+2)   user gets iommu_fd by open("/dev/iommu"). A default block_dma
+       domain is created per iommu_fd (or globally) with an empty I/O=20
+       page table.=20
 
->Thanks
->
->
->>
->> It would be better if SPDK vhost-target could leverage the datapath of
->> vduse directly and efficiently. Even the control path is vdpa based,
->> we may work out one daemon as agent to bridge SPDK vhost-target with vdu=
-se.
->> Then users who already deployed SPDK vhost-target, can smoothly run
->> some agent daemon without code modification on SPDK vhost-target itself.
->> (It is only better-to-have for SPDK vhost-target app, not mandatory
->> for SPDK) :) At least, some small barrier is there that blocked a
->> vhost-target use vduse datapath efficiently:
->> - Current IO completion irq of vduse is IOCTL based. If add one option
->> to get it eventfd based, then vhost-target can directly notify IO
->> completion via negotiated eventfd.
->>
->>
->> Thanks
->>  From Xiaodong
->>
->>
+3)   iommu_fd reports that only 1:1 group is supported
+
+4)   user gets device_fd by open("/dev/vfio/device"). At this point
+       mmap() should be blocked since a security context hasn't been=20
+       established for this fd. This could be done by returning an error=20
+       (EACCESS or EAGAIN?), or succeeding w/o actually setting up the=20
+       mapping.
+
+5)   user requests to bind device_fd to iommu_fd which verifies the=20
+       group is not 1:N (for mdev the check is on the parent device).=20
+       Successful binding automatically attaches the device to the block_
+       dma domain via iommu_attach_group(). From now on the user is=20
+       permitted to access the device. If mmap() in 3) is allowed, vfio=20
+       actually sets up the MMIO mapping at this point.
+
+6)   before the device is unbound from iommu_fd, it is always in a=20
+       security context. Attaching/detaching just switches the security
+       context between the block_dma domain and an ioasid domain.
+
+7)   Unbinding detaches the device from the block_dma domain and
+       re-attach it to the default domain. From now on the user should=20
+       be denied from accessing the device. vfio should tear down the
+       MMIO mapping at this point.
+
+[Stage-2]
+
+Both 1:1 and 1:N groups are handled via the new device-centric protocol.=20
+Old vfio uAPI is kept for legacy applications. All devices in the same grou=
+p=20
+must share the same I/O address space.
+
+A key difference from stage-1 is the additional check on group viability:
+
+1)   vfio creates /dev/vfio/device nodes for all devices
+
+2)   Same as stage-1 for getting iommu_fd
+
+3)   iommu_fd reports that both 1:1 and 1:N groups are supported
+
+4)   Same as stage-1 for getting device_fd=20
+
+5)   when receiving the binding call for the 1st device in a group, iommu
+       fd does several things:
+
+        a) Identify the group of this device and check group viability. A g=
+roup=20
+            is viable only when all devices in the group are in one of belo=
+w states:
+
+                * driver-less
+                * bound to a driver which is same as the one which does the
+                   binding call (vfio in this case)
+                * bound to an otherwise allowed driver (which indicates tha=
+t it
+                   is safe for iommu_fd usage around probe())
+
+        b) Attach all devices in the group to the block_dma domain, via exi=
+sting
+             iommu_attach_group().
+
+        c) Register a notifier callback to verifie group viability on IOMMU=
+_GROUP_
+            NOTIFY_BOUND_DRIVER event. BUG_ON() might be eliminated if
+            we can find a way to deny probe of non-iommu-safe drivers.
+                =20
+        From now on the user is permitted to access the device. Similar to=
+=20
+        stage-1, vfio may set up the MMIO mapping at this point.
+
+6)   Binding other devices in the same group just succeed
+
+7)   Before the last device in the group is unbound from iommu_fd, all
+       devices in the group (even not bound to iommu_fd) switch together=20
+       between block_dma domain and ioasid domain, initiated by attaching=20
+       to or detaching from an ioasid.
+
+        a) iommu_fd verifies that all bound devices in the same group must =
+be
+            attached to a single IOASID.
+
+        b) the 1st device attach in the group moves the entire group to use=
+=20
+             the new IOASID domain.
+
+        c) the last device detach moves the entire group back to the block-=
+dma
+            domain.
+
+ 8)  A device is allowed to be unbound from iommu_fd when other devices
+       in the group are still bound. In this case all devices in this group=
+ are still
+       attached to a security context (block-dma or ioasid). vfio may still=
+ zap=20
+       the mmio mapping (though still in security context) since it doesn't=
+=20
+       know group in this new flow. The unbound device should not be bound=
+=20
+       to another driver which could break the group viability.
+
+9)  When user requests to unbind the last device in the group, iommu_fd
+      detaches the whole group from the block-dma domain. All mmio mappings
+      must be zapped immediately. Devices in the group are re-attached to=20
+      the default domain from now on (not safe for user to access).
+
+[Stage-3]
+
+It's still an open whether we want to further allow devices within a group=
+=20
+attached to different IOASIDs in case that the source devices are reliably=
+=20
+identifiable. This is an usage not supported by existing vfio and might be
+not worthwhile due to improved isolation over time.
+
+When it's required, iommu layer has to create sub-group objects and=20
+expose the sub-group topology to userspace. In the meantime, iommu=20
+API will be extended to allow sub-group attach/detach operations.=20
+
+In this case, there is no much difference in stage-2 flow. iommu_fd just
+needs to understand the sub-group topology when allowing a group of
+devices attached to different IOASIDs. The key is still to enforce that=20
+the entire group is in iommu_fd managed security contexts (block-dma or=20
+ioasid) as long as one or more devices in the group are still bound to it.
+
+Thanks
+Kevin
