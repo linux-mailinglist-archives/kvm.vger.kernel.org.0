@@ -2,378 +2,148 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8398D3B5C7A
-	for <lists+kvm@lfdr.de>; Mon, 28 Jun 2021 12:32:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2BE173B5C7D
+	for <lists+kvm@lfdr.de>; Mon, 28 Jun 2021 12:32:53 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232559AbhF1Ket (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 28 Jun 2021 06:34:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39762 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231700AbhF1Kes (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 28 Jun 2021 06:34:48 -0400
-Received: from mail-oi1-x235.google.com (mail-oi1-x235.google.com [IPv6:2607:f8b0:4864:20::235])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AD402C061574;
-        Mon, 28 Jun 2021 03:32:19 -0700 (PDT)
-Received: by mail-oi1-x235.google.com with SMTP id w127so21471901oig.12;
-        Mon, 28 Jun 2021 03:32:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=6SpmYjbDA2VZHCXdxYH4FRULNvA8XJh57E6gm5kBBno=;
-        b=bBPVx4kN1TQSF0nMAFDpW4r1UGnnSIGVX27v0ZRLe1ULEwqQjLcFClaipmcwk39YDX
-         BWwF7NeoW8kIJPBx4EqjkxsmV77VAlu6Ol3ota6Ujnmh2O3TzDJTWIbalSbz3oF+8vmx
-         zO33XGdiHBPr2TlJDH3gdRmZRVMZYMQbJwc9yAfYQbObeZPHI0jm/dn33AleRs3vuw/2
-         C/arSWK8k5IPHg2P8Qb7zmzhbwldGNaII6OTZQmPMICRwV5mAURBeEfmGz+97VF8ZRxD
-         vFZd9x9pBTTnN0dENlQzbcNqCuDwAKOE5qB779vDqIgAteKSLK0YB3pvHUwzO8Xqqlic
-         or5w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=6SpmYjbDA2VZHCXdxYH4FRULNvA8XJh57E6gm5kBBno=;
-        b=e+gQywDs/53Ar8defPxBRVfgEtziuMp7fFt8Eqa+jejkFmelqlJ/z0In/HYRN4aI3p
-         lKduMub9X+NcKmk8IywUBF7PjZS1YsEnFhzVAvkb8yu9DEQyO5b0dUu/eOiTxLViPpUh
-         qZGMxcDwthFEi2Y+f/SgZHMNlYR4KJX2Wr4rAA8sKBy1mfbnUUUPOg4QgWl62dlOf2xS
-         CEO2FBKV5nBsQKrWx0KTal3DwbW2AJrt8rO2BVpKNcaa+WhueTIXmtFy6pw6ran2rpYh
-         n/Y15ESoyRnIxfTXcNCv/FKfRmhY7K3udLdasoT+XQxnyAne1cQpu/gHhwurHpoFlmRj
-         8GLA==
-X-Gm-Message-State: AOAM5309U12ngnOWK4qv08scNtcEVONTztBT7209F68kMgc5flcbmW5b
-        Ax0Hnrie+1VnQHox8LmM8mXUYRy186Fhoc9/cEU=
-X-Google-Smtp-Source: ABdhPJz8sBzkpgKrdhDCiR0zOFyxKvu+Kl0oVp23M/rlBJq8t/JdaWYpv3ZBMKnc68C9wmbmNRUL8I523Qt8bIiGeW8=
-X-Received: by 2002:a05:6808:25a:: with SMTP id m26mr20025949oie.52.1624876338975;
- Mon, 28 Jun 2021 03:32:18 -0700 (PDT)
+        id S232648AbhF1KfR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 28 Jun 2021 06:35:17 -0400
+Received: from forward100p.mail.yandex.net ([77.88.28.100]:47177 "EHLO
+        forward100p.mail.yandex.net" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S231700AbhF1KfP (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 28 Jun 2021 06:35:15 -0400
+Received: from sas2-3c349b911c75.qloud-c.yandex.net (sas2-3c349b911c75.qloud-c.yandex.net [IPv6:2a02:6b8:c08:bc8b:0:640:3c34:9b91])
+        by forward100p.mail.yandex.net (Yandex) with ESMTP id 0CAB85981A44;
+        Mon, 28 Jun 2021 13:32:47 +0300 (MSK)
+Received: from sas1-37da021029ee.qloud-c.yandex.net (sas1-37da021029ee.qloud-c.yandex.net [2a02:6b8:c08:1612:0:640:37da:210])
+        by sas2-3c349b911c75.qloud-c.yandex.net (mxback/Yandex) with ESMTP id gVYQjNAqUe-WjJmsFs4;
+        Mon, 28 Jun 2021 13:32:46 +0300
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex.ru; s=mail; t=1624876366;
+        bh=3kQmJTGFO2c4SH2iYvRbbWPk6MWPP2SOpCSH71um9AY=;
+        h=In-Reply-To:From:Date:References:To:Subject:Message-ID:Cc;
+        b=gRy6Pxlbts6G+NJEMMxNSOMaNPDH2ydyHGUXg55Va231Z5CYwYn1tmI3DtkjXvrfy
+         8Ybi8hkyqhHkr6MGdWR1XVrZmf9mOe9TjtB+d6ha6HSx7UD1+o+8Ac96HBZsYRsQrF
+         hLNYQq1zWHmi38IV3YUdi7ndTgCgEGPMQ5GbrAlU=
+Authentication-Results: sas2-3c349b911c75.qloud-c.yandex.net; dkim=pass header.i=@yandex.ru
+Received: by sas1-37da021029ee.qloud-c.yandex.net (smtp/Yandex) with ESMTPSA id 63B0I5yiru-Wi2K8S0E;
+        Mon, 28 Jun 2021 13:32:45 +0300
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
+        (Client certificate not present)
+Subject: Re: [PATCH] KVM: X86: Fix exception untrigger on ret to user
+To:     Vitaly Kuznetsov <vkuznets@redhat.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
+        kvm@vger.kernel.org
+References: <20210627233819.857906-1-stsp2@yandex.ru>
+ <87zgva3162.fsf@vitty.brq.redhat.com>
+ <b3ee97c8-318a-3134-07c7-75114e96b7cf@yandex.ru>
+ <87o8bq2tfm.fsf@vitty.brq.redhat.com>
+From:   stsp <stsp2@yandex.ru>
+Message-ID: <b08399e2-ce68-e895-ed0d-b97920f721ce@yandex.ru>
+Date:   Mon, 28 Jun 2021 13:32:43 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.11.0
 MIME-Version: 1.0
-References: <20210615141331.407-1-xieyongji@bytedance.com> <20210628103309.GA205554@storage2.sh.intel.com>
-In-Reply-To: <20210628103309.GA205554@storage2.sh.intel.com>
-From:   Yongji Xie <elohimes@gmail.com>
-Date:   Mon, 28 Jun 2021 18:32:07 +0800
-Message-ID: <CAONzpcbjr2zKOAQrWa46Tv=oR1fYkcKLcqqm_tSgO7RkU20yBA@mail.gmail.com>
-Subject: Re: [PATCH v8 00/10] Introduce VDUSE - vDPA Device in Userspace
-To:     Liu Xiaodong <xiaodong.liu@intel.com>
-Cc:     Xie Yongji <xieyongji@bytedance.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>, sgarzare@redhat.com,
-        parav@nvidia.com, hch@infradead.org,
-        christian.brauner@canonical.com, rdunlap@infradead.org,
-        willy@infradead.org, viro@zeniv.linux.org.uk, axboe@kernel.dk,
-        bcrl@kvack.org, corbet@lwn.net, mika.penttila@nextfour.com,
-        dan.carpenter@oracle.com, joro@8bytes.org,
-        gregkh@linuxfoundation.org, kvm@vger.kernel.org,
-        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-        virtualization@lists.linux-foundation.org,
-        iommu@lists.linux-foundation.org, songmuchun@bytedance.com,
-        linux-fsdevel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <87o8bq2tfm.fsf@vitty.brq.redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 28 Jun 2021 at 10:55, Liu Xiaodong <xiaodong.liu@intel.com> wrote:
+28.06.2021 13:07, Vitaly Kuznetsov пишет:
+> stsp <stsp2@yandex.ru> writes:
 >
-> On Tue, Jun 15, 2021 at 10:13:21PM +0800, Xie Yongji wrote:
-> >
-> > This series introduces a framework that makes it possible to implement
-> > software-emulated vDPA devices in userspace. And to make it simple, the
-> > emulated vDPA device's control path is handled in the kernel and only the
-> > data path is implemented in the userspace.
-> >
-> > Since the emuldated vDPA device's control path is handled in the kernel,
-> > a message mechnism is introduced to make userspace be aware of the data
-> > path related changes. Userspace can use read()/write() to receive/reply
-> > the control messages.
-> >
-> > In the data path, the core is mapping dma buffer into VDUSE daemon's
-> > address space, which can be implemented in different ways depending on
-> > the vdpa bus to which the vDPA device is attached.
-> >
-> > In virtio-vdpa case, we implements a MMU-based on-chip IOMMU driver with
-> > bounce-buffering mechanism to achieve that. And in vhost-vdpa case, the dma
-> > buffer is reside in a userspace memory region which can be shared to the
-> > VDUSE userspace processs via transferring the shmfd.
-> >
-> > The details and our user case is shown below:
-> >
-> > ------------------------    -------------------------   ----------------------------------------------
-> > |            Container |    |              QEMU(VM) |   |                               VDUSE daemon |
-> > |       ---------      |    |  -------------------  |   | ------------------------- ---------------- |
-> > |       |dev/vdx|      |    |  |/dev/vhost-vdpa-x|  |   | | vDPA device emulation | | block driver | |
-> > ------------+-----------     -----------+------------   -------------+----------------------+---------
-> >             |                           |                            |                      |
-> >             |                           |                            |                      |
-> > ------------+---------------------------+----------------------------+----------------------+---------
-> > |    | block device |           |  vhost device |            | vduse driver |          | TCP/IP |    |
-> > |    -------+--------           --------+--------            -------+--------          -----+----    |
-> > |           |                           |                           |                       |        |
-> > | ----------+----------       ----------+-----------         -------+-------                |        |
-> > | | virtio-blk driver |       |  vhost-vdpa driver |         | vdpa device |                |        |
-> > | ----------+----------       ----------+-----------         -------+-------                |        |
-> > |           |      virtio bus           |                           |                       |        |
-> > |   --------+----+-----------           |                           |                       |        |
-> > |                |                      |                           |                       |        |
-> > |      ----------+----------            |                           |                       |        |
-> > |      | virtio-blk device |            |                           |                       |        |
-> > |      ----------+----------            |                           |                       |        |
-> > |                |                      |                           |                       |        |
-> > |     -----------+-----------           |                           |                       |        |
-> > |     |  virtio-vdpa driver |           |                           |                       |        |
-> > |     -----------+-----------           |                           |                       |        |
-> > |                |                      |                           |    vdpa bus           |        |
-> > |     -----------+----------------------+---------------------------+------------           |        |
-> > |                                                                                        ---+---     |
-> > -----------------------------------------------------------------------------------------| NIC |------
-> >                                                                                          ---+---
-> >                                                                                             |
-> >                                                                                    ---------+---------
-> >                                                                                    | Remote Storages |
-> >                                                                                    -------------------
-> >
-> > We make use of it to implement a block device connecting to
-> > our distributed storage, which can be used both in containers and
-> > VMs. Thus, we can have an unified technology stack in this two cases.
-> >
-> > To test it with null-blk:
-> >
-> >   $ qemu-storage-daemon \
-> >       --chardev socket,id=charmonitor,path=/tmp/qmp.sock,server,nowait \
-> >       --monitor chardev=charmonitor \
-> >       --blockdev driver=host_device,cache.direct=on,aio=native,filename=/dev/nullb0,node-name=disk0 \
-> >       --export type=vduse-blk,id=test,node-name=disk0,writable=on,name=vduse-null,num-queues=16,queue-size=128
-> >
-> > The qemu-storage-daemon can be found at https://github.com/bytedance/qemu/tree/vduse
-> >
-> > To make the userspace VDUSE processes such as qemu-storage-daemon able to
-> > be run by an unprivileged user. We did some works on virtio driver to avoid
-> > trusting device, including:
-> >
-> >   - validating the used length:
-> >
-> >     * https://lore.kernel.org/lkml/20210531135852.113-1-xieyongji@bytedance.com/
-> >     * https://lore.kernel.org/lkml/20210525125622.1203-1-xieyongji@bytedance.com/
-> >
-> >   - validating the device config:
-> >
-> >     * https://lore.kernel.org/lkml/20210615104810.151-1-xieyongji@bytedance.com/
-> >
-> >   - validating the device response:
-> >
-> >     * https://lore.kernel.org/lkml/20210615105218.214-1-xieyongji@bytedance.com/
-> >
-> > Since I'm not sure if I missing something during auditing, especially on some
-> > virtio device drivers that I'm not familiar with, we limit the supported device
-> > type to virtio block device currently. The support for other device types can be
-> > added after the security issue of corresponding device driver is clarified or
-> > fixed in the future.
-> >
-> > Future work:
-> >   - Improve performance
-> >   - Userspace library (find a way to reuse device emulation code in qemu/rust-vmm)
-> >   - Support more device types
-> >
-> > V7 to V8:
-> > - Rebased to newest kernel tree
-> > - Rework VDUSE driver to handle the device's control path in kernel
-> > - Limit the supported device type to virtio block device
-> > - Export free_iova_fast()
-> > - Remove the virtio-blk and virtio-scsi patches (will send them alone)
-> > - Remove all module parameters
-> > - Use the same MAJOR for both control device and VDUSE devices
-> > - Avoid eventfd cleanup in vduse_dev_release()
-> >
-> > V6 to V7:
-> > - Export alloc_iova_fast()
-> > - Add get_config_size() callback
-> > - Add some patches to avoid trusting virtio devices
-> > - Add limited device emulation
-> > - Add some documents
-> > - Use workqueue to inject config irq
-> > - Add parameter on vq irq injecting
-> > - Rename vduse_domain_get_mapping_page() to vduse_domain_get_coherent_page()
-> > - Add WARN_ON() to catch message failure
-> > - Add some padding/reserved fields to uAPI structure
-> > - Fix some bugs
-> > - Rebase to vhost.git
-> >
-> > V5 to V6:
-> > - Export receive_fd() instead of __receive_fd()
-> > - Factor out the unmapping logic of pa and va separatedly
-> > - Remove the logic of bounce page allocation in page fault handler
-> > - Use PAGE_SIZE as IOVA allocation granule
-> > - Add EPOLLOUT support
-> > - Enable setting API version in userspace
-> > - Fix some bugs
-> >
-> > V4 to V5:
-> > - Remove the patch for irq binding
-> > - Use a single IOTLB for all types of mapping
-> > - Factor out vhost_vdpa_pa_map()
-> > - Add some sample codes in document
-> > - Use receice_fd_user() to pass file descriptor
-> > - Fix some bugs
-> >
-> > V3 to V4:
-> > - Rebase to vhost.git
-> > - Split some patches
-> > - Add some documents
-> > - Use ioctl to inject interrupt rather than eventfd
-> > - Enable config interrupt support
-> > - Support binding irq to the specified cpu
-> > - Add two module parameter to limit bounce/iova size
-> > - Create char device rather than anon inode per vduse
-> > - Reuse vhost IOTLB for iova domain
-> > - Rework the message mechnism in control path
-> >
-> > V2 to V3:
-> > - Rework the MMU-based IOMMU driver
-> > - Use the iova domain as iova allocator instead of genpool
-> > - Support transferring vma->vm_file in vhost-vdpa
-> > - Add SVA support in vhost-vdpa
-> > - Remove the patches on bounce pages reclaim
-> >
-> > V1 to V2:
-> > - Add vhost-vdpa support
-> > - Add some documents
-> > - Based on the vdpa management tool
-> > - Introduce a workqueue for irq injection
-> > - Replace interval tree with array map to store the iova_map
-> >
-> > Xie Yongji (10):
-> >   iova: Export alloc_iova_fast() and free_iova_fast();
-> >   file: Export receive_fd() to modules
-> >   eventfd: Increase the recursion depth of eventfd_signal()
-> >   vhost-iotlb: Add an opaque pointer for vhost IOTLB
-> >   vdpa: Add an opaque pointer for vdpa_config_ops.dma_map()
-> >   vdpa: factor out vhost_vdpa_pa_map() and vhost_vdpa_pa_unmap()
-> >   vdpa: Support transferring virtual addressing during DMA mapping
-> >   vduse: Implement an MMU-based IOMMU driver
-> >   vduse: Introduce VDUSE - vDPA Device in Userspace
-> >   Documentation: Add documentation for VDUSE
-> >
-> >  Documentation/userspace-api/index.rst              |    1 +
-> >  Documentation/userspace-api/ioctl/ioctl-number.rst |    1 +
-> >  Documentation/userspace-api/vduse.rst              |  222 +++
-> >  drivers/iommu/iova.c                               |    2 +
-> >  drivers/vdpa/Kconfig                               |   10 +
-> >  drivers/vdpa/Makefile                              |    1 +
-> >  drivers/vdpa/ifcvf/ifcvf_main.c                    |    2 +-
-> >  drivers/vdpa/mlx5/net/mlx5_vnet.c                  |    2 +-
-> >  drivers/vdpa/vdpa.c                                |    9 +-
-> >  drivers/vdpa/vdpa_sim/vdpa_sim.c                   |    8 +-
-> >  drivers/vdpa/vdpa_user/Makefile                    |    5 +
-> >  drivers/vdpa/vdpa_user/iova_domain.c               |  545 ++++++++
-> >  drivers/vdpa/vdpa_user/iova_domain.h               |   73 +
-> >  drivers/vdpa/vdpa_user/vduse_dev.c                 | 1453 ++++++++++++++++++++
-> >  drivers/vdpa/virtio_pci/vp_vdpa.c                  |    2 +-
-> >  drivers/vhost/iotlb.c                              |   20 +-
-> >  drivers/vhost/vdpa.c                               |  148 +-
-> >  fs/eventfd.c                                       |    2 +-
-> >  fs/file.c                                          |    6 +
-> >  include/linux/eventfd.h                            |    5 +-
-> >  include/linux/file.h                               |    7 +-
-> >  include/linux/vdpa.h                               |   21 +-
-> >  include/linux/vhost_iotlb.h                        |    3 +
-> >  include/uapi/linux/vduse.h                         |  143 ++
-> >  24 files changed, 2641 insertions(+), 50 deletions(-)
-> >  create mode 100644 Documentation/userspace-api/vduse.rst
-> >  create mode 100644 drivers/vdpa/vdpa_user/Makefile
-> >  create mode 100644 drivers/vdpa/vdpa_user/iova_domain.c
-> >  create mode 100644 drivers/vdpa/vdpa_user/iova_domain.h
-> >  create mode 100644 drivers/vdpa/vdpa_user/vduse_dev.c
-> >  create mode 100644 include/uapi/linux/vduse.h
-> >
-> > --
-> > 2.11.0
->
-> Hi, Yongji
->
-> Great work! your method is really wise that implements a software IOMMU
-> so that data path gets processed by userspace application efficiently.
-> Sorry, I've just realized your work and patches.
->
->
-> I was working on a similar thing aiming to get vhost-user-blk device
-> from SPDK vhost-target to be exported as local host kernel block device.
-> It's diagram is like this:
->
->
->                                 -----------------------------
-> ------------------------        |    -----------------      |    ---------------------------------------
-> |   <RunC Container>   |     <<<<<<<<| Shared-Memory |>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>        |
-> |       ---------      |     v  |    -----------------      |    |                            v        |
-> |       |dev/vdx|      |     v  |   <virtio-local-agent>    |    |      <Vhost-user Target>   v        |
-> ------------+-----------     v  | ------------------------  |    |  --------------------------v------  |
->             |                v  | |/dev/virtio-local-ctrl|  |    |  | unix socket |   |block driver |  |
->             |                v  ------------+----------------    --------+--------------------v---------
->             |                v              |                            |                    v
-> ------------+----------------v--------------+----------------------------+--------------------v--------|
-> |    | block device |        v      |  Misc device |                     |                    v        |
-> |    -------+--------        v      --------+-------                     |                    v        |
-> |           |                v              |                            |                    v        |
-> | ----------+----------      v              |                            |                    v        |
-> | | virtio-blk driver |      v              |                            |                    v        |
-> | ----------+----------      v              |                            |                    v        |
-> |           | virtio bus     v              |                            |                    v        |
-> |   --------+---+-------     v              |                            |                    v        |
-> |               |            v              |                            |                    v        |
-> |               |            v              |                            |                    v        |
-> |     ----------+----------  v     ---------+-----------                 |                    v        |
-> |     | virtio-blk device |--<----| virtio-local driver |----------------<                    v        |
-> |     ----------+----------       ----------+-----------                                      v        |
-> |                                                                                    ---------+--------|
-> -------------------------------------------------------------------------------------| RNIC |--| PCIe |-
->                                                                                      ----+---  | NVMe |
->                                                                                          |     --------
->                                                                                 ---------+---------
->                                                                                 | Remote Storages |
->                                                                                 -------------------
->
+>> 28.06.2021 10:20, Vitaly Kuznetsov пишет:
+>>> Stas Sergeev <stsp2@yandex.ru> writes:
+>>>
+>>>> When returning to user, the special care is taken about the
+>>>> exception that was already injected to VMCS but not yet to guest.
+>>>> cancel_injection removes such exception from VMCS. It is set as
+>>>> pending, and if the user does KVM_SET_REGS, it gets completely canceled.
+>>>>
+>>>> This didn't happen though, because the vcpu->arch.exception.injected
+>>>> and vcpu->arch.exception.pending were forgotten to update in
+>>>> cancel_injection. As the result, KVM_SET_REGS didn't cancel out
+>>>> anything, and the exception was re-injected on the next KVM_RUN,
+>>>> even though the guest registers (like EIP) were already modified.
+>>>> This was leading to an exception coming from the "wrong place".
+>>> It shouldn't be that hard to reproduce this in selftests, I
+>>> believe.
+>> Unfortunately the problem happens only on core2 CPU. I believe the reason
+>> is perhaps that more modern CPUs do not go to software for the exception
+>> injection?
+> Hm, I've completely missed that from the original description. As I read
+> it, 'cancel_injection' path in vcpu_enter_guest() is always broken when
+> vcpu->arch.exception.injected is set as we forget to clear it...
 
-Oh, yes, this design is similar to VDUSE.
+Yes, cancel_injection is supposed to
+be always broken indeed. But there
+are a few more things to it.
+Namely:
+- Other CPUs do not seem to exhibit
+that path. My guess here is that they
+just handle the exception in hardware,
+without returning to KVM for that. I
+am not sure why Core2 vmexits per
+each page fault. Is it incapable of
+handling the PF in hardware, or maybe
+some other bug is around?
 
->
-> I just draft out. an initial proof version. When seeing your RFC mail,
-> I'm thinking that SPDK target may depends on your work, so I could
-> directly drop mine.
+- Even if you followed the broken
+path, in most cases everything is still
+fine: the exception will just be re-injected.
+The unfortunate scenario is when you
+have _TIF_SIGPENDING at exactly
+right place. Then you go to user-space,
+and the user-space is unlucky to use
+SET_REGS right here. These conditions
+are not very likely to happen. I wrote a
+test-case for it, but it involves the entire
+buildroot setup and you need to wait
+a bit while it is trying to trigger the race.
 
-Great to hear that! I think we can extend VDUSE to meet your needs.
-But I prefer to do that after this initial version merged.
 
-> But after a glance of the RFC patches, seems it is not so easy or
-> efficient to get vduse leveraged by SPDK.
-> (Please correct me, if I get wrong understanding on vduse. :) )
->
-> The large barrier is bounce-buffer mapping: SPDK requires hugepages
-> for NVMe over PCIe and RDMA, so take some preallcoated hugepages to
-> map as bounce buffer is necessary. Or it's hard to avoid an extra
-> memcpy from bounce-buffer to hugepage.
-> If you can add an option to map hugepages as bounce-buffer,
-> then SPDK could also be a potential user of vduse.
->
+>>>    'exception.injected' can even be set through
+>>> KVM_SET_VCPU_EVENTS and then we call KVM_SET_REGS.
+>> Does this mean I shouldn't add WARN_ON_ONCE()?
+> WARN_ON_ONCE() is fine IMO in case there's no valid case when
+> 'vcpu->arch.exception.injected' is set during __set_regs().
 
-I think we can support registering user space memory for bounce-buffer
-use like XDP does. But this needs to pin the pages, so I didn't
-consider it in this initial version.
+But you said:
 
-> It would be better if SPDK vhost-target could leverage the datapath of
-> vduse directly and efficiently. Even the control path is vdpa based,
-> we may work out one daemon as agent to bridge SPDK vhost-target with vduse.
-> Then users who already deployed SPDK vhost-target, can smoothly run
-> some agent daemon without code modification on SPDK vhost-target itself.
+> 'exception.injected' can even be set through
+> KVM_SET_VCPU_EVENTS and then we call KVM_SET_REGS.
 
-That's a good idea!
+... which makes such scenario valid?
 
-> (It is only better-to-have for SPDK vhost-target app, not mandatory for SPDK) :)
-> At least, some small barrier is there that blocked a vhost-target use vduse
-> datapath efficiently:
-> - Current IO completion irq of vduse is IOCTL based. If add one option
-> to get it eventfd based, then vhost-target can directly notify IO
-> completion via negotiated eventfd.
->
+  
 
-Make sense. Actually we did use the eventfd mechanism for this purpose
-in the old version. But using ioctl would be simple, so we choose it
-in this initial version.
+>>
+>>>    Alternatively, we can
+>>> trigger a real exception from the guest. Could you maybe add something
+>>> like this to tools/testing/selftests/kvm/x86_64/set_sregs_test.c?
+>> Even if you have the right CPU to reproduce that (Core2), you also
+>> need the _TIF_SIGPENDING at the right moment to provoke the cancel_injection
+>> path. This is like triggering a race. If you don't get _TIF_SIGPENDING
+>> then it will just re-enter guest and  inject the exception properly.
+> I'd like to understand the hardware dependency first. Is it possible
+> that the exception which causes the problem is not triggered on other
+> CPUs?
 
-Thanks,
-Yongji
+No, exception is triggered, but I
+have never seen the race on any
+other CPUs, and none of the people
+who reported that problem to me,
+have seen it on any other CPU.
+I think other CPU just injects the PF
+without doing any vmexit, but I've
+no idea why Core2 does not do the
+same thing. Should it?
+
