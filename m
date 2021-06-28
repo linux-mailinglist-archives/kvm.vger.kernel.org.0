@@ -2,260 +2,138 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id EA8613B5C20
-	for <lists+kvm@lfdr.de>; Mon, 28 Jun 2021 12:06:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4AB8E3B5C25
+	for <lists+kvm@lfdr.de>; Mon, 28 Jun 2021 12:08:07 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232784AbhF1KIV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 28 Jun 2021 06:08:21 -0400
-Received: from mx13.kaspersky-labs.com ([91.103.66.164]:62072 "EHLO
-        mx13.kaspersky-labs.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232645AbhF1KIP (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 28 Jun 2021 06:08:15 -0400
-Received: from relay13.kaspersky-labs.com (unknown [127.0.0.10])
-        by relay13.kaspersky-labs.com (Postfix) with ESMTP id A844452279D;
-        Mon, 28 Jun 2021 13:05:46 +0300 (MSK)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kaspersky.com;
-        s=mail202102; t=1624874746;
-        bh=tKmtQQ01ctaYFWRFYY1ssjg0jyWvxlv52Sbi846U5a4=;
-        h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type;
-        b=GDBii2Mi1y39+64Hwu+ced6NiEIgoIoKKFiqJdDDY8ajlKpX3EMFVeouQYSniaV7O
-         5Yu+DV7FReYZkPPRkw2QpWiH6j5e7uPZoxwCr6RNTdNeov7jlwc5Rbz8r6OwHXa7ca
-         ZD6couPfmh/8RZ3SuOzlvfjGrueL9L21T107kEQ9TqTJ95J+zW09x8wf1HvLsGkw8N
-         8IY/Xh8rvObYKVprSQMjqHvwfa1QENFti9ZCfeXtO6ghnBlkRLCOzQhv8N0ZAupU59
-         HEADlKIF7oLl9jSEH7NCu1ZWZxiWoem7ybqjmIkNxYIaF27sv0sE6vkgadpnl9ov4T
-         r2GZWiGH2AOEw==
-Received: from mail-hq2.kaspersky.com (unknown [91.103.66.206])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-SHA256 (128/128 bits))
-        (Client CN "mail-hq2.kaspersky.com", Issuer "Kaspersky MailRelays CA G3" (verified OK))
-        by mailhub13.kaspersky-labs.com (Postfix) with ESMTPS id 658BC5227E1;
-        Mon, 28 Jun 2021 13:05:46 +0300 (MSK)
-Received: from arseniy-pc.avp.ru (10.64.68.129) by hqmailmbx3.avp.ru
- (10.64.67.243) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2176.14; Mon, 28
- Jun 2021 13:05:45 +0300
-From:   Arseny Krasnov <arseny.krasnov@kaspersky.com>
-To:     Stefan Hajnoczi <stefanha@redhat.com>,
-        Stefano Garzarella <sgarzare@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Arseny Krasnov <arseny.krasnov@kaspersky.com>,
-        Jorgen Hansen <jhansen@vmware.com>,
-        Norbert Slusarek <nslusarek@gmx.net>,
-        Colin Ian King <colin.king@canonical.com>,
-        Andra Paraschiv <andraprs@amazon.com>
-CC:     <kvm@vger.kernel.org>, <virtualization@lists.linux-foundation.org>,
-        <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <oxffffaa@gmail.com>
-Subject: [RFC PATCH v1 16/16] vsock_test: SEQPACKET read to broken buffer
-Date:   Mon, 28 Jun 2021 13:05:36 +0300
-Message-ID: <20210628100539.572000-1-arseny.krasnov@kaspersky.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20210628095959.569772-1-arseny.krasnov@kaspersky.com>
-References: <20210628095959.569772-1-arseny.krasnov@kaspersky.com>
+        id S232598AbhF1KKb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 28 Jun 2021 06:10:31 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:59501 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S232557AbhF1KK3 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 28 Jun 2021 06:10:29 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1624874884;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=acIMkFdI63AfUwOvhp5SrYDC8917vAjrM2I0aI+kJbA=;
+        b=dXk83DvXfdOa/bLyna33shK71ymCrqq4uxLumOuq+qN23hTQ3c9K8aPH6JBrytgCoqfJa7
+        Hw6mSQdwDnWwXDX06rIoYZ6SO/b5HqFyCjpNcG+v8X8JzTzg5+19p6NREIBbo/QQszI0jd
+        Si9cYWLPSF/CpFwjROzUeT5lNztlq/o=
+Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
+ [209.85.218.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-214-jSXS-VLHOrWXHCs0xaoeFw-1; Mon, 28 Jun 2021 06:08:00 -0400
+X-MC-Unique: jSXS-VLHOrWXHCs0xaoeFw-1
+Received: by mail-ej1-f71.google.com with SMTP id u4-20020a1709061244b02904648b302151so4144537eja.17
+        for <kvm@vger.kernel.org>; Mon, 28 Jun 2021 03:08:00 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
+         :message-id:mime-version:content-transfer-encoding;
+        bh=acIMkFdI63AfUwOvhp5SrYDC8917vAjrM2I0aI+kJbA=;
+        b=T4DO40gjF1B7Mh6zz1CwJ7MSMG9dJHTCELabrBh0Enz9tlvIe7uEfH359LZw7PP3Hk
+         m8iWBqBUg6yb6GVFQfVs39I6FE8oc1d4NSnFR3U3q9UIqEKUf8Dky4zlyr5VCECMDKXL
+         KEzl2Y87k0Pl3zL6rtS+1MDMrtXvJwzzcKdRCc6qLfm8bqUFg0BTQQUI9q7nLBR4hpCo
+         NAn7K0mLcJzhySorlcvIlACW1PhPm2Tzs+d+tjmE2TsenTRX4/ixzvcxKRyNzoK5kAoa
+         4Ts8H32EtwiZj9CXY4Okuo5zpYDf52lLcFShLhIRXrOKGEmn/Dgz86ji6yvGnxt0Id9h
+         HXiA==
+X-Gm-Message-State: AOAM532JzyATsnSeld66NkrRl5N1qNYQ9p+jXOXEmZkanYa/EYmXvPU7
+        YGSR4J8yQ3PyCNqvrH2e1IXwUBbaADmyPaGR8S9st5yBQcrWQ7liACtZTnIusC75ulaF52GiGcQ
+        4uEoJq2xzc7jIKqn/D38COc8+rDTi3ZhWbVKmL8b6/qL+rRpV9c8uOzzq54NAzZM5
+X-Received: by 2002:a05:6402:848:: with SMTP id b8mr31611229edz.44.1624874879385;
+        Mon, 28 Jun 2021 03:07:59 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxNxKZUWMCsM/y10314aaOMWYNEgEDfMcpMVbB7c6pvO80W85f7r6gTc2EVOl/YY4SKwC7DzQ==
+X-Received: by 2002:a05:6402:848:: with SMTP id b8mr31611199edz.44.1624874879205;
+        Mon, 28 Jun 2021 03:07:59 -0700 (PDT)
+Received: from vitty.brq.redhat.com (g-server-2.ign.cz. [91.219.240.2])
+        by smtp.gmail.com with ESMTPSA id k21sm6308798edr.90.2021.06.28.03.07.58
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 28 Jun 2021 03:07:58 -0700 (PDT)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     stsp <stsp2@yandex.ru>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
+        kvm@vger.kernel.org
+Subject: Re: [PATCH] KVM: X86: Fix exception untrigger on ret to user
+In-Reply-To: <b3ee97c8-318a-3134-07c7-75114e96b7cf@yandex.ru>
+References: <20210627233819.857906-1-stsp2@yandex.ru>
+ <87zgva3162.fsf@vitty.brq.redhat.com>
+ <b3ee97c8-318a-3134-07c7-75114e96b7cf@yandex.ru>
+Date:   Mon, 28 Jun 2021 12:07:57 +0200
+Message-ID: <87o8bq2tfm.fsf@vitty.brq.redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Originating-IP: [10.64.68.129]
-X-ClientProxiedBy: hqmailmbx2.avp.ru (10.64.67.242) To hqmailmbx3.avp.ru
- (10.64.67.243)
-X-KSE-ServerInfo: hqmailmbx3.avp.ru, 9
-X-KSE-AntiSpam-Interceptor-Info: scan successful
-X-KSE-AntiSpam-Version: 5.9.20, Database issued on: 06/28/2021 09:47:58
-X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
-X-KSE-AntiSpam-Method: none
-X-KSE-AntiSpam-Rate: 0
-X-KSE-AntiSpam-Info: Lua profiles 164664 [Jun 28 2021]
-X-KSE-AntiSpam-Info: Version: 5.9.20.0
-X-KSE-AntiSpam-Info: Envelope from: arseny.krasnov@kaspersky.com
-X-KSE-AntiSpam-Info: LuaCore: 448 448 71fb1b37213ce9a885768d4012c46ac449c77b17
-X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
-X-KSE-AntiSpam-Info: 127.0.0.199:7.1.2;kaspersky.com:7.1.1;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;arseniy-pc.avp.ru:7.1.1
-X-KSE-AntiSpam-Info: Rate: 0
-X-KSE-AntiSpam-Info: Status: not_detected
-X-KSE-AntiSpam-Info: Method: none
-X-KSE-Antiphishing-Info: Clean
-X-KSE-Antiphishing-ScanningType: Deterministic
-X-KSE-Antiphishing-Method: None
-X-KSE-Antiphishing-Bases: 06/28/2021 09:51:00
-X-KSE-AttachmentFiltering-Interceptor-Info: no applicable attachment filtering
- rules found
-X-KSE-Antivirus-Interceptor-Info: scan successful
-X-KSE-Antivirus-Info: Clean, bases: 28.06.2021 5:59:00
-X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
-X-KSE-AttachmentFiltering-Interceptor-Info: no applicable attachment filtering
- rules found
-X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
-X-KLMS-Rule-ID: 52
-X-KLMS-Message-Action: clean
-X-KLMS-AntiSpam-Status: not scanned, disabled by settings
-X-KLMS-AntiSpam-Interceptor-Info: not scanned
-X-KLMS-AntiPhishing: Clean, bases: 2021/06/28 08:23:00
-X-KLMS-AntiVirus: Kaspersky Security for Linux Mail Server, version 8.0.3.30, bases: 2021/06/28 05:40:00 #16806866
-X-KLMS-AntiVirus-Status: Clean, skipped
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Add test where sender sends two message, each with own
-data pattern. Reader tries to read first to broken buffer:
-it has three pages size, but middle page is unmapped. Then,
-reader tries to read second message to valid buffer. Test
-checks, that uncopied part of first message was dropped
-and thus not copied as part of second message.
+stsp <stsp2@yandex.ru> writes:
 
-Signed-off-by: Arseny Krasnov <arseny.krasnov@kaspersky.com>
----
- tools/testing/vsock/vsock_test.c | 121 +++++++++++++++++++++++++++++++
- 1 file changed, 121 insertions(+)
+> 28.06.2021 10:20, Vitaly Kuznetsov =D0=BF=D0=B8=D1=88=D0=B5=D1=82:
+>> Stas Sergeev <stsp2@yandex.ru> writes:
+>>
+>>> When returning to user, the special care is taken about the
+>>> exception that was already injected to VMCS but not yet to guest.
+>>> cancel_injection removes such exception from VMCS. It is set as
+>>> pending, and if the user does KVM_SET_REGS, it gets completely canceled.
+>>>
+>>> This didn't happen though, because the vcpu->arch.exception.injected
+>>> and vcpu->arch.exception.pending were forgotten to update in
+>>> cancel_injection. As the result, KVM_SET_REGS didn't cancel out
+>>> anything, and the exception was re-injected on the next KVM_RUN,
+>>> even though the guest registers (like EIP) were already modified.
+>>> This was leading to an exception coming from the "wrong place".
+>> It shouldn't be that hard to reproduce this in selftests, I
+>> believe.
+>
+> Unfortunately the problem happens only on core2 CPU. I believe the reason
+> is perhaps that more modern CPUs do not go to software for the exception
+> injection?
 
-diff --git a/tools/testing/vsock/vsock_test.c b/tools/testing/vsock/vsock_test.c
-index 67766bfe176f..697ba168e97f 100644
---- a/tools/testing/vsock/vsock_test.c
-+++ b/tools/testing/vsock/vsock_test.c
-@@ -16,6 +16,7 @@
- #include <linux/kernel.h>
- #include <sys/types.h>
- #include <sys/socket.h>
-+#include <sys/mman.h>
- 
- #include "timeout.h"
- #include "control.h"
-@@ -385,6 +386,121 @@ static void test_seqpacket_msg_trunc_server(const struct test_opts *opts)
- 	close(fd);
- }
- 
-+#define BUF_PATTERN_1 'a'
-+#define BUF_PATTERN_2 'b'
-+
-+static void test_seqpacket_invalid_rec_buffer_client(const struct test_opts *opts)
-+{
-+	int fd;
-+	unsigned char *buf1;
-+	unsigned char *buf2;
-+	int buf_size = getpagesize() * 3;
-+
-+	fd = vsock_seqpacket_connect(opts->peer_cid, 1234);
-+	if (fd < 0) {
-+		perror("connect");
-+		exit(EXIT_FAILURE);
-+	}
-+
-+	buf1 = malloc(buf_size);
-+	if (buf1 == NULL) {
-+		perror("'malloc()' for 'buf1'");
-+		exit(EXIT_FAILURE);
-+	}
-+
-+	buf2 = malloc(buf_size);
-+	if (buf2 == NULL) {
-+		perror("'malloc()' for 'buf2'");
-+		exit(EXIT_FAILURE);
-+	}
-+
-+	memset(buf1, BUF_PATTERN_1, buf_size);
-+	memset(buf2, BUF_PATTERN_2, buf_size);
-+
-+	if (send(fd, buf1, buf_size, 0) != buf_size) {
-+		perror("send failed");
-+		exit(EXIT_FAILURE);
-+	}
-+
-+	if (send(fd, buf2, buf_size, 0) != buf_size) {
-+		perror("send failed");
-+		exit(EXIT_FAILURE);
-+	}
-+
-+	close(fd);
-+}
-+
-+static void test_seqpacket_invalid_rec_buffer_server(const struct test_opts *opts)
-+{
-+	int fd;
-+	unsigned char *broken_buf;
-+	unsigned char *valid_buf;
-+	int page_size = getpagesize();
-+	int buf_size = page_size * 3;
-+	ssize_t res;
-+	int prot = PROT_READ | PROT_WRITE;
-+	int flags = MAP_PRIVATE | MAP_ANONYMOUS;
-+	int i;
-+
-+	fd = vsock_seqpacket_accept(VMADDR_CID_ANY, 1234, NULL);
-+	if (fd < 0) {
-+		perror("accept");
-+		exit(EXIT_FAILURE);
-+	}
-+
-+	/* Setup first buffer. */
-+	broken_buf = mmap(NULL, buf_size, prot, flags, -1, 0);
-+	if (broken_buf == MAP_FAILED) {
-+		perror("mmap for 'broken_buf'");
-+		exit(EXIT_FAILURE);
-+	}
-+
-+	/* Unmap "hole" in buffer. */
-+	if (munmap(broken_buf + page_size, page_size)) {
-+		perror("'broken_buf' setup");
-+		exit(EXIT_FAILURE);
-+	}
-+
-+	valid_buf = mmap(NULL, buf_size, prot, flags, -1, 0);
-+	if (valid_buf == MAP_FAILED) {
-+		perror("mmap for 'valid_buf'");
-+		exit(EXIT_FAILURE);
-+	}
-+
-+	/* Try to fill buffer with unmapped middle. */
-+	res = read(fd, broken_buf, buf_size);
-+	if (res != -1) {
-+		perror("invalid read result of 'broken_buf'");
-+		exit(EXIT_FAILURE);
-+	}
-+
-+	if (errno != ENOMEM) {
-+		perror("invalid errno of 'broken_buf'");
-+		exit(EXIT_FAILURE);
-+	}
-+
-+	/* Try to fill valid buffer. */
-+	res = read(fd, valid_buf, buf_size);
-+	if (res != buf_size) {
-+		perror("invalid read result of 'valid_buf'");
-+		exit(EXIT_FAILURE);
-+	}
-+
-+	for (i = 0; i < buf_size; i++) {
-+		if (valid_buf[i] != BUF_PATTERN_2) {
-+			perror("invalid pattern for valid buf");
-+			exit(EXIT_FAILURE);
-+		}
-+	}
-+
-+
-+	/* Unmap buffers. */
-+	munmap(broken_buf, page_size);
-+	munmap(broken_buf + page_size * 2, page_size);
-+	munmap(valid_buf, buf_size);
-+	close(fd);
-+}
-+
- static struct test_case test_cases[] = {
- 	{
- 		.name = "SOCK_STREAM connection reset",
-@@ -425,6 +541,11 @@ static struct test_case test_cases[] = {
- 		.run_client = test_seqpacket_msg_trunc_client,
- 		.run_server = test_seqpacket_msg_trunc_server,
- 	},
-+	{
-+		.name = "SOCK_SEQPACKET invalid receive buffer",
-+		.run_client = test_seqpacket_invalid_rec_buffer_client,
-+		.run_server = test_seqpacket_invalid_rec_buffer_server,
-+	},
- 	{},
- };
- 
--- 
-2.25.1
+Hm, I've completely missed that from the original description. As I read
+it, 'cancel_injection' path in vcpu_enter_guest() is always broken when
+vcpu->arch.exception.injected is set as we forget to clear it...
+
+>
+>
+>>   'exception.injected' can even be set through
+>> KVM_SET_VCPU_EVENTS and then we call KVM_SET_REGS.
+>
+> Does this mean I shouldn't add WARN_ON_ONCE()?
+
+WARN_ON_ONCE() is fine IMO in case there's no valid case when
+'vcpu->arch.exception.injected' is set during __set_regs(). selftest is
+needed to check for '... this was leading to an exception coming from
+the "wrong place"'.
+
+>
+>
+>>   Alternatively, we can
+>> trigger a real exception from the guest. Could you maybe add something
+>> like this to tools/testing/selftests/kvm/x86_64/set_sregs_test.c?
+> Even if you have the right CPU to reproduce that (Core2), you also
+> need the _TIF_SIGPENDING at the right moment to provoke the cancel_inject=
+ion
+> path. This is like triggering a race. If you don't get _TIF_SIGPENDING
+> then it will just re-enter guest and  inject the exception properly.
+
+I'd like to understand the hardware dependency first. Is it possible
+that the exception which causes the problem is not triggered on other
+CPUs? We can find a different way to trigger an exception from selftest
+then.
+
+(Maybe it's just me who still struggles to see the full picure here,
+hope Sean/Paolo will see the problem you're trying to address in no
+time)
+
+--=20
+Vitaly
 
