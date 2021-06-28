@@ -2,96 +2,211 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 064D33B66E8
-	for <lists+kvm@lfdr.de>; Mon, 28 Jun 2021 18:39:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3E1B53B66F4
+	for <lists+kvm@lfdr.de>; Mon, 28 Jun 2021 18:47:02 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231877AbhF1QmU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 28 Jun 2021 12:42:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37294 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231719AbhF1QmS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 28 Jun 2021 12:42:18 -0400
-Received: from mail-ot1-x330.google.com (mail-ot1-x330.google.com [IPv6:2607:f8b0:4864:20::330])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3E54AC061574
-        for <kvm@vger.kernel.org>; Mon, 28 Jun 2021 09:39:52 -0700 (PDT)
-Received: by mail-ot1-x330.google.com with SMTP id g19-20020a9d12930000b0290457fde18ad0so19405240otg.1
-        for <kvm@vger.kernel.org>; Mon, 28 Jun 2021 09:39:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=902eAWMv5ipiq/bYMJrSz0Lqst1L2tCLc8+/C521zeg=;
-        b=Srj8TY5XSww8YIXM8al1Oskt8S0Etqtf4Bs6BqwYPawuGMZqsQrAH5FWaz45qoppHv
-         nnhJY/lviEvRHHUTmkrSSoLSxELe5R+DcoFS3xCx7IdQqlZ818OFhkudWsEGszOfEoKI
-         jmEL2Brh0c7azylG6H94rnEY98SG3HAWULy5ssMnUnZD4xkoN7b869wyobhaR1BOnypJ
-         M2MNz7+udfJ2daZYyc/aT/0fMRuw9hvJH1Z2QqNSliLDwpdS5qf9EVkAW/CF3tcs0fcP
-         toB3GpJ+9IVgnNf4TU42M3UNgn8GLlsPWe6mQnMTEspnnxXfZ2PCCZrMQbSR2gf6apfm
-         q/lg==
+        id S231932AbhF1Qt1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 28 Jun 2021 12:49:27 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:47394 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S231742AbhF1Qt0 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 28 Jun 2021 12:49:26 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1624898819;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=7MifffiS+acjcOIrb7s3F8SlUQ2sNfURVZ4a746RSsA=;
+        b=D2fjS8EMGyyEH+k9v5W/LXnsvkOviK/VIh7GK71/q8Qfp651f5CYctPUfkBiiEDp+fZk/e
+        9uVXTgce9GTnFDDpDSHabwqvnjGbMNCK4qIFpOr2KpolWneSS3GE6E1WXpasOuHAfV4Cul
+        qCx5x2OW0+Jii1NJhzmBFA+vESslgIc=
+Received: from mail-ot1-f70.google.com (mail-ot1-f70.google.com
+ [209.85.210.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-224-rkrOAkOYN1Wq_E0bUC8XcQ-1; Mon, 28 Jun 2021 12:46:58 -0400
+X-MC-Unique: rkrOAkOYN1Wq_E0bUC8XcQ-1
+Received: by mail-ot1-f70.google.com with SMTP id a60-20020a9d26420000b0290448d2be15e6so13501365otb.23
+        for <kvm@vger.kernel.org>; Mon, 28 Jun 2021 09:46:58 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=902eAWMv5ipiq/bYMJrSz0Lqst1L2tCLc8+/C521zeg=;
-        b=FOVt3OGWTgsPHbEu7H3S3pSp9qp76BGrb84rmG4ZmTqswDaij9NtvdazJkjJEjbdN5
-         z2hh5VbgGvgHB3hcKEK7Mr9T1lzuILBDUYjk4ftMOJ9mYAWdMx47arUon3bOdRoNUdzz
-         tRRPRIYkhLvgw2odX9+FKzuMTYcb1m+cgZWbPwS4DnaLQncHZel9zsp1eUMmah0esGZa
-         D+2ZOQjDpxwdzb+yZSF1k10oti7jAYsl1a+VTIrnH9GExXig8hIkAqWak1T8xC0LNpjC
-         E3vtjYErtCYWyjmMbjaoYxBtjc0UYDejHKt41YetA8a/UQ2K3nGLjM2qQBRl5uWbhB2a
-         WfRQ==
-X-Gm-Message-State: AOAM53367mvuLXRboT/ZfuFXJCVnlBRWX/tHfbtL5mYqmR3O/HT/yH9o
-        FTBatX7N+eV+x7Jut+OocHwOcRxzKsqTsI+QNBRetg==
-X-Google-Smtp-Source: ABdhPJzkJsq+y+xvUJsgTcox+V1+MiHQBju5JHDPUZ6D3On0HMSaonm5zQErjMsK79yUWxegXRklUx30XduXoRD73j8=
-X-Received: by 2002:a9d:550e:: with SMTP id l14mr376697oth.241.1624898391199;
- Mon, 28 Jun 2021 09:39:51 -0700 (PDT)
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=7MifffiS+acjcOIrb7s3F8SlUQ2sNfURVZ4a746RSsA=;
+        b=dpVOOrzCmcDNjDMF/77DX/nWdfo3VMkWYM91Q6Xeal9LbbgDaTQ8+7JUnPf+KJ4PNu
+         XnNhkrGgcNf9imjQmKk51CNlfZ5d1aQyCz8ac+6JsRqgW6CpKsA8kZsAvu5u/oX+pExH
+         ag4UV1SZZFaZHAHoc8TTKxU27V4YOlCKTpZh1lRplCXgXEbfXOMsE9o0oZrHNd+CeYiY
+         6uhJQ+vUCzQFAUoJkgoBfMjRZLsMtFFSuiR4Cp81N70zg7Fotlbj47niwdb0To+HH4cq
+         KS39ZrSmesOEEsa/h+9rB/xfcZ9lZ9SQ0oiSw90dQrSQ7qH1yjCV0BtPlBaTWzadxkWr
+         +vqQ==
+X-Gm-Message-State: AOAM5335gZ4eU2ByguLLhgqXcaebgrYe6O5GL9IbWbg+d6w1zIan0t98
+        9gqSKArGRJSLDvx7k65pexSqdAJwLzbBfpAwjmfXY1/gWXkVRr8MCP+GOBdkX3Wm9B3SEst3Sfm
+        5vw4p7ci26Q0x
+X-Received: by 2002:aca:5dc6:: with SMTP id r189mr21612175oib.164.1624898816649;
+        Mon, 28 Jun 2021 09:46:56 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxUUwiSUZg0XsDMMhjRSmwKfYYb3ef1s71inHnWG0QtR4WyEMBmcy/t6OcgoQ5y2A8XA54hGw==
+X-Received: by 2002:aca:5dc6:: with SMTP id r189mr21612161oib.164.1624898816387;
+        Mon, 28 Jun 2021 09:46:56 -0700 (PDT)
+Received: from redhat.com ([198.99.80.109])
+        by smtp.gmail.com with ESMTPSA id y5sm3458144otq.5.2021.06.28.09.46.55
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 28 Jun 2021 09:46:55 -0700 (PDT)
+Date:   Mon, 28 Jun 2021 10:46:53 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     alex.williamson@redhat.com
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org, jgg@nvidia.com,
+        peterx@redhat.com, prime.zeng@hisilicon.com, cohuck@redhat.com
+Subject: Re: [PATCH v2] vfio/pci: Handle concurrent vma faults
+Message-ID: <20210628104653.4ca65921.alex.williamson@redhat.com>
+In-Reply-To: <161540257788.10151.6284852774772157400.stgit@gimli.home>
+References: <161540257788.10151.6284852774772157400.stgit@gimli.home>
+X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-References: <20210627233819.857906-1-stsp2@yandex.ru> <87zgva3162.fsf@vitty.brq.redhat.com>
- <b3ee97c8-318a-3134-07c7-75114e96b7cf@yandex.ru> <87o8bq2tfm.fsf@vitty.brq.redhat.com>
- <b08399e2-ce68-e895-ed0d-b97920f721ce@yandex.ru> <87lf6u2r6v.fsf@vitty.brq.redhat.com>
- <17c7da34-7a54-017e-1c2f-870d7e2c5ed7@yandex.ru>
-In-Reply-To: <17c7da34-7a54-017e-1c2f-870d7e2c5ed7@yandex.ru>
-From:   Jim Mattson <jmattson@google.com>
-Date:   Mon, 28 Jun 2021 09:39:39 -0700
-Message-ID: <CALMp9eRJedCx6AMW+gMBMeMvGRzn6uzB0wtAzTDRLdYMB1Kc5Q@mail.gmail.com>
-Subject: Re: [PATCH] KVM: X86: Fix exception untrigger on ret to user
-To:     stsp <stsp2@yandex.ru>
-Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
-        kvm@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Jun 28, 2021 at 4:27 AM stsp <stsp2@yandex.ru> wrote:
->
-> 28.06.2021 13:56, Vitaly Kuznetsov =D0=BF=D0=B8=D1=88=D0=B5=D1=82:
-> > stsp <stsp2@yandex.ru> writes:
-> >
-> >> Yes, cancel_injection is supposed to
-> >> be always broken indeed. But there
-> >> are a few more things to it.
-> >> Namely:
-> >> - Other CPUs do not seem to exhibit
-> >> that path. My guess here is that they
-> >> just handle the exception in hardware,
-> >> without returning to KVM for that. I
-> >> am not sure why Core2 vmexits per
-> >> each page fault. Is it incapable of
-> >> handling the PF in hardware, or maybe
-> >> some other bug is around?
-> > Wild guess: no EPT support and running on shadow pages?
->
-> That's something you should tell
-> me, and not the other way around. :)
-> I am just working with kvm as a user.
->
-Yes, with shadow paging, kvm intercepts all guest page faults. You
-should be able to replicate this behavior on modern CPUs by adding
-"ept=3DN" to the kvm_intel module parameters.
+On Wed, 10 Mar 2021 11:58:07 -0700
+Alex Williamson <alex.williamson@redhat.com> wrote:
+
+> vfio_pci_mmap_fault() incorrectly makes use of io_remap_pfn_range()
+> from within a vm_ops fault handler.  This function will trigger a
+> BUG_ON if it encounters a populated pte within the remapped range,
+> where any fault is meant to populate the entire vma.  Concurrent
+> inflight faults to the same vma will therefore hit this issue,
+> triggering traces such as:
+> 
+> [ 1591.733256] kernel BUG at mm/memory.c:2177!
+> [ 1591.739515] Internal error: Oops - BUG: 0 [#1] PREEMPT SMP
+> [ 1591.747381] Modules linked in: vfio_iommu_type1 vfio_pci vfio_virqfd vfio pv680_mii(O)
+> [ 1591.760536] CPU: 2 PID: 227 Comm: lcore-worker-2 Tainted: G O 5.11.0-rc3+ #1
+> [ 1591.770735] Hardware name:  , BIOS HixxxxFPGA 1P B600 V121-1
+> [ 1591.778872] pstate: 40400009 (nZcv daif +PAN -UAO -TCO BTYPE=--)
+> [ 1591.786134] pc : remap_pfn_range+0x214/0x340
+> [ 1591.793564] lr : remap_pfn_range+0x1b8/0x340
+> [ 1591.799117] sp : ffff80001068bbd0
+> [ 1591.803476] x29: ffff80001068bbd0 x28: 0000042eff6f0000
+> [ 1591.810404] x27: 0000001100910000 x26: 0000001300910000
+> [ 1591.817457] x25: 0068000000000fd3 x24: ffffa92f1338e358
+> [ 1591.825144] x23: 0000001140000000 x22: 0000000000000041
+> [ 1591.832506] x21: 0000001300910000 x20: ffffa92f141a4000
+> [ 1591.839520] x19: 0000001100a00000 x18: 0000000000000000
+> [ 1591.846108] x17: 0000000000000000 x16: ffffa92f11844540
+> [ 1591.853570] x15: 0000000000000000 x14: 0000000000000000
+> [ 1591.860768] x13: fffffc0000000000 x12: 0000000000000880
+> [ 1591.868053] x11: ffff0821bf3d01d0 x10: ffff5ef2abd89000
+> [ 1591.875932] x9 : ffffa92f12ab0064 x8 : ffffa92f136471c0
+> [ 1591.883208] x7 : 0000001140910000 x6 : 0000000200000000
+> [ 1591.890177] x5 : 0000000000000001 x4 : 0000000000000001
+> [ 1591.896656] x3 : 0000000000000000 x2 : 0168044000000fd3
+> [ 1591.903215] x1 : ffff082126261880 x0 : fffffc2084989868
+> [ 1591.910234] Call trace:
+> [ 1591.914837]  remap_pfn_range+0x214/0x340
+> [ 1591.921765]  vfio_pci_mmap_fault+0xac/0x130 [vfio_pci]
+> [ 1591.931200]  __do_fault+0x44/0x12c
+> [ 1591.937031]  handle_mm_fault+0xcc8/0x1230
+> [ 1591.942475]  do_page_fault+0x16c/0x484
+> [ 1591.948635]  do_translation_fault+0xbc/0xd8
+> [ 1591.954171]  do_mem_abort+0x4c/0xc0
+> [ 1591.960316]  el0_da+0x40/0x80
+> [ 1591.965585]  el0_sync_handler+0x168/0x1b0
+> [ 1591.971608]  el0_sync+0x174/0x180
+> [ 1591.978312] Code: eb1b027f 540000c0 f9400022 b4fffe02 (d4210000)
+> 
+> Switch to using vmf_insert_pfn() to allow replacing mappings, and
+> include decrypted memory protection as formerly provided by
+> io_remap_pfn_range().  Tracking of vmas is also updated to
+> prevent duplicate entries.
+> 
+> Fixes: 11c4cd07ba11 ("vfio-pci: Fault mmaps to enable vma tracking")
+> Reported-by: Zeng Tao <prime.zeng@hisilicon.com>
+> Suggested-by: Zeng Tao <prime.zeng@hisilicon.com>
+> Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
+> ---
+> 
+> v2: Set decrypted pgprot in mmap, use non-_prot vmf_insert_pfn()
+>     as suggested by Jason G.
+
+IIRC, there were no blocking issues on this patch as an interim fix to
+resolve the concurrent fault issues with io_remap_pfn_range().
+Unfortunately it also got no Reviewed-by or Tested-by feedback.  I'd
+like to put this in for v5.14 (should have gone in earlier).  Any final
+comments?  Thanks,
+
+Alex
+
+> 
+>  drivers/vfio/pci/vfio_pci.c |   30 ++++++++++++++++++------------
+>  1 file changed, 18 insertions(+), 12 deletions(-)
+> 
+> diff --git a/drivers/vfio/pci/vfio_pci.c b/drivers/vfio/pci/vfio_pci.c
+> index 65e7e6b44578..73e125d73640 100644
+> --- a/drivers/vfio/pci/vfio_pci.c
+> +++ b/drivers/vfio/pci/vfio_pci.c
+> @@ -1573,6 +1573,11 @@ static int __vfio_pci_add_vma(struct vfio_pci_device *vdev,
+>  {
+>  	struct vfio_pci_mmap_vma *mmap_vma;
+>  
+> +	list_for_each_entry(mmap_vma, &vdev->vma_list, vma_next) {
+> +		if (mmap_vma->vma == vma)
+> +			return 0; /* Swallow the error, the vma is tracked */
+> +	}
+> +
+>  	mmap_vma = kmalloc(sizeof(*mmap_vma), GFP_KERNEL);
+>  	if (!mmap_vma)
+>  		return -ENOMEM;
+> @@ -1612,31 +1617,31 @@ static vm_fault_t vfio_pci_mmap_fault(struct vm_fault *vmf)
+>  {
+>  	struct vm_area_struct *vma = vmf->vma;
+>  	struct vfio_pci_device *vdev = vma->vm_private_data;
+> -	vm_fault_t ret = VM_FAULT_NOPAGE;
+> +	unsigned long vaddr = vma->vm_start, pfn = vma->vm_pgoff;
+> +	vm_fault_t ret = VM_FAULT_SIGBUS;
+>  
+>  	mutex_lock(&vdev->vma_lock);
+>  	down_read(&vdev->memory_lock);
+>  
+> -	if (!__vfio_pci_memory_enabled(vdev)) {
+> -		ret = VM_FAULT_SIGBUS;
+> -		mutex_unlock(&vdev->vma_lock);
+> +	if (!__vfio_pci_memory_enabled(vdev))
+>  		goto up_out;
+> +
+> +	for (; vaddr < vma->vm_end; vaddr += PAGE_SIZE, pfn++) {
+> +		ret = vmf_insert_pfn(vma, vaddr, pfn);
+> +		if (ret != VM_FAULT_NOPAGE) {
+> +			zap_vma_ptes(vma, vma->vm_start, vaddr - vma->vm_start);
+> +			goto up_out;
+> +		}
+>  	}
+>  
+>  	if (__vfio_pci_add_vma(vdev, vma)) {
+>  		ret = VM_FAULT_OOM;
+> -		mutex_unlock(&vdev->vma_lock);
+> -		goto up_out;
+> +		zap_vma_ptes(vma, vma->vm_start, vma->vm_end - vma->vm_start);
+>  	}
+>  
+> -	mutex_unlock(&vdev->vma_lock);
+> -
+> -	if (io_remap_pfn_range(vma, vma->vm_start, vma->vm_pgoff,
+> -			       vma->vm_end - vma->vm_start, vma->vm_page_prot))
+> -		ret = VM_FAULT_SIGBUS;
+> -
+>  up_out:
+>  	up_read(&vdev->memory_lock);
+> +	mutex_unlock(&vdev->vma_lock);
+>  	return ret;
+>  }
+>  
+> @@ -1702,6 +1707,7 @@ static int vfio_pci_mmap(void *device_data, struct vm_area_struct *vma)
+>  
+>  	vma->vm_private_data = vdev;
+>  	vma->vm_page_prot = pgprot_noncached(vma->vm_page_prot);
+> +	vma->vm_page_prot = pgprot_decrypted(vma->vm_page_prot);
+>  	vma->vm_pgoff = (pci_resource_start(pdev, index) >> PAGE_SHIFT) + pgoff;
+>  
+>  	/*
+> 
+
