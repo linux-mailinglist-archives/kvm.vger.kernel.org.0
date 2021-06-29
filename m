@@ -2,190 +2,140 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8120B3B6F22
-	for <lists+kvm@lfdr.de>; Tue, 29 Jun 2021 10:15:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DC2E63B6FE1
+	for <lists+kvm@lfdr.de>; Tue, 29 Jun 2021 11:06:59 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232409AbhF2IRP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 29 Jun 2021 04:17:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46482 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232391AbhF2IRO (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 29 Jun 2021 04:17:14 -0400
-Received: from mail-ej1-x635.google.com (mail-ej1-x635.google.com [IPv6:2a00:1450:4864:20::635])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6F7B3C061760
-        for <kvm@vger.kernel.org>; Tue, 29 Jun 2021 01:14:47 -0700 (PDT)
-Received: by mail-ej1-x635.google.com with SMTP id b2so3542344ejg.8
-        for <kvm@vger.kernel.org>; Tue, 29 Jun 2021 01:14:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance-com.20150623.gappssmtp.com; s=20150623;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=uptPqcgshGnCftIWPnxGiyLOnUUUIP0/+ojiVFO1k00=;
-        b=DRDFZWTpGi9GCyTDEZBHK+CH/M843cbtTy9vUm8a5IsHg/jkfiUZbd4xYJX6iZu6cW
-         9GFiPjoCONUMKxg5SnLXbhDBJ/pjzDoy1JqsZXHVy8Kr2mESTA8qWpG1fam0YYiIMbhU
-         9GQywd2enJcCN300YNcOenjqf+z61wovjpxOBODz/aIV6xIqUGQr1Ssg3Hyiv4mAs1Cc
-         kfrvmN8IkAPcaOiP2ZLt/twpqM4r/ihXgA9G7NK7+twdlzhXEEjkO9OxziYqElX+Wri1
-         /EcksaYxLEvAl4P9igdr5L643F8OFvKS3ZRNWd9sxRl+uBkLH/YyNWfUL3Qa4HWi9OmH
-         NBOg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=uptPqcgshGnCftIWPnxGiyLOnUUUIP0/+ojiVFO1k00=;
-        b=eCUhx3/7aSuQpKaTdkTv1ABVMfO7vjr9tEmx9/omWuhg/3xsgvLqIFImrXTpfxRf4j
-         4WVZJqX0aN21i6Ll8DGEZfcWFBvZuDivR4hL75t4LoL0qfEF2ea1n+IBpvOcGsT+jtCk
-         JM3NqliGmD6qr089YLhqJ9xCEyun6lP6GMFEMXwhqBpli3UvfgVN7N29NARRWS37LVVk
-         ctL7aK0nY8nQ+hgQm3H/LeO5kIwXT6vqcPy/hAwd9uOoECeSu+S4l7VoWQOwoQxK9clP
-         girXOi5J597+fGePZB9l8WKIPUotHOL6EeF3cwhhR28EfCAzd5p/kTubmsyMqvZXHtI8
-         +8lg==
-X-Gm-Message-State: AOAM530UfM0n47i3eAcQunfYHFVP8vg7A0AECOzZ148+1RcUY6PhspPR
-        Ll98N1ONWX5CKdJqySEHfKmCBieDJlOZjx73JwcV
-X-Google-Smtp-Source: ABdhPJzdlnMCYGA3kLT4t5c8ykTQcQqn/qmqlv/E8TGGEpG2riZ7T0plVIhIHa9FvZNn80TVOmuS6b2nFy6yQNioXsA=
-X-Received: by 2002:a17:906:7142:: with SMTP id z2mr28262180ejj.427.1624954486045;
- Tue, 29 Jun 2021 01:14:46 -0700 (PDT)
-MIME-Version: 1.0
-References: <20210615141331.407-1-xieyongji@bytedance.com> <20210628103309.GA205554@storage2.sh.intel.com>
- <bdbe3a79-e5ce-c3a5-4c68-c11c65857377@redhat.com> <BYAPR11MB2662FFF6140A4C634648BB2E8C039@BYAPR11MB2662.namprd11.prod.outlook.com>
- <41cc419e-48b5-6755-0cb0-9033bd1310e4@redhat.com> <BYAPR11MB266276002F42D91FCE6E83CE8C029@BYAPR11MB2662.namprd11.prod.outlook.com>
-In-Reply-To: <BYAPR11MB266276002F42D91FCE6E83CE8C029@BYAPR11MB2662.namprd11.prod.outlook.com>
-From:   Yongji Xie <xieyongji@bytedance.com>
-Date:   Tue, 29 Jun 2021 16:14:35 +0800
-Message-ID: <CACycT3sfZCpWqB+GKQYMi3WjOkU0jAkBPU-u+MHHDCbLUvvu4w@mail.gmail.com>
-Subject: Re: RE: [PATCH v8 00/10] Introduce VDUSE - vDPA Device in Userspace
-To:     "Liu, Xiaodong" <xiaodong.liu@intel.com>
-Cc:     Jason Wang <jasowang@redhat.com>,
-        "mst@redhat.com" <mst@redhat.com>,
-        "stefanha@redhat.com" <stefanha@redhat.com>,
-        "sgarzare@redhat.com" <sgarzare@redhat.com>,
-        "parav@nvidia.com" <parav@nvidia.com>,
-        "hch@infradead.org" <hch@infradead.org>,
-        "christian.brauner@canonical.com" <christian.brauner@canonical.com>,
-        "rdunlap@infradead.org" <rdunlap@infradead.org>,
-        "willy@infradead.org" <willy@infradead.org>,
-        "viro@zeniv.linux.org.uk" <viro@zeniv.linux.org.uk>,
-        "axboe@kernel.dk" <axboe@kernel.dk>,
-        "bcrl@kvack.org" <bcrl@kvack.org>,
-        "corbet@lwn.net" <corbet@lwn.net>,
-        "mika.penttila@nextfour.com" <mika.penttila@nextfour.com>,
-        "dan.carpenter@oracle.com" <dan.carpenter@oracle.com>,
-        "joro@8bytes.org" <joro@8bytes.org>,
-        "gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>,
-        "songmuchun@bytedance.com" <songmuchun@bytedance.com>,
-        "virtualization@lists.linux-foundation.org" 
-        <virtualization@lists.linux-foundation.org>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
-        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+        id S232695AbhF2JJZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 29 Jun 2021 05:09:25 -0400
+Received: from mail.kernel.org ([198.145.29.99]:36020 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S232542AbhF2JJX (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 29 Jun 2021 05:09:23 -0400
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 28EF361DD6;
+        Tue, 29 Jun 2021 09:06:57 +0000 (UTC)
+Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94.2)
+        (envelope-from <maz@kernel.org>)
+        id 1ly9hn-00AaqP-50; Tue, 29 Jun 2021 10:06:55 +0100
+Date:   Tue, 29 Jun 2021 10:06:43 +0100
+Message-ID: <878s2tavks.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Alexandre Chartre <alexandre.chartre@oracle.com>
+Cc:     will@kernel.org, catalin.marinas@arm.com, alexandru.elisei@arm.com,
+        james.morse@arm.com, suzuki.poulose@arm.com,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org, konrad.wilk@oracle.com
+Subject: Re: [PATCH] KVM: arm64: Disabling disabled PMU counters wastes a lot of time
+In-Reply-To: <20210628161925.401343-1-alexandre.chartre@oracle.com>
+References: <20210628161925.401343-1-alexandre.chartre@oracle.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: alexandre.chartre@oracle.com, will@kernel.org, catalin.marinas@arm.com, alexandru.elisei@arm.com, james.morse@arm.com, suzuki.poulose@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, konrad.wilk@oracle.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jun 29, 2021 at 3:56 PM Liu, Xiaodong <xiaodong.liu@intel.com> wrot=
-e:
->
->
->
-> >-----Original Message-----
-> >From: Jason Wang <jasowang@redhat.com>
-> >Sent: Tuesday, June 29, 2021 12:11 PM
-> >To: Liu, Xiaodong <xiaodong.liu@intel.com>; Xie Yongji
-> ><xieyongji@bytedance.com>; mst@redhat.com; stefanha@redhat.com;
-> >sgarzare@redhat.com; parav@nvidia.com; hch@infradead.org;
-> >christian.brauner@canonical.com; rdunlap@infradead.org; willy@infradead.=
-org;
-> >viro@zeniv.linux.org.uk; axboe@kernel.dk; bcrl@kvack.org; corbet@lwn.net=
-;
-> >mika.penttila@nextfour.com; dan.carpenter@oracle.com; joro@8bytes.org;
-> >gregkh@linuxfoundation.org
-> >Cc: songmuchun@bytedance.com; virtualization@lists.linux-foundation.org;
-> >netdev@vger.kernel.org; kvm@vger.kernel.org; linux-fsdevel@vger.kernel.o=
-rg;
-> >iommu@lists.linux-foundation.org; linux-kernel@vger.kernel.org
-> >Subject: Re: [PATCH v8 00/10] Introduce VDUSE - vDPA Device in Userspace
-> >
-> >
-> >=E5=9C=A8 2021/6/28 =E4=B8=8B=E5=8D=881:54, Liu, Xiaodong =E5=86=99=E9=
-=81=93:
-> >>> Several issues:
-> >>>
-> >>> - VDUSE needs to limit the total size of the bounce buffers (64M if I=
- was not
-> >>> wrong). Does it work for SPDK?
-> >> Yes, Jason. It is enough and works for SPDK.
-> >> Since it's a kind of bounce buffer mainly for in-flight IO, so limited=
- size like
-> >> 64MB is enough.
-> >
-> >
-> >Ok.
-> >
-> >
-> >>
-> >>> - VDUSE can use hugepages but I'm not sure we can mandate hugepages (=
-or
-> >we
-> >>> need introduce new flags for supporting this)
-> >> Same with your worry, I'm afraid too that it is a hard for a kernel mo=
-dule
-> >> to directly preallocate hugepage internal.
-> >> What I tried is that:
-> >> 1. A simple agent daemon (represents for one device)  `preallocates` a=
-nd maps
-> >>      dozens of 2MB hugepages (like 64MB) for one device.
-> >> 2. The daemon passes its mapping addr&len and hugepage fd to kernel
-> >>      module through created IOCTL.
-> >> 3. Kernel module remaps the hugepages inside kernel.
-> >
-> >
-> >Such model should work, but the main "issue" is that it introduce
-> >overheads in the case of vhost-vDPA.
-> >
-> >Note that in the case of vhost-vDPA, we don't use bounce buffer, the
-> >userspace pages were shared directly.
-> >
-> >And since DMA is not done per page, it prevents us from using tricks
-> >like vm_insert_page() in those cases.
-> >
->
-> Yes, really, it's a problem to handle vhost-vDPA case.
-> But there are already several solutions to get VM served, like vhost-user=
-,
-> vfio-user, so at least for SPDK, it won't serve VM through VDUSE. If a us=
-er
-> still want to do that, then the user should tolerate Introduced overhead.
->
-> In other words, software backend like SPDK, will appreciate the virtio
-> datapath of VDUSE to serve local host instead of VM. That's why I also dr=
-afted
-> a "virtio-local" to bridge vhost-user target and local host kernel virtio=
--blk.
->
-> >
-> >> 4. Vhost user target gets and maps hugepage fd from kernel module
-> >>      in vhost-user msg through Unix Domain Socket cmsg.
-> >> Then kernel module and target map on the same hugepage based
-> >> bounce buffer for in-flight IO.
-> >>
-> >> If there is one option in VDUSE to map userspace preallocated memory, =
-then
-> >> VDUSE should be able to mandate it even it is hugepage based.
-> >>
-> >
-> >As above, this requires some kind of re-design since VDUSE depends on
-> >the model of mmap(MAP_SHARED) instead of umem registering.
->
-> Got it, Jason, this may be hard for current version of VDUSE.
-> Maybe we can consider these options after VDUSE merged later.
->
-> Since if VDUSE datapath could be directly leveraged by vhost-user target,
-> its value will be propagated immediately.
->
+Hi Alexandre,
 
-Agreed=EF=BC=81
+Thanks for looking into this.
 
-Thanks,
-Yongji
+On Mon, 28 Jun 2021 17:19:25 +0100,
+Alexandre Chartre <alexandre.chartre@oracle.com> wrote:
+> 
+> In a KVM guest on ARM, performance counters interrupts have an
+
+nit: arm64. 32bit ARM never had any working KVM PMU emulation.
+
+> unnecessary overhead which slows down execution when using the "perf
+> record" command and limits the "perf record" sampling period.
+> 
+> The problem is that when a guest VM disables counters by clearing the
+> PMCR_EL0.E bit (bit 0), KVM will disable all counters defined in
+> PMCR_EL0 even if they are not enabled in PMCNTENSET_EL0.
+> 
+> KVM disables a counter by calling into the perf framework, in particular
+> by calling perf_event_create_kernel_counter() which is a time consuming
+> operation. So, for example, with a Neoverse N1 CPU core which has 6 event
+> counters and one cycle counter, KVM will always disable all 7 counters
+> even if only one is enabled.
+> 
+> This typically happens when using the "perf record" command in a guest
+> VM: perf will disable all event counters with PMCNTENTSET_EL0 and only
+> uses the cycle counter. And when using the "perf record" -F option with
+> a high profiling frequency, the overhead of KVM disabling all counters
+> instead of one on every counter interrupt becomes very noticeable.
+> 
+> The problem is fixed by having KVM disable only counters which are
+> enabled in PMCNTENSET_EL0. If a counter is not enabled in PMCNTENSET_EL0
+> then KVM will not enable it when setting PMCR_EL0.E and it will remain
+> disable as long as it is not enabled in PMCNTENSET_EL0. So there is
+
+nit: disabled
+
+> effectively no need to disable a counter when clearing PMCR_EL0.E if it
+> is not enabled PMCNTENSET_EL0.
+> 
+> Fixes: 76993739cd6f ("arm64: KVM: Add helper to handle PMCR register bits")
+
+This isn't a fix (the current behaviour is correct per the
+architecture), "only" a performance improvement. We reserve "Fixes:"
+for things that are actually broken.
+
+> Signed-off-by: Alexandre Chartre <alexandre.chartre@oracle.com>
+> ---
+>  arch/arm64/kvm/pmu-emul.c | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
+> 
+> diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
+> index fd167d4f4215..bab4b735a0cf 100644
+> --- a/arch/arm64/kvm/pmu-emul.c
+> +++ b/arch/arm64/kvm/pmu-emul.c
+> @@ -571,7 +571,8 @@ void kvm_pmu_handle_pmcr(struct kvm_vcpu *vcpu, u64 val)
+>  		kvm_pmu_enable_counter_mask(vcpu,
+>  		       __vcpu_sys_reg(vcpu, PMCNTENSET_EL0) & mask);
+>  	} else {
+> -		kvm_pmu_disable_counter_mask(vcpu, mask);
+> +		kvm_pmu_disable_counter_mask(vcpu,
+> +		       __vcpu_sys_reg(vcpu, PMCNTENSET_EL0) & mask);
+
+This seems to perpetuate a flawed pattern. Why do we need to work out
+the *valid* PMCTENSET_EL0 bits? They should be correct by construction,
+and the way the shadow sysreg gets populated already enforces this:
+
+<quote>
+static bool access_pmcnten(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
+			   const struct sys_reg_desc *r)
+{
+[...]
+	mask = kvm_pmu_valid_counter_mask(vcpu);
+	if (p->is_write) {
+		val = p->regval & mask;
+		if (r->Op2 & 0x1) {
+			/* accessing PMCNTENSET_EL0 */
+			__vcpu_sys_reg(vcpu, PMCNTENSET_EL0) |= val;
+			kvm_pmu_enable_counter_mask(vcpu, val);
+			kvm_vcpu_pmu_restore_guest(vcpu);
+</quote>
+
+So the sysreg is the only thing we should consider, and I think we
+should drop the useless masking. There is at least another instance of
+this in the PMU code (kvm_pmu_overflow_status()), and apart from
+kvm_pmu_vcpu_reset(), only the sysreg accessors should care about the
+masking to sanitise accesses.
+
+What do you think?
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
