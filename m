@@ -2,148 +2,105 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 606A03B6D5A
-	for <lists+kvm@lfdr.de>; Tue, 29 Jun 2021 06:11:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 599073B6D5D
+	for <lists+kvm@lfdr.de>; Tue, 29 Jun 2021 06:13:15 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231920AbhF2ENo (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 29 Jun 2021 00:13:44 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:27600 "EHLO
+        id S230026AbhF2EPj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 29 Jun 2021 00:15:39 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:21199 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231955AbhF2ENl (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 29 Jun 2021 00:13:41 -0400
+        by vger.kernel.org with ESMTP id S229792AbhF2EPi (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 29 Jun 2021 00:15:38 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1624939874;
+        s=mimecast20190719; t=1624939992;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=artctqxsXOBji6dZlUYYfDDilnt3HH/T60QvobzscDY=;
-        b=avH55h/j9lrwOVgRrmHlkQd7SBQq4Yp/uD0DvHQoSqnSAee2HVhAPJPpbpAPcRySqFuspf
-        KH1jAd8r2kXGW9GHFnXlIV1ztQr+QeCopAhO867k08zc9WQ5QWBPm4IzOsE+eCLqiL7+ii
-        VLd1ysvOLt7nuLrB38K362ZosKVTuUo=
-Received: from mail-pg1-f198.google.com (mail-pg1-f198.google.com
- [209.85.215.198]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-105-ruQXgkaoOmy3jDjmclNnpQ-1; Tue, 29 Jun 2021 00:11:05 -0400
-X-MC-Unique: ruQXgkaoOmy3jDjmclNnpQ-1
-Received: by mail-pg1-f198.google.com with SMTP id x7-20020a63db470000b029022199758419so13338898pgi.11
-        for <kvm@vger.kernel.org>; Mon, 28 Jun 2021 21:11:05 -0700 (PDT)
+        bh=7N6S5aXlTsxjRnLUAwuT1GGB2dsJH/gvDpQ3UzIqM0M=;
+        b=SzUh/i8W2tjOYdKVVA/eEfddfMy1StTwJiTZYSj8HAtZ68CiWJ874FtLqq+cdtz+G0LEXY
+        vkI1Z7GBb5PCxfQwmWZ6uZGDH2stkTWWqiZT4Su5U3MaKm7lK7PwFtdxziuC9eW84yu2Z9
+        hfBlLce79yj+OthZpYL/4Tk8tdmefIw=
+Received: from mail-pg1-f197.google.com (mail-pg1-f197.google.com
+ [209.85.215.197]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-364-IV61naWbPgeUQ8bjzXQ3ng-1; Tue, 29 Jun 2021 00:13:08 -0400
+X-MC-Unique: IV61naWbPgeUQ8bjzXQ3ng-1
+Received: by mail-pg1-f197.google.com with SMTP id k9-20020a63d1090000b029021091ebb84cso13368727pgg.3
+        for <kvm@vger.kernel.org>; Mon, 28 Jun 2021 21:13:08 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-transfer-encoding
          :content-language;
-        bh=artctqxsXOBji6dZlUYYfDDilnt3HH/T60QvobzscDY=;
-        b=Bn62T0HNSuxOTnNUg12fZGkQGrnVazq+OMOoDwZMYFFQnxFw9NXRVP7gXk0Ixr78N9
-         WrvkOz8LKerRM+VW9oNlErWDTTGfQJMUHGsew+7e05gE6W0pGyQ0bo96XbTQpY69P4VO
-         oYR/iXUnaSuAjvvyY+q8awWElzyz2WBzPvf9cH628atQc8n/U8fxG678JyY+XZ4mGKH+
-         T7wRRLg4O4Hjy+d9NuhbkVGXhtr8BBcc5KlW4sAGeoZVYffLox5NXXMJDoQdgSM4vUtm
-         NAgBYJkP82E4cCoceHsjjyWrSLlamu8fJGBlzzpfvJiAmZS24vK/hZHYOux9M+JKIgZN
-         tiKg==
-X-Gm-Message-State: AOAM533IT3jB4GM+7KH6fbfosu2TD3YYrS3Y8HDE83cIxUA/s/P9gFjl
-        T8QuKmTLhq9XOxAmHnza1e0ZEOthtGMNXH+f2qqROQZhjgepp54BzKxFxMsLmvgjYzSitmMXaM0
-        bY6232hp0n3eI
-X-Received: by 2002:a62:b616:0:b029:303:aa7b:b2e0 with SMTP id j22-20020a62b6160000b0290303aa7bb2e0mr28469462pff.21.1624939864874;
-        Mon, 28 Jun 2021 21:11:04 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyEtTsRWTzX+1HKlyYauA7LaEp1VCLZNHRfy5MStjoYEhho4d0zuZ1s0SoSqwSCB7kvsITcEw==
-X-Received: by 2002:a62:b616:0:b029:303:aa7b:b2e0 with SMTP id j22-20020a62b6160000b0290303aa7bb2e0mr28469429pff.21.1624939864605;
-        Mon, 28 Jun 2021 21:11:04 -0700 (PDT)
+        bh=7N6S5aXlTsxjRnLUAwuT1GGB2dsJH/gvDpQ3UzIqM0M=;
+        b=ccN0aRsomzYo1IAdxg/r70ZQ1agc5qhDYkUXCMwHFUT1mxm+ihH9vfKkhKIGzf/Fnn
+         UCymzuQk5yQYiDjuKTa3ENdpdC5GG5p0eN3mhK8zneo4D4Jb56B95SlHFgX6Q9GnA99L
+         D2P5bS+66CyPCZ39fqRpm5+sU/anHrQc8wEr8oTMmTfiQvlVky/9JxzbZYCqKyjjLdGd
+         mBFK5MS6cnKJYmOji6oCdL97orsg3OHzz+SdFG826LW2ncEqKP+EkkC/5HUFjGZ0On+w
+         YnOh8l9YnkQ+4XzlJCeGZcxLk/cHBS7zYVZU2NNYbgJLFL/6JV14IAVbz8lyypdw8WOw
+         Co5Q==
+X-Gm-Message-State: AOAM530F1WyiEAQvfq/8AapNfhWlO0yhdOiOPvj7xrV1XGFGAJ5SLG/1
+        XicKZqiaDauH3G2k0HyeaV5165YbJ+6oiVRSw3S+RNQr+s+sXmm5EbhhDpWx7KRcCFx4Q+JUiII
+        cbovRRo+7U6x4
+X-Received: by 2002:a65:478d:: with SMTP id e13mr26587069pgs.37.1624939987921;
+        Mon, 28 Jun 2021 21:13:07 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxTnV+jCJcWth5Gh1PanbNwyDV44mMvsm0eLCzSFKGOg12/3H6rwksZzo35n3QJumwiuRcZHQ==
+X-Received: by 2002:a65:478d:: with SMTP id e13mr26587053pgs.37.1624939987713;
+        Mon, 28 Jun 2021 21:13:07 -0700 (PDT)
 Received: from wangxiaodeMacBook-Air.local ([209.132.188.80])
-        by smtp.gmail.com with ESMTPSA id cs1sm1085868pjb.56.2021.06.28.21.10.56
+        by smtp.gmail.com with ESMTPSA id k13sm1525904pgh.82.2021.06.28.21.12.59
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 28 Jun 2021 21:11:04 -0700 (PDT)
+        Mon, 28 Jun 2021 21:13:07 -0700 (PDT)
 Subject: Re: [PATCH v8 00/10] Introduce VDUSE - vDPA Device in Userspace
-To:     "Liu, Xiaodong" <xiaodong.liu@intel.com>,
-        Xie Yongji <xieyongji@bytedance.com>,
-        "mst@redhat.com" <mst@redhat.com>,
-        "stefanha@redhat.com" <stefanha@redhat.com>,
-        "sgarzare@redhat.com" <sgarzare@redhat.com>,
-        "parav@nvidia.com" <parav@nvidia.com>,
-        "hch@infradead.org" <hch@infradead.org>,
-        "christian.brauner@canonical.com" <christian.brauner@canonical.com>,
-        "rdunlap@infradead.org" <rdunlap@infradead.org>,
-        "willy@infradead.org" <willy@infradead.org>,
-        "viro@zeniv.linux.org.uk" <viro@zeniv.linux.org.uk>,
-        "axboe@kernel.dk" <axboe@kernel.dk>,
-        "bcrl@kvack.org" <bcrl@kvack.org>,
-        "corbet@lwn.net" <corbet@lwn.net>,
-        "mika.penttila@nextfour.com" <mika.penttila@nextfour.com>,
-        "dan.carpenter@oracle.com" <dan.carpenter@oracle.com>,
-        "joro@8bytes.org" <joro@8bytes.org>,
-        "gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>
-Cc:     "songmuchun@bytedance.com" <songmuchun@bytedance.com>,
-        "virtualization@lists.linux-foundation.org" 
-        <virtualization@lists.linux-foundation.org>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
-        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+To:     Yongji Xie <elohimes@gmail.com>,
+        Liu Xiaodong <xiaodong.liu@intel.com>
+Cc:     Xie Yongji <xieyongji@bytedance.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>, sgarzare@redhat.com,
+        parav@nvidia.com, hch@infradead.org,
+        christian.brauner@canonical.com, rdunlap@infradead.org,
+        willy@infradead.org, viro@zeniv.linux.org.uk, axboe@kernel.dk,
+        bcrl@kvack.org, corbet@lwn.net, mika.penttila@nextfour.com,
+        dan.carpenter@oracle.com, joro@8bytes.org,
+        gregkh@linuxfoundation.org, kvm@vger.kernel.org,
+        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+        virtualization@lists.linux-foundation.org,
+        iommu@lists.linux-foundation.org, songmuchun@bytedance.com,
+        linux-fsdevel@vger.kernel.org
 References: <20210615141331.407-1-xieyongji@bytedance.com>
  <20210628103309.GA205554@storage2.sh.intel.com>
- <bdbe3a79-e5ce-c3a5-4c68-c11c65857377@redhat.com>
- <BYAPR11MB2662FFF6140A4C634648BB2E8C039@BYAPR11MB2662.namprd11.prod.outlook.com>
+ <CAONzpcbjr2zKOAQrWa46Tv=oR1fYkcKLcqqm_tSgO7RkU20yBA@mail.gmail.com>
 From:   Jason Wang <jasowang@redhat.com>
-Message-ID: <41cc419e-48b5-6755-0cb0-9033bd1310e4@redhat.com>
-Date:   Tue, 29 Jun 2021 12:10:51 +0800
+Message-ID: <d5321870-ef29-48e2-fdf6-32d99a5fa3b9@redhat.com>
+Date:   Tue, 29 Jun 2021 12:12:57 +0800
 User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0)
  Gecko/20100101 Thunderbird/78.11.0
 MIME-Version: 1.0
-In-Reply-To: <BYAPR11MB2662FFF6140A4C634648BB2E8C039@BYAPR11MB2662.namprd11.prod.outlook.com>
-Content-Type: text/plain; charset=iso-2022-jp; format=flowed; delsp=yes
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <CAONzpcbjr2zKOAQrWa46Tv=oR1fYkcKLcqqm_tSgO7RkU20yBA@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
 Content-Language: en-US
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
-$B:_(B 2021/6/28 $B2<8a(B1:54, Liu, Xiaodong $B<LF;(B:
->> Several issues:
+在 2021/6/28 下午6:32, Yongji Xie 写道:
+>> The large barrier is bounce-buffer mapping: SPDK requires hugepages
+>> for NVMe over PCIe and RDMA, so take some preallcoated hugepages to
+>> map as bounce buffer is necessary. Or it's hard to avoid an extra
+>> memcpy from bounce-buffer to hugepage.
+>> If you can add an option to map hugepages as bounce-buffer,
+>> then SPDK could also be a potential user of vduse.
 >>
->> - VDUSE needs to limit the total size of the bounce buffers (64M if I was not
->> wrong). Does it work for SPDK?
-> Yes, Jason. It is enough and works for SPDK.
-> Since it's a kind of bounce buffer mainly for in-flight IO, so limited size like
-> 64MB is enough.
-
-
-Ok.
-
-
->
->> - VDUSE can use hugepages but I'm not sure we can mandate hugepages (or we
->> need introduce new flags for supporting this)
-> Same with your worry, I'm afraid too that it is a hard for a kernel module
-> to directly preallocate hugepage internal.
-> What I tried is that:
-> 1. A simple agent daemon (represents for one device)  `preallocates` and maps
->      dozens of 2MB hugepages (like 64MB) for one device.
-> 2. The daemon passes its mapping addr&len and hugepage fd to kernel
->      module through created IOCTL.
-> 3. Kernel module remaps the hugepages inside kernel.
-
-
-Such model should work, but the main "issue" is that it introduce  
-overheads in the case of vhost-vDPA.
-
-Note that in the case of vhost-vDPA, we don't use bounce buffer, the  
-userspace pages were shared directly.
-
-And since DMA is not done per page, it prevents us from using tricks  
-like vm_insert_page() in those cases.
-
-
-> 4. Vhost user target gets and maps hugepage fd from kernel module
->      in vhost-user msg through Unix Domain Socket cmsg.
-> Then kernel module and target map on the same hugepage based
-> bounce buffer for in-flight IO.
->
-> If there is one option in VDUSE to map userspace preallocated memory, then
-> VDUSE should be able to mandate it even it is hugepage based.
+> I think we can support registering user space memory for bounce-buffer
+> use like XDP does. But this needs to pin the pages, so I didn't
+> consider it in this initial version.
 >
 
-As above, this requires some kind of re-design since VDUSE depends on  
-the model of mmap(MAP_SHARED) instead of umem registering.
+Note that userspace should be unaware of the existence of the bounce buffer.
+
+So we need to think carefully of mmap() vs umem registering.
 
 Thanks
 
