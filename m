@@ -2,121 +2,135 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A46383B7347
-	for <lists+kvm@lfdr.de>; Tue, 29 Jun 2021 15:33:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C1A5E3B7374
+	for <lists+kvm@lfdr.de>; Tue, 29 Jun 2021 15:47:06 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234073AbhF2NgL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 29 Jun 2021 09:36:11 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:63380 "EHLO
-        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S233926AbhF2NgE (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 29 Jun 2021 09:36:04 -0400
-Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 15TDXHDZ150696;
-        Tue, 29 Jun 2021 09:33:37 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding; s=pp1;
- bh=xMYjNGIeVlFTQB1mk7gVaEiIcxTvIUgjfAYnIHgxc+Y=;
- b=IGpDbV8k9jvbo/IJJ4fAXIF9xyLVcjeVguzfJ8Tj6wee7NLPLo2rS/pXHfIw9D53E6yn
- LfL/Sqk5uHMTcWIicm9G/OLPQZxFuRTBu2YfU8TeBbic6Sza2gxNs3rfbOt0O935r3NS
- SFZD2hbtQrBrZKbo5+HFpw9UpYY8d6/vK+VltBLFRE8MHUesaej0VeTN2FU/y1Al8h1v
- 95o4zLEvyywTppOkeRsuYx5O44z4r0DFAhWxmcLyKLnz61XysqMbcy49bIOyVqyZAOQO
- TaoTgaszIy9AlG5u/8avpW4ZP8yymZyc7Aep27yicICiP7KvO6b7lcFRAte8LYTGxl4A 8w== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 39g2k4kmsn-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 29 Jun 2021 09:33:37 -0400
-Received: from m0098421.ppops.net (m0098421.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 15TDXI1D150914;
-        Tue, 29 Jun 2021 09:33:36 -0400
-Received: from ppma05fra.de.ibm.com (6c.4a.5195.ip4.static.sl-reverse.com [149.81.74.108])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 39g2k4kms2-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 29 Jun 2021 09:33:36 -0400
-Received: from pps.filterd (ppma05fra.de.ibm.com [127.0.0.1])
-        by ppma05fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 15TDT7Ak024538;
-        Tue, 29 Jun 2021 13:33:35 GMT
-Received: from b06avi18626390.portsmouth.uk.ibm.com (b06avi18626390.portsmouth.uk.ibm.com [9.149.26.192])
-        by ppma05fra.de.ibm.com with ESMTP id 39ft8er4k8-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 29 Jun 2021 13:33:34 +0000
-Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
-        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 15TDVxEW29491620
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 29 Jun 2021 13:31:59 GMT
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 6A5C9A40D8;
-        Tue, 29 Jun 2021 13:33:32 +0000 (GMT)
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 212AEA40F4;
-        Tue, 29 Jun 2021 13:33:32 +0000 (GMT)
-Received: from t46lp67.lnxne.boe (unknown [9.152.108.100])
-        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Tue, 29 Jun 2021 13:33:32 +0000 (GMT)
-From:   Janosch Frank <frankja@linux.ibm.com>
-To:     kvm@vger.kernel.org
-Cc:     linux-s390@vger.kernel.org, imbrenda@linux.ibm.com,
-        david@redhat.com, thuth@redhat.com, cohuck@redhat.com
-Subject: [kvm-unit-tests PATCH 5/5] lib: s390x: Print if a pgm happened while in SIE
-Date:   Tue, 29 Jun 2021 13:33:22 +0000
-Message-Id: <20210629133322.19193-6-frankja@linux.ibm.com>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20210629133322.19193-1-frankja@linux.ibm.com>
-References: <20210629133322.19193-1-frankja@linux.ibm.com>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: C8mtNVqDCsa0V_GEjS6XbKbtsNW1FgEV
-X-Proofpoint-ORIG-GUID: bdLZTa7ILanCJvs8MO50YwBEsazyLk39
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.790
- definitions=2021-06-29_06:2021-06-28,2021-06-29 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 phishscore=0
- mlxlogscore=999 clxscore=1015 impostorscore=0 priorityscore=1501
- suspectscore=0 adultscore=0 mlxscore=0 malwarescore=0 spamscore=0
- lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2104190000 definitions=main-2106290091
+        id S234163AbhF2Ntc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 29 Jun 2021 09:49:32 -0400
+Received: from mail.kernel.org ([198.145.29.99]:60264 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S233050AbhF2Ntb (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 29 Jun 2021 09:49:31 -0400
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id AD3D661D94;
+        Tue, 29 Jun 2021 13:47:04 +0000 (UTC)
+Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94.2)
+        (envelope-from <maz@kernel.org>)
+        id 1lyE4s-00Adto-On; Tue, 29 Jun 2021 14:47:02 +0100
+Date:   Tue, 29 Jun 2021 14:47:02 +0100
+Message-ID: <877dicbx61.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Alexandre Chartre <alexandre.chartre@oracle.com>
+Cc:     will@kernel.org, catalin.marinas@arm.com, alexandru.elisei@arm.com,
+        james.morse@arm.com, suzuki.poulose@arm.com,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org, konrad.wilk@oracle.com
+Subject: Re: [PATCH] KVM: arm64: Disabling disabled PMU counters wastes a lot of time
+In-Reply-To: <e3843c2c-e20a-ef58-c795-1ba8f1d91ff6@oracle.com>
+References: <20210628161925.401343-1-alexandre.chartre@oracle.com>
+        <878s2tavks.wl-maz@kernel.org>
+        <e3843c2c-e20a-ef58-c795-1ba8f1d91ff6@oracle.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: alexandre.chartre@oracle.com, will@kernel.org, catalin.marinas@arm.com, alexandru.elisei@arm.com, james.morse@arm.com, suzuki.poulose@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, konrad.wilk@oracle.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-For debugging it helps if you know if the PGM happened while being in
-SIE or not.
+On Tue, 29 Jun 2021 14:16:55 +0100,
+Alexandre Chartre <alexandre.chartre@oracle.com> wrote:
+> 
+> 
+> Hi Marc,
+> 
+> On 6/29/21 11:06 AM, Marc Zyngier wrote:
+> > Hi Alexandre,
 
-Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
----
- lib/s390x/interrupt.c | 17 ++++++++++++++---
- 1 file changed, 14 insertions(+), 3 deletions(-)
+[...]
 
-diff --git a/lib/s390x/interrupt.c b/lib/s390x/interrupt.c
-index b627942..76015b1 100644
---- a/lib/s390x/interrupt.c
-+++ b/lib/s390x/interrupt.c
-@@ -141,10 +141,21 @@ static void print_int_regs(struct stack_frame_int *stack)
- static void print_pgm_info(struct stack_frame_int *stack)
- 
- {
-+	bool in_sie;
-+
-+	in_sie = (lc->pgm_old_psw.addr >= (uintptr_t)sie_entry &&
-+		  lc->pgm_old_psw.addr <= (uintptr_t)sie_exit);
-+
- 	printf("\n");
--	printf("Unexpected program interrupt: %d on cpu %d at %#lx, ilen %d\n",
--	       lc->pgm_int_code, stap(), lc->pgm_old_psw.addr,
--	       lc->pgm_int_id);
-+	if (!in_sie)
-+		printf("Unexpected program interrupt: %d on cpu %d at %#lx, ilen %d\n",
-+		       lc->pgm_int_code, stap(), lc->pgm_old_psw.addr,
-+		       lc->pgm_int_id);
-+	else
-+		printf("Unexpected program interrupt in SIE: %d on cpu %d at %#lx, ilen %d\n",
-+		       lc->pgm_int_code, stap(), lc->pgm_old_psw.addr,
-+		       lc->pgm_int_id);
-+
- 	print_int_regs(stack);
- 	dump_stack();
- 	report_summary();
+> > So the sysreg is the only thing we should consider, and I think we
+> > should drop the useless masking. There is at least another instance of
+> > this in the PMU code (kvm_pmu_overflow_status()), and apart from
+> > kvm_pmu_vcpu_reset(), only the sysreg accessors should care about the
+> > masking to sanitise accesses.
+> > 
+> > What do you think?
+> > 
+> 
+> I think you are right. PMCNTENSET_EL0 is already masked with
+> kvm_pmu_valid_counter_mask() so there's effectively no need to mask
+> it again when we use it. I will send an additional patch (on top of
+> this one) to remove useless masking. Basically, changes would be:
+> 
+> diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
+> index bab4b735a0cf..e0dfd7ce4ba0 100644
+> --- a/arch/arm64/kvm/pmu-emul.c
+> +++ b/arch/arm64/kvm/pmu-emul.c
+> @@ -373,7 +373,6 @@ static u64 kvm_pmu_overflow_status(struct kvm_vcpu *vcpu)
+>                 reg = __vcpu_sys_reg(vcpu, PMOVSSET_EL0);
+>                 reg &= __vcpu_sys_reg(vcpu, PMCNTENSET_EL0);
+>                 reg &= __vcpu_sys_reg(vcpu, PMINTENSET_EL1);
+> -               reg &= kvm_pmu_valid_counter_mask(vcpu);
+>         }
+>          return reg;
+> @@ -564,21 +563,22 @@ void kvm_pmu_software_increment(struct kvm_vcpu *vcpu, u64 val)
+>   */
+>  void kvm_pmu_handle_pmcr(struct kvm_vcpu *vcpu, u64 val)
+>  {
+> -       unsigned long mask = kvm_pmu_valid_counter_mask(vcpu);
+> +       unsigned long mask;
+>         int i;
+>          if (val & ARMV8_PMU_PMCR_E) {
+>                 kvm_pmu_enable_counter_mask(vcpu,
+> -                      __vcpu_sys_reg(vcpu, PMCNTENSET_EL0) & mask);
+> +                      __vcpu_sys_reg(vcpu, PMCNTENSET_EL0));
+>         } else {
+>                 kvm_pmu_disable_counter_mask(vcpu,
+> -                      __vcpu_sys_reg(vcpu, PMCNTENSET_EL0) & mask);
+> +                      __vcpu_sys_reg(vcpu, PMCNTENSET_EL0));
+>         }
+>          if (val & ARMV8_PMU_PMCR_C)
+>                 kvm_pmu_set_counter_value(vcpu, ARMV8_PMU_CYCLE_IDX, 0);
+>          if (val & ARMV8_PMU_PMCR_P) {
+> +               mask = kvm_pmu_valid_counter_mask(vcpu);
+
+Careful here, this clashes with a fix from Alexandru that is currently
+in -next (PMCR_EL0.P shouldn't reset the cycle counter) and aimed at
+5.14. And whilst you're at it, consider moving the 'mask' declaration
+here too.
+
+>                 for_each_set_bit(i, &mask, 32)
+>                         kvm_pmu_set_counter_value(vcpu, i, 0);
+>         }
+> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> index 1a7968ad078c..2e406905760e 100644
+> --- a/arch/arm64/kvm/sys_regs.c
+> +++ b/arch/arm64/kvm/sys_regs.c
+> @@ -845,7 +845,7 @@ static bool access_pmcnten(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
+>                         kvm_pmu_disable_counter_mask(vcpu, val);
+>                 }
+>         } else {
+> -               p->regval = __vcpu_sys_reg(vcpu, PMCNTENSET_EL0) & mask;
+> +               p->regval = __vcpu_sys_reg(vcpu, PMCNTENSET_EL0);
+>         }
+>          return true;
+
+If you are cleaning up the read-side of sysregs, access_pminten() and
+access_pmovs() could have some of your attention too.
+
+Thanks,
+
+	M.
+
 -- 
-2.30.2
-
+Without deviation from the norm, progress is not possible.
