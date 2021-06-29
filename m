@@ -2,169 +2,150 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3BAF93B7501
-	for <lists+kvm@lfdr.de>; Tue, 29 Jun 2021 17:14:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EFA3E3B764F
+	for <lists+kvm@lfdr.de>; Tue, 29 Jun 2021 18:13:56 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234682AbhF2PQt (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 29 Jun 2021 11:16:49 -0400
-Received: from mail-mw2nam12on2055.outbound.protection.outlook.com ([40.107.244.55]:41441
-        "EHLO NAM12-MW2-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S234642AbhF2PQr (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 29 Jun 2021 11:16:47 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=YSPra1eaNBXOqWWLouH2iuJqKl6HmaEozIhXfwwXHZ0l4R8AXwjRCIYBwZ5Z/0xpAWsOL7+etA/JdwWGOWQCdCurqBnGfQ+jfXYVjaEZo99bX33i0eEOc8cMjrw8lESMzJRRyTKzdJcanmFGQsjc5Vt9YRkWewstFvHT8ZYs/8wOkgOT9bNVbMkBqNbh/q3EX6KdN+l97x8hl4hCjv0emPASVQnzRQFGgUutOYpTxL7t4uhV1G4MCfzcS16cG94Fvzx/hYpgIpv6bg4GRpC/iZtoffZ32KYEud0TvaEOK3GBfk6SliWhya4ih7h8qJPxyGIp6Orm8YE/ivxkwYicLA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=8zTW3gIaN5xuLG9gnYJybBASVdTG0s5L9dAdAX3I1Dw=;
- b=f1AEkcOen0YcWzIGECkAxA3l0/h6d1vpMs6EUatPIMdPOwjU0RTD9ekssmHAneyQPGJzLz/tj2Gld1S/nz9jy7KtEIUHNAyckUAAP9PWF2TVmYTJwEJdnuzrGu+0/SBBEsICFyxKQ5n6bzj/qqSH5biMv6C+iVaDgdACzHsm8PJa1xN1U89XkwfEQtgeEstx5pftv4EfTX2CReYT4qE7YkBlpBtazqaDwbpWhLaxq/xgfzQD3vf6ihXWCyqgW/UacFJj0/2KTk9EaGwzRMXDlK3ieZnjYPy+wRe2keIX7MwR5NfaedqoMIejijl53bs2Ky+Re4y4aqqyC03oMfpsGQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=8zTW3gIaN5xuLG9gnYJybBASVdTG0s5L9dAdAX3I1Dw=;
- b=gkgvXSbxEZYVcfLUi//iRwNl6wM1uzlkBGvkDCLaJleJh4jQ2ToNwfN41Ex15ZOlP2YxxAzubA5E3kcDwII39EY1nlO2l0gg9OqKfgMVO+uFM81mkYVkDL5D/z5Erh0RQ9VJA0BRJdzU1ows8YAHYBaWjC34ILD/mYYEpieknMM=
-Authentication-Results: redhat.com; dkim=none (message not signed)
- header.d=none;redhat.com; dmarc=none action=none header.from=amd.com;
-Received: from SN6PR12MB2767.namprd12.prod.outlook.com (2603:10b6:805:75::23)
- by SA0PR12MB4413.namprd12.prod.outlook.com (2603:10b6:806:9e::9) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4264.20; Tue, 29 Jun
- 2021 15:14:18 +0000
-Received: from SN6PR12MB2767.namprd12.prod.outlook.com
- ([fe80::958d:2e44:518c:744c]) by SN6PR12MB2767.namprd12.prod.outlook.com
- ([fe80::958d:2e44:518c:744c%7]) with mapi id 15.20.4264.026; Tue, 29 Jun 2021
- 15:14:18 +0000
-From:   Ashish Kalra <Ashish.Kalra@amd.com>
-To:     pbonzini@redhat.com
-Cc:     seanjc@google.com, tglx@linutronix.de, mingo@redhat.com,
-        hpa@zytor.com, joro@8bytes.org, bp@alien8.de,
-        Thomas.Lendacky@amd.com, x86@kernel.org, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, brijesh.singh@amd.com,
-        srutherford@google.com
-Subject: [PATCH v5 6/6] x86/kvm: Add kexec support for SEV Live Migration.
-Date:   Tue, 29 Jun 2021 15:14:09 +0000
-Message-Id: <8fce27b8477073b9c7750f7cfc0c68f7ebd3a97d.1624978790.git.ashish.kalra@amd.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <cover.1624978790.git.ashish.kalra@amd.com>
-References: <cover.1624978790.git.ashish.kalra@amd.com>
-Content-Type: text/plain
-X-Originating-IP: [165.204.77.1]
-X-ClientProxiedBy: SA0PR11CA0008.namprd11.prod.outlook.com
- (2603:10b6:806:d3::13) To SN6PR12MB2767.namprd12.prod.outlook.com
- (2603:10b6:805:75::23)
+        id S232343AbhF2QQV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 29 Jun 2021 12:16:21 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:34215 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S231892AbhF2QQU (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 29 Jun 2021 12:16:20 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1624983232;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=aLJ/SKVwJwB/WabGPGWzqfQWr3aEvu38+kKgAkvXE/g=;
+        b=YOnlYj28Tl1BnS3jv92Hqz+omRZhS/P4bXN3W24oBId5OouBFnXFgoye/78pTheISW5Hbf
+        BjPP6ydpbE6RsWPMtCKSt27yA3pNYI9vb8EwszPAe7wCxNmP1NX0M0wSiKmtvPM2Ux99uV
+        zSn4IGf5l5qLf/vniLtvhRC9/Myg6pI=
+Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
+ [209.85.218.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-260-U4JZc-EwObOAKkq6yT5ZHQ-1; Tue, 29 Jun 2021 12:13:51 -0400
+X-MC-Unique: U4JZc-EwObOAKkq6yT5ZHQ-1
+Received: by mail-ej1-f69.google.com with SMTP id de48-20020a1709069bf0b029048ae3ebecabso5895269ejc.16
+        for <kvm@vger.kernel.org>; Tue, 29 Jun 2021 09:13:50 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=aLJ/SKVwJwB/WabGPGWzqfQWr3aEvu38+kKgAkvXE/g=;
+        b=XDb1TrYDlHULV7EP1dMZV600exPyybjtl+PiDe/beVBX6txOihpM/fl+Nu1zZxgwv+
+         zteNEQPYBIMRU0zErtTaWSfsnDO76CXFrmllTTuPXmKRqn6Z/btg3BxdtBkZmW0wb+vv
+         ZX2I/HjCZz/xMd3e8msx4QC1fR6bdbiDpiDzCy2qyOuP+XxGCSBOsA2qoogcJpb6nAUZ
+         xGfOFQ8DZDspfjhxjHubXnDuH6uaGwpFxfCrOdoONaiyzv2nza2Xlx6JBhOx2WQKrCkU
+         yZz2thlxR30a3SbPYAmSC3hvFgwz+mB8X4Eke8YPTGITgN11s7pK23tjMxQYchfMMEIG
+         5/iQ==
+X-Gm-Message-State: AOAM533uzK68XodkY1IP3Zv/yAyvOCZpztenmJnc0775otIgYOgS+2z0
+        v+FfEsTI+7H1HGO4/DqacOYs2kxa/KJR+9HdTUTT6PhZ7IOfl2NDiGR+GixNQOMA0I5M9dNMt3c
+        laLz6DTuBSmdP
+X-Received: by 2002:a05:6402:220d:: with SMTP id cq13mr40598823edb.214.1624983229875;
+        Tue, 29 Jun 2021 09:13:49 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzYLbqmP6sK8vu6t1aK1eC6oNBWi6amiphRZMnr9QhdWtWQKVdiBEw+4XNqQwnomlQFR259lw==
+X-Received: by 2002:a05:6402:220d:: with SMTP id cq13mr40598805edb.214.1624983229650;
+        Tue, 29 Jun 2021 09:13:49 -0700 (PDT)
+Received: from gator (cst2-174-132.cust.vodafone.cz. [31.30.174.132])
+        by smtp.gmail.com with ESMTPSA id g23sm8402309ejh.116.2021.06.29.09.13.48
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 29 Jun 2021 09:13:49 -0700 (PDT)
+Date:   Tue, 29 Jun 2021 18:13:46 +0200
+From:   Andrew Jones <drjones@redhat.com>
+To:     Nikos Nikoleris <nikos.nikoleris@arm.com>
+Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, alexandru.elisei@arm.com,
+        Jade Alglave <Jade.Alglave@arm.com>,
+        maranget <luc.maranget@inria.fr>
+Subject: Re: [kvm-unit-tests PATCH 0/3] Add support for external tests and
+ litmus7 documentation
+Message-ID: <20210629161346.txzpeyqq2r2uaqyy@gator>
+References: <20210324171402.371744-1-nikos.nikoleris@arm.com>
+ <aaabf2d9-ecea-8665-f43b-d3382963ff5a@arm.com>
+ <20210414084216.khko7c7tk2tnu6bw@kamzik.brq.redhat.com>
+ <d28b8ee3-6957-a987-10da-727110343b8e@arm.com>
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from ashkalra_ubuntu_server.amd.com (165.204.77.1) by SA0PR11CA0008.namprd11.prod.outlook.com (2603:10b6:806:d3::13) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4264.19 via Frontend Transport; Tue, 29 Jun 2021 15:14:18 +0000
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 228246eb-0d2b-4b0d-8ef0-08d93b1090d8
-X-MS-TrafficTypeDiagnostic: SA0PR12MB4413:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <SA0PR12MB441322D9318215F51C30182D8E029@SA0PR12MB4413.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:2958;
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 9b4TnzSciORtaeAqWIJWTGSg2oWTbd6JELNotPBpcwoLI3LTCbdNjxugOhFlEQUJJjFmwr9o+Rh1r4Bt+Li2ruybkpaBdx2AmV7ZorIFYtxak5gQ9vdh4nxyJ9alcjE6PUbPLfsoXCPHQ34OcjMlho/vOwS150tjId9HyAoc/25Z9TRE1ulVTkNJEQ4uyqwMoImc8NgrX3J2Th/scdHlBDZGbRFI8zhDrGEGOTFb966/a26wYnGZ5BqZmHEoU2a5s5n3f+lGZeMrouOQw0A+LykkVeTku5SArawkK43NoqaFrUN5RDRPwMx5M9fmB5927qdviSDUDfMHeaewOHHnexBGSbMv6z53Wp4zprHsxjcwlSZtp+gg933Vfg4tZHvwEg1G9ypYL9cOJ8pshOT5HmnVmzLF0P8PEAM78IkMTXntpkkGFvkogj5K3Mg4MttpoPhhDakgAoRferpe6u15iIejEtFJ5fkTHwP0PEmz5kBypUtXoMmDkrbOZLyNWcwndV5eCD2gD108lVuCrOn7oMjqy/3vWe30rwrUAaQT9sN1UDDARGOtDEa1INDyxAsM9xyloROP/5hDK/SS3a6khicaCzJERuRD7rRTWa8cm2zL9vrmj4FeSWs/Wm+rmvnrJUmdKaMLrp+vqQmOwJSehAPmWzSZz/pUuSZOhvzWDOagXhTgSG/AtmO+mzIPTOL15IOdaxUspdRwz/ad2GZuBA==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR12MB2767.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(136003)(376002)(346002)(39850400004)(396003)(366004)(6666004)(6486002)(316002)(7416002)(26005)(16526019)(186003)(38100700002)(38350700002)(4326008)(2906002)(478600001)(66556008)(66476007)(5660300002)(7696005)(52116002)(956004)(2616005)(66946007)(86362001)(8936002)(36756003)(6916009)(8676002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?PNQA0uyti88+OEsg1xNxaqJz7QIHpUS05skmiPiAKkp2Dep5sgAkj4Q2rO3e?=
- =?us-ascii?Q?M/IiYy8ceGu24s3HQXGbVW87Nnu/HcDugcjCvF44DtVUJvtvdjq4Xi6zwpCu?=
- =?us-ascii?Q?suh86CTh4D3dGISUDB4BvCNp0gvTM3d/2dtobzx5XIVg4FfPqLmRO4Y6Kr1X?=
- =?us-ascii?Q?vwre9QMwhDj1HNTtYzds/3/f511HzVn8HynRwLrn3BOkT3gFyvdAkGYcuDwM?=
- =?us-ascii?Q?X1V2vsCCqZtLoY+H8R7HJzWHc8TEyz2nExXRiNk1+AKmkdE1by655GH7HIzI?=
- =?us-ascii?Q?brlJWfQyB7nd2CsUPeWrupaugLMWOIIhXeFuLpTlrT9c1oRRBiysCg3f5hp3?=
- =?us-ascii?Q?PCYhD/HOJ/ztrwWyqnIZlHx2ap60Vs0g2ZTEyQV3VjragIqXsrkMfZWIJTIa?=
- =?us-ascii?Q?+MW1Ht329ZjBGRG3mG34hJumBtWHiaF1XCnoQb28960Yh8EcLPx3iV9MG0qX?=
- =?us-ascii?Q?MnAL79jd6hLp6d3cEBd52wOTcKRMIaIs4W/yQIPQontu7FsnZfoJmJ5/KXnN?=
- =?us-ascii?Q?XNujpMFLEcCrH3M0Ai5anpDx8ZIOrADz02k22CnUIkX0P4Uf5wtnoKDIpNGh?=
- =?us-ascii?Q?OuzFOSnxKlu6ELO7h3nvjdWpfGQptR7Oeaw4jSydxTcO6YfP7iyHUazZHQw9?=
- =?us-ascii?Q?bX7QIoe0GrUexC703xDdxVK1YTn3o9H0qkEEKqCqwtbQloUKzS48C8jipFKi?=
- =?us-ascii?Q?W5Dvs2OvcTwuW+HcG1ZlIlwwu+L7qG6qzY4GE8dvS+WCXQERL2/DuhZ0lcZb?=
- =?us-ascii?Q?pdCOwmhqz5xdRk4VyfEJnXT5RIB+nLMDEi2YJEtaaP7m713dd7UVIzT6VKCk?=
- =?us-ascii?Q?Ingi3dzd0a6UN1wGt0tfQwYSyOW/nroTVE364gBRLS5/bbv+mefJP3Z0vVmi?=
- =?us-ascii?Q?4jZrh1MhGApxaRvSC9wrGaZAXnDAibs/94M/MXiboyavTv5xLd02YgPbC4sU?=
- =?us-ascii?Q?6sOcOpc72M/KTrcXfJjtaBfS5lLB05LPJbpqIrVjrI5IHgdZ7PyVGM+OvBQ8?=
- =?us-ascii?Q?k4eT1EenwhC/8nb6l39l3JwO4MbeCAQ2OsZ53YnMYkcnpWNjaWA857xrojH+?=
- =?us-ascii?Q?wWb87EJbEKmdfPsJ7VHn9vMD4MVYSztX1zEyAHInRRv+I5kS6BmTzxCiLmv3?=
- =?us-ascii?Q?Y2R2fiFgrFQiJYttoD7kCUyxKeMmUIdMBpxhNWTGRTv9b89hDr9Jkr1jNuxB?=
- =?us-ascii?Q?SaF9Cfh+Jr7nw5aKESYDtwpTG32k38JBrvbee57QSMkOncrV8VG38uKB0pjH?=
- =?us-ascii?Q?bTUOdwPWmWViyp9nDbtaNDDNcXKJj1ytXMftGulkmm6NtdF+17oionoLASuy?=
- =?us-ascii?Q?/lHhbBqBjlg0WpaAqzsiJWBP?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 228246eb-0d2b-4b0d-8ef0-08d93b1090d8
-X-MS-Exchange-CrossTenant-AuthSource: SN6PR12MB2767.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Jun 2021 15:14:18.6751
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: Jiey+Bf4wSuVI32OSZ288aIz2fhZLZJ8fl5H5Vl2gvIjuRJZIDBqa04FF/NqOB6krr1QFEtTdcXN7BTXxuEkVw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA0PR12MB4413
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <d28b8ee3-6957-a987-10da-727110343b8e@arm.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Ashish Kalra <ashish.kalra@amd.com>
+On Tue, Jun 29, 2021 at 04:32:36PM +0300, Nikos Nikoleris wrote:
+> Hi all,
+> 
+> On 14/04/2021 11:42, Andrew Jones wrote:
+> > On Tue, Apr 13, 2021 at 05:52:37PM +0100, Nikos Nikoleris wrote:
+> > > On 24/03/2021 17:13, Nikos Nikoleris wrote:
+> > > > This set of patches makes small changes to the build system to allow
+> > > > easy integration of tests not included in the repository. To this end,
+> > > > it adds a parameter to the configuration script `--ext-dir=DIR` which
+> > > > will instruct the build system to include the Makefile in
+> > > > DIR/Makefile. The external Makefile can then add extra tests,
+> > > > link object files and modify/extend flags.
+> > > > 
+> > > > In addition, to demonstrate how we can use this functionality, a
+> > > > README file explains how to use litmus7 to generate the C code for
+> > > > litmus tests and link with kvm-unit-tests to produce flat files.
+> > > > 
+> > > > Note that currently, litmus7 produces its own independent Makefile as
+> > > > an intermediate step. Once this set of changes is committed, litmus7
+> > > > will be modifed to make use hook to specify external tests and
+> > > > leverage the build system to build the external tests
+> > > > (https://github.com/relokin/herdtools7/commit/8f23eb39d25931c2c34f4effa096df58547a3bb4).
+> > > > 
+> > > 
+> > > Just wanted to add that if anyone's interested in trying out this series
+> > > with litmus7 I am very happy to help. Any feedback on this series or the way
+> > > we use kvm-unit-tests would be very welcome!
+> > 
+> > Hi Nikos,
+> > 
+> > It's on my TODO to play with this. I just haven't had a chance yet. I'm
+> > particularly slow right now because I'm in the process of handling a
+> > switch of my email server from one type to another, requiring rewrites
+> > of filters, new mail synchronization methods, and, in general, lots of
+> > pain... Hopefully by the end of this week all will be done. Then, I can
+> > start ignoring emails on purpose again, instead of due to the fact that
+> > I can't find them :-)
+> > 
+> > Thanks,
+> > drew
+> > 
+> 
+> Just wanted to revive the discussion on this. In particular there are two
+> fairly small changes to the build system that allow us to add external tests
+> (in our case, generated using litmus7) to the list of tests we build. This
+> is specific to arm builds but I am happy to look into generalizing it to
+> include all archs.
+>
 
-Reset the host's shared pages list related to kernel
-specific page encryption status settings before we load a
-new kernel by kexec. We cannot reset the complete
-shared pages list here as we need to retain the
-UEFI/OVMF firmware specific settings.
+Hi Nikos,
 
-The host's shared pages list is maintained for the
-guest to keep track of all unencrypted guest memory regions,
-therefore we need to explicitly mark all shared pages as
-encrypted again before rebooting into the new guest kernel.
+I just spent a few minutes playing around with litmus7. I see the
+litmus/libdir/kvm-*.cfg files in herdtools7[1] are very kvm-unit-tests
+specific. They appear to absorb much of the kvm-unit-tests Makefile
+paths, flags, cross compiler prefixes, etc. Are these .cfg files the
+only kvm-unit-tests specific files in herdtools7?
 
-Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
----
- arch/x86/kernel/kvm.c | 25 +++++++++++++++++++++++++
- 1 file changed, 25 insertions(+)
+Here's a half-baked proposal that I'd like your input on:
 
-diff --git a/arch/x86/kernel/kvm.c b/arch/x86/kernel/kvm.c
-index a014c9bb5066..a55712ee58a1 100644
---- a/arch/x86/kernel/kvm.c
-+++ b/arch/x86/kernel/kvm.c
-@@ -869,10 +869,35 @@ static void __init kvm_init_platform(void)
- 	if (sev_active() &&
- 	    kvm_para_has_feature(KVM_FEATURE_MIGRATION_CONTROL)) {
- 		unsigned long nr_pages;
-+		int i;
- 
- 		pv_ops.mmu.notify_page_enc_status_changed =
- 			kvm_sev_hc_page_enc_status;
- 
-+		/*
-+		 * Reset the host's shared pages list related to kernel
-+		 * specific page encryption status settings before we load a
-+		 * new kernel by kexec. Reset the page encryption status
-+		 * during early boot intead of just before kexec to avoid SMP
-+		 * races during kvm_pv_guest_cpu_reboot().
-+		 * NOTE: We cannot reset the complete shared pages list
-+		 * here as we need to retain the UEFI/OVMF firmware
-+		 * specific settings.
-+		 */
-+
-+		for (i = 0; i < e820_table->nr_entries; i++) {
-+			struct e820_entry *entry = &e820_table->entries[i];
-+
-+			if (entry->type != E820_TYPE_RAM)
-+				continue;
-+
-+			nr_pages = DIV_ROUND_UP(entry->size, PAGE_SIZE);
-+
-+			kvm_hypercall3(KVM_HC_MAP_GPA_RANGE, entry->addr,
-+				       nr_pages,
-+				       KVM_MAP_GPA_RANGE_ENCRYPTED | KVM_MAP_GPA_RANGE_PAGE_SZ_4K);
-+		}
-+
- 		/*
- 		 * Ensure that _bss_decrypted section is marked as decrypted in the
- 		 * shared pages list.
--- 
-2.17.1
+ 1) Generate the kvm-unit-tests specific .cfg files in kvm-unit-tests when
+    configured with a new --litmus7 configure switch. This will ensure
+    that the paths, flags, etc. will be up to date in the .cfg file.
+ 2) Add kvm-unit-tests as a git submodule to [1] to get access to the
+    generated .cfg files and to build the litmus tests for kvm-unit-tests.
+    A litmus7 command will invoke the kvm-unit-tests build (using
+    make -C).
+ 3) Create an additional unittests.cfg file (e.g. litmus7-tests.cfg) for
+    kvm-unit-tests that allows easily running all the litmus7 tests.
+    (That should also allow 'make standalone' to work for litmus7 tests.)
+ 4) Like patch 3/3 already does, document the litmus7 stuff in
+    kvm-unit-tests, so people understand the purpose of the --litmus7
+    configure switch and also to inform them of the ability to run
+    additional tests and how (by using [1]).
+
+[1] https://github.com/herd/herdtools7.git 
+
+Thanks,
+drew
 
