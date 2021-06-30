@@ -2,56 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 491C93B8A32
+	by mail.lfdr.de (Postfix) with ESMTP id 920C73B8A33
 	for <lists+kvm@lfdr.de>; Wed, 30 Jun 2021 23:48:27 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232327AbhF3Vuv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 30 Jun 2021 17:50:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39598 "EHLO
+        id S232432AbhF3Vux (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 30 Jun 2021 17:50:53 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39606 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232042AbhF3Vuu (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 30 Jun 2021 17:50:50 -0400
-Received: from mail-pj1-x1049.google.com (mail-pj1-x1049.google.com [IPv6:2607:f8b0:4864:20::1049])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 57513C061756
-        for <kvm@vger.kernel.org>; Wed, 30 Jun 2021 14:48:21 -0700 (PDT)
-Received: by mail-pj1-x1049.google.com with SMTP id c10-20020a17090a558ab029017019f7ec8fso2068037pji.8
-        for <kvm@vger.kernel.org>; Wed, 30 Jun 2021 14:48:21 -0700 (PDT)
+        with ESMTP id S232397AbhF3Vuw (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 30 Jun 2021 17:50:52 -0400
+Received: from mail-qt1-x849.google.com (mail-qt1-x849.google.com [IPv6:2607:f8b0:4864:20::849])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2A4DAC061756
+        for <kvm@vger.kernel.org>; Wed, 30 Jun 2021 14:48:23 -0700 (PDT)
+Received: by mail-qt1-x849.google.com with SMTP id c17-20020ac87dd10000b0290250fd339409so2037713qte.6
+        for <kvm@vger.kernel.org>; Wed, 30 Jun 2021 14:48:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=date:in-reply-to:message-id:mime-version:references:subject:from:to
          :cc;
-        bh=1h8e+apG3TTK1wRFhX1YgohezWt8EbM/GUKeu+wHNLA=;
-        b=TtIfBmZfHCJ2cr5jLzgT3clLRpf8lqr4lK1J+gSBwh8JoI65zvLR3SA46owrDYkD4z
-         cOzWzvLa4J28heFnsTro9kHcfuwn3uD2vI85vK1rXG6bQXPwHWjirmsuPRO61MoDQcfM
-         ZwaKFSy+44VC+oZuRhPtkbVfjSy/pgaug39/jpiS8pERPzFSw7DTRoiCG9panhRREmL+
-         DShfcinj3BZTWc24EZF0ORkQjJyF6PSkn4CDLlmCN1C+VLIofRtF9mA7Z5W5RG6rFEpA
-         jtFO6k/HCqX+Jgq1hve/RYZnKGr3CN4JMyDKMNxIOYeJFEHqXc9InxXzkpGUnAH40hqQ
-         U1nw==
+        bh=MWYYk9Sr8HKYlfAS2NHSlFPP/eKAy+6T+SEm5ULRBgE=;
+        b=q+c1Q3WcUvx9b5dZrgTHagM+IM3jIXcjW40U79ExET56cSUFS2poOMLEtjQuvyUa3d
+         +E+8lRvLOEA65qIxRru5VVAWYC7AHlPCo0ccaYGaltik+EheZUkoj4ozlE6m0DyPm+cy
+         USx/H9SYRAF6d53fZBlbJMnZG2I7phaLYYG8SGGTRNwnmTrkqPt67kgqP4DRrklWs92A
+         O6Gq3VcfR7NSwZeb0s72SY4G5Rco/BfjFaCAKxnKBYdSQTW2Vn7hK5ez2LB/WXVroiOx
+         owxLPBGQzJTRl8G5KXB/H1CuGmbsRzWAkSd8E4W0ZjAz7QYdvryRME46YHUtcd+qX8tu
+         BPdw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=1h8e+apG3TTK1wRFhX1YgohezWt8EbM/GUKeu+wHNLA=;
-        b=MgW2vVJr2Nup+Eq4zejPnI3bIq1FOu0dyAvWvtBIqjP0p3FvgP4j2v08JpRhAK8z8C
-         08HlD1FyfIvsyJSYLYxNkulrjoJMRi0yYMMhM8Yp1zby9ZDBhUo/sGtbUAQGyu93imV3
-         n+gMfvkKnAp0OAwwdAKULgMTTMrwa0Oo3zKJSTfh2kf5ISYLGw021tVZJxSfL+J9njPv
-         8dQ8fEiFyu+HvvR8TiKNyJhRCtthe4Q9pgXWZkGy5wWfp5hjHGje4BtsV3LF00d5W4KI
-         CM/XpIxPhm+YEn0f0/bzmKpf3Il8lc1sUdRNAuKffVA4TkE9xDqJprRUNnrhGJZ4QhPz
-         ktkA==
-X-Gm-Message-State: AOAM530JCAZ2rEQJIZ+lH3NfGlZKNBKvIpqQYyNX06AQhQgbQ5aOlqxO
-        hYBrtAt/S1DH9C4SOXkvhvnEKgweOejK0PKLH4p1HfvD5cO+AuBILB4BqXJokxRjiHwMYaVgjDt
-        IoBXJA1RnBBDBtO0Rpc9/NhmURYnf2/WUn5L+wuhGvUtFnEW83fakmy60vWAYEKo=
-X-Google-Smtp-Source: ABdhPJy/+bjigqQpu7LXftTmsvbM3zANLjDLlj3pASUu0wshlCndt+Uzut1h4+IlM2ZnzFbToNGOnteFCAUpdg==
+        bh=MWYYk9Sr8HKYlfAS2NHSlFPP/eKAy+6T+SEm5ULRBgE=;
+        b=ufDWIf1R263wEew9c7squgbQC27ai9vwnGZpLnEfPWKt46tFmKKZ9/qdifivKQwwLU
+         eiDhG3boiFwkc+4+2x9Xes1qnlNXwUDkqOZ9OMAnnz4zCPDZnAgEANPMyQ8WyHvEpZX2
+         BGbYTg1g1SVR4iP8A7pndpS/Thv84KpjST3tD9/wNFUw2ZIGlJlyPnhV8jd2Xf81KvDi
+         DkOrpdmUhnEJv7zmNce/TGLZOcGcI+RGSF4EBULSvHlaP2whdtRgHU7Ogx81VQHzG0VL
+         EmNSq7Te9BMQcefs/cMCTibUqUz72Pvsa+HWR277YoPiQqXayVuwxwTz1dV0CZ+YKkmL
+         Wk0Q==
+X-Gm-Message-State: AOAM531LIIbjVM1F+4GS3as96lh0tUKvrdFWJYB139MMFJ1wS8duvUgz
+        BH8nOuXK0KNq4bFr2kC1SS3iC3II2Wq/YT1SMDrSSGnt3czTBO3qNZ9rOnblNkIUoAPSNUzBDwb
+        iyzPeSOXf02jECH8YrZHRqJspsRPg4AKrMB35arxQoSZ6B06KaInk6RGWRCumAgw=
+X-Google-Smtp-Source: ABdhPJySf6pu89+nwMZgxjcqOXquBVQqyRpYf27QInfPRVYjrw70yBB+TIUWLuKxKlWtGN8YDSkhZYlM74eaLw==
 X-Received: from dmatlack-heavy.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:19cd])
- (user=dmatlack job=sendgmr) by 2002:a17:90b:4a0a:: with SMTP id
- kk10mr40665935pjb.16.1625089700683; Wed, 30 Jun 2021 14:48:20 -0700 (PDT)
-Date:   Wed, 30 Jun 2021 21:47:57 +0000
+ (user=dmatlack job=sendgmr) by 2002:a0c:dd8c:: with SMTP id
+ v12mr15116890qvk.23.1625089702229; Wed, 30 Jun 2021 14:48:22 -0700 (PDT)
+Date:   Wed, 30 Jun 2021 21:47:58 +0000
 In-Reply-To: <20210630214802.1902448-1-dmatlack@google.com>
-Message-Id: <20210630214802.1902448-2-dmatlack@google.com>
+Message-Id: <20210630214802.1902448-3-dmatlack@google.com>
 Mime-Version: 1.0
 References: <20210630214802.1902448-1-dmatlack@google.com>
 X-Mailer: git-send-email 2.32.0.93.g670b81a890-goog
-Subject: [PATCH v2 1/6] KVM: x86/mmu: Rename cr2_or_gpa to gpa in fast_page_fault
+Subject: [PATCH v2 2/6] KVM: x86/mmu: Fix use of enums in trace_fast_page_fault
 From:   David Matlack <dmatlack@google.com>
 To:     kvm@vger.kernel.org
 Cc:     Ben Gardon <bgardon@google.com>, Joerg Roedel <joro@8bytes.org>,
@@ -72,49 +72,36 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-fast_page_fault is only called from direct_page_fault where we know the
-address is a gpa.
+Enum values have to be exported to userspace since the formatting is not
+done in the kernel. Without doing this perf maps RET_PF_FIXED and
+RET_PF_SPURIOUS to 0, which results in incorrect output:
 
-Fixes: 736c291c9f36 ("KVM: x86: Use gpa_t for cr2/gpa to fix TDP support on 32-bit KVM")
-Reviewed-by: Ben Gardon <bgardon@google.com>
+  $ perf record -a -e kvmmmu:fast_page_fault --filter "ret==3" -- ./access_tracking_perf_test
+  $ perf script | head -1
+   [...] new 610006048d25877 spurious 0 fixed 0  <------ should be 1
+
+Fix this by exporting the enum values to userspace with TRACE_DEFINE_ENUM.
+
+Fixes: c4371c2a682e ("KVM: x86/mmu: Return unique RET_PF_* values if the fault was fixed")
 Signed-off-by: David Matlack <dmatlack@google.com>
 ---
- arch/x86/kvm/mmu/mmu.c | 8 +++-----
- 1 file changed, 3 insertions(+), 5 deletions(-)
+ arch/x86/kvm/mmu/mmutrace.h | 3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index b888385d1933..45274436d3c0 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -3098,8 +3098,7 @@ static bool is_access_allowed(u32 fault_err_code, u64 spte)
- /*
-  * Returns one of RET_PF_INVALID, RET_PF_FIXED or RET_PF_SPURIOUS.
-  */
--static int fast_page_fault(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa,
--			   u32 error_code)
-+static int fast_page_fault(struct kvm_vcpu *vcpu, gpa_t gpa, u32 error_code)
- {
- 	struct kvm_shadow_walk_iterator iterator;
- 	struct kvm_mmu_page *sp;
-@@ -3115,7 +3114,7 @@ static int fast_page_fault(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa,
- 	do {
- 		u64 new_spte;
+diff --git a/arch/x86/kvm/mmu/mmutrace.h b/arch/x86/kvm/mmu/mmutrace.h
+index efbad33a0645..55c7e0fcda52 100644
+--- a/arch/x86/kvm/mmu/mmutrace.h
++++ b/arch/x86/kvm/mmu/mmutrace.h
+@@ -244,6 +244,9 @@ TRACE_EVENT(
+ 		  __entry->access)
+ );
  
--		for_each_shadow_entry_lockless(vcpu, cr2_or_gpa, iterator, spte)
-+		for_each_shadow_entry_lockless(vcpu, gpa, iterator, spte)
- 			if (!is_shadow_present_pte(spte))
- 				break;
- 
-@@ -3194,8 +3193,7 @@ static int fast_page_fault(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa,
- 
- 	} while (true);
- 
--	trace_fast_page_fault(vcpu, cr2_or_gpa, error_code, iterator.sptep,
--			      spte, ret);
-+	trace_fast_page_fault(vcpu, gpa, error_code, iterator.sptep, spte, ret);
- 	walk_shadow_page_lockless_end(vcpu);
- 
- 	return ret;
++TRACE_DEFINE_ENUM(RET_PF_FIXED);
++TRACE_DEFINE_ENUM(RET_PF_SPURIOUS);
++
+ TRACE_EVENT(
+ 	fast_page_fault,
+ 	TP_PROTO(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa, u32 error_code,
 -- 
 2.32.0.93.g670b81a890-goog
 
