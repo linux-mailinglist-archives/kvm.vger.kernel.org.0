@@ -2,249 +2,465 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 71F763B8212
-	for <lists+kvm@lfdr.de>; Wed, 30 Jun 2021 14:23:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 046643B833C
+	for <lists+kvm@lfdr.de>; Wed, 30 Jun 2021 15:35:46 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234510AbhF3M0Z (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 30 Jun 2021 08:26:25 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:41440 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S234426AbhF3M0Z (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 30 Jun 2021 08:26:25 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1625055835;
+        id S234876AbhF3NiN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 30 Jun 2021 09:38:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42852 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S234723AbhF3NiL (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 30 Jun 2021 09:38:11 -0400
+Received: from mail.skyhub.de (mail.skyhub.de [IPv6:2a01:4f8:190:11c2::b:1457])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E23D6C061756;
+        Wed, 30 Jun 2021 06:35:42 -0700 (PDT)
+Received: from zn.tnic (p200300ec2f12c300d5c967e0b00ce97c.dip0.t-ipconnect.de [IPv6:2003:ec:2f12:c300:d5c9:67e0:b00c:e97c])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id E006F1EC046E;
+        Wed, 30 Jun 2021 15:35:40 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
+        t=1625060141;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=02KZVZINR5eeSJp8fjmn2mtAw2RjOU8lCXk4THynFKA=;
-        b=LO9ZyvwiuxslSCa/iBkG73J+bAaZiNhEkeJMA83QQU+QRY+IaRo2yERSsG+dFiBcm9k1g6
-        jdutXjVxqSOC9mNQilGnf7W1RU953qE+Dr3DbzpSbi1HChIn7ZANY69xnXY8KWuvfI14jV
-        dQGm8QWjLxYL3+GEJj+Kn0vtg18XLnc=
-Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
- [209.85.218.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-239-70pqPY4lM6WOwsn8mXAKnA-1; Wed, 30 Jun 2021 08:23:54 -0400
-X-MC-Unique: 70pqPY4lM6WOwsn8mXAKnA-1
-Received: by mail-ej1-f71.google.com with SMTP id k1-20020a17090666c1b029041c273a883dso708717ejp.3
-        for <kvm@vger.kernel.org>; Wed, 30 Jun 2021 05:23:54 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=02KZVZINR5eeSJp8fjmn2mtAw2RjOU8lCXk4THynFKA=;
-        b=qBEh+xg7xeYLYOGRK6sAJks4Ku/6+UUdZdozW8YIVEfN23WUXPa7FP4G93+UNaAUkc
-         w3J32YKB8NXYw1tFVUNkoi5NrtawWClNzXbPU9iVu/VvCOaXqqp6v72Qk+Pj0AQtBJTG
-         bPeuXNL6QMV1SaEcsl25qtRXjlj+PQD2WR2Sn29KlOjLRoTWKtHzCpE2GMdShuG7e5/v
-         JMjLXKbUDNfbMCQgvBjlq/7dDYKfN+HC00/TNXG6GabnRVbMCIvoCfJ08e/28lawR/mB
-         QTcvauFoYqD9Gx3FXIqYhpKpsmBnIJL7kkAGkmRqbfXuXptS56zRpTNlM+xWCBs7miE3
-         GXHg==
-X-Gm-Message-State: AOAM531SyMpDvZYfEDpMbOmyWjxypl+/SFOa4W8GXGPM4kaabR/uv6LQ
-        aQJyVfxSmnZERLwENi2BenHZ1xbDC41PBh4QpDH1w5GuY/imtQqpy2P8ygTXRb6pnA6DpO2eYe8
-        u707PiqMZcwYG
-X-Received: by 2002:aa7:dcd9:: with SMTP id w25mr45737628edu.372.1625055833162;
-        Wed, 30 Jun 2021 05:23:53 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwh9C79wqER+Wm2IP9GN1MpLgNiQ+DyzKcWB/dXKfkhrxXhsOS4PpiAbi+0B2Yuj51RcE7VGw==
-X-Received: by 2002:aa7:dcd9:: with SMTP id w25mr45737603edu.372.1625055832895;
-        Wed, 30 Jun 2021 05:23:52 -0700 (PDT)
-Received: from gator.home (cst2-174-132.cust.vodafone.cz. [31.30.174.132])
-        by smtp.gmail.com with ESMTPSA id ch17sm12693027edb.54.2021.06.30.05.23.51
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 30 Jun 2021 05:23:52 -0700 (PDT)
-Date:   Wed, 30 Jun 2021 14:23:50 +0200
-From:   Andrew Jones <drjones@redhat.com>
-To:     Nikos Nikoleris <nikos.nikoleris@arm.com>
-Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, alexandru.elisei@arm.com,
-        Jade Alglave <Jade.Alglave@arm.com>,
-        maranget <luc.maranget@inria.fr>
-Subject: Re: [kvm-unit-tests PATCH 0/3] Add support for external tests and
- litmus7 documentation
-Message-ID: <20210630122350.6nnuxa4yvjjfli7e@gator.home>
-References: <20210324171402.371744-1-nikos.nikoleris@arm.com>
- <aaabf2d9-ecea-8665-f43b-d3382963ff5a@arm.com>
- <20210414084216.khko7c7tk2tnu6bw@kamzik.brq.redhat.com>
- <d28b8ee3-6957-a987-10da-727110343b8e@arm.com>
- <20210629161346.txzpeyqq2r2uaqyy@gator>
- <3d5e3769-a48b-03b8-a97b-3b2e533e676c@arm.com>
+         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
+        bh=wPPCQp4f4RUBchaxZp4/uDs+S7WG+9WZBgFuIygun4Y=;
+        b=Qs0HTTFiFAa90rUyUBxepT0u0N2z+f59oFvbyO82BqhoqE/Gbv+Tw8E/F7ocjZDitIlU00
+        53xqBC1vnJL82h158EqaU70gt8t1kjb6bO4/Fzjs7CIOgdV2ag1iGwU7XtpsbRKKC1hdPh
+        DoropWwCO0f3PMQwTceqlWuVZAeqR5U=
+Date:   Wed, 30 Jun 2021 15:35:35 +0200
+From:   Borislav Petkov <bp@alien8.de>
+To:     Brijesh Singh <brijesh.singh@amd.com>
+Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
+        linux-coco@lists.linux.dev, linux-mm@kvack.org,
+        linux-crypto@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        David Rientjes <rientjes@google.com>, tony.luck@intel.com,
+        npmccallum@redhat.com
+Subject: Re: [PATCH Part1 RFC v3 22/22] virt: Add SEV-SNP guest driver
+Message-ID: <YNxzJ2I3ZumTELLb@zn.tnic>
+References: <20210602140416.23573-1-brijesh.singh@amd.com>
+ <20210602140416.23573-23-brijesh.singh@amd.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <3d5e3769-a48b-03b8-a97b-3b2e533e676c@arm.com>
+In-Reply-To: <20210602140416.23573-23-brijesh.singh@amd.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jun 29, 2021 at 07:49:37PM +0300, Nikos Nikoleris wrote:
+On Wed, Jun 02, 2021 at 09:04:16AM -0500, Brijesh Singh wrote:
+> SEV-SNP specification provides the guest a mechanism to communicate with
+> the PSP without risk from a malicious hypervisor who wishes to read, alter,
+> drop or replay the messages sent. The driver uses snp_issue_guest_request()
+> to issue GHCB SNP_GUEST_REQUEST NAE event. This command constructs a
+> trusted channel between the guest and the PSP firmware.
 > 
+> The userspace can use the following ioctls provided by the driver:
 > 
-> On 29/06/2021 19:13, Andrew Jones wrote:
-> > On Tue, Jun 29, 2021 at 04:32:36PM +0300, Nikos Nikoleris wrote:
-> > > Hi all,
-> > > 
-> > > On 14/04/2021 11:42, Andrew Jones wrote:
-> > > > On Tue, Apr 13, 2021 at 05:52:37PM +0100, Nikos Nikoleris wrote:
-> > > > > On 24/03/2021 17:13, Nikos Nikoleris wrote:
-> > > > > > This set of patches makes small changes to the build system to allow
-> > > > > > easy integration of tests not included in the repository. To this end,
-> > > > > > it adds a parameter to the configuration script `--ext-dir=DIR` which
-> > > > > > will instruct the build system to include the Makefile in
-> > > > > > DIR/Makefile. The external Makefile can then add extra tests,
-> > > > > > link object files and modify/extend flags.
-> > > > > > 
-> > > > > > In addition, to demonstrate how we can use this functionality, a
-> > > > > > README file explains how to use litmus7 to generate the C code for
-> > > > > > litmus tests and link with kvm-unit-tests to produce flat files.
-> > > > > > 
-> > > > > > Note that currently, litmus7 produces its own independent Makefile as
-> > > > > > an intermediate step. Once this set of changes is committed, litmus7
-> > > > > > will be modifed to make use hook to specify external tests and
-> > > > > > leverage the build system to build the external tests
-> > > > > > (https://github.com/relokin/herdtools7/commit/8f23eb39d25931c2c34f4effa096df58547a3bb4).
-> > > > > > 
-> > > > > 
-> > > > > Just wanted to add that if anyone's interested in trying out this series
-> > > > > with litmus7 I am very happy to help. Any feedback on this series or the way
-> > > > > we use kvm-unit-tests would be very welcome!
-> > > > 
-> > > > Hi Nikos,
-> > > > 
-> > > > It's on my TODO to play with this. I just haven't had a chance yet. I'm
-> > > > particularly slow right now because I'm in the process of handling a
-> > > > switch of my email server from one type to another, requiring rewrites
-> > > > of filters, new mail synchronization methods, and, in general, lots of
-> > > > pain... Hopefully by the end of this week all will be done. Then, I can
-> > > > start ignoring emails on purpose again, instead of due to the fact that
-> > > > I can't find them :-)
-> > > > 
-> > > > Thanks,
-> > > > drew
-> > > > 
-> > > 
-> > > Just wanted to revive the discussion on this. In particular there are two
-> > > fairly small changes to the build system that allow us to add external tests
-> > > (in our case, generated using litmus7) to the list of tests we build. This
-> > > is specific to arm builds but I am happy to look into generalizing it to
-> > > include all archs.
-> > > 
-> > 
-> > Hi Nikos,
-> > 
+> 1. Request an attestation report that can be used to assume the identity
+>    and security configuration of the guest.
+> 2. Ask the firmware to provide a key derived from a root key.
 > 
-> Hi Drew,
+> See SEV-SNP spec section Guest Messages for more details.
 > 
-> Thanks for having a look!
-> 
-> > I just spent a few minutes playing around with litmus7. I see the
-> > litmus/libdir/kvm-*.cfg files in herdtools7[1] are very kvm-unit-tests
-> > specific. They appear to absorb much of the kvm-unit-tests Makefile
-> > paths, flags, cross compiler prefixes, etc. Are these .cfg files the
-> > only kvm-unit-tests specific files in herdtools7?
-> > 
-> 
-> Indeed these kvm-*.cfg files redefine much of the same variables we have in
-> kvm-unit-tests make files. litmus7 uses these cfg files (and
-> litmus/libdir/_aarch64/kvm.rules for the rules) to generate a standalone
-> Makefile. When we call make, we compile the generated sources and link with
-> kvm-unit-tests object files. The generated Makefile redefines much of the
-> build system in kvm-unit-tests which is not great. If we make any change to
-> the build system in kvm-unit-tests (e.g., add support for efi) we have to
-> port this change to the standalone Makefile we generate using litmus7.
+> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
+> ---
+>  drivers/virt/Kconfig           |   3 +
+>  drivers/virt/Makefile          |   1 +
+>  drivers/virt/sevguest/Kconfig  |  10 +
+>  drivers/virt/sevguest/Makefile |   4 +
+>  drivers/virt/sevguest/snp.c    | 448 +++++++++++++++++++++++++++++++++
+>  drivers/virt/sevguest/snp.h    |  63 +++++
+>  include/uapi/linux/sev-guest.h |  56 +++++
+>  7 files changed, 585 insertions(+)
+>  create mode 100644 drivers/virt/sevguest/Kconfig
+>  create mode 100644 drivers/virt/sevguest/Makefile
+>  create mode 100644 drivers/virt/sevguest/snp.c
+>  create mode 100644 drivers/virt/sevguest/snp.h
+>  create mode 100644 include/uapi/linux/sev-guest.h
 
-Right, that's why I'm suggesting that kvm-unit-tests be brought into the
-litmus7 build as a submodule.
+Seeing how there are a bunch of such driver things for SEV stuff, I'd
+say to put it under:
+
+	drivers/virt/coco/
+
+where we can collect all those confidential computing supporting
+drivers.
 
 > 
-> > Here's a half-baked proposal that I'd like your input on:
-> > 
-> >   1) Generate the kvm-unit-tests specific .cfg files in kvm-unit-tests when
-> >      configured with a new --litmus7 configure switch. This will ensure
-> >      that the paths, flags, etc. will be up to date in the .cfg file.
-> 
-> This wouldn't be enough we would also need some sort of minimal Makefile too
-> (something like litmus/libdir/_aarch64/kvm.rules).
+> diff --git a/drivers/virt/Kconfig b/drivers/virt/Kconfig
+> index 8061e8ef449f..4de714c5ee9a 100644
+> --- a/drivers/virt/Kconfig
+> +++ b/drivers/virt/Kconfig
+> @@ -36,4 +36,7 @@ source "drivers/virt/vboxguest/Kconfig"
+>  source "drivers/virt/nitro_enclaves/Kconfig"
+>  
+>  source "drivers/virt/acrn/Kconfig"
+> +
+> +source "drivers/virt/sevguest/Kconfig"
+> +
+>  endif
+> diff --git a/drivers/virt/Makefile b/drivers/virt/Makefile
+> index 3e272ea60cd9..b2d1a8131c90 100644
+> --- a/drivers/virt/Makefile
+> +++ b/drivers/virt/Makefile
+> @@ -8,3 +8,4 @@ obj-y				+= vboxguest/
+>  
+>  obj-$(CONFIG_NITRO_ENCLAVES)	+= nitro_enclaves/
+>  obj-$(CONFIG_ACRN_HSM)		+= acrn/
+> +obj-$(CONFIG_SEV_GUEST)		+= sevguest/
+> diff --git a/drivers/virt/sevguest/Kconfig b/drivers/virt/sevguest/Kconfig
+> new file mode 100644
+> index 000000000000..e88a85527bf6
+> --- /dev/null
+> +++ b/drivers/virt/sevguest/Kconfig
+> @@ -0,0 +1,10 @@
+> +config SEV_GUEST
+> +	tristate "AMD SEV Guest driver"
+> +	default y
+> +	depends on AMD_MEM_ENCRYPT
+> +	help
+> +	  Provides AMD SNP guest request driver. The driver can be used by the
 
-It also looks derived from kvm-unit-tests:arm/Makefile.common. So why not
-just modify that instead? Possibly creating a new make target in order to
-accommodate any differences.
+s/Provides AMD SNP guest request driver. //
 
-> 
-> >   2) Add kvm-unit-tests as a git submodule to [1] to get access to the
-> >      generated .cfg files and to build the litmus tests for kvm-unit-tests.
-> >      A litmus7 command will invoke the kvm-unit-tests build (using
-> >      make -C).
-> 
-> That's possible but it doesn't solve the biggest problem which is figuring
-> out what is the command(s) we need to run to link an elf and subsequently
-> generate a flat file.
+> +	  guest to communicate with the hypervisor to request the attestation report
 
-Shouldn't all those commands be in the Makefiles that will be used as part
-of the 'make -C <kut-submodule-dir>' call?
+to communicate with the PSP, I thought, not the hypervisor?
 
-> 
-> >   3) Create an additional unittests.cfg file (e.g. litmus7-tests.cfg) for
-> >      kvm-unit-tests that allows easily running all the litmus7 tests.
-> >      (That should also allow 'make standalone' to work for litmus7 tests.)
-> 
-> This is a good point I can have a look at how we could add this.
-> 
-> >   4) Like patch 3/3 already does, document the litmus7 stuff in
-> >      kvm-unit-tests, so people understand the purpose of the --litmus7
-> >      configure switch and also to inform them of the ability to run
-> >      additional tests and how (by using [1]).
-> > 
-> 
-> Overall it would be great if we could piggyback on the build system of
-> kvm-unit-tests rather than try to re-generate (part of) it. This is what the
-> patch 2/3 tries to do. This is not solving the problem in a way that is
-> specific to litmus7 and allows for adding more source files to the all-tests
-> list.
+> +	  and more.
+> +
+> +	  If you choose 'M' here, this module will be called sevguest.
+> diff --git a/drivers/virt/sevguest/Makefile b/drivers/virt/sevguest/Makefile
+> new file mode 100644
+> index 000000000000..1505df437682
+> --- /dev/null
+> +++ b/drivers/virt/sevguest/Makefile
+> @@ -0,0 +1,4 @@
+> +# SPDX-License-Identifier: GPL-2.0-only
+> +sevguest-y := snp.o
 
-Patch 2/3 only adds the ability to add a new dir to look at. It leaves
-everything else up to litmus7 build code to duplicate what it needs and
-also manual commands to populate that new directory. I'd rather we have a
-more coherent solution.
+What's that for?
 
-We want to build litmus7 tests as kvm-unit-tests. We can look at this two
-ways: 1) we want to add litmus7 tests to kvm-unit-tests or 2) we want to
-build litmus7 tests for kvm-unit-tests.
+Why isn't the filename simply called:
 
-This patch series is going for (1), but without actually committing the
-tests to kvm-unit-tests. I'm arguing we should do (2), especially since
-the litmus7 build code already appears to need to know about
-kvm-unit-tests.
+drivers/virt/coco/sevguest.c
 
-I think we should only need to modify the build scripts of litmus7 to
-use/build kvm-unit-tests as a submodule and to somehow build litmus7
-tests with it. Also, litmus7 test running could be done from the
-litmus7 build repo or kvm-unit-tests standalone tests could built for
-litmus7 tests and installed elsewhere.
+?
 
-A final note on patch 2/3. Why not just override the TEST_DIR config
-variable with a different directory? (If it doesn't work for some
-reason, then we could hopefully fix that.)
+Or is more coming?
 
-Thanks,
-drew
+And below there's
 
-> 
-> If 2/3 was accepted then we would do something like [1]. And the generated
-> Makefile for the litmus7 tests turns into something very simple:
-> 
-> CFLAGS += -march=armv8.1-a
-> 
-> tests += $(EXT_DIR)/MP.flat
-> 
-> cflatobjs += $(EXT_DIR)/utils.o
-> cflatobjs += $(EXT_DIR)/kvm_timeofday.o
-> 
-> [1]: https://github.com/relokin/herdtools7/commit/6fa5ec06856c8263a0823ad21e097a39c97cabc1
-> 
-> Thanks,
-> 
-> Nikos
-> 
-> > [1] https://github.com/herd/herdtools7.git
-> > 
-> > Thanks,
-> > drew
-> > 
-> 
+	.name = "snp-guest",
 
+so you need to get the naming in order here.
+
+> +obj-$(CONFIG_SEV_GUEST) += sevguest.o
+> diff --git a/drivers/virt/sevguest/snp.c b/drivers/virt/sevguest/snp.c
+> new file mode 100644
+> index 000000000000..00d8e8fddf2c
+> --- /dev/null
+> +++ b/drivers/virt/sevguest/snp.c
+> @@ -0,0 +1,448 @@
+> +// SPDX-License-Identifier: GPL-2.0-only
+> +/*
+> + * AMD Secure Encrypted Virtualization Nested Paging (SEV-SNP) guest request interface
+> + *
+> + * Copyright (C) 2021 Advanced Micro Devices, Inc.
+> + *
+> + * Author: Brijesh Singh <brijesh.singh@amd.com>
+> + */
+> +
+> +#include <linux/module.h>
+> +#include <linux/kernel.h>
+> +#include <linux/types.h>
+> +#include <linux/mutex.h>
+> +#include <linux/io.h>
+> +#include <linux/platform_device.h>
+> +#include <linux/miscdevice.h>
+> +#include <linux/set_memory.h>
+> +#include <linux/fs.h>
+> +#include <crypto/aead.h>
+> +#include <linux/scatterlist.h>
+> +#include <linux/sev-guest.h>
+> +#include <uapi/linux/sev-guest.h>
+> +
+> +#include "snp.h"
+> +
+> +#define DEVICE_NAME	"sev-guest"
+> +#define AAD_LEN		48
+> +#define MSG_HDR_VER	1
+> +
+> +struct snp_guest_crypto {
+> +	struct crypto_aead *tfm;
+> +	uint8_t *iv, *authtag;
+> +	int iv_len, a_len;
+> +};
+> +
+> +struct snp_guest_dev {
+> +	struct device *dev;
+> +	struct miscdevice misc;
+> +
+> +	struct snp_guest_crypto *crypto;
+> +	struct snp_guest_msg *request, *response;
+> +};
+> +
+> +static DEFINE_MUTEX(snp_cmd_mutex);
+> +
+> +static inline struct snp_guest_dev *to_snp_dev(struct file *file)
+> +{
+> +	struct miscdevice *dev = file->private_data;
+> +
+> +	return container_of(dev, struct snp_guest_dev, misc);
+> +}
+> +
+> +static struct snp_guest_crypto *init_crypto(struct snp_guest_dev *snp_dev, uint8_t *key,
+> +					    size_t keylen)
+> +{
+> +	struct snp_guest_crypto *crypto;
+> +
+> +	crypto = kzalloc(sizeof(*crypto), GFP_KERNEL_ACCOUNT);
+> +	if (!crypto)
+> +		return NULL;
+> +
+> +	crypto->tfm = crypto_alloc_aead("gcm(aes)", 0, 0);
+
+I know that it is hard to unselect CONFIG_CRYPTO_AEAD2 which provides
+this but you better depend on it in the Makefile so that some random
+config still builds.
+
+> +	if (IS_ERR(crypto->tfm))
+> +		goto e_free;
+> +
+> +	if (crypto_aead_setkey(crypto->tfm, key, keylen))
+> +		goto e_free_crypto;
+> +
+> +	crypto->iv_len = crypto_aead_ivsize(crypto->tfm);
+> +	if (crypto->iv_len < 12) {
+> +		dev_err(snp_dev->dev, "IV length is less than 12.\n");
+> +		goto e_free_crypto;
+> +	}
+> +
+> +	crypto->iv = kmalloc(crypto->iv_len, GFP_KERNEL_ACCOUNT);
+> +	if (!crypto->iv)
+> +		goto e_free_crypto;
+> +
+> +	if (crypto_aead_authsize(crypto->tfm) > MAX_AUTHTAG_LEN) {
+> +		if (crypto_aead_setauthsize(crypto->tfm, MAX_AUTHTAG_LEN)) {
+> +			dev_err(snp_dev->dev, "failed to set authsize to %d\n", MAX_AUTHTAG_LEN);
+> +			goto e_free_crypto;
+> +		}
+> +	}
+> +
+> +	crypto->a_len = crypto_aead_authsize(crypto->tfm);
+> +	crypto->authtag = kmalloc(crypto->a_len, GFP_KERNEL_ACCOUNT);
+> +	if (!crypto->authtag)
+> +		goto e_free_crypto;
+> +
+> +	return crypto;
+> +
+> +e_free_crypto:
+> +	crypto_free_aead(crypto->tfm);
+> +e_free:
+> +	kfree(crypto->iv);
+> +	kfree(crypto->authtag);
+> +	kfree(crypto);
+> +
+> +	return NULL;
+> +}
+
+...
+
+> +static int handle_guest_request(struct snp_guest_dev *snp_dev, int msg_type,
+> +				struct snp_user_guest_request *input, void *req_buf,
+> +				size_t req_len, void __user *resp_buf, size_t resp_len)
+> +{
+> +	struct snp_guest_crypto *crypto = snp_dev->crypto;
+> +	struct page *page;
+> +	size_t msg_len;
+> +	int ret;
+> +
+> +	/* Allocate the buffer to hold response */
+> +	resp_len += crypto->a_len;
+> +	page = alloc_pages(GFP_KERNEL_ACCOUNT, get_order(resp_len));
+> +	if (!page)
+> +		return -ENOMEM;
+> +
+> +	ret = __handle_guest_request(snp_dev, msg_type, input, req_buf, req_len,
+> +			page_address(page), resp_len, &msg_len);
+
+Align arguments on the opening brace.
+
+Check the whole patch too for other similar cases.
+
+> +	if (ret)
+> +		goto e_free;
+> +
+> +	if (copy_to_user(resp_buf, page_address(page), msg_len))
+> +		ret = -EFAULT;
+> +
+> +e_free:
+> +	__free_pages(page, get_order(resp_len));
+> +
+> +	return ret;
+> +}
+> +
+> +static int get_report(struct snp_guest_dev *snp_dev, struct snp_user_guest_request *input)
+> +{
+> +	struct snp_user_report __user *report = (struct snp_user_report *)input->data;
+> +	struct snp_user_report_req req;
+> +
+> +	if (copy_from_user(&req, &report->req, sizeof(req)))
+
+What guarantees that that __user report thing is valid and is not going
+to trick the kernel into doing a NULL pointer access in the ->req access
+here?
+
+IOW, you need to verify all your user data being passed through before
+using it.
+
+> +		return -EFAULT;
+> +
+> +	return handle_guest_request(snp_dev, SNP_MSG_REPORT_REQ, input, &req.user_data,
+> +			sizeof(req.user_data), report->response, sizeof(report->response));
+> +}
+> +
+> +static int derive_key(struct snp_guest_dev *snp_dev, struct snp_user_guest_request *input)
+> +{
+> +	struct snp_user_derive_key __user *key = (struct snp_user_derive_key *)input->data;
+> +	struct snp_user_derive_key_req req;
+> +
+> +	if (copy_from_user(&req, &key->req, sizeof(req)))
+> +		return -EFAULT;
+> +
+> +	return handle_guest_request(snp_dev, SNP_MSG_KEY_REQ, input, &req, sizeof(req),
+> +			key->response, sizeof(key->response));
+> +}
+> +
+> +static long snp_guest_ioctl(struct file *file, unsigned int ioctl, unsigned long arg)
+> +{
+> +	struct snp_guest_dev *snp_dev = to_snp_dev(file);
+> +	struct snp_user_guest_request input;
+> +	void __user *argp = (void __user *)arg;
+> +	int ret = -ENOTTY;
+> +
+> +	if (copy_from_user(&input, argp, sizeof(input)))
+> +		return -EFAULT;
+> +
+> +	mutex_lock(&snp_cmd_mutex);
+> +	switch (ioctl) {
+> +	case SNP_GET_REPORT: {
+> +		ret = get_report(snp_dev, &input);
+> +		break;
+> +	}
+> +	case SNP_DERIVE_KEY: {
+> +		ret = derive_key(snp_dev, &input);
+> +		break;
+> +	}
+> +	default:
+> +		break;
+> +	}
+
+If only two ioctls, you don't need the switch-case thing.
+
+> +
+> +	mutex_unlock(&snp_cmd_mutex);
+> +
+> +	if (copy_to_user(argp, &input, sizeof(input)))
+> +		return -EFAULT;
+> +
+> +	return ret;
+> +}
+
+...
+
+> diff --git a/include/uapi/linux/sev-guest.h b/include/uapi/linux/sev-guest.h
+> new file mode 100644
+> index 000000000000..0a8454631605
+> --- /dev/null
+> +++ b/include/uapi/linux/sev-guest.h
+> @@ -0,0 +1,56 @@
+> +/* SPDX-License-Identifier: GPL-2.0-only WITH Linux-syscall-note */
+> +/*
+> + * Userspace interface for AMD SEV and SEV-SNP guest driver.
+> + *
+> + * Copyright (C) 2021 Advanced Micro Devices, Inc.
+> + *
+> + * Author: Brijesh Singh <brijesh.singh@amd.com>
+> + *
+> + * SEV-SNP API specification is available at: https://developer.amd.com/sev/
+> + */
+> +
+> +#ifndef __UAPI_LINUX_SEV_GUEST_H_
+> +#define __UAPI_LINUX_SEV_GUEST_H_
+> +
+> +#include <linux/types.h>
+> +
+> +struct snp_user_report_req {
+> +	__u8 user_data[64];
+> +};
+> +
+> +struct snp_user_report {
+> +	struct snp_user_report_req req;
+> +
+> +	/* see SEV-SNP spec for the response format */
+> +	__u8 response[4000];
+> +};
+> +
+> +struct snp_user_derive_key_req {
+> +	__u8 root_key_select;
+> +	__u64 guest_field_select;
+> +	__u32 vmpl;
+> +	__u32 guest_svn;
+> +	__u64 tcb_version;
+> +};
+> +
+> +struct snp_user_derive_key {
+> +	struct snp_user_derive_key_req req;
+> +
+> +	/* see SEV-SNP spec for the response format */
+> +	__u8 response[64];
+> +};
+> +
+> +struct snp_user_guest_request {
+> +	/* Message version number (must be non-zero) */
+> +	__u8 msg_version;
+> +	__u64 data;
+> +
+> +	/* firmware error code on failure (see psp-sev.h) */
+> +	__u32 fw_err;
+> +};
+
+All those struct names have a "snp_user" prefix. It seems to me that
+that "user" is superfluous.
+
+> +
+> +#define SNP_GUEST_REQ_IOC_TYPE	'S'
+> +#define SNP_GET_REPORT _IOWR(SNP_GUEST_REQ_IOC_TYPE, 0x0, struct snp_user_guest_request)
+> +#define SNP_DERIVE_KEY _IOWR(SNP_GUEST_REQ_IOC_TYPE, 0x1, struct snp_user_guest_request)
+
+Where are those ioctls documented so that userspace can know how to use
+them?
+
+Thx.
+
+-- 
+Regards/Gruss,
+    Boris.
+
+https://people.kernel.org/tglx/notes-about-netiquette
