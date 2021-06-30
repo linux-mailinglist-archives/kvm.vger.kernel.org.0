@@ -2,54 +2,54 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 720BE3B81CC
-	for <lists+kvm@lfdr.de>; Wed, 30 Jun 2021 14:12:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0929B3B81E3
+	for <lists+kvm@lfdr.de>; Wed, 30 Jun 2021 14:17:16 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234532AbhF3MPX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 30 Jun 2021 08:15:23 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:44934 "EHLO
+        id S234510AbhF3MTk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 30 Jun 2021 08:19:40 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:52250 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S234434AbhF3MPW (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 30 Jun 2021 08:15:22 -0400
+        by vger.kernel.org with ESMTP id S234490AbhF3MTi (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 30 Jun 2021 08:19:38 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1625055173;
+        s=mimecast20190719; t=1625055428;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=0N2yOcyFYV5CPN+IR8aqJYBNH6snD2VpY0jfF5xnCwA=;
-        b=HKrRxoPN1kQXddDBiHgYDeo24+X8Zd9lBy2nzUhhHTnwRyfe/IWfH3rDm1pKwVYenxm4dP
-        vY7zzNKLygJ1bh6Dl1rMZGhH68gPhPMgTR1F2wSRcKu26h2RQ0prH00wmXy/F9gH2PBULI
-        Xrn2e0We6Oy3FLsFQ+CaviPsH5+FuLc=
-Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
- [209.85.208.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-566-o_14-_O5M6e7-U4OoEPUCA-1; Wed, 30 Jun 2021 08:12:51 -0400
-X-MC-Unique: o_14-_O5M6e7-U4OoEPUCA-1
-Received: by mail-ed1-f71.google.com with SMTP id z5-20020a05640235c5b0290393974bcf7eso1049833edc.2
-        for <kvm@vger.kernel.org>; Wed, 30 Jun 2021 05:12:51 -0700 (PDT)
+        bh=S5U28ywwLl6OV7xmavpG2YSBQN6F4k443zEP4QDb3fA=;
+        b=CUxrRamZXfjkwDqb54IDozdSVfP0sxOlQRHUYpPUyei54BaOPKntB1o8P550/AmmxXwO2S
+        w2Jnx1lbX1CUDUsopSNq9ORJq0E7qBTHt9LfYGI/TaqQvwlQdjEi8KO0Cwg4LQBMMK4Sd1
+        cUXssM44FFUMTNUses092Avswx7G58s=
+Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
+ [209.85.208.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-391-S0caxrLjPhKKS16LhIttNw-1; Wed, 30 Jun 2021 08:17:04 -0400
+X-MC-Unique: S0caxrLjPhKKS16LhIttNw-1
+Received: by mail-ed1-f69.google.com with SMTP id s6-20020a0564020146b029039578926b8cso1031731edu.20
+        for <kvm@vger.kernel.org>; Wed, 30 Jun 2021 05:17:04 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=0N2yOcyFYV5CPN+IR8aqJYBNH6snD2VpY0jfF5xnCwA=;
-        b=qscv2dgZVVafAlmMxiDlL2ux2U7spyFiHCNRJkBaCvOMjclPvuFVNAMu4oKOiwnszJ
-         1uwLtxmMqoayAidPYeyRUPh7HzCr8s2a3R/JLyDq53Q2J7dfmzJ/9t6LSpkVPjTomK9C
-         wO91RIM2Dln/YwdNYZQJFC6uVMwIwLD/N67USP3i0B4nwqFV9gooR2wk6y3/UHiGwzsC
-         6y5aWjtg4LlnR/OGr3eqRFcqguVnCkOuP2L59a7ct+GBlTY+e36ObW2vHuogyD6YnRrn
-         phicWJpcW83VTHz9wmppTtNiaaTvIivG4CWuTmUtCI3RJEf6oOUVggxUG56KQXJ1iuFj
-         8Usg==
-X-Gm-Message-State: AOAM532d261a2hzBIcEUWNDTC2d1AXOHKTfbHjmcHlhFpfcM9iP8r2/n
-        fWEOVKcdYFcXWWCmlRQJAg1LCmpMlkN8ydx1iSgrTDPbeKws4AwNVtI3MFIGz/cxpGcuJsS1ABb
-        PYAAK5a0D528C
-X-Received: by 2002:a17:906:3755:: with SMTP id e21mr35502847ejc.0.1625055170500;
-        Wed, 30 Jun 2021 05:12:50 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyyQieQzL13kfgrAiQdC+xnDKI6+4gnyVHQvGrs/WltryrEMaxVn3e2E8N8jeK6pEWm6l6rvQ==
-X-Received: by 2002:a17:906:3755:: with SMTP id e21mr35502827ejc.0.1625055170336;
-        Wed, 30 Jun 2021 05:12:50 -0700 (PDT)
+        bh=S5U28ywwLl6OV7xmavpG2YSBQN6F4k443zEP4QDb3fA=;
+        b=aOUoMPdOlfzIQzJ1VjbjYLh2Gf6q5XOyMOr/2TOB7cOAdwnsYDuq3ZIpj+I5Ila8iv
+         unkEGKAlHyyZYCmKlQM3UTKbTe9eSgz8oeTlPQLM78bv7QI3Q65RvukdSBfuOdaJvwee
+         8sZ2FIrRt+1lZa2Uatr7g2wVBr6o+2NnOHr3v5x4A7hwar86mpGE7cDTg8/IlNukBJ9V
+         AOWkuOL0zQTNheANwTariVqkLRvQsi67bHxf7wkkLBusx0Gsg7cbtKbiuw9OZLtjgi7R
+         KmmoBmmFGPLXOCYV8RJd98RXqeMe22olicXKGFPK4Uqd0pX4wsH4ISC1LdU4+0p5AWFu
+         xOOg==
+X-Gm-Message-State: AOAM530DG7qZVWH/yWsAEBqOvb5wJKD6fuVYv7hD5X5PjzRWOyElv2KW
+        9F5212Yhnkbs1t2ggYdb3N0bsYnxPxaCe7/jUHcK5JTa/kHDiARuHaE//HTje0Qe/Dr1ij0uRJC
+        vPhLhLyuU+4se
+X-Received: by 2002:aa7:cb43:: with SMTP id w3mr47972947edt.126.1625055423546;
+        Wed, 30 Jun 2021 05:17:03 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyzTOoXea3dw2KwL4npV9WtK8OeMjBSRZaapsXE1JRl9I0iizB5JdRpr8sX+P8Pm7+k3AQDmw==
+X-Received: by 2002:aa7:cb43:: with SMTP id w3mr47972923edt.126.1625055423383;
+        Wed, 30 Jun 2021 05:17:03 -0700 (PDT)
 Received: from steredhat (host-79-18-148-79.retail.telecomitalia.it. [79.18.148.79])
-        by smtp.gmail.com with ESMTPSA id e17sm897093ejz.83.2021.06.30.05.12.48
+        by smtp.gmail.com with ESMTPSA id v24sm799726eds.39.2021.06.30.05.17.02
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 30 Jun 2021 05:12:49 -0700 (PDT)
-Date:   Wed, 30 Jun 2021 14:12:46 +0200
+        Wed, 30 Jun 2021 05:17:03 -0700 (PDT)
+Date:   Wed, 30 Jun 2021 14:17:00 +0200
 From:   Stefano Garzarella <sgarzare@redhat.com>
 To:     Arseny Krasnov <arseny.krasnov@kaspersky.com>
 Cc:     Stefan Hajnoczi <stefanha@redhat.com>,
@@ -57,72 +57,200 @@ Cc:     Stefan Hajnoczi <stefanha@redhat.com>,
         Jason Wang <jasowang@redhat.com>,
         "David S. Miller" <davem@davemloft.net>,
         Jakub Kicinski <kuba@kernel.org>,
-        Colin Ian King <colin.king@canonical.com>,
+        Jorgen Hansen <jhansen@vmware.com>,
         Norbert Slusarek <nslusarek@gmx.net>,
+        Colin Ian King <colin.king@canonical.com>,
         Andra Paraschiv <andraprs@amazon.com>,
         kvm <kvm@vger.kernel.org>,
         Linux Virtualization <virtualization@lists.linux-foundation.org>,
         netdev <netdev@vger.kernel.org>,
         kernel list <linux-kernel@vger.kernel.org>,
         Krasnov Arseniy <oxffffaa@gmail.com>
-Subject: Re: [RFC PATCH v1 11/16] afvsock: add 'seqpacket_drop()'
-Message-ID: <CAGxU2F4mX5khjA+a_LQEfZYg1rjEmccXce-ab0DVyEJEX-kYcw@mail.gmail.com>
+Subject: Re: [RFC PATCH v1 16/16] vsock_test: SEQPACKET read to broken buffer
+Message-ID: <CAGxU2F7GswqHk_bkSHx7Q4y_tvdNLG0PRcq0Ujex+cWv+pRCJw@mail.gmail.com>
 References: <20210628095959.569772-1-arseny.krasnov@kaspersky.com>
- <20210628100415.571391-1-arseny.krasnov@kaspersky.com>
+ <20210628100539.572000-1-arseny.krasnov@kaspersky.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20210628100415.571391-1-arseny.krasnov@kaspersky.com>
+In-Reply-To: <20210628100539.572000-1-arseny.krasnov@kaspersky.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Jun 28, 2021 at 01:04:12PM +0300, Arseny Krasnov wrote:
->Add special callback for SEQPACKET socket which is called when
->we need to drop current in-progress record: part of record was
->copied successfully, reader wait rest of record, but signal
->interrupts it and reader leaves it's loop, leaving packets of
->current record still in queue. So to avoid copy of "orphaned"
->record, we tell transport to drop every packet until EOR will
->be found.
+On Mon, Jun 28, 2021 at 01:05:36PM +0300, Arseny Krasnov wrote:
+>Add test where sender sends two message, each with own
+>data pattern. Reader tries to read first to broken buffer:
+>it has three pages size, but middle page is unmapped. Then,
+>reader tries to read second message to valid buffer. Test
+>checks, that uncopied part of first message was dropped
+>and thus not copied as part of second message.
 >
 >Signed-off-by: Arseny Krasnov <arseny.krasnov@kaspersky.com>
 >---
-> include/net/af_vsock.h   | 1 +
-> net/vmw_vsock/af_vsock.c | 1 +
-> 2 files changed, 2 insertions(+)
+> tools/testing/vsock/vsock_test.c | 121 +++++++++++++++++++++++++++++++
+> 1 file changed, 121 insertions(+)
 
-And also for this change, I think you can merge with patches 12, 13, 14, 
-15, otherwise if we bisect and we build at this patch, the 
-seqpacket_drop pointer is not valid.
+Cool test! Thanks for doing this!
+
+>
+>diff --git a/tools/testing/vsock/vsock_test.c b/tools/testing/vsock/vsock_test.c
+>index 67766bfe176f..697ba168e97f 100644
+>--- a/tools/testing/vsock/vsock_test.c
+>+++ b/tools/testing/vsock/vsock_test.c
+>@@ -16,6 +16,7 @@
+> #include <linux/kernel.h>
+> #include <sys/types.h>
+> #include <sys/socket.h>
+>+#include <sys/mman.h>
+>
+> #include "timeout.h"
+> #include "control.h"
+>@@ -385,6 +386,121 @@ static void test_seqpacket_msg_trunc_server(const struct test_opts *opts)
+>       close(fd);
+> }
+>
+>+#define BUF_PATTERN_1 'a'
+>+#define BUF_PATTERN_2 'b'
+>+
+>+static void test_seqpacket_invalid_rec_buffer_client(const struct test_opts *opts)
+>+{
+>+      int fd;
+>+      unsigned char *buf1;
+>+      unsigned char *buf2;
+>+      int buf_size = getpagesize() * 3;
+>+
+>+      fd = vsock_seqpacket_connect(opts->peer_cid, 1234);
+>+      if (fd < 0) {
+>+              perror("connect");
+>+              exit(EXIT_FAILURE);
+>+      }
+>+
+>+      buf1 = malloc(buf_size);
+>+      if (buf1 == NULL) {
+
+checkpatch suggests to use "if (!buf1)" ...
+
+>+              perror("'malloc()' for 'buf1'");
+>+              exit(EXIT_FAILURE);
+>+      }
+>+
+>+      buf2 = malloc(buf_size);
+>+      if (buf2 == NULL) {
+
+... and "if (!buf2)" ...
+
+>+              perror("'malloc()' for 'buf2'");
+>+              exit(EXIT_FAILURE);
+>+      }
+>+
+>+      memset(buf1, BUF_PATTERN_1, buf_size);
+>+      memset(buf2, BUF_PATTERN_2, buf_size);
+>+
+>+      if (send(fd, buf1, buf_size, 0) != buf_size) {
+>+              perror("send failed");
+>+              exit(EXIT_FAILURE);
+>+      }
+>+
+>+      if (send(fd, buf2, buf_size, 0) != buf_size) {
+>+              perror("send failed");
+>+              exit(EXIT_FAILURE);
+>+      }
+>+
+>+      close(fd);
+>+}
+>+
+>+static void test_seqpacket_invalid_rec_buffer_server(const struct test_opts *opts)
+>+{
+>+      int fd;
+>+      unsigned char *broken_buf;
+>+      unsigned char *valid_buf;
+>+      int page_size = getpagesize();
+>+      int buf_size = page_size * 3;
+>+      ssize_t res;
+>+      int prot = PROT_READ | PROT_WRITE;
+>+      int flags = MAP_PRIVATE | MAP_ANONYMOUS;
+>+      int i;
+>+
+>+      fd = vsock_seqpacket_accept(VMADDR_CID_ANY, 1234, NULL);
+>+      if (fd < 0) {
+>+              perror("accept");
+>+              exit(EXIT_FAILURE);
+>+      }
+>+
+>+      /* Setup first buffer. */
+>+      broken_buf = mmap(NULL, buf_size, prot, flags, -1, 0);
+>+      if (broken_buf == MAP_FAILED) {
+>+              perror("mmap for 'broken_buf'");
+>+              exit(EXIT_FAILURE);
+>+      }
+>+
+>+      /* Unmap "hole" in buffer. */
+>+      if (munmap(broken_buf + page_size, page_size)) {
+>+              perror("'broken_buf' setup");
+>+              exit(EXIT_FAILURE);
+>+      }
+>+
+>+      valid_buf = mmap(NULL, buf_size, prot, flags, -1, 0);
+>+      if (valid_buf == MAP_FAILED) {
+>+              perror("mmap for 'valid_buf'");
+>+              exit(EXIT_FAILURE);
+>+      }
+>+
+>+      /* Try to fill buffer with unmapped middle. */
+>+      res = read(fd, broken_buf, buf_size);
+>+      if (res != -1) {
+>+              perror("invalid read result of 'broken_buf'");
+>+              exit(EXIT_FAILURE);
+>+      }
+>+
+>+      if (errno != ENOMEM) {
+>+              perror("invalid errno of 'broken_buf'");
+>+              exit(EXIT_FAILURE);
+>+      }
+>+
+>+      /* Try to fill valid buffer. */
+>+      res = read(fd, valid_buf, buf_size);
+>+      if (res != buf_size) {
+>+              perror("invalid read result of 'valid_buf'");
+>+              exit(EXIT_FAILURE);
+>+      }
+>+
+>+      for (i = 0; i < buf_size; i++) {
+>+              if (valid_buf[i] != BUF_PATTERN_2) {
+>+                      perror("invalid pattern for valid buf");
+>+                      exit(EXIT_FAILURE);
+>+              }
+>+      }
+>+
+>+
+
+... and to remove the extra blank line here :-)
 
 Thanks,
 Stefano
 
->
->diff --git a/include/net/af_vsock.h b/include/net/af_vsock.h
->index 1747c0b564ef..356878aabbd4 100644
->--- a/include/net/af_vsock.h
->+++ b/include/net/af_vsock.h
->@@ -141,6 +141,7 @@ struct vsock_transport {
->       int (*seqpacket_enqueue)(struct vsock_sock *vsk, struct msghdr *msg,
->                                size_t len);
->       bool (*seqpacket_allow)(u32 remote_cid);
->+      void (*seqpacket_drop)(struct vsock_sock *vsk);
->
->       /* Notification. */
->       int (*notify_poll_in)(struct vsock_sock *, size_t, bool *);
->diff --git a/net/vmw_vsock/af_vsock.c b/net/vmw_vsock/af_vsock.c
->index ec54e4222cbf..27fa38090e13 100644
->--- a/net/vmw_vsock/af_vsock.c
->+++ b/net/vmw_vsock/af_vsock.c
->@@ -2024,6 +2024,7 @@ static int __vsock_seqpacket_recvmsg(struct sock *sk, struct msghdr *msg,
->               intr_err = vsock_connectible_wait_data(sk, &wait, timeout, NULL, 0);
->               if (intr_err <= 0) {
->                       err = intr_err;
->+                      transport->seqpacket_drop(vsk);
->                       break;
->               }
+>+      /* Unmap buffers. */
+>+      munmap(broken_buf, page_size);
+>+      munmap(broken_buf + page_size * 2, page_size);
+>+      munmap(valid_buf, buf_size);
+>+      close(fd);
+>+}
+>+
+> static struct test_case test_cases[] = {
+>       {
+>               .name = "SOCK_STREAM connection reset",
+>@@ -425,6 +541,11 @@ static struct test_case test_cases[] = {
+>               .run_client = test_seqpacket_msg_trunc_client,
+>               .run_server = test_seqpacket_msg_trunc_server,
+>       },
+>+      {
+>+              .name = "SOCK_SEQPACKET invalid receive buffer",
+>+              .run_client = test_seqpacket_invalid_rec_buffer_client,
+>+              .run_server = test_seqpacket_invalid_rec_buffer_server,
+>+      },
+>       {},
+> };
 >
 >--
 >2.25.1
