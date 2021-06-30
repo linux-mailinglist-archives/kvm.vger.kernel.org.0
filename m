@@ -2,55 +2,58 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 00CDA3B873C
-	for <lists+kvm@lfdr.de>; Wed, 30 Jun 2021 18:48:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2199A3B876E
+	for <lists+kvm@lfdr.de>; Wed, 30 Jun 2021 19:09:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229792AbhF3QvR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 30 Jun 2021 12:51:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58090 "EHLO
+        id S232420AbhF3RLv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 30 Jun 2021 13:11:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34434 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229510AbhF3QvQ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 30 Jun 2021 12:51:16 -0400
-Received: from mail-pj1-x102e.google.com (mail-pj1-x102e.google.com [IPv6:2607:f8b0:4864:20::102e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 602D5C061756
-        for <kvm@vger.kernel.org>; Wed, 30 Jun 2021 09:48:47 -0700 (PDT)
-Received: by mail-pj1-x102e.google.com with SMTP id g24-20020a17090ace98b029017225d0c013so3441160pju.1
-        for <kvm@vger.kernel.org>; Wed, 30 Jun 2021 09:48:47 -0700 (PDT)
+        with ESMTP id S229963AbhF3RLu (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 30 Jun 2021 13:11:50 -0400
+Received: from mail-lf1-x136.google.com (mail-lf1-x136.google.com [IPv6:2a00:1450:4864:20::136])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 044ABC0617A8
+        for <kvm@vger.kernel.org>; Wed, 30 Jun 2021 10:09:21 -0700 (PDT)
+Received: by mail-lf1-x136.google.com with SMTP id w19so6433312lfk.5
+        for <kvm@vger.kernel.org>; Wed, 30 Jun 2021 10:09:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=hx4sHPmpea1ssyo//7YojpBEY/8Dcb5c5IPS9PMJhIk=;
-        b=jw4C41UcaJLjRGuy4z9pSqd4r5Z5SnfuXfelNN0qNxjZCfFm4y61lAm2gS/JbmuC+y
-         pTkSg/zoQc+ojr+tDHflc4aTT33Y3V7sq0sGWNZTKokoJ5v9gKSllQJKRrC7xN3lh6JU
-         W+8sx3juiAIraD3gqInA/NklMtZezqx8B2Y/IiLA1wZ2Wu5YMQHLJMAcfhxBs+3QMpw1
-         sb3S1UBBzyXkKo1gMYg/bcAJh1hVJKrfeejbIcSMcoroznlfrf0slh32djIVKpx6b2ed
-         Sz05nHV6NSS90mMWwNUWAaU4hS9LCxycbbmGB9JqSw/SbSOnVgcO5L9mQEFyxDwjecHT
-         4c+Q==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=wMrs2skzTM0HY+lsZxoBQR/QKSygEmkXMJOZY+h7EgU=;
+        b=I/5vOpSFnyOPXZ3RLvoghmYhzElCIdMhy+l/aRdXSWff3CU0Y6AwdAXjYXvYyjqzvu
+         rolos0Kx+uEM6ryzcmaErs3qWR4n+D3cWk7aFTNjjNZQ5ESC4MAsLzcxmssHOAH1wCBl
+         Xz8xcxm+pKmIK+ccbCHfDr7EO4MaqK9/I7K3PPy0EEUbZadSwbU/PRuXBmOo4L7sUcKx
+         nz/MenT5nb54eWizcmxlYfrRjcQ7OmOSwP13r1onCw6hDZEJXZmqsqAijN5RJ2D6u8Gm
+         YGZ76RagyQ26oA9iNgtgM6Kzd6WjkDEgZseVgxjAdloZ5J5rEzBvxPsfp4+PuQ7oYk2c
+         JdJg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=hx4sHPmpea1ssyo//7YojpBEY/8Dcb5c5IPS9PMJhIk=;
-        b=fp+PQgoq5T1bIsIwY+yfOmKshwiuV3f9zU6ljxTzK1Iv5tITL6WyROb73lBGuja21p
-         p6fUclYX8hsAVmul8HTW9JvaYR7mTnsNBC+kwKTR9Tx2Fw4CObB5SdZui0fXgtzeH/1J
-         4GaOs0lJyf99Q+OXi5uLZ/EQoKjokRz7Ibe6i8sFDV+bz4B++qoVKulNLoI9UePrBava
-         6yL9diJZmKrj7nksFhf/UPvE3AmsO2ujO9vFbdQ+1oTCxvl/QrrdvrgK3jGevTzQKX7J
-         394SJ0yeCrIzfLQmGTB6+8VUpBEaeX3F3ekhbSuRzFcuSc8PKBVCkCViUArYqyXkpmq6
-         oi4w==
-X-Gm-Message-State: AOAM5330qFXqppHrUrCv9bSjH8kXEabIwJ/vOeKboqaVPXj4cLJZ8p+K
-        W4SG8p+lvdJSeMQBETco0eTNDFfxYUmaBw==
-X-Google-Smtp-Source: ABdhPJxs1KpcsKXdwFRVLG2nyYxkQ7sqFlLA6mfloOo099zl9iV5Yv046zB363+6JA1C8jrzLqW9Zg==
-X-Received: by 2002:a17:902:fe10:b029:127:6549:fe98 with SMTP id g16-20020a170902fe10b02901276549fe98mr32880513plj.25.1625071726557;
-        Wed, 30 Jun 2021 09:48:46 -0700 (PDT)
-Received: from google.com (254.80.82.34.bc.googleusercontent.com. [34.82.80.254])
-        by smtp.gmail.com with ESMTPSA id v3sm22917472pfb.126.2021.06.30.09.48.45
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 30 Jun 2021 09:48:45 -0700 (PDT)
-Date:   Wed, 30 Jun 2021 16:48:42 +0000
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=wMrs2skzTM0HY+lsZxoBQR/QKSygEmkXMJOZY+h7EgU=;
+        b=n83ZSTWmdhY4vSRbAM9xuz5dIVLcuRsWtI+bw44jah0dYMaPsmwRHD1QiWdClDhiim
+         tqzR+b/6HN5gV96tSwRKaKl9qOa9ZW/Y+YrgyWay3vqf49rTw4jzWbmgHwWpMwy7s0cH
+         qJJvfNCjkkdbDIq3oVbt1hUJMSMELsLmooN2aapere+MtUX49aEjGWFZfsSLdXshzv8S
+         sMKTQs/e7/2D+TO8q7o1cEr970M8L8Unj9ifg5OR3mwep2SqV7aCO5b4BgrDaIeJ1IL3
+         Xek7yzXx/OW66dC+4Ax9XkAZmV1c73i2aBbh1WSmlL2jggLfqznLoxgIo0R+vovu1OH1
+         FSpg==
+X-Gm-Message-State: AOAM5302LWlfL90YfWIBefJR875W0vNJ3W0SfsGCQAU4eTx5+Zwp/tAY
+        nkq3WoyTq399ZQojpnsiri2VuzVPZ2ebAP+zN7+56g==
+X-Google-Smtp-Source: ABdhPJwZkV4B0dPt6ZzKjYDuj/F1a4LpZ+b/3/t80CdZOdZTxUKldx+7TwMuz7chFvQvV9SZJiuuTbIGFeHUk5Djj9I=
+X-Received: by 2002:a05:6512:2314:: with SMTP id o20mr27246583lfu.531.1625072959006;
+ Wed, 30 Jun 2021 10:09:19 -0700 (PDT)
+MIME-Version: 1.0
+References: <20210628173152.2062988-1-david.edmondson@oracle.com> <YNyc26bXNg4bEAlG@google.com>
+In-Reply-To: <YNyc26bXNg4bEAlG@google.com>
 From:   David Matlack <dmatlack@google.com>
+Date:   Wed, 30 Jun 2021 10:08:52 -0700
+Message-ID: <CALzav=ewuTYiRS57iYkrVCa6T-garkyFh1OygsQWrUgOS993wQ@mail.gmail.com>
+Subject: Re: [PATCH 0/2] KVM: x86: Convey the exit reason to user-space on
+ emulation failure
 To:     David Edmondson <david.edmondson@oracle.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+Cc:     LKML <linux-kernel@vger.kernel.org>,
+        kvm list <kvm@vger.kernel.org>,
         Thomas Gleixner <tglx@linutronix.de>,
         Borislav Petkov <bp@alien8.de>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
@@ -59,128 +62,46 @@ Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
         "H. Peter Anvin" <hpa@zytor.com>,
-        Paolo Bonzini <pbonzini@redhat.com>, x86@kernel.org,
-        Joao Martins <joao.m.martins@oracle.com>
-Subject: Re: [PATCH 2/2] KVM: x86: On emulation failure, convey the exit
- reason to userspace
-Message-ID: <YNygagjfTIuptxL8@google.com>
-References: <20210628173152.2062988-1-david.edmondson@oracle.com>
- <20210628173152.2062988-3-david.edmondson@oracle.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210628173152.2062988-3-david.edmondson@oracle.com>
+        Paolo Bonzini <pbonzini@redhat.com>, X86 ML <x86@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Jun 28, 2021 at 06:31:52PM +0100, David Edmondson wrote:
-> To aid in debugging.
+On Wed, Jun 30, 2021 at 9:33 AM David Matlack <dmatlack@google.com> wrote:
+>
+> On Mon, Jun 28, 2021 at 06:31:50PM +0100, David Edmondson wrote:
+> > To aid in debugging failures in the field, when instruction emulation
+>
+> What do you mean by a "debugging failure"?
 
-Please add more context to the commit message.
+Oh! Sorry I misread this as "*debugging failures*" rather than
+"debugging *failures*". I know what you mean here :-).
 
-> 
-> Suggested-by: Joao Martins <joao.m.martins@oracle.com>
-> Signed-off-by: David Edmondson <david.edmondson@oracle.com>
-> ---
->  arch/x86/kvm/x86.c       | 23 +++++++++++++++++------
->  include/uapi/linux/kvm.h |  2 ++
->  2 files changed, 19 insertions(+), 6 deletions(-)
-> 
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index 8166ad113fb2..48ef0dc68faf 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -7455,7 +7455,7 @@ void kvm_inject_realmode_interrupt(struct kvm_vcpu *vcpu, int irq, int inc_eip)
->  }
->  EXPORT_SYMBOL_GPL(kvm_inject_realmode_interrupt);
->  
-> -static void prepare_emulation_failure_exit(struct kvm_vcpu *vcpu)
-> +static void prepare_emulation_failure_exit(struct kvm_vcpu *vcpu, uint64_t flags)
->  {
->  	struct x86_emulate_ctxt *ctxt = vcpu->arch.emulate_ctxt;
->  	u32 insn_size = ctxt->fetch.end - ctxt->fetch.data;
-> @@ -7466,7 +7466,8 @@ static void prepare_emulation_failure_exit(struct kvm_vcpu *vcpu)
->  	run->emulation_failure.ndata = 0;
->  	run->emulation_failure.flags = 0;
->  
-> -	if (insn_size) {
-> +	if (insn_size &&
-> +	    (flags & KVM_INTERNAL_ERROR_EMULATION_FLAG_INSTRUCTION_BYTES)) {
->  		run->emulation_failure.ndata = 3;
->  		run->emulation_failure.flags |=
->  			KVM_INTERNAL_ERROR_EMULATION_FLAG_INSTRUCTION_BYTES;
-> @@ -7476,6 +7477,14 @@ static void prepare_emulation_failure_exit(struct kvm_vcpu *vcpu)
->  		memcpy(run->emulation_failure.insn_bytes,
->  		       ctxt->fetch.data, insn_size);
->  	}
-> +
-> +	if (flags & KVM_INTERNAL_ERROR_EMULATION_FLAG_EXIT_REASON) {
-
-This flag is always passed so this check if superfluous. Perhaps change
-`int flags` to `bool instruction_bytes` and have it control only whether
-the instruction bytes are populated.
-
-> +		run->emulation_failure.ndata = 4;
-> +		run->emulation_failure.flags |=
-> +			KVM_INTERNAL_ERROR_EMULATION_FLAG_EXIT_REASON;
-> +		run->emulation_failure.exit_reason =
-> +			static_call(kvm_x86_get_exit_reason)(vcpu);
-> +	}
->  }
->  
->  static int handle_emulation_failure(struct kvm_vcpu *vcpu, int emulation_type)
-> @@ -7492,16 +7501,18 @@ static int handle_emulation_failure(struct kvm_vcpu *vcpu, int emulation_type)
->  
->  	if (kvm->arch.exit_on_emulation_error ||
->  	    (emulation_type & EMULTYPE_SKIP)) {
-> -		prepare_emulation_failure_exit(vcpu);
-> +		prepare_emulation_failure_exit(
-> +			vcpu,
-> +			KVM_INTERNAL_ERROR_EMULATION_FLAG_INSTRUCTION_BYTES |
-> +			KVM_INTERNAL_ERROR_EMULATION_FLAG_EXIT_REASON);
->  		return 0;
->  	}
->  
->  	kvm_queue_exception(vcpu, UD_VECTOR);
->  
->  	if (!is_guest_mode(vcpu) && static_call(kvm_x86_get_cpl)(vcpu) == 0) {
-> -		vcpu->run->exit_reason = KVM_EXIT_INTERNAL_ERROR;
-> -		vcpu->run->internal.suberror = KVM_INTERNAL_ERROR_EMULATION;
-> -		vcpu->run->internal.ndata = 0;
-> +		prepare_emulation_failure_exit(
-> +			vcpu, KVM_INTERNAL_ERROR_EMULATION_FLAG_EXIT_REASON);
-
-Should kvm_task_switch and kvm_handle_memory_failure also be updated
-like this?
-
->  		return 0;
->  	}
->  
-> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-> index 68c9e6d8bbda..3e4126652a67 100644
-> --- a/include/uapi/linux/kvm.h
-> +++ b/include/uapi/linux/kvm.h
-> @@ -282,6 +282,7 @@ struct kvm_xen_exit {
->  
->  /* Flags that describe what fields in emulation_failure hold valid data. */
->  #define KVM_INTERNAL_ERROR_EMULATION_FLAG_INSTRUCTION_BYTES (1ULL << 0)
-> +#define KVM_INTERNAL_ERROR_EMULATION_FLAG_EXIT_REASON       (1ULL << 1)
->  
->  /* for KVM_RUN, returned by mmap(vcpu_fd, offset=0) */
->  struct kvm_run {
-> @@ -404,6 +405,7 @@ struct kvm_run {
->  			__u64 flags;
->  			__u8  insn_size;
->  			__u8  insn_bytes[15];
-> +			__u64 exit_reason;
-
-Please document what this field contains, especially since its contents
-depend on AMD versus Intel.
-
->  		} emulation_failure;
->  		/* KVM_EXIT_OSI */
->  		struct {
-> -- 
-> 2.30.2
-> 
+>
+> > fails, report the VM exit reason to userspace in order that it can be
+> > recorded.
+>
+> What is the benefit of seeing the VM-exit reason that led to an
+> emulation failure?
+>
+> >
+> > The changes are on top of Aaron's patches from
+> > https://lore.kernel.org/r/20210510144834.658457-1-aaronlewis@google.com
+> > which are in the KVM queue, but not yet upstream.
+> >
+> > David Edmondson (2):
+> >   KVM: x86: Add kvm_x86_ops.get_exit_reason
+> >   KVM: x86: On emulation failure, convey the exit reason to userspace
+> >
+> >  arch/x86/include/asm/kvm-x86-ops.h |  1 +
+> >  arch/x86/include/asm/kvm_host.h    |  1 +
+> >  arch/x86/kvm/svm/svm.c             |  6 ++++++
+> >  arch/x86/kvm/vmx/vmx.c             |  6 ++++++
+> >  arch/x86/kvm/x86.c                 | 23 +++++++++++++++++------
+> >  include/uapi/linux/kvm.h           |  2 ++
+> >  6 files changed, 33 insertions(+), 6 deletions(-)
+> >
+> > --
+> > 2.30.2
+> >
