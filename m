@@ -2,155 +2,74 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 933553B87FE
-	for <lists+kvm@lfdr.de>; Wed, 30 Jun 2021 19:48:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0125C3B8872
+	for <lists+kvm@lfdr.de>; Wed, 30 Jun 2021 20:30:00 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233237AbhF3Ruu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 30 Jun 2021 13:50:50 -0400
-Received: from mx12.kaspersky-labs.com ([91.103.66.155]:46113 "EHLO
-        mx12.kaspersky-labs.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233035AbhF3Rut (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 30 Jun 2021 13:50:49 -0400
-Received: from relay12.kaspersky-labs.com (unknown [127.0.0.10])
-        by relay12.kaspersky-labs.com (Postfix) with ESMTP id 01CC4765AD;
-        Wed, 30 Jun 2021 20:48:18 +0300 (MSK)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kaspersky.com;
-        s=mail202102; t=1625075298;
-        bh=wTjYsDYdCcl2wrFdgyR1LeTjMj8BoNMgmgdB77KybX0=;
-        h=Subject:To:From:Message-ID:Date:MIME-Version:Content-Type;
-        b=gH/bjQ3UvZjDSAuc/Kso5NipdhqKXyRj9Pnr3XQ3OMj0gKMOCHkbQWQHs4VghlUJq
-         rpbs7ZdePbN7Pl0lxad1m0vnDt1g0LowORIMn6KUjo4wAmBTsfOEFHHj9T6z5CatJT
-         pH1JUonRMZ2tqgPDz/oIG2rgmZ/3J4Hc/3rS6+BoCME1TC4+IUrhObpxwYHlHoPRfK
-         40ycfG7nMW0sLZTsO3Lf+kAdPtylQkQL/p/F3Z3OTPUwvkq8+36aK5KbUsiradRK8g
-         RCM7OYIm7ZzQyvYC8531PY+q3gJeM3oOc3CdukUhKYuoiVUrsagVbkm6WTREAMFn2p
-         A2Zu65Zq/dFew==
-Received: from mail-hq2.kaspersky.com (unknown [91.103.66.206])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-SHA256 (128/128 bits))
-        (Client CN "mail-hq2.kaspersky.com", Issuer "Kaspersky MailRelays CA G3" (verified OK))
-        by mailhub12.kaspersky-labs.com (Postfix) with ESMTPS id 735AE765EE;
-        Wed, 30 Jun 2021 20:48:16 +0300 (MSK)
-Received: from [10.16.171.77] (10.64.64.121) by hqmailmbx3.avp.ru
- (10.64.67.243) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2176.14; Wed, 30
- Jun 2021 20:48:16 +0300
-Subject: Re: [RFC PATCH v1 11/16] afvsock: add 'seqpacket_drop()'
-To:     Stefano Garzarella <sgarzare@redhat.com>
-CC:     Stefan Hajnoczi <stefanha@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Colin Ian King <colin.king@canonical.com>,
-        Norbert Slusarek <nslusarek@gmx.net>,
-        Andra Paraschiv <andraprs@amazon.com>,
-        kvm <kvm@vger.kernel.org>,
-        Linux Virtualization <virtualization@lists.linux-foundation.org>,
-        netdev <netdev@vger.kernel.org>,
-        kernel list <linux-kernel@vger.kernel.org>,
-        Krasnov Arseniy <oxffffaa@gmail.com>
-References: <20210628095959.569772-1-arseny.krasnov@kaspersky.com>
- <20210628100415.571391-1-arseny.krasnov@kaspersky.com>
- <CAGxU2F4mX5khjA+a_LQEfZYg1rjEmccXce-ab0DVyEJEX-kYcw@mail.gmail.com>
-From:   Arseny Krasnov <arseny.krasnov@kaspersky.com>
-Message-ID: <bb4ef19f-6a49-9486-b420-f2ce55edc265@kaspersky.com>
-Date:   Wed, 30 Jun 2021 20:48:11 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        id S233300AbhF3ScW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 30 Jun 2021 14:32:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52612 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232358AbhF3ScV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 30 Jun 2021 14:32:21 -0400
+Received: from mail-pf1-x42e.google.com (mail-pf1-x42e.google.com [IPv6:2607:f8b0:4864:20::42e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 639BCC061756
+        for <kvm@vger.kernel.org>; Wed, 30 Jun 2021 11:29:51 -0700 (PDT)
+Received: by mail-pf1-x42e.google.com with SMTP id s14so3376193pfg.0
+        for <kvm@vger.kernel.org>; Wed, 30 Jun 2021 11:29:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:reply-to:from:date:message-id:subject:to;
+        bh=w2btr4ouW5UGs+WybnC/89DWunmUrOJbfclq4NSfiYU=;
+        b=AtzsKz6mJQPIe36n7X8ZP5NV9nFwioGs9M3lLo3G+N44aCXs3kQRHdChkgerKzStsC
+         zEQcijrqZ9sVHoAvv2dlrCgbcoAp5eREjW2H8n6J8UMF12PsHvq2pD2sREDinsbutvFG
+         IiSvuMdwbgByqjo7JajhkjYP3OyCm6XFiCHge31DEbffZtpyKA//c82uiGg3Yfzyx8yl
+         OHJnDJKLLSRQKN4atKQXNh5aB5+ZdnzfMeIESjctbCjzsh5BLwEEnDG61SEpr+Kyz3st
+         uXSnktJHpl3dnCCnAhjj3HnVnN5sVpUNB55bXS8MLZ+igAE6dSTKkAZ0ziyQxxsq/AfW
+         4aPg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:reply-to:from:date:message-id
+         :subject:to;
+        bh=w2btr4ouW5UGs+WybnC/89DWunmUrOJbfclq4NSfiYU=;
+        b=Z7esQ0Z5j9GM5OPCsxKV3PrSBz13lRHT0NtFi3WHsKSeXH/GJ49eIa37ILKMW1a5kP
+         3FwfQ6ToYJyU3f77pRZ6Osd1XnEp5BLX+LlFfKYuBQp54cQUVSO30yDQrgo9v+61JHa0
+         jTNMnws9DBOivjJwMauJR01hLV+BFnuHoKq4QcZ38tLzJbzozVp5qVJseBwl2SHrsmou
+         ChsHST0xxLQSvinQcuyvf3XqFrXDwBi8X4skD8xZ10AKYXylkn5U/H8TWXkv8AXPwf63
+         FcjONBJkWLOf01HLCnnsAXsVtoL6AD+lgerZEE0e2FB4rbka4AezxSivev4X7je1h+Sm
+         xbMw==
+X-Gm-Message-State: AOAM532ktAoYeVvtBfjrj2+zNNFXYhjIWrH5Qt+JCyUd9WSWSxjSunPs
+        jN2hU3jKnyy4vnNSeFlCfhHmO0j0mKsJa8zRSiY=
+X-Google-Smtp-Source: ABdhPJzeS5j9Vl+nJ6ZRkBA2Q/aQf6ML1e2iF8Vo7ktrY6Kuacw3gfduRU7SuYy9Xvioc24jWUUpjDGrPRS/e7hqC8w=
+X-Received: by 2002:a63:1c1f:: with SMTP id c31mr17757517pgc.380.1625077790873;
+ Wed, 30 Jun 2021 11:29:50 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <CAGxU2F4mX5khjA+a_LQEfZYg1rjEmccXce-ab0DVyEJEX-kYcw@mail.gmail.com>
-Content-Type: text/plain; charset="windows-1252"
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-X-Originating-IP: [10.64.64.121]
-X-ClientProxiedBy: hqmailmbx2.avp.ru (10.64.67.242) To hqmailmbx3.avp.ru
- (10.64.67.243)
-X-KSE-ServerInfo: hqmailmbx3.avp.ru, 9
-X-KSE-AntiSpam-Interceptor-Info: scan successful
-X-KSE-AntiSpam-Version: 5.9.20, Database issued on: 06/30/2021 17:34:42
-X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
-X-KSE-AntiSpam-Method: none
-X-KSE-AntiSpam-Rate: 0
-X-KSE-AntiSpam-Info: Lua profiles 164748 [Jun 30 2021]
-X-KSE-AntiSpam-Info: Version: 5.9.20.0
-X-KSE-AntiSpam-Info: Envelope from: arseny.krasnov@kaspersky.com
-X-KSE-AntiSpam-Info: LuaCore: 448 448 71fb1b37213ce9a885768d4012c46ac449c77b17
-X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
-X-KSE-AntiSpam-Info: 127.0.0.199:7.1.2;kaspersky.com:7.1.1;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1
-X-KSE-AntiSpam-Info: Rate: 0
-X-KSE-AntiSpam-Info: Status: not_detected
-X-KSE-AntiSpam-Info: Method: none
-X-KSE-Antiphishing-Info: Clean
-X-KSE-Antiphishing-ScanningType: Deterministic
-X-KSE-Antiphishing-Method: None
-X-KSE-Antiphishing-Bases: 06/30/2021 17:37:00
-X-KSE-AttachmentFiltering-Interceptor-Info: no applicable attachment filtering
- rules found
-X-KSE-Antivirus-Interceptor-Info: scan successful
-X-KSE-Antivirus-Info: Clean, bases: 30.06.2021 11:32:00
-X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
-X-KSE-AttachmentFiltering-Interceptor-Info: no applicable attachment filtering
- rules found
-X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
-X-KLMS-Rule-ID: 52
-X-KLMS-Message-Action: clean
-X-KLMS-AntiSpam-Status: not scanned, disabled by settings
-X-KLMS-AntiSpam-Interceptor-Info: not scanned
-X-KLMS-AntiPhishing: Clean, bases: 2021/06/30 16:18:00
-X-KLMS-AntiVirus: Kaspersky Security for Linux Mail Server, version 8.0.3.30, bases: 2021/06/30 08:30:00 #16841989
-X-KLMS-AntiVirus-Status: Clean, skipped
+Received: by 2002:a17:90a:7f02:0:0:0:0 with HTTP; Wed, 30 Jun 2021 11:29:50
+ -0700 (PDT)
+Reply-To: mrmichelduku@outlook.com
+From:   michel duku <mrdukumichel@gmail.com>
+Date:   Wed, 30 Jun 2021 18:29:50 +0000
+Message-ID: <CAFOTq7bY5vV1ABv4rLdxGFNjGxGBjaNRjY0CfU4MxNAFtB9D0Q@mail.gmail.com>
+Subject: Please respond urgently
+To:     undisclosed-recipients:;
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+ello,
 
-On 30.06.2021 15:12, Stefano Garzarella wrote:
-> On Mon, Jun 28, 2021 at 01:04:12PM +0300, Arseny Krasnov wrote:
->> Add special callback for SEQPACKET socket which is called when
->> we need to drop current in-progress record: part of record was
->> copied successfully, reader wait rest of record, but signal
->> interrupts it and reader leaves it's loop, leaving packets of
->> current record still in queue. So to avoid copy of "orphaned"
->> record, we tell transport to drop every packet until EOR will
->> be found.
->>
->> Signed-off-by: Arseny Krasnov <arseny.krasnov@kaspersky.com>
->> ---
->> include/net/af_vsock.h   | 1 +
->> net/vmw_vsock/af_vsock.c | 1 +
->> 2 files changed, 2 insertions(+)
-> And also for this change, I think you can merge with patches 12, 13, 14, 
-> 15, otherwise if we bisect and we build at this patch, the 
-> seqpacket_drop pointer is not valid.
->
-> Thanks,
-> Stefano
-Ack
->
->> diff --git a/include/net/af_vsock.h b/include/net/af_vsock.h
->> index 1747c0b564ef..356878aabbd4 100644
->> --- a/include/net/af_vsock.h
->> +++ b/include/net/af_vsock.h
->> @@ -141,6 +141,7 @@ struct vsock_transport {
->>       int (*seqpacket_enqueue)(struct vsock_sock *vsk, struct msghdr *msg,
->>                                size_t len);
->>       bool (*seqpacket_allow)(u32 remote_cid);
->> +      void (*seqpacket_drop)(struct vsock_sock *vsk);
->>
->>       /* Notification. */
->>       int (*notify_poll_in)(struct vsock_sock *, size_t, bool *);
->> diff --git a/net/vmw_vsock/af_vsock.c b/net/vmw_vsock/af_vsock.c
->> index ec54e4222cbf..27fa38090e13 100644
->> --- a/net/vmw_vsock/af_vsock.c
->> +++ b/net/vmw_vsock/af_vsock.c
->> @@ -2024,6 +2024,7 @@ static int __vsock_seqpacket_recvmsg(struct sock *sk, struct msghdr *msg,
->>               intr_err = vsock_connectible_wait_data(sk, &wait, timeout, NULL, 0);
->>               if (intr_err <= 0) {
->>                       err = intr_err;
->> +                      transport->seqpacket_drop(vsk);
->>                       break;
->>               }
->>
->> --
->> 2.25.1
->>
->
+With due respect to your person, I make this contact with you as I
+believe that you can be of great assistance to me. I need your urgent
+assistance in transferring the sum of $11.3million to your private
+account Where this money can be shared between us.
+
+The money has been here in our Bank lying dormant for years without
+anybody coming for the claim. I want to release the money to you as
+the relative to our deceased customer (the account owner) who died in
+a plane crash with his family since October 2005.
+
+By indicating your interest I will send you the full details on how
+the business will be executed.
+
+Best Regards,
+Michel Duku.
