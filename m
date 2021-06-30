@@ -2,34 +2,34 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C000C3B7DC9
-	for <lists+kvm@lfdr.de>; Wed, 30 Jun 2021 09:02:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3F5F23B7DD1
+	for <lists+kvm@lfdr.de>; Wed, 30 Jun 2021 09:06:44 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232607AbhF3HEo (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 30 Jun 2021 03:04:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39038 "EHLO
+        id S232716AbhF3HJK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 30 Jun 2021 03:09:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40038 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232426AbhF3HEn (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 30 Jun 2021 03:04:43 -0400
+        with ESMTP id S232598AbhF3HJJ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 30 Jun 2021 03:09:09 -0400
 Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4FEC9C061766;
-        Wed, 30 Jun 2021 00:02:15 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 947D4C061766;
+        Wed, 30 Jun 2021 00:06:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
         References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
         Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=PoknwIAy8Q9q+U6w+2a12vknwq+F35xgmvor8JHbCT0=; b=lhnHlNjmjExRd4kOidxPSUtHCF
-        lThr4z+W8p4z9I5Y0rKEDt2xxMBs6nqRsTPYUcwm01rqZGiL6BhwMqG70F9eJyhIh5NUvA1BGqqng
-        JVQ4sw5ouU8XKwWoMKDDo/2UQM4xLgLIsJobhS04QOf37hoyxdpTBlTWOa/xRlMM7SvDue9WSLdzw
-        dXizTRiFfG3ZU8vVDW6II2yjz1FclnXukf/xHjRSJz4pjnPXinchMsgdHyLWM8lZv6s0EYUqr4/kq
-        Uf8NR9mabxA6Qwpt1ElKsJdmFLdqvCWzrLZdJgwPFbYpSkA1aNI8jrMOE1cb4BVyBY4MLZo3/IEZb
-        8wWXiC1Q==;
+        bh=dsmF65Hp+Uqc28Sl8LwGXWskjtwe7+DI92hwHXbQkFA=; b=GIxFrLBhO6vSrFlIovAS3oKhAk
+        2Lz/EWmV4MXClGxqw8kfRDKlmi2GtdV0uLz8GInzsTYbp/j6OaWyhAKVo1eo4a9b8H2/k56EKbDvV
+        y2GtJ+TR5lnwszsDINs9HafiqdqlixqmpVUDT5RFgxU2QLLv+/cho+grL+1Vc0g8+2/SlnePBKOG7
+        OLho8hViHIYAx4TUPolbnmtBlBALFzfpGJ4VyBleE5rlmpssM7wYM8+dhx4YMPSsVXI8Z8G2kF82i
+        JQuions/tMg957LyjA2UxTSvzyqVxDMuHCys225WIfNum1nPw/BR1E6gHvktOeYDO7jdCSD6Jd991
+        piooUF5A==;
 Received: from hch by casper.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1lyUDz-005199-Qi; Wed, 30 Jun 2021 07:01:38 +0000
-Date:   Wed, 30 Jun 2021 08:01:31 +0100
+        id 1lyUI0-0051Ka-BD; Wed, 30 Jun 2021 07:05:46 +0000
+Date:   Wed, 30 Jun 2021 08:05:40 +0100
 From:   Christoph Hellwig <hch@infradead.org>
 To:     Jason Gunthorpe <jgg@nvidia.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+Cc:     Jason Wang <jasowang@redhat.com>,
         Jean-Philippe Brucker <jean-philippe@linaro.org>,
         "Tian, Kevin" <kevin.tian@intel.com>,
         "Jiang, Dave" <dave.jiang@intel.com>,
@@ -37,7 +37,6 @@ Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
         Jonathan Corbet <corbet@lwn.net>,
         David Woodhouse <dwmw2@infradead.org>,
-        Jason Wang <jasowang@redhat.com>,
         LKML <linux-kernel@vger.kernel.org>,
         "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
         Alex Williamson <alex.williamson@redhat.com>,
@@ -45,30 +44,38 @@ Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         Robin Murphy <robin.murphy@arm.com>,
         David Gibson <david@gibson.dropbear.id.au>
 Subject: Re: [RFC] /dev/ioasid uAPI proposal
-Message-ID: <YNwWy/j+diR7Y4Iv@infradead.org>
-References: <2d1ad075-bec6-bfb9-ce71-ed873795e973@redhat.com>
- <20210607175926.GJ1002214@nvidia.com>
- <fdb2f38c-da1f-9c12-af44-22df039fcfea@redhat.com>
- <20210608131547.GE1002214@nvidia.com>
- <89d30977-119c-49f3-3bf6-d3f7104e07d8@redhat.com>
- <20210608124700.7b9aa5a6.alex.williamson@redhat.com>
- <MWHPR11MB18861A89FE6620921E7A7CAC8C369@MWHPR11MB1886.namprd11.prod.outlook.com>
- <20210609115759.GY1002214@nvidia.com>
- <086ca28f-42e5-a432-8bef-ac47a0a6df45@redhat.com>
- <20210609124742.GB1002214@nvidia.com>
+Message-ID: <YNwXxAEIRz5t631E@infradead.org>
+References: <20210602173510.GE1002214@nvidia.com>
+ <20210602120111.5e5bcf93.alex.williamson@redhat.com>
+ <20210602180925.GH1002214@nvidia.com>
+ <20210602130053.615db578.alex.williamson@redhat.com>
+ <20210602195404.GI1002214@nvidia.com>
+ <20210602143734.72fb4fa4.alex.williamson@redhat.com>
+ <6a9426d7-ed55-e006-9c4c-6b7c78142e39@redhat.com>
+ <20210603130927.GZ1002214@nvidia.com>
+ <65614634-1db4-7119-1a90-64ba5c6e9042@redhat.com>
+ <20210604115805.GG1002214@nvidia.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20210609124742.GB1002214@nvidia.com>
+In-Reply-To: <20210604115805.GG1002214@nvidia.com>
 X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jun 09, 2021 at 09:47:42AM -0300, Jason Gunthorpe wrote:
-> I can vaugely understand this rational for vfio, but not at all for
-> the platform's iommu driver, sorry.
+On Fri, Jun 04, 2021 at 08:58:05AM -0300, Jason Gunthorpe wrote:
+> On Fri, Jun 04, 2021 at 09:11:03AM +0800, Jason Wang wrote:
+> > > nor do any virtio drivers implement the required platform specific
+> > > cache flushing to make no-snoop TLPs work.
+> > 
+> > I don't get why virtio drivers needs to do that. I think DMA API should hide
+> > those arch/platform specific stuffs from us.
+> 
+> It is not arch/platform stuff. If the device uses no-snoop then a
+> very platform specific recovery is required in the device driver.
 
-Agreed.  More importantly the dependency is not for the platform iommu
-driver but just for the core iommu code, which is always built in if
-enabled.
+Well, the proper way to support NO_SNOOP DMA would be to force the
+DMA API into supporting the device as if the platform was not DMA
+coherent, probably on a per-call basis.  It is just that no one bothered
+to actually do the work an people just kept piling hacks over hacks.
