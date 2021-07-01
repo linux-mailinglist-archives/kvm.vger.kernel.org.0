@@ -2,113 +2,107 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0586A3B9482
-	for <lists+kvm@lfdr.de>; Thu,  1 Jul 2021 18:04:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 41C973B94B1
+	for <lists+kvm@lfdr.de>; Thu,  1 Jul 2021 18:33:51 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230394AbhGAQHJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 1 Jul 2021 12:07:09 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:5838 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230005AbhGAQHI (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 1 Jul 2021 12:07:08 -0400
-Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 161G3kbO018503;
-        Thu, 1 Jul 2021 12:04:32 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : mime-version : content-transfer-encoding; s=pp1;
- bh=jwpL9XXnuEroQhs6QYfgPLWjME2s+w8TJoKkzlJ32fY=;
- b=AhuEuWqQ6u+m4d6YuV42ygHiq+X77gj2H/eaG7ERvbBtr1qN2aXTzjs3LiBRxjomQkxG
- G6FwJZJCYxH7IorKic6W4qK58t0Y2268MGEEdxAz46HU94gPjORj+LWdoi4S6eg8i8k4
- /KuXWC8Mhj7xRiLnLy8XY9hx1ZzkiAk31EM6ms/f6BpwakXwvoEvakWHkHD131tlliGm
- yOm8c9UR7/dsyo+QcigtLlUKQrZ1XrTrJ4cc85eZXOzXu40KWv3fO244pa6exT7W87tY
- 7QsZ6DVlmwbf3NRxFzsMycC8SSOQ3odWbtDjgUY5vMoMgbei7ZdsP6bSM/vryEI2BFdk NA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 39hepr4sh9-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 01 Jul 2021 12:04:32 -0400
-Received: from m0098409.ppops.net (m0098409.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 161G3vsn018935;
-        Thu, 1 Jul 2021 12:04:31 -0400
-Received: from ppma02fra.de.ibm.com (47.49.7a9f.ip4.static.sl-reverse.com [159.122.73.71])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 39hepr4sg9-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 01 Jul 2021 12:04:31 -0400
-Received: from pps.filterd (ppma02fra.de.ibm.com [127.0.0.1])
-        by ppma02fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 161Fv6OU024687;
-        Thu, 1 Jul 2021 16:04:29 GMT
-Received: from b06cxnps3074.portsmouth.uk.ibm.com (d06relay09.portsmouth.uk.ibm.com [9.149.109.194])
-        by ppma02fra.de.ibm.com with ESMTP id 39duv8hahh-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 01 Jul 2021 16:04:29 +0000
-Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
-        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 161G4QdB22085896
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 1 Jul 2021 16:04:26 GMT
-Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 3D4D95206B;
-        Thu,  1 Jul 2021 16:04:26 +0000 (GMT)
-Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
-        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTPS id 2B20A52065;
-        Thu,  1 Jul 2021 16:04:26 +0000 (GMT)
-Received: by tuxmaker.boeblingen.de.ibm.com (Postfix, from userid 25651)
-        id E75E1E03CC; Thu,  1 Jul 2021 18:04:25 +0200 (CEST)
-From:   Christian Borntraeger <borntraeger@de.ibm.com>
-To:     Shuah Khan <shuah@kernel.org>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Zenghui Yu <yuzenghui@huawei.com>, kvm@vger.kernel.org,
-        linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-s390@vger.kernel.org,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        vkuznets@redhat.com, wanghaibin.wang@huawei.com
-Subject: [PATCH] KVM: selftests: do not require 64GB in set_memory_region_test
-Date:   Thu,  1 Jul 2021 18:04:25 +0200
-Message-Id: <20210701160425.33666-1-borntraeger@de.ibm.com>
-X-Mailer: git-send-email 2.31.1
+        id S229764AbhGAQgU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 1 Jul 2021 12:36:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33056 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229671AbhGAQgU (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 1 Jul 2021 12:36:20 -0400
+Received: from mail-io1-xd33.google.com (mail-io1-xd33.google.com [IPv6:2607:f8b0:4864:20::d33])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BB1A0C061762
+        for <kvm@vger.kernel.org>; Thu,  1 Jul 2021 09:33:49 -0700 (PDT)
+Received: by mail-io1-xd33.google.com with SMTP id f21so8206068ioh.13
+        for <kvm@vger.kernel.org>; Thu, 01 Jul 2021 09:33:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=oxNmfnGuVWxwqtQP8iWetLNNCO0LL7lruLnrhE46HbY=;
+        b=TioGXDMwu1WAftTOwRQMsrLcoN14xtL+ozg3gIC/P2Ms+Ylo6+9IjYGyblZCvG9n8Z
+         r5QWhXcMrmuDDZX5xGuWtnYeD2mdznpq0P9x3UgfjMM93vsnQwyj11Kf7d9uQKLOetfV
+         AHA3acb89mu+ZPiYjA0sbtD2/X5GfsPE97zSWAQMPh+0FXYkWHrFR78r0bJhDeXxBBpI
+         HJuTPOuPffjoPfX/kmEOJithNlCyq8iNm/nSuE3u10GM5O9j5I46VGRVQ9Akk2qeSiIg
+         lADEBgHvo3lASUgMTAP5aezeEJa602kd7TvpdRVS8Rc0vyHwLH09ecCqtCHuIK/AJ7JQ
+         BnSQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=oxNmfnGuVWxwqtQP8iWetLNNCO0LL7lruLnrhE46HbY=;
+        b=mWQWN8pN9mk/qwIdCe/xu3JQuJywQ356zID1GtWZsDodiH1W7dj1YMw5g1le5ykt/t
+         jHxDoSyZ7Um2i4x6V6MfL+gPICMnCY8eL2LwIPOlfW6fPdD34F54oE+w5UDPjISE+XUD
+         qX6vbdsBq29QhA//EE24PYcH7T9c7PYiriFWEGT/YAGkHSo2MY+TempwCyDqNpwBegJr
+         a6EgERln2NTgYv7JUJ+OfndQ9+EmTy19oeap3s4muP3kNdXBh8ZnNh1WhXJidNjg3GTq
+         wn/QH7PW2Dx74JdyyfG7Lli3RnxiOE81yDHIbCJIzkwg9EW69wzpddw8gQsB73aezzXJ
+         V6hw==
+X-Gm-Message-State: AOAM531GzqkgIDOpzqdcCBTiQKI4D+ee1TC9UhA1KL80jU0XygUBK3tK
+        dJZR5Wd9hI+45S9o7JD3F0aP40uUdbGDE7ZRMhHWmA==
+X-Google-Smtp-Source: ABdhPJxqmIlTDA1yhmLYwjDxlu5KYbaTz3fteR4mltnVvDp8Cn5k2rJwkIH6uuP7tHtEN6PLDCP6EAlzIfOl4v6O4qc=
+X-Received: by 2002:a6b:5b11:: with SMTP id v17mr228586ioh.19.1625157228881;
+ Thu, 01 Jul 2021 09:33:48 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: MuhLx3pChNNubrKtsTco1XduxodZjQnT
-X-Proofpoint-GUID: jjk3-JYbNDcXscFbBev0D6uEDPpVW7mx
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.790
- definitions=2021-07-01_08:2021-07-01,2021-07-01 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0
- priorityscore=1501 bulkscore=0 phishscore=0 mlxlogscore=999 malwarescore=0
- impostorscore=0 adultscore=0 clxscore=1011 mlxscore=0 lowpriorityscore=0
- spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2104190000 definitions=main-2107010095
+References: <YNWm623jLRMMDoNS@mwanda>
+In-Reply-To: <YNWm623jLRMMDoNS@mwanda>
+From:   Ben Gardon <bgardon@google.com>
+Date:   Thu, 1 Jul 2021 09:33:38 -0700
+Message-ID: <CANgfPd9xMTre6yZjvM6Yh-7SUrUQf5QHOScncPrZzA7noCF7ug@mail.gmail.com>
+Subject: Re: [bug report] KVM: x86/mmu: Skip rmap operations if rmaps not allocated
+To:     Dan Carpenter <dan.carpenter@oracle.com>
+Cc:     kvm <kvm@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Unless the user sets overcommit_memory or has plenty of swap, the latest
-changes to the testcase will result in ENOMEM failures for hosts with
-less than 64GB RAM. As we do not use much of the allocated memory, we
-can use MAP_NORESERVE to avoid this error.
+Hi Dan,
 
-Cc: Zenghui Yu <yuzenghui@huawei.com>
-Cc: vkuznets@redhat.com
-Cc: wanghaibin.wang@huawei.com
-Cc: stable@vger.kernel.org
-Fixes: 309505dd5685 ("KVM: selftests: Fix mapping length truncation in m{,un}map()")
-Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
----
- tools/testing/selftests/kvm/set_memory_region_test.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+Thanks for reporting this. I believe it's already been fixed by "KVM:
+x86/mmu: Fix uninitialized boolean variable flush" from Colin King.
 
-diff --git a/tools/testing/selftests/kvm/set_memory_region_test.c b/tools/testing/selftests/kvm/set_memory_region_test.c
-index d8812f27648c..d31f54ac4e98 100644
---- a/tools/testing/selftests/kvm/set_memory_region_test.c
-+++ b/tools/testing/selftests/kvm/set_memory_region_test.c
-@@ -377,7 +377,8 @@ static void test_add_max_memory_regions(void)
- 		(max_mem_slots - 1), MEM_REGION_SIZE >> 10);
- 
- 	mem = mmap(NULL, (size_t)max_mem_slots * MEM_REGION_SIZE + alignment,
--		   PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
-+		   PROT_READ | PROT_WRITE,
-+		   MAP_PRIVATE | MAP_ANONYMOUS | MAP_NORESERVE, -1, 0);
- 	TEST_ASSERT(mem != MAP_FAILED, "Failed to mmap() host");
- 	mem_aligned = (void *)(((size_t) mem + alignment - 1) & ~(alignment - 1));
- 
--- 
-2.31.1
-
+On Fri, Jun 25, 2021 at 2:50 AM Dan Carpenter <dan.carpenter@oracle.com> wrote:
+>
+> Hello Ben Gardon,
+>
+> The patch e2209710ccc5: "KVM: x86/mmu: Skip rmap operations if rmaps
+> not allocated" from May 18, 2021, leads to the following static
+> checker warning:
+>
+>         arch/x86/kvm/mmu/mmu.c:5704 kvm_mmu_zap_collapsible_sptes()
+>         error: uninitialized symbol 'flush'.
+>
+> arch/x86/kvm/mmu/mmu.c
+>   5687  void kvm_mmu_zap_collapsible_sptes(struct kvm *kvm,
+>   5688                                     const struct kvm_memory_slot *memslot)
+>   5689  {
+>   5690          /* FIXME: const-ify all uses of struct kvm_memory_slot.  */
+>   5691          struct kvm_memory_slot *slot = (struct kvm_memory_slot *)memslot;
+>   5692          bool flush;
+>                 ^^^^^^^^^^
+> needs to be "bool flush = false;"
+>
+>   5693
+>   5694          if (kvm_memslots_have_rmaps(kvm)) {
+>   5695                  write_lock(&kvm->mmu_lock);
+>   5696                  flush = slot_handle_leaf(kvm, slot, kvm_mmu_zap_collapsible_spte, true);
+>   5697                  if (flush)
+>   5698                          kvm_arch_flush_remote_tlbs_memslot(kvm, slot);
+>   5699                  write_unlock(&kvm->mmu_lock);
+>   5700          }
+>   5701
+>   5702          if (is_tdp_mmu_enabled(kvm)) {
+>   5703                  read_lock(&kvm->mmu_lock);
+>   5704                  flush = kvm_tdp_mmu_zap_collapsible_sptes(kvm, slot, flush);
+>                                                                              ^^^^^
+> Unintialized.
+>
+>   5705                  if (flush)
+>   5706                          kvm_arch_flush_remote_tlbs_memslot(kvm, slot);
+>   5707                  read_unlock(&kvm->mmu_lock);
+>   5708          }
+>   5709  }
+>
+> regards,
+> dan carpenter
