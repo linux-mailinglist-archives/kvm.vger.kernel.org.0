@@ -2,141 +2,85 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id DE9E53B8DDD
-	for <lists+kvm@lfdr.de>; Thu,  1 Jul 2021 08:50:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 620823B8E1C
+	for <lists+kvm@lfdr.de>; Thu,  1 Jul 2021 09:19:37 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234556AbhGAGwu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 1 Jul 2021 02:52:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44156 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234311AbhGAGwr (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 1 Jul 2021 02:52:47 -0400
-Received: from mail-ej1-x62f.google.com (mail-ej1-x62f.google.com [IPv6:2a00:1450:4864:20::62f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 186DDC0617AD
-        for <kvm@vger.kernel.org>; Wed, 30 Jun 2021 23:50:16 -0700 (PDT)
-Received: by mail-ej1-x62f.google.com with SMTP id yy20so8644389ejb.6
-        for <kvm@vger.kernel.org>; Wed, 30 Jun 2021 23:50:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance-com.20150623.gappssmtp.com; s=20150623;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=j02ToljqO7cRBUGAX2kOb5odUf1+MulKZRF56vB9XJw=;
-        b=szPt3yjQkK/eOHnZmjZxK4k+ezfPy7N6CPhm+x7EICOpDhKGVX0SiYPkZ71JWWvZoa
-         8pTmz5fIarGaEdAOZPXlqb3Ft+IEB/7WrLziKTUMgfJwbxqKu7WpgOrDt2jDUDrJtIWr
-         cbeLlyv90jBAQgkaG5PcPMpKIESF32ydtpd5t9BVRkR/UxOzB7/03fJbEeEofSeS0xm4
-         nBRhtXHTm/IybqaRL0yZyrTa8PU3gB2gMQ79/soCsEBZSt5m98thaMV4L8/9brwhRN7o
-         B363iYyE78ClSv8CfWaatXdNXexk42WbsmRlR9FUB8yp+pkqine3MzByepxq/Xp9WTk6
-         QDZw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=j02ToljqO7cRBUGAX2kOb5odUf1+MulKZRF56vB9XJw=;
-        b=bV1371j2lXhVy4Z7mwGjokxyZZv7h+SGuB36oRcaiAHdD+4Wh7w4wusEVlKhQu4hiO
-         wpThZdFZOhvDds0hdcWMuHOtcYrfjYrgDmf/U+ccS3JKMFrpZijmTk4fqj68+c/Vo0fL
-         8tEbzfCbKxOK9vEUozOkyg4hYwRzGtTvqMCrXfodeSIQjFa112D2vtlcKCG2CIfHO2kE
-         qqg/wGFK/1RKU4gcCbo9Zbud7UpGE2WnxkcLYnXCss1ni9FYKxcNe1vtND8v++THPww9
-         5HGA77VpkYoV46zMbDhLhvS2YGVh4Qv7aIOhSy34jUCqqSCYsVVKtai73rLOijmRc9s3
-         Yzaw==
-X-Gm-Message-State: AOAM533gTL74ZjuclSr6p0boo3tesS18pJFoDyatDIGj2bXrWNM2P3xr
-        5PFC+IA6fIuWHIXjW2z6IMljuNWhCS2mO5tr8Xpo
-X-Google-Smtp-Source: ABdhPJw5rO5qehXjBGvgudrN3VY1PB04pXHwf1f+BSEDIJShRRuy3gy/c2hvero6OzD/zDnU0PCg34TMpYMSKS1otIo=
-X-Received: by 2002:a17:907:1b11:: with SMTP id mp17mr39880031ejc.1.1625122214373;
- Wed, 30 Jun 2021 23:50:14 -0700 (PDT)
+        id S234733AbhGAHWF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 1 Jul 2021 03:22:05 -0400
+Received: from mail.kernel.org ([198.145.29.99]:46010 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S234553AbhGAHWF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 1 Jul 2021 03:22:05 -0400
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id B9F2B61450;
+        Thu,  1 Jul 2021 07:19:35 +0000 (UTC)
+Received: from sofa.misterjones.org ([185.219.108.64] helo=hot-poop.lan)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94.2)
+        (envelope-from <maz@kernel.org>)
+        id 1lyqyz-00AwZh-BQ; Thu, 01 Jul 2021 08:19:33 +0100
+From:   Marc Zyngier <maz@kernel.org>
+To:     kvm@vger.kernel.org
+Cc:     kernel-team@android.com, Andrew Jones <drjones@redhat.com>,
+        Ricardo Koller <ricarkol@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Subject: [PATCH] KVM: selftests: x86: Address missing vm_install_exception_handler conversions
+Date:   Thu,  1 Jul 2021 08:19:28 +0100
+Message-Id: <20210701071928.2971053-1-maz@kernel.org>
+X-Mailer: git-send-email 2.30.2
 MIME-Version: 1.0
-References: <20210615141331.407-1-xieyongji@bytedance.com> <20210615141331.407-10-xieyongji@bytedance.com>
- <YNSatrDFsg+4VvH4@stefanha-x1.localdomain> <CACycT3vaXQ4dxC9QUzXXJs7og6TVqqVGa8uHZnTStacsYAiFwQ@mail.gmail.com>
- <YNw+q/ADMPviZi6S@stefanha-x1.localdomain>
-In-Reply-To: <YNw+q/ADMPviZi6S@stefanha-x1.localdomain>
-From:   Yongji Xie <xieyongji@bytedance.com>
-Date:   Thu, 1 Jul 2021 14:50:03 +0800
-Message-ID: <CACycT3t6M5i0gznABm52v=rdmeeLZu8smXAOLg+WsM3WY1fgTw@mail.gmail.com>
-Subject: Re: Re: Re: [PATCH v8 09/10] vduse: Introduce VDUSE - vDPA Device in Userspace
-To:     Stefan Hajnoczi <stefanha@redhat.com>
-Cc:     "Michael S. Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Stefano Garzarella <sgarzare@redhat.com>,
-        Parav Pandit <parav@nvidia.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Christian Brauner <christian.brauner@canonical.com>,
-        Randy Dunlap <rdunlap@infradead.org>,
-        Matthew Wilcox <willy@infradead.org>,
-        Al Viro <viro@zeniv.linux.org.uk>,
-        Jens Axboe <axboe@kernel.dk>, bcrl@kvack.org,
-        Jonathan Corbet <corbet@lwn.net>,
-        =?UTF-8?Q?Mika_Penttil=C3=A4?= <mika.penttila@nextfour.com>,
-        Dan Carpenter <dan.carpenter@oracle.com>, joro@8bytes.org,
-        Greg KH <gregkh@linuxfoundation.org>, songmuchun@bytedance.com,
-        virtualization <virtualization@lists.linux-foundation.org>,
-        netdev@vger.kernel.org, kvm <kvm@vger.kernel.org>,
-        linux-fsdevel@vger.kernel.org, iommu@lists.linux-foundation.org,
-        linux-kernel <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: kvm@vger.kernel.org, kernel-team@android.com, drjones@redhat.com, ricarkol@google.com, pbonzini@redhat.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jun 30, 2021 at 5:51 PM Stefan Hajnoczi <stefanha@redhat.com> wrote:
->
-> On Tue, Jun 29, 2021 at 10:59:51AM +0800, Yongji Xie wrote:
-> > On Mon, Jun 28, 2021 at 9:02 PM Stefan Hajnoczi <stefanha@redhat.com> wrote:
-> > >
-> > > On Tue, Jun 15, 2021 at 10:13:30PM +0800, Xie Yongji wrote:
-> > > > +/* ioctls */
-> > > > +
-> > > > +struct vduse_dev_config {
-> > > > +     char name[VDUSE_NAME_MAX]; /* vduse device name */
-> > > > +     __u32 vendor_id; /* virtio vendor id */
-> > > > +     __u32 device_id; /* virtio device id */
-> > > > +     __u64 features; /* device features */
-> > > > +     __u64 bounce_size; /* bounce buffer size for iommu */
-> > > > +     __u16 vq_size_max; /* the max size of virtqueue */
-> > >
-> > > The VIRTIO specification allows per-virtqueue sizes. A device can have
-> > > two virtqueues, where the first one allows up to 1024 descriptors and
-> > > the second one allows only 128 descriptors, for example.
-> > >
-> >
-> > Good point! But it looks like virtio-vdpa/virtio-pci doesn't support
-> > that now. All virtqueues have the same maximum size.
->
-> I see struct vpda_config_ops only supports a per-device max vq size:
-> u16 (*get_vq_num_max)(struct vdpa_device *vdev);
->
-> virtio-pci supports per-virtqueue sizes because the struct
-> virtio_pci_common_cfg->queue_size register is per-queue (controlled by
-> queue_select).
->
+Commit b78f4a59669 ("KVM: selftests: Rename vm_handle_exception")
+raced with a couple of new x86 tests, missing two vm_handle_exception
+to vm_install_exception_handler conversions.
 
-Oh, yes. I miss queue_select.
+Help the two broken tests to catch up with the new world.
 
-> I guess this is a question for Jason: will vdpa will keep this limitation?
-> If yes, then VDUSE can stick to it too without running into problems in
-> the future.
->
-> > > > +     __u16 padding; /* padding */
-> > > > +     __u32 vq_num; /* the number of virtqueues */
-> > > > +     __u32 vq_align; /* the allocation alignment of virtqueue's metadata */
-> > >
-> > > I'm not sure what this is?
-> > >
-> >
-> >  This will be used by vring_create_virtqueue() too.
->
-> If there is no official definition for the meaning of this value then
-> "/* same as vring_create_virtqueue()'s vring_align parameter */" would
-> be clearer. That way the reader knows what to research in order to
-> understand how this field works.
->
+Cc: Andrew Jones <drjones@redhat.com>
+CC: Ricardo Koller <ricarkol@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Signed-off-by: Marc Zyngier <maz@kernel.org>
+---
+ tools/testing/selftests/kvm/x86_64/hyperv_features.c | 2 +-
+ tools/testing/selftests/kvm/x86_64/mmu_role_test.c   | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
 
-OK.
+diff --git a/tools/testing/selftests/kvm/x86_64/hyperv_features.c b/tools/testing/selftests/kvm/x86_64/hyperv_features.c
+index 42bd658f52a8..af27c7e829c1 100644
+--- a/tools/testing/selftests/kvm/x86_64/hyperv_features.c
++++ b/tools/testing/selftests/kvm/x86_64/hyperv_features.c
+@@ -615,7 +615,7 @@ int main(void)
+ 
+ 	vm_init_descriptor_tables(vm);
+ 	vcpu_init_descriptor_tables(vm, VCPU_ID);
+-	vm_handle_exception(vm, GP_VECTOR, guest_gp_handler);
++	vm_install_exception_handler(vm, GP_VECTOR, guest_gp_handler);
+ 
+ 	pr_info("Testing access to Hyper-V specific MSRs\n");
+ 	guest_test_msrs_access(vm, addr_gva2hva(vm, msr_gva),
+diff --git a/tools/testing/selftests/kvm/x86_64/mmu_role_test.c b/tools/testing/selftests/kvm/x86_64/mmu_role_test.c
+index 523371cf8e8f..da2325fcad87 100644
+--- a/tools/testing/selftests/kvm/x86_64/mmu_role_test.c
++++ b/tools/testing/selftests/kvm/x86_64/mmu_role_test.c
+@@ -71,7 +71,7 @@ static void mmu_role_test(u32 *cpuid_reg, u32 evil_cpuid_val)
+ 	/* Set up a #PF handler to eat the RSVD #PF and signal all done! */
+ 	vm_init_descriptor_tables(vm);
+ 	vcpu_init_descriptor_tables(vm, VCPU_ID);
+-	vm_handle_exception(vm, PF_VECTOR, guest_pf_handler);
++	vm_install_exception_handler(vm, PF_VECTOR, guest_pf_handler);
+ 
+ 	r = _vcpu_run(vm, VCPU_ID);
+ 	TEST_ASSERT(r == 0, "vcpu_run failed: %d\n", r);
+-- 
+2.30.2
 
-> I don't remember but maybe it was used to support vrings when the
-> host/guest have non-4KB page sizes. I wonder if anyone has an official
-> definition for this value?
-
-Not sure. Maybe we might need some alignment which is less than
-PAGE_SIZE sometimes.
-
-Thanks,
-Yongji
