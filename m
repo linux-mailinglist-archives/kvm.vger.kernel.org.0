@@ -2,140 +2,89 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 57E8E3B907E
-	for <lists+kvm@lfdr.de>; Thu,  1 Jul 2021 12:26:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 45A3F3B917F
+	for <lists+kvm@lfdr.de>; Thu,  1 Jul 2021 14:08:48 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236026AbhGAK3H (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 1 Jul 2021 06:29:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35598 "EHLO
+        id S236373AbhGAMLP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 1 Jul 2021 08:11:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58436 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229878AbhGAK3F (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 1 Jul 2021 06:29:05 -0400
-Received: from mail-ed1-x52f.google.com (mail-ed1-x52f.google.com [IPv6:2a00:1450:4864:20::52f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 53200C0617A8
-        for <kvm@vger.kernel.org>; Thu,  1 Jul 2021 03:26:34 -0700 (PDT)
-Received: by mail-ed1-x52f.google.com with SMTP id s15so7602774edt.13
-        for <kvm@vger.kernel.org>; Thu, 01 Jul 2021 03:26:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance-com.20150623.gappssmtp.com; s=20150623;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=a9K4jyXYx47Q8btyuDKrrTrq0PEaaUA3+QP6HJIrGos=;
-        b=UbsrHWUQ+mj/292xk46YRGIEWdXS7+QUOxq+6nNb3yIUs4zHYJrkuHGgQOce8DFrQe
-         md9AW7iO+3I2/Gy/0pAB4ksC45W+234IMOkL++jK9Ut5s1vRLJE3bHdXjN761/r4oe2f
-         rrENVsppo3Jrt+VvPkoj8uviilfOhQYD1fLZsSYmxlaq+oX/ZAl36g/kjQIzB82UT/ci
-         MsYhbtWrw18oEv5eBIolntsiKHP3qi59dFbBWXD2KwR7OAOnPaSBv5xvF7/vHO2gDnY9
-         DYJCzMg6LY4GJsFkzIZYE13B6X8/NPbpnEh/pX4mSS3+UYLngtGXoFLSkaU2VGZ/3SUB
-         VdKQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=a9K4jyXYx47Q8btyuDKrrTrq0PEaaUA3+QP6HJIrGos=;
-        b=mkGr3KxeX894z6UCply6b4Ad1LnZgLM/M1yr8xsAHe6kyKIZmGjc7BGakKTHVwSeWh
-         mNPBWRZMpQeQxopHqZQYvH5KLzct7mES+AENuPlikr+BNeh14HKVmSUdysh9+wP+perz
-         VCAHmBWQSgbk0YTxH9f7HLUr1iwqPFsTs/LRapKloADPU6Cfo8WDrkhQAPce3dj6QzHo
-         XuO14XbIqcAwPMc9gK84ZPpyQEaycjEjvQ3duHr0yaHRPPl0AuLocLEniKbJZjTZYx7c
-         2vBzV1iAeGk4lIsXnW6JJIu7L2u3qx68baNZeRzzu4bOE1uy6RY9CrUMHMsMWY7ogbQ+
-         pZlg==
-X-Gm-Message-State: AOAM531GP1WfM8sLbglv/Gs8WO/t/9JECIdyk/72VahC3mfWTJERX8XR
-        0dxZLmQqAcCQoN7pvg3bN0x9G7VKA6t5JK9Vpxl3
-X-Google-Smtp-Source: ABdhPJz1/meMgJS0CbGomq08efo6oPox9DOh/ZiqfZwarY0z7LVGZFk2nW7ff1FIg7dKAGvVHmDMMOZVK5XkBCN2Y10=
-X-Received: by 2002:a50:ff01:: with SMTP id a1mr52286665edu.253.1625135192829;
- Thu, 01 Jul 2021 03:26:32 -0700 (PDT)
+        with ESMTP id S236256AbhGAMLP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 1 Jul 2021 08:11:15 -0400
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BD7BDC061756
+        for <kvm@vger.kernel.org>; Thu,  1 Jul 2021 05:08:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=lCu1PfQZkVR84Had3CDedJ1AfFR4DmELtRDrF/eDCwk=; b=gD2+EgcszzlzRGSNYbP+MSdh8j
+        bxQBTHSVC+vhGWDsPF6Uy0UTmpNf3WJ9phckjaPRdDdOYH3QghZSdEjdFb2KXSsmOkSY7ByRWm0Qg
+        mHFmlqnUfIsRqgjvnKiDAIVWcxYz0y+vx4G9qtBr2krZa/Miy9IHqFfUCJcnRZGPZzXH7aWB3kF6W
+        GkJllDD5lqqZNW6hKCtxIrk1NsJ7Qla4gdV/+YB30ONdXTr8AasryTz4sDA+iZ0MCPr93cN0KUH0A
+        R43s0nn16Y5+oktY9+GFKzZNLliGWQwIm5RJr21cNZQmdVW2efyWnG1XLyboxl00JZXvXV36Nchai
+        psnIDLcg==;
+Received: from willy by casper.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1lyvUK-006Wof-U9; Thu, 01 Jul 2021 12:08:18 +0000
+Date:   Thu, 1 Jul 2021 13:08:12 +0100
+From:   Matthew Wilcox <willy@infradead.org>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     David Matlack <dmatlack@google.com>, kvm <kvm@vger.kernel.org>,
+        Ben Gardon <bgardon@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Jim Mattson <jmattson@google.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Junaid Shahid <junaids@google.com>,
+        Andrew Jones <drjones@redhat.com>, Yu Zhao <yuzhao@google.com>,
+        David Hildenbrand <david@redhat.com>,
+        Andrew Morton <akpm@linux-foundation.org>
+Subject: Re: [PATCH v2 0/6] KVM: x86/mmu: Fast page fault support for the TDP
+ MMU
+Message-ID: <YN2wLHWpNkLXvDEB@casper.infradead.org>
+References: <20210630214802.1902448-1-dmatlack@google.com>
+ <YN0XRZvCrvroItQQ@casper.infradead.org>
+ <CABgObfZUFWCAvKoxDzGjmksFnwZgbnpX9GuC+nhiVLa-Fhwj6A@mail.gmail.com>
 MIME-Version: 1.0
-References: <20210615141331.407-1-xieyongji@bytedance.com> <20210615141331.407-10-xieyongji@bytedance.com>
- <YNSatrDFsg+4VvH4@stefanha-x1.localdomain> <CACycT3vaXQ4dxC9QUzXXJs7og6TVqqVGa8uHZnTStacsYAiFwQ@mail.gmail.com>
- <YNw+q/ADMPviZi6S@stefanha-x1.localdomain> <CACycT3t6M5i0gznABm52v=rdmeeLZu8smXAOLg+WsM3WY1fgTw@mail.gmail.com>
- <7264cb0b-7072-098e-3d22-2b7e89216545@redhat.com>
-In-Reply-To: <7264cb0b-7072-098e-3d22-2b7e89216545@redhat.com>
-From:   Yongji Xie <xieyongji@bytedance.com>
-Date:   Thu, 1 Jul 2021 18:26:21 +0800
-Message-ID: <CACycT3v7pYXAFtijPgWCMZ2WXxjT2Y-DUwS3hN_T7dhfE5o_6g@mail.gmail.com>
-Subject: Re: Re: [PATCH v8 09/10] vduse: Introduce VDUSE - vDPA Device in Userspace
-To:     Jason Wang <jasowang@redhat.com>
-Cc:     Stefan Hajnoczi <stefanha@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Stefano Garzarella <sgarzare@redhat.com>,
-        Parav Pandit <parav@nvidia.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Christian Brauner <christian.brauner@canonical.com>,
-        Randy Dunlap <rdunlap@infradead.org>,
-        Matthew Wilcox <willy@infradead.org>,
-        Al Viro <viro@zeniv.linux.org.uk>,
-        Jens Axboe <axboe@kernel.dk>, bcrl@kvack.org,
-        Jonathan Corbet <corbet@lwn.net>,
-        =?UTF-8?Q?Mika_Penttil=C3=A4?= <mika.penttila@nextfour.com>,
-        Dan Carpenter <dan.carpenter@oracle.com>, joro@8bytes.org,
-        Greg KH <gregkh@linuxfoundation.org>, songmuchun@bytedance.com,
-        virtualization <virtualization@lists.linux-foundation.org>,
-        netdev@vger.kernel.org, kvm <kvm@vger.kernel.org>,
-        linux-fsdevel@vger.kernel.org, iommu@lists.linux-foundation.org,
-        linux-kernel <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CABgObfZUFWCAvKoxDzGjmksFnwZgbnpX9GuC+nhiVLa-Fhwj6A@mail.gmail.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jul 1, 2021 at 3:55 PM Jason Wang <jasowang@redhat.com> wrote:
->
->
-> =E5=9C=A8 2021/7/1 =E4=B8=8B=E5=8D=882:50, Yongji Xie =E5=86=99=E9=81=93:
-> > On Wed, Jun 30, 2021 at 5:51 PM Stefan Hajnoczi <stefanha@redhat.com> w=
-rote:
-> >> On Tue, Jun 29, 2021 at 10:59:51AM +0800, Yongji Xie wrote:
-> >>> On Mon, Jun 28, 2021 at 9:02 PM Stefan Hajnoczi <stefanha@redhat.com>=
- wrote:
-> >>>> On Tue, Jun 15, 2021 at 10:13:30PM +0800, Xie Yongji wrote:
-> >>>>> +/* ioctls */
-> >>>>> +
-> >>>>> +struct vduse_dev_config {
-> >>>>> +     char name[VDUSE_NAME_MAX]; /* vduse device name */
-> >>>>> +     __u32 vendor_id; /* virtio vendor id */
-> >>>>> +     __u32 device_id; /* virtio device id */
-> >>>>> +     __u64 features; /* device features */
-> >>>>> +     __u64 bounce_size; /* bounce buffer size for iommu */
-> >>>>> +     __u16 vq_size_max; /* the max size of virtqueue */
-> >>>> The VIRTIO specification allows per-virtqueue sizes. A device can ha=
-ve
-> >>>> two virtqueues, where the first one allows up to 1024 descriptors an=
-d
-> >>>> the second one allows only 128 descriptors, for example.
-> >>>>
-> >>> Good point! But it looks like virtio-vdpa/virtio-pci doesn't support
-> >>> that now. All virtqueues have the same maximum size.
-> >> I see struct vpda_config_ops only supports a per-device max vq size:
-> >> u16 (*get_vq_num_max)(struct vdpa_device *vdev);
-> >>
-> >> virtio-pci supports per-virtqueue sizes because the struct
-> >> virtio_pci_common_cfg->queue_size register is per-queue (controlled by
-> >> queue_select).
-> >>
-> > Oh, yes. I miss queue_select.
+On Thu, Jul 01, 2021 at 08:47:06AM +0200, Paolo Bonzini wrote:
+> Il gio 1 lug 2021, 03:17 Matthew Wilcox <willy@infradead.org> ha scritto:
+> 
+> > On Wed, Jun 30, 2021 at 09:47:56PM +0000, David Matlack wrote:
+> > > This patch series adds support for the TDP MMU in the fast_page_fault
 > >
-> >> I guess this is a question for Jason: will vdpa will keep this limitat=
-ion?
-> >> If yes, then VDUSE can stick to it too without running into problems i=
-n
-> >> the future.
->
->
-> I think it's better to extend the get_vq_num_max() per virtqueue.
->
-> Currently, vDPA assumes the parent to have a global max size. This seems
-> to work on most of the parents but not vp-vDPA (which could be backed by
-> QEMU, in that case cvq's size is smaller).
->
-> Fortunately, we haven't enabled had cvq support in the userspace now.
->
-> I can post the fixes.
->
+> > Nowhere in this message do you explain what the TDP MMU is.
+> >
+> 
+> I don't know if you rolled a 1 too much in your last D&D session or what,
+> but this seems like a slightly petty remark given the wealth of information
+> that was in the commit message.
 
-OK. If so, it looks like we need to support the per-vq configuration.
-I wonder if it's better to use something like: VDUSE_CREATE_DEVICE ->
-VDUSE_SETUP_VQ -> VDUSE_SETUP_VQ -> ... -> VDUSE_ENABLE_DEVICE to do
-initialization rather than only use VDUSE_CREATE_DEVICE.
+Yes, there was a wealth of information, but I couldn't understand any of
+it because I have no idea what a TDP MMU is.  Actually, the length of
+the intro message annoyed me, because I had to scan the whole thing to
+try to figure out whether he explained what a TDP MMU is anywhere in it.
 
-Thanks,
-Yongji
+> The patches only touch kvm code, therefore David probably expected only kvm
+> reviewers to be interested---in which case, anyone who hasn't lived under a
+> rock for a year or two would know.
+
+He cc'd me.  That's usually a request for a review.  So I had to try
+to understand why I would care.  At this point, I don't think I care.
+Somebody explain to me why I should care?  That's the point of a cover
+letter.
+
+> Anyway the acronym is fairly
+> Google-friendly:
+> https://lore.kernel.org/kvm/20201014182700.2888246-1-bgardon@google.com/
+> http://lkml.iu.edu/hypermail/linux/kernel/2010.2/07021.html
+
+Now I'm really confused, and I don't understand why I was cc'd at all.
+get_maintainer.pl going wild?
