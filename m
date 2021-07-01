@@ -2,117 +2,179 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3907E3B939C
-	for <lists+kvm@lfdr.de>; Thu,  1 Jul 2021 16:59:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 336A13B941A
+	for <lists+kvm@lfdr.de>; Thu,  1 Jul 2021 17:39:04 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232991AbhGAPCD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 1 Jul 2021 11:02:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40036 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232463AbhGAPCC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 1 Jul 2021 11:02:02 -0400
-Received: from mail-oi1-x232.google.com (mail-oi1-x232.google.com [IPv6:2607:f8b0:4864:20::232])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7A8EDC061762
-        for <kvm@vger.kernel.org>; Thu,  1 Jul 2021 07:59:32 -0700 (PDT)
-Received: by mail-oi1-x232.google.com with SMTP id b2so7588473oiy.6
-        for <kvm@vger.kernel.org>; Thu, 01 Jul 2021 07:59:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=ltmhFCjb1WelitfArWc9DX2nLRCgQFqidnyjLJbZMyU=;
-        b=EkW9I5Hw9T7Mg3qzdaW7TNoGNc0FAw7z/Tz693senj6TSQVMaoO9C5+G8no3WO5QUQ
-         L/3hqNEzTF6sgam0DWFKbhtrIjPGIDPyk/Raok4vgFbuOJr495w7U4MLaEwOmLFmIQFV
-         ii7a5JdB0xwrhdXAC1RLPkqwhUOEina074K8j/o9J3k3aExEf6ttdrH/Pns2+zVcPSc/
-         /pm9JxrevtuwcYWahKFxt7SLlH9PGvUHVy7NDOOw5PozStUs3Zjan5fhTN4Hj4cxZYm5
-         0YZvxxFfmx3gQbeMrI5zR85IiPb87texys/4CID3lZIyineyDFZrp9QI9zdgTp90wU+6
-         dCkg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=ltmhFCjb1WelitfArWc9DX2nLRCgQFqidnyjLJbZMyU=;
-        b=MvuvGSnhDp/DUs74yz92HpESw8ZLQRk8zDhk4wPKhGuRGi4TOzSmLuLlfJ9ehdQVw+
-         6eBFfjSRIXqo3SwrEZnS7m3M4klWYMdQa6Il4PMXzJvAZCUkgoE8ESWrWnSK433q4kU6
-         ZmUDybSc/lPeSPG9DtfPOk4VVEwFSHw4GLXFT2jRJqHah04YIe6wqVMpkB35LI2xSPkr
-         MLby+DHVEz06+WY5fxGcrNM0jQI1m0GG2B7kVeun1nvuzQiq80uLElvE9Z4PPoYYrDhV
-         KCQsYl+mpM0qDcVNLg2QMk8kuHYL+p3OAd8fUOK9T2fKXqDkSC3g6deBMpsjWEIFjw+1
-         LDvQ==
-X-Gm-Message-State: AOAM532bNftEazxW4t45es8u4XVudS0ukwy+6csMOQt2kSG1udmPgwjN
-        RIsiN2wjMvmq5A1SCayWRxwpqDKqGc9RbWP+L1FXXg==
-X-Google-Smtp-Source: ABdhPJz7kZwgKADNdRptSCOhsnXccXkQQ52LRN1EzbPnXhsc9AMzr4LE8wtsRq7OyE83M21OVEMR1Sch+UK6Br6X3iE=
-X-Received: by 2002:a05:6808:158b:: with SMTP id t11mr1261355oiw.8.1625151571717;
- Thu, 01 Jul 2021 07:59:31 -0700 (PDT)
+        id S233676AbhGAPlc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 1 Jul 2021 11:41:32 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:22634 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S233588AbhGAPlb (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 1 Jul 2021 11:41:31 -0400
+Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 161FX9Ba105340;
+        Thu, 1 Jul 2021 11:39:00 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : mime-version : content-transfer-encoding; s=pp1;
+ bh=lUNzOdStyS4QPNYkzgwdhho09K6BMBnhG2L9TGVAqCg=;
+ b=eaEoZu93+hGWAbKkCFRp8TGs1Da+IORmx7mAgFuSJuIhAZtZmi9gewD5raR0gk3G9j/+
+ GhdmFYO5Ef1bJp2fFkEb3zBSTLWIj+ghia4Jozh2uKMsGVPMouNFOpe7rkkshqEnnZi0
+ eXfN6mbM4xwtGTYYoLDLz74udHeFyvr907173Z+SDrEeq4rP03E4QRDwZZmKE9orFfra
+ lWpOXH6nLzrE7SFYHU6xcVik2qAzVJKGzZQybeAZwG9bve3u8xGfZbRlxYBSCIK3GrkQ
+ riDtNun4wKfBMdkDsH0YixLZDyLxAPtV8UMHqoU3kEfWrm8VcM/3tF9uOlYjU0JewrHG ow== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 39hcn8qkxf-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 01 Jul 2021 11:39:00 -0400
+Received: from m0098393.ppops.net (m0098393.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 161FXAic105446;
+        Thu, 1 Jul 2021 11:39:00 -0400
+Received: from ppma04fra.de.ibm.com (6a.4a.5195.ip4.static.sl-reverse.com [149.81.74.106])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 39hcn8qkw9-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 01 Jul 2021 11:39:00 -0400
+Received: from pps.filterd (ppma04fra.de.ibm.com [127.0.0.1])
+        by ppma04fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 161FcvWO023269;
+        Thu, 1 Jul 2021 15:38:57 GMT
+Received: from b06cxnps4074.portsmouth.uk.ibm.com (d06relay11.portsmouth.uk.ibm.com [9.149.109.196])
+        by ppma04fra.de.ibm.com with ESMTP id 39duv8hadb-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 01 Jul 2021 15:38:57 +0000
+Received: from d06av24.portsmouth.uk.ibm.com (d06av24.portsmouth.uk.ibm.com [9.149.105.60])
+        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 161Fcsfu31392182
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 1 Jul 2021 15:38:54 GMT
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 3F32542056;
+        Thu,  1 Jul 2021 15:38:54 +0000 (GMT)
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 2A69442045;
+        Thu,  1 Jul 2021 15:38:54 +0000 (GMT)
+Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
+        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
+        Thu,  1 Jul 2021 15:38:54 +0000 (GMT)
+Received: by tuxmaker.boeblingen.de.ibm.com (Postfix, from userid 25651)
+        id A90E8E03CC; Thu,  1 Jul 2021 17:38:53 +0200 (CEST)
+From:   Christian Borntraeger <borntraeger@de.ibm.com>
+To:     KVM <kvm@vger.kernel.org>
+Cc:     Cornelia Huck <cohuck@redhat.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Janosch Frank <frankja@linux.vnet.ibm.com>,
+        David Hildenbrand <david@redhat.com>,
+        linux-s390 <linux-s390@vger.kernel.org>,
+        Thomas Huth <thuth@redhat.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Subject: [PATCH/RFC] KVM: selftests: introduce P44V64 for z196 and EC12
+Date:   Thu,  1 Jul 2021 17:38:53 +0200
+Message-Id: <20210701153853.33063-1-borntraeger@de.ibm.com>
+X-Mailer: git-send-email 2.31.1
 MIME-Version: 1.0
-References: <20210615133950.693489-1-tabba@google.com> <20210615133950.693489-9-tabba@google.com>
- <20210701134823.GH9757@willie-the-truck>
-In-Reply-To: <20210701134823.GH9757@willie-the-truck>
-From:   Fuad Tabba <tabba@google.com>
-Date:   Thu, 1 Jul 2021 15:58:55 +0100
-Message-ID: <CA+EHjTzsx1jR9JWhN5iKENSi8ry-0-byF1wN_bTBmm3+qn6MdA@mail.gmail.com>
-Subject: Re: [PATCH v2 08/13] KVM: arm64: Guest exit handlers for nVHE hyp
-To:     Will Deacon <will@kernel.org>
-Cc:     kvmarm@lists.cs.columbia.edu, maz@kernel.org, james.morse@arm.com,
-        alexandru.elisei@arm.com, suzuki.poulose@arm.com,
-        mark.rutland@arm.com, christoffer.dall@arm.com,
-        pbonzini@redhat.com, drjones@redhat.com, qperret@google.com,
-        kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        kernel-team@android.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: VtRnOspV0to1x1wVUDxdF5RYcOOMVk2z
+X-Proofpoint-ORIG-GUID: 258xkKQ62la6cL9NubBTBmR-Sh0etFLn
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.790
+ definitions=2021-07-01_08:2021-07-01,2021-07-01 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ phishscore=0 lowpriorityscore=0 impostorscore=0 adultscore=0 spamscore=0
+ suspectscore=0 bulkscore=0 clxscore=1015 mlxscore=0 mlxlogscore=999
+ malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2104190000 definitions=main-2107010093
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Will,
+Older machines likes z196 and zEC12 do only support 44 bits of physical
+addresses. Make this the default and check via IBC if we are on a later
+machine. We then add P47V64 as an additional model.
 
-On Thu, Jul 1, 2021 at 2:48 PM Will Deacon <will@kernel.org> wrote:
->
-> On Tue, Jun 15, 2021 at 02:39:45PM +0100, Fuad Tabba wrote:
-> > Add an array of pointers to handlers for various trap reasons in
-> > nVHE code.
-> >
-> > The current code selects how to fixup a guest on exit based on a
-> > series of if/else statements. Future patches will also require
-> > different handling for guest exists. Create an array of handlers
-> > to consolidate them.
-> >
-> > No functional change intended as the array isn't populated yet.
-> >
-> > Signed-off-by: Fuad Tabba <tabba@google.com>
-> > ---
-> >  arch/arm64/kvm/hyp/include/hyp/switch.h | 19 ++++++++++++++
-> >  arch/arm64/kvm/hyp/nvhe/switch.c        | 35 +++++++++++++++++++++++++
-> >  2 files changed, 54 insertions(+)
-> >
-> > diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
-> > index e4a2f295a394..f5d3d1da0aec 100644
-> > --- a/arch/arm64/kvm/hyp/include/hyp/switch.h
-> > +++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
-> > @@ -405,6 +405,18 @@ static inline bool __hyp_handle_ptrauth(struct kvm_vcpu *vcpu)
-> >       return true;
-> >  }
-> >
-> > +typedef int (*exit_handle_fn)(struct kvm_vcpu *);
-> > +
-> > +exit_handle_fn kvm_get_nvhe_exit_handler(struct kvm_vcpu *vcpu);
-> > +
-> > +static exit_handle_fn kvm_get_hyp_exit_handler(struct kvm_vcpu *vcpu)
-> > +{
-> > +     if (is_nvhe_hyp_code())
-> > +             return kvm_get_nvhe_exit_handler(vcpu);
-> > +     else
-> > +             return NULL;
-> > +}
->
-> nit: might be a bit tidier with a ternary if (?:).
+Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
+Fixes: 1bc603af73dd ("KVM: selftests: introduce P47V64 for s390x")
+---
+ tools/testing/selftests/kvm/include/kvm_util.h |  3 ++-
+ tools/testing/selftests/kvm/lib/guest_modes.c  | 16 ++++++++++++++++
+ tools/testing/selftests/kvm/lib/kvm_util.c     |  5 +++++
+ 3 files changed, 23 insertions(+), 1 deletion(-)
 
-Sure thing.
+diff --git a/tools/testing/selftests/kvm/include/kvm_util.h b/tools/testing/selftests/kvm/include/kvm_util.h
+index 35739567189e..74d73532fce9 100644
+--- a/tools/testing/selftests/kvm/include/kvm_util.h
++++ b/tools/testing/selftests/kvm/include/kvm_util.h
+@@ -44,6 +44,7 @@ enum vm_guest_mode {
+ 	VM_MODE_P40V48_64K,
+ 	VM_MODE_PXXV48_4K,	/* For 48bits VA but ANY bits PA */
+ 	VM_MODE_P47V64_4K,
++	VM_MODE_P44V64_4K,
+ 	NUM_VM_MODES,
+ };
+ 
+@@ -61,7 +62,7 @@ enum vm_guest_mode {
+ 
+ #elif defined(__s390x__)
+ 
+-#define VM_MODE_DEFAULT			VM_MODE_P47V64_4K
++#define VM_MODE_DEFAULT			VM_MODE_P44V64_4K
+ #define MIN_PAGE_SHIFT			12U
+ #define ptes_per_page(page_size)	((page_size) / 16)
+ 
+diff --git a/tools/testing/selftests/kvm/lib/guest_modes.c b/tools/testing/selftests/kvm/lib/guest_modes.c
+index 25bff307c71f..c330f414ef96 100644
+--- a/tools/testing/selftests/kvm/lib/guest_modes.c
++++ b/tools/testing/selftests/kvm/lib/guest_modes.c
+@@ -22,6 +22,22 @@ void guest_modes_append_default(void)
+ 		}
+ 	}
+ #endif
++#ifdef __s390x__
++	{
++		int kvm_fd, vm_fd;
++		struct kvm_s390_vm_cpu_processor info;
++
++		kvm_fd = open_kvm_dev_path_or_exit();
++		vm_fd = ioctl(kvm_fd, KVM_CREATE_VM, 0);
++		kvm_device_access(vm_fd, KVM_S390_VM_CPU_MODEL,
++				  KVM_S390_VM_CPU_PROCESSOR, &info, false);
++		close(vm_fd);
++		close(kvm_fd);
++		/* Starting with z13 we have 47bits of physical address */
++		if (info.ibc >= 0x30)
++			guest_mode_append(VM_MODE_P47V64_4K, true, true);
++	}
++#endif
+ }
+ 
+ void for_each_guest_mode(void (*func)(enum vm_guest_mode, void *), void *arg)
+diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
+index a2b732cf96ea..8606000c439e 100644
+--- a/tools/testing/selftests/kvm/lib/kvm_util.c
++++ b/tools/testing/selftests/kvm/lib/kvm_util.c
+@@ -176,6 +176,7 @@ const char *vm_guest_mode_string(uint32_t i)
+ 		[VM_MODE_P40V48_64K]	= "PA-bits:40,  VA-bits:48, 64K pages",
+ 		[VM_MODE_PXXV48_4K]	= "PA-bits:ANY, VA-bits:48,  4K pages",
+ 		[VM_MODE_P47V64_4K]	= "PA-bits:47,  VA-bits:64,  4K pages",
++		[VM_MODE_P44V64_4K]	= "PA-bits:44,  VA-bits:64,  4K pages",
+ 	};
+ 	_Static_assert(sizeof(strings)/sizeof(char *) == NUM_VM_MODES,
+ 		       "Missing new mode strings?");
+@@ -194,6 +195,7 @@ const struct vm_guest_mode_params vm_guest_mode_params[] = {
+ 	{ 40, 48, 0x10000, 16 },
+ 	{  0,  0,  0x1000, 12 },
+ 	{ 47, 64,  0x1000, 12 },
++	{ 44, 64,  0x1000, 12 },
+ };
+ _Static_assert(sizeof(vm_guest_mode_params)/sizeof(struct vm_guest_mode_params) == NUM_VM_MODES,
+ 	       "Missing new mode params?");
+@@ -282,6 +284,9 @@ struct kvm_vm *vm_create(enum vm_guest_mode mode, uint64_t phy_pages, int perm)
+ 	case VM_MODE_P47V64_4K:
+ 		vm->pgtable_levels = 5;
+ 		break;
++	case VM_MODE_P44V64_4K:
++		vm->pgtable_levels = 5;
++		break;
+ 	default:
+ 		TEST_FAIL("Unknown guest mode, mode: 0x%x", mode);
+ 	}
+-- 
+2.31.1
 
-Thanks,
-/fuad
-
-> But either way:
->
-> Acked-by: Will Deacon <will@kernel.org>
->
-> Will
