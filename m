@@ -2,126 +2,82 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 866293B95DB
-	for <lists+kvm@lfdr.de>; Thu,  1 Jul 2021 20:04:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 48EE43B9623
+	for <lists+kvm@lfdr.de>; Thu,  1 Jul 2021 20:27:35 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233119AbhGASGd (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 1 Jul 2021 14:06:33 -0400
-Received: from mail.skyhub.de ([5.9.137.197]:44848 "EHLO mail.skyhub.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229967AbhGASGc (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 1 Jul 2021 14:06:32 -0400
-Received: from zn.tnic (p200300ec2f129e0080cb4010141c3d3f.dip0.t-ipconnect.de [IPv6:2003:ec:2f12:9e00:80cb:4010:141c:3d3f])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 7547E1EC054E;
-        Thu,  1 Jul 2021 20:04:00 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
-        t=1625162640;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
-        bh=pA5qidpGRMz4iB462uPn953XJs14KjqFbjDwTnvDnKg=;
-        b=OHT4NlQL9fVtGHXge2xZSd0T4EtBcQOmHUNmaE2UC612fKA/8lwfY5w8HH19skwww6/STE
-        w59gY7ILIMMe0ZyN6jwbgjjR4zWs30kvUfgtbeBw73IN/ywKqCl1h2D8vx+XtIEcdzKNGg
-        kS/Fvml/488FUBEJyM1T7mfITHlUCSg=
-Date:   Thu, 1 Jul 2021 20:03:55 +0200
-From:   Borislav Petkov <bp@alien8.de>
-To:     Brijesh Singh <brijesh.singh@amd.com>
-Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
-        linux-coco@lists.linux.dev, linux-mm@kvack.org,
-        linux-crypto@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
+        id S230132AbhGASaE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 1 Jul 2021 14:30:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58724 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229894AbhGASaE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 1 Jul 2021 14:30:04 -0400
+Received: from mail-pj1-x1032.google.com (mail-pj1-x1032.google.com [IPv6:2607:f8b0:4864:20::1032])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E60CEC061762
+        for <kvm@vger.kernel.org>; Thu,  1 Jul 2021 11:27:32 -0700 (PDT)
+Received: by mail-pj1-x1032.google.com with SMTP id p4-20020a17090a9304b029016f3020d867so4465518pjo.3
+        for <kvm@vger.kernel.org>; Thu, 01 Jul 2021 11:27:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=7QXXcUHR5SdmSl1rk9LFsFtBV30ZJm0VXX3f2hS40gU=;
+        b=RZb62gmWRg1VP2419PrBZqRdnKcooYMY9xG/glDXUxhKiESIuvOWPpWnLhT5uuo91n
+         w+n7KuMNHjxvgaiDG+oIzYVz8UL3/z9xK2O7ZQoIzajuD5JQp9ETNEw4O+6g0smEs9lk
+         +QwDNMdxwmlj1eixqmHSFAZLdUsZ72LhqB5d9gs7BFQNwUU7qJTfRqJ4KIID/l24xbKg
+         4FKJeKsVJy67FoXUbXUoS+6vp13yi7bHlt8/Oso6PpfEmZ/IdwYbqy4YV268zv3/5JAk
+         Qgl/TnEs7wVOPEQBxB2bArKVSBBWiuPpNFp32cBSz9wdC2YBgM6BcHeLTQi/pdtLYlBF
+         qFgg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=7QXXcUHR5SdmSl1rk9LFsFtBV30ZJm0VXX3f2hS40gU=;
+        b=k6mwOGLZmVvVeY2jLxEMUIHr2CflAjPCfq4OGP2jbCBl+J0Ih+xyJnyU2PyYThe4kV
+         kQzGdPS1L+Y4cZE89DL0SB1wlhosmVgRHqXVx9hfmsx8zg7LJ6bH72AJVWXh4fJhYjCF
+         krzn/q8DXoEVyoSlypBwUZAdjv0ZPLc9hi6Hrci7ohvpjCRmo7oOwEjC/u/ROhHwGhXR
+         LgGAzBZFlkmKiGvXwiCmcLHwilA+U98kfBPZA9KcwOr24velbGfY9rto6SgA+8Q57a7v
+         41vaudfQ8iVIMdJFgNG+oyxCgXVl5nFB6xSSWedSuLyV6std/Udo+354/YfEhL/Xbl8c
+         TG7Q==
+X-Gm-Message-State: AOAM533uqV2GBFGzA+GN5bSRIlC3Fvf96xC08tZWuhRjNMa7yihUKCjd
+        F8zB3b7vHQtm3tvcIBrdgx9bfw==
+X-Google-Smtp-Source: ABdhPJzFlTAwnldUt/7pcmf343s13Yc2txaytH2juohKc0zrfIso88y16971TzNhnPpNqhDyALIN5A==
+X-Received: by 2002:a17:90a:4091:: with SMTP id l17mr960875pjg.12.1625164052242;
+        Thu, 01 Jul 2021 11:27:32 -0700 (PDT)
+Received: from google.com (254.80.82.34.bc.googleusercontent.com. [34.82.80.254])
+        by smtp.gmail.com with ESMTPSA id m16sm728245pfo.1.2021.07.01.11.27.31
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 01 Jul 2021 11:27:31 -0700 (PDT)
+Date:   Thu, 1 Jul 2021 18:27:28 +0000
+From:   David Matlack <dmatlack@google.com>
+To:     kernel test robot <lkp@intel.com>
+Cc:     kvm@vger.kernel.org, kbuild-all@lists.01.org,
+        Ben Gardon <bgardon@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
         Jim Mattson <jmattson@google.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
-        David Rientjes <rientjes@google.com>, tony.luck@intel.com,
-        npmccallum@redhat.com, Dov Murik <dovmurik@linux.ibm.com>
-Subject: Re: [PATCH Part1 RFC v3 22/22] virt: Add SEV-SNP guest driver
-Message-ID: <YN4DixahyShxyyCv@zn.tnic>
-References: <20210602140416.23573-1-brijesh.singh@amd.com>
- <20210602140416.23573-23-brijesh.singh@amd.com>
- <YNxzJ2I3ZumTELLb@zn.tnic>
- <46499161-0106-3ae9-9688-0afd9076b28b@amd.com>
+        Wanpeng Li <wanpengli@tencent.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Junaid Shahid <junaids@google.com>,
+        Andrew Jones <drjones@redhat.com>
+Subject: Re: [PATCH v2 4/6] KVM: x86/mmu: fast_page_fault support for the TDP
+ MMU
+Message-ID: <YN4JEBLXE9vVBjC5@google.com>
+References: <20210630214802.1902448-5-dmatlack@google.com>
+ <202107011212.FwmbO1RX-lkp@intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <46499161-0106-3ae9-9688-0afd9076b28b@amd.com>
+In-Reply-To: <202107011212.FwmbO1RX-lkp@intel.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jun 30, 2021 at 11:26:46AM -0500, Brijesh Singh wrote:
-> As you have noticed that Dov is submitting the SEV specific driver.
-
-Well, reportedly that driver is generic-ish as it only handles the
-EFI-provided sekrits and is not SEV-specific - the SEV use is only
-exemplary.
-
-> I was thinking that it will be nice if we have one driver that covers
-> both the SEV and SEV-SNP. That driver can be called "sevguest". The
-> kernel will install the appropriate platform device. The sevguest
-> driver can probe for both the "sev-guest" and "snp-guest" and delegate
-> the ioctl handling accordingly.
->
-> In the kernel the directory structure may look like this:
->
-> virt/coco/sevguest
->   sevguest.c       // common code
->   snp.c            // SNP specific ioctl implementation
->   sev.c            // SEV specific ioctl or sysfs implementation
+On Thu, Jul 01, 2021 at 12:27:58PM +0800, kernel test robot wrote:
 > 
-> Thoughts ?
+> >> arch/x86/kvm/mmu/mmu.c:3119:6: error: no previous prototype for 'get_last_sptep_lockless' [-Werror=missing-prototypes]
+>     3119 | u64 *get_last_sptep_lockless(struct kvm_vcpu *vcpu, gpa_t gpa, u64 *spte)
+>          |      ^~~~~~~~~~~~~~~~~~~~~~~
 
-Sure, but I'd call it sevguest.c and will have it deal with both SEV and
-SNP ioctls depending on what has been detected in the hardware. Or is
-there some special reason for having snp.c and sev.c separate?
-
-> I followed the naming convension you recommended during the initial SEV driver
-> developement. IIRC, the main reason for us having to add "user" in it because
-> we wanted to distinguious that this structure is not exactly same as the what
-> is defined in the SEV-SNP firmware spec.
-
-I most definitely have forgotten about this. Can you point me to the
-details of that discussion and why there's a need to distinguish?
-
-> Good question, I am not able to find a generic place to document it. Should we
-> create a documentation "Documentation/virt/coco/sevguest-api.rst" for it ? I am
-> open to other suggestions.
-
-Well, grepping the tree for "ioctl" I see:
-
-Documentation/driver-api/ioctl.rst
-Documentation/process/botching-up-ioctls.rst
-Documentation/userspace-api/ioctl/cdrom.rst
-Documentation/userspace-api/ioctl/hdio.rst
-Documentation/userspace-api/ioctl/index.rst
-Documentation/userspace-api/ioctl/ioctl-decoding.rst
-Documentation/userspace-api/ioctl/ioctl-number.rst
-Documentation/userspace-api/media/cec/cec-func-ioctl.rst
-Documentation/userspace-api/media/mediactl/media-func-ioctl.rst
-Documentation/userspace-api/media/mediactl/request-func-ioctl.rst
-Documentation/userspace-api/media/v4l/func-ioctl.rst
-
-and there's some good info as to what to do.
-
-In any case, Documentation/virt/coco/sevguest-api.rst doesn't sound too
-bad either, actually, as it collects everything under virt/
-
-Thx.
-
--- 
-Regards/Gruss,
-    Boris.
-
-https://people.kernel.org/tglx/notes-about-netiquette
+get_last_sptep_lockless should be static. I will include a fix in the
+next version of this series.
