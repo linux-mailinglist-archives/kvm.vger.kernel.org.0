@@ -2,125 +2,126 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2C0973B9585
-	for <lists+kvm@lfdr.de>; Thu,  1 Jul 2021 19:29:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 866293B95DB
+	for <lists+kvm@lfdr.de>; Thu,  1 Jul 2021 20:04:04 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233239AbhGARbp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 1 Jul 2021 13:31:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45550 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232397AbhGARbp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 1 Jul 2021 13:31:45 -0400
-Received: from mail-pj1-x102c.google.com (mail-pj1-x102c.google.com [IPv6:2607:f8b0:4864:20::102c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B38A4C061762
-        for <kvm@vger.kernel.org>; Thu,  1 Jul 2021 10:29:13 -0700 (PDT)
-Received: by mail-pj1-x102c.google.com with SMTP id p4-20020a17090a9304b029016f3020d867so4368515pjo.3
-        for <kvm@vger.kernel.org>; Thu, 01 Jul 2021 10:29:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=1IJtpsVcytmCjAYZJRNbaDAnaK0qMOEWAnoO2DngMDc=;
-        b=RPoOY+HP5qTgxbrCak3zwbbLkTPbRrYBM2JJOBv7sA45Zb4zepOmeqy0QMnMcjLb5j
-         udBgrbxMsxKtC6IwltG3FDR2vDdsVQLD0CRRVYn8YGQBtdqdt+wC4/+tkEiV1qAf28rK
-         S0dtWpPANJhkLvj+I0yB/MB1/AjPw3PLbg+E1si1c86//lJ2kgPSowgnHTxqnVYtV7Ro
-         ipJc/YNRkMHLMV/x2t8u4wSjfe5lPtfPa5ISTaV4msIjPwAamDTq8Y9NwkqrvqTM0bOf
-         o1lTN1ROo6NNka2WuKsBMPFRbT//Ldr9ReKtGn+rx/Et0mpr6anU5HaIjJZ1CETEwwK3
-         ykdQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=1IJtpsVcytmCjAYZJRNbaDAnaK0qMOEWAnoO2DngMDc=;
-        b=uLmd2flZn7iQz8tPyswOkkGpz1JiTxLIFHKjteTzNXEeDTG4P6rDSObRDv7qQ8Nhrp
-         wixs8WjJomBXg+4pXZnuR3/EnrFWYu/hrGNMMFHNQ+3PuXSflSp9u32CghlgdFfiZ1qU
-         XkciirrXgmOtMDq5DLfQza9NybvcRZm6mxZnPQ4I7rvGBsnHjJGfGSVUScoRn/omgGsP
-         l6Io7WKsTuj6nJU4rrN3t0105iPIAt43OsGgPDwKxYjaioWgS1nLhE0n1v+Y8JDit0RJ
-         4/rVJIiYofNL7sH4KC7sI1yIMNXV/LrXRI5L2mw0/+VukYbo/yfgSPzAM/DsDX2W5QCJ
-         aBwA==
-X-Gm-Message-State: AOAM530DiP5X/T+MrZf3mA2mzgRj9PBiJqF56RYgobwmDqwUjqIpbcGb
-        DfOSr+PCfUOYJS1HKwYA0ufEVQ==
-X-Google-Smtp-Source: ABdhPJzM3sOnNr4h5T9lf3f3fVbfhY6J151kPDfM6N/6JK1fqSYAmBBfSg9Uy8kcPa6rRGDgzfaDLQ==
-X-Received: by 2002:a17:902:b7c2:b029:128:c1cd:241e with SMTP id v2-20020a170902b7c2b0290128c1cd241emr689364plz.14.1625160553006;
-        Thu, 01 Jul 2021 10:29:13 -0700 (PDT)
-Received: from google.com (150.12.83.34.bc.googleusercontent.com. [34.83.12.150])
-        by smtp.gmail.com with ESMTPSA id t3sm598566pfl.44.2021.07.01.10.29.12
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 01 Jul 2021 10:29:12 -0700 (PDT)
-Date:   Thu, 1 Jul 2021 10:29:09 -0700
-From:   Ricardo Koller <ricarkol@google.com>
-To:     Andrew Jones <drjones@redhat.com>
-Cc:     Marc Zyngier <maz@kernel.org>, kvm@vger.kernel.org,
-        kernel-team@android.com, Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH] KVM: selftests: x86: Address missing
- vm_install_exception_handler conversions
-Message-ID: <YN37ZaayVZjPH4n1@google.com>
-References: <20210701071928.2971053-1-maz@kernel.org>
- <20210701073004.uy4ch45vrqc4a2y7@gator.home>
+        id S233119AbhGASGd (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 1 Jul 2021 14:06:33 -0400
+Received: from mail.skyhub.de ([5.9.137.197]:44848 "EHLO mail.skyhub.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229967AbhGASGc (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 1 Jul 2021 14:06:32 -0400
+Received: from zn.tnic (p200300ec2f129e0080cb4010141c3d3f.dip0.t-ipconnect.de [IPv6:2003:ec:2f12:9e00:80cb:4010:141c:3d3f])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 7547E1EC054E;
+        Thu,  1 Jul 2021 20:04:00 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
+        t=1625162640;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
+        bh=pA5qidpGRMz4iB462uPn953XJs14KjqFbjDwTnvDnKg=;
+        b=OHT4NlQL9fVtGHXge2xZSd0T4EtBcQOmHUNmaE2UC612fKA/8lwfY5w8HH19skwww6/STE
+        w59gY7ILIMMe0ZyN6jwbgjjR4zWs30kvUfgtbeBw73IN/ywKqCl1h2D8vx+XtIEcdzKNGg
+        kS/Fvml/488FUBEJyM1T7mfITHlUCSg=
+Date:   Thu, 1 Jul 2021 20:03:55 +0200
+From:   Borislav Petkov <bp@alien8.de>
+To:     Brijesh Singh <brijesh.singh@amd.com>
+Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
+        linux-coco@lists.linux.dev, linux-mm@kvack.org,
+        linux-crypto@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        David Rientjes <rientjes@google.com>, tony.luck@intel.com,
+        npmccallum@redhat.com, Dov Murik <dovmurik@linux.ibm.com>
+Subject: Re: [PATCH Part1 RFC v3 22/22] virt: Add SEV-SNP guest driver
+Message-ID: <YN4DixahyShxyyCv@zn.tnic>
+References: <20210602140416.23573-1-brijesh.singh@amd.com>
+ <20210602140416.23573-23-brijesh.singh@amd.com>
+ <YNxzJ2I3ZumTELLb@zn.tnic>
+ <46499161-0106-3ae9-9688-0afd9076b28b@amd.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20210701073004.uy4ch45vrqc4a2y7@gator.home>
+In-Reply-To: <46499161-0106-3ae9-9688-0afd9076b28b@amd.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jul 01, 2021 at 09:30:04AM +0200, Andrew Jones wrote:
-> On Thu, Jul 01, 2021 at 08:19:28AM +0100, Marc Zyngier wrote:
-> > Commit b78f4a59669 ("KVM: selftests: Rename vm_handle_exception")
-> > raced with a couple of new x86 tests, missing two vm_handle_exception
-> > to vm_install_exception_handler conversions.
-> > 
-> > Help the two broken tests to catch up with the new world.
-> > 
-> > Cc: Andrew Jones <drjones@redhat.com>
-> > CC: Ricardo Koller <ricarkol@google.com>
-> > Cc: Paolo Bonzini <pbonzini@redhat.com>
-> > Signed-off-by: Marc Zyngier <maz@kernel.org>
-> > ---
-> >  tools/testing/selftests/kvm/x86_64/hyperv_features.c | 2 +-
-> >  tools/testing/selftests/kvm/x86_64/mmu_role_test.c   | 2 +-
-> >  2 files changed, 2 insertions(+), 2 deletions(-)
-> > 
-> > diff --git a/tools/testing/selftests/kvm/x86_64/hyperv_features.c b/tools/testing/selftests/kvm/x86_64/hyperv_features.c
-> > index 42bd658f52a8..af27c7e829c1 100644
-> > --- a/tools/testing/selftests/kvm/x86_64/hyperv_features.c
-> > +++ b/tools/testing/selftests/kvm/x86_64/hyperv_features.c
-> > @@ -615,7 +615,7 @@ int main(void)
-> >  
-> >  	vm_init_descriptor_tables(vm);
-> >  	vcpu_init_descriptor_tables(vm, VCPU_ID);
-> > -	vm_handle_exception(vm, GP_VECTOR, guest_gp_handler);
-> > +	vm_install_exception_handler(vm, GP_VECTOR, guest_gp_handler);
-> >  
-> >  	pr_info("Testing access to Hyper-V specific MSRs\n");
-> >  	guest_test_msrs_access(vm, addr_gva2hva(vm, msr_gva),
-> > diff --git a/tools/testing/selftests/kvm/x86_64/mmu_role_test.c b/tools/testing/selftests/kvm/x86_64/mmu_role_test.c
-> > index 523371cf8e8f..da2325fcad87 100644
-> > --- a/tools/testing/selftests/kvm/x86_64/mmu_role_test.c
-> > +++ b/tools/testing/selftests/kvm/x86_64/mmu_role_test.c
-> > @@ -71,7 +71,7 @@ static void mmu_role_test(u32 *cpuid_reg, u32 evil_cpuid_val)
-> >  	/* Set up a #PF handler to eat the RSVD #PF and signal all done! */
-> >  	vm_init_descriptor_tables(vm);
-> >  	vcpu_init_descriptor_tables(vm, VCPU_ID);
-> > -	vm_handle_exception(vm, PF_VECTOR, guest_pf_handler);
-> > +	vm_install_exception_handler(vm, PF_VECTOR, guest_pf_handler);
-> >  
-> >  	r = _vcpu_run(vm, VCPU_ID);
-> >  	TEST_ASSERT(r == 0, "vcpu_run failed: %d\n", r);
-> > -- 
-> > 2.30.2
-> >
-> 
-> Reviewed-by: Andrew Jones <drjones@redhat.com>
-> 
-> Hopefully vm_install_exception_handler() has now officially won the race!
-> 
-> Thanks,
-> drew
-> 
+On Wed, Jun 30, 2021 at 11:26:46AM -0500, Brijesh Singh wrote:
+> As you have noticed that Dov is submitting the SEV specific driver.
 
-Reviewed-by: Ricardo Koller <ricarkol@google.com>
+Well, reportedly that driver is generic-ish as it only handles the
+EFI-provided sekrits and is not SEV-specific - the SEV use is only
+exemplary.
 
-Thanks!
-Ricardo
+> I was thinking that it will be nice if we have one driver that covers
+> both the SEV and SEV-SNP. That driver can be called "sevguest". The
+> kernel will install the appropriate platform device. The sevguest
+> driver can probe for both the "sev-guest" and "snp-guest" and delegate
+> the ioctl handling accordingly.
+>
+> In the kernel the directory structure may look like this:
+>
+> virt/coco/sevguest
+>   sevguest.c       // common code
+>   snp.c            // SNP specific ioctl implementation
+>   sev.c            // SEV specific ioctl or sysfs implementation
+> 
+> Thoughts ?
+
+Sure, but I'd call it sevguest.c and will have it deal with both SEV and
+SNP ioctls depending on what has been detected in the hardware. Or is
+there some special reason for having snp.c and sev.c separate?
+
+> I followed the naming convension you recommended during the initial SEV driver
+> developement. IIRC, the main reason for us having to add "user" in it because
+> we wanted to distinguious that this structure is not exactly same as the what
+> is defined in the SEV-SNP firmware spec.
+
+I most definitely have forgotten about this. Can you point me to the
+details of that discussion and why there's a need to distinguish?
+
+> Good question, I am not able to find a generic place to document it. Should we
+> create a documentation "Documentation/virt/coco/sevguest-api.rst" for it ? I am
+> open to other suggestions.
+
+Well, grepping the tree for "ioctl" I see:
+
+Documentation/driver-api/ioctl.rst
+Documentation/process/botching-up-ioctls.rst
+Documentation/userspace-api/ioctl/cdrom.rst
+Documentation/userspace-api/ioctl/hdio.rst
+Documentation/userspace-api/ioctl/index.rst
+Documentation/userspace-api/ioctl/ioctl-decoding.rst
+Documentation/userspace-api/ioctl/ioctl-number.rst
+Documentation/userspace-api/media/cec/cec-func-ioctl.rst
+Documentation/userspace-api/media/mediactl/media-func-ioctl.rst
+Documentation/userspace-api/media/mediactl/request-func-ioctl.rst
+Documentation/userspace-api/media/v4l/func-ioctl.rst
+
+and there's some good info as to what to do.
+
+In any case, Documentation/virt/coco/sevguest-api.rst doesn't sound too
+bad either, actually, as it collects everything under virt/
+
+Thx.
+
+-- 
+Regards/Gruss,
+    Boris.
+
+https://people.kernel.org/tglx/notes-about-netiquette
