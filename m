@@ -2,85 +2,120 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id AD9653B94E1
-	for <lists+kvm@lfdr.de>; Thu,  1 Jul 2021 18:51:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2B2CA3B9523
+	for <lists+kvm@lfdr.de>; Thu,  1 Jul 2021 19:00:57 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229974AbhGAQxz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 1 Jul 2021 12:53:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37012 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229629AbhGAQxy (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 1 Jul 2021 12:53:54 -0400
-Received: from mail-lf1-x136.google.com (mail-lf1-x136.google.com [IPv6:2a00:1450:4864:20::136])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B1CB0C061762
-        for <kvm@vger.kernel.org>; Thu,  1 Jul 2021 09:51:22 -0700 (PDT)
-Received: by mail-lf1-x136.google.com with SMTP id a11so12935886lfg.11
-        for <kvm@vger.kernel.org>; Thu, 01 Jul 2021 09:51:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=u/hjpLVuaEGZlBnwx66V+m10vVt/P55zQuMmba4vINk=;
-        b=FX+qn8otateyP9ykbIaQwiEdLNrowoqGjwt1nyavSmCYGKyU/Fv5ZZRTEEubA6Sn7/
-         xnJNVvnRKZ9hwdvdi8/zyPn+HR6+vUzaMYvBPZDf0iU/2zgXmoChqk5gFUTuHU+7hgS8
-         HS/iULSldQ+0yo7rcUePbWfTqf8q7CywLbX/jL7ol4cQtLwxgsDijoPqyybEDpgUc351
-         PQiG+1tbJZ9Enm/44EHpg6UbWIT92gH0ID3nhOOFe4YLxfIHAJbnYMz/FCRYhvc4Z784
-         /NkfgMz1D0gxUWCznDaG15w7hRtD4yHC/MeAtDZ03P3fCu6ptihLEpDcBuWm98IMGtQx
-         YTMw==
+        id S233072AbhGARD0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 1 Jul 2021 13:03:26 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:51841 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S233045AbhGARD0 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 1 Jul 2021 13:03:26 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1625158855;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=nOeE3vdzqSBLzhlrVzxDT7fPE/A21Lc3V+ndKNX6TGI=;
+        b=ESngaFug1cetY5TjPPYkX0wCJXqr0fsNNqBQFm3H7SCIQbAlTLuMAxoJjUC/vtFRNXPsuW
+        beW+87eUb13rZkeV26CfnOredxMh4Cm+mHO6GPUzlJzfLzDvrNin0l9vOFvZ02Rcg5FZzH
+        R20po+4nM+avo3OIZALRtxX1yxAHUXw=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-504-ujq5xl5WMqmOzTf33u_E5Q-1; Thu, 01 Jul 2021 13:00:53 -0400
+X-MC-Unique: ujq5xl5WMqmOzTf33u_E5Q-1
+Received: by mail-wm1-f69.google.com with SMTP id v2-20020a7bcb420000b0290146b609814dso2313026wmj.0
+        for <kvm@vger.kernel.org>; Thu, 01 Jul 2021 10:00:53 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=u/hjpLVuaEGZlBnwx66V+m10vVt/P55zQuMmba4vINk=;
-        b=l5Die4WI6wpkc9DJ8MyYjmHQozTguP4fBiVVcUCBWmzKtH38ve71EmcMzktRw7Uycn
-         OOHQdABPY1dodLA2tmpITi/wrAbsovbepwtyD3xe7Q+nQuroPl4V5Pdp7qSsw2Pjk5FK
-         aqEXjaFZ8ONtYWFm04/HuYfiNdA7aoaHlavQ/GFhRZk+JmI8m+8BUWdbWdH8o2ZUc5Vb
-         08B0QxDAcIgWjQfh1P32l2Y/MW+sFzoMdWuPm10PsPfg8YP/z/PH7JbnLX8MOOp6s7d+
-         7MxXomvlPVmYACyCApBR/E14x9c7e4h76Vc5/G0mbYUzR3Q58bldkLhD/DZE18d9EUae
-         B+7A==
-X-Gm-Message-State: AOAM531n0ks79lCTdTHD6QoM5hMsg7vbO1F0RE3hEA30PX1UQpUvHAbC
-        G2IwUbtw+lWEsWlTGmFsCClr5CLCuyzeUo7i8wWgCg==
-X-Google-Smtp-Source: ABdhPJzuaM7t1ejwWkbjogz84j+yGhIL9YJPpxK0n7LeHHZKaYhSVAT18rwmZS4cVMLd63Lcic86m/YKjsY96TmT9cg=
-X-Received: by 2002:a05:6512:3f17:: with SMTP id y23mr420528lfa.406.1625158280652;
- Thu, 01 Jul 2021 09:51:20 -0700 (PDT)
-MIME-Version: 1.0
-References: <20210630214802.1902448-1-dmatlack@google.com> <YN0XRZvCrvroItQQ@casper.infradead.org>
- <CABgObfZUFWCAvKoxDzGjmksFnwZgbnpX9GuC+nhiVLa-Fhwj6A@mail.gmail.com> <YN2wLHWpNkLXvDEB@casper.infradead.org>
-In-Reply-To: <YN2wLHWpNkLXvDEB@casper.infradead.org>
-From:   David Matlack <dmatlack@google.com>
-Date:   Thu, 1 Jul 2021 09:50:54 -0700
-Message-ID: <CALzav=f6acVN8kKctWDDQsjjSb2yHk9gdXkeQBSv+YakR=_Niw@mail.gmail.com>
-Subject: Re: [PATCH v2 0/6] KVM: x86/mmu: Fast page fault support for the TDP MMU
-To:     Matthew Wilcox <willy@infradead.org>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm <kvm@vger.kernel.org>,
-        Ben Gardon <bgardon@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
+        h=x-gm-message-state:to:cc:references:from:organization:subject
+         :message-id:date:user-agent:mime-version:in-reply-to
+         :content-language:content-transfer-encoding;
+        bh=nOeE3vdzqSBLzhlrVzxDT7fPE/A21Lc3V+ndKNX6TGI=;
+        b=uapcEAmwZfDWnMj2THkPPSVOtuT36z/ALR7jJo0WpO+0z8RZBmv7AnWPfbSLYafZcl
+         UIuqLd0txtS+Li6RohDnNnYAsaID8/qsk79IgSKU7x9oX4MR5l4Tzw5e753QInySN3YU
+         TfAU0hJWb5M4nOkZukxkUkrP1A8cdXyBT5t6l6aUguLq0lDu5Ut84yDBKzEfr/pdiIWC
+         T5KvKQzR7E/miJlje1S+d5h3y6fBN8yD6NCHkVqQA25KxpMqDpoisAt/N8rFKIqzPaN9
+         asESqnbh8dHyYpCTDiQ55BRZgrZ7kI+MxmFV5Q5gYvsMKsMSX74nJSzKiZjRW/wYmE2q
+         RgVg==
+X-Gm-Message-State: AOAM531Xw6/ttSK97x1ekFb1MWhRuoATNNQJLcJtr+GXOQIHqU5bIcUS
+        EhV0VnpTeQ73A6oXZq5tR5PUAOYMvLFvQrDLExMNAxsRzvI5mFTyF42t2H6+JotGNQtYy/dcZJs
+        HdeGyzNpE23OR
+X-Received: by 2002:a05:600c:2482:: with SMTP id 2mr705260wms.67.1625158852668;
+        Thu, 01 Jul 2021 10:00:52 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxO+VGWAmQusSv0GRR2Q/FBDYF1JdzCgGA6/ROMi2P7oMzkbRe66HkPQwyoKIntNiAhYicK7A==
+X-Received: by 2002:a05:600c:2482:: with SMTP id 2mr705250wms.67.1625158852533;
+        Thu, 01 Jul 2021 10:00:52 -0700 (PDT)
+Received: from [192.168.3.132] (p4ff23bca.dip0.t-ipconnect.de. [79.242.59.202])
+        by smtp.gmail.com with ESMTPSA id u15sm9985009wmq.48.2021.07.01.10.00.51
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 01 Jul 2021 10:00:52 -0700 (PDT)
+To:     David Matlack <dmatlack@google.com>, kvm@vger.kernel.org
+Cc:     Ben Gardon <bgardon@google.com>, Joerg Roedel <joro@8bytes.org>,
         Jim Mattson <jmattson@google.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
         Junaid Shahid <junaids@google.com>,
-        Andrew Jones <drjones@redhat.com>, Yu Zhao <yuzhao@google.com>,
-        David Hildenbrand <david@redhat.com>,
+        Andrew Jones <drjones@redhat.com>,
+        Matthew Wilcox <willy@infradead.org>,
+        Yu Zhao <yuzhao@google.com>,
         Andrew Morton <akpm@linux-foundation.org>
-Content-Type: text/plain; charset="UTF-8"
+References: <20210630214802.1902448-1-dmatlack@google.com>
+From:   David Hildenbrand <david@redhat.com>
+Organization: Red Hat
+Subject: Re: [PATCH v2 0/6] KVM: x86/mmu: Fast page fault support for the TDP
+ MMU
+Message-ID: <3568552b-f72d-b158-dc49-3721375c18d5@redhat.com>
+Date:   Thu, 1 Jul 2021 19:00:51 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.11.0
+MIME-Version: 1.0
+In-Reply-To: <20210630214802.1902448-1-dmatlack@google.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jul 1, 2021 at 5:08 AM Matthew Wilcox <willy@infradead.org> wrote:
->
-> Now I'm really confused, and I don't understand why I was cc'd at all.
-> get_maintainer.pl going wild?
+On 30.06.21 23:47, David Matlack wrote:
+> This patch series adds support for the TDP MMU in the fast_page_fault
+> path, which enables certain write-protection and access tracking faults
+> to be handled without taking the KVM MMU lock. This series brings the
+> performance of these faults up to par with the legacy MMU.
+> 
+> Since there is not currently any KVM test coverage for access tracking
+> faults, this series introduces a new KVM selftest,
+> access_tracking_perf_test. Note that this test relies on page_idle to
+> enable access tracking from userspace (since it is the only available
+> usersapce API to do so) and page_idle is being considered for removal
+> from Linux
+> (https://lore.kernel.org/linux-mm/20210612000714.775825-1-willy@infradead.org/).
 
-Apologies for the confusion. I could have made it more clear why I
-cc'd you in the cover letter.
+Well, at least a new selftest that implicitly tests a part of page_idle 
+-- nice :)
 
-I cc'd you, Yu, David, and Andrew (Morton) since this series
-introduces a new selftest that uses on page_idle and you recently
-discussed removing page_idle. See the second paragraph of the cover
-letter with the link to your page_idle patch, and patch 6 which
-introduces the selftest.
+Haven't looked into the details, but if you can live with page tables 
+starting unpopulated and only monitoring what gets populated on r/w 
+access, you might be able to achieve something similar using 
+/proc/self/pagemap and softdirty handling.
 
-I will make it more explicit in the future when cc'ing non-KVM
-developers on my KVM patches.
+Unpopulated page (e.g., via MADV_DISCARD) -> trigger read or write 
+access -> sense if page populated in pagemap
+Populated page-> clear all softdirty bits -> trigger write access -> 
+sense if page is softdirty in pagemap
+
+See https://lkml.kernel.org/r/20210419135443.12822-6-david@redhat.com 
+for an example.
+
+But I'm actually fairly happy to see page_idel getting used. Maybe you 
+could extend that test using pagemap, if it's applicable to your test setup.
+
+-- 
+Thanks,
+
+David / dhildenb
+
