@@ -2,55 +2,54 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A3C1B3B8FF1
-	for <lists+kvm@lfdr.de>; Thu,  1 Jul 2021 11:45:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 778343B8FF4
+	for <lists+kvm@lfdr.de>; Thu,  1 Jul 2021 11:45:58 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235866AbhGAJsJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 1 Jul 2021 05:48:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54718 "EHLO
+        id S235886AbhGAJs0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 1 Jul 2021 05:48:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54788 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235428AbhGAJsI (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 1 Jul 2021 05:48:08 -0400
-Received: from mail-oi1-x22b.google.com (mail-oi1-x22b.google.com [IPv6:2607:f8b0:4864:20::22b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 748A5C0617A8
-        for <kvm@vger.kernel.org>; Thu,  1 Jul 2021 02:45:37 -0700 (PDT)
-Received: by mail-oi1-x22b.google.com with SMTP id t3so6617467oic.5
-        for <kvm@vger.kernel.org>; Thu, 01 Jul 2021 02:45:37 -0700 (PDT)
+        with ESMTP id S235608AbhGAJs0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 1 Jul 2021 05:48:26 -0400
+Received: from mail-ot1-x32d.google.com (mail-ot1-x32d.google.com [IPv6:2607:f8b0:4864:20::32d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5DEB1C061756
+        for <kvm@vger.kernel.org>; Thu,  1 Jul 2021 02:45:55 -0700 (PDT)
+Received: by mail-ot1-x32d.google.com with SMTP id 7-20020a9d0d070000b0290439abcef697so5947133oti.2
+        for <kvm@vger.kernel.org>; Thu, 01 Jul 2021 02:45:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=S4TJbDbmRHYbelCTMQc9PtwVVnooXUeP5A1QqT0HJx0=;
-        b=Ms8bX1TZnLJgR7ZZZdcU7eQCDD2YpR2IrQ7nLRai3kq/EG1QO7IHtO0zKLcFgGRdcH
-         sAfej2gsPnsh9TCVPiI54d3E3impx+tYVwGgX+MbZUamZGi9RqYFd1zj7TngbaEZ0Py3
-         oH2IYHYhMRKnn4OOTcUCkPN6JZWxMhP64Uwn/gFM/dUCdhynk8dyXxT8GPb2dJoTOh4w
-         dIMv4adoo9oIoEXEUZMMbJVwBZ+n9aPoZq6mtQmFkdNBA8k6uMClQ2fGjPn7B8wb+9CP
-         BU36vtyu/X4N6ZYreyhw9TycxVNDWWwDoWMzndGQX1UjkiUPPp/abrybA+fXfrL6o63I
-         ZTIg==
+        bh=KxBpDgqk1Ey/xQW5QoMy+bkY1YOpl92uaqUPXrNuvPQ=;
+        b=sjwI1qP+JpJtL6HZhO47MI7GrA+78/msovLbbxWqCAi4sh1BvTkCpsP+gBYQQ6s0PA
+         92NJ8lPGv9A3dj2aO4C7kM5VpuYnl5h/EocekBQ422n/5+hhAlbyatEVs2HVjoaW75GE
+         4UjeMhBg0r3+20mvMgFt3ozek7fqgGw22H/j8OfVhCXjEDYFHxCwKLLrGKF1GHCaiOvZ
+         U8S8eAJD+BDr/NYjPQAJ3HP+S2LM/W4VT8b927rLRy2Ng0G2xEjGTesrC8/a8qt4QDFr
+         GxiF26a5tnfQfM+QnP5bHzS7kv5CVhp135zVnE3lpo1EUspJGmxl5ioQ1vKXwtB2HIZh
+         Wh/A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=S4TJbDbmRHYbelCTMQc9PtwVVnooXUeP5A1QqT0HJx0=;
-        b=FaxC7KOHMIevAuBP1lFLX2r5DWFKMSjyZif5YQOhG8fxo9sGjpCjZ/FtpAfdpT+7Cu
-         ATcgQAHncozMtTYUU+S222Ua8esC4IVABDortdj0nDmERWiSfm+cYgc3ZHWTtCPMy8bY
-         Qs+PekmVceUi5aAiPBmcCFPnpTg3LaZcY+BXjQz1QG+JpNqOdDN2Lyolv/1Azir8qxQj
-         C9lf7vWlr02V6pDXrNVontnu1l0pjOWqeroi/+pHBtfa7Qzwjan6N/wPWNdQbXu7xGJc
-         tUi/gc9dMUg5vC0+70P1FjlE6lPZgAx/YcJRCecbXxpufWStGnL7v4OTvFdHrvwXlTPt
-         SBcQ==
-X-Gm-Message-State: AOAM530SU7cJgBcNVjr74Po54U7VZOM3PE5Yc3og666hc4KYi3huOHvu
-        KVGNIGoZDgeYQBatL5ks3XQuIacmfKcuIXtGjJmJVQ==
-X-Google-Smtp-Source: ABdhPJyoiG7rNKpy1FkxlCFar9u5j2o+S5C1PZiAfvWpayLt/f0mt4lQcp5C2OOHDao6REjtiRNHHYdv74ArtXSsLK4=
-X-Received: by 2002:a05:6808:158b:: with SMTP id t11mr128947oiw.8.1625132735641;
- Thu, 01 Jul 2021 02:45:35 -0700 (PDT)
+        bh=KxBpDgqk1Ey/xQW5QoMy+bkY1YOpl92uaqUPXrNuvPQ=;
+        b=pfgs0OpKCOkGiOIYyTNviGRX9Mx/GWRZiVK5Eyc7loHjUdbggV/YwNbBy3h5fp0oTG
+         gxFCdE6WhDf3pNZ3Ved2yclCyBim1x7bDm23qLp/K0TnIUKfd4qY/4ru0TNDcnk26Eqp
+         1xtRFgApuPh58BfuJeW3OiZuotfHgej7J5zOM1BbI3gz6iVZKHvfPq0djpdGjivpYxHm
+         0tlidc209Gu3lsVE94oHmBAmipaedQThKFbIGji5PgU1nIlZ4Pd4iRgHLfif6cUIRErI
+         wmX5UncXFW5Z5xsdRo3MgIbMYzAccu0y5Do/ez+2HxUPND83La6KeCPCZtv26ccHDE21
+         BUFw==
+X-Gm-Message-State: AOAM5315PwoveSpqo9R7zVSIZXDE8Y4YyNM+lrwO5/T7yirp2MUDg/Vh
+        TwZDzZa0l991yJpxePIvQuT0gcKySvOHTd/rktyZiw==
+X-Google-Smtp-Source: ABdhPJw/wq/WtT3lr6OFv1i4ad9bDItEkA+z5vUXgnxwSrnrnqr8gFWSwGmg6M/o1MTmdcBIKMz0Mg6TzouhOo+TxmQ=
+X-Received: by 2002:a9d:17c5:: with SMTP id j63mr1305084otj.52.1625132754456;
+ Thu, 01 Jul 2021 02:45:54 -0700 (PDT)
 MIME-Version: 1.0
-References: <20210608154805.216869-1-jean-philippe@linaro.org> <20210608154805.216869-2-jean-philippe@linaro.org>
-In-Reply-To: <20210608154805.216869-2-jean-philippe@linaro.org>
+References: <20210608154805.216869-1-jean-philippe@linaro.org> <20210608154805.216869-3-jean-philippe@linaro.org>
+In-Reply-To: <20210608154805.216869-3-jean-philippe@linaro.org>
 From:   Fuad Tabba <tabba@google.com>
-Date:   Thu, 1 Jul 2021 10:44:59 +0100
-Message-ID: <CA+EHjTws5L8Nti_Pr7TYtECZXGbgOHiNQsoc5ez1Ncf7yaCQaw@mail.gmail.com>
-Subject: Re: [RFC PATCH 1/5] KVM: arm64: Replace power_off with mp_state in
- struct kvm_vcpu_arch
+Date:   Thu, 1 Jul 2021 10:45:18 +0100
+Message-ID: <CA+EHjTz3AAv2HyfHZBVjtB-0Y4c-_ifC4bPpx1sP0Wtm_Rqs2A@mail.gmail.com>
+Subject: Re: [RFC PATCH 2/5] KVM: arm64: Move WFI execution to check_vcpu_requests()
 To:     Jean-Philippe Brucker <jean-philippe@linaro.org>
 Cc:     maz@kernel.org, salil.mehta@huawei.com, lorenzo.pieralisi@arm.com,
         kvm@vger.kernel.org, corbet@lwn.net, catalin.marinas@arm.com,
@@ -67,205 +66,188 @@ Hi Jean-Philippe,
 On Tue, Jun 8, 2021 at 4:54 PM Jean-Philippe Brucker
 <jean-philippe@linaro.org> wrote:
 >
-> In order to add a new "suspend" power state, replace power_off with
-> mp_state in struct kvm_vcpu_arch. Factor the vcpu_off() function while
-> we're here.
+> Prepare for WFI requests from userspace, by adding a suspend request and
+> moving the WFI execution into check_vcpu_requests(), next to the
+> power-off logic.
 >
-> No functional change intended.
+> vcpu->arch.mp_state, previously only RUNNABLE or STOPPED, supports an
+> additional state HALTED and two new state transitions:
 >
-> Signed-off-by: Jean-Philippe Brucker <jean-philippe@linaro.org>
-> ---
->  arch/arm64/include/asm/kvm_host.h |  6 ++++--
->  arch/arm64/kvm/arm.c              | 29 +++++++++++++++--------------
->  arch/arm64/kvm/psci.c             | 19 ++++++-------------
->  3 files changed, 25 insertions(+), 29 deletions(-)
+>   RUNNABLE -> HALTED    from WFI or PSCI CPU_SUSPEND (same vCPU)
+>   HALTED -> RUNNABLE    vGIC IRQ, pending timer, signal
 >
-> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> index 7cd7d5c8c4bc..55a04f4d5919 100644
-> --- a/arch/arm64/include/asm/kvm_host.h
-> +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -340,8 +340,8 @@ struct kvm_vcpu_arch {
->                 u32     mdscr_el1;
->         } guest_debug_preserved;
->
-> -       /* vcpu power-off state */
-> -       bool power_off;
-> +       /* vcpu power state (runnable, stopped, halted) */
+> There shouldn't be any functional change with this patch, even though
+> the KVM_GET_MP_STATE ioctl could now in theory return
+> KVM_MP_STATE_HALTED, which would break some users' mp_state support. In
+> practice it should not happen because we do not return to userspace with
+> HALTED state. Both WFI and PSCI CPU_SUSPEND stay in the vCPU run loop
+> until the suspend request is consumed. It does feel fragile though,
+> maybe we should explicitly return RUNNABLE in KVM_GET_MP_STATE in place
+> of HALTED, to prevent future breakage.
 
-Should the comment be, for clarity, something along the lines of
-KVM_MP_STATE_(STOPPED, RUNNABLE, HALTED), or maybe "a valid struct
-kvm_mp_state", if you think other states might be added in the future?
+It's not really a functional change, but it might introduce some
+timing/scheduling changes I think.
+
+Before your changes, the kvm_vcpu_block() would take place at the end
+of the vCPU run loop, via handle_exit(). Now it takes place closer to
+the beginning, after cond_resched() is called, and not if there is a
+KVM_REQ_IRQ_PENDING.
+
+If my observation is correct, would it be good to mention that?
 
 Thanks,
 /fuad
 
 
-> +       u32 mp_state;
+
 >
->         /* Don't run the guest (internal implementation need) */
->         bool pause;
-> @@ -720,6 +720,8 @@ int kvm_arm_vcpu_arch_get_attr(struct kvm_vcpu *vcpu,
+> Signed-off-by: Jean-Philippe Brucker <jean-philippe@linaro.org>
+> ---
+>  arch/arm64/include/asm/kvm_host.h |  2 ++
+>  arch/arm64/kvm/arm.c              | 18 ++++++++++++++-
+>  arch/arm64/kvm/handle_exit.c      |  3 +--
+>  arch/arm64/kvm/psci.c             | 37 +++++++++++++------------------
+>  4 files changed, 35 insertions(+), 25 deletions(-)
+>
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index 55a04f4d5919..3ca732feb9a5 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -46,6 +46,7 @@
+>  #define KVM_REQ_VCPU_RESET     KVM_ARCH_REQ(2)
+>  #define KVM_REQ_RECORD_STEAL   KVM_ARCH_REQ(3)
+>  #define KVM_REQ_RELOAD_GICv4   KVM_ARCH_REQ(4)
+> +#define KVM_REQ_SUSPEND                KVM_ARCH_REQ(5)
+>
+>  #define KVM_DIRTY_LOG_MANUAL_CAPS   (KVM_DIRTY_LOG_MANUAL_PROTECT_ENABLE | \
+>                                      KVM_DIRTY_LOG_INITIALLY_SET)
+> @@ -722,6 +723,7 @@ int kvm_arm_vcpu_arch_has_attr(struct kvm_vcpu *vcpu,
 >                                struct kvm_device_attr *attr);
->  int kvm_arm_vcpu_arch_has_attr(struct kvm_vcpu *vcpu,
->                                struct kvm_device_attr *attr);
-> +void kvm_arm_vcpu_power_off(struct kvm_vcpu *vcpu);
-> +bool kvm_arm_vcpu_is_off(struct kvm_vcpu *vcpu);
+>  void kvm_arm_vcpu_power_off(struct kvm_vcpu *vcpu);
+>  bool kvm_arm_vcpu_is_off(struct kvm_vcpu *vcpu);
+> +void kvm_arm_vcpu_suspend(struct kvm_vcpu *vcpu);
 >
 >  /* Guest/host FPSIMD coordination helpers */
 >  int kvm_arch_vcpu_run_map_fp(struct kvm_vcpu *vcpu);
 > diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> index e720148232a0..bcc24adb9c0a 100644
+> index bcc24adb9c0a..d8cbaa0373c7 100644
 > --- a/arch/arm64/kvm/arm.c
 > +++ b/arch/arm64/kvm/arm.c
-> @@ -435,21 +435,22 @@ void kvm_arch_vcpu_put(struct kvm_vcpu *vcpu)
->         vcpu->cpu = -1;
+> @@ -447,6 +447,12 @@ bool kvm_arm_vcpu_is_off(struct kvm_vcpu *vcpu)
+>         return vcpu->arch.mp_state == KVM_MP_STATE_STOPPED;
 >  }
 >
-> -static void vcpu_power_off(struct kvm_vcpu *vcpu)
-> +void kvm_arm_vcpu_power_off(struct kvm_vcpu *vcpu)
->  {
-> -       vcpu->arch.power_off = true;
-> +       vcpu->arch.mp_state = KVM_MP_STATE_STOPPED;
->         kvm_make_request(KVM_REQ_SLEEP, vcpu);
->         kvm_vcpu_kick(vcpu);
->  }
->
-> +bool kvm_arm_vcpu_is_off(struct kvm_vcpu *vcpu)
+> +void kvm_arm_vcpu_suspend(struct kvm_vcpu *vcpu)
 > +{
-> +       return vcpu->arch.mp_state == KVM_MP_STATE_STOPPED;
+> +       vcpu->arch.mp_state = KVM_MP_STATE_HALTED;
+> +       kvm_make_request(KVM_REQ_SUSPEND, vcpu);
 > +}
 > +
 >  int kvm_arch_vcpu_ioctl_get_mpstate(struct kvm_vcpu *vcpu,
 >                                     struct kvm_mp_state *mp_state)
 >  {
-> -       if (vcpu->arch.power_off)
-> -               mp_state->mp_state = KVM_MP_STATE_STOPPED;
-> -       else
-> -               mp_state->mp_state = KVM_MP_STATE_RUNNABLE;
-> -
-> +       mp_state->mp_state = vcpu->arch.mp_state;
->         return 0;
->  }
+> @@ -667,6 +673,8 @@ static int kvm_vcpu_initialized(struct kvm_vcpu *vcpu)
 >
-> @@ -460,10 +461,10 @@ int kvm_arch_vcpu_ioctl_set_mpstate(struct kvm_vcpu *vcpu,
->
->         switch (mp_state->mp_state) {
->         case KVM_MP_STATE_RUNNABLE:
-> -               vcpu->arch.power_off = false;
-> +               vcpu->arch.mp_state = KVM_MP_STATE_RUNNABLE;
->                 break;
->         case KVM_MP_STATE_STOPPED:
-> -               vcpu_power_off(vcpu);
-> +               kvm_arm_vcpu_power_off(vcpu);
->                 break;
->         default:
->                 ret = -EINVAL;
-> @@ -483,7 +484,7 @@ int kvm_arch_vcpu_runnable(struct kvm_vcpu *v)
+>  static void check_vcpu_requests(struct kvm_vcpu *vcpu)
 >  {
->         bool irq_lines = *vcpu_hcr(v) & (HCR_VI | HCR_VF);
->         return ((irq_lines || kvm_vgic_vcpu_pending_irq(v))
-> -               && !v->arch.power_off && !v->arch.pause);
-> +               && !kvm_arm_vcpu_is_off(v) && !v->arch.pause);
->  }
+> +       bool irq_pending;
+> +
+>         if (kvm_request_pending(vcpu)) {
+>                 if (kvm_check_request(KVM_REQ_SLEEP, vcpu))
+>                         vcpu_req_sleep(vcpu);
+> @@ -678,7 +686,7 @@ static void check_vcpu_requests(struct kvm_vcpu *vcpu)
+>                  * Clear IRQ_PENDING requests that were made to guarantee
+>                  * that a VCPU sees new virtual interrupts.
+>                  */
+> -               kvm_check_request(KVM_REQ_IRQ_PENDING, vcpu);
+> +               irq_pending = kvm_check_request(KVM_REQ_IRQ_PENDING, vcpu);
 >
->  bool kvm_arch_vcpu_in_kernel(struct kvm_vcpu *vcpu)
-> @@ -643,10 +644,10 @@ static void vcpu_req_sleep(struct kvm_vcpu *vcpu)
->         struct rcuwait *wait = kvm_arch_vcpu_get_wait(vcpu);
->
->         rcuwait_wait_event(wait,
-> -                          (!vcpu->arch.power_off) &&(!vcpu->arch.pause),
-> +                          !kvm_arm_vcpu_is_off(vcpu) && !vcpu->arch.pause,
->                            TASK_INTERRUPTIBLE);
->
-> -       if (vcpu->arch.power_off || vcpu->arch.pause) {
-> +       if (kvm_arm_vcpu_is_off(vcpu) || vcpu->arch.pause) {
->                 /* Awaken to handle a signal, request we sleep again later. */
->                 kvm_make_request(KVM_REQ_SLEEP, vcpu);
+>                 if (kvm_check_request(KVM_REQ_RECORD_STEAL, vcpu))
+>                         kvm_update_stolen_time(vcpu);
+> @@ -690,6 +698,14 @@ static void check_vcpu_requests(struct kvm_vcpu *vcpu)
+>                         vgic_v4_load(vcpu);
+>                         preempt_enable();
+>                 }
+> +
+> +               if (kvm_check_request(KVM_REQ_SUSPEND, vcpu)) {
+> +                       if (!irq_pending) {
+> +                               kvm_vcpu_block(vcpu);
+> +                               kvm_clear_request(KVM_REQ_UNHALT, vcpu);
+> +                       }
+> +                       vcpu->arch.mp_state = KVM_MP_STATE_RUNNABLE;
+> +               }
 >         }
-> @@ -1087,9 +1088,9 @@ static int kvm_arch_vcpu_ioctl_vcpu_init(struct kvm_vcpu *vcpu,
->          * Handle the "start in power-off" case.
->          */
->         if (test_bit(KVM_ARM_VCPU_POWER_OFF, vcpu->arch.features))
-> -               vcpu_power_off(vcpu);
-> +               kvm_arm_vcpu_power_off(vcpu);
->         else
-> -               vcpu->arch.power_off = false;
-> +               vcpu->arch.mp_state = KVM_MP_STATE_RUNNABLE;
->
->         return 0;
 >  }
+>
+> diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
+> index 6f48336b1d86..9717df3104cf 100644
+> --- a/arch/arm64/kvm/handle_exit.c
+> +++ b/arch/arm64/kvm/handle_exit.c
+> @@ -95,8 +95,7 @@ static int kvm_handle_wfx(struct kvm_vcpu *vcpu)
+>         } else {
+>                 trace_kvm_wfx_arm64(*vcpu_pc(vcpu), false);
+>                 vcpu->stat.wfi_exit_stat++;
+> -               kvm_vcpu_block(vcpu);
+> -               kvm_clear_request(KVM_REQ_UNHALT, vcpu);
+> +               kvm_arm_vcpu_suspend(vcpu);
+>         }
+>
+>         kvm_incr_pc(vcpu);
 > diff --git a/arch/arm64/kvm/psci.c b/arch/arm64/kvm/psci.c
-> index db4056ecccfd..24b4a2265dbd 100644
+> index 24b4a2265dbd..42a307ceb95f 100644
 > --- a/arch/arm64/kvm/psci.c
 > +++ b/arch/arm64/kvm/psci.c
-> @@ -52,13 +52,6 @@ static unsigned long kvm_psci_vcpu_suspend(struct kvm_vcpu *vcpu)
->         return PSCI_RET_SUCCESS;
+> @@ -31,27 +31,6 @@ static unsigned long psci_affinity_mask(unsigned long affinity_level)
+>         return 0;
 >  }
 >
-> -static void kvm_psci_vcpu_off(struct kvm_vcpu *vcpu)
+> -static unsigned long kvm_psci_vcpu_suspend(struct kvm_vcpu *vcpu)
 > -{
-> -       vcpu->arch.power_off = true;
-> -       kvm_make_request(KVM_REQ_SLEEP, vcpu);
-> -       kvm_vcpu_kick(vcpu);
+> -       /*
+> -        * NOTE: For simplicity, we make VCPU suspend emulation to be
+> -        * same-as WFI (Wait-for-interrupt) emulation.
+> -        *
+> -        * This means for KVM the wakeup events are interrupts and
+> -        * this is consistent with intended use of StateID as described
+> -        * in section 5.4.1 of PSCI v0.2 specification (ARM DEN 0022A).
+> -        *
+> -        * Further, we also treat power-down request to be same as
+> -        * stand-by request as-per section 5.4.2 clause 3 of PSCI v0.2
+> -        * specification (ARM DEN 0022A). This means all suspend states
+> -        * for KVM will preserve the register state.
+> -        */
+> -       kvm_vcpu_block(vcpu);
+> -       kvm_clear_request(KVM_REQ_UNHALT, vcpu);
+> -
+> -       return PSCI_RET_SUCCESS;
 > -}
 > -
 >  static unsigned long kvm_psci_vcpu_on(struct kvm_vcpu *source_vcpu)
 >  {
 >         struct vcpu_reset_state *reset_state;
-> @@ -78,7 +71,7 @@ static unsigned long kvm_psci_vcpu_on(struct kvm_vcpu *source_vcpu)
->          */
->         if (!vcpu)
->                 return PSCI_RET_INVALID_PARAMS;
-> -       if (!vcpu->arch.power_off) {
-> +       if (!kvm_arm_vcpu_is_off(vcpu)) {
->                 if (kvm_psci_version(source_vcpu, kvm) != KVM_ARM_PSCI_0_1)
->                         return PSCI_RET_ALREADY_ON;
->                 else
-> @@ -107,7 +100,7 @@ static unsigned long kvm_psci_vcpu_on(struct kvm_vcpu *source_vcpu)
->          */
->         smp_wmb();
->
-> -       vcpu->arch.power_off = false;
-> +       vcpu->arch.mp_state = KVM_MP_STATE_RUNNABLE;
->         kvm_vcpu_wake_up(vcpu);
->
->         return PSCI_RET_SUCCESS;
-> @@ -142,7 +135,7 @@ static unsigned long kvm_psci_vcpu_affinity_info(struct kvm_vcpu *vcpu)
->                 mpidr = kvm_vcpu_get_mpidr_aff(tmp);
->                 if ((mpidr & target_affinity_mask) == target_affinity) {
->                         matching_cpus++;
-> -                       if (!tmp->arch.power_off)
-> +                       if (!kvm_arm_vcpu_is_off(tmp))
->                                 return PSCI_0_2_AFFINITY_LEVEL_ON;
->                 }
->         }
-> @@ -168,7 +161,7 @@ static void kvm_prepare_system_event(struct kvm_vcpu *vcpu, u32 type)
->          * re-initialized.
->          */
->         kvm_for_each_vcpu(i, tmp, vcpu->kvm)
-> -               tmp->arch.power_off = true;
-> +               tmp->arch.mp_state = KVM_MP_STATE_STOPPED;
->         kvm_make_all_cpus_request(vcpu->kvm, KVM_REQ_SLEEP);
->
->         memset(&vcpu->run->system_event, 0, sizeof(vcpu->run->system_event));
-> @@ -237,7 +230,7 @@ static int kvm_psci_0_2_call(struct kvm_vcpu *vcpu)
->                 val = kvm_psci_vcpu_suspend(vcpu);
+> @@ -227,7 +206,21 @@ static int kvm_psci_0_2_call(struct kvm_vcpu *vcpu)
+>                 break;
+>         case PSCI_0_2_FN_CPU_SUSPEND:
+>         case PSCI_0_2_FN64_CPU_SUSPEND:
+> -               val = kvm_psci_vcpu_suspend(vcpu);
+> +               /*
+> +                * NOTE: For simplicity, we make VCPU suspend emulation to be
+> +                * same-as WFI (Wait-for-interrupt) emulation.
+> +                *
+> +                * This means for KVM the wakeup events are interrupts and this
+> +                * is consistent with intended use of StateID as described in
+> +                * section 5.4.1 of PSCI v0.2 specification (ARM DEN 0022A).
+> +                *
+> +                * Further, we also treat power-down request to be same as
+> +                * stand-by request as-per section 5.4.2 clause 3 of PSCI v0.2
+> +                * specification (ARM DEN 0022A). This means all suspend states
+> +                * for KVM will preserve the register state.
+> +                */
+> +               kvm_arm_vcpu_suspend(vcpu);
+> +               val = PSCI_RET_SUCCESS;
 >                 break;
 >         case PSCI_0_2_FN_CPU_OFF:
-> -               kvm_psci_vcpu_off(vcpu);
-> +               kvm_arm_vcpu_power_off(vcpu);
->                 val = PSCI_RET_SUCCESS;
->                 break;
->         case PSCI_0_2_FN_CPU_ON:
-> @@ -350,7 +343,7 @@ static int kvm_psci_0_1_call(struct kvm_vcpu *vcpu)
->
->         switch (psci_fn) {
->         case KVM_PSCI_FN_CPU_OFF:
-> -               kvm_psci_vcpu_off(vcpu);
-> +               kvm_arm_vcpu_power_off(vcpu);
->                 val = PSCI_RET_SUCCESS;
->                 break;
->         case KVM_PSCI_FN_CPU_ON:
+>                 kvm_arm_vcpu_power_off(vcpu);
 > --
 > 2.31.1
 >
