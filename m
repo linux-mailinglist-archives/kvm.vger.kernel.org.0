@@ -2,55 +2,55 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4032B3B9398
-	for <lists+kvm@lfdr.de>; Thu,  1 Jul 2021 16:53:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3907E3B939C
+	for <lists+kvm@lfdr.de>; Thu,  1 Jul 2021 16:59:34 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233194AbhGAOzi (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 1 Jul 2021 10:55:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38634 "EHLO
+        id S232991AbhGAPCD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 1 Jul 2021 11:02:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40036 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232413AbhGAOzi (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 1 Jul 2021 10:55:38 -0400
-Received: from mail-ot1-x331.google.com (mail-ot1-x331.google.com [IPv6:2607:f8b0:4864:20::331])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2C787C061762
-        for <kvm@vger.kernel.org>; Thu,  1 Jul 2021 07:53:07 -0700 (PDT)
-Received: by mail-ot1-x331.google.com with SMTP id t24-20020a9d7f980000b029046f4a1a5ec4so6797242otp.1
-        for <kvm@vger.kernel.org>; Thu, 01 Jul 2021 07:53:07 -0700 (PDT)
+        with ESMTP id S232463AbhGAPCC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 1 Jul 2021 11:02:02 -0400
+Received: from mail-oi1-x232.google.com (mail-oi1-x232.google.com [IPv6:2607:f8b0:4864:20::232])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7A8EDC061762
+        for <kvm@vger.kernel.org>; Thu,  1 Jul 2021 07:59:32 -0700 (PDT)
+Received: by mail-oi1-x232.google.com with SMTP id b2so7588473oiy.6
+        for <kvm@vger.kernel.org>; Thu, 01 Jul 2021 07:59:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=5EFDBeL4wmuZzEbs7W+rIl4VyjBJBLY3vyT7h6elrGA=;
-        b=vV25TS8DGjTcLhoaG8JoSVRTN137gfLNlZwE6Q4PMet7uinfsLarQeqamk5xjmNLrh
-         cTR7RTrlksJg+LwmIePOuAHbuEv/z2xx8+uHUX0jEdGxHg1H3ycgdcEeLVWj7p/JF06i
-         ZxbbESPoOqDKqPjLul4K1iiCCOYUVM1r0xlFoae6ujZqLzzyq0HiIFOqxrBw+i6HWVlX
-         5VP0div0jR4WLPf7Vnq8Pmy/HHs1TG7E7eEtikRNETJq44JHSa3CLcnOaIdYBk35lvWQ
-         Y1GU2i/WF1zz+Is7N4CCjH9u1R0QAAjljxQl9D1dFcEy9byfiLPoYIxn+9rp1BLklEjA
-         Sm6w==
+        bh=ltmhFCjb1WelitfArWc9DX2nLRCgQFqidnyjLJbZMyU=;
+        b=EkW9I5Hw9T7Mg3qzdaW7TNoGNc0FAw7z/Tz693senj6TSQVMaoO9C5+G8no3WO5QUQ
+         L/3hqNEzTF6sgam0DWFKbhtrIjPGIDPyk/Raok4vgFbuOJr495w7U4MLaEwOmLFmIQFV
+         ii7a5JdB0xwrhdXAC1RLPkqwhUOEina074K8j/o9J3k3aExEf6ttdrH/Pns2+zVcPSc/
+         /pm9JxrevtuwcYWahKFxt7SLlH9PGvUHVy7NDOOw5PozStUs3Zjan5fhTN4Hj4cxZYm5
+         0YZvxxFfmx3gQbeMrI5zR85IiPb87texys/4CID3lZIyineyDFZrp9QI9zdgTp90wU+6
+         dCkg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=5EFDBeL4wmuZzEbs7W+rIl4VyjBJBLY3vyT7h6elrGA=;
-        b=b8rXAWlF9/KSJzaqR8Jcc5VHjjRRGfqdOHYoJxg6ZPRPCw/S6tjohFAgGacI6yq6eS
-         oWWvKTAXC1B86WgZt90HztJD8Toxzmf6ks8kppkHKPQesEwbnko+xVgMdVSNC1SzPyw4
-         0W8p1ax/W2HtD870uicRuiJdHZrs3SfsBQFx8sfkRdHVMTmVznzOvASIOPA8EGZkVwnw
-         fZ4Cje80NoeweczAPXkUVV6uJduhL2rPUgxgm8xYcTrJdfBje/yeC0sgfbJ91Np19lHg
-         9EPO41FchWEIP7Op2VJF0xNid0WJqAMGILXDAAFkPcYN3XWzS79xq99is74xaV8yWrnS
-         ZZ4A==
-X-Gm-Message-State: AOAM531L38Pewynbr6FQeCs++Y6H50Latukss/x8zmKbathYaUgnDjdp
-        3+/eJIT8MBjHs75JfspvaHs2/cESwKejYKnC+fIJ5w==
-X-Google-Smtp-Source: ABdhPJyWv/g4Ufw9xByzk3S6K4RbKA13wD+M2R4G/yMkrndH3boaDzw5iojn1U42XqhCK2L7/zSG9LMBVCOlJuZFVHw=
-X-Received: by 2002:a9d:17c5:: with SMTP id j63mr354113otj.52.1625151186279;
- Thu, 01 Jul 2021 07:53:06 -0700 (PDT)
+        bh=ltmhFCjb1WelitfArWc9DX2nLRCgQFqidnyjLJbZMyU=;
+        b=MvuvGSnhDp/DUs74yz92HpESw8ZLQRk8zDhk4wPKhGuRGi4TOzSmLuLlfJ9ehdQVw+
+         6eBFfjSRIXqo3SwrEZnS7m3M4klWYMdQa6Il4PMXzJvAZCUkgoE8ESWrWnSK433q4kU6
+         ZmUDybSc/lPeSPG9DtfPOk4VVEwFSHw4GLXFT2jRJqHah04YIe6wqVMpkB35LI2xSPkr
+         MLby+DHVEz06+WY5fxGcrNM0jQI1m0GG2B7kVeun1nvuzQiq80uLElvE9Z4PPoYYrDhV
+         KCQsYl+mpM0qDcVNLg2QMk8kuHYL+p3OAd8fUOK9T2fKXqDkSC3g6deBMpsjWEIFjw+1
+         LDvQ==
+X-Gm-Message-State: AOAM532bNftEazxW4t45es8u4XVudS0ukwy+6csMOQt2kSG1udmPgwjN
+        RIsiN2wjMvmq5A1SCayWRxwpqDKqGc9RbWP+L1FXXg==
+X-Google-Smtp-Source: ABdhPJz7kZwgKADNdRptSCOhsnXccXkQQ52LRN1EzbPnXhsc9AMzr4LE8wtsRq7OyE83M21OVEMR1Sch+UK6Br6X3iE=
+X-Received: by 2002:a05:6808:158b:: with SMTP id t11mr1261355oiw.8.1625151571717;
+ Thu, 01 Jul 2021 07:59:31 -0700 (PDT)
 MIME-Version: 1.0
-References: <20210615133950.693489-1-tabba@google.com> <20210615133950.693489-8-tabba@google.com>
- <20210701133311.GG9757@willie-the-truck>
-In-Reply-To: <20210701133311.GG9757@willie-the-truck>
+References: <20210615133950.693489-1-tabba@google.com> <20210615133950.693489-9-tabba@google.com>
+ <20210701134823.GH9757@willie-the-truck>
+In-Reply-To: <20210701134823.GH9757@willie-the-truck>
 From:   Fuad Tabba <tabba@google.com>
-Date:   Thu, 1 Jul 2021 15:52:30 +0100
-Message-ID: <CA+EHjTzssPziK9Vj3i7iUN5jtf=dRJdm+QoKJR7RTFzfbwB2Wg@mail.gmail.com>
-Subject: Re: [PATCH v2 07/13] KVM: arm64: Add config register bit definitions
+Date:   Thu, 1 Jul 2021 15:58:55 +0100
+Message-ID: <CA+EHjTzsx1jR9JWhN5iKENSi8ry-0-byF1wN_bTBmm3+qn6MdA@mail.gmail.com>
+Subject: Re: [PATCH v2 08/13] KVM: arm64: Guest exit handlers for nVHE hyp
 To:     Will Deacon <will@kernel.org>
 Cc:     kvmarm@lists.cs.columbia.edu, maz@kernel.org, james.morse@arm.com,
         alexandru.elisei@arm.com, suzuki.poulose@arm.com,
@@ -65,91 +65,54 @@ X-Mailing-List: kvm@vger.kernel.org
 
 Hi Will,
 
-On Thu, Jul 1, 2021 at 2:33 PM Will Deacon <will@kernel.org> wrote:
+On Thu, Jul 1, 2021 at 2:48 PM Will Deacon <will@kernel.org> wrote:
 >
-> On Tue, Jun 15, 2021 at 02:39:44PM +0100, Fuad Tabba wrote:
-> > Add hardware configuration register bit definitions for HCR_EL2
-> > and MDCR_EL2. Future patches toggle these hyp configuration
-> > register bits to trap on certain accesses.
+> On Tue, Jun 15, 2021 at 02:39:45PM +0100, Fuad Tabba wrote:
+> > Add an array of pointers to handlers for various trap reasons in
+> > nVHE code.
 > >
-> > No functional change intended.
+> > The current code selects how to fixup a guest on exit based on a
+> > series of if/else statements. Future patches will also require
+> > different handling for guest exists. Create an array of handlers
+> > to consolidate them.
+> >
+> > No functional change intended as the array isn't populated yet.
 > >
 > > Signed-off-by: Fuad Tabba <tabba@google.com>
 > > ---
-> >  arch/arm64/include/asm/kvm_arm.h | 21 +++++++++++++++++++++
-> >  1 file changed, 21 insertions(+)
+> >  arch/arm64/kvm/hyp/include/hyp/switch.h | 19 ++++++++++++++
+> >  arch/arm64/kvm/hyp/nvhe/switch.c        | 35 +++++++++++++++++++++++++
+> >  2 files changed, 54 insertions(+)
 > >
-> > diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
-> > index bee1ba6773fb..a78090071f1f 100644
-> > --- a/arch/arm64/include/asm/kvm_arm.h
-> > +++ b/arch/arm64/include/asm/kvm_arm.h
-> > @@ -12,7 +12,11 @@
-> >  #include <asm/types.h>
+> > diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
+> > index e4a2f295a394..f5d3d1da0aec 100644
+> > --- a/arch/arm64/kvm/hyp/include/hyp/switch.h
+> > +++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
+> > @@ -405,6 +405,18 @@ static inline bool __hyp_handle_ptrauth(struct kvm_vcpu *vcpu)
+> >       return true;
+> >  }
 > >
-> >  /* Hyp Configuration Register (HCR) bits */
-> > +#define HCR_TID5     (UL(1) << 58)
-> > +#define HCR_DCT              (UL(1) << 57)
-> >  #define HCR_ATA              (UL(1) << 56)
-> > +#define HCR_AMVOFFEN (UL(1) << 51)
-> > +#define HCR_FIEN     (UL(1) << 47)
-> >  #define HCR_FWB              (UL(1) << 46)
-> >  #define HCR_API              (UL(1) << 41)
-> >  #define HCR_APK              (UL(1) << 40)
-> > @@ -55,6 +59,7 @@
-> >  #define HCR_PTW              (UL(1) << 2)
-> >  #define HCR_SWIO     (UL(1) << 1)
-> >  #define HCR_VM               (UL(1) << 0)
-> > +#define HCR_RES0     ((UL(1) << 48) | (UL(1) << 39))
-> >
-> >  /*
-> >   * The bits we set in HCR:
-> > @@ -276,11 +281,21 @@
-> >  #define CPTR_EL2_TZ  (1 << 8)
-> >  #define CPTR_NVHE_EL2_RES1   0x000032ff /* known RES1 bits in CPTR_EL2 (nVHE) */
-> >  #define CPTR_EL2_DEFAULT     CPTR_NVHE_EL2_RES1
-> > +#define CPTR_NVHE_EL2_RES0   (GENMASK_ULL(63, 32) |  \
-> > +                              GENMASK_ULL(29, 21) |  \
-> > +                              GENMASK_ULL(19, 14) |  \
-> > +                              (UL(1) << 11))
-> >
-> >  /* Hyp Debug Configuration Register bits */
-> >  #define MDCR_EL2_E2TB_MASK   (UL(0x3))
-> >  #define MDCR_EL2_E2TB_SHIFT  (UL(24))
-> > +#define MDCR_EL2_HPMFZS              (UL(1) << 36)
-> > +#define MDCR_EL2_HPMFZO              (UL(1) << 29)
-> > +#define MDCR_EL2_MTPME               (UL(1) << 28)
-> > +#define MDCR_EL2_TDCC                (UL(1) << 27)
-> > +#define MDCR_EL2_HCCD                (UL(1) << 23)
-> >  #define MDCR_EL2_TTRF                (UL(1) << 19)
-> > +#define MDCR_EL2_HPMD                (UL(1) << 17)
-> >  #define MDCR_EL2_TPMS                (UL(1) << 14)
-> >  #define MDCR_EL2_E2PB_MASK   (UL(0x3))
-> >  #define MDCR_EL2_E2PB_SHIFT  (UL(12))
-> > @@ -292,6 +307,12 @@
-> >  #define MDCR_EL2_TPM         (UL(1) << 6)
-> >  #define MDCR_EL2_TPMCR               (UL(1) << 5)
-> >  #define MDCR_EL2_HPMN_MASK   (UL(0x1F))
-> > +#define MDCR_EL2_RES0                (GENMASK_ULL(63, 37) |  \
-> > +                              GENMASK_ULL(35, 30) |  \
-> > +                              GENMASK_ULL(25, 24) |  \
-> > +                              GENMASK_ULL(22, 20) |  \
-> > +                              (UL(1) << 18) |        \
-> > +                              GENMASK_ULL(16, 15))
+> > +typedef int (*exit_handle_fn)(struct kvm_vcpu *);
+> > +
+> > +exit_handle_fn kvm_get_nvhe_exit_handler(struct kvm_vcpu *vcpu);
+> > +
+> > +static exit_handle_fn kvm_get_hyp_exit_handler(struct kvm_vcpu *vcpu)
+> > +{
+> > +     if (is_nvhe_hyp_code())
+> > +             return kvm_get_nvhe_exit_handler(vcpu);
+> > +     else
+> > +             return NULL;
+> > +}
 >
-> There's an inconsistent mix of ULL and UL here. Given we're on arm64,
-> maybe just use GENMASK() and BIT() for these RES0 regions?
+> nit: might be a bit tidier with a ternary if (?:).
 
-The reason I use GENMASK_ULL instead of GENMASK, and UL()<< instead of
-BIT is to remain consistent with the rest of this file. It would
-definitely be clearer here, as you point out. I'll fix it.
+Sure thing.
 
-> Anyway, the bit positions all look fine. You're missing HLP in bit 26,
-> but I guess that's not something you care about?
-
-I don't need that bit. I could add it for completeness, but there are
-a few others that aren't here either...
-
-Cheers,
+Thanks,
 /fuad
 
+> But either way:
+>
+> Acked-by: Will Deacon <will@kernel.org>
+>
 > Will
