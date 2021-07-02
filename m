@@ -2,158 +2,86 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B8E7F3B9B00
-	for <lists+kvm@lfdr.de>; Fri,  2 Jul 2021 05:25:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 781973B9C4E
+	for <lists+kvm@lfdr.de>; Fri,  2 Jul 2021 08:47:03 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234884AbhGBD17 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 1 Jul 2021 23:27:59 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:43100 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S234827AbhGBD16 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 1 Jul 2021 23:27:58 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1625196327;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=KnDTUBO/qel2LJGKzNIBMBJoNluIIwfxXdRX1zb5ugw=;
-        b=BwKbchlaUmuikYl4oojjCU4TUBykBYIj94wm8Id2MfOokQ1awVY7JBjvziP5icaTabCvMT
-        CgrBAzf5Si9GkWvfOm5RgaEvrc1mH7pZnNipIyX+XnrrIAFUkVaKIepqxKuNnDmMBzZ6IF
-        S5Cw+ulDyFrUAQGMoCgH6A7Yt8YIRe8=
-Received: from mail-pl1-f200.google.com (mail-pl1-f200.google.com
- [209.85.214.200]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-78-L5b1UmcjNBGHY5VV2IX1eQ-1; Thu, 01 Jul 2021 23:25:26 -0400
-X-MC-Unique: L5b1UmcjNBGHY5VV2IX1eQ-1
-Received: by mail-pl1-f200.google.com with SMTP id a6-20020a1709027d86b02901019f88b046so3891710plm.21
-        for <kvm@vger.kernel.org>; Thu, 01 Jul 2021 20:25:25 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-transfer-encoding
-         :content-language;
-        bh=KnDTUBO/qel2LJGKzNIBMBJoNluIIwfxXdRX1zb5ugw=;
-        b=QDrjCpuDeM0TIPDKnvjOFIvz1t339cNZ9b57C5eVIMrFTY6XRltmJPPBiT0PGi6el4
-         OZGzTrrBqu2gk5H1brEy7XUnE3HeQhGiWqc0/4GRdVn/Pr1ylhcEwkliBsvmWl+qb/z9
-         UFvBQ0AiCslMiK3wrycIRt0SgJBzxrlqPDP4Chk4zxYx6f/ft4jVHwmPMxwSrWEmgaKr
-         H0rhtYKM6oiQxShGPwOlXlUoRs14dg8czmiW3tgWRbOtufyNvvnh0BKic5Ul5SnqK1JB
-         i6jnKhsfeM2ZWq5ZSXpvsxivdHiBxrU8HcpTelORDOlePKLbxTcxhHpakAlmX9B3xQiI
-         6axg==
-X-Gm-Message-State: AOAM530j+2d7S41KqgDS3dHy2H2RIi+Dch1QjOhyVZuYjkDEtneiA5dX
-        7Pgl/HRqn/ds6S6pJf9s6xzjiJLBvAi/Mu5umHqJytLPczAsk3JfozHRx3IsikZkc7kHCBY/hRV
-        OfphxsBfLeLU9
-X-Received: by 2002:a05:6a00:174e:b029:308:35eb:4593 with SMTP id j14-20020a056a00174eb029030835eb4593mr3353631pfc.8.1625196324987;
-        Thu, 01 Jul 2021 20:25:24 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyKMQl/tw5Kx6FHOmk54WvFeYF610dbfRRBBaUlCrS6TkxAlUSkb5jlHy46VzHh0+l9ZFtiag==
-X-Received: by 2002:a05:6a00:174e:b029:308:35eb:4593 with SMTP id j14-20020a056a00174eb029030835eb4593mr3353600pfc.8.1625196324718;
-        Thu, 01 Jul 2021 20:25:24 -0700 (PDT)
-Received: from wangxiaodeMacBook-Air.local ([209.132.188.80])
-        by smtp.gmail.com with ESMTPSA id p17sm11147627pjg.54.2021.07.01.20.25.16
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 01 Jul 2021 20:25:23 -0700 (PDT)
-Subject: Re: [PATCH v8 09/10] vduse: Introduce VDUSE - vDPA Device in
- Userspace
-To:     Yongji Xie <xieyongji@bytedance.com>
-Cc:     Stefan Hajnoczi <stefanha@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Stefano Garzarella <sgarzare@redhat.com>,
-        Parav Pandit <parav@nvidia.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Christian Brauner <christian.brauner@canonical.com>,
-        Randy Dunlap <rdunlap@infradead.org>,
-        Matthew Wilcox <willy@infradead.org>,
-        Al Viro <viro@zeniv.linux.org.uk>,
-        Jens Axboe <axboe@kernel.dk>, bcrl@kvack.org,
-        Jonathan Corbet <corbet@lwn.net>,
-        =?UTF-8?Q?Mika_Penttil=c3=a4?= <mika.penttila@nextfour.com>,
-        Dan Carpenter <dan.carpenter@oracle.com>, joro@8bytes.org,
-        Greg KH <gregkh@linuxfoundation.org>, songmuchun@bytedance.com,
-        virtualization <virtualization@lists.linux-foundation.org>,
-        netdev@vger.kernel.org, kvm <kvm@vger.kernel.org>,
-        linux-fsdevel@vger.kernel.org, iommu@lists.linux-foundation.org,
-        linux-kernel <linux-kernel@vger.kernel.org>
-References: <20210615141331.407-1-xieyongji@bytedance.com>
- <20210615141331.407-10-xieyongji@bytedance.com>
- <YNSatrDFsg+4VvH4@stefanha-x1.localdomain>
- <CACycT3vaXQ4dxC9QUzXXJs7og6TVqqVGa8uHZnTStacsYAiFwQ@mail.gmail.com>
- <YNw+q/ADMPviZi6S@stefanha-x1.localdomain>
- <CACycT3t6M5i0gznABm52v=rdmeeLZu8smXAOLg+WsM3WY1fgTw@mail.gmail.com>
- <7264cb0b-7072-098e-3d22-2b7e89216545@redhat.com>
- <CACycT3v7pYXAFtijPgWCMZ2WXxjT2Y-DUwS3hN_T7dhfE5o_6g@mail.gmail.com>
-From:   Jason Wang <jasowang@redhat.com>
-Message-ID: <c7d3473c-f855-166b-f4da-47be5a329859@redhat.com>
-Date:   Fri, 2 Jul 2021 11:25:15 +0800
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0)
- Gecko/20100101 Thunderbird/78.11.0
+        id S230056AbhGBGtd (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 2 Jul 2021 02:49:33 -0400
+Received: from szxga03-in.huawei.com ([45.249.212.189]:9335 "EHLO
+        szxga03-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230023AbhGBGtd (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 2 Jul 2021 02:49:33 -0400
+Received: from dggemv704-chm.china.huawei.com (unknown [172.30.72.55])
+        by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4GGQW75Sbkz74Bs;
+        Fri,  2 Jul 2021 14:42:43 +0800 (CST)
+Received: from dggema764-chm.china.huawei.com (10.1.198.206) by
+ dggemv704-chm.china.huawei.com (10.3.19.47) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256) id
+ 15.1.2176.2; Fri, 2 Jul 2021 14:46:59 +0800
+Received: from [10.174.185.179] (10.174.185.179) by
+ dggema764-chm.china.huawei.com (10.1.198.206) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
+ 15.1.2176.2; Fri, 2 Jul 2021 14:46:58 +0800
+Subject: Re: [PATCH v4 5/6] KVM: selftests: Add exception handling support for
+ aarch64
+To:     Ricardo Koller <ricarkol@google.com>
+CC:     <kvm@vger.kernel.org>, <kvmarm@lists.cs.columbia.edu>,
+        <pbonzini@redhat.com>, <maz@kernel.org>, <drjones@redhat.com>,
+        <alexandru.elisei@arm.com>, <eric.auger@redhat.com>,
+        <vkuznets@redhat.com>, Sean Christopherson <seanjc@google.com>
+References: <20210611011020.3420067-1-ricarkol@google.com>
+ <20210611011020.3420067-6-ricarkol@google.com>
+From:   Zenghui Yu <yuzenghui@huawei.com>
+Message-ID: <b1f581ec-56f4-24a2-7850-182128cdc4ac@huawei.com>
+Date:   Fri, 2 Jul 2021 14:46:57 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.9.0
 MIME-Version: 1.0
-In-Reply-To: <CACycT3v7pYXAFtijPgWCMZ2WXxjT2Y-DUwS3hN_T7dhfE5o_6g@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <20210611011020.3420067-6-ricarkol@google.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
 Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.174.185.179]
+X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
+ dggema764-chm.china.huawei.com (10.1.198.206)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+[+Sean]
 
-在 2021/7/1 下午6:26, Yongji Xie 写道:
-> On Thu, Jul 1, 2021 at 3:55 PM Jason Wang <jasowang@redhat.com> wrote:
->>
->> 在 2021/7/1 下午2:50, Yongji Xie 写道:
->>> On Wed, Jun 30, 2021 at 5:51 PM Stefan Hajnoczi <stefanha@redhat.com> wrote:
->>>> On Tue, Jun 29, 2021 at 10:59:51AM +0800, Yongji Xie wrote:
->>>>> On Mon, Jun 28, 2021 at 9:02 PM Stefan Hajnoczi <stefanha@redhat.com> wrote:
->>>>>> On Tue, Jun 15, 2021 at 10:13:30PM +0800, Xie Yongji wrote:
->>>>>>> +/* ioctls */
->>>>>>> +
->>>>>>> +struct vduse_dev_config {
->>>>>>> +     char name[VDUSE_NAME_MAX]; /* vduse device name */
->>>>>>> +     __u32 vendor_id; /* virtio vendor id */
->>>>>>> +     __u32 device_id; /* virtio device id */
->>>>>>> +     __u64 features; /* device features */
->>>>>>> +     __u64 bounce_size; /* bounce buffer size for iommu */
->>>>>>> +     __u16 vq_size_max; /* the max size of virtqueue */
->>>>>> The VIRTIO specification allows per-virtqueue sizes. A device can have
->>>>>> two virtqueues, where the first one allows up to 1024 descriptors and
->>>>>> the second one allows only 128 descriptors, for example.
->>>>>>
->>>>> Good point! But it looks like virtio-vdpa/virtio-pci doesn't support
->>>>> that now. All virtqueues have the same maximum size.
->>>> I see struct vpda_config_ops only supports a per-device max vq size:
->>>> u16 (*get_vq_num_max)(struct vdpa_device *vdev);
->>>>
->>>> virtio-pci supports per-virtqueue sizes because the struct
->>>> virtio_pci_common_cfg->queue_size register is per-queue (controlled by
->>>> queue_select).
->>>>
->>> Oh, yes. I miss queue_select.
->>>
->>>> I guess this is a question for Jason: will vdpa will keep this limitation?
->>>> If yes, then VDUSE can stick to it too without running into problems in
->>>> the future.
->>
->> I think it's better to extend the get_vq_num_max() per virtqueue.
->>
->> Currently, vDPA assumes the parent to have a global max size. This seems
->> to work on most of the parents but not vp-vDPA (which could be backed by
->> QEMU, in that case cvq's size is smaller).
->>
->> Fortunately, we haven't enabled had cvq support in the userspace now.
->>
->> I can post the fixes.
->>
-> OK. If so, it looks like we need to support the per-vq configuration.
-> I wonder if it's better to use something like: VDUSE_CREATE_DEVICE ->
-> VDUSE_SETUP_VQ -> VDUSE_SETUP_VQ -> ... -> VDUSE_ENABLE_DEVICE to do
-> initialization rather than only use VDUSE_CREATE_DEVICE.
+On 2021/6/11 9:10, Ricardo Koller wrote:
+> Add the infrastructure needed to enable exception handling in aarch64
+> selftests. The exception handling defaults to an unhandled-exception
+> handler which aborts the test, just like x86. These handlers can be
+> overridden by calling vm_install_exception_handler(vector) or
+> vm_install_sync_handler(vector, ec). The unhandled exception reporting
+> from the guest is done using the ucall type introduced in a previous
+> commit, UCALL_UNHANDLED.
+> 
+> The exception handling code is inspired on kvm-unit-tests.
+> 
+> Signed-off-by: Ricardo Koller <ricarkol@google.com>
+> ---
+>  tools/testing/selftests/kvm/Makefile          |   2 +-
+>  .../selftests/kvm/include/aarch64/processor.h |  63 +++++++++
+>  .../selftests/kvm/lib/aarch64/handlers.S      | 126 ++++++++++++++++++
+>  .../selftests/kvm/lib/aarch64/processor.c     |  97 ++++++++++++++
+>  4 files changed, 287 insertions(+), 1 deletion(-)
+>  create mode 100644 tools/testing/selftests/kvm/lib/aarch64/handlers.S
 
+[...]
 
-This should be fine.
+> +void vm_init_descriptor_tables(struct kvm_vm *vm)
+> +{
+> +	vm->handlers = vm_vaddr_alloc(vm, sizeof(struct handlers),
+> +			vm->page_size, 0, 0);
 
-Thanks
+This raced with commit a75a895e6457 ("KVM: selftests: Unconditionally
+use memslot 0 for vaddr allocations") which dropped memslot parameters
+from vm_vaddr_alloc().
 
+We can remove the related comments on top of vm_vaddr_alloc() as well.
 
->
-> Thanks,
-> Yongji
->
-
+Zenghui
