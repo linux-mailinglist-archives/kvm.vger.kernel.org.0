@@ -2,159 +2,91 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 16B2E3BA45E
-	for <lists+kvm@lfdr.de>; Fri,  2 Jul 2021 21:33:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B15883BA48E
+	for <lists+kvm@lfdr.de>; Fri,  2 Jul 2021 22:10:47 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230427AbhGBTfs (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 2 Jul 2021 15:35:48 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:59054 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230404AbhGBTfs (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 2 Jul 2021 15:35:48 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1625254395;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=ot20SRDzyxog6lyEGT+mgyL9waVUPOY7StPOnX4riLg=;
-        b=avBNegWDxiI6KtKWrKPr1freeRxl6L9ErjJcJNmiUQydA8c3lfh5dUJ+0hSy718I+27vHm
-        nEu+A3OT/PBnY0ilKurjmfY23Lf+RoazhKl4G2XsaNk9pS+RxqkjQwmrWyKZ6DU5xU1RNE
-        Y+hYf7x35dTJrehED1jeTgMd9BfCBkU=
-Received: from mail-oo1-f69.google.com (mail-oo1-f69.google.com
- [209.85.161.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-408-22QLSDIAObesI7vlx4Iz7Q-1; Fri, 02 Jul 2021 15:33:14 -0400
-X-MC-Unique: 22QLSDIAObesI7vlx4Iz7Q-1
-Received: by mail-oo1-f69.google.com with SMTP id y7-20020a4ac4070000b029024c017e61d4so6068794oop.14
-        for <kvm@vger.kernel.org>; Fri, 02 Jul 2021 12:33:14 -0700 (PDT)
+        id S231144AbhGBUNT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 2 Jul 2021 16:13:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60404 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230116AbhGBUNS (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 2 Jul 2021 16:13:18 -0400
+Received: from mail-pf1-x449.google.com (mail-pf1-x449.google.com [IPv6:2607:f8b0:4864:20::449])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 70F4DC061762
+        for <kvm@vger.kernel.org>; Fri,  2 Jul 2021 13:10:46 -0700 (PDT)
+Received: by mail-pf1-x449.google.com with SMTP id w191-20020a62ddc80000b0290318fa423788so1241pff.11
+        for <kvm@vger.kernel.org>; Fri, 02 Jul 2021 13:10:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=fpTMG9fTauuJitLgUq7zAvCgQyWDpOArBs49FPLP0Y8=;
+        b=cWJYhK77Lz48nM1zUfdkD63tuVW35Zj5TXtFYFq1P1W1qtHaQbo8Q4WJrRC6q6uhMh
+         nYZkiJaDnODzk3LqLzFd8rBN/LALvb5DN7FOiYvEiXblBhWLwR85YfH6LbnQdAU6Nq8U
+         SALRKARCEvW5YH7ztZq5c7EXdzD27ik79eRm4bY/LsydzA5vr3HpnbK+ck59+PJi4Rn2
+         nJJrU3MeSy027Xdk2w7pI5CqqYjTYvhtjyi98TKLF/Z2q2xWRimt3P6xSuqO+2AMoeFl
+         p1EY3lSvlgrNMTbeuqsaUhOwHDSBTkP5FaIejRDb3qnyEfcSrchzR9+uBo6psxj/R2Fw
+         GC9w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:mime-version
-         :content-transfer-encoding;
-        bh=ot20SRDzyxog6lyEGT+mgyL9waVUPOY7StPOnX4riLg=;
-        b=QIX8gyQK2YQAfZ//PPKyV4h8FKXPacvEAtkSUsJPwSqJVw6GxFcLxBCiETuX7yhTw9
-         jwwXyAr/ZkjNNnlO0lIBHP2RebBmqU/w+b54bNR1ZUBYOEVussAYsEyCNUdLF2rChyPq
-         K18MzRhpx83nB9srZv8VxP+fcnGpBqpi/z8uYozrdQnctEpEi1jzV35WdmQIgW/V2YD2
-         vHKopIV/3jgecPdKITZHjUyHTpodwvTGq34Xsb3se0D8QIzstNGFc8YqGHTNRToWFRiN
-         6UnP90tcifMIORV0mK8H32OLIxbLtFdCMsyCI669CBL6eONdz25maQImIgdaUZiuWJJ5
-         W5jA==
-X-Gm-Message-State: AOAM531zLdtTTg1UxpkzAy1Fi+q+X05z2xt96+rkyi/0XCwu32MNUn7Q
-        5JWsVre9B1Q9fGVvRAmiQwW42F8Gyw2Q1RXl6HnqfTYIKM2ZvIPZPPiDc1ojn3ocJhTM7z3P1BS
-        NzxFct2FM23M/
-X-Received: by 2002:a4a:b917:: with SMTP id x23mr1004560ooo.58.1625254393573;
-        Fri, 02 Jul 2021 12:33:13 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzSysrsoqZ+0hH+i6z8lVDJieU+Y2cpNlfjg67RGKJ9Qm7eYtd4xL+oGs3LKVH5OSShqZ4Y+g==
-X-Received: by 2002:a4a:b917:: with SMTP id x23mr1004550ooo.58.1625254393346;
-        Fri, 02 Jul 2021 12:33:13 -0700 (PDT)
-Received: from redhat.com ([198.99.80.109])
-        by smtp.gmail.com with ESMTPSA id l3sm925194oif.49.2021.07.02.12.33.12
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 02 Jul 2021 12:33:13 -0700 (PDT)
-Date:   Fri, 2 Jul 2021 13:33:12 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Linus Torvalds <torvalds@linux-foundation.org>
-Cc:     <linux-kernel@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
-Subject: [GIT PULL] VFIO updates for v5.14-rc1
-Message-ID: <20210702133312.61fe06aa.alex.williamson@redhat.com>
-X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=fpTMG9fTauuJitLgUq7zAvCgQyWDpOArBs49FPLP0Y8=;
+        b=YRxPtBjtRfyqMwOjvtHF91zrI3RkUNZC9zM7YqoKdpf3m0drCJG2SduNpmqXdcD1px
+         R/ZxyCwSb0KQ+++zl5IXdi5W57DofCNTjYAdZa2Q+1tqQGzFG4nN6v5O0Mwvg/KqOUy2
+         yh0Eca3l3PSvNjCmxKI/TvdnPtnqll47uru1XscV+ZRbU0gYQ1xvQVaEktDaEQbxfLuQ
+         PfAd1AwPZChS0Mtzbqw4XIX+uvP1A4O3jPMOqE2OXDIvdc9Yrj2gG1gFy3mYqkRCLBMz
+         n+DfUVyvl1sCtAK5HdojHeHync2ogAXs230DqlXRgxIloZV3xwmZhiW+9LStXvHAAN7Q
+         9c/Q==
+X-Gm-Message-State: AOAM5331MaGLr1bwhDA+wp08jDRz9VreX5WfESU8y9wt9WJSY2su2UQa
+        nDIuopssefUPfwnHnysGwlN0l9M0pUvx2igGUikz74BGNquiwyrORS5OOZvWLZMkRr9HRbqsvHt
+        6eF19lXvJRSphOndkFFNb3DUDBd831Qh2wsGHWRcOLYBc3miZd1I/98aZQ5AYH8s=
+X-Google-Smtp-Source: ABdhPJxGiYdV5yfa5L2g288Y7UPX8c8X/2XRZTO42+QGgpt9/aMwR4B2q9GbJz60UPQnwc7tat7p1qqFeRBQKw==
+X-Received: from ricarkol2.c.googlers.com ([fda3:e722:ac3:cc00:24:72f4:c0a8:62fe])
+ (user=ricarkol job=sendgmr) by 2002:a05:6a00:1411:b029:302:d9d6:651d with
+ SMTP id l17-20020a056a001411b0290302d9d6651dmr1254121pfu.56.1625256645780;
+ Fri, 02 Jul 2021 13:10:45 -0700 (PDT)
+Date:   Fri,  2 Jul 2021 13:10:42 -0700
+Message-Id: <20210702201042.4036162-1-ricarkol@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.32.0.93.g670b81a890-goog
+Subject: [PATCH] KVM: selftests: Address extra memslot parameters in vm_vaddr_alloc
+From:   Ricardo Koller <ricarkol@google.com>
+To:     kvm@vger.kernel.org
+Cc:     kvmarm@lists.cs.columbia.edu, pbonzini@redhat.com,
+        seanjc@google.com, maz@kernel.org,
+        Ricardo Koller <ricarkol@google.com>,
+        Zenghui Yu <yuzenghui@huawei.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The following changes since commit 009c9aa5be652675a06d5211e1640e02bbb1c33d:
+Commit a75a895e6457 ("KVM: selftests: Unconditionally use memslot 0 for
+vaddr allocations") removed the memslot parameters from vm_vaddr_alloc.
+It addressed all callers except one under lib/aarch64/, due to a race
+with commit e3db7579ef35 ("KVM: selftests: Add exception handling
+support for aarch64")
 
-  Linux 5.13-rc6 (2021-06-13 14:43:10 -0700)
+Fix the vm_vaddr_alloc call in lib/aarch64/processor.c.
 
-are available in the Git repository at:
+Reported-by: Zenghui Yu <yuzenghui@huawei.com>
+Signed-off-by: Ricardo Koller <ricarkol@google.com>
+---
+ tools/testing/selftests/kvm/lib/aarch64/processor.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-  git://github.com/awilliam/linux-vfio.git tags/vfio-v5.14-rc1
-
-for you to fetch changes up to 6a45ece4c9af473555f01f0f8b97eba56e3c7d0d:
-
-  vfio/pci: Handle concurrent vma faults (2021-06-30 13:55:53 -0600)
-
-----------------------------------------------------------------
-VFIO update for v5.14-rc1
-
- - Module reference fixes, structure renaming (Max Gurtovoy)
-
- - Export and use common pci_dev_trylock() (Luis Chamberlain)
-
- - Enable direct mdev device creation and probing by parent
-   (Christoph Hellwig & Jason Gunthorpe)
-
- - Fix mdpy error path leak (Colin Ian King)
-
- - Fix mtty list entry leak (Jason Gunthorpe)
-
- - Enforce mtty device limit (Alex Williamson)
-
- - Resolve concurrent vfio-pci mmap faults (Alex Williamson)
-
-----------------------------------------------------------------
-Alex Williamson (3):
-      Merge branch 'hch-mdev-direct-v4' into v5.14/vfio/next
-      vfio/mtty: Enforce available_instances
-      vfio/pci: Handle concurrent vma faults
-
-Christoph Hellwig (3):
-      driver core: Better distinguish probe errors in really_probe
-      driver core: Flow the return code from ->probe() through to sysfs bind
-      driver core: Don't return EPROBE_DEFER to userspace during sysfs bind
-
-Colin Ian King (1):
-      vfio/mdpy: Fix memory leak of object mdev_state->vconfig
-
-Jason Gunthorpe (8):
-      driver core: Pull required checks into driver_probe_device()
-      driver core: Export device_driver_attach()
-      vfio/mdev: Remove CONFIG_VFIO_MDEV_DEVICE
-      vfio/mdev: Allow the mdev_parent_ops to specify the device driver to bind
-      vfio/mtty: Convert to use vfio_register_group_dev()
-      vfio/mdpy: Convert to use vfio_register_group_dev()
-      vfio/mbochs: Convert to use vfio_register_group_dev()
-      vfio/mtty: Delete mdev_devices_list
-
-Luis Chamberlain (2):
-      PCI: Export pci_dev_trylock() and pci_dev_unlock()
-      vfio: use the new pci_dev_trylock() helper to simplify try lock
-
-Max Gurtovoy (3):
-      vfio: centralize module refcount in subsystem layer
-      vfio/platform: remove unneeded parent_module attribute
-      vfio/iommu_type1: rename vfio_group struck to vfio_iommu_group
-
- Documentation/driver-api/vfio-mediated-device.rst |  35 ++--
- Documentation/s390/vfio-ap.rst                    |   1 -
- arch/s390/Kconfig                                 |   2 +-
- drivers/base/base.h                               |   1 -
- drivers/base/bus.c                                |   8 +-
- drivers/base/dd.c                                 | 192 ++++++++++---------
- drivers/gpu/drm/i915/Kconfig                      |   2 +-
- drivers/pci/pci.c                                 |   6 +-
- drivers/vfio/fsl-mc/vfio_fsl_mc.c                 |  16 +-
- drivers/vfio/mdev/Kconfig                         |   7 -
- drivers/vfio/mdev/Makefile                        |   3 +-
- drivers/vfio/mdev/mdev_core.c                     |  46 ++++-
- drivers/vfio/mdev/mdev_driver.c                   |  10 +
- drivers/vfio/mdev/mdev_private.h                  |   2 +
- drivers/vfio/mdev/vfio_mdev.c                     |  37 +---
- drivers/vfio/pci/vfio_pci.c                       |  47 ++---
- drivers/vfio/platform/vfio_amba.c                 |   1 -
- drivers/vfio/platform/vfio_platform.c             |   1 -
- drivers/vfio/platform/vfio_platform_common.c      |   6 -
- drivers/vfio/platform/vfio_platform_private.h     |   1 -
- drivers/vfio/vfio.c                               |  10 +
- drivers/vfio/vfio_iommu_type1.c                   |  34 ++--
- include/linux/device.h                            |   2 +
- include/linux/mdev.h                              |   2 +
- include/linux/pci.h                               |   3 +
- samples/Kconfig                                   |   6 +-
- samples/vfio-mdev/mbochs.c                        | 163 +++++++++-------
- samples/vfio-mdev/mdpy.c                          | 160 +++++++++-------
- samples/vfio-mdev/mtty.c                          | 219 ++++++++++------------
- 29 files changed, 522 insertions(+), 501 deletions(-)
+diff --git a/tools/testing/selftests/kvm/lib/aarch64/processor.c b/tools/testing/selftests/kvm/lib/aarch64/processor.c
+index 9f49f6caafe5..632b74d6b3ca 100644
+--- a/tools/testing/selftests/kvm/lib/aarch64/processor.c
++++ b/tools/testing/selftests/kvm/lib/aarch64/processor.c
+@@ -401,7 +401,7 @@ void route_exception(struct ex_regs *regs, int vector)
+ void vm_init_descriptor_tables(struct kvm_vm *vm)
+ {
+ 	vm->handlers = vm_vaddr_alloc(vm, sizeof(struct handlers),
+-			vm->page_size, 0, 0);
++			vm->page_size);
+ 
+ 	*(vm_vaddr_t *)addr_gva2hva(vm, (vm_vaddr_t)(&exception_handlers)) = vm->handlers;
+ }
+-- 
+2.32.0.93.g670b81a890-goog
 
