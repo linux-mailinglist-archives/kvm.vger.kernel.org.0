@@ -2,26 +2,26 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 553AC3B9EB9
-	for <lists+kvm@lfdr.de>; Fri,  2 Jul 2021 12:00:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D52A23B9EBF
+	for <lists+kvm@lfdr.de>; Fri,  2 Jul 2021 12:00:13 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231634AbhGBKCM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 2 Jul 2021 06:02:12 -0400
-Received: from frasgout.his.huawei.com ([185.176.79.56]:3344 "EHLO
+        id S231846AbhGBKCV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 2 Jul 2021 06:02:21 -0400
+Received: from frasgout.his.huawei.com ([185.176.79.56]:3345 "EHLO
         frasgout.his.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231782AbhGBKCI (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 2 Jul 2021 06:02:08 -0400
-Received: from fraeml736-chm.china.huawei.com (unknown [172.18.147.207])
-        by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4GGVf84Wgdz6GBC9;
-        Fri,  2 Jul 2021 17:49:04 +0800 (CST)
+        with ESMTP id S231800AbhGBKCR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 2 Jul 2021 06:02:17 -0400
+Received: from fraeml737-chm.china.huawei.com (unknown [172.18.147.207])
+        by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4GGVfK0tKFz6GBCj;
+        Fri,  2 Jul 2021 17:49:13 +0800 (CST)
 Received: from lhreml710-chm.china.huawei.com (10.201.108.61) by
- fraeml736-chm.china.huawei.com (10.206.15.217) with Microsoft SMTP Server
+ fraeml737-chm.china.huawei.com (10.206.15.218) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2176.2; Fri, 2 Jul 2021 11:59:35 +0200
+ 15.1.2176.2; Fri, 2 Jul 2021 11:59:43 +0200
 Received: from A2006125610.china.huawei.com (10.47.85.147) by
  lhreml710-chm.china.huawei.com (10.201.108.61) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2176.2; Fri, 2 Jul 2021 10:59:28 +0100
+ 15.1.2176.2; Fri, 2 Jul 2021 10:59:37 +0100
 From:   Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
 To:     <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
         <linux-crypto@vger.kernel.org>
@@ -30,9 +30,9 @@ CC:     <alex.williamson@redhat.com>, <jgg@nvidia.com>,
         <liulongfang@huawei.com>, <prime.zeng@hisilicon.com>,
         <yuzenghui@huawei.com>, <jonathan.cameron@huawei.com>,
         <wangzhou1@hisilicon.com>
-Subject: [RFC v2 2/4] hisi_acc_vfio_pci: Override ioctl method to limit BAR2 region size
-Date:   Fri, 2 Jul 2021 10:58:47 +0100
-Message-ID: <20210702095849.1610-3-shameerali.kolothum.thodi@huawei.com>
+Subject: [RFC v2 3/4] crypto: hisilicon/qm - Export mailbox functions for common use
+Date:   Fri, 2 Jul 2021 10:58:48 +0100
+Message-ID: <20210702095849.1610-4-shameerali.kolothum.thodi@huawei.com>
 X-Mailer: git-send-email 2.12.0.windows.1
 In-Reply-To: <20210702095849.1610-1-shameerali.kolothum.thodi@huawei.com>
 References: <20210702095849.1610-1-shameerali.kolothum.thodi@huawei.com>
@@ -46,78 +46,73 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-HiSilicon ACC VF device BAR2 region consists of both functional register
-space and migration control register space. From a security point of
-view, it's not advisable to export the migration control region to Guest.
+From: Longfang Liu <liulongfang@huawei.com>
 
-Hence, hide the migration region and report only the functional register
-space.
+Export QM mailbox functions so that they can be used from HiSilicon
+ACC vfio live migration driver in follow-up patch.
 
+Signed-off-by: Longfang Liu <liulongfang@huawei.com>
 Signed-off-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
 ---
- drivers/vfio/pci/hisi_acc_vfio_pci.c | 42 +++++++++++++++++++++++++++-
- 1 file changed, 41 insertions(+), 1 deletion(-)
+ drivers/crypto/hisilicon/qm.c | 8 +++++---
+ drivers/crypto/hisilicon/qm.h | 4 ++++
+ 2 files changed, 9 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/vfio/pci/hisi_acc_vfio_pci.c b/drivers/vfio/pci/hisi_acc_vfio_pci.c
-index a9e173098ab5..d57cf6d7adaf 100644
---- a/drivers/vfio/pci/hisi_acc_vfio_pci.c
-+++ b/drivers/vfio/pci/hisi_acc_vfio_pci.c
-@@ -12,6 +12,46 @@
- #include <linux/vfio.h>
- #include <linux/vfio_pci_core.h>
+diff --git a/drivers/crypto/hisilicon/qm.c b/drivers/crypto/hisilicon/qm.c
+index ce439a0c66c9..87fc0199705e 100644
+--- a/drivers/crypto/hisilicon/qm.c
++++ b/drivers/crypto/hisilicon/qm.c
+@@ -492,7 +492,7 @@ static bool qm_qp_avail_state(struct hisi_qm *qm, struct hisi_qp *qp,
+ }
  
-+static long hisi_acc_vfio_pci_ioctl(struct vfio_device *core_vdev, unsigned int cmd,
-+				    unsigned long arg)
-+{
-+	struct vfio_pci_core_device *vdev =
-+		container_of(core_vdev, struct vfio_pci_core_device, vdev);
-+
-+	if (cmd == VFIO_DEVICE_GET_REGION_INFO) {
-+		struct pci_dev *pdev = vdev->pdev;
-+		struct vfio_region_info info;
-+		unsigned long minsz;
-+
-+		minsz = offsetofend(struct vfio_region_info, offset);
-+
-+		if (copy_from_user(&info, (void __user *)arg, minsz))
-+			return -EFAULT;
-+
-+		if (info.argsz < minsz)
-+			return -EINVAL;
-+
-+		if (info.index == VFIO_PCI_BAR2_REGION_INDEX) {
-+			info.offset = VFIO_PCI_INDEX_TO_OFFSET(info.index);
-+
-+			/*
-+			 * ACC VF dev BAR2 region(64K) consists of both functional
-+			 * register space and migration control register space.
-+			 * Report only the first 32K(functional region) to Guest.
-+			 */
-+			info.size = pci_resource_len(pdev, info.index) / 2;
-+
-+			info.flags = VFIO_REGION_INFO_FLAG_READ |
-+					VFIO_REGION_INFO_FLAG_WRITE |
-+					VFIO_REGION_INFO_FLAG_MMAP;
-+
-+			return copy_to_user((void __user *)arg, &info, minsz) ?
-+					    -EFAULT : 0;
-+		}
-+	}
-+	return vfio_pci_core_ioctl(core_vdev, cmd, arg);
-+}
-+
- static int hisi_acc_vfio_pci_open(struct vfio_device *core_vdev)
+ /* return 0 mailbox ready, -ETIMEDOUT hardware timeout */
+-static int qm_wait_mb_ready(struct hisi_qm *qm)
++int qm_wait_mb_ready(struct hisi_qm *qm)
  {
- 	struct vfio_pci_core_device *vdev =
-@@ -33,7 +73,7 @@ static const struct vfio_device_ops hisi_acc_vfio_pci_ops = {
- 	.name		= "hisi-acc-vfio-pci",
- 	.open		= hisi_acc_vfio_pci_open,
- 	.release	= vfio_pci_core_release,
--	.ioctl		= vfio_pci_core_ioctl,
-+	.ioctl		= hisi_acc_vfio_pci_ioctl,
- 	.read		= vfio_pci_core_read,
- 	.write		= vfio_pci_core_write,
- 	.mmap		= vfio_pci_core_mmap,
+ 	u32 val;
+ 
+@@ -500,6 +500,7 @@ static int qm_wait_mb_ready(struct hisi_qm *qm)
+ 					  val, !((val >> QM_MB_BUSY_SHIFT) &
+ 					  0x1), POLL_PERIOD, POLL_TIMEOUT);
+ }
++EXPORT_SYMBOL_GPL(qm_wait_mb_ready);
+ 
+ /* 128 bit should be written to hardware at one time to trigger a mailbox */
+ static void qm_mb_write(struct hisi_qm *qm, const void *src)
+@@ -523,8 +524,8 @@ static void qm_mb_write(struct hisi_qm *qm, const void *src)
+ 		     : "memory");
+ }
+ 
+-static int qm_mb(struct hisi_qm *qm, u8 cmd, dma_addr_t dma_addr, u16 queue,
+-		 bool op)
++int qm_mb(struct hisi_qm *qm, u8 cmd, dma_addr_t dma_addr, u16 queue,
++	  bool op)
+ {
+ 	struct qm_mailbox mailbox;
+ 	int ret = 0;
+@@ -563,6 +564,7 @@ static int qm_mb(struct hisi_qm *qm, u8 cmd, dma_addr_t dma_addr, u16 queue,
+ 		atomic64_inc(&qm->debug.dfx.mb_err_cnt);
+ 	return ret;
+ }
++EXPORT_SYMBOL_GPL(qm_mb);
+ 
+ static void qm_db_v1(struct hisi_qm *qm, u16 qn, u8 cmd, u16 index, u8 priority)
+ {
+diff --git a/drivers/crypto/hisilicon/qm.h b/drivers/crypto/hisilicon/qm.h
+index acefdf8b3a50..18b010d5452d 100644
+--- a/drivers/crypto/hisilicon/qm.h
++++ b/drivers/crypto/hisilicon/qm.h
+@@ -396,6 +396,10 @@ pci_ers_result_t hisi_qm_dev_slot_reset(struct pci_dev *pdev);
+ void hisi_qm_reset_prepare(struct pci_dev *pdev);
+ void hisi_qm_reset_done(struct pci_dev *pdev);
+ 
++int qm_wait_mb_ready(struct hisi_qm *qm);
++int qm_mb(struct hisi_qm *qm, u8 cmd, dma_addr_t dma_addr, u16 queue,
++	  bool op);
++
+ struct hisi_acc_sgl_pool;
+ struct hisi_acc_hw_sgl *hisi_acc_sg_buf_map_to_hw_sgl(struct device *dev,
+ 	struct scatterlist *sgl, struct hisi_acc_sgl_pool *pool,
 -- 
 2.17.1
 
