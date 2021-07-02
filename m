@@ -2,86 +2,61 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 781973B9C4E
-	for <lists+kvm@lfdr.de>; Fri,  2 Jul 2021 08:47:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 779A83B9C59
+	for <lists+kvm@lfdr.de>; Fri,  2 Jul 2021 08:49:41 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230056AbhGBGtd (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 2 Jul 2021 02:49:33 -0400
-Received: from szxga03-in.huawei.com ([45.249.212.189]:9335 "EHLO
-        szxga03-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230023AbhGBGtd (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 2 Jul 2021 02:49:33 -0400
-Received: from dggemv704-chm.china.huawei.com (unknown [172.30.72.55])
-        by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4GGQW75Sbkz74Bs;
-        Fri,  2 Jul 2021 14:42:43 +0800 (CST)
+        id S230112AbhGBGwL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 2 Jul 2021 02:52:11 -0400
+Received: from szxga02-in.huawei.com ([45.249.212.188]:9443 "EHLO
+        szxga02-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230026AbhGBGwK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 2 Jul 2021 02:52:10 -0400
+Received: from dggemv703-chm.china.huawei.com (unknown [172.30.72.57])
+        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4GGQbS4ggVzZppL;
+        Fri,  2 Jul 2021 14:46:28 +0800 (CST)
 Received: from dggema764-chm.china.huawei.com (10.1.198.206) by
- dggemv704-chm.china.huawei.com (10.3.19.47) with Microsoft SMTP Server
+ dggemv703-chm.china.huawei.com (10.3.19.46) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256) id
- 15.1.2176.2; Fri, 2 Jul 2021 14:46:59 +0800
+ 15.1.2176.2; Fri, 2 Jul 2021 14:49:36 +0800
 Received: from [10.174.185.179] (10.174.185.179) by
  dggema764-chm.china.huawei.com (10.1.198.206) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
- 15.1.2176.2; Fri, 2 Jul 2021 14:46:58 +0800
-Subject: Re: [PATCH v4 5/6] KVM: selftests: Add exception handling support for
- aarch64
-To:     Ricardo Koller <ricarkol@google.com>
-CC:     <kvm@vger.kernel.org>, <kvmarm@lists.cs.columbia.edu>,
-        <pbonzini@redhat.com>, <maz@kernel.org>, <drjones@redhat.com>,
-        <alexandru.elisei@arm.com>, <eric.auger@redhat.com>,
-        <vkuznets@redhat.com>, Sean Christopherson <seanjc@google.com>
-References: <20210611011020.3420067-1-ricarkol@google.com>
- <20210611011020.3420067-6-ricarkol@google.com>
+ 15.1.2176.2; Fri, 2 Jul 2021 14:49:35 +0800
+Subject: Re: [PATCH] KVM: selftests: do not require 64GB in
+ set_memory_region_test
+To:     Christian Borntraeger <borntraeger@de.ibm.com>
+CC:     Shuah Khan <shuah@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
+        <kvm@vger.kernel.org>, <linux-kselftest@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <linux-s390@vger.kernel.org>,
+        <vkuznets@redhat.com>, <wanghaibin.wang@huawei.com>
+References: <20210701160425.33666-1-borntraeger@de.ibm.com>
 From:   Zenghui Yu <yuzenghui@huawei.com>
-Message-ID: <b1f581ec-56f4-24a2-7850-182128cdc4ac@huawei.com>
-Date:   Fri, 2 Jul 2021 14:46:57 +0800
+Message-ID: <93ff00d3-b369-e00e-f172-7cc5375a6485@huawei.com>
+Date:   Fri, 2 Jul 2021 14:49:35 +0800
 User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
  Thunderbird/68.9.0
 MIME-Version: 1.0
-In-Reply-To: <20210611011020.3420067-6-ricarkol@google.com>
+In-Reply-To: <20210701160425.33666-1-borntraeger@de.ibm.com>
 Content-Type: text/plain; charset="utf-8"; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 X-Originating-IP: [10.174.185.179]
-X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
+X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
  dggema764-chm.china.huawei.com (10.1.198.206)
 X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-[+Sean]
+On 2021/7/2 0:04, Christian Borntraeger wrote:
+> Unless the user sets overcommit_memory or has plenty of swap, the latest
+> changes to the testcase will result in ENOMEM failures for hosts with
+> less than 64GB RAM. As we do not use much of the allocated memory, we
+> can use MAP_NORESERVE to avoid this error.
 
-On 2021/6/11 9:10, Ricardo Koller wrote:
-> Add the infrastructure needed to enable exception handling in aarch64
-> selftests. The exception handling defaults to an unhandled-exception
-> handler which aborts the test, just like x86. These handlers can be
-> overridden by calling vm_install_exception_handler(vector) or
-> vm_install_sync_handler(vector, ec). The unhandled exception reporting
-> from the guest is done using the ucall type introduced in a previous
-> commit, UCALL_UNHANDLED.
-> 
-> The exception handling code is inspired on kvm-unit-tests.
-> 
-> Signed-off-by: Ricardo Koller <ricarkol@google.com>
-> ---
->  tools/testing/selftests/kvm/Makefile          |   2 +-
->  .../selftests/kvm/include/aarch64/processor.h |  63 +++++++++
->  .../selftests/kvm/lib/aarch64/handlers.S      | 126 ++++++++++++++++++
->  .../selftests/kvm/lib/aarch64/processor.c     |  97 ++++++++++++++
->  4 files changed, 287 insertions(+), 1 deletion(-)
->  create mode 100644 tools/testing/selftests/kvm/lib/aarch64/handlers.S
+Had a go on arm64:
 
-[...]
+Tested-by: Zenghui Yu <yuzenghui@huawei.com>
 
-> +void vm_init_descriptor_tables(struct kvm_vm *vm)
-> +{
-> +	vm->handlers = vm_vaddr_alloc(vm, sizeof(struct handlers),
-> +			vm->page_size, 0, 0);
-
-This raced with commit a75a895e6457 ("KVM: selftests: Unconditionally
-use memslot 0 for vaddr allocations") which dropped memslot parameters
-from vm_vaddr_alloc().
-
-We can remove the related comments on top of vm_vaddr_alloc() as well.
-
+Thanks,
 Zenghui
