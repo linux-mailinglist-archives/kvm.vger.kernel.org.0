@@ -2,22 +2,22 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D2AB93BA57A
-	for <lists+kvm@lfdr.de>; Sat,  3 Jul 2021 00:06:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2DBA13BA57B
+	for <lists+kvm@lfdr.de>; Sat,  3 Jul 2021 00:06:09 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233647AbhGBWIY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 2 Jul 2021 18:08:24 -0400
+        id S233418AbhGBWI1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 2 Jul 2021 18:08:27 -0400
 Received: from mga17.intel.com ([192.55.52.151]:15270 "EHLO mga17.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S233257AbhGBWIC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        id S233228AbhGBWIC (ORCPT <rfc822;kvm@vger.kernel.org>);
         Fri, 2 Jul 2021 18:08:02 -0400
-X-IronPort-AV: E=McAfee;i="6200,9189,10033"; a="189168369"
+X-IronPort-AV: E=McAfee;i="6200,9189,10033"; a="189168370"
 X-IronPort-AV: E=Sophos;i="5.83,320,1616482800"; 
-   d="scan'208";a="189168369"
+   d="scan'208";a="189168370"
 Received: from fmsmga006.fm.intel.com ([10.253.24.20])
-  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Jul 2021 15:05:28 -0700
+  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Jul 2021 15:05:29 -0700
 X-IronPort-AV: E=Sophos;i="5.83,320,1616482800"; 
-   d="scan'208";a="642814836"
+   d="scan'208";a="642814839"
 Received: from ls.sc.intel.com (HELO localhost) ([143.183.96.54])
   by fmsmga006-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Jul 2021 15:05:28 -0700
 From:   isaku.yamahata@intel.com
@@ -34,9 +34,9 @@ To:     Thomas Gleixner <tglx@linutronix.de>,
         linux-kernel@vger.kernel.org, kvm@vger.kernel.org
 Cc:     isaku.yamahata@intel.com, isaku.yamahata@gmail.com,
         Sean Christopherson <sean.j.christopherson@intel.com>
-Subject: [RFC PATCH v2 48/69] KVM: x86/mmu: Introduce kvm_mmu_map_tdp_page() for use by TDX
-Date:   Fri,  2 Jul 2021 15:04:54 -0700
-Message-Id: <a7e7602375e1f63b32eda19cb8011f11794ebe28.1625186503.git.isaku.yamahata@intel.com>
+Subject: [RFC PATCH v2 49/69] KVM: VMX: Modify NMI and INTR handlers to take intr_info as param
+Date:   Fri,  2 Jul 2021 15:04:55 -0700
+Message-Id: <19efa94306ba82e433602af45d122265fa39b0c4.1625186503.git.isaku.yamahata@intel.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <cover.1625186503.git.isaku.yamahata@intel.com>
 References: <cover.1625186503.git.isaku.yamahata@intel.com>
@@ -48,68 +48,62 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Sean Christopherson <sean.j.christopherson@intel.com>
 
-Introduce a helper to directly (pun intended) fault-in a TDP page
-without having to go through the full page fault path.  This allows
-TDX to get the resulting pfn and also allows the RET_PF_* enums to
-stay in mmu.c where they belong.
+Pass intr_info to the NMI and INTR handlers instead of pulling it from
+vcpu_vmx in preparation for sharing the bulk of the handlers with TDX.
 
 Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
 Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
 ---
- arch/x86/kvm/mmu.h     |  3 +++
- arch/x86/kvm/mmu/mmu.c | 25 +++++++++++++++++++++++++
- 2 files changed, 28 insertions(+)
+ arch/x86/kvm/vmx/vmx.c | 15 +++++++--------
+ 1 file changed, 7 insertions(+), 8 deletions(-)
 
-diff --git a/arch/x86/kvm/mmu.h b/arch/x86/kvm/mmu.h
-index c3e241088851..8bf1c6dbac78 100644
---- a/arch/x86/kvm/mmu.h
-+++ b/arch/x86/kvm/mmu.h
-@@ -125,6 +125,9 @@ static inline int kvm_mmu_do_page_fault(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa,
- 	return vcpu->arch.mmu->page_fault(vcpu, cr2_or_gpa, err, prefault);
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index 7ce15a2c3490..e08f85c93e55 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -6404,25 +6404,24 @@ static void handle_interrupt_nmi_irqoff(struct kvm_vcpu *vcpu,
+ 	kvm_after_interrupt(vcpu);
  }
  
-+kvm_pfn_t kvm_mmu_map_tdp_page(struct kvm_vcpu *vcpu, gpa_t gpa,
-+			       u32 error_code, int max_level);
-+
- /*
-  * Currently, we have two sorts of write-protection, a) the first one
-  * write-protects guest page to sync the guest modification, b) another one is
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index 96a99450f114..82db62753acb 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -4098,6 +4098,31 @@ int kvm_tdp_page_fault(struct kvm_vcpu *vcpu, gpa_t gpa, u32 error_code,
- 				 max_level, true, &pfn);
- }
- 
-+kvm_pfn_t kvm_mmu_map_tdp_page(struct kvm_vcpu *vcpu, gpa_t gpa,
-+			       u32 error_code, int max_level)
-+{
-+	kvm_pfn_t pfn;
-+	int r;
-+
-+	if (mmu_topup_memory_caches(vcpu, false))
-+		return KVM_PFN_ERR_FAULT;
-+
-+	/*
-+	 * Loop on the page fault path to handle the case where an mmu_notifier
-+	 * invalidation triggers RET_PF_RETRY.  In the normal page fault path,
-+	 * KVM needs to resume the guest in case the invalidation changed any
-+	 * of the page fault properties, i.e. the gpa or error code.  For this
-+	 * path, the gpa and error code are fixed by the caller, and the caller
-+	 * expects failure if and only if the page fault can't be fixed.
-+	 */
-+	do {
-+		r = direct_page_fault(vcpu, gpa, error_code, false, max_level,
-+				      true, &pfn);
-+	} while (r == RET_PF_RETRY && !is_error_noslot_pfn(pfn));
-+	return pfn;
-+}
-+EXPORT_SYMBOL_GPL(kvm_mmu_map_tdp_page);
-+
- static void nonpaging_init_context(struct kvm_vcpu *vcpu,
- 				   struct kvm_mmu *context)
+-static void handle_exception_nmi_irqoff(struct vcpu_vmx *vmx)
++static void handle_exception_nmi_irqoff(struct kvm_vcpu *vcpu, u32 intr_info)
  {
+ 	const unsigned long nmi_entry = (unsigned long)asm_exc_nmi_noist;
+-	u32 intr_info = vmx_get_intr_info(&vmx->vcpu);
+ 
+ 	/* if exit due to PF check for async PF */
+ 	if (is_page_fault(intr_info))
+-		vmx->vcpu.arch.apf.host_apf_flags = kvm_read_and_reset_apf_flags();
++		vcpu->arch.apf.host_apf_flags = kvm_read_and_reset_apf_flags();
+ 	/* Handle machine checks before interrupts are enabled */
+ 	else if (is_machine_check(intr_info))
+ 		kvm_machine_check();
+ 	/* We need to handle NMIs before interrupts are enabled */
+ 	else if (is_nmi(intr_info))
+-		handle_interrupt_nmi_irqoff(&vmx->vcpu, nmi_entry);
++		handle_interrupt_nmi_irqoff(vcpu, nmi_entry);
+ }
+ 
+-static void handle_external_interrupt_irqoff(struct kvm_vcpu *vcpu)
++static void handle_external_interrupt_irqoff(struct kvm_vcpu *vcpu,
++					     u32 intr_info)
+ {
+-	u32 intr_info = vmx_get_intr_info(vcpu);
+ 	unsigned int vector = intr_info & INTR_INFO_VECTOR_MASK;
+ 	gate_desc *desc = (gate_desc *)host_idt_base + vector;
+ 
+@@ -6438,9 +6437,9 @@ static void vmx_handle_exit_irqoff(struct kvm_vcpu *vcpu)
+ 	struct vcpu_vmx *vmx = to_vmx(vcpu);
+ 
+ 	if (vmx->exit_reason.basic == EXIT_REASON_EXTERNAL_INTERRUPT)
+-		handle_external_interrupt_irqoff(vcpu);
++		handle_external_interrupt_irqoff(vcpu, vmx_get_intr_info(vcpu));
+ 	else if (vmx->exit_reason.basic == EXIT_REASON_EXCEPTION_NMI)
+-		handle_exception_nmi_irqoff(vmx);
++		handle_exception_nmi_irqoff(vcpu, vmx_get_intr_info(vcpu));
+ }
+ 
+ /*
 -- 
 2.25.1
 
