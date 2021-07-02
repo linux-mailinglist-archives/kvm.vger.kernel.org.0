@@ -2,136 +2,100 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id AED663BA00A
-	for <lists+kvm@lfdr.de>; Fri,  2 Jul 2021 13:48:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8AF3B3BA018
+	for <lists+kvm@lfdr.de>; Fri,  2 Jul 2021 13:53:07 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232055AbhGBLvY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 2 Jul 2021 07:51:24 -0400
-Received: from smtp-out1.suse.de ([195.135.220.28]:32972 "EHLO
-        smtp-out1.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232021AbhGBLvX (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 2 Jul 2021 07:51:23 -0400
-Received: from imap.suse.de (imap-alt.suse-dmz.suse.de [192.168.254.47])
-        (using TLSv1.2 with cipher ECDHE-ECDSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by smtp-out1.suse.de (Postfix) with ESMTPS id 7BA1822982;
-        Fri,  2 Jul 2021 11:48:50 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
-        t=1625226530; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=oQFJfMtJ7d44u/Eg9demA0543TOxxcunVlC/ArZcDv0=;
-        b=o4x9NiSgX+HD1y+cGs/NAtT0HAa569xMwAnQBHAA5HKhlnRdlykHhBczJHNXLbMZ1xG6Uy
-        bYECwfUOYzpioSUoN/tgTr5/bYGhP9JbITbGLjRUQ1gvUYUMoRI0P24FtzV09AoG/xW63b
-        Q9ixPWR0fbsQJ5pyEpOs3MkaxxUwwE0=
-Received: from imap3-int (imap-alt.suse-dmz.suse.de [192.168.254.47])
-        by imap.suse.de (Postfix) with ESMTP id 1C24B11C84;
-        Fri,  2 Jul 2021 11:48:50 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
-        t=1625226530; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=oQFJfMtJ7d44u/Eg9demA0543TOxxcunVlC/ArZcDv0=;
-        b=o4x9NiSgX+HD1y+cGs/NAtT0HAa569xMwAnQBHAA5HKhlnRdlykHhBczJHNXLbMZ1xG6Uy
-        bYECwfUOYzpioSUoN/tgTr5/bYGhP9JbITbGLjRUQ1gvUYUMoRI0P24FtzV09AoG/xW63b
-        Q9ixPWR0fbsQJ5pyEpOs3MkaxxUwwE0=
-Received: from director2.suse.de ([192.168.254.72])
-        by imap3-int with ESMTPSA
-        id SOhgBSL93mDDDAAALh3uQQ
-        (envelope-from <varad.gautam@suse.com>); Fri, 02 Jul 2021 11:48:50 +0000
-From:   Varad Gautam <varad.gautam@suse.com>
-To:     kvm@vger.kernel.org, virtualization@lists.linux-foundation.org
-Cc:     pbonzini@redhat.com, drjones@redhat.com, jroedel@suse.de,
-        bp@suse.de, thomas.lendacky@amd.com, brijesh.singh@amd.com,
-        varad.gautam@suse.com
-Subject: [kvm-unit-tests PATCH 6/6] x86: Disable some breaking tests for EFI and modify vmexit test
-Date:   Fri,  2 Jul 2021 13:48:20 +0200
-Message-Id: <20210702114820.16712-7-varad.gautam@suse.com>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20210702114820.16712-1-varad.gautam@suse.com>
-References: <20210702114820.16712-1-varad.gautam@suse.com>
+        id S232026AbhGBLzh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 2 Jul 2021 07:55:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34990 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231936AbhGBLzh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 2 Jul 2021 07:55:37 -0400
+Received: from desiato.infradead.org (desiato.infradead.org [IPv6:2001:8b0:10b:1:d65d:64ff:fe57:4e05])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D0EDAC061762;
+        Fri,  2 Jul 2021 04:53:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=desiato.20200630; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=/sLwb7Cxkc1PFTyYiL5GsOTR4TUt3nINwnHPE+BGuo0=; b=YpMOOV00UxinpjzrmMGOLPVn52
+        zW5a8SeV7X5BWstNgbMvDWMtF9TEc0vpSx2VJQyUJ+py5LIKjpGQcB+SOivcTZ6xr+P4J551yDbho
+        lrWof83QJfDmOF7RQr87jRGwcrcoiYWVeeOcyIaIwfHvyR8RQ6vCug822lktaN6Evkyg7t8S+V3+H
+        DP/aeNxHOt9YbEHhW47TqRZ/u1Ej6U7pMxPl3jYTdA8KMtCibWFsfh5xe6AUAAdUGSq97zH4BSzQq
+        xCh1Ihc36Ba6gM084VJFvIIcQHsOtPToKQsLvMk7gDeIZgx0Dv3EvYQbgsRuDsuG8wPUGV7JeqTyw
+        RBrha1aA==;
+Received: from j217100.upc-j.chello.nl ([24.132.217.100] helo=noisy.programming.kicks-ass.net)
+        by desiato.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1lzHic-00Dqhi-J4; Fri, 02 Jul 2021 11:52:41 +0000
+Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits))
+        (Client did not present a certificate)
+        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id 00AC83001DC;
+        Fri,  2 Jul 2021 13:52:22 +0200 (CEST)
+Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
+        id DDFB62CEACAE1; Fri,  2 Jul 2021 13:52:21 +0200 (CEST)
+Date:   Fri, 2 Jul 2021 13:52:21 +0200
+From:   Peter Zijlstra <peterz@infradead.org>
+To:     Zhu Lingshan <lingshan.zhu@intel.com>
+Cc:     pbonzini@redhat.com, bp@alien8.de, seanjc@google.com,
+        vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com,
+        joro@8bytes.org, weijiang.yang@intel.com,
+        kan.liang@linux.intel.com, ak@linux.intel.com,
+        wei.w.wang@intel.com, eranian@google.com, liuxiangdong5@huawei.com,
+        linux-kernel@vger.kernel.org, x86@kernel.org, kvm@vger.kernel.org,
+        like.xu.linux@gmail.com, Like Xu <like.xu@linux.intel.com>
+Subject: Re: [PATCH V7 11/18] KVM: x86/pmu: Add IA32_DS_AREA MSR emulation to
+ support guest DS
+Message-ID: <YN799S5hwWqsbY/h@hirez.programming.kicks-ass.net>
+References: <20210622094306.8336-1-lingshan.zhu@intel.com>
+ <20210622094306.8336-12-lingshan.zhu@intel.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210622094306.8336-12-lingshan.zhu@intel.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Disable some tests from building on EFI. These fail early, and need some
-adaptation (eg. inline asm changes / AP initialization / memory
-reclamation from EFI).
+On Tue, Jun 22, 2021 at 05:42:59PM +0800, Zhu Lingshan wrote:
+> diff --git a/arch/x86/events/intel/core.c b/arch/x86/events/intel/core.c
+> index 190d8d98abf0..b336bcaad626 100644
+> --- a/arch/x86/events/intel/core.c
+> +++ b/arch/x86/events/intel/core.c
+> @@ -21,6 +21,7 @@
+>  #include <asm/intel_pt.h>
+>  #include <asm/apic.h>
+>  #include <asm/cpu_device_id.h>
+> +#include <asm/kvm_host.h>
+>  
+>  #include "../perf_event.h"
+>  
+> @@ -3915,6 +3916,7 @@ static struct perf_guest_switch_msr *intel_guest_get_msrs(int *nr, void *data)
+>  {
+>  	struct cpu_hw_events *cpuc = this_cpu_ptr(&cpu_hw_events);
+>  	struct perf_guest_switch_msr *arr = cpuc->guest_switch_msrs;
+> +	struct kvm_pmu *pmu = (struct kvm_pmu *)data;
+>  	u64 intel_ctrl = hybrid(cpuc->pmu, intel_ctrl);
+>  	u64 pebs_mask = cpuc->pebs_enabled & x86_pmu.pebs_capable;
+>  
+> @@ -3945,9 +3947,15 @@ static struct perf_guest_switch_msr *intel_guest_get_msrs(int *nr, void *data)
+>  		return arr;
+>  	}
+>  
+> -	if (!x86_pmu.pebs_vmx)
+> +	if (!pmu || !x86_pmu.pebs_vmx)
+>  		return arr;
+>  
+> +	arr[(*nr)++] = (struct perf_guest_switch_msr){
+> +		.msr = MSR_IA32_DS_AREA,
+> +		.host = (unsigned long)cpuc->ds,
+> +		.guest = pmu->ds_area,
+> +	};
+> +
+>  	arr[*nr] = (struct perf_guest_switch_msr){
+>  		.msr = MSR_IA32_PEBS_ENABLE,
+>  		.host = cpuc->pebs_enabled & ~cpuc->intel_ctrl_guest_mask,
 
-Eg, asyncpf: runs out of memory since the allocator only uses the largest
-  EFI_CONVENTIONAL_MEMORY block.
-hyperv_*: untested with EFI.
-vmexit: breaks since test arg passing isn't enabled - enable it except for
-  pci-* cases since iomem needs more fixups.
-
-Signed-off-by: Varad Gautam <varad.gautam@suse.com>
----
- x86/Makefile.common | 21 +++++++++++----------
- x86/vmexit.c        |  7 +++++++
- 2 files changed, 18 insertions(+), 10 deletions(-)
-
-diff --git a/x86/Makefile.common b/x86/Makefile.common
-index 98d8de9..b995a67 100644
---- a/x86/Makefile.common
-+++ b/x86/Makefile.common
-@@ -62,17 +62,18 @@ FLATLIBS = lib/libcflat.a
- 	@chmod a-x $@
- 
- tests-flatonly = $(TEST_DIR)/realmode.$(out) $(TEST_DIR)/eventinj.$(out)		\
--		$(TEST_DIR)/smap.$(out) $(TEST_DIR)/umip.$(out)
--
--tests-common = $(TEST_DIR)/vmexit.$(out) $(TEST_DIR)/tsc.$(out)				\
--		$(TEST_DIR)/smptest.$(out) $(TEST_DIR)/msr.$(out)			\
--		$(TEST_DIR)/hypercall.$(out) $(TEST_DIR)/sieve.$(out)			\
--		$(TEST_DIR)/kvmclock_test.$(out) $(TEST_DIR)/s3.$(out)			\
-+		$(TEST_DIR)/smap.$(out) $(TEST_DIR)/umip.$(out)				\
-+		$(TEST_DIR)/kvmclock_test.$(out) $(TEST_DIR)/hypercall.$(out)		\
-+		$(TEST_DIR)/init.$(out)							\
-+		$(TEST_DIR)/asyncpf.$(out) $(TEST_DIR)/hyperv_synic.$(out)		\
-+		$(TEST_DIR)/hyperv_stimer.$(out) $(TEST_DIR)/hyperv_connections.$(out)
-+
-+tests-common = $(TEST_DIR)/tsc.$(out) $(TEST_DIR)/smptest.$(out)			\
-+		$(TEST_DIR)/msr.$(out) $(TEST_DIR)/sieve.$(out)				\
-+		$(TEST_DIR)/sieve.$(out) $(TEST_DIR)/s3.$(out)				\
- 		$(TEST_DIR)/pmu.$(out) $(TEST_DIR)/setjmp.$(out)			\
--		$(TEST_DIR)/tsc_adjust.$(out) $(TEST_DIR)/asyncpf.$(out)		\
--		$(TEST_DIR)/init.$(out) $(TEST_DIR)/hyperv_synic.$(out)			\
--		$(TEST_DIR)/hyperv_stimer.$(out) $(TEST_DIR)/hyperv_connections.$(out)	\
--		$(TEST_DIR)/tsx-ctrl.$(out)
-+		$(TEST_DIR)/tsc_adjust.$(out) $(TEST_DIR)/tsx-ctrl.$(out)		\
-+		$(TEST_DIR)/vmexit.$(out)
- 
- ifneq ($(CONFIG_EFI),y)
- tests-common += $(tests-flatonly)
-diff --git a/x86/vmexit.c b/x86/vmexit.c
-index 999babf..4062f7a 100644
---- a/x86/vmexit.c
-+++ b/x86/vmexit.c
-@@ -560,6 +560,12 @@ static void enable_nx(void *junk)
- 
- static bool test_wanted(struct test *test, char *wanted[], int nwanted)
- {
-+#ifdef CONFIG_EFI
-+	if (strcmp(test->name, "pci-io") == 0 || strcmp(test->name, "pci-mem") == 0 )
-+		return false;
-+
-+	return true;
-+#else
- 	int i;
- 
- 	if (!nwanted)
-@@ -570,6 +576,7 @@ static bool test_wanted(struct test *test, char *wanted[], int nwanted)
- 			return true;
- 
- 	return false;
-+#endif
- }
- 
- int main(int ac, char **av)
--- 
-2.30.2
-
+s/pmu/kvm_pmu/ or something. pmu is normally a struct pmu *, and having
+it be kvm_pmu here is super confusing.
