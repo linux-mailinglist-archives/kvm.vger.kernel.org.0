@@ -2,22 +2,22 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C79AC3BA5C2
-	for <lists+kvm@lfdr.de>; Sat,  3 Jul 2021 00:09:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B04B73BA55D
+	for <lists+kvm@lfdr.de>; Sat,  3 Jul 2021 00:05:28 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234374AbhGBWJu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 2 Jul 2021 18:09:50 -0400
-Received: from mga02.intel.com ([134.134.136.20]:51168 "EHLO mga02.intel.com"
+        id S233127AbhGBWH5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 2 Jul 2021 18:07:57 -0400
+Received: from mga02.intel.com ([134.134.136.20]:51166 "EHLO mga02.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229648AbhGBWHx (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 2 Jul 2021 18:07:53 -0400
-X-IronPort-AV: E=McAfee;i="6200,9189,10033"; a="195951885"
+        id S232991AbhGBWHy (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 2 Jul 2021 18:07:54 -0400
+X-IronPort-AV: E=McAfee;i="6200,9189,10033"; a="195951886"
 X-IronPort-AV: E=Sophos;i="5.83,320,1616482800"; 
-   d="scan'208";a="195951885"
+   d="scan'208";a="195951886"
 Received: from fmsmga006.fm.intel.com ([10.253.24.20])
   by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Jul 2021 15:05:20 -0700
 X-IronPort-AV: E=Sophos;i="5.83,320,1616482800"; 
-   d="scan'208";a="642814686"
+   d="scan'208";a="642814689"
 Received: from ls.sc.intel.com (HELO localhost) ([143.183.96.54])
   by fmsmga006-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Jul 2021 15:05:20 -0700
 From:   isaku.yamahata@intel.com
@@ -33,10 +33,12 @@ To:     Thomas Gleixner <tglx@linutronix.de>,
         Sean Christopherson <seanjc@google.com>, x86@kernel.org,
         linux-kernel@vger.kernel.org, kvm@vger.kernel.org
 Cc:     isaku.yamahata@intel.com, isaku.yamahata@gmail.com,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Kai Huang <kai.huang@linux.intel.com>,
         Xiaoyao Li <xiaoyao.li@intel.com>
-Subject: [RFC PATCH v2 06/69] KVM: TDX: add a helper function for kvm to call seamcall
-Date:   Fri,  2 Jul 2021 15:04:12 -0700
-Message-Id: <e777bbbe10b1ec2c37d85dcca2e175fe3bc565ec.1625186503.git.isaku.yamahata@intel.com>
+Subject: [RFC PATCH v2 07/69] KVM: TDX: define and export helper functions for KVM TDX support
+Date:   Fri,  2 Jul 2021 15:04:13 -0700
+Message-Id: <4fe4ce4faf5ad117f81d411deb00ef3b9657c842.1625186503.git.isaku.yamahata@intel.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <cover.1625186503.git.isaku.yamahata@intel.com>
 References: <cover.1625186503.git.isaku.yamahata@intel.com>
@@ -46,191 +48,301 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Isaku Yamahata <isaku.yamahata@intel.com>
+From: Sean Christopherson <sean.j.christopherson@intel.com>
 
-Add a helper function for kvm to call seamcall and a helper macro to check
-its return value.  The later patches will use them.
+NOTE: This is to make this patch series compile.  other patch series that
+loads/initializes TDX module will replace this patch.
 
+Define and export four helper functions commly used for for KVM TDX support
+and SEAMLDR.  tdx_get_sysinfo(), tdx_seamcall_on_each_pkg(),
+tdx_keyid_alloc() and tdx_keyid_free().  The SEAMLDR logic will initializes
+at boot phase and KVM TDX will use those function to get system info,
+operation of package wide resource and, alloc/free tdx private key ID.
+
+Signed-off-by: Kai Huang <kai.huang@linux.intel.com>
 Co-developed-by: Xiaoyao Li <xiaoyao.li@intel.com>
 Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
+Co-developed-by: Sean Christopherson <sean.j.christopherson@intel.com>
+Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
 Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
 ---
- arch/x86/kernel/asm-offsets_64.c | 15 ++++++++
- arch/x86/kvm/Makefile            |  1 +
- arch/x86/kvm/vmx/seamcall.S      | 64 ++++++++++++++++++++++++++++++++
- arch/x86/kvm/vmx/seamcall.h      | 47 +++++++++++++++++++++++
- 4 files changed, 127 insertions(+)
- create mode 100644 arch/x86/kvm/vmx/seamcall.S
- create mode 100644 arch/x86/kvm/vmx/seamcall.h
+ arch/x86/Kbuild                     |   1 +
+ arch/x86/include/asm/cpufeatures.h  |   2 +
+ arch/x86/include/asm/kvm_boot.h     |  30 +++++
+ arch/x86/kvm/boot/Makefile          |   6 +
+ arch/x86/kvm/boot/seam/tdx_common.c | 167 ++++++++++++++++++++++++++++
+ arch/x86/kvm/boot/seam/tdx_common.h |  13 +++
+ 6 files changed, 219 insertions(+)
+ create mode 100644 arch/x86/include/asm/kvm_boot.h
+ create mode 100644 arch/x86/kvm/boot/Makefile
+ create mode 100644 arch/x86/kvm/boot/seam/tdx_common.c
+ create mode 100644 arch/x86/kvm/boot/seam/tdx_common.h
 
-diff --git a/arch/x86/kernel/asm-offsets_64.c b/arch/x86/kernel/asm-offsets_64.c
-index b14533af7676..c5908bcf3055 100644
---- a/arch/x86/kernel/asm-offsets_64.c
-+++ b/arch/x86/kernel/asm-offsets_64.c
-@@ -9,6 +9,11 @@
- #include <asm/kvm_para.h>
- #endif
+diff --git a/arch/x86/Kbuild b/arch/x86/Kbuild
+index 30dec019756b..4f35eaad7468 100644
+--- a/arch/x86/Kbuild
++++ b/arch/x86/Kbuild
+@@ -4,6 +4,7 @@ obj-y += entry/
+ obj-$(CONFIG_PERF_EVENTS) += events/
  
-+#ifdef CONFIG_KVM_INTEL_TDX
-+#include <linux/kvm_types.h>
-+#include "../kvm/vmx/tdx_arch.h"
-+#endif
-+
- int main(void)
- {
- #ifdef CONFIG_PARAVIRT
-@@ -25,6 +30,16 @@ int main(void)
- 	BLANK();
- #endif
+ obj-$(CONFIG_KVM) += kvm/
++obj-$(subst m,y,$(CONFIG_KVM)) += kvm/boot/
  
-+#ifdef CONFIG_KVM_INTEL_TDX
-+	OFFSET(TDX_SEAM_rcx, tdx_ex_ret, rcx);
-+	OFFSET(TDX_SEAM_rdx, tdx_ex_ret, rdx);
-+	OFFSET(TDX_SEAM_r8,  tdx_ex_ret, r8);
-+	OFFSET(TDX_SEAM_r9,  tdx_ex_ret, r9);
-+	OFFSET(TDX_SEAM_r10, tdx_ex_ret, r10);
-+	OFFSET(TDX_SEAM_r11, tdx_ex_ret, r11);
-+	BLANK();
-+#endif
-+
- #define ENTRY(entry) OFFSET(pt_regs_ ## entry, pt_regs, entry)
- 	ENTRY(bx);
- 	ENTRY(cx);
-diff --git a/arch/x86/kvm/Makefile b/arch/x86/kvm/Makefile
-index c589db5d91b3..60f3e90fef8b 100644
---- a/arch/x86/kvm/Makefile
-+++ b/arch/x86/kvm/Makefile
-@@ -24,6 +24,7 @@ kvm-$(CONFIG_KVM_XEN)	+= xen.o
- kvm-intel-y		+= vmx/vmx.o vmx/vmenter.o vmx/pmu_intel.o vmx/vmcs12.o \
- 			   vmx/evmcs.o vmx/nested.o vmx/posted_intr.o
- kvm-intel-$(CONFIG_X86_SGX_KVM)	+= vmx/sgx.o
-+kvm-intel-$(CONFIG_KVM_INTEL_TDX)	+= vmx/seamcall.o
+ # Xen paravirtualization support
+ obj-$(CONFIG_XEN) += xen/
+diff --git a/arch/x86/include/asm/cpufeatures.h b/arch/x86/include/asm/cpufeatures.h
+index ac37830ae941..fe5cfc013444 100644
+--- a/arch/x86/include/asm/cpufeatures.h
++++ b/arch/x86/include/asm/cpufeatures.h
+@@ -230,6 +230,8 @@
+ #define X86_FEATURE_FLEXPRIORITY	( 8*32+ 2) /* Intel FlexPriority */
+ #define X86_FEATURE_EPT			( 8*32+ 3) /* Intel Extended Page Table */
+ #define X86_FEATURE_VPID		( 8*32+ 4) /* Intel Virtual Processor ID */
++#define X86_FEATURE_SEAM		( 8*32+ 5) /* "" Secure Arbitration Mode */
++#define X86_FEATURE_TDX			( 8*32+ 6) /* Intel Trusted Domain eXtensions */
  
- kvm-amd-y		+= svm/svm.o svm/vmenter.o svm/pmu.o svm/nested.o svm/avic.o svm/sev.o
- 
-diff --git a/arch/x86/kvm/vmx/seamcall.S b/arch/x86/kvm/vmx/seamcall.S
+ #define X86_FEATURE_VMMCALL		( 8*32+15) /* Prefer VMMCALL to VMCALL */
+ #define X86_FEATURE_XENPV		( 8*32+16) /* "" Xen paravirtual guest */
+diff --git a/arch/x86/include/asm/kvm_boot.h b/arch/x86/include/asm/kvm_boot.h
 new file mode 100644
-index 000000000000..08bb2b29deb7
+index 000000000000..3d58d4109566
 --- /dev/null
-+++ b/arch/x86/kvm/vmx/seamcall.S
-@@ -0,0 +1,64 @@
-+/* SPDX-License-Identifier: GPL-2.0 */
-+/* ASM helper to call SEAMCALL for P-SEAMLDR, TDX module */
++++ b/arch/x86/include/asm/kvm_boot.h
+@@ -0,0 +1,30 @@
++/* SPDX-License-Identifier: GPL-2.0-only */
++#ifndef _ASM_X86_KVM_BOOT_H
++#define _ASM_X86_KVM_BOOT_H
 +
-+#include <linux/linkage.h>
++#include <linux/cpumask.h>
++#include <linux/mutex.h>
++#include <linux/smp.h>
++#include <linux/types.h>
++#include <asm/processor.h>
 +
-+#include <asm/alternative.h>
-+#include <asm/asm-offsets.h>
-+#include <asm/frame.h>
-+#include <asm/asm.h>
-+
-+#include "seamcall.h"
++#ifdef CONFIG_KVM_INTEL_TDX
 +
 +/*
-+ * __seamcall - helper function to invoke SEAMCALL to request service
-+ *		of TDX module for KVM.
-+ *
-+ * @op  (RDI)   SEAMCALL leaf ID
-+ * @rcx (RSI)   input 1 (optional based on leaf ID)
-+ * @rdx (RDX)   input 2 (optional based on leaf ID)
-+ * @r8  (RCX)   input 3 (optional based on leaf ID)
-+ * @r9  (R8)    input 4 (optional based on leaf ID)
-+ * @r10 (R9)    input 5 (optional based on leaf ID)
-+ * @ex  stack   pointer to struct tdx_ex_ret. optional return value stored.
-+ *
-+ * @return RAX: completion code of P-SEAMLDR or TDX module
-+ *		0 on success, non-0 on failure
-+ *		trapnumber on fault
++ * Return pointer to TDX system info (TDSYSINFO_STRUCT) if TDX has been
++ * successfully initialized, or NULL.
 + */
-+SYM_FUNC_START(__seamcall)
-+	FRAME_BEGIN
++struct tdsysinfo_struct;
++const struct tdsysinfo_struct *tdx_get_sysinfo(void);
 +
-+	/* shuffle registers from function call ABI to SEAMCALL ABI. */
-+	movq    %r9, %r10
-+	movq    %r8, %r9
-+	movq    %rcx, %r8
-+	/* %rdx doesn't need shuffle. */
-+	movq    %rsi, %rcx
-+	movq    %rdi, %rax
++extern u32 tdx_seam_keyid __ro_after_init;
 +
-+.Lseamcall:
-+	seamcall
-+	jmp	.Lseamcall_ret
-+.Lspurious_fault:
-+	call	kvm_spurious_fault
-+.Lseamcall_ret:
++int tdx_seamcall_on_each_pkg(int (*fn)(void *), void *param);
 +
-+	movq    (FRAME_OFFSET + 8)(%rsp), %rdi
-+	testq   %rdi, %rdi
-+	jz 1f
++/* TDX keyID allocation functions */
++extern int tdx_keyid_alloc(void);
++extern void tdx_keyid_free(int keyid);
 +
-+	/* If ex is non-NULL, store extra return values into it. */
-+	movq    %rcx, TDX_SEAM_rcx(%rdi)
-+	movq    %rdx, TDX_SEAM_rdx(%rdi)
-+	movq    %r8,  TDX_SEAM_r8(%rdi)
-+	movq    %r9,  TDX_SEAM_r9(%rdi)
-+	movq    %r10, TDX_SEAM_r10(%rdi)
-+	movq    %r11, TDX_SEAM_r11(%rdi)
-+
-+1:
-+	FRAME_END
-+	ret
-+
-+	_ASM_EXTABLE(.Lseamcall, .Lspurious_fault)
-+SYM_FUNC_END(__seamcall)
-diff --git a/arch/x86/kvm/vmx/seamcall.h b/arch/x86/kvm/vmx/seamcall.h
-new file mode 100644
-index 000000000000..a318940f62ed
---- /dev/null
-+++ b/arch/x86/kvm/vmx/seamcall.h
-@@ -0,0 +1,47 @@
-+/* SPDX-License-Identifier: GPL-2.0 */
-+#ifndef __KVM_VMX_SEAMCALL_H
-+#define __KVM_VMX_SEAMCALL_H
-+
-+#ifdef __ASSEMBLY__
-+
-+#define seamcall .byte 0x66, 0x0f, 0x01, 0xcf
-+
-+#else
-+
-+#ifndef seamcall
-+struct tdx_ex_ret;
-+asmlinkage u64 __seamcall(u64 op, u64 rcx, u64 rdx, u64 r8, u64 r9, u64 r10,
-+			  struct tdx_ex_ret *ex);
-+
-+#define seamcall(op, rcx, rdx, r8, r9, r10, ex)				\
-+	__seamcall(SEAMCALL_##op, (rcx), (rdx), (r8), (r9), (r10), (ex))
 +#endif
 +
-+static inline void __pr_seamcall_error(u64 op, const char *op_str,
-+				       u64 err, struct tdx_ex_ret *ex)
++#endif /* _ASM_X86_KVM_BOOT_H */
+diff --git a/arch/x86/kvm/boot/Makefile b/arch/x86/kvm/boot/Makefile
+new file mode 100644
+index 000000000000..a85eb5af90d5
+--- /dev/null
++++ b/arch/x86/kvm/boot/Makefile
+@@ -0,0 +1,6 @@
++# SPDX-License-Identifier: GPL-2.0
++
++asflags-y += -I$(srctree)/arch/x86/kvm
++ccflags-y += -I$(srctree)/arch/x86/kvm
++
++obj-$(CONFIG_KVM_INTEL_TDX) += seam/tdx_common.o
+diff --git a/arch/x86/kvm/boot/seam/tdx_common.c b/arch/x86/kvm/boot/seam/tdx_common.c
+new file mode 100644
+index 000000000000..d803dbd11693
+--- /dev/null
++++ b/arch/x86/kvm/boot/seam/tdx_common.c
+@@ -0,0 +1,167 @@
++// SPDX-License-Identifier: GPL-2.0
++/* Common functions/symbols for SEAMLDR and KVM. */
++
++#include <linux/cpuhotplug.h>
++#include <linux/slab.h>
++#include <linux/cpu.h>
++#include <linux/idr.h>
++
++#include <asm/kvm_boot.h>
++
++#include "vmx/tdx_arch.h"
++
++/*
++ * TDX system information returned by TDSYSINFO.
++ */
++struct tdsysinfo_struct tdx_tdsysinfo;
++
++/* KeyID range reserved to TDX by BIOS */
++u32 tdx_keyids_start;
++u32 tdx_nr_keyids;
++
++u32 tdx_seam_keyid __ro_after_init;
++EXPORT_SYMBOL_GPL(tdx_seam_keyid);
++
++/* TDX keyID pool */
++static DEFINE_IDA(tdx_keyid_pool);
++
++static int *tdx_package_masters __ro_after_init;
++
++static int tdx_starting_cpu(unsigned int cpu)
 +{
-+	pr_err_ratelimited("SEAMCALL[%s] failed on cpu %d: 0x%llx\n",
-+			   op_str, smp_processor_id(), (err));
-+	if (ex)
-+		pr_err_ratelimited(
-+			"RCX 0x%llx, RDX 0x%llx, R8 0x%llx, R9 0x%llx, R10 0x%llx, R11 0x%llx\n",
-+			(ex)->rcx, (ex)->rdx, (ex)->r8, (ex)->r9, (ex)->r10,
-+			(ex)->r11);
++	int pkg = topology_physical_package_id(cpu);
++
++	/*
++	 * If this package doesn't have a master CPU for IPI operation, use this
++	 * CPU as package master.
++	 */
++	if (tdx_package_masters && tdx_package_masters[pkg] == -1)
++		tdx_package_masters[pkg] = cpu;
++
++	return 0;
 +}
 +
-+#define pr_seamcall_error(op, err, ex)			\
-+	__pr_seamcall_error(SEAMCALL_##op, #op, (err), (ex))
++static int tdx_dying_cpu(unsigned int cpu)
++{
++	int pkg = topology_physical_package_id(cpu);
++	int other;
 +
-+/* ex is a pointer to struct tdx_ex_ret or NULL. */
-+#define TDX_ERR(err, op, ex)			\
-+({						\
-+	u64 __ret_warn_on = WARN_ON_ONCE(err);	\
-+						\
-+	if (unlikely(__ret_warn_on))		\
-+		pr_seamcall_error(op, err, ex);	\
-+	__ret_warn_on;				\
-+})
++	if (!tdx_package_masters || tdx_package_masters[pkg] != cpu)
++		return 0;
 +
-+#endif
++	/*
++	 * If offlining cpu was used as package master, find other online cpu on
++	 * this package.
++	 */
++	tdx_package_masters[pkg] = -1;
++	for_each_online_cpu(other) {
++		if (other == cpu)
++			continue;
++		if (topology_physical_package_id(other) != pkg)
++			continue;
 +
-+#endif /* __KVM_VMX_SEAMCALL_H */
++		tdx_package_masters[pkg] = other;
++		break;
++	}
++
++	return 0;
++}
++
++/*
++ * Setup one-cpu-per-pkg array to do package-scoped SEAMCALLs. The array is
++ * only necessary if there are multiple packages.
++ */
++int __init init_package_masters(void)
++{
++	int cpu, pkg, nr_filled, nr_pkgs;
++
++	nr_pkgs = topology_max_packages();
++	if (nr_pkgs == 1)
++		return 0;
++
++	tdx_package_masters = kcalloc(nr_pkgs, sizeof(int), GFP_KERNEL);
++	if (!tdx_package_masters)
++		return -ENOMEM;
++
++	memset(tdx_package_masters, -1, nr_pkgs * sizeof(int));
++
++	nr_filled = 0;
++	for_each_online_cpu(cpu) {
++		pkg = topology_physical_package_id(cpu);
++		if (tdx_package_masters[pkg] >= 0)
++			continue;
++
++		tdx_package_masters[pkg] = cpu;
++		if (++nr_filled == topology_max_packages())
++			break;
++	}
++
++	if (WARN_ON(nr_filled != topology_max_packages())) {
++		kfree(tdx_package_masters);
++		return -EIO;
++	}
++
++	if (cpuhp_setup_state_nocalls(CPUHP_AP_ONLINE_DYN, "tdx/cpu:starting",
++				      tdx_starting_cpu, tdx_dying_cpu) < 0) {
++		kfree(tdx_package_masters);
++		return -EIO;
++	}
++
++	return 0;
++}
++
++int tdx_seamcall_on_each_pkg(int (*fn)(void *), void *param)
++{
++	int ret = 0;
++	int i;
++
++	cpus_read_lock();
++	if (!tdx_package_masters) {
++		ret = fn(param);
++		goto out;
++	}
++
++	for (i = 0; i < topology_max_packages(); i++) {
++		ret = smp_call_on_cpu(tdx_package_masters[i], fn, param, 1);
++		if (ret)
++			break;
++	}
++
++out:
++	cpus_read_unlock();
++	return ret;
++}
++EXPORT_SYMBOL_GPL(tdx_seamcall_on_each_pkg);
++
++const struct tdsysinfo_struct *tdx_get_sysinfo(void)
++{
++	if (boot_cpu_has(X86_FEATURE_TDX))
++		return &tdx_tdsysinfo;
++
++	return NULL;
++}
++EXPORT_SYMBOL_GPL(tdx_get_sysinfo);
++
++int tdx_keyid_alloc(void)
++{
++	if (!boot_cpu_has(X86_FEATURE_TDX))
++		return -EINVAL;
++
++	if (WARN_ON_ONCE(!tdx_keyids_start || !tdx_nr_keyids))
++		return -EINVAL;
++
++	/* The first keyID is reserved for the global key. */
++	return ida_alloc_range(&tdx_keyid_pool, tdx_keyids_start + 1,
++			       tdx_keyids_start + tdx_nr_keyids - 1,
++			       GFP_KERNEL);
++}
++EXPORT_SYMBOL_GPL(tdx_keyid_alloc);
++
++void tdx_keyid_free(int keyid)
++{
++	if (!keyid || keyid < 0)
++		return;
++
++	ida_free(&tdx_keyid_pool, keyid);
++}
++EXPORT_SYMBOL_GPL(tdx_keyid_free);
+diff --git a/arch/x86/kvm/boot/seam/tdx_common.h b/arch/x86/kvm/boot/seam/tdx_common.h
+new file mode 100644
+index 000000000000..6f94ebb2b815
+--- /dev/null
++++ b/arch/x86/kvm/boot/seam/tdx_common.h
+@@ -0,0 +1,13 @@
++/* SPDX-License-Identifier: GPL-2.0 */
++/* common functions/symbols used by SEAMLDR and KVM */
++
++#ifndef __BOOT_SEAM_TDX_COMMON_H
++#define __BOOT_SEAM_TDX_COMMON_H
++
++extern struct tdsysinfo_struct tdx_tdsysinfo;
++extern u32 tdx_keyids_start;
++extern u32 tdx_nr_keyids;
++
++int __init init_package_masters(void);
++
++#endif /* __BOOT_SEAM_TDX_COMMON_H */
 -- 
 2.25.1
 
