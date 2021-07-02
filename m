@@ -2,24 +2,24 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4624F3BA559
-	for <lists+kvm@lfdr.de>; Sat,  3 Jul 2021 00:05:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E9C813BA558
+	for <lists+kvm@lfdr.de>; Sat,  3 Jul 2021 00:05:21 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232987AbhGBWHx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 2 Jul 2021 18:07:53 -0400
+        id S230266AbhGBWHw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 2 Jul 2021 18:07:52 -0400
 Received: from mga02.intel.com ([134.134.136.20]:51166 "EHLO mga02.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S230185AbhGBWHw (ORCPT <rfc822;kvm@vger.kernel.org>);
+        id S229648AbhGBWHw (ORCPT <rfc822;kvm@vger.kernel.org>);
         Fri, 2 Jul 2021 18:07:52 -0400
-X-IronPort-AV: E=McAfee;i="6200,9189,10033"; a="195951879"
+X-IronPort-AV: E=McAfee;i="6200,9189,10033"; a="195951880"
 X-IronPort-AV: E=Sophos;i="5.83,320,1616482800"; 
-   d="scan'208";a="195951879"
+   d="scan'208";a="195951880"
 Received: from fmsmga006.fm.intel.com ([10.253.24.20])
   by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Jul 2021 15:05:19 -0700
 X-IronPort-AV: E=Sophos;i="5.83,320,1616482800"; 
-   d="scan'208";a="642814663"
+   d="scan'208";a="642814667"
 Received: from ls.sc.intel.com (HELO localhost) ([143.183.96.54])
-  by fmsmga006-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Jul 2021 15:05:18 -0700
+  by fmsmga006-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Jul 2021 15:05:19 -0700
 From:   isaku.yamahata@intel.com
 To:     Thomas Gleixner <tglx@linutronix.de>,
         Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
@@ -33,10 +33,12 @@ To:     Thomas Gleixner <tglx@linutronix.de>,
         Sean Christopherson <seanjc@google.com>, x86@kernel.org,
         linux-kernel@vger.kernel.org, kvm@vger.kernel.org
 Cc:     isaku.yamahata@intel.com, isaku.yamahata@gmail.com
-Subject: [RFC PATCH v2 00/69] KVM: X86: TDX support
-Date:   Fri,  2 Jul 2021 15:04:06 -0700
-Message-Id: <cover.1625186503.git.isaku.yamahata@intel.com>
+Subject: [RFC PATCH v2 01/69] KVM: TDX: introduce config for KVM TDX support
+Date:   Fri,  2 Jul 2021 15:04:07 -0700
+Message-Id: <2f265006e5cee03a5a48448c51c3632391e58ec7.1625186503.git.isaku.yamahata@intel.com>
 X-Mailer: git-send-email 2.25.1
+In-Reply-To: <cover.1625186503.git.isaku.yamahata@intel.com>
+References: <cover.1625186503.git.isaku.yamahata@intel.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
@@ -45,238 +47,36 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Isaku Yamahata <isaku.yamahata@intel.com>
 
-* What's TDX?
-TDX stands for Trust Domain Extensions which isolates VMs from the
-virtual-machine manager (VMM)/hypervisor and any other software on the
-platform. [1] For details, the specifications, [2], [3], [4], [5], [6], [7], are
-available.
+Add new config KVM_INTEL_TDX for KVM TDX support.  This patch introduce
+a config only.  Later patch will implement feature depends on it.
 
+Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
+---
+ arch/x86/kvm/Kconfig | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
 
-* The goal of this RFC patch
-The purpose of this post is to get feedback early on high level design issue of
-KVM enhancement for TDX. The detailed coding (variable naming etc) is not cared
-of. This patch series is incomplete (not working). So it's RFC.  Although
-multiple software components, not only KVM but also QEMU, guest Linux and
-virtual bios, need to be updated, this includes only KVM VMM part. For those who
-are curious to changes to other component, there are public repositories at
-github. [8], [9]
-
-
-* Patch organization
-The patch 66 is main change.  The preceding patches(1-65) The preceding
-patches(01-61) are refactoring the code and introducing additional hooks.
-
-- 01-12: They are preparations. introduce architecture constants, code
-         refactoring, export symbols for following patches.
-- 13-40: start to introduce the new type of VM and allow the coexistence of
-         multiple type of VM. allow/disallow KVM ioctl where
-         appropriate. Especially make per-system ioctl to per-VM ioctl.
-- 41-65: refactoring KVM VMX/MMU and adding new hooks for Secure EPT.
-- 66:    main patch to add "basic" support for building/running TDX.
-- 67:    trace points for
-- 68-69:  Documentation
-
-* TODOs
-Those major features are missing from this patch series to keep this patch
-series small.
-
-- load/initialize TDX module
-  split out from this patch series.
-- unmapping private page
-  Will integrate Kirill's patch to show how kvm will utilize it.
-- qemu gdb stub support
-- Large page support
-- guest PMU support
-- TDP MMU support
-- and more
-
-Changes from v1:
-- rebase to v5.13
-- drop load/initialization of TDX module
-- catch up the update of related specifications.
-- rework on C-wrapper function to invoke seamcall
-- various code clean up
-
-[1] TDX specification
-   https://software.intel.com/content/www/us/en/develop/articles/intel-trust-domain-extensions.html
-[2] Intel Trust Domain Extensions (Intel TDX)
-   https://software.intel.com/content/dam/develop/external/us/en/documents/tdx-whitepaper-final9-17.pdf
-[3] Intel CPU Architectural Extensions Specification
-   https://software.intel.com/content/dam/develop/external/us/en/documents-tps/intel-tdx-cpu-architectural-specification.pdf
-[4] Intel TDX Module 1.0 EAS
-   https://software.intel.com/content/dam/develop/external/us/en/documents/tdx-module-1eas-v0.85.039.pdf
-[5] Intel TDX Loader Interface Specification
-  https://software.intel.com/content/dam/develop/external/us/en/documents-tps/intel-tdx-seamldr-interface-specification.pdf
-[6] Intel TDX Guest-Hypervisor Communication Interface
-   https://software.intel.com/content/dam/develop/external/us/en/documents/intel-tdx-guest-hypervisor-communication-interface.pdf
-[7] Intel TDX Virtual Firmware Design Guide
-   https://software.intel.com/content/dam/develop/external/us/en/documents/tdx-virtual-firmware-design-guide-rev-1.pdf
-[8] intel public github
-   kvm TDX branch: https://github.com/intel/tdx/tree/kvm
-   TDX guest branch: https://github.com/intel/tdx/tree/guest
-   qemu TDX https://github.com/intel/qemu-tdx
-[9] TDVF
-    https://github.com/tianocore/edk2-staging/tree/TDVF
-
-Isaku Yamahata (11):
-  KVM: TDX: introduce config for KVM TDX support
-  KVM: X86: move kvm_cpu_vmxon() from vmx.c to virtext.h
-  KVM: X86: move out the definition vmcs_hdr/vmcs from kvm to x86
-  KVM: TDX: add a helper function for kvm to call seamcall
-  KVM: TDX: add trace point before/after TDX SEAMCALLs
-  KVM: TDX: Print the name of SEAMCALL status code
-  KVM: Add per-VM flag to mark read-only memory as unsupported
-  KVM: x86: add per-VM flags to disable SMI/INIT/SIPI
-  KVM: TDX: add trace point for TDVMCALL and SEPT operation
-  KVM: TDX: add document on TDX MODULE
-  Documentation/virtual/kvm: Add Trust Domain Extensions(TDX)
-
-Kai Huang (2):
-  KVM: x86: Add per-VM flag to disable in-kernel I/O APIC and level
-    routes
-  cpu/hotplug: Document that TDX also depends on booting CPUs once
-
-Rick Edgecombe (1):
-  KVM: x86: Add infrastructure for stolen GPA bits
-
-Sean Christopherson (53):
-  KVM: TDX: Add TDX "architectural" error codes
-  KVM: TDX: Add architectural definitions for structures and values
-  KVM: TDX: define and export helper functions for KVM TDX support
-  KVM: TDX: Add C wrapper functions for TDX SEAMCALLs
-  KVM: Export kvm_io_bus_read for use by TDX for PV MMIO
-  KVM: Enable hardware before doing arch VM initialization
-  KVM: x86: Split core of hypercall emulation to helper function
-  KVM: x86: Export kvm_mmio tracepoint for use by TDX for PV MMIO
-  KVM: x86/mmu: Zap only leaf SPTEs for deleted/moved memslot by default
-  KVM: Add infrastructure and macro to mark VM as bugged
-  KVM: Export kvm_make_all_cpus_request() for use in marking VMs as
-    bugged
-  KVM: x86: Use KVM_BUG/KVM_BUG_ON to handle bugs that are fatal to the
-    VM
-  KVM: x86/mmu: Mark VM as bugged if page fault returns RET_PF_INVALID
-  KVM: Add max_vcpus field in common 'struct kvm'
-  KVM: x86: Add vm_type to differentiate legacy VMs from protected VMs
-  KVM: x86: Hoist kvm_dirty_regs check out of sync_regs()
-  KVM: x86: Introduce "protected guest" concept and block disallowed
-    ioctls
-  KVM: x86: Add per-VM flag to disable direct IRQ injection
-  KVM: x86: Add flag to disallow #MC injection / KVM_X86_SETUP_MCE
-  KVM: x86: Add flag to mark TSC as immutable (for TDX)
-  KVM: Add per-VM flag to disable dirty logging of memslots for TDs
-  KVM: x86: Allow host-initiated WRMSR to set X2APIC regardless of CPUID
-  KVM: x86: Add kvm_x86_ops .cache_gprs() and .flush_gprs()
-  KVM: x86: Add support for vCPU and device-scoped KVM_MEMORY_ENCRYPT_OP
-  KVM: x86: Introduce vm_teardown() hook in kvm_arch_vm_destroy()
-  KVM: x86: Add a switch_db_regs flag to handle TDX's auto-switched
-    behavior
-  KVM: x86: Check for pending APICv interrupt in kvm_vcpu_has_events()
-  KVM: x86: Add option to force LAPIC expiration wait
-  KVM: x86: Add guest_supported_xss placholder
-  KVM: Export kvm_is_reserved_pfn() for use by TDX
-  KVM: x86/mmu: Explicitly check for MMIO spte in fast page fault
-  KVM: x86/mmu: Allow non-zero init value for shadow PTE
-  KVM: x86/mmu: Refactor shadow walk in __direct_map() to reduce
-    indentation
-  KVM: x86/mmu: Return old SPTE from mmu_spte_clear_track_bits()
-  KVM: x86/mmu: Frame in support for private/inaccessible shadow pages
-  KVM: x86/mmu: Move 'pfn' variable to caller of direct_page_fault()
-  KVM: x86/mmu: Introduce kvm_mmu_map_tdp_page() for use by TDX
-  KVM: VMX: Modify NMI and INTR handlers to take intr_info as param
-  KVM: VMX: Move NMI/exception handler to common helper
-  KVM: x86/mmu: Allow per-VM override of the TDP max page level
-  KVM: VMX: Split out guts of EPT violation to common/exposed function
-  KVM: VMX: Define EPT Violation architectural bits
-  KVM: VMX: Define VMCS encodings for shared EPT pointer
-  KVM: VMX: Add 'main.c' to wrap VMX and TDX
-  KVM: VMX: Move setting of EPT MMU masks to common VT-x code
-  KVM: VMX: Move register caching logic to common code
-  KVM: TDX: Define TDCALL exit reason
-  KVM: TDX: Stub in tdx.h with structs, accessors, and VMCS helpers
-  KVM: VMX: Add macro framework to read/write VMCS for VMs and TDs
-  KVM: VMX: Move AR_BYTES encoder/decoder helpers to common.h
-  KVM: VMX: MOVE GDT and IDT accessors to common code
-  KVM: VMX: Move .get_interrupt_shadow() implementation to common VMX
-    code
-  KVM: TDX: Add "basic" support for building and running Trust Domains
-
-Xiaoyao Li (2):
-  KVM: TDX: Introduce pr_seamcall_ex_ret_info() to print more info when
-    SEAMCALL fails
-  KVM: X86: Introduce initial_tsc_khz in struct kvm_arch
-
- Documentation/virt/kvm/api.rst        |    6 +-
- Documentation/virt/kvm/intel-tdx.rst  |  441 ++++++
- Documentation/virt/kvm/tdx-module.rst |   48 +
- arch/arm64/include/asm/kvm_host.h     |    3 -
- arch/arm64/kvm/arm.c                  |    7 +-
- arch/arm64/kvm/vgic/vgic-init.c       |    6 +-
- arch/x86/Kbuild                       |    1 +
- arch/x86/include/asm/cpufeatures.h    |    2 +
- arch/x86/include/asm/kvm-x86-ops.h    |    8 +
- arch/x86/include/asm/kvm_boot.h       |   30 +
- arch/x86/include/asm/kvm_host.h       |   55 +-
- arch/x86/include/asm/virtext.h        |   25 +
- arch/x86/include/asm/vmx.h            |   17 +
- arch/x86/include/uapi/asm/kvm.h       |   60 +
- arch/x86/include/uapi/asm/vmx.h       |    7 +-
- arch/x86/kernel/asm-offsets_64.c      |   15 +
- arch/x86/kvm/Kconfig                  |   11 +
- arch/x86/kvm/Makefile                 |    3 +-
- arch/x86/kvm/boot/Makefile            |    6 +
- arch/x86/kvm/boot/seam/tdx_common.c   |  242 +++
- arch/x86/kvm/boot/seam/tdx_common.h   |   13 +
- arch/x86/kvm/ioapic.c                 |    4 +
- arch/x86/kvm/irq_comm.c               |   13 +-
- arch/x86/kvm/lapic.c                  |    7 +-
- arch/x86/kvm/lapic.h                  |    2 +-
- arch/x86/kvm/mmu.h                    |   31 +-
- arch/x86/kvm/mmu/mmu.c                |  526 +++++--
- arch/x86/kvm/mmu/mmu_internal.h       |    3 +
- arch/x86/kvm/mmu/paging_tmpl.h        |   25 +-
- arch/x86/kvm/mmu/spte.c               |   15 +-
- arch/x86/kvm/mmu/spte.h               |   18 +-
- arch/x86/kvm/svm/svm.c                |   18 +-
- arch/x86/kvm/trace.h                  |  138 ++
- arch/x86/kvm/vmx/common.h             |  178 +++
- arch/x86/kvm/vmx/main.c               | 1098 ++++++++++++++
- arch/x86/kvm/vmx/posted_intr.c        |    6 +
- arch/x86/kvm/vmx/seamcall.S           |   64 +
- arch/x86/kvm/vmx/seamcall.h           |   68 +
- arch/x86/kvm/vmx/tdx.c                | 1958 +++++++++++++++++++++++++
- arch/x86/kvm/vmx/tdx.h                |  267 ++++
- arch/x86/kvm/vmx/tdx_arch.h           |  370 +++++
- arch/x86/kvm/vmx/tdx_errno.h          |  202 +++
- arch/x86/kvm/vmx/tdx_ops.h            |  218 +++
- arch/x86/kvm/vmx/tdx_stubs.c          |   45 +
- arch/x86/kvm/vmx/vmcs.h               |   11 -
- arch/x86/kvm/vmx/vmenter.S            |  146 ++
- arch/x86/kvm/vmx/vmx.c                |  509 ++-----
- arch/x86/kvm/x86.c                    |  285 +++-
- include/linux/kvm_host.h              |   51 +-
- include/uapi/linux/kvm.h              |    2 +
- kernel/cpu.c                          |    4 +
- tools/arch/x86/include/uapi/asm/kvm.h |   55 +
- tools/include/uapi/linux/kvm.h        |    2 +
- virt/kvm/kvm_main.c                   |   44 +-
- 54 files changed, 6717 insertions(+), 672 deletions(-)
- create mode 100644 Documentation/virt/kvm/intel-tdx.rst
- create mode 100644 Documentation/virt/kvm/tdx-module.rst
- create mode 100644 arch/x86/include/asm/kvm_boot.h
- create mode 100644 arch/x86/kvm/boot/Makefile
- create mode 100644 arch/x86/kvm/boot/seam/tdx_common.c
- create mode 100644 arch/x86/kvm/boot/seam/tdx_common.h
- create mode 100644 arch/x86/kvm/vmx/common.h
- create mode 100644 arch/x86/kvm/vmx/main.c
- create mode 100644 arch/x86/kvm/vmx/seamcall.S
- create mode 100644 arch/x86/kvm/vmx/seamcall.h
- create mode 100644 arch/x86/kvm/vmx/tdx.c
- create mode 100644 arch/x86/kvm/vmx/tdx.h
- create mode 100644 arch/x86/kvm/vmx/tdx_arch.h
- create mode 100644 arch/x86/kvm/vmx/tdx_errno.h
- create mode 100644 arch/x86/kvm/vmx/tdx_ops.h
- create mode 100644 arch/x86/kvm/vmx/tdx_stubs.c
-
+diff --git a/arch/x86/kvm/Kconfig b/arch/x86/kvm/Kconfig
+index f6b93a35ce14..66622901bf7d 100644
+--- a/arch/x86/kvm/Kconfig
++++ b/arch/x86/kvm/Kconfig
+@@ -96,6 +96,17 @@ config X86_SGX_KVM
+ 
+ 	  If unsure, say N.
+ 
++config KVM_INTEL_TDX
++	bool "Trusted Domain eXtensions(TDX) Host support"
++	depends on KVM_INTEL && X86_64
++	select FW_LOADER
++
++	help
++	  Extends KVM on Intel processors to support Trusted Domain Extensions.
++	  Intel Trust Domain eXtensions(TDX) is an architecture based on CPU
++	  instructions and TDX module to deploy hardware-isolated virtual
++	  machines(VMs) which is called Trust Domains(TDs).
++
+ config KVM_AMD
+ 	tristate "KVM for AMD processors support"
+ 	depends on KVM
 -- 
 2.25.1
 
