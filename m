@@ -2,203 +2,132 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 958943BA7FC
-	for <lists+kvm@lfdr.de>; Sat,  3 Jul 2021 11:04:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8E0953BA971
+	for <lists+kvm@lfdr.de>; Sat,  3 Jul 2021 18:20:03 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229997AbhGCJGs (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 3 Jul 2021 05:06:48 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:48409 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229582AbhGCJGs (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Sat, 3 Jul 2021 05:06:48 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1625303054;
+        id S229788AbhGCQWb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 3 Jul 2021 12:22:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40824 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229497AbhGCQWa (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 3 Jul 2021 12:22:30 -0400
+Received: from mail.skyhub.de (mail.skyhub.de [IPv6:2a01:4f8:190:11c2::b:1457])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B4AECC061762;
+        Sat,  3 Jul 2021 09:19:56 -0700 (PDT)
+Received: from zn.tnic (p200300ec2f289e0085c7d3fefeb66b8e.dip0.t-ipconnect.de [IPv6:2003:ec:2f28:9e00:85c7:d3fe:feb6:6b8e])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 1282F1EC047F;
+        Sat,  3 Jul 2021 18:19:55 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
+        t=1625329195;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=TVu0raAXHHac8RYBeboQlPHsVSFx1+2WCdPZevKx+R0=;
-        b=bjQgOb/5RRvOvqllzgsRD5ilBpIa3+VGvoeweNL5oDHKP4kX857jMyFUTmsNzfMgzLvqEj
-        oxmvsnLey+a0MHVR9+rjOk07jm7dckz7f4cijEL8vLeMhoQgh2XLmFs9NaR7rV+DUu7nLZ
-        e0B0yLeQB4zFQZ2ujlJGi/jIC4qrCuo=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-477-VxCWjosvOYCeUmizuuSSPQ-1; Sat, 03 Jul 2021 05:04:13 -0400
-X-MC-Unique: VxCWjosvOYCeUmizuuSSPQ-1
-Received: by mail-wm1-f72.google.com with SMTP id n37-20020a05600c3ba5b02901fe49ba3bd0so1947444wms.1
-        for <kvm@vger.kernel.org>; Sat, 03 Jul 2021 02:04:13 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=TVu0raAXHHac8RYBeboQlPHsVSFx1+2WCdPZevKx+R0=;
-        b=io0hO3Yp0ZlzUgkOFIA/cq45HEjtYaTwpX90jJz/zOj6TpCafO9vY14I7CffpOYAUc
-         CZhiep2hpCwcCY4uig11qgf61XzzeH9KR+yC9Ei0EFUgUzh4sxbgcuI6AcyWTAvf1MNo
-         TM4WQrdMkUvax7Q3dJLifDRJwKRnpaZVSy8uifyMbTJ5uo6+GH30vKO0JXAEZlmM5Rv/
-         NXPvAPTWAZNfYUvD888p0wIKSvHFes4KLHaVM7j99XsxE45j4K5XnS+H3xr/j3grt/Th
-         40sSN4PXyoj5lOb7CFRT8aWZQxYIL1KyIlZCaCqmWgDYl0IdYL8RUfyFZ7dvDugI1I+K
-         U84Q==
-X-Gm-Message-State: AOAM533UgdF+/wWxwp3cAcXGXlcQMBCxnXv/rj6qoWkGtwevNFjBeL8t
-        U6g7dsYeRxwEYir3S40u+AVL1ppVzwzKSt5crrYQKqVNddUwLzcI3V7lYYjYcdFV1CWFkZcdNRP
-        fPFUnHdxvq8K1
-X-Received: by 2002:a05:600c:1d06:: with SMTP id l6mr1310981wms.111.1625303051843;
-        Sat, 03 Jul 2021 02:04:11 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwBiMbxnrnsML4eQwt8oUtcimEaS5j9QhAj9zlj+jkBSqLAfDER1GiUjarz9whoxVL6duyUJw==
-X-Received: by 2002:a05:600c:1d06:: with SMTP id l6mr1310965wms.111.1625303051644;
-        Sat, 03 Jul 2021 02:04:11 -0700 (PDT)
-Received: from redhat.com ([2.55.4.39])
-        by smtp.gmail.com with ESMTPSA id 2sm5714024wrz.87.2021.07.03.02.04.09
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 03 Jul 2021 02:04:11 -0700 (PDT)
-Date:   Sat, 3 Jul 2021 05:04:07 -0400
-From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     kernel test robot <lkp@intel.com>
-Cc:     Zhu Lingshan <lingshan.zhu@intel.com>, jasowang@redhat.com,
-        clang-built-linux@googlegroups.com, kbuild-all@lists.01.org,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        kvm@vger.kernel.org
-Subject: Re: [PATCH 2/3] vDPA/ifcvf: implement management netlink framework
- for ifcvf
-Message-ID: <20210703050320-mutt-send-email-mst@kernel.org>
-References: <20210630082145.5729-3-lingshan.zhu@intel.com>
- <202107010221.pN7dwv6A-lkp@intel.com>
+         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
+        bh=upKFgpUh0zZ782nZABcY/RNBj8bd/OadOyw5te8iHZc=;
+        b=NudzYXsG646/+XcrvCCfobxDIXDqoINAGQsj0E1AkwVZlvZjqXEC4Q/LmnHdK/BN54pmaw
+        JFsqB2fy+zUTz07NLLpEzLpX8tb+BSpe+VA0CqnOJO8wCl7siWJe7RndUF0FD5wSiMEe/r
+        qnuIbLGmBy99uqaqdSvureQd8IDQa2A=
+Date:   Sat, 3 Jul 2021 18:19:47 +0200
+From:   Borislav Petkov <bp@alien8.de>
+To:     Brijesh Singh <brijesh.singh@amd.com>
+Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
+        linux-coco@lists.linux.dev, linux-mm@kvack.org,
+        linux-crypto@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        David Rientjes <rientjes@google.com>, tony.luck@intel.com,
+        npmccallum@redhat.com, Dov Murik <dovmurik@linux.ibm.com>
+Subject: Re: [PATCH Part1 RFC v3 22/22] virt: Add SEV-SNP guest driver
+Message-ID: <YOCOIy1AW5RUfbx4@zn.tnic>
+References: <20210602140416.23573-1-brijesh.singh@amd.com>
+ <20210602140416.23573-23-brijesh.singh@amd.com>
+ <YNxzJ2I3ZumTELLb@zn.tnic>
+ <46499161-0106-3ae9-9688-0afd9076b28b@amd.com>
+ <YN4DixahyShxyyCv@zn.tnic>
+ <5b4d20db-3013-4411-03b9-708dd18dbe64@amd.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <202107010221.pN7dwv6A-lkp@intel.com>
+In-Reply-To: <5b4d20db-3013-4411-03b9-708dd18dbe64@amd.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jul 01, 2021 at 03:04:09AM +0800, kernel test robot wrote:
-> Hi Zhu,
-> 
-> Thank you for the patch! Perhaps something to improve:
-> 
-> [auto build test WARNING on linus/master]
-> [also build test WARNING on v5.13 next-20210630]
-> [If your patch is applied to the wrong git tree, kindly drop us a note.
-> And when submitting patch, we suggest to use '--base' as documented in
-> https://git-scm.com/docs/git-format-patch]
-> 
-> url:    https://github.com/0day-ci/linux/commits/Zhu-Lingshan/vDPA-ifcvf-implement-management-netlink-framework/20210630-162940
-> base:   https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git 007b350a58754a93ca9fe50c498cc27780171153
-> config: x86_64-randconfig-a015-20210630 (attached as .config)
-> compiler: clang version 13.0.0 (https://github.com/llvm/llvm-project 8d21d5472501460933e78aead04cf59579025ba4)
-> reproduce (this is a W=1 build):
->         wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
->         chmod +x ~/bin/make.cross
->         # install x86_64 cross compiling tool for clang build
->         # apt-get install binutils-x86-64-linux-gnu
->         # https://github.com/0day-ci/linux/commit/7ea782fbd896e1a5b3c01b29f4929773748a525f
->         git remote add linux-review https://github.com/0day-ci/linux
->         git fetch --no-tags linux-review Zhu-Lingshan/vDPA-ifcvf-implement-management-netlink-framework/20210630-162940
->         git checkout 7ea782fbd896e1a5b3c01b29f4929773748a525f
->         # save the attached .config to linux build tree
->         COMPILER_INSTALL_PATH=$HOME/0day COMPILER=clang make.cross ARCH=x86_64 
-> 
-> If you fix the issue, kindly add following tag as appropriate
-> Reported-by: kernel test robot <lkp@intel.com>
-> 
-> All warnings (new ones prefixed by >>):
-> 
-> >> drivers/vdpa/ifcvf/ifcvf_main.c:612:14: warning: variable 'adapter' is uninitialized when used here [-Wuninitialized]
->            put_device(&adapter->vdpa.dev);
->                        ^~~~~~~
->    drivers/vdpa/ifcvf/ifcvf_main.c:546:31: note: initialize the variable 'adapter' to silence this warning
->            struct ifcvf_adapter *adapter;
->                                         ^
->                                          = NULL
->    1 warning generated.
-> 
+On Thu, Jul 01, 2021 at 04:32:25PM -0500, Brijesh Singh wrote:
+> The spec definition is present in include/linux/psp-sev.h but sometime
+> we don't expose the spec defs as-is to userspace.
 
+Why?
 
-Actually the problem is real and this is almost surely the wrong fix.
-We need an extra label to skip using put_device when adapter was not
-yet initialized.
+Having such undocumented and maybe unwarranted differences - I still
+don't see a clear reason why - is calling for additional and unnecessary
+confusion.
 
+> Several SEV/SEV-SNP does not need to be exposed to the userspace,
+> those which need to be expose we provide a bit modified Linux uapi for
+> it, and for SEV drivers we choose "_user" prefix.
 
+Is that documented somewhere?
 
-> vim +/adapter +612 drivers/vdpa/ifcvf/ifcvf_main.c
+Because "user" doesn't tell me it is a modified structure which is
+different from the spec.
+
+> e.g
+> a spec definition for the PEK import in include/linux/psp-sev.h is:
+> struct sev_data_pek_cert_import {
+> 	u64 pdh_cert_address;  /* system physical address */
+> 	u32 pdh_cert_len;
+> 	u32 reserved;
+> 	...
+> };
 > 
-> 7ea782fbd896e1 drivers/vdpa/ifcvf/ifcvf_main.c        Zhu Lingshan 2021-06-30  541  
-> 7ea782fbd896e1 drivers/vdpa/ifcvf/ifcvf_main.c        Zhu Lingshan 2021-06-30  542  static int ifcvf_probe(struct pci_dev *pdev, const struct pci_device_id *id)
-> 7ea782fbd896e1 drivers/vdpa/ifcvf/ifcvf_main.c        Zhu Lingshan 2021-06-30  543  {
-> 7ea782fbd896e1 drivers/vdpa/ifcvf/ifcvf_main.c        Zhu Lingshan 2021-06-30  544  	struct ifcvf_vdpa_mgmt_dev *ifcvf_mgmt_dev;
-> 7ea782fbd896e1 drivers/vdpa/ifcvf/ifcvf_main.c        Zhu Lingshan 2021-06-30  545  	struct device *dev = &pdev->dev;
-> 7ea782fbd896e1 drivers/vdpa/ifcvf/ifcvf_main.c        Zhu Lingshan 2021-06-30  546  	struct ifcvf_adapter *adapter;
-> 7ea782fbd896e1 drivers/vdpa/ifcvf/ifcvf_main.c        Zhu Lingshan 2021-06-30  547  	u32 dev_type;
-> 7ea782fbd896e1 drivers/vdpa/ifcvf/ifcvf_main.c        Zhu Lingshan 2021-06-30  548  	int ret;
-> 7ea782fbd896e1 drivers/vdpa/ifcvf/ifcvf_main.c        Zhu Lingshan 2021-06-30  549  
-> 7ea782fbd896e1 drivers/vdpa/ifcvf/ifcvf_main.c        Zhu Lingshan 2021-06-30  550  	ifcvf_mgmt_dev = kzalloc(sizeof(struct ifcvf_vdpa_mgmt_dev), GFP_KERNEL);
-> 7ea782fbd896e1 drivers/vdpa/ifcvf/ifcvf_main.c        Zhu Lingshan 2021-06-30  551  	if (!ifcvf_mgmt_dev) {
-> 7ea782fbd896e1 drivers/vdpa/ifcvf/ifcvf_main.c        Zhu Lingshan 2021-06-30  552  		IFCVF_ERR(pdev, "Failed to alloc memory for the vDPA management device\n");
-> 7ea782fbd896e1 drivers/vdpa/ifcvf/ifcvf_main.c        Zhu Lingshan 2021-06-30  553  		return -ENOMEM;
-> 7ea782fbd896e1 drivers/vdpa/ifcvf/ifcvf_main.c        Zhu Lingshan 2021-06-30  554  	}
-> 7ea782fbd896e1 drivers/vdpa/ifcvf/ifcvf_main.c        Zhu Lingshan 2021-06-30  555  
-> 7ea782fbd896e1 drivers/vdpa/ifcvf/ifcvf_main.c        Zhu Lingshan 2021-06-30  556  	dev_type = get_dev_type(pdev);
-> 7ea782fbd896e1 drivers/vdpa/ifcvf/ifcvf_main.c        Zhu Lingshan 2021-06-30  557  	switch (dev_type) {
-> 7ea782fbd896e1 drivers/vdpa/ifcvf/ifcvf_main.c        Zhu Lingshan 2021-06-30  558  	case VIRTIO_ID_NET:
-> 7ea782fbd896e1 drivers/vdpa/ifcvf/ifcvf_main.c        Zhu Lingshan 2021-06-30  559  		ifcvf_mgmt_dev->mdev.id_table = id_table_net;
-> 7ea782fbd896e1 drivers/vdpa/ifcvf/ifcvf_main.c        Zhu Lingshan 2021-06-30  560  		break;
-> 7ea782fbd896e1 drivers/vdpa/ifcvf/ifcvf_main.c        Zhu Lingshan 2021-06-30  561  	case VIRTIO_ID_BLOCK:
-> 7ea782fbd896e1 drivers/vdpa/ifcvf/ifcvf_main.c        Zhu Lingshan 2021-06-30  562  		ifcvf_mgmt_dev->mdev.id_table = id_table_blk;
-> 7ea782fbd896e1 drivers/vdpa/ifcvf/ifcvf_main.c        Zhu Lingshan 2021-06-30  563  		break;
-> 7ea782fbd896e1 drivers/vdpa/ifcvf/ifcvf_main.c        Zhu Lingshan 2021-06-30  564  	default:
-> 7ea782fbd896e1 drivers/vdpa/ifcvf/ifcvf_main.c        Zhu Lingshan 2021-06-30  565  		IFCVF_ERR(pdev, "VIRTIO ID %u not supported\n", dev_type);
-> 7ea782fbd896e1 drivers/vdpa/ifcvf/ifcvf_main.c        Zhu Lingshan 2021-06-30  566  		ret = -EOPNOTSUPP;
-> 7ea782fbd896e1 drivers/vdpa/ifcvf/ifcvf_main.c        Zhu Lingshan 2021-06-30  567  		goto err;
-> 7ea782fbd896e1 drivers/vdpa/ifcvf/ifcvf_main.c        Zhu Lingshan 2021-06-30  568  	}
-> 7ea782fbd896e1 drivers/vdpa/ifcvf/ifcvf_main.c        Zhu Lingshan 2021-06-30  569  
-> 7ea782fbd896e1 drivers/vdpa/ifcvf/ifcvf_main.c        Zhu Lingshan 2021-06-30  570  	ifcvf_mgmt_dev->mdev.ops = &ifcvf_vdpa_mgmt_dev_ops;
-> 7ea782fbd896e1 drivers/vdpa/ifcvf/ifcvf_main.c        Zhu Lingshan 2021-06-30  571  	ifcvf_mgmt_dev->mdev.device = dev;
-> 7ea782fbd896e1 drivers/vdpa/ifcvf/ifcvf_main.c        Zhu Lingshan 2021-06-30  572  	ifcvf_mgmt_dev->pdev = pdev;
-> 7ea782fbd896e1 drivers/vdpa/ifcvf/ifcvf_main.c        Zhu Lingshan 2021-06-30  573  
-> 7ea782fbd896e1 drivers/vdpa/ifcvf/ifcvf_main.c        Zhu Lingshan 2021-06-30  574  	ret = pcim_enable_device(pdev);
-> 7ea782fbd896e1 drivers/vdpa/ifcvf/ifcvf_main.c        Zhu Lingshan 2021-06-30  575  	if (ret) {
-> 7ea782fbd896e1 drivers/vdpa/ifcvf/ifcvf_main.c        Zhu Lingshan 2021-06-30  576  		IFCVF_ERR(pdev, "Failed to enable device\n");
-> 7ea782fbd896e1 drivers/vdpa/ifcvf/ifcvf_main.c        Zhu Lingshan 2021-06-30  577  		goto err;
-> 7ea782fbd896e1 drivers/vdpa/ifcvf/ifcvf_main.c        Zhu Lingshan 2021-06-30  578  	}
-> 7ea782fbd896e1 drivers/vdpa/ifcvf/ifcvf_main.c        Zhu Lingshan 2021-06-30  579  
-> 7ea782fbd896e1 drivers/vdpa/ifcvf/ifcvf_main.c        Zhu Lingshan 2021-06-30  580  	ret = pcim_iomap_regions(pdev, BIT(0) | BIT(2) | BIT(4),
-> 7ea782fbd896e1 drivers/vdpa/ifcvf/ifcvf_main.c        Zhu Lingshan 2021-06-30  581  				 IFCVF_DRIVER_NAME);
-> 7ea782fbd896e1 drivers/vdpa/ifcvf/ifcvf_main.c        Zhu Lingshan 2021-06-30  582  	if (ret) {
-> 7ea782fbd896e1 drivers/vdpa/ifcvf/ifcvf_main.c        Zhu Lingshan 2021-06-30  583  		IFCVF_ERR(pdev, "Failed to request MMIO region\n");
-> 7ea782fbd896e1 drivers/vdpa/ifcvf/ifcvf_main.c        Zhu Lingshan 2021-06-30  584  		goto err;
-> 7ea782fbd896e1 drivers/vdpa/ifcvf/ifcvf_main.c        Zhu Lingshan 2021-06-30  585  	}
-> 7ea782fbd896e1 drivers/vdpa/ifcvf/ifcvf_main.c        Zhu Lingshan 2021-06-30  586  
-> 7ea782fbd896e1 drivers/vdpa/ifcvf/ifcvf_main.c        Zhu Lingshan 2021-06-30  587  	ret = dma_set_mask_and_coherent(dev, DMA_BIT_MASK(64));
-> 7ea782fbd896e1 drivers/vdpa/ifcvf/ifcvf_main.c        Zhu Lingshan 2021-06-30  588  	if (ret) {
-> 7ea782fbd896e1 drivers/vdpa/ifcvf/ifcvf_main.c        Zhu Lingshan 2021-06-30  589  		IFCVF_ERR(pdev, "No usable DMA configuration\n");
-> 7ea782fbd896e1 drivers/vdpa/ifcvf/ifcvf_main.c        Zhu Lingshan 2021-06-30  590  		goto err;
-> 7ea782fbd896e1 drivers/vdpa/ifcvf/ifcvf_main.c        Zhu Lingshan 2021-06-30  591  	}
-> 7ea782fbd896e1 drivers/vdpa/ifcvf/ifcvf_main.c        Zhu Lingshan 2021-06-30  592  
-> 7ea782fbd896e1 drivers/vdpa/ifcvf/ifcvf_main.c        Zhu Lingshan 2021-06-30  593  	ret = devm_add_action_or_reset(dev, ifcvf_free_irq_vectors, pdev);
-> 7ea782fbd896e1 drivers/vdpa/ifcvf/ifcvf_main.c        Zhu Lingshan 2021-06-30  594  	if (ret) {
-> 7ea782fbd896e1 drivers/vdpa/ifcvf/ifcvf_main.c        Zhu Lingshan 2021-06-30  595  		IFCVF_ERR(pdev,
-> 7ea782fbd896e1 drivers/vdpa/ifcvf/ifcvf_main.c        Zhu Lingshan 2021-06-30  596  			  "Failed for adding devres for freeing irq vectors\n");
-> 7ea782fbd896e1 drivers/vdpa/ifcvf/ifcvf_main.c        Zhu Lingshan 2021-06-30  597  		goto err;
-> 7ea782fbd896e1 drivers/vdpa/ifcvf/ifcvf_main.c        Zhu Lingshan 2021-06-30  598  	}
-> 7ea782fbd896e1 drivers/vdpa/ifcvf/ifcvf_main.c        Zhu Lingshan 2021-06-30  599  
-> 7ea782fbd896e1 drivers/vdpa/ifcvf/ifcvf_main.c        Zhu Lingshan 2021-06-30  600  	pci_set_master(pdev);
-> 7ea782fbd896e1 drivers/vdpa/ifcvf/ifcvf_main.c        Zhu Lingshan 2021-06-30  601  
-> 7ea782fbd896e1 drivers/vdpa/ifcvf/ifcvf_main.c        Zhu Lingshan 2021-06-30  602  	ret = vdpa_mgmtdev_register(&ifcvf_mgmt_dev->mdev);
-> 7ea782fbd896e1 drivers/vdpa/ifcvf/ifcvf_main.c        Zhu Lingshan 2021-06-30  603  	if (ret) {
-> 7ea782fbd896e1 drivers/vdpa/ifcvf/ifcvf_main.c        Zhu Lingshan 2021-06-30  604  		IFCVF_ERR(pdev,
-> 7ea782fbd896e1 drivers/vdpa/ifcvf/ifcvf_main.c        Zhu Lingshan 2021-06-30  605  			  "Failed to initialize the management interfaces\n");
-> 5a2414bc454e89 drivers/virtio/vdpa/ifcvf/ifcvf_main.c Zhu Lingshan 2020-03-26  606  		goto err;
-> 5a2414bc454e89 drivers/virtio/vdpa/ifcvf/ifcvf_main.c Zhu Lingshan 2020-03-26  607  	}
-> 5a2414bc454e89 drivers/virtio/vdpa/ifcvf/ifcvf_main.c Zhu Lingshan 2020-03-26  608  
-> 5a2414bc454e89 drivers/virtio/vdpa/ifcvf/ifcvf_main.c Zhu Lingshan 2020-03-26  609  	return 0;
-> 5a2414bc454e89 drivers/virtio/vdpa/ifcvf/ifcvf_main.c Zhu Lingshan 2020-03-26  610  
-> 5a2414bc454e89 drivers/virtio/vdpa/ifcvf/ifcvf_main.c Zhu Lingshan 2020-03-26  611  err:
-> 5a2414bc454e89 drivers/virtio/vdpa/ifcvf/ifcvf_main.c Zhu Lingshan 2020-03-26 @612  	put_device(&adapter->vdpa.dev);
-> 7ea782fbd896e1 drivers/vdpa/ifcvf/ifcvf_main.c        Zhu Lingshan 2021-06-30  613  	kfree(ifcvf_mgmt_dev);
-> 5a2414bc454e89 drivers/virtio/vdpa/ifcvf/ifcvf_main.c Zhu Lingshan 2020-03-26  614  	return ret;
-> 5a2414bc454e89 drivers/virtio/vdpa/ifcvf/ifcvf_main.c Zhu Lingshan 2020-03-26  615  }
-> 5a2414bc454e89 drivers/virtio/vdpa/ifcvf/ifcvf_main.c Zhu Lingshan 2020-03-26  616  
-> 
-> ---
-> 0-DAY CI Kernel Test Service, Intel Corporation
-> https://lists.01.org/hyperkitty/list/kbuild-all@lists.01.org
+> But its corresponding userspace structure def in include/uapi/linux/psp-sev.h is:
+> struct sev_user_data_pek_cert_import {
+> 	__u64 pek_cert_uaddr; /* userspace address */
+> 	__u32 pek_cert_len;
+> 	...
+> };
 
+And the difference is a single "u32 reserved"?
 
+Dunno, from where I'm standing this looks like unnecessary confusion to
+me.
+
+> The ioctl handling takes care of mapping from uaddr to pa and other
+> things as required. So, I took similar approach for the SEV-SNP guest
+> ioctl. In this particular case the guest request structure defined in
+> the spec contains multiple field but many of those fields are managed
+> internally by the kernel (e.g seqno, IV, etc etc).
+
+Ok, multiple fields sounds like you wanna save on the data that is
+shovelled between kernel and user space and then some of the fields
+don't mean a thing for the user API. Ok.
+
+But again, where is this documented and stated clear so that people are
+aware?
+
+Or are you assuming that since the user counterparts are in
+
+include/uapi/linux/psp-sev.h
+	^^^^
+
+and it being an uapi header, then that should state that?
+
+-- 
+Regards/Gruss,
+    Boris.
+
+https://people.kernel.org/tglx/notes-about-netiquette
