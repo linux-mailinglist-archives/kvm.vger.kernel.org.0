@@ -2,260 +2,176 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0C2843BAC91
-	for <lists+kvm@lfdr.de>; Sun,  4 Jul 2021 11:49:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6BB7F3BAC9B
+	for <lists+kvm@lfdr.de>; Sun,  4 Jul 2021 11:54:43 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229642AbhGDJwE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 4 Jul 2021 05:52:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41574 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229529AbhGDJwD (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 4 Jul 2021 05:52:03 -0400
-Received: from mail-ej1-x62c.google.com (mail-ej1-x62c.google.com [IPv6:2a00:1450:4864:20::62c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E4C9BC0613DB
-        for <kvm@vger.kernel.org>; Sun,  4 Jul 2021 02:49:27 -0700 (PDT)
-Received: by mail-ej1-x62c.google.com with SMTP id i20so23902316ejw.4
-        for <kvm@vger.kernel.org>; Sun, 04 Jul 2021 02:49:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance-com.20150623.gappssmtp.com; s=20150623;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=qzAkMSP1FVlaF7igte07rNyxkup5fEZ5Kcb9vm7Jix8=;
-        b=SMZguhe0gCeK+K4fpWOBc4ZZOnMdsFi7GKjeWwau3BD+++plq8ypU2RwuzRKIlFwVo
-         EGstmcx5t98kTfUG9bhwv7ljPdHJ1Ls/qe95Asrjrtk1uCd4NQCBIIh0EKmHqhRoEYol
-         hldjt8N2LAzTyoYWQYZ2JlXUJXARXI1msbzhZKzCTFr69fWdoeJSsY/Sjn4i8pXkFpIo
-         YjRAzIAXBf6AhnVeSqz4sTXfeQB3jlvLSRpBgcbieZielxBSuw+ikxw+y8aApqvhW7Pn
-         QNM7ylmDgZqeNb+fgsjdZgKC1v3EleI+8SmZhbsCtEMJIhKligBSReCYfqRjdsfmjyH1
-         YajQ==
+        id S229570AbhGDJ5N (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 4 Jul 2021 05:57:13 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:34486 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229499AbhGDJ5M (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Sun, 4 Jul 2021 05:57:12 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1625392477;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=VYPXgNYdb3c09oXqHPIxazq2MDtMHdph5d1ic1D1Bi8=;
+        b=ATVwuldPS04IsUXhohH6jFKqf4ZS14D78gSpkAS7CTuRSa3A7MaC99origN9i8SuIEsxZf
+        k9Z9jOo89VQ7pKSTAeU2p2rmB+viDDOS7MtqU7/6g5qvGBHs0YUV4kHTH6kEp/2tCEz/Lj
+        KVZ7XXcsr80dymU2OW0OJdmj9xNe4PQ=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-121-Co3lVrvNP7Ku1ZJHA8JF2w-1; Sun, 04 Jul 2021 05:54:35 -0400
+X-MC-Unique: Co3lVrvNP7Ku1ZJHA8JF2w-1
+Received: by mail-wm1-f71.google.com with SMTP id i3-20020a05600c3543b02902075ed92710so269087wmq.0
+        for <kvm@vger.kernel.org>; Sun, 04 Jul 2021 02:54:35 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=qzAkMSP1FVlaF7igte07rNyxkup5fEZ5Kcb9vm7Jix8=;
-        b=FesxRJ/0DZ4EeLf9o+7FlWKhMdQv1VnFrR4g4blC8rnWlpRw8MP9anvpT+XOm6pdXJ
-         i1RI0nBRZ/o3ZhKuA3DVYQdBuHo2MNPEisd1e3ZK4HhuJZfa+7lLvnYIv9AtShX9YOyZ
-         rf42jFIeFKEN4ZmjyydebFi1nTUMXbxdubRM54c5DS8b64B2hxDU8/OL7vNr5umByF7e
-         3EcTv7qVur8eQQmA/EaYPXeq/ZOE96GolK8Vb2lkketFsLZ0M3ADVBwHj3SMs3ScEK4B
-         5n7pnILgZ7A3bw6VdwV9Nruc/CR+06Xg7uMO4oxsJ7juIJbWk9n/4DAFF/5harlhspWX
-         mJIQ==
-X-Gm-Message-State: AOAM533CkQ62GqJyyNH59cqkjV2zJh48FVXlgXDAR2y8PuBhyx1KXOMT
-        6/GS+WCjjzQRDa55TwtADMrdVlNKNQsun5pxqyIC
-X-Google-Smtp-Source: ABdhPJxvRtQJIj/yqZPkvbZHD8DNlSHEoDvhzkPyPsAyedq1EVF9bW4cXHVy5LeU0C2sRpYjWJqArcNlZLkm0IT3QiI=
-X-Received: by 2002:a17:907:1690:: with SMTP id hc16mr8249257ejc.247.1625392166205;
- Sun, 04 Jul 2021 02:49:26 -0700 (PDT)
-MIME-Version: 1.0
-References: <20210615141331.407-1-xieyongji@bytedance.com> <20210615141331.407-11-xieyongji@bytedance.com>
- <YNSCH6l31zwPxBjL@stefanha-x1.localdomain> <CACycT3uxnQmXWsgmNVxQtiRhz1UXXTAJFY3OiAJqokbJH6ifMA@mail.gmail.com>
- <YNxCDpM3bO5cPjqi@stefanha-x1.localdomain> <CACycT3taKhf1cWp3Jd0aSVekAZvpbR-_fkyPLQ=B+jZBB5H=8Q@mail.gmail.com>
- <YN3ABqCMLQf7ejOm@stefanha-x1.localdomain>
-In-Reply-To: <YN3ABqCMLQf7ejOm@stefanha-x1.localdomain>
-From:   Yongji Xie <xieyongji@bytedance.com>
-Date:   Sun, 4 Jul 2021 17:49:15 +0800
-Message-ID: <CACycT3vo-diHgTSLw_FS2E+5ia5VjihE3qw7JmZR7JT55P-wQA@mail.gmail.com>
-Subject: Re: Re: Re: [PATCH v8 10/10] Documentation: Add documentation for VDUSE
-To:     Stefan Hajnoczi <stefanha@redhat.com>,
-        Jason Wang <jasowang@redhat.com>
-Cc:     "Michael S. Tsirkin" <mst@redhat.com>,
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=VYPXgNYdb3c09oXqHPIxazq2MDtMHdph5d1ic1D1Bi8=;
+        b=facLOEwG0xXIwEqq4wyhTlUlWsN9CCMjahasCMnTb0hlKk7Z5+UyOVx3fJqfR0pTtH
+         4mcF5pUJBRvNyOMGjnZ8Bv4f8zSydzV4xd57rrFjvKtgYKmW6/Pk/m5fY+aeoYR/ukNj
+         ajqTY2Iw+zyms3OLXtpleqdoW9ERyqHB/Hsfhj2qEkfvKCqsTUA11Rwe3fPPAjK84nRn
+         NjeOQqKf+lCvN9i1JhtX/83FpHQLwO6OLD2qS8N7+3LPsS1xtiXLqGxf235sNj40u2QX
+         xoVe5K8V44eYzvIjV9Yr/+s77t2sAIgBE0Pz9wA3qTk8AoGNkBcROoBUu4pvCSJ38l/W
+         5dqA==
+X-Gm-Message-State: AOAM532+3NX+BZ1mfDwE+wyTkGAIYOGccPUq0oHLWzsrAWbAbzOSM1YJ
+        y+lGdlNUxKGsIQKrgAKMayPVDxNstFcIrzLP7mX/0BiK/8YagDKTNqVGRRaAVPQUGfvW+79DIFr
+        3I6qEI83bZAZL
+X-Received: by 2002:a7b:c8d9:: with SMTP id f25mr8743157wml.153.1625392474506;
+        Sun, 04 Jul 2021 02:54:34 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyWmhMPJZJ9uEg3kxS9p3QQw859N5k7H/UO+tCXIvTNNDhdZj57iiThsIDoBtYfE9gIxTqrUg==
+X-Received: by 2002:a7b:c8d9:: with SMTP id f25mr8743122wml.153.1625392474177;
+        Sun, 04 Jul 2021 02:54:34 -0700 (PDT)
+Received: from redhat.com ([2.55.4.39])
+        by smtp.gmail.com with ESMTPSA id c12sm10458200wrr.90.2021.07.04.02.54.31
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 04 Jul 2021 02:54:33 -0700 (PDT)
+Date:   Sun, 4 Jul 2021 05:54:29 -0400
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     Arseny Krasnov <arseny.krasnov@kaspersky.com>
+Cc:     Stefan Hajnoczi <stefanha@redhat.com>,
         Stefano Garzarella <sgarzare@redhat.com>,
-        Parav Pandit <parav@nvidia.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Christian Brauner <christian.brauner@canonical.com>,
-        Randy Dunlap <rdunlap@infradead.org>,
-        Matthew Wilcox <willy@infradead.org>,
-        Al Viro <viro@zeniv.linux.org.uk>,
-        Jens Axboe <axboe@kernel.dk>, bcrl@kvack.org,
-        Jonathan Corbet <corbet@lwn.net>,
-        =?UTF-8?Q?Mika_Penttil=C3=A4?= <mika.penttila@nextfour.com>,
-        Dan Carpenter <dan.carpenter@oracle.com>, joro@8bytes.org,
-        Greg KH <gregkh@linuxfoundation.org>, songmuchun@bytedance.com,
-        virtualization <virtualization@lists.linux-foundation.org>,
-        netdev@vger.kernel.org, kvm <kvm@vger.kernel.org>,
-        linux-fsdevel@vger.kernel.org, iommu@lists.linux-foundation.org,
-        linux-kernel <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+        Jason Wang <jasowang@redhat.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Andra Paraschiv <andraprs@amazon.com>,
+        Norbert Slusarek <nslusarek@gmx.net>,
+        Colin Ian King <colin.king@canonical.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "virtualization@lists.linux-foundation.org" 
+        <virtualization@lists.linux-foundation.org>,
+        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "oxffffaa@gmail.com" <oxffffaa@gmail.com>
+Subject: Re: [RFC PATCH v2 0/6] Improve SOCK_SEQPACKET receive logic
+Message-ID: <20210704055037-mutt-send-email-mst@kernel.org>
+References: <20210704080820.88746-1-arseny.krasnov@kaspersky.com>
+ <20210704042843-mutt-send-email-mst@kernel.org>
+ <b427dee7-5c1b-9686-9004-05fa05d45b28@kaspersky.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <b427dee7-5c1b-9686-9004-05fa05d45b28@kaspersky.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jul 1, 2021 at 9:15 PM Stefan Hajnoczi <stefanha@redhat.com> wrote:
->
-> On Thu, Jul 01, 2021 at 06:00:48PM +0800, Yongji Xie wrote:
-> > On Wed, Jun 30, 2021 at 6:06 PM Stefan Hajnoczi <stefanha@redhat.com> wrote:
-> > >
-> > > On Tue, Jun 29, 2021 at 01:43:11PM +0800, Yongji Xie wrote:
-> > > > On Mon, Jun 28, 2021 at 9:02 PM Stefan Hajnoczi <stefanha@redhat.com> wrote:
-> > > > > On Tue, Jun 15, 2021 at 10:13:31PM +0800, Xie Yongji wrote:
-> > > > > > +     static void *iova_to_va(int dev_fd, uint64_t iova, uint64_t *len)
-> > > > > > +     {
-> > > > > > +             int fd;
-> > > > > > +             void *addr;
-> > > > > > +             size_t size;
-> > > > > > +             struct vduse_iotlb_entry entry;
-> > > > > > +
-> > > > > > +             entry.start = iova;
-> > > > > > +             entry.last = iova + 1;
-> > > > >
-> > > > > Why +1?
-> > > > >
-> > > > > I expected the request to include *len so that VDUSE can create a bounce
-> > > > > buffer for the full iova range, if necessary.
-> > > > >
-> > > >
-> > > > The function is used to translate iova to va. And the *len is not
-> > > > specified by the caller. Instead, it's used to tell the caller the
-> > > > length of the contiguous iova region from the specified iova. And the
-> > > > ioctl VDUSE_IOTLB_GET_FD will get the file descriptor to the first
-> > > > overlapped iova region. So using iova + 1 should be enough here.
-> > >
-> > > Does the entry.last field have any purpose with VDUSE_IOTLB_GET_FD? I
-> > > wonder why userspace needs to assign a value at all if it's always +1.
-> > >
+On Sun, Jul 04, 2021 at 12:23:03PM +0300, Arseny Krasnov wrote:
+> 
+> On 04.07.2021 11:30, Michael S. Tsirkin wrote:
+> > On Sun, Jul 04, 2021 at 11:08:13AM +0300, Arseny Krasnov wrote:
+> >> 	This patchset modifies receive logic for SOCK_SEQPACKET.
+> >> Difference between current implementation and this version is that
+> >> now reader is woken up when there is at least one RW packet in rx
+> >> queue of socket and data is copied to user's buffer, while merged
+> >> approach wake up user only when whole message is received and kept
+> >> in queue. New implementation has several advantages:
+> >>  1) There is no limit for message length. Merged approach requires
+> >>     that length must be smaller than 'peer_buf_alloc', otherwise
+> >>     transmission will stuck.
+> >>  2) There is no need to keep whole message in queue, thus no
+> >>     'kmalloc()' memory will be wasted until EOR is received.
+> >>
+> >>     Also new approach has some feature: as fragments of message
+> >> are copied until EOR is received, it is possible that part of
+> >> message will be already in user's buffer, while rest of message
+> >> still not received. And if user will be interrupted by signal or
+> >> timeout with part of message in buffer, it will exit receive loop,
+> >> leaving rest of message in queue. To solve this problem special
+> >> callback was added to transport: it is called when user was forced
+> >> to leave exit loop and tells transport to drop any packet until
+> >> EOR met.
+> > Sorry about commenting late in the game.  I'm a bit lost
 > >
-> > If we need to get some iova regions in the specified range, we need
-> > the entry.last field. For example, we can use [0, ULONG_MAX] to get
-> > the first overlapped iova region which might be [4096, 8192]. But in
-> > this function, we don't use VDUSE_IOTLB_GET_FD like this. We need to
-> > get the iova region including the specified iova.
->
-> I see, thanks for explaining!
->
-> > > > > > +             return addr + iova - entry.start;
-> > > > > > +     }
-> > > > > > +
-> > > > > > +- VDUSE_DEV_GET_FEATURES: Get the negotiated features
-> > > > >
-> > > > > Are these VIRTIO feature bits? Please explain how feature negotiation
-> > > > > works. There must be a way for userspace to report the device's
-> > > > > supported feature bits to the kernel.
-> > > > >
-> > > >
-> > > > Yes, these are VIRTIO feature bits. Userspace will specify the
-> > > > device's supported feature bits when creating a new VDUSE device with
-> > > > ioctl(VDUSE_CREATE_DEV).
-> > >
-> > > Can the VDUSE device influence feature bit negotiation? For example, if
-> > > the VDUSE virtio-blk device does not implement discard/write-zeroes, how
-> > > does QEMU or the guest find out about this?
-> > >
 > >
-> > There is a "features" field in struct vduse_dev_config which is used
-> > to do feature negotiation.
->
-> This approach is more restrictive than required by the VIRTIO
-> specification:
->
->   "The device SHOULD accept any valid subset of features the driver
->   accepts, otherwise it MUST fail to set the FEATURES_OK device status
->   bit when the driver writes it."
->
->   https://docs.oasis-open.org/virtio/virtio/v1.1/cs01/virtio-v1.1-cs01.html#x1-130002
->
-> The spec allows a device to reject certain subsets of features. For
-> example, if feature B depends on feature A and can only be enabled when
-> feature A is also enabled.
->
-> From your description I think VDUSE would accept feature B without
-> feature A since the device implementation has no opportunity to fail
-> negotiation with custom logic.
->
-
-Yes, we discussed it [1] before. So I'd like to re-introduce
-SET_STATUS messages so that the userspace can fail feature negotiation
-during setting FEATURES_OK status bit.
-
-[1]  https://lkml.org/lkml/2021/6/28/1587
-
-> Ideally VDUSE would send a SET_FEATURES message to userspace, allowing
-> the device implementation full flexibility in which subsets of features
-> to accept.
->
-> This is a corner case. Many or maybe even all existing VIRTIO devices
-> don't need this flexibility, but I want to point out this limitation in
-> the VDUSE interface because it may cause issues in the future.
->
-> > > > > > +- VDUSE_DEV_UPDATE_CONFIG: Update the configuration space and inject a config interrupt
-> > > > >
-> > > > > Does this mean the contents of the configuration space are cached by
-> > > > > VDUSE?
-> > > >
-> > > > Yes, but the kernel will also store the same contents.
-> > > >
-> > > > > The downside is that the userspace code cannot generate the
-> > > > > contents on demand. Most devices doin't need to generate the contents
-> > > > > on demand, so I think this is okay but I had expected a different
-> > > > > interface:
-> > > > >
-> > > > > kernel->userspace VDUSE_DEV_GET_CONFIG
-> > > > > userspace->kernel VDUSE_DEV_INJECT_CONFIG_IRQ
-> > > > >
-> > > >
-> > > > The problem is how to handle the failure of VDUSE_DEV_GET_CONFIG. We
-> > > > will need lots of modification of virtio codes to support that. So to
-> > > > make it simple, we choose this way:
-> > > >
-> > > > userspace -> kernel VDUSE_DEV_SET_CONFIG
-> > > > userspace -> kernel VDUSE_DEV_INJECT_CONFIG_IRQ
-> > > >
-> > > > > I think you can leave it the way it is, but I wanted to mention this in
-> > > > > case someone thinks it's important to support generating the contents of
-> > > > > the configuration space on demand.
-> > > > >
-> > > >
-> > > > Sorry, I didn't get you here. Can't VDUSE_DEV_SET_CONFIG and
-> > > > VDUSE_DEV_INJECT_CONFIG_IRQ achieve that?
-> > >
-> > > If the contents of the configuration space change continuously, then the
-> > > VDUSE_DEV_SET_CONFIG approach is inefficient and might have race
-> > > conditions. For example, imagine a device where the driver can read a
-> > > timer from the configuration space. I think the VIRTIO device model
-> > > allows that although I'm not aware of any devices that do something like
-> > > it today. The problem is that VDUSE_DEV_SET_CONFIG would have to be
-> > > called frequently to keep the timer value updated even though the guest
-> > > driver probably isn't accessing it.
-> > >
+> > SOCK_SEQPACKET
+> > Provides sequenced, reliable, bidirectional, connection-mode transmission paths for records. A record can be sent using one or more output operations and received using one or more input operations, but a single operation never transfers part of more than one record. Record boundaries are visible to the receiver via the MSG_EOR flag.
 > >
-> > OK, I get you now. Since the VIRTIO specification says "Device
-> > configuration space is generally used for rarely-changing or
-> > initialization-time parameters". I assume the VDUSE_DEV_SET_CONFIG
-> > ioctl should not be called frequently.
->
-> The spec uses MUST and other terms to define the precise requirements.
-> Here the language (especially the word "generally") is weaker and means
-> there may be exceptions.
->
-> Another type of access that doesn't work with the VDUSE_DEV_SET_CONFIG
-> approach is reads that have side-effects. For example, imagine a field
-> containing an error code if the device encounters a problem unrelated to
-> a specific virtqueue request. Reading from this field resets the error
-> code to 0, saving the driver an extra configuration space write access
-> and possibly race conditions. It isn't possible to implement those
-> semantics suing VDUSE_DEV_SET_CONFIG. It's another corner case, but it
-> makes me think that the interface does not allow full VIRTIO semantics.
->
+> > it's supposed to be reliable - how is it legal to drop packets?
+> 
+> Sorry, seems i need to rephrase description. "Packet" here means fragment of record(message) at transport
+> 
+> layer. As this is SEQPACKET mode, receiver could get only whole message or error, so if only several fragments
+> 
+> of message was copied (if signal received for example) we can't return it to user - it breaks SEQPACKET sense. I think,
+> 
+> in this case we can drop rest of record's fragments legally.
+> 
+> 
+> Thank You
 
-Agreed. I will use VDUSE_DEV_GET_CONFIG in the next version. And to
-handle the message failure, I'm going to add a return value to
-virtio_config_ops.get() and virtio_cread_* API so that the error can
-be propagated to the virtio device driver. Then the virtio-blk device
-driver can be modified to handle that.
+Would not that violate the reliable property? IIUC it's only ok to
+return an error if socket gets closed. Just like e.g. TCP ...
 
-Jason and Stefan, what do you think of this way?
 
-> > > What's worse is that there might be race conditions where other
-> > > driver->device operations are supposed to update the configuration space
-> > > but VDUSE_DEV_SET_CONFIG means that the VDUSE kernel code is caching an
-> > > outdated copy.
-> > >
+
 > >
-> > I'm not sure. Should the device and driver be able to access the same
-> > fields concurrently?
->
-> Yes. The VIRTIO spec has a generation count to handle multi-field
-> accesses so that consistency can be ensured:
-> https://docs.oasis-open.org/virtio/virtio/v1.1/cs01/virtio-v1.1-cs01.html#x1-180004
->
+> >
+> >> When EOR is found, this mode is disabled and normal packet
+> >> processing started. Note, that when 'drop until EOR' mode is on,
+> >> incoming packets still inserted in queue, reader will be woken up,
+> >> tries to copy data, but nothing will be copied until EOR found.
+> >> It was possible to drain such unneeded packets it rx work without
+> >> kicking user, but implemented way is simplest. Anyway, i think
+> >> such cases are rare.
+> >
+> >>     New test also added - it tries to copy to invalid user's
+> >> buffer.
+> >>
+> >> Arseny Krasnov (16):
+> >>  af_vsock/virtio/vsock: change seqpacket receive logic
+> >>  af_vsock/virtio/vsock: remove 'seqpacket_has_data' callback
+> >>  virtio/vsock: remove 'msg_count' based logic
+> >>  af_vsock/virtio/vsock: add 'seqpacket_drop()' callback
+> >>  virtio/vsock: remove record size limit for SEQPACKET
+> >>  vsock_test: SEQPACKET read to broken buffer
+> >>
+> >>  drivers/vhost/vsock.c                   |   2 +-
+> >>  include/linux/virtio_vsock.h            |   7 +-
+> >>  include/net/af_vsock.h                  |   4 +-
+> >>  net/vmw_vsock/af_vsock.c                |  44 ++++----
+> >>  net/vmw_vsock/virtio_transport.c        |   2 +-
+> >>  net/vmw_vsock/virtio_transport_common.c | 103 ++++++++-----------
+> >>  net/vmw_vsock/vsock_loopback.c          |   2 +-
+> >>  tools/testing/vsock/vsock_test.c        | 120 ++++++++++++++++++++++
+> >>  8 files changed, 193 insertions(+), 91 deletions(-)
+> >>
+> >>  v1 -> v2:
+> >>  Patches reordered and reorganized.
+> >>
+> >> Signed-off-by: Arseny Krasnov <arseny.krasnov@kaspersky.com>
+> >> ---
+> >>  cv.txt | 0
+> >>  1 file changed, 0 insertions(+), 0 deletions(-)
+> >>  create mode 100644 cv.txt
+> >>
+> >> diff --git a/cv.txt b/cv.txt
+> >> new file mode 100644
+> >> index 000000000000..e69de29bb2d1
+> >> -- 
+> >> 2.25.1
+> >
 
-I see.
-
-Thanks,
-Yongji
