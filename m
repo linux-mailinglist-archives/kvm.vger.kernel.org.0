@@ -2,27 +2,27 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C348E3BB0B1
-	for <lists+kvm@lfdr.de>; Mon,  5 Jul 2021 01:09:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E7F153BB166
+	for <lists+kvm@lfdr.de>; Mon,  5 Jul 2021 01:10:31 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231246AbhGDXJO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 4 Jul 2021 19:09:14 -0400
-Received: from mail.kernel.org ([198.145.29.99]:46816 "EHLO mail.kernel.org"
+        id S232259AbhGDXLr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 4 Jul 2021 19:11:47 -0400
+Received: from mail.kernel.org ([198.145.29.99]:49050 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S230406AbhGDXIp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 4 Jul 2021 19:08:45 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id B6A5561410;
-        Sun,  4 Jul 2021 23:06:08 +0000 (UTC)
+        id S231144AbhGDXKy (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 4 Jul 2021 19:10:54 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id F25756194B;
+        Sun,  4 Jul 2021 23:07:57 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1625439969;
-        bh=mqd9n6vs1xgm7ByR8C/nW5XpQdznqzFjhFlNcwkIRYM=;
+        s=k20201202; t=1625440079;
+        bh=2Wi38nQN3VKnV4ahUhGFIElpkM/7DNUZ3EbizulaLTc=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=vG86QOkLre/UmuyIHrTu9TVJVWwf7bcWN/sgfL4wJw1Ibew68qy3PhAaFXYmJ88LV
-         qu2QU11OkkxYnmRfNf97TwQNZ+siNKUO0wGeLTrrEXBSq0zsftG5AcUJxTziWcu2dc
-         kVYovkUNLfg4PUuK8BhE7LorHGMrHjFgxLdJtcPgS4PtMxA8aOQJu+iSmB4YWHMVv6
-         dCZwp8PKPyMV2az/Da8e/oiZ6eYRvZ2CKzp/n/fnr4LXa1X7QZXoEixbZC/DAR2NKP
-         cpRJl+ON5bIEi6l7Q/jSAVNYiM9pmaEXddtKnXNOJB8+81hefe10Ev11NK9zMl5hlT
-         nIwkUUv92PYwA==
+        b=hAaIUVFn3+bGzW7u0EtvEsw4AAhadKX4tk8cvcLwrIyH0DsYXIAwyZeyqua7xem8N
+         rblsFhvXdLRxOLjpvH4S23MQx6qRy/9qfNcA6C9sQKigvNSwHnnfFW2eT57wsuhNBf
+         nKDq9djkVbj34ADGSml/cEVwptmbYShKfGEIJztjIRvsqmpW/lmXGUAo6Y8PFaRTAZ
+         ZM9zxf9RwjmA2HlEI9Q4Z4RFg4PB8lJP+yYoYzVUtq7AwomxyueV3iSjdN43q86WoU
+         y9hSdxQ215HCYM+ID9fMomDrx4buqA4+WWKRoAfH4f01RCwtLixehIAra+DZo7uhpg
+         yLHblX+l3Cu3w==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Heiko Carstens <hca@linux.ibm.com>,
@@ -32,12 +32,12 @@ Cc:     Heiko Carstens <hca@linux.ibm.com>,
         Claudio Imbrenda <imbrenda@linux.ibm.com>,
         Sasha Levin <sashal@kernel.org>, kvm@vger.kernel.org,
         linux-s390@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.13 81/85] KVM: s390: get rid of register asm usage
-Date:   Sun,  4 Jul 2021 19:04:16 -0400
-Message-Id: <20210704230420.1488358-81-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.12 77/80] KVM: s390: get rid of register asm usage
+Date:   Sun,  4 Jul 2021 19:06:13 -0400
+Message-Id: <20210704230616.1489200-77-sashal@kernel.org>
 X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20210704230420.1488358-1-sashal@kernel.org>
-References: <20210704230420.1488358-1-sashal@kernel.org>
+In-Reply-To: <20210704230616.1489200-1-sashal@kernel.org>
+References: <20210704230616.1489200-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -72,10 +72,10 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 9 insertions(+), 9 deletions(-)
 
 diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
-index 1296fc10f80c..876fc1f7282a 100644
+index 24ad447e648c..dd7136b3ed9a 100644
 --- a/arch/s390/kvm/kvm-s390.c
 +++ b/arch/s390/kvm/kvm-s390.c
-@@ -329,31 +329,31 @@ static void allow_cpu_feat(unsigned long nr)
+@@ -323,31 +323,31 @@ static void allow_cpu_feat(unsigned long nr)
  
  static inline int plo_test_bit(unsigned char nr)
  {
