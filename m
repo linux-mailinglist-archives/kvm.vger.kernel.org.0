@@ -2,62 +2,66 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id CCE403BAC0A
-	for <lists+kvm@lfdr.de>; Sun,  4 Jul 2021 10:11:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 640613BAC0F
+	for <lists+kvm@lfdr.de>; Sun,  4 Jul 2021 10:13:45 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229951AbhGDIN5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 4 Jul 2021 04:13:57 -0400
-Received: from mx13.kaspersky-labs.com ([91.103.66.164]:33766 "EHLO
-        mx13.kaspersky-labs.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229649AbhGDIN5 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 4 Jul 2021 04:13:57 -0400
-Received: from relay13.kaspersky-labs.com (unknown [127.0.0.10])
-        by relay13.kaspersky-labs.com (Postfix) with ESMTP id 9A4575213BA;
-        Sun,  4 Jul 2021 11:11:20 +0300 (MSK)
+        id S229685AbhGDIQO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 4 Jul 2021 04:16:14 -0400
+Received: from mx12.kaspersky-labs.com ([91.103.66.155]:55506 "EHLO
+        mx12.kaspersky-labs.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229540AbhGDIQN (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 4 Jul 2021 04:16:13 -0400
+Received: from relay12.kaspersky-labs.com (unknown [127.0.0.10])
+        by relay12.kaspersky-labs.com (Postfix) with ESMTP id BA69977097;
+        Sun,  4 Jul 2021 11:13:36 +0300 (MSK)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kaspersky.com;
-        s=mail202102; t=1625386280;
-        bh=5x5/eutDlDBy7csgIRAOiBd8x+Qpc2SvlIIL2kYZolI=;
-        h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type;
-        b=cn3KnGHzQA6eSAwijkOwiwtuoYRq0E35QHNm3iORuwdBM2X7R2O+IcMyu+Es9IZj/
-         Q0v4Wi0rR6pzclew4kqZ+A+WDGxdUXVPR7KKISXo9yWwS+chrtz4jEOrAUawX+duaY
-         JqQs+fFJz/fdJJlGroonyTSc0a59Bt8hGImjLDGMPHoI8IZXVm5+8YnbCuts0tdVOt
-         fPbcpvUDQCd0EfozIssyrtyVoZ+eykvbtml2p5ap3yzF1GZpYAFPPO93PfjjpzqQN7
-         2sDFfDNOKHHZ46AYa2yFN4PuSWogBjgIr+eyFXLWYeD9Ifcm+9zdAmoTuV1H+subgj
-         mmu/x2res/OLw==
+        s=mail202102; t=1625386416;
+        bh=kGEakyFUCdn/yapnPyeAmrB+mVozpPMc5PcblmevWac=;
+        h=Subject:To:From:Message-ID:Date:MIME-Version:Content-Type;
+        b=4NPcU/oE47TThcAJ3OPPf7S3OgTOAa5A4AUokDHOu6Q1Wgg00L3kQqouFzA2zhm6Z
+         YVwrlAzuZA+nNZG3LHFZR1R4euXmq1a35XwA4R5E2aqWfPcOlF32FiiY3GTyr2oHfX
+         Vj1dBSPkkyhJSzaum/iiAT4jqxCpDyhCyEY6Jz/Bc9FHztiCsMEZlrB+iGNBq34IZT
+         YqlijEbUxfd9Hx0coYoduueXlY5w0F0VSrCy+tE/8dl4whpDF5W74QyOAEk74fr205
+         XTplWZcFGL5e90vclrR4n6sor1JRHMHA/ZU8c6ZGSD+91iUhvRplQ9ZHmJX/NcT8Yy
+         JKAJm8+TIft1g==
 Received: from mail-hq2.kaspersky.com (unknown [91.103.66.206])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-SHA256 (128/128 bits))
         (Client CN "mail-hq2.kaspersky.com", Issuer "Kaspersky MailRelays CA G3" (verified OK))
-        by mailhub13.kaspersky-labs.com (Postfix) with ESMTPS id 4A3055213EA;
-        Sun,  4 Jul 2021 11:11:20 +0300 (MSK)
-Received: from arseniy-pc.avp.ru (10.64.64.121) by hqmailmbx3.avp.ru
+        by mailhub12.kaspersky-labs.com (Postfix) with ESMTPS id 7A19877096;
+        Sun,  4 Jul 2021 11:13:36 +0300 (MSK)
+Received: from [10.16.171.77] (10.64.68.128) by hqmailmbx3.avp.ru
  (10.64.67.243) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2176.14; Sun, 4
- Jul 2021 11:11:19 +0300
-From:   Arseny Krasnov <arseny.krasnov@kaspersky.com>
+ Jul 2021 11:13:36 +0300
+Subject: Re: [RFC PATCH v2 0/6] Improve SOCK_SEQPACKET receive logic
 To:     Stefan Hajnoczi <stefanha@redhat.com>,
         Stefano Garzarella <sgarzare@redhat.com>,
         "Michael S. Tsirkin" <mst@redhat.com>,
         Jason Wang <jasowang@redhat.com>,
         "David S. Miller" <davem@davemloft.net>,
         Jakub Kicinski <kuba@kernel.org>,
-        Arseny Krasnov <arseny.krasnov@kaspersky.com>,
-        Colin Ian King <colin.king@canonical.com>,
+        Andra Paraschiv <andraprs@amazon.com>,
         Norbert Slusarek <nslusarek@gmx.net>,
-        Andra Paraschiv <andraprs@amazon.com>
-CC:     <kvm@vger.kernel.org>, <virtualization@lists.linux-foundation.org>,
-        <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <oxffffaa@gmail.com>
-Subject: [RFC PATCH v2 6/6] vsock_test: SEQPACKET read to broken buffer
-Date:   Sun, 4 Jul 2021 11:11:11 +0300
-Message-ID: <20210704081114.89811-1-arseny.krasnov@kaspersky.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20210704080820.88746-1-arseny.krasnov@kaspersky.com>
+        Colin Ian King <colin.king@canonical.com>
+CC:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "virtualization@lists.linux-foundation.org" 
+        <virtualization@lists.linux-foundation.org>,
+        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "oxffffaa@gmail.com" <oxffffaa@gmail.com>
 References: <20210704080820.88746-1-arseny.krasnov@kaspersky.com>
+From:   Arseny Krasnov <arseny.krasnov@kaspersky.com>
+Message-ID: <81acbbf0-6886-7348-c4f8-06bb2f1419d2@kaspersky.com>
+Date:   Sun, 4 Jul 2021 11:13:35 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Originating-IP: [10.64.64.121]
-X-ClientProxiedBy: hqmailmbx2.avp.ru (10.64.67.242) To hqmailmbx3.avp.ru
+In-Reply-To: <20210704080820.88746-1-arseny.krasnov@kaspersky.com>
+Content-Type: text/plain; charset="koi8-r"
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+X-Originating-IP: [10.64.68.128]
+X-ClientProxiedBy: hqmailmbx1.avp.ru (10.64.67.241) To hqmailmbx3.avp.ru
  (10.64.67.243)
 X-KSE-ServerInfo: hqmailmbx3.avp.ru, 9
 X-KSE-AntiSpam-Interceptor-Info: scan successful
@@ -71,7 +75,7 @@ X-KSE-AntiSpam-Info: Envelope from: arseny.krasnov@kaspersky.com
 X-KSE-AntiSpam-Info: LuaCore: 448 448 71fb1b37213ce9a885768d4012c46ac449c77b17
 X-KSE-AntiSpam-Info: {Tracking_from_exist}
 X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
-X-KSE-AntiSpam-Info: kaspersky.com:7.1.1;127.0.0.199:7.1.2;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;arseniy-pc.avp.ru:7.1.1
+X-KSE-AntiSpam-Info: 127.0.0.199:7.1.2;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;kaspersky.com:7.1.1
 X-KSE-AntiSpam-Info: Rate: 0
 X-KSE-AntiSpam-Info: Status: not_detected
 X-KSE-AntiSpam-Info: Method: none
@@ -98,163 +102,67 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Add test where sender sends two message, each with own
-data pattern. Reader tries to read first to broken buffer:
-it has three pages size, but middle page is unmapped. Then,
-reader tries to read second message to valid buffer. Test
-checks, that uncopied part of first message was dropped
-and thus not copied as part of second message.
 
-Signed-off-by: Arseny Krasnov <arseny.krasnov@kaspersky.com>
----
- tools/testing/vsock/vsock_test.c | 120 +++++++++++++++++++++++++++++++
- 1 file changed, 120 insertions(+)
-
-diff --git a/tools/testing/vsock/vsock_test.c b/tools/testing/vsock/vsock_test.c
-index 67766bfe176f..cdaa154fc3a9 100644
---- a/tools/testing/vsock/vsock_test.c
-+++ b/tools/testing/vsock/vsock_test.c
-@@ -16,6 +16,7 @@
- #include <linux/kernel.h>
- #include <sys/types.h>
- #include <sys/socket.h>
-+#include <sys/mman.h>
- 
- #include "timeout.h"
- #include "control.h"
-@@ -385,6 +386,120 @@ static void test_seqpacket_msg_trunc_server(const struct test_opts *opts)
- 	close(fd);
- }
- 
-+#define BUF_PATTERN_1 'a'
-+#define BUF_PATTERN_2 'b'
-+
-+static void test_seqpacket_invalid_rec_buffer_client(const struct test_opts *opts)
-+{
-+	int fd;
-+	unsigned char *buf1;
-+	unsigned char *buf2;
-+	int buf_size = getpagesize() * 3;
-+
-+	fd = vsock_seqpacket_connect(opts->peer_cid, 1234);
-+	if (fd < 0) {
-+		perror("connect");
-+		exit(EXIT_FAILURE);
-+	}
-+
-+	buf1 = malloc(buf_size);
-+	if (!buf1) {
-+		perror("'malloc()' for 'buf1'");
-+		exit(EXIT_FAILURE);
-+	}
-+
-+	buf2 = malloc(buf_size);
-+	if (!buf2) {
-+		perror("'malloc()' for 'buf2'");
-+		exit(EXIT_FAILURE);
-+	}
-+
-+	memset(buf1, BUF_PATTERN_1, buf_size);
-+	memset(buf2, BUF_PATTERN_2, buf_size);
-+
-+	if (send(fd, buf1, buf_size, 0) != buf_size) {
-+		perror("send failed");
-+		exit(EXIT_FAILURE);
-+	}
-+
-+	if (send(fd, buf2, buf_size, 0) != buf_size) {
-+		perror("send failed");
-+		exit(EXIT_FAILURE);
-+	}
-+
-+	close(fd);
-+}
-+
-+static void test_seqpacket_invalid_rec_buffer_server(const struct test_opts *opts)
-+{
-+	int fd;
-+	unsigned char *broken_buf;
-+	unsigned char *valid_buf;
-+	int page_size = getpagesize();
-+	int buf_size = page_size * 3;
-+	ssize_t res;
-+	int prot = PROT_READ | PROT_WRITE;
-+	int flags = MAP_PRIVATE | MAP_ANONYMOUS;
-+	int i;
-+
-+	fd = vsock_seqpacket_accept(VMADDR_CID_ANY, 1234, NULL);
-+	if (fd < 0) {
-+		perror("accept");
-+		exit(EXIT_FAILURE);
-+	}
-+
-+	/* Setup first buffer. */
-+	broken_buf = mmap(NULL, buf_size, prot, flags, -1, 0);
-+	if (broken_buf == MAP_FAILED) {
-+		perror("mmap for 'broken_buf'");
-+		exit(EXIT_FAILURE);
-+	}
-+
-+	/* Unmap "hole" in buffer. */
-+	if (munmap(broken_buf + page_size, page_size)) {
-+		perror("'broken_buf' setup");
-+		exit(EXIT_FAILURE);
-+	}
-+
-+	valid_buf = mmap(NULL, buf_size, prot, flags, -1, 0);
-+	if (valid_buf == MAP_FAILED) {
-+		perror("mmap for 'valid_buf'");
-+		exit(EXIT_FAILURE);
-+	}
-+
-+	/* Try to fill buffer with unmapped middle. */
-+	res = read(fd, broken_buf, buf_size);
-+	if (res != -1) {
-+		perror("invalid read result of 'broken_buf'");
-+		exit(EXIT_FAILURE);
-+	}
-+
-+	if (errno != ENOMEM) {
-+		perror("invalid errno of 'broken_buf'");
-+		exit(EXIT_FAILURE);
-+	}
-+
-+	/* Try to fill valid buffer. */
-+	res = read(fd, valid_buf, buf_size);
-+	if (res != buf_size) {
-+		perror("invalid read result of 'valid_buf'");
-+		exit(EXIT_FAILURE);
-+	}
-+
-+	for (i = 0; i < buf_size; i++) {
-+		if (valid_buf[i] != BUF_PATTERN_2) {
-+			perror("invalid pattern for valid buf");
-+			exit(EXIT_FAILURE);
-+		}
-+	}
-+
-+	/* Unmap buffers. */
-+	munmap(broken_buf, page_size);
-+	munmap(broken_buf + page_size * 2, page_size);
-+	munmap(valid_buf, buf_size);
-+	close(fd);
-+}
-+
- static struct test_case test_cases[] = {
- 	{
- 		.name = "SOCK_STREAM connection reset",
-@@ -425,6 +540,11 @@ static struct test_case test_cases[] = {
- 		.run_client = test_seqpacket_msg_trunc_client,
- 		.run_server = test_seqpacket_msg_trunc_server,
- 	},
-+	{
-+		.name = "SOCK_SEQPACKET invalid receive buffer",
-+		.run_client = test_seqpacket_invalid_rec_buffer_client,
-+		.run_server = test_seqpacket_invalid_rec_buffer_server,
-+	},
- 	{},
- };
- 
--- 
-2.25.1
-
+On 04.07.2021 11:08, Arseny Krasnov wrote:
+> 	This patchset modifies receive logic for SOCK_SEQPACKET.
+> Difference between current implementation and this version is that
+> now reader is woken up when there is at least one RW packet in rx
+> queue of socket and data is copied to user's buffer, while merged
+> approach wake up user only when whole message is received and kept
+> in queue. New implementation has several advantages:
+>  1) There is no limit for message length. Merged approach requires
+>     that length must be smaller than 'peer_buf_alloc', otherwise
+>     transmission will stuck.
+>  2) There is no need to keep whole message in queue, thus no
+>     'kmalloc()' memory will be wasted until EOR is received.
+>
+>     Also new approach has some feature: as fragments of message
+> are copied until EOR is received, it is possible that part of
+> message will be already in user's buffer, while rest of message
+> still not received. And if user will be interrupted by signal or
+> timeout with part of message in buffer, it will exit receive loop,
+> leaving rest of message in queue. To solve this problem special
+> callback was added to transport: it is called when user was forced
+> to leave exit loop and tells transport to drop any packet until
+> EOR met. When EOR is found, this mode is disabled and normal packet
+> processing started. Note, that when 'drop until EOR' mode is on,
+> incoming packets still inserted in queue, reader will be woken up,
+> tries to copy data, but nothing will be copied until EOR found.
+> It was possible to drain such unneeded packets it rx work without
+> kicking user, but implemented way is simplest. Anyway, i think
+> such cases are rare.
+>
+>     New test also added - it tries to copy to invalid user's
+> buffer.
+>
+> Arseny Krasnov (16):
+>  af_vsock/virtio/vsock: change seqpacket receive logic
+>  af_vsock/virtio/vsock: remove 'seqpacket_has_data' callback
+>  virtio/vsock: remove 'msg_count' based logic
+>  af_vsock/virtio/vsock: add 'seqpacket_drop()' callback
+>  virtio/vsock: remove record size limit for SEQPACKET
+>  vsock_test: SEQPACKET read to broken buffer
+>
+>  drivers/vhost/vsock.c                   |   2 +-
+>  include/linux/virtio_vsock.h            |   7 +-
+>  include/net/af_vsock.h                  |   4 +-
+>  net/vmw_vsock/af_vsock.c                |  44 ++++----
+>  net/vmw_vsock/virtio_transport.c        |   2 +-
+>  net/vmw_vsock/virtio_transport_common.c | 103 ++++++++-----------
+>  net/vmw_vsock/vsock_loopback.c          |   2 +-
+>  tools/testing/vsock/vsock_test.c        | 120 ++++++++++++++++++++++
+>  8 files changed, 193 insertions(+), 91 deletions(-)
+>
+>  v1 -> v2:
+>  Patches reordered and reorganized.
+>
+> Signed-off-by: Arseny Krasnov <arseny.krasnov@kaspersky.com>
+> ---
+>  cv.txt | 0
+>  1 file changed, 0 insertions(+), 0 deletions(-)
+>  create mode 100644 cv.txt
+>
+> diff --git a/cv.txt b/cv.txt
+> new file mode 100644
+> index 000000000000..e69de29bb2d1
+Sorry, forget to remove my tmp file
