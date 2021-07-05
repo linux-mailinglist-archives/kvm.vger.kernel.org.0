@@ -2,108 +2,77 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 17D343BB5F0
-	for <lists+kvm@lfdr.de>; Mon,  5 Jul 2021 05:48:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A96693BB67B
+	for <lists+kvm@lfdr.de>; Mon,  5 Jul 2021 06:46:56 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229743AbhGEDvZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 4 Jul 2021 23:51:25 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:58105 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229652AbhGEDvY (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Sun, 4 Jul 2021 23:51:24 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1625456928;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=25P6+qOObwDiaurdWnfUZ/5fIR3I7PXs4U3cGO2pDNQ=;
-        b=ZxfKnzuUsmBJ24UVTsrzkAeYBQNnDiNzUV/bqxYppgDq1SU3RyEdzt0Se4hoHuUpnk4G1x
-        Gltq3yKVXEelmzk5iBAO35A5/LKb2D4RbY1O6zdlmoHUos8D9oOYnEXkUw36XZInZOIaid
-        +p05T5anyVxz+wzT9RmF1sq4ZNfyDLQ=
-Received: from mail-pg1-f199.google.com (mail-pg1-f199.google.com
- [209.85.215.199]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-548-joPrVS8qOJOK_I3mvubs9Q-1; Sun, 04 Jul 2021 23:48:47 -0400
-X-MC-Unique: joPrVS8qOJOK_I3mvubs9Q-1
-Received: by mail-pg1-f199.google.com with SMTP id h5-20020a6357450000b02902275ef514faso12741850pgm.6
-        for <kvm@vger.kernel.org>; Sun, 04 Jul 2021 20:48:46 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-transfer-encoding
-         :content-language;
-        bh=25P6+qOObwDiaurdWnfUZ/5fIR3I7PXs4U3cGO2pDNQ=;
-        b=B880L9klv6ruUTZQW3uTXzZemF/ZZ9SIAUvRxnIEOki4oA61L5qOoh0CRW3wp3mGgl
-         9fEhvcQisbnS5ngsBC2QfSI1Y1inNkP7u0XJUzj7RpWOkncYY7hynCEbMzungPftquiS
-         WoLijR/12h6y8o21rl0uLicZJHirIu8VIP2c8Fjp/uRhue0JSnk61TSWhXs00WFNtamm
-         6B9ou+FvZ6BS3cF110oP1vbqcwa3xDUyM/yiIEJ8viX/5agMa5MUUhBHiMQn8r4upXUt
-         tXUBVUCy5i04P7rTUzCPKsH/jloPSqsryYMx0M+F5wmwTKnco1KIeidv5gql/NW1OR7J
-         Q8XQ==
-X-Gm-Message-State: AOAM533dlA2QtPORbeUFLiVq0Iw6dgbl2K6StxTBZOAzmveqoHk0A2od
-        8WuRq5sPzFJikY+Jfc2kBABjsqwU6ZFI8wlG2vW+v+jS27+FfPvXDRmV4ntOBUf9un44q40eLnx
-        QAmVg3KuVl310
-X-Received: by 2002:a63:f955:: with SMTP id q21mr13651927pgk.448.1625456925968;
-        Sun, 04 Jul 2021 20:48:45 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxh+8a0lcafys7ntL0qYOJsYQ0uxw1HqHLN2/UyNlqrNDJW0H4QdQRaegwbRorAJ1FTbNPV1A==
-X-Received: by 2002:a63:f955:: with SMTP id q21mr13651917pgk.448.1625456925713;
-        Sun, 04 Jul 2021 20:48:45 -0700 (PDT)
-Received: from wangxiaodeMacBook-Air.local ([209.132.188.80])
-        by smtp.gmail.com with ESMTPSA id f193sm2380694pfa.185.2021.07.04.20.48.42
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 04 Jul 2021 20:48:45 -0700 (PDT)
-Subject: Re: [RFC PATCH] vhost-vdpa: mark vhost device invalid to reflect vdpa
- device unregistration
-To:     gautam.dawar@xilinx.com
-Cc:     martinh@xilinx.com, hanand@xilinx.com, gdawar@xilinx.com,
-        "Michael S. Tsirkin" <mst@redhat.com>, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-References: <20210704205205.6132-1-gdawar@xilinx.com>
-From:   Jason Wang <jasowang@redhat.com>
-Message-ID: <3d02b8f5-0a6b-e8d1-533d-8503da3fcc4e@redhat.com>
-Date:   Mon, 5 Jul 2021 11:48:36 +0800
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0)
- Gecko/20100101 Thunderbird/78.11.0
+        id S229689AbhGEEtb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 5 Jul 2021 00:49:31 -0400
+Received: from out28-220.mail.aliyun.com ([115.124.28.220]:36714 "EHLO
+        out28-220.mail.aliyun.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229447AbhGEEta (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 5 Jul 2021 00:49:30 -0400
+X-Alimail-AntiSpam: AC=CONTINUE;BC=0.08799765|-1;CH=green;DM=|CONTINUE|false|;DS=CONTINUE|ham_system_inform|0.0041981-0.000223123-0.995579;FP=9113306602455269698|1|1|2|0|-1|-1|-1;HT=ay29a033018047206;MF=haibiao.xiao@zstack.io;NM=1;PH=DS;RN=2;RT=2;SR=0;TI=SMTPD_---.KcFmI1S_1625460411;
+Received: from Rickylss-Ubuntu..(mailfrom:haibiao.xiao@zstack.io fp:SMTPD_---.KcFmI1S_1625460411)
+          by smtp.aliyun-inc.com(10.147.41.137);
+          Mon, 05 Jul 2021 12:46:52 +0800
+From:   "haibiao.xiao" <haibiao.xiao@zstack.io>
+To:     kvm@vger.kernel.org
+Cc:     "haibiao.xiao" <xiaohaibiao331@outlook.com>
+Subject: [PATCH kvmtool] Makefile: 'lvm version' works incorrect. Because CFLAGS can not get sub-make variable $(KVMTOOLS_VERSION)
+Date:   Mon,  5 Jul 2021 12:46:49 +0800
+Message-Id: <20210705044649.14890-1-haibiao.xiao@zstack.io>
+X-Mailer: git-send-email 2.30.2
 MIME-Version: 1.0
-In-Reply-To: <20210704205205.6132-1-gdawar@xilinx.com>
-Content-Type: text/plain; charset=gbk; format=flowed
 Content-Transfer-Encoding: 8bit
-Content-Language: en-US
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+From: "haibiao.xiao" <xiaohaibiao331@outlook.com>
 
-ÔÚ 2021/7/5 ÉÏÎç4:52, gautam.dawar@xilinx.com Ð´µÀ:
->   	vma->vm_page_prot = pgprot_noncached(vma->vm_page_prot);
-> @@ -1091,11 +1122,13 @@ static void vhost_vdpa_remove(struct vdpa_device *vdpa)
->   		opened = atomic_cmpxchg(&v->opened, 0, 1);
->   		if (!opened)
->   			break;
-> -		wait_for_completion_timeout(&v->completion,
-> -					    msecs_to_jiffies(1000));
-> -		dev_warn_once(&v->dev,
-> -			      "%s waiting for/dev/%s to be closed\n",
-> -			      __func__, dev_name(&v->dev));
-> +		if (!wait_for_completion_timeout(&v->completion,
-> +					    msecs_to_jiffies(1000))) {
-> +			dev_warn(&v->dev,
-> +				 "%s/dev/%s in use, continue..\n",
-> +				 __func__, dev_name(&v->dev));
-> +			break;
-> +		}
->   	} while (1);
->   
->   	put_device(&v->dev);
-> +	v->dev_invalid = true;
+Command 'lvm version' works incorrect.
+It is expected to print:
 
+    # ./lvm version
+    # kvm tool [KVMTOOLS_VERSION]
 
-Besides the mapping handling mentioned by Michael. I think this can lead 
-use-after-free. put_device may release the memory.
+but the KVMTOOLS_VERSION is missed:
 
-Another fundamental issue, vDPA is the parent of vhost-vDPA device. I'm 
-not sure the device core can allow the parent to go away first.
+    # ./lvm version
+    # kvm tool
 
-Thanks
+The KVMTOOLS_VERSION is defined in the KVMTOOLS-VERSION-FILE file which
+is included at the end of Makefile. Since the CFLAGS is a 'Simply
+expanded variables' which means CFLAGS is only scanned once. So the
+definetion of KVMTOOLS_VERSION at the end of Makefile would not scanned
+by CFLAGS. So the '-DKVMTOOLS_VERSION=' remains empty.
 
+I fixed the bug by moving the '-include $(OUTPUT)KVMTOOLS-VERSION-FILE'
+before the CFLAGS.
+---
+ Makefile | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/Makefile b/Makefile
+index bb7ad3e..9afb5e3 100644
+--- a/Makefile
++++ b/Makefile
+@@ -17,6 +17,7 @@ export E Q
+ 
+ include config/utilities.mak
+ include config/feature-tests.mak
++-include $(OUTPUT)KVMTOOLS-VERSION-FILE
+ 
+ CC	:= $(CROSS_COMPILE)gcc
+ CFLAGS	:=
+@@ -559,5 +560,4 @@ ifneq ($(MAKECMDGOALS),clean)
+ 
+ KVMTOOLS-VERSION-FILE:
+ 	@$(SHELL_PATH) util/KVMTOOLS-VERSION-GEN $(OUTPUT)
+--include $(OUTPUT)KVMTOOLS-VERSION-FILE
+-endif
++endif
+\ No newline at end of file
+-- 
+2.30.2
 
