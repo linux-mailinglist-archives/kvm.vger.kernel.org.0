@@ -2,108 +2,130 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 55B963BBA9D
-	for <lists+kvm@lfdr.de>; Mon,  5 Jul 2021 11:57:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9A7EC3BBAAA
+	for <lists+kvm@lfdr.de>; Mon,  5 Jul 2021 11:59:26 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230479AbhGEJ76 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 5 Jul 2021 05:59:58 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:59271 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230000AbhGEJ76 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 5 Jul 2021 05:59:58 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1625479041;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=TT9vJEoaVxuLffb3JgMy8FhvtJ+ac7w2RFyRIaNwv0E=;
-        b=YovEjDsm7fretM6ovXvp+U6EfBsmmkOPDb0n4oDM1B4n6hrFmM6WMgYTlU9Txdz7SFmNo+
-        CQAbSXBAXOaBhli7RdkFKUUnNnE7iDX9tuZRgAnBSpBosG4MN+0a4q9VzZCOpZkeINQF8g
-        vcNhapfrKK/UB77nT6lgXzcPDjBm7Ws=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-562-BhOoArC3Mu-_imEYm7TN-w-1; Mon, 05 Jul 2021 05:57:20 -0400
-X-MC-Unique: BhOoArC3Mu-_imEYm7TN-w-1
-Received: by mail-wm1-f69.google.com with SMTP id k5-20020a7bc3050000b02901e081f69d80so2914845wmj.8
-        for <kvm@vger.kernel.org>; Mon, 05 Jul 2021 02:57:20 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=TT9vJEoaVxuLffb3JgMy8FhvtJ+ac7w2RFyRIaNwv0E=;
-        b=QbVbeVJpzNwszTIpWNyT/lwI7QaJqd44esCyhyfwLXxJ89fw/TqBHrmsV3Rng4aZrT
-         AO+/YRbU8lTXHAOCNW2+SYrfiXRFP2I5Z5c0YZYHwXWw1pqocgnwNEtsofKne8j9KtOm
-         OZ91APVUXzP0l351OfPm27RT145JDuEXTnOmt9axF1wz6dqrTqL3qDbeIYtc7zAIWbZx
-         IlK01xXNBJCPbhnrbBcJ+U/9km41+EUZYUUxwmFErsPU8NduDY/0SNePlEJaJGNuhgLg
-         KxyXN7SxNyECF7Sm3Y6CVlpFxzrPn0s5ZcGnIdpSJvj5jYpHGxwD7Ff4426Qiixi16DW
-         IFSQ==
-X-Gm-Message-State: AOAM532/Aa+a+xochfxJojYawZLdNhcXUcFwq+QuI0o2Kx1DThUgj18m
-        EnhSWvTBT+Rfy1jZ0xf+vZ/d9NFCrb/uzd7fzFS7itK2V5Ox8Ds7/wGknkcs7/Oepccd7AbHLJk
-        sMfWHqinlRc0h
-X-Received: by 2002:a1c:cc02:: with SMTP id h2mr13572360wmb.39.1625479038956;
-        Mon, 05 Jul 2021 02:57:18 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxUUJkycBN1IGxatVRV8AT19lHi23ORSBLStzRwyll5y4tv8tW5FBc57g3oPpWeWfi+32GUYA==
-X-Received: by 2002:a1c:cc02:: with SMTP id h2mr13572348wmb.39.1625479038812;
-        Mon, 05 Jul 2021 02:57:18 -0700 (PDT)
-Received: from ?IPv6:2a01:e0a:59e:9d80:527b:9dff:feef:3874? ([2a01:e0a:59e:9d80:527b:9dff:feef:3874])
-        by smtp.gmail.com with ESMTPSA id v15sm21840814wmj.39.2021.07.05.02.57.17
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 05 Jul 2021 02:57:18 -0700 (PDT)
-Subject: Re: [PATCH] KVM: selftests: Address extra memslot parameters in
- vm_vaddr_alloc
-To:     Ricardo Koller <ricarkol@google.com>, kvm@vger.kernel.org
-Cc:     maz@kernel.org, seanjc@google.com, pbonzini@redhat.com,
-        kvmarm@lists.cs.columbia.edu
-References: <20210702201042.4036162-1-ricarkol@google.com>
-From:   Eric Auger <eauger@redhat.com>
-Message-ID: <441f3230-7d31-8a14-f100-a0c6063e3d07@redhat.com>
-Date:   Mon, 5 Jul 2021 11:57:17 +0200
+        id S230465AbhGEKCB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 5 Jul 2021 06:02:01 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:3080 "EHLO
+        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S230050AbhGEKCB (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 5 Jul 2021 06:02:01 -0400
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 1659Y75T130601;
+        Mon, 5 Jul 2021 05:59:24 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=1/PxTBfyA70het22KvEXDUU1kkRFw6abe+yL6bxElqE=;
+ b=AoAkXhkN92BBmq0FvAEpDpl26lnxK+PRCQ2pdIUY/h13W+sUdDDrk6xcrhU3CaPM5KUQ
+ 4HD9b+2mSvz/c+6pkAPP9E939Nk8hZkiZy4z/x+oj6enIzNqokgWYRN0r/pnxTizo9lG
+ 7rc3WyZPjup73qRrVfY5WMxUaQxicHWyYBAJ5Kvo2VUVktR6ext8KiEGhulh9X53XO5F
+ YmoYvwfzNJfobO9IcXPOFmMqb6w3ODZuoZu5d0UgbvBHPQ61y3nzK9V5eBUZq8spkfeR
+ S52ufO4Nrqeb3VlKUTdeOIdhVyZKM511e6KYj6TwQola8PQZFgjS52Wu8MMh/c/QcHNK lQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 39kww83fgw-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 05 Jul 2021 05:59:23 -0400
+Received: from m0098417.ppops.net (m0098417.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 1659Z1DH133389;
+        Mon, 5 Jul 2021 05:59:23 -0400
+Received: from ppma05fra.de.ibm.com (6c.4a.5195.ip4.static.sl-reverse.com [149.81.74.108])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 39kww83fge-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 05 Jul 2021 05:59:23 -0400
+Received: from pps.filterd (ppma05fra.de.ibm.com [127.0.0.1])
+        by ppma05fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 1659vNM4028875;
+        Mon, 5 Jul 2021 09:59:21 GMT
+Received: from b06avi18626390.portsmouth.uk.ibm.com (b06avi18626390.portsmouth.uk.ibm.com [9.149.26.192])
+        by ppma05fra.de.ibm.com with ESMTP id 39jfh8gcvs-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 05 Jul 2021 09:59:21 +0000
+Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
+        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 1659vW8k34865458
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 5 Jul 2021 09:57:32 GMT
+Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 15BE452054;
+        Mon,  5 Jul 2021 09:59:19 +0000 (GMT)
+Received: from oc7455500831.ibm.com (unknown [9.171.49.175])
+        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id AD2AF52051;
+        Mon,  5 Jul 2021 09:59:18 +0000 (GMT)
+Subject: Re: [PATCH/RFC] KVM: selftests: introduce P44V64 for z196 and EC12
+To:     David Hildenbrand <david@redhat.com>, KVM <kvm@vger.kernel.org>
+Cc:     Cornelia Huck <cohuck@redhat.com>,
+        Janosch Frank <frankja@linux.vnet.ibm.com>,
+        linux-s390 <linux-s390@vger.kernel.org>,
+        Thomas Huth <thuth@redhat.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+References: <20210701153853.33063-1-borntraeger@de.ibm.com>
+ <bc025447-db53-5472-76b0-0cfa2c3ae996@redhat.com>
+From:   Christian Borntraeger <borntraeger@de.ibm.com>
+Message-ID: <390803e9-a713-c9e7-cda8-ee822e5c1c40@de.ibm.com>
+Date:   Mon, 5 Jul 2021 11:59:18 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.10.1
+ Thunderbird/78.11.0
 MIME-Version: 1.0
-In-Reply-To: <20210702201042.4036162-1-ricarkol@google.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <bc025447-db53-5472-76b0-0cfa2c3ae996@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: ugFMm7HpFgYiwUeV-i7XSeD44y6bv814
+X-Proofpoint-ORIG-GUID: SnBiiw3iDORkgIEss6sfwSA7T1bj16bI
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.790
+ definitions=2021-07-05_05:2021-07-02,2021-07-05 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 mlxscore=0
+ bulkscore=0 suspectscore=0 lowpriorityscore=0 spamscore=0 phishscore=0
+ priorityscore=1501 malwarescore=0 mlxlogscore=836 impostorscore=0
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2104190000 definitions=main-2107050048
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Ricardo,
 
-On 7/2/21 10:10 PM, Ricardo Koller wrote:
-> Commit a75a895e6457 ("KVM: selftests: Unconditionally use memslot 0 for
-> vaddr allocations") removed the memslot parameters from vm_vaddr_alloc.
-> It addressed all callers except one under lib/aarch64/, due to a race
-> with commit e3db7579ef35 ("KVM: selftests: Add exception handling
-> support for aarch64")
-> 
-> Fix the vm_vaddr_alloc call in lib/aarch64/processor.c.
-> 
-> Reported-by: Zenghui Yu <yuzenghui@huawei.com>
-> Signed-off-by: Ricardo Koller <ricarkol@google.com>
-Reviewed-by: Eric Auger <eric.auger@redhat.com>
 
-Eric
-
-> ---
->  tools/testing/selftests/kvm/lib/aarch64/processor.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+On 05.07.21 11:53, David Hildenbrand wrote:
+> On 01.07.21 17:38, Christian Borntraeger wrote:
+>> Older machines likes z196 and zEC12 do only support 44 bits of physical
+>> addresses. Make this the default and check via IBC if we are on a later
+>> machine. We then add P47V64 as an additional model.
+>>
+>> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
+>> Fixes: 1bc603af73dd ("KVM: selftests: introduce P47V64 for s390x")
 > 
-> diff --git a/tools/testing/selftests/kvm/lib/aarch64/processor.c b/tools/testing/selftests/kvm/lib/aarch64/processor.c
-> index 9f49f6caafe5..632b74d6b3ca 100644
-> --- a/tools/testing/selftests/kvm/lib/aarch64/processor.c
-> +++ b/tools/testing/selftests/kvm/lib/aarch64/processor.c
-> @@ -401,7 +401,7 @@ void route_exception(struct ex_regs *regs, int vector)
->  void vm_init_descriptor_tables(struct kvm_vm *vm)
->  {
->  	vm->handlers = vm_vaddr_alloc(vm, sizeof(struct handlers),
-> -			vm->page_size, 0, 0);
-> +			vm->page_size);
->  
->  	*(vm_vaddr_t *)addr_gva2hva(vm, (vm_vaddr_t)(&exception_handlers)) = vm->handlers;
->  }
+> [...]
 > 
+>> +#ifdef __s390x__
+>> +    {
+>> +        int kvm_fd, vm_fd;
+>> +        struct kvm_s390_vm_cpu_processor info;
+>> +
+>> +        kvm_fd = open_kvm_dev_path_or_exit();
+>> +        vm_fd = ioctl(kvm_fd, KVM_CREATE_VM, 0);
+>> +        kvm_device_access(vm_fd, KVM_S390_VM_CPU_MODEL,
+>> +                  KVM_S390_VM_CPU_PROCESSOR, &info, false);
+> 
+> Can we always assume to run on a kernel where this won't fail?
 
+As far as I can tell, the selftests are bundled with a given kernel (and
+there it should not fail). I guess most selftests will fail with a 3.x
+kernel and we do not care?
+> 
+>> +        close(vm_fd);
+>> +        close(kvm_fd);
+>> +        /* Starting with z13 we have 47bits of physical address */
+> 
+> This matches the definition in the QEMU cpu models.
+> 
+>> +        if (info.ibc >= 0x30)
+>> +            guest_mode_append(VM_MODE_P47V64_4K, true, true);
+>> +    }
+>> +#endif
+> 
+> 
+> In general, LGTM
+> 
+> 
