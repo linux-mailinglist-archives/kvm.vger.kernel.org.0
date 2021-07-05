@@ -2,248 +2,172 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E50933BBA44
-	for <lists+kvm@lfdr.de>; Mon,  5 Jul 2021 11:37:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5107E3BBA6A
+	for <lists+kvm@lfdr.de>; Mon,  5 Jul 2021 11:41:43 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230394AbhGEJjq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 5 Jul 2021 05:39:46 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:36418 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230262AbhGEJjq (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 5 Jul 2021 05:39:46 -0400
-Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 1659XxN4131171;
-        Mon, 5 Jul 2021 05:37:09 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=fW2irKgha+rTv2x3G9AkxSjaUSzJY/LIZRyabvdxO8A=;
- b=E7qwExmsDhiw+OchnmxXoWV3GuCRFtxkXgjv+l1TuHdUsflYqPezO3Q8dzxlNiiBZbix
- 0Gj+LMZlMXqJKCor/6wYDWM+fRXL19cYRrXhE4PfeiyLsV3brgusZYQc5+wEqf4ldQrm
- kCLhdCVo1WgobD/io9pAQGM6I1tnxHZRQRjCxx8Kvdxjzr7s4rAAsVi16RTCMfw9lJDq
- Q1dhCQ68/xDnyY3geyh6oDtBYU4jtPWjPOjvOBxNU+j+eRgljjdSDYJ9MtVOOyG/7Pxq
- ZeboFEpSGG9A6OAhIAA5Augub1YNuxfnVhdIt9jbhAl0ABZWj0GRLv2cmAAd9p+JECN7 sw== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 39kukmxck0-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 05 Jul 2021 05:37:09 -0400
-Received: from m0098396.ppops.net (m0098396.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 1659ZNwm134514;
-        Mon, 5 Jul 2021 05:37:08 -0400
-Received: from ppma03fra.de.ibm.com (6b.4a.5195.ip4.static.sl-reverse.com [149.81.74.107])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 39kukmxcj6-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 05 Jul 2021 05:37:08 -0400
-Received: from pps.filterd (ppma03fra.de.ibm.com [127.0.0.1])
-        by ppma03fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 1659YwPi030517;
-        Mon, 5 Jul 2021 09:37:06 GMT
-Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
-        by ppma03fra.de.ibm.com with ESMTP id 39jfh88cwt-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 05 Jul 2021 09:37:06 +0000
-Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
-        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 1659ZEA736438312
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 5 Jul 2021 09:35:14 GMT
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id CE5B6A4055;
-        Mon,  5 Jul 2021 09:37:03 +0000 (GMT)
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 6D447A404D;
-        Mon,  5 Jul 2021 09:37:03 +0000 (GMT)
-Received: from localhost.localdomain (unknown [9.145.25.73])
-        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Mon,  5 Jul 2021 09:37:03 +0000 (GMT)
-Subject: Re: [kvm-unit-tests PATCH v2 3/3] s390x: mvpg: Add SIE mvpg test
-To:     Thomas Huth <thuth@redhat.com>, kvm@vger.kernel.org
-Cc:     linux-s390@vger.kernel.org, imbrenda@linux.ibm.com,
-        david@redhat.com, cohuck@redhat.com
-References: <20210629131841.17319-1-frankja@linux.ibm.com>
- <20210629131841.17319-4-frankja@linux.ibm.com>
- <d4966f2c-89b4-94b7-0dc7-df69534c2d7a@redhat.com>
-From:   Janosch Frank <frankja@linux.ibm.com>
-Message-ID: <8a742d45-bb49-d130-604a-da1e11150ef3@linux.ibm.com>
-Date:   Mon, 5 Jul 2021 11:37:03 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.10.1
+        id S230443AbhGEJoS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 5 Jul 2021 05:44:18 -0400
+Received: from mail-sn1anam02on2053.outbound.protection.outlook.com ([40.107.96.53]:3687
+        "EHLO NAM02-SN1-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S230000AbhGEJoQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 5 Jul 2021 05:44:16 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=b7u3KRA7mxZV9yuqzmCA3T/pxGIod8DthexWMLAb1uzFmShE19xovBknbqKAe3KJHgdkPBdqtBUgFwsyMNcQxHZLJF6001g/G29ahWnWaLq0+eaRkgQ5N2cYG1GenZBBMraqwP+KZPF+aEr5eVWi3LScMSXwU1BhRvcQW23I+zHH6zHq8B6OJCH+756MGixjxRyfYXOXjkXipffXzW6TCHo4HIq8AnHjUyziaw6jQY0mcVlPwCo8FXyqpWhct5SunYi6b00EdgjQci+2LLwjbT+3OVpu4kiEgqbA7CgW8QwPCHFboGBAq/QuHFKaTW+McHvbK1rFrYRjM/dmthHLnw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=gbn8syCm8gctlvWh0rG7DiclEAaAGJgKoIFeHS1z0j4=;
+ b=d+j4OuXPVqJMQ/bCIz3x4dRaTKKZG1CZ1JHkQjcX/n32NUIQkAk8+84spexRspPNtvhKa6Tx4zUSJzugdrzS4pj6c3MU0eTKpSJsmCqhxpoYvFq3GNggQDhtEe1ctRjgLx3MS9ABMK2q9Lur3R1ynQVt+3cXmYhoXLy4Nte+nabgkDhbxa62AWC1TexHhtoHVxTY11rN1jGaozCu5GT1OIghOeg4+TDpRvnp8gIpmX4gtnolgreNNfXbUEbLvLfuhwkhy78AiJXaPCz/BtEjQ2yoduKlmVYVIghQm2xLfH2JN4wr2G4fT8JYvuuB8lov9LEroG3cXuqLAedHePsMow==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.112.34) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=none sp=none pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=gbn8syCm8gctlvWh0rG7DiclEAaAGJgKoIFeHS1z0j4=;
+ b=UV12jDBkShjJas7IOJwtkw/6ov+6rnKC8wgawoiBlFU7MjTqUzh1hQlA5kwCxdOR+B0AXwFjjlX8PgjGn3ndSBiq+SdqstzD6dGhisMnGWtUeuTIz/Q4qHq/Bm4ITTpdd8wHcg3aNeuMODLwRTUoVE2EGV8bIiLlcO/zaDdMcxUyVOvO8Jp80Xx+5EUf/PVzyQXSFe39usmzRQgcHExobhaZQz1RYg6H3JQufLM5WGgvD7Uo8CTNXW13pehV+jEneSqy4lUXr6JpWSeGEl2hIKDVGUIXI5ahXzi20vAMDS0YvqWRkojKnM8tWDBPiy4Tz6ogbHt9E+lkwW/0ronDXw==
+Received: from BN9PR03CA0682.namprd03.prod.outlook.com (2603:10b6:408:10e::27)
+ by MW2PR12MB2457.namprd12.prod.outlook.com (2603:10b6:907:10::31) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4287.23; Mon, 5 Jul
+ 2021 09:41:37 +0000
+Received: from BN8NAM11FT062.eop-nam11.prod.protection.outlook.com
+ (2603:10b6:408:10e:cafe::a1) by BN9PR03CA0682.outlook.office365.com
+ (2603:10b6:408:10e::27) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4287.23 via Frontend
+ Transport; Mon, 5 Jul 2021 09:41:37 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.112.34)
+ smtp.mailfrom=nvidia.com; vger.kernel.org; dkim=none (message not signed)
+ header.d=none;vger.kernel.org; dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.112.34 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.112.34; helo=mail.nvidia.com;
+Received: from mail.nvidia.com (216.228.112.34) by
+ BN8NAM11FT062.mail.protection.outlook.com (10.13.177.34) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
+ 15.20.4287.22 via Frontend Transport; Mon, 5 Jul 2021 09:41:37 +0000
+Received: from [172.27.15.98] (172.20.187.6) by HQMAIL107.nvidia.com
+ (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1497.2; Mon, 5 Jul
+ 2021 09:41:33 +0000
+Subject: Re: [RFC v2 1/4] hisi-acc-vfio-pci: add new vfio_pci driver for
+ HiSilicon ACC devices
+To:     Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>,
+        "Leon Romanovsky" <leon@kernel.org>
+CC:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+        "jgg@nvidia.com" <jgg@nvidia.com>, Linuxarm <linuxarm@huawei.com>,
+        liulongfang <liulongfang@huawei.com>,
+        "Zengtao (B)" <prime.zeng@hisilicon.com>,
+        yuzenghui <yuzenghui@huawei.com>,
+        Jonathan Cameron <jonathan.cameron@huawei.com>,
+        "Wangzhou (B)" <wangzhou1@hisilicon.com>
+References: <20210702095849.1610-1-shameerali.kolothum.thodi@huawei.com>
+ <20210702095849.1610-2-shameerali.kolothum.thodi@huawei.com>
+ <YOFdTnlkcDZzw4b/@unreal> <fc9d6b0b82254fbdb1cc96365b5bdef3@huawei.com>
+From:   Max Gurtovoy <mgurtovoy@nvidia.com>
+Message-ID: <d02dff3a-8035-ced1-7fc3-fcff791f9203@nvidia.com>
+Date:   Mon, 5 Jul 2021 12:41:30 +0300
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.11.0
 MIME-Version: 1.0
-In-Reply-To: <d4966f2c-89b4-94b7-0dc7-df69534c2d7a@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+In-Reply-To: <fc9d6b0b82254fbdb1cc96365b5bdef3@huawei.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
 Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: 6XYCeT2HYGLWGuAWfMQDvMEEMHVGK5qh
-X-Proofpoint-ORIG-GUID: Uuz0uNUST17ZkRKtB6OwX2cpsAaU_8Fo
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.790
- definitions=2021-07-05_05:2021-07-02,2021-07-05 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
- phishscore=0 priorityscore=1501 adultscore=0 mlxlogscore=999
- impostorscore=0 malwarescore=0 spamscore=0 clxscore=1015 suspectscore=0
- bulkscore=0 mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2104190000 definitions=main-2107050048
+Content-Language: en-US
+X-Originating-IP: [172.20.187.6]
+X-ClientProxiedBy: HQMAIL107.nvidia.com (172.20.187.13) To
+ HQMAIL107.nvidia.com (172.20.187.13)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 7ac479fa-e0bc-4dde-d63f-08d93f991578
+X-MS-TrafficTypeDiagnostic: MW2PR12MB2457:
+X-Microsoft-Antispam-PRVS: <MW2PR12MB24572C1F08D267BDA4D6B82EDE1C9@MW2PR12MB2457.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:9508;
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: Knc6HUGR9p2H/f+QrSJyLTT0YUEr69EONq0+7vnO88KRQ9EYFWgT8bk6liZp/rzKt59k/IA+c81p44aEn3J6X60iHLI+w4cwbe3BYUF0TYbG4ihU49FqFYHmKV5ZPZGcg3lFS80f/p8KS/Ph4xW+Hk4fBkiW/+RVkOeL9YVcXgu52XOt1dYENlrRwXg+zun3PgYMuL7ZOfbhd/XoVKAH6FkXkJIbmj9Hb3bTO956wy21mvKriWbOQyxSwlFZgNSkLzMirN59JPu4xphJmix1lp+sKBzKTcwdB5Y5XUX03L73zZ8gaLS0s+bvVTaMmodF5FNn40C49QBWByyT+xpie86+jWPKe8IyBLOAbgADDrIprzJdLfQJAcNqtFebz+PUMtQr28Xzv6NjK9tIBt954mkaUihjPskvs63weWCpIDYq+/2ham5fImGyb5Jq7lgQFwWLUfGt5tEt7Rkn5yZj8z80HIivQ8+ez8T7nV5kRoacPX1CMVpyhvBGOvQrKXjhM4E3WvvB+3hLMNcRihDXEorAaHvygM4F0nQnoLQxUBwb4jUV/zo2aviClgq40UR5zq9g3N8N9Z7LuKT6uJ74c6I12mVT7vPdNkXPZ6gSiHmksmARX9p+MGd0n8EI2cBJM6e56BUnYUQf8gbsweoACTJKDfjIadgaqFGifEnrZgu7bxuN/5Hny7Wd2awFHQjylBaw84blSEGxJ7810J4lbWmE0PvGwTFjBuUs6OSZE30=
+X-Forefront-Antispam-Report: CIP:216.228.112.34;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:schybrid03.nvidia.com;CAT:NONE;SFS:(6029001)(4636009)(136003)(39860400002)(396003)(346002)(376002)(46966006)(36840700001)(36756003)(7416002)(47076005)(31696002)(70206006)(53546011)(70586007)(186003)(26005)(4326008)(16526019)(36860700001)(82310400003)(110136005)(54906003)(82740400003)(5660300002)(478600001)(8936002)(356005)(16576012)(86362001)(316002)(36906005)(8676002)(7636003)(336012)(2906002)(426003)(2616005)(83380400001)(31686004)(43740500002);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Jul 2021 09:41:37.0014
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 7ac479fa-e0bc-4dde-d63f-08d93f991578
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.112.34];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource: BN8NAM11FT062.eop-nam11.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW2PR12MB2457
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 7/5/21 9:24 AM, Thomas Huth wrote:
-> On 29/06/2021 15.18, Janosch Frank wrote:
->> Let's also check the PEI values to make sure our VSIE implementation
->> is correct.
+
+On 7/5/2021 11:47 AM, Shameerali Kolothum Thodi wrote:
+>
+>> -----Original Message-----
+>> From: Leon Romanovsky [mailto:leon@kernel.org]
+>> Sent: 04 July 2021 08:04
+>> To: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
+>> Cc: kvm@vger.kernel.org; linux-kernel@vger.kernel.org;
+>> linux-crypto@vger.kernel.org; alex.williamson@redhat.com; jgg@nvidia.com;
+>> mgurtovoy@nvidia.com; Linuxarm <linuxarm@huawei.com>; liulongfang
+>> <liulongfang@huawei.com>; Zengtao (B) <prime.zeng@hisilicon.com>;
+>> yuzenghui <yuzenghui@huawei.com>; Jonathan Cameron
+>> <jonathan.cameron@huawei.com>; Wangzhou (B) <wangzhou1@hisilicon.com>
+>> Subject: Re: [RFC v2 1/4] hisi-acc-vfio-pci: add new vfio_pci driver for HiSilicon
+>> ACC devices
 >>
->> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
->> ---
->>   s390x/Makefile                  |   2 +
->>   s390x/mvpg-sie.c                | 151 ++++++++++++++++++++++++++++++++
->>   s390x/snippets/c/mvpg-snippet.c |  33 +++++++
->>   s390x/unittests.cfg             |   3 +
->>   4 files changed, 189 insertions(+)
->>   create mode 100644 s390x/mvpg-sie.c
->>   create mode 100644 s390x/snippets/c/mvpg-snippet.c
+>> On Fri, Jul 02, 2021 at 10:58:46AM +0100, Shameer Kolothum wrote:
+>>> Add a vendor-specific vfio_pci driver for HiSilicon ACC devices.
+>>> This will be extended in follow-up patches to add support for
+>>> vfio live migration feature.
+>>>
+>>> Signed-off-by: Shameer Kolothum
+>> <shameerali.kolothum.thodi@huawei.com>
+>>> ---
+>>>   drivers/vfio/pci/Kconfig             |   9 +++
+>>>   drivers/vfio/pci/Makefile            |   2 +
+>>>   drivers/vfio/pci/hisi_acc_vfio_pci.c | 100 +++++++++++++++++++++++++++
+>>>   3 files changed, 111 insertions(+)
+>>>   create mode 100644 drivers/vfio/pci/hisi_acc_vfio_pci.c
+>> <...>
 >>
->> diff --git a/s390x/Makefile b/s390x/Makefile
->> index ba32f4c..07af26d 100644
->> --- a/s390x/Makefile
->> +++ b/s390x/Makefile
->> @@ -23,6 +23,7 @@ tests += $(TEST_DIR)/sie.elf
->>   tests += $(TEST_DIR)/mvpg.elf
->>   tests += $(TEST_DIR)/uv-host.elf
->>   tests += $(TEST_DIR)/edat.elf
->> +tests += $(TEST_DIR)/mvpg-sie.elf
->>   
->>   tests_binary = $(patsubst %.elf,%.bin,$(tests))
->>   ifneq ($(HOST_KEY_DOCUMENT),)
->> @@ -82,6 +83,7 @@ snippet_asmlib = $(SNIPPET_DIR)/c/cstart.o
->>   
->>   # perquisites (=guests) for the snippet hosts.
->>   # $(TEST_DIR)/<snippet-host>.elf: snippets = $(SNIPPET_DIR)/<c/asm>/<snippet>.gbin
->> +$(TEST_DIR)/mvpg-sie.elf: snippets = $(SNIPPET_DIR)/c/mvpg-snippet.gbin
->>   
->>   $(SNIPPET_DIR)/asm/%.gbin: $(SNIPPET_DIR)/asm/%.o $(FLATLIBS)
->>   	$(OBJCOPY) -O binary $(patsubst %.gbin,%.o,$@) $@
->> diff --git a/s390x/mvpg-sie.c b/s390x/mvpg-sie.c
->> new file mode 100644
->> index 0000000..3536c6a
->> --- /dev/null
->> +++ b/s390x/mvpg-sie.c
->> @@ -0,0 +1,151 @@
->> +#include <libcflat.h>
->> +#include <asm/asm-offsets.h>
->> +#include <asm-generic/barrier.h>
->> +#include <asm/pgtable.h>
->> +#include <mmu.h>
->> +#include <asm/page.h>
->> +#include <asm/facility.h>
->> +#include <asm/mem.h>
->> +#include <alloc_page.h>
->> +#include <vm.h>
->> +#include <sclp.h>
->> +#include <sie.h>
->> +
->> +static u8 *guest;
->> +static u8 *guest_instr;
->> +static struct vm vm;
->> +
->> +static uint8_t *src;
->> +static uint8_t *dst;
->> +static uint8_t *cmp;
->> +
->> +extern const char _binary_s390x_snippets_c_mvpg_snippet_gbin_start[];
->> +extern const char _binary_s390x_snippets_c_mvpg_snippet_gbin_end[];
->> +int binary_size;
->> +
->> +static void sie(struct vm *vm)
->> +{
->> +	/* Reset icptcode so we don't trip over it below */
->> +	vm->sblk->icptcode = 0;
->> +
->> +	while (vm->sblk->icptcode == 0) {
->> +		sie64a(vm->sblk, &vm->save_area);
->> +		if (vm->sblk->icptcode == ICPT_VALIDITY)
->> +			assert(0);
-> 
-> Please replace the above two lines with:
-> 
-> 		assert(vm->sblk->icptcode != ICPT_VALIDITY);
+>>> +static const struct vfio_device_ops hisi_acc_vfio_pci_ops = {
+>>> +	.name		= "hisi-acc-vfio-pci",
+>>> +	.open		= hisi_acc_vfio_pci_open,
+>>> +	.release	= vfio_pci_core_release,
+>>> +	.ioctl		= vfio_pci_core_ioctl,
+>>> +	.read		= vfio_pci_core_read,
+>>> +	.write		= vfio_pci_core_write,
+>>> +	.mmap		= vfio_pci_core_mmap,
+>>> +	.request	= vfio_pci_core_request,
+>>> +	.match		= vfio_pci_core_match,
+>>> +	.reflck_attach	= vfio_pci_core_reflck_attach,
+>> I don't remember what was proposed in vfio-pci-core conversion patches,
+>> but would expect that default behaviour is to fallback to vfio_pci_core_* API
+>> if ".release/.ioctl/e.t.c" are not redefined.
+> Yes, that would be nice, but don't think it does that in latest(v4).
+>
+> Hi Max,
+> Could we please consider fall back to the core defaults, may be check and assign defaults
+> in vfio_pci_core_register_device() ?
 
-Sure
+I don't see why we should do this.
 
-> 
->> +	}
->> +	vm->save_area.guest.grs[14] = vm->sblk->gg14;
->> +	vm->save_area.guest.grs[15] = vm->sblk->gg15;
->> +}
->> +
->> +static void test_mvpg_pei(void)
->> +{
->> +	uint64_t **pei_dst = (uint64_t **)((uintptr_t) vm.sblk + 0xc0);
->> +	uint64_t **pei_src = (uint64_t **)((uintptr_t) vm.sblk + 0xc8);
->> +
->> +	report_prefix_push("pei");
->> +
->> +	report_prefix_push("src");
->> +	memset(dst, 0, PAGE_SIZE);
->> +	protect_page(src, PAGE_ENTRY_I);
->> +	sie(&vm);
->> +	report(vm.sblk->icptcode == ICPT_PARTEXEC, "Partial execution");
->> +	report((uintptr_t)**pei_src == (uintptr_t)src + PAGE_ENTRY_I, "PEI_SRC correct");
->> +	report((uintptr_t)**pei_dst == (uintptr_t)dst, "PEI_DST correct");
->> +	unprotect_page(src, PAGE_ENTRY_I);
->> +	report(!memcmp(cmp, dst, PAGE_SIZE), "Destination intact");
->> +	/*
->> +	 * We need to execute the diag44 which is used as a blocker
->> +	 * behind the mvpg. It makes sure we fail the tests above if
->> +	 * the mvpg wouldn't have intercepted.
->> +	 */
->> +	sie(&vm);
->> +	/* Make sure we intercepted for the diag44 and nothing else */
->> +	assert(vm.sblk->icptcode == ICPT_INST &&
->> +	       vm.sblk->ipa == 0x8300 && vm.sblk->ipb == 0x440000);
->> +	report_prefix_pop();
->> +
->> +	/* Clear PEI data for next check */
->> +	report_prefix_push("dst");
->> +	memset((uint64_t *)((uintptr_t) vm.sblk + 0xc0), 0, 16);
->> +	memset(dst, 0, PAGE_SIZE);
->> +	protect_page(dst, PAGE_ENTRY_I);
->> +	sie(&vm);
->> +	report(vm.sblk->icptcode == ICPT_PARTEXEC, "Partial execution");
->> +	report((uintptr_t)**pei_src == (uintptr_t)src, "PEI_SRC correct");
->> +	report((uintptr_t)**pei_dst == (uintptr_t)dst + PAGE_ENTRY_I, "PEI_DST correct");
->> +	/* Needed for the memcmp and general cleanup */
->> +	unprotect_page(dst, PAGE_ENTRY_I);
->> +	report(!memcmp(cmp, dst, PAGE_SIZE), "Destination intact");
->> +	report_prefix_pop();
->> +
->> +	report_prefix_pop();
->> +}
-> 
-> Still quite a lot of magic values in above code ... any chance to introduce 
-> some #defines finally?
+vfio_pci_core.ko is just a library driver. It shouldn't decide for the 
+vendor driver ops.
 
-Currently not really.
-I added a comment for the diag 44 which should be enough right now. If
-needed I can add a comment to the pei variables as well.
+If a vendor driver would like to use its helper functions - great.
 
-> 
->> +static void test_mvpg(void)
->> +{
->> +	int binary_size = ((uintptr_t)_binary_s390x_snippets_c_mvpg_snippet_gbin_end -
->> +			   (uintptr_t)_binary_s390x_snippets_c_mvpg_snippet_gbin_start);
->> +
->> +	memcpy(guest, _binary_s390x_snippets_c_mvpg_snippet_gbin_start, binary_size);
->> +	memset(src, 0x42, PAGE_SIZE);
->> +	memset(dst, 0x43, PAGE_SIZE);
->> +	sie(&vm);
->> +	mb();
-> 
-> I think you don't need the mb() here.
+If it wants to override it - great.
 
-Right
+If it wants to leave some op as NULL - it can do it also.
 
-> 
->> +	report(!memcmp(src, dst, PAGE_SIZE) && *dst == 0x42, "Page moved");
->> +}
-> 
->   Thomas
-> 
 
+>
+> Thanks,
+> Shameer
