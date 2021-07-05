@@ -2,131 +2,155 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 825813BB7D3
-	for <lists+kvm@lfdr.de>; Mon,  5 Jul 2021 09:30:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7F8063BB914
+	for <lists+kvm@lfdr.de>; Mon,  5 Jul 2021 10:26:18 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230002AbhGEHcf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 5 Jul 2021 03:32:35 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:25271 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229972AbhGEHce (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 5 Jul 2021 03:32:34 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1625470197;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=TrSBmzvOS6/PS/ey8rda3qmHumcD6j+TIXTeJ0gyPEk=;
-        b=dNeLpPVKONoKQkz+74wkIHiJRgWaM31Y2ie1435U8FaIdq8FCnTu2p5vT8gyinvNukmlAs
-        zMQ7I+Zq7Njugo+sNRAH1wyBjLrTfGvnZLAj2tJ02fDObL5EhTGno+ccXePDFhdhMqf2tS
-        1qc2aoif7u2hALY4VbmbAK+BNdrBkSI=
-Received: from mail-pg1-f198.google.com (mail-pg1-f198.google.com
- [209.85.215.198]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-38-ImSEXgv_M0G7E4SUgriUTA-1; Mon, 05 Jul 2021 03:29:56 -0400
-X-MC-Unique: ImSEXgv_M0G7E4SUgriUTA-1
-Received: by mail-pg1-f198.google.com with SMTP id y1-20020a655b410000b02902235977d00cso13060340pgr.21
-        for <kvm@vger.kernel.org>; Mon, 05 Jul 2021 00:29:56 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-transfer-encoding
-         :content-language;
-        bh=TrSBmzvOS6/PS/ey8rda3qmHumcD6j+TIXTeJ0gyPEk=;
-        b=KYOpZ4yG5Bf61H0+C80JZW/XrRicW8H3pVG8XBRCncrU4vFNvMvqeSLO32ttuiaEqx
-         JrXVnj0SowwAVT4I91Pq5Ao4gtrP4K+VNcCiXTEHCmYULr67zZdHv5X7Y9vALPdP944s
-         IC+aX7yWJAjXoUe2LIg2FxzKsoA88D13YbpmDwnzB5WXvg5PbbrR6fjmRBoXY08rKQfs
-         JIW/vpTEi+HXwA1E/DTEBQYeFAmwSUN4y5YsyrOpsluWs09PmHvxsbBNhR0ZCEk3XzPE
-         LnGZEqhJ75HuRUYPaJfC+DxxpwC0bEAZmbNcRYkvQBpPiw8WFmNVD+7NQripzSsr5h3I
-         b1EA==
-X-Gm-Message-State: AOAM533b4FaeOTjVMd8yohzqP/Rvq1PexQpj3E/Ai94BILFmX68fUEi9
-        30iEUsdtOrCRdHT1h9wVadBopKTmKCgXBPCMO4HcuE6Q1clvjrkyM50HGb7XFz8emZK9W5P2Ye/
-        2eCeJRpoFPpjx
-X-Received: by 2002:a62:e40c:0:b029:317:3367:c5db with SMTP id r12-20020a62e40c0000b02903173367c5dbmr13828158pfh.62.1625470195673;
-        Mon, 05 Jul 2021 00:29:55 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyyPuvIjsJjbwagcjsnQti/B3SFzhjFQwJhjth684dqQCP2e9nWAUj+nOHvnbWfsYhmocWiLA==
-X-Received: by 2002:a62:e40c:0:b029:317:3367:c5db with SMTP id r12-20020a62e40c0000b02903173367c5dbmr13828142pfh.62.1625470195452;
-        Mon, 05 Jul 2021 00:29:55 -0700 (PDT)
-Received: from wangxiaodeMacBook-Air.local ([209.132.188.80])
-        by smtp.gmail.com with ESMTPSA id z76sm11997064pfc.173.2021.07.05.00.29.52
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 05 Jul 2021 00:29:54 -0700 (PDT)
-Subject: Re: [PATCH 2/2] vdpa: vp_vdpa: don't use hard-coded maximum virtqueue
- size
-To:     "Michael S. Tsirkin" <mst@redhat.com>
-Cc:     virtualization@lists.linux-foundation.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        netdev@vger.kernel.org, xieyongji@bytedance.com,
-        stefanha@redhat.com
-References: <20210705071910.31965-1-jasowang@redhat.com>
- <20210705071910.31965-2-jasowang@redhat.com>
- <20210705032602-mutt-send-email-mst@kernel.org>
-From:   Jason Wang <jasowang@redhat.com>
-Message-ID: <02139c5f-92c5-eda6-8d2d-8e1b6ac70f3e@redhat.com>
-Date:   Mon, 5 Jul 2021 15:29:47 +0800
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0)
- Gecko/20100101 Thunderbird/78.11.0
+        id S230115AbhGEI2w (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 5 Jul 2021 04:28:52 -0400
+Received: from 8bytes.org ([81.169.241.247]:58844 "EHLO theia.8bytes.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S230081AbhGEI2v (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 5 Jul 2021 04:28:51 -0400
+Received: from cap.home.8bytes.org (p5b006775.dip0.t-ipconnect.de [91.0.103.117])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
+        (No client certificate requested)
+        by theia.8bytes.org (Postfix) with ESMTPSA id 2C64A261;
+        Mon,  5 Jul 2021 10:26:12 +0200 (CEST)
+From:   Joerg Roedel <joro@8bytes.org>
+To:     x86@kernel.org
+Cc:     Joerg Roedel <joro@8bytes.org>, Joerg Roedel <jroedel@suse.de>,
+        hpa@zytor.com, Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Jiri Slaby <jslaby@suse.cz>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Juergen Gross <jgross@suse.com>,
+        Kees Cook <keescook@chromium.org>,
+        David Rientjes <rientjes@google.com>,
+        Cfir Cohen <cfir@google.com>,
+        Erdem Aktas <erdemaktas@google.com>,
+        Masami Hiramatsu <mhiramat@kernel.org>,
+        Mike Stunes <mstunes@vmware.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Martin Radev <martin.b.radev@gmail.com>,
+        Arvind Sankar <nivedita@alum.mit.edu>,
+        linux-coco@lists.linux.dev, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org
+Subject: [RFC PATCH 00/12] x86/sev: KEXEC/KDUMP support for SEV-ES guests
+Date:   Mon,  5 Jul 2021 10:24:31 +0200
+Message-Id: <20210705082443.14721-1-joro@8bytes.org>
+X-Mailer: git-send-email 2.31.1
 MIME-Version: 1.0
-In-Reply-To: <20210705032602-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain; charset=gbk; format=flowed
 Content-Transfer-Encoding: 8bit
-Content-Language: en-US
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+From: Joerg Roedel <jroedel@suse.de>
 
-ÔÚ 2021/7/5 ÏÂÎç3:26, Michael S. Tsirkin Ð´µÀ:
-> On Mon, Jul 05, 2021 at 03:19:10PM +0800, Jason Wang wrote:
->> This patch switch to read virtqueue size from the capability instead
->> of depending on the hardcoded value. This allows the per virtqueue
->> size could be advertised.
->>
->> Signed-off-by: Jason Wang <jasowang@redhat.com>
-> So let's add an ioctl for this? It's really a bug we don't..
+Hi,
+
+here are changes to enable kexec/kdump in SEV-ES guests. The biggest
+problem for supporting kexec/kdump under SEV-ES is to find a way to
+hand the non-boot CPUs (APs) from one kernel to another.
+
+Without SEV-ES the first kernel parks the CPUs in a HLT loop until
+they get reset by the kexec'ed kernel via an INIT-SIPI-SIPI sequence.
+For virtual machines the CPU reset is emulated by the hypervisor,
+which sets the vCPU registers back to reset state.
+
+This does not work under SEV-ES, because the hypervisor has no access
+to the vCPU registers and can't make modifications to them. So an
+SEV-ES guest needs to reset the vCPU itself and park it using the
+AP-reset-hold protocol. Upon wakeup the guest needs to jump to
+real-mode and to the reset-vector configured in the AP-Jump-Table.
+
+The code to do this is the main part of this patch-set. It works by
+placing code on the AP Jump-Table page itself to park the vCPU and for
+jumping to the reset vector upon wakeup. The code on the AP Jump Table
+runs in 16-bit protected mode with segment base set to the beginning
+of the page. The AP Jump-Table is usually not within the first 1MB of
+memory, so the code can't run in real-mode.
+
+The AP Jump-Table is the best place to put the parking code, because
+the memory is owned, but read-only by the firmware and writeable by
+the OS. Only the first 4 bytes are used for the reset-vector, leaving
+the rest of the page for code/data/stack to park a vCPU. The code
+can't be in kernel memory because by the time the vCPU wakes up the
+memory will be owned by the new kernel, which might have overwritten it
+already.
+
+The other patches add initial GHCB Version 2 protocol support, because
+kexec/kdump need the MSR-based (without a GHCB) AP-reset-hold VMGEXT,
+which is a GHCB protocol version 2 feature.
+
+The kexec'ed kernel is also entered via the decompressor and needs
+MMIO support there, so this patch-set also adds MMIO #VC support to
+the decompressor and support for handling CLFLUSH instructions.
+
+Finally there is also code to disable kexec/kdump support at runtime
+when the environment does not support it (e.g. no GHCB protocol
+version 2 support or AP Jump Table over 4GB).
+
+The diffstat looks big, but most of it is moving code for MMIO #VC
+support around to make it available to the decompressor.
+
+There is also a video showing the code in action:
+
+	https://www.youtube.com/watch?v=j1AUJANP7Mk
+
+Please review.
+
+Thanks,
+
+	Joerg
+
+Joerg Roedel (12):
+  kexec: Allow architecture code to opt-out at runtime
+  x86/kexec/64: Forbid kexec when running as an SEV-ES guest
+  x86/sev: Save and print negotiated GHCB protocol version
+  x86/sev: Do not hardcode GHCB protocol version
+  x86/sev: Use GHCB protocol version 2 if supported
+  x86/sev: Cache AP Jump Table Address
+  x86/sev: Setup code to park APs in the AP Jump Table
+  x86/sev: Park APs on AP Jump Table with GHCB protocol version 2
+  x86/sev: Use AP Jump Table blob to stop CPU
+  x86/sev: Add MMIO handling support to boot/compressed/ code
+  x86/sev: Handle CLFLUSH MMIO events
+  x86/sev: Support kexec under SEV-ES with AP Jump Table blob
+
+ arch/x86/boot/compressed/sev.c          |  56 +-
+ arch/x86/include/asm/realmode.h         |   5 +
+ arch/x86/include/asm/sev-ap-jumptable.h |  25 +
+ arch/x86/include/asm/sev.h              |  13 +-
+ arch/x86/kernel/machine_kexec_64.c      |  12 +
+ arch/x86/kernel/process.c               |   8 +
+ arch/x86/kernel/sev-shared.c            | 333 +++++++++-
+ arch/x86/kernel/sev.c                   | 494 ++++++---------
+ arch/x86/lib/insn-eval-shared.c         | 805 ++++++++++++++++++++++++
+ arch/x86/lib/insn-eval.c                | 802 +----------------------
+ arch/x86/realmode/Makefile              |   9 +-
+ arch/x86/realmode/rm/Makefile           |  11 +-
+ arch/x86/realmode/rm/header.S           |   3 +
+ arch/x86/realmode/rm/sev_ap_park.S      |  89 +++
+ arch/x86/realmode/rmpiggy.S             |   6 +
+ arch/x86/realmode/sev/Makefile          |  41 ++
+ arch/x86/realmode/sev/ap_jump_table.S   | 130 ++++
+ arch/x86/realmode/sev/ap_jump_table.lds |  24 +
+ include/linux/kexec.h                   |   2 +
+ kernel/kexec.c                          |  14 +
+ kernel/kexec_file.c                     |   9 +
+ 21 files changed, 1765 insertions(+), 1126 deletions(-)
+ create mode 100644 arch/x86/include/asm/sev-ap-jumptable.h
+ create mode 100644 arch/x86/lib/insn-eval-shared.c
+ create mode 100644 arch/x86/realmode/rm/sev_ap_park.S
+ create mode 100644 arch/x86/realmode/sev/Makefile
+ create mode 100644 arch/x86/realmode/sev/ap_jump_table.S
+ create mode 100644 arch/x86/realmode/sev/ap_jump_table.lds
 
 
-As explained in patch 1. Qemu doesn't use VHOST_VDPA_GET_VRING_NUM 
-actually. Instead it checks the result VHOST_VDPA_SET_VRING_NUM.
-
-So I change VHOST_VDPA_GET_VRING_NUM to return the minimal size of all 
-the virtqueues.
-
-If you wish we can add a VHOST_VDPA_GET_VRING_NUM2, but I'm not sure it 
-will have a user or not.
-
-Thanks
-
-
->
->> ---
->>   drivers/vdpa/virtio_pci/vp_vdpa.c | 6 ++++--
->>   1 file changed, 4 insertions(+), 2 deletions(-)
->>
->> diff --git a/drivers/vdpa/virtio_pci/vp_vdpa.c b/drivers/vdpa/virtio_pci/vp_vdpa.c
->> index 2926641fb586..198f7076e4d9 100644
->> --- a/drivers/vdpa/virtio_pci/vp_vdpa.c
->> +++ b/drivers/vdpa/virtio_pci/vp_vdpa.c
->> @@ -18,7 +18,6 @@
->>   #include <linux/virtio_pci.h>
->>   #include <linux/virtio_pci_modern.h>
->>   
->> -#define VP_VDPA_QUEUE_MAX 256
->>   #define VP_VDPA_DRIVER_NAME "vp_vdpa"
->>   #define VP_VDPA_NAME_SIZE 256
->>   
->> @@ -197,7 +196,10 @@ static void vp_vdpa_set_status(struct vdpa_device *vdpa, u8 status)
->>   
->>   static u16 vp_vdpa_get_vq_num_max(struct vdpa_device *vdpa, u16 qid)
->>   {
->> -	return VP_VDPA_QUEUE_MAX;
->> +	struct vp_vdpa *vp_vdpa = vdpa_to_vp(vdpa);
->> +	struct virtio_pci_modern_device *mdev = &vp_vdpa->mdev;
->> +
->> +	return vp_modern_get_queue_size(mdev, qid);
->>   }
->>   
->>   static int vp_vdpa_get_vq_state(struct vdpa_device *vdpa, u16 qid,
->> -- 
->> 2.25.1
+base-commit: 8d9d46bbf3b6b7ff8edcac33603ab45c29e0e07f
+-- 
+2.31.1
 
