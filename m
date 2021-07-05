@@ -2,126 +2,131 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7F34F3BC1DD
-	for <lists+kvm@lfdr.de>; Mon,  5 Jul 2021 18:57:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BF8333BC26B
+	for <lists+kvm@lfdr.de>; Mon,  5 Jul 2021 19:59:41 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229714AbhGERAY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 5 Jul 2021 13:00:24 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:35052 "EHLO
+        id S229834AbhGESCQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 5 Jul 2021 14:02:16 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:31349 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229652AbhGERAX (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 5 Jul 2021 13:00:23 -0400
+        by vger.kernel.org with ESMTP id S229733AbhGESCP (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 5 Jul 2021 14:02:15 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1625504266;
+        s=mimecast20190719; t=1625507978;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=NRt+Adp4e/5DqWeJnNZwJwNekN9wq5BW7MLMJkM77B0=;
-        b=P36rjB4Aun0s30ZTEq2C0+Lv79XjqyH+aN7Lu7KfaDSWMw8r/oNYx1c3l2GpIbt7VvNcTN
-        W5tl1TzglvKJOOFxasmZc+DK2dB0YKf9mlXssy3l3I1GDVdTDXEPOA5V24gR9RgPVyzbks
-        sGrWPcOC5MBb5gjxovHttV4bDrXUQ6I=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-415-HhWumVUANYu2eKLFCamjRA-1; Mon, 05 Jul 2021 12:57:45 -0400
-X-MC-Unique: HhWumVUANYu2eKLFCamjRA-1
-Received: by mail-wr1-f69.google.com with SMTP id u16-20020a5d6ad00000b0290137417d88cfso153910wrw.20
-        for <kvm@vger.kernel.org>; Mon, 05 Jul 2021 09:57:44 -0700 (PDT)
+        bh=5H38ZiEbwdys/XKq02eU1KZlFMkGpzH6Mp6cE7wcdag=;
+        b=MZ6mV90zngTbe5E1qSzQzx74mzrUuFRaZwoUPdVblmllRnXQyrDtEPwsGbTs/5RdT2qI62
+        kWgfQRg7XJaseZwJh2P2tDqEPiPv1TMkJ15o6AN1QaLxjorbou5sZXKU+h0tV7p4Mi+Nq8
+        uFPHtXFQEGYCF1LXhVp7qw9HtXplHE4=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-45-67wx6bo7PmaaKkC67v4csA-1; Mon, 05 Jul 2021 13:59:37 -0400
+X-MC-Unique: 67wx6bo7PmaaKkC67v4csA-1
+Received: by mail-wm1-f71.google.com with SMTP id z127-20020a1c7e850000b02901e46e4d52c0so10137287wmc.6
+        for <kvm@vger.kernel.org>; Mon, 05 Jul 2021 10:59:36 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=NRt+Adp4e/5DqWeJnNZwJwNekN9wq5BW7MLMJkM77B0=;
-        b=aoqg2fRJn0ud0R8yAmIgRqZuMbYt2CyTNjCYacyFo1j2HWAR+cUhanW8DhYF9WxHdQ
-         REPdMXwoW4PTl7618Q3yfhW/hjQHUc8vQb+WyRQZwvRkG+gMt4oRJ7IrZ6DC8d7P8AUU
-         YPKXVscuotKYa9jriQF1vE62W/3pF87yJs2eLACLbJqIaystOAdEcYelCABapkt97ahY
-         hF6XSF8XH9pI7hZ3B784YKF7WKHT/m5zbb85fWBWr/Dth0xIX1uWp4X9lnBnbvpq6cz9
-         OyR0kVgerI1QnBg3jdHxAKVG3pPPzvBm1+0vS6+8PwHYE12Obo5gAkQXaavLB0u/WBGf
-         L7Tg==
-X-Gm-Message-State: AOAM531NlHTrXaAl7n0haqWtWRSRKKO+VAB72j8VPscPjJE1aqDCJujy
-        PjzZKUGYw+M4AKLf6UgqpLdT9uCeTp11aS9573pgDLq9+R/y0jvos9z9aMdGRLg0fslHxvu28/X
-        xcRN4aHqCEsfY
-X-Received: by 2002:adf:fac7:: with SMTP id a7mr16721557wrs.384.1625504263893;
-        Mon, 05 Jul 2021 09:57:43 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwbCyZ+1Tu2rvGrznxgPZJrHO62wYyvyclAmXH8puX+YGe5rKOQwYBSYJq+dGKas0KoJ49L9A==
-X-Received: by 2002:adf:fac7:: with SMTP id a7mr16721541wrs.384.1625504263751;
-        Mon, 05 Jul 2021 09:57:43 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id m7sm443159wms.0.2021.07.05.09.57.42
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 05 Jul 2021 09:57:43 -0700 (PDT)
-Subject: Re: [RFC PATCH 0/8] Derive XSAVE state component offsets from CPUID
- leaf 0xd where possible
-To:     David Edmondson <david.edmondson@oracle.com>, qemu-devel@nongnu.org
-Cc:     Richard Henderson <richard.henderson@linaro.org>,
-        Michael Roth <michael.roth@amd.com>, kvm@vger.kernel.org,
-        Roman Bolshakov <r.bolshakov@yadro.com>,
-        Marcelo Tosatti <mtosatti@redhat.com>, babu.moger@amd.com,
-        Cameron Esfahani <dirty@apple.com>,
-        Eduardo Habkost <ehabkost@redhat.com>
-References: <20210705104632.2902400-1-david.edmondson@oracle.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <811b9dd2-1e9f-d0fc-d3cb-c95671ac09ea@redhat.com>
-Date:   Mon, 5 Jul 2021 18:57:42 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.11.0
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to;
+        bh=5H38ZiEbwdys/XKq02eU1KZlFMkGpzH6Mp6cE7wcdag=;
+        b=q/9BqTutZ5hH7v6kA96l0QWvojsypVqK7OCtkheSzj9xYPs301QDKpPOosZSSvr5Yn
+         fZZFEMd/hXFf9rWwM8/ROYkvHm504V/lcr5UPIQH9Rj7i7lTANBggDahz+ceQDrTnyKN
+         eG5SxLDI7hnUa+GE891WGldGm01ebzI81BFP3+VyK2oL3yXanXJCdiVOqFbsc0MZCrmY
+         p0qQtfHQD82I4cnLoD7l/aTIlr4Q8V2CeBz1K2kDXuEsCBLmFIukHRbbsBW8UH7lNb94
+         /9Kvdmmfhxl5M10t5tXSib1qwJli+SzMp80ptA7LjnGnkzJi2FIQkEyebQ97+RoZ6+5/
+         Onog==
+X-Gm-Message-State: AOAM531ZZE0ctT/kDUlCzb9Em3h6ymSmH5BYQ3+aukmqfcbS3Zf3Uf7l
+        NVmLbfl6awvA/BOIswMBYfIozg5zvC8a46t7Ut+T3FxsSWN4dqtxNkJIB7kndYygcC2odtns8wW
+        5fp0myjoLLXN0
+X-Received: by 2002:a5d:4c50:: with SMTP id n16mr17129684wrt.249.1625507975903;
+        Mon, 05 Jul 2021 10:59:35 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyF5s5Q0gB/0vxcQB2xCkwrdclED6Lm4U5rUd1KxdAr0pLnHm/bJh1UbIAHK2B4wx7WbXxmQw==
+X-Received: by 2002:a5d:4c50:: with SMTP id n16mr17129668wrt.249.1625507975669;
+        Mon, 05 Jul 2021 10:59:35 -0700 (PDT)
+Received: from redhat.com ([2.55.8.91])
+        by smtp.gmail.com with ESMTPSA id s9sm3028372wrn.87.2021.07.05.10.59.33
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 05 Jul 2021 10:59:34 -0700 (PDT)
+Date:   Mon, 5 Jul 2021 13:59:31 -0400
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     Jason Wang <jasowang@redhat.com>
+Cc:     virtualization@lists.linux-foundation.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        netdev@vger.kernel.org, xieyongji@bytedance.com,
+        stefanha@redhat.com
+Subject: Re: [PATCH 2/2] vdpa: vp_vdpa: don't use hard-coded maximum
+ virtqueue size
+Message-ID: <20210705065534-mutt-send-email-mst@kernel.org>
+References: <20210705071910.31965-1-jasowang@redhat.com>
+ <20210705071910.31965-2-jasowang@redhat.com>
+ <20210705032602-mutt-send-email-mst@kernel.org>
+ <02139c5f-92c5-eda6-8d2d-8e1b6ac70f3e@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20210705104632.2902400-1-david.edmondson@oracle.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <02139c5f-92c5-eda6-8d2d-8e1b6ac70f3e@redhat.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 05/07/21 12:46, David Edmondson wrote:
-> The offset of XSAVE state components within the XSAVE state area is
-> currently hard-coded via reference to the X86XSaveArea structure. This
-> structure is accurate for Intel systems at the time of writing, but
-> incorrect for newer AMD systems, as the state component for protection
-> keys is located differently (offset 0x980 rather than offset 0xa80).
+On Mon, Jul 05, 2021 at 03:29:47PM +0800, Jason Wang wrote:
 > 
-> For KVM and HVF, replace the hard-coding of the state component
-> offsets with data derived from CPUID leaf 0xd information.
+> 在 2021/7/5 下午3:26, Michael S. Tsirkin 写道:
+> > On Mon, Jul 05, 2021 at 03:19:10PM +0800, Jason Wang wrote:
+> > > This patch switch to read virtqueue size from the capability instead
+> > > of depending on the hardcoded value. This allows the per virtqueue
+> > > size could be advertised.
+> > > 
+> > > Signed-off-by: Jason Wang <jasowang@redhat.com>
+> > So let's add an ioctl for this? It's really a bug we don't..
 > 
-> TCG still uses the X86XSaveArea structure, as there is no underlying
-> CPU to use in determining appropriate values.
 > 
-> This is a replacement for the changes in
-> https://lore.kernel.org/r/20210520145647.3483809-1-david.edmondson@oracle.com,
-> which simply modifed the hard-coded offsets for AMD systems.
+> As explained in patch 1. Qemu doesn't use VHOST_VDPA_GET_VRING_NUM actually.
+> Instead it checks the result VHOST_VDPA_SET_VRING_NUM.
 > 
-> Testing on HVF is minimal (it builds and, by observation, the XSAVE
-> state component offsets reported to a running VM are accurate on an
-> older Intel system).
+> So I change VHOST_VDPA_GET_VRING_NUM to return the minimal size of all the
+> virtqueues.
+> 
+> If you wish we can add a VHOST_VDPA_GET_VRING_NUM2, but I'm not sure it will
+> have a user or not.
+> 
+> Thanks
 
-This looks great, thanks, so I am queuing it.
+Question is how do we know returning the minimal and not e.g. the max
+size is the right thing to do?
 
-Paolo
 
-> David Edmondson (8):
->    target/i386: Declare constants for XSAVE offsets
->    target/i386: Consolidate the X86XSaveArea offset checks
->    target/i386: Clarify the padding requirements of X86XSaveArea
->    target/i386: Pass buffer and length to XSAVE helper
->    target/i386: Make x86_ext_save_areas visible outside cpu.c
->    target/i386: Observe XSAVE state area offsets
->    target/i386: Populate x86_ext_save_areas offsets using cpuid where
->      possible
->    target/i386: Move X86XSaveArea into TCG
 > 
->   target/i386/cpu.c            |  18 +--
->   target/i386/cpu.h            |  41 ++----
->   target/i386/hvf/hvf-cpu.c    |  34 +++++
->   target/i386/hvf/hvf.c        |   3 +-
->   target/i386/hvf/x86hvf.c     |  19 ++-
->   target/i386/kvm/kvm-cpu.c    |  36 +++++
->   target/i386/kvm/kvm.c        |  52 +------
->   target/i386/tcg/fpu_helper.c |   1 +
->   target/i386/tcg/tcg-cpu.c    |  20 +++
->   target/i386/tcg/tcg-cpu.h    |  57 ++++++++
->   target/i386/xsave_helper.c   | 267 ++++++++++++++++++++++++++---------
->   11 files changed, 381 insertions(+), 167 deletions(-)
-> 
+> > 
+> > > ---
+> > >   drivers/vdpa/virtio_pci/vp_vdpa.c | 6 ++++--
+> > >   1 file changed, 4 insertions(+), 2 deletions(-)
+> > > 
+> > > diff --git a/drivers/vdpa/virtio_pci/vp_vdpa.c b/drivers/vdpa/virtio_pci/vp_vdpa.c
+> > > index 2926641fb586..198f7076e4d9 100644
+> > > --- a/drivers/vdpa/virtio_pci/vp_vdpa.c
+> > > +++ b/drivers/vdpa/virtio_pci/vp_vdpa.c
+> > > @@ -18,7 +18,6 @@
+> > >   #include <linux/virtio_pci.h>
+> > >   #include <linux/virtio_pci_modern.h>
+> > > -#define VP_VDPA_QUEUE_MAX 256
+> > >   #define VP_VDPA_DRIVER_NAME "vp_vdpa"
+> > >   #define VP_VDPA_NAME_SIZE 256
+> > > @@ -197,7 +196,10 @@ static void vp_vdpa_set_status(struct vdpa_device *vdpa, u8 status)
+> > >   static u16 vp_vdpa_get_vq_num_max(struct vdpa_device *vdpa, u16 qid)
+> > >   {
+> > > -	return VP_VDPA_QUEUE_MAX;
+> > > +	struct vp_vdpa *vp_vdpa = vdpa_to_vp(vdpa);
+> > > +	struct virtio_pci_modern_device *mdev = &vp_vdpa->mdev;
+> > > +
+> > > +	return vp_modern_get_queue_size(mdev, qid);
+> > >   }
+> > >   static int vp_vdpa_get_vq_state(struct vdpa_device *vdpa, u16 qid,
+> > > -- 
+> > > 2.25.1
 
