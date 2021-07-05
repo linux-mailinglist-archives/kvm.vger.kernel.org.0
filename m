@@ -2,131 +2,174 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id BF8333BC26B
-	for <lists+kvm@lfdr.de>; Mon,  5 Jul 2021 19:59:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6E10C3BC2A0
+	for <lists+kvm@lfdr.de>; Mon,  5 Jul 2021 20:27:46 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229834AbhGESCQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 5 Jul 2021 14:02:16 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:31349 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229733AbhGESCP (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 5 Jul 2021 14:02:15 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1625507978;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=5H38ZiEbwdys/XKq02eU1KZlFMkGpzH6Mp6cE7wcdag=;
-        b=MZ6mV90zngTbe5E1qSzQzx74mzrUuFRaZwoUPdVblmllRnXQyrDtEPwsGbTs/5RdT2qI62
-        kWgfQRg7XJaseZwJh2P2tDqEPiPv1TMkJ15o6AN1QaLxjorbou5sZXKU+h0tV7p4Mi+Nq8
-        uFPHtXFQEGYCF1LXhVp7qw9HtXplHE4=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-45-67wx6bo7PmaaKkC67v4csA-1; Mon, 05 Jul 2021 13:59:37 -0400
-X-MC-Unique: 67wx6bo7PmaaKkC67v4csA-1
-Received: by mail-wm1-f71.google.com with SMTP id z127-20020a1c7e850000b02901e46e4d52c0so10137287wmc.6
-        for <kvm@vger.kernel.org>; Mon, 05 Jul 2021 10:59:36 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to;
-        bh=5H38ZiEbwdys/XKq02eU1KZlFMkGpzH6Mp6cE7wcdag=;
-        b=q/9BqTutZ5hH7v6kA96l0QWvojsypVqK7OCtkheSzj9xYPs301QDKpPOosZSSvr5Yn
-         fZZFEMd/hXFf9rWwM8/ROYkvHm504V/lcr5UPIQH9Rj7i7lTANBggDahz+ceQDrTnyKN
-         eG5SxLDI7hnUa+GE891WGldGm01ebzI81BFP3+VyK2oL3yXanXJCdiVOqFbsc0MZCrmY
-         p0qQtfHQD82I4cnLoD7l/aTIlr4Q8V2CeBz1K2kDXuEsCBLmFIukHRbbsBW8UH7lNb94
-         /9Kvdmmfhxl5M10t5tXSib1qwJli+SzMp80ptA7LjnGnkzJi2FIQkEyebQ97+RoZ6+5/
-         Onog==
-X-Gm-Message-State: AOAM531ZZE0ctT/kDUlCzb9Em3h6ymSmH5BYQ3+aukmqfcbS3Zf3Uf7l
-        NVmLbfl6awvA/BOIswMBYfIozg5zvC8a46t7Ut+T3FxsSWN4dqtxNkJIB7kndYygcC2odtns8wW
-        5fp0myjoLLXN0
-X-Received: by 2002:a5d:4c50:: with SMTP id n16mr17129684wrt.249.1625507975903;
-        Mon, 05 Jul 2021 10:59:35 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyF5s5Q0gB/0vxcQB2xCkwrdclED6Lm4U5rUd1KxdAr0pLnHm/bJh1UbIAHK2B4wx7WbXxmQw==
-X-Received: by 2002:a5d:4c50:: with SMTP id n16mr17129668wrt.249.1625507975669;
-        Mon, 05 Jul 2021 10:59:35 -0700 (PDT)
-Received: from redhat.com ([2.55.8.91])
-        by smtp.gmail.com with ESMTPSA id s9sm3028372wrn.87.2021.07.05.10.59.33
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 05 Jul 2021 10:59:34 -0700 (PDT)
-Date:   Mon, 5 Jul 2021 13:59:31 -0400
-From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     Jason Wang <jasowang@redhat.com>
-Cc:     virtualization@lists.linux-foundation.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        netdev@vger.kernel.org, xieyongji@bytedance.com,
-        stefanha@redhat.com
-Subject: Re: [PATCH 2/2] vdpa: vp_vdpa: don't use hard-coded maximum
- virtqueue size
-Message-ID: <20210705065534-mutt-send-email-mst@kernel.org>
-References: <20210705071910.31965-1-jasowang@redhat.com>
- <20210705071910.31965-2-jasowang@redhat.com>
- <20210705032602-mutt-send-email-mst@kernel.org>
- <02139c5f-92c5-eda6-8d2d-8e1b6ac70f3e@redhat.com>
+        id S229934AbhGESaV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 5 Jul 2021 14:30:21 -0400
+Received: from mail.kernel.org ([198.145.29.99]:50922 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229734AbhGESaT (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 5 Jul 2021 14:30:19 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 806B56196C;
+        Mon,  5 Jul 2021 18:27:41 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1625509662;
+        bh=0nqfZ/KCF7agW0Kpzhwp3WsLtkBGdLLdBogUImYWf5I=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=KsgFp+lKiHt/k4fkAhVIoqwJCggTTMjGbRR+FrvV+RqmQCo4CZtV1Dp+lVn4CFDEV
+         zzo3PNFMoDpa9tigHnA4Ua+if9XWjM2+tfOanpVSRSXC7Rxy9RFG1qppYTS2RE1COy
+         HOVCkF04xQQqBozBWLOfDx9YAXTyWcFJOpNTuxH/nrEBcKrkjDx456P/FfP8fcT8jx
+         fA8Y2ife7aViDhAhNbdSckSouwLeAjRkCEPxw8YJcwduBTknvoZAqzVyjv+NyAj8bE
+         3WRJwELwyRuRk0ShGzT9e2E9CE8PjZRJcRxEEFfrvlkumIu13KCFlCX33bHNelBs2y
+         iJxbEz8b8uG2Q==
+Date:   Mon, 5 Jul 2021 21:27:37 +0300
+From:   Leon Romanovsky <leon@kernel.org>
+To:     Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
+Cc:     Max Gurtovoy <mgurtovoy@nvidia.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+        "jgg@nvidia.com" <jgg@nvidia.com>, Linuxarm <linuxarm@huawei.com>,
+        liulongfang <liulongfang@huawei.com>,
+        "Zengtao (B)" <prime.zeng@hisilicon.com>,
+        yuzenghui <yuzenghui@huawei.com>,
+        Jonathan Cameron <jonathan.cameron@huawei.com>,
+        "Wangzhou (B)" <wangzhou1@hisilicon.com>
+Subject: Re: [RFC v2 1/4] hisi-acc-vfio-pci: add new vfio_pci driver for
+ HiSilicon ACC devices
+Message-ID: <YONPGcwjGH+gImDj@unreal>
+References: <20210702095849.1610-1-shameerali.kolothum.thodi@huawei.com>
+ <20210702095849.1610-2-shameerali.kolothum.thodi@huawei.com>
+ <YOFdTnlkcDZzw4b/@unreal>
+ <fc9d6b0b82254fbdb1cc96365b5bdef3@huawei.com>
+ <d02dff3a-8035-ced1-7fc3-fcff791f9203@nvidia.com>
+ <834a009bba0d4db1b7a1c32e8f20611d@huawei.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <02139c5f-92c5-eda6-8d2d-8e1b6ac70f3e@redhat.com>
+In-Reply-To: <834a009bba0d4db1b7a1c32e8f20611d@huawei.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Jul 05, 2021 at 03:29:47PM +0800, Jason Wang wrote:
-> 
-> 在 2021/7/5 下午3:26, Michael S. Tsirkin 写道:
-> > On Mon, Jul 05, 2021 at 03:19:10PM +0800, Jason Wang wrote:
-> > > This patch switch to read virtqueue size from the capability instead
-> > > of depending on the hardcoded value. This allows the per virtqueue
-> > > size could be advertised.
-> > > 
-> > > Signed-off-by: Jason Wang <jasowang@redhat.com>
-> > So let's add an ioctl for this? It's really a bug we don't..
+On Mon, Jul 05, 2021 at 10:18:59AM +0000, Shameerali Kolothum Thodi wrote:
 > 
 > 
-> As explained in patch 1. Qemu doesn't use VHOST_VDPA_GET_VRING_NUM actually.
-> Instead it checks the result VHOST_VDPA_SET_VRING_NUM.
-> 
-> So I change VHOST_VDPA_GET_VRING_NUM to return the minimal size of all the
-> virtqueues.
-> 
-> If you wish we can add a VHOST_VDPA_GET_VRING_NUM2, but I'm not sure it will
-> have a user or not.
-> 
-> Thanks
-
-Question is how do we know returning the minimal and not e.g. the max
-size is the right thing to do?
-
-
-> 
+> > -----Original Message-----
+> > From: Max Gurtovoy [mailto:mgurtovoy@nvidia.com]
+> > Sent: 05 July 2021 10:42
+> > To: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>;
+> > Leon Romanovsky <leon@kernel.org>
+> > Cc: kvm@vger.kernel.org; linux-kernel@vger.kernel.org;
+> > linux-crypto@vger.kernel.org; alex.williamson@redhat.com; jgg@nvidia.com;
+> > Linuxarm <linuxarm@huawei.com>; liulongfang <liulongfang@huawei.com>;
+> > Zengtao (B) <prime.zeng@hisilicon.com>; yuzenghui
+> > <yuzenghui@huawei.com>; Jonathan Cameron
+> > <jonathan.cameron@huawei.com>; Wangzhou (B) <wangzhou1@hisilicon.com>
+> > Subject: Re: [RFC v2 1/4] hisi-acc-vfio-pci: add new vfio_pci driver for HiSilicon
+> > ACC devices
 > > 
-> > > ---
-> > >   drivers/vdpa/virtio_pci/vp_vdpa.c | 6 ++++--
-> > >   1 file changed, 4 insertions(+), 2 deletions(-)
-> > > 
-> > > diff --git a/drivers/vdpa/virtio_pci/vp_vdpa.c b/drivers/vdpa/virtio_pci/vp_vdpa.c
-> > > index 2926641fb586..198f7076e4d9 100644
-> > > --- a/drivers/vdpa/virtio_pci/vp_vdpa.c
-> > > +++ b/drivers/vdpa/virtio_pci/vp_vdpa.c
-> > > @@ -18,7 +18,6 @@
-> > >   #include <linux/virtio_pci.h>
-> > >   #include <linux/virtio_pci_modern.h>
-> > > -#define VP_VDPA_QUEUE_MAX 256
-> > >   #define VP_VDPA_DRIVER_NAME "vp_vdpa"
-> > >   #define VP_VDPA_NAME_SIZE 256
-> > > @@ -197,7 +196,10 @@ static void vp_vdpa_set_status(struct vdpa_device *vdpa, u8 status)
-> > >   static u16 vp_vdpa_get_vq_num_max(struct vdpa_device *vdpa, u16 qid)
-> > >   {
-> > > -	return VP_VDPA_QUEUE_MAX;
-> > > +	struct vp_vdpa *vp_vdpa = vdpa_to_vp(vdpa);
-> > > +	struct virtio_pci_modern_device *mdev = &vp_vdpa->mdev;
-> > > +
-> > > +	return vp_modern_get_queue_size(mdev, qid);
-> > >   }
-> > >   static int vp_vdpa_get_vq_state(struct vdpa_device *vdpa, u16 qid,
-> > > -- 
-> > > 2.25.1
+> > 
+> > On 7/5/2021 11:47 AM, Shameerali Kolothum Thodi wrote:
+> > >
+> > >> -----Original Message-----
+> > >> From: Leon Romanovsky [mailto:leon@kernel.org]
+> > >> Sent: 04 July 2021 08:04
+> > >> To: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
+> > >> Cc: kvm@vger.kernel.org; linux-kernel@vger.kernel.org;
+> > >> linux-crypto@vger.kernel.org; alex.williamson@redhat.com;
+> > jgg@nvidia.com;
+> > >> mgurtovoy@nvidia.com; Linuxarm <linuxarm@huawei.com>; liulongfang
+> > >> <liulongfang@huawei.com>; Zengtao (B) <prime.zeng@hisilicon.com>;
+> > >> yuzenghui <yuzenghui@huawei.com>; Jonathan Cameron
+> > >> <jonathan.cameron@huawei.com>; Wangzhou (B)
+> > <wangzhou1@hisilicon.com>
+> > >> Subject: Re: [RFC v2 1/4] hisi-acc-vfio-pci: add new vfio_pci driver for
+> > HiSilicon
+> > >> ACC devices
+> > >>
+> > >> On Fri, Jul 02, 2021 at 10:58:46AM +0100, Shameer Kolothum wrote:
+> > >>> Add a vendor-specific vfio_pci driver for HiSilicon ACC devices.
+> > >>> This will be extended in follow-up patches to add support for
+> > >>> vfio live migration feature.
+> > >>>
+> > >>> Signed-off-by: Shameer Kolothum
+> > >> <shameerali.kolothum.thodi@huawei.com>
+> > >>> ---
+> > >>>   drivers/vfio/pci/Kconfig             |   9 +++
+> > >>>   drivers/vfio/pci/Makefile            |   2 +
+> > >>>   drivers/vfio/pci/hisi_acc_vfio_pci.c | 100
+> > +++++++++++++++++++++++++++
+> > >>>   3 files changed, 111 insertions(+)
+> > >>>   create mode 100644 drivers/vfio/pci/hisi_acc_vfio_pci.c
+> > >> <...>
+> > >>
+> > >>> +static const struct vfio_device_ops hisi_acc_vfio_pci_ops = {
+> > >>> +	.name		= "hisi-acc-vfio-pci",
+> > >>> +	.open		= hisi_acc_vfio_pci_open,
+> > >>> +	.release	= vfio_pci_core_release,
+> > >>> +	.ioctl		= vfio_pci_core_ioctl,
+> > >>> +	.read		= vfio_pci_core_read,
+> > >>> +	.write		= vfio_pci_core_write,
+> > >>> +	.mmap		= vfio_pci_core_mmap,
+> > >>> +	.request	= vfio_pci_core_request,
+> > >>> +	.match		= vfio_pci_core_match,
+> > >>> +	.reflck_attach	= vfio_pci_core_reflck_attach,
+> > >> I don't remember what was proposed in vfio-pci-core conversion patches,
+> > >> but would expect that default behaviour is to fallback to vfio_pci_core_*
+> > API
+> > >> if ".release/.ioctl/e.t.c" are not redefined.
+> > > Yes, that would be nice, but don't think it does that in latest(v4).
+> > >
+> > > Hi Max,
+> > > Could we please consider fall back to the core defaults, may be check and
+> > assign defaults
+> > > in vfio_pci_core_register_device() ?
+> > 
+> > I don't see why we should do this.
+> > 
+> > vfio_pci_core.ko is just a library driver. It shouldn't decide for the
+> > vendor driver ops.
+> > 
+> > If a vendor driver would like to use its helper functions - great.
+> > 
+> > If it wants to override it - great.
+> > 
+> > If it wants to leave some op as NULL - it can do it also.
+> 
+> Based on the documentation of the vfio_device_ops callbacks,
+> It looks like we already have a precedence in the case of reflck_attach
+> callback where it uses the vfio core default one, if it is not implemented.
 
+The reflck_attach pattern is pretty common pattern in the kernel to provide fallback.
+
+> 
+> Also I would imagine that in majority use cases the vendor drivers will be
+> defaulting to core functions. 
+
+Right, this is whole idea of having core functionality in one place, if
+vendor wants/needs, he will overwrite.
+
+> 
+> I think, in any case, it would be good to update the Documentation based on
+> which way we end up doing this.
+
+The request to update Documentation can be seen as an example of
+choosing not-good API decisions. Expectation to see all drivers to
+use same callbacks with same vfio-core function calls sounds strange
+to me.
+
+Thanks
+
+> 
+> Thanks,
+> Shameer 
+> 
+>  
+> > 
+> > 
+> > >
+> > > Thanks,
+> > > Shameer
