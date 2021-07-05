@@ -2,165 +2,219 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7962B3BBCAA
-	for <lists+kvm@lfdr.de>; Mon,  5 Jul 2021 14:08:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3B23D3BBD17
+	for <lists+kvm@lfdr.de>; Mon,  5 Jul 2021 14:50:29 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231310AbhGEMLR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 5 Jul 2021 08:11:17 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:47095 "EHLO
+        id S231317AbhGEMwt (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 5 Jul 2021 08:52:49 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:25555 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230435AbhGEMLQ (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 5 Jul 2021 08:11:16 -0400
+        by vger.kernel.org with ESMTP id S231253AbhGEMwr (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 5 Jul 2021 08:52:47 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1625486919;
+        s=mimecast20190719; t=1625489410;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=H6IUe1pqjsnl6h6pzE1hlYlvrWwd2ZiBLis3OO/uItM=;
-        b=hAx+Mo6IvFXL0zsoWEp0fSNiIh/1dMRunXkt5CYddc0E/DEXsRlqm1rUKuI3LD5ytFRfGW
-        6BbyZyBnXFruEdWz5sfZ3ncaHKPOvFPX/iby7aJyK2s2tKC0drTSlaJ4rBcG5j1ZpiubPo
-        in1gn4BUfqyFM9mWZabZlid21uLJK+U=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-527-h7bF-jGIPoWfP6tvCkg4ZQ-1; Mon, 05 Jul 2021 08:08:38 -0400
-X-MC-Unique: h7bF-jGIPoWfP6tvCkg4ZQ-1
-Received: by mail-wm1-f70.google.com with SMTP id k5-20020a7bc3050000b02901e081f69d80so3039995wmj.8
-        for <kvm@vger.kernel.org>; Mon, 05 Jul 2021 05:08:38 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=H6IUe1pqjsnl6h6pzE1hlYlvrWwd2ZiBLis3OO/uItM=;
-        b=Q2h8cd1CPQ0UYp9g4t8Cm9FkK5V2glDIB9k5zRkBBWp5miw2PE5Bj3cJRM/WXtqCsU
-         z5QXfHPNjIYv4ovpRFI2uIxAOeyTOk9EXATuPVATLt0nfGyL6MYfwBpKT0J3JyRbMwcd
-         9zzScbs+VzGvRtpIXMCKIf5huwhLRCsar9QsLHdsBgRZHSxBvnmkpkSXqfCFaVDP0nke
-         +wdUENF2TnVEyTsfRXTCdgPdzV/LbK5rO7ilnH9G0q9nwv5K0WMIUhx8V1wjg0iaFoA9
-         5ZP4pp5Z5Q/gNeMBJeg0DzZmBdFWXDpfYDLHrYNgi4a/jTiRxuQqOLS7MFjzk5grhhhH
-         ocMg==
-X-Gm-Message-State: AOAM532wz6lzsM8Tx+DDu7qYOnKlvoWWOB/XHqO3KW9Yi7SgycmTAfmz
-        COxa9qOy8SXnCbtJ+zpVy1G9KVZowy4OXWaBybMHv33jIQ+B/2gTK8ySeX3YQa4p5P8W0oOwnsy
-        zlBblHmHmskty
-X-Received: by 2002:adf:d1e8:: with SMTP id g8mr15628178wrd.14.1625486917189;
-        Mon, 05 Jul 2021 05:08:37 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzJ9cZcFUKu+q/7/iHKb/ireWDtyt33kd7bofG6sYH2Jz7uCZA484Rro3+x4iN55SX+tAhAow==
-X-Received: by 2002:adf:d1e8:: with SMTP id g8mr15628159wrd.14.1625486917033;
-        Mon, 05 Jul 2021 05:08:37 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:63a7:c72e:ea0e:6045? ([2001:b07:6468:f312:63a7:c72e:ea0e:6045])
-        by smtp.gmail.com with ESMTPSA id j4sm13069372wra.1.2021.07.05.05.08.35
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 05 Jul 2021 05:08:36 -0700 (PDT)
-Subject: Re: [PATCH 3/6] KVM: nSVM: Introduce svm_copy_nonvmloadsave_state()
-To:     Vitaly Kuznetsov <vkuznets@redhat.com>, kvm@vger.kernel.org
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Maxim Levitsky <mlevitsk@redhat.com>,
-        Cathy Avery <cavery@redhat.com>,
-        Emanuele Giuseppe Esposito <eesposit@redhat.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Michael Roth <mdroth@linux.vnet.ibm.com>,
-        linux-kernel@vger.kernel.org
-References: <20210628104425.391276-1-vkuznets@redhat.com>
- <20210628104425.391276-4-vkuznets@redhat.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <2c79e83c-376f-0e60-f089-84eae7e91f49@redhat.com>
-Date:   Mon, 5 Jul 2021 14:08:35 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.11.0
+        bh=W8G/JsyH47bF0khJGv25MPY6jNei9NxXk5kKt2MzRCU=;
+        b=WG/IDJw9zwQK88YZqshvNZRs+Ku1Vb1nWMw7ut/7X2nnkHhYXeJR0PAZJrCNqehz5okyd7
+        N0M3Mffc0o+nojO72ybSCg0rLJArvlPEE2jiiL7fM1ZYz3f9yHgksPj3RftXXrbOkupGZk
+        C6F21M9FQ5gnqbR6hc6L/bGK8rmhVJc=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-145-ugf42SHOMTOwWKHm8Kh2QQ-1; Mon, 05 Jul 2021 08:50:09 -0400
+X-MC-Unique: ugf42SHOMTOwWKHm8Kh2QQ-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EA3EB1023F40;
+        Mon,  5 Jul 2021 12:50:05 +0000 (UTC)
+Received: from localhost (ovpn-114-164.ams2.redhat.com [10.36.114.164])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 5985260C0F;
+        Mon,  5 Jul 2021 12:49:59 +0000 (UTC)
+Date:   Mon, 5 Jul 2021 13:49:58 +0100
+From:   Stefan Hajnoczi <stefanha@redhat.com>
+To:     Jason Wang <jasowang@redhat.com>
+Cc:     Yongji Xie <xieyongji@bytedance.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Stefano Garzarella <sgarzare@redhat.com>,
+        Parav Pandit <parav@nvidia.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Christian Brauner <christian.brauner@canonical.com>,
+        Randy Dunlap <rdunlap@infradead.org>,
+        Matthew Wilcox <willy@infradead.org>,
+        Al Viro <viro@zeniv.linux.org.uk>,
+        Jens Axboe <axboe@kernel.dk>, bcrl@kvack.org,
+        Jonathan Corbet <corbet@lwn.net>,
+        Mika =?iso-8859-1?Q?Penttil=E4?= <mika.penttila@nextfour.com>,
+        Dan Carpenter <dan.carpenter@oracle.com>, joro@8bytes.org,
+        Greg KH <gregkh@linuxfoundation.org>, songmuchun@bytedance.com,
+        virtualization <virtualization@lists.linux-foundation.org>,
+        netdev@vger.kernel.org, kvm <kvm@vger.kernel.org>,
+        linux-fsdevel@vger.kernel.org, iommu@lists.linux-foundation.org,
+        linux-kernel <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH v8 10/10] Documentation: Add documentation for VDUSE
+Message-ID: <YOL/9mxkJaokKDHc@stefanha-x1.localdomain>
+References: <20210615141331.407-1-xieyongji@bytedance.com>
+ <20210615141331.407-11-xieyongji@bytedance.com>
+ <YNSCH6l31zwPxBjL@stefanha-x1.localdomain>
+ <CACycT3uxnQmXWsgmNVxQtiRhz1UXXTAJFY3OiAJqokbJH6ifMA@mail.gmail.com>
+ <YNxCDpM3bO5cPjqi@stefanha-x1.localdomain>
+ <CACycT3taKhf1cWp3Jd0aSVekAZvpbR-_fkyPLQ=B+jZBB5H=8Q@mail.gmail.com>
+ <YN3ABqCMLQf7ejOm@stefanha-x1.localdomain>
+ <CACycT3vo-diHgTSLw_FS2E+5ia5VjihE3qw7JmZR7JT55P-wQA@mail.gmail.com>
+ <8320d26d-6637-85c6-8773-49553dfa502d@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20210628104425.391276-4-vkuznets@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: multipart/signed; micalg=pgp-sha256;
+        protocol="application/pgp-signature"; boundary="nJZEr38ROGX7NVP+"
+Content-Disposition: inline
+In-Reply-To: <8320d26d-6637-85c6-8773-49553dfa502d@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 28/06/21 12:44, Vitaly Kuznetsov wrote:
-> Separate the code setting non-VMLOAD-VMSAVE state from
-> svm_set_nested_state() into its own function. This is going to be
-> re-used from svm_enter_smm()/svm_leave_smm().
-> 
-> Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
-> ---
->   arch/x86/kvm/svm/nested.c | 36 +++++++++++++++++++++---------------
->   arch/x86/kvm/svm/svm.h    |  2 ++
->   2 files changed, 23 insertions(+), 15 deletions(-)
-> 
-> diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
-> index 1c6b0698b52e..a1dec2c40181 100644
-> --- a/arch/x86/kvm/svm/nested.c
-> +++ b/arch/x86/kvm/svm/nested.c
-> @@ -697,6 +697,26 @@ int nested_svm_vmrun(struct kvm_vcpu *vcpu)
->   	return ret;
->   }
->   
-> +void svm_copy_nonvmloadsave_state(struct vmcb_save_area *from_save,
-> +				  struct vmcb_save_area *to_save)
 
-Probably best to name this svm_copy_vmrun_state and perhaps (as a 
-cleanup) change nested_svm_vmloadsave to svm_copy_vmloadsave_state.
+--nJZEr38ROGX7NVP+
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Paolo
+On Mon, Jul 05, 2021 at 11:36:15AM +0800, Jason Wang wrote:
+>=20
+> =E5=9C=A8 2021/7/4 =E4=B8=8B=E5=8D=885:49, Yongji Xie =E5=86=99=E9=81=93:
+> > > > OK, I get you now. Since the VIRTIO specification says "Device
+> > > > configuration space is generally used for rarely-changing or
+> > > > initialization-time parameters". I assume the VDUSE_DEV_SET_CONFIG
+> > > > ioctl should not be called frequently.
+> > > The spec uses MUST and other terms to define the precise requirements.
+> > > Here the language (especially the word "generally") is weaker and mea=
+ns
+> > > there may be exceptions.
+> > >=20
+> > > Another type of access that doesn't work with the VDUSE_DEV_SET_CONFIG
+> > > approach is reads that have side-effects. For example, imagine a field
+> > > containing an error code if the device encounters a problem unrelated=
+ to
+> > > a specific virtqueue request. Reading from this field resets the error
+> > > code to 0, saving the driver an extra configuration space write access
+> > > and possibly race conditions. It isn't possible to implement those
+> > > semantics suing VDUSE_DEV_SET_CONFIG. It's another corner case, but it
+> > > makes me think that the interface does not allow full VIRTIO semantic=
+s.
+>=20
+>=20
+> Note that though you're correct, my understanding is that config space is
+> not suitable for this kind of error propagating. And it would be very hard
+> to implement such kind of semantic in some transports.=C2=A0 Virtqueue sh=
+ould be
+> much better. As Yong Ji quoted, the config space is used for
+> "rarely-changing or intialization-time parameters".
+>=20
+>=20
+> > Agreed. I will use VDUSE_DEV_GET_CONFIG in the next version. And to
+> > handle the message failure, I'm going to add a return value to
+> > virtio_config_ops.get() and virtio_cread_* API so that the error can
+> > be propagated to the virtio device driver. Then the virtio-blk device
+> > driver can be modified to handle that.
+> >=20
+> > Jason and Stefan, what do you think of this way?
 
-> +{
-> +	to_save->es = from_save->es;
-> +	to_save->cs = from_save->cs;
-> +	to_save->ss = from_save->ss;
-> +	to_save->ds = from_save->ds;
-> +	to_save->gdtr = from_save->gdtr;
-> +	to_save->idtr = from_save->idtr;
-> +	to_save->rflags = from_save->rflags | X86_EFLAGS_FIXED;
-> +	to_save->efer = from_save->efer;
-> +	to_save->cr0 = from_save->cr0;
-> +	to_save->cr3 = from_save->cr3;
-> +	to_save->cr4 = from_save->cr4;
-> +	to_save->rax = from_save->rax;
-> +	to_save->rsp = from_save->rsp;
-> +	to_save->rip = from_save->rip;
-> +	to_save->cpl = 0;
-> +}
-> +
->   void nested_svm_vmloadsave(struct vmcb *from_vmcb, struct vmcb *to_vmcb)
->   {
->   	to_vmcb->save.fs = from_vmcb->save.fs;
-> @@ -1360,21 +1380,7 @@ static int svm_set_nested_state(struct kvm_vcpu *vcpu,
->   
->   	svm->nested.vmcb12_gpa = kvm_state->hdr.svm.vmcb_pa;
->   
-> -	svm->vmcb01.ptr->save.es = save->es;
-> -	svm->vmcb01.ptr->save.cs = save->cs;
-> -	svm->vmcb01.ptr->save.ss = save->ss;
-> -	svm->vmcb01.ptr->save.ds = save->ds;
-> -	svm->vmcb01.ptr->save.gdtr = save->gdtr;
-> -	svm->vmcb01.ptr->save.idtr = save->idtr;
-> -	svm->vmcb01.ptr->save.rflags = save->rflags | X86_EFLAGS_FIXED;
-> -	svm->vmcb01.ptr->save.efer = save->efer;
-> -	svm->vmcb01.ptr->save.cr0 = save->cr0;
-> -	svm->vmcb01.ptr->save.cr3 = save->cr3;
-> -	svm->vmcb01.ptr->save.cr4 = save->cr4;
-> -	svm->vmcb01.ptr->save.rax = save->rax;
-> -	svm->vmcb01.ptr->save.rsp = save->rsp;
-> -	svm->vmcb01.ptr->save.rip = save->rip;
-> -	svm->vmcb01.ptr->save.cpl = 0;
-> +	svm_copy_nonvmloadsave_state(save, &svm->vmcb01.ptr->save);
->   
->   	nested_load_control_from_vmcb12(svm, ctl);
->   
-> diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
-> index f89b623bb591..ff2dac2b23b6 100644
-> --- a/arch/x86/kvm/svm/svm.h
-> +++ b/arch/x86/kvm/svm/svm.h
-> @@ -463,6 +463,8 @@ void svm_leave_nested(struct vcpu_svm *svm);
->   void svm_free_nested(struct vcpu_svm *svm);
->   int svm_allocate_nested(struct vcpu_svm *svm);
->   int nested_svm_vmrun(struct kvm_vcpu *vcpu);
-> +void svm_copy_nonvmloadsave_state(struct vmcb_save_area *from_save,
-> +				  struct vmcb_save_area *to_save);
->   void nested_svm_vmloadsave(struct vmcb *from_vmcb, struct vmcb *to_vmcb);
->   int nested_svm_vmexit(struct vcpu_svm *svm);
->   
-> 
+Why does VDUSE_DEV_GET_CONFIG need to support an error return value?
+
+The VIRTIO spec provides no way for the device to report errors from
+config space accesses.
+
+The QEMU virtio-pci implementation returns -1 from invalid
+virtio_config_read*() and silently discards virtio_config_write*()
+accesses.
+
+VDUSE can take the same approach with
+VDUSE_DEV_GET_CONFIG/VDUSE_DEV_SET_CONFIG.
+
+> I'd like to stick to the current assumption thich get_config won't fail.
+> That is to say,
+>=20
+> 1) maintain a config in the kernel, make sure the config space read can
+> always succeed
+> 2) introduce an ioctl for the vduse usersapce to update the config space.
+> 3) we can synchronize with the vduse userspace during set_config
+>=20
+> Does this work?
+
+I noticed that caching is also allowed by the vhost-user protocol
+messages (QEMU's docs/interop/vhost-user.rst), but the device doesn't
+know whether or not caching is in effect. The interface you outlined
+above requires caching.
+
+Is there a reason why the host kernel vDPA code needs to cache the
+configuration space?
+
+Here are the vhost-user protocol messages:
+
+  Virtio device config space
+  ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+  +--------+------+-------+---------+
+  | offset | size | flags | payload |
+  +--------+------+-------+---------+
+
+  :offset: a 32-bit offset of virtio device's configuration space
+
+  :size: a 32-bit configuration space access size in bytes
+
+  :flags: a 32-bit value:
+    - 0: Vhost master messages used for writeable fields
+    - 1: Vhost master messages used for live migration
+
+  :payload: Size bytes array holding the contents of the virtio
+            device's configuration space
+
+  ...
+
+  ``VHOST_USER_GET_CONFIG``
+    :id: 24
+    :equivalent ioctl: N/A
+    :master payload: virtio device config space
+    :slave payload: virtio device config space
+
+    When ``VHOST_USER_PROTOCOL_F_CONFIG`` is negotiated, this message is
+    submitted by the vhost-user master to fetch the contents of the
+    virtio device configuration space, vhost-user slave's payload size
+    MUST match master's request, vhost-user slave uses zero length of
+    payload to indicate an error to vhost-user master. The vhost-user
+    master may cache the contents to avoid repeated
+    ``VHOST_USER_GET_CONFIG`` calls.
+
+  ``VHOST_USER_SET_CONFIG``
+    :id: 25
+    :equivalent ioctl: N/A
+    :master payload: virtio device config space
+    :slave payload: N/A
+
+    When ``VHOST_USER_PROTOCOL_F_CONFIG`` is negotiated, this message is
+    submitted by the vhost-user master when the Guest changes the virtio
+    device configuration space and also can be used for live migration
+    on the destination host. The vhost-user slave must check the flags
+    field, and slaves MUST NOT accept SET_CONFIG for read-only
+    configuration space fields unless the live migration bit is set.
+
+Stefan
+
+--nJZEr38ROGX7NVP+
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAmDi//YACgkQnKSrs4Gr
+c8jgKwf/S3jEpQ3OvcO2LwK0GDdjhgQBhsendLEbARZ7hCRFfpQT9NfPYYUu6ct/
+WLxxofULohkENWZgImWB7p0JD3XhfXusVRbY8gy70ZjrQ9LuTglcJHd0ZBOdW9nI
+ZE/AWB6ltdKTSFUmiEh+rQ2KyLB55l8VPpNhEL/KhztpGM3ZqpStVNwgpGJE4D53
+7/tXKbqCMBLdVenAetRVOdbi+/DXXgCpPVutcTKEirfkJqZaum8PqPQUoT4rh1j9
+vHVvnKRGLLsdLxCSa5Jw2jF9Ting+CbCV38QKdYTv8nWX7LFwIRd+xYkSkUea3i3
+aRvxtciBZWCajqsu/TEsHsk1sQn4Sg==
+=GVfM
+-----END PGP SIGNATURE-----
+
+--nJZEr38ROGX7NVP+--
 
