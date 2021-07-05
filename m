@@ -2,24 +2,28 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7F8063BB914
-	for <lists+kvm@lfdr.de>; Mon,  5 Jul 2021 10:26:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 808553BB926
+	for <lists+kvm@lfdr.de>; Mon,  5 Jul 2021 10:26:38 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230115AbhGEI2w (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 5 Jul 2021 04:28:52 -0400
-Received: from 8bytes.org ([81.169.241.247]:58844 "EHLO theia.8bytes.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S230081AbhGEI2v (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 5 Jul 2021 04:28:51 -0400
+        id S230220AbhGEI3G (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 5 Jul 2021 04:29:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55654 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230114AbhGEI2y (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 5 Jul 2021 04:28:54 -0400
+Received: from theia.8bytes.org (8bytes.org [IPv6:2a01:238:4383:600:38bc:a715:4b6d:a889])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F0B7AC061574;
+        Mon,  5 Jul 2021 01:26:16 -0700 (PDT)
 Received: from cap.home.8bytes.org (p5b006775.dip0.t-ipconnect.de [91.0.103.117])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
         (No client certificate requested)
-        by theia.8bytes.org (Postfix) with ESMTPSA id 2C64A261;
+        by theia.8bytes.org (Postfix) with ESMTPSA id B30C837C;
         Mon,  5 Jul 2021 10:26:12 +0200 (CEST)
 From:   Joerg Roedel <joro@8bytes.org>
 To:     x86@kernel.org
 Cc:     Joerg Roedel <joro@8bytes.org>, Joerg Roedel <jroedel@suse.de>,
-        hpa@zytor.com, Andy Lutomirski <luto@kernel.org>,
+        stable@vger.kernel.org, hpa@zytor.com,
+        Andy Lutomirski <luto@kernel.org>,
         Dave Hansen <dave.hansen@linux.intel.com>,
         Peter Zijlstra <peterz@infradead.org>,
         Jiri Slaby <jslaby@suse.cz>,
@@ -37,10 +41,12 @@ Cc:     Joerg Roedel <joro@8bytes.org>, Joerg Roedel <jroedel@suse.de>,
         Arvind Sankar <nivedita@alum.mit.edu>,
         linux-coco@lists.linux.dev, linux-kernel@vger.kernel.org,
         kvm@vger.kernel.org, virtualization@lists.linux-foundation.org
-Subject: [RFC PATCH 00/12] x86/sev: KEXEC/KDUMP support for SEV-ES guests
-Date:   Mon,  5 Jul 2021 10:24:31 +0200
-Message-Id: <20210705082443.14721-1-joro@8bytes.org>
+Subject: [RFC PATCH 01/12] kexec: Allow architecture code to opt-out at runtime
+Date:   Mon,  5 Jul 2021 10:24:32 +0200
+Message-Id: <20210705082443.14721-2-joro@8bytes.org>
 X-Mailer: git-send-email 2.31.1
+In-Reply-To: <20210705082443.14721-1-joro@8bytes.org>
+References: <20210705082443.14721-1-joro@8bytes.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
@@ -49,108 +55,86 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Joerg Roedel <jroedel@suse.de>
 
-Hi,
+Allow a runtime opt-out of kexec support for architecture code in case
+the kernel is running in an environment where kexec is not properly
+supported yet.
 
-here are changes to enable kexec/kdump in SEV-ES guests. The biggest
-problem for supporting kexec/kdump under SEV-ES is to find a way to
-hand the non-boot CPUs (APs) from one kernel to another.
+This will be used on x86 when the kernel is running as an SEV-ES
+guest. SEV-ES guests need special handling for kexec to hand over all
+CPUs to the new kernel. This requires special hypervisor support and
+handling code in the guest which is not yet implemented.
 
-Without SEV-ES the first kernel parks the CPUs in a HLT loop until
-they get reset by the kexec'ed kernel via an INIT-SIPI-SIPI sequence.
-For virtual machines the CPU reset is emulated by the hypervisor,
-which sets the vCPU registers back to reset state.
+Cc: stable@vger.kernel.org # v5.10+
+Signed-off-by: Joerg Roedel <jroedel@suse.de>
+---
+ include/linux/kexec.h |  2 ++
+ kernel/kexec.c        | 14 ++++++++++++++
+ kernel/kexec_file.c   |  9 +++++++++
+ 3 files changed, 25 insertions(+)
 
-This does not work under SEV-ES, because the hypervisor has no access
-to the vCPU registers and can't make modifications to them. So an
-SEV-ES guest needs to reset the vCPU itself and park it using the
-AP-reset-hold protocol. Upon wakeup the guest needs to jump to
-real-mode and to the reset-vector configured in the AP-Jump-Table.
-
-The code to do this is the main part of this patch-set. It works by
-placing code on the AP Jump-Table page itself to park the vCPU and for
-jumping to the reset vector upon wakeup. The code on the AP Jump Table
-runs in 16-bit protected mode with segment base set to the beginning
-of the page. The AP Jump-Table is usually not within the first 1MB of
-memory, so the code can't run in real-mode.
-
-The AP Jump-Table is the best place to put the parking code, because
-the memory is owned, but read-only by the firmware and writeable by
-the OS. Only the first 4 bytes are used for the reset-vector, leaving
-the rest of the page for code/data/stack to park a vCPU. The code
-can't be in kernel memory because by the time the vCPU wakes up the
-memory will be owned by the new kernel, which might have overwritten it
-already.
-
-The other patches add initial GHCB Version 2 protocol support, because
-kexec/kdump need the MSR-based (without a GHCB) AP-reset-hold VMGEXT,
-which is a GHCB protocol version 2 feature.
-
-The kexec'ed kernel is also entered via the decompressor and needs
-MMIO support there, so this patch-set also adds MMIO #VC support to
-the decompressor and support for handling CLFLUSH instructions.
-
-Finally there is also code to disable kexec/kdump support at runtime
-when the environment does not support it (e.g. no GHCB protocol
-version 2 support or AP Jump Table over 4GB).
-
-The diffstat looks big, but most of it is moving code for MMIO #VC
-support around to make it available to the decompressor.
-
-There is also a video showing the code in action:
-
-	https://www.youtube.com/watch?v=j1AUJANP7Mk
-
-Please review.
-
-Thanks,
-
-	Joerg
-
-Joerg Roedel (12):
-  kexec: Allow architecture code to opt-out at runtime
-  x86/kexec/64: Forbid kexec when running as an SEV-ES guest
-  x86/sev: Save and print negotiated GHCB protocol version
-  x86/sev: Do not hardcode GHCB protocol version
-  x86/sev: Use GHCB protocol version 2 if supported
-  x86/sev: Cache AP Jump Table Address
-  x86/sev: Setup code to park APs in the AP Jump Table
-  x86/sev: Park APs on AP Jump Table with GHCB protocol version 2
-  x86/sev: Use AP Jump Table blob to stop CPU
-  x86/sev: Add MMIO handling support to boot/compressed/ code
-  x86/sev: Handle CLFLUSH MMIO events
-  x86/sev: Support kexec under SEV-ES with AP Jump Table blob
-
- arch/x86/boot/compressed/sev.c          |  56 +-
- arch/x86/include/asm/realmode.h         |   5 +
- arch/x86/include/asm/sev-ap-jumptable.h |  25 +
- arch/x86/include/asm/sev.h              |  13 +-
- arch/x86/kernel/machine_kexec_64.c      |  12 +
- arch/x86/kernel/process.c               |   8 +
- arch/x86/kernel/sev-shared.c            | 333 +++++++++-
- arch/x86/kernel/sev.c                   | 494 ++++++---------
- arch/x86/lib/insn-eval-shared.c         | 805 ++++++++++++++++++++++++
- arch/x86/lib/insn-eval.c                | 802 +----------------------
- arch/x86/realmode/Makefile              |   9 +-
- arch/x86/realmode/rm/Makefile           |  11 +-
- arch/x86/realmode/rm/header.S           |   3 +
- arch/x86/realmode/rm/sev_ap_park.S      |  89 +++
- arch/x86/realmode/rmpiggy.S             |   6 +
- arch/x86/realmode/sev/Makefile          |  41 ++
- arch/x86/realmode/sev/ap_jump_table.S   | 130 ++++
- arch/x86/realmode/sev/ap_jump_table.lds |  24 +
- include/linux/kexec.h                   |   2 +
- kernel/kexec.c                          |  14 +
- kernel/kexec_file.c                     |   9 +
- 21 files changed, 1765 insertions(+), 1126 deletions(-)
- create mode 100644 arch/x86/include/asm/sev-ap-jumptable.h
- create mode 100644 arch/x86/lib/insn-eval-shared.c
- create mode 100644 arch/x86/realmode/rm/sev_ap_park.S
- create mode 100644 arch/x86/realmode/sev/Makefile
- create mode 100644 arch/x86/realmode/sev/ap_jump_table.S
- create mode 100644 arch/x86/realmode/sev/ap_jump_table.lds
-
-
-base-commit: 8d9d46bbf3b6b7ff8edcac33603ab45c29e0e07f
+diff --git a/include/linux/kexec.h b/include/linux/kexec.h
+index 0c994ae37729..400aae677435 100644
+--- a/include/linux/kexec.h
++++ b/include/linux/kexec.h
+@@ -422,6 +422,8 @@ static inline int kexec_crash_loaded(void) { return 0; }
+ #define kexec_in_progress false
+ #endif /* CONFIG_KEXEC_CORE */
+ 
++bool arch_kexec_supported(void);
++
+ #endif /* !defined(__ASSEBMLY__) */
+ 
+ #endif /* LINUX_KEXEC_H */
+diff --git a/kernel/kexec.c b/kernel/kexec.c
+index c82c6c06f051..d03134160458 100644
+--- a/kernel/kexec.c
++++ b/kernel/kexec.c
+@@ -195,11 +195,25 @@ static int do_kexec_load(unsigned long entry, unsigned long nr_segments,
+  * that to happen you need to do that yourself.
+  */
+ 
++bool __weak arch_kexec_supported(void)
++{
++	return true;
++}
++
+ static inline int kexec_load_check(unsigned long nr_segments,
+ 				   unsigned long flags)
+ {
+ 	int result;
+ 
++	/*
++	 * The architecture may support kexec in general, but the kernel could
++	 * run in an environment where it is not (yet) possible to execute a new
++	 * kernel. Allow the architecture code to opt-out of kexec support when
++	 * it is running in such an environment.
++	 */
++	if (!arch_kexec_supported())
++		return -ENOSYS;
++
+ 	/* We only trust the superuser with rebooting the system. */
+ 	if (!capable(CAP_SYS_BOOT) || kexec_load_disabled)
+ 		return -EPERM;
+diff --git a/kernel/kexec_file.c b/kernel/kexec_file.c
+index 33400ff051a8..96d08a512e9c 100644
+--- a/kernel/kexec_file.c
++++ b/kernel/kexec_file.c
+@@ -358,6 +358,15 @@ SYSCALL_DEFINE5(kexec_file_load, int, kernel_fd, int, initrd_fd,
+ 	int ret = 0, i;
+ 	struct kimage **dest_image, *image;
+ 
++	/*
++	 * The architecture may support kexec in general, but the kernel could
++	 * run in an environment where it is not (yet) possible to execute a new
++	 * kernel. Allow the architecture code to opt-out of kexec support when
++	 * it is running in such an environment.
++	 */
++	if (!arch_kexec_supported())
++		return -ENOSYS;
++
+ 	/* We only trust the superuser with rebooting the system. */
+ 	if (!capable(CAP_SYS_BOOT) || kexec_load_disabled)
+ 		return -EPERM;
 -- 
 2.31.1
 
