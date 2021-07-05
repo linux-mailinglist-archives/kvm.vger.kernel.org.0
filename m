@@ -2,35 +2,35 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 18AE53BBB7B
+	by mail.lfdr.de (Postfix) with ESMTP id 6118E3BBB7C
 	for <lists+kvm@lfdr.de>; Mon,  5 Jul 2021 12:46:47 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231222AbhGEKtV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 5 Jul 2021 06:49:21 -0400
-Received: from forward1-smtp.messagingengine.com ([66.111.4.223]:59627 "EHLO
+        id S231225AbhGEKtW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 5 Jul 2021 06:49:22 -0400
+Received: from forward1-smtp.messagingengine.com ([66.111.4.223]:45489 "EHLO
         forward1-smtp.messagingengine.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231202AbhGEKtU (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 5 Jul 2021 06:49:20 -0400
-Received: from compute3.internal (compute3.nyi.internal [10.202.2.43])
-        by mailforward.nyi.internal (Postfix) with ESMTP id D6E5E1940A24;
-        Mon,  5 Jul 2021 06:46:43 -0400 (EDT)
-Received: from mailfrontend2 ([10.202.2.163])
-  by compute3.internal (MEProxy); Mon, 05 Jul 2021 06:46:43 -0400
+        by vger.kernel.org with ESMTP id S231190AbhGEKtV (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 5 Jul 2021 06:49:21 -0400
+Received: from compute2.internal (compute2.nyi.internal [10.202.2.42])
+        by mailforward.nyi.internal (Postfix) with ESMTP id 01C2719409D5;
+        Mon,  5 Jul 2021 06:46:44 -0400 (EDT)
+Received: from mailfrontend1 ([10.202.2.162])
+  by compute2.internal (MEProxy); Mon, 05 Jul 2021 06:46:44 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
         messagingengine.com; h=cc:content-transfer-encoding:date:from
         :in-reply-to:message-id:mime-version:references:subject:to
         :x-me-proxy:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=
-        fm3; bh=zn9zUGz57ivQbtIoDzG6NwEdWAVLVWzxpCG0kNQ8R9Y=; b=whhAGXfQ
-        uHYstsMicIYNU+NXuUCVrYe7QZcmblGHhbPIyrpO/+rJB+V47yzm31kiZ2radUQ9
-        SfOA73gQp7H0dXTzOZta2s4g/zuZ8JyEMvEZFTsT5TT9wTrOwqJINksp33dKJKCt
-        zZ3F4LXYarFelCjF+Ef/c2uI8NJSIGXohejuBaGNvpEO0Ep4wLfZ/e9HfRfK8IPI
-        xITKltiKx4Qkxs1IIFr43PcJHowfT6kf5ZI1OQQAWbLS068CVLKXw5IkZ/XmZOSl
-        1eRJD105FCKWwsvxOaKb92TpiBdQ9jfJRKUh5V80F5FQjWdEQ4h4/g2B41/3Qpdo
-        VFp3usuzWNMe6A==
-X-ME-Sender: <xms:EuPiYMJJD5eFAjLxoMqwNWcigHGjRdVl2w9SbNr-PC7SRVlooDd-8A>
-    <xme:EuPiYMLPlJCRoOyKNMoQiRuUU4wCqN5pR4XDZy0jQe5E0uv8t4pM_rQ_4QlgUf2aS
-    4tRs0OYfQdogL_b640>
-X-ME-Received: <xmr:EuPiYMsZPfxJp7vC81o5Fji5TwTc-1mfJFDFPyCcdqyhjbgRP_IL1tIWpV-EE-Y2KCntHVM0Fr2I0frwcfES_v8TrSnz8iq46dOJhahY6rg>
+        fm3; bh=uHtzc5hD5n2kpYfDdA4+xmzSapD2LfwWyUZ1ufnaLg4=; b=Hx9D4/IF
+        IAxJNCW8R6Ewi2C7ssRf/JdN1kYEpb4nNkbRtKVjYt8RuzVwEjkFR5P8kxbx26w2
+        CnfDKtOdmUmlz9DZ21WThY5gNDxjUF415Y0+0nleZZ5yLAff2ORijnvqZys8ndot
+        Y/sq2zpKWz4kxYuplYn5eOITGD0C3HijEuXvmanOFaKJApoXQGlADyuViu+i5ys7
+        d4rpbSLaxxm5cVc++uh0jrEmnTghDrF/E+CJBnzBVqOiLOImKTv39zM2No+jWuO0
+        7OcF5hgKIteNgTPq5Iy/HxGbYTImXQ4NW4P3M5qdfNeogqDK2NwekQXw1O8ENguB
+        zqHnH08y5GfLBg==
+X-ME-Sender: <xms:E-PiYLt-B8vm6eQQtOmk34bNzpsrlRpqFfm1_wuirGDjTfUTEZYwog>
+    <xme:E-PiYMcTZ3T0ARmtTOD0DpynSv_dzj1EON807sxrCszo86LnDXkplcPnPM30uWiO6
+    9mw9eMjfRxnv79feBg>
+X-ME-Received: <xmr:E-PiYOyNfPCu-DgJdvl4LPSrcHE24_6eY-dp87dv8Id5ckGjafCN4RLNIP4tcB9Th5vQlTR5fgI73wYJBsk2aW6D4Sraqj0byj2R8LnsFIE>
 X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeduledrfeejgedgfeduucetufdoteggodetrfdotf
     fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
     uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
@@ -40,14 +40,14 @@ X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeduledrfeejgedgfeduucetufdoteggod
     leehfffhiefhgeelgfejtdehkeenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmh
     epmhgrihhlfhhrohhmpegurghvihgurdgvughmohhnughsohhnsehorhgrtghlvgdrtgho
     mh
-X-ME-Proxy: <xmx:EuPiYJbJN2HZD0111XnTyhuymNfnKEVB-Y1ivBV2J9flAzRAk5fg9A>
-    <xmx:EuPiYDZdaapCsn4Kh65r2BNYohkvpK5_FkwdhJ9qMCF3WMGpJUXs6g>
-    <xmx:EuPiYFDQSXv_qtJpEOY4uYn-UH9XmW4P_X2nU9jfKBuiKQ91Ope00Q>
-    <xmx:E-PiYJsZddk-YR7qPI8gsarAoY3Dqr-0pwnXJmjYWsTrhSK5SeDmKg>
+X-ME-Proxy: <xmx:E-PiYKPh_Q4VT-GA3wf8i9bj0-IImma2_iZqjRuFxg_SkrC7JWJ14Q>
+    <xmx:E-PiYL9IWRMnxOqegXF0OYgZd2VJkUZRj08_5ZYw0pOVJvr6XFw0oQ>
+    <xmx:E-PiYKUvWqcg84GMlhZpSS8lyJg28JrFJWm73sdUV77mP_MeOuzBKA>
+    <xmx:E-PiYIjLF7-VFoU7tpyvL-ZIJ7nEs9YXKsHDVSISLzrcfPJJ42gy3g>
 Received: by mail.messagingengine.com (Postfix) with ESMTPA; Mon,
- 5 Jul 2021 06:46:41 -0400 (EDT)
+ 5 Jul 2021 06:46:42 -0400 (EDT)
 Received: from localhost (disaster-area.hh.sledj.net [local])
-        by disaster-area.hh.sledj.net (OpenSMTPD) with ESMTPA id 22e66db2;
+        by disaster-area.hh.sledj.net (OpenSMTPD) with ESMTPA id f3fd2bd6;
         Mon, 5 Jul 2021 10:46:32 +0000 (UTC)
 From:   David Edmondson <david.edmondson@oracle.com>
 To:     qemu-devel@nongnu.org
@@ -59,9 +59,9 @@ Cc:     Richard Henderson <richard.henderson@linaro.org>,
         Cameron Esfahani <dirty@apple.com>,
         Eduardo Habkost <ehabkost@redhat.com>,
         David Edmondson <david.edmondson@oracle.com>
-Subject: [RFC PATCH 4/8] target/i386: Pass buffer and length to XSAVE helper
-Date:   Mon,  5 Jul 2021 11:46:28 +0100
-Message-Id: <20210705104632.2902400-5-david.edmondson@oracle.com>
+Subject: [RFC PATCH 5/8] target/i386: Make x86_ext_save_areas visible outside cpu.c
+Date:   Mon,  5 Jul 2021 11:46:29 +0100
+Message-Id: <20210705104632.2902400-6-david.edmondson@oracle.com>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20210705104632.2902400-1-david.edmondson@oracle.com>
 References: <20210705104632.2902400-1-david.edmondson@oracle.com>
@@ -71,199 +71,53 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-In preparation for removing assumptions about XSAVE area offsets, pass
-a buffer pointer and buffer length to the XSAVE helper functions.
+Provide visibility of the x86_ext_save_areas array and associated type
+outside of cpu.c.
 
 Signed-off-by: David Edmondson <david.edmondson@oracle.com>
 ---
- target/i386/cpu.h          |  5 +++--
- target/i386/hvf/hvf.c      |  3 ++-
- target/i386/hvf/x86hvf.c   | 19 ++++++++-----------
- target/i386/kvm/kvm.c      | 13 +++++++------
- target/i386/xsave_helper.c | 17 +++++++++--------
- 5 files changed, 29 insertions(+), 28 deletions(-)
+ target/i386/cpu.c | 7 +------
+ target/i386/cpu.h | 9 +++++++++
+ 2 files changed, 10 insertions(+), 6 deletions(-)
 
+diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+index d8f3ab3192..13caa0de50 100644
+--- a/target/i386/cpu.c
++++ b/target/i386/cpu.c
+@@ -1304,12 +1304,7 @@ static const X86RegisterInfo32 x86_reg_info_32[CPU_NB_REGS32] = {
+ };
+ #undef REGISTER
+ 
+-typedef struct ExtSaveArea {
+-    uint32_t feature, bits;
+-    uint32_t offset, size;
+-} ExtSaveArea;
+-
+-static const ExtSaveArea x86_ext_save_areas[] = {
++const ExtSaveArea x86_ext_save_areas[XSAVE_STATE_AREA_COUNT] = {
+     [XSTATE_FP_BIT] = {
+         /* x87 FP state component is always enabled if XSAVE is supported */
+         .feature = FEAT_1_ECX, .bits = CPUID_EXT_XSAVE,
 diff --git a/target/i386/cpu.h b/target/i386/cpu.h
-index 92f9ca264c..ada2941c6e 100644
+index ada2941c6e..c9c0a34330 100644
 --- a/target/i386/cpu.h
 +++ b/target/i386/cpu.h
-@@ -1667,6 +1667,7 @@ typedef struct CPUX86State {
-     uint64_t apic_bus_freq;
- #if defined(CONFIG_KVM) || defined(CONFIG_HVF)
-     void *xsave_buf;
-+    uint32_t xsave_buf_len;
- #endif
- #if defined(CONFIG_KVM)
-     struct kvm_nested_state *nested_state;
-@@ -2227,8 +2228,8 @@ void x86_cpu_dump_local_apic_state(CPUState *cs, int flags);
- /* cpu.c */
- bool cpu_is_bsp(X86CPU *cpu);
+@@ -1370,6 +1370,15 @@ QEMU_BUILD_BUG_ON(offsetof(X86XSaveArea, zmm_hi256_state) != XSAVE_ZMM_HI256_OFF
+ QEMU_BUILD_BUG_ON(offsetof(X86XSaveArea, hi16_zmm_state) != XSAVE_HI16_ZMM_OFFSET);
+ QEMU_BUILD_BUG_ON(offsetof(X86XSaveArea, pkru_state) != XSAVE_PKRU_OFFSET);
  
--void x86_cpu_xrstor_all_areas(X86CPU *cpu, const X86XSaveArea *buf);
--void x86_cpu_xsave_all_areas(X86CPU *cpu, X86XSaveArea *buf);
-+void x86_cpu_xrstor_all_areas(X86CPU *cpu, const void *buf, uint32_t buflen);
-+void x86_cpu_xsave_all_areas(X86CPU *cpu, void *buf, uint32_t buflen);
- void x86_update_hflags(CPUX86State* env);
- 
- static inline bool hyperv_feat_enabled(X86CPU *cpu, int feat)
-diff --git a/target/i386/hvf/hvf.c b/target/i386/hvf/hvf.c
-index 346dbcc26f..e62e8df028 100644
---- a/target/i386/hvf/hvf.c
-+++ b/target/i386/hvf/hvf.c
-@@ -267,7 +267,8 @@ int hvf_arch_init_vcpu(CPUState *cpu)
-     wvmcs(cpu->hvf->fd, VMCS_TPR_THRESHOLD, 0);
- 
-     x86cpu = X86_CPU(cpu);
--    x86cpu->env.xsave_buf = qemu_memalign(4096, 4096);
-+    x86cpu->env.xsave_buf_len = 4096;
-+    x86cpu->env.xsave_buf = qemu_memalign(4096, x86cpu->env.xsave_buf_len);
- 
-     hv_vcpu_enable_native_msr(cpu->hvf->fd, MSR_STAR, 1);
-     hv_vcpu_enable_native_msr(cpu->hvf->fd, MSR_LSTAR, 1);
-diff --git a/target/i386/hvf/x86hvf.c b/target/i386/hvf/x86hvf.c
-index 2ced2c2478..05ec1bddc4 100644
---- a/target/i386/hvf/x86hvf.c
-+++ b/target/i386/hvf/x86hvf.c
-@@ -73,14 +73,12 @@ void hvf_get_segment(SegmentCache *qseg, struct vmx_segment *vmx_seg)
- 
- void hvf_put_xsave(CPUState *cpu_state)
- {
-+    void *xsave = X86_CPU(cpu_state)->env.xsave_buf;
-+    uint32_t xsave_len = X86_CPU(cpu_state)->env.xsave_buf_len;
- 
--    struct X86XSaveArea *xsave;
-+    x86_cpu_xsave_all_areas(X86_CPU(cpu_state), xsave, xsave_len);
- 
--    xsave = X86_CPU(cpu_state)->env.xsave_buf;
--
--    x86_cpu_xsave_all_areas(X86_CPU(cpu_state), xsave);
--
--    if (hv_vcpu_write_fpstate(cpu_state->hvf->fd, (void*)xsave, 4096)) {
-+    if (hv_vcpu_write_fpstate(cpu_state->hvf->fd, xsave, xsave_len)) {
-         abort();
-     }
- }
-@@ -158,15 +156,14 @@ void hvf_put_msrs(CPUState *cpu_state)
- 
- void hvf_get_xsave(CPUState *cpu_state)
- {
--    struct X86XSaveArea *xsave;
--
--    xsave = X86_CPU(cpu_state)->env.xsave_buf;
-+    void *xsave = X86_CPU(cpu_state)->env.xsave_buf;
-+    uint32_t xsave_len = X86_CPU(cpu_state)->env.xsave_buf_len;
- 
--    if (hv_vcpu_read_fpstate(cpu_state->hvf->fd, (void*)xsave, 4096)) {
-+    if (hv_vcpu_read_fpstate(cpu_state->hvf->fd, xsave, xsave_len)) {
-         abort();
-     }
- 
--    x86_cpu_xrstor_all_areas(X86_CPU(cpu_state), xsave);
-+    x86_cpu_xrstor_all_areas(X86_CPU(cpu_state), xsave, xsave_len);
- }
- 
- void hvf_get_segments(CPUState *cpu_state)
-diff --git a/target/i386/kvm/kvm.c b/target/i386/kvm/kvm.c
-index 3ab1d71775..41b0764ab7 100644
---- a/target/i386/kvm/kvm.c
-+++ b/target/i386/kvm/kvm.c
-@@ -1888,8 +1888,9 @@ int kvm_arch_init_vcpu(CPUState *cs)
-     }
- 
-     if (has_xsave) {
--        env->xsave_buf = qemu_memalign(4096, sizeof(struct kvm_xsave));
--        memset(env->xsave_buf, 0, sizeof(struct kvm_xsave));
-+        env->xsave_buf_len = sizeof(struct kvm_xsave);
-+        env->xsave_buf = qemu_memalign(4096, env->xsave_buf_len);
-+        memset(env->xsave_buf, 0, env->xsave_buf_len);
-     }
- 
-     max_nested_state_len = kvm_max_nested_state_length();
-@@ -2469,12 +2470,12 @@ static int kvm_put_fpu(X86CPU *cpu)
- static int kvm_put_xsave(X86CPU *cpu)
- {
-     CPUX86State *env = &cpu->env;
--    X86XSaveArea *xsave = env->xsave_buf;
-+    void *xsave = env->xsave_buf;
- 
-     if (!has_xsave) {
-         return kvm_put_fpu(cpu);
-     }
--    x86_cpu_xsave_all_areas(cpu, xsave);
-+    x86_cpu_xsave_all_areas(cpu, xsave, env->xsave_buf_len);
- 
-     return kvm_vcpu_ioctl(CPU(cpu), KVM_SET_XSAVE, xsave);
- }
-@@ -3119,7 +3120,7 @@ static int kvm_get_fpu(X86CPU *cpu)
- static int kvm_get_xsave(X86CPU *cpu)
- {
-     CPUX86State *env = &cpu->env;
--    X86XSaveArea *xsave = env->xsave_buf;
-+    void *xsave = env->xsave_buf;
-     int ret;
- 
-     if (!has_xsave) {
-@@ -3130,7 +3131,7 @@ static int kvm_get_xsave(X86CPU *cpu)
-     if (ret < 0) {
-         return ret;
-     }
--    x86_cpu_xrstor_all_areas(cpu, xsave);
-+    x86_cpu_xrstor_all_areas(cpu, xsave, env->xsave_buf_len);
- 
-     return 0;
- }
-diff --git a/target/i386/xsave_helper.c b/target/i386/xsave_helper.c
-index 818115e7d2..b16c6ac0fe 100644
---- a/target/i386/xsave_helper.c
-+++ b/target/i386/xsave_helper.c
-@@ -6,14 +6,16 @@
- 
- #include "cpu.h"
- 
--void x86_cpu_xsave_all_areas(X86CPU *cpu, X86XSaveArea *buf)
-+void x86_cpu_xsave_all_areas(X86CPU *cpu, void *buf, uint32_t buflen)
- {
-     CPUX86State *env = &cpu->env;
-     X86XSaveArea *xsave = buf;
--
-     uint16_t cwd, swd, twd;
-     int i;
--    memset(xsave, 0, sizeof(X86XSaveArea));
++typedef struct ExtSaveArea {
++    uint32_t feature, bits;
++    uint32_t offset, size;
++} ExtSaveArea;
 +
-+    assert(buflen >= sizeof(*xsave));
++#define XSAVE_STATE_AREA_COUNT (XSTATE_PKRU_BIT + 1)
 +
-+    memset(xsave, 0, buflen);
-     twd = 0;
-     swd = env->fpus & ~(7 << 11);
-     swd |= (env->fpstt & 7) << 11;
-@@ -56,17 +58,17 @@ void x86_cpu_xsave_all_areas(X86CPU *cpu, X86XSaveArea *buf)
-             16 * sizeof env->xmm_regs[16]);
-     memcpy(&xsave->pkru_state, &env->pkru, sizeof env->pkru);
- #endif
--
- }
- 
--void x86_cpu_xrstor_all_areas(X86CPU *cpu, const X86XSaveArea *buf)
-+void x86_cpu_xrstor_all_areas(X86CPU *cpu, const void *buf, uint32_t buflen)
- {
--
-     CPUX86State *env = &cpu->env;
-     const X86XSaveArea *xsave = buf;
--
-     int i;
-     uint16_t cwd, swd, twd;
++extern const ExtSaveArea x86_ext_save_areas[XSAVE_STATE_AREA_COUNT];
 +
-+    assert(buflen >= sizeof(*xsave));
-+
-     cwd = xsave->legacy.fcw;
-     swd = xsave->legacy.fsw;
-     twd = xsave->legacy.ftw;
-@@ -108,5 +110,4 @@ void x86_cpu_xrstor_all_areas(X86CPU *cpu, const X86XSaveArea *buf)
-            16 * sizeof env->xmm_regs[16]);
-     memcpy(&env->pkru, &xsave->pkru_state, sizeof env->pkru);
- #endif
--
- }
+ typedef enum TPRAccess {
+     TPR_ACCESS_READ,
+     TPR_ACCESS_WRITE,
 -- 
 2.30.2
 
