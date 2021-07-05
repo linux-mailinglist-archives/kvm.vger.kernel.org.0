@@ -2,290 +2,147 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 831F63BBE15
-	for <lists+kvm@lfdr.de>; Mon,  5 Jul 2021 16:19:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4F6AB3BBED4
+	for <lists+kvm@lfdr.de>; Mon,  5 Jul 2021 17:23:48 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231446AbhGEOWC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 5 Jul 2021 10:22:02 -0400
-Received: from mga04.intel.com ([192.55.52.120]:44987 "EHLO mga04.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S231448AbhGEOWC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 5 Jul 2021 10:22:02 -0400
-X-IronPort-AV: E=McAfee;i="6200,9189,10036"; a="207158044"
-X-IronPort-AV: E=Sophos;i="5.83,325,1616482800"; 
-   d="scan'208";a="207158044"
-Received: from fmsmga003.fm.intel.com ([10.253.24.29])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Jul 2021 07:19:25 -0700
-X-IronPort-AV: E=Sophos;i="5.83,325,1616482800"; 
-   d="scan'208";a="485524234"
-Received: from unknown (HELO localhost.localdomain.bj.intel.com) ([10.240.192.107])
-  by fmsmga003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Jul 2021 07:19:23 -0700
-From:   Zhu Lingshan <lingshan.zhu@intel.com>
-To:     jasowang@redhat.com, mst@redhat.com
-Cc:     virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        kvm@vger.kernel.org, Zhu Lingshan <lingshan.zhu@intel.com>
-Subject: [PATCH V2 2/2] vDPA/ifcvf: implement management netlink framework for ifcvf
-Date:   Mon,  5 Jul 2021 22:13:33 +0800
-Message-Id: <20210705141333.9262-3-lingshan.zhu@intel.com>
-X-Mailer: git-send-email 2.27.0
-In-Reply-To: <20210705141333.9262-1-lingshan.zhu@intel.com>
-References: <20210705141333.9262-1-lingshan.zhu@intel.com>
+        id S231774AbhGEP0U (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 5 Jul 2021 11:26:20 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:30295 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S231569AbhGEP0U (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 5 Jul 2021 11:26:20 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1625498622;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=r2imsBDLHS8rC/hkSxHiuEVGdRV9OR2l0LhTihLqoT4=;
+        b=Unwb6ET9HOjfTYIqza2Fw9Pi1JhaNNTIA/ORnuPmhnr5PoJJAZ7NnPugZVtjnMrlz9yCQe
+        VrZPe1XM7+yx8AmnrBkqgl/EHBGIKZAT4MuuL/jxqgqt5CogRCvS77sM8rEpXvbHWscNJN
+        ECvt9HwgAbKQHiec3hZVXgHXWMtGD7o=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-538-P9X4KvpkOAWWkBqI5R2AhQ-1; Mon, 05 Jul 2021 11:23:41 -0400
+X-MC-Unique: P9X4KvpkOAWWkBqI5R2AhQ-1
+Received: by mail-wm1-f70.google.com with SMTP id v25-20020a1cf7190000b0290197a4be97b7so94040wmh.9
+        for <kvm@vger.kernel.org>; Mon, 05 Jul 2021 08:23:41 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=r2imsBDLHS8rC/hkSxHiuEVGdRV9OR2l0LhTihLqoT4=;
+        b=Ol7xNJTpp+62/MICkG2CWPdLiTYaeDFAAbL88qq7uu8vF/MoB3zy4tRdT4yCr0hQlV
+         QScSvJgx2w4wydNlFHWAXLaREC/vo1RmxyHO0shJm90KLD2cu296WHG1JiZTQb79CazC
+         BQnZrGRNbjdkT2IiGv6/OY7U96RSV1oWJSUlQv+diC/NSBHHhwPc+NA+Ze1fay3gOA1t
+         3IBt55Kxtyy4FEYNNHkM8kzecMD8UKHWRaefvF/w1qP7zWRr3gEOInwn8PtZhvhKf8Mj
+         uN9O+95xTJBqrgVdvQtyUQ7duhrEHlqUXyrlQHNe7tFJDQxygo05UeL5fC+mgGiQyEIL
+         CY3Q==
+X-Gm-Message-State: AOAM531EDAg4PO35f2+X8oFC7Q4q+N87nADpRMiNiBO6heTJJTBcU/7a
+        g1TYvNoOhiuJVWebjMxjqIWWSJLoHHzlEA20XPJmXbO5Rn/m/37j7KxeJYVZPaGzSk5x6KYsjDn
+        QealGVGK0A9JA
+X-Received: by 2002:a1c:ed08:: with SMTP id l8mr15084307wmh.38.1625498620563;
+        Mon, 05 Jul 2021 08:23:40 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJym7nxOUkrVOSJ373jn1gschu21kFntb7dSjS1xiqNy/Gh/kFjxLb5+nfUyvQAjU0bU2OESJg==
+X-Received: by 2002:a1c:ed08:: with SMTP id l8mr15084280wmh.38.1625498620313;
+        Mon, 05 Jul 2021 08:23:40 -0700 (PDT)
+Received: from steredhat (host-87-7-214-34.retail.telecomitalia.it. [87.7.214.34])
+        by smtp.gmail.com with ESMTPSA id y8sm13359781wrr.76.2021.07.05.08.23.38
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 05 Jul 2021 08:23:39 -0700 (PDT)
+Date:   Mon, 5 Jul 2021 17:23:36 +0200
+From:   Stefano Garzarella <sgarzare@redhat.com>
+To:     Arseny Krasnov <arseny.krasnov@kaspersky.com>
+Cc:     "Michael S. Tsirkin" <mst@redhat.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Andra Paraschiv <andraprs@amazon.com>,
+        Norbert Slusarek <nslusarek@gmx.net>,
+        Colin Ian King <colin.king@canonical.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "virtualization@lists.linux-foundation.org" 
+        <virtualization@lists.linux-foundation.org>,
+        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "oxffffaa@gmail.com" <oxffffaa@gmail.com>
+Subject: Re: [MASSMAIL KLMS]Re: [RFC PATCH v2 0/6] Improve SOCK_SEQPACKET
+ receive logic
+Message-ID: <20210705152336.ibv4ret3d2dyhdpc@steredhat>
+References: <20210704080820.88746-1-arseny.krasnov@kaspersky.com>
+ <20210704042843-mutt-send-email-mst@kernel.org>
+ <b427dee7-5c1b-9686-9004-05fa05d45b28@kaspersky.com>
+ <20210704055037-mutt-send-email-mst@kernel.org>
+ <c9f0d355-27a1-fb19-eac0-06a5d7648f5d@kaspersky.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <c9f0d355-27a1-fb19-eac0-06a5d7648f5d@kaspersky.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This commit implments the management netlink framework for ifcvf,
-including register and add / remove a device
+On Mon, Jul 05, 2021 at 01:48:28PM +0300, Arseny Krasnov wrote:
+>
+>On 04.07.2021 12:54, Michael S. Tsirkin wrote:
+>> On Sun, Jul 04, 2021 at 12:23:03PM +0300, Arseny Krasnov wrote:
+>>> On 04.07.2021 11:30, Michael S. Tsirkin wrote:
+>>>> On Sun, Jul 04, 2021 at 11:08:13AM +0300, Arseny Krasnov wrote:
+>>>>> 	This patchset modifies receive logic for SOCK_SEQPACKET.
+>>>>> Difference between current implementation and this version is that
+>>>>> now reader is woken up when there is at least one RW packet in rx
+>>>>> queue of socket and data is copied to user's buffer, while merged
+>>>>> approach wake up user only when whole message is received and kept
+>>>>> in queue. New implementation has several advantages:
+>>>>>  1) There is no limit for message length. Merged approach requires
+>>>>>     that length must be smaller than 'peer_buf_alloc', otherwise
+>>>>>     transmission will stuck.
+>>>>>  2) There is no need to keep whole message in queue, thus no
+>>>>>     'kmalloc()' memory will be wasted until EOR is received.
+>>>>>
+>>>>>     Also new approach has some feature: as fragments of message
+>>>>> are copied until EOR is received, it is possible that part of
+>>>>> message will be already in user's buffer, while rest of message
+>>>>> still not received. And if user will be interrupted by signal or
+>>>>> timeout with part of message in buffer, it will exit receive loop,
+>>>>> leaving rest of message in queue. To solve this problem special
+>>>>> callback was added to transport: it is called when user was forced
+>>>>> to leave exit loop and tells transport to drop any packet until
+>>>>> EOR met.
+>>>> Sorry about commenting late in the game.  I'm a bit lost
+>>>>
+>>>>
+>>>> SOCK_SEQPACKET
+>>>> Provides sequenced, reliable, bidirectional, connection-mode transmission paths for records. A record can be sent using one or more output operations and received using one or more input operations, but a single operation never transfers part of more than one record. Record boundaries are visible to the receiver via the MSG_EOR flag.
+>>>>
+>>>> it's supposed to be reliable - how is it legal to drop packets?
+>>> Sorry, seems i need to rephrase description. "Packet" here means fragment of record(message) at transport
+>>>
+>>> layer. As this is SEQPACKET mode, receiver could get only whole message or error, so if only several fragments
+>>>
+>>> of message was copied (if signal received for example) we can't return it to user - it breaks SEQPACKET sense. I think,
+>>>
+>>> in this case we can drop rest of record's fragments legally.
+>>>
+>>>
+>>> Thank You
+>> Would not that violate the reliable property? IIUC it's only ok to
+>> return an error if socket gets closed. Just like e.g. TCP ...
+>>
+>Sorry for late answer, yes You're right, seems this is unwanted drop...
+>
+>Lets wait for Stefano Garzarella feedback
 
-It works with iprouter2:
-[root@localhost lszhu]# vdpa mgmtdev show -jp
-{
-    "mgmtdev": {
-        "pci/0000:01:00.5": {
-            "supported_classes": [ "net" ]
-        },
-        "pci/0000:01:00.6": {
-            "supported_classes": [ "net" ]
-        }
-    }
-}
+It was the same concern I had with the series that introduced SEQPACKET 
+for vsock, which is why I suggested to wait until the message is 
+complete, before copying it to the user's buffer.
 
-[root@localhost lszhu]# vdpa dev add mgmtdev pci/0000:01:00.5 name vdpa0
-[root@localhost lszhu]# vdpa dev add mgmtdev pci/0000:01:00.6 name vdpa1
+IIUC, with the current upstream implementation, we don't have this 
+problem, right?
 
-Signed-off-by: Zhu Lingshan <lingshan.zhu@intel.com>
----
- drivers/vdpa/ifcvf/ifcvf_base.h |   6 ++
- drivers/vdpa/ifcvf/ifcvf_main.c | 154 ++++++++++++++++++++++++--------
- 2 files changed, 124 insertions(+), 36 deletions(-)
+I'm not sure how to fix this, other than by keeping all the fragments 
+queued until we've successfully copied them to user space, which is what 
+we should do without this series applied IIUC.
 
-diff --git a/drivers/vdpa/ifcvf/ifcvf_base.h b/drivers/vdpa/ifcvf/ifcvf_base.h
-index ded1b1b5fb13..e5251fcbb200 100644
---- a/drivers/vdpa/ifcvf/ifcvf_base.h
-+++ b/drivers/vdpa/ifcvf/ifcvf_base.h
-@@ -104,6 +104,12 @@ struct ifcvf_lm_cfg {
- 	struct ifcvf_vring_lm_cfg vring_lm_cfg[IFCVF_MAX_QUEUE_PAIRS];
- };
- 
-+struct ifcvf_vdpa_mgmt_dev {
-+	struct vdpa_mgmt_dev mdev;
-+	struct ifcvf_adapter *adapter;
-+	struct pci_dev *pdev;
-+};
-+
- int ifcvf_init_hw(struct ifcvf_hw *hw, struct pci_dev *dev);
- int ifcvf_start_hw(struct ifcvf_hw *hw);
- void ifcvf_stop_hw(struct ifcvf_hw *hw);
-diff --git a/drivers/vdpa/ifcvf/ifcvf_main.c b/drivers/vdpa/ifcvf/ifcvf_main.c
-index 5f70ab1283a0..c72d9b36e4a0 100644
---- a/drivers/vdpa/ifcvf/ifcvf_main.c
-+++ b/drivers/vdpa/ifcvf/ifcvf_main.c
-@@ -218,7 +218,7 @@ static void ifcvf_vdpa_set_status(struct vdpa_device *vdpa_dev, u8 status)
- 	int ret;
- 
- 	vf  = vdpa_to_vf(vdpa_dev);
--	adapter = dev_get_drvdata(vdpa_dev->dev.parent);
-+	adapter = vdpa_to_adapter(vdpa_dev);
- 	status_old = ifcvf_get_status(vf);
- 
- 	if (status_old == status)
-@@ -442,6 +442,16 @@ static const struct vdpa_config_ops ifc_vdpa_ops = {
- 	.set_config_cb  = ifcvf_vdpa_set_config_cb,
- };
- 
-+static struct virtio_device_id id_table_net[] = {
-+	{VIRTIO_ID_NET, VIRTIO_DEV_ANY_ID},
-+	{0},
-+};
-+
-+static struct virtio_device_id id_table_blk[] = {
-+	{VIRTIO_ID_BLOCK, VIRTIO_DEV_ANY_ID},
-+	{0},
-+};
-+
- static u32 get_dev_type(struct pci_dev *pdev)
- {
- 	u32 dev_type;
-@@ -462,48 +472,30 @@ static u32 get_dev_type(struct pci_dev *pdev)
- 	return dev_type;
- }
- 
--static int ifcvf_probe(struct pci_dev *pdev, const struct pci_device_id *id)
-+static int ifcvf_vdpa_dev_add(struct vdpa_mgmt_dev *mdev, const char *name)
- {
--	struct device *dev = &pdev->dev;
-+	struct ifcvf_vdpa_mgmt_dev *ifcvf_mgmt_dev;
- 	struct ifcvf_adapter *adapter;
-+	struct pci_dev *pdev;
- 	struct ifcvf_hw *vf;
-+	struct device *dev;
- 	int ret, i;
- 
--	ret = pcim_enable_device(pdev);
--	if (ret) {
--		IFCVF_ERR(pdev, "Failed to enable device\n");
--		return ret;
--	}
--
--	ret = pcim_iomap_regions(pdev, BIT(0) | BIT(2) | BIT(4),
--				 IFCVF_DRIVER_NAME);
--	if (ret) {
--		IFCVF_ERR(pdev, "Failed to request MMIO region\n");
--		return ret;
--	}
--
--	ret = dma_set_mask_and_coherent(dev, DMA_BIT_MASK(64));
--	if (ret) {
--		IFCVF_ERR(pdev, "No usable DMA configuration\n");
--		return ret;
--	}
--
--	ret = devm_add_action_or_reset(dev, ifcvf_free_irq_vectors, pdev);
--	if (ret) {
--		IFCVF_ERR(pdev,
--			  "Failed for adding devres for freeing irq vectors\n");
--		return ret;
--	}
-+	ifcvf_mgmt_dev = container_of(mdev, struct ifcvf_vdpa_mgmt_dev, mdev);
-+	if (ifcvf_mgmt_dev->adapter)
-+		return -EOPNOTSUPP;
- 
-+	pdev = ifcvf_mgmt_dev->pdev;
-+	dev = &pdev->dev;
- 	adapter = vdpa_alloc_device(struct ifcvf_adapter, vdpa,
--				    dev, &ifc_vdpa_ops, NULL);
--	if (adapter == NULL) {
-+				    dev, &ifc_vdpa_ops, name);
-+	if (!adapter) {
- 		IFCVF_ERR(pdev, "Failed to allocate vDPA structure");
- 		return -ENOMEM;
- 	}
- 
--	pci_set_master(pdev);
--	pci_set_drvdata(pdev, adapter);
-+	ifcvf_mgmt_dev->adapter = adapter;
-+	pci_set_drvdata(pdev, ifcvf_mgmt_dev);
- 
- 	vf = &adapter->vf;
- 	vf->dev_type = get_dev_type(pdev);
-@@ -523,9 +515,10 @@ static int ifcvf_probe(struct pci_dev *pdev, const struct pci_device_id *id)
- 
- 	vf->hw_features = ifcvf_get_hw_features(vf);
- 
--	ret = vdpa_register_device(&adapter->vdpa, IFCVF_MAX_QUEUE_PAIRS * 2);
-+	adapter->vdpa.mdev = &ifcvf_mgmt_dev->mdev;
-+	ret = _vdpa_register_device(&adapter->vdpa, IFCVF_MAX_QUEUE_PAIRS * 2);
- 	if (ret) {
--		IFCVF_ERR(pdev, "Failed to register ifcvf to vdpa bus");
-+		IFCVF_ERR(pdev, "Failed to register to vDPA bus");
- 		goto err;
- 	}
- 
-@@ -536,11 +529,100 @@ static int ifcvf_probe(struct pci_dev *pdev, const struct pci_device_id *id)
- 	return ret;
- }
- 
-+static void ifcvf_vdpa_dev_del(struct vdpa_mgmt_dev *mdev, struct vdpa_device *dev)
-+{
-+	struct ifcvf_vdpa_mgmt_dev *ifcvf_mgmt_dev;
-+
-+	ifcvf_mgmt_dev = container_of(mdev, struct ifcvf_vdpa_mgmt_dev, mdev);
-+	_vdpa_unregister_device(dev);
-+	ifcvf_mgmt_dev->adapter = NULL;
-+}
-+
-+static const struct vdpa_mgmtdev_ops ifcvf_vdpa_mgmt_dev_ops = {
-+	.dev_add = ifcvf_vdpa_dev_add,
-+	.dev_del = ifcvf_vdpa_dev_del
-+};
-+
-+static int ifcvf_probe(struct pci_dev *pdev, const struct pci_device_id *id)
-+{
-+	struct ifcvf_vdpa_mgmt_dev *ifcvf_mgmt_dev;
-+	struct device *dev = &pdev->dev;
-+	u32 dev_type;
-+	int ret;
-+
-+	ifcvf_mgmt_dev = kzalloc(sizeof(struct ifcvf_vdpa_mgmt_dev), GFP_KERNEL);
-+	if (!ifcvf_mgmt_dev) {
-+		IFCVF_ERR(pdev, "Failed to alloc memory for the vDPA management device\n");
-+		return -ENOMEM;
-+	}
-+
-+	dev_type = get_dev_type(pdev);
-+	switch (dev_type) {
-+	case VIRTIO_ID_NET:
-+		ifcvf_mgmt_dev->mdev.id_table = id_table_net;
-+		break;
-+	case VIRTIO_ID_BLOCK:
-+		ifcvf_mgmt_dev->mdev.id_table = id_table_blk;
-+		break;
-+	default:
-+		IFCVF_ERR(pdev, "VIRTIO ID %u not supported\n", dev_type);
-+		ret = -EOPNOTSUPP;
-+		goto err;
-+	}
-+
-+	ifcvf_mgmt_dev->mdev.ops = &ifcvf_vdpa_mgmt_dev_ops;
-+	ifcvf_mgmt_dev->mdev.device = dev;
-+	ifcvf_mgmt_dev->pdev = pdev;
-+
-+	ret = pcim_enable_device(pdev);
-+	if (ret) {
-+		IFCVF_ERR(pdev, "Failed to enable device\n");
-+		goto err;
-+	}
-+
-+	ret = pcim_iomap_regions(pdev, BIT(0) | BIT(2) | BIT(4),
-+				 IFCVF_DRIVER_NAME);
-+	if (ret) {
-+		IFCVF_ERR(pdev, "Failed to request MMIO region\n");
-+		goto err;
-+	}
-+
-+	ret = dma_set_mask_and_coherent(dev, DMA_BIT_MASK(64));
-+	if (ret) {
-+		IFCVF_ERR(pdev, "No usable DMA configuration\n");
-+		goto err;
-+	}
-+
-+	ret = devm_add_action_or_reset(dev, ifcvf_free_irq_vectors, pdev);
-+	if (ret) {
-+		IFCVF_ERR(pdev,
-+			  "Failed for adding devres for freeing irq vectors\n");
-+		goto err;
-+	}
-+
-+	pci_set_master(pdev);
-+
-+	ret = vdpa_mgmtdev_register(&ifcvf_mgmt_dev->mdev);
-+	if (ret) {
-+		IFCVF_ERR(pdev,
-+			  "Failed to initialize the management interfaces\n");
-+		goto err;
-+	}
-+
-+	return 0;
-+
-+err:
-+	kfree(ifcvf_mgmt_dev);
-+	return ret;
-+}
-+
- static void ifcvf_remove(struct pci_dev *pdev)
- {
--	struct ifcvf_adapter *adapter = pci_get_drvdata(pdev);
-+	struct ifcvf_vdpa_mgmt_dev *ifcvf_mgmt_dev;
- 
--	vdpa_unregister_device(&adapter->vdpa);
-+	ifcvf_mgmt_dev = pci_get_drvdata(pdev);
-+	vdpa_mgmtdev_unregister(&ifcvf_mgmt_dev->mdev);
-+	kfree(ifcvf_mgmt_dev);
- }
- 
- static struct pci_device_id ifcvf_pci_ids[] = {
--- 
-2.27.0
+Stefano
 
