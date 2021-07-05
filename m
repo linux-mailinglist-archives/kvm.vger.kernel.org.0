@@ -2,221 +2,110 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 65D7F3BB7C9
-	for <lists+kvm@lfdr.de>; Mon,  5 Jul 2021 09:24:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0C8C43BB7CB
+	for <lists+kvm@lfdr.de>; Mon,  5 Jul 2021 09:26:31 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230095AbhGEH1Q (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 5 Jul 2021 03:27:16 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:28453 "EHLO
+        id S229982AbhGEH3F (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 5 Jul 2021 03:29:05 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:51907 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230086AbhGEH1P (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 5 Jul 2021 03:27:15 -0400
+        by vger.kernel.org with ESMTP id S229884AbhGEH3E (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 5 Jul 2021 03:29:04 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1625469878;
+        s=mimecast20190719; t=1625469987;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=8+VVgy1P6n3WNEWs9KwW6riooXDdLjJZV8VUE8nZQUg=;
-        b=Wr6d6u0K1vNl+8gPPBmCMtPOVgyYVW0r6bBNHK0711l3Yaepl7EeBEYol6Y1D1bPExyRGs
-        GC5ufev13EYyWqCskvdHe3Gnz8I5nqGttB4OmcSMdbtCmppTl6RNgjkcNObaeMt3acMaEM
-        XPEn75rcLgWb7couOaaJI6a1twRzur8=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-433-b-2xG4sJNV6uN6DbEPcSWQ-1; Mon, 05 Jul 2021 03:24:37 -0400
-X-MC-Unique: b-2xG4sJNV6uN6DbEPcSWQ-1
-Received: by mail-wr1-f72.google.com with SMTP id r11-20020a5d52cb0000b02901309f5e7298so2554060wrv.0
-        for <kvm@vger.kernel.org>; Mon, 05 Jul 2021 00:24:37 -0700 (PDT)
+        bh=l9vs1YPIv2blq9FC78Zp91jCknQ/u9T8kZKZmeKaZRA=;
+        b=f6pNER3XwifOx80jTy0AW5kYV74j3FWMxz6H5TDsfdxA51ekw0Pj1IiRVyuTsPxSGKoxH8
+        SiaPitmTui5UIAhb2e9fKG7IEeDaYzONzHgmcx4CgVzRFULgKGTm5n2XM4BxWgU1x0juzW
+        r2pOUbtOYP/5lur7zpTogevEz0hSwYg=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-433-0pxSSwsXN3-AnGheCgFE5g-1; Mon, 05 Jul 2021 03:26:26 -0400
+X-MC-Unique: 0pxSSwsXN3-AnGheCgFE5g-1
+Received: by mail-wr1-f71.google.com with SMTP id u13-20020a5d6dad0000b029012e76845945so3822812wrs.11
+        for <kvm@vger.kernel.org>; Mon, 05 Jul 2021 00:26:26 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:to:cc:references:from:subject:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=8+VVgy1P6n3WNEWs9KwW6riooXDdLjJZV8VUE8nZQUg=;
-        b=P+NFcTfmCqET1NhWFTZVv+Qk3QTFvw425eLshwSgR57m9XzXe/4v8JwGbubKCdRt+f
-         gJgWMp1/tq90uG2x9Bp9J2BBogTgqZZ9PGqUCS4UBF5mLFgNwAUlTUp7LjnRmKVD8Mh+
-         JK+KUbYaKZv9pXiGO05ux+Dt6T60OQ9UbP4gbCBv5s753lxKtillP0HTwr3L4/+FczCg
-         73FE11gAJzTpeMrraZmYfst5fNitMBWA/4QmAP73PaeHTvA+v4g5XET/Og3fASsY+8q4
-         44AX+8Okmq1DrV6S9g0vI7QsQbq51zAKbAhDu7b3aAIWzVYn3X4A1PLatRH8Qb8mCSz0
-         UilA==
-X-Gm-Message-State: AOAM530AdkpNM+knxSK/bhloJBbiyWY+it/vw12eQvSNkcH0thvZFaVX
-        cqloxHoDvDa66udAXNaL0dK6/wVA25DONMpGb1WzUAIYLHwT9CW2wjqXS35IPTXI/Gx91tJOLSL
-        Ptkd2HvOmG8WR
-X-Received: by 2002:a05:600c:4ba9:: with SMTP id e41mr13269199wmp.72.1625469876089;
-        Mon, 05 Jul 2021 00:24:36 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwFG5VgxGGhu5Y3eqUo/7jO5LYJtV4P71h66RCR4WX1MFLXxZO3QyC8HPhjzkSMPx+FFr21/A==
-X-Received: by 2002:a05:600c:4ba9:: with SMTP id e41mr13269184wmp.72.1625469875941;
-        Mon, 05 Jul 2021 00:24:35 -0700 (PDT)
-Received: from thuth.remote.csb (pd9575e1e.dip0.t-ipconnect.de. [217.87.94.30])
-        by smtp.gmail.com with ESMTPSA id t17sm11739410wrs.61.2021.07.05.00.24.34
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 05 Jul 2021 00:24:35 -0700 (PDT)
-To:     Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org
-Cc:     linux-s390@vger.kernel.org, imbrenda@linux.ibm.com,
-        david@redhat.com, cohuck@redhat.com
-References: <20210629131841.17319-1-frankja@linux.ibm.com>
- <20210629131841.17319-4-frankja@linux.ibm.com>
-From:   Thomas Huth <thuth@redhat.com>
-Subject: Re: [kvm-unit-tests PATCH v2 3/3] s390x: mvpg: Add SIE mvpg test
-Message-ID: <d4966f2c-89b4-94b7-0dc7-df69534c2d7a@redhat.com>
-Date:   Mon, 5 Jul 2021 09:24:34 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.11.0
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=l9vs1YPIv2blq9FC78Zp91jCknQ/u9T8kZKZmeKaZRA=;
+        b=XXc8JXSx4zHpGGTTLykLiJa4OTyALd5c1eVB3PutjJEF7NHlEfqWI17+cT+F030GTO
+         BOPHlv7qN2lPnsoH5h2/t+QGMcwUd6T5WJf2KXOWdbnBhhng3vfBjWENZsQVWj2mq6QB
+         IzOEIIqMG29YCoj4MOLAqyRODNNBWNypZssYsrjr+tf4QYl/lAiQ3Xhco/U6WRcXTHnP
+         vyo6ir8T6f3qzb0Iqn7YDGTe6CRsVgBhliQymKmN5nj1x683idzOFH64BgNhrwzMiqj6
+         4xqfjMU90kMNE77Cwo3sIGaVTu0I59ysHqvmcqTZyB+wRAV7o6Y94Yy1AcgCJtYAKTHV
+         tBeQ==
+X-Gm-Message-State: AOAM530gHuj/eDz/AAu1aTs5mwB+sGfSeJRwFVoswlsCXmcZ3QpxwZek
+        hn6j7cx1O17IWCVPt3xAYWcP9p4QEZ4+ZqQYLhMMLgWJ3oGvKZCM2vjW28ZdiPS0tXOtnZFwDPb
+        0f6TKyDII8hQm
+X-Received: by 2002:a05:6000:1b90:: with SMTP id r16mr6213101wru.316.1625469985642;
+        Mon, 05 Jul 2021 00:26:25 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwX5s9gwqr/+i2PIcE3RNqcoNcbUIAVBtfFh7ejuMNIPfYUynbufqlpSdfdzmg6iRoFqGsfdA==
+X-Received: by 2002:a05:6000:1b90:: with SMTP id r16mr6213084wru.316.1625469985468;
+        Mon, 05 Jul 2021 00:26:25 -0700 (PDT)
+Received: from redhat.com ([2.55.4.39])
+        by smtp.gmail.com with ESMTPSA id n7sm19896668wmq.37.2021.07.05.00.26.23
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 05 Jul 2021 00:26:25 -0700 (PDT)
+Date:   Mon, 5 Jul 2021 03:26:21 -0400
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     Jason Wang <jasowang@redhat.com>
+Cc:     virtualization@lists.linux-foundation.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        netdev@vger.kernel.org, xieyongji@bytedance.com,
+        stefanha@redhat.com
+Subject: Re: [PATCH 2/2] vdpa: vp_vdpa: don't use hard-coded maximum
+ virtqueue size
+Message-ID: <20210705032602-mutt-send-email-mst@kernel.org>
+References: <20210705071910.31965-1-jasowang@redhat.com>
+ <20210705071910.31965-2-jasowang@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20210629131841.17319-4-frankja@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210705071910.31965-2-jasowang@redhat.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 29/06/2021 15.18, Janosch Frank wrote:
-> Let's also check the PEI values to make sure our VSIE implementation
-> is correct.
+On Mon, Jul 05, 2021 at 03:19:10PM +0800, Jason Wang wrote:
+> This patch switch to read virtqueue size from the capability instead
+> of depending on the hardcoded value. This allows the per virtqueue
+> size could be advertised.
 > 
-> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+> Signed-off-by: Jason Wang <jasowang@redhat.com>
+
+So let's add an ioctl for this? It's really a bug we don't..
+
 > ---
->   s390x/Makefile                  |   2 +
->   s390x/mvpg-sie.c                | 151 ++++++++++++++++++++++++++++++++
->   s390x/snippets/c/mvpg-snippet.c |  33 +++++++
->   s390x/unittests.cfg             |   3 +
->   4 files changed, 189 insertions(+)
->   create mode 100644 s390x/mvpg-sie.c
->   create mode 100644 s390x/snippets/c/mvpg-snippet.c
+>  drivers/vdpa/virtio_pci/vp_vdpa.c | 6 ++++--
+>  1 file changed, 4 insertions(+), 2 deletions(-)
 > 
-> diff --git a/s390x/Makefile b/s390x/Makefile
-> index ba32f4c..07af26d 100644
-> --- a/s390x/Makefile
-> +++ b/s390x/Makefile
-> @@ -23,6 +23,7 @@ tests += $(TEST_DIR)/sie.elf
->   tests += $(TEST_DIR)/mvpg.elf
->   tests += $(TEST_DIR)/uv-host.elf
->   tests += $(TEST_DIR)/edat.elf
-> +tests += $(TEST_DIR)/mvpg-sie.elf
->   
->   tests_binary = $(patsubst %.elf,%.bin,$(tests))
->   ifneq ($(HOST_KEY_DOCUMENT),)
-> @@ -82,6 +83,7 @@ snippet_asmlib = $(SNIPPET_DIR)/c/cstart.o
->   
->   # perquisites (=guests) for the snippet hosts.
->   # $(TEST_DIR)/<snippet-host>.elf: snippets = $(SNIPPET_DIR)/<c/asm>/<snippet>.gbin
-> +$(TEST_DIR)/mvpg-sie.elf: snippets = $(SNIPPET_DIR)/c/mvpg-snippet.gbin
->   
->   $(SNIPPET_DIR)/asm/%.gbin: $(SNIPPET_DIR)/asm/%.o $(FLATLIBS)
->   	$(OBJCOPY) -O binary $(patsubst %.gbin,%.o,$@) $@
-> diff --git a/s390x/mvpg-sie.c b/s390x/mvpg-sie.c
-> new file mode 100644
-> index 0000000..3536c6a
-> --- /dev/null
-> +++ b/s390x/mvpg-sie.c
-> @@ -0,0 +1,151 @@
-> +#include <libcflat.h>
-> +#include <asm/asm-offsets.h>
-> +#include <asm-generic/barrier.h>
-> +#include <asm/pgtable.h>
-> +#include <mmu.h>
-> +#include <asm/page.h>
-> +#include <asm/facility.h>
-> +#include <asm/mem.h>
-> +#include <alloc_page.h>
-> +#include <vm.h>
-> +#include <sclp.h>
-> +#include <sie.h>
+> diff --git a/drivers/vdpa/virtio_pci/vp_vdpa.c b/drivers/vdpa/virtio_pci/vp_vdpa.c
+> index 2926641fb586..198f7076e4d9 100644
+> --- a/drivers/vdpa/virtio_pci/vp_vdpa.c
+> +++ b/drivers/vdpa/virtio_pci/vp_vdpa.c
+> @@ -18,7 +18,6 @@
+>  #include <linux/virtio_pci.h>
+>  #include <linux/virtio_pci_modern.h>
+>  
+> -#define VP_VDPA_QUEUE_MAX 256
+>  #define VP_VDPA_DRIVER_NAME "vp_vdpa"
+>  #define VP_VDPA_NAME_SIZE 256
+>  
+> @@ -197,7 +196,10 @@ static void vp_vdpa_set_status(struct vdpa_device *vdpa, u8 status)
+>  
+>  static u16 vp_vdpa_get_vq_num_max(struct vdpa_device *vdpa, u16 qid)
+>  {
+> -	return VP_VDPA_QUEUE_MAX;
+> +	struct vp_vdpa *vp_vdpa = vdpa_to_vp(vdpa);
+> +	struct virtio_pci_modern_device *mdev = &vp_vdpa->mdev;
 > +
-> +static u8 *guest;
-> +static u8 *guest_instr;
-> +static struct vm vm;
-> +
-> +static uint8_t *src;
-> +static uint8_t *dst;
-> +static uint8_t *cmp;
-> +
-> +extern const char _binary_s390x_snippets_c_mvpg_snippet_gbin_start[];
-> +extern const char _binary_s390x_snippets_c_mvpg_snippet_gbin_end[];
-> +int binary_size;
-> +
-> +static void sie(struct vm *vm)
-> +{
-> +	/* Reset icptcode so we don't trip over it below */
-> +	vm->sblk->icptcode = 0;
-> +
-> +	while (vm->sblk->icptcode == 0) {
-> +		sie64a(vm->sblk, &vm->save_area);
-> +		if (vm->sblk->icptcode == ICPT_VALIDITY)
-> +			assert(0);
-
-Please replace the above two lines with:
-
-		assert(vm->sblk->icptcode != ICPT_VALIDITY);
-
-> +	}
-> +	vm->save_area.guest.grs[14] = vm->sblk->gg14;
-> +	vm->save_area.guest.grs[15] = vm->sblk->gg15;
-> +}
-> +
-> +static void test_mvpg_pei(void)
-> +{
-> +	uint64_t **pei_dst = (uint64_t **)((uintptr_t) vm.sblk + 0xc0);
-> +	uint64_t **pei_src = (uint64_t **)((uintptr_t) vm.sblk + 0xc8);
-> +
-> +	report_prefix_push("pei");
-> +
-> +	report_prefix_push("src");
-> +	memset(dst, 0, PAGE_SIZE);
-> +	protect_page(src, PAGE_ENTRY_I);
-> +	sie(&vm);
-> +	report(vm.sblk->icptcode == ICPT_PARTEXEC, "Partial execution");
-> +	report((uintptr_t)**pei_src == (uintptr_t)src + PAGE_ENTRY_I, "PEI_SRC correct");
-> +	report((uintptr_t)**pei_dst == (uintptr_t)dst, "PEI_DST correct");
-> +	unprotect_page(src, PAGE_ENTRY_I);
-> +	report(!memcmp(cmp, dst, PAGE_SIZE), "Destination intact");
-> +	/*
-> +	 * We need to execute the diag44 which is used as a blocker
-> +	 * behind the mvpg. It makes sure we fail the tests above if
-> +	 * the mvpg wouldn't have intercepted.
-> +	 */
-> +	sie(&vm);
-> +	/* Make sure we intercepted for the diag44 and nothing else */
-> +	assert(vm.sblk->icptcode == ICPT_INST &&
-> +	       vm.sblk->ipa == 0x8300 && vm.sblk->ipb == 0x440000);
-> +	report_prefix_pop();
-> +
-> +	/* Clear PEI data for next check */
-> +	report_prefix_push("dst");
-> +	memset((uint64_t *)((uintptr_t) vm.sblk + 0xc0), 0, 16);
-> +	memset(dst, 0, PAGE_SIZE);
-> +	protect_page(dst, PAGE_ENTRY_I);
-> +	sie(&vm);
-> +	report(vm.sblk->icptcode == ICPT_PARTEXEC, "Partial execution");
-> +	report((uintptr_t)**pei_src == (uintptr_t)src, "PEI_SRC correct");
-> +	report((uintptr_t)**pei_dst == (uintptr_t)dst + PAGE_ENTRY_I, "PEI_DST correct");
-> +	/* Needed for the memcmp and general cleanup */
-> +	unprotect_page(dst, PAGE_ENTRY_I);
-> +	report(!memcmp(cmp, dst, PAGE_SIZE), "Destination intact");
-> +	report_prefix_pop();
-> +
-> +	report_prefix_pop();
-> +}
-
-Still quite a lot of magic values in above code ... any chance to introduce 
-some #defines finally?
-
-> +static void test_mvpg(void)
-> +{
-> +	int binary_size = ((uintptr_t)_binary_s390x_snippets_c_mvpg_snippet_gbin_end -
-> +			   (uintptr_t)_binary_s390x_snippets_c_mvpg_snippet_gbin_start);
-> +
-> +	memcpy(guest, _binary_s390x_snippets_c_mvpg_snippet_gbin_start, binary_size);
-> +	memset(src, 0x42, PAGE_SIZE);
-> +	memset(dst, 0x43, PAGE_SIZE);
-> +	sie(&vm);
-> +	mb();
-
-I think you don't need the mb() here.
-
-> +	report(!memcmp(src, dst, PAGE_SIZE) && *dst == 0x42, "Page moved");
-> +}
-
-  Thomas
+> +	return vp_modern_get_queue_size(mdev, qid);
+>  }
+>  
+>  static int vp_vdpa_get_vq_state(struct vdpa_device *vdpa, u16 qid,
+> -- 
+> 2.25.1
 
