@@ -2,57 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B6EBE3BD855
-	for <lists+kvm@lfdr.de>; Tue,  6 Jul 2021 16:35:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1B9DF3BD844
+	for <lists+kvm@lfdr.de>; Tue,  6 Jul 2021 16:33:21 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232253AbhGFOhm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 6 Jul 2021 10:37:42 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:30437 "EHLO
+        id S232359AbhGFOfy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 6 Jul 2021 10:35:54 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:23054 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232244AbhGFOhl (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 6 Jul 2021 10:37:41 -0400
+        by vger.kernel.org with ESMTP id S232320AbhGFOfr (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 6 Jul 2021 10:35:47 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1625582102;
+        s=mimecast20190719; t=1625581693;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=HgpykafpViSKKg/vT0c+K8niR3uhRG40sTK1NxePChg=;
-        b=OK/vLpwgFh8VsPP9lT8xi02bPe+Sq3PShK6Gnj9Jc9J/VLHIfMxJl6aRgExNCdAPUNfTFM
-        FFwKyTTiXSVKHTiec5dyzv4sYZO6ugcDy6YURGHgHatxsesqk8zLgLzqJAkYLqcAl3YUlS
-        FqXPmckVFM2pKenOba4xriOqdawsKpQ=
-Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
- [209.85.208.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-67-JX13Ib2eNDOqRLyARGqqhg-1; Tue, 06 Jul 2021 10:17:58 -0400
-X-MC-Unique: JX13Ib2eNDOqRLyARGqqhg-1
-Received: by mail-ed1-f71.google.com with SMTP id m21-20020a50ef150000b029039c013d5b80so741175eds.7
-        for <kvm@vger.kernel.org>; Tue, 06 Jul 2021 07:17:58 -0700 (PDT)
+        bh=3GEYToz9UGkj5qm0ImJKs8heV1zy8ZipitXq+LmQpYg=;
+        b=WMYOqxdPlT1ilxIBj5HaoCO58ptSkA7zTwUUyNBGupE+z0llsTxvDbObIA6v47G92n85xb
+        51Y510MyxgPs9nqxH/q7hroHiSukTKaAiJh5A91a8EXjufw97fmKdd8YJ1CP4IGdeuzRZe
+        BkLUGZFmxWLRl2MOknNnUJfUQUm2agM=
+Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
+ [209.85.218.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-81-3UWaJXrfPzGlCFvN6r2tZg-1; Tue, 06 Jul 2021 10:22:08 -0400
+X-MC-Unique: 3UWaJXrfPzGlCFvN6r2tZg-1
+Received: by mail-ej1-f70.google.com with SMTP id d2-20020a1709072722b02904c99c7e6ddfso5870194ejl.15
+        for <kvm@vger.kernel.org>; Tue, 06 Jul 2021 07:22:07 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=HgpykafpViSKKg/vT0c+K8niR3uhRG40sTK1NxePChg=;
-        b=m6Fk6Hhej44jmMxTrakHuUgSJc9qe4qk1e7TFYRIEvd15PMcJFZkSeMHn/WltZk+/i
-         DDekdkJlnufzYAKf8nd+WnB1Lv6ZP2bDjgTUoxVBGEH2ojlJ76zUWuLMED4YGhFHchup
-         HClKgWDpLAtaRkVr/r6wwMBnhnV/W7QqBZLr23La93DaaPVlYlVakxixkwKLmm4Egfa5
-         /B008lnGtTROG8KjU6BPdXxPmO90x7nx8jlyvg5xtquI5KgxJo1AODCfsiBhT54PpQMF
-         YBT3oDwQicf9J4qCXJpbrUqF6hBNYW1EjeleiiLFlGgBVB/Y7N4ByG/LbgZwG/QJnvpt
-         fjgA==
-X-Gm-Message-State: AOAM533JABHrwpGZmaMnXVemXWQfJuccOyStJDzgSicf9P6IjnFxMNkb
-        JOY7p0Ry04inwRW4I0DZ8hL7jH4L4mTCLrwgqbbNwTefv840MCU91SPysmmFj0SO3DgmPqDGX1K
-        0O/0vv4zLwfnV
-X-Received: by 2002:a17:907:3f93:: with SMTP id hr19mr5978918ejc.174.1625581077640;
-        Tue, 06 Jul 2021 07:17:57 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxP8Cjndmhd1l2fvfJwWimt9VGxUlRqCL0hmiWaSy8opx1DXsrM7zvmzJ1dfy99qJTnxD2Gog==
-X-Received: by 2002:a17:907:3f93:: with SMTP id hr19mr5978899ejc.174.1625581077455;
-        Tue, 06 Jul 2021 07:17:57 -0700 (PDT)
+        bh=3GEYToz9UGkj5qm0ImJKs8heV1zy8ZipitXq+LmQpYg=;
+        b=IaWKju1hX/1b+8yl6ohXWnU0udL5lEaCeDvmoTavJWqZNe5W3w/NssT0yIj4e6SeJ1
+         vgkyaVGyas+qaZZuMntvPQGMCj+8s16YXR7Qgc+sguUmOewqKq/0CcE86vE0q3CkYcJz
+         FasrAMYLUGkqFg4sSV044VQ9kTgfVF2YFBIaj0ZmGN7sd1DoXBBlttqiWUUqiZBGU5ui
+         PEl4ScfppAXoseg91L3CZUPEn1ezh3fl4/Bqn6sHEhGGiRkt6IYGOHp0hsluG5XbX+ZZ
+         ooVL36QZI1Uh2DxyF2SDyadlmqtOIk90vezOk10zLfSNRK08SnCGehVKxXQS7s6R4qKQ
+         qdmg==
+X-Gm-Message-State: AOAM532zumKhUuRZE3ViFAJB8qtyZ8KYtMX0xfyVB7GHraCvRfdJUbab
+        oomA3kr7SAeLgG66AipVF9h9ppbcnJU4FF1mua/wikG+tyNw6k3nr90Brnsk8l9AD49f/W/hsMc
+        ymEuKTG4QLCoT
+X-Received: by 2002:a17:906:4fce:: with SMTP id i14mr8816402ejw.231.1625581326916;
+        Tue, 06 Jul 2021 07:22:06 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyPVTyy71iN1zsNglx8JRKhOkl4/84YFu6o8CZLhwV75mwOcTtwqWL/Rh/ITsWYsdP7hQ/jBQ==
+X-Received: by 2002:a17:906:4fce:: with SMTP id i14mr8816367ejw.231.1625581326738;
+        Tue, 06 Jul 2021 07:22:06 -0700 (PDT)
 Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id rp5sm4136176ejb.63.2021.07.06.07.17.56
+        by smtp.gmail.com with ESMTPSA id s3sm5816276ejm.49.2021.07.06.07.22.05
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 06 Jul 2021 07:17:56 -0700 (PDT)
-Subject: Re: [RFC PATCH v2 63/69] KVM: VMX: Move .get_interrupt_shadow()
- implementation to common VMX code
+        Tue, 06 Jul 2021 07:22:05 -0700 (PDT)
+Subject: Re: [RFC PATCH v2 65/69] KVM: X86: Introduce initial_tsc_khz in
+ struct kvm_arch
 To:     isaku.yamahata@intel.com, Thomas Gleixner <tglx@linutronix.de>,
         Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
         "H . Peter Anvin" <hpa@zytor.com>,
@@ -63,17 +63,16 @@ To:     isaku.yamahata@intel.com, Thomas Gleixner <tglx@linutronix.de>,
         Connor Kuehl <ckuehl@redhat.com>,
         Sean Christopherson <seanjc@google.com>, x86@kernel.org,
         linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc:     isaku.yamahata@gmail.com,
-        Sean Christopherson <sean.j.christopherson@intel.com>
+Cc:     isaku.yamahata@gmail.com, Xiaoyao Li <xiaoyao.li@intel.com>
 References: <cover.1625186503.git.isaku.yamahata@intel.com>
- <11a3389da6184785b238b0d5a7f60279aa0a93b1.1625186503.git.isaku.yamahata@intel.com>
+ <5f87f0b888555b52041a0fe32280adee0d563e63.1625186503.git.isaku.yamahata@intel.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <3343767a-f7b3-715b-8d99-9821a458a708@redhat.com>
-Date:   Tue, 6 Jul 2021 16:17:55 +0200
+Message-ID: <792040b0-4463-d805-d14e-ba264a3f8bbf@redhat.com>
+Date:   Tue, 6 Jul 2021 16:22:04 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.11.0
 MIME-Version: 1.0
-In-Reply-To: <11a3389da6184785b238b0d5a7f60279aa0a93b1.1625186503.git.isaku.yamahata@intel.com>
+In-Reply-To: <5f87f0b888555b52041a0fe32280adee0d563e63.1625186503.git.isaku.yamahata@intel.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -82,65 +81,59 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 On 03/07/21 00:05, isaku.yamahata@intel.com wrote:
-> From: Sean Christopherson <sean.j.christopherson@intel.com>
+> From: Xiaoyao Li <xiaoyao.li@intel.com>
 > 
-> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+> Introduce a per-vm variable initial_tsc_khz to hold the default tsc_khz
+> for kvm_arch_vcpu_create().
+> 
+> This field is going to be used by TDX since TSC frequency for TD guest
+> is configured at TD VM initialization phase.
+> 
+> Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
 > Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
 > ---
->   arch/x86/kvm/vmx/common.h | 14 ++++++++++++++
->   arch/x86/kvm/vmx/vmx.c    | 10 +---------
->   2 files changed, 15 insertions(+), 9 deletions(-)
-> 
-> diff --git a/arch/x86/kvm/vmx/common.h b/arch/x86/kvm/vmx/common.h
-> index 755aaec85199..817ff3e74933 100644
-> --- a/arch/x86/kvm/vmx/common.h
-> +++ b/arch/x86/kvm/vmx/common.h
-> @@ -120,6 +120,20 @@ static inline int __vmx_handle_ept_violation(struct kvm_vcpu *vcpu, gpa_t gpa,
->   	return kvm_mmu_page_fault(vcpu, gpa, error_code, NULL, 0);
->   }
->   
-> +static inline u32 __vmx_get_interrupt_shadow(struct kvm_vcpu *vcpu)
-> +{
-> +	u32 interruptibility;
-> +	int ret = 0;
-> +
-> +	interruptibility = vmread32(vcpu, GUEST_INTERRUPTIBILITY_INFO);
-> +	if (interruptibility & GUEST_INTR_STATE_STI)
-> +		ret |= KVM_X86_SHADOW_INT_STI;
-> +	if (interruptibility & GUEST_INTR_STATE_MOV_SS)
-> +		ret |= KVM_X86_SHADOW_INT_MOV_SS;
-> +
-> +	return ret;
-> +}
-> +
->   static inline u32 vmx_encode_ar_bytes(struct kvm_segment *var)
->   {
->   	u32 ar;
-> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> index d69d4dc7c071..d31cace67907 100644
-> --- a/arch/x86/kvm/vmx/vmx.c
-> +++ b/arch/x86/kvm/vmx/vmx.c
-> @@ -1467,15 +1467,7 @@ void vmx_set_rflags(struct kvm_vcpu *vcpu, unsigned long rflags)
->   
->   u32 vmx_get_interrupt_shadow(struct kvm_vcpu *vcpu)
->   {
-> -	u32 interruptibility = vmcs_read32(GUEST_INTERRUPTIBILITY_INFO);
-> -	int ret = 0;
-> -
-> -	if (interruptibility & GUEST_INTR_STATE_STI)
-> -		ret |= KVM_X86_SHADOW_INT_STI;
-> -	if (interruptibility & GUEST_INTR_STATE_MOV_SS)
-> -		ret |= KVM_X86_SHADOW_INT_MOV_SS;
-> -
-> -	return ret;
-> +	return __vmx_get_interrupt_shadow(vcpu);
->   }
->   
->   void vmx_set_interrupt_shadow(struct kvm_vcpu *vcpu, int mask)
-> 
+>   arch/x86/include/asm/kvm_host.h | 1 +
+>   arch/x86/kvm/x86.c              | 3 ++-
+>   2 files changed, 3 insertions(+), 1 deletion(-)
 
-Is there any reason to add the __ version, since at this point 
-kvm_x86_ops is already pointing to vt_get_interrupt_shadow?
+So this means disabling TSC frequency scaling on TDX.  Would it make 
+sense to delay VM creation to a separate ioctl, similar to 
+KVM_ARM_VCPU_FINALIZE (KVM_VM_FINALIZE)?
 
 Paolo
+
+> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+> index a47e17892258..ae8b96e15e71 100644
+> --- a/arch/x86/include/asm/kvm_host.h
+> +++ b/arch/x86/include/asm/kvm_host.h
+> @@ -1030,6 +1030,7 @@ struct kvm_arch {
+>   	u64 last_tsc_nsec;
+>   	u64 last_tsc_write;
+>   	u32 last_tsc_khz;
+> +	u32 initial_tsc_khz;
+>   	u64 cur_tsc_nsec;
+>   	u64 cur_tsc_write;
+>   	u64 cur_tsc_offset;
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index a8299add443f..d3ebed784eac 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -10441,7 +10441,7 @@ int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu)
+>   	else
+>   		vcpu->arch.mp_state = KVM_MP_STATE_UNINITIALIZED;
+>   
+> -	kvm_set_tsc_khz(vcpu, max_tsc_khz);
+> +	kvm_set_tsc_khz(vcpu, vcpu->kvm->arch.initial_tsc_khz);
+>   
+>   	r = kvm_mmu_create(vcpu);
+>   	if (r < 0)
+> @@ -10894,6 +10894,7 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
+>   	pvclock_update_vm_gtod_copy(kvm);
+>   
+>   	kvm->arch.guest_can_read_msr_platform_info = true;
+> +	kvm->arch.initial_tsc_khz = max_tsc_khz;
+>   
+>   	INIT_DELAYED_WORK(&kvm->arch.kvmclock_update_work, kvmclock_update_fn);
+>   	INIT_DELAYED_WORK(&kvm->arch.kvmclock_sync_work, kvmclock_sync_fn);
+> 
 
