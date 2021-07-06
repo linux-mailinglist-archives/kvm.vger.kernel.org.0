@@ -2,64 +2,105 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E62AC3BD764
-	for <lists+kvm@lfdr.de>; Tue,  6 Jul 2021 15:02:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7773C3BD780
+	for <lists+kvm@lfdr.de>; Tue,  6 Jul 2021 15:14:22 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232073AbhGFNEs (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 6 Jul 2021 09:04:48 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:36808 "EHLO
+        id S231631AbhGFNQ7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 6 Jul 2021 09:16:59 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:22824 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231367AbhGFNEs (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 6 Jul 2021 09:04:48 -0400
+        by vger.kernel.org with ESMTP id S231446AbhGFNQ4 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 6 Jul 2021 09:16:56 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1625576529;
+        s=mimecast20190719; t=1625577257;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=f6XFX0Bphb1u8qtHsQEBRFNlThVneEST27WVaLlnJRI=;
-        b=ZVyqCf93wVtjpItywlyJXqW5AJ9TmP7jpuJt5PWc5iHlLdT/7ElO2a49NWx6iz+UmnQ/k9
-        XGxQ2234sqVHKRrrwkyxWXOB92allsJrHgRv5dVIVpvJUZH8a0nqRMYNpQesCVFEOUmGmV
-        hRlq1PEDSPbi9DjUG6OEn/CB6/x9wEA=
+        bh=A+vURWiwExzHKQ1zqn329GpoJ8uorhaLWw889D3KLCk=;
+        b=DdhISsDmqFxYpwO5yBG7fob0cpK7FQ7/65EDlr7eka7+bN/s6kxJk0osoOOH2lk1dyE+Kz
+        mmgk7La+dS9CvanJEN4BsnXlgBRHKBKpLFpxtIbBOXGc0uxmXSu2l6G7jxaeLkoIxvOa1M
+        dB8lhOfreEry1su4Iqzvq7j5/AM7eWw=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-490-rjjCJXTwPZe9d7zz3V7uzw-1; Tue, 06 Jul 2021 09:02:06 -0400
-X-MC-Unique: rjjCJXTwPZe9d7zz3V7uzw-1
+ us-mta-382-Rm8scm4zMfycpyJd6ld4yQ-1; Tue, 06 Jul 2021 09:14:15 -0400
+X-MC-Unique: Rm8scm4zMfycpyJd6ld4yQ-1
 Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 23EBA1923779;
-        Tue,  6 Jul 2021 13:01:57 +0000 (UTC)
-Received: from localhost (ovpn-113-13.ams2.redhat.com [10.36.113.13])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 21DE15DAA5;
-        Tue,  6 Jul 2021 13:01:48 +0000 (UTC)
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org
-Cc:     linux-s390@vger.kernel.org, imbrenda@linux.ibm.com,
-        david@redhat.com, thuth@redhat.com
-Subject: Re: [kvm-unit-tests PATCH v2 5/5] lib: s390x: Remove left behing
- PGM report
-In-Reply-To: <20210706121757.24070-6-frankja@linux.ibm.com>
-Organization: Red Hat GmbH
-References: <20210706121757.24070-1-frankja@linux.ibm.com>
- <20210706121757.24070-6-frankja@linux.ibm.com>
-User-Agent: Notmuch/0.32.1 (https://notmuchmail.org)
-Date:   Tue, 06 Jul 2021 15:01:47 +0200
-Message-ID: <875yxnh9z8.fsf@redhat.com>
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 90CE7824F98;
+        Tue,  6 Jul 2021 13:14:14 +0000 (UTC)
+Received: from localhost (ovpn-115-23.ams2.redhat.com [10.36.115.23])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 7F3BF5DA60;
+        Tue,  6 Jul 2021 13:14:10 +0000 (UTC)
+Date:   Tue, 6 Jul 2021 14:14:09 +0100
+From:   Stefan Hajnoczi <stefanha@redhat.com>
+To:     Jason Wang <jasowang@redhat.com>
+Cc:     mst@redhat.com, virtualization@lists.linux-foundation.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        netdev@vger.kernel.org, xieyongji@bytedance.com
+Subject: Re: [PATCH 1/2] vdpa: support per virtqueue max queue size
+Message-ID: <YORXIS+WmDkX2DN7@stefanha-x1.localdomain>
+References: <20210705071910.31965-1-jasowang@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: multipart/signed; micalg=pgp-sha256;
+        protocol="application/pgp-signature"; boundary="LaXrVM2vNYxuaCd2"
+Content-Disposition: inline
+In-Reply-To: <20210705071910.31965-1-jasowang@redhat.com>
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jul 06 2021, Janosch Frank <frankja@linux.ibm.com> wrote:
 
-> When I added the backtrace support I forgot to remove the PGM report.
->
-> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+--LaXrVM2vNYxuaCd2
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Mon, Jul 05, 2021 at 03:19:09PM +0800, Jason Wang wrote:
+> Virtio spec allows the device to specify the per virtqueue max queue
+> size. vDPA needs to adapt to this flexibility. E.g Qemu advertise a
+> small control virtqueue for virtio-net.
+>=20
+> So this patch adds a index parameter to get_vq_num_max bus operations
+> for the device to report its per virtqueue max queue size.
+>=20
+> Both VHOST_VDPA_GET_VRING_NUM and VDPA_ATTR_DEV_MAX_VQ_SIZE assume a
+> global maximum size. So we iterate all the virtqueues to return the
+> minimal size in this case. Actually, the VHOST_VDPA_GET_VRING_NUM is
+> not a must for the userspace. Userspace may choose to check the
+> VHOST_SET_VRING_NUM for proving or validating the maximum virtqueue
+> size. Anyway, we can invent a per vq version of
+> VHOST_VDPA_GET_VRING_NUM in the future if it's necessary.
+>=20
+> Signed-off-by: Jason Wang <jasowang@redhat.com>
 > ---
->  lib/s390x/interrupt.c | 3 ---
->  1 file changed, 3 deletions(-)
+>  drivers/vdpa/ifcvf/ifcvf_main.c   |  2 +-
+>  drivers/vdpa/mlx5/net/mlx5_vnet.c |  2 +-
+>  drivers/vdpa/vdpa.c               | 22 +++++++++++++++++++++-
+>  drivers/vdpa/vdpa_sim/vdpa_sim.c  |  2 +-
+>  drivers/vdpa/virtio_pci/vp_vdpa.c |  2 +-
+>  drivers/vhost/vdpa.c              |  9 ++++++---
+>  drivers/virtio/virtio_vdpa.c      |  2 +-
+>  include/linux/vdpa.h              |  5 ++++-
+>  8 files changed, 36 insertions(+), 10 deletions(-)
 
-Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+
+--LaXrVM2vNYxuaCd2
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAmDkVyEACgkQnKSrs4Gr
+c8hTKggAp8tSQbbf8/pQa6Bi9ldcTpa4FzjzvITQFELFg45XJ9q4WDx+eNMxRTpe
+IuvanLQoWiiQL2pYcUZCi/+PCGsj+bu44yJ24Uk9/cIWUbg+s8T+GLMxaNdEP8WO
+52McfMT5MK+waHfnbhZ2jaNEGAdo5EVRBIF1Q/7vdg9Lfr0YxRtVuZ6EVuuncW5y
+jETFKnKb0YdHpbO//gK/a7L6jLJEABTm0QQNK9OZnxnlbEuduUfeu8saUZSdDbWL
+G/7TR55TF+CFd27T7gTA7WLcQszFk1tg1fTbdnDUpU/588L6Gy5+6CoCb+5+a6Ts
+vdBRToz2iTg0KTFP/gYhTTQcxq7wmA==
+=eXQg
+-----END PGP SIGNATURE-----
+
+--LaXrVM2vNYxuaCd2--
 
