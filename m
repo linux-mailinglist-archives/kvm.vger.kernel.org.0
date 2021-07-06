@@ -2,57 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6FBD93BD896
-	for <lists+kvm@lfdr.de>; Tue,  6 Jul 2021 16:42:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C92303BD845
+	for <lists+kvm@lfdr.de>; Tue,  6 Jul 2021 16:33:21 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231910AbhGFOpI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 6 Jul 2021 10:45:08 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:44173 "EHLO
+        id S232370AbhGFOf4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 6 Jul 2021 10:35:56 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:55326 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232570AbhGFOoH (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 6 Jul 2021 10:44:07 -0400
+        by vger.kernel.org with ESMTP id S232329AbhGFOfr (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 6 Jul 2021 10:35:47 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1625582488;
+        s=mimecast20190719; t=1625581681;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=3XDR4t5i3p70PJH/UTW7pBWWy4YfeP9y6sBia6H04go=;
-        b=gz1pyKHPcb9kY3EKgQ6AkcuAyVSPAGGM1cKNjMwGCTKOrN989SDJPycmTH8pnpMqJ3WeUe
-        XfWSifJA1VEaiqDdHFioM+qzVk8w3QyyfZItFstQRdq12/neV8wa5Au7bcU1HwqR/fzHnk
-        uakQNtFhNPmK9QgIL2aEF0peAyjAfQQ=
-Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
- [209.85.218.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-78-LBtxe5SXNZehuiQWXwD1vw-1; Tue, 06 Jul 2021 10:09:36 -0400
-X-MC-Unique: LBtxe5SXNZehuiQWXwD1vw-1
-Received: by mail-ej1-f70.google.com with SMTP id u4-20020a1709061244b02904648b302151so5874352eja.17
-        for <kvm@vger.kernel.org>; Tue, 06 Jul 2021 07:09:36 -0700 (PDT)
+        bh=jP5DGGxJWoHogq5jV5uZ5mGaY2kRQONzJzlVOQeyzM0=;
+        b=jONxPTpgylrsDkjyeSzbSIq+5ybobqnG0YL1rqRJSXpf1kEGD8mBfNmHozcTygte1IgzR1
+        n7ipIVAqNqtdKz/fz5ObP6eTuXYcaVtC6mZth1vNgj4iJUOQCc/vdCcebzQNU8HEm+kHii
+        GBDJdCkdD84vOvxGFjyUinw/UY6cWqE=
+Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
+ [209.85.208.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-463-ISnDMqtLP_Cf1vXT1gfETA-1; Tue, 06 Jul 2021 10:11:01 -0400
+X-MC-Unique: ISnDMqtLP_Cf1vXT1gfETA-1
+Received: by mail-ed1-f70.google.com with SMTP id i19-20020a05640200d3b02903948b71f25cso10860599edu.4
+        for <kvm@vger.kernel.org>; Tue, 06 Jul 2021 07:11:00 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=3XDR4t5i3p70PJH/UTW7pBWWy4YfeP9y6sBia6H04go=;
-        b=VPxC7V96N0DPeZ8kq/Quavslw9D5aqsRAP8xVFROdLL6Ur+Wok77xtY1CUIx77RcPR
-         unUBog8Mw+71C1+T9qJTjYeYl0DWQEg4XCmEkTufFe8gXIdSQETyEXhasAmORYmaQXk+
-         GqBM2kuNP63tNRuUTnW8qii6LuJ9/IEjsfxNVko1Xv4u1+/STlIR78Un7eGhWlXkP8E3
-         nI3vkvU7jSto5KoTPOJUqahNzffCEuJ1E9rLvq1dPcRdvP/ITOBy6LWdHHI2eTxaFLtA
-         wLed/0CDcmxj/r5Zcc1EDJFagQnA4fW3ogExu5js2HwmXEm37k0xvfh7FRdnKHfltrQM
-         Cz0A==
-X-Gm-Message-State: AOAM530eXFD1GxjteXsEwLH5WcIXbD8nPsxpF7ihTrGpQBhIWMwJuWUC
-        9Cyp2+YXYHqz8NqUJrtU0igW5u5OlhwuRmq2+7pPX6ujrQxB5VqdtQH+wBkUbjuajff7dDzmZBv
-        T4gM0stnkphMt
-X-Received: by 2002:a05:6402:7cf:: with SMTP id u15mr23179791edy.197.1625580575281;
-        Tue, 06 Jul 2021 07:09:35 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJy5IMU/pbxNHRaQUxdaB6tteA2kmm8Z+qw9Gju74ueIGFGdIm3nk3TPo1cMh4ZN602R18Aytw==
-X-Received: by 2002:a05:6402:7cf:: with SMTP id u15mr23179752edy.197.1625580575064;
-        Tue, 06 Jul 2021 07:09:35 -0700 (PDT)
+        bh=jP5DGGxJWoHogq5jV5uZ5mGaY2kRQONzJzlVOQeyzM0=;
+        b=C6NgEq5SvEi+yow69flngDiws3qvIAvHmors4W0Tj6fTgFftFufzZ/vP23H+i/f09+
+         iCJwGH61ufVLMOCIEhDKbuU9KcLxEEMI3Jjlki1Sn3koWPgfnWVMP6fyGasM12YhhLym
+         JQBN2OVtKD2Ia5J/UY5dg3V32is310EmYsxRMbM8pg0GJsUMjb0vAr44Ssi/AvNX51JZ
+         xG0uADFK6AruQN39aocXloGd1HzJvHGZcgUItK4mbmpQVzURufZoZtE2+aEibOkBlylM
+         CaTCSZlMco+7YwWaOHfw0yVXSOi1bMsU6/NSIsm7vDyzlNIq2aAgjkNYwlEHifN6r2ku
+         AuzA==
+X-Gm-Message-State: AOAM531N9TzKfKSPlKlZnPer8T6vkYygN/amog3nI8TkQPMdoMGHEJQS
+        gagys31HdOZcZjf9BLNp5y1OZdhABPJ1zHeMdqj3lUN1ZJlyHmjEUV4iVqy4iwtQaP8dhb7cL5k
+        Qji9ByZkYlYBv
+X-Received: by 2002:a17:906:dc91:: with SMTP id cs17mr18827611ejc.389.1625580659904;
+        Tue, 06 Jul 2021 07:10:59 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJy3OchyKJxg4IMKf3xa49iq+6B/OGalJj/TJI+5nrz+mfJ2AakBWeZtDiyZEdBBtoYaxp7Pkw==
+X-Received: by 2002:a17:906:dc91:: with SMTP id cs17mr18827594ejc.389.1625580659732;
+        Tue, 06 Jul 2021 07:10:59 -0700 (PDT)
 Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id jx17sm5780741ejc.60.2021.07.06.07.09.33
+        by smtp.gmail.com with ESMTPSA id lz19sm5925092ejb.48.2021.07.06.07.10.57
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 06 Jul 2021 07:09:34 -0700 (PDT)
-Subject: Re: [RFC PATCH v2 32/69] KVM: x86: Allow host-initiated WRMSR to set
- X2APIC regardless of CPUID
+        Tue, 06 Jul 2021 07:10:58 -0700 (PDT)
+Subject: Re: [RFC PATCH v2 33/69] KVM: x86: Add kvm_x86_ops .cache_gprs() and
+ .flush_gprs()
 To:     isaku.yamahata@intel.com, Thomas Gleixner <tglx@linutronix.de>,
         Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
         "H . Peter Anvin" <hpa@zytor.com>,
@@ -64,16 +64,17 @@ To:     isaku.yamahata@intel.com, Thomas Gleixner <tglx@linutronix.de>,
         Sean Christopherson <seanjc@google.com>, x86@kernel.org,
         linux-kernel@vger.kernel.org, kvm@vger.kernel.org
 Cc:     isaku.yamahata@gmail.com,
-        Sean Christopherson <sean.j.christopherson@intel.com>
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>
 References: <cover.1625186503.git.isaku.yamahata@intel.com>
- <9b00cb86878e9986f47a0febce3c0d2872d91443.1625186503.git.isaku.yamahata@intel.com>
+ <1d51898908a53120e3c60944108730e1922c2206.1625186503.git.isaku.yamahata@intel.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <21864cc4-56ed-096b-c3ff-9fc742d68624@redhat.com>
-Date:   Tue, 6 Jul 2021 16:09:32 +0200
+Message-ID: <71ea2142-b299-0fbf-c6f5-5146ad8370a6@redhat.com>
+Date:   Tue, 6 Jul 2021 16:10:56 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.11.0
 MIME-Version: 1.0
-In-Reply-To: <9b00cb86878e9986f47a0febce3c0d2872d91443.1625186503.git.isaku.yamahata@intel.com>
+In-Reply-To: <1d51898908a53120e3c60944108730e1922c2206.1625186503.git.isaku.yamahata@intel.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -82,27 +83,58 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 On 03/07/21 00:04, isaku.yamahata@intel.com wrote:
-> Let userspace, or in the case of TDX, KVM itself, enable X2APIC even if
-> X2APIC is not reported as supported in the guest's CPU model.  KVM
-> generally does not force specific ordering between ioctls(), e.g. this
-> forces userspace to configure CPUID before MSRs.
+> From: Sean Christopherson <sean.j.christopherson@intel.com>
+> 
+> Add hooks to cache and flush GPRs and invoke them from KVM_GET_REGS and
+> KVM_SET_REGS respecitively.  TDX will use the hooks to read/write GPRs
+> from TDX-SEAM on-demand (for debug TDs).
+> 
+> Cc: Tom Lendacky <thomas.lendacky@amd.com>
+> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+> Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
+> ---
+>   arch/x86/include/asm/kvm_host.h | 2 ++
+>   arch/x86/kvm/x86.c              | 6 ++++++
+>   2 files changed, 8 insertions(+)
+> 
+> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+> index 00333af724d7..9791c4bb5198 100644
+> --- a/arch/x86/include/asm/kvm_host.h
+> +++ b/arch/x86/include/asm/kvm_host.h
+> @@ -1248,6 +1248,8 @@ struct kvm_x86_ops {
+>   	void (*set_gdt)(struct kvm_vcpu *vcpu, struct desc_ptr *dt);
+>   	void (*sync_dirty_debug_regs)(struct kvm_vcpu *vcpu);
+>   	void (*set_dr7)(struct kvm_vcpu *vcpu, unsigned long value);
+> +	void (*cache_gprs)(struct kvm_vcpu *vcpu);
+> +	void (*flush_gprs)(struct kvm_vcpu *vcpu);
+>   	void (*cache_reg)(struct kvm_vcpu *vcpu, enum kvm_reg reg);
+>   	unsigned long (*get_rflags)(struct kvm_vcpu *vcpu);
+>   	void (*set_rflags)(struct kvm_vcpu *vcpu, unsigned long rflags);
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index c231a88d5946..f7ae0a47e555 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -9850,6 +9850,9 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
+>   
+>   static void __get_regs(struct kvm_vcpu *vcpu, struct kvm_regs *regs)
+>   {
+> +	if (kvm_x86_ops.cache_gprs)
+> +		kvm_x86_ops.cache_gprs(vcpu);
+> +
+>   	if (vcpu->arch.emulate_regs_need_sync_to_vcpu) {
+>   		/*
+>   		 * We are here if userspace calls get_regs() in the middle of
+> @@ -9924,6 +9927,9 @@ static void __set_regs(struct kvm_vcpu *vcpu, struct kvm_regs *regs)
+>   
+>   	vcpu->arch.exception.pending = false;
+>   
+> +	if (kvm_x86_ops.flush_gprs)
+> +		kvm_x86_ops.flush_gprs(vcpu);
+> +
+>   	kvm_make_request(KVM_REQ_EVENT, vcpu);
+>   }
+>   
+> 
 
-You already have to do this, see for example MSR_IA32_PERF_CAPABILITIES:
-
-                 struct kvm_msr_entry msr_ent = {.index = msr, .data = 0};
-
-                 if (!msr_info->host_initiated)
-                         return 1;
-                 if (guest_cpuid_has(vcpu, X86_FEATURE_PDCM) && kvm_get_msr_feature(&msr_ent))
-                         return 1;
-                 if (data & ~msr_ent.data)
-                         return 1;
-
-Is this patch necessary?  If not, I think it can be dropped.
-
-Paolo
-
-> And for TDX, vCPUs
-> will always run with X2APIC enabled, e.g. KVM will want/need to enable
-> X2APIC from time zero.
+Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
 
