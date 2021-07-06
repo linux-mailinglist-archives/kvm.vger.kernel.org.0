@@ -2,57 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8CC963BD857
-	for <lists+kvm@lfdr.de>; Tue,  6 Jul 2021 16:35:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7ADB63BD89B
+	for <lists+kvm@lfdr.de>; Tue,  6 Jul 2021 16:42:37 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232274AbhGFOhz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 6 Jul 2021 10:37:55 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:24832 "EHLO
+        id S232311AbhGFOpM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 6 Jul 2021 10:45:12 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:20031 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232245AbhGFOhx (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 6 Jul 2021 10:37:53 -0400
+        by vger.kernel.org with ESMTP id S232895AbhGFOpD (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 6 Jul 2021 10:45:03 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1625582114;
+        s=mimecast20190719; t=1625582543;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=SadklWu5h42Kr+n17qV7by5TT0XeZa9ds78ScI/5JFI=;
-        b=jT9eCeOi/WTmkOgz+PWPyMjhng9yuKRMmzj02wW7crx/zp9fem5DJW4CoiDbBDcpg23o68
-        bE3/iNIhvppuBiTbUx0g2Lam8Rps9bJnZDZTbHbD8XK9oV4zoBDK79o2agRZgS/XvoOPdq
-        FRV16H0m7ZfjktpFexIPpHrWEY6ucdw=
-Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
- [209.85.218.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-401-zZql-tviN72N0MkCLE6Thw-1; Tue, 06 Jul 2021 10:35:13 -0400
-X-MC-Unique: zZql-tviN72N0MkCLE6Thw-1
-Received: by mail-ej1-f70.google.com with SMTP id ci2-20020a1709072662b02904ce09e83b00so5076779ejc.23
-        for <kvm@vger.kernel.org>; Tue, 06 Jul 2021 07:35:12 -0700 (PDT)
+        bh=ViCBW+aU4HmX1q30hpE32yx0uxbzc7hky1uZJpH6cmY=;
+        b=TDNIJajozK27q8hSCYlmkPyQ2v09Ccu1QaM8Jg/p4HggR5ttk1lwCJ993Scvsd/1na6XJL
+        CHs6LyxWdPN8V1rvvVyUDPS+Zn44OFr0T4GMr5ENNoYA/+07YV7iXH7FPoUJLpYwV/tZs7
+        VqStFeZrfaKqOlVV+DE2dcc73ExDAw0=
+Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
+ [209.85.218.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-351-ddYcD6JSM1CNaLB1Fmjx9A-1; Tue, 06 Jul 2021 10:42:22 -0400
+X-MC-Unique: ddYcD6JSM1CNaLB1Fmjx9A-1
+Received: by mail-ej1-f69.google.com with SMTP id 16-20020a1709063010b029037417ca2d43so5902483ejz.5
+        for <kvm@vger.kernel.org>; Tue, 06 Jul 2021 07:42:22 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=SadklWu5h42Kr+n17qV7by5TT0XeZa9ds78ScI/5JFI=;
-        b=bcfHqoMFgilKQALcOMmPlQ3TmSGWa+SB363DMSwWDPFYFbAvXnqJiZ2U9Kko6ZqlWa
-         dcGXcdsisiNQmclEkiR/0xQGm+/oVVbHNOWESuXWDzbz6iO28sgVtEn4SyJc+Y2jmraP
-         Wnj4JpTD7MRWlzwnocLjWYYMT+r0yLN9YP9/7lBY+Sk0c3PuqDJF/cx6XJ3SKe0UxKTl
-         jRAsSuiwwegicylvkhpmMdtS+JvJw4J6luvG9jG7dXgjIfQ3/GLIvD8URL8JaG8oBAe1
-         eejzm469XCA993SVnp8QvpCi57hM5AY7yswwdAuxrswCRIC5vsBHOQy+ZbR92Wuov3Qg
-         kD5Q==
-X-Gm-Message-State: AOAM531RB8xoVANJvS+oVZjzBtYhyw5eDjzP6Tfrufes8PniJCUuwwCC
-        8aci9fYvH9s6IRN3lRPA7SQ/Kfz0vfmys9o6MbDI1c+WuVRqlEbn8KLCpR1kxNotifp2HVxWuSG
-        kXOtXjrMebWls
-X-Received: by 2002:a17:906:7b4f:: with SMTP id n15mr18484080ejo.42.1625582111851;
-        Tue, 06 Jul 2021 07:35:11 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyX/hN6grD9bMUghxfplyXRvID/QOIo0cYh5JzubHTBO/PXsUDzoj4n1GCTZJLcwlRuSvxCcQ==
-X-Received: by 2002:a17:906:7b4f:: with SMTP id n15mr18484049ejo.42.1625582111659;
-        Tue, 06 Jul 2021 07:35:11 -0700 (PDT)
+        bh=ViCBW+aU4HmX1q30hpE32yx0uxbzc7hky1uZJpH6cmY=;
+        b=HL5rRSwQHTCEslokLG0/31a3slCGujJcInUy8t6gv7rtsho3LOwWVzbbMaGmiV5cpu
+         vMpEKL5p0AfLuNOhzOElYI3YIJC+47ZQXf+b6PpH9SfjwriLVG421as6e9CIm+z1TmcR
+         h50I5Y0yhe7T8rY/60MvdNuf3PvkhFFsxW73gOYwgLdrVrT/JvklLLFUj1CpwbX+U0mW
+         bvkme1VdNuFB1pDL3/BH2to/NQCHoED22PItDhh7Z4TfJXuH3Wb26znv0JsdhVuM4UJ7
+         LbZk4GzPN0ir5QoypRtzmNspA0VZDM/Ft0/dTAStJThdk4ehLdPw4hS9sSaHinHu+FF0
+         Tjkg==
+X-Gm-Message-State: AOAM531L6vKSzS3x1fukdsDM56XTLB5aGxHqr8syds/yOtoM4aLE9F1T
+        hspUPP08GcMDlHJJwnt75AKbSrPM4ZfML1FPqvFJeKnEsSrQRuv1sZ3qEU28pmdN21qvbNiVyEu
+        m9jpGry7rix2P
+X-Received: by 2002:a17:907:72c9:: with SMTP id du9mr4054657ejc.497.1625582215084;
+        Tue, 06 Jul 2021 07:36:55 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyzSGNDTuDB2nTgFFg1Qz93NY7KXXLlEt7e7B/RxiR9gDpBYM1jY+L1YBkDn5cKQmZvz3QLMQ==
+X-Received: by 2002:a17:907:72c9:: with SMTP id du9mr4054632ejc.497.1625582214843;
+        Tue, 06 Jul 2021 07:36:54 -0700 (PDT)
 Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id d18sm1023485ejr.50.2021.07.06.07.35.10
+        by smtp.gmail.com with ESMTPSA id op26sm5117107ejb.57.2021.07.06.07.36.53
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 06 Jul 2021 07:35:11 -0700 (PDT)
-Subject: Re: [RFC PATCH v2 38/69] KVM: x86: Add option to force LAPIC
- expiration wait
+        Tue, 06 Jul 2021 07:36:54 -0700 (PDT)
+Subject: Re: [RFC PATCH v2 36/69] KVM: x86: Add a switch_db_regs flag to
+ handle TDX's auto-switched behavior
 To:     isaku.yamahata@intel.com, Thomas Gleixner <tglx@linutronix.de>,
         Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
         "H . Peter Anvin" <hpa@zytor.com>,
@@ -64,16 +64,18 @@ To:     isaku.yamahata@intel.com, Thomas Gleixner <tglx@linutronix.de>,
         Sean Christopherson <seanjc@google.com>, x86@kernel.org,
         linux-kernel@vger.kernel.org, kvm@vger.kernel.org
 Cc:     isaku.yamahata@gmail.com,
-        Sean Christopherson <sean.j.christopherson@intel.com>
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Xiaoyao Li <xiaoyao.li@intel.com>,
+        Chao Gao <chao.gao@intel.com>
 References: <cover.1625186503.git.isaku.yamahata@intel.com>
- <357378fcb6e3e2becb6d4f00a5c3d2b00b2c566b.1625186503.git.isaku.yamahata@intel.com>
+ <1f79ce2ad686f25767711ccd6a520324dd6e1c21.1625186503.git.isaku.yamahata@intel.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <a349d5bf-b85c-34c3-bb88-523df23a2985@redhat.com>
-Date:   Tue, 6 Jul 2021 16:35:09 +0200
+Message-ID: <8fd6118a-6804-4a58-138f-0c78855cc32a@redhat.com>
+Date:   Tue, 6 Jul 2021 16:36:52 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.11.0
 MIME-Version: 1.0
-In-Reply-To: <357378fcb6e3e2becb6d4f00a5c3d2b00b2c566b.1625186503.git.isaku.yamahata@intel.com>
+In-Reply-To: <1f79ce2ad686f25767711ccd6a520324dd6e1c21.1625186503.git.isaku.yamahata@intel.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -84,85 +86,73 @@ X-Mailing-List: kvm@vger.kernel.org
 On 03/07/21 00:04, isaku.yamahata@intel.com wrote:
 > From: Sean Christopherson <sean.j.christopherson@intel.com>
 > 
-> Add an option to skip the IRR check in kvm_wait_lapic_expire().  This
-> will be used by TDX to wait if there is an outstanding notification for
-> a TD, i.e. a virtual interrupt is being triggered via posted interrupt
-> processing.  KVM TDX doesn't emulate PI processing, i.e. there will
-> never be a bit set in IRR/ISR, so the default behavior for APICv of
-> querying the IRR doesn't work as intended.
+> Add a flag, KVM_DEBUGREG_AUTO_SWITCHED_GUEST, to skip saving/restoring DRs
+> irrespective of any other flags.  TDX-SEAM unconditionally saves and
+> restores guest DRs and reset to architectural INIT state on TD exit.
+> So, KVM needs to save host DRs before TD enter without restoring guest DRs
+> and restore host DRs after TD exit.
 > 
+> Opportunistically convert the KVM_DEBUGREG_* definitions to use BIT().
+> 
+> Reported-by: Xiaoyao Li <xiaoyao.li@intel.com>
 > Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+> Co-developed-by: Chao Gao <chao.gao@intel.com>
+> Signed-off-by: Chao Gao <chao.gao@intel.com>
 > Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
+> ---
+>   arch/x86/include/asm/kvm_host.h | 11 ++++++++---
+>   arch/x86/kvm/x86.c              |  3 ++-
+>   2 files changed, 10 insertions(+), 4 deletions(-)
+> 
+> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+> index 96e6cd95d884..7822b531a5e2 100644
+> --- a/arch/x86/include/asm/kvm_host.h
+> +++ b/arch/x86/include/asm/kvm_host.h
+> @@ -488,9 +488,14 @@ struct kvm_pmu {
+>   struct kvm_pmu_ops;
+>   
+>   enum {
+> -	KVM_DEBUGREG_BP_ENABLED = 1,
+> -	KVM_DEBUGREG_WONT_EXIT = 2,
+> -	KVM_DEBUGREG_RELOAD = 4,
+> +	KVM_DEBUGREG_BP_ENABLED		= BIT(0),
+> +	KVM_DEBUGREG_WONT_EXIT		= BIT(1),
+> +	KVM_DEBUGREG_RELOAD		= BIT(2),
+> +	/*
+> +	 * Guest debug registers are saved/restored by hardware on exit from
+> +	 * or enter guest. KVM needn't switch them.
+> +	 */
+> +	KVM_DEBUGREG_AUTO_SWITCH_GUEST	= BIT(3),
 
-Is there a better (existing after the previous patches) flag to test, or 
-possibly can it use vm_type following the suggestion I gave for patch 28?
+Maybe remove "_GUEST"?  Apart from that,
+
+Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
 
 Paolo
 
-> ---
->   arch/x86/kvm/lapic.c   | 4 ++--
->   arch/x86/kvm/lapic.h   | 2 +-
->   arch/x86/kvm/svm/svm.c | 2 +-
->   arch/x86/kvm/vmx/vmx.c | 2 +-
->   4 files changed, 5 insertions(+), 5 deletions(-)
-> 
-> diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
-> index 977a704e3ff1..3cfc0485a46e 100644
-> --- a/arch/x86/kvm/lapic.c
-> +++ b/arch/x86/kvm/lapic.c
-> @@ -1622,12 +1622,12 @@ static void __kvm_wait_lapic_expire(struct kvm_vcpu *vcpu)
->   		__wait_lapic_expire(vcpu, tsc_deadline - guest_tsc);
->   }
+>   };
 >   
-> -void kvm_wait_lapic_expire(struct kvm_vcpu *vcpu)
-> +void kvm_wait_lapic_expire(struct kvm_vcpu *vcpu, bool force_wait)
->   {
->   	if (lapic_in_kernel(vcpu) &&
->   	    vcpu->arch.apic->lapic_timer.expired_tscdeadline &&
->   	    vcpu->arch.apic->lapic_timer.timer_advance_ns &&
-> -	    lapic_timer_int_injected(vcpu))
-> +	    (force_wait || lapic_timer_int_injected(vcpu)))
->   		__kvm_wait_lapic_expire(vcpu);
->   }
->   EXPORT_SYMBOL_GPL(kvm_wait_lapic_expire);
-> diff --git a/arch/x86/kvm/lapic.h b/arch/x86/kvm/lapic.h
-> index 997c45a5963a..2bd32d86ad6f 100644
-> --- a/arch/x86/kvm/lapic.h
-> +++ b/arch/x86/kvm/lapic.h
-> @@ -233,7 +233,7 @@ static inline int kvm_lapic_latched_init(struct kvm_vcpu *vcpu)
+>   struct kvm_mtrr_range {
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index 4b436cae1732..f1d5e0a53640 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -9441,7 +9441,7 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
+>   	if (test_thread_flag(TIF_NEED_FPU_LOAD))
+>   		switch_fpu_return();
 >   
->   bool kvm_apic_pending_eoi(struct kvm_vcpu *vcpu, int vector);
->   
-> -void kvm_wait_lapic_expire(struct kvm_vcpu *vcpu);
-> +void kvm_wait_lapic_expire(struct kvm_vcpu *vcpu, bool force_wait);
->   
->   void kvm_bitmap_or_dest_vcpus(struct kvm *kvm, struct kvm_lapic_irq *irq,
->   			      unsigned long *vcpu_bitmap);
-> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-> index bcc3fc4872a3..b12bfdbc394b 100644
-> --- a/arch/x86/kvm/svm/svm.c
-> +++ b/arch/x86/kvm/svm/svm.c
-> @@ -3774,7 +3774,7 @@ static __no_kcsan fastpath_t svm_vcpu_run(struct kvm_vcpu *vcpu)
->   	clgi();
->   	kvm_load_guest_xsave_state(vcpu);
->   
-> -	kvm_wait_lapic_expire(vcpu);
-> +	kvm_wait_lapic_expire(vcpu, false);
->   
->   	/*
->   	 * If this vCPU has touched SPEC_CTRL, restore the guest's value if
-> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> index 36756a356704..7ce15a2c3490 100644
-> --- a/arch/x86/kvm/vmx/vmx.c
-> +++ b/arch/x86/kvm/vmx/vmx.c
-> @@ -6727,7 +6727,7 @@ static fastpath_t vmx_vcpu_run(struct kvm_vcpu *vcpu)
->   	if (enable_preemption_timer)
->   		vmx_update_hv_timer(vcpu);
->   
-> -	kvm_wait_lapic_expire(vcpu);
-> +	kvm_wait_lapic_expire(vcpu, false);
->   
->   	/*
->   	 * If this vCPU has touched SPEC_CTRL, restore the guest's value if
+> -	if (unlikely(vcpu->arch.switch_db_regs)) {
+> +	if (unlikely(vcpu->arch.switch_db_regs & ~KVM_DEBUGREG_AUTO_SWITCH_GUEST)) {
+>   		set_debugreg(0, 7);
+>   		set_debugreg(vcpu->arch.eff_db[0], 0);
+>   		set_debugreg(vcpu->arch.eff_db[1], 1);
+> @@ -9473,6 +9473,7 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
+>   	 */
+>   	if (unlikely(vcpu->arch.switch_db_regs & KVM_DEBUGREG_WONT_EXIT)) {
+>   		WARN_ON(vcpu->guest_debug & KVM_GUESTDBG_USE_HW_BP);
+> +		WARN_ON(vcpu->arch.switch_db_regs & KVM_DEBUGREG_AUTO_SWITCH_GUEST);
+>   		static_call(kvm_x86_sync_dirty_debug_regs)(vcpu);
+>   		kvm_update_dr0123(vcpu);
+>   		kvm_update_dr7(vcpu);
 > 
 
