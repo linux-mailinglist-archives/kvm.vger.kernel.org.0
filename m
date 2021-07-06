@@ -2,98 +2,103 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id ED73B3BC628
-	for <lists+kvm@lfdr.de>; Tue,  6 Jul 2021 07:42:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C6EBA3BC748
+	for <lists+kvm@lfdr.de>; Tue,  6 Jul 2021 09:34:12 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230074AbhGFFp3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 6 Jul 2021 01:45:29 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:59424 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230004AbhGFFp3 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 6 Jul 2021 01:45:29 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1625550171;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=kR/4RD2c6G7vfOI3cAArYTywlbZ39ro+LD6XzRbKsSs=;
-        b=TDR6ZtCBD9NitmTh6bdTybfy4XDJht6ItyVVW+kKBEuKor2wWgQa+aXyrAWjTSkRC6md/S
-        fVh4zkCyIuGnCV5vR+8v+shg/21TJDfYNsdrxr0VTs3NbJq91nSPn6QmwCf4KesRnpJdJH
-        ae+T/Z68g7bylHFhUb+i1CckFl0yx3s=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-109-_SAeTeXlPliJgBwt89E46g-1; Tue, 06 Jul 2021 01:42:49 -0400
-X-MC-Unique: _SAeTeXlPliJgBwt89E46g-1
-Received: by mail-wm1-f72.google.com with SMTP id f9-20020a7bcd090000b02901eca9a0d67cso250942wmj.0
-        for <kvm@vger.kernel.org>; Mon, 05 Jul 2021 22:42:49 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=kR/4RD2c6G7vfOI3cAArYTywlbZ39ro+LD6XzRbKsSs=;
-        b=EqlJuzS1t5RwpSgRXTKWWcrN0GndRItLAzvELUY+OP30HAhUnjaMdlZiksWAMvqD4E
-         jRLinvyVy42XoOw5L1RwbJ7uTH8rqmsxkmealVu2WZQOGqCPfCOtHO3xm1HPgfOkOH/d
-         SaP1efDqRURQ/NoMWeNuXdRnMBK9duTAtXcCcTTU/EG3DoMu/SeVQbrFj2XglyNT+7ZK
-         biVthrCEQ8Cs0ryRi3hEAI+pCtmPRg3Xzfw3FMISUXGG94YfV8j2bhEt7z9bJigSr8U5
-         b4VjzzDdrPktKiEs1CJhLoG2o3RVjHHAsazUMDRuYrXZV/EbpW5pZehCLLBcqQDZS1ep
-         O+xA==
-X-Gm-Message-State: AOAM5318aXnv2uh+UAbMjSjHKYdonQFXrJ6vnmlvc3SfRS9fwdeSDH/M
-        S6if+O/ehHbI7niNW89R9duIKYoN5buSnfrRMuS8t2TyrIRycuvBThQosbuAiCp3UDS+Dv8eaf4
-        vFaVZNYTGmWDy
-X-Received: by 2002:adf:a74a:: with SMTP id e10mr19186470wrd.185.1625550168797;
-        Mon, 05 Jul 2021 22:42:48 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwnq74tdPgX6MASLfGfeoSIgIe1/v6vzMrGXHjwD3JFyBqyiBH7F/q8wLbVgbgHfLJJqjJT5g==
-X-Received: by 2002:adf:a74a:: with SMTP id e10mr19186458wrd.185.1625550168591;
-        Mon, 05 Jul 2021 22:42:48 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id w8sm16481761wrt.83.2021.07.05.22.42.47
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 05 Jul 2021 22:42:47 -0700 (PDT)
-Subject: Re: [PATCH] KVM: nVMX: Dynamically compute max VMCS index for vmcs12
-To:     "Hu, Robert" <robert.hu@intel.com>,
+        id S230406AbhGFHgr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 6 Jul 2021 03:36:47 -0400
+Received: from mga02.intel.com ([134.134.136.20]:54950 "EHLO mga02.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S230274AbhGFHgr (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 6 Jul 2021 03:36:47 -0400
+X-IronPort-AV: E=McAfee;i="6200,9189,10036"; a="196236943"
+X-IronPort-AV: E=Sophos;i="5.83,328,1616482800"; 
+   d="scan'208";a="196236943"
+Received: from fmsmga003.fm.intel.com ([10.253.24.29])
+  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Jul 2021 00:33:54 -0700
+X-IronPort-AV: E=Sophos;i="5.83,328,1616482800"; 
+   d="scan'208";a="486033596"
+Received: from liujing-mobl.ccr.corp.intel.com (HELO [10.238.130.207]) ([10.238.130.207])
+  by fmsmga003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Jul 2021 00:33:52 -0700
+Subject: Re: [PATCH RFC 2/7] kvm: x86: Introduce XFD MSRs as passthrough to
+ guest
+To:     Dave Hansen <dave.hansen@intel.com>,
         Sean Christopherson <seanjc@google.com>
-Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-References: <20210618214658.2700765-1-seanjc@google.com>
- <c847e00a-e422-cdc9-3317-fbbd82b6e418@redhat.com>
- <YNDHfX0cntj72sk6@google.com> <da6c715345954a7b91c044ad685eb0f2@intel.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <d98092db-b277-44f5-df5e-f367ecb5a0fc@redhat.com>
-Date:   Tue, 6 Jul 2021 07:42:46 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.11.0
+Cc:     pbonzini@redhat.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, jing2.liu@intel.com
+References: <20210207154256.52850-1-jing2.liu@linux.intel.com>
+ <20210207154256.52850-3-jing2.liu@linux.intel.com>
+ <YKwd5OTXr97Fxfok@google.com>
+ <d6e7328d-335f-b244-48d7-4ffe8b04fb05@intel.com>
+ <3c63438b-2a42-0b81-f002-b937095570e1@linux.intel.com>
+ <895e41d7-b64c-e398-c4e2-6309c747068d@intel.com>
+From:   "Liu, Jing2" <jing2.liu@linux.intel.com>
+Message-ID: <7a59f745-6ffa-ae5f-fd66-9fca9ae95533@linux.intel.com>
+Date:   Tue, 6 Jul 2021 15:33:43 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.6.0
 MIME-Version: 1.0
-In-Reply-To: <da6c715345954a7b91c044ad685eb0f2@intel.com>
+In-Reply-To: <895e41d7-b64c-e398-c4e2-6309c747068d@intel.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 06/07/21 05:05, Hu, Robert wrote:
->> As noted in the code comments, KVM allows VMREAD/VMWRITE to all defined
->> fields, whether or not the field should actually exist for the vCPU model doesn't
->> enter into the equation.  That's technically wrong as there are a number of
->> fields that the SDM explicitly states exist iff a certain feature is supported.  To
->> fix that we'd need to add a "feature flag" to vmcs_field_to_offset_table that is
->> checked against the vCPU model, though updating the MSR would probably fall
->> onto userspace's shoulders?
-> 
-> [Hu, Robert]
-> Perhaps more easier and proper to do this in KVM side.
-> QEMU sets actual feature set down to KVM, and KVM updates IA32_VMX_VMCS_ENUM
-> MSR accordingly. We don't see a channel that QEMU constructs a VMCS and sets a whole
-> to KVM.
 
-Yes, it's possible to do that too.  If that is included in Linux 5.14, 
-we can remove it from QEMU.
 
-Paolo
+On 6/30/2021 1:58 AM, Dave Hansen wrote:
+> On 6/27/21 7:00 PM, Liu, Jing2 wrote:
+>> On 6/24/2021 1:50 AM, Dave Hansen wrote:
+>>> On 5/24/21 2:43 PM, Sean Christopherson wrote:
+>>>> On Sun, Feb 07, 2021, Jing Liu wrote:
+>>>>> Passthrough both MSRs to let guest access and write without vmexit.
+>>>> Why?  Except for read-only MSRs, e.g. MSR_CORE_C1_RES,
+>>>> passthrough MSRs are costly to support because KVM must context
+>>>> switch the MSR (which, by the by, is completely missing from the
+>>>> patch).
+>>>>
+>>>> In other words, if these MSRs are full RW passthrough, guests
+>>>> with XFD enabled will need to load the guest value on entry, save
+>>>> the guest value on exit, and load the host value on exit.  That's
+>>>> in the neighborhood of a 40% increase in latency for a single
+>>>> VM-Enter/VM-Exit roundtrip (~1500 cycles =>
+>>>>> 2000 cycles).
+>>> I'm not taking a position as to whether these _should_ be passthrough or
+>>> not.  But, if they are, I don't think you strictly need to do the
+>>> RDMSR/WRMSR at VM-Exit time.
+>> Hi Dave,
+>>
+>> Thanks for reviewing the patches.
+>>
+>> When vmexit, clearing XFD (because KVM thinks guest has requested AMX) can
+>> be deferred to the time when host does XSAVES, but this means need a new
+>> flag in common "fpu" structure or a common macro per thread which works
+>> only dedicated for KVM case, and check the flag in 1) switch_fpu_prepare()
+>> 2) kernel_fpu_begin() . This is the concern to me.
+> Why is this a concern?  You're worried about finding a single bit worth
+> of space somewhere?
+A bit of flag can be found so far though the space is somehow nervous. 
+What I
+am worrying about is, we introduce a flag per thread and add the check 
+in core
+place like softirq path and context switch path, to handle a case only 
+for KVM
+thread + XFD=1 + AMX usage in guest. This is not a quite frequent case 
+but we
+need check every time for every thread.
+
+I am considering using XGETBV(1) (~24 cycles) to detect if KVM really need
+wrmsr(0) to clear XFD for guest AMX state when vmexit. And this is not a 
+quite
+frequent case I think. Only one concern is, does/will kernel check 
+somewhere that
+thread's memory fpu buffer is already large but thread's XFD=1? (I 
+believe not)
+
+Thanks,
+Jing
+
+>   
 
