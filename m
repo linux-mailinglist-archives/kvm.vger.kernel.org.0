@@ -2,31 +2,36 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A14CD3BC522
-	for <lists+kvm@lfdr.de>; Tue,  6 Jul 2021 06:00:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C7FFC3BC5A5
+	for <lists+kvm@lfdr.de>; Tue,  6 Jul 2021 06:40:00 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229998AbhGFECg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 6 Jul 2021 00:02:36 -0400
-Received: from mail.kernel.org ([198.145.29.99]:44286 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229550AbhGFECf (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 6 Jul 2021 00:02:35 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 4AC8961375;
-        Tue,  6 Jul 2021 03:59:57 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1625543998;
-        bh=EBb836TUqwdFybd5e2qAGza9Mok0L1tjLS+MbMnBjN4=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=ro2L/nJ4cUN3ER5i2dJBf/AoagWgvc7fTnq9wCDIWMaIK1/W4Fsl2yB0GSMy9mC0L
-         D3ywytE827DeLQGb9bH5+zgKUENID8BWXwP7OgigfS++eWj34tKndOwKh1d6ACah7A
-         HMjgnNxt8KkJ97fiXGIEQ4riZ9A6cfV+i6nd6Lce18CP8vCVXpYL4yaiUkrT7RX2kP
-         ixKBJ1i36AsdX/evHWTr4u3uzEEsHHRoYXFG6Mr49SnegKfLZTkN2zNxBGGjX/vKew
-         WgTvpmKmW/NF3DleCNOTTj0eisiOauD4DzjHiBGeetDA9i2g6R7XC4iwkEULdjNHLH
-         6vPk8pBEd6jog==
-Date:   Tue, 6 Jul 2021 06:59:54 +0300
-From:   Leon Romanovsky <leon@kernel.org>
+        id S230004AbhGFEmg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 6 Jul 2021 00:42:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40304 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229926AbhGFEmf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 6 Jul 2021 00:42:35 -0400
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EE51AC061574;
+        Mon,  5 Jul 2021 21:39:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=Tm9bbwSLIXHzncYHK7SPpmMxLf8Q613BrbD6KMaacCU=; b=ZHopiEcE65spd6w6KieC7YH/9O
+        7KIMWJOGo8MuL0N/hif+7In1wZ4nMYAxts4WI+bThg19A1gHVk+zbNn2Pdxi3smtBEqehnkKz3sUg
+        k27f5BUV881/+Qpx5UChOFiMXm9luIVQZi/+TgVqY8ogi4Oa/Q4lrsG/BS/5k2aBCiOEpB7lsIxGC
+        8Jzdbi9F6JmB7U+ZCCeU4u7wPa2bEo73kJeRXc2I+LSTTKq3IzhaQOjtTWzwJ7yX5yzQ5hKoD6zkY
+        mJBkWTzUqrfkYMvY/Mxmr/0GsRBj026jW33bZuhIsz/UVAymC4vFNHkcOzqpC5t6HCwCADz2oI5fM
+        /k80Alig==;
+Received: from hch by casper.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1m0crl-00Apu4-QR; Tue, 06 Jul 2021 04:39:31 +0000
+Date:   Tue, 6 Jul 2021 05:39:25 +0100
+From:   Christoph Hellwig <hch@infradead.org>
 To:     Jason Gunthorpe <jgg@nvidia.com>
-Cc:     Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>,
+Cc:     Leon Romanovsky <leon@kernel.org>,
+        Shameerali Kolothum Thodi 
+        <shameerali.kolothum.thodi@huawei.com>,
         Max Gurtovoy <mgurtovoy@nvidia.com>,
         "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
         "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
@@ -40,7 +45,7 @@ Cc:     Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>,
         "Wangzhou (B)" <wangzhou1@hisilicon.com>
 Subject: Re: [RFC v2 1/4] hisi-acc-vfio-pci: add new vfio_pci driver for
  HiSilicon ACC devices
-Message-ID: <YOPVOnRXPWGvloIT@unreal>
+Message-ID: <YOPefSD9x+mv5jO6@infradead.org>
 References: <20210702095849.1610-1-shameerali.kolothum.thodi@huawei.com>
  <20210702095849.1610-2-shameerali.kolothum.thodi@huawei.com>
  <YOFdTnlkcDZzw4b/@unreal>
@@ -53,40 +58,14 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 In-Reply-To: <20210705183247.GU4459@nvidia.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 On Mon, Jul 05, 2021 at 03:32:47PM -0300, Jason Gunthorpe wrote:
-> On Mon, Jul 05, 2021 at 09:27:37PM +0300, Leon Romanovsky wrote:
-> 
-> > > I think, in any case, it would be good to update the Documentation based on
-> > > which way we end up doing this.
-> > 
-> > The request to update Documentation can be seen as an example of
-> > choosing not-good API decisions. Expectation to see all drivers to
-> > use same callbacks with same vfio-core function calls sounds strange
-> > to me.
-> 
-> It is not vfio-core, it is vfio-pci-core. It is similar to how some of
-> the fops stuff works, eg the generic_file whatever functions everyone
-> puts in.
+> It would be improved a bit by making the ops struct mutable and
+> populating it at runtime like we do in RDMA. Then the PCI ops and
+> driver ops could be merged together without the repetition.
 
-It doesn't really matter if it is vfio-core or vfio-pci-core. This looks
-horrible and it is going to be repeated for every driver:
-
-+       .release        = vfio_pci_core_release,
-+       .ioctl          = vfio_pci_core_ioctl,
-+       .read           = vfio_pci_core_read,
-+       .write          = vfio_pci_core_write,
-+       .mmap           = vfio_pci_core_mmap,
-+       .request        = vfio_pci_core_request,
-+       .match          = vfio_pci_core_match,
-+       .reflck_attach  = vfio_pci_core_reflck_attach,
-+};
-
-At some point of time you will add new .XXX callback and will
-find yourself changing all drivers to have something like
-".XXX = vfio_pci_core_XXX,"
-
-Thanks
+No, that would be everything but an improvement.
