@@ -2,57 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E8BA43BD8C4
-	for <lists+kvm@lfdr.de>; Tue,  6 Jul 2021 16:44:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 046263BD8CC
+	for <lists+kvm@lfdr.de>; Tue,  6 Jul 2021 16:45:11 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231683AbhGFOqx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 6 Jul 2021 10:46:53 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:22088 "EHLO
+        id S232695AbhGFOrq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 6 Jul 2021 10:47:46 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:54299 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S233028AbhGFOqY (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 6 Jul 2021 10:46:24 -0400
+        by vger.kernel.org with ESMTP id S232572AbhGFOrb (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 6 Jul 2021 10:47:31 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1625582622;
+        s=mimecast20190719; t=1625582692;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=ns4TUY5RO+JX4wfj0vy5qifMdax9cNA6M3GBSIkoFEM=;
-        b=HnneoBsw1hbOu7cR8MKAE/HEa/XOF2tGI26kPrAnfyrB5EhV3UheRWnIbzDTeSHa9e1rxc
-        mPciaSkLD7EhOOZGW1YrfVr6DUXJ8RFOXY6y2JTSGnuAsMrNmR22nWeId/TIvcV49ULAZp
-        c5lIwbNnHXbdWgpfOlf4OUoMOoKJ1AI=
-Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
- [209.85.218.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-601-bsroWH6iMkqh0evOEhBMIg-1; Tue, 06 Jul 2021 10:43:40 -0400
-X-MC-Unique: bsroWH6iMkqh0evOEhBMIg-1
-Received: by mail-ej1-f70.google.com with SMTP id jl8-20020a17090775c8b02904db50c87233so1751057ejc.16
-        for <kvm@vger.kernel.org>; Tue, 06 Jul 2021 07:43:40 -0700 (PDT)
+        bh=RAANL4ig1HFdU+pXl5/Z5A9qLIXjsKRkhJhRaPBHzvA=;
+        b=Zo4HWaIBiLYRGZGB14J+8ar2zVQirS0gJGbCvt4U2q43c65dxMttCZwRFx89wAM/Qb2sz+
+        TvPKARDXcwYE+oQSlA/9V+SfTy2vf4RZv/3lIqZHdQHlr1PLY54OfB3QMdIAZxxa5To9Bt
+        HLOk5m1gmrHbB4Gu7eEXTqMVaAOCVdQ=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-542-9E7XSTP0NMuzu5xE7N0Erg-1; Tue, 06 Jul 2021 10:44:50 -0400
+X-MC-Unique: 9E7XSTP0NMuzu5xE7N0Erg-1
+Received: by mail-wr1-f70.google.com with SMTP id y5-20020adfe6c50000b02901258bf1d760so7242286wrm.14
+        for <kvm@vger.kernel.org>; Tue, 06 Jul 2021 07:44:50 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=ns4TUY5RO+JX4wfj0vy5qifMdax9cNA6M3GBSIkoFEM=;
-        b=E5w4s8LGJtgPBMmCOBiscmUAvsGrrC5EPzOlwct1Awwp3s2zKCCwEJAoUkMp0611H3
-         uXCoGPVv5rdVP7COG+t3xo88QNreOH8L1uyKa5w06vpzHmhSyKS+oJW3KUQS/Lvd6/n8
-         ggoIWK2RFb5h8oQ7U2d2SLsXj+w1wvsrpguDXCnB7obGbgXZI5qNDbUNqfuqYhxuyXOz
-         tJ6vYVUnUSfj03syaU8UwMH+0yVY2sQIbuMac1F8kt1T4R4k/6uDH/0OwX16ZLw4Y+Qk
-         U4OcaOtEp12JqFn1i8dAxy0kdtUnV5Oz7AMwjKFdWyZO9LCaE69QmiiiY0iQjwxKZ8ot
-         j9Nw==
-X-Gm-Message-State: AOAM53148fVbijnyy6X3KQXV25AilRgiYAIttlpj2dWID2vmtioELqyb
-        k4j1zo+IRyiq7/Oi/gU7V4THgnQJbop6x+CQFRkdhTE1Z5xi+H2/Yni5GNm9titCUCIyD/KZxfh
-        FABC8V6Fk+eul
-X-Received: by 2002:a05:6402:796:: with SMTP id d22mr23658830edy.64.1625582619820;
-        Tue, 06 Jul 2021 07:43:39 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzSSNMGGlg6GIilGiscCpEFKf2dSG/bfkm6NBsS+otzsw2jItjDuqovoJWdlrFftwo+iPPPAQ==
-X-Received: by 2002:a05:6402:796:: with SMTP id d22mr23658798edy.64.1625582619689;
-        Tue, 06 Jul 2021 07:43:39 -0700 (PDT)
+        bh=RAANL4ig1HFdU+pXl5/Z5A9qLIXjsKRkhJhRaPBHzvA=;
+        b=mGbi5sk6ZQRPWMFn8DJFQpusqh7Jf+w1nAAGVVXBoI0W91r4TdIRsrRPzDheSmsAkH
+         g5K4LZvqYeu7sY8dVejNJyaCTboMzdDQcLC4RLhTPH+7X3rDD6NEPP2+kbp6Pe4qoH33
+         wg2SRGRQbxdLs4aB9dYqOJI0IZRsS78+G4SYsPfKpv+4l0+WqQVVO8dlaF6VKCR0Tdbl
+         psu539pEKGwSMLkQyHFZdaXICvrQzwqBoZfkNmwjt6QpgHzG/1V68cNunAUGKBFBrmJa
+         rBbgRtx46Uo8mPp49hCILl7y9KrRbqEFx1FdnbCHK6F0EG6df/HNt36fsT0mvQuDROJO
+         Kglg==
+X-Gm-Message-State: AOAM531L+54mUL76/iGfqtBaqPwDMFdgEQC7YPIHxJfFouNzfTMrgEhS
+        C9HMM2Y7FMHAbTYiSewRSEnUMWLcNnWDHJQxJ43cQY84WLL6+Q0ql4bUHMCShVaY2znSzl0F1Ia
+        72soU8iGCJqfA
+X-Received: by 2002:a05:600c:ad3:: with SMTP id c19mr21226885wmr.69.1625582689519;
+        Tue, 06 Jul 2021 07:44:49 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJz0IeWtlA758g39xd1jxRJjtpW/ewYlmZtgGi39cOuioAM+potjWdZNbp6tHpknbjVwPqzAaw==
+X-Received: by 2002:a05:600c:ad3:: with SMTP id c19mr21226860wmr.69.1625582689359;
+        Tue, 06 Jul 2021 07:44:49 -0700 (PDT)
 Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id q5sm5807904ejc.117.2021.07.06.07.43.36
+        by smtp.gmail.com with ESMTPSA id z4sm15796600wrp.46.2021.07.06.07.44.46
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 06 Jul 2021 07:43:38 -0700 (PDT)
-Subject: Re: [RFC PATCH v2 56/69] KVM: VMX: Move setting of EPT MMU masks to
- common VT-x code
+        Tue, 06 Jul 2021 07:44:48 -0700 (PDT)
+Subject: Re: [RFC PATCH v2 57/69] KVM: VMX: Move register caching logic to
+ common code
 To:     isaku.yamahata@intel.com, Thomas Gleixner <tglx@linutronix.de>,
         Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
         "H . Peter Anvin" <hpa@zytor.com>,
@@ -66,14 +66,14 @@ To:     isaku.yamahata@intel.com, Thomas Gleixner <tglx@linutronix.de>,
 Cc:     isaku.yamahata@gmail.com,
         Sean Christopherson <sean.j.christopherson@intel.com>
 References: <cover.1625186503.git.isaku.yamahata@intel.com>
- <a1b2906ef5264c1a1bdaeca238da9d24028ab61d.1625186503.git.isaku.yamahata@intel.com>
+ <088bc637ef2c0f40f33a3f7c6a8ed0ed844ad111.1625186503.git.isaku.yamahata@intel.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <02dd301a-c15f-08d3-3f69-4cf501979a49@redhat.com>
-Date:   Tue, 6 Jul 2021 16:43:36 +0200
+Message-ID: <ba82dedb-9193-2497-b35d-4978af302c5e@redhat.com>
+Date:   Tue, 6 Jul 2021 16:44:46 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.11.0
 MIME-Version: 1.0
-In-Reply-To: <a1b2906ef5264c1a1bdaeca238da9d24028ab61d.1625186503.git.isaku.yamahata@intel.com>
+In-Reply-To: <088bc637ef2c0f40f33a3f7c6a8ed0ed844ad111.1625186503.git.isaku.yamahata@intel.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -84,44 +84,137 @@ X-Mailing-List: kvm@vger.kernel.org
 On 03/07/21 00:05, isaku.yamahata@intel.com wrote:
 > From: Sean Christopherson <sean.j.christopherson@intel.com>
 > 
+> Move the guts of vmx_cache_reg() to vt_cache_reg() in preparation for
+> reusing the bulk of the code for TDX, which can access guest state for
+> debug TDs.
+> 
+> Use kvm_x86_ops.cache_reg() in ept_update_paging_mode_cr0() rather than
+> trying to expose vt_cache_reg() to vmx.c, even though it means taking a
+> retpoline.  The code runs if and only if EPT is enabled but unrestricted
+> guest.  Only one generation of CPU, Nehalem, supports EPT but not
+> unrestricted guest, and disabling unrestricted guest without also
+> disabling EPT is, to put it bluntly, dumb.
+> 
 > Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
 > Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
 > ---
->   arch/x86/kvm/vmx/main.c | 4 ++++
->   arch/x86/kvm/vmx/vmx.c  | 4 ----
->   2 files changed, 4 insertions(+), 4 deletions(-)
+>   arch/x86/kvm/vmx/main.c | 37 +++++++++++++++++++++++++++++++++++-
+>   arch/x86/kvm/vmx/vmx.c  | 42 +----------------------------------------
+>   2 files changed, 37 insertions(+), 42 deletions(-)
 > 
 > diff --git a/arch/x86/kvm/vmx/main.c b/arch/x86/kvm/vmx/main.c
-> index c3fefa0e5a63..0d8d2a0a2979 100644
+> index 0d8d2a0a2979..b619615f77de 100644
 > --- a/arch/x86/kvm/vmx/main.c
 > +++ b/arch/x86/kvm/vmx/main.c
-> @@ -34,6 +34,10 @@ static __init int vt_hardware_setup(void)
->   	if (ret)
->   		return ret;
+> @@ -341,7 +341,42 @@ static void vt_sync_dirty_debug_regs(struct kvm_vcpu *vcpu)
 >   
-> +	if (enable_ept)
-> +		kvm_mmu_set_ept_masks(enable_ept_ad_bits,
-> +				      cpu_has_vmx_ept_execute_only());
+>   static void vt_cache_reg(struct kvm_vcpu *vcpu, enum kvm_reg reg)
+>   {
+> -	vmx_cache_reg(vcpu, reg);
+> +	unsigned long guest_owned_bits;
 > +
->   	return 0;
+> +	kvm_register_mark_available(vcpu, reg);
+> +
+> +	switch (reg) {
+> +	case VCPU_REGS_RSP:
+> +		vcpu->arch.regs[VCPU_REGS_RSP] = vmcs_readl(GUEST_RSP);
+> +		break;
+> +	case VCPU_REGS_RIP:
+> +		vcpu->arch.regs[VCPU_REGS_RIP] = vmcs_readl(GUEST_RIP);
+> +		break;
+> +	case VCPU_EXREG_PDPTR:
+> +		if (enable_ept)
+> +			ept_save_pdptrs(vcpu);
+> +		break;
+> +	case VCPU_EXREG_CR0:
+> +		guest_owned_bits = vcpu->arch.cr0_guest_owned_bits;
+> +
+> +		vcpu->arch.cr0 &= ~guest_owned_bits;
+> +		vcpu->arch.cr0 |= vmcs_readl(GUEST_CR0) & guest_owned_bits;
+> +		break;
+> +	case VCPU_EXREG_CR3:
+> +		if (is_unrestricted_guest(vcpu) ||
+> +		    (enable_ept && is_paging(vcpu)))
+> +			vcpu->arch.cr3 = vmcs_readl(GUEST_CR3);
+> +		break;
+> +	case VCPU_EXREG_CR4:
+> +		guest_owned_bits = vcpu->arch.cr4_guest_owned_bits;
+> +
+> +		vcpu->arch.cr4 &= ~guest_owned_bits;
+> +		vcpu->arch.cr4 |= vmcs_readl(GUEST_CR4) & guest_owned_bits;
+> +		break;
+> +	default:
+> +		KVM_BUG_ON(1, vcpu->kvm);
+> +		break;
+> +	}
 >   }
 >   
+>   static unsigned long vt_get_rflags(struct kvm_vcpu *vcpu)
 > diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> index 77b2b2cf76db..e315a46d1566 100644
+> index e315a46d1566..3c3bfc80d2bb 100644
 > --- a/arch/x86/kvm/vmx/vmx.c
 > +++ b/arch/x86/kvm/vmx/vmx.c
-> @@ -7644,10 +7644,6 @@ static __init int hardware_setup(void)
+> @@ -2326,46 +2326,6 @@ static int vmx_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+>   	return ret;
+>   }
 >   
->   	set_bit(0, vmx_vpid_bitmap); /* 0 is reserved for host */
->   
-> -	if (enable_ept)
-> -		kvm_mmu_set_ept_masks(enable_ept_ad_bits,
-> -				      cpu_has_vmx_ept_execute_only());
+> -static void vmx_cache_reg(struct kvm_vcpu *vcpu, enum kvm_reg reg)
+> -{
+> -	unsigned long guest_owned_bits;
 > -
->   	if (!enable_ept)
->   		ept_lpage_level = 0;
->   	else if (cpu_has_vmx_ept_1g_page())
+> -	kvm_register_mark_available(vcpu, reg);
+> -
+> -	switch (reg) {
+> -	case VCPU_REGS_RSP:
+> -		vcpu->arch.regs[VCPU_REGS_RSP] = vmcs_readl(GUEST_RSP);
+> -		break;
+> -	case VCPU_REGS_RIP:
+> -		vcpu->arch.regs[VCPU_REGS_RIP] = vmcs_readl(GUEST_RIP);
+> -		break;
+> -	case VCPU_EXREG_PDPTR:
+> -		if (enable_ept)
+> -			ept_save_pdptrs(vcpu);
+> -		break;
+> -	case VCPU_EXREG_CR0:
+> -		guest_owned_bits = vcpu->arch.cr0_guest_owned_bits;
+> -
+> -		vcpu->arch.cr0 &= ~guest_owned_bits;
+> -		vcpu->arch.cr0 |= vmcs_readl(GUEST_CR0) & guest_owned_bits;
+> -		break;
+> -	case VCPU_EXREG_CR3:
+> -		if (is_unrestricted_guest(vcpu) ||
+> -		    (enable_ept && is_paging(vcpu)))
+> -			vcpu->arch.cr3 = vmcs_readl(GUEST_CR3);
+> -		break;
+> -	case VCPU_EXREG_CR4:
+> -		guest_owned_bits = vcpu->arch.cr4_guest_owned_bits;
+> -
+> -		vcpu->arch.cr4 &= ~guest_owned_bits;
+> -		vcpu->arch.cr4 |= vmcs_readl(GUEST_CR4) & guest_owned_bits;
+> -		break;
+> -	default:
+> -		KVM_BUG_ON(1, vcpu->kvm);
+> -		break;
+> -	}
+> -}
+> -
+>   static __init int vmx_disabled_by_bios(void)
+>   {
+>   	return !boot_cpu_has(X86_FEATURE_MSR_IA32_FEAT_CTL) ||
+> @@ -3066,7 +3026,7 @@ static void ept_update_paging_mode_cr0(unsigned long *hw_cr0,
+>   	struct vcpu_vmx *vmx = to_vmx(vcpu);
+>   
+>   	if (!kvm_register_is_available(vcpu, VCPU_EXREG_CR3))
+> -		vmx_cache_reg(vcpu, VCPU_EXREG_CR3);
+> +		kvm_x86_ops.cache_reg(vcpu, VCPU_EXREG_CR3);
+>   	if (!(cr0 & X86_CR0_PG)) {
+>   		/* From paging/starting to nonpaging */
+>   		exec_controls_setbit(vmx, CPU_BASED_CR3_LOAD_EXITING |
 > 
 
-Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
+This shows the problem with #including vmx.c.  You should have a .h file 
+for both vmx.h and main.h (e.g. kvm_intel.h), so that here you can just 
+use vt_cache_reg.
+
+Paolo
 
