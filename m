@@ -2,215 +2,208 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D74823BC92C
-	for <lists+kvm@lfdr.de>; Tue,  6 Jul 2021 12:12:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 203503BC949
+	for <lists+kvm@lfdr.de>; Tue,  6 Jul 2021 12:15:05 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231344AbhGFKPD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 6 Jul 2021 06:15:03 -0400
-Received: from forward3-smtp.messagingengine.com ([66.111.4.237]:42519 "EHLO
-        forward3-smtp.messagingengine.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231299AbhGFKPC (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 6 Jul 2021 06:15:02 -0400
-Received: from compute2.internal (compute2.nyi.internal [10.202.2.42])
-        by mailforward.nyi.internal (Postfix) with ESMTP id 555C21940619;
-        Tue,  6 Jul 2021 06:12:23 -0400 (EDT)
-Received: from mailfrontend2 ([10.202.2.163])
-  by compute2.internal (MEProxy); Tue, 06 Jul 2021 06:12:23 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-        messagingengine.com; h=cc:content-transfer-encoding:date:from
-        :in-reply-to:message-id:mime-version:references:subject:to
-        :x-me-proxy:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=
-        fm3; bh=50e02u+t8XVaFNF+IXucFs9YC7xNugTJ9Gt13UVtu6w=; b=Wm7bGfgV
-        krUTAQV3tlyTyGAi3IO9PiZtgFDbRuL+KEqAoEF4Ninb/SFvZkaIzJ3VdaSw0Sve
-        1J3b8Jgl68QFtDW6zl9I6UQ4EXFQpZYBA6nshmnl99+qngyzVj1L5F/0rN1tXN1n
-        n/I1Vyi8ymuxmrsn7LhIO8LAwb7iJfR6oL72UOHJHdPVGtB4xp0St50nPbfePiWG
-        sgh+x3oQxf+Yc2j2mSiWe5pv0svQ8WYi5rsgfbhJbfEn6c95p46n2ZnIGflOIo5j
-        /nVAJFNbxHPPVrAIcM/fBlEtafE8XA3Gj+wvdW8rcYH41oIvB19OAJ1EFsjsGSRr
-        HIXwCMiAvTx81g==
-X-ME-Sender: <xms:hSzkYFjYv9assFpkZ24hJDI2aLX9yZsvC2_wcxsPyWUQYIJwPR4Vng>
-    <xme:hSzkYKBJJNWk6xbwPaQoISGPZxzYIP8erp0-0v4yiz3wgswLkjZo64BS6UprP8Ld0
-    RnlMW7zzlBy5CK_AnQ>
-X-ME-Received: <xmr:hSzkYFFxefHIr9l16NyhF7Vr9mWDp0MIXyFUJo6iV6RbatpjNjKPqtuAhaoMMSwITScYyziyVcqg_0BJooMs5xTS-7x__8I69QbyzGlUHEM>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeduledrfeejiedgvddvucetufdoteggodetrfdotf
-    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
-    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
-    cujfgurhephffvufffkffojghfggfgsedtkeertdertddtnecuhfhrohhmpeffrghvihgu
-    ucfgughmohhnughsohhnuceouggrvhhiugdrvggumhhonhgushhonhesohhrrggtlhgvrd
-    gtohhmqeenucggtffrrghtthgvrhhnpedufeetjefgfefhtdejhfehtdfftefhteekhefg
-    leehfffhiefhgeelgfejtdehkeenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmh
-    epmhgrihhlfhhrohhmpegurghvihgurdgvughmohhnughsohhnsehorhgrtghlvgdrtgho
-    mh
-X-ME-Proxy: <xmx:hSzkYKRxE-ZV2IxOgpte1To-1X0YDeVsX-bn8AG4Z6yDOl5L7BovQA>
-    <xmx:hSzkYCx_1KUYkvOKl1oLnI8Ujwgl06oioNiE1q9FTkmJ7MNkafAsYA>
-    <xmx:hSzkYA5KMms0lWzGjAmFSSeNpGnTTB6b7Vv4yBWe_webuJM5rtQYww>
-    <xmx:hyzkYMqepm5yhi9AtFyg8nD9xz6EYX8ovrD_yyDEB_8yUk8J02shZ9qXC5s>
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Tue,
- 6 Jul 2021 06:12:20 -0400 (EDT)
-Received: from localhost (disaster-area.hh.sledj.net [local])
-        by disaster-area.hh.sledj.net (OpenSMTPD) with ESMTPA id e125f3ea;
-        Tue, 6 Jul 2021 10:12:07 +0000 (UTC)
-From:   David Edmondson <david.edmondson@oracle.com>
-To:     linux-kernel@vger.kernel.org
-Cc:     Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Borislav Petkov <bp@alien8.de>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        David Matlack <dmatlack@google.com>,
-        Thomas Gleixner <tglx@linutronix.de>, x86@kernel.org,
-        Ingo Molnar <mingo@redhat.com>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        David Edmondson <david.edmondson@oracle.com>,
-        Joao Martins <joao.m.martins@oracle.com>
-Subject: [PATCH v2 2/2] KVM: x86: On emulation failure, convey the exit reason to userspace
-Date:   Tue,  6 Jul 2021 11:12:07 +0100
-Message-Id: <20210706101207.2993686-3-david.edmondson@oracle.com>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20210706101207.2993686-1-david.edmondson@oracle.com>
-References: <20210706101207.2993686-1-david.edmondson@oracle.com>
+        id S231235AbhGFKRl (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 6 Jul 2021 06:17:41 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:46146 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S231225AbhGFKRl (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 6 Jul 2021 06:17:41 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1625566502;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=EbtKyQLHeXyAf7XTeEVWB1Q3nM607AfNrt9n7XkxYzw=;
+        b=LnrxZknS5z6ZvGq4UBhhvPzlWnZrbpIGIVSE7WhefxX7iX8SPhiyC0QO8ENGSR2ROAkqL8
+        PozpkywowT4Tlu9PfZ/o0WUMC5Uh90TyGXBzft26n/fTaw6vL2Nfkcy00s6ZdgaBt2LQUI
+        OaVRu6BeRN76s2sFNkj7g6YATHVPfC0=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-441-McPLJZCxOI-QDg_bHt4FDw-1; Tue, 06 Jul 2021 06:15:00 -0400
+X-MC-Unique: McPLJZCxOI-QDg_bHt4FDw-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id ECA2F9126B;
+        Tue,  6 Jul 2021 10:14:56 +0000 (UTC)
+Received: from localhost (ovpn-115-23.ams2.redhat.com [10.36.115.23])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 0F76610074F8;
+        Tue,  6 Jul 2021 10:14:51 +0000 (UTC)
+Date:   Tue, 6 Jul 2021 11:14:51 +0100
+From:   Stefan Hajnoczi <stefanha@redhat.com>
+To:     Jason Wang <jasowang@redhat.com>
+Cc:     Yongji Xie <xieyongji@bytedance.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Stefano Garzarella <sgarzare@redhat.com>,
+        Parav Pandit <parav@nvidia.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Christian Brauner <christian.brauner@canonical.com>,
+        Randy Dunlap <rdunlap@infradead.org>,
+        Matthew Wilcox <willy@infradead.org>,
+        Al Viro <viro@zeniv.linux.org.uk>,
+        Jens Axboe <axboe@kernel.dk>, bcrl@kvack.org,
+        Jonathan Corbet <corbet@lwn.net>,
+        Mika =?iso-8859-1?Q?Penttil=E4?= <mika.penttila@nextfour.com>,
+        Dan Carpenter <dan.carpenter@oracle.com>, joro@8bytes.org,
+        Greg KH <gregkh@linuxfoundation.org>, songmuchun@bytedance.com,
+        virtualization <virtualization@lists.linux-foundation.org>,
+        netdev@vger.kernel.org, kvm <kvm@vger.kernel.org>,
+        linux-fsdevel@vger.kernel.org, iommu@lists.linux-foundation.org,
+        linux-kernel <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH v8 10/10] Documentation: Add documentation for VDUSE
+Message-ID: <YOQtG3gDOhHDO5CQ@stefanha-x1.localdomain>
+References: <20210615141331.407-11-xieyongji@bytedance.com>
+ <YNSCH6l31zwPxBjL@stefanha-x1.localdomain>
+ <CACycT3uxnQmXWsgmNVxQtiRhz1UXXTAJFY3OiAJqokbJH6ifMA@mail.gmail.com>
+ <YNxCDpM3bO5cPjqi@stefanha-x1.localdomain>
+ <CACycT3taKhf1cWp3Jd0aSVekAZvpbR-_fkyPLQ=B+jZBB5H=8Q@mail.gmail.com>
+ <YN3ABqCMLQf7ejOm@stefanha-x1.localdomain>
+ <CACycT3vo-diHgTSLw_FS2E+5ia5VjihE3qw7JmZR7JT55P-wQA@mail.gmail.com>
+ <8320d26d-6637-85c6-8773-49553dfa502d@redhat.com>
+ <YOL/9mxkJaokKDHc@stefanha-x1.localdomain>
+ <5b5107fa-3b32-8a3b-720d-eee6b2a84ace@redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: multipart/signed; micalg=pgp-sha256;
+        protocol="application/pgp-signature"; boundary="bGDTE9bI8S9vsB/T"
+Content-Disposition: inline
+In-Reply-To: <5b5107fa-3b32-8a3b-720d-eee6b2a84ace@redhat.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Should instruction emulation fail, include the VM exit reason in the
-emulation_failure data passed to userspace, in order that the VMM can
-report it as a debugging aid when describing the failure.
 
-Suggested-by: Joao Martins <joao.m.martins@oracle.com>
-Signed-off-by: David Edmondson <david.edmondson@oracle.com>
----
- arch/x86/include/asm/kvm_host.h |  2 ++
- arch/x86/kvm/vmx/vmx.c          |  5 +----
- arch/x86/kvm/x86.c              | 22 +++++++++++++---------
- include/uapi/linux/kvm.h        |  7 +++++++
- 4 files changed, 23 insertions(+), 13 deletions(-)
+--bGDTE9bI8S9vsB/T
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index 0ee580c68839..2e411e26e40e 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -1630,6 +1630,8 @@ extern u64 kvm_mce_cap_supported;
- int kvm_emulate_instruction(struct kvm_vcpu *vcpu, int emulation_type);
- int kvm_emulate_instruction_from_buffer(struct kvm_vcpu *vcpu,
- 					void *insn, int insn_len);
-+void kvm_prepare_emulation_failure_exit(struct kvm_vcpu *vcpu,
-+					bool instruction_bytes);
- 
- void kvm_enable_efer_bits(u64);
- bool kvm_valid_efer(struct kvm_vcpu *vcpu, u64 efer);
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index d9a4d6cf6406..4fb240204c2c 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -5367,10 +5367,7 @@ static int handle_invalid_guest_state(struct kvm_vcpu *vcpu)
- 
- 		if (vmx->emulation_required && !vmx->rmode.vm86_active &&
- 		    vcpu->arch.exception.pending) {
--			vcpu->run->exit_reason = KVM_EXIT_INTERNAL_ERROR;
--			vcpu->run->internal.suberror =
--						KVM_INTERNAL_ERROR_EMULATION;
--			vcpu->run->internal.ndata = 0;
-+			kvm_prepare_emulation_failure_exit(vcpu, false);
- 			return 0;
- 		}
- 
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 17468d983fbd..bf30b445b65d 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -7452,7 +7452,8 @@ void kvm_inject_realmode_interrupt(struct kvm_vcpu *vcpu, int irq, int inc_eip)
- }
- EXPORT_SYMBOL_GPL(kvm_inject_realmode_interrupt);
- 
--static void prepare_emulation_failure_exit(struct kvm_vcpu *vcpu)
-+void kvm_prepare_emulation_failure_exit(struct kvm_vcpu *vcpu,
-+					bool instruction_bytes)
- {
- 	struct x86_emulate_ctxt *ctxt = vcpu->arch.emulate_ctxt;
- 	u32 insn_size = ctxt->fetch.end - ctxt->fetch.data;
-@@ -7463,7 +7464,7 @@ static void prepare_emulation_failure_exit(struct kvm_vcpu *vcpu)
- 	run->emulation_failure.ndata = 0;
- 	run->emulation_failure.flags = 0;
- 
--	if (insn_size) {
-+	if (insn_size && instruction_bytes) {
- 		run->emulation_failure.ndata = 3;
- 		run->emulation_failure.flags |=
- 			KVM_INTERNAL_ERROR_EMULATION_FLAG_INSTRUCTION_BYTES;
-@@ -7473,7 +7474,14 @@ static void prepare_emulation_failure_exit(struct kvm_vcpu *vcpu)
- 		memcpy(run->emulation_failure.insn_bytes,
- 		       ctxt->fetch.data, insn_size);
- 	}
-+
-+	run->emulation_failure.ndata = 4;
-+	run->emulation_failure.flags |=
-+		KVM_INTERNAL_ERROR_EMULATION_FLAG_EXIT_REASON;
-+	run->emulation_failure.exit_reason =
-+		static_call(kvm_x86_get_exit_reason)(vcpu);
- }
-+EXPORT_SYMBOL_GPL(kvm_prepare_emulation_failure_exit);
- 
- static int handle_emulation_failure(struct kvm_vcpu *vcpu, int emulation_type)
- {
-@@ -7489,16 +7497,14 @@ static int handle_emulation_failure(struct kvm_vcpu *vcpu, int emulation_type)
- 
- 	if (kvm->arch.exit_on_emulation_error ||
- 	    (emulation_type & EMULTYPE_SKIP)) {
--		prepare_emulation_failure_exit(vcpu);
-+		kvm_prepare_emulation_failure_exit(vcpu, true);
- 		return 0;
- 	}
- 
- 	kvm_queue_exception(vcpu, UD_VECTOR);
- 
- 	if (!is_guest_mode(vcpu) && static_call(kvm_x86_get_cpl)(vcpu) == 0) {
--		vcpu->run->exit_reason = KVM_EXIT_INTERNAL_ERROR;
--		vcpu->run->internal.suberror = KVM_INTERNAL_ERROR_EMULATION;
--		vcpu->run->internal.ndata = 0;
-+		kvm_prepare_emulation_failure_exit(vcpu, false);
- 		return 0;
- 	}
- 
-@@ -12092,9 +12098,7 @@ int kvm_handle_memory_failure(struct kvm_vcpu *vcpu, int r,
- 	 * doesn't seem to be a real use-case behind such requests, just return
- 	 * KVM_EXIT_INTERNAL_ERROR for now.
- 	 */
--	vcpu->run->exit_reason = KVM_EXIT_INTERNAL_ERROR;
--	vcpu->run->internal.suberror = KVM_INTERNAL_ERROR_EMULATION;
--	vcpu->run->internal.ndata = 0;
-+	kvm_prepare_emulation_failure_exit(vcpu, false);
- 
- 	return 0;
- }
-diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-index d9e4aabcb31a..863195371272 100644
---- a/include/uapi/linux/kvm.h
-+++ b/include/uapi/linux/kvm.h
-@@ -282,6 +282,7 @@ struct kvm_xen_exit {
- 
- /* Flags that describe what fields in emulation_failure hold valid data. */
- #define KVM_INTERNAL_ERROR_EMULATION_FLAG_INSTRUCTION_BYTES (1ULL << 0)
-+#define KVM_INTERNAL_ERROR_EMULATION_FLAG_EXIT_REASON       (1ULL << 1)
- 
- /* for KVM_RUN, returned by mmap(vcpu_fd, offset=0) */
- struct kvm_run {
-@@ -404,6 +405,12 @@ struct kvm_run {
- 			__u64 flags;
- 			__u8  insn_size;
- 			__u8  insn_bytes[15];
-+			/*
-+			 * The "exit reason" extracted from the
-+			 * VMCS/VMCB that was the cause of attempted
-+			 * emulation.
-+			 */
-+			__u64 exit_reason;
- 		} emulation_failure;
- 		/* KVM_EXIT_OSI */
- 		struct {
--- 
-2.30.2
+On Tue, Jul 06, 2021 at 10:34:33AM +0800, Jason Wang wrote:
+>=20
+> =E5=9C=A8 2021/7/5 =E4=B8=8B=E5=8D=888:49, Stefan Hajnoczi =E5=86=99=E9=
+=81=93:
+> > On Mon, Jul 05, 2021 at 11:36:15AM +0800, Jason Wang wrote:
+> > > =E5=9C=A8 2021/7/4 =E4=B8=8B=E5=8D=885:49, Yongji Xie =E5=86=99=E9=81=
+=93:
+> > > > > > OK, I get you now. Since the VIRTIO specification says "Device
+> > > > > > configuration space is generally used for rarely-changing or
+> > > > > > initialization-time parameters". I assume the VDUSE_DEV_SET_CON=
+FIG
+> > > > > > ioctl should not be called frequently.
+> > > > > The spec uses MUST and other terms to define the precise requirem=
+ents.
+> > > > > Here the language (especially the word "generally") is weaker and=
+ means
+> > > > > there may be exceptions.
+> > > > >=20
+> > > > > Another type of access that doesn't work with the VDUSE_DEV_SET_C=
+ONFIG
+> > > > > approach is reads that have side-effects. For example, imagine a =
+field
+> > > > > containing an error code if the device encounters a problem unrel=
+ated to
+> > > > > a specific virtqueue request. Reading from this field resets the =
+error
+> > > > > code to 0, saving the driver an extra configuration space write a=
+ccess
+> > > > > and possibly race conditions. It isn't possible to implement those
+> > > > > semantics suing VDUSE_DEV_SET_CONFIG. It's another corner case, b=
+ut it
+> > > > > makes me think that the interface does not allow full VIRTIO sema=
+ntics.
+> > >=20
+> > > Note that though you're correct, my understanding is that config spac=
+e is
+> > > not suitable for this kind of error propagating. And it would be very=
+ hard
+> > > to implement such kind of semantic in some transports.=C2=A0 Virtqueu=
+e should be
+> > > much better. As Yong Ji quoted, the config space is used for
+> > > "rarely-changing or intialization-time parameters".
+> > >=20
+> > >=20
+> > > > Agreed. I will use VDUSE_DEV_GET_CONFIG in the next version. And to
+> > > > handle the message failure, I'm going to add a return value to
+> > > > virtio_config_ops.get() and virtio_cread_* API so that the error can
+> > > > be propagated to the virtio device driver. Then the virtio-blk devi=
+ce
+> > > > driver can be modified to handle that.
+> > > >=20
+> > > > Jason and Stefan, what do you think of this way?
+> > Why does VDUSE_DEV_GET_CONFIG need to support an error return value?
+> >=20
+> > The VIRTIO spec provides no way for the device to report errors from
+> > config space accesses.
+> >=20
+> > The QEMU virtio-pci implementation returns -1 from invalid
+> > virtio_config_read*() and silently discards virtio_config_write*()
+> > accesses.
+> >=20
+> > VDUSE can take the same approach with
+> > VDUSE_DEV_GET_CONFIG/VDUSE_DEV_SET_CONFIG.
+> >=20
+> > > I'd like to stick to the current assumption thich get_config won't fa=
+il.
+> > > That is to say,
+> > >=20
+> > > 1) maintain a config in the kernel, make sure the config space read c=
+an
+> > > always succeed
+> > > 2) introduce an ioctl for the vduse usersapce to update the config sp=
+ace.
+> > > 3) we can synchronize with the vduse userspace during set_config
+> > >=20
+> > > Does this work?
+> > I noticed that caching is also allowed by the vhost-user protocol
+> > messages (QEMU's docs/interop/vhost-user.rst), but the device doesn't
+> > know whether or not caching is in effect. The interface you outlined
+> > above requires caching.
+> >=20
+> > Is there a reason why the host kernel vDPA code needs to cache the
+> > configuration space?
+>=20
+>=20
+> Because:
+>=20
+> 1) Kernel can not wait forever in get_config(), this is the major differe=
+nce
+> with vhost-user.
+
+virtio_cread() can sleep:
+
+  #define virtio_cread(vdev, structname, member, ptr)                     \
+          do {                                                            \
+                  typeof(((structname*)0)->member) virtio_cread_v;        \
+                                                                          \
+                  might_sleep();                                          \
+                  ^^^^^^^^^^^^^^
+
+Which code path cannot sleep?
+
+> 2) Stick to the current assumption that virtio_cread() should always
+> succeed.
+
+That can be done by reading -1 (like QEMU does) when the read fails.
+
+Stefan
+
+--bGDTE9bI8S9vsB/T
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAmDkLRoACgkQnKSrs4Gr
+c8g5rQf/dEn1vwdw9gb5jvAShRGnaCqMAiYL94qRkH44VSSYFNUpuWuei42cVzk5
+PXleyCcoPY4o1g1xBwL6ddvi0qziAyjlTDw4BkflDiLyDqRk4cryoGSdxBe9mNoq
+mOiwWONGbv2EHefjW2PLq5MpuVf2XYEJlSyIpJPSfEpaClH8tF16GhcHofMePvnS
+d4etvc/M6x7ZiX8mV+lTVK/+5VRYPpcBTmLLkHObS0Dk4utsosMBRj0n+26ZsLCu
+O7Hifgw0DrW0IQCYB5GNnKNYYPdeSNvXv7I6mqaI9W/xLPsP5Ze2IPDITeMmAtWS
+ppMaw40ExhBaIt4ViPFG//Va5Me2rQ==
+=TOAU
+-----END PGP SIGNATURE-----
+
+--bGDTE9bI8S9vsB/T--
 
