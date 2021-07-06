@@ -2,200 +2,285 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A01893BDA4C
-	for <lists+kvm@lfdr.de>; Tue,  6 Jul 2021 17:35:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 483893BDAC5
+	for <lists+kvm@lfdr.de>; Tue,  6 Jul 2021 17:56:03 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232559AbhGFPif (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 6 Jul 2021 11:38:35 -0400
-Received: from mx0a-00069f02.pphosted.com ([205.220.165.32]:37534 "EHLO
-        mx0a-00069f02.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232683AbhGFPib (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 6 Jul 2021 11:38:31 -0400
-Received: from pps.filterd (m0246617.ppops.net [127.0.0.1])
-        by mx0b-00069f02.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 166FWJdf007221;
-        Tue, 6 Jul 2021 15:35:45 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
- references : from : message-id : date : in-reply-to : content-type :
- content-transfer-encoding : mime-version; s=corp-2020-01-29;
- bh=r4AiR5xoOb6sRA5+WPOgMSQNGIo492iKgBnGCJntJ3o=;
- b=vRv6vC9oXX2ERernF/lXTIYE06RTMoeC9AIABnftd/bTFRmnKD43wypeVbIqSMy0dhAl
- 0gT5fI9LCcHyVvU0puzO3SIv/RbCn4pdSuIINIXvtw2OkmKYeQtmmfaMmJm61UT+C60C
- 5LRncT4D4exZ/jSRMVCy9KtHndE3iaTaKpz9kwvgN3Zu/yJvJZ7hmCR/xS3ch80aKRsw
- CJyNWcjSG3DHLp3SP0d8dFK4eTveEDFwEOdIPOlfDHbuZdPZAq8KUEynbYONcnwtMChP
- 3p/bBeEA3DBlAuIN5ZfRjGciZwNS4DMjg5LLkJ97eRYX6ar0mJknQ601oKFpVcqwSLD8 yA== 
-Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
-        by mx0b-00069f02.pphosted.com with ESMTP id 39m3mha2rv-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 06 Jul 2021 15:35:45 +0000
-Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
-        by aserp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 166FUXYe127235;
-        Tue, 6 Jul 2021 15:35:44 GMT
-Received: from nam11-dm6-obe.outbound.protection.outlook.com (mail-dm6nam11lp2173.outbound.protection.outlook.com [104.47.57.173])
-        by aserp3030.oracle.com with ESMTP id 39jdxhceth-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 06 Jul 2021 15:35:44 +0000
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=T5y9xRIiLfAh+LHsDu5NV6XiovyZ9ai0AhKwoKDVFLWhYNlO9/ivN1xvW+4gKEaJ/YPHz20Berqce/lWQJi6pZGLGW0DyfXvOrqhmZxJy62YX0AIHPM/jzUdOSHK7RdD1sR046rOuIdXGaCnkSTJPRmxoH8CjIlmXSvPFjcpbZS8bL07R6tsLLdY/ZLPR3Zi21E1f/TXu5RUmfFiOL1IVH7ZfqvID5bDdWsa8uexODCk1jl67uqJiM+Ym9ULLeGMDm9L6XEOCq9x/iP2UBapfj8w/BrBAi9t/IhX1m/Y2wep05YX6+0m6WvAAwcpGaCMPjfvwE5ph79KgNGW2YhlIQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=r4AiR5xoOb6sRA5+WPOgMSQNGIo492iKgBnGCJntJ3o=;
- b=TaeSFPJcNHlRfff18o9wSjKdC8Oavbm7h3F3NFyDHSuQYngHIUtt9fflmwzwswAvTlVIhPeF68JHP1BCZ0BdVyWwFWJjKmG0JsoBSIqL/TPvM9/uTolVHhmN8pSjqgDugdG4NGEjawXF66AgSktH0zRmOocysOLOtJDtUUM/IMxwViS+mf/QGKDNbTFzSmn936VBdDptwcb0m+ZObwH0n6EpWKu8V9ppGx54OxJLByY/qQWvrMWwizp6S0Af25XoWZHHqngUeGEyrlel+kDzXjSuC15lfjKuIlzbqB15EAzlmI2wAOnHvHp5tPtZEesoiqaqyDKKX3Jel8tFUqFG3A==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
- dkim=pass header.d=oracle.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=r4AiR5xoOb6sRA5+WPOgMSQNGIo492iKgBnGCJntJ3o=;
- b=J4GWCrt6mz3WeQhIXeyaswH+IIbYkOgvbp/iCZ3j/0f1Wvj/7ADKJT+1ERK2iA1NdDNe51U6AUAJsvkgqxlD3LiH/Y5kSWn+NAHPcYBzLp0kbgr1hYXyfEx4cSFtrsuikbUAMUyqOClM7ZZyfbYVVkpd6vh+h7Pvi30QrDN2pgg=
-Authentication-Results: oracle.com; dkim=none (message not signed)
- header.d=none;oracle.com; dmarc=none action=none header.from=oracle.com;
-Received: from CH2PR10MB4391.namprd10.prod.outlook.com (2603:10b6:610:7d::11)
- by CH0PR10MB5498.namprd10.prod.outlook.com (2603:10b6:610:ed::5) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4308.20; Tue, 6 Jul
- 2021 15:35:43 +0000
-Received: from CH2PR10MB4391.namprd10.prod.outlook.com
- ([fe80::b895:ab48:fa35:3f15]) by CH2PR10MB4391.namprd10.prod.outlook.com
- ([fe80::b895:ab48:fa35:3f15%4]) with mapi id 15.20.4287.033; Tue, 6 Jul 2021
- 15:35:43 +0000
-Subject: Re: [PATCH] KVM: arm64: Disabling disabled PMU counters wastes a lot
- of time
-To:     Marc Zyngier <maz@kernel.org>
-Cc:     will@kernel.org, catalin.marinas@arm.com, alexandru.elisei@arm.com,
-        james.morse@arm.com, suzuki.poulose@arm.com,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        kvm@vger.kernel.org, konrad.wilk@oracle.com,
-        alexandre.chartre@oracle.com
-References: <20210628161925.401343-1-alexandre.chartre@oracle.com>
- <878s2tavks.wl-maz@kernel.org>
- <e3843c2c-e20a-ef58-c795-1ba8f1d91ff6@oracle.com>
- <ed86299d-c0d4-f73e-ff7d-86eefd2de650@oracle.com>
- <87y2aj7av5.wl-maz@kernel.org>
-From:   Alexandre Chartre <alexandre.chartre@oracle.com>
-Message-ID: <cfe6b72b-9e87-8c24-b54b-a315d929fe0b@oracle.com>
-Date:   Tue, 6 Jul 2021 17:35:37 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.10.0
-In-Reply-To: <87y2aj7av5.wl-maz@kernel.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: LO2P123CA0094.GBRP123.PROD.OUTLOOK.COM
- (2603:10a6:600:139::9) To CH2PR10MB4391.namprd10.prod.outlook.com
- (2603:10b6:610:7d::11)
+        id S230258AbhGFP6k (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 6 Jul 2021 11:58:40 -0400
+Received: from metis.ext.pengutronix.de ([85.220.165.71]:33225 "EHLO
+        metis.ext.pengutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230219AbhGFP6k (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 6 Jul 2021 11:58:40 -0400
+Received: from ptx.hi.pengutronix.de ([2001:67c:670:100:1d::c0])
+        by metis.ext.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+        (Exim 4.92)
+        (envelope-from <ukl@pengutronix.de>)
+        id 1m0nLI-0007mL-3h; Tue, 06 Jul 2021 17:50:36 +0200
+Received: from ukl by ptx.hi.pengutronix.de with local (Exim 4.92)
+        (envelope-from <ukl@pengutronix.de>)
+        id 1m0nL5-0005Si-VW; Tue, 06 Jul 2021 17:50:23 +0200
+From:   =?UTF-8?q?Uwe=20Kleine-K=C3=B6nig?= 
+        <u.kleine-koenig@pengutronix.de>
+To:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Cc:     kernel@pengutronix.de, Cornelia Huck <cohuck@redhat.com>,
+        linux-kernel@vger.kernel.org, Russell King <linux@armlinux.org.uk>,
+        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+        "James E.J. Bottomley" <James.Bottomley@HansenPartnership.com>,
+        Helge Deller <deller@gmx.de>,
+        Geoff Levand <geoff@infradead.org>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        Paul Mackerras <paulus@samba.org>,
+        "Rafael J. Wysocki" <rjw@rjwysocki.net>,
+        Len Brown <lenb@kernel.org>,
+        William Breathitt Gray <vilhelm.gray@gmail.com>,
+        =?UTF-8?q?Rafa=C5=82=20Mi=C5=82ecki?= <zajec5@gmail.com>,
+        Maxime Ripard <mripard@kernel.org>,
+        Chen-Yu Tsai <wens@csie.org>,
+        Jernej Skrabec <jernej.skrabec@gmail.com>,
+        Alison Schofield <alison.schofield@intel.com>,
+        Vishal Verma <vishal.l.verma@intel.com>,
+        Ira Weiny <ira.weiny@intel.com>,
+        Ben Widawsky <ben.widawsky@intel.com>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Dave Jiang <dave.jiang@intel.com>,
+        Vinod Koul <vkoul@kernel.org>,
+        Stefan Richter <stefanr@s5r6.in-berlin.de>,
+        Sudeep Holla <sudeep.holla@arm.com>,
+        Cristian Marussi <cristian.marussi@arm.com>,
+        Wu Hao <hao.wu@intel.com>, Tom Rix <trix@redhat.com>,
+        Moritz Fischer <mdf@kernel.org>,
+        Jiri Kosina <jikos@kernel.org>,
+        Benjamin Tissoires <benjamin.tissoires@redhat.com>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        "K. Y. Srinivasan" <kys@microsoft.com>,
+        Haiyang Zhang <haiyangz@microsoft.com>,
+        Stephen Hemminger <sthemmin@microsoft.com>,
+        Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>,
+        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+        Wolfram Sang <wsa@kernel.org>,
+        Alexandre Belloni <alexandre.belloni@bootlin.com>,
+        Dmitry Torokhov <dmitry.torokhov@gmail.com>,
+        Samuel Iglesias Gonsalvez <siglesias@igalia.com>,
+        Jens Taprogge <jens.taprogge@taprogge.org>,
+        Johannes Thumshirn <morbidrsa@gmail.com>,
+        Mauro Carvalho Chehab <mchehab@kernel.org>,
+        Maxim Levitsky <maximlevitsky@gmail.com>,
+        Alex Dubov <oakad@yahoo.com>,
+        Ulf Hansson <ulf.hansson@linaro.org>,
+        Lee Jones <lee.jones@linaro.org>,
+        Tomas Winkler <tomas.winkler@intel.com>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Jakub Kicinski <kuba@kernel.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jon Mason <jdmason@kudzu.us>, Allen Hubbe <allenbh@gmail.com>,
+        Kishon Vijay Abraham I <kishon@ti.com>,
+        Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>,
+        =?UTF-8?q?Krzysztof=20Wilczy=C5=84ski?= <kw@linux.com>,
+        Bjorn Helgaas <bhelgaas@google.com>,
+        Dominik Brodowski <linux@dominikbrodowski.net>,
+        Maximilian Luz <luzmaximilian@gmail.com>,
+        Hans de Goede <hdegoede@redhat.com>,
+        Mark Gross <mgross@linux.intel.com>,
+        Matt Porter <mporter@kernel.crashing.org>,
+        Alexandre Bounine <alex.bou9@gmail.com>,
+        Ohad Ben-Cohen <ohad@wizery.com>,
+        Bjorn Andersson <bjorn.andersson@linaro.org>,
+        Mathieu Poirier <mathieu.poirier@linaro.org>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Thorsten Scherer <t.scherer@eckelmann.de>,
+        Srinivas Kandagatla <srinivas.kandagatla@linaro.org>,
+        Andy Gross <agross@kernel.org>,
+        Mark Brown <broonie@kernel.org>,
+        Stephen Boyd <sboyd@kernel.org>, Michael Buesch <m@bues.ch>,
+        Sven Van Asbroeck <TheSven73@gmail.com>,
+        Johan Hovold <johan@kernel.org>, Alex Elder <elder@kernel.org>,
+        Andreas Noever <andreas.noever@gmail.com>,
+        Michael Jamet <michael.jamet@intel.com>,
+        Mika Westerberg <mika.westerberg@linux.intel.com>,
+        Yehezkel Bernat <YehezkelShB@gmail.com>,
+        Rob Herring <robh@kernel.org>,
+        Jiri Slaby <jirislaby@kernel.org>,
+        Heikki Krogerus <heikki.krogerus@linux.intel.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Kirti Wankhede <kwankhede@nvidia.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Martyn Welch <martyn@welchs.me.uk>,
+        Manohar Vanga <manohar.vanga@gmail.com>,
+        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
+        Juergen Gross <jgross@suse.com>,
+        Stefano Stabellini <sstabellini@kernel.org>,
+        Johannes Berg <johannes@sipsolutions.net>,
+        Jaroslav Kysela <perex@perex.cz>,
+        Takashi Iwai <tiwai@suse.com>, Marc Zyngier <maz@kernel.org>,
+        Tyrel Datwyler <tyreld@linux.ibm.com>,
+        Vladimir Zapolskiy <vz@mleia.com>,
+        Samuel Holland <samuel@sholland.org>,
+        Qinglang Miao <miaoqinglang@huawei.com>,
+        Alexey Kardashevskiy <aik@ozlabs.ru>,
+        Kai-Heng Feng <kai.heng.feng@canonical.com>,
+        Joey Pabalan <jpabalanb@gmail.com>,
+        =?UTF-8?q?Pali=20Roh=C3=A1r?= <pali@kernel.org>,
+        Adrian Hunter <adrian.hunter@intel.com>,
+        Frank Li <lznuaa@gmail.com>,
+        Mike Christie <michael.christie@oracle.com>,
+        Bodo Stroesser <bostroesser@gmail.com>,
+        Hannes Reinecke <hare@suse.de>,
+        David Woodhouse <dwmw@amazon.co.uk>,
+        SeongJae Park <sjpark@amazon.de>,
+        Julien Grall <jgrall@amazon.com>,
+        linux-arm-kernel@lists.infradead.org, linux-mips@vger.kernel.org,
+        linux-parisc@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+        linux-acpi@vger.kernel.org, linux-wireless@vger.kernel.org,
+        linux-sunxi@lists.linux.dev, linux-cxl@vger.kernel.org,
+        nvdimm@lists.linux.dev, dmaengine@vger.kernel.org,
+        linux1394-devel@lists.sourceforge.net, linux-fpga@vger.kernel.org,
+        linux-input@vger.kernel.org, linux-hyperv@vger.kernel.org,
+        linux-i2c@vger.kernel.org, linux-i3c@lists.infradead.org,
+        industrypack-devel@lists.sourceforge.net,
+        linux-media@vger.kernel.org, linux-mmc@vger.kernel.org,
+        netdev@vger.kernel.org, linux-ntb@googlegroups.com,
+        linux-pci@vger.kernel.org, platform-driver-x86@vger.kernel.org,
+        linux-remoteproc@vger.kernel.org, linux-scsi@vger.kernel.org,
+        alsa-devel@alsa-project.org, linux-arm-msm@vger.kernel.org,
+        linux-spi@vger.kernel.org, linux-staging@lists.linux.dev,
+        greybus-dev@lists.linaro.org, target-devel@vger.kernel.org,
+        linux-usb@vger.kernel.org, linux-serial@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
+        xen-devel@lists.xenproject.org
+Subject: [PATCH v2 0/4] bus: Make remove callback return void
+Date:   Tue,  6 Jul 2021 17:47:59 +0200
+Message-Id: <20210706154803.1631813-1-u.kleine-koenig@pengutronix.de>
+X-Mailer: git-send-email 2.30.2
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from localhost.localdomain (2.7.202.103) by LO2P123CA0094.GBRP123.PROD.OUTLOOK.COM (2603:10a6:600:139::9) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4287.23 via Frontend Transport; Tue, 6 Jul 2021 15:35:41 +0000
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: a5343025-e3fe-4920-7225-08d94093b73f
-X-MS-TrafficTypeDiagnostic: CH0PR10MB5498:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <CH0PR10MB5498AC894C3C74F06A56BE4D9A1B9@CH0PR10MB5498.namprd10.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:8882;
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: Fonp3CH3oWXUYtLhF/KXMnavDWcdl2fFdZ7CbomOVyX2wGbsLmltqAjRAzLU94eu8N+1qPGTHtvYPN5UL0z/uRQHq+mA+UJBW/nzRiN5shBkWTYijOCYYbeBPO/NfzByPqVuiDmm3n9CYTmOtCPvNP/SmA8fsOXcoTYioBzN58e4R1y6LaN1Zc9WCUxCz2G+EewUsIbP0zMnT8iEhYb5Oiqoyi02iKkYYzlAWyp8S+UvXQsoT0mtDb5W3ChsEQjcut8AwpjV9l3U9kj1gMQEy2kCqPRczzc0tUtILGBEY350g2LB3z7aNSenNZa4rGGoUlZTrx06Jt6ry70kn66upURhzNpA/nzfjt8HN3glMwG7YOCnTzDgF8zO7bCSWpsmfD/9ys8dBK531yJAdPRjnhfT7hy5f9GbMAzpas7sydrwO6PwRLH/RyzrZ1u++Kv+7nRh3C0pvPadHKjInIzCO2+18F9pKXPpp3xZ559A++gwkharzAsa7wzMLEjeGJumUKA9ul2JYzJl/t/2BKIPeRGUqwmd/f+bfOQC5SiSzYeWZsB8rE46qw6N2uFZSGGKHOxrrVcsfpa5DV9T8maSz4aTj0RF0c8tiTeYCB2/cIPObPigeqEOwTEvbbuRTqf/hzipCPlPXo4Mlkb52+dEF0fvfDQctY2h3sDfvN8kW0JRpRYljXUH/dB+8tvVBY0P9snCMV5iu2i96TjlOJ5O70z6+bRztuonOdpaqNprJZo=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH2PR10MB4391.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(346002)(39860400002)(136003)(396003)(376002)(366004)(86362001)(83380400001)(4326008)(478600001)(2616005)(5660300002)(107886003)(26005)(31686004)(36756003)(316002)(31696002)(2906002)(6916009)(44832011)(186003)(8676002)(66476007)(6506007)(38100700002)(66946007)(53546011)(8936002)(66556008)(6486002)(6512007)(956004)(6666004)(43740500002)(45980500001);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?TjBuMG5uck8vcU5pb3VZTzArWHhLWlJubjNBSWNWclJuRlV1WkJ2MGhPUm5q?=
- =?utf-8?B?S0JrcW5rRGFuWkJ3K2Fhc1VnT2cvVVF2YWd2eU55eTZoWENmSGs4Ni9Rd1g1?=
- =?utf-8?B?OXhWRFpPam9DWStIcFIrSnhWTXZKU29wSSt5V2ZtUnlpeVg4ekdqLzQ1R2Vu?=
- =?utf-8?B?d0U0ZmJGdlU5ckdtWlViNWdITGlhUGpVTTkwcnlGWXlEcS9udGs4dktnV2Fj?=
- =?utf-8?B?WTJXMHJvdVZnYkIva0hXQnpEQldteWoxY1Y1VkJwWUFmS2c1ZGI3bGdlSEts?=
- =?utf-8?B?dXp1VFliOWpOV0IrMjVUZUlySmU3dXBmNGJnZ0RBdGJOL1dKSUZmM1dMYnRF?=
- =?utf-8?B?bkdpK3FUa1JLeUxpUzNhSEdMUzl4VVBuN3hTWVcvVmthYStsUHF5d1M2WjZo?=
- =?utf-8?B?MlQrekY3SkE5ZzdSZWtmL0RyVTBrWWFQVXRhM2hjeWdLcUpGV25wSlFvcDZG?=
- =?utf-8?B?WktrcWxzTTcyajhxc2tzMVBaQ0JSaGZkUWtvQ29oRnZyRVVmYVZLaEVwUlYv?=
- =?utf-8?B?bnM3bEpvY3ZCUkUzTzRtTkNxRldWeHd0QTBmc3Z3WUJWZnVKSmN2UWRSdUJR?=
- =?utf-8?B?bzBabkFycGFCUXFtTFZYMGNZVmtrRWZielhVYjhOZ2xBcExKck9ZUytCUGNY?=
- =?utf-8?B?WjlLTFA5MjN1a0lENnVNS084WW12b2hjbVFndG1PUDVWMDdZNytWVmsxS2Ji?=
- =?utf-8?B?VEVqa2ZmSVZPb3o2UWk3M2lvalVwbVJDaEZ5OUJqOWo2VVpFMWh5cXlrbWhr?=
- =?utf-8?B?YVA1ZVZrYWFoenpKMHgxbGQvNFdWK0lkalUrTFNHb01CYXB2K2VmVFppczN6?=
- =?utf-8?B?T3JqdzI3V0JGYWZDOFl5L09zeVdvVUtFTDduK2dvQThwYy9jRzVBQTdaaGFz?=
- =?utf-8?B?Y21KOWN3d2NLd0REdy9YZnVyaTBPbXlNTGpIK3VWV1E3R3pkNnJQejZNbDVo?=
- =?utf-8?B?YnNzckduaThLR1djNUVsd2hGVW5NaUNBM3ZQV1RGcjFIdTJHeWFpWTl5SVBZ?=
- =?utf-8?B?YmxxNU0yNS9BME4rWkFtNnYwOFh3YVo3dkhlZEdHSUE3NDFKY0ZJVG5yS3NH?=
- =?utf-8?B?Um05akcrWTFqU2MwdGdiQ2wzL1FlRWZlNWI5V3pzOExSeXhpUEJaR09NcWRr?=
- =?utf-8?B?ZlQ2SW5hTjNHcXppRndPN1BSay9IZTlTa3kyWDIzUk1FVTh1VkJtQlcxRjZN?=
- =?utf-8?B?cXVla1lXU01DbTYzUGZsTUlwZnRQS3NqOUVBZDJKUmVRbkZyckh5QjN2eVRK?=
- =?utf-8?B?ODdOOW5XMmFTQ255RFBLdVVDR1NTUGRPYTFvTU94RFd3cXdiRU1sdzNqSklE?=
- =?utf-8?B?TmhBMDBXdktER1YwZHZ3V09YeWNxbWhFalZDNFBJMDFLSGN2NlhPdXZJL1l0?=
- =?utf-8?B?TXN0aEErNUxNS0FFZjNaVThNUEhtbGlBaVBuREEweVBjc2cyb3JvcmhsWEVv?=
- =?utf-8?B?NGZ3TERhWXRuRTFhQTFhOGpYK1JzU2lHZ3BCKzZvdjM1ckFJdmNJSXRHMGQ4?=
- =?utf-8?B?dzFNSFk2SlQvT0FFUXFXbjdwajgyd3AxbWV3cUlhL21ldk9Ec1lySnAzdWxF?=
- =?utf-8?B?MGhva1diUVUydWJYNWY0Rmkxa3hCYVpCVGlwVDlPNnR2TDlzcUc4S0FiV2hk?=
- =?utf-8?B?ZUcvUU11SFNqLzFEdHQxKzNUaUdSNHRjRm1PNFRJeEdrTEtBNDB3MklHQUZj?=
- =?utf-8?B?SHpNcTNMNGhsTFZVZWxETkRGc3hUY2VSVG9QSXp1MUZleUkxMTZRYVpHZnU1?=
- =?utf-8?Q?7htxodD8UpRfKucaYPPre5QT5RIXWHwiExp8RqP?=
-X-OriginatorOrg: oracle.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: a5343025-e3fe-4920-7225-08d94093b73f
-X-MS-Exchange-CrossTenant-AuthSource: CH2PR10MB4391.namprd10.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Jul 2021 15:35:42.9798
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: vpqpJDt47H3UWxbm+f8hno+BqCItqga6GawX3XXobg6NX6jBy7yVRID6gyIgPSbTZ9z+JyDRJEXVFetHrwlZz6MQkf6/5Tc+ngJFBWSuuAI=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH0PR10MB5498
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=10037 signatures=668682
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxlogscore=999 suspectscore=0
- spamscore=0 adultscore=0 malwarescore=0 mlxscore=0 phishscore=0
- bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2104190000 definitions=main-2107060071
-X-Proofpoint-GUID: 920qnSY5NcRBQY4eMwwvMHTkKO1_IKz1
-X-Proofpoint-ORIG-GUID: 920qnSY5NcRBQY4eMwwvMHTkKO1_IKz1
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 2001:67c:670:100:1d::c0
+X-SA-Exim-Mail-From: ukl@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.ext.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: kvm@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Hello,
+
+compared to (implicit) v1 that I sent earlier today
+(https://lore.kernel.org/r/20210706095037.1425211-1-u.kleine-koenig@pengutronix.de)
+the following is changed:
+
+ - Add three more patches preparing some s390 specific busses
+   and adapt them in the last patch. Thanks to Cornelia Huck for
+   pointing this out.
+ - Add various Acks to the last patch
+
+I now tested allmodconfig on arm, powerpc, s390 and amd64.
+
+As before this depends on "PCI: endpoint: Make struct pci_epf_driver::remove
+return void" that is not yet applied, see
+https://lore.kernel.org/r/20210223090757.57604-1-u.kleine-koenig@pengutronix.de.
+
+Best regards
+Uwe
+
+Uwe Kleine-König (4):
+  s390/cio: Make struct css_driver::remove return void
+  s390/ccwgroup: Drop if with an always false condition
+  s390/scm: Make struct scm_driver::remove return void
+  bus: Make remove callback return void
+
+ arch/arm/common/locomo.c                  | 3 +--
+ arch/arm/common/sa1111.c                  | 4 +---
+ arch/arm/mach-rpc/ecard.c                 | 4 +---
+ arch/mips/sgi-ip22/ip22-gio.c             | 3 +--
+ arch/parisc/kernel/drivers.c              | 5 ++---
+ arch/powerpc/platforms/ps3/system-bus.c   | 3 +--
+ arch/powerpc/platforms/pseries/ibmebus.c  | 3 +--
+ arch/powerpc/platforms/pseries/vio.c      | 3 +--
+ arch/s390/include/asm/eadm.h              | 2 +-
+ drivers/acpi/bus.c                        | 3 +--
+ drivers/amba/bus.c                        | 4 +---
+ drivers/base/auxiliary.c                  | 4 +---
+ drivers/base/isa.c                        | 4 +---
+ drivers/base/platform.c                   | 4 +---
+ drivers/bcma/main.c                       | 6 ++----
+ drivers/bus/sunxi-rsb.c                   | 4 +---
+ drivers/cxl/core.c                        | 3 +--
+ drivers/dax/bus.c                         | 4 +---
+ drivers/dma/idxd/sysfs.c                  | 4 +---
+ drivers/firewire/core-device.c            | 4 +---
+ drivers/firmware/arm_scmi/bus.c           | 4 +---
+ drivers/firmware/google/coreboot_table.c  | 4 +---
+ drivers/fpga/dfl.c                        | 4 +---
+ drivers/hid/hid-core.c                    | 4 +---
+ drivers/hid/intel-ish-hid/ishtp/bus.c     | 4 +---
+ drivers/hv/vmbus_drv.c                    | 5 +----
+ drivers/hwtracing/intel_th/core.c         | 4 +---
+ drivers/i2c/i2c-core-base.c               | 5 +----
+ drivers/i3c/master.c                      | 4 +---
+ drivers/input/gameport/gameport.c         | 3 +--
+ drivers/input/serio/serio.c               | 3 +--
+ drivers/ipack/ipack.c                     | 4 +---
+ drivers/macintosh/macio_asic.c            | 4 +---
+ drivers/mcb/mcb-core.c                    | 4 +---
+ drivers/media/pci/bt8xx/bttv-gpio.c       | 3 +--
+ drivers/memstick/core/memstick.c          | 3 +--
+ drivers/mfd/mcp-core.c                    | 3 +--
+ drivers/misc/mei/bus.c                    | 4 +---
+ drivers/misc/tifm_core.c                  | 3 +--
+ drivers/mmc/core/bus.c                    | 4 +---
+ drivers/mmc/core/sdio_bus.c               | 4 +---
+ drivers/net/netdevsim/bus.c               | 3 +--
+ drivers/ntb/core.c                        | 4 +---
+ drivers/ntb/ntb_transport.c               | 4 +---
+ drivers/nvdimm/bus.c                      | 3 +--
+ drivers/pci/endpoint/pci-epf-core.c       | 4 +---
+ drivers/pci/pci-driver.c                  | 3 +--
+ drivers/pcmcia/ds.c                       | 4 +---
+ drivers/platform/surface/aggregator/bus.c | 4 +---
+ drivers/platform/x86/wmi.c                | 4 +---
+ drivers/pnp/driver.c                      | 3 +--
+ drivers/rapidio/rio-driver.c              | 4 +---
+ drivers/rpmsg/rpmsg_core.c                | 4 +---
+ drivers/s390/block/scm_drv.c              | 4 +---
+ drivers/s390/cio/ccwgroup.c               | 6 +-----
+ drivers/s390/cio/chsc_sch.c               | 3 +--
+ drivers/s390/cio/css.c                    | 7 +++----
+ drivers/s390/cio/css.h                    | 2 +-
+ drivers/s390/cio/device.c                 | 9 +++------
+ drivers/s390/cio/eadm_sch.c               | 4 +---
+ drivers/s390/cio/scm.c                    | 5 +++--
+ drivers/s390/cio/vfio_ccw_drv.c           | 3 +--
+ drivers/s390/crypto/ap_bus.c              | 4 +---
+ drivers/scsi/scsi_debug.c                 | 3 +--
+ drivers/siox/siox-core.c                  | 4 +---
+ drivers/slimbus/core.c                    | 4 +---
+ drivers/soc/qcom/apr.c                    | 4 +---
+ drivers/spi/spi.c                         | 4 +---
+ drivers/spmi/spmi.c                       | 3 +--
+ drivers/ssb/main.c                        | 4 +---
+ drivers/staging/fieldbus/anybuss/host.c   | 4 +---
+ drivers/staging/greybus/gbphy.c           | 4 +---
+ drivers/target/loopback/tcm_loop.c        | 5 ++---
+ drivers/thunderbolt/domain.c              | 4 +---
+ drivers/tty/serdev/core.c                 | 4 +---
+ drivers/usb/common/ulpi.c                 | 4 +---
+ drivers/usb/serial/bus.c                  | 4 +---
+ drivers/usb/typec/bus.c                   | 4 +---
+ drivers/vdpa/vdpa.c                       | 4 +---
+ drivers/vfio/mdev/mdev_driver.c           | 4 +---
+ drivers/virtio/virtio.c                   | 3 +--
+ drivers/vme/vme.c                         | 4 +---
+ drivers/xen/xenbus/xenbus.h               | 2 +-
+ drivers/xen/xenbus/xenbus_probe.c         | 4 +---
+ include/linux/device/bus.h                | 2 +-
+ sound/aoa/soundbus/core.c                 | 4 +---
+ 86 files changed, 95 insertions(+), 236 deletions(-)
 
 
-On 7/6/21 4:52 PM, Marc Zyngier wrote:
-> On Tue, 06 Jul 2021 14:50:35 +0100,
-> Alexandre Chartre <alexandre.chartre@oracle.com> wrote:
->>
->>
->> Hi Marc,
->>
->> On 6/29/21 3:16 PM, Alexandre Chartre wrote:
->>> On 6/29/21 11:06 AM, Marc Zyngier wrote
->>> [...]
->>>> So the sysreg is the only thing we should consider, and I think we
->>>> should drop the useless masking. There is at least another instance of
->>>> this in the PMU code (kvm_pmu_overflow_status()), and apart from
->>>> kvm_pmu_vcpu_reset(), only the sysreg accessors should care about the
->>>> masking to sanitise accesses.
->>>>
->>>> What do you think?
->>>>
->>>
->>> I think you are right. PMCNTENSET_EL0 is already masked with kvm_pmu_valid_counter_mask()
->>> so there's effectively no need to mask it again when we use it. I will send an additional
->>> patch (on top of this one) to remove useless masking. Basically, changes would be:
->>
->> I had a closer look and we can't remove the mask. The access
->> functions (for pmcnten, pminten, pmovs), clear or set only the
->> specified valid counter bits. This means that bits other than the
->> valid counter bits never change in __vcpu_sys_reg(), and those bits
->> are not necessarily zero because the initial value is
->> 0x1de7ec7edbadc0deULL (set by reset_unknown()).
-> 
-> That's a bug that should be fixed on its own. Bits that are RAZ/WI in
-> the architecture shouldn't be kept in the shadow registers the first
-> place. I'll have a look.
-> 
->> So I will resubmit initial patch, with just the commit message
->> changes.
-> 
-> Please don't. I'm not papering over this kind of bug.
-> 
-
-Right, I meant I will resubmit after -rc1 as you requested.
-
-Thanks,
-
-alex.
+base-commit: 79160a603bdb51916226caf4a6616cc4e1c58a58
+prerequisite-patch-id: e5c7b97ea399fddc2695e8cf5d0c02d14175abac
+-- 
+2.30.2
 
