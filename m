@@ -2,70 +2,98 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C7FFC3BC5A5
-	for <lists+kvm@lfdr.de>; Tue,  6 Jul 2021 06:40:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id ED73B3BC628
+	for <lists+kvm@lfdr.de>; Tue,  6 Jul 2021 07:42:53 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230004AbhGFEmg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 6 Jul 2021 00:42:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40304 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229926AbhGFEmf (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 6 Jul 2021 00:42:35 -0400
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EE51AC061574;
-        Mon,  5 Jul 2021 21:39:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=Tm9bbwSLIXHzncYHK7SPpmMxLf8Q613BrbD6KMaacCU=; b=ZHopiEcE65spd6w6KieC7YH/9O
-        7KIMWJOGo8MuL0N/hif+7In1wZ4nMYAxts4WI+bThg19A1gHVk+zbNn2Pdxi3smtBEqehnkKz3sUg
-        k27f5BUV881/+Qpx5UChOFiMXm9luIVQZi/+TgVqY8ogi4Oa/Q4lrsG/BS/5k2aBCiOEpB7lsIxGC
-        8Jzdbi9F6JmB7U+ZCCeU4u7wPa2bEo73kJeRXc2I+LSTTKq3IzhaQOjtTWzwJ7yX5yzQ5hKoD6zkY
-        mJBkWTzUqrfkYMvY/Mxmr/0GsRBj026jW33bZuhIsz/UVAymC4vFNHkcOzqpC5t6HCwCADz2oI5fM
-        /k80Alig==;
-Received: from hch by casper.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1m0crl-00Apu4-QR; Tue, 06 Jul 2021 04:39:31 +0000
-Date:   Tue, 6 Jul 2021 05:39:25 +0100
-From:   Christoph Hellwig <hch@infradead.org>
-To:     Jason Gunthorpe <jgg@nvidia.com>
-Cc:     Leon Romanovsky <leon@kernel.org>,
-        Shameerali Kolothum Thodi 
-        <shameerali.kolothum.thodi@huawei.com>,
-        Max Gurtovoy <mgurtovoy@nvidia.com>,
+        id S230074AbhGFFp3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 6 Jul 2021 01:45:29 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:59424 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S230004AbhGFFp3 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 6 Jul 2021 01:45:29 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1625550171;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=kR/4RD2c6G7vfOI3cAArYTywlbZ39ro+LD6XzRbKsSs=;
+        b=TDR6ZtCBD9NitmTh6bdTybfy4XDJht6ItyVVW+kKBEuKor2wWgQa+aXyrAWjTSkRC6md/S
+        fVh4zkCyIuGnCV5vR+8v+shg/21TJDfYNsdrxr0VTs3NbJq91nSPn6QmwCf4KesRnpJdJH
+        ae+T/Z68g7bylHFhUb+i1CckFl0yx3s=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-109-_SAeTeXlPliJgBwt89E46g-1; Tue, 06 Jul 2021 01:42:49 -0400
+X-MC-Unique: _SAeTeXlPliJgBwt89E46g-1
+Received: by mail-wm1-f72.google.com with SMTP id f9-20020a7bcd090000b02901eca9a0d67cso250942wmj.0
+        for <kvm@vger.kernel.org>; Mon, 05 Jul 2021 22:42:49 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=kR/4RD2c6G7vfOI3cAArYTywlbZ39ro+LD6XzRbKsSs=;
+        b=EqlJuzS1t5RwpSgRXTKWWcrN0GndRItLAzvELUY+OP30HAhUnjaMdlZiksWAMvqD4E
+         jRLinvyVy42XoOw5L1RwbJ7uTH8rqmsxkmealVu2WZQOGqCPfCOtHO3xm1HPgfOkOH/d
+         SaP1efDqRURQ/NoMWeNuXdRnMBK9duTAtXcCcTTU/EG3DoMu/SeVQbrFj2XglyNT+7ZK
+         biVthrCEQ8Cs0ryRi3hEAI+pCtmPRg3Xzfw3FMISUXGG94YfV8j2bhEt7z9bJigSr8U5
+         b4VjzzDdrPktKiEs1CJhLoG2o3RVjHHAsazUMDRuYrXZV/EbpW5pZehCLLBcqQDZS1ep
+         O+xA==
+X-Gm-Message-State: AOAM5318aXnv2uh+UAbMjSjHKYdonQFXrJ6vnmlvc3SfRS9fwdeSDH/M
+        S6if+O/ehHbI7niNW89R9duIKYoN5buSnfrRMuS8t2TyrIRycuvBThQosbuAiCp3UDS+Dv8eaf4
+        vFaVZNYTGmWDy
+X-Received: by 2002:adf:a74a:: with SMTP id e10mr19186470wrd.185.1625550168797;
+        Mon, 05 Jul 2021 22:42:48 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwnq74tdPgX6MASLfGfeoSIgIe1/v6vzMrGXHjwD3JFyBqyiBH7F/q8wLbVgbgHfLJJqjJT5g==
+X-Received: by 2002:adf:a74a:: with SMTP id e10mr19186458wrd.185.1625550168591;
+        Mon, 05 Jul 2021 22:42:48 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+        by smtp.gmail.com with ESMTPSA id w8sm16481761wrt.83.2021.07.05.22.42.47
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 05 Jul 2021 22:42:47 -0700 (PDT)
+Subject: Re: [PATCH] KVM: nVMX: Dynamically compute max VMCS index for vmcs12
+To:     "Hu, Robert" <robert.hu@intel.com>,
+        Sean Christopherson <seanjc@google.com>
+Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
         "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-        Linuxarm <linuxarm@huawei.com>,
-        liulongfang <liulongfang@huawei.com>,
-        "Zengtao (B)" <prime.zeng@hisilicon.com>,
-        yuzenghui <yuzenghui@huawei.com>,
-        Jonathan Cameron <jonathan.cameron@huawei.com>,
-        "Wangzhou (B)" <wangzhou1@hisilicon.com>
-Subject: Re: [RFC v2 1/4] hisi-acc-vfio-pci: add new vfio_pci driver for
- HiSilicon ACC devices
-Message-ID: <YOPefSD9x+mv5jO6@infradead.org>
-References: <20210702095849.1610-1-shameerali.kolothum.thodi@huawei.com>
- <20210702095849.1610-2-shameerali.kolothum.thodi@huawei.com>
- <YOFdTnlkcDZzw4b/@unreal>
- <fc9d6b0b82254fbdb1cc96365b5bdef3@huawei.com>
- <d02dff3a-8035-ced1-7fc3-fcff791f9203@nvidia.com>
- <834a009bba0d4db1b7a1c32e8f20611d@huawei.com>
- <YONPGcwjGH+gImDj@unreal>
- <20210705183247.GU4459@nvidia.com>
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+References: <20210618214658.2700765-1-seanjc@google.com>
+ <c847e00a-e422-cdc9-3317-fbbd82b6e418@redhat.com>
+ <YNDHfX0cntj72sk6@google.com> <da6c715345954a7b91c044ad685eb0f2@intel.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <d98092db-b277-44f5-df5e-f367ecb5a0fc@redhat.com>
+Date:   Tue, 6 Jul 2021 07:42:46 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.11.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210705183247.GU4459@nvidia.com>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
+In-Reply-To: <da6c715345954a7b91c044ad685eb0f2@intel.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Jul 05, 2021 at 03:32:47PM -0300, Jason Gunthorpe wrote:
-> It would be improved a bit by making the ops struct mutable and
-> populating it at runtime like we do in RDMA. Then the PCI ops and
-> driver ops could be merged together without the repetition.
+On 06/07/21 05:05, Hu, Robert wrote:
+>> As noted in the code comments, KVM allows VMREAD/VMWRITE to all defined
+>> fields, whether or not the field should actually exist for the vCPU model doesn't
+>> enter into the equation.  That's technically wrong as there are a number of
+>> fields that the SDM explicitly states exist iff a certain feature is supported.  To
+>> fix that we'd need to add a "feature flag" to vmcs_field_to_offset_table that is
+>> checked against the vCPU model, though updating the MSR would probably fall
+>> onto userspace's shoulders?
+> 
+> [Hu, Robert]
+> Perhaps more easier and proper to do this in KVM side.
+> QEMU sets actual feature set down to KVM, and KVM updates IA32_VMX_VMCS_ENUM
+> MSR accordingly. We don't see a channel that QEMU constructs a VMCS and sets a whole
+> to KVM.
 
-No, that would be everything but an improvement.
+Yes, it's possible to do that too.  If that is included in Linux 5.14, 
+we can remove it from QEMU.
+
+Paolo
+
