@@ -2,123 +2,196 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 692673BD8F4
-	for <lists+kvm@lfdr.de>; Tue,  6 Jul 2021 16:50:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A8F3D3BD8FF
+	for <lists+kvm@lfdr.de>; Tue,  6 Jul 2021 16:52:32 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232523AbhGFOxA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 6 Jul 2021 10:53:00 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:43624 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232441AbhGFOwz (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 6 Jul 2021 10:52:55 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1625583016;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=s5YRgxjBVFyVrsecYfIDXV3/UmWdoKFIP6xE5czOL/I=;
-        b=PO96Gbaw9iz7nCoIZIkdLahCVRMSc7lXgTrNWTL1YZC7mubYkUpnp7iux+sDWisOI08KFx
-        oPxQxKIQATot3dlu2vYIQ9DtKmZMUhXOlvz9igky9lvMcpRR/0pbtlEymFwe1h83Z+boI/
-        n0yqnO/LT2BND3fL2SCm92/S9OVqtRc=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-455-Ghh-e-fRMq-RhUbaegceLg-1; Tue, 06 Jul 2021 10:50:14 -0400
-X-MC-Unique: Ghh-e-fRMq-RhUbaegceLg-1
-Received: by mail-wm1-f69.google.com with SMTP id m7-20020a05600c4f47b02901ff81a3bb59so1979343wmq.2
-        for <kvm@vger.kernel.org>; Tue, 06 Jul 2021 07:50:14 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=s5YRgxjBVFyVrsecYfIDXV3/UmWdoKFIP6xE5czOL/I=;
-        b=M247/HiO/WRIneJyqOUPlU46OPWuUzRZKnqBw25s4TParp2Mo5xws2eK7zqtQ1Rt8r
-         g1+X+J9ZCOk/9MXt9HrhlGnos+zOubRZqwkefTWW9LDpfo7WqWmBBF9zK+5KjMZfAw4R
-         pVVlh7Opkoy/Od+zxB6OBlSYMjlH8zHxFYRO4kHu6IgCj3KgUBp7CN2xqDXl59h8JA6J
-         N0gGyBHcPpXl69tv0OpqjYV15sZX+IE0WTG52UpMxZXTTTCwPAgfdC/zcrszBYI1c00X
-         hCYD+oGmu0/cAm8u9AAKdaQruh0wmirEr5D72875y5nGGo2txQFOI630wHWH8RVgS2/o
-         e+0w==
-X-Gm-Message-State: AOAM532yBK3EZ0NaqxJle+Qj3JbutOsqj1mLXFNUA3BqCI7xhjiozjoH
-        NbBTdiqYBR40ilfqTTJ4GzAiIXKy9CQb7EODU4fEgidG2Ax4SMjk5ws6HZTI5mqY5uMaZkWU54T
-        L9kEXi9gC42mD
-X-Received: by 2002:a5d:530f:: with SMTP id e15mr21899214wrv.217.1625583013663;
-        Tue, 06 Jul 2021 07:50:13 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyJUXd4AsURshO/WOcPijFSw+4/Maf9g/IRtAdvHhF7Ym+8rdnyoGw/RRjS3QkvtHK5WXo4aA==
-X-Received: by 2002:a5d:530f:: with SMTP id e15mr21899201wrv.217.1625583013504;
-        Tue, 06 Jul 2021 07:50:13 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id w8sm18306728wrt.83.2021.07.06.07.50.12
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 06 Jul 2021 07:50:12 -0700 (PDT)
-Subject: Re: [RFC PATCH v2 37/69] KVM: x86: Check for pending APICv interrupt
- in kvm_vcpu_has_events()
-To:     isaku.yamahata@intel.com, Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        "H . Peter Anvin" <hpa@zytor.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, erdemaktas@google.com,
-        Connor Kuehl <ckuehl@redhat.com>,
-        Sean Christopherson <seanjc@google.com>, x86@kernel.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc:     isaku.yamahata@gmail.com,
-        Sean Christopherson <sean.j.christopherson@intel.com>
-References: <cover.1625186503.git.isaku.yamahata@intel.com>
- <489df8a1b8fb43677c2c2c5347398ce985713577.1625186503.git.isaku.yamahata@intel.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <02369ee0-8e21-2b30-03c6-94bb885a0ffb@redhat.com>
-Date:   Tue, 6 Jul 2021 16:50:11 +0200
+        id S232134AbhGFOzJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 6 Jul 2021 10:55:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36638 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231248AbhGFOzH (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 6 Jul 2021 10:55:07 -0400
+Received: from desiato.infradead.org (desiato.infradead.org [IPv6:2001:8b0:10b:1:d65d:64ff:fe57:4e05])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DFDE3C0617AB;
+        Tue,  6 Jul 2021 07:52:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=desiato.20200630; h=Content-Transfer-Encoding:Content-Type
+        :In-Reply-To:MIME-Version:Date:Message-ID:From:References:Cc:To:Subject:
+        Sender:Reply-To:Content-ID:Content-Description;
+        bh=1ayrkKf5NvJjQdfUl2A/VO9K+bU0q5/9ZgivWetFS3o=; b=JbK3meFocLJ6fB6QYONBPtOQk9
+        DJh8XYIRvVsq19DtaRbOde3Pqt+U3mVhAJRiVq9/pLYYfHRPetQ2VwkvtOK63TFIov9LQtN9N9PJt
+        W7/r5BUcb6i86u+BjFat8OYQU9y2P1DA/EDcTwU14mU2aPtj4aDiy4zBQ/DSm0rkTEqy36baSOqyA
+        V4yYgj7JmTV6DLtcs5VRxDGb3q6cP0CLL/po4JfkE8jt0lxs+Hs+g3d6AcmGzyEozq//QEL4RnMt8
+        byUYd3U5VUmkthiwr4pU7QnYiaWZQxohw6U15DrlSostKCZf7pcDzFMvg9GIfhVhYyVE4cG/tyrih
+        3mmB/xNA==;
+Received: from [2602:306:c5a2:a380:b447:81b0:ffaa:defc]
+        by desiato.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1m0mQg-00F4IY-8x; Tue, 06 Jul 2021 14:52:06 +0000
+Subject: Re: [PATCH] bus: Make remove callback return void
+To:     =?UTF-8?Q?Uwe_Kleine-K=c3=b6nig?= <u.kleine-koenig@pengutronix.de>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Cc:     kernel@pengutronix.de, linux-kernel@vger.kernel.org,
+        Russell King <linux@armlinux.org.uk>,
+        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+        "James E.J. Bottomley" <James.Bottomley@HansenPartnership.com>,
+        Helge Deller <deller@gmx.de>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        Paul Mackerras <paulus@samba.org>,
+        "Rafael J. Wysocki" <rjw@rjwysocki.net>,
+        Len Brown <lenb@kernel.org>,
+        William Breathitt Gray <vilhelm.gray@gmail.com>,
+        =?UTF-8?B?UmFmYcWCIE1pxYJlY2tp?= <zajec5@gmail.com>,
+        Maxime Ripard <mripard@kernel.org>,
+        Chen-Yu Tsai <wens@csie.org>,
+        Jernej Skrabec <jernej.skrabec@gmail.com>,
+        Alison Schofield <alison.schofield@intel.com>,
+        Vishal Verma <vishal.l.verma@intel.com>,
+        Ira Weiny <ira.weiny@intel.com>,
+        Ben Widawsky <ben.widawsky@intel.com>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Dave Jiang <dave.jiang@intel.com>,
+        Vinod Koul <vkoul@kernel.org>,
+        Stefan Richter <stefanr@s5r6.in-berlin.de>,
+        Sudeep Holla <sudeep.holla@arm.com>,
+        Cristian Marussi <cristian.marussi@arm.com>,
+        Wu Hao <hao.wu@intel.com>, Tom Rix <trix@redhat.com>,
+        Moritz Fischer <mdf@kernel.org>,
+        Jiri Kosina <jikos@kernel.org>,
+        Benjamin Tissoires <benjamin.tissoires@redhat.com>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        "K. Y. Srinivasan" <kys@microsoft.com>,
+        Haiyang Zhang <haiyangz@microsoft.com>,
+        Stephen Hemminger <sthemmin@microsoft.com>,
+        Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>,
+        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+        Wolfram Sang <wsa@kernel.org>,
+        Alexandre Belloni <alexandre.belloni@bootlin.com>,
+        Dmitry Torokhov <dmitry.torokhov@gmail.com>,
+        Samuel Iglesias Gonsalvez <siglesias@igalia.com>,
+        Jens Taprogge <jens.taprogge@taprogge.org>,
+        Johannes Thumshirn <morbidrsa@gmail.com>,
+        Mauro Carvalho Chehab <mchehab@kernel.org>,
+        Maxim Levitsky <maximlevitsky@gmail.com>,
+        Alex Dubov <oakad@yahoo.com>,
+        Ulf Hansson <ulf.hansson@linaro.org>,
+        Lee Jones <lee.jones@linaro.org>,
+        Tomas Winkler <tomas.winkler@intel.com>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Jakub Kicinski <kuba@kernel.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jon Mason <jdmason@kudzu.us>, Allen Hubbe <allenbh@gmail.com>,
+        Kishon Vijay Abraham I <kishon@ti.com>,
+        Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>,
+        =?UTF-8?Q?Krzysztof_Wilczy=c5=84ski?= <kw@linux.com>,
+        Bjorn Helgaas <bhelgaas@google.com>,
+        Dominik Brodowski <linux@dominikbrodowski.net>,
+        Maximilian Luz <luzmaximilian@gmail.com>,
+        Hans de Goede <hdegoede@redhat.com>,
+        Mark Gross <mgross@linux.intel.com>,
+        Matt Porter <mporter@kernel.crashing.org>,
+        Alexandre Bounine <alex.bou9@gmail.com>,
+        Ohad Ben-Cohen <ohad@wizery.com>,
+        Bjorn Andersson <bjorn.andersson@linaro.org>,
+        Mathieu Poirier <mathieu.poirier@linaro.org>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Thorsten Scherer <t.scherer@eckelmann.de>,
+        Srinivas Kandagatla <srinivas.kandagatla@linaro.org>,
+        Andy Gross <agross@kernel.org>,
+        Mark Brown <broonie@kernel.org>,
+        Stephen Boyd <sboyd@kernel.org>, Michael Buesch <m@bues.ch>,
+        Sven Van Asbroeck <TheSven73@gmail.com>,
+        Johan Hovold <johan@kernel.org>, Alex Elder <elder@kernel.org>,
+        Andreas Noever <andreas.noever@gmail.com>,
+        Michael Jamet <michael.jamet@intel.com>,
+        Mika Westerberg <mika.westerberg@linux.intel.com>,
+        Yehezkel Bernat <YehezkelShB@gmail.com>,
+        Rob Herring <robh@kernel.org>,
+        Jiri Slaby <jirislaby@kernel.org>,
+        Heikki Krogerus <heikki.krogerus@linux.intel.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Kirti Wankhede <kwankhede@nvidia.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Martyn Welch <martyn@welchs.me.uk>,
+        Manohar Vanga <manohar.vanga@gmail.com>,
+        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
+        Juergen Gross <jgross@suse.com>,
+        Stefano Stabellini <sstabellini@kernel.org>,
+        Johannes Berg <johannes@sipsolutions.net>,
+        Jaroslav Kysela <perex@perex.cz>,
+        Takashi Iwai <tiwai@suse.com>, Marc Zyngier <maz@kernel.org>,
+        Tyrel Datwyler <tyreld@linux.ibm.com>,
+        Vladimir Zapolskiy <vz@mleia.com>,
+        Samuel Holland <samuel@sholland.org>,
+        Qinglang Miao <miaoqinglang@huawei.com>,
+        Alexey Kardashevskiy <aik@ozlabs.ru>,
+        Kai-Heng Feng <kai.heng.feng@canonical.com>,
+        Joey Pabalan <jpabalanb@gmail.com>,
+        =?UTF-8?Q?Pali_Roh=c3=a1r?= <pali@kernel.org>,
+        Adrian Hunter <adrian.hunter@intel.com>,
+        Frank Li <lznuaa@gmail.com>,
+        Mike Christie <michael.christie@oracle.com>,
+        Bodo Stroesser <bostroesser@gmail.com>,
+        Hannes Reinecke <hare@suse.de>,
+        David Woodhouse <dwmw@amazon.co.uk>,
+        SeongJae Park <sjpark@amazon.de>,
+        Julien Grall <jgrall@amazon.com>,
+        linux-arm-kernel@lists.infradead.org, linux-mips@vger.kernel.org,
+        linux-parisc@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+        linux-acpi@vger.kernel.org, linux-wireless@vger.kernel.org,
+        linux-sunxi@lists.linux.dev, linux-cxl@vger.kernel.org,
+        nvdimm@lists.linux.dev, dmaengine@vger.kernel.org,
+        linux1394-devel@lists.sourceforge.net, linux-fpga@vger.kernel.org,
+        linux-input@vger.kernel.org, linux-hyperv@vger.kernel.org,
+        linux-i2c@vger.kernel.org, linux-i3c@lists.infradead.org,
+        industrypack-devel@lists.sourceforge.net,
+        linux-media@vger.kernel.org, linux-mmc@vger.kernel.org,
+        netdev@vger.kernel.org, linux-ntb@googlegroups.com,
+        linux-pci@vger.kernel.org, platform-driver-x86@vger.kernel.org,
+        linux-remoteproc@vger.kernel.org, linux-scsi@vger.kernel.org,
+        alsa-devel@alsa-project.org, linux-arm-msm@vger.kernel.org,
+        linux-spi@vger.kernel.org, linux-staging@lists.linux.dev,
+        greybus-dev@lists.linaro.org, target-devel@vger.kernel.org,
+        linux-usb@vger.kernel.org, linux-serial@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
+        xen-devel@lists.xenproject.org
+References: <20210706095037.1425211-1-u.kleine-koenig@pengutronix.de>
+From:   Geoff Levand <geoff@infradead.org>
+Message-ID: <7a68b536-302c-0374-848f-4b9535ff1306@infradead.org>
+Date:   Tue, 6 Jul 2021 07:51:36 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.11.0
 MIME-Version: 1.0
-In-Reply-To: <489df8a1b8fb43677c2c2c5347398ce985713577.1625186503.git.isaku.yamahata@intel.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <20210706095037.1425211-1-u.kleine-koenig@pengutronix.de>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 03/07/21 00:04, isaku.yamahata@intel.com wrote:
-> From: Sean Christopherson <sean.j.christopherson@intel.com>
-> 
-> Return true for kvm_vcpu_has_events() if the vCPU has a pending APICv
-> interrupt to support TDX's usage of APICv.  Unlike VMX, TDX doesn't have
-> access to vmcs.GUEST_INTR_STATUS and so can't emulate posted interrupts,
-> i.e. needs to generate a posted interrupt and more importantly can't
-> manually move requested interrupts into the vIRR (which it also doesn't
-> have access to).
-> 
-> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
-> Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
-> ---
->   arch/x86/kvm/x86.c | 4 +++-
->   1 file changed, 3 insertions(+), 1 deletion(-)
-> 
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index f1d5e0a53640..92d5a6649a21 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -11341,7 +11341,9 @@ static inline bool kvm_vcpu_has_events(struct kvm_vcpu *vcpu)
->   
->   	if (kvm_arch_interrupt_allowed(vcpu) &&
->   	    (kvm_cpu_has_interrupt(vcpu) ||
-> -	    kvm_guest_apic_has_interrupt(vcpu)))
-> +	     kvm_guest_apic_has_interrupt(vcpu) ||
-> +	     (vcpu->arch.apicv_active &&
-> +	      kvm_x86_ops.dy_apicv_has_pending_interrupt(vcpu))))
->   		return true;
->   
->   	if (kvm_hv_has_stimer_pending(vcpu))
-> 
+On 7/6/21 2:50 AM, Uwe Kleine-König wrote:
 
-Please remove "dy_" from the name of the callback, and use the static 
-call.  Also, if it makes sense, please consider using the same test as 
-for patch 38 to choose *between* either kvm_cpu_has_interrupt() + 
-kvm_guest_apic_has_interrupt() or 
-kvm_x86_ops.dy_apicv_has_pending_interrupt().
+> --- a/arch/powerpc/platforms/ps3/system-bus.c
+> +++ b/arch/powerpc/platforms/ps3/system-bus.c
+> @@ -381,7 +381,7 @@ static int ps3_system_bus_probe(struct device *_dev)
+>  	return result;
+>  }
+>  
+> -static int ps3_system_bus_remove(struct device *_dev)
+> +static void ps3_system_bus_remove(struct device *_dev)
+>  {
+>  	struct ps3_system_bus_device *dev = ps3_dev_to_system_bus_dev(_dev);
+>  	struct ps3_system_bus_driver *drv;
+> @@ -399,7 +399,6 @@ static int ps3_system_bus_remove(struct device *_dev)
+>  			__func__, __LINE__, drv->core.name);
+>  
+>  	pr_debug(" <- %s:%d: %s\n", __func__, __LINE__, dev_name(&dev->core));
+> -	return 0;
+>  }
 
-Paolo
+PS3 part looks fine.
 
+Acked-by: Geoff Levand <geoff@infradead.org>
