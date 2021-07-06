@@ -2,54 +2,40 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id BFF3F3BCB0B
-	for <lists+kvm@lfdr.de>; Tue,  6 Jul 2021 12:57:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 593273BCB1E
+	for <lists+kvm@lfdr.de>; Tue,  6 Jul 2021 12:58:33 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231573AbhGFK7j (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 6 Jul 2021 06:59:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38960 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229907AbhGFK7i (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 6 Jul 2021 06:59:38 -0400
-Received: from mail-wr1-x435.google.com (mail-wr1-x435.google.com [IPv6:2a00:1450:4864:20::435])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F020FC061574
-        for <kvm@vger.kernel.org>; Tue,  6 Jul 2021 03:56:59 -0700 (PDT)
-Received: by mail-wr1-x435.google.com with SMTP id n9so8213184wrs.13
-        for <kvm@vger.kernel.org>; Tue, 06 Jul 2021 03:56:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=l+H215FJz8pJPI4hh9v/iWNuVbn0nifA4Jaafd28qC4=;
-        b=UCSZee8bkwQhVbXkWa9n6dda1YB5cGQkIPiVKhb8KKz80S/zIXHEgxifSSr+8L29bp
-         bwv7fkXzMNhKGGQN2c3BmsUcjrj/WCoXm6Ben2qP8+Bg0YH95vQBsFhGIbEyGr/lrU1Q
-         Ln5txN4w7J+T5EMRaT/NpEGp+Hm9dI3o+V77bGk/sdRf0SYC4Lr7n5Wxc/3RjcZaFj49
-         pMNis8YQVecjuUzjIFQPnwBJPdiGSBK5ZHDxUgMGNPSzs1az976bZyXyvd6ztydUQ9Xm
-         nwGGg1WV1KPpW+turyU66Gq6SgHBmHxg/+HCmUj/1/PNr7tZsqoiZrxGaduOWyUClunz
-         BuDQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=l+H215FJz8pJPI4hh9v/iWNuVbn0nifA4Jaafd28qC4=;
-        b=JEznsjvYsGibwEKBFiZHWmJUvteZSSBL4aKRl9WGwGAj5F6pZLj0yNTqQc2XvHcpOX
-         /VCHcQi2WLJN7a71ibyBIyZ/D3EBeaYuc4ZA/MSSB+OSZ3r6rBmgxOLevEn5c9Ndb5+8
-         wmo8pZPHYwwCxvk9LSmbmMStazALzRbuq5P9RD1JIkEWvgqLCpa1W9kS5Ls4WhmzJFUX
-         GTatDg+dnqFIcbHk1Js8pu+MNuGUfZk7+hmKlfII6Khwg/IKzWztKZIV77TWnI7Ln5PJ
-         3aJTN0cMsQ8R4Q8st3K6zamLeTYFj6Xez/GmlWyvSOBGBqN5pUkYG35rl+T/Vau37KXw
-         TuAg==
-X-Gm-Message-State: AOAM532Lb7trn8Nf6DfeuPnffltZgtwuOP9P0pIUEyzKaAAtR0HE4M/i
-        +wcvnJX9uVFvsQIndlBO6UMw3g==
-X-Google-Smtp-Source: ABdhPJwMhrNwpvhovE9XwK0jC9OIuq8TBsnt9DrnKno6fhX9rnIZO8Cd1er4LBIyS1GM0G/5i1HmFw==
-X-Received: by 2002:a5d:4711:: with SMTP id y17mr21172584wrq.355.1625569018612;
-        Tue, 06 Jul 2021 03:56:58 -0700 (PDT)
-Received: from [192.168.86.34] (cpc86377-aztw32-2-0-cust226.18-1.cable.virginm.net. [92.233.226.227])
-        by smtp.googlemail.com with ESMTPSA id o3sm16468134wrw.56.2021.07.06.03.56.55
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 06 Jul 2021 03:56:57 -0700 (PDT)
-Subject: Re: [PATCH] bus: Make remove callback return void
-To:     =?UTF-8?Q?Uwe_Kleine-K=c3=b6nig?= <u.kleine-koenig@pengutronix.de>,
+        id S231565AbhGFLAZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 6 Jul 2021 07:00:25 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:59301 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S231718AbhGFLAY (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 6 Jul 2021 07:00:24 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1625569065;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=QUyu+xoe1E6BsQbSDzUeyLIXRBJKwC/I/FCZr8qcsPA=;
+        b=OP4A90nDzTdDH9pCXS7i40kzev43201L9fvpI05/FOaAr4ypll9zerTW1tnWG2pVUobSLV
+        5YFAi7Lu1vHtT/b1ik2su9r4VEpddHnvDOEQAzXUOJoJQZpoOkbqUTBZG6gMdSg7YoZmEg
+        +KZpcKWJmRVHRXrJDWx6RU5iQ5QNt1U=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-459-bJl2kziYOtaGttG1OZkYHQ-1; Tue, 06 Jul 2021 06:57:43 -0400
+X-MC-Unique: bJl2kziYOtaGttG1OZkYHQ-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 47DE81800D41;
+        Tue,  6 Jul 2021 10:57:36 +0000 (UTC)
+Received: from localhost (ovpn-113-13.ams2.redhat.com [10.36.113.13])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 95A0A60CC6;
+        Tue,  6 Jul 2021 10:57:19 +0000 (UTC)
+From:   Cornelia Huck <cohuck@redhat.com>
+To:     Uwe =?utf-8?Q?Kleine-K=C3=B6nig?= 
+        <u.kleine-koenig@pengutronix.de>,
         Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 Cc:     kernel@pengutronix.de, linux-kernel@vger.kernel.org,
         Russell King <linux@armlinux.org.uk>,
@@ -63,8 +49,8 @@ Cc:     kernel@pengutronix.de, linux-kernel@vger.kernel.org,
         "Rafael J. Wysocki" <rjw@rjwysocki.net>,
         Len Brown <lenb@kernel.org>,
         William Breathitt Gray <vilhelm.gray@gmail.com>,
-        =?UTF-8?B?UmFmYcWCIE1pxYJlY2tp?= <zajec5@gmail.com>,
-        Maxime Ripard <mripard@kernel.org>,
+        =?utf-8?Q?Rafa=C5=82_Mi=C5=82eck?= =?utf-8?Q?i?= 
+        <zajec5@gmail.com>, Maxime Ripard <mripard@kernel.org>,
         Chen-Yu Tsai <wens@csie.org>,
         Jernej Skrabec <jernej.skrabec@gmail.com>,
         Alison Schofield <alison.schofield@intel.com>,
@@ -105,57 +91,126 @@ Cc:     kernel@pengutronix.de, linux-kernel@vger.kernel.org,
         Jon Mason <jdmason@kudzu.us>, Allen Hubbe <allenbh@gmail.com>,
         Kishon Vijay Abraham I <kishon@ti.com>,
         Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>,
-        =?UTF-8?Q?Krzysztof_Wilczy=c5=84ski?= <kw@linux.com>,
-        Bjorn Helgaas <bhelgaas@google.com>,
+        Krzysztof =?utf-8?Q?Wilczy=C5=84sk?= =?utf-8?Q?i?= 
+        <kw@linux.com>, Bjorn Helgaas <bhelgaas@google.com>,
         Dominik Brodowski <linux@dominikbrodowski.net>,
         Maximilian Luz <luzmaximilian@gmail.com>,
         Hans de Goede <hdegoede@redhat.com>,
         Mark Gross <mgross@linux.intel.com>,
         Matt Porter <mporter@kernel.crashing.org>,
-        linux-arm-msm@vger.kernel.org, linux-spi@vger.kernel.org,
-        linux-staging@lists.linux.dev, greybus-dev@lists.linaro.org,
-        target-devel@vger.kernel.org, linux-usb@vger.kernel.org,
-        linux-serial@vger.kernel.org,
+        Alexandre Bounine <alex.bou9@gmail.com>,
+        Ohad Ben-Cohen <ohad@wizery.com>,
+        Bjorn Andersson <bjorn.andersson@linaro.org>,
+        Mathieu Poirier <mathieu.poirier@linaro.org>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Thorsten Scherer <t.scherer@eckelmann.de>,
+        Srinivas Kandagatla <srinivas.kandagatla@linaro.org>,
+        Andy Gross <agross@kernel.org>,
+        Mark Brown <broonie@kernel.org>,
+        Stephen Boyd <sboyd@kernel.org>, Michael Buesch <m@bues.ch>,
+        Sven Van Asbroeck <TheSven73@gmail.com>,
+        Johan Hovold <johan@kernel.org>, Alex Elder <elder@kernel.org>,
+        Andreas Noever <andreas.noever@gmail.com>,
+        Michael Jamet <michael.jamet@intel.com>,
+        Mika Westerberg <mika.westerberg@linux.intel.com>,
+        Yehezkel Bernat <YehezkelShB@gmail.com>,
+        Rob Herring <robh@kernel.org>,
+        Jiri Slaby <jirislaby@kernel.org>,
+        Heikki Krogerus <heikki.krogerus@linux.intel.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Kirti Wankhede <kwankhede@nvidia.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Martyn Welch <martyn@welchs.me.uk>,
+        Manohar Vanga <manohar.vanga@gmail.com>,
+        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
+        Juergen Gross <jgross@suse.com>,
+        Stefano Stabellini <sstabellini@kernel.org>,
+        Johannes Berg <johannes@sipsolutions.net>,
+        Jaroslav Kysela <perex@perex.cz>,
+        Takashi Iwai <tiwai@suse.com>, Marc Zyngier <maz@kernel.org>,
+        Tyrel Datwyler <tyreld@linux.ibm.com>,
+        Vladimir Zapolskiy <vz@mleia.com>,
+        Samuel Holland <samuel@sholland.org>,
+        Qinglang Miao <miaoqinglang@huawei.com>,
+        Alexey Kardashevskiy <aik@ozlabs.ru>,
+        Kai-Heng Feng <kai.heng.feng@canonical.com>,
+        Joey Pabalan <jpabalanb@gmail.com>,
+        Pali =?utf-8?Q?Roh=C3=A1r?= <pali@kernel.org>,
+        Adrian Hunter <adrian.hunter@intel.com>,
+        Frank Li <lznuaa@gmail.com>,
+        Mike Christie <michael.christie@oracle.com>,
+        Bodo Stroesser <bostroesser@gmail.com>,
+        Hannes Reinecke <hare@suse.de>,
+        David Woodhouse <dwmw@amazon.co.uk>,
+        SeongJae Park <sjpark@amazon.de>,
+        Julien Grall <jgrall@amazon.com>,
+        linux-arm-kernel@lists.infradead.org, linux-mips@vger.kernel.org,
+        linux-parisc@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+        linux-acpi@vger.kernel.org, linux-wireless@vger.kernel.org,
+        linux-sunxi@lists.linux.dev, linux-cxl@vger.kernel.org,
+        nvdimm@lists.linux.dev, dmaengine@vger.kernel.org,
+        linux1394-devel@lists.sourceforge.net, linux-fpga@vger.kernel.org,
+        linux-input@vger.kernel.org, linux-hyperv@vger.kernel.org,
+        linux-i2c@vger.kernel.org, linux-i3c@lists.infradead.org,
+        industrypack-devel@lists.sourceforge.net,
+        linux-media@vger.kernel.org, linux-mmc@vger.kernel.org,
+        netdev@vger.kernel.org, linux-ntb@googlegroups.com,
+        linux-pci@vger.kernel.org, platform-driver-x86@vger.kernel.org,
+        linux-remoteproc@vger.kernel.org, linux-scsi@vger.kernel.org,
+        alsa-devel@alsa-project.org, linux-arm-msm@vger.kernel.org,
+        linux-spi@vger.kernel.org, linux-staging@lists.linux.dev,
+        greybus-dev@lists.linaro.org, target-devel@vger.kernel.org,
+        linux-usb@vger.kernel.org, linux-serial@vger.kernel.org,
         virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
         xen-devel@lists.xenproject.org
-References: <20210706095037.1425211-1-u.kleine-koenig@pengutronix.de>
-From:   Srinivas Kandagatla <srinivas.kandagatla@linaro.org>
-Message-ID: <bd408732-a23d-d3e6-3786-ea9fbf114d50@linaro.org>
-Date:   Tue, 6 Jul 2021 11:56:54 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
-MIME-Version: 1.0
+Subject: Re: [PATCH] bus: Make remove callback return void
 In-Reply-To: <20210706095037.1425211-1-u.kleine-koenig@pengutronix.de>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Organization: Red Hat GmbH
+References: <20210706095037.1425211-1-u.kleine-koenig@pengutronix.de>
+User-Agent: Notmuch/0.32.1 (https://notmuchmail.org)
+Date:   Tue, 06 Jul 2021 12:57:17 +0200
+Message-ID: <87pmvvhfqq.fsf@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Tue, Jul 06 2021, Uwe Kleine-K=C3=B6nig <u.kleine-koenig@pengutronix.de>=
+ wrote:
 
-
-On 06/07/2021 10:50, Uwe Kleine-König wrote:
 > The driver core ignores the return value of this callback because there
 > is only little it can do when a device disappears.
-> 
+>
 > This is the final bit of a long lasting cleanup quest where several
 > buses were converted to also return void from their remove callback.
 > Additionally some resource leaks were fixed that were caused by drivers
 > returning an error code in the expectation that the driver won't go
 > away.
-> 
+>
 > With struct bus_type::remove returning void it's prevented that newly
 > implemented buses return an ignored error code and so don't anticipate
 > wrong expectations for driver authors.
-> 
-> Signed-off-by: Uwe Kleine-König<u.kleine-koenig@pengutronix.de>
+
+Yay!
+
+>
+> Signed-off-by: Uwe Kleine-K=C3=B6nig <u.kleine-koenig@pengutronix.de>
 > ---
-...
+> Hello,
+>
+> this patch depends on "PCI: endpoint: Make struct pci_epf_driver::remove
+> return void" that is not yet applied, see
+> https://lore.kernel.org/r/20210223090757.57604-1-u.kleine-koenig@pengutro=
+nix.de.
+>
+> I tested it using allmodconfig on amd64 and arm, but I wouldn't be
+> surprised if I still missed to convert a driver. So it would be great to
+> get this into next early after the merge window closes.
 
->   drivers/slimbus/core.c                    | 4 +---
-
-for slimbus changes:
-
-Acked-by: Srinivas Kandagatla <srinivas.kandagatla@linaro.org>
+I'm afraid you missed the s390-specific busses in drivers/s390/cio/
+(css/ccw/ccwgroup).
 
