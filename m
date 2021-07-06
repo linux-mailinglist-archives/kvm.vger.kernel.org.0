@@ -2,55 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id BCA573BD91A
-	for <lists+kvm@lfdr.de>; Tue,  6 Jul 2021 16:53:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E13F23BD91D
+	for <lists+kvm@lfdr.de>; Tue,  6 Jul 2021 16:54:27 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232531AbhGFO4I (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 6 Jul 2021 10:56:08 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:32850 "EHLO
+        id S232543AbhGFO5E (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 6 Jul 2021 10:57:04 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:56710 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231852AbhGFO4I (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 6 Jul 2021 10:56:08 -0400
+        by vger.kernel.org with ESMTP id S232160AbhGFO5B (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 6 Jul 2021 10:57:01 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1625583209;
+        s=mimecast20190719; t=1625583262;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=J6NVm2pYc7KkCmbLNwpdJR5mdsiFS18TYkWg9Ro+c24=;
-        b=iiZ1shVMZOjoIyAhpeVV2oVHemQrUNQjMrr+lP+/frmEOmatLMZBI/kGMXnjesUhyGpNZS
-        NkzN4CEIPE89bNSKggv2XFgorAhXTP0/hbkCQ3PbosLipKM2S9hA5SLKXBhq1+DBwOGSE2
-        NnKpmXeobHkFebB5DckbIAMLVG8kLVo=
-Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
- [209.85.218.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-390-zGEPMvYyM4StA3apsm6UKg-1; Tue, 06 Jul 2021 10:53:27 -0400
-X-MC-Unique: zGEPMvYyM4StA3apsm6UKg-1
-Received: by mail-ej1-f70.google.com with SMTP id h14-20020a1709070b0eb02904d7c421e00bso2776917ejl.2
-        for <kvm@vger.kernel.org>; Tue, 06 Jul 2021 07:53:27 -0700 (PDT)
+        bh=gIfve6HAPRxgtAkyhJQItncry4m+39jYCxDrBmpEpYw=;
+        b=c0LmuNyZiZH8G4V/wELIFP03p958HycrvS904r8MqfJTN6Kxf9+xrqAqFHOvLII+tHn6+i
+        CRRpcnFwgO5UVBmr7rqo0wVYho8sYcfvsrGJ+ldGdtFmD9hCIjT6nF7cK3nhXsR2l8y1Ge
+        JNhntW1d70WVdeUfgl3ktiSHoyDejd0=
+Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
+ [209.85.218.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-528-yHZcZ2FGNaOd_I1ObxAQcw-1; Tue, 06 Jul 2021 10:54:20 -0400
+X-MC-Unique: yHZcZ2FGNaOd_I1ObxAQcw-1
+Received: by mail-ej1-f71.google.com with SMTP id hy7-20020a1709068a67b02904cdf8737a75so5092407ejc.9
+        for <kvm@vger.kernel.org>; Tue, 06 Jul 2021 07:54:20 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:to:cc:references:from:subject:message-id:date
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=J6NVm2pYc7KkCmbLNwpdJR5mdsiFS18TYkWg9Ro+c24=;
-        b=m7OTlga9UGOzBMHt5IGZzGbylmbDWT/pMLY6kV46RJXvYeJ6tYtJal8y9Y0jyRi/D9
-         xRKSrIrUKdW8h1z2viN8xaIoKP2392gW8XO9VAndVvPcmYGd+0B504Q+ZNUS2Ul9rEiv
-         NtwYB2P8d+3dZQyeUbtoT2oFCEJnOciVSaQKITQK7xZiaQpCknNgOib2BJZJhlKNFd/l
-         5KR0S741UTxu1/ERNxTFEKe8m6pa7Dg4Wl+DGv9IU2Sb/ikmULX1f9D8cfYLiuvqK4Wq
-         al0KMxvcyYhEcDC2D8cmIBVq435sSj/mkE9dXoF9bhzTVudGh2E7NEQa6jLzdmumVRzX
-         71LA==
-X-Gm-Message-State: AOAM533A7bFbSW2mKJ4LXs//NoLQOxi7ESUE5hAgjhgDDKYshWOnXoRY
-        scjnld5Ai1+AXA1mz7fCuIMLQnhmLgT265FxhGsIFm97vGTkHs/8c+/XNTTYY8jVpuvqVYCtGiQ
-        Ys1MIkHUFHDuY
-X-Received: by 2002:a17:906:6047:: with SMTP id p7mr18832599ejj.206.1625583206551;
-        Tue, 06 Jul 2021 07:53:26 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzx38vUyETr6B4m1Myr9dqa8Lha/dt9+ZFh6SdGAKHQ3/e68Y+6MWCf3cD0kN+63CtGaRWZYw==
-X-Received: by 2002:a17:906:6047:: with SMTP id p7mr18832585ejj.206.1625583206360;
-        Tue, 06 Jul 2021 07:53:26 -0700 (PDT)
+        bh=gIfve6HAPRxgtAkyhJQItncry4m+39jYCxDrBmpEpYw=;
+        b=gM5SBBbvRQyRStdU9TWLKp/Cq6aEstLKewMYFz1u2L3wcBAPQen4s05PFlpLCSWIff
+         Kokft8ds0ne+O7BoPllmW0ueap59h72fselJhZZiqOEVuwvJzRsFOm9MxVCUUmMpLCGO
+         zUASRO0J8yCNRFGxO0hZaXRin+Qml2fu2E9+XCK0GOvUxDakHIYLksLrwQpksynnhxTV
+         DDLmEfHq+jkBFbwyfapkhzhPiJd4K4dtMBoZN/VMKDg58YCH+vDpzww0dKGLyF40Mrov
+         3IAABe4vDRtFbbiT/Dj0cTYosWcQWoo+aS1q2i6LF+AkWVO3MtuVQJTeOJZ7dDKRtESy
+         ItqA==
+X-Gm-Message-State: AOAM531D9+3Eoaw39I8H+OQY5W9D8QrhO5GbgH6lw1br+94qXI5gvI79
+        sFAurtkE74rLv62ya3YmpiuSvbHbjyAY2CGKHP7b7b7YMWE45vHtLgiytz3G3UH5eYP8ahyOX9i
+        McGteOz6KnWnm
+X-Received: by 2002:a05:6402:50d3:: with SMTP id h19mr12969996edb.344.1625583259464;
+        Tue, 06 Jul 2021 07:54:19 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwEI8iGjPWBBVHpfrdgKkk0/gfUGY3UHDu1YXJK2IbxReY3yiJw+E/vLPnBNu9LWMXRAKKImQ==
+X-Received: by 2002:a05:6402:50d3:: with SMTP id h19mr12969953edb.344.1625583259174;
+        Tue, 06 Jul 2021 07:54:19 -0700 (PDT)
 Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id b5sm3368939ejz.122.2021.07.06.07.53.24
+        by smtp.gmail.com with ESMTPSA id p5sm5795104ejm.115.2021.07.06.07.54.16
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 06 Jul 2021 07:53:25 -0700 (PDT)
+        Tue, 06 Jul 2021 07:54:17 -0700 (PDT)
+Subject: Re: [RFC PATCH v2 41/69] KVM: x86: Add infrastructure for stolen GPA
+ bits
 To:     isaku.yamahata@intel.com, Thomas Gleixner <tglx@linutronix.de>,
         Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
         "H . Peter Anvin" <hpa@zytor.com>,
@@ -61,266 +63,417 @@ To:     isaku.yamahata@intel.com, Thomas Gleixner <tglx@linutronix.de>,
         Connor Kuehl <ckuehl@redhat.com>,
         Sean Christopherson <seanjc@google.com>, x86@kernel.org,
         linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc:     isaku.yamahata@gmail.com
+Cc:     isaku.yamahata@gmail.com,
+        Rick Edgecombe <rick.p.edgecombe@intel.com>
 References: <cover.1625186503.git.isaku.yamahata@intel.com>
+ <c958a131ded780808a687b0f25c02127ca14418a.1625186503.git.isaku.yamahata@intel.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [RFC PATCH v2 00/69] KVM: X86: TDX support
-Message-ID: <9531986f-867f-6858-3e09-d1e8a64f5518@redhat.com>
-Date:   Tue, 6 Jul 2021 16:53:24 +0200
+Message-ID: <7b4ca19e-246a-35e6-7ef2-6a867b41ca90@redhat.com>
+Date:   Tue, 6 Jul 2021 16:54:16 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.11.0
 MIME-Version: 1.0
-In-Reply-To: <cover.1625186503.git.isaku.yamahata@intel.com>
+In-Reply-To: <c958a131ded780808a687b0f25c02127ca14418a.1625186503.git.isaku.yamahata@intel.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Based on the initial review, I think patches 2-3-17-18-19-20-23-49 can 
-already be merged for 5.15.
+On 03/07/21 00:04, isaku.yamahata@intel.com wrote:
+> From: Rick Edgecombe <rick.p.edgecombe@intel.com>
+> 
+> Add support in KVM's MMU for aliasing multiple GPAs (from a hardware
+> perspective) to a single GPA (from a memslot perspective). GPA alising
+> will be used to repurpose GPA bits as attribute bits, e.g. to expose an
+> execute-only permission bit to the guest. To keep the implementation
+> simple (relatively speaking), GPA aliasing is only supported via TDP.
+> 
+> Today KVM assumes two things that are broken by GPA aliasing.
+>    1. GPAs coming from hardware can be simply shifted to get the GFNs.
+>    2. GPA bits 51:MAXPHYADDR are reserved to zero.
+> 
+> With GPA aliasing, translating a GPA to GFN requires masking off the
+> repurposed bit, and a repurposed bit may reside in 51:MAXPHYADDR.
+> 
+> To support GPA aliasing, introduce the concept of per-VM GPA stolen bits,
+> that is, bits stolen from the GPA to act as new virtualized attribute
+> bits. A bit in the mask will cause the MMU code to create aliases of the
+> GPA. It can also be used to find the GFN out of a GPA coming from a tdp
+> fault.
+> 
+> To handle case (1) from above, retain any stolen bits when passing a GPA
+> in KVM's MMU code, but strip them when converting to a GFN so that the
+> GFN contains only the "real" GFN, i.e. never has repurposed bits set.
+> 
+> GFNs (without stolen bits) continue to be used to:
+> 	-Specify physical memory by userspace via memslots
+> 	-Map GPAs to TDP PTEs via RMAP
+> 	-Specify dirty tracking and write protection
+> 	-Look up MTRR types
+> 	-Inject async page faults
+> 
+> Since there are now multiple aliases for the same aliased GPA, when
+> userspace memory backing the memslots is paged out, both aliases need to be
+> modified. Fortunately this happens automatically. Since rmap supports
+> multiple mappings for the same GFN for PTE shadowing based paging, by
+> adding/removing each alias PTE with its GFN, kvm_handle_hva() based
+> operations will be applied to both aliases.
+> 
+> In the case of the rmap being removed in the future, the needed
+> information could be recovered by iterating over the stolen bits and
+> walking the TDP page tables.
+> 
+> For TLB flushes that are address based, make sure to flush both aliases
+> in the stolen bits case.
+> 
+> Only support stolen bits in 64 bit guest paging modes (long, PAE).
+> Features that use this infrastructure should restrict the stolen bits to
+> exclude the other paging modes. Don't support stolen bits for shadow EPT.
+> 
+> Signed-off-by: Rick Edgecombe <rick.p.edgecombe@intel.com>
+> Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
 
-The next part should be the introduction of vm_types, blocking ioctls 
-depending on the vm_type (patches 24-31).  Perhaps this blocking should 
-be applied already to SEV-ES, so that the corresponding code in QEMU can 
-be added early.
+Looks good, but the commit message is obsolete.
 
 Paolo
 
-On 03/07/21 00:04, isaku.yamahata@intel.com wrote:
-> From: Isaku Yamahata <isaku.yamahata@intel.com>
+>   arch/x86/kvm/mmu.h              | 26 ++++++++++
+>   arch/x86/kvm/mmu/mmu.c          | 86 ++++++++++++++++++++++-----------
+>   arch/x86/kvm/mmu/mmu_internal.h |  1 +
+>   arch/x86/kvm/mmu/paging_tmpl.h  | 25 ++++++----
+>   4 files changed, 101 insertions(+), 37 deletions(-)
 > 
-> * What's TDX?
-> TDX stands for Trust Domain Extensions which isolates VMs from the
-> virtual-machine manager (VMM)/hypervisor and any other software on the
-> platform. [1] For details, the specifications, [2], [3], [4], [5], [6], [7], are
-> available.
-> 
-> 
-> * The goal of this RFC patch
-> The purpose of this post is to get feedback early on high level design issue of
-> KVM enhancement for TDX. The detailed coding (variable naming etc) is not cared
-> of. This patch series is incomplete (not working). So it's RFC.  Although
-> multiple software components, not only KVM but also QEMU, guest Linux and
-> virtual bios, need to be updated, this includes only KVM VMM part. For those who
-> are curious to changes to other component, there are public repositories at
-> github. [8], [9]
-> 
-> 
-> * Patch organization
-> The patch 66 is main change.  The preceding patches(1-65) The preceding
-> patches(01-61) are refactoring the code and introducing additional hooks.
-> 
-> - 01-12: They are preparations. introduce architecture constants, code
->           refactoring, export symbols for following patches.
-> - 13-40: start to introduce the new type of VM and allow the coexistence of
->           multiple type of VM. allow/disallow KVM ioctl where
->           appropriate. Especially make per-system ioctl to per-VM ioctl.
-> - 41-65: refactoring KVM VMX/MMU and adding new hooks for Secure EPT.
-> - 66:    main patch to add "basic" support for building/running TDX.
-> - 67:    trace points for
-> - 68-69:  Documentation
-> 
-> * TODOs
-> Those major features are missing from this patch series to keep this patch
-> series small.
-> 
-> - load/initialize TDX module
->    split out from this patch series.
-> - unmapping private page
->    Will integrate Kirill's patch to show how kvm will utilize it.
-> - qemu gdb stub support
-> - Large page support
-> - guest PMU support
-> - TDP MMU support
-> - and more
-> 
-> Changes from v1:
-> - rebase to v5.13
-> - drop load/initialization of TDX module
-> - catch up the update of related specifications.
-> - rework on C-wrapper function to invoke seamcall
-> - various code clean up
-> 
-> [1] TDX specification
->     https://software.intel.com/content/www/us/en/develop/articles/intel-trust-domain-extensions.html
-> [2] Intel Trust Domain Extensions (Intel TDX)
->     https://software.intel.com/content/dam/develop/external/us/en/documents/tdx-whitepaper-final9-17.pdf
-> [3] Intel CPU Architectural Extensions Specification
->     https://software.intel.com/content/dam/develop/external/us/en/documents-tps/intel-tdx-cpu-architectural-specification.pdf
-> [4] Intel TDX Module 1.0 EAS
->     https://software.intel.com/content/dam/develop/external/us/en/documents/tdx-module-1eas-v0.85.039.pdf
-> [5] Intel TDX Loader Interface Specification
->    https://software.intel.com/content/dam/develop/external/us/en/documents-tps/intel-tdx-seamldr-interface-specification.pdf
-> [6] Intel TDX Guest-Hypervisor Communication Interface
->     https://software.intel.com/content/dam/develop/external/us/en/documents/intel-tdx-guest-hypervisor-communication-interface.pdf
-> [7] Intel TDX Virtual Firmware Design Guide
->     https://software.intel.com/content/dam/develop/external/us/en/documents/tdx-virtual-firmware-design-guide-rev-1.pdf
-> [8] intel public github
->     kvm TDX branch: https://github.com/intel/tdx/tree/kvm
->     TDX guest branch: https://github.com/intel/tdx/tree/guest
->     qemu TDX https://github.com/intel/qemu-tdx
-> [9] TDVF
->      https://github.com/tianocore/edk2-staging/tree/TDVF
-> 
-> Isaku Yamahata (11):
->    KVM: TDX: introduce config for KVM TDX support
->    KVM: X86: move kvm_cpu_vmxon() from vmx.c to virtext.h
->    KVM: X86: move out the definition vmcs_hdr/vmcs from kvm to x86
->    KVM: TDX: add a helper function for kvm to call seamcall
->    KVM: TDX: add trace point before/after TDX SEAMCALLs
->    KVM: TDX: Print the name of SEAMCALL status code
->    KVM: Add per-VM flag to mark read-only memory as unsupported
->    KVM: x86: add per-VM flags to disable SMI/INIT/SIPI
->    KVM: TDX: add trace point for TDVMCALL and SEPT operation
->    KVM: TDX: add document on TDX MODULE
->    Documentation/virtual/kvm: Add Trust Domain Extensions(TDX)
-> 
-> Kai Huang (2):
->    KVM: x86: Add per-VM flag to disable in-kernel I/O APIC and level
->      routes
->    cpu/hotplug: Document that TDX also depends on booting CPUs once
-> 
-> Rick Edgecombe (1):
->    KVM: x86: Add infrastructure for stolen GPA bits
-> 
-> Sean Christopherson (53):
->    KVM: TDX: Add TDX "architectural" error codes
->    KVM: TDX: Add architectural definitions for structures and values
->    KVM: TDX: define and export helper functions for KVM TDX support
->    KVM: TDX: Add C wrapper functions for TDX SEAMCALLs
->    KVM: Export kvm_io_bus_read for use by TDX for PV MMIO
->    KVM: Enable hardware before doing arch VM initialization
->    KVM: x86: Split core of hypercall emulation to helper function
->    KVM: x86: Export kvm_mmio tracepoint for use by TDX for PV MMIO
->    KVM: x86/mmu: Zap only leaf SPTEs for deleted/moved memslot by default
->    KVM: Add infrastructure and macro to mark VM as bugged
->    KVM: Export kvm_make_all_cpus_request() for use in marking VMs as
->      bugged
->    KVM: x86: Use KVM_BUG/KVM_BUG_ON to handle bugs that are fatal to the
->      VM
->    KVM: x86/mmu: Mark VM as bugged if page fault returns RET_PF_INVALID
->    KVM: Add max_vcpus field in common 'struct kvm'
->    KVM: x86: Add vm_type to differentiate legacy VMs from protected VMs
->    KVM: x86: Hoist kvm_dirty_regs check out of sync_regs()
->    KVM: x86: Introduce "protected guest" concept and block disallowed
->      ioctls
->    KVM: x86: Add per-VM flag to disable direct IRQ injection
->    KVM: x86: Add flag to disallow #MC injection / KVM_X86_SETUP_MCE
->    KVM: x86: Add flag to mark TSC as immutable (for TDX)
->    KVM: Add per-VM flag to disable dirty logging of memslots for TDs
->    KVM: x86: Allow host-initiated WRMSR to set X2APIC regardless of CPUID
->    KVM: x86: Add kvm_x86_ops .cache_gprs() and .flush_gprs()
->    KVM: x86: Add support for vCPU and device-scoped KVM_MEMORY_ENCRYPT_OP
->    KVM: x86: Introduce vm_teardown() hook in kvm_arch_vm_destroy()
->    KVM: x86: Add a switch_db_regs flag to handle TDX's auto-switched
->      behavior
->    KVM: x86: Check for pending APICv interrupt in kvm_vcpu_has_events()
->    KVM: x86: Add option to force LAPIC expiration wait
->    KVM: x86: Add guest_supported_xss placholder
->    KVM: Export kvm_is_reserved_pfn() for use by TDX
->    KVM: x86/mmu: Explicitly check for MMIO spte in fast page fault
->    KVM: x86/mmu: Allow non-zero init value for shadow PTE
->    KVM: x86/mmu: Refactor shadow walk in __direct_map() to reduce
->      indentation
->    KVM: x86/mmu: Return old SPTE from mmu_spte_clear_track_bits()
->    KVM: x86/mmu: Frame in support for private/inaccessible shadow pages
->    KVM: x86/mmu: Move 'pfn' variable to caller of direct_page_fault()
->    KVM: x86/mmu: Introduce kvm_mmu_map_tdp_page() for use by TDX
->    KVM: VMX: Modify NMI and INTR handlers to take intr_info as param
->    KVM: VMX: Move NMI/exception handler to common helper
->    KVM: x86/mmu: Allow per-VM override of the TDP max page level
->    KVM: VMX: Split out guts of EPT violation to common/exposed function
->    KVM: VMX: Define EPT Violation architectural bits
->    KVM: VMX: Define VMCS encodings for shared EPT pointer
->    KVM: VMX: Add 'main.c' to wrap VMX and TDX
->    KVM: VMX: Move setting of EPT MMU masks to common VT-x code
->    KVM: VMX: Move register caching logic to common code
->    KVM: TDX: Define TDCALL exit reason
->    KVM: TDX: Stub in tdx.h with structs, accessors, and VMCS helpers
->    KVM: VMX: Add macro framework to read/write VMCS for VMs and TDs
->    KVM: VMX: Move AR_BYTES encoder/decoder helpers to common.h
->    KVM: VMX: MOVE GDT and IDT accessors to common code
->    KVM: VMX: Move .get_interrupt_shadow() implementation to common VMX
->      code
->    KVM: TDX: Add "basic" support for building and running Trust Domains
-> 
-> Xiaoyao Li (2):
->    KVM: TDX: Introduce pr_seamcall_ex_ret_info() to print more info when
->      SEAMCALL fails
->    KVM: X86: Introduce initial_tsc_khz in struct kvm_arch
-> 
->   Documentation/virt/kvm/api.rst        |    6 +-
->   Documentation/virt/kvm/intel-tdx.rst  |  441 ++++++
->   Documentation/virt/kvm/tdx-module.rst |   48 +
->   arch/arm64/include/asm/kvm_host.h     |    3 -
->   arch/arm64/kvm/arm.c                  |    7 +-
->   arch/arm64/kvm/vgic/vgic-init.c       |    6 +-
->   arch/x86/Kbuild                       |    1 +
->   arch/x86/include/asm/cpufeatures.h    |    2 +
->   arch/x86/include/asm/kvm-x86-ops.h    |    8 +
->   arch/x86/include/asm/kvm_boot.h       |   30 +
->   arch/x86/include/asm/kvm_host.h       |   55 +-
->   arch/x86/include/asm/virtext.h        |   25 +
->   arch/x86/include/asm/vmx.h            |   17 +
->   arch/x86/include/uapi/asm/kvm.h       |   60 +
->   arch/x86/include/uapi/asm/vmx.h       |    7 +-
->   arch/x86/kernel/asm-offsets_64.c      |   15 +
->   arch/x86/kvm/Kconfig                  |   11 +
->   arch/x86/kvm/Makefile                 |    3 +-
->   arch/x86/kvm/boot/Makefile            |    6 +
->   arch/x86/kvm/boot/seam/tdx_common.c   |  242 +++
->   arch/x86/kvm/boot/seam/tdx_common.h   |   13 +
->   arch/x86/kvm/ioapic.c                 |    4 +
->   arch/x86/kvm/irq_comm.c               |   13 +-
->   arch/x86/kvm/lapic.c                  |    7 +-
->   arch/x86/kvm/lapic.h                  |    2 +-
->   arch/x86/kvm/mmu.h                    |   31 +-
->   arch/x86/kvm/mmu/mmu.c                |  526 +++++--
->   arch/x86/kvm/mmu/mmu_internal.h       |    3 +
->   arch/x86/kvm/mmu/paging_tmpl.h        |   25 +-
->   arch/x86/kvm/mmu/spte.c               |   15 +-
->   arch/x86/kvm/mmu/spte.h               |   18 +-
->   arch/x86/kvm/svm/svm.c                |   18 +-
->   arch/x86/kvm/trace.h                  |  138 ++
->   arch/x86/kvm/vmx/common.h             |  178 +++
->   arch/x86/kvm/vmx/main.c               | 1098 ++++++++++++++
->   arch/x86/kvm/vmx/posted_intr.c        |    6 +
->   arch/x86/kvm/vmx/seamcall.S           |   64 +
->   arch/x86/kvm/vmx/seamcall.h           |   68 +
->   arch/x86/kvm/vmx/tdx.c                | 1958 +++++++++++++++++++++++++
->   arch/x86/kvm/vmx/tdx.h                |  267 ++++
->   arch/x86/kvm/vmx/tdx_arch.h           |  370 +++++
->   arch/x86/kvm/vmx/tdx_errno.h          |  202 +++
->   arch/x86/kvm/vmx/tdx_ops.h            |  218 +++
->   arch/x86/kvm/vmx/tdx_stubs.c          |   45 +
->   arch/x86/kvm/vmx/vmcs.h               |   11 -
->   arch/x86/kvm/vmx/vmenter.S            |  146 ++
->   arch/x86/kvm/vmx/vmx.c                |  509 ++-----
->   arch/x86/kvm/x86.c                    |  285 +++-
->   include/linux/kvm_host.h              |   51 +-
->   include/uapi/linux/kvm.h              |    2 +
->   kernel/cpu.c                          |    4 +
->   tools/arch/x86/include/uapi/asm/kvm.h |   55 +
->   tools/include/uapi/linux/kvm.h        |    2 +
->   virt/kvm/kvm_main.c                   |   44 +-
->   54 files changed, 6717 insertions(+), 672 deletions(-)
->   create mode 100644 Documentation/virt/kvm/intel-tdx.rst
->   create mode 100644 Documentation/virt/kvm/tdx-module.rst
->   create mode 100644 arch/x86/include/asm/kvm_boot.h
->   create mode 100644 arch/x86/kvm/boot/Makefile
->   create mode 100644 arch/x86/kvm/boot/seam/tdx_common.c
->   create mode 100644 arch/x86/kvm/boot/seam/tdx_common.h
->   create mode 100644 arch/x86/kvm/vmx/common.h
->   create mode 100644 arch/x86/kvm/vmx/main.c
->   create mode 100644 arch/x86/kvm/vmx/seamcall.S
->   create mode 100644 arch/x86/kvm/vmx/seamcall.h
->   create mode 100644 arch/x86/kvm/vmx/tdx.c
->   create mode 100644 arch/x86/kvm/vmx/tdx.h
->   create mode 100644 arch/x86/kvm/vmx/tdx_arch.h
->   create mode 100644 arch/x86/kvm/vmx/tdx_errno.h
->   create mode 100644 arch/x86/kvm/vmx/tdx_ops.h
->   create mode 100644 arch/x86/kvm/vmx/tdx_stubs.c
+> diff --git a/arch/x86/kvm/mmu.h b/arch/x86/kvm/mmu.h
+> index 88d0ed5225a4..69b82857acdb 100644
+> --- a/arch/x86/kvm/mmu.h
+> +++ b/arch/x86/kvm/mmu.h
+> @@ -232,4 +232,30 @@ int kvm_arch_write_log_dirty(struct kvm_vcpu *vcpu);
+>   int kvm_mmu_post_init_vm(struct kvm *kvm);
+>   void kvm_mmu_pre_destroy_vm(struct kvm *kvm);
+>   
+> +static inline gfn_t kvm_gfn_stolen_mask(struct kvm *kvm)
+> +{
+> +	/* Currently there are no stolen bits in KVM */
+> +	return 0;
+> +}
+> +
+> +static inline gfn_t vcpu_gfn_stolen_mask(struct kvm_vcpu *vcpu)
+> +{
+> +	return kvm_gfn_stolen_mask(vcpu->kvm);
+> +}
+> +
+> +static inline gpa_t kvm_gpa_stolen_mask(struct kvm *kvm)
+> +{
+> +	return kvm_gfn_stolen_mask(kvm) << PAGE_SHIFT;
+> +}
+> +
+> +static inline gpa_t vcpu_gpa_stolen_mask(struct kvm_vcpu *vcpu)
+> +{
+> +	return kvm_gpa_stolen_mask(vcpu->kvm);
+> +}
+> +
+> +static inline gfn_t vcpu_gpa_to_gfn_unalias(struct kvm_vcpu *vcpu, gpa_t gpa)
+> +{
+> +	return (gpa >> PAGE_SHIFT) & ~vcpu_gfn_stolen_mask(vcpu);
+> +}
+> +
+>   #endif
+> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> index 0dc4bf34ce9c..990ee645b8a2 100644
+> --- a/arch/x86/kvm/mmu/mmu.c
+> +++ b/arch/x86/kvm/mmu/mmu.c
+> @@ -188,27 +188,37 @@ static inline bool kvm_available_flush_tlb_with_range(void)
+>   	return kvm_x86_ops.tlb_remote_flush_with_range;
+>   }
+>   
+> -static void kvm_flush_remote_tlbs_with_range(struct kvm *kvm,
+> -		struct kvm_tlb_range *range)
+> -{
+> -	int ret = -ENOTSUPP;
+> -
+> -	if (range && kvm_x86_ops.tlb_remote_flush_with_range)
+> -		ret = static_call(kvm_x86_tlb_remote_flush_with_range)(kvm, range);
+> -
+> -	if (ret)
+> -		kvm_flush_remote_tlbs(kvm);
+> -}
+> -
+>   void kvm_flush_remote_tlbs_with_address(struct kvm *kvm,
+>   		u64 start_gfn, u64 pages)
+>   {
+>   	struct kvm_tlb_range range;
+> +	u64 gfn_stolen_mask;
+> +
+> +	if (!kvm_available_flush_tlb_with_range())
+> +		goto generic_flush;
+> +
+> +	/*
+> +	 * Fall back to the big hammer flush if there is more than one
+> +	 * GPA alias that needs to be flushed.
+> +	 */
+> +	gfn_stolen_mask = kvm_gfn_stolen_mask(kvm);
+> +	if (hweight64(gfn_stolen_mask) > 1)
+> +		goto generic_flush;
+>   
+>   	range.start_gfn = start_gfn;
+>   	range.pages = pages;
+> +	if (static_call(kvm_x86_tlb_remote_flush_with_range)(kvm, &range))
+> +		goto generic_flush;
+> +
+> +	if (!gfn_stolen_mask)
+> +		return;
+>   
+> -	kvm_flush_remote_tlbs_with_range(kvm, &range);
+> +	range.start_gfn |= gfn_stolen_mask;
+> +	static_call(kvm_x86_tlb_remote_flush_with_range)(kvm, &range);
+> +	return;
+> +
+> +generic_flush:
+> +	kvm_flush_remote_tlbs(kvm);
+>   }
+>   
+>   bool is_nx_huge_page_enabled(void)
+> @@ -1949,14 +1959,16 @@ static void clear_sp_write_flooding_count(u64 *spte)
+>   	__clear_sp_write_flooding_count(sptep_to_sp(spte));
+>   }
+>   
+> -static struct kvm_mmu_page *kvm_mmu_get_page(struct kvm_vcpu *vcpu,
+> -					     gfn_t gfn,
+> -					     gva_t gaddr,
+> -					     unsigned level,
+> -					     int direct,
+> -					     unsigned int access)
+> +static struct kvm_mmu_page *__kvm_mmu_get_page(struct kvm_vcpu *vcpu,
+> +					       gfn_t gfn,
+> +					       gfn_t gfn_stolen_bits,
+> +					       gva_t gaddr,
+> +					       unsigned int level,
+> +					       int direct,
+> +					       unsigned int access)
+>   {
+>   	bool direct_mmu = vcpu->arch.mmu->direct_map;
+> +	gpa_t gfn_and_stolen = gfn | gfn_stolen_bits;
+>   	union kvm_mmu_page_role role;
+>   	struct hlist_head *sp_list;
+>   	unsigned quadrant;
+> @@ -1978,9 +1990,9 @@ static struct kvm_mmu_page *kvm_mmu_get_page(struct kvm_vcpu *vcpu,
+>   		role.quadrant = quadrant;
+>   	}
+>   
+> -	sp_list = &vcpu->kvm->arch.mmu_page_hash[kvm_page_table_hashfn(gfn)];
+> +	sp_list = &vcpu->kvm->arch.mmu_page_hash[kvm_page_table_hashfn(gfn_and_stolen)];
+>   	for_each_valid_sp(vcpu->kvm, sp, sp_list) {
+> -		if (sp->gfn != gfn) {
+> +		if ((sp->gfn | sp->gfn_stolen_bits) != gfn_and_stolen) {
+>   			collisions++;
+>   			continue;
+>   		}
+> @@ -2020,6 +2032,7 @@ static struct kvm_mmu_page *kvm_mmu_get_page(struct kvm_vcpu *vcpu,
+>   	sp = kvm_mmu_alloc_page(vcpu, direct);
+>   
+>   	sp->gfn = gfn;
+> +	sp->gfn_stolen_bits = gfn_stolen_bits;
+>   	sp->role = role;
+>   	hlist_add_head(&sp->hash_link, sp_list);
+>   	if (!direct) {
+> @@ -2044,6 +2057,13 @@ static struct kvm_mmu_page *kvm_mmu_get_page(struct kvm_vcpu *vcpu,
+>   	return sp;
+>   }
+>   
+> +static struct kvm_mmu_page *kvm_mmu_get_page(struct kvm_vcpu *vcpu, gfn_t gfn,
+> +					     gva_t gaddr, unsigned int level,
+> +					     int direct, unsigned int access)
+> +{
+> +	return __kvm_mmu_get_page(vcpu, gfn, 0, gaddr, level, direct, access);
+> +}
+> +
+>   static void shadow_walk_init_using_root(struct kvm_shadow_walk_iterator *iterator,
+>   					struct kvm_vcpu *vcpu, hpa_t root,
+>   					u64 addr)
+> @@ -2637,7 +2657,9 @@ static int direct_pte_prefetch_many(struct kvm_vcpu *vcpu,
+>   
+>   	gfn = kvm_mmu_page_get_gfn(sp, start - sp->spt);
+>   	slot = gfn_to_memslot_dirty_bitmap(vcpu, gfn, access & ACC_WRITE_MASK);
+> -	if (!slot)
+> +
+> +	/* Don't map private memslots for stolen bits */
+> +	if (!slot || (sp->gfn_stolen_bits && slot->id >= KVM_USER_MEM_SLOTS))
+>   		return -1;
+>   
+>   	ret = gfn_to_page_many_atomic(slot, gfn, pages, end - start);
+> @@ -2827,7 +2849,9 @@ static int __direct_map(struct kvm_vcpu *vcpu, gpa_t gpa, u32 error_code,
+>   	struct kvm_shadow_walk_iterator it;
+>   	struct kvm_mmu_page *sp;
+>   	int level, req_level, ret;
+> -	gfn_t gfn = gpa >> PAGE_SHIFT;
+> +	gpa_t gpa_stolen_mask = vcpu_gpa_stolen_mask(vcpu);
+> +	gfn_t gfn = (gpa & ~gpa_stolen_mask) >> PAGE_SHIFT;
+> +	gfn_t gfn_stolen_bits = (gpa & gpa_stolen_mask) >> PAGE_SHIFT;
+>   	gfn_t base_gfn = gfn;
+>   
+>   	if (WARN_ON(!VALID_PAGE(vcpu->arch.mmu->root_hpa)))
+> @@ -2852,8 +2876,9 @@ static int __direct_map(struct kvm_vcpu *vcpu, gpa_t gpa, u32 error_code,
+>   
+>   		drop_large_spte(vcpu, it.sptep);
+>   		if (!is_shadow_present_pte(*it.sptep)) {
+> -			sp = kvm_mmu_get_page(vcpu, base_gfn, it.addr,
+> -					      it.level - 1, true, ACC_ALL);
+> +			sp = __kvm_mmu_get_page(vcpu, base_gfn,
+> +						gfn_stolen_bits, it.addr,
+> +						it.level - 1, true, ACC_ALL);
+>   
+>   			link_shadow_page(vcpu, it.sptep, sp);
+>   			if (is_tdp && huge_page_disallowed &&
+> @@ -3689,6 +3714,13 @@ static bool try_async_pf(struct kvm_vcpu *vcpu, bool prefault, gfn_t gfn,
+>   	if (slot && (slot->flags & KVM_MEMSLOT_INVALID))
+>   		return true;
+>   
+> +	/* Don't expose aliases for no slot GFNs or private memslots */
+> +	if ((cr2_or_gpa & vcpu_gpa_stolen_mask(vcpu)) &&
+> +	    !kvm_is_visible_memslot(slot)) {
+> +		*pfn = KVM_PFN_NOSLOT;
+> +		return false;
+> +	}
+> +
+>   	/* Don't expose private memslots to L2. */
+>   	if (is_guest_mode(vcpu) && !kvm_is_visible_memslot(slot)) {
+>   		*pfn = KVM_PFN_NOSLOT;
+> @@ -3723,7 +3755,7 @@ static int direct_page_fault(struct kvm_vcpu *vcpu, gpa_t gpa, u32 error_code,
+>   	bool write = error_code & PFERR_WRITE_MASK;
+>   	bool map_writable;
+>   
+> -	gfn_t gfn = gpa >> PAGE_SHIFT;
+> +	gfn_t gfn = vcpu_gpa_to_gfn_unalias(vcpu, gpa);
+>   	unsigned long mmu_seq;
+>   	kvm_pfn_t pfn;
+>   	hva_t hva;
+> @@ -3833,7 +3865,7 @@ int kvm_tdp_page_fault(struct kvm_vcpu *vcpu, gpa_t gpa, u32 error_code,
+>   	     max_level > PG_LEVEL_4K;
+>   	     max_level--) {
+>   		int page_num = KVM_PAGES_PER_HPAGE(max_level);
+> -		gfn_t base = (gpa >> PAGE_SHIFT) & ~(page_num - 1);
+> +		gfn_t base = vcpu_gpa_to_gfn_unalias(vcpu, gpa) & ~(page_num - 1);
+>   
+>   		if (kvm_mtrr_check_gfn_range_consistency(vcpu, base, page_num))
+>   			break;
+> diff --git a/arch/x86/kvm/mmu/mmu_internal.h b/arch/x86/kvm/mmu/mmu_internal.h
+> index d64ccb417c60..c896ec9f3159 100644
+> --- a/arch/x86/kvm/mmu/mmu_internal.h
+> +++ b/arch/x86/kvm/mmu/mmu_internal.h
+> @@ -46,6 +46,7 @@ struct kvm_mmu_page {
+>   	 */
+>   	union kvm_mmu_page_role role;
+>   	gfn_t gfn;
+> +	gfn_t gfn_stolen_bits;
+>   
+>   	u64 *spt;
+>   	/* hold the gfn of each spte inside spt */
+> diff --git a/arch/x86/kvm/mmu/paging_tmpl.h b/arch/x86/kvm/mmu/paging_tmpl.h
+> index 823a5919f9fa..439dc141391b 100644
+> --- a/arch/x86/kvm/mmu/paging_tmpl.h
+> +++ b/arch/x86/kvm/mmu/paging_tmpl.h
+> @@ -25,7 +25,8 @@
+>   	#define guest_walker guest_walker64
+>   	#define FNAME(name) paging##64_##name
+>   	#define PT_BASE_ADDR_MASK PT64_BASE_ADDR_MASK
+> -	#define PT_LVL_ADDR_MASK(lvl) PT64_LVL_ADDR_MASK(lvl)
+> +	#define PT_LVL_ADDR_MASK(vcpu, lvl) (~vcpu_gpa_stolen_mask(vcpu) & \
+> +					     PT64_LVL_ADDR_MASK(lvl))
+>   	#define PT_LVL_OFFSET_MASK(lvl) PT64_LVL_OFFSET_MASK(lvl)
+>   	#define PT_INDEX(addr, level) PT64_INDEX(addr, level)
+>   	#define PT_LEVEL_BITS PT64_LEVEL_BITS
+> @@ -44,7 +45,7 @@
+>   	#define guest_walker guest_walker32
+>   	#define FNAME(name) paging##32_##name
+>   	#define PT_BASE_ADDR_MASK PT32_BASE_ADDR_MASK
+> -	#define PT_LVL_ADDR_MASK(lvl) PT32_LVL_ADDR_MASK(lvl)
+> +	#define PT_LVL_ADDR_MASK(vcpu, lvl) PT32_LVL_ADDR_MASK(lvl)
+>   	#define PT_LVL_OFFSET_MASK(lvl) PT32_LVL_OFFSET_MASK(lvl)
+>   	#define PT_INDEX(addr, level) PT32_INDEX(addr, level)
+>   	#define PT_LEVEL_BITS PT32_LEVEL_BITS
+> @@ -58,7 +59,7 @@
+>   	#define guest_walker guest_walkerEPT
+>   	#define FNAME(name) ept_##name
+>   	#define PT_BASE_ADDR_MASK PT64_BASE_ADDR_MASK
+> -	#define PT_LVL_ADDR_MASK(lvl) PT64_LVL_ADDR_MASK(lvl)
+> +	#define PT_LVL_ADDR_MASK(vcpu, lvl) PT64_LVL_ADDR_MASK(lvl)
+>   	#define PT_LVL_OFFSET_MASK(lvl) PT64_LVL_OFFSET_MASK(lvl)
+>   	#define PT_INDEX(addr, level) PT64_INDEX(addr, level)
+>   	#define PT_LEVEL_BITS PT64_LEVEL_BITS
+> @@ -75,7 +76,7 @@
+>   #define PT_GUEST_ACCESSED_MASK (1 << PT_GUEST_ACCESSED_SHIFT)
+>   
+>   #define gpte_to_gfn_lvl FNAME(gpte_to_gfn_lvl)
+> -#define gpte_to_gfn(pte) gpte_to_gfn_lvl((pte), PG_LEVEL_4K)
+> +#define gpte_to_gfn(vcpu, pte) gpte_to_gfn_lvl(vcpu, pte, PG_LEVEL_4K)
+>   
+>   /*
+>    * The guest_walker structure emulates the behavior of the hardware page
+> @@ -96,9 +97,9 @@ struct guest_walker {
+>   	struct x86_exception fault;
+>   };
+>   
+> -static gfn_t gpte_to_gfn_lvl(pt_element_t gpte, int lvl)
+> +static gfn_t gpte_to_gfn_lvl(struct kvm_vcpu *vcpu, pt_element_t gpte, int lvl)
+>   {
+> -	return (gpte & PT_LVL_ADDR_MASK(lvl)) >> PAGE_SHIFT;
+> +	return (gpte & PT_LVL_ADDR_MASK(vcpu, lvl)) >> PAGE_SHIFT;
+>   }
+>   
+>   static inline void FNAME(protect_clean_gpte)(struct kvm_mmu *mmu, unsigned *access,
+> @@ -366,7 +367,7 @@ static int FNAME(walk_addr_generic)(struct guest_walker *walker,
+>   		--walker->level;
+>   
+>   		index = PT_INDEX(addr, walker->level);
+> -		table_gfn = gpte_to_gfn(pte);
+> +		table_gfn = gpte_to_gfn(vcpu, pte);
+>   		offset    = index * sizeof(pt_element_t);
+>   		pte_gpa   = gfn_to_gpa(table_gfn) + offset;
+>   
+> @@ -432,7 +433,7 @@ static int FNAME(walk_addr_generic)(struct guest_walker *walker,
+>   	if (unlikely(errcode))
+>   		goto error;
+>   
+> -	gfn = gpte_to_gfn_lvl(pte, walker->level);
+> +	gfn = gpte_to_gfn_lvl(vcpu, pte, walker->level);
+>   	gfn += (addr & PT_LVL_OFFSET_MASK(walker->level)) >> PAGE_SHIFT;
+>   
+>   	if (PTTYPE == 32 && walker->level > PG_LEVEL_4K && is_cpuid_PSE36())
+> @@ -537,12 +538,14 @@ FNAME(prefetch_gpte)(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp,
+>   	gfn_t gfn;
+>   	kvm_pfn_t pfn;
+>   
+> +	WARN_ON(gpte & vcpu_gpa_stolen_mask(vcpu));
+> +
+>   	if (FNAME(prefetch_invalid_gpte)(vcpu, sp, spte, gpte))
+>   		return false;
+>   
+>   	pgprintk("%s: gpte %llx spte %p\n", __func__, (u64)gpte, spte);
+>   
+> -	gfn = gpte_to_gfn(gpte);
+> +	gfn = gpte_to_gfn(vcpu, gpte);
+>   	pte_access = sp->role.access & FNAME(gpte_access)(gpte);
+>   	FNAME(protect_clean_gpte)(vcpu->arch.mmu, &pte_access, gpte);
+>   	pfn = pte_prefetch_gfn_to_pfn(vcpu, gfn,
+> @@ -652,6 +655,8 @@ static int FNAME(fetch)(struct kvm_vcpu *vcpu, gpa_t addr,
+>   
+>   	direct_access = gw->pte_access;
+>   
+> +	WARN_ON(addr & vcpu_gpa_stolen_mask(vcpu));
+> +
+>   	top_level = vcpu->arch.mmu->root_level;
+>   	if (top_level == PT32E_ROOT_LEVEL)
+>   		top_level = PT32_ROOT_LEVEL;
+> @@ -1067,7 +1072,7 @@ static int FNAME(sync_page)(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp)
+>   			continue;
+>   		}
+>   
+> -		gfn = gpte_to_gfn(gpte);
+> +		gfn = gpte_to_gfn(vcpu, gpte);
+>   		pte_access = sp->role.access;
+>   		pte_access &= FNAME(gpte_access)(gpte);
+>   		FNAME(protect_clean_gpte)(vcpu->arch.mmu, &pte_access, gpte);
 > 
 
