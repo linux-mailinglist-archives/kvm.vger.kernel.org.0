@@ -2,57 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E13F23BD91D
-	for <lists+kvm@lfdr.de>; Tue,  6 Jul 2021 16:54:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0523C3BD920
+	for <lists+kvm@lfdr.de>; Tue,  6 Jul 2021 16:55:04 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232543AbhGFO5E (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 6 Jul 2021 10:57:04 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:56710 "EHLO
+        id S232399AbhGFO5k (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 6 Jul 2021 10:57:40 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:23188 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232160AbhGFO5B (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 6 Jul 2021 10:57:01 -0400
+        by vger.kernel.org with ESMTP id S231779AbhGFO5j (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 6 Jul 2021 10:57:39 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1625583262;
+        s=mimecast20190719; t=1625583300;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=gIfve6HAPRxgtAkyhJQItncry4m+39jYCxDrBmpEpYw=;
-        b=c0LmuNyZiZH8G4V/wELIFP03p958HycrvS904r8MqfJTN6Kxf9+xrqAqFHOvLII+tHn6+i
-        CRRpcnFwgO5UVBmr7rqo0wVYho8sYcfvsrGJ+ldGdtFmD9hCIjT6nF7cK3nhXsR2l8y1Ge
-        JNhntW1d70WVdeUfgl3ktiSHoyDejd0=
-Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
- [209.85.218.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-528-yHZcZ2FGNaOd_I1ObxAQcw-1; Tue, 06 Jul 2021 10:54:20 -0400
-X-MC-Unique: yHZcZ2FGNaOd_I1ObxAQcw-1
-Received: by mail-ej1-f71.google.com with SMTP id hy7-20020a1709068a67b02904cdf8737a75so5092407ejc.9
-        for <kvm@vger.kernel.org>; Tue, 06 Jul 2021 07:54:20 -0700 (PDT)
+        bh=KuYfeHNoqBpl5N4HfNgkRzpz5JKHLkceTMnlQS9abyQ=;
+        b=Fm/2iJmpU0guLpDmO0gxItAsZdf0QHu0UkGvb5BORtzv2+SdW2tVZvxn5dWGjdna0ucGcw
+        f7d4WuA8Y+LEyKYV2zjy8YYX8vhH4ygXORooY/1qda1PM6ZFzU9Ula/zOb8pupo3SA3Pne
+        MRmH55Hnq1POLzA6K1TMWonTYUL3yHY=
+Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
+ [209.85.218.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-498-GnKdo0kIO7SpwTrnK03MRQ-1; Tue, 06 Jul 2021 10:54:59 -0400
+X-MC-Unique: GnKdo0kIO7SpwTrnK03MRQ-1
+Received: by mail-ej1-f70.google.com with SMTP id 16-20020a1709063010b029037417ca2d43so5917352ejz.5
+        for <kvm@vger.kernel.org>; Tue, 06 Jul 2021 07:54:59 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=gIfve6HAPRxgtAkyhJQItncry4m+39jYCxDrBmpEpYw=;
-        b=gM5SBBbvRQyRStdU9TWLKp/Cq6aEstLKewMYFz1u2L3wcBAPQen4s05PFlpLCSWIff
-         Kokft8ds0ne+O7BoPllmW0ueap59h72fselJhZZiqOEVuwvJzRsFOm9MxVCUUmMpLCGO
-         zUASRO0J8yCNRFGxO0hZaXRin+Qml2fu2E9+XCK0GOvUxDakHIYLksLrwQpksynnhxTV
-         DDLmEfHq+jkBFbwyfapkhzhPiJd4K4dtMBoZN/VMKDg58YCH+vDpzww0dKGLyF40Mrov
-         3IAABe4vDRtFbbiT/Dj0cTYosWcQWoo+aS1q2i6LF+AkWVO3MtuVQJTeOJZ7dDKRtESy
-         ItqA==
-X-Gm-Message-State: AOAM531D9+3Eoaw39I8H+OQY5W9D8QrhO5GbgH6lw1br+94qXI5gvI79
-        sFAurtkE74rLv62ya3YmpiuSvbHbjyAY2CGKHP7b7b7YMWE45vHtLgiytz3G3UH5eYP8ahyOX9i
-        McGteOz6KnWnm
-X-Received: by 2002:a05:6402:50d3:: with SMTP id h19mr12969996edb.344.1625583259464;
-        Tue, 06 Jul 2021 07:54:19 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwEI8iGjPWBBVHpfrdgKkk0/gfUGY3UHDu1YXJK2IbxReY3yiJw+E/vLPnBNu9LWMXRAKKImQ==
-X-Received: by 2002:a05:6402:50d3:: with SMTP id h19mr12969953edb.344.1625583259174;
-        Tue, 06 Jul 2021 07:54:19 -0700 (PDT)
+        bh=KuYfeHNoqBpl5N4HfNgkRzpz5JKHLkceTMnlQS9abyQ=;
+        b=ZuJZZNdLh/62vGImEUnkOyrKV4xZUvW0Xv9YcD5eAcbvmG0xYpF057nmBoyQk21z6q
+         H4LeRmDoza/GeEVEK18SPAaabMmrRsW/F6SUPW5Q7jenkh+3w7B4a1J5mKbZRgYM5z5L
+         v6PrAufxqrh9ItlkpzlECJismLNzu1yxQ9MWXAMzZV2ch+pxbRd1+bawITFtwxZ2L9Cx
+         EqrKED+fb/ucFxndC0O7fbh8NSHQv0MkQU5n5iHHtuQR21EClBjO7LNbQcw7uqOCEXal
+         zSdngLad2WWjkNhjocZpr4rpuht68KmXE3XAd+Fyg3NSjwB0PvflEKNoEKVEkQ4tbuVb
+         25QA==
+X-Gm-Message-State: AOAM530zMYZvBQEhGAiqirh1cubYnors0HaD2PzR/rfbY9qJAj2ehan6
+        zbT4Wdd9cjMd2pruRW8ay1AuJE/piko8TV7g1moDGsQUtTUIGpwW6h5/t0W+ysAfp6Rh3ktyF/9
+        V2bAsKekBQlj0
+X-Received: by 2002:a17:907:2d0e:: with SMTP id gs14mr19653268ejc.49.1625583298178;
+        Tue, 06 Jul 2021 07:54:58 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxu/HxHED8qHhMd++zEduBrLuA+TKJfofjJlP+ABGykUHeQw668AalvTk0MYhBa6r29iCQ07g==
+X-Received: by 2002:a17:907:2d0e:: with SMTP id gs14mr19653246ejc.49.1625583298025;
+        Tue, 06 Jul 2021 07:54:58 -0700 (PDT)
 Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id p5sm5795104ejm.115.2021.07.06.07.54.16
+        by smtp.gmail.com with ESMTPSA id w13sm7240116edd.66.2021.07.06.07.54.56
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 06 Jul 2021 07:54:17 -0700 (PDT)
-Subject: Re: [RFC PATCH v2 41/69] KVM: x86: Add infrastructure for stolen GPA
- bits
+        Tue, 06 Jul 2021 07:54:57 -0700 (PDT)
+Subject: Re: [RFC PATCH v2 42/69] KVM: x86/mmu: Explicitly check for MMIO spte
+ in fast page fault
 To:     isaku.yamahata@intel.com, Thomas Gleixner <tglx@linutronix.de>,
         Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
         "H . Peter Anvin" <hpa@zytor.com>,
@@ -64,16 +64,16 @@ To:     isaku.yamahata@intel.com, Thomas Gleixner <tglx@linutronix.de>,
         Sean Christopherson <seanjc@google.com>, x86@kernel.org,
         linux-kernel@vger.kernel.org, kvm@vger.kernel.org
 Cc:     isaku.yamahata@gmail.com,
-        Rick Edgecombe <rick.p.edgecombe@intel.com>
+        Sean Christopherson <sean.j.christopherson@intel.com>
 References: <cover.1625186503.git.isaku.yamahata@intel.com>
- <c958a131ded780808a687b0f25c02127ca14418a.1625186503.git.isaku.yamahata@intel.com>
+ <26005d563a9303ecc6ca68a9baea77895a75e8e0.1625186503.git.isaku.yamahata@intel.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <7b4ca19e-246a-35e6-7ef2-6a867b41ca90@redhat.com>
-Date:   Tue, 6 Jul 2021 16:54:16 +0200
+Message-ID: <534e7bb1-6e81-f1de-3d78-022449ac5a1e@redhat.com>
+Date:   Tue, 6 Jul 2021 16:54:55 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.11.0
 MIME-Version: 1.0
-In-Reply-To: <c958a131ded780808a687b0f25c02127ca14418a.1625186503.git.isaku.yamahata@intel.com>
+In-Reply-To: <26005d563a9303ecc6ca68a9baea77895a75e8e0.1625186503.git.isaku.yamahata@intel.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -82,398 +82,32 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 On 03/07/21 00:04, isaku.yamahata@intel.com wrote:
-> From: Rick Edgecombe <rick.p.edgecombe@intel.com>
+> From: Sean Christopherson <sean.j.christopherson@intel.com>
 > 
-> Add support in KVM's MMU for aliasing multiple GPAs (from a hardware
-> perspective) to a single GPA (from a memslot perspective). GPA alising
-> will be used to repurpose GPA bits as attribute bits, e.g. to expose an
-> execute-only permission bit to the guest. To keep the implementation
-> simple (relatively speaking), GPA aliasing is only supported via TDP.
+> Explicity check for an MMIO spte in the fast page fault flow.  TDX will
+> use a not-present entry for MMIO sptes, which can be mistaken for an
+> access-tracked spte since both have SPTE_SPECIAL_MASK set.
 > 
-> Today KVM assumes two things that are broken by GPA aliasing.
->    1. GPAs coming from hardware can be simply shifted to get the GFNs.
->    2. GPA bits 51:MAXPHYADDR are reserved to zero.
-> 
-> With GPA aliasing, translating a GPA to GFN requires masking off the
-> repurposed bit, and a repurposed bit may reside in 51:MAXPHYADDR.
-> 
-> To support GPA aliasing, introduce the concept of per-VM GPA stolen bits,
-> that is, bits stolen from the GPA to act as new virtualized attribute
-> bits. A bit in the mask will cause the MMU code to create aliases of the
-> GPA. It can also be used to find the GFN out of a GPA coming from a tdp
-> fault.
-> 
-> To handle case (1) from above, retain any stolen bits when passing a GPA
-> in KVM's MMU code, but strip them when converting to a GFN so that the
-> GFN contains only the "real" GFN, i.e. never has repurposed bits set.
-> 
-> GFNs (without stolen bits) continue to be used to:
-> 	-Specify physical memory by userspace via memslots
-> 	-Map GPAs to TDP PTEs via RMAP
-> 	-Specify dirty tracking and write protection
-> 	-Look up MTRR types
-> 	-Inject async page faults
-> 
-> Since there are now multiple aliases for the same aliased GPA, when
-> userspace memory backing the memslots is paged out, both aliases need to be
-> modified. Fortunately this happens automatically. Since rmap supports
-> multiple mappings for the same GFN for PTE shadowing based paging, by
-> adding/removing each alias PTE with its GFN, kvm_handle_hva() based
-> operations will be applied to both aliases.
-> 
-> In the case of the rmap being removed in the future, the needed
-> information could be recovered by iterating over the stolen bits and
-> walking the TDP page tables.
-> 
-> For TLB flushes that are address based, make sure to flush both aliases
-> in the stolen bits case.
-> 
-> Only support stolen bits in 64 bit guest paging modes (long, PAE).
-> Features that use this infrastructure should restrict the stolen bits to
-> exclude the other paging modes. Don't support stolen bits for shadow EPT.
-> 
-> Signed-off-by: Rick Edgecombe <rick.p.edgecombe@intel.com>
+> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
 > Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
-
-Looks good, but the commit message is obsolete.
-
-Paolo
-
->   arch/x86/kvm/mmu.h              | 26 ++++++++++
->   arch/x86/kvm/mmu/mmu.c          | 86 ++++++++++++++++++++++-----------
->   arch/x86/kvm/mmu/mmu_internal.h |  1 +
->   arch/x86/kvm/mmu/paging_tmpl.h  | 25 ++++++----
->   4 files changed, 101 insertions(+), 37 deletions(-)
+> ---
+>   arch/x86/kvm/mmu/mmu.c | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
 > 
-> diff --git a/arch/x86/kvm/mmu.h b/arch/x86/kvm/mmu.h
-> index 88d0ed5225a4..69b82857acdb 100644
-> --- a/arch/x86/kvm/mmu.h
-> +++ b/arch/x86/kvm/mmu.h
-> @@ -232,4 +232,30 @@ int kvm_arch_write_log_dirty(struct kvm_vcpu *vcpu);
->   int kvm_mmu_post_init_vm(struct kvm *kvm);
->   void kvm_mmu_pre_destroy_vm(struct kvm *kvm);
->   
-> +static inline gfn_t kvm_gfn_stolen_mask(struct kvm *kvm)
-> +{
-> +	/* Currently there are no stolen bits in KVM */
-> +	return 0;
-> +}
-> +
-> +static inline gfn_t vcpu_gfn_stolen_mask(struct kvm_vcpu *vcpu)
-> +{
-> +	return kvm_gfn_stolen_mask(vcpu->kvm);
-> +}
-> +
-> +static inline gpa_t kvm_gpa_stolen_mask(struct kvm *kvm)
-> +{
-> +	return kvm_gfn_stolen_mask(kvm) << PAGE_SHIFT;
-> +}
-> +
-> +static inline gpa_t vcpu_gpa_stolen_mask(struct kvm_vcpu *vcpu)
-> +{
-> +	return kvm_gpa_stolen_mask(vcpu->kvm);
-> +}
-> +
-> +static inline gfn_t vcpu_gpa_to_gfn_unalias(struct kvm_vcpu *vcpu, gpa_t gpa)
-> +{
-> +	return (gpa >> PAGE_SHIFT) & ~vcpu_gfn_stolen_mask(vcpu);
-> +}
-> +
->   #endif
 > diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> index 0dc4bf34ce9c..990ee645b8a2 100644
+> index 990ee645b8a2..631b92e6e9ba 100644
 > --- a/arch/x86/kvm/mmu/mmu.c
 > +++ b/arch/x86/kvm/mmu/mmu.c
-> @@ -188,27 +188,37 @@ static inline bool kvm_available_flush_tlb_with_range(void)
->   	return kvm_x86_ops.tlb_remote_flush_with_range;
->   }
->   
-> -static void kvm_flush_remote_tlbs_with_range(struct kvm *kvm,
-> -		struct kvm_tlb_range *range)
-> -{
-> -	int ret = -ENOTSUPP;
-> -
-> -	if (range && kvm_x86_ops.tlb_remote_flush_with_range)
-> -		ret = static_call(kvm_x86_tlb_remote_flush_with_range)(kvm, range);
-> -
-> -	if (ret)
-> -		kvm_flush_remote_tlbs(kvm);
-> -}
-> -
->   void kvm_flush_remote_tlbs_with_address(struct kvm *kvm,
->   		u64 start_gfn, u64 pages)
->   {
->   	struct kvm_tlb_range range;
-> +	u64 gfn_stolen_mask;
-> +
-> +	if (!kvm_available_flush_tlb_with_range())
-> +		goto generic_flush;
-> +
-> +	/*
-> +	 * Fall back to the big hammer flush if there is more than one
-> +	 * GPA alias that needs to be flushed.
-> +	 */
-> +	gfn_stolen_mask = kvm_gfn_stolen_mask(kvm);
-> +	if (hweight64(gfn_stolen_mask) > 1)
-> +		goto generic_flush;
->   
->   	range.start_gfn = start_gfn;
->   	range.pages = pages;
-> +	if (static_call(kvm_x86_tlb_remote_flush_with_range)(kvm, &range))
-> +		goto generic_flush;
-> +
-> +	if (!gfn_stolen_mask)
-> +		return;
->   
-> -	kvm_flush_remote_tlbs_with_range(kvm, &range);
-> +	range.start_gfn |= gfn_stolen_mask;
-> +	static_call(kvm_x86_tlb_remote_flush_with_range)(kvm, &range);
-> +	return;
-> +
-> +generic_flush:
-> +	kvm_flush_remote_tlbs(kvm);
->   }
->   
->   bool is_nx_huge_page_enabled(void)
-> @@ -1949,14 +1959,16 @@ static void clear_sp_write_flooding_count(u64 *spte)
->   	__clear_sp_write_flooding_count(sptep_to_sp(spte));
->   }
->   
-> -static struct kvm_mmu_page *kvm_mmu_get_page(struct kvm_vcpu *vcpu,
-> -					     gfn_t gfn,
-> -					     gva_t gaddr,
-> -					     unsigned level,
-> -					     int direct,
-> -					     unsigned int access)
-> +static struct kvm_mmu_page *__kvm_mmu_get_page(struct kvm_vcpu *vcpu,
-> +					       gfn_t gfn,
-> +					       gfn_t gfn_stolen_bits,
-> +					       gva_t gaddr,
-> +					       unsigned int level,
-> +					       int direct,
-> +					       unsigned int access)
->   {
->   	bool direct_mmu = vcpu->arch.mmu->direct_map;
-> +	gpa_t gfn_and_stolen = gfn | gfn_stolen_bits;
->   	union kvm_mmu_page_role role;
->   	struct hlist_head *sp_list;
->   	unsigned quadrant;
-> @@ -1978,9 +1990,9 @@ static struct kvm_mmu_page *kvm_mmu_get_page(struct kvm_vcpu *vcpu,
->   		role.quadrant = quadrant;
->   	}
->   
-> -	sp_list = &vcpu->kvm->arch.mmu_page_hash[kvm_page_table_hashfn(gfn)];
-> +	sp_list = &vcpu->kvm->arch.mmu_page_hash[kvm_page_table_hashfn(gfn_and_stolen)];
->   	for_each_valid_sp(vcpu->kvm, sp, sp_list) {
-> -		if (sp->gfn != gfn) {
-> +		if ((sp->gfn | sp->gfn_stolen_bits) != gfn_and_stolen) {
->   			collisions++;
->   			continue;
->   		}
-> @@ -2020,6 +2032,7 @@ static struct kvm_mmu_page *kvm_mmu_get_page(struct kvm_vcpu *vcpu,
->   	sp = kvm_mmu_alloc_page(vcpu, direct);
->   
->   	sp->gfn = gfn;
-> +	sp->gfn_stolen_bits = gfn_stolen_bits;
->   	sp->role = role;
->   	hlist_add_head(&sp->hash_link, sp_list);
->   	if (!direct) {
-> @@ -2044,6 +2057,13 @@ static struct kvm_mmu_page *kvm_mmu_get_page(struct kvm_vcpu *vcpu,
->   	return sp;
->   }
->   
-> +static struct kvm_mmu_page *kvm_mmu_get_page(struct kvm_vcpu *vcpu, gfn_t gfn,
-> +					     gva_t gaddr, unsigned int level,
-> +					     int direct, unsigned int access)
-> +{
-> +	return __kvm_mmu_get_page(vcpu, gfn, 0, gaddr, level, direct, access);
-> +}
-> +
->   static void shadow_walk_init_using_root(struct kvm_shadow_walk_iterator *iterator,
->   					struct kvm_vcpu *vcpu, hpa_t root,
->   					u64 addr)
-> @@ -2637,7 +2657,9 @@ static int direct_pte_prefetch_many(struct kvm_vcpu *vcpu,
->   
->   	gfn = kvm_mmu_page_get_gfn(sp, start - sp->spt);
->   	slot = gfn_to_memslot_dirty_bitmap(vcpu, gfn, access & ACC_WRITE_MASK);
-> -	if (!slot)
-> +
-> +	/* Don't map private memslots for stolen bits */
-> +	if (!slot || (sp->gfn_stolen_bits && slot->id >= KVM_USER_MEM_SLOTS))
->   		return -1;
->   
->   	ret = gfn_to_page_many_atomic(slot, gfn, pages, end - start);
-> @@ -2827,7 +2849,9 @@ static int __direct_map(struct kvm_vcpu *vcpu, gpa_t gpa, u32 error_code,
->   	struct kvm_shadow_walk_iterator it;
->   	struct kvm_mmu_page *sp;
->   	int level, req_level, ret;
-> -	gfn_t gfn = gpa >> PAGE_SHIFT;
-> +	gpa_t gpa_stolen_mask = vcpu_gpa_stolen_mask(vcpu);
-> +	gfn_t gfn = (gpa & ~gpa_stolen_mask) >> PAGE_SHIFT;
-> +	gfn_t gfn_stolen_bits = (gpa & gpa_stolen_mask) >> PAGE_SHIFT;
->   	gfn_t base_gfn = gfn;
->   
->   	if (WARN_ON(!VALID_PAGE(vcpu->arch.mmu->root_hpa)))
-> @@ -2852,8 +2876,9 @@ static int __direct_map(struct kvm_vcpu *vcpu, gpa_t gpa, u32 error_code,
->   
->   		drop_large_spte(vcpu, it.sptep);
->   		if (!is_shadow_present_pte(*it.sptep)) {
-> -			sp = kvm_mmu_get_page(vcpu, base_gfn, it.addr,
-> -					      it.level - 1, true, ACC_ALL);
-> +			sp = __kvm_mmu_get_page(vcpu, base_gfn,
-> +						gfn_stolen_bits, it.addr,
-> +						it.level - 1, true, ACC_ALL);
->   
->   			link_shadow_page(vcpu, it.sptep, sp);
->   			if (is_tdp && huge_page_disallowed &&
-> @@ -3689,6 +3714,13 @@ static bool try_async_pf(struct kvm_vcpu *vcpu, bool prefault, gfn_t gfn,
->   	if (slot && (slot->flags & KVM_MEMSLOT_INVALID))
->   		return true;
->   
-> +	/* Don't expose aliases for no slot GFNs or private memslots */
-> +	if ((cr2_or_gpa & vcpu_gpa_stolen_mask(vcpu)) &&
-> +	    !kvm_is_visible_memslot(slot)) {
-> +		*pfn = KVM_PFN_NOSLOT;
-> +		return false;
-> +	}
-> +
->   	/* Don't expose private memslots to L2. */
->   	if (is_guest_mode(vcpu) && !kvm_is_visible_memslot(slot)) {
->   		*pfn = KVM_PFN_NOSLOT;
-> @@ -3723,7 +3755,7 @@ static int direct_page_fault(struct kvm_vcpu *vcpu, gpa_t gpa, u32 error_code,
->   	bool write = error_code & PFERR_WRITE_MASK;
->   	bool map_writable;
->   
-> -	gfn_t gfn = gpa >> PAGE_SHIFT;
-> +	gfn_t gfn = vcpu_gpa_to_gfn_unalias(vcpu, gpa);
->   	unsigned long mmu_seq;
->   	kvm_pfn_t pfn;
->   	hva_t hva;
-> @@ -3833,7 +3865,7 @@ int kvm_tdp_page_fault(struct kvm_vcpu *vcpu, gpa_t gpa, u32 error_code,
->   	     max_level > PG_LEVEL_4K;
->   	     max_level--) {
->   		int page_num = KVM_PAGES_PER_HPAGE(max_level);
-> -		gfn_t base = (gpa >> PAGE_SHIFT) & ~(page_num - 1);
-> +		gfn_t base = vcpu_gpa_to_gfn_unalias(vcpu, gpa) & ~(page_num - 1);
->   
->   		if (kvm_mtrr_check_gfn_range_consistency(vcpu, base, page_num))
+> @@ -3060,7 +3060,7 @@ static int fast_page_fault(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa,
 >   			break;
-> diff --git a/arch/x86/kvm/mmu/mmu_internal.h b/arch/x86/kvm/mmu/mmu_internal.h
-> index d64ccb417c60..c896ec9f3159 100644
-> --- a/arch/x86/kvm/mmu/mmu_internal.h
-> +++ b/arch/x86/kvm/mmu/mmu_internal.h
-> @@ -46,6 +46,7 @@ struct kvm_mmu_page {
->   	 */
->   	union kvm_mmu_page_role role;
->   	gfn_t gfn;
-> +	gfn_t gfn_stolen_bits;
 >   
->   	u64 *spt;
->   	/* hold the gfn of each spte inside spt */
-> diff --git a/arch/x86/kvm/mmu/paging_tmpl.h b/arch/x86/kvm/mmu/paging_tmpl.h
-> index 823a5919f9fa..439dc141391b 100644
-> --- a/arch/x86/kvm/mmu/paging_tmpl.h
-> +++ b/arch/x86/kvm/mmu/paging_tmpl.h
-> @@ -25,7 +25,8 @@
->   	#define guest_walker guest_walker64
->   	#define FNAME(name) paging##64_##name
->   	#define PT_BASE_ADDR_MASK PT64_BASE_ADDR_MASK
-> -	#define PT_LVL_ADDR_MASK(lvl) PT64_LVL_ADDR_MASK(lvl)
-> +	#define PT_LVL_ADDR_MASK(vcpu, lvl) (~vcpu_gpa_stolen_mask(vcpu) & \
-> +					     PT64_LVL_ADDR_MASK(lvl))
->   	#define PT_LVL_OFFSET_MASK(lvl) PT64_LVL_OFFSET_MASK(lvl)
->   	#define PT_INDEX(addr, level) PT64_INDEX(addr, level)
->   	#define PT_LEVEL_BITS PT64_LEVEL_BITS
-> @@ -44,7 +45,7 @@
->   	#define guest_walker guest_walker32
->   	#define FNAME(name) paging##32_##name
->   	#define PT_BASE_ADDR_MASK PT32_BASE_ADDR_MASK
-> -	#define PT_LVL_ADDR_MASK(lvl) PT32_LVL_ADDR_MASK(lvl)
-> +	#define PT_LVL_ADDR_MASK(vcpu, lvl) PT32_LVL_ADDR_MASK(lvl)
->   	#define PT_LVL_OFFSET_MASK(lvl) PT32_LVL_OFFSET_MASK(lvl)
->   	#define PT_INDEX(addr, level) PT32_INDEX(addr, level)
->   	#define PT_LEVEL_BITS PT32_LEVEL_BITS
-> @@ -58,7 +59,7 @@
->   	#define guest_walker guest_walkerEPT
->   	#define FNAME(name) ept_##name
->   	#define PT_BASE_ADDR_MASK PT64_BASE_ADDR_MASK
-> -	#define PT_LVL_ADDR_MASK(lvl) PT64_LVL_ADDR_MASK(lvl)
-> +	#define PT_LVL_ADDR_MASK(vcpu, lvl) PT64_LVL_ADDR_MASK(lvl)
->   	#define PT_LVL_OFFSET_MASK(lvl) PT64_LVL_OFFSET_MASK(lvl)
->   	#define PT_INDEX(addr, level) PT64_INDEX(addr, level)
->   	#define PT_LEVEL_BITS PT64_LEVEL_BITS
-> @@ -75,7 +76,7 @@
->   #define PT_GUEST_ACCESSED_MASK (1 << PT_GUEST_ACCESSED_SHIFT)
+>   		sp = sptep_to_sp(iterator.sptep);
+> -		if (!is_last_spte(spte, sp->role.level))
+> +		if (!is_last_spte(spte, sp->role.level) || is_mmio_spte(spte))
+>   			break;
 >   
->   #define gpte_to_gfn_lvl FNAME(gpte_to_gfn_lvl)
-> -#define gpte_to_gfn(pte) gpte_to_gfn_lvl((pte), PG_LEVEL_4K)
-> +#define gpte_to_gfn(vcpu, pte) gpte_to_gfn_lvl(vcpu, pte, PG_LEVEL_4K)
->   
->   /*
->    * The guest_walker structure emulates the behavior of the hardware page
-> @@ -96,9 +97,9 @@ struct guest_walker {
->   	struct x86_exception fault;
->   };
->   
-> -static gfn_t gpte_to_gfn_lvl(pt_element_t gpte, int lvl)
-> +static gfn_t gpte_to_gfn_lvl(struct kvm_vcpu *vcpu, pt_element_t gpte, int lvl)
->   {
-> -	return (gpte & PT_LVL_ADDR_MASK(lvl)) >> PAGE_SHIFT;
-> +	return (gpte & PT_LVL_ADDR_MASK(vcpu, lvl)) >> PAGE_SHIFT;
->   }
->   
->   static inline void FNAME(protect_clean_gpte)(struct kvm_mmu *mmu, unsigned *access,
-> @@ -366,7 +367,7 @@ static int FNAME(walk_addr_generic)(struct guest_walker *walker,
->   		--walker->level;
->   
->   		index = PT_INDEX(addr, walker->level);
-> -		table_gfn = gpte_to_gfn(pte);
-> +		table_gfn = gpte_to_gfn(vcpu, pte);
->   		offset    = index * sizeof(pt_element_t);
->   		pte_gpa   = gfn_to_gpa(table_gfn) + offset;
->   
-> @@ -432,7 +433,7 @@ static int FNAME(walk_addr_generic)(struct guest_walker *walker,
->   	if (unlikely(errcode))
->   		goto error;
->   
-> -	gfn = gpte_to_gfn_lvl(pte, walker->level);
-> +	gfn = gpte_to_gfn_lvl(vcpu, pte, walker->level);
->   	gfn += (addr & PT_LVL_OFFSET_MASK(walker->level)) >> PAGE_SHIFT;
->   
->   	if (PTTYPE == 32 && walker->level > PG_LEVEL_4K && is_cpuid_PSE36())
-> @@ -537,12 +538,14 @@ FNAME(prefetch_gpte)(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp,
->   	gfn_t gfn;
->   	kvm_pfn_t pfn;
->   
-> +	WARN_ON(gpte & vcpu_gpa_stolen_mask(vcpu));
-> +
->   	if (FNAME(prefetch_invalid_gpte)(vcpu, sp, spte, gpte))
->   		return false;
->   
->   	pgprintk("%s: gpte %llx spte %p\n", __func__, (u64)gpte, spte);
->   
-> -	gfn = gpte_to_gfn(gpte);
-> +	gfn = gpte_to_gfn(vcpu, gpte);
->   	pte_access = sp->role.access & FNAME(gpte_access)(gpte);
->   	FNAME(protect_clean_gpte)(vcpu->arch.mmu, &pte_access, gpte);
->   	pfn = pte_prefetch_gfn_to_pfn(vcpu, gfn,
-> @@ -652,6 +655,8 @@ static int FNAME(fetch)(struct kvm_vcpu *vcpu, gpa_t addr,
->   
->   	direct_access = gw->pte_access;
->   
-> +	WARN_ON(addr & vcpu_gpa_stolen_mask(vcpu));
-> +
->   	top_level = vcpu->arch.mmu->root_level;
->   	if (top_level == PT32E_ROOT_LEVEL)
->   		top_level = PT32_ROOT_LEVEL;
-> @@ -1067,7 +1072,7 @@ static int FNAME(sync_page)(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp)
->   			continue;
->   		}
->   
-> -		gfn = gpte_to_gfn(gpte);
-> +		gfn = gpte_to_gfn(vcpu, gpte);
->   		pte_access = sp->role.access;
->   		pte_access &= FNAME(gpte_access)(gpte);
->   		FNAME(protect_clean_gpte)(vcpu->arch.mmu, &pte_access, gpte);
+>   		/*
 > 
+
+Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
 
