@@ -2,55 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D2D7B3BD851
-	for <lists+kvm@lfdr.de>; Tue,  6 Jul 2021 16:34:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8CC963BD857
+	for <lists+kvm@lfdr.de>; Tue,  6 Jul 2021 16:35:18 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232198AbhGFOhV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 6 Jul 2021 10:37:21 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:43300 "EHLO
+        id S232274AbhGFOhz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 6 Jul 2021 10:37:55 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:24832 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231937AbhGFOhU (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 6 Jul 2021 10:37:20 -0400
+        by vger.kernel.org with ESMTP id S232245AbhGFOhx (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 6 Jul 2021 10:37:53 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1625582081;
+        s=mimecast20190719; t=1625582114;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=G/gssxW/mbIhY3PmRppDUAwsg3OaI9WCT71TjUjACeA=;
-        b=fGV5nQt+jG4lfliGdO5oXqzy686K3xlWrtU7PvrFWMm/S+M/xKsJ+6SUtfN2cpfTHaY+qL
-        i6uW9U2yIT2F61Q79NTi52Zb04lfTtoqUU1eTuyBoWUedq8czIA6Q5k683RBOaaKue1c/S
-        eN5MfPn0pm39zEJGlSW7Ezyu9Hi/R7M=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-559-BAqmqvFJMV67V1wDPw8_kg-1; Tue, 06 Jul 2021 10:34:40 -0400
-X-MC-Unique: BAqmqvFJMV67V1wDPw8_kg-1
-Received: by mail-wm1-f70.google.com with SMTP id v25-20020a1cf7190000b0290197a4be97b7so1005279wmh.9
-        for <kvm@vger.kernel.org>; Tue, 06 Jul 2021 07:34:40 -0700 (PDT)
+        bh=SadklWu5h42Kr+n17qV7by5TT0XeZa9ds78ScI/5JFI=;
+        b=jT9eCeOi/WTmkOgz+PWPyMjhng9yuKRMmzj02wW7crx/zp9fem5DJW4CoiDbBDcpg23o68
+        bE3/iNIhvppuBiTbUx0g2Lam8Rps9bJnZDZTbHbD8XK9oV4zoBDK79o2agRZgS/XvoOPdq
+        FRV16H0m7ZfjktpFexIPpHrWEY6ucdw=
+Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
+ [209.85.218.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-401-zZql-tviN72N0MkCLE6Thw-1; Tue, 06 Jul 2021 10:35:13 -0400
+X-MC-Unique: zZql-tviN72N0MkCLE6Thw-1
+Received: by mail-ej1-f70.google.com with SMTP id ci2-20020a1709072662b02904ce09e83b00so5076779ejc.23
+        for <kvm@vger.kernel.org>; Tue, 06 Jul 2021 07:35:12 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:to:cc:references:from:subject:message-id:date
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=G/gssxW/mbIhY3PmRppDUAwsg3OaI9WCT71TjUjACeA=;
-        b=EoeBNUWMnfW+VzoCrsa5eiXECE/SnugXjRbEo9i6Etr61+QuGtrtJR/mS38SBj4WMB
-         h0+fln+CbLcUObgDjzYWVDTkHX67K8xuR+FJHQBAgq9aMEFl/7rL/Nsn5O7MwOFXUo+M
-         EAohSuowzDXnXLTqgsizIQxQPdasbdu5rHPgENo4wknh9XC9aD8hiw8q98p8Nmfq09rJ
-         +4Yz/u3+lQR5iVJag5E9ZKDeGY09jGMxj6K6Bj04aFAsl8O/MtaR6BP1Z0C7CXlmWuXb
-         MfQsBrlZRiD5PPLV0kg/Wetde2Nu0YdRZoHl6rksE3rzMs1uMMwrsLwQ44YQYupbmBAr
-         9jeg==
-X-Gm-Message-State: AOAM533zke/NKqueWDPzphzOaf/9QWSF6kP3DVtECDu1riJbaO2oQHgq
-        SKyZCncuvlPkX26+5c94qwJ9wcp8T3o2+mA3SGLW9pHiJxngm9hZW2QgL7m+XWbWs8f/1S5JWLD
-        hPLmI0ZQxC47Q
-X-Received: by 2002:a05:6000:1787:: with SMTP id e7mr21954383wrg.167.1625582079466;
-        Tue, 06 Jul 2021 07:34:39 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyta9Y16G3a+VI4XCXTFQBPTRZDYBxdBee0/p86BqoXT5KemnytIPbM4B6FvK7NsjZAlgpykw==
-X-Received: by 2002:a05:6000:1787:: with SMTP id e7mr21954354wrg.167.1625582079256;
-        Tue, 06 Jul 2021 07:34:39 -0700 (PDT)
+        bh=SadklWu5h42Kr+n17qV7by5TT0XeZa9ds78ScI/5JFI=;
+        b=bcfHqoMFgilKQALcOMmPlQ3TmSGWa+SB363DMSwWDPFYFbAvXnqJiZ2U9Kko6ZqlWa
+         dcGXcdsisiNQmclEkiR/0xQGm+/oVVbHNOWESuXWDzbz6iO28sgVtEn4SyJc+Y2jmraP
+         Wnj4JpTD7MRWlzwnocLjWYYMT+r0yLN9YP9/7lBY+Sk0c3PuqDJF/cx6XJ3SKe0UxKTl
+         jRAsSuiwwegicylvkhpmMdtS+JvJw4J6luvG9jG7dXgjIfQ3/GLIvD8URL8JaG8oBAe1
+         eejzm469XCA993SVnp8QvpCi57hM5AY7yswwdAuxrswCRIC5vsBHOQy+ZbR92Wuov3Qg
+         kD5Q==
+X-Gm-Message-State: AOAM531RB8xoVANJvS+oVZjzBtYhyw5eDjzP6Tfrufes8PniJCUuwwCC
+        8aci9fYvH9s6IRN3lRPA7SQ/Kfz0vfmys9o6MbDI1c+WuVRqlEbn8KLCpR1kxNotifp2HVxWuSG
+        kXOtXjrMebWls
+X-Received: by 2002:a17:906:7b4f:: with SMTP id n15mr18484080ejo.42.1625582111851;
+        Tue, 06 Jul 2021 07:35:11 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyX/hN6grD9bMUghxfplyXRvID/QOIo0cYh5JzubHTBO/PXsUDzoj4n1GCTZJLcwlRuSvxCcQ==
+X-Received: by 2002:a17:906:7b4f:: with SMTP id n15mr18484049ejo.42.1625582111659;
+        Tue, 06 Jul 2021 07:35:11 -0700 (PDT)
 Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id w1sm15936566wmi.13.2021.07.06.07.34.35
+        by smtp.gmail.com with ESMTPSA id d18sm1023485ejr.50.2021.07.06.07.35.10
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 06 Jul 2021 07:34:38 -0700 (PDT)
+        Tue, 06 Jul 2021 07:35:11 -0700 (PDT)
+Subject: Re: [RFC PATCH v2 38/69] KVM: x86: Add option to force LAPIC
+ expiration wait
 To:     isaku.yamahata@intel.com, Thomas Gleixner <tglx@linutronix.de>,
         Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
         "H . Peter Anvin" <hpa@zytor.com>,
@@ -64,104 +66,103 @@ To:     isaku.yamahata@intel.com, Thomas Gleixner <tglx@linutronix.de>,
 Cc:     isaku.yamahata@gmail.com,
         Sean Christopherson <sean.j.christopherson@intel.com>
 References: <cover.1625186503.git.isaku.yamahata@intel.com>
- <ac17ee5e713b83ce64626b7b39c40515d98db09f.1625186503.git.isaku.yamahata@intel.com>
+ <357378fcb6e3e2becb6d4f00a5c3d2b00b2c566b.1625186503.git.isaku.yamahata@intel.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [RFC PATCH v2 35/69] KVM: x86: Introduce vm_teardown() hook in
- kvm_arch_vm_destroy()
-Message-ID: <98e17bdc-cc91-f225-b24a-d64e052e1b3d@redhat.com>
-Date:   Tue, 6 Jul 2021 16:34:35 +0200
+Message-ID: <a349d5bf-b85c-34c3-bb88-523df23a2985@redhat.com>
+Date:   Tue, 6 Jul 2021 16:35:09 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.11.0
 MIME-Version: 1.0
-In-Reply-To: <ac17ee5e713b83ce64626b7b39c40515d98db09f.1625186503.git.isaku.yamahata@intel.com>
+In-Reply-To: <357378fcb6e3e2becb6d4f00a5c3d2b00b2c566b.1625186503.git.isaku.yamahata@intel.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 On 03/07/21 00:04, isaku.yamahata@intel.com wrote:
-> -static void svm_vm_destroy(struct kvm *kvm)
-> +static void svm_vm_teardown(struct kvm *kvm)
->   {
->   	avic_vm_destroy(kvm);
->   	sev_vm_destroy(kvm);
->   }
+> From: Sean Christopherson <sean.j.christopherson@intel.com>
+> 
+> Add an option to skip the IRR check in kvm_wait_lapic_expire().  This
+> will be used by TDX to wait if there is an outstanding notification for
+> a TD, i.e. a virtual interrupt is being triggered via posted interrupt
+> processing.  KVM TDX doesn't emulate PI processing, i.e. there will
+> never be a bit set in IRR/ISR, so the default behavior for APICv of
+> querying the IRR doesn't work as intended.
+> 
+> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+> Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
 
-Please keep "destroy" as is and use "free" from the final step.
-
-> +static void svm_vm_destroy(struct kvm *kvm)
-> +{
-> +
-
-Please remove the empty lines.
+Is there a better (existing after the previous patches) flag to test, or 
+possibly can it use vm_type following the suggestion I gave for patch 28?
 
 Paolo
 
-> +}
-> +
->   static bool svm_is_vm_type_supported(unsigned long type)
->   {
->   	return type == KVM_X86_LEGACY_VM;
-> @@ -4456,6 +4461,7 @@ static struct kvm_x86_ops svm_x86_ops __initdata = {
->   	.is_vm_type_supported = svm_is_vm_type_supported,
->   	.vm_size = sizeof(struct kvm_svm),
->   	.vm_init = svm_vm_init,
-> +	.vm_teardown = svm_vm_teardown,
->   	.vm_destroy = svm_vm_destroy,
+> ---
+>   arch/x86/kvm/lapic.c   | 4 ++--
+>   arch/x86/kvm/lapic.h   | 2 +-
+>   arch/x86/kvm/svm/svm.c | 2 +-
+>   arch/x86/kvm/vmx/vmx.c | 2 +-
+>   4 files changed, 5 insertions(+), 5 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
+> index 977a704e3ff1..3cfc0485a46e 100644
+> --- a/arch/x86/kvm/lapic.c
+> +++ b/arch/x86/kvm/lapic.c
+> @@ -1622,12 +1622,12 @@ static void __kvm_wait_lapic_expire(struct kvm_vcpu *vcpu)
+>   		__wait_lapic_expire(vcpu, tsc_deadline - guest_tsc);
+>   }
 >   
->   	.prepare_guest_switch = svm_prepare_guest_switch,
+> -void kvm_wait_lapic_expire(struct kvm_vcpu *vcpu)
+> +void kvm_wait_lapic_expire(struct kvm_vcpu *vcpu, bool force_wait)
+>   {
+>   	if (lapic_in_kernel(vcpu) &&
+>   	    vcpu->arch.apic->lapic_timer.expired_tscdeadline &&
+>   	    vcpu->arch.apic->lapic_timer.timer_advance_ns &&
+> -	    lapic_timer_int_injected(vcpu))
+> +	    (force_wait || lapic_timer_int_injected(vcpu)))
+>   		__kvm_wait_lapic_expire(vcpu);
+>   }
+>   EXPORT_SYMBOL_GPL(kvm_wait_lapic_expire);
+> diff --git a/arch/x86/kvm/lapic.h b/arch/x86/kvm/lapic.h
+> index 997c45a5963a..2bd32d86ad6f 100644
+> --- a/arch/x86/kvm/lapic.h
+> +++ b/arch/x86/kvm/lapic.h
+> @@ -233,7 +233,7 @@ static inline int kvm_lapic_latched_init(struct kvm_vcpu *vcpu)
+>   
+>   bool kvm_apic_pending_eoi(struct kvm_vcpu *vcpu, int vector);
+>   
+> -void kvm_wait_lapic_expire(struct kvm_vcpu *vcpu);
+> +void kvm_wait_lapic_expire(struct kvm_vcpu *vcpu, bool force_wait);
+>   
+>   void kvm_bitmap_or_dest_vcpus(struct kvm *kvm, struct kvm_lapic_irq *irq,
+>   			      unsigned long *vcpu_bitmap);
+> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+> index bcc3fc4872a3..b12bfdbc394b 100644
+> --- a/arch/x86/kvm/svm/svm.c
+> +++ b/arch/x86/kvm/svm/svm.c
+> @@ -3774,7 +3774,7 @@ static __no_kcsan fastpath_t svm_vcpu_run(struct kvm_vcpu *vcpu)
+>   	clgi();
+>   	kvm_load_guest_xsave_state(vcpu);
+>   
+> -	kvm_wait_lapic_expire(vcpu);
+> +	kvm_wait_lapic_expire(vcpu, false);
+>   
+>   	/*
+>   	 * If this vCPU has touched SPEC_CTRL, restore the guest's value if
 > diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> index 84c2df824ecc..36756a356704 100644
+> index 36756a356704..7ce15a2c3490 100644
 > --- a/arch/x86/kvm/vmx/vmx.c
 > +++ b/arch/x86/kvm/vmx/vmx.c
-> @@ -6995,6 +6995,16 @@ static int vmx_vm_init(struct kvm *kvm)
->   	return 0;
->   }
+> @@ -6727,7 +6727,7 @@ static fastpath_t vmx_vcpu_run(struct kvm_vcpu *vcpu)
+>   	if (enable_preemption_timer)
+>   		vmx_update_hv_timer(vcpu);
 >   
-> +static void vmx_vm_teardown(struct kvm *kvm)
-> +{
-> +
-> +}
-> +
-> +static void vmx_vm_destroy(struct kvm *kvm)
-> +{
-> +
-> +}
-> +
->   static int __init vmx_check_processor_compat(void)
->   {
->   	struct vmcs_config vmcs_conf;
-> @@ -7613,6 +7623,8 @@ static struct kvm_x86_ops vmx_x86_ops __initdata = {
->   	.is_vm_type_supported = vmx_is_vm_type_supported,
->   	.vm_size = sizeof(struct kvm_vmx),
->   	.vm_init = vmx_vm_init,
-> +	.vm_teardown = vmx_vm_teardown,
-> +	.vm_destroy = vmx_vm_destroy,
+> -	kvm_wait_lapic_expire(vcpu);
+> +	kvm_wait_lapic_expire(vcpu, false);
 >   
->   	.vcpu_create = vmx_create_vcpu,
->   	.vcpu_free = vmx_free_vcpu,
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index da9f1081cb03..4b436cae1732 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -11043,7 +11043,7 @@ void kvm_arch_destroy_vm(struct kvm *kvm)
->   		__x86_set_memory_region(kvm, TSS_PRIVATE_MEMSLOT, 0, 0);
->   		mutex_unlock(&kvm->slots_lock);
->   	}
-> -	static_call_cond(kvm_x86_vm_destroy)(kvm);
-> +	static_call(kvm_x86_vm_teardown)(kvm);
->   	kvm_free_msr_filter(srcu_dereference_check(kvm->arch.msr_filter, &kvm->srcu, 1));
->   	kvm_pic_destroy(kvm);
->   	kvm_ioapic_destroy(kvm);
-> @@ -11054,6 +11054,7 @@ void kvm_arch_destroy_vm(struct kvm *kvm)
->   	kvm_page_track_cleanup(kvm);
->   	kvm_xen_destroy_vm(kvm);
->   	kvm_hv_destroy_vm(kvm);
-> +	static_call_cond(kvm_x86_vm_destroy)(kvm);
->   }
->   
->   void kvm_arch_free_memslot(struct kvm *kvm, struct kvm_memory_slot *slot)
+>   	/*
+>   	 * If this vCPU has touched SPEC_CTRL, restore the guest's value if
 > 
 
