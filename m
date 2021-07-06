@@ -2,196 +2,207 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A8F3D3BD8FF
-	for <lists+kvm@lfdr.de>; Tue,  6 Jul 2021 16:52:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DADC13BD914
+	for <lists+kvm@lfdr.de>; Tue,  6 Jul 2021 16:52:53 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232134AbhGFOzJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 6 Jul 2021 10:55:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36638 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231248AbhGFOzH (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 6 Jul 2021 10:55:07 -0400
-Received: from desiato.infradead.org (desiato.infradead.org [IPv6:2001:8b0:10b:1:d65d:64ff:fe57:4e05])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DFDE3C0617AB;
-        Tue,  6 Jul 2021 07:52:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=desiato.20200630; h=Content-Transfer-Encoding:Content-Type
-        :In-Reply-To:MIME-Version:Date:Message-ID:From:References:Cc:To:Subject:
-        Sender:Reply-To:Content-ID:Content-Description;
-        bh=1ayrkKf5NvJjQdfUl2A/VO9K+bU0q5/9ZgivWetFS3o=; b=JbK3meFocLJ6fB6QYONBPtOQk9
-        DJh8XYIRvVsq19DtaRbOde3Pqt+U3mVhAJRiVq9/pLYYfHRPetQ2VwkvtOK63TFIov9LQtN9N9PJt
-        W7/r5BUcb6i86u+BjFat8OYQU9y2P1DA/EDcTwU14mU2aPtj4aDiy4zBQ/DSm0rkTEqy36baSOqyA
-        V4yYgj7JmTV6DLtcs5VRxDGb3q6cP0CLL/po4JfkE8jt0lxs+Hs+g3d6AcmGzyEozq//QEL4RnMt8
-        byUYd3U5VUmkthiwr4pU7QnYiaWZQxohw6U15DrlSostKCZf7pcDzFMvg9GIfhVhYyVE4cG/tyrih
-        3mmB/xNA==;
-Received: from [2602:306:c5a2:a380:b447:81b0:ffaa:defc]
-        by desiato.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1m0mQg-00F4IY-8x; Tue, 06 Jul 2021 14:52:06 +0000
-Subject: Re: [PATCH] bus: Make remove callback return void
-To:     =?UTF-8?Q?Uwe_Kleine-K=c3=b6nig?= <u.kleine-koenig@pengutronix.de>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Cc:     kernel@pengutronix.de, linux-kernel@vger.kernel.org,
-        Russell King <linux@armlinux.org.uk>,
-        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
-        "James E.J. Bottomley" <James.Bottomley@HansenPartnership.com>,
-        Helge Deller <deller@gmx.de>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        Paul Mackerras <paulus@samba.org>,
-        "Rafael J. Wysocki" <rjw@rjwysocki.net>,
-        Len Brown <lenb@kernel.org>,
-        William Breathitt Gray <vilhelm.gray@gmail.com>,
-        =?UTF-8?B?UmFmYcWCIE1pxYJlY2tp?= <zajec5@gmail.com>,
-        Maxime Ripard <mripard@kernel.org>,
-        Chen-Yu Tsai <wens@csie.org>,
-        Jernej Skrabec <jernej.skrabec@gmail.com>,
-        Alison Schofield <alison.schofield@intel.com>,
-        Vishal Verma <vishal.l.verma@intel.com>,
-        Ira Weiny <ira.weiny@intel.com>,
-        Ben Widawsky <ben.widawsky@intel.com>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Dave Jiang <dave.jiang@intel.com>,
-        Vinod Koul <vkoul@kernel.org>,
-        Stefan Richter <stefanr@s5r6.in-berlin.de>,
-        Sudeep Holla <sudeep.holla@arm.com>,
-        Cristian Marussi <cristian.marussi@arm.com>,
-        Wu Hao <hao.wu@intel.com>, Tom Rix <trix@redhat.com>,
-        Moritz Fischer <mdf@kernel.org>,
-        Jiri Kosina <jikos@kernel.org>,
-        Benjamin Tissoires <benjamin.tissoires@redhat.com>,
-        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
-        "K. Y. Srinivasan" <kys@microsoft.com>,
-        Haiyang Zhang <haiyangz@microsoft.com>,
-        Stephen Hemminger <sthemmin@microsoft.com>,
-        Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>,
-        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
-        Wolfram Sang <wsa@kernel.org>,
-        Alexandre Belloni <alexandre.belloni@bootlin.com>,
-        Dmitry Torokhov <dmitry.torokhov@gmail.com>,
-        Samuel Iglesias Gonsalvez <siglesias@igalia.com>,
-        Jens Taprogge <jens.taprogge@taprogge.org>,
-        Johannes Thumshirn <morbidrsa@gmail.com>,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        Maxim Levitsky <maximlevitsky@gmail.com>,
-        Alex Dubov <oakad@yahoo.com>,
-        Ulf Hansson <ulf.hansson@linaro.org>,
-        Lee Jones <lee.jones@linaro.org>,
-        Tomas Winkler <tomas.winkler@intel.com>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Jakub Kicinski <kuba@kernel.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jon Mason <jdmason@kudzu.us>, Allen Hubbe <allenbh@gmail.com>,
-        Kishon Vijay Abraham I <kishon@ti.com>,
-        Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>,
-        =?UTF-8?Q?Krzysztof_Wilczy=c5=84ski?= <kw@linux.com>,
-        Bjorn Helgaas <bhelgaas@google.com>,
-        Dominik Brodowski <linux@dominikbrodowski.net>,
-        Maximilian Luz <luzmaximilian@gmail.com>,
-        Hans de Goede <hdegoede@redhat.com>,
-        Mark Gross <mgross@linux.intel.com>,
-        Matt Porter <mporter@kernel.crashing.org>,
-        Alexandre Bounine <alex.bou9@gmail.com>,
-        Ohad Ben-Cohen <ohad@wizery.com>,
-        Bjorn Andersson <bjorn.andersson@linaro.org>,
-        Mathieu Poirier <mathieu.poirier@linaro.org>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        Thorsten Scherer <t.scherer@eckelmann.de>,
-        Srinivas Kandagatla <srinivas.kandagatla@linaro.org>,
-        Andy Gross <agross@kernel.org>,
-        Mark Brown <broonie@kernel.org>,
-        Stephen Boyd <sboyd@kernel.org>, Michael Buesch <m@bues.ch>,
-        Sven Van Asbroeck <TheSven73@gmail.com>,
-        Johan Hovold <johan@kernel.org>, Alex Elder <elder@kernel.org>,
-        Andreas Noever <andreas.noever@gmail.com>,
-        Michael Jamet <michael.jamet@intel.com>,
-        Mika Westerberg <mika.westerberg@linux.intel.com>,
-        Yehezkel Bernat <YehezkelShB@gmail.com>,
-        Rob Herring <robh@kernel.org>,
-        Jiri Slaby <jirislaby@kernel.org>,
-        Heikki Krogerus <heikki.krogerus@linux.intel.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Kirti Wankhede <kwankhede@nvidia.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Martyn Welch <martyn@welchs.me.uk>,
-        Manohar Vanga <manohar.vanga@gmail.com>,
-        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
-        Juergen Gross <jgross@suse.com>,
-        Stefano Stabellini <sstabellini@kernel.org>,
-        Johannes Berg <johannes@sipsolutions.net>,
-        Jaroslav Kysela <perex@perex.cz>,
-        Takashi Iwai <tiwai@suse.com>, Marc Zyngier <maz@kernel.org>,
-        Tyrel Datwyler <tyreld@linux.ibm.com>,
-        Vladimir Zapolskiy <vz@mleia.com>,
-        Samuel Holland <samuel@sholland.org>,
-        Qinglang Miao <miaoqinglang@huawei.com>,
-        Alexey Kardashevskiy <aik@ozlabs.ru>,
-        Kai-Heng Feng <kai.heng.feng@canonical.com>,
-        Joey Pabalan <jpabalanb@gmail.com>,
-        =?UTF-8?Q?Pali_Roh=c3=a1r?= <pali@kernel.org>,
-        Adrian Hunter <adrian.hunter@intel.com>,
-        Frank Li <lznuaa@gmail.com>,
-        Mike Christie <michael.christie@oracle.com>,
-        Bodo Stroesser <bostroesser@gmail.com>,
-        Hannes Reinecke <hare@suse.de>,
-        David Woodhouse <dwmw@amazon.co.uk>,
-        SeongJae Park <sjpark@amazon.de>,
-        Julien Grall <jgrall@amazon.com>,
-        linux-arm-kernel@lists.infradead.org, linux-mips@vger.kernel.org,
-        linux-parisc@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-        linux-acpi@vger.kernel.org, linux-wireless@vger.kernel.org,
-        linux-sunxi@lists.linux.dev, linux-cxl@vger.kernel.org,
-        nvdimm@lists.linux.dev, dmaengine@vger.kernel.org,
-        linux1394-devel@lists.sourceforge.net, linux-fpga@vger.kernel.org,
-        linux-input@vger.kernel.org, linux-hyperv@vger.kernel.org,
-        linux-i2c@vger.kernel.org, linux-i3c@lists.infradead.org,
-        industrypack-devel@lists.sourceforge.net,
-        linux-media@vger.kernel.org, linux-mmc@vger.kernel.org,
-        netdev@vger.kernel.org, linux-ntb@googlegroups.com,
-        linux-pci@vger.kernel.org, platform-driver-x86@vger.kernel.org,
-        linux-remoteproc@vger.kernel.org, linux-scsi@vger.kernel.org,
-        alsa-devel@alsa-project.org, linux-arm-msm@vger.kernel.org,
-        linux-spi@vger.kernel.org, linux-staging@lists.linux.dev,
-        greybus-dev@lists.linaro.org, target-devel@vger.kernel.org,
-        linux-usb@vger.kernel.org, linux-serial@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
-        xen-devel@lists.xenproject.org
-References: <20210706095037.1425211-1-u.kleine-koenig@pengutronix.de>
-From:   Geoff Levand <geoff@infradead.org>
-Message-ID: <7a68b536-302c-0374-848f-4b9535ff1306@infradead.org>
-Date:   Tue, 6 Jul 2021 07:51:36 -0700
+        id S232439AbhGFOza (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 6 Jul 2021 10:55:30 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:60710 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S232631AbhGFOzY (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 6 Jul 2021 10:55:24 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1625583165;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=ZlKHZBOFtzIcfww4JrhdQyRbEpi1c+RqFo/2UmsBVj0=;
+        b=Pdg0IDnj3wpoFOxUvPzbeHCI3/9mnKmjdAz9rEeS7am84Qsw5XiEjSUVKAeznWE6Ti7GnO
+        Ri8qsYW22jlJa4aJIc0ynU9Ly+fU9m38ID2f0/BMTh4qQcSU/3ha4Nlt16rdh5nw5ca6og
+        QEPStG20k5dS4kM5UvaRijqELYcoyOk=
+Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
+ [209.85.218.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-213-23vypzMOOm-nZgpjvIxuBQ-1; Tue, 06 Jul 2021 10:52:44 -0400
+X-MC-Unique: 23vypzMOOm-nZgpjvIxuBQ-1
+Received: by mail-ej1-f70.google.com with SMTP id u4-20020a1709061244b02904648b302151so5930831eja.17
+        for <kvm@vger.kernel.org>; Tue, 06 Jul 2021 07:52:44 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=ZlKHZBOFtzIcfww4JrhdQyRbEpi1c+RqFo/2UmsBVj0=;
+        b=Gu/PCC6/BPjQhQTcqQXz+cwe8KNhrxACeAVoitUNmp4CL0N9etYT25xDKhC+pHyaaM
+         N52umn9A0dcWnOsiYw99OSktkIuf8ulpvwYTcZKxkiu1qAhS4G0sLCvOaNw6VTfnPtPW
+         2HLttShTzINyVPAUEv2uSL9S3mTgzxG4LWDcIp02YEnjJLa2uChSQTgypDctQGYvSyNc
+         IlwjbrcGJPWB9obkR3OxYsNscurZq53JMJQmj+Xdzivi6uXAT7LvL+6i2dO02TFjSplP
+         t9eooa8H9HC5lkl/sbh09nZ+M0wjuVOYwXepM/PJsgBp2SThMZYJRMkeS1AnXQguWm6F
+         xW1g==
+X-Gm-Message-State: AOAM531YWtsN3Re3EGoOfbZCMl+KV9r3zvL0JVa/1Gdhrf4TupkpXtv7
+        Y5YgeOUqxAtHNK0XSLG/w4EnDMKSZNDcH95+nI+xdMoVdVZ/bBtXzrSPyKDoUjuK4ZF4wwx26em
+        OxjfOdmC5AJpV
+X-Received: by 2002:a17:906:9b8f:: with SMTP id dd15mr14650116ejc.77.1625583163186;
+        Tue, 06 Jul 2021 07:52:43 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJybwVNPdcLr1AvMM3eRhz7ACzYUDsNh+IZyNcfinFweWQHgNjZLYge6y/4/pKirCODKxhQxLA==
+X-Received: by 2002:a17:906:9b8f:: with SMTP id dd15mr14650097ejc.77.1625583163024;
+        Tue, 06 Jul 2021 07:52:43 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+        by smtp.gmail.com with ESMTPSA id y17sm1198961ejd.16.2021.07.06.07.52.41
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 06 Jul 2021 07:52:42 -0700 (PDT)
+Subject: Re: [RFC PATCH v2 52/69] KVM: VMX: Split out guts of EPT violation to
+ common/exposed function
+To:     isaku.yamahata@intel.com, Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        "H . Peter Anvin" <hpa@zytor.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, erdemaktas@google.com,
+        Connor Kuehl <ckuehl@redhat.com>,
+        Sean Christopherson <seanjc@google.com>, x86@kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Cc:     isaku.yamahata@gmail.com,
+        Sean Christopherson <sean.j.christopherson@intel.com>
+References: <cover.1625186503.git.isaku.yamahata@intel.com>
+ <8e246d479e8986172d19704ef4ef4d2b666d5ac1.1625186503.git.isaku.yamahata@intel.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <6e129879-bb76-622e-19a9-afb62fcf864b@redhat.com>
+Date:   Tue, 6 Jul 2021 16:52:41 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.11.0
 MIME-Version: 1.0
-In-Reply-To: <20210706095037.1425211-1-u.kleine-koenig@pengutronix.de>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <8e246d479e8986172d19704ef4ef4d2b666d5ac1.1625186503.git.isaku.yamahata@intel.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 7/6/21 2:50 AM, Uwe Kleine-König wrote:
+On 03/07/21 00:04, isaku.yamahata@intel.com wrote:
+> From: Sean Christopherson <sean.j.christopherson@intel.com>
+> 
+> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+> Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
+> ---
+>   arch/x86/kvm/vmx/common.h | 29 +++++++++++++++++++++++++++++
+>   arch/x86/kvm/vmx/vmx.c    | 33 +++++----------------------------
+>   2 files changed, 34 insertions(+), 28 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/vmx/common.h b/arch/x86/kvm/vmx/common.h
+> index 81c73f30d01d..9e5865b05d47 100644
+> --- a/arch/x86/kvm/vmx/common.h
+> +++ b/arch/x86/kvm/vmx/common.h
+> @@ -5,8 +5,11 @@
+>   #include <linux/kvm_host.h>
+>   
+>   #include <asm/traps.h>
+> +#include <asm/vmx.h>
+>   
+> +#include "mmu.h"
+>   #include "vmcs.h"
+> +#include "vmx.h"
+>   #include "x86.h"
+>   
+>   extern unsigned long vmx_host_idt_base;
+> @@ -49,4 +52,30 @@ static inline void vmx_handle_external_interrupt_irqoff(struct kvm_vcpu *vcpu,
+>   	vmx_handle_interrupt_nmi_irqoff(vcpu, gate_offset(desc));
+>   }
+>   
+> +static inline int __vmx_handle_ept_violation(struct kvm_vcpu *vcpu, gpa_t gpa,
+> +					     unsigned long exit_qualification)
+> +{
+> +	u64 error_code;
+> +
+> +	/* Is it a read fault? */
+> +	error_code = (exit_qualification & EPT_VIOLATION_ACC_READ)
+> +		     ? PFERR_USER_MASK : 0;
+> +	/* Is it a write fault? */
+> +	error_code |= (exit_qualification & EPT_VIOLATION_ACC_WRITE)
+> +		      ? PFERR_WRITE_MASK : 0;
+> +	/* Is it a fetch fault? */
+> +	error_code |= (exit_qualification & EPT_VIOLATION_ACC_INSTR)
+> +		      ? PFERR_FETCH_MASK : 0;
+> +	/* ept page table entry is present? */
+> +	error_code |= (exit_qualification &
+> +		       (EPT_VIOLATION_READABLE | EPT_VIOLATION_WRITABLE |
+> +			EPT_VIOLATION_EXECUTABLE))
+> +		      ? PFERR_PRESENT_MASK : 0;
+> +
+> +	error_code |= (exit_qualification & EPT_VIOLATION_GVA_TRANSLATED) != 0 ?
+> +	       PFERR_GUEST_FINAL_MASK : PFERR_GUEST_PAGE_MASK;
+> +
+> +	return kvm_mmu_page_fault(vcpu, gpa, error_code, NULL, 0);
+> +}
+> +
+>   #endif /* __KVM_X86_VMX_COMMON_H */
+> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+> index 452d4d1400db..8a104a54121b 100644
+> --- a/arch/x86/kvm/vmx/vmx.c
+> +++ b/arch/x86/kvm/vmx/vmx.c
+> @@ -5328,11 +5328,10 @@ static int handle_task_switch(struct kvm_vcpu *vcpu)
+>   
+>   static int handle_ept_violation(struct kvm_vcpu *vcpu)
+>   {
+> -	unsigned long exit_qualification;
+> -	gpa_t gpa;
+> -	u64 error_code;
+> +	unsigned long exit_qualification = vmx_get_exit_qual(vcpu);
+> +	gpa_t gpa = vmcs_read64(GUEST_PHYSICAL_ADDRESS);
+>   
+> -	exit_qualification = vmx_get_exit_qual(vcpu);
+> +	trace_kvm_page_fault(gpa, exit_qualification);
+>   
+>   	/*
+>   	 * EPT violation happened while executing iret from NMI,
+> @@ -5341,31 +5340,9 @@ static int handle_ept_violation(struct kvm_vcpu *vcpu)
+>   	 * AAK134, BY25.
+>   	 */
+>   	if (!(to_vmx(vcpu)->idt_vectoring_info & VECTORING_INFO_VALID_MASK) &&
+> -			enable_vnmi &&
+> -			(exit_qualification & INTR_INFO_UNBLOCK_NMI))
+> +	    enable_vnmi && (exit_qualification & INTR_INFO_UNBLOCK_NMI))
+>   		vmcs_set_bits(GUEST_INTERRUPTIBILITY_INFO, GUEST_INTR_STATE_NMI);
+>   
+> -	gpa = vmcs_read64(GUEST_PHYSICAL_ADDRESS);
+> -	trace_kvm_page_fault(gpa, exit_qualification);
+> -
+> -	/* Is it a read fault? */
+> -	error_code = (exit_qualification & EPT_VIOLATION_ACC_READ)
+> -		     ? PFERR_USER_MASK : 0;
+> -	/* Is it a write fault? */
+> -	error_code |= (exit_qualification & EPT_VIOLATION_ACC_WRITE)
+> -		      ? PFERR_WRITE_MASK : 0;
+> -	/* Is it a fetch fault? */
+> -	error_code |= (exit_qualification & EPT_VIOLATION_ACC_INSTR)
+> -		      ? PFERR_FETCH_MASK : 0;
+> -	/* ept page table entry is present? */
+> -	error_code |= (exit_qualification &
+> -		       (EPT_VIOLATION_READABLE | EPT_VIOLATION_WRITABLE |
+> -			EPT_VIOLATION_EXECUTABLE))
+> -		      ? PFERR_PRESENT_MASK : 0;
+> -
+> -	error_code |= (exit_qualification & EPT_VIOLATION_GVA_TRANSLATED) != 0 ?
+> -	       PFERR_GUEST_FINAL_MASK : PFERR_GUEST_PAGE_MASK;
+> -
+>   	vcpu->arch.exit_qualification = exit_qualification;
+>   
+>   	/*
+> @@ -5379,7 +5356,7 @@ static int handle_ept_violation(struct kvm_vcpu *vcpu)
+>   	if (unlikely(allow_smaller_maxphyaddr && kvm_vcpu_is_illegal_gpa(vcpu, gpa)))
+>   		return kvm_emulate_instruction(vcpu, 0);
+>   
+> -	return kvm_mmu_page_fault(vcpu, gpa, error_code, NULL, 0);
+> +	return __vmx_handle_ept_violation(vcpu, gpa, exit_qualification);
+>   }
+>   
+>   static int handle_ept_misconfig(struct kvm_vcpu *vcpu)
+> 
 
-> --- a/arch/powerpc/platforms/ps3/system-bus.c
-> +++ b/arch/powerpc/platforms/ps3/system-bus.c
-> @@ -381,7 +381,7 @@ static int ps3_system_bus_probe(struct device *_dev)
->  	return result;
->  }
->  
-> -static int ps3_system_bus_remove(struct device *_dev)
-> +static void ps3_system_bus_remove(struct device *_dev)
->  {
->  	struct ps3_system_bus_device *dev = ps3_dev_to_system_bus_dev(_dev);
->  	struct ps3_system_bus_driver *drv;
-> @@ -399,7 +399,6 @@ static int ps3_system_bus_remove(struct device *_dev)
->  			__func__, __LINE__, drv->core.name);
->  
->  	pr_debug(" <- %s:%d: %s\n", __func__, __LINE__, dev_name(&dev->core));
-> -	return 0;
->  }
+This should be in main.c, not in a header (and named 
+__vt_handle_ept_qualification).
 
-PS3 part looks fine.
+Paolo
 
-Acked-by: Geoff Levand <geoff@infradead.org>
