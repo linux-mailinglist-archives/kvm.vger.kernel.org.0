@@ -2,207 +2,94 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id DADC13BD914
-	for <lists+kvm@lfdr.de>; Tue,  6 Jul 2021 16:52:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6D4673BD917
+	for <lists+kvm@lfdr.de>; Tue,  6 Jul 2021 16:52:55 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232439AbhGFOza (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 6 Jul 2021 10:55:30 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:60710 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232631AbhGFOzY (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 6 Jul 2021 10:55:24 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1625583165;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=ZlKHZBOFtzIcfww4JrhdQyRbEpi1c+RqFo/2UmsBVj0=;
-        b=Pdg0IDnj3wpoFOxUvPzbeHCI3/9mnKmjdAz9rEeS7am84Qsw5XiEjSUVKAeznWE6Ti7GnO
-        Ri8qsYW22jlJa4aJIc0ynU9Ly+fU9m38ID2f0/BMTh4qQcSU/3ha4Nlt16rdh5nw5ca6og
-        QEPStG20k5dS4kM5UvaRijqELYcoyOk=
-Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
- [209.85.218.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-213-23vypzMOOm-nZgpjvIxuBQ-1; Tue, 06 Jul 2021 10:52:44 -0400
-X-MC-Unique: 23vypzMOOm-nZgpjvIxuBQ-1
-Received: by mail-ej1-f70.google.com with SMTP id u4-20020a1709061244b02904648b302151so5930831eja.17
-        for <kvm@vger.kernel.org>; Tue, 06 Jul 2021 07:52:44 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=ZlKHZBOFtzIcfww4JrhdQyRbEpi1c+RqFo/2UmsBVj0=;
-        b=Gu/PCC6/BPjQhQTcqQXz+cwe8KNhrxACeAVoitUNmp4CL0N9etYT25xDKhC+pHyaaM
-         N52umn9A0dcWnOsiYw99OSktkIuf8ulpvwYTcZKxkiu1qAhS4G0sLCvOaNw6VTfnPtPW
-         2HLttShTzINyVPAUEv2uSL9S3mTgzxG4LWDcIp02YEnjJLa2uChSQTgypDctQGYvSyNc
-         IlwjbrcGJPWB9obkR3OxYsNscurZq53JMJQmj+Xdzivi6uXAT7LvL+6i2dO02TFjSplP
-         t9eooa8H9HC5lkl/sbh09nZ+M0wjuVOYwXepM/PJsgBp2SThMZYJRMkeS1AnXQguWm6F
-         xW1g==
-X-Gm-Message-State: AOAM531YWtsN3Re3EGoOfbZCMl+KV9r3zvL0JVa/1Gdhrf4TupkpXtv7
-        Y5YgeOUqxAtHNK0XSLG/w4EnDMKSZNDcH95+nI+xdMoVdVZ/bBtXzrSPyKDoUjuK4ZF4wwx26em
-        OxjfOdmC5AJpV
-X-Received: by 2002:a17:906:9b8f:: with SMTP id dd15mr14650116ejc.77.1625583163186;
-        Tue, 06 Jul 2021 07:52:43 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJybwVNPdcLr1AvMM3eRhz7ACzYUDsNh+IZyNcfinFweWQHgNjZLYge6y/4/pKirCODKxhQxLA==
-X-Received: by 2002:a17:906:9b8f:: with SMTP id dd15mr14650097ejc.77.1625583163024;
-        Tue, 06 Jul 2021 07:52:43 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id y17sm1198961ejd.16.2021.07.06.07.52.41
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 06 Jul 2021 07:52:42 -0700 (PDT)
-Subject: Re: [RFC PATCH v2 52/69] KVM: VMX: Split out guts of EPT violation to
- common/exposed function
-To:     isaku.yamahata@intel.com, Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        "H . Peter Anvin" <hpa@zytor.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, erdemaktas@google.com,
-        Connor Kuehl <ckuehl@redhat.com>,
-        Sean Christopherson <seanjc@google.com>, x86@kernel.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc:     isaku.yamahata@gmail.com,
-        Sean Christopherson <sean.j.christopherson@intel.com>
-References: <cover.1625186503.git.isaku.yamahata@intel.com>
- <8e246d479e8986172d19704ef4ef4d2b666d5ac1.1625186503.git.isaku.yamahata@intel.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <6e129879-bb76-622e-19a9-afb62fcf864b@redhat.com>
-Date:   Tue, 6 Jul 2021 16:52:41 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.11.0
-MIME-Version: 1.0
-In-Reply-To: <8e246d479e8986172d19704ef4ef4d2b666d5ac1.1625186503.git.isaku.yamahata@intel.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+        id S232666AbhGFOzb convert rfc822-to-8bit (ORCPT
+        <rfc822;lists+kvm@lfdr.de>); Tue, 6 Jul 2021 10:55:31 -0400
+Received: from mail.kernel.org ([198.145.29.99]:42312 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S232655AbhGFOz2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 6 Jul 2021 10:55:28 -0400
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 90D40613B2;
+        Tue,  6 Jul 2021 14:52:48 +0000 (UTC)
+Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94.2)
+        (envelope-from <maz@kernel.org>)
+        id 1m0mRK-00BkmS-Ha; Tue, 06 Jul 2021 15:52:46 +0100
+Date:   Tue, 06 Jul 2021 15:52:46 +0100
+Message-ID: <87y2aj7av5.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Alexandre Chartre <alexandre.chartre@oracle.com>
+Cc:     will@kernel.org, catalin.marinas@arm.com, alexandru.elisei@arm.com,
+        james.morse@arm.com, suzuki.poulose@arm.com,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org, konrad.wilk@oracle.com
+Subject: Re: [PATCH] KVM: arm64: Disabling disabled PMU counters wastes a lot of time
+In-Reply-To: <ed86299d-c0d4-f73e-ff7d-86eefd2de650@oracle.com>
+References: <20210628161925.401343-1-alexandre.chartre@oracle.com>
+        <878s2tavks.wl-maz@kernel.org>
+        <e3843c2c-e20a-ef58-c795-1ba8f1d91ff6@oracle.com>
+        <ed86299d-c0d4-f73e-ff7d-86eefd2de650@oracle.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8BIT
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: alexandre.chartre@oracle.com, will@kernel.org, catalin.marinas@arm.com, alexandru.elisei@arm.com, james.morse@arm.com, suzuki.poulose@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, konrad.wilk@oracle.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 03/07/21 00:04, isaku.yamahata@intel.com wrote:
-> From: Sean Christopherson <sean.j.christopherson@intel.com>
+On Tue, 06 Jul 2021 14:50:35 +0100,
+Alexandre Chartre <alexandre.chartre@oracle.com> wrote:
 > 
-> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
-> Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
-> ---
->   arch/x86/kvm/vmx/common.h | 29 +++++++++++++++++++++++++++++
->   arch/x86/kvm/vmx/vmx.c    | 33 +++++----------------------------
->   2 files changed, 34 insertions(+), 28 deletions(-)
 > 
-> diff --git a/arch/x86/kvm/vmx/common.h b/arch/x86/kvm/vmx/common.h
-> index 81c73f30d01d..9e5865b05d47 100644
-> --- a/arch/x86/kvm/vmx/common.h
-> +++ b/arch/x86/kvm/vmx/common.h
-> @@ -5,8 +5,11 @@
->   #include <linux/kvm_host.h>
->   
->   #include <asm/traps.h>
-> +#include <asm/vmx.h>
->   
-> +#include "mmu.h"
->   #include "vmcs.h"
-> +#include "vmx.h"
->   #include "x86.h"
->   
->   extern unsigned long vmx_host_idt_base;
-> @@ -49,4 +52,30 @@ static inline void vmx_handle_external_interrupt_irqoff(struct kvm_vcpu *vcpu,
->   	vmx_handle_interrupt_nmi_irqoff(vcpu, gate_offset(desc));
->   }
->   
-> +static inline int __vmx_handle_ept_violation(struct kvm_vcpu *vcpu, gpa_t gpa,
-> +					     unsigned long exit_qualification)
-> +{
-> +	u64 error_code;
-> +
-> +	/* Is it a read fault? */
-> +	error_code = (exit_qualification & EPT_VIOLATION_ACC_READ)
-> +		     ? PFERR_USER_MASK : 0;
-> +	/* Is it a write fault? */
-> +	error_code |= (exit_qualification & EPT_VIOLATION_ACC_WRITE)
-> +		      ? PFERR_WRITE_MASK : 0;
-> +	/* Is it a fetch fault? */
-> +	error_code |= (exit_qualification & EPT_VIOLATION_ACC_INSTR)
-> +		      ? PFERR_FETCH_MASK : 0;
-> +	/* ept page table entry is present? */
-> +	error_code |= (exit_qualification &
-> +		       (EPT_VIOLATION_READABLE | EPT_VIOLATION_WRITABLE |
-> +			EPT_VIOLATION_EXECUTABLE))
-> +		      ? PFERR_PRESENT_MASK : 0;
-> +
-> +	error_code |= (exit_qualification & EPT_VIOLATION_GVA_TRANSLATED) != 0 ?
-> +	       PFERR_GUEST_FINAL_MASK : PFERR_GUEST_PAGE_MASK;
-> +
-> +	return kvm_mmu_page_fault(vcpu, gpa, error_code, NULL, 0);
-> +}
-> +
->   #endif /* __KVM_X86_VMX_COMMON_H */
-> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> index 452d4d1400db..8a104a54121b 100644
-> --- a/arch/x86/kvm/vmx/vmx.c
-> +++ b/arch/x86/kvm/vmx/vmx.c
-> @@ -5328,11 +5328,10 @@ static int handle_task_switch(struct kvm_vcpu *vcpu)
->   
->   static int handle_ept_violation(struct kvm_vcpu *vcpu)
->   {
-> -	unsigned long exit_qualification;
-> -	gpa_t gpa;
-> -	u64 error_code;
-> +	unsigned long exit_qualification = vmx_get_exit_qual(vcpu);
-> +	gpa_t gpa = vmcs_read64(GUEST_PHYSICAL_ADDRESS);
->   
-> -	exit_qualification = vmx_get_exit_qual(vcpu);
-> +	trace_kvm_page_fault(gpa, exit_qualification);
->   
->   	/*
->   	 * EPT violation happened while executing iret from NMI,
-> @@ -5341,31 +5340,9 @@ static int handle_ept_violation(struct kvm_vcpu *vcpu)
->   	 * AAK134, BY25.
->   	 */
->   	if (!(to_vmx(vcpu)->idt_vectoring_info & VECTORING_INFO_VALID_MASK) &&
-> -			enable_vnmi &&
-> -			(exit_qualification & INTR_INFO_UNBLOCK_NMI))
-> +	    enable_vnmi && (exit_qualification & INTR_INFO_UNBLOCK_NMI))
->   		vmcs_set_bits(GUEST_INTERRUPTIBILITY_INFO, GUEST_INTR_STATE_NMI);
->   
-> -	gpa = vmcs_read64(GUEST_PHYSICAL_ADDRESS);
-> -	trace_kvm_page_fault(gpa, exit_qualification);
-> -
-> -	/* Is it a read fault? */
-> -	error_code = (exit_qualification & EPT_VIOLATION_ACC_READ)
-> -		     ? PFERR_USER_MASK : 0;
-> -	/* Is it a write fault? */
-> -	error_code |= (exit_qualification & EPT_VIOLATION_ACC_WRITE)
-> -		      ? PFERR_WRITE_MASK : 0;
-> -	/* Is it a fetch fault? */
-> -	error_code |= (exit_qualification & EPT_VIOLATION_ACC_INSTR)
-> -		      ? PFERR_FETCH_MASK : 0;
-> -	/* ept page table entry is present? */
-> -	error_code |= (exit_qualification &
-> -		       (EPT_VIOLATION_READABLE | EPT_VIOLATION_WRITABLE |
-> -			EPT_VIOLATION_EXECUTABLE))
-> -		      ? PFERR_PRESENT_MASK : 0;
-> -
-> -	error_code |= (exit_qualification & EPT_VIOLATION_GVA_TRANSLATED) != 0 ?
-> -	       PFERR_GUEST_FINAL_MASK : PFERR_GUEST_PAGE_MASK;
-> -
->   	vcpu->arch.exit_qualification = exit_qualification;
->   
->   	/*
-> @@ -5379,7 +5356,7 @@ static int handle_ept_violation(struct kvm_vcpu *vcpu)
->   	if (unlikely(allow_smaller_maxphyaddr && kvm_vcpu_is_illegal_gpa(vcpu, gpa)))
->   		return kvm_emulate_instruction(vcpu, 0);
->   
-> -	return kvm_mmu_page_fault(vcpu, gpa, error_code, NULL, 0);
-> +	return __vmx_handle_ept_violation(vcpu, gpa, exit_qualification);
->   }
->   
->   static int handle_ept_misconfig(struct kvm_vcpu *vcpu)
+> Hi Marc,
 > 
+> On 6/29/21 3:16 PM, Alexandre Chartre wrote:
+> > On 6/29/21 11:06 AM, Marc Zyngier wrote
+> > [...]
+> >> So the sysreg is the only thing we should consider, and I think we
+> >> should drop the useless masking. There is at least another instance of
+> >> this in the PMU code (kvm_pmu_overflow_status()), and apart from
+> >> kvm_pmu_vcpu_reset(), only the sysreg accessors should care about the
+> >> masking to sanitise accesses.
+> >> 
+> >> What do you think?
+> >> 
+> > 
+> > I think you are right. PMCNTENSET_EL0 is already masked with kvm_pmu_valid_counter_mask()
+> > so there's effectively no need to mask it again when we use it. I will send an additional
+> > patch (on top of this one) to remove useless masking. Basically, changes would be:
+> 
+> I had a closer look and we can't remove the mask. The access
+> functions (for pmcnten, pminten, pmovs), clear or set only the
+> specified valid counter bits. This means that bits other than the
+> valid counter bits never change in __vcpu_sys_reg(), and those bits
+> are not necessarily zero because the initial value is
+> 0x1de7ec7edbadc0deULL (set by reset_unknown()).
 
-This should be in main.c, not in a header (and named 
-__vt_handle_ept_qualification).
+That's a bug that should be fixed on its own. Bits that are RAZ/WI in
+the architecture shouldn't be kept in the shadow registers the first
+place. I'll have a look.
 
-Paolo
+> So I will resubmit initial patch, with just the commit message
+> changes.
 
+Please don't. I'm not papering over this kind of bug.
+
+Thanks,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
