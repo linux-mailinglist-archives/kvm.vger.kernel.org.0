@@ -2,56 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 27A173BDCA5
-	for <lists+kvm@lfdr.de>; Tue,  6 Jul 2021 20:04:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1F5413BDCA7
+	for <lists+kvm@lfdr.de>; Tue,  6 Jul 2021 20:04:57 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231173AbhGFSGf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 6 Jul 2021 14:06:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51894 "EHLO
+        id S231181AbhGFSGg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 6 Jul 2021 14:06:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51900 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231162AbhGFSGe (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 6 Jul 2021 14:06:34 -0400
+        with ESMTP id S231175AbhGFSGg (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 6 Jul 2021 14:06:36 -0400
 Received: from mail-qt1-x84a.google.com (mail-qt1-x84a.google.com [IPv6:2607:f8b0:4864:20::84a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2176BC06175F
-        for <kvm@vger.kernel.org>; Tue,  6 Jul 2021 11:03:56 -0700 (PDT)
-Received: by mail-qt1-x84a.google.com with SMTP id c17-20020ac87dd10000b0290250fd339409so19790qte.6
-        for <kvm@vger.kernel.org>; Tue, 06 Jul 2021 11:03:56 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9EDDEC06175F
+        for <kvm@vger.kernel.org>; Tue,  6 Jul 2021 11:03:57 -0700 (PDT)
+Received: by mail-qt1-x84a.google.com with SMTP id t6-20020ac80dc60000b029024e988e8277so11678038qti.23
+        for <kvm@vger.kernel.org>; Tue, 06 Jul 2021 11:03:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=date:in-reply-to:message-id:mime-version:references:subject:from:to
          :cc;
-        bh=fF6j8POF8iWLCA43O7ZfDObsMW0wQoLTlF29knN9tKg=;
-        b=hHRyc03OBksoyXSj89AptvKZOBbuf2SKJOosv8ggpviRQetpsOy+KEw+8j+vfumO/R
-         9MyNqJHkYMvOvVGWUMgdHCpgBK8yr9gBxRn4UVcr3rfKTjMb4NLHzQ8zy4nJK+33X166
-         IdV39ReiPwMxnsjweT1I9eTRG9RiFTP3OTUpm+5+Q+jN79OA6pkctVb+BHK+E+ACWbhM
-         SknIzUxswsNUUgjGnMIyCEpKP52ldnNYlipLVdjS/2/lJUEu4yO8xkTZBa0bWMxSkY3K
-         49taI/LuZGDj+gSQqk4qUqq/oeoO29AW9cHM4IMIT/XmVniR6pBDv4hjVgl7jHG3aeQM
-         0Sug==
+        bh=tuY40cRvRjb7LOqoOokdd2WJ/UxGgrW/aY+HZzkwyxg=;
+        b=JKuSvh3Qc1mRz3g4jUBCdl2w09FhmvGwIfnYfp9xP+FtJqgtmVsQABLLq8SzosvZeG
+         XQMAcz5oNR0Kvpm88UUF1Hv0nJAawGBAz44WgC1zlL8snKRmCDelTxJ6zXewwInLreho
+         gRT23nzYjyFztpPSTgbNYqnLvTNG5JQa96PZie7dURMDxsp3f6KF70LiCr/rdeEJTf/p
+         cR6PF87TowUIMfWwBUrRikvODGnpghvGqfDHeCoLqSRabTJk439L6LECYGzOkO5YjF/2
+         Ghqii2tje0ASDIf4jbGE/4HxZ1PzyPt7R8UNXAgZz8WcjJEgrEew3FerGZR5aYBWfLmH
+         2Uzw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=fF6j8POF8iWLCA43O7ZfDObsMW0wQoLTlF29knN9tKg=;
-        b=BGaKk3QR8pwD6pXA8NNCFUqk3JKHdsnOrf+3aagHCYT1+qDKAL/Ru/pJqYjYvC+iN+
-         DAFS0tzj6bagpjzsBuwzkv2HncbKF08TBf6wbN8bJJxmkEJVzoUyeM2V4LowlgUkshSB
-         4RxuBxeLnalMtuL6cJbqyjR+2O5LnY/GPMomRYQ5QZkPInoAKrg3oGYMsrC1r1dCpdFw
-         ElqnGWxV5SJgRW2JuekGIJr+fFr4hTng3I6SenL4Z05TMLbtz9o62iUnS0FuCOAOkrIW
-         51MuP27XQ4w1rLQ8AfB5JPGxyG3tq+FQbw1lWqbn/eFiDl/uyEOFNO0FLXoPwouVzofM
-         ShIw==
-X-Gm-Message-State: AOAM531iiHiZww7mVnquzkQcIoyEfqUQMp7qvvHrT/zAx3X4VOHy6X5A
-        J8E5e8xim6HYaH4qr5msB1NNUn1UHYLXB38oPQWXVgxQXwFoVQ9nxDXMdSB2yG1YqtttJTsnJrE
-        MePhEGsclXpUO1PD3PQVcHieIDayiXsLC15zOlpF0hUae3mDNuw6yxViqsN+IGifygwrnoU4=
-X-Google-Smtp-Source: ABdhPJzwzjtXd/x2FeBGe16SmcPRnxkwEm8GQ2lTaxo9PvBJj/UVzE1g3b2RBv7jkQA1GUzwRU8OgpCoFkuYFpF3nQ==
+        bh=tuY40cRvRjb7LOqoOokdd2WJ/UxGgrW/aY+HZzkwyxg=;
+        b=Qbht7PcT4QunIgAVdqCmAqgfS2WpKJooTceq0ayf1ernOqhT7T3g/JvpjCXiosA3cl
+         E2Mjv81J6p7q30zIilTc03gqEf3qQHUPpBRRr0QmlrczkeHN07sB0dy7Wvxfwtaw4PD+
+         upu3CITXOQbf+qz1/OgqmVNTmGSI2RR66lVd3YqKfR0sy1W1di3NvEM6RCIWfGc2BPME
+         8CfpurZlORyJ1vE9qUjh8iphKGhV6h6VPTfnVui7KCCfBgKwK8PaLBtQXTVnkg88MUzH
+         RNV01ga0ayxoWbkLzMCedWBeumOFyeUKRJNNZ/SaW5jVEGfZF4+1/ZMKDSuHoIr5b/sn
+         qqqw==
+X-Gm-Message-State: AOAM533C+nIa8aisjmgWfAbxD7wut6t5kl2+eT7qKY+2my771u6Lq9yJ
+        gzImbu47tt/QSOsjXUK44Tuz+rb0M3g7OJFBOF1GkCAmUIPYOcSeLdfB75kX/g6oMqOjBUvCiNR
+        RoVqWXzIF/k2j1CteC8XTpKnKySeVUGAijee9CqmH8A2cD6CZyFNhdHAZf/u005/HfiTAIrY=
+X-Google-Smtp-Source: ABdhPJzESY6ESFJ2Ic1TWEY5cky+ur7M+9iz9D+Pqke5K3ovUn094YlKNjld75ok0TZ4vd3AePg6RNxzDS9NOtgRzw==
 X-Received: from jgzg.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:1acf])
- (user=jingzhangos job=sendgmr) by 2002:a05:6214:8ec:: with SMTP id
- dr12mr20074756qvb.12.1625594635091; Tue, 06 Jul 2021 11:03:55 -0700 (PDT)
-Date:   Tue,  6 Jul 2021 18:03:47 +0000
+ (user=jingzhangos job=sendgmr) by 2002:a0c:b38c:: with SMTP id
+ t12mr19376471qve.44.1625594636671; Tue, 06 Jul 2021 11:03:56 -0700 (PDT)
+Date:   Tue,  6 Jul 2021 18:03:48 +0000
 In-Reply-To: <20210706180350.2838127-1-jingzhangos@google.com>
-Message-Id: <20210706180350.2838127-2-jingzhangos@google.com>
+Message-Id: <20210706180350.2838127-3-jingzhangos@google.com>
 Mime-Version: 1.0
 References: <20210706180350.2838127-1-jingzhangos@google.com>
 X-Mailer: git-send-email 2.32.0.93.g670b81a890-goog
-Subject: [PATCH v1 1/4] KVM: stats: Support linear and logarithmic histogram statistics
+Subject: [PATCH v1 2/4] KVM: stats: Update doc for histogram statistics
 From:   Jing Zhang <jingzhangos@google.com>
 To:     KVM <kvm@vger.kernel.org>, KVMPPC <kvm-ppc@vger.kernel.org>,
         Paolo Bonzini <pbonzini@redhat.com>,
@@ -67,380 +67,92 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Add new types of KVM stats, linear and logarithmic histogram.
-Histogram are very useful for observing the value distribution
-of time or size related stats.
+Add documentations for linear and logarithmic histogram statistics.
+Add binary stats capability text which is missing during merge of
+the binary stats patch.
 
 Signed-off-by: Jing Zhang <jingzhangos@google.com>
 ---
- arch/arm64/kvm/guest.c    |  4 ---
- arch/mips/kvm/mips.c      |  4 ---
- arch/powerpc/kvm/book3s.c |  4 ---
- arch/powerpc/kvm/booke.c  |  4 ---
- arch/s390/kvm/kvm-s390.c  |  4 ---
- arch/x86/kvm/x86.c        |  4 ---
- include/linux/kvm_host.h  | 53 ++++++++++++++++++++++++++++-----------
- include/linux/kvm_types.h | 16 ++++++++++++
- include/uapi/linux/kvm.h  | 11 +++++---
- virt/kvm/binary_stats.c   | 36 ++++++++++++++++++++++++++
- 10 files changed, 98 insertions(+), 42 deletions(-)
+ Documentation/virt/kvm/api.rst | 36 +++++++++++++++++++++++++++++++---
+ 1 file changed, 33 insertions(+), 3 deletions(-)
 
-diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
-index 1512a8007a78..cb44d8756fa7 100644
---- a/arch/arm64/kvm/guest.c
-+++ b/arch/arm64/kvm/guest.c
-@@ -31,8 +31,6 @@
- const struct _kvm_stats_desc kvm_vm_stats_desc[] = {
- 	KVM_GENERIC_VM_STATS()
- };
--static_assert(ARRAY_SIZE(kvm_vm_stats_desc) ==
--		sizeof(struct kvm_vm_stat) / sizeof(u64));
+diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+index 3b6e3b1628b4..948d33c26704 100644
+--- a/Documentation/virt/kvm/api.rst
++++ b/Documentation/virt/kvm/api.rst
+@@ -5171,6 +5171,9 @@ by a string of size ``name_size``.
+ 	#define KVM_STATS_TYPE_CUMULATIVE	(0x0 << KVM_STATS_TYPE_SHIFT)
+ 	#define KVM_STATS_TYPE_INSTANT		(0x1 << KVM_STATS_TYPE_SHIFT)
+ 	#define KVM_STATS_TYPE_PEAK		(0x2 << KVM_STATS_TYPE_SHIFT)
++	#define KVM_STATS_TYPE_LINEAR_HIST	(0x3 << KVM_STATS_TYPE_SHIFT)
++	#define KVM_STATS_TYPE_LOG_HIST		(0x4 << KVM_STATS_TYPE_SHIFT)
++	#define KVM_STATS_TYPE_MAX		KVM_STATS_TYPE_LOG_HIST
  
- const struct kvm_stats_header kvm_vm_stats_header = {
- 	.name_size = KVM_STATS_NAME_SIZE,
-@@ -52,8 +50,6 @@ const struct _kvm_stats_desc kvm_vcpu_stats_desc[] = {
- 	STATS_DESC_COUNTER(VCPU, mmio_exit_kernel),
- 	STATS_DESC_COUNTER(VCPU, exits)
- };
--static_assert(ARRAY_SIZE(kvm_vcpu_stats_desc) ==
--		sizeof(struct kvm_vcpu_stat) / sizeof(u64));
+ 	#define KVM_STATS_UNIT_SHIFT		4
+ 	#define KVM_STATS_UNIT_MASK		(0xF << KVM_STATS_UNIT_SHIFT)
+@@ -5178,11 +5181,13 @@ by a string of size ``name_size``.
+ 	#define KVM_STATS_UNIT_BYTES		(0x1 << KVM_STATS_UNIT_SHIFT)
+ 	#define KVM_STATS_UNIT_SECONDS		(0x2 << KVM_STATS_UNIT_SHIFT)
+ 	#define KVM_STATS_UNIT_CYCLES		(0x3 << KVM_STATS_UNIT_SHIFT)
++	#define KVM_STATS_UNIT_MAX		KVM_STATS_UNIT_CYCLES
  
- const struct kvm_stats_header kvm_vcpu_stats_header = {
- 	.name_size = KVM_STATS_NAME_SIZE,
-diff --git a/arch/mips/kvm/mips.c b/arch/mips/kvm/mips.c
-index af9dd029a4e1..75c6f264c626 100644
---- a/arch/mips/kvm/mips.c
-+++ b/arch/mips/kvm/mips.c
-@@ -41,8 +41,6 @@
- const struct _kvm_stats_desc kvm_vm_stats_desc[] = {
- 	KVM_GENERIC_VM_STATS()
- };
--static_assert(ARRAY_SIZE(kvm_vm_stats_desc) ==
--		sizeof(struct kvm_vm_stat) / sizeof(u64));
+ 	#define KVM_STATS_BASE_SHIFT		8
+ 	#define KVM_STATS_BASE_MASK		(0xF << KVM_STATS_BASE_SHIFT)
+ 	#define KVM_STATS_BASE_POW10		(0x0 << KVM_STATS_BASE_SHIFT)
+ 	#define KVM_STATS_BASE_POW2		(0x1 << KVM_STATS_BASE_SHIFT)
++	#define KVM_STATS_BASE_MAX		KVM_STATS_BASE_POW2
  
- const struct kvm_stats_header kvm_vm_stats_header = {
- 	.name_size = KVM_STATS_NAME_SIZE,
-@@ -85,8 +83,6 @@ const struct _kvm_stats_desc kvm_vcpu_stats_desc[] = {
- 	STATS_DESC_COUNTER(VCPU, vz_cpucfg_exits),
- #endif
- };
--static_assert(ARRAY_SIZE(kvm_vcpu_stats_desc) ==
--		sizeof(struct kvm_vcpu_stat) / sizeof(u64));
+ 	struct kvm_stats_desc {
+ 		__u32 flags;
+@@ -5214,6 +5219,22 @@ Bits 0-3 of ``flags`` encode the type:
+     represents a peak value for a measurement, for example the maximum number
+     of items in a hash table bucket, the longest time waited and so on.
+     The corresponding ``size`` field for this type is always 1.
++  * ``KVM_STATS_TYPE_LINEAR_HIST``
++    The statistics data is in the form of linear histogram. The number of
++    buckets is specified by the ``size`` field. The size of buckets is specified
++    by the ``hist_param`` field. The range of the Nth bucket (1 <= N < ``size``)
++    is [``hist_param``*(N-1), ``hist_param``*N), while the range of the last
++    bucket is [``hist_param``*(``size``-1), +INF). (+INF means positive infinity
++    value.) The bucket value indicates how many times the statistics data is in
++    the bucket's range.
++  * ``KVM_STATS_TYPE_LOG_HIST``
++    The statistics data is in the form of logarithmic histogram. The number of
++    buckets is specified by the ``size`` field. The base of logarithm is
++    specified by the ``hist_param`` field. The range of the Nth bucket (1 < N <
++    ``size``) is [pow(``hist_param``, N-2), pow(``hist_param``, N-1)). The range
++    of the first bucket is [0, 1), while the range of the last bucket is
++    [pow(``hist_param``, ``size``-2), +INF). The bucket value indicates how many
++    times the statistics data is in the bucket's range.
  
- const struct kvm_stats_header kvm_vcpu_stats_header = {
- 	.name_size = KVM_STATS_NAME_SIZE,
-diff --git a/arch/powerpc/kvm/book3s.c b/arch/powerpc/kvm/book3s.c
-index 79833f78d1da..5cc6e90095b0 100644
---- a/arch/powerpc/kvm/book3s.c
-+++ b/arch/powerpc/kvm/book3s.c
-@@ -43,8 +43,6 @@ const struct _kvm_stats_desc kvm_vm_stats_desc[] = {
- 	STATS_DESC_ICOUNTER(VM, num_2M_pages),
- 	STATS_DESC_ICOUNTER(VM, num_1G_pages)
- };
--static_assert(ARRAY_SIZE(kvm_vm_stats_desc) ==
--		sizeof(struct kvm_vm_stat) / sizeof(u64));
+ Bits 4-7 of ``flags`` encode the unit:
+   * ``KVM_STATS_UNIT_NONE``
+@@ -5246,9 +5267,10 @@ unsigned 64bit data.
+ The ``offset`` field is the offset from the start of Data Block to the start of
+ the corresponding statistics data.
  
- const struct kvm_stats_header kvm_vm_stats_header = {
- 	.name_size = KVM_STATS_NAME_SIZE,
-@@ -88,8 +86,6 @@ const struct _kvm_stats_desc kvm_vcpu_stats_desc[] = {
- 	STATS_DESC_COUNTER(VCPU, pthru_host),
- 	STATS_DESC_COUNTER(VCPU, pthru_bad_aff)
- };
--static_assert(ARRAY_SIZE(kvm_vcpu_stats_desc) ==
--		sizeof(struct kvm_vcpu_stat) / sizeof(u64));
+-The ``unused`` field is reserved for future support for other types of
+-statistics data, like log/linear histogram. Its value is always 0 for the types
+-defined above.
++The ``hist_param`` field is used as a parameter for histogram statistics data.
++For linear histogram statistics data, it indicates the size of a bucket. For
++logarithmic histogram statistics data, it indicates the base of the logarithm.
++Only base of 2 is supported fo logarithmic histogram.
  
- const struct kvm_stats_header kvm_vcpu_stats_header = {
- 	.name_size = KVM_STATS_NAME_SIZE,
-diff --git a/arch/powerpc/kvm/booke.c b/arch/powerpc/kvm/booke.c
-index 551b30d84aee..5ed6c235e059 100644
---- a/arch/powerpc/kvm/booke.c
-+++ b/arch/powerpc/kvm/booke.c
-@@ -41,8 +41,6 @@ const struct _kvm_stats_desc kvm_vm_stats_desc[] = {
- 	STATS_DESC_ICOUNTER(VM, num_2M_pages),
- 	STATS_DESC_ICOUNTER(VM, num_1G_pages)
- };
--static_assert(ARRAY_SIZE(kvm_vm_stats_desc) ==
--		sizeof(struct kvm_vm_stat) / sizeof(u64));
- 
- const struct kvm_stats_header kvm_vm_stats_header = {
- 	.name_size = KVM_STATS_NAME_SIZE,
-@@ -79,8 +77,6 @@ const struct _kvm_stats_desc kvm_vcpu_stats_desc[] = {
- 	STATS_DESC_COUNTER(VCPU, pthru_host),
- 	STATS_DESC_COUNTER(VCPU, pthru_bad_aff)
- };
--static_assert(ARRAY_SIZE(kvm_vcpu_stats_desc) ==
--		sizeof(struct kvm_vcpu_stat) / sizeof(u64));
- 
- const struct kvm_stats_header kvm_vcpu_stats_header = {
- 	.name_size = KVM_STATS_NAME_SIZE,
-diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
-index 1695f0ced5ba..7610d33d319b 100644
---- a/arch/s390/kvm/kvm-s390.c
-+++ b/arch/s390/kvm/kvm-s390.c
-@@ -66,8 +66,6 @@ const struct _kvm_stats_desc kvm_vm_stats_desc[] = {
- 	STATS_DESC_COUNTER(VM, inject_service_signal),
- 	STATS_DESC_COUNTER(VM, inject_virtio)
- };
--static_assert(ARRAY_SIZE(kvm_vm_stats_desc) ==
--		sizeof(struct kvm_vm_stat) / sizeof(u64));
- 
- const struct kvm_stats_header kvm_vm_stats_header = {
- 	.name_size = KVM_STATS_NAME_SIZE,
-@@ -174,8 +172,6 @@ const struct _kvm_stats_desc kvm_vcpu_stats_desc[] = {
- 	STATS_DESC_COUNTER(VCPU, diagnose_other),
- 	STATS_DESC_COUNTER(VCPU, pfault_sync)
- };
--static_assert(ARRAY_SIZE(kvm_vcpu_stats_desc) ==
--		sizeof(struct kvm_vcpu_stat) / sizeof(u64));
- 
- const struct kvm_stats_header kvm_vcpu_stats_header = {
- 	.name_size = KVM_STATS_NAME_SIZE,
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 8166ad113fb2..b94a80ad5b8d 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -239,8 +239,6 @@ const struct _kvm_stats_desc kvm_vm_stats_desc[] = {
- 	STATS_DESC_ICOUNTER(VM, nx_lpage_splits),
- 	STATS_DESC_PCOUNTER(VM, max_mmu_page_hash_collisions)
- };
--static_assert(ARRAY_SIZE(kvm_vm_stats_desc) ==
--		sizeof(struct kvm_vm_stat) / sizeof(u64));
- 
- const struct kvm_stats_header kvm_vm_stats_header = {
- 	.name_size = KVM_STATS_NAME_SIZE,
-@@ -280,8 +278,6 @@ const struct _kvm_stats_desc kvm_vcpu_stats_desc[] = {
- 	STATS_DESC_COUNTER(VCPU, directed_yield_successful),
- 	STATS_DESC_ICOUNTER(VCPU, guest_mode)
- };
--static_assert(ARRAY_SIZE(kvm_vcpu_stats_desc) ==
--		sizeof(struct kvm_vcpu_stat) / sizeof(u64));
- 
- const struct kvm_stats_header kvm_vcpu_stats_header = {
- 	.name_size = KVM_STATS_NAME_SIZE,
-diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-index ae7735b490b4..356af173114d 100644
---- a/include/linux/kvm_host.h
-+++ b/include/linux/kvm_host.h
-@@ -1273,56 +1273,66 @@ struct _kvm_stats_desc {
- 	char name[KVM_STATS_NAME_SIZE];
- };
- 
--#define STATS_DESC_COMMON(type, unit, base, exp)			       \
-+#define STATS_DESC_COMMON(type, unit, base, exp, sz, param)		       \
- 	.flags = type | unit | base |					       \
- 		 BUILD_BUG_ON_ZERO(type & ~KVM_STATS_TYPE_MASK) |	       \
- 		 BUILD_BUG_ON_ZERO(unit & ~KVM_STATS_UNIT_MASK) |	       \
- 		 BUILD_BUG_ON_ZERO(base & ~KVM_STATS_BASE_MASK),	       \
- 	.exponent = exp,						       \
--	.size = 1
-+	.size = sz,							       \
-+	.hist_param = param
- 
--#define VM_GENERIC_STATS_DESC(stat, type, unit, base, exp)		       \
-+#define VM_GENERIC_STATS_DESC(stat, type, unit, base, exp, sz, param)	       \
- 	{								       \
- 		{							       \
--			STATS_DESC_COMMON(type, unit, base, exp),	       \
-+			STATS_DESC_COMMON(type, unit, base, exp, sz, param),   \
- 			.offset = offsetof(struct kvm_vm_stat, generic.stat)   \
- 		},							       \
- 		.name = #stat,						       \
- 	}
--#define VCPU_GENERIC_STATS_DESC(stat, type, unit, base, exp)		       \
-+#define VCPU_GENERIC_STATS_DESC(stat, type, unit, base, exp, sz, param)	       \
- 	{								       \
- 		{							       \
--			STATS_DESC_COMMON(type, unit, base, exp),	       \
-+			STATS_DESC_COMMON(type, unit, base, exp, sz, param),   \
- 			.offset = offsetof(struct kvm_vcpu_stat, generic.stat) \
- 		},							       \
- 		.name = #stat,						       \
- 	}
--#define VM_STATS_DESC(stat, type, unit, base, exp)			       \
-+#define VM_STATS_DESC(stat, type, unit, base, exp, sz, param)		       \
- 	{								       \
- 		{							       \
--			STATS_DESC_COMMON(type, unit, base, exp),	       \
-+			STATS_DESC_COMMON(type, unit, base, exp, sz, param),   \
- 			.offset = offsetof(struct kvm_vm_stat, stat)	       \
- 		},							       \
- 		.name = #stat,						       \
- 	}
--#define VCPU_STATS_DESC(stat, type, unit, base, exp)			       \
-+#define VCPU_STATS_DESC(stat, type, unit, base, exp, sz, param)		       \
- 	{								       \
- 		{							       \
--			STATS_DESC_COMMON(type, unit, base, exp),	       \
-+			STATS_DESC_COMMON(type, unit, base, exp, sz, param),   \
- 			.offset = offsetof(struct kvm_vcpu_stat, stat)	       \
- 		},							       \
- 		.name = #stat,						       \
- 	}
- /* SCOPE: VM, VM_GENERIC, VCPU, VCPU_GENERIC */
--#define STATS_DESC(SCOPE, stat, type, unit, base, exp)			       \
--	SCOPE##_STATS_DESC(stat, type, unit, base, exp)
-+#define STATS_DESC(SCOPE, stat, type, unit, base, exp, sz, param)	       \
-+	SCOPE##_STATS_DESC(stat, type, unit, base, exp, sz, param)
- 
- #define STATS_DESC_CUMULATIVE(SCOPE, name, unit, base, exponent)	       \
--	STATS_DESC(SCOPE, name, KVM_STATS_TYPE_CUMULATIVE, unit, base, exponent)
-+	STATS_DESC(SCOPE, name, KVM_STATS_TYPE_CUMULATIVE,		       \
-+		unit, base, exponent, 1, 0)
- #define STATS_DESC_INSTANT(SCOPE, name, unit, base, exponent)		       \
--	STATS_DESC(SCOPE, name, KVM_STATS_TYPE_INSTANT, unit, base, exponent)
-+	STATS_DESC(SCOPE, name, KVM_STATS_TYPE_INSTANT,			       \
-+		unit, base, exponent, 1, 0)
- #define STATS_DESC_PEAK(SCOPE, name, unit, base, exponent)		       \
--	STATS_DESC(SCOPE, name, KVM_STATS_TYPE_PEAK, unit, base, exponent)
-+	STATS_DESC(SCOPE, name, KVM_STATS_TYPE_PEAK,			       \
-+		unit, base, exponent, 1, 0)
-+#define STATS_DESC_LINEAR_HIST(SCOPE, name, unit, base, exponent, sz, param)   \
-+	STATS_DESC(SCOPE, name, KVM_STATS_TYPE_LINEAR_HIST,		       \
-+		unit, base, exponent, sz, param)
-+#define STATS_DESC_LOG_HIST(SCOPE, name, unit, base, exponent, sz, param)      \
-+	STATS_DESC(SCOPE, name, KVM_STATS_TYPE_LOG_HIST,		       \
-+		unit, base, exponent, sz, param)
- 
- /* Cumulative counter, read/write */
- #define STATS_DESC_COUNTER(SCOPE, name)					       \
-@@ -1341,6 +1351,14 @@ struct _kvm_stats_desc {
- #define STATS_DESC_TIME_NSEC(SCOPE, name)				       \
- 	STATS_DESC_CUMULATIVE(SCOPE, name, KVM_STATS_UNIT_SECONDS,	       \
- 		KVM_STATS_BASE_POW10, -9)
-+/* Linear histogram for time in nanosecond */
-+#define STATS_DESC_LINHIST_TIME_NSEC(SCOPE, name, sz, bucket_size)	       \
-+	STATS_DESC_LINEAR_HIST(SCOPE, name, KVM_STATS_UNIT_SECONDS,	       \
-+		KVM_STATS_BASE_POW10, -9, sz, bucket_size)
-+/* Logarithmic histogram for time in nanosecond */
-+#define STATS_DESC_LOGHIST_TIME_NSEC(SCOPE, name, sz)			       \
-+	STATS_DESC_LOG_HIST(SCOPE, name, KVM_STATS_UNIT_SECONDS,	       \
-+		KVM_STATS_BASE_POW10, -9, sz, LOGHIST_BASE_2)
- 
- #define KVM_GENERIC_VM_STATS()						       \
- 	STATS_DESC_COUNTER(VM_GENERIC, remote_tlb_flush)
-@@ -1354,10 +1372,15 @@ struct _kvm_stats_desc {
- 	STATS_DESC_TIME_NSEC(VCPU_GENERIC, halt_poll_fail_ns)
- 
- extern struct dentry *kvm_debugfs_dir;
+ The ``name`` field is the name string of the statistics data. The name string
+ starts at the end of ``struct kvm_stats_desc``.  The maximum length including
+@@ -7182,3 +7204,11 @@ The argument to KVM_ENABLE_CAP is also a bitmask, and must be a subset
+ of the result of KVM_CHECK_EXTENSION.  KVM will forward to userspace
+ the hypercalls whose corresponding bit is in the argument, and return
+ ENOSYS for the others.
 +
- ssize_t kvm_stats_read(char *id, const struct kvm_stats_header *header,
- 		       const struct _kvm_stats_desc *desc,
- 		       void *stats, size_t size_stats,
- 		       char __user *user_buffer, size_t size, loff_t *offset);
-+void kvm_stats_linear_hist_update(u64 *data, size_t size,
-+				  u64 value, size_t bucket_size);
-+void kvm_stats_log_hist_update(u64 *data, size_t size, u64 value);
++8.35 KVM_CAP_STATS_BINARY_FD
++----------------------------
 +
- extern const struct kvm_stats_header kvm_vm_stats_header;
- extern const struct _kvm_stats_desc kvm_vm_stats_desc[];
- extern const struct kvm_stats_header kvm_vcpu_stats_header;
-diff --git a/include/linux/kvm_types.h b/include/linux/kvm_types.h
-index ed6a985c5680..cc88cd676775 100644
---- a/include/linux/kvm_types.h
-+++ b/include/linux/kvm_types.h
-@@ -76,6 +76,22 @@ struct kvm_mmu_memory_cache {
- };
- #endif
- 
-+/* Constants used for histogram stats */
-+#define LINHIST_SIZE_SMALL		10
-+#define LINHIST_SIZE_MEDIUM		20
-+#define LINHIST_SIZE_LARGE		50
-+#define LINHIST_SIZE_XLARGE		100
-+#define LINHIST_BUCKET_SIZE_SMALL	10
-+#define LINHIST_BUCKET_SIZE_MEDIUM	100
-+#define LINHIST_BUCKET_SIZE_LARGE	1000
-+#define LINHIST_BUCKET_SIZE_XLARGE	10000
++:Architectures: all
 +
-+#define LOGHIST_SIZE_SMALL		8
-+#define LOGHIST_SIZE_MEDIUM		16
-+#define LOGHIST_SIZE_LARGE		32
-+#define LOGHIST_SIZE_XLARGE		64
-+#define LOGHIST_BASE_2			2
-+
- struct kvm_vm_stat_generic {
- 	u64 remote_tlb_flush;
- };
-diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-index 68c9e6d8bbda..ff34a471d9ef 100644
---- a/include/uapi/linux/kvm.h
-+++ b/include/uapi/linux/kvm.h
-@@ -1963,7 +1963,9 @@ struct kvm_stats_header {
- #define KVM_STATS_TYPE_CUMULATIVE	(0x0 << KVM_STATS_TYPE_SHIFT)
- #define KVM_STATS_TYPE_INSTANT		(0x1 << KVM_STATS_TYPE_SHIFT)
- #define KVM_STATS_TYPE_PEAK		(0x2 << KVM_STATS_TYPE_SHIFT)
--#define KVM_STATS_TYPE_MAX		KVM_STATS_TYPE_PEAK
-+#define KVM_STATS_TYPE_LINEAR_HIST	(0x3 << KVM_STATS_TYPE_SHIFT)
-+#define KVM_STATS_TYPE_LOG_HIST		(0x4 << KVM_STATS_TYPE_SHIFT)
-+#define KVM_STATS_TYPE_MAX		KVM_STATS_TYPE_LOG_HIST
- 
- #define KVM_STATS_UNIT_SHIFT		4
- #define KVM_STATS_UNIT_MASK		(0xF << KVM_STATS_UNIT_SHIFT)
-@@ -1987,7 +1989,10 @@ struct kvm_stats_header {
-  *        Every data item is of type __u64.
-  * @offset: The offset of the stats to the start of stat structure in
-  *          struture kvm or kvm_vcpu.
-- * @unused: Unused field for future usage. Always 0 for now.
-+ * @hist_param: A parameter value used for histogram stats. For linear
-+ *              histogram stats, it indicates the size of the bucket;
-+ *              For logarithmic histogram stats, it indicates the base
-+ *              of the logarithm. Only base of 2 is supported.
-  * @name: The name string for the stats. Its size is indicated by the
-  *        &kvm_stats_header->name_size.
-  */
-@@ -1996,7 +2001,7 @@ struct kvm_stats_desc {
- 	__s16 exponent;
- 	__u16 size;
- 	__u32 offset;
--	__u32 unused;
-+	__u32 hist_param;
- 	char name[];
- };
- 
-diff --git a/virt/kvm/binary_stats.c b/virt/kvm/binary_stats.c
-index e609d428811a..6eead6979a7f 100644
---- a/virt/kvm/binary_stats.c
-+++ b/virt/kvm/binary_stats.c
-@@ -144,3 +144,39 @@ ssize_t kvm_stats_read(char *id, const struct kvm_stats_header *header,
- 	*offset = pos;
- 	return len;
- }
-+
-+/**
-+ * kvm_stats_linear_hist_update() - Update bucket value for linear histogram
-+ * statistics data.
-+ *
-+ * @data: start address of the stats data
-+ * @size: the number of bucket of the stats data
-+ * @value: the new value used to update the linear histogram's bucket
-+ * @bucket_size: the size (width) of a bucket
-+ */
-+void kvm_stats_linear_hist_update(u64 *data, size_t size,
-+				  u64 value, size_t bucket_size)
-+{
-+	size_t index = value / bucket_size;
-+
-+	if (index >= size)
-+		index = size - 1;
-+	++data[index];
-+}
-+
-+/**
-+ * kvm_stats_log_hist_update() - Update bucket value for logarithmic histogram
-+ * statistics data.
-+ *
-+ * @data: start address of the stats data
-+ * @size: the number of bucket of the stats data
-+ * @value: the new value used to update the logarithmic histogram's bucket
-+ */
-+void kvm_stats_log_hist_update(u64 *data, size_t size, u64 value)
-+{
-+	size_t index = fls64(value);
-+
-+	if (index >= size)
-+		index = size - 1;
-+	++data[index];
-+}
++This capability indicates the feature that userspace can get a file descriptor
++for every VM and VCPU to read statistics data in binary format.
 -- 
 2.32.0.93.g670b81a890-goog
 
