@@ -2,156 +2,134 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8BDA93BC4F7
-	for <lists+kvm@lfdr.de>; Tue,  6 Jul 2021 05:04:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5D9FC3BC4F8
+	for <lists+kvm@lfdr.de>; Tue,  6 Jul 2021 05:07:32 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229963AbhGFDHP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 5 Jul 2021 23:07:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48076 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229919AbhGFDHJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 5 Jul 2021 23:07:09 -0400
-Received: from mail-ed1-x52f.google.com (mail-ed1-x52f.google.com [IPv6:2a00:1450:4864:20::52f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 37483C061760
-        for <kvm@vger.kernel.org>; Mon,  5 Jul 2021 20:04:31 -0700 (PDT)
-Received: by mail-ed1-x52f.google.com with SMTP id k17so8186857edq.2
-        for <kvm@vger.kernel.org>; Mon, 05 Jul 2021 20:04:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance-com.20150623.gappssmtp.com; s=20150623;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=LCgUQ9YXkJh4ceT+VmUThz5I8QlmLbs1I7Jug0v7X9c=;
-        b=AniVf1hg8E84bf88GbqvkjR+BefQ1f0lgfPF37iHtxf/YNkU0AyXPnMQYAxXb02mbo
-         G48TrGfyovbNsFXOaWMWb/wyYJ2otEbO4ALwFWjEp+ou6S1UnsrushF1eZx06kGNzJN8
-         ZE+sG3ukhj23G3+11XF15U8C53r0c8X3EEc4Ok4kOBRxqvzy8189Ucu76sgW34Wbm8+X
-         cTKFYWmWxoprLOtkLuVBPTW79tw5zhQYEEPwKl+lmcbOagdDirWCGWdkJ6EIa0dQXVy8
-         dgnLZv4WULOteK3YLraIZY9wXPfWdUjgUnwLaGWun0yx5ionzoeg2EP/vsiH019ipKeh
-         +bSw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=LCgUQ9YXkJh4ceT+VmUThz5I8QlmLbs1I7Jug0v7X9c=;
-        b=hQCfdHmqEM70XsJ0ZXUioFkVb9gNKJ+oLrDQUFi2C2F5DIHY5c72LqhZtebveP2eMF
-         MaQmjnN1UUNkiKJVOTLwH+iYe2hUhaBhFX+rcmVnYTw+tft/gIb5cpTt49bzalOq3kyV
-         ZSaGC/ZXNglp1sl0i3ogB+nM5AjrEHW2/Ib2pWt8F5btobOL1ir5P5arAlNXUSxB1Jct
-         QBKm1FIgQqyfANyaE+btEr1VS84myX8UX/jXdJZU3zte2oYI3ALVTAYLxc9Jtpv9nbrn
-         oJTWzLitxVinVdst1TuE5w0DpygkVlreNS8o0iRRfDnBF34ZapL9QbxB5M5EMQRRmhWe
-         1Jnw==
-X-Gm-Message-State: AOAM531gKzRkWLHcf8jOo0bYIKmVzy8MgTrjM3D/KS0l0Tl3IHuoKiP1
-        FjoPxuJ0Dz4HY/PJghe0CjndZzC+1v0E+DroPKtc
-X-Google-Smtp-Source: ABdhPJxK8aaodUmVuDEfTR7oD0ZVR0H0WNfCSx96KkTtw1Uj+YwvZnEo/lcejGfXLnkvlfTU0w/nA3UorXy0nyt0lC8=
-X-Received: by 2002:a50:ff01:: with SMTP id a1mr19688860edu.253.1625540668739;
- Mon, 05 Jul 2021 20:04:28 -0700 (PDT)
+        id S229987AbhGFDIR convert rfc822-to-8bit (ORCPT
+        <rfc822;lists+kvm@lfdr.de>); Mon, 5 Jul 2021 23:08:17 -0400
+Received: from mga06.intel.com ([134.134.136.31]:44953 "EHLO mga06.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229919AbhGFDIR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 5 Jul 2021 23:08:17 -0400
+X-IronPort-AV: E=McAfee;i="6200,9189,10036"; a="270168143"
+X-IronPort-AV: E=Sophos;i="5.83,327,1616482800"; 
+   d="scan'208";a="270168143"
+Received: from fmsmga005.fm.intel.com ([10.253.24.32])
+  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Jul 2021 20:05:38 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.83,327,1616482800"; 
+   d="scan'208";a="647080111"
+Received: from fmsmsx604.amr.corp.intel.com ([10.18.126.84])
+  by fmsmga005.fm.intel.com with ESMTP; 05 Jul 2021 20:05:38 -0700
+Received: from shsmsx602.ccr.corp.intel.com (10.109.6.142) by
+ fmsmsx604.amr.corp.intel.com (10.18.126.84) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2242.10; Mon, 5 Jul 2021 20:05:37 -0700
+Received: from shsmsx603.ccr.corp.intel.com (10.109.6.143) by
+ SHSMSX602.ccr.corp.intel.com (10.109.6.142) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2242.4; Tue, 6 Jul 2021 11:05:35 +0800
+Received: from shsmsx603.ccr.corp.intel.com ([10.109.6.143]) by
+ SHSMSX603.ccr.corp.intel.com ([10.109.6.143]) with mapi id 15.01.2242.008;
+ Tue, 6 Jul 2021 11:05:35 +0800
+From:   "Hu, Robert" <robert.hu@intel.com>
+To:     Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+CC:     Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: RE: [PATCH] KVM: nVMX: Dynamically compute max VMCS index for vmcs12
+Thread-Topic: [PATCH] KVM: nVMX: Dynamically compute max VMCS index for vmcs12
+Thread-Index: AQHXZIuB9zPySR3qkk2RxIcrlGLzAKseKLEAgAAIJYCAFyq6oA==
+Date:   Tue, 6 Jul 2021 03:05:35 +0000
+Message-ID: <da6c715345954a7b91c044ad685eb0f2@intel.com>
+References: <20210618214658.2700765-1-seanjc@google.com>
+ <c847e00a-e422-cdc9-3317-fbbd82b6e418@redhat.com>
+ <YNDHfX0cntj72sk6@google.com>
+In-Reply-To: <YNDHfX0cntj72sk6@google.com>
+Accept-Language: zh-CN, en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+dlp-version: 11.5.1.3
+dlp-reaction: no-action
+dlp-product: dlpe-windows
+x-originating-ip: [10.239.127.36]
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 8BIT
 MIME-Version: 1.0
-References: <20210615141331.407-1-xieyongji@bytedance.com> <20210615141331.407-11-xieyongji@bytedance.com>
- <YNSCH6l31zwPxBjL@stefanha-x1.localdomain> <CACycT3uxnQmXWsgmNVxQtiRhz1UXXTAJFY3OiAJqokbJH6ifMA@mail.gmail.com>
- <YNxCDpM3bO5cPjqi@stefanha-x1.localdomain> <CACycT3taKhf1cWp3Jd0aSVekAZvpbR-_fkyPLQ=B+jZBB5H=8Q@mail.gmail.com>
- <YN3ABqCMLQf7ejOm@stefanha-x1.localdomain> <CACycT3vo-diHgTSLw_FS2E+5ia5VjihE3qw7JmZR7JT55P-wQA@mail.gmail.com>
- <8320d26d-6637-85c6-8773-49553dfa502d@redhat.com> <YOL/9mxkJaokKDHc@stefanha-x1.localdomain>
-In-Reply-To: <YOL/9mxkJaokKDHc@stefanha-x1.localdomain>
-From:   Yongji Xie <xieyongji@bytedance.com>
-Date:   Tue, 6 Jul 2021 11:04:18 +0800
-Message-ID: <CACycT3t-BTMrpNTwBUfbvaxTh6tLthxbo3OJwMk_iuiSpMuZPg@mail.gmail.com>
-Subject: Re: [PATCH v8 10/10] Documentation: Add documentation for VDUSE
-To:     Stefan Hajnoczi <stefanha@redhat.com>
-Cc:     Jason Wang <jasowang@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Stefano Garzarella <sgarzare@redhat.com>,
-        Parav Pandit <parav@nvidia.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Christian Brauner <christian.brauner@canonical.com>,
-        Randy Dunlap <rdunlap@infradead.org>,
-        Matthew Wilcox <willy@infradead.org>,
-        Al Viro <viro@zeniv.linux.org.uk>,
-        Jens Axboe <axboe@kernel.dk>, bcrl@kvack.org,
-        Jonathan Corbet <corbet@lwn.net>,
-        =?UTF-8?Q?Mika_Penttil=C3=A4?= <mika.penttila@nextfour.com>,
-        Dan Carpenter <dan.carpenter@oracle.com>, joro@8bytes.org,
-        Greg KH <gregkh@linuxfoundation.org>, songmuchun@bytedance.com,
-        virtualization <virtualization@lists.linux-foundation.org>,
-        netdev@vger.kernel.org, kvm <kvm@vger.kernel.org>,
-        linux-fsdevel@vger.kernel.org, iommu@lists.linux-foundation.org,
-        linux-kernel <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Jul 5, 2021 at 8:50 PM Stefan Hajnoczi <stefanha@redhat.com> wrote:
->
-> On Mon, Jul 05, 2021 at 11:36:15AM +0800, Jason Wang wrote:
-> >
-> > =E5=9C=A8 2021/7/4 =E4=B8=8B=E5=8D=885:49, Yongji Xie =E5=86=99=E9=81=
-=93:
-> > > > > OK, I get you now. Since the VIRTIO specification says "Device
-> > > > > configuration space is generally used for rarely-changing or
-> > > > > initialization-time parameters". I assume the VDUSE_DEV_SET_CONFI=
-G
-> > > > > ioctl should not be called frequently.
-> > > > The spec uses MUST and other terms to define the precise requiremen=
-ts.
-> > > > Here the language (especially the word "generally") is weaker and m=
-eans
-> > > > there may be exceptions.
-> > > >
-> > > > Another type of access that doesn't work with the VDUSE_DEV_SET_CON=
-FIG
-> > > > approach is reads that have side-effects. For example, imagine a fi=
-eld
-> > > > containing an error code if the device encounters a problem unrelat=
-ed to
-> > > > a specific virtqueue request. Reading from this field resets the er=
-ror
-> > > > code to 0, saving the driver an extra configuration space write acc=
-ess
-> > > > and possibly race conditions. It isn't possible to implement those
-> > > > semantics suing VDUSE_DEV_SET_CONFIG. It's another corner case, but=
- it
-> > > > makes me think that the interface does not allow full VIRTIO semant=
-ics.
-> >
-> >
-> > Note that though you're correct, my understanding is that config space =
-is
-> > not suitable for this kind of error propagating. And it would be very h=
-ard
-> > to implement such kind of semantic in some transports.  Virtqueue shoul=
-d be
-> > much better. As Yong Ji quoted, the config space is used for
-> > "rarely-changing or intialization-time parameters".
-> >
-> >
-> > > Agreed. I will use VDUSE_DEV_GET_CONFIG in the next version. And to
-> > > handle the message failure, I'm going to add a return value to
-> > > virtio_config_ops.get() and virtio_cread_* API so that the error can
-> > > be propagated to the virtio device driver. Then the virtio-blk device
-> > > driver can be modified to handle that.
+
+
+> -----Original Message-----
+> From: Sean Christopherson <seanjc@google.com>
+> Sent: Tuesday, June 22, 2021 01:08
+> To: Paolo Bonzini <pbonzini@redhat.com>
+> Cc: Vitaly Kuznetsov <vkuznets@redhat.com>; Wanpeng Li
+> <wanpengli@tencent.com>; Jim Mattson <jmattson@google.com>; Joerg
+> Roedel <joro@8bytes.org>; kvm@vger.kernel.org; linux-kernel@vger.kernel.org
+> Subject: Re: [PATCH] KVM: nVMX: Dynamically compute max VMCS index for
+> vmcs12
+> 
+> On Mon, Jun 21, 2021, Paolo Bonzini wrote:
+> > On 18/06/21 23:46, Sean Christopherson wrote:
+> > > Calculate the max VMCS index for vmcs12 by walking the array to find
+> > > the actual max index.  Hardcoding the index is prone to bitrot, and
+> > > the calculation is only done on KVM bringup (albeit on every CPU,
+> > > but there aren't _that_ many null entries in the array).
 > > >
-> > > Jason and Stefan, what do you think of this way?
->
-> Why does VDUSE_DEV_GET_CONFIG need to support an error return value?
->
+> > > Fixes: 3c0f99366e34 ("KVM: nVMX: Add a TSC multiplier field in
+> > > VMCS12")
+> > > Signed-off-by: Sean Christopherson <seanjc@google.com>
+> > > ---
+> > >
+> > > Note, the vmx test in kvm-unit-tests will still fail using stock
+> > > QEMU, as QEMU also hardcodes and overwrites the MSR.  The test
+> > > passes if I hack KVM to ignore userspace (it was easier than rebuilding
+> QEMU).
+> >
+> > Queued, thanks.  Without having checked the kvm-unit-tests sources
+> > very thoroughly, this might be a configuration issue in
+> > kvm-unit-tests; in theory "-cpu host" (unlike "-cpu
+> > host,migratable=no") should not enable TSC scaling.
+> 
+> As noted in the code comments, KVM allows VMREAD/VMWRITE to all defined
+> fields, whether or not the field should actually exist for the vCPU model doesn't
+> enter into the equation.  That's technically wrong as there are a number of
+> fields that the SDM explicitly states exist iff a certain feature is supported.  To
+> fix that we'd need to add a "feature flag" to vmcs_field_to_offset_table that is
+> checked against the vCPU model, though updating the MSR would probably fall
+> onto userspace's shoulders?
+[Hu, Robert] 
+Perhaps more easier and proper to do this in KVM side.
+QEMU sets actual feature set down to KVM, and KVM updates IA32_VMX_VMCS_ENUM
+MSR accordingly. We don't see a channel that QEMU constructs a VMCS and sets a whole
+to KVM.
 
-We add a timeout and return error in case userspace never replies to
-the message.
+> 
+> And FWIW, this is the QEMU code:
+> 
+>   #define VMCS12_MAX_FIELD_INDEX (0x17)
+> 
+>   static void kvm_msr_entry_add_vmx(X86CPU *cpu, FeatureWordArray f)
+>   {
+>       ...
+> 
+>       /*
+>        * Just to be safe, write these with constant values.  The CRn_FIXED1
+>        * MSRs are generated by KVM based on the vCPU's CPUID.
+>        */
+>       kvm_msr_entry_add(cpu, MSR_IA32_VMX_CR0_FIXED0,
+>                         CR0_PE_MASK | CR0_PG_MASK | CR0_NE_MASK);
+>       kvm_msr_entry_add(cpu, MSR_IA32_VMX_CR4_FIXED0,
+>                         CR4_VMXE_MASK);
+>       kvm_msr_entry_add(cpu, MSR_IA32_VMX_VMCS_ENUM,
+>                         VMCS12_MAX_FIELD_INDEX << 1);
+>   }
 
-> The VIRTIO spec provides no way for the device to report errors from
-> config space accesses.
->
-> The QEMU virtio-pci implementation returns -1 from invalid
-> virtio_config_read*() and silently discards virtio_config_write*()
-> accesses.
->
-> VDUSE can take the same approach with
-> VDUSE_DEV_GET_CONFIG/VDUSE_DEV_SET_CONFIG.
->
-
-I noticed that virtio_config_read*() only returns -1 when we access a
-invalid field. But in the VDUSE case, VDUSE_DEV_GET_CONFIG might fail
-when we access a valid field. Not sure if it's ok to silently ignore
-this kind of error.
-
-Thanks,
-Yongji
