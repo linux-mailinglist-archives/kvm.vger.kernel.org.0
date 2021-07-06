@@ -2,58 +2,58 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2C0953BC76A
-	for <lists+kvm@lfdr.de>; Tue,  6 Jul 2021 09:45:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id AFB0B3BC7B8
+	for <lists+kvm@lfdr.de>; Tue,  6 Jul 2021 10:18:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230255AbhGFHsF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 6 Jul 2021 03:48:05 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:28836 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230223AbhGFHsD (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 6 Jul 2021 03:48:03 -0400
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 1667WmAT158949;
-        Tue, 6 Jul 2021 03:45:25 -0400
+        id S230433AbhGFIUy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 6 Jul 2021 04:20:54 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:7436 "EHLO
+        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S230257AbhGFIUx (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 6 Jul 2021 04:20:53 -0400
+Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 16683wOJ061522;
+        Tue, 6 Jul 2021 04:18:15 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : from : to : cc
  : references : message-id : date : mime-version : in-reply-to :
  content-type : content-transfer-encoding; s=pp1;
- bh=T6QO7X6CF36Nbfp19HCHv55ZKSdwwhgubqPY+cDVeJY=;
- b=l2zVz4M/HumC/GWxvic2lVvU7JSWBND/qDGQG5ofmpuBkaMXpSjvxUY5b+a5y1eybhqY
- e8FLUTx0Kh9mISxU40yfCJ8RoExg+Cecx7VHRfmVusF0nuN9qSgHQH2ZTKd98C00t4JL
- SyB6tdRkToLVF2vMu/sJ0Z+iIyIj7iXIP12LISuVEbJRZrTInEDscoLkDLlFQxgNslXD
- 7u7LFnqJp41BxDRG/eImbvYCbQusuImAefrmMpmuCgnjwQauzWQOCPKbGtP3dldMY46j
- sNe+pRlgcE39P1/FZrPJg8O4S4gi8K21QHfwD4Z/V5VvfUxLgNFq3iS717ZZ0i3//S/7 Ew== 
+ bh=3D4pvzYUr06tmIJqrEmEDWqgbM/4TgVCyf0WVq5NWus=;
+ b=F6jQS1uMbrRIQV/VC1Rq9EV0tikxutY8jOdxzBw7cc4yeIx+Cpf/8d/PjamTdvbx2R51
+ jzryLN6q2f/gXz2xEcto2hN7GJZqRG/r/K2IP9Z8LzYQNliTdn6GaGNcT+ZFecQrks+f
+ O23xbSUPUjWYudvhqC87JGx5fAoHrig4SeBSHBiAbENEgPYc7gqeuNvUnNR1uGHprLp8
+ HJDwryQZfp6ITvBcWRP0xbmZ+ASVS6MumuHge0PcYxonQkYeKqAR+KPUOifKFFLy1G90
+ WLIf/nN2xIqUxoNGZ/502mLCf9UD1t0fHrdcH64nyCUTAMwScwnNpBrzxQCWRXoyBLNs yA== 
 Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 39mjkk8r2n-1
+        by mx0a-001b2d01.pphosted.com with ESMTP id 39mc14sspp-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 06 Jul 2021 03:45:25 -0400
-Received: from m0098404.ppops.net (m0098404.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 1667Wuvf159405;
-        Tue, 6 Jul 2021 03:45:25 -0400
-Received: from ppma04fra.de.ibm.com (6a.4a.5195.ip4.static.sl-reverse.com [149.81.74.106])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 39mjkk8r1t-1
+        Tue, 06 Jul 2021 04:18:15 -0400
+Received: from m0098421.ppops.net (m0098421.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 16685tCI070742;
+        Tue, 6 Jul 2021 04:18:14 -0400
+Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 39mc14ssp8-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 06 Jul 2021 03:45:24 -0400
-Received: from pps.filterd (ppma04fra.de.ibm.com [127.0.0.1])
-        by ppma04fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 1667gqfW015948;
-        Tue, 6 Jul 2021 07:45:22 GMT
-Received: from b06cxnps3074.portsmouth.uk.ibm.com (d06relay09.portsmouth.uk.ibm.com [9.149.109.194])
-        by ppma04fra.de.ibm.com with ESMTP id 39jfh8gkk7-1
+        Tue, 06 Jul 2021 04:18:14 -0400
+Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
+        by ppma06ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 1668I8MO019334;
+        Tue, 6 Jul 2021 08:18:13 GMT
+Received: from b06cxnps4075.portsmouth.uk.ibm.com (d06relay12.portsmouth.uk.ibm.com [9.149.109.197])
+        by ppma06ams.nl.ibm.com with ESMTP id 39jf5h94s5-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 06 Jul 2021 07:45:22 +0000
+        Tue, 06 Jul 2021 08:18:12 +0000
 Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
-        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 1667jKxV26935782
+        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 1668IA9o33685994
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 6 Jul 2021 07:45:20 GMT
+        Tue, 6 Jul 2021 08:18:10 GMT
 Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id E588F4C04A;
-        Tue,  6 Jul 2021 07:45:19 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id 673404C04E;
+        Tue,  6 Jul 2021 08:18:10 +0000 (GMT)
 Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 748D14C044;
-        Tue,  6 Jul 2021 07:45:19 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id 065DA4C058;
+        Tue,  6 Jul 2021 08:18:10 +0000 (GMT)
 Received: from oc7455500831.ibm.com (unknown [9.171.59.107])
         by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Tue,  6 Jul 2021 07:45:19 +0000 (GMT)
+        Tue,  6 Jul 2021 08:18:09 +0000 (GMT)
 Subject: Re: [PATCH/RFC] KVM: selftests: introduce P44V64 for z196 and EC12
 From:   Christian Borntraeger <borntraeger@de.ibm.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
@@ -66,123 +66,41 @@ Cc:     Cornelia Huck <cohuck@redhat.com>,
         KVM <kvm@vger.kernel.org>
 References: <20210701153853.33063-1-borntraeger@de.ibm.com>
  <3a7be99a-5438-cc5b-ec6e-938832e7ab5a@de.ibm.com>
-Message-ID: <91b4c894-b04a-1d28-b57e-6496b166186b@de.ibm.com>
-Date:   Tue, 6 Jul 2021 09:45:19 +0200
+ <91b4c894-b04a-1d28-b57e-6496b166186b@de.ibm.com>
+Message-ID: <05d65201-8577-699a-740a-a72ade93f829@de.ibm.com>
+Date:   Tue, 6 Jul 2021 10:18:09 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.11.0
 MIME-Version: 1.0
-In-Reply-To: <3a7be99a-5438-cc5b-ec6e-938832e7ab5a@de.ibm.com>
+In-Reply-To: <91b4c894-b04a-1d28-b57e-6496b166186b@de.ibm.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: dG6Xxah1g9NMQE8ZX83qeQyybYPbbR7N
-X-Proofpoint-ORIG-GUID: mFpWRY3yDco_xlGy5sXrZ340U9riEDpS
+X-Proofpoint-ORIG-GUID: u5mcdTjhQAidEquBtCDui5FZUSFY4hnl
+X-Proofpoint-GUID: ER4X_nu4ELlm1452djkW5WX4tcJEHBby
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.790
  definitions=2021-07-06_02:2021-07-02,2021-07-06 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 bulkscore=0
- phishscore=0 mlxlogscore=999 spamscore=0 priorityscore=1501
- impostorscore=0 lowpriorityscore=0 mlxscore=0 adultscore=0 suspectscore=0
- malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2104190000 definitions=main-2107060037
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ bulkscore=0 lowpriorityscore=0 adultscore=0 malwarescore=0 mlxlogscore=999
+ phishscore=0 impostorscore=0 mlxscore=0 spamscore=0 clxscore=1015
+ suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2104190000 definitions=main-2107060040
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 06.07.21 09:40, Christian Borntraeger wrote:
-> Paolo,
-> 
-> since you have not yet pulled my queue for 5.14. Shall I add the two selftest patches and send a new
-> pull request?
 
-Hmm, I cant put it on top of the next queue since I would need to rebase.
-So lets do the original pull request and I will do another one
-on top of kvm/master for the 2 selftest patches.
+On 06.07.21 09:45, Christian Borntraeger wrote:
+> On 06.07.21 09:40, Christian Borntraeger wrote:
+>> Paolo,
+>>
+>> since you have not yet pulled my queue for 5.14. Shall I add the two selftest patches and send a new
+>> pull request?
 > 
-> On 01.07.21 17:38, Christian Borntraeger wrote:
->> Older machines likes z196 and zEC12 do only support 44 bits of physical
->> addresses. Make this the default and check via IBC if we are on a later
->> machine. We then add P47V64 as an additional model.
->>
->> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
->> Fixes: 1bc603af73dd ("KVM: selftests: introduce P47V64 for s390x")
->> ---
->>   tools/testing/selftests/kvm/include/kvm_util.h |  3 ++-
->>   tools/testing/selftests/kvm/lib/guest_modes.c  | 16 ++++++++++++++++
->>   tools/testing/selftests/kvm/lib/kvm_util.c     |  5 +++++
->>   3 files changed, 23 insertions(+), 1 deletion(-)
->>
->> diff --git a/tools/testing/selftests/kvm/include/kvm_util.h b/tools/testing/selftests/kvm/include/kvm_util.h
->> index 35739567189e..74d73532fce9 100644
->> --- a/tools/testing/selftests/kvm/include/kvm_util.h
->> +++ b/tools/testing/selftests/kvm/include/kvm_util.h
->> @@ -44,6 +44,7 @@ enum vm_guest_mode {
->>       VM_MODE_P40V48_64K,
->>       VM_MODE_PXXV48_4K,    /* For 48bits VA but ANY bits PA */
->>       VM_MODE_P47V64_4K,
->> +    VM_MODE_P44V64_4K,
->>       NUM_VM_MODES,
->>   };
->> @@ -61,7 +62,7 @@ enum vm_guest_mode {
->>   #elif defined(__s390x__)
->> -#define VM_MODE_DEFAULT            VM_MODE_P47V64_4K
->> +#define VM_MODE_DEFAULT            VM_MODE_P44V64_4K
->>   #define MIN_PAGE_SHIFT            12U
->>   #define ptes_per_page(page_size)    ((page_size) / 16)
->> diff --git a/tools/testing/selftests/kvm/lib/guest_modes.c b/tools/testing/selftests/kvm/lib/guest_modes.c
->> index 25bff307c71f..c330f414ef96 100644
->> --- a/tools/testing/selftests/kvm/lib/guest_modes.c
->> +++ b/tools/testing/selftests/kvm/lib/guest_modes.c
->> @@ -22,6 +22,22 @@ void guest_modes_append_default(void)
->>           }
->>       }
->>   #endif
->> +#ifdef __s390x__
->> +    {
->> +        int kvm_fd, vm_fd;
->> +        struct kvm_s390_vm_cpu_processor info;
->> +
->> +        kvm_fd = open_kvm_dev_path_or_exit();
->> +        vm_fd = ioctl(kvm_fd, KVM_CREATE_VM, 0);
->> +        kvm_device_access(vm_fd, KVM_S390_VM_CPU_MODEL,
->> +                  KVM_S390_VM_CPU_PROCESSOR, &info, false);
->> +        close(vm_fd);
->> +        close(kvm_fd);
->> +        /* Starting with z13 we have 47bits of physical address */
->> +        if (info.ibc >= 0x30)
->> +            guest_mode_append(VM_MODE_P47V64_4K, true, true);
->> +    }
->> +#endif
->>   }
->>   void for_each_guest_mode(void (*func)(enum vm_guest_mode, void *), void *arg)
->> diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
->> index a2b732cf96ea..8606000c439e 100644
->> --- a/tools/testing/selftests/kvm/lib/kvm_util.c
->> +++ b/tools/testing/selftests/kvm/lib/kvm_util.c
->> @@ -176,6 +176,7 @@ const char *vm_guest_mode_string(uint32_t i)
->>           [VM_MODE_P40V48_64K]    = "PA-bits:40,  VA-bits:48, 64K pages",
->>           [VM_MODE_PXXV48_4K]    = "PA-bits:ANY, VA-bits:48,  4K pages",
->>           [VM_MODE_P47V64_4K]    = "PA-bits:47,  VA-bits:64,  4K pages",
->> +        [VM_MODE_P44V64_4K]    = "PA-bits:44,  VA-bits:64,  4K pages",
->>       };
->>       _Static_assert(sizeof(strings)/sizeof(char *) == NUM_VM_MODES,
->>                  "Missing new mode strings?");
->> @@ -194,6 +195,7 @@ const struct vm_guest_mode_params vm_guest_mode_params[] = {
->>       { 40, 48, 0x10000, 16 },
->>       {  0,  0,  0x1000, 12 },
->>       { 47, 64,  0x1000, 12 },
->> +    { 44, 64,  0x1000, 12 },
->>   };
->>   _Static_assert(sizeof(vm_guest_mode_params)/sizeof(struct vm_guest_mode_params) == NUM_VM_MODES,
->>              "Missing new mode params?");
->> @@ -282,6 +284,9 @@ struct kvm_vm *vm_create(enum vm_guest_mode mode, uint64_t phy_pages, int perm)
->>       case VM_MODE_P47V64_4K:
->>           vm->pgtable_levels = 5;
->>           break;
->> +    case VM_MODE_P44V64_4K:
->> +        vm->pgtable_levels = 5;
->> +        break;
->>       default:
->>           TEST_FAIL("Unknown guest mode, mode: 0x%x", mode);
->>       }
->>
+> Hmm, I cant put it on top of the next queue since I would need to rebase.
+> So lets do the original pull request and I will do another one
+> on top of kvm/master for the 2 selftest patches.
+
+And I just realized that you did already pull the s390x and sent it to Linus.
+Pull request for the selftest patches will follow soon.
