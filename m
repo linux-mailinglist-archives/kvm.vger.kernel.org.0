@@ -2,74 +2,92 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 39A423BC4C2
-	for <lists+kvm@lfdr.de>; Tue,  6 Jul 2021 04:31:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 84DAB3BC4CC
+	for <lists+kvm@lfdr.de>; Tue,  6 Jul 2021 04:34:50 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229812AbhGFCdo (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 5 Jul 2021 22:33:44 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:31974 "EHLO
+        id S229951AbhGFChY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 5 Jul 2021 22:37:24 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:30081 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229774AbhGFCdo (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 5 Jul 2021 22:33:44 -0400
+        by vger.kernel.org with ESMTP id S229781AbhGFChY (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 5 Jul 2021 22:37:24 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1625538666;
+        s=mimecast20190719; t=1625538886;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=+t7xgkqb9EDjx9o5Ws18UiODNH1rDl4lfk/LxQtMlSA=;
-        b=R6lFr8rKtG4II2DzsSdSjXYfLMAGBbeOl99kxPgfTR1QOZx2DQftmSAyhI/nbDUQ3pKVGb
-        x+r5wppcTnDpPVk7sRy1xpVY/ICSNraJZENasgx7d2EeRERyYrca5bWtjEqgHkG1nkv2qY
-        rtygTiRSJdyy91EkAP+/64W7HjRMjPM=
-Received: from mail-pj1-f72.google.com (mail-pj1-f72.google.com
- [209.85.216.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-457-3geKOvMgMpCXlNAg-TsUzw-1; Mon, 05 Jul 2021 22:31:05 -0400
-X-MC-Unique: 3geKOvMgMpCXlNAg-TsUzw-1
-Received: by mail-pj1-f72.google.com with SMTP id p22-20020a17090a9316b029016a0aced749so7402943pjo.9
-        for <kvm@vger.kernel.org>; Mon, 05 Jul 2021 19:31:04 -0700 (PDT)
+        bh=HVuNMGPjUFR4EYVE5SY3SOVJbIMJT/f5oi+I5uWxFrM=;
+        b=Eqsvfqt9261sxoBWWgwYdPrY1YKxJJ7Gno77b0R1NwOZZx/46z+VHucSdBtgYBN+fv/Nu+
+        RKiy6z7DWaeSlwlUsfhfvFqRF745+d45CIm/AX1s1Ud0ZC9iW8iuD60NRp13jEwr/9jeKj
+        7CnqGy8g/wQZqJG+6LX9KBjUl0fFssY=
+Received: from mail-pl1-f197.google.com (mail-pl1-f197.google.com
+ [209.85.214.197]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-564-YlKbcuyBP-WIkUGukmlbMw-1; Mon, 05 Jul 2021 22:34:45 -0400
+X-MC-Unique: YlKbcuyBP-WIkUGukmlbMw-1
+Received: by mail-pl1-f197.google.com with SMTP id c24-20020a1709028498b0290128cdfbb2f1so6634218plo.14
+        for <kvm@vger.kernel.org>; Mon, 05 Jul 2021 19:34:44 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-transfer-encoding
          :content-language;
-        bh=+t7xgkqb9EDjx9o5Ws18UiODNH1rDl4lfk/LxQtMlSA=;
-        b=G5sL6dfrVvIK84QaVvVpRiAQb2Xz7QW0uWdTspl66wkO3bq1wOCwygvmEMOn/A60j4
-         wa5UHCp334pD5HZkVRwEcrvaZ7UZmOblxmL1HQ+TH6b2W4gTaoyI22NnN1Xfqpzir/PL
-         z81/lNGmzKHFdo3rVyKtINBS86q2kHphtw4NaD/s1d8YU6pDhX7soUKnKwN4AeWPfRDn
-         lIzrS7jpTLNvuhU34ppwAEqyJg8E73BD2qMzS3z+YMRtw2L7lacSOOY/oykHh7Fmg3IA
-         0DwoyezdbpmgWHW8qNY297D8sXEdAJ35UTNnfNiEyqi2/UDVTbN85Q7R72qTY9sgyFjD
-         SI7w==
-X-Gm-Message-State: AOAM532mOxs8+TiNuQDgq0ljnaSxnqz89Ldf7X50P5lB7e2sZa7wlwq4
-        i7AeUUcAia5c/bAA+Rh1zh15S3Ka645KKoZ/nS9XLp93K4smZjZge5+Cy0rMAGzeUuufS8cwd+7
-        cjsFwKWyzVbfE
-X-Received: by 2002:a17:90b:124f:: with SMTP id gx15mr2053892pjb.8.1625538664048;
-        Mon, 05 Jul 2021 19:31:04 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzGJ3C4PIS2j1yjac50lMKMZ06m91aoC+A1GrgZ9KMYDd3ldGiJnB8VFZ5kPGCmj4zRcWEfnQ==
-X-Received: by 2002:a17:90b:124f:: with SMTP id gx15mr2053875pjb.8.1625538663867;
-        Mon, 05 Jul 2021 19:31:03 -0700 (PDT)
+        bh=HVuNMGPjUFR4EYVE5SY3SOVJbIMJT/f5oi+I5uWxFrM=;
+        b=r3hhxCxNAIOjioCAeT9ls09e1mw/Ywv40XvQggYnBzzLf57QBGFvzDJIabfLD8JtFV
+         uBlNcv6tQ1UA9IJwuaVZGH5y7NGThkGEQ3V2mv2z8SYZrDMd9SCLzCQKm9Z1zDoWrC9m
+         y2qGocjhIwFwWsmyFNXcVYjlOFbwIbPcuXTY3k8a/TyZFS+KafcoVwuFBTLOn1qGgN5L
+         J+B/4dv/nQALo6G51WU2kKgNXs3SBK3/zdNizgrE5xG+U/tUx+TAxxNVp9i1ijMflEAE
+         6rYcmrnztw+DMR0k8V3ZeSsnQ9Rj5VXg6l2mqqj6g2MNBb/0c+r3qVdQSRD+ZZtoeJa6
+         /yrQ==
+X-Gm-Message-State: AOAM533GJIkKnRPkFiw7yljBn2zMfJ9iXnZQH2gVBK5Xek25HwUodDnJ
+        LcsNYEnwrHq0xnXd2ss71SWfHuSQh1TaGDtxa479+k9fFhCGLy/OFEqhiI1SSjgMRKIDLhAuuPF
+        OvsSyniDB9Qmg
+X-Received: by 2002:a63:f556:: with SMTP id e22mr18650447pgk.189.1625538883950;
+        Mon, 05 Jul 2021 19:34:43 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzILej/0FQHGxl4T6zrYB/SOfscbH6OhsOWvj703yvNi6LpSqIaMqZLCnRp/+Zmr1wzG6xIfg==
+X-Received: by 2002:a63:f556:: with SMTP id e22mr18650421pgk.189.1625538883702;
+        Mon, 05 Jul 2021 19:34:43 -0700 (PDT)
 Received: from wangxiaodeMacBook-Air.local ([209.132.188.80])
-        by smtp.gmail.com with ESMTPSA id d25sm13862589pgn.42.2021.07.05.19.31.00
+        by smtp.gmail.com with ESMTPSA id g18sm13838184pfi.199.2021.07.05.19.34.35
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 05 Jul 2021 19:31:03 -0700 (PDT)
-Subject: Re: [PATCH 2/2] vdpa: vp_vdpa: don't use hard-coded maximum virtqueue
- size
-To:     "Michael S. Tsirkin" <mst@redhat.com>
-Cc:     virtualization@lists.linux-foundation.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        netdev@vger.kernel.org, xieyongji@bytedance.com,
-        stefanha@redhat.com
-References: <20210705071910.31965-1-jasowang@redhat.com>
- <20210705071910.31965-2-jasowang@redhat.com>
- <20210705032602-mutt-send-email-mst@kernel.org>
- <02139c5f-92c5-eda6-8d2d-8e1b6ac70f3e@redhat.com>
- <20210705065534-mutt-send-email-mst@kernel.org>
+        Mon, 05 Jul 2021 19:34:42 -0700 (PDT)
+Subject: Re: [PATCH v8 10/10] Documentation: Add documentation for VDUSE
+To:     Stefan Hajnoczi <stefanha@redhat.com>
+Cc:     Yongji Xie <xieyongji@bytedance.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Stefano Garzarella <sgarzare@redhat.com>,
+        Parav Pandit <parav@nvidia.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Christian Brauner <christian.brauner@canonical.com>,
+        Randy Dunlap <rdunlap@infradead.org>,
+        Matthew Wilcox <willy@infradead.org>,
+        Al Viro <viro@zeniv.linux.org.uk>,
+        Jens Axboe <axboe@kernel.dk>, bcrl@kvack.org,
+        Jonathan Corbet <corbet@lwn.net>,
+        =?UTF-8?Q?Mika_Penttil=c3=a4?= <mika.penttila@nextfour.com>,
+        Dan Carpenter <dan.carpenter@oracle.com>, joro@8bytes.org,
+        Greg KH <gregkh@linuxfoundation.org>, songmuchun@bytedance.com,
+        virtualization <virtualization@lists.linux-foundation.org>,
+        netdev@vger.kernel.org, kvm <kvm@vger.kernel.org>,
+        linux-fsdevel@vger.kernel.org, iommu@lists.linux-foundation.org,
+        linux-kernel <linux-kernel@vger.kernel.org>
+References: <20210615141331.407-1-xieyongji@bytedance.com>
+ <20210615141331.407-11-xieyongji@bytedance.com>
+ <YNSCH6l31zwPxBjL@stefanha-x1.localdomain>
+ <CACycT3uxnQmXWsgmNVxQtiRhz1UXXTAJFY3OiAJqokbJH6ifMA@mail.gmail.com>
+ <YNxCDpM3bO5cPjqi@stefanha-x1.localdomain>
+ <CACycT3taKhf1cWp3Jd0aSVekAZvpbR-_fkyPLQ=B+jZBB5H=8Q@mail.gmail.com>
+ <YN3ABqCMLQf7ejOm@stefanha-x1.localdomain>
+ <CACycT3vo-diHgTSLw_FS2E+5ia5VjihE3qw7JmZR7JT55P-wQA@mail.gmail.com>
+ <8320d26d-6637-85c6-8773-49553dfa502d@redhat.com>
+ <YOL/9mxkJaokKDHc@stefanha-x1.localdomain>
 From:   Jason Wang <jasowang@redhat.com>
-Message-ID: <e0744583-fcdc-07d0-a414-31d660089e2b@redhat.com>
-Date:   Tue, 6 Jul 2021 10:30:59 +0800
+Message-ID: <5b5107fa-3b32-8a3b-720d-eee6b2a84ace@redhat.com>
+Date:   Tue, 6 Jul 2021 10:34:33 +0800
 User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0)
  Gecko/20100101 Thunderbird/78.11.0
 MIME-Version: 1.0
-In-Reply-To: <20210705065534-mutt-send-email-mst@kernel.org>
+In-Reply-To: <YOL/9mxkJaokKDHc@stefanha-x1.localdomain>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
 Content-Language: en-US
@@ -78,69 +96,129 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
-在 2021/7/6 上午1:59, Michael S. Tsirkin 写道:
-> On Mon, Jul 05, 2021 at 03:29:47PM +0800, Jason Wang wrote:
->> 在 2021/7/5 下午3:26, Michael S. Tsirkin 写道:
->>> On Mon, Jul 05, 2021 at 03:19:10PM +0800, Jason Wang wrote:
->>>> This patch switch to read virtqueue size from the capability instead
->>>> of depending on the hardcoded value. This allows the per virtqueue
->>>> size could be advertised.
+在 2021/7/5 下午8:49, Stefan Hajnoczi 写道:
+> On Mon, Jul 05, 2021 at 11:36:15AM +0800, Jason Wang wrote:
+>> 在 2021/7/4 下午5:49, Yongji Xie 写道:
+>>>>> OK, I get you now. Since the VIRTIO specification says "Device
+>>>>> configuration space is generally used for rarely-changing or
+>>>>> initialization-time parameters". I assume the VDUSE_DEV_SET_CONFIG
+>>>>> ioctl should not be called frequently.
+>>>> The spec uses MUST and other terms to define the precise requirements.
+>>>> Here the language (especially the word "generally") is weaker and means
+>>>> there may be exceptions.
 >>>>
->>>> Signed-off-by: Jason Wang <jasowang@redhat.com>
->>> So let's add an ioctl for this? It's really a bug we don't..
+>>>> Another type of access that doesn't work with the VDUSE_DEV_SET_CONFIG
+>>>> approach is reads that have side-effects. For example, imagine a field
+>>>> containing an error code if the device encounters a problem unrelated to
+>>>> a specific virtqueue request. Reading from this field resets the error
+>>>> code to 0, saving the driver an extra configuration space write access
+>>>> and possibly race conditions. It isn't possible to implement those
+>>>> semantics suing VDUSE_DEV_SET_CONFIG. It's another corner case, but it
+>>>> makes me think that the interface does not allow full VIRTIO semantics.
 >>
->> As explained in patch 1. Qemu doesn't use VHOST_VDPA_GET_VRING_NUM actually.
->> Instead it checks the result VHOST_VDPA_SET_VRING_NUM.
+>> Note that though you're correct, my understanding is that config space is
+>> not suitable for this kind of error propagating. And it would be very hard
+>> to implement such kind of semantic in some transports.  Virtqueue should be
+>> much better. As Yong Ji quoted, the config space is used for
+>> "rarely-changing or intialization-time parameters".
 >>
->> So I change VHOST_VDPA_GET_VRING_NUM to return the minimal size of all the
->> virtqueues.
 >>
->> If you wish we can add a VHOST_VDPA_GET_VRING_NUM2, but I'm not sure it will
->> have a user or not.
+>>> Agreed. I will use VDUSE_DEV_GET_CONFIG in the next version. And to
+>>> handle the message failure, I'm going to add a return value to
+>>> virtio_config_ops.get() and virtio_cread_* API so that the error can
+>>> be propagated to the virtio device driver. Then the virtio-blk device
+>>> driver can be modified to handle that.
+>>>
+>>> Jason and Stefan, what do you think of this way?
+> Why does VDUSE_DEV_GET_CONFIG need to support an error return value?
+>
+> The VIRTIO spec provides no way for the device to report errors from
+> config space accesses.
+>
+> The QEMU virtio-pci implementation returns -1 from invalid
+> virtio_config_read*() and silently discards virtio_config_write*()
+> accesses.
+>
+> VDUSE can take the same approach with
+> VDUSE_DEV_GET_CONFIG/VDUSE_DEV_SET_CONFIG.
+>
+>> I'd like to stick to the current assumption thich get_config won't fail.
+>> That is to say,
 >>
->> Thanks
-> Question is how do we know returning the minimal and not e.g. the max
-> size is the right thing to do?
+>> 1) maintain a config in the kernel, make sure the config space read can
+>> always succeed
+>> 2) introduce an ioctl for the vduse usersapce to update the config space.
+>> 3) we can synchronize with the vduse userspace during set_config
+>>
+>> Does this work?
+> I noticed that caching is also allowed by the vhost-user protocol
+> messages (QEMU's docs/interop/vhost-user.rst), but the device doesn't
+> know whether or not caching is in effect. The interface you outlined
+> above requires caching.
+>
+> Is there a reason why the host kernel vDPA code needs to cache the
+> configuration space?
 
 
-For the new ioctl, it will return the max queue size per vq.
+Because:
 
-It's probably too late to fix the old one, so it's only safe to return 
-the minimal one.
-
-Actually, most of the vDPA parents should be fine except for the 
-vp_vdpa. When running in a nested environment, Qemu only advertise cvq 
-with 64 entries.
+1) Kernel can not wait forever in get_config(), this is the major 
+difference with vhost-user.
+2) Stick to the current assumption that virtio_cread() should always 
+succeed.
 
 Thanks
 
 
 >
+> Here are the vhost-user protocol messages:
 >
->>>> ---
->>>>    drivers/vdpa/virtio_pci/vp_vdpa.c | 6 ++++--
->>>>    1 file changed, 4 insertions(+), 2 deletions(-)
->>>>
->>>> diff --git a/drivers/vdpa/virtio_pci/vp_vdpa.c b/drivers/vdpa/virtio_pci/vp_vdpa.c
->>>> index 2926641fb586..198f7076e4d9 100644
->>>> --- a/drivers/vdpa/virtio_pci/vp_vdpa.c
->>>> +++ b/drivers/vdpa/virtio_pci/vp_vdpa.c
->>>> @@ -18,7 +18,6 @@
->>>>    #include <linux/virtio_pci.h>
->>>>    #include <linux/virtio_pci_modern.h>
->>>> -#define VP_VDPA_QUEUE_MAX 256
->>>>    #define VP_VDPA_DRIVER_NAME "vp_vdpa"
->>>>    #define VP_VDPA_NAME_SIZE 256
->>>> @@ -197,7 +196,10 @@ static void vp_vdpa_set_status(struct vdpa_device *vdpa, u8 status)
->>>>    static u16 vp_vdpa_get_vq_num_max(struct vdpa_device *vdpa, u16 qid)
->>>>    {
->>>> -	return VP_VDPA_QUEUE_MAX;
->>>> +	struct vp_vdpa *vp_vdpa = vdpa_to_vp(vdpa);
->>>> +	struct virtio_pci_modern_device *mdev = &vp_vdpa->mdev;
->>>> +
->>>> +	return vp_modern_get_queue_size(mdev, qid);
->>>>    }
->>>>    static int vp_vdpa_get_vq_state(struct vdpa_device *vdpa, u16 qid,
->>>> -- 
->>>> 2.25.1
+>    Virtio device config space
+>    ^^^^^^^^^^^^^^^^^^^^^^^^^^
+>
+>    +--------+------+-------+---------+
+>    | offset | size | flags | payload |
+>    +--------+------+-------+---------+
+>
+>    :offset: a 32-bit offset of virtio device's configuration space
+>
+>    :size: a 32-bit configuration space access size in bytes
+>
+>    :flags: a 32-bit value:
+>      - 0: Vhost master messages used for writeable fields
+>      - 1: Vhost master messages used for live migration
+>
+>    :payload: Size bytes array holding the contents of the virtio
+>              device's configuration space
+>
+>    ...
+>
+>    ``VHOST_USER_GET_CONFIG``
+>      :id: 24
+>      :equivalent ioctl: N/A
+>      :master payload: virtio device config space
+>      :slave payload: virtio device config space
+>
+>      When ``VHOST_USER_PROTOCOL_F_CONFIG`` is negotiated, this message is
+>      submitted by the vhost-user master to fetch the contents of the
+>      virtio device configuration space, vhost-user slave's payload size
+>      MUST match master's request, vhost-user slave uses zero length of
+>      payload to indicate an error to vhost-user master. The vhost-user
+>      master may cache the contents to avoid repeated
+>      ``VHOST_USER_GET_CONFIG`` calls.
+>
+>    ``VHOST_USER_SET_CONFIG``
+>      :id: 25
+>      :equivalent ioctl: N/A
+>      :master payload: virtio device config space
+>      :slave payload: N/A
+>
+>      When ``VHOST_USER_PROTOCOL_F_CONFIG`` is negotiated, this message is
+>      submitted by the vhost-user master when the Guest changes the virtio
+>      device configuration space and also can be used for live migration
+>      on the destination host. The vhost-user slave must check the flags
+>      field, and slaves MUST NOT accept SET_CONFIG for read-only
+>      configuration space fields unless the live migration bit is set.
+>
+> Stefan
 
