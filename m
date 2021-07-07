@@ -2,119 +2,121 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 89B913BE4BE
-	for <lists+kvm@lfdr.de>; Wed,  7 Jul 2021 10:53:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DAEFB3BE4C6
+	for <lists+kvm@lfdr.de>; Wed,  7 Jul 2021 10:54:12 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231248AbhGGIzp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 7 Jul 2021 04:55:45 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:40886 "EHLO
+        id S231218AbhGGI4v (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 7 Jul 2021 04:56:51 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:59988 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230506AbhGGIzo (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 7 Jul 2021 04:55:44 -0400
+        by vger.kernel.org with ESMTP id S230467AbhGGI4u (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 7 Jul 2021 04:56:50 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1625647984;
+        s=mimecast20190719; t=1625648050;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=RSGta0qNpB6QcJ/llRMjKtAhvAPIvAnC+iGh3rJx/qg=;
-        b=hJtnXPMJIcE5o8NZgK0nnNYUwrB/6eLhIX1CQcKNw/EZqNPt4cXqHG8in8yY7OfXwdXMBD
-        EFxLHaFVFpjcbkSXbtajKDTSiRScTnwz4QbCpTZiB2IlygToNIGPMsyN7ChEM7ITdTNSGy
-        r1dwppbklqiEsBN/O6dKbYXg1Yvoo4w=
+        bh=4bNksCUZBGOM01YOqNVk0ERUtPqgiPlg77eX2weUD+s=;
+        b=PjPDNMLe3Rrv+j/Hp0b2t6et/PB7jklI2d+mvFP29mWhryc2FAfE6xuzL1COWqDNdfPCwN
+        6Tez8HXjD9LV0Wp7OAHKXtwW4d7ySH9fMzDzNJxhlaEGRgrIxW/6/PyI1cgv1vjqi4hgO6
+        E8ILFRkR4w5ADQc5zv5HFPNIjM0ngzc=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-68-v1nUrO-5Ov24IW-5AspE9w-1; Wed, 07 Jul 2021 04:53:03 -0400
-X-MC-Unique: v1nUrO-5Ov24IW-5AspE9w-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+ us-mta-587-lOc9jp2VOp-3e1dzyLl61A-1; Wed, 07 Jul 2021 04:54:09 -0400
+X-MC-Unique: lOc9jp2VOp-3e1dzyLl61A-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4831F1800D41;
-        Wed,  7 Jul 2021 08:53:00 +0000 (UTC)
-Received: from localhost (ovpn-114-152.ams2.redhat.com [10.36.114.152])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id A3E7719C44;
-        Wed,  7 Jul 2021 08:52:55 +0000 (UTC)
-Date:   Wed, 7 Jul 2021 09:52:54 +0100
-From:   Stefan Hajnoczi <stefanha@redhat.com>
-To:     Xie Yongji <xieyongji@bytedance.com>
-Cc:     mst@redhat.com, jasowang@redhat.com, sgarzare@redhat.com,
-        parav@nvidia.com, hch@infradead.org,
-        christian.brauner@canonical.com, rdunlap@infradead.org,
-        willy@infradead.org, viro@zeniv.linux.org.uk, axboe@kernel.dk,
-        bcrl@kvack.org, corbet@lwn.net, mika.penttila@nextfour.com,
-        dan.carpenter@oracle.com, joro@8bytes.org,
-        gregkh@linuxfoundation.org, songmuchun@bytedance.com,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        kvm@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        iommu@lists.linux-foundation.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v8 09/10] vduse: Introduce VDUSE - vDPA Device in
- Userspace
-Message-ID: <YOVrZtGIEjZZSSoU@stefanha-x1.localdomain>
-References: <20210615141331.407-1-xieyongji@bytedance.com>
- <20210615141331.407-10-xieyongji@bytedance.com>
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DC9B2100C609;
+        Wed,  7 Jul 2021 08:54:07 +0000 (UTC)
+Received: from localhost (ovpn-112-160.ams2.redhat.com [10.36.112.160])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 018752C6BF;
+        Wed,  7 Jul 2021 08:54:03 +0000 (UTC)
+From:   Cornelia Huck <cohuck@redhat.com>
+To:     Christian Borntraeger <borntraeger@de.ibm.com>,
+        Janis Schoetterl-Glausch <scgl@linux.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>
+Cc:     David Hildenbrand <david@redhat.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        "open list:KERNEL VIRTUAL MACHINE for s390 (KVM/s390)" 
+        <kvm@vger.kernel.org>,
+        "open list:S390" <linux-s390@vger.kernel.org>,
+        open list <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH] KVM: s390: Enable specification exception interpretation
+In-Reply-To: <05430c91-6a84-0fc9-0af4-89f408eb691f@de.ibm.com>
+Organization: Red Hat GmbH
+References: <20210706114714.3936825-1-scgl@linux.ibm.com>
+ <05430c91-6a84-0fc9-0af4-89f408eb691f@de.ibm.com>
+User-Agent: Notmuch/0.32.1 (https://notmuchmail.org)
+Date:   Wed, 07 Jul 2021 10:54:02 +0200
+Message-ID: <87lf6ifqs5.fsf@redhat.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="FCq4Eu07/ej1hAmI"
-Content-Disposition: inline
-In-Reply-To: <20210615141331.407-10-xieyongji@bytedance.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+Content-Type: text/plain
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Wed, Jul 07 2021, Christian Borntraeger <borntraeger@de.ibm.com> wrote:
 
---FCq4Eu07/ej1hAmI
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+> On 06.07.21 13:47, Janis Schoetterl-Glausch wrote:
+>> When this feature is enabled the hardware is free to interpret
+>> specification exceptions generated by the guest, instead of causing
+>> program interruption interceptions.
+>> 
+>> This benefits (test) programs that generate a lot of specification
+>> exceptions (roughly 4x increase in exceptions/sec).
+>> 
+>> Interceptions will occur as before if ICTL_PINT is set,
+>> i.e. if guest debug is enabled.
+>
+> I think I will add
+>
+> There is no indication if this feature is available or not and the hardware
+> is free to interpret or not. So we can simply set this bit and if the
+> hardware ignores it we fall back to intercept 8 handling.
 
-On Tue, Jun 15, 2021 at 10:13:30PM +0800, Xie Yongji wrote:
-> +static bool vduse_validate_config(struct vduse_dev_config *config)
-> +{
+Sounds good.
 
-The name field needs to be NUL terminated?
+>
+>
+> With that
+>
+> Reviewed-by: Christian Borntraeger <borntraeger@de.ibm.com>
+>> 
+>> Signed-off-by: Janis Schoetterl-Glausch <scgl@linux.ibm.com>
+>> ---
+>> I'll additionally send kvm-unit-tests for testing this feature.
+>> 
+>>   arch/s390/include/asm/kvm_host.h | 1 +
+>>   arch/s390/kvm/kvm-s390.c         | 2 ++
+>>   arch/s390/kvm/vsie.c             | 2 ++
+>>   3 files changed, 5 insertions(+)
 
-> +	case VDUSE_CREATE_DEV: {
-> +		struct vduse_dev_config config;
-> +		unsigned long size = offsetof(struct vduse_dev_config, config);
-> +		void *buf;
-> +
-> +		ret = -EFAULT;
-> +		if (copy_from_user(&config, argp, size))
-> +			break;
-> +
-> +		ret = -EINVAL;
-> +		if (vduse_validate_config(&config) == false)
-> +			break;
-> +
-> +		buf = vmemdup_user(argp + size, config.config_size);
-> +		if (IS_ERR(buf)) {
-> +			ret = PTR_ERR(buf);
-> +			break;
-> +		}
-> +		ret = vduse_create_dev(&config, buf, control->api_version);
-> +		break;
-> +	}
-> +	case VDUSE_DESTROY_DEV: {
-> +		char name[VDUSE_NAME_MAX];
-> +
-> +		ret = -EFAULT;
-> +		if (copy_from_user(name, argp, VDUSE_NAME_MAX))
-> +			break;
+(...)
 
-Is this missing a NUL terminator?
+>> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
+>> index b655a7d82bf0..aadd589a3755 100644
+>> --- a/arch/s390/kvm/kvm-s390.c
+>> +++ b/arch/s390/kvm/kvm-s390.c
+>> @@ -3200,6 +3200,8 @@ static int kvm_s390_vcpu_setup(struct kvm_vcpu *vcpu)
+>>   		vcpu->arch.sie_block->ecb |= ECB_SRSI;
+>>   	if (test_kvm_facility(vcpu->kvm, 73))
+>>   		vcpu->arch.sie_block->ecb |= ECB_TE;
 
---FCq4Eu07/ej1hAmI
-Content-Type: application/pgp-signature; name="signature.asc"
+Maybe add
 
------BEGIN PGP SIGNATURE-----
+/* no facility bit, but safe as the hardware may ignore it */
 
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAmDla2YACgkQnKSrs4Gr
-c8iwDwgAklDinwoNdcTKlrJAeuzd7lkg6g0pp6GgPOoSoPbIEzizyjezLIi98oHV
-vF5TkSJ9SmhwrTkrfniJQf7czNd+oWvB/PeLW+YOTNYnHkS4AlS4z4/Z48sAiees
-bjx0y6rK8AKEd1d2F5lOEbHr1hyPAEuA5j1trgrHzaUhKLKiRfCYQI0mJIaWYUTT
-5AJ6lKidGWNOayzU4/GQ+PfEPahMie3/T2g+ivR4j0E6YLNvJs7CFFerZYRNGLXQ
-D5MqzXxvgHF75J7QuXmOOYTRhRMzWoYI4K6EfwzZJHWIJrBhVeXogKJ0Z4tnp82W
-f66VauRbMPZNCJ5g0gXGzczBzlXh0A==
-=aR1n
------END PGP SIGNATURE-----
+or something like that, so that we don't stumble over that in the future?
 
---FCq4Eu07/ej1hAmI--
+>> +	if (!kvm_is_ucontrol(vcpu->kvm))
+>> +		vcpu->arch.sie_block->ecb |= ECB_SPECI;
+>> 
+>>   	if (test_kvm_facility(vcpu->kvm, 8) && vcpu->kvm->arch.use_pfmfi)
+>>   		vcpu->arch.sie_block->ecb2 |= ECB2_PFMFI;
+
+Reviewed-by: Cornelia Huck <cohuck@redhat.com>
 
