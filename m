@@ -2,62 +2,58 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 077A33BE553
-	for <lists+kvm@lfdr.de>; Wed,  7 Jul 2021 11:09:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8C9BE3BE573
+	for <lists+kvm@lfdr.de>; Wed,  7 Jul 2021 11:19:50 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231569AbhGGJMH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 7 Jul 2021 05:12:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53486 "EHLO
+        id S231192AbhGGJW2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 7 Jul 2021 05:22:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55800 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231549AbhGGJMG (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 7 Jul 2021 05:12:06 -0400
-Received: from mail-ed1-x529.google.com (mail-ed1-x529.google.com [IPv6:2a00:1450:4864:20::529])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2B571C06175F
-        for <kvm@vger.kernel.org>; Wed,  7 Jul 2021 02:09:26 -0700 (PDT)
-Received: by mail-ed1-x529.google.com with SMTP id v1so2449003edt.6
-        for <kvm@vger.kernel.org>; Wed, 07 Jul 2021 02:09:26 -0700 (PDT)
+        with ESMTP id S231259AbhGGJW1 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 7 Jul 2021 05:22:27 -0400
+Received: from mail-ej1-x62a.google.com (mail-ej1-x62a.google.com [IPv6:2a00:1450:4864:20::62a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 97F4FC061762
+        for <kvm@vger.kernel.org>; Wed,  7 Jul 2021 02:19:47 -0700 (PDT)
+Received: by mail-ej1-x62a.google.com with SMTP id v20so2157377eji.10
+        for <kvm@vger.kernel.org>; Wed, 07 Jul 2021 02:19:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=bytedance-com.20150623.gappssmtp.com; s=20150623;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=FtdRj0uqhbWYJv1fXc78UI5Oym+NbdH9ODlpZg+9HZI=;
-        b=UP2gxo7E+OXts94W4XG8ov25acIgy16F7Xuv5WNUryBRLvnB1SUdOumUACfAPoJmFS
-         52RE8R7P3qzg1tarx6KjKAKEHb0Dj5puUCLSt4CliZJpugu/J1PeSwvG09Sv8SfFplGU
-         DBap5eLBxTmFKW9K2PAgbKQ4UW5jIafViUeCgIHHk0GQV9Tv4AoOXsa2pQcvvdtk0UEk
-         qzg8jcE6bFOHgPnYLfHRZZTw0XzS/1JMmDSF7Xh2WYY8wHkQJK4LhvVclPWJCWFgWaoK
-         6TQcVcEEhAqleM8ofZK+PMsZBBDsQDwSyML/MSyfSeinKDg97GhQwRNlPXflVJHElUst
-         mqKA==
+         :cc;
+        bh=ntF5ShiMpxZzH3NgDCu0lj/qLit/wsTznB+iv/n6Jts=;
+        b=EkUktZhVW6Hw0D3CwFrVu6SPtBCLkJYy2M7BJM1xaa8T71w3Am8UIGnGLzZ7sZjGBy
+         oJPZFOsWMkQsg1Eor8GYHzrS0gvtg/qEnI+kjIYCFKEPoLzQIQX6UgYFrffMXB7uW8ud
+         DAJeTUNRxqnYoE0JTnNDRQ4iWBS+hwKVMh6CzB8D/Nd7MUwmVBFXb/1DGoN5IcQxOlxA
+         XEcMYCGgJ6/e1b9/F4uGKBE66Lafq27VxOH+bGLgnrQlIyePfFxmfVAzA2OsUgePTZRJ
+         T3ukDS1lDG6sIQr7dau/XyarH0KZbl27sp8FmAm/INCn+Zavbu6Ds2cG23H+ZLiJNIkK
+         nv1g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=FtdRj0uqhbWYJv1fXc78UI5Oym+NbdH9ODlpZg+9HZI=;
-        b=bT1C+6UF7+j32CCxQz4DtaKV85JBgeWlJHGJkllBInNYPrra5XjzAL/BW+x2vUnZeq
-         NgZjtNieZxC4f3pzfjJ5nZiEmo0Qddnokhm/xb8tEAI7DL+zyo2UomuqMQ2+TpfQFJmB
-         G1kNbY6jjWEMY1fsD9zXxiv/r0B8B1SZtv2HO9vkpOLs7sDJwv4ZWnCamSntPfnRW7UE
-         k5/OV2LNs4nNRp6O3xvplvvMdQk7Dztte2QjlSXAaokrqKSxiSsdFzWy38WRvAzOi1CW
-         SHjOA71aAMu1X5FcRdSHc2t0OU0d0qDmk0ob99LuPqrGxXqTAB27PAUK/aQldSCqoJWo
-         B6ig==
-X-Gm-Message-State: AOAM532xlpvqPtjlwPQAVVXpwIEk+8N0PsCVVlS5xHwEhmaaca1UIV2U
-        aAy4lp8tTeX5K2lmvHTQGOQfy2zNiqAy1VOCEm97
-X-Google-Smtp-Source: ABdhPJwtLvo0kWOr3LJJHVAL2cWB4hYaaS7KjefICks1FsWVhmQrnAQXN0teABT1P1UQsj+keI5UW3/FiAWPPwjYY38=
-X-Received: by 2002:a05:6402:31ae:: with SMTP id dj14mr23195138edb.145.1625648964822;
- Wed, 07 Jul 2021 02:09:24 -0700 (PDT)
+         :message-id:subject:to:cc;
+        bh=ntF5ShiMpxZzH3NgDCu0lj/qLit/wsTznB+iv/n6Jts=;
+        b=LdifzSU/2JiWoYgqg9roYkucj7sv+XwoQY8LYLsvqG0Hg6fM4ao8wk1WwRjNmNZQ8o
+         YT22mje7Gc5YxzoNxYi+TbzFdINR2KJser8bE9OVvDJV1EKWSjOkmpmgfG0P1+AlmmFu
+         1fKwRCuuQFw0bCHqTnT1/zHbuMJBSwFlIfDlQAZXTu4vi/FmfYLXUmzT7OPvDo0+/amB
+         svbXAo7bIUw4LXV1YemuHLA5i18tjB/gg8cuDxpq4Ryp6gw7BPOVy9B3SGhaCjwUjVI3
+         i5D6wGQxI7VmvAlDeBof/t2KPS8TzbGvw1txBujRLxPZ2DyTp+5qlVyK0sg1ZPQu6K3Y
+         yzVA==
+X-Gm-Message-State: AOAM533/XU3G/876zcw4CRHwbnNJVjVrqQO3hQSpYIZXBhMeITmqIAd7
+        U7nyZnRsJ6/5J+3HgpO9yt1IZzMgusM5z95aNsN/
+X-Google-Smtp-Source: ABdhPJwfUSLvIX93bY45nGlunKheveZx2mGwfBnicH+p8nMulhsjVrxLC9+PoE5I/qwuA5U0XX93SwRw5wHXZDNyzBo=
+X-Received: by 2002:a17:906:cb93:: with SMTP id mf19mr20870738ejb.427.1625649585892;
+ Wed, 07 Jul 2021 02:19:45 -0700 (PDT)
 MIME-Version: 1.0
-References: <20210615141331.407-11-xieyongji@bytedance.com>
- <YNSCH6l31zwPxBjL@stefanha-x1.localdomain> <CACycT3uxnQmXWsgmNVxQtiRhz1UXXTAJFY3OiAJqokbJH6ifMA@mail.gmail.com>
- <YNxCDpM3bO5cPjqi@stefanha-x1.localdomain> <CACycT3taKhf1cWp3Jd0aSVekAZvpbR-_fkyPLQ=B+jZBB5H=8Q@mail.gmail.com>
- <YN3ABqCMLQf7ejOm@stefanha-x1.localdomain> <CACycT3vo-diHgTSLw_FS2E+5ia5VjihE3qw7JmZR7JT55P-wQA@mail.gmail.com>
- <8320d26d-6637-85c6-8773-49553dfa502d@redhat.com> <YOL/9mxkJaokKDHc@stefanha-x1.localdomain>
- <CACycT3t-BTMrpNTwBUfbvaxTh6tLthxbo3OJwMk_iuiSpMuZPg@mail.gmail.com> <YOQu8dB6tlb9juNz@stefanha-x1.localdomain>
-In-Reply-To: <YOQu8dB6tlb9juNz@stefanha-x1.localdomain>
+References: <20210615141331.407-1-xieyongji@bytedance.com> <20210615141331.407-10-xieyongji@bytedance.com>
+ <YOVrZtGIEjZZSSoU@stefanha-x1.localdomain>
+In-Reply-To: <YOVrZtGIEjZZSSoU@stefanha-x1.localdomain>
 From:   Yongji Xie <xieyongji@bytedance.com>
-Date:   Wed, 7 Jul 2021 17:09:13 +0800
-Message-ID: <CACycT3t=V-VV7LYDda8mt=QxN_Ay-N+3dgWp382TObkeei9MOg@mail.gmail.com>
-Subject: Re: [PATCH v8 10/10] Documentation: Add documentation for VDUSE
+Date:   Wed, 7 Jul 2021 17:19:35 +0800
+Message-ID: <CACycT3tvvMpsjmJGhY5duNCXt5YyyWqQ2MpxRuMKQwmtpgF0Aw@mail.gmail.com>
+Subject: Re: [PATCH v8 09/10] vduse: Introduce VDUSE - vDPA Device in Userspace
 To:     Stefan Hajnoczi <stefanha@redhat.com>
-Cc:     Jason Wang <jasowang@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
+Cc:     "Michael S. Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
         Stefano Garzarella <sgarzare@redhat.com>,
         Parav Pandit <parav@nvidia.com>,
         Christoph Hellwig <hch@infradead.org>,
@@ -75,113 +71,52 @@ Cc:     Jason Wang <jasowang@redhat.com>,
         linux-fsdevel@vger.kernel.org, iommu@lists.linux-foundation.org,
         linux-kernel <linux-kernel@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jul 6, 2021 at 6:22 PM Stefan Hajnoczi <stefanha@redhat.com> wrote:
+On Wed, Jul 7, 2021 at 4:53 PM Stefan Hajnoczi <stefanha@redhat.com> wrote:
 >
-> On Tue, Jul 06, 2021 at 11:04:18AM +0800, Yongji Xie wrote:
-> > On Mon, Jul 5, 2021 at 8:50 PM Stefan Hajnoczi <stefanha@redhat.com> wr=
-ote:
-> > >
-> > > On Mon, Jul 05, 2021 at 11:36:15AM +0800, Jason Wang wrote:
-> > > >
-> > > > =E5=9C=A8 2021/7/4 =E4=B8=8B=E5=8D=885:49, Yongji Xie =E5=86=99=E9=
-=81=93:
-> > > > > > > OK, I get you now. Since the VIRTIO specification says "Devic=
-e
-> > > > > > > configuration space is generally used for rarely-changing or
-> > > > > > > initialization-time parameters". I assume the VDUSE_DEV_SET_C=
-ONFIG
-> > > > > > > ioctl should not be called frequently.
-> > > > > > The spec uses MUST and other terms to define the precise requir=
-ements.
-> > > > > > Here the language (especially the word "generally") is weaker a=
-nd means
-> > > > > > there may be exceptions.
-> > > > > >
-> > > > > > Another type of access that doesn't work with the VDUSE_DEV_SET=
-_CONFIG
-> > > > > > approach is reads that have side-effects. For example, imagine =
-a field
-> > > > > > containing an error code if the device encounters a problem unr=
-elated to
-> > > > > > a specific virtqueue request. Reading from this field resets th=
-e error
-> > > > > > code to 0, saving the driver an extra configuration space write=
- access
-> > > > > > and possibly race conditions. It isn't possible to implement th=
-ose
-> > > > > > semantics suing VDUSE_DEV_SET_CONFIG. It's another corner case,=
- but it
-> > > > > > makes me think that the interface does not allow full VIRTIO se=
-mantics.
-> > > >
-> > > >
-> > > > Note that though you're correct, my understanding is that config sp=
-ace is
-> > > > not suitable for this kind of error propagating. And it would be ve=
-ry hard
-> > > > to implement such kind of semantic in some transports.  Virtqueue s=
-hould be
-> > > > much better. As Yong Ji quoted, the config space is used for
-> > > > "rarely-changing or intialization-time parameters".
-> > > >
-> > > >
-> > > > > Agreed. I will use VDUSE_DEV_GET_CONFIG in the next version. And =
-to
-> > > > > handle the message failure, I'm going to add a return value to
-> > > > > virtio_config_ops.get() and virtio_cread_* API so that the error =
-can
-> > > > > be propagated to the virtio device driver. Then the virtio-blk de=
-vice
-> > > > > driver can be modified to handle that.
-> > > > >
-> > > > > Jason and Stefan, what do you think of this way?
-> > >
-> > > Why does VDUSE_DEV_GET_CONFIG need to support an error return value?
-> > >
-> >
-> > We add a timeout and return error in case userspace never replies to
-> > the message.
-> >
-> > > The VIRTIO spec provides no way for the device to report errors from
-> > > config space accesses.
-> > >
-> > > The QEMU virtio-pci implementation returns -1 from invalid
-> > > virtio_config_read*() and silently discards virtio_config_write*()
-> > > accesses.
-> > >
-> > > VDUSE can take the same approach with
-> > > VDUSE_DEV_GET_CONFIG/VDUSE_DEV_SET_CONFIG.
-> > >
-> >
-> > I noticed that virtio_config_read*() only returns -1 when we access a
-> > invalid field. But in the VDUSE case, VDUSE_DEV_GET_CONFIG might fail
-> > when we access a valid field. Not sure if it's ok to silently ignore
-> > this kind of error.
+> On Tue, Jun 15, 2021 at 10:13:30PM +0800, Xie Yongji wrote:
+> > +static bool vduse_validate_config(struct vduse_dev_config *config)
+> > +{
 >
-> That's a good point but it's a general VIRTIO issue. Any device
-> implementation (QEMU userspace, hardware vDPA, etc) can fail, so the
-> VIRTIO specification needs to provide a way for the driver to detect
-> this.
->
-> If userspace violates the contract then VDUSE needs to mark the device
-> broken. QEMU's device emulation does something similar with the
-> vdev->broken flag.
->
-> The VIRTIO Device Status field DEVICE_NEEDS_RESET bit can be set by
-> vDPA/VDUSE to indicate that the device is not operational and must be
-> reset.
+> The name field needs to be NUL terminated?
 >
 
-It might be a solution. But DEVICE_NEEDS_RESET  is not implemented
-currently. So I'm thinking whether it's ok to add a check of
-DEVICE_NEEDS_RESET status bit in probe function of virtio device
-driver (e.g. virtio-blk driver). Then VDUSE can make use of it to fail
-device initailization when configuration space access failed.
+I think so.
+
+> > +     case VDUSE_CREATE_DEV: {
+> > +             struct vduse_dev_config config;
+> > +             unsigned long size = offsetof(struct vduse_dev_config, config);
+> > +             void *buf;
+> > +
+> > +             ret = -EFAULT;
+> > +             if (copy_from_user(&config, argp, size))
+> > +                     break;
+> > +
+> > +             ret = -EINVAL;
+> > +             if (vduse_validate_config(&config) == false)
+> > +                     break;
+> > +
+> > +             buf = vmemdup_user(argp + size, config.config_size);
+> > +             if (IS_ERR(buf)) {
+> > +                     ret = PTR_ERR(buf);
+> > +                     break;
+> > +             }
+> > +             ret = vduse_create_dev(&config, buf, control->api_version);
+> > +             break;
+> > +     }
+> > +     case VDUSE_DESTROY_DEV: {
+> > +             char name[VDUSE_NAME_MAX];
+> > +
+> > +             ret = -EFAULT;
+> > +             if (copy_from_user(name, argp, VDUSE_NAME_MAX))
+> > +                     break;
+>
+> Is this missing a NUL terminator?
+
+Oh, yes. Looks like I need to set '\0' to name[VDUSE_VDUSE_NAME_MAX - 1] here.
 
 Thanks,
 Yongji
