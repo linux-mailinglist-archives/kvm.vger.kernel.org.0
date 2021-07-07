@@ -2,203 +2,96 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D1A423BE1D3
-	for <lists+kvm@lfdr.de>; Wed,  7 Jul 2021 06:04:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 44EEC3BE2A6
+	for <lists+kvm@lfdr.de>; Wed,  7 Jul 2021 07:39:07 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230196AbhGGEHT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 7 Jul 2021 00:07:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42380 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230024AbhGGEHS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 7 Jul 2021 00:07:18 -0400
-Received: from mail-ej1-x62b.google.com (mail-ej1-x62b.google.com [IPv6:2a00:1450:4864:20::62b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4B8A5C061760
-        for <kvm@vger.kernel.org>; Tue,  6 Jul 2021 21:04:39 -0700 (PDT)
-Received: by mail-ej1-x62b.google.com with SMTP id bu12so1150377ejb.0
-        for <kvm@vger.kernel.org>; Tue, 06 Jul 2021 21:04:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance-com.20150623.gappssmtp.com; s=20150623;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=6zjpr5a14XdAl8V/dJOqiSPX85IwvcMo+5qs0QumtoU=;
-        b=NcIlXNH6QZfLdl+rOmj0a0sYOVGpIuDw2eaLsZZxns1FcZzHWni5N7x3YZs8xhU0Bg
-         p3L+7Qj/WTQbQU692SWnGKpJCRBD772YbcwGtcrRwjRjhQa7GEp8REi/5yYp+PDc0evH
-         vd5DJiXSrQuyVixRfBeXo7htXkahDOMz/kjaOv+/rsZfHBYOJbyoV0fF28QNeKEsJsvH
-         5VVyJmYRaOtAu+ApBTNbcXtbtwcKwr7TSEoRsUYwmkyyXmZvYBrleo86FA2a+jcohn6u
-         MLDQ3xJFhojpYCsRXRxTYhxZ4UVhpycp0w1pN/nAo5AYlI6pJfkKUJ0/1nYQyixpFN/T
-         UTRQ==
+        id S230240AbhGGFll (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 7 Jul 2021 01:41:41 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:25829 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229717AbhGGFlk (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 7 Jul 2021 01:41:40 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1625636340;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=kGTF9aX4UU8SQB/ux5DynjlqPbikwmwfckJttBuZsBQ=;
+        b=hlvV+6YFBirr9zSO3dcdhyI1VtRMHysCEyWZMrD0QhTeIQhh7uDpWGuY658AqxeI3t5jgc
+        UehPjneZauR2xBx8fpycXEQKzF72F7m06ueh7riX8uSrYlhq/LExO5jMMYhr6zrB2pg3xb
+        lokVmmhA6aP8WAVgdvdRQ4HdWpL8bPk=
+Received: from mail-pj1-f72.google.com (mail-pj1-f72.google.com
+ [209.85.216.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-155-huhq1GmsPZS4hk-Ms5fohw-1; Wed, 07 Jul 2021 01:38:58 -0400
+X-MC-Unique: huhq1GmsPZS4hk-Ms5fohw-1
+Received: by mail-pj1-f72.google.com with SMTP id t5-20020a17090a4485b029016f7fcb8a3dso990557pjg.2
+        for <kvm@vger.kernel.org>; Tue, 06 Jul 2021 22:38:58 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=6zjpr5a14XdAl8V/dJOqiSPX85IwvcMo+5qs0QumtoU=;
-        b=k6ePsWnM3Z+EnOyZ8+uKVq+y1ayWsluLNFEsyST1zqEWPVe94yRdzBcxGqSPVSTpkn
-         JqedTxAZ9d7NJm4cfDBNGKb5cNwbEF5hMsS35U6RgUVdcpH5bJsas4elXPXitKgD9PXO
-         9/j88Dne2mk/qzopmDNqmyY1cGltyywrQUTxWjUbvYFNVscLyWL3JVKFQQLE2xlvhkoY
-         VbyiRTXgTh4GQEHNyzM48cEeJ9uvBQ3dK70YTMr9jeRvtRF6OrWU5IEkZq3zmUqxTPjf
-         OCzJRUgXz3f72cE6CrbrvyVn37wtQm/0S4Bgo0qqvIOcrT5Or2hXjHSU2hv/ZojjP05/
-         LvnA==
-X-Gm-Message-State: AOAM532OxuewThpxhINdulUQBdtn4mwcuxsGCrIeFOfitSdngrqUbs2D
-        YgQFueGywtcsN2tJsC/huf1/u/fMFPEnb7HDr4Xt
-X-Google-Smtp-Source: ABdhPJwodR/9AiC+ds303rzjTtBa597jDG5eURB1M4pjwxtZlg+3fLUQdBFK55hIze2MopS9emr3dsl4e5KrA2LexOc=
-X-Received: by 2002:a17:906:58c7:: with SMTP id e7mr18831497ejs.197.1625630677638;
- Tue, 06 Jul 2021 21:04:37 -0700 (PDT)
-MIME-Version: 1.0
-References: <20210705071910.31965-1-jasowang@redhat.com>
-In-Reply-To: <20210705071910.31965-1-jasowang@redhat.com>
-From:   Yongji Xie <xieyongji@bytedance.com>
-Date:   Wed, 7 Jul 2021 12:04:26 +0800
-Message-ID: <CACycT3tMd750PQ0mgqCjHnxM4RmMcx2+Eo=2RBs2E2W3qPJang@mail.gmail.com>
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-transfer-encoding
+         :content-language;
+        bh=kGTF9aX4UU8SQB/ux5DynjlqPbikwmwfckJttBuZsBQ=;
+        b=Sjy0gSpvslAAol3nArTsTugFtsU7/YHLdg8qQi5Bj0rBA96oCUvA+cZpHpKBC0P6FR
+         6qJEWJiCGPE1GU2h7bnP2Y8SQu1qOmSN4LgiNpPhCfboDW7vGUVTGyvc4ncojQl0NtzV
+         ypYhK08QAMFccik01o0cv7/gxNZ2CiAvQPbcfiRWTj9b+c2g2eB3chPhXH0mwQYqwuvV
+         IPBaDrIRYh8gduaKP3Ms4SyHfr2p3ROQZU0qctYekxjduiaxZtnkzt+TgxWRZOuGZ5r0
+         TuJkXqsnMjT0QYMmCUPOwVf5BRF/QpUNBldiZEtRp1UGNRVM4dCSLkyu/DnSF0IOw+G4
+         lwug==
+X-Gm-Message-State: AOAM531pyHv0IE3ZWXZlac/Sbkm/uCB3NaWGiraNtw4lA/5rkQflgNeV
+        WmgnEcA3K/OwtMNhU0oBlV8E+qmUqYUDiXRx6is/myLxdFHwus5CsDSOiZ9HBOrdQcHNgTf+gM/
+        cgjtOSmodx0tc
+X-Received: by 2002:a63:d709:: with SMTP id d9mr24915995pgg.337.1625636337942;
+        Tue, 06 Jul 2021 22:38:57 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwdcAYzPe9Td2iDIGFQQSaewh4hvbPDcFQ56fjCZjz8xFGYhjP3HXr2pwcyE40/rv2oyxP9Dg==
+X-Received: by 2002:a63:d709:: with SMTP id d9mr24915987pgg.337.1625636337752;
+        Tue, 06 Jul 2021 22:38:57 -0700 (PDT)
+Received: from wangxiaodeMacBook-Air.local ([209.132.188.80])
+        by smtp.gmail.com with ESMTPSA id pj4sm4703749pjb.18.2021.07.06.22.38.54
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 06 Jul 2021 22:38:57 -0700 (PDT)
 Subject: Re: [PATCH 1/2] vdpa: support per virtqueue max queue size
-To:     Jason Wang <jasowang@redhat.com>
+To:     Yongji Xie <xieyongji@bytedance.com>
 Cc:     "Michael S. Tsirkin" <mst@redhat.com>,
         virtualization <virtualization@lists.linux-foundation.org>,
         linux-kernel <linux-kernel@vger.kernel.org>,
         kvm <kvm@vger.kernel.org>, netdev@vger.kernel.org,
         Stefan Hajnoczi <stefanha@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
+References: <20210705071910.31965-1-jasowang@redhat.com>
+ <CACycT3tMd750PQ0mgqCjHnxM4RmMcx2+Eo=2RBs2E2W3qPJang@mail.gmail.com>
+From:   Jason Wang <jasowang@redhat.com>
+Message-ID: <f655025b-5db4-a146-ff85-a211576e29af@redhat.com>
+Date:   Wed, 7 Jul 2021 13:38:52 +0800
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0)
+ Gecko/20100101 Thunderbird/78.11.0
+MIME-Version: 1.0
+In-Reply-To: <CACycT3tMd750PQ0mgqCjHnxM4RmMcx2+Eo=2RBs2E2W3qPJang@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Jul 5, 2021 at 3:19 PM Jason Wang <jasowang@redhat.com> wrote:
->
-> Virtio spec allows the device to specify the per virtqueue max queue
-> size. vDPA needs to adapt to this flexibility. E.g Qemu advertise a
-> small control virtqueue for virtio-net.
->
-> So this patch adds a index parameter to get_vq_num_max bus operations
-> for the device to report its per virtqueue max queue size.
->
-> Both VHOST_VDPA_GET_VRING_NUM and VDPA_ATTR_DEV_MAX_VQ_SIZE assume a
-> global maximum size. So we iterate all the virtqueues to return the
-> minimal size in this case. Actually, the VHOST_VDPA_GET_VRING_NUM is
-> not a must for the userspace. Userspace may choose to check the
-> VHOST_SET_VRING_NUM for proving or validating the maximum virtqueue
-> size. Anyway, we can invent a per vq version of
-> VHOST_VDPA_GET_VRING_NUM in the future if it's necessary.
->
-> Signed-off-by: Jason Wang <jasowang@redhat.com>
-> ---
->  drivers/vdpa/ifcvf/ifcvf_main.c   |  2 +-
->  drivers/vdpa/mlx5/net/mlx5_vnet.c |  2 +-
->  drivers/vdpa/vdpa.c               | 22 +++++++++++++++++++++-
->  drivers/vdpa/vdpa_sim/vdpa_sim.c  |  2 +-
->  drivers/vdpa/virtio_pci/vp_vdpa.c |  2 +-
->  drivers/vhost/vdpa.c              |  9 ++++++---
->  drivers/virtio/virtio_vdpa.c      |  2 +-
->  include/linux/vdpa.h              |  5 ++++-
->  8 files changed, 36 insertions(+), 10 deletions(-)
->
-> diff --git a/drivers/vdpa/ifcvf/ifcvf_main.c b/drivers/vdpa/ifcvf/ifcvf_main.c
-> index ab0ab5cf0f6e..646b340db2af 100644
-> --- a/drivers/vdpa/ifcvf/ifcvf_main.c
-> +++ b/drivers/vdpa/ifcvf/ifcvf_main.c
-> @@ -254,7 +254,7 @@ static void ifcvf_vdpa_set_status(struct vdpa_device *vdpa_dev, u8 status)
->         ifcvf_set_status(vf, status);
->  }
->
-> -static u16 ifcvf_vdpa_get_vq_num_max(struct vdpa_device *vdpa_dev)
-> +static u16 ifcvf_vdpa_get_vq_num_max(struct vdpa_device *vdpa_dev, u16 qid)
->  {
->         return IFCVF_QUEUE_MAX;
->  }
-> diff --git a/drivers/vdpa/mlx5/net/mlx5_vnet.c b/drivers/vdpa/mlx5/net/mlx5_vnet.c
-> index dda5dc6f7737..afd6114d07b0 100644
-> --- a/drivers/vdpa/mlx5/net/mlx5_vnet.c
-> +++ b/drivers/vdpa/mlx5/net/mlx5_vnet.c
-> @@ -1584,7 +1584,7 @@ static void mlx5_vdpa_set_config_cb(struct vdpa_device *vdev, struct vdpa_callba
->  }
->
->  #define MLX5_VDPA_MAX_VQ_ENTRIES 256
-> -static u16 mlx5_vdpa_get_vq_num_max(struct vdpa_device *vdev)
-> +static u16 mlx5_vdpa_get_vq_num_max(struct vdpa_device *vdev, u16 idx)
->  {
->         return MLX5_VDPA_MAX_VQ_ENTRIES;
->  }
-> diff --git a/drivers/vdpa/vdpa.c b/drivers/vdpa/vdpa.c
-> index bb3f1d1f0422..d77d59811389 100644
-> --- a/drivers/vdpa/vdpa.c
-> +++ b/drivers/vdpa/vdpa.c
-> @@ -239,6 +239,26 @@ void vdpa_unregister_driver(struct vdpa_driver *drv)
->  }
->  EXPORT_SYMBOL_GPL(vdpa_unregister_driver);
->
-> +/**
-> + * vdpa_get_vq_num_max - get the maximum virtqueue size
-> + * @vdev: vdpa device
-> + */
-> +u16 vdpa_get_vq_num_max(struct vdpa_device *vdev)
-> +{
-> +       const struct vdpa_config_ops *ops = vdev->config;
-> +       u16 s, size = ops->get_vq_num_max(vdev, 0);
-> +       int i;
-> +
-> +       for (i = 1; i < vdev->nvqs; i++) {
-> +               s = ops->get_vq_num_max(vdev, i);
-> +               if (s && s < size)
-> +                       size = s;
-> +       }
-> +
-> +       return size;
-> +}
-> +EXPORT_SYMBOL_GPL(vdpa_get_vq_num_max);
-> +
->  /**
->   * vdpa_mgmtdev_register - register a vdpa management device
->   *
-> @@ -502,7 +522,7 @@ vdpa_dev_fill(struct vdpa_device *vdev, struct sk_buff *msg, u32 portid, u32 seq
->
->         device_id = vdev->config->get_device_id(vdev);
->         vendor_id = vdev->config->get_vendor_id(vdev);
-> -       max_vq_size = vdev->config->get_vq_num_max(vdev);
-> +       max_vq_size = vdpa_get_vq_num_max(vdev);
->
->         err = -EMSGSIZE;
->         if (nla_put_string(msg, VDPA_ATTR_DEV_NAME, dev_name(&vdev->dev)))
-> diff --git a/drivers/vdpa/vdpa_sim/vdpa_sim.c b/drivers/vdpa/vdpa_sim/vdpa_sim.c
-> index 98f793bc9376..49e29056f164 100644
-> --- a/drivers/vdpa/vdpa_sim/vdpa_sim.c
-> +++ b/drivers/vdpa/vdpa_sim/vdpa_sim.c
-> @@ -422,7 +422,7 @@ static void vdpasim_set_config_cb(struct vdpa_device *vdpa,
->         /* We don't support config interrupt */
->  }
->
-> -static u16 vdpasim_get_vq_num_max(struct vdpa_device *vdpa)
-> +static u16 vdpasim_get_vq_num_max(struct vdpa_device *vdpa, u16 idx)
->  {
->         return VDPASIM_QUEUE_MAX;
->  }
-> diff --git a/drivers/vdpa/virtio_pci/vp_vdpa.c b/drivers/vdpa/virtio_pci/vp_vdpa.c
-> index c76ebb531212..2926641fb586 100644
-> --- a/drivers/vdpa/virtio_pci/vp_vdpa.c
-> +++ b/drivers/vdpa/virtio_pci/vp_vdpa.c
-> @@ -195,7 +195,7 @@ static void vp_vdpa_set_status(struct vdpa_device *vdpa, u8 status)
->                 vp_vdpa_free_irq(vp_vdpa);
->  }
->
-> -static u16 vp_vdpa_get_vq_num_max(struct vdpa_device *vdpa)
-> +static u16 vp_vdpa_get_vq_num_max(struct vdpa_device *vdpa, u16 qid)
->  {
->         return VP_VDPA_QUEUE_MAX;
->  }
-> diff --git a/drivers/vhost/vdpa.c b/drivers/vhost/vdpa.c
-> index fb41db3da611..c9ec395b8c42 100644
-> --- a/drivers/vhost/vdpa.c
-> +++ b/drivers/vhost/vdpa.c
-> @@ -289,11 +289,14 @@ static long vhost_vdpa_set_features(struct vhost_vdpa *v, u64 __user *featurep)
->
->  static long vhost_vdpa_get_vring_num(struct vhost_vdpa *v, u16 __user *argp)
->  {
-> -       struct vdpa_device *vdpa = v->vdpa;
-> -       const struct vdpa_config_ops *ops = vdpa->config;
->         u16 num;
->
-> -       num = ops->get_vq_num_max(vdpa);
-> +       /*
-> +        * VHOST_VDPA_GET_VRING_NUM asssumes a global max virtqueue
 
-s/asssumes/assumes. Other looks good to me.
+在 2021/7/7 下午12:04, Yongji Xie 写道:
+>>   static long vhost_vdpa_get_vring_num(struct vhost_vdpa *v, u16 __user *argp)
+>>   {
+>> -       struct vdpa_device *vdpa = v->vdpa;
+>> -       const struct vdpa_config_ops *ops = vdpa->config;
+>>          u16 num;
+>>
+>> -       num = ops->get_vq_num_max(vdpa);
+>> +       /*
+>> +        * VHOST_VDPA_GET_VRING_NUM asssumes a global max virtqueue
+> s/asssumes/assumes. Other looks good to me.
+>
+> Thanks,
+> Yongji
+>
 
-Thanks,
-Yongji
+Will fix.
+
+Thanks
+
