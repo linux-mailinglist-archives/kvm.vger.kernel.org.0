@@ -2,130 +2,186 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 27B613BE4DA
-	for <lists+kvm@lfdr.de>; Wed,  7 Jul 2021 10:59:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 077A33BE553
+	for <lists+kvm@lfdr.de>; Wed,  7 Jul 2021 11:09:29 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231145AbhGGJCR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 7 Jul 2021 05:02:17 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:36978 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230219AbhGGJCQ (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 7 Jul 2021 05:02:16 -0400
-Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 1678Xi62051132;
-        Wed, 7 Jul 2021 04:59:36 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=QgYglSGD24Lym5FcJPRMfrnEZE2L0FN6CiErNmTmAco=;
- b=bboyrJGneCEHRZDV2mFB6FvhWmTMUsLBXCwzPf7GXBdYtaUZSodMU7tmfaXcG9WPBKW5
- /eRYHSWp1mWPcPLESdQ8M2/3ByHg87DmW1nv59MPSfS2wrf+m0EJy8NRqlOTFHNDVA+U
- GHHAp2RYt8BIGV6HUMy9V18htw6pjQz7rxSyzJz2NfvjceosnDYAUxboTkHMA23UEvXK
- sUrCNRxffhQlK42SucRIKvCOrVb+GG8x8oEztSvhQnQp41Udvi7oc5NWpmiXFEU2ovT4
- dCX1FXuUsERyfxx2YL6O3BXJs2L9ioHAdIR6U/unu+PUqVzNuP383OP26NljzCTYhi7p 9w== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 39n28j9gpm-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 07 Jul 2021 04:59:36 -0400
-Received: from m0098399.ppops.net (m0098399.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 1678Y0nn052129;
-        Wed, 7 Jul 2021 04:59:36 -0400
-Received: from ppma05fra.de.ibm.com (6c.4a.5195.ip4.static.sl-reverse.com [149.81.74.108])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 39n28j9gp3-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 07 Jul 2021 04:59:35 -0400
-Received: from pps.filterd (ppma05fra.de.ibm.com [127.0.0.1])
-        by ppma05fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 1678v9SF006523;
-        Wed, 7 Jul 2021 08:59:33 GMT
-Received: from b06cxnps4075.portsmouth.uk.ibm.com (d06relay12.portsmouth.uk.ibm.com [9.149.109.197])
-        by ppma05fra.de.ibm.com with ESMTP id 39jfh8gvr7-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 07 Jul 2021 08:59:33 +0000
-Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
-        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 1678xUY326345802
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 7 Jul 2021 08:59:30 GMT
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 3AA7BAE06A;
-        Wed,  7 Jul 2021 08:59:30 +0000 (GMT)
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id A5F14AE075;
-        Wed,  7 Jul 2021 08:59:29 +0000 (GMT)
-Received: from oc7455500831.ibm.com (unknown [9.171.89.68])
-        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Wed,  7 Jul 2021 08:59:29 +0000 (GMT)
-Subject: Re: [PATCH] KVM: s390: Enable specification exception interpretation
-To:     Janis Schoetterl-Glausch <scgl@linux.vnet.ibm.com>,
-        Janis Schoetterl-Glausch <scgl@linux.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>
-Cc:     David Hildenbrand <david@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        "open list:KERNEL VIRTUAL MACHINE for s390 (KVM/s390)" 
-        <kvm@vger.kernel.org>,
-        "open list:S390" <linux-s390@vger.kernel.org>,
-        open list <linux-kernel@vger.kernel.org>
-References: <20210706114714.3936825-1-scgl@linux.ibm.com>
- <05430c91-6a84-0fc9-0af4-89f408eb691f@de.ibm.com>
- <c61223e4-0076-18c1-64bd-8ba899e91eb4@linux.vnet.ibm.com>
-From:   Christian Borntraeger <borntraeger@de.ibm.com>
-Message-ID: <a2e3484a-34af-0bab-2fb3-b22a69361807@de.ibm.com>
-Date:   Wed, 7 Jul 2021 10:59:29 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.11.0
+        id S231569AbhGGJMH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 7 Jul 2021 05:12:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53486 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231549AbhGGJMG (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 7 Jul 2021 05:12:06 -0400
+Received: from mail-ed1-x529.google.com (mail-ed1-x529.google.com [IPv6:2a00:1450:4864:20::529])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2B571C06175F
+        for <kvm@vger.kernel.org>; Wed,  7 Jul 2021 02:09:26 -0700 (PDT)
+Received: by mail-ed1-x529.google.com with SMTP id v1so2449003edt.6
+        for <kvm@vger.kernel.org>; Wed, 07 Jul 2021 02:09:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=bytedance-com.20150623.gappssmtp.com; s=20150623;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=FtdRj0uqhbWYJv1fXc78UI5Oym+NbdH9ODlpZg+9HZI=;
+        b=UP2gxo7E+OXts94W4XG8ov25acIgy16F7Xuv5WNUryBRLvnB1SUdOumUACfAPoJmFS
+         52RE8R7P3qzg1tarx6KjKAKEHb0Dj5puUCLSt4CliZJpugu/J1PeSwvG09Sv8SfFplGU
+         DBap5eLBxTmFKW9K2PAgbKQ4UW5jIafViUeCgIHHk0GQV9Tv4AoOXsa2pQcvvdtk0UEk
+         qzg8jcE6bFOHgPnYLfHRZZTw0XzS/1JMmDSF7Xh2WYY8wHkQJK4LhvVclPWJCWFgWaoK
+         6TQcVcEEhAqleM8ofZK+PMsZBBDsQDwSyML/MSyfSeinKDg97GhQwRNlPXflVJHElUst
+         mqKA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=FtdRj0uqhbWYJv1fXc78UI5Oym+NbdH9ODlpZg+9HZI=;
+        b=bT1C+6UF7+j32CCxQz4DtaKV85JBgeWlJHGJkllBInNYPrra5XjzAL/BW+x2vUnZeq
+         NgZjtNieZxC4f3pzfjJ5nZiEmo0Qddnokhm/xb8tEAI7DL+zyo2UomuqMQ2+TpfQFJmB
+         G1kNbY6jjWEMY1fsD9zXxiv/r0B8B1SZtv2HO9vkpOLs7sDJwv4ZWnCamSntPfnRW7UE
+         k5/OV2LNs4nNRp6O3xvplvvMdQk7Dztte2QjlSXAaokrqKSxiSsdFzWy38WRvAzOi1CW
+         SHjOA71aAMu1X5FcRdSHc2t0OU0d0qDmk0ob99LuPqrGxXqTAB27PAUK/aQldSCqoJWo
+         B6ig==
+X-Gm-Message-State: AOAM532xlpvqPtjlwPQAVVXpwIEk+8N0PsCVVlS5xHwEhmaaca1UIV2U
+        aAy4lp8tTeX5K2lmvHTQGOQfy2zNiqAy1VOCEm97
+X-Google-Smtp-Source: ABdhPJwtLvo0kWOr3LJJHVAL2cWB4hYaaS7KjefICks1FsWVhmQrnAQXN0teABT1P1UQsj+keI5UW3/FiAWPPwjYY38=
+X-Received: by 2002:a05:6402:31ae:: with SMTP id dj14mr23195138edb.145.1625648964822;
+ Wed, 07 Jul 2021 02:09:24 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <c61223e4-0076-18c1-64bd-8ba899e91eb4@linux.vnet.ibm.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: XiT2ViL0tcCvvtdlW1Ov_7g-1PF_Ks8G
-X-Proofpoint-ORIG-GUID: cktgOo6vzzu3BV6wCwqJK--5ejhcKKLc
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.790
- definitions=2021-07-07_05:2021-07-06,2021-07-07 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0 mlxscore=0
- bulkscore=0 spamscore=0 adultscore=0 priorityscore=1501 impostorscore=0
- suspectscore=0 phishscore=0 malwarescore=0 clxscore=1015 mlxlogscore=999
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2104190000
- definitions=main-2107070050
+References: <20210615141331.407-11-xieyongji@bytedance.com>
+ <YNSCH6l31zwPxBjL@stefanha-x1.localdomain> <CACycT3uxnQmXWsgmNVxQtiRhz1UXXTAJFY3OiAJqokbJH6ifMA@mail.gmail.com>
+ <YNxCDpM3bO5cPjqi@stefanha-x1.localdomain> <CACycT3taKhf1cWp3Jd0aSVekAZvpbR-_fkyPLQ=B+jZBB5H=8Q@mail.gmail.com>
+ <YN3ABqCMLQf7ejOm@stefanha-x1.localdomain> <CACycT3vo-diHgTSLw_FS2E+5ia5VjihE3qw7JmZR7JT55P-wQA@mail.gmail.com>
+ <8320d26d-6637-85c6-8773-49553dfa502d@redhat.com> <YOL/9mxkJaokKDHc@stefanha-x1.localdomain>
+ <CACycT3t-BTMrpNTwBUfbvaxTh6tLthxbo3OJwMk_iuiSpMuZPg@mail.gmail.com> <YOQu8dB6tlb9juNz@stefanha-x1.localdomain>
+In-Reply-To: <YOQu8dB6tlb9juNz@stefanha-x1.localdomain>
+From:   Yongji Xie <xieyongji@bytedance.com>
+Date:   Wed, 7 Jul 2021 17:09:13 +0800
+Message-ID: <CACycT3t=V-VV7LYDda8mt=QxN_Ay-N+3dgWp382TObkeei9MOg@mail.gmail.com>
+Subject: Re: [PATCH v8 10/10] Documentation: Add documentation for VDUSE
+To:     Stefan Hajnoczi <stefanha@redhat.com>
+Cc:     Jason Wang <jasowang@redhat.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Stefano Garzarella <sgarzare@redhat.com>,
+        Parav Pandit <parav@nvidia.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Christian Brauner <christian.brauner@canonical.com>,
+        Randy Dunlap <rdunlap@infradead.org>,
+        Matthew Wilcox <willy@infradead.org>,
+        Al Viro <viro@zeniv.linux.org.uk>,
+        Jens Axboe <axboe@kernel.dk>, bcrl@kvack.org,
+        Jonathan Corbet <corbet@lwn.net>,
+        =?UTF-8?Q?Mika_Penttil=C3=A4?= <mika.penttila@nextfour.com>,
+        Dan Carpenter <dan.carpenter@oracle.com>, joro@8bytes.org,
+        Greg KH <gregkh@linuxfoundation.org>, songmuchun@bytedance.com,
+        virtualization <virtualization@lists.linux-foundation.org>,
+        netdev@vger.kernel.org, kvm <kvm@vger.kernel.org>,
+        linux-fsdevel@vger.kernel.org, iommu@lists.linux-foundation.org,
+        linux-kernel <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Tue, Jul 6, 2021 at 6:22 PM Stefan Hajnoczi <stefanha@redhat.com> wrote:
+>
+> On Tue, Jul 06, 2021 at 11:04:18AM +0800, Yongji Xie wrote:
+> > On Mon, Jul 5, 2021 at 8:50 PM Stefan Hajnoczi <stefanha@redhat.com> wr=
+ote:
+> > >
+> > > On Mon, Jul 05, 2021 at 11:36:15AM +0800, Jason Wang wrote:
+> > > >
+> > > > =E5=9C=A8 2021/7/4 =E4=B8=8B=E5=8D=885:49, Yongji Xie =E5=86=99=E9=
+=81=93:
+> > > > > > > OK, I get you now. Since the VIRTIO specification says "Devic=
+e
+> > > > > > > configuration space is generally used for rarely-changing or
+> > > > > > > initialization-time parameters". I assume the VDUSE_DEV_SET_C=
+ONFIG
+> > > > > > > ioctl should not be called frequently.
+> > > > > > The spec uses MUST and other terms to define the precise requir=
+ements.
+> > > > > > Here the language (especially the word "generally") is weaker a=
+nd means
+> > > > > > there may be exceptions.
+> > > > > >
+> > > > > > Another type of access that doesn't work with the VDUSE_DEV_SET=
+_CONFIG
+> > > > > > approach is reads that have side-effects. For example, imagine =
+a field
+> > > > > > containing an error code if the device encounters a problem unr=
+elated to
+> > > > > > a specific virtqueue request. Reading from this field resets th=
+e error
+> > > > > > code to 0, saving the driver an extra configuration space write=
+ access
+> > > > > > and possibly race conditions. It isn't possible to implement th=
+ose
+> > > > > > semantics suing VDUSE_DEV_SET_CONFIG. It's another corner case,=
+ but it
+> > > > > > makes me think that the interface does not allow full VIRTIO se=
+mantics.
+> > > >
+> > > >
+> > > > Note that though you're correct, my understanding is that config sp=
+ace is
+> > > > not suitable for this kind of error propagating. And it would be ve=
+ry hard
+> > > > to implement such kind of semantic in some transports.  Virtqueue s=
+hould be
+> > > > much better. As Yong Ji quoted, the config space is used for
+> > > > "rarely-changing or intialization-time parameters".
+> > > >
+> > > >
+> > > > > Agreed. I will use VDUSE_DEV_GET_CONFIG in the next version. And =
+to
+> > > > > handle the message failure, I'm going to add a return value to
+> > > > > virtio_config_ops.get() and virtio_cread_* API so that the error =
+can
+> > > > > be propagated to the virtio device driver. Then the virtio-blk de=
+vice
+> > > > > driver can be modified to handle that.
+> > > > >
+> > > > > Jason and Stefan, what do you think of this way?
+> > >
+> > > Why does VDUSE_DEV_GET_CONFIG need to support an error return value?
+> > >
+> >
+> > We add a timeout and return error in case userspace never replies to
+> > the message.
+> >
+> > > The VIRTIO spec provides no way for the device to report errors from
+> > > config space accesses.
+> > >
+> > > The QEMU virtio-pci implementation returns -1 from invalid
+> > > virtio_config_read*() and silently discards virtio_config_write*()
+> > > accesses.
+> > >
+> > > VDUSE can take the same approach with
+> > > VDUSE_DEV_GET_CONFIG/VDUSE_DEV_SET_CONFIG.
+> > >
+> >
+> > I noticed that virtio_config_read*() only returns -1 when we access a
+> > invalid field. But in the VDUSE case, VDUSE_DEV_GET_CONFIG might fail
+> > when we access a valid field. Not sure if it's ok to silently ignore
+> > this kind of error.
+>
+> That's a good point but it's a general VIRTIO issue. Any device
+> implementation (QEMU userspace, hardware vDPA, etc) can fail, so the
+> VIRTIO specification needs to provide a way for the driver to detect
+> this.
+>
+> If userspace violates the contract then VDUSE needs to mark the device
+> broken. QEMU's device emulation does something similar with the
+> vdev->broken flag.
+>
+> The VIRTIO Device Status field DEVICE_NEEDS_RESET bit can be set by
+> vDPA/VDUSE to indicate that the device is not operational and must be
+> reset.
+>
 
+It might be a solution. But DEVICE_NEEDS_RESET  is not implemented
+currently. So I'm thinking whether it's ok to add a check of
+DEVICE_NEEDS_RESET status bit in probe function of virtio device
+driver (e.g. virtio-blk driver). Then VDUSE can make use of it to fail
+device initailization when configuration space access failed.
 
-On 07.07.21 10:56, Janis Schoetterl-Glausch wrote:
-> On 7/7/21 10:30 AM, Christian Borntraeger wrote:
->>
->>
->> On 06.07.21 13:47, Janis Schoetterl-Glausch wrote:
->>> When this feature is enabled the hardware is free to interpret
->>> specification exceptions generated by the guest, instead of causing
->>> program interruption interceptions.
->>>
->>> This benefits (test) programs that generate a lot of specification
->>> exceptions (roughly 4x increase in exceptions/sec).
->>>
->>> Interceptions will occur as before if ICTL_PINT is set,
->>> i.e. if guest debug is enabled.
->>
->> I think I will add
->>
->> There is no indication if this feature is available or not and the hardware
->> is free to interpret or not. So we can simply set this bit and if the
->> hardware ignores it we fall back to intercept 8 handling.
-> 
-> Might also mention vSIE and/or incorporate into first paragraph:
-> 
-> When this feature is enabled the hardware is free to interpret
-> specification exceptions generated by the guest, instead of causing
-> program interruption interceptions, but it is not required to.
-> There is no indication if this feature is available or not,
-> so we can simply set this bit and if the hardware ignores it
-> we fall back to intercept 8 handling.
-> The same applies to vSIE, we forward the guest hypervisor's bit
-> and fall back to injection if interpretation does not occur.
-
-Can you maybe resend a v2 with all comments (and RBs) added?
+Thanks,
+Yongji
