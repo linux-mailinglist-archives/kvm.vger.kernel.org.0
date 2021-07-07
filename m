@@ -2,136 +2,264 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 76CB03BE603
-	for <lists+kvm@lfdr.de>; Wed,  7 Jul 2021 11:55:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8C7AB3BE62B
+	for <lists+kvm@lfdr.de>; Wed,  7 Jul 2021 12:10:27 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231194AbhGGJ6F (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 7 Jul 2021 05:58:05 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:11194 "EHLO
-        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230150AbhGGJ6F (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 7 Jul 2021 05:58:05 -0400
-Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 1679ZCtk189338;
-        Wed, 7 Jul 2021 05:55:24 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=jDXQsTaa+lxcNJEXAJ8od+lGjnZDTHZfKWbXITHOyPI=;
- b=TYTIOcKcPYsspDqZCVOLHwzSUOe2rSHoG+xYt6dpWKFDVsu/Cn8/q7pnZ/0WgEXhIT1r
- fti+FEcNep76korOdGvLQF7zuQrUw3hNmGR6TTb2SEWoDaZ+nTTbEA6D3T9K4dOIWkt4
- xYpR8Moac6t+3l2pQjhFKNfcuiDcp++iQ9fWlBpUJGRnyreA5qz5/6zIgjVLRG3Syb03
- co9n1uPPjTIMgZ9z3WP4izKKOocuuLQjUQXOl8ER42d1D/34jXK6ppJ0u92TYXpDHdaZ
- c+KKJ9gDnOLcXeiMxY3uAH4ClhlF5VWduYj4nIEpLIlw/7egAVKIR1qQg5K418ZcdN0j 1g== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 39mm669hb2-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 07 Jul 2021 05:55:24 -0400
-Received: from m0127361.ppops.net (m0127361.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 1679aa6p193816;
-        Wed, 7 Jul 2021 05:55:23 -0400
-Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 39mm669haj-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 07 Jul 2021 05:55:23 -0400
-Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
-        by ppma04ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 1679rSKV011996;
-        Wed, 7 Jul 2021 09:55:22 GMT
-Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
-        by ppma04ams.nl.ibm.com with ESMTP id 39jfh8sp73-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 07 Jul 2021 09:55:21 +0000
-Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
-        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 1679rODZ12124602
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 7 Jul 2021 09:53:24 GMT
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id C4DF9AE05A;
-        Wed,  7 Jul 2021 09:55:18 +0000 (GMT)
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 51BECAE053;
-        Wed,  7 Jul 2021 09:55:18 +0000 (GMT)
-Received: from li-7e0de7cc-2d9d-11b2-a85c-de26c016e5ad.ibm.com (unknown [9.171.25.185])
-        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Wed,  7 Jul 2021 09:55:18 +0000 (GMT)
-Subject: Re: [PATCH] KVM: s390: Enable specification exception interpretation
-To:     Cornelia Huck <cohuck@redhat.com>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Janis Schoetterl-Glausch <scgl@linux.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>
-Cc:     David Hildenbrand <david@redhat.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        "open list:KERNEL VIRTUAL MACHINE for s390 (KVM/s390)" 
-        <kvm@vger.kernel.org>,
-        "open list:S390" <linux-s390@vger.kernel.org>,
-        open list <linux-kernel@vger.kernel.org>
-References: <20210706114714.3936825-1-scgl@linux.ibm.com>
- <05430c91-6a84-0fc9-0af4-89f408eb691f@de.ibm.com> <87lf6ifqs5.fsf@redhat.com>
-From:   Janis Schoetterl-Glausch <scgl@linux.vnet.ibm.com>
-Message-ID: <243a5476-153f-8d4b-7e0a-bb291010a3bd@linux.vnet.ibm.com>
-Date:   Wed, 7 Jul 2021 11:55:18 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.11.0
+        id S231137AbhGGKNG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 7 Jul 2021 06:13:06 -0400
+Received: from forward4-smtp.messagingengine.com ([66.111.4.238]:46111 "EHLO
+        forward4-smtp.messagingengine.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229949AbhGGKNG (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 7 Jul 2021 06:13:06 -0400
+Received: from compute4.internal (compute4.nyi.internal [10.202.2.44])
+        by mailforward.nyi.internal (Postfix) with ESMTP id C6B031940A95;
+        Wed,  7 Jul 2021 06:10:24 -0400 (EDT)
+Received: from mailfrontend2 ([10.202.2.163])
+  by compute4.internal (MEProxy); Wed, 07 Jul 2021 06:10:24 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+        messagingengine.com; h=cc:content-type:date:from:in-reply-to
+        :message-id:mime-version:references:subject:to:x-me-proxy
+        :x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; bh=4WFZkI
+        qFucvxApFj10Psye5LSKg2fXRNlu/SJZTJ6Ws=; b=WMrXGTYFDiKAuUUWbEfH+v
+        zxGWvHtFEZoe+xvOUtB/W2K7vJBRGzUTS3CwqavSdhnRyr/g0qvU1/rzSKZ0aJGB
+        WXgxiIZNyVr6OP2vqI4gy5lh6pyjFT+FKhaGBLFUw2/spwVDUG2D1wdMVT+z7RRN
+        m3dv2U+Ucpx1EYSTw4bKqZtMiCzX8g2z/fU1c3kDWeOn0OXr5kqrrOiREdlAwM3H
+        rY2KWiqAJelR/Ts2MqM/D0wfABQFIPK598VP6kXadxS53EM2DUH7B2f1baMYaDh6
+        mLeU6dHkB5iulimIzPD9ZV7PstTBXNoBco5d1cHMUnCtWHOh0Akw1XPRqiV08wtA
+        ==
+X-ME-Sender: <xms:kH3lYNczy8Rmnr92EN3NifG5X48Rog3Xm9pzF0B90p2IbWJwpTMxlg>
+    <xme:kH3lYLNYQt8LENRYiS9cZofsxhEsauMoTUTK_kJB7fAZCfITJ-DLJ2-4d8I9bg1k-
+    AyWttkypfwYmON6rSc>
+X-ME-Received: <xmr:kH3lYGjuVKG09eL7XEPDdAWEU7Du_wrvDrNhDA5S2EOfx3f9Gh7nNAc9ZJ_azClXI4BArOjBqhW-s7afdPhiTAXEbdhkrzyuoR6VC0WrU5M>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvtddrtddvgddvgecutefuodetggdotefrodftvf
+    curfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfghnecu
+    uegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenuc
+    fjughrpefvufgjfhfhfffkgggtsehttdertddttddtnecuhfhrohhmpeffrghvihguucfg
+    ughmohhnughsohhnuceoughmvgesughmvgdrohhrgheqnecuggftrfgrthhtvghrnhephf
+    ekgeeutddvgeffffetheejvdejieetgfefgfffudegffffgeduheegteegleeknecuvehl
+    uhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomhepughmvgesughmvg
+    drohhrgh
+X-ME-Proxy: <xmx:kH3lYG9eHjyTum8BgmjTLEGkRgkNUAD8HOnD65FqSbiYBV_RZ7XSMw>
+    <xmx:kH3lYJuzXW4b-Bc1bmFpMTGBZ4pFtCVS5JySFq686rTmLOonTQtXZA>
+    <xmx:kH3lYFFXDasi371bjWJwxdpP5yxzsJlcYSl4r6z3ZNzBgTROBDPkNw>
+    <xmx:kH3lYKli1NMLlsQcgLXp_WRnZF9MPKEuZGR42SKoAMTBYDCZM-LWzQ>
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Wed,
+ 7 Jul 2021 06:10:23 -0400 (EDT)
+Received: from localhost (disaster-area.hh.sledj.net [local])
+        by disaster-area.hh.sledj.net (OpenSMTPD) with ESMTPA id ad53b2bc;
+        Wed, 7 Jul 2021 10:10:21 +0000 (UTC)
+To:     Richard Henderson <richard.henderson@linaro.org>,
+        qemu-devel@nongnu.org
+Cc:     Michael Roth <michael.roth@amd.com>, kvm@vger.kernel.org,
+        Roman Bolshakov <r.bolshakov@yadro.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Marcelo Tosatti <mtosatti@redhat.com>, babu.moger@amd.com,
+        Cameron Esfahani <dirty@apple.com>,
+        Eduardo Habkost <ehabkost@redhat.com>
+Subject: Re: [RFC PATCH 8/8] target/i386: Move X86XSaveArea into TCG
+In-Reply-To: <0d75c3ab-926b-d4cd-244a-8c8b603535f9@linaro.org>
+References: <20210705104632.2902400-1-david.edmondson@oracle.com>
+ <20210705104632.2902400-9-david.edmondson@oracle.com>
+ <0d75c3ab-926b-d4cd-244a-8c8b603535f9@linaro.org>
+X-HGTTG: heart-of-gold
+From:   David Edmondson <dme@dme.org>
+Date:   Wed, 07 Jul 2021 11:10:21 +0100
+Message-ID: <m2czru4epe.fsf@dme.org>
 MIME-Version: 1.0
-In-Reply-To: <87lf6ifqs5.fsf@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: uX1jevWFui0MdAnn8XqlFxNbqbqOAZ8E
-X-Proofpoint-ORIG-GUID: y_RZqFGtdW5l7W9Dhia6sOx50M6SrVrE
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.790
- definitions=2021-07-07_05:2021-07-06,2021-07-07 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0 adultscore=0
- lowpriorityscore=0 spamscore=0 mlxscore=0 priorityscore=1501 phishscore=0
- clxscore=1015 mlxlogscore=999 malwarescore=0 bulkscore=0 suspectscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2104190000
- definitions=main-2107070056
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 7/7/21 10:54 AM, Cornelia Huck wrote:
+On Tuesday, 2021-07-06 at 18:09:42 -07, Richard Henderson wrote:
 
-[...]
+> On 7/5/21 3:46 AM, David Edmondson wrote:
+>> Given that TCG is now the only consumer of X86XSaveArea, move the
+>> structure definition and associated offset declarations and checks to a
+>> TCG specific header.
+>> 
+>> Signed-off-by: David Edmondson <david.edmondson@oracle.com>
+>> ---
+>>   target/i386/cpu.h            | 57 ------------------------------------
+>>   target/i386/tcg/fpu_helper.c |  1 +
+>>   target/i386/tcg/tcg-cpu.h    | 57 ++++++++++++++++++++++++++++++++++++
+>>   3 files changed, 58 insertions(+), 57 deletions(-)
+>> 
+>> diff --git a/target/i386/cpu.h b/target/i386/cpu.h
+>> index 96b672f8bd..0f7ddbfeae 100644
+>> --- a/target/i386/cpu.h
+>> +++ b/target/i386/cpu.h
+>> @@ -1305,48 +1305,6 @@ typedef struct XSavePKRU {
+>>       uint32_t padding;
+>>   } XSavePKRU;
+>>   
+>> -#define XSAVE_FCW_FSW_OFFSET    0x000
+>> -#define XSAVE_FTW_FOP_OFFSET    0x004
+>> -#define XSAVE_CWD_RIP_OFFSET    0x008
+>> -#define XSAVE_CWD_RDP_OFFSET    0x010
+>> -#define XSAVE_MXCSR_OFFSET      0x018
+>> -#define XSAVE_ST_SPACE_OFFSET   0x020
+>> -#define XSAVE_XMM_SPACE_OFFSET  0x0a0
+>> -#define XSAVE_XSTATE_BV_OFFSET  0x200
+>> -#define XSAVE_AVX_OFFSET        0x240
+>> -#define XSAVE_BNDREG_OFFSET     0x3c0
+>> -#define XSAVE_BNDCSR_OFFSET     0x400
+>> -#define XSAVE_OPMASK_OFFSET     0x440
+>> -#define XSAVE_ZMM_HI256_OFFSET  0x480
+>> -#define XSAVE_HI16_ZMM_OFFSET   0x680
+>> -#define XSAVE_PKRU_OFFSET       0xa80
+>> -
+>> -typedef struct X86XSaveArea {
+>> -    X86LegacyXSaveArea legacy;
+>> -    X86XSaveHeader header;
+>> -
+>> -    /* Extended save areas: */
+>> -
+>> -    /* AVX State: */
+>> -    XSaveAVX avx_state;
+>> -
+>> -    /* Ensure that XSaveBNDREG is properly aligned. */
+>> -    uint8_t padding[XSAVE_BNDREG_OFFSET
+>> -                    - sizeof(X86LegacyXSaveArea)
+>> -                    - sizeof(X86XSaveHeader)
+>> -                    - sizeof(XSaveAVX)];
+>> -
+>> -    /* MPX State: */
+>> -    XSaveBNDREG bndreg_state;
+>> -    XSaveBNDCSR bndcsr_state;
+>> -    /* AVX-512 State: */
+>> -    XSaveOpmask opmask_state;
+>> -    XSaveZMM_Hi256 zmm_hi256_state;
+>> -    XSaveHi16_ZMM hi16_zmm_state;
+>> -    /* PKRU State: */
+>> -    XSavePKRU pkru_state;
+>> -} X86XSaveArea;
+>> -
+>>   QEMU_BUILD_BUG_ON(sizeof(XSaveAVX) != 0x100);
+>>   QEMU_BUILD_BUG_ON(sizeof(XSaveBNDREG) != 0x40);
+>>   QEMU_BUILD_BUG_ON(sizeof(XSaveBNDCSR) != 0x40);
+>> @@ -1355,21 +1313,6 @@ QEMU_BUILD_BUG_ON(sizeof(XSaveZMM_Hi256) != 0x200);
+>>   QEMU_BUILD_BUG_ON(sizeof(XSaveHi16_ZMM) != 0x400);
+>>   QEMU_BUILD_BUG_ON(sizeof(XSavePKRU) != 0x8);
+>>   
+>> -QEMU_BUILD_BUG_ON(offsetof(X86XSaveArea, legacy.fcw) != XSAVE_FCW_FSW_OFFSET);
+>> -QEMU_BUILD_BUG_ON(offsetof(X86XSaveArea, legacy.ftw) != XSAVE_FTW_FOP_OFFSET);
+>> -QEMU_BUILD_BUG_ON(offsetof(X86XSaveArea, legacy.fpip) != XSAVE_CWD_RIP_OFFSET);
+>> -QEMU_BUILD_BUG_ON(offsetof(X86XSaveArea, legacy.fpdp) != XSAVE_CWD_RDP_OFFSET);
+>> -QEMU_BUILD_BUG_ON(offsetof(X86XSaveArea, legacy.mxcsr) != XSAVE_MXCSR_OFFSET);
+>> -QEMU_BUILD_BUG_ON(offsetof(X86XSaveArea, legacy.fpregs) != XSAVE_ST_SPACE_OFFSET);
+>> -QEMU_BUILD_BUG_ON(offsetof(X86XSaveArea, legacy.xmm_regs) != XSAVE_XMM_SPACE_OFFSET);
+>> -QEMU_BUILD_BUG_ON(offsetof(X86XSaveArea, avx_state) != XSAVE_AVX_OFFSET);
+>> -QEMU_BUILD_BUG_ON(offsetof(X86XSaveArea, bndreg_state) != XSAVE_BNDREG_OFFSET);
+>> -QEMU_BUILD_BUG_ON(offsetof(X86XSaveArea, bndcsr_state) != XSAVE_BNDCSR_OFFSET);
+>> -QEMU_BUILD_BUG_ON(offsetof(X86XSaveArea, opmask_state) != XSAVE_OPMASK_OFFSET);
+>> -QEMU_BUILD_BUG_ON(offsetof(X86XSaveArea, zmm_hi256_state) != XSAVE_ZMM_HI256_OFFSET);
+>> -QEMU_BUILD_BUG_ON(offsetof(X86XSaveArea, hi16_zmm_state) != XSAVE_HI16_ZMM_OFFSET);
+>> -QEMU_BUILD_BUG_ON(offsetof(X86XSaveArea, pkru_state) != XSAVE_PKRU_OFFSET);
+>> -
+>>   typedef struct ExtSaveArea {
+>>       uint32_t feature, bits;
+>>       uint32_t offset, size;
+>> diff --git a/target/i386/tcg/fpu_helper.c b/target/i386/tcg/fpu_helper.c
+>> index 4e11965067..74bbe94b80 100644
+>> --- a/target/i386/tcg/fpu_helper.c
+>> +++ b/target/i386/tcg/fpu_helper.c
+>> @@ -20,6 +20,7 @@
+>>   #include "qemu/osdep.h"
+>>   #include <math.h>
+>>   #include "cpu.h"
+>> +#include "tcg-cpu.h"
+>>   #include "exec/helper-proto.h"
+>>   #include "fpu/softfloat.h"
+>>   #include "fpu/softfloat-macros.h"
+>> diff --git a/target/i386/tcg/tcg-cpu.h b/target/i386/tcg/tcg-cpu.h
+>> index 36bd300af0..53a8494455 100644
+>> --- a/target/i386/tcg/tcg-cpu.h
+>> +++ b/target/i386/tcg/tcg-cpu.h
+>> @@ -19,6 +19,63 @@
+>>   #ifndef TCG_CPU_H
+>>   #define TCG_CPU_H
+>>   
+>> +#define XSAVE_FCW_FSW_OFFSET    0x000
+>> +#define XSAVE_FTW_FOP_OFFSET    0x004
+>> +#define XSAVE_CWD_RIP_OFFSET    0x008
+>> +#define XSAVE_CWD_RDP_OFFSET    0x010
+>> +#define XSAVE_MXCSR_OFFSET      0x018
+>> +#define XSAVE_ST_SPACE_OFFSET   0x020
+>> +#define XSAVE_XMM_SPACE_OFFSET  0x0a0
+>> +#define XSAVE_XSTATE_BV_OFFSET  0x200
+>> +#define XSAVE_AVX_OFFSET        0x240
+>> +#define XSAVE_BNDREG_OFFSET     0x3c0
+>> +#define XSAVE_BNDCSR_OFFSET     0x400
+>> +#define XSAVE_OPMASK_OFFSET     0x440
+>> +#define XSAVE_ZMM_HI256_OFFSET  0x480
+>> +#define XSAVE_HI16_ZMM_OFFSET   0x680
+>> +#define XSAVE_PKRU_OFFSET       0xa80
+>> +
+>> +typedef struct X86XSaveArea {
+>> +    X86LegacyXSaveArea legacy;
+>> +    X86XSaveHeader header;
+>> +
+>> +    /* Extended save areas: */
+>> +
+>> +    /* AVX State: */
+>> +    XSaveAVX avx_state;
+>> +
+>> +    /* Ensure that XSaveBNDREG is properly aligned. */
+>> +    uint8_t padding[XSAVE_BNDREG_OFFSET
+>> +                    - sizeof(X86LegacyXSaveArea)
+>> +                    - sizeof(X86XSaveHeader)
+>> +                    - sizeof(XSaveAVX)];
+>> +
+>> +    /* MPX State: */
+>> +    XSaveBNDREG bndreg_state;
+>> +    XSaveBNDCSR bndcsr_state;
+>> +    /* AVX-512 State: */
+>> +    XSaveOpmask opmask_state;
+>> +    XSaveZMM_Hi256 zmm_hi256_state;
+>> +    XSaveHi16_ZMM hi16_zmm_state;
+>> +    /* PKRU State: */
+>> +    XSavePKRU pkru_state;
+>> +} X86XSaveArea;
+>> +
+>> +QEMU_BUILD_BUG_ON(offsetof(X86XSaveArea, legacy.fcw) != XSAVE_FCW_FSW_OFFSET);
+>> +QEMU_BUILD_BUG_ON(offsetof(X86XSaveArea, legacy.ftw) != XSAVE_FTW_FOP_OFFSET);
+>> +QEMU_BUILD_BUG_ON(offsetof(X86XSaveArea, legacy.fpip) != XSAVE_CWD_RIP_OFFSET);
+>> +QEMU_BUILD_BUG_ON(offsetof(X86XSaveArea, legacy.fpdp) != XSAVE_CWD_RDP_OFFSET);
+>> +QEMU_BUILD_BUG_ON(offsetof(X86XSaveArea, legacy.mxcsr) != XSAVE_MXCSR_OFFSET);
+>> +QEMU_BUILD_BUG_ON(offsetof(X86XSaveArea, legacy.fpregs) != XSAVE_ST_SPACE_OFFSET);
+>> +QEMU_BUILD_BUG_ON(offsetof(X86XSaveArea, legacy.xmm_regs) != XSAVE_XMM_SPACE_OFFSET);
+>> +QEMU_BUILD_BUG_ON(offsetof(X86XSaveArea, avx_state) != XSAVE_AVX_OFFSET);
+>> +QEMU_BUILD_BUG_ON(offsetof(X86XSaveArea, bndreg_state) != XSAVE_BNDREG_OFFSET);
+>> +QEMU_BUILD_BUG_ON(offsetof(X86XSaveArea, bndcsr_state) != XSAVE_BNDCSR_OFFSET);
+>> +QEMU_BUILD_BUG_ON(offsetof(X86XSaveArea, opmask_state) != XSAVE_OPMASK_OFFSET);
+>> +QEMU_BUILD_BUG_ON(offsetof(X86XSaveArea, zmm_hi256_state) != XSAVE_ZMM_HI256_OFFSET);
+>> +QEMU_BUILD_BUG_ON(offsetof(X86XSaveArea, hi16_zmm_state) != XSAVE_HI16_ZMM_OFFSET);
+>> +QEMU_BUILD_BUG_ON(offsetof(X86XSaveArea, pkru_state) != XSAVE_PKRU_OFFSET);
+>
+> My only quibble is that these offsets are otherwise unused.  This just becomes validation 
+> of compiler layout.
 
-> 
->>> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
->>> index b655a7d82bf0..aadd589a3755 100644
->>> --- a/arch/s390/kvm/kvm-s390.c
->>> +++ b/arch/s390/kvm/kvm-s390.c
->>> @@ -3200,6 +3200,8 @@ static int kvm_s390_vcpu_setup(struct kvm_vcpu *vcpu)
->>>   		vcpu->arch.sie_block->ecb |= ECB_SRSI;
->>>   	if (test_kvm_facility(vcpu->kvm, 73))
->>>   		vcpu->arch.sie_block->ecb |= ECB_TE;
-> 
-> Maybe add
-> 
-> /* no facility bit, but safe as the hardware may ignore it */
-> 
-> or something like that, so that we don't stumble over that in the future?
+Yes.
 
-Well, the hardware being allowed to ignore the bit makes its introduction
-without an indication forward compatible because it does not require vSIE to be adapted.
-The reserved bits are implicitly set to 0 which means new features are disabled
-by default and one observes all the interception one expects.
+> I presume that XSAVE_BNDREG_OFFSET is not merely ROUND_UP(offsetof(avx_state) + 
+> sizeof(avx_state), some_pow2)?
 
-Maybe this:
+The offsets were just extracted from a CPU at some point in the
+past. It's likely that things are as you describe, but that is not
+defined anywhere.
 
-/* no facility bit, can opt in because we do not need
-   to observe specification exception intercepts */
+> Do these offsets need to be migrated?  Otherwise, how can one start a vm with kvm and then 
+> migrate to tcg?  I presume the offsets above are constant for a given cpu, and that 
+> whatever cpu provides different offsets is not supported by tcg?  Given the lack of avx, 
+> that's trivial these days...
 
-?
+For TCG I think that the offsets used should be derived from the CPU
+model selected, rather than being the same for all CPU models.
 
-> 
->>> +	if (!kvm_is_ucontrol(vcpu->kvm))
->>> +		vcpu->arch.sie_block->ecb |= ECB_SPECI;
->>>
->>>   	if (test_kvm_facility(vcpu->kvm, 8) && vcpu->kvm->arch.use_pfmfi)
->>>   		vcpu->arch.sie_block->ecb2 |= ECB2_PFMFI;
-> 
-> Reviewed-by: Cornelia Huck <cohuck@redhat.com>
-> 
+If that was done, then in principle it should be possible to migrate
+XSAVE state between same CPU model KVM and TCG environments.
 
+dme.
+-- 
+Tonight I'm gonna bury that horse in the ground.
