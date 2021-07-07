@@ -2,93 +2,139 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id CCC173BE922
-	for <lists+kvm@lfdr.de>; Wed,  7 Jul 2021 15:58:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9604E3BE939
+	for <lists+kvm@lfdr.de>; Wed,  7 Jul 2021 16:03:36 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231893AbhGGOB2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 7 Jul 2021 10:01:28 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:30381 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231720AbhGGOB1 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 7 Jul 2021 10:01:27 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1625666326;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=Z7dzRxBxm91wjIPJ9WL8p7wOAJtFPjrAp62go4fmxBM=;
-        b=Oab+mbvA78Hvsi7kR2Tw3n1LvenRG+Q+HtuN6b0jc4GspghbELXF6zVieIpxhg2Jr75rBw
-        2773RIiqvWJRw0ythgjjq9mSwWc+Vs1zTGQ9eGBtNd1YysOhD+kvlI6P8VgLa0uIg5i6NT
-        1B80mJzuH0PY2QTdAtCssNpylLTL4ow=
-Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
- [209.85.218.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-179-IH93AFPWPxihp6Oolpr9TQ-1; Wed, 07 Jul 2021 09:58:44 -0400
-X-MC-Unique: IH93AFPWPxihp6Oolpr9TQ-1
-Received: by mail-ej1-f70.google.com with SMTP id u4-20020a1709061244b02904648b302151so584534eja.17
-        for <kvm@vger.kernel.org>; Wed, 07 Jul 2021 06:58:44 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=Z7dzRxBxm91wjIPJ9WL8p7wOAJtFPjrAp62go4fmxBM=;
-        b=qjutsDH2OFlIAiEa1E0wDluZtW+8wIZZ8o/owVNW+c4RYuSC4nWAfn9vMA01+uniRf
-         RYjO9RXjhxJNjvPrZohPNhEtTifHJ1jC2LKs61gPkVRq7sbvg/XoVjD3AaLqNB9UCRfw
-         VjTUgF8XxAJTvi7QgQ1J8Ek8xzGazWdMTGHOVeNK42I9eLiQpr5Zkd+8kVViMC2VPuOW
-         vKgClDg4HnvLN/IlayRfH/LsvXCtXKvr3gaiSp3VegNv+jiV+uMrBpSIpo7cPsqGAlKF
-         jo6Xo1fzUx3iiFHLi8PPuvJL+RXG3RZErYUeZmf13Cx9hsUaLp8QxoIfhYSysZwOVP7v
-         NsxQ==
-X-Gm-Message-State: AOAM5333hXzgQEPuIaj+qMX4t+wbK3B9leyqTgxQOBsqozlwUInz105R
-        dUCWaVAw2XxiCy+IGfhFDlYBDN886Br8ZK9X3+yKQEqeLt9jV+TE+Sd7i2gAWin5MOOQhZVYnpK
-        8akXdfhB+MOVq
-X-Received: by 2002:a17:907:778a:: with SMTP id ky10mr24219095ejc.32.1625666323678;
-        Wed, 07 Jul 2021 06:58:43 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyv4/GKMuuk/PByT1b/oedsUb6euFSbdyt/iajMDhfbbJx/hDlbvK2r52qKQEnfJptk9m8CAg==
-X-Received: by 2002:a17:907:778a:: with SMTP id ky10mr24219079ejc.32.1625666323534;
-        Wed, 07 Jul 2021 06:58:43 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id z10sm8700548edd.11.2021.07.07.06.58.42
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 07 Jul 2021 06:58:42 -0700 (PDT)
-Subject: Re: [PATCH 02/10] KVM: x86: APICv: fix race in
- kvm_request_apicv_update on SVM
-To:     Maxim Levitsky <mlevitsk@redhat.com>, kvm@vger.kernel.org
-Cc:     Thomas Gleixner <tglx@linutronix.de>,
-        Sean Christopherson <seanjc@google.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Joerg Roedel <joro@8bytes.org>, Borislav Petkov <bp@alien8.de>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ingo Molnar <mingo@redhat.com>,
-        "open list:X86 ARCHITECTURE (32-BIT AND 64-BIT)" 
-        <linux-kernel@vger.kernel.org>,
-        "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
-        Jim Mattson <jmattson@google.com>
-References: <20210623113002.111448-1-mlevitsk@redhat.com>
- <20210623113002.111448-3-mlevitsk@redhat.com>
- <6c4a69ce-595e-d5a1-7b4e-e6ce1afe1252@redhat.com>
- <43ef1a1ea488977db11d40ec9672b524ec816112.camel@redhat.com>
- <9413056ebbd5997a35b446f2841589973484ba02.camel@redhat.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <502391b4-5a5f-6f37-dab6-06ae276a205f@redhat.com>
-Date:   Wed, 7 Jul 2021 15:58:41 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.11.0
+        id S231952AbhGGOGP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 7 Jul 2021 10:06:15 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:40266 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S231631AbhGGOGP (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 7 Jul 2021 10:06:15 -0400
+Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 167E3VLu124404;
+        Wed, 7 Jul 2021 10:03:34 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : content-transfer-encoding : mime-version; s=pp1;
+ bh=K+R8+3MHE3zIf59ukIN0Ynk4o375oDG64/SpJmwPcgs=;
+ b=JhGM8Kr40P31Les/ZIRgH5drFldQiWo4ldGjLBwpyE1CwsuAICxpBD3vpxN9o1BZyy+G
+ fdc75LmOjyUYJSspZV7UimBfKtldGXrJPAQnuwGDbWDg95tXrrM1ZPCrkIOrP6e8HGmV
+ thJcwWUQbTFIGtUXDAPjz4O82x4fQPIyN2GyPOZRPskIIq7n/md4/q9Dooz6HLVMfIet
+ Lb2P331b6EY2zC2eR2WUuqvSDu4dgKqQ8RM7RZw+s6OblEQ6ySgzbAWNenR31uYB9mlj
+ 8FeBRXLcPDEf2rABX+TUIR0BZaH5FfD5+Tkku781jqwaQXrLeGQFs8VUvLsHbl/gSdRX hw== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 39mbkf4des-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 07 Jul 2021 10:03:34 -0400
+Received: from m0098416.ppops.net (m0098416.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 167E3XWX124637;
+        Wed, 7 Jul 2021 10:03:33 -0400
+Received: from ppma04fra.de.ibm.com (6a.4a.5195.ip4.static.sl-reverse.com [149.81.74.106])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 39mbkf4ddg-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 07 Jul 2021 10:03:33 -0400
+Received: from pps.filterd (ppma04fra.de.ibm.com [127.0.0.1])
+        by ppma04fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 167E3UO7002904;
+        Wed, 7 Jul 2021 14:03:30 GMT
+Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
+        by ppma04fra.de.ibm.com with ESMTP id 39jfh8gy4q-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 07 Jul 2021 14:03:30 +0000
+Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
+        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 167E1Ww631523282
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 7 Jul 2021 14:01:32 GMT
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 17335A4057;
+        Wed,  7 Jul 2021 14:03:27 +0000 (GMT)
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 9AF8AA405F;
+        Wed,  7 Jul 2021 14:03:26 +0000 (GMT)
+Received: from localhost.localdomain.com (unknown [9.145.29.241])
+        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Wed,  7 Jul 2021 14:03:26 +0000 (GMT)
+From:   Janosch Frank <frankja@linux.ibm.com>
+To:     pbonzini@redhat.com
+Cc:     kvm@vger.kernel.org, frankja@linux.ibm.com, david@redhat.com,
+        borntraeger@de.ibm.com, cohuck@redhat.com,
+        linux-s390@vger.kernel.org, imbrenda@linux.ibm.com,
+        thuth@redhat.com
+Subject: [kvm-unit-tests GIT PULL 0/8] s390x update 2021-07-07
+Date:   Wed,  7 Jul 2021 16:03:10 +0200
+Message-Id: <20210707140318.44255-1-frankja@linux.ibm.com>
+X-Mailer: git-send-email 2.31.1
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: tXVrxvc8c6vlPftT_P9oWR7sEP__sehy
+X-Proofpoint-ORIG-GUID: eeD6zcMoFfo31S9832CSl9EUyrmZ6ilu
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-UnRewURL: 0 URL was un-rewritten
 MIME-Version: 1.0
-In-Reply-To: <9413056ebbd5997a35b446f2841589973484ba02.camel@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.790
+ definitions=2021-07-07_06:2021-07-06,2021-07-07 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0 mlxscore=0
+ lowpriorityscore=0 clxscore=1015 mlxlogscore=999 phishscore=0
+ priorityscore=1501 spamscore=0 malwarescore=0 adultscore=0 bulkscore=0
+ suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2104190000 definitions=main-2107070084
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 07/07/21 14:57, Maxim Levitsky wrote:
-> 
-> Hi!
-> Any update? should I use a lock for this?
+Dear Paolo,
 
-Yes please, even irq_lock can do.
+please merge or pull the following changes:
 
-Paolo
+* Add snippet support that makes starting guests in tests easier
+* Cleanup
+
+MERGE:
+https://gitlab.com/kvm-unit-tests/kvm-unit-tests/-/merge_requests/13
+
+PIPELINE:
+https://gitlab.com/frankja/kvm-unit-tests/-/pipelines/333035606
+
+PULL:
+The following changes since commit bc6f264386b4cb2cadc8b2492315f3e6e8a801a2:
+
+  Merge branch 'arm/queue' into 'master' (2021-06-30 13:35:55 +0000)
+
+are available in the Git repository at:
+
+  https://gitlab.com/frankja/kvm-unit-tests.git s390x-pull-2021-07-07
+
+for you to fetch changes up to 81598ca0d3fbeb52e02eecf5ddbc15e30f8c600a:
+
+  lib: s390x: Remove left behing PGM report (2021-07-07 08:00:29 +0000)
+
+Janosch Frank (7):
+  s390x: snippets: Add gitignore as well as linker script and start
+    assembly
+  s390x: mvpg: Add SIE mvpg test
+  s390x: sie: Add missing includes
+  s390x: sie: Fix sie.h integer types
+  lib: s390x: uv: Add offset comments to uv_query and extend it
+  lib: s390x: Print if a pgm happened while in SIE
+  lib: s390x: Remove left behing PGM report
+
+Steffen Eiden (1):
+  s390x: snippets: Add snippet compilation
+
+ .gitignore                      |   1 +
+ lib/s390x/asm/uv.h              |  33 +++----
+ lib/s390x/interrupt.c           |  14 +--
+ lib/s390x/sie.h                 |  11 ++-
+ s390x/Makefile                  |  29 +++++--
+ s390x/mvpg-sie.c                | 149 ++++++++++++++++++++++++++++++++
+ s390x/snippets/c/cstart.S       |  16 ++++
+ s390x/snippets/c/flat.lds       |  51 +++++++++++
+ s390x/snippets/c/mvpg-snippet.c |  33 +++++++
+ s390x/unittests.cfg             |   3 +
+ 10 files changed, 308 insertions(+), 32 deletions(-)
+ create mode 100644 s390x/mvpg-sie.c
+ create mode 100644 s390x/snippets/c/cstart.S
+ create mode 100644 s390x/snippets/c/flat.lds
+ create mode 100644 s390x/snippets/c/mvpg-snippet.c
+
+-- 
+2.31.1
 
