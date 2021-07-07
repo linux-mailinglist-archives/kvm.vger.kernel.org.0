@@ -2,190 +2,112 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 89FE73BE667
-	for <lists+kvm@lfdr.de>; Wed,  7 Jul 2021 12:36:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7E7933BE71F
+	for <lists+kvm@lfdr.de>; Wed,  7 Jul 2021 13:28:23 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231388AbhGGKij (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 7 Jul 2021 06:38:39 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:45165 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231363AbhGGKij (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 7 Jul 2021 06:38:39 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1625654159;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=hVNk6OIYC0v/uBOVnfJb+zURrA/rvxARCwRIQsrTqyE=;
-        b=KohaVrOHJFhYKUn9/6/qb3zI4SIIpmZOSuH1A03l2ecIoasvJ0v7Nw1B0ad2w3SbwuxWAN
-        K92Th5otoMzp7+Vaxp6Kiuhe1nM9IGKMQ42WyYmVH25hJoLP3T8VcF9RMJfM9POzEfxW8D
-        t9HTtjoBZK/uHR9O07jfF2iyki2oAHs=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-453-6Y8aClxhO22KMcbvAdCOqQ-1; Wed, 07 Jul 2021 06:35:58 -0400
-X-MC-Unique: 6Y8aClxhO22KMcbvAdCOqQ-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9F1F51084F56;
-        Wed,  7 Jul 2021 10:35:56 +0000 (UTC)
-Received: from starship (unknown [10.40.192.10])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 765555C1D5;
-        Wed,  7 Jul 2021 10:35:53 +0000 (UTC)
-Message-ID: <6fecea5161f17614f1ca745041243332de45fafb.camel@redhat.com>
-Subject: Re: [PATCH 6/6] KVM: selftests: smm_test: Test SMM enter from L2
-From:   Maxim Levitsky <mlevitsk@redhat.com>
-To:     Vitaly Kuznetsov <vkuznets@redhat.com>, kvm@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Cathy Avery <cavery@redhat.com>,
-        Emanuele Giuseppe Esposito <eesposit@redhat.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Michael Roth <mdroth@linux.vnet.ibm.com>,
-        linux-kernel@vger.kernel.org
-Date:   Wed, 07 Jul 2021 13:35:52 +0300
-In-Reply-To: <20210628104425.391276-7-vkuznets@redhat.com>
-References: <20210628104425.391276-1-vkuznets@redhat.com>
-         <20210628104425.391276-7-vkuznets@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
+        id S231383AbhGGLbC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 7 Jul 2021 07:31:02 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:64912 "EHLO
+        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S230354AbhGGLbB (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 7 Jul 2021 07:31:01 -0400
+Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 167B4Btu063345;
+        Wed, 7 Jul 2021 07:28:18 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=sJkuiIPWL+zmNUKTo92A4q5nuVa20X2F2oVcvtl4B48=;
+ b=l584uJo+PdLaJJ34AJnDmNvNxBH8UmTWl05whuvc16XR3aTJ5y9yN8zx7aexeAAiR9ul
+ bPmyBrhjSEYLKw9+T25+I7X1EoYLs8f4d3zqIphzLxOiyu8D+dgWgo7ZUuUpNXIbiNkj
+ N5XnzoNxW3o2Y97CutzP6K//iy8jNqvUpkELEa6kSc/rAnKzp8d8I5BPrh3njBzS3EMf
+ XjTtr4J1nsXiYHzm1Hud57shOloXIkkQqMJ+beBAp/t7B3opWColMw3wsa1HR0g7Ga7r
+ SHnQwcKt5CTNMzxM3Y/n1JTFHQ1FO5qFYwY/BKt7HndMBnJQbEwpTizWtVjQqgRESIpK 9w== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 39mc15ya7s-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 07 Jul 2021 07:28:18 -0400
+Received: from m0098421.ppops.net (m0098421.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 167B4m2h069150;
+        Wed, 7 Jul 2021 07:28:18 -0400
+Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 39mc15ya6f-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 07 Jul 2021 07:28:18 -0400
+Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
+        by ppma06ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 167BNePm012146;
+        Wed, 7 Jul 2021 11:28:15 GMT
+Received: from b06avi18626390.portsmouth.uk.ibm.com (b06avi18626390.portsmouth.uk.ibm.com [9.149.26.192])
+        by ppma06ams.nl.ibm.com with ESMTP id 39jf5h9q8h-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 07 Jul 2021 11:28:14 +0000
+Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
+        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 167BQK6936569444
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 7 Jul 2021 11:26:20 GMT
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id E40664C044;
+        Wed,  7 Jul 2021 11:28:11 +0000 (GMT)
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 721A14C04A;
+        Wed,  7 Jul 2021 11:28:11 +0000 (GMT)
+Received: from oc6887364776.ibm.com (unknown [9.152.212.90])
+        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Wed,  7 Jul 2021 11:28:11 +0000 (GMT)
+Subject: Re: [PATCH v2 1/4] s390/cio: Make struct css_driver::remove return
+ void
+To:     =?UTF-8?Q?Uwe_Kleine-K=c3=b6nig?= <u.kleine-koenig@pengutronix.de>,
+        Cornelia Huck <cohuck@redhat.com>
+Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        linux-s390@vger.kernel.org, Eric Farman <farman@linux.ibm.com>,
+        kernel@pengutronix.de, Vasily Gorbik <gor@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Peter Oberparleiter <oberpar@linux.ibm.com>,
+        linux-kernel@vger.kernel.org, Halil Pasic <pasic@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        kvm@vger.kernel.org, Matthew Rosato <mjrosato@linux.ibm.com>
+References: <20210706154803.1631813-1-u.kleine-koenig@pengutronix.de>
+ <20210706154803.1631813-2-u.kleine-koenig@pengutronix.de>
+ <87zguzfn8e.fsf@redhat.com> <20210706160543.3qfekhzalwsrtahv@pengutronix.de>
+From:   Vineeth Vijayan <vneethv@linux.ibm.com>
+Message-ID: <ccc9c098-504d-4fd4-43a9-ccb3fa2a2232@linux.ibm.com>
+Date:   Wed, 7 Jul 2021 13:28:11 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.11.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+In-Reply-To: <20210706160543.3qfekhzalwsrtahv@pengutronix.de>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: g821e7G6u4XTyuCXz1527U4_cwagVy8v
+X-Proofpoint-GUID: DRW3uRCPRiFRux4cOwzLdMv-5I0AFuBq
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.790
+ definitions=2021-07-07_06:2021-07-06,2021-07-07 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ bulkscore=0 lowpriorityscore=0 adultscore=0 malwarescore=0 mlxlogscore=999
+ phishscore=0 impostorscore=0 mlxscore=0 spamscore=0 clxscore=1015
+ suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2104190000 definitions=main-2107070063
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 2021-06-28 at 12:44 +0200, Vitaly Kuznetsov wrote:
-> Two additional tests are added:
-> - SMM triggered from L2 does not currupt L1 host state.
-> - Save/restore during SMM triggered from L2 does not corrupt guest/host
->   state.
-> 
-> Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
-> ---
->  tools/testing/selftests/kvm/x86_64/smm_test.c | 70 +++++++++++++++++--
->  1 file changed, 64 insertions(+), 6 deletions(-)
-> 
-> diff --git a/tools/testing/selftests/kvm/x86_64/smm_test.c b/tools/testing/selftests/kvm/x86_64/smm_test.c
-> index c1f831803ad2..d0fe2fdce58c 100644
-> --- a/tools/testing/selftests/kvm/x86_64/smm_test.c
-> +++ b/tools/testing/selftests/kvm/x86_64/smm_test.c
-> @@ -53,15 +53,28 @@ static inline void sync_with_host(uint64_t phase)
->  		     : "+a" (phase));
->  }
->  
-> -void self_smi(void)
-> +static void self_smi(void)
->  {
->  	x2apic_write_reg(APIC_ICR,
->  			 APIC_DEST_SELF | APIC_INT_ASSERT | APIC_DM_SMI);
->  }
->  
-> -void guest_code(void *arg)
-> +static void l2_guest_code(void)
->  {
-> +	sync_with_host(8);
-> +
-> +	sync_with_host(10);
-> +
-> +	vmcall();
-> +}
-> +
-> +static void guest_code(void *arg)
-> +{
-> +	#define L2_GUEST_STACK_SIZE 64
-> +	unsigned long l2_guest_stack[L2_GUEST_STACK_SIZE];
->  	uint64_t apicbase = rdmsr(MSR_IA32_APICBASE);
-> +	struct svm_test_data *svm = arg;
-> +	struct vmx_pages *vmx_pages = arg;
->  
->  	sync_with_host(1);
->  
-> @@ -74,21 +87,50 @@ void guest_code(void *arg)
->  	sync_with_host(4);
->  
->  	if (arg) {
-> -		if (cpu_has_svm())
-> -			generic_svm_setup(arg, NULL, NULL);
-> -		else
-> -			GUEST_ASSERT(prepare_for_vmx_operation(arg));
-> +		if (cpu_has_svm()) {
-> +			generic_svm_setup(svm, l2_guest_code,
-> +					  &l2_guest_stack[L2_GUEST_STACK_SIZE]);
-> +		} else {
-> +			GUEST_ASSERT(prepare_for_vmx_operation(vmx_pages));
-> +			GUEST_ASSERT(load_vmcs(vmx_pages));
-> +			prepare_vmcs(vmx_pages, l2_guest_code,
-> +				     &l2_guest_stack[L2_GUEST_STACK_SIZE]);
-> +		}
->  
->  		sync_with_host(5);
->  
->  		self_smi();
->  
->  		sync_with_host(7);
-> +
-> +		if (cpu_has_svm()) {
-> +			run_guest(svm->vmcb, svm->vmcb_gpa);
-> +			svm->vmcb->save.rip += 3;
-> +			run_guest(svm->vmcb, svm->vmcb_gpa);
-> +		} else {
-> +			vmlaunch();
-> +			vmresume();
-> +		}
-> +
-> +		/* Stages 8-11 are eaten by SMM (SMRAM_STAGE reported instead) */
-> +		sync_with_host(12);
->  	}
->  
->  	sync_with_host(DONE);
->  }
->  
-> +void inject_smi(struct kvm_vm *vm)
-> +{
-> +	struct kvm_vcpu_events events;
-> +
-> +	vcpu_events_get(vm, VCPU_ID, &events);
-> +
-> +	events.smi.pending = 1;
-> +	events.flags |= KVM_VCPUEVENT_VALID_SMM;
-> +
-> +	vcpu_events_set(vm, VCPU_ID, &events);
-> +}
-> +
->  int main(int argc, char *argv[])
->  {
->  	vm_vaddr_t nested_gva = 0;
-> @@ -147,6 +189,22 @@ int main(int argc, char *argv[])
->  			    "Unexpected stage: #%x, got %x",
->  			    stage, stage_reported);
->  
-> +		/*
-> +		 * Enter SMM during L2 execution and check that we correctly
-> +		 * return from it. Do not perform save/restore while in SMM yet.
-> +		 */
-> +		if (stage == 8) {
-> +			inject_smi(vm);
-> +			continue;
-> +		}
-> +
-> +		/*
-> +		 * Perform save/restore while the guest is in SMM triggered
-> +		 * during L2 execution.
-> +		 */
-> +		if (stage == 10)
-> +			inject_smi(vm);
-> +
->  		state = vcpu_save_state(vm, VCPU_ID);
->  		kvm_vm_release(vm);
->  		kvm_vm_restart(vm, O_RDWR);
+Thank you. I will use the modified description. This will be picked up 
+by Vasily/Heiko to the s390-tree.
 
-Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
+Also Acked-by: Vineeth Vijayan <vneethv@linux.ibm.com>
 
-Best regards,
-	Maxim Levitsky
+One question, is this patchset supposed to have 4 patches ? Are we 
+missing one ?
 
+On 7/6/21 6:05 PM, Uwe Kleine-König wrote:
+> Argh, too much copy&paste. I make this:
+>
+> 	The driver core ignores the return value of css_remove()
+> 	(because there is only little it can do when a device
+> 	disappears) and all callbacks return 0 anyhow.
+>
+> to make this actually correct.
+>
+>> Reviewed-by: Cornelia Huck<cohuck@redhat.com>
