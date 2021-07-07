@@ -2,108 +2,111 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8C6FC3BE943
-	for <lists+kvm@lfdr.de>; Wed,  7 Jul 2021 16:03:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 924863BE98A
+	for <lists+kvm@lfdr.de>; Wed,  7 Jul 2021 16:15:58 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231979AbhGGOGU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 7 Jul 2021 10:06:20 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:3348 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231974AbhGGOGT (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 7 Jul 2021 10:06:19 -0400
-Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 167DXtSO165557;
-        Wed, 7 Jul 2021 10:03:39 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding; s=pp1;
- bh=LhHNKzf8eC+sDyppNRXNGnKxuTjdSeuQRNVuyJxGYLA=;
- b=UUYok74q2KO8pkr2kzeutDIxV+2e4BhCNrrxJFEA6RntGGC4QfT9dFX4WydAdpFUqS1Q
- 8RC7MI4itrFeztxxaVBa1GXResxApbNBlTUboCQHmkfbMSI667gXQzjYWBOSwvfWzWr4
- FAqPs4EvicLhKJIBJV8v8zh0Bt+tU63cdhx+7yiPpQIQiY6tBkN13z/mZDdNWww/giYk
- OeYV95W7X6iWk+NF1NhxOzpDI8Qv8H0ahTJVgCxGMnakyNJ1EzQS/udacpFe7m2J+Hso
- CW6FuydtDbLUWVIwdqmpzCuTVSifiAgaKmOUYaoaGVi3/+UZLabEQDzJMaOvjgeCZL8r /Q== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 39mts0m220-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 07 Jul 2021 10:03:39 -0400
-Received: from m0098396.ppops.net (m0098396.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 167DYD4k166854;
-        Wed, 7 Jul 2021 10:03:38 -0400
-Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 39mts0m20e-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 07 Jul 2021 10:03:38 -0400
-Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
-        by ppma06ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 167E1YY3004282;
-        Wed, 7 Jul 2021 14:03:35 GMT
-Received: from b06cxnps3074.portsmouth.uk.ibm.com (d06relay09.portsmouth.uk.ibm.com [9.149.109.194])
-        by ppma06ams.nl.ibm.com with ESMTP id 39jf5h9sn1-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 07 Jul 2021 14:03:34 +0000
-Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
-        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 167E3VSX33554758
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 7 Jul 2021 14:03:31 GMT
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id CA31EA4055;
-        Wed,  7 Jul 2021 14:03:31 +0000 (GMT)
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 4BCE2A404D;
-        Wed,  7 Jul 2021 14:03:31 +0000 (GMT)
-Received: from localhost.localdomain.com (unknown [9.145.29.241])
-        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Wed,  7 Jul 2021 14:03:31 +0000 (GMT)
-From:   Janosch Frank <frankja@linux.ibm.com>
-To:     pbonzini@redhat.com
-Cc:     kvm@vger.kernel.org, frankja@linux.ibm.com, david@redhat.com,
-        borntraeger@de.ibm.com, cohuck@redhat.com,
-        linux-s390@vger.kernel.org, imbrenda@linux.ibm.com,
-        thuth@redhat.com
-Subject: [kvm-unit-tests GIT PULL 8/8] lib: s390x: Remove left behing PGM report
-Date:   Wed,  7 Jul 2021 16:03:18 +0200
-Message-Id: <20210707140318.44255-9-frankja@linux.ibm.com>
-X-Mailer: git-send-email 2.31.1
-In-Reply-To: <20210707140318.44255-1-frankja@linux.ibm.com>
-References: <20210707140318.44255-1-frankja@linux.ibm.com>
+        id S231959AbhGGOSf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 7 Jul 2021 10:18:35 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:23135 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S231724AbhGGOSe (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 7 Jul 2021 10:18:34 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1625667354;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=v7TkRYJsDfarqXSn4EBmx0Hd12Melpzh3GqncamrRv0=;
+        b=eL78irsKPKOtKpi7eK3/ww4MDKFXjWxdCvd61LfSaS6Bp05l497zI+5SMUVGG5/wkGaThi
+        J6CyvTXtdehEfcFb3j9rwkS7TDV2V7h2v2E/bZDSGyDUu2IOojS2kGhaONjp2sI/G729nb
+        lTjSPjMJUPjwl4hmMQNpCeNLxDpNvsA=
+Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
+ [209.85.218.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-544-QRyvefsbNiibhcwW76dddw-1; Wed, 07 Jul 2021 10:15:52 -0400
+X-MC-Unique: QRyvefsbNiibhcwW76dddw-1
+Received: by mail-ej1-f72.google.com with SMTP id f1-20020a1709064941b02903f6b5ef17bfso604533ejt.20
+        for <kvm@vger.kernel.org>; Wed, 07 Jul 2021 07:15:52 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=v7TkRYJsDfarqXSn4EBmx0Hd12Melpzh3GqncamrRv0=;
+        b=P1yfeVSgUsUhhikoZqmVksW8o6DJ64eCfs6jQHf87f6wc/P3WdpfOSFtJFcH+OYFTa
+         yCNXsBL1B2L37qWR619RuAOgwYUDU7s+lL/unLpAfrJK71ggxLqZK5ba5CcfdxBKpB3q
+         OvgVI3k2u1JMJ41DWBJnrWBH/BOT2Iso+iEdO8p9xGBtQh2lurGIEVUFBbtbKWG+Q+vw
+         MZJv/2RnFm7I1D0vmWBxDzGa5JMhvRYkNLx2D3RsR/rzIKqjSMZ1s36LCO3NAJd+oRdY
+         UZzJX0ayTxVBEbvAroML9fXm48S1reiYCE21oL2iex7Od/dtd6O8EdA3ScFr32nuemTJ
+         5H5w==
+X-Gm-Message-State: AOAM533S1URhuiYGiy4ZCMxvZSfF53LH+C7sBQUjYcq0xVLVDfPSOzWO
+        5Z+LXVeJZvbLxFDYw5QxEtBekSWIVL4TkzeIT/zuYUZq1fjuQ1kq9MbSXWV/VsoBKtUWN2nzmOL
+        A+RwD0LMkVeGP
+X-Received: by 2002:a17:906:842:: with SMTP id f2mr24646137ejd.460.1625667351671;
+        Wed, 07 Jul 2021 07:15:51 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxogJG5EZkoMMu8maydXHcDJhSX3aRBwefzb6CXUOxZgETiNeOxmsHGUhIROgdGHhgQ760dLw==
+X-Received: by 2002:a17:906:842:: with SMTP id f2mr24646105ejd.460.1625667351434;
+        Wed, 07 Jul 2021 07:15:51 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+        by smtp.gmail.com with ESMTPSA id zp1sm6983114ejb.92.2021.07.07.07.15.50
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 07 Jul 2021 07:15:50 -0700 (PDT)
+Subject: Re: [PATCH 3/4] KVM: x86: WARN and reject loading KVM if NX is
+ supported but not enabled
+To:     Naresh Kamboju <naresh.kamboju@linaro.org>
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm list <kvm@vger.kernel.org>,
+        open list <linux-kernel@vger.kernel.org>,
+        lkft-triage@lists.linaro.org, regressions@lists.linux.dev
+References: <20210615164535.2146172-1-seanjc@google.com>
+ <20210615164535.2146172-4-seanjc@google.com> <YNUITW5fsaQe4JSo@google.com>
+ <ad85c5db-c780-bd13-c6ce-e3478838acbe@redhat.com>
+ <CA+G9fYsrQo3FvtW1VhXocY2xkaPLNADA4S5f=fBM5uqa=C5LYg@mail.gmail.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <40623553-310a-68f7-2981-f8ea9c7bd5b0@redhat.com>
+Date:   Wed, 7 Jul 2021 16:15:49 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.11.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: B7_u8As3iXNTnuHLd-88L8fyLLeh47nO
-X-Proofpoint-GUID: qzbHSJjNx4395mVd9fZjWC6wzi8-me3m
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.790
- definitions=2021-07-07_06:2021-07-06,2021-07-07 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0
- lowpriorityscore=0 spamscore=0 bulkscore=0 mlxlogscore=999 malwarescore=0
- phishscore=0 priorityscore=1501 clxscore=1015 adultscore=0 impostorscore=0
- mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2104190000 definitions=main-2107070081
+In-Reply-To: <CA+G9fYsrQo3FvtW1VhXocY2xkaPLNADA4S5f=fBM5uqa=C5LYg@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-When I added the backtrace support I forgot to remove the PGM report.
+On 07/07/21 14:09, Naresh Kamboju wrote:
+> On Fri, 25 Jun 2021 at 14:35, Paolo Bonzini <pbonzini@redhat.com> wrote:
+>>
+>> On 25/06/21 00:33, Sean Christopherson wrote:
+>>> On Tue, Jun 15, 2021, Sean Christopherson wrote:
+>>>> WARN if NX is reported as supported but not enabled in EFER.  All flavors
+>>>> of the kernel, including non-PAE 32-bit kernels, set EFER.NX=1 if NX is
+>>>> supported, even if NX usage is disable via kernel command line.
+>>>
+>>> Ugh, I misread .Ldefault_entry in head_32.S, it skips over the entire EFER code
+>>> if PAE=0.  Apparently I didn't test this with non-PAE paging and EPT?
+>>>
+>>> Paolo, I'll send a revert since it's in kvm/next, but even better would be if
+>>> you can drop the patch :-)  Lucky for me you didn't pick up patch 4/4 that
+>>> depends on this...
+>>>
+>>> I'll revisit this mess in a few weeks.
+>>
+>> Rather, let's keep this, see if anyone complains and possibly add a
+>> "depends on X86_PAE || X86_64" to KVM.
+> 
+> [ please ignore if this is already reported ]
+> 
+> The following kernel warning noticed while booting linus master branch and
+> Linux next 20210707 tag on i386 kernel booting on x86_64 machine.
 
-Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
-Reviewed-by: Cornelia Huck <cohuck@redhat.com>
----
- lib/s390x/interrupt.c | 3 ---
- 1 file changed, 3 deletions(-)
+Ok, so the "depends on" is needed.  Let's add it, I'm getting back to 
+KVM work and will send the patch today or tomorrow.
 
-diff --git a/lib/s390x/interrupt.c b/lib/s390x/interrupt.c
-index 109f2907..785b7355 100644
---- a/lib/s390x/interrupt.c
-+++ b/lib/s390x/interrupt.c
-@@ -162,9 +162,6 @@ void handle_pgm_int(struct stack_frame_int *stack)
- 		/* Force sclp_busy to false, otherwise we will loop forever */
- 		sclp_handle_ext();
- 		print_pgm_info(stack);
--		report_abort("Unexpected program interrupt: %d on cpu %d at %#lx, ilen %d\n",
--			     lc->pgm_int_code, stap(), lc->pgm_old_psw.addr,
--			     lc->pgm_int_id);
- 	}
- 
- 	pgm_int_expected = false;
--- 
-2.31.1
+Paolo
 
