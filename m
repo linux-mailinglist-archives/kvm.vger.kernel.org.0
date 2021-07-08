@@ -2,191 +2,477 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 155313C1A96
-	for <lists+kvm@lfdr.de>; Thu,  8 Jul 2021 22:35:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id AF3383C1AC8
+	for <lists+kvm@lfdr.de>; Thu,  8 Jul 2021 23:01:21 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230497AbhGHUiG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 8 Jul 2021 16:38:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46474 "EHLO
+        id S230489AbhGHVEC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 8 Jul 2021 17:04:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52234 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230493AbhGHUiF (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 8 Jul 2021 16:38:05 -0400
-Received: from mail-pg1-x533.google.com (mail-pg1-x533.google.com [IPv6:2607:f8b0:4864:20::533])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B2A9DC06175F
-        for <kvm@vger.kernel.org>; Thu,  8 Jul 2021 13:35:22 -0700 (PDT)
-Received: by mail-pg1-x533.google.com with SMTP id 62so7579209pgf.1
-        for <kvm@vger.kernel.org>; Thu, 08 Jul 2021 13:35:22 -0700 (PDT)
+        with ESMTP id S230238AbhGHVEA (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 8 Jul 2021 17:04:00 -0400
+Received: from mail-pj1-x102c.google.com (mail-pj1-x102c.google.com [IPv6:2607:f8b0:4864:20::102c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6D883C06175F
+        for <kvm@vger.kernel.org>; Thu,  8 Jul 2021 14:01:17 -0700 (PDT)
+Received: by mail-pj1-x102c.google.com with SMTP id x21-20020a17090aa395b029016e25313bfcso4782222pjp.2
+        for <kvm@vger.kernel.org>; Thu, 08 Jul 2021 14:01:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=Kl0UstyEraXY68jDpGmnd3NZGwUo8e2e0FemGce00zA=;
-        b=upK5A0amrbf3n92/3nQS7H1OESzObIjFROsWcWUjkOiuGBxleLh8D0NffDK0PtGYhj
-         LRx0tZd0qcE0SJ2ttMKhcP/aG/BYzUf1LYYslLhwKahW7aXxHcVP2kRjFTDq9Fiwf8Mv
-         hpNkBcUQxg9PG5WxpEHjk7Aq7DM7D2BEzIfjrnCH1MoGpcFY7tzPHqI1B9OBr3xopg5O
-         ODnFhYfO1ffXCsKbQ6Bj44y9ZFL+V6ihI7QLOfoRnpawnrL9aLmZMjkGK4btcbHK2it/
-         Y/lv5/ROSozXE5pKT5ivGmD0Ie3oPGOLi6KgRCX3PfyNbMZZrsEuLNgJdtoT6NXEYSKa
-         GL5w==
+        bh=XnLVhnDqha4c59VyXUJUIVkNSVAAQY+VM5n1Wqckpa0=;
+        b=WTorCl1o635xlAu+NKkM9OWtM0K3nsO3XI4PbuomT5fDze7UeK1dlLDwqG78skJebh
+         vKyi4S9CnyhMzg/vWKJ6ur5mVmN41Lgru01VtBa65jhAUsSQv2gOb81pe8Cnv3YcyQnl
+         cTX9WTtDSQ8f8RmgRgEpzMA9Pg9StdBtOOOEo3t3QV1CPY2d+CHuZO8Wz/ZS+n6R566f
+         HO/Y12OfGuFzOSzyJy4Txw9lI2DqXL0sfii4u0camHTqCSmFS+4O8niydoE4VUYeXlV9
+         XKZB1nK02S9ou134oMR8g1fYFwcgqBWIsfxjwBqPvnHoSgfh6TtFykPX11OPgwoS57wQ
+         wKIg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=Kl0UstyEraXY68jDpGmnd3NZGwUo8e2e0FemGce00zA=;
-        b=KHdhNdGDeZI1IFf3eeXr+/Pa0XpAErxJ2C+rsAIZ8zHryOow6MpLJ22XMXAUUvk3er
-         2Q4JsFyxmigoRZGNaFKuIxtqjJLROLm6HtWkY+Eppx08MjvpWBGNv57kHm00EFwshv87
-         1JtdEYiQtnGtKOVXj3JxPXpjlW22gYAVpFG/sIMw1wMO54RtbZBhKTNp//cV6zkDTeZI
-         dG1fJ7Jrjmcmiv2dzDuHLw2PweqxM8VXUFdUctNcxcVoymHcZJtdasUnFMuhHjwrOWcf
-         aA+3lUMN69VtUgxBVT1fL6yMmajqoJyCxNG+uChYciUkMuGlp88HQfLc0Le7hf+jVSwU
-         YaOA==
-X-Gm-Message-State: AOAM533X7DfJQE7b+W/Zc1jIWTXgTCYHlshaD0ehLwchXullJQgaYz2V
-        nPmY5Qlj6OO3qKUF+lUq+9LB1g==
-X-Google-Smtp-Source: ABdhPJwELSZtV6L9yMvFZoFOLERy4vbuKCApmnsERQW/tYcVHxntYe6X8UlC2G67TCntdHTVQRNXNw==
-X-Received: by 2002:a65:5a41:: with SMTP id z1mr33360580pgs.130.1625776522024;
-        Thu, 08 Jul 2021 13:35:22 -0700 (PDT)
+        bh=XnLVhnDqha4c59VyXUJUIVkNSVAAQY+VM5n1Wqckpa0=;
+        b=ucC5A/hsl3SPk72SMUtzYyZEnVvOegjlyG8hhiV0DvMTOYq/6GlGHSdE+94SlFwKsL
+         gqyUPNwL8+WOGs1AjGQdE5jfhIBbTVK9fxhXEO9ZumJUr8kJTiHl2QeOPlo2b7YuH2Gc
+         HRJSD9FGmbg9e/9VWMPabkLfMQK2tIBhgOq7uZv9SYVBLNVINIr+4wwLfiyJf7x3z9Ft
+         JW0zrdZmJt/6bqxIOXbdwrl/v4tIWxuMEi3izsRDQ6VUd3ISLBRwNW0igJDv/rcaXDby
+         XX7eeLr7I4/G5ZNHQbra3yBT2XUMQ/dWpDZlYQi+PuksbcwKtzLrmUNmc24dJ96c0EcN
+         s4Sg==
+X-Gm-Message-State: AOAM532BGTmifoKyDlkd9sHK3UGPeXmMHcyMoTKG1PYujRyNKBEPqIy3
+        agkkETXmzxmPtvXZmcdQCIKWFg==
+X-Google-Smtp-Source: ABdhPJxn4cJBOse66K7sy6jUSjOBf17B5E2LvnIIh8493ivqd0pnAisa4RHJrJUccnk6Cd/Jj5KA4w==
+X-Received: by 2002:a17:902:b94a:b029:10d:6f56:eeac with SMTP id h10-20020a170902b94ab029010d6f56eeacmr27835997pls.54.1625778076559;
+        Thu, 08 Jul 2021 14:01:16 -0700 (PDT)
 Received: from google.com (254.80.82.34.bc.googleusercontent.com. [34.82.80.254])
-        by smtp.gmail.com with ESMTPSA id 20sm3804440pfi.170.2021.07.08.13.35.20
+        by smtp.gmail.com with ESMTPSA id z2sm3590995pfn.120.2021.07.08.14.01.14
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 08 Jul 2021 13:35:21 -0700 (PDT)
-Date:   Thu, 8 Jul 2021 20:35:17 +0000
+        Thu, 08 Jul 2021 14:01:14 -0700 (PDT)
+Date:   Thu, 8 Jul 2021 21:01:11 +0000
 From:   David Matlack <dmatlack@google.com>
-To:     David Edmondson <dme@dme.org>
-Cc:     linux-kernel@vger.kernel.org, Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Borislav Petkov <bp@alien8.de>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+To:     Jing Zhang <jingzhangos@google.com>
+Cc:     KVM <kvm@vger.kernel.org>, KVMPPC <kvm-ppc@vger.kernel.org>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>, x86@kernel.org,
-        Ingo Molnar <mingo@redhat.com>,
-        "H. Peter Anvin" <hpa@zytor.com>
-Subject: Re: [PATCH v2 0/2] kvm: x86: Convey the exit reason to user-space on
- emulation failure
-Message-ID: <YOdhhcjXEHUaMIFc@google.com>
-References: <20210706101207.2993686-1-david.edmondson@oracle.com>
- <YOY2pLoXQ8ePXu0W@google.com>
- <m28s2g51q3.fsf@dme.org>
- <YOdGGuk2trw0h95x@google.com>
- <m2y2ag36od.fsf@dme.org>
+        Sean Christopherson <seanjc@google.com>,
+        Jim Mattson <jmattson@google.com>,
+        Peter Shier <pshier@google.com>,
+        Oliver Upton <oupton@google.com>,
+        David Rientjes <rientjes@google.com>
+Subject: Re: [PATCH v1 1/4] KVM: stats: Support linear and logarithmic
+ histogram statistics
+Message-ID: <YOdnl5nzCaPB5l2P@google.com>
+References: <20210706180350.2838127-1-jingzhangos@google.com>
+ <20210706180350.2838127-2-jingzhangos@google.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <m2y2ag36od.fsf@dme.org>
+In-Reply-To: <20210706180350.2838127-2-jingzhangos@google.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jul 08, 2021 at 09:13:38PM +0100, David Edmondson wrote:
-> On Thursday, 2021-07-08 at 18:38:18 UTC, David Matlack wrote:
+On Tue, Jul 06, 2021 at 06:03:47PM +0000, Jing Zhang wrote:
+> Add new types of KVM stats, linear and logarithmic histogram.
+> Histogram are very useful for observing the value distribution
+> of time or size related stats.
 > 
-> > On Thu, Jul 08, 2021 at 03:17:40PM +0100, David Edmondson wrote:
-> >> Apologies if you see two of these - I had some email problems earlier.
-> >
-> > I only got one! :)
+> Signed-off-by: Jing Zhang <jingzhangos@google.com>
+> ---
+>  arch/arm64/kvm/guest.c    |  4 ---
+>  arch/mips/kvm/mips.c      |  4 ---
+>  arch/powerpc/kvm/book3s.c |  4 ---
+>  arch/powerpc/kvm/booke.c  |  4 ---
+>  arch/s390/kvm/kvm-s390.c  |  4 ---
+>  arch/x86/kvm/x86.c        |  4 ---
+>  include/linux/kvm_host.h  | 53 ++++++++++++++++++++++++++++-----------
+>  include/linux/kvm_types.h | 16 ++++++++++++
+>  include/uapi/linux/kvm.h  | 11 +++++---
+>  virt/kvm/binary_stats.c   | 36 ++++++++++++++++++++++++++
+>  10 files changed, 98 insertions(+), 42 deletions(-)
 > 
-> Phew!
-> 
-> >> On Wednesday, 2021-07-07 at 23:20:04 UTC, David Matlack wrote:
-> >> 
-> >> > On Tue, Jul 06, 2021 at 11:12:05AM +0100, David Edmondson wrote:
-> >> >> To help when debugging failures in the field, if instruction emulation
-> >> >> fails, report the VM exit reason to userspace in order that it can be
-> >> >> recorded.
-> >> >
-> >> > What is the benefit of seeing the VM-exit reason that led to an
-> >> > emulation failure?
-> >> 
-> >> I can't cite an example of where this has definitively led in a
-> >> direction that helped solve a problem, but we do sometimes see emulation
-> >> failures reported in situations where we are not able to reproduce the
-> >> failures on demand and the existing information provided at the time of
-> >> failure is either insufficient or suspect.
-> >> 
-> >> Given that, I'm left casting about for data that can be made available
-> >> to assist in postmortem analysis of the failures.
-> >
-> > Understood, thanks for the context. My only concern would be that
-> > userspace APIs are difficult to change once they exist.
-> 
-> Agreed.
-> 
-> > If it turns out knowing the exit reason does not help with debugging
-> > emulation failures we'd still be stuck with exporting it on every
-> > emulation failure.
-> 
-> We could stop setting the flag and never export it, but this would waste
-> space in the structure and be odd, without doubt.
-> 
-> > My intuition is that the instruction bytes (which are now available with
-> > Aaron's patch) and the guest register state (which is queryable through
-> > other ioctls) should be sufficient to set up a reproduction of the
-> > emulation failure in a kvm-unit-test and the exit reason should not
-> > really matter. I'm curious if that's not the case?
-> 
-> The instruction bytes around the reported EIP are all zeroes - the
-> register dump looks suspect, and doesn't correspond with the reported
-> behaviour of the VM at the time of the failure.
+> diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
+> index 1512a8007a78..cb44d8756fa7 100644
+> --- a/arch/arm64/kvm/guest.c
+> +++ b/arch/arm64/kvm/guest.c
+> @@ -31,8 +31,6 @@
+>  const struct _kvm_stats_desc kvm_vm_stats_desc[] = {
+>  	KVM_GENERIC_VM_STATS()
+>  };
+> -static_assert(ARRAY_SIZE(kvm_vm_stats_desc) ==
+> -		sizeof(struct kvm_vm_stat) / sizeof(u64));
+>  
+>  const struct kvm_stats_header kvm_vm_stats_header = {
+>  	.name_size = KVM_STATS_NAME_SIZE,
+> @@ -52,8 +50,6 @@ const struct _kvm_stats_desc kvm_vcpu_stats_desc[] = {
+>  	STATS_DESC_COUNTER(VCPU, mmio_exit_kernel),
+>  	STATS_DESC_COUNTER(VCPU, exits)
+>  };
+> -static_assert(ARRAY_SIZE(kvm_vcpu_stats_desc) ==
+> -		sizeof(struct kvm_vcpu_stat) / sizeof(u64));
+>  
+>  const struct kvm_stats_header kvm_vcpu_stats_header = {
+>  	.name_size = KVM_STATS_NAME_SIZE,
+> diff --git a/arch/mips/kvm/mips.c b/arch/mips/kvm/mips.c
+> index af9dd029a4e1..75c6f264c626 100644
+> --- a/arch/mips/kvm/mips.c
+> +++ b/arch/mips/kvm/mips.c
+> @@ -41,8 +41,6 @@
+>  const struct _kvm_stats_desc kvm_vm_stats_desc[] = {
+>  	KVM_GENERIC_VM_STATS()
+>  };
+> -static_assert(ARRAY_SIZE(kvm_vm_stats_desc) ==
+> -		sizeof(struct kvm_vm_stat) / sizeof(u64));
+>  
+>  const struct kvm_stats_header kvm_vm_stats_header = {
+>  	.name_size = KVM_STATS_NAME_SIZE,
+> @@ -85,8 +83,6 @@ const struct _kvm_stats_desc kvm_vcpu_stats_desc[] = {
+>  	STATS_DESC_COUNTER(VCPU, vz_cpucfg_exits),
+>  #endif
+>  };
+> -static_assert(ARRAY_SIZE(kvm_vcpu_stats_desc) ==
+> -		sizeof(struct kvm_vcpu_stat) / sizeof(u64));
+>  
+>  const struct kvm_stats_header kvm_vcpu_stats_header = {
+>  	.name_size = KVM_STATS_NAME_SIZE,
+> diff --git a/arch/powerpc/kvm/book3s.c b/arch/powerpc/kvm/book3s.c
+> index 79833f78d1da..5cc6e90095b0 100644
+> --- a/arch/powerpc/kvm/book3s.c
+> +++ b/arch/powerpc/kvm/book3s.c
+> @@ -43,8 +43,6 @@ const struct _kvm_stats_desc kvm_vm_stats_desc[] = {
+>  	STATS_DESC_ICOUNTER(VM, num_2M_pages),
+>  	STATS_DESC_ICOUNTER(VM, num_1G_pages)
+>  };
+> -static_assert(ARRAY_SIZE(kvm_vm_stats_desc) ==
+> -		sizeof(struct kvm_vm_stat) / sizeof(u64));
+>  
+>  const struct kvm_stats_header kvm_vm_stats_header = {
+>  	.name_size = KVM_STATS_NAME_SIZE,
+> @@ -88,8 +86,6 @@ const struct _kvm_stats_desc kvm_vcpu_stats_desc[] = {
+>  	STATS_DESC_COUNTER(VCPU, pthru_host),
+>  	STATS_DESC_COUNTER(VCPU, pthru_bad_aff)
+>  };
+> -static_assert(ARRAY_SIZE(kvm_vcpu_stats_desc) ==
+> -		sizeof(struct kvm_vcpu_stat) / sizeof(u64));
+>  
+>  const struct kvm_stats_header kvm_vcpu_stats_header = {
+>  	.name_size = KVM_STATS_NAME_SIZE,
+> diff --git a/arch/powerpc/kvm/booke.c b/arch/powerpc/kvm/booke.c
+> index 551b30d84aee..5ed6c235e059 100644
+> --- a/arch/powerpc/kvm/booke.c
+> +++ b/arch/powerpc/kvm/booke.c
+> @@ -41,8 +41,6 @@ const struct _kvm_stats_desc kvm_vm_stats_desc[] = {
+>  	STATS_DESC_ICOUNTER(VM, num_2M_pages),
+>  	STATS_DESC_ICOUNTER(VM, num_1G_pages)
+>  };
+> -static_assert(ARRAY_SIZE(kvm_vm_stats_desc) ==
+> -		sizeof(struct kvm_vm_stat) / sizeof(u64));
+>  
+>  const struct kvm_stats_header kvm_vm_stats_header = {
+>  	.name_size = KVM_STATS_NAME_SIZE,
+> @@ -79,8 +77,6 @@ const struct _kvm_stats_desc kvm_vcpu_stats_desc[] = {
+>  	STATS_DESC_COUNTER(VCPU, pthru_host),
+>  	STATS_DESC_COUNTER(VCPU, pthru_bad_aff)
+>  };
+> -static_assert(ARRAY_SIZE(kvm_vcpu_stats_desc) ==
+> -		sizeof(struct kvm_vcpu_stat) / sizeof(u64));
+>  
+>  const struct kvm_stats_header kvm_vcpu_stats_header = {
+>  	.name_size = KVM_STATS_NAME_SIZE,
+> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
+> index 1695f0ced5ba..7610d33d319b 100644
+> --- a/arch/s390/kvm/kvm-s390.c
+> +++ b/arch/s390/kvm/kvm-s390.c
+> @@ -66,8 +66,6 @@ const struct _kvm_stats_desc kvm_vm_stats_desc[] = {
+>  	STATS_DESC_COUNTER(VM, inject_service_signal),
+>  	STATS_DESC_COUNTER(VM, inject_virtio)
+>  };
+> -static_assert(ARRAY_SIZE(kvm_vm_stats_desc) ==
+> -		sizeof(struct kvm_vm_stat) / sizeof(u64));
+>  
+>  const struct kvm_stats_header kvm_vm_stats_header = {
+>  	.name_size = KVM_STATS_NAME_SIZE,
+> @@ -174,8 +172,6 @@ const struct _kvm_stats_desc kvm_vcpu_stats_desc[] = {
+>  	STATS_DESC_COUNTER(VCPU, diagnose_other),
+>  	STATS_DESC_COUNTER(VCPU, pfault_sync)
+>  };
+> -static_assert(ARRAY_SIZE(kvm_vcpu_stats_desc) ==
+> -		sizeof(struct kvm_vcpu_stat) / sizeof(u64));
+>  
+>  const struct kvm_stats_header kvm_vcpu_stats_header = {
+>  	.name_size = KVM_STATS_NAME_SIZE,
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index 8166ad113fb2..b94a80ad5b8d 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -239,8 +239,6 @@ const struct _kvm_stats_desc kvm_vm_stats_desc[] = {
+>  	STATS_DESC_ICOUNTER(VM, nx_lpage_splits),
+>  	STATS_DESC_PCOUNTER(VM, max_mmu_page_hash_collisions)
+>  };
+> -static_assert(ARRAY_SIZE(kvm_vm_stats_desc) ==
+> -		sizeof(struct kvm_vm_stat) / sizeof(u64));
+>  
+>  const struct kvm_stats_header kvm_vm_stats_header = {
+>  	.name_size = KVM_STATS_NAME_SIZE,
+> @@ -280,8 +278,6 @@ const struct _kvm_stats_desc kvm_vcpu_stats_desc[] = {
+>  	STATS_DESC_COUNTER(VCPU, directed_yield_successful),
+>  	STATS_DESC_ICOUNTER(VCPU, guest_mode)
+>  };
+> -static_assert(ARRAY_SIZE(kvm_vcpu_stats_desc) ==
+> -		sizeof(struct kvm_vcpu_stat) / sizeof(u64));
+>  
+>  const struct kvm_stats_header kvm_vcpu_stats_header = {
+>  	.name_size = KVM_STATS_NAME_SIZE,
+> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+> index ae7735b490b4..356af173114d 100644
+> --- a/include/linux/kvm_host.h
+> +++ b/include/linux/kvm_host.h
+> @@ -1273,56 +1273,66 @@ struct _kvm_stats_desc {
+>  	char name[KVM_STATS_NAME_SIZE];
+>  };
+>  
+> -#define STATS_DESC_COMMON(type, unit, base, exp)			       \
+> +#define STATS_DESC_COMMON(type, unit, base, exp, sz, param)		       \
+>  	.flags = type | unit | base |					       \
+>  		 BUILD_BUG_ON_ZERO(type & ~KVM_STATS_TYPE_MASK) |	       \
+>  		 BUILD_BUG_ON_ZERO(unit & ~KVM_STATS_UNIT_MASK) |	       \
+>  		 BUILD_BUG_ON_ZERO(base & ~KVM_STATS_BASE_MASK),	       \
+>  	.exponent = exp,						       \
+> -	.size = 1
+> +	.size = sz,							       \
+> +	.hist_param = param
+>  
+> -#define VM_GENERIC_STATS_DESC(stat, type, unit, base, exp)		       \
+> +#define VM_GENERIC_STATS_DESC(stat, type, unit, base, exp, sz, param)	       \
+>  	{								       \
+>  		{							       \
+> -			STATS_DESC_COMMON(type, unit, base, exp),	       \
+> +			STATS_DESC_COMMON(type, unit, base, exp, sz, param),   \
+>  			.offset = offsetof(struct kvm_vm_stat, generic.stat)   \
+>  		},							       \
+>  		.name = #stat,						       \
+>  	}
+> -#define VCPU_GENERIC_STATS_DESC(stat, type, unit, base, exp)		       \
+> +#define VCPU_GENERIC_STATS_DESC(stat, type, unit, base, exp, sz, param)	       \
+>  	{								       \
+>  		{							       \
+> -			STATS_DESC_COMMON(type, unit, base, exp),	       \
+> +			STATS_DESC_COMMON(type, unit, base, exp, sz, param),   \
+>  			.offset = offsetof(struct kvm_vcpu_stat, generic.stat) \
+>  		},							       \
+>  		.name = #stat,						       \
+>  	}
+> -#define VM_STATS_DESC(stat, type, unit, base, exp)			       \
+> +#define VM_STATS_DESC(stat, type, unit, base, exp, sz, param)		       \
+>  	{								       \
+>  		{							       \
+> -			STATS_DESC_COMMON(type, unit, base, exp),	       \
+> +			STATS_DESC_COMMON(type, unit, base, exp, sz, param),   \
+>  			.offset = offsetof(struct kvm_vm_stat, stat)	       \
+>  		},							       \
+>  		.name = #stat,						       \
+>  	}
+> -#define VCPU_STATS_DESC(stat, type, unit, base, exp)			       \
+> +#define VCPU_STATS_DESC(stat, type, unit, base, exp, sz, param)		       \
+>  	{								       \
+>  		{							       \
+> -			STATS_DESC_COMMON(type, unit, base, exp),	       \
+> +			STATS_DESC_COMMON(type, unit, base, exp, sz, param),   \
+>  			.offset = offsetof(struct kvm_vcpu_stat, stat)	       \
+>  		},							       \
+>  		.name = #stat,						       \
+>  	}
+>  /* SCOPE: VM, VM_GENERIC, VCPU, VCPU_GENERIC */
+> -#define STATS_DESC(SCOPE, stat, type, unit, base, exp)			       \
+> -	SCOPE##_STATS_DESC(stat, type, unit, base, exp)
+> +#define STATS_DESC(SCOPE, stat, type, unit, base, exp, sz, param)	       \
+> +	SCOPE##_STATS_DESC(stat, type, unit, base, exp, sz, param)
+>  
+>  #define STATS_DESC_CUMULATIVE(SCOPE, name, unit, base, exponent)	       \
+> -	STATS_DESC(SCOPE, name, KVM_STATS_TYPE_CUMULATIVE, unit, base, exponent)
+> +	STATS_DESC(SCOPE, name, KVM_STATS_TYPE_CUMULATIVE,		       \
+> +		unit, base, exponent, 1, 0)
+>  #define STATS_DESC_INSTANT(SCOPE, name, unit, base, exponent)		       \
+> -	STATS_DESC(SCOPE, name, KVM_STATS_TYPE_INSTANT, unit, base, exponent)
+> +	STATS_DESC(SCOPE, name, KVM_STATS_TYPE_INSTANT,			       \
+> +		unit, base, exponent, 1, 0)
+>  #define STATS_DESC_PEAK(SCOPE, name, unit, base, exponent)		       \
+> -	STATS_DESC(SCOPE, name, KVM_STATS_TYPE_PEAK, unit, base, exponent)
+> +	STATS_DESC(SCOPE, name, KVM_STATS_TYPE_PEAK,			       \
+> +		unit, base, exponent, 1, 0)
+> +#define STATS_DESC_LINEAR_HIST(SCOPE, name, unit, base, exponent, sz, param)   \
+> +	STATS_DESC(SCOPE, name, KVM_STATS_TYPE_LINEAR_HIST,		       \
+> +		unit, base, exponent, sz, param)
+> +#define STATS_DESC_LOG_HIST(SCOPE, name, unit, base, exponent, sz, param)      \
+> +	STATS_DESC(SCOPE, name, KVM_STATS_TYPE_LOG_HIST,		       \
+> +		unit, base, exponent, sz, param)
+>  
+>  /* Cumulative counter, read/write */
+>  #define STATS_DESC_COUNTER(SCOPE, name)					       \
+> @@ -1341,6 +1351,14 @@ struct _kvm_stats_desc {
+>  #define STATS_DESC_TIME_NSEC(SCOPE, name)				       \
+>  	STATS_DESC_CUMULATIVE(SCOPE, name, KVM_STATS_UNIT_SECONDS,	       \
+>  		KVM_STATS_BASE_POW10, -9)
+> +/* Linear histogram for time in nanosecond */
+> +#define STATS_DESC_LINHIST_TIME_NSEC(SCOPE, name, sz, bucket_size)	       \
+> +	STATS_DESC_LINEAR_HIST(SCOPE, name, KVM_STATS_UNIT_SECONDS,	       \
+> +		KVM_STATS_BASE_POW10, -9, sz, bucket_size)
+> +/* Logarithmic histogram for time in nanosecond */
+> +#define STATS_DESC_LOGHIST_TIME_NSEC(SCOPE, name, sz)			       \
+> +	STATS_DESC_LOG_HIST(SCOPE, name, KVM_STATS_UNIT_SECONDS,	       \
+> +		KVM_STATS_BASE_POW10, -9, sz, LOGHIST_BASE_2)
+>  
+>  #define KVM_GENERIC_VM_STATS()						       \
+>  	STATS_DESC_COUNTER(VM_GENERIC, remote_tlb_flush)
+> @@ -1354,10 +1372,15 @@ struct _kvm_stats_desc {
+>  	STATS_DESC_TIME_NSEC(VCPU_GENERIC, halt_poll_fail_ns)
+>  
+>  extern struct dentry *kvm_debugfs_dir;
+> +
+>  ssize_t kvm_stats_read(char *id, const struct kvm_stats_header *header,
+>  		       const struct _kvm_stats_desc *desc,
+>  		       void *stats, size_t size_stats,
+>  		       char __user *user_buffer, size_t size, loff_t *offset);
+> +void kvm_stats_linear_hist_update(u64 *data, size_t size,
+> +				  u64 value, size_t bucket_size);
+> +void kvm_stats_log_hist_update(u64 *data, size_t size, u64 value);
+> +
+>  extern const struct kvm_stats_header kvm_vm_stats_header;
+>  extern const struct _kvm_stats_desc kvm_vm_stats_desc[];
+>  extern const struct kvm_stats_header kvm_vcpu_stats_header;
+> diff --git a/include/linux/kvm_types.h b/include/linux/kvm_types.h
+> index ed6a985c5680..cc88cd676775 100644
+> --- a/include/linux/kvm_types.h
+> +++ b/include/linux/kvm_types.h
+> @@ -76,6 +76,22 @@ struct kvm_mmu_memory_cache {
+>  };
+>  #endif
+>  
+> +/* Constants used for histogram stats */
+> +#define LINHIST_SIZE_SMALL		10
+> +#define LINHIST_SIZE_MEDIUM		20
+> +#define LINHIST_SIZE_LARGE		50
+> +#define LINHIST_SIZE_XLARGE		100
 
-Interesting... Nothing comes to mind but others on this list might have
-a suggestion of where to look next.
+nit: s/SIZE/BUCKET_COUNT/
 
-> 
-> It's possible that Aaron's changes will help, indeed, given that they
-> report state from within the instruction emulator itself. So far I don't
-> have a sufficiently reproducible case to be able to see if that is the
-> case.
-> 
-> > I'm really not opposed to exporting the exit reason if it is useful, I'm
-> > just not sure it will help.
-> 
-> In the emulation failure case we are not in something I would consider a
-> fast path, and the overhead of acquiring and reporting the exit reason
-> is low.
+> +#define LINHIST_BUCKET_SIZE_SMALL	10
+> +#define LINHIST_BUCKET_SIZE_MEDIUM	100
+> +#define LINHIST_BUCKET_SIZE_LARGE	1000
+> +#define LINHIST_BUCKET_SIZE_XLARGE	10000
+> +
+> +#define LOGHIST_SIZE_SMALL		8
+> +#define LOGHIST_SIZE_MEDIUM		16
+> +#define LOGHIST_SIZE_LARGE		32
+> +#define LOGHIST_SIZE_XLARGE		64
 
-Agreed. I'm not worried about performance, only code complexity and
-bloat in the userspace API. But as you suggested above we could always
-stop setting the flag and remove the code that populates the exit reason
-if it turns out to not be useful. The field in kvm_run is the only thing
-that could be hard to remove in the future.
+Ditto here.
 
-> 
-> Do you anticipate a case where it would be inappropriate or expensive to
-> report the reason?
-> 
-> >> 
-> >> >> I'm unsure whether sgx_handle_emulation_failure() needs to be adapted
-> >> >> to use the emulation_failure part of the exit union in struct kvm_run
-> >> >> - advice welcomed.
-> >> >> 
-> >> >> v2:
-> >> >> - Improve patch comments (dmatlack)
-> >> >> - Intel should provide the full exit reason (dmatlack)
-> >> >> - Pass a boolean rather than flags (dmatlack)
-> >> >> - Use the helper in kvm_task_switch() and kvm_handle_memory_failure()
-> >> >>   (dmatlack)
-> >> >> - Describe the exit_reason field of the emulation_failure structure
-> >> >>   (dmatlack)
-> >> >> 
-> >> >> David Edmondson (2):
-> >> >>   KVM: x86: Add kvm_x86_ops.get_exit_reason
-> >> >>   KVM: x86: On emulation failure, convey the exit reason to userspace
-> >> >> 
-> >> >>  arch/x86/include/asm/kvm-x86-ops.h |  1 +
-> >> >>  arch/x86/include/asm/kvm_host.h    |  3 +++
-> >> >>  arch/x86/kvm/svm/svm.c             |  6 ++++++
-> >> >>  arch/x86/kvm/vmx/vmx.c             | 11 +++++++----
-> >> >>  arch/x86/kvm/x86.c                 | 22 +++++++++++++---------
-> >> >>  include/uapi/linux/kvm.h           |  7 +++++++
-> >> >>  6 files changed, 37 insertions(+), 13 deletions(-)
-> >> >> 
-> >> >> -- 
-> >> >> 2.30.2
-> >> >> 
-> >> 
-> >> dme.
-> >> -- 
-> >> It's gettin', it's gettin', it's gettin' kinda hectic.
-> 
-> dme.
+> +#define LOGHIST_BASE_2			2
+> +
+>  struct kvm_vm_stat_generic {
+>  	u64 remote_tlb_flush;
+>  };
+> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+> index 68c9e6d8bbda..ff34a471d9ef 100644
+> --- a/include/uapi/linux/kvm.h
+> +++ b/include/uapi/linux/kvm.h
+> @@ -1963,7 +1963,9 @@ struct kvm_stats_header {
+>  #define KVM_STATS_TYPE_CUMULATIVE	(0x0 << KVM_STATS_TYPE_SHIFT)
+>  #define KVM_STATS_TYPE_INSTANT		(0x1 << KVM_STATS_TYPE_SHIFT)
+>  #define KVM_STATS_TYPE_PEAK		(0x2 << KVM_STATS_TYPE_SHIFT)
+> -#define KVM_STATS_TYPE_MAX		KVM_STATS_TYPE_PEAK
+> +#define KVM_STATS_TYPE_LINEAR_HIST	(0x3 << KVM_STATS_TYPE_SHIFT)
+> +#define KVM_STATS_TYPE_LOG_HIST		(0x4 << KVM_STATS_TYPE_SHIFT)
+> +#define KVM_STATS_TYPE_MAX		KVM_STATS_TYPE_LOG_HIST
+>  
+>  #define KVM_STATS_UNIT_SHIFT		4
+>  #define KVM_STATS_UNIT_MASK		(0xF << KVM_STATS_UNIT_SHIFT)
+> @@ -1987,7 +1989,10 @@ struct kvm_stats_header {
+>   *        Every data item is of type __u64.
+>   * @offset: The offset of the stats to the start of stat structure in
+>   *          struture kvm or kvm_vcpu.
+> - * @unused: Unused field for future usage. Always 0 for now.
+> + * @hist_param: A parameter value used for histogram stats. For linear
+> + *              histogram stats, it indicates the size of the bucket;
+> + *              For logarithmic histogram stats, it indicates the base
+> + *              of the logarithm. Only base of 2 is supported.
+>   * @name: The name string for the stats. Its size is indicated by the
+>   *        &kvm_stats_header->name_size.
+>   */
+> @@ -1996,7 +2001,7 @@ struct kvm_stats_desc {
+>  	__s16 exponent;
+>  	__u16 size;
+>  	__u32 offset;
+> -	__u32 unused;
+> +	__u32 hist_param;
+
+`hist_param` is vague. What about making this an anonymous union to make
+the dual meaning explicit?
+
+        union {
+                /* Only used for KVM_STATS_TYPE_LOG_HIST. */
+                __u32 base;
+                /* Only used for KVM_STATS_TYPE_LINEAR_HIST. */
+                __u32 bucket_size;
+        };
+
+It may make the STATS_DESC code a bit more complicated but the rest of
+the code that uses it will be much more clear.
+
+>  	char name[];
+>  };
+>  
+> diff --git a/virt/kvm/binary_stats.c b/virt/kvm/binary_stats.c
+> index e609d428811a..6eead6979a7f 100644
+> --- a/virt/kvm/binary_stats.c
+> +++ b/virt/kvm/binary_stats.c
+> @@ -144,3 +144,39 @@ ssize_t kvm_stats_read(char *id, const struct kvm_stats_header *header,
+>  	*offset = pos;
+>  	return len;
+>  }
+> +
+> +/**
+> + * kvm_stats_linear_hist_update() - Update bucket value for linear histogram
+> + * statistics data.
+> + *
+> + * @data: start address of the stats data
+> + * @size: the number of bucket of the stats data
+> + * @value: the new value used to update the linear histogram's bucket
+> + * @bucket_size: the size (width) of a bucket
+> + */
+> +void kvm_stats_linear_hist_update(u64 *data, size_t size,
+> +				  u64 value, size_t bucket_size)
+> +{
+> +	size_t index = value / bucket_size;
+> +
+> +	if (index >= size)
+> +		index = size - 1;
+
+nit: It would be simpler to use max().
+
+        size_t index = max(value / bucket_size, size - 1);
+
+> +	++data[index];
+> +}
+> +
+> +/**
+> + * kvm_stats_log_hist_update() - Update bucket value for logarithmic histogram
+> + * statistics data.
+> + *
+> + * @data: start address of the stats data
+> + * @size: the number of bucket of the stats data
+> + * @value: the new value used to update the logarithmic histogram's bucket
+> + */
+> +void kvm_stats_log_hist_update(u64 *data, size_t size, u64 value)
+> +{
+> +	size_t index = fls64(value);
+> +
+> +	if (index >= size)
+> +		index = size - 1;
+
+Ditto here about using max().
+
+> +	++data[index];
+> +}
 > -- 
-> Please forgive me if I act a little strange, for I know not what I do.
+> 2.32.0.93.g670b81a890-goog
+> 
