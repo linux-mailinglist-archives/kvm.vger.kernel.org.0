@@ -2,286 +2,216 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 710783BF47E
-	for <lists+kvm@lfdr.de>; Thu,  8 Jul 2021 06:18:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1E9683BF533
+	for <lists+kvm@lfdr.de>; Thu,  8 Jul 2021 07:39:16 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229608AbhGHEUy (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 8 Jul 2021 00:20:54 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:57743 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229524AbhGHEUw (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 8 Jul 2021 00:20:52 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1625717890;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=DNu1zHrcXhgpVSSnQcgsiGwDGO6YEQsjo75QjE9guwc=;
-        b=fYyH6w/eIBwqjX1SKGqb/LccQle0nQ76DZy2PYdekPwT38XXK39moNSFiBrVBOOVbE+J+H
-        K83AH5gqsHE2DqTPPtw/Xv8Qi0PZnp/1dZ5SgzdL4KL/grJPW5z8BaKU77FAKrLPozCPUy
-        hsfK+R5SflQNIJuUo+/QNpozqj9h2sg=
-Received: from mail-pl1-f197.google.com (mail-pl1-f197.google.com
- [209.85.214.197]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-157-7xBUhmt8PQWWQci2Gzdm9w-1; Thu, 08 Jul 2021 00:18:09 -0400
-X-MC-Unique: 7xBUhmt8PQWWQci2Gzdm9w-1
-Received: by mail-pl1-f197.google.com with SMTP id t10-20020a170902b20ab029011b9ceafaafso1389905plr.11
-        for <kvm@vger.kernel.org>; Wed, 07 Jul 2021 21:18:09 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-transfer-encoding
-         :content-language;
-        bh=DNu1zHrcXhgpVSSnQcgsiGwDGO6YEQsjo75QjE9guwc=;
-        b=C5FmKUi1gXQbUTcUunCd0qqCxSUgKyTVuU3nX0Jg7gEB9wDj5pobt/k05e/YMtTYHG
-         /T8LKTw50Vk1i0HhJTi5zyh+V3z9HRVrDqguX/fJl+ubGoQDapDmDrO9okEEnQ5Ug5cH
-         XVLOvxIcb3jaJh0VjzE+j2C4vjtyqbQxcITgTTsCcKBwVboVMLZXIDtzkg+QfyYc7SVo
-         zJ4Ljme9OcNm8IQU2sWilKzwx0G6eI8Ew3nqRTG33ygrwW6GzIUWU0vHy96in4Bm4urF
-         g6Jk6NIRNgpoUFTV/jjrAmjfoNHVekFP3r1KJREIemOpomztu6NwAt3AD99LP/e+cxJm
-         Ptug==
-X-Gm-Message-State: AOAM530zuGIYpss02luQIiypAno0lXxuVV6SVtCz7A5zg7FLF4eZr5a8
-        HnHg/8Y4wIR+XFQtjuNFjAER9bV8Th7rp7Ot5bN2YHzMQPE0aqGuj/De6JNFQh1nGGKdkfozcKk
-        4Qz024XK7sOva
-X-Received: by 2002:a17:902:aa86:b029:116:3e3a:2051 with SMTP id d6-20020a170902aa86b02901163e3a2051mr24239003plr.38.1625717888579;
-        Wed, 07 Jul 2021 21:18:08 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzgPpvaVl8Rg4KqU5dAGuQXgjQhnKK5qnVXzUgmrqEO0suxCn8aS1zG54MnxoNvIGvMzyvnlw==
-X-Received: by 2002:a17:902:aa86:b029:116:3e3a:2051 with SMTP id d6-20020a170902aa86b02901163e3a2051mr24238978plr.38.1625717888336;
-        Wed, 07 Jul 2021 21:18:08 -0700 (PDT)
-Received: from wangxiaodeMacBook-Air.local ([209.132.188.80])
-        by smtp.gmail.com with ESMTPSA id c64sm792630pfb.166.2021.07.07.21.18.01
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 07 Jul 2021 21:18:07 -0700 (PDT)
-Subject: Re: [PATCH v8 10/10] Documentation: Add documentation for VDUSE
-To:     Stefan Hajnoczi <stefanha@redhat.com>
-Cc:     Xie Yongji <xieyongji@bytedance.com>,
+        id S229843AbhGHFlv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 8 Jul 2021 01:41:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44032 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229756AbhGHFlu (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 8 Jul 2021 01:41:50 -0400
+Received: from metis.ext.pengutronix.de (metis.ext.pengutronix.de [IPv6:2001:67c:670:201:290:27ff:fe1d:cc33])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4D21FC061574
+        for <kvm@vger.kernel.org>; Wed,  7 Jul 2021 22:39:09 -0700 (PDT)
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+        by metis.ext.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+        (Exim 4.92)
+        (envelope-from <ukl@pengutronix.de>)
+        id 1m1MkA-0006EE-1O; Thu, 08 Jul 2021 07:38:38 +0200
+Received: from [2a0a:edc0:0:900:1d::77] (helo=ptz.office.stw.pengutronix.de)
+        by drehscheibe.grey.stw.pengutronix.de with esmtp (Exim 4.92)
+        (envelope-from <ukl@pengutronix.de>)
+        id 1m1Mk9-00030H-1D; Thu, 08 Jul 2021 07:38:37 +0200
+Received: from ukl by ptz.office.stw.pengutronix.de with local (Exim 4.92)
+        (envelope-from <ukl@pengutronix.de>)
+        id 1m1Mk8-0007Hx-U3; Thu, 08 Jul 2021 07:38:36 +0200
+Date:   Thu, 8 Jul 2021 07:38:13 +0200
+From:   Uwe =?utf-8?Q?Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>
+To:     Sven Van Asbroeck <thesven73@gmail.com>
+Cc:     nvdimm@lists.linux.dev, Alexey Kardashevskiy <aik@ozlabs.ru>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        Samuel Iglesias Gonsalvez <siglesias@igalia.com>,
+        Jens Taprogge <jens.taprogge@taprogge.org>,
+        Ulf Hansson <ulf.hansson@linaro.org>,
+        Jaroslav Kysela <perex@perex.cz>, linux-fpga@vger.kernel.org,
+        Benjamin Tissoires <benjamin.tissoires@redhat.com>,
+        Paul Mackerras <paulus@samba.org>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        "K. Y. Srinivasan" <kys@microsoft.com>,
+        Mike Christie <michael.christie@oracle.com>,
+        Wei Liu <wei.liu@kernel.org>,
+        Maxim Levitsky <maximlevitsky@gmail.com>,
+        Samuel Holland <samuel@sholland.org>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        linux-acpi@vger.kernel.org, linux-pci@vger.kernel.org,
+        xen-devel@lists.xenproject.org,
+        Tomas Winkler <tomas.winkler@intel.com>,
+        Julien Grall <jgrall@amazon.com>,
+        Ohad Ben-Cohen <ohad@wizery.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Alex Elder <elder@kernel.org>, linux-parisc@vger.kernel.org,
+        Geoff Levand <geoff@infradead.org>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        linux-usb@vger.kernel.org, "Rafael J. Wysocki" <rjw@rjwysocki.net>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        linux-spi <linux-spi@vger.kernel.org>,
+        Thorsten Scherer <t.scherer@eckelmann.de>,
+        Sascha Hauer <kernel@pengutronix.de>,
+        Jon Mason <jdmason@kudzu.us>, linux-ntb@googlegroups.com,
+        Wu Hao <hao.wu@intel.com>, David Woodhouse <dwmw@amazon.co.uk>,
+        Krzysztof =?utf-8?Q?Wilczy=C5=84ski?= <kw@linux.com>,
+        Alexandre Belloni <alexandre.belloni@bootlin.com>,
+        Manohar Vanga <manohar.vanga@gmail.com>,
+        linux-wireless@vger.kernel.org,
+        Dominik Brodowski <linux@dominikbrodowski.net>,
+        virtualization@lists.linux-foundation.org,
+        "James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>,
+        target-devel@vger.kernel.org,
+        Srinivas Kandagatla <srinivas.kandagatla@linaro.org>,
+        linux-i2c <linux-i2c@vger.kernel.org>,
+        Kai-Heng Feng <kai.heng.feng@canonical.com>,
+        Stefano Stabellini <sstabellini@kernel.org>,
+        Stephen Hemminger <sthemmin@microsoft.com>,
+        Ira Weiny <ira.weiny@intel.com>, Helge Deller <deller@gmx.de>,
+        =?utf-8?B?UmFmYcWCIE1pxYJlY2tp?= <zajec5@gmail.com>,
+        industrypack-devel@lists.sourceforge.net,
+        linux-mips@vger.kernel.org, Len Brown <lenb@kernel.org>,
+        alsa-devel@alsa-project.org, linux-arm-msm@vger.kernel.org,
+        linux-media <linux-media@vger.kernel.org>,
+        Maxime Ripard <mripard@kernel.org>,
+        Johan Hovold <johan@kernel.org>, greybus-dev@lists.linaro.org,
+        Bjorn Helgaas <bhelgaas@google.com>,
+        Dave Jiang <dave.jiang@intel.com>,
+        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
+        Mika Westerberg <mika.westerberg@linux.intel.com>,
+        "moderated list:ARM/FREESCALE IMX / MXC ARM ARCHITECTURE" 
+        <linux-arm-kernel@lists.infradead.org>,
+        Johannes Thumshirn <morbidrsa@gmail.com>,
+        Mathieu Poirier <mathieu.poirier@linaro.org>,
+        Stephen Boyd <sboyd@kernel.org>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Wolfram Sang <wsa@kernel.org>,
+        Joey Pabalan <jpabalanb@gmail.com>,
+        Yehezkel Bernat <YehezkelShB@gmail.com>,
+        Pali =?utf-8?B?Um9ow6Fy?= <pali@kernel.org>,
+        Bodo Stroesser <bostroesser@gmail.com>,
+        Alison Schofield <alison.schofield@intel.com>,
+        Heikki Krogerus <heikki.krogerus@linux.intel.com>,
+        Tyrel Datwyler <tyreld@linux.ibm.com>,
+        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+        Tom Rix <trix@redhat.com>, Jason Wang <jasowang@redhat.com>,
+        SeongJae Park <sjpark@amazon.de>, linux-hyperv@vger.kernel.org,
+        platform-driver-x86@vger.kernel.org, Frank Li <lznuaa@gmail.com>,
+        netdev <netdev@vger.kernel.org>,
+        Jiri Slaby <jirislaby@kernel.org>,
+        Rob Herring <robh@kernel.org>,
+        Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>,
+        Mark Gross <mgross@linux.intel.com>,
+        linux-staging@lists.linux.dev, Dexuan Cui <decui@microsoft.com>,
+        Jernej Skrabec <jernej.skrabec@gmail.com>,
+        Kishon Vijay Abraham I <kishon@ti.com>,
+        Chen-Yu Tsai <wens@csie.org>, linux-input@vger.kernel.org,
+        Matt Porter <mporter@kernel.crashing.org>,
+        Allen Hubbe <allenbh@gmail.com>, Alex Dubov <oakad@yahoo.com>,
+        Haiyang Zhang <haiyangz@microsoft.com>,
+        Jiri Kosina <jikos@kernel.org>,
+        Vladimir Zapolskiy <vz@mleia.com>,
+        Ben Widawsky <ben.widawsky@intel.com>,
+        Moritz Fischer <mdf@kernel.org>, linux-cxl@vger.kernel.org,
+        Michael Buesch <m@bues.ch>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Mauro Carvalho Chehab <mchehab@kernel.org>,
+        Cristian Marussi <cristian.marussi@arm.com>,
+        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Martyn Welch <martyn@welchs.me.uk>,
+        Dmitry Torokhov <dmitry.torokhov@gmail.com>,
+        linux-mmc@vger.kernel.org, linux-sunxi@lists.linux.dev,
+        Stefan Richter <stefanr@s5r6.in-berlin.de>,
+        Sudeep Holla <sudeep.holla@arm.com>,
+        "David S. Miller" <davem@davemloft.net>, kvm@vger.kernel.org,
         "Michael S. Tsirkin" <mst@redhat.com>,
-        Stefano Garzarella <sgarzare@redhat.com>,
-        Parav Pandit <parav@nvidia.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Christian Brauner <christian.brauner@canonical.com>,
-        Randy Dunlap <rdunlap@infradead.org>,
-        Matthew Wilcox <willy@infradead.org>,
-        Al Viro <viro@zeniv.linux.org.uk>,
-        Jens Axboe <axboe@kernel.dk>,
-        "bcrl@kvack.org" <bcrl@kvack.org>,
-        Jonathan Corbet <corbet@lwn.net>,
-        =?UTF-8?Q?Mika_Penttil=c3=a4?= <mika.penttila@nextfour.com>,
-        Dan Carpenter <dan.carpenter@oracle.com>, joro@8bytes.org,
-        gregkh@linuxfoundation.org,
-        "songmuchun@bytedance.com" <songmuchun@bytedance.com>,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        kvm@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
-        linux-kernel <linux-kernel@vger.kernel.org>
-References: <CACycT3vo-diHgTSLw_FS2E+5ia5VjihE3qw7JmZR7JT55P-wQA@mail.gmail.com>
- <8320d26d-6637-85c6-8773-49553dfa502d@redhat.com>
- <YOL/9mxkJaokKDHc@stefanha-x1.localdomain>
- <5b5107fa-3b32-8a3b-720d-eee6b2a84ace@redhat.com>
- <YOQtG3gDOhHDO5CQ@stefanha-x1.localdomain>
- <CACGkMEs2HHbUfarum8uQ6wuXoDwLQUSXTsa-huJFiqr__4cwRg@mail.gmail.com>
- <YOSOsrQWySr0andk@stefanha-x1.localdomain>
- <100e6788-7fdf-1505-d69c-bc28a8bc7a78@redhat.com>
- <YOVr801d01YOPzLL@stefanha-x1.localdomain>
- <a03c8627-7dac-2255-a2d9-603fc623b618@redhat.com>
- <YOXOMiPl7mKd7FoM@stefanha-x1.localdomain>
-From:   Jason Wang <jasowang@redhat.com>
-Message-ID: <d5aef112-0828-6b79-4bce-753d3cd496c1@redhat.com>
-Date:   Thu, 8 Jul 2021 12:17:56 +0800
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0)
- Gecko/20100101 Thunderbird/78.11.0
+        linux-remoteproc@vger.kernel.org,
+        Bjorn Andersson <bjorn.andersson@linaro.org>,
+        Kirti Wankhede <kwankhede@nvidia.com>,
+        Andreas Noever <andreas.noever@gmail.com>,
+        linux-i3c@lists.infradead.org,
+        linux1394-devel@lists.sourceforge.net,
+        Lee Jones <lee.jones@linaro.org>,
+        Arnd Bergmann <arnd@arndb.de>, linux-scsi@vger.kernel.org,
+        Vishal Verma <vishal.l.verma@intel.com>,
+        Russell King <linux@armlinux.org.uk>,
+        Andy Gross <agross@kernel.org>, linux-serial@vger.kernel.org,
+        Jakub Kicinski <kuba@kernel.org>,
+        Michael Jamet <michael.jamet@intel.com>,
+        William Breathitt Gray <vilhelm.gray@gmail.com>,
+        Hans de Goede <hdegoede@redhat.com>,
+        Hannes Reinecke <hare@suse.de>,
+        Adrian Hunter <adrian.hunter@intel.com>,
+        Juergen Gross <jgross@suse.com>, linuxppc-dev@lists.ozlabs.org,
+        Takashi Iwai <tiwai@suse.com>,
+        Alexandre Bounine <alex.bou9@gmail.com>,
+        Vinod Koul <vkoul@kernel.org>, Mark Brown <broonie@kernel.org>,
+        Marc Zyngier <maz@kernel.org>, dmaengine@vger.kernel.org,
+        Johannes Berg <johannes@sipsolutions.net>,
+        Maximilian Luz <luzmaximilian@gmail.com>
+Subject: Re: [PATCH v2 0/4] bus: Make remove callback return void
+Message-ID: <20210708053813.pem2ufjuwkacptv3@pengutronix.de>
+References: <20210706154803.1631813-1-u.kleine-koenig@pengutronix.de>
+ <CAGngYiWm4u27o-yy5L5tokMB5G1RUR5uYmKf2oXah2P3J=hK2A@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <YOXOMiPl7mKd7FoM@stefanha-x1.localdomain>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
+Content-Type: multipart/signed; micalg=pgp-sha512;
+        protocol="application/pgp-signature"; boundary="bpxpm3lcta7ifhrg"
+Content-Disposition: inline
+In-Reply-To: <CAGngYiWm4u27o-yy5L5tokMB5G1RUR5uYmKf2oXah2P3J=hK2A@mail.gmail.com>
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: ukl@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.ext.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: kvm@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
-在 2021/7/7 下午11:54, Stefan Hajnoczi 写道:
-> On Wed, Jul 07, 2021 at 05:24:08PM +0800, Jason Wang wrote:
->> 在 2021/7/7 下午4:55, Stefan Hajnoczi 写道:
->>> On Wed, Jul 07, 2021 at 11:43:28AM +0800, Jason Wang wrote:
->>>> 在 2021/7/7 上午1:11, Stefan Hajnoczi 写道:
->>>>> On Tue, Jul 06, 2021 at 09:08:26PM +0800, Jason Wang wrote:
->>>>>> On Tue, Jul 6, 2021 at 6:15 PM Stefan Hajnoczi <stefanha@redhat.com> wrote:
->>>>>>> On Tue, Jul 06, 2021 at 10:34:33AM +0800, Jason Wang wrote:
->>>>>>>> 在 2021/7/5 下午8:49, Stefan Hajnoczi 写道:
->>>>>>>>> On Mon, Jul 05, 2021 at 11:36:15AM +0800, Jason Wang wrote:
->>>>>>>>>> 在 2021/7/4 下午5:49, Yongji Xie 写道:
->>>>>>>>>>>>> OK, I get you now. Since the VIRTIO specification says "Device
->>>>>>>>>>>>> configuration space is generally used for rarely-changing or
->>>>>>>>>>>>> initialization-time parameters". I assume the VDUSE_DEV_SET_CONFIG
->>>>>>>>>>>>> ioctl should not be called frequently.
->>>>>>>>>>>> The spec uses MUST and other terms to define the precise requirements.
->>>>>>>>>>>> Here the language (especially the word "generally") is weaker and means
->>>>>>>>>>>> there may be exceptions.
->>>>>>>>>>>>
->>>>>>>>>>>> Another type of access that doesn't work with the VDUSE_DEV_SET_CONFIG
->>>>>>>>>>>> approach is reads that have side-effects. For example, imagine a field
->>>>>>>>>>>> containing an error code if the device encounters a problem unrelated to
->>>>>>>>>>>> a specific virtqueue request. Reading from this field resets the error
->>>>>>>>>>>> code to 0, saving the driver an extra configuration space write access
->>>>>>>>>>>> and possibly race conditions. It isn't possible to implement those
->>>>>>>>>>>> semantics suing VDUSE_DEV_SET_CONFIG. It's another corner case, but it
->>>>>>>>>>>> makes me think that the interface does not allow full VIRTIO semantics.
->>>>>>>>>> Note that though you're correct, my understanding is that config space is
->>>>>>>>>> not suitable for this kind of error propagating. And it would be very hard
->>>>>>>>>> to implement such kind of semantic in some transports.  Virtqueue should be
->>>>>>>>>> much better. As Yong Ji quoted, the config space is used for
->>>>>>>>>> "rarely-changing or intialization-time parameters".
->>>>>>>>>>
->>>>>>>>>>
->>>>>>>>>>> Agreed. I will use VDUSE_DEV_GET_CONFIG in the next version. And to
->>>>>>>>>>> handle the message failure, I'm going to add a return value to
->>>>>>>>>>> virtio_config_ops.get() and virtio_cread_* API so that the error can
->>>>>>>>>>> be propagated to the virtio device driver. Then the virtio-blk device
->>>>>>>>>>> driver can be modified to handle that.
->>>>>>>>>>>
->>>>>>>>>>> Jason and Stefan, what do you think of this way?
->>>>>>>>> Why does VDUSE_DEV_GET_CONFIG need to support an error return value?
->>>>>>>>>
->>>>>>>>> The VIRTIO spec provides no way for the device to report errors from
->>>>>>>>> config space accesses.
->>>>>>>>>
->>>>>>>>> The QEMU virtio-pci implementation returns -1 from invalid
->>>>>>>>> virtio_config_read*() and silently discards virtio_config_write*()
->>>>>>>>> accesses.
->>>>>>>>>
->>>>>>>>> VDUSE can take the same approach with
->>>>>>>>> VDUSE_DEV_GET_CONFIG/VDUSE_DEV_SET_CONFIG.
->>>>>>>>>
->>>>>>>>>> I'd like to stick to the current assumption thich get_config won't fail.
->>>>>>>>>> That is to say,
->>>>>>>>>>
->>>>>>>>>> 1) maintain a config in the kernel, make sure the config space read can
->>>>>>>>>> always succeed
->>>>>>>>>> 2) introduce an ioctl for the vduse usersapce to update the config space.
->>>>>>>>>> 3) we can synchronize with the vduse userspace during set_config
->>>>>>>>>>
->>>>>>>>>> Does this work?
->>>>>>>>> I noticed that caching is also allowed by the vhost-user protocol
->>>>>>>>> messages (QEMU's docs/interop/vhost-user.rst), but the device doesn't
->>>>>>>>> know whether or not caching is in effect. The interface you outlined
->>>>>>>>> above requires caching.
->>>>>>>>>
->>>>>>>>> Is there a reason why the host kernel vDPA code needs to cache the
->>>>>>>>> configuration space?
->>>>>>>> Because:
->>>>>>>>
->>>>>>>> 1) Kernel can not wait forever in get_config(), this is the major difference
->>>>>>>> with vhost-user.
->>>>>>> virtio_cread() can sleep:
->>>>>>>
->>>>>>>      #define virtio_cread(vdev, structname, member, ptr)                     \
->>>>>>>              do {                                                            \
->>>>>>>                      typeof(((structname*)0)->member) virtio_cread_v;        \
->>>>>>>                                                                              \
->>>>>>>                      might_sleep();                                          \
->>>>>>>                      ^^^^^^^^^^^^^^
->>>>>>>
->>>>>>> Which code path cannot sleep?
->>>>>> Well, it can sleep but it can't sleep forever. For VDUSE, a
->>>>>> buggy/malicious userspace may refuse to respond to the get_config.
->>>>>>
->>>>>> It looks to me the ideal case, with the current virtio spec, for VDUSE is to
->>>>>>
->>>>>> 1) maintain the device and its state in the kernel, userspace may sync
->>>>>> with the kernel device via ioctls
->>>>>> 2) offload the datapath (virtqueue) to the userspace
->>>>>>
->>>>>> This seems more robust and safe than simply relaying everything to
->>>>>> userspace and waiting for its response.
->>>>>>
->>>>>> And we know for sure this model can work, an example is TUN/TAP:
->>>>>> netdevice is abstracted in the kernel and datapath is done via
->>>>>> sendmsg()/recvmsg().
->>>>>>
->>>>>> Maintaining the config in the kernel follows this model and it can
->>>>>> simplify the device generation implementation.
->>>>>>
->>>>>> For config space write, it requires more thought but fortunately it's
->>>>>> not commonly used. So VDUSE can choose to filter out the
->>>>>> device/features that depends on the config write.
->>>>> This is the problem. There are other messages like SET_FEATURES where I
->>>>> guess we'll face the same challenge.
->>>> Probably not, userspace device can tell the kernel about the device_features
->>>> and mandated_features during creation, and the feature negotiation could be
->>>> done purely in the kernel without bothering the userspace.
->>
->> (For some reason I drop the list accidentally, adding them back, sorry)
->>
->>
->>> Sorry, I confused the messages. I meant SET_STATUS. It's a synchronous
->>> interface where the driver waits for the device.
->>
->> It depends on how we define "synchronous" here. If I understand correctly,
->> the spec doesn't expect there will be any kind of failure for the operation
->> of set_status itself.
->>
->> Instead, anytime it want any synchronization, it should be done via
->> get_status():
->>
->> 1) re-read device status to make sure FEATURES_OK is set during feature
->> negotiation
->> 2) re-read device status to be 0 to make sure the device has finish the
->> reset
->>
->>
->>> VDUSE currently doesn't wait for the device emulation process to handle
->>> this message (no reply is needed) but I think this is a mistake because
->>> VDUSE is not following the VIRTIO device model.
->>
->> With the trick that is done for FEATURES_OK above, I think we don't need to
->> wait for the reply.
->>
->> If userspace takes too long to respond, it can be detected since
->> get_status() doesn't return the expected value for long time.
->>
->> And for the case that needs a timeout, we probably can use NEEDS_RESET.
-> I think you're right. get_status is the synchronization point, not
-> set_status.
->
-> Currently there is no VDUSE GET_STATUS message. The
-> VDUSE_START/STOP_DATAPLANE messages could be changed to SET_STATUS so
-> that the device emulation program can participate in emulating the
-> Device Status field.
+--bpxpm3lcta7ifhrg
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
+On Wed, Jul 07, 2021 at 10:08:53PM -0400, Sven Van Asbroeck wrote:
+> On Tue, Jul 6, 2021 at 11:50 AM Uwe Kleine-K=F6nig
+> <u.kleine-koenig@pengutronix.de> wrote:
+> >
+> >  drivers/staging/fieldbus/anybuss/host.c   | 4 +---
+>=20
+> Awesome !
+>=20
+> Acked-by: Sven Van Asbroeck <TheSven73@gmail.com>
 
-I'm not sure I get this, but it is what has been done?
+I note that as an Ack for patch 4 only, as the others don't touch this
+file.
 
-+static void vduse_vdpa_set_status(struct vdpa_device *vdpa, u8 status)
-+{
-+    struct vduse_dev *dev = vdpa_to_vduse(vdpa);
-+    bool started = !!(status & VIRTIO_CONFIG_S_DRIVER_OK);
-+
-+    dev->status = status;
-+
-+    if (dev->started == started)
-+        return;
-+
-+    dev->started = started;
-+    if (dev->started) {
-+        vduse_dev_start_dataplane(dev);
-+    } else {
-+        vduse_dev_reset(dev);
-+        vduse_dev_stop_dataplane(dev);
-+    }
-+}
+Best regards
+Uwe
 
+--=20
+Pengutronix e.K.                           | Uwe Kleine-K=F6nig            |
+Industrial Linux Solutions                 | https://www.pengutronix.de/ |
 
-But the looks not correct:
+--bpxpm3lcta7ifhrg
+Content-Type: application/pgp-signature; name="signature.asc"
 
-1) !DRIVER_OK doesn't means a reset?
-2) Need to deal with FEATURES_OK
+-----BEGIN PGP SIGNATURE-----
 
-Thanks
+iQEzBAABCgAdFiEEfnIqFpAYrP8+dKQLwfwUeK3K7AkFAmDmjzsACgkQwfwUeK3K
+7Alp5wf+LJkpxzkaW2ldAtFhGuqT1XfOqbe9d5vNgqvqupJS1Q+aeie0kH0038ba
+uN3KDJ2V2DAmMf6OIKUFucVxBpCC92myb63zIHRJs5kGzTu41BRp3yt/I650Xzdr
++MB/xdEr/XFy2f9gDr/QdCojwh44TXqKzZPG6a7r6uQu8/AAUOdVEcfK6o01hN8W
+szxNTR1qtdQMHj9Ji8fo0wADdSPEez1kGe+HEOJVWBZnhdyCqS0jh774r7GsLjqY
+l8S7HhKPoY6/CCbEHKfYA15GUvexTA14O2tn6vuQPtiTTdDoh/Nl0wj0z5/WbWjX
+HF/tKnNb3l18s65PbEmxEKa2XonjFQ==
+=+Y+1
+-----END PGP SIGNATURE-----
 
-
->   This change could affect VDUSE's VIRTIO feature
-> interface since the device emulation program can reject features by not
-> setting FEATURES_OK.
->
-> Stefan
-
+--bpxpm3lcta7ifhrg--
