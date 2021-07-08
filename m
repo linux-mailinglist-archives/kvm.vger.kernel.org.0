@@ -2,75 +2,77 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id ACDB23C1770
-	for <lists+kvm@lfdr.de>; Thu,  8 Jul 2021 18:51:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 241C13C1785
+	for <lists+kvm@lfdr.de>; Thu,  8 Jul 2021 18:56:42 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230103AbhGHQyL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 8 Jul 2021 12:54:11 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:59562 "EHLO
+        id S229581AbhGHQ7X (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 8 Jul 2021 12:59:23 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:34023 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229469AbhGHQyK (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 8 Jul 2021 12:54:10 -0400
+        by vger.kernel.org with ESMTP id S229469AbhGHQ7W (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 8 Jul 2021 12:59:22 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1625763088;
+        s=mimecast20190719; t=1625763400;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=SYpoSLky/52YWrPuCvWYEFOuiX2LDrIjQnGVL8zOqkg=;
-        b=D/aIfJY+ZwISguOkhIojquensr6wszX5I6rk1it0YUnhLI3agPO3H5d081pRohcdcjMmtj
-        B+LmtxQWcu6wmaZxmBlcEFMDN0ykPsumSHs+udbXLHvi/Y5KLO6FsEQJTvSZbBpOF53XX7
-        0kT3rwvpTlhbBoKUV4TZ23Gp8V+EaYo=
-Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
- [209.85.208.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-58-qQehz41XNW2WfBh2xuoGtw-1; Thu, 08 Jul 2021 12:51:27 -0400
-X-MC-Unique: qQehz41XNW2WfBh2xuoGtw-1
-Received: by mail-ed1-f72.google.com with SMTP id o8-20020aa7dd480000b02903954c05c938so3648611edw.3
-        for <kvm@vger.kernel.org>; Thu, 08 Jul 2021 09:51:26 -0700 (PDT)
+        bh=8zOv/MDfEWcH9s0zWRUnQQNA4xFdmSTmuagPnlN1tB8=;
+        b=bjHx1/WJo87LgGxoipNOzW0CG5a/I/XjDZdTiY+pHjrPCyHT3jI4ruRYMZDq5ONaA6leL0
+        T8sKZB70L0Ecl0dQBm9NmVPCeqlO8iGKapIh42VbCc9z0HRzJrAziltZ/9F62DpFW8TB8w
+        xaAhEwQki70pOthdUS1lTtz/CUePdBg=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-313-bqT-sPcMNq-S1m9sr0uhpw-1; Thu, 08 Jul 2021 12:56:39 -0400
+X-MC-Unique: bqT-sPcMNq-S1m9sr0uhpw-1
+Received: by mail-wr1-f69.google.com with SMTP id p4-20020a5d63840000b0290126f2836a61so2219191wru.6
+        for <kvm@vger.kernel.org>; Thu, 08 Jul 2021 09:56:38 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=SYpoSLky/52YWrPuCvWYEFOuiX2LDrIjQnGVL8zOqkg=;
-        b=DJzLMulwnvb3EIWf4Ls8XT+lF785CNzIpvD9KkSkzkn2zyc19Ip4Aoc1jO6WWkvreN
-         O2oZ2LMWd+u+ha4rD1KteytmPb0j8YkjXQa/dbgV+PpNzkHFpy2/IlnJEJxhEWejSLEe
-         W1JFWRopdnbWDIeaRJP4daZo2cypcNcI1CHNb1YuKvthraW8nEE36Mj1BoZCjuA4ZHX6
-         M8sGYq4e+cUv+RECaETC/122lcYVZLioOLKQZFYWrrD14bN9sGGMZiAxvwdoMMx2v/tL
-         RM5G6ypTMbdW9JNGWtEQlrTg0/9uL1LXsxDo8XZGbRs+MNHv8nmm0Ty0Tk8rho1BP1wr
-         j3Bg==
-X-Gm-Message-State: AOAM531qAhnnmHgjWJzvxAgeJZMdLS5XCOoBa66tNbTibPYW1q8oD/Vv
-        taoDv5vtpWVA6pKXpWp1pZz2YPar8KXGhibW3E0DAMqYDhisPyb6DxpF7K9MfMG0DExr/hFF5fe
-        abLj44GOaPqpx
-X-Received: by 2002:a17:906:60d3:: with SMTP id f19mr32679786ejk.413.1625762785289;
-        Thu, 08 Jul 2021 09:46:25 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxKy10UxVtQ7oO9YwYzVTP/mgRlPlJX9CqrvtVvMkjx6B/EzHogyUAAvrBXNOPeRtNzur5mew==
-X-Received: by 2002:a17:906:60d3:: with SMTP id f19mr32679767ejk.413.1625762785157;
-        Thu, 08 Jul 2021 09:46:25 -0700 (PDT)
-Received: from [192.168.10.67] ([93.56.169.140])
-        by smtp.gmail.com with ESMTPSA id h9sm1220167ejk.15.2021.07.08.09.46.24
+        bh=8zOv/MDfEWcH9s0zWRUnQQNA4xFdmSTmuagPnlN1tB8=;
+        b=dtkEwtGA3fnLCyDA5oEgCER4fIU0k1SAk17I/pJK2lqaWexN8vURIApydjgkZyNoHd
+         Izj4ty40oA33tSJZ1f8zJHU7gr51ovf23FrZDKX0aOzuRB3RwIAo/taouC6F5g/Q7th1
+         g6L4FEFERSdaLGqKPpvMpHTMczriW0SLTSiuJoaMfZhNJ2imaiy7chIlZkRNnL4lVDsp
+         TTM3rpKQXiR/7MZafkE1LA5FBL4gYDJPclIXT/H2FQ7CN40P2/NhUhi/zZ5994tK8WXW
+         yZ2fbWVt53nRWz/lS5kxDHejug+nweFdoFKKFzChpzuDgQWGSgccJ9nltmcreyK6WZy/
+         ElMw==
+X-Gm-Message-State: AOAM533llcMjtpXY4hNoOqR+a3xTO2HxktmRjXbb+CzhklZwTJQ2S0/Q
+        rDovyWp3hUAuuES8M5MMcuUzRoXM4WQRP9U0PdHC5RaWji2AMSJH5MWL3sZekPLTjIk4jkgbbyP
+        +5KckGGoq98YAQSU6OBaPgjavPkddpEjbdBa/qTDD/yPcMl3+dIX/3mhKtr8wh0ah
+X-Received: by 2002:a17:907:ea5:: with SMTP id ho37mr31944257ejc.109.1625762903219;
+        Thu, 08 Jul 2021 09:48:23 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJw3a5F1wHTH5P/QRmbTxUMdjhRN2uE1z7VdPPF6Jl7c6aaYv8oJSi/bC2ELxd8i4zc3tObZCg==
+X-Received: by 2002:a17:907:ea5:: with SMTP id ho37mr31944235ejc.109.1625762903030;
+        Thu, 08 Jul 2021 09:48:23 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+        by smtp.gmail.com with ESMTPSA id g17sm1552964edb.37.2021.07.08.09.48.21
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 08 Jul 2021 09:46:24 -0700 (PDT)
-Subject: Re: [PATCH] KVM: x86/pmu: Clear anythread deprecated bit when 0xa
- leaf is unsupported on the SVM
-To:     Like Xu <like.xu.linux@gmail.com>
-Cc:     Sean Christopherson <seanjc@google.com>,
+        Thu, 08 Jul 2021 09:48:22 -0700 (PDT)
+Subject: Re: [PATCH] KVM: X86: Also reload the debug registers before
+ kvm_x86->run() when the host is using them
+To:     Lai Jiangshan <jiangshanlai@gmail.com>,
+        linux-kernel@vger.kernel.org
+Cc:     Lai Jiangshan <laijs@linux.alibaba.com>,
+        Sean Christopherson <seanjc@google.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
         Joerg Roedel <joro@8bytes.org>,
-        Stephane Eranian <eranian@google.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Borislav Petkov <bp@alien8.de>, x86@kernel.org,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20210628074354.33848-1-likexu@tencent.com>
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
+        kvm@vger.kernel.org
+References: <20210628172632.81029-1-jiangshanlai@gmail.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <7f5d7af0-a48e-5bca-34e2-2a6f2bdab448@redhat.com>
-Date:   Thu, 8 Jul 2021 18:44:11 +0200
+Message-ID: <46e0aaf1-b7cd-288f-e4be-ac59aa04908f@redhat.com>
+Date:   Thu, 8 Jul 2021 18:48:21 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.11.0
 MIME-Version: 1.0
-In-Reply-To: <20210628074354.33848-1-likexu@tencent.com>
+In-Reply-To: <20210628172632.81029-1-jiangshanlai@gmail.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -78,38 +80,61 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 28/06/21 09:43, Like Xu wrote:
-> The AMD platform does not support the functions Ah CPUID leaf. The returned
-> results for this entry should all remain zero just like the native does:
+On 28/06/21 19:26, Lai Jiangshan wrote:
+> From: Lai Jiangshan <laijs@linux.alibaba.com>
 > 
-> AMD host:
->     0x0000000a 0x00: eax=0x00000000 ebx=0x00000000 ecx=0x00000000 edx=0x00000000
-> (uncanny) AMD guest:
->     0x0000000a 0x00: eax=0x00000000 ebx=0x00000000 ecx=0x00000000 edx=0x00008000
+> When the host is using debug registers but the guest is not using them
+> nor is the guest in guest-debug state, the kvm code does not reset
+> the host debug registers before kvm_x86->run().  Rather, it relies on
+> the hardware vmentry instruction to automatically reset the dr7 registers
+> which ensures that the host breakpoints do not affect the guest.
 > 
-> Fixes: cadbaa039b99 ("perf/x86/intel: Make anythread filter support conditional")
-> Signed-off-by: Like Xu <likexu@tencent.com>
-> ---
->   arch/x86/kvm/cpuid.c | 3 ++-
->   1 file changed, 2 insertions(+), 1 deletion(-)
-> 
-> diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-> index 0edda1fc4fe7..b1808e4fc7d5 100644
-> --- a/arch/x86/kvm/cpuid.c
-> +++ b/arch/x86/kvm/cpuid.c
-> @@ -765,7 +765,8 @@ static inline int __do_cpuid_func(struct kvm_cpuid_array *array, u32 function)
->   
->   		edx.split.num_counters_fixed = min(cap.num_counters_fixed, MAX_FIXED_COUNTERS);
->   		edx.split.bit_width_fixed = cap.bit_width_fixed;
-> -		edx.split.anythread_deprecated = 1;
-> +		if (cap.version)
-> +			edx.split.anythread_deprecated = 1;
->   		edx.split.reserved1 = 0;
->   		edx.split.reserved2 = 0;
->   
-> 
+> But there are still problems:
+> 	o The addresses of the host breakpoints can leak into the guest
+> 	  and the guest may use these information to attack the host.
 
-Queued, thanks.
+I don't think this is true, because DRn reads would exit (if they don't, 
+switch_db_regs would be nonzero).  But otherwise it makes sense to do at 
+least the DR7 write, and we might as well do all of them.
+
+> 	o It violates the non-instrumentable nature around VM entry and
+> 	  exit.  For example, when a host breakpoint is set on
+> 	  vcpu->arch.cr2, #DB will hit aftr kvm_guest_enter_irqoff().
+> 
+> Beside the problems, the logic is not consistent either. When the guest
+> debug registers are active, the host breakpoints are reset before
+> kvm_x86->run(). But when the guest debug registers are inactive, the
+> host breakpoints are delayed to be disabled.  The host tracing tools may
+> see different results depending on there is any guest running or not.
+
+More precisely, the host tracing tools may see different results 
+depending on what the guest is doing.
+
+Queued (with fixed commit message), thanks!
 
 Paolo
+
+> To fix the problems, we also reload the debug registers before
+> kvm_x86->run() when the host is using them whenever the guest is using
+> them or not.
+> 
+> Signed-off-by: Lai Jiangshan <laijs@linux.alibaba.com>
+> ---
+>   arch/x86/kvm/x86.c | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index b594275d49b5..cce316655d3c 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -9320,7 +9320,7 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
+>   	if (test_thread_flag(TIF_NEED_FPU_LOAD))
+>   		switch_fpu_return();
+>   
+> -	if (unlikely(vcpu->arch.switch_db_regs)) {
+> +	if (unlikely(vcpu->arch.switch_db_regs || hw_breakpoint_active())) {
+>   		set_debugreg(0, 7);
+>   		set_debugreg(vcpu->arch.eff_db[0], 0);
+>   		set_debugreg(vcpu->arch.eff_db[1], 1);
+> 
 
