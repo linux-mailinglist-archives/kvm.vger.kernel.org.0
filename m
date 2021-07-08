@@ -2,102 +2,148 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7EAB43C18BF
-	for <lists+kvm@lfdr.de>; Thu,  8 Jul 2021 19:57:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E31E43C194C
+	for <lists+kvm@lfdr.de>; Thu,  8 Jul 2021 20:38:29 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230020AbhGHSAQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 8 Jul 2021 14:00:16 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:59833 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229631AbhGHSAN (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 8 Jul 2021 14:00:13 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1625767051;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=xjKPzQ8ubajcvMakFlYLidaZJUhpZpB7jXpO5LDMoFg=;
-        b=Z1wE0AvZKblbxlW/cH0fnmp2ZjjukfQOn0iK+zILIEbMbv7/txz83gIbnYL727Ds2ZA7gU
-        UcBiAAyn42DuwrGgrVFqXm3sCjQmQ3T/TMPUMwd9yNqaPo6NBT8znIV+MIDT2SEHcI/XOY
-        zkSuD7pm3cUFSrSomiGfR8UY0p6Ts1M=
-Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
- [209.85.218.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-233-vvwESoa2MiSgaLjiEGDCwg-1; Thu, 08 Jul 2021 13:57:28 -0400
-X-MC-Unique: vvwESoa2MiSgaLjiEGDCwg-1
-Received: by mail-ej1-f69.google.com with SMTP id jx16-20020a1709077610b02904e0a2912b46so2181944ejc.7
-        for <kvm@vger.kernel.org>; Thu, 08 Jul 2021 10:57:27 -0700 (PDT)
+        id S229469AbhGHSlJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 8 Jul 2021 14:41:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48842 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229863AbhGHSlH (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 8 Jul 2021 14:41:07 -0400
+Received: from mail-pf1-x436.google.com (mail-pf1-x436.google.com [IPv6:2607:f8b0:4864:20::436])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4E86BC061574
+        for <kvm@vger.kernel.org>; Thu,  8 Jul 2021 11:38:24 -0700 (PDT)
+Received: by mail-pf1-x436.google.com with SMTP id 145so6370144pfv.0
+        for <kvm@vger.kernel.org>; Thu, 08 Jul 2021 11:38:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=7IMuMUvHO82Rf0Ss8PXs63y6ANC76fGZyxGH24nk1uY=;
+        b=AEJUmU092XhSjinH3RNlcQMS/9jJCUfRHFTvGQOCYGEgAkLDTt91AoUhpV20zqrqaG
+         DgxEkyC7dIjMJejx10JKJCCad8mo9r17BDUHgTgdADxDWEmoQX6MI/Ks82PTsEV6wf6b
+         wKLuoB0Bw21064KfDHSoi9ggEs0OdmCiFqzx+6A/Qav7JexZHVOP5GV64ONuI1uoMqnJ
+         IK8vOt7ia2yi82nY24zzCbuTHHcTJGeeT6wXiPdp0g3awgHWnmetypwl0L8gEXlERsvv
+         zaj3cym87YUy76sBrw/rUq8ip5xJy8lswH9QtOrhmAE4wJ4AU/HW2//+e5yWeiPhqfWo
+         iJxQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=xjKPzQ8ubajcvMakFlYLidaZJUhpZpB7jXpO5LDMoFg=;
-        b=qzjqHK55pTJjgiexVwHG1T+Wn3IMc/yirB51eANnnQIVjNXIlBxLH0U4EhlC/+wgmA
-         60gRxzo12/N3KLPaG5ShiNwYloWQ5Q1YHhDbTKVsqpmhu9vTcu+CEMQQQKqIn4QFm9Hs
-         QBXNpor+rLaO1RmiFfkv3h8WsAzZsvlY7fFkDkKuC+CbTM8Mwfj7taFlp3kY+/WGnscg
-         DUtEn6OZVMSNz1xl5FCNIPImGCse/pjEDA2A6183uItNzOtVAHL6w0z6Zptwdzs9DTxp
-         nryx084h1FiPH1s2Exhhv2We2d/yM8x6IrAGgkYRhPyO2YiFUZkj19C7yHs2PrZWM5jK
-         2zQw==
-X-Gm-Message-State: AOAM531dMGzUR15PwjAXTCCbzuEzGjScX750BteVSpDWGNoWSnCaJovf
-        aB81Y11aZYyuW7Y6GODeF7/3YvkD0crvIjz0q/t7M+Ru7nntDLTx26jV23ZnHmQh4ywUB76L28I
-        IzeAOLCP1LPda
-X-Received: by 2002:a17:906:4e4f:: with SMTP id g15mr32574572ejw.217.1625767046875;
-        Thu, 08 Jul 2021 10:57:26 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxes3RJnJHPw1XUt3+d5G0lMVrsT7hZfH0IJlalPxgoyMu2G8Ho5BYEGYeT7Cs3ei908+CMwQ==
-X-Received: by 2002:a17:906:4e4f:: with SMTP id g15mr32574555ejw.217.1625767046707;
-        Thu, 08 Jul 2021 10:57:26 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id ze15sm1297121ejb.79.2021.07.08.10.57.25
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 08 Jul 2021 10:57:26 -0700 (PDT)
-Subject: Re: [PATCH 0/5] KVM: x86: Use kernel x86 cpuid utilities in KVM
- selftests
-To:     Ricardo Koller <ricarkol@google.com>
-Cc:     Jim Mattson <jmattson@google.com>, kvm@vger.kernel.org,
-        Peter Zijlstra <peterz@infradead.org>,
-        Ingo Molnar <mingo@redhat.com>,
-        Arnaldo Carvalho de Melo <acme@kernel.org>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
-        Jiri Olsa <jolsa@redhat.com>,
-        Namhyung Kim <namhyung@kernel.org>,
-        "H. Peter Anvin" <hpa@zytor.com>,
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=7IMuMUvHO82Rf0Ss8PXs63y6ANC76fGZyxGH24nk1uY=;
+        b=ba8n4+1qckIS0lIv+nFTrEblfB1n0wdCTYjz0o437Yoiexh87v5ygPPMFQL8MjbYQ9
+         QO2bizgGzEs3BXfpqsYPFtS/UOoqrW2SX29BlsC0fQd5Swh+jBgmE5EKB09UEG7/L6FZ
+         HS3j/fbmR5Y9fideiv/u09v/i4ymXu5ZxYSGdxOjtl1cq52gsrj+ytI3zvWDCt6YahX7
+         5t45vsEt7VA8gWXvUYlHS7xx64FOnAVInqN7aJip/Tr79gAQwwdWnCJ0hJSb0vIiHp0A
+         sO58OCnrY+L4cx2uMM+zl8aarJ742EiGcua2y87aVsRfqKN4Pw0vrxwlzk1AuQzwpVMg
+         iQAg==
+X-Gm-Message-State: AOAM531GXjk/Q4irvN4+QQTgTNIEqLtsVdv9IV3h8+sppGUDccqLalbi
+        2LrjilfnlniceIkhm6TqGOTetw==
+X-Google-Smtp-Source: ABdhPJwvrGKMIplQ3AYMPHgsfd1ogRE/LvqPPIKpnrjJ1sSar/mUZLFVw9JqUCa95Qns7PZ7PlcqCQ==
+X-Received: by 2002:aa7:8d5a:0:b029:302:e2cb:6d79 with SMTP id s26-20020aa78d5a0000b0290302e2cb6d79mr32258922pfe.71.1625769503629;
+        Thu, 08 Jul 2021 11:38:23 -0700 (PDT)
+Received: from google.com (254.80.82.34.bc.googleusercontent.com. [34.82.80.254])
+        by smtp.gmail.com with ESMTPSA id 2sm4277773pgz.26.2021.07.08.11.38.22
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 08 Jul 2021 11:38:22 -0700 (PDT)
+Date:   Thu, 8 Jul 2021 18:38:18 +0000
+From:   David Matlack <dmatlack@google.com>
+To:     David Edmondson <dme@dme.org>
+Cc:     linux-kernel@vger.kernel.org, Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
         Sean Christopherson <seanjc@google.com>,
+        Borislav Petkov <bp@alien8.de>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Nathan Chancellor <nathan@kernel.org>,
-        Nick Desaulniers <ndesaulniers@google.com>,
-        linux-kernel@vger.kernel.org, clang-built-linux@googlegroups.com
-References: <20210422005626.564163-1-ricarkol@google.com>
- <c4524e4a-55c7-66f9-25d6-d397f11d25a8@redhat.com>
- <YIm7iWxggvoN9riz@google.com>
- <CALMp9eSfpdWF0OROsOqxohxMoFrrY=Gt7FYfB1_31D7no4JYLw@mail.gmail.com>
- <16823e91-5caf-f52e-e0dc-28ebb9a87b47@redhat.com>
- <YOc0BUrL6VMw78nF@google.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <8a4163ee-ac31-60fa-4b8b-f7677ec0fd46@redhat.com>
-Date:   Thu, 8 Jul 2021 19:57:24 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.11.0
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Thomas Gleixner <tglx@linutronix.de>, x86@kernel.org,
+        Ingo Molnar <mingo@redhat.com>,
+        "H. Peter Anvin" <hpa@zytor.com>
+Subject: Re: [PATCH v2 0/2] kvm: x86: Convey the exit reason to user-space on
+ emulation failure
+Message-ID: <YOdGGuk2trw0h95x@google.com>
+References: <20210706101207.2993686-1-david.edmondson@oracle.com>
+ <YOY2pLoXQ8ePXu0W@google.com>
+ <m28s2g51q3.fsf@dme.org>
 MIME-Version: 1.0
-In-Reply-To: <YOc0BUrL6VMw78nF@google.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <m28s2g51q3.fsf@dme.org>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 08/07/21 19:21, Ricardo Koller wrote:
->> I also prefer the kvm-unit-tests implementation, for what it's worth...
->> Let's see what the code looks like?
-> I'm not sure I understand the question. You mean: let's see how this
-> looks using kvm-unit-tests headers? If that's the case I can work on a
-> v3 using kvm-unit-tests.
+On Thu, Jul 08, 2021 at 03:17:40PM +0100, David Edmondson wrote:
+> Apologies if you see two of these - I had some email problems earlier.
 
-Yes, exactly.  Thanks!
+I only got one! :)
 
-Paolo
+> 
+> On Wednesday, 2021-07-07 at 23:20:04 UTC, David Matlack wrote:
+> 
+> > On Tue, Jul 06, 2021 at 11:12:05AM +0100, David Edmondson wrote:
+> >> To help when debugging failures in the field, if instruction emulation
+> >> fails, report the VM exit reason to userspace in order that it can be
+> >> recorded.
+> >
+> > What is the benefit of seeing the VM-exit reason that led to an
+> > emulation failure?
+> 
+> I can't cite an example of where this has definitively led in a
+> direction that helped solve a problem, but we do sometimes see emulation
+> failures reported in situations where we are not able to reproduce the
+> failures on demand and the existing information provided at the time of
+> failure is either insufficient or suspect.
+> 
+> Given that, I'm left casting about for data that can be made available
+> to assist in postmortem analysis of the failures.
 
+Understood, thanks for the context. My only concern would be that
+userspace APIs are difficult to change once they exist. If it turns
+out knowing the exit reason does not help with debugging emulation
+failures we'd still be stuck with exporting it on every emulation
+failure.
+
+My intuition is that the instruction bytes (which are now available with
+Aaron's patch) and the guest register state (which is queryable through
+other ioctls) should be sufficient to set up a reproduction of the
+emulation failure in a kvm-unit-test and the exit reason should not
+really matter. I'm curious if that's not the case?
+
+I'm really not opposed to exporting the exit reason if it is useful, I'm
+just not sure it will help.
+
+> 
+> >> I'm unsure whether sgx_handle_emulation_failure() needs to be adapted
+> >> to use the emulation_failure part of the exit union in struct kvm_run
+> >> - advice welcomed.
+> >> 
+> >> v2:
+> >> - Improve patch comments (dmatlack)
+> >> - Intel should provide the full exit reason (dmatlack)
+> >> - Pass a boolean rather than flags (dmatlack)
+> >> - Use the helper in kvm_task_switch() and kvm_handle_memory_failure()
+> >>   (dmatlack)
+> >> - Describe the exit_reason field of the emulation_failure structure
+> >>   (dmatlack)
+> >> 
+> >> David Edmondson (2):
+> >>   KVM: x86: Add kvm_x86_ops.get_exit_reason
+> >>   KVM: x86: On emulation failure, convey the exit reason to userspace
+> >> 
+> >>  arch/x86/include/asm/kvm-x86-ops.h |  1 +
+> >>  arch/x86/include/asm/kvm_host.h    |  3 +++
+> >>  arch/x86/kvm/svm/svm.c             |  6 ++++++
+> >>  arch/x86/kvm/vmx/vmx.c             | 11 +++++++----
+> >>  arch/x86/kvm/x86.c                 | 22 +++++++++++++---------
+> >>  include/uapi/linux/kvm.h           |  7 +++++++
+> >>  6 files changed, 37 insertions(+), 13 deletions(-)
+> >> 
+> >> -- 
+> >> 2.30.2
+> >> 
+> 
+> dme.
+> -- 
+> It's gettin', it's gettin', it's gettin' kinda hectic.
