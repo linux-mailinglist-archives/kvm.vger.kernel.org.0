@@ -2,52 +2,52 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B37C23C15D4
-	for <lists+kvm@lfdr.de>; Thu,  8 Jul 2021 17:20:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EE0273C15DB
+	for <lists+kvm@lfdr.de>; Thu,  8 Jul 2021 17:21:57 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231942AbhGHPW5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 8 Jul 2021 11:22:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60762 "EHLO
+        id S231956AbhGHPYi (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 8 Jul 2021 11:24:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32914 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231815AbhGHPW4 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 8 Jul 2021 11:22:56 -0400
-Received: from mail-pf1-x42c.google.com (mail-pf1-x42c.google.com [IPv6:2607:f8b0:4864:20::42c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C8BE2C061574;
-        Thu,  8 Jul 2021 08:20:14 -0700 (PDT)
-Received: by mail-pf1-x42c.google.com with SMTP id y4so5707620pfi.9;
-        Thu, 08 Jul 2021 08:20:14 -0700 (PDT)
+        with ESMTP id S231815AbhGHPYh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 8 Jul 2021 11:24:37 -0400
+Received: from mail-pj1-x1034.google.com (mail-pj1-x1034.google.com [IPv6:2607:f8b0:4864:20::1034])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 13692C061574;
+        Thu,  8 Jul 2021 08:21:55 -0700 (PDT)
+Received: by mail-pj1-x1034.google.com with SMTP id cs1-20020a17090af501b0290170856e1a8aso6102400pjb.3;
+        Thu, 08 Jul 2021 08:21:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to:user-agent;
-        bh=Oa1n/03ttdi3Zf5gHmQjIpSy/crMGDJ29NI1GoGfvEg=;
-        b=V5amZpP3ONMVJggcdh2j+5YpI3lV2lc9De0dnPy6kSqUgUMXtpBLZx6oid6aMklJ5N
-         WtCINBljJl7ZXHVWCPK0UmPAdmjaxsrGzcvTH6iQDacbxNsYwE03lyoOrZ6iEl7mltcF
-         X6zpNM7RXTbKzFEmvf/izet8wS3XpXzj6FuVFYZMdBtPdSxIZLziBZ31KOBzf0LX3j82
-         ILB5s8bUgkxJdXCd8IspfKo2kGhyhrSU65ZJPsURrXhViij29Qd5EEcZRw+cwQEW1jDE
-         wc/NrLB67VyMnnrN04RZ2uTfG998Gs8R/roCehGIFmUR5uyCLBviNcWG8LyKAYqDz6jA
-         WcHw==
+        bh=3Fqa3JBj0Mm9fkBkNJ7GXxkTFWxEhmfT0t9V/cQ727s=;
+        b=hxtwVxRcpcsJoF9+n57xGeTeJaz2f6WWTY4XnqgKoPLbi41YKZZwEWgQJHG8flKXPP
+         hYz2lMwTiaUHs4WpaBvwIrRXHwN7Fowm0tk/ffuuuFSv5BySYvdMNpUR0qDdxBIzsn1J
+         kJc+xSKaRWIB5wCxm/hBeIugFbv4HAXyC8ZyAU91Sf8jP6zjCFloMOvZXlmpyfnwLFiQ
+         W5psn7i7/h+5n4VqYgAIDCI35zFI8oFzyPmYB8Ygic7UPK//Bw6di+1/Rexl1nWsVot9
+         G1gZexwi12GEQvRScQ40Js0kzdfSu1YLXjAQB9Be4qbDJ4p+VSKAl3PvN3rJHR9/i84J
+         ysiw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=Oa1n/03ttdi3Zf5gHmQjIpSy/crMGDJ29NI1GoGfvEg=;
-        b=es2ASJ+u3R47FmgydJ7YSqWHy0ppUhNasfIUFre/8wUTDLv432qVwSawSFRb90MOce
-         ++rRSg+FIKoWTgESov83PH7Yy0mnZ/gx5vgaw6Jo1RmswEuWpl/m3ha8UzCq7Immlry6
-         kdYlBf6sTmIPBwMv1pn73w76XYc1CZIS4uMLR4hnDzReELtiZC+s8e1byPyfMP4aRPFX
-         +9UiyPc+uyoWatBzB7H54VQMeq3xh7kisDB+6Sm24FuyuWkT/6wmgIwQjOUfCj7szhGL
-         bF2ARWO4Vv5PJAcJok3ZFqm+b7dwHOw8Bs74kgAhvJsjqdf5J9mCHvpS+JIGJd/1RmI+
-         wEMg==
-X-Gm-Message-State: AOAM5337Sg8i+913w61aHF23LHMacbqMW+q5k5dmlnY0bae/K3SaVGXJ
-        lx0K7qcB3qsRrs0ZT/j1HaM=
-X-Google-Smtp-Source: ABdhPJzSKnaFQnkVkV8bkLbOKU0rfchxmthNXjsLQBZBVV3tO/4LG8SauJrN5U1F/4rQ9RoBWaEngQ==
-X-Received: by 2002:a65:450c:: with SMTP id n12mr28900567pgq.98.1625757614264;
-        Thu, 08 Jul 2021 08:20:14 -0700 (PDT)
+        bh=3Fqa3JBj0Mm9fkBkNJ7GXxkTFWxEhmfT0t9V/cQ727s=;
+        b=Z5LNK/igB2vf+kbT2zkmOQ+hHEmURAeQj71aCXxDwgsqkHBWHDZ/5ESBVOAKKAhzkR
+         y8ARlrB0rVLIBN8wobwz+1vs6R1jBi94ELZAG0sGly0mcb7PC9Q3Vm1gYBwvjgwlGH41
+         A8m7StdiKISiT5c5A+Hj5Hv/EKEZ+ODWTjwT1lGh39Gls8Y63uFLcjk3lttbQUXCZrex
+         Wjo5kqhP0hsasBIiU71VTnClWm+pUjqvyb3Y2PQT+Lc6TU7OkbvRDMS+SCJh7KOVJelH
+         FagpY/dmDAfmFL1Id/VHbCWGXQQrnWFgtTpsA3//cnCv3fLwk0WVXp4vvs03XJx+nYVa
+         c3Vw==
+X-Gm-Message-State: AOAM531sf3RRhC1Gc/p/OgHpXxeu9TrqOoJj624PyRPoD+PS6RdFtZsn
+        NTYew4ngpCvEligaztLCN9g=
+X-Google-Smtp-Source: ABdhPJz9H92rKwh3I7eM5NHfswNbRROh3I53dWdBQ7onM2aiB+pcMCdG10WGGSdMIk+b4rVpicPNFw==
+X-Received: by 2002:a17:902:988f:b029:114:12d2:d548 with SMTP id s15-20020a170902988fb029011412d2d548mr26555639plp.73.1625757714594;
+        Thu, 08 Jul 2021 08:21:54 -0700 (PDT)
 Received: from localhost ([2601:647:4600:1ed4:adaa:7ff5:893e:b91])
-        by smtp.gmail.com with ESMTPSA id 133sm3530456pfx.39.2021.07.08.08.20.13
+        by smtp.gmail.com with ESMTPSA id m21sm3460649pfa.99.2021.07.08.08.21.53
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 08 Jul 2021 08:20:13 -0700 (PDT)
-Date:   Thu, 8 Jul 2021 08:20:12 -0700
+        Thu, 08 Jul 2021 08:21:54 -0700 (PDT)
+Date:   Thu, 8 Jul 2021 08:21:52 -0700
 From:   Isaku Yamahata <isaku.yamahata@gmail.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     isaku.yamahata@intel.com, Thomas Gleixner <tglx@linutronix.de>,
@@ -61,45 +61,33 @@ Cc:     isaku.yamahata@intel.com, Thomas Gleixner <tglx@linutronix.de>,
         Sean Christopherson <seanjc@google.com>, x86@kernel.org,
         linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
         isaku.yamahata@gmail.com,
-        Sean Christopherson <sean.j.christopherson@intel.com>
-Subject: Re: [RFC PATCH v2 43/69] KVM: x86/mmu: Allow non-zero init value for
- shadow PTE
-Message-ID: <20210708152012.GA278847@private.email.ne.jp>
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        kernel test robot <lkp@intel.com>,
+        Xiaoyao Li <xiaoyao.li@intel.com>
+Subject: Re: [RFC PATCH v2 55/69] KVM: VMX: Add 'main.c' to wrap VMX and TDX
+Message-ID: <20210708152152.GB278847@private.email.ne.jp>
 References: <cover.1625186503.git.isaku.yamahata@intel.com>
- <2a12f8867229459dba2da233bf7762cb1ac2722c.1625186503.git.isaku.yamahata@intel.com>
- <c27da555-b0f2-045c-d577-7e9afb858da1@redhat.com>
+ <52e7bb9f6bd27dc56880d81e232270679ffee601.1625186503.git.isaku.yamahata@intel.com>
+ <0b1edf62-fce8-f628-b482-021f99004f38@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <c27da555-b0f2-045c-d577-7e9afb858da1@redhat.com>
+In-Reply-To: <0b1edf62-fce8-f628-b482-021f99004f38@redhat.com>
 User-Agent: Mutt/1.10.1 (2018-07-13)
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jul 06, 2021 at 04:56:07PM +0200,
+On Tue, Jul 06, 2021 at 04:43:22PM +0200,
 Paolo Bonzini <pbonzini@redhat.com> wrote:
 
-> On 03/07/21 00:04, isaku.yamahata@intel.com wrote:
-> > From: Sean Christopherson <sean.j.christopherson@intel.com>
-> > 
-> > TDX will run with EPT violation #VEs enabled, which means KVM needs to
-> > set the "suppress #VE" bit in unused PTEs to avoid unintentionally
-> > reflecting not-present EPT violations into the guest.
-> > 
-> > Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
-> > Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
-> > ---
-> >   arch/x86/kvm/mmu.h      |  1 +
-> >   arch/x86/kvm/mmu/mmu.c  | 50 +++++++++++++++++++++++++++++++++++------
-> >   arch/x86/kvm/mmu/spte.c | 10 +++++++++
-> >   arch/x86/kvm/mmu/spte.h |  2 ++
-> >   4 files changed, 56 insertions(+), 7 deletions(-)
+> On 03/07/21 00:05, isaku.yamahata@intel.com wrote:
+> > +#include "vmx.c"
 > 
-> Please ensure that this also works for tdp_mmu.c (if anything, consider
-> supporting TDX only for TDP MMU; it's quite likely that mmu.c support for
-> EPT/NPT will go away).
+> What makes it particularly hard to have this as a separate .o file rather
+> than an #include?
 
-It's on my TODO list. Will address it.
+It's to let complier to optimize functionc call of "if (tdx) tdx_xxx() else vmx_xxx()",
+given x86_ops static call story.
 -- 
 Isaku Yamahata <isaku.yamahata@gmail.com>
