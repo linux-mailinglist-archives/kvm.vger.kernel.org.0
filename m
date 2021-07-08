@@ -2,57 +2,54 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B32573C1B20
-	for <lists+kvm@lfdr.de>; Thu,  8 Jul 2021 23:40:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4C4D53C1B24
+	for <lists+kvm@lfdr.de>; Thu,  8 Jul 2021 23:42:15 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231366AbhGHVnQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 8 Jul 2021 17:43:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60924 "EHLO
+        id S231265AbhGHVo4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 8 Jul 2021 17:44:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33080 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231265AbhGHVnP (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 8 Jul 2021 17:43:15 -0400
-Received: from mail-lj1-x22d.google.com (mail-lj1-x22d.google.com [IPv6:2a00:1450:4864:20::22d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9454BC061574
-        for <kvm@vger.kernel.org>; Thu,  8 Jul 2021 14:40:31 -0700 (PDT)
-Received: by mail-lj1-x22d.google.com with SMTP id s18so4682892ljg.7
-        for <kvm@vger.kernel.org>; Thu, 08 Jul 2021 14:40:31 -0700 (PDT)
+        with ESMTP id S230508AbhGHVoz (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 8 Jul 2021 17:44:55 -0400
+Received: from mail-pg1-x52b.google.com (mail-pg1-x52b.google.com [IPv6:2607:f8b0:4864:20::52b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CB08EC06175F
+        for <kvm@vger.kernel.org>; Thu,  8 Jul 2021 14:42:12 -0700 (PDT)
+Received: by mail-pg1-x52b.google.com with SMTP id t9so7790101pgn.4
+        for <kvm@vger.kernel.org>; Thu, 08 Jul 2021 14:42:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=TXK7p+epxbJwyolr6/upwM2QAM3CL+EU1GZF12Y5SBI=;
-        b=QNAxEP/zZr0b/D09jMjqUu4PlHeXQ1uyZw9XP/XIvhkUQuEYNIYFkemxdaMXMu2Xvd
-         VbsKmxmfcZgPl/K6NYJ6VItfbRjahd9ieS06SUBdyxjaEievwSOwzN2WjJGOvE0vKLQQ
-         fbrijrtrvj5JbVd/hv5Mm7U3hh6/2mFc8GSzBn0FgW3N7MmRQGl7zUv+9QL5eLmbVOXJ
-         ECm623AAEcxvuE50zhBg40/Ut+vppXMIx29qiJTlbT7ldN/3ls82xRIBi2tKd0Me5nx5
-         5tW8KgQ2mNAQ+eoWpU2412yZZaXxzRk6sM+RENio3tSQhatYH73FwtOWxz2oBixmvHtO
-         s86Q==
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=BTssUIU0Hkcht1oMBHXsf5sT4efBSvwi3ZE6IgkkbiU=;
+        b=azsapfAH0Vpt5f+X+8DYUN9tza8bhh4IF7FhpKhhxKan2d79Ym6roVjByecfjhrPuJ
+         qNCzTW6E5xI96eYGlsEsgWdyvTkkoOA1mpH9E8gQk/z0R0T7RStf/I8F05tog05nY+XR
+         kdFXSplw6L7oFuP4m2Zmb0Zx4SIV4YZxEd8ArMShJumBUB0pCPqsLmbufFFZr4aFDZPZ
+         sDyQQxkRAGowILarsWQf8yR+Zihnz/Oc1NockBprATRq4mXNrWm0r8wG5jIAndixaLh4
+         fxqyyLjpa45pt4OVslmVdppSURqVDyeVaHJqrmNl0ZCP0WZ8GVtrs3wMoCktQgPdRs/u
+         yc6g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=TXK7p+epxbJwyolr6/upwM2QAM3CL+EU1GZF12Y5SBI=;
-        b=T3tYUNATwbGO73FKLBx7wTydMaaESZgYW2kgzf27wfA+m6AxX7dXrGgotflsWepclp
-         9ttttOSCfu+nVdTw5hXICLhb22R+ddIh3kZXxE72JNptTxmfoOZwTwVybIInk2nLwgGN
-         M/TAk3LLJ5wSYQJ+RCEXZlEhTXp81VIeFfxr2ZYyRSjXC8Msl0Koc7ym9tuP/52W9fH0
-         MToYm9Vbotb43pitiFTZa4Hk4riil8W5O/qOcbx3QhdUUsrI/7ZWXibaYcEqxASVnLTx
-         mmkyWANz7zrMlsBXNEsi7xP7cin8iIjfGQntAsDHoKegcapf35D4WyKPZhnWbpoNuu/z
-         B3Mw==
-X-Gm-Message-State: AOAM531otX7vRhWBs3cuyu/bRJ+tZvBBeai6bclxWAD5yVZS5DYeHAkx
-        58A3+ueeUw7PnWjHIQMJHD/AZY4eFYrgcHose6xPrA==
-X-Google-Smtp-Source: ABdhPJycGq0PQFXm9YCW/wHOsDCnAMrM2TsjtbPWNvDqQ4fDoZu/HUoqGvEMeS3+CfS2+B2LCXTM6mWgGGDCdbeWhHc=
-X-Received: by 2002:a05:651c:d7:: with SMTP id 23mr16392409ljr.304.1625780428526;
- Thu, 08 Jul 2021 14:40:28 -0700 (PDT)
-MIME-Version: 1.0
-References: <20210706180350.2838127-1-jingzhangos@google.com>
- <20210706180350.2838127-2-jingzhangos@google.com> <YOdnl5nzCaPB5l2P@google.com>
-In-Reply-To: <YOdnl5nzCaPB5l2P@google.com>
-From:   Jing Zhang <jingzhangos@google.com>
-Date:   Thu, 8 Jul 2021 16:40:16 -0500
-Message-ID: <CAAdAUtgw_MZxqvmnCQ6ei7LZOBtrOSYK+MLS1Xf2_dRi9FULZw@mail.gmail.com>
-Subject: Re: [PATCH v1 1/4] KVM: stats: Support linear and logarithmic
- histogram statistics
-To:     David Matlack <dmatlack@google.com>
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=BTssUIU0Hkcht1oMBHXsf5sT4efBSvwi3ZE6IgkkbiU=;
+        b=rhsiTplv4whpn9zmNM8tWawdLaW8CXwh8b21xpTc3qB+9dNuCFoHXiNZ6eICFXRLpm
+         TbVzVY1ETncE3jmbPJqAzJpi0H29dgirMNJbt2jKKlu+8OR6V/Bl16uPJ8Ix8VCVE1pZ
+         PI7tegOTgs/k0W/O8jweQdRcYF2ggJ7L5eMdcJvETDSzsVzs0F/PzUZ6BiXwXApAvfAz
+         iQvZ/LpoeGud3bCsFA7qzGHOskt/zKphKes8dw3VbJ09Xkyk2FgztdPgB7uUa1sAVRiL
+         6PfSEmYQWfh4EYzoiCg/se4z8RQLtREbZ0JWyyEoYNgX6K7qm301P+/FIPjRTXic31AR
+         HybA==
+X-Gm-Message-State: AOAM531XOK/2mDm/ip5MY9DTEP0LwmE+pUjbIEGR/OygOeZHNJm9wPnR
+        c+bq+2E1BK8jdZP9TDSyKZsIVA==
+X-Google-Smtp-Source: ABdhPJzxkkH46u/AR+41eefbjbdjKlXyGPUGcyVQpnRpIUDUUSkDSzMnryyw6YUIu+F1rG/u/pwRtQ==
+X-Received: by 2002:a63:655:: with SMTP id 82mr2432038pgg.133.1625780532170;
+        Thu, 08 Jul 2021 14:42:12 -0700 (PDT)
+Received: from google.com (254.80.82.34.bc.googleusercontent.com. [34.82.80.254])
+        by smtp.gmail.com with ESMTPSA id v1sm3773235pfn.40.2021.07.08.14.42.11
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 08 Jul 2021 14:42:11 -0700 (PDT)
+Date:   Thu, 8 Jul 2021 21:42:07 +0000
+From:   David Matlack <dmatlack@google.com>
+To:     Jing Zhang <jingzhangos@google.com>
 Cc:     KVM <kvm@vger.kernel.org>, KVMPPC <kvm-ppc@vger.kernel.org>,
         Paolo Bonzini <pbonzini@redhat.com>,
         Sean Christopherson <seanjc@google.com>,
@@ -60,428 +57,215 @@ Cc:     KVM <kvm@vger.kernel.org>, KVMPPC <kvm-ppc@vger.kernel.org>,
         Peter Shier <pshier@google.com>,
         Oliver Upton <oupton@google.com>,
         David Rientjes <rientjes@google.com>
-Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [PATCH v1 4/4] KVM: stats: Add halt polling related histogram
+ stats
+Message-ID: <YOdxLwJx00nQIR87@google.com>
+References: <20210706180350.2838127-1-jingzhangos@google.com>
+ <20210706180350.2838127-5-jingzhangos@google.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210706180350.2838127-5-jingzhangos@google.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jul 8, 2021 at 4:01 PM David Matlack <dmatlack@google.com> wrote:
->
-> On Tue, Jul 06, 2021 at 06:03:47PM +0000, Jing Zhang wrote:
-> > Add new types of KVM stats, linear and logarithmic histogram.
-> > Histogram are very useful for observing the value distribution
-> > of time or size related stats.
-> >
-> > Signed-off-by: Jing Zhang <jingzhangos@google.com>
-> > ---
-> >  arch/arm64/kvm/guest.c    |  4 ---
-> >  arch/mips/kvm/mips.c      |  4 ---
-> >  arch/powerpc/kvm/book3s.c |  4 ---
-> >  arch/powerpc/kvm/booke.c  |  4 ---
-> >  arch/s390/kvm/kvm-s390.c  |  4 ---
-> >  arch/x86/kvm/x86.c        |  4 ---
-> >  include/linux/kvm_host.h  | 53 ++++++++++++++++++++++++++++-----------
-> >  include/linux/kvm_types.h | 16 ++++++++++++
-> >  include/uapi/linux/kvm.h  | 11 +++++---
-> >  virt/kvm/binary_stats.c   | 36 ++++++++++++++++++++++++++
-> >  10 files changed, 98 insertions(+), 42 deletions(-)
-> >
-> > diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
-> > index 1512a8007a78..cb44d8756fa7 100644
-> > --- a/arch/arm64/kvm/guest.c
-> > +++ b/arch/arm64/kvm/guest.c
-> > @@ -31,8 +31,6 @@
-> >  const struct _kvm_stats_desc kvm_vm_stats_desc[] = {
-> >       KVM_GENERIC_VM_STATS()
-> >  };
-> > -static_assert(ARRAY_SIZE(kvm_vm_stats_desc) ==
-> > -             sizeof(struct kvm_vm_stat) / sizeof(u64));
-> >
-> >  const struct kvm_stats_header kvm_vm_stats_header = {
-> >       .name_size = KVM_STATS_NAME_SIZE,
-> > @@ -52,8 +50,6 @@ const struct _kvm_stats_desc kvm_vcpu_stats_desc[] = {
-> >       STATS_DESC_COUNTER(VCPU, mmio_exit_kernel),
-> >       STATS_DESC_COUNTER(VCPU, exits)
-> >  };
-> > -static_assert(ARRAY_SIZE(kvm_vcpu_stats_desc) ==
-> > -             sizeof(struct kvm_vcpu_stat) / sizeof(u64));
-> >
-> >  const struct kvm_stats_header kvm_vcpu_stats_header = {
-> >       .name_size = KVM_STATS_NAME_SIZE,
-> > diff --git a/arch/mips/kvm/mips.c b/arch/mips/kvm/mips.c
-> > index af9dd029a4e1..75c6f264c626 100644
-> > --- a/arch/mips/kvm/mips.c
-> > +++ b/arch/mips/kvm/mips.c
-> > @@ -41,8 +41,6 @@
-> >  const struct _kvm_stats_desc kvm_vm_stats_desc[] = {
-> >       KVM_GENERIC_VM_STATS()
-> >  };
-> > -static_assert(ARRAY_SIZE(kvm_vm_stats_desc) ==
-> > -             sizeof(struct kvm_vm_stat) / sizeof(u64));
-> >
-> >  const struct kvm_stats_header kvm_vm_stats_header = {
-> >       .name_size = KVM_STATS_NAME_SIZE,
-> > @@ -85,8 +83,6 @@ const struct _kvm_stats_desc kvm_vcpu_stats_desc[] = {
-> >       STATS_DESC_COUNTER(VCPU, vz_cpucfg_exits),
-> >  #endif
-> >  };
-> > -static_assert(ARRAY_SIZE(kvm_vcpu_stats_desc) ==
-> > -             sizeof(struct kvm_vcpu_stat) / sizeof(u64));
-> >
-> >  const struct kvm_stats_header kvm_vcpu_stats_header = {
-> >       .name_size = KVM_STATS_NAME_SIZE,
-> > diff --git a/arch/powerpc/kvm/book3s.c b/arch/powerpc/kvm/book3s.c
-> > index 79833f78d1da..5cc6e90095b0 100644
-> > --- a/arch/powerpc/kvm/book3s.c
-> > +++ b/arch/powerpc/kvm/book3s.c
-> > @@ -43,8 +43,6 @@ const struct _kvm_stats_desc kvm_vm_stats_desc[] = {
-> >       STATS_DESC_ICOUNTER(VM, num_2M_pages),
-> >       STATS_DESC_ICOUNTER(VM, num_1G_pages)
-> >  };
-> > -static_assert(ARRAY_SIZE(kvm_vm_stats_desc) ==
-> > -             sizeof(struct kvm_vm_stat) / sizeof(u64));
-> >
-> >  const struct kvm_stats_header kvm_vm_stats_header = {
-> >       .name_size = KVM_STATS_NAME_SIZE,
-> > @@ -88,8 +86,6 @@ const struct _kvm_stats_desc kvm_vcpu_stats_desc[] = {
-> >       STATS_DESC_COUNTER(VCPU, pthru_host),
-> >       STATS_DESC_COUNTER(VCPU, pthru_bad_aff)
-> >  };
-> > -static_assert(ARRAY_SIZE(kvm_vcpu_stats_desc) ==
-> > -             sizeof(struct kvm_vcpu_stat) / sizeof(u64));
-> >
-> >  const struct kvm_stats_header kvm_vcpu_stats_header = {
-> >       .name_size = KVM_STATS_NAME_SIZE,
-> > diff --git a/arch/powerpc/kvm/booke.c b/arch/powerpc/kvm/booke.c
-> > index 551b30d84aee..5ed6c235e059 100644
-> > --- a/arch/powerpc/kvm/booke.c
-> > +++ b/arch/powerpc/kvm/booke.c
-> > @@ -41,8 +41,6 @@ const struct _kvm_stats_desc kvm_vm_stats_desc[] = {
-> >       STATS_DESC_ICOUNTER(VM, num_2M_pages),
-> >       STATS_DESC_ICOUNTER(VM, num_1G_pages)
-> >  };
-> > -static_assert(ARRAY_SIZE(kvm_vm_stats_desc) ==
-> > -             sizeof(struct kvm_vm_stat) / sizeof(u64));
-> >
-> >  const struct kvm_stats_header kvm_vm_stats_header = {
-> >       .name_size = KVM_STATS_NAME_SIZE,
-> > @@ -79,8 +77,6 @@ const struct _kvm_stats_desc kvm_vcpu_stats_desc[] = {
-> >       STATS_DESC_COUNTER(VCPU, pthru_host),
-> >       STATS_DESC_COUNTER(VCPU, pthru_bad_aff)
-> >  };
-> > -static_assert(ARRAY_SIZE(kvm_vcpu_stats_desc) ==
-> > -             sizeof(struct kvm_vcpu_stat) / sizeof(u64));
-> >
-> >  const struct kvm_stats_header kvm_vcpu_stats_header = {
-> >       .name_size = KVM_STATS_NAME_SIZE,
-> > diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
-> > index 1695f0ced5ba..7610d33d319b 100644
-> > --- a/arch/s390/kvm/kvm-s390.c
-> > +++ b/arch/s390/kvm/kvm-s390.c
-> > @@ -66,8 +66,6 @@ const struct _kvm_stats_desc kvm_vm_stats_desc[] = {
-> >       STATS_DESC_COUNTER(VM, inject_service_signal),
-> >       STATS_DESC_COUNTER(VM, inject_virtio)
-> >  };
-> > -static_assert(ARRAY_SIZE(kvm_vm_stats_desc) ==
-> > -             sizeof(struct kvm_vm_stat) / sizeof(u64));
-> >
-> >  const struct kvm_stats_header kvm_vm_stats_header = {
-> >       .name_size = KVM_STATS_NAME_SIZE,
-> > @@ -174,8 +172,6 @@ const struct _kvm_stats_desc kvm_vcpu_stats_desc[] = {
-> >       STATS_DESC_COUNTER(VCPU, diagnose_other),
-> >       STATS_DESC_COUNTER(VCPU, pfault_sync)
-> >  };
-> > -static_assert(ARRAY_SIZE(kvm_vcpu_stats_desc) ==
-> > -             sizeof(struct kvm_vcpu_stat) / sizeof(u64));
-> >
-> >  const struct kvm_stats_header kvm_vcpu_stats_header = {
-> >       .name_size = KVM_STATS_NAME_SIZE,
-> > diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> > index 8166ad113fb2..b94a80ad5b8d 100644
-> > --- a/arch/x86/kvm/x86.c
-> > +++ b/arch/x86/kvm/x86.c
-> > @@ -239,8 +239,6 @@ const struct _kvm_stats_desc kvm_vm_stats_desc[] = {
-> >       STATS_DESC_ICOUNTER(VM, nx_lpage_splits),
-> >       STATS_DESC_PCOUNTER(VM, max_mmu_page_hash_collisions)
-> >  };
-> > -static_assert(ARRAY_SIZE(kvm_vm_stats_desc) ==
-> > -             sizeof(struct kvm_vm_stat) / sizeof(u64));
-> >
-> >  const struct kvm_stats_header kvm_vm_stats_header = {
-> >       .name_size = KVM_STATS_NAME_SIZE,
-> > @@ -280,8 +278,6 @@ const struct _kvm_stats_desc kvm_vcpu_stats_desc[] = {
-> >       STATS_DESC_COUNTER(VCPU, directed_yield_successful),
-> >       STATS_DESC_ICOUNTER(VCPU, guest_mode)
-> >  };
-> > -static_assert(ARRAY_SIZE(kvm_vcpu_stats_desc) ==
-> > -             sizeof(struct kvm_vcpu_stat) / sizeof(u64));
-> >
-> >  const struct kvm_stats_header kvm_vcpu_stats_header = {
-> >       .name_size = KVM_STATS_NAME_SIZE,
-> > diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-> > index ae7735b490b4..356af173114d 100644
-> > --- a/include/linux/kvm_host.h
-> > +++ b/include/linux/kvm_host.h
-> > @@ -1273,56 +1273,66 @@ struct _kvm_stats_desc {
-> >       char name[KVM_STATS_NAME_SIZE];
-> >  };
-> >
-> > -#define STATS_DESC_COMMON(type, unit, base, exp)                            \
-> > +#define STATS_DESC_COMMON(type, unit, base, exp, sz, param)                 \
-> >       .flags = type | unit | base |                                          \
-> >                BUILD_BUG_ON_ZERO(type & ~KVM_STATS_TYPE_MASK) |              \
-> >                BUILD_BUG_ON_ZERO(unit & ~KVM_STATS_UNIT_MASK) |              \
-> >                BUILD_BUG_ON_ZERO(base & ~KVM_STATS_BASE_MASK),               \
-> >       .exponent = exp,                                                       \
-> > -     .size = 1
-> > +     .size = sz,                                                            \
-> > +     .hist_param = param
-> >
-> > -#define VM_GENERIC_STATS_DESC(stat, type, unit, base, exp)                  \
-> > +#define VM_GENERIC_STATS_DESC(stat, type, unit, base, exp, sz, param)               \
-> >       {                                                                      \
-> >               {                                                              \
-> > -                     STATS_DESC_COMMON(type, unit, base, exp),              \
-> > +                     STATS_DESC_COMMON(type, unit, base, exp, sz, param),   \
-> >                       .offset = offsetof(struct kvm_vm_stat, generic.stat)   \
-> >               },                                                             \
-> >               .name = #stat,                                                 \
-> >       }
-> > -#define VCPU_GENERIC_STATS_DESC(stat, type, unit, base, exp)                \
-> > +#define VCPU_GENERIC_STATS_DESC(stat, type, unit, base, exp, sz, param)             \
-> >       {                                                                      \
-> >               {                                                              \
-> > -                     STATS_DESC_COMMON(type, unit, base, exp),              \
-> > +                     STATS_DESC_COMMON(type, unit, base, exp, sz, param),   \
-> >                       .offset = offsetof(struct kvm_vcpu_stat, generic.stat) \
-> >               },                                                             \
-> >               .name = #stat,                                                 \
-> >       }
-> > -#define VM_STATS_DESC(stat, type, unit, base, exp)                          \
-> > +#define VM_STATS_DESC(stat, type, unit, base, exp, sz, param)                       \
-> >       {                                                                      \
-> >               {                                                              \
-> > -                     STATS_DESC_COMMON(type, unit, base, exp),              \
-> > +                     STATS_DESC_COMMON(type, unit, base, exp, sz, param),   \
-> >                       .offset = offsetof(struct kvm_vm_stat, stat)           \
-> >               },                                                             \
-> >               .name = #stat,                                                 \
-> >       }
-> > -#define VCPU_STATS_DESC(stat, type, unit, base, exp)                        \
-> > +#define VCPU_STATS_DESC(stat, type, unit, base, exp, sz, param)                     \
-> >       {                                                                      \
-> >               {                                                              \
-> > -                     STATS_DESC_COMMON(type, unit, base, exp),              \
-> > +                     STATS_DESC_COMMON(type, unit, base, exp, sz, param),   \
-> >                       .offset = offsetof(struct kvm_vcpu_stat, stat)         \
-> >               },                                                             \
-> >               .name = #stat,                                                 \
-> >       }
-> >  /* SCOPE: VM, VM_GENERIC, VCPU, VCPU_GENERIC */
-> > -#define STATS_DESC(SCOPE, stat, type, unit, base, exp)                              \
-> > -     SCOPE##_STATS_DESC(stat, type, unit, base, exp)
-> > +#define STATS_DESC(SCOPE, stat, type, unit, base, exp, sz, param)           \
-> > +     SCOPE##_STATS_DESC(stat, type, unit, base, exp, sz, param)
-> >
-> >  #define STATS_DESC_CUMULATIVE(SCOPE, name, unit, base, exponent)            \
-> > -     STATS_DESC(SCOPE, name, KVM_STATS_TYPE_CUMULATIVE, unit, base, exponent)
-> > +     STATS_DESC(SCOPE, name, KVM_STATS_TYPE_CUMULATIVE,                     \
-> > +             unit, base, exponent, 1, 0)
-> >  #define STATS_DESC_INSTANT(SCOPE, name, unit, base, exponent)                       \
-> > -     STATS_DESC(SCOPE, name, KVM_STATS_TYPE_INSTANT, unit, base, exponent)
-> > +     STATS_DESC(SCOPE, name, KVM_STATS_TYPE_INSTANT,                        \
-> > +             unit, base, exponent, 1, 0)
-> >  #define STATS_DESC_PEAK(SCOPE, name, unit, base, exponent)                  \
-> > -     STATS_DESC(SCOPE, name, KVM_STATS_TYPE_PEAK, unit, base, exponent)
-> > +     STATS_DESC(SCOPE, name, KVM_STATS_TYPE_PEAK,                           \
-> > +             unit, base, exponent, 1, 0)
-> > +#define STATS_DESC_LINEAR_HIST(SCOPE, name, unit, base, exponent, sz, param)   \
-> > +     STATS_DESC(SCOPE, name, KVM_STATS_TYPE_LINEAR_HIST,                    \
-> > +             unit, base, exponent, sz, param)
-> > +#define STATS_DESC_LOG_HIST(SCOPE, name, unit, base, exponent, sz, param)      \
-> > +     STATS_DESC(SCOPE, name, KVM_STATS_TYPE_LOG_HIST,                       \
-> > +             unit, base, exponent, sz, param)
-> >
-> >  /* Cumulative counter, read/write */
-> >  #define STATS_DESC_COUNTER(SCOPE, name)                                             \
-> > @@ -1341,6 +1351,14 @@ struct _kvm_stats_desc {
-> >  #define STATS_DESC_TIME_NSEC(SCOPE, name)                                   \
-> >       STATS_DESC_CUMULATIVE(SCOPE, name, KVM_STATS_UNIT_SECONDS,             \
-> >               KVM_STATS_BASE_POW10, -9)
-> > +/* Linear histogram for time in nanosecond */
-> > +#define STATS_DESC_LINHIST_TIME_NSEC(SCOPE, name, sz, bucket_size)          \
-> > +     STATS_DESC_LINEAR_HIST(SCOPE, name, KVM_STATS_UNIT_SECONDS,            \
-> > +             KVM_STATS_BASE_POW10, -9, sz, bucket_size)
-> > +/* Logarithmic histogram for time in nanosecond */
-> > +#define STATS_DESC_LOGHIST_TIME_NSEC(SCOPE, name, sz)                               \
-> > +     STATS_DESC_LOG_HIST(SCOPE, name, KVM_STATS_UNIT_SECONDS,               \
-> > +             KVM_STATS_BASE_POW10, -9, sz, LOGHIST_BASE_2)
-> >
-> >  #define KVM_GENERIC_VM_STATS()                                                      \
-> >       STATS_DESC_COUNTER(VM_GENERIC, remote_tlb_flush)
-> > @@ -1354,10 +1372,15 @@ struct _kvm_stats_desc {
-> >       STATS_DESC_TIME_NSEC(VCPU_GENERIC, halt_poll_fail_ns)
-> >
-> >  extern struct dentry *kvm_debugfs_dir;
-> > +
-> >  ssize_t kvm_stats_read(char *id, const struct kvm_stats_header *header,
-> >                      const struct _kvm_stats_desc *desc,
-> >                      void *stats, size_t size_stats,
-> >                      char __user *user_buffer, size_t size, loff_t *offset);
-> > +void kvm_stats_linear_hist_update(u64 *data, size_t size,
-> > +                               u64 value, size_t bucket_size);
-> > +void kvm_stats_log_hist_update(u64 *data, size_t size, u64 value);
-> > +
-> >  extern const struct kvm_stats_header kvm_vm_stats_header;
-> >  extern const struct _kvm_stats_desc kvm_vm_stats_desc[];
-> >  extern const struct kvm_stats_header kvm_vcpu_stats_header;
-> > diff --git a/include/linux/kvm_types.h b/include/linux/kvm_types.h
-> > index ed6a985c5680..cc88cd676775 100644
-> > --- a/include/linux/kvm_types.h
-> > +++ b/include/linux/kvm_types.h
-> > @@ -76,6 +76,22 @@ struct kvm_mmu_memory_cache {
-> >  };
-> >  #endif
-> >
-> > +/* Constants used for histogram stats */
-> > +#define LINHIST_SIZE_SMALL           10
-> > +#define LINHIST_SIZE_MEDIUM          20
-> > +#define LINHIST_SIZE_LARGE           50
-> > +#define LINHIST_SIZE_XLARGE          100
->
-> nit: s/SIZE/BUCKET_COUNT/
->
-Sure, it makes more sense.
-> > +#define LINHIST_BUCKET_SIZE_SMALL    10
-> > +#define LINHIST_BUCKET_SIZE_MEDIUM   100
-> > +#define LINHIST_BUCKET_SIZE_LARGE    1000
-> > +#define LINHIST_BUCKET_SIZE_XLARGE   10000
-> > +
-> > +#define LOGHIST_SIZE_SMALL           8
-> > +#define LOGHIST_SIZE_MEDIUM          16
-> > +#define LOGHIST_SIZE_LARGE           32
-> > +#define LOGHIST_SIZE_XLARGE          64
->
-> Ditto here.
->
-Will do.
-> > +#define LOGHIST_BASE_2                       2
-> > +
-> >  struct kvm_vm_stat_generic {
-> >       u64 remote_tlb_flush;
-> >  };
-> > diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-> > index 68c9e6d8bbda..ff34a471d9ef 100644
-> > --- a/include/uapi/linux/kvm.h
-> > +++ b/include/uapi/linux/kvm.h
-> > @@ -1963,7 +1963,9 @@ struct kvm_stats_header {
-> >  #define KVM_STATS_TYPE_CUMULATIVE    (0x0 << KVM_STATS_TYPE_SHIFT)
-> >  #define KVM_STATS_TYPE_INSTANT               (0x1 << KVM_STATS_TYPE_SHIFT)
-> >  #define KVM_STATS_TYPE_PEAK          (0x2 << KVM_STATS_TYPE_SHIFT)
-> > -#define KVM_STATS_TYPE_MAX           KVM_STATS_TYPE_PEAK
-> > +#define KVM_STATS_TYPE_LINEAR_HIST   (0x3 << KVM_STATS_TYPE_SHIFT)
-> > +#define KVM_STATS_TYPE_LOG_HIST              (0x4 << KVM_STATS_TYPE_SHIFT)
-> > +#define KVM_STATS_TYPE_MAX           KVM_STATS_TYPE_LOG_HIST
-> >
-> >  #define KVM_STATS_UNIT_SHIFT         4
-> >  #define KVM_STATS_UNIT_MASK          (0xF << KVM_STATS_UNIT_SHIFT)
-> > @@ -1987,7 +1989,10 @@ struct kvm_stats_header {
-> >   *        Every data item is of type __u64.
-> >   * @offset: The offset of the stats to the start of stat structure in
-> >   *          struture kvm or kvm_vcpu.
-> > - * @unused: Unused field for future usage. Always 0 for now.
-> > + * @hist_param: A parameter value used for histogram stats. For linear
-> > + *              histogram stats, it indicates the size of the bucket;
-> > + *              For logarithmic histogram stats, it indicates the base
-> > + *              of the logarithm. Only base of 2 is supported.
-> >   * @name: The name string for the stats. Its size is indicated by the
-> >   *        &kvm_stats_header->name_size.
-> >   */
-> > @@ -1996,7 +2001,7 @@ struct kvm_stats_desc {
-> >       __s16 exponent;
-> >       __u16 size;
-> >       __u32 offset;
-> > -     __u32 unused;
-> > +     __u32 hist_param;
->
-> `hist_param` is vague. What about making this an anonymous union to make
-> the dual meaning explicit?
->
->         union {
->                 /* Only used for KVM_STATS_TYPE_LOG_HIST. */
->                 __u32 base;
->                 /* Only used for KVM_STATS_TYPE_LINEAR_HIST. */
->                 __u32 bucket_size;
->         };
->
-> It may make the STATS_DESC code a bit more complicated but the rest of
-> the code that uses it will be much more clear.
->
-Since we only support base-2 log hist, maybe it is not necessary to
-have the base field.
-The reason to only support base-2 log hist is that its range is
-already large enough for
-any stats.
-Will just change hist_param to bucket_size.
-> >       char name[];
-> >  };
-> >
-> > diff --git a/virt/kvm/binary_stats.c b/virt/kvm/binary_stats.c
-> > index e609d428811a..6eead6979a7f 100644
-> > --- a/virt/kvm/binary_stats.c
-> > +++ b/virt/kvm/binary_stats.c
-> > @@ -144,3 +144,39 @@ ssize_t kvm_stats_read(char *id, const struct kvm_stats_header *header,
-> >       *offset = pos;
-> >       return len;
-> >  }
-> > +
-> > +/**
-> > + * kvm_stats_linear_hist_update() - Update bucket value for linear histogram
-> > + * statistics data.
-> > + *
-> > + * @data: start address of the stats data
-> > + * @size: the number of bucket of the stats data
-> > + * @value: the new value used to update the linear histogram's bucket
-> > + * @bucket_size: the size (width) of a bucket
-> > + */
-> > +void kvm_stats_linear_hist_update(u64 *data, size_t size,
-> > +                               u64 value, size_t bucket_size)
-> > +{
-> > +     size_t index = value / bucket_size;
-> > +
-> > +     if (index >= size)
-> > +             index = size - 1;
->
-> nit: It would be simpler to use max().
->
->         size_t index = max(value / bucket_size, size - 1);
->
-Will do.
-> > +     ++data[index];
-> > +}
-> > +
-> > +/**
-> > + * kvm_stats_log_hist_update() - Update bucket value for logarithmic histogram
-> > + * statistics data.
-> > + *
-> > + * @data: start address of the stats data
-> > + * @size: the number of bucket of the stats data
-> > + * @value: the new value used to update the logarithmic histogram's bucket
-> > + */
-> > +void kvm_stats_log_hist_update(u64 *data, size_t size, u64 value)
-> > +{
-> > +     size_t index = fls64(value);
-> > +
-> > +     if (index >= size)
-> > +             index = size - 1;
->
-> Ditto here about using max().
->
-Will do.
-> > +     ++data[index];
-> > +}
-> > --
-> > 2.32.0.93.g670b81a890-goog
-> >
-Thanks,
-Jing
+On Tue, Jul 06, 2021 at 06:03:50PM +0000, Jing Zhang wrote:
+> Add simple stats halt_wait_ns to record the time a VCPU has spent on
+> waiting for all architectures (not just powerpc).
+> Add three log histogram stats to record the distribution of time spent
+> on successful polling, failed polling and VCPU wait.
+> halt_poll_success_hist: Distribution of time spent before a successful
+> polling.
+> halt_poll_fail_hist: Distribution of time spent before a failed polling.
+> halt_wait_hist: Distribution of time a VCPU has spent on waiting.
+> 
+> Signed-off-by: Jing Zhang <jingzhangos@google.com>
+> ---
+>  arch/powerpc/include/asm/kvm_host.h |  1 -
+>  arch/powerpc/kvm/book3s.c           |  1 -
+>  arch/powerpc/kvm/book3s_hv.c        | 20 +++++++++++++++++---
+>  arch/powerpc/kvm/booke.c            |  1 -
+>  include/linux/kvm_host.h            |  9 ++++++++-
+>  include/linux/kvm_types.h           |  4 ++++
+>  virt/kvm/kvm_main.c                 | 19 +++++++++++++++++++
+>  7 files changed, 48 insertions(+), 7 deletions(-)
+> 
+> diff --git a/arch/powerpc/include/asm/kvm_host.h b/arch/powerpc/include/asm/kvm_host.h
+> index 9f52f282b1aa..4931d03e5799 100644
+> --- a/arch/powerpc/include/asm/kvm_host.h
+> +++ b/arch/powerpc/include/asm/kvm_host.h
+> @@ -103,7 +103,6 @@ struct kvm_vcpu_stat {
+>  	u64 emulated_inst_exits;
+>  	u64 dec_exits;
+>  	u64 ext_intr_exits;
+> -	u64 halt_wait_ns;
+
+The halt_wait_ns refactor should be a separate patch.
+
+>  	u64 halt_successful_wait;
+>  	u64 dbell_exits;
+>  	u64 gdbell_exits;
+> diff --git a/arch/powerpc/kvm/book3s.c b/arch/powerpc/kvm/book3s.c
+> index 5cc6e90095b0..b785f6772391 100644
+> --- a/arch/powerpc/kvm/book3s.c
+> +++ b/arch/powerpc/kvm/book3s.c
+> @@ -69,7 +69,6 @@ const struct _kvm_stats_desc kvm_vcpu_stats_desc[] = {
+>  	STATS_DESC_COUNTER(VCPU, emulated_inst_exits),
+>  	STATS_DESC_COUNTER(VCPU, dec_exits),
+>  	STATS_DESC_COUNTER(VCPU, ext_intr_exits),
+> -	STATS_DESC_TIME_NSEC(VCPU, halt_wait_ns),
+>  	STATS_DESC_COUNTER(VCPU, halt_successful_wait),
+>  	STATS_DESC_COUNTER(VCPU, dbell_exits),
+>  	STATS_DESC_COUNTER(VCPU, gdbell_exits),
+> diff --git a/arch/powerpc/kvm/book3s_hv.c b/arch/powerpc/kvm/book3s_hv.c
+> index cd544a46183e..103f998cee75 100644
+> --- a/arch/powerpc/kvm/book3s_hv.c
+> +++ b/arch/powerpc/kvm/book3s_hv.c
+> @@ -4144,19 +4144,33 @@ static void kvmppc_vcore_blocked(struct kvmppc_vcore *vc)
+>  
+>  	/* Attribute wait time */
+>  	if (do_sleep) {
+> -		vc->runner->stat.halt_wait_ns +=
+> +		vc->runner->stat.generic.halt_wait_ns +=
+>  			ktime_to_ns(cur) - ktime_to_ns(start_wait);
+> +		kvm_stats_log_hist_update(
+> +				vc->runner->stat.generic.halt_wait_hist,
+> +				LOGHIST_SIZE_LARGE,
+> +				ktime_to_ns(cur) - ktime_to_ns(start_wait));
+>  		/* Attribute failed poll time */
+> -		if (vc->halt_poll_ns)
+> +		if (vc->halt_poll_ns) {
+>  			vc->runner->stat.generic.halt_poll_fail_ns +=
+>  				ktime_to_ns(start_wait) -
+>  				ktime_to_ns(start_poll);
+> +			kvm_stats_log_hist_update(
+> +				vc->runner->stat.generic.halt_poll_fail_hist,
+> +				LOGHIST_SIZE_LARGE, ktime_to_ns(start_wait) -
+> +				ktime_to_ns(start_poll));
+> +		}
+>  	} else {
+>  		/* Attribute successful poll time */
+> -		if (vc->halt_poll_ns)
+> +		if (vc->halt_poll_ns) {
+>  			vc->runner->stat.generic.halt_poll_success_ns +=
+>  				ktime_to_ns(cur) -
+>  				ktime_to_ns(start_poll);
+> +			kvm_stats_log_hist_update(
+> +				vc->runner->stat.generic.halt_poll_success_hist,
+> +				LOGHIST_SIZE_LARGE,
+> +				ktime_to_ns(cur) - ktime_to_ns(start_poll));
+> +		}
+>  	}
+>  
+>  	/* Adjust poll time */
+> diff --git a/arch/powerpc/kvm/booke.c b/arch/powerpc/kvm/booke.c
+> index 5ed6c235e059..977801c83aff 100644
+> --- a/arch/powerpc/kvm/booke.c
+> +++ b/arch/powerpc/kvm/booke.c
+> @@ -67,7 +67,6 @@ const struct _kvm_stats_desc kvm_vcpu_stats_desc[] = {
+>  	STATS_DESC_COUNTER(VCPU, emulated_inst_exits),
+>  	STATS_DESC_COUNTER(VCPU, dec_exits),
+>  	STATS_DESC_COUNTER(VCPU, ext_intr_exits),
+> -	STATS_DESC_TIME_NSEC(VCPU, halt_wait_ns),
+>  	STATS_DESC_COUNTER(VCPU, halt_successful_wait),
+>  	STATS_DESC_COUNTER(VCPU, dbell_exits),
+>  	STATS_DESC_COUNTER(VCPU, gdbell_exits),
+> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+> index 356af173114d..268a0ccc9c5f 100644
+> --- a/include/linux/kvm_host.h
+> +++ b/include/linux/kvm_host.h
+> @@ -1369,7 +1369,14 @@ struct _kvm_stats_desc {
+>  	STATS_DESC_COUNTER(VCPU_GENERIC, halt_poll_invalid),		       \
+>  	STATS_DESC_COUNTER(VCPU_GENERIC, halt_wakeup),			       \
+>  	STATS_DESC_TIME_NSEC(VCPU_GENERIC, halt_poll_success_ns),	       \
+> -	STATS_DESC_TIME_NSEC(VCPU_GENERIC, halt_poll_fail_ns)
+> +	STATS_DESC_TIME_NSEC(VCPU_GENERIC, halt_poll_fail_ns),		       \
+> +	STATS_DESC_LOGHIST_TIME_NSEC(VCPU_GENERIC, halt_poll_success_hist,     \
+> +			LOGHIST_SIZE_LARGE),				       \
+
+This should probably be a new macro rather than using LOGHIST_SIZE_LARGE
+everywhere.
+
+#define HALT_POLL_HIST_SIZE LOGHIST_SIZE_LARGE
+
+> +	STATS_DESC_LOGHIST_TIME_NSEC(VCPU_GENERIC, halt_poll_fail_hist,	       \
+> +			LOGHIST_SIZE_LARGE),				       \
+> +	STATS_DESC_TIME_NSEC(VCPU_GENERIC, halt_wait_ns),		       \
+> +	STATS_DESC_LOGHIST_TIME_NSEC(VCPU_GENERIC, halt_wait_hist,	       \
+> +			LOGHIST_SIZE_LARGE)
+>  
+>  extern struct dentry *kvm_debugfs_dir;
+>  
+> diff --git a/include/linux/kvm_types.h b/include/linux/kvm_types.h
+> index cc88cd676775..7838a42932c8 100644
+> --- a/include/linux/kvm_types.h
+> +++ b/include/linux/kvm_types.h
+> @@ -103,6 +103,10 @@ struct kvm_vcpu_stat_generic {
+>  	u64 halt_wakeup;
+>  	u64 halt_poll_success_ns;
+>  	u64 halt_poll_fail_ns;
+> +	u64 halt_poll_success_hist[LOGHIST_SIZE_LARGE];
+> +	u64 halt_poll_fail_hist[LOGHIST_SIZE_LARGE];
+> +	u64 halt_wait_ns;
+> +	u64 halt_wait_hist[LOGHIST_SIZE_LARGE];
+>  };
+>  
+>  #define KVM_STATS_NAME_SIZE	48
+> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> index 3dcc2abbfc60..840b5bece080 100644
+> --- a/virt/kvm/kvm_main.c
+> +++ b/virt/kvm/kvm_main.c
+> @@ -3093,12 +3093,24 @@ void kvm_vcpu_block(struct kvm_vcpu *vcpu)
+>  				++vcpu->stat.generic.halt_successful_poll;
+>  				if (!vcpu_valid_wakeup(vcpu))
+>  					++vcpu->stat.generic.halt_poll_invalid;
+> +
+> +				kvm_stats_log_hist_update(
+> +				      vcpu->stat.generic.halt_poll_success_hist,
+> +				      LOGHIST_SIZE_LARGE,
+> +				      ktime_to_ns(ktime_get()) -
+> +				      ktime_to_ns(start));
+>  				goto out;
+>  			}
+>  			poll_end = cur = ktime_get();
+>  		} while (kvm_vcpu_can_poll(cur, stop));
+> +
+> +		kvm_stats_log_hist_update(
+> +				vcpu->stat.generic.halt_poll_fail_hist,
+> +				LOGHIST_SIZE_LARGE,
+> +				ktime_to_ns(ktime_get()) - ktime_to_ns(start));
+
+nit: Consider creating a wrapper for kvm_stats_log_hist_update() since
+there are so many call sites. You can save a line at every call site by
+avoiding passing in the histogram size.
+
+        void halt_poll_hist_update(u64 *histogram, ktime_t time)
+        {
+                kvm_stats_log_hist_update(histogram, LOGHIST_SIZE_LARGE, time);
+        }
+
+
+>  	}
+>  
+> +
+>  	prepare_to_rcuwait(&vcpu->wait);
+>  	for (;;) {
+>  		set_current_state(TASK_INTERRUPTIBLE);
+> @@ -3111,6 +3123,13 @@ void kvm_vcpu_block(struct kvm_vcpu *vcpu)
+>  	}
+>  	finish_rcuwait(&vcpu->wait);
+>  	cur = ktime_get();
+> +	if (waited) {
+> +		vcpu->stat.generic.halt_wait_ns +=
+> +			ktime_to_ns(cur) - ktime_to_ns(poll_end);
+> +		kvm_stats_log_hist_update(vcpu->stat.generic.halt_wait_hist,
+> +				LOGHIST_SIZE_LARGE,
+> +				ktime_to_ns(cur) - ktime_to_ns(poll_end));
+> +	}
+>  out:
+>  	kvm_arch_vcpu_unblocking(vcpu);
+>  	block_ns = ktime_to_ns(cur) - ktime_to_ns(start);
+> -- 
+> 2.32.0.93.g670b81a890-goog
+> 
