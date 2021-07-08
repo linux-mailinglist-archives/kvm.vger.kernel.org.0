@@ -2,106 +2,113 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5A8523C17EF
-	for <lists+kvm@lfdr.de>; Thu,  8 Jul 2021 19:16:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C96303C17FF
+	for <lists+kvm@lfdr.de>; Thu,  8 Jul 2021 19:21:18 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229516AbhGHRTG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 8 Jul 2021 13:19:06 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:34171 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229524AbhGHRTE (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 8 Jul 2021 13:19:04 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1625764581;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=+NjBGd/4T9twKgX/ZHNdm+93Uf3nnJPB993PVyrBW5E=;
-        b=GleDX/IDgJAdw7BZlXSOaZG0vbxfpWGFnSY0NrJUjqwGM79IwzCyjEvOCYhIMAjDe3yXl+
-        K/Aws7Kd3vKyLJ7XjYTMjVFFS7gHanKyULk0FVClavW3WtOb1dN3AH2o45N2A8xC2igb+k
-        Ow6EgbrnFd92O/HoDd5ly7r83a2gawg=
-Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
- [209.85.218.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-548-5HQy5KGcOQC22VRGhNGjPw-1; Thu, 08 Jul 2021 13:16:20 -0400
-X-MC-Unique: 5HQy5KGcOQC22VRGhNGjPw-1
-Received: by mail-ej1-f70.google.com with SMTP id rl7-20020a1709072167b02904f7606bd58fso1701188ejb.11
-        for <kvm@vger.kernel.org>; Thu, 08 Jul 2021 10:16:20 -0700 (PDT)
+        id S229592AbhGHRX7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 8 Jul 2021 13:23:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59756 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229553AbhGHRX5 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 8 Jul 2021 13:23:57 -0400
+Received: from mail-pf1-x42c.google.com (mail-pf1-x42c.google.com [IPv6:2607:f8b0:4864:20::42c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0B90DC061574
+        for <kvm@vger.kernel.org>; Thu,  8 Jul 2021 10:21:14 -0700 (PDT)
+Received: by mail-pf1-x42c.google.com with SMTP id q10so6054647pfj.12
+        for <kvm@vger.kernel.org>; Thu, 08 Jul 2021 10:21:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=QCo14xV8rAUzfCQotnJU7VU371YftBdUOIgGhDFsTfQ=;
+        b=uKrPkQ7z//kRJCEDNzlJq3jk9963Z+56kAkAGNixVeitn98yJqkQMIhBYO1kGOdsDG
+         ChwAe9JIO+Y+NVLtWJVhoW37GHQ5l6q7n9Hs15/uIcr0+YY1NhV3cU7rgWfuhjUTHLDP
+         F3kPdaqUAsErGeyoU4v1lN/j9va7VuIJ44dMfTd+0mnRTjHW4xzPYoWJwUMgGkF0JOje
+         yORTgZVVMPOSQeFNwMbzTh7Lu303zxcjjeBLIZLrQBzzlZ/WjxLtyKdSusYE9v+IZDfE
+         KxEkj8zPLAJPsvrgrpuUwkSAwQa4v0VHjEq84bmaS4mtyQypu42ylkQklHjyK5Tu1ZyD
+         nQmQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=+NjBGd/4T9twKgX/ZHNdm+93Uf3nnJPB993PVyrBW5E=;
-        b=WWDt7Fdrkn6PzCHFyss4J4RrNYjwgnuwSlb9r7yxOuWpKejXi19DMd8f97vQpRUXK9
-         p9KPW8pNxgzh24hKmcrU2R8pVx9xbzC5jMk0ry+d6AwYW6R3+vwhGDmED8+hqgsIQYNh
-         3INHvQdDE5KOQSDs4YPL5sbOoR/qA7D1Z0CbEd1ajhkmH+4vsbfvWzClLj1yO/hR3zdB
-         qQg/AeBPLBVU7GR1snkRiJCzRfncGiuu/qK0kw+QBPujMHRDiupxdi3NBtxyL1NgB80+
-         52455tEUf+FyIXC6IP01XlmheDQUAtgQ5+PJjS8cHq9b19jhmxP/MbVHG7ViMoPTG4N4
-         +AAg==
-X-Gm-Message-State: AOAM530p4P533i2r6BLc/Rx5q4edfP1Q3aTx65JY/d0z1EeHQucEkTPh
-        nX/CQwsfXOuw1IGivoLcjMQezIYQF4woMaJmEDJgD5LSkzZJUbg4gsVH/p0mt/nvHQPRPw/xN1x
-        9NwwMWNvsKCcA
-X-Received: by 2002:a05:6402:419:: with SMTP id q25mr40332855edv.331.1625764579274;
-        Thu, 08 Jul 2021 10:16:19 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzQVvnmaFFbGkreLluH7iRVwQq7iwQchIQvrtFvvU2a0y+JUwjav42PUgwI1804W02tpXYMtA==
-X-Received: by 2002:a05:6402:419:: with SMTP id q25mr40332821edv.331.1625764578995;
-        Thu, 08 Jul 2021 10:16:18 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id e24sm1138632ejx.100.2021.07.08.10.16.17
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 08 Jul 2021 10:16:18 -0700 (PDT)
-Subject: Re: [PATCH] KVM: selftests: Address extra memslot parameters in
- vm_vaddr_alloc
-To:     Ricardo Koller <ricarkol@google.com>, kvm@vger.kernel.org
-Cc:     kvmarm@lists.cs.columbia.edu, seanjc@google.com, maz@kernel.org,
-        Zenghui Yu <yuzenghui@huawei.com>
-References: <20210702201042.4036162-1-ricarkol@google.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <eebf14e1-cd5c-a55d-cd68-620df1c9bcf0@redhat.com>
-Date:   Thu, 8 Jul 2021 19:16:16 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.11.0
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=QCo14xV8rAUzfCQotnJU7VU371YftBdUOIgGhDFsTfQ=;
+        b=Yj/URtjzrfiUjzImNDvuQ298cujfkQ07Je7q6ZYx3ZO9ayeogo03lCyOwBGrJPlGVr
+         hGPmvlulC/uqgeo0LfDCnFr4PT8XwM4p1vSvSrCKh3j1k1K5TUzcJJdRlYMyp+FPlOhW
+         xUmeP/Ynpp1/V2pHbGvginfTXT28rI/zL+Mpf7Va/iJ1M7cGALi8Q9PCQeYY550RKwTA
+         JRuVn/LwbLPf7MyFckqu3QaYlg8FWZP7ZO4ewLQ6+yOaypw3Q/E2ifsrSJzxZ6iN/OdK
+         GO4PGwVGD5YXsdCP/CrfSppUF8lKcQgZsMdLDlrdTF7Q4Faxv2bQuzbvWiH6mVOBKrnh
+         Rq0Q==
+X-Gm-Message-State: AOAM531HuPjeIkFSwJhOB2vq10Aw6undfnKn5fg9JQ693XDVarduVin5
+        iakE8jvL5aQi7BamqCTn95go8Q==
+X-Google-Smtp-Source: ABdhPJxw9Zesv74cgLZNu9iz4EI0aH/v4a9liAq8BZawNc4Jve8bQGGcctC73X4IMo9Il18j/byJCQ==
+X-Received: by 2002:a05:6a00:b41:b029:324:2cb7:ed97 with SMTP id p1-20020a056a000b41b02903242cb7ed97mr13631893pfo.53.1625764873255;
+        Thu, 08 Jul 2021 10:21:13 -0700 (PDT)
+Received: from google.com (150.12.83.34.bc.googleusercontent.com. [34.83.12.150])
+        by smtp.gmail.com with ESMTPSA id h14sm3833299pgv.47.2021.07.08.10.21.12
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 08 Jul 2021 10:21:12 -0700 (PDT)
+Date:   Thu, 8 Jul 2021 10:21:09 -0700
+From:   Ricardo Koller <ricarkol@google.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Jim Mattson <jmattson@google.com>, kvm@vger.kernel.org,
+        Peter Zijlstra <peterz@infradead.org>,
+        Ingo Molnar <mingo@redhat.com>,
+        Arnaldo Carvalho de Melo <acme@kernel.org>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+        Jiri Olsa <jolsa@redhat.com>,
+        Namhyung Kim <namhyung@kernel.org>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Nathan Chancellor <nathan@kernel.org>,
+        Nick Desaulniers <ndesaulniers@google.com>,
+        linux-kernel@vger.kernel.org, clang-built-linux@googlegroups.com
+Subject: Re: [PATCH 0/5] KVM: x86: Use kernel x86 cpuid utilities in KVM
+ selftests
+Message-ID: <YOc0BUrL6VMw78nF@google.com>
+References: <20210422005626.564163-1-ricarkol@google.com>
+ <c4524e4a-55c7-66f9-25d6-d397f11d25a8@redhat.com>
+ <YIm7iWxggvoN9riz@google.com>
+ <CALMp9eSfpdWF0OROsOqxohxMoFrrY=Gt7FYfB1_31D7no4JYLw@mail.gmail.com>
+ <16823e91-5caf-f52e-e0dc-28ebb9a87b47@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20210702201042.4036162-1-ricarkol@google.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <16823e91-5caf-f52e-e0dc-28ebb9a87b47@redhat.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 02/07/21 22:10, Ricardo Koller wrote:
-> Commit a75a895e6457 ("KVM: selftests: Unconditionally use memslot 0 for
-> vaddr allocations") removed the memslot parameters from vm_vaddr_alloc.
-> It addressed all callers except one under lib/aarch64/, due to a race
-> with commit e3db7579ef35 ("KVM: selftests: Add exception handling
-> support for aarch64")
+On Thu, Jul 08, 2021 at 06:50:41PM +0200, Paolo Bonzini wrote:
+> On 29/06/21 19:28, Jim Mattson wrote:
+> > > Thanks. I was thinking about kvm-unit-tests, but the issue is that it
+> > > would also be a copy. And just like with kernel headers, it would be
+> > > ideal to keep them in-sync. The advantage of the kernel headers is that
+> > > it's much easier to check and fix diffs with them. On the other hand, as
+> > > you say, there would not be any #ifdef stuff with kvm=unit-tests. Please
+> > > let me know what you think.
+> > 
+> > I think the kvm-unit-tests implementation is superior to the kernel
+> > implementation, but that's probably because I suggested it. Still, I
+> > think there's an argument to be made that selftests, unlike
+> > kvm-unit-tests, are part of the kernel distribution and should be
+> > consistent with the kernel where possible.
+> > 
+> > Paolo?
 > 
-> Fix the vm_vaddr_alloc call in lib/aarch64/processor.c.
-> 
-> Reported-by: Zenghui Yu <yuzenghui@huawei.com>
-> Signed-off-by: Ricardo Koller <ricarkol@google.com>
-> ---
->   tools/testing/selftests/kvm/lib/aarch64/processor.c | 2 +-
->   1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/tools/testing/selftests/kvm/lib/aarch64/processor.c b/tools/testing/selftests/kvm/lib/aarch64/processor.c
-> index 9f49f6caafe5..632b74d6b3ca 100644
-> --- a/tools/testing/selftests/kvm/lib/aarch64/processor.c
-> +++ b/tools/testing/selftests/kvm/lib/aarch64/processor.c
-> @@ -401,7 +401,7 @@ void route_exception(struct ex_regs *regs, int vector)
->   void vm_init_descriptor_tables(struct kvm_vm *vm)
->   {
->   	vm->handlers = vm_vaddr_alloc(vm, sizeof(struct handlers),
-> -			vm->page_size, 0, 0);
-> +			vm->page_size);
->   
->   	*(vm_vaddr_t *)addr_gva2hva(vm, (vm_vaddr_t)(&exception_handlers)) = vm->handlers;
->   }
-> 
+> I also prefer the kvm-unit-tests implementation, for what it's worth...
+> Let's see what the code looks like?
 
-Queued, thanks.
+I'm not sure I understand the question. You mean: let's see how this
+looks using kvm-unit-tests headers? If that's the case I can work on a
+v3 using kvm-unit-tests.
 
-Paolo
+Thanks,
+Ricardo
 
+> 
+> Paolo
+> 
