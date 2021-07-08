@@ -2,92 +2,95 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id EE0273C15DB
-	for <lists+kvm@lfdr.de>; Thu,  8 Jul 2021 17:21:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D2E5E3C15E0
+	for <lists+kvm@lfdr.de>; Thu,  8 Jul 2021 17:22:08 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231956AbhGHPYi (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 8 Jul 2021 11:24:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32914 "EHLO
+        id S232040AbhGHPYt (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 8 Jul 2021 11:24:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32970 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231815AbhGHPYh (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 8 Jul 2021 11:24:37 -0400
-Received: from mail-pj1-x1034.google.com (mail-pj1-x1034.google.com [IPv6:2607:f8b0:4864:20::1034])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 13692C061574;
-        Thu,  8 Jul 2021 08:21:55 -0700 (PDT)
-Received: by mail-pj1-x1034.google.com with SMTP id cs1-20020a17090af501b0290170856e1a8aso6102400pjb.3;
-        Thu, 08 Jul 2021 08:21:55 -0700 (PDT)
+        with ESMTP id S232037AbhGHPYs (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 8 Jul 2021 11:24:48 -0400
+Received: from mail-pg1-x531.google.com (mail-pg1-x531.google.com [IPv6:2607:f8b0:4864:20::531])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B6A9FC061574
+        for <kvm@vger.kernel.org>; Thu,  8 Jul 2021 08:22:06 -0700 (PDT)
+Received: by mail-pg1-x531.google.com with SMTP id 62so6366844pgf.1
+        for <kvm@vger.kernel.org>; Thu, 08 Jul 2021 08:22:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=3Fqa3JBj0Mm9fkBkNJ7GXxkTFWxEhmfT0t9V/cQ727s=;
-        b=hxtwVxRcpcsJoF9+n57xGeTeJaz2f6WWTY4XnqgKoPLbi41YKZZwEWgQJHG8flKXPP
-         hYz2lMwTiaUHs4WpaBvwIrRXHwN7Fowm0tk/ffuuuFSv5BySYvdMNpUR0qDdxBIzsn1J
-         kJc+xSKaRWIB5wCxm/hBeIugFbv4HAXyC8ZyAU91Sf8jP6zjCFloMOvZXlmpyfnwLFiQ
-         W5psn7i7/h+5n4VqYgAIDCI35zFI8oFzyPmYB8Ygic7UPK//Bw6di+1/Rexl1nWsVot9
-         G1gZexwi12GEQvRScQ40Js0kzdfSu1YLXjAQB9Be4qbDJ4p+VSKAl3PvN3rJHR9/i84J
-         ysiw==
+        d=linaro.org; s=google;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=Z3+Q9ODZjlDSPdw6IBnWtOgaR7okcL3u6WMzL8uhktM=;
+        b=TK+EvJmx8qRhfYKj98Cx+gUzBDcQ+DyHGcsppJeLx++a6IHg4CURREFfoE5XgtsG6J
+         bQR1o+K2lONhQzWuiYhBSB6D6EKjcgKS57cK32WcZpbgh+RZNVp2jxZOGe+jk/YMdPnb
+         pvakJYdPz7bpsoa30EyU2U8rvchu14NymqWjL0Q8sx4y/gg2QFb/QM1vcXngf0Skg+7r
+         cETAWDe0CY5Hp3iU6HS+LZYaM7NtsV+BYpg/c4lJ2aMfaMsh+rfw2RLx1HmPRkKi/hzz
+         ShnL5A6+j+d8bzKZ/03SiicXnelu0tvYuOdBBk4DbK5/iTwzmWg5zBEiWAEU3sdE0HBO
+         e+cA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=3Fqa3JBj0Mm9fkBkNJ7GXxkTFWxEhmfT0t9V/cQ727s=;
-        b=Z5LNK/igB2vf+kbT2zkmOQ+hHEmURAeQj71aCXxDwgsqkHBWHDZ/5ESBVOAKKAhzkR
-         y8ARlrB0rVLIBN8wobwz+1vs6R1jBi94ELZAG0sGly0mcb7PC9Q3Vm1gYBwvjgwlGH41
-         A8m7StdiKISiT5c5A+Hj5Hv/EKEZ+ODWTjwT1lGh39Gls8Y63uFLcjk3lttbQUXCZrex
-         Wjo5kqhP0hsasBIiU71VTnClWm+pUjqvyb3Y2PQT+Lc6TU7OkbvRDMS+SCJh7KOVJelH
-         FagpY/dmDAfmFL1Id/VHbCWGXQQrnWFgtTpsA3//cnCv3fLwk0WVXp4vvs03XJx+nYVa
-         c3Vw==
-X-Gm-Message-State: AOAM531sf3RRhC1Gc/p/OgHpXxeu9TrqOoJj624PyRPoD+PS6RdFtZsn
-        NTYew4ngpCvEligaztLCN9g=
-X-Google-Smtp-Source: ABdhPJz9H92rKwh3I7eM5NHfswNbRROh3I53dWdBQ7onM2aiB+pcMCdG10WGGSdMIk+b4rVpicPNFw==
-X-Received: by 2002:a17:902:988f:b029:114:12d2:d548 with SMTP id s15-20020a170902988fb029011412d2d548mr26555639plp.73.1625757714594;
-        Thu, 08 Jul 2021 08:21:54 -0700 (PDT)
-Received: from localhost ([2601:647:4600:1ed4:adaa:7ff5:893e:b91])
-        by smtp.gmail.com with ESMTPSA id m21sm3460649pfa.99.2021.07.08.08.21.53
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 08 Jul 2021 08:21:54 -0700 (PDT)
-Date:   Thu, 8 Jul 2021 08:21:52 -0700
-From:   Isaku Yamahata <isaku.yamahata@gmail.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     isaku.yamahata@intel.com, Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        "H . Peter Anvin" <hpa@zytor.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, erdemaktas@google.com,
-        Connor Kuehl <ckuehl@redhat.com>,
-        Sean Christopherson <seanjc@google.com>, x86@kernel.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        isaku.yamahata@gmail.com,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        kernel test robot <lkp@intel.com>,
-        Xiaoyao Li <xiaoyao.li@intel.com>
-Subject: Re: [RFC PATCH v2 55/69] KVM: VMX: Add 'main.c' to wrap VMX and TDX
-Message-ID: <20210708152152.GB278847@private.email.ne.jp>
-References: <cover.1625186503.git.isaku.yamahata@intel.com>
- <52e7bb9f6bd27dc56880d81e232270679ffee601.1625186503.git.isaku.yamahata@intel.com>
- <0b1edf62-fce8-f628-b482-021f99004f38@redhat.com>
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=Z3+Q9ODZjlDSPdw6IBnWtOgaR7okcL3u6WMzL8uhktM=;
+        b=nyxQ5IOH+zBKNzjKy6pQH1fySyrv5NsNFZ5UTVtZ6WxuzLQB1dnEu8sT9uB8jSdsh9
+         ppXJBiK8kED8nwBAuTE9T2UZC7FhUoMTbUUjomcPewOutc+IY6aRjOWEgdbFfitMV0MU
+         5cUQhYRIhwdcdHh0m6Z/Os2iy4tnlAb47z2hRJQOP3Bg5WrgCdeNyB4o2o3Xg/K4IRfu
+         rtWCz2OcKeNKCidRPYscNnvOnn1sMllp1tlFVmSgFnNOqYaVeb38L/0g1xH2cdBnG8XA
+         UDTDXvfy143oynFP3LzPZ5/mIp9HC8eC1wp8GcUvczUeXtWCOJskjuAVfgv32c6gkbPy
+         RQ2g==
+X-Gm-Message-State: AOAM533Kf9+e2GtHXYINOFoLgYkU99a61Zbx9jsBTDkhH2DftEJdFfCE
+        T1JEu9WhcTs7aBOKr+tThLZDaA==
+X-Google-Smtp-Source: ABdhPJzWKTHnsttocosGQjtRPjfaTz1zKUbtbCwB3uWhuMfWcpm51tAxUa03Ml/Fb/HwBoANJSJr4Q==
+X-Received: by 2002:a65:68c1:: with SMTP id k1mr32443829pgt.335.1625757726261;
+        Thu, 08 Jul 2021 08:22:06 -0700 (PDT)
+Received: from [192.168.1.11] ([71.212.149.176])
+        by smtp.gmail.com with ESMTPSA id k5sm3110066pfu.202.2021.07.08.08.22.05
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 08 Jul 2021 08:22:05 -0700 (PDT)
+Subject: Re: [RFC PATCH 8/8] target/i386: Move X86XSaveArea into TCG
+To:     David Edmondson <dme@dme.org>, qemu-devel@nongnu.org
+Cc:     Eduardo Habkost <ehabkost@redhat.com>, kvm@vger.kernel.org,
+        Michael Roth <michael.roth@amd.com>,
+        Marcelo Tosatti <mtosatti@redhat.com>,
+        Cameron Esfahani <dirty@apple.com>, babu.moger@amd.com,
+        Roman Bolshakov <r.bolshakov@yadro.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+References: <20210705104632.2902400-1-david.edmondson@oracle.com>
+ <20210705104632.2902400-9-david.edmondson@oracle.com>
+ <0d75c3ab-926b-d4cd-244a-8c8b603535f9@linaro.org> <m2czru4epe.fsf@dme.org>
+ <m24kd5p7uf.fsf@dme.org>
+From:   Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <e4a048f5-cc6d-7bbe-6659-54075cafb9c6@linaro.org>
+Date:   Thu, 8 Jul 2021 08:22:02 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.11.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <0b1edf62-fce8-f628-b482-021f99004f38@redhat.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+In-Reply-To: <m24kd5p7uf.fsf@dme.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jul 06, 2021 at 04:43:22PM +0200,
-Paolo Bonzini <pbonzini@redhat.com> wrote:
-
-> On 03/07/21 00:05, isaku.yamahata@intel.com wrote:
-> > +#include "vmx.c"
+On 7/8/21 12:45 AM, David Edmondson wrote:
+> Actually, that's nonsense. With KVM or HVF we have to use the offsets of
+> the host CPU, as the hardware won't do anything else, irrespective of
+> the general CPU model chosen.
 > 
-> What makes it particularly hard to have this as a separate .o file rather
-> than an #include?
+> To have KVM -> TCG migration work it would be necessary to pass the
+> offsets in the migration stream and have TCG observe them, as you
+> originally said.
+> 
+> TCG -> KVM migration would only be possible if TCG was configured to use
+> the same offsets as would later required by KVM (meaning, the host CPU).
 
-It's to let complier to optimize functionc call of "if (tdx) tdx_xxx() else vmx_xxx()",
-given x86_ops static call story.
--- 
-Isaku Yamahata <isaku.yamahata@gmail.com>
+And kvm -> kvm migration, with the same general cpu model chosen, but with different host 
+cpus with different offsets?
+
+It seems like we must migrate then and verify the offsets in that case, so that we can 
+fail the migration.
+
+
+r~
