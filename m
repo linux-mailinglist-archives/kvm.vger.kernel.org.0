@@ -2,148 +2,238 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E31E43C194C
-	for <lists+kvm@lfdr.de>; Thu,  8 Jul 2021 20:38:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id F1B283C1978
+	for <lists+kvm@lfdr.de>; Thu,  8 Jul 2021 20:56:42 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229469AbhGHSlJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 8 Jul 2021 14:41:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48842 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229863AbhGHSlH (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 8 Jul 2021 14:41:07 -0400
-Received: from mail-pf1-x436.google.com (mail-pf1-x436.google.com [IPv6:2607:f8b0:4864:20::436])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4E86BC061574
-        for <kvm@vger.kernel.org>; Thu,  8 Jul 2021 11:38:24 -0700 (PDT)
-Received: by mail-pf1-x436.google.com with SMTP id 145so6370144pfv.0
-        for <kvm@vger.kernel.org>; Thu, 08 Jul 2021 11:38:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=7IMuMUvHO82Rf0Ss8PXs63y6ANC76fGZyxGH24nk1uY=;
-        b=AEJUmU092XhSjinH3RNlcQMS/9jJCUfRHFTvGQOCYGEgAkLDTt91AoUhpV20zqrqaG
-         DgxEkyC7dIjMJejx10JKJCCad8mo9r17BDUHgTgdADxDWEmoQX6MI/Ks82PTsEV6wf6b
-         wKLuoB0Bw21064KfDHSoi9ggEs0OdmCiFqzx+6A/Qav7JexZHVOP5GV64ONuI1uoMqnJ
-         IK8vOt7ia2yi82nY24zzCbuTHHcTJGeeT6wXiPdp0g3awgHWnmetypwl0L8gEXlERsvv
-         zaj3cym87YUy76sBrw/rUq8ip5xJy8lswH9QtOrhmAE4wJ4AU/HW2//+e5yWeiPhqfWo
-         iJxQ==
+        id S230187AbhGHS7U (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 8 Jul 2021 14:59:20 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:30237 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229631AbhGHS7T (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 8 Jul 2021 14:59:19 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1625770596;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=1va5nv4AZF0iU5FnZEUJ2+LCm5h8PaUbvUsoxAiHxDY=;
+        b=SnoPYTLQ2uxAUwAg0q7Z1p5+m/rGSe+DRm71vbsaEZIaRLOxwPE/ZUcnI/OdCLFmc7xjzB
+        LSWieuRvIo58pZkq0aFkM23E3ArKEKZ3e9cVXL8JGp5rhd46LctdvoCaM7Bmf9Ptedcj93
+        3A3KiM/FZ25MEndxO/erXVqT/a2tZbQ=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-171-zEhBfwJvPKa87DQYN4nfew-1; Thu, 08 Jul 2021 14:56:35 -0400
+X-MC-Unique: zEhBfwJvPKa87DQYN4nfew-1
+Received: by mail-wm1-f69.google.com with SMTP id p9-20020a7bcc890000b02902190142995dso926529wma.4
+        for <kvm@vger.kernel.org>; Thu, 08 Jul 2021 11:56:35 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=7IMuMUvHO82Rf0Ss8PXs63y6ANC76fGZyxGH24nk1uY=;
-        b=ba8n4+1qckIS0lIv+nFTrEblfB1n0wdCTYjz0o437Yoiexh87v5ygPPMFQL8MjbYQ9
-         QO2bizgGzEs3BXfpqsYPFtS/UOoqrW2SX29BlsC0fQd5Swh+jBgmE5EKB09UEG7/L6FZ
-         HS3j/fbmR5Y9fideiv/u09v/i4ymXu5ZxYSGdxOjtl1cq52gsrj+ytI3zvWDCt6YahX7
-         5t45vsEt7VA8gWXvUYlHS7xx64FOnAVInqN7aJip/Tr79gAQwwdWnCJ0hJSb0vIiHp0A
-         sO58OCnrY+L4cx2uMM+zl8aarJ742EiGcua2y87aVsRfqKN4Pw0vrxwlzk1AuQzwpVMg
-         iQAg==
-X-Gm-Message-State: AOAM531GXjk/Q4irvN4+QQTgTNIEqLtsVdv9IV3h8+sppGUDccqLalbi
-        2LrjilfnlniceIkhm6TqGOTetw==
-X-Google-Smtp-Source: ABdhPJwvrGKMIplQ3AYMPHgsfd1ogRE/LvqPPIKpnrjJ1sSar/mUZLFVw9JqUCa95Qns7PZ7PlcqCQ==
-X-Received: by 2002:aa7:8d5a:0:b029:302:e2cb:6d79 with SMTP id s26-20020aa78d5a0000b0290302e2cb6d79mr32258922pfe.71.1625769503629;
-        Thu, 08 Jul 2021 11:38:23 -0700 (PDT)
-Received: from google.com (254.80.82.34.bc.googleusercontent.com. [34.82.80.254])
-        by smtp.gmail.com with ESMTPSA id 2sm4277773pgz.26.2021.07.08.11.38.22
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=1va5nv4AZF0iU5FnZEUJ2+LCm5h8PaUbvUsoxAiHxDY=;
+        b=iutU4yJfZLVAHLyILgYtJgF42gxpq6gLLOvgRlRweSEKqguNpx6SKPFspdxvznt8gn
+         hitDqnk2BTcZITqdyxhSER6C6s7MqqiqXIjFaXHk61If1gKTn4mZyEKSf8IGk/PwGejp
+         D/MgRZ5/LBNTkPUHCMfaM9JXPKrNZ72AJgkTJaPnQnCOQvBBzxpejtO0Xo3d3J3m19D4
+         Jk10HiWHVTts0dPC97+lcpHXfFnY4yP+3D2U8Fs+lGUB1/ZnakLcR9wf4eRrXvjrhfez
+         AkCs6aENXaibd6IyaTphj29C+1kb4vYHT54f4IVUn4NohOwYpeomDCZ3aIJW7cajcijK
+         jH3Q==
+X-Gm-Message-State: AOAM530te0q2og2aHTJjUSWbrPcGPDPuq7bGXjbUqjvsfW0kY7G4WP+8
+        0HL8EHF1gvVJeKohQCniOXcmrTMrFk6TT1qhHK/if1Vl2UJLCc6DQLJFahxHOqyizfpZfnm9VVx
+        SNtR6GXcvLphM
+X-Received: by 2002:a05:6000:1361:: with SMTP id q1mr35672356wrz.179.1625770594552;
+        Thu, 08 Jul 2021 11:56:34 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwhquME75eUWVHFrrZ+V9pwudJ25ehwm0sVcMEMSNcf4tH+Xhq/bHqTeFabCsx2g8CMjSfcTw==
+X-Received: by 2002:a05:6000:1361:: with SMTP id q1mr35672310wrz.179.1625770594307;
+        Thu, 08 Jul 2021 11:56:34 -0700 (PDT)
+Received: from work-vm (cpc109021-salf6-2-0-cust453.10-2.cable.virginm.net. [82.29.237.198])
+        by smtp.gmail.com with ESMTPSA id o11sm10760305wmc.2.2021.07.08.11.56.32
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 08 Jul 2021 11:38:22 -0700 (PDT)
-Date:   Thu, 8 Jul 2021 18:38:18 +0000
-From:   David Matlack <dmatlack@google.com>
-To:     David Edmondson <dme@dme.org>
-Cc:     linux-kernel@vger.kernel.org, Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Borislav Petkov <bp@alien8.de>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        Thu, 08 Jul 2021 11:56:33 -0700 (PDT)
+Date:   Thu, 8 Jul 2021 19:56:31 +0100
+From:   "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To:     Brijesh Singh <brijesh.singh@amd.com>
+Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
+        linux-coco@lists.linux.dev, linux-mm@kvack.org,
+        linux-crypto@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>, x86@kernel.org,
-        Ingo Molnar <mingo@redhat.com>,
-        "H. Peter Anvin" <hpa@zytor.com>
-Subject: Re: [PATCH v2 0/2] kvm: x86: Convey the exit reason to user-space on
- emulation failure
-Message-ID: <YOdGGuk2trw0h95x@google.com>
-References: <20210706101207.2993686-1-david.edmondson@oracle.com>
- <YOY2pLoXQ8ePXu0W@google.com>
- <m28s2g51q3.fsf@dme.org>
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        David Rientjes <rientjes@google.com>,
+        Dov Murik <dovmurik@linux.ibm.com>,
+        Tobin Feldman-Fitzthum <tobin@ibm.com>,
+        Borislav Petkov <bp@alien8.de>,
+        Michael Roth <michael.roth@amd.com>,
+        Vlastimil Babka <vbabka@suse.cz>, tony.luck@intel.com,
+        npmccallum@redhat.com, brijesh.ksingh@gmail.com
+Subject: Re: [PATCH Part2 RFC v4 14/40] crypto:ccp: Provide APIs to issue
+ SEV-SNP commands
+Message-ID: <YOdKX/3cTytIiGYM@work-vm>
+References: <20210707183616.5620-1-brijesh.singh@amd.com>
+ <20210707183616.5620-15-brijesh.singh@amd.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <m28s2g51q3.fsf@dme.org>
+In-Reply-To: <20210707183616.5620-15-brijesh.singh@amd.com>
+User-Agent: Mutt/2.0.7 (2021-05-04)
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jul 08, 2021 at 03:17:40PM +0100, David Edmondson wrote:
-> Apologies if you see two of these - I had some email problems earlier.
-
-I only got one! :)
-
+* Brijesh Singh (brijesh.singh@amd.com) wrote:
+> Provide the APIs for the hypervisor to manage an SEV-SNP guest. The
+> commands for SEV-SNP is defined in the SEV-SNP firmware specification.
 > 
-> On Wednesday, 2021-07-07 at 23:20:04 UTC, David Matlack wrote:
+> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
+> ---
+>  drivers/crypto/ccp/sev-dev.c | 24 ++++++++++++
+>  include/linux/psp-sev.h      | 74 ++++++++++++++++++++++++++++++++++++
+>  2 files changed, 98 insertions(+)
 > 
-> > On Tue, Jul 06, 2021 at 11:12:05AM +0100, David Edmondson wrote:
-> >> To help when debugging failures in the field, if instruction emulation
-> >> fails, report the VM exit reason to userspace in order that it can be
-> >> recorded.
-> >
-> > What is the benefit of seeing the VM-exit reason that led to an
-> > emulation failure?
-> 
-> I can't cite an example of where this has definitively led in a
-> direction that helped solve a problem, but we do sometimes see emulation
-> failures reported in situations where we are not able to reproduce the
-> failures on demand and the existing information provided at the time of
-> failure is either insufficient or suspect.
-> 
-> Given that, I'm left casting about for data that can be made available
-> to assist in postmortem analysis of the failures.
+> diff --git a/drivers/crypto/ccp/sev-dev.c b/drivers/crypto/ccp/sev-dev.c
+> index 84c91bab00bd..ad9a0c8111e0 100644
+> --- a/drivers/crypto/ccp/sev-dev.c
+> +++ b/drivers/crypto/ccp/sev-dev.c
+> @@ -1017,6 +1017,30 @@ int sev_guest_df_flush(int *error)
+>  }
+>  EXPORT_SYMBOL_GPL(sev_guest_df_flush);
+>  
+> +int snp_guest_decommission(struct sev_data_snp_decommission *data, int *error)
+> +{
+> +	return sev_do_cmd(SEV_CMD_SNP_DECOMMISSION, data, error);
+> +}
+> +EXPORT_SYMBOL_GPL(snp_guest_decommission);
+> +
+> +int snp_guest_df_flush(int *error)
+> +{
+> +	return sev_do_cmd(SEV_CMD_SNP_DF_FLUSH, NULL, error);
+> +}
+> +EXPORT_SYMBOL_GPL(snp_guest_df_flush);
+> +
+> +int snp_guest_page_reclaim(struct sev_data_snp_page_reclaim *data, int *error)
+> +{
+> +	return sev_do_cmd(SEV_CMD_SNP_PAGE_RECLAIM, data, error);
+> +}
+> +EXPORT_SYMBOL_GPL(snp_guest_page_reclaim);
+> +
+> +int snp_guest_dbg_decrypt(struct sev_data_snp_dbg *data, int *error)
+> +{
+> +	return sev_do_cmd(SEV_CMD_SNP_DBG_DECRYPT, data, error);
+> +}
+> +EXPORT_SYMBOL_GPL(snp_guest_dbg_decrypt);
+> +
+>  static void sev_exit(struct kref *ref)
+>  {
+>  	misc_deregister(&misc_dev->misc);
+> diff --git a/include/linux/psp-sev.h b/include/linux/psp-sev.h
+> index 1b53e8782250..63ef766cbd7a 100644
+> --- a/include/linux/psp-sev.h
+> +++ b/include/linux/psp-sev.h
+> @@ -860,6 +860,65 @@ int sev_guest_df_flush(int *error);
+>   */
+>  int sev_guest_decommission(struct sev_data_decommission *data, int *error);
+>  
+> +/**
+> + * snp_guest_df_flush - perform SNP DF_FLUSH command
+> + *
+> + * @sev_ret: sev command return code
+> + *
+> + * Returns:
+> + * 0 if the sev successfully processed the command
+> + * -%ENODEV    if the sev device is not available
+> + * -%ENOTSUPP  if the sev does not support SEV
 
-Understood, thanks for the context. My only concern would be that
-userspace APIs are difficult to change once they exist. If it turns
-out knowing the exit reason does not help with debugging emulation
-failures we'd still be stuck with exporting it on every emulation
-failure.
+Weird wording.
 
-My intuition is that the instruction bytes (which are now available with
-Aaron's patch) and the guest register state (which is queryable through
-other ioctls) should be sufficient to set up a reproduction of the
-emulation failure in a kvm-unit-test and the exit reason should not
-really matter. I'm curious if that's not the case?
-
-I'm really not opposed to exporting the exit reason if it is useful, I'm
-just not sure it will help.
-
-> 
-> >> I'm unsure whether sgx_handle_emulation_failure() needs to be adapted
-> >> to use the emulation_failure part of the exit union in struct kvm_run
-> >> - advice welcomed.
-> >> 
-> >> v2:
-> >> - Improve patch comments (dmatlack)
-> >> - Intel should provide the full exit reason (dmatlack)
-> >> - Pass a boolean rather than flags (dmatlack)
-> >> - Use the helper in kvm_task_switch() and kvm_handle_memory_failure()
-> >>   (dmatlack)
-> >> - Describe the exit_reason field of the emulation_failure structure
-> >>   (dmatlack)
-> >> 
-> >> David Edmondson (2):
-> >>   KVM: x86: Add kvm_x86_ops.get_exit_reason
-> >>   KVM: x86: On emulation failure, convey the exit reason to userspace
-> >> 
-> >>  arch/x86/include/asm/kvm-x86-ops.h |  1 +
-> >>  arch/x86/include/asm/kvm_host.h    |  3 +++
-> >>  arch/x86/kvm/svm/svm.c             |  6 ++++++
-> >>  arch/x86/kvm/vmx/vmx.c             | 11 +++++++----
-> >>  arch/x86/kvm/x86.c                 | 22 +++++++++++++---------
-> >>  include/uapi/linux/kvm.h           |  7 +++++++
-> >>  6 files changed, 37 insertions(+), 13 deletions(-)
-> >> 
-> >> -- 
-> >> 2.30.2
-> >> 
-> 
-> dme.
+> + * -%ETIMEDOUT if the sev command timed out
+> + * -%EIO       if the sev returned a non-zero return code
+> + */
+> +int snp_guest_df_flush(int *error);
+> +
+> +/**
+> + * snp_guest_decommission - perform SNP_DECOMMISSION command
+> + *
+> + * @decommission: sev_data_decommission structure to be processed
+> + * @sev_ret: sev command return code
+> + *
+> + * Returns:
+> + * 0 if the sev successfully processed the command
+> + * -%ENODEV    if the sev device is not available
+> + * -%ENOTSUPP  if the sev does not support SEV
+> + * -%ETIMEDOUT if the sev command timed out
+> + * -%EIO       if the sev returned a non-zero return code
+> + */
+> +int snp_guest_decommission(struct sev_data_snp_decommission *data, int *error);
+> +
+> +/**
+> + * snp_guest_page_reclaim - perform SNP_PAGE_RECLAIM command
+> + *
+> + * @decommission: sev_snp_page_reclaim structure to be processed
+> + * @sev_ret: sev command return code
+> + *
+> + * Returns:
+> + * 0 if the sev successfully processed the command
+> + * -%ENODEV    if the sev device is not available
+> + * -%ENOTSUPP  if the sev does not support SEV
+> + * -%ETIMEDOUT if the sev command timed out
+> + * -%EIO       if the sev returned a non-zero return code
+> + */
+> +int snp_guest_page_reclaim(struct sev_data_snp_page_reclaim *data, int *error);
+> +
+> +/**
+> + * snp_guest_dbg_decrypt - perform SEV SNP_DBG_DECRYPT command
+> + *
+> + * @sev_ret: sev command return code
+> + *
+> + * Returns:
+> + * 0 if the sev successfully processed the command
+> + * -%ENODEV    if the sev device is not available
+> + * -%ENOTSUPP  if the sev does not support SEV
+> + * -%ETIMEDOUT if the sev command timed out
+> + * -%EIO       if the sev returned a non-zero return code
+> + */
+> +int snp_guest_dbg_decrypt(struct sev_data_snp_dbg *data, int *error);
+> +
+> +
+>  void *psp_copy_user_blob(u64 uaddr, u32 len);
+>  
+>  #else	/* !CONFIG_CRYPTO_DEV_SP_PSP */
+> @@ -887,6 +946,21 @@ sev_issue_cmd_external_user(struct file *filep, unsigned int id, void *data, int
+>  
+>  static inline void *psp_copy_user_blob(u64 __user uaddr, u32 len) { return ERR_PTR(-EINVAL); }
+>  
+> +static inline int
+> +snp_guest_decommission(struct sev_data_snp_decommission *data, int *error) { return -ENODEV; }
+> +
+> +static inline int snp_guest_df_flush(int *error) { return -ENODEV; }
+> +
+> +static inline int snp_guest_page_reclaim(struct sev_data_snp_page_reclaim *data, int *error)
+> +{
+> +	return -ENODEV;
+> +}
+> +
+> +static inline int snp_guest_dbg_decrypt(struct sev_data_snp_dbg *data, int *error)
+> +{
+> +	return -ENODEV;
+> +}
+> +
+>  #endif	/* CONFIG_CRYPTO_DEV_SP_PSP */
+>  
+>  #endif	/* __PSP_SEV_H__ */
 > -- 
-> It's gettin', it's gettin', it's gettin' kinda hectic.
+> 2.17.1
+> 
+> 
+-- 
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+
