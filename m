@@ -2,83 +2,97 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1EE583C1F39
-	for <lists+kvm@lfdr.de>; Fri,  9 Jul 2021 08:08:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 834063C1F68
+	for <lists+kvm@lfdr.de>; Fri,  9 Jul 2021 08:39:03 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230129AbhGIGLg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 9 Jul 2021 02:11:36 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:31621 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229494AbhGIGLg (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 9 Jul 2021 02:11:36 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1625810932;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=vy3RT833Zluxm0D5IqTflstNdttnmf/u6KXeL7O1ITo=;
-        b=Vd3xvmoYOOBIFmcgZbiv5SiDcJhhR2NrTj7ElLvZ/QgL5nXdcsJy+EC6qB8qWItZ1oHg2I
-        nNffCThSCtEtVkwCBCAQdUxsWqxu6R6EidjszeuDwA5WFXNVDxB74Swi/vkMlm8p5nuoo3
-        5tamOjmGeiQgNMbYx4M9DbHdEm2h16E=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-426-zL_CMw1sPXixCGMcENOB2A-1; Fri, 09 Jul 2021 02:08:49 -0400
-X-MC-Unique: zL_CMw1sPXixCGMcENOB2A-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 37D49362FA;
-        Fri,  9 Jul 2021 06:08:48 +0000 (UTC)
-Received: from starship (unknown [10.40.192.10])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id A2128100EBAF;
-        Fri,  9 Jul 2021 06:08:44 +0000 (UTC)
-Message-ID: <67e2e6b4fcbc2ec0bdda1e1af1cfe61d3c1fde6f.camel@redhat.com>
-Subject: Re: [PATCH 1/6] KVM: nSVM: Check the value written to
- MSR_VM_HSAVE_PA
-From:   Maxim Levitsky <mlevitsk@redhat.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>, kvm@vger.kernel.org
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Cathy Avery <cavery@redhat.com>,
-        Emanuele Giuseppe Esposito <eesposit@redhat.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Michael Roth <mdroth@linux.vnet.ibm.com>,
-        linux-kernel@vger.kernel.org
-Date:   Fri, 09 Jul 2021 09:08:43 +0300
-In-Reply-To: <4318c980-6eff-7b74-ae99-b3210021789d@redhat.com>
-References: <20210628104425.391276-1-vkuznets@redhat.com>
-         <20210628104425.391276-2-vkuznets@redhat.com>
-         <595c45e8fb753556b2c01b25ac7052369c8357ac.camel@redhat.com>
-         <4318c980-6eff-7b74-ae99-b3210021789d@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
+        id S230189AbhGIGll (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 9 Jul 2021 02:41:41 -0400
+Received: from szxga01-in.huawei.com ([45.249.212.187]:6782 "EHLO
+        szxga01-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229954AbhGIGlk (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 9 Jul 2021 02:41:40 -0400
+Received: from dggemv704-chm.china.huawei.com (unknown [172.30.72.56])
+        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4GLjz74D3DzXr5K;
+        Fri,  9 Jul 2021 14:33:23 +0800 (CST)
+Received: from dggpemm500001.china.huawei.com (7.185.36.107) by
+ dggemv704-chm.china.huawei.com (10.3.19.47) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2176.2; Fri, 9 Jul 2021 14:38:52 +0800
+Received: from huawei.com (10.67.174.169) by dggpemm500001.china.huawei.com
+ (7.185.36.107) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2176.2; Fri, 9 Jul 2021
+ 14:38:52 +0800
+From:   Chen Lifu <chenlifu@huawei.com>
+To:     <pbonzini@redhat.com>, <shuah@kernel.org>, <bgardon@google.com>,
+        <wangyanan55@huawei.com>, <axelrasmussen@google.com>,
+        <drjones@redhat.com>, <chenlifu@huawei.com>, <seanjc@google.com>,
+        <vkuznets@redhat.com>, <dwmw@amazon.co.uk>,
+        <joao.m.martins@oracle.com>, <yangyingliang@huawei.com>,
+        <kvm@vger.kernel.org>, <linux-kselftest@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>
+Subject: [PATCH -next 1/2] selftests: Fix vm_handle_exception undefined error
+Date:   Fri, 9 Jul 2021 14:37:40 +0800
+Message-ID: <20210709063741.355325-1-chenlifu@huawei.com>
+X-Mailer: git-send-email 2.32.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-Originating-IP: [10.67.174.169]
+X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
+ dggpemm500001.china.huawei.com (7.185.36.107)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 2021-07-08 at 19:27 +0200, Paolo Bonzini wrote:
-> On 07/07/21 12:28, Maxim Levitsky wrote:
-> > Minor nitpick: I would have checked the host provided value as well,
-> > just in case since there is no reason why it won't pass the same check,
-> > and fail if the value is not aligned.
-> 
-> The reason not to do so is that it would allow a guest running an old 
-> kernel to defeat live migration.
-I understand now, and I will keep this in mind next time.
+Compile setftests on x86_64 occurs following error:
+make -C tools/testing/selftests
+...
 
-Best regards,
-	Maxim Levitsky
+x86_64/hyperv_features.c:618:2: warning: implicit declaration of function ‘vm_handle_exception’ [-Wimplicit-function-declaration]
+  618 |  vm_handle_exception(vm, GP_VECTOR, guest_gp_handler);
+/usr/bin/ld: /tmp/cclOnpml.o: in function `main':
+tools/testing/selftests/kvm/x86_64/hyperv_features.c:618: undefined reference to `vm_handle_exception'
+collect2: error: ld returned 1 exit status
 
-> 
-> Paolo
-> 
-> > Other than that:
-> > Reviewed-by: Maxim Levitsky<mlevitsk@redhat.com>
+The reason is that commit b78f4a596692 ("KVM: selftests: Rename vm_handle_exception")
+renamed "vm_handle_exception" function to "vm_install_exception_handler" function.
 
+Fix it by replacing "vm_handle_exception" with "vm_install_exception_handler"
+in corresponding selftests files.
+
+Signed-off-by: Chen Lifu <chenlifu@huawei.com>
+---
+ tools/testing/selftests/kvm/x86_64/hyperv_features.c | 2 +-
+ tools/testing/selftests/kvm/x86_64/mmu_role_test.c   | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/tools/testing/selftests/kvm/x86_64/hyperv_features.c b/tools/testing/selftests/kvm/x86_64/hyperv_features.c
+index 42bd658f52a8..af27c7e829c1 100644
+--- a/tools/testing/selftests/kvm/x86_64/hyperv_features.c
++++ b/tools/testing/selftests/kvm/x86_64/hyperv_features.c
+@@ -615,7 +615,7 @@ int main(void)
+ 
+ 	vm_init_descriptor_tables(vm);
+ 	vcpu_init_descriptor_tables(vm, VCPU_ID);
+-	vm_handle_exception(vm, GP_VECTOR, guest_gp_handler);
++	vm_install_exception_handler(vm, GP_VECTOR, guest_gp_handler);
+ 
+ 	pr_info("Testing access to Hyper-V specific MSRs\n");
+ 	guest_test_msrs_access(vm, addr_gva2hva(vm, msr_gva),
+diff --git a/tools/testing/selftests/kvm/x86_64/mmu_role_test.c b/tools/testing/selftests/kvm/x86_64/mmu_role_test.c
+index 523371cf8e8f..da2325fcad87 100644
+--- a/tools/testing/selftests/kvm/x86_64/mmu_role_test.c
++++ b/tools/testing/selftests/kvm/x86_64/mmu_role_test.c
+@@ -71,7 +71,7 @@ static void mmu_role_test(u32 *cpuid_reg, u32 evil_cpuid_val)
+ 	/* Set up a #PF handler to eat the RSVD #PF and signal all done! */
+ 	vm_init_descriptor_tables(vm);
+ 	vcpu_init_descriptor_tables(vm, VCPU_ID);
+-	vm_handle_exception(vm, PF_VECTOR, guest_pf_handler);
++	vm_install_exception_handler(vm, PF_VECTOR, guest_pf_handler);
+ 
+ 	r = _vcpu_run(vm, VCPU_ID);
+ 	TEST_ASSERT(r == 0, "vcpu_run failed: %d\n", r);
+-- 
+2.32.0
 
