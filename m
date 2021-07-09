@@ -2,301 +2,301 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 332183C22FD
-	for <lists+kvm@lfdr.de>; Fri,  9 Jul 2021 13:38:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 42E743C25D7
+	for <lists+kvm@lfdr.de>; Fri,  9 Jul 2021 16:23:00 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231156AbhGILlO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 9 Jul 2021 07:41:14 -0400
-Received: from foss.arm.com ([217.140.110.172]:50862 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S230024AbhGILlN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 9 Jul 2021 07:41:13 -0400
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id ECE34ED1;
-        Fri,  9 Jul 2021 04:38:29 -0700 (PDT)
-Received: from slackpad.fritz.box (unknown [172.31.20.19])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 577B53F5A1;
-        Fri,  9 Jul 2021 04:38:28 -0700 (PDT)
-Date:   Fri, 9 Jul 2021 12:37:49 +0100
-From:   Andre Przywara <andre.przywara@arm.com>
-To:     Wei Chen <Wei.Chen@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>
-Cc:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "xen-devel@lists.xen.org" <xen-devel@lists.xen.org>,
-        "will@kernel.org" <will@kernel.org>,
-        "jean-philippe@linaro.org" <jean-philippe@linaro.org>,
-        Julien Grall <julien@xen.org>, Marc Zyngier <maz@kernel.org>,
-        "julien.thierry.kdev@gmail.com" <julien.thierry.kdev@gmail.com>,
-        Stefano Stabellini <sstabellini@kernel.org>,
-        Oleksandr Tyshchenko <Oleksandr_Tyshchenko@epam.com>
-Subject: Re: [Kvmtool] Some thoughts on using kvmtool Virtio for Xen
-Message-ID: <20210709123749.1aaa5bfe@slackpad.fritz.box>
-In-Reply-To: <DB9PR08MB6857B375207376D8320AFBA89E309@DB9PR08MB6857.eurprd08.prod.outlook.com>
-References: <DB9PR08MB6857B375207376D8320AFBA89E309@DB9PR08MB6857.eurprd08.prod.outlook.com>
-Organization: Arm Ltd.
-X-Mailer: Claws Mail 3.17.1 (GTK+ 2.24.31; x86_64-slackware-linux-gnu)
+        id S232080AbhGIOZm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 9 Jul 2021 10:25:42 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:7576 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S229561AbhGIOZm (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 9 Jul 2021 10:25:42 -0400
+Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 169EFJvY189128;
+        Fri, 9 Jul 2021 10:22:58 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=Td5OpM0huNaSZooLOaqoUK/0SC/3VJ1AE8pgMDfztek=;
+ b=JmZ6lORwz93U5znoI0kfOaKVWO/DNNKysKEetY0EZZq9fGGsw6gf6bKCranblURWHVc1
+ mm4PYYK/gyf5fmdyjYZWbURdGowfY/pAFiRrnVDlGMDzjEq12sqeMPsHsQJ9hdwUc+b3
+ dpQyewT5wU2epO2zVvwIjoFDBd8TvXOw88z1yt8lSXtpoVDJMaGf6PQ6Xw2bavuKTNjg
+ uya5NksV7luYSNMVu2c79u/D1HesfNoFZYIZv9W8QEgyRo/H7pF6MCJDnsnT/pKa/Hjt
+ 025B0bEnZlFyguKSd31Toy4m67oYQ3MGk88M+JdzjrRIIJoWP6FTqCLrXKdtRWdxJrmy bw== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 39pjhehddf-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 09 Jul 2021 10:22:58 -0400
+Received: from m0098414.ppops.net (m0098414.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 169EFgvj190111;
+        Fri, 9 Jul 2021 10:22:57 -0400
+Received: from ppma04fra.de.ibm.com (6a.4a.5195.ip4.static.sl-reverse.com [149.81.74.106])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 39pjhehdcr-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 09 Jul 2021 10:22:57 -0400
+Received: from pps.filterd (ppma04fra.de.ibm.com [127.0.0.1])
+        by ppma04fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 169EHc3i007383;
+        Fri, 9 Jul 2021 14:22:55 GMT
+Received: from b06avi18626390.portsmouth.uk.ibm.com (b06avi18626390.portsmouth.uk.ibm.com [9.149.26.192])
+        by ppma04fra.de.ibm.com with ESMTP id 39jfh8hf59-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 09 Jul 2021 14:22:55 +0000
+Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
+        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 169EKtQ435782946
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 9 Jul 2021 14:20:55 GMT
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 5418FA405B;
+        Fri,  9 Jul 2021 14:22:51 +0000 (GMT)
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id DE6D7A4057;
+        Fri,  9 Jul 2021 14:22:50 +0000 (GMT)
+Received: from li-7e0de7cc-2d9d-11b2-a85c-de26c016e5ad.ibm.com (unknown [9.171.8.8])
+        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Fri,  9 Jul 2021 14:22:50 +0000 (GMT)
+Subject: Re: [kvm-unit-tests PATCH] s390x: Add specification exception test
+To:     Cornelia Huck <cohuck@redhat.com>,
+        Janis Schoetterl-Glausch <scgl@linux.ibm.com>,
+        Thomas Huth <thuth@redhat.com>,
+        David Hildenbrand <david@redhat.com>,
+        Janosch Frank <frankja@linux.ibm.com>
+Cc:     Claudio Imbrenda <imbrenda@linux.ibm.com>, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org
+References: <20210706115459.372749-1-scgl@linux.ibm.com>
+ <87v95jet9d.fsf@redhat.com>
+From:   Janis Schoetterl-Glausch <scgl@linux.vnet.ibm.com>
+Message-ID: <e5a5fa4a-c5c4-e3f8-3229-9c8e70dffb45@linux.vnet.ibm.com>
+Date:   Fri, 9 Jul 2021 16:22:50 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.11.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <87v95jet9d.fsf@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: z4bFkgCzfwK2JQQKNqKCiII8dZXEVWJy
+X-Proofpoint-GUID: YnNP0I0vONsWehfzmuh9hNbUgasgkqDh
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.790
+ definitions=2021-07-09_09:2021-07-09,2021-07-09 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 mlxlogscore=999
+ adultscore=0 malwarescore=0 suspectscore=0 spamscore=0 priorityscore=1501
+ mlxscore=0 lowpriorityscore=0 clxscore=1015 phishscore=0 impostorscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2104190000
+ definitions=main-2107090070
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 15 Jun 2021 07:12:08 +0100
-Wei Chen <Wei.Chen@arm.com> wrote:
+On 7/9/21 11:22 AM, Cornelia Huck wrote:
+> On Tue, Jul 06 2021, Janis Schoetterl-Glausch <scgl@linux.ibm.com> wrote:
+> 
+>> Generate specification exceptions and check that they occur.
+>> Also generate specification exceptions during a transaction,
+>> which results in another interruption code.
+>> With the iterations argument one can check if specification
+>> exception interpretation occurs, e.g. by using a high value and
+>> checking that the debugfs counters are substantially lower.
+>> The argument is also useful for estimating the performance benefit
+>> of interpretation.
+>>
+>> Signed-off-by: Janis Schoetterl-Glausch <scgl@linux.ibm.com>
+>> ---
+>>  s390x/Makefile           |   1 +
+>>  lib/s390x/asm/arch_def.h |   1 +
+>>  s390x/spec_ex.c          | 344 +++++++++++++++++++++++++++++++++++++++
+>>  s390x/unittests.cfg      |   3 +
+>>  4 files changed, 349 insertions(+)
+>>  create mode 100644 s390x/spec_ex.c
+> 
+> (...)
+> 
+>> +static void lpsw(uint64_t psw)
+> 
+> Maybe call this load_psw(), as you do a bit more than a simple lpsw?
 
-Hi Wei,
+[...]
 
-> I have some thoughts of using kvmtool Virtio implementation
-> for Xen. I copied my markdown file to this email. If you have
-> time, could you please help me review it?
-> 
-> Any feedback is welcome!
-> 
-> # Some thoughts on using kvmtool Virtio for Xen
-> ## Background
-> 
-> Xen community is working on adding VIRTIO capability to Xen. And we're working
-> on VIRTIO backend of Xen. But except QEMU can support virtio-net for x86-xen,
-> there is not any VIRTIO backend can support Xen. Because of the community's
-> strong voice of Out-of-QEMU, we want to find a light weight VIRTIO backend to
-> support Xen.
-> 
-> We have an idea of utilizing the virtio implementaton of kvmtool for Xen. And
-> We know there was some agreement that kvmtool won't try to be a full QEMU
-> alternative. So we have written two proposals in following content for
-> communities to discuss in public:
-> 
-> ## Proposals
-> ### 1. Introduce a new "dm-only" command
-> 1. Introduce a new "dm-only" command to provide a pure device model mode. In
->    this mode, kvmtool only handles IO request. VM creation and initialization
->    will be bypassed.
-> 
->     * We will rework the interface between the virtio code and the rest of
->     kvmtool, to use just the minimal set of information. At the end, there
->     would be MMIO accesses and shared memory that control the device model,
->     so that could be abstracted to do away with any KVM specifics at all. If
->     this is workable, we will send the first set of patches to introduce this
->     interface, and adapt the existing kvmtool to it. Then later we will can
->     add Xen support on top of it.
-> 
->     About Xen support, we will detect the presence of Xen libraries, also
->     allow people to ignore them, as kvmtoll do with optional features like
->     libz or libaio.
-> 
->     Idealy, we want to move all code replying on Xen libraries to a set of
->     new files. In this case, thes files can only be compiled when Xen
->     libraries are detected. But if we can't decouple this code completely,
->     we may introduce a bit of #ifdefs to protect this code.
-> 
->     If kvm or other VMM do not need "dm-only" mode. Or "dm-only" can not
->     work without Xen libraries. We will make "dm-only" command depends on
->     the presence of Xen libraries.
-> 
->     So a normal compile (without the Xen libraries installed) would create
->     a binary as close as possible to the current code, and only the people
->     who having Xen libraries installed would ever generate a "dm-only"
->     capable kvmtool.
+> The indentation looks a bit funny here.
 
-This is not for me to decide, but just to let you know that this
-approach might not be very popular with kvmtool people, as kvmtool's
-design goal is be "lean and mean". So slapping a lot of code on the
-side, not helping with the actual KVM functionality, does not sound too
-tempting.
+[...]
 
-> 
-> ### 2. Abstract kvmtool virtio implementation as a library
-> 1. Add a kvmtool Makefile target to generate a virtio library. In this
->    scenario, not just Xen, but any project else want to provide a
->    userspace virtio backend service can link to this virtio libraris.
->    These users would benefit from the VIRTIO implementation of kvmtool
->    and will participate in improvements, upgrades, and maintenance of
->    the VIRTIO libraries.
-> 
->     * In this case, Xen part code will not upstream to kvmtool repo,
->       it would then be natural parts of the xen repo, in xen/tools or
->       maintained in other repo.
-> 
->       We will have a completely separate VIRTIO backend for Xen, just
->       linking to kvmtool's VIRTIO library.
-> 
->     * The main changes of kvmtool would be:
->         1. Still need to rework the interface between the virtio code
->            and the rest of kvmtool, to abstract the whole virtio
->            implementation into a library
->         2. Modify current build system to add a new virtio library target.
+> Here as well.
 
-As this has at least the prospect of being cleaner, this approach
-sounds better to me.
+Ok, will fix.
+> 
+>> +}
+> 
+> (...)
+> 
+>> +#define report_info_if(cond, fmt, ...)			\
+>> +	do {						\
+>> +		if (cond) {				\
+>> +			report_info(fmt, ##__VA_ARGS__);\
+>> +		}					\
+>> +	} while (0)
+> 
+> I'm wondering whether such a wrapper function could be generally useful.
+> 
 
-> 
-> ## Reworking the interface is the common work for above proposals
-> **In kvmtool, one virtual device can be separated into three layers:**
-> 
-> - A device type layer to provide an abstract
->     - Provide interface to collect and store device configuration.
->         Using block device as an example, kvmtool is using disk_image to
->         -  collect and store disk parameters like:
->             -  backend image format: raw, qcow or block device
->             -  backend block device or file image path
->             -  Readonly, direct and etc
->     - Provide operations to interact with real backend devices or services:
->         - provide backend device operations:
->             - block device operations
->             - raw image operations
->             - qcow image operations
+I've found 9 occurrences with:
+find . -type f \( -name "*.c" -o -name "*.h" \) -exec awk '/if\s*\(.*/{i=2;f=$0} /report_info/ && i>0{print FILENAME, NR-1 ":" f;r=4} r>1{print FILENAME, NR ":" $0;r--} r==1{print "--";r=0} {i--}' '{}' \;
 
-So I was wondering if the device backend would come as part of the
-library package? At the end of the day this mostly POSIX code to access
-some files.
-Or did you plan to terminate the library interface at the block access
-level (read/write device x sector y), and have the actual storage
-backends (raw, qcow, block device, you-name-it) in the Xen parts? What
-would Xen need here, on top of what kvmtool already offers?
-
-And that brings up the question of portability: At the moment kvmtool is
-Linux only (naturally), but IIUC Xen Dom0s also run in *BSD,
-potentially even other OSes? That might not be a showstopper, but the
-kvmtool code might contain some Linux-isms (libaio?), which would need
-to be abstracted first.
-
-
-I haven't looked at the details down the line, but I guess we should
-agree on the general feasibility first.
-
-Cheers,
-Andre
-
-> - Hypervisor interfaces
->     - Guest memory mapping and unmapping interfaces
->     - Virtual device register interface
->         - MMIO/PIO space register
->         - IRQ register
->     - Virtual IRQ inject interface
->     - Hypervisor eventfd interface
-> - An implementation layer to handle guest IO request.
->     - Kvmtool provides virtual devices for guest. Some virtual devices two
->       kinds of implementations:
->         - VIRTIO implementation
->         - Real hardware emulation
-> 
-> For example, kvmtool console has virtio console and 8250 serial two kinds
-> of implementations. These implementation depends on device type parameters
-> to create devices, and depends on device type ops to forward data from/to
-> real device. And the implementation will invoke hypervisor interfaces to
-> map/unmap resources and notify guest.
-> 
-> In the current kvmtool code, the boundaries between these three layers are
-> relatively clear, but there are a few pieces of code that are somewhat
-> interleaved, for example:
-> - In virtio_blk__init(...) function, the code will use disk_image directly.
->   This data is kvmtool specified. If we want to make VIRTIO implementation
->   become hypervisor agnostic. Such kind of code should be moved to other
->   place. Or we just keep code from virtio_blk__init_one(...) in virtio block
->   implementation, but keep virtio_blk__init(...) in kvmtool specified part
->   code.
-> 
-> However, in the current VIRTIO device creation and data handling process,
-> the device type and hypervisor API used are both exclusive to kvmtool and
-> KVM. If we want to use current VIRTIO implementation for other device
-> models and hypervisors, it is unlikely to work properly.
-> 
-> So, the major work of reworking interface is decoupling VIRTIO implementation
-> from kvmtool and KVM.
-> 
-> **Introduce some intermediate data structures to do decouple:**
-> 1. Introduce intermedidate type data structures like `virtio_disk_type`,
->    `virtio_net_type`, `virtio_console_type` and etc. These data structures
->    will be the standard device type interfaces between virtio device
->    implementation and hypervisor.  Using virtio_disk_type as an example:
->     ~~~~
->     struct virtio_disk_type {
->         /*
->          * Essential configuration for virtio block device can be got from
->          * kvmtool disk_image. Other hypervisor device model also can use
->          * this data structure to pass necessary parameters for creating
->          * a virtio block device.
->          */
->         struct virtio_blk_cfg vblk_cfg;
->         /*
->          * Virtio block device MMIO address and IRQ line. These two members
->          * are optional. If hypervisor provides allocate_mmio_space and
->          * allocate_irq_line capability and device model doesn't set these
->          * two fields, virtio block implementation will use hypervisor APIs
->          * to allocate MMIO address and IRQ line. If these two fields are
->          * configured, virtio block implementation will use them.
->          */
->         paddr_t addr;
->         uint32_t irq;
->         /*
->          * In kvmtool, this ops will connect to disk_image APIs. Other
->          * hypervisor device model should provide similar APIs for this
->          * ops to interact with real backend device.
->          */
->         struct disk_type_ops {
->             .read
->             .write
->             .flush
->             .wait
->             ...
->         } ops;
->     };
->     ~~~~
-> 
-> 2. Introduce a intermediate hypervisor data structure. This data structure
->    provides a set of standard hypervisor API interfaces. In virtio
->    implementation, the KVM specified APIs, like kvm_register_mmio, will not
->    be invoked directly. The virtio implementation will use these interfaces
->    to access hypervisor specified APIs. for example `struct vmm_impl`:
->     ~~~~
->     struct vmm_impl {
->         /*
->          * Pointer that link to real hypervisor handle like `struct kvm *kvm`.
->          * This pointer will be passed to the vmm ops;
->          */
->         void *vmm;
->         allocate_irq_line_fn_t(void* vmm, ...);
->         allocate_mmio_space_fn_t(void* vmm, ...);
->         register_mmio_fn_t(void* vmm, ...);
->         map_guest_page_fn_t(void* vmm, ...);
->         unmap_guest_page_fn_t(void* vmm, ...);
->         virtual_irq_inject_fn_t(void* vmm, ...);
->     };
->     ~~~~
-> 
-> 3. After decoupled with kvmtool, any hypervisor can use standard `vmm_impl`
->    and `virtio_xxxx_type` interfaces to invoke standard virtio implementation
->    interfaces to create virtio devices.
->     ~~~~
->     /* Prepare VMM interface */
->     struct vmm_impl *vmm = ...;
->     vmm->register_mmio_fn_t = kvm__register_mmio;
->     /* kvm__map_guset_page is a wrapper guest_flat_to_host */
->     vmm->map_guest_page_fn_t = kvm__map_guset_page;
->     ...
-> 
->     /* Prepare virtio_disk_type */
->     struct virtio_disk_type *vdisk_type = ...;
->     vdisk_type->vblk_cfg.capacity = disk_image->size / SECTOR_SIZE;
->     ...
->     vdisk_type->ops->read = disk_image__read;
->     vdisk_type->ops->write = disk_image__write;
->     ...
-> 
->     /* Invoke VIRTIO implementation API to create a virtio block device */
->     virtio_blk__init_one(vmm, vdisk_type);
->     ~~~~
-> 
-> VIRTIO block device simple flow before reworking interface:
-> https://drive.google.com/file/d/1k0Grd4RSuCmhKUPktHj9FRamEYrPCFkX/view?usp=sharing
-> ![image](https://drive.google.com/uc?export=view&id=1k0Grd4RSuCmhKUPktHj9FRamEYrPCFkX)
-> 
-> VIRTIO block device simple flow after reworking interface:
-> https://drive.google.com/file/d/1rMXRvulwlRO39juWf08Wgk3G1NZtG2nL/view?usp=sharing
-> ![image](https://drive.google.com/uc?export=view&id=1rMXRvulwlRO39juWf08Wgk3G1NZtG2nL)
-> 
-> 
-> Thanks,
-> Wei Chen
-
+./lib/s390x/css_lib.c 177:      if (cc) {
+./lib/s390x/css_lib.c 178:              report_info("stsch: updating sch %08x failed with cc=%d",
+./lib/s390x/css_lib.c 179:                          schid, cc);
+./lib/s390x/css_lib.c 180:              return false;
+--
+./lib/s390x/css_lib.c 183:      if (!(pmcw->flags & PMCW_ENABLE)) {
+./lib/s390x/css_lib.c 184:              report_info("stsch: sch %08x not enabled", schid);
+./lib/s390x/css_lib.c 185:              return false;
+./lib/s390x/css_lib.c 186:      }
+--
+./lib/s390x/css_lib.c 207:      if (cc) {
+./lib/s390x/css_lib.c 208:              report_info("stsch: sch %08x failed with cc=%d", schid, cc);
+./lib/s390x/css_lib.c 209:              return cc;
+./lib/s390x/css_lib.c 210:      }
+--
+./lib/s390x/css_lib.c 213:      if ((pmcw->flags & (PMCW_ISC_MASK | PMCW_ENABLE)) == flags) {
+./lib/s390x/css_lib.c 214:              report_info("stsch: sch %08x already enabled", schid);
+./lib/s390x/css_lib.c 215:              return 0;
+./lib/s390x/css_lib.c 216:      }
+--
+./lib/s390x/css_lib.c 269:      if (cc) {
+./lib/s390x/css_lib.c 270:              report_info("stsch: sch %08x failed with cc=%d", schid, cc);
+./lib/s390x/css_lib.c 271:              return false;
+./lib/s390x/css_lib.c 272:      }
+--
+./lib/s390x/css_lib.c 305:      if (cc) {
+./lib/s390x/css_lib.c 306:              report_info("stsch: updating sch %08x failed with cc=%d",
+./lib/s390x/css_lib.c 307:                          schid, cc);
+./lib/s390x/css_lib.c 308:              return false;
+--
+./lib/s390x/css_lib.c 466:      if (irb.scsw.sch_stat & ~SCSW_SCHS_IL) {
+./lib/s390x/css_lib.c 467:              report_info("Unexpected Subch. status %02x", irb.scsw.sch_stat);
+./lib/s390x/css_lib.c 468:              ret = -1;
+./lib/s390x/css_lib.c 469:              goto end;
+--
+./s390x/sclp.c 80:      if (res) {
+./s390x/sclp.c 81:              report_info("SCLP not ready (command %#x, address %p, cc %d)", cmd, addr, res);
+./s390x/sclp.c 82:              return false;
+./s390x/sclp.c 83:      }
+--
+./s390x/sclp.c 86:      if (!((1ULL << pgm) & exp_pgm)) {
+./s390x/sclp.c 87:              report_info("First failure at addr %p, buf_len %d, cmd %#x, pgm code %d",
+./s390x/sclp.c 88:                              addr, buf_len, cmd, pgm);
+./s390x/sclp.c 89:              return false;
+--
+./s390x/sclp.c 92:      if (exp_rc && exp_rc != h->response_code) {
+./s390x/sclp.c 93:              report_info("First failure at addr %p, buf_len %d, cmd %#x, resp code %#x",
+./s390x/sclp.c 94:                              addr, buf_len, cmd, h->response_code);
+./s390x/sclp.c 95:              return false;
+--
+./s390x/css.c 105:      if (ret < 0) {
+./s390x/css.c 106:              report_info("no valid residual count");
+./s390x/css.c 107:      } else if (ret != 0) {
+./s390x/css.c 108:              len = sizeof(*senseid) - ret;
+--
+./s390x/css.c 112:              } else if (ret && len)
+./s390x/css.c 113:                      report_info("transferred a shorter length: %d", len);
+./s390x/css.c 114:      }
+./s390x/css.c 115:
+--
+./s390x/css.c 153:      if (css_test_general_feature(CSSC_EXTENDED_MEASUREMENT_BLOCK))
+./s390x/css.c 154:              report_info("Extended measurement block available");
+./s390x/css.c 155:
+./s390x/css.c 156:      /* bits 59-63 of MB address must be 0  if MBU is defined */
+--
+./arm/psci.c 119:               } else if (cpu_on_ret[cpu] != PSCI_RET_ALREADY_ON) {
+./arm/psci.c 120:                       report_info("unexpected cpu_on return value: caller=CPU%d, ret=%d", cpu, cpu_on_ret[cpu]);
+./arm/psci.c 121:                       failed = true;
+./arm/psci.c 122:               }
+--
+./arm/psci.c 125:       if (ret_success != 1) {
+./arm/psci.c 126:               report_info("got %d CPU_ON success", ret_success);
+./arm/psci.c 127:               failed = true;
+./arm/psci.c 128:       }
+--
+./arm/pmu.c 236:        if (!supported && warn)
+./arm/pmu.c 237:                report_info("event 0x%x is not supported", n);
+./arm/pmu.c 238:        return supported;
+./arm/pmu.c 239:}
+--
+./arm/cache.c 115:      if (dcache_clean)
+./arm/cache.c 116:              report_info("dcache clean to PoU required");
+./arm/cache.c 117:      if (icache_inval)
+./arm/cache.c 117:      if (icache_inval)
+./arm/cache.c 118:              report_info("icache invalidation to PoU required");
+./arm/cache.c 119:
+./arm/cache.c 120:      check_code_generation(dcache_clean, icache_inval);
+--
+./arm/pl031.c 193:      if (!irq_triggered) {
+./arm/pl031.c 194:              report_info("  RTC RIS: %"PRIx32, readl(&pl031->ris));
+./arm/pl031.c 195:              report_info("  RTC MIS: %"PRIx32, readl(&pl031->mis));
+./arm/pl031.c 196:              report_info("  RTC IMSC: %"PRIx32, readl(&pl031->imsc));
+--
+./arm/gic.c 84:                 if (i)
+./arm/gic.c 85:                         report_info("interrupts took more than %d ms", i * 100);
+./arm/gic.c 86:                 /* Wait for unexpected interrupts to fire */
+./arm/gic.c 87:                 mdelay(100);
+--
+./arm/gic.c 115:                if (has_gicv2 && irq_sender[cpu] != sender) {
+./arm/gic.c 116:                        report_info("cpu%d received IPI from wrong sender %d",
+./arm/gic.c 117:                                        cpu, irq_sender[cpu]);
+./arm/gic.c 118:                        pass = false;
+--
+./arm/gic.c 121:                if (irq_number[cpu] != irqnum) {
+./arm/gic.c 122:                        report_info("cpu%d received wrong irq %d",
+./arm/gic.c 123:                                        cpu, irq_number[cpu]);
+./arm/gic.c 124:                        pass = false;
+--
+./arm/gic.c 128:        if (missing || extra || unexpected) {
+./arm/gic.c 129:                report_info("ACKS: missing=%d extra=%d unexpected=%d",
+./arm/gic.c 130:                                missing, extra, unexpected);
+./arm/gic.c 131:                pass = false;
+--
+./arm/gic.c 142:                if (spurious[cpu])
+./arm/gic.c 143:                        report_info("WARN: cpu%d got %d spurious interrupts",
+./arm/gic.c 144:                                cpu, spurious[cpu]);
+./arm/gic.c 145:        }
+--
+./arm/gic.c 194:                if (acked[i] != expected[i]) {
+./arm/gic.c 195:                        report_info("expected %d LPIs on PE #%d, %d observed",
+./arm/gic.c 196:                                    expected[i], i, acked[i]);
+./arm/gic.c 197:                        pass = false;
+--
+./arm/gic.c 421:        if (!res)
+./arm/gic.c 422:                report_info("byte 1 of 0x%08"PRIx32" => 0x%02"PRIx32, pattern & mask, reg);
+./arm/gic.c 423:
+./arm/gic.c 424:        pattern = REPLACE_BYTE(pattern, 2, 0x1f);
+--
+./arm/gic.c 429:        if (!res)
+./arm/gic.c 430:                report_info("writing 0x%02"PRIx32" into bytes 2 => 0x%08"PRIx32,
+./arm/gic.c 431:                            BYTE(pattern, 2), reg);
+./arm/gic.c 432:}
+--
+./arm/gic.c 519:        if (reg != (pattern & cpu_mask))
+./arm/gic.c 520:                report_info("writing %08"PRIx32" reads back as %08"PRIx32,
+./arm/gic.c 521:                            pattern & cpu_mask, reg);
+./arm/gic.c 522:
+--
+./x86/vmx_tests.c 4733: if (!(ctrl_cpu_rev[0].clr & CPU_NMI_WINDOW)) {
+./x86/vmx_tests.c 4734:         report_info("NMI-window exiting is not supported, skipping...");
+./x86/vmx_tests.c 4735:         goto done;
+./x86/vmx_tests.c 4736: }
+--
+./x86/vmx_tests.c 4841:                 if (un_cache) {
+./x86/vmx_tests.c 4842:                         report_info("EPT paging structure memory-type is Un-cacheable\n");
+./x86/vmx_tests.c 4843:                         ctrl = true;
+./x86/vmx_tests.c 4844:                 } else {
+--
+./x86/vmx_tests.c 4848:                 if (wr_bk) {
+./x86/vmx_tests.c 4849:                         report_info("EPT paging structure memory-type is Write-back\n");
+./x86/vmx_tests.c 4850:                         ctrl = true;
+./x86/vmx_tests.c 4851:                 } else {
+--
+./x86/vmx_tests.c 4899: if (msr & EPT_CAP_AD_FLAG) {
+./x86/vmx_tests.c 4900:         report_info("Processor supports accessed and dirty flag");
+./x86/vmx_tests.c 4901:         eptp &= ~EPTP_AD_FLAG;
+./x86/vmx_tests.c 4902:         test_eptp_ad_bit(eptp, true);
+--
