@@ -2,92 +2,197 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6CE453C220E
-	for <lists+kvm@lfdr.de>; Fri,  9 Jul 2021 12:05:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CB5423C22B7
+	for <lists+kvm@lfdr.de>; Fri,  9 Jul 2021 13:20:26 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232036AbhGIKIW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 9 Jul 2021 06:08:22 -0400
-Received: from out4436.biz.mail.alibaba.com ([47.88.44.36]:24795 "EHLO
-        out4436.biz.mail.alibaba.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231958AbhGIKIV (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 9 Jul 2021 06:08:21 -0400
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R181e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e04394;MF=laijs@linux.alibaba.com;NM=1;PH=DS;RN=14;SR=0;TI=SMTPD_---0UfChuN8_1625825125;
-Received: from C02XQCBJJG5H.local(mailfrom:laijs@linux.alibaba.com fp:SMTPD_---0UfChuN8_1625825125)
-          by smtp.aliyun-inc.com(127.0.0.1);
-          Fri, 09 Jul 2021 18:05:26 +0800
-Subject: Re: [PATCH] KVM: X86: Also reload the debug registers before
- kvm_x86->run() when the host is using them
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        Lai Jiangshan <jiangshanlai@gmail.com>,
-        linux-kernel@vger.kernel.org
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
-        kvm@vger.kernel.org
-References: <20210628172632.81029-1-jiangshanlai@gmail.com>
- <46e0aaf1-b7cd-288f-e4be-ac59aa04908f@redhat.com>
- <c79d0167-7034-ebe2-97b7-58354d81323d@linux.alibaba.com>
- <397a448e-ffa7-3bea-af86-e92fbb273a07@redhat.com>
-From:   Lai Jiangshan <laijs@linux.alibaba.com>
-Message-ID: <a4e07fb1-1f36-1078-0695-ff4b72016d48@linux.alibaba.com>
-Date:   Fri, 9 Jul 2021 18:05:25 +0800
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0)
- Gecko/20100101 Thunderbird/78.11.0
+        id S230404AbhGILWt (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 9 Jul 2021 07:22:49 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:28213 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229975AbhGILWs (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 9 Jul 2021 07:22:48 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1625829604;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type;
+        bh=hKiczKxzAPI29UJiV3gO14mPIUiI0XC1F52rfsccKc4=;
+        b=THuhczr2nb/+8VESe3DhE9MOm1FlQT2RnP/datbI/ZFI138YgB40NRlc5Q479dtCqwW51b
+        m90Ic3kLARcT8EE91djlyk6TO/10eUAIREvqXO/hIkvzLbN30AZeCIRZcc7wchKAdc+dOV
+        YFgED124yfjYMjHBBPDi5JSXC0oErIk=
+Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
+ [209.85.218.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-478-WtgjsSEZPCmRDc6n_0RjEg-1; Fri, 09 Jul 2021 07:20:03 -0400
+X-MC-Unique: WtgjsSEZPCmRDc6n_0RjEg-1
+Received: by mail-ej1-f70.google.com with SMTP id d2-20020a1709072722b02904c99c7e6ddfso2991312ejl.15
+        for <kvm@vger.kernel.org>; Fri, 09 Jul 2021 04:20:03 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:mime-version
+         :content-disposition;
+        bh=hKiczKxzAPI29UJiV3gO14mPIUiI0XC1F52rfsccKc4=;
+        b=BaH1ZLZVAA9VAkGa/3DqgvyNL6J6xYbOvZi4lgY4lCV0ziTbc6WFC5nZ7JiGsVojj5
+         bcYO+O5tuKv/sM2c+EIzEEpe6W8VXu4SKRbtXJNbyK3FiwBWRhvTUugZs11I+goHivnB
+         9ZJ73WnHjnHk0pMkO3moqGvIGW1LtQUjoneFBxYy62MZVq1eanRIX2L/Nlo+9EkkUTyr
+         horPmg7YWcepAAyN55bIJqKd+xbXmywHuaVVYrmXG83n09FsUsr/81yWVTPzcgjBONNC
+         5aYmVahYVbqZJ5DCOl8vVR83rEdk3z/tdFNpSBmo2zYBgtgaHAli0Q0RmYMZVntCHo1a
+         XeWA==
+X-Gm-Message-State: AOAM532BbaPHqsC8QQVSn3a+mhaTyICzr09N00TJnuL9/aMlQJH/0ZZv
+        /pIzbyvqB7t+PR+FyUQLq6A8Vdfp4uBZzn/cr2GxjhqOUqFw+ckIVaIi0akifrxjkMGBE/6HMXo
+        /EfZa82I+3yuA
+X-Received: by 2002:a17:907:3d8e:: with SMTP id he14mr37164179ejc.374.1625829602218;
+        Fri, 09 Jul 2021 04:20:02 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwtc4xWGn+OHTWUqQ2ZN7QMBLRjQS+tqvvgK+bB1PKTcn/km2lYNbAnqdYoxRG3K4UGhWeOuQ==
+X-Received: by 2002:a17:907:3d8e:: with SMTP id he14mr37164137ejc.374.1625829601998;
+        Fri, 09 Jul 2021 04:20:01 -0700 (PDT)
+Received: from redhat.com ([2.55.150.102])
+        by smtp.gmail.com with ESMTPSA id s4sm2830932edu.49.2021.07.09.04.19.56
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 09 Jul 2021 04:20:01 -0700 (PDT)
+Date:   Fri, 9 Jul 2021 07:19:52 -0400
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
+        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+        abaci@linux.alibaba.com, dan.carpenter@oracle.com,
+        david@redhat.com, elic@nvidia.com, jasowang@redhat.com,
+        lingshan.zhu@intel.com, lkp@intel.com, michael.christie@oracle.com,
+        mst@redhat.com, sgarzare@redhat.com, sohaib.amhmd@gmail.com,
+        stefanha@redhat.com, wanjiabing@vivo.com, xieyongji@bytedance.com,
+        yang.lee@linux.alibaba.com, zhangshaokun@hisilicon.com
+Subject: [GIT PULL] virtio,vhost,vdpa: features, fixes
+Message-ID: <20210709071952-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <397a448e-ffa7-3bea-af86-e92fbb273a07@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+X-Mutt-Fcc: =sent
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+The following changes since commit 3dbdb38e286903ec220aaf1fb29a8d94297da246:
 
+  Merge branch 'for-5.14' of git://git.kernel.org/pub/scm/linux/kernel/git/tj/cgroup (2021-07-01 17:22:14 -0700)
 
-On 2021/7/9 17:49, Paolo Bonzini wrote:
-> On 09/07/21 05:09, Lai Jiangshan wrote:
->> I just noticed that emulation.c fails to emulate with DBn.
->> Is there any problem around it?
-> 
-> Just what you said, it's not easy and the needs are limited.  I implemented kvm_vcpu_check_breakpoint because I was 
-> interested in using hardware breakpoints from gdb, even with unrestricted_guest=0 and invalid guest state, but that's it.
-> 
+are available in the Git repository at:
 
-Hello Paolo
+  https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git tags/for_linus
 
-I just remembered I once came across the patch, but I forgot it when
-I wrote the mail.
+for you to fetch changes up to db7b337709a15d33cc5e901d2ee35d3bb3e42b2f:
 
-It seems kvm_vcpu_check_breakpoint() handles only for code breakpoint
-and doesn't handle for data breakpoints.
+  virtio-mem: prioritize unplug from ZONE_MOVABLE in Big Block Mode (2021-07-08 07:49:02 -0400)
 
-And no code handles DR7_GD bit when the emulation is not resulted from
-vm-exit. (for example, the non-first instruction when kvm emulates
-instructions back to back and the instruction accesses to DBn).
+----------------------------------------------------------------
+virtio,vhost,vdpa: features, fixes
 
-Thanks
-Lai
+Doorbell remapping for ifcvf, mlx5.
+virtio_vdpa support for mlx5.
+Validate device input in several drivers (for SEV and friends).
+ZONE_MOVABLE aware handling in virtio-mem.
+Misc fixes, cleanups.
 
+Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 
-> Paolo
-> 
->> For code breakpoint, if the instruction didn't cause vm-exit,
->> (for example, the 2nd instruction when kvm emulates instructions
->> back to back) emulation.c fails to emulate with DBn.
->>
->> For code breakpoint, if the instruction just caused vm-exit.
->> It is difficult to analyze this case due to the complex priorities
->> between vectored events and fault-like vm-exit.
->> Anyway, if it is an instruction that vm-exit has priority over #DB,
->> emulation.c fails to emulate with DBn.
->>
->> For data breakpoint, a #DB must be delivered to guest or to VMM (when
->> guest-debug) after the instruction. But emulation.c doesn't do so.
->>
->> And the existence of both of effective DBn (guest debug) and guest DBn
->> complicates the problem when we try to emulate them.
+----------------------------------------------------------------
+David Hildenbrand (7):
+      virtio-mem: don't read big block size in Sub Block Mode
+      virtio-mem: use page_zonenum() in virtio_mem_fake_offline()
+      virtio-mem: simplify high-level plug handling in Sub Block Mode
+      virtio-mem: simplify high-level unplug handling in Sub Block Mode
+      virtio-mem: prioritize unplug from ZONE_MOVABLE in Sub Block Mode
+      virtio-mem: simplify high-level unplug handling in Big Block Mode
+      virtio-mem: prioritize unplug from ZONE_MOVABLE in Big Block Mode
+
+Eli Cohen (8):
+      vdpa/mlx5: Fix umem sizes assignments on VQ create
+      vdpa/mlx5: Fix possible failure in umem size calculation
+      vdpa/mlx5: Support creating resources with uid == 0
+      vdp/mlx5: Fix setting the correct dma_device
+      vdpa/mlx5: Add support for running with virtio_vdpa
+      vdpa/mlx5: Add support for doorbell bypassing
+      vdpa/mlx5: Clear vq ready indication upon device reset
+      virtio/vdpa: clear the virtqueue state during probe
+
+Jason Wang (11):
+      vp_vdpa: correct the return value when fail to map notification
+      virtio-ring: maintain next in extra state for packed virtqueue
+      virtio_ring: rename vring_desc_extra_packed
+      virtio-ring: factor out desc_extra allocation
+      virtio_ring: secure handling of mapping errors
+      virtio_ring: introduce virtqueue_desc_add_split()
+      virtio: use err label in __vring_new_virtqueue()
+      virtio-ring: store DMA metadata in desc_extra for split virtqueue
+      vdpa: support packed virtqueue for set/get_vq_state()
+      virtio-pci library: introduce vp_modern_get_driver_features()
+      vp_vdpa: allow set vq state to initial state after reset
+
+Michael S. Tsirkin (4):
+      virtio_net: move tx vq operation under tx queue lock
+      virtio_net: move txq wakeups under tx q lock
+      virtio: fix up virtio_disable_cb
+      virtio_net: disable cb aggressively
+
+Mike Christie (5):
+      vhost: remove work arg from vhost_work_flush
+      vhost-scsi: remove extra flushes
+      vhost-scsi: reduce flushes during endpoint clearing
+      vhost: fix poll coding style
+      vhost: fix up vhost_work coding style
+
+Shaokun Zhang (1):
+      vhost: Remove the repeated declaration
+
+Sohaib (1):
+      virtio_blk: cleanups: remove check obsoleted by CONFIG_LBDAF removal
+
+Stefan Hajnoczi (1):
+      virtio-blk: limit seg_max to a safe value
+
+Stefano Garzarella (1):
+      vhost-iotlb: fix vhost_iotlb_del_range() documentation
+
+Wan Jiabing (1):
+      vdpa_sim_blk: remove duplicate include of linux/blkdev.h
+
+Xie Yongji (3):
+      virtio-blk: Fix memory leak among suspend/resume procedure
+      virtio_net: Fix error handling in virtnet_restore()
+      virtio_console: Assure used length from device is limited
+
+Yang Li (1):
+      virtio_ring: Fix kernel-doc
+
+Zhu Lingshan (4):
+      vDPA/ifcvf: record virtio notify base
+      vDPA/ifcvf: implement doorbell mapping for ifcvf
+      virtio: update virtio id table, add transitional ids
+      vDPA/ifcvf: reuse pre-defined macros for device ids and vendor ids
+
+ drivers/block/virtio_blk.c             |  17 +-
+ drivers/char/virtio_console.c          |   4 +-
+ drivers/net/virtio_net.c               |  53 +++--
+ drivers/vdpa/ifcvf/ifcvf_base.c        |   4 +
+ drivers/vdpa/ifcvf/ifcvf_base.h        |  14 +-
+ drivers/vdpa/ifcvf/ifcvf_main.c        |  43 ++--
+ drivers/vdpa/mlx5/core/mlx5_vdpa.h     |   2 +
+ drivers/vdpa/mlx5/core/mr.c            |  97 ++++++---
+ drivers/vdpa/mlx5/core/resources.c     |   7 +
+ drivers/vdpa/mlx5/net/mlx5_vnet.c      |  67 +++++--
+ drivers/vdpa/vdpa_sim/vdpa_sim.c       |   4 +-
+ drivers/vdpa/vdpa_sim/vdpa_sim_blk.c   |   1 -
+ drivers/vdpa/virtio_pci/vp_vdpa.c      |  43 +++-
+ drivers/vhost/iotlb.c                  |   2 +-
+ drivers/vhost/scsi.c                   |  21 +-
+ drivers/vhost/vdpa.c                   |   4 +-
+ drivers/vhost/vhost.c                  |   8 +-
+ drivers/vhost/vhost.h                  |  21 +-
+ drivers/vhost/vsock.c                  |   2 +-
+ drivers/virtio/virtio_mem.c            | 346 +++++++++++++++++----------------
+ drivers/virtio/virtio_pci_modern_dev.c |  21 ++
+ drivers/virtio/virtio_ring.c           | 229 ++++++++++++++++------
+ drivers/virtio/virtio_vdpa.c           |  15 ++
+ include/linux/mlx5/mlx5_ifc.h          |   4 +-
+ include/linux/vdpa.h                   |  25 ++-
+ include/linux/virtio_pci_modern.h      |   1 +
+ include/uapi/linux/virtio_ids.h        |  12 ++
+ 27 files changed, 713 insertions(+), 354 deletions(-)
+
