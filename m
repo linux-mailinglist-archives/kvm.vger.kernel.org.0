@@ -2,41 +2,41 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 88F443C2B0B
+	by mail.lfdr.de (Postfix) with ESMTP id D3FBF3C2B0C
 	for <lists+kvm@lfdr.de>; Fri,  9 Jul 2021 23:56:21 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229506AbhGIV7A (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 9 Jul 2021 17:59:00 -0400
+        id S231245AbhGIV7B (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 9 Jul 2021 17:59:01 -0400
 Received: from mail-bn7nam10on2062.outbound.protection.outlook.com ([40.107.92.62]:31937
         "EHLO NAM10-BN7-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S231133AbhGIV66 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        id S231181AbhGIV66 (ORCPT <rfc822;kvm@vger.kernel.org>);
         Fri, 9 Jul 2021 17:58:58 -0400
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=KLzOgYxx7taE2CgcCkknkMtMYLk7ai98DpagkcBfjati4cdQdAj0B8OW1mZVJ4VgxzA6QUbFtmb18D+X2vsnGovyu6z2rxoDLmWSPCHgzDHhKPCYXGcZtqpQtvS9yRH3W+JI8bkPKXPCPclzOzgjO9fitRBWnXGI4lyyvo6sD7P1UnWRaC0MjnYAIlPiSgcKUFaRaF9a1iS1AmEmXZMjfUVZ3P934ehA5ADSr7Ed/rPuamL5HbF2V+zlfcchMJwbzmFWwflhhxn+RPC4fldLYLtJfzDKbfd9spACHvvXXBXgSGRtY/HTCeK1l940BNRsObmWxCfExLg0RsDIsA26vw==
+ b=bJoeZsIWPdDY8V0JQMk5H7F3XZAj1QCyVuUTdxa4dTjZpU0VGXzbh0YnT/PoGhGFgRf0ZOxDUeODyd2gCC02/kXFLyFiWztkDaFQT/E41Te+2ugyKgFj5KkT5Vwq+f1zZ9QOBvabnXqyN7rwcE4EJeHwSa8SYQqR8kojx6SL/T7WiLtSgF/XcwSFvUcT7QXIeABaJi3cPMvhtejrh1g4zL0kdm7DSaeVjL0ZOrj+zOWRBvbZjVJMrOPwgEdJb7TYfEQO+twzKFFvnfPMXeOYGMy67d+he1RrwWh2XrkOBlF44i1NdHtclfdthOZfma7CLnyv7mYwlzd/53NCvqVdUg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=SS5kgrI8gBb97Fva2W60j49RkiZfbbvK9wWxZ2hB5N0=;
- b=OF9U7b9puLHkndPFtK95iClFALNOmwIMEnaGp59irEkuLUQq3avIvp+JYN1Qa8HEfVdt+KjKYHuPluO9g5h2oLunZSJVUghinWmecQr+N/95/b1txrvFSKzh18c7JmfK6FsQOQGlxyAp8PXmWhFu6Emkvi9rvNU0Ep7Ex0pnTLQkXTIub0z+YHDHdU13PZglviWuliYyaHZdoRfglWjw8FTLIViI3fGEqH9DP1IVg+/Q60wX7/qrfAxe+KKXLYNcoKVUl4VNHNjWPirtMrkMcMdZzRgWHVIekttS7a85rYXNqagKEi2grJ/A0UPRm+uBQaWdaVffzutAQ4dwJepLgA==
+ bh=7/Vie47PxRPlWdAkPdp5i3FY8mj0catEPt6gPEFGvxQ=;
+ b=lCVB7bQJMYL1nsp1cHu6sqWA8010vMmOK9T7x8OzCtisVWnh5Yn+xmSMz+kGtgN4CaIjpV05AwFigzhT+IYMdLIBp2wYT51SARtzZUQfM+//IqLK3j4a5HKSw2MZXhmOJbdte3dZifh5Amm5EMDmhndEz/a2nicrHnBhPZ6zVGIC/vYrW2UMokdOEEaFM/zediGFupPhc9NfOhFL+JXpBgG1nev1pmje9cQbJTBwlt1t7zoEuRwWVgz5ogqEmeg9v6IQsmjXaoy5wTa3blQhG7JOYDYNCJAET6Pmb+77OiIZb++KHh4FcM742TBV2gt+CrCrMPxSG8KmFh4MmcrRkg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
  header.d=amd.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=SS5kgrI8gBb97Fva2W60j49RkiZfbbvK9wWxZ2hB5N0=;
- b=wswZhP2yiAvKrDzLHFTokWyT4iLA47Wu2aTjaT3hFsIVhm54faJ1fN8dW3+kwEEJfCDqiI0qE3yK4T9SzWuJV6iAIfZRmBpXQWbiBU11VeHqgsGYxY8och4hXZ/ruq2bNjCt+k0R7pYmQ/DOPdczEDptRN9Sf8qxgWd/qnmWhaM=
+ bh=7/Vie47PxRPlWdAkPdp5i3FY8mj0catEPt6gPEFGvxQ=;
+ b=WdBSBy/b1D3RLdhyeZGlqsXYZwGWUzTFfmTpoTirvIA3ozoreHebgajmpf12sOGSVA2piWpRglvPT0zXdhHq5/S7JYYbROvCO75v3uDsvlHSqkRc67jQJ6niMMeWj4UcM3V2/dF9ASvsko+sI9rtqrUCObTsXyO/xruYb89JPEQ=
 Authentication-Results: nongnu.org; dkim=none (message not signed)
  header.d=none;nongnu.org; dmarc=none action=none header.from=amd.com;
 Received: from SN6PR12MB2718.namprd12.prod.outlook.com (2603:10b6:805:6f::22)
  by SA0PR12MB4575.namprd12.prod.outlook.com (2603:10b6:806:73::19) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4308.21; Fri, 9 Jul
- 2021 21:56:12 +0000
+ 2021 21:56:13 +0000
 Received: from SN6PR12MB2718.namprd12.prod.outlook.com
  ([fe80::a8a9:2aac:4fd1:88fa]) by SN6PR12MB2718.namprd12.prod.outlook.com
  ([fe80::a8a9:2aac:4fd1:88fa%3]) with mapi id 15.20.4308.022; Fri, 9 Jul 2021
- 21:56:12 +0000
+ 21:56:13 +0000
 From:   Brijesh Singh <brijesh.singh@amd.com>
 To:     qemu-devel@nongnu.org
 Cc:     Connor Kuehl <ckuehl@redhat.com>,
@@ -52,9 +52,9 @@ Cc:     Connor Kuehl <ckuehl@redhat.com>,
         kvm@vger.kernel.org, Michael Roth <michael.roth@amd.com>,
         Eduardo Habkost <ehabkost@redhat.com>,
         Brijesh Singh <brijesh.singh@amd.com>
-Subject: [RFC PATCH 4/6] i386/sev: add the SNP launch start context
-Date:   Fri,  9 Jul 2021 16:55:48 -0500
-Message-Id: <20210709215550.32496-5-brijesh.singh@amd.com>
+Subject: [RFC PATCH 5/6] i386/sev: add support to encrypt BIOS when SEV-SNP is enabled
+Date:   Fri,  9 Jul 2021 16:55:49 -0500
+Message-Id: <20210709215550.32496-6-brijesh.singh@amd.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20210709215550.32496-1-brijesh.singh@amd.com>
 References: <20210709215550.32496-1-brijesh.singh@amd.com>
@@ -64,122 +64,125 @@ X-ClientProxiedBy: SN4PR0601CA0007.namprd06.prod.outlook.com
  (2603:10b6:805:6f::22)
 MIME-Version: 1.0
 X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from sbrijesh-desktop.amd.com (165.204.77.1) by SN4PR0601CA0007.namprd06.prod.outlook.com (2603:10b6:803:2f::17) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4308.20 via Frontend Transport; Fri, 9 Jul 2021 21:56:11 +0000
+Received: from sbrijesh-desktop.amd.com (165.204.77.1) by SN4PR0601CA0007.namprd06.prod.outlook.com (2603:10b6:803:2f::17) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4308.20 via Frontend Transport; Fri, 9 Jul 2021 21:56:12 +0000
 X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 35fd1136-dac2-4def-46ad-08d943245dc9
+X-MS-Office365-Filtering-Correlation-Id: 1e8adfde-3b26-4af2-f056-08d943245e3d
 X-MS-TrafficTypeDiagnostic: SA0PR12MB4575:
 X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <SA0PR12MB4575A7E7472B5DCE37ED821FE5189@SA0PR12MB4575.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:208;
+X-Microsoft-Antispam-PRVS: <SA0PR12MB45755B7AF7BD14A72E7107B7E5189@SA0PR12MB4575.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:660;
 X-MS-Exchange-SenderADCheck: 1
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: vLaFPJHqVWkt3xmLfYF3MpIVv+631upqSd7iuh0CvShhP/lJ7rqHUYlxFCWOgzF53/YfiDyzEAuPGj4seG45LKwUfxBnDMrDXlTCNblcaZVhsyM38Xnj7QoDIBhWtLYpyDgVNvMlb/xM8glcOd4ugIElRMlHz+QDupdeei+9wz0aku5KeZz8ezok4yCedfOXdFItXjmgLIh5JiIWaC4D7dXUREv+ljgtRMTes8kMi4ThobY2d3OoCRPekIjGV2myRsbOlpQwJmg6DW7WMlKUjsa6cXQiLCoeNwC4xHMHT79sUm0eBST962rMPw+770rtryJjWRu6zRu//jZ0q4wrEElltrcr46fb1gcdhG6ySUgShmh0gCfDf0KPf2HqwL5zac3rfKRg5+ciozwOXpOV6TWkXLnaOfEkhHSiLbsFYnqdJe8u8Nql6JQ0ZhWyDAA8oxUd4iB32b3pbvRs+Ysm91WzqjeSyByk8JAPqNJxAkYJKP7MOQLduMgyNtHZthDSdSQVx1RoTTwR2LvDyKoDCIR68neK1N/Zdybh+tDOXQNbrbs9nc6KWj/ZhHZ24jJX43TmaRdVtd6Dg2bmJ23Cd88NRqxkGzuQbxZfdsec5XTudemMMcB7XbBhwiie0kPNjuzAESwF6BBkcOGaAeFoKecCJf5DYzw+qu220tL9zkTsMFW8NdnMyiVidSAHJSWnzQfl1fViqytJCm65fSXjRg==
+X-Microsoft-Antispam-Message-Info: IFCTxhTSmM3FU8ZeLndUEdxS8ex8xNUS0FObjaZzFdlIoqPg/7vj+HONHgzxXxT5oYsn8snS2ZxCw1+Qkxa92jlEdYVUxnIxp1x3MVC9YwRgNzZhAXV2gDanAr7SmagJit3m1Obk5ClkJEGr6B7++ZRiTM5TVRNrLK8sv9T6o8ffdCV42CzITBeFsFMjljNQKErUtsNeq2IMDoDw0GS/IHlLsky/jzGtB6G9529iSjxRRfM/oa/UECtqF+4m9hpMKMspNHMxyE9Y8VmY7K7gG1dg8xEaLaFQWnvDDc03Fv6i8mqmXPf1UB7Wm9bffnfg94hlDVTphkLadsmBHVXMuMMZo6yILu2bAVOdlHiKVWNxXCx8PXHfEp759uUDVslaF6CSj+Gy8s/zBgurVF+auoQh1QLEumA0PhiUZXfHOpjd3xz4h4Oi5nc5vl2NGJJBbf2wZ/PdhNnF+n22wtbd9hpM+QXokDQQbkgT5c+uCJWDtDc3oCs6LilcyjGWx1GRB3cLdxC5BKNu+QP1AjxvB4PtnK9RURdkcufDvt3T9X7unnoPJWaijNx4x/QYaERwXw/tF59jrJcgaUuY3mkkhqQKJbn+6nogvFb6lY2GSee4YZKRS1ljnD9VYAO9tUhwXPwgCkTT7y5srRefIFR4pwScojSsqZQDrCwT4vIgtbManLxT63z0OHarMMeX0of2u9e/DTJkfnIbywa00d+n6Q==
 X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR12MB2718.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(136003)(39860400002)(376002)(396003)(346002)(6916009)(2616005)(66556008)(36756003)(6666004)(6486002)(83380400001)(7696005)(52116002)(2906002)(66476007)(316002)(4326008)(186003)(38100700002)(66946007)(38350700002)(8676002)(8936002)(956004)(86362001)(5660300002)(44832011)(54906003)(478600001)(1076003)(26005)(7416002);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?omKuYw+JW2UfJRIKm2fzRKq2C/kdiMcPaQBekhgAIDwgm9iobJxrWv0iGj3c?=
- =?us-ascii?Q?jBgGs1TqZFp8BFzpE5sb6uHDtD3194K4BNUbVmJ24lSAWHPSJzA0eWGKq0S0?=
- =?us-ascii?Q?Hfc1fs9PAa5uxAQOyBEQBwdw0cHXBc9ceYPn2dwnBmkmMIfvzx7YVzCZvZGs?=
- =?us-ascii?Q?65hlyiamExEc0FsxUNlkg8HMvnWTdQSt+hO4FX+yZ14E5ouE7dIabiKepjEg?=
- =?us-ascii?Q?uzrK/GCmKrbbMt/wM95KqepJQ3eWVr4LF0/aekCaAm3NjyKx7WMjKSs3q/HK?=
- =?us-ascii?Q?x4fpk3U007yTy2yUyLljVTAIpwyJTHMrf0OgVP4NMrCyZBh3coVWxGrUy4kT?=
- =?us-ascii?Q?S5kFwB8ZZhlZ8OU4caIo3/8FwcaFRn6HBxC/sF6TlhQDVX63TPwdqdtYhqtq?=
- =?us-ascii?Q?l1RlTXRVNdnYMQ2XgL8qOzHkk29Asmb4f66ov1V1yJ8X6rtatE8iKYyHY8b9?=
- =?us-ascii?Q?4aZ7lMUbjZE7h5FGHp3xZfNEXk2OX4QWPjTMx/gC7c6V5hC8IWjD4ZUnES89?=
- =?us-ascii?Q?LeIVfBBHV49gG8K+p5FfFArL+2Nk/DCLFgC2vZjOl3xmQG2npZgfDw3QKzrB?=
- =?us-ascii?Q?b5P/OZQ2WNX/RhZCeSdf2rJD3rFNe8qDBbsBz7FXe6H2+UEdylp6g3ozuC4D?=
- =?us-ascii?Q?zjNEbBD05iWtlXURaxuRjUeX1u+/YTDZSG9XfoLZL2gqVvZ182EnU2bnIWir?=
- =?us-ascii?Q?MBT3zebgheDT/GThXFuP8bsIt8TqMLV2xgq7Qo79wAoxj3nES/bG3Hpl+TTc?=
- =?us-ascii?Q?QHLN5SUHd5wCdtmk2VyvbnEQap8E7ejaH4Nz7NZZL47uQkkGEstk5g6S2t0u?=
- =?us-ascii?Q?qfmYYQ+aI+EwQbyFpdFBDaeJUdlwt/KzaCRwWo34HsxAHIjD7Be9xaY7TvPX?=
- =?us-ascii?Q?zPyazO/DuYwxn99GTritNGSrkVNpXhUdhtOuDCvKC4wayi1bDjyRrbHXqvf1?=
- =?us-ascii?Q?+r9MQIAwqr99X4ebOFCwibMrArZd4+s+recZseBrdIRaYLAY+NmT/nhgeQbB?=
- =?us-ascii?Q?w38MuE8wxndaFGqR+DlD8pNqnQIPy5mmLI6/I/9xOy8sX1ZybsIQeH9xIG6g?=
- =?us-ascii?Q?ZGtZs7k473ZZyy8/S30hR4ebWOm2Gic9P4N4uYqNjr0QyCM/C94WvpkHMUSQ?=
- =?us-ascii?Q?ywJm3jrPuOYVPtWjbw9nTGrZPMtlVDOBbZK+wVoqYFFRIpkExNBPWu5CpBFj?=
- =?us-ascii?Q?BVTag6aXfsnI+0bnvZBkbXjkvZ1o2CeCCMCec6JXWmsLSykUISO8AikNJDRi?=
- =?us-ascii?Q?P/Z0MrAKY2LA42F7rRgXPFU6A4ADismGeN9tg41FEfw7czfq3/d4ktwml3Oq?=
- =?us-ascii?Q?7FM3ySuOl9WwUXzoKN9Wwr/f?=
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?F6swLJEP6P+OVH9IoJ2TGagV8Gnk32sn+8iqRKh4tTIKtCC2c4BmCkMee4ll?=
+ =?us-ascii?Q?4FD/o8+/GyqO4wlNQmL7Ajxg7bWbDhYQEkXPDavfzP7tlc+W+NjuotS2NSSj?=
+ =?us-ascii?Q?8ELfZ5AVVseANpJeyt+tdGYHs+x2rcJKOcN9hOUn8Ah5ZZfJAjo09PSHgqvH?=
+ =?us-ascii?Q?vrLEd7EnCn42CR+qHK06GF6CwnMO8gzXDmkVyrAWwKDdJpxEEefrI2bQrIJK?=
+ =?us-ascii?Q?2ULPtN1utUeDruPVkRauuq7X0iVwe8gLNhXVjlD6EnoC2E5faB6Wxj+5koZe?=
+ =?us-ascii?Q?k7dMKbIulOx1BHi2v8KtL57brMYh3rtgLrK7OONWSDJ8Kd5zBi+Dq/hfA6JU?=
+ =?us-ascii?Q?dOyidktuPV8XEmYU8GkLCmvEgPZ1Ss7Lzt1mQbMdEqzdS2vlgW24ojSyrU47?=
+ =?us-ascii?Q?zxbd7qFK1/Izt9kwHIf6OVN9thgcdCxjtoiaTEbV0VTh5NuxgCMhwxfX+UcE?=
+ =?us-ascii?Q?3xiHWfm46FGOHQDTZLN2bDg0a2KxbFd1Nj8EM0BN6oflDzwyvYwijXs6P+FX?=
+ =?us-ascii?Q?w3wZpRYNXP7fCMMQDdDOsoUJ1MWVjZCg53dyTBb1csdme6RlS61TuMKiz2eQ?=
+ =?us-ascii?Q?9jc71XX72zLL+sJPMABjiMZyMTKcgJSqGaK18busmmyDlqxoCWuOzDqtpLAj?=
+ =?us-ascii?Q?YgeramrsWvh2CGc00PBlkr+I0GeMkuA1DBy2wH9sr1x0G5O92Jw5fStu3dxP?=
+ =?us-ascii?Q?3mbW5bbW+w1iYsCyQNwrC4JQU1bRXq1R+IU5lPGC2KLLQxem4uFXiKtwi7e0?=
+ =?us-ascii?Q?YlqChlMPSV1IQgwJG3YlKbXAM+mIzpJJNSE8ocqh9SNwXY/hnuX6jh0Y9bfo?=
+ =?us-ascii?Q?NAtp6KhmpjBTlTr9wcCSoiPgIY1S4RyCnj8GxauSh8p4+NH/KksI+XD9Vez4?=
+ =?us-ascii?Q?wJWeByDtyOXWqvAIfb1X2Ah7C9uhd2qiMFPIWNPpfpJX9hvGVF1FnI/BHdgo?=
+ =?us-ascii?Q?nC1dqx1FfcSJvdK3pZmagIow7jNdIs9S/uAsEJN2FHxSAadp+UahQ1tHB1XZ?=
+ =?us-ascii?Q?BhfL4NDqCV8ee+GSA8Nqqi9I7lmLaeFicA82vC/MhBv3XoK0vkfuoGMJfsO1?=
+ =?us-ascii?Q?TOK+hf/y1Fgf1wcB+VuUqjeOX5IZT3s8RmBLsRRPw4ER/7bdgq7qDQdlQhAp?=
+ =?us-ascii?Q?0efdOZWD5JLHirReoqwHiC9SKLzXNtMdhEke1U1IpauFjTbf6QdfuuPU36GU?=
+ =?us-ascii?Q?U69/VZJ10dkH/eFvoX21ePrpd9KkNKAEtBFVsTi6Rn2aJTByvIjyz3NXLU0C?=
+ =?us-ascii?Q?8uJCztwBpTVdWPCU0JMidAutT/RZcTVEYVegO/7okHyeP3JHQSul6ZBghXhk?=
+ =?us-ascii?Q?jPNUZxBBQM0gsr0t0OszK3ot?=
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 35fd1136-dac2-4def-46ad-08d943245dc9
+X-MS-Exchange-CrossTenant-Network-Message-Id: 1e8adfde-3b26-4af2-f056-08d943245e3d
 X-MS-Exchange-CrossTenant-AuthSource: SN6PR12MB2718.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Jul 2021 21:56:12.2610
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Jul 2021 21:56:12.9886
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: LP3G8LG2TyVHnSqA9mdHCDi3/SyXvpiXbXI7fZ5EnV6Oo0BRlPlM5UjMZrdGwe1YqI9XaLvmsx1aXeo00Aa+0g==
+X-MS-Exchange-CrossTenant-UserPrincipalName: pjcLUpoqjuxY5A/+2RqGnQxbzO/piiFLmHO4cxE/ECZ+ido4Y9/5X4dxIdpUOZgyHPwNS/8zi+nreD8bK9BOCg==
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA0PR12MB4575
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The SNP_LAUNCH_START is called first to create a cryptographic launch
-context within the firmware.
+The KVM_SEV_SNP_LAUNCH_UPDATE command is used for encrypting the bios
+image used for booting the SEV-SNP guest.
 
 Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
 ---
- target/i386/sev.c        | 30 +++++++++++++++++++++++++++++-
+ target/i386/sev.c        | 33 ++++++++++++++++++++++++++++++++-
  target/i386/trace-events |  1 +
- 2 files changed, 30 insertions(+), 1 deletion(-)
+ 2 files changed, 33 insertions(+), 1 deletion(-)
 
 diff --git a/target/i386/sev.c b/target/i386/sev.c
-index 84ae244af0..259408a8f1 100644
+index 259408a8f1..41dcb084d1 100644
 --- a/target/i386/sev.c
 +++ b/target/i386/sev.c
-@@ -812,6 +812,29 @@ sev_read_file_base64(const char *filename, guchar **data, gsize *len)
-     return 0;
+@@ -883,6 +883,30 @@ out:
+     return ret;
  }
  
 +static int
-+sev_snp_launch_start(SevGuestState *sev)
++sev_snp_launch_update(SevGuestState *sev, uint8_t *addr, uint64_t len, int type)
 +{
-+    int ret = 1;
-+    int fw_error, rc;
-+    struct kvm_sev_snp_launch_start *start = &sev->snp_config.start;
++    int ret, fw_error;
++    struct kvm_sev_snp_launch_update update = {};
 +
-+    trace_kvm_sev_snp_launch_start(start->policy);
-+
-+    rc = sev_ioctl(sev->sev_fd, KVM_SEV_SNP_LAUNCH_START, start, &fw_error);
-+    if (rc < 0) {
-+        error_report("%s: SNP_LAUNCH_START ret=%d fw_error=%d '%s'",
-+                __func__, ret, fw_error, fw_error_to_str(fw_error));
-+        goto out;
++    if (!addr || !len) {
++        return 1;
 +    }
 +
-+    sev_set_guest_state(sev, SEV_STATE_LAUNCH_UPDATE);
-+    ret = 0;
++    update.uaddr = (__u64)(unsigned long)addr;
++    update.len = len;
++    update.page_type = type;
++    trace_kvm_sev_snp_launch_update(addr, len, type);
++    ret = sev_ioctl(sev->sev_fd, KVM_SEV_SNP_LAUNCH_UPDATE,
++                    &update, &fw_error);
++    if (ret) {
++        error_report("%s: SNP_LAUNCH_UPDATE ret=%d fw_error=%d '%s'",
++                __func__, ret, fw_error, fw_error_to_str(fw_error));
++    }
 +
-+out:
 +    return ret;
 +}
 +
  static int
- sev_launch_start(SevGuestState *sev)
+ sev_launch_update_data(SevGuestState *sev, uint8_t *addr, uint64_t len)
  {
-@@ -1105,7 +1128,12 @@ int sev_kvm_init(ConfidentialGuestSupport *cgs, Error **errp)
-         goto err;
-     }
+@@ -1161,7 +1185,14 @@ sev_encrypt_flash(uint8_t *ptr, uint64_t len, Error **errp)
  
--    ret = sev_launch_start(sev);
-+    if (sev_snp_enabled()) {
-+        ret = sev_snp_launch_start(sev);
-+    } else {
-+        ret = sev_launch_start(sev);
-+    }
+     /* if SEV is in update state then encrypt the data else do nothing */
+     if (sev_check_state(sev_guest, SEV_STATE_LAUNCH_UPDATE)) {
+-        int ret = sev_launch_update_data(sev_guest, ptr, len);
++        int ret;
 +
-     if (ret) {
-         error_setg(errp, "%s: failed to create encryption context", __func__);
-         goto err;
++        if (sev_snp_enabled()) {
++            ret = sev_snp_launch_update(sev_guest, ptr, len,
++                                        KVM_SEV_SNP_PAGE_TYPE_NORMAL);
++        } else {
++            ret = sev_launch_update_data(sev_guest, ptr, len);
++        }
+         if (ret < 0) {
+             error_setg(errp, "failed to encrypt pflash rom");
+             return ret;
 diff --git a/target/i386/trace-events b/target/i386/trace-events
-index 2cd8726eeb..18cc14b956 100644
+index 18cc14b956..0c2d250206 100644
 --- a/target/i386/trace-events
 +++ b/target/i386/trace-events
-@@ -11,3 +11,4 @@ kvm_sev_launch_measurement(const char *value) "data %s"
- kvm_sev_launch_finish(void) ""
+@@ -12,3 +12,4 @@ kvm_sev_launch_finish(void) ""
  kvm_sev_launch_secret(uint64_t hpa, uint64_t hva, uint64_t secret, int len) "hpa 0x%" PRIx64 " hva 0x%" PRIx64 " data 0x%" PRIx64 " len %d"
  kvm_sev_attestation_report(const char *mnonce, const char *data) "mnonce %s data %s"
-+kvm_sev_snp_launch_start(uint64_t policy) "policy 0x%" PRIx64
+ kvm_sev_snp_launch_start(uint64_t policy) "policy 0x%" PRIx64
++kvm_sev_snp_launch_update(void *addr, uint64_t len, int type) "addr %p len 0x%" PRIx64 " type %d"
 -- 
 2.17.1
 
