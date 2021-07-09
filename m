@@ -2,126 +2,74 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 859E93C2B10
-	for <lists+kvm@lfdr.de>; Fri,  9 Jul 2021 23:58:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E04A33C2B84
+	for <lists+kvm@lfdr.de>; Sat, 10 Jul 2021 00:55:09 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229606AbhGIWBB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 9 Jul 2021 18:01:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48716 "EHLO
+        id S231405AbhGIW5v (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 9 Jul 2021 18:57:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33104 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229542AbhGIWBA (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 9 Jul 2021 18:01:00 -0400
-Received: from mail-pj1-x1032.google.com (mail-pj1-x1032.google.com [IPv6:2607:f8b0:4864:20::1032])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 226F9C0613DD
-        for <kvm@vger.kernel.org>; Fri,  9 Jul 2021 14:58:17 -0700 (PDT)
-Received: by mail-pj1-x1032.google.com with SMTP id b14-20020a17090a7aceb029017261c7d206so8994093pjl.5
-        for <kvm@vger.kernel.org>; Fri, 09 Jul 2021 14:58:17 -0700 (PDT)
+        with ESMTP id S231382AbhGIW5u (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 9 Jul 2021 18:57:50 -0400
+Received: from mail-ot1-x331.google.com (mail-ot1-x331.google.com [IPv6:2607:f8b0:4864:20::331])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B9286C0613E5
+        for <kvm@vger.kernel.org>; Fri,  9 Jul 2021 15:55:05 -0700 (PDT)
+Received: by mail-ot1-x331.google.com with SMTP id 75-20020a9d08510000b02904acfe6bcccaso11052392oty.12
+        for <kvm@vger.kernel.org>; Fri, 09 Jul 2021 15:55:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=tCttvNGovKwVSPHHRmt+ZWxOoFjRateaVSBYX4FqXkQ=;
-        b=NuNDqsnfC6CPF+QO34/L3c0YBe6exgYG8PXhUtsFdVz2UGp8FubC4jDf6sK+CPCIBd
-         dMzFwwYMD4uAr26hNspDYgFy+3LXN4g1YGaWlNVQNCGcx1xolQmECssaiB64mrgCZFci
-         7Vjq+Z45rYRjuM1UxNTinwxyTZS4FMdaSqIz9yQJI9qFbx4pRm9zVn9jhAkxWcj03jbO
-         lD/S+7znBlg45bhox6itBbrU5hE6uXU+1X5aXHxY6AjWdxBSaKvqXpbqXF32bWxAES2M
-         q1WFEXuGbPLMmgqhOGJCF/jqhw7/KdfmeYtoRprhVpY9O+1i2316npiGqCLTPTBpPVFd
-         o3eg==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=K66QBtJ+phE9JDS05iwl9n97KF/7XWVHefoFggtflzM=;
+        b=Z/XPwxtaDaG7Js+AzZfVg7udevUwQeigbzx2kcOEOIMdKZCh9sVF/Y/W06OI71vVY3
+         /JFy9RUt7+y/MUHSyhiCbN0oEp++Y/QF5Dl0C24seRliY5YF1z/DxkR1b6RRINEMW0l6
+         wHP88x0UyOI+fAuhMGHr1/BTlWWbdRtPdhwY3YekmvTa2k8DK8hN7h/TzM94IiMazauB
+         qaQYgLjYTLudt5LMQ9+WnOErefGfuM2g0Il0p2lfBprzLIfyiPixrppmC8YRQ6oQgCLT
+         vYmXal5xRAmgHE9kR9Fle9PnTRkGe52G3gJayqOeCBkJixnxV4N1r6jOM91CDa4ivbai
+         GKLw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=tCttvNGovKwVSPHHRmt+ZWxOoFjRateaVSBYX4FqXkQ=;
-        b=Dml0oQ78xU+cyK6ZY0y59sjQK4c5psw949izkWMwfzJo0zHEIzRXvvxs3xMEGqgXDs
-         sFFoslUkjAkOLOB8vISkZdPyXZ2wFjvRXMEYwElCgLlHPuenYzM+NxWpY1aDwirGBbPZ
-         EkEz6tIfKqiecT+cWZYDUsZMdGHc5ANAEVNBNrX3mP76xl55nyhetpeecpIu8B7WM4xl
-         RrOHQqPejhYNLTnZ+H20LAox1o9RVZwvRZLWKujmQ10r01FS14GT9jDNFkueTVkMsJjc
-         WXmt09BDHUHmcc4WbIxylrn2BXoPX1pECaQgcW5Kq6xCYN3ERZkqkLCsVqTfFk7vlDou
-         O/hQ==
-X-Gm-Message-State: AOAM532eVqG/ZhMhNhqT5KhMstHwvzwaOZAXSmZ6VP/UMtOMHwZARrIR
-        ruP+VeBoiXEhqSLZ2AU8l71a1A==
-X-Google-Smtp-Source: ABdhPJxPoP1PHrp+KF/2i7yXh31TP9NwoiFn1ceC9bx9PtxYQ7uism9KYXesfofZ/nZ+HOSbQpWjmw==
-X-Received: by 2002:a17:902:778f:b029:128:b3e1:15f8 with SMTP id o15-20020a170902778fb0290128b3e115f8mr32710938pll.14.1625867896424;
-        Fri, 09 Jul 2021 14:58:16 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id f2sm7073392pfe.23.2021.07.09.14.58.15
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 09 Jul 2021 14:58:15 -0700 (PDT)
-Date:   Fri, 9 Jul 2021 21:58:12 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     David Edmondson <david.edmondson@oracle.com>
-Cc:     David Matlack <dmatlack@google.com>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
-        Borislav Petkov <bp@alien8.de>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Joerg Roedel <joro@8bytes.org>, Ingo Molnar <mingo@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Paolo Bonzini <pbonzini@redhat.com>, x86@kernel.org,
-        Joao Martins <joao.m.martins@oracle.com>
-Subject: Re: [PATCH 2/2] KVM: x86: On emulation failure, convey the exit
- reason to userspace
-Message-ID: <YOjGdFXXCqDeVlh4@google.com>
-References: <20210628173152.2062988-1-david.edmondson@oracle.com>
- <20210628173152.2062988-3-david.edmondson@oracle.com>
- <YNygagjfTIuptxL8@google.com>
- <m2pmw114w5.fsf@oracle.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=K66QBtJ+phE9JDS05iwl9n97KF/7XWVHefoFggtflzM=;
+        b=BgAngJwmC7gQRVVAz5vUCvcOCIJ73nM1QICU9lLromH3CQwZNtM+RH7sIF6Q6FHGss
+         1Z8ZSYTO+qo5AXeCEMFVifPinqjlwVBYafN8hVIVSCtkloQe9Oj4q30+szlUKa6Duqcu
+         z7BVZ2s9TYG9r+J2k80UAWUMmt6gvXyqsjq0wsASJ2006EkNEqOcrJpui9dgMnWFWZ6T
+         frFrd2xI0yztjmoyuuMXBIssbM9y6hkYfm8BOdP/S78Jf460fY3uwoBHAjBWXgYZ8DLd
+         XYWsfIvT/b4wUbdq/xMu4f5k2nTdqqql0pXg2kt57jCLzVbYCpNHah2XcEkjFkvzonwY
+         BIrA==
+X-Gm-Message-State: AOAM532f22f25VaWujz871bVBkDKeXaY/47nxkBY3/0FEkrlNl3xPfhd
+        Q3HUCD3yxzVKz4SU+EVJMttzTbE3ZWB8U5OPYjhdRA==
+X-Google-Smtp-Source: ABdhPJy5uCAPcDt5kVVjgCYzDengiFvxQ8jSXjkQFK9bVgyvt+tzXMN3MUek0UZoagdOIr7X/Uavr8JUjm6YJkR+0wM=
+X-Received: by 2002:a05:6830:25cb:: with SMTP id d11mr24792741otu.56.1625871304819;
+ Fri, 09 Jul 2021 15:55:04 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <m2pmw114w5.fsf@oracle.com>
+References: <1625825111-6604-1-git-send-email-weijiang.yang@intel.com> <1625825111-6604-7-git-send-email-weijiang.yang@intel.com>
+In-Reply-To: <1625825111-6604-7-git-send-email-weijiang.yang@intel.com>
+From:   Jim Mattson <jmattson@google.com>
+Date:   Fri, 9 Jul 2021 15:54:53 -0700
+Message-ID: <CALMp9eQEs9pUyy1PpwLPG0_PtF07tR2Opw+1b=w4-knOwYPvvg@mail.gmail.com>
+Subject: Re: [PATCH v5 06/13] KVM: x86/vmx: Save/Restore host MSR_ARCH_LBR_CTL state
+To:     Yang Weijiang <weijiang.yang@intel.com>
+Cc:     pbonzini@redhat.com, seanjc@google.com, vkuznets@redhat.com,
+        wei.w.wang@intel.com, like.xu.linux@gmail.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Jul 02, 2021, David Edmondson wrote:
-> On Wednesday, 2021-06-30 at 16:48:42 UTC, David Matlack wrote:
-> 
-> > On Mon, Jun 28, 2021 at 06:31:52PM +0100, David Edmondson wrote:
-> >>  	if (!is_guest_mode(vcpu) && static_call(kvm_x86_get_cpl)(vcpu) == 0) {
-> >> -		vcpu->run->exit_reason = KVM_EXIT_INTERNAL_ERROR;
-> >> -		vcpu->run->internal.suberror = KVM_INTERNAL_ERROR_EMULATION;
-> >> -		vcpu->run->internal.ndata = 0;
-> >> +		prepare_emulation_failure_exit(
-> >> +			vcpu, KVM_INTERNAL_ERROR_EMULATION_FLAG_EXIT_REASON);
-> >
-> > Should kvm_task_switch and kvm_handle_memory_failure also be updated
-> > like this?
-> 
-> Will do in v2.
-> 
-> sgx_handle_emulation_failure() seems like an existing user of
-> KVM_INTERNAL_ERROR_EMULATION that doesn't follow the new protocol (use
-> the emulation_failure part of the union).
-> 
-> Sean: If I add another flag for this case, what is the existing
-> user-level consumer?
+On Fri, Jul 9, 2021 at 2:51 AM Yang Weijiang <weijiang.yang@intel.com> wrote:
+>
+> If host is using MSR_ARCH_LBR_CTL then save it before vm-entry
+> and reload it after vm-exit.
 
-Doh, the SGX case should have been updated as part of commit c88339d88b0a ("kvm:
-x86: Allow userspace to handle emulation errors").  The easiest fix for SGX would
-be to zero out 'flags', bump ndata, and shift the existing field usage.  That
-would resolve the existing problem of the address being misinterpreted as flags,
-and would play nice _if_ additional flags are added.  I'll send a patch for that.
+I don't see anything being done here "before VM-entry" or "after
+VM-exit." This code seems to be invoked on vcpu_load and vcpu_put.
 
-Regarding the consumer, there is no existing consumer per se.  SGX is simply
-dumping the bad address that prevented emulation (the only SGX emulation failure
-scenarios are bad/missing memslots/vmas).  The SGX case is very similar to
-nested VMX instruction emulation, where failure is either due to a bad userspace
-configuration (bad/missing memslot) or a busted L1 kernel (SGX instruction data
-operand points at emulated MMIO).  A bad userspace configuration is almost always
-going to be fatal, and I highly doubt any userspace VMM will bother emulating
-SGX+MMIO.  In other words, the info dumped by SGX is purely for debug.
-
-Which brings me back to adding another flag when dumping the exit reason.  Unless
-there is a concrete use case for programmatically taking action in reponse to
-failed emulation, e.g. attemping emulation in userspace using insn_bytes+insn_size,
-I think we should not add a flag and instead dump info for debug/triage purposes
-without committing to an ABI.  I.e. define the ABI such that KVM can dump
-arbitrary info in the unused portions of data[].
-
-Not having a true ABI will be a bit gross, but digging into these types of
-failures is going to be painful no matter what; having to deduce the format of
-the data is unlikely to shift the needle much.  And the code should be
-straightforward, especially for userspace, e.g. dump all of data[] if emulation
-in userspace failed.
+In any case, I don't see why this one MSR is special. It seems that if
+the host is using the architectural LBR MSRs, then *all* of the host
+architectural LBR MSRs have to be saved on vcpu_load and restored on
+vcpu_put. Shouldn't  kvm_load_guest_fpu() and kvm_put_guest_fpu() do
+that via the calls to kvm_save_current_fpu(vcpu->arch.user_fpu) and
+restore_fpregs_from_fpstate(&vcpu->arch.user_fpu->state)?
