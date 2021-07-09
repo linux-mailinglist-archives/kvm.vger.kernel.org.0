@@ -2,92 +2,133 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 39DFB3C27E4
-	for <lists+kvm@lfdr.de>; Fri,  9 Jul 2021 19:02:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 946253C2838
+	for <lists+kvm@lfdr.de>; Fri,  9 Jul 2021 19:21:59 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229603AbhGIREu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 9 Jul 2021 13:04:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38478 "EHLO
+        id S229651AbhGIRYl (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 9 Jul 2021 13:24:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43022 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229503AbhGIREt (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 9 Jul 2021 13:04:49 -0400
-Received: from mail-ot1-x32c.google.com (mail-ot1-x32c.google.com [IPv6:2607:f8b0:4864:20::32c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 59270C0613E5
-        for <kvm@vger.kernel.org>; Fri,  9 Jul 2021 10:02:06 -0700 (PDT)
-Received: by mail-ot1-x32c.google.com with SMTP id f12-20020a056830204cb029048bcf4c6bd9so10094364otp.8
-        for <kvm@vger.kernel.org>; Fri, 09 Jul 2021 10:02:06 -0700 (PDT)
+        with ESMTP id S229459AbhGIRYl (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 9 Jul 2021 13:24:41 -0400
+Received: from mail-pj1-x102b.google.com (mail-pj1-x102b.google.com [IPv6:2607:f8b0:4864:20::102b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A0879C0613E5
+        for <kvm@vger.kernel.org>; Fri,  9 Jul 2021 10:21:57 -0700 (PDT)
+Received: by mail-pj1-x102b.google.com with SMTP id g6-20020a17090adac6b029015d1a9a6f1aso7476335pjx.1
+        for <kvm@vger.kernel.org>; Fri, 09 Jul 2021 10:21:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=nh9/iNzoFNEIgyZu/Qlm8/4wVhFn8ycrPC1i/L8PYJw=;
-        b=RGwMWLLhK2+AOE285PRCDhZC45szeGyR65RdsTakJNvgutrQToMEUWI8Dm3aDg+70w
-         LwYctokSSTVcBSA1WxUQUx4sC4V5agmSmTt1qLBJ19YTTnGPz2Y0R3sNHvLiUHghh5hN
-         lXQKyUOZOYHhPqM+Vsa+RdEEvpf31gG4oXiFmeLyOkE+uMh9zXa4NfiDSo7DHduw6KB5
-         naqQMhlnb9Alsj6Dx9LTjNrza5ru58JzzIxjK9D0leJacXHWii+hv96Anger2Pehdfz4
-         qUbL0d5vgWRP4oBN+XF6vKrOZwsX7lMQgv5M7ofSUk58LVIRAPSVt83+olp6NbX3NgyL
-         rpGA==
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=Nc1RujRxUKzPX3Wrhc15+dX4Hbs3SpGgW4ZBkvgtlWw=;
+        b=vScavMm43CmPwbVKjYLaRrlJJBUpzt6Ad/5991OiMkMuKQlSiGQwiIYo4lHzl/QBJj
+         TLW0rjN4FYi8zqNuiRyY4xktnEabUQQzzkhPw6vQzFmwI1ncCEBwFysmjz6ZXwfBLk0D
+         CYBiXQMoGbRo0ye2XA7/7OWmS5svjqOKCkNPIbM25RX7FOrFG4QU72L1n1QI2RZrAo8A
+         Z+FKcZDIkQZZQWnr8VbFrj3loB8V4Hvvs5dbsCeMUFJ5oSnsW0FDbYJHyk/xYVWsj0tQ
+         +VNf7u4NJa8BTlJh0KclzgrLQNGwObZcVDyrht27TYXfsiImuv47RokCfemhaYoTtWOS
+         t9pg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=nh9/iNzoFNEIgyZu/Qlm8/4wVhFn8ycrPC1i/L8PYJw=;
-        b=ASkrcOcBxc8OgY9yM/6XKagQ/o2a8mbxxrWmjKEv0rkloWfsWebUZgRCE1TNl3Zoob
-         LRvO9HscGbOdvqVIHnuZdc2zY8pbppVRj3QHQemkdyhew/HGFMPFy9XA4E3hqgnr2hOI
-         akiccXAF2x0TLaVw7CmzEq5JLZKnsd96GcaWIg08fTlijPvb5MODti1Axipb9pDJG5LZ
-         7yTzqG8xvcsz6Lc029zlwIWav860uQ47TDTIa3QOQSje91nppsRoitManrN3zvtneLpQ
-         pf6lKzNLyaxpnWyn6eHierD5LUogDwH09JtEiH7dIQqf8qVTUIieUfxLpXTG7CzEj/70
-         01Aw==
-X-Gm-Message-State: AOAM532K3hYvATRF2j/XkFI21tDZfoevcX7MIKMe4L3k/hf6Z6gFma0i
-        RgV4RKQvsRTa7gyEjpITrqHtLyNH7y37gThKXWRz6g==
-X-Google-Smtp-Source: ABdhPJzwEnMHC1LMMeMjfcvzNaL2InBapCK+/72lVd2Enw+TfAGE6vJiniiuNb9kp6NKu3TkLfqWhH1VoYtQU6fu/68=
-X-Received: by 2002:a9d:550e:: with SMTP id l14mr30322349oth.241.1625850125274;
- Fri, 09 Jul 2021 10:02:05 -0700 (PDT)
-MIME-Version: 1.0
-References: <20210628172632.81029-1-jiangshanlai@gmail.com>
- <46e0aaf1-b7cd-288f-e4be-ac59aa04908f@redhat.com> <c79d0167-7034-ebe2-97b7-58354d81323d@linux.alibaba.com>
- <397a448e-ffa7-3bea-af86-e92fbb273a07@redhat.com> <a4e07fb1-1f36-1078-0695-ff4b72016d48@linux.alibaba.com>
- <01946b5a-9912-3dfb-36f0-031f425432d2@redhat.com> <CALMp9eQWnUM-O7VmMWTGE2C2YraWxM2K0QcOQnbkctkzg_1pUA@mail.gmail.com>
- <bac2de6d-ae6d-565d-38f2-0c46b06cee0f@redhat.com>
-In-Reply-To: <bac2de6d-ae6d-565d-38f2-0c46b06cee0f@redhat.com>
-From:   Jim Mattson <jmattson@google.com>
-Date:   Fri, 9 Jul 2021 10:01:54 -0700
-Message-ID: <CALMp9eRrPtidJOamfSnkHT-PnPRXZ7SXkw9JFW-Q38v0Q-ws5w@mail.gmail.com>
-Subject: Re: [PATCH] KVM: X86: Also reload the debug registers before
- kvm_x86->run() when the host is using them
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=Nc1RujRxUKzPX3Wrhc15+dX4Hbs3SpGgW4ZBkvgtlWw=;
+        b=SbrFc/h0sGUxJ9V4TOPpYNSMPB0DGSJ9LFo8LqZqh5YDxe3GSSb3H2DBwDJ2yRJXa6
+         SMKm7xL01WNYujaHpMVqi4Wyfl0/EvLG5MOqjT1H/GivkKDdMOjxwMYNd7hUG9JDBWcp
+         MTR+rdNR1bl+43a1vUCnPtS4GnZFeGt88ZTIHaoPDZEXPJbEYZZQAx1hFXjzIWMybKjr
+         MmJaaODsriuXxxBCqRj87kr0oGabZiPp7Q0/HDWMBE+lgJv6Nz2LjVnAQMDV0XlrnfC5
+         WXhYHkeQZdGTtK6tTYzXIKx3x84OfaYpjNwKLyYZXqKb8dV0Qzqx6EXdhRL3DjYjRscj
+         InOw==
+X-Gm-Message-State: AOAM530Cf6exQluaxI5J8jPCxY9z2f2nLk30JDkcFU7nRURNjMIqmtwg
+        vzuwtmDhRKi4fbu2pAgeMlfcKw==
+X-Google-Smtp-Source: ABdhPJzhykY6zt8ypwrURBbnuE9gwCHbkXLnj4Ko+JmUddPmGTfMZoWr75VP9CfeQGX0ZlXJ3PgRhA==
+X-Received: by 2002:a17:902:7488:b029:129:c9cd:67ec with SMTP id h8-20020a1709027488b0290129c9cd67ecmr11958540pll.58.1625851316960;
+        Fri, 09 Jul 2021 10:21:56 -0700 (PDT)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id d1sm6577298pfu.6.2021.07.09.10.21.56
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 09 Jul 2021 10:21:56 -0700 (PDT)
+Date:   Fri, 9 Jul 2021 17:21:52 +0000
+From:   Sean Christopherson <seanjc@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Lai Jiangshan <laijs@linux.alibaba.com>,
-        Lai Jiangshan <jiangshanlai@gmail.com>,
-        linux-kernel@vger.kernel.org,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
+Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
-        kvm@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] Revert "KVM: x86: WARN and reject loading KVM if NX is
+ supported but not enabled"
+Message-ID: <YOiFsB9vZgMcpJZu@google.com>
+References: <20210625001853.318148-1-seanjc@google.com>
+ <28ec9d07-756b-f546-dad1-0af751167838@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <28ec9d07-756b-f546-dad1-0af751167838@redhat.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Jul 9, 2021 at 9:59 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
->
-> On 09/07/21 18:35, Jim Mattson wrote:
-> >>>> Just what you said, it's not easy and the needs are limited.  I
-> >>>> implemented kvm_vcpu_check_breakpoint because I was interested in
-> >>>> using hardware breakpoints from gdb, even with unrestricted_guest=0
-> >>>> and invalid guest state, but that's it.
-> >>> It seems kvm_vcpu_check_breakpoint() handles only for code breakpoint
-> >>> and doesn't handle for data breakpoints.
-> >> Correct, there's a comment above the call.  But data breakpoint are much
-> >> harder and relatively less useful.
-> >
-> > Data breakpoints are actually quite useful. I/O breakpoints not so much.
->
-> Normally yes; much less for the specific case of debugging
-> invalid-guest-state or other invocations of the emulator.
+On Thu, Jul 08, 2021, Paolo Bonzini wrote:
+> On 25/06/21 02:18, Sean Christopherson wrote:
+> > Let KVM load if EFER.NX=0 even if NX is supported, the analysis and
+> > testing (or lack thereof) for the non-PAE host case was garbage.
+> > 
+> > If the kernel won't be using PAE paging, .Ldefault_entry in head_32.S
+> > skips over the entire EFER sequence.  Hopefully that can be changed in
+> > the future to allow KVM to require EFER.NX, but the motivation behind
+> > KVM's requirement isn't yet merged.  Reverting and revisiting the mess
+> > at a later date is by far the safest approach.
+> > 
+> > This reverts commit 8bbed95d2cb6e5de8a342d761a89b0a04faed7be.
+> > 
+> > Fixes: 8bbed95d2cb6 ("KVM: x86: WARN and reject loading KVM if NX is supported but not enabled")
+> > Signed-off-by: Sean Christopherson <seanjc@google.com>
+> > ---
+> > 
+> > Hopefully it's not too late to just drop the original patch...
+> > 
+> >   arch/x86/kvm/x86.c | 3 ---
+> >   1 file changed, 3 deletions(-)
+> > 
+> > diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> > index 4a597aafe637..1cc02a3685d0 100644
+> > --- a/arch/x86/kvm/x86.c
+> > +++ b/arch/x86/kvm/x86.c
+> > @@ -10981,9 +10981,6 @@ int kvm_arch_hardware_setup(void *opaque)
+> >   	int r;
+> >   	rdmsrl_safe(MSR_EFER, &host_efer);
+> > -	if (WARN_ON_ONCE(boot_cpu_has(X86_FEATURE_NX) &&
+> > -			 !(host_efer & EFER_NX)))
+> > -		return -EIO;
+> >   	if (boot_cpu_has(X86_FEATURE_XSAVES))
+> >   		rdmsrl(MSR_IA32_XSS, host_xss);
+> > 
+> 
+> So do we want this or "depends on X86_64 || X86_PAE"?
 
-Agreed. But if they don't actually work in-guest (because the emulator
-ignores them), then their normal usefulness is curtailed.
+Hmm, I'm leaning towards keeping !PAE support purely for testing the !PAE<->PAE
+MMU transitions for nested virtualization.  It's not much coverage, and the !PAE
+NPT horror is a much bigger testing gap (because KVM doesn't support it), but on
+the other hand setting EFER.NX for !PAE kernels appears to be trivial, e.g.
+
+diff --git a/arch/x86/kernel/head_32.S b/arch/x86/kernel/head_32.S
+index 67f590425d90..bfbea25a9fe8 100644
+--- a/arch/x86/kernel/head_32.S
++++ b/arch/x86/kernel/head_32.S
+@@ -214,12 +214,6 @@ SYM_FUNC_START(startup_32_smp)
+        andl $~1,%edx                   # Ignore CPUID.FPU
+        jz .Lenable_paging              # No flags or only CPUID.FPU = no CR4
+
+-       movl pa(mmu_cr4_features),%eax
+-       movl %eax,%cr4
+-
+-       testb $X86_CR4_PAE, %al         # check if PAE is enabled
+-       jz .Lenable_paging
+-
+        /* Check if extended functions are implemented */
+        movl $0x80000000, %eax
+        cpuid
+
+My only hesitation is the risk of somehow breaking ancient CPUs by falling into
+the NX path.  Maybe try forcing EFER.NX=1 for !PAE, and fall back to requiring
+PAE if that gets NAK'd or needs to be reverted for whatever reason?
