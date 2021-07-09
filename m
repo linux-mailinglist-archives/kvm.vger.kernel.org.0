@@ -2,69 +2,69 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0622D3C1D82
-	for <lists+kvm@lfdr.de>; Fri,  9 Jul 2021 04:29:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4CB143C1D86
+	for <lists+kvm@lfdr.de>; Fri,  9 Jul 2021 04:37:32 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230235AbhGICcd (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 8 Jul 2021 22:32:33 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:59895 "EHLO
+        id S230307AbhGICkK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 8 Jul 2021 22:40:10 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:21606 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230242AbhGICcc (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 8 Jul 2021 22:32:32 -0400
+        by vger.kernel.org with ESMTP id S230235AbhGICkK (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 8 Jul 2021 22:40:10 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1625797789;
+        s=mimecast20190719; t=1625798247;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=jC8ebqLDwty//t4KfVA7RFoJa+JDs1zz/7ayauIgC5s=;
-        b=T2dZn3qqtixeMaAy9fnk6V/vRgwfEGGCntCSTFc1K1+rluxWA88zsW5MNUwXvo873ngYDt
-        gS0HKuAT9OkYe0WkeuGmdTLlGLnspsI09t8SH3iO7kaRjEUYkAEtNcEzTltSpxaO52l8Sd
-        WvSAT1RQ9bXXbRoO4rh1mWW0eWs0jtI=
-Received: from mail-pg1-f197.google.com (mail-pg1-f197.google.com
- [209.85.215.197]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-304-gmMOhLSCPKqz9C4cGMJjpQ-1; Thu, 08 Jul 2021 22:29:48 -0400
-X-MC-Unique: gmMOhLSCPKqz9C4cGMJjpQ-1
-Received: by mail-pg1-f197.google.com with SMTP id o15-20020a655bcf0000b029022c1a9c33b7so5941509pgr.18
-        for <kvm@vger.kernel.org>; Thu, 08 Jul 2021 19:29:48 -0700 (PDT)
+        bh=+J9Lnw5DVtWJKPf6tEyqz5oiUm5AxvYYKjyiKxoR3zk=;
+        b=GdHYV2/IAv7l07x2Q1POMZDx+HNp7v/1mgT7JOi4hEAultOeqiwG5/eK/a5Q8049IGHxuo
+        ubtVO+R3vfadsIGrPot03sfkR/XEDzbUjO8bqO8ig8vBqe7fcGXx3xtoow9mcy84qvu2fj
+        Ryi1G/FxQb21d8/uFb0fvGTAVvQ3ONw=
+Received: from mail-pg1-f200.google.com (mail-pg1-f200.google.com
+ [209.85.215.200]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-542-AEo-QzhWMk-kfMGeJVZ_rg-1; Thu, 08 Jul 2021 22:37:26 -0400
+X-MC-Unique: AEo-QzhWMk-kfMGeJVZ_rg-1
+Received: by mail-pg1-f200.google.com with SMTP id j17-20020a63cf110000b0290226eb0c27acso6051019pgg.23
+        for <kvm@vger.kernel.org>; Thu, 08 Jul 2021 19:37:26 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-transfer-encoding
          :content-language;
-        bh=jC8ebqLDwty//t4KfVA7RFoJa+JDs1zz/7ayauIgC5s=;
-        b=sa77lgT7mVMsXqp5LAdd36pmMGzeopCykzJoYHHGQgasYVwoYRzE4ywwQXv9oQXCo1
-         3nSE7Ks3qf5lvauAs5t5yUA3oCd/HPvTNzG2kxqCBQyBIhl/0nnKFM1Uia9yHQ1KaI+2
-         TI6mzQbu89dhtBSbqZ5BCTLk6eX5vSr1D4SdNYt8YTIcPZ1XrA1aP8zewtXOGYf9lqzw
-         GXWc8wt54aTx3tmJLmeyk2+d4iaNo5419faDGIWV2YXHg8ksCTC6vshG2h1Po1B9U+OB
-         NRvSm/av4PvTzK9P4XFCDI4+O3UolEaSU2nMFTQUGjHoqTeI72qgzpFsQ8gSDJ08iz5/
-         ii4w==
-X-Gm-Message-State: AOAM531ozBS4XBWfNi4cCYGPr8tNVDHqmDPufRkUSmx3VMumtIlRHTN4
-        jHle5GfeM8kGOOFd8vaCiuXQI+ucY/l87794OQk6ocLoxSmUyL06oCDJb1hSmRntIX32Dnz3TFZ
-        h9xUD+54C0v7910D1osQ7jYsT6+J0d9hZE6p0C7prvh4+RHyJaxxGQm9YTyqa33Lm
-X-Received: by 2002:a62:1708:0:b029:31b:113f:174a with SMTP id 8-20020a6217080000b029031b113f174amr30557499pfx.68.1625797787008;
-        Thu, 08 Jul 2021 19:29:47 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzcSNDEpisA7AaUQv65sNC7SSxSvR5Hd5rr7dX1Ad3A6kno6Tgb6OvZoPwEHv5RC/WjWhzHRg==
-X-Received: by 2002:a62:1708:0:b029:31b:113f:174a with SMTP id 8-20020a6217080000b029031b113f174amr30557471pfx.68.1625797786688;
-        Thu, 08 Jul 2021 19:29:46 -0700 (PDT)
+        bh=+J9Lnw5DVtWJKPf6tEyqz5oiUm5AxvYYKjyiKxoR3zk=;
+        b=SR3sybSnp6V/Ej8YYe4wy7kdg95yfTFMoafC9KH2YkzuX/RVuHpxuJUWyuHUMAwZXw
+         HaFzxNttqdS36H/u6ua0Ocvkua7a95CYdIrUHCJmfugnohMZUT48V0riYnM9wI5sUgMs
+         XApmiZ7LLgsOUQshRhIblBQ59IPFGxHK5ykPMpdu7I6qrjplixHITy4P4CaC1C0wtEty
+         Kd8rdeoOM5jXYSRV0eUwotRr8+fdRijn7XlmRn5YBH1w5HLq68KuYfXAwRdEr0WefIkD
+         p+4zdXK4hxaossoBiK2ZDIM6vogx3VGtM+IQDwzDhhqupplg6x0ZRZb0P17S/I8putky
+         Z3Mw==
+X-Gm-Message-State: AOAM5320++VYd8YktHe444dGDOcvlR7uOOHZgzWSoNW2g+E+rXsIFq26
+        +QfQRUr7szbiDkoTacAjZJHXpc43wURawsRxYhBMQXZx3Qv6ePjkNuG5qiUGsAxrnuZ0QWB4UJA
+        tvNST8CrX+b0rjUCOuApvKcCL1iT9rofHz58JQKtHgwnOV6x0A4hpL75YKmdw0Oje
+X-Received: by 2002:a65:5b0f:: with SMTP id y15mr35436079pgq.263.1625798244893;
+        Thu, 08 Jul 2021 19:37:24 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwW1VzzGMbGReLBmXJmIGxaq1O7VrIc2ROGTJpNodFzrGiyhKCxtsCzrfwEi9MUAlff62XWmg==
+X-Received: by 2002:a65:5b0f:: with SMTP id y15mr35436050pgq.263.1625798244629;
+        Thu, 08 Jul 2021 19:37:24 -0700 (PDT)
 Received: from wangxiaodeMacBook-Air.local ([209.132.188.80])
-        by smtp.gmail.com with ESMTPSA id v6sm4947769pgk.33.2021.07.08.19.29.43
+        by smtp.gmail.com with ESMTPSA id lb13sm10506564pjb.5.2021.07.08.19.37.22
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 08 Jul 2021 19:29:46 -0700 (PDT)
-Subject: Re: [PATCH V3 1/2] vDPA/ifcvf: introduce get_dev_type() which returns
- virtio dev id
+        Thu, 08 Jul 2021 19:37:24 -0700 (PDT)
+Subject: Re: [PATCH V3 2/2] vDPA/ifcvf: implement management netlink framework
+ for ifcvf
 To:     Zhu Lingshan <lingshan.zhu@intel.com>, mst@redhat.com
 Cc:     virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
         kvm@vger.kernel.org
 References: <20210706023649.23360-1-lingshan.zhu@intel.com>
- <20210706023649.23360-2-lingshan.zhu@intel.com>
+ <20210706023649.23360-3-lingshan.zhu@intel.com>
 From:   Jason Wang <jasowang@redhat.com>
-Message-ID: <abe284e0-7f0a-2cca-04ad-ef69fa1cc1d7@redhat.com>
-Date:   Fri, 9 Jul 2021 10:29:38 +0800
+Message-ID: <d965cd00-387e-3610-6c9c-50f99574438e@redhat.com>
+Date:   Fri, 9 Jul 2021 10:37:17 +0800
 User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0)
  Gecko/20100101 Thunderbird/78.11.0
 MIME-Version: 1.0
-In-Reply-To: <20210706023649.23360-2-lingshan.zhu@intel.com>
+In-Reply-To: <20210706023649.23360-3-lingshan.zhu@intel.com>
 Content-Type: text/plain; charset=gbk; format=flowed
 Content-Transfer-Encoding: 8bit
 Content-Language: en-US
@@ -74,8 +74,24 @@ X-Mailing-List: kvm@vger.kernel.org
 
 
 ÔÚ 2021/7/6 ÉÏÎç10:36, Zhu Lingshan Ð´µÀ:
-> This commit introduces a new function get_dev_type() which returns
-> the virtio device id of a device, to avoid duplicated code.
+> This commit implements the management netlink framework for ifcvf,
+> including register and add / remove a device
+>
+> It works with iproute2:
+> [root@localhost lszhu]# vdpa mgmtdev show -jp
+> {
+>      "mgmtdev": {
+>          "pci/0000:01:00.5": {
+>              "supported_classes": [ "net" ]
+>          },
+>          "pci/0000:01:00.6": {
+>              "supported_classes": [ "net" ]
+>          }
+>      }
+> }
+>
+> [root@localhost lszhu]# vdpa dev add mgmtdev pci/0000:01:00.5 name vdpa0
+> [root@localhost lszhu]# vdpa dev add mgmtdev pci/0000:01:00.6 name vdpa1
 >
 > Signed-off-by: Zhu Lingshan <lingshan.zhu@intel.com>
 
@@ -84,59 +100,233 @@ Acked-by: Jason Wang <jasowang@redhat.com>
 
 
 > ---
->   drivers/vdpa/ifcvf/ifcvf_main.c | 34 ++++++++++++++++++++-------------
->   1 file changed, 21 insertions(+), 13 deletions(-)
+>   drivers/vdpa/ifcvf/ifcvf_base.h |   6 ++
+>   drivers/vdpa/ifcvf/ifcvf_main.c | 154 ++++++++++++++++++++++++--------
+>   2 files changed, 124 insertions(+), 36 deletions(-)
 >
+> diff --git a/drivers/vdpa/ifcvf/ifcvf_base.h b/drivers/vdpa/ifcvf/ifcvf_base.h
+> index ded1b1b5fb13..e5251fcbb200 100644
+> --- a/drivers/vdpa/ifcvf/ifcvf_base.h
+> +++ b/drivers/vdpa/ifcvf/ifcvf_base.h
+> @@ -104,6 +104,12 @@ struct ifcvf_lm_cfg {
+>   	struct ifcvf_vring_lm_cfg vring_lm_cfg[IFCVF_MAX_QUEUE_PAIRS];
+>   };
+>   
+> +struct ifcvf_vdpa_mgmt_dev {
+> +	struct vdpa_mgmt_dev mdev;
+> +	struct ifcvf_adapter *adapter;
+> +	struct pci_dev *pdev;
+> +};
+> +
+>   int ifcvf_init_hw(struct ifcvf_hw *hw, struct pci_dev *dev);
+>   int ifcvf_start_hw(struct ifcvf_hw *hw);
+>   void ifcvf_stop_hw(struct ifcvf_hw *hw);
 > diff --git a/drivers/vdpa/ifcvf/ifcvf_main.c b/drivers/vdpa/ifcvf/ifcvf_main.c
-> index bc1d59f316d1..5f70ab1283a0 100644
+> index 5f70ab1283a0..c72d9b36e4a0 100644
 > --- a/drivers/vdpa/ifcvf/ifcvf_main.c
 > +++ b/drivers/vdpa/ifcvf/ifcvf_main.c
-> @@ -442,6 +442,26 @@ static const struct vdpa_config_ops ifc_vdpa_ops = {
+> @@ -218,7 +218,7 @@ static void ifcvf_vdpa_set_status(struct vdpa_device *vdpa_dev, u8 status)
+>   	int ret;
+>   
+>   	vf  = vdpa_to_vf(vdpa_dev);
+> -	adapter = dev_get_drvdata(vdpa_dev->dev.parent);
+> +	adapter = vdpa_to_adapter(vdpa_dev);
+>   	status_old = ifcvf_get_status(vf);
+>   
+>   	if (status_old == status)
+> @@ -442,6 +442,16 @@ static const struct vdpa_config_ops ifc_vdpa_ops = {
 >   	.set_config_cb  = ifcvf_vdpa_set_config_cb,
 >   };
 >   
-> +static u32 get_dev_type(struct pci_dev *pdev)
-> +{
-> +	u32 dev_type;
+> +static struct virtio_device_id id_table_net[] = {
+> +	{VIRTIO_ID_NET, VIRTIO_DEV_ANY_ID},
+> +	{0},
+> +};
 > +
-> +	/* This drirver drives both modern virtio devices and transitional
-> +	 * devices in modern mode.
-> +	 * vDPA requires feature bit VIRTIO_F_ACCESS_PLATFORM,
-> +	 * so legacy devices and transitional devices in legacy
-> +	 * mode will not work for vDPA, this driver will not
-> +	 * drive devices with legacy interface.
-> +	 */
+> +static struct virtio_device_id id_table_blk[] = {
+> +	{VIRTIO_ID_BLOCK, VIRTIO_DEV_ANY_ID},
+> +	{0},
+> +};
 > +
-> +	if (pdev->device < 0x1040)
-> +		dev_type =  pdev->subsystem_device;
-> +	else
-> +		dev_type =  pdev->device - 0x1040;
-> +
-> +	return dev_type;
-> +}
-> +
->   static int ifcvf_probe(struct pci_dev *pdev, const struct pci_device_id *id)
+>   static u32 get_dev_type(struct pci_dev *pdev)
 >   {
->   	struct device *dev = &pdev->dev;
-> @@ -486,19 +506,7 @@ static int ifcvf_probe(struct pci_dev *pdev, const struct pci_device_id *id)
->   	pci_set_drvdata(pdev, adapter);
+>   	u32 dev_type;
+> @@ -462,48 +472,30 @@ static u32 get_dev_type(struct pci_dev *pdev)
+>   	return dev_type;
+>   }
+>   
+> -static int ifcvf_probe(struct pci_dev *pdev, const struct pci_device_id *id)
+> +static int ifcvf_vdpa_dev_add(struct vdpa_mgmt_dev *mdev, const char *name)
+>   {
+> -	struct device *dev = &pdev->dev;
+> +	struct ifcvf_vdpa_mgmt_dev *ifcvf_mgmt_dev;
+>   	struct ifcvf_adapter *adapter;
+> +	struct pci_dev *pdev;
+>   	struct ifcvf_hw *vf;
+> +	struct device *dev;
+>   	int ret, i;
+>   
+> -	ret = pcim_enable_device(pdev);
+> -	if (ret) {
+> -		IFCVF_ERR(pdev, "Failed to enable device\n");
+> -		return ret;
+> -	}
+> -
+> -	ret = pcim_iomap_regions(pdev, BIT(0) | BIT(2) | BIT(4),
+> -				 IFCVF_DRIVER_NAME);
+> -	if (ret) {
+> -		IFCVF_ERR(pdev, "Failed to request MMIO region\n");
+> -		return ret;
+> -	}
+> -
+> -	ret = dma_set_mask_and_coherent(dev, DMA_BIT_MASK(64));
+> -	if (ret) {
+> -		IFCVF_ERR(pdev, "No usable DMA configuration\n");
+> -		return ret;
+> -	}
+> -
+> -	ret = devm_add_action_or_reset(dev, ifcvf_free_irq_vectors, pdev);
+> -	if (ret) {
+> -		IFCVF_ERR(pdev,
+> -			  "Failed for adding devres for freeing irq vectors\n");
+> -		return ret;
+> -	}
+> +	ifcvf_mgmt_dev = container_of(mdev, struct ifcvf_vdpa_mgmt_dev, mdev);
+> +	if (ifcvf_mgmt_dev->adapter)
+> +		return -EOPNOTSUPP;
+>   
+> +	pdev = ifcvf_mgmt_dev->pdev;
+> +	dev = &pdev->dev;
+>   	adapter = vdpa_alloc_device(struct ifcvf_adapter, vdpa,
+> -				    dev, &ifc_vdpa_ops, NULL);
+> -	if (adapter == NULL) {
+> +				    dev, &ifc_vdpa_ops, name);
+> +	if (!adapter) {
+>   		IFCVF_ERR(pdev, "Failed to allocate vDPA structure");
+>   		return -ENOMEM;
+>   	}
+>   
+> -	pci_set_master(pdev);
+> -	pci_set_drvdata(pdev, adapter);
+> +	ifcvf_mgmt_dev->adapter = adapter;
+> +	pci_set_drvdata(pdev, ifcvf_mgmt_dev);
 >   
 >   	vf = &adapter->vf;
-> -
-> -	/* This drirver drives both modern virtio devices and transitional
-> -	 * devices in modern mode.
-> -	 * vDPA requires feature bit VIRTIO_F_ACCESS_PLATFORM,
-> -	 * so legacy devices and transitional devices in legacy
-> -	 * mode will not work for vDPA, this driver will not
-> -	 * drive devices with legacy interface.
-> -	 */
-> -	if (pdev->device < 0x1040)
-> -		vf->dev_type =  pdev->subsystem_device;
-> -	else
-> -		vf->dev_type =  pdev->device - 0x1040;
-> -
-> +	vf->dev_type = get_dev_type(pdev);
->   	vf->base = pcim_iomap_table(pdev);
+>   	vf->dev_type = get_dev_type(pdev);
+> @@ -523,9 +515,10 @@ static int ifcvf_probe(struct pci_dev *pdev, const struct pci_device_id *id)
 >   
->   	adapter->pdev = pdev;
+>   	vf->hw_features = ifcvf_get_hw_features(vf);
+>   
+> -	ret = vdpa_register_device(&adapter->vdpa, IFCVF_MAX_QUEUE_PAIRS * 2);
+> +	adapter->vdpa.mdev = &ifcvf_mgmt_dev->mdev;
+> +	ret = _vdpa_register_device(&adapter->vdpa, IFCVF_MAX_QUEUE_PAIRS * 2);
+>   	if (ret) {
+> -		IFCVF_ERR(pdev, "Failed to register ifcvf to vdpa bus");
+> +		IFCVF_ERR(pdev, "Failed to register to vDPA bus");
+>   		goto err;
+>   	}
+>   
+> @@ -536,11 +529,100 @@ static int ifcvf_probe(struct pci_dev *pdev, const struct pci_device_id *id)
+>   	return ret;
+>   }
+>   
+> +static void ifcvf_vdpa_dev_del(struct vdpa_mgmt_dev *mdev, struct vdpa_device *dev)
+> +{
+> +	struct ifcvf_vdpa_mgmt_dev *ifcvf_mgmt_dev;
+> +
+> +	ifcvf_mgmt_dev = container_of(mdev, struct ifcvf_vdpa_mgmt_dev, mdev);
+> +	_vdpa_unregister_device(dev);
+> +	ifcvf_mgmt_dev->adapter = NULL;
+> +}
+> +
+> +static const struct vdpa_mgmtdev_ops ifcvf_vdpa_mgmt_dev_ops = {
+> +	.dev_add = ifcvf_vdpa_dev_add,
+> +	.dev_del = ifcvf_vdpa_dev_del
+> +};
+> +
+> +static int ifcvf_probe(struct pci_dev *pdev, const struct pci_device_id *id)
+> +{
+> +	struct ifcvf_vdpa_mgmt_dev *ifcvf_mgmt_dev;
+> +	struct device *dev = &pdev->dev;
+> +	u32 dev_type;
+> +	int ret;
+> +
+> +	ifcvf_mgmt_dev = kzalloc(sizeof(struct ifcvf_vdpa_mgmt_dev), GFP_KERNEL);
+> +	if (!ifcvf_mgmt_dev) {
+> +		IFCVF_ERR(pdev, "Failed to alloc memory for the vDPA management device\n");
+> +		return -ENOMEM;
+> +	}
+> +
+> +	dev_type = get_dev_type(pdev);
+> +	switch (dev_type) {
+> +	case VIRTIO_ID_NET:
+> +		ifcvf_mgmt_dev->mdev.id_table = id_table_net;
+> +		break;
+> +	case VIRTIO_ID_BLOCK:
+> +		ifcvf_mgmt_dev->mdev.id_table = id_table_blk;
+> +		break;
+> +	default:
+> +		IFCVF_ERR(pdev, "VIRTIO ID %u not supported\n", dev_type);
+> +		ret = -EOPNOTSUPP;
+> +		goto err;
+> +	}
+> +
+> +	ifcvf_mgmt_dev->mdev.ops = &ifcvf_vdpa_mgmt_dev_ops;
+> +	ifcvf_mgmt_dev->mdev.device = dev;
+> +	ifcvf_mgmt_dev->pdev = pdev;
+> +
+> +	ret = pcim_enable_device(pdev);
+> +	if (ret) {
+> +		IFCVF_ERR(pdev, "Failed to enable device\n");
+> +		goto err;
+> +	}
+> +
+> +	ret = pcim_iomap_regions(pdev, BIT(0) | BIT(2) | BIT(4),
+> +				 IFCVF_DRIVER_NAME);
+> +	if (ret) {
+> +		IFCVF_ERR(pdev, "Failed to request MMIO region\n");
+> +		goto err;
+> +	}
+> +
+> +	ret = dma_set_mask_and_coherent(dev, DMA_BIT_MASK(64));
+> +	if (ret) {
+> +		IFCVF_ERR(pdev, "No usable DMA configuration\n");
+> +		goto err;
+> +	}
+> +
+> +	ret = devm_add_action_or_reset(dev, ifcvf_free_irq_vectors, pdev);
+> +	if (ret) {
+> +		IFCVF_ERR(pdev,
+> +			  "Failed for adding devres for freeing irq vectors\n");
+> +		goto err;
+> +	}
+> +
+> +	pci_set_master(pdev);
+> +
+> +	ret = vdpa_mgmtdev_register(&ifcvf_mgmt_dev->mdev);
+> +	if (ret) {
+> +		IFCVF_ERR(pdev,
+> +			  "Failed to initialize the management interfaces\n");
+> +		goto err;
+> +	}
+> +
+> +	return 0;
+> +
+> +err:
+> +	kfree(ifcvf_mgmt_dev);
+> +	return ret;
+> +}
+> +
+>   static void ifcvf_remove(struct pci_dev *pdev)
+>   {
+> -	struct ifcvf_adapter *adapter = pci_get_drvdata(pdev);
+> +	struct ifcvf_vdpa_mgmt_dev *ifcvf_mgmt_dev;
+>   
+> -	vdpa_unregister_device(&adapter->vdpa);
+> +	ifcvf_mgmt_dev = pci_get_drvdata(pdev);
+> +	vdpa_mgmtdev_unregister(&ifcvf_mgmt_dev->mdev);
+> +	kfree(ifcvf_mgmt_dev);
+>   }
+>   
+>   static struct pci_device_id ifcvf_pci_ids[] = {
 
