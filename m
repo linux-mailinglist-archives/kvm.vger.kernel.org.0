@@ -2,135 +2,112 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8349E3C270E
-	for <lists+kvm@lfdr.de>; Fri,  9 Jul 2021 17:47:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9F4263C2715
+	for <lists+kvm@lfdr.de>; Fri,  9 Jul 2021 17:52:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232443AbhGIPt6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 9 Jul 2021 11:49:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49862 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232269AbhGIPt5 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 9 Jul 2021 11:49:57 -0400
-Received: from mail-pj1-x1033.google.com (mail-pj1-x1033.google.com [IPv6:2607:f8b0:4864:20::1033])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D5198C0613DD
-        for <kvm@vger.kernel.org>; Fri,  9 Jul 2021 08:47:12 -0700 (PDT)
-Received: by mail-pj1-x1033.google.com with SMTP id g24so5969026pji.4
-        for <kvm@vger.kernel.org>; Fri, 09 Jul 2021 08:47:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=aWRV/nM5DEWXiCQSe/62S8V1L20wuubZeFimG8/S0eY=;
-        b=ouHw5uK7Qig/cJRudMZNkpgkYuA3HP9yCXWPjJzIgGCv78msj3WCGK78eFhNe1d0e8
-         fkLIrgIHCDigJwKsDF/BMlAQcWr4Fu590jCX6/sL8ngrHygaWLCW/xvlQdJLl2Jr5CRH
-         NRFrdtbYv645uAYeXH8hOusnvJ7Nt8xqoF7nSHhNL0FUsgr8bLQaCe49/3NZSeJ32XA0
-         TnjS5D05oZM4FEfXtTvch9VGkp08ee6PWlaEC0BxTXJ3LjTGrbz5LSv2GU6GbswPkyqp
-         m/uFPsHZWYDo7yLMWLq5nOEH9mCKR+UNxTORFVkKrRFciL9NgD5KCPTfrpFCXee8L4O7
-         QRzA==
+        id S232351AbhGIPy6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 9 Jul 2021 11:54:58 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:26975 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S231976AbhGIPy5 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 9 Jul 2021 11:54:57 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1625845933;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=1VK85CjDgO7q1lh2C8SeovkJ7Y5QqbUrbsSNOKI14K4=;
+        b=L+9i85MpAowxXjkB72UeqrS2wFUGTGLwIfuPahefUjda+E1pUZKnmo8lwUFhkr68W/bR+j
+        zt8F1RVBxSmHjM9qAjo6FeLOoZPcYX2cCInLhSIvWe9R+/j/t46EKqLpc0ygqzxOy6txIR
+        6cFortZbUcDauZRca/S3jXaBnVA5Qvs=
+Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
+ [209.85.218.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-504-572CXI_UOSuRj3rJX5OYgA-1; Fri, 09 Jul 2021 11:52:12 -0400
+X-MC-Unique: 572CXI_UOSuRj3rJX5OYgA-1
+Received: by mail-ej1-f72.google.com with SMTP id h14-20020a1709070b0eb02904d7c421e00bso3328542ejl.2
+        for <kvm@vger.kernel.org>; Fri, 09 Jul 2021 08:52:12 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=aWRV/nM5DEWXiCQSe/62S8V1L20wuubZeFimG8/S0eY=;
-        b=Tna0ww/N1sddcdnA0I8jWD8UzRDIVB8BuT0e7HlfRdSAHMucGOYmSs8zHEC7Ojk8U8
-         uIRwLE2ojIfj4AF0jQbT+VrGb0uP3x0+yBKqpquArT4ZgRNVaA7s/tjPj/oM7ts1Yy1y
-         +cyrMA3noLKZPGMne1O82/mAVrI7GR+O2WmqhKnJaZHgvuXL+cxaMvGmAnkATEvHQ2+m
-         /Wdds/PTOSEHRNg2WCdJ/vdgRrosRmn/FWsDKkePCgi8fG2uWOfzuS5E4PwfHyF2n5jK
-         fPvbMlCADL1gTh+BKu39o9FbeJTTWpATae8D9w39ekTIpbBVjhEe3L1vhkyz5Yr0PI/N
-         gL1g==
-X-Gm-Message-State: AOAM53253YoJ6ESnTUO6C8W+/10B0upW/DThA/BEbP5cRaFmGMHvmALo
-        I0nARrYIdAV7E0s97DYfYuFm/w==
-X-Google-Smtp-Source: ABdhPJxSzgUbe56dtC+lLbeqw5dBgJD5rlSaxgGt55Qv1he1TgNACLH1yFF2FnfBKrT+NjOSvXks/w==
-X-Received: by 2002:a17:90a:de8b:: with SMTP id n11mr38743076pjv.11.1625845632179;
-        Fri, 09 Jul 2021 08:47:12 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id p24sm7495391pgl.68.2021.07.09.08.47.11
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 09 Jul 2021 08:47:11 -0700 (PDT)
-Date:   Fri, 9 Jul 2021 15:47:08 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     David Edmondson <david.edmondson@oracle.com>
-Cc:     linux-kernel@vger.kernel.org, Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Borislav Petkov <bp@alien8.de>,
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=1VK85CjDgO7q1lh2C8SeovkJ7Y5QqbUrbsSNOKI14K4=;
+        b=o5h94+P6p5mrVUQ/r4j3wlyUMFf1ycGmtNl3P2YFgpo7ohLePtqOQQlh17YlnbkA7Z
+         bhSA9EupyzNghasn1rkV3Vj2W72AaiHxf2JSeMfT8A1/r5+46j+vPkTRe4KnNsScK4Z2
+         FBJICaHBTcPW86oe2ey6XswLQxSHfK+p7xSs50FxrkIRTw8f1iWK0uKulNj52XFhRDks
+         3ugrMIwp0FkWzIOuimFqAnypMKKOFB65H6aqGpMYO3y9csvKknk9FCao+5q+ywPyIWkr
+         DcBzFDL8b6+c27Si8fsBWclJjJ0NMl7m8YsgRfIpcalCsM6ZVXWmsm3mFYH6E9sgCSRi
+         LOmQ==
+X-Gm-Message-State: AOAM533c7tG72mOeEWuc6/Ckd2GrbpzpJThR/Pk1Dr7l+bwKPU/j+5g/
+        3Llo45CxqWq2EHDaXlZ6l0T+JlzLfVXT7OQAVM9KA26HWHnF08cdUMgcfKRK6VgOqwcV5+6otOU
+        vgsybkx3oq+I4q83m6j91YmGaJyHZY342UVvBzt/WGbTDnnwNbb8mDyp+WzepERXz
+X-Received: by 2002:a17:906:5d05:: with SMTP id g5mr36851539ejt.201.1625845931326;
+        Fri, 09 Jul 2021 08:52:11 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyoktX1Vnw/+FIXOZZuYI62Nh9l9V615NMqOPA3F2cp8ApW8p32uWSHT+X6K94dBjQ12SP5oA==
+X-Received: by 2002:a17:906:5d05:: with SMTP id g5mr36851517ejt.201.1625845931147;
+        Fri, 09 Jul 2021 08:52:11 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+        by smtp.gmail.com with ESMTPSA id x1sm3060934edd.25.2021.07.09.08.52.09
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 09 Jul 2021 08:52:10 -0700 (PDT)
+Subject: Re: [PATCH] KVM: X86: Also reload the debug registers before
+ kvm_x86->run() when the host is using them
+To:     Lai Jiangshan <laijs@linux.alibaba.com>,
+        Lai Jiangshan <jiangshanlai@gmail.com>,
+        linux-kernel@vger.kernel.org
+Cc:     Sean Christopherson <seanjc@google.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        David Matlack <dmatlack@google.com>,
-        Thomas Gleixner <tglx@linutronix.de>, x86@kernel.org,
-        Ingo Molnar <mingo@redhat.com>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Joao Martins <joao.m.martins@oracle.com>
-Subject: Re: [PATCH v2 2/2] KVM: x86: On emulation failure, convey the exit
- reason to userspace
-Message-ID: <YOhvfDfqypLCRZuO@google.com>
-References: <20210706101207.2993686-1-david.edmondson@oracle.com>
- <20210706101207.2993686-3-david.edmondson@oracle.com>
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
+        kvm@vger.kernel.org
+References: <20210628172632.81029-1-jiangshanlai@gmail.com>
+ <46e0aaf1-b7cd-288f-e4be-ac59aa04908f@redhat.com>
+ <c79d0167-7034-ebe2-97b7-58354d81323d@linux.alibaba.com>
+ <397a448e-ffa7-3bea-af86-e92fbb273a07@redhat.com>
+ <a4e07fb1-1f36-1078-0695-ff4b72016d48@linux.alibaba.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <01946b5a-9912-3dfb-36f0-031f425432d2@redhat.com>
+Date:   Fri, 9 Jul 2021 17:52:09 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.11.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210706101207.2993686-3-david.edmondson@oracle.com>
+In-Reply-To: <a4e07fb1-1f36-1078-0695-ff4b72016d48@linux.alibaba.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jul 06, 2021, David Edmondson wrote:
-> Should instruction emulation fail, include the VM exit reason in the
-> emulation_failure data passed to userspace, in order that the VMM can
-> report it as a debugging aid when describing the failure.
-
-...
-
-> @@ -7473,7 +7474,14 @@ static void prepare_emulation_failure_exit(struct kvm_vcpu *vcpu)
->  		memcpy(run->emulation_failure.insn_bytes,
->  		       ctxt->fetch.data, insn_size);
->  	}
-> +
-> +	run->emulation_failure.ndata = 4;
-> +	run->emulation_failure.flags |=
-> +		KVM_INTERNAL_ERROR_EMULATION_FLAG_EXIT_REASON;
-> +	run->emulation_failure.exit_reason =
-> +		static_call(kvm_x86_get_exit_reason)(vcpu);
->  }
-
-...
-
-> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-> index d9e4aabcb31a..863195371272 100644
-> --- a/include/uapi/linux/kvm.h
-> +++ b/include/uapi/linux/kvm.h
-> @@ -282,6 +282,7 @@ struct kvm_xen_exit {
->  
->  /* Flags that describe what fields in emulation_failure hold valid data. */
->  #define KVM_INTERNAL_ERROR_EMULATION_FLAG_INSTRUCTION_BYTES (1ULL << 0)
-> +#define KVM_INTERNAL_ERROR_EMULATION_FLAG_EXIT_REASON       (1ULL << 1)
->  
->  /* for KVM_RUN, returned by mmap(vcpu_fd, offset=0) */
->  struct kvm_run {
-> @@ -404,6 +405,12 @@ struct kvm_run {
->  			__u64 flags;
->  			__u8  insn_size;
->  			__u8  insn_bytes[15];
-> +			/*
-> +			 * The "exit reason" extracted from the
-> +			 * VMCS/VMCB that was the cause of attempted
-> +			 * emulation.
-> +			 */
-> +			__u64 exit_reason;
-
-Rather than providing just the exit reason and adding another kvm_x86_ops hook,
-I would prefer to extend kvm_x86_get_exit_info() to also provide the exit reason
-and use that.  E.g. on VMX, all exceptions funnel through a single exit reason.
-Dumping exit_info_{1,2} and error_code in addition to intr_info might not be all
-that useful, but I can't see in harm either, and more info is generally a good
-thing.
-
-The only other user of kvm_x86_get_exit_info() is for tracepoints, those could
-be modified to not pass in the exit reason.
-
->  		} emulation_failure;
->  		/* KVM_EXIT_OSI */
->  		struct {
-> -- 
-> 2.30.2
+On 09/07/21 12:05, Lai Jiangshan wrote:
 > 
+> 
+> On 2021/7/9 17:49, Paolo Bonzini wrote:
+>> On 09/07/21 05:09, Lai Jiangshan wrote:
+>>> I just noticed that emulation.c fails to emulate with DBn.
+>>> Is there any problem around it?
+>>
+>> Just what you said, it's not easy and the needs are limited.  I 
+>> implemented kvm_vcpu_check_breakpoint because I was interested in 
+>> using hardware breakpoints from gdb, even with unrestricted_guest=0 
+>> and invalid guest state, but that's it.
+> 
+> It seems kvm_vcpu_check_breakpoint() handles only for code breakpoint
+> and doesn't handle for data breakpoints.
+
+Correct, there's a comment above the call.  But data breakpoint are much 
+harder and relatively less useful.
+
+> And no code handles DR7_GD bit when the emulation is not resulted from
+> vm-exit. (for example, the non-first instruction when kvm emulates
+> instructions back to back and the instruction accesses to DBn).
+
+Good point, that should be fixed too.
+
+Paolo
+
