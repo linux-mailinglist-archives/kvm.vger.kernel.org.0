@@ -2,331 +2,107 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4CB143C1D86
-	for <lists+kvm@lfdr.de>; Fri,  9 Jul 2021 04:37:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5E1C53C1DBA
+	for <lists+kvm@lfdr.de>; Fri,  9 Jul 2021 05:09:46 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230307AbhGICkK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 8 Jul 2021 22:40:10 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:21606 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230235AbhGICkK (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 8 Jul 2021 22:40:10 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1625798247;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=+J9Lnw5DVtWJKPf6tEyqz5oiUm5AxvYYKjyiKxoR3zk=;
-        b=GdHYV2/IAv7l07x2Q1POMZDx+HNp7v/1mgT7JOi4hEAultOeqiwG5/eK/a5Q8049IGHxuo
-        ubtVO+R3vfadsIGrPot03sfkR/XEDzbUjO8bqO8ig8vBqe7fcGXx3xtoow9mcy84qvu2fj
-        Ryi1G/FxQb21d8/uFb0fvGTAVvQ3ONw=
-Received: from mail-pg1-f200.google.com (mail-pg1-f200.google.com
- [209.85.215.200]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-542-AEo-QzhWMk-kfMGeJVZ_rg-1; Thu, 08 Jul 2021 22:37:26 -0400
-X-MC-Unique: AEo-QzhWMk-kfMGeJVZ_rg-1
-Received: by mail-pg1-f200.google.com with SMTP id j17-20020a63cf110000b0290226eb0c27acso6051019pgg.23
-        for <kvm@vger.kernel.org>; Thu, 08 Jul 2021 19:37:26 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-transfer-encoding
-         :content-language;
-        bh=+J9Lnw5DVtWJKPf6tEyqz5oiUm5AxvYYKjyiKxoR3zk=;
-        b=SR3sybSnp6V/Ej8YYe4wy7kdg95yfTFMoafC9KH2YkzuX/RVuHpxuJUWyuHUMAwZXw
-         HaFzxNttqdS36H/u6ua0Ocvkua7a95CYdIrUHCJmfugnohMZUT48V0riYnM9wI5sUgMs
-         XApmiZ7LLgsOUQshRhIblBQ59IPFGxHK5ykPMpdu7I6qrjplixHITy4P4CaC1C0wtEty
-         Kd8rdeoOM5jXYSRV0eUwotRr8+fdRijn7XlmRn5YBH1w5HLq68KuYfXAwRdEr0WefIkD
-         p+4zdXK4hxaossoBiK2ZDIM6vogx3VGtM+IQDwzDhhqupplg6x0ZRZb0P17S/I8putky
-         Z3Mw==
-X-Gm-Message-State: AOAM5320++VYd8YktHe444dGDOcvlR7uOOHZgzWSoNW2g+E+rXsIFq26
-        +QfQRUr7szbiDkoTacAjZJHXpc43wURawsRxYhBMQXZx3Qv6ePjkNuG5qiUGsAxrnuZ0QWB4UJA
-        tvNST8CrX+b0rjUCOuApvKcCL1iT9rofHz58JQKtHgwnOV6x0A4hpL75YKmdw0Oje
-X-Received: by 2002:a65:5b0f:: with SMTP id y15mr35436079pgq.263.1625798244893;
-        Thu, 08 Jul 2021 19:37:24 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwW1VzzGMbGReLBmXJmIGxaq1O7VrIc2ROGTJpNodFzrGiyhKCxtsCzrfwEi9MUAlff62XWmg==
-X-Received: by 2002:a65:5b0f:: with SMTP id y15mr35436050pgq.263.1625798244629;
-        Thu, 08 Jul 2021 19:37:24 -0700 (PDT)
-Received: from wangxiaodeMacBook-Air.local ([209.132.188.80])
-        by smtp.gmail.com with ESMTPSA id lb13sm10506564pjb.5.2021.07.08.19.37.22
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 08 Jul 2021 19:37:24 -0700 (PDT)
-Subject: Re: [PATCH V3 2/2] vDPA/ifcvf: implement management netlink framework
- for ifcvf
-To:     Zhu Lingshan <lingshan.zhu@intel.com>, mst@redhat.com
-Cc:     virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        id S230463AbhGIDMY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 8 Jul 2021 23:12:24 -0400
+Received: from out30-54.freemail.mail.aliyun.com ([115.124.30.54]:41169 "EHLO
+        out30-54.freemail.mail.aliyun.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S230347AbhGIDMX (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 8 Jul 2021 23:12:23 -0400
+X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R181e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e04423;MF=laijs@linux.alibaba.com;NM=1;PH=DS;RN=14;SR=0;TI=SMTPD_---0UfAZH.L_1625800178;
+Received: from C02XQCBJJG5H.local(mailfrom:laijs@linux.alibaba.com fp:SMTPD_---0UfAZH.L_1625800178)
+          by smtp.aliyun-inc.com(127.0.0.1);
+          Fri, 09 Jul 2021 11:09:38 +0800
+Subject: Re: [PATCH] KVM: X86: Also reload the debug registers before
+ kvm_x86->run() when the host is using them
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        Lai Jiangshan <jiangshanlai@gmail.com>,
+        linux-kernel@vger.kernel.org
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
         kvm@vger.kernel.org
-References: <20210706023649.23360-1-lingshan.zhu@intel.com>
- <20210706023649.23360-3-lingshan.zhu@intel.com>
-From:   Jason Wang <jasowang@redhat.com>
-Message-ID: <d965cd00-387e-3610-6c9c-50f99574438e@redhat.com>
-Date:   Fri, 9 Jul 2021 10:37:17 +0800
+References: <20210628172632.81029-1-jiangshanlai@gmail.com>
+ <46e0aaf1-b7cd-288f-e4be-ac59aa04908f@redhat.com>
+From:   Lai Jiangshan <laijs@linux.alibaba.com>
+Message-ID: <c79d0167-7034-ebe2-97b7-58354d81323d@linux.alibaba.com>
+Date:   Fri, 9 Jul 2021 11:09:38 +0800
 User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0)
  Gecko/20100101 Thunderbird/78.11.0
 MIME-Version: 1.0
-In-Reply-To: <20210706023649.23360-3-lingshan.zhu@intel.com>
-Content-Type: text/plain; charset=gbk; format=flowed
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <46e0aaf1-b7cd-288f-e4be-ac59aa04908f@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
-�� 2021/7/6 ����10:36, Zhu Lingshan д��:
-> This commit implements the management netlink framework for ifcvf,
-> including register and add / remove a device
->
-> It works with iproute2:
-> [root@localhost lszhu]# vdpa mgmtdev show -jp
-> {
->      "mgmtdev": {
->          "pci/0000:01:00.5": {
->              "supported_classes": [ "net" ]
->          },
->          "pci/0000:01:00.6": {
->              "supported_classes": [ "net" ]
->          }
->      }
-> }
->
-> [root@localhost lszhu]# vdpa dev add mgmtdev pci/0000:01:00.5 name vdpa0
-> [root@localhost lszhu]# vdpa dev add mgmtdev pci/0000:01:00.6 name vdpa1
->
-> Signed-off-by: Zhu Lingshan <lingshan.zhu@intel.com>
 
+On 2021/7/9 00:48, Paolo Bonzini wrote:
+> On 28/06/21 19:26, Lai Jiangshan wrote:
+>> From: Lai Jiangshan <laijs@linux.alibaba.com>
+>>
+>> When the host is using debug registers but the guest is not using them
+>> nor is the guest in guest-debug state, the kvm code does not reset
+>> the host debug registers before kvm_x86->run().  Rather, it relies on
+>> the hardware vmentry instruction to automatically reset the dr7 registers
+>> which ensures that the host breakpoints do not affect the guest.
+>>
+>> But there are still problems:
+>>     o The addresses of the host breakpoints can leak into the guest
+>>       and the guest may use these information to attack the host.
+> 
+> I don't think this is true, because DRn reads would exit (if they don't, switch_db_regs would be nonzero).  But 
+> otherwise it makes sense to do at least the DR7 write, and we might as well do all of them.
 
-Acked-by: Jason Wang <jasowang@redhat.com>
+Ahh.... you are right.
 
+> 
+>>     o It violates the non-instrumentable nature around VM entry and
+>>       exit.  For example, when a host breakpoint is set on
+>>       vcpu->arch.cr2, #DB will hit aftr kvm_guest_enter_irqoff().
+>>
+>> Beside the problems, the logic is not consistent either. When the guest
+>> debug registers are active, the host breakpoints are reset before
+>> kvm_x86->run(). But when the guest debug registers are inactive, the
+>> host breakpoints are delayed to be disabled.  The host tracing tools may
+>> see different results depending on there is any guest running or not.
+> 
+> More precisely, the host tracing tools may see different results depending on what the guest is doing.
+> 
+> Queued (with fixed commit message), thanks!
+> 
+> Paolo
 
-> ---
->   drivers/vdpa/ifcvf/ifcvf_base.h |   6 ++
->   drivers/vdpa/ifcvf/ifcvf_main.c | 154 ++++++++++++++++++++++++--------
->   2 files changed, 124 insertions(+), 36 deletions(-)
->
-> diff --git a/drivers/vdpa/ifcvf/ifcvf_base.h b/drivers/vdpa/ifcvf/ifcvf_base.h
-> index ded1b1b5fb13..e5251fcbb200 100644
-> --- a/drivers/vdpa/ifcvf/ifcvf_base.h
-> +++ b/drivers/vdpa/ifcvf/ifcvf_base.h
-> @@ -104,6 +104,12 @@ struct ifcvf_lm_cfg {
->   	struct ifcvf_vring_lm_cfg vring_lm_cfg[IFCVF_MAX_QUEUE_PAIRS];
->   };
->   
-> +struct ifcvf_vdpa_mgmt_dev {
-> +	struct vdpa_mgmt_dev mdev;
-> +	struct ifcvf_adapter *adapter;
-> +	struct pci_dev *pdev;
-> +};
-> +
->   int ifcvf_init_hw(struct ifcvf_hw *hw, struct pci_dev *dev);
->   int ifcvf_start_hw(struct ifcvf_hw *hw);
->   void ifcvf_stop_hw(struct ifcvf_hw *hw);
-> diff --git a/drivers/vdpa/ifcvf/ifcvf_main.c b/drivers/vdpa/ifcvf/ifcvf_main.c
-> index 5f70ab1283a0..c72d9b36e4a0 100644
-> --- a/drivers/vdpa/ifcvf/ifcvf_main.c
-> +++ b/drivers/vdpa/ifcvf/ifcvf_main.c
-> @@ -218,7 +218,7 @@ static void ifcvf_vdpa_set_status(struct vdpa_device *vdpa_dev, u8 status)
->   	int ret;
->   
->   	vf  = vdpa_to_vf(vdpa_dev);
-> -	adapter = dev_get_drvdata(vdpa_dev->dev.parent);
-> +	adapter = vdpa_to_adapter(vdpa_dev);
->   	status_old = ifcvf_get_status(vf);
->   
->   	if (status_old == status)
-> @@ -442,6 +442,16 @@ static const struct vdpa_config_ops ifc_vdpa_ops = {
->   	.set_config_cb  = ifcvf_vdpa_set_config_cb,
->   };
->   
-> +static struct virtio_device_id id_table_net[] = {
-> +	{VIRTIO_ID_NET, VIRTIO_DEV_ANY_ID},
-> +	{0},
-> +};
-> +
-> +static struct virtio_device_id id_table_blk[] = {
-> +	{VIRTIO_ID_BLOCK, VIRTIO_DEV_ANY_ID},
-> +	{0},
-> +};
-> +
->   static u32 get_dev_type(struct pci_dev *pdev)
->   {
->   	u32 dev_type;
-> @@ -462,48 +472,30 @@ static u32 get_dev_type(struct pci_dev *pdev)
->   	return dev_type;
->   }
->   
-> -static int ifcvf_probe(struct pci_dev *pdev, const struct pci_device_id *id)
-> +static int ifcvf_vdpa_dev_add(struct vdpa_mgmt_dev *mdev, const char *name)
->   {
-> -	struct device *dev = &pdev->dev;
-> +	struct ifcvf_vdpa_mgmt_dev *ifcvf_mgmt_dev;
->   	struct ifcvf_adapter *adapter;
-> +	struct pci_dev *pdev;
->   	struct ifcvf_hw *vf;
-> +	struct device *dev;
->   	int ret, i;
->   
-> -	ret = pcim_enable_device(pdev);
-> -	if (ret) {
-> -		IFCVF_ERR(pdev, "Failed to enable device\n");
-> -		return ret;
-> -	}
-> -
-> -	ret = pcim_iomap_regions(pdev, BIT(0) | BIT(2) | BIT(4),
-> -				 IFCVF_DRIVER_NAME);
-> -	if (ret) {
-> -		IFCVF_ERR(pdev, "Failed to request MMIO region\n");
-> -		return ret;
-> -	}
-> -
-> -	ret = dma_set_mask_and_coherent(dev, DMA_BIT_MASK(64));
-> -	if (ret) {
-> -		IFCVF_ERR(pdev, "No usable DMA configuration\n");
-> -		return ret;
-> -	}
-> -
-> -	ret = devm_add_action_or_reset(dev, ifcvf_free_irq_vectors, pdev);
-> -	if (ret) {
-> -		IFCVF_ERR(pdev,
-> -			  "Failed for adding devres for freeing irq vectors\n");
-> -		return ret;
-> -	}
-> +	ifcvf_mgmt_dev = container_of(mdev, struct ifcvf_vdpa_mgmt_dev, mdev);
-> +	if (ifcvf_mgmt_dev->adapter)
-> +		return -EOPNOTSUPP;
->   
-> +	pdev = ifcvf_mgmt_dev->pdev;
-> +	dev = &pdev->dev;
->   	adapter = vdpa_alloc_device(struct ifcvf_adapter, vdpa,
-> -				    dev, &ifc_vdpa_ops, NULL);
-> -	if (adapter == NULL) {
-> +				    dev, &ifc_vdpa_ops, name);
-> +	if (!adapter) {
->   		IFCVF_ERR(pdev, "Failed to allocate vDPA structure");
->   		return -ENOMEM;
->   	}
->   
-> -	pci_set_master(pdev);
-> -	pci_set_drvdata(pdev, adapter);
-> +	ifcvf_mgmt_dev->adapter = adapter;
-> +	pci_set_drvdata(pdev, ifcvf_mgmt_dev);
->   
->   	vf = &adapter->vf;
->   	vf->dev_type = get_dev_type(pdev);
-> @@ -523,9 +515,10 @@ static int ifcvf_probe(struct pci_dev *pdev, const struct pci_device_id *id)
->   
->   	vf->hw_features = ifcvf_get_hw_features(vf);
->   
-> -	ret = vdpa_register_device(&adapter->vdpa, IFCVF_MAX_QUEUE_PAIRS * 2);
-> +	adapter->vdpa.mdev = &ifcvf_mgmt_dev->mdev;
-> +	ret = _vdpa_register_device(&adapter->vdpa, IFCVF_MAX_QUEUE_PAIRS * 2);
->   	if (ret) {
-> -		IFCVF_ERR(pdev, "Failed to register ifcvf to vdpa bus");
-> +		IFCVF_ERR(pdev, "Failed to register to vDPA bus");
->   		goto err;
->   	}
->   
-> @@ -536,11 +529,100 @@ static int ifcvf_probe(struct pci_dev *pdev, const struct pci_device_id *id)
->   	return ret;
->   }
->   
-> +static void ifcvf_vdpa_dev_del(struct vdpa_mgmt_dev *mdev, struct vdpa_device *dev)
-> +{
-> +	struct ifcvf_vdpa_mgmt_dev *ifcvf_mgmt_dev;
-> +
-> +	ifcvf_mgmt_dev = container_of(mdev, struct ifcvf_vdpa_mgmt_dev, mdev);
-> +	_vdpa_unregister_device(dev);
-> +	ifcvf_mgmt_dev->adapter = NULL;
-> +}
-> +
-> +static const struct vdpa_mgmtdev_ops ifcvf_vdpa_mgmt_dev_ops = {
-> +	.dev_add = ifcvf_vdpa_dev_add,
-> +	.dev_del = ifcvf_vdpa_dev_del
-> +};
-> +
-> +static int ifcvf_probe(struct pci_dev *pdev, const struct pci_device_id *id)
-> +{
-> +	struct ifcvf_vdpa_mgmt_dev *ifcvf_mgmt_dev;
-> +	struct device *dev = &pdev->dev;
-> +	u32 dev_type;
-> +	int ret;
-> +
-> +	ifcvf_mgmt_dev = kzalloc(sizeof(struct ifcvf_vdpa_mgmt_dev), GFP_KERNEL);
-> +	if (!ifcvf_mgmt_dev) {
-> +		IFCVF_ERR(pdev, "Failed to alloc memory for the vDPA management device\n");
-> +		return -ENOMEM;
-> +	}
-> +
-> +	dev_type = get_dev_type(pdev);
-> +	switch (dev_type) {
-> +	case VIRTIO_ID_NET:
-> +		ifcvf_mgmt_dev->mdev.id_table = id_table_net;
-> +		break;
-> +	case VIRTIO_ID_BLOCK:
-> +		ifcvf_mgmt_dev->mdev.id_table = id_table_blk;
-> +		break;
-> +	default:
-> +		IFCVF_ERR(pdev, "VIRTIO ID %u not supported\n", dev_type);
-> +		ret = -EOPNOTSUPP;
-> +		goto err;
-> +	}
-> +
-> +	ifcvf_mgmt_dev->mdev.ops = &ifcvf_vdpa_mgmt_dev_ops;
-> +	ifcvf_mgmt_dev->mdev.device = dev;
-> +	ifcvf_mgmt_dev->pdev = pdev;
-> +
-> +	ret = pcim_enable_device(pdev);
-> +	if (ret) {
-> +		IFCVF_ERR(pdev, "Failed to enable device\n");
-> +		goto err;
-> +	}
-> +
-> +	ret = pcim_iomap_regions(pdev, BIT(0) | BIT(2) | BIT(4),
-> +				 IFCVF_DRIVER_NAME);
-> +	if (ret) {
-> +		IFCVF_ERR(pdev, "Failed to request MMIO region\n");
-> +		goto err;
-> +	}
-> +
-> +	ret = dma_set_mask_and_coherent(dev, DMA_BIT_MASK(64));
-> +	if (ret) {
-> +		IFCVF_ERR(pdev, "No usable DMA configuration\n");
-> +		goto err;
-> +	}
-> +
-> +	ret = devm_add_action_or_reset(dev, ifcvf_free_irq_vectors, pdev);
-> +	if (ret) {
-> +		IFCVF_ERR(pdev,
-> +			  "Failed for adding devres for freeing irq vectors\n");
-> +		goto err;
-> +	}
-> +
-> +	pci_set_master(pdev);
-> +
-> +	ret = vdpa_mgmtdev_register(&ifcvf_mgmt_dev->mdev);
-> +	if (ret) {
-> +		IFCVF_ERR(pdev,
-> +			  "Failed to initialize the management interfaces\n");
-> +		goto err;
-> +	}
-> +
-> +	return 0;
-> +
-> +err:
-> +	kfree(ifcvf_mgmt_dev);
-> +	return ret;
-> +}
-> +
->   static void ifcvf_remove(struct pci_dev *pdev)
->   {
-> -	struct ifcvf_adapter *adapter = pci_get_drvdata(pdev);
-> +	struct ifcvf_vdpa_mgmt_dev *ifcvf_mgmt_dev;
->   
-> -	vdpa_unregister_device(&adapter->vdpa);
-> +	ifcvf_mgmt_dev = pci_get_drvdata(pdev);
-> +	vdpa_mgmtdev_unregister(&ifcvf_mgmt_dev->mdev);
-> +	kfree(ifcvf_mgmt_dev);
->   }
->   
->   static struct pci_device_id ifcvf_pci_ids[] = {
+I just noticed that emulation.c fails to emulate with DBn.
+Is there any problem around it?
+
+For code breakpoint, if the instruction didn't cause vm-exit,
+(for example, the 2nd instruction when kvm emulates instructions
+back to back) emulation.c fails to emulate with DBn.
+
+For code breakpoint, if the instruction just caused vm-exit.
+It is difficult to analyze this case due to the complex priorities
+between vectored events and fault-like vm-exit.
+Anyway, if it is an instruction that vm-exit has priority over #DB,
+emulation.c fails to emulate with DBn.
+
+For data breakpoint, a #DB must be delivered to guest or to VMM (when
+guest-debug) after the instruction. But emulation.c doesn't do so.
+
+And the existence of both of effective DBn (guest debug) and guest DBn
+complicates the problem when we try to emulate them.
+
+Thanks.
+Lai.
+
 
