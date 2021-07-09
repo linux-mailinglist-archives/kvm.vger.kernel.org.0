@@ -2,41 +2,41 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 517AC3C2B08
-	for <lists+kvm@lfdr.de>; Fri,  9 Jul 2021 23:56:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 403463C2B0A
+	for <lists+kvm@lfdr.de>; Fri,  9 Jul 2021 23:56:21 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231175AbhGIV66 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 9 Jul 2021 17:58:58 -0400
+        id S231241AbhGIV67 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 9 Jul 2021 17:58:59 -0400
 Received: from mail-bn7nam10on2062.outbound.protection.outlook.com ([40.107.92.62]:31937
         "EHLO NAM10-BN7-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S230494AbhGIV64 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 9 Jul 2021 17:58:56 -0400
+        id S230526AbhGIV65 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 9 Jul 2021 17:58:57 -0400
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Od7qr1+rjah08GXh2JFio7DTzW9O7+Q7aKj4YT1J0aq8JCnMHkci8BNXxWlO0b49Wxtjxd6a4usMmpVAhyN2VWGVrBUfnQy9hPqPa+kjGa8ZsFPhsVD+fBVQ2us4ji1+IJOL2jZVNMaSEtC5Q28gFVSRWAw20YBdgHU8/Kk1Z7gNDj0J/wXddRTP8ctPEkBk7i0/o8JhdriCiZnnWAD6fpjCtcNt+gmJEYGweVLt14rAKqs+dyLcZuUUelnqL3eC58LtdNySXBvHaolJ2K5h0p0fs6Pt11/vYA9p4UlCGMFQucMYZuCuSuOQOsVKEysz9lMsKABL1GUu7z6b7isXkQ==
+ b=Pu6o+ZobULeCNAUJZvxSlq0KUEQW3n4GhGaM20LgXTPmJpNMXdnbbhgGLuqVWZq0YqTQSVz9t/daBpVDxIdqqWLrG271BsVBDnP7XUNVIznxWFhb4zHlE3CzGCj3pnAxLRssOQX9bCADkmojMzFbktAUVAvstmz5Z8NVqTTsZMCpH04k4BlLB9RVjPuD8KijfxJdCuhNuA7dKDwX+ydDxhvPD84+H+xCeqeGQDIai51UtF83aeMK6YTkjXWcPHRM4Kmd993aFGeS76YVcRy16rMcPKKvllgRRpJVJMFdM4dZWotBcEKqEuPDHpcOAS3XfWDnCb88JLzVhBr+g2xs4w==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=qz/2JzX4a56wLgP9dFkSeajHUQGe8h0GKR7KnT3CW8c=;
- b=Io/v6yeSf+/MRIIoxsCl/tdL0/S8F/j3gXWn529vfAwgmCzB0l6nyvuQxf1P9pYMRGJEIjwvql8agMhiCbiQONxkHoanKLnlKGK+E2jUJvZ56A4sHgvz0eeFxaE521CE/kuDX7me9rByjYhsnnIvfog32HIyMQbDKYjbqd+5lKGjE7wDeH8h6ybSAjnungXcgQ0Kuv0EkWcgm+5N3gCDLHDehbCOfdcNLuW2xEG+xi22sVYJoHiw/NkJpu8sde9oicAiCBwAhaUz9Rg++zPVXZZw6YTIIeMd1piZPuepFWZNsKV4UscCUvsyOmrz0byyyx7Gxhd8Ff15yncchFeZTQ==
+ bh=cy37rgKPFXduWgu6fvACrKP6ieipd51K57Wju9q/1L4=;
+ b=K7wzyIaXd4quJbFszsLBOY6nP1snBxt8SSHbUeKF6dm0Gw+N6IKH0VSDXrb57tk+e0cUznABfQ+jfMAEVyLgguvvo224SYW497F1eXHTeqX99bNcDzWngOHTwOTh21TW7TlKusctbQTuEFYpWLx6QcfCt9CMUJC21UjZt/ZJdI2N44S458HDK+dlXOHLnhFdOe2hmPbP9gXdMyRhVNPOcMbngc9YBRV+wS300BsdAnrdWbfiOz6XAv552hK6wA0XkzKodhmCf4cO08iCY9IPthFj2HiyA/mFk3vaMz+Y+YHdCdSGqDL3BYnlPvGmvVE081gngQdQ41yzI/0xZ0Wppg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
  header.d=amd.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=qz/2JzX4a56wLgP9dFkSeajHUQGe8h0GKR7KnT3CW8c=;
- b=NMcaoEkSIMgUns+H6TbHm1GKQjPhyHQ6opftbVEZwNwns8nut2++jvCPU4yglhbL+GzU7FZnOXfryxFuWrlJ5FYsw8SQG1gFEAXs29tOyR//I8qPQoOUfVAgpDFVun7p04fly76/YJzqOqTe0I5sactEUs4tBwyyUrqLbzUQxpc=
+ bh=cy37rgKPFXduWgu6fvACrKP6ieipd51K57Wju9q/1L4=;
+ b=qWv22JPEHmXthiUdHi4yl2WJAoeF9Y8BWP3Si5+aXBHDVq+gE8Dd8luE5m37MjeFY5E0GOi1q++M3LFRawms999oWvSs679acb5NUm32oN82TycELuYMv2D4nA3ORlYfbSKWl/elmIgYCQVc4qB6u+fODAXgQzD27C85G4nCsA0=
 Authentication-Results: nongnu.org; dkim=none (message not signed)
  header.d=none;nongnu.org; dmarc=none action=none header.from=amd.com;
 Received: from SN6PR12MB2718.namprd12.prod.outlook.com (2603:10b6:805:6f::22)
  by SA0PR12MB4575.namprd12.prod.outlook.com (2603:10b6:806:73::19) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4308.21; Fri, 9 Jul
- 2021 21:56:10 +0000
+ 2021 21:56:11 +0000
 Received: from SN6PR12MB2718.namprd12.prod.outlook.com
  ([fe80::a8a9:2aac:4fd1:88fa]) by SN6PR12MB2718.namprd12.prod.outlook.com
  ([fe80::a8a9:2aac:4fd1:88fa%3]) with mapi id 15.20.4308.022; Fri, 9 Jul 2021
- 21:56:10 +0000
+ 21:56:11 +0000
 From:   Brijesh Singh <brijesh.singh@amd.com>
 To:     qemu-devel@nongnu.org
 Cc:     Connor Kuehl <ckuehl@redhat.com>,
@@ -52,9 +52,9 @@ Cc:     Connor Kuehl <ckuehl@redhat.com>,
         kvm@vger.kernel.org, Michael Roth <michael.roth@amd.com>,
         Eduardo Habkost <ehabkost@redhat.com>,
         Brijesh Singh <brijesh.singh@amd.com>
-Subject: [RFC PATCH 2/6] i386/sev: extend sev-guest property to include SEV-SNP
-Date:   Fri,  9 Jul 2021 16:55:46 -0500
-Message-Id: <20210709215550.32496-3-brijesh.singh@amd.com>
+Subject: [RFC PATCH 3/6] i386/sev: initialize SNP context
+Date:   Fri,  9 Jul 2021 16:55:47 -0500
+Message-Id: <20210709215550.32496-4-brijesh.singh@amd.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20210709215550.32496-1-brijesh.singh@amd.com>
 References: <20210709215550.32496-1-brijesh.singh@amd.com>
@@ -64,493 +64,138 @@ X-ClientProxiedBy: SN4PR0601CA0007.namprd06.prod.outlook.com
  (2603:10b6:805:6f::22)
 MIME-Version: 1.0
 X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from sbrijesh-desktop.amd.com (165.204.77.1) by SN4PR0601CA0007.namprd06.prod.outlook.com (2603:10b6:803:2f::17) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4308.20 via Frontend Transport; Fri, 9 Jul 2021 21:56:10 +0000
+Received: from sbrijesh-desktop.amd.com (165.204.77.1) by SN4PR0601CA0007.namprd06.prod.outlook.com (2603:10b6:803:2f::17) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4308.20 via Frontend Transport; Fri, 9 Jul 2021 21:56:11 +0000
 X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 80e2f6e3-c861-46ce-d7e1-08d943245cf4
+X-MS-Office365-Filtering-Correlation-Id: 899c9154-571b-4f82-1a74-08d943245d5a
 X-MS-TrafficTypeDiagnostic: SA0PR12MB4575:
 X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <SA0PR12MB457575A5F5544CF9B0B80103E5189@SA0PR12MB4575.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:2582;
+X-Microsoft-Antispam-PRVS: <SA0PR12MB45753BF85B711C0C94ADAC9FE5189@SA0PR12MB4575.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:813;
 X-MS-Exchange-SenderADCheck: 1
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: YzgK1dXLTKdNJU1xN4gpNNNkTcNUfnj2sid+XwdpvIltOH6snjV20t8bntA9qtEp8kZpPsSHBDfG785i4A6lAlcQrIgo+ByypdaNXxU7dvLk5lFgzQt1dTsgIZO1OxyAIINPg3XYhOhy7UHlGhUc4k4ySDpBtoiZ35IJZXbGxIbPVDeVjuwtzKaRWhk9jirnSeY9c+YxYeZMOxjrjiIpR9sO0vFYzqfimzsasvxk38a+44FdW2vogUdSAc72tAAeyTLcRZNC6jUGWSfLIWIznO23hDx2cnfMofXlfPHJE1uBA8WBotNg6KGiid5tX2PvaBVloCiG03vONy7OLlTZv8vbdQm+RXDeI/sEwBULyPVXLtxYvRwMapB4tlnLcXXvN/l6JXorjW1q94I2JPhUy7hd30FuDL7FDYS4rZ2DGFH3ULAnLC09LP265kCMXSsWp8PamzlKVUTSrXpm1ylv+hXRx5g7YXULyO+v6sAuCTa0/586Hh+pglFNlwb40h9//4kSQlTDVOPjgtDki1Flg/rv1fAnQGEYuWfhDD4PS878AYRzW2kDNrcsgbUWhjMPpCJk9/xr9zll3Cy87CgsvPpkkXbxAYBNgyx+gUkmVsfcf3LVarDZROlKH5OB3OSD3OAbQx7KaeW8fId4Dt4rLcHDIAKz43wgZxFkYaR2qIIPMlfpZLhO+189Mv2FpArUERlxYGO4gojk6iwfDH2HbA==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR12MB2718.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(136003)(39860400002)(376002)(396003)(346002)(30864003)(6916009)(2616005)(66556008)(36756003)(6666004)(6486002)(83380400001)(7696005)(52116002)(2906002)(66476007)(316002)(4326008)(186003)(38100700002)(66946007)(38350700002)(8676002)(8936002)(956004)(86362001)(5660300002)(44832011)(54906003)(478600001)(1076003)(26005)(7416002);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam-Message-Info: HsnxluPV1JkHLE5kpAWBfIutehHv6ypiGqKFd5T7w29m3HoL58JomMSemIWDupDEaXfIxAWRYFEKiH9YUrWfoSeik7w8s1sNTlQ8mIrrIjOcs+FWUWXQmlgxy5gcSuRlPIq4bM70h+vM6UAsrzI9jW3BTHQ7/83gVcTkqY2gkcOAgmeVPdfCzEGhYq9xZyP+5EQmcbsnkwU42fLwwCBqLniMeNmxQQ8fx4lXBujLU2qgzky74W4p1JDQQwC7Ii6rb6KOk1XMJilbrbHZ6jNlRjFMAUVt3XfWum9v34w/bn3m2Mi/Jx67L6HeHLmIPBg8r20AC0K/YSLXWXJkZQ1oc2htMIrjQjsARmTM1pM2L8Pq61Juazq+giP5+XE9b9k6PU5apXS1uxVU8LYq7Qb6nXR0Z3X3mJ9ibRuFZaY2iyItcWd7AgNLCYtI5YJVNY6cIa3c6+ub2a2Vfv1odm2VX09+ooaN3d055X9M9C6g9dwSKRrcNo+DtMCFltnbsS8m8vC7NKjb+IRPupY9S1wfisqTWuj88/iNfus4KeQ/tlPINJUD9sekDntDKC/EtnYYWR1AOBkSIS1xX17d6ElWObWYRM/Gnipp7mO3m2/k6d1XHsW+XaZHXB5F+8gBHsmpItsUGWsWzJbvXg0OTdC59kWiJNHYuCxWPe2iVec31eQRng5+V0rhJdnLuewg+9V/OJBiWqYTTBGP344inMbfyOMzgMPh15fFLh8Kfe7k26Q=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR12MB2718.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(136003)(39860400002)(376002)(396003)(346002)(6916009)(2616005)(66556008)(36756003)(6666004)(6486002)(83380400001)(7696005)(52116002)(2906002)(66476007)(316002)(4326008)(186003)(38100700002)(66946007)(38350700002)(8676002)(8936002)(956004)(86362001)(5660300002)(44832011)(54906003)(478600001)(1076003)(26005)(7416002)(309714004);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?flxAS2bmkWM+BXpp2iB5L9Z/R2NWcNIob9+nQVNZ6TzQNjly5lT/0+YN88Sf?=
- =?us-ascii?Q?QLJ0rlEph/2x2mM3z46ZYG++YhvIOmTczW7AWm21bn5hNEO+qF423mzNWlU3?=
- =?us-ascii?Q?5m5YcSvfnKT/eFTopU97m0lFnpS2OQNHrSchW1O+GShfFIMeXJIc9KVX17GU?=
- =?us-ascii?Q?+IzaKPYYek5b9UKTPfuYAp1mWKp+AR6tzkIosfNIKkOJ7UPr+l8CpeRfEJIn?=
- =?us-ascii?Q?MOn1iciO4tc9VfbHf6vF5cISp99hj5RKyPGxjC5Z0Xgo0pSGnyC1xep8cF9d?=
- =?us-ascii?Q?owqIXx6WHy1JeJbro1JJERA/I2JI8Bl5RIg5vBzBWzwKLwRlXLeQ3Y0X6zLO?=
- =?us-ascii?Q?YpWHRovW+18Rcc4OX6lZEa/PjO7LmS2SjVrA5RF5HpzE8vEr3VCNUZEy8S6l?=
- =?us-ascii?Q?5BzmnLNOw7lSPE274vwEK+cJ10NPvFff5gNCT1OygYVhq9+6W67ccMz63IxX?=
- =?us-ascii?Q?B2Rnn0nvMzr7rDJU/0aVDMWBNPb4IwxrtnHlJHQoliP6fiWbBTmpPS/+3JDj?=
- =?us-ascii?Q?sAScc1ekxVCM3eQkdP5IBtXCQS9SV1soiw4oD1HPOcUHLvIcM0nJor7XpJ0D?=
- =?us-ascii?Q?e7NYy2afPONlFvzu3tYNfjZLkASv3OQPPvxrm/L0qdDhMeP5KD/EPgLVkmMA?=
- =?us-ascii?Q?C8am0wEIc0TuCs1MvcW+dPum0gNNtFtRGwh0dQzoU6LK6lFkwfxGFQZThGbb?=
- =?us-ascii?Q?E01VFMsIs5N23oYosQq4hPMoYbNYDpt70AL9aFJmBLhzwRy5Y6RRDJkyYDww?=
- =?us-ascii?Q?IwufZau6IHMMC6ADc5RN8MTVFGKO7V2ppKCvIncRtnpLqDmWpENvhwi557h5?=
- =?us-ascii?Q?Jlz9FZWidb77N2x+atonjsqNFgh7CZUEiB3woc9yc4cg412T+bI5+mC4y5P9?=
- =?us-ascii?Q?1qPzRXeTKlewS9Xqze16IcmTihLI5kM1T/mDByZmirv2Ut0hKY01wi4wrYtr?=
- =?us-ascii?Q?1RrwsqRlo5dQG77mFfxPJm4SHREtva+yK5z9yeljELnKRo9E5g0BIzlp3E+L?=
- =?us-ascii?Q?6WXi3XamYvZ3uX5kX0EAg1Hm5X4CjBb+vkpl5uHygUwyctd+zHt+pbNawwVv?=
- =?us-ascii?Q?XUnbRmmbq+hloTRcLBhloZrBuonPHUciA9e1bz8CYE+QkBd5B5q38HusA7QP?=
- =?us-ascii?Q?o7WGthmTVc/7kmD/z02s9lhtvVc5yWpSBlhrJjSxg0gKf7Ot6+I1E48yHsh9?=
- =?us-ascii?Q?5ab2lJOPr/NqdFSRvHe+jd+8WehwsgaJAtTxKU43iN8m5p5VZQlJTvh4dE1Q?=
- =?us-ascii?Q?6tQhNaBcdY51JpWMhsqGwIhmhdYjpSuvuaZtED5c5ButI/2gGbrRvhLveRuu?=
- =?us-ascii?Q?b4dcRQyGmh7NIjPwHOdakuWj?=
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?AXWwuk+ZhJP64RJ9joSIIAr56L8tdR3uQfikxBh/yw3HzbtrkE5fL5LdFx8y?=
+ =?us-ascii?Q?oxyYzSLZD2INsBLFU0poNifQzXdHNJZf1ppVp6Sb7XaAuu6Ny8StsdX9g8BM?=
+ =?us-ascii?Q?j9igvjpsUk14ULxueTrym8FKyYVGKVrMCOZ6EHSgc+m9B22Fg8zX66JwnxbQ?=
+ =?us-ascii?Q?wuORzdokYGY+pw8myD9GKxD9EXdkWlMf72B5pbHNUbdBn/Pugwl+LSV1suio?=
+ =?us-ascii?Q?G9BFlFJ1rb0tq2dfWWXYvINGP04sF2XUctBxYIMjxrhqZvxmDH1F+HYAuo8A?=
+ =?us-ascii?Q?z7FAKCBHt8sJ6GMgrYCDA+yB1Pg4REuFVBNAC9wfWVoozjdC4D6c/Cd01iCY?=
+ =?us-ascii?Q?nAJCQ60qrr3pRAb/yUJK6z6N6z2mymzoJt2ystJUQq/ZGaefnWbIS3lNGPbd?=
+ =?us-ascii?Q?syoX4Ba8nVP4tvlunOuuLPxRT6awHbKtflBpRtAX1gSeFPDttnwZZnvVmPAR?=
+ =?us-ascii?Q?Z4SjRvhVEIdp6sUxkC8QGRFWCQhjdmE5doJ4fsL3fePhn+ngcDVaHuKKHSxG?=
+ =?us-ascii?Q?WBhRyGDgWtQprBLmsGeeSA3+VjQPdWt5ZWHcGsbJIez5BBDDI1b+zDBlMiIV?=
+ =?us-ascii?Q?HWmViP17UFB999HbNMt+U5mYfwfAdK/8AIui27cUw5qxSOUzmcYI1oTanUUe?=
+ =?us-ascii?Q?EzvpvrVh9L+Vq0bK0H6Wu2ptEPlb/Mz2dd7QkqROuZj3eCRkoe5ChkxFv3wo?=
+ =?us-ascii?Q?wuxzxhps0Iflf1joJoMle5ykLIbB0XbyVa2zCIbGz2ZK7xyaYsc+T9WgNy+Q?=
+ =?us-ascii?Q?ktfjtOwGqWU8/KShdMtsMGXvKG1itsLBfjj12vDGbZ0Z3V96rzQQD9tATPhG?=
+ =?us-ascii?Q?NbNUVuT2pn1X71pL4prumg0fs/TdWQ+m9c6d6q4Jiv6lCyzW/qHrNk3CMLl4?=
+ =?us-ascii?Q?8P4vJzSQqrEDc2qzBiMGrN6hbjAKK1z9u40CQEyFSJlyJVzzAEBaYbn7OeVc?=
+ =?us-ascii?Q?Z1B2pdq63BK0PaTh16YJbDnQ8B2F5HB0axV3Mzj31o3QCeeuVmdL9JVmbFgC?=
+ =?us-ascii?Q?P1Zb2seGE4c9TvNMoVmdxHUtmk4Xnz+sAq73AN6bEvJq3kYB+UDBwzIM/Ddw?=
+ =?us-ascii?Q?aJnsw4+rc3lfUL92R0rvgdNUf82/QgcXFk37oc7H8LhKYJE9FnXqRGds17zj?=
+ =?us-ascii?Q?Mj7vY2roGB24RfHepJK3JjCDj9ynTQOiA/Y3/NycoDl7IMhx4b+ThrKyDjei?=
+ =?us-ascii?Q?cEGXJZRzXH89OsyPs8uTLWQUbf5HoF0jR3GQCvY0mt2ajxXIwa2LFamjI7e+?=
+ =?us-ascii?Q?uKR6Zea+586MW9wJceU9PL0Y2KYa3FvW+Y8mLAIMTBHY4rJFc+NTxtHyg744?=
+ =?us-ascii?Q?fTOHsE6bnDSQN9ojc15D3xFN?=
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 80e2f6e3-c861-46ce-d7e1-08d943245cf4
+X-MS-Exchange-CrossTenant-Network-Message-Id: 899c9154-571b-4f82-1a74-08d943245d5a
 X-MS-Exchange-CrossTenant-AuthSource: SN6PR12MB2718.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Jul 2021 21:56:10.8448
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Jul 2021 21:56:11.5204
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: gjO7Y0mXznxe4QgEdYzycxR8kVhuP6HZlCZ86j7MvqxyCZlFylWadQVxbsk5H3CKTozYZS5YZ7iX7/9TcwXz4g==
+X-MS-Exchange-CrossTenant-UserPrincipalName: jFRwfhR8Nboe6mdrZ1v9ERWKARBdRcB7rENqQ7pSytmi2Vy//unpzchIgANDcaH5pFuC6V2pcI/rXliOPJJORg==
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA0PR12MB4575
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-To launch the SEV-SNP guest, a user can specify up to 8 parameters.
-Passing all parameters through command line can be difficult. To simplify
-the launch parameter passing, introduce a .ini-like config file that can be
-used for passing the parameters to the launch flow.
-
-The contents of the config file will look like this:
-
-$ cat snp-launch.init
-
-# SNP launch parameters
-[SEV-SNP]
-init_flags = 0
-policy = 0x1000
-id_block = "YWFhYWFhYWFhYWFhYWFhCg=="
-
-
-Add 'snp' property that can be used to indicate that SEV guest launch
-should enable the SNP support.
-
-SEV-SNP guest launch examples:
-
-1) launch without additional parameters
-
-  $(QEMU_CLI) \
-    -object sev-guest,id=sev0,snp=on
-
-2) launch with optional parameters
-  $(QEMU_CLI) \
-    -object sev-guest,id=sev0,snp=on,launch-config=<file>
+When SEV-SNP is enabled, the KVM_SNP_INIT command is used to initialize
+the platform. The command checks whether SNP is enabled in the KVM, if
+enabled then it allocate a new ASID from the SNP pool and calls the
+firmware to initialize the all the resources.
 
 Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
 ---
- docs/amd-memory-encryption.txt |  81 +++++++++++-
- qapi/qom.json                  |   6 +
- target/i386/sev.c              | 227 +++++++++++++++++++++++++++++++++
- 3 files changed, 312 insertions(+), 2 deletions(-)
+ target/i386/sev.c      | 24 +++++++++++++++++++++---
+ target/i386/sev_i386.h |  1 +
+ 2 files changed, 22 insertions(+), 3 deletions(-)
 
-diff --git a/docs/amd-memory-encryption.txt b/docs/amd-memory-encryption.txt
-index ffca382b5f..322bf38f68 100644
---- a/docs/amd-memory-encryption.txt
-+++ b/docs/amd-memory-encryption.txt
-@@ -22,8 +22,8 @@ support for notifying a guest's operating system when certain types of VMEXITs
- are about to occur. This allows the guest to selectively share information with
- the hypervisor to satisfy the requested function.
- 
--Launching
-----------
-+Launching (SEV and SEV-ES)
-+--------------------------
- Boot images (such as bios) must be encrypted before a guest can be booted. The
- MEMORY_ENCRYPT_OP ioctl provides commands to encrypt the images: LAUNCH_START,
- LAUNCH_UPDATE_DATA, LAUNCH_MEASURE and LAUNCH_FINISH. These four commands
-@@ -113,6 +113,83 @@ a SEV-ES guest:
-  - Requires in-kernel irqchip - the burden is placed on the hypervisor to
-    manage booting APs.
- 
-+Launching (SEV-SNP)
-+-------------------
-+Boot images (such as bios) must be encrypted before a guest can be booted. The
-+MEMORY_ENCRYPT_OP ioctl provides commands to encrypt the images:
-+KVM_SNP_INIT, SNP_LAUNCH_START, SNP_LAUNCH_UPDATE, and SNP_LAUNCH_FINISH. These
-+four commands together generate a fresh memory encryption key for the VM,
-+encrypt the boot images for a successful launch.
-+
-+KVM_SNP_INIT is called first to initialize the SEV-SNP firmware and SNP
-+features in the KVM. The feature flags value can be provided through the
-+launch-config file.
-+
-++------------+-------+----------+---------------------------------+
-+| key        | type  | default  | meaning                         |
-++------------+-------+----------+---------------------------------+
-+| init_flags | hex   | 0        | SNP feature flags               |
-++-----------------------------------------------------------------+
-+
-+Note: currently the init_flags must be zero.
-+
-+SNP_LAUNCH_START is called first to create a cryptographic launch context
-+within the firmware. To create this context, guest owner must provide a guest
-+policy and other parameters as described in the SEV-SNP firmware
-+specification. The launch parameters should be specified in the launch-config
-+ini file and should be treated as a binary blob and must be passed as-is to
-+the SEV-SNP firmware.
-+
-+The SNP_LAUNCH_START uses the following parameters from the launch-config
-+file. See the SEV-SNP specification for more details.
-+
-++--------+-------+----------+----------------------------------------------+
-+| key    | type  | default  | meaning                                      |
-++--------+-------+----------+----------------------------------------------+
-+| policy | hex   | 0x30000  | a 64-bit guest policy                        |
-+| imi_en | bool  | 0        | 1 when IMI is enabled                        |
-+| ma_end | bool  | 0        | 1 when migration agent is used               |
-+| gosvw  | string| 0        | 16-byte base64 encoded string for the guest  |
-+|        |       |          | OS visible workaround.                       |
-++--------+-------+----------+----------------------------------------------+
-+
-+SNP_LAUNCH_UPDATE encrypts the memory region using the cryptographic context
-+created via the SNP_LAUNCH_START command. If required, this command can be called
-+multiple times to encrypt different memory regions. The command also calculates
-+the measurement of the memory contents as it encrypts.
-+
-+SNP_LAUNCH_FINISH finalizes the guest launch flow. Optionally, while finalizing
-+the launch the firmware can perform checks on the launch digest computing
-+through the SNP_LAUNCH_UPDATE. To perform the check the user must supply
-+the id block, authentication blob and host data that should be included in the
-+attestation report. See the SEV-SNP spec for further details.
-+
-+The SNP_LAUNCH_FINISH uses the following parameters from the launch-config file.
-+
-++------------+-------+----------+----------------------------------------------+
-+| key        | type  | default  | meaning                                      |
-++------------+-------+----------+----------------------------------------------+
-+| id_block   | string| none     | base64 encoded ID block                      |
-++------------+-------+----------+----------------------------------------------+
-+| id_auth    | string| none     | base64 encoded authentication information    |
-++------------+-------+----------+----------------------------------------------+
-+| auth_key_en| bool  | 0        | auth block contains author key               |
-++------------+-------+----------+----------------------------------------------+
-+| host_data  | string| none     | host provided data                           |
-++------------+-------+----------+----------------------------------------------+
-+
-+To launch a SEV-SNP guest
-+
-+# ${QEMU} \
-+    -machine ...,confidential-guest-support=sev0 \
-+    -object sev-guest,id=sev0,cbitpos=51,reduced-phys-bits=1,snp=on
-+
-+To launch a SEV-SNP guest with launch configuration
-+
-+# ${QEMU} \
-+    -machine ...,confidential-guest-support=sev0 \
-+    -object sev-guest,id=sev0,cbitpos=51,reduced-phys-bits=1,snp=on,launch-config=<config>
-+
- Debugging
- -----------
- Since the memory contents of a SEV guest are encrypted, hypervisor access to
-diff --git a/qapi/qom.json b/qapi/qom.json
-index 652be317b8..bdf89fda27 100644
---- a/qapi/qom.json
-+++ b/qapi/qom.json
-@@ -749,6 +749,10 @@
- # @reduced-phys-bits: number of bits in physical addresses that become
- #                     unavailable when SEV is enabled
- #
-+# @snp: SEV-SNP is enabled (default: 0)
-+#
-+# @launch-config: launch config file to use
-+#
- # Since: 2.12
- ##
- { 'struct': 'SevGuestProperties',
-@@ -758,6 +762,8 @@
-             '*policy': 'uint32',
-             '*handle': 'uint32',
-             '*cbitpos': 'uint32',
-+            '*snp': 'bool',
-+            '*launch-config': 'str',
-             'reduced-phys-bits': 'uint32' } }
- 
- ##
 diff --git a/target/i386/sev.c b/target/i386/sev.c
-index 83df8c09f6..6b238ef969 100644
+index 6b238ef969..84ae244af0 100644
 --- a/target/i386/sev.c
 +++ b/target/i386/sev.c
-@@ -37,6 +37,11 @@
- #define TYPE_SEV_GUEST "sev-guest"
- OBJECT_DECLARE_SIMPLE_TYPE(SevGuestState, SEV_GUEST)
- 
-+struct snp_launch_config {
-+    struct kvm_snp_init init;
-+    struct kvm_sev_snp_launch_start start;
-+    struct kvm_sev_snp_launch_finish finish;
-+};
- 
- /**
-  * SevGuestState:
-@@ -58,6 +63,8 @@ struct SevGuestState {
-     char *session_file;
-     uint32_t cbitpos;
-     uint32_t reduced_phys_bits;
-+    char *launch_config_file;
-+    bool snp;
- 
-     /* runtime state */
-     uint32_t handle;
-@@ -72,10 +79,13 @@ struct SevGuestState {
-     uint32_t reset_cs;
-     uint32_t reset_ip;
-     bool reset_data_valid;
-+
-+    struct snp_launch_config snp_config;
- };
- 
- #define DEFAULT_GUEST_POLICY    0x1 /* disable debug */
- #define DEFAULT_SEV_DEVICE      "/dev/sev"
-+#define DEFAULT_SEV_SNP_POLICY  0x30000
- 
- #define SEV_INFO_BLOCK_GUID     "00f771de-1a7e-4fcb-890e-68c77e2fb44e"
- typedef struct __attribute__((__packed__)) SevInfoBlock {
-@@ -298,6 +308,212 @@ sev_guest_set_sev_device(Object *obj, const char *value, Error **errp)
-     sev->sev_device = g_strdup(value);
+@@ -583,10 +583,17 @@ sev_enabled(void)
+     return !!sev_guest;
  }
  
-+static void
-+sev_guest_set_snp(Object *obj, bool value, Error **errp)
++bool
++sev_snp_enabled(void)
 +{
-+    SevGuestState *sev = SEV_GUEST(obj);
-+
-+    sev->snp = value;
++    return sev_guest->snp;
 +}
 +
-+static bool
-+sev_guest_get_snp(Object *obj, Error **errp)
-+{
-+    SevGuestState *sev = SEV_GUEST(obj);
-+
-+    return sev->snp;
-+}
-+
-+
-+static char *
-+sev_guest_get_launch_config_file(Object *obj, Error **errp)
-+{
-+    SevGuestState *s = SEV_GUEST(obj);
-+
-+    return g_strdup(s->launch_config_file);
-+}
-+
-+static int
-+config_read_uint64(GKeyFile *f, const char *key, uint64_t *value, Error **errp)
-+{
-+    g_autoptr(GError) error = NULL;
-+    g_autofree gchar *str = NULL;
-+    uint64_t res;
-+
-+    str = g_key_file_get_string(f, "SEV-SNP", key, &error);
-+    if (!str) {
-+        /* key not found */
-+        return 0;
-+    }
-+
-+    res = g_ascii_strtoull(str, NULL, 16);
-+    if (res == G_MAXUINT64) {
-+        error_setg(errp, "Failed to convert %s", str);
-+        return 1;
-+    }
-+
-+    *value = res;
-+    return 0;
-+}
-+
-+static int
-+config_read_bool(GKeyFile *f, const char *key, bool *value, Error **errp)
-+{
-+    g_autoptr(GError) error = NULL;
-+    gboolean val;
-+
-+    val = g_key_file_get_boolean(f, "SEV-SNP", key, &error);
-+    if (!val && g_error_matches(error, G_KEY_FILE_ERROR,
-+                                 G_KEY_FILE_ERROR_INVALID_VALUE)) {
-+        error_setg(errp, "%s", error->message);
-+        return 1;
-+    }
-+
-+    *value = val;
-+    return 0;
-+}
-+
-+static int
-+config_read_blob(GKeyFile *f, const char *key, uint8_t *blob, uint32_t len,
-+                 Error **errp)
-+{
-+    g_autoptr(GError) error = NULL;
-+    g_autofree guchar *data = NULL;
-+    g_autofree gchar *base64 = NULL;
-+    gsize size;
-+
-+    base64 = g_key_file_get_string(f, "SEV-SNP", key, &error);
-+    if (!base64) {
-+        /* key not found */
-+        return 0;
-+    }
-+
-+    /* lets decode the value string */
-+    data = g_base64_decode(base64, &size);
-+    if (!data) {
-+        error_setg(errp, "failed to decode '%s'", key);
-+        return 1;
-+    }
-+
-+    /* verify the length */
-+    if (len != size) {
-+        error_setg(errp, "invalid length for key '%s' (expected %d got %ld)",
-+                   key, len, size);
-+        return 1;
-+    }
-+
-+    memcpy(blob, data, size);
-+    return 0;
-+}
-+
-+static int
-+snp_parse_launch_config(SevGuestState *sev, const char *file, Error **errp)
-+{
-+    g_autoptr(GError) error = NULL;
-+    g_autoptr(GKeyFile) key_file = g_key_file_new();
-+    struct kvm_sev_snp_launch_start *start = &sev->snp_config.start;
-+    struct kvm_snp_init *init = &sev->snp_config.init;
-+    struct kvm_sev_snp_launch_finish *finish = &sev->snp_config.finish;
-+    uint8_t *id_block = NULL, *id_auth = NULL;
-+
-+    if (!g_key_file_load_from_file(key_file, file, G_KEY_FILE_NONE, &error)) {
-+        error_setg(errp, "Error loading config file: %s", error->message);
-+        return 1;
-+    }
-+
-+    /* Check the group first */
-+    if (!g_key_file_has_group(key_file, "SEV-SNP")) {
-+        error_setg(errp, "Error parsing config file, group SEV-SNP not found");
-+        return 1;
-+    }
-+
-+    /* Get the init_flags used in KVM_SNP_INIT */
-+    if (config_read_uint64(key_file, "init_flags",
-+                           (uint64_t *)&init->flags, errp)) {
-+        goto err;
-+    }
-+
-+    /* Get the policy used in LAUNCH_START */
-+    if (config_read_uint64(key_file, "policy",
-+                           (uint64_t *)&start->policy, errp)) {
-+        goto err;
-+    }
-+
-+    /* Get IMI_EN used in LAUNCH_START */
-+    if (config_read_bool(key_file, "imi_en", (bool *)&start->imi_en, errp)) {
-+        goto err;
-+    }
-+
-+    /* Get MA_EN used in LAUNCH_START */
-+    if (config_read_bool(key_file, "imi_en", (bool *)&start->ma_en, errp)) {
-+        goto err;
-+    }
-+
-+    /* Get GOSVW used in LAUNCH_START */
-+    if (config_read_blob(key_file, "gosvw", (uint8_t *)&start->gosvw,
-+                         sizeof(start->gosvw), errp)) {
-+        goto err;
-+    }
-+
-+    /* Get ID block used in LAUNCH_FINISH */
-+    if (g_key_file_has_key(key_file, "SEV-SNP", "id_block", &error)) {
-+
-+        id_block = g_malloc(KVM_SEV_SNP_ID_BLOCK_SIZE);
-+
-+        if (config_read_blob(key_file, "id_block", id_block,
-+                             KVM_SEV_SNP_ID_BLOCK_SIZE, errp)) {
-+            goto err;
-+        }
-+
-+        finish->id_block_uaddr = (unsigned long)id_block;
-+        finish->id_block_en = 1;
-+    }
-+
-+    /* Get authentication block used in LAUNCH_FINISH */
-+    if (g_key_file_has_key(key_file, "SEV-SNP", "id_auth", &error)) {
-+
-+        id_auth = g_malloc(KVM_SEV_SNP_ID_AUTH_SIZE);
-+
-+        if (config_read_blob(key_file, "auth_block", id_auth,
-+                             KVM_SEV_SNP_ID_AUTH_SIZE, errp)) {
-+            goto err;
-+        }
-+
-+        finish->id_auth_uaddr = (unsigned long)id_auth;
-+
-+        /* Get AUTH_KEY_EN used in LAUNCH_FINISH */
-+        if (config_read_bool(key_file, "auth_key_en",
-+                             (bool *)&finish->auth_key_en, errp)) {
-+            goto err;
-+        }
-+    }
-+
-+    /* Get host_data used in LAUNCH_FINISH */
-+    if (config_read_blob(key_file, "host_data", (uint8_t *)&finish->host_data,
-+                         sizeof(finish->host_data), errp)) {
-+        goto err;
-+    }
-+
-+    return 0;
-+
-+err:
-+    g_free(id_block);
-+    g_free(id_auth);
-+    return 1;
-+}
-+
-+static void
-+sev_guest_set_launch_config_file(Object *obj, const char *value, Error **errp)
-+{
-+    SevGuestState *s = SEV_GUEST(obj);
-+
-+    if (snp_parse_launch_config(s, value, errp)) {
-+        return;
-+    }
-+
-+    s->launch_config_file = g_strdup(value);
-+}
-+
- static void
- sev_guest_class_init(ObjectClass *oc, void *data)
+ bool
+ sev_es_enabled(void)
  {
-@@ -316,6 +532,16 @@ sev_guest_class_init(ObjectClass *oc, void *data)
-                                   sev_guest_set_session_file);
-     object_class_property_set_description(oc, "session-file",
-             "guest owners session parameters (encoded with base64)");
-+    object_class_property_add_bool(oc, "snp",
-+                                   sev_guest_get_snp,
-+                                   sev_guest_set_snp);
-+    object_class_property_set_description(oc, "snp",
-+            "enable SEV-SNP support");
-+    object_class_property_add_str(oc, "launch-config",
-+                                  sev_guest_get_launch_config_file,
-+                                  sev_guest_set_launch_config_file);
-+    object_class_property_set_description(oc, "launch-config",
-+            "the file provides the SEV-SNP guest launch parameters");
+-    return sev_enabled() && (sev_guest->policy & SEV_POLICY_ES);
++    return sev_snp_enabled() ||
++           (sev_enabled() && (sev_guest->policy & SEV_POLICY_ES));
  }
  
- static void
-@@ -325,6 +551,7 @@ sev_guest_instance_init(Object *obj)
+ uint64_t
+@@ -1008,6 +1015,7 @@ int sev_kvm_init(ConfidentialGuestSupport *cgs, Error **errp)
+     uint32_t ebx;
+     uint32_t host_cbitpos;
+     struct sev_user_data_status status = {};
++    void *init_args = NULL;
  
-     sev->sev_device = g_strdup(DEFAULT_SEV_DEVICE);
-     sev->policy = DEFAULT_GUEST_POLICY;
-+    sev->snp_config.start.policy = DEFAULT_SEV_SNP_POLICY;
-     object_property_add_uint32_ptr(obj, "policy", &sev->policy,
-                                    OBJ_PROP_FLAG_READWRITE);
-     object_property_add_uint32_ptr(obj, "handle", &sev->handle,
+     if (!sev) {
+         return 0;
+@@ -1061,7 +1069,17 @@ int sev_kvm_init(ConfidentialGuestSupport *cgs, Error **errp)
+     sev->api_major = status.api_major;
+     sev->api_minor = status.api_minor;
+ 
+-    if (sev_es_enabled()) {
++    if (sev_snp_enabled()) {
++        if (!kvm_kernel_irqchip_allowed()) {
++            error_report("%s: SEV-SNP guests require in-kernel irqchip support",
++                         __func__);
++            goto err;
++        }
++
++        cmd = KVM_SEV_SNP_INIT;
++        init_args = (void *)&sev->snp_config.init;
++
++    } else if (sev_es_enabled()) {
+         if (!kvm_kernel_irqchip_allowed()) {
+             error_report("%s: SEV-ES guests require in-kernel irqchip support",
+                          __func__);
+@@ -1080,7 +1098,7 @@ int sev_kvm_init(ConfidentialGuestSupport *cgs, Error **errp)
+     }
+ 
+     trace_kvm_sev_init();
+-    ret = sev_ioctl(sev->sev_fd, cmd, NULL, &fw_error);
++    ret = sev_ioctl(sev->sev_fd, cmd, init_args, &fw_error);
+     if (ret) {
+         error_setg(errp, "%s: failed to initialize ret=%d fw_error=%d '%s'",
+                    __func__, ret, fw_error, fw_error_to_str(fw_error));
+diff --git a/target/i386/sev_i386.h b/target/i386/sev_i386.h
+index ae6d840478..e0e1a599be 100644
+--- a/target/i386/sev_i386.h
++++ b/target/i386/sev_i386.h
+@@ -29,6 +29,7 @@
+ #define SEV_POLICY_SEV          0x20
+ 
+ extern bool sev_es_enabled(void);
++extern bool sev_snp_enabled(void);
+ extern uint64_t sev_get_me_mask(void);
+ extern SevInfo *sev_get_info(void);
+ extern uint32_t sev_get_cbit_position(void);
 -- 
 2.17.1
 
