@@ -2,107 +2,83 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5E1C53C1DBA
-	for <lists+kvm@lfdr.de>; Fri,  9 Jul 2021 05:09:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1EE583C1F39
+	for <lists+kvm@lfdr.de>; Fri,  9 Jul 2021 08:08:55 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230463AbhGIDMY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 8 Jul 2021 23:12:24 -0400
-Received: from out30-54.freemail.mail.aliyun.com ([115.124.30.54]:41169 "EHLO
-        out30-54.freemail.mail.aliyun.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230347AbhGIDMX (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 8 Jul 2021 23:12:23 -0400
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R181e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e04423;MF=laijs@linux.alibaba.com;NM=1;PH=DS;RN=14;SR=0;TI=SMTPD_---0UfAZH.L_1625800178;
-Received: from C02XQCBJJG5H.local(mailfrom:laijs@linux.alibaba.com fp:SMTPD_---0UfAZH.L_1625800178)
-          by smtp.aliyun-inc.com(127.0.0.1);
-          Fri, 09 Jul 2021 11:09:38 +0800
-Subject: Re: [PATCH] KVM: X86: Also reload the debug registers before
- kvm_x86->run() when the host is using them
+        id S230129AbhGIGLg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 9 Jul 2021 02:11:36 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:31621 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229494AbhGIGLg (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 9 Jul 2021 02:11:36 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1625810932;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=vy3RT833Zluxm0D5IqTflstNdttnmf/u6KXeL7O1ITo=;
+        b=Vd3xvmoYOOBIFmcgZbiv5SiDcJhhR2NrTj7ElLvZ/QgL5nXdcsJy+EC6qB8qWItZ1oHg2I
+        nNffCThSCtEtVkwCBCAQdUxsWqxu6R6EidjszeuDwA5WFXNVDxB74Swi/vkMlm8p5nuoo3
+        5tamOjmGeiQgNMbYx4M9DbHdEm2h16E=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-426-zL_CMw1sPXixCGMcENOB2A-1; Fri, 09 Jul 2021 02:08:49 -0400
+X-MC-Unique: zL_CMw1sPXixCGMcENOB2A-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 37D49362FA;
+        Fri,  9 Jul 2021 06:08:48 +0000 (UTC)
+Received: from starship (unknown [10.40.192.10])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id A2128100EBAF;
+        Fri,  9 Jul 2021 06:08:44 +0000 (UTC)
+Message-ID: <67e2e6b4fcbc2ec0bdda1e1af1cfe61d3c1fde6f.camel@redhat.com>
+Subject: Re: [PATCH 1/6] KVM: nSVM: Check the value written to
+ MSR_VM_HSAVE_PA
+From:   Maxim Levitsky <mlevitsk@redhat.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>,
-        Lai Jiangshan <jiangshanlai@gmail.com>,
-        linux-kernel@vger.kernel.org
+        Vitaly Kuznetsov <vkuznets@redhat.com>, kvm@vger.kernel.org
 Cc:     Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
-        kvm@vger.kernel.org
-References: <20210628172632.81029-1-jiangshanlai@gmail.com>
- <46e0aaf1-b7cd-288f-e4be-ac59aa04908f@redhat.com>
-From:   Lai Jiangshan <laijs@linux.alibaba.com>
-Message-ID: <c79d0167-7034-ebe2-97b7-58354d81323d@linux.alibaba.com>
-Date:   Fri, 9 Jul 2021 11:09:38 +0800
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0)
- Gecko/20100101 Thunderbird/78.11.0
+        Cathy Avery <cavery@redhat.com>,
+        Emanuele Giuseppe Esposito <eesposit@redhat.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Michael Roth <mdroth@linux.vnet.ibm.com>,
+        linux-kernel@vger.kernel.org
+Date:   Fri, 09 Jul 2021 09:08:43 +0300
+In-Reply-To: <4318c980-6eff-7b74-ae99-b3210021789d@redhat.com>
+References: <20210628104425.391276-1-vkuznets@redhat.com>
+         <20210628104425.391276-2-vkuznets@redhat.com>
+         <595c45e8fb753556b2c01b25ac7052369c8357ac.camel@redhat.com>
+         <4318c980-6eff-7b74-ae99-b3210021789d@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
 MIME-Version: 1.0
-In-Reply-To: <46e0aaf1-b7cd-288f-e4be-ac59aa04908f@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-
-On 2021/7/9 00:48, Paolo Bonzini wrote:
-> On 28/06/21 19:26, Lai Jiangshan wrote:
->> From: Lai Jiangshan <laijs@linux.alibaba.com>
->>
->> When the host is using debug registers but the guest is not using them
->> nor is the guest in guest-debug state, the kvm code does not reset
->> the host debug registers before kvm_x86->run().  Rather, it relies on
->> the hardware vmentry instruction to automatically reset the dr7 registers
->> which ensures that the host breakpoints do not affect the guest.
->>
->> But there are still problems:
->>     o The addresses of the host breakpoints can leak into the guest
->>       and the guest may use these information to attack the host.
+On Thu, 2021-07-08 at 19:27 +0200, Paolo Bonzini wrote:
+> On 07/07/21 12:28, Maxim Levitsky wrote:
+> > Minor nitpick: I would have checked the host provided value as well,
+> > just in case since there is no reason why it won't pass the same check,
+> > and fail if the value is not aligned.
 > 
-> I don't think this is true, because DRn reads would exit (if they don't, switch_db_regs would be nonzero).  But 
-> otherwise it makes sense to do at least the DR7 write, and we might as well do all of them.
+> The reason not to do so is that it would allow a guest running an old 
+> kernel to defeat live migration.
+I understand now, and I will keep this in mind next time.
 
-Ahh.... you are right.
+Best regards,
+	Maxim Levitsky
 
-> 
->>     o It violates the non-instrumentable nature around VM entry and
->>       exit.  For example, when a host breakpoint is set on
->>       vcpu->arch.cr2, #DB will hit aftr kvm_guest_enter_irqoff().
->>
->> Beside the problems, the logic is not consistent either. When the guest
->> debug registers are active, the host breakpoints are reset before
->> kvm_x86->run(). But when the guest debug registers are inactive, the
->> host breakpoints are delayed to be disabled.  The host tracing tools may
->> see different results depending on there is any guest running or not.
-> 
-> More precisely, the host tracing tools may see different results depending on what the guest is doing.
-> 
-> Queued (with fixed commit message), thanks!
 > 
 > Paolo
-
-I just noticed that emulation.c fails to emulate with DBn.
-Is there any problem around it?
-
-For code breakpoint, if the instruction didn't cause vm-exit,
-(for example, the 2nd instruction when kvm emulates instructions
-back to back) emulation.c fails to emulate with DBn.
-
-For code breakpoint, if the instruction just caused vm-exit.
-It is difficult to analyze this case due to the complex priorities
-between vectored events and fault-like vm-exit.
-Anyway, if it is an instruction that vm-exit has priority over #DB,
-emulation.c fails to emulate with DBn.
-
-For data breakpoint, a #DB must be delivered to guest or to VMM (when
-guest-debug) after the instruction. But emulation.c doesn't do so.
-
-And the existence of both of effective DBn (guest debug) and guest DBn
-complicates the problem when we try to emulate them.
-
-Thanks.
-Lai.
+> 
+> > Other than that:
+> > Reviewed-by: Maxim Levitsky<mlevitsk@redhat.com>
 
 
