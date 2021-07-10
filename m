@@ -2,245 +2,204 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D5FBA3C3444
-	for <lists+kvm@lfdr.de>; Sat, 10 Jul 2021 13:01:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9B9843C3490
+	for <lists+kvm@lfdr.de>; Sat, 10 Jul 2021 15:09:16 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232665AbhGJLEH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 10 Jul 2021 07:04:07 -0400
-Received: from mail-il1-f198.google.com ([209.85.166.198]:44822 "EHLO
-        mail-il1-f198.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232644AbhGJLEG (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 10 Jul 2021 07:04:06 -0400
-Received: by mail-il1-f198.google.com with SMTP id s12-20020a056e02216cb02901f9cee02769so1081562ilv.11
-        for <kvm@vger.kernel.org>; Sat, 10 Jul 2021 04:01:21 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:date:message-id:subject:from:to;
-        bh=+FcDO2zOq13VzQYFsm3JgNyCt0LszFez/T4skcJUOkY=;
-        b=G73wz+Ypaa1UI5VdkQ/tztbsPpdBhL19+THOC4V9nUCM5t1wmRXAJensUciyWr+4NI
-         GrxG+PiYU/6+OA5UchrVJvy2hLTbVaNTuuHxQPp0jLXpnxW+tYMR2Nvma5kQMcB4088w
-         zZ6HVF4eI3rE8FaSsNk6KH9IxqwaNAvfIZ7P7lyyvwKXW6mVgGWJxwpNdwfaRfpCRp0D
-         p0ySURWQ6c5rK4cvOH2tHj86qcYE5b6SENHRThl3LhnsVvmqwWzL74bnBsBoMD9R4CI7
-         IfXQRi8R5g4hGTxXYYvHQgnlmqe/7ZQbwnYtxMEJuu6bRJRPIIXiaDPBPOt1OQCJpGaa
-         fczQ==
-X-Gm-Message-State: AOAM532r8CGnXFDMqInpTaydyXYAVWM+ZzSIHqLtq+q7OlI56WC807hx
-        XcGYnUCHc/vtycOeOxUL2bQJw9Vw+MjLpuE35OvhPaGiQaEE
-X-Google-Smtp-Source: ABdhPJxRdBUdD5MFGHv/t6NV7ztbcmaZ6T/HtQ72FN68KckmLwOvQxHT58AKrnV7YAIo2zBZlVWXcpaGATVAbB8f4CLvmV/ANErq
-MIME-Version: 1.0
-X-Received: by 2002:a02:a913:: with SMTP id n19mr6111996jam.7.1625914881080;
- Sat, 10 Jul 2021 04:01:21 -0700 (PDT)
-Date:   Sat, 10 Jul 2021 04:01:21 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000ec01e405c6c2cee3@google.com>
-Subject: [syzbot] possible deadlock in loop_add
-From:   syzbot <syzbot+118992efda475c16dfb0@syzkaller.appspotmail.com>
-To:     axboe@kernel.dk, bp@alien8.de, christian.brauner@ubuntu.com,
-        corbet@lwn.net, hch@lst.de, hpa@zytor.com, jmattson@google.com,
-        johannes.thumshirn@wdc.com, joro@8bytes.org, josef@toxicpanda.com,
-        kvm@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-doc@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-kernel@vger.kernel.org, mingo@redhat.com,
-        pbonzini@redhat.com, seanjc@google.com,
-        syzkaller-bugs@googlegroups.com, tglx@linutronix.de,
-        viro@zeniv.linux.org.uk, vkuznets@redhat.com,
-        wanpengli@tencent.com, x86@kernel.org
-Content-Type: text/plain; charset="UTF-8"
+        id S231232AbhGJNLy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 10 Jul 2021 09:11:54 -0400
+Received: from mga11.intel.com ([192.55.52.93]:46545 "EHLO mga11.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229656AbhGJNLx (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 10 Jul 2021 09:11:53 -0400
+X-IronPort-AV: E=McAfee;i="6200,9189,10040"; a="206812197"
+X-IronPort-AV: E=Sophos;i="5.84,229,1620716400"; 
+   d="scan'208";a="206812197"
+Received: from fmsmga003.fm.intel.com ([10.253.24.29])
+  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Jul 2021 06:09:07 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.84,229,1620716400"; 
+   d="scan'208";a="488742364"
+Received: from chang-linux-3.sc.intel.com ([172.25.66.175])
+  by FMSMGA003.fm.intel.com with ESMTP; 10 Jul 2021 06:09:06 -0700
+From:   "Chang S. Bae" <chang.seok.bae@intel.com>
+To:     bp@suse.de, luto@kernel.org, tglx@linutronix.de, mingo@kernel.org,
+        x86@kernel.org
+Cc:     len.brown@intel.com, dave.hansen@intel.com,
+        thiago.macieira@intel.com, jing2.liu@intel.com,
+        ravi.v.shankar@intel.com, linux-kernel@vger.kernel.org,
+        chang.seok.bae@intel.com, kvm@vger.kernel.org
+Subject: [PATCH v7 01/26] x86/fpu/xstate: Modify the initialization helper to handle both static and dynamic buffers
+Date:   Sat, 10 Jul 2021 06:02:48 -0700
+Message-Id: <20210710130313.5072-2-chang.seok.bae@intel.com>
+X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20210710130313.5072-1-chang.seok.bae@intel.com>
+References: <20210710130313.5072-1-chang.seok.bae@intel.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hello,
+Have the function initializing the XSTATE buffer take a struct fpu *
+pointer in preparation for dynamic state buffer support.
 
-syzbot found the following issue on:
+init_fpstate is a special case, which is indicated by a null pointer
+parameter to fpstate_init().
 
-HEAD commit:    ee268dee Add linux-next specific files for 20210707
-git tree:       linux-next
-console output: https://syzkaller.appspot.com/x/log.txt?x=12c39ae2300000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=59e1e3bbc3afca75
-dashboard link: https://syzkaller.appspot.com/bug?extid=118992efda475c16dfb0
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=14698794300000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=13e25ee4300000
+Also, fpstate_init_xstate() now accepts the state component bitmap to
+customize the compacted format.
 
-The issue was bisected to:
+No functional change.
 
-commit 0f00b82e5413571ed225ddbccad6882d7ea60bc7
-Author: Christoph Hellwig <hch@lst.de>
-Date:   Mon Mar 8 07:45:50 2021 +0000
-
-    block: remove the revalidate_disk method
-
-bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=14bb406c300000
-final oops:     https://syzkaller.appspot.com/x/report.txt?x=16bb406c300000
-console output: https://syzkaller.appspot.com/x/log.txt?x=12bb406c300000
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+118992efda475c16dfb0@syzkaller.appspotmail.com
-Fixes: 0f00b82e5413 ("block: remove the revalidate_disk method")
-
-======================================================
-WARNING: possible circular locking dependency detected
-5.13.0-next-20210707-syzkaller #0 Not tainted
-------------------------------------------------------
-systemd-udevd/8674 is trying to acquire lock:
-ffffffff8c4875c8 (loop_ctl_mutex){+.+.}-{3:3}, at: loop_add+0x9c/0x8c0 drivers/block/loop.c:2250
-
-but task is already holding lock:
-ffffffff8c1f3e08 (major_names_lock){+.+.}-{3:3}, at: blk_request_module+0x25/0x1d0 block/genhd.c:657
-
-which lock already depends on the new lock.
-
-
-the existing dependency chain (in reverse order) is:
-
--> #3 (major_names_lock){+.+.}-{3:3}:
-       __mutex_lock_common kernel/locking/mutex.c:959 [inline]
-       __mutex_lock+0x12a/0x10a0 kernel/locking/mutex.c:1104
-       __register_blkdev+0x2b/0x3e0 block/genhd.c:216
-       register_mtd_blktrans+0x85/0x3c0 drivers/mtd/mtd_blkdevs.c:531
-       do_one_initcall+0x103/0x650 init/main.c:1285
-       do_initcall_level init/main.c:1360 [inline]
-       do_initcalls init/main.c:1376 [inline]
-       do_basic_setup init/main.c:1396 [inline]
-       kernel_init_freeable+0x6b8/0x741 init/main.c:1598
-       kernel_init+0x1a/0x1d0 init/main.c:1490
-       ret_from_fork+0x1f/0x30 arch/x86/entry/entry_64.S:295
-
--> #2 (mtd_table_mutex){+.+.}-{3:3}:
-       __mutex_lock_common kernel/locking/mutex.c:959 [inline]
-       __mutex_lock+0x12a/0x10a0 kernel/locking/mutex.c:1104
-       blktrans_open+0x69/0x600 drivers/mtd/mtd_blkdevs.c:210
-       blkdev_get_whole+0xa1/0x420 fs/block_dev.c:1251
-       blkdev_get_by_dev.part.0+0x30c/0xdd0 fs/block_dev.c:1415
-       blkdev_get_by_dev fs/block_dev.c:1504 [inline]
-       blkdev_open+0x295/0x300 fs/block_dev.c:1510
-       do_dentry_open+0x4c8/0x11d0 fs/open.c:826
-       do_open fs/namei.c:3374 [inline]
-       path_openat+0x1c23/0x27f0 fs/namei.c:3507
-       do_filp_open+0x1aa/0x400 fs/namei.c:3534
-       do_sys_openat2+0x16d/0x420 fs/open.c:1204
-       do_sys_open fs/open.c:1220 [inline]
-       __do_sys_open fs/open.c:1228 [inline]
-       __se_sys_open fs/open.c:1224 [inline]
-       __x64_sys_open+0x119/0x1c0 fs/open.c:1224
-       do_syscall_x64 arch/x86/entry/common.c:50 [inline]
-       do_syscall_64+0x35/0xb0 arch/x86/entry/common.c:80
-       entry_SYSCALL_64_after_hwframe+0x44/0xae
-
--> #1 (&disk->open_mutex){+.+.}-{3:3}:
-       __mutex_lock_common kernel/locking/mutex.c:959 [inline]
-       __mutex_lock+0x12a/0x10a0 kernel/locking/mutex.c:1104
-       del_gendisk+0x8b/0x770 block/genhd.c:587
-       loop_remove drivers/block/loop.c:2347 [inline]
-       loop_control_remove drivers/block/loop.c:2396 [inline]
-       loop_control_ioctl+0x3b5/0x450 drivers/block/loop.c:2428
-       vfs_ioctl fs/ioctl.c:51 [inline]
-       __do_sys_ioctl fs/ioctl.c:1069 [inline]
-       __se_sys_ioctl fs/ioctl.c:1055 [inline]
-       __x64_sys_ioctl+0x193/0x200 fs/ioctl.c:1055
-       do_syscall_x64 arch/x86/entry/common.c:50 [inline]
-       do_syscall_64+0x35/0xb0 arch/x86/entry/common.c:80
-       entry_SYSCALL_64_after_hwframe+0x44/0xae
-
--> #0 (loop_ctl_mutex){+.+.}-{3:3}:
-       check_prev_add kernel/locking/lockdep.c:3051 [inline]
-       check_prevs_add kernel/locking/lockdep.c:3174 [inline]
-       validate_chain kernel/locking/lockdep.c:3789 [inline]
-       __lock_acquire+0x2a07/0x54a0 kernel/locking/lockdep.c:5015
-       lock_acquire kernel/locking/lockdep.c:5625 [inline]
-       lock_acquire+0x1ab/0x510 kernel/locking/lockdep.c:5590
-       __mutex_lock_common kernel/locking/mutex.c:959 [inline]
-       __mutex_lock+0x12a/0x10a0 kernel/locking/mutex.c:1104
-       loop_add+0x9c/0x8c0 drivers/block/loop.c:2250
-       loop_probe+0x6a/0x80 drivers/block/loop.c:2360
-       blk_request_module+0x111/0x1d0 block/genhd.c:660
-       blkdev_get_no_open+0x1d5/0x250 fs/block_dev.c:1332
-       blkdev_get_by_dev.part.0+0x25/0xdd0 fs/block_dev.c:1395
-       blkdev_get_by_dev fs/block_dev.c:1504 [inline]
-       blkdev_open+0x295/0x300 fs/block_dev.c:1510
-       do_dentry_open+0x4c8/0x11d0 fs/open.c:826
-       do_open fs/namei.c:3374 [inline]
-       path_openat+0x1c23/0x27f0 fs/namei.c:3507
-       do_filp_open+0x1aa/0x400 fs/namei.c:3534
-       do_sys_openat2+0x16d/0x420 fs/open.c:1204
-       do_sys_open fs/open.c:1220 [inline]
-       __do_sys_open fs/open.c:1228 [inline]
-       __se_sys_open fs/open.c:1224 [inline]
-       __x64_sys_open+0x119/0x1c0 fs/open.c:1224
-       do_syscall_x64 arch/x86/entry/common.c:50 [inline]
-       do_syscall_64+0x35/0xb0 arch/x86/entry/common.c:80
-       entry_SYSCALL_64_after_hwframe+0x44/0xae
-
-other info that might help us debug this:
-
-Chain exists of:
-  loop_ctl_mutex --> mtd_table_mutex --> major_names_lock
-
- Possible unsafe locking scenario:
-
-       CPU0                    CPU1
-       ----                    ----
-  lock(major_names_lock);
-                               lock(mtd_table_mutex);
-                               lock(major_names_lock);
-  lock(loop_ctl_mutex);
-
- *** DEADLOCK ***
-
-1 lock held by systemd-udevd/8674:
- #0: ffffffff8c1f3e08 (major_names_lock){+.+.}-{3:3}, at: blk_request_module+0x25/0x1d0 block/genhd.c:657
-
-stack backtrace:
-CPU: 0 PID: 8674 Comm: systemd-udevd Not tainted 5.13.0-next-20210707-syzkaller #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
-Call Trace:
- __dump_stack lib/dump_stack.c:88 [inline]
- dump_stack_lvl+0xcd/0x134 lib/dump_stack.c:105
- check_noncircular+0x25f/0x2e0 kernel/locking/lockdep.c:2131
- check_prev_add kernel/locking/lockdep.c:3051 [inline]
- check_prevs_add kernel/locking/lockdep.c:3174 [inline]
- validate_chain kernel/locking/lockdep.c:3789 [inline]
- __lock_acquire+0x2a07/0x54a0 kernel/locking/lockdep.c:5015
- lock_acquire kernel/locking/lockdep.c:5625 [inline]
- lock_acquire+0x1ab/0x510 kernel/locking/lockdep.c:5590
- __mutex_lock_common kernel/locking/mutex.c:959 [inline]
- __mutex_lock+0x12a/0x10a0 kernel/locking/mutex.c:1104
- loop_add+0x9c/0x8c0 drivers/block/loop.c:2250
- loop_probe+0x6a/0x80 drivers/block/loop.c:2360
- blk_request_module+0x111/0x1d0 block/genhd.c:660
- blkdev_get_no_open+0x1d5/0x250 fs/block_dev.c:1332
- blkdev_get_by_dev.part.0+0x25/0xdd0 fs/block_dev.c:1395
- blkdev_get_by_dev fs/block_dev.c:1504 [inline]
- blkdev_open+0x295/0x300 fs/block_dev.c:1510
- do_dentry_open+0x4c8/0x11d0 fs/open.c:826
- do_open fs/namei.c:3374 [inline]
- path_openat+0x1c23/0x27f0 fs/namei.c:3507
- do_filp_open+0x1aa/0x400 fs/namei.c:3534
- do_sys_openat2+0x16d/0x420 fs/open.c:1204
- do_sys_open fs/open.c:1220 [inline]
- __do_sys_open fs/open.c:1228 [inline]
- __se_sys_open fs/open.c:1224 [inline]
- __x64_sys_open+0x119/0x1c0 fs/open.c:1224
- do_syscall_x64 arch/x86/entry/common.c:50 [inline]
- do_syscall_64+0x35/0xb0 arch/x86/entry/common.c:80
- entry_SYSCALL_64_after_hwframe+0x44/0xae
-RIP: 0033:0x7fb26e980840
-Code: 73 01 c3 48 8b 0d 68 77 20 00 f7 d8 64 89 01 48 83 c8 ff c3 66 0f 1f 44 00 00 83 3d 89 bb 20 00 00 75 10 b8 02 00 00 00 0f 05 <48> 3d 01 f0 ff ff 73 31 c3 48 83 ec 08 e8 1e f6 ff ff 48 89 04 24
-RSP: 002b:00007fff25793e98 EFLAGS: 00000246 ORIG_RAX: 0000000000000002
-RAX: ffffffffffffffda RBX: 0000563b22a5f910 RCX: 00007fb26e980840
-RDX: 0000563b21ce5fe3 RSI: 00000000000a0800 RDI: 0000563b22a5f850
-RBP: 00007fff25794010 R08: 0000563b21ce5670 R09: 0000000000000010
-R10: 0000563b21ce5d0c R11: 0000000000000246 R12: 00007fff25793f60
-R13: 0000563b22a61030 R14: 0000000000000003 R15: 000000000000000e
-
-
+Signed-off-by: Chang S. Bae <chang.seok.bae@intel.com>
+Reviewed-by: Len Brown <len.brown@intel.com>
+Cc: x86@kernel.org
+Cc: linux-kernel@vger.kernel.org
+Cc: kvm@vger.kernel.org
 ---
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+Changes from v5:
+* Moved fpstate_init_xstate() back to the header (again).
+* Massaged the changelog.
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-For information about bisection process see: https://goo.gl/tpsmEJ#bisection
-syzbot can test patches for this issue, for details see:
-https://goo.gl/tpsmEJ#testing-patches
+Changes from v4:
+* Added a proper function description. (Borislav Petkov)
+* Added the likely() statement as a null pointer is a special case.
+
+Changes from v3:
+* Updated the changelog. (Borislav Petkov)
+* Updated the function comment to use kernel-doc style. (Borislav Petkov)
+
+Changes from v2:
+* Updated the changelog with task->fpu removed. (Borislav Petkov)
+---
+ arch/x86/include/asm/fpu/internal.h | 11 ++++++++++-
+ arch/x86/kernel/fpu/core.c          | 28 +++++++++++++++++-----------
+ arch/x86/kernel/fpu/init.c          |  2 +-
+ arch/x86/kernel/fpu/xstate.c        |  3 +--
+ arch/x86/kvm/x86.c                  |  2 +-
+ 5 files changed, 30 insertions(+), 16 deletions(-)
+
+diff --git a/arch/x86/include/asm/fpu/internal.h b/arch/x86/include/asm/fpu/internal.h
+index 5a18694a89b2..c7a64e2806a9 100644
+--- a/arch/x86/include/asm/fpu/internal.h
++++ b/arch/x86/include/asm/fpu/internal.h
+@@ -80,7 +80,7 @@ static __always_inline __pure bool use_fxsr(void)
+ 
+ extern union fpregs_state init_fpstate;
+ 
+-extern void fpstate_init(union fpregs_state *state);
++extern void fpstate_init(struct fpu *fpu);
+ #ifdef CONFIG_MATH_EMULATION
+ extern void fpstate_init_soft(struct swregs_state *soft);
+ #else
+@@ -88,6 +88,15 @@ static inline void fpstate_init_soft(struct swregs_state *soft) {}
+ #endif
+ extern void save_fpregs_to_fpstate(struct fpu *fpu);
+ 
++static inline void fpstate_init_xstate(struct xregs_state *xsave, u64 mask)
++{
++	/*
++	 * XRSTORS requires these bits set in xcomp_bv, or it will
++	 * trigger #GP:
++	 */
++	xsave->header.xcomp_bv = XCOMP_BV_COMPACTED_FORMAT | mask;
++}
++
+ /* Returns 0 or the negated trap number, which results in -EFAULT for #PF */
+ #define user_insn(insn, output, input...)				\
+ ({									\
+diff --git a/arch/x86/kernel/fpu/core.c b/arch/x86/kernel/fpu/core.c
+index 7ada7bd03a32..6bc8ad4a3bd7 100644
+--- a/arch/x86/kernel/fpu/core.c
++++ b/arch/x86/kernel/fpu/core.c
+@@ -203,15 +203,6 @@ void fpu_sync_fpstate(struct fpu *fpu)
+ 	fpregs_unlock();
+ }
+ 
+-static inline void fpstate_init_xstate(struct xregs_state *xsave)
+-{
+-	/*
+-	 * XRSTORS requires these bits set in xcomp_bv, or it will
+-	 * trigger #GP:
+-	 */
+-	xsave->header.xcomp_bv = XCOMP_BV_COMPACTED_FORMAT | xfeatures_mask_all;
+-}
+-
+ static inline void fpstate_init_fxstate(struct fxregs_state *fx)
+ {
+ 	fx->cwd = 0x37f;
+@@ -229,8 +220,23 @@ static inline void fpstate_init_fstate(struct fregs_state *fp)
+ 	fp->fos = 0xffff0000u;
+ }
+ 
+-void fpstate_init(union fpregs_state *state)
++/**
++ *
++ * fpstate_init() - initialize the xstate buffer
++ *
++ * If @fpu is NULL, initialize init_fpstate.
++ *
++ * @fpu:	A struct fpu * pointer
++ */
++void fpstate_init(struct fpu *fpu)
+ {
++	union fpregs_state *state;
++
++	if (likely(fpu))
++		state = &fpu->state;
++	else
++		state = &init_fpstate;
++
+ 	if (!static_cpu_has(X86_FEATURE_FPU)) {
+ 		fpstate_init_soft(&state->soft);
+ 		return;
+@@ -239,7 +245,7 @@ void fpstate_init(union fpregs_state *state)
+ 	memset(state, 0, fpu_kernel_xstate_size);
+ 
+ 	if (static_cpu_has(X86_FEATURE_XSAVES))
+-		fpstate_init_xstate(&state->xsave);
++		fpstate_init_xstate(&state->xsave, xfeatures_mask_all);
+ 	if (static_cpu_has(X86_FEATURE_FXSR))
+ 		fpstate_init_fxstate(&state->fxsave);
+ 	else
+diff --git a/arch/x86/kernel/fpu/init.c b/arch/x86/kernel/fpu/init.c
+index 64e29927cc32..e14c72bc8706 100644
+--- a/arch/x86/kernel/fpu/init.c
++++ b/arch/x86/kernel/fpu/init.c
+@@ -124,7 +124,7 @@ static void __init fpu__init_system_generic(void)
+ 	 * Set up the legacy init FPU context. (xstate init might overwrite this
+ 	 * with a more modern format, if the CPU supports it.)
+ 	 */
+-	fpstate_init(&init_fpstate);
++	fpstate_init(NULL);
+ 
+ 	fpu__init_system_mxcsr();
+ }
+diff --git a/arch/x86/kernel/fpu/xstate.c b/arch/x86/kernel/fpu/xstate.c
+index c8def1b7f8fb..d4fdceb9a309 100644
+--- a/arch/x86/kernel/fpu/xstate.c
++++ b/arch/x86/kernel/fpu/xstate.c
+@@ -395,8 +395,7 @@ static void __init setup_init_fpu_buf(void)
+ 	print_xstate_features();
+ 
+ 	if (boot_cpu_has(X86_FEATURE_XSAVES))
+-		init_fpstate.xsave.header.xcomp_bv = XCOMP_BV_COMPACTED_FORMAT |
+-						     xfeatures_mask_all;
++		fpstate_init_xstate(&init_fpstate.xsave, xfeatures_mask_all);
+ 
+ 	/*
+ 	 * Init all the features state with header.xfeatures being 0x0
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index c6dc1b445231..606b66c9b44a 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -10597,7 +10597,7 @@ static void fx_init(struct kvm_vcpu *vcpu)
+ 	if (!vcpu->arch.guest_fpu)
+ 		return;
+ 
+-	fpstate_init(&vcpu->arch.guest_fpu->state);
++	fpstate_init(vcpu->arch.guest_fpu);
+ 	if (boot_cpu_has(X86_FEATURE_XSAVES))
+ 		vcpu->arch.guest_fpu->state.xsave.header.xcomp_bv =
+ 			host_xcr0 | XSTATE_COMPACTION_ENABLED;
+-- 
+2.17.1
+
