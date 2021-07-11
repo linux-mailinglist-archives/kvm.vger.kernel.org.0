@@ -2,155 +2,181 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id CFF143C36C6
-	for <lists+kvm@lfdr.de>; Sat, 10 Jul 2021 22:32:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DDCF53C3DD8
+	for <lists+kvm@lfdr.de>; Sun, 11 Jul 2021 18:08:46 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229640AbhGJUe6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 10 Jul 2021 16:34:58 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:54422 "EHLO
+        id S232319AbhGKQLF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 11 Jul 2021 12:11:05 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:24542 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229515AbhGJUe5 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Sat, 10 Jul 2021 16:34:57 -0400
+        by vger.kernel.org with ESMTP id S229801AbhGKQLF (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Sun, 11 Jul 2021 12:11:05 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1625949131;
+        s=mimecast20190719; t=1626019698;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=vK/k+IFVP1J4jdM2NFzS1evc2TAHZuSfCTiZIbMJz6E=;
-        b=f+Pz+jdyqAxL9ADnBRnUXyNptH3ET5V51EVxuAYadWohbiCmxEQoITGyIbYEsz8v93dko1
-        N+svaWF9z9lYMIUQQnGL/TgY/lRKB7rU3pDJV6Vz+ll2VGFzmODs3dvA1rxvoI4WeyU+RD
-        6LZTCmjX82jEiw0rA9WRKtLf08K1nKM=
+        bh=XELSw37O8TDJHMK3is14sKF8BhQBplTncIZKxDsEcK0=;
+        b=VjfCaCBGL8QzlW6E/cp3hW5jJVIkD0lAzvFTLaJJJxIzxXs3OnffRH71ZIXMmaB6QYligv
+        C3xrAS0RUlpsqaeEFy+cvp1ibCXaWZLXLT4u1P+c6jyT6jaZu2XnIKgEv8Fw4PPyHSqKWi
+        xchx3k+aBCiL1JfBj3OW9sA4Leowir4=
 Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
  [209.85.208.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-526-cyJPlDdmPOqJDu5gV8BEoA-1; Sat, 10 Jul 2021 16:32:10 -0400
-X-MC-Unique: cyJPlDdmPOqJDu5gV8BEoA-1
-Received: by mail-ed1-f70.google.com with SMTP id x16-20020aa7d6d00000b02903a2e0d2acb7so2437442edr.16
-        for <kvm@vger.kernel.org>; Sat, 10 Jul 2021 13:32:10 -0700 (PDT)
+ us-mta-86-RmbRlfdCPJqusIdUhXBZ9Q-1; Sun, 11 Jul 2021 12:08:16 -0400
+X-MC-Unique: RmbRlfdCPJqusIdUhXBZ9Q-1
+Received: by mail-ed1-f70.google.com with SMTP id v14-20020a056402184eb029039994f9cab9so2629471edy.22
+        for <kvm@vger.kernel.org>; Sun, 11 Jul 2021 09:08:16 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=vK/k+IFVP1J4jdM2NFzS1evc2TAHZuSfCTiZIbMJz6E=;
-        b=n9Vu9jQdWqamRILDltnNyDSRv+rzE5JZ99G5jWvyWJiQjHK6XWzMKbMU930fDLsqL2
-         ZliqmRQ40hBDPdnM0g0LNAKf9gqdKXdAqZSHDjCQtXGxQiB+KZQL12PllNihG67MvNLW
-         97wZnPCPNGKxbbJLPRyKAnCE1QbQg5UDlZOszH2CCfI80XPF2Wlg3BITbBt+o5n2Fggm
-         fOUD/3ZHtajJ/KpTxPAgGbJ6AvINCc6S+SV6ppQnzJQ5VchBd6GQB5ipA32P42uoCTef
-         eVZA506CdeCKjW8Al8fFAECFpqHXg3qHeOrVvP81HyWys+XQnonqc+729vZfmeI7LFwi
-         heUA==
-X-Gm-Message-State: AOAM531+9pgeF1aaeaDKVQ4+P1qI650LWEdSZL/OoAk3LBwD0YOxz50X
-        9674G5Fx2Wm1rS8tfMAyP2s2Hhh6DV1JzxpUzmZq4Bh/ubrsiR9M9MauHB/5bIJgAeD4Mkn4M9G
-        dKhzJhGPnEEgI
-X-Received: by 2002:a05:6402:510d:: with SMTP id m13mr55138853edd.179.1625949129479;
-        Sat, 10 Jul 2021 13:32:09 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwhBwV7xiuVieW6MsUcGkhFQKl8z4jMbj40gGsYJmhV/Gd78VG37WlnmLQf5XiejMjuLtS/tw==
-X-Received: by 2002:a05:6402:510d:: with SMTP id m13mr55138839edd.179.1625949129363;
-        Sat, 10 Jul 2021 13:32:09 -0700 (PDT)
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to;
+        bh=XELSw37O8TDJHMK3is14sKF8BhQBplTncIZKxDsEcK0=;
+        b=DTDljLiGdsEbRSVIp8+uBIt1mrzXNcLwAjbWZ188xuqyh+eg8Jy/3QzdfVQr/FrkAB
+         jI4Jmca+YAPsUbuhOo1RIkQDTaBb3w9WHEy+vYKDmmHvZR4PZYyowXacTzoNf4oqWoPn
+         cVkX9lhRyEDbRosjG3czMcEVAZ1L2TlDBN7S4eWkhEvBCHO5jVxpN11UjrJDOhcQCphj
+         0Tqb2hMZsuW2BEyH3jyTxMubGgSqSkka4WgJLiS0TObu97puru7O+dcqNnfNQnX9Sxc8
+         EwqlCH+ezu0peRgIZ5xcC2amz70x/olpHxvAmGk+/qReZqM43+2ZhGLOurcWWyWHvyzO
+         gnXQ==
+X-Gm-Message-State: AOAM533yvmEHeIs66SP8cAFIfarPxJ91Sv4vWa/FkAJMExZnHXxQADiO
+        p+FgxiL1sIiqutqL5razFkaqcqzgHtKNgYw9vLOGf+sSUjRTh4nkwyLFKdtLpzInFSvZVJlZk1K
+        iWhse5M9nGNAa
+X-Received: by 2002:a17:906:5fc1:: with SMTP id k1mr27785410ejv.360.1626019695557;
+        Sun, 11 Jul 2021 09:08:15 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwoOutlQAd3/f1sy1nxXxkoEnxMXnTXG9X2/DyP8QFWC6t3h/0LFkJ/lZQlZunhgEyGPQEKoA==
+X-Received: by 2002:a17:906:5fc1:: with SMTP id k1mr27785387ejv.360.1626019695342;
+        Sun, 11 Jul 2021 09:08:15 -0700 (PDT)
 Received: from redhat.com ([2.55.136.76])
-        by smtp.gmail.com with ESMTPSA id jg9sm2390624ejc.6.2021.07.10.13.32.05
+        by smtp.gmail.com with ESMTPSA id y7sm5292459edc.86.2021.07.11.09.08.11
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 10 Jul 2021 13:32:08 -0700 (PDT)
-Date:   Sat, 10 Jul 2021 16:32:03 -0400
+        Sun, 11 Jul 2021 09:08:14 -0700 (PDT)
+Date:   Sun, 11 Jul 2021 12:08:09 -0400
 From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     Brijesh Singh <brijesh.singh@amd.com>
-Cc:     qemu-devel@nongnu.org, Connor Kuehl <ckuehl@redhat.com>,
-        Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>,
-        James Bottomley <jejb@linux.ibm.com>,
-        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Dov Murik <dovmurik@linux.ibm.com>,
-        David Gibson <david@gibson.dropbear.id.au>,
-        Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>,
-        kvm@vger.kernel.org, Michael Roth <michael.roth@amd.com>,
-        Eduardo Habkost <ehabkost@redhat.com>
-Subject: Re: [RFC PATCH 1/6] linux-header: add the SNP specific command
-Message-ID: <20210710163148-mutt-send-email-mst@kernel.org>
-References: <20210709215550.32496-1-brijesh.singh@amd.com>
- <20210709215550.32496-2-brijesh.singh@amd.com>
+To:     Jason Wang <jasowang@redhat.com>
+Cc:     Christoph Hellwig <hch@infradead.org>,
+        virtualization@lists.linux-foundation.org,
+        linux-kernel@vger.kernel.org, xieyongji@bytedance.com,
+        stefanha@redhat.com, file@sect.tu-berlin.de, ashish.kalra@amd.com,
+        konrad.wilk@oracle.com, kvm@vger.kernel.org
+Subject: Re: [RFC PATCH V2 0/7] Do not read from descripto ring
+Message-ID: <20210711120627-mutt-send-email-mst@kernel.org>
+References: <20210423080942.2997-1-jasowang@redhat.com>
+ <0e9d70b7-6c8a-4ff5-1fa9-3c4f04885bb8@redhat.com>
+ <20210506041057-mutt-send-email-mst@kernel.org>
+ <20210506123829.GA403858@infradead.org>
+ <20210514063516-mutt-send-email-mst@kernel.org>
+ <8bf22db2-97d4-9f88-8b6b-d685fd63ac8b@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20210709215550.32496-2-brijesh.singh@amd.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <8bf22db2-97d4-9f88-8b6b-d685fd63ac8b@redhat.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Jul 09, 2021 at 04:55:45PM -0500, Brijesh Singh wrote:
-> Sync the kvm.h with the kernel to include the SNP specific commands.
+On Fri, Jun 04, 2021 at 01:38:01PM +0800, Jason Wang wrote:
 > 
-> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
-
-Pls specify which kernel version you used for the sync.
-
-> ---
->  linux-headers/linux/kvm.h | 47 +++++++++++++++++++++++++++++++++++++++
->  1 file changed, 47 insertions(+)
+> 在 2021/5/14 下午7:13, Michael S. Tsirkin 写道:
+> > On Thu, May 06, 2021 at 01:38:29PM +0100, Christoph Hellwig wrote:
+> > > On Thu, May 06, 2021 at 04:12:17AM -0400, Michael S. Tsirkin wrote:
+> > > > Let's try for just a bit, won't make this window anyway:
+> > > > 
+> > > > I have an old idea. Add a way to find out that unmap is a nop
+> > > > (or more exactly does not use the address/length).
+> > > > Then in that case even with DMA API we do not need
+> > > > the extra data. Hmm?
+> > > So we actually do have a check for that from the early days of the DMA
+> > > API, but it only works at compile time: CONFIG_NEED_DMA_MAP_STATE.
+> > > 
+> > > But given how rare configs without an iommu or swiotlb are these days
+> > > it has stopped to be very useful.  Unfortunately a runtime-version is
+> > > not entirely trivial, but maybe if we allow for false positives we
+> > > could do something like this
+> > > 
+> > > bool dma_direct_need_state(struct device *dev)
+> > > {
+> > > 	/* some areas could not be covered by any map at all */
+> > > 	if (dev->dma_range_map)
+> > > 		return false;
+> > > 	if (force_dma_unencrypted(dev))
+> > > 		return false;
+> > > 	if (dma_direct_need_sync(dev))
+> > > 		return false;
+> > > 	return *dev->dma_mask == DMA_BIT_MASK(64);
+> > > }
+> > > 
+> > > bool dma_need_state(struct device *dev)
+> > > {
+> > > 	const struct dma_map_ops *ops = get_dma_ops(dev);
+> > > 
+> > > 	if (dma_map_direct(dev, ops))
+> > > 		return dma_direct_need_state(dev);
+> > > 	return ops->unmap_page ||
+> > > 		ops->sync_single_for_cpu || ops->sync_single_for_device;
+> > > }
+> > Yea that sounds like a good idea. We will need to document that.
+> > 
+> > 
+> > Something like:
+> > 
+> > /*
+> >   * dma_need_state - report whether unmap calls use the address and length
+> >   * @dev: device to guery
+> >   *
+> >   * This is a runtime version of CONFIG_NEED_DMA_MAP_STATE.
+> >   *
+> >   * Return the value indicating whether dma_unmap_* and dma_sync_* calls for the device
+> >   * use the DMA state parameters passed to them.
+> >   * The DMA state parameters are: scatter/gather list/table, address and
+> >   * length.
+> >   *
+> >   * If dma_need_state returns false then DMA state parameters are
+> >   * ignored by all dma_unmap_* and dma_sync_* calls, so it is safe to pass 0 for
+> >   * address and length, and DMA_UNMAP_SG_TABLE_INVALID and
+> >   * DMA_UNMAP_SG_LIST_INVALID for s/g table and length respectively.
+> >   * If dma_need_state returns true then DMA state might
+> >   * be used and so the actual values are required.
+> >   */
+> > 
+> > And we will need DMA_UNMAP_SG_TABLE_INVALID and
+> > DMA_UNMAP_SG_LIST_INVALID as pointers to an empty global table and list
+> > for calls such as dma_unmap_sgtable that dereference pointers before checking
+> > they are used.
+> > 
+> > 
+> > Does this look good?
+> > 
+> > The table/length variants are for consistency, virtio specifically does
+> > not use s/g at the moment, but it seems nicer than leaving
+> > users wonder what to do about these.
+> > 
+> > Thoughts? Jason want to try implementing?
 > 
-> diff --git a/linux-headers/linux/kvm.h b/linux-headers/linux/kvm.h
-> index 20d6a263bb..c17ace1ece 100644
-> --- a/linux-headers/linux/kvm.h
-> +++ b/linux-headers/linux/kvm.h
-> @@ -1679,6 +1679,12 @@ enum sev_cmd_id {
->  	/* Guest Migration Extension */
->  	KVM_SEV_SEND_CANCEL,
->  
-> +	/* SNP specific commands */
-> +	KVM_SEV_SNP_INIT = 256,
-> +	KVM_SEV_SNP_LAUNCH_START,
-> +	KVM_SEV_SNP_LAUNCH_UPDATE,
-> +	KVM_SEV_SNP_LAUNCH_FINISH,
-> +
->  	KVM_SEV_NR_MAX,
->  };
->  
-> @@ -1775,6 +1781,47 @@ struct kvm_sev_receive_update_data {
->  	__u32 trans_len;
->  };
->  
-> +struct kvm_snp_init {
-> +	__u64 flags;
-> +};
-> +
-> +struct kvm_sev_snp_launch_start {
-> +	__u64 policy;
-> +	__u64 ma_uaddr;
-> +	__u8 ma_en;
-> +	__u8 imi_en;
-> +	__u8 gosvw[16];
-> +};
-> +
-> +#define KVM_SEV_SNP_PAGE_TYPE_NORMAL		0x1
-> +#define KVM_SEV_SNP_PAGE_TYPE_VMSA		0x2
-> +#define KVM_SEV_SNP_PAGE_TYPE_ZERO		0x3
-> +#define KVM_SEV_SNP_PAGE_TYPE_UNMEASURED	0x4
-> +#define KVM_SEV_SNP_PAGE_TYPE_SECRETS		0x5
-> +#define KVM_SEV_SNP_PAGE_TYPE_CPUID		0x6
-> +
-> +struct kvm_sev_snp_launch_update {
-> +	__u64 uaddr;
-> +	__u32 len;
-> +	__u8 imi_page;
-> +	__u8 page_type;
-> +	__u8 vmpl3_perms;
-> +	__u8 vmpl2_perms;
-> +	__u8 vmpl1_perms;
-> +};
-> +
-> +#define KVM_SEV_SNP_ID_BLOCK_SIZE	96
-> +#define KVM_SEV_SNP_ID_AUTH_SIZE	4096
-> +#define KVM_SEV_SNP_FINISH_DATA_SIZE	32
-> +
-> +struct kvm_sev_snp_launch_finish {
-> +	__u64 id_block_uaddr;
-> +	__u64 id_auth_uaddr;
-> +	__u8 id_block_en;
-> +	__u8 auth_key_en;
-> +	__u8 host_data[KVM_SEV_SNP_FINISH_DATA_SIZE];
-> +};
-> +
->  #define KVM_DEV_ASSIGN_ENABLE_IOMMU	(1 << 0)
->  #define KVM_DEV_ASSIGN_PCI_2_3		(1 << 1)
->  #define KVM_DEV_ASSIGN_MASK_INTX	(1 << 2)
-> -- 
-> 2.17.1
+> 
+> I can add it in my todo list other if other people are interested in this,
+> please let us know.
+> 
+> But this is just about saving the efforts of unmap and it doesn't eliminate
+> the necessary of using private memory (addr, length) for the metadata for
+> validating the device inputs.
+
+
+Besides unmap, why do we need to validate address? length can be
+typically validated by specific drivers - not all of them even use it ..
+
+> And just to clarify, the slight regression we see is testing without
+> VIRTIO_F_ACCESS_PLATFORM which means DMA API is not used.
+
+I guess this is due to extra cache pressure? Maybe create yet another
+array just for DMA state ...
+
+> So I will go to post a formal version of this series and we can start from
+> there.
+> 
+> Thanks
+> 
+> 
+> > 
 
