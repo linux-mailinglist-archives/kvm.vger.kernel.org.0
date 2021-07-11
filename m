@@ -2,59 +2,69 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0D0D63C3EF2
-	for <lists+kvm@lfdr.de>; Sun, 11 Jul 2021 22:07:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2C6353C3EF4
+	for <lists+kvm@lfdr.de>; Sun, 11 Jul 2021 22:13:52 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229823AbhGKUKA convert rfc822-to-8bit (ORCPT
-        <rfc822;lists+kvm@lfdr.de>); Sun, 11 Jul 2021 16:10:00 -0400
-Received: from mail.07d05.mspz7.gob.ec ([186.46.59.139]:32770 "EHLO
-        mail.07d05.mspz7.gob.ec" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229544AbhGKUKA (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 11 Jul 2021 16:10:00 -0400
-Received: from localhost (localhost [127.0.0.1])
-        by mail.07d05.mspz7.gob.ec (Postfix) with ESMTP id 192981860B8E;
-        Sun, 11 Jul 2021 14:08:15 -0500 (-05)
-Received: from mail.07d05.mspz7.gob.ec ([127.0.0.1])
-        by localhost (mail.07d05.mspz7.gob.ec [127.0.0.1]) (amavisd-new, port 10032)
-        with ESMTP id 6GuSRBIO8N2i; Sun, 11 Jul 2021 14:08:14 -0500 (-05)
-Received: from localhost (localhost [127.0.0.1])
-        by mail.07d05.mspz7.gob.ec (Postfix) with ESMTP id BE90D1860B8C;
-        Sun, 11 Jul 2021 14:08:14 -0500 (-05)
-X-Virus-Scanned: amavisd-new at 07d05.mspz7.gob.ec
-Received: from mail.07d05.mspz7.gob.ec ([127.0.0.1])
-        by localhost (mail.07d05.mspz7.gob.ec [127.0.0.1]) (amavisd-new, port 10026)
-        with ESMTP id GObaSceXmAoe; Sun, 11 Jul 2021 14:08:14 -0500 (-05)
-Received: from cris-PC.wifi (unknown [105.9.79.139])
-        by mail.07d05.mspz7.gob.ec (Postfix) with ESMTPSA id A2F4D1860B8E;
-        Sun, 11 Jul 2021 14:08:06 -0500 (-05)
-Content-Type: text/plain; charset="utf-8"
+        id S229817AbhGKUQg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 11 Jul 2021 16:16:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32888 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229544AbhGKUQg (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 11 Jul 2021 16:16:36 -0400
+Received: from mail-lf1-x12f.google.com (mail-lf1-x12f.google.com [IPv6:2a00:1450:4864:20::12f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D661DC0613DD
+        for <kvm@vger.kernel.org>; Sun, 11 Jul 2021 13:13:47 -0700 (PDT)
+Received: by mail-lf1-x12f.google.com with SMTP id n14so37887659lfu.8
+        for <kvm@vger.kernel.org>; Sun, 11 Jul 2021 13:13:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:from:date:message-id:subject:to:cc;
+        bh=HkkE83YWXSph8GGIQ7a8kcVSWWojDzOTgjqgI2j1TWo=;
+        b=UUylzr1hG+ZQjAhsc+9yWJYeijJ2x+miim2+7b/KM6QSUabvG6o9hQ2P0ZiO6pacO9
+         uYSX+UUKZYEbYZm/LMy1M901MLhaAn5skTZpAkAi1isP0E/19XcfuoqcN2CbTXFeLdQc
+         5h5ATDmOJW1CoXMk1FY1g/fNmDGYdDzoHq60d4OxXFdOlOjfCTv770WeCqo6dIrugDbY
+         L3cMS1d/CxcSiTM1OfjWMVJqyTeIkUTkAm5rveGP4Y4Rezn//OCqaBcYLkOifLAMOIr+
+         VMek4FnVrxYpgTcsWBzt5Ug0xcvtLyKfrbT2Gy19jNOGLL6rWiy5wLqpWhx6CHwE7ka0
+         +thA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:from:date:message-id:subject:to:cc;
+        bh=HkkE83YWXSph8GGIQ7a8kcVSWWojDzOTgjqgI2j1TWo=;
+        b=CcKo8maZSARl+yJbqeIAzlo+3KiltjtAQWnHUZI2/4XDY2pKpON7jfFyZrjoBwZZSS
+         WB2NFHguIuzqPVCxypKIU1dWi/0EVB1rWD5Edx/URrqsCqHeZ/bnSRw43f8GSDnwTZty
+         LvQVaIym9e0tDMZb2BGXqrn24eBDQ1ySn2oueJ6v5PFxU3dsyZ9At0m3cQJZw9z3aMLr
+         IS/hMJEO1ruqY92x26UckLA29PirYkRYvy0UQWBIlwQf8zowl9XKc1dnnnz1/RCm1WMS
+         XHU8pLksukLNp2B1mdsbkE3boVBEDAKt2J/beK4W7Uv6dLCXsLs3wWLPeD/ngCnsWkpZ
+         PEhg==
+X-Gm-Message-State: AOAM530qII5DK1QTk8M05WHwnacWUO9N5VlqR86QH/W+anzi0P5JRJOd
+        y2VKcTiz8+cHrlZ/N+3LsFc8mg9FEbs7rGH/bonQ4yzePTTYNKMJI5o=
+X-Google-Smtp-Source: ABdhPJyKW8APxPy/WdNLH5AQFZlV2Reke51kIv1QMnURdqM9GxloNk/zRZujUtXhKGCwxZYFaSvSih2DNjQQSE4d8Kk=
+X-Received: by 2002:a19:2d0a:: with SMTP id k10mr38478844lfj.301.1626034426019;
+ Sun, 11 Jul 2021 13:13:46 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8BIT
-Content-Description: Mail message body
-Subject: spende von 2,000,000 euro
-To:     Recipients <maria.coronel@07d05.mspz7.gob.ec>
-From:   ''Michael Weirsky'' <maria.coronel@07d05.mspz7.gob.ec>
-Date:   Sun, 11 Jul 2021 21:07:57 +0200
-Reply-To: mikeweirskyspende@gmail.com
-Message-Id: <20210711190806.A2F4D1860B8E@mail.07d05.mspz7.gob.ec>
+From:   harry harry <hiharryharryharry@gmail.com>
+Date:   Sun, 11 Jul 2021 15:13:39 -0500
+Message-ID: <CA+-xGqNUX4dpzFV7coJSoJnPz6cE5gdPy1kzRKsQtGD371hyEg@mail.gmail.com>
+Subject: About two-dimensional page translation (e.g., Intel EPT) and shadow
+ page table in Linux QEMU/KVM
+To:     kvm@vger.kernel.org, qemu-devel@nongnu.org
+Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
+        Paolo Bonzini <pbonzini@redhat.com>, stefanha@redhat.com,
+        mathieu.tarral@protonmail.com, Maxim Levitsky <mlevitsk@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Lieber Freund,
+Hi all,
 
-Ich bin Herr Mike Weirsky, New Jersey, Vereinigte Staaten von Amerika, der Mega-Gewinner von $ 273million In Mega Millions Jackpot, spende ich an 5 zufällige Personen, wenn Sie diese E-Mail erhalten, dann wurde Ihre E-Mail nach einem Spinball ausgewählt.Ich habe den größten Teil meines Vermögens auf eine Reihe von Wohltätigkeitsorganisationen und Organisationen verteilt.Ich habe mich freiwillig dazu entschieden, die Summe von € 2.000.000,00 an Sie als eine der ausgewählten 5 zu spenden, um meine Gewinne zu überprüfen.
-Das ist dein Spendencode: [MW530342019]
+I hope you are very well! May I know whether it is possible to enable
+two-dimensional page translation (e.g., Intel EPT) mechanisms and
+shadow page table mechanisms in Linux QEMU/KVM at the same time on a
+physical server? For example, if the physical server has 80 cores, is
+it possible to let 40 cores use Intel EPT mechanisms for page
+translation and the other 40 cores use shadow page table mechanisms?
+Thanks!
 
-www.youtube.com/watch?v=un8yRTmrYMY
-
-
-Antworten Sie mit dem SPENDE-CODE an diese 
-
-E-Mail:mikeweirskyspende@gmail.com
-
-
-Ich hoffe, Sie und Ihre Familie glücklich zu machen.
-
-Grüße
-Herr Mike Weirsky
+Best,
+Harry
