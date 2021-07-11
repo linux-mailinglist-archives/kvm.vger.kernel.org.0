@@ -2,181 +2,133 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id DDCF53C3DD8
-	for <lists+kvm@lfdr.de>; Sun, 11 Jul 2021 18:08:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A3EEC3C3DDB
+	for <lists+kvm@lfdr.de>; Sun, 11 Jul 2021 18:11:27 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232319AbhGKQLF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 11 Jul 2021 12:11:05 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:24542 "EHLO
+        id S232467AbhGKQLd (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 11 Jul 2021 12:11:33 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:44501 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229801AbhGKQLF (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Sun, 11 Jul 2021 12:11:05 -0400
+        by vger.kernel.org with ESMTP id S229660AbhGKQLd (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Sun, 11 Jul 2021 12:11:33 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1626019698;
+        s=mimecast20190719; t=1626019726;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=XELSw37O8TDJHMK3is14sKF8BhQBplTncIZKxDsEcK0=;
-        b=VjfCaCBGL8QzlW6E/cp3hW5jJVIkD0lAzvFTLaJJJxIzxXs3OnffRH71ZIXMmaB6QYligv
-        C3xrAS0RUlpsqaeEFy+cvp1ibCXaWZLXLT4u1P+c6jyT6jaZu2XnIKgEv8Fw4PPyHSqKWi
-        xchx3k+aBCiL1JfBj3OW9sA4Leowir4=
-Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
- [209.85.208.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-86-RmbRlfdCPJqusIdUhXBZ9Q-1; Sun, 11 Jul 2021 12:08:16 -0400
-X-MC-Unique: RmbRlfdCPJqusIdUhXBZ9Q-1
-Received: by mail-ed1-f70.google.com with SMTP id v14-20020a056402184eb029039994f9cab9so2629471edy.22
-        for <kvm@vger.kernel.org>; Sun, 11 Jul 2021 09:08:16 -0700 (PDT)
+        bh=plvdWyXd4qV9pRAdncULs2MVIZL8MtO+i2JcuYf646o=;
+        b=Ucn408Q1FoS3dzmyRF51WXK7I1TJSpir/307vw/dKN8h59NSXfS+q9I33wnEGz2fqyqtuX
+        7vOtqD83eNU9CKr59feVOhqGf0/rSrImlAIoqKwAjNDo0rsIgT9zspqywMbajfu0iFnCYy
+        scMKtuPTdTYyTVSRHCTPoNSzbu0dOsY=
+Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
+ [209.85.218.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-362-9iqZCveIPOKCy6t87jHzFA-1; Sun, 11 Jul 2021 12:08:44 -0400
+X-MC-Unique: 9iqZCveIPOKCy6t87jHzFA-1
+Received: by mail-ej1-f71.google.com with SMTP id hg14-20020a1709072cceb02904dcfba77bceso4015510ejc.19
+        for <kvm@vger.kernel.org>; Sun, 11 Jul 2021 09:08:44 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to;
-        bh=XELSw37O8TDJHMK3is14sKF8BhQBplTncIZKxDsEcK0=;
-        b=DTDljLiGdsEbRSVIp8+uBIt1mrzXNcLwAjbWZ188xuqyh+eg8Jy/3QzdfVQr/FrkAB
-         jI4Jmca+YAPsUbuhOo1RIkQDTaBb3w9WHEy+vYKDmmHvZR4PZYyowXacTzoNf4oqWoPn
-         cVkX9lhRyEDbRosjG3czMcEVAZ1L2TlDBN7S4eWkhEvBCHO5jVxpN11UjrJDOhcQCphj
-         0Tqb2hMZsuW2BEyH3jyTxMubGgSqSkka4WgJLiS0TObu97puru7O+dcqNnfNQnX9Sxc8
-         EwqlCH+ezu0peRgIZ5xcC2amz70x/olpHxvAmGk+/qReZqM43+2ZhGLOurcWWyWHvyzO
-         gnXQ==
-X-Gm-Message-State: AOAM533yvmEHeIs66SP8cAFIfarPxJ91Sv4vWa/FkAJMExZnHXxQADiO
-        p+FgxiL1sIiqutqL5razFkaqcqzgHtKNgYw9vLOGf+sSUjRTh4nkwyLFKdtLpzInFSvZVJlZk1K
-        iWhse5M9nGNAa
-X-Received: by 2002:a17:906:5fc1:: with SMTP id k1mr27785410ejv.360.1626019695557;
-        Sun, 11 Jul 2021 09:08:15 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwoOutlQAd3/f1sy1nxXxkoEnxMXnTXG9X2/DyP8QFWC6t3h/0LFkJ/lZQlZunhgEyGPQEKoA==
-X-Received: by 2002:a17:906:5fc1:: with SMTP id k1mr27785387ejv.360.1626019695342;
-        Sun, 11 Jul 2021 09:08:15 -0700 (PDT)
+         :mime-version:content-disposition:in-reply-to;
+        bh=plvdWyXd4qV9pRAdncULs2MVIZL8MtO+i2JcuYf646o=;
+        b=pDqllx6/18jkgsKrazctLS3g/HtP3UPw5/lJ7iYkX0FM7OQPuBHt3HlpSTnLC2ZwSr
+         9T+mkczlHYBA7J9N+kkwL9EDbqRVwa7PG6I26aCwL+vA+J+yhLix1g7fug0GPvLhVNQd
+         Qf4p4nQ+wE7AqUdLwzdT6V5MSJeyDGmW7GvzGkAhxAjKdbO0uDvAN2h+PYRdJAXXjFNg
+         6jsPxBRWQmc9U3dwNjM5TzkHW4ayWrblpMj+59UNUcUCwG2TsbFZTyqeTKC5DqUd1GQ1
+         mJ2X6CxeV1YoBqJJ9MNp4Pn79vXDKgpQ5E14p926HzLQ2LaDfXP+vwOMWD+2nYD3K+/f
+         twcw==
+X-Gm-Message-State: AOAM531SgWM8l9CditjC3Un+K2jr9QSUf9q9ywV01Fu1MlwPiz8wXeRp
+        yCoXVJwZ1bGQQ3KiV2HlaNlGVqV8Ht52/5agWlxxban8gJJNDTyTwl+4F3P30RPQWceojMHiNNW
+        NyMvKnVN+Gz9q
+X-Received: by 2002:a05:6402:334:: with SMTP id q20mr7782574edw.384.1626019723356;
+        Sun, 11 Jul 2021 09:08:43 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJw5DbXTPixgKQ7SAA5myg1QUAzpzti+8oHSmlPRSSCZOaBtsoWfnjplFHvrs4qVGWvzNiKsUw==
+X-Received: by 2002:a05:6402:334:: with SMTP id q20mr7782566edw.384.1626019723238;
+        Sun, 11 Jul 2021 09:08:43 -0700 (PDT)
 Received: from redhat.com ([2.55.136.76])
-        by smtp.gmail.com with ESMTPSA id y7sm5292459edc.86.2021.07.11.09.08.11
+        by smtp.gmail.com with ESMTPSA id f12sm5266367ejz.99.2021.07.11.09.08.39
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 11 Jul 2021 09:08:14 -0700 (PDT)
-Date:   Sun, 11 Jul 2021 12:08:09 -0400
+        Sun, 11 Jul 2021 09:08:42 -0700 (PDT)
+Date:   Sun, 11 Jul 2021 12:08:36 -0400
 From:   "Michael S. Tsirkin" <mst@redhat.com>
 To:     Jason Wang <jasowang@redhat.com>
-Cc:     Christoph Hellwig <hch@infradead.org>,
-        virtualization@lists.linux-foundation.org,
+Cc:     virtualization@lists.linux-foundation.org,
         linux-kernel@vger.kernel.org, xieyongji@bytedance.com,
         stefanha@redhat.com, file@sect.tu-berlin.de, ashish.kalra@amd.com,
-        konrad.wilk@oracle.com, kvm@vger.kernel.org
-Subject: Re: [RFC PATCH V2 0/7] Do not read from descripto ring
-Message-ID: <20210711120627-mutt-send-email-mst@kernel.org>
-References: <20210423080942.2997-1-jasowang@redhat.com>
- <0e9d70b7-6c8a-4ff5-1fa9-3c4f04885bb8@redhat.com>
- <20210506041057-mutt-send-email-mst@kernel.org>
- <20210506123829.GA403858@infradead.org>
- <20210514063516-mutt-send-email-mst@kernel.org>
- <8bf22db2-97d4-9f88-8b6b-d685fd63ac8b@redhat.com>
+        konrad.wilk@oracle.com, kvm@vger.kernel.org, hch@infradead.org,
+        ak@linux.intel.com, luto@kernel.org
+Subject: Re: [PATCH 0/7] Do not read from descriptor ring
+Message-ID: <20210711120824-mutt-send-email-mst@kernel.org>
+References: <20210604055350.58753-1-jasowang@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <8bf22db2-97d4-9f88-8b6b-d685fd63ac8b@redhat.com>
+In-Reply-To: <20210604055350.58753-1-jasowang@redhat.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Jun 04, 2021 at 01:38:01PM +0800, Jason Wang wrote:
+On Fri, Jun 04, 2021 at 01:53:43PM +0800, Jason Wang wrote:
+> Hi:
 > 
-> 在 2021/5/14 下午7:13, Michael S. Tsirkin 写道:
-> > On Thu, May 06, 2021 at 01:38:29PM +0100, Christoph Hellwig wrote:
-> > > On Thu, May 06, 2021 at 04:12:17AM -0400, Michael S. Tsirkin wrote:
-> > > > Let's try for just a bit, won't make this window anyway:
-> > > > 
-> > > > I have an old idea. Add a way to find out that unmap is a nop
-> > > > (or more exactly does not use the address/length).
-> > > > Then in that case even with DMA API we do not need
-> > > > the extra data. Hmm?
-> > > So we actually do have a check for that from the early days of the DMA
-> > > API, but it only works at compile time: CONFIG_NEED_DMA_MAP_STATE.
-> > > 
-> > > But given how rare configs without an iommu or swiotlb are these days
-> > > it has stopped to be very useful.  Unfortunately a runtime-version is
-> > > not entirely trivial, but maybe if we allow for false positives we
-> > > could do something like this
-> > > 
-> > > bool dma_direct_need_state(struct device *dev)
-> > > {
-> > > 	/* some areas could not be covered by any map at all */
-> > > 	if (dev->dma_range_map)
-> > > 		return false;
-> > > 	if (force_dma_unencrypted(dev))
-> > > 		return false;
-> > > 	if (dma_direct_need_sync(dev))
-> > > 		return false;
-> > > 	return *dev->dma_mask == DMA_BIT_MASK(64);
-> > > }
-> > > 
-> > > bool dma_need_state(struct device *dev)
-> > > {
-> > > 	const struct dma_map_ops *ops = get_dma_ops(dev);
-> > > 
-> > > 	if (dma_map_direct(dev, ops))
-> > > 		return dma_direct_need_state(dev);
-> > > 	return ops->unmap_page ||
-> > > 		ops->sync_single_for_cpu || ops->sync_single_for_device;
-> > > }
-> > Yea that sounds like a good idea. We will need to document that.
-> > 
-> > 
-> > Something like:
-> > 
-> > /*
-> >   * dma_need_state - report whether unmap calls use the address and length
-> >   * @dev: device to guery
-> >   *
-> >   * This is a runtime version of CONFIG_NEED_DMA_MAP_STATE.
-> >   *
-> >   * Return the value indicating whether dma_unmap_* and dma_sync_* calls for the device
-> >   * use the DMA state parameters passed to them.
-> >   * The DMA state parameters are: scatter/gather list/table, address and
-> >   * length.
-> >   *
-> >   * If dma_need_state returns false then DMA state parameters are
-> >   * ignored by all dma_unmap_* and dma_sync_* calls, so it is safe to pass 0 for
-> >   * address and length, and DMA_UNMAP_SG_TABLE_INVALID and
-> >   * DMA_UNMAP_SG_LIST_INVALID for s/g table and length respectively.
-> >   * If dma_need_state returns true then DMA state might
-> >   * be used and so the actual values are required.
-> >   */
-> > 
-> > And we will need DMA_UNMAP_SG_TABLE_INVALID and
-> > DMA_UNMAP_SG_LIST_INVALID as pointers to an empty global table and list
-> > for calls such as dma_unmap_sgtable that dereference pointers before checking
-> > they are used.
-> > 
-> > 
-> > Does this look good?
-> > 
-> > The table/length variants are for consistency, virtio specifically does
-> > not use s/g at the moment, but it seems nicer than leaving
-> > users wonder what to do about these.
-> > 
-> > Thoughts? Jason want to try implementing?
+> The virtio driver should not trust the device. This beame more urgent
+> for the case of encrtpyed VM or VDUSE[1]. In both cases, technology
+> like swiotlb/IOMMU is used to prevent the poking/mangling of memory
+> from the device. But this is not sufficient since current virtio
+> driver may trust what is stored in the descriptor table (coherent
+> mapping) for performing the DMA operations like unmap and bounce so
+> the device may choose to utilize the behaviour of swiotlb to perform
+> attacks[2].
 > 
+> To protect from a malicous device, this series store and use the
+> descriptor metadata in an auxiliay structure which can not be accessed
+> via swiotlb/device instead of the ones in the descriptor table. This
+> means the descriptor table is write-only from the view of the driver.
 > 
-> I can add it in my todo list other if other people are interested in this,
-> please let us know.
+> Actually, we've almost achieved that through packed virtqueue and we
+> just need to fix a corner case of handling mapping errors. For split
+> virtqueue we just follow what's done in the packed.
 > 
-> But this is just about saving the efforts of unmap and it doesn't eliminate
-> the necessary of using private memory (addr, length) for the metadata for
-> validating the device inputs.
+> Note that we don't duplicate descriptor medata for indirect
+> descriptors since it uses stream mapping which is read only so it's
+> safe if the metadata of non-indirect descriptors are correct.
+> 
+> For split virtqueue, the change increase the footprint due the the
+> auxiliary metadata but it's almost neglectlable in simple test like
+> pktgen and netperf TCP stream (slightly noticed in a 40GBE environment
+> with more CPU usage).
+> 
+> Slightly tested with packed on/off, iommu on/of, swiotlb force/off in
+> the guest.
+> 
+> Note that this series tries to fix the attack via descriptor
+> ring. The other cases (used ring and config space) will be fixed by
+> other series or patches.
+> 
+> Please review.
 
+This needs a rebase - can you do it pls?
 
-Besides unmap, why do we need to validate address? length can be
-typically validated by specific drivers - not all of them even use it ..
-
-> And just to clarify, the slight regression we see is testing without
-> VIRTIO_F_ACCESS_PLATFORM which means DMA API is not used.
-
-I guess this is due to extra cache pressure? Maybe create yet another
-array just for DMA state ...
-
-> So I will go to post a formal version of this series and we can start from
-> there.
+> Changes from RFC V2:
+> - no code change
+> - twaeak the commit log a little bit
 > 
-> Thanks
+> Changes from RFC V1:
+> - Always use auxiliary metadata for split virtqueue
+> - Don't read from descripto when detaching indirect descriptor
 > 
+> Jason Wang (7):
+>   virtio-ring: maintain next in extra state for packed virtqueue
+>   virtio_ring: rename vring_desc_extra_packed
+>   virtio-ring: factor out desc_extra allocation
+>   virtio_ring: secure handling of mapping errors
+>   virtio_ring: introduce virtqueue_desc_add_split()
+>   virtio: use err label in __vring_new_virtqueue()
+>   virtio-ring: store DMA metadata in desc_extra for split virtqueue
 > 
-> > 
+>  drivers/virtio/virtio_ring.c | 201 +++++++++++++++++++++++++----------
+>  1 file changed, 144 insertions(+), 57 deletions(-)
+> 
+> -- 
+> 2.25.1
 
