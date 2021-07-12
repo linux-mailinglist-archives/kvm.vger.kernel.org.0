@@ -2,139 +2,148 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C9AFD3C650D
-	for <lists+kvm@lfdr.de>; Mon, 12 Jul 2021 22:38:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6111A3C652C
+	for <lists+kvm@lfdr.de>; Mon, 12 Jul 2021 22:53:11 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232890AbhGLUk4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 12 Jul 2021 16:40:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57410 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230058AbhGLUky (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 12 Jul 2021 16:40:54 -0400
-Received: from mail-pl1-x62c.google.com (mail-pl1-x62c.google.com [IPv6:2607:f8b0:4864:20::62c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5FB94C0613DD
-        for <kvm@vger.kernel.org>; Mon, 12 Jul 2021 13:38:05 -0700 (PDT)
-Received: by mail-pl1-x62c.google.com with SMTP id j3so7963126plx.7
-        for <kvm@vger.kernel.org>; Mon, 12 Jul 2021 13:38:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=fNMr/yrOHQY7jjxJpQ0RVW33vo4pEDNx34eavU3PIlg=;
-        b=EPCJA+5EoTiQyNlpJ1a5iaYZUfKugBxZE46noGw501Ezfyh/7pC5a1sw5neRrAUcnC
-         MbGv2WGQUs5Dlwqi3dw7qzwcI0ZhyTFA4lPkIB2IH0kPT75FiRUQCkbWspo8W1NDj3LK
-         cpIOTUiwqg4chHsjr6TM2OBx5LxSEfHjJpSloy47AL2LulfVImUdcf4L+o2hUd6zJQzc
-         njIfzsDfMPwwktcErhfLD3qBnkilzestub2Pi014mvPV3lRfXqc06SGZf8kdIzbJBeFH
-         bCQQGiBPHCzkhIvQS9/CKT1vjcS58lU6uVW3qjS4mLwwER63z+itisM2INeszuj3gvY4
-         83Rg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=fNMr/yrOHQY7jjxJpQ0RVW33vo4pEDNx34eavU3PIlg=;
-        b=ZLf0T0/xzJrp6ulXSfSElBphKQcS6jJ3ihoLhEVXO0A5X2dbsHLkUYGTAT1LvVhPXA
-         fq9Hm5I3DCp7ZKAeSbxGKUKECFER4nrxwttuD83XwHPVdxXaotcDLm3yT+FNCdYJvLn8
-         5OqNYcTGroIc7VzIP0V7MipP4NMTJkvnd/CiLUcOVDxFBGKdQPB3AhCoa7u2LSAXLgai
-         6IMzwOyc6tksD+XO5SaQVdacqcHDL7O8wRgCkFvrs5rElHjuw7ZT/RGzEY17fpk/88hH
-         QL7q4zOFPtTuHYzd/Xtpijmm7/ANkETNMrC2LSHL2hubVGIv2CrvqhBYerifE9mYgwml
-         2cwA==
-X-Gm-Message-State: AOAM5319UVaPN51jx84rV/pf2OetSJSgrvN8FKEiFV6w2b8m9ZEZ4x7D
-        CXauyEfm/Qh4thOnet9rL+y2Ww==
-X-Google-Smtp-Source: ABdhPJwltdZ/KpokzOzMv6eE28iQ6WLcJDCozePTMOoKErPxEeKChv5F0rMkbL/Fp5++VhnGPXodPQ==
-X-Received: by 2002:a17:90a:d590:: with SMTP id v16mr699974pju.205.1626122284449;
-        Mon, 12 Jul 2021 13:38:04 -0700 (PDT)
-Received: from google.com (254.80.82.34.bc.googleusercontent.com. [34.82.80.254])
-        by smtp.gmail.com with ESMTPSA id d3sm14007327pjo.31.2021.07.12.13.38.03
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 12 Jul 2021 13:38:03 -0700 (PDT)
-Date:   Mon, 12 Jul 2021 20:38:00 +0000
-From:   David Matlack <dmatlack@google.com>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Ben Gardon <bgardon@google.com>, kvm <kvm@vger.kernel.org>,
-        Joerg Roedel <joro@8bytes.org>,
-        Jim Mattson <jmattson@google.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Junaid Shahid <junaids@google.com>,
-        Andrew Jones <drjones@redhat.com>,
-        Matthew Wilcox <willy@infradead.org>,
-        Yu Zhao <yuzhao@google.com>,
-        David Hildenbrand <david@redhat.com>,
-        Andrew Morton <akpm@linux-foundation.org>
-Subject: Re: [PATCH v2 2/6] KVM: x86/mmu: Fix use of enums in
- trace_fast_page_fault
-Message-ID: <YOyoKFr+Vt+ITYpv@google.com>
-References: <20210630214802.1902448-1-dmatlack@google.com>
- <20210630214802.1902448-3-dmatlack@google.com>
- <CANgfPd8zqOKjLeFCcYR-waHhDxb_6LX113o6Dv5uip8R_G3e8g@mail.gmail.com>
- <YOyF3fZY8mXk/3+6@google.com>
- <YOyd063LlhGUFjWD@google.com>
+        id S233998AbhGLUyz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 12 Jul 2021 16:54:55 -0400
+Received: from mail.kernel.org ([198.145.29.99]:45476 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S231289AbhGLUyz (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 12 Jul 2021 16:54:55 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id BFC3461002;
+        Mon, 12 Jul 2021 20:52:05 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1626123126;
+        bh=J6m9ao+LV67ChBaN6D64zfORhcALTt0HFhiUy/cX4yk=;
+        h=Date:From:To:cc:Subject:In-Reply-To:References:From;
+        b=MqxrWtNtRibR6ZBFDxMeQZ8Meqm2snsLyWgMfVMLk57zGg1pd9db/FoZ+tkxENbgy
+         fKhmAnV8sMaaevh+nCKW7nPdqSYH0wB3f8eRS+ySaIgw72MH+h/9SW0QVRzUXogKX+
+         PMDtQBZ9dwOjob5BN24RqAHb4Ia7jEMSwVMet1mU6KPc8n3FHLQ6+x+rxG6hZA2MHM
+         qjwxbka8/LlWPS37/wDnZc47WAtIGVa/Q+EvZ7vnkYhCrUPMju/vakgKDlzzlZIuFm
+         1MF/QjiajpOO7+BE3fYtR/stmiaaBD2QMrtbUf+8MZqHEAa/DWKoma3VuUUHOcqRjx
+         3/7jehQiSkIuQ==
+Date:   Mon, 12 Jul 2021 13:52:05 -0700 (PDT)
+From:   Stefano Stabellini <sstabellini@kernel.org>
+X-X-Sender: sstabellini@sstabellini-ThinkPad-T480s
+To:     Andre Przywara <andre.przywara@arm.com>
+cc:     Wei Chen <Wei.Chen@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "xen-devel@lists.xen.org" <xen-devel@lists.xen.org>,
+        "will@kernel.org" <will@kernel.org>,
+        "jean-philippe@linaro.org" <jean-philippe@linaro.org>,
+        Julien Grall <julien@xen.org>, Marc Zyngier <maz@kernel.org>,
+        "julien.thierry.kdev@gmail.com" <julien.thierry.kdev@gmail.com>,
+        Stefano Stabellini <sstabellini@kernel.org>,
+        Oleksandr Tyshchenko <Oleksandr_Tyshchenko@epam.com>
+Subject: Re: [Kvmtool] Some thoughts on using kvmtool Virtio for Xen
+In-Reply-To: <20210709123749.1aaa5bfe@slackpad.fritz.box>
+Message-ID: <alpine.DEB.2.21.2107121342290.23286@sstabellini-ThinkPad-T480s>
+References: <DB9PR08MB6857B375207376D8320AFBA89E309@DB9PR08MB6857.eurprd08.prod.outlook.com> <20210709123749.1aaa5bfe@slackpad.fritz.box>
+User-Agent: Alpine 2.21 (DEB 202 2017-01-01)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <YOyd063LlhGUFjWD@google.com>
+Content-Type: text/plain; charset=US-ASCII
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Jul 12, 2021 at 07:53:55PM +0000, Sean Christopherson wrote:
-> On Mon, Jul 12, 2021, David Matlack wrote:
-> > On Mon, Jul 12, 2021 at 09:14:01AM -0700, Ben Gardon wrote:
-> > > On Wed, Jun 30, 2021 at 2:48 PM David Matlack <dmatlack@google.com> wrote:
-> > > >
-> > > > Enum values have to be exported to userspace since the formatting is not
-> > > > done in the kernel. Without doing this perf maps RET_PF_FIXED and
-> > > > RET_PF_SPURIOUS to 0, which results in incorrect output:
+On Fri, 9 Jul 2021, Andre Przywara wrote:
+> On Tue, 15 Jun 2021 07:12:08 +0100
+> Wei Chen <Wei.Chen@arm.com> wrote:
 > 
-> Oof, that's brutal.
+> Hi Wei,
 > 
-> > > >   $ perf record -a -e kvmmmu:fast_page_fault --filter "ret==3" -- ./access_tracking_perf_test
-> > > >   $ perf script | head -1
-> > > >    [...] new 610006048d25877 spurious 0 fixed 0  <------ should be 1
-> > > >
-> > > > Fix this by exporting the enum values to userspace with TRACE_DEFINE_ENUM.
-> > > >
-> > > > Fixes: c4371c2a682e ("KVM: x86/mmu: Return unique RET_PF_* values if the fault was fixed")
-> > > > Signed-off-by: David Matlack <dmatlack@google.com>
-> > > > ---
-> > > >  arch/x86/kvm/mmu/mmutrace.h | 3 +++
-> > > >  1 file changed, 3 insertions(+)
-> > > >
-> > > > diff --git a/arch/x86/kvm/mmu/mmutrace.h b/arch/x86/kvm/mmu/mmutrace.h
-> > > > index efbad33a0645..55c7e0fcda52 100644
-> > > > --- a/arch/x86/kvm/mmu/mmutrace.h
-> > > > +++ b/arch/x86/kvm/mmu/mmutrace.h
-> > > > @@ -244,6 +244,9 @@ TRACE_EVENT(
-> > > >                   __entry->access)
-> > > >  );
-> > > >
-> > > > +TRACE_DEFINE_ENUM(RET_PF_FIXED);
-> > > > +TRACE_DEFINE_ENUM(RET_PF_SPURIOUS);
-> > > > +
-> > > 
-> > > If you're planning to send out a v3 anyway, it might be worth adding
-> > > all the PF return code enums:
-> > > 
-> > > enum {
-> > > RET_PF_RETRY = 0,
-> > > RET_PF_EMULATE,
-> > > RET_PF_INVALID,
-> > > RET_PF_FIXED,
-> > > RET_PF_SPURIOUS,
-> > > };
-> > > 
-> > > Just so that no one has to worry about this in the future.
+> > I have some thoughts of using kvmtool Virtio implementation
+> > for Xen. I copied my markdown file to this email. If you have
+> > time, could you please help me review it?
+> > 
+> > Any feedback is welcome!
+> > 
+> > # Some thoughts on using kvmtool Virtio for Xen
+> > ## Background
+> > 
+> > Xen community is working on adding VIRTIO capability to Xen. And we're working
+> > on VIRTIO backend of Xen. But except QEMU can support virtio-net for x86-xen,
+> > there is not any VIRTIO backend can support Xen. Because of the community's
+> > strong voice of Out-of-QEMU, we want to find a light weight VIRTIO backend to
+> > support Xen.
+> > 
+> > We have an idea of utilizing the virtio implementaton of kvmtool for Xen. And
+> > We know there was some agreement that kvmtool won't try to be a full QEMU
+> > alternative. So we have written two proposals in following content for
+> > communities to discuss in public:
+> > 
+> > ## Proposals
+> > ### 1. Introduce a new "dm-only" command
+> > 1. Introduce a new "dm-only" command to provide a pure device model mode. In
+> >    this mode, kvmtool only handles IO request. VM creation and initialization
+> >    will be bypassed.
+> > 
+> >     * We will rework the interface between the virtio code and the rest of
+> >     kvmtool, to use just the minimal set of information. At the end, there
+> >     would be MMIO accesses and shared memory that control the device model,
+> >     so that could be abstracted to do away with any KVM specifics at all. If
+> >     this is workable, we will send the first set of patches to introduce this
+> >     interface, and adapt the existing kvmtool to it. Then later we will can
+> >     add Xen support on top of it.
+> > 
+> >     About Xen support, we will detect the presence of Xen libraries, also
+> >     allow people to ignore them, as kvmtoll do with optional features like
+> >     libz or libaio.
+> > 
+> >     Idealy, we want to move all code replying on Xen libraries to a set of
+> >     new files. In this case, thes files can only be compiled when Xen
+> >     libraries are detected. But if we can't decouple this code completely,
+> >     we may introduce a bit of #ifdefs to protect this code.
+> > 
+> >     If kvm or other VMM do not need "dm-only" mode. Or "dm-only" can not
+> >     work without Xen libraries. We will make "dm-only" command depends on
+> >     the presence of Xen libraries.
+> > 
+> >     So a normal compile (without the Xen libraries installed) would create
+> >     a binary as close as possible to the current code, and only the people
+> >     who having Xen libraries installed would ever generate a "dm-only"
+> >     capable kvmtool.
 > 
-> Until someone adds a new enum :-/
+> This is not for me to decide, but just to let you know that this
+> approach might not be very popular with kvmtool people, as kvmtool's
+> design goal is be "lean and mean". So slapping a lot of code on the
+> side, not helping with the actual KVM functionality, does not sound too
+> tempting.
 > 
-> > Will do in v3. Thanks.
+> > 
+> > ### 2. Abstract kvmtool virtio implementation as a library
+> > 1. Add a kvmtool Makefile target to generate a virtio library. In this
+> >    scenario, not just Xen, but any project else want to provide a
+> >    userspace virtio backend service can link to this virtio libraris.
+> >    These users would benefit from the VIRTIO implementation of kvmtool
+> >    and will participate in improvements, upgrades, and maintenance of
+> >    the VIRTIO libraries.
+> > 
+> >     * In this case, Xen part code will not upstream to kvmtool repo,
+> >       it would then be natural parts of the xen repo, in xen/tools or
+> >       maintained in other repo.
+> > 
+> >       We will have a completely separate VIRTIO backend for Xen, just
+> >       linking to kvmtool's VIRTIO library.
+> > 
+> >     * The main changes of kvmtool would be:
+> >         1. Still need to rework the interface between the virtio code
+> >            and the rest of kvmtool, to abstract the whole virtio
+> >            implementation into a library
+> >         2. Modify current build system to add a new virtio library target.
 > 
-> What about converting the enums to #defines, with a blurb in the comment
-> explaining that the values are arbitrary but aren't enums purely to avoid this
-> tracepoint issue?
+> As this has at least the prospect of being cleaner, this approach
+> sounds better to me.
 
-That will make it possible for someone to accidentally introduce a new
-RET_PF symbol with a duplicate value which will result in incorrect
-behavior. I am leaning towards keeping it as an enum but adding a
-comment that any new enums should be reexported in mmutrace.h.
+There are two sets of changes:
+
+a) Xen ioreq handling
+b) introducing map_guest_page/unmap_guest_page and abstracting other
+   hypervisor interfaces 
+
+a) is minimal and b) is more invasive. The problem is b) is required
+regardless, so the library approach wouldn't really help much with
+reducing the amount of changes required for this to work. But yes, it
+might be cleaner.
