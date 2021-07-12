@@ -2,193 +2,193 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B4BEE3C6542
-	for <lists+kvm@lfdr.de>; Mon, 12 Jul 2021 23:03:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D96E23C6549
+	for <lists+kvm@lfdr.de>; Mon, 12 Jul 2021 23:09:20 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231837AbhGLVGG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 12 Jul 2021 17:06:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34792 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230087AbhGLVGF (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 12 Jul 2021 17:06:05 -0400
-Received: from mail-pl1-x62f.google.com (mail-pl1-x62f.google.com [IPv6:2607:f8b0:4864:20::62f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E3ADDC0613DD
-        for <kvm@vger.kernel.org>; Mon, 12 Jul 2021 14:03:16 -0700 (PDT)
-Received: by mail-pl1-x62f.google.com with SMTP id v14so2983034plg.9
-        for <kvm@vger.kernel.org>; Mon, 12 Jul 2021 14:03:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=ThVuTOrd3dYAEEJRjDVU3NiFGGY4NsXeanubIT7E+8A=;
-        b=f6vC1QkkFVyOj6YHZ0XbnUdqTCh/z6b7MZ2BIiAJqAe10iw267GjUP6YLPJcTbEJ9n
-         895212u4pYe+Sb71r6MWCK2zGTP5b8TAskmyomxkLe5KqR8jKMbcyEJlhQxGycKRt5yo
-         gJtcmkwMtm9gzeghGEdsLi1CpjKWFzrSEd87n180348SDfDVdIuvRDFal6Y1yK9r4G3g
-         JVSu32MP+jamnq58FesPFODAQDWgXs5RtDLZXHKIX+MNomUVvB2kljsPWqZWncfcxnqZ
-         tXdTURvEbYmB7t8ZICybwN7mvrwstXco+IMfMIcJhmKk+kYwNDVsrGm/5Jt0fV8MImGb
-         whdw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=ThVuTOrd3dYAEEJRjDVU3NiFGGY4NsXeanubIT7E+8A=;
-        b=V7DkOFPbxyqZc+2IM0zws2kAb2SN9CtpxyVHkiLs3nTZlWl0hp8znvo4Npmvc9OAyL
-         Mh/YWLRjG6zOb5xFp+KbMVn3Tgq8J5FKkWHZ46b5o0X206/aEX/KBX6F+LOVkp6Z5nOj
-         1iONt7vRrVJijI36HVFJa3mFe/brmG3Z7ST6sZNmMucOiQnUAAro9dDOGXihkybgXCCB
-         nT5K6mPFCrtPcri0HlNB5/rA/qAoGkRAy4+mYoZiL3oXAW3cFkUe7rvFBVqSWOpOg+RG
-         vteBDMpiW/GdgAYmG1nJQrtQo8OXX3yXLodXR0//851BzISFREjpfLcRvu025hLXus7R
-         Qzwg==
-X-Gm-Message-State: AOAM530D8U0kg/pWhMOLAqb2kQjZuIZHxIoRBC60Vh09jrsxMAd9mP3s
-        rQU6Cz/+kfXAHaHjKyKY8WJDqg==
-X-Google-Smtp-Source: ABdhPJyRzK97B/13GGmkcM6iOCjE1VLKvepudlBgRSYfUOleDf+vRvb0t+Te3cTGHdCr25dW4To9Gw==
-X-Received: by 2002:a17:90a:c283:: with SMTP id f3mr812703pjt.138.1626123796223;
-        Mon, 12 Jul 2021 14:03:16 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id g6sm131719pfi.108.2021.07.12.14.03.15
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 12 Jul 2021 14:03:15 -0700 (PDT)
-Date:   Mon, 12 Jul 2021 21:03:11 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Ben Gardon <bgardon@google.com>
-Cc:     David Matlack <dmatlack@google.com>, kvm <kvm@vger.kernel.org>,
-        Joerg Roedel <joro@8bytes.org>,
-        Jim Mattson <jmattson@google.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        id S233376AbhGLVMH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 12 Jul 2021 17:12:07 -0400
+Received: from mail-dm6nam12on2078.outbound.protection.outlook.com ([40.107.243.78]:49376
+        "EHLO NAM12-DM6-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S230087AbhGLVMG (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 12 Jul 2021 17:12:06 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=YUfY2mstwWKJY1C9LD4x8p0nDljp9oWC0Sq1MAP3Oeun/c3zKczCuo8SXLAqtyInXqU9EefBqtWwLeKfWo+iCTbFBq2JZh6PlLsSyrqZnvSOa22AyyFyagnYvYwd8uDXgXcJSWzpfUNVNsl5c4FrnJWq6Xue+E2KouQbxYmp4uak9JSIGviPvDgArLgFSSz7UmZ2Rfc0IZFxecynD4XcqHvJrCo4B5UaJ7tmbKr7ecMGn9C2S7c9+m6NMqksjackwiZj7i29xutiXHd3N5hfZiCiZxxfG0BITF6Pgdlps5cc0z/h8LpLJMFO7fGUG1husju5LuhmFDgfQmw65QAPXQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=ReN3Mr6f8LANxO58byxnMJY/vRqJik3RSL0UR8LDtFE=;
+ b=hAj6Q4HxcUaNQwgtuANU/XOlbSBy6r0SSJtiEy+gQ3uSqG9nPDsbt+2pYtlVjKC6GBskDuhUPH5BrCOLwQByTbNeNiab6ubFgLIrYu9lFy/nAyGkloqKT4xwpeJin8ryEVn+7eRr1i2uEkaYEsIFQVjWWYsPpHjM+27DxgxswSBs5Bmxki/qN/RM+58jdZXAvmrL3oJy9TPK9I1oWGc8G9NQyXM2ZbmiHu9EppV4P4+l0jW8I9Ei/siuk6+1Pt+e5m4C2rs/G7CVNtkct9jEPlI9RDfJTUsREtlE/8CGgNsGGDN6x1SfCUfny3gls8Yube58L/1yw1FdGysJZ1FndQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=ReN3Mr6f8LANxO58byxnMJY/vRqJik3RSL0UR8LDtFE=;
+ b=enLVgJRT8vXdK+n2rzCfCxGe3zI53/cwDXZbu7CQwJfN2vP7sPo5avuXrro2CjOugOzGrnJp8ynffWa7NE/e9s8tanpqBVBOh0AGfQL5OQGvOwkQ8EmeGkn3qJBXEaK3XFPVTqxlkbymZHLx3GVSyvBbMW2AsoF+O/X2ywCJf7g=
+Authentication-Results: vger.kernel.org; dkim=none (message not signed)
+ header.d=none;vger.kernel.org; dmarc=none action=none header.from=amd.com;
+Received: from SN6PR12MB2718.namprd12.prod.outlook.com (2603:10b6:805:6f::22)
+ by SA0PR12MB4557.namprd12.prod.outlook.com (2603:10b6:806:9d::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4308.20; Mon, 12 Jul
+ 2021 21:09:16 +0000
+Received: from SN6PR12MB2718.namprd12.prod.outlook.com
+ ([fe80::a8a9:2aac:4fd1:88fa]) by SN6PR12MB2718.namprd12.prod.outlook.com
+ ([fe80::a8a9:2aac:4fd1:88fa%3]) with mapi id 15.20.4308.026; Mon, 12 Jul 2021
+ 21:09:16 +0000
+Cc:     brijesh.singh@amd.com, Lars Bull <larsbull@google.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        Junaid Shahid <junaids@google.com>,
-        Andrew Jones <drjones@redhat.com>,
-        Matthew Wilcox <willy@infradead.org>,
-        Yu Zhao <yuzhao@google.com>,
-        David Hildenbrand <david@redhat.com>,
-        Andrew Morton <akpm@linux-foundation.org>
-Subject: Re: [PATCH v2 4/6] KVM: x86/mmu: fast_page_fault support for the TDP
- MMU
-Message-ID: <YOyuD7UJXHpNnXA2@google.com>
-References: <20210630214802.1902448-1-dmatlack@google.com>
- <20210630214802.1902448-5-dmatlack@google.com>
- <CANgfPd_Ew2AcwegRxcwr+M_myVjyjq2UVz=pHqVuy-UnPWY_ew@mail.gmail.com>
+        Sean Christopherson <seanjc@google.com>,
+        David Rientjes <rientjes@google.com>,
+        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        "H. Peter Anvin" <hpa@zytor.com>, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 2/3] KVM, SEV: Add support for SEV local migration
+To:     Peter Gonda <pgonda@google.com>, kvm@vger.kernel.org
+References: <20210621163118.1040170-1-pgonda@google.com>
+ <20210621163118.1040170-3-pgonda@google.com>
+From:   Brijesh Singh <brijesh.singh@amd.com>
+Message-ID: <3f4a1b67-f426-5101-1e07-9f948e529d34@amd.com>
+Date:   Mon, 12 Jul 2021 16:09:14 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.11.0
+In-Reply-To: <20210621163118.1040170-3-pgonda@google.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: SA0PR11CA0198.namprd11.prod.outlook.com
+ (2603:10b6:806:1bc::23) To SN6PR12MB2718.namprd12.prod.outlook.com
+ (2603:10b6:805:6f::22)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CANgfPd_Ew2AcwegRxcwr+M_myVjyjq2UVz=pHqVuy-UnPWY_ew@mail.gmail.com>
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from [10.236.31.95] (165.204.77.1) by SA0PR11CA0198.namprd11.prod.outlook.com (2603:10b6:806:1bc::23) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4308.20 via Frontend Transport; Mon, 12 Jul 2021 21:09:15 +0000
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 0a7e1eee-6b61-4dae-8b2c-08d945794ea2
+X-MS-TrafficTypeDiagnostic: SA0PR12MB4557:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <SA0PR12MB45571B39BDE8073E054E2AC9E5159@SA0PR12MB4557.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:6790;
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: +mENNKQ5UwGS7wLgR2pVcuFFseu6HwRdzXLrBruebsMvTzOAZmCUBZjrnMiFiHBCVyI1CxRXe1vYSjrpLgTupXj1HMJEhyZUG8dKXpGu5NpCJDYHDxjNHvbTtDynUoxREbADTp8sh82FbKA/5MnOYeHjLq+xqkhDCUFbd/DUH/LowDSeaKy+nuNb9qE01O9XaxCkcdGZIzbXxLKDrIa8OigPicXBtA+xidZhWE2RyxrgZVmEZODsX5WBWpw5QS56Mp3eFI4jIh5/Lo2AEbrVyjLQYVNEaWiNSZ8h1HqADPxSaaQEZLkgezKsiUkR1p24sfs2aKccZ3XbpaqoKkMaz34BK7I0giVEfeolBZxMTA8jhxzFyW631CIdahoCimJo3W8xyMSHgkK/AlakRCUWewf6pAnwa/6YehwFHxSLBE9+74Y3eAB6xk4wD4ulSt7MweYrBwmVxa3V5YNFmeog1AGtnwk5yahSr+p9QQ00r1pD+Qg2Wq219NowT0hJO7z3K5J4QFnZT/fFWNWEz7taKAJoTKBTLDlrAZQHhOFCGiINnLIdOR+6Ob8a3cui3WCHA8HdfPGz8PSPFjpmBVg06AijnrotKTPw3KXko0VrIFmECvVfIO+PtFDds84v049hjDJxk0IQKvIo7GlEx0Azox860mMJphDmNr0BwmJUfuLetzc07qVR1ZVLAA45N9HHgX6LARzEm782IvgU/FNdj4T1M8MuYy3lg5lOxOXq7nhcA+q7KmvChrsv7Q7Zp7JXuz3rJ1v4d6joOwAhld3fSQ==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR12MB2718.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(39860400002)(396003)(376002)(366004)(346002)(136003)(38350700002)(38100700002)(316002)(7416002)(36756003)(83380400001)(66476007)(66946007)(53546011)(4326008)(5660300002)(478600001)(86362001)(31696002)(6486002)(8676002)(52116002)(186003)(16576012)(54906003)(26005)(31686004)(8936002)(66556008)(956004)(2616005)(44832011)(2906002)(43740500002)(45980500001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?aGlhMmg2dFhBSHJDUWIxZTVlSVdCdFE4WWVacGU0TUhncGttVC9hUVMvRUgv?=
+ =?utf-8?B?WHc4bytIeGxaOXlCUzF2MUJoT0ZBaEhNU29TV3lXT1hqUWlXckMvT0YxbFF4?=
+ =?utf-8?B?enVQYkpwaU9XUXVDK2UxSnRyeFpoRDUvSXExL3pkZk40NEdNeXJ3cG9LWElk?=
+ =?utf-8?B?V0F4ZDlUMEE4bXNzNmVtbVpKcjZSZXZ0ZlZmMXQvZnRNZWFXMW1ZNG9JTDBM?=
+ =?utf-8?B?aFQ3Q3lNUW1TZUQ0dTlSQWtxOTh3dUlrb3J1M3ZsdVlOT1J4bzU5b3IwYjlu?=
+ =?utf-8?B?SVRoMWlheWNjVm5mRnhldUI3ZWwrV0hlVXZUUzVqMG40N053N0RaeXJYb0dU?=
+ =?utf-8?B?b2dzRU1ueUtnKzZ1YWtZMFJFVGkrbmRDaEp2ckJvYjZjNndWaTJYWXJTNFdu?=
+ =?utf-8?B?SmVrYXJOcXd6b3BxZE51NG1zWTFrRHQxdUUyQnQ5VFNxclNuOXhPM3pPSCs0?=
+ =?utf-8?B?RFFXVGt1MTliNmtpbEZyQVg4RWtyVnVuRWR2SERTeUpqVzcrQkM0OVBhSk1G?=
+ =?utf-8?B?T3YwRllyMTZzYS9SY1BlVkhDcWZGRnRrbWdDVWM4aksxa3pwUm9MUk5IZEhX?=
+ =?utf-8?B?NCtnVGV4Yk1ZN3ZxYi95VnA2V2VHWEJzaUtzeitDamg0YW1aRVJMdUVDdXhL?=
+ =?utf-8?B?K3B0cnZaU2hEWkM0c0lDM1V2aW5Pd0xGdVVnbWN0OUhJTUFJUHBZQ255T0Rj?=
+ =?utf-8?B?TzExVjlPa2dRbk4rTHpQR01ZbitxaUdaRlNPcnNKMGQxR0kxb1VKRElpMFBw?=
+ =?utf-8?B?MTB4M3BHTVBVQ3ZYZlhtSU9waURmV0cvQ2lyRmV1UjZxaDBvNFlYRWYwWXla?=
+ =?utf-8?B?RW8vbGJ2RzR3T0svN3JHbEJsSFdza2wzazdseTM0dlQwbTFwT296OWNualpC?=
+ =?utf-8?B?dVZ5OEpsU095TUtaTGpod3gyMUZhb2dkYmVIR0MvcHI3SHZLeFRlZkdUOTY3?=
+ =?utf-8?B?TVkxR3pnUzRyWjZ2MTFqU1doMHplTDEyaHdjN2pkaW9hUnRtTmdJSUoxT3p2?=
+ =?utf-8?B?cFI0UEw1UlRZaTlGSWE5Rk8yclF2MDJPWGdLMFBpZzRZQjlOWGlldFlSNFBx?=
+ =?utf-8?B?aHdaVlZ6UjFNMFc4Q2NDM2JyNDZmNnlsTnFJNXdleExLaitPK2ZxblQwWm5s?=
+ =?utf-8?B?RzRsU3NsbUVmcTFHZW51aVNuamUySDNMK09Kajd0OWFFVnZqanlJRzZ2cXpM?=
+ =?utf-8?B?ek9rYk00U3pzQ2hLaTMwZlZkcHVOZXdYYkNqNFFqajEvTnY1TmVIdEkrT04r?=
+ =?utf-8?B?eFJ4NFNzN3QwVUZZalBJWFhlY2cxY0dDU283M25aQXdxVmRNcDRFVUtyT2Nx?=
+ =?utf-8?B?YWYrdzNzZytJUkx1bW1vWFViM3pRZFJSTlhmcGJINm5sWm5JWUhORDNyS0JQ?=
+ =?utf-8?B?d2FKR3pBMGdGNWhBYkZ4VStZWEI5c2FTUVdFdWkwbW9ZWUdUTTVhVXVOdnU2?=
+ =?utf-8?B?M3NVTkVaZmFKZERadDg3NytvS3BTNXZOa0VMZmlIZ0UrZDBmcmhEZ20wL2xs?=
+ =?utf-8?B?bDNpVUNEcnh4UjNJSHRQQkt6WnJaZkZwSGZoQUM1QWVaemJTR1A2VStsUjB4?=
+ =?utf-8?B?WmVmeXI5clBuU0w1S2dyMDlKQythcmxzZ2VEc3VIN0ZidFBwOGpmelVlb1U0?=
+ =?utf-8?B?bnVCRUJudENNZHJjYTY1anRkMi9tRktrdVQ4Y3p0YjJ1NEFuamQ1VnMyVEV2?=
+ =?utf-8?B?bDlhMUlEUS9YNUJTZG1FZ21GckVjUjFlemtXNTlXQ3hlZTVlSWc0K05QZTFK?=
+ =?utf-8?Q?N4xNBqB907r04CDMFTjniT1157JN4KfJBOxLjkA?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 0a7e1eee-6b61-4dae-8b2c-08d945794ea2
+X-MS-Exchange-CrossTenant-AuthSource: SN6PR12MB2718.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Jul 2021 21:09:16.3899
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: +/mE5Htqy/Na+O6nynvnTZ83+4EZaEqPCQhPjRorcHnLrn5ql9gCEkbvomoVvltG5l0S6U/XVJR3Zk7Uj6fAoA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA0PR12MB4557
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Jul 12, 2021, Ben Gardon wrote:
-> > diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
-> > index c6fa8d00bf9f..2c9e0ed71fa0 100644
-> > --- a/arch/x86/kvm/mmu/tdp_mmu.c
-> > +++ b/arch/x86/kvm/mmu/tdp_mmu.c
-> > @@ -527,6 +527,10 @@ static inline bool tdp_mmu_set_spte_atomic_no_dirty_log(struct kvm *kvm,
-> >         if (is_removed_spte(iter->old_spte))
-> >                 return false;
-> >
-> > +       /*
-> > +        * TDP MMU sptes can also be concurrently cmpxchg'd in
-> > +        * fast_pf_fix_direct_spte as part of fast_page_fault.
-> > +        */
 
-The cmpxchg64 part isn't what's interesting, it's just the means to the end.
-Maybe reword slightly to focus on modifying SPTEs without holding mmu_lock, e.g.
 
-	/*
-	 * Note, fast_pf_fix_direct_spte() can also modify TDP MMU SPTEs outside
-	 * of mmu_lock.
-	 */
+On 6/21/21 11:31 AM, Peter Gonda wrote:
 
-> >         if (cmpxchg64(rcu_dereference(iter->sptep), iter->old_spte,
-> >                       new_spte) != iter->old_spte)
-> >                 return false;
-> 
-> I'm a little nervous about not going through the handle_changed_spte
-> flow for the TDP MMU, but as things are now, I think it's safe.
+> +	if (!sev_guest(kvm))
+> +		return -ENOTTY;
+> +
+> +	if (sev->es_active)
+> +		return -EPERM;
+> +
+> +	if (sev->info_token != 0)
+> +		return -EEXIST;
+> +
+> +	if (copy_from_user(&params, (void __user *)(uintptr_t)argp->data,
+> +			   sizeof(params)))
+> +		return -EFAULT;
+> +
+> +	entry = kzalloc(sizeof(*entry), GFP_KERNEL);
+> +	if (!entry)
+> +		return -ENOMEM;
+> +
+> +	entry->asid = sev->asid;
+> +	entry->handle = sev->handle;
+> +	entry->pages_locked = sev->pages_locked;
+> +	entry->misc_cg = sev->misc_cg;
+> +
+> +	INIT_LIST_HEAD(&entry->regions_list);
+> +	list_replace_init(&sev->regions_list, &entry->regions_list);
 
-Ya, it would be nice to flow through the TDP MMU proper as we could also "restore"
-__rcu.  That said, the fast #PF fix flow is unique and specific enough that I don't
-think it's worth going out of our way to force the issue.
+I believe the entry->regions_list will be NULL if the command is called 
+before the memory regions are registered. The quesiton is, do you need 
+to check whether for a valid sev->handle (i.e, LAUNCH_START is done)?
 
-> > @@ -1546,3 +1550,35 @@ int kvm_tdp_mmu_get_walk_lockless(struct kvm_vcpu *vcpu, u64 addr, u64 *sptes,
-> >
-> >         return leaf;
-> >  }
-> > +
-> > +/*
-> > + * Must be called between kvm_tdp_mmu_walk_shadow_page_lockless_{begin,end}.
-> > + *
-> > + * The returned sptep must not be used after
-> > + * kvm_tdp_mmu_walk_shadow_page_lockless_end.
-> > + */
-> > +u64 *kvm_tdp_mmu_get_last_sptep_lockless(struct kvm_vcpu *vcpu, u64 addr,
-> > +                                        u64 *spte)
-> > +{
-> > +       struct tdp_iter iter;
-> > +       struct kvm_mmu *mmu = vcpu->arch.mmu;
-> > +       gfn_t gfn = addr >> PAGE_SHIFT;
-> > +       tdp_ptep_t sptep = NULL;
-> > +
-> > +       tdp_mmu_for_each_pte(iter, mmu, gfn, gfn + 1) {
-> > +               *spte = iter.old_spte;
-> > +               sptep = iter.sptep;
-> > +       }
-> > +
-> > +       if (sptep)
 
-This check is unnecessary, even when using rcu_dereference.
+> +
+>   /* Userspace wants to query session length. */
+>   static int
+>   __sev_send_start_query_session_length(struct kvm *kvm, struct kvm_sev_cmd *argp,
+> @@ -1513,6 +1711,18 @@ int svm_mem_enc_op(struct kvm *kvm, void __user *argp)
+>   		goto out;
+>   	}
+>   
+> +	/*
+> +	 * If this VM has started exporting its SEV contents to another VM,
+> +	 * it's not allowed to do any more SEV operations that may modify the
+> +	 * SEV state.
+> +	 */
+> +	if (to_kvm_svm(kvm)->sev_info.info_token &&
+> +	    sev_cmd.id != KVM_SEV_DBG_ENCRYPT &&
+> +	    sev_cmd.id != KVM_SEV_DBG_DECRYPT) {
+> +		r = -EPERM;
+> +		goto out;
+> +	}
 
-> > +               /*
-> > +                * Perform the rcu dereference here since we are passing the
-> > +                * sptep up to the generic MMU code which does not know the
-> > +                * synchronization details of the TDP MMU. This is safe as long
-> > +                * as the caller obeys the contract that the sptep is not used
-> > +                * after kvm_tdp_mmu_walk_shadow_page_lockless_end.
-> > +                */
-> 
-> There's a little more to this contract:
-> 1. The caller should only modify the SPTE using an atomic cmpxchg with
-> the returned spte value.
-> 2. The caller should not modify the mapped PFN or present <-> not
-> present state of the SPTE.
-> 3. There are other bits the caller can't modify too. (lpage, mt, etc.)
-> 
-> If the comments on this function don't document all the constraints on
-> how the returned sptep can be used, it might be safer to specify that
-> this is only meant to be used as part of the fast page fault handler.
+Maybe move this check in a function so that it can later extended for 
+SEV-SNP (cmd ids for the debug is different).
 
-Or maybe a less specific, but more scary comment?
+Something like:
 
-> 
-> > +               return rcu_dereference(sptep);
+static bool is_local_mig_active(struct kvm *)
+{
+	....
+}
 
-I still vote to use "(__force u64 *)" instead of rcu_dereference() to make it
-clear we're cheating in order to share code with the legacy MMU.
+Once the migration range hypercall is merged, we also need to preserve 
+any metadata memory maintained by KVM for the unencrypted ranges.
 
-	/*
-	 * Squash the __rcu annotation, the legacy MMU doesn't rely on RCU to
-	 * protect its page tables and so the common MMU code doesn't preserve
-	 * the annotation.
-	 *
-	 * It goes without saying, but the caller must honor all TDP MMU
-	 * contracts for accessing/modifying SPTEs outside of mmu_lock.
-	 */
-	return (__force u64 *)sptep;
-	
-> > +       return NULL;
-> > +}
-> > diff --git a/arch/x86/kvm/mmu/tdp_mmu.h b/arch/x86/kvm/mmu/tdp_mmu.h
-> > index e9dde5f9c0ef..508a23bdf7da 100644
-> > --- a/arch/x86/kvm/mmu/tdp_mmu.h
-> > +++ b/arch/x86/kvm/mmu/tdp_mmu.h
-> > @@ -81,6 +81,8 @@ void kvm_tdp_mmu_walk_lockless_begin(void);
-> >  void kvm_tdp_mmu_walk_lockless_end(void);
-> >  int kvm_tdp_mmu_get_walk_lockless(struct kvm_vcpu *vcpu, u64 addr, u64 *sptes,
-> >                                   int *root_level);
-> > +u64 *kvm_tdp_mmu_get_last_sptep_lockless(struct kvm_vcpu *vcpu, u64 addr,
-> > +                                        u64 *spte);
-> >
-> >  #ifdef CONFIG_X86_64
-> >  bool kvm_mmu_init_tdp_mmu(struct kvm *kvm);
-> > --
-> > 2.32.0.93.g670b81a890-goog
-> >
+-Brijesh
