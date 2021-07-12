@@ -2,129 +2,131 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id F2C443C6098
-	for <lists+kvm@lfdr.de>; Mon, 12 Jul 2021 18:29:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1EA723C60A0
+	for <lists+kvm@lfdr.de>; Mon, 12 Jul 2021 18:30:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233695AbhGLQcZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 12 Jul 2021 12:32:25 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:50397 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S233207AbhGLQcY (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 12 Jul 2021 12:32:24 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1626107375;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=TJmtx5S78DeUeOiaROIWgqckn0w0Vqgpgk4lj+SYH84=;
-        b=MJkm7F7YtEIMvzCuJfcCzs6dFf6A5CjxTMM5XpRteqfyqoONDBxW87fIt4RDfOBAF+7HRN
-        dA/lhj/+sHse9aB5I7WPsF0/wbCE32YlDKFhyd0ZNVW88JvXcjx2Wx41pWWB4KJZVL4Rs3
-        pZbBbtuF2T0e8QZh5rfNj8H/jqsCnhE=
-Received: from mail-io1-f72.google.com (mail-io1-f72.google.com
- [209.85.166.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-161-T-YqQpyJMQ-6FdB85iVLjQ-1; Mon, 12 Jul 2021 12:29:34 -0400
-X-MC-Unique: T-YqQpyJMQ-6FdB85iVLjQ-1
-Received: by mail-io1-f72.google.com with SMTP id p7-20020a6b63070000b029050017e563a6so12225065iog.4
-        for <kvm@vger.kernel.org>; Mon, 12 Jul 2021 09:29:34 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=TJmtx5S78DeUeOiaROIWgqckn0w0Vqgpgk4lj+SYH84=;
-        b=rPILugXsmq7K7pXZhOQhY2NiQVljK+UbUAW7HZfBw0dwcJ18ofAM5KWqSNW9YVOY1z
-         zHqd4/51UVIedrb+54IVuJdhZ5dPvkOFfTE96+O+zPJdF6m5Wt4ouz/jopsqN03brvDr
-         YtVHdXuQle5Eul+OSSSIfpwhCbdyVu4bY2bAdZhRREa4kmQ+3K16NMSI6jQPm4zBfyEF
-         QiInYZYnStT8y360TA58wUweNzZGZ4Vb6xHfvxJ+iKeKj7s7aw80i0V4LHsBIA6+qT9r
-         DBE/8U4qvj5Wlu66Y8kZzQIxB+AkYxqWFbO/hDzgS1jNRRiBbY+rS6DpkkqEfxTNeGIA
-         x8eQ==
-X-Gm-Message-State: AOAM533vBMHpj02Dtm/WlugLDtPv69/nq40t+7vf/iNlNYQSsf/SOQ/4
-        gNzwCkNVB3yyx0mFYhE2Evq2QkcTBQO818kBdH+WcaOnqEqzjKy8Gnq2wQ29uouWHToYNdLrbnL
-        bCR1Zj8SZVcoZ
-X-Received: by 2002:a5d:9396:: with SMTP id c22mr1954806iol.204.1626107373566;
-        Mon, 12 Jul 2021 09:29:33 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwImilQcOnLt4sAj84ow/BK6iQ1ylqR4O4cCQi7qJ0WuQd4a7pAccIK5xQXdYHv+ORO5s/zdw==
-X-Received: by 2002:a5d:9396:: with SMTP id c22mr1954792iol.204.1626107373284;
-        Mon, 12 Jul 2021 09:29:33 -0700 (PDT)
-Received: from gator ([140.82.166.162])
-        by smtp.gmail.com with ESMTPSA id x10sm751617ill.26.2021.07.12.09.29.32
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 12 Jul 2021 09:29:32 -0700 (PDT)
-Date:   Mon, 12 Jul 2021 18:29:30 +0200
-From:   Andrew Jones <drjones@redhat.com>
-To:     Varad Gautam <varad.gautam@suse.com>
-Cc:     kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
-        pbonzini@redhat.com, jroedel@suse.de, bp@suse.de,
-        thomas.lendacky@amd.com, brijesh.singh@amd.com
-Subject: Re: [kvm-unit-tests PATCH 0/6] Initial x86_64 UEFI support
-Message-ID: <20210712162930.hhxv66geufxqe4vy@gator>
-References: <20210702114820.16712-1-varad.gautam@suse.com>
+        id S233983AbhGLQdD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 12 Jul 2021 12:33:03 -0400
+Received: from mga17.intel.com ([192.55.52.151]:7325 "EHLO mga17.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S232710AbhGLQdC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 12 Jul 2021 12:33:02 -0400
+X-IronPort-AV: E=McAfee;i="6200,9189,10043"; a="190393113"
+X-IronPort-AV: E=Sophos;i="5.84,234,1620716400"; 
+   d="scan'208";a="190393113"
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Jul 2021 09:29:38 -0700
+X-IronPort-AV: E=Sophos;i="5.84,234,1620716400"; 
+   d="scan'208";a="459240343"
+Received: from kpurma-mobl.amr.corp.intel.com (HELO [10.212.163.17]) ([10.212.163.17])
+  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Jul 2021 09:29:36 -0700
+Subject: Re: [PATCH Part2 RFC v4 10/40] x86/fault: Add support to handle the
+ RMP fault for user address
+To:     Brijesh Singh <brijesh.singh@amd.com>, x86@kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
+        linux-coco@lists.linux.dev, linux-mm@kvack.org,
+        linux-crypto@vger.kernel.org
+Cc:     Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        David Rientjes <rientjes@google.com>,
+        Dov Murik <dovmurik@linux.ibm.com>,
+        Tobin Feldman-Fitzthum <tobin@ibm.com>,
+        Borislav Petkov <bp@alien8.de>,
+        Michael Roth <michael.roth@amd.com>,
+        Vlastimil Babka <vbabka@suse.cz>, tony.luck@intel.com,
+        npmccallum@redhat.com, brijesh.ksingh@gmail.com
+References: <20210707183616.5620-1-brijesh.singh@amd.com>
+ <20210707183616.5620-11-brijesh.singh@amd.com>
+ <3c6b6fc4-05b2-8d18-2eb8-1bd1a965c632@intel.com>
+ <2b4accb6-b68e-02d3-6fed-975f90558099@amd.com>
+ <a249b101-87d1-2e66-d7d6-af737c045cc3@intel.com>
+ <5592d8ff-e2c3-6474-4a10-96abe1962d6f@amd.com>
+ <bfb857d2-8e3c-4a3b-c64e-96a16c0c6d49@intel.com>
+ <aef6be8a-c93a-1aaa-57fe-116e70483542@amd.com>
+From:   Dave Hansen <dave.hansen@intel.com>
+Autocrypt: addr=dave.hansen@intel.com; keydata=
+ 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
+ z5cecg==
+Message-ID: <c3c71a5b-8100-63f2-1792-d7b53731147c@intel.com>
+Date:   Mon, 12 Jul 2021 09:29:34 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210702114820.16712-1-varad.gautam@suse.com>
+In-Reply-To: <aef6be8a-c93a-1aaa-57fe-116e70483542@amd.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Jul 02, 2021 at 01:48:14PM +0200, Varad Gautam wrote:
-> This series brings EFI support to a reduced subset of kvm-unit-tests
-> on x86_64. I'm sending it out for early review since it covers enough
-> ground to allow adding KVM testcases for EFI-only environments.
+On 7/12/21 9:24 AM, Brijesh Singh wrote:
+> Apologies if I was not clear in the messaging, that's exactly what I
+> mean that we don't feed RMP entries during the page state change.
 > 
-> EFI support works by changing the test entrypoint to a stub entry
-> point for the EFI loader to jump to in long mode, where the test binary
-> exits EFI boot services, performs the remaining CPU bootstrapping,
-> and then calls the testcase main().
+> The sequence of the operation is:
 > 
-> Since the EFI loader only understands PE objects, the first commit
-> introduces a `configure --efi` mode which builds each test as a shared
-> lib. This shared lib is repackaged into a PE via objdump.
+> 1. Guest issues a VMGEXIT (page state change) to add a page in the RMP
+> 2. Hyperivosr adds the page in the RMP table.
 > 
-> Commit 2-4 take a trip from the asm entrypoint to C to exit EFI and
-> relocate ELF .dynamic contents.
-> 
-> Commit 5 adds post-EFI long mode x86_64 setup and calls the testcase.
-> 
-> Commit 6 patches out some broken tests for EFI. Testcases that refuse
-> to build as shared libs are also left disabled, these need some massaging.
-> 
-> git tree: https://github.com/varadgautam/kvm-unit-tests/commits/efi-stub
+> The check will be inside the hypervisor (#2), to query the backing page
+> type, if the backing page is from the hugetlbfs, then don't add the page
+> in the RMP, and fail the page state change VMGEXIT.
 
-Hi Varad,
-
-Thanks for this. I haven't reviewed it in detail yet (I just got back from
-vacation), but this looks like the right approach. In fact, I had started
-going down the efi stub approach for AArch64 a while back as well, but the
-effort got preempted by other work [again]. I'll try to allocate time to
-play with this for x86 and to build on it for AArch64 in the coming weeks.
-
-drew
-
-> 
-> Varad Gautam (6):
->   x86: Build tests as PE objects for the EFI loader
->   x86: Call efi_main from _efi_pe_entry
->   x86: efi_main: Get EFI memory map and exit boot services
->   x86: efi_main: Self-relocate ELF .dynamic addresses
->   cstart64.S: x86_64 bootstrapping after exiting EFI
->   x86: Disable some breaking tests for EFI and modify vmexit test
-> 
->  .gitignore          |   2 +
->  Makefile            |  16 ++-
->  configure           |  11 ++
->  lib/linux/uefi.h    | 337 ++++++++++++++++++++++++++++++++++++++++++++
->  x86/Makefile.common |  45 ++++--
->  x86/Makefile.x86_64 |  43 +++---
->  x86/cstart64.S      |  78 ++++++++++
->  x86/efi.lds         |  67 +++++++++
->  x86/efi_main.c      | 167 ++++++++++++++++++++++
->  x86/vmexit.c        |   7 +
->  10 files changed, 741 insertions(+), 32 deletions(-)
->  create mode 100644 lib/linux/uefi.h
->  create mode 100644 x86/efi.lds
->  create mode 100644 x86/efi_main.c
-> 
-> -- 
-> 2.30.2
-> 
-
+Right, but *LOOOOOONG* before that, something walked the page tables and
+stuffed the PFN into the NPT (that's the AMD equivalent of EPT, right?).
+ You could also avoid this whole mess by refusing to allow hugetblfs to
+be mapped into the guest in the first place.
