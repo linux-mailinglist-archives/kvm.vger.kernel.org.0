@@ -2,95 +2,129 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 30C9E3C5ADA
-	for <lists+kvm@lfdr.de>; Mon, 12 Jul 2021 13:04:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EE78F3C5BEA
+	for <lists+kvm@lfdr.de>; Mon, 12 Jul 2021 14:21:52 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232218AbhGLKhV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 12 Jul 2021 06:37:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58896 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234100AbhGLKhR (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 12 Jul 2021 06:37:17 -0400
-Received: from mail-pf1-x431.google.com (mail-pf1-x431.google.com [IPv6:2607:f8b0:4864:20::431])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7D40DC0613E5;
-        Mon, 12 Jul 2021 03:34:28 -0700 (PDT)
-Received: by mail-pf1-x431.google.com with SMTP id j199so15990183pfd.7;
-        Mon, 12 Jul 2021 03:34:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=bZZ+r9TAdHHsxLCRnmElJouEcg6KlMoFa+SwP9B2Hb8=;
-        b=n07LaDd+Q7BHFZ1vVP3/p0OAnGpuEo1aN5MQHACQHE+5AQKxKeOngqDi/cktBfJ5au
-         VsXgFGRxJKYwn04MOnbCGX/4+k8F0GrlH90Z9UNIGBYE1YebAawjlIIXdslozBdMcFTb
-         cqL4vbjG7/94hBU3at723lOA/N9VtYyNMnNn2TIjsf1DTT4KRInKDGMKiv066Yn5m1GD
-         2OYPMS36P1P5LZL5JNre5JyrOfdwYbPVjChMsLs+XNKU5Q2/AeiDBID27WhDQeYcI1vO
-         T1j3g73S69kfFDVXPxDNCbNbU9wiNFTXLOJlfiOivdb8P5ltxFQT8iN3l5KgMlUqnpoP
-         mHfA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=bZZ+r9TAdHHsxLCRnmElJouEcg6KlMoFa+SwP9B2Hb8=;
-        b=LasItA0joza+ExQm27QLPgfiA9gVUJeoZlsdV7wKa+yEXWSSSnJNRPChGTqYl+nMIu
-         QqC2VxRmciV/t757CchkG1mJb3PJgNElNsfovBZsTbTkVuNmpfRB2WF/TZPj8Jp42nZ7
-         22T4MICHB0rG45j4/ePyweR5BaVM7setkDlXTATC8RuoG/dhLtsdPhtSAl8EoIfJUpOh
-         uTgoPBDzzROr4YwGy/+mY1wi8ggbD/g/PnL9FJEOOuPtIyF1O3gtmNyLXPODewDsS6bb
-         wTp6Vp//h7fc+9jH2DO1v8qb+v/7xg1RL++ePIk+Ue+uOeWazQE81+mpH8UaprfSA3MG
-         Iy1g==
-X-Gm-Message-State: AOAM5317ucN9lIGBVgzgEh7nSxmDp3wavfLbrJZhQ+Exxd8bgb136dko
-        XtKGsM63nN0qNQssEyxcPGA=
-X-Google-Smtp-Source: ABdhPJwxaxzVfwaz971hhX33+UhGltIgWQMW5Y3fx9QbUmbuDSwJRSgYHxNK4f01wYPASuV2LUc6oA==
-X-Received: by 2002:a63:1a5b:: with SMTP id a27mr53401043pgm.427.1626086068019;
-        Mon, 12 Jul 2021 03:34:28 -0700 (PDT)
-Received: from Likes-MacBook-Pro.local ([103.7.29.32])
-        by smtp.gmail.com with ESMTPSA id nl2sm3803193pjb.10.2021.07.12.03.34.23
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 12 Jul 2021 03:34:27 -0700 (PDT)
-Subject: Re: [PATCH V7 00/18] KVM: x86/pmu: Add *basic* support to enable
- guest PEBS via DS
-To:     Liuxiangdong <liuxiangdong5@huawei.com>, lingshan.zhu@intel.com
-Cc:     ak@linux.intel.com, bp@alien8.de, eranian@google.com,
-        jmattson@google.com, joro@8bytes.org, kan.liang@linux.intel.com,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        pbonzini@redhat.com, peterz@infradead.org, seanjc@google.com,
-        vkuznets@redhat.com, wanpengli@tencent.com, wei.w.wang@intel.com,
-        weijiang.yang@intel.com, x86@kernel.org,
-        "Fangyi (Eric)" <eric.fangyi@huawei.com>,
-        Xiexiangyou <xiexiangyou@huawei.com>
-References: <20210622094306.8336-1-lingshan.zhu@intel.com>
- <60EB9CD8.6080608@huawei.com>
-From:   Like Xu <like.xu.linux@gmail.com>
-Message-ID: <19b7db9e-ccde-ca1f-3e17-09e718a1f3a4@gmail.com>
-Date:   Mon, 12 Jul 2021 18:34:17 +0800
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0)
- Gecko/20100101 Thunderbird/78.11.0
-MIME-Version: 1.0
-In-Reply-To: <60EB9CD8.6080608@huawei.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
+        id S233765AbhGLMQO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 12 Jul 2021 08:16:14 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:34678 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S230074AbhGLMQN (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 12 Jul 2021 08:16:13 -0400
+Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 16CC3q8o063869;
+        Mon, 12 Jul 2021 08:13:19 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : message-id : references : content-type : in-reply-to :
+ content-transfer-encoding : mime-version; s=pp1;
+ bh=BdjMHSTliAkxVobXwCyCSfvkC2Mr4rDmoFKGccLL69k=;
+ b=hwK1PHG7ymOQaRFLOMv5IeeGeITaBlvhdzvYGmjTpz4MvCOaJaOC4KtYX2DZo/gtyZKz
+ nUIKmy/GP5iE4wZh1hUvSOmWXPfBcfTjx2/ftb4fNEaQukBkY9oGMzzhz+CecEanUX4M
+ J8QXOfpg87RNH+hMrsZH+8BkESxU0GooIbrOAMEbiJzdnn7Hv61yDApb7e2XXHZi57Fs
+ oJky7lVtUx2zPzwa//Tsst8Twv5VIacqvHcmypoR03TzUakvXSQbbtciQhLi26j+sDxy
+ OUSUCR+Trfz445o0/6QK9HglbJisaOqd3/iTlNfSHaD7n2oBL7LIhcHSNdWfumejsyHC 1Q== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 39qrhyrahr-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 12 Jul 2021 08:13:19 -0400
+Received: from m0098410.ppops.net (m0098410.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 16CC3xS9064620;
+        Mon, 12 Jul 2021 08:13:19 -0400
+Received: from ppma03fra.de.ibm.com (6b.4a.5195.ip4.static.sl-reverse.com [149.81.74.107])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 39qrhyragn-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 12 Jul 2021 08:13:19 -0400
+Received: from pps.filterd (ppma03fra.de.ibm.com [127.0.0.1])
+        by ppma03fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 16CC6u75008136;
+        Mon, 12 Jul 2021 12:13:16 GMT
+Received: from b06cxnps3074.portsmouth.uk.ibm.com (d06relay09.portsmouth.uk.ibm.com [9.149.109.194])
+        by ppma03fra.de.ibm.com with ESMTP id 39q3688d9h-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 12 Jul 2021 12:13:16 +0000
+Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
+        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 16CCDDEI32768284
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 12 Jul 2021 12:13:13 GMT
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id C41704C058;
+        Mon, 12 Jul 2021 12:13:12 +0000 (GMT)
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 43BE04C064;
+        Mon, 12 Jul 2021 12:13:12 +0000 (GMT)
+Received: from osiris (unknown [9.145.68.238])
+        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
+        Mon, 12 Jul 2021 12:13:12 +0000 (GMT)
+Date:   Mon, 12 Jul 2021 14:13:10 +0200
+From:   Heiko Carstens <hca@linux.ibm.com>
+To:     Uwe =?iso-8859-1?Q?Kleine-K=F6nig?= 
+        <u.kleine-koenig@pengutronix.de>
+Cc:     Vineeth Vijayan <vneethv@linux.ibm.com>,
+        Cornelia Huck <cohuck@redhat.com>, linux-s390@vger.kernel.org,
+        Eric Farman <farman@linux.ibm.com>, kvm@vger.kernel.org,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Peter Oberparleiter <oberpar@linux.ibm.com>,
+        linux-kernel@vger.kernel.org, Halil Pasic <pasic@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        kernel@pengutronix.de, Matthew Rosato <mjrosato@linux.ibm.com>
+Subject: Re: [PATCH v2 1/4] s390/cio: Make struct css_driver::remove return
+ void
+Message-ID: <YOwx1lZxLPIRQIJn@osiris>
+References: <20210706154803.1631813-1-u.kleine-koenig@pengutronix.de>
+ <20210706154803.1631813-2-u.kleine-koenig@pengutronix.de>
+ <87zguzfn8e.fsf@redhat.com>
+ <20210706160543.3qfekhzalwsrtahv@pengutronix.de>
+ <ccc9c098-504d-4fd4-43a9-ccb3fa2a2232@linux.ibm.com>
+ <20210707143431.g2wigjypoah4nrlz@pengutronix.de>
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <20210707143431.g2wigjypoah4nrlz@pengutronix.de>
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: tl-b3u-hZoomtKhwFgAacLK_0kNqyNMe
+X-Proofpoint-GUID: gMmn3Jl9HDzU6VQr65Ahy6MSpn6eaBPT
 Content-Transfer-Encoding: 8bit
+X-Proofpoint-UnRewURL: 0 URL was un-rewritten
+MIME-Version: 1.0
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.790
+ definitions=2021-07-12_05:2021-07-12,2021-07-12 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ mlxlogscore=999 suspectscore=0 phishscore=0 spamscore=0 malwarescore=0
+ bulkscore=0 impostorscore=0 mlxscore=0 clxscore=1011 adultscore=0
+ lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2104190000 definitions=main-2107120094
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 12/7/2021 9:37 am, Liuxiangdong wrote:
-> Hiï¼Œ Lingshan.
+On Wed, Jul 07, 2021 at 04:34:31PM +0200, Uwe Kleine-König wrote:
+> Hello Vineeth,
 > 
-> We can use basic pebs for KVM Guest on ICX by this patches set. Will we 
-> consider supporting "perf mem" for KVM Guest?
+> On Wed, Jul 07, 2021 at 01:28:11PM +0200, Vineeth Vijayan wrote:
+> > Thank you. I will use the modified description. This will be picked up by
+> > Vasily/Heiko to the s390-tree.
+> > 
+> > Also Acked-by: Vineeth Vijayan <vneethv@linux.ibm.com>
+> > 
+> > One question, is this patchset supposed to have 4 patches ? Are we missing
+> > one ?
 > 
+> Yes, the fourth patch[1] has the following shortstat:
+> 
+> 	80 files changed, 83 insertions(+), 219 deletions(-)
+> 
+> and the affected files are distributed over the whole source tree.
+> 
+> Given that this fourth patch is the actual motivation for the first
+> three, and I'd like to get this in during the next merge window, I would
+> prefer if these patches were taken together. (Well unless the first
+> three make it into 5.14-rc1 of course.)
+> 
+> Best regards
+> Uwe
+> 
+> [1] https://lore.kernel.org/lkml/20210706154803.1631813-5-u.kleine-koenig@pengutronix.de/
 
-I suggest we can enable more advanced PEBS features
-after the basic support hits the mainline.
+In this case I think Greg should pick up all four patches.
 
-> AFAIK, the load latency facility requires processor supporting PEBS. 
-> Besides, it needs MSR_PEBS_LD_LAT_THRESHOLD
-> msr (3F6H) to specify the desired latency threshold. How about 
-> passthrough this msr to Guest?
-> 
-> Thanks!
-> Xiangdong Liu
-> 
-> 
+FWIW: it's usually also not very helpful to cc people only on parts of
+a patch series and let them figure out the bigger picture.
