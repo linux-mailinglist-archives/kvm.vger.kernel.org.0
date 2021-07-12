@@ -2,162 +2,160 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E46CA3C5FFC
-	for <lists+kvm@lfdr.de>; Mon, 12 Jul 2021 18:01:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1342D3C6004
+	for <lists+kvm@lfdr.de>; Mon, 12 Jul 2021 18:02:56 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233903AbhGLQD6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 12 Jul 2021 12:03:58 -0400
-Received: from mga04.intel.com ([192.55.52.120]:5970 "EHLO mga04.intel.com"
+        id S230039AbhGLQFi (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 12 Jul 2021 12:05:38 -0400
+Received: from foss.arm.com ([217.140.110.172]:57646 "EHLO foss.arm.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229475AbhGLQD6 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 12 Jul 2021 12:03:58 -0400
-X-IronPort-AV: E=McAfee;i="6200,9189,10043"; a="208187470"
-X-IronPort-AV: E=Sophos;i="5.84,234,1620716400"; 
-   d="scan'208";a="208187470"
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Jul 2021 09:01:01 -0700
-X-IronPort-AV: E=Sophos;i="5.84,234,1620716400"; 
-   d="scan'208";a="459231372"
-Received: from kpurma-mobl.amr.corp.intel.com (HELO [10.212.163.17]) ([10.212.163.17])
-  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Jul 2021 09:00:59 -0700
-Subject: Re: [PATCH Part2 RFC v4 10/40] x86/fault: Add support to handle the
- RMP fault for user address
-To:     Brijesh Singh <brijesh.singh@amd.com>, x86@kernel.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
-        linux-coco@lists.linux.dev, linux-mm@kvack.org,
-        linux-crypto@vger.kernel.org
-Cc:     Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
-        David Rientjes <rientjes@google.com>,
-        Dov Murik <dovmurik@linux.ibm.com>,
-        Tobin Feldman-Fitzthum <tobin@ibm.com>,
-        Borislav Petkov <bp@alien8.de>,
-        Michael Roth <michael.roth@amd.com>,
-        Vlastimil Babka <vbabka@suse.cz>, tony.luck@intel.com,
-        npmccallum@redhat.com, brijesh.ksingh@gmail.com
-References: <20210707183616.5620-1-brijesh.singh@amd.com>
- <20210707183616.5620-11-brijesh.singh@amd.com>
- <3c6b6fc4-05b2-8d18-2eb8-1bd1a965c632@intel.com>
- <2b4accb6-b68e-02d3-6fed-975f90558099@amd.com>
-From:   Dave Hansen <dave.hansen@intel.com>
-Autocrypt: addr=dave.hansen@intel.com; keydata=
- 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
- z5cecg==
-Message-ID: <a249b101-87d1-2e66-d7d6-af737c045cc3@intel.com>
-Date:   Mon, 12 Jul 2021 09:00:56 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        id S229465AbhGLQFh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 12 Jul 2021 12:05:37 -0400
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 1A6E11FB;
+        Mon, 12 Jul 2021 09:02:49 -0700 (PDT)
+Received: from [10.57.36.240] (unknown [10.57.36.240])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 6C4933F774;
+        Mon, 12 Jul 2021 09:02:47 -0700 (PDT)
+Subject: Re: [PATCH v2] KVM: arm64: Disabling disabled PMU counters wastes a
+ lot of time
+To:     Alexandru Elisei <alexandru.elisei@arm.com>,
+        Alexandre Chartre <alexandre.chartre@oracle.com>,
+        maz@kernel.org, will@kernel.org, catalin.marinas@arm.com,
+        james.morse@arm.com, suzuki.poulose@arm.com,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org
+Cc:     konrad.wilk@oracle.com
+References: <20210712151700.654819-1-alexandre.chartre@oracle.com>
+ <d4646297-da3a-c629-d0b2-b830cce6a656@arm.com>
+ <90b0b99b-505c-c46c-6c2c-a45192135f5a@arm.com>
+From:   Robin Murphy <robin.murphy@arm.com>
+Message-ID: <74ccea1f-50b6-cf10-0b7f-3aced1d6f42e@arm.com>
+Date:   Mon, 12 Jul 2021 17:02:43 +0100
+User-Agent: Mozilla/5.0 (Windows NT 10.0; rv:78.0) Gecko/20100101
+ Thunderbird/78.11.0
 MIME-Version: 1.0
-In-Reply-To: <2b4accb6-b68e-02d3-6fed-975f90558099@amd.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+In-Reply-To: <90b0b99b-505c-c46c-6c2c-a45192135f5a@arm.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-GB
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 7/12/21 8:43 AM, Brijesh Singh wrote:
->>> +    /*
->>> +     * The backing page level is higher than the RMP page level,
->>> request
->>> +     * to split the page.
->>> +     */
->>> +    if (level > rmp_level)
->>> +        return RMP_FAULT_PAGE_SPLIT;
+On 2021-07-12 16:51, Alexandru Elisei wrote:
+> Hi Robin,
+> 
+> On 7/12/21 4:44 PM, Robin Murphy wrote:
+>> On 2021-07-12 16:17, Alexandre Chartre wrote:
+>>> In a KVM guest on arm64, performance counters interrupts have an
+>>> unnecessary overhead which slows down execution when using the "perf
+>>> record" command and limits the "perf record" sampling period.
+>>>
+>>> The problem is that when a guest VM disables counters by clearing the
+>>> PMCR_EL0.E bit (bit 0), KVM will disable all counters defined in
+>>> PMCR_EL0 even if they are not enabled in PMCNTENSET_EL0.
+>>>
+>>> KVM disables a counter by calling into the perf framework, in particular
+>>> by calling perf_event_create_kernel_counter() which is a time consuming
+>>> operation. So, for example, with a Neoverse N1 CPU core which has 6 event
+>>> counters and one cycle counter, KVM will always disable all 7 counters
+>>> even if only one is enabled.
+>>>
+>>> This typically happens when using the "perf record" command in a guest
+>>> VM: perf will disable all event counters with PMCNTENTSET_EL0 and only
+>>> uses the cycle counter. And when using the "perf record" -F option with
+>>> a high profiling frequency, the overhead of KVM disabling all counters
+>>> instead of one on every counter interrupt becomes very noticeable.
+>>>
+>>> The problem is fixed by having KVM disable only counters which are
+>>> enabled in PMCNTENSET_EL0. If a counter is not enabled in PMCNTENSET_EL0
+>>> then KVM will not enable it when setting PMCR_EL0.E and it will remain
+>>> disabled as long as it is not enabled in PMCNTENSET_EL0. So there is
+>>> effectively no need to disable a counter when clearing PMCR_EL0.E if it
+>>> is not enabled PMCNTENSET_EL0.
+>>>
+>>> Signed-off-by: Alexandre Chartre <alexandre.chartre@oracle.com>
+>>> ---
+>>> The patch is based on
+>>> https://git.kernel.org/pub/scm/linux/kernel/git/maz/arm-platforms.git/log/?h=kvm-arm64/pmu/reset-values
+>>>
+>>>    arch/arm64/kvm/pmu-emul.c | 8 +++++---
+>>>    1 file changed, 5 insertions(+), 3 deletions(-)
+>>>
+>>> diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
+>>> index fae4e95b586c..1f317c3dac61 100644
+>>> --- a/arch/arm64/kvm/pmu-emul.c
+>>> +++ b/arch/arm64/kvm/pmu-emul.c
+>>> @@ -563,21 +563,23 @@ void kvm_pmu_software_increment(struct kvm_vcpu *vcpu,
+>>> u64 val)
+>>>     */
+>>>    void kvm_pmu_handle_pmcr(struct kvm_vcpu *vcpu, u64 val)
+>>>    {
+>>> -    unsigned long mask = kvm_pmu_valid_counter_mask(vcpu);
+>>> +    unsigned long mask;
+>>>        int i;
+>>>          if (val & ARMV8_PMU_PMCR_E) {
+>>>            kvm_pmu_enable_counter_mask(vcpu,
+>>>                   __vcpu_sys_reg(vcpu, PMCNTENSET_EL0));
+>>>        } else {
+>>> -        kvm_pmu_disable_counter_mask(vcpu, mask);
+>>> +        kvm_pmu_disable_counter_mask(vcpu,
+>>> +               __vcpu_sys_reg(vcpu, PMCNTENSET_EL0));
+>>>        }
+>>>          if (val & ARMV8_PMU_PMCR_C)
+>>>            kvm_pmu_set_counter_value(vcpu, ARMV8_PMU_CYCLE_IDX, 0);
+>>>          if (val & ARMV8_PMU_PMCR_P) {
+>>> -        mask &= ~BIT(ARMV8_PMU_CYCLE_IDX);
+>>> +        mask = kvm_pmu_valid_counter_mask(vcpu)
+>>> +            & BIT(ARMV8_PMU_CYCLE_IDX);
 >>
->> This can theoretically trigger on a hugetlbfs page.  Right?
+>> This looks suspiciously opposite of what it replaces;
 > 
-> Yes, theoretically.
+> It always sets the bit, which goes against the architecture and the code it was
+> replacing, yes.
 > 
-> In the current implementation, the VMM is enlightened to not use the
-> hugetlbfs for backing page when creating the SEV-SNP guests.
+>> however did we even need to do a bitwise operation here in the first place?
+>> Couldn't we skip the cycle counter by just limiting the for_each_set_bit
+>> iteration below to 31 bits?
+> 
+> To quote myself [1]:
+> 
+> "Entertained the idea of restricting the number of bits in for_each_set_bit() to
+> 31 since Linux (and the architecture, to some degree) treats the cycle count
+> register as the 32nd event counter.
 
-"The VMM"?
+FWIW I wouldn't say there's any degree to it - we're iterating over the 
+bits in a register where the cycle counter enable is unequivocally the 
+32nd bit.
 
-We try to write kernel code so that it "works" and doesn't do unexpected
-things with whatever userspace might throw at it.  This seems to be
-written with an assumption that no VMM will ever use hugetlbfs with SEV-SNP.
+> Settled on this approach because I think it's
+> clearer."
+> 
+> To expand on that, incorrectly resetting the cycle counter was introduced by a
+> refactoring, so I preferred making it very clear that PMCR_EL0.P is not supposed
+> to clear the cycle counter.
 
-That worries me.  Not only because someone is sure to try it, but it's
-the kind of assumption that an attacker or a fuzzer might try.
+Fair enough, but if this has turned out to be a contentious hot path 
+then masking the bit to zero and then deliberately iterating to see if 
+it's set (find_next_bit() isn't exactly free) adds up to more overhead 
+than a comment ;)
 
-Could you please test this kernel code in practice with hugetblfs?
+Robin.
 
->> I also suspect you can just set VM_FAULT_SIGBUS and let the do_sigbus()
->> call later on in the function do its work.
->>>   +static int handle_split_page_fault(struct vm_fault *vmf)
->>> +{
->>> +    if (!IS_ENABLED(CONFIG_AMD_MEM_ENCRYPT))
->>> +        return VM_FAULT_SIGBUS;
->>> +
->>> +    __split_huge_pmd(vmf->vma, vmf->pmd, vmf->address, false, NULL);
->>> +    return 0;
->>> +}
+> 
+> [1] https://lore.kernel.org/kvmarm/20210618105139.83795-1-alexandru.elisei@arm.com/
+> 
+> Thanks,
+> 
+> Alex
+> 
 >>
->> What will this do when you hand it a hugetlbfs page?
-> 
-> VMM is updated to not use the hugetlbfs when creating SEV-SNP guests.
-> So, we should not run into it.
-
-Please fix this code to handle hugetlbfs along with any other non-THP
-source of level>0 mappings.  DAX comes to mind.  "Handle" can mean
-rejecting these.  You don't have to find some way to split them and make
-the VM work, just fail safely, ideally as early as possible.
-
-To me, this is a fundamental requirement before this code can be accepted.
-
-How many more parts of this series are predicated on the behavior of the
-VMM like this?
+>> Robin.
+>>
+>>>            for_each_set_bit(i, &mask, 32)
+>>>                kvm_pmu_set_counter_value(vcpu, i, 0);
+>>>        }
+>>>
+>>> base-commit: 83f870a663592797c576846db3611e0a1664eda2
+>>>
