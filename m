@@ -2,127 +2,125 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E3D7A3C5E6D
-	for <lists+kvm@lfdr.de>; Mon, 12 Jul 2021 16:36:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2A9FD3C5E8A
+	for <lists+kvm@lfdr.de>; Mon, 12 Jul 2021 16:44:00 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235120AbhGLOjr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 12 Jul 2021 10:39:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58308 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234869AbhGLOjq (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 12 Jul 2021 10:39:46 -0400
-Received: from mail-pj1-x102b.google.com (mail-pj1-x102b.google.com [IPv6:2607:f8b0:4864:20::102b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 59A3AC0613E5
-        for <kvm@vger.kernel.org>; Mon, 12 Jul 2021 07:36:58 -0700 (PDT)
-Received: by mail-pj1-x102b.google.com with SMTP id x21-20020a17090aa395b029016e25313bfcso110076pjp.2
-        for <kvm@vger.kernel.org>; Mon, 12 Jul 2021 07:36:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=odpZLNPMc7XYOJg4WAjgRzU40NqCOqtx42Rk0WM2s8Q=;
-        b=ccZ563+VV+52OBsIFH3Aw7IcIzyEFxDuWoPL/0/Ik9RJfCbUb9xS2zP5h+vMjB5lGT
-         UovueBCODylFLwLm2y/1KXaxxDlJ7rC713azl6HojRAE56wP85G1zm8m7WfkCGk4B5cD
-         gKE1SRURXYSE6wGHqOU/iydAh2okH9ACEOPYJTLKCobp3p/GNIR+CorF4Pr3DaKkTO8P
-         o42U5J73ZidVYKNSRerp2T5cwgCANolDgNT5C1Hhwu6AlVaancH/VeQZJkkSa0UytTnp
-         Cj2ZNcBEBCbfuRKnK48fYKFvAGLaLm6wrsafx0cy5C7iyN5XNAOcFYpK6JyKOOMZ8FgF
-         KPrw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=odpZLNPMc7XYOJg4WAjgRzU40NqCOqtx42Rk0WM2s8Q=;
-        b=W2aQccdNH8l/Z2I5w6E1xdlJmB+nyg6k/dlIGVUSuhPQahamX40GbCMRxznhz9znsC
-         h+FZKxKgVYgQLjo+uGxQNDfuG505luoUzUdwKbv/ZnMoMU4uf9B0rAribxhBKN4/kk3h
-         6y68I/+erXlpPPHG/LjL0ToWTmzxIHlCP/v+1Ly2JudVpG7V7ntBMmPOEpcPiHtzkfvK
-         Vugo39n5lMnpAozbq4+IFkclkAxdXQak4jdPsNmNB9v54te/Qy08qjJuDnQJABfqp3JH
-         Tp80v7yTafMMruXjrccAVbHO1+ZvZ68U0PUoP8DP/F+RzUgJA1Wr7Hm1FDpUDJPLAf/c
-         nNyw==
-X-Gm-Message-State: AOAM531RNWmf2eQH/TIBrwKRyU28HMFWivZvPr2d66DFE+WSJj2/tsAJ
-        zzu32CEtFFYDVst/xx+OLiT/Cg==
-X-Google-Smtp-Source: ABdhPJwnHw0fPqz0rqhI99sLF99SJZNDiWLEHr3fi5BvinY9+07QGr9tGi3TR61W+NCXS3E6nyOp1w==
-X-Received: by 2002:a17:90a:af90:: with SMTP id w16mr14567927pjq.129.1626100617660;
-        Mon, 12 Jul 2021 07:36:57 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id k9sm16054928pfu.100.2021.07.12.07.36.56
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 12 Jul 2021 07:36:57 -0700 (PDT)
-Date:   Mon, 12 Jul 2021 14:36:53 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Yu Zhang <yu.c.zhang@linux.intel.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] Revert "KVM: x86: WARN and reject loading KVM if NX is
- supported but not enabled"
-Message-ID: <YOxThZrKeyONVe4i@google.com>
-References: <20210625001853.318148-1-seanjc@google.com>
- <28ec9d07-756b-f546-dad1-0af751167838@redhat.com>
- <YOiFsB9vZgMcpJZu@google.com>
- <20210712075223.hqqoi4yp4fkkhrt5@linux.intel.com>
+        id S235026AbhGLOqr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 12 Jul 2021 10:46:47 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:32597 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S230363AbhGLOqq (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 12 Jul 2021 10:46:46 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1626101038;
+        h=from:from:reply-to:reply-to:subject:subject:date:date:
+         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+         content-type:content-type:in-reply-to:in-reply-to:  references:references;
+        bh=/hur5bIhEYkoQXxvA1D+ZqSlUPy6prLJMFDVP9XQz8k=;
+        b=XhQbIOghs0l6Qt10Q9BexWx/KBWkNMR4DvE8DpZkZr45FnMUtjNeIYWlOUFxd/8xXnt0Xw
+        pIQPbpT8QmrAEwpZyJG3afKRUqA6xrnfotdlirngWH+5lt+Ame9nUpc21Og0y5B4N/sil0
+        e13lJsdBzdDU+/xc3nJcpCWdgjU6wDk=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-404--D6HKpjGPxaE6Dt4B6ImKQ-1; Mon, 12 Jul 2021 10:43:57 -0400
+X-MC-Unique: -D6HKpjGPxaE6Dt4B6ImKQ-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 84DE71932482;
+        Mon, 12 Jul 2021 14:43:55 +0000 (UTC)
+Received: from redhat.com (ovpn-114-105.ams2.redhat.com [10.36.114.105])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id EC88D1962F;
+        Mon, 12 Jul 2021 14:43:48 +0000 (UTC)
+Date:   Mon, 12 Jul 2021 15:43:46 +0100
+From:   Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To:     Brijesh Singh <brijesh.singh@amd.com>
+Cc:     qemu-devel@nongnu.org, Connor Kuehl <ckuehl@redhat.com>,
+        Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+        "Michael S . Tsirkin" <mst@redhat.com>,
+        James Bottomley <jejb@linux.ibm.com>,
+        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Dov Murik <dovmurik@linux.ibm.com>,
+        David Gibson <david@gibson.dropbear.id.au>,
+        kvm@vger.kernel.org, Michael Roth <michael.roth@amd.com>,
+        Eduardo Habkost <ehabkost@redhat.com>
+Subject: Re: [RFC PATCH 2/6] i386/sev: extend sev-guest property to include
+ SEV-SNP
+Message-ID: <YOxVIjuQnQnO9ytT@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <20210709215550.32496-1-brijesh.singh@amd.com>
+ <20210709215550.32496-3-brijesh.singh@amd.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20210712075223.hqqoi4yp4fkkhrt5@linux.intel.com>
+In-Reply-To: <20210709215550.32496-3-brijesh.singh@amd.com>
+User-Agent: Mutt/2.0.7 (2021-05-04)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Jul 12, 2021, Yu Zhang wrote:
-> On Fri, Jul 09, 2021 at 05:21:52PM +0000, Sean Christopherson wrote:
-> > On Thu, Jul 08, 2021, Paolo Bonzini wrote:
-> > > So do we want this or "depends on X86_64 || X86_PAE"?
-> > 
-> > Hmm, I'm leaning towards keeping !PAE support purely for testing the !PAE<->PAE
-> > MMU transitions for nested virtualization.  It's not much coverage, and the !PAE
+On Fri, Jul 09, 2021 at 04:55:46PM -0500, Brijesh Singh wrote:
+> To launch the SEV-SNP guest, a user can specify up to 8 parameters.
+> Passing all parameters through command line can be difficult.
+
+This sentence applies to pretty much everything in QEMU and the
+SEV-SNP example is nowhere near an extreme example IMHO.
+
+>                                                              To simplify
+> the launch parameter passing, introduce a .ini-like config file that can be
+> used for passing the parameters to the launch flow.
+
+Inventing a new config file format for usage by just one specific
+niche feature in QEMU is something I'd say we do not want.
+
+Our long term goal in QEMU is to move to a world where 100% of
+QEMU configuration is provided in JSON format, using the QAPI
+schema to define the accepted input set.  
+
 > 
-> May I ask what "!PAE<->PAE MMU transition for nested virtualization" means?
-> Running L1 KVM with !PAE and L0 in PAE? I had thought KVM can only function
-> with PAE set(though I did not see any check of CR4 in kvm_arch_init()). Did
-> I miss something?
-
-When L1 uses shadow paging, L0 KVM's uses a single MMU instance for both L1 and
-L2, and relies on the MMU role to differentiate between L1 and L2.  KVM requires
-PAE for shadow paging, but does not require PAE in the host kernel.  So when L1
-KVM uses shadow paging, it can effectively use !PAE paging for L1 and PAE paging
-for L2.  L0 KVM needs to handle that the !PAE<->PAE transitions when switching
-between L1 and L2, e.g. needs to correctly reinitialize the MMU context.
-
-> > NPT horror is a much bigger testing gap (because KVM doesn't support it), but on
-> > the other hand setting EFER.NX for !PAE kernels appears to be trivial, e.g.
-> > 
-> > diff --git a/arch/x86/kernel/head_32.S b/arch/x86/kernel/head_32.S
-> > index 67f590425d90..bfbea25a9fe8 100644
-> > --- a/arch/x86/kernel/head_32.S
-> > +++ b/arch/x86/kernel/head_32.S
-> > @@ -214,12 +214,6 @@ SYM_FUNC_START(startup_32_smp)
-> >         andl $~1,%edx                   # Ignore CPUID.FPU
-> >         jz .Lenable_paging              # No flags or only CPUID.FPU = no CR4
-> > 
-> > -       movl pa(mmu_cr4_features),%eax
-> > -       movl %eax,%cr4
-> > -
-> > -       testb $X86_CR4_PAE, %al         # check if PAE is enabled
-> > -       jz .Lenable_paging
-> > -
-> >         /* Check if extended functions are implemented */
-> >         movl $0x80000000, %eax
-> >         cpuid
-> > 
-> > My only hesitation is the risk of somehow breaking ancient CPUs by falling into
-> > the NX path.  Maybe try forcing EFER.NX=1 for !PAE, and fall back to requiring
-> > PAE if that gets NAK'd or needs to be reverted for whatever reason?
-> > 
+> The contents of the config file will look like this:
 > 
-> One more dumb question: are you planning to set NX for linux with !PAE?
+> $ cat snp-launch.init
+> 
+> # SNP launch parameters
+> [SEV-SNP]
+> init_flags = 0
+> policy = 0x1000
+> id_block = "YWFhYWFhYWFhYWFhYWFhCg=="
 
-Yep.
+These parameters are really tiny and trivial to provide on the command
+line, so I'm not finding this config file compelling.
 
-> Why do we need EFER in that case? Thanks! :)
+> 
+> 
+> Add 'snp' property that can be used to indicate that SEV guest launch
+> should enable the SNP support.
+> 
+> SEV-SNP guest launch examples:
+> 
+> 1) launch without additional parameters
+> 
+>   $(QEMU_CLI) \
+>     -object sev-guest,id=sev0,snp=on
+> 
+> 2) launch with optional parameters
+>   $(QEMU_CLI) \
+>     -object sev-guest,id=sev0,snp=on,launch-config=<file>
+> 
+> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
+> ---
+>  docs/amd-memory-encryption.txt |  81 +++++++++++-
+>  qapi/qom.json                  |   6 +
+>  target/i386/sev.c              | 227 +++++++++++++++++++++++++++++++++
+>  3 files changed, 312 insertions(+), 2 deletions(-)
 
-Because as you rightly remembered above, KVM always uses PAE paging for the guest,
-even when the host is !PAE.  And KVM also requires EFER.NX=1 for the guest when
-using shadow paging to handle a potential SMEP and !WP case.  
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+
