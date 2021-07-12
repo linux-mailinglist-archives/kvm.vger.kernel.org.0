@@ -2,131 +2,140 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1EA723C60A0
-	for <lists+kvm@lfdr.de>; Mon, 12 Jul 2021 18:30:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 834583C60B0
+	for <lists+kvm@lfdr.de>; Mon, 12 Jul 2021 18:36:54 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233983AbhGLQdD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 12 Jul 2021 12:33:03 -0400
-Received: from mga17.intel.com ([192.55.52.151]:7325 "EHLO mga17.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S232710AbhGLQdC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 12 Jul 2021 12:33:02 -0400
-X-IronPort-AV: E=McAfee;i="6200,9189,10043"; a="190393113"
-X-IronPort-AV: E=Sophos;i="5.84,234,1620716400"; 
-   d="scan'208";a="190393113"
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Jul 2021 09:29:38 -0700
-X-IronPort-AV: E=Sophos;i="5.84,234,1620716400"; 
-   d="scan'208";a="459240343"
-Received: from kpurma-mobl.amr.corp.intel.com (HELO [10.212.163.17]) ([10.212.163.17])
-  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Jul 2021 09:29:36 -0700
-Subject: Re: [PATCH Part2 RFC v4 10/40] x86/fault: Add support to handle the
- RMP fault for user address
-To:     Brijesh Singh <brijesh.singh@amd.com>, x86@kernel.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
-        linux-coco@lists.linux.dev, linux-mm@kvack.org,
-        linux-crypto@vger.kernel.org
-Cc:     Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
-        David Rientjes <rientjes@google.com>,
-        Dov Murik <dovmurik@linux.ibm.com>,
-        Tobin Feldman-Fitzthum <tobin@ibm.com>,
-        Borislav Petkov <bp@alien8.de>,
-        Michael Roth <michael.roth@amd.com>,
-        Vlastimil Babka <vbabka@suse.cz>, tony.luck@intel.com,
-        npmccallum@redhat.com, brijesh.ksingh@gmail.com
-References: <20210707183616.5620-1-brijesh.singh@amd.com>
- <20210707183616.5620-11-brijesh.singh@amd.com>
- <3c6b6fc4-05b2-8d18-2eb8-1bd1a965c632@intel.com>
- <2b4accb6-b68e-02d3-6fed-975f90558099@amd.com>
- <a249b101-87d1-2e66-d7d6-af737c045cc3@intel.com>
- <5592d8ff-e2c3-6474-4a10-96abe1962d6f@amd.com>
- <bfb857d2-8e3c-4a3b-c64e-96a16c0c6d49@intel.com>
- <aef6be8a-c93a-1aaa-57fe-116e70483542@amd.com>
-From:   Dave Hansen <dave.hansen@intel.com>
-Autocrypt: addr=dave.hansen@intel.com; keydata=
- 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
- z5cecg==
-Message-ID: <c3c71a5b-8100-63f2-1792-d7b53731147c@intel.com>
-Date:   Mon, 12 Jul 2021 09:29:34 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        id S232710AbhGLQjm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 12 Jul 2021 12:39:42 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:27347 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S230184AbhGLQjl (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 12 Jul 2021 12:39:41 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1626107812;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=MtrPeL1MW5g9H7qmJOUpT+3Y4CWR41HGQODgw/zxeBs=;
+        b=gRVYqrRYr/O0Xs8gh7WUoBjPIfvrJs0fyabPdf3ks++Wj1nPANLMChPL0eQLhAdeHU/p10
+        o9qmLGAZ7xRxCPopJ5w+vk9E4gG4ZGU9LnWPoIVd2DyIF1r6SABVO7mMO5FH2k0nyfx3Hp
+        DFqvO9n0FGFo/dEunRiIGMEOcwHlKYc=
+Received: from mail-il1-f197.google.com (mail-il1-f197.google.com
+ [209.85.166.197]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-322-lmNCuTAOPZCAKX7TMJZMdQ-1; Mon, 12 Jul 2021 12:36:51 -0400
+X-MC-Unique: lmNCuTAOPZCAKX7TMJZMdQ-1
+Received: by mail-il1-f197.google.com with SMTP id s12-20020a056e02216cb02901f9cee02769so5762842ilv.11
+        for <kvm@vger.kernel.org>; Mon, 12 Jul 2021 09:36:50 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=MtrPeL1MW5g9H7qmJOUpT+3Y4CWR41HGQODgw/zxeBs=;
+        b=L0hR3SrmTrh0woIb1em8WatiZdkiYkmJXIqxDy4mPeaCAMtCj8NWGP9YYAfzqhSc5Q
+         k2uLOmVrPlE6/f5xrJa6pE3e0YKchWsHa8PnM+sk1ZVcW0NtkY9X/1pujjv8i7Y369Hv
+         CHgUF+PKeZiWXZaahumAJfNtbd5A/0uBdXmdQYP1rf693gfusLHp/qy1oDj6p+rDq5Yp
+         OrUtIcQno5XuRhQClUI894z2PUGg/E6lXeJcrrDc20tSh59KZ43Ub0yFT9ONQparlS26
+         sz74V3pj8yvre9tISeHlb2k3dXkA0/q/3fUL3j6CgpSd04UzoyWlTwT1Dq0LwCb0xWl3
+         Teag==
+X-Gm-Message-State: AOAM531QnNwttp9ImpNzKZR1kmSHEuqwg9c6/TCRpFm/GyiNb5n0VB/d
+        8NNs4tR+lZ96UQ82j38bZb+/uZEaQBv3v9qkcpOM6kRIJoRETv5B3r5Z3mOiHm+3giR5GLDtw75
+        nxvZppyLZ/K7w
+X-Received: by 2002:a05:6638:3594:: with SMTP id v20mr44398387jal.25.1626107810375;
+        Mon, 12 Jul 2021 09:36:50 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwfZs7GgsE/lzYFDtyQMKvJJdBgqUsxHSeDXSOj4Dft5q8ck5jfD4jmnOq1o4WYVKlXhNT6cA==
+X-Received: by 2002:a05:6638:3594:: with SMTP id v20mr44398375jal.25.1626107810195;
+        Mon, 12 Jul 2021 09:36:50 -0700 (PDT)
+Received: from gator ([140.82.166.162])
+        by smtp.gmail.com with ESMTPSA id m24sm8288360ion.3.2021.07.12.09.36.49
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 12 Jul 2021 09:36:49 -0700 (PDT)
+Date:   Mon, 12 Jul 2021 18:36:47 +0200
+From:   Andrew Jones <drjones@redhat.com>
+To:     Alexandru Elisei <alexandru.elisei@arm.com>
+Cc:     thuth@redhat.com, pbonzini@redhat.com, lvivier@redhat.com,
+        kvm-ppc@vger.kernel.org, david@redhat.com, frankja@linux.ibm.com,
+        cohuck@redhat.com, imbrenda@linux.ibm.com,
+        linux-s390@vger.kernel.org, kvm@vger.kernel.org,
+        kvmarm@lists.cs.columbia.edu, andre.przywara@arm.com,
+        maz@kernel.org, vivek.gautam@arm.com
+Subject: Re: [kvm-unit-tests RFC PATCH 1/5] lib: arm: Print test exit status
+ on exit if chr-testdev is not available
+Message-ID: <20210712163647.oxntpjapur4z23sl@gator>
+References: <20210702163122.96110-1-alexandru.elisei@arm.com>
+ <20210702163122.96110-2-alexandru.elisei@arm.com>
 MIME-Version: 1.0
-In-Reply-To: <aef6be8a-c93a-1aaa-57fe-116e70483542@amd.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210702163122.96110-2-alexandru.elisei@arm.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 7/12/21 9:24 AM, Brijesh Singh wrote:
-> Apologies if I was not clear in the messaging, that's exactly what I
-> mean that we don't feed RMP entries during the page state change.
+On Fri, Jul 02, 2021 at 05:31:18PM +0100, Alexandru Elisei wrote:
+> The arm64 tests can be run under kvmtool, which doesn't emulate a
+> chr-testdev device. In preparation for adding run script support for
+> kvmtool, print the test exit status so the scripts can pick it up and
+> correctly mark the test as pass or fail.
 > 
-> The sequence of the operation is:
+> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
+> ---
+>  lib/chr-testdev.h |  1 +
+>  lib/arm/io.c      | 10 +++++++++-
+>  lib/chr-testdev.c |  5 +++++
+>  3 files changed, 15 insertions(+), 1 deletion(-)
 > 
-> 1. Guest issues a VMGEXIT (page state change) to add a page in the RMP
-> 2. Hyperivosr adds the page in the RMP table.
-> 
-> The check will be inside the hypervisor (#2), to query the backing page
-> type, if the backing page is from the hugetlbfs, then don't add the page
-> in the RMP, and fail the page state change VMGEXIT.
+> diff --git a/lib/chr-testdev.h b/lib/chr-testdev.h
+> index ffd9a851aa9b..09b4b424670e 100644
+> --- a/lib/chr-testdev.h
+> +++ b/lib/chr-testdev.h
+> @@ -11,4 +11,5 @@
+>   */
+>  extern void chr_testdev_init(void);
+>  extern void chr_testdev_exit(int code);
+> +extern bool chr_testdev_available(void);
+>  #endif
+> diff --git a/lib/arm/io.c b/lib/arm/io.c
+> index 343e10822263..9e62b571a91b 100644
+> --- a/lib/arm/io.c
+> +++ b/lib/arm/io.c
+> @@ -125,7 +125,15 @@ extern void halt(int code);
+>  
+>  void exit(int code)
+>  {
+> -	chr_testdev_exit(code);
+> +	if (chr_testdev_available()) {
+> +		chr_testdev_exit(code);
 
-Right, but *LOOOOOONG* before that, something walked the page tables and
-stuffed the PFN into the NPT (that's the AMD equivalent of EPT, right?).
- You could also avoid this whole mess by refusing to allow hugetblfs to
-be mapped into the guest in the first place.
+chr_testdev_exit() already has a 'if !vcon goto out' in it, so you can
+just call it unconditionally. No need for chr_testdev_available().
+
+> +	} else {
+> +		/*
+> +		 * Print the test return code in the format used by chr-testdev
+> +		 * so the runner script can parse it.
+> +		 */
+> +		printf("\nEXIT: STATUS=%d\n", ((code) << 1) | 1);
+> +	}
+>  	psci_system_off();
+>  	halt(code);
+>  	__builtin_unreachable();
+> diff --git a/lib/chr-testdev.c b/lib/chr-testdev.c
+> index b3c641a833fe..301e73a6c064 100644
+> --- a/lib/chr-testdev.c
+> +++ b/lib/chr-testdev.c
+> @@ -68,3 +68,8 @@ void chr_testdev_init(void)
+>  	in_vq = vqs[0];
+>  	out_vq = vqs[1];
+>  }
+> +
+> +bool chr_testdev_available(void)
+> +{
+> +	return vcon != NULL;
+> +}
+> -- 
+> 2.32.0
+>
+
+Thanks,
+drew 
+
