@@ -2,185 +2,108 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 05BD93C61AD
-	for <lists+kvm@lfdr.de>; Mon, 12 Jul 2021 19:12:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E07C83C61C0
+	for <lists+kvm@lfdr.de>; Mon, 12 Jul 2021 19:20:18 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235473AbhGLRPW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 12 Jul 2021 13:15:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38038 "EHLO
+        id S234208AbhGLRXG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 12 Jul 2021 13:23:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39800 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235525AbhGLRPV (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 12 Jul 2021 13:15:21 -0400
-Received: from mail-pg1-x52d.google.com (mail-pg1-x52d.google.com [IPv6:2607:f8b0:4864:20::52d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6EC3CC0613E8;
-        Mon, 12 Jul 2021 10:12:33 -0700 (PDT)
-Received: by mail-pg1-x52d.google.com with SMTP id a2so18940934pgi.6;
-        Mon, 12 Jul 2021 10:12:33 -0700 (PDT)
+        with ESMTP id S233668AbhGLRXF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 12 Jul 2021 13:23:05 -0400
+Received: from mail-oi1-x22a.google.com (mail-oi1-x22a.google.com [IPv6:2607:f8b0:4864:20::22a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BDB4EC0613E5
+        for <kvm@vger.kernel.org>; Mon, 12 Jul 2021 10:20:16 -0700 (PDT)
+Received: by mail-oi1-x22a.google.com with SMTP id w127so25330235oig.12
+        for <kvm@vger.kernel.org>; Mon, 12 Jul 2021 10:20:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:message-id:mime-version:subject:date:in-reply-to:cc:to
-         :references;
-        bh=d/B8JhWrn+P+yWZ6A7daQWqsVya17WmZTHfEtvqYBfI=;
-        b=hjTL7bTAdN4wcNkHBK9e23RjGwMSI3zDECVWUCkJjSvAfRPg27gXedUHbesheDmWbh
-         Cz951EsDV6FeAp8J3fWXAskm+sH81BpBYFGgUZQ1RBRZRI1zh3Vw0R6jHsMBvZ5l0hhz
-         zKazvU+1fvn+1OWHy4UanPXk9vz/2+LhUOR5KnwuAh5kfgZdhLISDqEXs67iB8s69Ywp
-         zrFiOz78XMjFd8BP5N1GjxX1ITPzIL1fG09Jy2JMPos6B2w3NJKT8soFJ24B2UORGJhF
-         EP7YJgCennpf5s5uP+uYm7y5BItu0jPfxW7CZZHWW/fOZsgZRIVvctzGsEtDdY7PKugY
-         S9mA==
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=/g8dTtqEdW34OwE46m1MAAewcTdXVykzo2F4gfcfFFQ=;
+        b=FgzYbYWWchiFEX7JgzLKKjpNjSXbJFtN64/66JKLT7nxtDXqKdS6dmH55joKAL+sXz
+         BxIQNE9emF49HbPJ+lPO2V++Kc5y++hSFU0F+z7Lv7o2iYOub3UWC1bAA0cp3kD/dOf6
+         ji4OkDM89dDb2iK2vZzHUwweAI7g6BoUt7h6FmNNTDcQIyGIeuJofzEzyKxvL1Bvwz+O
+         zQP9ciarNI2bFATzZ7+oGOi7/BoKEAC78+KpGDYMm/aySIVbDs9mJwnGFnjBAUkr15mJ
+         iws9TWsO9v5liXhfcImCSsWYTZjUlhEtD6LHxZg14KIwkotAg7CKC4nCFuHiGlHCWWNx
+         8OEA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:message-id:mime-version:subject:date
-         :in-reply-to:cc:to:references;
-        bh=d/B8JhWrn+P+yWZ6A7daQWqsVya17WmZTHfEtvqYBfI=;
-        b=hztIfcZfmhBTDgSp6Lk5hY7JTce04BoI+5T1T/9xwouVwIaOLC8/p2RcoMyF1By2wd
-         Ezvr5O7dJOC5sZivYpWqKjre5T5eKsoZwBAYLdQAXYFcQ5v0FSmDyybX0v7lACku3CAP
-         Oarm+gNpdT4rj9gVAUGWx6kWatnO9s7NpHAojns/kOye0kQz9ashBYzjgK+vLnLeQ5lA
-         nGqNDGx1hH7W95nZplTAIL0AID+gy7AvhupJs20CDL3PrEzjcF9SD5z6eha4s9cdybmw
-         NRxtQw8Bb9RIQfBA9gZHext9XQC71G1Ng7y6xzFV3kOdA9uU+6lBpOX9bi2O5Jw8Nglk
-         fORA==
-X-Gm-Message-State: AOAM533qHwXKyp+LMCw09zeuMQj5vR3HymX94Uxr8Wq+/gTBHR5dmmLb
-        5UxdekRGSMhaPcvbOMVIGSI=
-X-Google-Smtp-Source: ABdhPJw8dktYBLoO8NebmN3gh5UlbpP9aIxWwZiONjNtgpy7m0NOs/lG3v6o29Rd6bkdRGQNPmk+UA==
-X-Received: by 2002:a63:67c5:: with SMTP id b188mr122427pgc.333.1626109952779;
-        Mon, 12 Jul 2021 10:12:32 -0700 (PDT)
-Received: from smtpclient.apple (c-24-6-216-183.hsd1.ca.comcast.net. [24.6.216.183])
-        by smtp.gmail.com with ESMTPSA id t2sm16281610pfg.73.2021.07.12.10.12.30
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 12 Jul 2021 10:12:31 -0700 (PDT)
-From:   Nadav Amit <nadav.amit@gmail.com>
-Message-Id: <442EEB37-C289-4CB5-8161-71A54A350FEE@gmail.com>
-Content-Type: multipart/signed;
-        boundary="Apple-Mail=_DFB43D18-AF75-4226-A207-864049DAB84E";
-        protocol="application/pgp-signature";
-        micalg=pgp-sha256
-Mime-Version: 1.0 (Mac OS X Mail 14.0 \(3654.100.0.2.22\))
-Subject: Re: [kvm-unit-tests RFC PATCH 1/5] lib: arm: Print test exit status
- on exit if chr-testdev is not available
-Date:   Mon, 12 Jul 2021 10:12:29 -0700
-In-Reply-To: <20210712170745.wz2jewomlqchmhhb@gator>
-Cc:     Andre Przywara <andre.przywara@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Thomas Huth <thuth@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Laurent Vivier <lvivier@redhat.com>, kvm-ppc@vger.kernel.org,
-        David Hildenbrand <david@redhat.com>,
-        Janosch Frank <frankja@linux.ibm.com>, cohuck@redhat.com,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        linux-s390 <linux-s390@vger.kernel.org>,
-        KVM <kvm@vger.kernel.org>, kvmarm@lists.cs.columbia.edu,
-        maz@kernel.org, vivek.gautam@arm.com
-To:     Andrew Jones <drjones@redhat.com>
-References: <20210702163122.96110-1-alexandru.elisei@arm.com>
- <20210702163122.96110-2-alexandru.elisei@arm.com>
- <20210712175155.7c6f8dc3@slackpad.fritz.box>
- <20210712170745.wz2jewomlqchmhhb@gator>
-X-Mailer: Apple Mail (2.3654.100.0.2.22)
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=/g8dTtqEdW34OwE46m1MAAewcTdXVykzo2F4gfcfFFQ=;
+        b=sQWkyN8UV9gbZcLCndYSOC6vzQkKqc9zIOstbADeoZoMQ6/iXdtWxR92HEo9CeVmRl
+         vc6HQxxcjbhJGli2rcnHD7v55WMghPK0/jR1pYi/VLIMSWrNoVEXYfrCeW6rGxX7Lcvx
+         zYRzxw3oH0KZ7EEIBqhm21Vb972oHtJrSsZofVyjxU/k4vCVDFJRxa/8cjHnmGN53NvF
+         wmTwc5Nw2p+MSdDjlgXuQ3DCIU6zvqVOinjbl1NkUs7DN+fdScOm1JYrA+cbMr/N89XO
+         rT2eeJ5H0qqToktS3ay4EQmAsbbHmhhSPaRn9IRa+ycpuVdU2tFgpx8djt8Aw5gARBMI
+         zO/A==
+X-Gm-Message-State: AOAM531WW88TANzGNtO/yGvdZLRc5dHdun9H4IG8ChaZvaTHwqGZTWKq
+        OlNqAlqt8V0U5OxYBaFkzF0plYnEDP0XY6rSJiu2eg==
+X-Google-Smtp-Source: ABdhPJwCTwS+1GiIchwcl2et26v1BPVnXTvxhpqTj7f2o9f4uQ8NqprnWvmsykCIPGrQTpb07BkYbdGEmxSQSDOApoo=
+X-Received: by 2002:aca:1e07:: with SMTP id m7mr38610835oic.28.1626110415883;
+ Mon, 12 Jul 2021 10:20:15 -0700 (PDT)
+MIME-Version: 1.0
+References: <1625825111-6604-1-git-send-email-weijiang.yang@intel.com>
+ <1625825111-6604-7-git-send-email-weijiang.yang@intel.com>
+ <CALMp9eQEs9pUyy1PpwLPG0_PtF07tR2Opw+1b=w4-knOwYPvvg@mail.gmail.com>
+ <CALMp9eQ+9czB0ayBFR3-nW-ynKuH0v9uHAGeV4wgkXYJMSs1=w@mail.gmail.com>
+ <20210712095305.GE12162@intel.com> <d73eb316-4e09-a924-5f60-e3778db91df4@gmail.com>
+In-Reply-To: <d73eb316-4e09-a924-5f60-e3778db91df4@gmail.com>
+From:   Jim Mattson <jmattson@google.com>
+Date:   Mon, 12 Jul 2021 10:20:04 -0700
+Message-ID: <CALMp9eQmK+asv7fXeUpF2UiRKL7VmZx44HMGj67aSqm0k9nKVg@mail.gmail.com>
+Subject: Re: [PATCH v5 06/13] KVM: x86/vmx: Save/Restore host MSR_ARCH_LBR_CTL state
+To:     Like Xu <like.xu.linux@gmail.com>
+Cc:     Yang Weijiang <weijiang.yang@intel.com>, pbonzini@redhat.com,
+        seanjc@google.com, vkuznets@redhat.com, wei.w.wang@intel.com,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        "kan.liang@linux.intel.com" <kan.liang@linux.intel.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Mon, Jul 12, 2021 at 3:19 AM Like Xu <like.xu.linux@gmail.com> wrote:
+>
+> On 12/7/2021 5:53 pm, Yang Weijiang wrote:
+> > On Fri, Jul 09, 2021 at 04:41:30PM -0700, Jim Mattson wrote:
+> >> On Fri, Jul 9, 2021 at 3:54 PM Jim Mattson <jmattson@google.com> wrote=
+:
+> >>>
+> >>> On Fri, Jul 9, 2021 at 2:51 AM Yang Weijiang <weijiang.yang@intel.com=
+> wrote:
+> >>>>
+> >>>> If host is using MSR_ARCH_LBR_CTL then save it before vm-entry
+> >>>> and reload it after vm-exit.
+> >>>
+> >>> I don't see anything being done here "before VM-entry" or "after
+> >>> VM-exit." This code seems to be invoked on vcpu_load and vcpu_put.
+> >>>
+> >>> In any case, I don't see why this one MSR is special. It seems that i=
+f
+> >>> the host is using the architectural LBR MSRs, then *all* of the host
+> >>> architectural LBR MSRs have to be saved on vcpu_load and restored on
+> >>> vcpu_put. Shouldn't  kvm_load_guest_fpu() and kvm_put_guest_fpu() do
+> >>> that via the calls to kvm_save_current_fpu(vcpu->arch.user_fpu) and
+> >>> restore_fpregs_from_fpstate(&vcpu->arch.user_fpu->state)?
+> >>
+> >> It does seem like there is something special about IA32_LBR_DEPTH, tho=
+ugh...
+> >>
+> >> Section 7.3.1 of the Intel=C2=AE Architecture Instruction Set Extensio=
+ns
+> >> and Future Features Programming Reference
+> >> says, "IA32_LBR_DEPTH is saved by XSAVES, but it is not written by
+> >> XRSTORS in any circumstance." It seems like that would require some
+> >> special handling if the host depth and the guest depth do not match.
+> > In our vPMU design, guest depth is alway kept the same as that of host,
+> > so this won't be a problem. But I'll double check the code again, thank=
+s!
+>
+> KVM only exposes the host's depth value to the user space
+> so the guest can only use the same depth as the host.
 
---Apple-Mail=_DFB43D18-AF75-4226-A207-864049DAB84E
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain;
-	charset=utf-8
-
-
-
-> On Jul 12, 2021, at 10:07 AM, Andrew Jones <drjones@redhat.com> wrote:
->=20
-> On Mon, Jul 12, 2021 at 05:51:55PM +0100, Andre Przywara wrote:
->> On Fri,  2 Jul 2021 17:31:18 +0100
->> Alexandru Elisei <alexandru.elisei@arm.com> wrote:
->>=20
->> Hi,
->>=20
->>> The arm64 tests can be run under kvmtool, which doesn't emulate a
->>> chr-testdev device. In preparation for adding run script support for
->>> kvmtool, print the test exit status so the scripts can pick it up =
-and
->>> correctly mark the test as pass or fail.
->>>=20
->>> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
->>> ---
->>> lib/chr-testdev.h |  1 +
->>> lib/arm/io.c      | 10 +++++++++-
->>> lib/chr-testdev.c |  5 +++++
->>> 3 files changed, 15 insertions(+), 1 deletion(-)
->>>=20
->>> diff --git a/lib/chr-testdev.h b/lib/chr-testdev.h
->>> index ffd9a851aa9b..09b4b424670e 100644
->>> --- a/lib/chr-testdev.h
->>> +++ b/lib/chr-testdev.h
->>> @@ -11,4 +11,5 @@
->>>  */
->>> extern void chr_testdev_init(void);
->>> extern void chr_testdev_exit(int code);
->>> +extern bool chr_testdev_available(void);
->>> #endif
->>> diff --git a/lib/arm/io.c b/lib/arm/io.c
->>> index 343e10822263..9e62b571a91b 100644
->>> --- a/lib/arm/io.c
->>> +++ b/lib/arm/io.c
->>> @@ -125,7 +125,15 @@ extern void halt(int code);
->>>=20
->>> void exit(int code)
->>> {
->>> -	chr_testdev_exit(code);
->>> +	if (chr_testdev_available()) {
->>> +		chr_testdev_exit(code);
->>> +	} else {
->>> +		/*
->>> +		 * Print the test return code in the format used by =
-chr-testdev
->>> +		 * so the runner script can parse it.
->>> +		 */
->>> +		printf("\nEXIT: STATUS=3D%d\n", ((code) << 1) | 1);
->>=20
->> It's more me being clueless here rather than a problem, but where =
-does
->> this "EXIT: STATUS" line come from? In lib/chr-testdev.c I see "%dq",
->> so it this coming from QEMU (but I couldn't find it in there)?
->>=20
->> But anyways the patch looks good and matches what PPC and s390 do.
->=20
-> I invented the 'EXIT: STATUS' format for PPC, which didn't/doesn't =
-have an
-> exit code testdev. Now that it has also been adopted by s390 I guess =
-we've
-> got a kvm-unit-tests standard to follow for arm :-)
-
-I was unaware of this =E2=80=9Cstandard=E2=80=9D and I mistakenly used a =
-different format
-for x86, in case someone wants to fix it. [1]
-
-[1] =
-https://gitlab.com/kvm-unit-tests/kvm-unit-tests/-/commit/5747945371b47c51=
-cb16187a26111d06f58f06b2
-
---Apple-Mail=_DFB43D18-AF75-4226-A207-864049DAB84E
-Content-Transfer-Encoding: 7bit
-Content-Disposition: attachment;
-	filename=signature.asc
-Content-Type: application/pgp-signature;
-	name=signature.asc
-Content-Description: Message signed with OpenPGP
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEESJL3osl5Ymx/w9I1HaAqSabaD1oFAmDsd/0ACgkQHaAqSaba
-D1qcGg//YR7HD5To5tLeXN8Sr9qEqR48YInrt1N2wDkBtgLyixAUA6PPVBfKGPA+
-pbV06doi6bj9rF1eHSF/hz2XX3KFp2Z7pmn072Rg3uNMoX857kVJtv+mcPePLsEE
-eQ7AZ2ofYf/Oo/xeQI14uoeHOLz276s962h6Vz5+dwfodFSOZ5Q4S2n3BZIkdSVJ
-Y1ieWWIlMrerYnIUYJ5yF4yG+PtUFhE7KHoXOhoDFKXlZJ/c/fHZiuA43DlrrSEl
-0ycMcKRzdgqyLE3Kd4mvi6A8kKr0piZCABGlrgGib4duoFGyUxkjgDWUqRrnebRr
-f6OR57XzMAdnic8MbqdKIvC+Z8LYbE/vOBSrKj3yvjQvXvwbIgZr5tejIutIT7jD
-EIVBbqemZ5eKPN3bqIHArNB4t+eO6kroSCgeQVQ0fcg06r/5mxow2qTSt9BQ+DdG
-gnSbSugOfdBCnVw6ZC16oR8uxRUcF3UTAfG1SyDAMC9IX9ZbMPpOo9vNhizdUrrV
-EU4sc2WVDH5qgr5LYTEm3G+iaBJd8P6JF/qa+2V6dq0UsZTB1OPTUA95zPLRubZ2
-PjfZuoxVwx9g9yPDVQaCIicO461N0o92gxfU4pYAST3tNhO1/AcELzUsphDi8eQ8
-nAOl4nmKoOVkWpEsy4YQ89o5C7R4zF1lhyfIAAcEM40rZjw8AKw=
-=tyb3
------END PGP SIGNATURE-----
-
---Apple-Mail=_DFB43D18-AF75-4226-A207-864049DAB84E--
+The allowed depth supplied by KVM_GET_SUPPORTED_CPUID isn't enforced,
+though, is it?
