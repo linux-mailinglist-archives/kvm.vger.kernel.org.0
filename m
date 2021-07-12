@@ -2,261 +2,206 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id F1C333C5FD8
-	for <lists+kvm@lfdr.de>; Mon, 12 Jul 2021 17:56:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 420503C5FDA
+	for <lists+kvm@lfdr.de>; Mon, 12 Jul 2021 17:56:45 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233957AbhGLP7F (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 12 Jul 2021 11:59:05 -0400
-Received: from mx0b-00069f02.pphosted.com ([205.220.177.32]:6356 "EHLO
-        mx0b-00069f02.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S233638AbhGLP7C (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 12 Jul 2021 11:59:02 -0400
-Received: from pps.filterd (m0246630.ppops.net [127.0.0.1])
-        by mx0b-00069f02.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 16CFfCNA016257;
-        Mon, 12 Jul 2021 15:56:05 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
- references : from : message-id : date : in-reply-to : content-type :
- content-transfer-encoding : mime-version; s=corp-2020-01-29;
- bh=7hms17+ywCyyULtIV0EsVEoAPUsUW9fgiAzK4WWV0/I=;
- b=vcnwxp7u+7asuKnkGezOFUnNMu2gZuSrPdCChf22cORJjOr+yIyQdcImX/iJu19jpW+T
- I73LvQ1m7WjpOF7MS+x/H/sGatR1+DwcGuf9VXX3ltDM+Q2nRyAQAw5JlqIFUi4W6YWv
- XvlEQXWwYdMdsB9PDYBuLoMsqXsxYl8dvbXHoSe0gMj0mV3xClR/n4XDSXftOkwxlrkW
- /jsXhNB/Wc8+c5tnB1UGUFWbVE49l2cxrFc8jR4S9CmABQ+VA8sBa5R/ePJTgP7Prwm0
- mai9jWWmzblC6WO8b8/V+ie8Ce4vvuAZD9mnINOEjt8Aob6Vs+eTmb119cCWKOpzdome Wg== 
-Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
-        by mx0b-00069f02.pphosted.com with ESMTP id 39rnxdgffh-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 12 Jul 2021 15:56:05 +0000
-Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
-        by aserp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 16CFenis089948;
-        Mon, 12 Jul 2021 15:56:04 GMT
-Received: from nam12-dm6-obe.outbound.protection.outlook.com (mail-dm6nam12lp2169.outbound.protection.outlook.com [104.47.59.169])
-        by aserp3030.oracle.com with ESMTP id 39qycs55ck-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 12 Jul 2021 15:56:03 +0000
+        id S233875AbhGLP7d (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 12 Jul 2021 11:59:33 -0400
+Received: from mail-dm6nam11on2042.outbound.protection.outlook.com ([40.107.223.42]:43105
+        "EHLO NAM11-DM6-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S230394AbhGLP7c (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 12 Jul 2021 11:59:32 -0400
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=IGc8x8uUGgfuX+JXf0InIGpSgmywoFy2yvRA63Bk4VjBThJTUvO0TzkAWcyx9AHVCIMqu2ZtYChKDZbwsPtwP25AndeUiVZsQLinygzd48mWes8/H2sAQvizXCZIYUENRs+n+aGQXq7gtblSeuNGasfaTsDTuM2HMqk8nYXjc0Dzo4EM35lVk+3V28NxbZkM2i9PqXgcCOtlyXhvy6mhYGM4BZO/jb73YsnbvLShXXyP4yekwu5j+Kpd6hjMkP3duI1Hcs6ek/ez2RXMH6kmiPRgdT71SjRshRrjJZUy4YllOn+mDDJ3jtmhp5eZcHP57YpbTR73oC6xiZsAdXhF0w==
+ b=TJUi3Ggm/r6WR+WZ4kL2cji5G2BLgoDrbivwYqXpC2RnkDq5K2GoKDTpVAVdKPqWq6Z+R43UAzlJgSYN+oWEqSFKJokPMLSQgSxtQHv+2UkgsU3No/Vfr+G6olRUcl/hAWiOYMDUkSFfpeXoVlHntFZjDP5dQOxVByNnm2vw/IczmJYuK+FWs42QBSGO1Ult058OgpZj0eIgVwmkI/LYjolTooYlSlqTFQ0l9P4k19gTR3eNCXjATpF058nvFEKRcgP/HoQa/pIXEXkjd3A8+mzEPLYrElg6oQBRQmQbSpaelxwXQ4rTPlFIEbDnPpWmof2IlDTTfc0n0P+m517cIg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=7hms17+ywCyyULtIV0EsVEoAPUsUW9fgiAzK4WWV0/I=;
- b=EneB0lmosuNXuOAQRTIMVqBR34tuMN8HmQVJxXB78g0xPODCATBRjazg2LLCiJzZ0MhKq5CEiT1nRZMbUN2SWIM6Q1AZmZXJe0REOvKPKpLomnuYGLpFV+U0G5Zc6lKkx8shyVAB6lH8ZtnQI2yu0iRM9ClhCu7Y13uYLFQlE79ozlszdBsB7VeN0e1sXc2AnRbkS4kP6Aojq02fB67ylaQd3cKsymCbR+33ni58GJv+IECN+HFNteXrHURA9DQfdJzZMhb1W66bfXUIJ7CRdoftkTAsmNgYI3K+Sned8bJ/J5N31ruUwtQgTOvJKTLM9tScHy2WRIVuqeUwni3UvA==
+ bh=hXQuCxC0yocQbPXY7Pl/p/P4Fsaeo/luRhzWiB48UEQ=;
+ b=JHMEODBAmFoWB89yy9T3eQf+7Z/DYKgOuZaGPsgusARJyl5jsOeFrqBVkNfLK2bJEtXuLsv+AHsA17FMYWqtMadcmGha0UiSofyN/ckf5qEsv7v9SuHwA4cZwT7vbJfPZB3Q8qKnzIgzXEOvz0f0OHc8Be4PYMPHM2feij4T73vEt1xr6zJ051YFXSxEtEBHZdP9XvUiXlev7r4IGVHGV5OlXvng216/F3rLGIy1r94hPFDX4PWQkHYT0ZoDhNLxUr2kajNfRLsnIaYzpYOUlF0skoQXAUUgLpU2h3APtGEDvqhHD+4XH90SU7gS7HBLdHCZAmzTxgAx7/lHLkt2Hw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
- dkim=pass header.d=oracle.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=7hms17+ywCyyULtIV0EsVEoAPUsUW9fgiAzK4WWV0/I=;
- b=w0hZ60ajCFxv0//06k0FiaXx4ZDJ6ZRkIaKjTqwcbND1j6stnoC90oTkHIKaRWcyUG7tNGl2BcPA2H5TdQLeIU/memqcoKifrx4mFvFLL5HYbPKeGOMDfg1/Tih1R1+EPT/qZ65Dzc3RqIAs/X9svy9YJ63fZB/dm1a5Tz/WveY=
-Authentication-Results: oracle.com; dkim=none (message not signed)
- header.d=none;oracle.com; dmarc=none action=none header.from=oracle.com;
-Received: from CH2PR10MB4391.namprd10.prod.outlook.com (2603:10b6:610:7d::11)
- by CH2PR10MB4165.namprd10.prod.outlook.com (2603:10b6:610:a5::24) with
+ bh=hXQuCxC0yocQbPXY7Pl/p/P4Fsaeo/luRhzWiB48UEQ=;
+ b=qYz7fFexRuuBn/eaukuold/bQ+0GPMS8eoUkQGbDHbvR/XJog+OM666qfrppDBpr0msancJEFgvmIY3EiQSZBMd+EL/9/X7CpKzHAbLcz3nbT6kMJtYMI9mBhFAwW3tUa0D3v3G1RrwuikapIVJxzHUhyTKK1fiIBIkOlknOENo=
+Authentication-Results: redhat.com; dkim=none (message not signed)
+ header.d=none;redhat.com; dmarc=none action=none header.from=amd.com;
+Received: from SN6PR12MB2718.namprd12.prod.outlook.com (2603:10b6:805:6f::22)
+ by SN6PR12MB2782.namprd12.prod.outlook.com (2603:10b6:805:73::19) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4308.20; Mon, 12 Jul
- 2021 15:55:53 +0000
-Received: from CH2PR10MB4391.namprd10.prod.outlook.com
- ([fe80::b895:ab48:fa35:3f15]) by CH2PR10MB4391.namprd10.prod.outlook.com
- ([fe80::b895:ab48:fa35:3f15%4]) with mapi id 15.20.4308.026; Mon, 12 Jul 2021
- 15:55:53 +0000
-Subject: Re: [PATCH v2] KVM: arm64: Disabling disabled PMU counters wastes a
- lot of time
-To:     Alexandru Elisei <alexandru.elisei@arm.com>,
-        Robin Murphy <robin.murphy@arm.com>, maz@kernel.org,
-        will@kernel.org, catalin.marinas@arm.com, james.morse@arm.com,
-        suzuki.poulose@arm.com, linux-arm-kernel@lists.infradead.org,
-        kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
-Cc:     konrad.wilk@oracle.com
-References: <20210712151700.654819-1-alexandre.chartre@oracle.com>
- <d4646297-da3a-c629-d0b2-b830cce6a656@arm.com>
- <90b0b99b-505c-c46c-6c2c-a45192135f5a@arm.com>
-From:   Alexandre Chartre <alexandre.chartre@oracle.com>
-Message-ID: <a7663dbe-4ff9-0b1b-29ca-aab16d896217@oracle.com>
-Date:   Mon, 12 Jul 2021 17:55:48 +0200
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4308.23; Mon, 12 Jul
+ 2021 15:56:42 +0000
+Received: from SN6PR12MB2718.namprd12.prod.outlook.com
+ ([fe80::a8a9:2aac:4fd1:88fa]) by SN6PR12MB2718.namprd12.prod.outlook.com
+ ([fe80::a8a9:2aac:4fd1:88fa%3]) with mapi id 15.20.4308.026; Mon, 12 Jul 2021
+ 15:56:42 +0000
+Cc:     brijesh.singh@amd.com, qemu-devel@nongnu.org,
+        Connor Kuehl <ckuehl@redhat.com>,
+        =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+        "Michael S . Tsirkin" <mst@redhat.com>,
+        James Bottomley <jejb@linux.ibm.com>,
+        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Dov Murik <dovmurik@linux.ibm.com>,
+        David Gibson <david@gibson.dropbear.id.au>,
+        kvm@vger.kernel.org, Michael Roth <michael.roth@amd.com>,
+        Eduardo Habkost <ehabkost@redhat.com>
+Subject: Re: [RFC PATCH 2/6] i386/sev: extend sev-guest property to include
+ SEV-SNP
+To:     =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>
+References: <20210709215550.32496-1-brijesh.singh@amd.com>
+ <20210709215550.32496-3-brijesh.singh@amd.com> <YOxVIjuQnQnO9ytT@redhat.com>
+From:   Brijesh Singh <brijesh.singh@amd.com>
+Message-ID: <cd63ed13-ba05-84de-ecba-6e497cf7874d@amd.com>
+Date:   Mon, 12 Jul 2021 10:56:40 -0500
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.10.0
-In-Reply-To: <90b0b99b-505c-c46c-6c2c-a45192135f5a@arm.com>
+ Thunderbird/78.11.0
+In-Reply-To: <YOxVIjuQnQnO9ytT@redhat.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: LO3P265CA0003.GBRP265.PROD.OUTLOOK.COM
- (2603:10a6:600:bb::8) To CH2PR10MB4391.namprd10.prod.outlook.com
- (2603:10b6:610:7d::11)
+X-ClientProxiedBy: SN4PR0601CA0002.namprd06.prod.outlook.com
+ (2603:10b6:803:2f::12) To SN6PR12MB2718.namprd12.prod.outlook.com
+ (2603:10b6:805:6f::22)
 MIME-Version: 1.0
 X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from localhost.localdomain (2.7.202.103) by LO3P265CA0003.GBRP265.PROD.OUTLOOK.COM (2603:10a6:600:bb::8) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4308.21 via Frontend Transport; Mon, 12 Jul 2021 15:55:51 +0000
+Received: from [10.236.31.95] (165.204.77.1) by SN4PR0601CA0002.namprd06.prod.outlook.com (2603:10b6:803:2f::12) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4308.20 via Frontend Transport; Mon, 12 Jul 2021 15:56:42 +0000
 X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 499af761-1ea7-4eda-de6f-08d9454d873d
-X-MS-TrafficTypeDiagnostic: CH2PR10MB4165:
+X-MS-Office365-Filtering-Correlation-Id: 6f50f62e-128f-42af-ef93-08d9454da479
+X-MS-TrafficTypeDiagnostic: SN6PR12MB2782:
 X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <CH2PR10MB416549F0BE5777427D5A84759A159@CH2PR10MB4165.namprd10.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:2657;
+X-Microsoft-Antispam-PRVS: <SN6PR12MB2782C5C8E325FD43910F2B17E5159@SN6PR12MB2782.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:6790;
 X-MS-Exchange-SenderADCheck: 1
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: VqjIdHjkU/Nl2ObSjWBp6g6lLFXx+d2+xGlPDZEAj0N1hOTpR7XhjW2MZe1q29ukFKvnGj1ZqVo/iIFuE/m/7UbLd+uz+A4uv7bB24Nk3/Nr5uLz4uKRdoh0Ve+ySzU05fJXe/ksPWTBXFkF6IDcJdRYeSrdk3SzHEFuI0gdiFiRCT3S1MGJ4QUlOgM3nA/gCjC03q8rc+exS7Rn4cwEvOvEepMJRm8xI1G4hqrwNXnA4qjQ3Vm+MVHvDclTsGMFpH3i8Y1L8ifS21Q7y7+q028xaPo2IoXvpGYIyDppR5/zeSsPdOUBOIPS8ym4MKudUfNBBOKYw30kG1wHXETLbdoFQE29yl9Vkw5G1UYSECV+EZ9mPUalyeCkNxhrmOdE1wfoVNASg2W1Dx9fjufKawQ3h1GXG43XonnJE+JwLUg97LQK0hOWs00kQ6SH7yQ5n0sWgkOoOOu9FhzmS0pbsGJ4UTR2txNWtI80IQ0eVw9ePo8JbfFb9aRdY8Uastf7pdGF8PIXWvACpwiAsciXeXtaXgBcQ8eFx1lJGmEBTzzO/6Fbj6Vhyss/a9uCkoc8v3ll1H177JWXj5xAWF1Ugmx1BjhyRFLxUoMDSqHDV4XmNoliS8DD9fUrF9BNJ3+LshOBtQkujI5EXTJyhgmrOfRpfarZejhGCBHT1WMxdxbjrW1ogpzdOCV0/fj9aTfXE4bKbosdZfAU2JzvNR+DMazlyRsCuyla6V5+0RE0bYLWPXLEzts11SGbxPfYZnE0T3cUlDOgGHJEO511ZwcpgX75cIQ94f8dnik6UwUMfG/1xsJKjFAuHpvclH6uuVydi+MkeEecnEMrKPO1S9dx2hy5wm3m6+HHS55hNs7RiqiVFNs0iYAx1CRg+LLboBdP
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH2PR10MB4391.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(39860400002)(366004)(396003)(376002)(346002)(136003)(36756003)(86362001)(31686004)(2906002)(966005)(6666004)(31696002)(6512007)(4326008)(316002)(107886003)(6486002)(921005)(44832011)(7416002)(956004)(2616005)(186003)(53546011)(6506007)(110136005)(5660300002)(26005)(478600001)(38100700002)(66476007)(66946007)(8936002)(66556008)(83380400001)(8676002)(45980500001)(43740500002);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam-Message-Info: 6cHTn/7XTBc9WZqE6Mk1xdi74N5aRt/1pZZXUjcKdf2/cc7pEOM1OTT4VMTyLXDc6fUHKNFFu79kaxIOngoAYZCI9kWKEZH4jZKhQutyNJ0AHlsf7SoCUtdzjoWBRwoAePTIQuSNy1Ac1nretz/epabOM9GyTYjiRcpz0xmo4as4Np844SWMTF+Vd5Uy2Mi9Q4n0pZE8FilWGKoqDGkiAs+H5mpdN19HXjtaCWbgm0ys6TYuRru1hGHaga+2BhBOTdvfcegkirT5+WCf09+XpQO6T7CcxvWOttHrT1riYSCHVb/X31sb+gZYOJXMS4YY94jneRKOBsovR270FWBzmWwon9H+MZ+K6/LSSqLH0EAEsHK1qxjFWjj3Ja3SUa4UUMt3piBHzW+I4ebErGOgANcRxPkOuqU7+bLo6TTRRHbUZw0QVcQDYhkT8ZdWUbzTweJXKqJL/bQxxUqBHACtbj/DrfdwvVUph2wF5vhTkArbYI1ezzaCmTZ6lem3yLHSa2XdN9DZ88W56afNvcqxnK2sSH8Lk0TSR2csQLzQ574MCmzU8y/qs738wYYP8RPjVzMgHhE47Jm3B8THzQRFLs6kDTBTNAZsbBsCLshJmn7QwoLUFygp3dioHx8x+2j2qYB1X/xMcbpVxMmFurY9PsweWYP93OT3q2+OR/Pl4T59BRpNUsdh+N5uoem2FTIBmkKVE7kCK1jbyZmmXxl4WgS5BNEgGZkLwl8HmrRpngwjZYmztt4SatUKNYRGyt57JtxjDiIdGzXe4TQoALOHZg==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR12MB2718.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(39860400002)(346002)(136003)(396003)(376002)(366004)(86362001)(5660300002)(186003)(66556008)(66476007)(26005)(52116002)(66946007)(31696002)(31686004)(36756003)(53546011)(478600001)(83380400001)(6916009)(6486002)(38350700002)(16576012)(44832011)(8676002)(4326008)(2616005)(38100700002)(956004)(8936002)(2906002)(316002)(7416002)(54906003)(43740500002)(45980500001);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?ZWorOExvL2hRKzRoOURsb2g4amtITjFwWUZKb1dkdnMybit0THNJK3IwcFV0?=
- =?utf-8?B?cFNTRUZkVjBZa3lidm51a2lQem9yV3lodmRsM2ZpMDd1WnU2MjQvbHNlcUlz?=
- =?utf-8?B?S3lvQ2VUaUEvalRBaEY2OUdudHI5VEFYSHc2R256cS9xMkgzQjZCWkQwTjFx?=
- =?utf-8?B?Wm1QN3NrOWg4M2dmMzZ5bjBPbUNqTEhkUllrME1ORExHakV3SXMwa0JVSnJn?=
- =?utf-8?B?YjRjcE5Dd2pwSk5ZWVNuQ1dUWHl1UGlBMndBeGwvNFFOS3BMOS9JUGtKeWxN?=
- =?utf-8?B?SktxQlg2QzJpWHpoMzlGaFJncHNPRmJXOElRNHVrNFBuQngyV1VDcnB1TjV3?=
- =?utf-8?B?elBQbWhvTklSVFNNbGoybUpCaTltNkJBMCtoTXp0bUVmWDhlN1JLSkhnaDVP?=
- =?utf-8?B?bkowblNYek94Vk5rTGZTbWZUN1FFZC94VFp1Z0lVY05PaFVkY1d4cHE4N2FX?=
- =?utf-8?B?eEllRTEzcVhmdCt2WmlYRVhTVnlRMVcwMytPdWtTWFprVytoR2x2QWQram9a?=
- =?utf-8?B?R2hMN1BnbUxWekZDeUl2ZHJzc3owZmttWlNiRmRaSkcyNVpDcXBRYll1c0RZ?=
- =?utf-8?B?SzVDUUZJbkNia2hQV3ppVWdzbVJ2a0xYU1FQY1U5T2xhdGloQVk4bytUQXo5?=
- =?utf-8?B?dGtOcEJBbXZabG5ySHFSd0xPZEFJOVpWZDVxOWMyb0JxdWpxSndzWDVrdWtT?=
- =?utf-8?B?WjFQUWlhZGFMUjJQdkpDRmJvaC93S25TNXU3WlBCYkFrb0ZQaWs5RXdLcnBy?=
- =?utf-8?B?RTMzNWR5Nm5Wb2dWSDRocnNmaGFYWS9MVFQyNHNZalpPcHM4c3RVTlh0Y1Nt?=
- =?utf-8?B?aWx6Rk12MFExK3ZvbjFGelg3Y3pGdEJIREZQQVhuQm5MdVNDbVIzUW9kOWJJ?=
- =?utf-8?B?bndya3RmNHhaaUc1LzRlNkp0STZZY1VBaXloa3dvQkxQakZKcWhXOFN4aEx6?=
- =?utf-8?B?UFJGQWxCdzEvSW9aeVJPSlVsM3hoanZkb3M2amkralMxYjhhYzR3NmFNbW1R?=
- =?utf-8?B?ZFBQU0VHYXNEZDVaWkpTZHJRMUlFTVpjL2lyWjR0OVlYVnprR1M2UUFzTEM5?=
- =?utf-8?B?aEJBT1NIRWRxR3k0SWIxemRRVGdDZ2g3enAvRzA1SktuSHc3NXdsaVJUMzc5?=
- =?utf-8?B?bGtJSE1KOWxDQWZmaXRZa0tSMmFoa0xlQ0hJcG5HSVo0bk4vMEkrOGpmYWlo?=
- =?utf-8?B?RHA3bktrS0RUUTBZVlg3ZnBncGhodFgwUlovcG5ZNGEyTVRBUDkvQjlIYmFk?=
- =?utf-8?B?YVVqby9WdzcwZ0x4dmNGN0VyWVErcUVxbjBrYVRmN0FGQklGWGFTdm82d1Av?=
- =?utf-8?B?Z2NYUzl2UXE5SFZXUEdBQURRaHhzYzM1eHhwenBaSkpubjc2TmR4b1h0cnJH?=
- =?utf-8?B?RUc3aUw2S3ExSVc5aGduU2RUb1RnNThYRENkVVM4STRraWpRaXEyVGtNb0Np?=
- =?utf-8?B?aC9yQXAwKzlrYmh2dnMrc0ttRmpBTW1tRkl5ZDgvcHJzY3ptNHo1WGVNc0Qx?=
- =?utf-8?B?T2NCMVhZbk9lam1yQ0hpaURWbjlzVk8wckZVSkFhRGM0eDR3L0E3K1RXNDh1?=
- =?utf-8?B?a21YZVJJOXlrUVFBS2M0UXorLzUzaWJTbjRmRXRmWjNaNkg0RHJRNVNWR1Q3?=
- =?utf-8?B?WG5HQlYwTjIrSnhYSnF4SXRsc2FhVGQrSWZLRTZGUTBDenIxS083NHVhbmJi?=
- =?utf-8?B?a1pyNDBoNlRGYndsNmxqRXdzZU5zSnE3dGJMclhvREVubitiRWovcmx5MG9v?=
- =?utf-8?Q?IcJ9sjyV1MvN3MxEZKAKM+I9O1rNVdSpWBQkACg?=
-X-OriginatorOrg: oracle.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 499af761-1ea7-4eda-de6f-08d9454d873d
-X-MS-Exchange-CrossTenant-AuthSource: CH2PR10MB4391.namprd10.prod.outlook.com
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?WXppbC9sTUl3QlJZNFRsbDBtTEhuSC96YXl1WENGa3JBcnExZlZ1dEUzK1Ir?=
+ =?utf-8?B?STdrYjRLeGQ0VHo4cFlyaEMzZytiNEF0c05Yd0F6cmVQbmhKZ01HKzlZV3pn?=
+ =?utf-8?B?UXVSdHJqcW45NjJOeEs5UE5CbllxckVZb1dYTkwxdWIwNjVYQ3JubjBvQ0M2?=
+ =?utf-8?B?SGtoYS81aXI5TXN3YjFxVVVNWGdxTHlsaW5LNnNxd1VDQVhCK1E0N1BKeUVL?=
+ =?utf-8?B?T2dzaW9UeHV2T2h4alIybmw0VWFaNDhqY2pLN29LZHROSS9kK21tVXlSTldh?=
+ =?utf-8?B?RjVvWFpwT1dibDBHZldJeithZXZpTDNSdTVjaFhxckxnOGQzU0FiTC9Eb1Ba?=
+ =?utf-8?B?cUhKSUhyR2psU21lY2ZYeTNkK0xXYnJqdE5pR0FjRjBMcDYxQTIxakRieGpD?=
+ =?utf-8?B?TDlPSFVTYnBRbVlyU0MrUWZ6UmZOODBWcVB4aDFoUUlKVG9WVlhwYTBXSDFL?=
+ =?utf-8?B?a1JwNUJCWS9rOEx0VjhyNnFnYUdEajA5K1VSNGcybXBPcG02MisyMjY1eDlM?=
+ =?utf-8?B?MHFscmJ1akNhVlNzNVYwT1JYUHA0V0RFSVBaekZXY0JvOCtyZXg0U1J1T1NF?=
+ =?utf-8?B?UzhSN0dScXVFeE1PTnRsZUFiRzBRa1VzQUYwaldwV2pMUTFmVnVySEcvQk1o?=
+ =?utf-8?B?UmNRVWZFYjBJSnh5Y01vWWlPTXM1c3hXcGEvekdlaU41bThxRkhpRXhMWVpx?=
+ =?utf-8?B?Z1hzZHJJOFdvb05UcW1zWFdTZkUwemhPZ2dIYnRHZlgwS3RKTVY0Q0Z5WE5H?=
+ =?utf-8?B?ZVZHNHNpdkdkZEhYQ3dqaGpUM0FpRHZ4cXVQSmhQODJWcVB6NjRQbmZ0Tjdi?=
+ =?utf-8?B?bFF4REIvaXlUZXY1b1Q5MDRyQlBGbDFiTDIwdmJlVmp2b01OZ0VUb2xSaE0r?=
+ =?utf-8?B?dSt0WFNoRlR0WTl6ckhjWk9XWHRWVlFjU1BFOXhJZWtSRmRZYmdjQ3pCNmJX?=
+ =?utf-8?B?QitZMGVrL3NZbXZEZ3ducmZ3c2hjODFzZlJNandQaGo5cjZhSnNQRm9OQ0xp?=
+ =?utf-8?B?azRMc1JTWlNOU2FvTjd2V3pYYWVTdW5sOStXcHlzUk5uV3F6d3o4UVZWd3NS?=
+ =?utf-8?B?TGYzbUNUZVZiMENRRzRJRmhaMGhyd09wbXptTk8zUjAydVVsZHlweFI5ZTJT?=
+ =?utf-8?B?bFBoa3R3UWRXdEdJNXJyOXlNbnliYVM0dWduc0t6ZkF6cHBaQitDMDYwSzhs?=
+ =?utf-8?B?eDA2WnNteVAwb3pBN2ZpSHU2eENxbU1UdG1mSVAveS85VHhMMWZ6L2wwUXdF?=
+ =?utf-8?B?Tis3amVkcXgveW5paVNMM0huZVpDaDVVTGg4L1JGZEtKM3NjT0FqNXorUTVu?=
+ =?utf-8?B?bWlEejV4b0ZvYWg3T0s1STh5MDl6a3RVd1JDb2pPUmZBQzMwZ2dVVnBldFZW?=
+ =?utf-8?B?b3E0b1V2RHUrZFIwcThCNlVyY3BuUXZ3V1ZYK1NMQVNVd1FhcFozaksrQUVV?=
+ =?utf-8?B?RGpEb004elFabTRpWVQ3ZXFIYmtGMHFXTkhEc2RkdTdqL2FzWjdoWWdQU1ps?=
+ =?utf-8?B?YWtUcS9LaGhub0NSZk5ZNXlHWkM2MDBwUmRmNUJVaVBoUVNvaVgrTHU5dGtJ?=
+ =?utf-8?B?OEFYbTE3VnRXdGFIVzhnajNIQWdoZ1lwTXpYMlRqcFllUTRQLy9RTURuZkhZ?=
+ =?utf-8?B?ajNjeGtUTzJOdXpJcG1xNFQ0a3NvOVJTbnc0MkZBTXNacDBTR0NlR3pndVJD?=
+ =?utf-8?B?andIaW1kUHQ0azhqalZUalVpME94OXp4RlpQbzBBblR1SUQ1RHU1eUtIMGlZ?=
+ =?utf-8?Q?FZIQUGqeTxE+I8TWkwBQZjrl1lPaAGXDpHbPBJ+?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 6f50f62e-128f-42af-ef93-08d9454da479
+X-MS-Exchange-CrossTenant-AuthSource: SN6PR12MB2718.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Jul 2021 15:55:53.4328
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Jul 2021 15:56:42.5028
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: bLpsbrI7BHUcF2dFWwzXQjJzCsCZvI4L0W6tSGMoF1SXyZzreC+DCzV1NCI0UczuWf+xWFu7dWDK1sxzfOc56ia8ogWkQzukfhSJStWapuM=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH2PR10MB4165
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=10043 signatures=668682
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 phishscore=0 mlxlogscore=999
- adultscore=0 malwarescore=0 bulkscore=0 mlxscore=0 suspectscore=0
- spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2104190000 definitions=main-2107120121
-X-Proofpoint-GUID: 2ijBziU_6z06QF6himcroU2tlbXvq9J8
-X-Proofpoint-ORIG-GUID: 2ijBziU_6z06QF6himcroU2tlbXvq9J8
+X-MS-Exchange-CrossTenant-UserPrincipalName: KkLi7z4aUvQcSF8CrM8Z3G78TnuRQRrK2ObeR/xK9yI8s9Htu/sN2oycEhNsn6TTkQjq5xoa+IFlx+z9rxBVyg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN6PR12MB2782
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
 
-On 7/12/21 5:51 PM, Alexandru Elisei wrote:
-> Hi Robin,
+On 7/12/21 9:43 AM, Daniel P. Berrangé wrote:
+> On Fri, Jul 09, 2021 at 04:55:46PM -0500, Brijesh Singh wrote:
+>> To launch the SEV-SNP guest, a user can specify up to 8 parameters.
+>> Passing all parameters through command line can be difficult.
 > 
-> On 7/12/21 4:44 PM, Robin Murphy wrote:
->> On 2021-07-12 16:17, Alexandre Chartre wrote:
->>> In a KVM guest on arm64, performance counters interrupts have an
->>> unnecessary overhead which slows down execution when using the "perf
->>> record" command and limits the "perf record" sampling period.
->>>
->>> The problem is that when a guest VM disables counters by clearing the
->>> PMCR_EL0.E bit (bit 0), KVM will disable all counters defined in
->>> PMCR_EL0 even if they are not enabled in PMCNTENSET_EL0.
->>>
->>> KVM disables a counter by calling into the perf framework, in particular
->>> by calling perf_event_create_kernel_counter() which is a time consuming
->>> operation. So, for example, with a Neoverse N1 CPU core which has 6 event
->>> counters and one cycle counter, KVM will always disable all 7 counters
->>> even if only one is enabled.
->>>
->>> This typically happens when using the "perf record" command in a guest
->>> VM: perf will disable all event counters with PMCNTENTSET_EL0 and only
->>> uses the cycle counter. And when using the "perf record" -F option with
->>> a high profiling frequency, the overhead of KVM disabling all counters
->>> instead of one on every counter interrupt becomes very noticeable.
->>>
->>> The problem is fixed by having KVM disable only counters which are
->>> enabled in PMCNTENSET_EL0. If a counter is not enabled in PMCNTENSET_EL0
->>> then KVM will not enable it when setting PMCR_EL0.E and it will remain
->>> disabled as long as it is not enabled in PMCNTENSET_EL0. So there is
->>> effectively no need to disable a counter when clearing PMCR_EL0.E if it
->>> is not enabled PMCNTENSET_EL0.
->>>
->>> Signed-off-by: Alexandre Chartre <alexandre.chartre@oracle.com>
->>> ---
->>> The patch is based on
->>> https://git.kernel.org/pub/scm/linux/kernel/git/maz/arm-platforms.git/log/?h=kvm-arm64/pmu/reset-values
->>>
->>>    arch/arm64/kvm/pmu-emul.c | 8 +++++---
->>>    1 file changed, 5 insertions(+), 3 deletions(-)
->>>
->>> diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
->>> index fae4e95b586c..1f317c3dac61 100644
->>> --- a/arch/arm64/kvm/pmu-emul.c
->>> +++ b/arch/arm64/kvm/pmu-emul.c
->>> @@ -563,21 +563,23 @@ void kvm_pmu_software_increment(struct kvm_vcpu *vcpu,
->>> u64 val)
->>>     */
->>>    void kvm_pmu_handle_pmcr(struct kvm_vcpu *vcpu, u64 val)
->>>    {
->>> -    unsigned long mask = kvm_pmu_valid_counter_mask(vcpu);
->>> +    unsigned long mask;
->>>        int i;
->>>          if (val & ARMV8_PMU_PMCR_E) {
->>>            kvm_pmu_enable_counter_mask(vcpu,
->>>                   __vcpu_sys_reg(vcpu, PMCNTENSET_EL0));
->>>        } else {
->>> -        kvm_pmu_disable_counter_mask(vcpu, mask);
->>> +        kvm_pmu_disable_counter_mask(vcpu,
->>> +               __vcpu_sys_reg(vcpu, PMCNTENSET_EL0));
->>>        }
->>>          if (val & ARMV8_PMU_PMCR_C)
->>>            kvm_pmu_set_counter_value(vcpu, ARMV8_PMU_CYCLE_IDX, 0);
->>>          if (val & ARMV8_PMU_PMCR_P) {
->>> -        mask &= ~BIT(ARMV8_PMU_CYCLE_IDX);
->>> +        mask = kvm_pmu_valid_counter_mask(vcpu)
->>> +            & BIT(ARMV8_PMU_CYCLE_IDX);
+> This sentence applies to pretty much everything in QEMU and the
+> SEV-SNP example is nowhere near an extreme example IMHO.
+> 
+>>                                                               To simplify
+>> the launch parameter passing, introduce a .ini-like config file that can be
+>> used for passing the parameters to the launch flow.
+> 
+> Inventing a new config file format for usage by just one specific
+> niche feature in QEMU is something I'd say we do not want.
+> 
+> Our long term goal in QEMU is to move to a world where 100% of
+> QEMU configuration is provided in JSON format, using the QAPI
+> schema to define the accepted input set.
+> 
+
+I am open to all suggestions. I was trying to avoid passing all these 
+parameters through the command line because some of them can be huge (up 
+to a page size)
+
+
 >>
->> This looks suspiciously opposite of what it replaces;
-> 
-> It always sets the bit, which goes against the architecture and the code it was
-> replacing, yes.
-> 
-
-My bad, I screw up and I dropped the ~. I will resend.
-
-Sorry,
-
-alex.
-
->> however did we even need to do a bitwise operation here in the first place?
->> Couldn't we skip the cycle counter by just limiting the for_each_set_bit
->> iteration below to 31 bits?
-> 
-> To quote myself [1]:
-> 
-> "Entertained the idea of restricting the number of bits in for_each_set_bit() to
-> 31 since Linux (and the architecture, to some degree) treats the cycle count
-> register as the 32nd event counter. Settled on this approach because I think it's
-> clearer."
-> 
-> To expand on that, incorrectly resetting the cycle counter was introduced by a
-> refactoring, so I preferred making it very clear that PMCR_EL0.P is not supposed
-> to clear the cycle counter.
-> 
-> [1] https://lore.kernel.org/kvmarm/20210618105139.83795-1-alexandru.elisei@arm.com/
-> 
-> Thanks,
-> 
-> Alex
-> 
+>> The contents of the config file will look like this:
 >>
->> Robin.
+>> $ cat snp-launch.init
 >>
->>>            for_each_set_bit(i, &mask, 32)
->>>                kvm_pmu_set_counter_value(vcpu, i, 0);
->>>        }
->>>
->>> base-commit: 83f870a663592797c576846db3611e0a1664eda2
->>>
+>> # SNP launch parameters
+>> [SEV-SNP]
+>> init_flags = 0
+>> policy = 0x1000
+>> id_block = "YWFhYWFhYWFhYWFhYWFhCg=="
+> 
+> These parameters are really tiny and trivial to provide on the command
+> line, so I'm not finding this config file compelling.
+> 
+
+I have only included 3 small parameters. Other parameters can be up to a 
+page size. The breakdown looks like this:
+
+policy: 8 bytes
+flags: 8 bytes
+id_block: 96 bytes
+id_auth: 4096 bytes
+host_data: 32 bytes
+gosvw: 16 bytes
+
+
+
+>>
+>>
+>> Add 'snp' property that can be used to indicate that SEV guest launch
+>> should enable the SNP support.
+>>
+>> SEV-SNP guest launch examples:
+>>
+>> 1) launch without additional parameters
+>>
+>>    $(QEMU_CLI) \
+>>      -object sev-guest,id=sev0,snp=on
+>>
+>> 2) launch with optional parameters
+>>    $(QEMU_CLI) \
+>>      -object sev-guest,id=sev0,snp=on,launch-config=<file>
+>>
+>> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
+>> ---
+>>   docs/amd-memory-encryption.txt |  81 +++++++++++-
+>>   qapi/qom.json                  |   6 +
+>>   target/i386/sev.c              | 227 +++++++++++++++++++++++++++++++++
+>>   3 files changed, 312 insertions(+), 2 deletions(-)
+> 
+> Regards,
+> Daniel
+> 
