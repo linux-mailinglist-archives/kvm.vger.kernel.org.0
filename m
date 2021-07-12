@@ -2,73 +2,176 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 33E1B3C5A39
-	for <lists+kvm@lfdr.de>; Mon, 12 Jul 2021 13:03:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BBBD93C5AA5
+	for <lists+kvm@lfdr.de>; Mon, 12 Jul 2021 13:04:33 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237694AbhGLJmh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 12 Jul 2021 05:42:37 -0400
-Received: from mga07.intel.com ([134.134.136.100]:4552 "EHLO mga07.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1383350AbhGLJlw (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 12 Jul 2021 05:41:52 -0400
-X-IronPort-AV: E=McAfee;i="6200,9189,10042"; a="273785002"
-X-IronPort-AV: E=Sophos;i="5.84,232,1620716400"; 
-   d="scan'208";a="273785002"
-Received: from fmsmga003.fm.intel.com ([10.253.24.29])
-  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Jul 2021 02:39:03 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.84,232,1620716400"; 
-   d="scan'208";a="491957731"
-Received: from michael-optiplex-9020.sh.intel.com (HELO localhost) ([10.239.159.182])
-  by FMSMGA003.fm.intel.com with ESMTP; 12 Jul 2021 02:39:01 -0700
-Date:   Mon, 12 Jul 2021 17:53:05 +0800
-From:   Yang Weijiang <weijiang.yang@intel.com>
-To:     Jim Mattson <jmattson@google.com>
-Cc:     Yang Weijiang <weijiang.yang@intel.com>, pbonzini@redhat.com,
-        seanjc@google.com, vkuznets@redhat.com, wei.w.wang@intel.com,
-        like.xu.linux@gmail.com, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v5 06/13] KVM: x86/vmx: Save/Restore host
- MSR_ARCH_LBR_CTL state
-Message-ID: <20210712095305.GE12162@intel.com>
+        id S235047AbhGLKN4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 12 Jul 2021 06:13:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52186 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S238459AbhGLKNa (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 12 Jul 2021 06:13:30 -0400
+Received: from mail-pg1-x531.google.com (mail-pg1-x531.google.com [IPv6:2607:f8b0:4864:20::531])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 503F6C0613DD;
+        Mon, 12 Jul 2021 03:10:40 -0700 (PDT)
+Received: by mail-pg1-x531.google.com with SMTP id a2so17707390pgi.6;
+        Mon, 12 Jul 2021 03:10:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=iEk/ir9/c5kSFxMDMVhuyjD1jxHThSmk1Tkskkir1rU=;
+        b=qqUoJbLgzwxcX4qaTCPtUubntnRMo4Vgt1/AK90kCTwnlF+r6vfCJAGfGrOQ7+7kLV
+         eL0vgadXeOt3waCA8JqCWLMabNjAocZjePvEW3lSDXTf8UJD8SBLxi5S1B5amaXko1um
+         +7lhS5imt0lIAbec/vN+K5ugke7Vai7AKAh6cLU42JsAX5e01rmuYT0fdrkEUzK/76mU
+         Ge5vpzKCtZUlfUuUtbMnEEH+mHqVWP7vgZ7oVdgIzMLW7hcY6tWqUkg81gWPbLA4BrmL
+         Ev7hjolxznPvBHPZZT58AIbHxXJOuQogNkrW21XTTlJytr3cFGUrmc79OSNGLVg3nLdm
+         Vzaw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=iEk/ir9/c5kSFxMDMVhuyjD1jxHThSmk1Tkskkir1rU=;
+        b=bGa2b/xUJCf+95sqjaZYVOkw8etOOz1PIHoiq4UiPNC4Ct2DpKnS8tuDL4QJyu1cVA
+         rVneLDchAJ49R6rqcCxXJmCtVXSh2FCr13loG2/lbG3u8EDe87zhhpec7bZ4B2uDBoc/
+         apEs0jNKQMuxbyQadRtj7VUXZRMAG0WBQJupbTyWkzh5O6YM9iX8vo3IOR7OpzRSB4ok
+         zHGoYKKyWUG9qsCNUTZul845MTUddGMmnr33kVHgnLes5ac+DW+EWO863cWpfKtHtCbZ
+         b3uxZpugNJAgsuFtApI0ZtTz663gTK/Swt9eALqp8RLqneHrx/7oMFphvJhc3DZO3V60
+         JzOg==
+X-Gm-Message-State: AOAM5332nwmzpVSzjDiakltX9sioYzByAqvIfd6goUeCGrSkI0EuAXe/
+        hBPtZgWsBLtM7ORgqdKUSss=
+X-Google-Smtp-Source: ABdhPJzXCINaueh7u8MBAcqVETylU6Tc2av30BJoHPIU+k0H57txwsmCcHe/7/KIPAmNm6a2xskU9g==
+X-Received: by 2002:a65:6489:: with SMTP id e9mr24110978pgv.409.1626084639845;
+        Mon, 12 Jul 2021 03:10:39 -0700 (PDT)
+Received: from Likes-MacBook-Pro.local ([103.7.29.32])
+        by smtp.gmail.com with ESMTPSA id j19sm17051700pgm.44.2021.07.12.03.10.36
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 12 Jul 2021 03:10:39 -0700 (PDT)
+Subject: Re: [PATCH v5 05/13] KVM: vmx/pmu: Emulate MSR_ARCH_LBR_CTL for guest
+ Arch LBR
+To:     Yang Weijiang <weijiang.yang@intel.com>,
+        Jim Mattson <jmattson@google.com>
+Cc:     pbonzini@redhat.com, seanjc@google.com, vkuznets@redhat.com,
+        wei.w.wang@intel.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Like Xu <like.xu@linux.intel.com>
 References: <1625825111-6604-1-git-send-email-weijiang.yang@intel.com>
- <1625825111-6604-7-git-send-email-weijiang.yang@intel.com>
- <CALMp9eQEs9pUyy1PpwLPG0_PtF07tR2Opw+1b=w4-knOwYPvvg@mail.gmail.com>
- <CALMp9eQ+9czB0ayBFR3-nW-ynKuH0v9uHAGeV4wgkXYJMSs1=w@mail.gmail.com>
+ <1625825111-6604-6-git-send-email-weijiang.yang@intel.com>
+ <CALMp9eR8mbVXS5E6sB7TwEocytpWcG_6w-ijmfxAd4ciHPtfmw@mail.gmail.com>
+ <20210712093626.GC12162@intel.com>
+From:   Like Xu <like.xu.linux@gmail.com>
+Message-ID: <bd386ed1-69d8-39ab-8bee-6e3aed8d2ee2@gmail.com>
+Date:   Mon, 12 Jul 2021 18:10:30 +0800
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0)
+ Gecko/20100101 Thunderbird/78.11.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
+In-Reply-To: <20210712093626.GC12162@intel.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <CALMp9eQ+9czB0ayBFR3-nW-ynKuH0v9uHAGeV4wgkXYJMSs1=w@mail.gmail.com>
-User-Agent: Mutt/1.5.24 (2015-08-30)
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Jul 09, 2021 at 04:41:30PM -0700, Jim Mattson wrote:
-> On Fri, Jul 9, 2021 at 3:54 PM Jim Mattson <jmattson@google.com> wrote:
-> >
-> > On Fri, Jul 9, 2021 at 2:51 AM Yang Weijiang <weijiang.yang@intel.com> wrote:
-> > >
-> > > If host is using MSR_ARCH_LBR_CTL then save it before vm-entry
-> > > and reload it after vm-exit.
-> >
-> > I don't see anything being done here "before VM-entry" or "after
-> > VM-exit." This code seems to be invoked on vcpu_load and vcpu_put.
-> >
-> > In any case, I don't see why this one MSR is special. It seems that if
-> > the host is using the architectural LBR MSRs, then *all* of the host
-> > architectural LBR MSRs have to be saved on vcpu_load and restored on
-> > vcpu_put. Shouldn't  kvm_load_guest_fpu() and kvm_put_guest_fpu() do
-> > that via the calls to kvm_save_current_fpu(vcpu->arch.user_fpu) and
-> > restore_fpregs_from_fpstate(&vcpu->arch.user_fpu->state)?
+On 12/7/2021 5:36 pm, Yang Weijiang wrote:
+> On Fri, Jul 09, 2021 at 02:55:35PM -0700, Jim Mattson wrote:
+>> On Fri, Jul 9, 2021 at 2:51 AM Yang Weijiang <weijiang.yang@intel.com> wrote:
+>>>
+>>> From: Like Xu <like.xu@linux.intel.com>
+>>>
+>>> Arch LBRs are enabled by setting MSR_ARCH_LBR_CTL.LBREn to 1. A new guest
+>>> state field named "Guest IA32_LBR_CTL" is added to enhance guest LBR usage.
+>>> When guest Arch LBR is enabled, a guest LBR event will be created like the
+>>> model-specific LBR does. Clear guest LBR enable bit on host PMI handling so
+>>> guest can see expected config.
+>>>
+>>> On processors that support Arch LBR, MSR_IA32_DEBUGCTLMSR[bit 0] has no
+>>> meaning. It can be written to 0 or 1, but reads will always return 0.
+>>> Like IA32_DEBUGCTL, IA32_ARCH_LBR_CTL msr is also reserved on INIT.
+>>
+>> I suspect you mean "preserved" rather than "reserved."
+> Yes, should be preserved.
 > 
-> It does seem like there is something special about IA32_LBR_DEPTH, though...
+>>
+>>> Signed-off-by: Like Xu <like.xu@linux.intel.com>
+>>> Signed-off-by: Yang Weijiang <weijiang.yang@intel.com>
+>>> ---
+>>>   arch/x86/events/intel/lbr.c      |  2 --
+>>>   arch/x86/include/asm/msr-index.h |  1 +
+>>>   arch/x86/include/asm/vmx.h       |  2 ++
+>>>   arch/x86/kvm/vmx/pmu_intel.c     | 31 ++++++++++++++++++++++++++-----
+>>>   arch/x86/kvm/vmx/vmx.c           |  9 +++++++++
+>>>   5 files changed, 38 insertions(+), 7 deletions(-)
+>>>
+>>
+>>> diff --git a/arch/x86/kvm/vmx/pmu_intel.c b/arch/x86/kvm/vmx/pmu_intel.c
+>>> index da68f0e74702..4500c564c63a 100644
+>>> --- a/arch/x86/kvm/vmx/pmu_intel.c
+>>> +++ b/arch/x86/kvm/vmx/pmu_intel.c
+>>> @@ -19,6 +19,11 @@
+>>>   #include "pmu.h"
+>>>
+>>>   #define MSR_PMC_FULL_WIDTH_BIT      (MSR_IA32_PMC0 - MSR_IA32_PERFCTR0)
+>>> +/*
+>>> + * Regardless of the Arch LBR or legacy LBR, when the LBR_EN bit 0 of the
+>>> + * corresponding control MSR is set to 1, LBR recording will be enabled.
+>>> + */
+>>
+>> Is this comment misplaced? It doesn't seem to have anything to do with
+>> the macro being defined below.
+> Agree, will put this in commit message.
+>>
+>>> @@ -458,6 +467,14 @@ static int intel_pmu_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+>>>                  lbr_desc->records.nr = data;
+>>>                  lbr_desc->arch_lbr_reset = true;
+>>>                  return 0;
+>>> +       case MSR_ARCH_LBR_CTL:
+>>> +               if (data & ~KVM_ARCH_LBR_CTL_MASK)
+>>
+>> Is a static mask sufficient? Per the Intel® Architecture Instruction
+>> Set Extensions and Future Features Programming Reference, some of
+>> these bits may not be supported on all microarchitectures. See Table
+>> 7-8. CPUID Leaf 01CH Enumeration of Architectural LBR Capabilities.
+> Yes, more sanity checks are required, thanks!
 > 
-> Section 7.3.1 of the Intel� Architecture Instruction Set Extensions
-> and Future Features Programming Reference
-> says, "IA32_LBR_DEPTH is saved by XSAVES, but it is not written by
-> XRSTORS in any circumstance." It seems like that would require some
-> special handling if the host depth and the guest depth do not match.
-In our vPMU design, guest depth is alway kept the same as that of host,
-so this won't be a problem. But I'll double check the code again, thanks!
+>>
+>>> +                       break;
+>>> +               vmcs_write64(GUEST_IA32_LBR_CTL, data);
+>>> +               if (intel_pmu_lbr_is_enabled(vcpu) && !lbr_desc->event &&
+>>> +                   (data & ARCH_LBR_CTL_LBREN))
+>>> +                       intel_pmu_create_guest_lbr_event(vcpu);
+>>
+>> Nothing has to be done when the LBREN bit goes from 1 to 0?
+> Need to release the event and reset related flag when the bit goes from
+> 1 to 0. Thanks!
+
+No need to release the LBR event and it will be lazily released.
+
+>>
+>>> +               return 0;
+>>>          default:
+>>>                  if ((pmc = get_gp_pmc(pmu, msr, MSR_IA32_PERFCTR0)) ||
+>>>                      (pmc = get_gp_pmc(pmu, msr, MSR_IA32_PMC0))) {
+>>
+>> Per the Intel® Architecture Instruction Set Extensions and Future
+>> Features Programming Reference, "IA32_LBR_CTL.LBREn is saved and
+>> cleared on #SMI, and restored on RSM." I don't see that happening
+>> anywhere. That manual also says, "On a warm reset...IA32_LBR_CTL.LBREn
+>> is cleared to 0, disabling LBRs." I don't see that happening either.
+> 
+> Yes, I'll add related code to make it consistent with spec, thanks!
+>>
+>> I have a question about section 7.1.4.4 in that manual. It says, "On a
+>> debug breakpoint event (#DB), IA32_LBR_CTL.LBREn is cleared." When,
+>> exactly, does that happen? In particular, if kvm synthesizes such an
+>> event (for example, in kvm_vcpu_do_singlestep), does
+>> IA32_LBR_CTL.LBREn automatically get cleared (after loading the guest
+>> IA32_LBR_CTL value from the VMCS)? Or does kvm need to explicitly
+>> clear that bit in the VMCS before injecting the #DB?
+> OK, I don't have answer now, will ask the Arch to get clear answer on this,
+> thanks for raising the question!
+
+I think we also need a kvm-unit-tests to cover it (as well as the legacy 
+LBR).
+
+> 
