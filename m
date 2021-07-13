@@ -2,134 +2,158 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A76153C6E4A
-	for <lists+kvm@lfdr.de>; Tue, 13 Jul 2021 12:16:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 543AC3C6F19
+	for <lists+kvm@lfdr.de>; Tue, 13 Jul 2021 13:03:30 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235322AbhGMKTI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 13 Jul 2021 06:19:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42720 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235143AbhGMKTH (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 13 Jul 2021 06:19:07 -0400
-Received: from mail-pf1-x42d.google.com (mail-pf1-x42d.google.com [IPv6:2607:f8b0:4864:20::42d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9864EC0613DD;
-        Tue, 13 Jul 2021 03:16:16 -0700 (PDT)
-Received: by mail-pf1-x42d.google.com with SMTP id a127so19108828pfa.10;
-        Tue, 13 Jul 2021 03:16:16 -0700 (PDT)
+        id S235800AbhGMLGQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 13 Jul 2021 07:06:16 -0400
+Received: from mx0a-00069f02.pphosted.com ([205.220.165.32]:12380 "EHLO
+        mx0a-00069f02.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229784AbhGMLGP (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 13 Jul 2021 07:06:15 -0400
+Received: from pps.filterd (m0246627.ppops.net [127.0.0.1])
+        by mx0b-00069f02.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 16DB1Qvx007979;
+        Tue, 13 Jul 2021 11:02:46 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=date : from : to : cc
+ : subject : message-id : references : content-type : in-reply-to :
+ mime-version; s=corp-2020-01-29;
+ bh=bJjYanza1S94svd51N3qTB5JtzOYaZZJ17wynlJ79pY=;
+ b=zH1fyTFGq6F7TV0dZQsDZmG7PLx6w+F79mxiqymAWv5WvnbZminL/KtweL5OZ1asQeG9
+ fr7Pf+PaZryMCoyqSmyrJ3NNv3XdxypeJyiRHIoXd35IkVRdAPc2YJBZ9gFxIgH5GY41
+ Kwpj8JbSlbdyB9TQ6VGcl+K2f+xbKXdEki/ofRg6zxkTXkhyBamhT+AooLBe6Ell0Amk
+ OfXANXFe9XsC8zefyboDX49DQm/uUU++BKIYg4mrg14r1WZsObodll0UQjnxulGQazNj
+ qSZvHqJ42SNN90zA3t4VRhCSGu9gcB74ZG/J3p2I6J4kikGDhheS9oDxvJKpB5zH/AU4 7Q== 
+Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
+        by mx0b-00069f02.pphosted.com with ESMTP id 39r9hckb9n-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 13 Jul 2021 11:02:45 +0000
+Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
+        by aserp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 16DAsfLe140212;
+        Tue, 13 Jul 2021 11:02:44 GMT
+Received: from nam12-dm6-obe.outbound.protection.outlook.com (mail-dm6nam12lp2172.outbound.protection.outlook.com [104.47.59.172])
+        by aserp3020.oracle.com with ESMTP id 39q3cas8qc-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 13 Jul 2021 11:02:44 +0000
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=JxFqVzQUJVmeYxsJHe7j0XS9EusKlvb2s53l3S20rDpcWiAfPfY1bahr5fv/BiCZCSW2nXmhUGp7AZXZaAKktnumAMaFOX1UNh0qVVuqW/KAH/Cp1OCJjb00+QdEdAwjVPxPPremkYW9zTd685JSazlHBtUm5XddqnlBtgf8CBX0jI/OniUEBcfqcBnmEl6gKc2sKKmQVQd4mWX9cDx07VHjjCePGgTU98Gkae0f58NrEqJ+NGfCEdT2nbyxVt3LxGuIMjDOvDH2cuJcfTxXgXz0bHKX9+KTeE1WQbc7fAg8ysZUG5IGVBLIQsaRjBlb+/X6XhvTkbfGiatRWzm+Qw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=bJjYanza1S94svd51N3qTB5JtzOYaZZJ17wynlJ79pY=;
+ b=dBbHUf7ieShb2GSGLTmImPIxvaioM7MzDDzZGyX+b8oppNvO27tgplELmYKJZJ1ruKHb1BBE7sJIpvBHchUBu1Q3yAHzl8DS+/b6Z0CnbM+UNLfxThaVryfanQrr/8DbSz3QtbAZXnh48641s3o/vfH1A+y1QaTIpo3p703bokirOB83S0Dalr4DyeU+jBDhn98eMyNwqyU1T5d4sUj9ROTS8eMGIGhlduET4P8YALeRBya9XJLvl13oca8Ow+Xf3tJuBjUI1sFMDZMASyKmK/PvpOVn+md0tOA1T5K0dKyT99uAwMhLL+VLiQ1dFXOFoaxRwoX3GIb/BcDLQOQlEQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
+ dkim=pass header.d=oracle.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=to:cc:references:from:subject:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=pZ+kJIZpqwPna83byG9/WJMMnZqY/UkbffT9YAmCx5Y=;
-        b=FggyFQ1hdkSBHPNsyxE7wgkRDUf+2lrqhQYPR+9om9qKy71AO7QUa2bAULnsN7CFD2
-         hjV4k+E1rbfgUMW/6LiVe1tFlOpp5sbigFNT9rb8Zg1ImEugjwMLr7AhEWfm4+3xGr7C
-         U5eyOLNgIOWiRTKXZQT5c1pN1uMKTLnZhd7hnYFof7o5MQw2eDVVbshIw9kkLiqmbtnQ
-         3AAJ71AYWh/oYG8spKS435N19+ChT3/QAK7C9GBSaJPwGT8YXSWifElDljPREMv+Yhca
-         tVBwwS131a4tZ7KfuaNEB1TXq8HKKL2pdRMMT3TMQzoJ9cQ6Mc4ehR39xL6Jc1FkdJpO
-         ekBg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:to:cc:references:from:subject:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=pZ+kJIZpqwPna83byG9/WJMMnZqY/UkbffT9YAmCx5Y=;
-        b=DybDQU0hB4R8zZDC6CtpR2Imtcsid6FgWJRn4qfQdfF8BNHVC1ZPzQ98mzF99SvFdg
-         QpbzWux5uP4LPGJg0Yz1PUSNrFo9gDLFqLK0OaCEeQ1+n2IjcuS96BAC2Z6hK3f1y2CX
-         rW+RgXlJ0K/dHtKq11Crc6PXhnvThHxidAt4AGztHOF1weUwxokL1RJgIp/NGRgxKWmu
-         Uf6XAoLk4TwYCnWqsfrNdLUmCo7HkjCGmn8YyOdUiMpVTgeQEiQ1+gbR+fTcjvjDRpCY
-         t0Ods9fmruyC69owB0hbQh/80cgFGzVYwEBIgCOurxSEiZm69EB41hVQnk2QeEBgc9Qt
-         I/ag==
-X-Gm-Message-State: AOAM531Cc0g7Lpd8vl++hZu8llGM3sVFwZJrYAWicmoy34n7Uy+IDusI
-        y8jzrxjHkdnD0UaQ2u4Lcpc2SnWw1dtQOowJ
-X-Google-Smtp-Source: ABdhPJzzwC6RpHs3l+fl6fcP04Rduib3eXMpIf9Z3Z5X9sYmQ+cWiYU4vvptjSzzgwNWOeBlPoiI5g==
-X-Received: by 2002:a65:5086:: with SMTP id r6mr3566071pgp.237.1626171375987;
-        Tue, 13 Jul 2021 03:16:15 -0700 (PDT)
-Received: from Likes-MacBook-Pro.local ([103.7.29.32])
-        by smtp.gmail.com with ESMTPSA id x10sm14944114pfr.150.2021.07.13.03.16.13
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 13 Jul 2021 03:16:15 -0700 (PDT)
-To:     Yang Weijiang <weijiang.yang@intel.com>,
-        Jim Mattson <jmattson@google.com>
-Cc:     pbonzini@redhat.com, seanjc@google.com, vkuznets@redhat.com,
-        wei.w.wang@intel.com, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-References: <1625825111-6604-1-git-send-email-weijiang.yang@intel.com>
- <1625825111-6604-7-git-send-email-weijiang.yang@intel.com>
- <CALMp9eQEs9pUyy1PpwLPG0_PtF07tR2Opw+1b=w4-knOwYPvvg@mail.gmail.com>
- <20210712095034.GD12162@intel.com>
- <CALMp9eQLHfXQwPCfqtc_y34sKGkZsCxEFL+BGx8wHgz7A8cOPA@mail.gmail.com>
- <20210713094713.GB13824@intel.com>
-From:   Like Xu <like.xu.linux@gmail.com>
-Subject: Re: [PATCH v5 06/13] KVM: x86/vmx: Save/Restore host MSR_ARCH_LBR_CTL
- state
-Message-ID: <1be1fde6-37c5-4697-cff0-b15af419975e@gmail.com>
-Date:   Tue, 13 Jul 2021 18:16:06 +0800
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0)
- Gecko/20100101 Thunderbird/78.11.0
+ d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=bJjYanza1S94svd51N3qTB5JtzOYaZZJ17wynlJ79pY=;
+ b=mj84pwQEKcharaCiHQD0nItI2ZMd1yjs+B8gJJnKQC19FCWX2wjpOmy7vzrfHiVRYjKN6dc/smzCVH5Ju7hZK+pjnxwCpxIhscTjCRGvE50/KhmJZxqOTOck8nmow31MH1C96dHcWgFMAPDE87NQsSqSNm1p6J1TtKKHYOhx8G0=
+Authentication-Results: bytedance.com; dkim=none (message not signed)
+ header.d=none;bytedance.com; dmarc=none action=none header.from=oracle.com;
+Received: from MWHPR1001MB2365.namprd10.prod.outlook.com
+ (2603:10b6:301:2d::28) by CO1PR10MB4706.namprd10.prod.outlook.com
+ (2603:10b6:303:9d::11) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4308.20; Tue, 13 Jul
+ 2021 11:02:42 +0000
+Received: from MWHPR1001MB2365.namprd10.prod.outlook.com
+ ([fe80::3413:3c61:5067:ba73]) by MWHPR1001MB2365.namprd10.prod.outlook.com
+ ([fe80::3413:3c61:5067:ba73%5]) with mapi id 15.20.4308.027; Tue, 13 Jul 2021
+ 11:02:42 +0000
+Date:   Tue, 13 Jul 2021 14:02:11 +0300
+From:   Dan Carpenter <dan.carpenter@oracle.com>
+To:     Xie Yongji <xieyongji@bytedance.com>
+Cc:     mst@redhat.com, jasowang@redhat.com, stefanha@redhat.com,
+        sgarzare@redhat.com, parav@nvidia.com, hch@infradead.org,
+        christian.brauner@canonical.com, rdunlap@infradead.org,
+        willy@infradead.org, viro@zeniv.linux.org.uk, axboe@kernel.dk,
+        bcrl@kvack.org, corbet@lwn.net, mika.penttila@nextfour.com,
+        joro@8bytes.org, gregkh@linuxfoundation.org, zhe.he@windriver.com,
+        xiaodong.liu@intel.com, songmuchun@bytedance.com,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        kvm@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        iommu@lists.linux-foundation.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v9 07/17] virtio: Don't set FAILED status bit on device
+ index allocation failure
+Message-ID: <20210713110211.GK1954@kadam>
+References: <20210713084656.232-1-xieyongji@bytedance.com>
+ <20210713084656.232-8-xieyongji@bytedance.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210713084656.232-8-xieyongji@bytedance.com>
+User-Agent: Mutt/1.9.4 (2018-02-28)
+X-ClientProxiedBy: JN2P275CA0018.ZAFP275.PROD.OUTLOOK.COM (2603:1086:0:3::30)
+ To MWHPR1001MB2365.namprd10.prod.outlook.com (2603:10b6:301:2d::28)
 MIME-Version: 1.0
-In-Reply-To: <20210713094713.GB13824@intel.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from kadam (102.222.70.252) by JN2P275CA0018.ZAFP275.PROD.OUTLOOK.COM (2603:1086:0:3::30) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4308.19 via Frontend Transport; Tue, 13 Jul 2021 11:02:27 +0000
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: ea0f191e-4339-4e89-4adf-08d945edbc55
+X-MS-TrafficTypeDiagnostic: CO1PR10MB4706:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <CO1PR10MB4706A0B2FFFE16DE7AD48D3C8E149@CO1PR10MB4706.namprd10.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:1728;
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: rpdNG6Y+TZgpyuFZA7SVbUDQheP54Pam3v1gDqisOyRoU9EDqfPKzZEw209umAW+FJOSeuDjm2MgGq0BRc4py8uoBTBrutu384grdYgid2RI7sUOWv9Q4/43oKoo4oj0NIFlTuaSS1Q7vStWelr5pOsvNESB3GA3n/0vVRDWU28+PBCy6FP7MGAuKH8RUZJ4riQyUmKaEaEObReMT+/iIjAomKqW8OE8W4K0Epf9EZDVgDFGpJDwPOYUEqJxLdSKeBz4Urm9d7JvaaMpq5FNsQdJGE91Inx3gXvtmstG7v3Ybq9EJ32708XjjOtggKrO600Lj8DUBmdc1aeTa9o9w93366pDbbfszin5nVwpjqqrkEMsdFFuiJ0kZY6Lijhh1BP/32LxsXwobxVtLQWDH2yqHgZLBrY9RQ6QhuU1cnyvkEBgzdC2Z4xFpmnDnH6JYAZbFhgxkW0f5u8slLvVCMjMlTwr6xTps/XTgjGG/3sW3GTsw0UonsBUlzf+hR6qUt6B18moGkWa0MTbiHcb/ukuV4ADBufonPPTwnJivPKqCdTOMvdFD37b2ukaIoc0aTE1fUf3uf7ge3ainhI1IvgDgcnSeYTtJNnZu227AXy5JEy6JEPWQICYUEibct8LHNdK7iZjtAvzBkZO3VfmCLVcjst3cIySlZUV61G0gnO48ZBCObE7hfq1apm7H7FjvGemJxTHVP2Au5NtY2GnEQ==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MWHPR1001MB2365.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(376002)(136003)(366004)(39860400002)(396003)(346002)(86362001)(6496006)(316002)(55016002)(66476007)(4326008)(33716001)(66946007)(1076003)(44832011)(66556008)(6916009)(83380400001)(52116002)(5660300002)(26005)(33656002)(38350700002)(8676002)(186003)(478600001)(6666004)(8936002)(956004)(38100700002)(9576002)(4744005)(7416002)(9686003)(2906002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?WboQdJFAps6YvlryAunlFrzyZD0UU79y8FhIPmZr7Ah8/9fAioLTAMIbl9Kr?=
+ =?us-ascii?Q?6Fk8A2nH5Hjpi7ZxnOD3FHFosd9SO2Vqa3mwmN+Ckdqj/0s6JHEkKpcmbWR1?=
+ =?us-ascii?Q?h24Tgf0VO+p+IP2+qz/+zI6UHGyiiMXgAXwuvNJOpfTD5zyS6dE86KNlsXt/?=
+ =?us-ascii?Q?GdLnrN2YyW9AfwmnoTmApeS322qlDLfVcEQWhi55engwZl40jfOs+upycPrM?=
+ =?us-ascii?Q?yySZdZe3EIwtwtk83rJuvOmFT2nTZXbLKp5Lspy5iFBA40n7/xIHpD0jSA+L?=
+ =?us-ascii?Q?gR5/JIOMaXJK2yYHOO4DN142GzSad8fe2AoJadhAdw5Ty/9PRIH8in+s4esz?=
+ =?us-ascii?Q?lg9QODu3TeVEiXkQ6UW0xkJ8KbLYXxT1IIrcZqe6fxgabwBwrcQlL6WmG5tv?=
+ =?us-ascii?Q?WDERjZeyC9SPBcsIUl85db3x4buGRWXCAb0rV1w9I8otWA12qm2yLTxlqLo+?=
+ =?us-ascii?Q?ONbLBl260bZnu8cQf7ONSLYN72mWn6/S8HJ9d1P4tqfkvaK44Q3+RSMwPzk0?=
+ =?us-ascii?Q?V9Ix8KWPrUdodNfjfCOgJRwCz0wCbeco+ND1YrUzOOoFZyB+1vteoA/cYacU?=
+ =?us-ascii?Q?ozmkh3EORNcGKxplck1zq16wZZb3Oscxv2qZUKTjY1/81qXZ1t7IcBcjSfvZ?=
+ =?us-ascii?Q?1D6gfZn1zs76r8qCjYHOZuOE5v6p+7YuTHGXSpZSadQ2JYo7m6L7iHhTLiaF?=
+ =?us-ascii?Q?QHK+RRfN712z8fbxtJfI75dFAmMlIPyoLdHHe3IUvpWH7jrYlVjsCbDETo7h?=
+ =?us-ascii?Q?FSNKNkw7lgoE7CwPxTlCQRkRRZ50gb/z3d4r2hJAP4x+0j82CTEDT+nsfVOX?=
+ =?us-ascii?Q?jrLWTOWkaaGOiv5L6bPCz74DnrN1A91pas/Cj5bups6GyXNyI13+Rb3aUm3f?=
+ =?us-ascii?Q?y6kidH8sB/jsxu7lXbsXfuPcMg7avE5OyfingsZkq55k5bR5WkatVmn4t4Ya?=
+ =?us-ascii?Q?4jdndSftT2TMmDg8MS73GVs5othSWLK2BVD6SkUg701xzEozt/KntdSlJZAK?=
+ =?us-ascii?Q?0PbRzC1jRM7ZnW/vRnNkOvs4i6/5YbH3dS1wtPjZg9FnOvchLBDnW0xT7nb5?=
+ =?us-ascii?Q?/MwuGe+TEqKoRPaL2IdaITSIlP98xRl6+CpZt9kJfMXEAjTIQZwJ5qPrqHlS?=
+ =?us-ascii?Q?2UHTq4WAOpvqVK+zo+6lM3nkGwdKdRSkllV7hyTaF1eVzGASUZK2FnLY04UT?=
+ =?us-ascii?Q?zepItgOH8EC+wMfcLDF8Bw6s2gg21DAI2lnl/icYUaAwoeza3E1rwIbIOUO5?=
+ =?us-ascii?Q?0a5FgWz20gwttJUGteKEhfTmIMaZfgptHEdCOlGbrVnfVKPEJ1PWDZUyEhmi?=
+ =?us-ascii?Q?xy306PM8XOFuqohYG/BF5bEa?=
+X-OriginatorOrg: oracle.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: ea0f191e-4339-4e89-4adf-08d945edbc55
+X-MS-Exchange-CrossTenant-AuthSource: MWHPR1001MB2365.namprd10.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Jul 2021 11:02:42.1126
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: XpJCTAcd9jqhz8kFdygfGjEpvo5kDivkdYwPBDtzGykHuiTSw+z6+Rcgw+KBgEj9LDIiQ05qPQ9+GieqHclmHENvIPPo/BP7FtuxH5dfl5I=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CO1PR10MB4706
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=10043 signatures=668682
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 spamscore=0 malwarescore=0 mlxscore=0
+ suspectscore=0 phishscore=0 adultscore=0 mlxlogscore=999 bulkscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2104190000
+ definitions=main-2107130070
+X-Proofpoint-ORIG-GUID: DFUk50LmBfb8Xb2NUJqW4oISIaKeSfxW
+X-Proofpoint-GUID: DFUk50LmBfb8Xb2NUJqW4oISIaKeSfxW
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 13/7/2021 5:47 pm, Yang Weijiang wrote:
-> On Mon, Jul 12, 2021 at 10:23:02AM -0700, Jim Mattson wrote:
->> On Mon, Jul 12, 2021 at 2:36 AM Yang Weijiang <weijiang.yang@intel.com> wrote:
->>>
->>> On Fri, Jul 09, 2021 at 03:54:53PM -0700, Jim Mattson wrote:
->>>> On Fri, Jul 9, 2021 at 2:51 AM Yang Weijiang <weijiang.yang@intel.com> wrote:
->>>>>
->>>>> If host is using MSR_ARCH_LBR_CTL then save it before vm-entry
->>>>> and reload it after vm-exit.
->>>>
->>>> I don't see anything being done here "before VM-entry" or "after
->>>> VM-exit." This code seems to be invoked on vcpu_load and vcpu_put.
->>>>
->>>> In any case, I don't see why this one MSR is special. It seems that if
->>>> the host is using the architectural LBR MSRs, then *all* of the host
->>>> architectural LBR MSRs have to be saved on vcpu_load and restored on
->>>> vcpu_put. Shouldn't  kvm_load_guest_fpu() and kvm_put_guest_fpu() do
->>>> that via the calls to kvm_save_current_fpu(vcpu->arch.user_fpu) and
->>>> restore_fpregs_from_fpstate(&vcpu->arch.user_fpu->state)?
->>> I looked back on the discussion thread:
->>> https://patchwork.kernel.org/project/kvm/patch/20210303135756.1546253-8-like.xu@linux.intel.com/
->>> not sure why this code is added, but IMO, although fpu save/restore in outer loop
->>> covers this LBR MSR, but the operation points are far away from vm-entry/exit
->>> point, i.e., the guest MSR setting could leak to host side for a signicant
->>> long of time, it may cause host side profiling accuracy. if we save/restore it
->>> manually, it'll mitigate the issue signifcantly.
->>
->> I'll be interested to see how you distinguish the intermingled branch
->> streams, if you allow the host to record LBRs while the LBR MSRs
->> contain guest values!
+On Tue, Jul 13, 2021 at 04:46:46PM +0800, Xie Yongji wrote:
+> We don't need to set FAILED status bit on device index allocation
+> failure since the device initialization hasn't been started yet.
 
-The guest is pretty fine that the real LBR MSRs contain the guest values
-even after vm-exit if there is no other LBR user in the current thread.
+The commit message should say what the effect of this change is to the
+user.  Is this a bugfix?  Will it have any effect on runtime at all?
 
-(The perf subsystem makes this data visible only to the current thread)
+To me, hearing your thoughts on this is valuable even if you have to
+guess.  "I noticed this mistake during review and I don't think it will
+affect runtime."
 
-Except for MSR_ARCH_LBR_CTL, we don't want to add msr switch overhead to
-the vmx transaction (just think about {from, to, info} * 32 entries).
+regards,
+dan carpenter
 
-If we have other LBR user (such as a "perf kvm") in the current thread,
-the host/guest LBR user will create separate LBR events to compete for
-who can use the LBR in the the current thread.
-
-The final arbiter is the host perf scheduler. The host perf will
-save/restore the contents of the LBR when switching between two
-LBR events.
-
-Indeed, if the LBR hardware is assigned to the host LBR event before
-vm-entry, then the guest LBR feature will be broken and a warning
-will be triggered on the host.
-
-LBR is the kind of exclusive hardware resource and cannot be shared
-by different host/guest lbr_select configurations.
-
-> I'll check if an inner simplified xsave/restore to guest/host LBR MSRs is meaningful,
-> the worst case is to drop this patch since it's not correct to only enable host lbr ctl
-> while still leaves guest LBR data in the MSRs. Thanks for the reminder!
-> 
