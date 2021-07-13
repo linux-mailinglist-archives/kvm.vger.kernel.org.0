@@ -2,124 +2,158 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E3FE93C6BA6
-	for <lists+kvm@lfdr.de>; Tue, 13 Jul 2021 09:45:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8A4F73C6BE0
+	for <lists+kvm@lfdr.de>; Tue, 13 Jul 2021 10:06:00 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234233AbhGMHsj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 13 Jul 2021 03:48:39 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:29624 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S233762AbhGMHsi (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 13 Jul 2021 03:48:38 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1626162348;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=NzhMW8UmyexogLd7WLsnQ7mohPd+vth26CSjnwu5sho=;
-        b=GLXQBXPmA3Bt6x73kDHcT4WtQhPX3IFqb5EouQoybixG+EZCa/FLb8Na3hqwGbX8rLqdY5
-        V3ygiVKyABr/vKI1cVbMaoj3yX/L1LheVP2lUOM4yBYjjRJV9hAhFd2jSUA3w80Vig4XWy
-        l+XGQQVb454e5ECjTDu8QxvqWf9VmOs=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-138-Ht4US0QcMjG6oqlg43cMvA-1; Tue, 13 Jul 2021 03:45:47 -0400
-X-MC-Unique: Ht4US0QcMjG6oqlg43cMvA-1
-Received: by mail-wr1-f70.google.com with SMTP id a4-20020a0560001884b02901401e436a18so1257039wri.21
-        for <kvm@vger.kernel.org>; Tue, 13 Jul 2021 00:45:47 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=NzhMW8UmyexogLd7WLsnQ7mohPd+vth26CSjnwu5sho=;
-        b=J/Uk/F3kCHPd8nyfQFVrKABq1iwUmp5zOFByQ4D7kAtfF/OQLxoDtM5ViPLqE9WSkF
-         66Q5yut/Jvarzet0RtDLUAOZPxWp72ja35hRTsNhDzLFHmNcfQo1vBc9ukV4AbrEDhXG
-         N46vVKVQcgoIkg1U8SYXIslpwHfvY9zh+YKIYFB0Zx8alhFQCGNgpUnwOtdmVfGwSbnw
-         DtlcLJzQzw98J/YeF7Nx3dHVaXTPh7Z+D6laRRzY+G6kGjUqvl35fZlDju4K7kE6Blj7
-         taUMLbZJSbIAPYUA4tGzAaGkeXUYGv6Grud3z4QGQVZZEGT3mNyvRC/8r9IpQeOm+BvA
-         xyWQ==
-X-Gm-Message-State: AOAM532ulFedS33Q9m0Bdnr8vix17xxI1okaBgDgDSTiYBBxfVsZ4Qiz
-        KfNKx1FiuOQnranuQWbHl9fmZ1RUZ6RFBdMFQQf1DmZ2zXm7Ml3wNUr9s/4Te20dYS0egAgEx72
-        XVYTD7WA0wICg
-X-Received: by 2002:a5d:4f82:: with SMTP id d2mr3896507wru.345.1626162346314;
-        Tue, 13 Jul 2021 00:45:46 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzCWsmYfh0hjLY/M0FVKG9/E4Vh+zpZr2m1Ysr7LX2IDMssKj2c36kIzZD77QuB8ng/nRFXng==
-X-Received: by 2002:a5d:4f82:: with SMTP id d2mr3896486wru.345.1626162346098;
-        Tue, 13 Jul 2021 00:45:46 -0700 (PDT)
-Received: from thuth.remote.csb (pd9575fd2.dip0.t-ipconnect.de. [217.87.95.210])
-        by smtp.gmail.com with ESMTPSA id z17sm865725wrs.54.2021.07.13.00.45.44
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 13 Jul 2021 00:45:45 -0700 (PDT)
-Subject: Re: [kvm-unit-tests RFC PATCH 2/5] scripts: Rename run_qemu_status ->
- run_test_status
-To:     Alexandru Elisei <alexandru.elisei@arm.com>, drjones@redhat.com,
-        pbonzini@redhat.com, lvivier@redhat.com, kvm-ppc@vger.kernel.org,
-        david@redhat.com, frankja@linux.ibm.com, cohuck@redhat.com,
-        imbrenda@linux.ibm.com, linux-s390@vger.kernel.org,
-        kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
-Cc:     andre.przywara@arm.com, maz@kernel.org, vivek.gautam@arm.com
-References: <20210702163122.96110-1-alexandru.elisei@arm.com>
- <20210702163122.96110-3-alexandru.elisei@arm.com>
-From:   Thomas Huth <thuth@redhat.com>
-Message-ID: <24f5629f-eff4-11b3-30a3-c6052f533ced@redhat.com>
-Date:   Tue, 13 Jul 2021 09:45:44 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+        id S234496AbhGMIIs (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 13 Jul 2021 04:08:48 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:61204 "EHLO
+        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S234357AbhGMIIr (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 13 Jul 2021 04:08:47 -0400
+Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 16D83NvG061557;
+        Tue, 13 Jul 2021 04:05:48 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
+ references : from : message-id : date : in-reply-to : content-type :
+ content-transfer-encoding : mime-version; s=pp1;
+ bh=JCbYkbmxpcl4s3hpG8rFjTAfqObviZZhKack65HfRaQ=;
+ b=stQGKBkTErktHREmyqQLHQPvqCSe4VDX+VLYrgs3rXa5RV/d9pecEgPX+1tWRuGdM/bz
+ eL7Ry4bTKHMdQviCUy1CEljNyGtRGP3rG4JjRvlcp/TD41Pb8lWPmeFIdDi8VgIaAItT
+ Y2Vt0SxbJxIaCJo8kayoSpUFoLZor1J2mMy4tByIpmLv7MFgVTKrGJVRZPvSHQlqvq8x
+ V8ekH5MTfa1yOH1JcJRk4QKO08U1yaDCUTwSeAD6TGn14BJ8DaMU2biA7HaIJQa6HKS4
+ q2m6kCOpP2zdy2Fc2mjfRW5ItXmR89pGPWNLDrp4zhuLE1N5FhioLBo6nRbA3NzKp6ZL MQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 39qrudbgwv-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 13 Jul 2021 04:05:48 -0400
+Received: from m0098421.ppops.net (m0098421.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 16D83eBZ063155;
+        Tue, 13 Jul 2021 04:05:47 -0400
+Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 39qrudbgvv-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 13 Jul 2021 04:05:47 -0400
+Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
+        by ppma03ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 16D83Lra015077;
+        Tue, 13 Jul 2021 08:05:45 GMT
+Received: from b06avi18626390.portsmouth.uk.ibm.com (b06avi18626390.portsmouth.uk.ibm.com [9.149.26.192])
+        by ppma03ams.nl.ibm.com with ESMTP id 39q368958w-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 13 Jul 2021 08:05:45 +0000
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
+        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 16D83bQl31326536
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 13 Jul 2021 08:03:38 GMT
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 9FF38A405C;
+        Tue, 13 Jul 2021 08:05:42 +0000 (GMT)
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 9B2FDA406A;
+        Tue, 13 Jul 2021 08:05:38 +0000 (GMT)
+Received: from [9.160.8.119] (unknown [9.160.8.119])
+        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Tue, 13 Jul 2021 08:05:38 +0000 (GMT)
+Subject: Re: [RFC PATCH 0/6] Add AMD Secure Nested Paging (SEV-SNP) support
+To:     Brijesh Singh <brijesh.singh@amd.com>, qemu-devel@nongnu.org
+Cc:     Connor Kuehl <ckuehl@redhat.com>,
+        =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+        "Michael S . Tsirkin" <mst@redhat.com>,
+        James Bottomley <jejb@linux.ibm.com>,
+        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        David Gibson <david@gibson.dropbear.id.au>,
+        =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
+        kvm@vger.kernel.org, Michael Roth <michael.roth@amd.com>,
+        Eduardo Habkost <ehabkost@redhat.com>,
+        Dov Murik <dovmurik@linux.ibm.com>
+References: <20210709215550.32496-1-brijesh.singh@amd.com>
+From:   Dov Murik <dovmurik@linux.ibm.com>
+Message-ID: <e68a9760-121f-72ee-f8ae-193b92bde403@linux.ibm.com>
+Date:   Tue, 13 Jul 2021 11:05:37 +0300
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
  Thunderbird/78.11.0
-MIME-Version: 1.0
-In-Reply-To: <20210702163122.96110-3-alexandru.elisei@arm.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <20210709215550.32496-1-brijesh.singh@amd.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: Cff8pOgg45Q5genl7gyk6eH65UPTJqbS
+X-Proofpoint-ORIG-GUID: _H61TdGLiXZXC6XpSW7Ldy814GkD5ilY
 Content-Transfer-Encoding: 7bit
+X-Proofpoint-UnRewURL: 0 URL was un-rewritten
+MIME-Version: 1.0
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.790
+ definitions=2021-07-13_03:2021-07-13,2021-07-13 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ clxscore=1015 suspectscore=0 phishscore=0 malwarescore=0 mlxscore=0
+ spamscore=0 mlxlogscore=999 impostorscore=0 bulkscore=0 adultscore=0
+ lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2104190000 definitions=main-2107130051
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 02/07/2021 18.31, Alexandru Elisei wrote:
-> kvm-unit-tests will get support for running tests automatically under
-> kvmtool, rename the function to make it more generic.
+Brijesh,
+
+On 10/07/2021 0:55, Brijesh Singh wrote:
+> SEV-SNP builds upon existing SEV and SEV-ES functionality while adding
+> new hardware-based memory protections. SEV-SNP adds strong memory integrity
+> protection to help prevent malicious hypervisor-based attacks like data
+> replay, memory re-mapping and more in order to create an isolated memory
+> encryption environment.
 > 
-> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
-> ---
->   scripts/arch-run.bash | 2 +-
->   powerpc/run           | 2 +-
->   s390x/run             | 2 +-
->   3 files changed, 3 insertions(+), 3 deletions(-)
+> The patches to support the SEV-SNP in Linux kernel and OVMF are available:
+> https://lore.kernel.org/kvm/20210707181506.30489-1-brijesh.singh@amd.com/
+> https://lore.kernel.org/kvm/20210707183616.5620-1-brijesh.singh@amd.com/
+> https://edk2.groups.io/g/devel/message/77335?p=,,,20,0,0,0::Created,,posterid%3A5969970,20,2,20,83891508
 > 
-> diff --git a/scripts/arch-run.bash b/scripts/arch-run.bash
-> index 5997e384019b..8ceed53ed7f8 100644
-> --- a/scripts/arch-run.bash
-> +++ b/scripts/arch-run.bash
-> @@ -69,7 +69,7 @@ run_qemu ()
->   	return $ret
->   }
->   
-> -run_qemu_status ()
-> +run_test_status ()
->   {
->   	local stdout ret
->   
-> diff --git a/powerpc/run b/powerpc/run
-> index 597ab96ed8a8..312576006504 100755
-> --- a/powerpc/run
-> +++ b/powerpc/run
-> @@ -31,4 +31,4 @@ command="$(migration_cmd) $(timeout_cmd) $command"
->   # to fixup the fixup below by parsing the true exit code from the output.
->   # The second fixup is also a FIXME, because once we add chr-testdev
->   # support for powerpc, we won't need the second fixup.
-> -run_qemu_status $command "$@"
-> +run_test_status $command "$@"
-> diff --git a/s390x/run b/s390x/run
-> index c615caa1b772..5a4bb3bda805 100755
-> --- a/s390x/run
-> +++ b/s390x/run
-> @@ -28,4 +28,4 @@ command+=" -kernel"
->   command="$(timeout_cmd) $command"
->   
->   # We return the exit code via stdout, not via the QEMU return code
-> -run_qemu_status $command "$@"
-> +run_test_status $command "$@"
+> The Qemu patches uses the command id added by the SEV-SNP hypervisor
+> patches to bootstrap the SEV-SNP VMs.
+> 
+> TODO:
+>  * Add support to filter CPUID values through the PSP.
+> 
+> Additional resources
+> ---------------------
+> SEV-SNP whitepaper
+> https://www.amd.com/system/files/TechDocs/SEV-SNP-strengthening-vm-isolation-with-integrity-protection-and-more.pdf
+> 
+> APM 2: https://www.amd.com/system/files/TechDocs/24593.pdf (section 15.36)
+> 
+> GHCB spec:
+> https://developer.amd.com/wp-content/resources/56421.pdf
+> 
+> SEV-SNP firmware specification:
+> https://www.amd.com/system/files/TechDocs/56860.pdf
+> 
+> Brijesh Singh (6):
+>   linux-header: add the SNP specific command
+>   i386/sev: extend sev-guest property to include SEV-SNP
+>   i386/sev: initialize SNP context
+>   i386/sev: add the SNP launch start context
+>   i386/sev: add support to encrypt BIOS when SEV-SNP is enabled
+>   i386/sev: populate secrets and cpuid page and finalize the SNP launch
+> 
+>  docs/amd-memory-encryption.txt |  81 +++++-
+>  linux-headers/linux/kvm.h      |  47 ++++
+>  qapi/qom.json                  |   6 +
+>  target/i386/sev.c              | 498 ++++++++++++++++++++++++++++++++-
+>  target/i386/sev_i386.h         |   1 +
+>  target/i386/trace-events       |   4 +
+>  6 files changed, 628 insertions(+), 9 deletions(-)
 > 
 
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+It might be useful to allow the user to view SNP-related status/settings
+in HMP's `info sev` and QMP's qom-list/qom-get under
+/machine/confidential-guest-support .
 
+(Not sure whether HMP is deprecated and new stuff should not be added
+there.)
+
+Particularly confusing is the `policy` attribute which is only relevant
+for SEV / SEV-ES, while there's a new `snp.policy` attribute for SNP...
+Maybe the irrelevant attributes should not be added to the tree when not
+in SNP.
+
+-Dov
