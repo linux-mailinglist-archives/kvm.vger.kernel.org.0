@@ -2,196 +2,352 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4F56C3C7A17
-	for <lists+kvm@lfdr.de>; Wed, 14 Jul 2021 01:24:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9564B3C7A28
+	for <lists+kvm@lfdr.de>; Wed, 14 Jul 2021 01:26:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236974AbhGMX1j (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 13 Jul 2021 19:27:39 -0400
-Received: from mga14.intel.com ([192.55.52.115]:43874 "EHLO mga14.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S236951AbhGMX1i (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 13 Jul 2021 19:27:38 -0400
-X-IronPort-AV: E=McAfee;i="6200,9189,10044"; a="210074379"
-X-IronPort-AV: E=Sophos;i="5.84,237,1620716400"; 
-   d="scan'208";a="210074379"
-Received: from fmsmga001.fm.intel.com ([10.253.24.23])
-  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Jul 2021 16:24:48 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.84,237,1620716400"; 
-   d="scan'208";a="570877220"
-Received: from fmsmsx606.amr.corp.intel.com ([10.18.126.86])
-  by fmsmga001.fm.intel.com with ESMTP; 13 Jul 2021 16:24:48 -0700
-Received: from fmsmsx611.amr.corp.intel.com (10.18.126.91) by
- fmsmsx606.amr.corp.intel.com (10.18.126.86) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2242.10; Tue, 13 Jul 2021 16:24:47 -0700
-Received: from FMSEDG603.ED.cps.intel.com (10.1.192.133) by
- fmsmsx611.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2242.10 via Frontend Transport; Tue, 13 Jul 2021 16:24:47 -0700
-Received: from NAM10-DM6-obe.outbound.protection.outlook.com (104.47.58.107)
- by edgegateway.intel.com (192.55.55.68) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2242.10; Tue, 13 Jul 2021 16:24:47 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=JX1Xy56vfmK5Cjuzcqo28WSEJykP8HYg7vPaHQ9Lf+iBI6aQVvLtz3iVYTS4VpTkHN35Mf47VwL3PgU5x6Gjer5lw1NIV+pAAZqYHp9ON/2iZXJ3mUR3WjGbALrXW75u4yJzjIoJVEg+tXaw6zILv7vfuFUBrNG+aQiAGFnRAzxB/FamWYcv9rqs4p8O0UAC+7iPFGZfbEbkHsHlLN4jVzPaHbkS0nWzdkCGOgWv+gi7QzlGXiX2uTFZ2NGtWtk5pjiRFjtbHrIGy3HlLmefdYtF3bcP/FJ18UwiEFmGJcLwjOIZNvsYAZ3l8njnlyorAtyaquEXm76/HmAmJocjPw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=7hYD4QSQszhuVoJ2Dgfq8c+7EU6nqbg/zyGfKBMwgpI=;
- b=oCbiiO6YxbZde7yrAhNHuegdfep2vBsqVZvxaP+pA70IpZkBju9D1JfZ9NvN1w2+DYcIvOl0g+ldEWK0Rj5PZdVIaZuGFAEm0vdZprs/u9ML/Brfm3QQEB4dAeNEUTjFHKCtg+2jXFJPuDmjRhiU5u67EmN1pUGPQ+Ltpxjx5fY76aN9hW5zujulZr3Oa7TiNXPcQjlOpPkbKUiOvLd8yI0Ll+dtskxto895ObJSGqKKVRlzNeGK1R5lhmnGWs6q++q48Y6kmE5vcFESCjfaEdXHhbCvoTAHXiOs6eXtP3HlzVKnIwiucM1oKm5GLktCaBxX2sE0ogLWLR+FhT/Njw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=intel.onmicrosoft.com;
- s=selector2-intel-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=7hYD4QSQszhuVoJ2Dgfq8c+7EU6nqbg/zyGfKBMwgpI=;
- b=emSMvDoHLUnfn9Sfgs7roLptl3B1z8mlbv6QEmmT+GEslbbnwoZkOW5f+AX0/Av36Q0HnvRpvK1W1WzaATocgyI7UQ2jELCakJ7vz4pDwGxSikMTVgm9ZpwRbnWpBo6gUqCmnN51TyjBwfFICQYsRoObWfuuSx/aNDzdvGZJ7lQ=
-Received: from BN9PR11MB5433.namprd11.prod.outlook.com (2603:10b6:408:11e::13)
- by BN6PR1101MB2337.namprd11.prod.outlook.com (2603:10b6:404:92::23) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4308.23; Tue, 13 Jul
- 2021 23:24:45 +0000
-Received: from BN9PR11MB5433.namprd11.prod.outlook.com
- ([fe80::fd4b:cdde:6790:134]) by BN9PR11MB5433.namprd11.prod.outlook.com
- ([fe80::fd4b:cdde:6790:134%7]) with mapi id 15.20.4308.027; Tue, 13 Jul 2021
- 23:24:45 +0000
-From:   "Tian, Kevin" <kevin.tian@intel.com>
-To:     Jason Gunthorpe <jgg@nvidia.com>
-CC:     Alex Williamson <alex.williamson@redhat.com>,
-        Jean-Philippe Brucker <jean-philippe@linaro.org>,
-        David Gibson <david@gibson.dropbear.id.au>,
-        Jason Wang <jasowang@redhat.com>,
-        "parav@mellanox.com" <parav@mellanox.com>,
-        "Enrico Weigelt, metux IT consult" <lkml@metux.net>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Shenming Lu <lushenming@huawei.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Eric Auger <eric.auger@redhat.com>,
-        "Jonathan Corbet" <corbet@lwn.net>,
-        "Raj, Ashok" <ashok.raj@intel.com>,
-        "Liu, Yi L" <yi.l.liu@intel.com>, "Wu, Hao" <hao.wu@intel.com>,
-        "Jiang, Dave" <dave.jiang@intel.com>,
-        Jacob Pan <jacob.jun.pan@linux.intel.com>,
-        "Kirti Wankhede" <kwankhede@nvidia.com>,
-        Robin Murphy <robin.murphy@arm.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
-        "David Woodhouse" <dwmw2@infradead.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        "Lu Baolu" <baolu.lu@linux.intel.com>
-Subject: RE: [RFC v2] /dev/iommu uAPI proposal
-Thread-Topic: [RFC v2] /dev/iommu uAPI proposal
-Thread-Index: Add0lrMH87IsTsl5Rp6WN1oQU6kGMQAdcmAAAGvGIGAAJH+YAAAKpxYQABuHCIAAB18VgAAAO+iAAA0EGnAAAJwcAAAAZsfAAABJ8wAAAA+coA==
-Date:   Tue, 13 Jul 2021 23:24:45 +0000
-Message-ID: <BN9PR11MB543392E18CB0B7746157C3F18C149@BN9PR11MB5433.namprd11.prod.outlook.com>
-References: <20210709155052.2881f561.alex.williamson@redhat.com>
- <BN9PR11MB54336FB9845649BB2D53022C8C159@BN9PR11MB5433.namprd11.prod.outlook.com>
- <20210712124150.2bf421d1.alex.williamson@redhat.com>
- <BL1PR11MB54299D9554D71F53D74E1E378C159@BL1PR11MB5429.namprd11.prod.outlook.com>
- <20210713125503.GC136586@nvidia.com>
- <20210713102607.3a886fee.alex.williamson@redhat.com>
- <20210713163249.GE136586@nvidia.com>
- <BN9PR11MB5433438C17AE123B9C7F83A68C149@BN9PR11MB5433.namprd11.prod.outlook.com>
- <20210713230258.GH136586@nvidia.com>
- <BN9PR11MB54331F80DA135AF3EAD025998C149@BN9PR11MB5433.namprd11.prod.outlook.com>
- <20210713232244.GJ136586@nvidia.com>
-In-Reply-To: <20210713232244.GJ136586@nvidia.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-dlp-version: 11.5.1.3
-dlp-product: dlpe-windows
-dlp-reaction: no-action
-authentication-results: nvidia.com; dkim=none (message not signed)
- header.d=none;nvidia.com; dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: e012b453-3c10-4c9a-aa58-08d9465566ae
-x-ms-traffictypediagnostic: BN6PR1101MB2337:
-x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <BN6PR1101MB233753130786199BC2EE3B7D8C149@BN6PR1101MB2337.namprd11.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:7691;
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: DOQKcnooBdORQ3cSem2UgJwI6j0jzQVoFDy4DV9AAsQ2feWWtgxcro2MypjChfsplH6+HCGSrwq3s8+Wrljyu95iTaZwZRsXURVQIGD25y1rrPK8HciuCoHSZlVPds4+D7wBJMSVhwkfBjPdm9GGBcovnRxffIHBJVhB9ZaZ874SONNvNd6aAybfPm6zxcyzFHYJd3HjT4fG8WOgFAmwdd5ydcmmp+tSX2nWiAJMm9DRT9lRAEo9n6Lyl617h7iZmCvNPlD3gG6REa2cPAWNd6qn18/Pg7nT9e8FfrvpKPmaj2C882TBTVpgPvOedlGvTf6ItuRY7MmjDaUUK8najlyFnR5rnQSsQzHWLntXz2vutWq5z2VxTM5t9pzsIaOxD06kpyvkhl+3M8nvea3+wj0AGUwJAS6NRO2RQlcfzLTcKkupJpkdAOlRb5zTffatcwAadLlXZcGniBDu9Ia/kCKPQIqkyWZy2KUkSZuFnMjNzNBT8UE7GrvcPSHXExgUFOkgCwMBw5HGhqwP5duku6mX2Z0kFhz/uKe9tFPw9Q7BBCP7Ils5QnKOA0k+ByQzz0UGk5KBED7mXstpHCNwN3L/cEa2vnphnR0V2bATqBbE5rUAEyIuPEZ3xCA/pSl+8B5l5eNY77TwCaQEMzXUgjlNRX0dybFWLy2LOVo65+FpZszIAcJjm8clFqmNDCjp3RJp2aOG+q1AbLxCjtTeaQ==
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BN9PR11MB5433.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(39860400002)(136003)(366004)(346002)(396003)(376002)(33656002)(66556008)(66446008)(64756008)(76116006)(9686003)(54906003)(86362001)(66946007)(478600001)(5660300002)(122000001)(7696005)(4326008)(7416002)(26005)(66476007)(83380400001)(55016002)(8936002)(52536014)(186003)(71200400001)(2906002)(8676002)(316002)(6506007)(6916009)(38100700002)(38070700004);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?wti5UeM+quGj5f3ZGlXm0CgM53dvlHvCMKC24mDwbuCPl+jOxMMbKCrqKvA2?=
- =?us-ascii?Q?r4bTdGikYcKr+DBzR+mIh3/nTaZfmeRMl6Dok0xTi8AK03xgP6FLWGNWh/v/?=
- =?us-ascii?Q?DyLXckQHE6KXujwFiNaA2ZF4SYwXvCEdtxm0KCw4XZz1LqHN6/x7drtTp0Kt?=
- =?us-ascii?Q?ltwNf0Ecz3zI+tbcvudf5EfjR8fIlB2wxSECyap0eTuENyCMHIwRIaaRHxgj?=
- =?us-ascii?Q?RHSmkvzKKg2OXdCmsJoWeEvgsCyZ7mirrFI1zG+KTIIV9mrxoReJF+aBwAvi?=
- =?us-ascii?Q?08rfauoax9MpCwIyWHNrIiTYiC+ko5/BAlqunIu76tKDn/7IsE/XaUjzG+My?=
- =?us-ascii?Q?p0/wwCATQnkaB4wCvuma7d+ej9A+Wcpda/Qw6LRoYwUjVSdKv5FF1QGe306/?=
- =?us-ascii?Q?GIRDQ1Vg1EaffW3yHH6sjvr+7EvipBwBwTc1SMcAXxewzUbRQLcvw9CiXHFD?=
- =?us-ascii?Q?GIoGIzs252fu64YHRbxlnh1dAR+ySt0fZw5L2CBeUTk0xkVv1sSa/PV+bTv7?=
- =?us-ascii?Q?oYgIdILl1IEFUL9B1oOechF1Ef4450qwBV6K6oGgqfg++RcGa9qakHm6D3Ev?=
- =?us-ascii?Q?54elUIeWkEieMV6v/CNivDifY78CRUKCNk59CZgB345/Y5yrVZ7EwDyYmIuk?=
- =?us-ascii?Q?8uTdY9WTsHAN/ywUnlA8hcDLVLk9xpOHNp6OLcVsheD/Q/hRY6t4h+y1k+ej?=
- =?us-ascii?Q?HhUVUtYs694jETebjzUEvNkbJcy6/IaS1ZFdM6sSvKXiGuLgh48YI3sB5iJ2?=
- =?us-ascii?Q?qey8836KAulT6zledUgaNPW6uNg4sGYAFPK3gwWjsi/5htiLjRYHPK8ngXN8?=
- =?us-ascii?Q?jV3WXSWhE5JhtHXJqx5f0Qvio3a0lVdS+U8h12D63jFSQAMdWJLb15OXsQe1?=
- =?us-ascii?Q?Hfzb5duHBa0/gH3OWc3UuXS5MzyOAUeZ6v/PWXX4AetdwQCG34Xtg3alqhK+?=
- =?us-ascii?Q?cTZQGuopcCVLbmghjWKNCgjNUgQ/BW9l6zIKuvZQaYLbhSobLJL5vUo6+fA0?=
- =?us-ascii?Q?TVsF9WKB3DJrvi7GGrlM1Kmipc32IegxC1p/5tV8+lb+UIV3AUwmVSTsyLX7?=
- =?us-ascii?Q?4G5bKuwL/tobXAKR5a3ketdBur/zZWRA9gxczKYJnlmtT/NVmfnZzJPJoff0?=
- =?us-ascii?Q?RfhI2oBLn9GlU/vyuR4K/DUbLD7tyXdEAMkC1kDJ2EhOD4gHe3DlY6Z5KHib?=
- =?us-ascii?Q?qDuM6MtUKB/nTHlX5pb39dvgpNGKBVdFp1lF6tziyFq3F6+3w1TlCAPrktNe?=
- =?us-ascii?Q?TigBzZRvZwxWqoMBcP+JOAuhY/dIFp3pKAoI1vEEIjnAsczWwNwdWrmM+tKd?=
- =?us-ascii?Q?xx/9BrISIwakJG5EkR6GPcOf?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+        id S237139AbhGMX3D (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 13 Jul 2021 19:29:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53984 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S236888AbhGMX3C (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 13 Jul 2021 19:29:02 -0400
+Received: from mail-qk1-x72c.google.com (mail-qk1-x72c.google.com [IPv6:2607:f8b0:4864:20::72c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 216C4C0613E9
+        for <kvm@vger.kernel.org>; Tue, 13 Jul 2021 16:26:11 -0700 (PDT)
+Received: by mail-qk1-x72c.google.com with SMTP id e14so23448856qkl.9
+        for <kvm@vger.kernel.org>; Tue, 13 Jul 2021 16:26:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=ee/o65exFIzIhsxcS7E9njpZeaIcqPJlsjtSMIS/Xmk=;
+        b=ld2WluOzZ3vcWQh+pP5ehks61yNJxkt5zFFIsmejPkfjk2F5r6//qaTETyIu/NEdp1
+         lo/njfGH8sitMpnXrklCs0Ln3MpHXkTu6NwBWHWhSYjzN33HH+87VuydBSpendj6Yy0x
+         skQGkCA9gx/JX79yKklvKmpYogkQ5Xd79TyJyUT+AJTV71Fp+pjDoe/Fe5c6KYIuHXJQ
+         F82m35jvRTkv8Gezpa+yrzPz3w9AXrTJYCGbl1PeSPzHYYp9eIcbibBCLtUFKsN4LdMh
+         2JWosCvK22k3s/LoEbyvIJ6VDMxiveq9RjLBeoSN71VNqEZZPaZt765q4Tc6nSNUN6BD
+         7iKw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=ee/o65exFIzIhsxcS7E9njpZeaIcqPJlsjtSMIS/Xmk=;
+        b=pZ47s/CM9K0ttyEbWIM9z50P8mgCVQxhfav3n1CDQJgCHAjMYaAmNMV9kvKb0Beadr
+         vyO8a+RLLbiI6H89QayNSzcVQn38DlDDCFkesD4mxWpSekuoTjy0EtEk4aLy3m+NC6m8
+         AVv8xlzIZUZUufLDfkR3hh7Q/XytY/mQ2x6yaekFi59nH21YcUBH2htGGnF0Cjakxr1d
+         YAjBpxSrVCioY21ML14G6i7lc0/PeQFK2zXqGW/+uAUSa/ePD9NQETAqJ7m9/GdC0sOo
+         cuLNCnRPNVOp3ng4N/d6Q3wCxAh9U0v66ba/Pdb+DyYtLbbQdBqjMfI3mbRskZO2Hu4J
+         n90Q==
+X-Gm-Message-State: AOAM531IcrFJnnf51sKoUw8Mq1pqCaavLgFI/6PVucBoAgACk1F7BT4z
+        7qQUxtkaBSw/qsOuYj4RV9+Hk0dXt7auK9aATReDQA==
+X-Google-Smtp-Source: ABdhPJwnPd0n5kMOUoBcuVwycNcXbzgcRQKeNmVCbbgeKN1tUtc9QZ0DWnEOnGfCQ1+6Eu0INYEaQ4h+QJjUaawsNxM=
+X-Received: by 2002:a05:620a:a90:: with SMTP id v16mr6785145qkg.150.1626218769988;
+ Tue, 13 Jul 2021 16:26:09 -0700 (PDT)
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: BN9PR11MB5433.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: e012b453-3c10-4c9a-aa58-08d9465566ae
-X-MS-Exchange-CrossTenant-originalarrivaltime: 13 Jul 2021 23:24:45.7278
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: FHrHr3HbP7ZZYBfNiJpPY3cNUXZe3i3Mhk3OPzXyraVkcCkYgu/g1HB81HYs25e5kFFINolSy0YA1hGV9fy/cw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN6PR1101MB2337
-X-OriginatorOrg: intel.com
+References: <20210621163118.1040170-1-pgonda@google.com> <20210621163118.1040170-4-pgonda@google.com>
+In-Reply-To: <20210621163118.1040170-4-pgonda@google.com>
+From:   Marc Orr <marcorr@google.com>
+Date:   Tue, 13 Jul 2021 16:25:57 -0700
+Message-ID: <CAA03e5F_TLCfKusJb4ekSuXYt7EiG-MiGxN2wLovFDc4s4j==w@mail.gmail.com>
+Subject: Re: [PATCH 3/3] KVM, SEV: Add support for SEV-ES local migration
+To:     Peter Gonda <pgonda@google.com>
+Cc:     kvm list <kvm@vger.kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        David Rientjes <rientjes@google.com>,
+        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
+        Brijesh Singh <brijesh.singh@amd.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        "H. Peter Anvin" <hpa@zytor.com>, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-> From: Jason Gunthorpe <jgg@nvidia.com>
-> Sent: Wednesday, July 14, 2021 7:23 AM
->=20
-> On Tue, Jul 13, 2021 at 11:20:12PM +0000, Tian, Kevin wrote:
-> > > From: Jason Gunthorpe <jgg@nvidia.com>
-> > > Sent: Wednesday, July 14, 2021 7:03 AM
-> > >
-> > > On Tue, Jul 13, 2021 at 10:48:38PM +0000, Tian, Kevin wrote:
-> > >
-> > > > We can still bind to the parent with cookie, but with
-> > > > iommu_register_ sw_device() IOMMU fd knows that this binding
-> doesn't
-> > > > need to establish any security context via IOMMU API.
-> > >
-> > > AFAIK there is no reason to involve the parent PCI or other device in
-> > > SW mode. The iommufd doesn't need to be aware of anything there.
-> > >
-> >
-> > Yes. but does it makes sense to have an unified model in IOMMU fd
-> > which always have a [struct device, cookie] with flags to indicate whet=
-her
-> > the binding/attaching should be specially handled for sw mdev? Or
-> > are you suggesting that lacking of struct device is actually the indica=
-tor
-> > for such trick?
->=20
-> I think you've veered into such micro implementation details that it
-> is better to wait and see how things look.
->=20
-> The important point here is that whatever physical device is under a
-> SW mdev does not need to be passed to the iommufd because there is
-> nothing it can do with that information.
->=20
+On Mon, Jun 21, 2021 at 9:59 AM Peter Gonda <pgonda@google.com> wrote:
+>
+> Local migration provides a low-cost mechanism for userspace VMM upgrades.
+> It is an alternative to traditional (i.e., remote) live migration. Whereas
+> remote migration handles move a guest to a new host, local migration only
+> handles moving a guest to a new userspace VMM within a host.
+>
+> For SEV-ES to work with local migration the VMSAs, GHCB metadata,
+> and other SEV-ES info needs to be preserved along with the guest's
+> memory. KVM maintains a pointer to each vCPUs GHCB and may additionally
+> contain an copy of the GHCB's save area if the guest has been using it
+> for NAE handling. The local send and receive ioctls have been updated to
+> move this additional metadata required for each vCPU in SEV-ES into
+> hashmap for SEV local migration data.
+>
+> Signed-off-by: Peter Gonda <pgonda@google.com>
+> Cc: Paolo Bonzini <pbonzini@redhat.com>
+> Cc: Sean Christopherson <seanjc@google.com>
+> Cc: David Rientjes <rientjes@google.com>
+> Cc: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> Cc: Brijesh Singh <brijesh.singh@amd.com>
+> Cc: Vitaly Kuznetsov <vkuznets@redhat.com>
+> Cc: Wanpeng Li <wanpengli@tencent.com>
+> Cc: Jim Mattson <jmattson@google.com>
+> Cc: Joerg Roedel <joro@8bytes.org>
+> Cc: Thomas Gleixner <tglx@linutronix.de>
+> Cc: Ingo Molnar <mingo@redhat.com>
+> Cc: Borislav Petkov <bp@alien8.de>
+> Cc: "H. Peter Anvin" <hpa@zytor.com>
+> Cc: kvm@vger.kernel.org
+> Cc: linux-kernel@vger.kernel.org
+>
+> ---
+>  arch/x86/kvm/svm/sev.c | 164 +++++++++++++++++++++++++++++++++++++----
+>  1 file changed, 150 insertions(+), 14 deletions(-)
+>
+> diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+> index 7c33ad2b910d..33df7ed08d21 100644
+> --- a/arch/x86/kvm/svm/sev.c
+> +++ b/arch/x86/kvm/svm/sev.c
+> @@ -77,6 +77,19 @@ struct enc_region {
+>         unsigned long size;
+>  };
+>
+> +struct vmsa_node {
+> +       struct list_head list;
+> +       int vcpu_id;
+> +       struct vmcb_save_area *vmsa;
+> +       struct ghcb *ghcb;
+> +       u64 ghcb_gpa;
+> +
+> +       void *ghcb_sa;
+> +       u64 ghcb_sa_len;
+> +       bool ghcb_sa_sync;
+> +       bool ghcb_sa_free;
+> +};
+> +
+>  struct sev_info_migration_node {
+>         struct hlist_node hnode;
+>         u64 token;
+> @@ -87,6 +100,11 @@ struct sev_info_migration_node {
+>         unsigned long pages_locked;
+>         struct list_head regions_list;
+>         struct misc_cg *misc_cg;
+> +
+> +       /* The following fields are for SEV-ES guests */
+> +       bool es_enabled;
+> +       struct list_head vmsa_list;
+> +       u64 ap_jump_table;
+>  };
+>
+>  #define SEV_INFO_MIGRATION_HASH_BITS    7
+> @@ -1163,6 +1181,94 @@ static int place_migration_node(struct sev_info_migration_node *entry)
+>         return ret;
+>  }
+>
+> +static int process_vmsa_list(struct kvm *kvm, struct list_head *vmsa_list)
+> +{
+> +       struct vmsa_node *vmsa_node, *q;
+> +       struct kvm_vcpu *vcpu;
+> +       struct vcpu_svm *svm;
+> +
+> +       lockdep_assert_held(&kvm->lock);
+> +
+> +       if (!vmsa_list)
+> +               return 0;
+> +
+> +       list_for_each_entry(vmsa_node, vmsa_list, list) {
+> +               if (!kvm_get_vcpu_by_id(kvm, vmsa_node->vcpu_id)) {
+> +                       WARN(1,
+> +                            "Failed to find VCPU with ID %d despite presence in VMSA list.\n",
+> +                            vmsa_node->vcpu_id);
+> +                       return -1;
+> +               }
+> +       }
+> +
+> +       /*
+> +        * Move any stashed VMSAs back to their respective VMCBs and delete
+> +        * those nodes.
+> +        */
+> +       list_for_each_entry_safe(vmsa_node, q, vmsa_list, list) {
+> +               vcpu = kvm_get_vcpu_by_id(kvm, vmsa_node->vcpu_id);
+> +               svm = to_svm(vcpu);
+> +               svm->vmsa = vmsa_node->vmsa;
+> +               svm->ghcb = vmsa_node->ghcb;
+> +               svm->vmcb->control.ghcb_gpa = vmsa_node->ghcb_gpa;
+> +               svm->vcpu.arch.guest_state_protected = true;
+> +               svm->vmcb->control.vmsa_pa = __pa(svm->vmsa);
+> +               svm->ghcb_sa = vmsa_node->ghcb_sa;
+> +               svm->ghcb_sa_len = vmsa_node->ghcb_sa_len;
+> +               svm->ghcb_sa_sync = vmsa_node->ghcb_sa_sync;
+> +               svm->ghcb_sa_free = vmsa_node->ghcb_sa_free;
+> +
+> +               list_del(&vmsa_node->list);
+> +               kfree(vmsa_node);
+> +       }
+> +
+> +       return 0;
+> +}
+> +
+> +static int create_vmsa_list(struct kvm *kvm,
+> +                           struct sev_info_migration_node *entry)
+> +{
+> +       int i;
+> +       const int num_vcpus = atomic_read(&kvm->online_vcpus);
+> +       struct vmsa_node *node;
+> +       struct kvm_vcpu *vcpu;
+> +       struct vcpu_svm *svm;
+> +
+> +       INIT_LIST_HEAD(&entry->vmsa_list);
+> +       for (i = 0; i < num_vcpus; ++i) {
+> +               node = kzalloc(sizeof(*node), GFP_KERNEL);
+> +               if (!node)
+> +                       goto e_freelist;
+> +
+> +               vcpu = kvm->vcpus[i];
+> +               node->vcpu_id = vcpu->vcpu_id;
+> +
+> +               svm = to_svm(vcpu);
+> +               node->vmsa = svm->vmsa;
+> +               svm->vmsa = NULL;
+> +               node->ghcb = svm->ghcb;
+> +               svm->ghcb = NULL;
+> +               node->ghcb_gpa = svm->vmcb->control.ghcb_gpa;
+> +               node->ghcb_sa = svm->ghcb_sa;
+> +               svm->ghcb_sa = NULL;
+> +               node->ghcb_sa_len = svm->ghcb_sa_len;
+> +               svm->ghcb_sa_len = 0;
+> +               node->ghcb_sa_sync = svm->ghcb_sa_sync;
+> +               svm->ghcb_sa_sync = false;
+> +               node->ghcb_sa_free = svm->ghcb_sa_free;
+> +               svm->ghcb_sa_free = false;
+> +
+> +               list_add_tail(&node->list, &entry->vmsa_list);
+> +       }
+> +
+> +       return 0;
+> +
+> +e_freelist:
+> +       if (process_vmsa_list(kvm, &entry->vmsa_list))
+> +               WARN(1, "Unable to move VMSA list back to source VM. Guest is in a broken state now.");
+> +       return -1;
+> +}
+> +
+>  static int sev_local_send(struct kvm *kvm, struct kvm_sev_cmd *argp)
+>  {
+>         struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
+> @@ -1174,9 +1280,6 @@ static int sev_local_send(struct kvm *kvm, struct kvm_sev_cmd *argp)
+>         if (!sev_guest(kvm))
+>                 return -ENOTTY;
+>
+> -       if (sev->es_active)
+> -               return -EPERM;
+> -
+>         if (sev->info_token != 0)
+>                 return -EEXIST;
+>
+> @@ -1196,8 +1299,19 @@ static int sev_local_send(struct kvm *kvm, struct kvm_sev_cmd *argp)
+>         INIT_LIST_HEAD(&entry->regions_list);
+>         list_replace_init(&sev->regions_list, &entry->regions_list);
+>
+> +       if (sev_es_guest(kvm)) {
+> +               /*
+> +                * If this is an ES guest, we need to move each VMCB's VMSA into a
+> +                * list for migration.
+> +                */
+> +               entry->es_enabled = true;
+> +               entry->ap_jump_table = sev->ap_jump_table;
+> +               if (create_vmsa_list(kvm, entry))
+> +                       goto e_listdel;
+> +       }
+> +
+>         if (place_migration_node(entry))
+> -               goto e_listdel;
+> +               goto e_vmsadel;
+>
+>         token = entry->token;
+>
+> @@ -1215,6 +1329,11 @@ static int sev_local_send(struct kvm *kvm, struct kvm_sev_cmd *argp)
+>         hash_del(&entry->hnode);
+>         spin_unlock(&sev_info_migration_hash_lock);
+>
+> +e_vmsadel:
+> +       if (sev_es_guest(kvm) && process_vmsa_list(kvm, &entry->vmsa_list))
+> +               WARN(1,
+> +                    "Unable to move VMSA list back to source VM. Guest is in a broken state now.");
+> +
+>  e_listdel:
+>         list_replace_init(&entry->regions_list, &sev->regions_list);
+>
+> @@ -1233,9 +1352,6 @@ static int sev_local_receive(struct kvm *kvm, struct kvm_sev_cmd *argp)
+>         if (!sev_guest(kvm))
+>                 return -ENOTTY;
+>
+> -       if (sev->es_active)
+> -               return -EPERM;
+> -
+>         if (sev->handle != 0)
+>                 return -EPERM;
+>
+> @@ -1254,6 +1370,14 @@ static int sev_local_receive(struct kvm *kvm, struct kvm_sev_cmd *argp)
+>
+>         memcpy(&old_info, sev, sizeof(old_info));
+>
+> +       if (entry->es_enabled) {
+> +               if (process_vmsa_list(kvm, &entry->vmsa_list))
+> +                       goto err_unlock;
+> +
+> +               sev->es_active = true;
+> +               sev->ap_jump_table = entry->ap_jump_table;
+> +       }
+> +
+>         /*
+>          * The source VM always frees @entry On the target we simply
+>          * mark the token as invalid to notify the source the sev info
+> @@ -2046,12 +2170,22 @@ void sev_vm_destroy(struct kvm *kvm)
+>                 __unregister_region_list_locked(kvm, &sev->regions_list);
+>         }
+>
+> -       /*
+> -        * If userspace was terminated before unregistering the memory
+> -        * regions then lets unpin all the registered memory.
+> -        */
+> -       if (entry)
+> +       if (entry) {
+> +               /*
+> +                * If there are any saved VMSAs, restore them so they can be
+> +                * destructed through the normal path.
+> +                */
+> +               if (entry->es_enabled)
+> +                       if (process_vmsa_list(kvm, &entry->vmsa_list))
+> +                               WARN(1,
+> +                                    "Unable to clean up vmsa_list");
+> +
+> +               /*
+> +                * If userspace was terminated before unregistering the memory
+> +                * regions then lets unpin all the registered memory.
+> +                */
+>                 __unregister_region_list_locked(kvm, &entry->regions_list);
+> +       }
+>
+>         mutex_unlock(&kvm->lock);
+>
+> @@ -2243,9 +2377,11 @@ void sev_free_vcpu(struct kvm_vcpu *vcpu)
+>
+>         svm = to_svm(vcpu);
+>
+> -       if (vcpu->arch.guest_state_protected)
+> +       if (svm->ghcb && vcpu->arch.guest_state_protected)
+>                 sev_flush_guest_memory(svm, svm->vmsa, PAGE_SIZE);
+> -       __free_page(virt_to_page(svm->vmsa));
+> +
+> +       if (svm->vmsa)
+> +               __free_page(virt_to_page(svm->vmsa));
+>
+>         if (svm->ghcb_sa_free)
+>                 kfree(svm->ghcb_sa);
+> --
+> 2.32.0.288.g62a8d224e6-goog
+>
 
-Make sense
+Reviewed-by: Marc Orr <marcorr@google.com>
