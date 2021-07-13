@@ -2,52 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0969A3C7966
-	for <lists+kvm@lfdr.de>; Wed, 14 Jul 2021 00:10:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 892D53C7967
+	for <lists+kvm@lfdr.de>; Wed, 14 Jul 2021 00:10:14 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236046AbhGMWMx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 13 Jul 2021 18:12:53 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36910 "EHLO
+        id S236191AbhGMWMz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 13 Jul 2021 18:12:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36914 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234947AbhGMWMx (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 13 Jul 2021 18:12:53 -0400
-Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 97450C0613DD
-        for <kvm@vger.kernel.org>; Tue, 13 Jul 2021 15:10:02 -0700 (PDT)
-Received: by mail-yb1-xb4a.google.com with SMTP id 132-20020a25158a0000b029055791ebe1e6so29258107ybv.20
-        for <kvm@vger.kernel.org>; Tue, 13 Jul 2021 15:10:02 -0700 (PDT)
+        with ESMTP id S234947AbhGMWMy (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 13 Jul 2021 18:12:54 -0400
+Received: from mail-pj1-x104a.google.com (mail-pj1-x104a.google.com [IPv6:2607:f8b0:4864:20::104a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C310CC0613DD
+        for <kvm@vger.kernel.org>; Tue, 13 Jul 2021 15:10:03 -0700 (PDT)
+Received: by mail-pj1-x104a.google.com with SMTP id p10-20020a17090a428ab0290175556801d5so1996212pjg.2
+        for <kvm@vger.kernel.org>; Tue, 13 Jul 2021 15:10:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
-        h=date:message-id:mime-version:subject:from:to:cc;
-        bh=T81hhWd804ZyXie/r82DQRDd7mDCkogvw32WjhX25vM=;
-        b=JOCkMaJP8F3nqWMLozCycw80zc0sPtPzgWxyRKYjZ4d4I3yXbNOdGcsTt/StTBIy+W
-         rgiNiivFlVpNY1BhPWxAWUHLsdF8pmFAwT03jlxlyEt739qkq+KPNgErGoBtEfX2qavZ
-         StnHDVXIOv/ngx2da/npdDKlhtTZD1Lhip+vJzP3aeJeayBFjfSoAMvIL+NTBdCMUuPe
-         NeVCoxM5rvD1d03BXf2I/Zw9vBjgzmUluwRclPn6rH5ptt1UOLkjoTqz46+MV7BiholZ
-         WfmG8xYXCBSzg06iUUVvbkpzgra3hs6PkreJqdLYGSoVIYcRDKALd3+jSqTUoRuJTckt
-         xshA==
+        h=date:in-reply-to:message-id:mime-version:references:subject:from:to
+         :cc;
+        bh=2ABDjF8MB/R2dWxAlh/L8XFGX/KrVG9UAlNev/AY4Ro=;
+        b=fWOB1+SWJjnWGUBoXuRGcX52L8gVHhqP6B5fG7eFi1XBkZAaQXzcZySH1fYhg/84K5
+         TXHTyzh64YcBZt5H0gTZZql0maJ+aje/yv9QdsMfac0NJCT1ReCiMw8vwg9NC+8VitS1
+         c2EyM+QpCExpgwBDJ0wYWY/LoqriqX+ZWeF8xZjBxDegatWVszuESP9JS6yTmYVyOlD2
+         NrWgSruaOxec979iIp5TUl3O9hXWX41+xquaY7QerGHk/3AxrNZkdCMLyBEGYG3ucq01
+         8ZTC4NSY449t5RcUzh0E6Xy4qt4FZgpu0Whn6Qp2UnD576tSqKo18eNK0knSyLqS2tMM
+         TOVw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
-        bh=T81hhWd804ZyXie/r82DQRDd7mDCkogvw32WjhX25vM=;
-        b=epcYrLGyPvs+vAz4NasmjtaAJeA1QBk3JjTcjG/t2rQYoraT6S1J9Y5mF15Vyt3btK
-         rk8AZncXOJabyAFKmZORqbj7F/72sIw6P2k514FSre3dh+T/tmJv1BXSdTdT8TdyxVNG
-         0Ibv/gjH0b4x1RumRmmt0cTuGd1z2dOjNyDS/mFtpGoUQCOrgQVv2pHt4cNigK20ojBU
-         AjNnjYReg14B/bdiipu00Nb8flijyZIbpDp2UyjZpEXzpMpWnneNw+fSTEAvRPu/TwJ4
-         CmpZ9yWST6To3Bhdr8TFJmN8zqUqwP6aOiQEgG316MVsl5jHmXYEgQsUke4ar5mU2Lf0
-         ePYw==
-X-Gm-Message-State: AOAM533z9yT/In6n8MvlvoeJKcakQ6QZk/1OfBoVEruNO89lvu2OvZrl
-        nnQS+KfKisSgmGPCgwPYuPyhSi8q42E5U1/t4oufMqlhie243WAQofpu11AkjSWOo140gLZBsNa
-        yX5K6niDyZEwayVKBgu3N2NLnRFMRnzTJSTFWoP0mFgn1NTxKpFGU3FgPiaxYNcA=
-X-Google-Smtp-Source: ABdhPJynlUQsuvP52Df67Pgw9zm4ml1kmDV5NCx97dLGDEPS+UnGvKz7dt1QYcimliXFarurSb/g1+RwlbcklA==
+        h=x-gm-message-state:date:in-reply-to:message-id:mime-version
+         :references:subject:from:to:cc;
+        bh=2ABDjF8MB/R2dWxAlh/L8XFGX/KrVG9UAlNev/AY4Ro=;
+        b=kbqAN39Ycet2On02PtEeOHYSn3waUqMSAtbN0vgXaFjl6uN5RwZ+CYekIjrWMQYdGU
+         CySrG8TkFARR5Hn3w4qCMcEoINU3NXk/f06/v/+2pJ2OnTonpFXalYbsTakCggTAA5CK
+         KpkqE/am5yIvLSN+f1/eDxHlXdjstAf2Kl8jQRymMhH5ylFQ8hBxlu4JOYnBZbZDwbxG
+         bPwa2dHOqiKUd5VB6qmp9PKKtRsS4Ram0D4SFaiGF/+BFfN/p/vleP13h232E5nmQkJF
+         aFddRWZZ69b7POShpkvSUOSd3I5tyUWs3K7t/oYqcbYZrhKRdSldP8GDVBWzEzLHz+s5
+         D90A==
+X-Gm-Message-State: AOAM5326FXniCJWZMWjT2xRDkbg7mQR+4EXYv80CS3Lap5xrrgOndAeo
+        D16sI7+gLpB+rKxIvMVe+QpxDh4AEziV0hAGuUOOO6stIAHG4dECoSHQiF0ATkS9Qtdv+Tq21R0
+        RxqxLhKtR+/u9KW8GGqXtlDmwAjlni1VIiLpxo5GM+zbKzHlJWy5ylcrgdLKJsrA=
+X-Google-Smtp-Source: ABdhPJyNQ36hT+QjX/LQi841V24Bw9vpQRl1+dMh0NcaK1JinW+vAx0I2FejaIcShBKWZj6GIVl0yIX4tZ9RVw==
 X-Received: from dmatlack-heavy.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:19cd])
- (user=dmatlack job=sendgmr) by 2002:a25:1988:: with SMTP id
- 130mr9390687ybz.458.1626214201564; Tue, 13 Jul 2021 15:10:01 -0700 (PDT)
-Date:   Tue, 13 Jul 2021 22:09:51 +0000
-Message-Id: <20210713220957.3493520-1-dmatlack@google.com>
+ (user=dmatlack job=sendgmr) by 2002:a17:90a:4cc4:: with SMTP id
+ k62mr416653pjh.110.1626214203174; Tue, 13 Jul 2021 15:10:03 -0700 (PDT)
+Date:   Tue, 13 Jul 2021 22:09:52 +0000
+In-Reply-To: <20210713220957.3493520-1-dmatlack@google.com>
+Message-Id: <20210713220957.3493520-2-dmatlack@google.com>
 Mime-Version: 1.0
+References: <20210713220957.3493520-1-dmatlack@google.com>
 X-Mailer: git-send-email 2.32.0.93.g670b81a890-goog
-Subject: [PATCH v3 0/6] KVM: x86/mmu: Fast page fault support for the TDP MMU
+Subject: [PATCH v3 1/6] KVM: x86/mmu: Rename cr2_or_gpa to gpa in fast_page_fault
 From:   David Matlack <dmatlack@google.com>
 To:     kvm@vger.kernel.org
 Cc:     Ben Gardon <bgardon@google.com>, Joerg Roedel <joro@8bytes.org>,
@@ -68,136 +72,50 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This patch series adds support for the TDP MMU in the fast_page_fault
-path, which enables certain write-protection and access tracking faults
-to be handled without taking the KVM MMU lock. This series brings the
-performance of these faults up to par with the legacy MMU.
+fast_page_fault is only called from direct_page_fault where we know the
+address is a gpa.
 
-Since there is not currently any KVM test coverage for access tracking
-faults, this series introduces a new KVM selftest,
-access_tracking_perf_test. This test relies on page_idle to enable access
-tracking from userspace (since it is the only available usersapce API to do
-so).
+Fixes: 736c291c9f36 ("KVM: x86: Use gpa_t for cr2/gpa to fix TDP support on 32-bit KVM")
+Reviewed-by: Ben Gardon <bgardon@google.com>
+Reviewed-by: Sean Christopherson <seanjc@google.com>
+Signed-off-by: David Matlack <dmatlack@google.com>
+---
+ arch/x86/kvm/mmu/mmu.c | 8 +++-----
+ 1 file changed, 3 insertions(+), 5 deletions(-)
 
-Matthew Wilcox, Yu Zhao, David Hildenbrand, and Andrew Morton: You are cc'd
-since you have discussed dropping page_idle from Linux [1].
-
-Design
-------
-
-This series enables the existing fast_page_fault handler to operate
-independent of whether the TDP MMU is enabled or not by abstracting out
-the details behind a new lockless page walk API.
-
-An alternative design considered was to add a separate fast_page_fault
-handler to the TDP MMU. The code that inspects the spte and genereates
-the new spte can be shared with the legacy MMU. However with this
-design the retry loop has to be duplicated, there are many calls back
-and forth between mmu.c and tdp_mmu.c, and passing around the RET_PF_*
-values gets complicated.
-
-Testing
--------
-
-This series was tested on an Intel Cascade Lake machine. The kvm_intel
-parameters eptad and pml were disabled to force access and dirty
-tracking to go through fast_page_fault. All tests were run with the
-TDP MMU enabled and then again disabled.
-
-Tests ran:
- - All KVM selftests with default arguments
- - All x86_64 kvm-unit-tests.
- - ./access_tracking_perf_test -v 4
- - ./access_tracking_perf_test -v 4 -o
- - ./access_tracking_perf_test -v 4 -s anonymous_thp
- - ./access_tracking_perf_test -v 4 -s anonymous_thp -o
- - ./access_tracking_perf_test -v 64
- - ./dirty_log_perf_test -v 4
- - ./dirty_log_perf_test -v 4 -o
- - ./dirty_log_perf_test -v 4 -s anonymous_thp
- - ./dirty_log_perf_test -v 4 -s anonymous_thp -o
- - ./dirty_log_perf_test -v 64
-
-For certain tests I also collected the fast_page_fault tracepoint to
-manually make sure it was getting triggered properly:
-
-  perf record -e kvmmmu:fast_page_fault --filter "old_spte != 0" -- <test>
-
-Performance Results
--------------------
-
-To measure performance I ran dirty_log_perf_test and
-access_tracking_perf_test with 64 vCPUs. For dirty_log_perf_test
-performance is measured by "Iteration 2 dirty memory time", the time it
-takes for all vCPUs to write to their memory after it has been
-write-protected. For access_tracking_perf_test performance is measured
-by "Writing to idle memory", the time it takes for all vCPUs to write to
-their memory after it has been access-protected.
-
-Metric                            | tdp_mmu=Y before   | tdp_mmu=Y after
---------------------------------- | ------------------ | -----------------
-Iteration 2 dirty memory time     | 3.545234984s       | 0.313867232s
-Writing to idle memory            | 3.249645416s       | 0.296113187s
-
-The performance improvement comes from less time spent acquiring the
-mmu lock in read mode and less time looking up the memslot for the
-faulting gpa.
-
-The TDP MMU is now on par with the legacy MMU:
-
-Metric                            | tdp_mmu=N          | tdp_mmu=Y
---------------------------------- | ------------------ | -----------------
-Iteration 2 dirty memory time     | 0.303452990s       | 0.313867232s
-Writing to idle memory            | 0.291742127s       | 0.296113187s
-
-v3:
- * PATCH 1/6: Add Sean's Reviewed-by.
- * PATCH 2/6: Add TRACE_DEFINE_ENUM for all RET_PF_* values. [Ben]
- * PATCH 2/6: Add comment for future RET_PF values. [me]
- * PATCH 3/6: Pull walk_shadow_page_lockless_{begin,end} out of get_walk. [Ben]
- * PATCH 3/6: Make kvm_tdp_mmu_walk_lockless_{begin,end} static inline. [Sean]
- * PATCH 4/6: Make get_last_sptep_lockless static. [kernel test robot]
- * PATCH 4/6: Fix comment above kvm_tdp_mmu_get_last_sptep_lockless. [me]
- * PATCH 4/6: Rename and comment functions only meant for fast_page_fault handling. [Ben]
- * PATCH 4/6: Improve comment in tdp_mmu_set_spte_atomic_no_dirty_log. [Sean]
- * PATCH 4/6: Remove unnecessary sptep null check. [Sean]
-
-v2: https://lore.kernel.org/kvm/20210630214802.1902448-1-dmatlack@google.com/
- * Split is_tdp_mmu_root cleanup into a separate series. [Sean]
-   https://lore.kernel.org/kvm/20210617231948.2591431-1-dmatlack@google.com/
- * Split walk_shadow_page_lockless into 2 APIs. [Sean]
- * Perform rcu_dereference on TDP MMU sptep.
- * Add comment to tdp_mmu_set_spte_atomic explaining new interaction
- * with fast_pf_fix_direct_spte. [Ben]
- * Document pagemap shifts in access_tracking_perf_test. [Ben]
- * Skip test if lacking pagemap permissions (present pfn is 0). [Ben]
- * Add Ben's Reviewed-by tags.
-
-v1: https://lore.kernel.org/kvm/20210611235701.3941724-1-dmatlack@google.com/
-
-[1] https://lore.kernel.org/linux-mm/20210612000714.775825-1-willy@infradead.org/
-
-David Matlack (6):
-  KVM: x86/mmu: Rename cr2_or_gpa to gpa in fast_page_fault
-  KVM: x86/mmu: Fix use of enums in trace_fast_page_fault
-  KVM: x86/mmu: Make walk_shadow_page_lockless_{begin,end} interoperate
-    with the TDP MMU
-  KVM: x86/mmu: fast_page_fault support for the TDP MMU
-  KVM: selftests: Fix missing break in dirty_log_perf_test arg parsing
-  KVM: selftests: Introduce access_tracking_perf_test
-
- arch/x86/kvm/mmu/mmu.c                        |  74 ++-
- arch/x86/kvm/mmu/mmu_internal.h               |   3 +
- arch/x86/kvm/mmu/mmutrace.h                   |   6 +
- arch/x86/kvm/mmu/tdp_mmu.c                    |  47 +-
- arch/x86/kvm/mmu/tdp_mmu.h                    |  12 +
- tools/testing/selftests/kvm/.gitignore        |   1 +
- tools/testing/selftests/kvm/Makefile          |   1 +
- .../selftests/kvm/access_tracking_perf_test.c | 429 ++++++++++++++++++
- .../selftests/kvm/dirty_log_perf_test.c       |   1 +
- 9 files changed, 550 insertions(+), 24 deletions(-)
- create mode 100644 tools/testing/selftests/kvm/access_tracking_perf_test.c
-
+diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+index b888385d1933..45274436d3c0 100644
+--- a/arch/x86/kvm/mmu/mmu.c
++++ b/arch/x86/kvm/mmu/mmu.c
+@@ -3098,8 +3098,7 @@ static bool is_access_allowed(u32 fault_err_code, u64 spte)
+ /*
+  * Returns one of RET_PF_INVALID, RET_PF_FIXED or RET_PF_SPURIOUS.
+  */
+-static int fast_page_fault(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa,
+-			   u32 error_code)
++static int fast_page_fault(struct kvm_vcpu *vcpu, gpa_t gpa, u32 error_code)
+ {
+ 	struct kvm_shadow_walk_iterator iterator;
+ 	struct kvm_mmu_page *sp;
+@@ -3115,7 +3114,7 @@ static int fast_page_fault(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa,
+ 	do {
+ 		u64 new_spte;
+ 
+-		for_each_shadow_entry_lockless(vcpu, cr2_or_gpa, iterator, spte)
++		for_each_shadow_entry_lockless(vcpu, gpa, iterator, spte)
+ 			if (!is_shadow_present_pte(spte))
+ 				break;
+ 
+@@ -3194,8 +3193,7 @@ static int fast_page_fault(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa,
+ 
+ 	} while (true);
+ 
+-	trace_fast_page_fault(vcpu, cr2_or_gpa, error_code, iterator.sptep,
+-			      spte, ret);
++	trace_fast_page_fault(vcpu, gpa, error_code, iterator.sptep, spte, ret);
+ 	walk_shadow_page_lockless_end(vcpu);
+ 
+ 	return ret;
 -- 
 2.32.0.93.g670b81a890-goog
 
