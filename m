@@ -2,37 +2,37 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0DE283C720B
+	by mail.lfdr.de (Postfix) with ESMTP id C40FC3C720D
 	for <lists+kvm@lfdr.de>; Tue, 13 Jul 2021 16:21:14 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236939AbhGMOX7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 13 Jul 2021 10:23:59 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:31576 "EHLO
+        id S236934AbhGMOYC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 13 Jul 2021 10:24:02 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:22426 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S236909AbhGMOXz (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 13 Jul 2021 10:23:55 -0400
+        by vger.kernel.org with ESMTP id S236924AbhGMOYA (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 13 Jul 2021 10:24:00 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1626186065;
+        s=mimecast20190719; t=1626186070;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=NizuknTonLPtfV10+PDZQabcKPTYBFw/w+7o4Dzz+h4=;
-        b=E3igu3a9H/wTnVD6gCLU3EFpCe2y5GE4zVZo24PO1CboizOB6HrelS3QPs4JOe2e02OmZc
-        lR8mJjqSw5iUpxDCap+/BPSnai7XQ/RhcUn4wgx7WWtDisCgRiSt3NEy/F+31C/o5lHDmm
-        TjDSEhzmsWPOPBo1K97/GXesVbGMSts=
+        bh=BX+YylLZ9qZgcimj05R9RtZJMGcNZYW90ShLadETE08=;
+        b=CYtZpizeBP/Zgr+j4yNUo8uf6+Cu8gwjLM3uKqiviX2uWNDTGJimI78uKzqcE8wkyx6CEv
+        QB6XYxz7l5050ZofLevAJsNBoRuO6JnBwKhm+oArkvrLvLSIPuKY4SzW8GuUWNFq0wtrAg
+        gJZ3X0BUpvKgSQQeJ9ix6DOZTw/VIuw=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-391-g7sPQ8PxNc2RUF4p3PzceA-1; Tue, 13 Jul 2021 10:21:04 -0400
-X-MC-Unique: g7sPQ8PxNc2RUF4p3PzceA-1
+ us-mta-466-lqZq-iSMNI2od2dx-Jcj9Q-1; Tue, 13 Jul 2021 10:21:08 -0400
+X-MC-Unique: lqZq-iSMNI2od2dx-Jcj9Q-1
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5788291FCC0;
-        Tue, 13 Jul 2021 14:21:02 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id ED31C101F000;
+        Tue, 13 Jul 2021 14:21:06 +0000 (UTC)
 Received: from localhost.localdomain (unknown [10.40.192.10])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 3F16B6267C;
-        Tue, 13 Jul 2021 14:20:58 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id D11D65D6AB;
+        Tue, 13 Jul 2021 14:21:02 +0000 (UTC)
 From:   Maxim Levitsky <mlevitsk@redhat.com>
 To:     kvm@vger.kernel.org
 Cc:     linux-kernel@vger.kernel.org (open list:X86 ARCHITECTURE (32-BIT AND
@@ -46,9 +46,9 @@ Cc:     linux-kernel@vger.kernel.org (open list:X86 ARCHITECTURE (32-BIT AND
         x86@kernel.org (maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)),
         Sean Christopherson <seanjc@google.com>,
         Maxim Levitsky <mlevitsk@redhat.com>
-Subject: [PATCH v2 7/8] KVM: SVM: call avic_vcpu_load/avic_vcpu_put when enabling/disabling AVIC
-Date:   Tue, 13 Jul 2021 17:20:22 +0300
-Message-Id: <20210713142023.106183-8-mlevitsk@redhat.com>
+Subject: [PATCH v2 8/8] KVM: x86: hyper-v: Deactivate APICv only when AutoEOI feature is in use
+Date:   Tue, 13 Jul 2021 17:20:23 +0300
+Message-Id: <20210713142023.106183-9-mlevitsk@redhat.com>
 In-Reply-To: <20210713142023.106183-1-mlevitsk@redhat.com>
 References: <20210713142023.106183-1-mlevitsk@redhat.com>
 MIME-Version: 1.0
@@ -58,164 +58,118 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Currently it is possible to have the following scenario:
+From: Vitaly Kuznetsov <vkuznets@redhat.com>
 
-1. AVIC is disabled by svm_refresh_apicv_exec_ctrl
-2. svm_vcpu_blocking calls avic_vcpu_put which does nothing
-3. svm_vcpu_unblocking enables the AVIC (due to KVM_REQ_APICV_UPDATE)
-   and then calls avic_vcpu_load
-4. warning is triggered in avic_vcpu_load since
-   AVIC_PHYSICAL_ID_ENTRY_IS_RUNNING_MASK was never cleared
+APICV_INHIBIT_REASON_HYPERV is currently unconditionally forced upon
+SynIC activation as SynIC's AutoEOI is incompatible with APICv/AVIC. It is,
+however, possible to track whether the feature was actually used by the
+guest and only inhibit APICv/AVIC when needed.
 
-While it is possible to just remove the warning, it seems to be more robust
-to fully disable/enable AVIC in svm_refresh_apicv_exec_ctrl by calling the
-avic_vcpu_load/avic_vcpu_put
+TLFS suggests a dedicated 'HV_DEPRECATING_AEOI_RECOMMENDED' flag to let
+Windows know that AutoEOI feature should be avoided. While it's up to
+KVM userspace to set the flag, KVM can help a bit by exposing global
+APICv/AVIC enablement: in case APICv/AVIC usage is impossible, AutoEOI
+is still preferred.
 
+Maxim:
+   - added SRCU lock drop around call to kvm_request_apicv_update
+   - always set HV_DEPRECATING_AEOI_RECOMMENDED in kvm_get_hv_cpuid,
+     since this feature can be used regardless of AVIC
+
+Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
 Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
 ---
- arch/x86/kvm/svm/avic.c | 43 ++++++++++++++++++++++-------------------
- arch/x86/kvm/svm/svm.c  |  8 ++++++--
- arch/x86/kvm/x86.c      | 10 ++++++++--
- 3 files changed, 37 insertions(+), 24 deletions(-)
+ arch/x86/include/asm/kvm_host.h |  3 +++
+ arch/x86/kvm/hyperv.c           | 34 +++++++++++++++++++++++++++------
+ 2 files changed, 31 insertions(+), 6 deletions(-)
 
-diff --git a/arch/x86/kvm/svm/avic.c b/arch/x86/kvm/svm/avic.c
-index 64d1e1b6a305..0e4370fe0868 100644
---- a/arch/x86/kvm/svm/avic.c
-+++ b/arch/x86/kvm/svm/avic.c
-@@ -80,6 +80,28 @@ enum avic_ipi_failure_cause {
- 	AVIC_IPI_FAILURE_INVALID_BACKING_PAGE,
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index e11d64aa0bcd..f900dca58af8 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -956,6 +956,9 @@ struct kvm_hv {
+ 	/* How many vCPUs have VP index != vCPU index */
+ 	atomic_t num_mismatched_vp_indexes;
+ 
++	/* How many SynICs use 'AutoEOI' feature */
++	atomic_t synic_auto_eoi_used;
++
+ 	struct hv_partition_assist_pg *hv_pa_pg;
+ 	struct kvm_hv_syndbg hv_syndbg;
  };
+diff --git a/arch/x86/kvm/hyperv.c b/arch/x86/kvm/hyperv.c
+index b07592ca92f0..6bf47a583d0e 100644
+--- a/arch/x86/kvm/hyperv.c
++++ b/arch/x86/kvm/hyperv.c
+@@ -85,9 +85,22 @@ static bool synic_has_vector_auto_eoi(struct kvm_vcpu_hv_synic *synic,
+ 	return false;
+ }
  
 +
-+static void __avic_set_running(struct kvm_vcpu *vcpu, bool is_run)
++static void synic_toggle_avic(struct kvm_vcpu *vcpu, bool activate)
 +{
-+	if (is_run)
-+		avic_vcpu_load(vcpu, vcpu->cpu);
-+	else
-+		avic_vcpu_put(vcpu);
++	srcu_read_unlock(&vcpu->kvm->srcu, vcpu->srcu_idx);
++	kvm_request_apicv_update(vcpu->kvm, activate,
++			APICV_INHIBIT_REASON_HYPERV);
++	vcpu->srcu_idx = srcu_read_lock(&vcpu->kvm->srcu);
 +}
 +
-+/*
-+ * This function is called during VCPU halt/unhalt.
-+ */
-+static void avic_set_running(struct kvm_vcpu *vcpu, bool is_run)
-+{
-+	struct vcpu_svm *svm = to_svm(vcpu);
-+
-+	svm->avic_is_running = is_run;
-+
-+	if (kvm_vcpu_apicv_active(vcpu))
-+		__avic_set_running(vcpu, is_run);
-+}
-+
- /* Note:
-  * This function is called from IOMMU driver to notify
-  * SVM to schedule in a particular vCPU of a particular VM.
-@@ -667,6 +689,7 @@ void svm_refresh_apicv_exec_ctrl(struct kvm_vcpu *vcpu)
- 	}
- 	vmcb_mark_dirty(vmcb, VMCB_AVIC);
- 
-+	__avic_set_running(vcpu, activated);
- 	svm_set_pi_irte_mode(vcpu, activated);
- }
- 
-@@ -960,9 +983,6 @@ void avic_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
- 	int h_physical_id = kvm_cpu_get_apicid(cpu);
- 	struct vcpu_svm *svm = to_svm(vcpu);
- 
--	if (!kvm_vcpu_apicv_active(vcpu))
--		return;
--
- 	/*
- 	 * Since the host physical APIC id is 8 bits,
- 	 * we can support host APIC ID upto 255.
-@@ -990,9 +1010,6 @@ void avic_vcpu_put(struct kvm_vcpu *vcpu)
- 	u64 entry;
- 	struct vcpu_svm *svm = to_svm(vcpu);
- 
--	if (!kvm_vcpu_apicv_active(vcpu))
--		return;
--
- 	entry = READ_ONCE(*(svm->avic_physical_id_cache));
- 	if (entry & AVIC_PHYSICAL_ID_ENTRY_IS_RUNNING_MASK)
- 		avic_update_iommu_vcpu_affinity(vcpu, -1, 0);
-@@ -1001,20 +1018,6 @@ void avic_vcpu_put(struct kvm_vcpu *vcpu)
- 	WRITE_ONCE(*(svm->avic_physical_id_cache), entry);
- }
- 
--/*
-- * This function is called during VCPU halt/unhalt.
-- */
--static void avic_set_running(struct kvm_vcpu *vcpu, bool is_run)
--{
--	struct vcpu_svm *svm = to_svm(vcpu);
--
--	svm->avic_is_running = is_run;
--	if (is_run)
--		avic_vcpu_load(vcpu, vcpu->cpu);
--	else
--		avic_vcpu_put(vcpu);
--}
--
- void svm_vcpu_blocking(struct kvm_vcpu *vcpu)
+ static void synic_update_vector(struct kvm_vcpu_hv_synic *synic,
+ 				int vector)
  {
- 	avic_set_running(vcpu, false);
-diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index d14be8aba2d7..2c291dfa0e04 100644
---- a/arch/x86/kvm/svm/svm.c
-+++ b/arch/x86/kvm/svm/svm.c
-@@ -1505,12 +1505,16 @@ static void svm_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
- 		sd->current_vmcb = svm->vmcb;
- 		indirect_branch_prediction_barrier();
- 	}
--	avic_vcpu_load(vcpu, cpu);
++	struct kvm_vcpu *vcpu = hv_synic_to_vcpu(synic);
++	struct kvm_hv *hv = to_kvm_hv(vcpu->kvm);
++	int auto_eoi_old, auto_eoi_new;
 +
-+	if (kvm_vcpu_apicv_active(vcpu))
-+		avic_vcpu_load(vcpu, cpu);
- }
- 
- static void svm_vcpu_put(struct kvm_vcpu *vcpu)
- {
--	avic_vcpu_put(vcpu);
-+	if (kvm_vcpu_apicv_active(vcpu))
-+		avic_vcpu_put(vcpu);
-+
- 	svm_prepare_host_switch(vcpu);
- 
- 	++vcpu->stat.host_state_reload;
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index a91e35b92447..213d332664e2 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -9177,12 +9177,18 @@ void kvm_make_scan_ioapic_request(struct kvm *kvm)
- 
- void kvm_vcpu_update_apicv(struct kvm_vcpu *vcpu)
- {
-+	bool activate;
-+
- 	if (!lapic_in_kernel(vcpu))
+ 	if (vector < HV_SYNIC_FIRST_VALID_VECTOR)
  		return;
  
- 	mutex_lock(&vcpu->kvm->apicv_update_lock);
+@@ -96,10 +109,23 @@ static void synic_update_vector(struct kvm_vcpu_hv_synic *synic,
+ 	else
+ 		__clear_bit(vector, synic->vec_bitmap);
  
--	vcpu->arch.apicv_active = kvm_apicv_activated(vcpu->kvm);
-+	activate = kvm_apicv_activated(vcpu->kvm);
-+	if (vcpu->arch.apicv_active == activate)
-+		goto out;
++	auto_eoi_old = bitmap_weight(synic->auto_eoi_bitmap, 256);
 +
-+	vcpu->arch.apicv_active = activate;
- 	kvm_apic_update_apicv(vcpu);
- 	static_call(kvm_x86_refresh_apicv_exec_ctrl)(vcpu);
- 
-@@ -9194,7 +9200,7 @@ void kvm_vcpu_update_apicv(struct kvm_vcpu *vcpu)
- 	 */
- 	if (!vcpu->arch.apicv_active)
- 		kvm_make_request(KVM_REQ_EVENT, vcpu);
--
-+out:
- 	mutex_unlock(&vcpu->kvm->apicv_update_lock);
+ 	if (synic_has_vector_auto_eoi(synic, vector))
+ 		__set_bit(vector, synic->auto_eoi_bitmap);
+ 	else
+ 		__clear_bit(vector, synic->auto_eoi_bitmap);
++
++	auto_eoi_new = bitmap_weight(synic->auto_eoi_bitmap, 256);
++
++	/* Hyper-V SynIC auto EOI SINTs are not compatible with APICV */
++	if (!auto_eoi_old && auto_eoi_new) {
++		if (atomic_inc_return(&hv->synic_auto_eoi_used) == 1)
++			synic_toggle_avic(vcpu, false);
++	} else if (!auto_eoi_new && auto_eoi_old) {
++		if (atomic_dec_return(&hv->synic_auto_eoi_used) == 0)
++			synic_toggle_avic(vcpu, true);
++	}
  }
- EXPORT_SYMBOL_GPL(kvm_vcpu_update_apicv);
+ 
+ static int synic_set_sint(struct kvm_vcpu_hv_synic *synic, int sint,
+@@ -933,12 +959,6 @@ int kvm_hv_activate_synic(struct kvm_vcpu *vcpu, bool dont_zero_synic_pages)
+ 
+ 	synic = to_hv_synic(vcpu);
+ 
+-	/*
+-	 * Hyper-V SynIC auto EOI SINT's are
+-	 * not compatible with APICV, so request
+-	 * to deactivate APICV permanently.
+-	 */
+-	kvm_request_apicv_update(vcpu->kvm, false, APICV_INHIBIT_REASON_HYPERV);
+ 	synic->active = true;
+ 	synic->dont_zero_synic_pages = dont_zero_synic_pages;
+ 	synic->control = HV_SYNIC_CONTROL_ENABLE;
+@@ -2466,6 +2486,8 @@ int kvm_get_hv_cpuid(struct kvm_vcpu *vcpu, struct kvm_cpuid2 *cpuid,
+ 				ent->eax |= HV_X64_ENLIGHTENED_VMCS_RECOMMENDED;
+ 			if (!cpu_smt_possible())
+ 				ent->eax |= HV_X64_NO_NONARCH_CORESHARING;
++
++			ent->eax |= HV_DEPRECATING_AEOI_RECOMMENDED;
+ 			/*
+ 			 * Default number of spinlock retry attempts, matches
+ 			 * HyperV 2016.
 -- 
 2.26.3
 
