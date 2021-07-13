@@ -2,56 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D9BA63C74A5
-	for <lists+kvm@lfdr.de>; Tue, 13 Jul 2021 18:36:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3129F3C74A6
+	for <lists+kvm@lfdr.de>; Tue, 13 Jul 2021 18:36:27 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233294AbhGMQgf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 13 Jul 2021 12:36:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44976 "EHLO
+        id S233371AbhGMQgh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 13 Jul 2021 12:36:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44990 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232250AbhGMQgd (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 13 Jul 2021 12:36:33 -0400
-Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EBA76C0613DD
-        for <kvm@vger.kernel.org>; Tue, 13 Jul 2021 09:33:42 -0700 (PDT)
-Received: by mail-yb1-xb49.google.com with SMTP id g3-20020a256b030000b0290551bbd99700so27767466ybc.6
-        for <kvm@vger.kernel.org>; Tue, 13 Jul 2021 09:33:42 -0700 (PDT)
+        with ESMTP id S233268AbhGMQgf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 13 Jul 2021 12:36:35 -0400
+Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CD990C0613EE
+        for <kvm@vger.kernel.org>; Tue, 13 Jul 2021 09:33:44 -0700 (PDT)
+Received: by mail-yb1-xb4a.google.com with SMTP id x84-20020a2531570000b029055d47682463so26320035ybx.5
+        for <kvm@vger.kernel.org>; Tue, 13 Jul 2021 09:33:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=reply-to:date:in-reply-to:message-id:mime-version:references
          :subject:from:to:cc;
-        bh=qVAaYnz6pX9NpBAvuefpA8nWzJech9ezcBMh3QJZR+s=;
-        b=OR7dSXpwFlC+X0W7OqUvl4kIpeBJF+qjuDAJSMu2iAijKG2W0OPADSYrJ2Wlhv48mZ
-         fgMSwugGchIv/CKKT4x2ilhtNc+qnQcrk8hQjzYDiR7aefplm7QDZGvv2zo6cVjGOjkH
-         LJFpRk2h0pTzxk4r4bO5Hx8r+ZbiIfNVl8V4MmUGHxgwRHLeiFFNp0AWc0xE5YRzqf8Z
-         7MBdicd6KCU7NsaXNX9b173HANfizgOfHUWoNINcFEf7t5MwiKgUIAfFjddfkZKfGsZZ
-         S2+xwdBV4MhtbNLKwVLAB74Mx6z2AoDjZr7nxIspW7L3xOtOosiEdu3KZx0hn8gDmtUs
-         HB4A==
+        bh=AGAjMyxP8Kz+nybtWUECIkFt/HGEOoMESc1mkCwzAiw=;
+        b=UCQx6DBF7jZuuIBk/LPOaIgpig7BPufPBP1HccKEpPWjOVUUq2+vOZCpyk45K55qfp
+         IkuPgFkVYU4NmkVbDXfrYp/H5AaJ7Z+DcRzUrLSCLZfOnxLnPUj08XVdXKqz8sAuYuuf
+         Q8/+nsvzS7H9XvNpXs5ViM+41tnfVgbpU7l+P7tno+mb1Uo26SRvha9xzM2KvWSW5L8C
+         ndiUikKd7/v8Flub24h2PE485cDvfS5vRnYIzDM16YMR/fFrJlaGPWFStEhUGkvp1HUh
+         xAPbEHG9+4CH0XASSTBS4FdMeBpMtV/mPuAaWrm4G/rUytfIQOlUEle9k2NlpI/ojg0A
+         U70g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:reply-to:date:in-reply-to:message-id
          :mime-version:references:subject:from:to:cc;
-        bh=qVAaYnz6pX9NpBAvuefpA8nWzJech9ezcBMh3QJZR+s=;
-        b=QYqouLJ1jwO11ud9EXK+RoOgQPuNPND3s+gxTnrTFGkeeA9nhqxWq2h1L71WvUqV+P
-         eX4TGwyBovZJBYpFVzrK6GcSSiSp/5iJVTIR6sf5g34AIdXNkVPtDJ9PbWPkaFl/KJag
-         UX/E7eZJ+jHIKiqEXZywtlBK7RiNLuorWbBq3+uGQAk7QlhpaBrsP7wlzlY3tz2RpPPV
-         Xv9sAZPgTtRfNd7f8C1LCowGxCkhLja3S747+g2ksASBeKRHIVqBLHGNwDO+BN1FXcJk
-         Xe2wMc/SR6qAoxrKQyJHRojbRSN4qDJOMfQ8DggyMv1E+xDUAF0mPbO5eOOHC2Z6h8C8
-         ev8Q==
-X-Gm-Message-State: AOAM5335+4i8MPaDBL0BlmghJNYF1qMjlzu0j72MjO37/nkIgKPzKLFn
-        wPCvtHRIH3GbYBoE8gl3Zjjgc5JbMDY=
-X-Google-Smtp-Source: ABdhPJyiyPuUnBaRxZJxtDyjf+Sb+7Fe/yKqvjWGeg/m1vbZgaG2C17q3843vEj6qP4u2s+znFWM0FGOyAg=
+        bh=AGAjMyxP8Kz+nybtWUECIkFt/HGEOoMESc1mkCwzAiw=;
+        b=XbY0YBffQoJQ7s7iLc9UWAi0idvMEVMOZ3LL3ZPl3rxyDfKZU4kxCWOiDDY9Ln/jFR
+         bkIaSkaqUXQIucZUDG4CKkF7Cyhle3uaXqrSOTdM6GKFcblQUqdjJT9QFbM+2bbj9QTp
+         RK84aucnI5Q1fFMEeTVeaCIfKD++Wwc7CIxSNpOddvazk3vuKyUvsSieWD0sBFsH1V/6
+         OanY3viH1ENhAja4chLpTzhCaqOShw2/E0HKI/2gHsjNXe8jzgVbFswv8PjsRmQZwsL8
+         vXvSQa1OfR3r5Do5l92wxc5W17WcZKL8bMfJrPfznDyFS5E4we+JsRGsNWdtPoHtYnju
+         D3LA==
+X-Gm-Message-State: AOAM532TQSURsg7bWyl8x4QS5MprHt8CddDGWlhNkfKi/v5vOkyd4IoS
+        e8i/OzIOPudlgrCzyMV2+lI3YmwoRPM=
+X-Google-Smtp-Source: ABdhPJyfcF3/EzRv4tHswNTrHoKijaTLQxcVLSWE/9QuBQ3MsAO9+Y4R2BDk6XtS3whc0LgFUVxHhUHC310=
 X-Received: from seanjc798194.pdx.corp.google.com ([2620:15c:90:200:825e:11a1:364b:8109])
- (user=seanjc job=sendgmr) by 2002:a25:888b:: with SMTP id d11mr7526792ybl.385.1626194022140;
- Tue, 13 Jul 2021 09:33:42 -0700 (PDT)
+ (user=seanjc job=sendgmr) by 2002:a25:b55:: with SMTP id 82mr6710404ybl.501.1626194024052;
+ Tue, 13 Jul 2021 09:33:44 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Tue, 13 Jul 2021 09:32:42 -0700
+Date:   Tue, 13 Jul 2021 09:32:43 -0700
 In-Reply-To: <20210713163324.627647-1-seanjc@google.com>
-Message-Id: <20210713163324.627647-5-seanjc@google.com>
+Message-Id: <20210713163324.627647-6-seanjc@google.com>
 Mime-Version: 1.0
 References: <20210713163324.627647-1-seanjc@google.com>
 X-Mailer: git-send-email 2.32.0.93.g670b81a890-goog
-Subject: [PATCH v2 04/46] KVM: VMX: Set EDX at INIT with CPUID.0x1, Family-Model-Stepping
+Subject: [PATCH v2 05/46] KVM: SVM: Require exact CPUID.0x1 match when
+ stuffing EDX at INIT
 From:   Sean Christopherson <seanjc@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     Sean Christopherson <seanjc@google.com>,
@@ -65,44 +66,37 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Set EDX at RESET/INIT based on the userspace-defined CPUID model when
-possible, i.e. when CPUID.0x1.EAX is defind by userspace.  At RESET/INIT,
-all CPUs that support CPUID set EDX to the FMS enumerated in
-CPUID.0x1.EAX.  If no CPUID match is found, fall back to KVM's default
-of 0x600 (Family '6'), which is the least awful approximation of KVM's
-virtual CPU model.
+Do not allow an inexact CPUID "match" when querying the guest's CPUID.0x1
+to stuff EDX during INIT.  In the common case, where the guest CPU model
+is an AMD variant, allowing an inexact match is a nop since KVM doesn't
+emulate Intel's goofy "out-of-range" logic for AMD and Hygon.  If the
+vCPU model happens to be an Intel variant, an inexact match is possible
+if and only if the max CPUID leaf is precisely '0'. Aside from the fact
+that there's probably no CPU in existence with a single CPUID leaf, if
+the max CPUID leaf is '0', that means that CPUID.0.EAX is '0', and thus
+an inexact match for CPUID.0x1.EAX will also yield '0'.
 
-Fixes: 6aa8b732ca01 ("[PATCH] kvm: userspace interface")
+So, with lots of twisty logic, no functional change intended.
+
+Reviewed-by: Reiji Watanabe <reijiw@google.com>
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/kvm/vmx/vmx.c | 7 ++++++-
- 1 file changed, 6 insertions(+), 1 deletion(-)
+ arch/x86/kvm/svm/svm.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index 927a552393b9..825197f21700 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -4394,6 +4394,7 @@ static void vmx_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event)
- {
- 	struct vcpu_vmx *vmx = to_vmx(vcpu);
- 	struct msr_data apic_base_msr;
-+	u32 eax, dummy;
- 	u64 cr0;
+diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+index 2150642e1bef..12e49dc16efe 100644
+--- a/arch/x86/kvm/svm/svm.c
++++ b/arch/x86/kvm/svm/svm.c
+@@ -1359,7 +1359,7 @@ static void svm_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event)
+ 	}
+ 	init_vmcb(vcpu);
  
- 	vmx->rmode.vm86_active = 0;
-@@ -4401,7 +4402,11 @@ static void vmx_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event)
+-	kvm_cpuid(vcpu, &eax, &dummy, &dummy, &dummy, false);
++	kvm_cpuid(vcpu, &eax, &dummy, &dummy, &dummy, true);
+ 	kvm_rdx_write(vcpu, eax);
  
- 	vmx->msr_ia32_umwait_control = 0;
- 
--	vmx->vcpu.arch.regs[VCPU_REGS_RDX] = get_rdx_init_val();
-+	eax = 1;
-+	if (!kvm_cpuid(vcpu, &eax, &dummy, &dummy, &dummy, true))
-+		eax = get_rdx_init_val();
-+	kvm_rdx_write(vcpu, eax);
-+
- 	vmx->hv_deadline_tsc = -1;
- 	kvm_set_cr8(vcpu, 0);
- 
+ 	if (kvm_vcpu_apicv_active(vcpu) && !init_event)
 -- 
 2.32.0.93.g670b81a890-goog
 
