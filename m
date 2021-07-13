@@ -2,151 +2,350 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3C3973C6837
-	for <lists+kvm@lfdr.de>; Tue, 13 Jul 2021 03:46:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 109663C68D1
+	for <lists+kvm@lfdr.de>; Tue, 13 Jul 2021 05:10:04 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233213AbhGMBsr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 12 Jul 2021 21:48:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41176 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230000AbhGMBsr (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 12 Jul 2021 21:48:47 -0400
-Received: from mail-ot1-x32f.google.com (mail-ot1-x32f.google.com [IPv6:2607:f8b0:4864:20::32f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 932DAC0613DD
-        for <kvm@vger.kernel.org>; Mon, 12 Jul 2021 18:45:58 -0700 (PDT)
-Received: by mail-ot1-x32f.google.com with SMTP id v32-20020a0568300920b02904b90fde9029so6291729ott.7
-        for <kvm@vger.kernel.org>; Mon, 12 Jul 2021 18:45:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=amHpZtSdIEej/owL8aVzmXyTCQ7j7cjyj5v+QZPgqdI=;
-        b=Qz72lTahuK4Mhg06ZsvY7pm8tv1/hJkQryfMRJMeHgc1SG/iyMcekbh4O460T+pgjJ
-         D0HFc3GDfPWsPoMXg4obK2uP7fYCq+mZ0e99mvCngGgQNmwGo32r4sy1hCv7fkoAvGhG
-         zUaIYS1T+FpWMMiVjxPrZSSwKtQ1KvpdRjdwk=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=amHpZtSdIEej/owL8aVzmXyTCQ7j7cjyj5v+QZPgqdI=;
-        b=H3rBocLaKqqdUZhSVzASW9CSEesCt0wWOsGG19MUG0jy7M4yWNYoK9KlO9H5JBJeNz
-         OQQW4xwSxvqQd/TWPkfeCTtAqmeQhDOGhhK+dKgZRVKtt91TMGyiek0oGuXk1M0lvmrH
-         ipzB57fd6GNaLOqWxPkp0SpygBH9rN0YTlrwEbSyhSlzXC/9pfjWZfU3nLJqg/c8vJk5
-         t0kCVBao4z8eS5zB5WcHLYENzZNbKGTedViJo3eN8F9NqDlAFRZcrI/lQtFCxkhG+z1j
-         kk/SCBFqrigCSrqtBHjhwjJ6dQMwre3mhVvC9mdtWRBHlzx2MHI37yysglJuvSFP7iAM
-         jwKA==
-X-Gm-Message-State: AOAM530ijepg+GE3yQ9Guv4JpOJkIjU6x+W2FRKfwWfxcMnDvD1GlAhU
-        7ah2cY5UOZ64T3PgDjS7Wmen0ZIllHdRvav3BeMd1w==
-X-Google-Smtp-Source: ABdhPJxVJAotLnMqO+eWnqQcBDOlctirw2WJyy8srNVUx7n6HKcLFhYvaILsjqvETpoSmGj61KqFtBAT3qsCFoc5UTg=
-X-Received: by 2002:a05:6830:544:: with SMTP id l4mr1530242otb.164.1626140758004;
- Mon, 12 Jul 2021 18:45:58 -0700 (PDT)
+        id S234060AbhGMDMw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 12 Jul 2021 23:12:52 -0400
+Received: from h4.fbrelay.privateemail.com ([131.153.2.45]:37745 "EHLO
+        h4.fbrelay.privateemail.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S231340AbhGMDMv (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 12 Jul 2021 23:12:51 -0400
+Received: from MTA-05-3.privateemail.com (mta-05-1.privateemail.com [198.54.122.55])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by h3.fbrelay.privateemail.com (Postfix) with ESMTPS id 0387B807ED
+        for <kvm@vger.kernel.org>; Mon, 12 Jul 2021 23:10:01 -0400 (EDT)
+Received: from mta-05.privateemail.com (localhost [127.0.0.1])
+        by mta-05.privateemail.com (Postfix) with ESMTP id 41D7918018E8;
+        Mon, 12 Jul 2021 23:09:59 -0400 (EDT)
+Received: from hal-station.. (unknown [10.20.151.215])
+        by mta-05.privateemail.com (Postfix) with ESMTPA id BC9AA18018E6;
+        Mon, 12 Jul 2021 23:09:57 -0400 (EDT)
+From:   Hamza Mahfooz <someguy@effective-light.com>
+To:     linux-kernel@vger.kernel.org
+Cc:     Hamza Mahfooz <someguy@effective-light.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
+        kvm@vger.kernel.org
+Subject: [PATCH] KVM: const-ify all relevant uses of struct kvm_memory_slot
+Date:   Mon, 12 Jul 2021 22:33:38 -0400
+Message-Id: <20210713023338.57108-1-someguy@effective-light.com>
+X-Mailer: git-send-email 2.32.0
 MIME-Version: 1.0
-References: <20210630031037.584190-1-venkateshs@chromium.org>
- <YNyayUOiDDZ9V3Ex@google.com> <YOiLlqZBhEK0hsie@google.com>
-In-Reply-To: <YOiLlqZBhEK0hsie@google.com>
-From:   Venkatesh Srinivas <venkateshs@chromium.org>
-Date:   Mon, 12 Jul 2021 18:45:47 -0700
-Message-ID: <CAA0tLEo+t+d09h=OdDO8KiQ11xVBPixv_rg-xCca+rzXbqeRgg@mail.gmail.com>
-Subject: Re: [PATCH] KVM: kvm_vcpu_kick: Do not read potentially-stale vcpu->cpu
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     David Matlack <dmatlack@google.com>, kvm@vger.kernel.org,
-        Jim Mattson <jmattson@google.com>, elver@google.com,
-        dvyukov@google.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-Virus-Scanned: ClamAV using ClamSMTP
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Jul 9, 2021 at 10:47 AM Sean Christopherson <seanjc@google.com> wrote:
->
-> On Wed, Jun 30, 2021, David Matlack wrote:
-> > On Tue, Jun 29, 2021 at 08:10:37PM -0700, Venkatesh Srinivas wrote:
-> > > vcpu->cpu contains the last cpu a vcpu run/is running on;
-> > > kvm_vcpu_kick is used to 'kick' a guest vcpu by sending an IPI
-> > > to the last CPU; vcpu->cpu is updated on sched_in when a vcpu
-> > > moves to a new CPU, so it possible for the vcpu->cpu field to
-> > > be stale.
->
-> This fails to document the actual bug being fixed, and why the fix is correct.
-> The fact that vcpu->cpu may be stale is itself not a bug, e.g. even with this
-> patch, the IPI can be sent to the "wrong", i.e. smp_send_reschedule() can still
-> consume a stale vcpu->cpu.
->
-> The bug that's being fixed is that grabbing the potentially-stale vcpu->cpu
-> _before_ kvm_arch_vcpu_should_kick() can cause KVM to send an IPI to the wrong
-> CPU _and_ let the vCPU run longer than intended.  The fix is correct because KVM
-> doesn't truly care about sending an IPI to the correct pCPU, it only cares about
-> about kicking the pCPU out of the guest.  If the vCPU has exited and been loaded
-> on a different pCPU after kvm_arch_vcpu_should_kick(), then its mission has been
-> accomplished and the IPI (to the wrong pCPU) is truly spurious.
+As alluded to in commit f36f3f2846b5 ("KVM: add "new" argument to
+kvm_arch_commit_memory_region"), a bunch of other places where struct
+kvm_memory_slot is used, needs to be refactored to preserve the
+"const"ness of struct kvm_memory_slot across-the-board.
 
-Will improve the comment for V2.
+Signed-off-by: Hamza Mahfooz <someguy@effective-light.com>
+---
+ arch/x86/include/asm/kvm_host.h |  4 +--
+ arch/x86/kvm/mmu/mmu.c          | 58 ++++++++++++++++++---------------
+ arch/x86/kvm/mmu/mmu_internal.h |  4 +--
+ arch/x86/kvm/mmu/tdp_mmu.c      |  7 ++--
+ arch/x86/kvm/mmu/tdp_mmu.h      |  6 ++--
+ arch/x86/kvm/x86.c              |  7 ++--
+ 6 files changed, 44 insertions(+), 42 deletions(-)
 
-> > > kvm_vcpu_kick also read vcpu->cpu early with a plain read,
-> > > while vcpu->cpu could be concurrently written. This caused
-> > > a data race, found by kcsan:
-> > >
-> > > write to 0xffff8880274e8460 of 4 bytes by task 30718 on cpu 0:
-> > >  kvm_arch_vcpu_load arch/x86/kvm/x86.c:4018
-> > >  kvm_sched_in virt/kvm/kvm_main.c:4864
-> > >
-> > > vs
-> > >  kvm_vcpu_kick virt/kvm/kvm_main.c:2909
-> > >  kvm_arch_async_page_present_queued arch/x86/kvm/x86.c:11287
-> > >  async_pf_execute virt/kvm/async_pf.c:79
-> > >  ...
-> > >
-> > > Use a READ_ONCE to atomically read vcpu->cpu and avoid the
-> > > data race.
-> > >
-> > > Found by kcsan & syzbot.
-> > >
-> > > Signed-off-by: Venkatesh Srinivas <venkateshs@chromium.org>
->
-> Suggested-by: Sean Christopherson <seanjc@google.com>
->
-> > Reviewed-by: David Matlack <dmatlack@google.com>
-> >
-> > > ---
-> > >  virt/kvm/kvm_main.c | 10 ++++++----
-> > >  1 file changed, 6 insertions(+), 4 deletions(-)
-> > >
-> > > diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> > > index 46fb042837d2..0525f42afb7d 100644
-> > > --- a/virt/kvm/kvm_main.c
-> > > +++ b/virt/kvm/kvm_main.c
-> > > @@ -3058,16 +3058,18 @@ EXPORT_SYMBOL_GPL(kvm_vcpu_wake_up);
-> > >   */
-> > >  void kvm_vcpu_kick(struct kvm_vcpu *vcpu)
-> > >  {
-> > > -   int me;
-> > > -   int cpu = vcpu->cpu;
-> > > +   int me, cpu;
-> > >
-> > >     if (kvm_vcpu_wake_up(vcpu))
-> > >             return;
-> > >
-> > >     me = get_cpu();
-> > > -   if (cpu != me && (unsigned)cpu < nr_cpu_ids && cpu_online(cpu))
-> > > -           if (kvm_arch_vcpu_should_kick(vcpu))
-> > > +   if (kvm_arch_vcpu_should_kick(vcpu)) {
-> > > +           cpu = READ_ONCE(vcpu->cpu);
-> > > +           WARN_ON_ONCE(cpu == me);
-> >
-> > nit: A comment here may be useful to explain the interaction with
-> > kvm_arch_vcpu_should_kick(). Took me a minute to understand why you
-> > added the warning.
->
-> Agreed.
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index 974cbfb1eefe..a195e1c32018 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -1536,12 +1536,12 @@ void kvm_mmu_uninit_vm(struct kvm *kvm);
+ void kvm_mmu_after_set_cpuid(struct kvm_vcpu *vcpu);
+ void kvm_mmu_reset_context(struct kvm_vcpu *vcpu);
+ void kvm_mmu_slot_remove_write_access(struct kvm *kvm,
+-				      struct kvm_memory_slot *memslot,
++				      const struct kvm_memory_slot *memslot,
+ 				      int start_level);
+ void kvm_mmu_zap_collapsible_sptes(struct kvm *kvm,
+ 				   const struct kvm_memory_slot *memslot);
+ void kvm_mmu_slot_leaf_clear_dirty(struct kvm *kvm,
+-				   struct kvm_memory_slot *memslot);
++				   const struct kvm_memory_slot *memslot);
+ void kvm_mmu_zap_all(struct kvm *kvm);
+ void kvm_mmu_invalidate_mmio_sptes(struct kvm *kvm, u64 gen);
+ unsigned long kvm_mmu_calculate_default_mmu_pages(struct kvm *kvm);
+diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+index 845d114ae075..39ee8df5cc1f 100644
+--- a/arch/x86/kvm/mmu/mmu.c
++++ b/arch/x86/kvm/mmu/mmu.c
+@@ -784,7 +784,7 @@ static struct kvm_lpage_info *lpage_info_slot(gfn_t gfn,
+ 	return &slot->arch.lpage_info[level - 2][idx];
+ }
+ 
+-static void update_gfn_disallow_lpage_count(struct kvm_memory_slot *slot,
++static void update_gfn_disallow_lpage_count(const struct kvm_memory_slot *slot,
+ 					    gfn_t gfn, int count)
+ {
+ 	struct kvm_lpage_info *linfo;
+@@ -797,12 +797,12 @@ static void update_gfn_disallow_lpage_count(struct kvm_memory_slot *slot,
+ 	}
+ }
+ 
+-void kvm_mmu_gfn_disallow_lpage(struct kvm_memory_slot *slot, gfn_t gfn)
++void kvm_mmu_gfn_disallow_lpage(const struct kvm_memory_slot *slot, gfn_t gfn)
+ {
+ 	update_gfn_disallow_lpage_count(slot, gfn, 1);
+ }
+ 
+-void kvm_mmu_gfn_allow_lpage(struct kvm_memory_slot *slot, gfn_t gfn)
++void kvm_mmu_gfn_allow_lpage(const struct kvm_memory_slot *slot, gfn_t gfn)
+ {
+ 	update_gfn_disallow_lpage_count(slot, gfn, -1);
+ }
+@@ -989,7 +989,7 @@ static void pte_list_remove(struct kvm_rmap_head *rmap_head, u64 *sptep)
+ }
+ 
+ static struct kvm_rmap_head *__gfn_to_rmap(gfn_t gfn, int level,
+-					   struct kvm_memory_slot *slot)
++					   const struct kvm_memory_slot *slot)
+ {
+ 	unsigned long idx;
+ 
+@@ -1216,7 +1216,7 @@ static bool spte_wrprot_for_clear_dirty(u64 *sptep)
+  * Returns true iff any D or W bits were cleared.
+  */
+ static bool __rmap_clear_dirty(struct kvm *kvm, struct kvm_rmap_head *rmap_head,
+-			       struct kvm_memory_slot *slot)
++			       const struct kvm_memory_slot *slot)
+ {
+ 	u64 *sptep;
+ 	struct rmap_iterator iter;
+@@ -1375,7 +1375,7 @@ static bool rmap_write_protect(struct kvm_vcpu *vcpu, u64 gfn)
+ }
+ 
+ static bool kvm_zap_rmapp(struct kvm *kvm, struct kvm_rmap_head *rmap_head,
+-			  struct kvm_memory_slot *slot)
++			  const struct kvm_memory_slot *slot)
+ {
+ 	u64 *sptep;
+ 	struct rmap_iterator iter;
+@@ -1440,7 +1440,7 @@ static bool kvm_set_pte_rmapp(struct kvm *kvm, struct kvm_rmap_head *rmap_head,
+ 
+ struct slot_rmap_walk_iterator {
+ 	/* input fields. */
+-	struct kvm_memory_slot *slot;
++	const struct kvm_memory_slot *slot;
+ 	gfn_t start_gfn;
+ 	gfn_t end_gfn;
+ 	int start_level;
+@@ -1467,16 +1467,20 @@ rmap_walk_init_level(struct slot_rmap_walk_iterator *iterator, int level)
+ 
+ static void
+ slot_rmap_walk_init(struct slot_rmap_walk_iterator *iterator,
+-		    struct kvm_memory_slot *slot, int start_level,
++		    const struct kvm_memory_slot *slot, int start_level,
+ 		    int end_level, gfn_t start_gfn, gfn_t end_gfn)
+ {
+-	iterator->slot = slot;
+-	iterator->start_level = start_level;
+-	iterator->end_level = end_level;
+-	iterator->start_gfn = start_gfn;
+-	iterator->end_gfn = end_gfn;
++	struct slot_rmap_walk_iterator iter = {
++		.slot = slot,
++		.start_gfn = start_gfn,
++		.end_gfn = end_gfn,
++		.start_level = start_level,
++		.end_level = end_level,
++	};
++
++	rmap_walk_init_level(&iter, iterator->start_level);
+ 
+-	rmap_walk_init_level(iterator, iterator->start_level);
++	memcpy(iterator, &iter, sizeof(struct slot_rmap_walk_iterator));
+ }
+ 
+ static bool slot_rmap_walk_okay(struct slot_rmap_walk_iterator *iterator)
+@@ -5274,12 +5278,13 @@ void kvm_configure_mmu(bool enable_tdp, int tdp_max_root_level,
+ EXPORT_SYMBOL_GPL(kvm_configure_mmu);
+ 
+ /* The return value indicates if tlb flush on all vcpus is needed. */
+-typedef bool (*slot_level_handler) (struct kvm *kvm, struct kvm_rmap_head *rmap_head,
+-				    struct kvm_memory_slot *slot);
++typedef bool (*slot_level_handler) (struct kvm *kvm,
++				    struct kvm_rmap_head *rmap_head,
++				    const struct kvm_memory_slot *slot);
+ 
+ /* The caller should hold mmu-lock before calling this function. */
+ static __always_inline bool
+-slot_handle_level_range(struct kvm *kvm, struct kvm_memory_slot *memslot,
++slot_handle_level_range(struct kvm *kvm, const struct kvm_memory_slot *memslot,
+ 			slot_level_handler fn, int start_level, int end_level,
+ 			gfn_t start_gfn, gfn_t end_gfn, bool flush_on_yield,
+ 			bool flush)
+@@ -5306,7 +5311,7 @@ slot_handle_level_range(struct kvm *kvm, struct kvm_memory_slot *memslot,
+ }
+ 
+ static __always_inline bool
+-slot_handle_level(struct kvm *kvm, struct kvm_memory_slot *memslot,
++slot_handle_level(struct kvm *kvm, const struct kvm_memory_slot *memslot,
+ 		  slot_level_handler fn, int start_level, int end_level,
+ 		  bool flush_on_yield)
+ {
+@@ -5317,7 +5322,7 @@ slot_handle_level(struct kvm *kvm, struct kvm_memory_slot *memslot,
+ }
+ 
+ static __always_inline bool
+-slot_handle_leaf(struct kvm *kvm, struct kvm_memory_slot *memslot,
++slot_handle_leaf(struct kvm *kvm, const struct kvm_memory_slot *memslot,
+ 		 slot_level_handler fn, bool flush_on_yield)
+ {
+ 	return slot_handle_level(kvm, memslot, fn, PG_LEVEL_4K,
+@@ -5576,7 +5581,8 @@ void kvm_zap_gfn_range(struct kvm *kvm, gfn_t gfn_start, gfn_t gfn_end)
+ 				if (start >= end)
+ 					continue;
+ 
+-				flush = slot_handle_level_range(kvm, memslot,
++				flush = slot_handle_level_range(kvm,
++						(const struct kvm_memory_slot *) memslot,
+ 						kvm_zap_rmapp, PG_LEVEL_4K,
+ 						KVM_MAX_HUGEPAGE_LEVEL, start,
+ 						end - 1, true, flush);
+@@ -5604,13 +5610,13 @@ void kvm_zap_gfn_range(struct kvm *kvm, gfn_t gfn_start, gfn_t gfn_end)
+ 
+ static bool slot_rmap_write_protect(struct kvm *kvm,
+ 				    struct kvm_rmap_head *rmap_head,
+-				    struct kvm_memory_slot *slot)
++				    const struct kvm_memory_slot *slot)
+ {
+ 	return __rmap_write_protect(kvm, rmap_head, false);
+ }
+ 
+ void kvm_mmu_slot_remove_write_access(struct kvm *kvm,
+-				      struct kvm_memory_slot *memslot,
++				      const struct kvm_memory_slot *memslot,
+ 				      int start_level)
+ {
+ 	bool flush = false;
+@@ -5646,7 +5652,7 @@ void kvm_mmu_slot_remove_write_access(struct kvm *kvm,
+ 
+ static bool kvm_mmu_zap_collapsible_spte(struct kvm *kvm,
+ 					 struct kvm_rmap_head *rmap_head,
+-					 struct kvm_memory_slot *slot)
++					 const struct kvm_memory_slot *slot)
+ {
+ 	u64 *sptep;
+ 	struct rmap_iterator iter;
+@@ -5685,10 +5691,8 @@ static bool kvm_mmu_zap_collapsible_spte(struct kvm *kvm,
+ }
+ 
+ void kvm_mmu_zap_collapsible_sptes(struct kvm *kvm,
+-				   const struct kvm_memory_slot *memslot)
++				   const struct kvm_memory_slot *slot)
+ {
+-	/* FIXME: const-ify all uses of struct kvm_memory_slot.  */
+-	struct kvm_memory_slot *slot = (struct kvm_memory_slot *)memslot;
+ 	bool flush = false;
+ 
+ 	if (kvm_memslots_have_rmaps(kvm)) {
+@@ -5724,7 +5728,7 @@ void kvm_arch_flush_remote_tlbs_memslot(struct kvm *kvm,
+ }
+ 
+ void kvm_mmu_slot_leaf_clear_dirty(struct kvm *kvm,
+-				   struct kvm_memory_slot *memslot)
++				   const struct kvm_memory_slot *memslot)
+ {
+ 	bool flush = false;
+ 
+diff --git a/arch/x86/kvm/mmu/mmu_internal.h b/arch/x86/kvm/mmu/mmu_internal.h
+index 35567293c1fd..ee4ad9c99219 100644
+--- a/arch/x86/kvm/mmu/mmu_internal.h
++++ b/arch/x86/kvm/mmu/mmu_internal.h
+@@ -124,8 +124,8 @@ static inline bool is_nx_huge_page_enabled(void)
+ 
+ int mmu_try_to_unsync_pages(struct kvm_vcpu *vcpu, gfn_t gfn, bool can_unsync);
+ 
+-void kvm_mmu_gfn_disallow_lpage(struct kvm_memory_slot *slot, gfn_t gfn);
+-void kvm_mmu_gfn_allow_lpage(struct kvm_memory_slot *slot, gfn_t gfn);
++void kvm_mmu_gfn_disallow_lpage(const struct kvm_memory_slot *slot, gfn_t gfn);
++void kvm_mmu_gfn_allow_lpage(const struct kvm_memory_slot *slot, gfn_t gfn);
+ bool kvm_mmu_slot_gfn_write_protect(struct kvm *kvm,
+ 				    struct kvm_memory_slot *slot, u64 gfn,
+ 				    int min_level);
+diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
+index 0853370bd811..5d8d69d56a81 100644
+--- a/arch/x86/kvm/mmu/tdp_mmu.c
++++ b/arch/x86/kvm/mmu/tdp_mmu.c
+@@ -1242,8 +1242,8 @@ static bool wrprot_gfn_range(struct kvm *kvm, struct kvm_mmu_page *root,
+  * only affect leaf SPTEs down to min_level.
+  * Returns true if an SPTE has been changed and the TLBs need to be flushed.
+  */
+-bool kvm_tdp_mmu_wrprot_slot(struct kvm *kvm, struct kvm_memory_slot *slot,
+-			     int min_level)
++bool kvm_tdp_mmu_wrprot_slot(struct kvm *kvm,
++			     const struct kvm_memory_slot *slot, int min_level)
+ {
+ 	struct kvm_mmu_page *root;
+ 	bool spte_set = false;
+@@ -1313,7 +1313,8 @@ static bool clear_dirty_gfn_range(struct kvm *kvm, struct kvm_mmu_page *root,
+  * each SPTE. Returns true if an SPTE has been changed and the TLBs need to
+  * be flushed.
+  */
+-bool kvm_tdp_mmu_clear_dirty_slot(struct kvm *kvm, struct kvm_memory_slot *slot)
++bool kvm_tdp_mmu_clear_dirty_slot(struct kvm *kvm,
++				  const struct kvm_memory_slot *slot)
+ {
+ 	struct kvm_mmu_page *root;
+ 	bool spte_set = false;
+diff --git a/arch/x86/kvm/mmu/tdp_mmu.h b/arch/x86/kvm/mmu/tdp_mmu.h
+index 1cae4485b3bc..49437dbb4804 100644
+--- a/arch/x86/kvm/mmu/tdp_mmu.h
++++ b/arch/x86/kvm/mmu/tdp_mmu.h
+@@ -61,10 +61,10 @@ bool kvm_tdp_mmu_age_gfn_range(struct kvm *kvm, struct kvm_gfn_range *range);
+ bool kvm_tdp_mmu_test_age_gfn(struct kvm *kvm, struct kvm_gfn_range *range);
+ bool kvm_tdp_mmu_set_spte_gfn(struct kvm *kvm, struct kvm_gfn_range *range);
+ 
+-bool kvm_tdp_mmu_wrprot_slot(struct kvm *kvm, struct kvm_memory_slot *slot,
+-			     int min_level);
++bool kvm_tdp_mmu_wrprot_slot(struct kvm *kvm,
++			     const struct kvm_memory_slot *slot, int min_level);
+ bool kvm_tdp_mmu_clear_dirty_slot(struct kvm *kvm,
+-				  struct kvm_memory_slot *slot);
++				  const struct kvm_memory_slot *slot);
+ void kvm_tdp_mmu_clear_dirty_pt_masked(struct kvm *kvm,
+ 				       struct kvm_memory_slot *slot,
+ 				       gfn_t gfn, unsigned long mask,
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index c6dc1b445231..970e95110175 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -11473,7 +11473,7 @@ static void kvm_mmu_update_cpu_dirty_logging(struct kvm *kvm, bool enable)
+ 
+ static void kvm_mmu_slot_apply_flags(struct kvm *kvm,
+ 				     struct kvm_memory_slot *old,
+-				     struct kvm_memory_slot *new,
++				     const struct kvm_memory_slot *new,
+ 				     enum kvm_mr_change change)
+ {
+ 	bool log_dirty_pages = new->flags & KVM_MEM_LOG_DIRTY_PAGES;
+@@ -11553,10 +11553,7 @@ void kvm_arch_commit_memory_region(struct kvm *kvm,
+ 		kvm_mmu_change_mmu_pages(kvm,
+ 				kvm_mmu_calculate_default_mmu_pages(kvm));
+ 
+-	/*
+-	 * FIXME: const-ify all uses of struct kvm_memory_slot.
+-	 */
+-	kvm_mmu_slot_apply_flags(kvm, old, (struct kvm_memory_slot *) new, change);
++	kvm_mmu_slot_apply_flags(kvm, old, new, change);
+ 
+ 	/* Free the arrays associated with the old memslot. */
+ 	if (change == KVM_MR_MOVE)
+-- 
+2.32.0
 
-Will do for V2
-
-> > > +           if ((unsigned)cpu < nr_cpu_ids && cpu_online(cpu))
-> > >                     smp_send_reschedule(cpu);
-> > > +   }
-> > >     put_cpu();
-> > >  }
-> > >  EXPORT_SYMBOL_GPL(kvm_vcpu_kick);
-> > > --
-> > > 2.30.2
-> > >
