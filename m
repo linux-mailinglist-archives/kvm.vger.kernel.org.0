@@ -2,57 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C25DF3C749C
-	for <lists+kvm@lfdr.de>; Tue, 13 Jul 2021 18:33:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A6C843C749E
+	for <lists+kvm@lfdr.de>; Tue, 13 Jul 2021 18:33:45 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231931AbhGMQg2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 13 Jul 2021 12:36:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44938 "EHLO
+        id S233067AbhGMQgc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 13 Jul 2021 12:36:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44946 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231802AbhGMQg1 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 13 Jul 2021 12:36:27 -0400
-Received: from mail-qk1-x74a.google.com (mail-qk1-x74a.google.com [IPv6:2607:f8b0:4864:20::74a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 58004C0613E9
-        for <kvm@vger.kernel.org>; Tue, 13 Jul 2021 09:33:37 -0700 (PDT)
-Received: by mail-qk1-x74a.google.com with SMTP id bm22-20020a05620a1996b02903b87dad5a1dso4009873qkb.23
-        for <kvm@vger.kernel.org>; Tue, 13 Jul 2021 09:33:37 -0700 (PDT)
+        with ESMTP id S232852AbhGMQga (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 13 Jul 2021 12:36:30 -0400
+Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5E7BAC0613DD
+        for <kvm@vger.kernel.org>; Tue, 13 Jul 2021 09:33:39 -0700 (PDT)
+Received: by mail-yb1-xb49.google.com with SMTP id j186-20020a25d2c30000b029055ed6ffbea6so20159660ybg.14
+        for <kvm@vger.kernel.org>; Tue, 13 Jul 2021 09:33:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=reply-to:date:in-reply-to:message-id:mime-version:references
-         :subject:from:to:cc:content-transfer-encoding;
-        bh=yeyM8miFXVfhYCiRacpfh4x5/Y1VXoOxcgLbMzodMTs=;
-        b=gmkIzyulalQgm0iUkw5EyMI4acmPrftCi/JxE0avsh261tlyjOsTc8y3eCFLK4U2xj
-         4kMtA7UeZ8G5aJwgY7KEbGInJGWrQqEEns3qJzuxuW1KoLj+KPqVhRXa0Mt3TrLYfPOw
-         bPgGWsWO3VwZM0GLigsA92jIZERVIPFwD20MS1hpLdwc/3nHnwpHDXzLMwM+fIw8XtM4
-         vSwAXaSy0sE8JwcIfU4EsYGfBiRWfzfaM/qXn3KuCFDZIuneUXZkhevPebN5elEwjjry
-         xtDF80ue9AK2pfDYCLUCGxX5PzK2swNv30wmbASC+CHfCAkc+LG0Cngbqzk6ruE/8OgZ
-         IZIA==
+         :subject:from:to:cc;
+        bh=CGUCznRdiPWAmsCMQFonxOBex98YQEwxWBKOh5eQt7M=;
+        b=tJqwt8bZlc8oPW/4EXV9GTQdpI1HLnBQftLNu4By8/T3ToR8ArcbB9DvXcDFFNlyEw
+         8WGUYedXdNMVnobO4pNadTycYVgvAqx+pU9fBKQwrveviacCgiUe18n1XQTtJECgVnSD
+         nEmhRfmToc4gQ2EiDKpiUBqatrjl0o4v41mw6KOFeh08WRlBzWHqupDweD875Nm3LzCa
+         SHBnz5mw89ezDDv0lxIOD1gXHU1dathcQwWezPxEEq5rSx9TWP18aTDg5gV02+V7DOde
+         hHUG0LVjlHoKSJZ0QcOAIvzh0z4EjlVlPWvYe3LvuMPBKNJZGEmTikF22RI9jVnxvkDq
+         CIDg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:reply-to:date:in-reply-to:message-id
-         :mime-version:references:subject:from:to:cc
-         :content-transfer-encoding;
-        bh=yeyM8miFXVfhYCiRacpfh4x5/Y1VXoOxcgLbMzodMTs=;
-        b=WrBWDQVUDodjH0f6XIm7XcoeOsQYQ8AKU/chiBCUw3+QCafS4z+4zzA31MS6ci/StX
-         pqjakSYEhBDYzzb5Q3XZ+7HBaGmI9Rfu0k5PGmsQiAWWFQoi/babX6l7RV0VfJ7sZJsE
-         uDQ4hAoywBxZ3eQHVx4ISklbyXfd3waEF7mAk5Qx2f2F+Y0n1D/RwDi7/ZICnZkGl9Cp
-         Ml0fGebXdWqFBMu2CWf6aHc4LygcvrKWv1tZAuAaDXiN8KIaVEgn9qI+AGqNZFlj/xnc
-         3ReajlFIO0K3JEdVEBMLB++js8636bFq5aMufGj8/qL5iOrXv3ski5EA9pufBuSGtDy6
-         PdiQ==
-X-Gm-Message-State: AOAM530PAjZIyZpWeHvxZm7qrwY4eEvLJZIy974JR1FWVNH9DuXNL4vo
-        PIHXrcGb0zRSy4loet+f+WIVsA3TO3U=
-X-Google-Smtp-Source: ABdhPJzNv3IrIvUUMO8p+vTbbzvg8/gZPxZ+5gcJjFCq3w/wqMdzu0+2wJRWpZC/wQLsNMZ8ef8ajgs/xvE=
+         :mime-version:references:subject:from:to:cc;
+        bh=CGUCznRdiPWAmsCMQFonxOBex98YQEwxWBKOh5eQt7M=;
+        b=PmycVH6jqaXpXXfSxqJSuwVAxL5tQwIK7v0lfWyHZy1GxZ180cfmv+nA2LneD62v7y
+         P1Qhpy7f54208RRceWpvw3biYhQBJLLTO0c3SGwDGhwgVPSVkzM81g/e4WWqtWhurq2e
+         xB5/ypEV60mqIcQ9ZP5tJMEfDXrIkfWSd68Hi2ybl0939wpLOKAaRuUds4ptW/eHk4gj
+         Gkxp55lngxuzW+rfY9WuTgpCpq/nZXl4WtUUoptDzMwsPRIu1smg74MQVhEk4OBZekOq
+         ZRzaJS5DXpHlly7lPX9IQ/J7MCSC0IMjmTwNRDpCWfDx4hWTqsSd5gGngnBd6cb6yWtQ
+         BOCQ==
+X-Gm-Message-State: AOAM531k3eLKvFC2NKdJV8L3/jqLkji7LAptq5Vp/Bfx9x7l0w+7dx2v
+        d2yfBVUJA1wOOuz7uBTwz0reJY+nzOE=
+X-Google-Smtp-Source: ABdhPJwCVfYAbbbuA0so14IArA0SM/M/g2EbwalCLw55NEUbXBxsGXZnNsPeOTln8DYQHm8nyn9QAMQ9+Lg=
 X-Received: from seanjc798194.pdx.corp.google.com ([2620:15c:90:200:825e:11a1:364b:8109])
- (user=seanjc job=sendgmr) by 2002:a0c:b44b:: with SMTP id e11mr5841955qvf.38.1626194016387;
- Tue, 13 Jul 2021 09:33:36 -0700 (PDT)
+ (user=seanjc job=sendgmr) by 2002:a25:ab41:: with SMTP id u59mr7079483ybi.218.1626194018438;
+ Tue, 13 Jul 2021 09:33:38 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Tue, 13 Jul 2021 09:32:39 -0700
+Date:   Tue, 13 Jul 2021 09:32:40 -0700
 In-Reply-To: <20210713163324.627647-1-seanjc@google.com>
-Message-Id: <20210713163324.627647-2-seanjc@google.com>
+Message-Id: <20210713163324.627647-3-seanjc@google.com>
 Mime-Version: 1.0
 References: <20210713163324.627647-1-seanjc@google.com>
 X-Mailer: git-send-email 2.32.0.93.g670b81a890-goog
-Subject: [PATCH v2 01/46] KVM: x86: Flush the guest's TLB on INIT
+Subject: [PATCH v2 02/46] KVM: nVMX: Set LDTR to its architecturally defined
+ value on nested VM-Exit
 From:   Sean Christopherson <seanjc@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     Sean Christopherson <seanjc@google.com>,
@@ -62,89 +62,43 @@ Cc:     Sean Christopherson <seanjc@google.com>,
         Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
         linux-kernel@vger.kernel.org, Reiji Watanabe <reijiw@google.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Flush the guest's TLB on INIT, as required by Intel's SDM.  Although
-AMD's APM states that the TLBs are unchanged by INIT, it's not clear that
-that's correct as the APM also states that the TLB is flush on "External
-initialization of the processor."  Regardless, relying on the guest to be
-paranoid is unnecessarily risky, while an unnecessary flush is benign
-from a functional perspective and likely has no measurable impact on
-guest performance.
+Set L1's LDTR on VM-Exit per the Intel SDM:
 
-Note, as of the April 2021 version of Intels' SDM, it also contradicts
-itself with respect to TLB flushing.  The overview of INIT explicitly
-calls out the TLBs as being invalidated, while a table later in the same
-section says they are unchanged.
+  The host-state area does not contain a selector field for LDTR. LDTR is
+  established as follows on all VM exits: the selector is cleared to
+  0000H, the segment is marked unusable and is otherwise undefined
+  (although the base address is always canonical).
 
-  9.1 INITIALIZATION OVERVIEW:
-    The major difference is that during an INIT, the internal caches, MSRs,
-    MTRRs, and x87 FPU state are left unchanged (although, the TLBs and BTB
-    are invalidated as with a hardware reset)
+This is likely a benign bug since the LDTR is unusable, as it means the
+L1 VMM is conditioned to reload its LDTR in order to function properly on
+bare metal.
 
-  Table 9-1:
-
-  Register                    Power up    Reset      INIT
-  Data and Code Cache, TLBs:  Invalid[6]  Invalid[6] Unchanged
-
-Given Core2's erratum[*] about global TLB entries not being flush on INIT,
-it's safe to assume that the table is simply wrong.
-
-  AZ28. INIT Does Not Clear Global Entries in the TLB
-  Problem: INIT may not flush a TLB entry when:
-    =E2=80=A2 The processor is in protected mode with paging enabled and th=
-e page global enable
-      flag is set (PGE bit of CR4 register)
-    =E2=80=A2 G bit for the page table entry is set
-    =E2=80=A2 TLB entry is present in TLB when INIT occurs
-    =E2=80=A2 Software may encounter unexpected page fault or incorrect add=
-ress translation due
-      to a TLB entry erroneously left in TLB after INIT.
-
-  Workaround: Write to CR3, CR4 (setting bits PSE, PGE or PAE) or CR0 (sett=
-ing
-              bits PG or PE) registers before writing to memory early in BI=
-OS
-              code to clear all the global entries from TLB.
-
-  Status: For the steppings affected, see the Summary Tables of Changes.
-
-[*] https://www.intel.com/content/dam/support/us/en/documents/processors/mo=
-bile/celeron/sb/320121.pdf
-
-Fixes: 6aa8b732ca01 ("[PATCH] kvm: userspace interface")
+Fixes: 4704d0befb07 ("KVM: nVMX: Exiting from L2 to L1")
+Reviewed-by: Reiji Watanabe <reijiw@google.com>
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/kvm/x86.c | 12 ++++++++++++
- 1 file changed, 12 insertions(+)
+ arch/x86/kvm/vmx/nested.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 8166ad113fb2..4ffc4ca7d7b0 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -10867,6 +10867,18 @@ void kvm_vcpu_reset(struct kvm_vcpu *vcpu, bool in=
-it_event)
- 	 */
- 	if (old_cr0 & X86_CR0_PG)
- 		kvm_mmu_reset_context(vcpu);
+diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+index 1a52134b0c42..7f8184f432b4 100644
+--- a/arch/x86/kvm/vmx/nested.c
++++ b/arch/x86/kvm/vmx/nested.c
+@@ -4298,6 +4298,10 @@ static void load_vmcs12_host_state(struct kvm_vcpu *vcpu,
+ 	};
+ 	vmx_set_segment(vcpu, &seg, VCPU_SREG_TR);
+ 
++	memset(&seg, 0, sizeof(seg));
++	seg.unusable = 1;
++	vmx_set_segment(vcpu, &seg, VCPU_SREG_LDTR);
 +
-+	/*
-+	 * Intel's SDM states that all TLB entries are flushed on INIT.  AMD's
-+	 * APM states the TLBs are untouched by INIT, but it also states that
-+	 * the TLBs are flushed on "External initialization of the processor."
-+	 * Flush the guest TLB regardless of vendor, there is no meaningful
-+	 * benefit in relying on the guest to flush the TLB immediately after
-+	 * INIT.  A spurious TLB flush is benign and likely negligible from a
-+	 * performance perspective.
-+	 */
-+	if (init_event)
-+		kvm_make_request(KVM_REQ_TLB_FLUSH_GUEST, vcpu);
- }
-=20
- void kvm_vcpu_deliver_sipi_vector(struct kvm_vcpu *vcpu, u8 vector)
---=20
+ 	kvm_set_dr(vcpu, 7, 0x400);
+ 	vmcs_write64(GUEST_IA32_DEBUGCTL, 0);
+ 
+-- 
 2.32.0.93.g670b81a890-goog
 
