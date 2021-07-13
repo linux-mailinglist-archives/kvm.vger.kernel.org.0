@@ -2,350 +2,116 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 109663C68D1
-	for <lists+kvm@lfdr.de>; Tue, 13 Jul 2021 05:10:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 82FF83C68FA
+	for <lists+kvm@lfdr.de>; Tue, 13 Jul 2021 05:59:54 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234060AbhGMDMw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 12 Jul 2021 23:12:52 -0400
-Received: from h4.fbrelay.privateemail.com ([131.153.2.45]:37745 "EHLO
-        h4.fbrelay.privateemail.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231340AbhGMDMv (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 12 Jul 2021 23:12:51 -0400
-Received: from MTA-05-3.privateemail.com (mta-05-1.privateemail.com [198.54.122.55])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by h3.fbrelay.privateemail.com (Postfix) with ESMTPS id 0387B807ED
-        for <kvm@vger.kernel.org>; Mon, 12 Jul 2021 23:10:01 -0400 (EDT)
-Received: from mta-05.privateemail.com (localhost [127.0.0.1])
-        by mta-05.privateemail.com (Postfix) with ESMTP id 41D7918018E8;
-        Mon, 12 Jul 2021 23:09:59 -0400 (EDT)
-Received: from hal-station.. (unknown [10.20.151.215])
-        by mta-05.privateemail.com (Postfix) with ESMTPA id BC9AA18018E6;
-        Mon, 12 Jul 2021 23:09:57 -0400 (EDT)
-From:   Hamza Mahfooz <someguy@effective-light.com>
-To:     linux-kernel@vger.kernel.org
-Cc:     Hamza Mahfooz <someguy@effective-light.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
+        id S229782AbhGMECl (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 13 Jul 2021 00:02:41 -0400
+Received: from mga03.intel.com ([134.134.136.65]:22541 "EHLO mga03.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229436AbhGMECk (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 13 Jul 2021 00:02:40 -0400
+X-IronPort-AV: E=McAfee;i="6200,9189,10043"; a="210135314"
+X-IronPort-AV: E=Sophos;i="5.84,235,1620716400"; 
+   d="scan'208";a="210135314"
+Received: from fmsmga003.fm.intel.com ([10.253.24.29])
+  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Jul 2021 20:59:50 -0700
+X-IronPort-AV: E=Sophos;i="5.84,235,1620716400"; 
+   d="scan'208";a="492552884"
+Received: from jianye-mobl1.ccr.corp.intel.com (HELO localhost) ([10.249.169.175])
+  by fmsmga003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Jul 2021 20:59:46 -0700
+Date:   Tue, 13 Jul 2021 11:59:44 +0800
+From:   Yu Zhang <yu.c.zhang@linux.intel.com>
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
-        kvm@vger.kernel.org
-Subject: [PATCH] KVM: const-ify all relevant uses of struct kvm_memory_slot
-Date:   Mon, 12 Jul 2021 22:33:38 -0400
-Message-Id: <20210713023338.57108-1-someguy@effective-light.com>
-X-Mailer: git-send-email 2.32.0
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] Revert "KVM: x86: WARN and reject loading KVM if NX is
+ supported but not enabled"
+Message-ID: <20210713035944.l7qa7q4qsmqywg6u@linux.intel.com>
+References: <20210625001853.318148-1-seanjc@google.com>
+ <28ec9d07-756b-f546-dad1-0af751167838@redhat.com>
+ <YOiFsB9vZgMcpJZu@google.com>
+ <20210712075223.hqqoi4yp4fkkhrt5@linux.intel.com>
+ <YOxThZrKeyONVe4i@google.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Virus-Scanned: ClamAV using ClamSMTP
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <YOxThZrKeyONVe4i@google.com>
+User-Agent: NeoMutt/20171215
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-As alluded to in commit f36f3f2846b5 ("KVM: add "new" argument to
-kvm_arch_commit_memory_region"), a bunch of other places where struct
-kvm_memory_slot is used, needs to be refactored to preserve the
-"const"ness of struct kvm_memory_slot across-the-board.
+On Mon, Jul 12, 2021 at 02:36:53PM +0000, Sean Christopherson wrote:
+> On Mon, Jul 12, 2021, Yu Zhang wrote:
+> > On Fri, Jul 09, 2021 at 05:21:52PM +0000, Sean Christopherson wrote:
+> > > On Thu, Jul 08, 2021, Paolo Bonzini wrote:
+> > > > So do we want this or "depends on X86_64 || X86_PAE"?
+> > > 
+> > > Hmm, I'm leaning towards keeping !PAE support purely for testing the !PAE<->PAE
+> > > MMU transitions for nested virtualization.  It's not much coverage, and the !PAE
+> > 
+> > May I ask what "!PAE<->PAE MMU transition for nested virtualization" means?
+> > Running L1 KVM with !PAE and L0 in PAE? I had thought KVM can only function
+> > with PAE set(though I did not see any check of CR4 in kvm_arch_init()). Did
+> > I miss something?
+> 
+> When L1 uses shadow paging, L0 KVM's uses a single MMU instance for both L1 and
+> L2, and relies on the MMU role to differentiate between L1 and L2.  KVM requires
+> PAE for shadow paging, but does not require PAE in the host kernel.  So when L1
+> KVM uses shadow paging, it can effectively use !PAE paging for L1 and PAE paging
+> for L2.  L0 KVM needs to handle that the !PAE<->PAE transitions when switching
+> between L1 and L2, e.g. needs to correctly reinitialize the MMU context.
 
-Signed-off-by: Hamza Mahfooz <someguy@effective-light.com>
----
- arch/x86/include/asm/kvm_host.h |  4 +--
- arch/x86/kvm/mmu/mmu.c          | 58 ++++++++++++++++++---------------
- arch/x86/kvm/mmu/mmu_internal.h |  4 +--
- arch/x86/kvm/mmu/tdp_mmu.c      |  7 ++--
- arch/x86/kvm/mmu/tdp_mmu.h      |  6 ++--
- arch/x86/kvm/x86.c              |  7 ++--
- 6 files changed, 44 insertions(+), 42 deletions(-)
+Hah... Actually, I do have a misunderstanding here. The host does not need to be
+PAE. Thanks for the explanation! :)
 
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index 974cbfb1eefe..a195e1c32018 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -1536,12 +1536,12 @@ void kvm_mmu_uninit_vm(struct kvm *kvm);
- void kvm_mmu_after_set_cpuid(struct kvm_vcpu *vcpu);
- void kvm_mmu_reset_context(struct kvm_vcpu *vcpu);
- void kvm_mmu_slot_remove_write_access(struct kvm *kvm,
--				      struct kvm_memory_slot *memslot,
-+				      const struct kvm_memory_slot *memslot,
- 				      int start_level);
- void kvm_mmu_zap_collapsible_sptes(struct kvm *kvm,
- 				   const struct kvm_memory_slot *memslot);
- void kvm_mmu_slot_leaf_clear_dirty(struct kvm *kvm,
--				   struct kvm_memory_slot *memslot);
-+				   const struct kvm_memory_slot *memslot);
- void kvm_mmu_zap_all(struct kvm *kvm);
- void kvm_mmu_invalidate_mmio_sptes(struct kvm *kvm, u64 gen);
- unsigned long kvm_mmu_calculate_default_mmu_pages(struct kvm *kvm);
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index 845d114ae075..39ee8df5cc1f 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -784,7 +784,7 @@ static struct kvm_lpage_info *lpage_info_slot(gfn_t gfn,
- 	return &slot->arch.lpage_info[level - 2][idx];
- }
- 
--static void update_gfn_disallow_lpage_count(struct kvm_memory_slot *slot,
-+static void update_gfn_disallow_lpage_count(const struct kvm_memory_slot *slot,
- 					    gfn_t gfn, int count)
- {
- 	struct kvm_lpage_info *linfo;
-@@ -797,12 +797,12 @@ static void update_gfn_disallow_lpage_count(struct kvm_memory_slot *slot,
- 	}
- }
- 
--void kvm_mmu_gfn_disallow_lpage(struct kvm_memory_slot *slot, gfn_t gfn)
-+void kvm_mmu_gfn_disallow_lpage(const struct kvm_memory_slot *slot, gfn_t gfn)
- {
- 	update_gfn_disallow_lpage_count(slot, gfn, 1);
- }
- 
--void kvm_mmu_gfn_allow_lpage(struct kvm_memory_slot *slot, gfn_t gfn)
-+void kvm_mmu_gfn_allow_lpage(const struct kvm_memory_slot *slot, gfn_t gfn)
- {
- 	update_gfn_disallow_lpage_count(slot, gfn, -1);
- }
-@@ -989,7 +989,7 @@ static void pte_list_remove(struct kvm_rmap_head *rmap_head, u64 *sptep)
- }
- 
- static struct kvm_rmap_head *__gfn_to_rmap(gfn_t gfn, int level,
--					   struct kvm_memory_slot *slot)
-+					   const struct kvm_memory_slot *slot)
- {
- 	unsigned long idx;
- 
-@@ -1216,7 +1216,7 @@ static bool spte_wrprot_for_clear_dirty(u64 *sptep)
-  * Returns true iff any D or W bits were cleared.
-  */
- static bool __rmap_clear_dirty(struct kvm *kvm, struct kvm_rmap_head *rmap_head,
--			       struct kvm_memory_slot *slot)
-+			       const struct kvm_memory_slot *slot)
- {
- 	u64 *sptep;
- 	struct rmap_iterator iter;
-@@ -1375,7 +1375,7 @@ static bool rmap_write_protect(struct kvm_vcpu *vcpu, u64 gfn)
- }
- 
- static bool kvm_zap_rmapp(struct kvm *kvm, struct kvm_rmap_head *rmap_head,
--			  struct kvm_memory_slot *slot)
-+			  const struct kvm_memory_slot *slot)
- {
- 	u64 *sptep;
- 	struct rmap_iterator iter;
-@@ -1440,7 +1440,7 @@ static bool kvm_set_pte_rmapp(struct kvm *kvm, struct kvm_rmap_head *rmap_head,
- 
- struct slot_rmap_walk_iterator {
- 	/* input fields. */
--	struct kvm_memory_slot *slot;
-+	const struct kvm_memory_slot *slot;
- 	gfn_t start_gfn;
- 	gfn_t end_gfn;
- 	int start_level;
-@@ -1467,16 +1467,20 @@ rmap_walk_init_level(struct slot_rmap_walk_iterator *iterator, int level)
- 
- static void
- slot_rmap_walk_init(struct slot_rmap_walk_iterator *iterator,
--		    struct kvm_memory_slot *slot, int start_level,
-+		    const struct kvm_memory_slot *slot, int start_level,
- 		    int end_level, gfn_t start_gfn, gfn_t end_gfn)
- {
--	iterator->slot = slot;
--	iterator->start_level = start_level;
--	iterator->end_level = end_level;
--	iterator->start_gfn = start_gfn;
--	iterator->end_gfn = end_gfn;
-+	struct slot_rmap_walk_iterator iter = {
-+		.slot = slot,
-+		.start_gfn = start_gfn,
-+		.end_gfn = end_gfn,
-+		.start_level = start_level,
-+		.end_level = end_level,
-+	};
-+
-+	rmap_walk_init_level(&iter, iterator->start_level);
- 
--	rmap_walk_init_level(iterator, iterator->start_level);
-+	memcpy(iterator, &iter, sizeof(struct slot_rmap_walk_iterator));
- }
- 
- static bool slot_rmap_walk_okay(struct slot_rmap_walk_iterator *iterator)
-@@ -5274,12 +5278,13 @@ void kvm_configure_mmu(bool enable_tdp, int tdp_max_root_level,
- EXPORT_SYMBOL_GPL(kvm_configure_mmu);
- 
- /* The return value indicates if tlb flush on all vcpus is needed. */
--typedef bool (*slot_level_handler) (struct kvm *kvm, struct kvm_rmap_head *rmap_head,
--				    struct kvm_memory_slot *slot);
-+typedef bool (*slot_level_handler) (struct kvm *kvm,
-+				    struct kvm_rmap_head *rmap_head,
-+				    const struct kvm_memory_slot *slot);
- 
- /* The caller should hold mmu-lock before calling this function. */
- static __always_inline bool
--slot_handle_level_range(struct kvm *kvm, struct kvm_memory_slot *memslot,
-+slot_handle_level_range(struct kvm *kvm, const struct kvm_memory_slot *memslot,
- 			slot_level_handler fn, int start_level, int end_level,
- 			gfn_t start_gfn, gfn_t end_gfn, bool flush_on_yield,
- 			bool flush)
-@@ -5306,7 +5311,7 @@ slot_handle_level_range(struct kvm *kvm, struct kvm_memory_slot *memslot,
- }
- 
- static __always_inline bool
--slot_handle_level(struct kvm *kvm, struct kvm_memory_slot *memslot,
-+slot_handle_level(struct kvm *kvm, const struct kvm_memory_slot *memslot,
- 		  slot_level_handler fn, int start_level, int end_level,
- 		  bool flush_on_yield)
- {
-@@ -5317,7 +5322,7 @@ slot_handle_level(struct kvm *kvm, struct kvm_memory_slot *memslot,
- }
- 
- static __always_inline bool
--slot_handle_leaf(struct kvm *kvm, struct kvm_memory_slot *memslot,
-+slot_handle_leaf(struct kvm *kvm, const struct kvm_memory_slot *memslot,
- 		 slot_level_handler fn, bool flush_on_yield)
- {
- 	return slot_handle_level(kvm, memslot, fn, PG_LEVEL_4K,
-@@ -5576,7 +5581,8 @@ void kvm_zap_gfn_range(struct kvm *kvm, gfn_t gfn_start, gfn_t gfn_end)
- 				if (start >= end)
- 					continue;
- 
--				flush = slot_handle_level_range(kvm, memslot,
-+				flush = slot_handle_level_range(kvm,
-+						(const struct kvm_memory_slot *) memslot,
- 						kvm_zap_rmapp, PG_LEVEL_4K,
- 						KVM_MAX_HUGEPAGE_LEVEL, start,
- 						end - 1, true, flush);
-@@ -5604,13 +5610,13 @@ void kvm_zap_gfn_range(struct kvm *kvm, gfn_t gfn_start, gfn_t gfn_end)
- 
- static bool slot_rmap_write_protect(struct kvm *kvm,
- 				    struct kvm_rmap_head *rmap_head,
--				    struct kvm_memory_slot *slot)
-+				    const struct kvm_memory_slot *slot)
- {
- 	return __rmap_write_protect(kvm, rmap_head, false);
- }
- 
- void kvm_mmu_slot_remove_write_access(struct kvm *kvm,
--				      struct kvm_memory_slot *memslot,
-+				      const struct kvm_memory_slot *memslot,
- 				      int start_level)
- {
- 	bool flush = false;
-@@ -5646,7 +5652,7 @@ void kvm_mmu_slot_remove_write_access(struct kvm *kvm,
- 
- static bool kvm_mmu_zap_collapsible_spte(struct kvm *kvm,
- 					 struct kvm_rmap_head *rmap_head,
--					 struct kvm_memory_slot *slot)
-+					 const struct kvm_memory_slot *slot)
- {
- 	u64 *sptep;
- 	struct rmap_iterator iter;
-@@ -5685,10 +5691,8 @@ static bool kvm_mmu_zap_collapsible_spte(struct kvm *kvm,
- }
- 
- void kvm_mmu_zap_collapsible_sptes(struct kvm *kvm,
--				   const struct kvm_memory_slot *memslot)
-+				   const struct kvm_memory_slot *slot)
- {
--	/* FIXME: const-ify all uses of struct kvm_memory_slot.  */
--	struct kvm_memory_slot *slot = (struct kvm_memory_slot *)memslot;
- 	bool flush = false;
- 
- 	if (kvm_memslots_have_rmaps(kvm)) {
-@@ -5724,7 +5728,7 @@ void kvm_arch_flush_remote_tlbs_memslot(struct kvm *kvm,
- }
- 
- void kvm_mmu_slot_leaf_clear_dirty(struct kvm *kvm,
--				   struct kvm_memory_slot *memslot)
-+				   const struct kvm_memory_slot *memslot)
- {
- 	bool flush = false;
- 
-diff --git a/arch/x86/kvm/mmu/mmu_internal.h b/arch/x86/kvm/mmu/mmu_internal.h
-index 35567293c1fd..ee4ad9c99219 100644
---- a/arch/x86/kvm/mmu/mmu_internal.h
-+++ b/arch/x86/kvm/mmu/mmu_internal.h
-@@ -124,8 +124,8 @@ static inline bool is_nx_huge_page_enabled(void)
- 
- int mmu_try_to_unsync_pages(struct kvm_vcpu *vcpu, gfn_t gfn, bool can_unsync);
- 
--void kvm_mmu_gfn_disallow_lpage(struct kvm_memory_slot *slot, gfn_t gfn);
--void kvm_mmu_gfn_allow_lpage(struct kvm_memory_slot *slot, gfn_t gfn);
-+void kvm_mmu_gfn_disallow_lpage(const struct kvm_memory_slot *slot, gfn_t gfn);
-+void kvm_mmu_gfn_allow_lpage(const struct kvm_memory_slot *slot, gfn_t gfn);
- bool kvm_mmu_slot_gfn_write_protect(struct kvm *kvm,
- 				    struct kvm_memory_slot *slot, u64 gfn,
- 				    int min_level);
-diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
-index 0853370bd811..5d8d69d56a81 100644
---- a/arch/x86/kvm/mmu/tdp_mmu.c
-+++ b/arch/x86/kvm/mmu/tdp_mmu.c
-@@ -1242,8 +1242,8 @@ static bool wrprot_gfn_range(struct kvm *kvm, struct kvm_mmu_page *root,
-  * only affect leaf SPTEs down to min_level.
-  * Returns true if an SPTE has been changed and the TLBs need to be flushed.
-  */
--bool kvm_tdp_mmu_wrprot_slot(struct kvm *kvm, struct kvm_memory_slot *slot,
--			     int min_level)
-+bool kvm_tdp_mmu_wrprot_slot(struct kvm *kvm,
-+			     const struct kvm_memory_slot *slot, int min_level)
- {
- 	struct kvm_mmu_page *root;
- 	bool spte_set = false;
-@@ -1313,7 +1313,8 @@ static bool clear_dirty_gfn_range(struct kvm *kvm, struct kvm_mmu_page *root,
-  * each SPTE. Returns true if an SPTE has been changed and the TLBs need to
-  * be flushed.
-  */
--bool kvm_tdp_mmu_clear_dirty_slot(struct kvm *kvm, struct kvm_memory_slot *slot)
-+bool kvm_tdp_mmu_clear_dirty_slot(struct kvm *kvm,
-+				  const struct kvm_memory_slot *slot)
- {
- 	struct kvm_mmu_page *root;
- 	bool spte_set = false;
-diff --git a/arch/x86/kvm/mmu/tdp_mmu.h b/arch/x86/kvm/mmu/tdp_mmu.h
-index 1cae4485b3bc..49437dbb4804 100644
---- a/arch/x86/kvm/mmu/tdp_mmu.h
-+++ b/arch/x86/kvm/mmu/tdp_mmu.h
-@@ -61,10 +61,10 @@ bool kvm_tdp_mmu_age_gfn_range(struct kvm *kvm, struct kvm_gfn_range *range);
- bool kvm_tdp_mmu_test_age_gfn(struct kvm *kvm, struct kvm_gfn_range *range);
- bool kvm_tdp_mmu_set_spte_gfn(struct kvm *kvm, struct kvm_gfn_range *range);
- 
--bool kvm_tdp_mmu_wrprot_slot(struct kvm *kvm, struct kvm_memory_slot *slot,
--			     int min_level);
-+bool kvm_tdp_mmu_wrprot_slot(struct kvm *kvm,
-+			     const struct kvm_memory_slot *slot, int min_level);
- bool kvm_tdp_mmu_clear_dirty_slot(struct kvm *kvm,
--				  struct kvm_memory_slot *slot);
-+				  const struct kvm_memory_slot *slot);
- void kvm_tdp_mmu_clear_dirty_pt_masked(struct kvm *kvm,
- 				       struct kvm_memory_slot *slot,
- 				       gfn_t gfn, unsigned long mask,
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index c6dc1b445231..970e95110175 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -11473,7 +11473,7 @@ static void kvm_mmu_update_cpu_dirty_logging(struct kvm *kvm, bool enable)
- 
- static void kvm_mmu_slot_apply_flags(struct kvm *kvm,
- 				     struct kvm_memory_slot *old,
--				     struct kvm_memory_slot *new,
-+				     const struct kvm_memory_slot *new,
- 				     enum kvm_mr_change change)
- {
- 	bool log_dirty_pages = new->flags & KVM_MEM_LOG_DIRTY_PAGES;
-@@ -11553,10 +11553,7 @@ void kvm_arch_commit_memory_region(struct kvm *kvm,
- 		kvm_mmu_change_mmu_pages(kvm,
- 				kvm_mmu_calculate_default_mmu_pages(kvm));
- 
--	/*
--	 * FIXME: const-ify all uses of struct kvm_memory_slot.
--	 */
--	kvm_mmu_slot_apply_flags(kvm, old, (struct kvm_memory_slot *) new, change);
-+	kvm_mmu_slot_apply_flags(kvm, old, new, change);
- 
- 	/* Free the arrays associated with the old memslot. */
- 	if (change == KVM_MR_MOVE)
--- 
-2.32.0
+> 
+> > > NPT horror is a much bigger testing gap (because KVM doesn't support it), but on
+> > > the other hand setting EFER.NX for !PAE kernels appears to be trivial, e.g.
+> > > 
+> > > diff --git a/arch/x86/kernel/head_32.S b/arch/x86/kernel/head_32.S
+> > > index 67f590425d90..bfbea25a9fe8 100644
+> > > --- a/arch/x86/kernel/head_32.S
+> > > +++ b/arch/x86/kernel/head_32.S
+> > > @@ -214,12 +214,6 @@ SYM_FUNC_START(startup_32_smp)
+> > >         andl $~1,%edx                   # Ignore CPUID.FPU
+> > >         jz .Lenable_paging              # No flags or only CPUID.FPU = no CR4
+> > > 
+> > > -       movl pa(mmu_cr4_features),%eax
+> > > -       movl %eax,%cr4
+> > > -
+> > > -       testb $X86_CR4_PAE, %al         # check if PAE is enabled
+> > > -       jz .Lenable_paging
+> > > -
+> > >         /* Check if extended functions are implemented */
+> > >         movl $0x80000000, %eax
+> > >         cpuid
+> > > 
+> > > My only hesitation is the risk of somehow breaking ancient CPUs by falling into
+> > > the NX path.  Maybe try forcing EFER.NX=1 for !PAE, and fall back to requiring
+> > > PAE if that gets NAK'd or needs to be reverted for whatever reason?
+> > > 
+> > 
+> > One more dumb question: are you planning to set NX for linux with !PAE?
+> 
+> Yep.
+> 
+> > Why do we need EFER in that case? Thanks! :)
+> 
+> Because as you rightly remembered above, KVM always uses PAE paging for the guest,
+> even when the host is !PAE.  And KVM also requires EFER.NX=1 for the guest when
+> using shadow paging to handle a potential SMEP and !WP case.  
+> 
 
+Just saw this in update_transition_efer(), which now enables efer.nx in shadow
+unconditionally. But I guess the host kernel still needs to set efer.nx for
+!PAE(e.g. in head_32.S), because the guest may not touch efer at all. Is this
+correct?
+
+B.R.
+Yu
