@@ -2,52 +2,52 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 48B323C7845
-	for <lists+kvm@lfdr.de>; Tue, 13 Jul 2021 22:56:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 003B03C7852
+	for <lists+kvm@lfdr.de>; Tue, 13 Jul 2021 22:58:08 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235139AbhGMU7J (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 13 Jul 2021 16:59:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48284 "EHLO
+        id S235750AbhGMVAu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 13 Jul 2021 17:00:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48668 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234290AbhGMU7I (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 13 Jul 2021 16:59:08 -0400
-Received: from mail-pl1-x636.google.com (mail-pl1-x636.google.com [IPv6:2607:f8b0:4864:20::636])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A07F0C0613E9
-        for <kvm@vger.kernel.org>; Tue, 13 Jul 2021 13:56:17 -0700 (PDT)
-Received: by mail-pl1-x636.google.com with SMTP id j3so63966plx.7
-        for <kvm@vger.kernel.org>; Tue, 13 Jul 2021 13:56:17 -0700 (PDT)
+        with ESMTP id S235717AbhGMVAs (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 13 Jul 2021 17:00:48 -0400
+Received: from mail-pj1-x102a.google.com (mail-pj1-x102a.google.com [IPv6:2607:f8b0:4864:20::102a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 43CF6C0613E9
+        for <kvm@vger.kernel.org>; Tue, 13 Jul 2021 13:57:58 -0700 (PDT)
+Received: by mail-pj1-x102a.google.com with SMTP id o3-20020a17090a6783b0290173ce472b8aso2148708pjj.2
+        for <kvm@vger.kernel.org>; Tue, 13 Jul 2021 13:57:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=LMLZw+7kP17xj8iob4CnXRS8mLPc06HVwcScbSpgmog=;
-        b=DbhUnemaxXAYoclSgYPqjmzCgDcfvbTt0Fp2D3iAma0zwBxS/PVN+wOVRPnC4yPEXP
-         56fAdE8DeC5XAmFGZI1M6jOscQOIWAOLas285nt9xvjZiSVQsc5VDJtd9ZQHTOk5EVvx
-         9Z6DqQtUPkBOCvJd+rRYaB0zDlhvhs8VX82lgwiPf6AYDwItMgV6UFfcd9tmSMQuI85f
-         92mxF8FyStxwL5H2rKfLi7cakA6gtrS9QZU11Ty6YAj4rXYy1YX0fzHhNSN8xukw81EC
-         sZ1dBuH25Jl8vnQek1/rexfaZYFIKrcC34oedX3HJOdABtebYdwYWXEIfeMuMY0SdkA8
-         v6ug==
+        bh=1DqW0KvhYSIK42zC7O5KI/TTNeM/zzYloShAYV2CzpE=;
+        b=eWyy0jddXtN29MpB2D2HVwuG3z4IKomgwIsIgLyaih5fTxUChd13N0JRqGOH80TUV+
+         WtqjwGggJAMvnUEwcpeOUkWoICip1CFGD6LSbIFPQ+wQDcOTBSZGeJgdu0so8TLAuQCw
+         oHmKKJAgNUnMBXm4STr7NZLHun8HTh6onEXkPPMIj1AZVA3wPrmK32lV7O5UckRUb1XD
+         AtVCkzcbSJxZBStCGdGEtsIi7kZkgRq/EyKjVjlA+ASpzY3kMPEyHObTlEUF1UhOXWC1
+         Dpc6t6V9iaEwfyb6IENuWGS/42LpLBpiqEfkPie3xpwF0fn/zPrKcoUu3w/T0kVE/AmE
+         NouQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=LMLZw+7kP17xj8iob4CnXRS8mLPc06HVwcScbSpgmog=;
-        b=plhiNG5Q8jYHDhybxU/nMaVhJnI3uzbusCVgkPdcbUHQUEVjt4xHcoWaT1dRSUSTn4
-         NX/I+tqv5XGbdP69tjr/Awn+SCDyJo1y5gCgc/LG51ux6EBKtasF4e7Adb7CNpm3lrZP
-         z92NALMkYSVu2iYG2v5f/ZowOlcBnI3wFGDZ6Ja2gOW6tvwWhfXmM4dinpJ7zVZEOq9s
-         9m2zKJ/Jddwp2xJRT9LrF5hxOgC8s1hz7Z/Zl1Zndm5NHyadUvvs7S0UQFjUMcGM4X2k
-         IuIcp3AzOQglu0Ka1+VkiiUICukXRr/YHr8GFDLhLGiDIRu1cZ7vHyUC8gqs09k+bA91
-         NeqQ==
-X-Gm-Message-State: AOAM530mKuBpi6W0il9sbMAEwFsAYYixT4SczmikHoHXrUKfl2AHdWfV
-        ow+Hk2l8DOKIUyrK9q0ihPbqBA==
-X-Google-Smtp-Source: ABdhPJwppbUt2eHS1spdEOKVMbf1fSzhtbIwYnWe8xIFSfLd75nFK+mE2w4E+UrVxpXtbpNpKe9XHg==
-X-Received: by 2002:a17:90a:510b:: with SMTP id t11mr135413pjh.178.1626209776872;
-        Tue, 13 Jul 2021 13:56:16 -0700 (PDT)
+        bh=1DqW0KvhYSIK42zC7O5KI/TTNeM/zzYloShAYV2CzpE=;
+        b=Z6JUb2qqCaCNyBpR+MajdzsN/Gfv4E059eVU8uwt/Y7Mmk3QSAhCkm9EROA3IM+W5m
+         gbcCmAXifrVSVNVZmvMTcpJgLYv2iu0/MywGvMl3F+mTiNU9M486vHZ0FZO8pWcdjndJ
+         W3LjXoiijuUwywaZ3J6F9wbwegMAk500IrCr72N/g5okmL314TVm6plsA22P5w1G5QwI
+         ij/h9xBol4TKG8uxMoOnk//ptaQa0McezY8aNDIwKrwvxmlvDGV6uVL9rbMGOcNiVQpI
+         fyogyF6zHwrx+1CXZ95qf0R1+iARdSTzMm105qI6uyU0/Ehqb9ozxaX1An2QwYKs8iF7
+         7J/A==
+X-Gm-Message-State: AOAM531B1jnA+a3M8gP6zvF63JZrbsQEj+EJmv1gQGbmZDl6HWnOSZ0E
+        OaafVgIE33VYpRYKjTlFsmmxMA==
+X-Google-Smtp-Source: ABdhPJwSZs/McCYhg/hhS8WKfqryjNr8b0GDcFuBCWzj9pFrQyNjwnmRhy2UDrMeRnVoncYXBv7KMg==
+X-Received: by 2002:a17:902:8ec4:b029:129:7649:87b7 with SMTP id x4-20020a1709028ec4b0290129764987b7mr4881431plo.23.1626209877658;
+        Tue, 13 Jul 2021 13:57:57 -0700 (PDT)
 Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id j21sm57759pjz.26.2021.07.13.13.56.16
+        by smtp.gmail.com with ESMTPSA id m24sm6619pgv.24.2021.07.13.13.57.57
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 13 Jul 2021 13:56:16 -0700 (PDT)
-Date:   Tue, 13 Jul 2021 20:56:12 +0000
+        Tue, 13 Jul 2021 13:57:57 -0700 (PDT)
+Date:   Tue, 13 Jul 2021 20:57:53 +0000
 From:   Sean Christopherson <seanjc@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     isaku.yamahata@intel.com, Thomas Gleixner <tglx@linutronix.de>,
@@ -61,52 +61,43 @@ Cc:     isaku.yamahata@intel.com, Thomas Gleixner <tglx@linutronix.de>,
         linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
         isaku.yamahata@gmail.com,
         Sean Christopherson <sean.j.christopherson@intel.com>
-Subject: Re: [RFC PATCH v2 60/69] KVM: VMX: Add macro framework to read/write
- VMCS for VMs and TDs
-Message-ID: <YO397L2OQXFBZN5q@google.com>
+Subject: Re: [RFC PATCH v2 52/69] KVM: VMX: Split out guts of EPT violation
+ to common/exposed function
+Message-ID: <YO3+UTNfbxdKNCJt@google.com>
 References: <cover.1625186503.git.isaku.yamahata@intel.com>
- <5735bf9268130a70b49bc32ff4b68ffc53ee788c.1625186503.git.isaku.yamahata@intel.com>
- <71ee8575-bd72-f51e-38c5-4e8411b8aedd@redhat.com>
+ <8e246d479e8986172d19704ef4ef4d2b666d5ac1.1625186503.git.isaku.yamahata@intel.com>
+ <6e129879-bb76-622e-19a9-afb62fcf864b@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <71ee8575-bd72-f51e-38c5-4e8411b8aedd@redhat.com>
+In-Reply-To: <6e129879-bb76-622e-19a9-afb62fcf864b@redhat.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 On Tue, Jul 06, 2021, Paolo Bonzini wrote:
-> On 03/07/21 00:05, isaku.yamahata@intel.com wrote:
-> > From: Sean Christopherson <sean.j.christopherson@intel.com>
-> > 
-> > Add a macro framework to hide VMX vs. TDX details of VMREAD and VMWRITE
-> > so the VMX and TDX can shared common flows, e.g. accessing DTs.
-> > 
-> > Note, the TDX paths are dead code at this time.  There is no great way
-> > to deal with the chicken-and-egg scenario of having things in place for
-> > TDX without first having TDX.
-> > 
-> > Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
-> > Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
-> > ---
-> >   arch/x86/kvm/vmx/common.h | 41 +++++++++++++++++++++++++++++++++++++++
-> >   1 file changed, 41 insertions(+)
-> > 
-> > diff --git a/arch/x86/kvm/vmx/common.h b/arch/x86/kvm/vmx/common.h
-> > index 9e5865b05d47..aa6a569b87d1 100644
-> > --- a/arch/x86/kvm/vmx/common.h
-> > +++ b/arch/x86/kvm/vmx/common.h
-> > @@ -11,6 +11,47 @@
-> >   #include "vmcs.h"
-> >   #include "vmx.h"
-> >   #include "x86.h"
-> > +#include "tdx.h"
-> > +
-> > +#ifdef CONFIG_KVM_INTEL_TDX
-> 
-> Is this #ifdef needed at all if tdx.h properly stubs is_td_vcpu (to return
-> false) and possibly declares a dummy version of td_vmcs_read/td_vmcs_write?
+> On 03/07/21 00:04, isaku.yamahata@intel.com wrote:
+> > +static inline int __vmx_handle_ept_violation(struct kvm_vcpu *vcpu, gpa_t gpa,
+> > +					     unsigned long exit_qualification)
+> > +{
 
-IIRC, it requires dummy versions of is_debug_td() and all the ##bits variants of
-td_vmcs_read/write().  I'm not sure if I ever actually tried that, e.g. to see
-if the compiler completely elided the TDX crud when CONFIG_KVM_INTEL_TDX=n.
+...
+
+> > +}
+> > +
+
+...
+
+> > @@ -5379,7 +5356,7 @@ static int handle_ept_violation(struct kvm_vcpu *vcpu)
+> >   	if (unlikely(allow_smaller_maxphyaddr && kvm_vcpu_is_illegal_gpa(vcpu, gpa)))
+> >   		return kvm_emulate_instruction(vcpu, 0);
+> > -	return kvm_mmu_page_fault(vcpu, gpa, error_code, NULL, 0);
+> > +	return __vmx_handle_ept_violation(vcpu, gpa, exit_qualification);
+> >   }
+> >   static int handle_ept_misconfig(struct kvm_vcpu *vcpu)
+> > 
+> 
+> This should be in main.c, not in a header (and named
+> __vt_handle_ept_qualification).
+
+Yar, though I'm guessing you meant __vt_handle_ept_violation?
