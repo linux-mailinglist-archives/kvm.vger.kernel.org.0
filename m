@@ -2,174 +2,98 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C40FC3C720D
-	for <lists+kvm@lfdr.de>; Tue, 13 Jul 2021 16:21:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D1BBE3C7266
+	for <lists+kvm@lfdr.de>; Tue, 13 Jul 2021 16:40:00 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236934AbhGMOYC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 13 Jul 2021 10:24:02 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:22426 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S236924AbhGMOYA (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 13 Jul 2021 10:24:00 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1626186070;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=BX+YylLZ9qZgcimj05R9RtZJMGcNZYW90ShLadETE08=;
-        b=CYtZpizeBP/Zgr+j4yNUo8uf6+Cu8gwjLM3uKqiviX2uWNDTGJimI78uKzqcE8wkyx6CEv
-        QB6XYxz7l5050ZofLevAJsNBoRuO6JnBwKhm+oArkvrLvLSIPuKY4SzW8GuUWNFq0wtrAg
-        gJZ3X0BUpvKgSQQeJ9ix6DOZTw/VIuw=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-466-lqZq-iSMNI2od2dx-Jcj9Q-1; Tue, 13 Jul 2021 10:21:08 -0400
-X-MC-Unique: lqZq-iSMNI2od2dx-Jcj9Q-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id ED31C101F000;
-        Tue, 13 Jul 2021 14:21:06 +0000 (UTC)
-Received: from localhost.localdomain (unknown [10.40.192.10])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id D11D65D6AB;
-        Tue, 13 Jul 2021 14:21:02 +0000 (UTC)
-From:   Maxim Levitsky <mlevitsk@redhat.com>
-To:     kvm@vger.kernel.org
-Cc:     linux-kernel@vger.kernel.org (open list:X86 ARCHITECTURE (32-BIT AND
-        64-BIT)), Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, Borislav Petkov <bp@alien8.de>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ingo Molnar <mingo@redhat.com>,
-        x86@kernel.org (maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)),
-        Sean Christopherson <seanjc@google.com>,
-        Maxim Levitsky <mlevitsk@redhat.com>
-Subject: [PATCH v2 8/8] KVM: x86: hyper-v: Deactivate APICv only when AutoEOI feature is in use
-Date:   Tue, 13 Jul 2021 17:20:23 +0300
-Message-Id: <20210713142023.106183-9-mlevitsk@redhat.com>
-In-Reply-To: <20210713142023.106183-1-mlevitsk@redhat.com>
-References: <20210713142023.106183-1-mlevitsk@redhat.com>
+        id S236872AbhGMOmp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 13 Jul 2021 10:42:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46564 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S236636AbhGMOmp (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 13 Jul 2021 10:42:45 -0400
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7D678C0613DD
+        for <kvm@vger.kernel.org>; Tue, 13 Jul 2021 07:39:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+        MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+        Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+        List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+         bh=SJJMrxtMNFqRvemONP1f4NnQi5qafts1cHoez9F3skE=; b=gl70oHKF6x5JHToNhVhDWqKOL
+        JPTvLKHhNDqsg5zHBfI7iMMI17d3Z5JZA4HtyKekNYDXXXnYdfZI9QM3hKg9lyHSYz2eR1j7teD+D
+        stciPEAXNl1laacDnsuHrcuym53mrrwHFvM42qvEh+zwSNVKI5g3tkaLXq+xhxR+0+Zp6nk08EO2x
+        VMvDpW3eDqlraIQUBNqpcfo4KYWqZYXyycg7Pzlx+Z+9KOJbbSyvGPMIAq65AsuhRJiHodJKSpBV7
+        wvfmX4+NHUbtchvCyy13+nNhl61XEaftoRi/3S2fmGEoX4jcSXOLt8KSOkr/zCZeT8SzmKJ0p3Iaf
+        Gq9U1G/9A==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:46056)
+        by pandora.armlinux.org.uk with esmtpsa (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+        (Exim 4.92)
+        (envelope-from <linux@armlinux.org.uk>)
+        id 1m3JZg-0006DA-4G; Tue, 13 Jul 2021 15:39:52 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.92)
+        (envelope-from <linux@shell.armlinux.org.uk>)
+        id 1m3JZd-0000OC-Uk; Tue, 13 Jul 2021 15:39:49 +0100
+Date:   Tue, 13 Jul 2021 15:39:49 +0100
+From:   "Russell King (Oracle)" <linux@armlinux.org.uk>
+To:     Marc Zyngier <maz@kernel.org>
+Cc:     linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org,
+        kvmarm@lists.cs.columbia.edu, James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Alexandre Chartre <alexandre.chartre@oracle.com>,
+        Robin Murphy <robin.murphy@arm.com>, kernel-team@android.com
+Subject: Re: [PATCH 1/3] KVM: arm64: Narrow PMU sysreg reset values to
+ architectural requirements
+Message-ID: <20210713143949.GJ22278@shell.armlinux.org.uk>
+References: <20210713135900.1473057-1-maz@kernel.org>
+ <20210713135900.1473057-2-maz@kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210713135900.1473057-2-maz@kernel.org>
+User-Agent: Mutt/1.10.1 (2018-07-13)
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Vitaly Kuznetsov <vkuznets@redhat.com>
+On Tue, Jul 13, 2021 at 02:58:58PM +0100, Marc Zyngier wrote:
+> +static void reset_pmu_reg(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r)
+> +{
+> +	u64 n, mask;
+> +
+> +	/* No PMU available, any PMU reg may UNDEF... */
+> +	if (!kvm_arm_support_pmu_v3())
+> +		return;
+> +
+> +	n = read_sysreg(pmcr_el0) >> ARMV8_PMU_PMCR_N_SHIFT;
+> +	n &= ARMV8_PMU_PMCR_N_MASK;
+> +
+> +	reset_unknown(vcpu, r);
+> +
+> +	mask = BIT(ARMV8_PMU_CYCLE_IDX);
+> +	if (n)
+> +		mask |= GENMASK(n - 1, 0);
+> +
+> +	__vcpu_sys_reg(vcpu, r->reg) &= mask;
 
-APICV_INHIBIT_REASON_HYPERV is currently unconditionally forced upon
-SynIC activation as SynIC's AutoEOI is incompatible with APICv/AVIC. It is,
-however, possible to track whether the feature was actually used by the
-guest and only inhibit APICv/AVIC when needed.
+Would this read more logically to structure it as:
 
-TLFS suggests a dedicated 'HV_DEPRECATING_AEOI_RECOMMENDED' flag to let
-Windows know that AutoEOI feature should be avoided. While it's up to
-KVM userspace to set the flag, KVM can help a bit by exposing global
-APICv/AVIC enablement: in case APICv/AVIC usage is impossible, AutoEOI
-is still preferred.
+	mask = BIT(ARMV8_PMU_CYCLE_IDX);
 
-Maxim:
-   - added SRCU lock drop around call to kvm_request_apicv_update
-   - always set HV_DEPRECATING_AEOI_RECOMMENDED in kvm_get_hv_cpuid,
-     since this feature can be used regardless of AVIC
+	n = read_sysreg(pmcr_el0) >> ARMV8_PMU_PMCR_N_SHIFT;
+	n &= ARMV8_PMU_PMCR_N_MASK;
+	if (n)
+		mask |= GENMASK(n - 1, 0);
 
-Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
-Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
----
- arch/x86/include/asm/kvm_host.h |  3 +++
- arch/x86/kvm/hyperv.c           | 34 +++++++++++++++++++++++++++------
- 2 files changed, 31 insertions(+), 6 deletions(-)
+	reset_unknown(vcpu, r);
+	__vcpu_sys_reg(vcpu, r->reg) &= mask;
 
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index e11d64aa0bcd..f900dca58af8 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -956,6 +956,9 @@ struct kvm_hv {
- 	/* How many vCPUs have VP index != vCPU index */
- 	atomic_t num_mismatched_vp_indexes;
- 
-+	/* How many SynICs use 'AutoEOI' feature */
-+	atomic_t synic_auto_eoi_used;
-+
- 	struct hv_partition_assist_pg *hv_pa_pg;
- 	struct kvm_hv_syndbg hv_syndbg;
- };
-diff --git a/arch/x86/kvm/hyperv.c b/arch/x86/kvm/hyperv.c
-index b07592ca92f0..6bf47a583d0e 100644
---- a/arch/x86/kvm/hyperv.c
-+++ b/arch/x86/kvm/hyperv.c
-@@ -85,9 +85,22 @@ static bool synic_has_vector_auto_eoi(struct kvm_vcpu_hv_synic *synic,
- 	return false;
- }
- 
-+
-+static void synic_toggle_avic(struct kvm_vcpu *vcpu, bool activate)
-+{
-+	srcu_read_unlock(&vcpu->kvm->srcu, vcpu->srcu_idx);
-+	kvm_request_apicv_update(vcpu->kvm, activate,
-+			APICV_INHIBIT_REASON_HYPERV);
-+	vcpu->srcu_idx = srcu_read_lock(&vcpu->kvm->srcu);
-+}
-+
- static void synic_update_vector(struct kvm_vcpu_hv_synic *synic,
- 				int vector)
- {
-+	struct kvm_vcpu *vcpu = hv_synic_to_vcpu(synic);
-+	struct kvm_hv *hv = to_kvm_hv(vcpu->kvm);
-+	int auto_eoi_old, auto_eoi_new;
-+
- 	if (vector < HV_SYNIC_FIRST_VALID_VECTOR)
- 		return;
- 
-@@ -96,10 +109,23 @@ static void synic_update_vector(struct kvm_vcpu_hv_synic *synic,
- 	else
- 		__clear_bit(vector, synic->vec_bitmap);
- 
-+	auto_eoi_old = bitmap_weight(synic->auto_eoi_bitmap, 256);
-+
- 	if (synic_has_vector_auto_eoi(synic, vector))
- 		__set_bit(vector, synic->auto_eoi_bitmap);
- 	else
- 		__clear_bit(vector, synic->auto_eoi_bitmap);
-+
-+	auto_eoi_new = bitmap_weight(synic->auto_eoi_bitmap, 256);
-+
-+	/* Hyper-V SynIC auto EOI SINTs are not compatible with APICV */
-+	if (!auto_eoi_old && auto_eoi_new) {
-+		if (atomic_inc_return(&hv->synic_auto_eoi_used) == 1)
-+			synic_toggle_avic(vcpu, false);
-+	} else if (!auto_eoi_new && auto_eoi_old) {
-+		if (atomic_dec_return(&hv->synic_auto_eoi_used) == 0)
-+			synic_toggle_avic(vcpu, true);
-+	}
- }
- 
- static int synic_set_sint(struct kvm_vcpu_hv_synic *synic, int sint,
-@@ -933,12 +959,6 @@ int kvm_hv_activate_synic(struct kvm_vcpu *vcpu, bool dont_zero_synic_pages)
- 
- 	synic = to_hv_synic(vcpu);
- 
--	/*
--	 * Hyper-V SynIC auto EOI SINT's are
--	 * not compatible with APICV, so request
--	 * to deactivate APICV permanently.
--	 */
--	kvm_request_apicv_update(vcpu->kvm, false, APICV_INHIBIT_REASON_HYPERV);
- 	synic->active = true;
- 	synic->dont_zero_synic_pages = dont_zero_synic_pages;
- 	synic->control = HV_SYNIC_CONTROL_ENABLE;
-@@ -2466,6 +2486,8 @@ int kvm_get_hv_cpuid(struct kvm_vcpu *vcpu, struct kvm_cpuid2 *cpuid,
- 				ent->eax |= HV_X64_ENLIGHTENED_VMCS_RECOMMENDED;
- 			if (!cpu_smt_possible())
- 				ent->eax |= HV_X64_NO_NONARCH_CORESHARING;
-+
-+			ent->eax |= HV_DEPRECATING_AEOI_RECOMMENDED;
- 			/*
- 			 * Default number of spinlock retry attempts, matches
- 			 * HyperV 2016.
+?
+
+Thanks.
+
 -- 
-2.26.3
-
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 40Mbps down 10Mbps up. Decent connectivity at last!
