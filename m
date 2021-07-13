@@ -2,153 +2,431 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9C29C3C7573
-	for <lists+kvm@lfdr.de>; Tue, 13 Jul 2021 19:00:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 965F53C757C
+	for <lists+kvm@lfdr.de>; Tue, 13 Jul 2021 19:05:45 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233182AbhGMRDa (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 13 Jul 2021 13:03:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51396 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230342AbhGMRD3 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 13 Jul 2021 13:03:29 -0400
-Received: from mail-oo1-xc31.google.com (mail-oo1-xc31.google.com [IPv6:2607:f8b0:4864:20::c31])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 74B83C0613E9
-        for <kvm@vger.kernel.org>; Tue, 13 Jul 2021 10:00:38 -0700 (PDT)
-Received: by mail-oo1-xc31.google.com with SMTP id n24-20020a4ad4180000b029025bcb88a40eso4555077oos.2
-        for <kvm@vger.kernel.org>; Tue, 13 Jul 2021 10:00:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=Iyd71zygjkALjfNR6BPtRYHIjCwkNZJ9IWsAmCWNWXw=;
-        b=oKG33raUTfKzmue0/xiWngowvVuZ7RSY1xx8Sx1DoVgB3k2tEzmLQ7QtloH25idFhA
-         t5lNmLZjvGvaqzuYNAQ/yr9gAivPmkHzwf3xNPDHMW3V/NqHja7EAIkvVaVkGBp84tHQ
-         V0QTMzJK4KWJ1d75E9EA5/VjCKGALSKuFYfgC+UqT7HzjcYD1vopRSD9OKqrroRmfOXr
-         IbZAxQr+DV0kMIBMpWryUgeW4bX2SgqL6gWN7DJgkmwArwMW8eRd6Q8u0a67oiXyPEGc
-         gfBajshntHIiMg2ZHWfggkbKdj0Bav1/ng5lOPx406nUKKLLifhDOJFnugw8bV3DhAJQ
-         A8ig==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=Iyd71zygjkALjfNR6BPtRYHIjCwkNZJ9IWsAmCWNWXw=;
-        b=gSr38Y/0fYA+xIayEa1OwMwqg1qGS4hyzv1m9kmcbOEpzGWrRd4suYEJtr76E9LEh6
-         R/gHN3o3Ys3bQGb5XbsYWVR8/qMLTIr5g38GXquyAimioZ/qQ6GRYvqEr2f7kScEVNjd
-         3hMy/Sf3eQFNf5v9Rbw9r6Ypeb2oy2wQISrw6ds4Qg7DuLUXmjTRgETL7pJKClEHmrPQ
-         8aaVEWoEv3d2gOXMc6wSl9pqBD1VpFr/uVq3tErAI+AK5n7CvRG3+AX6Dz5Bz606T7lH
-         b/Lucrg7U8tUMg5B9evtrFp43XJtBVSUlaW2c1VlC/bc/jKo1BKQ0TSfu+FUs1jqkQ1w
-         CHNw==
-X-Gm-Message-State: AOAM532d8YRXoGYpoo48KEy9lqVs3Duu9Q4Ouou3E6J0RYJ5QP/9Do29
-        Cyi/1zy3SunZ7fLpto5be/GT61/hV51/PlM5SM4AGA==
-X-Google-Smtp-Source: ABdhPJyqUdx2+4+LH6kBnhmxtFqnpOsDAQJfiUPsPfAEV+M0wliH2RWETipy/jfG0iVPnPrspcVq4wo7J5wooPYl31k=
-X-Received: by 2002:a4a:6c0c:: with SMTP id q12mr4290748ooc.81.1626195636387;
- Tue, 13 Jul 2021 10:00:36 -0700 (PDT)
+        id S232254AbhGMRIa (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 13 Jul 2021 13:08:30 -0400
+Received: from foss.arm.com ([217.140.110.172]:47574 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S231837AbhGMRIa (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 13 Jul 2021 13:08:30 -0400
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id A0DD41FB;
+        Tue, 13 Jul 2021 10:05:39 -0700 (PDT)
+Received: from monolith.cable.virginm.net (unknown [172.31.20.19])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 2C4143F7D8;
+        Tue, 13 Jul 2021 10:05:38 -0700 (PDT)
+From:   Alexandru Elisei <alexandru.elisei@arm.com>
+To:     will@kernel.org, julien.thierry.kdev@gmail.com, kvm@vger.kernel.org
+Cc:     andre.przywara@arm.com, sami.mujawar@arm.com,
+        lorenzo.pieralisi@arm.com, maz@kernel.org, pierre.gondois@arm.com
+Subject: [PATCH v3 kvmtool 0/4] arm/arm64: PCI Express 1.1 support
+Date:   Tue, 13 Jul 2021 18:06:27 +0100
+Message-Id: <20210713170631.155595-1-alexandru.elisei@arm.com>
+X-Mailer: git-send-email 2.32.0
 MIME-Version: 1.0
-References: <1625825111-6604-1-git-send-email-weijiang.yang@intel.com>
- <1625825111-6604-7-git-send-email-weijiang.yang@intel.com>
- <CALMp9eQEs9pUyy1PpwLPG0_PtF07tR2Opw+1b=w4-knOwYPvvg@mail.gmail.com>
- <CALMp9eQ+9czB0ayBFR3-nW-ynKuH0v9uHAGeV4wgkXYJMSs1=w@mail.gmail.com>
- <20210712095305.GE12162@intel.com> <d73eb316-4e09-a924-5f60-e3778db91df4@gmail.com>
- <CALMp9eQmK+asv7fXeUpF2UiRKL7VmZx44HMGj67aSqm0k9nKVg@mail.gmail.com>
- <CALMp9eSWDmWerj5CaxRyMiNqnBf1akHHaWV2Cfq_66Xjg-0MEw@mail.gmail.com> <12a3e8e4-3183-9917-c9d5-59ab257b8fd3@gmail.com>
-In-Reply-To: <12a3e8e4-3183-9917-c9d5-59ab257b8fd3@gmail.com>
-From:   Jim Mattson <jmattson@google.com>
-Date:   Tue, 13 Jul 2021 10:00:25 -0700
-Message-ID: <CALMp9eROgWVBe1NuqD46xbgXHedgAFW1EMFX5zW-_Ee5enHmnw@mail.gmail.com>
-Subject: Re: [PATCH v5 06/13] KVM: x86/vmx: Save/Restore host MSR_ARCH_LBR_CTL state
-To:     Like Xu <like.xu.linux@gmail.com>
-Cc:     Yang Weijiang <weijiang.yang@intel.com>, pbonzini@redhat.com,
-        seanjc@google.com, vkuznets@redhat.com, wei.w.wang@intel.com,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        "kan.liang@linux.intel.com" <kan.liang@linux.intel.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jul 13, 2021 at 2:49 AM Like Xu <like.xu.linux@gmail.com> wrote:
->
-> On 13/7/2021 1:45 am, Jim Mattson wrote:
-> > On Mon, Jul 12, 2021 at 10:20 AM Jim Mattson <jmattson@google.com> wrot=
-e:
-> >>
-> >> On Mon, Jul 12, 2021 at 3:19 AM Like Xu <like.xu.linux@gmail.com> wrot=
-e:
-> >>>
-> >>> On 12/7/2021 5:53 pm, Yang Weijiang wrote:
-> >>>> On Fri, Jul 09, 2021 at 04:41:30PM -0700, Jim Mattson wrote:
-> >>>>> On Fri, Jul 9, 2021 at 3:54 PM Jim Mattson <jmattson@google.com> wr=
-ote:
-> >>>>>>
-> >>>>>> On Fri, Jul 9, 2021 at 2:51 AM Yang Weijiang <weijiang.yang@intel.=
-com> wrote:
-> >>>>>>>
-> >>>>>>> If host is using MSR_ARCH_LBR_CTL then save it before vm-entry
-> >>>>>>> and reload it after vm-exit.
-> >>>>>>
-> >>>>>> I don't see anything being done here "before VM-entry" or "after
-> >>>>>> VM-exit." This code seems to be invoked on vcpu_load and vcpu_put.
-> >>>>>>
-> >>>>>> In any case, I don't see why this one MSR is special. It seems tha=
-t if
-> >>>>>> the host is using the architectural LBR MSRs, then *all* of the ho=
-st
-> >>>>>> architectural LBR MSRs have to be saved on vcpu_load and restored =
-on
-> >>>>>> vcpu_put. Shouldn't  kvm_load_guest_fpu() and kvm_put_guest_fpu() =
-do
-> >>>>>> that via the calls to kvm_save_current_fpu(vcpu->arch.user_fpu) an=
-d
-> >>>>>> restore_fpregs_from_fpstate(&vcpu->arch.user_fpu->state)?
-> >>>>>
-> >>>>> It does seem like there is something special about IA32_LBR_DEPTH, =
-though...
-> >>>>>
-> >>>>> Section 7.3.1 of the Intel=C2=AE Architecture Instruction Set Exten=
-sions
-> >>>>> and Future Features Programming Reference
-> >>>>> says, "IA32_LBR_DEPTH is saved by XSAVES, but it is not written by
-> >>>>> XRSTORS in any circumstance." It seems like that would require some
-> >>>>> special handling if the host depth and the guest depth do not match=
-.
-> >>>> In our vPMU design, guest depth is alway kept the same as that of ho=
-st,
-> >>>> so this won't be a problem. But I'll double check the code again, th=
-anks!
-> >>>
-> >>> KVM only exposes the host's depth value to the user space
-> >>> so the guest can only use the same depth as the host.
-> >>
-> >> The allowed depth supplied by KVM_GET_SUPPORTED_CPUID isn't enforced,
-> >> though, is it?
->
-> Like other hardware dependent features, the functionality will not
-> promise to work properly if the guest uses the unsupported CPUID.
+Patches + EDK2 binary that I used for testing can be found at [5].
 
-It's fine if it doesn't work in the guest, but can't a guest with the
-wrong depth prevent the host LBRs from being reloaded when switching
-back to the host state? It's definitely not okay for an ill-configured
-guest to break host functionality.
+This series aims to add support for PCI Express 1.1. It is based on the
+last patch [0] of the reassignable BAR series. The patch was discarded at
+the time because there was no easy solution to solve the overlap between
+the UART address and kvmtool's PCI I/O region, which made EDK2 and/or a
+guest compiled with 64k pages very unhappy [1]. This is not the case
+anymore, as the UART has been moved to address 0x1000000 in commit
+45b4968e0de1 ("hw/serial: ARM/arm64: Use MMIO at higher addresses").
 
-> >
-> > Also, doesn't this end up being a major constraint on future
-> > platforms? Every host that this vCPU will ever run on will have to use
-> > the same LBR depth as the host on which it was started.
-> >
->
-> As a first step, we made the guest LBR feature only available for the
-> "migratable=3Doff" user space, which is why we intentionally did not add
-> MSR_ARCH_LBR_* stuff to msrs_to_save_all[] in earlier versions.
+The series has also been tested with EDK2 built from the patches [6] that
+add PCI Express when running under kvmtool. This means that someone will be
+able to download an official iso from the debian website and install it in
+a kvmtool VM.
 
-We have no such concept in our user space. Features that are not
-migratable should clearly be identified as such by an appropriate KVM
-API. At present, I don't believe there is such an API.
+The first two patches in the series are small and hopefully straightford
+cleanups for stuff that I discovered when playing with kvmtool.
 
-> But hopefully, we may make it at least migratable for Arch LBR.
->
-> I'm personally curious about the cost of using XSAVES to swicth
-> guest lbr msrs during vmx transaction, and if the cost is unacceptable,
-> we may ask the perf host to adjust different depths for threads.
->
->
+The third patch implements the PCI Express support only for the arm and
+arm64 architectures. The reason for that is that I don't know how to do it
+for x86, powerpc and mips (and for the last two I don't even have machines
+to test it).
+
+The last patch implements a fix for a Realtek RTL8168 NIC, where the Linux
+drivers falls back to a device specific method of initialization if the
+device is not PCI Express capable (doesn't have the PCI Express
+Capability) [2].
+
+
+Changes in v3
+=============
+
+* Gathered Reviewed-by tags.
+
+* Changed the way the device configuration space is created for vfio in #3
+  "arm/arm64: Add PCI Express 1.1 support". Now kvmtool will read only the
+  legacy configuration space (the first 256 bytes), instead of the entire
+  extended configuration space. This range corresponds to what is actually
+  being modified and written back to the device. PCI EXPRESS BASE
+  SPECIFICATION, REV. 1.1 defines the MSI, MSIX and PCI Express
+  capabilities as being part of the PCI 3.0 configuration space and they
+  must be accessible to legacy drivers.
+
+
+Changes in v2
+=============
+
+* Gathered Reviewed-by tag, many thanks!
+
+* Renamed #2 "arm/fdt.c: Warn if MMIO device doesn't provide a node
+  generator" to "arm/fdt.c: Don't generate the node if generator function
+  is NULL" and replaced the warning with a debug message.
+
+* Added the PCI_CAP_EXP_RC_ENDPOINT_SIZEOF_V1 define when it's not present
+  on the system in patch #4.
+
+
+Testing for v3
+==============
+
+Only light testing, since there is no functional change. Just like with v2,
+I did a sanity run on my x86 machine with SDL. Also tested on an AMD
+Seattle with an RTL8168 assigned to the VM, direct kernel boot and EDK2
+boot, 4k and 64k pages; and tested on an odroid C4, direct kernel boot and
+EDK2 boot, 4k, 16k and 64k pages.
+
+
+Testing for v2
+==============
+
+In this iteration, the only change that impacts PCI Express support is the
+addition of the PCI_CAP_EXP_RC_ENDPOINT_SIZEOF_V1 define when it's not
+present on the system. Because of this, I believe the testing I did for v1
+is still valid.
+
+However, for completeness, a did a sanity run on my x86 machine. Also, the
+EDK2 version that I used for testing on arm64 was built from a
+work-in-progress tree, and in the meantime the patches have landed on the
+mailing list [6]. I also ran some tests with EDK2 built from those patches.
+Details below.
+
+On a Ryzen 3900x:
+-----------------
+
+amd64 architecture and no PCIE support, making sure no regressions are
+introduced.
+
+1. Direct kernel boot + Debian 10 disk with SDL, to exercise the emulated
+VESA device.  Was able to login using the display manager and
+virtio-{net,blk} were working correctly.
+
+On odroid-c4:
+-------------
+
+1. Debian 10 disk + EDK2 + --force-pci. The kernel was booted via Debian
+grub, and I tried kernels compiled with 4k, 16k and 64k page sizes.
+
+On AMD Seattle:
+---------------
+
+1. Using the EDK2 image and the passthrough Realtek RTL8168 NIC as the
+network interface, and a vanilla netinstall iso from the debian website [3]
+I was able to install debian in a virtual machine. The installation hint
+from the testing for v1 still applies.
+
+2. Realtek RTL8168 + EDK2 boot + --force-pci, kernel compiled with 4k and
+64k pages (Seattle doesn't support 16k pages).
+
+3. Intel 82574L NIC + EDK2 boot + --force-pci, kernel compiled with 4k and
+64k pages.
+
+4. AMD FirePro W2100 VGA + HDMI audio (both assigned to the VM) + EDK2 boot
++ --force-pci, kernel compiled from v5.10 (see testing for v1) with 4k and
+64k pages.
+
+5. NVIDIA Quadro P400 VGA + HDMI audio (both assigned to the VM) + EDK2
+boot + --force-pci, kernel compiled with 4k and 64k pages (see testing for
+v1).
+
+
+Testing for v1
+==============
+
+Warning, wall of text. Unless specified, the guest kernel was built from
+tag v5.12.
+
+On a Ryzen 3900x:
+-----------------
+
+amd64 architecture and no PCIE support, making sure no regressions are
+introduced.
+
+1. Direct kernel boot + Debian 10 disk with SDL, to exercise the emulated
+VESA device.  Was able to login using the display manager and
+virtio-{net,blk} were working correctly.
+
+2. Direct kernel boot + Debian 10 disk with SDL + Realtek RTL8168 + Intel
+82574L PCIE NIC, both assigned to the VM. Assigning an ip address to the
+Realtek NIC fails with the message: "No native access to PCI extended
+config space, falling back to CSI", which makes sense since kvmtool is
+emulating legacy PCI 3.0 for the amd64 architecture. Other than that,
+everything works as expected.
+
+On odroid-c4:
+-------------
+
+1. Debian 10 disk + upstream EDK2 built from commit 1f515342d8d8
+("DynamicTablesPkg: Use AML_NAME_SEG_SIZE define"), **without** --force-pci
+(so using virtio-mmio). Kernel compiled with 4k, 16k and 64k pages. This
+was done to make sure there are no regressions.
+
+2. Direct kernel boot + Debian 10 disk, with --force-pci. Tried 3 versions
+of the kernel, compiled with 4k, 16k and 64k pagesize. Got the warning:
+"TCP: enp0s0: Driver has suspect GRO implementation, TCP performance may be
+compromised." I suspect it is because of kvmtool legacy version of virtio.
+This was further confirmed by running the same kernel with kvmtool built
+from master, with and without --force-pci, the warning was still there.
+
+3. Debian 10 disk + a work-in-progress version of EDK2 which enables PCIE
+support for kvmtool, with --force-pci. The kernel was booted via Debian
+grub, and same as above, I tried with kernels compiled with 4k, 16k and 64k
+page sizes.
+
+On AMD Seattle:
+---------------
+
+1. Using the EDK2 image and the passthrough Realtek RTL8168 NIC as the
+network interface, I was able to use a vanilla netinstall iso from the
+debian website [3] and install debian in a virtual machine. Woohoo!
+
+One gotcha during installation: because kvmtool doesn't emulate a SCSI
+CD-ROM, you need to manually specify the virtio disk for the installation
+iso. At the 'Detect and mount CD-ROM' prompt, choose No when asked to load
+CD-ROM drivers from removable media, Yes to manually select a CD-ROM module
+and device, none when choosing the CD-ROM module (it's a virtio disk), then
+the device file for accessing the CD-ROM is /dev/vda (only if the iso file
+is the first --disk kvmtool parameter, otherwise /dev/vdb if it's the
+second, and so on).
+
+2. Realtek RTL8168, direct kernel boot and EDK2 boot with Debian 10 disk,
+--force-pci, kernel compiled with 4k and 64k pages (Seattle doesn't support
+16k pages) for both direct kernel boot and EDK2 boot.
+
+3. Intel 82574L NIC, direct kernel boot and EDK2 boot with Debian 10 disk,
+--force-pci, kernel compiled with 4k and 64k pages for both direct boot and
+EDK2 boot.
+
+4. AMD FirePro W2100 VGA + HDMI audio, both assigned to a VM, direct kernel
+boot and EDK2 boot with Debian 10 disk, --force-pci, kernel compiled with
+4k and 64k pages for both direct boot and EDK2 boot.
+
+For this test, I switched the guest kernel to v5.10 because with v5.11 and
+v5.12 I was getting this kernel panic caused by a NULL pointer deference:
+
+[..]
+[    0.943927] [drm] radeon kernel modesetting enabled.
+[    0.945050] [drm] initializing kernel modesetting (OLAND 0x1002:0x6608 0x1002:0x2120 0x00).
+[    0.946313] radeon 0000:00:00.0: BAR 6: can't assign [??? 0x00000000 flags 0x20000000] (bogus alignment)
+[    0.947736] radeon 0000:00:00.0: BAR 6: can't assign [??? 0x00000000 flags 0x20000000] (bogus alignment)
+[    0.949193] [drm:radeon_get_bios] *ERROR* Unable to locate a BIOS ROM
+[    0.950151] radeon 0000:00:00.0: Fatal error during GPU init
+[    0.950990] [drm] radeon: finishing device.
+[    0.951633] Unable to handle kernel NULL pointer dereference at virtual address 0000000000000020
+[    0.952936] Mem abort info:
+[    0.953369]   ESR = 0x96000004
+[    0.953838]   EC = 0x25: DABT (current EL), IL = 32 bits
+[    0.954635]   SET = 0, FnV = 0
+[    0.955100]   EA = 0, S1PTW = 0
+[    0.955590] Data abort info:
+[    0.956033]   ISV = 0, ISS = 0x00000004
+[    0.956608]   CM = 0, WnR = 0
+[    0.957099] [0000000000000020] user address but active_mm is swapper
+[    0.958051] Internal error: Oops: 96000004 [#1] PREEMPT SMP
+[    0.958881] Modules linked in:
+[    0.959356] CPU: 3 PID: 1 Comm: swapper/0 Not tainted 5.11.0 #13
+[    0.960268] Hardware name: linux,dummy-virt (DT)
+[    0.960970] pstate: 60000005 (nZCv daif -PAN -UAO -TCO BTYPE=--)
+[    0.962013] pc : ttm_resource_manager_evict_all+0x64/0x1f0
+[    0.962972] lr : ttm_resource_manager_evict_all+0x5c/0x1f0
+[    0.963931] sp : ffff80001212ba00
+[    0.964517] x29: ffff80001212ba00 x28: 0000000000000000 
+[    0.965448] x27: ffff8000118004e0 x26: ffff8000120cd000 
+[    0.966371] x25: 0000000000000000 x24: ffff000080c946e8 
+[    0.967296] x23: 0000000000000020 x22: 0000000000000000 
+[    0.968227] x21: 0000000000000000 x20: ffff8000120cdb90 
+[    0.969152] x19: ffff000080c94000 x18: ffffffffffffffff 
+[    0.970076] x17: 0000000000000000 x16: 0000000000000001 
+[    0.970999] x15: ffff80009212b787 x14: 0000000000000006 
+[    0.971928] x13: ffff800011de2368 x12: 0000000000000264 
+[    0.972852] x11: 00000000000000cc x10: ffff800011de2368 
+[    0.973780] x9 : ffff800011de2368 x8 : 00000000ffffefff 
+[    0.974701] x7 : ffff800011e3a368 x6 : ffff800011e3a368 
+[    0.975637] x5 : 0000000000000000 x4 : 0000000000000000 
+[    0.976559] x3 : ffff8000120cdb90 x2 : 0000000000000001 
+[    0.977483] x1 : 0000000000000000 x0 : 0000000000000000 
+[    0.978410] Call trace:
+[    0.978851]  ttm_resource_manager_evict_all+0x64/0x1f0
+[    0.979759]  radeon_bo_evict_vram+0x1c/0x30
+[    0.980494]  radeon_device_fini+0x34/0xe8
+[    0.981209]  radeon_driver_unload_kms+0x48/0x90
+[    0.982000]  radeon_driver_load_kms+0x124/0x174
+[    0.982792]  drm_dev_register+0xe0/0x210
+[    0.983486]  radeon_pci_probe+0x120/0x1bc
+[    0.984180]  local_pci_probe+0x40/0xac
+[    0.984843]  pci_device_probe+0x114/0x1b0
+[    0.985548]  really_probe+0xe4/0x4c0
+[    0.986181]  driver_probe_device+0x58/0xc0
+[    0.986902]  device_driver_attach+0xc0/0xcc
+[    0.987642]  __driver_attach+0x84/0x124
+[    0.988317]  bus_for_each_dev+0x70/0xd0
+[    0.988996]  driver_attach+0x24/0x30
+[    0.989627]  bus_add_driver+0x104/0x1ec
+[    0.990300]  driver_register+0x78/0x130
+[    0.990974]  __pci_register_driver+0x48/0x54
+[    0.991730]  radeon_module_init+0x54/0x64
+[    0.992438]  do_one_initcall+0x50/0x1b0
+[    0.993115]  kernel_init_freeable+0x1d4/0x23c
+[    0.993880]  kernel_init+0x14/0x118
+[    0.994496]  ret_from_fork+0x10/0x34
+[    0.995132] Code: f90033ff 9420650e d37c7f36 8b1602b6 (f94012c0) 
+[    0.996201] ---[ end trace 88eed6171e8cb9bc ]---
+[    0.997011] note: swapper/0[1] exited with preempt_count 1
+[    0.997840] Kernel panic - not syncing: Attempted to kill init! exitcode=0x0000000b
+[    0.998984] SMP: stopping secondary CPUs
+[    0.999605] Kernel Offset: disabled
+[    1.000137] CPU features: 0x00240022,61006082
+[    1.000793] Memory Limit: none
+[    1.001330] ---[ end Kernel panic - not syncing: Attempted to kill init! exitcode=0x0000000b ]---
+
+This is how dmesg looks like with v5.10, v5.8 and v5.6:
+
+[..]
+[    0.972061] [drm] radeon kernel modesetting enabled.
+[    0.973162] [drm] initializing kernel modesetting (OLAND 0x1002:0x6608 0x1002:0x2120 0x00).
+[    0.974426] radeon 0000:00:00.0: BAR 6: can't assign [??? 0x00000000 flags 0x20000000] (bogus alignment)
+[    0.976037] radeon 0000:00:00.0: BAR 6: can't assign [??? 0x00000000 flags 0x20000000] (bogus alignment)
+[    0.977435] [drm:radeon_get_bios] *ERROR* Unable to locate a BIOS ROM
+[    0.978381] radeon 0000:00:00.0: Fatal error during GPU init
+[    0.979341] [drm] radeon: finishing device.
+[    0.979963] [TTM] Memory type 2 has not been initialized
+[    0.988250] radeon: probe of 0000:00:00.0 failed with error -22
+[    0.989282] cacheinfo: Unable to detect cache hierarchy for CPU 0
+[    0.993326] loop: module loaded
+[..]
+
+In my opinion, this is an upstream bug caused by incorrect clean up when
+probing fails. I plan to see if I can reproduce it on my x86 machine (to
+make it easier to other people to reproduce it) and then report it
+upstream.
+
+Note that I used the radeon driver instead of amdgpu because this is the
+recommended driver [4] for the GCN1 architecture.
+
+5. NVIDIA Quadro P400 VGA + HDMI audio, both assigned to a VM, direct kernel
+boot and EDK2 boot with Debian 10 disk, --force-pci, kernel compiled with
+4k and 64k pages for both direct boot and EDK2 boot.
+
+Nouveau seems to work as expected (it binds to the GPU). but during driver
+initialization it looks like the system hangs for 30s-1m. My guess is that
+something times out in the driver due to missing emulation in kvmtool:
+
+[..]
+[    0.335506] [drm] radeon kernel modesetting enabled.
+[    0.336369] nouveau 0000:00:00.0: enabling device (0000 -> 0003)
+[    0.359468] nouveau 0000:00:00.0: NVIDIA GP107 (137000a1)
+[    0.505066] nouveau 0000:00:00.0: bios: version 86.07.6b.00.01
+              <---- hangs here
+[  123.867379] nouveau 0000:00:00.0: acr: firmware unavailable
+[  123.868337] nouveau 0000:00:00.0: pmu: firmware unavailable
+[  123.869488] nouveau 0000:00:00.0: gr: firmware unavailable
+[  123.870506] nouveau 0000:00:00.0: sec2: firmware unavailable
+[  123.928149] nouveau 0000:00:00.0: fb: 2048 MiB GDDR5
+[  123.963159] [TTM] Zone  kernel: Available graphics memory: 8313888 KiB
+[  123.964823] [TTM] Zone   dma32: Available graphics memory: 2097152 KiB
+[  123.966172] nouveau 0000:00:00.0: DRM: VRAM: 2048 MiB
+[  123.967101] nouveau 0000:00:00.0: DRM: GART: 536870912 MiB
+[  123.968258] nouveau 0000:00:00.0: DRM: BIT table 'A' not found
+[  123.969403] nouveau 0000:00:00.0: DRM: BIT table 'L' not found
+[  123.970498] nouveau 0000:00:00.0: DRM: TMDS table version 2.0
+[  123.971688] nouveau 0000:00:00.0: DRM: DCB version 4.1
+[  123.972639] nouveau 0000:00:00.0: DRM: DCB outp 00: 01800f56 04600020
+[  123.973820] nouveau 0000:00:00.0: DRM: DCB outp 01: 01000f52 04620020
+[  123.975083] nouveau 0000:00:00.0: DRM: DCB outp 02: 01811f46 04600010
+[  123.976500] nouveau 0000:00:00.0: DRM: DCB outp 03: 01011f42 04620010
+[  123.977681] nouveau 0000:00:00.0: DRM: DCB outp 04: 02822f76 04600020
+[  123.978955] nouveau 0000:00:00.0: DRM: DCB outp 05: 02022f72 00020020
+[  123.980309] nouveau 0000:00:00.0: DRM: DCB conn 00: 00002046
+[  123.981352] nouveau 0000:00:00.0: DRM: DCB conn 01: 00001146
+[  123.982379] nouveau 0000:00:00.0: DRM: DCB conn 02: 00020246
+[  123.984507] nouveau 0000:00:00.0: DRM: failed to create kernel channel, -22
+[  123.986661] nouveau 0000:00:00.0: DRM: MM: using COPY for buffer copies
+[  124.291297] nouveau 0000:00:00.0: [drm] Cannot find any crtc or sizes
+[  124.292839] [drm] Initialized nouveau 1.3.1 20120801 for 0000:00:00.0 on minor 0
+[..]
+
+6. Crucial MX500 SSD connected to a generic PCIE to sata adapter assigned
+to the VM, direct kernel boot and EDK2 boot with Debian 10 disk,
+--force-pci, 4k and 64k pages kernel for both direct kernel and UEFI boot.
+
+This was weird. On the host, the PCIE adapter worked just fine with kernel
+v5.8, but on v5.12 the host was not able to initialize it:
+
+[    2.891697] ata2: SATA link down (SStatus 0 SControl 300)
+[    3.211695] ata3: SATA link down (SStatus 0 SControl 300)
+[    3.531699] ata4: SATA link down (SStatus 0 SControl 300)
+[    3.851694] ata5: SATA link down (SStatus 0 SControl 300)
+[    4.141559] ata9: SATA link down (SStatus 0 SControl 0)
+[    4.171691] ata6: SATA link down (SStatus 0 SControl 300)
+[    4.491695] ata7: SATA link down (SStatus 0 SControl 300)
+[    4.811693] ata8: SATA link down (SStatus 0 SControl 300)
+[    6.973559] arm-smmu e0a00000.smmu: Unhandled context fault: fsr=0x2, iova=0x8002420000, fsynr=0x181, cbfrsynra=0x100, cb=0
+[    6.983615] ata10: softreset failed (SRST command error)
+[    6.989992] ata10: reset failed (errno=-5), retrying in 8 secs
+[   17.173560] arm-smmu e0a00000.smmu: Unhandled context fault: fsr=0x2, iova=0x8002420000, fsynr=0x181, cbfrsynra=0x100, cb=0
+[   17.183618] ata10: softreset failed (SRST command error)
+[   17.189990] ata10: reset failed (errno=-5), retrying in 8 secs
+[   27.413557] arm-smmu e0a00000.smmu: Unhandled context fault: fsr=0x2, iova=0x8002420000, fsynr=0x181, cbfrsynra=0x100, cb=0
+[   27.423615] ata10: softreset failed (SRST command error)
+[   27.429986] ata10: reset failed (errno=-5), retrying in 33 secs
+[   60.837548] ata10: limiting SATA link speed to 1.5 Gbps
+[   63.001557] arm-smmu e0a00000.smmu: Unhandled context fault: fsr=0x2, iova=0x8002420000, fsynr=0x181, cbfrsynra=0x100, cb=0
+[   63.011615] ata10: softreset failed (SRST command error)
+[   63.017988] ata10: reset failed, giving up
+
+Assigning it to a VM worked though after the host running Linux v5.8
+unitializes the adapter, so I'm going to consider this a pass. After a few
+more tests, I was able to trigger the same error on v5.8. On v5.12
+initialization has failed every time (so far, at least).
+
+[0] https://lore.kernel.org/kvm/20200326152438.6218-1-alexandru.elisei@arm.com/T/#m835c93ef1dc7c539b4cdda85aee23210d494ea49
+[1] https://lore.kernel.org/kvm/20200326152438.6218-1-alexandru.elisei@arm.com/
+[2] https://www.spinics.net/lists/kvm/msg245607.html
+[3] https://cdimage.debian.org/debian-cd/current/arm64/iso-cd/debian-10.9.0-arm64-netinst.iso
+[4] https://wiki.archlinux.org/title/Xorg#AMD
+[5] https://gitlab.arm.com/linux-arm/kvmtool-ae/-/tree/pci-express-v3-edk2-binary
+[6] https://edk2.groups.io/g/devel/message/76522?p=,,,20,0,0,0::Created,,armvirtpkg,20,2,0,83558261
+
+
+
+Alexandru Elisei (4):
+  Move fdt_irq_fn typedef to fdt.h
+  arm/fdt.c: Don't generate the node if generator function is NULL
+  arm/arm64: Add PCI Express 1.1 support
+  arm/arm64: vfio: Add PCI Express Capability Structure
+
+ arm/fdt.c                         |  7 ++-
+ arm/include/arm-common/kvm-arch.h |  4 +-
+ arm/pci.c                         |  2 +-
+ hw/rtc.c                          |  1 +
+ include/kvm/fdt.h                 |  2 +
+ include/kvm/kvm.h                 |  1 -
+ include/kvm/pci.h                 | 75 ++++++++++++++++++++++++++++---
+ pci.c                             |  5 ++-
+ vfio/pci.c                        | 44 +++++++++++++-----
+ 9 files changed, 119 insertions(+), 22 deletions(-)
+
+-- 
+2.32.0
+
