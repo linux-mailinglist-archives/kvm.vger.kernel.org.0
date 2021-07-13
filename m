@@ -2,57 +2,58 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D1D1A3C7968
-	for <lists+kvm@lfdr.de>; Wed, 14 Jul 2021 00:10:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 54B113C7969
+	for <lists+kvm@lfdr.de>; Wed, 14 Jul 2021 00:10:15 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236342AbhGMWM5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 13 Jul 2021 18:12:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36920 "EHLO
+        id S236359AbhGMWM6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 13 Jul 2021 18:12:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36934 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236133AbhGMWM4 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 13 Jul 2021 18:12:56 -0400
+        with ESMTP id S236344AbhGMWM5 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 13 Jul 2021 18:12:57 -0400
 Received: from mail-pl1-x64a.google.com (mail-pl1-x64a.google.com [IPv6:2607:f8b0:4864:20::64a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4EC39C0613DD
-        for <kvm@vger.kernel.org>; Tue, 13 Jul 2021 15:10:05 -0700 (PDT)
-Received: by mail-pl1-x64a.google.com with SMTP id z13-20020a170903408db0290129a6155d3cso87400plc.2
-        for <kvm@vger.kernel.org>; Tue, 13 Jul 2021 15:10:05 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E17E2C0613E9
+        for <kvm@vger.kernel.org>; Tue, 13 Jul 2021 15:10:06 -0700 (PDT)
+Received: by mail-pl1-x64a.google.com with SMTP id l10-20020a17090270cab029011dbfb3981aso80030plt.22
+        for <kvm@vger.kernel.org>; Tue, 13 Jul 2021 15:10:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=date:in-reply-to:message-id:mime-version:references:subject:from:to
          :cc;
-        bh=NOH8R+qMC89oot0SC/08ymQAilQcWzou/O8p8abaSjA=;
-        b=ErxesmfmeNt52qNZrPLa3igMDfD7mRSPnET/yqD6LS614zIwRYAaur2UP9x/TLGwyL
-         OttLjx6vckVAEk9Qt+37/H0McAideQcyUiGfaum3lso37yyw4ayLx7HdRklFq+AoaAhO
-         ykmOzOHtXd44p/g+7ZcGVfD40fi4R/YnwFcB40vtJ96zNRBG+5odCDyYwHzGUm6fP1yj
-         oh8KoDiDmSxq1BXk/Djhepf/3FELsjtFCnKPhrzrSrXm9293zt5xobZh9VnoXhczVp24
-         HGE/CI7v1Ur4Nl2rRCMWjAjNatI2p70CH7SKisrR8l25J98YQ0mv7VYtbL1tss41t+7S
-         3JBQ==
+        bh=CsySGCAQ8336by2YJBp50kxUPY3frhNUxx9JeUFjwp8=;
+        b=SFuiu9fAcgy31OXti8nIfcaltUKg0QxALdmPhReGQPGYTYWGvZQcxVCxIqYqxsICPI
+         TjCd4Znb5+xDdAbxF/VUuByQvCwTEqjO80EqJkXlVAJBq+NHRb0i5ZK8209oB8Po228t
+         lBfzg+bq6vpk2xZzi2KaFzLW8ZQZl6zDBRzfwC0VIUC03PbTQ8X0LFFI0mOOf8VWheB+
+         8K5XsU5v845yXjT8W1jLAD0g8YysjCATmUHk8GHkNwSNOvW8pHl5wjVw0WTJMPOmgQ9h
+         0xx+VTNghiadUvPQ7uCfKJFuOXcyGZu4lYlbK0g1WTDbPD3Oz3q/VB5gC24GMOrX4jYs
+         5q4g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=NOH8R+qMC89oot0SC/08ymQAilQcWzou/O8p8abaSjA=;
-        b=jF2rPVeb5oP1KnzqrfjnyPxodvsvOR82gN/cY8S4wshpTdf2SeAxFBc2pL4IbtqyaA
-         T9Ljegh4MlZW/oI3Feee40boK55PoDy57GI+Pwlr4CxUdXwgdusDy1Sp0nWUNqCgdRFp
-         +0yCT3MGqgD4sfQEx9BZEwmj2EwBMaCvnZzsgSLRY3e6v7iTk/P27FyVxqik/Vm/Eql2
-         aBOhS0MPGap7In6r7laXVR97rhgO166RzzxoC2mBU/2lZAwPxECQFUVifuRlXM04ggmd
-         QbM2Wb67wly0Gnr/i36EtqS8LG9ePFlCcioPapZKaXMh9zDddxQzXQt/XHOFyQvvAHIT
-         nV6w==
-X-Gm-Message-State: AOAM531d+pRtMe4+bW8Nwf7toez8kgwrtm4mjEyUn2qe6JXFn3s7b6tO
-        VmgbyKkIan7TIr2wgqksHfF4Qmbq6AcwzEA85F6dZmQE4KGlO3p5c9ystxn8RFAJgxt0NMr7Oin
-        pRpbLv6+RCM/CpMyoEcSAOVHZ4LXCiaBcjHJfDCA61L6yMFwHQuu9uUu13aUwE/k=
-X-Google-Smtp-Source: ABdhPJy3vpihhlg1lleHDRSun1HfD08fj57Oqbw6YeA1/tOa0FiOUyDLIa4Tt6leggULOOmAR2cXExWygRPKVw==
+        bh=CsySGCAQ8336by2YJBp50kxUPY3frhNUxx9JeUFjwp8=;
+        b=tCpIcOSDwD1pBgU4+SJa5R8FGcb6x7ZqmBtZNUGYpxTRQq9Pwv7694+2Xde1LmQ434
+         /cbpsYNVQTCo/npb/R9hcy/n7hjjzsYB5bxSH17vt957fivb/8PhUIpW0K/Bdo89pw48
+         fPbo4vCOo95ObIaJ/q7sP0U0PJAj6Hiw+E249/gp97hKXq32TjS3CS3HkUuvbu+Ae1AG
+         UHKuK+al/+AWuodanHmiYwFLvOCSp/W+YEGlr3k6g5ybv90lqsTmJlT5uB4EAPqohWUV
+         229dyKi1uFne0VkE/DNZDDc2HNaoLFNknzzHqcyMPqyrS3n3T5r67s/bmGOQDfAn6bTF
+         7bMQ==
+X-Gm-Message-State: AOAM533RyDjAF1XheazorECuJFLbmeeuv9oicH7BTUH4YUEC6nkBRbKn
+        V0Q65ti4SmVER4ZXBJOrop1zeUgLJRe+tAQUVr0cC/37bMDVMdnMktnev578klxNSc23BUixroU
+        d/AKFVD1EdFJCj4V51Y/mAuAPo/viqT8oDX12pf162Z7Q9VW0iN86Yt5zYHVnQCA=
+X-Google-Smtp-Source: ABdhPJxKhKgAxUbvTGJlfOWn10MX0zlpjtbk5OuUEK7EngliDE/WdO1Ve9F01MoDctVH9SpYvG06/safXuIsCQ==
 X-Received: from dmatlack-heavy.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:19cd])
- (user=dmatlack job=sendgmr) by 2002:a62:7ac1:0:b029:329:77f5:8ffa with SMTP
- id v184-20020a627ac10000b029032977f58ffamr6800269pfc.36.1626214204693; Tue,
- 13 Jul 2021 15:10:04 -0700 (PDT)
-Date:   Tue, 13 Jul 2021 22:09:53 +0000
+ (user=dmatlack job=sendgmr) by 2002:a17:902:8e88:b029:11c:51bc:def8 with SMTP
+ id bg8-20020a1709028e88b029011c51bcdef8mr5011271plb.57.1626214206274; Tue, 13
+ Jul 2021 15:10:06 -0700 (PDT)
+Date:   Tue, 13 Jul 2021 22:09:54 +0000
 In-Reply-To: <20210713220957.3493520-1-dmatlack@google.com>
-Message-Id: <20210713220957.3493520-3-dmatlack@google.com>
+Message-Id: <20210713220957.3493520-4-dmatlack@google.com>
 Mime-Version: 1.0
 References: <20210713220957.3493520-1-dmatlack@google.com>
 X-Mailer: git-send-email 2.32.0.93.g670b81a890-goog
-Subject: [PATCH v3 2/6] KVM: x86/mmu: Fix use of enums in trace_fast_page_fault
+Subject: [PATCH v3 3/6] KVM: x86/mmu: Make walk_shadow_page_lockless_{begin,end}
+ interoperate with the TDP MMU
 From:   David Matlack <dmatlack@google.com>
 To:     kvm@vger.kernel.org
 Cc:     Ben Gardon <bgardon@google.com>, Joerg Roedel <joro@8bytes.org>,
@@ -73,54 +74,138 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Enum values have to be exported to userspace since the formatting is not
-done in the kernel. Without doing this perf maps RET_PF_FIXED and
-RET_PF_SPURIOUS to 0, which results in incorrect output:
+Acquire the RCU read lock in walk_shadow_page_lockless_begin and release
+it in walk_shadow_page_lockless_end when the TDP MMU is enabled.  This
+should not introduce any functional changes but is used in the following
+commit to make fast_page_fault interoperate with the TDP MMU.
 
-  $ perf record -a -e kvmmmu:fast_page_fault --filter "ret==3" -- ./access_tracking_perf_test
-  $ perf script | head -1
-   [...] new 610006048d25877 spurious 0 fixed 0  <------ should be 1
-
-Fix this by exporting the enum values to userspace with TRACE_DEFINE_ENUM.
-
-Fixes: c4371c2a682e ("KVM: x86/mmu: Return unique RET_PF_* values if the fault was fixed")
 Signed-off-by: David Matlack <dmatlack@google.com>
 ---
- arch/x86/kvm/mmu/mmu_internal.h | 3 +++
- arch/x86/kvm/mmu/mmutrace.h     | 6 ++++++
- 2 files changed, 9 insertions(+)
+ arch/x86/kvm/mmu/mmu.c     | 20 ++++++++++++++++----
+ arch/x86/kvm/mmu/tdp_mmu.c |  6 ++----
+ arch/x86/kvm/mmu/tdp_mmu.h | 10 ++++++++++
+ 3 files changed, 28 insertions(+), 8 deletions(-)
 
-diff --git a/arch/x86/kvm/mmu/mmu_internal.h b/arch/x86/kvm/mmu/mmu_internal.h
-index 35567293c1fd..626cb848dab4 100644
---- a/arch/x86/kvm/mmu/mmu_internal.h
-+++ b/arch/x86/kvm/mmu/mmu_internal.h
-@@ -140,6 +140,9 @@ void kvm_flush_remote_tlbs_with_address(struct kvm *kvm,
-  * RET_PF_INVALID: the spte is invalid, let the real page fault path update it.
-  * RET_PF_FIXED: The faulting entry has been fixed.
-  * RET_PF_SPURIOUS: The faulting entry was already fixed, e.g. by another vCPU.
-+ *
-+ * Any names added to this enum should be exported to userspace for use in
-+ * tracepoints via TRACE_DEFINE_ENUM() in mmutrace.h
-  */
- enum {
- 	RET_PF_RETRY = 0,
-diff --git a/arch/x86/kvm/mmu/mmutrace.h b/arch/x86/kvm/mmu/mmutrace.h
-index efbad33a0645..2924a4081a19 100644
---- a/arch/x86/kvm/mmu/mmutrace.h
-+++ b/arch/x86/kvm/mmu/mmutrace.h
-@@ -54,6 +54,12 @@
- 	{ PFERR_RSVD_MASK, "RSVD" },	\
- 	{ PFERR_FETCH_MASK, "F" }
+diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+index 45274436d3c0..e3d99853b962 100644
+--- a/arch/x86/kvm/mmu/mmu.c
++++ b/arch/x86/kvm/mmu/mmu.c
+@@ -686,6 +686,11 @@ static bool mmu_spte_age(u64 *sptep)
  
-+TRACE_DEFINE_ENUM(RET_PF_RETRY);
-+TRACE_DEFINE_ENUM(RET_PF_EMULATE);
-+TRACE_DEFINE_ENUM(RET_PF_INVALID);
-+TRACE_DEFINE_ENUM(RET_PF_FIXED);
-+TRACE_DEFINE_ENUM(RET_PF_SPURIOUS);
+ static void walk_shadow_page_lockless_begin(struct kvm_vcpu *vcpu)
+ {
++	if (is_tdp_mmu(vcpu->arch.mmu)) {
++		kvm_tdp_mmu_walk_lockless_begin();
++		return;
++	}
 +
+ 	/*
+ 	 * Prevent page table teardown by making any free-er wait during
+ 	 * kvm_flush_remote_tlbs() IPI to all active vcpus.
+@@ -701,6 +706,11 @@ static void walk_shadow_page_lockless_begin(struct kvm_vcpu *vcpu)
+ 
+ static void walk_shadow_page_lockless_end(struct kvm_vcpu *vcpu)
+ {
++	if (is_tdp_mmu(vcpu->arch.mmu)) {
++		kvm_tdp_mmu_walk_lockless_end();
++		return;
++	}
++
+ 	/*
+ 	 * Make sure the write to vcpu->mode is not reordered in front of
+ 	 * reads to sptes.  If it does, kvm_mmu_commit_zap_page() can see us
+@@ -3612,6 +3622,8 @@ static bool mmio_info_in_cache(struct kvm_vcpu *vcpu, u64 addr, bool direct)
  /*
-  * A pagetable walk has started
+  * Return the level of the lowest level SPTE added to sptes.
+  * That SPTE may be non-present.
++ *
++ * Must be called between walk_shadow_page_lockless_{begin,end}.
   */
+ static int get_walk(struct kvm_vcpu *vcpu, u64 addr, u64 *sptes, int *root_level)
+ {
+@@ -3619,8 +3631,6 @@ static int get_walk(struct kvm_vcpu *vcpu, u64 addr, u64 *sptes, int *root_level
+ 	int leaf = -1;
+ 	u64 spte;
+ 
+-	walk_shadow_page_lockless_begin(vcpu);
+-
+ 	for (shadow_walk_init(&iterator, vcpu, addr),
+ 	     *root_level = iterator.level;
+ 	     shadow_walk_okay(&iterator);
+@@ -3634,8 +3644,6 @@ static int get_walk(struct kvm_vcpu *vcpu, u64 addr, u64 *sptes, int *root_level
+ 			break;
+ 	}
+ 
+-	walk_shadow_page_lockless_end(vcpu);
+-
+ 	return leaf;
+ }
+ 
+@@ -3647,11 +3655,15 @@ static bool get_mmio_spte(struct kvm_vcpu *vcpu, u64 addr, u64 *sptep)
+ 	int root, leaf, level;
+ 	bool reserved = false;
+ 
++	walk_shadow_page_lockless_begin(vcpu);
++
+ 	if (is_tdp_mmu(vcpu->arch.mmu))
+ 		leaf = kvm_tdp_mmu_get_walk(vcpu, addr, sptes, &root);
+ 	else
+ 		leaf = get_walk(vcpu, addr, sptes, &root);
+ 
++	walk_shadow_page_lockless_end(vcpu);
++
+ 	if (unlikely(leaf < 0)) {
+ 		*sptep = 0ull;
+ 		return reserved;
+diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
+index caac4ddb46df..98ffd1ba556e 100644
+--- a/arch/x86/kvm/mmu/tdp_mmu.c
++++ b/arch/x86/kvm/mmu/tdp_mmu.c
+@@ -1516,6 +1516,8 @@ bool kvm_tdp_mmu_write_protect_gfn(struct kvm *kvm,
+ /*
+  * Return the level of the lowest level SPTE added to sptes.
+  * That SPTE may be non-present.
++ *
++ * Must be called between kvm_tdp_mmu_walk_lockless_{begin,end}.
+  */
+ int kvm_tdp_mmu_get_walk(struct kvm_vcpu *vcpu, u64 addr, u64 *sptes,
+ 			 int *root_level)
+@@ -1527,14 +1529,10 @@ int kvm_tdp_mmu_get_walk(struct kvm_vcpu *vcpu, u64 addr, u64 *sptes,
+ 
+ 	*root_level = vcpu->arch.mmu->shadow_root_level;
+ 
+-	rcu_read_lock();
+-
+ 	tdp_mmu_for_each_pte(iter, mmu, gfn, gfn + 1) {
+ 		leaf = iter.level;
+ 		sptes[leaf] = iter.old_spte;
+ 	}
+ 
+-	rcu_read_unlock();
+-
+ 	return leaf;
+ }
+diff --git a/arch/x86/kvm/mmu/tdp_mmu.h b/arch/x86/kvm/mmu/tdp_mmu.h
+index 1cae4485b3bc..93e1bf5089c4 100644
+--- a/arch/x86/kvm/mmu/tdp_mmu.h
++++ b/arch/x86/kvm/mmu/tdp_mmu.h
+@@ -77,6 +77,16 @@ bool kvm_tdp_mmu_write_protect_gfn(struct kvm *kvm,
+ 				   struct kvm_memory_slot *slot, gfn_t gfn,
+ 				   int min_level);
+ 
++static inline void kvm_tdp_mmu_walk_lockless_begin(void)
++{
++	rcu_read_lock();
++}
++
++static inline void kvm_tdp_mmu_walk_lockless_end(void)
++{
++	rcu_read_unlock();
++}
++
+ int kvm_tdp_mmu_get_walk(struct kvm_vcpu *vcpu, u64 addr, u64 *sptes,
+ 			 int *root_level);
+ 
 -- 
 2.32.0.93.g670b81a890-goog
 
