@@ -2,121 +2,202 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 85F033C791A
-	for <lists+kvm@lfdr.de>; Tue, 13 Jul 2021 23:41:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0969A3C7966
+	for <lists+kvm@lfdr.de>; Wed, 14 Jul 2021 00:10:05 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236119AbhGMVnx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 13 Jul 2021 17:43:53 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58648 "EHLO
+        id S236046AbhGMWMx (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 13 Jul 2021 18:12:53 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36910 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235118AbhGMVnw (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 13 Jul 2021 17:43:52 -0400
-Received: from mail-pj1-x1029.google.com (mail-pj1-x1029.google.com [IPv6:2607:f8b0:4864:20::1029])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AE8EBC0613DD
-        for <kvm@vger.kernel.org>; Tue, 13 Jul 2021 14:41:00 -0700 (PDT)
-Received: by mail-pj1-x1029.google.com with SMTP id v18-20020a17090ac912b0290173b9578f1cso2507444pjt.0
-        for <kvm@vger.kernel.org>; Tue, 13 Jul 2021 14:41:00 -0700 (PDT)
+        with ESMTP id S234947AbhGMWMx (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 13 Jul 2021 18:12:53 -0400
+Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 97450C0613DD
+        for <kvm@vger.kernel.org>; Tue, 13 Jul 2021 15:10:02 -0700 (PDT)
+Received: by mail-yb1-xb4a.google.com with SMTP id 132-20020a25158a0000b029055791ebe1e6so29258107ybv.20
+        for <kvm@vger.kernel.org>; Tue, 13 Jul 2021 15:10:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=vrEJ0IT39G6kebRkO06W9h6TS+oFcHPIOO8VkXk5PLc=;
-        b=EkBKXPjG/EViWsVLjIMs74wrEbBjOH730bpAeV5qYqG+B0UneYTAvPtkjZLsA1rjv6
-         w2jUhzukYTGEkN5V53eb/WR+qauAqVGwKHRRomK6w8HAJDVa0Y0cmRRMC6Asrnhn+dmU
-         Pr04MUNXrEiPdlhTCKD8He9wd3WcedkSp1HqdGVZ3LTxko8dgwSkb+NL9zGmwj82jEX+
-         4jUVWseWvcjt8nyo7DdqdbtPvzrQvh+WFPcKRKVuKqOh2es/FcR+fMIjPVhVOr/K3/O8
-         SIBH9iBaiwOcJai9B60fJtXdnfezRqdn2ElMDDx4s5kmBvZSFew0evOajJJwFrisVLl2
-         qfqA==
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=T81hhWd804ZyXie/r82DQRDd7mDCkogvw32WjhX25vM=;
+        b=JOCkMaJP8F3nqWMLozCycw80zc0sPtPzgWxyRKYjZ4d4I3yXbNOdGcsTt/StTBIy+W
+         rgiNiivFlVpNY1BhPWxAWUHLsdF8pmFAwT03jlxlyEt739qkq+KPNgErGoBtEfX2qavZ
+         StnHDVXIOv/ngx2da/npdDKlhtTZD1Lhip+vJzP3aeJeayBFjfSoAMvIL+NTBdCMUuPe
+         NeVCoxM5rvD1d03BXf2I/Zw9vBjgzmUluwRclPn6rH5ptt1UOLkjoTqz46+MV7BiholZ
+         WfmG8xYXCBSzg06iUUVvbkpzgra3hs6PkreJqdLYGSoVIYcRDKALd3+jSqTUoRuJTckt
+         xshA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=vrEJ0IT39G6kebRkO06W9h6TS+oFcHPIOO8VkXk5PLc=;
-        b=LitjRYzwle9ZzGOD9TMFohaw3yqK+AL10p9phEp4WPPrjJn1SW1KWhYBJL+42b38UW
-         VXhi+8e0elJMNWijPRE7FHHfSnqZcZwgswNZGZsw4ZHiZUt/+V3ctUjcV5PT4yxfvCiY
-         gWy/hiBQCo5g/JHjnwTN4fWuqzWRLrHNMwrANIWPCtwleJ0Ldr4PWNpadX/YLboBUH4j
-         GhV8Q5we4uo+neyRkm07TG6Nq1RO1A50NldnlV8yRST/LToQjvEXXolgYhC21eJsIfzL
-         S4p85gkLpJQMU2x8cSU+YcWDRoGQIwwlAzttmGGUST+863ukPMHQLrvDeyu0qrf0pBaC
-         k9/g==
-X-Gm-Message-State: AOAM530JGlYhahfgcRnH7p5FOIrpQ/N7WcX/6WRkVs0XbpyAkXcD5GeX
-        35tIMaycpsQrohYTsD6h/s8WTg==
-X-Google-Smtp-Source: ABdhPJweJYmPzlJGgylcdQJabbQixGutCZcMF0Rp33GsEdP6B9GDMskxSoz4hKihkerQAW4A12A+iw==
-X-Received: by 2002:a17:902:e852:b029:128:e56b:3227 with SMTP id t18-20020a170902e852b0290128e56b3227mr4995350plg.81.1626212460062;
-        Tue, 13 Jul 2021 14:41:00 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id x128sm114459pfd.167.2021.07.13.14.40.59
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 13 Jul 2021 14:40:59 -0700 (PDT)
-Date:   Tue, 13 Jul 2021 21:40:55 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Peter Gonda <pgonda@google.com>
-Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-        David Rientjes <rientjes@google.com>,
-        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
-        Brijesh Singh <brijesh.singh@amd.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=T81hhWd804ZyXie/r82DQRDd7mDCkogvw32WjhX25vM=;
+        b=epcYrLGyPvs+vAz4NasmjtaAJeA1QBk3JjTcjG/t2rQYoraT6S1J9Y5mF15Vyt3btK
+         rk8AZncXOJabyAFKmZORqbj7F/72sIw6P2k514FSre3dh+T/tmJv1BXSdTdT8TdyxVNG
+         0Ibv/gjH0b4x1RumRmmt0cTuGd1z2dOjNyDS/mFtpGoUQCOrgQVv2pHt4cNigK20ojBU
+         AjNnjYReg14B/bdiipu00Nb8flijyZIbpDp2UyjZpEXzpMpWnneNw+fSTEAvRPu/TwJ4
+         CmpZ9yWST6To3Bhdr8TFJmN8zqUqwP6aOiQEgG316MVsl5jHmXYEgQsUke4ar5mU2Lf0
+         ePYw==
+X-Gm-Message-State: AOAM533z9yT/In6n8MvlvoeJKcakQ6QZk/1OfBoVEruNO89lvu2OvZrl
+        nnQS+KfKisSgmGPCgwPYuPyhSi8q42E5U1/t4oufMqlhie243WAQofpu11AkjSWOo140gLZBsNa
+        yX5K6niDyZEwayVKBgu3N2NLnRFMRnzTJSTFWoP0mFgn1NTxKpFGU3FgPiaxYNcA=
+X-Google-Smtp-Source: ABdhPJynlUQsuvP52Df67Pgw9zm4ml1kmDV5NCx97dLGDEPS+UnGvKz7dt1QYcimliXFarurSb/g1+RwlbcklA==
+X-Received: from dmatlack-heavy.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:19cd])
+ (user=dmatlack job=sendgmr) by 2002:a25:1988:: with SMTP id
+ 130mr9390687ybz.458.1626214201564; Tue, 13 Jul 2021 15:10:01 -0700 (PDT)
+Date:   Tue, 13 Jul 2021 22:09:51 +0000
+Message-Id: <20210713220957.3493520-1-dmatlack@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.32.0.93.g670b81a890-goog
+Subject: [PATCH v3 0/6] KVM: x86/mmu: Fast page fault support for the TDP MMU
+From:   David Matlack <dmatlack@google.com>
+To:     kvm@vger.kernel.org
+Cc:     Ben Gardon <bgardon@google.com>, Joerg Roedel <joro@8bytes.org>,
         Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        "H. Peter Anvin" <hpa@zytor.com>, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 1/3] KVM, SEV: Refactor out function for unregistering
- encrypted regions
-Message-ID: <YO4IZwk0M4GoVoit@google.com>
-References: <20210621163118.1040170-1-pgonda@google.com>
- <20210621163118.1040170-2-pgonda@google.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210621163118.1040170-2-pgonda@google.com>
+        Wanpeng Li <wanpengli@tencent.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Junaid Shahid <junaids@google.com>,
+        Andrew Jones <drjones@redhat.com>,
+        Matthew Wilcox <willy@infradead.org>,
+        Yu Zhao <yuzhao@google.com>,
+        David Hildenbrand <david@redhat.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        David Matlack <dmatlack@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Jun 21, 2021, Peter Gonda wrote:
-> Factor out helper function for freeing the encrypted region list.
+This patch series adds support for the TDP MMU in the fast_page_fault
+path, which enables certain write-protection and access tracking faults
+to be handled without taking the KVM MMU lock. This series brings the
+performance of these faults up to par with the legacy MMU.
 
-...
+Since there is not currently any KVM test coverage for access tracking
+faults, this series introduces a new KVM selftest,
+access_tracking_perf_test. This test relies on page_idle to enable access
+tracking from userspace (since it is the only available usersapce API to do
+so).
 
->  arch/x86/kvm/svm/sev.c | 26 +++++++++++++++++---------
->  1 file changed, 17 insertions(+), 9 deletions(-)
-> 
-> diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-> index 46e339c84998..5af46ff6ec48 100644
-> --- a/arch/x86/kvm/svm/sev.c
-> +++ b/arch/x86/kvm/svm/sev.c
-> @@ -1767,11 +1767,25 @@ int svm_vm_copy_asid_from(struct kvm *kvm, unsigned int source_fd)
->  	return ret;
->  }
->  
-> +static void __unregister_region_list_locked(struct kvm *kvm,
-> +					    struct list_head *mem_regions)
+Matthew Wilcox, Yu Zhao, David Hildenbrand, and Andrew Morton: You are cc'd
+since you have discussed dropping page_idle from Linux [1].
 
-I don't think the underscores or the "locked" qualifier are necessary.  Unlike
-__unregister_enc_region_locked(), there is no unregister_region_list() to avoid.
+Design
+------
 
-I'd also votes to drop "list" and instead use a plural "regions".  Without the
-plural form, it's not immediately obvious that the difference is that this
-helper deletes multiple regions.
+This series enables the existing fast_page_fault handler to operate
+independent of whether the TDP MMU is enabled or not by abstracting out
+the details behind a new lockless page walk API.
 
-Last nit, I assume these are all encrypted regions?  If so, unregister_enc_regions()
-seems like the natural choice.
+An alternative design considered was to add a separate fast_page_fault
+handler to the TDP MMU. The code that inspects the spte and genereates
+the new spte can be shared with the legacy MMU. However with this
+design the retry loop has to be duplicated, there are many calls back
+and forth between mmu.c and tdp_mmu.c, and passing around the RET_PF_*
+values gets complicated.
 
-> +{
-> +	struct enc_region *pos, *q;
-> +
-> +	lockdep_assert_held(&kvm->lock);
+Testing
+-------
 
-This locked (big thumbs up) is part of why I think it's a-ok to drop the "locked"
-qualifier.
+This series was tested on an Intel Cascade Lake machine. The kvm_intel
+parameters eptad and pml were disabled to force access and dirty
+tracking to go through fast_page_fault. All tests were run with the
+TDP MMU enabled and then again disabled.
 
-> +
-> +	if (list_empty(mem_regions))
-> +		return;
-> +
-> +	list_for_each_entry_safe(pos, q, mem_regions, list) {
-> +		__unregister_enc_region_locked(kvm, pos);
-> +		cond_resched();
-> +	}
-> +}
+Tests ran:
+ - All KVM selftests with default arguments
+ - All x86_64 kvm-unit-tests.
+ - ./access_tracking_perf_test -v 4
+ - ./access_tracking_perf_test -v 4 -o
+ - ./access_tracking_perf_test -v 4 -s anonymous_thp
+ - ./access_tracking_perf_test -v 4 -s anonymous_thp -o
+ - ./access_tracking_perf_test -v 64
+ - ./dirty_log_perf_test -v 4
+ - ./dirty_log_perf_test -v 4 -o
+ - ./dirty_log_perf_test -v 4 -s anonymous_thp
+ - ./dirty_log_perf_test -v 4 -s anonymous_thp -o
+ - ./dirty_log_perf_test -v 64
+
+For certain tests I also collected the fast_page_fault tracepoint to
+manually make sure it was getting triggered properly:
+
+  perf record -e kvmmmu:fast_page_fault --filter "old_spte != 0" -- <test>
+
+Performance Results
+-------------------
+
+To measure performance I ran dirty_log_perf_test and
+access_tracking_perf_test with 64 vCPUs. For dirty_log_perf_test
+performance is measured by "Iteration 2 dirty memory time", the time it
+takes for all vCPUs to write to their memory after it has been
+write-protected. For access_tracking_perf_test performance is measured
+by "Writing to idle memory", the time it takes for all vCPUs to write to
+their memory after it has been access-protected.
+
+Metric                            | tdp_mmu=Y before   | tdp_mmu=Y after
+--------------------------------- | ------------------ | -----------------
+Iteration 2 dirty memory time     | 3.545234984s       | 0.313867232s
+Writing to idle memory            | 3.249645416s       | 0.296113187s
+
+The performance improvement comes from less time spent acquiring the
+mmu lock in read mode and less time looking up the memslot for the
+faulting gpa.
+
+The TDP MMU is now on par with the legacy MMU:
+
+Metric                            | tdp_mmu=N          | tdp_mmu=Y
+--------------------------------- | ------------------ | -----------------
+Iteration 2 dirty memory time     | 0.303452990s       | 0.313867232s
+Writing to idle memory            | 0.291742127s       | 0.296113187s
+
+v3:
+ * PATCH 1/6: Add Sean's Reviewed-by.
+ * PATCH 2/6: Add TRACE_DEFINE_ENUM for all RET_PF_* values. [Ben]
+ * PATCH 2/6: Add comment for future RET_PF values. [me]
+ * PATCH 3/6: Pull walk_shadow_page_lockless_{begin,end} out of get_walk. [Ben]
+ * PATCH 3/6: Make kvm_tdp_mmu_walk_lockless_{begin,end} static inline. [Sean]
+ * PATCH 4/6: Make get_last_sptep_lockless static. [kernel test robot]
+ * PATCH 4/6: Fix comment above kvm_tdp_mmu_get_last_sptep_lockless. [me]
+ * PATCH 4/6: Rename and comment functions only meant for fast_page_fault handling. [Ben]
+ * PATCH 4/6: Improve comment in tdp_mmu_set_spte_atomic_no_dirty_log. [Sean]
+ * PATCH 4/6: Remove unnecessary sptep null check. [Sean]
+
+v2: https://lore.kernel.org/kvm/20210630214802.1902448-1-dmatlack@google.com/
+ * Split is_tdp_mmu_root cleanup into a separate series. [Sean]
+   https://lore.kernel.org/kvm/20210617231948.2591431-1-dmatlack@google.com/
+ * Split walk_shadow_page_lockless into 2 APIs. [Sean]
+ * Perform rcu_dereference on TDP MMU sptep.
+ * Add comment to tdp_mmu_set_spte_atomic explaining new interaction
+ * with fast_pf_fix_direct_spte. [Ben]
+ * Document pagemap shifts in access_tracking_perf_test. [Ben]
+ * Skip test if lacking pagemap permissions (present pfn is 0). [Ben]
+ * Add Ben's Reviewed-by tags.
+
+v1: https://lore.kernel.org/kvm/20210611235701.3941724-1-dmatlack@google.com/
+
+[1] https://lore.kernel.org/linux-mm/20210612000714.775825-1-willy@infradead.org/
+
+David Matlack (6):
+  KVM: x86/mmu: Rename cr2_or_gpa to gpa in fast_page_fault
+  KVM: x86/mmu: Fix use of enums in trace_fast_page_fault
+  KVM: x86/mmu: Make walk_shadow_page_lockless_{begin,end} interoperate
+    with the TDP MMU
+  KVM: x86/mmu: fast_page_fault support for the TDP MMU
+  KVM: selftests: Fix missing break in dirty_log_perf_test arg parsing
+  KVM: selftests: Introduce access_tracking_perf_test
+
+ arch/x86/kvm/mmu/mmu.c                        |  74 ++-
+ arch/x86/kvm/mmu/mmu_internal.h               |   3 +
+ arch/x86/kvm/mmu/mmutrace.h                   |   6 +
+ arch/x86/kvm/mmu/tdp_mmu.c                    |  47 +-
+ arch/x86/kvm/mmu/tdp_mmu.h                    |  12 +
+ tools/testing/selftests/kvm/.gitignore        |   1 +
+ tools/testing/selftests/kvm/Makefile          |   1 +
+ .../selftests/kvm/access_tracking_perf_test.c | 429 ++++++++++++++++++
+ .../selftests/kvm/dirty_log_perf_test.c       |   1 +
+ 9 files changed, 550 insertions(+), 24 deletions(-)
+ create mode 100644 tools/testing/selftests/kvm/access_tracking_perf_test.c
+
+-- 
+2.32.0.93.g670b81a890-goog
+
