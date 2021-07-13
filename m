@@ -2,110 +2,82 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D47493C7430
-	for <lists+kvm@lfdr.de>; Tue, 13 Jul 2021 18:16:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8FCD83C743B
+	for <lists+kvm@lfdr.de>; Tue, 13 Jul 2021 18:18:42 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229445AbhGMQSj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 13 Jul 2021 12:18:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40594 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229666AbhGMQSi (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 13 Jul 2021 12:18:38 -0400
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7323AC0613DD
-        for <kvm@vger.kernel.org>; Tue, 13 Jul 2021 09:15:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-        MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-        Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-        List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-         bh=LQoPboS23ZJWmSVy61Mm/NOINFZejZIfzYMHAqlDOS0=; b=w/jsQrSI7bJ1ZrydFotmRErPM
-        drc4eD9/xShHE8IkaqogtxmHN5jecAuKJe1hm1GnJxVZI+Khij+VACmFAts2xIJmVbR3YB7dWeQtB
-        rAVxHNnrVUqg8xcQbgoZtOWF2WuPgAMssSGfm1kTR6/ZCoOvD1TPh0lXcVW9wQN4saPSvme4wD6c4
-        IWhlSFvcCRZabQU6yLCEsX3+oSmROYeyyGEvCiZ6o+Sn1TclIMwaEC7OBz/LvArxRyJq2JjtkKXYG
-        6ogFP2ohLPG23VtH/DfY1wn4GMrcPdgCqLuri45n/qazASEiOX9EifgyxP5LWYTsAcCqYMf1+wUo7
-        tz0a/f/FQ==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:46060)
-        by pandora.armlinux.org.uk with esmtpsa (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-        (Exim 4.92)
-        (envelope-from <linux@armlinux.org.uk>)
-        id 1m3L4T-0006Iy-PN; Tue, 13 Jul 2021 17:15:45 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.92)
-        (envelope-from <linux@shell.armlinux.org.uk>)
-        id 1m3L4S-0000SA-Fi; Tue, 13 Jul 2021 17:15:44 +0100
-Date:   Tue, 13 Jul 2021 17:15:44 +0100
-From:   "Russell King (Oracle)" <linux@armlinux.org.uk>
-To:     Marc Zyngier <maz@kernel.org>
-Cc:     linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org,
-        kvmarm@lists.cs.columbia.edu, James Morse <james.morse@arm.com>,
+        id S229995AbhGMQVb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 13 Jul 2021 12:21:31 -0400
+Received: from foss.arm.com ([217.140.110.172]:46556 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229474AbhGMQVa (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 13 Jul 2021 12:21:30 -0400
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 2CD206D;
+        Tue, 13 Jul 2021 09:18:40 -0700 (PDT)
+Received: from [192.168.1.179] (unknown [172.31.20.19])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id C11E03F7D8;
+        Tue, 13 Jul 2021 09:18:38 -0700 (PDT)
+Subject: Re: [PATCH] KVM: arm64: Fix detection of shared VMAs on guest fault
+To:     Marc Zyngier <maz@kernel.org>, kvmarm@lists.cs.columbia.edu,
+        linux-arm-kernel@lists.infradead.org
+Cc:     kvm@vger.kernel.org, James Morse <james.morse@arm.com>,
         Suzuki K Poulose <suzuki.poulose@arm.com>,
         Alexandru Elisei <alexandru.elisei@arm.com>,
-        Alexandre Chartre <alexandre.chartre@oracle.com>,
-        Robin Murphy <robin.murphy@arm.com>, kernel-team@android.com
-Subject: Re: [PATCH 1/3] KVM: arm64: Narrow PMU sysreg reset values to
- architectural requirements
-Message-ID: <20210713161544.GL22278@shell.armlinux.org.uk>
-References: <20210713135900.1473057-1-maz@kernel.org>
- <20210713135900.1473057-2-maz@kernel.org>
- <20210713143949.GJ22278@shell.armlinux.org.uk>
- <87mtqq6w75.wl-maz@kernel.org>
+        Will Deacon <will@kernel.org>, kernel-team@android.com,
+        Catalin Marinas <catalin.marinas@arm.com>
+References: <20210713114804.594993-1-maz@kernel.org>
+From:   Steven Price <steven.price@arm.com>
+Message-ID: <017a25b0-d706-df97-dbba-80d5b21d1779@arm.com>
+Date:   Tue, 13 Jul 2021 17:18:33 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.11.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <87mtqq6w75.wl-maz@kernel.org>
-User-Agent: Mutt/1.10.1 (2018-07-13)
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+In-Reply-To: <20210713114804.594993-1-maz@kernel.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-GB
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jul 13, 2021 at 04:59:58PM +0100, Marc Zyngier wrote:
-> On Tue, 13 Jul 2021 15:39:49 +0100,
-> "Russell King (Oracle)" <linux@armlinux.org.uk> wrote:
-> > 
-> > On Tue, Jul 13, 2021 at 02:58:58PM +0100, Marc Zyngier wrote:
-> > > +static void reset_pmu_reg(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r)
-> > > +{
-> > > +	u64 n, mask;
-> > > +
-> > > +	/* No PMU available, any PMU reg may UNDEF... */
-> > > +	if (!kvm_arm_support_pmu_v3())
-> > > +		return;
-> > > +
-> > > +	n = read_sysreg(pmcr_el0) >> ARMV8_PMU_PMCR_N_SHIFT;
-> > > +	n &= ARMV8_PMU_PMCR_N_MASK;
-> > > +
-> > > +	reset_unknown(vcpu, r);
-> > > +
-> > > +	mask = BIT(ARMV8_PMU_CYCLE_IDX);
-> > > +	if (n)
-> > > +		mask |= GENMASK(n - 1, 0);
-> > > +
-> > > +	__vcpu_sys_reg(vcpu, r->reg) &= mask;
-> > 
-> > Would this read more logically to structure it as:
-> > 
-> > 	mask = BIT(ARMV8_PMU_CYCLE_IDX);
-> > 
-> > 	n = read_sysreg(pmcr_el0) >> ARMV8_PMU_PMCR_N_SHIFT;
-> > 	n &= ARMV8_PMU_PMCR_N_MASK;
-> > 	if (n)
-> > 		mask |= GENMASK(n - 1, 0);
-> > 
-> > 	reset_unknown(vcpu, r);
-> > 	__vcpu_sys_reg(vcpu, r->reg) &= mask;
-> > 
-> > ?
+On 13/07/2021 12:48, Marc Zyngier wrote:
+> When merging the KVM MTE support, the blob that was interposed between
+> the chair and the keyboard experienced a neuronal accident (also known
+> as a brain fart), turning a check for VM_SHARED into VM_PFNMAP as it
+> was reshuffling some of the code.
 > 
-> Yup, that's nicer. Amended locally.
+> The blob having now come back to its senses, let's restore the
+> initial check that the original author got right the first place.
+> 
+> Fixes: ea7fc1bb1cd1 ("KVM: arm64: Introduce MTE VM feature")
+> Cc: Steven Price <steven.price@arm.com>
+> Cc: Catalin Marinas <catalin.marinas@arm.com>
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
 
-Thanks Marc.
+Reviewed-by: Steven Price <steven.price@arm.com>
 
-For the whole series:
+Somehow this blob missed it too while reviewing the changes you'd made.
 
-Acked-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+Thanks,
 
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 40Mbps down 10Mbps up. Decent connectivity at last!
+Steve
+
+> ---
+>  arch/arm64/kvm/mmu.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+> index 3155c9e778f0..0625bf2353c2 100644
+> --- a/arch/arm64/kvm/mmu.c
+> +++ b/arch/arm64/kvm/mmu.c
+> @@ -947,7 +947,7 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+>  		vma_shift = get_vma_page_shift(vma, hva);
+>  	}
+>  
+> -	shared = (vma->vm_flags & VM_PFNMAP);
+> +	shared = (vma->vm_flags & VM_SHARED);
+>  
+>  	switch (vma_shift) {
+>  #ifndef __PAGETABLE_PMD_FOLDED
+> 
+
