@@ -2,173 +2,54 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id CFDFA3C6B67
-	for <lists+kvm@lfdr.de>; Tue, 13 Jul 2021 09:41:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 568603C6B60
+	for <lists+kvm@lfdr.de>; Tue, 13 Jul 2021 09:40:42 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234397AbhGMHoN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 13 Jul 2021 03:44:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34984 "EHLO
+        id S234382AbhGMHn1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 13 Jul 2021 03:43:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34764 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234248AbhGMHoM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 13 Jul 2021 03:44:12 -0400
+        with ESMTP id S234394AbhGMHn0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 13 Jul 2021 03:43:26 -0400
 Received: from metis.ext.pengutronix.de (metis.ext.pengutronix.de [IPv6:2001:67c:670:201:290:27ff:fe1d:cc33])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1DC92C0613DD
-        for <kvm@vger.kernel.org>; Tue, 13 Jul 2021 00:41:23 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 12776C0613E9
+        for <kvm@vger.kernel.org>; Tue, 13 Jul 2021 00:40:37 -0700 (PDT)
 Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
         by metis.ext.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
         (Exim 4.92)
         (envelope-from <ukl@pengutronix.de>)
-        id 1m3D1n-0003wU-UB; Tue, 13 Jul 2021 09:40:28 +0200
+        id 1m3D1j-0003xz-4k; Tue, 13 Jul 2021 09:40:23 +0200
 Received: from [2a0a:edc0:0:900:1d::77] (helo=ptz.office.stw.pengutronix.de)
         by drehscheibe.grey.stw.pengutronix.de with esmtp (Exim 4.92)
         (envelope-from <ukl@pengutronix.de>)
-        id 1m3D1h-0006Pq-8S; Tue, 13 Jul 2021 09:40:21 +0200
+        id 1m3D1h-0006Py-Jh; Tue, 13 Jul 2021 09:40:21 +0200
 Received: from ukl by ptz.office.stw.pengutronix.de with local (Exim 4.92)
         (envelope-from <ukl@pengutronix.de>)
-        id 1m3D1h-0000sY-4N; Tue, 13 Jul 2021 09:40:21 +0200
+        id 1m3D1h-0000vP-Ie; Tue, 13 Jul 2021 09:40:21 +0200
 From:   =?UTF-8?q?Uwe=20Kleine-K=C3=B6nig?= 
         <u.kleine-koenig@pengutronix.de>
 To:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 Cc:     kernel@pengutronix.de,
-        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
-        Alexandre Belloni <alexandre.belloni@bootlin.com>,
-        Alexandre Bounine <alex.bou9@gmail.com>,
-        Alex Dubov <oakad@yahoo.com>, Alex Elder <elder@kernel.org>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Alison Schofield <alison.schofield@intel.com>,
-        Allen Hubbe <allenbh@gmail.com>,
-        Andreas Noever <andreas.noever@gmail.com>,
-        Andy Gross <agross@kernel.org>, Arnd Bergmann <arnd@arndb.de>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        Benjamin Tissoires <benjamin.tissoires@redhat.com>,
-        Ben Widawsky <ben.widawsky@intel.com>,
-        Bjorn Andersson <bjorn.andersson@linaro.org>,
-        Bjorn Helgaas <bhelgaas@google.com>,
-        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
-        Chen-Yu Tsai <wens@csie.org>,
         Christian Borntraeger <borntraeger@de.ibm.com>,
         Cornelia Huck <cohuck@redhat.com>,
-        Cristian Marussi <cristian.marussi@arm.com>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Dave Jiang <dave.jiang@intel.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        David Woodhouse <dwmw@amazon.co.uk>,
-        Dexuan Cui <decui@microsoft.com>,
-        Dmitry Torokhov <dmitry.torokhov@gmail.com>,
-        Dominik Brodowski <linux@dominikbrodowski.net>,
         Eric Farman <farman@linux.ibm.com>,
-        Frank Li <lznuaa@gmail.com>,
-        Geoff Levand <geoff@infradead.org>,
-        Haiyang Zhang <haiyangz@microsoft.com>,
         Halil Pasic <pasic@linux.ibm.com>,
-        Hannes Reinecke <hare@suse.de>,
-        Hans de Goede <hdegoede@redhat.com>,
-        Harald Freudenberger <freude@linux.ibm.com>,
-        Heikki Krogerus <heikki.krogerus@linux.intel.com>,
         Heiko Carstens <hca@linux.ibm.com>,
-        Helge Deller <deller@gmx.de>, Ira Weiny <ira.weiny@intel.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        "James E.J. Bottomley" <James.Bottomley@HansenPartnership.com>,
-        Jaroslav Kysela <perex@perex.cz>,
-        Jason Wang <jasowang@redhat.com>,
-        Jens Taprogge <jens.taprogge@taprogge.org>,
-        Jernej Skrabec <jernej.skrabec@gmail.com>,
-        Jiri Kosina <jikos@kernel.org>,
-        Jiri Slaby <jirislaby@kernel.org>,
-        Joey Pabalan <jpabalanb@gmail.com>,
-        Johan Hovold <johan@kernel.org>,
-        Johannes Berg <johannes@sipsolutions.net>,
-        Johannes Thumshirn <morbidrsa@gmail.com>,
-        Jon Mason <jdmason@kudzu.us>, Juergen Gross <jgross@suse.com>,
-        Julien Grall <jgrall@amazon.com>,
-        Kai-Heng Feng <kai.heng.feng@canonical.com>,
-        Kirti Wankhede <kwankhede@nvidia.com>,
-        Kishon Vijay Abraham I <kishon@ti.com>,
-        =?UTF-8?q?Krzysztof=20Wilczy=C5=84ski?= <kw@linux.com>,
-        "K. Y. Srinivasan" <kys@microsoft.com>,
-        Lee Jones <lee.jones@linaro.org>, Len Brown <lenb@kernel.org>,
-        Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>,
-        Manohar Vanga <manohar.vanga@gmail.com>,
-        Marc Zyngier <maz@kernel.org>, Mark Brown <broonie@kernel.org>,
-        Mark Gross <mgross@linux.intel.com>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        Martyn Welch <martyn@welchs.me.uk>,
-        Mathieu Poirier <mathieu.poirier@linaro.org>,
         Matthew Rosato <mjrosato@linux.ibm.com>,
-        Matt Porter <mporter@kernel.crashing.org>,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        Maxime Ripard <mripard@kernel.org>,
-        Maximilian Luz <luzmaximilian@gmail.com>,
-        Maxim Levitsky <maximlevitsky@gmail.com>,
-        Michael Buesch <m@bues.ch>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Michael Jamet <michael.jamet@intel.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Mika Westerberg <mika.westerberg@linux.intel.com>,
-        Mike Christie <michael.christie@oracle.com>,
-        Moritz Fischer <mdf@kernel.org>,
-        Ohad Ben-Cohen <ohad@wizery.com>,
-        =?UTF-8?q?Pali=20Roh=C3=A1r?= <pali@kernel.org>,
-        Paul Mackerras <paulus@samba.org>,
         Peter Oberparleiter <oberpar@linux.ibm.com>,
-        "Rafael J. Wysocki" <rjw@rjwysocki.net>,
-        =?UTF-8?q?Rafa=C5=82=20Mi=C5=82ecki?= <zajec5@gmail.com>,
-        Rob Herring <robh@kernel.org>,
-        Russell King <linux@armlinux.org.uk>,
-        "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
-        Samuel Holland <samuel@sholland.org>,
-        Samuel Iglesias Gonsalvez <siglesias@igalia.com>,
-        SeongJae Park <sjpark@amazon.de>,
-        Srinivas Kandagatla <srinivas.kandagatla@linaro.org>,
-        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
-        Stefano Stabellini <sstabellini@kernel.org>,
-        Stefan Richter <stefanr@s5r6.in-berlin.de>,
-        Stephen Boyd <sboyd@kernel.org>,
-        Stephen Hemminger <sthemmin@microsoft.com>,
-        Sudeep Holla <sudeep.holla@arm.com>,
-        Sven Van Asbroeck <TheSven73@gmail.com>,
-        Takashi Iwai <tiwai@suse.com>,
-        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
-        Thorsten Scherer <t.scherer@eckelmann.de>,
-        Tomas Winkler <tomas.winkler@intel.com>,
-        Tom Rix <trix@redhat.com>,
-        Tyrel Datwyler <tyreld@linux.ibm.com>,
-        Ulf Hansson <ulf.hansson@linaro.org>,
         Vasily Gorbik <gor@linux.ibm.com>,
-        Vineeth Vijayan <vneethv@linux.ibm.com>,
-        Vinod Koul <vkoul@kernel.org>,
-        Vishal Verma <vishal.l.verma@intel.com>,
-        Wei Liu <wei.liu@kernel.org>,
-        William Breathitt Gray <vilhelm.gray@gmail.com>,
-        Wolfram Sang <wsa@kernel.org>, Wu Hao <hao.wu@intel.com>,
-        Yehezkel Bernat <YehezkelShB@gmail.com>,
-        YueHaibing <yuehaibing@huawei.com>, alsa-devel@alsa-project.org,
-        dmaengine@vger.kernel.org, greybus-dev@lists.linaro.org,
-        industrypack-devel@lists.sourceforge.net, kvm@vger.kernel.org,
-        linux1394-devel@lists.sourceforge.net, linux-acpi@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org,
-        linux-arm-msm@vger.kernel.org, linux-cxl@vger.kernel.org,
-        linux-fpga@vger.kernel.org, linux-hyperv@vger.kernel.org,
-        linux-i2c@vger.kernel.org, linux-i3c@lists.infradead.org,
-        linux-input@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-media@vger.kernel.org, linux-mips@vger.kernel.org,
-        linux-mmc@vger.kernel.org, linux-ntb@googlegroups.com,
-        linux-parisc@vger.kernel.org, linux-pci@vger.kernel.org,
-        linuxppc-dev@lists.ozlabs.org, linux-remoteproc@vger.kernel.org,
-        linux-s390@vger.kernel.org, linux-scsi@vger.kernel.org,
-        linux-serial@vger.kernel.org, linux-spi@vger.kernel.org,
-        linux-staging@lists.linux.dev, linux-sunxi@lists.linux.dev,
-        linux-usb@vger.kernel.org, linux-wireless@vger.kernel.org,
-        netdev@vger.kernel.org, nvdimm@lists.linux.dev,
-        platform-driver-x86@vger.kernel.org, target-devel@vger.kernel.org,
-        virtualization@lists.linux-foundation.org,
-        xen-devel@lists.xenproject.org
-Subject: [PATCH v3 0/5] bus: Make remove callback return void
-Date:   Tue, 13 Jul 2021 09:40:09 +0200
-Message-Id: <20210713074014.684791-1-u.kleine-koenig@pengutronix.de>
+        Vineeth Vijayan <vneethv@linux.ibm.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-s390@vger.kernel.org
+Subject: [PATCH v3 2/5] s390/cio: Make struct css_driver::remove return void
+Date:   Tue, 13 Jul 2021 09:40:11 +0200
+Message-Id: <20210713074014.684791-3-u.kleine-koenig@pengutronix.de>
 X-Mailer: git-send-email 2.30.2
+In-Reply-To: <20210713074014.684791-1-u.kleine-koenig@pengutronix.de>
+References: <20210713074014.684791-1-u.kleine-koenig@pengutronix.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
+X-Patch-Hashes: v=1; h=sha256; i=Zzh6Qah9igZDzbjfUk8AwTB4DBF9iwmgRJQWuOwvwcc=; m=NJ6Mrq9SGd+6Raj4Ph3u7WcDxqXD2X9JpTrAqQ6iaJc=; p=dIvXn065WcUeFDWu88dn/CVmtGJ9aRxWBgN4OMyj3Gw=; g=8a2a8dab3e3a8f389794804b23c10178add091b4
+X-Patch-Sig: m=pgp; i=uwe@kleine-koenig.org; s=0x0D2511F322BFAB1C1580266BE2DCDD9132669BD6; b=iQEzBAABCgAdFiEEfnIqFpAYrP8+dKQLwfwUeK3K7AkFAmDtQzgACgkQwfwUeK3K7AkEZQf9ESX O1FmCODfAQ9yF+paMVBqOutxPpjaUHr4N0kf0U4rQuCsTftLcpduS+5xmgDONEPvWkOGK4vdD8BxN Pl2Sd/WAHAOUqPoPuLVFTyIh+hazmgFuGQaS9dusyasZlKxssitxKHqKMobW+w+5Ldf6ngA6aCod6 9hcbjLD0BpY8gT1eqYLU6S7JGUGrd2X6S8tl+L1IZl17oa2SijOhEFCrPfm7YAGLebpelbzi6SPRp dk9w3hV6bzmaxzWaSv/VlPe6mdWtWMisyXMRTZ4zHvZYO26+upnxWQJqm5TTHgVFgqbSx7cpYPPWT u5PJ+9dAXSMjMKrE7Lm5PGL7U1RpAcA==
 Content-Transfer-Encoding: 8bit
 X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
 X-SA-Exim-Mail-From: ukl@pengutronix.de
@@ -178,133 +59,156 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hello,
+The driver core ignores the return value of css_remove()
+(because there is only little it can do when a device disappears) and
+all callbacks return 0 anyhow.
 
-this is the final patch set for my effort to make struct
-bus_type::remove return void.
+So make it impossible for future drivers to return an unused error code
+by changing the remove prototype to return void.
 
-The first four patches contain cleanups that make some of these
-callbacks (more obviously) always return 0. They are acked by the
-respective maintainers. Bjorn Helgaas explicitly asked to include the
-pci patch (#1) into this series, so Greg taking this is fine. I assume
-the s390 people are fine with Greg taking patches #2 to #4, too, they
-didn't explicitly said so though.
+The real motivation for this change is the quest to make struct
+bus_type::remove return void, too.
 
-The last patch actually changes the prototype and so touches quite some
-drivers and has the potential to conflict with future developments, so I
-consider it beneficial to put these patches into next soon. I expect
-that it will be Greg who takes the complete series, he already confirmed
-via irc (for v2) to look into this series.
+Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+Acked-by: Vineeth Vijayan <vneethv@linux.ibm.com>
+Signed-off-by: Uwe Kleine-König <u.kleine-koenig@pengutronix.de>
+---
+ drivers/s390/cio/chsc_sch.c     | 3 +--
+ drivers/s390/cio/css.c          | 7 ++++---
+ drivers/s390/cio/css.h          | 2 +-
+ drivers/s390/cio/device.c       | 5 ++---
+ drivers/s390/cio/eadm_sch.c     | 4 +---
+ drivers/s390/cio/vfio_ccw_drv.c | 3 +--
+ 6 files changed, 10 insertions(+), 14 deletions(-)
 
-In the last round I failed to send the cover letter to all affected
-people, sorry for that, this should be fixed now.
-
-Best regards
-Uwe
-
-Changes since v2:
- - Add several acks/review tags
- - Include patch #1 explicitly
- - rebase to v5.14-rc1, build test on amd64, arm64 and s390 using
-   allmodconfig
-
-Uwe Kleine-König (5):
-  PCI: endpoint: Make struct pci_epf_driver::remove return void
-  s390/cio: Make struct css_driver::remove return void
-  s390/ccwgroup: Drop if with an always false condition
-  s390/scm: Make struct scm_driver::remove return void
-  bus: Make remove callback return void
-
- arch/arm/common/locomo.c                  | 3 +--
- arch/arm/common/sa1111.c                  | 4 +---
- arch/arm/mach-rpc/ecard.c                 | 4 +---
- arch/mips/sgi-ip22/ip22-gio.c             | 3 +--
- arch/parisc/kernel/drivers.c              | 5 ++---
- arch/powerpc/platforms/ps3/system-bus.c   | 3 +--
- arch/powerpc/platforms/pseries/ibmebus.c  | 3 +--
- arch/powerpc/platforms/pseries/vio.c      | 3 +--
- arch/s390/include/asm/eadm.h              | 2 +-
- drivers/acpi/bus.c                        | 3 +--
- drivers/amba/bus.c                        | 4 +---
- drivers/base/auxiliary.c                  | 4 +---
- drivers/base/isa.c                        | 4 +---
- drivers/base/platform.c                   | 4 +---
- drivers/bcma/main.c                       | 6 ++----
- drivers/bus/sunxi-rsb.c                   | 4 +---
- drivers/cxl/core.c                        | 3 +--
- drivers/dax/bus.c                         | 4 +---
- drivers/dma/idxd/sysfs.c                  | 4 +---
- drivers/firewire/core-device.c            | 4 +---
- drivers/firmware/arm_scmi/bus.c           | 4 +---
- drivers/firmware/google/coreboot_table.c  | 4 +---
- drivers/fpga/dfl.c                        | 4 +---
- drivers/hid/hid-core.c                    | 4 +---
- drivers/hid/intel-ish-hid/ishtp/bus.c     | 4 +---
- drivers/hv/vmbus_drv.c                    | 5 +----
- drivers/hwtracing/intel_th/core.c         | 4 +---
- drivers/i2c/i2c-core-base.c               | 5 +----
- drivers/i3c/master.c                      | 4 +---
- drivers/input/gameport/gameport.c         | 3 +--
- drivers/input/serio/serio.c               | 3 +--
- drivers/ipack/ipack.c                     | 4 +---
- drivers/macintosh/macio_asic.c            | 4 +---
- drivers/mcb/mcb-core.c                    | 4 +---
- drivers/media/pci/bt8xx/bttv-gpio.c       | 3 +--
- drivers/memstick/core/memstick.c          | 3 +--
- drivers/mfd/mcp-core.c                    | 3 +--
- drivers/misc/mei/bus.c                    | 4 +---
- drivers/misc/tifm_core.c                  | 3 +--
- drivers/mmc/core/bus.c                    | 4 +---
- drivers/mmc/core/sdio_bus.c               | 4 +---
- drivers/net/netdevsim/bus.c               | 3 +--
- drivers/ntb/core.c                        | 4 +---
- drivers/ntb/ntb_transport.c               | 4 +---
- drivers/nvdimm/bus.c                      | 3 +--
- drivers/pci/endpoint/pci-epf-core.c       | 7 ++-----
- drivers/pci/pci-driver.c                  | 3 +--
- drivers/pcmcia/ds.c                       | 4 +---
- drivers/platform/surface/aggregator/bus.c | 4 +---
- drivers/platform/x86/wmi.c                | 4 +---
- drivers/pnp/driver.c                      | 3 +--
- drivers/rapidio/rio-driver.c              | 4 +---
- drivers/rpmsg/rpmsg_core.c                | 7 ++-----
- drivers/s390/block/scm_drv.c              | 4 +---
- drivers/s390/cio/ccwgroup.c               | 6 +-----
- drivers/s390/cio/chsc_sch.c               | 3 +--
- drivers/s390/cio/css.c                    | 7 +++----
- drivers/s390/cio/css.h                    | 2 +-
- drivers/s390/cio/device.c                 | 9 +++------
- drivers/s390/cio/eadm_sch.c               | 4 +---
- drivers/s390/cio/scm.c                    | 5 +++--
- drivers/s390/cio/vfio_ccw_drv.c           | 3 +--
- drivers/s390/crypto/ap_bus.c              | 4 +---
- drivers/scsi/scsi_debug.c                 | 3 +--
- drivers/siox/siox-core.c                  | 4 +---
- drivers/slimbus/core.c                    | 4 +---
- drivers/soc/qcom/apr.c                    | 4 +---
- drivers/spi/spi.c                         | 4 +---
- drivers/spmi/spmi.c                       | 3 +--
- drivers/ssb/main.c                        | 4 +---
- drivers/staging/fieldbus/anybuss/host.c   | 4 +---
- drivers/staging/greybus/gbphy.c           | 4 +---
- drivers/target/loopback/tcm_loop.c        | 5 ++---
- drivers/thunderbolt/domain.c              | 4 +---
- drivers/tty/serdev/core.c                 | 4 +---
- drivers/usb/common/ulpi.c                 | 4 +---
- drivers/usb/serial/bus.c                  | 4 +---
- drivers/usb/typec/bus.c                   | 4 +---
- drivers/vdpa/vdpa.c                       | 4 +---
- drivers/vfio/mdev/mdev_driver.c           | 4 +---
- drivers/virtio/virtio.c                   | 3 +--
- drivers/vme/vme.c                         | 4 +---
- drivers/xen/xenbus/xenbus.h               | 2 +-
- drivers/xen/xenbus/xenbus_probe.c         | 4 +---
- include/linux/device/bus.h                | 2 +-
- include/linux/pci-epf.h                   | 2 +-
- sound/aoa/soundbus/core.c                 | 4 +---
- 87 files changed, 98 insertions(+), 241 deletions(-)
-
-base-commit: e73f0f0ee7541171d89f2e2491130c7771ba58d3
+diff --git a/drivers/s390/cio/chsc_sch.c b/drivers/s390/cio/chsc_sch.c
+index c42405c620b5..684348d82f08 100644
+--- a/drivers/s390/cio/chsc_sch.c
++++ b/drivers/s390/cio/chsc_sch.c
+@@ -100,7 +100,7 @@ static int chsc_subchannel_probe(struct subchannel *sch)
+ 	return ret;
+ }
+ 
+-static int chsc_subchannel_remove(struct subchannel *sch)
++static void chsc_subchannel_remove(struct subchannel *sch)
+ {
+ 	struct chsc_private *private;
+ 
+@@ -112,7 +112,6 @@ static int chsc_subchannel_remove(struct subchannel *sch)
+ 		put_device(&sch->dev);
+ 	}
+ 	kfree(private);
+-	return 0;
+ }
+ 
+ static void chsc_subchannel_shutdown(struct subchannel *sch)
+diff --git a/drivers/s390/cio/css.c b/drivers/s390/cio/css.c
+index a974943c27da..092fd1ea5799 100644
+--- a/drivers/s390/cio/css.c
++++ b/drivers/s390/cio/css.c
+@@ -1374,12 +1374,13 @@ static int css_probe(struct device *dev)
+ static int css_remove(struct device *dev)
+ {
+ 	struct subchannel *sch;
+-	int ret;
+ 
+ 	sch = to_subchannel(dev);
+-	ret = sch->driver->remove ? sch->driver->remove(sch) : 0;
++	if (sch->driver->remove)
++		sch->driver->remove(sch);
+ 	sch->driver = NULL;
+-	return ret;
++
++	return 0;
+ }
+ 
+ static void css_shutdown(struct device *dev)
+diff --git a/drivers/s390/cio/css.h b/drivers/s390/cio/css.h
+index 2eddfc47f687..c98522cbe276 100644
+--- a/drivers/s390/cio/css.h
++++ b/drivers/s390/cio/css.h
+@@ -81,7 +81,7 @@ struct css_driver {
+ 	int (*chp_event)(struct subchannel *, struct chp_link *, int);
+ 	int (*sch_event)(struct subchannel *, int);
+ 	int (*probe)(struct subchannel *);
+-	int (*remove)(struct subchannel *);
++	void (*remove)(struct subchannel *);
+ 	void (*shutdown)(struct subchannel *);
+ 	int (*settle)(void);
+ };
+diff --git a/drivers/s390/cio/device.c b/drivers/s390/cio/device.c
+index 84f659cafe76..cd5d2d4d8e46 100644
+--- a/drivers/s390/cio/device.c
++++ b/drivers/s390/cio/device.c
+@@ -137,7 +137,7 @@ static int ccw_uevent(struct device *dev, struct kobj_uevent_env *env)
+ 
+ static void io_subchannel_irq(struct subchannel *);
+ static int io_subchannel_probe(struct subchannel *);
+-static int io_subchannel_remove(struct subchannel *);
++static void io_subchannel_remove(struct subchannel *);
+ static void io_subchannel_shutdown(struct subchannel *);
+ static int io_subchannel_sch_event(struct subchannel *, int);
+ static int io_subchannel_chp_event(struct subchannel *, struct chp_link *,
+@@ -1101,7 +1101,7 @@ static int io_subchannel_probe(struct subchannel *sch)
+ 	return 0;
+ }
+ 
+-static int io_subchannel_remove(struct subchannel *sch)
++static void io_subchannel_remove(struct subchannel *sch)
+ {
+ 	struct io_subchannel_private *io_priv = to_io_private(sch);
+ 	struct ccw_device *cdev;
+@@ -1120,7 +1120,6 @@ static int io_subchannel_remove(struct subchannel *sch)
+ 			  io_priv->dma_area, io_priv->dma_area_dma);
+ 	kfree(io_priv);
+ 	sysfs_remove_group(&sch->dev.kobj, &io_subchannel_attr_group);
+-	return 0;
+ }
+ 
+ static void io_subchannel_verify(struct subchannel *sch)
+diff --git a/drivers/s390/cio/eadm_sch.c b/drivers/s390/cio/eadm_sch.c
+index c8964e0a23e7..15bdae5981ca 100644
+--- a/drivers/s390/cio/eadm_sch.c
++++ b/drivers/s390/cio/eadm_sch.c
+@@ -282,7 +282,7 @@ static void eadm_quiesce(struct subchannel *sch)
+ 	spin_unlock_irq(sch->lock);
+ }
+ 
+-static int eadm_subchannel_remove(struct subchannel *sch)
++static void eadm_subchannel_remove(struct subchannel *sch)
+ {
+ 	struct eadm_private *private = get_eadm_private(sch);
+ 
+@@ -297,8 +297,6 @@ static int eadm_subchannel_remove(struct subchannel *sch)
+ 	spin_unlock_irq(sch->lock);
+ 
+ 	kfree(private);
+-
+-	return 0;
+ }
+ 
+ static void eadm_subchannel_shutdown(struct subchannel *sch)
+diff --git a/drivers/s390/cio/vfio_ccw_drv.c b/drivers/s390/cio/vfio_ccw_drv.c
+index 9b61e9b131ad..76099bcb765b 100644
+--- a/drivers/s390/cio/vfio_ccw_drv.c
++++ b/drivers/s390/cio/vfio_ccw_drv.c
+@@ -234,7 +234,7 @@ static int vfio_ccw_sch_probe(struct subchannel *sch)
+ 	return ret;
+ }
+ 
+-static int vfio_ccw_sch_remove(struct subchannel *sch)
++static void vfio_ccw_sch_remove(struct subchannel *sch)
+ {
+ 	struct vfio_ccw_private *private = dev_get_drvdata(&sch->dev);
+ 	struct vfio_ccw_crw *crw, *temp;
+@@ -257,7 +257,6 @@ static int vfio_ccw_sch_remove(struct subchannel *sch)
+ 	VFIO_CCW_MSG_EVENT(4, "unbound from subchannel %x.%x.%04x\n",
+ 			   sch->schid.cssid, sch->schid.ssid,
+ 			   sch->schid.sch_no);
+-	return 0;
+ }
+ 
+ static void vfio_ccw_sch_shutdown(struct subchannel *sch)
 -- 
 2.30.2
 
