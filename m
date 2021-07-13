@@ -2,79 +2,89 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4B3453C7815
-	for <lists+kvm@lfdr.de>; Tue, 13 Jul 2021 22:37:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 44F1F3C781B
+	for <lists+kvm@lfdr.de>; Tue, 13 Jul 2021 22:39:15 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235119AbhGMUkj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 13 Jul 2021 16:40:39 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:32287 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231499AbhGMUkj (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 13 Jul 2021 16:40:39 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1626208668;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=+3BE+KBwmpKZs3HfTywA3YepA+ZFEmEvW/zZIsH9yzY=;
-        b=aFNIw4XIj7NWs/l8kpBXo81ObNfYetfTQJKCWkxCWYhEgVgGE/ATRO44JKl52r/Nhv4H1o
-        nrtJq5Jam33yB7VKlON8YZGO5cEd4Ww/PIMAGT94BnNQHEKuGhXYEfp+TjWLTytDoGH/tC
-        BibkcjWFqcvi1x6bKnBp+KXNiVZUxyo=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-269-OxfjYbIcPK2i_muuum3CcA-1; Tue, 13 Jul 2021 16:37:47 -0400
-X-MC-Unique: OxfjYbIcPK2i_muuum3CcA-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0CB3E804145;
-        Tue, 13 Jul 2021 20:37:46 +0000 (UTC)
-Received: from gator.redhat.com (unknown [10.22.8.235])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 1A4581002D71;
-        Tue, 13 Jul 2021 20:37:44 +0000 (UTC)
-From:   Andrew Jones <drjones@redhat.com>
-To:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
-Cc:     maz@kernel.org, pbonzini@redhat.com
-Subject: [PATCH 2/2] KVM: arm64: selftests: get-reg-list: actually enable pmu regs in pmu sublist
-Date:   Tue, 13 Jul 2021 22:37:42 +0200
-Message-Id: <20210713203742.29680-3-drjones@redhat.com>
-In-Reply-To: <20210713203742.29680-1-drjones@redhat.com>
-References: <20210713203742.29680-1-drjones@redhat.com>
+        id S235139AbhGMUmD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 13 Jul 2021 16:42:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44438 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S235149AbhGMUmC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 13 Jul 2021 16:42:02 -0400
+Received: from mail-pl1-x636.google.com (mail-pl1-x636.google.com [IPv6:2607:f8b0:4864:20::636])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 12779C0613E9
+        for <kvm@vger.kernel.org>; Tue, 13 Jul 2021 13:39:11 -0700 (PDT)
+Received: by mail-pl1-x636.google.com with SMTP id p17so36359plf.12
+        for <kvm@vger.kernel.org>; Tue, 13 Jul 2021 13:39:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=vAEz6tbBq7rYrMMnkx41TwsKhbqefEUfL96yExQSeis=;
+        b=vXnVzvAmDrRF8FTIsxLeNffuHPTEaCiYb4YtzDpnJgAQPgXvS5lawhS8/WpTLy6Vo8
+         XlS/V+9queLMhMPiBN3DLqU2fxswvlBmwcLsjpD2m5ckBzHUhDYMteAj2jmdG4vTJfog
+         NU5w6EgdvzWFrdlyYRIGFeE75quGdFyU8yJBd214cGiixfntXOFbiMbPSCeRXmpB4Kvw
+         eF95YGDWecVO/K9fGyUaoAhWC/2xHXoluwTYXaQqEmoEywCIGKTh01ebamJj6d05BlT8
+         2Q7lSXC0DvKkNpfCZb/zgF0QjpTWOs5uzuEdlE8SsZJg2Z97Y0tQ9ph7APv7V+7TkLMh
+         L0ug==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=vAEz6tbBq7rYrMMnkx41TwsKhbqefEUfL96yExQSeis=;
+        b=mYxgWIams65JKaZX5C2FI/QrIMgjx9wgeKSUJStZP+e1mjCInoW3zW5C/lArLo8fd3
+         fqOQteHL46k2UEczt6kwhafmu6ZFGE7Q8GPphxs7Hag6SThsVkMw2NeLAYobz1vywSqw
+         WPtUg40o4H8b789BGjM5Mpg/CHvYGHpwH9UoAivXsue+8TyjPjxjYUEENsoWOIE0Dti5
+         C+Uap7tElKt2YVz7r8f9yOLGvoiRdAKQft57dzjszxAgozYYNAZFKY5cUkquQIkWXQCO
+         VAUgzoMAnetkGl33AZZEY7Ic+HBFxAILbLjz7j6HP8pND/Kqjtase0cRRmXmgNZmsNl8
+         KGYw==
+X-Gm-Message-State: AOAM5316+y0jOTx0AIxVL3h/rwOA8k5QJoqRnxM0AcIqpQE/fzRm8Wg7
+        WDhRmnTtkuM7DbQso03uc9NHjA==
+X-Google-Smtp-Source: ABdhPJxKaCTzakoran7rQmGGw8tLT/Er02SRPgN8R/aU28R0uj21uUB5p9Z0RNISuFUJlrAIQ3rCSg==
+X-Received: by 2002:a17:90a:1785:: with SMTP id q5mr99843pja.38.1626208750366;
+        Tue, 13 Jul 2021 13:39:10 -0700 (PDT)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id d29sm37603pfq.193.2021.07.13.13.39.09
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 13 Jul 2021 13:39:09 -0700 (PDT)
+Date:   Tue, 13 Jul 2021 20:39:06 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     isaku.yamahata@intel.com, Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        "H . Peter Anvin" <hpa@zytor.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, erdemaktas@google.com,
+        Connor Kuehl <ckuehl@redhat.com>, x86@kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        isaku.yamahata@gmail.com,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Xiaoyao Li <xiaoyao.li@intel.com>
+Subject: Re: [RFC PATCH v2 22/69] KVM: x86: Add vm_type to differentiate
+ legacy VMs from protected VMs
+Message-ID: <YO356ni0SjPsLsSo@google.com>
+References: <cover.1625186503.git.isaku.yamahata@intel.com>
+ <8eb87cd52a89d957af03f93a9ece5634426a7757.1625186503.git.isaku.yamahata@intel.com>
+ <e2270f66-abd8-db17-c3bd-b6d9459624ec@redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <e2270f66-abd8-db17-c3bd-b6d9459624ec@redhat.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-We reworked get-reg-list to make it easier to enable optional register
-sublists by parametrizing their vcpu feature flags as well as making
-other generalizations. That was all to make sure we enable the PMU
-registers when we want to test them. Somehow we forgot to actually
-include the PMU feature flag in the PMU sublist description though!
-Do that now.
+On Tue, Jul 06, 2021, Paolo Bonzini wrote:
+> On 03/07/21 00:04, isaku.yamahata@intel.com wrote:
+> >   struct kvm_arch {
+> > +	unsigned long vm_type;
+> 
+> Also why not just int or u8?
 
-Fixes: 313673bad871 ("KVM: arm64: selftests: get-reg-list: Split base and pmu registers")
-Signed-off-by: Andrew Jones <drjones@redhat.com>
----
- tools/testing/selftests/kvm/aarch64/get-reg-list.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+Heh, because kvm_dev_ioctl_create_vm() takes an "unsigned long" for the type and
+it felt wrong to store it as something else.  Storing it as a smaller field should
+be fine, I highly doubt we'll get to 256 types anytime soon :-)
 
-diff --git a/tools/testing/selftests/kvm/aarch64/get-reg-list.c b/tools/testing/selftests/kvm/aarch64/get-reg-list.c
-index a16c8f05366c..cc898181faab 100644
---- a/tools/testing/selftests/kvm/aarch64/get-reg-list.c
-+++ b/tools/testing/selftests/kvm/aarch64/get-reg-list.c
-@@ -1019,7 +1019,8 @@ static __u64 sve_rejects_set[] = {
- #define VREGS_SUBLIST \
- 	{ "vregs", .regs = vregs, .regs_n = ARRAY_SIZE(vregs), }
- #define PMU_SUBLIST \
--	{ "pmu", .regs = pmu_regs, .regs_n = ARRAY_SIZE(pmu_regs), }
-+	{ "pmu", .capability = KVM_CAP_ARM_PMU_V3, .feature = KVM_ARM_VCPU_PMU_V3, \
-+	  .regs = pmu_regs, .regs_n = ARRAY_SIZE(pmu_regs), }
- #define SVE_SUBLIST \
- 	{ "sve", .capability = KVM_CAP_ARM_SVE, .feature = KVM_ARM_VCPU_SVE, .finalize = true, \
- 	  .regs = sve_regs, .regs_n = ARRAY_SIZE(sve_regs), \
--- 
-2.31.1
-
+I think kvm_x86_ops.is_vm_type_supported() should take the full size though.
