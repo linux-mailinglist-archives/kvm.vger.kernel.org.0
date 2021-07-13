@@ -2,175 +2,160 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2FBB63C7476
-	for <lists+kvm@lfdr.de>; Tue, 13 Jul 2021 18:26:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id F39D43C7499
+	for <lists+kvm@lfdr.de>; Tue, 13 Jul 2021 18:33:37 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230072AbhGMQ3D (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 13 Jul 2021 12:29:03 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:27321 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229437AbhGMQ3C (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 13 Jul 2021 12:29:02 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1626193572;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=aUNFSZ0FEoShWeStx0gKzE+MBfhHSV0LmcBrnFbHTXY=;
-        b=imYZ3nnr50zpDOZ363UQPIDY1+KD88gVR6aWNmF8CRaUzzIXpILEq+OdmRrMcPHpFU1rwP
-        /OHAOxhMh1XmzmHo5QroNfqhqLgxGUiCDgdHNVLJ9v56+TDIKndkIyp3jbB4AuEt4IaBQy
-        tlsOCPsle8EzLOMsaRsb6UCinn0BtAw=
-Received: from mail-ot1-f71.google.com (mail-ot1-f71.google.com
- [209.85.210.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-169-mayh8VxnPWWSill6V98Ltw-1; Tue, 13 Jul 2021 12:26:11 -0400
-X-MC-Unique: mayh8VxnPWWSill6V98Ltw-1
-Received: by mail-ot1-f71.google.com with SMTP id y23-20020a9d71570000b02904b68024dc91so10530882otj.0
-        for <kvm@vger.kernel.org>; Tue, 13 Jul 2021 09:26:11 -0700 (PDT)
+        id S229666AbhGMQg0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 13 Jul 2021 12:36:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44926 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229454AbhGMQgZ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 13 Jul 2021 12:36:25 -0400
+Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 74BB2C0613E9
+        for <kvm@vger.kernel.org>; Tue, 13 Jul 2021 09:33:35 -0700 (PDT)
+Received: by mail-yb1-xb49.google.com with SMTP id a4-20020a25f5040000b029054df41d5cceso27748755ybe.18
+        for <kvm@vger.kernel.org>; Tue, 13 Jul 2021 09:33:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=reply-to:date:message-id:mime-version:subject:from:to:cc;
+        bh=eCce4R3xq3isKOouF5FTNEunRJdZmdeo4W5/csS7Oys=;
+        b=WW7f7RhIOPkS4TYxNubIzf63Dv/yms2kaYN5+Rxv5Q9YroM0R2ch1JNCqJSPPwyUlo
+         KAF82pu3Bp4g/Pn+xuTKeUAwB/TO69M6o1eZRkVdgC1tee/P/80S/uaAp7ti/HK3esQk
+         Q0ute6Gan86natVKaRfSeabXGhIzjPsBIB/HhoYgyxThITgbW2GiDLBWHLW8iIwxtJNt
+         vochZXnSRORkeDzrndGVSRqhSDgvh8hxbxWMzFFi/rSojFqOf7TCcj+bXcv3KCd5+lEm
+         8V/XzYdyWhy/C8ZT/zuzaVoIWT8zpBN0LW61lb5Tz/vRzpRc6UN871GxHFqxOTrEkUZC
+         5izQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=aUNFSZ0FEoShWeStx0gKzE+MBfhHSV0LmcBrnFbHTXY=;
-        b=BfMBeuMWPF3TuqkRZKHv8Juo2XwwU2SBC78K/61wz/c49uH0+8s41K0VIt+FO4Q4xJ
-         Ls22MLnXFilStgHfZXN7nbcBybDx/FcusTgqHYGa7Z6kqEU0NN5tx9J4s1mqKJW38K7n
-         qBOcb+80nltJGjmtfMBXpeMHWv2Je7ZbiGaHAa6fZ/Pc9cctawewfS/e3jsPXsWMFYbR
-         eq7qbAhv691sKz1/G3Pjm5F0g4dQC55yGJ8o4hDStuvLWbcOkYXo0EuAkwloJ7k8YFMw
-         nsUFeMIj7DGy8MpsceeZYMDHi6XoMhs6tU0gW/7XlmxMeGWiOqws1mcns/0JB+TiOMyG
-         u+tA==
-X-Gm-Message-State: AOAM533fo9EJt88wRpAh3l3YL2apHO7gW9vm3bYt3EuDLDS4Azk2HC8/
-        8jpUwSKVJ6jJfDtqINQFzrKD/hFzEqeep5xtcYYDqX+7Qtmf//vQTLyXn1MOQ+3W0/umFHxQTuc
-        a/qtFLU9PfEyC
-X-Received: by 2002:aca:1e04:: with SMTP id m4mr3818775oic.1.1626193570358;
-        Tue, 13 Jul 2021 09:26:10 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzl+u2c3Je1HN3GzIh0wo30xQVXEXR89UpoNOeKThRgzm1AgZvalAzbyfHug11B/NidaNjezQ==
-X-Received: by 2002:aca:1e04:: with SMTP id m4mr3818748oic.1.1626193570154;
-        Tue, 13 Jul 2021 09:26:10 -0700 (PDT)
-Received: from redhat.com ([198.99.80.109])
-        by smtp.gmail.com with ESMTPSA id l15sm1047355otk.56.2021.07.13.09.26.08
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 13 Jul 2021 09:26:09 -0700 (PDT)
-Date:   Tue, 13 Jul 2021 10:26:07 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Jason Gunthorpe <jgg@nvidia.com>
-Cc:     "Tian, Kevin" <kevin.tian@intel.com>,
-        Jean-Philippe Brucker <jean-philippe@linaro.org>,
-        David Gibson <david@gibson.dropbear.id.au>,
-        Jason Wang <jasowang@redhat.com>,
-        "parav@mellanox.com" <parav@mellanox.com>,
-        "Enrico Weigelt, metux IT consult" <lkml@metux.net>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Shenming Lu <lushenming@huawei.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Eric Auger <eric.auger@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        "Raj, Ashok" <ashok.raj@intel.com>,
-        "Liu, Yi L" <yi.l.liu@intel.com>, "Wu, Hao" <hao.wu@intel.com>,
-        "Jiang, Dave" <dave.jiang@intel.com>,
-        Jacob Pan <jacob.jun.pan@linux.intel.com>,
-        Kirti Wankhede <kwankhede@nvidia.com>,
-        Robin Murphy <robin.murphy@arm.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
-        David Woodhouse <dwmw2@infradead.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Lu Baolu <baolu.lu@linux.intel.com>
-Subject: Re: [RFC v2] /dev/iommu uAPI proposal
-Message-ID: <20210713102607.3a886fee.alex.williamson@redhat.com>
-In-Reply-To: <20210713125503.GC136586@nvidia.com>
-References: <BN9PR11MB5433B1E4AE5B0480369F97178C189@BN9PR11MB5433.namprd11.prod.outlook.com>
-        <20210709155052.2881f561.alex.williamson@redhat.com>
-        <BN9PR11MB54336FB9845649BB2D53022C8C159@BN9PR11MB5433.namprd11.prod.outlook.com>
-        <20210712124150.2bf421d1.alex.williamson@redhat.com>
-        <BL1PR11MB54299D9554D71F53D74E1E378C159@BL1PR11MB5429.namprd11.prod.outlook.com>
-        <20210713125503.GC136586@nvidia.com>
-X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+        h=x-gm-message-state:reply-to:date:message-id:mime-version:subject
+         :from:to:cc;
+        bh=eCce4R3xq3isKOouF5FTNEunRJdZmdeo4W5/csS7Oys=;
+        b=YNWwiWjTBtj6jppYP1EJ70ECzE4IFNdL7facOQfYgkz/M0ARxUexr9Hrchtpln2LU7
+         XSwsPLA/CldJYD7DKKIKXVK709Q/Jl+fgHdC9fKgpRcZ+4bld4TnVLrVHFyqSD7CYbqS
+         1u6xPE3xzlLO/nwHAw747g0H8ieUij0+JnRNQuapLoc30mvEqO5hlXp+ElQVpuIjoP66
+         C+oiHJJzornwmSX4t9K0mQzXP3y+jVYI/rAyOD41Pj9fKCka3K50lIlAZi9P0hL1a/3W
+         do4R71TX3ilg6HzzGe7Drv5OH/ohtOfHj9apSd+KWX8oYcL26qQWDw6j/ghIrJp04rl3
+         Po9A==
+X-Gm-Message-State: AOAM530QhTYpXKz/Yqoo5KtE1ONid0Kw5d1ykJVio8/kvimk/AaJikYe
+        d8pC+HrIQmoaggHgD9lMv0mngovL/eA=
+X-Google-Smtp-Source: ABdhPJx9JGW3qNNkd9oyzMw9G4hOv/gl13Yd2iL9EaRCo7CMB+rG3efy24zY7EhlUxx50+F6I7t4jPBb7to=
+X-Received: from seanjc798194.pdx.corp.google.com ([2620:15c:90:200:825e:11a1:364b:8109])
+ (user=seanjc job=sendgmr) by 2002:a25:8743:: with SMTP id e3mr6953766ybn.125.1626194014534;
+ Tue, 13 Jul 2021 09:33:34 -0700 (PDT)
+Reply-To: Sean Christopherson <seanjc@google.com>
+Date:   Tue, 13 Jul 2021 09:32:38 -0700
+Message-Id: <20210713163324.627647-1-seanjc@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.32.0.93.g670b81a890-goog
+Subject: [PATCH v2 00/46] KVM: x86: vCPU RESET/INIT fixes and consolidation
+From:   Sean Christopherson <seanjc@google.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Reiji Watanabe <reijiw@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 13 Jul 2021 09:55:03 -0300
-Jason Gunthorpe <jgg@nvidia.com> wrote:
+The end goal of this series is to consolidate the RESET/INIT code, both to
+deduplicate code and to try to avoid divergent behavior/bugs, e.g. SVM only
+recently started updating vcpu->arch.cr4 on INIT.
 
-> On Mon, Jul 12, 2021 at 11:56:24PM +0000, Tian, Kevin wrote:
-> 
-> > Maybe I misunderstood your question. Are you specifically worried
-> > about establishing the security context for a mdev vs. for its
-> > parent?  
-> 
-> The way to think about the cookie, and the device bind/attach in
-> general, is as taking control of a portion of the IOMMU routing:
-> 
->  - RID
->  - RID + PASID
->  - "software"
-> 
-> For the first two there can be only one device attachment per value so
-> the cookie is unambiguous.
-> 
-> For "software" the iommu layer has little to do with this - everything
-> is constructed outside by the mdev. If the mdev wishes to communicate
-> on /dev/iommu using the cookie then it has to do so using some iommufd
-> api and we can convay the proper device at that point.
-> 
-> Kevin didn't show it, but along side the PCI attaches:
-> 
->         struct iommu_attach_data * iommu_pci_device_attach(
->                 struct iommu_dev *dev, struct pci_device *pdev,
->                 u32 ioasid);
-> 
-> There would also be a software attach for mdev:
-> 
->         struct iommu_attach_data * iommu_sw_device_attach(
->                 struct iommu_dev *dev, struct device *pdev, u32 ioasid);
-> 
-> Which does not connect anything to the iommu layer.
-> 
-> It would have to return something that allows querying the IO page
-> table, and the mdev would use that API instead of vfio_pin_pages().
+The TL;DR of why it takes 40+ patches to get there is that the RESET/INIT
+flows have multiple latent bugs and hidden dependencies, but "work"
+because they're rarely touched, are mostly fixed flows in both KVM and the
+guest, and because guests don't sanity check state after INIT.
 
+While several of the patches have Fixes tags, I am absolutely terrified of
+backporting most of them due to the likelihood of breaking a different
+version of KVM.  And, for the most part the bugs are benign in the sense
+no guest has actually encountered any of these bugs.  For that reason, I
+intentionally omitted stable@ entirely.  The only patches I would consider
+even remotely safe for backporting are the first four patches in the series.
 
-Quoting this proposal again:
+v2:
+  - Collect Reviews. [Reiji]
+  - Fix an apic->base_address initialization goof. [Reiji]
+  - Add patch to flush TLB on INIT. [Reiji]
+  - Add patch to preserved CR0.CD/NW on INIT. [Reiji]
+  - Add patch to emulate #INIT after shutdown on SVM. [Reiji]
+  - Add patch to consolidate arch.hflags code. [Reiji]
+  - Drop patch to omit VMWRITE zeroing. [Paolo, Jim]
+  - Drop several MMU patches (moved to other series).
 
-> 1)  A successful binding call for the first device in the group creates 
->     the security context for the entire group, by:
-> 
->     * Verifying group viability in a similar way as VFIO does;
-> 
->     * Calling IOMMU-API to move the group into a block-dma state,
->       which makes all devices in the group attached to an block-dma
->       domain with an empty I/O page table;
-> 
->     VFIO should not allow the user to mmap the MMIO bar of the bound
->     device until the binding call succeeds.
+v1: https://lkml.kernel.org/r/20210424004645.3950558-1-seanjc@google.com
 
-The attach step is irrelevant to my question, the bind step is where
-the device/group gets into a secure state for device access.
+Sean Christopherson (46):
+  KVM: x86: Flush the guest's TLB on INIT
+  KVM: nVMX: Set LDTR to its architecturally defined value on nested
+    VM-Exit
+  KVM: SVM: Zero out GDTR.base and IDTR.base on INIT
+  KVM: VMX: Set EDX at INIT with CPUID.0x1, Family-Model-Stepping
+  KVM: SVM: Require exact CPUID.0x1 match when stuffing EDX at INIT
+  KVM: SVM: Fall back to KVM's hardcoded value for EDX at RESET/INIT
+  KVM: VMX: Remove explicit MMU reset in enter_rmode()
+  KVM: SVM: Drop explicit MMU reset at RESET/INIT
+  KVM: SVM: Drop a redundant init_vmcb() from svm_create_vcpu()
+  KVM: VMX: Move init_vmcs() invocation to vmx_vcpu_reset()
+  KVM: x86: WARN if the APIC map is dirty without an in-kernel local
+    APIC
+  KVM: x86: Remove defunct BSP "update" in local APIC reset
+  KVM: x86: Migrate the PIT only if vcpu0 is migrated, not any BSP
+  KVM: x86: Don't force set BSP bit when local APIC is managed by
+    userspace
+  KVM: x86: Set BSP bit in reset BSP vCPU's APIC base by default
+  KVM: VMX: Stuff vcpu->arch.apic_base directly at vCPU RESET
+  KVM: x86: Open code necessary bits of kvm_lapic_set_base() at vCPU
+    RESET
+  KVM: x86: Consolidate APIC base RESET initialization code
+  KVM: x86: Move EDX initialization at vCPU RESET to common code
+  KVM: SVM: Don't bother writing vmcb->save.rip at vCPU RESET/INIT
+  KVM: VMX: Invert handling of CR0.WP for EPT without unrestricted guest
+  KVM: VMX: Remove direct write to vcpu->arch.cr0 during vCPU RESET/INIT
+  KVM: VMX: Fold ept_update_paging_mode_cr0() back into vmx_set_cr0()
+  KVM: nVMX: Do not clear CR3 load/store exiting bits if L1 wants 'em
+  KVM: VMX: Pull GUEST_CR3 from the VMCS iff CR3 load exiting is
+    disabled
+  KVM: x86/mmu: Skip the permission_fault() check on MMIO if CR0.PG=0
+  KVM: VMX: Process CR0.PG side effects after setting CR0 assets
+  KVM: VMX: Skip emulation required checks during pmode/rmode
+    transitions
+  KVM: nVMX: Don't evaluate "emulation required" on nested VM-Exit
+  KVM: SVM: Tweak order of cr0/cr4/efer writes at RESET/INIT
+  KVM: SVM: Drop redundant writes to vmcb->save.cr4 at RESET/INIT
+  KVM: SVM: Stuff save->dr6 at during VMSA sync, not at RESET/INIT
+  KVM: VMX: Skip pointless MSR bitmap update when setting EFER
+  KVM: VMX: Refresh list of user return MSRs after setting guest CPUID
+  KVM: VMX: Don't _explicitly_ reconfigure user return MSRs on vCPU INIT
+  KVM: x86: Move setting of sregs during vCPU RESET/INIT to common x86
+  KVM: VMX: Remove obsolete MSR bitmap refresh at vCPU RESET/INIT
+  KVM: nVMX: Remove obsolete MSR bitmap refresh at nested transitions
+  KVM: VMX: Don't redo x2APIC MSR bitmaps when userspace filter is
+    changed
+  KVM: VMX: Remove unnecessary initialization of msr_bitmap_mode
+  KVM: VMX: Smush x2APIC MSR bitmap adjustments into single function
+  KVM: VMX: Remove redundant write to set vCPU as active at RESET/INIT
+  KVM: VMX: Move RESET-only VMWRITE sequences to init_vmcs()
+  KVM: SVM: Emulate #INIT in response to triple fault shutdown
+  KVM: SVM: Drop redundant clearing of vcpu->arch.hflags at INIT/RESET
+  KVM: x86: Preserve guest's CR0.CD/NW on INIT
 
-So for IGD we have two scenarios, direct assignment and software mdevs.
+ arch/x86/include/asm/kvm_host.h |   5 -
+ arch/x86/kvm/i8254.c            |   3 +-
+ arch/x86/kvm/lapic.c            |  26 +--
+ arch/x86/kvm/svm/sev.c          |   1 +
+ arch/x86/kvm/svm/svm.c          |  48 ++----
+ arch/x86/kvm/vmx/nested.c       |  24 ++-
+ arch/x86/kvm/vmx/vmx.c          | 270 +++++++++++++++-----------------
+ arch/x86/kvm/vmx/vmx.h          |   5 +-
+ arch/x86/kvm/x86.c              |  52 +++++-
+ 9 files changed, 211 insertions(+), 223 deletions(-)
 
-AIUI the operation of VFIO_DEVICE_BIND_IOMMU_FD looks like this:
-
-	iommu_ctx = iommu_ctx_fdget(iommu_fd);
-
-	mdev = mdev_from_dev(vdev->dev);
-	dev = mdev ? mdev_parent_dev(mdev) : vdev->dev;
-
-	iommu_dev = iommu_register_device(iommu_ctx, dev, cookie);
-
-In either case, this last line is either registering the IGD itself
-(ie. the struct device representing PCI device 0000:00:02.0) or the
-parent of the GVT-g mdev (ie. the struct device representing PCI device
-0000:00:02.0).  They're the same!  AIUI, the cookie is simply an
-arbitrary user generated value which they'll use to refer to this
-device via the iommu_fd uAPI.
-
-So what magic is iommu_register_device() doing to infer my intentions
-as to whether I'm asking for the IGD RID to be isolated or I'm only
-creating a software context for an mdev?  Thanks,
-
-Alex
+-- 
+2.32.0.93.g670b81a890-goog
 
