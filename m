@@ -2,138 +2,128 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5636C3C758F
-	for <lists+kvm@lfdr.de>; Tue, 13 Jul 2021 19:12:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D1DE83C75CC
+	for <lists+kvm@lfdr.de>; Tue, 13 Jul 2021 19:34:34 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229978AbhGMRPD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 13 Jul 2021 13:15:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54058 "EHLO
+        id S233455AbhGMRhV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 13 Jul 2021 13:37:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59120 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229478AbhGMRPD (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 13 Jul 2021 13:15:03 -0400
-Received: from mail-oi1-x229.google.com (mail-oi1-x229.google.com [IPv6:2607:f8b0:4864:20::229])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 44EBBC0613E9
-        for <kvm@vger.kernel.org>; Tue, 13 Jul 2021 10:12:13 -0700 (PDT)
-Received: by mail-oi1-x229.google.com with SMTP id l26so29398712oic.7
-        for <kvm@vger.kernel.org>; Tue, 13 Jul 2021 10:12:13 -0700 (PDT)
+        with ESMTP id S229867AbhGMRhV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 13 Jul 2021 13:37:21 -0400
+Received: from mail-pj1-x1031.google.com (mail-pj1-x1031.google.com [IPv6:2607:f8b0:4864:20::1031])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 23FBEC0613E9
+        for <kvm@vger.kernel.org>; Tue, 13 Jul 2021 10:34:31 -0700 (PDT)
+Received: by mail-pj1-x1031.google.com with SMTP id p9so12551843pjl.3
+        for <kvm@vger.kernel.org>; Tue, 13 Jul 2021 10:34:31 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=n5veVY6Aaqiwela1VTgvyQeZvKjk2HOBHm+S80Fosp4=;
-        b=Nhq89+zvRlnrFJm1BqHy2q61n3E4rKBojKAwuo5+Qa8zsj2pSrQrpRfVTSJOXaoJl5
-         L8UGZWVhp5tD0AAm5sf+gUxy+xgGFJCAlM3KqG/iQcLKfELoepqYj00fak8AE7PdDNIJ
-         X1HwdiJXt4y0M/vxC/Ae1lUopA4jUnMDhSq7Kk2RjBm8cpSOLCtrz6AtrxxoSWV1lf/j
-         uY0TO2Y3xNUDKhKVxkLlfonquQGTYQPH58yli+dCaol0USNrGgPl1FfRywN+wXn71hFw
-         LgAeiSAQ0YaOinCG5pT9G1kEH1V5VJ8JHhFzMCuNI/UGj9SrQ2WHmS01984wlnqlbf9H
-         LBBQ==
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=Hd1cC6I5OHV5VCDUp3dibhj6CjJ47a+lGBgbKjVqLDo=;
+        b=LleuEq/lqSw5USk8nmG+gJYpplLw6vMTPgb+W/T4AXU4Ii5D0O3PT1eyhcbudFfmff
+         TKg6AnZdz6bJALmhn65rU5RkWnoDqnoxVw0tw8dP9uThmiDxvTDb89l7t+E8XcaKZyD3
+         VcOAWoPj56sQ81fDzRL4slLRfpTI5d+DCPpaCGajnzJWpL+UVB1tXow2JH4sjLGsWGKh
+         LFpEUBG8fDERCteyN3HQDkQ0nMLRGlIWJRzZm3aWLva1nl0dDcMQY97LskY5nyJrW3V8
+         6B2A8ZHsQTDo04vqlaTG1NhmnmVcBq7wsxrm1vt8vsldGDPr0ksDNg/jt2ixU2lWccI5
+         3Mag==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=n5veVY6Aaqiwela1VTgvyQeZvKjk2HOBHm+S80Fosp4=;
-        b=iOh9CvVePOuk+GBqv3yrjQ/v8LVKkjTgDQi8FYyg3rXnFMoa6iKbz9T3pu5MSxnCb0
-         3AVNOODmHjqzAD3uY6g+Yq9pQIsFf1Nr8j9A36nPqbOrz7qWdXPfDU44J4/2RI8xW8Dg
-         BCwgvXLxsg/KDPTll0VhXJRL4AJaxRae5C0voMiCNrA9xLHa5+0U2lsDH6U6V8TWhyZ7
-         QP0N595sJAwDN9j1xNnwNnLwhmXRhjepmyeGSGqba6PEjAhTbjgtIHtCmyyKrVxtwwgY
-         BkKc3bIIrE+SU4nl4BhxcIfxqTGYJZso4GYJhmD9pArJyBANdqmtoXo5//0fvRDREXgx
-         zCvQ==
-X-Gm-Message-State: AOAM5319+c528fg84X/gCS/af48IAwmK4hPJMsYN/9bOos91hIPiCnY2
-        gDKahZfx6O0g5o2pzRB+mr+GAoPDmFywG700zmXeDw==
-X-Google-Smtp-Source: ABdhPJxi1iNIG51zOSsQQLi9TRZ3R+CvAU+7ctLD3c3G0E9vI40AtM+Vi9LVN+oWPPejUf7jhqENJxCd6j1HI1/thtg=
-X-Received: by 2002:aca:1e07:: with SMTP id m7mr3825205oic.28.1626196332203;
- Tue, 13 Jul 2021 10:12:12 -0700 (PDT)
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=Hd1cC6I5OHV5VCDUp3dibhj6CjJ47a+lGBgbKjVqLDo=;
+        b=SjW0UkDFa53y8jQAN+V3h87J5axDhaITStfptUPsh3xZHN3O+r3kOZjWxlJm4Xi27Z
+         N52RySf7VrryL+VCwCrTQMI1pphyiFXF6d0xi61MWWTOp9Kt3m7dENJN7j5F5P9H0GEZ
+         0nb5DVr7b48YBendTylw6QH+Yrsu41RwfPok7rdkJAApsNjIP3ep0bQeY9jzkCnYXln0
+         YVYv2ZuERkSpnb+2Jk9TEqmDws3CNVsDzYQiWniAG4e6hC7f2DTy9QDW9F11ERhonT3p
+         Vq/7MO15TTxkESH76soYA4v6Mg8/hxJvaUqxRJlW7vgdx758IaUQUzbNEF/4YY6uPd9e
+         6SVA==
+X-Gm-Message-State: AOAM533dTBhyyFkxVQvDE49/44CBTvJCZ3Zi/y6E/cKq3MkiQceDEJ9M
+        M4eXJZXFI/S1nUyF6BjMC2fZkg==
+X-Google-Smtp-Source: ABdhPJzoax2/gc1CHqtAG4G+Lr32vWff3NrNBVMUJoPXvCNFGjysNQxujHpb68AeTfZJajIcgLsexQ==
+X-Received: by 2002:a17:90a:3807:: with SMTP id w7mr5207288pjb.115.1626197670459;
+        Tue, 13 Jul 2021 10:34:30 -0700 (PDT)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id pj3sm7604658pjb.35.2021.07.13.10.34.29
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 13 Jul 2021 10:34:29 -0700 (PDT)
+Date:   Tue, 13 Jul 2021 17:34:26 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        bgardon@google.com
+Subject: Re: [PATCH 1/2] KVM: Block memslot updates across range_start() and
+ range_end()
+Message-ID: <YO3OomTEhGFo2yee@google.com>
+References: <20210610120615.172224-1-pbonzini@redhat.com>
+ <20210610120615.172224-2-pbonzini@redhat.com>
 MIME-Version: 1.0
-References: <1625825111-6604-1-git-send-email-weijiang.yang@intel.com>
- <1625825111-6604-7-git-send-email-weijiang.yang@intel.com>
- <CALMp9eQEs9pUyy1PpwLPG0_PtF07tR2Opw+1b=w4-knOwYPvvg@mail.gmail.com>
- <20210712095034.GD12162@intel.com> <CALMp9eQLHfXQwPCfqtc_y34sKGkZsCxEFL+BGx8wHgz7A8cOPA@mail.gmail.com>
- <20210713094713.GB13824@intel.com> <1be1fde6-37c5-4697-cff0-b15af419975e@gmail.com>
-In-Reply-To: <1be1fde6-37c5-4697-cff0-b15af419975e@gmail.com>
-From:   Jim Mattson <jmattson@google.com>
-Date:   Tue, 13 Jul 2021 10:12:00 -0700
-Message-ID: <CALMp9eSTVVH1fZ361o0Zpf8A3AG24efqGhM6tnYAbv0M5xyhZw@mail.gmail.com>
-Subject: Re: [PATCH v5 06/13] KVM: x86/vmx: Save/Restore host MSR_ARCH_LBR_CTL state
-To:     Like Xu <like.xu.linux@gmail.com>
-Cc:     Yang Weijiang <weijiang.yang@intel.com>, pbonzini@redhat.com,
-        seanjc@google.com, vkuznets@redhat.com, wei.w.wang@intel.com,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210610120615.172224-2-pbonzini@redhat.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jul 13, 2021 at 3:16 AM Like Xu <like.xu.linux@gmail.com> wrote:
->
-> On 13/7/2021 5:47 pm, Yang Weijiang wrote:
-> > On Mon, Jul 12, 2021 at 10:23:02AM -0700, Jim Mattson wrote:
-> >> On Mon, Jul 12, 2021 at 2:36 AM Yang Weijiang <weijiang.yang@intel.com> wrote:
-> >>>
-> >>> On Fri, Jul 09, 2021 at 03:54:53PM -0700, Jim Mattson wrote:
-> >>>> On Fri, Jul 9, 2021 at 2:51 AM Yang Weijiang <weijiang.yang@intel.com> wrote:
-> >>>>>
-> >>>>> If host is using MSR_ARCH_LBR_CTL then save it before vm-entry
-> >>>>> and reload it after vm-exit.
-> >>>>
-> >>>> I don't see anything being done here "before VM-entry" or "after
-> >>>> VM-exit." This code seems to be invoked on vcpu_load and vcpu_put.
-> >>>>
-> >>>> In any case, I don't see why this one MSR is special. It seems that if
-> >>>> the host is using the architectural LBR MSRs, then *all* of the host
-> >>>> architectural LBR MSRs have to be saved on vcpu_load and restored on
-> >>>> vcpu_put. Shouldn't  kvm_load_guest_fpu() and kvm_put_guest_fpu() do
-> >>>> that via the calls to kvm_save_current_fpu(vcpu->arch.user_fpu) and
-> >>>> restore_fpregs_from_fpstate(&vcpu->arch.user_fpu->state)?
-> >>> I looked back on the discussion thread:
-> >>> https://patchwork.kernel.org/project/kvm/patch/20210303135756.1546253-8-like.xu@linux.intel.com/
-> >>> not sure why this code is added, but IMO, although fpu save/restore in outer loop
-> >>> covers this LBR MSR, but the operation points are far away from vm-entry/exit
-> >>> point, i.e., the guest MSR setting could leak to host side for a signicant
-> >>> long of time, it may cause host side profiling accuracy. if we save/restore it
-> >>> manually, it'll mitigate the issue signifcantly.
-> >>
-> >> I'll be interested to see how you distinguish the intermingled branch
-> >> streams, if you allow the host to record LBRs while the LBR MSRs
-> >> contain guest values!
->
-> The guest is pretty fine that the real LBR MSRs contain the guest values
-> even after vm-exit if there is no other LBR user in the current thread.
->
-> (The perf subsystem makes this data visible only to the current thread)
->
-> Except for MSR_ARCH_LBR_CTL, we don't want to add msr switch overhead to
-> the vmx transaction (just think about {from, to, info} * 32 entries).
->
-> If we have other LBR user (such as a "perf kvm") in the current thread,
-> the host/guest LBR user will create separate LBR events to compete for
-> who can use the LBR in the the current thread.
->
-> The final arbiter is the host perf scheduler. The host perf will
-> save/restore the contents of the LBR when switching between two
-> LBR events.
->
-> Indeed, if the LBR hardware is assigned to the host LBR event before
-> vm-entry, then the guest LBR feature will be broken and a warning
-> will be triggered on the host.
+On Thu, Jun 10, 2021, Paolo Bonzini wrote:
+>  static inline struct kvm_memslots *kvm_memslots(struct kvm *kvm)
+> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> index fa7e7ebefc79..0dc0726c8d18 100644
+> --- a/virt/kvm/kvm_main.c
+> +++ b/virt/kvm/kvm_main.c
+> @@ -605,10 +605,13 @@ static void kvm_mmu_notifier_change_pte(struct mmu_notifier *mn,
+>  
+>  	/*
+>  	 * .change_pte() must be surrounded by .invalidate_range_{start,end}(),
+> -	 * and so always runs with an elevated notifier count.  This obviates
+> -	 * the need to bump the sequence count.
+> +	 * If mmu_notifier_count is zero, then start() didn't find a relevant
+> +	 * memslot and wasn't forced down the slow path; rechecking here is
+> +	 * unnecessary.
+>  	 */
+> -	WARN_ON_ONCE(!kvm->mmu_notifier_count);
+> +	WARN_ON_ONCE(!READ_ONCE(kvm->mn_active_invalidate_count));
 
-Are you saying that the guest LBR feature only works some of the time?
-How are failures communicated to the guest? If this feature doesn't
-follow the architectural specification, perhaps you should consider
-offering a paravirtual feature instead.
+The sanity check on mn_active_invalidate_count can be added in this patch, but
+the optimization to return on !mmu_notifier_count should go in the next patch,
+i.e. mmu_notifier_count must be non-zero since __kvm_handle_hva_range() always
+takes mmu_lock at the time of this patch.
 
-Warnings on the host, by the way, are almost completely useless. How
-do I surface such a warning to a customer who has a misbehaving VM? At
-the very least, user space should be notified of KVM emulation errors,
-so I can get an appropriate message to the customer.
+> +	if (!kvm->mmu_notifier_count)
+> +		return;
+>  
+>  	kvm_handle_hva_range(mn, address, address + 1, pte, kvm_set_spte_gfn);
+>  }
 
-> LBR is the kind of exclusive hardware resource and cannot be shared
-> by different host/guest lbr_select configurations.
+...
 
-In that case, it definitely sounds like guest architectural LBRs
-should be a paravirtual feature, since you can't actually virtualize
-the hardware.
+> @@ -1281,7 +1322,21 @@ static struct kvm_memslots *install_new_memslots(struct kvm *kvm,
+>  	WARN_ON(gen & KVM_MEMSLOT_GEN_UPDATE_IN_PROGRESS);
+>  	slots->generation = gen | KVM_MEMSLOT_GEN_UPDATE_IN_PROGRESS;
+>  
+> +	/*
+> +	 * Do not store the new memslots while there are invalidations in
+> +	 * progress (preparatory change for the next commit).
+> +	 */
+> +	spin_lock(&kvm->mn_invalidate_lock);
+> +	prepare_to_rcuwait(&kvm->mn_memslots_update_rcuwait);
+> +	while (kvm->mn_active_invalidate_count) {
 
-> > I'll check if an inner simplified xsave/restore to guest/host LBR MSRs is meaningful,
-> > the worst case is to drop this patch since it's not correct to only enable host lbr ctl
-> > while still leaves guest LBR data in the MSRs. Thanks for the reminder!
-> >
+Does this need a READ_ONCE()?  Or are the spin locks guaranteed to prevent the
+compiler from caching mn_active_invalidate_count?
+
+> +		set_current_state(TASK_UNINTERRUPTIBLE);
+> +		spin_unlock(&kvm->mn_invalidate_lock);
+> +		schedule();
+> +		spin_lock(&kvm->mn_invalidate_lock);
+> +	}
+> +	finish_rcuwait(&kvm->mn_memslots_update_rcuwait);
+>  	rcu_assign_pointer(kvm->memslots[as_id], slots);
+> +	spin_unlock(&kvm->mn_invalidate_lock);
+>  
+>  	/*
+>  	 * Acquired in kvm_set_memslot. Must be released before synchronize
+> -- 
+> 2.27.0
+> 
+> 
