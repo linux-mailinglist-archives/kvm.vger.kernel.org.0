@@ -2,57 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 37EEF3C74E1
-	for <lists+kvm@lfdr.de>; Tue, 13 Jul 2021 18:36:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6A36D3C74E5
+	for <lists+kvm@lfdr.de>; Tue, 13 Jul 2021 18:36:50 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235184AbhGMQi0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 13 Jul 2021 12:38:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45090 "EHLO
+        id S234431AbhGMQid (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 13 Jul 2021 12:38:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45092 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234677AbhGMQiN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 13 Jul 2021 12:38:13 -0400
-Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BEB36C0613AA
-        for <kvm@vger.kernel.org>; Tue, 13 Jul 2021 09:34:39 -0700 (PDT)
-Received: by mail-yb1-xb4a.google.com with SMTP id p63-20020a25d8420000b029055bc6fd5e5bso27638673ybg.9
-        for <kvm@vger.kernel.org>; Tue, 13 Jul 2021 09:34:39 -0700 (PDT)
+        with ESMTP id S230376AbhGMQiO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 13 Jul 2021 12:38:14 -0400
+Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D5856C0613B8
+        for <kvm@vger.kernel.org>; Tue, 13 Jul 2021 09:34:41 -0700 (PDT)
+Received: by mail-yb1-xb49.google.com with SMTP id x15-20020a25ce0f0000b029055bb0981111so27838099ybe.7
+        for <kvm@vger.kernel.org>; Tue, 13 Jul 2021 09:34:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=reply-to:date:in-reply-to:message-id:mime-version:references
          :subject:from:to:cc;
-        bh=skFR+CsoOPtmRzhI0uP937m12Z4yOYLQ+FONgUtSivg=;
-        b=VUNyEnJAv35fM9G5xqTp30Qf15uHEjgktioN/MXNnOgqOjgJyiLtOthrNo4CVzFWOq
-         7FR+Pn31WLI7alKgLgS/XhMvOfGAxaHe4IpK9ljxYyt3+SKc1idY430RXnjcELjuIXVD
-         sbBtVq8I51qkeIQANBerUbKhsae8izm7tPGNzxndhYKXxC8DobNsKY5xbUiwWfW4OLEa
-         pmlxZoO9XW0evRHpDwEDCPodNs+K2b9LyydThD520BX4vFv3xRVwDVj5lLAlkcQCfCBe
-         D5rpSDfu6aWIfZXmj0y2PWCz6Ni50PEaTJUukiQh+IPNpu+Wn33QsKFOPTQuWPp+yua6
-         tvKQ==
+        bh=vIWc55IJyEVoNC9ov84IeWMlOnEp9DjAfbK1wsM0Yas=;
+        b=EHc24xcXcaRLUjqC/SA/M1jyyqgnl7dGPNghNeAJo0E8DqPiCbfriPxhy3OM70O3wi
+         b81ZekWmOvgC2OLvhY4OmkiUxUqGhMlM4Z7mrJoknSobg/b/DU5ks4sxiwwRaq7cN3Gs
+         6WS2YVOAU0Z32iJccqc2e/9cTiahvi6lpKHnkEoPIy/j0Y+8gRXRYMnGIBosd946LE3S
+         sfgYQIalCI+kyt04wGn1isr9y/6HMebU/Sjs/nrDtLPHAdDsygLgR5yipsoOYKoSt8Js
+         rHQhIp9br2v/hoB6vYN46MnTpECYYWqYHaXxkAyayCvMU+TrvSGU3ObdRW0HZy+dvILY
+         NKaQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:reply-to:date:in-reply-to:message-id
          :mime-version:references:subject:from:to:cc;
-        bh=skFR+CsoOPtmRzhI0uP937m12Z4yOYLQ+FONgUtSivg=;
-        b=UiYc2esTMOPU8JG1l2G9DcDLOqwIzo47qYYANAz1gTbPUuxzyeFGcMStVnqh8Qoegd
-         2j+hK258zYpN8dBdv+qhp+qzZG5k6OB47DUhCGGLccDSllPiZKGwjhsSEuxExYBuGItj
-         MvOs/uXcZnYfGu1UCKLtp/jpCoPlZAtXCmk+LcEZX7+F1A+7Ee62qMsYI+ZlDpq/3tye
-         3xMaHKBJVzVSw7cED7nGE3olQBSmjGth+xFr+fy2y8Cpd7Gw/YGNoj7idGHhcjURqrGy
-         +WSbi1jiOySLJzgnV/mfmIzXQbW7h41xjQt8iDVzD24dERarsVDbKZfUxPuyvKxDo0IM
-         0IyQ==
-X-Gm-Message-State: AOAM531r9zCOQpPs3WtAYRVFDEzBNx1bXFqHGyRW5UvlWZovMkJVy2Qt
-        XyLjzpaU5LUe+xFphVrCXSpwIucONu0=
-X-Google-Smtp-Source: ABdhPJwlFJn49OqshcuieT77PrsL//3oCmHnYyTpJeaMJp1u9tGGcgfRO0Sx7zmlRsDLItNxd9fVZcFPeOc=
+        bh=vIWc55IJyEVoNC9ov84IeWMlOnEp9DjAfbK1wsM0Yas=;
+        b=UxTJJmm2snBvgx5qUjn3kpjbOR+pMVDKvPdFZ80Wbg1D8zu2J8zbqd9w0Th0zaRcLZ
+         KNIEXwK/rmWLJCI9YYypnzoBbIs1suF94C7LwROYnymTGgBXJ7ZFnL0vbpqTzwr92Lq0
+         /nnews72v6gML3bxOh//nZGU/T+b0oNPV3aXzL1vREwM63EN3YvgzyQ24Ww9/zqGmy0F
+         hW19jS/fvePpr6HlpVg2iW9Lr0nctD996GQXYUIBB4rWJsVzqoZZJmuvtziokbB3e7FF
+         fbjT2+6v1u3FPAUBQ7L4ALoMxmAnieaOWSO1VasrVj9AJaQdXjTiDChi/wTn2VtJnAk9
+         hljQ==
+X-Gm-Message-State: AOAM533JbPlMEOkm0rV45qA5KPiCZif9ubEH6E1QqwYipzl4QFI74OcZ
+        KNFqaDa5CkrjD5mYASS6S5AlFFtdFSQ=
+X-Google-Smtp-Source: ABdhPJxqtfpMYERsHaOr+5vEs9x2n03DLrMc9aG60KPKlR/Yj/1lPr/5wO9Qd4ZHkQ90BdZUtkmmGF4rChc=
 X-Received: from seanjc798194.pdx.corp.google.com ([2620:15c:90:200:825e:11a1:364b:8109])
- (user=seanjc job=sendgmr) by 2002:a25:2e49:: with SMTP id b9mr7359056ybn.250.1626194078968;
- Tue, 13 Jul 2021 09:34:38 -0700 (PDT)
+ (user=seanjc job=sendgmr) by 2002:a25:d97:: with SMTP id 145mr7293842ybn.276.1626194081024;
+ Tue, 13 Jul 2021 09:34:41 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Tue, 13 Jul 2021 09:33:12 -0700
+Date:   Tue, 13 Jul 2021 09:33:13 -0700
 In-Reply-To: <20210713163324.627647-1-seanjc@google.com>
-Message-Id: <20210713163324.627647-35-seanjc@google.com>
+Message-Id: <20210713163324.627647-36-seanjc@google.com>
 Mime-Version: 1.0
 References: <20210713163324.627647-1-seanjc@google.com>
 X-Mailer: git-send-email 2.32.0.93.g670b81a890-goog
-Subject: [PATCH v2 34/46] KVM: VMX: Refresh list of user return MSRs after
- setting guest CPUID
+Subject: [PATCH v2 35/46] KVM: VMX: Don't _explicitly_ reconfigure user return
+ MSRs on vCPU INIT
 From:   Sean Christopherson <seanjc@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     Sean Christopherson <seanjc@google.com>,
@@ -66,32 +66,40 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-After a CPUID update, refresh the list of user return MSRs that are
-loaded into hardware when running the vCPU.  This is necessary to handle
-the oddball case where userspace exposes X86_FEATURE_RDTSCP to the guest
-after the vCPU is running.
+When emulating vCPU INIT, do not unconditionally refresh the list of user
+return MSRs that need to be loaded into hardware when running the guest.
+Unconditionally refreshing the list is confusing, as the vast majority of
+MSRs are not modified on INIT.  The real motivation is to handle the case
+where an INIT during long mode obviates the need to load the SYSCALL MSRs,
+and that is handled as needed by vmx_set_efer().
 
-Fixes: 0023ef39dc35 ("kvm: vmx: Set IA32_TSC_AUX for legacy mode guests")
-Fixes: 4e47c7a6d714 ("KVM: VMX: Add instruction rdtscp support for guest")
-Reviewed-by: Reiji Watanabe <reijiw@google.com>
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/kvm/vmx/vmx.c | 2 ++
- 1 file changed, 2 insertions(+)
+ arch/x86/kvm/vmx/vmx.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index d7a4db15a169..3045daa3ec30 100644
+index 3045daa3ec30..555235d6c17e 100644
 --- a/arch/x86/kvm/vmx/vmx.c
 +++ b/arch/x86/kvm/vmx/vmx.c
-@@ -7159,6 +7159,8 @@ static void vmx_vcpu_after_set_cpuid(struct kvm_vcpu *vcpu)
- 	/* xsaves_enabled is recomputed in vmx_compute_secondary_exec_control(). */
- 	vcpu->arch.xsaves_enabled = false;
- 
-+	vmx_setup_uret_msrs(vmx);
+@@ -4406,6 +4406,8 @@ static void init_vmcs(struct vcpu_vmx *vmx)
+ 		vmx->pt_desc.guest.output_mask = 0x7F;
+ 		vmcs_write64(GUEST_IA32_RTIT_CTL, 0);
+ 	}
 +
- 	if (cpu_has_secondary_exec_ctrls()) {
- 		vmx_compute_secondary_exec_control(vmx);
- 		vmcs_set_secondary_exec_control(vmx);
++	vmx_setup_uret_msrs(vmx);
+ }
+ 
+ static void vmx_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event)
+@@ -4467,8 +4469,6 @@ static void vmx_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event)
+ 	if (kvm_mpx_supported())
+ 		vmcs_write64(GUEST_BNDCFGS, 0);
+ 
+-	vmx_setup_uret_msrs(vmx);
+-
+ 	if (cpu_has_vmx_msr_bitmap())
+ 		vmx_update_msr_bitmap(&vmx->vcpu);
+ 
 -- 
 2.32.0.93.g670b81a890-goog
 
