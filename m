@@ -2,162 +2,117 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 32E9B3C7459
-	for <lists+kvm@lfdr.de>; Tue, 13 Jul 2021 18:19:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 788963C742D
+	for <lists+kvm@lfdr.de>; Tue, 13 Jul 2021 18:15:45 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232491AbhGMQWW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 13 Jul 2021 12:22:22 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:27205 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231224AbhGMQWS (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 13 Jul 2021 12:22:18 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1626193167;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=9N7I4CG3taq2l6vmtHS+Sm2lvwi2u1+4xNug9n6BUtc=;
-        b=cDoCat8px3luAwj2o2qbkpYRmQDivnzJWDCDFuvUORUqPRUfPTBqpgDUpejQg8Tdca9aF4
-        9pTizMyrToeWDRjHKl64bCIpxSg35DKn3Zi6GQDuCoC2Y9+fjbllCxEssOvZJCaVtuV4el
-        HCP1QH7mGiYbGTdXmOCml9R9kPjRZi4=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-108-7qeO11xqNJmjDRslUN1TAQ-1; Tue, 13 Jul 2021 12:19:26 -0400
-X-MC-Unique: 7qeO11xqNJmjDRslUN1TAQ-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A9D8FDF8A4;
-        Tue, 13 Jul 2021 16:19:24 +0000 (UTC)
-Received: from localhost (ovpn-113-28.rdu2.redhat.com [10.10.113.28])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id F0977369A;
-        Tue, 13 Jul 2021 16:19:20 +0000 (UTC)
-From:   Eduardo Habkost <ehabkost@redhat.com>
-To:     qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Eduardo Habkost <ehabkost@redhat.com>,
-        Marcelo Tosatti <mtosatti@redhat.com>,
-        Richard Henderson <richard.henderson@linaro.org>,
-        Michal Privoznik <mprivozn@redhat.com>,
-        Igor Mammedov <imammedo@redhat.com>
-Subject: [PULL 11/11] numa: Parse initiator= attribute before cpus= attribute
-Date:   Tue, 13 Jul 2021 12:09:57 -0400
-Message-Id: <20210713160957.3269017-12-ehabkost@redhat.com>
-In-Reply-To: <20210713160957.3269017-1-ehabkost@redhat.com>
-References: <20210713160957.3269017-1-ehabkost@redhat.com>
+        id S231406AbhGMQSR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 13 Jul 2021 12:18:17 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:41178 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S234586AbhGMQSN (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 13 Jul 2021 12:18:13 -0400
+Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 16DG45Oe142719;
+        Tue, 13 Jul 2021 12:15:23 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : message-id : references : mime-version : content-type :
+ in-reply-to; s=pp1; bh=VJXHV11dkS5ZO7BU+D6sJmRseM/GF4sEjmGuGQ8JtBU=;
+ b=K0m8YFzEsquU1om1WgjZjbsMkt1WOiVp5ls+UJd1PYD0OQy/Sn8cb7ZGigN8xWUGDiVL
+ qcEKfZFW0cU2LiXvcexL9A0i+oQ8KVnBJ1W6DzgYkn7nKGYzvYgeWmpftNfJbbSwHLdp
+ 6dnfq2weL5qf/jcn0kuu3hOPLOvqAqGqeWSCj18b2c7NvZViCgIi/2HBQN5FWNxCudSV
+ /Icy0rMmP8r51jqBVVdBHBTD31ftsSPvClyhiNuqcMFMFNnEeLKeAdi5S9Vr5jtCllPL
+ 1Ja3+ilSYTla5w1RKxktKto1oKds7Pa5zFL56wBd+0KY5ExkRWNZvSZUyQ3zv6kdb4j3 Ig== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 39qs3cb717-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 13 Jul 2021 12:15:23 -0400
+Received: from m0098416.ppops.net (m0098416.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 16DG4A9n143241;
+        Tue, 13 Jul 2021 12:15:22 -0400
+Received: from ppma06fra.de.ibm.com (48.49.7a9f.ip4.static.sl-reverse.com [159.122.73.72])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 39qs3cb70b-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 13 Jul 2021 12:15:22 -0400
+Received: from pps.filterd (ppma06fra.de.ibm.com [127.0.0.1])
+        by ppma06fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 16DGFKxc023030;
+        Tue, 13 Jul 2021 16:15:20 GMT
+Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
+        by ppma06fra.de.ibm.com with ESMTP id 39q2th8qsq-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 13 Jul 2021 16:15:20 +0000
+Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
+        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 16DGFHAl36372890
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 13 Jul 2021 16:15:17 GMT
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 7DA0E4C04E;
+        Tue, 13 Jul 2021 16:15:17 +0000 (GMT)
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 2CC214C046;
+        Tue, 13 Jul 2021 16:15:17 +0000 (GMT)
+Received: from osiris (unknown [9.145.20.227])
+        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
+        Tue, 13 Jul 2021 16:15:17 +0000 (GMT)
+Date:   Tue, 13 Jul 2021 18:15:15 +0200
+From:   Heiko Carstens <hca@linux.ibm.com>
+To:     Christian Borntraeger <borntraeger@de.ibm.com>
+Cc:     Janosch Frank <frankja@linux.vnet.ibm.com>,
+        David Hildenbrand <david@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org
+Subject: Re: [PATCH] KVM: s390: generate kvm hypercall functions
+Message-ID: <YO28E42wIH6/aGUm@osiris>
+References: <20210713145713.2815167-1-hca@linux.ibm.com>
+ <82d32e12-c061-1fe0-0a3e-02c930cbab2e@de.ibm.com>
+ <YO22qSixp0VWDle2@osiris>
+ <fe51925a-7f1c-fb98-94c9-729c5e23ff08@de.ibm.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <fe51925a-7f1c-fb98-94c9-729c5e23ff08@de.ibm.com>
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: HdIzRpQVaJ6Iy5tcWLUfiCL8nFwePj-K
+X-Proofpoint-ORIG-GUID: rijbUf_9EleBgcwYADS17Xpj49NT3ZGS
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.790
+ definitions=2021-07-13_07:2021-07-13,2021-07-13 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ mlxlogscore=876 phishscore=0 impostorscore=0 suspectscore=0 mlxscore=0
+ adultscore=0 malwarescore=0 clxscore=1015 bulkscore=0 spamscore=0
+ lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2104190000 definitions=main-2107130103
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Michal Privoznik <mprivozn@redhat.com>
+On Tue, Jul 13, 2021 at 05:59:17PM +0200, Christian Borntraeger wrote:
+> On 13.07.21 17:52, Heiko Carstens wrote:
+> > On Tue, Jul 13, 2021 at 05:41:33PM +0200, Christian Borntraeger wrote:
+> > > On 13.07.21 16:57, Heiko Carstens wrote:
+> > > [..]
+> > > > +#define HYPERCALL_FMT_0
+> > > > +#define HYPERCALL_FMT_1 , "0" (r2)
+> > > > +#define HYPERCALL_FMT_2 , "d" (r3) HYPERCALL_FMT_1
+> > > > +#define HYPERCALL_FMT_3 , "d" (r4) HYPERCALL_FMT_2
+> > > > +#define HYPERCALL_FMT_4 , "d" (r5) HYPERCALL_FMT_3
+> > > > +#define HYPERCALL_FMT_5 , "d" (r6) HYPERCALL_FMT_4
+> > > > +#define HYPERCALL_FMT_6 , "d" (r7) HYPERCALL_FMT_5
+> > > 
+> > > This will result in reverse order.
+> > > old:
+> > > "d" (__nr), "0" (__p1), "d" (__p2), "d" (__p3), "d" (__p4), "d" (__p5), "d" (__p6)
+> > > new:
+> > > "d"(__nr), "d"(r7), "d"(r6), "d"(r5), "d"(r4), "d"(r3), "0"(r2)
+> > > 
+> > > As we do not reference the variable in the asm this should not matter,
+> > > I just noticed it when comparing the result of the preprocessed files.
+> > > 
+> > > Assuming that we do not care this looks good.
+> > 
+> > Yes, it does not matter. Please let me know if should change it anyway.
+> 
+> No, I think this is ok.
+> Shall I take it via the kvm tree or do you want to take it via the s390 tree?
 
-When parsing cpus= attribute of -numa object couple of checks
-is performed, such as correct initiator setting (see the if()
-statement at the end of for() loop in
-machine_set_cpu_numa_node()).
-
-However, with the current code cpus= attribute is parsed before
-initiator= attribute and thus the check may fail even though it
-is not obvious why. But since parsing the initiator= attribute
-does not depend on the cpus= attribute we can swap the order of
-the two.
-
-It's fairly easy to reproduce with the following command line
-(snippet of an actual cmd line):
-
-  -smp 4,sockets=4,cores=1,threads=1 \
-  -object '{"qom-type":"memory-backend-ram","id":"ram-node0","size":2147483648}' \
-  -numa node,nodeid=0,cpus=0-1,initiator=0,memdev=ram-node0 \
-  -object '{"qom-type":"memory-backend-ram","id":"ram-node1","size":2147483648}' \
-  -numa node,nodeid=1,cpus=2-3,initiator=1,memdev=ram-node1 \
-  -numa hmat-lb,initiator=0,target=0,hierarchy=memory,data-type=access-latency,latency=5 \
-  -numa hmat-lb,initiator=0,target=0,hierarchy=first-level,data-type=access-latency,latency=10 \
-  -numa hmat-lb,initiator=1,target=1,hierarchy=memory,data-type=access-latency,latency=5 \
-  -numa hmat-lb,initiator=1,target=1,hierarchy=first-level,data-type=access-latency,latency=10 \
-  -numa hmat-lb,initiator=0,target=0,hierarchy=memory,data-type=access-bandwidth,bandwidth=204800K \
-  -numa hmat-lb,initiator=0,target=0,hierarchy=first-level,data-type=access-bandwidth,bandwidth=208896K \
-  -numa hmat-lb,initiator=1,target=1,hierarchy=memory,data-type=access-bandwidth,bandwidth=204800K \
-  -numa hmat-lb,initiator=1,target=1,hierarchy=first-level,data-type=access-bandwidth,bandwidth=208896K \
-  -numa hmat-cache,node-id=0,size=10K,level=1,associativity=direct,policy=write-back,line=8 \
-  -numa hmat-cache,node-id=1,size=10K,level=1,associativity=direct,policy=write-back,line=8 \
-
-Signed-off-by: Michal Privoznik <mprivozn@redhat.com>
-Reviewed-by: Igor Mammedov <imammedo@redhat.com>
-Message-Id: <b27a6a88986d63e3f610a728c845e01ff8d92e2e.1625662776.git.mprivozn@redhat.com>
-Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
----
- hw/core/numa.c | 45 +++++++++++++++++++++++----------------------
- 1 file changed, 23 insertions(+), 22 deletions(-)
-
-diff --git a/hw/core/numa.c b/hw/core/numa.c
-index 1058d3697b1..510d096a888 100644
---- a/hw/core/numa.c
-+++ b/hw/core/numa.c
-@@ -88,6 +88,29 @@ static void parse_numa_node(MachineState *ms, NumaNodeOptions *node,
-         return;
-     }
- 
-+    /*
-+     * If not set the initiator, set it to MAX_NODES. And if
-+     * HMAT is enabled and this node has no cpus, QEMU will raise error.
-+     */
-+    numa_info[nodenr].initiator = MAX_NODES;
-+    if (node->has_initiator) {
-+        if (!ms->numa_state->hmat_enabled) {
-+            error_setg(errp, "ACPI Heterogeneous Memory Attribute Table "
-+                       "(HMAT) is disabled, enable it with -machine hmat=on "
-+                       "before using any of hmat specific options");
-+            return;
-+        }
-+
-+        if (node->initiator >= MAX_NODES) {
-+            error_report("The initiator id %" PRIu16 " expects an integer "
-+                         "between 0 and %d", node->initiator,
-+                         MAX_NODES - 1);
-+            return;
-+        }
-+
-+        numa_info[nodenr].initiator = node->initiator;
-+    }
-+
-     for (cpus = node->cpus; cpus; cpus = cpus->next) {
-         CpuInstanceProperties props;
-         if (cpus->value >= max_cpus) {
-@@ -142,28 +165,6 @@ static void parse_numa_node(MachineState *ms, NumaNodeOptions *node,
-         numa_info[nodenr].node_memdev = MEMORY_BACKEND(o);
-     }
- 
--    /*
--     * If not set the initiator, set it to MAX_NODES. And if
--     * HMAT is enabled and this node has no cpus, QEMU will raise error.
--     */
--    numa_info[nodenr].initiator = MAX_NODES;
--    if (node->has_initiator) {
--        if (!ms->numa_state->hmat_enabled) {
--            error_setg(errp, "ACPI Heterogeneous Memory Attribute Table "
--                       "(HMAT) is disabled, enable it with -machine hmat=on "
--                       "before using any of hmat specific options");
--            return;
--        }
--
--        if (node->initiator >= MAX_NODES) {
--            error_report("The initiator id %" PRIu16 " expects an integer "
--                         "between 0 and %d", node->initiator,
--                         MAX_NODES - 1);
--            return;
--        }
--
--        numa_info[nodenr].initiator = node->initiator;
--    }
-     numa_info[nodenr].present = true;
-     max_numa_nodeid = MAX(max_numa_nodeid, nodenr + 1);
-     ms->numa_state->num_nodes++;
--- 
-2.31.1
-
+I think this should go via kvm tree. It probably has to wait until next merge
+window anyway(?).
