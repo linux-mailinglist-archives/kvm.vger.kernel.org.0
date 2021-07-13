@@ -2,120 +2,95 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B0A663C782B
-	for <lists+kvm@lfdr.de>; Tue, 13 Jul 2021 22:48:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0FB8F3C7833
+	for <lists+kvm@lfdr.de>; Tue, 13 Jul 2021 22:51:49 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235423AbhGMUut (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 13 Jul 2021 16:50:49 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:35510 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S234172AbhGMUut (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 13 Jul 2021 16:50:49 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1626209278;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=edgULd724qxW2wczl2lL2drDkUNp/TtLehg+wvSDn60=;
-        b=Ar4ojXmG6Q2dkV0Jpk/t4opwXDoPvp8YcsUOXGwFqL68Ia0SroRRh/i8jGFvd7FuhXBdon
-        VRIiR+q48SU5cZO4ukljvADEq1yYwykubo88VPUYqXOkyf/74Yc/fQY/PGSbm87wjUPCNx
-        aNufL5LYJNU2YO4BnI4bzHiEluAQoy8=
-Received: from mail-il1-f197.google.com (mail-il1-f197.google.com
- [209.85.166.197]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-460-XhlHF-M0PPGNFtBWrIPYpg-1; Tue, 13 Jul 2021 16:47:57 -0400
-X-MC-Unique: XhlHF-M0PPGNFtBWrIPYpg-1
-Received: by mail-il1-f197.google.com with SMTP id h17-20020a056e021d91b02902004a17fb0aso15587397ila.3
-        for <kvm@vger.kernel.org>; Tue, 13 Jul 2021 13:47:57 -0700 (PDT)
+        id S235353AbhGMUyi (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 13 Jul 2021 16:54:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47288 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S234394AbhGMUyh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 13 Jul 2021 16:54:37 -0400
+Received: from mail-pf1-x42f.google.com (mail-pf1-x42f.google.com [IPv6:2607:f8b0:4864:20::42f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B4257C0613DD
+        for <kvm@vger.kernel.org>; Tue, 13 Jul 2021 13:51:47 -0700 (PDT)
+Received: by mail-pf1-x42f.google.com with SMTP id 21so20712915pfp.3
+        for <kvm@vger.kernel.org>; Tue, 13 Jul 2021 13:51:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=obIPDjCBKxSf9eNIBaYimuhTq9MwYLKG2Lkrml2WVkc=;
+        b=l1OFOVbx799HYclC5UOFfxx756UAUM/yU24he0IN8K1LaHcvE2nZeQTDoO6FcrgbHa
+         b8YRJLTifIDRJhe4o9C7g2tSW/ZKGTEuiTNXQWwGrXzaG9uicD2z0jNGchDb/HV4QzXa
+         HcyHiUPxlHFUi/mDI0F6bj8SNACsRrfqCVXddPYA2d83fVmFsVHNaw7kL9n9m3GiJtci
+         1FnbPhKmdx9Vp6Tj+XCqm2Lm+v9e0ATizOmsJJK0fH0WGJ9S9ivNlaHJypYpNvkrsi3i
+         e98y2DWTz0nZsPjOAelEYHVGpI/PILCLKDtQQ7f9vUcM/eewEhWFpQbRUcSvtdAOxKGU
+         d+8Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to;
-        bh=edgULd724qxW2wczl2lL2drDkUNp/TtLehg+wvSDn60=;
-        b=I09LR9+tJOsAh8tAX6JtQU8bt8hrjUC/P4deFpMMuonUumBJSbtHCM0Vx95s0j2zlR
-         4RTzvIsPfOJLUUS7vD3LB0pEyz3dkDrugqH3OcvqL0kvrVz0juhmn4S01Z7B1YtrTi9L
-         DEQgukjFeaXSslTb5jnzf+oeMcFcpPekVMu1VnDcEnnyfUaOsmSed5BphZQE/yUUgJ50
-         wc/8ITYBcnSHLSWXJMRhCXXOHQ1qWvmemXv2YQql06ZPc6hHs92biCSJ75EBJCcga9dC
-         zfYGOBVhX8K9w/HM5Mb53rZvCJz1DBMRHFIpSzi0RDPI4fMdWzlnoGP+0IdBnBuecCFn
-         WAdw==
-X-Gm-Message-State: AOAM530XVNfldvjaNiQkCSQgjG7RRx4tzf5WVXXSLPWBILwMmh/dTduy
-        0DrbhkBxnxdY0GuIzVJdwWmXwMVzHU1VtY4rTzh6q7OSipplZ0fHMV9iprkOwF37wcLNOR8Sujr
-        8rWVkk2bEXqt8
-X-Received: by 2002:a92:db4e:: with SMTP id w14mr4382867ilq.188.1626209277264;
-        Tue, 13 Jul 2021 13:47:57 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxlRTk8ZYwTep6uQ3YEemMecev8TKW7q7hnLoZpmdpPTnuZHGlGP2olwGFrF73D7gKpIhoktA==
-X-Received: by 2002:a92:db4e:: with SMTP id w14mr4382859ilq.188.1626209277118;
-        Tue, 13 Jul 2021 13:47:57 -0700 (PDT)
-Received: from gator ([140.82.166.162])
-        by smtp.gmail.com with ESMTPSA id s6sm22547ilv.76.2021.07.13.13.47.56
+         :mime-version:content-disposition:in-reply-to;
+        bh=obIPDjCBKxSf9eNIBaYimuhTq9MwYLKG2Lkrml2WVkc=;
+        b=I6NJtupRXLH9723w9MjlduUr93MJgkeNCIWPtNoaNtcD7P1R7hSoZVjZfJzQXsQEVJ
+         +ABebTMaZb48Q06kzSUdCRqHdG/LfCabkiENd7l0uo+DsVwwG/DJIrWfiGOVyo1Woddy
+         +AcMwD2oMBau02uYXP7F2k7duPd+F5WsrVZvklTRri8lqVR2dn7KMJOc7BTMWiI7dXIr
+         mx4q4MsHp/jyO0Por0RACUqJL7GcObbl8rF3corSWtFOI+VSh9DrUjc0yvbJ843zf91+
+         YXvQwUrg17JbxozrPIO2XqhNsJf2wANee+5z2j8eoUnMfL5qzeCSsxYxS4fBfoAsgmPD
+         +qtA==
+X-Gm-Message-State: AOAM532xV5L919rbeMVk3n8IvQIk8/1cYBI8ORw9rEKYUu9y2jbtI/yf
+        prpm4b1UcTCrDownAHwi6gSN/A==
+X-Google-Smtp-Source: ABdhPJxctmb2j3ozJzCx4wGg8EArySI8Ls9La6ABeaZiakTKEoU0dIpxA+s5VUkbK1/K2sd8nCLGOQ==
+X-Received: by 2002:a63:ae01:: with SMTP id q1mr5782132pgf.216.1626209507187;
+        Tue, 13 Jul 2021 13:51:47 -0700 (PDT)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id gd20sm50816pjb.33.2021.07.13.13.51.46
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 13 Jul 2021 13:47:56 -0700 (PDT)
-Date:   Tue, 13 Jul 2021 22:47:54 +0200
-From:   Andrew Jones <drjones@redhat.com>
-To:     Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-Cc:     kvm@vger.kernel.org, maz@kernel.org, shashi.mallela@linaro.org,
-        qemu-arm@nongnu.org, kvmarm@lists.cs.columbia.edu,
-        linux-arm-kernel@lists.infradead.org, pbonzini@redhat.com
-Subject: Re: [kvm-unit-tests PATCH v2 2/4] scripts/arch-run: don't use
- deprecated server/nowait options
-Message-ID: <20210713204754.xg3eawok4m6q7ulk@gator>
-References: <20210525172628.2088-1-alex.bennee@linaro.org>
- <20210525172628.2088-3-alex.bennee@linaro.org>
+        Tue, 13 Jul 2021 13:51:46 -0700 (PDT)
+Date:   Tue, 13 Jul 2021 20:51:43 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     isaku.yamahata@intel.com, Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        "H . Peter Anvin" <hpa@zytor.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, erdemaktas@google.com,
+        Connor Kuehl <ckuehl@redhat.com>, x86@kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        isaku.yamahata@gmail.com,
+        Sean Christopherson <sean.j.christopherson@intel.com>
+Subject: Re: [RFC PATCH v2 38/69] KVM: x86: Add option to force LAPIC
+ expiration wait
+Message-ID: <YO3832IMZH/ZLZ4Z@google.com>
+References: <cover.1625186503.git.isaku.yamahata@intel.com>
+ <357378fcb6e3e2becb6d4f00a5c3d2b00b2c566b.1625186503.git.isaku.yamahata@intel.com>
+ <a349d5bf-b85c-34c3-bb88-523df23a2985@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20210525172628.2088-3-alex.bennee@linaro.org>
+In-Reply-To: <a349d5bf-b85c-34c3-bb88-523df23a2985@redhat.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, May 25, 2021 at 06:26:26PM +0100, Alex Bennée wrote:
-> The very fact that QEMU drops the deprecation warning while running is
-> enough to confuse the its-migration test into failing. The boolean
-> options server and wait have accepted the long form options for a long
-> time.
+On Tue, Jul 06, 2021, Paolo Bonzini wrote:
+> On 03/07/21 00:04, isaku.yamahata@intel.com wrote:
+> > From: Sean Christopherson <sean.j.christopherson@intel.com>
+> > 
+> > Add an option to skip the IRR check in kvm_wait_lapic_expire().  This
+> > will be used by TDX to wait if there is an outstanding notification for
+> > a TD, i.e. a virtual interrupt is being triggered via posted interrupt
+> > processing.  KVM TDX doesn't emulate PI processing, i.e. there will
+> > never be a bit set in IRR/ISR, so the default behavior for APICv of
+> > querying the IRR doesn't work as intended.
+> > 
+> > Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+> > Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
 > 
-> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-> Cc: Shashi Mallela <shashi.mallela@linaro.org>
-> ---
->  scripts/arch-run.bash | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/scripts/arch-run.bash b/scripts/arch-run.bash
-> index 5997e38..70693f2 100644
-> --- a/scripts/arch-run.bash
-> +++ b/scripts/arch-run.bash
-> @@ -122,14 +122,14 @@ run_migration ()
->  	trap 'kill 0; exit 2' INT TERM
->  	trap 'rm -f ${migout1} ${migsock} ${qmp1} ${qmp2} ${fifo}' RETURN EXIT
->  
-> -	eval "$@" -chardev socket,id=mon1,path=${qmp1},server,nowait \
-> +	eval "$@" -chardev socket,id=mon1,path=${qmp1},server=on,wait=off \
->  		-mon chardev=mon1,mode=control | tee ${migout1} &
->  
->  	# We have to use cat to open the named FIFO, because named FIFO's, unlike
->  	# pipes, will block on open() until the other end is also opened, and that
->  	# totally breaks QEMU...
->  	mkfifo ${fifo}
-> -	eval "$@" -chardev socket,id=mon2,path=${qmp2},server,nowait \
-> +	eval "$@" -chardev socket,id=mon2,path=${qmp2},server=on,wait=off \
->  		-mon chardev=mon2,mode=control -incoming unix:${migsock} < <(cat ${fifo}) &
->  	incoming_pid=`jobs -l %+ | awk '{print$2}'`
->  
-> -- 
-> 2.20.1
-> 
-> _______________________________________________
-> kvmarm mailing list
-> kvmarm@lists.cs.columbia.edu
-> https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+> Is there a better (existing after the previous patches) flag to test, or
+> possibly can it use vm_type following the suggestion I gave for patch 28?
 
-Applied to misc/queue
-
-https://gitlab.com/rhdrjones/kvm-unit-tests/-/commits/misc/queue
-
-Thanks,
-drew
-
+Not sure if there's a "better" flag, but there's most definitely a flag somewhere
+that will suffice :-)
