@@ -2,245 +2,220 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2F5EB3C6744
-	for <lists+kvm@lfdr.de>; Tue, 13 Jul 2021 01:56:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E4C503C67E2
+	for <lists+kvm@lfdr.de>; Tue, 13 Jul 2021 03:10:12 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233676AbhGLX7S (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 12 Jul 2021 19:59:18 -0400
-Received: from mga09.intel.com ([134.134.136.24]:1854 "EHLO mga09.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S233528AbhGLX7R (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 12 Jul 2021 19:59:17 -0400
-X-IronPort-AV: E=McAfee;i="6200,9189,10043"; a="210046011"
-X-IronPort-AV: E=Sophos;i="5.84,235,1620716400"; 
-   d="scan'208";a="210046011"
-Received: from orsmga002.jf.intel.com ([10.7.209.21])
-  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Jul 2021 16:56:27 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.84,235,1620716400"; 
-   d="scan'208";a="429846845"
-Received: from orsmsx605.amr.corp.intel.com ([10.22.229.18])
-  by orsmga002.jf.intel.com with ESMTP; 12 Jul 2021 16:56:27 -0700
-Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
- ORSMSX605.amr.corp.intel.com (10.22.229.18) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2242.4; Mon, 12 Jul 2021 16:56:27 -0700
-Received: from orsmsx611.amr.corp.intel.com (10.22.229.24) by
- ORSMSX610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2242.10; Mon, 12 Jul 2021 16:56:26 -0700
-Received: from ORSEDG602.ED.cps.intel.com (10.7.248.7) by
- orsmsx611.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2242.10 via Frontend Transport; Mon, 12 Jul 2021 16:56:26 -0700
-Received: from NAM10-BN7-obe.outbound.protection.outlook.com (104.47.70.104)
- by edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2242.10; Mon, 12 Jul 2021 16:56:26 -0700
+        id S233870AbhGMBNA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 12 Jul 2021 21:13:00 -0400
+Received: from mx0b-00069f02.pphosted.com ([205.220.177.32]:5050 "EHLO
+        mx0b-00069f02.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S233856AbhGMBM7 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 12 Jul 2021 21:12:59 -0400
+Received: from pps.filterd (m0246631.ppops.net [127.0.0.1])
+        by mx0b-00069f02.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 16D15qcT015402;
+        Tue, 13 Jul 2021 01:08:46 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
+ references : from : message-id : date : in-reply-to : content-type :
+ content-transfer-encoding : mime-version; s=corp-2020-01-29;
+ bh=3B6cHqYTowbOTbSTyzn2axoZNIZlNWJOMyUnuxwsz6I=;
+ b=FhDLiUE/zhUzhe8Z9s0QpXpRSQpJf6OWXwSK0D9s3ChKbYlBciG7FgGXc3VIokBQ2b3Q
+ KeNPStadZf5sn/AXNcjOxuKW3ZYhY19UtHExLKxOhRIqjkd6KkIJeeoo4wLqvnHjrCsh
+ 4xcOsGr3PYHTnnZWnYsfp0FR4KGAk9E30I9vAqr1HKcqmT2TwRXz8unM3h59fJFJvYfn
+ jK6hPcorvpm2pnc0Plcuy3IMP04Dkj0vlW9wrqmerAxh0b8ZQstX4vuqWPXu9IUBFJPh
+ c9449Vq8QwWLciETOdsvFihn/yc6/mM01OQRkysHaSEp2QPx7YAQMVH52frAEmZTHK8I /g== 
+Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
+        by mx0b-00069f02.pphosted.com with ESMTP id 39rpd8sd0n-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 13 Jul 2021 01:08:46 +0000
+Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
+        by userp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 16D14whw035107;
+        Tue, 13 Jul 2021 01:08:45 GMT
+Received: from nam11-dm6-obe.outbound.protection.outlook.com (mail-dm6nam11lp2172.outbound.protection.outlook.com [104.47.57.172])
+        by userp3020.oracle.com with ESMTP id 39qnavyj7m-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 13 Jul 2021 01:08:43 +0000
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=i7q6DhBIhyWyUun0nq4Uk7d6ah7RSBPBJvjmm9v4sMsFNt1bIShO6+9KTp4RO4vSeo6+mWwamlVrCxMomrxIcvoaf8N7MIpD+0U+fqFJHn2U3SgY5UNCDjwJVgtEt3gHBXGQ1gyujl10yWUN9Drf9lyZLGQce2erYufHLyNNkS6f2k2gQ2wFB8Torhe4ibbmiQSXOw6lmj6LUBk92tG/5dlLZPq3m1D16v+6nWp4crtQ+lca0oFgxY8q00HaXKL++MdRLHoqGp37fIIZywbeA03E5vrvPNqo84CDCnlRE8Ui1l9eGf0voKAaYSu7+T7HJDtTFaGRQ7t4JpU1aJdxZg==
+ b=nswK2OeKCa4FHtz5K+jOnGHn4VpxmcR41NaPm+CKP7z8V9EOR5eJ65Ho+P2OwRL4UkRVzxjG3sSjMvK3yN1NXe3wSUoAZdJpt6nPbIJqM2jEqzARwPbDNZAgQfL/Yk/2+rNHrCGslrJ7wQk/ZrWllCkcIOPvfZ3b6cttzL37/n33zkg9VVt57SWEeW8+yvGJnHn+G2pFTRh6GIPPzj4eQUxVvDhKIi6HyCvJ69TWU/UztLofjTeLbOxxAhG9ow/6CsB1plLrprM8Va69SzmUgkP+EYtSi4cjcZmkkjBqWIWIa6aDsdjkdpf1gsDJYFp+RxPa4tlGBoIwYSnYGr8FUQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=AdyhzgG8UPvTl0WlEBdPpaYfJ6XkydIC1hBHU5Vh2yQ=;
- b=JEthGul0QS4w5eX3dHy88888AZuTsyR3mHUZvC0KhdjT4kg3VjGyixvliBvlFOrVTV5k3x9heNrmNxt0gZPQHnWMuoKLIUpiqC1MdAEZDn7MiSSBvG5MBLEFXt13p3J0oNNbLfOjxtu5oeh7MM+N864nKUR9B93fXUOjciDRbA17J6nlILucQoO8vjqNqFe4YGD01ceKTtD2G4UHU5HBrrlzSTJu+YwXGO2OL+6nTU2jZLBBM+sqJUqIlL0CctB8WmUPtt69y5XGZnhsGOT38mW8Idzp61eQnY/xOYrFeezEUHdahx1Oms57WenfSQ1o234mvSCzdHOERAiVrzAUrA==
+ bh=3B6cHqYTowbOTbSTyzn2axoZNIZlNWJOMyUnuxwsz6I=;
+ b=ncq211w++Ps3JSWtOt603EoJLGb2lshE5Y+GxoDmsZEL0R12ojaH+qyNIHx45ksJL0qgRtgt+iknkh1cqQO5FoRiOVJVwsrUoODESDZUyr2HQKO1b8VkQcSOVShxEVcyxmfGHMfDtpRLApdPv01dJtvcNUNw2jdWUIXLMYt9yVDy1Lu0zNGQOgxJkb7sgnVm/OWNiGNGZ35FUBQuPJe1AkjZyXFQ9KRX2mIHyiWrSHSpeR2A46ZxInBb7veCIg1Q0Og1PNCJ769UvvvplPAvk1ZDEe8ZnAjwOrIBWb/TSKTt+DE6BHIezbgpYrkXl8MaIpzNo+ymP9ZVCzoXCYeiqw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=intel.onmicrosoft.com;
- s=selector2-intel-onmicrosoft-com;
+ smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
+ dkim=pass header.d=oracle.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=AdyhzgG8UPvTl0WlEBdPpaYfJ6XkydIC1hBHU5Vh2yQ=;
- b=GWvgBocu/qYUAsdr6nZs5pg97tzcqkIyocv3NqNBugT+7fmMkUphtsKPQTs4N2zDFyMzAYQ/t1wm66oW+In/veV+8mM74MyHgyYkONHuf5dEerErmmZEyG+BgCsWDLPz7e329HazeKlbfBwVOOtHpZ0bVe1kb9yl68hT1Jh9Cag=
-Received: from BL1PR11MB5429.namprd11.prod.outlook.com (2603:10b6:208:30b::13)
- by MN2PR11MB4743.namprd11.prod.outlook.com (2603:10b6:208:260::8) with
+ bh=3B6cHqYTowbOTbSTyzn2axoZNIZlNWJOMyUnuxwsz6I=;
+ b=JuOcz6nshmg/vP6oFoQDTBX4lLhwYugvvJDpyKJpj9jBL984cpgU0EzZa6yvLnGHk2d/dFDHSUB+aCAV+vuO7KPDkyXp0UXfwzCK/qFAfZZGFgp74kvKvZbMeyQJFKmY9mieC4+cRfwKS5fBtazCndbAFtonRxDe4/eugtIvNbM=
+Authentication-Results: linutronix.de; dkim=none (message not signed)
+ header.d=none;linutronix.de; dmarc=none action=none header.from=oracle.com;
+Received: from BLAPR10MB4835.namprd10.prod.outlook.com (2603:10b6:208:331::11)
+ by BL0PR10MB2931.namprd10.prod.outlook.com (2603:10b6:208:73::10) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4308.20; Mon, 12 Jul
- 2021 23:56:24 +0000
-Received: from BL1PR11MB5429.namprd11.prod.outlook.com
- ([fe80::ec88:e23e:b921:65ea]) by BL1PR11MB5429.namprd11.prod.outlook.com
- ([fe80::ec88:e23e:b921:65ea%6]) with mapi id 15.20.4308.026; Mon, 12 Jul 2021
- 23:56:24 +0000
-From:   "Tian, Kevin" <kevin.tian@intel.com>
-To:     Alex Williamson <alex.williamson@redhat.com>
-CC:     Jason Gunthorpe <jgg@nvidia.com>,
-        Jean-Philippe Brucker <jean-philippe@linaro.org>,
-        David Gibson <david@gibson.dropbear.id.au>,
-        "Jason Wang" <jasowang@redhat.com>,
-        "parav@mellanox.com" <parav@mellanox.com>,
-        "Enrico Weigelt, metux IT consult" <lkml@metux.net>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Shenming Lu <lushenming@huawei.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Eric Auger <eric.auger@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        "Raj, Ashok" <ashok.raj@intel.com>,
-        "Liu, Yi L" <yi.l.liu@intel.com>, "Wu, Hao" <hao.wu@intel.com>,
-        "Jiang, Dave" <dave.jiang@intel.com>,
-        Jacob Pan <jacob.jun.pan@linux.intel.com>,
-        "Kirti Wankhede" <kwankhede@nvidia.com>,
-        Robin Murphy <robin.murphy@arm.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
-        "David Woodhouse" <dwmw2@infradead.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        "Lu Baolu" <baolu.lu@linux.intel.com>
-Subject: RE: [RFC v2] /dev/iommu uAPI proposal
-Thread-Topic: [RFC v2] /dev/iommu uAPI proposal
-Thread-Index: Add0lrMH87IsTsl5Rp6WN1oQU6kGMQAdcmAAAGvGIGAAJH+YAAAKpxYQ
-Date:   Mon, 12 Jul 2021 23:56:24 +0000
-Message-ID: <BL1PR11MB54299D9554D71F53D74E1E378C159@BL1PR11MB5429.namprd11.prod.outlook.com>
-References: <BN9PR11MB5433B1E4AE5B0480369F97178C189@BN9PR11MB5433.namprd11.prod.outlook.com>
-        <20210709155052.2881f561.alex.williamson@redhat.com>
-        <BN9PR11MB54336FB9845649BB2D53022C8C159@BN9PR11MB5433.namprd11.prod.outlook.com>
- <20210712124150.2bf421d1.alex.williamson@redhat.com>
-In-Reply-To: <20210712124150.2bf421d1.alex.williamson@redhat.com>
-Accept-Language: en-US
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4308.26; Tue, 13 Jul
+ 2021 01:08:40 +0000
+Received: from BLAPR10MB4835.namprd10.prod.outlook.com
+ ([fe80::5833:5ab2:944c:7360]) by BLAPR10MB4835.namprd10.prod.outlook.com
+ ([fe80::5833:5ab2:944c:7360%9]) with mapi id 15.20.4308.027; Tue, 13 Jul 2021
+ 01:08:40 +0000
+Subject: Re: [syzbot] general protection fault in try_grab_compound_head
+To:     Sean Christopherson <seanjc@google.com>,
+        Mike Kravetz <mike.kravetz@oracle.com>
+Cc:     syzbot <syzbot+a3fcd59df1b372066f5a@syzkaller.appspotmail.com>,
+        akpm@linux-foundation.org, bp@alien8.de, hpa@zytor.com,
+        jmattson@google.com, joro@8bytes.org, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        mark.rutland@arm.com, masahiroy@kernel.org, mingo@redhat.com,
+        pbonzini@redhat.com, peterz@infradead.org,
+        rafael.j.wysocki@intel.com, rostedt@goodmis.org,
+        sedat.dilek@gmail.com, syzkaller-bugs@googlegroups.com,
+        vitor@massaru.org, vkuznets@redhat.com, wanpengli@tencent.com,
+        will@kernel.org, x86@kernel.org,
+        Thomas Gleixner <tglx@linutronix.de>
+References: <0000000000009e89e205c63dda94@google.com>
+ <87fswpot3i.ffs@nanos.tec.linutronix.de> <YOy0HAnhsXJ4W210@google.com>
+From:   Joao Martins <joao.m.martins@oracle.com>
+Message-ID: <9afe2365-4448-51b1-f711-a81ec79be817@oracle.com>
+Date:   Tue, 13 Jul 2021 02:08:31 +0100
+In-Reply-To: <YOy0HAnhsXJ4W210@google.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-dlp-version: 11.5.1.3
-dlp-product: dlpe-windows
-dlp-reaction: no-action
-authentication-results: redhat.com; dkim=none (message not signed)
- header.d=none;redhat.com; dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 0964f565-9bdf-4bb4-bb8a-08d94590a7c6
-x-ms-traffictypediagnostic: MN2PR11MB4743:
-x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <MN2PR11MB4743BC9C09AEB69845D8385F8C159@MN2PR11MB4743.namprd11.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:8882;
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: 2hjamZXp5+BW9x7Jt4MMd5mtdBc7H+zYLH9gPgvjBkekFdA7KPY6Lo1yMOSk8EoWKM3QNgvlVCvi4HihWQlCumhTdLNVJrLwYiEIwYzrQk+2HqNmN0jf/h+Z/rGhKVaLYE6L8GjozNm+/D1ktCR+n7ty8IBcnBgWE/pPMVVM0szik9Q1rzXu6D36zeyn3gtDHDmQVURe4foDQyCYxnSdqUYA9R0qh6usdwDEkJ1E2fNWT4ipNj/1Est6iEuKqX78wwzg/skMT+EUzGfPG1kpc9ze747kjG6at+f8DTpHVSrqgSW1pSzJ4cV3Q4VzjXmeUE2jNcdowHHQ9ZIUf1MmkfMGvPS17snu2tJ6WEKo9EdrTBBKTDDJFKui8ww1nhrngiJltbhLxJ1Drk9fwTO5EcAwZsjTolFgBkXOSRiz++jTKkRclYROarf0cVi9IyxtXbGeiImpJosdm1T7DD7L0LY/cdIdlzGJvXb7hwAErzP3AAYTDoi+UDM+bToiJk62wMPbOgfkzoSIZPm+Yda1E1ChOAzGqFGaolKGx7RQXmLE7CeBIm7XsPqJS6YZ9+j6Sh/v+iP26NIcV/jwYqo6SVascuFg2zPmcbiSQxrCvd+2Zi8m6GpN9MPgStu/ISw2m3Qpwuqo2FrLyMxhg8hZcA==
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL1PR11MB5429.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(39860400002)(136003)(376002)(346002)(396003)(6506007)(76116006)(66446008)(66946007)(478600001)(38100700002)(8936002)(26005)(5660300002)(6916009)(186003)(52536014)(66556008)(66476007)(2906002)(7696005)(316002)(33656002)(64756008)(122000001)(86362001)(7416002)(55016002)(83380400001)(71200400001)(54906003)(4326008)(9686003)(8676002);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?He2/UC7ntyi9Lpa+sYqvrqHlQI9xF3FwzCNKb9OeBOnP/nadlsoSy18V/73I?=
- =?us-ascii?Q?sCNFuCLECVk46nFL/JfEVGCxqb5+VRHmZzvECaHb2vTI+ZtbFk1i/DaA4Sgq?=
- =?us-ascii?Q?sOPnCduFysT34Itu4V776o9vMgQejcMNKxNsg1XGgiXKInWQopfPndPJN9W4?=
- =?us-ascii?Q?SFFy2gGBJZwDGDkBdVmu7NpVe7/PYF5ixc68yf7v2kbE8y4y/1jJ7U5enEmW?=
- =?us-ascii?Q?9MxJMWh9k0K9qB1QSocveHdYghmU1iT3NgsnFWFNbTBs2bqAaAO2IEYVI3VC?=
- =?us-ascii?Q?LmhHom9D5qU7aD/y2A+Nv6cykTnKDYUHZupYoFkP5zhu5JFHfDKvkRKhCNNc?=
- =?us-ascii?Q?Sco638Cy87nyKd2oXAQMWJJfR7KwYz+NAq1rxrjDdQvYImGNtjLNqbprLAo1?=
- =?us-ascii?Q?Y9LoyFSHWhbB1lAvzF/h7fLOep8uk+0NDdXb0ZxRd4RYmvPczTNpsX4vdReW?=
- =?us-ascii?Q?sd3Jy9pRddkfNHYb/4kaFJBjmjITvyNvozDSwqS1A2zjcDqKBk1TtpDGCo1L?=
- =?us-ascii?Q?U4M2hQUZLtDFPGwePE17vSJ7mn9tovcGEmEkRCS89pCtXqg9/H1DZnv3E7NQ?=
- =?us-ascii?Q?9UF8zdF6LBRfIMXEHSGu2H1O0HAxIJaDBCT/whxt/bZiMzQWLtQPZ7Vt71z3?=
- =?us-ascii?Q?o9B4qsJ2Y6/nQaQxVt8J9798qj3qxFtf3Lp1Xfsz3HvTJmuyGojIrW4GgTrO?=
- =?us-ascii?Q?EzKLhT/6SvY+rDh3X5d+Y8gskxKk88crOawfMPkGkG44nA6LhNBwcaeURAtT?=
- =?us-ascii?Q?tEtPgQJ4RutQ9oJrcAC1OemYoB0iTdgiB3HtcjW+WrjsCqZHXBZxJlrXACc1?=
- =?us-ascii?Q?Lpod6li7vEb/QS+H2C5hsOtxePHvKYZWQnPPhibIMSClWKMdl0Hk7wYtNkkS?=
- =?us-ascii?Q?y1nw1bdO1stnC01Cben28Qf0yFVUzygngpXBKb3kxtKXmnWUU0eA7UPJFSIj?=
- =?us-ascii?Q?iJkfqL5Uo0DEMyYS/6Hqc/nQmkZouaAWiEtEXX970ZkICcP2KLS/HC2iMCBe?=
- =?us-ascii?Q?MHkUMNd4wENECTfOBqx/HTdSpqdvAk2yDh18PrlisoDjN550klEIYh5p4C/m?=
- =?us-ascii?Q?O+Zm8uu9S3B2TuHWEeB3Ie3Wc5DajmqNYrWFEWlyEPyvw77TddNc4hUfRm8D?=
- =?us-ascii?Q?BCYqHkaOX2ovxLhgWjrQ487Nl26ucI9vTnb3gVvOU2tzElPXBucq7jwBpJkt?=
- =?us-ascii?Q?hZfRlxy+N4+RZSkRCFe6+phXbB01I+8i/COyyW4+LKVIBncDW0hwMfsrE32C?=
- =?us-ascii?Q?0OG2diQWHlhmGJMBTZp4J7WZCBChOqYh+lAxIUdaPLzCVNU65dqvyQwnU/Ez?=
- =?us-ascii?Q?N1fl0Uuw4Iotjnfuzlk/ZgNb?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: LO2P265CA0462.GBRP265.PROD.OUTLOOK.COM
+ (2603:10a6:600:a2::18) To BLAPR10MB4835.namprd10.prod.outlook.com
+ (2603:10b6:208:331::11)
 MIME-Version: 1.0
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from [192.168.1.67] (94.61.1.144) by LO2P265CA0462.GBRP265.PROD.OUTLOOK.COM (2603:10a6:600:a2::18) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4308.19 via Frontend Transport; Tue, 13 Jul 2021 01:08:37 +0000
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: d0b5737c-9274-436b-b6f8-08d9459ac044
+X-MS-TrafficTypeDiagnostic: BL0PR10MB2931:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <BL0PR10MB293158F38A1D72957E39DDBABB149@BL0PR10MB2931.namprd10.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:8882;
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: JLv67sk41yLeLI3XRh+45H9RuOtc4IryZ9++/IKOEcweJMtKvJ5AL7rMroj0h1sZkozCT7nJenLS3L9f/ON04GsCoSkgL+bVUvNs9rUANDfCehbMZp8DK70C9GifXsHbnEzr6ftU+A3qxTeJYeTerSvHDNLpVsg09TeUpOh3TddJznFco3Vwt49xr/him8dXnjCCgFmOAdnLigQRxeWft8CR2hNZo0NTNSgy+HTMPauOb/MN2SYs8HKvfHlrcjfhgSopKsP4iCtGQmhB3wFHwAwlw5We5+8VKqQ1PlUsjy5lFR0uTwUarxJKOoV84KiCyY6cWlDh1VRGq2R0s0cLJXnzaGSOz53YKOttSwff7hVMsDUIr9eh4Rj3PHyfsK8nVJcIRGvrCn9qNkJpCJZQhOAzZlJsuVNAJ/76zFDILOd3Goy1JViHCbqAB+B5FBwi+eQm29TIGBOgccbEt/gWUPwwJdB8syOknbNlUV62m4znXesnExxf12pT/xlxZNZBeFRGx3jLmhU7UV92YtJVeCvMi0qkljnptiv7CUgqXpHQoCUsu0K3Mu6f0tdhGsmfMt3Vok/cS8lrSD4fvqdFPwF5UEKR4B1esxnpFB75Nms91vKVsjQlJnGu08x6V7LoGSFw7S3CTlFVR1VPl1sU6PEWa6uAbwItw6LyuqXNwykYom48FK30EBgbZcfkAPBFbB7p5XKx/tVGAgLHBzQnhA==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BLAPR10MB4835.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(136003)(376002)(346002)(366004)(39860400002)(396003)(316002)(956004)(5660300002)(16576012)(2616005)(8936002)(2906002)(7416002)(4326008)(26005)(186003)(8676002)(31686004)(86362001)(31696002)(36756003)(478600001)(6486002)(6636002)(66476007)(83380400001)(66556008)(53546011)(110136005)(66946007)(54906003)(6666004)(38100700002)(45980500001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?UzlIL25wSml1WFJZQnRJTlBjMkVYakxNMkUxRENPOEN6UjVRb05ZdUwvM01M?=
+ =?utf-8?B?ckhaUEd2RWlJNGo4U1NBMisyVmxiVmdoL0JJdmkvUXlHZzBjWEdDV0dScnk1?=
+ =?utf-8?B?cVlrZFVJQndtakYxNXlIVlU4MWswS3lad2toZ0JscjJyK05jWmNTRmhpQmZw?=
+ =?utf-8?B?OEhGSzdWNGE4YitIRHV1UnFTUG44MXpKOW5pMVR3RjBRc1Z3eTBCSGNOWndr?=
+ =?utf-8?B?cGZBRzREZzRhOTJyYmhsamcrK1o2blNnWCtwcmxERTRHUER1L1crRVNSQ1NG?=
+ =?utf-8?B?TnRZS2V6ZWFuWU1qaWlObkMxQlFQSVJpR2pPR2FCOElzNlZWa3E1RkV4dEFG?=
+ =?utf-8?B?M3hJOG9wOUJVSVVaTmY5ZGlqUFNHQXhva2Q1M3BTaVRRd2NxeUhxS3JkdU04?=
+ =?utf-8?B?RUVjaFlZaFI5RjhJK0w4bHJUeTBkV09oaHBQbDQ4c0JtOEVGRG9JTlZCR3l6?=
+ =?utf-8?B?dFNweEt0TXQ4bDBGVzhLcE5Da0p2K2o4SFA5RnRuN2U2MDJEZEQzemRmUjRN?=
+ =?utf-8?B?eWlEeEdHMko1TDN6bXV0djdXZFJ6NVdOdHB6SlJHSzRUN2YwV2F2MVJ3REd6?=
+ =?utf-8?B?M3YrQ3VXQWc4ZG94WlREODFMWmM2aEJvWXc3Uys1QXpCVXBZZm5TUmxOb2Jl?=
+ =?utf-8?B?WllWdG9ybXVveUlnS0FVdGlmRG9ad1hueUxsRmlKTjVXNUZlZVh1eFgyaHFo?=
+ =?utf-8?B?eWxMS1daY2h2Wjd0YldUcFBrQWtjb2FRTlN0QngwTzVHMTM3UUx4ZERBZ0Ew?=
+ =?utf-8?B?R2dTZnRUSVBNMGlqeFozL1d0VlA2WGo2TGFwTk01eXJiSkRmdVFBNE1mOWJP?=
+ =?utf-8?B?UWhxN1BDR01GZ2JCMDlxV3pXQWVpQk9uVUhGdDBmeDhTR096NmJRb2VDMkxz?=
+ =?utf-8?B?ZjVqd2lmYVE1T0w3cW5Xcjk4UDRqalo3bEFMclJpTk1lbFNRbFVROXc5eVdC?=
+ =?utf-8?B?dmJuZEJYZG91UTdMWU5aWmRoWGtWRm9DWVBsZGNWc3BOK2xEMEF2emNLYSt1?=
+ =?utf-8?B?WVlTY1BVakZRaTBYL2JlbVYvaWNkTHlHdENpcXV6UE1nRmtEeUl0eU1NclBZ?=
+ =?utf-8?B?L2QxSDhrdExQRVl5blVHWTNrTDNhSy9oZ09adE9veG5jYS85aWdIdjh3UFZB?=
+ =?utf-8?B?RjNycWVQbWFwZ3JqYmZTazRiMzVzeUxDWGtkNll5UW9CY3MweFJUWnFFV0Va?=
+ =?utf-8?B?QzZZcjg5bnUzRHFkOWlvWnQvYWlhRVF6bWJjcWVxMnZxVUd1TFI4ZGYvZjhE?=
+ =?utf-8?B?TGpHeHhOWEwzV2p4RCtUZ1JWVG11dGp6UDN4akMvbldBZHhMdG5FUkZOSStN?=
+ =?utf-8?B?YVZDV2U3UHppc1gwVkNOZ2hXa0xkNzhnSnJacEVzNVllT3VudWxCUkdxdU01?=
+ =?utf-8?B?MlhCVHFubG9jOE9SRHErbTluSDhBL3F6WjNKbEVKQ3RWZlpPWm04S1ZoeDVD?=
+ =?utf-8?B?b3k0N1RrRVpiQVk2NDR4R2RNSmg2TUhkdFdSa2VoNlZYWUNIZVlQR21vcFEw?=
+ =?utf-8?B?RTlhRk9KL2VWbUI0S1BZOXpyQ3ZTTk0xS3pmdGI3dmZyckxOWW5iZUJCSzFj?=
+ =?utf-8?B?RHIzRkJaSVp2VFRRYXQ1bmZsSUc4bm9YVXhseHNFbEtqQ0h1MHhrK1RQbjhp?=
+ =?utf-8?B?SU5yRWx6N0piNlBtZG5oU29WYmxxZGgwUzQ1ckJLM2tpUDRNR2l1QkFNY2RM?=
+ =?utf-8?B?TmUxTW5KandDNzZLTGlwUE1wMjZWNi9qZ1pBdG9CRmpjMzBDdEYyZnAydE5N?=
+ =?utf-8?Q?JxvBnA8nR0CfdDscM0eKTIjv9nfZGMpdYY6m3h2?=
+X-OriginatorOrg: oracle.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: d0b5737c-9274-436b-b6f8-08d9459ac044
+X-MS-Exchange-CrossTenant-AuthSource: BLAPR10MB4835.namprd10.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: BL1PR11MB5429.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 0964f565-9bdf-4bb4-bb8a-08d94590a7c6
-X-MS-Exchange-CrossTenant-originalarrivaltime: 12 Jul 2021 23:56:24.1006
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Jul 2021 01:08:40.4924
  (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: kKrUaJu/fT/jXQPNMrBZw1qE3dEe0kdyTnJyQD63iOSTfjt6mq5lbROV9c1s1yJPwgGBjAfL60psCj8kyy3A7w==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR11MB4743
-X-OriginatorOrg: intel.com
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: nW706F6Sa7UXdKclgk/AwWdj2CdITX4QFBFKPKz/0YvLvdd38Su9iqqliyakXH/QYC/LK2Kxuz0zYkSHC65RWwkZaAtYniInO0Qq1T0ugBg=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL0PR10MB2931
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=10043 signatures=668682
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 phishscore=0 bulkscore=0 malwarescore=0
+ spamscore=0 suspectscore=0 adultscore=0 mlxlogscore=999 mlxscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2104190000
+ definitions=main-2107130005
+X-Proofpoint-GUID: 4kHa2qbmx-ZRqp-OvB4jyeA2d-Dh1wRd
+X-Proofpoint-ORIG-GUID: 4kHa2qbmx-ZRqp-OvB4jyeA2d-Dh1wRd
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-> From: Alex Williamson <alex.williamson@redhat.com>
-> Sent: Tuesday, July 13, 2021 2:42 AM
->=20
-> On Mon, 12 Jul 2021 01:22:11 +0000
-> "Tian, Kevin" <kevin.tian@intel.com> wrote:
-> > > From: Alex Williamson <alex.williamson@redhat.com>
-> > > Sent: Saturday, July 10, 2021 5:51 AM
-> > > On Fri, 9 Jul 2021 07:48:44 +0000
-> > > "Tian, Kevin" <kevin.tian@intel.com> wrote:
->=20
-> > > > For mdev the struct device should be the pointer to the parent devi=
-ce.
-> > >
-> > > I don't get how iommu_register_device() differentiates an mdev from a
-> > > pdev in this case.
-> >
-> > via device cookie.
->=20
->=20
-> Let me re-add this section for more context:
->=20
-> > 3. Sample structures and helper functions
-> > --------------------------------------------------------
-> >
-> > Three helper functions are provided to support VFIO_BIND_IOMMU_FD:
-> >
-> > 	struct iommu_ctx *iommu_ctx_fdget(int fd);
-> > 	struct iommu_dev *iommu_register_device(struct iommu_ctx *ctx,
-> > 		struct device *device, u64 cookie);
-> > 	int iommu_unregister_device(struct iommu_dev *dev);
-> >
-> > An iommu_ctx is created for each fd:
-> >
-> > 	struct iommu_ctx {
-> > 		// a list of allocated IOASID data's
-> > 		struct xarray		ioasid_xa;
-> >
-> > 		// a list of registered devices
-> > 		struct xarray		dev_xa;
-> > 	};
-> >
-> > Later some group-tracking fields will be also introduced to support
-> > multi-devices group.
-> >
-> > Each registered device is represented by iommu_dev:
-> >
-> > 	struct iommu_dev {
-> > 		struct iommu_ctx	*ctx;
-> > 		// always be the physical device
-> > 		struct device 		*device;
-> > 		u64			cookie;
-> > 		struct kref		kref;
-> > 	};
-> >
-> > A successful binding establishes a security context for the bound
-> > device and returns struct iommu_dev pointer to the caller. After this
-> > point, the user is allowed to query device capabilities via IOMMU_
-> > DEVICE_GET_INFO.
-> >
-> > For mdev the struct device should be the pointer to the parent device.
->=20
->=20
-> So we'll have a VFIO_DEVICE_BIND_IOMMU_FD ioctl where the user
-> provides
-> the iommu_fd and a cookie.  vfio will use iommu_ctx_fdget() to get an
-> iommu_ctx* for that iommu_fd, then we'll call iommu_register_device()
-> using that iommu_ctx* we got from the iommu_fd, the cookie provided by
-> the user, and for an mdev, the parent of the device the user owns
-> (the device_fd on which this ioctl is called)...
->=20
-> How does an arbitrary user provided cookie let you differentiate that
-> the request is actually for an mdev versus the parent device itself?
->=20
+On 7/12/21 10:29 PM, Sean Christopherson wrote:
+> On Thu, Jul 08, 2021, Thomas Gleixner wrote:
+>> On Sat, Jul 03 2021 at 13:24, syzbot wrote:
+>>> syzbot has bisected this issue to:
+>>>
+>>> commit 997acaf6b4b59c6a9c259740312a69ea549cc684
+>>> Author: Mark Rutland <mark.rutland@arm.com>
+>>> Date:   Mon Jan 11 15:37:07 2021 +0000
+>>>
+>>>     lockdep: report broken irq restoration
+>>
+>> That's the commit which makes the underlying problem visible:
+>>
+>>        raw_local_irq_restore() called with IRQs enabled
+>>
+>> and is triggered by this call chain:
+>>
+>>  kvm_wait arch/x86/kernel/kvm.c:860 [inline]
+>>  kvm_wait+0xc3/0xe0 arch/x86/kernel/kvm.c:837
+> 
+> And the bug in kvm_wait() was fixed by commit f4e61f0c9add ("x86/kvm: Fix broken
+> irq restoration in kvm_wait").  The bisection is bad, syzbot happened into the
+> kvm_wait() WARN and got distracted.  The original #GP looks stable, if someone
+> from mm land has bandwidth.
+> 
 
-Maybe I misunderstood your question. Are you specifically worried
-about establishing the security context for a mdev vs. for its parent?
-At least in concept we should not change the security context of
-the parent if this binding call is just for the mdev. And for mdev it will =
-be
- in a security context as long as the associated PASID entry is disabled=20
-at the binding time. If this is the case, possibly we also need VFIO to=20
-provide defPASID marking the mdev when calling iommu_register_device()
-then IOMMU fd also provides defPASID when calling IOMMU API to
-establish the security context.
+I've bisected this to (my) recent commit 82e5d378b0e47 ("mm/hugetlb: refactor subpage
+recording").
 
-Thanks,
-Kevin
+I have this fix below and should formally submit tomorrow after more testing.
+My apologies for the trouble.
+
+	Joao
+
+------>8------
+
+Subject: mm/hugetlb: fix refs calculation from unaligned @vaddr
+
+commit 82e5d378b0e47 ("mm/hugetlb: refactor subpage recording")
+refactored the count of subpages but missed an edge case when @vaddr is
+less than a PAGE_SIZE close to vma->vm_end. It would errousnly set @refs
+to 0 and record_subpages_vmas() wouldn't set the pages array element to
+its value, consequently causing the reported #GP by syzbot.
+
+Fix it by aligning down @vaddr in @refs calculation.
+
+Reported-by: syzbot+a3fcd59df1b372066f5a@syzkaller.appspotmail.com
+Fixes: 82e5d378b0e47 ("mm/hugetlb: refactor subpage recording")
+Signed-off-by: Joao Martins <joao.m.martins@oracle.com>
+
+diff --git a/mm/hugetlb.c b/mm/hugetlb.c
+index a86a58ef132d..cbc448c1a3c8 100644
+--- a/mm/hugetlb.c
++++ b/mm/hugetlb.c
+@@ -4949,8 +4949,9 @@ long follow_hugetlb_page(struct mm_struct *mm, struct vm_area_struct
+*vma,
+                        continue;
+                }
+
+-               refs = min3(pages_per_huge_page(h) - pfn_offset,
+-                           (vma->vm_end - vaddr) >> PAGE_SHIFT, remainder);
++               /* [vaddr .. vm_end] may not be aligned to PAGE_SIZE */
++               refs = min3(pages_per_huge_page(h) - pfn_offset, remainder,
++                   (vma->vm_end - ALIGN_DOWN(vaddr, PAGE_SIZE)) >> PAGE_SHIFT);
+
+                if (pages || vmas)
+                        record_subpages_vmas(mem_map_offset(page, pfn_offset),
