@@ -2,100 +2,384 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 226423C8532
-	for <lists+kvm@lfdr.de>; Wed, 14 Jul 2021 15:22:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 41E4E3C8539
+	for <lists+kvm@lfdr.de>; Wed, 14 Jul 2021 15:22:56 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232167AbhGNNYy (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 14 Jul 2021 09:24:54 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:55829 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232058AbhGNNX4 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 14 Jul 2021 09:23:56 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1626268864;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=+fntq9dxK/DsvMDb1vmj39FQnBcJ0Sqj0F7MADcjTnk=;
-        b=bVncbu38tH9UfwNj8FBBG/XxFgOV2gr0EZEJUypARLyH+gittYt6httFi8OHN+hq6+vrnj
-        3KhRwXVLLutCE4bnbGJ8DFnHGiM8dpTJONP/OV+yH4p2ebvOUNL5l/iVDg8qko5aGWfpLP
-        5cb0z0aT7o/7/VEYAzFkAigsSXHhGzQ=
-Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
- [209.85.208.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-369--30h2EeyOXm7otvJJIYeXg-1; Wed, 14 Jul 2021 09:21:03 -0400
-X-MC-Unique: -30h2EeyOXm7otvJJIYeXg-1
-Received: by mail-ed1-f69.google.com with SMTP id j7-20020aa7c4070000b02903a4b519b413so1233149edq.9
-        for <kvm@vger.kernel.org>; Wed, 14 Jul 2021 06:21:02 -0700 (PDT)
+        id S239422AbhGNNZl (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 14 Jul 2021 09:25:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45896 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S239423AbhGNNZk (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 14 Jul 2021 09:25:40 -0400
+Received: from mail-qt1-x834.google.com (mail-qt1-x834.google.com [IPv6:2607:f8b0:4864:20::834])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E6B91C061762
+        for <kvm@vger.kernel.org>; Wed, 14 Jul 2021 06:22:47 -0700 (PDT)
+Received: by mail-qt1-x834.google.com with SMTP id x24so1784306qts.11
+        for <kvm@vger.kernel.org>; Wed, 14 Jul 2021 06:22:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=8WaQzYZeQ7Li+6RRsoQKD67iI4SEvRFGh30cooQVpZw=;
+        b=ALZqB1qoxrXn+jAy7RQaf+A7TkxQvjq4ulZG5YO0uUIcybxnZKm0rpHD53EIfe8Jk/
+         YpGITna9ARYShBitncZbkmgkFksLsZIy/+ZdAoeYLBTDx8C1DKoohAJPaBYnRKyySVGc
+         ITV+cFCVYK57U2R6VkGW5CEThNcTLrXhcqZ3U/43GLOYRV5ZCgoQENAK9PMCgKrnE4Bx
+         RHXyl1CDuy68G1JGKqXbsBkwwZFSyQIkgTYpbX3O1ZpSJIeE/kExE2YJ4ajcd9qm2a80
+         xOkPSt+FopxTdx7Z1GVBLUUUa3y0DyeLiL1Gd0HkNb5dMY0ayoba9xVy0Kz+ZAL5/J4w
+         3PIw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
-         :message-id:mime-version;
-        bh=+fntq9dxK/DsvMDb1vmj39FQnBcJ0Sqj0F7MADcjTnk=;
-        b=H3oknq13VrBV/re/bCVBkfmeKZ05NTw+OPGNU8SOGEsHPgkAKhmoPuXF5VB7qbzNrD
-         ZgNBQC4prSae+pS2iU8cPzF0eCShfExKTWE5wR/gF+nXlEPGOwUcECzQTSnGFIxDBBmu
-         xC//Tqb5Lqv+27FWIOYm+3S9RIn4/2whk0r0kXMe/kIjDuDyMIchzh2Zi8N1jZBq8X1X
-         D0W2975/k98g2JkMvCww5cHdvo4sLwBBSad+S9YGaOFpcP0IXTpInWDT78KOS6G3si32
-         QdKp2RaAr+00jXbRUotk2bXz0mL/fxQ8IsdUqJ+GfquGr0IR0hWFlP3vbcDOvXWBWj8C
-         Dy9w==
-X-Gm-Message-State: AOAM533XRp+wwNkYHHvOKgrTLuA4UvOFCsw7MmK24XE7WNzlkAhPRri5
-        MoZNL+aGCKXmEj5xtTZ4Q/eIV4j/If6NYq96FNlrXLD2Om5IiW8Lz+16WcX8R0aUFsTQcpD9/e9
-        7klwQ5loQ8GeGGaWlsMfVuov1bKZ5OuIjYQQwdEkmz/E774v98ItG5JvoqrHd7HrJ
-X-Received: by 2002:a05:6402:17d3:: with SMTP id s19mr13544062edy.49.1626268861920;
-        Wed, 14 Jul 2021 06:21:01 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyL7BSCePriyxKihJPYAItdtydFUidngy/E8P+iCKdpMyGjTTXvx+4VpuJJqgrbrMXY5WRlJw==
-X-Received: by 2002:a05:6402:17d3:: with SMTP id s19mr13544026edy.49.1626268861714;
-        Wed, 14 Jul 2021 06:21:01 -0700 (PDT)
-Received: from vitty.brq.redhat.com (g-server-2.ign.cz. [91.219.240.2])
-        by smtp.gmail.com with ESMTPSA id p26sm788024ejn.112.2021.07.14.06.21.00
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 14 Jul 2021 06:21:01 -0700 (PDT)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     Juergen Gross <jgross@suse.com>
-Cc:     Jonathan Corbet <corbet@lwn.net>,
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=8WaQzYZeQ7Li+6RRsoQKD67iI4SEvRFGh30cooQVpZw=;
+        b=G56bs+FLXPOHzZZ9DcP+h8bK6r9pn5SexiKLImb08Avjv89dGu6KSMNYwtUacLEfAP
+         j+PFuSRLPuX7d5m8RUV5qOmtBkUkSfMAOw/FmsUgt7FOJulV7z9u6mhmjRPud1R2HNYq
+         4VNOCzEOgiNKtSjg1qtkvjFQhCPTDWE4i+6Y+VJZtf59z0RuqBj3f512iAjJUqjeSWjy
+         PVSgHpGAVKJRBKwqK1ZzNuLVmno+5lpW9c/F7RodEtgyJdIRb43lfAF0CQ8AY6PI7NT9
+         BV9wEyolTr/m9kiplAuHlWm7p8sJ2m9Yy8dqxI2JmeOrdIjdnColSKQWEYIxPerIfrbM
+         Bk5A==
+X-Gm-Message-State: AOAM532yLdtvwOxijH0UKvP5nOaRGTs3un7pKgNGsI/5C2LK79zuRjFC
+        VBxl3HBOC/gTdJJvYK7D9axaRBuKGgG8rwXrlXnTu7XWFcUAzG8M
+X-Google-Smtp-Source: ABdhPJzUq99VHUKVJMfZn1C5QDzWePBXid78b3kd93+UIASO5flvGLThImwDSEJuQzURM3cOVvnjCPX/f4O4MxrE6VA=
+X-Received: by 2002:a05:622a:409:: with SMTP id n9mr9315541qtx.261.1626268966412;
+ Wed, 14 Jul 2021 06:22:46 -0700 (PDT)
+MIME-Version: 1.0
+References: <20210707183616.5620-1-brijesh.singh@amd.com> <20210707183616.5620-16-brijesh.singh@amd.com>
+In-Reply-To: <20210707183616.5620-16-brijesh.singh@amd.com>
+From:   Marc Orr <marcorr@google.com>
+Date:   Wed, 14 Jul 2021 06:22:35 -0700
+Message-ID: <CAA03e5HA_vjhOtTPL-vKFJvPxseLRMs5=s90ffUwDWQxtG7aCQ@mail.gmail.com>
+Subject: Re: [PATCH Part2 RFC v4 15/40] crypto: ccp: Handle the legacy TMR
+ allocation when SNP is enabled
+To:     Brijesh Singh <brijesh.singh@amd.com>
+Cc:     x86@kernel.org, linux-kernel@vger.kernel.org,
+        kvm list <kvm@vger.kernel.org>, linux-efi@vger.kernel.org,
+        platform-driver-x86@vger.kernel.org, linux-coco@lists.linux.dev,
+        linux-mm@kvack.org, linux-crypto@vger.kernel.org,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
         Paolo Bonzini <pbonzini@redhat.com>,
         Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        "H. Peter Anvin" <hpa@zytor.com>, linux-kernel@vger.kernel.org,
-        x86@kernel.org, linux-doc@vger.kernel.org, kvm@vger.kernel.org
-Subject: Re: [PATCH 6/6] x86/kvm: add boot parameter for setting max number
- of vcpus per guest
-In-Reply-To: <62679c6a-2f23-c1d1-f54c-1872ec748965@suse.com>
-References: <20210701154105.23215-1-jgross@suse.com>
- <20210701154105.23215-7-jgross@suse.com>
- <87h7gx2lkt.fsf@vitty.brq.redhat.com>
- <1ddffb87-a6a2-eba3-3f34-cf606a2ecba2@suse.com>
- <878s292k75.fsf@vitty.brq.redhat.com>
- <62679c6a-2f23-c1d1-f54c-1872ec748965@suse.com>
-Date:   Wed, 14 Jul 2021 15:21:00 +0200
-Message-ID: <8735sh2fr7.fsf@vitty.brq.redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        David Rientjes <rientjes@google.com>,
+        Dov Murik <dovmurik@linux.ibm.com>,
+        Tobin Feldman-Fitzthum <tobin@ibm.com>,
+        Borislav Petkov <bp@alien8.de>,
+        Michael Roth <michael.roth@amd.com>,
+        Vlastimil Babka <vbabka@suse.cz>, tony.luck@intel.com,
+        npmccallum@redhat.com, brijesh.ksingh@gmail.com,
+        Alper Gun <alpergun@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Juergen Gross <jgross@suse.com> writes:
-
-> On 14.07.21 13:45, Vitaly Kuznetsov wrote:
+On Wed, Jul 7, 2021 at 11:37 AM Brijesh Singh <brijesh.singh@amd.com> wrote:
 >
->> Personally, I'd vote for introducing a 'ratio' parameter then so
->> generally users will only have to set 'kvm.max_vcpus'.
+> The behavior and requirement for the SEV-legacy command is altered when
+> the SNP firmware is in the INIT state. See SEV-SNP firmware specification
+> for more details.
 >
-> Okay.
+> When SNP is INIT state, all the SEV-legacy commands that cause the
+> firmware to write memory must be in the firmware state. The TMR memory
+> is allocated by the host but updated by the firmware, so, it must be
+> in the firmware state.  Additionally, the TMR memory must be a 2MB aligned
+> instead of the 1MB, and the TMR length need to be 2MB instead of 1MB.
+> The helper __snp_{alloc,free}_firmware_pages() can be used for allocating
+> and freeing the memory used by the firmware.
 >
-> Default '4' then? Or '2 ^ (topology_levels - 2)' (assuming a
-> topology_level of 3 on Intel: thread/core/socket and 4 on EPYC:
-> thread/core/package/socket).
+> While at it, provide API that can be used by others to allocate a page
+> that can be used by the firmware. The immediate user for this API will
+> be the KVM driver. The KVM driver to need to allocate a firmware context
+> page during the guest creation. The context page need to be updated
+> by the firmware. See the SEV-SNP specification for further details.
+>
+> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
+> ---
+>  drivers/crypto/ccp/sev-dev.c | 144 +++++++++++++++++++++++++++++++----
+>  include/linux/psp-sev.h      |  11 +++
+>  2 files changed, 142 insertions(+), 13 deletions(-)
+>
+> diff --git a/drivers/crypto/ccp/sev-dev.c b/drivers/crypto/ccp/sev-dev.c
+> index ad9a0c8111e0..bb07c68834a6 100644
+> --- a/drivers/crypto/ccp/sev-dev.c
+> +++ b/drivers/crypto/ccp/sev-dev.c
+> @@ -54,6 +54,14 @@ static int psp_timeout;
+>  #define SEV_ES_TMR_SIZE                (1024 * 1024)
+>  static void *sev_es_tmr;
+>
+> +/* When SEV-SNP is enabled the TMR need to be 2MB aligned and 2MB size. */
 
-I'd suggest we default to '4' for both Intel and AMD as we haven't given
-up completely on cross-vendor VMs (running AMD VMs on Intel CPUs and
-vice versa). It would be great to leave a comment where the number comes
-from of course.
+nit: "the TMR need" -> "the TMR needs"
 
--- 
-Vitaly
+> +#define SEV_SNP_ES_TMR_SIZE    (2 * 1024 * 1024)
+> +
+> +static size_t sev_es_tmr_size = SEV_ES_TMR_SIZE;
+> +
+> +static int __sev_do_cmd_locked(int cmd, void *data, int *psp_ret);
+> +static int sev_do_cmd(int cmd, void *data, int *psp_ret);
+> +
+>  static inline bool sev_version_greater_or_equal(u8 maj, u8 min)
+>  {
+>         struct sev_device *sev = psp_master->sev_data;
+> @@ -151,6 +159,112 @@ static int sev_cmd_buffer_len(int cmd)
+>         return 0;
+>  }
+>
+> +static int snp_reclaim_page(struct page *page, bool locked)
+> +{
+> +       struct sev_data_snp_page_reclaim data = {};
 
+Hmmm.. according to some things I read online, an empty initializer
+list is not legal in C. For example:
+https://stackoverflow.com/questions/17589533/is-an-empty-initializer-list-valid-c-code
+I'm sure this is compiling. Should we change this to `{0}`, which I
+believe will initialize all fields in this struct to zero, according
+to: https://stackoverflow.com/questions/11152160/initializing-a-struct-to-0?
+
+> +       int ret, err;
+> +
+> +       data.paddr = page_to_pfn(page) << PAGE_SHIFT;
+> +
+> +       if (locked)
+> +               ret = __sev_do_cmd_locked(SEV_CMD_SNP_PAGE_RECLAIM, &data, &err);
+> +       else
+> +               ret = sev_do_cmd(SEV_CMD_SNP_PAGE_RECLAIM, &data, &err);
+> +
+> +       return ret;
+> +}
+> +
+> +static int snp_set_rmptable_state(unsigned long paddr, int npages,
+> +                                 struct rmpupdate *val, bool locked, bool need_reclaim)
+> +{
+> +       unsigned long pfn = __sme_clr(paddr) >> PAGE_SHIFT;
+> +       unsigned long pfn_end = pfn + npages;
+> +       struct psp_device *psp = psp_master;
+> +       struct sev_device *sev;
+> +       int rc;
+> +
+> +       if (!psp || !psp->sev_data)
+> +               return 0;
+
+Should this return a non-zero value -- maybe `-ENODEV`? Otherwise, the
+`snp_alloc_firmware_page()` API will return a page that the caller
+believes is suitable to use with FW. My concern is that someone
+decides to use this API to stash a page very early on during kernel
+boot and that page becomes a time bomb.
+
+If we initialize `rc` to `-ENODEV` (or something similar), then every
+return in this function can be `return rc`.
+
+> +
+> +       /* If SEV-SNP is initialized then add the page in RMP table. */
+> +       sev = psp->sev_data;
+> +       if (!sev->snp_inited)
+> +               return 0;
+
+Ditto. Should this turn a non-zero value?
+
+> +
+> +       while (pfn < pfn_end) {
+> +               if (need_reclaim)
+> +                       if (snp_reclaim_page(pfn_to_page(pfn), locked))
+> +                               return -EFAULT;
+> +
+> +               rc = rmpupdate(pfn_to_page(pfn), val);
+> +               if (rc)
+> +                       return rc;
+> +
+> +               pfn++;
+> +       }
+> +
+> +       return 0;
+> +}
+> +
+> +static struct page *__snp_alloc_firmware_pages(gfp_t gfp_mask, int order, bool locked)
+> +{
+> +       struct rmpupdate val = {};
+
+`{}` -> `{0}`? (Not sure, see my previous comment.)
+
+> +       unsigned long paddr;
+> +       struct page *page;
+> +
+> +       page = alloc_pages(gfp_mask, order);
+> +       if (!page)
+> +               return NULL;
+> +
+> +       val.assigned = 1;
+> +       val.immutable = 1;
+> +       paddr = __pa((unsigned long)page_address(page));
+> +
+> +       if (snp_set_rmptable_state(paddr, 1 << order, &val, locked, false)) {
+> +               pr_warn("Failed to set page state (leaking it)\n");
+
+Maybe `WARN_ONCE` instead of `pr_warn`? It's both a big attention
+grabber and also rate limited.
+
+> +               return NULL;
+> +       }
+> +
+> +       return page;
+> +}
+> +
+> +void *snp_alloc_firmware_page(gfp_t gfp_mask)
+> +{
+> +       struct page *page;
+> +
+> +       page = __snp_alloc_firmware_pages(gfp_mask, 0, false);
+> +
+> +       return page ? page_address(page) : NULL;
+> +}
+> +EXPORT_SYMBOL_GPL(snp_alloc_firmware_page);
+>
+> +static void __snp_free_firmware_pages(struct page *page, int order, bool locked)
+> +{
+> +       struct rmpupdate val = {};
+
+`{}` -> `{0}`? (Not sure, see my previous comment.)
+
+> +       unsigned long paddr;
+> +
+> +       if (!page)
+> +               return;
+> +
+> +       paddr = __pa((unsigned long)page_address(page));
+> +
+> +       if (snp_set_rmptable_state(paddr, 1 << order, &val, locked, true)) {
+> +               pr_warn("Failed to set page state (leaking it)\n");
+
+WARN_ONCE?
+
+> +               return;
+> +       }
+> +
+> +       __free_pages(page, order);
+> +}
+> +
+> +void snp_free_firmware_page(void *addr)
+> +{
+> +       if (!addr)
+> +               return;
+> +
+> +       __snp_free_firmware_pages(virt_to_page(addr), 0, false);
+> +}
+> +EXPORT_SYMBOL(snp_free_firmware_page);
+> +
+>  static int __sev_do_cmd_locked(int cmd, void *data, int *psp_ret)
+>  {
+>         struct psp_device *psp = psp_master;
+> @@ -273,7 +387,7 @@ static int __sev_platform_init_locked(int *error)
+>
+>                 data.flags |= SEV_INIT_FLAGS_SEV_ES;
+>                 data.tmr_address = tmr_pa;
+> -               data.tmr_len = SEV_ES_TMR_SIZE;
+> +               data.tmr_len = sev_es_tmr_size;
+>         }
+>
+>         rc = __sev_do_cmd_locked(SEV_CMD_INIT, &data, error);
+> @@ -630,6 +744,8 @@ static int __sev_snp_init_locked(int *error)
+>         sev->snp_inited = true;
+>         dev_dbg(sev->dev, "SEV-SNP firmware initialized\n");
+>
+> +       sev_es_tmr_size = SEV_SNP_ES_TMR_SIZE;
+> +
+>         return rc;
+>  }
+>
+> @@ -1153,8 +1269,10 @@ static void sev_firmware_shutdown(struct sev_device *sev)
+>                 /* The TMR area was encrypted, flush it from the cache */
+>                 wbinvd_on_all_cpus();
+>
+> -               free_pages((unsigned long)sev_es_tmr,
+> -                          get_order(SEV_ES_TMR_SIZE));
+> +
+> +               __snp_free_firmware_pages(virt_to_page(sev_es_tmr),
+> +                                         get_order(sev_es_tmr_size),
+> +                                         false);
+>                 sev_es_tmr = NULL;
+>         }
+>
+> @@ -1204,16 +1322,6 @@ void sev_pci_init(void)
+>             sev_update_firmware(sev->dev) == 0)
+>                 sev_get_api_version();
+>
+> -       /* Obtain the TMR memory area for SEV-ES use */
+> -       tmr_page = alloc_pages(GFP_KERNEL, get_order(SEV_ES_TMR_SIZE));
+> -       if (tmr_page) {
+> -               sev_es_tmr = page_address(tmr_page);
+> -       } else {
+> -               sev_es_tmr = NULL;
+> -               dev_warn(sev->dev,
+> -                        "SEV: TMR allocation failed, SEV-ES support unavailable\n");
+> -       }
+> -
+>         /*
+>          * If boot CPU supports the SNP, then first attempt to initialize
+>          * the SNP firmware.
+> @@ -1229,6 +1337,16 @@ void sev_pci_init(void)
+>                 }
+>         }
+>
+> +       /* Obtain the TMR memory area for SEV-ES use */
+> +       tmr_page = __snp_alloc_firmware_pages(GFP_KERNEL, get_order(sev_es_tmr_size), false);
+> +       if (tmr_page) {
+> +               sev_es_tmr = page_address(tmr_page);
+> +       } else {
+> +               sev_es_tmr = NULL;
+> +               dev_warn(sev->dev,
+> +                        "SEV: TMR allocation failed, SEV-ES support unavailable\n");
+> +       }
+> +
+>         /* Initialize the platform */
+>         rc = sev_platform_init(&error);
+>         if (rc && (error == SEV_RET_SECURE_DATA_INVALID)) {
+> diff --git a/include/linux/psp-sev.h b/include/linux/psp-sev.h
+> index 63ef766cbd7a..b72a74f6a4e9 100644
+> --- a/include/linux/psp-sev.h
+> +++ b/include/linux/psp-sev.h
+> @@ -12,6 +12,8 @@
+>  #ifndef __PSP_SEV_H__
+>  #define __PSP_SEV_H__
+>
+> +#include <linux/sev.h>
+> +
+>  #include <uapi/linux/psp-sev.h>
+>
+>  #ifdef CONFIG_X86
+> @@ -920,6 +922,8 @@ int snp_guest_dbg_decrypt(struct sev_data_snp_dbg *data, int *error);
+>
+>
+>  void *psp_copy_user_blob(u64 uaddr, u32 len);
+> +void *snp_alloc_firmware_page(gfp_t mask);
+> +void snp_free_firmware_page(void *addr);
+>
+>  #else  /* !CONFIG_CRYPTO_DEV_SP_PSP */
+>
+> @@ -961,6 +965,13 @@ static inline int snp_guest_dbg_decrypt(struct sev_data_snp_dbg *data, int *erro
+>         return -ENODEV;
+>  }
+>
+> +static inline void *snp_alloc_firmware_page(gfp_t mask)
+> +{
+> +       return NULL;
+> +}
+> +
+> +static inline void snp_free_firmware_page(void *addr) { }
+> +
+>  #endif /* CONFIG_CRYPTO_DEV_SP_PSP */
+>
+>  #endif /* __PSP_SEV_H__ */
+> --
+> 2.17.1
+>
+>
