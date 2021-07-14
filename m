@@ -2,180 +2,116 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id CEBCB3C8386
-	for <lists+kvm@lfdr.de>; Wed, 14 Jul 2021 13:15:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B4E0A3C83C5
+	for <lists+kvm@lfdr.de>; Wed, 14 Jul 2021 13:22:00 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239045AbhGNLSL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 14 Jul 2021 07:18:11 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:22885 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S239035AbhGNLSL (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 14 Jul 2021 07:18:11 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1626261319;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=Z981OS1uXu1xWcE4bmmWH5UA+7i0ZIyGX9+WawOYgZo=;
-        b=fPAEgyLwXPgYpdJOc4jqXnQVSdHHi5Fd5FOzfKjbzyJtuHJ2i1VGJ/7TKaMBlTps9lfS6R
-        vS/oiySyQLkcf4e0l25rBoxVP+kZd9a54Dkt18zRYYT5YczAJc17bf1hc1+iFhwBpm1VxI
-        7zjQWhLKbCZYoT9l8fOKvril9RoVowI=
-Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
- [209.85.208.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-532-pLFIFBwOOQ-wwaUX8KIv9A-1; Wed, 14 Jul 2021 07:15:18 -0400
-X-MC-Unique: pLFIFBwOOQ-wwaUX8KIv9A-1
-Received: by mail-ed1-f71.google.com with SMTP id z13-20020a05640235cdb02903aa750a46efso1075784edc.8
-        for <kvm@vger.kernel.org>; Wed, 14 Jul 2021 04:15:17 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
-         :message-id:mime-version;
-        bh=Z981OS1uXu1xWcE4bmmWH5UA+7i0ZIyGX9+WawOYgZo=;
-        b=bVQZtlmH736+TNIm8PdOhNr2o9LIaf76PprW36gbH0ukrOSK9apx19LJZV1X4oP5ku
-         ywrdCFLSgOWSZxDVVci2JsfjQ+9qvykj+1m5Wm6PgXOpeIttOhKK6tePENuAWSmET9FA
-         imhQP0NNrvrYMClMVa6FcCOHhh0vBGEpcju11RQ667XqSFMpjN8ycln7eR16VOCxXv84
-         LiqZqwndDoSdOY+F88cEzU3dQ0p+G9zN/qC7sMKQTvEiCM3f/KhfLOGZGCtwO63ikMRr
-         j5qwnXuG93DCDXJPpat7VqmFFHPdpQlVb+tnnzP+zVeIwRTd6W7AbT29RiSHp0YRuztR
-         OPWw==
-X-Gm-Message-State: AOAM5334TwlsAZMpPDurOYcGLdTB3Cm6vKVcJNMqhha0uHGeHLFSWhbB
-        +tUHBKO/JnTPs4Cmg0wStx1NPdZ6IzWvsM3RLnLuKTQwRZzVgg6p2v6DTvK4+P6R5J4JHZoPQl+
-        As6kb9JzORA15bYufp/9HXT2vYDOSaldiRVkHgT+qfTlr2lfWSFU4yYX9na5k++4K
-X-Received: by 2002:a17:906:69b:: with SMTP id u27mr11926794ejb.338.1626261316890;
-        Wed, 14 Jul 2021 04:15:16 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJw5zumagCRkCslZ2/AUY9GUUlZ8EfDeo1zQ/HZbuzDOyv8xHdWXLhu2I/TDon6OVtivEdWwjg==
-X-Received: by 2002:a17:906:69b:: with SMTP id u27mr11926750ejb.338.1626261316611;
-        Wed, 14 Jul 2021 04:15:16 -0700 (PDT)
-Received: from vitty.brq.redhat.com (g-server-2.ign.cz. [91.219.240.2])
-        by smtp.gmail.com with ESMTPSA id n11sm676315ejg.111.2021.07.14.04.15.15
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 14 Jul 2021 04:15:16 -0700 (PDT)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     Juergen Gross <jgross@suse.com>
-Cc:     Jonathan Corbet <corbet@lwn.net>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        "H. Peter Anvin" <hpa@zytor.com>, linux-kernel@vger.kernel.org,
-        x86@kernel.org, linux-doc@vger.kernel.org, kvm@vger.kernel.org
-Subject: Re: [PATCH 6/6] x86/kvm: add boot parameter for setting max number
- of vcpus per guest
-In-Reply-To: <20210701154105.23215-7-jgross@suse.com>
-References: <20210701154105.23215-1-jgross@suse.com>
- <20210701154105.23215-7-jgross@suse.com>
-Date:   Wed, 14 Jul 2021 13:15:14 +0200
-Message-ID: <87h7gx2lkt.fsf@vitty.brq.redhat.com>
+        id S231136AbhGNLYu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 14 Jul 2021 07:24:50 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:49762 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S230164AbhGNLYu (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 14 Jul 2021 07:24:50 -0400
+Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 16EB3xL5142064;
+        Wed, 14 Jul 2021 07:21:59 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : message-id : references : mime-version : content-type :
+ in-reply-to; s=pp1; bh=GdnJyVHJARk6MNPiC15FadKa0Y4qjKwV9jON7WmVRu8=;
+ b=e42KMdQiLiot7CUYQwrF8nkrOJ2VW2ShKPlfhuI0m4Wd6UvCpZv2TXe0ELSnGIG5eIxm
+ LJaWfP0AdOh/nTeao/GN6UNn+3sFJMrijHXuuzoDNrq28Br/B/LGOBeQxG6b2SIJlGJs
+ IEmHp+jhrJjZqaEMNUIoM9RcZ6VMEYSYvtKGwKNcwyEeh6B19jLWWPrtS5UoMmPg+G77
+ R22pedeqShl7/jccrS6d1/hZRXv8jkOVkz/RWMrABUrdfvnKZ2cw/K5jDVE/dKHP/0tM
+ kkpauzBRBG/8pkqYsi/3LKhbPSmiCEwfoXJyA8ulrWT/t5WdSU+uSlfvst1l6NTy2urC nQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 39s8vgfx5r-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 14 Jul 2021 07:21:58 -0400
+Received: from m0098410.ppops.net (m0098410.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 16EB4IsJ143998;
+        Wed, 14 Jul 2021 07:21:58 -0400
+Received: from ppma04fra.de.ibm.com (6a.4a.5195.ip4.static.sl-reverse.com [149.81.74.106])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 39s8vgfx4k-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 14 Jul 2021 07:21:58 -0400
+Received: from pps.filterd (ppma04fra.de.ibm.com [127.0.0.1])
+        by ppma04fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 16EBIv1R009276;
+        Wed, 14 Jul 2021 11:21:56 GMT
+Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
+        by ppma04fra.de.ibm.com with ESMTP id 39q368gx2y-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 14 Jul 2021 11:21:55 +0000
+Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
+        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 16EBJgs332309586
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 14 Jul 2021 11:19:42 GMT
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 6E7994C046;
+        Wed, 14 Jul 2021 11:21:52 +0000 (GMT)
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 2376F4C044;
+        Wed, 14 Jul 2021 11:21:52 +0000 (GMT)
+Received: from osiris (unknown [9.145.156.107])
+        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
+        Wed, 14 Jul 2021 11:21:52 +0000 (GMT)
+Date:   Wed, 14 Jul 2021 13:21:50 +0200
+From:   Heiko Carstens <hca@linux.ibm.com>
+To:     Christian Borntraeger <borntraeger@de.ibm.com>
+Cc:     Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Janosch Frank <frankja@linux.vnet.ibm.com>,
+        David Hildenbrand <david@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org
+Subject: Re: [PATCH] KVM: s390: generate kvm hypercall functions
+Message-ID: <YO7Izgq+WodlmMcm@osiris>
+References: <20210713145713.2815167-1-hca@linux.ibm.com>
+ <20210714113843.6daa7e09@p-imbrenda>
+ <YO6zadbavNXs4Z3+@osiris>
+ <ad7dfe27-cc38-5832-6d43-01b6014d841a@de.ibm.com>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ad7dfe27-cc38-5832-6d43-01b6014d841a@de.ibm.com>
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: Vbpw4Hwu8KGf7lNdO2OKd0Dbbs5FFyPg
+X-Proofpoint-GUID: JEDNPHNoAunoxd4riBEdUMQNsddhATfy
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.790
+ definitions=2021-07-14_04:2021-07-14,2021-07-14 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0
+ priorityscore=1501 mlxscore=0 phishscore=0 bulkscore=0 suspectscore=0
+ impostorscore=0 mlxlogscore=829 clxscore=1015 spamscore=0 adultscore=0
+ lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2104190000 definitions=main-2107140070
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Juergen Gross <jgross@suse.com> writes:
+On Wed, Jul 14, 2021 at 12:03:20PM +0200, Christian Borntraeger wrote:
+> > > didn't we want to get rid of asm register allocations?
+> > > this would have been a nice time to do such a cleanup
+> > 
+> > I see only two ways to get rid them, both are suboptimal, therefore I
+> > decided to keep them at very few places; one of them this one.
+> > 
+> > Alternatively to this approach it would be possible to:
+> > 
+> > a) write the function entirely in assembler (instead of inlining it).
+> 
+> I would like to keep this as is, unless we know that this could break.
+> Maybe we should add something like nokasan or whatever?
 
-> Today the maximum number of vcpus of a kvm guest is set via a #define
-> in a header file.
->
-> In order to support higher vcpu numbers for guests without generally
-> increasing the memory consumption of guests on the host especially on
-> very large systems add a boot parameter for specifying the number of
-> allowed vcpus for guests.
->
-> The default will still be the current setting of 288. The value 0 has
-> the special meaning to limit the number of possible vcpus to the
-> number of possible cpus of the host.
->
-> Signed-off-by: Juergen Gross <jgross@suse.com>
-> ---
->  Documentation/admin-guide/kernel-parameters.txt | 10 ++++++++++
->  arch/x86/include/asm/kvm_host.h                 |  5 ++++-
->  arch/x86/kvm/x86.c                              |  7 +++++++
->  3 files changed, 21 insertions(+), 1 deletion(-)
->
-> diff --git a/Documentation/admin-guide/kernel-parameters.txt b/Documentation/admin-guide/kernel-parameters.txt
-> index 99bfa53a2bbd..8eb856396ffa 100644
-> --- a/Documentation/admin-guide/kernel-parameters.txt
-> +++ b/Documentation/admin-guide/kernel-parameters.txt
-> @@ -2373,6 +2373,16 @@
->  			guest can't have more vcpus than the set value + 1.
->  			Default: 1023
->  
-> +	kvm.max_vcpus=	[KVM,X86] Set the maximum allowed numbers of vcpus per
-> +			guest. The special value 0 sets the limit to the number
-> +			of physical cpus possible on the host (including not
-> +			yet hotplugged cpus). Higher values will result in
-> +			slightly higher memory consumption per guest. Depending
-> +			on the value and the virtual topology the maximum
-> +			allowed vcpu-id might need to be raised, too (see
-> +			kvm.max_vcpu_id parameter).
+That would only make sense if the function would not be inlined. For
+that we have e.g. __no_kasan_or_inline. But then I'd rather prefer
+__always_inline. But that wouldn't solve any problems, if you see any.
 
-I'd suggest to at least add a sanity check: 'max_vcpu_id' should always
-be >= 'max_vcpus'. Alternatively, we can replace 'max_vcpu_id' with say
-'vcpu_id_to_vcpus_ratio' and set it to e.g. '4' by default.
+From my point of view this should be safe wrt instrumentation. There
+are only scalar assignments without memory accesses or anything else
+the could be instrumented. If even that wouldn't work then "register
+asm" would be completely useless. Even though, given all the potential
+pitfalls, it is very close to being useless.
 
-> +			Default: 288
-> +
->  	l1tf=           [X86] Control mitigation of the L1TF vulnerability on
->  			      affected CPUs
->  
-> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-> index 39cbc4b6bffb..65ae82a5d444 100644
-> --- a/arch/x86/include/asm/kvm_host.h
-> +++ b/arch/x86/include/asm/kvm_host.h
-> @@ -37,7 +37,8 @@
->  
->  #define __KVM_HAVE_ARCH_VCPU_DEBUGFS
->  
-> -#define KVM_MAX_VCPUS 288
-> +#define KVM_DEFAULT_MAX_VCPUS 288
-> +#define KVM_MAX_VCPUS max_vcpus
->  #define KVM_SOFT_MAX_VCPUS 240
->  #define KVM_DEFAULT_MAX_VCPU_ID 1023
->  #define KVM_MAX_VCPU_ID max_vcpu_id
-> @@ -1509,6 +1510,8 @@ extern u64  kvm_max_tsc_scaling_ratio;
->  extern u64  kvm_default_tsc_scaling_ratio;
->  /* bus lock detection supported? */
->  extern bool kvm_has_bus_lock_exit;
-> +/* maximum number of vcpus per guest */
-> +extern unsigned int max_vcpus;
->  /* maximum vcpu-id */
->  extern unsigned int max_vcpu_id;
->  /* per cpu vcpu bitmasks (disable preemption during usage) */
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index a9b0bb2221ea..888c4507504d 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -177,6 +177,10 @@ module_param(force_emulation_prefix, bool, S_IRUGO);
->  int __read_mostly pi_inject_timer = -1;
->  module_param(pi_inject_timer, bint, S_IRUGO | S_IWUSR);
->  
-> +unsigned int __read_mostly max_vcpus = KVM_DEFAULT_MAX_VCPUS;
-> +module_param(max_vcpus, uint, S_IRUGO);
-> +EXPORT_SYMBOL_GPL(max_vcpus);
-> +
->  unsigned int __read_mostly max_vcpu_id = KVM_DEFAULT_MAX_VCPU_ID;
->  module_param(max_vcpu_id, uint, S_IRUGO);
->  
-> @@ -10648,6 +10652,9 @@ int kvm_arch_hardware_setup(void *opaque)
->  	if (boot_cpu_has(X86_FEATURE_XSAVES))
->  		rdmsrl(MSR_IA32_XSS, host_xss);
->  
-> +	if (max_vcpus == 0)
-> +		max_vcpus = num_possible_cpus();
+So if you want to go that route (noinstr, or whatever), then we need
+those functions in a way that they can't be inlined. But keep in mind
+that we also have e.g. call_on_stack() with a similar construct which
+I'd like to keep inlined for performance reasons.
 
-Is this special case really needed? I mean 'max_vcpus' is not '0' by
-default so whoever sets it manually probably knows how big his guests
-are going to be anyway and it is not always obvious how many CPUs are
-reported by 'num_possible_cpus()' (ACPI tables can be weird for example).
-
-> +
->  	kvm_pcpu_vcpu_mask = __alloc_percpu(KVM_VCPU_MASK_SZ,
->  					    sizeof(unsigned long));
->  	kvm_hv_vp_bitmap = __alloc_percpu(KVM_HV_VPMAP_SZ, sizeof(u64));
-
--- 
-Vitaly
-
+Let me know if you want any changes to the hypercall code.
