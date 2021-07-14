@@ -2,135 +2,102 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 36ED03C7DE7
-	for <lists+kvm@lfdr.de>; Wed, 14 Jul 2021 07:24:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 048243C7DF2
+	for <lists+kvm@lfdr.de>; Wed, 14 Jul 2021 07:30:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237908AbhGNF1G (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 14 Jul 2021 01:27:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49320 "EHLO
+        id S237913AbhGNFdH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 14 Jul 2021 01:33:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50654 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237802AbhGNF1F (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 14 Jul 2021 01:27:05 -0400
-Received: from mail-ej1-x634.google.com (mail-ej1-x634.google.com [IPv6:2a00:1450:4864:20::634])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7E031C0613EE
-        for <kvm@vger.kernel.org>; Tue, 13 Jul 2021 22:24:14 -0700 (PDT)
-Received: by mail-ej1-x634.google.com with SMTP id gn32so1311648ejc.2
-        for <kvm@vger.kernel.org>; Tue, 13 Jul 2021 22:24:14 -0700 (PDT)
+        with ESMTP id S237802AbhGNFdG (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 14 Jul 2021 01:33:06 -0400
+Received: from mail-lf1-x12c.google.com (mail-lf1-x12c.google.com [IPv6:2a00:1450:4864:20::12c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 63B82C0613DD
+        for <kvm@vger.kernel.org>; Tue, 13 Jul 2021 22:30:15 -0700 (PDT)
+Received: by mail-lf1-x12c.google.com with SMTP id 22so1455432lfy.12
+        for <kvm@vger.kernel.org>; Tue, 13 Jul 2021 22:30:15 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance-com.20150623.gappssmtp.com; s=20150623;
+        d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=IR3H7P/Qqdz0+z7mAz+4BcJc0mjzsggsr8mNH8312vk=;
-        b=J2IDtTc5DxsvAMq/DAkPuYqj0Y7dNpRgm5w+Q5Mo3F1Au3zIy957DexG4xM3ot9TeB
-         gz7qUXOBffxs7ZJq8NwJJx3+F2yWdVty637g3WtUU13nzkMXjdWWulrIly/TOJxD+Hyy
-         /NqXLpxJ8/rX9zvF4onj7kuKA/hY855NC/q2nDjsHgyYw3/sSLkn4POQUtEcySzhEGrh
-         CDn9h5b45a/ov20IIHnvFDOFr1x5Vomj6Ve9ZjPNFGa6QG+3p9U0VzK3a00J7z6C/fWK
-         eWV/SVtA1pGWD7wh4Q6+tQY/Bv7Ble6R8AihTwasCDJOPdVPj+NAufXpshOEW+KCfFKO
-         W7Lg==
+        bh=C3Z9CFxob2kEmCEAlCKWUPaU9hX+53zK6v4wQ2QlHFg=;
+        b=VPTgdfil+GwXO7aZSuEge0uSYQQpIq8WFDOqaG4kz23mRyTm20rQHqJ6c9s9XXZR2d
+         NDmm00L1EkY2wl7TcNTtMHSYWCjs7970YZtlzfApInzryHYZRQ8Wmn65qSFQpKv/JAbz
+         l35cCt+Dzou82ybFA/qs2UQhP6a16jKNVg4z48ozplhKIzsp4+W7TvoLj/RDE7mvagKw
+         6SBHHeVgj4aBy24TfbEaTnyGJMCTI1XxY7uM+po33N5UcLNnT50dJunb9RlylUGPfI4X
+         tx3Arba6kUxkzNCayOii13Hr2/rvB5I5BH7H+PxmDpPgFEw+OB9XeMQcGpl3iTnYUkaT
+         gkBQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=IR3H7P/Qqdz0+z7mAz+4BcJc0mjzsggsr8mNH8312vk=;
-        b=jg5cqoX/VfbBeEDoOba+OSqyt5+O8KyDWleDD35zts+HQ8pJRapYmieyEe9Ynu6Uy7
-         Z4WZV7Wy83hcoPhHiPlpsw6IriaSnBWs7tm9uslXs4wKRaWA53LhNhtlgi/MV2qZZ7Fl
-         XcACuVE187MsKxE2N+jaJS85qFbaGQbL5ql/eQyW8LkJmNx3d/bedSy9xVvmYCdsDDqL
-         XKTmGY7lTpSiQrToCLPxV+Yuld77FWQd3M3GylWDlbN82lOxR3jueQ1O/wbTe7sZI7PI
-         f+DffxOqIFy4d1V3fzLeyVOVRbCtCiZWCsCGB/yu/8tkmPppwDAHmahAjtIQMltcqSZL
-         wfZg==
-X-Gm-Message-State: AOAM532v65G33zmz214LAMPmp678YnclJ+F87zUDRP46M//pJ99SLj26
-        ZroSDPdGK+uUlof2lVkh7AZx+7kdrHc4YVhYJrR+
-X-Google-Smtp-Source: ABdhPJwiVScNvW759FNHFZbUm6bF1Hh8xD+5SHXF+XpeC6RBKLMlly39eCK/TlQciP+Rhit5f+SlsKPq8Beb+93M0R0=
-X-Received: by 2002:a17:906:4b46:: with SMTP id j6mr10270164ejv.247.1626240253024;
- Tue, 13 Jul 2021 22:24:13 -0700 (PDT)
+        bh=C3Z9CFxob2kEmCEAlCKWUPaU9hX+53zK6v4wQ2QlHFg=;
+        b=bpjRpIf2L1a6J21VUP0UKJ+TR7DC56rMCSNgAxkUyS7elDq8BhgWLXhZDIa/X3aKV8
+         pWjDPwBz891spgDqwO3DvsmAGn40Kv0HCmafPK1T/R3IBuGS5xM6VRghqqJZleYA/pK3
+         opJcDXN20WEhYozpQ1PLR2oAGozy8tkfO4e4ZBtMZBmVE4lE2wtCAics4waylBovW6x+
+         fvLoyflgJgp6emeYGDquuv0EW914zw2X/UNQVVcNWtJxk1IgEnkO+5yRNyeULLgIEt7s
+         q9MuQTb89UauLpCFjdoFdJGeYpc9ZvzbSrxEVnIItwr1pJuWPj7mFYnF4xdeFbrGzz3w
+         3Byg==
+X-Gm-Message-State: AOAM532znL2pgnrS5I10RnuuAK6F8547g/tqK4JnR3Fc5N5/ExIzYYrL
+        XjzHLiM+K2dLmhdvdvEbre7hSs6DhlZ2o7zYLHW7Aiu/rGQ=
+X-Google-Smtp-Source: ABdhPJzwGzp1+TAupobQLPbG3N+XphKRuUSDwilCNDvuT3/BEtaVEVbBuQflBmok1a5NdcLA6b+zt0OuoEJ3TExFYWg=
+X-Received: by 2002:a19:5f43:: with SMTP id a3mr6316001lfj.504.1626240613790;
+ Tue, 13 Jul 2021 22:30:13 -0700 (PDT)
 MIME-Version: 1.0
-References: <20210713084656.232-1-xieyongji@bytedance.com> <20210713084656.232-14-xieyongji@bytedance.com>
- <20210713113114.GL1954@kadam>
-In-Reply-To: <20210713113114.GL1954@kadam>
-From:   Yongji Xie <xieyongji@bytedance.com>
-Date:   Wed, 14 Jul 2021 13:24:02 +0800
-Message-ID: <CACycT3uKwu5xzj2ynWH5njCKHaYyOPkDb8BVLTHE5NJ-qpD3xQ@mail.gmail.com>
-Subject: Re: [PATCH v9 13/17] vdpa: factor out vhost_vdpa_pa_map() and vhost_vdpa_pa_unmap()
-To:     Dan Carpenter <dan.carpenter@oracle.com>
-Cc:     "Michael S. Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Stefano Garzarella <sgarzare@redhat.com>,
-        Parav Pandit <parav@nvidia.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Christian Brauner <christian.brauner@canonical.com>,
-        Randy Dunlap <rdunlap@infradead.org>,
-        Matthew Wilcox <willy@infradead.org>,
-        Al Viro <viro@zeniv.linux.org.uk>,
-        Jens Axboe <axboe@kernel.dk>, bcrl@kvack.org,
-        Jonathan Corbet <corbet@lwn.net>,
-        =?UTF-8?Q?Mika_Penttil=C3=A4?= <mika.penttila@nextfour.com>,
-        joro@8bytes.org, Greg KH <gregkh@linuxfoundation.org>,
-        He Zhe <zhe.he@windriver.com>,
-        Liu Xiaodong <xiaodong.liu@intel.com>,
-        songmuchun@bytedance.com,
-        virtualization <virtualization@lists.linux-foundation.org>,
-        netdev@vger.kernel.org, kvm <kvm@vger.kernel.org>,
-        linux-fsdevel@vger.kernel.org, iommu@lists.linux-foundation.org,
-        linux-kernel <linux-kernel@vger.kernel.org>
+References: <CA+-xGqNUX4dpzFV7coJSoJnPz6cE5gdPy1kzRKsQtGD371hyEg@mail.gmail.com>
+ <d79db3d7c443f392f5a8b3cf631e5607b72b6208.camel@redhat.com>
+ <CA+-xGqOdu1rjhkG0FhxfzF1N1Uiq+z0b3MBJ=sjuVStHP5TBKg@mail.gmail.com>
+ <d95d40428ec07ee07e7c583a383d5f324f89686a.camel@redhat.com> <YOxYM+8qCIyV+rTJ@google.com>
+In-Reply-To: <YOxYM+8qCIyV+rTJ@google.com>
+From:   harry harry <hiharryharryharry@gmail.com>
+Date:   Wed, 14 Jul 2021 00:30:12 -0500
+Message-ID: <CA+-xGqOSd0yhU4fEcobf3tW0mLb0TmLGycTwXNVUteyvvnXjdw@mail.gmail.com>
+Subject: Re: About two-dimensional page translation (e.g., Intel EPT) and
+ shadow page table in Linux QEMU/KVM
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Maxim Levitsky <mlevitsk@redhat.com>, kvm@vger.kernel.org,
+        qemu-devel@nongnu.org,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Paolo Bonzini <pbonzini@redhat.com>, stefanha@redhat.com,
+        mathieu.tarral@protonmail.com
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jul 13, 2021 at 7:31 PM Dan Carpenter <dan.carpenter@oracle.com> wrote:
->
-> On Tue, Jul 13, 2021 at 04:46:52PM +0800, Xie Yongji wrote:
-> > @@ -613,37 +618,28 @@ static void vhost_vdpa_unmap(struct vhost_vdpa *v, u64 iova, u64 size)
-> >       }
-> >  }
-> >
-> > -static int vhost_vdpa_process_iotlb_update(struct vhost_vdpa *v,
-> > -                                        struct vhost_iotlb_msg *msg)
-> > +static int vhost_vdpa_pa_map(struct vhost_vdpa *v,
-> > +                          u64 iova, u64 size, u64 uaddr, u32 perm)
-> >  {
-> >       struct vhost_dev *dev = &v->vdev;
-> > -     struct vhost_iotlb *iotlb = dev->iotlb;
-> >       struct page **page_list;
-> >       unsigned long list_size = PAGE_SIZE / sizeof(struct page *);
-> >       unsigned int gup_flags = FOLL_LONGTERM;
-> >       unsigned long npages, cur_base, map_pfn, last_pfn = 0;
-> >       unsigned long lock_limit, sz2pin, nchunks, i;
-> > -     u64 iova = msg->iova;
-> > +     u64 start = iova;
-> >       long pinned;
-> >       int ret = 0;
-> >
-> > -     if (msg->iova < v->range.first ||
-> > -         msg->iova + msg->size - 1 > v->range.last)
-> > -             return -EINVAL;
->
-> This is not related to your patch, but can the "msg->iova + msg->size"
-> addition can have an integer overflow.  From looking at the callers it
-> seems like it can.  msg comes from:
->   vhost_chr_write_iter()
->   --> dev->msg_handler(dev, &msg);
->       --> vhost_vdpa_process_iotlb_msg()
->          --> vhost_vdpa_process_iotlb_update()
->
-> If I'm thinking of the right thing then these are allowed to overflow to
-> 0 because of the " - 1" but not further than that.  I believe the check
-> needs to be something like:
->
->         if (msg->iova < v->range.first ||
->             msg->iova - 1 > U64_MAX - msg->size ||
->             msg->iova + msg->size - 1 > v->range.last)
+Dear Sean,
+
+Thanks for the comments!
+
+
+> Heh, because the MMUs are all per-vCPU, it actually wouldn't be that much effort
+> beyond supporting !TDP and TDP for different VMs...
 >
 
-Make sense.
+Sorry, may I know what do you mean by "MMUs are all per-vCPU"? Do you
+mean the MMUs walk the page tables of each vCPU?
 
-> But writing integer overflow check correctly is notoriously difficult.
-> Do you think you could send a fix for that which is separate from the
-> patcheset?  We'd want to backport it to stable.
+
+> ...but supporting !TDP and TDP in a single KVM instance isn't going to happen.
+> It's certainly possible, but comes with a very high complexity cost, and likely
+> even performance costs.
+
+For one KVM instance, I think it might be possible to let several
+physical cores use !TDP and other cores use TDP but I am not sure
+about the implementation complexity.
+
 >
+> The more sane way to support !TDP and TDP on a single host would be to support
+> multiple instances of KVM, e.g. /dev/kvm0, /dev/kvm1, etc...  Being able to use
+> !TDP and TDP isn't strong justification for the work required, but supporting
+> multiple KVM instances would allow upgrading KVM without having to migrate VMs
+> off the host, which is very desirable.  If multiple KVM instances are supported,
+> running !TDP and TDP KVM instances should Just Work.
 
-OK, I will send a patch to fix it.
+Yes, for different KVM instances, it may be much easier but there
+might be some other issues, e.g., communication overhead between
+different instances. I think the upgrading idea is great but is very
+limited to local upgrading.
 
-Thanks,
-Yongji
+Best,
+Harry
