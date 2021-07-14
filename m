@@ -2,164 +2,148 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id BE1153C87EB
-	for <lists+kvm@lfdr.de>; Wed, 14 Jul 2021 17:47:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 662053C8844
+	for <lists+kvm@lfdr.de>; Wed, 14 Jul 2021 18:01:59 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239659AbhGNPuC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 14 Jul 2021 11:50:02 -0400
-Received: from foss.arm.com ([217.140.110.172]:36340 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S232318AbhGNPuB (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 14 Jul 2021 11:50:01 -0400
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id D548131B;
-        Wed, 14 Jul 2021 08:47:09 -0700 (PDT)
-Received: from [192.168.0.110] (unknown [172.31.20.19])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id BDFB03F7D8;
-        Wed, 14 Jul 2021 08:47:06 -0700 (PDT)
-Subject: Re: [PATCH 1/3] KVM: arm64: Narrow PMU sysreg reset values to
- architectural requirements
-To:     Marc Zyngier <maz@kernel.org>,
-        linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org,
-        kvmarm@lists.cs.columbia.edu
-Cc:     James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Alexandre Chartre <alexandre.chartre@oracle.com>,
-        Robin Murphy <robin.murphy@arm.com>, kernel-team@android.com
-References: <20210713135900.1473057-1-maz@kernel.org>
- <20210713135900.1473057-2-maz@kernel.org>
-From:   Alexandru Elisei <alexandru.elisei@arm.com>
-Message-ID: <ae510501-0410-47b1-77f3-cb83d3b1fa9e@arm.com>
-Date:   Wed, 14 Jul 2021 16:48:07 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.11.0
-MIME-Version: 1.0
-In-Reply-To: <20210713135900.1473057-2-maz@kernel.org>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
+        id S232418AbhGNQEu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 14 Jul 2021 12:04:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54434 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232392AbhGNQEt (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 14 Jul 2021 12:04:49 -0400
+Received: from mail-pg1-x549.google.com (mail-pg1-x549.google.com [IPv6:2607:f8b0:4864:20::549])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 340BCC061760
+        for <kvm@vger.kernel.org>; Wed, 14 Jul 2021 09:01:58 -0700 (PDT)
+Received: by mail-pg1-x549.google.com with SMTP id o9-20020a6561490000b0290226fc371410so1983154pgv.8
+        for <kvm@vger.kernel.org>; Wed, 14 Jul 2021 09:01:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=36Omnbyd7/DKRdeKJAY3Yo0H0DXYFeJOYXFkJ9nO0PY=;
+        b=bNaY5m0BNjTkrIa24jfGv5ZBzhSpdWHZnjwdQTOmK870VyWvISk6WpG8iprS31EDue
+         upk28mQj2kaUubx9qY1I99MzOu3WaOt/gI/R5H7hZLdi2US8QxWdZ8TUTpwhbfjBveUf
+         UVIK4lQnLDwNr/nIomjIsz1rHpiaOJO/mzmaRj6UOiQ2mUp2+2JhBiBLg/8S0BalAwHA
+         X8/fMziV6hVBXzPZAGfgTVVFURjfbkvCq1TAw/zbS1v5avNdG5K5Fuw21JTbElKa7k8P
+         md2dEuWugUvnK0i8I4S4UnG8VsUyVqOQxrAYFW2CuBaJWxjOJ6IYcYMh6gj9eWvtYw9I
+         iBiA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=36Omnbyd7/DKRdeKJAY3Yo0H0DXYFeJOYXFkJ9nO0PY=;
+        b=f2nomZCfTYBdfRAbqUf8mcvk/sXgI9hmYBa/G0Ldn4oTy8b5r8ga9uOlKUgAu45F5T
+         afCzvBVKmXlBtNihOy2he4FKoZq2g5YYYD8FTcN8656FIqQefrxIbRQ4uauRuikoh/gB
+         vzxcbViIfcGWSfrMbTw/V3F6tzb+vk8RO7oeEGfdrqtnKbmnF8IEUN0NSNy8LS++ItDD
+         z5M+WWehXHl5ZR8nt3qKZE+MIC1cfDTSDs7UfQbOETGN/aH6wBvLANQJfsTo52GXmVl8
+         iqjDHO7DE0Dltt+HEnVWfTwT+N0BpmYKAAy8JPcdadSlz13kgLhL99I2ELhQleXLjBV/
+         RM+Q==
+X-Gm-Message-State: AOAM533/FuHzuulwUog41xfHM6v1hrnI1LGYs8tbkw1wcSKrdiZoCCuV
+        JLC+Xfx0kraxz70x5vjRh9BeqKI55fA=
+X-Google-Smtp-Source: ABdhPJzYnFQVarUz/3jyy/DooiZ6xEAeyOR7C/uDYGDXITH8IplGRb69qQwH/GJRN4uO8N2lU9jDLSFB4oI=
+X-Received: from pgonda1.kir.corp.google.com ([2620:0:1008:11:32d8:66d1:672:9aeb])
+ (user=pgonda job=sendgmr) by 2002:a17:902:d4c9:b029:12b:46f3:2db2 with SMTP
+ id o9-20020a170902d4c9b029012b46f32db2mr2240730plg.5.1626278517567; Wed, 14
+ Jul 2021 09:01:57 -0700 (PDT)
+Date:   Wed, 14 Jul 2021 09:01:40 -0700
+Message-Id: <20210714160143.2116583-1-pgonda@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.32.0.93.g670b81a890-goog
+Subject: [PATCH 0/3 V2] Add AMD SEV and SEV-ES intra host migration support
+From:   Peter Gonda <pgonda@google.com>
+To:     pgonda@google.com
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        David Rientjes <rientjes@google.com>,
+        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
+        Brijesh Singh <brijesh.singh@amd.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        "H. Peter Anvin" <hpa@zytor.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Marc,
+Intra host migration provides a low-cost mechanism for userspace VMM upgrades.
+It is an alternative to traditional (i.e., remote) live migration. Whereas
+remote migration handles move a guest to a new host, intra host migration only
+handles moving a guest to a new userspace VMM within a host.  This can be
+used to update, rollback, change flags of the VMM, etc. The lower cost
+compared to live migration comes from the fact that the guest's memory does
+not need to be copied between processes. A handle to the guest memory
+simply gets passed to the new VMM, this could be done via using /dev/shm
+with share=on or similar feature.
 
-On 7/13/21 2:58 PM, Marc Zyngier wrote:
-> A number of the PMU sysregs expose reset values that are not in
-> compliant with the architecture (set bits in the RES0 ranges,
-> for example).
->
-> This in turn has the effect that we need to pointlessly mask
-> some register when using them.
->
-> Let's start by making sure we don't have illegal values in the
-> shadow registers at reset time. This affects all the registers
-> that dedicate one bit per counter, the counters themselves,
-> PMEVTYPERn_EL0 and PMSELR_EL0.
->
-> Reported-by: Alexandre Chartre <alexandre.chartre@oracle.com>
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> ---
->  arch/arm64/kvm/sys_regs.c | 46 ++++++++++++++++++++++++++++++++++++---
->  1 file changed, 43 insertions(+), 3 deletions(-)
->
-> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> index f6f126eb6ac1..95ccb8f45409 100644
-> --- a/arch/arm64/kvm/sys_regs.c
-> +++ b/arch/arm64/kvm/sys_regs.c
-> @@ -603,6 +603,44 @@ static unsigned int pmu_visibility(const struct kvm_vcpu *vcpu,
->  	return REG_HIDDEN;
->  }
->  
-> +static void reset_pmu_reg(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r)
-> +{
-> +	u64 n, mask;
-> +
-> +	/* No PMU available, any PMU reg may UNDEF... */
-> +	if (!kvm_arm_support_pmu_v3())
-> +		return;
-> +
-> +	n = read_sysreg(pmcr_el0) >> ARMV8_PMU_PMCR_N_SHIFT;
+The guest state can be transferred from an old VMM to a new VMM as follows:
+1. Export guest state from KVM to the old user-space VMM via a getter
+user-space/kernel API 2. Transfer guest state from old VMM to new VMM via
+IPC communication 3. Import guest state into KVM from the new user-space
+VMM via a setter user-space/kernel API VMMs by exporting from KVM using
+getters, sending that data to the new VMM, then setting it again in KVM.
 
-Isn't this going to cause a lot of unnecessary traps with NV? Is that going to be
-a problem? Because at the moment I can't think of an elegant way to avoid it,
-other than special casing PMCR_EL0 in kvm_reset_sys_regs() and using here
-__vcpu_sys_reg(vcpu, PMCR_EL0). Or, even better, using
-kvm_pmu_valid_counter_mask(vcpu), since this is identical to what that function does.
+In the common case for intra host migration, we can rely on the normal ioctls
+for passing data from one VMM to the next. SEV, SEV-ES, and other
+confidential compute environments make most of this information opaque, and
+render KVM ioctls such as "KVM_GET_REGS" irrelevant.  As a result, we need
+the ability to pass this opaque metadata from one VMM to the next. The
+easiest way to do this is to leave this data in the kernel, and transfer
+ownership of the metadata from one KVM VM (or vCPU) to the next. For
+example, we need to move the SEV enabled ASID, VMSAs, and GHCB metadata
+from one VMM to the next.  In general, we need to be able to hand off any
+data that would be unsafe/impossible for the kernel to hand directly to
+userspace (and cannot be reproduced using data that can be handed safely to
+userspace).
 
-> +	n &= ARMV8_PMU_PMCR_N_MASK;
-> +
-> +	reset_unknown(vcpu, r);
-> +
-> +	mask = BIT(ARMV8_PMU_CYCLE_IDX);
+During the intra host send operation the SEV required metadata, the guest's
+ASID is loaded into a kvm wide hashmap keyed by a value given by
+userspace. This allows the userspace VMM to pass the key to the target
+VMM. Then on intra host receive the target VMM can be loaded with the
+metadata from the hashmap.
 
-PMSWINC_EL0 has bit 31 RES0. Other than that, looked at all the PMU registers and
-everything looks correct to me.
+v2:
+ * Added marcorr@ reviewed by tag
+ * Renamed function introduced in 1/3
+ * Edited with seanjc@'s review comments
+ ** Cleaned up WARN usage
+ ** Userspace makes random token now
+ * Edited with brijesh.singh@'s review comments
+ ** Checks for different LAUNCH_* states in send function
 
-Thanks,
+v1: https://lore.kernel.org/kvm/20210621163118.1040170-1-pgonda@google.com/
 
-Alex
+Peter Gonda (3):
+  KVM, SEV: Refactor out function for unregistering encrypted regions
+  KVM, SEV: Add support for SEV intra host migration
+  KVM, SEV: Add support for SEV-ES intra host migration
 
-> +	if (n)
-> +		mask |= GENMASK(n - 1, 0);
-> +
-> +	__vcpu_sys_reg(vcpu, r->reg) &= mask;
-> +}
-> +
-> +static void reset_pmevcntr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r)
-> +{
-> +	reset_unknown(vcpu, r);
-> +	__vcpu_sys_reg(vcpu, r->reg) &= GENMASK(31, 0);
-> +}
-> +
-> +static void reset_pmevtyper(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r)
-> +{
-> +	reset_unknown(vcpu, r);
-> +	__vcpu_sys_reg(vcpu, r->reg) &= ARMV8_PMU_EVTYPE_MASK;
-> +}
-> +
-> +static void reset_pmselr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r)
-> +{
-> +	reset_unknown(vcpu, r);
-> +	__vcpu_sys_reg(vcpu, r->reg) &= ARMV8_PMU_COUNTER_MASK;
-> +}
-> +
->  static void reset_pmcr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r)
->  {
->  	u64 pmcr, val;
-> @@ -944,16 +982,18 @@ static bool access_pmuserenr(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
->  	  trap_wcr, reset_wcr, 0, 0,  get_wcr, set_wcr }
->  
->  #define PMU_SYS_REG(r)						\
-> -	SYS_DESC(r), .reset = reset_unknown, .visibility = pmu_visibility
-> +	SYS_DESC(r), .reset = reset_pmu_reg, .visibility = pmu_visibility
->  
->  /* Macro to expand the PMEVCNTRn_EL0 register */
->  #define PMU_PMEVCNTR_EL0(n)						\
->  	{ PMU_SYS_REG(SYS_PMEVCNTRn_EL0(n)),				\
-> +	  .reset = reset_pmevcntr,					\
->  	  .access = access_pmu_evcntr, .reg = (PMEVCNTR0_EL0 + n), }
->  
->  /* Macro to expand the PMEVTYPERn_EL0 register */
->  #define PMU_PMEVTYPER_EL0(n)						\
->  	{ PMU_SYS_REG(SYS_PMEVTYPERn_EL0(n)),				\
-> +	  .reset = reset_pmevtyper,					\
->  	  .access = access_pmu_evtyper, .reg = (PMEVTYPER0_EL0 + n), }
->  
->  static bool undef_access(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
-> @@ -1595,13 +1635,13 @@ static const struct sys_reg_desc sys_reg_descs[] = {
->  	{ PMU_SYS_REG(SYS_PMSWINC_EL0),
->  	  .access = access_pmswinc, .reg = PMSWINC_EL0 },
->  	{ PMU_SYS_REG(SYS_PMSELR_EL0),
-> -	  .access = access_pmselr, .reg = PMSELR_EL0 },
-> +	  .access = access_pmselr, .reset = reset_pmselr, .reg = PMSELR_EL0 },
->  	{ PMU_SYS_REG(SYS_PMCEID0_EL0),
->  	  .access = access_pmceid, .reset = NULL },
->  	{ PMU_SYS_REG(SYS_PMCEID1_EL0),
->  	  .access = access_pmceid, .reset = NULL },
->  	{ PMU_SYS_REG(SYS_PMCCNTR_EL0),
-> -	  .access = access_pmu_evcntr, .reg = PMCCNTR_EL0 },
-> +	  .access = access_pmu_evcntr, .reset = reset_unknown, .reg = PMCCNTR_EL0 },
->  	{ PMU_SYS_REG(SYS_PMXEVTYPER_EL0),
->  	  .access = access_pmu_evtyper, .reset = NULL },
->  	{ PMU_SYS_REG(SYS_PMXEVCNTR_EL0),
+ .../virt/kvm/amd-memory-encryption.rst        |  43 ++
+ arch/x86/kvm/svm/sev.c                        | 396 +++++++++++++++++-
+ arch/x86/kvm/svm/svm.h                        |   1 +
+ include/uapi/linux/kvm.h                      |  12 +
+ 4 files changed, 433 insertions(+), 19 deletions(-)
+
+base-commit: 7caa04b36f20
+
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Sean Christopherson <seanjc@google.com>
+Cc: David Rientjes <rientjes@google.com>
+Cc: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Cc: Brijesh Singh <brijesh.singh@amd.com>
+Cc: Vitaly Kuznetsov <vkuznets@redhat.com>
+Cc: Wanpeng Li <wanpengli@tencent.com>
+Cc: Jim Mattson <jmattson@google.com>
+Cc: Joerg Roedel <joro@8bytes.org>
+Cc: Thomas Gleixner <tglx@linutronix.de>
+Cc: Ingo Molnar <mingo@redhat.com>
+Cc: Borislav Petkov <bp@alien8.de>
+Cc: "H. Peter Anvin" <hpa@zytor.com>
+Cc: kvm@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org
+
+-- 
+2.32.0.93.g670b81a890-goog
+
