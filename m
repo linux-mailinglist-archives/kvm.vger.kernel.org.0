@@ -2,326 +2,87 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 464B23C92C8
-	for <lists+kvm@lfdr.de>; Wed, 14 Jul 2021 23:07:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2D05B3C9330
+	for <lists+kvm@lfdr.de>; Wed, 14 Jul 2021 23:38:54 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234978AbhGNVKf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 14 Jul 2021 17:10:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42156 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234968AbhGNVKe (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 14 Jul 2021 17:10:34 -0400
-Received: from mail-pj1-x1031.google.com (mail-pj1-x1031.google.com [IPv6:2607:f8b0:4864:20::1031])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 019C9C06175F
-        for <kvm@vger.kernel.org>; Wed, 14 Jul 2021 14:07:42 -0700 (PDT)
-Received: by mail-pj1-x1031.google.com with SMTP id x21-20020a17090aa395b029016e25313bfcso2595027pjp.2
-        for <kvm@vger.kernel.org>; Wed, 14 Jul 2021 14:07:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:content-transfer-encoding:in-reply-to;
-        bh=OrJjmDihky9L5lychbpTBZwL1+xpeDWHYbd6hVXreJM=;
-        b=tlz5bGQLSoLrdG3yHlzIPTA4kenOD+40ek2Xmm5ZcZAuRAmgi1szyK30dlHoMqPjr1
-         HC6+ZapUN1ng1N8iPi3Xx+1Wk6Bzzl+zci2pX/dkzPsyvzPtUD5PHfZ6PZiaVwQ660uR
-         uXhtnHkr98V4781RINe/3kERQ//Xiv4ZIKUkPHx8R00NMWzEOkyqBnPzIPRQIrmjR2JR
-         AW0GQ2ltDtzB/uumhtBlcS22Ycv15zYhmDnK2LyN0oSlspTzcLWNdE2QdVVAmrvCsv7s
-         pCi4Qnr/JcI9IbckJWsASScJV6y7KBIAdxBYawEZyIeQg1TB8oc5D6AWSh5Kkcq749bg
-         HXbA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to;
-        bh=OrJjmDihky9L5lychbpTBZwL1+xpeDWHYbd6hVXreJM=;
-        b=JxCl3yrnOUzxlZSy463ypCZWOjt2ZxweZ3BbFQ5SeRP6JerYkVzetv4gu+H9zr3nDx
-         TNVmiIOKwjv1HJVEpXosYMH1b/AXuMROUaFG0lMLpl7GjgO6pYmAqsXfOjtABsLR2U5E
-         FhjMjRgrT1pbh6qvTuYAoXa4c4AKc3OiooJiFKVvLbIGzpCyDc/yimMVNHpykO7n+X6z
-         7z4RsTyaF69NzXXmyOKjQP/t8DmPz0W01qiN5O4teYVtGo3Jlki2iiqHuvnxiGmqLgRQ
-         KFyVOdDgCmpFGRQ3cjvNG4fKc2GLg7atOEtxjGrLOwoEr7aVhlcFQWKEwtLF5Gi6VDKM
-         7Ong==
-X-Gm-Message-State: AOAM531DkpDAq9NecEFfui7/vVhYghbPH1+ychma7m/k1Lomigp7jHDM
-        q4zwOTOG2aI0Gur5+q9P/KJMhw==
-X-Google-Smtp-Source: ABdhPJy6ZvJ7eEKoQQlA+dc27/Ymn/phT2UWrJkO7pxjQvI0kRR62Q2ZaSp9qAhwtDJisSV5ZIWr7g==
-X-Received: by 2002:a17:90a:c092:: with SMTP id o18mr5529982pjs.3.1626296861177;
-        Wed, 14 Jul 2021 14:07:41 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id m21sm3758645pfo.159.2021.07.14.14.07.40
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 14 Jul 2021 14:07:40 -0700 (PDT)
-Date:   Wed, 14 Jul 2021 21:07:37 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Brijesh Singh <brijesh.singh@amd.com>
-Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
-        linux-coco@lists.linux.dev, linux-mm@kvack.org,
-        linux-crypto@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
-        David Rientjes <rientjes@google.com>,
-        Dov Murik <dovmurik@linux.ibm.com>,
-        Tobin Feldman-Fitzthum <tobin@ibm.com>,
-        Borislav Petkov <bp@alien8.de>,
-        Michael Roth <michael.roth@amd.com>,
-        Vlastimil Babka <vbabka@suse.cz>, tony.luck@intel.com,
-        npmccallum@redhat.com, brijesh.ksingh@gmail.com
-Subject: Re: [PATCH Part2 RFC v4 04/40] x86/sev: Add the host SEV-SNP
- initialization support
-Message-ID: <YO9SGT6byW8w37oO@google.com>
-References: <20210707183616.5620-1-brijesh.singh@amd.com>
- <20210707183616.5620-5-brijesh.singh@amd.com>
+        id S233967AbhGNVln (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 14 Jul 2021 17:41:43 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:54992 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S230004AbhGNVlm (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 14 Jul 2021 17:41:42 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1626298730;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=AS2PhfoWmQKR8Ft5CX0e3UMsUDYv8nJr/WqBjmF1Fek=;
+        b=IDlFRxObJsHVuTeKtwnpZp9BwSL31ZlHRXa7Pghpg0GA9/b92MaTE+vDkmWdRoxJsGf2jq
+        FqbYoLRhvFUwTjPJZs+u1BCIjfsvXsPnIvw4FhaZ/cOMgGntAZ7oz+bzww+NzRZcDYETcb
+        9mBCuvBNTWTbyVdNLbgReRpcWfMFwh0=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-518-l4tbBZzgNjqr1nduikmTsw-1; Wed, 14 Jul 2021 17:38:48 -0400
+X-MC-Unique: l4tbBZzgNjqr1nduikmTsw-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 46B7710C1ADC;
+        Wed, 14 Jul 2021 21:38:47 +0000 (UTC)
+Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id DA2435D9DD;
+        Wed, 14 Jul 2021 21:38:46 +0000 (UTC)
+From:   Paolo Bonzini <pbonzini@redhat.com>
+To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Cc:     stable@vger.kernel.org, Stas Sergeev <stsp2@yandex.ru>
+Subject: [PATCH] KVM: x86: accept userspace interrupt only if no event is injected
+Date:   Wed, 14 Jul 2021 17:38:46 -0400
+Message-Id: <20210714213846.854837-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20210707183616.5620-5-brijesh.singh@amd.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jul 07, 2021, Brijesh Singh wrote:
-> diff --git a/arch/x86/kernel/sev.c b/arch/x86/kernel/sev.c
-> index aa7e37631447..f9d813d498fa 100644
-> --- a/arch/x86/kernel/sev.c
-> +++ b/arch/x86/kernel/sev.c
-> @@ -24,6 +24,8 @@
->  #include <linux/sev-guest.h>
->  #include <linux/platform_device.h>
->  #include <linux/io.h>
-> +#include <linux/io.h>
-> +#include <linux/iommu.h>
->  
->  #include <asm/cpu_entry_area.h>
->  #include <asm/stacktrace.h>
-> @@ -40,11 +42,14 @@
->  #include <asm/efi.h>
->  #include <asm/cpuid-indexed.h>
->  #include <asm/setup.h>
-> +#include <asm/iommu.h>
->  
->  #include "sev-internal.h"
->  
->  #define DR7_RESET_VALUE        0x400
->  
-> +#define RMPTABLE_ENTRIES_OFFSET        0x4000
+Once an exception has been injected, any side effects related to
+the exception (such as setting CR2 or DR6) have been taked place.
+Therefore, once KVM sets the VM-entry interruption information
+field or the AMD EVENTINJ field, the next VM-entry must deliver that
+exception.
 
-A comment and/or blurb in the changelog describing this magic number would be
-quite helpful.  And maybe call out that this is for the bookkeeping, e.g.
+Pending interrupts are processed after injected exceptions, so
+in theory it would not be a problem to use KVM_INTERRUPT when
+an injected exception is present.  However, DOSBox is using
+run->ready_for_interrupt_injection to detect interrupt windows
+and then using KVM_SET_SREGS/KVM_SET_REGS to inject the
+interrupt manually.  For this to work, the interrupt window
+must be delayed after the completion of the previous event
+injection.
 
-  #define RMPTABLE_CPU_BOOKKEEPING_SIZE	0x4000
+Cc: stable@vger.kernel.org
+Reported-by: Stas Sergeev <stsp2@yandex.ru>
+Tested-by: Stas Sergeev <stsp2@yandex.ru>
+Fixes: 71cc849b7093 ("KVM: x86: Fix split-irqchip vs interrupt injection window request")
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ arch/x86/kvm/x86.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-Also, the APM doesn't actually state the exact location of the bookkeeping
-region, it only states that it's somewhere between RMP_BASE and RMP_END.  This
-seems to imply that the bookkeeping region is always at RMP_BASE?
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index fe3aaf195292..7fbab29b3569 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -4342,6 +4342,9 @@ static int kvm_vcpu_ioctl_set_lapic(struct kvm_vcpu *vcpu,
+ 
+ static int kvm_cpu_accept_dm_intr(struct kvm_vcpu *vcpu)
+ {
++	if (kvm_event_needs_reinjection(vcpu))
++		return false;
++
+ 	/*
+ 	 * We can accept userspace's request for interrupt injection
+ 	 * as long as we have a place to store the interrupt number.
+-- 
+2.27.0
 
-  The region of memory between RMP_BASE and RMP_END contains a 16KB region used
-  for processor bookkeeping followed by the RMP entries, which are each 16B in
-  size. The size of the RMP determines the range of physical memory that the
-  hypervisor can assign to SNP-active virtual machines at runtime. The RMP covers
-  the system physical address space from address 0h to the address calculated by:
-
-  ((RMP_END + 1 – RMP_BASE – 16KB) / 16B) x 4KB
-
->  /* For early boot hypervisor communication in SEV-ES enabled guests */
->  static struct ghcb boot_ghcb_page __bss_decrypted __aligned(PAGE_SIZE);
->  
-> @@ -56,6 +61,9 @@ static struct ghcb __initdata *boot_ghcb;
->  
->  static u64 snp_secrets_phys;
->  
-> +static unsigned long rmptable_start __ro_after_init;
-> +static unsigned long rmptable_end __ro_after_init;
-> +
->  /* #VC handler runtime per-CPU data */
->  struct sev_es_runtime_data {
->  	struct ghcb ghcb_page;
-> @@ -2176,3 +2184,138 @@ static int __init add_snp_guest_request(void)
->  	return 0;
->  }
->  device_initcall(add_snp_guest_request);
-> +
-> +#undef pr_fmt
-> +#define pr_fmt(fmt)	"SEV-SNP: " fmt
-> +
-> +static int __snp_enable(unsigned int cpu)
-> +{
-> +	u64 val;
-> +
-> +	if (!cpu_feature_enabled(X86_FEATURE_SEV_SNP))
-> +		return 0;
-> +
-> +	rdmsrl(MSR_AMD64_SYSCFG, val);
-> +
-> +	val |= MSR_AMD64_SYSCFG_SNP_EN;
-> +	val |= MSR_AMD64_SYSCFG_SNP_VMPL_EN;
-
-Is VMPL required?  Do we plan on using VMPL out of the gate?
-
-> +
-> +	wrmsrl(MSR_AMD64_SYSCFG, val);
-> +
-> +	return 0;
-> +}
-> +
-> +static __init void snp_enable(void *arg)
-> +{
-> +	__snp_enable(smp_processor_id());
-> +}
-> +
-> +static bool get_rmptable_info(u64 *start, u64 *len)
-> +{
-> +	u64 calc_rmp_sz, rmp_sz, rmp_base, rmp_end, nr_pages;
-> +
-> +	rdmsrl(MSR_AMD64_RMP_BASE, rmp_base);
-> +	rdmsrl(MSR_AMD64_RMP_END, rmp_end);
-> +
-> +	if (!rmp_base || !rmp_end) {
-
-Can BIOS put the RMP at PA=0?
-
-Also, why is it a BIOS decision?  AFAICT, the MSRs aren't locked until SNP_EN
-is set in SYSCFG, and that appears to be a kernel decision (ignoring kexec),
-i.e. nothing would prevent the kernel from configuring it's own RMP.
-
-> +		pr_info("Memory for the RMP table has not been reserved by BIOS\n");
-> +		return false;
-> +	}
-> +
-> +	rmp_sz = rmp_end - rmp_base + 1;
-> +
-> +	/*
-> +	 * Calculate the amount the memory that must be reserved by the BIOS to
-> +	 * address the full system RAM. The reserved memory should also cover the
-> +	 * RMP table itself.
-> +	 *
-> +	 * See PPR section 2.1.5.2 for more information on memory requirement.
-> +	 */
-> +	nr_pages = totalram_pages();
-> +	calc_rmp_sz = (((rmp_sz >> PAGE_SHIFT) + nr_pages) << 4) + RMPTABLE_ENTRIES_OFFSET;
-> +
-> +	if (calc_rmp_sz > rmp_sz) {
-> +		pr_info("Memory reserved for the RMP table does not cover the full system "
-> +			"RAM (expected 0x%llx got 0x%llx)\n", calc_rmp_sz, rmp_sz);
-
-Is BIOS expected to provide exact coverage, e.g. should this be s/expected/need?
-
-Should the kernel also sanity check other requirements, e.g. the 8kb alignment,
-or does the CPU enforce those things at WRMSR?
-
-> +		return false;
-> +	}
-> +
-> +	*start = rmp_base;
-> +	*len = rmp_sz;
-> +
-> +	pr_info("RMP table physical address 0x%016llx - 0x%016llx\n", rmp_base, rmp_end);
-> +
-> +	return true;
-> +}
-> +
-> +static __init int __snp_rmptable_init(void)
-> +{
-> +	u64 rmp_base, sz;
-> +	void *start;
-> +	u64 val;
-> +
-> +	if (!get_rmptable_info(&rmp_base, &sz))
-> +		return 1;
-> +
-> +	start = memremap(rmp_base, sz, MEMREMAP_WB);
-> +	if (!start) {
-> +		pr_err("Failed to map RMP table 0x%llx+0x%llx\n", rmp_base, sz);
-> +		return 1;
-> +	}
-> +
-> +	/*
-> +	 * Check if SEV-SNP is already enabled, this can happen if we are coming from
-> +	 * kexec boot.
-> +	 */
-> +	rdmsrl(MSR_AMD64_SYSCFG, val);
-> +	if (val & MSR_AMD64_SYSCFG_SNP_EN)
-
-Hmm, it kinda feels like there should be a sanity check for the case where SNP is
-already enabled but get_rmptable_info() fails, e.g. due to insufficient RMP size.
-
-> +		goto skip_enable;
-> +
-> +	/* Initialize the RMP table to zero */
-> +	memset(start, 0, sz);
-> +
-> +	/* Flush the caches to ensure that data is written before SNP is enabled. */
-> +	wbinvd_on_all_cpus();
-> +
-> +	/* Enable SNP on all CPUs. */
-> +	on_each_cpu(snp_enable, NULL, 1);
-> +
-> +skip_enable:
-> +	rmptable_start = (unsigned long)start;
-
-Mostly out of curiosity, why store start/end as unsigned longs?  This is all 64-bit
-only so it doesn't actually affect the code generation, but it feels odd to store
-things that absolutely have to be 64-bit values as unsigned long.
-
-Similar question for why asm/sev-common.h cases to unsigned long instead of u64.
-E.g. the below in particular looks wrong because we're shifting an unsigned long
-b y32 bits, i.e. the value _must_ be a 64-bit value, why obfuscate that?
-
-	#define GHCB_CPUID_REQ(fn, reg)		\
-		(GHCB_MSR_CPUID_REQ | \
-		(((unsigned long)reg & GHCB_MSR_CPUID_REG_MASK) << GHCB_MSR_CPUID_REG_POS) | \
-		(((unsigned long)fn) << GHCB_MSR_CPUID_FUNC_POS))
-
-> +	rmptable_end = rmptable_start + sz;
-> +
-> +	return 0;
-> +}
-> +
-> +static int __init snp_rmptable_init(void)
-> +{
-> +	if (!boot_cpu_has(X86_FEATURE_SEV_SNP))
-> +		return 0;
-> +
-> +	/*
-> +	 * The SEV-SNP support requires that IOMMU must be enabled, and is not
-> +	 * configured in the passthrough mode.
-> +	 */
-> +	if (no_iommu || iommu_default_passthrough()) {
-
-Similar comment regarding the sanity check, kexec'ing into a kernel with SNP
-already enabled should probably fail explicitly if the new kernel is booted with
-incompatible params.
-
-> +		setup_clear_cpu_cap(X86_FEATURE_SEV_SNP);
-> +		pr_err("IOMMU is either disabled or configured in passthrough mode.\n");
-> +		return 0;
-> +	}
-> +
-> +	if (__snp_rmptable_init()) {
-> +		setup_clear_cpu_cap(X86_FEATURE_SEV_SNP);
-> +		return 1;
-> +	}
-> +
-> +	cpuhp_setup_state(CPUHP_AP_ONLINE_DYN, "x86/rmptable_init:online", __snp_enable, NULL);
-> +
-> +	return 0;
-> +}
-> +
-> +/*
-> + * This must be called after the PCI subsystem. This is because before enabling
-> + * the SNP feature we need to ensure that IOMMU is not configured in the
-> + * passthrough mode. The iommu_default_passthrough() is used for checking the
-> + * passthough state, and it is available after subsys_initcall().
-> + */
-> +fs_initcall(snp_rmptable_init);
-> -- 
-> 2.17.1
-> 
