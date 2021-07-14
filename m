@@ -2,81 +2,135 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 47A953C7DE4
-	for <lists+kvm@lfdr.de>; Wed, 14 Jul 2021 07:22:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 36ED03C7DE7
+	for <lists+kvm@lfdr.de>; Wed, 14 Jul 2021 07:24:18 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237892AbhGNFZc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 14 Jul 2021 01:25:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48976 "EHLO
+        id S237908AbhGNF1G (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 14 Jul 2021 01:27:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49320 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237802AbhGNFZb (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 14 Jul 2021 01:25:31 -0400
-Received: from mail-lj1-x22f.google.com (mail-lj1-x22f.google.com [IPv6:2a00:1450:4864:20::22f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5B922C0613DD
-        for <kvm@vger.kernel.org>; Tue, 13 Jul 2021 22:22:40 -0700 (PDT)
-Received: by mail-lj1-x22f.google.com with SMTP id 141so1574452ljj.2
-        for <kvm@vger.kernel.org>; Tue, 13 Jul 2021 22:22:40 -0700 (PDT)
+        with ESMTP id S237802AbhGNF1F (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 14 Jul 2021 01:27:05 -0400
+Received: from mail-ej1-x634.google.com (mail-ej1-x634.google.com [IPv6:2a00:1450:4864:20::634])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7E031C0613EE
+        for <kvm@vger.kernel.org>; Tue, 13 Jul 2021 22:24:14 -0700 (PDT)
+Received: by mail-ej1-x634.google.com with SMTP id gn32so1311648ejc.2
+        for <kvm@vger.kernel.org>; Tue, 13 Jul 2021 22:24:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
+        d=bytedance-com.20150623.gappssmtp.com; s=20150623;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=nm8cNY4RzDr9m47lomPKCIO5cyQCB456mTwOJ1bIX3k=;
-        b=ejTRkMZJBLibJcF6ks4Crtx+CzygwpSdiVtJy6OLbKQ6E3yJ1iqpMScgww4vIX2Dz0
-         HNalAAIzDjG5AUJny/d7XGgoBf8WL92hhD/e27k85X8yPCL2WQ1l5ZhZlJAvoHPCUFUB
-         SMM7b4yt+r8hWCSYWNY/2prs3jHntI4VSg53RNJ49+FBZ3nN5aM7Z1ENGiQQzEL+jdOo
-         710apJDwQWHt4qDfdZoexZ613LUBBxR2yUi+N+noKG/RkIK30ni80aGGL5i8C9Zx1c/y
-         6nvVBoDNoo8RZe4g9weiPr5MBVTFFG6/qcZm+K65Ese6S/xLGRhUGm6O7ebWGxctgJ7w
-         S1ZA==
+        bh=IR3H7P/Qqdz0+z7mAz+4BcJc0mjzsggsr8mNH8312vk=;
+        b=J2IDtTc5DxsvAMq/DAkPuYqj0Y7dNpRgm5w+Q5Mo3F1Au3zIy957DexG4xM3ot9TeB
+         gz7qUXOBffxs7ZJq8NwJJx3+F2yWdVty637g3WtUU13nzkMXjdWWulrIly/TOJxD+Hyy
+         /NqXLpxJ8/rX9zvF4onj7kuKA/hY855NC/q2nDjsHgyYw3/sSLkn4POQUtEcySzhEGrh
+         CDn9h5b45a/ov20IIHnvFDOFr1x5Vomj6Ve9ZjPNFGa6QG+3p9U0VzK3a00J7z6C/fWK
+         eWV/SVtA1pGWD7wh4Q6+tQY/Bv7Ble6R8AihTwasCDJOPdVPj+NAufXpshOEW+KCfFKO
+         W7Lg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=nm8cNY4RzDr9m47lomPKCIO5cyQCB456mTwOJ1bIX3k=;
-        b=ddB7k7o9ODUOJL8tBTarwmAyzU3jkr6dVUEp2c2BCVWZS9tdH6YD+bV5AnzgvtxVe1
-         wIp0sDVmQVQExEQ0VNd53D8iAq9ADRBU61lZlA77OA/94VFhDZbbgWIOzcxSeW1gJdTT
-         nrqn9x5o8XbYBejlf31mP8IRE/jyqeEKFMIp8Zgd7I81EsbRUGLZwR+vmfuhZfSlp8EX
-         R3o7FOQoOtTQVnfvNerQsMnkDYvOZA3u6ea4CPhPNuUfO8NM6zn6GYxt0bFLHYsLbM74
-         PtQhqITbW8QGUdRTGaUTYfTzgwz+na0uS/VSm1N7VDd8M3zNJHgdVW/AAdIAWsjYQeKc
-         7xHg==
-X-Gm-Message-State: AOAM530ZftORbtjdG31vXcMhLcyf9Xen4LhLvNFfYZVoN/6cS/6py5gt
-        5kbxPNp6vkpDAvawAqkMGSnWkZEnhMUCcPbaw2U=
-X-Google-Smtp-Source: ABdhPJzPF9D0u4w9EYV5W1SHFFcG15UqfAEDTAsWzEVpp0cnJ1/tCpmAahGulINkIwSvoWpS6wlhQ6g5Wvdd1h4LBYA=
-X-Received: by 2002:a2e:bc17:: with SMTP id b23mr7486870ljf.209.1626240158647;
- Tue, 13 Jul 2021 22:22:38 -0700 (PDT)
+        bh=IR3H7P/Qqdz0+z7mAz+4BcJc0mjzsggsr8mNH8312vk=;
+        b=jg5cqoX/VfbBeEDoOba+OSqyt5+O8KyDWleDD35zts+HQ8pJRapYmieyEe9Ynu6Uy7
+         Z4WZV7Wy83hcoPhHiPlpsw6IriaSnBWs7tm9uslXs4wKRaWA53LhNhtlgi/MV2qZZ7Fl
+         XcACuVE187MsKxE2N+jaJS85qFbaGQbL5ql/eQyW8LkJmNx3d/bedSy9xVvmYCdsDDqL
+         XKTmGY7lTpSiQrToCLPxV+Yuld77FWQd3M3GylWDlbN82lOxR3jueQ1O/wbTe7sZI7PI
+         f+DffxOqIFy4d1V3fzLeyVOVRbCtCiZWCsCGB/yu/8tkmPppwDAHmahAjtIQMltcqSZL
+         wfZg==
+X-Gm-Message-State: AOAM532v65G33zmz214LAMPmp678YnclJ+F87zUDRP46M//pJ99SLj26
+        ZroSDPdGK+uUlof2lVkh7AZx+7kdrHc4YVhYJrR+
+X-Google-Smtp-Source: ABdhPJwiVScNvW759FNHFZbUm6bF1Hh8xD+5SHXF+XpeC6RBKLMlly39eCK/TlQciP+Rhit5f+SlsKPq8Beb+93M0R0=
+X-Received: by 2002:a17:906:4b46:: with SMTP id j6mr10270164ejv.247.1626240253024;
+ Tue, 13 Jul 2021 22:24:13 -0700 (PDT)
 MIME-Version: 1.0
-References: <CA+-xGqNUX4dpzFV7coJSoJnPz6cE5gdPy1kzRKsQtGD371hyEg@mail.gmail.com>
- <d79db3d7c443f392f5a8b3cf631e5607b72b6208.camel@redhat.com>
- <CA+-xGqOdu1rjhkG0FhxfzF1N1Uiq+z0b3MBJ=sjuVStHP5TBKg@mail.gmail.com> <d95d40428ec07ee07e7c583a383d5f324f89686a.camel@redhat.com>
-In-Reply-To: <d95d40428ec07ee07e7c583a383d5f324f89686a.camel@redhat.com>
-From:   harry harry <hiharryharryharry@gmail.com>
-Date:   Wed, 14 Jul 2021 00:22:37 -0500
-Message-ID: <CA+-xGqPh+m2Q3pMoKaMFiJ_sZPPE0XafcT4LqUYT3niJAkxU0g@mail.gmail.com>
-Subject: Re: About two-dimensional page translation (e.g., Intel EPT) and
- shadow page table in Linux QEMU/KVM
-To:     Maxim Levitsky <mlevitsk@redhat.com>
-Cc:     kvm@vger.kernel.org, qemu-devel@nongnu.org,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Paolo Bonzini <pbonzini@redhat.com>, stefanha@redhat.com,
-        mathieu.tarral@protonmail.com
+References: <20210713084656.232-1-xieyongji@bytedance.com> <20210713084656.232-14-xieyongji@bytedance.com>
+ <20210713113114.GL1954@kadam>
+In-Reply-To: <20210713113114.GL1954@kadam>
+From:   Yongji Xie <xieyongji@bytedance.com>
+Date:   Wed, 14 Jul 2021 13:24:02 +0800
+Message-ID: <CACycT3uKwu5xzj2ynWH5njCKHaYyOPkDb8BVLTHE5NJ-qpD3xQ@mail.gmail.com>
+Subject: Re: [PATCH v9 13/17] vdpa: factor out vhost_vdpa_pa_map() and vhost_vdpa_pa_unmap()
+To:     Dan Carpenter <dan.carpenter@oracle.com>
+Cc:     "Michael S. Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Stefano Garzarella <sgarzare@redhat.com>,
+        Parav Pandit <parav@nvidia.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Christian Brauner <christian.brauner@canonical.com>,
+        Randy Dunlap <rdunlap@infradead.org>,
+        Matthew Wilcox <willy@infradead.org>,
+        Al Viro <viro@zeniv.linux.org.uk>,
+        Jens Axboe <axboe@kernel.dk>, bcrl@kvack.org,
+        Jonathan Corbet <corbet@lwn.net>,
+        =?UTF-8?Q?Mika_Penttil=C3=A4?= <mika.penttila@nextfour.com>,
+        joro@8bytes.org, Greg KH <gregkh@linuxfoundation.org>,
+        He Zhe <zhe.he@windriver.com>,
+        Liu Xiaodong <xiaodong.liu@intel.com>,
+        songmuchun@bytedance.com,
+        virtualization <virtualization@lists.linux-foundation.org>,
+        netdev@vger.kernel.org, kvm <kvm@vger.kernel.org>,
+        linux-fsdevel@vger.kernel.org, iommu@lists.linux-foundation.org,
+        linux-kernel <linux-kernel@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Dear Maxim,
-
-Thanks for your reply!
-
-> For same VM, I don't think it is feasable.
+On Tue, Jul 13, 2021 at 7:31 PM Dan Carpenter <dan.carpenter@oracle.com> wrote:
 >
-> For multiple VMs make some use NPT/EPT and some don't,
-> this should be possible to implement.
+> On Tue, Jul 13, 2021 at 04:46:52PM +0800, Xie Yongji wrote:
+> > @@ -613,37 +618,28 @@ static void vhost_vdpa_unmap(struct vhost_vdpa *v, u64 iova, u64 size)
+> >       }
+> >  }
+> >
+> > -static int vhost_vdpa_process_iotlb_update(struct vhost_vdpa *v,
+> > -                                        struct vhost_iotlb_msg *msg)
+> > +static int vhost_vdpa_pa_map(struct vhost_vdpa *v,
+> > +                          u64 iova, u64 size, u64 uaddr, u32 perm)
+> >  {
+> >       struct vhost_dev *dev = &v->vdev;
+> > -     struct vhost_iotlb *iotlb = dev->iotlb;
+> >       struct page **page_list;
+> >       unsigned long list_size = PAGE_SIZE / sizeof(struct page *);
+> >       unsigned int gup_flags = FOLL_LONGTERM;
+> >       unsigned long npages, cur_base, map_pfn, last_pfn = 0;
+> >       unsigned long lock_limit, sz2pin, nchunks, i;
+> > -     u64 iova = msg->iova;
+> > +     u64 start = iova;
+> >       long pinned;
+> >       int ret = 0;
+> >
+> > -     if (msg->iova < v->range.first ||
+> > -         msg->iova + msg->size - 1 > v->range.last)
+> > -             return -EINVAL;
 >
-> Why do you need it?
+> This is not related to your patch, but can the "msg->iova + msg->size"
+> addition can have an integer overflow.  From looking at the callers it
+> seems like it can.  msg comes from:
+>   vhost_chr_write_iter()
+>   --> dev->msg_handler(dev, &msg);
+>       --> vhost_vdpa_process_iotlb_msg()
+>          --> vhost_vdpa_process_iotlb_update()
+>
+> If I'm thinking of the right thing then these are allowed to overflow to
+> 0 because of the " - 1" but not further than that.  I believe the check
+> needs to be something like:
+>
+>         if (msg->iova < v->range.first ||
+>             msg->iova - 1 > U64_MAX - msg->size ||
+>             msg->iova + msg->size - 1 > v->range.last)
 >
 
-I am just curious about it :).
+Make sense.
 
+> But writing integer overflow check correctly is notoriously difficult.
+> Do you think you could send a fix for that which is separate from the
+> patcheset?  We'd want to backport it to stable.
+>
 
-Best,
-Harry
+OK, I will send a patch to fix it.
+
+Thanks,
+Yongji
