@@ -2,151 +2,127 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C7BBB3C81E0
-	for <lists+kvm@lfdr.de>; Wed, 14 Jul 2021 11:42:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 438EE3C820E
+	for <lists+kvm@lfdr.de>; Wed, 14 Jul 2021 11:50:43 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238869AbhGNJpC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 14 Jul 2021 05:45:02 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:56098 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S238679AbhGNJpB (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 14 Jul 2021 05:45:01 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1626255729;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=ZplaldvdPUqWqjFHRQy6XqAYb6B2IbOETrAj7lOt6Jc=;
-        b=U/iYW3aw5IvGT0aLmnDGEgbNSbd3zFCuMNZvKUaU6vdvh/QQ3wHtRhFO8uI/3Yie8wQicU
-        A0VzkvKIq4XVYe2Pz89y/TfGPrHHYaqbLAtkTA32Rg5QWVy+NaiLybW60HuUIXYIm1eYq7
-        IR5D4ADt9M7YDgtgA9PJudwghn9bWfk=
-Received: from mail-pj1-f71.google.com (mail-pj1-f71.google.com
- [209.85.216.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-397-4VBfYIxCNHOHYudcJpEhSA-1; Wed, 14 Jul 2021 05:42:08 -0400
-X-MC-Unique: 4VBfYIxCNHOHYudcJpEhSA-1
-Received: by mail-pj1-f71.google.com with SMTP id ch15-20020a17090af40fb0290173b9573ea7so3377729pjb.6
-        for <kvm@vger.kernel.org>; Wed, 14 Jul 2021 02:42:08 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-transfer-encoding
-         :content-language;
-        bh=ZplaldvdPUqWqjFHRQy6XqAYb6B2IbOETrAj7lOt6Jc=;
-        b=h6+EVQYbeHb7LlaPT/RwZt2Qg+Mh4qm2EILyv8tCBL3WTCua13T6jA9YoAi5tqQ1pI
-         muDpz8B/qHBn6XqEoxxqQ/jyC/erNG7EMTIlxDQFbljrpniAob1I9CfuBXkhdxWWBUmI
-         FnK9ocHah0Tm2756GidPWPZan8+JSrb477NCgmGIejNFJEv4zgZmlTCzX7oA02uPvijJ
-         eoMq1Fotfv5acEsL5kT5yLufz+0OXV3B6YGzCP0xPInMeA9hdaYKCGI0LaKQBee0HG1j
-         9kNlr/IhhRr6TQf2p37T3xM/IGK2YrAfX6xItTjgwdlQ47336eIPm1B4oBHUDOriUhxw
-         ArtA==
-X-Gm-Message-State: AOAM532iisISqO5Tmor43xp3PhgYRhd/R8oxuctopdBKUHPJQ4SrEj0S
-        i28NI5ZqaIwuOEVsN3FAzi2E6G7fribXe88xFjOoJc/8Vqd21taJvroNai4psWSEpxCXqsqueme
-        zMiIU6ZJTsqAh
-X-Received: by 2002:a17:90a:7a86:: with SMTP id q6mr3009920pjf.141.1626255727204;
-        Wed, 14 Jul 2021 02:42:07 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzB8iUML1glTVs5bknbuEkym014DDJoi+0qmllMveSYsw48CwsnGAccGqgHSeXUC5btvXZSoA==
-X-Received: by 2002:a17:90a:7a86:: with SMTP id q6mr3009902pjf.141.1626255726913;
-        Wed, 14 Jul 2021 02:42:06 -0700 (PDT)
-Received: from wangxiaodeMacBook-Air.local ([209.132.188.80])
-        by smtp.gmail.com with ESMTPSA id p5sm2075572pfn.46.2021.07.14.02.41.59
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 14 Jul 2021 02:42:06 -0700 (PDT)
-Subject: Re: [PATCH v9 13/17] vdpa: factor out vhost_vdpa_pa_map() and
- vhost_vdpa_pa_unmap()
-To:     Dan Carpenter <dan.carpenter@oracle.com>
-Cc:     Xie Yongji <xieyongji@bytedance.com>, mst@redhat.com,
-        stefanha@redhat.com, sgarzare@redhat.com, parav@nvidia.com,
-        hch@infradead.org, christian.brauner@canonical.com,
-        rdunlap@infradead.org, willy@infradead.org,
-        viro@zeniv.linux.org.uk, axboe@kernel.dk, bcrl@kvack.org,
-        corbet@lwn.net, mika.penttila@nextfour.com, joro@8bytes.org,
-        gregkh@linuxfoundation.org, zhe.he@windriver.com,
-        xiaodong.liu@intel.com, songmuchun@bytedance.com,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        kvm@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        iommu@lists.linux-foundation.org, linux-kernel@vger.kernel.org
-References: <20210713084656.232-1-xieyongji@bytedance.com>
- <20210713084656.232-14-xieyongji@bytedance.com> <20210713113114.GL1954@kadam>
- <20e75b53-0dce-2f2d-b717-f78553bddcd8@redhat.com>
- <20210714080512.GW1954@kadam>
-From:   Jason Wang <jasowang@redhat.com>
-Message-ID: <db02315d-0ffe-f4a2-da67-5a014060fa4a@redhat.com>
-Date:   Wed, 14 Jul 2021 17:41:54 +0800
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0)
- Gecko/20100101 Thunderbird/78.11.0
+        id S238905AbhGNJxc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 14 Jul 2021 05:53:32 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:5012 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S238271AbhGNJxc (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 14 Jul 2021 05:53:32 -0400
+Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 16E9Y3ED187502;
+        Wed, 14 Jul 2021 05:50:40 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : message-id : references : mime-version : content-type :
+ in-reply-to; s=pp1; bh=t4gpCQMDXnpdkc6VBOQdvRGHznSkjRftDBs/orXu85I=;
+ b=EVjXkgxEURLlnB+T4SnOUqKiPPoPkzQSV6hQdzQGNkrme0ft+yRn/PhqmWxBDNsqCuaA
+ FiUeoPNUv44jObx+YpoI3fMSRBk+gkJjTE+FBm+U4Ujq/l4Op6WYZCDPp5kW2Hupbmlt
+ 4i8KOyUkkzPaVZS5zOAlIJORNwV3rN9CPXEnUgQtTdnrHOumbd2MWSoVi11z1XPx1sBe
+ lXojLXPZ7BaHdTzug7NJT5VqnoTJOmIyG+6KsJUphaA0lx5PGaYqp8qFwFbtpOvqUrVj
+ S/MED5svDCeWED4sNd0x7TI8hM1f6MDRIn6dIIOMpbE3ccHBpzZv/u/pb/i6xdg82Ojs 6g== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 39sde1j5ma-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 14 Jul 2021 05:50:40 -0400
+Received: from m0098419.ppops.net (m0098419.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 16E9ZNXi191345;
+        Wed, 14 Jul 2021 05:50:40 -0400
+Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 39sde1j5ke-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 14 Jul 2021 05:50:40 -0400
+Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
+        by ppma06ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 16E9n27Z015225;
+        Wed, 14 Jul 2021 09:50:38 GMT
+Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
+        by ppma06ams.nl.ibm.com with ESMTP id 39q2th9q87-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 14 Jul 2021 09:50:38 +0000
+Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
+        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 16E9oYxJ27328954
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 14 Jul 2021 09:50:35 GMT
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id D67BCA4040;
+        Wed, 14 Jul 2021 09:50:34 +0000 (GMT)
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 8C832A404D;
+        Wed, 14 Jul 2021 09:50:34 +0000 (GMT)
+Received: from osiris (unknown [9.145.156.107])
+        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
+        Wed, 14 Jul 2021 09:50:34 +0000 (GMT)
+Date:   Wed, 14 Jul 2021 11:50:33 +0200
+From:   Heiko Carstens <hca@linux.ibm.com>
+To:     Claudio Imbrenda <imbrenda@linux.ibm.com>
+Cc:     Christian Borntraeger <borntraeger@de.ibm.com>,
+        Janosch Frank <frankja@linux.vnet.ibm.com>,
+        David Hildenbrand <david@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org
+Subject: Re: [PATCH] KVM: s390: generate kvm hypercall functions
+Message-ID: <YO6zadbavNXs4Z3+@osiris>
+References: <20210713145713.2815167-1-hca@linux.ibm.com>
+ <20210714113843.6daa7e09@p-imbrenda>
 MIME-Version: 1.0
-In-Reply-To: <20210714080512.GW1954@kadam>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210714113843.6daa7e09@p-imbrenda>
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: 8cJMNYiPDGsq2ev834_wHvwhd8GgwkPq
+X-Proofpoint-ORIG-GUID: lAMlpMdjYaVs9jcJudzkxGbbtXu4ruXv
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.790
+ definitions=2021-07-14_04:2021-07-14,2021-07-14 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 phishscore=0
+ spamscore=0 clxscore=1015 mlxlogscore=999 impostorscore=0 adultscore=0
+ mlxscore=0 lowpriorityscore=0 malwarescore=0 priorityscore=1501
+ suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2104190000 definitions=main-2107140062
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Wed, Jul 14, 2021 at 11:38:43AM +0200, Claudio Imbrenda wrote:
+> On Tue, 13 Jul 2021 16:57:13 +0200
+> Heiko Carstens <hca@linux.ibm.com> wrote:
+> 
+> [snip]
+> 
+> > +#define HYPERCALL_ARGS_0
+> > +#define HYPERCALL_ARGS_1 , arg1
+> > +#define HYPERCALL_ARGS_2 HYPERCALL_ARGS_1, arg2
+> > +#define HYPERCALL_ARGS_3 HYPERCALL_ARGS_2, arg3
+> > +#define HYPERCALL_ARGS_4 HYPERCALL_ARGS_3, arg4
+> > +#define HYPERCALL_ARGS_5 HYPERCALL_ARGS_4, arg5
+> > +#define HYPERCALL_ARGS_6 HYPERCALL_ARGS_5, arg6
+> > +
+> > +#define GENERATE_KVM_HYPERCALL_FUNC(args)
+> > 	\ +static inline
+> > 			\ +long __kvm_hypercall##args(unsigned long
+> > nr HYPERCALL_PARM_##args)	\ +{
+> > 					\
+> > +	register unsigned long __nr asm("1") = nr;
+> > 	\
+> > +	register long __rc asm("2");
+> > 	\
+> 
+> didn't we want to get rid of asm register allocations?
+> 
+> this would have been a nice time to do such a cleanup
 
-在 2021/7/14 下午4:05, Dan Carpenter 写道:
-> On Wed, Jul 14, 2021 at 10:14:32AM +0800, Jason Wang wrote:
->> 在 2021/7/13 下午7:31, Dan Carpenter 写道:
->>> On Tue, Jul 13, 2021 at 04:46:52PM +0800, Xie Yongji wrote:
->>>> @@ -613,37 +618,28 @@ static void vhost_vdpa_unmap(struct vhost_vdpa *v, u64 iova, u64 size)
->>>>    	}
->>>>    }
->>>> -static int vhost_vdpa_process_iotlb_update(struct vhost_vdpa *v,
->>>> -					   struct vhost_iotlb_msg *msg)
->>>> +static int vhost_vdpa_pa_map(struct vhost_vdpa *v,
->>>> +			     u64 iova, u64 size, u64 uaddr, u32 perm)
->>>>    {
->>>>    	struct vhost_dev *dev = &v->vdev;
->>>> -	struct vhost_iotlb *iotlb = dev->iotlb;
->>>>    	struct page **page_list;
->>>>    	unsigned long list_size = PAGE_SIZE / sizeof(struct page *);
->>>>    	unsigned int gup_flags = FOLL_LONGTERM;
->>>>    	unsigned long npages, cur_base, map_pfn, last_pfn = 0;
->>>>    	unsigned long lock_limit, sz2pin, nchunks, i;
->>>> -	u64 iova = msg->iova;
->>>> +	u64 start = iova;
->>>>    	long pinned;
->>>>    	int ret = 0;
->>>> -	if (msg->iova < v->range.first ||
->>>> -	    msg->iova + msg->size - 1 > v->range.last)
->>>> -		return -EINVAL;
->>> This is not related to your patch, but can the "msg->iova + msg->size"
->>> addition can have an integer overflow.  From looking at the callers it
->>> seems like it can.  msg comes from:
->>>     vhost_chr_write_iter()
->>>     --> dev->msg_handler(dev, &msg);
->>>         --> vhost_vdpa_process_iotlb_msg()
->>>            --> vhost_vdpa_process_iotlb_update()
->>
->> Yes.
->>
->>
->>> If I'm thinking of the right thing then these are allowed to overflow to
->>> 0 because of the " - 1" but not further than that.  I believe the check
->>> needs to be something like:
->>>
->>> 	if (msg->iova < v->range.first ||
->>> 	    msg->iova - 1 > U64_MAX - msg->size ||
->>
->> I guess we don't need - 1 here?
-> The - 1 is important.  The highest address is 0xffffffff.  So it goes
-> start + size = 0 and then start + size - 1 == 0xffffffff.
+I see only two ways to get rid them, both are suboptimal, therefore I
+decided to keep them at very few places; one of them this one.
 
+Alternatively to this approach it would be possible to:
 
-Right, so actually
+a) write the function entirely in assembler (instead of inlining it).
 
-msg->iova = 0xfffffffe, msg->size=2 is valid.
+b) pass a structure with all parameters to the inline assembly and
+   clobber a large amount of registers, which _might_ even lead to
+   compile errors since the compiler might run out of registers when
+   allocating registers for the inline asm.
 
-Thanks
-
-
->
-> I guess we could move the - 1 to the other side?
->
-> 	msg->iova > U64_MAX - msg->size + 1 ||
->
-> regards,
-> dan carpenter
->
->
-
+Given that hypercall is slow anyway a) might be an option. But that's
+up to you guys. Otherwise I would consider this the "final" solution
+until we get compiler support which allows for something better.
