@@ -2,93 +2,164 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 12C7A3C87C2
-	for <lists+kvm@lfdr.de>; Wed, 14 Jul 2021 17:34:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BE1153C87EB
+	for <lists+kvm@lfdr.de>; Wed, 14 Jul 2021 17:47:11 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239842AbhGNPg4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 14 Jul 2021 11:36:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47802 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240007AbhGNPgm (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 14 Jul 2021 11:36:42 -0400
-X-Greylist: delayed 393 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Wed, 14 Jul 2021 08:33:50 PDT
-Received: from mail.thalheim.io (mail.thalheim.io [IPv6:2a01:4f9:2b:1605::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7B188C061786
-        for <kvm@vger.kernel.org>; Wed, 14 Jul 2021 08:33:50 -0700 (PDT)
-Received: from mail.thalheim.io (eve.i [IPv6:2a01:4f9:2b:1605::1])
-        by mail.thalheim.io (Postfix) with ESMTPSA id 00D28C2AE0A;
-        Wed, 14 Jul 2021 15:27:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=thalheim.io; s=default;
-        t=1626276436; h=from:from:reply-to:reply-to:subject:subject:date:date:
-         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-         content-type:content-type:  content-transfer-encoding:content-transfer-encoding;
-        bh=xjHlv0OyBsLdQnfYGQhtE5KnFGOLXIQ9KwS1YjM4m8o=;
-        b=N3LlkGN7gK2tzan3uQuWHyaV0QfAuIq2ah88DmfHZ6MsQu7/l2D1Me+qf+iv06rg6mgJGK
-        vn3xpP68R6DC5oe7yajU5uokONWMUA8Ar7sE33OxA4RBgvd/a+jPwlN9r/+czp9b2BuSHv
-        LcO3lDJCVm3LUEnGyJs2SjLDK8NlEMw=
+        id S239659AbhGNPuC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 14 Jul 2021 11:50:02 -0400
+Received: from foss.arm.com ([217.140.110.172]:36340 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S232318AbhGNPuB (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 14 Jul 2021 11:50:01 -0400
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id D548131B;
+        Wed, 14 Jul 2021 08:47:09 -0700 (PDT)
+Received: from [192.168.0.110] (unknown [172.31.20.19])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id BDFB03F7D8;
+        Wed, 14 Jul 2021 08:47:06 -0700 (PDT)
+Subject: Re: [PATCH 1/3] KVM: arm64: Narrow PMU sysreg reset values to
+ architectural requirements
+To:     Marc Zyngier <maz@kernel.org>,
+        linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org,
+        kvmarm@lists.cs.columbia.edu
+Cc:     James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Alexandre Chartre <alexandre.chartre@oracle.com>,
+        Robin Murphy <robin.murphy@arm.com>, kernel-team@android.com
+References: <20210713135900.1473057-1-maz@kernel.org>
+ <20210713135900.1473057-2-maz@kernel.org>
+From:   Alexandru Elisei <alexandru.elisei@arm.com>
+Message-ID: <ae510501-0410-47b1-77f3-cb83d3b1fa9e@arm.com>
+Date:   Wed, 14 Jul 2021 16:48:07 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.11.0
 MIME-Version: 1.0
-Date:   Wed, 14 Jul 2021 15:27:15 +0000
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-X-Mailer: RainLoop/1.16.0
-From:   "=?utf-8?B?SsO2cmcgVGhhbGhlaW0=?=" <joerg@thalheim.io>
-Message-ID: <8231a065caffd539c6dee272d78b1df0@thalheim.io>
-Reply-To: cover.1613828726.git.eafanasova@gmail.com
-Subject: Re: [RFC v3 0/5] Introduce MMIO/PIO dispatch file descriptors 
- (ioregionfd)
-To:     eafanasova@gmail.com
-Cc:     kvm@vger.kernel.org
-Authentication-Results: ORIGINATING;
-        auth=pass smtp.auth=joerg@higgsboson.tk smtp.mailfrom=joerg@thalheim.io
+In-Reply-To: <20210713135900.1473057-2-maz@kernel.org>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The patches does not compile because vcpu->ioregion_ctx is missing a len =
-field.
+Hi Marc,
 
+On 7/13/21 2:58 PM, Marc Zyngier wrote:
+> A number of the PMU sysregs expose reset values that are not in
+> compliant with the architecture (set bits in the RES0 ranges,
+> for example).
+>
+> This in turn has the effect that we need to pointlessly mask
+> some register when using them.
+>
+> Let's start by making sure we don't have illegal values in the
+> shadow registers at reset time. This affects all the registers
+> that dedicate one bit per counter, the counters themselves,
+> PMEVTYPERn_EL0 and PMSELR_EL0.
+>
+> Reported-by: Alexandre Chartre <alexandre.chartre@oracle.com>
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> ---
+>  arch/arm64/kvm/sys_regs.c | 46 ++++++++++++++++++++++++++++++++++++---
+>  1 file changed, 43 insertions(+), 3 deletions(-)
+>
+> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> index f6f126eb6ac1..95ccb8f45409 100644
+> --- a/arch/arm64/kvm/sys_regs.c
+> +++ b/arch/arm64/kvm/sys_regs.c
+> @@ -603,6 +603,44 @@ static unsigned int pmu_visibility(const struct kvm_vcpu *vcpu,
+>  	return REG_HIDDEN;
+>  }
+>  
+> +static void reset_pmu_reg(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r)
+> +{
+> +	u64 n, mask;
+> +
+> +	/* No PMU available, any PMU reg may UNDEF... */
+> +	if (!kvm_arm_support_pmu_v3())
+> +		return;
+> +
+> +	n = read_sysreg(pmcr_el0) >> ARMV8_PMU_PMCR_N_SHIFT;
 
-arch/x86/kvm/x86.c: In function =E2=80=98complete_ioregion_fast_pio=E2=80=
-=99:
-arch/x86/kvm/x86.c:9680:58: error: =E2=80=98struct <anonymous>=E2=80=99 h=
-as no member named =E2=80=98len=E2=80=99
- 9680 |   memcpy(&val, vcpu->ioregion_ctx.val, vcpu->ioregion_ctx.len);
-      |                                                          ^
+Isn't this going to cause a lot of unnecessary traps with NV? Is that going to be
+a problem? Because at the moment I can't think of an elegant way to avoid it,
+other than special casing PMCR_EL0 in kvm_reset_sys_regs() and using here
+__vcpu_sys_reg(vcpu, PMCR_EL0). Or, even better, using
+kvm_pmu_valid_counter_mask(vcpu), since this is identical to what that function does.
 
+> +	n &= ARMV8_PMU_PMCR_N_MASK;
+> +
+> +	reset_unknown(vcpu, r);
+> +
+> +	mask = BIT(ARMV8_PMU_CYCLE_IDX);
 
-Gcc8 was also unhappy that the function would have no return values for c=
-ases.
+PMSWINC_EL0 has bit 31 RES0. Other than that, looked at all the PMU registers and
+everything looks correct to me.
 
----
- arch/x86/kvm/x86.c  | 1 +
- virt/kvm/ioregion.c | 1 +
- 2 files changed, 2 insertions(+)
+Thanks,
 
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 7dc1b80170f1..73205619cdd3 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -9709,6 +9709,7 @@ static int complete_ioregion_io(struct kvm_vcpu *vc=
-pu)
- 		return complete_ioregion_mmio(vcpu);
- 	if (vcpu->arch.pio.count)
- 		return complete_ioregion_pio(vcpu);
-+	return 0;
- }
- #endif /* CONFIG_KVM_IOREGION */
-=20
-diff=20--git a/virt/kvm/ioregion.c b/virt/kvm/ioregion.c
-index d53e3d1cd2ff..e0a52b2a56df 100644
---- a/virt/kvm/ioregion.c
-+++ b/virt/kvm/ioregion.c
-@@ -311,6 +311,7 @@ get_ioregion_list(struct kvm *kvm, enum kvm_bus bus_i=
-dx)
- 		return &kvm->ioregions_mmio;
- 	if (bus_idx =3D=3D KVM_PIO_BUS)
- 		return &kvm->ioregions_pio;
-+	return NULL;
- }
-=20
- /* check for not overlapping case and reverse */
---=20
-2.32.0
+Alex
+
+> +	if (n)
+> +		mask |= GENMASK(n - 1, 0);
+> +
+> +	__vcpu_sys_reg(vcpu, r->reg) &= mask;
+> +}
+> +
+> +static void reset_pmevcntr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r)
+> +{
+> +	reset_unknown(vcpu, r);
+> +	__vcpu_sys_reg(vcpu, r->reg) &= GENMASK(31, 0);
+> +}
+> +
+> +static void reset_pmevtyper(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r)
+> +{
+> +	reset_unknown(vcpu, r);
+> +	__vcpu_sys_reg(vcpu, r->reg) &= ARMV8_PMU_EVTYPE_MASK;
+> +}
+> +
+> +static void reset_pmselr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r)
+> +{
+> +	reset_unknown(vcpu, r);
+> +	__vcpu_sys_reg(vcpu, r->reg) &= ARMV8_PMU_COUNTER_MASK;
+> +}
+> +
+>  static void reset_pmcr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r)
+>  {
+>  	u64 pmcr, val;
+> @@ -944,16 +982,18 @@ static bool access_pmuserenr(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
+>  	  trap_wcr, reset_wcr, 0, 0,  get_wcr, set_wcr }
+>  
+>  #define PMU_SYS_REG(r)						\
+> -	SYS_DESC(r), .reset = reset_unknown, .visibility = pmu_visibility
+> +	SYS_DESC(r), .reset = reset_pmu_reg, .visibility = pmu_visibility
+>  
+>  /* Macro to expand the PMEVCNTRn_EL0 register */
+>  #define PMU_PMEVCNTR_EL0(n)						\
+>  	{ PMU_SYS_REG(SYS_PMEVCNTRn_EL0(n)),				\
+> +	  .reset = reset_pmevcntr,					\
+>  	  .access = access_pmu_evcntr, .reg = (PMEVCNTR0_EL0 + n), }
+>  
+>  /* Macro to expand the PMEVTYPERn_EL0 register */
+>  #define PMU_PMEVTYPER_EL0(n)						\
+>  	{ PMU_SYS_REG(SYS_PMEVTYPERn_EL0(n)),				\
+> +	  .reset = reset_pmevtyper,					\
+>  	  .access = access_pmu_evtyper, .reg = (PMEVTYPER0_EL0 + n), }
+>  
+>  static bool undef_access(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
+> @@ -1595,13 +1635,13 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+>  	{ PMU_SYS_REG(SYS_PMSWINC_EL0),
+>  	  .access = access_pmswinc, .reg = PMSWINC_EL0 },
+>  	{ PMU_SYS_REG(SYS_PMSELR_EL0),
+> -	  .access = access_pmselr, .reg = PMSELR_EL0 },
+> +	  .access = access_pmselr, .reset = reset_pmselr, .reg = PMSELR_EL0 },
+>  	{ PMU_SYS_REG(SYS_PMCEID0_EL0),
+>  	  .access = access_pmceid, .reset = NULL },
+>  	{ PMU_SYS_REG(SYS_PMCEID1_EL0),
+>  	  .access = access_pmceid, .reset = NULL },
+>  	{ PMU_SYS_REG(SYS_PMCCNTR_EL0),
+> -	  .access = access_pmu_evcntr, .reg = PMCCNTR_EL0 },
+> +	  .access = access_pmu_evcntr, .reset = reset_unknown, .reg = PMCCNTR_EL0 },
+>  	{ PMU_SYS_REG(SYS_PMXEVTYPER_EL0),
+>  	  .access = access_pmu_evtyper, .reset = NULL },
+>  	{ PMU_SYS_REG(SYS_PMXEVCNTR_EL0),
