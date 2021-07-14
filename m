@@ -2,90 +2,120 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id AA3113C887C
-	for <lists+kvm@lfdr.de>; Wed, 14 Jul 2021 18:15:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 672D73C8881
+	for <lists+kvm@lfdr.de>; Wed, 14 Jul 2021 18:17:05 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232517AbhGNQSP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 14 Jul 2021 12:18:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57574 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231260AbhGNQSO (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 14 Jul 2021 12:18:14 -0400
-Received: from mail-ot1-x32c.google.com (mail-ot1-x32c.google.com [IPv6:2607:f8b0:4864:20::32c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EB7E3C061760
-        for <kvm@vger.kernel.org>; Wed, 14 Jul 2021 09:15:22 -0700 (PDT)
-Received: by mail-ot1-x32c.google.com with SMTP id 7-20020a9d0d070000b0290439abcef697so3057346oti.2
-        for <kvm@vger.kernel.org>; Wed, 14 Jul 2021 09:15:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=FcJqFhnBs3c+2NPpPUvwxuNTpO21d8YHEIVzJJluXGY=;
-        b=YP+2hyEJXigWYVj+xlaBdB8e4G12hxNTLrNTHcYTZdZrF+D1pNTQaBJwPQ6mqZuGfs
-         zUI1aZJuX17W/usN9r4dvlPsw+PUurvljbKBGA1ZafhYTd7jlHpD8jiiw9ZfjFLSiboI
-         GBtyE8ux36bNIB9Eae2kD35gPKM7kyfgByzJ2NSGXOyIJ1tgdK99vaGHr/Dzz34ThLju
-         cv+vw6QKCQbcp7qqV7uV+75Fom+To2QDW9Ns0sz/JV99tczNjI+wnLZe9YTLc9kCPtcx
-         eJo2kbDRlyMMlyk4ed91ed/ImPVYEvbQmfsfvJhtP9JJ718MPqh9O7N0KY3diSYfjXes
-         eq5A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=FcJqFhnBs3c+2NPpPUvwxuNTpO21d8YHEIVzJJluXGY=;
-        b=FTfJ5A+uIcWM5nQGKYRIIykjXKQaTMJ9StdbANMADXxOuhdfGd9TrXBOutrkVDY/Br
-         3F28IkBRd5rJmq7M8kMo9ZaDgJOrcjCbKHqlWxedGg3V3PjLOLiPuyAktYno5X2pdGAX
-         kIUZxEr92cOfhKEI9/srBTI+z1BlQN6HQJOot26buAjlpuAm2K7Ma89ikdu2LFfTnb6n
-         m3+7s0q3OH56dQ+IAJr3jjPcEJy+KxRFBcGRJg5zEBSPYfVYCHSW0rmQ/YfyCU6D5gkN
-         /BIAEgt4fNPpaD4vRMpffdNjY6zvaCHVpS9XjKYanMZAIoX3Rf6cAUErNusJ/O+TXcBB
-         WYFw==
-X-Gm-Message-State: AOAM5313OzFW54EYUPiVol07F2lX0CNC2Dmx2bz6Vk20AIBuFGR5MJDF
-        q2Nqi5VA5EN42YALlPwRwKdwD1qiLAKiJyBl+BqPKA==
-X-Google-Smtp-Source: ABdhPJxEFIMS7J1VqoMpDvD+RYJFHirbgxfFTbTCcHZoXrz+J2T1sP9siadEw3dTCtiCVduj1kZAJsN/vuqiAfRvo7c=
-X-Received: by 2002:a9d:550e:: with SMTP id l14mr9050040oth.241.1626279321498;
- Wed, 14 Jul 2021 09:15:21 -0700 (PDT)
+        id S230376AbhGNQTz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 14 Jul 2021 12:19:55 -0400
+Received: from foss.arm.com ([217.140.110.172]:36694 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229897AbhGNQTz (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 14 Jul 2021 12:19:55 -0400
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 306AED6E;
+        Wed, 14 Jul 2021 09:17:03 -0700 (PDT)
+Received: from [192.168.0.110] (unknown [172.31.20.19])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id B0B273F7D8;
+        Wed, 14 Jul 2021 09:17:01 -0700 (PDT)
+Subject: Re: [PATCH 3/3] KVM: arm64: Disabling disabled PMU counters wastes a
+ lot of time
+To:     Marc Zyngier <maz@kernel.org>,
+        linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org,
+        kvmarm@lists.cs.columbia.edu
+Cc:     James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Alexandre Chartre <alexandre.chartre@oracle.com>,
+        Robin Murphy <robin.murphy@arm.com>, kernel-team@android.com
+References: <20210713135900.1473057-1-maz@kernel.org>
+ <20210713135900.1473057-4-maz@kernel.org>
+From:   Alexandru Elisei <alexandru.elisei@arm.com>
+Message-ID: <d4f16a13-1324-ce69-ce62-d68f922a7338@arm.com>
+Date:   Wed, 14 Jul 2021 17:18:07 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.11.0
 MIME-Version: 1.0
-References: <1625825111-6604-1-git-send-email-weijiang.yang@intel.com>
- <1625825111-6604-7-git-send-email-weijiang.yang@intel.com>
- <CALMp9eQEs9pUyy1PpwLPG0_PtF07tR2Opw+1b=w4-knOwYPvvg@mail.gmail.com>
- <CALMp9eQ+9czB0ayBFR3-nW-ynKuH0v9uHAGeV4wgkXYJMSs1=w@mail.gmail.com>
- <20210712095305.GE12162@intel.com> <d73eb316-4e09-a924-5f60-e3778db91df4@gmail.com>
- <CALMp9eQmK+asv7fXeUpF2UiRKL7VmZx44HMGj67aSqm0k9nKVg@mail.gmail.com>
- <CALMp9eSWDmWerj5CaxRyMiNqnBf1akHHaWV2Cfq_66Xjg-0MEw@mail.gmail.com>
- <12a3e8e4-3183-9917-c9d5-59ab257b8fd3@gmail.com> <CALMp9eROgWVBe1NuqD46xbgXHedgAFW1EMFX5zW-_Ee5enHmnw@mail.gmail.com>
- <cb4c1daa-f7a3-4f9c-fcdd-6a91e0dbcab4@gmail.com>
-In-Reply-To: <cb4c1daa-f7a3-4f9c-fcdd-6a91e0dbcab4@gmail.com>
-From:   Jim Mattson <jmattson@google.com>
-Date:   Wed, 14 Jul 2021 09:15:10 -0700
-Message-ID: <CALMp9eQF2ZAs0qNfmjpXAUNwiR8ESfUiA8AjA3uPbDMeX_Aotw@mail.gmail.com>
-Subject: Re: [PATCH v5 06/13] KVM: x86/vmx: Save/Restore host MSR_ARCH_LBR_CTL state
-To:     Like Xu <like.xu.linux@gmail.com>
-Cc:     Yang Weijiang <weijiang.yang@intel.com>, pbonzini@redhat.com,
-        seanjc@google.com, vkuznets@redhat.com, wei.w.wang@intel.com,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        "kan.liang@linux.intel.com" <kan.liang@linux.intel.com>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <20210713135900.1473057-4-maz@kernel.org>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jul 14, 2021 at 6:33 AM Like Xu <like.xu.linux@gmail.com> wrote:
+Hi Marc,
+
+On 7/13/21 2:59 PM, Marc Zyngier wrote:
+> From: Alexandre Chartre <alexandre.chartre@oracle.com>
 >
-> On 14/7/2021 1:00 am, Jim Mattson wrote:
-
-> > We have no such concept in our user space. Features that are not
-> > migratable should clearly be identified as such by an appropriate KVM
-> > API. At present, I don't believe there is such an API.
+> In a KVM guest on arm64, performance counters interrupts have an
+> unnecessary overhead which slows down execution when using the "perf
+> record" command and limits the "perf record" sampling period.
 >
-> I couldn't agree with you more on this point.
+> The problem is that when a guest VM disables counters by clearing the
+> PMCR_EL0.E bit (bit 0), KVM will disable all counters defined in
+> PMCR_EL0 even if they are not enabled in PMCNTENSET_EL0.
+>
+> KVM disables a counter by calling into the perf framework, in particular
+> by calling perf_event_create_kernel_counter() which is a time consuming
+> operation. So, for example, with a Neoverse N1 CPU core which has 6 event
+> counters and one cycle counter, KVM will always disable all 7 counters
+> even if only one is enabled.
+>
+> This typically happens when using the "perf record" command in a guest
+> VM: perf will disable all event counters with PMCNTENTSET_EL0 and only
+> uses the cycle counter. And when using the "perf record" -F option with
+> a high profiling frequency, the overhead of KVM disabling all counters
+> instead of one on every counter interrupt becomes very noticeable.
+>
+> The problem is fixed by having KVM disable only counters which are
+> enabled in PMCNTENSET_EL0. If a counter is not enabled in PMCNTENSET_EL0
+> then KVM will not enable it when setting PMCR_EL0.E and it will remain
+> disabled as long as it is not enabled in PMCNTENSET_EL0. So there is
+> effectively no need to disable a counter when clearing PMCR_EL0.E if it
+> is not enabled PMCNTENSET_EL0.
+>
+> Signed-off-by: Alexandre Chartre <alexandre.chartre@oracle.com>
+> [maz: moved 'mask' close to the actual user, simplifying the patch]
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> Link: https://lore.kernel.org/r/20210712170345.660272-1-alexandre.chartre@oracle.com
+> ---
+>  arch/arm64/kvm/pmu-emul.c | 5 +++--
+>  1 file changed, 3 insertions(+), 2 deletions(-)
+>
+> diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
+> index fae4e95b586c..dc65b58dc68f 100644
+> --- a/arch/arm64/kvm/pmu-emul.c
+> +++ b/arch/arm64/kvm/pmu-emul.c
+> @@ -563,20 +563,21 @@ void kvm_pmu_software_increment(struct kvm_vcpu *vcpu, u64 val)
+>   */
+>  void kvm_pmu_handle_pmcr(struct kvm_vcpu *vcpu, u64 val)
+>  {
+> -	unsigned long mask = kvm_pmu_valid_counter_mask(vcpu);
+>  	int i;
+>  
+>  	if (val & ARMV8_PMU_PMCR_E) {
+>  		kvm_pmu_enable_counter_mask(vcpu,
+>  		       __vcpu_sys_reg(vcpu, PMCNTENSET_EL0));
+>  	} else {
+> -		kvm_pmu_disable_counter_mask(vcpu, mask);
+> +		kvm_pmu_disable_counter_mask(vcpu,
+> +		       __vcpu_sys_reg(vcpu, PMCNTENSET_EL0));
+>  	}
+>  
+>  	if (val & ARMV8_PMU_PMCR_C)
+>  		kvm_pmu_set_counter_value(vcpu, ARMV8_PMU_CYCLE_IDX, 0);
+>  
+>  	if (val & ARMV8_PMU_PMCR_P) {
+> +		unsigned long mask = kvm_pmu_valid_counter_mask(vcpu);
+>  		mask &= ~BIT(ARMV8_PMU_CYCLE_IDX);
+>  		for_each_set_bit(i, &mask, 32)
+>  			kvm_pmu_set_counter_value(vcpu, i, 0);
 
-Maybe KVM_GET_SUPPORTED_CPUID could be made more useful if it took an
-argument, such as 'MAX', 'MIGRATABLE', etc.
+Looks reasonable to me, and it fixes the issue described in the commit:
 
-> We do have a code gap to make Arch LBR migratable for any KVM user.
+Reviewed-by: Alexandru Elisei <alexandru.elisei@arm.com>
 
-Right. My point is that the feature as architected appears to be
-migratable. Therefore, it would be reasonable for userspace to assume
-that any KVM implementation that claims to support the feature (via
-KVM_GET_SUPPORTED_CPUID) should support it in a fully migratable way
-(i.e. if the hardware supports the guest LBR depth, then it should be
-able to run the VM, without loss of functionality).
+Thanks,
+
+Alex
+
