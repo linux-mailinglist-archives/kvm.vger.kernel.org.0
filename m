@@ -2,217 +2,138 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C4BE63C8084
-	for <lists+kvm@lfdr.de>; Wed, 14 Jul 2021 10:44:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id F042A3C80DA
+	for <lists+kvm@lfdr.de>; Wed, 14 Jul 2021 10:57:34 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238681AbhGNIrO convert rfc822-to-8bit (ORCPT
-        <rfc822;lists+kvm@lfdr.de>); Wed, 14 Jul 2021 04:47:14 -0400
-Received: from mail-ua1-f46.google.com ([209.85.222.46]:34628 "EHLO
-        mail-ua1-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238628AbhGNIrL (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 14 Jul 2021 04:47:11 -0400
-Received: by mail-ua1-f46.google.com with SMTP id s13so354504uao.1;
-        Wed, 14 Jul 2021 01:44:18 -0700 (PDT)
+        id S238786AbhGNJAC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 14 Jul 2021 05:00:02 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:31072 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S238781AbhGNJAB (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 14 Jul 2021 05:00:01 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1626253029;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=b67pj1XjCFcb4vjOC6L9gEcYmcQccLEDJzYb3n+c66I=;
+        b=izYdgIPViBrjodbEmKIuj31rynO1KOexp4s0EXFtCbJN0aczCRvebWxDEqPH3bFjYFGJiC
+        CZaGgTxbxhySnYm+eGcA6q0Mqc8RAajrNpdR3fAUbNK3JcrHcYvhj/fEUj6Je2jTcmHv0d
+        wQv44fcgVaJljc4kC+4OeHjZX8r4VtI=
+Received: from mail-pj1-f72.google.com (mail-pj1-f72.google.com
+ [209.85.216.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-74-Gh3b8NEFNgmZq17iKiMcog-1; Wed, 14 Jul 2021 04:57:06 -0400
+X-MC-Unique: Gh3b8NEFNgmZq17iKiMcog-1
+Received: by mail-pj1-f72.google.com with SMTP id k23-20020a17090a5917b02901739510b17fso881887pji.6
+        for <kvm@vger.kernel.org>; Wed, 14 Jul 2021 01:57:06 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=r5k/nzvm++7I0kjlsxJbLPoLxldn2GkCJzAXrc4Q3tE=;
-        b=HYt7OhlyET59fENYKovpSBxCiijoiIfp5U60wYyF5ej4/UeoD4xedkgIaeL3k7LJVH
-         TFze34BROVl/KqQ3w4nOvT/eOaJmDh76UNAOdy0C9f1/iPJ2qoKaiU+FtqK5Qm7bNfFy
-         5Jk+Y1W+duADFwm4YoWkJOtejE+Vpnti5lX2qEm5lw2Kbs583dGx5CHcs6i13RnIavhI
-         cKdHiytSHoEWOGUdyv5Bz7FQchQx3Hqe0uBmn2LxnTS9mLHIECd0WOotulSh0J5Xv6DC
-         DLtXPtgD396qs2ITEF0XmaeW9vtjmgzRpce2p0L2jWP7PQl6hIoMf5mGaR+nqm4aBa1s
-         z+Hw==
-X-Gm-Message-State: AOAM530Zu8yDBrP+j3r5+DR4jetcwqgK5OwAdfqEjH0b/Pc9esWnl1vj
-        xEFUtJ5uYfxtLQwC4wcSCbbCm5TzvJ6wFLFuh6k=
-X-Google-Smtp-Source: ABdhPJw+Y3tnjfY/zI+Y1qOhR0PNRzn2MQD3PHuwf/AzIRJfXjUIjP825Ll9FtnbmVsf04QAqWLG0Tq2dErAW2+m0rM=
-X-Received: by 2002:a9f:3f0d:: with SMTP id h13mr12412958uaj.100.1626252258156;
- Wed, 14 Jul 2021 01:44:18 -0700 (PDT)
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-transfer-encoding
+         :content-language;
+        bh=b67pj1XjCFcb4vjOC6L9gEcYmcQccLEDJzYb3n+c66I=;
+        b=Q52r4LHq1rL8JoeNVOuvy+i0/e91D5zdA+/7ixS5uVoG1KY/NDbhojpYUvpkXYGfBT
+         GztHr3GBH5LI8cfEvrOax/aGW/UUTzZ8rE9jDLMmxf2YnqKTyBdvLRP1XsRD1AcpkILj
+         oRTmxXGL7IkjjLVJeZmQVvDQNjYwNquyNEA/NEpybDcdvH/jsCUO/mudUeIYbV91UiTT
+         PJhNCuYkqFf7CKyKKGjxxlngmqWvJ9bAZVpHlUUmXRoUHvn7JxJawkENskv/zdIWhsN4
+         rRqng1zTKiKClBjec6nlBnRDJHiHbdLWW8OFxV/EFpL/5nV6d2QN3NKGeCXQyRNwdKq4
+         YUKA==
+X-Gm-Message-State: AOAM530TSCSLhIXcI8mLXJpA5o8DiDgaBn94WX1NN8hHNyRLQXf2Akro
+        2yt69S8lUYcimk5r+io3gCIo9LBEAO8lrE08OJUaYrOtYAdknWRDXfhsd+yGr43LO1fOolUppA2
+        tQtpg/eBgAHrL
+X-Received: by 2002:a17:90a:af90:: with SMTP id w16mr2814472pjq.129.1626253025289;
+        Wed, 14 Jul 2021 01:57:05 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzI/UxSDMVXZBsCbO/ysTuOL+td5Krg49S3x+yII+Nt1pi43Zbgr08iKwIXB4LRw/hvEMwy1w==
+X-Received: by 2002:a17:90a:af90:: with SMTP id w16mr2814452pjq.129.1626253024987;
+        Wed, 14 Jul 2021 01:57:04 -0700 (PDT)
+Received: from wangxiaodeMacBook-Air.local ([209.132.188.80])
+        by smtp.gmail.com with ESMTPSA id d2sm2127796pgh.59.2021.07.14.01.56.57
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 14 Jul 2021 01:57:04 -0700 (PDT)
+Subject: Re: [PATCH v9 16/17] vduse: Introduce VDUSE - vDPA Device in
+ Userspace
+To:     Greg KH <gregkh@linuxfoundation.org>
+Cc:     "Michael S. Tsirkin" <mst@redhat.com>,
+        Xie Yongji <xieyongji@bytedance.com>, stefanha@redhat.com,
+        sgarzare@redhat.com, parav@nvidia.com, hch@infradead.org,
+        christian.brauner@canonical.com, rdunlap@infradead.org,
+        willy@infradead.org, viro@zeniv.linux.org.uk, axboe@kernel.dk,
+        bcrl@kvack.org, corbet@lwn.net, mika.penttila@nextfour.com,
+        dan.carpenter@oracle.com, joro@8bytes.org, zhe.he@windriver.com,
+        xiaodong.liu@intel.com, songmuchun@bytedance.com,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        kvm@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        iommu@lists.linux-foundation.org, linux-kernel@vger.kernel.org
+References: <20210713084656.232-1-xieyongji@bytedance.com>
+ <20210713084656.232-17-xieyongji@bytedance.com>
+ <26116714-f485-eeab-4939-71c4c10c30de@redhat.com>
+ <20210714014817-mutt-send-email-mst@kernel.org>
+ <0565ed6c-88e2-6d93-7cc6-7b4afaab599c@redhat.com>
+ <YO6IiDIMUjQsA2LS@kroah.com>
+From:   Jason Wang <jasowang@redhat.com>
+Message-ID: <a493bc51-9a5c-05f1-2eac-54cb9e6c9d9b@redhat.com>
+Date:   Wed, 14 Jul 2021 16:56:55 +0800
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0)
+ Gecko/20100101 Thunderbird/78.11.0
 MIME-Version: 1.0
-References: <20210713193522.1770306-1-u.kleine-koenig@pengutronix.de> <20210713193522.1770306-6-u.kleine-koenig@pengutronix.de>
-In-Reply-To: <20210713193522.1770306-6-u.kleine-koenig@pengutronix.de>
-From:   Geert Uytterhoeven <geert@linux-m68k.org>
-Date:   Wed, 14 Jul 2021 10:44:06 +0200
-Message-ID: <CAMuHMdW8r6u4O5zv2ee-3=jPP6qwnOSHdSzf8pPE_y=jY3Bn5A@mail.gmail.com>
-Subject: Re: [PATCH v4 5/5] bus: Make remove callback return void
-To:     =?UTF-8?Q?Uwe_Kleine=2DK=C3=B6nig?= 
-        <u.kleine-koenig@pengutronix.de>
-Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Sascha Hauer <kernel@pengutronix.de>,
-        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
-        Alexandre Belloni <alexandre.belloni@bootlin.com>,
-        Alexandre Bounine <alex.bou9@gmail.com>,
-        Alex Dubov <oakad@yahoo.com>, Alex Elder <elder@kernel.org>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Alison Schofield <alison.schofield@intel.com>,
-        Allen Hubbe <allenbh@gmail.com>,
-        Andreas Noever <andreas.noever@gmail.com>,
-        Andy Gross <agross@kernel.org>, Arnd Bergmann <arnd@arndb.de>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        Benjamin Tissoires <benjamin.tissoires@redhat.com>,
-        Ben Widawsky <ben.widawsky@intel.com>,
-        Bjorn Andersson <bjorn.andersson@linaro.org>,
-        Bjorn Helgaas <bhelgaas@google.com>,
-        Bodo Stroesser <bostroesser@gmail.com>,
-        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
-        Chen-Yu Tsai <wens@csie.org>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Cristian Marussi <cristian.marussi@arm.com>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Dave Jiang <dave.jiang@intel.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        David Woodhouse <dwmw@amazon.co.uk>,
-        Dexuan Cui <decui@microsoft.com>,
-        Dmitry Torokhov <dmitry.torokhov@gmail.com>,
-        Dominik Brodowski <linux@dominikbrodowski.net>,
-        Finn Thain <fthain@linux-m68k.org>,
-        Florian Fainelli <f.fainelli@gmail.com>,
-        Frank Li <lznuaa@gmail.com>,
-        Geoff Levand <geoff@infradead.org>,
-        Haiyang Zhang <haiyangz@microsoft.com>,
-        Hannes Reinecke <hare@suse.de>,
-        Hans de Goede <hdegoede@redhat.com>,
-        Harald Freudenberger <freude@linux.ibm.com>,
-        Heikki Krogerus <heikki.krogerus@linux.intel.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Helge Deller <deller@gmx.de>, Ira Weiny <ira.weiny@intel.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        "James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>,
-        Jaroslav Kysela <perex@perex.cz>,
-        Jason Wang <jasowang@redhat.com>,
-        Jens Taprogge <jens.taprogge@taprogge.org>,
-        Jernej Skrabec <jernej.skrabec@gmail.com>,
-        Jiri Kosina <jikos@kernel.org>,
-        Jiri Slaby <jirislaby@kernel.org>,
-        Joey Pabalan <jpabalanb@gmail.com>,
-        Johan Hovold <johan@kernel.org>,
-        Johannes Berg <johannes@sipsolutions.net>,
-        Johannes Thumshirn <morbidrsa@gmail.com>,
-        Jon Mason <jdmason@kudzu.us>, Juergen Gross <jgross@suse.com>,
-        Julien Grall <jgrall@amazon.com>,
-        Kai-Heng Feng <kai.heng.feng@canonical.com>,
-        Kirti Wankhede <kwankhede@nvidia.com>,
-        Kishon Vijay Abraham I <kishon@ti.com>,
-        =?UTF-8?Q?Krzysztof_Wilczy=C5=84ski?= <kw@linux.com>,
-        "K. Y. Srinivasan" <kys@microsoft.com>,
-        Lee Jones <lee.jones@linaro.org>, Len Brown <lenb@kernel.org>,
-        Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>,
-        Manohar Vanga <manohar.vanga@gmail.com>,
-        Marc Zyngier <maz@kernel.org>, Mark Brown <broonie@kernel.org>,
-        Mark Gross <mgross@linux.intel.com>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        Martyn Welch <martyn@welchs.me.uk>,
-        Mathieu Poirier <mathieu.poirier@linaro.org>,
-        Matt Porter <mporter@kernel.crashing.org>,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        Maxime Ripard <mripard@kernel.org>,
-        Maximilian Luz <luzmaximilian@gmail.com>,
-        Maxim Levitsky <maximlevitsky@gmail.com>,
-        Michael Buesch <m@bues.ch>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Michael Jamet <michael.jamet@intel.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Mika Westerberg <mika.westerberg@linux.intel.com>,
-        Mike Christie <michael.christie@oracle.com>,
-        Moritz Fischer <mdf@kernel.org>,
-        Ohad Ben-Cohen <ohad@wizery.com>,
-        =?UTF-8?Q?Pali_Roh=C3=A1r?= <pali@kernel.org>,
-        Paul Mackerras <paulus@samba.org>,
-        Peter Oberparleiter <oberpar@linux.ibm.com>,
-        "Rafael J. Wysocki" <rjw@rjwysocki.net>,
-        =?UTF-8?B?UmFmYcWCIE1pxYJlY2tp?= <zajec5@gmail.com>,
-        Rich Felker <dalias@libc.org>,
-        Rikard Falkeborn <rikard.falkeborn@gmail.com>,
-        Rob Herring <robh@kernel.org>,
-        Russell King <linux@armlinux.org.uk>,
-        "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
-        Samuel Holland <samuel@sholland.org>,
-        Samuel Iglesias Gonsalvez <siglesias@igalia.com>,
-        SeongJae Park <sjpark@amazon.de>,
-        Srinivas Kandagatla <srinivas.kandagatla@linaro.org>,
-        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
-        Stefano Stabellini <sstabellini@kernel.org>,
-        Stefan Richter <stefanr@s5r6.in-berlin.de>,
-        Stephen Boyd <sboyd@kernel.org>,
-        Stephen Hemminger <sthemmin@microsoft.com>,
-        Sudeep Holla <sudeep.holla@arm.com>,
-        Sven Van Asbroeck <TheSven73@gmail.com>,
-        Takashi Iwai <tiwai@suse.com>,
-        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
-        Thorsten Scherer <t.scherer@eckelmann.de>,
-        Tomas Winkler <tomas.winkler@intel.com>,
-        Tom Rix <trix@redhat.com>,
-        Tyrel Datwyler <tyreld@linux.ibm.com>,
-        Ulf Hansson <ulf.hansson@linaro.org>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Vineeth Vijayan <vneethv@linux.ibm.com>,
-        Vinod Koul <vkoul@kernel.org>,
-        Vishal Verma <vishal.l.verma@intel.com>,
-        Wei Liu <wei.liu@kernel.org>,
-        William Breathitt Gray <vilhelm.gray@gmail.com>,
-        Wolfram Sang <wsa@kernel.org>, Wu Hao <hao.wu@intel.com>,
-        Yehezkel Bernat <YehezkelShB@gmail.com>,
-        Yoshinori Sato <ysato@users.sourceforge.jp>,
-        YueHaibing <yuehaibing@huawei.com>,
-        Yufen Yu <yuyufen@huawei.com>, alsa-devel@alsa-project.org,
-        dmaengine@vger.kernel.org, greybus-dev@lists.linaro.org,
-        industrypack-devel@lists.sourceforge.net, kvm@vger.kernel.org,
-        linux1394-devel@lists.sourceforge.net, linux-acpi@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org,
-        linux-arm-msm@vger.kernel.org, linux-cxl@vger.kernel.org,
-        linux-fpga@vger.kernel.org, linux-hyperv@vger.kernel.org,
-        linux-i2c@vger.kernel.org, linux-i3c@lists.infradead.org,
-        linux-input@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-m68k@lists.linux-m68k.org, linux-media@vger.kernel.org,
-        linux-mips@vger.kernel.org, linux-mmc@vger.kernel.org,
-        linux-ntb@googlegroups.com, linux-parisc@vger.kernel.org,
-        linux-pci@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-        linux-remoteproc@vger.kernel.org, linux-s390@vger.kernel.org,
-        linux-scsi@vger.kernel.org, linux-serial@vger.kernel.org,
-        linux-sh@vger.kernel.org, linux-spi@vger.kernel.org,
-        linux-staging@lists.linux.dev, linux-sunxi@lists.linux.dev,
-        linux-usb@vger.kernel.org, linux-wireless@vger.kernel.org,
-        netdev@vger.kernel.org, nvdimm@lists.linux.dev,
-        platform-driver-x86@vger.kernel.org, sparclinux@vger.kernel.org,
-        target-devel@vger.kernel.org,
-        virtualization@lists.linux-foundation.org,
-        xen-devel@lists.xenproject.org,
-        Johannes Thumshirn <jth@kernel.org>,
-        "Rafael J . Wysocki" <rafael@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8BIT
+In-Reply-To: <YO6IiDIMUjQsA2LS@kroah.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jul 13, 2021 at 9:35 PM Uwe Kleine-König
-<u.kleine-koenig@pengutronix.de> wrote:
-> The driver core ignores the return value of this callback because there
-> is only little it can do when a device disappears.
+
+在 2021/7/14 下午2:47, Greg KH 写道:
+> On Wed, Jul 14, 2021 at 02:02:50PM +0800, Jason Wang wrote:
+>> 在 2021/7/14 下午1:54, Michael S. Tsirkin 写道:
+>>> On Wed, Jul 14, 2021 at 01:45:39PM +0800, Jason Wang wrote:
+>>>>> +static int vduse_dev_msg_sync(struct vduse_dev *dev,
+>>>>> +			      struct vduse_dev_msg *msg)
+>>>>> +{
+>>>>> +	int ret;
+>>>>> +
+>>>>> +	init_waitqueue_head(&msg->waitq);
+>>>>> +	spin_lock(&dev->msg_lock);
+>>>>> +	msg->req.request_id = dev->msg_unique++;
+>>>>> +	vduse_enqueue_msg(&dev->send_list, msg);
+>>>>> +	wake_up(&dev->waitq);
+>>>>> +	spin_unlock(&dev->msg_lock);
+>>>>> +
+>>>>> +	wait_event_killable_timeout(msg->waitq, msg->completed,
+>>>>> +				    VDUSE_REQUEST_TIMEOUT * HZ);
+>>>>> +	spin_lock(&dev->msg_lock);
+>>>>> +	if (!msg->completed) {
+>>>>> +		list_del(&msg->list);
+>>>>> +		msg->resp.result = VDUSE_REQ_RESULT_FAILED;
+>>>>> +	}
+>>>>> +	ret = (msg->resp.result == VDUSE_REQ_RESULT_OK) ? 0 : -EIO;
+>>>> I think we should mark the device as malfunction when there is a timeout and
+>>>> forbid any userspace operations except for the destroy aftwards for safety.
+>>> This looks like if one tried to run gdb on the program the behaviour
+>>> will change completely because kernel wants it to respond within
+>>> specific time. Looks like a receipe for heisenbugs.
+>>>
+>>> Let's not build interfaces with arbitrary timeouts like that.
+>>> Interruptible wait exists for this very reason.
+>>
+>> The problem is. Do we want userspace program like modprobe to be stuck for
+>> indefinite time and expect the administrator to kill that?
+> Why would modprobe be stuck for forever?
 >
-> This is the final bit of a long lasting cleanup quest where several
-> buses were converted to also return void from their remove callback.
-> Additionally some resource leaks were fixed that were caused by drivers
-> returning an error code in the expectation that the driver won't go
-> away.
+> Is this on the module probe path?
+
+
+Yes, it is called in the device probing path where the kernel forwards 
+the device configuration request to userspace and wait for its response.
+
+If it turns out to be tricky, we can implement the whole device inside 
+the kernel and leave only the datapath in the userspace (as what TUN did).
+
+Thanks
+
+
 >
-> With struct bus_type::remove returning void it's prevented that newly
-> implemented buses return an ignored error code and so don't anticipate
-> wrong expectations for driver authors.
 
->  drivers/zorro/zorro-driver.c              | 3 +--
-
-Acked-by: Geert Uytterhoeven <geert@linux-m68k.org>
-
-Gr{oetje,eeting}s,
-
-                        Geert
-
--- 
-Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
-
-In personal conversations with technical people, I call myself a hacker. But
-when I'm talking to journalists I just say "programmer" or something like that.
-                                -- Linus Torvalds
