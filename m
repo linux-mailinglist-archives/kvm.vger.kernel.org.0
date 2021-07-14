@@ -2,164 +2,263 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 434DA3C855C
-	for <lists+kvm@lfdr.de>; Wed, 14 Jul 2021 15:33:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E96003C8561
+	for <lists+kvm@lfdr.de>; Wed, 14 Jul 2021 15:35:40 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232007AbhGNNgr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 14 Jul 2021 09:36:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48396 "EHLO
+        id S232321AbhGNNia (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 14 Jul 2021 09:38:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48788 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231485AbhGNNgq (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 14 Jul 2021 09:36:46 -0400
-Received: from mail-pg1-x533.google.com (mail-pg1-x533.google.com [IPv6:2607:f8b0:4864:20::533])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4CFA0C06175F;
-        Wed, 14 Jul 2021 06:33:54 -0700 (PDT)
-Received: by mail-pg1-x533.google.com with SMTP id u14so2399764pga.11;
-        Wed, 14 Jul 2021 06:33:54 -0700 (PDT)
+        with ESMTP id S232170AbhGNNia (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 14 Jul 2021 09:38:30 -0400
+Received: from mail-qt1-x82b.google.com (mail-qt1-x82b.google.com [IPv6:2607:f8b0:4864:20::82b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D4DECC061760
+        for <kvm@vger.kernel.org>; Wed, 14 Jul 2021 06:35:37 -0700 (PDT)
+Received: by mail-qt1-x82b.google.com with SMTP id r17so1846148qtp.5
+        for <kvm@vger.kernel.org>; Wed, 14 Jul 2021 06:35:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=to:cc:references:from:subject:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=zXeJ5upciacjDJ+R0O8tajIDexHBhtbchVhzFOMwTgk=;
-        b=VBBHOC5rZLUn9BjaxpBV2az1ka/YY2mtcfGvyhJkoWBW4C6p08XBCwkPGMaLOrQd8U
-         2q8ao+bF3Gr6NVqQZA3UCC/9mO3P8y6MIsGux0lDxbIPYWQF/xIuL/CdrhTrBdqQL5fE
-         joZsunPXTNt7nws1LOfgVvgkoJlKYhzSSlPUtDZGUl9OAC8XHydtEtk9EOn4ycrFmzFX
-         cuSqod6mHioeTh6zfKHZ0afNXiZChdCVJuwbSFLX+KmMRFnhgntvzgfKHtWqsRyYKAcX
-         YwxY13BrVRrMhMv24CKR9ZuFzbaGDADvwKIn5dFYuDNMBH/snOjLubpl0Sblln8SCjJP
-         i5EA==
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=gezvR5OfWZEWK2TINd2PVmo/b1ZbFygnVhycPzHy+1c=;
+        b=iIy+9GSk+zYyAeMPjHL4uxaQ+VRSxHyvLemv6SdeDForAaOLO96KR6F4Oirhi6E4mT
+         dRQSiEO63qs8RIylfOlbHut9wIAE3UKvoUwo1dHevzTGpDEVY/ZjLw4piW1Bxy0tIC1p
+         FZD21VNTrLIh/awNsx50LT0NfrI5d85JM6UaNeCwk4t9KcRv2XADcMeepIWVgx2Xsqx9
+         q3AgIVFayuSe7UduLS/mKtyGoeabwpwL8292TftpMQZzaYhYSI0P3uBXw9/OMIDLn9+F
+         mpjW5cGWLQBjpT33lLmlgQwgcwipQg86TKe44W3/kRJBp4S818Njgg4CFZo8kjEVY450
+         A7Og==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:to:cc:references:from:subject:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=zXeJ5upciacjDJ+R0O8tajIDexHBhtbchVhzFOMwTgk=;
-        b=PScIR/Ibbg4YQ7umEVrMv4JVARXeQKluvjW7eK+lJIisVF/BUvQJ0c22NWFtHXwbKK
-         dyMssIs0AZe+94juWJ5FLXfsu6vVXE4kzvpkc/VNM3sTTtNYTRPJb7FC0rXi2av4liig
-         QHar6BXINeIwA5AaB0WZuzJN3TUi3D8tAWXzp+iTMvjxtU2A8rrGbnjnOF+zaxYVxF76
-         Kj2JROVWLWfjonobzCV2EYxZiq+OO0/nR2aVfjnZDr4L/Q2DuP5f5VAH6pLacZ2BNFay
-         e+EYpt/+bJ8zW4PrWTZhYAcxXoZauzAJKtbMullntU3MUd57yznsaaFYlxoaS5jOoUQI
-         mJ+g==
-X-Gm-Message-State: AOAM533saLuHMqFgWgRTF1+5JsNnIi4BZlCajwT6CSHex1veUEfSMZ2c
-        XLYOLW2xGIIdLPt77u9j+Ng=
-X-Google-Smtp-Source: ABdhPJzD0xh+BNL1MmJj8lN/oi8ZHi5fuiKMhAxbWe7f70VJbnvlqatZV4uFTACZA2B4pRf/AVMbjQ==
-X-Received: by 2002:a65:5648:: with SMTP id m8mr9812707pgs.93.1626269633846;
-        Wed, 14 Jul 2021 06:33:53 -0700 (PDT)
-Received: from Likes-MacBook-Pro.local ([103.7.29.32])
-        by smtp.gmail.com with ESMTPSA id i8sm2796525pfo.154.2021.07.14.06.33.51
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 14 Jul 2021 06:33:53 -0700 (PDT)
-To:     Jim Mattson <jmattson@google.com>
-Cc:     Yang Weijiang <weijiang.yang@intel.com>, pbonzini@redhat.com,
-        seanjc@google.com, vkuznets@redhat.com, wei.w.wang@intel.com,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        "kan.liang@linux.intel.com" <kan.liang@linux.intel.com>
-References: <1625825111-6604-1-git-send-email-weijiang.yang@intel.com>
- <1625825111-6604-7-git-send-email-weijiang.yang@intel.com>
- <CALMp9eQEs9pUyy1PpwLPG0_PtF07tR2Opw+1b=w4-knOwYPvvg@mail.gmail.com>
- <CALMp9eQ+9czB0ayBFR3-nW-ynKuH0v9uHAGeV4wgkXYJMSs1=w@mail.gmail.com>
- <20210712095305.GE12162@intel.com>
- <d73eb316-4e09-a924-5f60-e3778db91df4@gmail.com>
- <CALMp9eQmK+asv7fXeUpF2UiRKL7VmZx44HMGj67aSqm0k9nKVg@mail.gmail.com>
- <CALMp9eSWDmWerj5CaxRyMiNqnBf1akHHaWV2Cfq_66Xjg-0MEw@mail.gmail.com>
- <12a3e8e4-3183-9917-c9d5-59ab257b8fd3@gmail.com>
- <CALMp9eROgWVBe1NuqD46xbgXHedgAFW1EMFX5zW-_Ee5enHmnw@mail.gmail.com>
-From:   Like Xu <like.xu.linux@gmail.com>
-Subject: Re: [PATCH v5 06/13] KVM: x86/vmx: Save/Restore host MSR_ARCH_LBR_CTL
- state
-Message-ID: <cb4c1daa-f7a3-4f9c-fcdd-6a91e0dbcab4@gmail.com>
-Date:   Wed, 14 Jul 2021 21:33:44 +0800
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0)
- Gecko/20100101 Thunderbird/78.11.0
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=gezvR5OfWZEWK2TINd2PVmo/b1ZbFygnVhycPzHy+1c=;
+        b=dK3ovAfeWNvHx4AcVHoKp9fyiB177SuumkmxCUEOGLSU4nv6u83iAZEkf0rBBd+m26
+         mdz702L+YzBY5XGsaq2jU+giMM2l0cOlio7kJYQnvdJ6cMgwQ1pH8Y10iRM8+18tLO6h
+         Wc+MnVG62wEmrbBsQLQN9N5M8+y3b1z3uHEMDGCWVPguzgpoFSeI9xtqqNSZZGmEMMBu
+         pyFxomJSm5yLK0+krdQ5VBE19KVjupJ1D0HhJTAKjJAliR4JdJhm73bBI1blBH/I8+Qa
+         ua3xSEgQpKMsshYnNJ0dRQ+iIITGUzUlg9c7aAV5bTRyrW9XLB0PKQ75JAg66tZOoJFd
+         PrfA==
+X-Gm-Message-State: AOAM5304L9fKs5dTuKP8+lU+I0DlCQjoAtgv5KghL3bS4WCxfwvCtQI8
+        +Uze23v6HqnmXsfLxYQJkPyXAQsqeGnE01fTi6/V3g==
+X-Google-Smtp-Source: ABdhPJypSv0TU7nBnxqsDHmSUMM1jMnGMe3CBMSxE5apXqTiTt8f2xDtYPwfN2OTi2rinidVsdixs65t6ruo5TJDyGw=
+X-Received: by 2002:a05:622a:409:: with SMTP id n9mr9370891qtx.261.1626269736594;
+ Wed, 14 Jul 2021 06:35:36 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <CALMp9eROgWVBe1NuqD46xbgXHedgAFW1EMFX5zW-_Ee5enHmnw@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+References: <20210707183616.5620-1-brijesh.singh@amd.com> <20210707183616.5620-21-brijesh.singh@amd.com>
+In-Reply-To: <20210707183616.5620-21-brijesh.singh@amd.com>
+From:   Marc Orr <marcorr@google.com>
+Date:   Wed, 14 Jul 2021 06:35:25 -0700
+Message-ID: <CAA03e5FMD8xvvBdf9gqdoR05xF9+scLZBNLpx9iP6WVWK84xdw@mail.gmail.com>
+Subject: Re: [PATCH Part2 RFC v4 20/40] KVM: SVM: Make AVIC backing, VMSA and
+ VMCB memory allocation SNP safe
+To:     Brijesh Singh <brijesh.singh@amd.com>
+Cc:     x86@kernel.org, linux-kernel@vger.kernel.org,
+        kvm list <kvm@vger.kernel.org>, linux-efi@vger.kernel.org,
+        platform-driver-x86@vger.kernel.org, linux-coco@lists.linux.dev,
+        linux-mm@kvack.org, linux-crypto@vger.kernel.org,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        David Rientjes <rientjes@google.com>,
+        Dov Murik <dovmurik@linux.ibm.com>,
+        Tobin Feldman-Fitzthum <tobin@ibm.com>,
+        Borislav Petkov <bp@alien8.de>,
+        Michael Roth <michael.roth@amd.com>,
+        Vlastimil Babka <vbabka@suse.cz>, tony.luck@intel.com,
+        npmccallum@redhat.com, brijesh.ksingh@gmail.com
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 14/7/2021 1:00 am, Jim Mattson wrote:
-> On Tue, Jul 13, 2021 at 2:49 AM Like Xu <like.xu.linux@gmail.com> wrote:
->>
->> On 13/7/2021 1:45 am, Jim Mattson wrote:
->>> On Mon, Jul 12, 2021 at 10:20 AM Jim Mattson <jmattson@google.com> wrote:
->>>>
->>>> On Mon, Jul 12, 2021 at 3:19 AM Like Xu <like.xu.linux@gmail.com> wrote:
->>>>>
->>>>> On 12/7/2021 5:53 pm, Yang Weijiang wrote:
->>>>>> On Fri, Jul 09, 2021 at 04:41:30PM -0700, Jim Mattson wrote:
->>>>>>> On Fri, Jul 9, 2021 at 3:54 PM Jim Mattson <jmattson@google.com> wrote:
->>>>>>>>
->>>>>>>> On Fri, Jul 9, 2021 at 2:51 AM Yang Weijiang <weijiang.yang@intel.com> wrote:
->>>>>>>>>
->>>>>>>>> If host is using MSR_ARCH_LBR_CTL then save it before vm-entry
->>>>>>>>> and reload it after vm-exit.
->>>>>>>>
->>>>>>>> I don't see anything being done here "before VM-entry" or "after
->>>>>>>> VM-exit." This code seems to be invoked on vcpu_load and vcpu_put.
->>>>>>>>
->>>>>>>> In any case, I don't see why this one MSR is special. It seems that if
->>>>>>>> the host is using the architectural LBR MSRs, then *all* of the host
->>>>>>>> architectural LBR MSRs have to be saved on vcpu_load and restored on
->>>>>>>> vcpu_put. Shouldn't  kvm_load_guest_fpu() and kvm_put_guest_fpu() do
->>>>>>>> that via the calls to kvm_save_current_fpu(vcpu->arch.user_fpu) and
->>>>>>>> restore_fpregs_from_fpstate(&vcpu->arch.user_fpu->state)?
->>>>>>>
->>>>>>> It does seem like there is something special about IA32_LBR_DEPTH, though...
->>>>>>>
->>>>>>> Section 7.3.1 of the Intel® Architecture Instruction Set Extensions
->>>>>>> and Future Features Programming Reference
->>>>>>> says, "IA32_LBR_DEPTH is saved by XSAVES, but it is not written by
->>>>>>> XRSTORS in any circumstance." It seems like that would require some
->>>>>>> special handling if the host depth and the guest depth do not match.
->>>>>> In our vPMU design, guest depth is alway kept the same as that of host,
->>>>>> so this won't be a problem. But I'll double check the code again, thanks!
->>>>>
->>>>> KVM only exposes the host's depth value to the user space
->>>>> so the guest can only use the same depth as the host.
->>>>
->>>> The allowed depth supplied by KVM_GET_SUPPORTED_CPUID isn't enforced,
->>>> though, is it?
->>
->> Like other hardware dependent features, the functionality will not
->> promise to work properly if the guest uses the unsupported CPUID.
-> 
-> It's fine if it doesn't work in the guest, but can't a guest with the
-> wrong depth prevent the host LBRs from being reloaded when switching
-> back to the host state? It's definitely not okay for an ill-configured
-> guest to break host functionality.
+On Wed, Jul 7, 2021 at 11:38 AM Brijesh Singh <brijesh.singh@amd.com> wrote:
+>
+> When SEV-SNP is globally enabled on a system, the VMRUN instruction
+> performs additional security checks on AVIC backing, VMSA, and VMCB page.
+> On a successful VMRUN, these pages are marked "in-use" by the
+> hardware in the RMP entry, and any attempt to modify the RMP entry for
+> these pages will result in page-fault (RMP violation check).
+>
+> While performing the RMP check, hardware will try to create a 2MB TLB
+> entry for the large page accesses. When it does this, it first reads
+> the RMP for the base of 2MB region and verifies that all this memory is
+> safe. If AVIC backing, VMSA, and VMCB memory happen to be the base of
+> 2MB region, then RMP check will fail because of the "in-use" marking for
+> the base entry of this 2MB region.
+>
+> e.g.
+>
+> 1. A VMCB was allocated on 2MB-aligned address.
+> 2. The VMRUN instruction marks this RMP entry as "in-use".
+> 3. Another process allocated some other page of memory that happened to be
+>    within the same 2MB region.
+> 4. That process tried to write its page using physmap.
+>
+> If the physmap entry in step #4 uses a large (1G/2M) page, then the
+> hardware will attempt to create a 2M TLB entry. The hardware will find
+> that the "in-use" bit is set in the RMP entry (because it was a
+> VMCB page) and will cause an RMP violation check.
+>
+> See APM2 section 15.36.12 for more information on VMRUN checks when
+> SEV-SNP is globally active.
+>
+> A generic allocator can return a page which are 2M aligned and will not
+> be safe to be used when SEV-SNP is globally enabled. Add a
+> snp_safe_alloc_page() helper that can be used for allocating the
+> SNP safe memory. The helper allocated 2 pages and splits them into order-1
+> allocation. It frees one page and keeps one of the page which is not
+> 2M aligned.
+>
+> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
 
-If the ownership of LBR changes, there must be two (or more) LBR events
-for perf event scheduling switch for current task, and the perf
-subsystem callback will save the previous LBR state and restore
-the state of the next LBR event considering different depths.
+Co-developed-by: Marc Orr <marcorr@google.com>
 
-> 
->>>
->>> Also, doesn't this end up being a major constraint on future
->>> platforms? Every host that this vCPU will ever run on will have to use
->>> the same LBR depth as the host on which it was started.
->>>
->>
->> As a first step, we made the guest LBR feature only available for the
->> "migratable=off" user space, which is why we intentionally did not add
->> MSR_ARCH_LBR_* stuff to msrs_to_save_all[] in earlier versions.
-> 
-> We have no such concept in our user space. Features that are not
-> migratable should clearly be identified as such by an appropriate KVM
-> API. At present, I don't believe there is such an API.
+The original version of this patch had this tag. I think it got
+dropped on accident.
 
-I couldn't agree with you more on this point.
-
-We do have a code gap to make Arch LBR migratable for any KVM user.
-
-> 
->> But hopefully, we may make it at least migratable for Arch LBR.
->>
->> I'm personally curious about the cost of using XSAVES to swicth
->> guest lbr msrs during vmx transaction, and if the cost is unacceptable,
->> we may ask the perf host to adjust different depths for threads.
->>
->>
-> 
+> ---
+>  arch/x86/include/asm/kvm_host.h |  1 +
+>  arch/x86/kvm/lapic.c            |  5 ++++-
+>  arch/x86/kvm/svm/sev.c          | 27 +++++++++++++++++++++++++++
+>  arch/x86/kvm/svm/svm.c          | 16 ++++++++++++++--
+>  arch/x86/kvm/svm/svm.h          |  1 +
+>  5 files changed, 47 insertions(+), 3 deletions(-)
+>
+> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+> index 55efbacfc244..188110ab2c02 100644
+> --- a/arch/x86/include/asm/kvm_host.h
+> +++ b/arch/x86/include/asm/kvm_host.h
+> @@ -1383,6 +1383,7 @@ struct kvm_x86_ops {
+>         int (*complete_emulated_msr)(struct kvm_vcpu *vcpu, int err);
+>
+>         void (*vcpu_deliver_sipi_vector)(struct kvm_vcpu *vcpu, u8 vector);
+> +       void *(*alloc_apic_backing_page)(struct kvm_vcpu *vcpu);
+>  };
+>
+>  struct kvm_x86_nested_ops {
+> diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
+> index c0ebef560bd1..d4c77f66d7d5 100644
+> --- a/arch/x86/kvm/lapic.c
+> +++ b/arch/x86/kvm/lapic.c
+> @@ -2441,7 +2441,10 @@ int kvm_create_lapic(struct kvm_vcpu *vcpu, int timer_advance_ns)
+>
+>         vcpu->arch.apic = apic;
+>
+> -       apic->regs = (void *)get_zeroed_page(GFP_KERNEL_ACCOUNT);
+> +       if (kvm_x86_ops.alloc_apic_backing_page)
+> +               apic->regs = kvm_x86_ops.alloc_apic_backing_page(vcpu);
+> +       else
+> +               apic->regs = (void *)get_zeroed_page(GFP_KERNEL_ACCOUNT);
+>         if (!apic->regs) {
+>                 printk(KERN_ERR "malloc apic regs error for vcpu %x\n",
+>                        vcpu->vcpu_id);
+> diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+> index b8505710c36b..411ed72f63af 100644
+> --- a/arch/x86/kvm/svm/sev.c
+> +++ b/arch/x86/kvm/svm/sev.c
+> @@ -2692,3 +2692,30 @@ void sev_vcpu_deliver_sipi_vector(struct kvm_vcpu *vcpu, u8 vector)
+>                 break;
+>         }
+>  }
+> +
+> +struct page *snp_safe_alloc_page(struct kvm_vcpu *vcpu)
+> +{
+> +       unsigned long pfn;
+> +       struct page *p;
+> +
+> +       if (!cpu_feature_enabled(X86_FEATURE_SEV_SNP))
+> +               return alloc_page(GFP_KERNEL_ACCOUNT | __GFP_ZERO);
+> +
+> +       p = alloc_pages(GFP_KERNEL_ACCOUNT | __GFP_ZERO, 1);
+> +       if (!p)
+> +               return NULL;
+> +
+> +       /* split the page order */
+> +       split_page(p, 1);
+> +
+> +       /* Find a non-2M aligned page */
+> +       pfn = page_to_pfn(p);
+> +       if (IS_ALIGNED(__pfn_to_phys(pfn), PMD_SIZE)) {
+> +               pfn++;
+> +               __free_page(p);
+> +       } else {
+> +               __free_page(pfn_to_page(pfn + 1));
+> +       }
+> +
+> +       return pfn_to_page(pfn);
+> +}
+> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+> index 2acf187a3100..a7adf6ca1713 100644
+> --- a/arch/x86/kvm/svm/svm.c
+> +++ b/arch/x86/kvm/svm/svm.c
+> @@ -1336,7 +1336,7 @@ static int svm_create_vcpu(struct kvm_vcpu *vcpu)
+>         svm = to_svm(vcpu);
+>
+>         err = -ENOMEM;
+> -       vmcb01_page = alloc_page(GFP_KERNEL_ACCOUNT | __GFP_ZERO);
+> +       vmcb01_page = snp_safe_alloc_page(vcpu);
+>         if (!vmcb01_page)
+>                 goto out;
+>
+> @@ -1345,7 +1345,7 @@ static int svm_create_vcpu(struct kvm_vcpu *vcpu)
+>                  * SEV-ES guests require a separate VMSA page used to contain
+>                  * the encrypted register state of the guest.
+>                  */
+> -               vmsa_page = alloc_page(GFP_KERNEL_ACCOUNT | __GFP_ZERO);
+> +               vmsa_page = snp_safe_alloc_page(vcpu);
+>                 if (!vmsa_page)
+>                         goto error_free_vmcb_page;
+>
+> @@ -4439,6 +4439,16 @@ static int svm_vm_init(struct kvm *kvm)
+>         return 0;
+>  }
+>
+> +static void *svm_alloc_apic_backing_page(struct kvm_vcpu *vcpu)
+> +{
+> +       struct page *page = snp_safe_alloc_page(vcpu);
+> +
+> +       if (!page)
+> +               return NULL;
+> +
+> +       return page_address(page);
+> +}
+> +
+>  static struct kvm_x86_ops svm_x86_ops __initdata = {
+>         .hardware_unsetup = svm_hardware_teardown,
+>         .hardware_enable = svm_hardware_enable,
+> @@ -4564,6 +4574,8 @@ static struct kvm_x86_ops svm_x86_ops __initdata = {
+>         .complete_emulated_msr = svm_complete_emulated_msr,
+>
+>         .vcpu_deliver_sipi_vector = svm_vcpu_deliver_sipi_vector,
+> +
+> +       .alloc_apic_backing_page = svm_alloc_apic_backing_page,
+>  };
+>
+>  static struct kvm_x86_init_ops svm_init_ops __initdata = {
+> diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
+> index 5f874168551b..1175edb02d33 100644
+> --- a/arch/x86/kvm/svm/svm.h
+> +++ b/arch/x86/kvm/svm/svm.h
+> @@ -554,6 +554,7 @@ void sev_es_create_vcpu(struct vcpu_svm *svm);
+>  void sev_vcpu_deliver_sipi_vector(struct kvm_vcpu *vcpu, u8 vector);
+>  void sev_es_prepare_guest_switch(struct vcpu_svm *svm, unsigned int cpu);
+>  void sev_es_unmap_ghcb(struct vcpu_svm *svm);
+> +struct page *snp_safe_alloc_page(struct kvm_vcpu *vcpu);
+>
+>  /* vmenter.S */
+>
+> --
+> 2.17.1
+>
+>
