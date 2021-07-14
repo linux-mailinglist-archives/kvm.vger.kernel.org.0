@@ -2,59 +2,64 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 662053C8844
-	for <lists+kvm@lfdr.de>; Wed, 14 Jul 2021 18:01:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6F07C3C8847
+	for <lists+kvm@lfdr.de>; Wed, 14 Jul 2021 18:02:11 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232418AbhGNQEu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 14 Jul 2021 12:04:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54434 "EHLO
+        id S239800AbhGNQEx (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 14 Jul 2021 12:04:53 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54442 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232392AbhGNQEt (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 14 Jul 2021 12:04:49 -0400
-Received: from mail-pg1-x549.google.com (mail-pg1-x549.google.com [IPv6:2607:f8b0:4864:20::549])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 340BCC061760
-        for <kvm@vger.kernel.org>; Wed, 14 Jul 2021 09:01:58 -0700 (PDT)
-Received: by mail-pg1-x549.google.com with SMTP id o9-20020a6561490000b0290226fc371410so1983154pgv.8
-        for <kvm@vger.kernel.org>; Wed, 14 Jul 2021 09:01:58 -0700 (PDT)
+        with ESMTP id S239774AbhGNQEw (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 14 Jul 2021 12:04:52 -0400
+Received: from mail-qv1-xf4a.google.com (mail-qv1-xf4a.google.com [IPv6:2607:f8b0:4864:20::f4a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4FD9EC06175F
+        for <kvm@vger.kernel.org>; Wed, 14 Jul 2021 09:02:00 -0700 (PDT)
+Received: by mail-qv1-xf4a.google.com with SMTP id y35-20020a0cb8a30000b0290270c2da88e8so1948715qvf.13
+        for <kvm@vger.kernel.org>; Wed, 14 Jul 2021 09:02:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
-        h=date:message-id:mime-version:subject:from:to:cc;
-        bh=36Omnbyd7/DKRdeKJAY3Yo0H0DXYFeJOYXFkJ9nO0PY=;
-        b=bNaY5m0BNjTkrIa24jfGv5ZBzhSpdWHZnjwdQTOmK870VyWvISk6WpG8iprS31EDue
-         upk28mQj2kaUubx9qY1I99MzOu3WaOt/gI/R5H7hZLdi2US8QxWdZ8TUTpwhbfjBveUf
-         UVIK4lQnLDwNr/nIomjIsz1rHpiaOJO/mzmaRj6UOiQ2mUp2+2JhBiBLg/8S0BalAwHA
-         X8/fMziV6hVBXzPZAGfgTVVFURjfbkvCq1TAw/zbS1v5avNdG5K5Fuw21JTbElKa7k8P
-         md2dEuWugUvnK0i8I4S4UnG8VsUyVqOQxrAYFW2CuBaJWxjOJ6IYcYMh6gj9eWvtYw9I
-         iBiA==
+        h=date:in-reply-to:message-id:mime-version:references:subject:from:to
+         :cc;
+        bh=ukpFEBQ3ZSOPfYZVcnUGmbU85zNXyRaZS2xqA85qNuA=;
+        b=tRgSEEmo0V/Rf3S07YeK87hz/a7Vmc7RcBcly8NcC+QOXRreSc+UoWK/Lb6dVlLa/o
+         QC9Tghk26QugyI6CBcHFoIaLvfmtJJV/YFO0EcG8ukxjDWSGtSf3LQTuPvHEsdQXAbgX
+         qp4UFTGfO0usrnBkB2ikNwjiotoEc7XlpOd91bFRRr3zYJ/B0NOY6YSAXy6ZBm+DjWi4
+         ktcNs/UEAWnPgYb0Dh7WIyjxUH00mKJwPV7J2sAHUSImQm6dAlnR6A1TZepBgHleefdd
+         /741/8aAZIf1gI80zQ5+VOQRAZW9KmQLN6jr+ye7f4vq3sOYzuDZb/+o9bbKTUK4PtBV
+         Iouw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
-        bh=36Omnbyd7/DKRdeKJAY3Yo0H0DXYFeJOYXFkJ9nO0PY=;
-        b=f2nomZCfTYBdfRAbqUf8mcvk/sXgI9hmYBa/G0Ldn4oTy8b5r8ga9uOlKUgAu45F5T
-         afCzvBVKmXlBtNihOy2he4FKoZq2g5YYYD8FTcN8656FIqQefrxIbRQ4uauRuikoh/gB
-         vzxcbViIfcGWSfrMbTw/V3F6tzb+vk8RO7oeEGfdrqtnKbmnF8IEUN0NSNy8LS++ItDD
-         z5M+WWehXHl5ZR8nt3qKZE+MIC1cfDTSDs7UfQbOETGN/aH6wBvLANQJfsTo52GXmVl8
-         iqjDHO7DE0Dltt+HEnVWfTwT+N0BpmYKAAy8JPcdadSlz13kgLhL99I2ELhQleXLjBV/
-         RM+Q==
-X-Gm-Message-State: AOAM533/FuHzuulwUog41xfHM6v1hrnI1LGYs8tbkw1wcSKrdiZoCCuV
-        JLC+Xfx0kraxz70x5vjRh9BeqKI55fA=
-X-Google-Smtp-Source: ABdhPJzYnFQVarUz/3jyy/DooiZ6xEAeyOR7C/uDYGDXITH8IplGRb69qQwH/GJRN4uO8N2lU9jDLSFB4oI=
+        h=x-gm-message-state:date:in-reply-to:message-id:mime-version
+         :references:subject:from:to:cc;
+        bh=ukpFEBQ3ZSOPfYZVcnUGmbU85zNXyRaZS2xqA85qNuA=;
+        b=FUFKb4Dx91hlDKz1LF5Ly+kJpxo/TpANixTVx4/bxdvK6Yz/ZxkVzy/Vyw6gzJjiVx
+         0AnkcYQinWwSguPN6hUwDEyZrOq1xsIpyY6wpRmJG8yMDc27zAoGe9+MbSUf2XXCc1Gq
+         IZwjsubph7GaSpnPYkXv/aV5BBUnQ7nrixFFA9m7tQA6DxRAcXkYjXnGwYhBElprv6y/
+         rnVcG9wkX28H3eRr1W5Et16vHqp+HH4ikKj8JqmDXUtcmg1bthOmBF0siiO29whk5P09
+         GuxU9qgNRx5fi/7LaBRGNiwxhYoFN+rQr+4pY9UavESccCQ8s9ouNUjKOegvJX6sP1IG
+         zeFQ==
+X-Gm-Message-State: AOAM533dmrksfrb6dEm/222TvnlhXKxof3kKNGlcJQgA6bL46Ax80Ld3
+        +VZB2uNUEWWmUd53RdIhMtqQT/q5Ya0=
+X-Google-Smtp-Source: ABdhPJy6lP52o8qVNiah756L56JiDKxfILhWmiDeBLW+a5hJESre4NIuFeuouILhaYGP5OsWibWZ0fS/f+Y=
 X-Received: from pgonda1.kir.corp.google.com ([2620:0:1008:11:32d8:66d1:672:9aeb])
- (user=pgonda job=sendgmr) by 2002:a17:902:d4c9:b029:12b:46f3:2db2 with SMTP
- id o9-20020a170902d4c9b029012b46f32db2mr2240730plg.5.1626278517567; Wed, 14
- Jul 2021 09:01:57 -0700 (PDT)
-Date:   Wed, 14 Jul 2021 09:01:40 -0700
-Message-Id: <20210714160143.2116583-1-pgonda@google.com>
+ (user=pgonda job=sendgmr) by 2002:a05:6214:1141:: with SMTP id
+ b1mr11599789qvt.2.1626278519429; Wed, 14 Jul 2021 09:01:59 -0700 (PDT)
+Date:   Wed, 14 Jul 2021 09:01:41 -0700
+In-Reply-To: <20210714160143.2116583-1-pgonda@google.com>
+Message-Id: <20210714160143.2116583-2-pgonda@google.com>
 Mime-Version: 1.0
+References: <20210714160143.2116583-1-pgonda@google.com>
 X-Mailer: git-send-email 2.32.0.93.g670b81a890-goog
-Subject: [PATCH 0/3 V2] Add AMD SEV and SEV-ES intra host migration support
+Subject: [PATCH 1/3 V2] KVM, SEV: Refactor out function for unregistering
+ encrypted regions
 From:   Peter Gonda <pgonda@google.com>
 To:     pgonda@google.com
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+Cc:     Brijesh Singh <brijesh.singh@amd.com>,
+        Marc Orr <marcorr@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
         Sean Christopherson <seanjc@google.com>,
         David Rientjes <rientjes@google.com>,
         "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
-        Brijesh Singh <brijesh.singh@amd.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
@@ -68,66 +73,11 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Intra host migration provides a low-cost mechanism for userspace VMM upgrades.
-It is an alternative to traditional (i.e., remote) live migration. Whereas
-remote migration handles move a guest to a new host, intra host migration only
-handles moving a guest to a new userspace VMM within a host.  This can be
-used to update, rollback, change flags of the VMM, etc. The lower cost
-compared to live migration comes from the fact that the guest's memory does
-not need to be copied between processes. A handle to the guest memory
-simply gets passed to the new VMM, this could be done via using /dev/shm
-with share=on or similar feature.
+Factor out helper function for freeing the encrypted region list.
 
-The guest state can be transferred from an old VMM to a new VMM as follows:
-1. Export guest state from KVM to the old user-space VMM via a getter
-user-space/kernel API 2. Transfer guest state from old VMM to new VMM via
-IPC communication 3. Import guest state into KVM from the new user-space
-VMM via a setter user-space/kernel API VMMs by exporting from KVM using
-getters, sending that data to the new VMM, then setting it again in KVM.
-
-In the common case for intra host migration, we can rely on the normal ioctls
-for passing data from one VMM to the next. SEV, SEV-ES, and other
-confidential compute environments make most of this information opaque, and
-render KVM ioctls such as "KVM_GET_REGS" irrelevant.  As a result, we need
-the ability to pass this opaque metadata from one VMM to the next. The
-easiest way to do this is to leave this data in the kernel, and transfer
-ownership of the metadata from one KVM VM (or vCPU) to the next. For
-example, we need to move the SEV enabled ASID, VMSAs, and GHCB metadata
-from one VMM to the next.  In general, we need to be able to hand off any
-data that would be unsafe/impossible for the kernel to hand directly to
-userspace (and cannot be reproduced using data that can be handed safely to
-userspace).
-
-During the intra host send operation the SEV required metadata, the guest's
-ASID is loaded into a kvm wide hashmap keyed by a value given by
-userspace. This allows the userspace VMM to pass the key to the target
-VMM. Then on intra host receive the target VMM can be loaded with the
-metadata from the hashmap.
-
-v2:
- * Added marcorr@ reviewed by tag
- * Renamed function introduced in 1/3
- * Edited with seanjc@'s review comments
- ** Cleaned up WARN usage
- ** Userspace makes random token now
- * Edited with brijesh.singh@'s review comments
- ** Checks for different LAUNCH_* states in send function
-
-v1: https://lore.kernel.org/kvm/20210621163118.1040170-1-pgonda@google.com/
-
-Peter Gonda (3):
-  KVM, SEV: Refactor out function for unregistering encrypted regions
-  KVM, SEV: Add support for SEV intra host migration
-  KVM, SEV: Add support for SEV-ES intra host migration
-
- .../virt/kvm/amd-memory-encryption.rst        |  43 ++
- arch/x86/kvm/svm/sev.c                        | 396 +++++++++++++++++-
- arch/x86/kvm/svm/svm.h                        |   1 +
- include/uapi/linux/kvm.h                      |  12 +
- 4 files changed, 433 insertions(+), 19 deletions(-)
-
-base-commit: 7caa04b36f20
-
+Signed-off-by: Peter Gonda <pgonda@google.com>
+Reviewed-by: Brijesh Singh <brijesh.singh@amd.com>
+Reviewed-by: Marc Orr <marcorr@google.com>
 Cc: Paolo Bonzini <pbonzini@redhat.com>
 Cc: Sean Christopherson <seanjc@google.com>
 Cc: David Rientjes <rientjes@google.com>
@@ -143,7 +93,57 @@ Cc: Borislav Petkov <bp@alien8.de>
 Cc: "H. Peter Anvin" <hpa@zytor.com>
 Cc: kvm@vger.kernel.org
 Cc: linux-kernel@vger.kernel.org
+---
+ arch/x86/kvm/svm/sev.c | 26 +++++++++++++++++---------
+ 1 file changed, 17 insertions(+), 9 deletions(-)
 
+diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+index 8d36f0c73071..78fea9c4048d 100644
+--- a/arch/x86/kvm/svm/sev.c
++++ b/arch/x86/kvm/svm/sev.c
+@@ -1775,11 +1775,25 @@ int svm_vm_copy_asid_from(struct kvm *kvm, unsigned int source_fd)
+ 	return ret;
+ }
+ 
++static void unregister_enc_regions(struct kvm *kvm,
++					    struct list_head *mem_regions)
++{
++	struct enc_region *pos, *q;
++
++	lockdep_assert_held(&kvm->lock);
++
++	if (list_empty(mem_regions))
++		return;
++
++	list_for_each_entry_safe(pos, q, mem_regions, list) {
++		__unregister_enc_region_locked(kvm, pos);
++		cond_resched();
++	}
++}
++
+ void sev_vm_destroy(struct kvm *kvm)
+ {
+ 	struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
+-	struct list_head *head = &sev->regions_list;
+-	struct list_head *pos, *q;
+ 
+ 	if (!sev_guest(kvm))
+ 		return;
+@@ -1803,13 +1817,7 @@ void sev_vm_destroy(struct kvm *kvm)
+ 	 * if userspace was terminated before unregistering the memory regions
+ 	 * then lets unpin all the registered memory.
+ 	 */
+-	if (!list_empty(head)) {
+-		list_for_each_safe(pos, q, head) {
+-			__unregister_enc_region_locked(kvm,
+-				list_entry(pos, struct enc_region, list));
+-			cond_resched();
+-		}
+-	}
++	unregister_enc_regions(kvm, &sev->regions_list);
+ 
+ 	mutex_unlock(&kvm->lock);
+ 
 -- 
 2.32.0.93.g670b81a890-goog
 
