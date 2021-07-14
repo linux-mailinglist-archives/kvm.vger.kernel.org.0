@@ -2,127 +2,114 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 438EE3C820E
-	for <lists+kvm@lfdr.de>; Wed, 14 Jul 2021 11:50:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6B44A3C8217
+	for <lists+kvm@lfdr.de>; Wed, 14 Jul 2021 11:52:33 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238905AbhGNJxc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 14 Jul 2021 05:53:32 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:5012 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S238271AbhGNJxc (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 14 Jul 2021 05:53:32 -0400
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 16E9Y3ED187502;
-        Wed, 14 Jul 2021 05:50:40 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
- subject : message-id : references : mime-version : content-type :
- in-reply-to; s=pp1; bh=t4gpCQMDXnpdkc6VBOQdvRGHznSkjRftDBs/orXu85I=;
- b=EVjXkgxEURLlnB+T4SnOUqKiPPoPkzQSV6hQdzQGNkrme0ft+yRn/PhqmWxBDNsqCuaA
- FiUeoPNUv44jObx+YpoI3fMSRBk+gkJjTE+FBm+U4Ujq/l4Op6WYZCDPp5kW2Hupbmlt
- 4i8KOyUkkzPaVZS5zOAlIJORNwV3rN9CPXEnUgQtTdnrHOumbd2MWSoVi11z1XPx1sBe
- lXojLXPZ7BaHdTzug7NJT5VqnoTJOmIyG+6KsJUphaA0lx5PGaYqp8qFwFbtpOvqUrVj
- S/MED5svDCeWED4sNd0x7TI8hM1f6MDRIn6dIIOMpbE3ccHBpzZv/u/pb/i6xdg82Ojs 6g== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 39sde1j5ma-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 14 Jul 2021 05:50:40 -0400
-Received: from m0098419.ppops.net (m0098419.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 16E9ZNXi191345;
-        Wed, 14 Jul 2021 05:50:40 -0400
-Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 39sde1j5ke-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 14 Jul 2021 05:50:40 -0400
-Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
-        by ppma06ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 16E9n27Z015225;
-        Wed, 14 Jul 2021 09:50:38 GMT
-Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
-        by ppma06ams.nl.ibm.com with ESMTP id 39q2th9q87-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 14 Jul 2021 09:50:38 +0000
-Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
-        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 16E9oYxJ27328954
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 14 Jul 2021 09:50:35 GMT
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id D67BCA4040;
-        Wed, 14 Jul 2021 09:50:34 +0000 (GMT)
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 8C832A404D;
-        Wed, 14 Jul 2021 09:50:34 +0000 (GMT)
-Received: from osiris (unknown [9.145.156.107])
-        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
-        Wed, 14 Jul 2021 09:50:34 +0000 (GMT)
-Date:   Wed, 14 Jul 2021 11:50:33 +0200
-From:   Heiko Carstens <hca@linux.ibm.com>
-To:     Claudio Imbrenda <imbrenda@linux.ibm.com>
-Cc:     Christian Borntraeger <borntraeger@de.ibm.com>,
-        Janosch Frank <frankja@linux.vnet.ibm.com>,
-        David Hildenbrand <david@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org
-Subject: Re: [PATCH] KVM: s390: generate kvm hypercall functions
-Message-ID: <YO6zadbavNXs4Z3+@osiris>
-References: <20210713145713.2815167-1-hca@linux.ibm.com>
- <20210714113843.6daa7e09@p-imbrenda>
+        id S238951AbhGNJzT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 14 Jul 2021 05:55:19 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:34045 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S238271AbhGNJzT (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 14 Jul 2021 05:55:19 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1626256347;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=icg0gvPwRGJz9uuUXCiq7UXEwnGrtfXn8+lGykTSI4U=;
+        b=ej58bkUl2qBiXz+iKOlN9KHQWrLoQBw6MlfFyhHGBtuKr7e57WVKk3l4BkoBv7CEYjlPKH
+        mD1EMoii3rrfS+TCebc+rn6vLWLq6IFvY57JE+wIufNMJ0EYXw0uX9LHCh+yhQh7+A3BWX
+        EP6Y5tSx9shad4Km/O9vj79MNakqHFI=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-295-EDxdF7L1PK2mor7IbM-rbg-1; Wed, 14 Jul 2021 05:52:26 -0400
+X-MC-Unique: EDxdF7L1PK2mor7IbM-rbg-1
+Received: by mail-wr1-f71.google.com with SMTP id 5-20020a0560001565b029013fe432d176so1200723wrz.23
+        for <kvm@vger.kernel.org>; Wed, 14 Jul 2021 02:52:25 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=icg0gvPwRGJz9uuUXCiq7UXEwnGrtfXn8+lGykTSI4U=;
+        b=n4vyTFRPmv/hNB83p6sxDvi6+wdc7hTKXJUfw8W+naRbhun8vVi1ZNZ7PP5C7ZO8u1
+         S19zQUL8TvOgtx+C0bSh7VqBWzL4D4ZpSDZrQqviqbqCN4qv7LkBIHpAxLAjRiotCc3Q
+         9gwXLGPf/SynQHKTIBxzklm7Y0NgkTt1WKDkoX7TxFuhF0vw0v9JFggrI6C8qNql852T
+         EK/AqzvN2OkEPSj//pisJsrvS9CdUVaID0GLT/sbxgOf+SA6BrGUVd29ahbDAe0FduiU
+         GYeV66vKsZra3iH6t/SiQK8lPbUgh8g156oUqiqhQIBooJrq+NE5s+v3TKOdLc6Plmzr
+         21ag==
+X-Gm-Message-State: AOAM533HgKPF6HwtUsDV9797IzW1mLFOYx76VzAtcErRJ7wapD9tiQlG
+        5Z2sjSSm/bp3v4/t0XVPZNxdCOKSNLO9lCFQpm8gJVbY2ADZat+VQhJchDYirgnSgtvybtYHhz7
+        xxgeVQkp9iQ2V
+X-Received: by 2002:a5d:6804:: with SMTP id w4mr11543876wru.417.1626256344877;
+        Wed, 14 Jul 2021 02:52:24 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxGq1APKVeGWyFBIONIwgXSyQW6dds1jdrV4WQGl+a002MKBsxUMjBsprzsDXyASkBfy5FbSA==
+X-Received: by 2002:a5d:6804:: with SMTP id w4mr11543858wru.417.1626256344733;
+        Wed, 14 Jul 2021 02:52:24 -0700 (PDT)
+Received: from work-vm (cpc109021-salf6-2-0-cust453.10-2.cable.virginm.net. [82.29.237.198])
+        by smtp.gmail.com with ESMTPSA id a64sm1529978wme.8.2021.07.14.02.52.23
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 14 Jul 2021 02:52:24 -0700 (PDT)
+Date:   Wed, 14 Jul 2021 10:52:21 +0100
+From:   "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To:     Brijesh Singh <brijesh.singh@amd.com>
+Cc:     Dov Murik <dovmurik@linux.ibm.com>, qemu-devel@nongnu.org,
+        Connor Kuehl <ckuehl@redhat.com>,
+        Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>,
+        "Michael S . Tsirkin" <mst@redhat.com>,
+        James Bottomley <jejb@linux.ibm.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        David Gibson <david@gibson.dropbear.id.au>,
+        Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>,
+        kvm@vger.kernel.org, Michael Roth <michael.roth@amd.com>,
+        Eduardo Habkost <ehabkost@redhat.com>
+Subject: Re: [RFC PATCH 0/6] Add AMD Secure Nested Paging (SEV-SNP) support
+Message-ID: <YO6z1dJxuT5cNz6T@work-vm>
+References: <20210709215550.32496-1-brijesh.singh@amd.com>
+ <e68a9760-121f-72ee-f8ae-193b92bde403@linux.ibm.com>
+ <80b92ee9-97d8-76f2-8859-06e61fe10f71@amd.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20210714113843.6daa7e09@p-imbrenda>
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: 8cJMNYiPDGsq2ev834_wHvwhd8GgwkPq
-X-Proofpoint-ORIG-GUID: lAMlpMdjYaVs9jcJudzkxGbbtXu4ruXv
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.790
- definitions=2021-07-14_04:2021-07-14,2021-07-14 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 phishscore=0
- spamscore=0 clxscore=1015 mlxlogscore=999 impostorscore=0 adultscore=0
- mlxscore=0 lowpriorityscore=0 malwarescore=0 priorityscore=1501
- suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2104190000 definitions=main-2107140062
+In-Reply-To: <80b92ee9-97d8-76f2-8859-06e61fe10f71@amd.com>
+User-Agent: Mutt/2.0.7 (2021-05-04)
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jul 14, 2021 at 11:38:43AM +0200, Claudio Imbrenda wrote:
-> On Tue, 13 Jul 2021 16:57:13 +0200
-> Heiko Carstens <hca@linux.ibm.com> wrote:
+* Brijesh Singh (brijesh.singh@amd.com) wrote:
 > 
-> [snip]
 > 
-> > +#define HYPERCALL_ARGS_0
-> > +#define HYPERCALL_ARGS_1 , arg1
-> > +#define HYPERCALL_ARGS_2 HYPERCALL_ARGS_1, arg2
-> > +#define HYPERCALL_ARGS_3 HYPERCALL_ARGS_2, arg3
-> > +#define HYPERCALL_ARGS_4 HYPERCALL_ARGS_3, arg4
-> > +#define HYPERCALL_ARGS_5 HYPERCALL_ARGS_4, arg5
-> > +#define HYPERCALL_ARGS_6 HYPERCALL_ARGS_5, arg6
-> > +
-> > +#define GENERATE_KVM_HYPERCALL_FUNC(args)
-> > 	\ +static inline
-> > 			\ +long __kvm_hypercall##args(unsigned long
-> > nr HYPERCALL_PARM_##args)	\ +{
-> > 					\
-> > +	register unsigned long __nr asm("1") = nr;
-> > 	\
-> > +	register long __rc asm("2");
-> > 	\
+> On 7/13/21 3:05 AM, Dov Murik wrote:>
+> > Particularly confusing is the `policy` attribute which is only relevant
+> > for SEV / SEV-ES, while there's a new `snp.policy` attribute for SNP...
+> > Maybe the irrelevant attributes should not be added to the tree when not
+> > in SNP.
 > 
-> didn't we want to get rid of asm register allocations?
+> The policy fields are also applicable to the SNP. The main difference are:
 > 
-> this would have been a nice time to do such a cleanup
+> - in SEV/SEV-ES the policy is 32-bit compare to 64-bit value in SEV-SNP.
+> However, for SEV-SNP spec uses lower 32-bit value and higher bits are marked
+> reserved.
+> 
+> - the bit field meaning are different
 
-I see only two ways to get rid them, both are suboptimal, therefore I
-decided to keep them at very few places; one of them this one.
+Ah, I see that from the SNP ABI spec (section 4.3).
 
-Alternatively to this approach it would be possible to:
+That's a bit subtle; in that at the moment we select SEV or SEV-ES based
+on the existing guest policy flags; I think you're saying that SEV-SNP
+is enabled by the user explicitly.
 
-a) write the function entirely in assembler (instead of inlining it).
+> Based on this, we can introduce a new filed 'snp-policy'.
 
-b) pass a structure with all parameters to the inline assembly and
-   clobber a large amount of registers, which _might_ even lead to
-   compile errors since the compiler might run out of registers when
-   allocating registers for the inline asm.
+Yes, people are bound to confuse them if they're not clearly separated;
+although I guess whatever comes after SNP will probably share that
+longer field?
 
-Given that hypercall is slow anyway a) might be an option. But that's
-up to you guys. Otherwise I would consider this the "final" solution
-until we get compiler support which allows for something better.
+Dave
+
+> -Brijesh
+> 
+-- 
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+
