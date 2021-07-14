@@ -2,102 +2,125 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 048243C7DF2
-	for <lists+kvm@lfdr.de>; Wed, 14 Jul 2021 07:30:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 690B63C7E0E
+	for <lists+kvm@lfdr.de>; Wed, 14 Jul 2021 07:45:39 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237913AbhGNFdH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 14 Jul 2021 01:33:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50654 "EHLO
+        id S237959AbhGNFsR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 14 Jul 2021 01:48:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53974 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237802AbhGNFdG (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 14 Jul 2021 01:33:06 -0400
-Received: from mail-lf1-x12c.google.com (mail-lf1-x12c.google.com [IPv6:2a00:1450:4864:20::12c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 63B82C0613DD
-        for <kvm@vger.kernel.org>; Tue, 13 Jul 2021 22:30:15 -0700 (PDT)
-Received: by mail-lf1-x12c.google.com with SMTP id 22so1455432lfy.12
-        for <kvm@vger.kernel.org>; Tue, 13 Jul 2021 22:30:15 -0700 (PDT)
+        with ESMTP id S237802AbhGNFsQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 14 Jul 2021 01:48:16 -0400
+Received: from mail-ed1-x532.google.com (mail-ed1-x532.google.com [IPv6:2a00:1450:4864:20::532])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 03BABC0613EF
+        for <kvm@vger.kernel.org>; Tue, 13 Jul 2021 22:45:23 -0700 (PDT)
+Received: by mail-ed1-x532.google.com with SMTP id l26so1446705eda.10
+        for <kvm@vger.kernel.org>; Tue, 13 Jul 2021 22:45:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
+        d=bytedance-com.20150623.gappssmtp.com; s=20150623;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=C3Z9CFxob2kEmCEAlCKWUPaU9hX+53zK6v4wQ2QlHFg=;
-        b=VPTgdfil+GwXO7aZSuEge0uSYQQpIq8WFDOqaG4kz23mRyTm20rQHqJ6c9s9XXZR2d
-         NDmm00L1EkY2wl7TcNTtMHSYWCjs7970YZtlzfApInzryHYZRQ8Wmn65qSFQpKv/JAbz
-         l35cCt+Dzou82ybFA/qs2UQhP6a16jKNVg4z48ozplhKIzsp4+W7TvoLj/RDE7mvagKw
-         6SBHHeVgj4aBy24TfbEaTnyGJMCTI1XxY7uM+po33N5UcLNnT50dJunb9RlylUGPfI4X
-         tx3Arba6kUxkzNCayOii13Hr2/rvB5I5BH7H+PxmDpPgFEw+OB9XeMQcGpl3iTnYUkaT
-         gkBQ==
+         :cc:content-transfer-encoding;
+        bh=CHZPSlSYGfv/SLrxAM/jOzUDS1kn5mU0G7/MnH+av7w=;
+        b=TFIXYmOj7xWCYyEiL8IfX/z7XfVUXzphq5lOB8eXolpRNkYjOSMo0nDnxvLCmz0v0P
+         4eGMqbLigvSrkWD5Ktxv46HxIXTFcGk13cG3kVrsNbQzLREMK2CU0ptM1QqPqXW9BxdS
+         yI4oyRP0mP48+7gXh6dqlj0high4D9cExctbn2AE52uoOqBY9Swobwxv+2it40H4ayu7
+         w3w1GZTkgOOUrnt/2hwL0W/gWDo4Pi9Ue3FoX1Gqies4/s5dcU7t+zv44Y6s1Srs86AZ
+         4j0nZgRECcfTY+He18dAroizi7KMqRIvXRIBJ9g/s8NvMcfm0xZ4ZqsIQ2184Hh5NyoU
+         dwow==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=C3Z9CFxob2kEmCEAlCKWUPaU9hX+53zK6v4wQ2QlHFg=;
-        b=bpjRpIf2L1a6J21VUP0UKJ+TR7DC56rMCSNgAxkUyS7elDq8BhgWLXhZDIa/X3aKV8
-         pWjDPwBz891spgDqwO3DvsmAGn40Kv0HCmafPK1T/R3IBuGS5xM6VRghqqJZleYA/pK3
-         opJcDXN20WEhYozpQ1PLR2oAGozy8tkfO4e4ZBtMZBmVE4lE2wtCAics4waylBovW6x+
-         fvLoyflgJgp6emeYGDquuv0EW914zw2X/UNQVVcNWtJxk1IgEnkO+5yRNyeULLgIEt7s
-         q9MuQTb89UauLpCFjdoFdJGeYpc9ZvzbSrxEVnIItwr1pJuWPj7mFYnF4xdeFbrGzz3w
-         3Byg==
-X-Gm-Message-State: AOAM532znL2pgnrS5I10RnuuAK6F8547g/tqK4JnR3Fc5N5/ExIzYYrL
-        XjzHLiM+K2dLmhdvdvEbre7hSs6DhlZ2o7zYLHW7Aiu/rGQ=
-X-Google-Smtp-Source: ABdhPJzwGzp1+TAupobQLPbG3N+XphKRuUSDwilCNDvuT3/BEtaVEVbBuQflBmok1a5NdcLA6b+zt0OuoEJ3TExFYWg=
-X-Received: by 2002:a19:5f43:: with SMTP id a3mr6316001lfj.504.1626240613790;
- Tue, 13 Jul 2021 22:30:13 -0700 (PDT)
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=CHZPSlSYGfv/SLrxAM/jOzUDS1kn5mU0G7/MnH+av7w=;
+        b=L5ZUi5ojW7xjtRb3n+OUbttc5WeXLY0R42rv5WuA6t6tC0bbKd0ww4XY6E/tVfhr3k
+         9mVFkenUD1eEoiA9n/5ODHkNzhL3PKzmUycJDJmKLMh6BeliNiD7Y8KK7rphDrKkNvsH
+         AGNmHn2pGNzN5Bv/wqIk9FawZ15VAfpC/oJZD6+7oE0+OoclQfslWH8fKhIBcKH/sEZ9
+         oW/ulRRPbwGIX3yvFq6V7FVHpzz0kOY6jQeGibw3M2Hl2/ABqCi1ZmwZPy1eb12Ss64c
+         y7Zr4HGhY+l0nxITc7mcMMuWjdbBOe5F0tJJs6VClkZikaszBv2dbmPK4DFPr2mnWi4d
+         tbqQ==
+X-Gm-Message-State: AOAM5338nNhCG6G02llgbJTKjJvLFQAvPgLkwMhbOodI6Pa2dN6a1hc3
+        7bDB/2L2DzWhZSpeSm5MrClodq7yIip7BQj5ouE4
+X-Google-Smtp-Source: ABdhPJxB+DrOBDXuwclE4BqKnRj6flob2oW8SNccGw0iEXIiLGhLEqaAkjs4n04tANFRLCsq6H5lMvNd7tbeRCpkn8s=
+X-Received: by 2002:a50:ff01:: with SMTP id a1mr10874200edu.253.1626241521339;
+ Tue, 13 Jul 2021 22:45:21 -0700 (PDT)
 MIME-Version: 1.0
-References: <CA+-xGqNUX4dpzFV7coJSoJnPz6cE5gdPy1kzRKsQtGD371hyEg@mail.gmail.com>
- <d79db3d7c443f392f5a8b3cf631e5607b72b6208.camel@redhat.com>
- <CA+-xGqOdu1rjhkG0FhxfzF1N1Uiq+z0b3MBJ=sjuVStHP5TBKg@mail.gmail.com>
- <d95d40428ec07ee07e7c583a383d5f324f89686a.camel@redhat.com> <YOxYM+8qCIyV+rTJ@google.com>
-In-Reply-To: <YOxYM+8qCIyV+rTJ@google.com>
-From:   harry harry <hiharryharryharry@gmail.com>
-Date:   Wed, 14 Jul 2021 00:30:12 -0500
-Message-ID: <CA+-xGqOSd0yhU4fEcobf3tW0mLb0TmLGycTwXNVUteyvvnXjdw@mail.gmail.com>
-Subject: Re: About two-dimensional page translation (e.g., Intel EPT) and
- shadow page table in Linux QEMU/KVM
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Maxim Levitsky <mlevitsk@redhat.com>, kvm@vger.kernel.org,
-        qemu-devel@nongnu.org,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Paolo Bonzini <pbonzini@redhat.com>, stefanha@redhat.com,
-        mathieu.tarral@protonmail.com
+References: <20210713084656.232-1-xieyongji@bytedance.com> <20210713084656.232-17-xieyongji@bytedance.com>
+ <20210713132741.GM1954@kadam> <c42979dd-331f-4af5-fda6-18d80f22be2d@redhat.com>
+In-Reply-To: <c42979dd-331f-4af5-fda6-18d80f22be2d@redhat.com>
+From:   Yongji Xie <xieyongji@bytedance.com>
+Date:   Wed, 14 Jul 2021 13:45:10 +0800
+Message-ID: <CACycT3vNiAdOLVRhjqUjZGBfPnCti+_5+vdkgtbJ4XyRsYfrPg@mail.gmail.com>
+Subject: Re: [PATCH v9 16/17] vduse: Introduce VDUSE - vDPA Device in Userspace
+To:     Jason Wang <jasowang@redhat.com>
+Cc:     Dan Carpenter <dan.carpenter@oracle.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Stefano Garzarella <sgarzare@redhat.com>,
+        Parav Pandit <parav@nvidia.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Christian Brauner <christian.brauner@canonical.com>,
+        Randy Dunlap <rdunlap@infradead.org>,
+        Matthew Wilcox <willy@infradead.org>,
+        Al Viro <viro@zeniv.linux.org.uk>,
+        Jens Axboe <axboe@kernel.dk>, bcrl@kvack.org,
+        Jonathan Corbet <corbet@lwn.net>,
+        =?UTF-8?Q?Mika_Penttil=C3=A4?= <mika.penttila@nextfour.com>,
+        joro@8bytes.org, Greg KH <gregkh@linuxfoundation.org>,
+        He Zhe <zhe.he@windriver.com>,
+        Liu Xiaodong <xiaodong.liu@intel.com>,
+        songmuchun@bytedance.com,
+        virtualization <virtualization@lists.linux-foundation.org>,
+        netdev@vger.kernel.org, kvm <kvm@vger.kernel.org>,
+        linux-fsdevel@vger.kernel.org, iommu@lists.linux-foundation.org,
+        linux-kernel <linux-kernel@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Dear Sean,
-
-Thanks for the comments!
-
-
-> Heh, because the MMUs are all per-vCPU, it actually wouldn't be that much effort
-> beyond supporting !TDP and TDP for different VMs...
+On Wed, Jul 14, 2021 at 10:54 AM Jason Wang <jasowang@redhat.com> wrote:
+>
+>
+> =E5=9C=A8 2021/7/13 =E4=B8=8B=E5=8D=889:27, Dan Carpenter =E5=86=99=E9=81=
+=93:
+> > On Tue, Jul 13, 2021 at 04:46:55PM +0800, Xie Yongji wrote:
+> >> +static int vduse_dev_init_vdpa(struct vduse_dev *dev, const char *nam=
+e)
+> >> +{
+> >> +    struct vduse_vdpa *vdev;
+> >> +    int ret;
+> >> +
+> >> +    if (dev->vdev)
+> >> +            return -EEXIST;
+> >> +
+> >> +    vdev =3D vdpa_alloc_device(struct vduse_vdpa, vdpa, dev->dev,
+> >> +                             &vduse_vdpa_config_ops, name, true);
+> >> +    if (!vdev)
+> >> +            return -ENOMEM;
+> > This should be an IS_ERR() check instead of a NULL check.
+>
+>
+> Yes.
+>
+>
+> >
+> > The vdpa_alloc_device() macro is doing something very complicated but
+> > I'm not sure what.  It calls container_of() and that looks buggy until
+> > you spot the BUILD_BUG_ON_ZERO() compile time assert which ensures that
+> > the container_of() is a no-op.
+> >
+> > Only one of the callers checks for error pointers correctly so maybe
+> > it's too complicated or maybe there should be better documentation.
+>
+>
+> We need better documentation for this macro and fix all the buggy callers=
+.
+>
+> Yong Ji, want to do that?
 >
 
-Sorry, may I know what do you mean by "MMUs are all per-vCPU"? Do you
-mean the MMUs walk the page tables of each vCPU?
+Sure, I will send the fix soon.
 
-
-> ...but supporting !TDP and TDP in a single KVM instance isn't going to happen.
-> It's certainly possible, but comes with a very high complexity cost, and likely
-> even performance costs.
-
-For one KVM instance, I think it might be possible to let several
-physical cores use !TDP and other cores use TDP but I am not sure
-about the implementation complexity.
-
->
-> The more sane way to support !TDP and TDP on a single host would be to support
-> multiple instances of KVM, e.g. /dev/kvm0, /dev/kvm1, etc...  Being able to use
-> !TDP and TDP isn't strong justification for the work required, but supporting
-> multiple KVM instances would allow upgrading KVM without having to migrate VMs
-> off the host, which is very desirable.  If multiple KVM instances are supported,
-> running !TDP and TDP KVM instances should Just Work.
-
-Yes, for different KVM instances, it may be much easier but there
-might be some other issues, e.g., communication overhead between
-different instances. I think the upgrading idea is great but is very
-limited to local upgrading.
-
-Best,
-Harry
+Thanks,
+Yongji
