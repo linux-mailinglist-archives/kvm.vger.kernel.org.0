@@ -2,96 +2,232 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4A84F3C91B1
-	for <lists+kvm@lfdr.de>; Wed, 14 Jul 2021 22:05:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3C3503C91EA
+	for <lists+kvm@lfdr.de>; Wed, 14 Jul 2021 22:17:39 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240871AbhGNUFg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 14 Jul 2021 16:05:36 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:43533 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S242308AbhGNUEq (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 14 Jul 2021 16:04:46 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1626292913;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=sQM1t+sm3YURTxJOPDtOEB2n2+vo2zYAMj6B34VXxkw=;
-        b=AyArrd0hoYixa8BNGuVxyinQ9DwUV3DbMp2IBq4B1A5tSMtXTLuKRDSHqmM8jqYmanmDwN
-        /sBfw3W5XcKdILmM52gZpzHBFgScIngdXhhVCXjdWbdKSR2SwkoVTZtngSz0RT3c8tfg20
-        2e/Vi23yHsaKpUBjCm61YOLFHZYh+9U=
-Received: from mail-qt1-f197.google.com (mail-qt1-f197.google.com
- [209.85.160.197]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-28-GjwHDs8hNMefvAk7fd1ASg-1; Wed, 14 Jul 2021 16:01:52 -0400
-X-MC-Unique: GjwHDs8hNMefvAk7fd1ASg-1
-Received: by mail-qt1-f197.google.com with SMTP id g4-20020ac80ac40000b029024ead0ebb62so2604727qti.13
-        for <kvm@vger.kernel.org>; Wed, 14 Jul 2021 13:01:52 -0700 (PDT)
+        id S239690AbhGNUU1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 14 Jul 2021 16:20:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57108 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S239544AbhGNUU0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 14 Jul 2021 16:20:26 -0400
+Received: from mail-pg1-x52b.google.com (mail-pg1-x52b.google.com [IPv6:2607:f8b0:4864:20::52b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3D93FC061765
+        for <kvm@vger.kernel.org>; Wed, 14 Jul 2021 13:17:34 -0700 (PDT)
+Received: by mail-pg1-x52b.google.com with SMTP id 70so320952pgh.2
+        for <kvm@vger.kernel.org>; Wed, 14 Jul 2021 13:17:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=gI+EA8/Nf0J6cK0TpEGVYGTiyDY2bGvR4CfRf7LwiKE=;
+        b=g5d0iCWIXzMtG9uTu4/WlfhcZDBDTSjF3SH5HB9h4kkyFWdS7ZFPeo0oNtlcStWvtn
+         OANE7EZVNP4nmKgWq8tgYnWAvrvGJWebyAdeeXhf96uLFGMcFQsamzdhmuuzVPYGOyb8
+         O5RDhJG8U68pCLJi5ASJNrLwnUrnkZNoF7FD6XOsrw74H2NswKJvPvJgBvUDCkLvprwV
+         NLId20507N3qid+yv8cijIDtEser1wyOco2oH3TW+xXgGAo00hgYD3DO+d60Or3VkQeb
+         Wx27yxaXGRcyWXv3NnYcW7bUilesUtohyflmFOm3jAn7bgNguf6V8uYVWOpKM14JokT9
+         aPoQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=sQM1t+sm3YURTxJOPDtOEB2n2+vo2zYAMj6B34VXxkw=;
-        b=ZxMasK2UtiOCFV0iapW1f+M9BDzDH4HlEW8nJzngU5EV7xkGhpFB4wbBhW871LgjXr
-         0/HeWCcPWd8oZ7w53Yola7uPv4f3xkDwX9nJaTNbnOMDNWMJ0DBs9/0OEgpx5BU+SY1h
-         YkItAjgNCArUrI3KoTSscvxuIJqhKRDeLvomV6J1bkDdx+DeWGLDKVjVNgJQvxmgJSUF
-         qV6hKvmcJLVnJ90X5YME0jGHiCr5k3zw1SBjlGoyew/qVIn4Hb/4xokRqIoC9GRqruSY
-         cX71wVhVCz8ujOezrcP5ZqTmtXL2aHgcJdKMFB0AQQbLvtNyLQmOneUmoNhRyBRjoPHt
-         SADw==
-X-Gm-Message-State: AOAM532KcsE2HH4PopZtkFgq9Vpza8jdZIv6qLfVLtvGGelSlEUED1M7
-        +xibM4DjAkKfKwDKs/DiSTyOTNWDjAtSGIka3lkd10TSXAc6Y7QikA++UfLWlM8EOVCqpxNTIfH
-        /5DWpAZpqSx60
-X-Received: by 2002:a05:620a:24c7:: with SMTP id m7mr11467462qkn.143.1626292911998;
-        Wed, 14 Jul 2021 13:01:51 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyk3zeWWq9kFBADIM8pqrA3Tmt8g/FfXldlWPscDEzBqvEiYx2I+tAs3oIgkN/bg/94hw4gdg==
-X-Received: by 2002:a05:620a:24c7:: with SMTP id m7mr11467440qkn.143.1626292911820;
-        Wed, 14 Jul 2021 13:01:51 -0700 (PDT)
-Received: from gator ([140.82.166.162])
-        by smtp.gmail.com with ESMTPSA id p187sm1505865qkd.101.2021.07.14.13.01.50
+        bh=gI+EA8/Nf0J6cK0TpEGVYGTiyDY2bGvR4CfRf7LwiKE=;
+        b=fw8G2v7U5s9wPotwY87DPMLwxJ8SyvNQ3Cn8z3tN3sF7b29/Pyfoesoij5N+2JJ8t0
+         dWc1CqWNlAB7QFpAP9UBvIfAFMg3leYxnnSunX+KahNu4odddmrZ3k+1sG679ek2LBQV
+         EmPapSJGhJzlJnZkajMs2313crzvM3pCn6xke9Jz2E9xfLCjK38yNJEnuQijGllFrf9K
+         dujyppqbu0vf0whn7nzn5NVsI+Tmsqn4iw2UrgQa1p/arVxd9NUe45lN4BGWHVLy/QH4
+         sznLCI/xyWM5kvSli9+WhOTB7hFpDpLSH4ONPyZY4nRG9m7m1v71i5vMmOHsj6omm1J/
+         wczw==
+X-Gm-Message-State: AOAM530e93503g/USKX6zHNXDtRuPBr3AR1Qzh4xUseu9MT7IccWUCZJ
+        ytuSJT1OIkDAHb8cJjcb97WBFvAR0Sb3LQ==
+X-Google-Smtp-Source: ABdhPJxZmb+DhcGTDT/5mCgrCU1UlHYl4NvPyzbchWS9bE34G11Vek+44z/cDUPxjy/753noD0t2Cw==
+X-Received: by 2002:a63:471b:: with SMTP id u27mr11470643pga.301.1626293853407;
+        Wed, 14 Jul 2021 13:17:33 -0700 (PDT)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id p1sm3784881pfp.137.2021.07.14.13.17.32
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 14 Jul 2021 13:01:51 -0700 (PDT)
-Date:   Wed, 14 Jul 2021 22:01:48 +0200
-From:   Andrew Jones <drjones@redhat.com>
-To:     Will Deacon <will@kernel.org>
-Cc:     Fuad Tabba <tabba@google.com>, kvmarm@lists.cs.columbia.edu,
-        maz@kernel.org, james.morse@arm.com, alexandru.elisei@arm.com,
-        suzuki.poulose@arm.com, mark.rutland@arm.com,
-        christoffer.dall@arm.com, pbonzini@redhat.com, qperret@google.com,
-        kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        kernel-team@android.com
-Subject: Re: [PATCH v2 09/13] KVM: arm64: Add trap handlers for protected VMs
-Message-ID: <20210714200148.vjujrwsn2qsfd6kd@gator>
-References: <20210615133950.693489-1-tabba@google.com>
- <20210615133950.693489-10-tabba@google.com>
- <20210701140821.GI9757@willie-the-truck>
+        Wed, 14 Jul 2021 13:17:32 -0700 (PDT)
+Date:   Wed, 14 Jul 2021 20:17:29 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Brijesh Singh <brijesh.singh@amd.com>
+Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
+        linux-coco@lists.linux.dev, linux-mm@kvack.org,
+        linux-crypto@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        David Rientjes <rientjes@google.com>,
+        Dov Murik <dovmurik@linux.ibm.com>,
+        Tobin Feldman-Fitzthum <tobin@ibm.com>,
+        Borislav Petkov <bp@alien8.de>,
+        Michael Roth <michael.roth@amd.com>,
+        Vlastimil Babka <vbabka@suse.cz>, tony.luck@intel.com,
+        npmccallum@redhat.com, brijesh.ksingh@gmail.com
+Subject: Re: [PATCH Part2 RFC v4 01/40] KVM: SVM: Add support to handle AP
+ reset MSR protocol
+Message-ID: <YO9GWVsZmfXJ4BRl@google.com>
+References: <20210707183616.5620-1-brijesh.singh@amd.com>
+ <20210707183616.5620-2-brijesh.singh@amd.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20210701140821.GI9757@willie-the-truck>
+In-Reply-To: <20210707183616.5620-2-brijesh.singh@amd.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jul 01, 2021 at 03:08:22PM +0100, Will Deacon wrote:
-> On Tue, Jun 15, 2021 at 02:39:46PM +0100, Fuad Tabba wrote:
-> > Add trap handlers for protected VMs. These are mainly for Sys64
-> > and debug traps.
+On Wed, Jul 07, 2021, Brijesh Singh wrote:
+> From: Tom Lendacky <thomas.lendacky@amd.com>
 > 
-> I think one big thing missing from this patch is some rationale around
-> which features are advertised and which are not. Further, when traps
-> are enabled later on, there doesn't seem to be one place which drives the
-> logic, so it's quite hard to reason about.
+> Add support for AP Reset Hold being invoked using the GHCB MSR protocol,
+> available in version 2 of the GHCB specification.
+
+Please provide a brief overview of the protocol, and why it's needed.  I assume
+it's to allow AP wakeup without a shared GHCB?
+
+> Signed-off-by: Tom Lendacky <thomas.lendacky@amd.com>
+> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
+> ---
+
+...
+
+>  static u8 sev_enc_bit;
+>  static DECLARE_RWSEM(sev_deactivate_lock);
+>  static DEFINE_MUTEX(sev_bitmap_lock);
+> @@ -2199,6 +2203,9 @@ static int sev_es_validate_vmgexit(struct vcpu_svm *svm)
+>  
+>  void sev_es_unmap_ghcb(struct vcpu_svm *svm)
+>  {
+> +	/* Clear any indication that the vCPU is in a type of AP Reset Hold */
+> +	svm->ap_reset_hold_type = AP_RESET_HOLD_NONE;
+> +
+>  	if (!svm->ghcb)
+>  		return;
+>  
+> @@ -2404,6 +2411,22 @@ static int sev_handle_vmgexit_msr_protocol(struct vcpu_svm *svm)
+>  				  GHCB_MSR_INFO_POS);
+>  		break;
+>  	}
+> +	case GHCB_MSR_AP_RESET_HOLD_REQ:
+> +		svm->ap_reset_hold_type = AP_RESET_HOLD_MSR_PROTO;
+> +		ret = kvm_emulate_ap_reset_hold(&svm->vcpu);
+
+The hold type feels like it should be a param to kvm_emulate_ap_reset_hold().
+
+> +
+> +		/*
+> +		 * Preset the result to a non-SIPI return and then only set
+> +		 * the result to non-zero when delivering a SIPI.
+> +		 */
+> +		set_ghcb_msr_bits(svm, 0,
+> +				  GHCB_MSR_AP_RESET_HOLD_RESULT_MASK,
+> +				  GHCB_MSR_AP_RESET_HOLD_RESULT_POS);
+> +
+> +		set_ghcb_msr_bits(svm, GHCB_MSR_AP_RESET_HOLD_RESP,
+> +				  GHCB_MSR_INFO_MASK,
+> +				  GHCB_MSR_INFO_POS);
+
+It looks like all uses set an arbitrary value and then the response.  I think
+folding the response into the helper would improve both readability and robustness.
+I also suspect the helper needs to do WRITE_ONCE() to guarantee the guest sees
+what it's supposed to see, though memory ordering is not my strong suit.
+
+Might even be able to squeeze in a build-time assertion.
+
+Also, do the guest-provided contents actually need to be preserved?  That seems
+somewhat odd.
+
+E.g. can it be
+
+static void set_ghcb_msr_response(struct vcpu_svm *svm, u64 response, u64 value,
+				  u64 mask, unsigned int pos)
+{
+	u64 val = (response << GHCB_MSR_INFO_POS) | (val << pos);
+
+	WRITE_ONCE(svm->vmcb->control.ghcb_gpa |= (value & mask) << pos;
+}
+
+and
+
+		set_ghcb_msr_response(svm, GHCB_MSR_AP_RESET_HOLD_RESP,
+				      GHCB_MSR_AP_RESET_HOLD_RESULT_MASK,
+				      GHCB_MSR_AP_RESET_HOLD_RESULT_POS);
+
+> +		break;
+>  	case GHCB_MSR_TERM_REQ: {
+>  		u64 reason_set, reason_code;
+>  
+> @@ -2491,6 +2514,7 @@ int sev_handle_vmgexit(struct kvm_vcpu *vcpu)
+>  		ret = svm_invoke_exit_handler(vcpu, SVM_EXIT_IRET);
+>  		break;
+>  	case SVM_VMGEXIT_AP_HLT_LOOP:
+> +		svm->ap_reset_hold_type = AP_RESET_HOLD_NAE_EVENT;
+>  		ret = kvm_emulate_ap_reset_hold(vcpu);
+>  		break;
+>  	case SVM_VMGEXIT_AP_JUMP_TABLE: {
+> @@ -2628,13 +2652,29 @@ void sev_vcpu_deliver_sipi_vector(struct kvm_vcpu *vcpu, u8 vector)
+>  		return;
+>  	}
+>  
+> -	/*
+> -	 * Subsequent SIPI: Return from an AP Reset Hold VMGEXIT, where
+> -	 * the guest will set the CS and RIP. Set SW_EXIT_INFO_2 to a
+> -	 * non-zero value.
+> -	 */
+> -	if (!svm->ghcb)
+> -		return;
+> +	/* Subsequent SIPI */
+> +	switch (svm->ap_reset_hold_type) {
+> +	case AP_RESET_HOLD_NAE_EVENT:
+> +		/*
+> +		 * Return from an AP Reset Hold VMGEXIT, where the guest will
+> +		 * set the CS and RIP. Set SW_EXIT_INFO_2 to a non-zero value.
+> +		 */
+> +		ghcb_set_sw_exit_info_2(svm->ghcb, 1);
+> +		break;
+> +	case AP_RESET_HOLD_MSR_PROTO:
+> +		/*
+> +		 * Return from an AP Reset Hold VMGEXIT, where the guest will
+> +		 * set the CS and RIP. Set GHCB data field to a non-zero value.
+> +		 */
+> +		set_ghcb_msr_bits(svm, 1,
+> +				  GHCB_MSR_AP_RESET_HOLD_RESULT_MASK,
+> +				  GHCB_MSR_AP_RESET_HOLD_RESULT_POS);
+>  
+> -	ghcb_set_sw_exit_info_2(svm->ghcb, 1);
+> +		set_ghcb_msr_bits(svm, GHCB_MSR_AP_RESET_HOLD_RESP,
+> +				  GHCB_MSR_INFO_MASK,
+> +				  GHCB_MSR_INFO_POS);
+> +		break;
+> +	default:
+> +		break;
+> +	}
+>  }
+> diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
+> index 0b89aee51b74..ad12ca26b2d8 100644
+> --- a/arch/x86/kvm/svm/svm.h
+> +++ b/arch/x86/kvm/svm/svm.h
+> @@ -174,6 +174,7 @@ struct vcpu_svm {
+>  	struct ghcb *ghcb;
+>  	struct kvm_host_map ghcb_map;
+>  	bool received_first_sipi;
+> +	unsigned int ap_reset_hold_type;
+
+Can't this be a u8?
+
+>  
+>  	/* SEV-ES scratch area support */
+>  	void *ghcb_sa;
+> -- 
+> 2.17.1
 > 
-> So I think we need both some documentation to describe the architectural
-> environment provided to protected VMs, but also a way to couple the logic
-> which says "We hide this feature from the ID registers because of foo"
-> with the logic that says "And here is the control bit to trap this feature".
-
-I think it would be better to have documentation that says "We expose this
-feature because foo". If the feature doesn't have any rationale to be
-exposed, then it's just not. It may also make sense to document features
-that should never be exposed, if there are features like that, in order to
-ensure nobody comes along and exposes them later.
-
-Thanks,
-drew
-
