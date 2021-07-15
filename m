@@ -2,237 +2,219 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 42AD23CA8C5
-	for <lists+kvm@lfdr.de>; Thu, 15 Jul 2021 21:01:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C18713CA5A0
+	for <lists+kvm@lfdr.de>; Thu, 15 Jul 2021 20:37:37 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242372AbhGOTCv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 15 Jul 2021 15:02:51 -0400
-Received: from mx0a-00069f02.pphosted.com ([205.220.165.32]:20112 "EHLO
-        mx0a-00069f02.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S240846AbhGOTBh (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 15 Jul 2021 15:01:37 -0400
-Received: from pps.filterd (m0246617.ppops.net [127.0.0.1])
-        by mx0b-00069f02.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 16FIvY2T023396;
-        Thu, 15 Jul 2021 18:58:21 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
- subject : date : message-id : in-reply-to : references :
- content-transfer-encoding : content-type : mime-version;
- s=corp-2021-07-09; bh=LZgy6xYj+35ZMRPS5LHmelT7OIaRVigcXUjqzM5BpC0=;
- b=OQT4t1AFm7XL8jWuZJMfpCDN0fL79MsBIeKHAg8O8PQA2ejbKljhgBoPfKXusWVnFnVt
- 2FcUcD/PCXiggoL4XW5s8MwN1M2L40l+AOdrjA3QYK811YkQpXYmtUMdtLFmeogMRbn2
- ukG9Rph/3n4lU1xpnDNan2i3qo4NRDAEJP9SsoBJg0cb//139L/S8a1g0i9JeoNWS52t
- JExKn8NfOnEgNYhuTSS6UZBt+zqo+iBFQqvbbJSi3M9e/ob7k2b1h2fawaBbfKdiMTR9
- 7KeKU6qPr+bDxwKBIAE5zsX8fxR7pPTxDLFUDT+aBggZpqCYf4HFmWQstYJqgq4O01YR Dg== 
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
- subject : date : message-id : in-reply-to : references :
- content-transfer-encoding : content-type : mime-version;
- s=corp-2020-01-29; bh=LZgy6xYj+35ZMRPS5LHmelT7OIaRVigcXUjqzM5BpC0=;
- b=K651e0JI29gBHqHOWTKNO2WpHuZX0ZF9LLPU3Ez778De+aIlzrVXXzGelIldnLuWW+P0
- sexcI9Os21F74PveoqGQNaB3W/t0PIlgGj7oBQG8IDRNnmzqKnp7XXyJKzwrbElqZoWw
- inGUaCobLKDEmt6X2R2sngllvM70ONsZ9tmVr1dUtn9Nth/fSw5GbMfoPMlixJaqPdWw
- bdlx+7JCosrCQoJw75btinnPsFlzeM9eQHCkwBwmYQyG1hF/hppnzn2XoPoTTGOfUy8B
- XDY6S7pp9v9OUYXgjjD8OIAK5+Hlkz/+le/GxeGChCU1OQWYwSnrLxm4FHgie3fZkRuV rA== 
-Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
-        by mx0b-00069f02.pphosted.com with ESMTP id 39t77ut7am-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 15 Jul 2021 18:58:20 +0000
-Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
-        by aserp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 16FIsouk050707;
-        Thu, 15 Jul 2021 18:58:19 GMT
-Received: from nam11-dm6-obe.outbound.protection.outlook.com (mail-dm6nam11lp2171.outbound.protection.outlook.com [104.47.57.171])
-        by aserp3020.oracle.com with ESMTP id 39q3cjc79b-3
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 15 Jul 2021 18:58:19 +0000
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=iQiByfCis8Y7csdNS0ZlPFjYrQ9kMZWfc31w/NzhYLQPbwLUkvnHbh0rPLvlc4QZb65qr6Tj426XuvNkLYKKiIILjMzC4kfniPH5C9bqGZGqaOKIIGV//jDk+DzmXIBbb76JZQW2mtpd5CjJ2WlJ2eo0+C47nfv/fT4YtZJaKa+Hg7qsjpo0OvD4HwM3H2UJK1Q4jWPoDCQVDztwYpnbMHZvyoXpJviPP9NcNgAFv543rOgcj6wBf2nXLP3E+Y8jpkiiwGH05IJHowil3WnxwijybAbUThypJ+tw0B4wBXRHeOX9L3oHbiJNCYqtf4sugUAtYODuaIC966SFv3Xb1w==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=LZgy6xYj+35ZMRPS5LHmelT7OIaRVigcXUjqzM5BpC0=;
- b=V1URtX+VVutQqxKNAZXkhqrkxaxxTREJ/6njarA9EDzWK+Vo+ujaesCRA1625euXyzlNzi1KVtqXeOd6DClu5t49UQQTbPkv4y3KWl2+QR9ioSS7QWbt32nImI2I109h+lBhavs8wwI3rSwFltjx+mnSXiBII4BezswilO8AAqIEXrLoM36eItT2L9MuU6xbkQsC7gWMXhGhoh4ZG/mvwVLak1AzhnCEo30UE8OhSZOmCTnAOcHl67CpWymQB5JDDnGNkCYW8MvEmL2p59yz6zmN4syDSOl4Ci/fEkcuK/k9xvKw5C8wqWYLhBykzNJ5tJSGTwhuoeIbj6kvtdSLHg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
- dkim=pass header.d=oracle.com; arc=none
+        id S230165AbhGOSk2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 15 Jul 2021 14:40:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54464 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229966AbhGOSkZ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 15 Jul 2021 14:40:25 -0400
+Received: from mail-pf1-x42a.google.com (mail-pf1-x42a.google.com [IPv6:2607:f8b0:4864:20::42a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A4FB4C061765
+        for <kvm@vger.kernel.org>; Thu, 15 Jul 2021 11:37:30 -0700 (PDT)
+Received: by mail-pf1-x42a.google.com with SMTP id o201so6316923pfd.1
+        for <kvm@vger.kernel.org>; Thu, 15 Jul 2021 11:37:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=LZgy6xYj+35ZMRPS5LHmelT7OIaRVigcXUjqzM5BpC0=;
- b=fJAEIao+W0DPY+pEN+yZBKE/A+qm0PpLz2bC53nAFvU6TxVFxjar8S3L9Kh3EAtQxfSYcUCr5hHiStsu1xfm/rPHlqyPswKRca5uApJ1zGMaym3B46+5mt2qYDvM6Va+Yv/0TTOqeDbAvo1dVA8fkid0OEoHJ41XKVMbpm2iFTY=
-Authentication-Results: vger.kernel.org; dkim=none (message not signed)
- header.d=none;vger.kernel.org; dmarc=none action=none header.from=oracle.com;
-Received: from SN6PR10MB3021.namprd10.prod.outlook.com (2603:10b6:805:cc::19)
- by SN6PR10MB2558.namprd10.prod.outlook.com (2603:10b6:805:48::19) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4331.21; Thu, 15 Jul
- 2021 18:58:18 +0000
-Received: from SN6PR10MB3021.namprd10.prod.outlook.com
- ([fe80::f17c:44eb:d1be:2107]) by SN6PR10MB3021.namprd10.prod.outlook.com
- ([fe80::f17c:44eb:d1be:2107%7]) with mapi id 15.20.4308.027; Thu, 15 Jul 2021
- 18:58:18 +0000
-From:   Krish Sadhukhan <krish.sadhukhan@oracle.com>
-To:     kvm@vger.kernel.org
-Cc:     pbonzini@redhat.com, jmattson@google.com, seanjc@google.com,
-        vkuznets@redhat.com, wanpengli@tencent.com, joro@8bytes.org
-Subject: [PATCH 2/2] Test: nSVM: Test the effect of guest EFLAGS.TF on VMRUN
-Date:   Thu, 15 Jul 2021 14:08:24 -0400
-Message-Id: <20210715180824.234781-3-krish.sadhukhan@oracle.com>
-X-Mailer: git-send-email 2.25.4
-In-Reply-To: <20210715180824.234781-1-krish.sadhukhan@oracle.com>
-References: <20210715180824.234781-1-krish.sadhukhan@oracle.com>
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: SN7PR04CA0114.namprd04.prod.outlook.com
- (2603:10b6:806:122::29) To SN6PR10MB3021.namprd10.prod.outlook.com
- (2603:10b6:805:cc::19)
+        d=google.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=b0k1g7//WbCfpqVPknCaS62XmrgAPcdGgqibAcypVAA=;
+        b=ZuFddVCnGCX2gwIB5owc8oQOjN5zz0iQq+GFG5cfKoR26QRYNgdBRLlV3L/mvPgaVz
+         3RSdZ1WZmIi6LR4QnYs4JYaAWwwS3PhNqzoc1HTPdWdiSB5oVyimTgEpYxvbGd32qPXV
+         SOz3HElhRqllBnhDZ5bF58P3tzlMN3fbvCPenHgvmO64sLAyHp/ufhZGI0KPeyP9ynbR
+         eTFn1muNqJuSgge26KfL3qPMjaxtfPP6p821CXz1OjEck/wH1Ves4PKSg51ImOEyq6io
+         ycwb28L2SK3acNcoroR5aFuYlh4D5XqwRE601MJZRiXt2Uv7GELoNr7jC3gwYtNmeagF
+         mRIQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=b0k1g7//WbCfpqVPknCaS62XmrgAPcdGgqibAcypVAA=;
+        b=ENhczXZQy0+XbVggliabwZT8vPiyQD8SymdNj8rCQeNcIF1Jvr5eFfOHgtYO0N9z08
+         JHdhvGMVoVmG1+EiAbDLYiAd/leq/IsqLkvVtabTK4irm55Yv5QNLWIpYuNi8mGKaX+E
+         gijd/z/MFvKak6Bnegu+RxuyKzZ2GoJ3/uEvPcRA+oiyxE03TERnwgPXbQHPZveDSwgN
+         VyKOcjKExBAfdWeY8uMMd3CAoSLn8ce6r0IgFxRRVEnphz134yJf5Gwt9jLcUzRTKe4t
+         SR5zsvMsCnI6wlqp/sGccxMKA/zuNd9I106cubA4gA8ROhXe0FxPOARGA+WOW06Fv61X
+         wdmA==
+X-Gm-Message-State: AOAM530xIY7TXCXY5f0jY+fBoCBsotnOrLG2OnSikBWpHGAmXC9PO7M0
+        aubkiMz481hl0xV45C0LdBDTyA==
+X-Google-Smtp-Source: ABdhPJxqkYY9aLIvqtUQ9od6UU93/eKmeKYJstKVrJ9ha/ruBvMB7R0iAD4iuyNlkS3yLOCj5ZJZtw==
+X-Received: by 2002:aa7:8154:0:b029:310:70d:a516 with SMTP id d20-20020aa781540000b0290310070da516mr6181701pfn.63.1626374249730;
+        Thu, 15 Jul 2021 11:37:29 -0700 (PDT)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id y82sm7396193pfb.121.2021.07.15.11.37.28
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 15 Jul 2021 11:37:29 -0700 (PDT)
+Date:   Thu, 15 Jul 2021 18:37:25 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Brijesh Singh <brijesh.singh@amd.com>
+Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
+        linux-coco@lists.linux.dev, linux-mm@kvack.org,
+        linux-crypto@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        David Rientjes <rientjes@google.com>,
+        Dov Murik <dovmurik@linux.ibm.com>,
+        Tobin Feldman-Fitzthum <tobin@ibm.com>,
+        Borislav Petkov <bp@alien8.de>,
+        Michael Roth <michael.roth@amd.com>,
+        Vlastimil Babka <vbabka@suse.cz>, tony.luck@intel.com,
+        npmccallum@redhat.com, brijesh.ksingh@gmail.com
+Subject: Re: [PATCH Part2 RFC v4 05/40] x86/sev: Add RMP entry lookup helpers
+Message-ID: <YPCAZaROOHNskGlO@google.com>
+References: <20210707183616.5620-1-brijesh.singh@amd.com>
+ <20210707183616.5620-6-brijesh.singh@amd.com>
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from ban25x6uut29.us.oracle.com (138.3.201.29) by SN7PR04CA0114.namprd04.prod.outlook.com (2603:10b6:806:122::29) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4331.22 via Frontend Transport; Thu, 15 Jul 2021 18:58:17 +0000
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: cfb6ebab-6961-45d6-4a8a-08d947c28224
-X-MS-TrafficTypeDiagnostic: SN6PR10MB2558:
-X-Microsoft-Antispam-PRVS: <SN6PR10MB25589736EA7F77DA22B9FB7F81129@SN6PR10MB2558.namprd10.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:7219;
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: MGrAiaYlZ5Iccrr3d6YPKqsawubAmuXoIyLupRA1sjLLdpiiRoJyL8uSWtY9a07qbmKm/r3kgSyXC5aNwIOoU20j53b0KbBIZdxYlVF17lHoxbAisBoZckc8JPV87yrklBe2wnX/9hwC0ftQCL5N3bQWlJvR9rq79Dtj3VDkxlZKMONZMBYu/PyKmk+Ar6K0vBmJk4j1oF3q6PipOXsRRSQpJByO2SuuGcZg79e0GClDd5xeDN+BHqIslvkOGrrYQ4BSg0nnmm2Bm1Vy/g49rNMavG+2KUrZJOwCh9JmvgsnQFVrrBWuy64c9zn2MsUrwJgI8u2UCg9hjNBT+9AUsGBW9A1RCS1Mdu9w84Nb49g/8by3g/nXicY5sz1Hv/KGA0HG7/7JCUClRPXcljmmEWAUtSmIvUzDrzLqDpatK9L4ddI3JO6y1RKnuF2ItELoiKYqX0Mi4By+ZQNiADBubzMEdel69GXQDiqWDzGGwFnhfPGu4InEEkCKiZUUDYrYwF5+BHVABCP2pHilM4Wfa+lLJPais5pvjre6r68XaTVWWJS2QL8BkfewL4gOCqIAC/lexf+aFf17uFhiZ5Sb7j4ohEhIgDVkqHmmf5noyVi/zqtqHfvzBm/iOBkocdoIh7izwk3gq8efscRzYXQ46w6SGaFL1ZyQl7nf9ZiHu1SaRrbJMXFmjo3MEUy+lUSnLKloPi0NdhHtd1eyus8kYg==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR10MB3021.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(346002)(366004)(39850400004)(396003)(376002)(136003)(38350700002)(2906002)(6666004)(86362001)(36756003)(38100700002)(1076003)(4326008)(8676002)(6486002)(6916009)(186003)(478600001)(26005)(44832011)(8936002)(5660300002)(52116002)(7696005)(66946007)(66556008)(66476007)(956004)(2616005)(316002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?ULvyV3igQFVpK6J639TKHZ/ale4dXzVsCi5iTSz/edTavBNY3/Mp5RyzQyoz?=
- =?us-ascii?Q?/3fLFw/FslRSzoNgHyejJtENzog8NuNkv/NE7T4xN2IxGJaMT6HZPkLllwc+?=
- =?us-ascii?Q?e/m3TxukaVHcpkLsI5BDgiv3ZsEiIyg8slZbmXSwOBDyxDzAGUcX3hT1JcEC?=
- =?us-ascii?Q?pOi4CM2qSDsrNnbiBsnNEdA1waGCMbGf0iT0jN81H6Pfoh6vOQRX+LfINCzp?=
- =?us-ascii?Q?oXRQKueLWnCe/7XGSEkWMZs8MpbJUcPWiRxzmHE+Ieit1gvJo3P2g1BkUHvC?=
- =?us-ascii?Q?RTCXs7zN4qBS71oMnLDDY9gZ0hrwWCZym3Lw5oItntoU+NitMjvMKIJMUrHm?=
- =?us-ascii?Q?txJ4UI/OYqlFlslEh7eF9SDMG6kVrUlYJ2OscDm5zq52q+WMv5oT+4+FLIez?=
- =?us-ascii?Q?e2kmHGO1+gwFiF6tYvIXBhPD8216hz5ZoXCUpFCtDjiJfsJYZCfOFpYb9zhH?=
- =?us-ascii?Q?7yno2s/KnWQDRSaLkbD4LeuKLDXCPCJo+tPO4YpnPW7cUfJDUpHQIDQeDmOY?=
- =?us-ascii?Q?2ZFNl04KtgYbgex/rvsvbn/re924mTK2rkvkQ8bjBmtJ3AmfBs9OI5AuPthz?=
- =?us-ascii?Q?VXXgP9a0WBCY9qkHDgKOmnU3pRrj+sJw7CrcvPzp2p0NG4vNIuIQhM+/uV6f?=
- =?us-ascii?Q?9jwr+OdXZqSIxH7ZrK/6UYt6p6yvzjytPZzGi8+dn6UJqfG3Sx57N33n17sg?=
- =?us-ascii?Q?4pviBz4b9J/LdFRYaIqVTQtxFhRThogGlI3Z4tMXRykcZzUwRLdwDr97Tt2r?=
- =?us-ascii?Q?GU9omO4lEgEYH/As+7Caodni9UBeL6v+tADKr31l4WtI7mDHcwOme+qHb/8u?=
- =?us-ascii?Q?Qt0AWx4vPHh3o1riRKLGAf9gzjlM+SC6wat6a1LSHHtwchooJqHocEewMRan?=
- =?us-ascii?Q?opXvA2loGIOEo03KJUP0GNzt3kT3Q9yyA9YxfeSYey6YdM/TLvK0cNVaaZHc?=
- =?us-ascii?Q?GGJpHq1V2wn/blGCqZ5ZP4UnbJGxPTBRGuUhAlT8OZSry0Y9A19t2l2C1l0+?=
- =?us-ascii?Q?J9K2jfHNYBerbAm8JzSQisXb8lHP9XcikttpKfA6kV/NHh6nLxwS4MwHjZW+?=
- =?us-ascii?Q?wqORFxZWD6L+v53YUmECEyq5QYsENcxqgu6mCRGCRGZFb53B6VpRrdKR1p1R?=
- =?us-ascii?Q?8t8Ui/liL5xfBHKo+snVbJeVi6FzrD++mtQ60Bkp3QOEqdBylVpWyt654CM5?=
- =?us-ascii?Q?rFsJC9pc40E5nFaP8Zlqz+tNcjd3FUXrWGsLqEv4+77oRwO9ExmNB0RDw0b1?=
- =?us-ascii?Q?RppBX1KMQHIfy0S8g0mnYe6P7Ei8vP+q6yFua1LcuT69M69ZnWlrEcAW+Y86?=
- =?us-ascii?Q?E1jwf2z4GNZFIuKlzzCYqUi5?=
-X-OriginatorOrg: oracle.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: cfb6ebab-6961-45d6-4a8a-08d947c28224
-X-MS-Exchange-CrossTenant-AuthSource: SN6PR10MB3021.namprd10.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Jul 2021 18:58:18.3838
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: taj4LUZRF4IvUkljSXynt9ZLNtKPNgvnmAWA3Pk+sC7QvGiK5PelIEtuvMai1OGjm0ytjHE/5Xr4N40lKgedcrfeIvwrM2ZnN2Hhw5WU2ls=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN6PR10MB2558
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=10046 signatures=668682
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 spamscore=0 malwarescore=0 mlxscore=0
- suspectscore=0 phishscore=0 adultscore=0 mlxlogscore=899 bulkscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2104190000
- definitions=main-2107150129
-X-Proofpoint-GUID: c1UrNx3e3r7VeSFgTRem8RZ6BGNyq4Hr
-X-Proofpoint-ORIG-GUID: c1UrNx3e3r7VeSFgTRem8RZ6BGNyq4Hr
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210707183616.5620-6-brijesh.singh@amd.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-According to section "VMRUN and TF/RF Bits in EFLAGS." in APM vol 2,
+On Wed, Jul 07, 2021, Brijesh Singh wrote:
+> The snp_lookup_page_in_rmptable() can be used by the host to read the RMP
+> entry for a given page. The RMP entry format is documented in AMD PPR, see
+> https://bugzilla.kernel.org/attachment.cgi?id=296015.
 
-     "When VMRUN loads a guest value of 1 in EFLAGS.TF, that value does not
-      cause a trace trap between the VMRUN and the first guest instruction,
-      but rather after completion of the first guest instruction."
+Ewwwwww, the RMP format isn't architectural!?
 
-Signed-off-by: Krish Sadhukhan <krish.sadhukhan@oracle.com>
----
- x86/svm_tests.c | 61 +++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 61 insertions(+)
+  Architecturally the format of RMP entries are not specified in APM. In order
+  to assist software, the following table specifies select portions of the RMP
+  entry format for this specific product.
 
-diff --git a/x86/svm_tests.c b/x86/svm_tests.c
-index a56a197..2d06d9e 100644
---- a/x86/svm_tests.c
-+++ b/x86/svm_tests.c
-@@ -2491,6 +2491,66 @@ static void test_vmrun_canonicalization(void)
- 	TEST_CANONICAL(vmcb->save.tr.base, "TR");
- }
- 
-+/*
-+ * When VMRUN loads a guest value of 1 in EFLAGS.TF, that value does not
-+ * cause a trace trap between the VMRUN and the first guest instruction, but
-+ * rather after completion of the first guest instruction.
-+ *
-+ * [APM vol 2]
-+ */
-+u64 guest_rflags_test_trap_rip;
-+
-+static void guest_rflags_test_db_handler(struct ex_regs *r)
-+{
-+	guest_rflags_test_trap_rip = r->rip;
-+	r->rflags &= ~X86_EFLAGS_TF;
-+}
-+
-+extern void guest_rflags_test_guest(struct svm_test *test);
-+extern u64 *insn2;
-+extern u64 *guest_end;
-+
-+asm("guest_rflags_test_guest:\n\t"
-+    "push %rbp\n\t"
-+    ".global insn2\n\t"
-+    "insn2:\n\t"
-+    "mov %rsp,%rbp\n\t"
-+    "vmmcall\n\t"
-+    "vmmcall\n\t"
-+    ".global guest_end\n\t"
-+    "guest_end:\n\t"
-+    "vmmcall\n\t"
-+    "pop %rbp\n\t"
-+    "ret");
-+
-+static void test_guest_rflags(void)
-+{
-+	handle_exception(DB_VECTOR, guest_rflags_test_db_handler);
-+
-+	/*
-+	 * Trap expected after completion of first guest instruction
-+	 */
-+	vmcb->save.rflags |= X86_EFLAGS_TF;
-+	report (svm_vmrun_custom((u64)guest_rflags_test_guest) == SVM_EXIT_VMMCALL &&
-+		guest_rflags_test_trap_rip == (u64)&insn2,
-+               "Test EFLAGS.TF on VMRUN: trap expected after completion of first guest instruction");
-+	/*
-+	 * No trap expected
-+	 */
-+	guest_rflags_test_trap_rip = 0;
-+	vmcb->save.rip += 3;
-+	vmcb->save.rflags |= X86_EFLAGS_TF;
-+	report (svm_vmrun_custom(vmcb->save.rip) == SVM_EXIT_VMMCALL &&
-+		guest_rflags_test_trap_rip == 0, "Test EFLAGS.TF on VMRUN: trap not expected");
-+
-+	/*
-+	 * Let guest finish execution
-+	 */
-+	vmcb->save.rip += 3;
-+	report (svm_vmrun_custom(vmcb->save.rip) == SVM_EXIT_VMMCALL &&
-+		vmcb->save.rip == (u64)&guest_end, "Test EFLAGS.TF on VMRUN: guest execution completion");
-+}
-+
- static void svm_guest_state_test(void)
- {
- 	test_set_guest(basic_guest_main);
-@@ -2501,6 +2561,7 @@ static void svm_guest_state_test(void)
- 	test_dr();
- 	test_msrpm_iopm_bitmap_addrs();
- 	test_vmrun_canonicalization();
-+	test_guest_rflags();
- }
- 
- static void __svm_npt_rsvd_bits_test(u64 *pxe, u64 rsvd_bits, u64 efer,
--- 
-2.27.0
+I know we generally don't want to add infrastructure without good reason, but on
+the other hand exposing a microarchitectural data structure to the kernel at large
+is going to be a disaster if the format does change on a future processor.
 
+Looking at the future patches, dump_rmpentry() is the only power user, e.g.
+everything else mostly looks at "assigned" and "level" (and one ratelimited warn
+on "validated" in snp_make_page_shared(), but I suspect that particular check
+can and should be dropped).
+
+So, what about hiding "struct rmpentry" and possibly renaming it to something
+scary/microarchitectural, e.g. something like
+
+/*
+ * Returns 1 if the RMP entry is assigned, 0 if it exists but is not assigned,
+ * and -errno if there is no corresponding RMP entry.
+ */
+int snp_lookup_rmpentry(struct page *page, int *level)
+{
+	unsigned long phys = page_to_pfn(page) << PAGE_SHIFT;
+	struct rmpentry *entry, *large_entry;
+	unsigned long vaddr;
+
+	if (!cpu_feature_enabled(X86_FEATURE_SEV_SNP))
+		return -ENXIO;
+
+	vaddr = rmptable_start + rmptable_page_offset(phys);
+	if (unlikely(vaddr > rmptable_end))
+		return -EXNIO;
+
+	entry = (struct rmpentry *)vaddr;
+
+	/* Read a large RMP entry to get the correct page level used in RMP entry. */
+	vaddr = rmptable_start + rmptable_page_offset(phys & PMD_MASK);
+	large_entry = (struct rmpentry *)vaddr;
+	*level = RMP_TO_X86_PG_LEVEL(rmpentry_pagesize(large_entry));
+
+	return !!entry->assigned;
+}
+
+
+And then move dump_rmpentry() (or add a helper) in sev.c so that "struct rmpentry"
+can be declared in sev.c.
+
+> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
+> ---
+>  arch/x86/include/asm/sev.h |  4 +--
+>  arch/x86/kernel/sev.c      | 26 +++++++++++++++++++
+>  include/linux/sev.h        | 51 ++++++++++++++++++++++++++++++++++++++
+>  3 files changed, 78 insertions(+), 3 deletions(-)
+>  create mode 100644 include/linux/sev.h
+> 
+> diff --git a/arch/x86/include/asm/sev.h b/arch/x86/include/asm/sev.h
+> index 6c23e694a109..9e7e7e737f55 100644
+> --- a/arch/x86/include/asm/sev.h
+> +++ b/arch/x86/include/asm/sev.h
+> @@ -9,6 +9,7 @@
+>  #define __ASM_ENCRYPTED_STATE_H
+>  
+>  #include <linux/types.h>
+> +#include <linux/sev.h>
+
+Why move things to linux/sev.h?  AFAICT, even at the end of the series, the only
+users of anything in this file all reside somewhere in arch/x86.
+
+>  #include <asm/insn.h>
+>  #include <asm/sev-common.h>
+>  #include <asm/bootparam.h>
+> @@ -75,9 +76,6 @@ extern bool handle_vc_boot_ghcb(struct pt_regs *regs);
+>  /* Software defined (when rFlags.CF = 1) */
+>  #define PVALIDATE_FAIL_NOUPDATE		255
+>  
+> -/* RMP page size */
+> -#define RMP_PG_SIZE_4K			0
+> -
+>  #define RMPADJUST_VMSA_PAGE_BIT		BIT(16)
+>  
+>  #ifdef CONFIG_AMD_MEM_ENCRYPT
+> diff --git a/arch/x86/kernel/sev.c b/arch/x86/kernel/sev.c
+> index f9d813d498fa..1aed3d53f59f 100644
+> --- a/arch/x86/kernel/sev.c
+> +++ b/arch/x86/kernel/sev.c
+> @@ -49,6 +49,8 @@
+>  #define DR7_RESET_VALUE        0x400
+>  
+>  #define RMPTABLE_ENTRIES_OFFSET        0x4000
+> +#define RMPENTRY_SHIFT			8
+> +#define rmptable_page_offset(x)	(RMPTABLE_ENTRIES_OFFSET + (((unsigned long)x) >> RMPENTRY_SHIFT))
+>  
+>  /* For early boot hypervisor communication in SEV-ES enabled guests */
+>  static struct ghcb boot_ghcb_page __bss_decrypted __aligned(PAGE_SIZE);
+> @@ -2319,3 +2321,27 @@ static int __init snp_rmptable_init(void)
+>   * passthough state, and it is available after subsys_initcall().
+>   */
+>  fs_initcall(snp_rmptable_init);
+> +
+> +struct rmpentry *snp_lookup_page_in_rmptable(struct page *page, int *level)
+
+Maybe just snp_get_rmpentry?  Or snp_lookup_rmpentry?  I'm guessing the name was
+chosen to align with e.g. lookup_address_in_mm, but IMO the lookup_address helpers
+are oddly named.
+
+> +{
+> +	unsigned long phys = page_to_pfn(page) << PAGE_SHIFT;
+> +	struct rmpentry *entry, *large_entry;
+> +	unsigned long vaddr;
+> +
+> +	if (!cpu_feature_enabled(X86_FEATURE_SEV_SNP))
+> +		return NULL;
+> +
+> +	vaddr = rmptable_start + rmptable_page_offset(phys);
+> +	if (unlikely(vaddr > rmptable_end))
+> +		return NULL;
+> +
+> +	entry = (struct rmpentry *)vaddr;
+> +
+> +	/* Read a large RMP entry to get the correct page level used in RMP entry. */
+> +	vaddr = rmptable_start + rmptable_page_offset(phys & PMD_MASK);
+> +	large_entry = (struct rmpentry *)vaddr;
+> +	*level = RMP_TO_X86_PG_LEVEL(rmpentry_pagesize(large_entry));
+> +
+> +	return entry;
+> +}
