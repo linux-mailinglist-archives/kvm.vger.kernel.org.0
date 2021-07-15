@@ -2,148 +2,156 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 28BB93CA0DB
-	for <lists+kvm@lfdr.de>; Thu, 15 Jul 2021 16:42:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5F3163CA0FD
+	for <lists+kvm@lfdr.de>; Thu, 15 Jul 2021 16:55:55 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236905AbhGOOo5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 15 Jul 2021 10:44:57 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:46946 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231210AbhGOOo4 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 15 Jul 2021 10:44:56 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1626360123;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=7pcIJmX3PG+chVFQ1t6vFLhpa+n9TBg5nXXIlj2PiO4=;
-        b=KX5iPY5S+ojK2XjqI2LvWuyzTT8S/GNtF8UCBcj7NvuzW2pFYtMYu/Ol0so5Txg5GqeXdZ
-        ETeThzttoYV06vai0J/kGlyI7Q/YEL+lPoBWSVTBm2yUYdv0pXd8ZHra2MrY+U9QhUadJX
-        SVgOf3jg3OfWUDlsZdcM6QN+B8v6KGk=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-488-TU3V0QtzOpi7WKDdyzvztA-1; Thu, 15 Jul 2021 10:42:01 -0400
-X-MC-Unique: TU3V0QtzOpi7WKDdyzvztA-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B94EA1023F4B;
-        Thu, 15 Jul 2021 14:42:00 +0000 (UTC)
-Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 6909960C9F;
-        Thu, 15 Jul 2021 14:42:00 +0000 (UTC)
-From:   Paolo Bonzini <pbonzini@redhat.com>
-To:     torvalds@linux-foundation.org
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Subject: [GIT PULL] KVM fixes for Linux 5.14-rc2
-Date:   Thu, 15 Jul 2021 10:41:59 -0400
-Message-Id: <20210715144159.1132260-1-pbonzini@redhat.com>
+        id S237940AbhGOO6r (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 15 Jul 2021 10:58:47 -0400
+Received: from mail-bn7nam10on2080.outbound.protection.outlook.com ([40.107.92.80]:62689
+        "EHLO NAM10-BN7-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S231745AbhGOO6q (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 15 Jul 2021 10:58:46 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=oLs0WNpAymiVptj1LPtku7XXqxvB1ZBKC22Xqd9DkfQQkHKUV3Rkh5S5nAbgA6BNTSTAONmxMDFq+1/nLwk3l4h8FPW+/ZBQ14kqAJRPGYdrwSxTlfkYc7iKtEYFsys3PPVCHdvRNWDL1DM1LltrXpXWqq3kSz6JxUotWcWjCHodYMeZdeu8NMAAAKLLsFBrFF25SPsoFYyRjRl+os0YVu9CJN+njDXhOHFI16nBqnMBlpW5gTC0rMxnUdfoee7svHydlx472mpmJ0MNOONTjQwhRSRr7XS//fBIVd0S0d1dYZIc5S3rM/fGr9Ral+a8phaiD3Y6cuh1djwpH86NXQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=guA2e0ovaaT8BnGSBE34Q9CJNmQ8V+ghtdZcvwWQSKE=;
+ b=k5gN3gXAnaGGXrZ8awgkuKKzCsYsfPv1oP7XC+np4p4fJQmn871HHFRV3Se8OmyJyAqAH+L56FCdxyC45a0e/NvaUB0+OPYUR/8DOWUbBnD2cmNv6gxdAUw9KzYif+GizLaOC/tq7YNba1hZLN08+lDnMRnhLN7RcIXZ3B+9YGiNiHe7eX8u+/F/LWQiZ8kUpusdJvDJpxdLiY//sXtY/h4oBkd3CBtWnDr6iQ7pLnYUTuQ3YJMvTNyAyhOaD1C1IXSoe6JJ3rt/pVEGnQe5B+SbHcngmDRwVqBQBvOTrDlyao3dqhCiIoFOHi0OyrCX6td+jOWreW1bLomrV8J3IA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=guA2e0ovaaT8BnGSBE34Q9CJNmQ8V+ghtdZcvwWQSKE=;
+ b=tDVqvhDKpCD/tTNQt52ua/3R9H+suP/L8PCeUl6MaRaqL47izTpRdovkmw5buAobA6tqzKb8F190QqSc11VnabRS2ODyG9b7EW2u5l/4stzHWZMNuSGoL/4l7Et356b5J89dDRcE8lvW8s4KqBjQ6i9cwsbA/cIa3RIjoNCEHBDKhPlD3zvBYbNH8N6usnQYVgGSHkkIC9B75np6R0mUEtCq4vo/Fwspg5sqSXJk0Kw4QARVnKPNcFZ7IovrqrJsuAXRRJLb5w8dbqfVDkawxJCTQhkM1ioS3AwLHCy+LedHGX2qUwRDnKPuite4RNvphuH4Tof6G5jnZZzBcFYdZQ==
+Authentication-Results: nvidia.com; dkim=none (message not signed)
+ header.d=none;nvidia.com; dmarc=none action=none header.from=nvidia.com;
+Received: from BL0PR12MB5506.namprd12.prod.outlook.com (2603:10b6:208:1cb::22)
+ by BL1PR12MB5061.namprd12.prod.outlook.com (2603:10b6:208:310::13) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4331.22; Thu, 15 Jul
+ 2021 14:55:50 +0000
+Received: from BL0PR12MB5506.namprd12.prod.outlook.com
+ ([fe80::d017:af2f:7049:5482]) by BL0PR12MB5506.namprd12.prod.outlook.com
+ ([fe80::d017:af2f:7049:5482%5]) with mapi id 15.20.4331.024; Thu, 15 Jul 2021
+ 14:55:50 +0000
+Date:   Thu, 15 Jul 2021 11:55:48 -0300
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     Kirti Wankhede <kwankhede@nvidia.com>
+Cc:     David Airlie <airlied@linux.ie>,
+        Tony Krowiak <akrowiak@linux.ibm.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        Diana Craciun <diana.craciun@oss.nxp.com>,
+        dri-devel@lists.freedesktop.org,
+        Eric Auger <eric.auger@redhat.com>,
+        Eric Farman <farman@linux.ibm.com>,
+        Harald Freudenberger <freude@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        intel-gfx@lists.freedesktop.org,
+        intel-gvt-dev@lists.freedesktop.org,
+        Jani Nikula <jani.nikula@linux.intel.com>,
+        Jason Herne <jjherne@linux.ibm.com>,
+        Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
+        kvm@vger.kernel.org, linux-doc@vger.kernel.org,
+        linux-s390@vger.kernel.org,
+        Matthew Rosato <mjrosato@linux.ibm.com>,
+        Peter Oberparleiter <oberpar@linux.ibm.com>,
+        Halil Pasic <pasic@linux.ibm.com>,
+        Rodrigo Vivi <rodrigo.vivi@intel.com>,
+        Vineeth Vijayan <vneethv@linux.ibm.com>,
+        Zhenyu Wang <zhenyuw@linux.intel.com>,
+        Zhi Wang <zhi.a.wang@intel.com>,
+        "Raj, Ashok" <ashok.raj@intel.com>, Christoph Hellwig <hch@lst.de>,
+        Leon Romanovsky <leonro@nvidia.com>,
+        Max Gurtovoy <mgurtovoy@nvidia.com>,
+        Yishai Hadas <yishaih@nvidia.com>
+Subject: Re: [PATCH 00/13] Provide core infrastructure for managing
+ open/release
+Message-ID: <20210715145548.GD543781@nvidia.com>
+References: <0-v1-eaf3ccbba33c+1add0-vfio_reflck_jgg@nvidia.com>
+ <862e9ad9-e1f8-4179-4809-9b5b2743e640@nvidia.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <862e9ad9-e1f8-4179-4809-9b5b2743e640@nvidia.com>
+X-ClientProxiedBy: CH2PR14CA0057.namprd14.prod.outlook.com
+ (2603:10b6:610:56::37) To BL0PR12MB5506.namprd12.prod.outlook.com
+ (2603:10b6:208:1cb::22)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from mlx.ziepe.ca (206.223.160.26) by CH2PR14CA0057.namprd14.prod.outlook.com (2603:10b6:610:56::37) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4331.21 via Frontend Transport; Thu, 15 Jul 2021 14:55:49 +0000
+Received: from jgg by mlx with local (Exim 4.94)        (envelope-from <jgg@nvidia.com>)        id 1m42mC-002gn2-4p; Thu, 15 Jul 2021 11:55:48 -0300
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 6d4b88ec-2636-4001-a9d2-08d947a0a246
+X-MS-TrafficTypeDiagnostic: BL1PR12MB5061:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <BL1PR12MB50616A6C01DDF7C6F131AAC6C2129@BL1PR12MB5061.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:8882;
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: eo8LYRLGsdqOCItotTvWoarad4KYfMIxhR/hcIGnm8aTILLtEopc8kMPL/DR8QIPs/A230IADYFDEUR5jjsmOn1zexocS7u+BHO7+9532DxCfJpgGDFx4GJ6qwAb+e7I4EsqxilPPeknlXnXa91SKijMKeTMUXkjytdJd/6for3nJEeKGxBV0zJU1O2+JuLVQ7Cl5bWF+OMdUFzhX5SqF8whA0wC9Ziz3vnx3UsZ7LLISL0Xlm1OrxTLqZ/W44jbBvZzl6bBbcZF/82hbboajP+C+JnoJ2hp+Ym/3+3f0izxTDlNjaicf7R2ftmNbWM5K5wm3B/0/3G5BhXLy+Uw/LEl1B943IjMs8fmu6U2SEAR8ExhR1EokhnaBHPuQ/7I/3pyaj2Zq0TE7/ZDlUqRofnQPlwSca3/AQ7YFQ660DObZYWnTd7zhUtntLoNDWcv1b7fzgAfFyeuhK0aXrKfULfl4TBL06Gwmj6URNDCx/U9fqGOoyQy2bUV7jVlsXmcOsbBjD+ueKHNx8m28YqV5ari2E5KsRRdYoJoSpyFJGNGyZz7J+qveOEdMycmgzQ6IE5V1IWqmZhH5Y0jVj+wRzub7bPSU4esn9opihd/tSJwV4LWbUdtMdOX4nLYE5GvCDTVVS0ZJsK8bI9LkynRo5oiIhoTdL1by7U0ltiG9j9PEJrXjEhTL4FN9x9O9TwJwbfX6xJ5zrtfS7New3aOOg==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL0PR12MB5506.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(39860400002)(346002)(136003)(366004)(396003)(376002)(8676002)(4744005)(478600001)(5660300002)(54906003)(37006003)(186003)(1076003)(86362001)(2906002)(6636002)(316002)(36756003)(426003)(66476007)(66946007)(8936002)(33656002)(83380400001)(6862004)(66556008)(2616005)(38100700002)(107886003)(26005)(4326008)(9786002)(9746002)(7416002)(7406005)(27376004);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?FYVLkBk1VNHvjyxZw0ZNpplUByUzkXMSrTz4nrBMHqjqTt+v53EynhZy8XR1?=
+ =?us-ascii?Q?MBXvY/T1zNkBrr5pHQR3EqjRoDaPBQsWRztWtQNOrxTi5Nw3W9txNgz3+4UD?=
+ =?us-ascii?Q?mbKGs9/ukWf66uRScagCa1MYcU7cS0K7d7rW5bk0YB4JGhpJnRkmfuxQcasI?=
+ =?us-ascii?Q?6D2r7HkX0krO94h8yfveQUHttnydYq1bNawaT/571hfhLT3lFzjp5iLMigv2?=
+ =?us-ascii?Q?gQnahZvzCU6jL4XPiCFidM6KpI0Fq7TPuNLbc7kqy/pD4iTdK3X9KcbNi9ON?=
+ =?us-ascii?Q?4aYtJBsa8HgkARzeO86AnMt3yfd/U+X2xF29pRfKbVD8vdADBTVdWZEJW61n?=
+ =?us-ascii?Q?d8MrN5ErVmSCkbn24+H4i1d/3AubTkFABxxwoY7xTFnyzuHaewH1n0Cjpgwn?=
+ =?us-ascii?Q?jCBGmFvVG2+3ESQcbrFARfVo6+bP+tzUP0mBxVCKxu8W9Ufc14Atr0Q/Lh9b?=
+ =?us-ascii?Q?bjRQOocAMZ7ZrPrZkComqydvf35j/R+rct6vD+QHqxdamTdTf65ib2W3IzRB?=
+ =?us-ascii?Q?X5gSOhMZLZBYLDHe3D/jSE4aaRmq0JmBPMWekHYUeiIVtthggbuW0NE/vMyY?=
+ =?us-ascii?Q?UByGe/6IEsUXRAt7yD3ve0CjGbzfbbR55XZMXm4kLuSb3u/Efk0Zm8bWRN7E?=
+ =?us-ascii?Q?sMByz97cQPXO7CGLV9z9yrS1dUYjECdXbPnfx9dmQObZW2tv5GMJ9Kp2LRAs?=
+ =?us-ascii?Q?ba+uaC5nvwS0jXewyHDSYxco5quPxkNRrrrWzhoqnvogqi5Wv3lyE3ohkfzm?=
+ =?us-ascii?Q?AiD+0TfzLkAwhUhk0O4ShgG1EVRylY6UsNAA3+jAAW+dBHGO5JSHXhWd7NOE?=
+ =?us-ascii?Q?sC0yO4pzmf8xgYgtRqCoglM1KaJ3ivfRForMoWkhmTqqGGP0HSWj28DahxHP?=
+ =?us-ascii?Q?yv3d/H6niEfjmfVJhLAjlGDE4HrvRo2D763AiUoXzAA2B3G7aDKHSL4Ofb04?=
+ =?us-ascii?Q?EIq4p7p+vn4VFIX3vgqret4WGJT6rsGsWS6Agt2i8athw/u/Z1zzvbynLz3U?=
+ =?us-ascii?Q?s0E4uLbRz7z5PHyRD1y1lInVKNg+47rFoQEnhbY5I9Qy2fE8ce3vtySyVxQu?=
+ =?us-ascii?Q?BKEzUJc7kqN0Rbc4eSaOzpSPDw3rbL7s/GqFA06EUcQnXTdIe6m3aloHUNY0?=
+ =?us-ascii?Q?g3KJLGB6DUNLf5pAAdioIzRiIvQX0UpCkPJFQYTVCpPx5y2O+cG1PjuFiFIZ?=
+ =?us-ascii?Q?87B2x204X+BRMEfNuD+85aeHchmr/Vxz3DV275GN02h9iO9BV+dCJlG63Ga2?=
+ =?us-ascii?Q?cXEHkpap1ORfHetUe7X6sMlkvsRgSELrfR6P6AactV687hZdmwmj9IND1FYd?=
+ =?us-ascii?Q?3Ho4/WooVON8PgbN6MzueXRk?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 6d4b88ec-2636-4001-a9d2-08d947a0a246
+X-MS-Exchange-CrossTenant-AuthSource: BL0PR12MB5506.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Jul 2021 14:55:49.7612
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 7R3CRmrkFBvWf9epZ850JB0cjoUsrbVUULXGCCFvoDNKiayQ6RQskkFDH9j8e+UJ
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL1PR12MB5061
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Linus,
+On Thu, Jul 15, 2021 at 06:58:31PM +0530, Kirti Wankhede wrote:
 
-The following changes since commit b8917b4ae44d1b945f6fba3d8ee6777edb44633b:
+> > Review of all the drivers show that they are either already open coding
+> > the first/last semantic or are buggy and missing it. All drivers are
+> > migrated/fixed to the new open/close_device ops and the unused per-FD
+> > open()/release() ops are deleted.
+> 
+> Why can't open()/release() ops be reused instead of adding
+> open_device()/close_device().
 
-  Merge tag 'kvmarm-5.14' of git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm into HEAD (2021-06-25 11:24:24 -0400)
+It could be done but it would ruin the structure of the patch series,
+obfuscate the naming of the ops, and complicate backporting as this is
+a significant semantic difference.
 
-are available in the Git repository at:
+Overall when funtionality changes significantly it is better to change
+the name along with it
 
-  https://git.kernel.org/pub/scm/virt/kvm/kvm.git tags/for-linus
-
-for you to fetch changes up to d951b2210c1ad2dc08345bb8d97e5a172a15261e:
-
-  KVM: selftests: smm_test: Test SMM enter from L2 (2021-07-15 10:19:44 -0400)
-
-----------------------------------------------------------------
-* Allow again loading KVM on 32-bit non-PAE builds
-
-* Fixes for host SMIs on AMD
-
-* Fixes for guest SMIs on AMD
-
-* Fixes for selftests on s390 and ARM
-
-* Fix memory leak
-
-* Enforce no-instrumentation area on vmentry when hardware
-  breakpoints are in use.
-
-----------------------------------------------------------------
-Christian Borntraeger (2):
-      KVM: selftests: introduce P44V64 for z196 and EC12
-      KVM: selftests: do not require 64GB in set_memory_region_test
-
-Kefeng Wang (1):
-      KVM: mmio: Fix use-after-free Read in kvm_vm_ioctl_unregister_coalesced_mmio
-
-Lai Jiangshan (1):
-      KVM: X86: Disable hardware breakpoints unconditionally before kvm_x86->run()
-
-Like Xu (1):
-      KVM: x86/pmu: Clear anythread deprecated bit when 0xa leaf is unsupported on the SVM
-
-Marc Zyngier (1):
-      KVM: selftests: x86: Address missing vm_install_exception_handler conversions
-
-Maxim Levitsky (3):
-      KVM: SVM: #SMI interception must not skip the instruction
-      KVM: SVM: remove INIT intercept handler
-      KVM: SVM: add module param to control the #SMI interception
-
-Paolo Bonzini (1):
-      Merge tag 'kvm-s390-master-5.14-1' of git://git.kernel.org/pub/scm/linux/kernel/git/kvms390/linux into HEAD
-
-Pavel Skripkin (1):
-      kvm: debugfs: fix memory leak in kvm_create_vm_debugfs
-
-Ricardo Koller (1):
-      KVM: selftests: Address extra memslot parameters in vm_vaddr_alloc
-
-Sean Christopherson (7):
-      Revert "KVM: x86: WARN and reject loading KVM if NX is supported but not enabled"
-      KVM: x86: Use guest MAXPHYADDR from CPUID.0x8000_0008 iff TDP is enabled
-      KVM: x86: Use kernel's x86_phys_bits to handle reduced MAXPHYADDR
-      KVM: x86/mmu: Do not apply HPA (memory encryption) mask to GPAs
-      KVM: SVM: Revert clearing of C-bit on GPA in #NPF handler
-      KVM: SVM: Return -EFAULT if copy_to_user() for SEV mig packet header fails
-      KVM: SVM: Fix sev_pin_memory() error checks in SEV migration utilities
-
-Vitaly Kuznetsov (6):
-      KVM: nSVM: Check the value written to MSR_VM_HSAVE_PA
-      KVM: nSVM: Check that VM_HSAVE_PA MSR was set before VMRUN
-      KVM: nSVM: Introduce svm_copy_vmrun_state()
-      KVM: nSVM: Fix L1 state corruption upon return from SMM
-      KVM: nSVM: Restore nested control upon leaving SMM
-      KVM: selftests: smm_test: Test SMM enter from L2
-
-Yu Zhang (1):
-      KVM: VMX: Remove vmx_msr_index from vmx.h
-
- arch/x86/kvm/cpuid.c                                 | 30 +++++++++--
- arch/x86/kvm/mmu/mmu.c                               |  2 +
- arch/x86/kvm/mmu/paging.h                            | 14 +++++
- arch/x86/kvm/mmu/paging_tmpl.h                       |  4 +-
- arch/x86/kvm/mmu/spte.h                              |  6 ---
- arch/x86/kvm/svm/nested.c                            | 53 +++++++++++-------
- arch/x86/kvm/svm/sev.c                               | 14 ++---
- arch/x86/kvm/svm/svm.c                               | 77 ++++++++++++++++++++++++---
- arch/x86/kvm/svm/svm.h                               |  5 ++
- arch/x86/kvm/vmx/vmx.h                               |  2 -
- arch/x86/kvm/x86.c                                   |  8 +--
- tools/testing/selftests/kvm/include/kvm_util.h       |  3 +-
- tools/testing/selftests/kvm/lib/aarch64/processor.c  |  2 +-
- tools/testing/selftests/kvm/lib/guest_modes.c        | 16 ++++++
- tools/testing/selftests/kvm/lib/kvm_util.c           |  5 ++
- tools/testing/selftests/kvm/set_memory_region_test.c |  3 +-
- tools/testing/selftests/kvm/x86_64/hyperv_features.c |  2 +-
- tools/testing/selftests/kvm/x86_64/mmu_role_test.c   |  2 +-
- tools/testing/selftests/kvm/x86_64/smm_test.c        | 70 +++++++++++++++++++++---
- virt/kvm/coalesced_mmio.c                            |  2 +-
- virt/kvm/kvm_main.c                                  |  2 +-
- 21 files changed, 258 insertions(+), 64 deletions(-)
-
+Jason
