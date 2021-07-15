@@ -2,170 +2,189 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 442BF3CAF1C
-	for <lists+kvm@lfdr.de>; Fri, 16 Jul 2021 00:27:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 156D93CAFC6
+	for <lists+kvm@lfdr.de>; Fri, 16 Jul 2021 01:48:29 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230143AbhGOWas (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 15 Jul 2021 18:30:48 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:37848 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231278AbhGOWap (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 15 Jul 2021 18:30:45 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1626388071;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=CLA8eO2Mn4hxr+cJbgc910e8VN/wkTHNL7BaNmCYSD0=;
-        b=CZseuO4VjGJ+qQf/Rw1LhVWGrKLWUBZQ8kZuBJ1P/GQJTWgaixX4F/8gGi1HJHnn2gdIxo
-        d4jQG+N4/eUR+upugTRhyL+A3gKyJUDs/30Ml3E6FiqMZXr9UrCUAPpMMKzAZpgToVTynk
-        xH6yvu5Uym90YwjBaJB4rFHFNXssnLM=
-Received: from mail-ot1-f70.google.com (mail-ot1-f70.google.com
- [209.85.210.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-404-gpuW5wP-NSyG_R7kBlRIug-1; Thu, 15 Jul 2021 18:27:50 -0400
-X-MC-Unique: gpuW5wP-NSyG_R7kBlRIug-1
-Received: by mail-ot1-f70.google.com with SMTP id y59-20020a9d22c10000b0290451891192f0so5697139ota.1
-        for <kvm@vger.kernel.org>; Thu, 15 Jul 2021 15:27:50 -0700 (PDT)
+        id S232499AbhGOXvT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 15 Jul 2021 19:51:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41704 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232452AbhGOXvT (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 15 Jul 2021 19:51:19 -0400
+Received: from mail-pf1-x42c.google.com (mail-pf1-x42c.google.com [IPv6:2607:f8b0:4864:20::42c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4CCE3C061760
+        for <kvm@vger.kernel.org>; Thu, 15 Jul 2021 16:48:24 -0700 (PDT)
+Received: by mail-pf1-x42c.google.com with SMTP id 17so7178316pfz.4
+        for <kvm@vger.kernel.org>; Thu, 15 Jul 2021 16:48:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=5OQMDn6Hx/yHVRBDOLcOoarZgTpJ6ou0lJ0Voq0OG4M=;
+        b=Xerp+3Ma+7CKr4/78JI541G8uYD8//jwvClMOF/fOO7QmiQm8HAEUnu6NpDbBLMH1q
+         bZGV9qTn+NrOGGYaOzCjTB7B/aPpvd5It43hKuUVskOmztUVNBp7D+395FsS2sQvlrxq
+         xVAo8FpFCDhowTVg4hGaiMCdbGyqn6qUNM0miSvgPCaSI49UBGL5vj48ibmF6+Rb17X0
+         w7C8AuBB8wkZlc1aeNQ5K9KigBlX9jYvbv1ccsercnerPpuW03IdweX4DvdjBnQR82bX
+         e0jajjskDBGjMsxL7Fj/B+zCTGGj135zbVxs9kViMAV8ZYC/Kcwbxlf9wsPPlckGHHm4
+         ds+Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=CLA8eO2Mn4hxr+cJbgc910e8VN/wkTHNL7BaNmCYSD0=;
-        b=V81RNMA+rP1uIhgLgAoM79T9mr0Ju8FyXDLWDhEizUgnKHX0sWlDilbUJXVZdo5m/m
-         wBXmXf2C6ylx+sY+Nt+tXjmZCqiqES0L4CzI0FNR5CkbBzqI0Ne/kft66M/ZhxcOA1H0
-         kCwWzMcRYr+6NzMWt4XainI38Gg+y6owAu2JS+UN3m3Y4LGNlQEj8iIKjnSwuAmoH8/T
-         ZV+ET27QxEtf6sUJF7EAgh5CxILyllLuyTeUFNwLj4tQv/DNe4MwQfGOFRfXQHFSejip
-         4CLQaRfSZdZMTvAUjI7tko8cHMbiGOmflvmkmTNPo08f+EePWJQ3oNqP1qfAGipdgc9E
-         m42w==
-X-Gm-Message-State: AOAM531RMH5BLnlBDSvG0SU+bB5w/ljZqiK7Ino/aN+dW0O+DEcZE3GY
-        9HT50T7mmANjaupLwj5BQhEJk6Bp9TRmVrVXEyA2BGXeK8KZc3ALDDdQI7unN96E7BWED/C47fP
-        t44QmGb3UWBLP
-X-Received: by 2002:a9d:5e15:: with SMTP id d21mr5845728oti.280.1626388069903;
-        Thu, 15 Jul 2021 15:27:49 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyp8ZblGgPS0JAdEwOCHdvHkA3HueEV2SZpBhta6Fuh8EOKxxl4birTsJK3gicGUmZGOxesYw==
-X-Received: by 2002:a9d:5e15:: with SMTP id d21mr5845703oti.280.1626388069722;
-        Thu, 15 Jul 2021 15:27:49 -0700 (PDT)
-Received: from redhat.com ([198.99.80.109])
-        by smtp.gmail.com with ESMTPSA id v203sm1565993oib.37.2021.07.15.15.27.48
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=5OQMDn6Hx/yHVRBDOLcOoarZgTpJ6ou0lJ0Voq0OG4M=;
+        b=sviXCN0RP963vlt559Zb0KyuIUJZ28JQcDqrZzT4PBjpdhCsqbmyYRhhpPddIu1gKY
+         aS8z4KVZlMZr+hZpklUxmlMcCHwFj/LvoJZ/tDdFdKG/KkjhFtK4AuN8yqwMwHT89aEf
+         mTrwgo9wPV2/EMnajij7K3/as6m0MO5jVIG0GgQ5KdJNJ8Vd2cqIy1oAlUAu2s+ZrtpP
+         hW8WMZ0i34I4p6V6Dx6QTzc/kXRtfv05E8vWcBV5OFiSNMaxUPzIJb8MfUIvqKLCLJUO
+         2Pyq5L+Rc3PLfEYNiuKjdRvCY1J+ZOYcCNfDpX1yjAuIzc0t6gXEnBAoOsZPEr0yustg
+         PUlg==
+X-Gm-Message-State: AOAM531cSXJsfR4Ko8C/fYvdFFS6arFbo2rdY/+iI1wxCn+fLh1DYwoD
+        pNB9Vl2d3xgA2ASbnQvF6mvnTw==
+X-Google-Smtp-Source: ABdhPJzB/aLwcMzRnzgFsmskaKhCj/u4SogoqFPq9x0TyUcwapKqqebbwl1vM0o7pXaHZ6NJDfrs4g==
+X-Received: by 2002:a63:4e5d:: with SMTP id o29mr275121pgl.379.1626392903572;
+        Thu, 15 Jul 2021 16:48:23 -0700 (PDT)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id o184sm8719553pga.18.2021.07.15.16.48.22
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 15 Jul 2021 15:27:49 -0700 (PDT)
-Date:   Thu, 15 Jul 2021 16:27:47 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Jason Gunthorpe <jgg@nvidia.com>
-Cc:     David Airlie <airlied@linux.ie>,
-        Tony Krowiak <akrowiak@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Daniel Vetter <daniel@ffwll.ch>,
-        Diana Craciun <diana.craciun@oss.nxp.com>,
-        dri-devel@lists.freedesktop.org,
-        Eric Auger <eric.auger@redhat.com>,
-        Eric Farman <farman@linux.ibm.com>,
-        Harald Freudenberger <freude@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        intel-gfx@lists.freedesktop.org,
-        intel-gvt-dev@lists.freedesktop.org,
-        Jani Nikula <jani.nikula@linux.intel.com>,
-        Jason Herne <jjherne@linux.ibm.com>,
-        Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
-        kvm@vger.kernel.org, Kirti Wankhede <kwankhede@nvidia.com>,
-        linux-doc@vger.kernel.org, linux-s390@vger.kernel.org,
-        Matthew Rosato <mjrosato@linux.ibm.com>,
-        Peter Oberparleiter <oberpar@linux.ibm.com>,
-        Halil Pasic <pasic@linux.ibm.com>,
-        Rodrigo Vivi <rodrigo.vivi@intel.com>,
-        Vineeth Vijayan <vneethv@linux.ibm.com>,
-        Zhenyu Wang <zhenyuw@linux.intel.com>,
-        Zhi Wang <zhi.a.wang@intel.com>,
-        "Raj, Ashok" <ashok.raj@intel.com>, Christoph Hellwig <hch@lst.de>,
-        Leon Romanovsky <leonro@nvidia.com>,
-        Max Gurtovoy <mgurtovoy@nvidia.com>,
-        Yishai Hadas <yishaih@nvidia.com>
-Subject: Re: [PATCH 09/13] vfio/pci: Reorganize VFIO_DEVICE_PCI_HOT_RESET to
- use the device set
-Message-ID: <20210715162747.4186b482.alex.williamson@redhat.com>
-In-Reply-To: <20210715221149.GJ543781@nvidia.com>
-References: <0-v1-eaf3ccbba33c+1add0-vfio_reflck_jgg@nvidia.com>
-        <9-v1-eaf3ccbba33c+1add0-vfio_reflck_jgg@nvidia.com>
-        <20210715150055.474f535f.alex.williamson@redhat.com>
-        <20210715221149.GJ543781@nvidia.com>
-X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
+        Thu, 15 Jul 2021 16:48:22 -0700 (PDT)
+Date:   Thu, 15 Jul 2021 23:48:19 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Brijesh Singh <brijesh.singh@amd.com>
+Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
+        linux-coco@lists.linux.dev, linux-mm@kvack.org,
+        linux-crypto@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        David Rientjes <rientjes@google.com>,
+        Dov Murik <dovmurik@linux.ibm.com>,
+        Tobin Feldman-Fitzthum <tobin@ibm.com>,
+        Borislav Petkov <bp@alien8.de>,
+        Michael Roth <michael.roth@amd.com>,
+        Vlastimil Babka <vbabka@suse.cz>, tony.luck@intel.com,
+        npmccallum@redhat.com, brijesh.ksingh@gmail.com
+Subject: Re: [PATCH Part2 RFC v4 15/40] crypto: ccp: Handle the legacy TMR
+ allocation when SNP is enabled
+Message-ID: <YPDJQ0uumar8j22y@google.com>
+References: <20210707183616.5620-1-brijesh.singh@amd.com>
+ <20210707183616.5620-16-brijesh.singh@amd.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210707183616.5620-16-brijesh.singh@amd.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 15 Jul 2021 19:11:49 -0300
-Jason Gunthorpe <jgg@nvidia.com> wrote:
+On Wed, Jul 07, 2021, Brijesh Singh wrote:
+> The behavior and requirement for the SEV-legacy command is altered when
+> the SNP firmware is in the INIT state. See SEV-SNP firmware specification
+> for more details.
+> 
+> When SNP is INIT state, all the SEV-legacy commands that cause the
+> firmware to write memory must be in the firmware state. The TMR memory
 
-> On Thu, Jul 15, 2021 at 03:00:55PM -0600, Alex Williamson wrote:
-> > On Wed, 14 Jul 2021 21:20:38 -0300
-> > Jason Gunthorpe <jgg@nvidia.com> wrote:  
-> > > +/*
-> > > + * We need to get memory_lock for each device, but devices can share mmap_lock,
-> > > + * therefore we need to zap and hold the vma_lock for each device, and only then
-> > > + * get each memory_lock.
-> > > + */
-> > > +static int vfio_hot_reset_device_set(struct vfio_pci_device *vdev,
-> > > +				     struct vfio_pci_group_info *groups)
-> > > +{
-> > > +	struct vfio_device_set *dev_set = vdev->vdev.dev_set;
-> > > +	struct vfio_pci_device *cur_mem =
-> > > +		list_first_entry(&dev_set->device_list, struct vfio_pci_device,
-> > > +				 vdev.dev_set_list);  
-> > 
-> > We shouldn't be looking at the list outside of the lock, if the first
-> > entry got removed we'd break our unwind code.
-> >   
-> > > +	struct vfio_pci_device *cur_vma;
-> > > +	struct vfio_pci_device *cur;
-> > > +	bool is_mem = true;
-> > > +	int ret;
-> > >  
-> > > -	if (pci_dev_driver(pdev) != &vfio_pci_driver) {
-> > > -		vfio_device_put(device);
-> > > -		return -EBUSY;
-> > > +	mutex_lock(&dev_set->lock);  
-> >         ^^^^^^^^^^^^^^^^^^^^^^^^^^^  
-> 
-> Oh, righto, this is an oopsie!
-> 
-> > > +	list_for_each_entry(cur, &dev_set->device_list, vdev.dev_set_list)
-> > > +		up_write(&cur->memory_lock);
-> > > +	mutex_unlock(&dev_set->lock);
-> > > +
-> > > +	return ret;  
-> > 
-> > 
-> > Isn't the above section actually redundant to below, ie. we could just
-> > fall through after the pci_reset_bus()?  Thanks,  
-> 
-> It could, but I thought it was less confusing this way due to how
-> oddball the below is:
-> 
-> > > +err_undo:
-> > > +	list_for_each_entry(cur, &dev_set->device_list, vdev.dev_set_list) {
-> > > +		if (cur == cur_mem)
-> > > +			is_mem = false;
-> > > +		if (cur == cur_vma)
-> > > +			break;
-> > > +		if (is_mem)
-> > > +			up_write(&cur->memory_lock);
-> > > +		else
-> > > +			mutex_unlock(&cur->vma_lock);
-> > > +	}  
-> 
-> But either works, do want it switch in v2?
+It'd be helpful to spell out Trusted Memory Region, I hadn't seen that
+term before and for some reason my brain immediately thought "xAPIC register!".
 
-Yeah, I think the simpler version just adds to the confusion of what
-this oddball logic does.  It already handles all cases, up to and
-including success, so let's give it more exercise by always using it.
-Thanks,
+> is allocated by the host but updated by the firmware, so, it must be
+> in the firmware state.  Additionally, the TMR memory must be a 2MB aligned
+> instead of the 1MB, and the TMR length need to be 2MB instead of 1MB.
+> The helper __snp_{alloc,free}_firmware_pages() can be used for allocating
+> and freeing the memory used by the firmware.
 
-Alex
+None of this actually states what the patch does, e.g. it's not clear whether
+all allocations are being converted to 2mb or just the SNP.  Looks like it's
+just SNP.  Something like this?
 
+  Allocate the Trusted Memory Region (TMR) as a 2mb sized/aligned region when
+  SNP is enabled to satisfy new requirements for SNP.  Continue allocating a
+  1mb region for !SNP configuration.
+
+> While at it, provide API that can be used by others to allocate a page
+> that can be used by the firmware. The immediate user for this API will
+> be the KVM driver. The KVM driver to need to allocate a firmware context
+> page during the guest creation. The context page need to be updated
+> by the firmware. See the SEV-SNP specification for further details.
+
+...
+
+> @@ -1153,8 +1269,10 @@ static void sev_firmware_shutdown(struct sev_device *sev)
+>  		/* The TMR area was encrypted, flush it from the cache */
+>  		wbinvd_on_all_cpus();
+>  
+> -		free_pages((unsigned long)sev_es_tmr,
+> -			   get_order(SEV_ES_TMR_SIZE));
+> +
+> +		__snp_free_firmware_pages(virt_to_page(sev_es_tmr),
+> +					  get_order(sev_es_tmr_size),
+> +					  false);
+>  		sev_es_tmr = NULL;
+>  	}
+>  
+> @@ -1204,16 +1322,6 @@ void sev_pci_init(void)
+>  	    sev_update_firmware(sev->dev) == 0)
+>  		sev_get_api_version();
+>  
+> -	/* Obtain the TMR memory area for SEV-ES use */
+> -	tmr_page = alloc_pages(GFP_KERNEL, get_order(SEV_ES_TMR_SIZE));
+> -	if (tmr_page) {
+> -		sev_es_tmr = page_address(tmr_page);
+> -	} else {
+> -		sev_es_tmr = NULL;
+> -		dev_warn(sev->dev,
+> -			 "SEV: TMR allocation failed, SEV-ES support unavailable\n");
+> -	}
+> -
+>  	/*
+>  	 * If boot CPU supports the SNP, then first attempt to initialize
+>  	 * the SNP firmware.
+> @@ -1229,6 +1337,16 @@ void sev_pci_init(void)
+>  		}
+>  	}
+>  
+> +	/* Obtain the TMR memory area for SEV-ES use */
+> +	tmr_page = __snp_alloc_firmware_pages(GFP_KERNEL, get_order(sev_es_tmr_size), false);
+> +	if (tmr_page) {
+> +		sev_es_tmr = page_address(tmr_page);
+> +	} else {
+> +		sev_es_tmr = NULL;
+> +		dev_warn(sev->dev,
+> +			 "SEV: TMR allocation failed, SEV-ES support unavailable\n");
+> +	}
+
+I think your patch ordering got a bit wonky.  AFAICT, the chunk that added
+sev_snp_init() and friends in the previous patch 14 should have landed above
+the TMR allocation, i.e. the code movement here should be unnecessary.
+
+>  	/* Initialize the platform */
+>  	rc = sev_platform_init(&error);
+>  	if (rc && (error == SEV_RET_SECURE_DATA_INVALID)) {
+
+...
+
+> @@ -961,6 +965,13 @@ static inline int snp_guest_dbg_decrypt(struct sev_data_snp_dbg *data, int *erro
+>  	return -ENODEV;
+>  }
+>  
+> +static inline void *snp_alloc_firmware_page(gfp_t mask)
+> +{
+> +	return NULL;
+> +}
+> +
+> +static inline void snp_free_firmware_page(void *addr) { }
+
+Hmm, I think we should probably bite the bullet and #ifdef and/or stub out large
+swaths of svm/sev.c before adding SNP support.  sev.c is getting quite massive,
+and we're accumulating more and more stubs outside of KVM because its SEV code
+is compiled unconditionally.
