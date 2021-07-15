@@ -2,198 +2,110 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D032E3CAF02
-	for <lists+kvm@lfdr.de>; Fri, 16 Jul 2021 00:12:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4935A3CAF17
+	for <lists+kvm@lfdr.de>; Fri, 16 Jul 2021 00:24:32 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232064AbhGOWOs (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 15 Jul 2021 18:14:48 -0400
-Received: from mail-bn7nam10on2056.outbound.protection.outlook.com ([40.107.92.56]:9601
-        "EHLO NAM10-BN7-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S231871AbhGOWOr (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 15 Jul 2021 18:14:47 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=QjzovEptQ1Kx11El65RBKQnSULZKQaTU+7AqLOprQUmJWTvDywTUFlBmK5DiqRxapCiEbODcPyWyFYbtSP/Qrr6qK7kxwA/rZndtt77NAhfjeZDzJzGsbGF08p4VlT1jVmvBF8sL1krXw7s9kfzKF50WI5oqIoWEDTpKbVPkGiXskh6MZQPYsdqehNyFSNlopBUnXGILwK8yUwJkAvOIK3mPYMjeURl7BIz7+NPTmdeeIfrl+EYevKCi1A0MEDzVMDVWrjLR0lBwT9VTpTQ9hm0l5gLQ9MdJiN0bXej2iiKcOl3zP70mPbR25tWb5X5G/Xy5zATm/q3p4QweOxv0+w==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=MRa6WL/7Sz7cBATAupIJCezZXUKpeypA3CUH9nnfBsc=;
- b=PfL2BTG5TPp68wA3fC3mtu/MP5EWmKUb3Ff3PwacT+4bi5q7R41ciVo8cts1nf2wQPzHIZ2seUOcXug25sL2R+e+VN4NZO+NtA1UN5/ENS2R6ARo3aoqdrjaD8tTDEAsmTukMY/fB5BUqt0ZKEAlWfWfb+y/jxYQeA3hN0WfN1Xtp6HHCgypgiDw4NTGyyp2tnythycxGB6LTamqAeyUzvGyTEKx2PeND6uJv96yBXTvux9PEaHOdPo7bI0YRf28WZsGqFL72T3521oRlPxBrdTDNzZ7CtvAxM8hXJPMKrZKjZCou+MOumQM1UrYBOqrL6JPrMsXmT2mgOKFBR1Rsw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=MRa6WL/7Sz7cBATAupIJCezZXUKpeypA3CUH9nnfBsc=;
- b=tGhJuuE6Knh6p8e3erQs1W7OsAKpZl1mdcbeJr+MX39n8qItiZkvkoRYCnloIzGA14waWsacp8AXpRpa1PdrDQb5xdTh9qcpSD15aDLnZaifAh1aWYviwmPEZWSY99qB08senv7ZjelO7l5zH8mziRmFNQXzp8fJgvp2Uwxy17JOsBJWcyGh3wuU/HEtAQYY4jERkq9jfr7tivsiNz2OjbTa2e9lhajxbgU1adgOEcyDLZyyp82fUcpFR51j3XbIAmy0LX7xppHGIh4yapw5U/VtmrhpmifhRPDAdMOigC7yaXtDwhayblDlbmruHVSGdR/TOZ9j5wqCDp3YbzJQhg==
-Authentication-Results: redhat.com; dkim=none (message not signed)
- header.d=none;redhat.com; dmarc=none action=none header.from=nvidia.com;
-Received: from BL0PR12MB5506.namprd12.prod.outlook.com (2603:10b6:208:1cb::22)
- by BL1PR12MB5078.namprd12.prod.outlook.com (2603:10b6:208:313::11) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4331.22; Thu, 15 Jul
- 2021 22:11:51 +0000
-Received: from BL0PR12MB5506.namprd12.prod.outlook.com
- ([fe80::d017:af2f:7049:5482]) by BL0PR12MB5506.namprd12.prod.outlook.com
- ([fe80::d017:af2f:7049:5482%5]) with mapi id 15.20.4331.024; Thu, 15 Jul 2021
- 22:11:51 +0000
-Date:   Thu, 15 Jul 2021 19:11:49 -0300
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     Alex Williamson <alex.williamson@redhat.com>
-Cc:     David Airlie <airlied@linux.ie>,
-        Tony Krowiak <akrowiak@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Daniel Vetter <daniel@ffwll.ch>,
-        Diana Craciun <diana.craciun@oss.nxp.com>,
-        dri-devel@lists.freedesktop.org,
-        Eric Auger <eric.auger@redhat.com>,
-        Eric Farman <farman@linux.ibm.com>,
-        Harald Freudenberger <freude@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        intel-gfx@lists.freedesktop.org,
-        intel-gvt-dev@lists.freedesktop.org,
-        Jani Nikula <jani.nikula@linux.intel.com>,
-        Jason Herne <jjherne@linux.ibm.com>,
-        Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
-        kvm@vger.kernel.org, Kirti Wankhede <kwankhede@nvidia.com>,
-        linux-doc@vger.kernel.org, linux-s390@vger.kernel.org,
-        Matthew Rosato <mjrosato@linux.ibm.com>,
-        Peter Oberparleiter <oberpar@linux.ibm.com>,
-        Halil Pasic <pasic@linux.ibm.com>,
-        Rodrigo Vivi <rodrigo.vivi@intel.com>,
-        Vineeth Vijayan <vneethv@linux.ibm.com>,
-        Zhenyu Wang <zhenyuw@linux.intel.com>,
-        Zhi Wang <zhi.a.wang@intel.com>,
-        "Raj, Ashok" <ashok.raj@intel.com>, Christoph Hellwig <hch@lst.de>,
-        Leon Romanovsky <leonro@nvidia.com>,
-        Max Gurtovoy <mgurtovoy@nvidia.com>,
-        Yishai Hadas <yishaih@nvidia.com>
-Subject: Re: [PATCH 09/13] vfio/pci: Reorganize VFIO_DEVICE_PCI_HOT_RESET to
- use the device set
-Message-ID: <20210715221149.GJ543781@nvidia.com>
-References: <0-v1-eaf3ccbba33c+1add0-vfio_reflck_jgg@nvidia.com>
- <9-v1-eaf3ccbba33c+1add0-vfio_reflck_jgg@nvidia.com>
- <20210715150055.474f535f.alex.williamson@redhat.com>
+        id S231342AbhGOW1Y (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 15 Jul 2021 18:27:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51260 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229792AbhGOW1X (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 15 Jul 2021 18:27:23 -0400
+Received: from mail-pf1-x42a.google.com (mail-pf1-x42a.google.com [IPv6:2607:f8b0:4864:20::42a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E7474C06175F
+        for <kvm@vger.kernel.org>; Thu, 15 Jul 2021 15:24:28 -0700 (PDT)
+Received: by mail-pf1-x42a.google.com with SMTP id 17so6950108pfz.4
+        for <kvm@vger.kernel.org>; Thu, 15 Jul 2021 15:24:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=2lQDk68Sg2ZcVfZoZUpcNk+B0eVf8vhZQYIFh/6ss3c=;
+        b=oxwBnn1jSOaB6+KZAq7l+6dV6lmn2zeQyJ69rrNgm+dKEY+pzQZQ62yxFpf4m1G6jZ
+         itXUe2AvaJ3SumTdAArdH6qy5jsvFVDJs4Y4bDQd4AmRsjm6B91BUyMlAzMREMJ4FHaF
+         db9GBUCph88kknuQbH2as6UB+FBPUUw+gZvaxvBmVXB1wGIIx0yXcNpbcFcgkt38SRCE
+         z+jxc8mxLxiRViX62tml0U7r8ArkYPlLX24ZLdL4gZdPgC5+T3MUp67jotAGqw0RLpHN
+         1YxSy2VL0OZjwMW3L5nB4tEdYn2NmOBmvWkomOyxF8kyicvBWkoiLYbJs0qC9J4Klevv
+         UGxA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=2lQDk68Sg2ZcVfZoZUpcNk+B0eVf8vhZQYIFh/6ss3c=;
+        b=VWF+76t33W8tvNOhRE8OsITa+FYlBh6tIkfw/OrvpdfiAHx82Nh5Kh7IuzmLiIID7i
+         8ESfDdfxWFr0+XkS1mZ4yIk+Mi37o+NeKyDc+7hyrTOOpbm405SpAIRK9BhNwDAXT0MV
+         sgkaPkGYGl2OX2wZHX0zHhroLOQ1mCQBcL1Gv7SDzyp3TIZtVgLycf/AZaRnQ9uTjGpl
+         Pik9SoOgc30/emKoVtTJ4gkgq7itN3iwcYVRauCkPzTUxOWPk79tPwja91dHjY6N8P4D
+         DIPRIhk0FsRC0ntwGahkOeDzWiGeRITfb0uHMu1lWIkLquqWomnmVyQGXykcv3iCzLKY
+         Sq7Q==
+X-Gm-Message-State: AOAM531lxH0v7pK+Qau2L79ejuRBSpoopxOTBHkghEOh5cH+BhdYG0TO
+        QEXLaszn4rvvMElWt4xkPnfttg==
+X-Google-Smtp-Source: ABdhPJzPCzT3r4sxyQ8lS3dX63H0wq99U0HEg0khmmtGLlGyV2wHrFFVp+loksaPbmyCezZbvpkHZA==
+X-Received: by 2002:a63:2b91:: with SMTP id r139mr6606926pgr.242.1626387867089;
+        Thu, 15 Jul 2021 15:24:27 -0700 (PDT)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id c7sm8073897pgq.22.2021.07.15.15.24.26
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 15 Jul 2021 15:24:26 -0700 (PDT)
+Date:   Thu, 15 Jul 2021 22:24:22 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     harry harry <hiharryharryharry@gmail.com>
+Cc:     Maxim Levitsky <mlevitsk@redhat.com>, kvm@vger.kernel.org,
+        qemu-devel@nongnu.org,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Paolo Bonzini <pbonzini@redhat.com>, stefanha@redhat.com,
+        mathieu.tarral@protonmail.com
+Subject: Re: About two-dimensional page translation (e.g., Intel EPT) and
+ shadow page table in Linux QEMU/KVM
+Message-ID: <YPC1lgV5dZC0CyG0@google.com>
+References: <CA+-xGqNUX4dpzFV7coJSoJnPz6cE5gdPy1kzRKsQtGD371hyEg@mail.gmail.com>
+ <d79db3d7c443f392f5a8b3cf631e5607b72b6208.camel@redhat.com>
+ <CA+-xGqOdu1rjhkG0FhxfzF1N1Uiq+z0b3MBJ=sjuVStHP5TBKg@mail.gmail.com>
+ <d95d40428ec07ee07e7c583a383d5f324f89686a.camel@redhat.com>
+ <YOxYM+8qCIyV+rTJ@google.com>
+ <CA+-xGqOSd0yhU4fEcobf3tW0mLb0TmLGycTwXNVUteyvvnXjdw@mail.gmail.com>
+ <YO8jPvScgCmtj0JP@google.com>
+ <CA+-xGqOkH-hU1guGx=t-qtjsRdO92oX+8HhcO1eXnCigMc+NPw@mail.gmail.com>
+MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20210715150055.474f535f.alex.williamson@redhat.com>
-X-ClientProxiedBy: YT1PR01CA0005.CANPRD01.PROD.OUTLOOK.COM (2603:10b6:b01::18)
- To BL0PR12MB5506.namprd12.prod.outlook.com (2603:10b6:208:1cb::22)
-MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from mlx.ziepe.ca (206.223.160.26) by YT1PR01CA0005.CANPRD01.PROD.OUTLOOK.COM (2603:10b6:b01::18) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4331.21 via Frontend Transport; Thu, 15 Jul 2021 22:11:50 +0000
-Received: from jgg by mlx with local (Exim 4.94)        (envelope-from <jgg@nvidia.com>)        id 1m49a9-002sbh-74; Thu, 15 Jul 2021 19:11:49 -0300
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 2ffc67c4-ba7b-4274-9d79-08d947dd8ba9
-X-MS-TrafficTypeDiagnostic: BL1PR12MB5078:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <BL1PR12MB507897DF81B77B1C1F91D789C2129@BL1PR12MB5078.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:9508;
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 0QQIHEyJEcDYD1VDKW8jMBeCzikFy01FFLn5sbD2PoSDxIN798ZU6Key7P+pPnwgiSDOFhRu9NJQngqUL7hCIkQZFEiOz0laRu2PgSebB7muJQdFnbbx2YoXRYQ8dB1ZQHqNDNDqbBDcAmOVPZYWUDVZpWWYE3UVgs1Tu1NP1aBis5MVeQfyQH5m68bGM/bAgpVJ38gKaxWHA6K1PZfzPdXAioUjjaffV8BIEs540BHyj2tXuLvoe5ulweeNxzc055nnlnmpKMwe9S8E/T2t32dXUjvHHrUboXUfmngEslGdC3L8VqHofZwHReZ31fN9VJFDor0e/jF/RJsJnD2Pn3LWK+1a0/ukaLHOSNHRD8bXT/o18K0eNyMXqC/v5mosN7Kw2A1QaWJHJxVnQACkdXMIdThZNGfVtnZY337bSRKIKXZ9HtNq1QfirM8+ICVm5o0ZxtA6RloVt3phXYSgSIYnwH6aU2EFHWz2HiKus8Y468xkxNdJIYlFBus4z+0IdZLiHeyPue3EPQeE+n/l0A4i1ohNDHFPAGGnddNlHwcoRLdWBDtC1kzSp8fylci5l6knFFDWS0r55doQCtKqwA2Ivv5OBE2lqlDW5pg2u/RRHmhXZ1krHIWVV/P+/FwHZZVtWvudQ8Hi6jItS/GdNnauqolQt705MJF+hUFefTdZfxRnBJkOopLpoZmvz0/5
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL0PR12MB5506.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(376002)(396003)(39860400002)(346002)(366004)(136003)(86362001)(316002)(54906003)(6916009)(26005)(33656002)(426003)(2616005)(66476007)(2906002)(7416002)(7406005)(1076003)(66556008)(5660300002)(38100700002)(8676002)(4326008)(8936002)(9746002)(9786002)(186003)(83380400001)(36756003)(478600001)(107886003)(66946007)(27376004);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?VyfpNAPsL9Z1ZYGGu1s5XN6lsWuAZHOHZdIHseT0JRJB7MeSP66itwDLzfsr?=
- =?us-ascii?Q?Pm1Lh+OewfF83bk2nxGUl5Q0/g9mAysf6iAVXl5s3zhAUObAL/f8zpgen2oj?=
- =?us-ascii?Q?rHgBXzbbAIREtEqusIikEubn3CJ9CO01THUzJfk/4KLGgJjjGnk471Ay61Xw?=
- =?us-ascii?Q?jSMgHaLZG2y6aobi3JQxGeAJqktF050A8nwXz4g1b1bMTnzaaIUAo3g1mF6a?=
- =?us-ascii?Q?44R3QInZNYiArXPEWrQeYJxobKpUsH4PPpjLDaITzvvUURJwH7M1ukDa/JzJ?=
- =?us-ascii?Q?JOvlkHsBwVMEPQY9OyibkDtZKYR4CzsGpTxw9v6/q8aXEiWO6PBhm8u6UTom?=
- =?us-ascii?Q?NVBzSRRkTg+YWwsr3fUOoOJDPUvZ4AWrZkLmTNenZFkqRIntOXHDUkIPktDJ?=
- =?us-ascii?Q?4NLfpFn40ETgsuYTLfQFg0Hm77c5PYHq8AYJTAnJTC0ItMq0SrT6ExOlV4sB?=
- =?us-ascii?Q?J8RJ5SLCiUrx0ylIdruATsHnHnVskcbuah2fDbi9BJG+U1xDutErflqc9uXQ?=
- =?us-ascii?Q?/U3E4+u3FKy3tzSPIg4bttNBxzMyOt24lJ008PttHb2gvmSp/uOjQPdOyZXL?=
- =?us-ascii?Q?SKc5SQui/hNil66DDWVXI2+hk4VfI/PPp7SaGOAm72m/+ficMyztSu1DRzO+?=
- =?us-ascii?Q?a8ncsgwvkSJhdlKbiBt7fWiV0CNbXsSrMwOMF1is4syotSw9DgAfbiw9nxnd?=
- =?us-ascii?Q?x1Hakiz9qVrbJQbJov0mGrAQiEaeQpaGGcg4ZFM2930ebGXqNzPNN3Xggulq?=
- =?us-ascii?Q?7Y3GfKx1wRDXH91trUa80yOHsg4/QrkSElhg/TJyhiilPzGuZZMwzWGqXLvR?=
- =?us-ascii?Q?MMMYI45DibKjhgaIIZgmv0h6On6HWnkKdF43FIdVh1Myc0i+8JX6sOOs8Jh4?=
- =?us-ascii?Q?gomU19SEcf8yBykrbt50fiK34a1Pz6kU0n/3yEGRoe4w79KUjWUfJfk5fC+Z?=
- =?us-ascii?Q?ajZUbkhIDqzidvtUEab58CJsq/1Sh/3WKaCkjrEnnRlQCJbghgBY+YbpK8aK?=
- =?us-ascii?Q?ZucS8/ySENap8di4jBDpNT0LjRVTG7qJMn9Ow711HpsGkb6kNjzDa1zGTgx3?=
- =?us-ascii?Q?HNjxiB+KeT6gzrx1axvvhuwgRx6At92hvMYeWO/5w8cbbzIDNuFKu4mqad9H?=
- =?us-ascii?Q?SuKfL408BoRo5BNBx6bD4zyTx/VFTNXnOA/YLbOiw7AokjNZvCeWPQtf014K?=
- =?us-ascii?Q?AI8z+Rdif9cGEsoUPI/+gekBZWUCHQKNOytJAhdXN3HZkl6LDKpRhSuQMMzV?=
- =?us-ascii?Q?tjSx8dlAglm9WlOLuSocycrymuwXewkZjSMj6yJXuwNmyD2KcDFX6dso9d7Q?=
- =?us-ascii?Q?ma++UjY05SYI9qUWImpXPC6A?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 2ffc67c4-ba7b-4274-9d79-08d947dd8ba9
-X-MS-Exchange-CrossTenant-AuthSource: BL0PR12MB5506.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Jul 2021 22:11:51.1326
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: cH4AuLJO/ysHm0qh5ICYmLCC9C0V3Ngyrpv61JsVO6E2ZE3NUMdG7xxBY5h5S0W4
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL1PR12MB5078
+In-Reply-To: <CA+-xGqOkH-hU1guGx=t-qtjsRdO92oX+8HhcO1eXnCigMc+NPw@mail.gmail.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jul 15, 2021 at 03:00:55PM -0600, Alex Williamson wrote:
-> On Wed, 14 Jul 2021 21:20:38 -0300
-> Jason Gunthorpe <jgg@nvidia.com> wrote:
-> > +/*
-> > + * We need to get memory_lock for each device, but devices can share mmap_lock,
-> > + * therefore we need to zap and hold the vma_lock for each device, and only then
-> > + * get each memory_lock.
-> > + */
-> > +static int vfio_hot_reset_device_set(struct vfio_pci_device *vdev,
-> > +				     struct vfio_pci_group_info *groups)
-> > +{
-> > +	struct vfio_device_set *dev_set = vdev->vdev.dev_set;
-> > +	struct vfio_pci_device *cur_mem =
-> > +		list_first_entry(&dev_set->device_list, struct vfio_pci_device,
-> > +				 vdev.dev_set_list);
+On Thu, Jul 15, 2021, harry harry wrote:
+> Hi Sean,
 > 
-> We shouldn't be looking at the list outside of the lock, if the first
-> entry got removed we'd break our unwind code.
+> > No, each vCPU has its own MMU instance, where an "MMU instance" is (mostly) a KVM
+> > construct.  Per-vCPU MMU instances are necessary because each vCPU has its own
+> > relevant state, e.g. CR0, CR4, EFER, etc..., that affects the MMU instance in
+> > some way.  E.g. the MMU instance is used to walk guest page tables when
+> > translating GVA->GPA for emulation, so per-vCPU MMUs are necessary even when
+> > using TDP.
+> >
+> > However, shadow/TDP PTEs are shared between compatible MMU instances.  E.g. in
+> > the common case where all vCPUs in a VM use identical settings, there will
+> > effectively be a single set of TDP page tables shared by all vCPUs.
 > 
-> > +	struct vfio_pci_device *cur_vma;
-> > +	struct vfio_pci_device *cur;
-> > +	bool is_mem = true;
-> > +	int ret;
-> >  
-> > -	if (pci_dev_driver(pdev) != &vfio_pci_driver) {
-> > -		vfio_device_put(device);
-> > -		return -EBUSY;
-> > +	mutex_lock(&dev_set->lock);
->         ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> What do you mean by "MMU instance"? Do you mean VMCS? MMU is hardware.
 
-Oh, righto, this is an oopsie!
+No, an MMU is not a hardware-exclusive term, e.g. a software emulator will have
+an MMU to emulate the MMU of the target hardware.
 
-> > +	list_for_each_entry(cur, &dev_set->device_list, vdev.dev_set_list)
-> > +		up_write(&cur->memory_lock);
-> > +	mutex_unlock(&dev_set->lock);
-> > +
-> > +	return ret;
-> 
-> 
-> Isn't the above section actually redundant to below, ie. we could just
-> fall through after the pci_reset_bus()?  Thanks,
+The terminology we use in KVM is roughly that a KVM MMU is KVM's presentation of
+a hardware MMU to the guest.  E.g. when shadow paging is used, there is both the
+hardware MMU that is stuffed with KVM's shadow PTEs, and the KVM MMU that models
+the guest's MMU (the guest thinks its configuring a hardware MMU, but in reality
+KVM is intercepting (some) guest PTE modifications).  When TDP (EPT) is used, the
+hardware MMU has two parts: the TDP PTEs that are controlled by KVM, and the IA32
+PTEs that are controlled by the guest.  And there's still a KVM MMU for the guest;
+the KVM MMU in that case knows how to connfigure the TDP PTEs in hardware _and_
+walk the guest IA32 PTEs, e.g. to handle memory accesses during emulation.
 
-It could, but I thought it was less confusing this way due to how
-oddball the below is:
+Even more fun, when nested TDP is used, there is a KVM MMU for L1, a KVM MMU for
+L1's EPT for L2, a KVM MMU for L2 (L2's legacy page tables), and the hardware MMU.
 
-> > +err_undo:
-> > +	list_for_each_entry(cur, &dev_set->device_list, vdev.dev_set_list) {
-> > +		if (cur == cur_mem)
-> > +			is_mem = false;
-> > +		if (cur == cur_vma)
-> > +			break;
-> > +		if (is_mem)
-> > +			up_write(&cur->memory_lock);
-> > +		else
-> > +			mutex_unlock(&cur->vma_lock);
-> > +	}
+> Could you please share me the code of the MMU instance in KVM? Thanks!
 
-But either works, do want it switch in v2?
-
-Thanks,
-Jason
+struct kvm_mmu, and generally speaking everything under arch/x86/kvm/mmu/.
