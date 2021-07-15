@@ -2,211 +2,156 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 132D23CAE55
-	for <lists+kvm@lfdr.de>; Thu, 15 Jul 2021 23:01:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B9F893CAECD
+	for <lists+kvm@lfdr.de>; Thu, 15 Jul 2021 23:53:27 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231215AbhGOVDz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 15 Jul 2021 17:03:55 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:40285 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230354AbhGOVDx (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 15 Jul 2021 17:03:53 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1626382859;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=w6cMvV3xGXdKHq4WzPyleEVhevpPRqkhvlCWSt+Y12E=;
-        b=UlZ//gQ9Vq9zWrksL/UIApx4nA5S+VDj0vuN0tvDhwpVVekNoeqHLefIFyDzX8Ua1hAzfE
-        o/5g8GmTroPI1h0CiwuTxiZ2cLn3XVvuN9FzDidCwwoDysuu5prpyUgQQiOFa4t7KwX0bK
-        lJWlOOTuuoxfKut6P177d1pGtODlIUo=
-Received: from mail-ot1-f69.google.com (mail-ot1-f69.google.com
- [209.85.210.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-479-dJVj_-jmMAuX7V2Y26e3RA-1; Thu, 15 Jul 2021 17:00:58 -0400
-X-MC-Unique: dJVj_-jmMAuX7V2Y26e3RA-1
-Received: by mail-ot1-f69.google.com with SMTP id e15-20020a9d63cf0000b02904ccb7285c38so1277993otl.14
-        for <kvm@vger.kernel.org>; Thu, 15 Jul 2021 14:00:58 -0700 (PDT)
+        id S230126AbhGOV4T (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 15 Jul 2021 17:56:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44260 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229776AbhGOV4S (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 15 Jul 2021 17:56:18 -0400
+Received: from mail-pl1-x62d.google.com (mail-pl1-x62d.google.com [IPv6:2607:f8b0:4864:20::62d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C6E0EC061760
+        for <kvm@vger.kernel.org>; Thu, 15 Jul 2021 14:53:23 -0700 (PDT)
+Received: by mail-pl1-x62d.google.com with SMTP id n10so4173470plk.1
+        for <kvm@vger.kernel.org>; Thu, 15 Jul 2021 14:53:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=fT5PdprpzzVdpuGRQjB10wOKBXaawvXKa53cRx1HK6I=;
+        b=svmrN+O4TI98vQfj9n2X/vE50XmQmqn1PaXKCP4Nr/CQyCC4gpvE/2A44G7O3EEASy
+         /EfSX6dHh4q+I/a6RzTa5Z+Q8thrryvjaD57bsWLXbdH95pEPz+xykR9xEgUdH4Bv4Z3
+         ZoAGTa8Dt+Ijjc+XetNUvdXC7ojCQeJcD0LZiPZWKk/RdXBOQA7PxVYGDtHqNFQ/g3+1
+         ouQ3Nz6ZGFswmzMs7fe8Jr1UislrbNvLnmgdVpL88bQPCqp5nJlc9aQYclxLYlImlTzk
+         iqbO3a14CqCw0bGU2cATmeN0NT1CTHGMNXISk50SAZ9lM50oC08Hg9k5l20FPm3XWnsR
+         s63g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
-         :references:organization:mime-version:content-transfer-encoding;
-        bh=w6cMvV3xGXdKHq4WzPyleEVhevpPRqkhvlCWSt+Y12E=;
-        b=ooUKb/6SZqLS5GZOrGiMBNAmNDt5m+KWkZS2c1v/bvS9VRvpFBmfJ85NGQJ+pPt2iD
-         VId+NqrGV+5XvBfVCOA/0GZDiZN7KxzRNhW8580iJBUzWrH31KEcSiPbPuJJ4E+Gg6s+
-         2dT+WQ7zAkDldCGdDLSOe7t1To4X67ScqqtsQukFIFwP1F8rGXJURbV7txz50MkJg6KG
-         fPhTwURd7ozZLXrHoRmLM9AR1jwiFqCnnnDJ/s2Ugxcf/lQ4O7PRxM99UYAhKFtv7yN7
-         1E47wpnDbz3auYoluWnVYaIo+ay3dY2Teqq2qlStCUkGVZOfNbmZ6vx+r5bhzj8amkOr
-         Fzgg==
-X-Gm-Message-State: AOAM532LdJeyk/D065Zirg5618hHxrBLr17xnDElicOeFHKKgiZxC2ss
-        e7GtfOtydZBTMlgr8V7zjBAtnA5h/8A+RpEqtS64TJREb13TgCdIiUyjnBnqOaEJvur3DVLZqEl
-        4Ejq+ziWrvM7x
-X-Received: by 2002:aca:2112:: with SMTP id 18mr9993626oiz.48.1626382857937;
-        Thu, 15 Jul 2021 14:00:57 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxhGopnxXSOUkiyj2IazWlzUmam8q3Wm1mG8M1diFnOhbK2stM6MvqH6+i/pmWQg4ZlT4QnEQ==
-X-Received: by 2002:aca:2112:: with SMTP id 18mr9993610oiz.48.1626382857721;
-        Thu, 15 Jul 2021 14:00:57 -0700 (PDT)
-Received: from redhat.com ([198.99.80.109])
-        by smtp.gmail.com with ESMTPSA id n9sm1367932otn.54.2021.07.15.14.00.55
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=fT5PdprpzzVdpuGRQjB10wOKBXaawvXKa53cRx1HK6I=;
+        b=kFImvtecq840VLXcULhPYdDpi9I8heJacDyZ5VSS1T/XoCsR91KXmY5ZnA00zwybAl
+         O2f63Rw4prCGlmtEXD7f4ek/oqKRg85TmOhxVPuUArW4jEA6NOE0exY9wYPT52WqsGe2
+         KAEIiQPx/WYgbdg/xCTWsbg0pbz3iocrRTbeexxPLQnUytHYVJAnUlVV65e+HbvpY/ux
+         R8RKzKNtuCOf+8R8ECS18M370ONe9Rycs+wdRaOcl7Jo5VVxzal4xabHcza2ILR0Si+5
+         Ix9yMM/SqybqHicdn2P2IeicphrF8EswYErd1byrCJckDVG/sFPJknjSoejGjTl6qgwm
+         kAQQ==
+X-Gm-Message-State: AOAM532sZFkPkqNOuW85VVIFrzNmn9oGIBskUYbzNkOm6yBg1wDgXItb
+        MqjXXHgjNLkahJ5pLLXPNS+V+g==
+X-Google-Smtp-Source: ABdhPJwIwDUr/HSzt1W7U3WJexPF19d/NdRvrPK8Jq2C1qfjx7umE1NH31E27//HtmrPWVEOD8ZZLw==
+X-Received: by 2002:a17:90a:9b89:: with SMTP id g9mr12007893pjp.200.1626386003022;
+        Thu, 15 Jul 2021 14:53:23 -0700 (PDT)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id m21sm7561729pfo.159.2021.07.15.14.53.22
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 15 Jul 2021 14:00:57 -0700 (PDT)
-Date:   Thu, 15 Jul 2021 15:00:55 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Jason Gunthorpe <jgg@nvidia.com>
-Cc:     David Airlie <airlied@linux.ie>,
-        Tony Krowiak <akrowiak@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Daniel Vetter <daniel@ffwll.ch>,
-        Diana Craciun <diana.craciun@oss.nxp.com>,
-        dri-devel@lists.freedesktop.org,
-        Eric Auger <eric.auger@redhat.com>,
-        Eric Farman <farman@linux.ibm.com>,
-        Harald Freudenberger <freude@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        intel-gfx@lists.freedesktop.org,
-        intel-gvt-dev@lists.freedesktop.org,
-        Jani Nikula <jani.nikula@linux.intel.com>,
-        Jason Herne <jjherne@linux.ibm.com>,
-        Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
-        kvm@vger.kernel.org, Kirti Wankhede <kwankhede@nvidia.com>,
-        linux-doc@vger.kernel.org, linux-s390@vger.kernel.org,
-        Matthew Rosato <mjrosato@linux.ibm.com>,
-        Peter Oberparleiter <oberpar@linux.ibm.com>,
-        Halil Pasic <pasic@linux.ibm.com>,
-        Rodrigo Vivi <rodrigo.vivi@intel.com>,
-        Vineeth Vijayan <vneethv@linux.ibm.com>,
-        Zhenyu Wang <zhenyuw@linux.intel.com>,
-        Zhi Wang <zhi.a.wang@intel.com>,
-        "Raj, Ashok" <ashok.raj@intel.com>, Christoph Hellwig <hch@lst.de>,
-        Leon Romanovsky <leonro@nvidia.com>,
-        Max Gurtovoy <mgurtovoy@nvidia.com>,
-        Yishai Hadas <yishaih@nvidia.com>
-Subject: Re: [PATCH 09/13] vfio/pci: Reorganize VFIO_DEVICE_PCI_HOT_RESET to
- use the device set
-Message-ID: <20210715150055.474f535f.alex.williamson@redhat.com>
-In-Reply-To: <9-v1-eaf3ccbba33c+1add0-vfio_reflck_jgg@nvidia.com>
-References: <0-v1-eaf3ccbba33c+1add0-vfio_reflck_jgg@nvidia.com>
-        <9-v1-eaf3ccbba33c+1add0-vfio_reflck_jgg@nvidia.com>
-Organization: Red Hat
-X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
+        Thu, 15 Jul 2021 14:53:22 -0700 (PDT)
+Date:   Thu, 15 Jul 2021 21:53:18 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Brijesh Singh <brijesh.singh@amd.com>
+Cc:     Dave Hansen <dave.hansen@intel.com>, x86@kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
+        linux-coco@lists.linux.dev, linux-mm@kvack.org,
+        linux-crypto@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        David Rientjes <rientjes@google.com>,
+        Dov Murik <dovmurik@linux.ibm.com>,
+        Tobin Feldman-Fitzthum <tobin@ibm.com>,
+        Borislav Petkov <bp@alien8.de>,
+        Michael Roth <michael.roth@amd.com>,
+        Vlastimil Babka <vbabka@suse.cz>, tony.luck@intel.com,
+        npmccallum@redhat.com, brijesh.ksingh@gmail.com
+Subject: Re: [PATCH Part2 RFC v4 10/40] x86/fault: Add support to handle the
+ RMP fault for user address
+Message-ID: <YPCuTiNET/hJHqOY@google.com>
+References: <20210707183616.5620-1-brijesh.singh@amd.com>
+ <20210707183616.5620-11-brijesh.singh@amd.com>
+ <3c6b6fc4-05b2-8d18-2eb8-1bd1a965c632@intel.com>
+ <2b4accb6-b68e-02d3-6fed-975f90558099@amd.com>
+ <a249b101-87d1-2e66-d7d6-af737c045cc3@intel.com>
+ <5592d8ff-e2c3-6474-4a10-96abe1962d6f@amd.com>
+ <bfb857d2-8e3c-4a3b-c64e-96a16c0c6d49@intel.com>
+ <aef6be8a-c93a-1aaa-57fe-116e70483542@amd.com>
+ <c3c71a5b-8100-63f2-1792-d7b53731147c@intel.com>
+ <298d2e19-566d-2e58-b639-724c10885646@amd.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <298d2e19-566d-2e58-b639-724c10885646@amd.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 14 Jul 2021 21:20:38 -0300
-Jason Gunthorpe <jgg@nvidia.com> wrote:
-> +/*
-> + * We need to get memory_lock for each device, but devices can share mmap_lock,
-> + * therefore we need to zap and hold the vma_lock for each device, and only then
-> + * get each memory_lock.
-> + */
-> +static int vfio_hot_reset_device_set(struct vfio_pci_device *vdev,
-> +				     struct vfio_pci_group_info *groups)
-> +{
-> +	struct vfio_device_set *dev_set = vdev->vdev.dev_set;
-> +	struct vfio_pci_device *cur_mem =
-> +		list_first_entry(&dev_set->device_list, struct vfio_pci_device,
-> +				 vdev.dev_set_list);
+On Mon, Jul 12, 2021, Brijesh Singh wrote:
+> 
+> 
+> On 7/12/21 11:29 AM, Dave Hansen wrote:
+> > On 7/12/21 9:24 AM, Brijesh Singh wrote:
+> > > Apologies if I was not clear in the messaging, that's exactly what I
+> > > mean that we don't feed RMP entries during the page state change.
+> > > 
+> > > The sequence of the operation is:
+> > > 
+> > > 1. Guest issues a VMGEXIT (page state change) to add a page in the RMP
+> > > 2. Hyperivosr adds the page in the RMP table.
+> > > 
+> > > The check will be inside the hypervisor (#2), to query the backing page
+> > > type, if the backing page is from the hugetlbfs, then don't add the page
+> > > in the RMP, and fail the page state change VMGEXIT.
+> > 
+> > Right, but *LOOOOOONG* before that, something walked the page tables and
+> > stuffed the PFN into the NPT (that's the AMD equivalent of EPT, right?).
+> >   You could also avoid this whole mess by refusing to allow hugetblfs to
+> > be mapped into the guest in the first place.
+> > 
+> 
+> Ah, that should be doable. For SEV stuff, we require the VMM to register the
+> memory region to the hypervisor during the VM creation time. I can check the
+> hugetlbfs while registering the memory region and fail much earlier.
 
-We shouldn't be looking at the list outside of the lock, if the first
-entry got removed we'd break our unwind code.
+That's technically unnecessary, because this patch is working on the wrong set of
+page tables when handling faults from KVM.
 
-> +	struct vfio_pci_device *cur_vma;
-> +	struct vfio_pci_device *cur;
-> +	bool is_mem = true;
-> +	int ret;
->  
-> -	if (pci_dev_driver(pdev) != &vfio_pci_driver) {
-> -		vfio_device_put(device);
-> -		return -EBUSY;
-> +	mutex_lock(&dev_set->lock);
-        ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+The host page tables constrain KVM's NPT, but the two are not mirrors of each
+other.  Specifically, KVM cannot exceed the size of the host page tables because
+that would give the guest access to memory it does not own, but KVM isn't required
+to use the same size as the host.  E.g. a 1gb page in the host can be 1gb, 2mb, or
+4kb in the NPT.
 
-> +
-> +	/* All devices in the group to be reset need VFIO devices */
-> +	if (vfio_pci_for_each_slot_or_bus(
-> +		    vdev->pdev, vfio_pci_check_all_devices_bound, dev_set,
-> +		    !pci_probe_reset_slot(vdev->pdev->slot))) {
-> +		ret = -EINVAL;
-> +		goto err_unlock;
->  	}
->  
-> -	vdev = container_of(device, struct vfio_pci_device, vdev);
-> +	list_for_each_entry(cur_vma, &dev_set->device_list, vdev.dev_set_list) {
-> +		/*
-> +		 * Test whether all the affected devices are contained by the
-> +		 * set of groups provided by the user.
-> +		 */
-> +		if (!vfio_dev_in_groups(cur_vma, groups)) {
-> +			ret = -EINVAL;
-> +			goto err_undo;
-> +		}
->  
-> -	/*
-> -	 * Locking multiple devices is prone to deadlock, runaway and
-> -	 * unwind if we hit contention.
-> -	 */
-> -	if (!vfio_pci_zap_and_vma_lock(vdev, true)) {
-> -		vfio_device_put(device);
-> -		return -EBUSY;
-> +		/*
-> +		 * Locking multiple devices is prone to deadlock, runaway and
-> +		 * unwind if we hit contention.
-> +		 */
-> +		if (!vfio_pci_zap_and_vma_lock(cur_vma, true)) {
-> +			ret = -EBUSY;
-> +			goto err_undo;
-> +		}
->  	}
->  
-> -	devs->devices[devs->cur_index++] = vdev;
-> -	return 0;
-> +	list_for_each_entry(cur_mem, &dev_set->device_list, vdev.dev_set_list) {
-> +		if (!down_write_trylock(&cur_mem->memory_lock)) {
-> +			ret = -EBUSY;
-> +			goto err_undo;
-> +		}
-> +		mutex_unlock(&cur_mem->vma_lock);
-> +	}
-> +
-> +	ret = pci_reset_bus(vdev->pdev);
-> +
+The code "works" because the size contraints mean it can't get false negatives,
+only false positives, false positives will never be fatal, e.g. the fault handler
+may unnecessarily demote a 1gb, and demoting a host page will further constrain
+KVM's NPT.
 
+The distinction matters because it changes our options.  For RMP violations on
+NPT due to page size mismatches, KVM can and should handle the fault without
+consulting the primary MMU, i.e. by demoting the NPT entry.  That means KVM does
+not need to care about hugetlbfs or any other backing type that cannot be split
+since KVM will never initiate a host page split in response to a #NPT RMP violation.
 
-> +	list_for_each_entry(cur, &dev_set->device_list, vdev.dev_set_list)
-> +		up_write(&cur->memory_lock);
-> +	mutex_unlock(&dev_set->lock);
-> +
-> +	return ret;
+That doesn't mean that hugetlbfs will magically work since e.g. get/put_user()
+will fault and fail, but that's a generic non-KVM problem since nothing prevents
+remapping and/or accessing the page(s) outside of KVM context.
 
+The other reason to not disallow hugetlbfs and co. is that a guest that's
+enlightened to operate at 2mb granularity, e.g. always do page state changes on
+2mb chunks, can play nice with hugetlbfs without ever hitting an RMP violation.
 
-Isn't the above section actually redundant to below, ie. we could just
-fall through after the pci_reset_bus()?  Thanks,
-
-Alex
-
-> +
-> +err_undo:
-> +	list_for_each_entry(cur, &dev_set->device_list, vdev.dev_set_list) {
-> +		if (cur == cur_mem)
-> +			is_mem = false;
-> +		if (cur == cur_vma)
-> +			break;
-> +		if (is_mem)
-> +			up_write(&cur->memory_lock);
-> +		else
-> +			mutex_unlock(&cur->vma_lock);
-> +	}
-> +err_unlock:
-> +	mutex_unlock(&dev_set->lock);
-> +	return ret;
->  }
->  
->  /*
-
+Last thought, have we taken care in the guest side of things to work at 2mb
+granularity when possible?  AFAICT, PSMASH is effectively a one-way street since
+RMPUPDATE to restore a 2mb RMP is destructive, i.e. requires PVALIDATE on the
+entire 2mb chunk, and the guest can't safely do that without reinitializing the
+whole page, e.g. would either lose data or have to save/init/restore.
