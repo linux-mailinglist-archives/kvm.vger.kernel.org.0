@@ -2,121 +2,117 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 443993CAB89
-	for <lists+kvm@lfdr.de>; Thu, 15 Jul 2021 21:20:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 11B503CABFF
+	for <lists+kvm@lfdr.de>; Thu, 15 Jul 2021 21:34:18 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S245217AbhGOTUi (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 15 Jul 2021 15:20:38 -0400
-Received: from mga17.intel.com ([192.55.52.151]:2063 "EHLO mga17.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S245667AbhGOTT6 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 15 Jul 2021 15:19:58 -0400
-X-IronPort-AV: E=McAfee;i="6200,9189,10046"; a="190988507"
-X-IronPort-AV: E=Sophos;i="5.84,243,1620716400"; 
-   d="scan'208";a="190988507"
-Received: from fmsmga003.fm.intel.com ([10.253.24.29])
-  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Jul 2021 12:17:00 -0700
-X-IronPort-AV: E=Sophos;i="5.84,243,1620716400"; 
-   d="scan'208";a="495610768"
-Received: from snchan-mobl2.amr.corp.intel.com (HELO [10.209.125.33]) ([10.209.125.33])
-  by fmsmga003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Jul 2021 12:16:58 -0700
-Subject: Re: [PATCH Part2 RFC v4 08/40] x86/traps: Define RMP violation #PF
- error code
-To:     Sean Christopherson <seanjc@google.com>,
-        Brijesh Singh <brijesh.singh@amd.com>
-Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
-        linux-coco@lists.linux.dev, linux-mm@kvack.org,
-        linux-crypto@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
-        David Rientjes <rientjes@google.com>,
-        Dov Murik <dovmurik@linux.ibm.com>,
-        Tobin Feldman-Fitzthum <tobin@ibm.com>,
-        Borislav Petkov <bp@alien8.de>,
-        Michael Roth <michael.roth@amd.com>,
-        Vlastimil Babka <vbabka@suse.cz>, tony.luck@intel.com,
-        npmccallum@redhat.com, brijesh.ksingh@gmail.com
-References: <20210707183616.5620-1-brijesh.singh@amd.com>
- <20210707183616.5620-9-brijesh.singh@amd.com> <YPCGVKESqZFWwdyB@google.com>
-From:   Dave Hansen <dave.hansen@intel.com>
-Autocrypt: addr=dave.hansen@intel.com; keydata=
- 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
- z5cecg==
-Message-ID: <801770da-f9b3-77a6-1aea-cb9a7796c386@intel.com>
-Date:   Thu, 15 Jul 2021 12:16:56 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        id S244271AbhGOT1Z (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 15 Jul 2021 15:27:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35766 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S245494AbhGOTYH (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 15 Jul 2021 15:24:07 -0400
+Received: from mail-pj1-x1034.google.com (mail-pj1-x1034.google.com [IPv6:2607:f8b0:4864:20::1034])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 80CE6C08E88F
+        for <kvm@vger.kernel.org>; Thu, 15 Jul 2021 12:05:50 -0700 (PDT)
+Received: by mail-pj1-x1034.google.com with SMTP id jx7-20020a17090b46c7b02901757deaf2c8so4884019pjb.0
+        for <kvm@vger.kernel.org>; Thu, 15 Jul 2021 12:05:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=95Ws8SoLDeiiC/xhmaFN6B+CWti1BA+DLMkI6ssQcrc=;
+        b=bXgqBDsfHWFL6lNl+ymP4+ZDG2O7lhysegxs2WgM1sb+KDzSHsLee4tCgbCcHbjBwK
+         ut8YjXqdfcqQSdkyeY4ORZsTR7LrvSTAKQzKDj1lBTtmochzK9Bvy1DdZvOjqiVAfkyA
+         pMakKFR7BPLQJBJl84dBFUeRatT5TG7AYBby0sznDUUSRsnfWpfYH5UJXDRXer8bYXqw
+         /gokUDRqvJPDMNRdAo91HtpubE3Bi0UDgJ2V4k8NwLlVRPY1REiO/axpAcWWZ62Jot1y
+         1DGUNW4EQp5T+C3sKvArazOa5s77xxev9/50SWdn60cM+Lai05BEmNHYlUjlUUa7WeYD
+         OY0w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=95Ws8SoLDeiiC/xhmaFN6B+CWti1BA+DLMkI6ssQcrc=;
+        b=MP/prJ2lIW2xeto92ZnXRTa40oKzWDyjLYHaAHoiF/179NcyCD/14aaHgH9xfZ9sGQ
+         bnmvpQlv/dHcJdeiulgRFb+crRtS4ov9AntFBPuwkNnMepTTtK57kuVbMemOyIZZZMJS
+         2xOfIU66uG9mGzpcH0f3CDK0MFPiag85z6s1AAuG3YpEQd52Y+rivOz4gY7j3O4I0cGz
+         P9I+zDwx81qflUnO4Lb30QMx8a8bhvT51eqXvJy10TBkFPfXZz5OYADQNp6DgV+/qREx
+         BSIZHd9lPV51nkXPys+lufAB7xDyFZqlnqvKzeBjcQPbuE5DxvOcAD6ahRqLXI3Q3UrH
+         mO8Q==
+X-Gm-Message-State: AOAM531/TTnRKVHXnpZxEJy4rZqD2mBH4dZFOUmt6qlWmUvtQGXHNB5y
+        8OEFVLWMXlpKId+61DYuliMtzg==
+X-Google-Smtp-Source: ABdhPJx388Ovjy8T8KG/KZjsWpsxdyCjDHlh69BUYNbAAAuCfGgp9HGfgp34yhD86wCKMusZ2YWj/A==
+X-Received: by 2002:a17:90a:9f91:: with SMTP id o17mr11395903pjp.29.1626375949904;
+        Thu, 15 Jul 2021 12:05:49 -0700 (PDT)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id a22sm7352206pfv.113.2021.07.15.12.05.49
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 15 Jul 2021 12:05:49 -0700 (PDT)
+Date:   Thu, 15 Jul 2021 19:05:45 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Krish Sadhukhan <krish.sadhukhan@oracle.com>
+Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, jmattson@google.com,
+        vkuznets@redhat.com, wanpengli@tencent.com, joro@8bytes.org
+Subject: Re: [PATCH 1/2] nSVM: Add a variant of svm_vmrun() for executing
+ custom guest code
+Message-ID: <YPCHCX7rBvKXI0Ts@google.com>
+References: <20210715180824.234781-1-krish.sadhukhan@oracle.com>
+ <20210715180824.234781-2-krish.sadhukhan@oracle.com>
 MIME-Version: 1.0
-In-Reply-To: <YPCGVKESqZFWwdyB@google.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210715180824.234781-2-krish.sadhukhan@oracle.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 7/15/21 12:02 PM, Sean Christopherson wrote:
->>  #ifndef _ASM_X86_TRAP_PF_H
->>  #define _ASM_X86_TRAP_PF_H
->>  
->> +#include <vdso/bits.h>  /* BIT() macro */
-> What are people's thoughts on using linux/bits.h instead of vdso.bits.h, even
-> though the vDSO version is technically sufficient?  Seeing the "vdso" reference
-> definitely made me blink slowly a few times.
+On Thu, Jul 15, 2021, Krish Sadhukhan wrote:
+> Current implementation of svm_vmrun() and test_run() sets the guest RIP to a
+> wrapper function which executes the guest code being used by tests. This is
+> not suitable for tests like testing the effect of guest EFLAGS.TF on VMRUN
+> because the trap handler will point to the second guest instruction to which
+> the test code does not have access.
+> 
+> Therefore, add a variant of svm_vmrun() that will set the guest RIP to the
+> actual guest code that tests want to test. This will be used by the next
+> patch in this series.
+> 
+> Signed-off-by: Krish Sadhukhan <krish.sadhukhan@oracle.com>
+> ---
+>  x86/svm.c | 14 ++++++++++++--
+>  x86/svm.h |  1 +
+>  2 files changed, 13 insertions(+), 2 deletions(-)
+> 
+> diff --git a/x86/svm.c b/x86/svm.c
+> index f185ca0..50b6a15 100644
+> --- a/x86/svm.c
+> +++ b/x86/svm.c
+> @@ -227,9 +227,9 @@ struct svm_test *v2_test;
+>  
+>  u64 guest_stack[10000];
+>  
+> -int svm_vmrun(void)
+> +static int _svm_vmrun(u64 rip)
 
-Ugh, missed that.  Yes, that does look very weird.
+I'd prefer to stay with the kernel style of two underscores for inner helpers.
 
-I don't see any reason to use that vdso/ version instead of BIT_ULL().
-I suspect I said to use BIT() when I commented on this in a previous
-round.  If so, that was wrong.
+>  {
+> -	vmcb->save.rip = (ulong)test_thunk;
+> +	vmcb->save.rip = (ulong)rip;
+>  	vmcb->save.rsp = (ulong)(guest_stack + ARRAY_SIZE(guest_stack));
+>  	regs.rdi = (ulong)v2_test;
+>  
+> @@ -244,6 +244,16 @@ int svm_vmrun(void)
+>  	return (vmcb->control.exit_code);
+>  }
+>  
+> +int svm_vmrun(void)
+> +{
+> +	return _svm_vmrun((u64)test_thunk);
+> +}
+> +
+> +int svm_vmrun_custom(u64 rip)
+> +{
+> +	return _svm_vmrun(rip);
+> +}
+
+Why bother with the "custom" wrapper?  Just expose the inner helper.
