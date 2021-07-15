@@ -2,199 +2,201 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 267FE3C9BE9
-	for <lists+kvm@lfdr.de>; Thu, 15 Jul 2021 11:32:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 20AA73C9C14
+	for <lists+kvm@lfdr.de>; Thu, 15 Jul 2021 11:44:47 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237137AbhGOJfd (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 15 Jul 2021 05:35:33 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:2206 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S234685AbhGOJfc (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 15 Jul 2021 05:35:32 -0400
-Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 16F98NDM067114;
-        Thu, 15 Jul 2021 05:32:28 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=BLdUUlY9LFD5HLar2I/qXTTovDzIUCQkKhyDHwzP9AY=;
- b=mo4RfO6xdTl6chIPZsh085fVKeznVDAzxT5H1OmC6uiORoM964GmnXtkdf+b4YlvEORe
- F0K1M6mSczik5I8wmfP6HeXMndcuihQsiL+++vdBKuQK03GX+JpO+1l875PpkfhEN/qE
- oQ+lE/GuXg1Nc6bpmNmsP/1T+FIaVE8WVJrmYH33aRXM4JEcCng9Wnjq0vk6OzPvoMQK
- 8q4x4zqJ46NsR7rDEc8hs0hwWBGYrn9RqsOqm7MNi2krvYwvg/g892hphWY+5F0sSIrk
- XEGWfwTrhp/PVdh+WZ4mOVOc89CcwCzJU8XeuIU9tDkkkDBnlAu9t7ojt3TPQpn+fx4u 5Q== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 39tbj69wm2-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 15 Jul 2021 05:32:28 -0400
-Received: from m0098414.ppops.net (m0098414.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 16F9BEMW077647;
-        Thu, 15 Jul 2021 05:32:27 -0400
-Received: from ppma02fra.de.ibm.com (47.49.7a9f.ip4.static.sl-reverse.com [159.122.73.71])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 39tbj69wkc-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 15 Jul 2021 05:32:27 -0400
-Received: from pps.filterd (ppma02fra.de.ibm.com [127.0.0.1])
-        by ppma02fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 16F9RoQ0020291;
-        Thu, 15 Jul 2021 09:32:25 GMT
-Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
-        by ppma02fra.de.ibm.com with ESMTP id 39s3p78k06-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 15 Jul 2021 09:32:25 +0000
-Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
-        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 16F9WMjH32899536
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 15 Jul 2021 09:32:22 GMT
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 0F748A4057;
-        Thu, 15 Jul 2021 09:32:22 +0000 (GMT)
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 214A7A4069;
-        Thu, 15 Jul 2021 09:32:17 +0000 (GMT)
-Received: from [9.160.50.212] (unknown [9.160.50.212])
-        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Thu, 15 Jul 2021 09:32:16 +0000 (GMT)
-Subject: Re: [RFC PATCH 3/6] i386/sev: initialize SNP context
-To:     Brijesh Singh <brijesh.singh@amd.com>, qemu-devel@nongnu.org
-Cc:     Connor Kuehl <ckuehl@redhat.com>,
-        =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
-        "Michael S . Tsirkin" <mst@redhat.com>,
-        James Bottomley <jejb@linux.ibm.com>,
-        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        David Gibson <david@gibson.dropbear.id.au>,
-        =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
-        kvm@vger.kernel.org, Michael Roth <michael.roth@amd.com>,
-        Eduardo Habkost <ehabkost@redhat.com>,
-        Dov Murik <dovmurik@linux.ibm.com>
-References: <20210709215550.32496-1-brijesh.singh@amd.com>
- <20210709215550.32496-4-brijesh.singh@amd.com>
-From:   Dov Murik <dovmurik@linux.ibm.com>
-Message-ID: <34b8bda5-9b4d-c1e0-0009-1a407a48dd4a@linux.ibm.com>
-Date:   Thu, 15 Jul 2021 12:32:15 +0300
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.11.0
-MIME-Version: 1.0
-In-Reply-To: <20210709215550.32496-4-brijesh.singh@amd.com>
-Content-Type: text/plain; charset=utf-8
+        id S236198AbhGOJri (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 15 Jul 2021 05:47:38 -0400
+Received: from de-smtp-delivery-102.mimecast.com ([194.104.109.102]:46221 "EHLO
+        de-smtp-delivery-102.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S231655AbhGOJri (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 15 Jul 2021 05:47:38 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=mimecast20200619;
+        t=1626342283;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=v9pgcUlEz74IZTdHdaUXk5JLYSOmI68SSuZr5ztBIPI=;
+        b=DeYVsOGjZst+Z7zLUpSP6QzYz7ecwPdp8prELneklHrw6cCel317Wzoe0x7APCCLCoVQoN
+        FKY86mjdnLohk+0ES34lGRMiAtLml8xDu+z7uu6fYSSJ9yeE2zh8hHhq5cjs04AKx+Q9TI
+        mWaInd/S3LEdXtb70Ol/pR78rcFRK3I=
+Received: from EUR02-AM5-obe.outbound.protection.outlook.com
+ (mail-am5eur02lp2059.outbound.protection.outlook.com [104.47.4.59]) (Using
+ TLS) by relay.mimecast.com with ESMTP id
+ de-mta-23-6CvbyWXlOu2E9xYOXVRhgw-1; Thu, 15 Jul 2021 11:44:42 +0200
+X-MC-Unique: 6CvbyWXlOu2E9xYOXVRhgw-1
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=htlT7jwk9sOSow4aUXIFpbZwc13B+BsQRfrwnUtnyW9cmQRJeMsX9AH3KYFlDG2JOalhtR3tIZbYxhkFbChA3GgW/cA05iVSBe0ybZBvsr6/X1alSXsDIpa1jZBHkbQp23EXz5Pa7V6Mg5PcH+oFKKKGEMd87BboWMNl+tzfrwDcWkt9M27wjqeSr68+EJLJJ5ib2rEVOaMZzCgbw72CwwRyeu5y5ZbBDFbwVDXZOjXzBt/V6ho72xRHscj5EB0t5mKqAOLn4oXzDrpDoYhbSwSB6yItHHrZuvKAMQMHJv7mboMS6zafyA/zXEGaKnD3+BqFJs3wyKMg3nLT0V6oXw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=TX6RsXvp0ZJt2BckOx6Z2HNd6qG46qG8BpY4QoW8Kak=;
+ b=I2ciWx+CCbzSPaQ/EV/i1F4tEITcEaGNR/niHGnUMrDcS4r1KyGUhPtTY89YsZMvYFTIXzB7zWRY1k7mWBMo2laCTlTpER389pPpEqK6OTRIsvbjVnPjImXSZvXuN6ATzqy/wEJvRq7zGPpXJbYs4hdtxeWfRzgstyRZvEi6ePyz56RF9aphHQcunKBMplvlnpowuL+P+E6MD98jQBZPhg7QnMdBCME37lSIlAmoItmoMPcE5QrsQx7qjj9ADpBQART9pSSxhbQ5Zkj1kgNoi9qUBXRteSLy6hWv0oOJbHgMSUpjfriGL+uYijg+Nun6L/7EsdrzcWkkNSKKWrPQdg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=suse.com; dmarc=pass action=none header.from=suse.com;
+ dkim=pass header.d=suse.com; arc=none
+Authentication-Results: lists.infradead.org; dkim=none (message not signed)
+ header.d=none;lists.infradead.org; dmarc=none action=none
+ header.from=suse.com;
+Received: from AM7PR04MB6821.eurprd04.prod.outlook.com (2603:10a6:20b:105::22)
+ by AM7PR04MB7015.eurprd04.prod.outlook.com (2603:10a6:20b:117::19) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4308.23; Thu, 15 Jul
+ 2021 09:44:41 +0000
+Received: from AM7PR04MB6821.eurprd04.prod.outlook.com
+ ([fe80::816b:1f6a:c279:1b65]) by AM7PR04MB6821.eurprd04.prod.outlook.com
+ ([fe80::816b:1f6a:c279:1b65%3]) with mapi id 15.20.4308.027; Thu, 15 Jul 2021
+ 09:44:41 +0000
+To:     Robin Murphy <robin.murphy@arm.com>, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org,
+        Linux ARM <linux-arm-kernel@lists.infradead.org>
+References: <37f873cf-1b39-ea7f-a5e7-6feb0200dd4c@suse.com>
+ <e17449e7-b91d-d288-ff1c-e9451f9d1973@arm.com>
+From:   Qu Wenruo <wqu@suse.com>
+Subject: Re: Any way to disable KVM VHE extension?
+Message-ID: <0e992d47-1f17-d49f-8341-670770ac49ef@suse.com>
+Date:   Thu, 15 Jul 2021 17:44:32 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.12.0
+In-Reply-To: <e17449e7-b91d-d288-ff1c-e9451f9d1973@arm.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: P__0eO5IViPBg4jqoku5Y3N7HVR80X7w
-X-Proofpoint-ORIG-GUID: lfK2eG9CkKyXQHMLg1-ScmGl-mbwJTpe
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.790
- definitions=2021-07-15_04:2021-07-14,2021-07-15 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 phishscore=0
- adultscore=0 bulkscore=0 suspectscore=0 mlxlogscore=999 malwarescore=0
- spamscore=0 priorityscore=1501 impostorscore=0 mlxscore=0
- lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2104190000 definitions=main-2107150068
+Content-Transfer-Encoding: quoted-printable
+X-ClientProxiedBy: BYAPR06CA0041.namprd06.prod.outlook.com
+ (2603:10b6:a03:14b::18) To AM7PR04MB6821.eurprd04.prod.outlook.com
+ (2603:10a6:20b:105::22)
+MIME-Version: 1.0
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from [0.0.0.0] (149.28.201.231) by BYAPR06CA0041.namprd06.prod.outlook.com (2603:10b6:a03:14b::18) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4331.21 via Frontend Transport; Thu, 15 Jul 2021 09:44:39 +0000
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: e8b7e425-02d0-4e6a-2339-08d947752b5c
+X-MS-TrafficTypeDiagnostic: AM7PR04MB7015:
+X-Microsoft-Antispam-PRVS: <AM7PR04MB7015786BB634ED40119A45E2D6129@AM7PR04MB7015.eurprd04.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:9508;
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: xbpu1eXgjYQrhtNxQ/BLFN0K8/YSW3WE3szMFjTAZ0YWQoE+N/vEbsiYzkqte0h4PefRjtfa5+zUb4tGL1rJDge6TttNHxeF1yrt9vxDh2ZVf8uxY+fXlhuWwExMCK/HNQiM6XNQ6dt4yV5UGoo5QPml0Z2xPXGb1cQtsxi80oZv0jbvE1Ij16fJSPAqQLyPkDIEyg0XdkzCW0Hma773ZxE5TnWwSMezDLTWCLUCG68+468kFlX5RnF+n113+1kPNNVIbJZ060ollFvAqnko2b5k3lCukKWGgkgSRctZWEX4RJPLjj58dsUGaKcQh5WHiTNVJ8eh1C5Vos2ii4WyJwGTJGFId3AzI98BzuClQiYDfNrIrmplLz67lPxZ8f+xLqdHGEtccY1lapYkQ58qeuisl9dadFNyJEI5iUTdfKllK1bJjJrRKr2w/RdfjW4vWYw/qVYerKIU09kqqHUUtUru1gQ5ZXIT8mW2+QnlFBshmmUCgD0MaUefBzdsO/ZCdIMuqAjS1oByUQ7O4EgRLgmO1o+SKXSb5Ieq7b/3muLkGrRZxac94g+7bXHoiXaJru/m/CTgFfjRy1TbWVv6TMottqE/0hcYJzEOjsXS2ZvygYWMwu5rDU793S2Bz9hM+E0qCBJW9RZFHnHUligZCba+fSxbV8Lgwo0csDvQqomMkXSOzWcEcLNYs1OesZAV7REhpKoR143pGUVLLayFDn7ubjrGayX2XOQzTXRaGqgumfEnhrPR/daCs7K5z8iwUod7VNy+yrll5DC+8eICVNKdp2KG14AsccVRc4YdXz5S9jyQw7OqrlgYw+GHmkR0UvB4nM7IBVJDdS3lHWVLsw3/taFZ/Mmp2osZO9zZ8M0=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM7PR04MB6821.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(376002)(396003)(346002)(39860400002)(366004)(136003)(5660300002)(31696002)(2906002)(186003)(66946007)(956004)(66476007)(8676002)(31686004)(6486002)(316002)(26005)(66556008)(36756003)(86362001)(83380400001)(2616005)(16576012)(6706004)(6666004)(966005)(478600001)(110136005)(38100700002)(53546011)(8936002)(43043002)(78286007)(43740500002)(45980500001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?nMksWXwhbmGJiOhco/oRiFpgZq3IP79i9YZDkwmz2rj2Yk8Jj6l00kuwWU7B?=
+ =?us-ascii?Q?xdwYbuG4Un5XYwQbl50KFnIqvuLc9zA/EnFSgphizXMI5BbvWNBhJYxj0ud5?=
+ =?us-ascii?Q?PEX/bIHsRsQynsIVWeJNjANhKVOpb9jUZj+KJtNw8Y/aEu0C+vyN19UqiZPO?=
+ =?us-ascii?Q?ph3cblaANdMFLbJOgS10fHVJi57cdxswBfW+/xC/Xu10CIEXNiCwb5eeT2tr?=
+ =?us-ascii?Q?N9BlnBplXr3WdRn85wvGhbS9mmCJQ+CCa92BaiXeFijBsKivv8iQvbOM93VE?=
+ =?us-ascii?Q?q9OUm0Bzwgsq+bNs8eSbgN4wGkgghjUnzcly8r56w2wCrks7s8hfAAVG4Wf9?=
+ =?us-ascii?Q?JMo9Y74jrxJBACVeqp7jhQ5b3k6twlZkHVROCM0shXNRq4hzgfV+AhfnMh92?=
+ =?us-ascii?Q?a/+y7jh4mv0bYOms5Dtwl2OEa/zox2q0PnjOQ2qIbxlTJU0Drjpv/PsgJcNg?=
+ =?us-ascii?Q?OwFAesAvXiVldhSuVcS+5VrAls4evvmeX59ZVmtFHd0K4bd0cdyhmRM6GEmO?=
+ =?us-ascii?Q?byhSqEf/Tn8WSkO96xoOSOvNov+9BZ01GX8CYFQ/Jf8XXsD1UkKA+7bzm3P8?=
+ =?us-ascii?Q?eCjLkaNY1HVkrY62tB7JeaoL9i0jhU434Mu5M37M25TyWyIn2RD3eE50GBiF?=
+ =?us-ascii?Q?6ZsNVYvDQunrQEJAlPmlTSVco7jg4Fkeii7ivWHvxYhumQW6crwVbkBXF6Tf?=
+ =?us-ascii?Q?m8l2CFNxqI21pBjPIkTJS9X1zLQY177IV+Ov5T1xCwMsvUvkk5ViJHdccpyw?=
+ =?us-ascii?Q?KNkU6wAmEUAmwAhgkpyGs94HyuhNVvQ5Ho1xlD55+9vPYB6hpDzdV97oxElc?=
+ =?us-ascii?Q?vw139mdKCnBQUUYVm9CeDXxGI8lMlTieswuKna/ORxTNZ4sS4wg7pXgXeexg?=
+ =?us-ascii?Q?vuvZynpTTJFmALwC7HRkNfMshAWy51Smwn7OzHopcum+PvMvg59Ov4UQpGSm?=
+ =?us-ascii?Q?p0TObnM3NN4BDm2SMvrRst1cZyD1J3c/elELi8g8lW97Vcw3bTvGTqRCBgk6?=
+ =?us-ascii?Q?Inaij0vctq7850Jq1GnxGXvccKfytPfw+RwDtiJSTidHsHJgs9+01v0Wm3Zs?=
+ =?us-ascii?Q?l4vQJxUtEUUXT1wz2Whr86XOfoqciQkRGz9E+DHJXZIVOUQhmLY95L0H+W33?=
+ =?us-ascii?Q?Sz62PAuRFVUaSyuy6Ryv5wVBC2+aucCjAEJpbOrsnLZBkqcUbHCb4TRIZl+J?=
+ =?us-ascii?Q?Uxr6yAxjo+LjsbGndWAeOdDnTGX/Hx6wSoxEeFuGiSlZusOF9xDeWGkbVkzJ?=
+ =?us-ascii?Q?9P6MBw7EOHTsntMti0ANb8PQcNaX1SefTyQGYK4cxcpOJl900ZaHvgprw+/+?=
+ =?us-ascii?Q?Sdb5rE+g21biTbsSW0ARCV7U?=
+X-OriginatorOrg: suse.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: e8b7e425-02d0-4e6a-2339-08d947752b5c
+X-MS-Exchange-CrossTenant-AuthSource: AM7PR04MB6821.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Jul 2021 09:44:41.4776
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: f7a17af6-1c5c-4a36-aa8b-f5be247aa4ba
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: Aai4LowXJ7KykwdhDhFhWULUOr1SH5cMmF35viPVZ+nggw4lMO9UO6a7CI06axa3
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM7PR04MB7015
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Brijesh,
-
-On 10/07/2021 0:55, Brijesh Singh wrote:
-> When SEV-SNP is enabled, the KVM_SNP_INIT command is used to initialize
-> the platform. The command checks whether SNP is enabled in the KVM, if
-> enabled then it allocate a new ASID from the SNP pool and calls the
-
-s/allocate/allocates/
-
-> firmware to initialize the all the resources.
-> 
-> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
-> ---
->  target/i386/sev.c      | 24 +++++++++++++++++++++---
->  target/i386/sev_i386.h |  1 +
->  2 files changed, 22 insertions(+), 3 deletions(-)
-> 
-> diff --git a/target/i386/sev.c b/target/i386/sev.c
-> index 6b238ef969..84ae244af0 100644
-> --- a/target/i386/sev.c
-> +++ b/target/i386/sev.c
-> @@ -583,10 +583,17 @@ sev_enabled(void)
->      return !!sev_guest;
->  }
->  
-> +bool
-> +sev_snp_enabled(void)
-> +{
-> +    return sev_guest->snp;
-> +}
-> +
->  bool
->  sev_es_enabled(void)
->  {
-> -    return sev_enabled() && (sev_guest->policy & SEV_POLICY_ES);
-> +    return sev_snp_enabled() ||
-> +           (sev_enabled() && (sev_guest->policy & SEV_POLICY_ES));
->  }
->  
-
-Just making sure I understand:
-
-* sev_enabled() returns true for SEV or newer (SEV or SEV-ES or
-  SEV-SNP).
-* sev_es_enabled() returns true for SEV-ES or newer (SEV-ES or SEV-SNP).
-* sev_snp_enabled() returns true for SEV-SNP or newer (currently only
-  SEV-SNP).
-
-Is that indeed the intention?
 
 
--Dov
+On 2021/7/15 =E4=B8=8B=E5=8D=885:28, Robin Murphy wrote:
+> On 2021-07-15 09:55, Qu Wenruo wrote:
+>> Hi,
+>>
+>> Recently I'm playing around the Nvidia Xavier AGX board, which has VHE=20
+>> extension support.
+>>
+>> In theory, considering the CPU and memory, it should be pretty=20
+>> powerful compared to boards like RPI CM4.
+>>
+>> But to my surprise, KVM runs pretty poor on Xavier.
+>>
+>> Just booting the edk2 firmware could take over 10s, and 20s to fully=20
+>> boot the kernel.
+>> Even my VM on RPI CM4 has way faster boot time, even just running on=20
+>> PCIE2.0 x1 lane NVME, and just 4 2.1Ghz A72 core.
+>>
+>> This is definitely out of my expectation, I double checked to be sure=20
+>> that it's running in KVM mode.
+>>
+>> But further digging shows that, since Xavier AGX CPU supports VHE, kvm=20
+>> is running in VHE mode other than HYP mode on CM4.
+>>
+>> Is there anyway to manually disable VHE mode to test the more common=20
+>> HYP mode on Xavier?
+>=20
+> According to kernel-parameters.txt, "kvm-arm.mode=3Dnvhe" (or its=20
+> low-level equivalent "id_aa64mmfr1.vh=3D0") on the command line should do=
+=20
+> that.
 
+Thanks for this one, I stupidly only searched modinfo of kvm, and didn't=20
+even bother to search arch/arm64/kvm...
 
->  uint64_t
-> @@ -1008,6 +1015,7 @@ int sev_kvm_init(ConfidentialGuestSupport *cgs, Error **errp)
->      uint32_t ebx;
->      uint32_t host_cbitpos;
->      struct sev_user_data_status status = {};
-> +    void *init_args = NULL;
->  
->      if (!sev) {
->          return 0;
-> @@ -1061,7 +1069,17 @@ int sev_kvm_init(ConfidentialGuestSupport *cgs, Error **errp)
->      sev->api_major = status.api_major;
->      sev->api_minor = status.api_minor;
->  
-> -    if (sev_es_enabled()) {
-> +    if (sev_snp_enabled()) {
-> +        if (!kvm_kernel_irqchip_allowed()) {
-> +            error_report("%s: SEV-SNP guests require in-kernel irqchip support",
-> +                         __func__);
-> +            goto err;
-> +        }
-> +
-> +        cmd = KVM_SEV_SNP_INIT;
-> +        init_args = (void *)&sev->snp_config.init;
-> +
-> +    } else if (sev_es_enabled()) {
->          if (!kvm_kernel_irqchip_allowed()) {
->              error_report("%s: SEV-ES guests require in-kernel irqchip support",
->                           __func__);
-> @@ -1080,7 +1098,7 @@ int sev_kvm_init(ConfidentialGuestSupport *cgs, Error **errp)
->      }
->  
->      trace_kvm_sev_init();
-> -    ret = sev_ioctl(sev->sev_fd, cmd, NULL, &fw_error);
-> +    ret = sev_ioctl(sev->sev_fd, cmd, init_args, &fw_error);
->      if (ret) {
->          error_setg(errp, "%s: failed to initialize ret=%d fw_error=%d '%s'",
->                     __func__, ret, fw_error, fw_error_to_str(fw_error));
-> diff --git a/target/i386/sev_i386.h b/target/i386/sev_i386.h
-> index ae6d840478..e0e1a599be 100644
-> --- a/target/i386/sev_i386.h
-> +++ b/target/i386/sev_i386.h
-> @@ -29,6 +29,7 @@
->  #define SEV_POLICY_SEV          0x20
->  
->  extern bool sev_es_enabled(void);
-> +extern bool sev_snp_enabled(void);
->  extern uint64_t sev_get_me_mask(void);
->  extern SevInfo *sev_get_info(void);
->  extern uint32_t sev_get_cbit_position(void);
-> 
+>=20
+> However I'd imagine the discrepancy is likely to be something more=20
+> fundamental to the wildly different microarchitectures. There's=20
+> certainly no harm in giving non-VHE a go for comparison, but I wouldn't=20
+> be surprised if it turns out even slower...
+
+You're totally right, with nvhe mode, it's still the same slow speed.
+
+BTW, what did you mean by the "wildly different microarch"?
+Is ARMv8.2 arch that different from ARMv8 of RPI4?
+
+And any extra methods I could try to explore the reason of the slowness?
+
+At least RPI CM4 is beyond my expectation and is working pretty fine.
+
+Thanks,
+Qu
+
+>=20
+> Robin.
+>=20
+>> BTW, this is the dmesg related to KVM on Xavier, running v5.13=20
+>> upstream kernel, with 64K page size:
+>> [=C2=A0=C2=A0=C2=A0 0.852357] kvm [1]: IPA Size Limit: 40 bits
+>> [=C2=A0=C2=A0=C2=A0 0.857378] kvm [1]: vgic interrupt IRQ9
+>> [=C2=A0=C2=A0=C2=A0 0.862122] kvm: pmu event creation failed -2
+>> [=C2=A0=C2=A0=C2=A0 0.866734] kvm [1]: VHE mode initialized successfully
+>>
+>> While on CM4, the host runs v5.12.10 upstream kernel (with downstream=20
+>> dtb), with 4K page size:
+>> [=C2=A0=C2=A0=C2=A0 1.276818] kvm [1]: IPA Size Limit: 44 bits
+>> [=C2=A0=C2=A0=C2=A0 1.278425] kvm [1]: vgic interrupt IRQ9
+>> [=C2=A0=C2=A0=C2=A0 1.278620] kvm [1]: Hyp mode initialized successfully
+>>
+>> Could it be the PAGE size causing problem?
+>>
+>> Thanks,
+>> Qu
+>>
+>>
+>> _______________________________________________
+>> linux-arm-kernel mailing list
+>> linux-arm-kernel@lists.infradead.org
+>> http://lists.infradead.org/mailman/listinfo/linux-arm-kernel
+>=20
+
