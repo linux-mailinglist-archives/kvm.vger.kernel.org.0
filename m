@@ -2,151 +2,134 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C594C3C9896
-	for <lists+kvm@lfdr.de>; Thu, 15 Jul 2021 07:55:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 241433C98CB
+	for <lists+kvm@lfdr.de>; Thu, 15 Jul 2021 08:29:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236792AbhGOF6F (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 15 Jul 2021 01:58:05 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:6752 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231910AbhGOF6E (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 15 Jul 2021 01:58:04 -0400
-Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 16F5XYWN088105;
-        Thu, 15 Jul 2021 01:54:54 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=Fi9hQjQUcA9Hyz7d7/Ubs0EUDvS2qcumowwBVxCMS6o=;
- b=byT7k4zODNuXgKXLNocgLKqAWDLiQJrym6m53CGCgZX459ZxMDRCzgL+LVd7b2yfEli/
- r+CSVNLRT+vF0G2PMRMq1MVECIBVJuz6ujqWAKjF8NvsgZJlrsKZvPe+RDkUDvNCngp5
- N4NyYnD7BcwbBZOucZoRlNz8Nd/B3YpPSih6AQiP50k/d3UVxSYENu+B4p5KbfufzhIB
- 25N4JHDg6NRCmw8Ti6FRLbak03em0S0pz/0aZ278Vosm4DJQgrbopNklQDPLe57l6zs7
- mydwrP/Fv8etufGu05QGWrn5HXQcW2n4/mCpfqKuGviwel6A8tfeMHKUR5BwDb9BDAc6 Eg== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 39ssjy9u7k-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 15 Jul 2021 01:54:54 -0400
-Received: from m0098393.ppops.net (m0098393.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 16F5rhHq002689;
-        Thu, 15 Jul 2021 01:54:54 -0400
-Received: from ppma06fra.de.ibm.com (48.49.7a9f.ip4.static.sl-reverse.com [159.122.73.72])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 39ssjy9u6w-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 15 Jul 2021 01:54:53 -0400
-Received: from pps.filterd (ppma06fra.de.ibm.com [127.0.0.1])
-        by ppma06fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 16F5n495015801;
-        Thu, 15 Jul 2021 05:54:51 GMT
-Received: from b06cxnps4074.portsmouth.uk.ibm.com (d06relay11.portsmouth.uk.ibm.com [9.149.109.196])
-        by ppma06fra.de.ibm.com with ESMTP id 39q2th93qf-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 15 Jul 2021 05:54:51 +0000
-Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
-        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 16F5sn7j34079072
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 15 Jul 2021 05:54:49 GMT
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id DDDB1A4053;
-        Thu, 15 Jul 2021 05:54:48 +0000 (GMT)
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 90AD7A4040;
-        Thu, 15 Jul 2021 05:54:44 +0000 (GMT)
-Received: from [9.160.50.212] (unknown [9.160.50.212])
-        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Thu, 15 Jul 2021 05:54:44 +0000 (GMT)
-Subject: Re: [RFC PATCH 5/6] i386/sev: add support to encrypt BIOS when
- SEV-SNP is enabled
-To:     Brijesh Singh <brijesh.singh@amd.com>,
-        Connor Kuehl <ckuehl@redhat.com>, qemu-devel@nongnu.org
-Cc:     =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
-        "Michael S . Tsirkin" <mst@redhat.com>,
-        James Bottomley <jejb@linux.ibm.com>,
-        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
+        id S240192AbhGOGcI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 15 Jul 2021 02:32:08 -0400
+Received: from szxga01-in.huawei.com ([45.249.212.187]:7011 "EHLO
+        szxga01-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231149AbhGOGcH (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 15 Jul 2021 02:32:07 -0400
+Received: from dggemv711-chm.china.huawei.com (unknown [172.30.72.56])
+        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4GQPT04QJtzXtJ0;
+        Thu, 15 Jul 2021 14:23:32 +0800 (CST)
+Received: from dggpemm500022.china.huawei.com (7.185.36.162) by
+ dggemv711-chm.china.huawei.com (10.1.198.66) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2176.2; Thu, 15 Jul 2021 14:29:11 +0800
+Received: from [10.174.185.67] (10.174.185.67) by
+ dggpemm500022.china.huawei.com (7.185.36.162) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2176.2; Thu, 15 Jul 2021 14:29:10 +0800
+Subject: Re: [RFC v2] /dev/iommu uAPI proposal
+To:     "Tian, Kevin" <kevin.tian@intel.com>
+CC:     Jason Gunthorpe <jgg@nvidia.com>,
+        "Alex Williamson (alex.williamson@redhat.com)" 
+        <alex.williamson@redhat.com>,
+        "Jean-Philippe Brucker" <jean-philippe@linaro.org>,
         David Gibson <david@gibson.dropbear.id.au>,
-        =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
-        kvm@vger.kernel.org, Michael Roth <michael.roth@amd.com>,
-        Eduardo Habkost <ehabkost@redhat.com>
-References: <20210709215550.32496-1-brijesh.singh@amd.com>
- <20210709215550.32496-6-brijesh.singh@amd.com>
- <3976829d-770e-b9fd-ffa8-2c2f79f3c503@redhat.com>
- <866c2a6b-8693-a943-fb06-45adf2cdcb92@amd.com>
-From:   Dov Murik <dovmurik@linux.ibm.com>
-Message-ID: <cfa95bf4-9d20-8d43-e6e0-6e5b9752d27a@linux.ibm.com>
-Date:   Thu, 15 Jul 2021 08:54:42 +0300
+        Jason Wang <jasowang@redhat.com>,
+        "parav@mellanox.com" <parav@mellanox.com>,
+        "Enrico Weigelt, metux IT consult" <lkml@metux.net>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Eric Auger <eric.auger@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        "Raj, Ashok" <ashok.raj@intel.com>,
+        "Liu, Yi L" <yi.l.liu@intel.com>, "Wu, Hao" <hao.wu@intel.com>,
+        "Jiang, Dave" <dave.jiang@intel.com>,
+        Jacob Pan <jacob.jun.pan@linux.intel.com>,
+        "Kirti Wankhede" <kwankhede@nvidia.com>,
+        Robin Murphy <robin.murphy@arm.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
+        "David Woodhouse" <dwmw2@infradead.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        "Lu Baolu" <baolu.lu@linux.intel.com>,
+        "wanghaibin.wang@huawei.com" <wanghaibin.wang@huawei.com>
+References: <BN9PR11MB5433B1E4AE5B0480369F97178C189@BN9PR11MB5433.namprd11.prod.outlook.com>
+ <7ea349f8-8c53-e240-fe80-382954ba7f28@huawei.com>
+ <BN9PR11MB5433A9B792441CAF21A183A38C129@BN9PR11MB5433.namprd11.prod.outlook.com>
+From:   Shenming Lu <lushenming@huawei.com>
+Message-ID: <a8edb2c1-9c9c-6204-072c-4f1604b7dace@huawei.com>
+Date:   Thu, 15 Jul 2021 14:29:00 +0800
 User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.11.0
+ Thunderbird/78.2.2
 MIME-Version: 1.0
-In-Reply-To: <866c2a6b-8693-a943-fb06-45adf2cdcb92@amd.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <BN9PR11MB5433A9B792441CAF21A183A38C129@BN9PR11MB5433.namprd11.prod.outlook.com>
+Content-Type: text/plain; charset="utf-8"
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: IAfuLmj2Ukorpr1e2ZZKc-sEVJSo7q1O
-X-Proofpoint-ORIG-GUID: c4F22pNZyhf2ATb2VkDUy-zczwePk0-d
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.790
- definitions=2021-07-15_02:2021-07-14,2021-07-15 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 bulkscore=0
- malwarescore=0 adultscore=0 spamscore=0 impostorscore=0 clxscore=1015
- lowpriorityscore=0 priorityscore=1501 mlxscore=0 phishscore=0
- mlxlogscore=999 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2104190000 definitions=main-2107150040
+X-Originating-IP: [10.174.185.67]
+X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
+ dggpemm500022.china.huawei.com (7.185.36.162)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-
-On 14/07/2021 21:52, Brijesh Singh wrote:
-> 
-> 
-> On 7/14/21 12:08 PM, Connor Kuehl wrote:
->> On 7/9/21 3:55 PM, Brijesh Singh wrote:
->>> The KVM_SEV_SNP_LAUNCH_UPDATE command is used for encrypting the bios
->>> image used for booting the SEV-SNP guest.
+On 2021/7/15 11:55, Tian, Kevin wrote:
+>> From: Shenming Lu <lushenming@huawei.com>
+>> Sent: Thursday, July 15, 2021 11:21 AM
+>>
+>> On 2021/7/9 15:48, Tian, Kevin wrote:
+>>> 4.6. I/O page fault
+>>> +++++++++++++++++++
 >>>
->>> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
->>> ---
->>>   target/i386/sev.c        | 33 ++++++++++++++++++++++++++++++++-
->>>   target/i386/trace-events |  1 +
->>>   2 files changed, 33 insertions(+), 1 deletion(-)
+>>> uAPI is TBD. Here is just about the high-level flow from host IOMMU driver
+>>> to guest IOMMU driver and backwards. This flow assumes that I/O page
+>> faults
+>>> are reported via IOMMU interrupts. Some devices report faults via device
+>>> specific way instead of going through the IOMMU. That usage is not
+>> covered
+>>> here:
 >>>
->>> diff --git a/target/i386/sev.c b/target/i386/sev.c
->>> index 259408a8f1..41dcb084d1 100644
->>> --- a/target/i386/sev.c
->>> +++ b/target/i386/sev.c
->>> @@ -883,6 +883,30 @@ out:
->>>       return ret;
->>>   }
->>>   +static int
->>> +sev_snp_launch_update(SevGuestState *sev, uint8_t *addr, uint64_t
->>> len, int type)
->>> +{
->>> +    int ret, fw_error;
->>> +    struct kvm_sev_snp_launch_update update = {};
->>> +
->>> +    if (!addr || !len) {
->>> +        return 1;
+>>> -   Host IOMMU driver receives a I/O page fault with raw fault_data {rid,
+>>>     pasid, addr};
+>>>
+>>> -   Host IOMMU driver identifies the faulting I/O page table according to
+>>>     {rid, pasid} and calls the corresponding fault handler with an opaque
+>>>     object (registered by the handler) and raw fault_data (rid, pasid, addr);
+>>>
+>>> -   IOASID fault handler identifies the corresponding ioasid and device
+>>>     cookie according to the opaque object, generates an user fault_data
+>>>     (ioasid, cookie, addr) in the fault region, and triggers eventfd to
+>>>     userspace;
+>>>
 >>
->> Should this be a -1? It looks like the caller checks if this function
->> returns < 0, but doesn't check for res == 1.
-> 
-> Ah, it should be -1.
-> 
+>> Hi, I have some doubts here:
 >>
->> Alternatively, invoking error_report might provide more useful
->> information that the preconditions to this function were violated.
+>> For mdev, it seems that the rid in the raw fault_data is the parent device's,
+>> then in the vSVA scenario, how can we get to know the mdev(cookie) from
+>> the
+>> rid and pasid?
+>>
+>> And from this point of view，would it be better to register the mdev
+>> (iommu_register_device()) with the parent device info?
 >>
 > 
-> Sure, I will add error_report.
+> This is what is proposed in this RFC. A successful binding generates a new
+> iommu_dev object for each vfio device. For mdev this object includes 
+> its parent device, the defPASID marking this mdev, and the cookie 
+> representing it in userspace. Later it is iommu_dev being recorded in
+> the attaching_data when the mdev is attached to an IOASID:
+> 
+> 	struct iommu_attach_data *__iommu_device_attach(
+> 		struct iommu_dev *dev, u32 ioasid, u32 pasid, int flags);
+> 
+> Then when a fault is reported, the fault handler just needs to figure out 
+> iommu_dev according to {rid, pasid} in the raw fault data.
+> 
 
-Maybe even simpler:
+Yeah, we have the defPASID that marks the mdev and refers to the default
+I/O address space, but how about the non-default I/O address spaces?
+Is there a case that two different mdevs (on the same parent device)
+are used by the same process in the guest, thus have a same pasid route
+in the physical IOMMU? It seems that we can't figure out the mdev from
+the rid and pasid in this case...
 
-  assert(addr);
-  assert(len > 0);
+Did I misunderstand something?... :-)
 
-The assertion failure will show the developer what is wrong. This should
-not happen for the end-user (unless I'm missing something).
-
--Dov
+Thanks,
+Shenming
