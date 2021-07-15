@@ -2,123 +2,125 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C39383CA4B7
-	for <lists+kvm@lfdr.de>; Thu, 15 Jul 2021 19:49:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 324A13CA4C3
+	for <lists+kvm@lfdr.de>; Thu, 15 Jul 2021 19:51:34 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235437AbhGORwD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 15 Jul 2021 13:52:03 -0400
-Received: from mga14.intel.com ([192.55.52.115]:16124 "EHLO mga14.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S235390AbhGORwC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 15 Jul 2021 13:52:02 -0400
-X-IronPort-AV: E=McAfee;i="6200,9189,10046"; a="210412295"
-X-IronPort-AV: E=Sophos;i="5.84,243,1620716400"; 
-   d="scan'208";a="210412295"
-Received: from fmsmga004.fm.intel.com ([10.253.24.48])
-  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Jul 2021 10:49:04 -0700
-X-IronPort-AV: E=Sophos;i="5.84,243,1620716400"; 
-   d="scan'208";a="489539779"
-Received: from otc-nc-03.jf.intel.com (HELO otc-nc-03) ([10.54.39.36])
-  by fmsmga004-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Jul 2021 10:49:03 -0700
-Date:   Thu, 15 Jul 2021 10:48:36 -0700
-From:   "Raj, Ashok" <ashok.raj@intel.com>
-To:     Jason Gunthorpe <jgg@nvidia.com>
-Cc:     "Tian, Kevin" <kevin.tian@intel.com>,
-        Shenming Lu <lushenming@huawei.com>,
-        "Alex Williamson (alex.williamson@redhat.com)" 
-        <alex.williamson@redhat.com>,
-        Jean-Philippe Brucker <jean-philippe@linaro.org>,
-        David Gibson <david@gibson.dropbear.id.au>,
-        Jason Wang <jasowang@redhat.com>,
-        "parav@mellanox.com" <parav@mellanox.com>,
-        "Enrico Weigelt, metux IT consult" <lkml@metux.net>,
+        id S229960AbhGORy0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 15 Jul 2021 13:54:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43732 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230358AbhGORyZ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 15 Jul 2021 13:54:25 -0400
+Received: from mail-pj1-x102b.google.com (mail-pj1-x102b.google.com [IPv6:2607:f8b0:4864:20::102b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 81B4AC061765
+        for <kvm@vger.kernel.org>; Thu, 15 Jul 2021 10:51:32 -0700 (PDT)
+Received: by mail-pj1-x102b.google.com with SMTP id v18-20020a17090ac912b0290173b9578f1cso6042758pjt.0
+        for <kvm@vger.kernel.org>; Thu, 15 Jul 2021 10:51:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=SPUir8j18PLybVHK4M3a0vCQIxEbnuUyBjChvlSKLmw=;
+        b=O6AX+9hzZex3eU5uvfUHqD2gB8kkBZk+ho0pFS2dUIJw1QUWPEIQ3cGrzjEgmQ5EGx
+         gYai+UQVtsPWNE6v8zHWdWbJJXlcF02q/r7/sQz/nFxk1BSaW85VYOSPU3ABhgUDkUur
+         5N6ceKHGHDX7KUttzFzG/IKO2ub60a5iylSdkeqcMkchE0JkEuAicdvSqID+aIUDAu1A
+         Az9u0TdsmnrXPgK4u5zDJWgJfYtd4H1fQ8U39B5RZq1fYuA2RNah69hBucHHAQrhcpK6
+         H7NekraqO2ltqIVdk8+zE5/NUcItPe6ci/slDsqdql74v6bwnu6pit9OxnS4H2jQscpC
+         Dt/Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=SPUir8j18PLybVHK4M3a0vCQIxEbnuUyBjChvlSKLmw=;
+        b=f7BfjnsuSyZWtu4eYVb6//voC6yFGp/w8bHDnjbX4uDt450IS8/3gnm/rVX5zYbsow
+         Yw5WOQpWlvk39BYKZV05fZl3xi52b1yxkmlI113RsZmfSmsnLO5JcYgvbWfIH3zwA+qv
+         bL0H8i7N5wqYjoh7pOH0FVvI1OxTZou5TRPsjoITZlgk0l6Yn9vNsYk2jSrOf1f7fMq9
+         k9uMwvR3jlgPXPiY/T+5H/lH0GHAJZQS/+NpeWX3M9sHsKD7hGawM1XWSIZu4Ib3Ffon
+         SP/SQwsz+wFfD2aemoOiVtA/6rabQZu7iLH4vS0aNr13qBvaEeq77AqFPhttdyBPL5rb
+         oVyA==
+X-Gm-Message-State: AOAM530DqYEQxbozi2auYuAm5eByQ1JgBd70nhiLhdUtw6EDWveH8Ekr
+        sOETxdx/yXxO7PoIove6pF4C4cJgVnt2zw==
+X-Google-Smtp-Source: ABdhPJwBoOpS4t+WKHVcsb/gcZglXaCGGZ+MYH+86n+Y3LrgK7OgBFTpOpP7AW5uPh8vDSMESTclww==
+X-Received: by 2002:a17:90a:9f06:: with SMTP id n6mr5466944pjp.92.1626371491663;
+        Thu, 15 Jul 2021 10:51:31 -0700 (PDT)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id j19sm8009841pgm.44.2021.07.15.10.51.30
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 15 Jul 2021 10:51:31 -0700 (PDT)
+Date:   Thu, 15 Jul 2021 17:51:27 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Brijesh Singh <brijesh.singh@amd.com>
+Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
+        linux-coco@lists.linux.dev, linux-mm@kvack.org,
+        linux-crypto@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Eric Auger <eric.auger@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        "Liu, Yi L" <yi.l.liu@intel.com>, "Wu, Hao" <hao.wu@intel.com>,
-        "Jiang, Dave" <dave.jiang@intel.com>,
-        Jacob Pan <jacob.jun.pan@linux.intel.com>,
-        Kirti Wankhede <kwankhede@nvidia.com>,
-        Robin Murphy <robin.murphy@arm.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
-        David Woodhouse <dwmw2@infradead.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Lu Baolu <baolu.lu@linux.intel.com>,
-        "wanghaibin.wang@huawei.com" <wanghaibin.wang@huawei.com>
-Subject: Re: [RFC v2] /dev/iommu uAPI proposal
-Message-ID: <20210715174836.GB593686@otc-nc-03>
-References: <BN9PR11MB5433B1E4AE5B0480369F97178C189@BN9PR11MB5433.namprd11.prod.outlook.com>
- <7ea349f8-8c53-e240-fe80-382954ba7f28@huawei.com>
- <BN9PR11MB5433A9B792441CAF21A183A38C129@BN9PR11MB5433.namprd11.prod.outlook.com>
- <a8edb2c1-9c9c-6204-072c-4f1604b7dace@huawei.com>
- <BN9PR11MB54336D6A8CAE31F951770A428C129@BN9PR11MB5433.namprd11.prod.outlook.com>
- <20210715124813.GC543781@nvidia.com>
- <20210715135757.GC590891@otc-nc-03>
- <20210715152325.GF543781@nvidia.com>
- <20210715162141.GA593686@otc-nc-03>
- <20210715171826.GG543781@nvidia.com>
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        David Rientjes <rientjes@google.com>,
+        Dov Murik <dovmurik@linux.ibm.com>,
+        Tobin Feldman-Fitzthum <tobin@ibm.com>,
+        Borislav Petkov <bp@alien8.de>,
+        Michael Roth <michael.roth@amd.com>,
+        Vlastimil Babka <vbabka@suse.cz>, tony.luck@intel.com,
+        npmccallum@redhat.com, brijesh.ksingh@gmail.com
+Subject: Re: [PATCH Part2 RFC v4 07/40] x86/sev: Split the physmap when
+ adding the page in RMP table
+Message-ID: <YPB1n0+G+0EoyEvE@google.com>
+References: <20210707183616.5620-1-brijesh.singh@amd.com>
+ <20210707183616.5620-8-brijesh.singh@amd.com>
+ <YO9kP1v0TAFXISHD@google.com>
+ <d486a008-8340-66b0-9667-11c8a50974e4@amd.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20210715171826.GG543781@nvidia.com>
+In-Reply-To: <d486a008-8340-66b0-9667-11c8a50974e4@amd.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jul 15, 2021 at 02:18:26PM -0300, Jason Gunthorpe wrote:
-> On Thu, Jul 15, 2021 at 09:21:41AM -0700, Raj, Ashok wrote:
-> > On Thu, Jul 15, 2021 at 12:23:25PM -0300, Jason Gunthorpe wrote:
-> > > On Thu, Jul 15, 2021 at 06:57:57AM -0700, Raj, Ashok wrote:
-> > > > On Thu, Jul 15, 2021 at 09:48:13AM -0300, Jason Gunthorpe wrote:
-> > > > > On Thu, Jul 15, 2021 at 06:49:54AM +0000, Tian, Kevin wrote:
-> > > > > 
-> > > > > > No. You are right on this case. I don't think there is a way to 
-> > > > > > differentiate one mdev from the other if they come from the
-> > > > > > same parent and attached by the same guest process. In this
-> > > > > > case the fault could be reported on either mdev (e.g. the first
-> > > > > > matching one) to get it fixed in the guest.
-> > > > > 
-> > > > > If the IOMMU can't distinguish the two mdevs they are not isolated
-> > > > > and would have to share a group. Since group sharing is not supported
-> > > > > today this seems like a non-issue
-> > > > 
-> > > > Does this mean we have to prevent 2 mdev's from same pdev being assigned to
-> > > > the same guest? 
-> > > 
-> > > No, it means that the IOMMU layer has to be able to distinguish them.
+On Thu, Jul 15, 2021, Brijesh Singh wrote:
+> 
+> On 7/14/21 5:25 PM, Sean Christopherson wrote:
+> > > @@ -2375,6 +2375,12 @@ int rmpupdate(struct page *page, struct rmpupdate *val)
+> > >   	if (!cpu_feature_enabled(X86_FEATURE_SEV_SNP))
+> > >   		return -ENXIO;
+> > > +	ret = set_memory_4k((unsigned long)page_to_virt(page), 1);
 > > 
-> > Ok, the guest has no control over it, as it see 2 separate pci devices and
-> > thinks they are all different.
+> > IIUC, this shatters the direct map for page that's assigned to an SNP guest, and
+> > the large pages are never recovered?
 > > 
-> > Only time when it can fail is during the bind operation. From guest
-> > perspective a bind in vIOMMU just turns into a write to local table and a
-> > invalidate will cause the host to update the real copy from the shadow.
+> > I believe a better approach would be to do something similar to memfd_secret[*],
+> > which encountered a similar problem with the direct map.  Instead of forcing the
+> > direct map to be forever 4k, unmap the direct map when making a page guest private,
+> > and restore the direct map when it's made shared (or freed).
 > > 
-> > There is no way to fail the bind? and Allocation of the PASID is also a
-> > separate operation and has no clue how its going to be used in the guest.
+> > I thought memfd_secret had also solved the problem of restoring large pages in
+> > the direct map, but at a glance I can't tell if that's actually implemented
+> > anywhere.  But, even if it's not currently implemented, I think it makes sense
+> > to mimic the memfd_secret approach so that both features can benefit if large
+> > page preservation/restoration is ever added.
+> > 
 > 
-> You can't attach the same RID to the same PASID twice. The IOMMU code
-> should prevent this.
+> thanks for the memfd_secrets pointer. At the lowest level it shares the
+> same logic to split the physmap. We both end up calling to
+> change_page_attrs_set_clr() which split the page and updates the page
+> table attributes.
 > 
-> As we've talked about several times, it seems to me the vIOMMU
-> interface is misdesigned for the requirements you have. The hypervisor
-> should have a role in allocating the PASID since there are invisible
-> hypervisor restrictions. This is one of them.
+> Given this, I believe in future if the change_page_attrs_set_clr() is
+> enhanced to track the splitting of the pages and restore it later then it
+> should work transparently.
 
-Allocating a PASID is a separate step from binding, isn't it? In vt-d we
-have a virtual command interface that can fail an allocation of PASID. But
-which device its bound to is a dynamic thing that only gets at bind_mm()
-right?
-
-> 
-> > Do we have any isolation requirements here? its the same process. So if the
-> > page-request it sent to guest and even if you report it for mdev1, after
-> > the PRQ is resolved by guest, the request from mdev2 from the same guest
-> > should simply work?
-> 
-> I think we already talked about this and said it should not be done.
-
-I get the should not be done, I'm wondering where should that be
-implemented?
+But something actually needs to initiate the restore.  If the RMPUDATE path just
+force 4k pages then there will never be a restore.  And zapping the direct map
+for private pages is a good thing, e.g. prevents the kernel from reading garbage,
+which IIUC isn't enforced by the RMP?
