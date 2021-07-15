@@ -2,125 +2,158 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 324A13CA4C3
-	for <lists+kvm@lfdr.de>; Thu, 15 Jul 2021 19:51:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 996883CA4C9
+	for <lists+kvm@lfdr.de>; Thu, 15 Jul 2021 19:53:42 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229960AbhGORy0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 15 Jul 2021 13:54:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43732 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230358AbhGORyZ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 15 Jul 2021 13:54:25 -0400
-Received: from mail-pj1-x102b.google.com (mail-pj1-x102b.google.com [IPv6:2607:f8b0:4864:20::102b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 81B4AC061765
-        for <kvm@vger.kernel.org>; Thu, 15 Jul 2021 10:51:32 -0700 (PDT)
-Received: by mail-pj1-x102b.google.com with SMTP id v18-20020a17090ac912b0290173b9578f1cso6042758pjt.0
-        for <kvm@vger.kernel.org>; Thu, 15 Jul 2021 10:51:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=SPUir8j18PLybVHK4M3a0vCQIxEbnuUyBjChvlSKLmw=;
-        b=O6AX+9hzZex3eU5uvfUHqD2gB8kkBZk+ho0pFS2dUIJw1QUWPEIQ3cGrzjEgmQ5EGx
-         gYai+UQVtsPWNE6v8zHWdWbJJXlcF02q/r7/sQz/nFxk1BSaW85VYOSPU3ABhgUDkUur
-         5N6ceKHGHDX7KUttzFzG/IKO2ub60a5iylSdkeqcMkchE0JkEuAicdvSqID+aIUDAu1A
-         Az9u0TdsmnrXPgK4u5zDJWgJfYtd4H1fQ8U39B5RZq1fYuA2RNah69hBucHHAQrhcpK6
-         H7NekraqO2ltqIVdk8+zE5/NUcItPe6ci/slDsqdql74v6bwnu6pit9OxnS4H2jQscpC
-         Dt/Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=SPUir8j18PLybVHK4M3a0vCQIxEbnuUyBjChvlSKLmw=;
-        b=f7BfjnsuSyZWtu4eYVb6//voC6yFGp/w8bHDnjbX4uDt450IS8/3gnm/rVX5zYbsow
-         Yw5WOQpWlvk39BYKZV05fZl3xi52b1yxkmlI113RsZmfSmsnLO5JcYgvbWfIH3zwA+qv
-         bL0H8i7N5wqYjoh7pOH0FVvI1OxTZou5TRPsjoITZlgk0l6Yn9vNsYk2jSrOf1f7fMq9
-         k9uMwvR3jlgPXPiY/T+5H/lH0GHAJZQS/+NpeWX3M9sHsKD7hGawM1XWSIZu4Ib3Ffon
-         SP/SQwsz+wFfD2aemoOiVtA/6rabQZu7iLH4vS0aNr13qBvaEeq77AqFPhttdyBPL5rb
-         oVyA==
-X-Gm-Message-State: AOAM530DqYEQxbozi2auYuAm5eByQ1JgBd70nhiLhdUtw6EDWveH8Ekr
-        sOETxdx/yXxO7PoIove6pF4C4cJgVnt2zw==
-X-Google-Smtp-Source: ABdhPJwBoOpS4t+WKHVcsb/gcZglXaCGGZ+MYH+86n+Y3LrgK7OgBFTpOpP7AW5uPh8vDSMESTclww==
-X-Received: by 2002:a17:90a:9f06:: with SMTP id n6mr5466944pjp.92.1626371491663;
-        Thu, 15 Jul 2021 10:51:31 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id j19sm8009841pgm.44.2021.07.15.10.51.30
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 15 Jul 2021 10:51:31 -0700 (PDT)
-Date:   Thu, 15 Jul 2021 17:51:27 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Brijesh Singh <brijesh.singh@amd.com>
-Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
-        linux-coco@lists.linux.dev, linux-mm@kvack.org,
-        linux-crypto@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
+        id S236328AbhGOR4e (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 15 Jul 2021 13:56:34 -0400
+Received: from mail-bn7nam10on2054.outbound.protection.outlook.com ([40.107.92.54]:51439
+        "EHLO NAM10-BN7-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S231181AbhGOR4e (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 15 Jul 2021 13:56:34 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=TJ0EucaL9AkKe7pArIEQaBgCgOFABch7cPNFbJ/rvW4NGeY3oZpmWn1YS+179WUNLyF7idGy1hGfoxasANg/n6eMDvMPj/C2WLWhbT++syc5fsYXL2hHpyyUpIld61gvHqXFZtG+K4cGmDvYLFwwnP5FnrEGNe8sTZ26g/m5iuyZyA8+/TE75bpRcab7Jau6Jhs97B+1TMZ4CnNOlFi8MNTTU38niouT/8iyWd+XXQ8ZoQTmD1dY5tKbnXLCf5U6b6rD01wdgW5qsWKwFCguaIanDgmMzAKpkIQZdH/38oWCaL24h4G6TOYcgDMcgJFf+HTqgjcd8vhPW5tCBrd4XQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=FmV9zT6u80YCCP8B9PXO/s58ZFnj7eOfM7QMVbQRwfY=;
+ b=L687BNyZpNSveQo6EabM/5iM2oqCeY1ZTdt+NRGcY1yqDFmqJUsFbTD4R2pi3LBqKvJ9AS+YaThgbxoiPgIsAOFpL+PE7dPfaJxBMpU/Kx7g1nwMpJD3bQ6w6l6Cuo/mzJoAUe4uuPQTi1Z8vPUuZ+NBwaBuuJlr3omMqYZKKwcqLEyyN/ZflkXUWtarxWGeKr2s/QQKjhG3EwKHRhjLZsq+LnRxjf9kOxIozitnk+AzzBQN/Khmhhn4svU+4q3utG5lKvAzUOd9CcYEKI/Z8Csvdi33vJ+o9evSEhO9SwNDwuVY+b7w4g6ELrU1vFQ5T7g6iAjurzd67BxiPLj6Dw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=FmV9zT6u80YCCP8B9PXO/s58ZFnj7eOfM7QMVbQRwfY=;
+ b=IGsT9ZJ7Yt3PVWdXVL2i38ubkoMi4ShXJ4X07E2WOC4NhD0c0Ywqkeytw4F9X0WoO2g4jGUDP8N7MvRAntgE3DF8TZQoQ6QZNKgDUrSCziT4NiyuEOrvmy+aRZj+LJeSTGlgpnLrTv+12uR2Eav/MhDIrjkkiCmckrPm5sn/xYpt0BUt4g5lBZ3X5TYM51RC4qaZ25NH1gjMnuqGxUnWaAG1yyVf8OfU6l+kTKbRp6Cw+oYX3XEoZZbJzM6e5BCdaZjCYkRDMVC0+1CWDGoV7fE40FFExCa5+9lFwz0B14M6ZE0Oe/cjypKD85u1bfcOuUAuRa0JLhW3YaCZNQRJYA==
+Authentication-Results: intel.com; dkim=none (message not signed)
+ header.d=none;intel.com; dmarc=none action=none header.from=nvidia.com;
+Received: from BL0PR12MB5506.namprd12.prod.outlook.com (2603:10b6:208:1cb::22)
+ by BL1PR12MB5080.namprd12.prod.outlook.com (2603:10b6:208:30a::6) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4331.22; Thu, 15 Jul
+ 2021 17:53:38 +0000
+Received: from BL0PR12MB5506.namprd12.prod.outlook.com
+ ([fe80::d017:af2f:7049:5482]) by BL0PR12MB5506.namprd12.prod.outlook.com
+ ([fe80::d017:af2f:7049:5482%5]) with mapi id 15.20.4331.024; Thu, 15 Jul 2021
+ 17:53:38 +0000
+Date:   Thu, 15 Jul 2021 14:53:36 -0300
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     "Raj, Ashok" <ashok.raj@intel.com>
+Cc:     "Tian, Kevin" <kevin.tian@intel.com>,
+        Shenming Lu <lushenming@huawei.com>,
+        "Alex Williamson (alex.williamson@redhat.com)" 
+        <alex.williamson@redhat.com>,
+        Jean-Philippe Brucker <jean-philippe@linaro.org>,
+        David Gibson <david@gibson.dropbear.id.au>,
+        Jason Wang <jasowang@redhat.com>,
+        "parav@mellanox.com" <parav@mellanox.com>,
+        "Enrico Weigelt, metux IT consult" <lkml@metux.net>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
-        David Rientjes <rientjes@google.com>,
-        Dov Murik <dovmurik@linux.ibm.com>,
-        Tobin Feldman-Fitzthum <tobin@ibm.com>,
-        Borislav Petkov <bp@alien8.de>,
-        Michael Roth <michael.roth@amd.com>,
-        Vlastimil Babka <vbabka@suse.cz>, tony.luck@intel.com,
-        npmccallum@redhat.com, brijesh.ksingh@gmail.com
-Subject: Re: [PATCH Part2 RFC v4 07/40] x86/sev: Split the physmap when
- adding the page in RMP table
-Message-ID: <YPB1n0+G+0EoyEvE@google.com>
-References: <20210707183616.5620-1-brijesh.singh@amd.com>
- <20210707183616.5620-8-brijesh.singh@amd.com>
- <YO9kP1v0TAFXISHD@google.com>
- <d486a008-8340-66b0-9667-11c8a50974e4@amd.com>
-MIME-Version: 1.0
+        Joerg Roedel <joro@8bytes.org>,
+        Eric Auger <eric.auger@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        "Liu, Yi L" <yi.l.liu@intel.com>, "Wu, Hao" <hao.wu@intel.com>,
+        "Jiang, Dave" <dave.jiang@intel.com>,
+        Jacob Pan <jacob.jun.pan@linux.intel.com>,
+        Kirti Wankhede <kwankhede@nvidia.com>,
+        Robin Murphy <robin.murphy@arm.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
+        David Woodhouse <dwmw2@infradead.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Lu Baolu <baolu.lu@linux.intel.com>,
+        "wanghaibin.wang@huawei.com" <wanghaibin.wang@huawei.com>
+Subject: Re: [RFC v2] /dev/iommu uAPI proposal
+Message-ID: <20210715175336.GH543781@nvidia.com>
+References: <7ea349f8-8c53-e240-fe80-382954ba7f28@huawei.com>
+ <BN9PR11MB5433A9B792441CAF21A183A38C129@BN9PR11MB5433.namprd11.prod.outlook.com>
+ <a8edb2c1-9c9c-6204-072c-4f1604b7dace@huawei.com>
+ <BN9PR11MB54336D6A8CAE31F951770A428C129@BN9PR11MB5433.namprd11.prod.outlook.com>
+ <20210715124813.GC543781@nvidia.com>
+ <20210715135757.GC590891@otc-nc-03>
+ <20210715152325.GF543781@nvidia.com>
+ <20210715162141.GA593686@otc-nc-03>
+ <20210715171826.GG543781@nvidia.com>
+ <20210715174836.GB593686@otc-nc-03>
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <d486a008-8340-66b0-9667-11c8a50974e4@amd.com>
+In-Reply-To: <20210715174836.GB593686@otc-nc-03>
+X-ClientProxiedBy: YT2PR01CA0001.CANPRD01.PROD.OUTLOOK.COM
+ (2603:10b6:b01:38::6) To BL0PR12MB5506.namprd12.prod.outlook.com
+ (2603:10b6:208:1cb::22)
+MIME-Version: 1.0
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from mlx.ziepe.ca (206.223.160.26) by YT2PR01CA0001.CANPRD01.PROD.OUTLOOK.COM (2603:10b6:b01:38::6) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4331.21 via Frontend Transport; Thu, 15 Jul 2021 17:53:38 +0000
+Received: from jgg by mlx with local (Exim 4.94)        (envelope-from <jgg@nvidia.com>)        id 1m45YG-002lUp-Tw; Thu, 15 Jul 2021 14:53:36 -0300
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 2dcd2400-e72c-4ee9-363f-08d947b979b8
+X-MS-TrafficTypeDiagnostic: BL1PR12MB5080:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <BL1PR12MB5080E230F438A553D9AB8FABC2129@BL1PR12MB5080.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:7691;
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: g/8iNgriH7xmJY6JhKx6opdI3m2Re9+smQABBiuodUQA0LLa+SCAt+sxhJT82zWSUlfhHwo47fNkmMI/wbbDHaUixfXxWzjfxRgCURm7PBMQc11jiMWsGxzVKHlP3+f7qVSgwSWBSDmBjio2EGSpIOnjZNonBSFoShl6bXOmGQNOSGRL3xumTaigXIH8E46k+YjErXisxyxZF7R6Pg+aHWOT30OYUWQF3EHjUnZvNlU9q/JDc9oqsCfEjf41XFnnBzfkdsQCGHCS6s/ZHX/vYfaa0hyp+XA4bJXVkPJXfCoPSNfsUnD8oWLzwlYjaTVEVdUm1lOnUFxV61olLD7Q6G6qtJr1iGJf3gP8sLtubPAbFOy4z1JUJMXmZre4Q0q0MLfBQLX4VUgFTeE6TXeN7KORJRepe3P/MUEvK+RWBzdQ3qshP38k9zMeN44kZ1vZS0IF66yELju4Hn0eWXddlalyZP7fqVa/pTEkT38gibS7+ttu2OqcheAEW598P4LXGkVru9bxeYYhkSQK09iT9K+l0gU+cAr4O4wK+Fqz1YpLw0xAiByAWFxyeai6znX2uXniev1gVsnuV6M1nZ0HMdKsPSBMC+6C2/VU9i2u4p9PRCe+l5qLeNwqbMnZi9KXDCN530PwboXN/pi6ek6Ilvq1lkomITuXaXpo3OVOBDr5Jb92DeTeptT/QFSTK/jPH+pJkUINBUhZZ0pF+QZM1Q==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL0PR12MB5506.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(346002)(376002)(136003)(39860400002)(396003)(2906002)(316002)(54906003)(186003)(9786002)(38100700002)(9746002)(2616005)(36756003)(426003)(26005)(66946007)(86362001)(4744005)(478600001)(83380400001)(33656002)(4326008)(6916009)(66556008)(8676002)(8936002)(66476007)(7416002)(5660300002)(1076003)(27376004);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?9yrwgJAoiR0veLWutXCMdTCKxShh5bT5TuFFH7FUKaAnTBWMRwjgLUzcddMu?=
+ =?us-ascii?Q?8+rpbrL9KCIVoJN+p9vORE3oOgwWEzgvlq47jiAetB9fZrEE0gTggQ2bbg3f?=
+ =?us-ascii?Q?4HvDQAgJXQ4ic6CTtp+eV+o7A1qmvZJwBpuadgKcZ7FDmDkPVrzDof+iZLmw?=
+ =?us-ascii?Q?q2CzX2cMmj91G3w5BiRDiapWzeaARo//zU6vAOwdE1ckXPATFOwJXVRgBeYr?=
+ =?us-ascii?Q?BjeFirzZeha6bl7YPaImKCHOgv1JwQa8YTGxJ7pGrJ4DKGUYSo+ThLRV4X8T?=
+ =?us-ascii?Q?UNskj/FSQoNhogOkuRqCYpV0+m8favBs/DtKXMl3x4tEXJX2gJaOaKB7ejK+?=
+ =?us-ascii?Q?OZB1WVSn4fmiG0EBL/RQBCyJxQpSuvhaqGj2VCfj6A4UWK7fyKhUrmb6IFZS?=
+ =?us-ascii?Q?tuzLMDVpTNus2IO+TeOXGwpzxF7BqfijUL7bpoN0l9H7YmPdd4qE5iQmgAIX?=
+ =?us-ascii?Q?zr4KzkmmFN58apnzE2IT8Si+xFGym7vGkuV9rwWxMXziSStUA4T6G5URiF4f?=
+ =?us-ascii?Q?JqFvweCRJUwlhWMNwKVvF7eLZyRZbZ2XhtCToKuOvg9oVs4hlrZ4QQik82Se?=
+ =?us-ascii?Q?cLa3eHIF2C5bmoqHOp7RsIGGJAo9uvdIZlYMZKDV7rm1WIjBd92U8BYhXN4j?=
+ =?us-ascii?Q?wNZi4rwq57UTHhXwG5N+oDM0kwqc+nRir694d9/HyCAee67gQfitr1vrGKYp?=
+ =?us-ascii?Q?cRKjCX0ji1Nm+VaAlpj5jtyr2p79kbkX5oCLDkdICr7JclnjqKosG87GoNf6?=
+ =?us-ascii?Q?pBUDD4SnkRktTerzFKwLjvslXW798zMlXGGAZMFVrF1yxGb158dkIh6J9yRS?=
+ =?us-ascii?Q?u9fPUcJ36b1TzjiifsM3tsayqVxwExenlvDaGoGJYDuW82UlZC6wIgv2l5YY?=
+ =?us-ascii?Q?uRLOji5yE4Xpj2XU1nw1GpdL1WdLyQp/YvkoxE9xpcgEKR+3vhVeEycPMTFs?=
+ =?us-ascii?Q?s1EnHsfpEyhvRKFSlDe4aZQKMsMq8Mz7jx5LVSXEELTeF9okxbR9J78ukkM0?=
+ =?us-ascii?Q?HZQZbAy8WeXE5ymqH36zE2I4tOnlrvCUlzx4kSkMdUYGNCwNC2ftzQA+0HMW?=
+ =?us-ascii?Q?EsU/skM6JOC3MCevCci7lhBwEfPutcxa5vj9lAMlSNTLx1VQ0C/NgopiCkTp?=
+ =?us-ascii?Q?15f1nZfbvwPzV54PpuoVQKhs0IhVsYKQoUj3hY9YmAK07rR4VoT+76gZZfnc?=
+ =?us-ascii?Q?7KlpSRE6bSa/MexnshpUAeSULd9yztl0wbcUDI5AwNQqkV+J5aoCClgKAs+Y?=
+ =?us-ascii?Q?76cbU5of+gTFPxW9ozBx7adIl9qYj7cDteZyZ26ZjC0CkgVMvEq6ekrm9j9a?=
+ =?us-ascii?Q?CIwqnOQEgmqecgXotYv6YgTR?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 2dcd2400-e72c-4ee9-363f-08d947b979b8
+X-MS-Exchange-CrossTenant-AuthSource: BL0PR12MB5506.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Jul 2021 17:53:38.7866
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: oxvgb5EmDQz54joG/1Z/lnmbQSb9tpsylbtZ4hedWnHcJTcjFNg0dfn2Ldd0rjdE
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL1PR12MB5080
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jul 15, 2021, Brijesh Singh wrote:
-> 
-> On 7/14/21 5:25 PM, Sean Christopherson wrote:
-> > > @@ -2375,6 +2375,12 @@ int rmpupdate(struct page *page, struct rmpupdate *val)
-> > >   	if (!cpu_feature_enabled(X86_FEATURE_SEV_SNP))
-> > >   		return -ENXIO;
-> > > +	ret = set_memory_4k((unsigned long)page_to_virt(page), 1);
-> > 
-> > IIUC, this shatters the direct map for page that's assigned to an SNP guest, and
-> > the large pages are never recovered?
-> > 
-> > I believe a better approach would be to do something similar to memfd_secret[*],
-> > which encountered a similar problem with the direct map.  Instead of forcing the
-> > direct map to be forever 4k, unmap the direct map when making a page guest private,
-> > and restore the direct map when it's made shared (or freed).
-> > 
-> > I thought memfd_secret had also solved the problem of restoring large pages in
-> > the direct map, but at a glance I can't tell if that's actually implemented
-> > anywhere.  But, even if it's not currently implemented, I think it makes sense
-> > to mimic the memfd_secret approach so that both features can benefit if large
-> > page preservation/restoration is ever added.
-> > 
-> 
-> thanks for the memfd_secrets pointer. At the lowest level it shares the
-> same logic to split the physmap. We both end up calling to
-> change_page_attrs_set_clr() which split the page and updates the page
-> table attributes.
-> 
-> Given this, I believe in future if the change_page_attrs_set_clr() is
-> enhanced to track the splitting of the pages and restore it later then it
-> should work transparently.
+On Thu, Jul 15, 2021 at 10:48:36AM -0700, Raj, Ashok wrote:
 
-But something actually needs to initiate the restore.  If the RMPUDATE path just
-force 4k pages then there will never be a restore.  And zapping the direct map
-for private pages is a good thing, e.g. prevents the kernel from reading garbage,
-which IIUC isn't enforced by the RMP?
+> > > Do we have any isolation requirements here? its the same process. So if the
+> > > page-request it sent to guest and even if you report it for mdev1, after
+> > > the PRQ is resolved by guest, the request from mdev2 from the same guest
+> > > should simply work?
+> > 
+> > I think we already talked about this and said it should not be done.
+> 
+> I get the should not be done, I'm wondering where should that be
+> implemented?
+
+The iommu layer cannot have ambiguity. Every RID or RID,PASID slot
+must have only one device attached to it. Attempting to connect two
+devices to the same slot fails on the iommu layer.
+
+So the 2nd mdev will fail during IOASID binding when it tries to bind
+to the same PASID that the first mdev is already bound to.
+
+Jason
