@@ -2,109 +2,151 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D3D6E3C99C0
-	for <lists+kvm@lfdr.de>; Thu, 15 Jul 2021 09:40:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 556C73C9A4F
+	for <lists+kvm@lfdr.de>; Thu, 15 Jul 2021 10:14:19 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240395AbhGOHm5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 15 Jul 2021 03:42:57 -0400
-Received: from smtp-out1.suse.de ([195.135.220.28]:50280 "EHLO
-        smtp-out1.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232345AbhGOHm4 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 15 Jul 2021 03:42:56 -0400
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out1.suse.de (Postfix) with ESMTPS id A07AC2279C;
-        Thu, 15 Jul 2021 07:40:01 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1626334801; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=5JMBVUc1fC80+7deLYH6ZLQZq/uUCL7N+S0Ckg+qtbI=;
-        b=Twb6x088Ds05jfTu5/IB5porBtTYCy7ypb/AOBkBIcuTOW8D+d7upMLB1l3nohEF7iPW/p
-        8deiq9K1vIvBrAZjm5PrzzYiClmYOaPP+BfxFaSOoAZgjQKRVJE/jYn3GYYxV/6Wzn5j3A
-        OCFRqAN5FYIib3+LRrkkcU505ZTakD0=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1626334801;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=5JMBVUc1fC80+7deLYH6ZLQZq/uUCL7N+S0Ckg+qtbI=;
-        b=iCqY9l43TypCWFiyhhci4MfAifGCRh3LrqaNuvVgpKgYxC55KpqRWrvVubNKGrttlJ8kft
-        DVVygz62vy0zvcDA==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 7FEF413C2C;
-        Thu, 15 Jul 2021 07:40:00 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id teNrHVDm72BeZwAAMHmgww
-        (envelope-from <jroedel@suse.de>); Thu, 15 Jul 2021 07:40:00 +0000
-Date:   Thu, 15 Jul 2021 09:39:58 +0200
-From:   Joerg Roedel <jroedel@suse.de>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Brijesh Singh <brijesh.singh@amd.com>, x86@kernel.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
-        linux-coco@lists.linux.dev, linux-mm@kvack.org,
-        linux-crypto@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
+        id S240569AbhGOIRK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 15 Jul 2021 04:17:10 -0400
+Received: from szxga02-in.huawei.com ([45.249.212.188]:11422 "EHLO
+        szxga02-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232568AbhGOIRK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 15 Jul 2021 04:17:10 -0400
+Received: from dggemv704-chm.china.huawei.com (unknown [172.30.72.54])
+        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4GQRrw5Mgtzcd91;
+        Thu, 15 Jul 2021 16:10:56 +0800 (CST)
+Received: from dggpemm500022.china.huawei.com (7.185.36.162) by
+ dggemv704-chm.china.huawei.com (10.3.19.47) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2176.2; Thu, 15 Jul 2021 16:14:14 +0800
+Received: from [10.174.185.67] (10.174.185.67) by
+ dggpemm500022.china.huawei.com (7.185.36.162) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2176.2; Thu, 15 Jul 2021 16:14:13 +0800
+Subject: Re: [RFC v2] /dev/iommu uAPI proposal
+To:     "Tian, Kevin" <kevin.tian@intel.com>
+CC:     Jason Gunthorpe <jgg@nvidia.com>,
+        "Alex Williamson (alex.williamson@redhat.com)" 
+        <alex.williamson@redhat.com>,
+        "Jean-Philippe Brucker" <jean-philippe@linaro.org>,
+        David Gibson <david@gibson.dropbear.id.au>,
+        Jason Wang <jasowang@redhat.com>,
+        "parav@mellanox.com" <parav@mellanox.com>,
+        "Enrico Weigelt, metux IT consult" <lkml@metux.net>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
-        David Rientjes <rientjes@google.com>,
-        Dov Murik <dovmurik@linux.ibm.com>,
-        Tobin Feldman-Fitzthum <tobin@ibm.com>,
-        Borislav Petkov <bp@alien8.de>,
-        Michael Roth <michael.roth@amd.com>,
-        Vlastimil Babka <vbabka@suse.cz>, tony.luck@intel.com,
-        npmccallum@redhat.com, brijesh.ksingh@gmail.com
-Subject: Re: [PATCH Part2 RFC v4 01/40] KVM: SVM: Add support to handle AP
- reset MSR protocol
-Message-ID: <YO/mTtzslwrAxuxz@suse.de>
-References: <20210707183616.5620-1-brijesh.singh@amd.com>
- <20210707183616.5620-2-brijesh.singh@amd.com>
- <YO9GWVsZmfXJ4BRl@google.com>
+        Joerg Roedel <joro@8bytes.org>,
+        Eric Auger <eric.auger@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        "Raj, Ashok" <ashok.raj@intel.com>,
+        "Liu, Yi L" <yi.l.liu@intel.com>, "Wu, Hao" <hao.wu@intel.com>,
+        "Jiang, Dave" <dave.jiang@intel.com>,
+        Jacob Pan <jacob.jun.pan@linux.intel.com>,
+        "Kirti Wankhede" <kwankhede@nvidia.com>,
+        Robin Murphy <robin.murphy@arm.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
+        "David Woodhouse" <dwmw2@infradead.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        "Lu Baolu" <baolu.lu@linux.intel.com>,
+        "wanghaibin.wang@huawei.com" <wanghaibin.wang@huawei.com>
+References: <BN9PR11MB5433B1E4AE5B0480369F97178C189@BN9PR11MB5433.namprd11.prod.outlook.com>
+ <7ea349f8-8c53-e240-fe80-382954ba7f28@huawei.com>
+ <BN9PR11MB5433A9B792441CAF21A183A38C129@BN9PR11MB5433.namprd11.prod.outlook.com>
+ <a8edb2c1-9c9c-6204-072c-4f1604b7dace@huawei.com>
+ <BN9PR11MB54336D6A8CAE31F951770A428C129@BN9PR11MB5433.namprd11.prod.outlook.com>
+From:   Shenming Lu <lushenming@huawei.com>
+Message-ID: <5962d403-80c4-0ac4-4f37-96b055a2b4d0@huawei.com>
+Date:   Thu, 15 Jul 2021 16:14:02 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.2.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <YO9GWVsZmfXJ4BRl@google.com>
+In-Reply-To: <BN9PR11MB54336D6A8CAE31F951770A428C129@BN9PR11MB5433.namprd11.prod.outlook.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-Originating-IP: [10.174.185.67]
+X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
+ dggpemm500022.china.huawei.com (7.185.36.162)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jul 14, 2021 at 08:17:29PM +0000, Sean Christopherson wrote:
-> On Wed, Jul 07, 2021, Brijesh Singh wrote:
-> > From: Tom Lendacky <thomas.lendacky@amd.com>
-> > 
-> > Add support for AP Reset Hold being invoked using the GHCB MSR protocol,
-> > available in version 2 of the GHCB specification.
+On 2021/7/15 14:49, Tian, Kevin wrote:
+>> From: Shenming Lu <lushenming@huawei.com>
+>> Sent: Thursday, July 15, 2021 2:29 PM
+>>
+>> On 2021/7/15 11:55, Tian, Kevin wrote:
+>>>> From: Shenming Lu <lushenming@huawei.com>
+>>>> Sent: Thursday, July 15, 2021 11:21 AM
+>>>>
+>>>> On 2021/7/9 15:48, Tian, Kevin wrote:
+>>>>> 4.6. I/O page fault
+>>>>> +++++++++++++++++++
+>>>>>
+>>>>> uAPI is TBD. Here is just about the high-level flow from host IOMMU
+>> driver
+>>>>> to guest IOMMU driver and backwards. This flow assumes that I/O page
+>>>> faults
+>>>>> are reported via IOMMU interrupts. Some devices report faults via
+>> device
+>>>>> specific way instead of going through the IOMMU. That usage is not
+>>>> covered
+>>>>> here:
+>>>>>
+>>>>> -   Host IOMMU driver receives a I/O page fault with raw fault_data {rid,
+>>>>>     pasid, addr};
+>>>>>
+>>>>> -   Host IOMMU driver identifies the faulting I/O page table according to
+>>>>>     {rid, pasid} and calls the corresponding fault handler with an opaque
+>>>>>     object (registered by the handler) and raw fault_data (rid, pasid, addr);
+>>>>>
+>>>>> -   IOASID fault handler identifies the corresponding ioasid and device
+>>>>>     cookie according to the opaque object, generates an user fault_data
+>>>>>     (ioasid, cookie, addr) in the fault region, and triggers eventfd to
+>>>>>     userspace;
+>>>>>
+>>>>
+>>>> Hi, I have some doubts here:
+>>>>
+>>>> For mdev, it seems that the rid in the raw fault_data is the parent device's,
+>>>> then in the vSVA scenario, how can we get to know the mdev(cookie) from
+>>>> the
+>>>> rid and pasid?
+>>>>
+>>>> And from this point of view，would it be better to register the mdev
+>>>> (iommu_register_device()) with the parent device info?
+>>>>
+>>>
+>>> This is what is proposed in this RFC. A successful binding generates a new
+>>> iommu_dev object for each vfio device. For mdev this object includes
+>>> its parent device, the defPASID marking this mdev, and the cookie
+>>> representing it in userspace. Later it is iommu_dev being recorded in
+>>> the attaching_data when the mdev is attached to an IOASID:
+>>>
+>>> 	struct iommu_attach_data *__iommu_device_attach(
+>>> 		struct iommu_dev *dev, u32 ioasid, u32 pasid, int flags);
+>>>
+>>> Then when a fault is reported, the fault handler just needs to figure out
+>>> iommu_dev according to {rid, pasid} in the raw fault data.
+>>>
+>>
+>> Yeah, we have the defPASID that marks the mdev and refers to the default
+>> I/O address space, but how about the non-default I/O address spaces?
+>> Is there a case that two different mdevs (on the same parent device)
+>> are used by the same process in the guest, thus have a same pasid route
+>> in the physical IOMMU? It seems that we can't figure out the mdev from
+>> the rid and pasid in this case...
+>>
+>> Did I misunderstand something?... :-)
+>>
 > 
-> Please provide a brief overview of the protocol, and why it's needed.  I assume
-> it's to allow AP wakeup without a shared GHCB?
+> No. You are right on this case. I don't think there is a way to 
+> differentiate one mdev from the other if they come from the
+> same parent and attached by the same guest process. In this
+> case the fault could be reported on either mdev (e.g. the first
+> matching one) to get it fixed in the guest.
+> 
 
-Yes, this is needed for SEV-ES kexec support to park APs without the
-need for memory that will be owned by the new kernel when APs are woken
-up.
+OK. Thanks,
 
-You can have a look into my SEV-ES kexec/kdump patch-set for details:
-
-	https://lore.kernel.org/lkml/20210705082443.14721-1-joro@8bytes.org/
-
-I also sent this patch separatly earlier this week to enable GHCB
-protocol version 2 support in KVM.
-
-Regards,
-
-	Joerg
+Shenming
