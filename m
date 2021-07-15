@@ -2,150 +2,177 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id EC0513C9F68
-	for <lists+kvm@lfdr.de>; Thu, 15 Jul 2021 15:24:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1132D3C9F77
+	for <lists+kvm@lfdr.de>; Thu, 15 Jul 2021 15:29:05 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237544AbhGON1V (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 15 Jul 2021 09:27:21 -0400
-Received: from mail-co1nam11on2040.outbound.protection.outlook.com ([40.107.220.40]:43168
-        "EHLO NAM11-CO1-obe.outbound.protection.outlook.com"
+        id S237628AbhGONb5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 15 Jul 2021 09:31:57 -0400
+Received: from mail-dm6nam10on2072.outbound.protection.outlook.com ([40.107.93.72]:26810
+        "EHLO NAM10-DM6-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S232170AbhGON1V (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 15 Jul 2021 09:27:21 -0400
+        id S231713AbhGONbz (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 15 Jul 2021 09:31:55 -0400
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=WxdmHRalmfFE8mAV2xyh473RLAj0HpOUe5HJDSTAGwzdrYep2ehhXnne2gldRDQGpNSrEEC0eZTuANLPn1pRvdj4pt2VK48qxJWQmjFteIteJCNZ5EvQX5YGlmclnd7o1Qt5d1y8Mt/itvHjNFYabQUNavNiJy2UYT7WEdH2lI71EGMjcZT+fY4Fj3uRXYjJ+u+KDcExjkK2I48rASiaYvNEjRNUggMpZDoontVCyI60+bCxMTlRclh7/zHmeOp6ayHfdi5EB3KG6jkRWKwi2K5lWMfyIvl4yamPxvXJiyUndBCTvAjv4vzgdzPFtFbNLZRcItno/F/rXuA0Wzb1pw==
+ b=C1fM//49DoJiK6F8PZH6aVsAmJfIs+Krg49nH7HkYmFO8vr1oar1F86ECOQyMgqGrqP9KWVLe8NBBTPP4gIiX60Rspd5J1rV4wKbf5swZBR/0kW9+8Ms007GgpZB1qm5bF3bze9pI+206r4SYdW4gLW9BhMZ1Mn7XsgVnKSw3B2/pDUKfSvFehVwMn8NHQ2M3SL9vGBh1vKOJjQPmDowvx3pyNpqtGPSyktdXkIND1prdrqWJ8ByomBr1W4knJ2F4rWaEn/86BdAURRMF4OIDyxBG+gq+WqyQ+ACC8dA5uN05fWofHZulKYinwWV4CgX6iMHzf41niNe6KhdY1NWPA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=3P3UqQeYDL/6sGQ1nFrX0zZnu+ibUQ6G2NoFBftzMos=;
- b=kxHo29UNh0ifDcg39xZzktaM0q4JTuKkJVcYOzGksmDdDUaO4RO2jzTsL4Hbacw4A3B2QX6AcSqv1z+Ew9m4pAfRnslPQpBqiTw2/oeEzADDxEmo9js1meLedqzSAyM/qx+XGEy9T1WlP0ofU2O9M/DE7TjNiau5XCOp9wpddytfTA7LzMDo6/s/60CoM8hK5rdkybQmoV9bsJ+TugtqCEmx4gD4WvlV35J5/0MIraUuaFTDxnXdVyvjfW9xdTq+Vf7WhkCwuH91kGhqmGooSmO6aBUGDb4l/pN/iyi6boOtiL37TUX4cymKXe68Ulji/1NN5M1kcsGJqirlvvNTfg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ bh=mf0cYvUfkQHZe1ox9dAKWC9ViRnGRvsvRKpLWwVzJ98=;
+ b=Vy2bHnjuob/Pv0T046lsbuzw/tjPTBASMImqTjhbd0uxzwgDkthfuHTvXeUvL/sh80k04Qf+lTA/HJMcOPNk0NP2pW47tApfLhpXNrbWRTA/958g23sHHvCkgRH+MjTR+n10WH9iXt41wG+e7vgPTu6XqfcAPwYzrG+YnaUkD1RYFRu9P34JNjcquif6OG0rymMtHaaN/7xRBqoKoDcTyR3dr45g/689egKkyWiOT0xziVVBipYTEKhUfZNXif1+Eb+gmUtXIMMs68c0zHiMH7S/EzATknk80kW/HjM0hJzBc4dSXVxmDgufGvUDmy4/m3dKEb9HEJiNUyiEq7YRTw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.112.34) smtp.rcpttodomain=linux.ibm.com smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=quarantine sp=none pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=3P3UqQeYDL/6sGQ1nFrX0zZnu+ibUQ6G2NoFBftzMos=;
- b=sQEHjDeTY8SOLsVy+VNfwHZs3sv6l6F5C5k9MWv07WtHhLPvK7llXvh05zB5+Zgu0h9vZhfGVWl4KiKjfOXFW0HYtxXC3qKTUQ9yn/ldsDWhWkgangoVQA4/vaLa/hic63jaxwpllgRogakp/YzXNH3hMS1ZT7Gw4AHlElcMOpU=
-Authentication-Results: redhat.com; dkim=none (message not signed)
- header.d=none;redhat.com; dmarc=none action=none header.from=amd.com;
-Received: from SN6PR12MB2718.namprd12.prod.outlook.com (2603:10b6:805:6f::22)
- by SA0PR12MB4384.namprd12.prod.outlook.com (2603:10b6:806:9f::22) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4331.21; Thu, 15 Jul
- 2021 13:24:27 +0000
-Received: from SN6PR12MB2718.namprd12.prod.outlook.com
- ([fe80::a8a9:2aac:4fd1:88fa]) by SN6PR12MB2718.namprd12.prod.outlook.com
- ([fe80::a8a9:2aac:4fd1:88fa%3]) with mapi id 15.20.4331.024; Thu, 15 Jul 2021
- 13:24:27 +0000
-Cc:     brijesh.singh@amd.com, Connor Kuehl <ckuehl@redhat.com>,
-        =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
-        "Michael S . Tsirkin" <mst@redhat.com>,
-        James Bottomley <jejb@linux.ibm.com>,
-        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        David Gibson <david@gibson.dropbear.id.au>,
-        =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
-        kvm@vger.kernel.org, Michael Roth <michael.roth@amd.com>,
-        Eduardo Habkost <ehabkost@redhat.com>
-Subject: Re: [RFC PATCH 3/6] i386/sev: initialize SNP context
-To:     Dov Murik <dovmurik@linux.ibm.com>, qemu-devel@nongnu.org
-References: <20210709215550.32496-1-brijesh.singh@amd.com>
- <20210709215550.32496-4-brijesh.singh@amd.com>
- <34b8bda5-9b4d-c1e0-0009-1a407a48dd4a@linux.ibm.com>
-From:   Brijesh Singh <brijesh.singh@amd.com>
-Message-ID: <4de32b0f-d4f7-33a8-3678-dca68cc8bfca@amd.com>
-Date:   Thu, 15 Jul 2021 08:24:25 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ bh=mf0cYvUfkQHZe1ox9dAKWC9ViRnGRvsvRKpLWwVzJ98=;
+ b=lyIXnDQuE9+gTqXb/KGbfaIiqjMpaLFpbl0CgmyholSKTxRBUzc63RGt2lSacSAYu+WyRHtjcHEXaxSTOKJ9i0+BDl8616H+3ycWpOJ5YDOjvmRzi7Ev1/7NIZ7QdKdFfw4qYS28YgiXHrCvfp9pZcXk7MDFy0VwgYMyy/M5wEOESgBZzat0suT1RjaQYhvsFrYdDyWExUg1yv4RVR2g2fP36dSlpniMRK/9pR1NNXerqFr19sgBlS0VrshGpzIM3YgTJC6WkfePaWmo2Stk8IMEHbampL9c5m7POAi4krU4HSGYNU4QxJdvJ9w22TF2N0EKNKLUhtc8I7lJhT5pXw==
+Received: from DM5PR18CA0087.namprd18.prod.outlook.com (2603:10b6:3:3::25) by
+ BYAPR12MB2728.namprd12.prod.outlook.com (2603:10b6:a03:61::25) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.4308.26; Thu, 15 Jul 2021 13:29:00 +0000
+Received: from DM6NAM11FT011.eop-nam11.prod.protection.outlook.com
+ (2603:10b6:3:3:cafe::4e) by DM5PR18CA0087.outlook.office365.com
+ (2603:10b6:3:3::25) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4331.21 via Frontend
+ Transport; Thu, 15 Jul 2021 13:28:59 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.112.34)
+ smtp.mailfrom=nvidia.com; linux.ibm.com; dkim=none (message not signed)
+ header.d=none;linux.ibm.com; dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.112.34 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.112.34; helo=mail.nvidia.com;
+Received: from mail.nvidia.com (216.228.112.34) by
+ DM6NAM11FT011.mail.protection.outlook.com (10.13.172.108) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
+ 15.20.4331.21 via Frontend Transport; Thu, 15 Jul 2021 13:28:59 +0000
+Received: from [10.40.102.146] (172.20.187.6) by HQMAIL107.nvidia.com
+ (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1497.2; Thu, 15 Jul
+ 2021 13:28:35 +0000
+Subject: Re: [PATCH 00/13] Provide core infrastructure for managing
+ open/release
+To:     Jason Gunthorpe <jgg@nvidia.com>, David Airlie <airlied@linux.ie>,
+        "Tony Krowiak" <akrowiak@linux.ibm.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        "Daniel Vetter" <daniel@ffwll.ch>,
+        Diana Craciun <diana.craciun@oss.nxp.com>,
+        <dri-devel@lists.freedesktop.org>,
+        Eric Auger <eric.auger@redhat.com>,
+        "Eric Farman" <farman@linux.ibm.com>,
+        Harald Freudenberger <freude@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        <intel-gfx@lists.freedesktop.org>,
+        <intel-gvt-dev@lists.freedesktop.org>,
+        Jani Nikula <jani.nikula@linux.intel.com>,
+        Jason Herne <jjherne@linux.ibm.com>,
+        Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
+        <kvm@vger.kernel.org>, <linux-doc@vger.kernel.org>,
+        <linux-s390@vger.kernel.org>,
+        Matthew Rosato <mjrosato@linux.ibm.com>,
+        "Peter Oberparleiter" <oberpar@linux.ibm.com>,
+        Halil Pasic <pasic@linux.ibm.com>,
+        Rodrigo Vivi <rodrigo.vivi@intel.com>,
+        Vineeth Vijayan <vneethv@linux.ibm.com>,
+        Zhenyu Wang <zhenyuw@linux.intel.com>,
+        Zhi Wang <zhi.a.wang@intel.com>
+CC:     "Raj, Ashok" <ashok.raj@intel.com>, Christoph Hellwig <hch@lst.de>,
+        "Leon Romanovsky" <leonro@nvidia.com>,
+        Max Gurtovoy <mgurtovoy@nvidia.com>,
+        "Yishai Hadas" <yishaih@nvidia.com>
+References: <0-v1-eaf3ccbba33c+1add0-vfio_reflck_jgg@nvidia.com>
+X-Nvconfidentiality: public
+From:   Kirti Wankhede <kwankhede@nvidia.com>
+Message-ID: <862e9ad9-e1f8-4179-4809-9b5b2743e640@nvidia.com>
+Date:   Thu, 15 Jul 2021 18:58:31 +0530
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
  Thunderbird/78.11.0
-In-Reply-To: <34b8bda5-9b4d-c1e0-0009-1a407a48dd4a@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+MIME-Version: 1.0
+In-Reply-To: <0-v1-eaf3ccbba33c+1add0-vfio_reflck_jgg@nvidia.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: SA9PR11CA0018.namprd11.prod.outlook.com
- (2603:10b6:806:6e::23) To SN6PR12MB2718.namprd12.prod.outlook.com
- (2603:10b6:805:6f::22)
-MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from [10.236.31.95] (165.204.77.1) by SA9PR11CA0018.namprd11.prod.outlook.com (2603:10b6:806:6e::23) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4331.21 via Frontend Transport; Thu, 15 Jul 2021 13:24:26 +0000
+X-Originating-IP: [172.20.187.6]
+X-ClientProxiedBy: HQMAIL111.nvidia.com (172.20.187.18) To
+ HQMAIL107.nvidia.com (172.20.187.13)
+X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: b5ceab62-e49a-4a4c-02b1-08d94793de73
-X-MS-TrafficTypeDiagnostic: SA0PR12MB4384:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <SA0PR12MB4384C150BD304069D789C01BE5129@SA0PR12MB4384.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:4125;
+X-MS-Office365-Filtering-Correlation-Id: 9e4580cd-12bf-41ea-6436-08d94794812c
+X-MS-TrafficTypeDiagnostic: BYAPR12MB2728:
+X-Microsoft-Antispam-PRVS: <BYAPR12MB27287B674779581AFD834915DC129@BYAPR12MB2728.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:8882;
 X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 2XupCGoLamyncWVvYmRGOOP/cxCAp5VRilCOlsAPaC1A7Gzp+t5Tiu1pz7Td+QVNCwB3CGSk9cEJZCuSJvcKJCgfDs7ZG9VHimjBzOZZ66VPr+ETS/BNOwqXceTJuuOczvoadgf7OuPTcq+vpP5S2Mz4rG2YGyVOEO5HmdhgRgzf3SPwtsr42Oc+uYHaUETdgms2MNXhuk+1x8whthb25HFUUbBEJjEpH3Ne0ypetzt/qWjJaE8J0YqOB4uAbG3k3aLjMRGKy6KjlPvJ2xoZD6pDsbIfclTz5+zSqo0NiO0ii+Wp4wEoZmWUdystPS8WKzQsfz0t2tAoOgAQ2yDwpwbiOJrufx8F/AXcVDYvoE7R4bXY6/rXQGJSuFVG40gc7BXeDGZmLF5KwNjF0UsCuZxJVHwkwYv4rh4ml1dFUVItGa2ghjm3uwPWnRecwAw086B+j4H/qukuDFrk2PuPEG3gVL1v2o70fsETiGjyvopELlhhPvC9GtdRxLiPnavcNFzYBir4g7QBhHSHeQqJhnwz8xCOIdtozz+Viv/YSorzTyIntdEAeP1NCIQVU7dipZW8U2fe3DodNeARQ75vhsrKFALI8IjReN6fB0wdjifPW1k/Pb0q0UjzqAluHs5M4N3KDUCRbURPio3xNvsbp9cc8Ea0QWZAfT5iewBJtNtyuH/ZF448/WAXMA9DaihMjaFFpZKCKrDMcPEXFgBHLH0D+a48Te0J0oY8pPMjsI3JbEKGHYVzyJ5l9IMtgYhf8BNJP+1IZ+7+giHjGquzSg==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR12MB2718.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(346002)(39860400002)(136003)(366004)(376002)(396003)(44832011)(4744005)(7416002)(66946007)(316002)(6486002)(26005)(53546011)(8676002)(66476007)(36756003)(31686004)(66556008)(52116002)(5660300002)(186003)(956004)(38350700002)(38100700002)(2616005)(2906002)(478600001)(8936002)(86362001)(54906003)(4326008)(16576012)(31696002)(43740500002)(45980500001);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?ek83eXg0QWdTNWp1bmdPam02ZmtCM1pjT3ZranZET2NZY1FPTXBYeHJwNDlZ?=
- =?utf-8?B?SmwyK1JEVnFWdmNna05SMkp6R0tpMU9ydnZvei9ZVXdVNFhIQ2dINWVhWUE1?=
- =?utf-8?B?bXVTWDJTcGY4azRkbHpoZ0xKVWZVWU1YdUNuOU8vcGJwcktOd3VkRVF1cWZE?=
- =?utf-8?B?dGpWSFlKSWxLdHVvejkwSFF3ZTBNZEwzaW5GVFVEMGd3SEhhTnRPNi9BOEJB?=
- =?utf-8?B?aXVrMmpFNW5HUTAwTDNyUzNOb0c4Z3B0b0pJMm9DV3Q1dlZsUml0cFFHb3lF?=
- =?utf-8?B?dWEvMlJTVEthanVNZmxMK3g4alNHc2lyR2dIdDd5Zkp3YXFIWDM0OHMyMVo4?=
- =?utf-8?B?ek5nYnlYUjBqVHd6anRSdkdzMURaZXg1ekIveTlreVVLYWdIZ3RQTC9QaUt0?=
- =?utf-8?B?L0I5YjAyUERTb1l3VnhFdzM0aDVKd1VtaWpiZWREd2QvODBRckpZSnExNFRD?=
- =?utf-8?B?TmNsNDZDK3NyR2lac3Z0bEpJZEJHdDRBRXZlOVdmUlJ2Q3R5bHVPdDdYZ2Ey?=
- =?utf-8?B?MEd5TG1UMUJIU04xVlMwZlUvTkhycktqd0JPSHhEQXZXdk9RZWM0anZldEpE?=
- =?utf-8?B?SGNDOFJzRmc3eTJXZHFEWDMxUVZwNEJKbFdIbHV2QTBHWFZubzJ0RVQxMWtV?=
- =?utf-8?B?UHFFWVYrU1ErQmppZjQ3ZlRXQllsRFRBUkd4Wk1LcVZzbWhVci84NUQ3MS9m?=
- =?utf-8?B?QXN0aHhYaVV0SnNLVzZ5bi9HTHdNVXdObGd0azNjTG5Uc010TTFiczhzWGZG?=
- =?utf-8?B?bS92Z21HUCtSRU42UVVJTTBDdnl6T0M3bWRIVmRSNnhFMUJxNDhZRVhjZ0Ri?=
- =?utf-8?B?NEoyNEE4dm9MRG9zWUY4d1UvS0FXMmtydFh2bGdXQTNuNlVHMHdNY1VYOEh1?=
- =?utf-8?B?SmNzYU5qejJsMnpwYkcyeFZ0bndQcDhleTVUM0tvYWg3UFVqYkQ3U0JwSVZj?=
- =?utf-8?B?b3A3b2lWeEE0aDBxMUVrY3cySmV6Wkd5V2VEQmNYblNmejZNNXQ0bkV3ckxu?=
- =?utf-8?B?ZEpTWElsOXpzblpCMzZJOGxxZ0dZNTNMTjQwQ2hiamFnY3FBL014RDlJSGNR?=
- =?utf-8?B?RmI0WDY3bUZtaEE2eFJ3MERBRjZjMWJDNW9uV2JENjZVYlYyTktHQ21HbnZZ?=
- =?utf-8?B?cUZOSHpVM3Y4L2l0UU1nT1MvRnQ3U1dmeS9GSm85UEY1S1ZXbVdQOGF5Ym5z?=
- =?utf-8?B?YUVjU0tPdVF1MEg5ckplaGk5VUMvQ2I0U1dvZnByWGdCU0pxcHN6RHY0dXBG?=
- =?utf-8?B?eVpNU21qQ053ejFoQUtRalZkQjBuOFJtUzkxQURjblJPeGNwckk1TGJGbEQ0?=
- =?utf-8?B?WUptY0VOd0RsRlYzbXVWeDM4RmdsaWtUbHNwY3ozL09tMkNTa0RENUMxOHNh?=
- =?utf-8?B?WlJmd3d1VnhPU2Z4bnlFRVY3dTFnaEpQRjNxaEY1RHptL0F2R0UwckVETlVk?=
- =?utf-8?B?QmRDdHJPY1lleXNjUHEzSlR3ZFhkcjdSWVdOWmREZFBxL3ZmTTdHYVptdUJw?=
- =?utf-8?B?dzZHaVh3UnMwUGRaYXBCUTlrQVlIeDZiY2M1SVpEcndoWlJMdFRzQndSVlIz?=
- =?utf-8?B?cWZJcnFHYUxyUEw1Yk9GVHh2MXViS0pRcXZOUEJ1S1p2SElRSHlHc0JDRjdj?=
- =?utf-8?B?czVXdkNuTXI1aStwRXd1QWZIcE51OU9pQUkyN1hxcTNLdENWODAvMFo1ZDRu?=
- =?utf-8?B?YlAxaTVjc0dSZDBORlZybzdsYTI2bjB4a2RIa1JpV09RaWdyZkloRW13NGpu?=
- =?utf-8?Q?mHb3eIytfzAKJENS9EtGFvX+qLRFn6cbE3IE2aw?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: b5ceab62-e49a-4a4c-02b1-08d94793de73
-X-MS-Exchange-CrossTenant-AuthSource: SN6PR12MB2718.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Jul 2021 13:24:26.9448
+X-Microsoft-Antispam-Message-Info: 280SWfZXn+Bgu9Ux5mhCqtwQOxRZf6xUlvKL8y06d+EByphs6AuCF+ewQOceWFlSUso1/HSoelgSiJO7kkF7UfaHPCNgOTt5FzpuCGvtlghrBgXLqPFWD1wlGpWyYMdimCDvZz0arox3ygxf+CdPPv1GsmTdKmebfh2LApERHLK+A21fTDe0s/mU4iMi1L5VsapxFXtZEF+1qpLwmp1UlI4YfqZ5+DuaOOBuwrFra8ch+GV1qN9/NDhA2xr0PBL3oGgWonKxADVx38ECWfgcvB6vrgUHTFv9XnPoDOkMbNUARojWi7hYldT8tmRYicD+WNsagP5nAdbSW7peD2VULG57worjeaSaNyyQ2dxCUamUcgrtOOf5tHUsh+EM2buIoWvBVpLtXoRGRP3p7BLCCZvZiTeM/zVgeq2fibsqif2G9eKX7UQQzWKHbPIY001/+5BxCnmlgZKxZL2ArPutFm12z8DJ78lPLK+/awJKxAerXuoqri1nfdWaVk/vKC8EEwlNJhNyC5L2rgeTye0qJ1jdeKcpEzwkNQj48t/xc3r2Z3kkozIQKiXpeb2G5M7L2Q3970qiHGJ8I8GoKLda5xoIGAwbbBmWVMXLun8JzJS1A3Bo4PGu5bYa9zBLHWTmGAlfEYqlnu5BEsVeCNleetjdByS3CqnnrWKobDl0AUqfhaJZ4muy3u5Js/SjJsAlDW7TITPqFl27Oxf/XvDKRfhEDWE1ijVSVedT/H7zsPTvezatnLxOTvsYTvT4SdM1yN89vcEQv0jSBlDEIwwsAZuRfWBrhopdduYh/sR73zaxXF7dlEMQvnhkpS3bWoREcfTUdP+1e4ew7UbPb3BNZYUFJjTRNTv1+fdYD60cDLrH7kfsakAiM70XpRKCd5SRIy/Drxmvyg56MmQBvYveNUJLrImVWVaR0ElydhckwTE=
+X-Forefront-Antispam-Report: CIP:216.228.112.34;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:schybrid03.nvidia.com;CAT:NONE;SFS:(4636009)(46966006)(36840700001)(7636003)(86362001)(26005)(53546011)(36756003)(356005)(186003)(478600001)(16526019)(5660300002)(31696002)(6666004)(36860700001)(966005)(4326008)(31686004)(107886003)(47076005)(7406005)(82310400003)(110136005)(921005)(2906002)(34020700004)(83380400001)(336012)(16576012)(8936002)(426003)(8676002)(7416002)(70206006)(70586007)(54906003)(36906005)(2616005)(316002)(43740500002)(2101003)(83996005);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Jul 2021 13:28:59.5988
  (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: UlLhO1nK3bdcVHVP3LZjhwMLttexO3yMWmoiycWoAqNswpV2nrh3YlFhSVtTxWaZC3i1k7uTIqnSKSF9gQX/Fw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA0PR12MB4384
+X-MS-Exchange-CrossTenant-Network-Message-Id: 9e4580cd-12bf-41ea-6436-08d94794812c
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.112.34];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource: DM6NAM11FT011.eop-nam11.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BYAPR12MB2728
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
 
-On 7/15/21 4:32 AM, Dov Murik wrote:
+On 7/15/2021 5:50 AM, Jason Gunthorpe wrote:
+> Prologue:
 > 
-> Just making sure I understand:
+> This is the first series of three to send the "mlx5_vfio_pci" driver that has
+> been discussed on the list for a while now.
+>   - Reorganize reflck to support splitting vfio_pci
+>   - Split vfio_pci into vfio_pci/vfio_pci_core and provide infrastructure
+>     for non-generic VFIO PCI drivers
+>   - The new driver mlx5_vfio_pci that is a full implementation of
+>     suspend/resume functionality for mlx5 devices.
 > 
-> * sev_enabled() returns true for SEV or newer (SEV or SEV-ES or
->    SEV-SNP).
-> * sev_es_enabled() returns true for SEV-ES or newer (SEV-ES or SEV-SNP).
-> * sev_snp_enabled() returns true for SEV-SNP or newer (currently only
->    SEV-SNP).
+> A preview of all the patches can be seen here:
 > 
-> Is that indeed the intention?
+> https://github.com/jgunthorpe/linux/commits/mlx5_vfio_pci
+> 
+> ===============
+> 
+> This is in support of Max's series to split vfio-pci. For that to work the
+> reflck concept embedded in vfio-pci needs to be sharable across all of the
+> new VFIO PCI drivers which motivated re-examining how this is
+> implemented.
+> 
+> Another significant issue is how the VFIO PCI core includes code like:
+> 
+>     if (pci_dev_driver(pdev) != &vfio_pci_driver)
+> 
+> Which is not scalable if there are going to be multiple different driver
+> types.
+> 
+> This series takes the approach of moving the "reflck" mechanism into the
+> core code as a "device set". Each vfio_device driver can specify how
+> vfio_devices are grouped into the set using a key and the set comes along
+> with a set-global mutex. The core code manages creating per-device set
+> memory and associating it with each vfio_device.
+> 
+> In turn this allows the core code to provide an open/close_device()
+> operation that is called only for the first/last FD, and is called under
+> the global device set lock.
+> 
+> Review of all the drivers show that they are either already open coding
+> the first/last semantic or are buggy and missing it. All drivers are
+> migrated/fixed to the new open/close_device ops and the unused per-FD
+> open()/release() ops are deleted.
 > 
 
-Yes. The SEV-SNP support requires the SEV and SEV-ES to be enabled. See 
-the text from the APM vol2 section 15.36.
+Why can't open()/release() ops be reused instead of adding 
+open_device()/close_device().
 
-	The SEV-SNP features enable additional protection for encrypted
-	VMs designed to achieve stronger isolation from the hypervisor.
-	SEV-SNP is used with the SEV and SEV-ES features described in
-	Section 15.34 and Section 15.35 respectively and requires the
-	enablement and use of these features.
-
-thanks
+Thanks,
+Kirti
