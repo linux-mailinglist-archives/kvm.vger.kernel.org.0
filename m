@@ -2,192 +2,184 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A698A3CA394
-	for <lists+kvm@lfdr.de>; Thu, 15 Jul 2021 19:06:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 604383CA3D0
+	for <lists+kvm@lfdr.de>; Thu, 15 Jul 2021 19:18:32 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231622AbhGORIx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 15 Jul 2021 13:08:53 -0400
-Received: from mail-mw2nam12on2057.outbound.protection.outlook.com ([40.107.244.57]:7905
-        "EHLO NAM12-MW2-obe.outbound.protection.outlook.com"
+        id S233768AbhGORVY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 15 Jul 2021 13:21:24 -0400
+Received: from mail-mw2nam10on2044.outbound.protection.outlook.com ([40.107.94.44]:4033
+        "EHLO NAM10-MW2-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S229566AbhGORIw (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 15 Jul 2021 13:08:52 -0400
+        id S229786AbhGORVX (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 15 Jul 2021 13:21:23 -0400
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=JwqIMwetePY5nSjOSeV1gIAosNfuudIT+beQqP/MFbAMBa5uvQAUcQzapuEzjTt5yKdi4n9OeDXMUL36cZFHjBrem3NnfFWWUrxVQOBCsGOPj0WMnYNlvU/zOd1Ke3szrsPMpc0ev+JbYH4VuriK907r01sqVIJIP+nEMsx9oQj6YBfS5q0+sJBtkEJ+Ty0AoRUSR05ILptwwH7eDs48yJRe/hE8Bud0ZOtXJUYnKiMbJeYKtkr4pg0V8Bpgzkk637QfwT6sy5EeZeCk54RoNuiks/SSj2Ty0V/zMHnjCB7cmiKC3lD7nm+nUXkb+j1KHVa4CUxhTxotm1Cw5hSNWA==
+ b=gRe/YahjxfC368AtvVekbaOHdw87qf+okCBBaBdY4JdQ/MjAAFR3L0O/3DjB4akgJc+/k1ElkrhyVK0YIKZINcC4UlkKA+IlOHng1+duA47FS6hgagNhlT5vu8VELgImUIN04JYrn0dHE8YIBqITnrobsiSFawqKBpqD/R4TESCfN5Y3/hxh0JaJFD4jUM4H0aw+nrgwzv3I2JjCdj+vpDii47LGFZi5dlRYCGoWnuQ/fRsJEgzHNT/lQn5NKVBlHvZcWQB60Ifmoi71D7KdLA+fDOnUAwcqLsgTMUyXauRnNYFu5IAF4eONB5TiHgK5BDmdCkzwRhZt+NhjJUHetQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=GBchjtyFiOJzXoplBaTr2RPMpcVa4WNzxIAh4hTBSWw=;
- b=MrUmNuhmloMmqe6O0ZGqOb3TDrs+G8H579e5e/sZ+bWFGp+RdZtT75UujdY+25IykLeAGsxHL+FdMaJzVKfWSxRa+jK6XgMGv08dRSZYJqUDHKy0fG4Xk2tVnsWgYMwQZszNiudO01M9GTReEjd5YGtS0IczVulEcLxDoXIYTF1mtpT3ljFCplnZ0+cWmx5hr4sfjsLynJ/HR3OjMzftj25f/F8RmZcfKfo9iFyQw3/xRcXZZgt0fCb+f4gmie/uJwFFx4uHWRbZgy3gOlKybqFcuLGOMiJrNS+R1gauZh5wgIVPXKhq3ZqmwerYFSbXUUnGpzFqo3zV3XgSCwUikQ==
+ bh=DFdfjgXpn7ic9hLGG/Q/JiOttTHqvmzOyKgW1RHbdtU=;
+ b=oMEH2znCLyrJh8BkIHMDLz7GN8b33lxuLCaQNbifAAyDgRaeVrxX3lMliZnhuw6KAUeGJfBUogZ28zssu5OFDSRDIEYe20U+ndlxNVJk5BE89urimFqSKYQGi8uzqke95Btpu37//DgtVNpB+GIZpY7e2ubH3bkBkmgwEQ4bLuoCZbYNvxnqb0/lQVdWaBKkzVFduX0hFV4q86PT0rE8ctqNEVttNqT8vLNApbIVKDsDAo17X8eoz2k0L6ojIvunio3P5vyDlx8ELIDPxtq2Sho+8LGSbupxoGxkaikjUQ6CtPaI3r4llSJHZ0eRan6oovoVpshCfdgSpRzRYNfsLg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=GBchjtyFiOJzXoplBaTr2RPMpcVa4WNzxIAh4hTBSWw=;
- b=uNeaYQlNUTRplOE5Mmr/sMrNRiU62mw4iYsqtHvFsdX+aHznY5RPX0+gRevpF2NjruEkXQd8lrOvkKwFlcSa5rB6ahFuOka/1CHx14ANP9ALWNmWW0WYufe30gM8b03QH59UEs61aZOhEIbRdSFiApJ+eGe0Z4Ptgcf5Ctlh9Hs=
-Authentication-Results: gmail.com; dkim=none (message not signed)
- header.d=none;gmail.com; dmarc=none action=none header.from=amd.com;
-Received: from SN6PR12MB2718.namprd12.prod.outlook.com (2603:10b6:805:6f::22)
- by SN6PR12MB4670.namprd12.prod.outlook.com (2603:10b6:805:11::22) with
+ bh=DFdfjgXpn7ic9hLGG/Q/JiOttTHqvmzOyKgW1RHbdtU=;
+ b=LDnm2Vl3Q46VCtsLDDrlX6JaCbApW25qnMGG/xXhZzJCoTTFaiWLVohuEeGLwcGiKisFvn8OrQo/gvsufp/P6T5LQv8fxyMwfk7kVQeKXqT92QVlvnBZJz3omY1l/XrI4GVtMk+icfNJKUD9H3RyFhjTyZqvIUnMcc98UOx3qruVNfVv7/tFX+gc2Yib7q23xywKElXWMTvwPd6m/Z0EHD16M4J3+e+Frif3hvFBNsl5I0VZAsQDbmnRt3SZ1kvGkzQsLv5RQje/F0TWsNrsKBGB+zgKQLSFOJ4n49MgpoX6eAqYguiE000zVt7tZUmXGOjO3LwIW1CY/E9J72KgSQ==
+Authentication-Results: intel.com; dkim=none (message not signed)
+ header.d=none;intel.com; dmarc=none action=none header.from=nvidia.com;
+Received: from BL0PR12MB5506.namprd12.prod.outlook.com (2603:10b6:208:1cb::22)
+ by BL0PR12MB5540.namprd12.prod.outlook.com (2603:10b6:208:1cb::20) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4308.22; Thu, 15 Jul
- 2021 17:05:56 +0000
-Received: from SN6PR12MB2718.namprd12.prod.outlook.com
- ([fe80::a8a9:2aac:4fd1:88fa]) by SN6PR12MB2718.namprd12.prod.outlook.com
- ([fe80::a8a9:2aac:4fd1:88fa%3]) with mapi id 15.20.4331.024; Thu, 15 Jul 2021
- 17:05:56 +0000
-Cc:     brijesh.singh@amd.com, x86@kernel.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
-        linux-coco@lists.linux.dev, linux-mm@kvack.org,
-        linux-crypto@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4331.21; Thu, 15 Jul
+ 2021 17:18:28 +0000
+Received: from BL0PR12MB5506.namprd12.prod.outlook.com
+ ([fe80::d017:af2f:7049:5482]) by BL0PR12MB5506.namprd12.prod.outlook.com
+ ([fe80::d017:af2f:7049:5482%5]) with mapi id 15.20.4331.024; Thu, 15 Jul 2021
+ 17:18:28 +0000
+Date:   Thu, 15 Jul 2021 14:18:26 -0300
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     "Raj, Ashok" <ashok.raj@intel.com>
+Cc:     "Tian, Kevin" <kevin.tian@intel.com>,
+        Shenming Lu <lushenming@huawei.com>,
+        "Alex Williamson (alex.williamson@redhat.com)" 
+        <alex.williamson@redhat.com>,
+        Jean-Philippe Brucker <jean-philippe@linaro.org>,
+        David Gibson <david@gibson.dropbear.id.au>,
+        Jason Wang <jasowang@redhat.com>,
+        "parav@mellanox.com" <parav@mellanox.com>,
+        "Enrico Weigelt, metux IT consult" <lkml@metux.net>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
-        David Rientjes <rientjes@google.com>,
-        Dov Murik <dovmurik@linux.ibm.com>,
-        Tobin Feldman-Fitzthum <tobin@ibm.com>,
-        Borislav Petkov <bp@alien8.de>,
-        Michael Roth <michael.roth@amd.com>,
-        Vlastimil Babka <vbabka@suse.cz>, tony.luck@intel.com,
-        npmccallum@redhat.com, brijesh.ksingh@gmail.com
-Subject: Re: [PATCH Part2 RFC v4 07/40] x86/sev: Split the physmap when adding
- the page in RMP table
-To:     Sean Christopherson <seanjc@google.com>
-References: <20210707183616.5620-1-brijesh.singh@amd.com>
- <20210707183616.5620-8-brijesh.singh@amd.com> <YO9kP1v0TAFXISHD@google.com>
-From:   Brijesh Singh <brijesh.singh@amd.com>
-Message-ID: <d486a008-8340-66b0-9667-11c8a50974e4@amd.com>
-Date:   Thu, 15 Jul 2021 12:05:54 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.11.0
-In-Reply-To: <YO9kP1v0TAFXISHD@google.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: SA0PR11CA0024.namprd11.prod.outlook.com
- (2603:10b6:806:d3::29) To SN6PR12MB2718.namprd12.prod.outlook.com
- (2603:10b6:805:6f::22)
+        Joerg Roedel <joro@8bytes.org>,
+        Eric Auger <eric.auger@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        "Liu, Yi L" <yi.l.liu@intel.com>, "Wu, Hao" <hao.wu@intel.com>,
+        "Jiang, Dave" <dave.jiang@intel.com>,
+        Jacob Pan <jacob.jun.pan@linux.intel.com>,
+        Kirti Wankhede <kwankhede@nvidia.com>,
+        Robin Murphy <robin.murphy@arm.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
+        David Woodhouse <dwmw2@infradead.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Lu Baolu <baolu.lu@linux.intel.com>,
+        "wanghaibin.wang@huawei.com" <wanghaibin.wang@huawei.com>
+Subject: Re: [RFC v2] /dev/iommu uAPI proposal
+Message-ID: <20210715171826.GG543781@nvidia.com>
+References: <BN9PR11MB5433B1E4AE5B0480369F97178C189@BN9PR11MB5433.namprd11.prod.outlook.com>
+ <7ea349f8-8c53-e240-fe80-382954ba7f28@huawei.com>
+ <BN9PR11MB5433A9B792441CAF21A183A38C129@BN9PR11MB5433.namprd11.prod.outlook.com>
+ <a8edb2c1-9c9c-6204-072c-4f1604b7dace@huawei.com>
+ <BN9PR11MB54336D6A8CAE31F951770A428C129@BN9PR11MB5433.namprd11.prod.outlook.com>
+ <20210715124813.GC543781@nvidia.com>
+ <20210715135757.GC590891@otc-nc-03>
+ <20210715152325.GF543781@nvidia.com>
+ <20210715162141.GA593686@otc-nc-03>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210715162141.GA593686@otc-nc-03>
+X-ClientProxiedBy: CH2PR12CA0027.namprd12.prod.outlook.com
+ (2603:10b6:610:57::37) To BL0PR12MB5506.namprd12.prod.outlook.com
+ (2603:10b6:208:1cb::22)
 MIME-Version: 1.0
 X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from [10.236.31.95] (165.204.77.1) by SA0PR11CA0024.namprd11.prod.outlook.com (2603:10b6:806:d3::29) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4331.21 via Frontend Transport; Thu, 15 Jul 2021 17:05:54 +0000
+Received: from mlx.ziepe.ca (206.223.160.26) by CH2PR12CA0027.namprd12.prod.outlook.com (2603:10b6:610:57::37) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4331.22 via Frontend Transport; Thu, 15 Jul 2021 17:18:28 +0000
+Received: from jgg by mlx with local (Exim 4.94)        (envelope-from <jgg@nvidia.com>)        id 1m450E-002jZj-Ux; Thu, 15 Jul 2021 14:18:26 -0300
 X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 60421bdb-8d1d-473a-52c9-08d947b2cf99
-X-MS-TrafficTypeDiagnostic: SN6PR12MB4670:
+X-MS-Office365-Filtering-Correlation-Id: 27b25a49-4b9c-4774-d571-08d947b48fc6
+X-MS-TrafficTypeDiagnostic: BL0PR12MB5540:
 X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <SN6PR12MB46709FE5F5C3DAC0A8C8DBC3E5129@SN6PR12MB4670.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:9508;
+X-Microsoft-Antispam-PRVS: <BL0PR12MB55408F6FC0C90651F01A4255C2129@BL0PR12MB5540.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:8882;
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: hljcrTp+7fOTz/aNHBSMOTp4SfklEV3LEFcwbF4/xeswMIETLJsgo7Oj0CF3y5wyvyyR0dPGRGrfao41nxF9M/qVJS5YHJarMMnG5+ZjoFnrSZW6qZEj3mDSDqvoXYdJRv6a6TfI2LdG2JItlqss5fslYv/YVRtPoe9T+T1TWMz2g0XnD55ymFVEqYkAQ+MdctQp34lFdvgC5n7ZQveQLJdHcxXrv9CFwuIT9yA8l98aqApqdtb8Pa9iLt8SbpqJp0UVHf9SbzxCVNZxiHI2IEPVmcEWLAQq3PUmvISkoTFMqz1L9G1tNQS0ZXK+dsgoGdAm1o8WhkfCssEMmqK+FJ6aJmYaoHFU7MF8I+C7uCipx879BnIB2aoeMJ4nawk920z7JsxErSc82uzMylmPky78hUD8vP206l4hrJMIM0krvuTiQTg9L/ccBLKSWgRJRmFuAu5i41QVfsSKHHVjrtF9PdMg7t2W9od3Kpg2gUPwhejP8kX0QlaBa9m5avnIWoI4FbKL7r5yF2blWQ1pj4040eE2qBFPRR7GyFPL4xx05V+/2omvy5j4Oo6vWMgFth9uWrVyYyosTqqYvjWEMoEu6RipnRWQQnXGzg8kXsXrFDTmsL74CIyhtEk9OLn2r674PZ/lw9VmttkSrDg5ie3NL/c7CyIImiEy8F+Tejxx+hvYADRQMiHdZ8pXsFLMYCscLP8WA+0mGK1iFpSFOqFlpNwAAT4Jmpu65Ccz0/MqVkV4kEOAeO9L/EPSd7XeaRSkr2uWYKNo+peKTrOXaQ==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR12MB2718.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(8676002)(7406005)(7416002)(8936002)(36756003)(83380400001)(2906002)(316002)(16576012)(54906003)(52116002)(53546011)(31696002)(66476007)(44832011)(6916009)(956004)(2616005)(26005)(6486002)(186003)(478600001)(38100700002)(66556008)(38350700002)(4326008)(31686004)(5660300002)(66946007)(86362001)(45980500001)(43740500002);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam-Message-Info: V2lZY/EffyBW30qahltZLLGnnz49Xr2CwjMT63X216ZzSBdnBhkL3j33i6sPY1bJI7EvBWfX+YXzarcjiLnFQNtaPBTT7ESipYzBykwtxOq62wudQlZl/En2BiR+jFHYIUwiWjnG/gb+BjtEzJQ7gX53sO1nOL3VYBbEBwxgdB93ELKlRlMvSfFH3V7dS/wpjnwXUNT/q38henJ7pVC27zts5kSGCr9vA8IiDmeaMtIZz/gLO6CMTBd0zExGbwZzX+2/M+O5Jq64tnrkpA6PlT1lSRPo79MKHnk3hxluYWRhgxrfWpuwfBb0NNtTNo4PR5RcX93NYg97DX3hxuRFJHj5hyednUb49+EFOCVbvvr6ziusblrGTMkAboTKeyfwyBuX2O/GlAIuCxlUVtTmOx47ze7HXFZ8DrEAGrA6cxZa0NPuhfTv1rzif66+X3TWAtWteUgndFmCA+aZP0Ty4G8BxtiOkprFsqehUIo6Hky9gOgVCUS6so6ujrsmDJvPPUhfjElw9hbSrx4stgF0L6h5lB+sTujyS1NiiT1zQDAtv32udLY2vGBynF3b/Md580LOEIqHh+h7NHppbF+Es1s7WGgzITc9byrBqSmdYa12JdjSS/jIP+MAAjtYzPSvlJ6ACzE31bJKLLq4dtdiexH6w4DRHhixTdKP+LoLsm/whFuJ8FnoQdQjH0Qzm/firOeQKzGDsRB2mK7M4YvkgA==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL0PR12MB5506.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(426003)(4326008)(9786002)(9746002)(2616005)(8936002)(38100700002)(1076003)(478600001)(33656002)(8676002)(5660300002)(86362001)(36756003)(186003)(26005)(54906003)(316002)(2906002)(83380400001)(66476007)(66556008)(66946007)(7416002)(6916009)(27376004);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?SUt1aUZZRTFHOGdSMHVDMkRxb29HeTFFZ3RhY0c2THNLUkR5NFVVQjNBTEJC?=
- =?utf-8?B?WWtFQmxUU1FrK1BRR28xTFNrZytubjBlZmRWR2VZS1o1OWhRNDhPY1U3T2lJ?=
- =?utf-8?B?TXhaSVkwTWZVWlJPdHUzV29oNU4yT2pOSTFLS2dkNTFFcTBrZGlPeFNyYU94?=
- =?utf-8?B?aEpON3RwZUd2SElrd0hrVEFpV1hhWVZwdWc0T3o3d0pXclhKalkzSldJdUM3?=
- =?utf-8?B?c1BvWFZDTWNhSUh6c3ZPekU3cWkzakhnbXdnTjAyRDc5bjFrdGJUSGw0U0JO?=
- =?utf-8?B?WEQ4RWhsWHB2bGdsN3h6M2xxTzBKUEFhYlF6UUhTb1cxQXRDaEVHM2N5ZVZH?=
- =?utf-8?B?WTBvUXB5VTUvNkFFWmIwSnZtRGhFWUFXRHhITVY5UHB5UHBySTNBMTlUcDJC?=
- =?utf-8?B?ZHpxekFwZW0xNnlyTEhTR0lTSHIxYzJwWUpjSHJ2Qm9lMDlFTEN3ZGIxVTlJ?=
- =?utf-8?B?QUlYb0ZJeGZuT1VTOWo5MW8vbWlna2N4enF5WUpISGdHcmRoMHFyTEx2emhG?=
- =?utf-8?B?T3dzcnp3RFZPam1nTWlVMCsxemhTZDJDQjBJSXpYVk03NkFvZERzdys1RFhz?=
- =?utf-8?B?N3lpRlJwcXpkcjhweVhlcWdxQzdEZTgxTnM5NlpoOGxFVTM4bEJrTXBveTFR?=
- =?utf-8?B?bm5Da0dwNktzbHZVeHZ3bXNHd1RuS2h1K1EydGt5aGdBU2Y5eDVjSVA4anZP?=
- =?utf-8?B?L2JxSmV6UThGd01lazZjQldnamVuWWpDSFFuVFNBVXZ3WUJRWU84MlRXbWFQ?=
- =?utf-8?B?Z2QrMmdSbDVQcVFkRm1kTERYK2grMlBkRlkyYXo1TnVUay9sbjNjOFh5SmhF?=
- =?utf-8?B?Y3hPdjBJcEMxdDZldWxZNUphblVkTEdzVllwWjdJcEVPRUFsbU1LaEVtYmxy?=
- =?utf-8?B?N29UamZLSnpvSzdOU3NRME5tUS8vaHV3dlJMaWJ6YnowQkpOYjBKZm9zTVds?=
- =?utf-8?B?UDFaMVh5UWtydFpFa1lIWHpLYnAxWDh5bWx2L0swczdTcEZ3VnVNaVVTeUdG?=
- =?utf-8?B?WjhzUVZnUXlvZHVPUjRGTDA2bFVFb1hST0d4eWFNREtDU0NPV1FYdEp2clFs?=
- =?utf-8?B?L1NJOUQyN0tQcEw1OFRmNjVBbFg3c0xrTW5MWDFaUm04cHJZbVpFVVVRSFJm?=
- =?utf-8?B?YWdZQkUzM25YK1VuZ2RQSFd6eDhGZ2tmZDFPWlZWVTNBbmdLUnVJVnk0WHFH?=
- =?utf-8?B?c2xlWW91dW9uQ0ovcmVNUUFFUGxHYmRNSWFmTHo4YXpzUnlMemcrVzNkRUw0?=
- =?utf-8?B?TTVoN0dvZTgxUG52QVJVYnpPbm5Vbi9VVHdoRkc4Sm9zdktrbndlQmU1dDB5?=
- =?utf-8?B?ZGg5aFBNUGhoNWZGK3VET0UwNlcvVVFka2Q5S3ZwZnI4enBIVVp5Mm45WDBX?=
- =?utf-8?B?R0NuRHRzQUUvd0lJT3gxN29lcitaVTJxZ3ZTeUgrZ1lMcURnYUtaQnBYOVV0?=
- =?utf-8?B?ejgvUWo5M3ZKeHNrWXc4NTFjcEFQM2RDVVprWk5PdjNSMk5oUks4aWl3bTZ6?=
- =?utf-8?B?Uzd3M2NJUVgyWktjaWFGNUsyKzdVK0ZabHVHQTY0YkRSTGVLMG1QNUZXM0pC?=
- =?utf-8?B?RURlQkl6bFR5ajdTM1c3RktvSUp0ZmhBOHcxTElXUUpZYW03dHFZMWNzZ2p6?=
- =?utf-8?B?TUtLaURta2crMFAxN2FlRlIwTW5yOFRWU3JmSEhwVUo4MFNReW9EOWxJaE9N?=
- =?utf-8?B?RzBGN0xtRWNxVVYyMHcvaDU1a1A4bUU2MGt3b3o2MnYrN3lnQ3RPTFdqenE4?=
- =?utf-8?Q?bXWvgtxd1I6bSKIXoYK6hBd6ZAjG4tQYL/BUZsN?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 60421bdb-8d1d-473a-52c9-08d947b2cf99
-X-MS-Exchange-CrossTenant-AuthSource: SN6PR12MB2718.namprd12.prod.outlook.com
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?mBmeg97zzuHbpQGj7NlDUdIKj9OYKdFo0ah20IZYhoPXFIiJPeYbvUA2Lz10?=
+ =?us-ascii?Q?rBDMOuHYeA71rcdd7qM0LRivUFhqw5KXqVlJP3wTQFAvEkc40MmNq42/Nzng?=
+ =?us-ascii?Q?zPl1vTaL2wBIRcSiP7ewk3OWhn5KYBhcT6X/+JkmmvWdA0DRnCiADmUJAQg4?=
+ =?us-ascii?Q?vdnipHcc2B1jd893ala0Ax4zIRSIMEoDzOMtCGjf75wLDXMZNmWc4foU5o29?=
+ =?us-ascii?Q?KqQjDiLCS5EDGtUTOQ+y803JdpIze4p4Y7+/ml78TfBQjFDfN8FPUAk/KIgD?=
+ =?us-ascii?Q?umL95oJ3evqCkX5HZAwLhs6dtC8Pln132wAnUpGi6rsZaMSX+AU0iuZbZm3L?=
+ =?us-ascii?Q?GHGO1F5v142P98ErGUgXuShN2ZdabYRcehweU4jVTW/PN69U2g6yXOZymCug?=
+ =?us-ascii?Q?kuEBJ55b/Qxo9GPCQjdMt6/MxI/f8kujRjuye0PMJd3aCbm+Sr7cMWw6/eDF?=
+ =?us-ascii?Q?owsomyrgAZRsHQNpCdzMlb63fT+N6+DptqBwuXg9vVEZ/lXT5Bl5dsi/F3Sp?=
+ =?us-ascii?Q?nc8mbjrffrVW5b6EZQIYxj9BTmmE1Tymd5irTnj24Ct7gKytgja0HgokDbBF?=
+ =?us-ascii?Q?TkFZy1KSymqb6qEhgeVeZvedaRqG/0kwZT933IRM1CKqj3mNrH8iiOYeuwr7?=
+ =?us-ascii?Q?ccVodFd0c7IHPYa+62lE2EXr/R6raPeq75C3py8nQV4Skgm4Gf82xAcmP4nX?=
+ =?us-ascii?Q?trwpiJ/TufDg2gbPfxeKJBn+0a+fGI1pXQz8JWnI/bn17NQ1NbcAB2x2IXiU?=
+ =?us-ascii?Q?hurtZPCdUepOAD4E/fxVGyZ50hijcxxp6QBrPgWrSmV4hdJUtmqZPwly/AFP?=
+ =?us-ascii?Q?vrd2YCGpVmxROpJdgk1dqa2AYA2/2UxjPaSvNjcwM4PowoJp9gjDvnSuSttl?=
+ =?us-ascii?Q?TcPjpcxL3cXl6fGfXkQDFw09AJkewFYHz8f9nSO3fLM146QLriGkMStGLVW+?=
+ =?us-ascii?Q?co4ybGiBNByJOmnwYGtZG/oHoynEYYvVvTyoQy0/LWyP4wk/cZshuzse65pG?=
+ =?us-ascii?Q?lNVjAj7WUj/N1y/AtrH4JXnkMjNK9qnEkGVQrfMyeHNwT1DJ7zgyXH4mrgIn?=
+ =?us-ascii?Q?H5NzUndsizxNcZQm0iT8p9IyUo0yrAWZYD2Vn6p0Hk/Xuw5uZBQNaKWZQBKk?=
+ =?us-ascii?Q?04s93t4wVDbwo8Q3g4Itzu7Nhq7/DFqpkVFE9DSq5v178Nu+4cF0F/bX4xyc?=
+ =?us-ascii?Q?TDbNtVU/B6Fe7MeTXWe5c5UvF2EaegFJheAyaYRDZY2bgLzJ8RU1juZaNP0x?=
+ =?us-ascii?Q?8UU6EmrBlPaCh1gjAuibM9zp3pVb1Q0P7HbolK64m3OpXuPvnKYpvamf5iTQ?=
+ =?us-ascii?Q?jjuZOIQBiQYyJHaMvUOu0WZF?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 27b25a49-4b9c-4774-d571-08d947b48fc6
+X-MS-Exchange-CrossTenant-AuthSource: BL0PR12MB5506.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Jul 2021 17:05:56.5796
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Jul 2021 17:18:28.4321
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: V2XjJfRg1EcaS/54CTwtFCRXAvOz4Riz5ylxJO76c4weszyVLXxUf9fIkDzj6svEDa314EFzGBiVWy9N12z9kQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN6PR12MB4670
+X-MS-Exchange-CrossTenant-UserPrincipalName: CAQ49bA6e3dfnrix9i7rGiwgMgBxhh7VfmMjVp2RJQZUt36rlg8FoGWQI3ea3IhW
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL0PR12MB5540
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-
-On 7/14/21 5:25 PM, Sean Christopherson wrote:
->> A write from the hypervisor goes through the RMP checks. When the
->> hypervisor writes to pages, hardware checks to ensures that the assigned
->> bit in the RMP is zero (i.e page is shared). If the page table entry that
->> gives the sPA indicates that the target page size is a large page, then
->> all RMP entries for the 4KB constituting pages of the target must have the
->> assigned bit 0. If one of entry does not have assigned bit 0 then hardware
->> will raise an RMP violation. To resolve it, split the page table entry
->> leading to target page into 4K.
+On Thu, Jul 15, 2021 at 09:21:41AM -0700, Raj, Ashok wrote:
+> On Thu, Jul 15, 2021 at 12:23:25PM -0300, Jason Gunthorpe wrote:
+> > On Thu, Jul 15, 2021 at 06:57:57AM -0700, Raj, Ashok wrote:
+> > > On Thu, Jul 15, 2021 at 09:48:13AM -0300, Jason Gunthorpe wrote:
+> > > > On Thu, Jul 15, 2021 at 06:49:54AM +0000, Tian, Kevin wrote:
+> > > > 
+> > > > > No. You are right on this case. I don't think there is a way to 
+> > > > > differentiate one mdev from the other if they come from the
+> > > > > same parent and attached by the same guest process. In this
+> > > > > case the fault could be reported on either mdev (e.g. the first
+> > > > > matching one) to get it fixed in the guest.
+> > > > 
+> > > > If the IOMMU can't distinguish the two mdevs they are not isolated
+> > > > and would have to share a group. Since group sharing is not supported
+> > > > today this seems like a non-issue
+> > > 
+> > > Does this mean we have to prevent 2 mdev's from same pdev being assigned to
+> > > the same guest? 
+> > 
+> > No, it means that the IOMMU layer has to be able to distinguish them.
 > 
-> Isn't the above just saying:
+> Ok, the guest has no control over it, as it see 2 separate pci devices and
+> thinks they are all different.
 > 
->    All RMP entries covered by a large page must match the shared vs. encrypted
->    state of the page, e.g. host large pages must have assigned=0 for all relevant
->    RMP entries.
+> Only time when it can fail is during the bind operation. From guest
+> perspective a bind in vIOMMU just turns into a write to local table and a
+> invalidate will cause the host to update the real copy from the shadow.
 > 
+> There is no way to fail the bind? and Allocation of the PASID is also a
+> separate operation and has no clue how its going to be used in the guest.
 
-Yes.
+You can't attach the same RID to the same PASID twice. The IOMMU code
+should prevent this.
 
+As we've talked about several times, it seems to me the vIOMMU
+interface is misdesigned for the requirements you have. The hypervisor
+should have a role in allocating the PASID since there are invisible
+hypervisor restrictions. This is one of them.
 
->> @@ -2375,6 +2375,12 @@ int rmpupdate(struct page *page, struct rmpupdate *val)
->>   	if (!cpu_feature_enabled(X86_FEATURE_SEV_SNP))
->>   		return -ENXIO;
->>   
->> +	ret = set_memory_4k((unsigned long)page_to_virt(page), 1);
-> 
-> IIUC, this shatters the direct map for page that's assigned to an SNP guest, and
-> the large pages are never recovered?
-> 
-> I believe a better approach would be to do something similar to memfd_secret[*],
-> which encountered a similar problem with the direct map.  Instead of forcing the
-> direct map to be forever 4k, unmap the direct map when making a page guest private,
-> and restore the direct map when it's made shared (or freed).
-> 
-> I thought memfd_secret had also solved the problem of restoring large pages in
-> the direct map, but at a glance I can't tell if that's actually implemented
-> anywhere.  But, even if it's not currently implemented, I think it makes sense
-> to mimic the memfd_secret approach so that both features can benefit if large
-> page preservation/restoration is ever added.
-> 
+> Do we have any isolation requirements here? its the same process. So if the
+> page-request it sent to guest and even if you report it for mdev1, after
+> the PRQ is resolved by guest, the request from mdev2 from the same guest
+> should simply work?
 
-thanks for the memfd_secrets pointer. At the lowest level it shares the
-same logic to split the physmap. We both end up calling to
-change_page_attrs_set_clr() which split the page and updates the page
-table attributes.
+I think we already talked about this and said it should not be done.
 
-Given this, I believe in future if the change_page_attrs_set_clr() is 
-enhanced to track the splitting of the pages and restore it later then 
-it should work transparently.
-
-thanks
+Jason
