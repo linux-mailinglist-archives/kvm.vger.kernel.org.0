@@ -2,92 +2,112 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8A87A3C9DFF
-	for <lists+kvm@lfdr.de>; Thu, 15 Jul 2021 13:51:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 617E13C9E04
+	for <lists+kvm@lfdr.de>; Thu, 15 Jul 2021 13:51:57 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230075AbhGOLyX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 15 Jul 2021 07:54:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44864 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229472AbhGOLyW (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 15 Jul 2021 07:54:22 -0400
-Received: from mail-pl1-x636.google.com (mail-pl1-x636.google.com [IPv6:2607:f8b0:4864:20::636])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 58D37C06175F;
-        Thu, 15 Jul 2021 04:51:28 -0700 (PDT)
-Received: by mail-pl1-x636.google.com with SMTP id u3so3115776plf.5;
-        Thu, 15 Jul 2021 04:51:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=to:cc:references:from:subject:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=yZjacCxpi7Hc/0XmbRGuc2b47sUM+dfTK3uYpjKk0uk=;
-        b=OSE/NzbMZZ9y27MeU4K0Fj1hs0/yEw6nnX58IKsv/HM0BhTWISAHDLR1XINadtgwdS
-         Ocp2llzBL+FwVppqFbEeRF5zcb7SsBgzpQThzmrtSIXVKt5ghWAiEd86Rv+LvCEL0EKs
-         RfGVfXUI41PbIGF/nid9t/Tr4xhFQOJWjnqal/0h4OwXNYVPUAwMnaXtg+H2swWLFhrZ
-         sqcmlIhYYhhQaE2J9ZH39ePNzJVUtjOiPrUj6VnP8AkzFHudR7eE8vjJBgr5wDtm83KX
-         VPGXeZaf6vJn0bMaN4y341ekfROTYqsoSR7Yxwxz7hnYxtfW51cMqx2zlAr566kbyDg9
-         HaLg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:to:cc:references:from:subject:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=yZjacCxpi7Hc/0XmbRGuc2b47sUM+dfTK3uYpjKk0uk=;
-        b=iuFIFm05NHr73gLsmgEpItVs0biwJmikEF8Ff0Q6b5QaogE4xRWNnArm1KVHuE1p9B
-         ICwq5Li/L7Ww3LwxmUW8G2pVLW9plhRDzu9kEW6Uu0qfUBz92jRUVhZv822OjFbHpNpm
-         NONWet2vrvbnOSBeDjCLoj1Tgneu9d53BYur7+eKVxnPzomOJMgVJ7mwQgCGPtuPwtuu
-         3AL5g5nFaBf8aCvoOmxkW8d82JteP22OErZuFy+Q8K4O/iMteLWC1iug8a30ZmTHqnFj
-         UY1ctJmFMuwVlS5hdpy0SjFPy3Lkgj8jaisD/a+KANvI56PRjdHAFflNpkPOUFXPZElZ
-         afCw==
-X-Gm-Message-State: AOAM531ORtwxVBzTbZtlitWyEQUnPSNIXujVgAMrjRpdXTcCbu8A46O6
-        vf/iC0jcL7zt3DimgoFPtDCUzoTKBSQ8Ch2n
-X-Google-Smtp-Source: ABdhPJx1I4jSSfv+s7lhS8zeKVzBTFjzQ9wVTxyrUOVVBQZJiI8HkanR4Z1raWELo3yeZNKQj6KQ8g==
-X-Received: by 2002:a17:90a:6d82:: with SMTP id a2mr4004621pjk.150.1626349887810;
-        Thu, 15 Jul 2021 04:51:27 -0700 (PDT)
-Received: from Likes-MacBook-Pro.local ([103.7.29.32])
-        by smtp.gmail.com with ESMTPSA id y1sm6958546pgr.70.2021.07.15.04.51.24
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 15 Jul 2021 04:51:27 -0700 (PDT)
-To:     Paolo Bonzini <pbonzini@redhat.com>, Joerg Roedel <joro@8bytes.org>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>, x86@kernel.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-References: <20210715104505.96220-1-likexu@tencent.com>
- <3d2ad944-9e0c-dea7-f0e4-4e55072ccf99@redhat.com>
-From:   Like Xu <like.xu.linux@gmail.com>
-Subject: Re: [PATCH] KVM: x86/cpuid: Expose the true number of available ASIDs
-Message-ID: <fe96fd65-df65-1306-f8d0-29fd3f35a531@gmail.com>
-Date:   Thu, 15 Jul 2021 19:51:19 +0800
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0)
- Gecko/20100101 Thunderbird/78.11.0
+        id S230159AbhGOLyt (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 15 Jul 2021 07:54:49 -0400
+Received: from foss.arm.com ([217.140.110.172]:51576 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S230106AbhGOLys (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 15 Jul 2021 07:54:48 -0400
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 9B6FD31B;
+        Thu, 15 Jul 2021 04:51:55 -0700 (PDT)
+Received: from [10.57.36.240] (unknown [10.57.36.240])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 419113F694;
+        Thu, 15 Jul 2021 04:51:54 -0700 (PDT)
+Subject: Re: [PATCH 1/3] KVM: arm64: Narrow PMU sysreg reset values to
+ architectural requirements
+To:     Marc Zyngier <maz@kernel.org>,
+        Alexandru Elisei <alexandru.elisei@arm.com>
+Cc:     linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org,
+        kvmarm@lists.cs.columbia.edu, James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Alexandre Chartre <alexandre.chartre@oracle.com>,
+        kernel-team@android.com
+References: <20210713135900.1473057-1-maz@kernel.org>
+ <20210713135900.1473057-2-maz@kernel.org>
+ <ae510501-0410-47b1-77f3-cb83d3b1fa9e@arm.com> <87mtqnkf1w.wl-maz@kernel.org>
+From:   Robin Murphy <robin.murphy@arm.com>
+Message-ID: <daf4c8a9-8873-276d-ff15-b2812ed7f1e1@arm.com>
+Date:   Thu, 15 Jul 2021 12:51:49 +0100
+User-Agent: Mozilla/5.0 (Windows NT 10.0; rv:78.0) Gecko/20100101
+ Thunderbird/78.11.0
 MIME-Version: 1.0
-In-Reply-To: <3d2ad944-9e0c-dea7-f0e4-4e55072ccf99@redhat.com>
+In-Reply-To: <87mtqnkf1w.wl-maz@kernel.org>
 Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Language: en-GB
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 15/7/2021 7:19 pm, Paolo Bonzini wrote:
-> On 15/07/21 12:45, Like Xu wrote:
->> The original fixed number "8" was first introduced 11 years ago. Time has
->> passed and now let KVM report the true number of address space 
->> identifiers
->> (ASIDs) that are supported by the processor returned in Fn8000_000A_EBX.
->>
->> It helps user-space to make better decisions about guest values.
->>
->> -        entry->ebx = 8; /* Lets support 8 ASIDs in case we add proper
->> -                   ASID emulation to nested SVM */
+On 2021-07-15 12:11, Marc Zyngier wrote:
+> Hi Alex,
 > 
-> Why, since we don't have ASID emulation yet anyway?
+> On Wed, 14 Jul 2021 16:48:07 +0100,
+> Alexandru Elisei <alexandru.elisei@arm.com> wrote:
+>>
+>> Hi Marc,
+>>
+>> On 7/13/21 2:58 PM, Marc Zyngier wrote:
+>>> A number of the PMU sysregs expose reset values that are not in
+>>> compliant with the architecture (set bits in the RES0 ranges,
+>>> for example).
+>>>
+>>> This in turn has the effect that we need to pointlessly mask
+>>> some register when using them.
+>>>
+>>> Let's start by making sure we don't have illegal values in the
+>>> shadow registers at reset time. This affects all the registers
+>>> that dedicate one bit per counter, the counters themselves,
+>>> PMEVTYPERn_EL0 and PMSELR_EL0.
+>>>
+>>> Reported-by: Alexandre Chartre <alexandre.chartre@oracle.com>
+>>> Signed-off-by: Marc Zyngier <maz@kernel.org>
+>>> ---
+>>>   arch/arm64/kvm/sys_regs.c | 46 ++++++++++++++++++++++++++++++++++++---
+>>>   1 file changed, 43 insertions(+), 3 deletions(-)
+>>>
+>>> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+>>> index f6f126eb6ac1..95ccb8f45409 100644
+>>> --- a/arch/arm64/kvm/sys_regs.c
+>>> +++ b/arch/arm64/kvm/sys_regs.c
+>>> @@ -603,6 +603,44 @@ static unsigned int pmu_visibility(const struct kvm_vcpu *vcpu,
+>>>   	return REG_HIDDEN;
+>>>   }
+>>>   
+>>> +static void reset_pmu_reg(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r)
+>>> +{
+>>> +	u64 n, mask;
+>>> +
+>>> +	/* No PMU available, any PMU reg may UNDEF... */
+>>> +	if (!kvm_arm_support_pmu_v3())
+>>> +		return;
+>>> +
+>>> +	n = read_sysreg(pmcr_el0) >> ARMV8_PMU_PMCR_N_SHIFT;
+>>
+>> Isn't this going to cause a lot of unnecessary traps with NV? Is
+>> that going to be a problem?
 > 
-> Paolo
+> We'll get a new traps at L2 VM creation if we expose a PMU to the L1
+> guest, and if L2 gets one too. I don't think that's a real problem, as
+> the performance of an L2 PMU is bound to be hilarious, and if we are
+> really worried about that, we can always cache it locally. Which is
+> likely the best thing to do if you think of big-little.
+> 
+> Let's not think of big-little.
+> 
+> Another thing is that we could perfectly ignore the number of counter
+> on the host and always expose the architectural maximum, given that
+> the PMU is completely emulated. With that, no trap.
 
-I suppose you're right on the current state.
+Although that would deliberately exacerbate the existing problem of 
+guest counters mysteriously under-reporting due to the host event 
+getting multiplexed, thus arguably make the L2 PMU even less useful.
 
-But do we have an explanation as to why it is hard-coded as 8
-and not zero or a real supported number?
+But then trying to analyse application performance under NV at all seems 
+to stand a high chance of being akin to shovelling fog, so...
+
+Robin.
