@@ -2,129 +2,128 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id AE1053C9D3A
-	for <lists+kvm@lfdr.de>; Thu, 15 Jul 2021 12:48:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 231E83C9D40
+	for <lists+kvm@lfdr.de>; Thu, 15 Jul 2021 12:50:09 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241684AbhGOKvQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 15 Jul 2021 06:51:16 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:28528 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232055AbhGOKvP (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 15 Jul 2021 06:51:15 -0400
-Received: from pps.filterd (m0187473.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 16FAXwl0090894;
-        Thu, 15 Jul 2021 06:48:22 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=ajXHLHDEBxtcysRI+JtyCQLk+dpnXZmt4tX8qjYsO6E=;
- b=Ov8h1iIYScH6ysIFJulNnX5jTffQCUIIMeJwl6PZa/Z/FMEKCyMjoYV54/QkXw2uDL7e
- tqBElkxjC3hKo3bLpFui8I98VBgembnW9DWUA5lKNom6JIibNX6eMOAPLRpl9K53TCGv
- OKXm/3vys0X+YU+S9pKj5vbPJCa4S5uZiwep0vQrMFrtfPXaVE526sYkCoDYcT17IpSX
- PX8q70PLTQQX3iGtsuAw6KNCx1PYitlHI231tqYugqiX5NqEMmyOs6bhTVvIJGdbvic6
- C0gnMj30a1edsdvTqqX5HC/EwzjWNs+91UD5YrU4fbEYwIRTwn4a7F0KGrtmqoCB0gk9 oQ== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 39sc8m2cu3-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 15 Jul 2021 06:48:22 -0400
-Received: from m0187473.ppops.net (m0187473.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 16FAZIr7095574;
-        Thu, 15 Jul 2021 06:48:22 -0400
-Received: from ppma03fra.de.ibm.com (6b.4a.5195.ip4.static.sl-reverse.com [149.81.74.107])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 39sc8m2ctc-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 15 Jul 2021 06:48:22 -0400
-Received: from pps.filterd (ppma03fra.de.ibm.com [127.0.0.1])
-        by ppma03fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 16FAlahE014044;
-        Thu, 15 Jul 2021 10:48:19 GMT
-Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
-        by ppma03fra.de.ibm.com with ESMTP id 39q36895wh-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 15 Jul 2021 10:48:19 +0000
-Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
-        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 16FAmGLP28246340
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 15 Jul 2021 10:48:16 GMT
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 177D6AE059;
-        Thu, 15 Jul 2021 10:48:16 +0000 (GMT)
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 98819AE070;
-        Thu, 15 Jul 2021 10:48:15 +0000 (GMT)
-Received: from oc3016276355.ibm.com (unknown [9.145.77.125])
-        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Thu, 15 Jul 2021 10:48:15 +0000 (GMT)
-Subject: Re: [PATCH v1 2/2] KVM: s390: Topology expose TOPOLOGY facility
-To:     David Hildenbrand <david@redhat.com>, kvm@vger.kernel.org
-Cc:     linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
-        borntraeger@de.ibm.com, frankja@linux.ibm.com, cohuck@redhat.com,
-        thuth@redhat.com, imbrenda@linux.ibm.com, hca@linux.ibm.com,
-        gor@linux.ibm.com
-References: <1626276343-22805-1-git-send-email-pmorel@linux.ibm.com>
- <1626276343-22805-3-git-send-email-pmorel@linux.ibm.com>
- <3a7836ad-f748-296e-cd1a-a10cbc570474@redhat.com>
-From:   Pierre Morel <pmorel@linux.ibm.com>
-Message-ID: <d0f4ac74-af7b-87ef-f451-bfa3ad90ad01@linux.ibm.com>
-Date:   Thu, 15 Jul 2021 12:48:15 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.11.0
-MIME-Version: 1.0
-In-Reply-To: <3a7836ad-f748-296e-cd1a-a10cbc570474@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: rIfUhqHvEZ2PmSvGgBLtE7jtLTSYW3HG
-X-Proofpoint-ORIG-GUID: 3H3nkTlfYU4CSM610bGfVQkbWNPFflsM
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.790
- definitions=2021-07-15_07:2021-07-14,2021-07-15 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 phishscore=0
- adultscore=0 lowpriorityscore=0 bulkscore=0 priorityscore=1501
- mlxlogscore=999 spamscore=0 suspectscore=0 impostorscore=0 clxscore=1015
- malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2104190000 definitions=main-2107150077
+        id S241712AbhGOKxA convert rfc822-to-8bit (ORCPT
+        <rfc822;lists+kvm@lfdr.de>); Thu, 15 Jul 2021 06:53:00 -0400
+Received: from mail.kernel.org ([198.145.29.99]:58456 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S232055AbhGOKw7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 15 Jul 2021 06:52:59 -0400
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 84B0961002;
+        Thu, 15 Jul 2021 10:50:06 +0000 (UTC)
+Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94.2)
+        (envelope-from <maz@kernel.org>)
+        id 1m3ywO-00DVgb-FB; Thu, 15 Jul 2021 11:50:04 +0100
+Date:   Thu, 15 Jul 2021 11:49:54 +0100
+Message-ID: <87o8b3kg19.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Qu Wenruo <wqu@suse.com>
+Cc:     Robin Murphy <robin.murphy@arm.com>, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org,
+        Linux ARM <linux-arm-kernel@lists.infradead.org>
+Subject: Re: Any way to disable KVM VHE extension?
+In-Reply-To: <0e992d47-1f17-d49f-8341-670770ac49ef@suse.com>
+References: <37f873cf-1b39-ea7f-a5e7-6feb0200dd4c@suse.com>
+        <e17449e7-b91d-d288-ff1c-e9451f9d1973@arm.com>
+        <0e992d47-1f17-d49f-8341-670770ac49ef@suse.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8BIT
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: wqu@suse.com, robin.murphy@arm.com, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-
-On 7/15/21 10:52 AM, David Hildenbrand wrote:
-> On 14.07.21 17:25, Pierre Morel wrote:
->> We add the KVM extension KVM_CAP_S390_CPU_TOPOLOGY, this will
->> allow the userland hypervisor to handle the interception of the
->> PTF (Perform topology Function) instruction.
-> 
-> Ehm, no you don't add any new capability. Or my eyes are too tired to 
-> spot it :)
-
-hum, yes, sorry, seems I kept my old commit message as I let fall the 
-capability after internal reviews.
-
-
-> 
->>
->> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
->> ---
->>   arch/s390/tools/gen_facilities.c | 1 +
->>   1 file changed, 1 insertion(+)
->>
->> diff --git a/arch/s390/tools/gen_facilities.c 
->> b/arch/s390/tools/gen_facilities.c
->> index 606324e56e4e..2c260eb22bae 100644
->> --- a/arch/s390/tools/gen_facilities.c
->> +++ b/arch/s390/tools/gen_facilities.c
->> @@ -112,6 +112,7 @@ static struct facility_def facility_defs[] = {
->>           .name = "FACILITIES_KVM_CPUMODEL",
->>           .bits = (int[]){
->> +            11, /* configuration topology facility */
->>               12, /* AP Query Configuration Information */
->>               15, /* AP Facilities Test */
->>               156, /* etoken facility */
->>
+On Thu, 15 Jul 2021 10:44:32 +0100,
+Qu Wenruo <wqu@suse.com> wrote:
 > 
 > 
+> 
+> On 2021/7/15 下午5:28, Robin Murphy wrote:
+> > On 2021-07-15 09:55, Qu Wenruo wrote:
+> >> Hi,
+> >> 
+> >> Recently I'm playing around the Nvidia Xavier AGX board, which has
+> >> VHE extension support.
+> >> 
+> >> In theory, considering the CPU and memory, it should be pretty
+> >> powerful compared to boards like RPI CM4.
+> >> 
+> >> But to my surprise, KVM runs pretty poor on Xavier.
+> >> 
+> >> Just booting the edk2 firmware could take over 10s, and 20s to
+> >> fully boot the kernel.
+> >> Even my VM on RPI CM4 has way faster boot time, even just running
+> >> on PCIE2.0 x1 lane NVME, and just 4 2.1Ghz A72 core.
+> >> 
+> >> This is definitely out of my expectation, I double checked to be
+> >> sure that it's running in KVM mode.
+> >> 
+> >> But further digging shows that, since Xavier AGX CPU supports VHE,
+> >> kvm is running in VHE mode other than HYP mode on CM4.
+> >> 
+> >> Is there anyway to manually disable VHE mode to test the more
+> >> common HYP mode on Xavier?
+> > 
+> > According to kernel-parameters.txt, "kvm-arm.mode=nvhe" (or its
+> > low-level equivalent "id_aa64mmfr1.vh=0") on the command line should
+> > do that.
+> 
+> Thanks for this one, I stupidly only searched modinfo of kvm, and
+> didn't even bother to search arch/arm64/kvm...
+> 
+> > 
+> > However I'd imagine the discrepancy is likely to be something more
+> > fundamental to the wildly different microarchitectures. There's
+> > certainly no harm in giving non-VHE a go for comparison, but I
+> > wouldn't be surprised if it turns out even slower...
+> 
+> You're totally right, with nvhe mode, it's still the same slow speed.
+
+My experience with Denver (Nvidia's previous core) is that it is
+horribly slow when running KVM. I guess that the JIT-like microarch
+fares poorly with exceptions and save-restore operations.
+
+> BTW, what did you mean by the "wildly different microarch"?
+> Is ARMv8.2 arch that different from ARMv8 of RPI4?
+> 
+> And any extra methods I could try to explore the reason of the slowness?
+> 
+> At least RPI CM4 is beyond my expectation and is working pretty fine.
+> 
+> Thanks,
+> Qu
+> 
+> > 
+> > Robin.
+> > 
+> >> BTW, this is the dmesg related to KVM on Xavier, running v5.13
+> >> upstream kernel, with 64K page size:
+> >> [    0.852357] kvm [1]: IPA Size Limit: 40 bits
+> >> [    0.857378] kvm [1]: vgic interrupt IRQ9
+> >> [    0.862122] kvm: pmu event creation failed -2
+
+And this isn't going to help finding out the bottleneck, as the kernel
+doesn't find a PMU. On Denver, once the PMU is enabled, profiling
+anything makes the whole thing even slower. At which point, I just
+parked the board and forgot about it.
+
+Thanks,
+
+	M.
 
 -- 
-Pierre Morel
-IBM Lab Boeblingen
+Without deviation from the norm, progress is not possible.
