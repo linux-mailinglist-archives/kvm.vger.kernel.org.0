@@ -2,25 +2,25 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9B0653CA260
-	for <lists+kvm@lfdr.de>; Thu, 15 Jul 2021 18:32:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3BFC03CA263
+	for <lists+kvm@lfdr.de>; Thu, 15 Jul 2021 18:32:27 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231695AbhGOQfN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 15 Jul 2021 12:35:13 -0400
-Received: from mail.kernel.org ([198.145.29.99]:43018 "EHLO mail.kernel.org"
+        id S231676AbhGOQfP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 15 Jul 2021 12:35:15 -0400
+Received: from mail.kernel.org ([198.145.29.99]:43046 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S231587AbhGOQfK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        id S231597AbhGOQfK (ORCPT <rfc822;kvm@vger.kernel.org>);
         Thu, 15 Jul 2021 12:35:10 -0400
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 5323B613D3;
+        by mail.kernel.org (Postfix) with ESMTPSA id AC41B613F9;
         Thu, 15 Jul 2021 16:32:17 +0000 (UTC)
 Received: from sofa.misterjones.org ([185.219.108.64] helo=why.lan)
         by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
         (Exim 4.94.2)
         (envelope-from <maz@kernel.org>)
-        id 1m44HX-00DYjr-OF; Thu, 15 Jul 2021 17:32:15 +0100
+        id 1m44HY-00DYjr-32; Thu, 15 Jul 2021 17:32:16 +0100
 From:   Marc Zyngier <maz@kernel.org>
 To:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
         kvm@vger.kernel.org, linux-kernel@vger.kernel.org
@@ -31,9 +31,9 @@ Cc:     will@kernel.org, qperret@google.com, dbrazdil@google.com,
         Suzuki K Poulose <suzuki.poulose@arm.com>,
         Alexandru Elisei <alexandru.elisei@arm.com>,
         kernel-team@android.com
-Subject: [PATCH 03/16] KVM: arm64: Turn kvm_pgtable_stage2_set_owner into kvm_pgtable_stage2_annotate
-Date:   Thu, 15 Jul 2021 17:31:46 +0100
-Message-Id: <20210715163159.1480168-4-maz@kernel.org>
+Subject: [PATCH 04/16] KVM: arm64: Add MMIO checking infrastructure
+Date:   Thu, 15 Jul 2021 17:31:47 +0100
+Message-Id: <20210715163159.1480168-5-maz@kernel.org>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20210715163159.1480168-1-maz@kernel.org>
 References: <20210715163159.1480168-1-maz@kernel.org>
@@ -47,159 +47,174 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-kvm_pgtable_stage2_set_owner() could be generalised into a way
-to store up to 63 bits in the page tables, as long as we don't
-set bit 0.
+Introduce the infrastructure required to identify an IPA region
+that is expected to be used as an MMIO window.
 
-Let's just do that.
+This include mapping, unmapping and checking the regions. Nothing
+calls into it yet, so no expected functional change.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/include/asm/kvm_pgtable.h  | 12 +++++++-----
- arch/arm64/kvm/hyp/nvhe/mem_protect.c | 14 ++++++++++++--
- arch/arm64/kvm/hyp/pgtable.c          | 20 ++++++--------------
- 3 files changed, 25 insertions(+), 21 deletions(-)
+ arch/arm64/include/asm/kvm_host.h |   2 +
+ arch/arm64/include/asm/kvm_mmu.h  |   5 ++
+ arch/arm64/kvm/mmu.c              | 115 ++++++++++++++++++++++++++++++
+ 3 files changed, 122 insertions(+)
 
-diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
-index f004c0115d89..9579e8c2793b 100644
---- a/arch/arm64/include/asm/kvm_pgtable.h
-+++ b/arch/arm64/include/asm/kvm_pgtable.h
-@@ -274,14 +274,16 @@ int kvm_pgtable_stage2_map(struct kvm_pgtable *pgt, u64 addr, u64 size,
- 			   void *mc);
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index 4add6c27251f..914c1b7bb3ad 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -125,6 +125,8 @@ struct kvm_arch {
+ #define KVM_ARCH_FLAG_RETURN_NISV_IO_ABORT_TO_USER	0
+ 	/* Memory Tagging Extension enabled for the guest */
+ #define KVM_ARCH_FLAG_MTE_ENABLED			1
++	/* Gues has bought into the MMIO guard extension */
++#define KVM_ARCH_FLAG_MMIO_GUARD			2
+ 	unsigned long flags;
  
- /**
-- * kvm_pgtable_stage2_set_owner() - Unmap and annotate pages in the IPA space to
-- *				    track ownership.
-+ * kvm_pgtable_stage2_annotate() - Unmap and annotate pages in the IPA space
-+ *				   to track ownership (and more).
-  * @pgt:	Page-table structure initialised by kvm_pgtable_stage2_init*().
-  * @addr:	Base intermediate physical address to annotate.
-  * @size:	Size of the annotated range.
-  * @mc:		Cache of pre-allocated and zeroed memory from which to allocate
-  *		page-table pages.
-- * @owner_id:	Unique identifier for the owner of the page.
-+ * @annotation:	A 63 bit value that will be stored in the page tables.
-+ *		@annotation[0] must be 0, and @annotation[63:1] is stored
-+ *		in the page tables. @annotation as a whole must not be 0.
-  *
-  * By default, all page-tables are owned by identifier 0. This function can be
-  * used to mark portions of the IPA space as owned by other entities. When a
-@@ -290,8 +292,8 @@ int kvm_pgtable_stage2_map(struct kvm_pgtable *pgt, u64 addr, u64 size,
-  *
-  * Return: 0 on success, negative error code on failure.
-  */
--int kvm_pgtable_stage2_set_owner(struct kvm_pgtable *pgt, u64 addr, u64 size,
--				 void *mc, u8 owner_id);
-+int kvm_pgtable_stage2_annotate(struct kvm_pgtable *pgt, u64 addr, u64 size,
-+				void *mc, kvm_pte_t annotation);
+ 	/*
+diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
+index b52c5c4b9a3d..f6b8fc1671b3 100644
+--- a/arch/arm64/include/asm/kvm_mmu.h
++++ b/arch/arm64/include/asm/kvm_mmu.h
+@@ -170,6 +170,11 @@ phys_addr_t kvm_mmu_get_httbr(void);
+ phys_addr_t kvm_get_idmap_vector(void);
+ int kvm_mmu_init(u32 *hyp_va_bits);
  
- /**
-  * kvm_pgtable_stage2_unmap() - Remove a mapping from a guest stage-2 page-table.
-diff --git a/arch/arm64/kvm/hyp/nvhe/mem_protect.c b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-index d938ce95d3bd..ffe482c3b818 100644
---- a/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-+++ b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-@@ -245,6 +245,15 @@ static int host_stage2_idmap(u64 addr)
- 	return ret;
++/* MMIO guard */
++bool kvm_install_ioguard_page(struct kvm_vcpu *vcpu, gpa_t ipa);
++bool kvm_remove_ioguard_page(struct kvm_vcpu *vcpu, gpa_t ipa);
++bool kvm_check_ioguard_page(struct kvm_vcpu *vcpu, gpa_t ipa);
++
+ static inline void *__kvm_vector_slot2addr(void *base,
+ 					   enum arm64_hyp_spectre_vector slot)
+ {
+diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+index 3155c9e778f0..638827c8842b 100644
+--- a/arch/arm64/kvm/mmu.c
++++ b/arch/arm64/kvm/mmu.c
+@@ -1120,6 +1120,121 @@ static void handle_access_fault(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa)
+ 		kvm_set_pfn_accessed(pte_pfn(pte));
  }
  
-+#define KVM_INVALID_PTE_OWNER_MASK	GENMASK(63, 56)
-+#define KVM_MAX_OWNER_ID		1
++#define MMIO_NOTE	('M' << 24 | 'M' << 16 | 'I' << 8 | '0')
 +
-+static kvm_pte_t kvm_init_invalid_leaf_owner(u8 owner_id)
++bool kvm_install_ioguard_page(struct kvm_vcpu *vcpu, gpa_t ipa)
 +{
-+	BUG_ON(owner_id > KVM_MAX_OWNER_ID);
-+	return FIELD_PREP(KVM_INVALID_PTE_OWNER_MASK, owner_id);
++	struct kvm_mmu_memory_cache *memcache;
++	struct kvm_memory_slot *memslot;
++	int ret, idx;
++
++	if (!test_bit(KVM_ARCH_FLAG_MMIO_GUARD, &vcpu->kvm->arch.flags))
++		return false;
++
++	/* Must be page-aligned */
++	if (ipa & ~PAGE_MASK)
++		return false;
++
++	/*
++	 * The page cannot be in a memslot. At some point, this will
++	 * have to deal with device mappings though.
++	 */
++	idx = srcu_read_lock(&vcpu->kvm->srcu);
++	memslot = gfn_to_memslot(vcpu->kvm, ipa >> PAGE_SHIFT);
++	srcu_read_unlock(&vcpu->kvm->srcu, idx);
++
++	if (memslot)
++		return false;
++
++	/* Guest has direct access to the GICv2 virtual CPU interface */
++	if (irqchip_in_kernel(vcpu->kvm) &&
++	    vcpu->kvm->arch.vgic.vgic_model == KVM_DEV_TYPE_ARM_VGIC_V2 &&
++	    ipa == vcpu->kvm->arch.vgic.vgic_cpu_base)
++		return true;
++
++	memcache = &vcpu->arch.mmu_page_cache;
++	if (kvm_mmu_topup_memory_cache(memcache,
++				       kvm_mmu_cache_min_pages(vcpu->kvm)))
++		return false;
++
++	spin_lock(&vcpu->kvm->mmu_lock);
++	ret = kvm_pgtable_stage2_annotate(vcpu->arch.hw_mmu->pgt,
++					  ipa, PAGE_SIZE, memcache,
++					  MMIO_NOTE);
++	spin_unlock(&vcpu->kvm->mmu_lock);
++
++	return ret == 0;
 +}
 +
- int __pkvm_mark_hyp(phys_addr_t start, phys_addr_t end)
- {
- 	int ret;
-@@ -257,8 +266,9 @@ int __pkvm_mark_hyp(phys_addr_t start, phys_addr_t end)
- 		return -EINVAL;
- 
- 	hyp_spin_lock(&host_kvm.lock);
--	ret = kvm_pgtable_stage2_set_owner(&host_kvm.pgt, start, end - start,
--					   &host_s2_pool, pkvm_hyp_id);
-+	ret = kvm_pgtable_stage2_annotate(&host_kvm.pgt, start, end - start,
-+					  &host_s2_pool,
-+					  kvm_init_invalid_leaf_owner(pkvm_hyp_id));
- 	hyp_spin_unlock(&host_kvm.lock);
- 
- 	return ret != -EAGAIN ? ret : 0;
-diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
-index a5874ebd0354..a065f6d960af 100644
---- a/arch/arm64/kvm/hyp/pgtable.c
-+++ b/arch/arm64/kvm/hyp/pgtable.c
-@@ -50,9 +50,6 @@
- 
- #define KVM_PTE_LEAF_ATTR_S2_IGNORED	GENMASK(58, 55)
- 
--#define KVM_INVALID_PTE_OWNER_MASK	GENMASK(63, 56)
--#define KVM_MAX_OWNER_ID		1
--
- struct kvm_pgtable_walk_data {
- 	struct kvm_pgtable		*pgt;
- 	struct kvm_pgtable_walker	*walker;
-@@ -206,11 +203,6 @@ static kvm_pte_t kvm_init_valid_leaf_pte(u64 pa, kvm_pte_t attr, u32 level)
- 	return pte;
- }
- 
--static kvm_pte_t kvm_init_invalid_leaf_owner(u8 owner_id)
--{
--	return FIELD_PREP(KVM_INVALID_PTE_OWNER_MASK, owner_id);
--}
--
- static int kvm_pgtable_visitor_cb(struct kvm_pgtable_walk_data *data, u64 addr,
- 				  u32 level, kvm_pte_t *ptep,
- 				  enum kvm_pgtable_walk_flags flag)
-@@ -466,7 +458,7 @@ void kvm_pgtable_hyp_destroy(struct kvm_pgtable *pgt)
- struct stage2_map_data {
- 	u64				phys;
- 	kvm_pte_t			attr;
--	u8				owner_id;
-+	u64				annotation;
- 
- 	kvm_pte_t			*anchor;
- 	kvm_pte_t			*childp;
-@@ -603,7 +595,7 @@ static int stage2_map_walker_try_leaf(u64 addr, u64 end, u32 level,
- 	if (kvm_phys_is_valid(phys))
- 		new = kvm_init_valid_leaf_pte(phys, data->attr, level);
- 	else
--		new = kvm_init_invalid_leaf_owner(data->owner_id);
-+		new = data->annotation;
- 
- 	if (stage2_pte_is_counted(old)) {
- 		/*
-@@ -796,8 +788,8 @@ int kvm_pgtable_stage2_map(struct kvm_pgtable *pgt, u64 addr, u64 size,
- 	return ret;
- }
- 
--int kvm_pgtable_stage2_set_owner(struct kvm_pgtable *pgt, u64 addr, u64 size,
--				 void *mc, u8 owner_id)
-+int kvm_pgtable_stage2_annotate(struct kvm_pgtable *pgt, u64 addr, u64 size,
-+				void *mc, kvm_pte_t annotation)
- {
- 	int ret;
- 	struct stage2_map_data map_data = {
-@@ -805,7 +797,7 @@ int kvm_pgtable_stage2_set_owner(struct kvm_pgtable *pgt, u64 addr, u64 size,
- 		.mmu		= pgt->mmu,
- 		.memcache	= mc,
- 		.mm_ops		= pgt->mm_ops,
--		.owner_id	= owner_id,
-+		.annotation	= annotation,
- 	};
- 	struct kvm_pgtable_walker walker = {
- 		.cb		= stage2_map_walker,
-@@ -815,7 +807,7 @@ int kvm_pgtable_stage2_set_owner(struct kvm_pgtable *pgt, u64 addr, u64 size,
- 		.arg		= &map_data,
- 	};
- 
--	if (owner_id > KVM_MAX_OWNER_ID)
-+	if (!annotation || (annotation & PTE_VALID))
- 		return -EINVAL;
- 
- 	ret = kvm_pgtable_walk(pgt, addr, size, &walker);
++struct s2_walk_data {
++	kvm_pte_t	pteval;
++	u32		level;
++};
++
++static int s2_walker(u64 addr, u64 end, u32 level, kvm_pte_t *ptep,
++		     enum kvm_pgtable_walk_flags flag, void * const arg)
++{
++	struct s2_walk_data *data = arg;
++
++	data->level = level;
++	data->pteval = *ptep;
++	return 0;
++}
++
++/* Assumes mmu_lock taken */
++static bool __check_ioguard_page(struct kvm_vcpu *vcpu, gpa_t ipa)
++{
++	struct s2_walk_data data;
++	struct kvm_pgtable_walker walker = {
++		.cb             = s2_walker,
++		.flags          = KVM_PGTABLE_WALK_LEAF,
++		.arg            = &data,
++	};
++
++	kvm_pgtable_walk(vcpu->arch.hw_mmu->pgt, ALIGN_DOWN(ipa, PAGE_SIZE),
++			 PAGE_SIZE, &walker);
++
++	/* Must be a PAGE_SIZE mapping with our annotation */
++	return (BIT(ARM64_HW_PGTABLE_LEVEL_SHIFT(data.level)) == PAGE_SIZE &&
++		data.pteval == MMIO_NOTE);
++}
++
++bool kvm_remove_ioguard_page(struct kvm_vcpu *vcpu, gpa_t ipa)
++{
++	bool ret;
++
++	if (!test_bit(KVM_ARCH_FLAG_MMIO_GUARD, &vcpu->kvm->arch.flags))
++		return false;
++
++	/* Keep the PT locked across the two walks */
++	spin_lock(&vcpu->kvm->mmu_lock);
++
++	ret = __check_ioguard_page(vcpu, ipa);
++	if (ret)		/* Drop the annotation */
++		kvm_pgtable_stage2_unmap(vcpu->arch.hw_mmu->pgt,
++					 ALIGN_DOWN(ipa, PAGE_SIZE), PAGE_SIZE);
++
++	spin_unlock(&vcpu->kvm->mmu_lock);
++	return ret;
++}
++
++bool kvm_check_ioguard_page(struct kvm_vcpu *vcpu, gpa_t ipa)
++{
++	bool ret;
++
++	if (!test_bit(KVM_ARCH_FLAG_MMIO_GUARD, &vcpu->kvm->arch.flags))
++		return true;
++
++	spin_lock(&vcpu->kvm->mmu_lock);
++	ret = __check_ioguard_page(vcpu, ipa & PAGE_MASK);
++	spin_unlock(&vcpu->kvm->mmu_lock);
++
++	if (!ret)
++		kvm_inject_dabt(vcpu, kvm_vcpu_get_hfar(vcpu));
++
++	return ret;
++}
++
+ /**
+  * kvm_handle_guest_abort - handles all 2nd stage aborts
+  * @vcpu:	the VCPU pointer
 -- 
 2.30.2
 
