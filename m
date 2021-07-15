@@ -2,159 +2,102 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1FCD83C95DB
-	for <lists+kvm@lfdr.de>; Thu, 15 Jul 2021 04:21:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DA8DE3C966F
+	for <lists+kvm@lfdr.de>; Thu, 15 Jul 2021 05:20:52 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234847AbhGOCXr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 14 Jul 2021 22:23:47 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:35343 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231165AbhGOCXq (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 14 Jul 2021 22:23:46 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1626315653;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=qIMPem89MDX9CyRymEODASuBwQsPbelIeY3DhbvC9/k=;
-        b=DcXIrls6kUOSzah4+A5t5FUO7Cdsj42KYlPmndz+pIQ1IfGKcKkStoNGmQbkiY94DIUGOi
-        okL6e1sRJNyvHkBUPm5kKK1VP3zEC5d1VwJcXZVdCnkQdQ0pphvmvZR29cHWYdnz06Bsi3
-        0tcdpk9eIz3NhYQJvpME/Vg0W10lrN4=
-Received: from mail-pj1-f70.google.com (mail-pj1-f70.google.com
- [209.85.216.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-362-wKWCINo_N3uzKvMlhT77Dg-1; Wed, 14 Jul 2021 22:20:52 -0400
-X-MC-Unique: wKWCINo_N3uzKvMlhT77Dg-1
-Received: by mail-pj1-f70.google.com with SMTP id z5-20020a17090a7b85b0290173d3902d78so2621273pjc.9
-        for <kvm@vger.kernel.org>; Wed, 14 Jul 2021 19:20:52 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-transfer-encoding
-         :content-language;
-        bh=qIMPem89MDX9CyRymEODASuBwQsPbelIeY3DhbvC9/k=;
-        b=sK4uzveXZmd5oDFiWjOd7Okg0/tkiZHh409x1mdKnevVZWmrRVreYvokNK8K287nC5
-         mBbeaBIQZuNAItyCIe7Kf9XIcZ2nWcNbbl3RAtFOwtQfk3S/9W2U6b3r2LVyel/gssBc
-         K5rB+EQfH1ZwQT0zjFa3Ve5SX8PAkn5EQ4fWsGHysj5qHe/VCTYUtdL0zo/LMV0E4j5m
-         uUPGI652xcptcx/8vYOk4dqKDlfm7ybOp0vLnyolqg8TXs4cHInQP1AguHfBAAJmKUsG
-         f975eO9tK+RnVVftxTh6VK6jw3FcoQs4vJ+glG4Ei3IvV7BcaqVQY0nt3XzzIFxjGaxj
-         Vn7Q==
-X-Gm-Message-State: AOAM532jErBSlldMynqdXfG36JoLuiHOqixL5VA5qxu8gegS7llC337Y
-        oUYbT4pB5TOwyQt7wMTu3kbkbOfNadnYIsXTO5RUliBFEBDFZVdMkWQaiZ5agzQuhBzRWusW2z+
-        /SzJKV4M9m80I
-X-Received: by 2002:a17:90a:1941:: with SMTP id 1mr7021895pjh.217.1626315650958;
-        Wed, 14 Jul 2021 19:20:50 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJybOsI3CmBYlnZZGHyBp8j1KVybpeIfAQjdQVC6tPCV/HtNWu2hK14gevvyKrFs/xFGbLJ7PQ==
-X-Received: by 2002:a17:90a:1941:: with SMTP id 1mr7021834pjh.217.1626315650579;
-        Wed, 14 Jul 2021 19:20:50 -0700 (PDT)
-Received: from wangxiaodeMacBook-Air.local ([209.132.188.80])
-        by smtp.gmail.com with ESMTPSA id p3sm7097812pjt.0.2021.07.14.19.20.42
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 14 Jul 2021 19:20:50 -0700 (PDT)
-Subject: Re: [PATCH v9 13/17] vdpa: factor out vhost_vdpa_pa_map() and
- vhost_vdpa_pa_unmap()
-To:     Dan Carpenter <dan.carpenter@oracle.com>
-Cc:     Xie Yongji <xieyongji@bytedance.com>, mst@redhat.com,
-        stefanha@redhat.com, sgarzare@redhat.com, parav@nvidia.com,
-        hch@infradead.org, christian.brauner@canonical.com,
-        rdunlap@infradead.org, willy@infradead.org,
-        viro@zeniv.linux.org.uk, axboe@kernel.dk, bcrl@kvack.org,
-        corbet@lwn.net, mika.penttila@nextfour.com, joro@8bytes.org,
-        gregkh@linuxfoundation.org, zhe.he@windriver.com,
-        xiaodong.liu@intel.com, songmuchun@bytedance.com,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        kvm@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        iommu@lists.linux-foundation.org, linux-kernel@vger.kernel.org
-References: <20210713084656.232-1-xieyongji@bytedance.com>
- <20210713084656.232-14-xieyongji@bytedance.com> <20210713113114.GL1954@kadam>
- <20e75b53-0dce-2f2d-b717-f78553bddcd8@redhat.com>
- <20210714080512.GW1954@kadam>
- <db02315d-0ffe-f4a2-da67-5a014060fa4a@redhat.com>
- <20210714095722.GC25548@kadam>
-From:   Jason Wang <jasowang@redhat.com>
-Message-ID: <96f66296-2071-c321-96d7-882070261eb6@redhat.com>
-Date:   Thu, 15 Jul 2021 10:20:40 +0800
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0)
- Gecko/20100101 Thunderbird/78.11.0
+        id S232589AbhGODXl (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 14 Jul 2021 23:23:41 -0400
+Received: from szxga02-in.huawei.com ([45.249.212.188]:6931 "EHLO
+        szxga02-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230495AbhGODXk (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 14 Jul 2021 23:23:40 -0400
+Received: from dggemv703-chm.china.huawei.com (unknown [172.30.72.56])
+        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4GQKKz5SXlz7tWX;
+        Thu, 15 Jul 2021 11:17:11 +0800 (CST)
+Received: from dggpemm500022.china.huawei.com (7.185.36.162) by
+ dggemv703-chm.china.huawei.com (10.3.19.46) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2176.2; Thu, 15 Jul 2021 11:20:44 +0800
+Received: from [10.174.185.67] (10.174.185.67) by
+ dggpemm500022.china.huawei.com (7.185.36.162) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2176.2; Thu, 15 Jul 2021 11:20:43 +0800
+Subject: Re: [RFC v2] /dev/iommu uAPI proposal
+To:     "Tian, Kevin" <kevin.tian@intel.com>
+CC:     Jason Gunthorpe <jgg@nvidia.com>,
+        "Alex Williamson (alex.williamson@redhat.com)" 
+        <alex.williamson@redhat.com>,
+        "Jean-Philippe Brucker" <jean-philippe@linaro.org>,
+        David Gibson <david@gibson.dropbear.id.au>,
+        Jason Wang <jasowang@redhat.com>,
+        "parav@mellanox.com" <parav@mellanox.com>,
+        "Enrico Weigelt, metux IT consult" <lkml@metux.net>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Eric Auger <eric.auger@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        "Raj, Ashok" <ashok.raj@intel.com>,
+        "Liu, Yi L" <yi.l.liu@intel.com>, "Wu, Hao" <hao.wu@intel.com>,
+        "Jiang, Dave" <dave.jiang@intel.com>,
+        Jacob Pan <jacob.jun.pan@linux.intel.com>,
+        "Kirti Wankhede" <kwankhede@nvidia.com>,
+        Robin Murphy <robin.murphy@arm.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
+        "David Woodhouse" <dwmw2@infradead.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        "Lu Baolu" <baolu.lu@linux.intel.com>,
+        "wanghaibin.wang@huawei.com" <wanghaibin.wang@huawei.com>
+References: <BN9PR11MB5433B1E4AE5B0480369F97178C189@BN9PR11MB5433.namprd11.prod.outlook.com>
+From:   Shenming Lu <lushenming@huawei.com>
+Message-ID: <7ea349f8-8c53-e240-fe80-382954ba7f28@huawei.com>
+Date:   Thu, 15 Jul 2021 11:20:34 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.2.2
 MIME-Version: 1.0
-In-Reply-To: <20210714095722.GC25548@kadam>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <BN9PR11MB5433B1E4AE5B0480369F97178C189@BN9PR11MB5433.namprd11.prod.outlook.com>
+Content-Type: text/plain; charset="utf-8"
 Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-Originating-IP: [10.174.185.67]
+X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
+ dggpemm500022.china.huawei.com (7.185.36.162)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On 2021/7/9 15:48, Tian, Kevin wrote:
+> 4.6. I/O page fault
+> +++++++++++++++++++
+> 
+> uAPI is TBD. Here is just about the high-level flow from host IOMMU driver
+> to guest IOMMU driver and backwards. This flow assumes that I/O page faults
+> are reported via IOMMU interrupts. Some devices report faults via device
+> specific way instead of going through the IOMMU. That usage is not covered
+> here:
+> 
+> -   Host IOMMU driver receives a I/O page fault with raw fault_data {rid, 
+>     pasid, addr};
+> 
+> -   Host IOMMU driver identifies the faulting I/O page table according to
+>     {rid, pasid} and calls the corresponding fault handler with an opaque
+>     object (registered by the handler) and raw fault_data (rid, pasid, addr);
+> 
+> -   IOASID fault handler identifies the corresponding ioasid and device 
+>     cookie according to the opaque object, generates an user fault_data 
+>     (ioasid, cookie, addr) in the fault region, and triggers eventfd to 
+>     userspace;
+> 
 
-在 2021/7/14 下午5:57, Dan Carpenter 写道:
-> On Wed, Jul 14, 2021 at 05:41:54PM +0800, Jason Wang wrote:
->> 在 2021/7/14 下午4:05, Dan Carpenter 写道:
->>> On Wed, Jul 14, 2021 at 10:14:32AM +0800, Jason Wang wrote:
->>>> 在 2021/7/13 下午7:31, Dan Carpenter 写道:
->>>>> On Tue, Jul 13, 2021 at 04:46:52PM +0800, Xie Yongji wrote:
->>>>>> @@ -613,37 +618,28 @@ static void vhost_vdpa_unmap(struct vhost_vdpa *v, u64 iova, u64 size)
->>>>>>     	}
->>>>>>     }
->>>>>> -static int vhost_vdpa_process_iotlb_update(struct vhost_vdpa *v,
->>>>>> -					   struct vhost_iotlb_msg *msg)
->>>>>> +static int vhost_vdpa_pa_map(struct vhost_vdpa *v,
->>>>>> +			     u64 iova, u64 size, u64 uaddr, u32 perm)
->>>>>>     {
->>>>>>     	struct vhost_dev *dev = &v->vdev;
->>>>>> -	struct vhost_iotlb *iotlb = dev->iotlb;
->>>>>>     	struct page **page_list;
->>>>>>     	unsigned long list_size = PAGE_SIZE / sizeof(struct page *);
->>>>>>     	unsigned int gup_flags = FOLL_LONGTERM;
->>>>>>     	unsigned long npages, cur_base, map_pfn, last_pfn = 0;
->>>>>>     	unsigned long lock_limit, sz2pin, nchunks, i;
->>>>>> -	u64 iova = msg->iova;
->>>>>> +	u64 start = iova;
->>>>>>     	long pinned;
->>>>>>     	int ret = 0;
->>>>>> -	if (msg->iova < v->range.first ||
->>>>>> -	    msg->iova + msg->size - 1 > v->range.last)
->>>>>> -		return -EINVAL;
->>>>> This is not related to your patch, but can the "msg->iova + msg->size"
->>>>> addition can have an integer overflow.  From looking at the callers it
->>>>> seems like it can.  msg comes from:
->>>>>      vhost_chr_write_iter()
->>>>>      --> dev->msg_handler(dev, &msg);
->>>>>          --> vhost_vdpa_process_iotlb_msg()
->>>>>             --> vhost_vdpa_process_iotlb_update()
->>>> Yes.
->>>>
->>>>
->>>>> If I'm thinking of the right thing then these are allowed to overflow to
->>>>> 0 because of the " - 1" but not further than that.  I believe the check
->>>>> needs to be something like:
->>>>>
->>>>> 	if (msg->iova < v->range.first ||
->>>>> 	    msg->iova - 1 > U64_MAX - msg->size ||
->>>> I guess we don't need - 1 here?
->>> The - 1 is important.  The highest address is 0xffffffff.  So it goes
->>> start + size = 0 and then start + size - 1 == 0xffffffff.
->>
->> Right, so actually
->>
->> msg->iova = 0xfffffffe, msg->size=2 is valid.
-> I believe so, yes.  It's inclusive of 0xfffffffe and 0xffffffff.
-> (Not an expert).
+Hi, I have some doubts here:
 
+For mdev, it seems that the rid in the raw fault_data is the parent device's,
+then in the vSVA scenario, how can we get to know the mdev(cookie) from the
+rid and pasid?
 
-I think so, and we probably need to fix vhost_overflow() as well which did:
+And from this point of view，would it be better to register the mdev
+(iommu_register_device()) with the parent device info?
 
-static bool vhost_overflow(u64 uaddr, u64 size)
-{
-         /* Make sure 64 bit math will not overflow. */
-         return uaddr > ULONG_MAX || size > ULONG_MAX || uaddr > 
-ULONG_MAX - size;
-}
-
-Thanks
-
-
->
-> regards,
-> dan carpenter
->
-
+Thanks,
+Shenming
