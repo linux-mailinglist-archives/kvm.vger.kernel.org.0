@@ -2,101 +2,129 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8628E3C9D09
-	for <lists+kvm@lfdr.de>; Thu, 15 Jul 2021 12:45:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id AE1053C9D3A
+	for <lists+kvm@lfdr.de>; Thu, 15 Jul 2021 12:48:24 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241594AbhGOKsL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 15 Jul 2021 06:48:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58014 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229973AbhGOKsK (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 15 Jul 2021 06:48:10 -0400
-Received: from mail-pj1-x1034.google.com (mail-pj1-x1034.google.com [IPv6:2607:f8b0:4864:20::1034])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 54AA8C06175F;
-        Thu, 15 Jul 2021 03:45:16 -0700 (PDT)
-Received: by mail-pj1-x1034.google.com with SMTP id me13-20020a17090b17cdb0290173bac8b9c9so5913955pjb.3;
-        Thu, 15 Jul 2021 03:45:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=IHBjkWgqS/NOdM7d9Jyx0y5kUtcIn0jIJPI+JSBGKAE=;
-        b=rJNcvfxjnwtlwcC9UEJcg6LDpoLcuMLdztJerSbCVAeqHTiE+kG5tlKWkMInUTH2O9
-         jumVZu0ljDnnKh1Vn3dIW8q4TgD0ClmOcGOVmQBILDmulaSnK+M5vRGhOBY0D6rRRihI
-         O4Es3+Q1VPYnEEpS5hkkyPmypJ1KnFkZjxU3DOYPJoS0zlOeiChN0iq+crFmD3ZzvSy0
-         nHe4JyEfrYYydh0s3DIGB/+Nmap3aK8zGfWgv1vdPRbDnTdMT5UW3qEnXihuFeWCbOES
-         w8TdqsJ9x5QmJzDe7LmhS3HaE5rGUnkvqVpgS8RcIS5gOYs5Jwe6XyN5kRgA1zt7QOJ6
-         e9gw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=IHBjkWgqS/NOdM7d9Jyx0y5kUtcIn0jIJPI+JSBGKAE=;
-        b=KAUN/J8/qszK5g5cVpQ3L3Ug5zDmYm/JDNLN8LX7bR7xuPVCYGrMpVyjC53AEx5Vap
-         1rAYboQfZhYXR+Xi1ElrJWpIdn+9ck/6++YDQQQIOsJA3lBAkZGNmr3lrD8oYms/Q7Bg
-         JlQnREEWC0mSHWHQvKiwPL/z1pUOU4jz7z0RLrpHcwCqnhTkkS8Iuub25OdWsXcrn/rA
-         puMFIT3gW13QpE6rrsfLmZPk7Y6jsFnMUunovF7/cmV8mzzj70xUO9rBEZhYnACRKurB
-         ngniWpNNWHeTpDgJyUK+aQU02lA5SOdLMdbM3skDB5DsDXjJ1B248RpV/7cBVzsf+2Gw
-         Aotg==
-X-Gm-Message-State: AOAM531a3Z7KWv5RuXHsphG2qRJTVtEzIORahJBpdQa8v9KkYaEn87nf
-        A5Vu+7cqiifBT3tXiIHQ3hE=
-X-Google-Smtp-Source: ABdhPJztWtQgx3wKN8L+Bpy2CdMFj40VEP2AkLDCRuLvPAR9WGstnpFlEcctcGW8gIPXwoSOoMg4dQ==
-X-Received: by 2002:a17:90a:b795:: with SMTP id m21mr3624401pjr.143.1626345915877;
-        Thu, 15 Jul 2021 03:45:15 -0700 (PDT)
-Received: from localhost.localdomain ([103.7.29.32])
-        by smtp.gmail.com with ESMTPSA id f4sm6704452pgs.3.2021.07.15.03.45.13
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 15 Jul 2021 03:45:15 -0700 (PDT)
-From:   Like Xu <like.xu.linux@gmail.com>
-X-Google-Original-From: Like Xu <likexu@tencent.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>, Joerg Roedel <joro@8bytes.org>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>, x86@kernel.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Subject: [PATCH] KVM: x86/cpuid: Expose the true number of available ASIDs
-Date:   Thu, 15 Jul 2021 18:45:05 +0800
-Message-Id: <20210715104505.96220-1-likexu@tencent.com>
-X-Mailer: git-send-email 2.32.0
+        id S241684AbhGOKvQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 15 Jul 2021 06:51:16 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:28528 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S232055AbhGOKvP (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 15 Jul 2021 06:51:15 -0400
+Received: from pps.filterd (m0187473.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 16FAXwl0090894;
+        Thu, 15 Jul 2021 06:48:22 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=ajXHLHDEBxtcysRI+JtyCQLk+dpnXZmt4tX8qjYsO6E=;
+ b=Ov8h1iIYScH6ysIFJulNnX5jTffQCUIIMeJwl6PZa/Z/FMEKCyMjoYV54/QkXw2uDL7e
+ tqBElkxjC3hKo3bLpFui8I98VBgembnW9DWUA5lKNom6JIibNX6eMOAPLRpl9K53TCGv
+ OKXm/3vys0X+YU+S9pKj5vbPJCa4S5uZiwep0vQrMFrtfPXaVE526sYkCoDYcT17IpSX
+ PX8q70PLTQQX3iGtsuAw6KNCx1PYitlHI231tqYugqiX5NqEMmyOs6bhTVvIJGdbvic6
+ C0gnMj30a1edsdvTqqX5HC/EwzjWNs+91UD5YrU4fbEYwIRTwn4a7F0KGrtmqoCB0gk9 oQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 39sc8m2cu3-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 15 Jul 2021 06:48:22 -0400
+Received: from m0187473.ppops.net (m0187473.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 16FAZIr7095574;
+        Thu, 15 Jul 2021 06:48:22 -0400
+Received: from ppma03fra.de.ibm.com (6b.4a.5195.ip4.static.sl-reverse.com [149.81.74.107])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 39sc8m2ctc-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 15 Jul 2021 06:48:22 -0400
+Received: from pps.filterd (ppma03fra.de.ibm.com [127.0.0.1])
+        by ppma03fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 16FAlahE014044;
+        Thu, 15 Jul 2021 10:48:19 GMT
+Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
+        by ppma03fra.de.ibm.com with ESMTP id 39q36895wh-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 15 Jul 2021 10:48:19 +0000
+Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
+        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 16FAmGLP28246340
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 15 Jul 2021 10:48:16 GMT
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 177D6AE059;
+        Thu, 15 Jul 2021 10:48:16 +0000 (GMT)
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 98819AE070;
+        Thu, 15 Jul 2021 10:48:15 +0000 (GMT)
+Received: from oc3016276355.ibm.com (unknown [9.145.77.125])
+        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Thu, 15 Jul 2021 10:48:15 +0000 (GMT)
+Subject: Re: [PATCH v1 2/2] KVM: s390: Topology expose TOPOLOGY facility
+To:     David Hildenbrand <david@redhat.com>, kvm@vger.kernel.org
+Cc:     linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
+        borntraeger@de.ibm.com, frankja@linux.ibm.com, cohuck@redhat.com,
+        thuth@redhat.com, imbrenda@linux.ibm.com, hca@linux.ibm.com,
+        gor@linux.ibm.com
+References: <1626276343-22805-1-git-send-email-pmorel@linux.ibm.com>
+ <1626276343-22805-3-git-send-email-pmorel@linux.ibm.com>
+ <3a7836ad-f748-296e-cd1a-a10cbc570474@redhat.com>
+From:   Pierre Morel <pmorel@linux.ibm.com>
+Message-ID: <d0f4ac74-af7b-87ef-f451-bfa3ad90ad01@linux.ibm.com>
+Date:   Thu, 15 Jul 2021 12:48:15 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.11.0
 MIME-Version: 1.0
+In-Reply-To: <3a7836ad-f748-296e-cd1a-a10cbc570474@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: rIfUhqHvEZ2PmSvGgBLtE7jtLTSYW3HG
+X-Proofpoint-ORIG-GUID: 3H3nkTlfYU4CSM610bGfVQkbWNPFflsM
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.790
+ definitions=2021-07-15_07:2021-07-14,2021-07-15 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 phishscore=0
+ adultscore=0 lowpriorityscore=0 bulkscore=0 priorityscore=1501
+ mlxlogscore=999 spamscore=0 suspectscore=0 impostorscore=0 clxscore=1015
+ malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2104190000 definitions=main-2107150077
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Like Xu <likexu@tencent.com>
 
-The original fixed number "8" was first introduced 11 years ago. Time has
-passed and now let KVM report the true number of address space identifiers
-(ASIDs) that are supported by the processor returned in Fn8000_000A_EBX.
 
-It helps user-space to make better decisions about guest values.
+On 7/15/21 10:52 AM, David Hildenbrand wrote:
+> On 14.07.21 17:25, Pierre Morel wrote:
+>> We add the KVM extension KVM_CAP_S390_CPU_TOPOLOGY, this will
+>> allow the userland hypervisor to handle the interception of the
+>> PTF (Perform topology Function) instruction.
+> 
+> Ehm, no you don't add any new capability. Or my eyes are too tired to 
+> spot it :)
 
-Fixes: c2c63a493924 ("KVM: SVM: Report emulated SVM features to userspace")
-Signed-off-by: Like Xu <likexu@tencent.com>
----
- arch/x86/kvm/cpuid.c | 7 +++++--
- 1 file changed, 5 insertions(+), 2 deletions(-)
+hum, yes, sorry, seems I kept my old commit message as I let fall the 
+capability after internal reviews.
 
-diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-index 739be5da3bca..133827704fd3 100644
---- a/arch/x86/kvm/cpuid.c
-+++ b/arch/x86/kvm/cpuid.c
-@@ -967,8 +967,11 @@ static inline int __do_cpuid_func(struct kvm_cpuid_array *array, u32 function)
- 			break;
- 		}
- 		entry->eax = 1; /* SVM revision 1 */
--		entry->ebx = 8; /* Lets support 8 ASIDs in case we add proper
--				   ASID emulation to nested SVM */
-+		/*
-+		 * Let's support at least 8 ASIDs in case we
-+		 * add proper ASID emulation to nested SVM.
-+		 */
-+		entry->ebx = max_t(unsigned int, 8, entry->ebx);
- 		entry->ecx = 0; /* Reserved */
- 		cpuid_entry_override(entry, CPUID_8000_000A_EDX);
- 		break;
+
+> 
+>>
+>> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
+>> ---
+>>   arch/s390/tools/gen_facilities.c | 1 +
+>>   1 file changed, 1 insertion(+)
+>>
+>> diff --git a/arch/s390/tools/gen_facilities.c 
+>> b/arch/s390/tools/gen_facilities.c
+>> index 606324e56e4e..2c260eb22bae 100644
+>> --- a/arch/s390/tools/gen_facilities.c
+>> +++ b/arch/s390/tools/gen_facilities.c
+>> @@ -112,6 +112,7 @@ static struct facility_def facility_defs[] = {
+>>           .name = "FACILITIES_KVM_CPUMODEL",
+>>           .bits = (int[]){
+>> +            11, /* configuration topology facility */
+>>               12, /* AP Query Configuration Information */
+>>               15, /* AP Facilities Test */
+>>               156, /* etoken facility */
+>>
+> 
+> 
+
 -- 
-2.32.0
-
+Pierre Morel
+IBM Lab Boeblingen
