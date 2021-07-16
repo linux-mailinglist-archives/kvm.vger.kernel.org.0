@@ -2,90 +2,109 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A751B3CB37B
-	for <lists+kvm@lfdr.de>; Fri, 16 Jul 2021 09:46:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 43EDC3CB485
+	for <lists+kvm@lfdr.de>; Fri, 16 Jul 2021 10:43:34 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235671AbhGPHtS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 16 Jul 2021 03:49:18 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:60861 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S236765AbhGPHtQ (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 16 Jul 2021 03:49:16 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1626421582;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=pjmFcds/WV8dhcYGpd0lRbK9Jq1LDuZxIF1yKejxoxk=;
-        b=NYGaNyIH7kUdhxWiVvC+Wb60BLh5aLtwGls9E2GN6CYcUqdlCPLE5swrXCmVYcZzO2+la4
-        /DY07gbnDlXDhTT+XmY6rJVyjdn9UFvXvPuFbuYcPXJ2PyH+oOTGaEs0YdlWQY2fQ69pc2
-        uTnqj6wvMCjFAlkwMzsMKR5Km44Yu7A=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-481-GJjTJkMrPlmJehhbE42pnA-1; Fri, 16 Jul 2021 03:46:20 -0400
-X-MC-Unique: GJjTJkMrPlmJehhbE42pnA-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7EED9804142
-        for <kvm@vger.kernel.org>; Fri, 16 Jul 2021 07:46:19 +0000 (UTC)
-Received: from thuth.com (ovpn-112-45.ams2.redhat.com [10.36.112.45])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 885EF5C1A1;
-        Fri, 16 Jul 2021 07:46:18 +0000 (UTC)
-From:   Thomas Huth <thuth@redhat.com>
-To:     kvm@vger.kernel.org
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Andrew Jones <drjones@redhat.com>
-Subject: [kvm-unit-tests PATCH] ci: Update the macOS CI jobs to Big Sur
-Date:   Fri, 16 Jul 2021 09:46:16 +0200
-Message-Id: <20210716074616.1176282-1-thuth@redhat.com>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+        id S238445AbhGPIjQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 16 Jul 2021 04:39:16 -0400
+Received: from mga18.intel.com ([134.134.136.126]:37901 "EHLO mga18.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S232034AbhGPIjK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 16 Jul 2021 04:39:10 -0400
+X-IronPort-AV: E=McAfee;i="6200,9189,10046"; a="197962407"
+X-IronPort-AV: E=Sophos;i="5.84,244,1620716400"; 
+   d="scan'208";a="197962407"
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Jul 2021 01:36:12 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.84,244,1620716400"; 
+   d="scan'208";a="460679659"
+Received: from michael-optiplex-9020.sh.intel.com ([10.239.159.182])
+  by orsmga008.jf.intel.com with ESMTP; 16 Jul 2021 01:36:09 -0700
+From:   Yang Weijiang <weijiang.yang@intel.com>
+To:     pbonzini@redhat.com, jmattson@google.com, seanjc@google.com,
+        vkuznets@redhat.com, wei.w.wang@intel.com, like.xu.linux@gmail.com,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc:     Yang Weijiang <weijiang.yang@intel.com>
+Subject: [PATCH v6 00/12] Introduce Architectural LBR for vPMU
+Date:   Fri, 16 Jul 2021 16:49:54 +0800
+Message-Id: <1626425406-18582-1-git-send-email-weijiang.yang@intel.com>
+X-Mailer: git-send-email 2.7.4
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Homebrew stopped working for the Catalina-based images. After updating
-to Big Sur and adding an explicit "brew update", the pipelines go green
-again.
+The Architectural Last Branch Records (LBRs) is published in the 319433-040
+release of Intel Architecture Instruction Set Extensions and Future Features
+Programming Reference[0].
 
-Signed-off-by: Thomas Huth <thuth@redhat.com>
----
- ci/cirrus-ci-macos-i386.yml   | 3 ++-
- ci/cirrus-ci-macos-x86-64.yml | 3 ++-
- 2 files changed, 4 insertions(+), 2 deletions(-)
+The main advantages of Arch LBR are [1]:
+- Faster context switching due to XSAVES support and faster reset of
+  LBR MSRs via the new DEPTH MSR
+- Faster LBR read for a non-PEBS event due to XSAVES support, which
+  lowers the overhead of the NMI handler.
+- Linux kernel can support the LBR features without knowing the model
+  number of the current CPU.
 
-diff --git a/ci/cirrus-ci-macos-i386.yml b/ci/cirrus-ci-macos-i386.yml
-index b837101..ef0861e 100644
---- a/ci/cirrus-ci-macos-i386.yml
-+++ b/ci/cirrus-ci-macos-i386.yml
-@@ -1,8 +1,9 @@
- 
- macos_i386_task:
-   osx_instance:
--    image: catalina-base
-+    image: big-sur-base
-   install_script:
-+    - brew update
-     - brew install coreutils bash git gnu-getopt make qemu i686-elf-gcc
-   clone_script:
-     - git clone --depth 100 "@CI_REPOSITORY_URL@" .
-diff --git a/ci/cirrus-ci-macos-x86-64.yml b/ci/cirrus-ci-macos-x86-64.yml
-index f72c8e1..676646f 100644
---- a/ci/cirrus-ci-macos-x86-64.yml
-+++ b/ci/cirrus-ci-macos-x86-64.yml
-@@ -1,8 +1,9 @@
- 
- macos_task:
-   osx_instance:
--    image: catalina-base
-+    image: big-sur-base
-   install_script:
-+    - brew update
-     - brew install coreutils bash git gnu-getopt make qemu x86_64-elf-gcc
-   clone_script:
-     - git clone --depth 100 "@CI_REPOSITORY_URL@" .
+From end user's point of view, the usage of Arch LBR is the same as
+the Legacy LBR that has been merged in the mainline.
+
+Note, there's one limitations for current guest Arch LBR implementation:
+Guest can only use the same LBR record depth as host, this is due to
+the special behavior of MSR_ARCH_LBR_DEPTH: a) On write to the MSR,
+it'll reset all Arch LBR recording MSRs to 0s. b) XRSTORS will reset all
+recording MSRs to 0s if the saved depth mismatches MSR_ARCH_LBR_DEPTH.
+
+But this limitation won't impact guest perf tool usage.
+
+Regarding the MSR_ARCH_LBR_CTL handling in SMM and #DB, pending details
+inquiry to spec. owner, will enclose related patches if necessary.
+
+[0] https://software.intel.com/content/www/us/en/develop/download/intel-architecture-instruction-set-extensions-and-future-features-programming-reference.html
+[1] https://lore.kernel.org/lkml/1593780569-62993-1-git-send-email-kan.liang@linux.intel.com/
+
+
+Previous version:
+v5: https://lkml.kernel.org/kvm/1625825111-6604-1-git-send-email-weijiang.yang@intel.com/
+
+Changes in v6:
+1. Removed host MSR_ARCH_LBR_CTL save/restore patch as it won't benefit host Arch LBR profiling. <Jim M.>
+2. Removed arch_lbr_reset flag as it'll make things complicated/broken. <Jim M.>
+3. Fixed a few issues in setting Arch LBR MSRs. <Jim M.>
+4. Explicitly mask the Arch LBR depth in guest CPUID so that guest only sees the supported value.
+5. Other minor fixes per Jim's review feedback.
+
+Like Xu (6):
+  perf/x86/intel: Fix the comment about guest LBR support on KVM
+  perf/x86/lbr: Simplify the exposure check for the LBR_INFO registers
+  KVM: vmx/pmu: Emulate MSR_ARCH_LBR_DEPTH for guest Arch LBR
+  KVM: vmx/pmu: Emulate MSR_ARCH_LBR_CTL for guest Arch LBR
+  KVM: x86: Refine the matching and clearing logic for supported_xss
+  KVM: x86: Add XSAVE Support for Architectural LBR
+
+Sean Christopherson (1):
+  KVM: x86: Report XSS as an MSR to be saved if there are supported
+    features
+
+Yang Weijiang (5):
+  KVM: x86: Add arch LBR MSRs to msrs_to_save_all list
+  KVM: x86/pmu: Refactor code to support guest Arch LBR
+  KVM: x86: Refresh CPUID on writes to MSR_IA32_XSS
+  KVM: x86/vmx: Check Arch LBR config  when return perf capabilities
+  KVM: x86/cpuid: Advise Arch LBR feature in CPUID
+
+ arch/x86/events/intel/core.c     |   3 +-
+ arch/x86/events/intel/lbr.c      |   6 +-
+ arch/x86/include/asm/kvm_host.h  |   1 +
+ arch/x86/include/asm/msr-index.h |   1 +
+ arch/x86/include/asm/vmx.h       |   4 ++
+ arch/x86/kvm/cpuid.c             |  54 ++++++++++++--
+ arch/x86/kvm/vmx/capabilities.h  |  25 ++++---
+ arch/x86/kvm/vmx/pmu_intel.c     | 120 +++++++++++++++++++++++++++----
+ arch/x86/kvm/vmx/vmx.c           |  27 +++++--
+ arch/x86/kvm/x86.c               |  24 ++++++-
+ 10 files changed, 226 insertions(+), 39 deletions(-)
+
 -- 
-2.27.0
+2.21.1
 
