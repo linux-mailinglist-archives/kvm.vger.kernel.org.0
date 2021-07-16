@@ -2,61 +2,61 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C752B3CB540
-	for <lists+kvm@lfdr.de>; Fri, 16 Jul 2021 11:30:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 274CF3CB578
+	for <lists+kvm@lfdr.de>; Fri, 16 Jul 2021 11:52:23 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232923AbhGPJ2S (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 16 Jul 2021 05:28:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58358 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231354AbhGPJ2Q (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 16 Jul 2021 05:28:16 -0400
-Received: from mail-oi1-x233.google.com (mail-oi1-x233.google.com [IPv6:2607:f8b0:4864:20::233])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F119BC06175F;
-        Fri, 16 Jul 2021 02:25:19 -0700 (PDT)
-Received: by mail-oi1-x233.google.com with SMTP id u15so10186692oiw.3;
-        Fri, 16 Jul 2021 02:25:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=M3L6N/isUtLMNrxa1XCwVdqbDJYk3wmwipYc7UHIg30=;
-        b=r4+zxL8Ly1S8l0ZTRBbHhjuykg+E/jFwukwFh3ZLskQKJmd22UtiHt9e8Vrc4B/r1E
-         StnSypkfyxFZx/dILMKWn0jGTvuzX5X/Vf8Np9xiQsE0TiMRPZFjQisx7QQXlZL9Duk/
-         KXwqG2D4cf5WMWD+8ks9BTvFkTqg0X34U5ZTbw8Pmmky5S+tRtvNJJKJN9+yatdb5s0i
-         4nnTnwrvJKghJ4z3ARRSdRv2gp5YKVngkA5lzcrK65yF6Zn1sl+8nT+i+0RdxoKKRRKQ
-         JCIK93oHSE7ncCgx6BlwZp09fjFbXlB8kcmD0zPR8fQOKuxkxHIZg0VXPvJKTCVY8TV+
-         9MDQ==
+        id S234048AbhGPJzP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 16 Jul 2021 05:55:15 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:48062 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S230360AbhGPJzN (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 16 Jul 2021 05:55:13 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1626429136;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=Fb4R+JVoagpsb7WH3nwCiNnKAH31HT4aNCBqTWasD8c=;
+        b=QFPxxgzuUDD72Q5SSvalruNCTh6biu9CK3lvCCRhb+UrcfqW1Da3hqwW2woU/kuxZd1zGF
+        x7UswQHXHPwbYGjobXXynZ03E+OG7p8PUJeoGzAXrZMXVHjC5DTOUoudhCk5pAUBj8prP1
+        b8nFFk2kFcRtMPOP36HeFndl917I/C8=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-355-cRQoqPi-MwuPJSKH7S31xw-1; Fri, 16 Jul 2021 05:52:14 -0400
+X-MC-Unique: cRQoqPi-MwuPJSKH7S31xw-1
+Received: by mail-wr1-f69.google.com with SMTP id h11-20020adffa8b0000b029013a357d7bdcso4602339wrr.18
+        for <kvm@vger.kernel.org>; Fri, 16 Jul 2021 02:52:14 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=M3L6N/isUtLMNrxa1XCwVdqbDJYk3wmwipYc7UHIg30=;
-        b=XoscfH+ptbr5QKOb/JwR4JDr/VM7Yu4Pp0qiEAk+TIfaYVjtKnQbwsF01JIw9cB7dU
-         YrKIeaotCRZiJPK+FQcswO2CF1nCN9sU0CFoo5UiKCQeyBEzIX7sTaPJmZfZb5SSudyq
-         a4BK4VtRu7x/sAGG7zGgKCsw4VeUASJ6QxRrqTQ0SV/9IrfAHD+p+hvN4jXSMhgou/47
-         z3s9Etw0GrdvVteds50YeOb3Z9rjYs/CpkIZC3vcIkRPligckX3c1Zo5S8V9jGz9g35j
-         GHSTcP23gFlDBPlN9WKPREGsnVwxkhwtLzEPpRYH9JBO522OQvr2WRJj8uPZc3QWYimA
-         Y/uA==
-X-Gm-Message-State: AOAM531v5+y2yLT5F4Q5coudE1Njy9YmtFU9TOT7jN5b6vR8RS+CrVHR
-        gighozRKBDIo+inkHl2oyFK7WpLNBPQeTSZ6ee4=
-X-Google-Smtp-Source: ABdhPJxHyb8ANuJhmrB3GrlnpY3IjWqx4f3k/5MpMwr2A8uB+jRVB/RRadAnxqsI07492YshjiCdsR22hzW+eMENJfA=
-X-Received: by 2002:aca:1017:: with SMTP id 23mr1121001oiq.141.1626427519435;
- Fri, 16 Jul 2021 02:25:19 -0700 (PDT)
-MIME-Version: 1.0
-References: <20210716064808.14757-1-guang.zeng@intel.com>
-In-Reply-To: <20210716064808.14757-1-guang.zeng@intel.com>
-From:   Wanpeng Li <kernellwp@gmail.com>
-Date:   Fri, 16 Jul 2021 17:25:08 +0800
-Message-ID: <CANRm+Cy=ncU-H7duei5q+CG+pm-kXvG8N8CiUQavQ3OEpDj9eg@mail.gmail.com>
-Subject: Re: [PATCH 0/5] IPI virtualization support for VM
-To:     Zeng Guang <guang.zeng@intel.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        h=x-gm-message-state:to:cc:references:from:subject:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=Fb4R+JVoagpsb7WH3nwCiNnKAH31HT4aNCBqTWasD8c=;
+        b=Fi8g8b4HibHOWTLD4Oq0Se7YLxfPnMXLUvL+bDWmmAHxNTiz/GSQ++UfeGPrQtff4H
+         lCKdIxtRjlqNYaUAnnqUPjgtrCfPARoq3JZ1DnxOBVithKW35IaqpKhpuCDGdMWJtUhr
+         0gEGETOikDyw+xhCzDkj/TQD+8qI58QcfGpTVpWkxn/z7b4Qia7ulLVGeDyrHCcQmtFZ
+         nBad94JLeI/QoiqY4UB2x9uZe+wH7jlKFiCvKy/u8WzaZaFzqnUYULSPYmqunmL0Ap6Z
+         +OqySDQ8jsnXdTILTA3KWLHJscL3gqO5K2h2+A5lE39jlGCztzpDMSt6mgaQ8CrLZxPZ
+         nIRA==
+X-Gm-Message-State: AOAM532LvD1nNil8y67A0z6BPtURsrsFk7iElFl12eqwH1r+/9biQnod
+        2HOG+II1HFo95Hzj0ZBY9WQFw6qjDLu0dyMuMuS67VCg/x8/1dsrCJVBHGLVW60vVMn18zC6LMK
+        7tGFz3owY/Ra6
+X-Received: by 2002:a05:600c:4f96:: with SMTP id n22mr9486993wmq.137.1626429133664;
+        Fri, 16 Jul 2021 02:52:13 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJw4PzoAhnSdzpCYK7ODLnh30V49UUpOf9H5Ht+rIvB4Eqa05Jn7dZdV6hgU0Y5jzzVByP7LiQ==
+X-Received: by 2002:a05:600c:4f96:: with SMTP id n22mr9486968wmq.137.1626429133409;
+        Fri, 16 Jul 2021 02:52:13 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:63a7:c72e:ea0e:6045? ([2001:b07:6468:f312:63a7:c72e:ea0e:6045])
+        by smtp.gmail.com with ESMTPSA id c125sm12505903wme.36.2021.07.16.02.52.11
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 16 Jul 2021 02:52:12 -0700 (PDT)
+To:     Zeng Guang <guang.zeng@intel.com>,
         Sean Christopherson <seanjc@google.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm <kvm@vger.kernel.org>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
         Dave Hansen <dave.hansen@linux.intel.com>,
         Tony Luck <tony.luck@intel.com>,
         Kan Liang <kan.liang@linux.intel.com>,
@@ -66,97 +66,65 @@ Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         Kim Phillips <kim.phillips@amd.com>,
         Jarkko Sakkinen <jarkko@kernel.org>,
         Jethro Beekman <jethro@fortanix.com>,
-        Kai Huang <kai.huang@intel.com>,
-        "the arch/x86 maintainers" <x86@kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Robert Hu <robert.hu@intel.com>, Gao Chao <chao.gao@intel.com>
-Content-Type: text/plain; charset="UTF-8"
+        Kai Huang <kai.huang@intel.com>
+Cc:     x86@kernel.org, linux-kernel@vger.kernel.org,
+        Robert Hu <robert.hu@intel.com>, Gao Chao <chao.gao@intel.com>,
+        Emanuele Giuseppe Esposito <eesposit@redhat.com>
+References: <20210716064808.14757-1-guang.zeng@intel.com>
+ <20210716064808.14757-7-guang.zeng@intel.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [PATCH 6/6] KVM: VMX: enable IPI virtualization
+Message-ID: <8aed2541-082d-d115-09ac-e7fcc05f96dc@redhat.com>
+Date:   Fri, 16 Jul 2021 11:52:10 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.11.0
+MIME-Version: 1.0
+In-Reply-To: <20210716064808.14757-7-guang.zeng@intel.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 16 Jul 2021 at 15:14, Zeng Guang <guang.zeng@intel.com> wrote:
->
-> Current IPI process in guest VM will virtualize the writing to interrupt
-> command register(ICR) of the local APIC which will cause VM-exit anyway
-> on source vCPU. Frequent VM-exit could induce much overhead accumulated
-> if running IPI intensive task.
->
-> IPI virtualization as a new VT-x feature targets to eliminate VM-exits
-> when issuing IPI on source vCPU. It introduces a new VM-execution
-> control - "IPI virtualization"(bit4) in the tertiary processor-based
-> VM-exection controls and a new data structure - "PID-pointer table
-> address" and "Last PID-pointer index" referenced by the VMCS. When "IPI
-> virtualization" is enabled, processor emulateds following kind of writes
-> to APIC registers that would send IPIs, moreover without causing VM-exits.
-> - Memory-mapped ICR writes
-> - MSR-mapped ICR writes
-> - SENDUIPI execution
->
-> This patch series implement IPI virtualization support in KVM.
->
-> Patches 1-3 add tertiary processor-based VM-execution support
-> framework.
->
-> Patch 4 implement interrupt dispatch support in x2APIC mode with
-> APIC-write VM exit. In previous platform, no CPU would produce
-> APIC-write VM exit with exit qulification 300H when the "virtual x2APIC
-> mode" VM-execution control was 1.
->
-> Patch 5 implement IPI virtualization related function including
-> feature enabling through tertiary processor-based VM-execution in
-> various scenario of VMCS configuration, PID table setup in vCPU creation
-> and vCPU block consideration.
->
-> Document for IPI virtualization is now available at the latest "Intel
-> Architecture Instruction Set Extensions Programming Reference".
->
-> Document Link:
-> https://software.intel.com/content/www/us/en/develop/download/intel-architecture-instruction-set-extensions-programming-reference.html
->
-> We did experiment to measure average time sending IPI from source vCPU
-> to the target vCPU completing the IPI handling by kvm unittest w/ and
-> w/o IPI virtualization. When IPI virtualizatin enabled, it will reduce
-> 22.21% and 15.98% cycles comsuming in xAPIC mode and x2APIC mode
-> respectly.
->
-> KMV unittest:vmexit/ipi, 2 vCPU, AP runs without halt to ensure no VM
-> exit impact on target vCPU.
->
->                 Cycles of IPI
->                 xAPIC mode              x2APIC mode
->         test    w/o IPIv  w/ IPIv       w/o IPIv  w/ IPIv
->         1       6106      4816          4265      3768
->         2       6244      4656          4404      3546
->         3       6165      4658          4233      3474
->         4       5992      4710          4363      3430
->         5       6083      4741          4215      3551
->         6       6238      4904          4304      3547
->         7       6164      4617          4263      3709
->         8       5984      4763          4518      3779
->         9       5931      4712          4645      3667
->         10      5955      4530          4332      3724
->         11      5897      4673          4283      3569
->         12      6140      4794          4178      3598
->         13      6183      4728          4363      3628
->         14      5991      4994          4509      3842
->         15      5866      4665          4520      3739
->         16      6032      4654          4229      3701
->         17      6050      4653          4185      3726
->         18      6004      4792          4319      3746
->         19      5961      4626          4196      3392
->         20      6194      4576          4433      3760
->
-> Average cycles  6059      4713.1        4337.85   3644.8
-> %Reduction                -22.21%                 -15.98%
+On 16/07/21 08:48, Zeng Guang wrote:
+>  
+> +	if (!(_cpu_based_3rd_exec_control & TERTIARY_EXEC_IPI_VIRT))
+> +		enable_ipiv = 0;
+> +
+>   	}
 
-Commit a9ab13ff6e (KVM: X86: Improve latency for single target IPI
-fastpath) mentioned that the whole ipi fastpath feature reduces the
-latency from 4238 to 3293 around 22.3% on SKX server, why your IPIv
-hardware acceleration is worse than software emulation? In addition,
-please post the IPI microbenchmark score w/ and w/o the
-patchset.(https://lore.kernel.org/kvm/20171219085010.4081-1-ynorov@caviumnetworks.com),
-I found that the hardware acceleration is not always outstanding.
-https://lore.kernel.org/kvm/CANRm+Cx597FNRUCyVz1D=B6Vs2GX3Sw57X7Muk+yMpi_hb+v1w@mail.gmail.com
+Please move this to hardware_setup(), using a new function 
+cpu_has_vmx_ipiv() in vmx/capabilities.h.
 
-    Wanpeng
+>  	if (_cpu_based_exec_control & CPU_BASED_ACTIVATE_TERTIARY_CONTROLS) {
+> -		u64 opt3 = 0;
+> +		u64 opt3 = enable_ipiv ? TERTIARY_EXEC_IPI_VIRT : 0;
+>  		u64 min3 = 0;
+
+I like the idea of changing opt3, but it's different from how 
+setup_vmcs_config works for the other execution controls.  Let me think 
+if it makes sense to clean this up, and move the handling of other 
+module parameters from hardware_setup() to setup_vmcs_config().
+
+> +
+> +	if (vmx->ipiv_active)
+> +		install_pid(vmx);
+
+This should be if (enable_ipiv) instead, I think.
+
+In fact, in all other places that are using vmx->ipiv_active, you can 
+actually replace it with enable_ipiv; they are all reached only with 
+kvm_vcpu_apicv_active(vcpu) == true.
+
+> +	if (!enable_apicv) {
+> +		enable_ipiv = 0;
+> +		vmcs_config.cpu_based_3rd_exec_ctrl &= ~TERTIARY_EXEC_IPI_VIRT;
+> +	}
+
+The assignment to vmcs_config.cpu_based_3rd_exec_ctrl should not be 
+necessary; kvm_vcpu_apicv_active will always be false in that case and 
+IPI virtualization would never be enabled.
+
+Paolo
+
