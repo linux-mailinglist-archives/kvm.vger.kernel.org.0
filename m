@@ -2,117 +2,88 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A418F3CB57C
-	for <lists+kvm@lfdr.de>; Fri, 16 Jul 2021 11:54:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 74B213CB5FA
+	for <lists+kvm@lfdr.de>; Fri, 16 Jul 2021 12:23:42 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235401AbhGPJ45 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 16 Jul 2021 05:56:57 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:31031 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230360AbhGPJ44 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 16 Jul 2021 05:56:56 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1626429241;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=qSYQoQIXt9Z2BtB3kqZMkIjAxOf7dLzf1YUeJiDHuZY=;
-        b=in4I6idmhMYfQqAiMdmhT7iN9pWXxX1m00Pz2DkT/kGJWpkyULSCSu/JnfxKYsI5Wh9YR2
-        CXWOj4u3t4olm3ngI6x3sl5YkZO3toRuhkdn3rj+QlB2p+8JxPnhv319pNnSZuNMJblDWo
-        4EIWI3H2L5j0gpFFsAQJ/v6SwgHTvoo=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-474-0tunkZtVOHq7p0SO_hv5Mw-1; Fri, 16 Jul 2021 05:54:00 -0400
-X-MC-Unique: 0tunkZtVOHq7p0SO_hv5Mw-1
-Received: by mail-wr1-f72.google.com with SMTP id j6-20020adff5460000b029013c7749ad05so4632088wrp.8
-        for <kvm@vger.kernel.org>; Fri, 16 Jul 2021 02:53:59 -0700 (PDT)
+        id S238968AbhGPK0f (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 16 Jul 2021 06:26:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43548 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S238398AbhGPK0b (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 16 Jul 2021 06:26:31 -0400
+Received: from mail-pf1-x433.google.com (mail-pf1-x433.google.com [IPv6:2607:f8b0:4864:20::433])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DAD65C061765
+        for <kvm@vger.kernel.org>; Fri, 16 Jul 2021 03:23:36 -0700 (PDT)
+Received: by mail-pf1-x433.google.com with SMTP id b12so8553752pfv.6
+        for <kvm@vger.kernel.org>; Fri, 16 Jul 2021 03:23:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=bytedance-com.20150623.gappssmtp.com; s=20150623;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=mJYWdsw34aaRbO5ru3xen2MP+EZCEf1FnSIinPAOBxs=;
+        b=lfW3C2RlMykUor71r2BAqRYYlG/PW0KIuSkBiSttDLmUoxPDOjn+FANYMaPFQDPbgF
+         0ZGWE6wcWYKK0bXHb9Y9xQepzfzmilg/oDUoxtf60gjKQ2N318O8yABWEOP02o6Nd/Wa
+         w6Gm6X8EYCVu27mecSuqpL0zooyyAgcek6s646cFx1q/xsQa/U5Txad6U5hXYOX2Q62L
+         Cm9rS1Hh1nh03KWD1UaFQyrdp7uEUdH0/wuZqvMI4AR42bYV9bFSE2SyPfVEI+xmhw1j
+         ESfq9gRb/fXf2qyyKZUvuGoZpEfJU+Jyls1nO52IIE88k3Pn8jSmB86NDTMuWC5WDW9r
+         1+/Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
          :content-transfer-encoding;
-        bh=qSYQoQIXt9Z2BtB3kqZMkIjAxOf7dLzf1YUeJiDHuZY=;
-        b=NQLLsp8l5WdlKE9d8GN2TEL5Hkd0euA91DMvuCGUjBKyvIoXL0F5tF/OveyzFbe5nS
-         ptX2LEpG2Ne90ZkmSF08mb5xfZDMBmircRNXcuIdyQw46SqSEz5iI+8y2/+M6/uhSwE8
-         27mcGquI/Tb1he84a84NLyZfL6128pXzgF1cJ6A68mmkqKbQSjms8NV2vUD0/OaEJkTI
-         g9hpfhvQRY8K65+Dr13MyeWKIjHL19/GHQQA4RcaEzT91w1Uno1lp9mG51r1kRDQGc7L
-         7RDWV+aSvmiIs0IS/MfBRHtzpzl/zS5OmN2Cm3rsl6PmiLW7sEkov9SwewNYt0ih4sI3
-         1uGw==
-X-Gm-Message-State: AOAM532hiHMZ5OgGGRICDynU+hZVOUQJOSCt1TSGhfLSZkemdHO3PgGY
-        xNOGTMwdp1sBMADW+X68HLYTpJANeSMK74bzl5a+OVDtMX8lLKjNSLwOuBf1wUxfNmqDv4EOsKN
-        s7F1H6V0I6WLa
-X-Received: by 2002:adf:e7cc:: with SMTP id e12mr11476529wrn.51.1626429239057;
-        Fri, 16 Jul 2021 02:53:59 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJz2vTSZObp/rgdL0tzhlpszUJsjlqhYQTTiKg2QOCa9BOVpsuGr2fQ5ScgYC92bHnkX8bwEmw==
-X-Received: by 2002:adf:e7cc:: with SMTP id e12mr11476507wrn.51.1626429238851;
-        Fri, 16 Jul 2021 02:53:58 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:63a7:c72e:ea0e:6045? ([2001:b07:6468:f312:63a7:c72e:ea0e:6045])
-        by smtp.gmail.com with ESMTPSA id o5sm6375839wms.43.2021.07.16.02.53.57
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 16 Jul 2021 02:53:58 -0700 (PDT)
-Subject: Re: [kvm-unit-tests PATCH] ci: Update the macOS CI jobs to Big Sur
-To:     Thomas Huth <thuth@redhat.com>, kvm@vger.kernel.org
-Cc:     Andrew Jones <drjones@redhat.com>
-References: <20210716074616.1176282-1-thuth@redhat.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <a203f90e-7488-e073-0734-98043c142d2f@redhat.com>
-Date:   Fri, 16 Jul 2021 11:53:57 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.11.0
+        bh=mJYWdsw34aaRbO5ru3xen2MP+EZCEf1FnSIinPAOBxs=;
+        b=kwctV7tNfe9FaQqlhqJoFaX0CmrTPU3z0dGne9IW0/kpFmrizt6Xy9vvDlvY3YX4VD
+         usVCnBUhz3abA6S1gJB4vb3GXyFMCXv39p6vMqjJDK9orZEVly2MReZbT+jRJemVGhjt
+         KHfGYlWsVePg8G2TPwwZsrjfWX4WTpMx73Ig9QT+NJqks0Wn/4V3tfUfSveGkERnDzVl
+         fnsEU7eD4AcEep8GiPVyqdh6dT9FLpL8MxZEHfWEAdiXHTdIJXEliEX75ZgxcHqFSR7T
+         Ajk1lgYV5QapFIihCWsupqieyTV4ZteR5YNMqJ7zZrYYyl/CWkrUcF/oBOCGRjS1t40V
+         JTyg==
+X-Gm-Message-State: AOAM531FKlvJvYM8OH5cZiI4VXhz4TRYyqwQRcWjCJViEmCXsnc+9p9a
+        20pQm7bjKgpNhoBICAjRggDU
+X-Google-Smtp-Source: ABdhPJxONsQNT4fPjubNFPLig4RCYzRSiNrG4NZUr7bg0TGdIHNu5HB6tFcl+zKNW/s/fpUFw6yJaQ==
+X-Received: by 2002:aa7:854a:0:b029:332:330e:1387 with SMTP id y10-20020aa7854a0000b0290332330e1387mr9452917pfn.67.1626431016369;
+        Fri, 16 Jul 2021 03:23:36 -0700 (PDT)
+Received: from localhost ([139.177.225.253])
+        by smtp.gmail.com with ESMTPSA id 1sm9961963pfv.138.2021.07.16.03.23.33
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 16 Jul 2021 03:23:35 -0700 (PDT)
+From:   Xie Yongji <xieyongji@bytedance.com>
+To:     mst@redhat.com, jasowang@redhat.com, dan.carpenter@oracle.com
+Cc:     virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH 1/2] vhost-vdpa: Fix integer overflow in vhost_vdpa_process_iotlb_update()
+Date:   Fri, 16 Jul 2021 18:22:38 +0800
+Message-Id: <20210716102239.96-1-xieyongji@bytedance.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-In-Reply-To: <20210716074616.1176282-1-thuth@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 16/07/21 09:46, Thomas Huth wrote:
-> Homebrew stopped working for the Catalina-based images. After updating
-> to Big Sur and adding an explicit "brew update", the pipelines go green
-> again.
-> 
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
-> ---
->   ci/cirrus-ci-macos-i386.yml   | 3 ++-
->   ci/cirrus-ci-macos-x86-64.yml | 3 ++-
->   2 files changed, 4 insertions(+), 2 deletions(-)
-> 
-> diff --git a/ci/cirrus-ci-macos-i386.yml b/ci/cirrus-ci-macos-i386.yml
-> index b837101..ef0861e 100644
-> --- a/ci/cirrus-ci-macos-i386.yml
-> +++ b/ci/cirrus-ci-macos-i386.yml
-> @@ -1,8 +1,9 @@
->   
->   macos_i386_task:
->     osx_instance:
-> -    image: catalina-base
-> +    image: big-sur-base
->     install_script:
-> +    - brew update
->       - brew install coreutils bash git gnu-getopt make qemu i686-elf-gcc
->     clone_script:
->       - git clone --depth 100 "@CI_REPOSITORY_URL@" .
-> diff --git a/ci/cirrus-ci-macos-x86-64.yml b/ci/cirrus-ci-macos-x86-64.yml
-> index f72c8e1..676646f 100644
-> --- a/ci/cirrus-ci-macos-x86-64.yml
-> +++ b/ci/cirrus-ci-macos-x86-64.yml
-> @@ -1,8 +1,9 @@
->   
->   macos_task:
->     osx_instance:
-> -    image: catalina-base
-> +    image: big-sur-base
->     install_script:
-> +    - brew update
->       - brew install coreutils bash git gnu-getopt make qemu x86_64-elf-gcc
->     clone_script:
->       - git clone --depth 100 "@CI_REPOSITORY_URL@" .
-> 
+The "msg->iova + msg->size" addition can have an integer overflow
+if the iotlb message is from a malicious user space application.
+So let's fix it.
 
-Queued, thanks.
+Fixes: 1b48dc03e575 ("vhost: vdpa: report iova range")
+Reported-by: Dan Carpenter <dan.carpenter@oracle.com>
+Signed-off-by: Xie Yongji <xieyongji@bytedance.com>
+---
+ drivers/vhost/vdpa.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-Paolo
+diff --git a/drivers/vhost/vdpa.c b/drivers/vhost/vdpa.c
+index 210ab35a7ebf..8e3c8790d493 100644
+--- a/drivers/vhost/vdpa.c
++++ b/drivers/vhost/vdpa.c
+@@ -615,6 +615,7 @@ static int vhost_vdpa_process_iotlb_update(struct vhost_vdpa *v,
+ 	int ret = 0;
+ 
+ 	if (msg->iova < v->range.first ||
++	    msg->iova - 1 > U64_MAX - msg->size ||
+ 	    msg->iova + msg->size - 1 > v->range.last)
+ 		return -EINVAL;
+ 
+-- 
+2.11.0
 
