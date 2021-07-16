@@ -2,382 +2,145 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0A83A3CB319
-	for <lists+kvm@lfdr.de>; Fri, 16 Jul 2021 09:14:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 405EB3CB2FE
+	for <lists+kvm@lfdr.de>; Fri, 16 Jul 2021 09:12:35 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236137AbhGPHQ5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 16 Jul 2021 03:16:57 -0400
-Received: from mga05.intel.com ([192.55.52.43]:35322 "EHLO mga05.intel.com"
+        id S235208AbhGPHP1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 16 Jul 2021 03:15:27 -0400
+Received: from mga11.intel.com ([192.55.52.93]:52773 "EHLO mga11.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S236202AbhGPHQr (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 16 Jul 2021 03:16:47 -0400
-X-IronPort-AV: E=McAfee;i="6200,9189,10046"; a="296331591"
+        id S229930AbhGPHPZ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 16 Jul 2021 03:15:25 -0400
+X-IronPort-AV: E=McAfee;i="6200,9189,10046"; a="207663283"
 X-IronPort-AV: E=Sophos;i="5.84,244,1620716400"; 
-   d="scan'208";a="296331591"
-Received: from fmsmga002.fm.intel.com ([10.253.24.26])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Jul 2021 00:13:53 -0700
+   d="asc'?scan'208";a="207663283"
+Received: from fmsmga003.fm.intel.com ([10.253.24.29])
+  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Jul 2021 00:12:29 -0700
+X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.84,244,1620716400"; 
-   d="scan'208";a="506375093"
-Received: from arthur-vostro-3668.sh.intel.com ([10.239.13.1])
-  by fmsmga002-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Jul 2021 00:13:46 -0700
-From:   Zeng Guang <guang.zeng@intel.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Tony Luck <tony.luck@intel.com>,
-        Kan Liang <kan.liang@linux.intel.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Kim Phillips <kim.phillips@amd.com>,
-        Jarkko Sakkinen <jarkko@kernel.org>,
-        Jethro Beekman <jethro@fortanix.com>,
-        Kai Huang <kai.huang@intel.com>
-Cc:     x86@kernel.org, linux-kernel@vger.kernel.org,
-        Robert Hu <robert.hu@intel.com>, Gao Chao <chao.gao@intel.com>,
-        Zeng Guang <guang.zeng@intel.com>
-Subject: [PATCH 6/6] KVM: VMX: enable IPI virtualization
-Date:   Fri, 16 Jul 2021 14:48:08 +0800
-Message-Id: <20210716064808.14757-7-guang.zeng@intel.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20210716064808.14757-1-guang.zeng@intel.com>
-References: <20210716064808.14757-1-guang.zeng@intel.com>
+   d="asc'?scan'208";a="495951551"
+Received: from zhen-hp.sh.intel.com (HELO zhen-hp) ([10.239.160.143])
+  by FMSMGA003.fm.intel.com with ESMTP; 16 Jul 2021 00:12:21 -0700
+Date:   Fri, 16 Jul 2021 14:50:57 +0800
+From:   Zhenyu Wang <zhenyuw@linux.intel.com>
+To:     Jason Gunthorpe <jgg@nvidia.com>
+Cc:     David Airlie <airlied@linux.ie>,
+        Tony Krowiak <akrowiak@linux.ibm.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        Diana Craciun <diana.craciun@oss.nxp.com>,
+        dri-devel@lists.freedesktop.org,
+        Eric Auger <eric.auger@redhat.com>,
+        Eric Farman <farman@linux.ibm.com>,
+        Harald Freudenberger <freude@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        intel-gfx@lists.freedesktop.org,
+        intel-gvt-dev@lists.freedesktop.org,
+        Jani Nikula <jani.nikula@linux.intel.com>,
+        Jason Herne <jjherne@linux.ibm.com>,
+        Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
+        kvm@vger.kernel.org, Kirti Wankhede <kwankhede@nvidia.com>,
+        linux-doc@vger.kernel.org, linux-s390@vger.kernel.org,
+        Matthew Rosato <mjrosato@linux.ibm.com>,
+        Peter Oberparleiter <oberpar@linux.ibm.com>,
+        Halil Pasic <pasic@linux.ibm.com>,
+        Rodrigo Vivi <rodrigo.vivi@intel.com>,
+        Vineeth Vijayan <vneethv@linux.ibm.com>,
+        Zhenyu Wang <zhenyuw@linux.intel.com>,
+        Zhi Wang <zhi.a.wang@intel.com>,
+        "Raj, Ashok" <ashok.raj@intel.com>, Christoph Hellwig <hch@lst.de>,
+        Leon Romanovsky <leonro@nvidia.com>,
+        Max Gurtovoy <mgurtovoy@nvidia.com>,
+        Yishai Hadas <yishaih@nvidia.com>
+Subject: Re: [PATCH 12/13] vfio/gvt: Fix open/close when multiple device FDs
+ are open
+Message-ID: <20210716065057.GA13928@zhen-hp.sh.intel.com>
+Reply-To: Zhenyu Wang <zhenyuw@linux.intel.com>
+References: <0-v1-eaf3ccbba33c+1add0-vfio_reflck_jgg@nvidia.com>
+ <12-v1-eaf3ccbba33c+1add0-vfio_reflck_jgg@nvidia.com>
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha1;
+        protocol="application/pgp-signature"; boundary="k+w/mQv8wyuph6w0"
+Content-Disposition: inline
+In-Reply-To: <12-v1-eaf3ccbba33c+1add0-vfio_reflck_jgg@nvidia.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Gao Chao <chao.gao@intel.com>
 
-With IPI virtualization enabled, the processor emulates writes
-to APIC registers that would send IPIs. The processor sets the
-bit corresponding to the vector in target vCPU's PIR and may send
-a notification (IPI) specified by NDST and NV fields in target vCPU's
-PID. It is similar to what IOMMU engine does when dealing with posted
-interrupt from devices.
+--k+w/mQv8wyuph6w0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-A PID-pointer table is used by the processor to locate the PID of a
-vCPU with the vCPU's APIC ID.
+On 2021.07.14 21:20:41 -0300, Jason Gunthorpe wrote:
+> The user can open multiple device FDs if it likes, however the open
+> function calls vfio_register_notifier() on device global state. Calling
+> vfio_register_notifier() twice will trigger a WARN_ON from
+> notifier_chain_register() and the first close will wrongly delete the
+> notifier and more.
+>=20
+> Since these really want the new open/close_device() semantics just change
+> the function over.
+>=20
+> Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
+> ---
+>  drivers/gpu/drm/i915/gvt/kvmgt.c | 8 ++++----
+>  1 file changed, 4 insertions(+), 4 deletions(-)
+>=20
+> diff --git a/drivers/gpu/drm/i915/gvt/kvmgt.c b/drivers/gpu/drm/i915/gvt/=
+kvmgt.c
+> index 1ac98f8aba31e6..7efa386449d104 100644
+> --- a/drivers/gpu/drm/i915/gvt/kvmgt.c
+> +++ b/drivers/gpu/drm/i915/gvt/kvmgt.c
+> @@ -885,7 +885,7 @@ static int intel_vgpu_group_notifier(struct notifier_=
+block *nb,
+>  	return NOTIFY_OK;
+>  }
+> =20
+> -static int intel_vgpu_open(struct mdev_device *mdev)
+> +static int intel_vgpu_open_device(struct mdev_device *mdev)
+>  {
+>  	struct intel_vgpu *vgpu =3D mdev_get_drvdata(mdev);
+>  	struct kvmgt_vdev *vdev =3D kvmgt_vdev(vgpu);
+> @@ -1004,7 +1004,7 @@ static void __intel_vgpu_release(struct intel_vgpu =
+*vgpu)
+>  	vgpu->handle =3D 0;
+>  }
+> =20
+> -static void intel_vgpu_release(struct mdev_device *mdev)
+> +static void intel_vgpu_close_device(struct mdev_device *mdev)
+>  {
+>  	struct intel_vgpu *vgpu =3D mdev_get_drvdata(mdev);
+> =20
+> @@ -1753,8 +1753,8 @@ static struct mdev_parent_ops intel_vgpu_ops =3D {
+>  	.create			=3D intel_vgpu_create,
+>  	.remove			=3D intel_vgpu_remove,
+> =20
+> -	.open			=3D intel_vgpu_open,
+> -	.release		=3D intel_vgpu_release,
+> +	.open_device		=3D intel_vgpu_open_device,
+> +	.close_device		=3D intel_vgpu_close_device,
+> =20
+>  	.read			=3D intel_vgpu_read,
+>  	.write			=3D intel_vgpu_write,
 
-Like VT-d PI, if a vCPU goes to blocked state, VMM needs to switch its
-notification vector to wakeup vector. This can ensure that when an IPI
-for blocked vCPUs arrives, VMM can get control and wake up blocked
-vCPUs. And if a VCPU is preempted, its posted interrupt notification
-is suppressed.
+Looks ok to me. Thanks!
 
-Note that IPI virtualization can only virualize physical-addressing,
-flat mode, unicast IPIs. Sending other IPIs would still cause a
-VM exit and need to be handled by VMM.
+Reviewed-by: Zhenyu Wang <zhenyuw@linux.intel.com>
 
-Signed-off-by: Gao Chao <chao.gao@intel.com>
-Signed-off-by: Zeng Guang <guang.zeng@intel.com>
----
- arch/x86/include/asm/vmx.h         |  8 ++++
- arch/x86/include/asm/vmxfeatures.h |  2 +
- arch/x86/kvm/vmx/capabilities.h    |  1 +
- arch/x86/kvm/vmx/posted_intr.c     | 22 ++++++---
- arch/x86/kvm/vmx/vmx.c             | 72 ++++++++++++++++++++++++++++--
- arch/x86/kvm/vmx/vmx.h             |  6 +++
- 6 files changed, 102 insertions(+), 9 deletions(-)
+--k+w/mQv8wyuph6w0
+Content-Type: application/pgp-signature; name="signature.asc"
 
-diff --git a/arch/x86/include/asm/vmx.h b/arch/x86/include/asm/vmx.h
-index 15652047f2db..e97cf7b9ff12 100644
---- a/arch/x86/include/asm/vmx.h
-+++ b/arch/x86/include/asm/vmx.h
-@@ -76,6 +76,11 @@
- #define SECONDARY_EXEC_ENABLE_USR_WAIT_PAUSE	VMCS_CONTROL_BIT(USR_WAIT_PAUSE)
- #define SECONDARY_EXEC_BUS_LOCK_DETECTION	VMCS_CONTROL_BIT(BUS_LOCK_DETECTION)
- 
-+/*
-+ * Definitions of Tertiary Processor-Based VM-Execution Controls.
-+ */
-+#define TERTIARY_EXEC_IPI_VIRT			VMCS_CONTROL_BIT(IPI_VIRT)
-+
- #define PIN_BASED_EXT_INTR_MASK                 VMCS_CONTROL_BIT(INTR_EXITING)
- #define PIN_BASED_NMI_EXITING                   VMCS_CONTROL_BIT(NMI_EXITING)
- #define PIN_BASED_VIRTUAL_NMIS                  VMCS_CONTROL_BIT(VIRTUAL_NMIS)
-@@ -159,6 +164,7 @@ static inline int vmx_misc_mseg_revid(u64 vmx_misc)
- enum vmcs_field {
- 	VIRTUAL_PROCESSOR_ID            = 0x00000000,
- 	POSTED_INTR_NV                  = 0x00000002,
-+	LAST_PID_POINTER_INDEX		= 0x00000008,
- 	GUEST_ES_SELECTOR               = 0x00000800,
- 	GUEST_CS_SELECTOR               = 0x00000802,
- 	GUEST_SS_SELECTOR               = 0x00000804,
-@@ -224,6 +230,8 @@ enum vmcs_field {
- 	TSC_MULTIPLIER_HIGH             = 0x00002033,
- 	TERTIARY_VM_EXEC_CONTROL	= 0x00002034,
- 	TERTIARY_VM_EXEC_CONTROL_HIGH	= 0x00002035,
-+	PID_POINTER_TABLE		= 0x00002042,
-+	PID_POINTER_TABLE_HIGH		= 0x00002043,
- 	GUEST_PHYSICAL_ADDRESS          = 0x00002400,
- 	GUEST_PHYSICAL_ADDRESS_HIGH     = 0x00002401,
- 	VMCS_LINK_POINTER               = 0x00002800,
-diff --git a/arch/x86/include/asm/vmxfeatures.h b/arch/x86/include/asm/vmxfeatures.h
-index 27e76eeca05b..e821e8126097 100644
---- a/arch/x86/include/asm/vmxfeatures.h
-+++ b/arch/x86/include/asm/vmxfeatures.h
-@@ -86,4 +86,6 @@
- #define VMX_FEATURE_ENCLV_EXITING	( 2*32+ 28) /* "" VM-Exit on ENCLV (leaf dependent) */
- #define VMX_FEATURE_BUS_LOCK_DETECTION	( 2*32+ 30) /* "" VM-Exit when bus lock caused */
- 
-+/* Tertiary Processor-Based VM-Execution Controls, word 3 */
-+#define VMX_FEATURE_IPI_VIRT		( 3*32 + 4) /* "" Enable IPI virtualization */
- #endif /* _ASM_X86_VMXFEATURES_H */
-diff --git a/arch/x86/kvm/vmx/capabilities.h b/arch/x86/kvm/vmx/capabilities.h
-index 38d414f64e61..9e9710c3ee51 100644
---- a/arch/x86/kvm/vmx/capabilities.h
-+++ b/arch/x86/kvm/vmx/capabilities.h
-@@ -12,6 +12,7 @@ extern bool __read_mostly enable_ept;
- extern bool __read_mostly enable_unrestricted_guest;
- extern bool __read_mostly enable_ept_ad_bits;
- extern bool __read_mostly enable_pml;
-+extern bool __read_mostly enable_ipiv;
- extern int __read_mostly pt_mode;
- 
- #define PT_MODE_SYSTEM		0
-diff --git a/arch/x86/kvm/vmx/posted_intr.c b/arch/x86/kvm/vmx/posted_intr.c
-index 5f81ef092bd4..d817331bfb05 100644
---- a/arch/x86/kvm/vmx/posted_intr.c
-+++ b/arch/x86/kvm/vmx/posted_intr.c
-@@ -81,9 +81,12 @@ void vmx_vcpu_pi_put(struct kvm_vcpu *vcpu)
- {
- 	struct pi_desc *pi_desc = vcpu_to_pi_desc(vcpu);
- 
--	if (!kvm_arch_has_assigned_device(vcpu->kvm) ||
--		!irq_remapping_cap(IRQ_POSTING_CAP)  ||
--		!kvm_vcpu_apicv_active(vcpu))
-+	if (!kvm_vcpu_apicv_active(vcpu))
-+		return;
-+
-+	if ((!kvm_arch_has_assigned_device(vcpu->kvm) ||
-+		!irq_remapping_cap(IRQ_POSTING_CAP)) &&
-+		!to_vmx(vcpu)->ipiv_active)
- 		return;
- 
- 	/* Set SN when the vCPU is preempted */
-@@ -141,9 +144,16 @@ int pi_pre_block(struct kvm_vcpu *vcpu)
- 	struct pi_desc old, new;
- 	struct pi_desc *pi_desc = vcpu_to_pi_desc(vcpu);
- 
--	if (!kvm_arch_has_assigned_device(vcpu->kvm) ||
--		!irq_remapping_cap(IRQ_POSTING_CAP)  ||
--		!kvm_vcpu_apicv_active(vcpu))
-+	if (!kvm_vcpu_apicv_active(vcpu))
-+		return 0;
-+
-+	/* Put vCPU into a list and set NV to wakeup vector if it is
-+	 * one of the following cases:
-+	 * 1. any assigned device is in use.
-+	 * 2. IPI virtualization is enabled.
-+	 */
-+	if ((!kvm_arch_has_assigned_device(vcpu->kvm) ||
-+		!irq_remapping_cap(IRQ_POSTING_CAP)) && !to_vmx(vcpu)->ipiv_active)
- 		return 0;
- 
- 	WARN_ON(irqs_disabled());
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index 820fc131d258..8a45f45b263c 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -104,6 +104,9 @@ module_param(fasteoi, bool, S_IRUGO);
- 
- module_param(enable_apicv, bool, S_IRUGO);
- 
-+bool __read_mostly enable_ipiv = 1;
-+module_param(enable_ipiv, bool, S_IRUGO);
-+
- /*
-  * If nested=1, nested virtualization is supported, i.e., guests may use
-  * VMX and be a hypervisor for its own guests. If nested=0, guests may not
-@@ -225,6 +228,7 @@ static const struct {
- };
- 
- #define L1D_CACHE_ORDER 4
-+#define PID_TABLE_ORDER get_order(KVM_MAX_VCPU_ID << 3)
- static void *vmx_l1d_flush_pages;
- 
- static int vmx_setup_l1d_flush(enum vmx_l1d_flush_state l1tf)
-@@ -2514,7 +2518,7 @@ static __init int setup_vmcs_config(struct vmcs_config *vmcs_conf,
- 	}
- 
- 	if (_cpu_based_exec_control & CPU_BASED_ACTIVATE_TERTIARY_CONTROLS) {
--		u64 opt3 = 0;
-+		u64 opt3 = enable_ipiv ? TERTIARY_EXEC_IPI_VIRT : 0;
- 		u64 min3 = 0;
- 
- 		if (adjust_vmx_controls_64(min3, opt3,
-@@ -2523,6 +2527,9 @@ static __init int setup_vmcs_config(struct vmcs_config *vmcs_conf,
- 			return -EIO;
- 	}
- 
-+	if (!(_cpu_based_3rd_exec_control & TERTIARY_EXEC_IPI_VIRT))
-+		enable_ipiv = 0;
-+
- 	min = VM_EXIT_SAVE_DEBUG_CONTROLS | VM_EXIT_ACK_INTR_ON_EXIT;
- #ifdef CONFIG_X86_64
- 	min |= VM_EXIT_HOST_ADDR_SPACE_SIZE;
-@@ -3870,6 +3877,8 @@ static void vmx_update_msr_bitmap_x2apic(struct kvm_vcpu *vcpu, u8 mode)
- 		vmx_enable_intercept_for_msr(vcpu, X2APIC_MSR(APIC_TMCCT), MSR_TYPE_RW);
- 		vmx_disable_intercept_for_msr(vcpu, X2APIC_MSR(APIC_EOI), MSR_TYPE_W);
- 		vmx_disable_intercept_for_msr(vcpu, X2APIC_MSR(APIC_SELF_IPI), MSR_TYPE_W);
-+		vmx_set_intercept_for_msr(vcpu, X2APIC_MSR(APIC_ICR),
-+				MSR_TYPE_RW, !to_vmx(vcpu)->ipiv_active);
- 	}
- }
- 
-@@ -4138,14 +4147,21 @@ static void vmx_refresh_apicv_exec_ctrl(struct kvm_vcpu *vcpu)
- 
- 	pin_controls_set(vmx, vmx_pin_based_exec_ctrl(vmx));
- 	if (cpu_has_secondary_exec_ctrls()) {
--		if (kvm_vcpu_apicv_active(vcpu))
-+		if (kvm_vcpu_apicv_active(vcpu)) {
- 			secondary_exec_controls_setbit(vmx,
- 				      SECONDARY_EXEC_APIC_REGISTER_VIRT |
- 				      SECONDARY_EXEC_VIRTUAL_INTR_DELIVERY);
--		else
-+			if (cpu_has_tertiary_exec_ctrls() && enable_ipiv)
-+				tertiary_exec_controls_setbit(vmx,
-+					TERTIARY_EXEC_IPI_VIRT);
-+		} else {
- 			secondary_exec_controls_clearbit(vmx,
- 					SECONDARY_EXEC_APIC_REGISTER_VIRT |
- 					SECONDARY_EXEC_VIRTUAL_INTR_DELIVERY);
-+			if (cpu_has_tertiary_exec_ctrls())
-+				tertiary_exec_controls_clearbit(vmx,
-+					TERTIARY_EXEC_IPI_VIRT);
-+		}
- 	}
- 
- 	if (cpu_has_vmx_msr_bitmap())
-@@ -4236,8 +4252,14 @@ vmx_adjust_secondary_exec_control(struct vcpu_vmx *vmx, u32 *exec_control,
- 
- static void vmx_compute_tertiary_exec_control(struct vcpu_vmx *vmx)
- {
-+	struct kvm_vcpu *vcpu = &vmx->vcpu;
- 	u32 exec_control = vmcs_config.cpu_based_3rd_exec_ctrl;
- 
-+	if (!kvm_vcpu_apicv_active(vcpu))
-+		exec_control &= ~TERTIARY_EXEC_IPI_VIRT;
-+
-+	vmx->ipiv_active = (exec_control & TERTIARY_EXEC_IPI_VIRT) ? true : false;
-+
- 	vmx->tertiary_exec_control = exec_control;
- }
- 
-@@ -4332,6 +4354,17 @@ static void vmx_compute_secondary_exec_control(struct vcpu_vmx *vmx)
- 
- #define VMX_XSS_EXIT_BITMAP 0
- 
-+static void install_pid(struct vcpu_vmx *vmx)
-+{
-+	struct kvm_vmx *kvm_vmx = to_kvm_vmx(vmx->vcpu.kvm);
-+
-+	BUG_ON(vmx->vcpu.vcpu_id > kvm_vmx->pid_last_index);
-+	/* Bit 0 is the valid bit */
-+	kvm_vmx->pid_table[vmx->vcpu.vcpu_id] = __pa(&vmx->pi_desc) | 1;
-+	vmcs_write64(PID_POINTER_TABLE, __pa(kvm_vmx->pid_table));
-+	vmcs_write16(LAST_PID_POINTER_INDEX, kvm_vmx->pid_last_index);
-+}
-+
- /*
-  * Noting that the initialization of Guest-state Area of VMCS is in
-  * vmx_vcpu_reset().
-@@ -4430,6 +4463,9 @@ static void init_vmcs(struct vcpu_vmx *vmx)
- 		vmx->pt_desc.guest.output_mask = 0x7F;
- 		vmcs_write64(GUEST_IA32_RTIT_CTL, 0);
- 	}
-+
-+	if (vmx->ipiv_active)
-+		install_pid(vmx);
- }
- 
- static void vmx_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event)
-@@ -6969,6 +7005,22 @@ static int vmx_vm_init(struct kvm *kvm)
- 			break;
- 		}
- 	}
-+
-+	if (enable_ipiv) {
-+		struct page *pages;
-+
-+		/* Allocate pages for PID table in order of PID_TABLE_ORDER
-+		 * depending on KVM_MAX_VCPU_ID. Each PID entry is 8 bytes.
-+		 */
-+		pages = alloc_pages(GFP_KERNEL | __GFP_ZERO, PID_TABLE_ORDER);
-+
-+		if (!pages)
-+			return -ENOMEM;
-+
-+		to_kvm_vmx(kvm)->pid_table = (void *)page_address(pages);
-+		to_kvm_vmx(kvm)->pid_last_index = KVM_MAX_VCPU_ID;
-+	}
-+
- 	return 0;
- }
- 
-@@ -7579,6 +7631,14 @@ static bool vmx_check_apicv_inhibit_reasons(ulong bit)
- 	return supported & BIT(bit);
- }
- 
-+static void vmx_vm_destroy(struct kvm *kvm)
-+{
-+	struct kvm_vmx *kvm_vmx = to_kvm_vmx(kvm);
-+
-+	if (kvm_vmx->pid_table)
-+		free_pages((unsigned long)kvm_vmx->pid_table, PID_TABLE_ORDER);
-+}
-+
- static struct kvm_x86_ops vmx_x86_ops __initdata = {
- 	.hardware_unsetup = hardware_unsetup,
- 
-@@ -7589,6 +7649,7 @@ static struct kvm_x86_ops vmx_x86_ops __initdata = {
- 
- 	.vm_size = sizeof(struct kvm_vmx),
- 	.vm_init = vmx_vm_init,
-+	.vm_destroy = vmx_vm_destroy,
- 
- 	.vcpu_create = vmx_create_vcpu,
- 	.vcpu_free = vmx_free_vcpu,
-@@ -7828,6 +7889,11 @@ static __init int hardware_setup(void)
- 		vmx_x86_ops.sync_pir_to_irr = NULL;
- 	}
- 
-+	if (!enable_apicv) {
-+		enable_ipiv = 0;
-+		vmcs_config.cpu_based_3rd_exec_ctrl &= ~TERTIARY_EXEC_IPI_VIRT;
-+	}
-+
- 	if (cpu_has_vmx_tsc_scaling()) {
- 		kvm_has_tsc_control = true;
- 		kvm_max_tsc_scaling_ratio = KVM_VMX_TSC_MULTIPLIER_MAX;
-diff --git a/arch/x86/kvm/vmx/vmx.h b/arch/x86/kvm/vmx/vmx.h
-index c356ceebe84c..0dee1e4c628c 100644
---- a/arch/x86/kvm/vmx/vmx.h
-+++ b/arch/x86/kvm/vmx/vmx.h
-@@ -344,6 +344,9 @@ struct vcpu_vmx {
- 		DECLARE_BITMAP(read, MAX_POSSIBLE_PASSTHROUGH_MSRS);
- 		DECLARE_BITMAP(write, MAX_POSSIBLE_PASSTHROUGH_MSRS);
- 	} shadow_msr_intercept;
-+
-+	/* IPI virtualization status */
-+	bool ipiv_active;
- };
- 
- struct kvm_vmx {
-@@ -352,6 +355,9 @@ struct kvm_vmx {
- 	unsigned int tss_addr;
- 	bool ept_identity_pagetable_done;
- 	gpa_t ept_identity_map_addr;
-+	/* PID table for IPI virtualization */
-+	u64 *pid_table;
-+	u16 pid_last_index;
- };
- 
- bool nested_vmx_allowed(struct kvm_vcpu *vcpu);
--- 
-2.25.1
+-----BEGIN PGP SIGNATURE-----
 
+iF0EARECAB0WIQTXuabgHDW6LPt9CICxBBozTXgYJwUCYPEsTAAKCRCxBBozTXgY
+Jx7CAJwL3rjxtO0hmyVLloknYXTNq4Pl4gCcC95wG37YNR4DYMf5Ns1jbuH5Nqk=
+=WTLJ
+-----END PGP SIGNATURE-----
+
+--k+w/mQv8wyuph6w0--
