@@ -2,161 +2,221 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E65DD3CBE77
-	for <lists+kvm@lfdr.de>; Fri, 16 Jul 2021 23:25:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3E41A3CBE8B
+	for <lists+kvm@lfdr.de>; Fri, 16 Jul 2021 23:27:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235737AbhGPV2Z (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 16 Jul 2021 17:28:25 -0400
-Received: from mail-bn8nam11on2046.outbound.protection.outlook.com ([40.107.236.46]:45152
-        "EHLO NAM11-BN8-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S235304AbhGPV2W (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 16 Jul 2021 17:28:22 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=F+9ynfEkpqS5IXn2sdW1PXUiaIcLMdz7cFTe2bWwKXA7gOX39NV/nR3pvvYtyamfmQUtnBenGrSMebX1Hb/y28MEbyVnpstdZtH+ZIwRVfsbPAeJqOwWQiG9i5Ble/icP8JPXIj7Lo16gMCI3gXs0WoV5VhLGEoLs9rrgF6gBrNRFxXO5gqGOd3PUw47dzTYd/tQZj5Hd4lCUHu1bOZa7dAF0D1+AhyH6HIFLzySF4DruoadnX6vfCkxZua9kZu74KEjTiADoeSm/vJ4pbVfmYAaHcMhvK6Q44StIjgxfuea+zZ9QrGemJBxUALWi6Xs7WSB7fbeM327nmxFWpZX6Q==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=mTdI+fTA1UXZazDgnLPmbujBWrZtwQ9krVHPN5u35V8=;
- b=PaetAvH9mD1twDpdZKJsFGL9DhXxZ/wQtKAkEjr3o02XELasOtR9pLHDa6EVexhUHzw+WT+qAztmGD3PC3nzMbllOC0a0Vy5By1L56mVnB9sNvDbSYLCEpnzfrClbL8OkWL1UVOomF7jJggx9Cg/EsTsE3BGTsK4aBk25hz/JNWp3laNNJcHTSBZdi0fJ1oOA7/hFFVDPwmiP90B5FVpDjWOKUHwXhtLhL6Yd8sDxxFYuri/Ep8sc0MBoOSwU+bjZ5h9NHkUEJUDfAqVfljlhgmkWp/Kq/612HPyHyN7JOsp4+lq9vZaozW8ZpAoG8Icc+HVpU0JbFGn1xwdPc2owQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=mTdI+fTA1UXZazDgnLPmbujBWrZtwQ9krVHPN5u35V8=;
- b=d3GT4j5tHJQ2DEysGmlsUwU6kOsPN/J+IcHBEvOv9jCPC8Aalf6qMyV3BKKDDUtHaKyR58pyhH3rqsbxqTVUmpj6t5D7tY8YN3ecFiRvDfZQrBqtgogCAqJco91aWXsHiMaSsxejnBSK2Nv3NIw/nBEQgyQOdtEvCUinM5FM5pc=
-Authentication-Results: gmail.com; dkim=none (message not signed)
- header.d=none;gmail.com; dmarc=none action=none header.from=amd.com;
-Received: from SN6PR12MB2718.namprd12.prod.outlook.com (2603:10b6:805:6f::22)
- by SN1PR12MB2447.namprd12.prod.outlook.com (2603:10b6:802:27::22) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4331.23; Fri, 16 Jul
- 2021 21:25:24 +0000
-Received: from SN6PR12MB2718.namprd12.prod.outlook.com
- ([fe80::a8a9:2aac:4fd1:88fa]) by SN6PR12MB2718.namprd12.prod.outlook.com
- ([fe80::a8a9:2aac:4fd1:88fa%3]) with mapi id 15.20.4331.024; Fri, 16 Jul 2021
- 21:25:24 +0000
-Cc:     brijesh.singh@amd.com, x86@kernel.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
-        linux-coco@lists.linux.dev, linux-mm@kvack.org,
-        linux-crypto@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
+        id S235846AbhGPV3i (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 16 Jul 2021 17:29:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52714 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S235173AbhGPV3h (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 16 Jul 2021 17:29:37 -0400
+Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 953ACC06175F
+        for <kvm@vger.kernel.org>; Fri, 16 Jul 2021 14:26:40 -0700 (PDT)
+Received: by mail-yb1-xb49.google.com with SMTP id x84-20020a2531570000b029055d47682463so14460816ybx.5
+        for <kvm@vger.kernel.org>; Fri, 16 Jul 2021 14:26:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=CG1+N8vSAN8jzRMG92Z0vjc6XGG3WrzLze9UYb4OGFM=;
+        b=hpALvyjB67nNiBWyNRqdwZIgq9/Ah4C1wy4WzyAhOF1YMY/PbIl+5JKuOIwVYnwWXL
+         yHkH+Q76WdRKmp3DXfrvnGBgf3RmSHMMJP1rsysV+s0a0bDxSckfFBsAmpPs5qMieJPr
+         Z/4fTJy3iUAL++yl1gG/rPWRtSIQlPEv0nTGfhj0vmNoICTnPyCUDw85Scu6xFnhxqQ/
+         PCl5syulBaA+CBZq01RP/dqRWltjhNxXD34Gf3fbM6nhoBWFHS0MzyhH4DCJ8wLeMicH
+         vzXbhsT3y3DycKc2TTueJe29yKr7LdDQxOI22pnAgKXyUZZrFRHTKRIqBL2NhrtrEbTw
+         SYhQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=CG1+N8vSAN8jzRMG92Z0vjc6XGG3WrzLze9UYb4OGFM=;
+        b=PagxCMssjpTFrF++4XViuzQiK0gh7B78acx4oL9kFeNOnqdfxTrcUPnvoMuRwxj4zx
+         dAN13SGroKETrpJOUcsuEwPAOlfoxzdFZYnNFoYXMuu+Hr7lGssbNc9mI6FkFKvUXC2T
+         uo5YicQBgpociuwlZ6wmXi3pTxHPlQmXlSZ8UF8/N1XcDdlEcK5SdbWPXCxrziiN6Ims
+         e9LA5KJRnC4oYKCW+3o3NPWkqkux5b/j0We/mesM/kzEW3iB9253oLKPYECyfBLC46i0
+         sxuR/Do69Xsg1oN4U9oL29H8+/QjRWtL7+Hx7o4zuQ7DT0vgLH9AbB4tM1+oo17ljDC5
+         oJig==
+X-Gm-Message-State: AOAM531bJqTzL1ilvu6iFqzfYLBLdkI0UjwPypx5ZR4gKLe7U1zhXfUs
+        g88g2oGF3tLY2U9JAZZ80V9Q4lBJCmnYZ0Di5PlZJBz663eCWhbAFmzwwAUn1BxN+KjFRcKJYMI
+        qj0J4lP2It3O3dIABUdskff80WEp8JvuCg6mJXvWHPNdYe0qy8XVYLY4ULg==
+X-Google-Smtp-Source: ABdhPJyM4yakm1D1JS9PB+woXsIw2d1EI19Wm7mHRgWc5nFPgvVvTY/SC4vCot6IQ4tGKqy+FEet80OPohc=
+X-Received: from oupton.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:404])
+ (user=oupton job=sendgmr) by 2002:a25:ed0b:: with SMTP id k11mr14179470ybh.39.1626470799678;
+ Fri, 16 Jul 2021 14:26:39 -0700 (PDT)
+Date:   Fri, 16 Jul 2021 21:26:17 +0000
+Message-Id: <20210716212629.2232756-1-oupton@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.32.0.402.g57bb445576-goog
+Subject: [PATCH v2 00/12] KVM: Add idempotent controls for migrating system
+ counter state
+From:   Oliver Upton <oupton@google.com>
+To:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Marc Zyngier <maz@kernel.org>, Peter Shier <pshier@google.com>,
         Jim Mattson <jmattson@google.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
-        David Rientjes <rientjes@google.com>,
-        Dov Murik <dovmurik@linux.ibm.com>,
-        Tobin Feldman-Fitzthum <tobin@ibm.com>,
-        Borislav Petkov <bp@alien8.de>,
-        Michael Roth <michael.roth@amd.com>,
-        Vlastimil Babka <vbabka@suse.cz>, tony.luck@intel.com,
-        npmccallum@redhat.com, brijesh.ksingh@gmail.com
-Subject: Re: [PATCH Part2 RFC v4 22/40] KVM: SVM: Add KVM_SNP_INIT command
-To:     Sean Christopherson <seanjc@google.com>
-References: <20210707183616.5620-1-brijesh.singh@amd.com>
- <20210707183616.5620-23-brijesh.singh@amd.com> <YPHfC1mI8dQkkzyV@google.com>
-From:   Brijesh Singh <brijesh.singh@amd.com>
-Message-ID: <3f12243a-dee3-2a97-9a1b-51f4f6095349@amd.com>
-Date:   Fri, 16 Jul 2021 16:25:16 -0500
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0)
- Gecko/20100101 Thunderbird/78.12.0
-In-Reply-To: <YPHfC1mI8dQkkzyV@google.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-X-ClientProxiedBy: SN4PR0501CA0126.namprd05.prod.outlook.com
- (2603:10b6:803:42::43) To SN6PR12MB2718.namprd12.prod.outlook.com
- (2603:10b6:805:6f::22)
-MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from Brijeshs-MacBook-Pro.local (70.112.153.56) by SN4PR0501CA0126.namprd05.prod.outlook.com (2603:10b6:803:42::43) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4352.15 via Frontend Transport; Fri, 16 Jul 2021 21:25:21 +0000
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 32789d18-78ec-405b-c9cc-08d948a038fd
-X-MS-TrafficTypeDiagnostic: SN1PR12MB2447:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <SN1PR12MB244747FEC188CEF388808375E5119@SN1PR12MB2447.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:9508;
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: eccvAwDbtApsu+038/bLJy20xak/D3bCHktERZIPnwnT2BZPf/NlLhYHFZR722AZcF5FYlI5IT9T8r+BOKMxxqzWno4UxAFYVKyZiU80ZN/eztNx6x07ZMZBmKBwVyAr3f8oZCQZvLyMFunAWaAwB7StgNERDojUxJp3iLGkqr8PTkeF3BnHm05xEr4aDOlvkhuXeqXtEu9z2s9747Ob4M/kWeI9wPtEMR6ml0LRBxCey2l9VbvT730HPeIyg/Z0KReOvR2lNNWo0S5lbx9zxgAfvJxyDUUjkP2q3nUZ1jesVTTK+PccJuRcmEbWB/sCjXSEA1m1QQdovdN4ut1YNeZY6DNCWaAkYCCaaBGLwi8ew2VlxIPdoFWbArv46CyHyrPTYbW9xzxWaTr4XixiRC/A/rbkmr/9CBlcKiNOGCEu+m9a8tIOKsnahYqeAObalTUvMyYKZxZ7lMABQ72W1PwrijZkrk3VuPCWQzXMGY8hGN+14Ml9NYYHYGVcOEWkmJHHr8DNC+9mUwcq4PolLRn+jDgZEvyUB94WxaozpMyc/MtE4dzpino55UHpGVP20d53elFJKjHJQQMTvl28XCsBd8ATK7SyK0S7WlpTPjuU5yIy3iXGbpoxbltMc+luVRfJkS9epJfBfs0Qw7GbcIIzqBfYid34/67k5dGwzozswl+qlGnPQsXdS+C9Ascl1i4Xthsvw4SZ0g+B2H4+YvqUep8YWf+eDh1hEEBtWD2yijTDVI8O0fibdDEIvwRLaP2an6M1fY651wAqsbxX/g==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR12MB2718.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(136003)(346002)(39860400002)(376002)(396003)(44832011)(54906003)(8676002)(52116002)(83380400001)(7416002)(316002)(956004)(7406005)(8936002)(66476007)(66946007)(2616005)(6666004)(31696002)(5660300002)(4326008)(66556008)(6916009)(6506007)(38100700002)(86362001)(6486002)(38350700002)(36756003)(26005)(186003)(53546011)(478600001)(2906002)(31686004)(6512007)(43740500002)(45980500001);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?bUJ4YitkMzdSVi9MUnlQUVFISmoxbUN1U01rbDJwOVhmNzZhbGtPKzlEaEVa?=
- =?utf-8?B?ajRrYjlEU3ExQzgvZEJESjQvdlNuZEhaOTJFRDV2WmxjUGJsdnNHSmJBTkJq?=
- =?utf-8?B?WlNubERBRUIwTVprNTd4WVcvRS91dHhCVENwbkl5R1NnOWxySEhxQkltR3pS?=
- =?utf-8?B?SENDWERYaCs3Y1FOUDYwd2VYdU96YU15RjV0SE16YW5RU1d1a24wemxpWHpy?=
- =?utf-8?B?UENQanYwb012VHM3MEhMU1dBTzB0enFxRTdPT3RRbkREQkxmb3daNCt3ZmZS?=
- =?utf-8?B?VHdrZlBaL2U4R1FTQng2S2VUSFhmQWJmemx0RUdHUDFhWkhURUdjbWNOQUdX?=
- =?utf-8?B?SU1YRGkvYzVURFJmckRaOVFpMTRzSkxONnI1NnRhbDIyaUZlcVpGZ1RtVFVr?=
- =?utf-8?B?T1k4ZktMc0YyUmNJbGQ1eGx2cjJpUVFVMXBvTnNXNnJyNTVxY2szY1hjMTFm?=
- =?utf-8?B?bGtQNHlsTlJXT2ZScGZlbm1lTXlldG5HTFhUQzZVM2xoeVlSSmZRWGpnTlYy?=
- =?utf-8?B?dVJsRjBtRjZ6VXE4ZHEwU0ErNXVvK28vc1R5TjduVDV0anZabzkxdTNoeFdV?=
- =?utf-8?B?SWpHZklkMUU3T28wT3ExVHFKdjVnam1OMEFMR0FBRDJUZ3dPT2RSQ2Z0UTRt?=
- =?utf-8?B?cFlJN2p5cy85RndwM2wrTko4WmtIdXl1ZVc0QkkzVjFvcVo1QWlyNVZGMnFk?=
- =?utf-8?B?Qng4dWVaRThzbkNSOTEveUVIZ29nL1hUcVlMZ1lHSkRRb0FhS1lrS3RpUGM1?=
- =?utf-8?B?d0VmVnFSaG1LL0dsZnpVTTdGWkxWcTNKZWZDcDROeklVc3pwMjVMT3ZEU1pR?=
- =?utf-8?B?WUI4N2t5QmdqYXlKc2ljMHpQbWpPa0lRV1FyU0tPOVhJY1RtS0NCWWJSQ3NI?=
- =?utf-8?B?UDZkY0xERVpSYU1mWkp2YXVza2VCek44bnlnWlg4NW1BSGpRZ3JkMUdFSnpF?=
- =?utf-8?B?eHZMeXBPMHRwZFdXcTUvTmlEeFZKYkIzZlJsOTBza1JHTE9WNFZzRW0vek45?=
- =?utf-8?B?NG1LQTdoNWFqQTFaL3FJaVZPL1RtSDMzbXU3N09vTTI5Yy9KRFYzWm9tRjhP?=
- =?utf-8?B?T2pQVmlLNWg1cWVnNVRhc2lCc1ZPbmNHdFJCZUJLNjdQYVk4V1JiM1YwV1NO?=
- =?utf-8?B?TE9QUmxDRUhOdGtNVTIwSENFT0RRUWtBOGd3SHpwTmZjUTdCMWtJRWlQVUhJ?=
- =?utf-8?B?KzArUTZtY04ySWY2dGtGNEo2djZoQm9QQ21rMEw5TEFERUJGMzRGM1FBM084?=
- =?utf-8?B?QVA2UmU1dU5JRGpsUklKNUw0SXJ1dkhZNEo4QVdhZC9rYUNtS2pTd1NQME9Q?=
- =?utf-8?B?aU5HcXF2R2JFYmxjc3FKSUJvS2M0ZjRzemRNQlFKQVQvcU1mdDIyWHIxR3ZC?=
- =?utf-8?B?cFZ1blpQTUQ3YVc1bU43L3ovcDAyZzhVMCtnbTJDV2syN1hnNzNzYTE5Znh1?=
- =?utf-8?B?ZUhhOFdpeWZ5bVdpcXVIM2xyS1lWUjlEYkJ1VHp1RWowMG9TOTUzM3ZhaWFh?=
- =?utf-8?B?NHBESTczK0tUdTAvQzhYd0R4TG5vNTFOTU42aXVTQ0ZuejB4STFsV29NR3Bn?=
- =?utf-8?B?a1pUWm5lYlp3QjltSWpKYW5sKy9NNzRCNXhpZWZUYXkzSjVSWkEyQ1ZkTnlQ?=
- =?utf-8?B?bDBVM2toS2xoVk1TWEd6ajRPcDNXVkRRTE9NM3RrVnloeDA3U2Y2MktGSXAz?=
- =?utf-8?B?RHplQVhlZEt6Z1p6WjJWcGxwMzFwLy83MEZ1RmpIcWcyK0FHdW9kWGh5R1NQ?=
- =?utf-8?Q?gMeEcODntyztcHs5xfdrApgNCuHRxeBwQs3ncMa?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 32789d18-78ec-405b-c9cc-08d948a038fd
-X-MS-Exchange-CrossTenant-AuthSource: SN6PR12MB2718.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Jul 2021 21:25:24.0108
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: mLTJPuBH/GV8NGpJcVw6GmOGvGxqqYwrUFYWAlUzJsgkdhM71vNjdLSn29AyHzl53QInysqz1v+GUO1UKzPIbw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN1PR12MB2447
+        David Matlack <dmatlack@google.com>,
+        Ricardo Koller <ricarkol@google.com>,
+        Jing Zhang <jingzhangos@google.com>,
+        Raghavendra Rao Anata <rananta@google.com>,
+        James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        linux-arm-kernel@lists.infradead.org,
+        Oliver Upton <oupton@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+KVM's current means of saving/restoring system counters is plagued with
+temporal issues. At least on ARM64 and x86, we migrate the guest's
+system counter by-value through the respective guest system register
+values (cntvct_el0, ia32_tsc). Restoring system counters by-value is
+brittle as the state is not idempotent: the host system counter is still
+oscillating between the attempted save and restore. Furthermore, VMMs
+may wish to transparently live migrate guest VMs, meaning that they
+include the elapsed time due to live migration blackout in the guest
+system counter view. The VMM thread could be preempted for any number of
+reasons (scheduler, L0 hypervisor under nested) between the time that
+it calculates the desired guest counter value and when KVM actually sets
+this counter state.
 
-On 7/16/21 2:33 PM, Sean Christopherson wrote:
-> On Wed, Jul 07, 2021, Brijesh Singh wrote:
->> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
->> index 3fd9a7e9d90c..989a64aa1ae5 100644
->> --- a/include/uapi/linux/kvm.h
->> +++ b/include/uapi/linux/kvm.h
->> @@ -1678,6 +1678,9 @@ enum sev_cmd_id {
->>  	/* Guest Migration Extension */
->>  	KVM_SEV_SEND_CANCEL,
->>  
->> +	/* SNP specific commands */
->> +	KVM_SEV_SNP_INIT = 256,
-> Is there any meaning behind '256'?  If not, why skip a big chunk?  I wouldn't be
-> concerned if it weren't for KVM_SEV_NR_MAX, whose existence arguably implies that
-> 0-KVM_SEV_NR_MAX-1 are all valid SEV commands.
+Despite the value-based interface that we present to userspace, KVM
+actually has idempotent guest controls by way of system counter offsets.
+We can avoid all of the issues associated with a value-based interface
+by abstracting these offset controls in new ioctls. This series
+introduces new vCPU device attributes to provide userspace access to the
+vCPU's system counter offset.
 
-In previous patches, Peter highlighted that we should keep some gap
-between the SEV/ES and SNP to leave room for legacy SEV/ES expansion. I
-was not sure how many we need to reserve without knowing what will come
-in the future; especially recently some of the command additional  are
-not linked to the firmware. I am okay to reduce the gap or remove the
-gap all together.
+Patch 1 adopts Paolo's suggestion, augmenting the KVM_{GET,SET}_CLOCK
+ioctls to provide userspace with a (host_tsc, realtime) instant. This is
+essential for a VMM to perform precise migration of the guest's system
+counters.
+
+Patches 2-3 add support for x86 by shoehorning the new controls into the
+pre-existing synchronization heuristics.
+
+Patches 4-5 implement a test for the new additions to
+KVM_{GET,SET}_CLOCK.
+
+Patches 6-7 implement at test for the tsc offset attribute introduced in
+patch 3.
+
+Patch 8 adds a device attribute for the arm64 virtual counter-timer
+offset.
+
+Patch 9 extends the test from patch 7 to cover the arm64 virtual
+counter-timer offset.
+
+Patch 10 adds a device attribute for the arm64 physical counter-timer
+offset. Currently, this is implemented as a synthetic register, forcing
+the guest to trap to the host and emulating the offset in the fast exit
+path. Later down the line we will have hardware with FEAT_ECV, which
+allows the hypervisor to perform physical counter-timer offsetting in
+hardware (CNTPOFF_EL2).
+
+Patch 11 extends the test from patch 7 to cover the arm64 physical
+counter-timer offset.
+
+Patch 12 introduces a benchmark to measure the overhead of emulation in
+patch 10.
+
+Physical counter benchmark
+--------------------------
+
+The following data was collected by running 10000 iterations of the
+benchmark test from Patch 6 on an Ampere Mt. Jade reference server, A 2S
+machine with 2 80-core Ampere Altra SoCs. Measurements were collected
+for both VHE and nVHE operation using the `kvm-arm.mode=` command-line
+parameter.
+
+nVHE
+----
+
++--------------------+--------+---------+
+|       Metric       | Native | Trapped |
++--------------------+--------+---------+
+| Average            | 54ns   | 148ns   |
+| Standard Deviation | 124ns  | 122ns   |
+| 95th Percentile    | 258ns  | 348ns   |
++--------------------+--------+---------+
+
+VHE
+---
+
++--------------------+--------+---------+
+|       Metric       | Native | Trapped |
++--------------------+--------+---------+
+| Average            | 53ns   | 152ns   |
+| Standard Deviation | 92ns   | 94ns    |
+| 95th Percentile    | 204ns  | 307ns   |
++--------------------+--------+---------+
+
+This series applies cleanly to the following commit:
+
+1889228d80fe ("KVM: selftests: smm_test: Test SMM enter from L2")
+
+v1 -> v2:
+  - Reimplemented as vCPU device attributes instead of a distinct ioctl.
+  - Added the (realtime, host_tsc) instant support to
+    KVM_{GET,SET}_CLOCK
+  - Changed the arm64 implementation to broadcast counter offset values
+    to all vCPUs in a guest. This upholds the architectural expectations
+    of a consistent counter-timer across CPUs.
+  - Fixed a bug with traps in VHE mode. We now configure traps on every
+    transition into a guest to handle differing VMs (trapped, emulated).
+
+Oliver Upton (12):
+  KVM: x86: Report host tsc and realtime values in KVM_GET_CLOCK
+  KVM: x86: Refactor tsc synchronization code
+  KVM: x86: Expose TSC offset controls to userspace
+  tools: arch: x86: pull in pvclock headers
+  selftests: KVM: Add test for KVM_{GET,SET}_CLOCK
+  selftests: KVM: Add helpers for vCPU device attributes
+  selftests: KVM: Introduce system counter offset test
+  KVM: arm64: Allow userspace to configure a vCPU's virtual offset
+  selftests: KVM: Add support for aarch64 to system_counter_offset_test
+  KVM: arm64: Provide userspace access to the physical counter offset
+  selftests: KVM: Test physical counter offsetting
+  selftests: KVM: Add counter emulation benchmark
+
+ Documentation/virt/kvm/api.rst                |  42 +-
+ Documentation/virt/kvm/locking.rst            |  11 +
+ arch/arm64/include/asm/kvm_host.h             |   1 +
+ arch/arm64/include/asm/kvm_hyp.h              |   2 -
+ arch/arm64/include/asm/sysreg.h               |   1 +
+ arch/arm64/include/uapi/asm/kvm.h             |   2 +
+ arch/arm64/kvm/arch_timer.c                   | 118 ++++-
+ arch/arm64/kvm/arm.c                          |   4 +-
+ arch/arm64/kvm/hyp/include/hyp/switch.h       |  23 +
+ arch/arm64/kvm/hyp/include/hyp/timer-sr.h     |  26 ++
+ arch/arm64/kvm/hyp/nvhe/switch.c              |   2 -
+ arch/arm64/kvm/hyp/nvhe/timer-sr.c            |  21 +-
+ arch/arm64/kvm/hyp/vhe/timer-sr.c             |  27 ++
+ arch/x86/include/asm/kvm_host.h               |   4 +
+ arch/x86/include/uapi/asm/kvm.h               |   4 +
+ arch/x86/kvm/x86.c                            | 421 ++++++++++++++----
+ include/kvm/arm_arch_timer.h                  |   2 -
+ include/uapi/linux/kvm.h                      |   7 +-
+ tools/arch/x86/include/asm/pvclock-abi.h      |  48 ++
+ tools/arch/x86/include/asm/pvclock.h          | 103 +++++
+ tools/testing/selftests/kvm/.gitignore        |   3 +
+ tools/testing/selftests/kvm/Makefile          |   4 +
+ .../kvm/aarch64/counter_emulation_benchmark.c | 215 +++++++++
+ .../selftests/kvm/include/aarch64/processor.h |  24 +
+ .../testing/selftests/kvm/include/kvm_util.h  |  11 +
+ tools/testing/selftests/kvm/lib/kvm_util.c    |  38 ++
+ .../kvm/system_counter_offset_test.c          | 206 +++++++++
+ .../selftests/kvm/x86_64/kvm_clock_test.c     | 210 +++++++++
+ 28 files changed, 1447 insertions(+), 133 deletions(-)
+ create mode 100644 arch/arm64/kvm/hyp/include/hyp/timer-sr.h
+ create mode 100644 tools/arch/x86/include/asm/pvclock-abi.h
+ create mode 100644 tools/arch/x86/include/asm/pvclock.h
+ create mode 100644 tools/testing/selftests/kvm/aarch64/counter_emulation_benchmark.c
+ create mode 100644 tools/testing/selftests/kvm/system_counter_offset_test.c
+ create mode 100644 tools/testing/selftests/kvm/x86_64/kvm_clock_test.c
+
+-- 
+2.32.0.402.g57bb445576-goog
 
