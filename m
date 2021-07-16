@@ -2,92 +2,112 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C4F383CB5FF
-	for <lists+kvm@lfdr.de>; Fri, 16 Jul 2021 12:25:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A53ED3CB668
+	for <lists+kvm@lfdr.de>; Fri, 16 Jul 2021 12:52:29 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239001AbhGPK0h (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 16 Jul 2021 06:26:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43566 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238938AbhGPK0f (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 16 Jul 2021 06:26:35 -0400
-Received: from mail-pg1-x531.google.com (mail-pg1-x531.google.com [IPv6:2607:f8b0:4864:20::531])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 98000C06175F
-        for <kvm@vger.kernel.org>; Fri, 16 Jul 2021 03:23:40 -0700 (PDT)
-Received: by mail-pg1-x531.google.com with SMTP id k20so9516228pgg.7
-        for <kvm@vger.kernel.org>; Fri, 16 Jul 2021 03:23:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance-com.20150623.gappssmtp.com; s=20150623;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=O+aoi4mzR9R0iZuLemuHjtXgfA9womLoAerCtxXTQaU=;
-        b=EGvXh4cu9xHTBQMHWEdPcpq0Cehs0/omnlJ7DpLTRy4lJ44ulzrdc7Nk6Ng1rMSWCF
-         on1ymYszZTIM8tY2LL6bBOOvdANp+flT1o+DR0mo/1esxdpEll1K9tjgfnVCidwoumyR
-         UBy1cO9cYEGzMGNL15FYBzmsA9K1iIb/PGJmy38XQFZRA52RKVxwNm6u4DWKuR6uJSrd
-         2mHjCoJmKdM13gH+qPdJJz9xV6k4UyJhC6xMxFXwKFOmBOMEY49nrwL/daEURrsrbn4l
-         UJXsTjUl0kZ67KBVXHNZatfysQn7hG+yrBf0qZT99bB49bgr6nW9Rr/jrpwW1uW4n0+V
-         Holg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=O+aoi4mzR9R0iZuLemuHjtXgfA9womLoAerCtxXTQaU=;
-        b=e7DbYn+l7e8gowURE5ZOo9JjqeSIRL7i12kgfs5YCnpDpJ4TJs1jx3UNwKqoBZKZPJ
-         l5FVY7yVFM92W9zRe4fHYzRtlR3DssbfduVIilahYEC+C4o9/8k9RvHquwynrtWoPaJi
-         4ElEhwr9JydTPfTbDHCSIMcvFWmKilYVBbOiLoKXplmC0u40MLe6/p/hTpIp/9ceQcSk
-         qf5MFn7CI6IK1ua1RqCNIDwZ++ILsbhxiNOE4a8tM6gTqS4trMBeNXtWzCUBn5N695C1
-         nvnOg5Hjfd7jkIw78fexBqPvUYRl0Xe5rjFL4jMX1WGGeCIs5wnvSMwW/q8d6j8Dj+nV
-         qTrw==
-X-Gm-Message-State: AOAM531v93eZah/Mk7zTVKKuNRWSoNbFi73y/QtzV9zLVL8lgk0j7TPe
-        IT1/ex4y1+UNc9GeB16uVAei
-X-Google-Smtp-Source: ABdhPJxuw98GR5HK3YBPh9STuop2yfagNpyb+GFBdHn1W/rAoINiKBfEzL6gAM6RByS5JfWFM0Uw3g==
-X-Received: by 2002:a05:6a00:1a09:b029:32c:7b3a:837 with SMTP id g9-20020a056a001a09b029032c7b3a0837mr9616864pfv.36.1626431020225;
-        Fri, 16 Jul 2021 03:23:40 -0700 (PDT)
-Received: from localhost ([139.177.225.253])
-        by smtp.gmail.com with ESMTPSA id k19sm8137435pji.32.2021.07.16.03.23.38
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 16 Jul 2021 03:23:39 -0700 (PDT)
-From:   Xie Yongji <xieyongji@bytedance.com>
-To:     mst@redhat.com, jasowang@redhat.com, dan.carpenter@oracle.com
-Cc:     virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH 2/2] vhost: Fix the calculation in vhost_overflow()
-Date:   Fri, 16 Jul 2021 18:22:39 +0800
-Message-Id: <20210716102239.96-2-xieyongji@bytedance.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20210716102239.96-1-xieyongji@bytedance.com>
-References: <20210716102239.96-1-xieyongji@bytedance.com>
+        id S232494AbhGPKzW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 16 Jul 2021 06:55:22 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:54342 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S232248AbhGPKzW (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 16 Jul 2021 06:55:22 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1626432747;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=dQ9livOHX4Of0h6YaqNPiNRMVMaSNTYaTom+qtCoFiQ=;
+        b=ePkXuSRToM0mobCHMbygjLrPFsXLE18oBjeWjzP0dzJ0VWOX6j/nvKtf1TVPdHQtwUozFg
+        CCtCJpjNTeiLODBJaAts0UQVGFGymWrbJt1JCYBYcuFy+uQX+PoNQyaFFCrLJ3TEgeYYT+
+        a0en5uWOgNr2P2JFNMWgIexVwoCu+hU=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-33-34PWzeb3NAO36xU5YtbMAA-1; Fri, 16 Jul 2021 06:52:25 -0400
+X-MC-Unique: 34PWzeb3NAO36xU5YtbMAA-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id AA4FB80006E;
+        Fri, 16 Jul 2021 10:52:24 +0000 (UTC)
+Received: from thuth.com (ovpn-112-45.ams2.redhat.com [10.36.112.45])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 668D110016F7;
+        Fri, 16 Jul 2021 10:52:23 +0000 (UTC)
+From:   Thomas Huth <thuth@redhat.com>
+To:     kvm@vger.kernel.org, Janosch Frank <frankja@linux.ibm.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Steffen Eiden <seiden@linux.ibm.com>
+Subject: [kvm-unit-tests PATCH] s390x: Fix out-of-tree builds
+Date:   Fri, 16 Jul 2021 12:52:19 +0200
+Message-Id: <20210716105219.1201997-1-thuth@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This fixes the incorrect calculation for integer overflow
-when the last address of iova range is 0xffffffff.
+The support for "snippets" (nested guest binaries) that has been added
+recently to the s390x folder broke the out-of-tree compilation. We
+have to make sure that the snippet folder is created in the build
+directory, too, and that linker script is taken from the source folder.
 
-Fixes: ec33d031a14b ("vhost: detect 32 bit integer wrap around“)
-Reported-by: Jason Wang <jasowang@redhat.com>
-Signed-off-by: Xie Yongji <xieyongji@bytedance.com>
+While we're at it, switch the gitlab-CI cross compiler job to use
+out-of-tree builds, too, so that this does not happen so easily again.
+We're still testing in-tree s390x builds with the native "s390x-kvm"
+job on the s390x host, so we now test both, in-tree and out-of-tree
+builds.
+
+Fixes: 2f6fdb4ac446 ("s390x: snippets: Add snippet compilation")
+Signed-off-by: Thomas Huth <thuth@redhat.com>
 ---
- drivers/vhost/vhost.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ .gitlab-ci.yml | 4 +++-
+ configure      | 4 ++++
+ s390x/Makefile | 2 +-
+ 3 files changed, 8 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/vhost/vhost.c b/drivers/vhost/vhost.c
-index b9e853e6094d..a9fd1b311d2f 100644
---- a/drivers/vhost/vhost.c
-+++ b/drivers/vhost/vhost.c
-@@ -738,7 +738,8 @@ static bool log_access_ok(void __user *log_base, u64 addr, unsigned long sz)
- static bool vhost_overflow(u64 uaddr, u64 size)
- {
- 	/* Make sure 64 bit math will not overflow. */
--	return uaddr > ULONG_MAX || size > ULONG_MAX || uaddr > ULONG_MAX - size;
-+	return uaddr > ULONG_MAX || size > ULONG_MAX ||
-+	       uaddr - 1 > ULONG_MAX - size;
- }
+diff --git a/.gitlab-ci.yml b/.gitlab-ci.yml
+index 4aebb97..943b20f 100644
+--- a/.gitlab-ci.yml
++++ b/.gitlab-ci.yml
+@@ -57,7 +57,9 @@ build-ppc64le:
+ build-s390x:
+  script:
+  - dnf install -y qemu-system-s390x gcc-s390x-linux-gnu
+- - ./configure --arch=s390x --cross-prefix=s390x-linux-gnu-
++ - mkdir build
++ - cd build
++ - ../configure --arch=s390x --cross-prefix=s390x-linux-gnu-
+  - make -j2
+  - ACCEL=tcg ./run_tests.sh
+      selftest-setup intercept emulator sieve skey diag10 diag308 vector diag288
+diff --git a/configure b/configure
+index 1d4871e..1d4d855 100755
+--- a/configure
++++ b/configure
+@@ -296,6 +296,10 @@ if test ! -e Makefile; then
+     ln -sf "$srcdir/$testdir/unittests.cfg" $testdir/
+     ln -sf "$srcdir/run_tests.sh"
  
- /* Caller should have vq mutex and device mutex. */
++    if [ -d "$srcdir/$testdir/snippets" ]; then
++        mkdir -p "$testdir/snippets/c"
++    fi
++
+     echo "linking scripts..."
+     ln -sf "$srcdir/scripts"
+ fi
+diff --git a/s390x/Makefile b/s390x/Makefile
+index 07af26d..6565561 100644
+--- a/s390x/Makefile
++++ b/s390x/Makefile
+@@ -90,7 +90,7 @@ $(SNIPPET_DIR)/asm/%.gbin: $(SNIPPET_DIR)/asm/%.o $(FLATLIBS)
+ 	$(OBJCOPY) -I binary -O elf64-s390 -B "s390:64-bit" $@ $@
+ 
+ $(SNIPPET_DIR)/c/%.gbin: $(SNIPPET_DIR)/c/%.o $(snippet_asmlib) $(FLATLIBS)
+-	$(CC) $(LDFLAGS) -o $@ -T $(SNIPPET_DIR)/c/flat.lds $(patsubst %.gbin,%.o,$@) $(snippet_asmlib) $(FLATLIBS)
++	$(CC) $(LDFLAGS) -o $@ -T $(SRCDIR)/s390x/snippets/c/flat.lds $(patsubst %.gbin,%.o,$@) $(snippet_asmlib) $(FLATLIBS)
+ 	$(OBJCOPY) -O binary $@ $@
+ 	$(OBJCOPY) -I binary -O elf64-s390 -B "s390:64-bit" $@ $@
+ 
 -- 
-2.11.0
+2.27.0
 
