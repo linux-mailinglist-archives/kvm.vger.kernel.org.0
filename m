@@ -2,189 +2,296 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 156D93CAFC6
-	for <lists+kvm@lfdr.de>; Fri, 16 Jul 2021 01:48:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id AB5BA3CB041
+	for <lists+kvm@lfdr.de>; Fri, 16 Jul 2021 03:04:37 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232499AbhGOXvT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 15 Jul 2021 19:51:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41704 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232452AbhGOXvT (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 15 Jul 2021 19:51:19 -0400
-Received: from mail-pf1-x42c.google.com (mail-pf1-x42c.google.com [IPv6:2607:f8b0:4864:20::42c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4CCE3C061760
-        for <kvm@vger.kernel.org>; Thu, 15 Jul 2021 16:48:24 -0700 (PDT)
-Received: by mail-pf1-x42c.google.com with SMTP id 17so7178316pfz.4
-        for <kvm@vger.kernel.org>; Thu, 15 Jul 2021 16:48:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=5OQMDn6Hx/yHVRBDOLcOoarZgTpJ6ou0lJ0Voq0OG4M=;
-        b=Xerp+3Ma+7CKr4/78JI541G8uYD8//jwvClMOF/fOO7QmiQm8HAEUnu6NpDbBLMH1q
-         bZGV9qTn+NrOGGYaOzCjTB7B/aPpvd5It43hKuUVskOmztUVNBp7D+395FsS2sQvlrxq
-         xVAo8FpFCDhowTVg4hGaiMCdbGyqn6qUNM0miSvgPCaSI49UBGL5vj48ibmF6+Rb17X0
-         w7C8AuBB8wkZlc1aeNQ5K9KigBlX9jYvbv1ccsercnerPpuW03IdweX4DvdjBnQR82bX
-         e0jajjskDBGjMsxL7Fj/B+zCTGGj135zbVxs9kViMAV8ZYC/Kcwbxlf9wsPPlckGHHm4
-         ds+Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=5OQMDn6Hx/yHVRBDOLcOoarZgTpJ6ou0lJ0Voq0OG4M=;
-        b=sviXCN0RP963vlt559Zb0KyuIUJZ28JQcDqrZzT4PBjpdhCsqbmyYRhhpPddIu1gKY
-         aS8z4KVZlMZr+hZpklUxmlMcCHwFj/LvoJZ/tDdFdKG/KkjhFtK4AuN8yqwMwHT89aEf
-         mTrwgo9wPV2/EMnajij7K3/as6m0MO5jVIG0GgQ5KdJNJ8Vd2cqIy1oAlUAu2s+ZrtpP
-         hW8WMZ0i34I4p6V6Dx6QTzc/kXRtfv05E8vWcBV5OFiSNMaxUPzIJb8MfUIvqKLCLJUO
-         2Pyq5L+Rc3PLfEYNiuKjdRvCY1J+ZOYcCNfDpX1yjAuIzc0t6gXEnBAoOsZPEr0yustg
-         PUlg==
-X-Gm-Message-State: AOAM531cSXJsfR4Ko8C/fYvdFFS6arFbo2rdY/+iI1wxCn+fLh1DYwoD
-        pNB9Vl2d3xgA2ASbnQvF6mvnTw==
-X-Google-Smtp-Source: ABdhPJzB/aLwcMzRnzgFsmskaKhCj/u4SogoqFPq9x0TyUcwapKqqebbwl1vM0o7pXaHZ6NJDfrs4g==
-X-Received: by 2002:a63:4e5d:: with SMTP id o29mr275121pgl.379.1626392903572;
-        Thu, 15 Jul 2021 16:48:23 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id o184sm8719553pga.18.2021.07.15.16.48.22
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 15 Jul 2021 16:48:22 -0700 (PDT)
-Date:   Thu, 15 Jul 2021 23:48:19 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Brijesh Singh <brijesh.singh@amd.com>
-Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
-        linux-coco@lists.linux.dev, linux-mm@kvack.org,
-        linux-crypto@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
-        David Rientjes <rientjes@google.com>,
-        Dov Murik <dovmurik@linux.ibm.com>,
-        Tobin Feldman-Fitzthum <tobin@ibm.com>,
-        Borislav Petkov <bp@alien8.de>,
-        Michael Roth <michael.roth@amd.com>,
-        Vlastimil Babka <vbabka@suse.cz>, tony.luck@intel.com,
-        npmccallum@redhat.com, brijesh.ksingh@gmail.com
-Subject: Re: [PATCH Part2 RFC v4 15/40] crypto: ccp: Handle the legacy TMR
- allocation when SNP is enabled
-Message-ID: <YPDJQ0uumar8j22y@google.com>
-References: <20210707183616.5620-1-brijesh.singh@amd.com>
- <20210707183616.5620-16-brijesh.singh@amd.com>
+        id S232499AbhGPBH3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 15 Jul 2021 21:07:29 -0400
+Received: from mga11.intel.com ([192.55.52.93]:49170 "EHLO mga11.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S231314AbhGPBH2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 15 Jul 2021 21:07:28 -0400
+X-IronPort-AV: E=McAfee;i="6200,9189,10046"; a="207630366"
+X-IronPort-AV: E=Sophos;i="5.84,243,1620716400"; 
+   d="scan'208";a="207630366"
+Received: from fmsmga001.fm.intel.com ([10.253.24.23])
+  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Jul 2021 18:04:33 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.84,243,1620716400"; 
+   d="scan'208";a="573247686"
+Received: from fmsmsx602.amr.corp.intel.com ([10.18.126.82])
+  by fmsmga001.fm.intel.com with ESMTP; 15 Jul 2021 18:04:33 -0700
+Received: from fmsmsx607.amr.corp.intel.com (10.18.126.87) by
+ fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2242.10; Thu, 15 Jul 2021 18:04:32 -0700
+Received: from fmsmsx607.amr.corp.intel.com (10.18.126.87) by
+ fmsmsx607.amr.corp.intel.com (10.18.126.87) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2242.10; Thu, 15 Jul 2021 18:04:32 -0700
+Received: from fmsedg601.ED.cps.intel.com (10.1.192.135) by
+ fmsmsx607.amr.corp.intel.com (10.18.126.87) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2242.10 via Frontend Transport; Thu, 15 Jul 2021 18:04:32 -0700
+Received: from NAM02-SN1-obe.outbound.protection.outlook.com (104.47.57.42) by
+ edgegateway.intel.com (192.55.55.70) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2242.10; Thu, 15 Jul 2021 18:04:28 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=bpE6SYI6Wj5YEhsyFWTtN5Q/Jf7stnwgjUrhUbnphFOn1Z6VRn5AA1fqD1yHWKooAWxo4lvzrFby2/cDvg+crsEwE9kllF44Ld0iLPxTNt9gxAiHXjSvabyLqoiMCutyOlPGZJFbO0AT+s30/KWruhHPb43NMInk9ANGr7JZNNy1YxDivF/0Wol+k1DblpSkzmzqs4iUE3MXc9sa3QCvMWUKBwN6WgfPz6d2KUiFRBLvr4NGKobUu6DNnIIR872M59SwBw5/jq3VzyNedmBpY1I282uYlORd3yhNdKsUjRLhkxrmNlltSUtxe/z20sRWgdrt2Rf1WjoIp3VUMezrPg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=CiVfGMMDx+Digi6jv+AnhiYtn74BjqEbNg9V7Wfho1c=;
+ b=FYs5snA8jLmimGKh7sDAIuB1CDR0vVt52TQP1FWPYrkbfFoMSf8+P33Veg+5Eh6r/jbdFsi0YqkDwa0KjWQqNd35mruGx0Kf/oRCaIIKfPgax6DxhQ9iDHcezPe27swQY4F9Rdypmjzic81oHDhGHC8/QYb4TLgOtwO66nWPPGWv0pU3PdYaEffBb48WyXqs4V1XmlHnpwsSgD1RcXxYBBXXlU+OFzsmS/9zNBCrAowY7rypcOPokFSh90nLGA8s3LE8fSqA4blSAvvHQnB/67BGIOknj0cHeUu/auNREaBjJCRSnnpw2br1EFl4JBG9NjAIb6F7np1vEhI7fjfllw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=intel.onmicrosoft.com;
+ s=selector2-intel-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=CiVfGMMDx+Digi6jv+AnhiYtn74BjqEbNg9V7Wfho1c=;
+ b=wrVvW6qqq3Qw6ur8TU82UZMylb9j/+MaadoA13suMXwQFMxpEEIRQ9gqqM/u2WGaomssqMZDULihYueu81rGf9IW2Pyl+yeKxESwZBg2kmtT1UifybI6nxKABQsB6cXWOJPlr3MsQlF8/HivsPl46A7505ddMTxmInc8VmFFl8M=
+Received: from BYAPR11MB3095.namprd11.prod.outlook.com (2603:10b6:a03:91::26)
+ by SJ0PR11MB5103.namprd11.prod.outlook.com (2603:10b6:a03:2d3::11) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4331.21; Fri, 16 Jul
+ 2021 01:04:23 +0000
+Received: from BYAPR11MB3095.namprd11.prod.outlook.com
+ ([fe80::59c1:1d11:445a:3942]) by BYAPR11MB3095.namprd11.prod.outlook.com
+ ([fe80::59c1:1d11:445a:3942%5]) with mapi id 15.20.4331.022; Fri, 16 Jul 2021
+ 01:04:23 +0000
+From:   "Chen, Mike Ximing" <mike.ximing.chen@intel.com>
+To:     Greg KH <gregkh@linuxfoundation.org>,
+        "Williams, Dan J" <dan.j.williams@intel.com>
+CC:     Netdev <netdev@vger.kernel.org>,
+        David Miller <davem@davemloft.net>,
+        "Jakub Kicinski" <kuba@kernel.org>, Arnd Bergmann <arnd@arndb.de>,
+        "Pierre-Louis Bossart" <pierre-louis.bossart@linux.intel.com>,
+        "Brandeburg, Jesse" <jesse.brandeburg@intel.com>,
+        KVM list <kvm@vger.kernel.org>,
+        "Raj, Ashok" <ashok.raj@intel.com>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+Subject: RE: [PATCH v10 00/20] dlb: introduce DLB device driver
+Thread-Topic: [PATCH v10 00/20] dlb: introduce DLB device driver
+Thread-Index: AQHW/9Zt8wdlPnXnkESxoD5/CU9Koap9GIKAgAMHmACAAN/QcIAAU8sAgARar7CAANe9AIBaPk+AgALX+oCAYh0MMA==
+Date:   Fri, 16 Jul 2021 01:04:23 +0000
+Message-ID: <BYAPR11MB30952BA538BB905331392A08D9119@BYAPR11MB3095.namprd11.prod.outlook.com>
+References: <20210210175423.1873-1-mike.ximing.chen@intel.com>
+ <YEiLI8fGoa9DoCnF@kroah.com>
+ <CAPcyv4gCMjoDCc2azLEc8QC5mVhdKeLibic9gj4Lm=Xwpft9ZA@mail.gmail.com>
+ <BYAPR11MB30950965A223EDE5414EAE08D96F9@BYAPR11MB3095.namprd11.prod.outlook.com>
+ <CAPcyv4htddEBB9ePPSheH+rO+=VJULeHzx0gc384if7qXTUHHg@mail.gmail.com>
+ <BYAPR11MB309515F449B8660043A559E5D96C9@BYAPR11MB3095.namprd11.prod.outlook.com>
+ <YFBz1BICsjDsSJwv@kroah.com>
+ <CAPcyv4g89PjKqPuPp2ag0vB9Vq8igTqh0gdP0h+7ySTVPagQ9w@mail.gmail.com>
+ <YJ6KHznWTKvKQZEl@kroah.com>
+In-Reply-To: <YJ6KHznWTKvKQZEl@kroah.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+dlp-version: 11.5.1.3
+dlp-reaction: no-action
+dlp-product: dlpe-windows
+authentication-results: linuxfoundation.org; dkim=none (message not signed)
+ header.d=none;linuxfoundation.org; dmarc=none action=none
+ header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 1ed337b1-27ec-4972-9443-08d947f5a68a
+x-ms-traffictypediagnostic: SJ0PR11MB5103:
+x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr,ExtFwd
+x-ms-exchange-transport-forked: True
+x-microsoft-antispam-prvs: <SJ0PR11MB510397942DE5D496B2136D97D9119@SJ0PR11MB5103.namprd11.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:9508;
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: UJSHPdYfXba3IkgOJM7HgLkj2t5Y2LL14QPlDG3OHVYRv04tYnvH5qYZfw/QybsR10b/M4hRpXBkFj3o+e6zXm5ahQas3JFU4smAtevaHsyRKCWU1Ov8aHPwxqcj10GtabRudIhrjpiL7Qvbo+fa5222dki4FBwLr/BLrftaLvIpu+9oU0pNSo3aILoYYUITIhT+9xN0looakfllj0Bs64QR58LdTCPGsGDBBvOGelleLXV+Dm3VGyKkAXPQCojfOCadb8JIf3Wlhhcfn9SE2pqRPEG4qtvf+1o990VpmoT9yfUDsW6jErv6Cm/PKwTgKa7EMMINcoDiVBK8nv3vdz9n9exnK2HJvNq0tYFdOG6mnJuI2NfSwGBZksCxDSSQBF+LCDbRlEcJc8CUjZyQOc/y/MKG76TuL0qCh6+S8leAyb6filfNAa3G6OKbb/WGq5Lm8LO+i470vES7z5eeoHuLql6kU8ncuIyKJXxmpnckaCeTCj7eZ2c9GkuT6DnU1GIF6P51S5k3W/XJv8m2vM1KfXWhOG6IKDlrEIMUQpZXllNwFVKaJZ7050Pihc61JPAYmfZoEwm0TsZ+Y/lItOU0YWJuA0em/xKUVPwGdHsKd27kOYjEpDzQJJe6C5RsHbq+fGEwan3GVxyW4a6N4jP8NDuIabd10jLvodfJyOcMZhcF9THoGHkRvXDUiGeUjdRM+AHOEGEuQLYNbQ1N073+Dd67KB7tvIX13DvZz6GGZ4V4u8/u4IhZjw4RvevfJfC4T3hW0RAvSeuKJHTcRwIRt3ietvOO51d009/a5EM=
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BYAPR11MB3095.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(376002)(39860400002)(136003)(396003)(346002)(9686003)(8936002)(7696005)(52536014)(186003)(26005)(38100700002)(5660300002)(33656002)(122000001)(4326008)(6506007)(86362001)(66446008)(2906002)(316002)(6636002)(83380400001)(478600001)(8676002)(76116006)(54906003)(71200400001)(55016002)(110136005)(64756008)(66556008)(66476007)(66946007)(53546011)(38070700004);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?svgXwsmeLsmyo4jg0Y1w+i1GA2oJsz5UQenyIGhSMH9+FCqXu1lkqnUMpy2i?=
+ =?us-ascii?Q?oU2VJ5R78QZHI3UMzqiHibBrGB8vOc5WT/5r7bGpO0gA8Q3knyBTvbHzUwgE?=
+ =?us-ascii?Q?l7DwXVYvflxHirUhXoehlJgLuqAmN2Ltr7eIz6Xoq5fhQY20CJeOsPXJLUhA?=
+ =?us-ascii?Q?G3zTU2EhLMkn3+A07FptcOjcUKGkCqL4RDgqQXH2oJhatwALfGAw6x/gS51V?=
+ =?us-ascii?Q?MvpXOT6aGQLJXIBNRcJ6f205RFCok1uolJCIFguf3wvI3EN0az6rTfWsczC8?=
+ =?us-ascii?Q?NzEIWIawwrnc8c1HPLMEXLGquf+tGJXwREQFQe5AZjSe5t1Wb3+GD55HhtOJ?=
+ =?us-ascii?Q?FL0Z3Wm/AVt709QZOFsA23hCfC89XPeJKN80jGbifuDbeqmfi8FKA1i+Lj8n?=
+ =?us-ascii?Q?4EPTsN03+bLRBq1cG4kpwOwFf97uKb0rVfPMHT6BJIk3xUMOvYZ+WxHLukFZ?=
+ =?us-ascii?Q?cJ3PdPRP2J0rYiK+QBqqYjhfktRI5KinFEa2AeTVG/4C38guggBXzVCdZKji?=
+ =?us-ascii?Q?awYDwcTElze0Tb03B2gu4YDZ3SxPtjyFFLAJIUeOJlnUQ9mkYvNIz04a7/TI?=
+ =?us-ascii?Q?V2uA4UMRJpTOHsg8igc0SG0UsDc5uKe5zkzGLDmCNxOHhNDU4OAgOT0cJTEA?=
+ =?us-ascii?Q?G3qVKZ/WpJbUtJ3anNA4ZJGLJ+WjxPh/PEd3gUpYeShswHU0MM7hHVBiQsbv?=
+ =?us-ascii?Q?gC6+n5FJr71X7monkNrH2YLRFR2NwVGyshkqL9umdij61xF9GgB7uv2RJFoK?=
+ =?us-ascii?Q?g1ociaCvrtfJKwiHKiMPJiGhccaP7fDFH4XMGqoMIWqpNkxEFJz+/Lq8+fKn?=
+ =?us-ascii?Q?Kct7qZMuUQK1qKgQj7H4qW/t/pea2v4bknURIWkfA11BC1w62aXNm91QkSKh?=
+ =?us-ascii?Q?QrQ/gdlQmxkG8469TI3rovxCL0ZsF7603Kz8uFyjX0p1nQuKP22OGCC3AzEB?=
+ =?us-ascii?Q?EHCedANu2uTooIShmR+3UispqqvCl/KF6pLovaWEPWyNWbQH8qYekfRtszdc?=
+ =?us-ascii?Q?/YmpmF4rBB/G/GeZx09ps9FxTrZDUd+BNp1NzsCCMmyXqIHoJmPKnU8qNS6V?=
+ =?us-ascii?Q?a1RGwOyK1xjz82kj6Pt2JgnaV022IxT0fmpyMGX8pFu+8vXe8Pjsd+RoTOQ4?=
+ =?us-ascii?Q?fU1/IC6+ufh9xhX6EwCdxamOm8DxeD+U3KjZgZtj5tALK6i7pdY9aQ6tNGNn?=
+ =?us-ascii?Q?zwgGHh5ssdzycDacKZtA4snXOAtlUvmIt/Ct9Ei4p/2SMkwe/lxlbBk5vT6L?=
+ =?us-ascii?Q?b41Xh/o6TssUKfK15zCjoxlGfB0vvEQ35kE4U+XSyxmqyYNGTf/OhJxe9/CN?=
+ =?us-ascii?Q?sXXsFPOHgr8rcArFUjyJqBCs?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210707183616.5620-16-brijesh.singh@amd.com>
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: BYAPR11MB3095.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 1ed337b1-27ec-4972-9443-08d947f5a68a
+X-MS-Exchange-CrossTenant-originalarrivaltime: 16 Jul 2021 01:04:23.4875
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: 8E8HvH1WuKZWDS1rmwOAN7Jg/mQ48D2+EHhC4j0RRSOK2APC7WM0JWRmvxLU/u2bXjow8fTIc6Yx8GokY9Jl8blYavGh2qSFcHsVyvCIf9w=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR11MB5103
+X-OriginatorOrg: intel.com
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jul 07, 2021, Brijesh Singh wrote:
-> The behavior and requirement for the SEV-legacy command is altered when
-> the SNP firmware is in the INIT state. See SEV-SNP firmware specification
-> for more details.
-> 
-> When SNP is INIT state, all the SEV-legacy commands that cause the
-> firmware to write memory must be in the firmware state. The TMR memory
+> -----Original Message-----
+> From: Greg KH <gregkh@linuxfoundation.org>
+> Sent: Friday, May 14, 2021 10:33 AM
+> To: Williams, Dan J <dan.j.williams@intel.com>
+> > Hi Greg,
+> >
+> > So, for the last few weeks Mike and company have patiently waded
+> > through my questions and now I think we are at a point to work through
+> > the upstream driver architecture options and tradeoffs. You were not
+> > alone in struggling to understand what this device does because it is
+> > unlike any other accelerator Linux has ever considered. It shards /
+> > load balances a data stream for processing by CPU threads. This is
+> > typically a network appliance function / protocol, but could also be
+> > any other generic thread pool like the kernel's padata. It saves the
+> > CPU cycles spent load balancing work items and marshaling them through
+> > a thread pool pipeline. For example, in DPDK applications, DLB2 frees
+> > up entire cores that would otherwise be consumed with scheduling and
+> > work distribution. A separate proof-of-concept, using DLB2 to
+> > accelerate the kernel's "padata" thread pool for a crypto workload,
+> > demonstrated ~150% higher throughput with hardware employed to manage
+> > work distribution and result ordering. Yes, you need a sufficiently
+> > high touch / high throughput protocol before the software load
+> > balancing overhead coordinating CPU threads starts to dominate the
+> > performance, but there are some specific workloads willing to switch
+> > to this regime.
+> >
+> > The primary consumer to date has been as a backend for the event
+> > handling in the userspace networking stack, DPDK. DLB2 has an existing
+> > polled-mode-userspace driver for that use case. So I said, "great,
+> > just add more features to that userspace driver and you're done". In
+> > fact there was DLB1 hardware that also had a polled-mode-userspace
+> > driver. So, the next question is "what's changed in DLB2 where a
+> > userspace driver is no longer suitable?". The new use case for DLB2 is
+> > new hardware support for a host driver to carve up device resources
+> > into smaller sets (vfio-mdevs) that can be assigned to guests (Intel
+> > calls this new hardware capability SIOV: Scalable IO Virtualization).
+> >
+> > Hardware resource management is difficult to handle in userspace
+> > especially when bare-metal hardware events need to coordinate with
+> > guest-VM device instances. This includes a mailbox interface for the
+> > guest VM to negotiate resources with the host driver. Another more
+> > practical roadblock for a "DLB2 in userspace" proposal is the fact
+> > that it implements what are in-effect software-defined-interrupts to
+> > go beyond the scalability limits of PCI MSI-x (Intel calls this
+> > Interrupt Message Store: IMS). So even if hardware resource management
+> > was awkwardly plumbed into a userspace daemon there would still need
+> > to be kernel enabling for device-specific extensions to
+> > drivers/vfio/pci/vfio_pci_intrs.c for it to understand the IMS
+> > interrupts of DLB2 in addition to PCI MSI-x.
+> >
+> > While that still might be solvable in userspace if you squint at it, I
+> > don't think Linux end users are served by pushing all of hardware
+> > resource management to userspace. VFIO is mostly built to pass entire
+> > PCI devices to guests, or in coordination with a kernel driver to
+> > describe a subset of the hardware to a virtual-device (vfio-mdev)
+> > interface. The rub here is that to date kernel drivers using VFIO to
+> > provision mdevs have some existing responsibilities to the core kernel
+> > like a network driver or DMA offload driver. The DLB2 driver offers no
+> > such service to the kernel for its primary role of accelerating a
+> > userspace data-plane. I am assuming here that  the padata
+> > proof-of-concept is interesting, but not a compelling reason to ship a
+> > driver compared to giving end users competent kernel-driven
+> > hardware-resource assignment for deploying DLB2 virtual instances into
+> > guest VMs.
+> >
+> > My "just continue in userspace" suggestion has no answer for the IMS
+> > interrupt and reliable hardware resource management support
+> > requirements. If you're with me so far we can go deeper into the
+> > details, but in answer to your previous questions most of the TLAs
+> > were from the land of "SIOV" where the VFIO community should be
+> > brought in to review. The driver is mostly a configuration plane where
+> > the fast path data-plane is entirely in userspace. That configuration
+> > plane needs to manage hardware events and resourcing on behalf of
+> > guest VMs running on a partitioned subset of the device. There are
+> > worthwhile questions about whether some of the uapi can be refactored
+> > to common modules like uacce, but I think we need to get to a first
+> > order understanding on what DLB2 is and why the kernel has a role
+> > before diving into the uapi discussion.
+> >
+> > Any clearer?
+>=20
+> A bit, yes, thanks.
+>=20
+> > So, in summary drivers/misc/ appears to be the first stop in the
+> > review since a host driver needs to be established to start the VFIO
+> > enabling campaign. With my community hat on, I think requiring
+> > standalone host drivers is healthier for Linux than broaching the
+> > subject of VFIO-only drivers. Even if, as in this case, the initial
+> > host driver is mostly implementing a capability that could be achieved
+> > with a userspace driver.
+>=20
+> Ok, then how about a much "smaller" kernel driver for all of this, and a =
+whole lot of documentation to
+> describe what is going on and what all of the TLAs are.
+>=20
+> thanks,
+>=20
+> greg k-h
 
-It'd be helpful to spell out Trusted Memory Region, I hadn't seen that
-term before and for some reason my brain immediately thought "xAPIC register!".
+Hi Greg,
 
-> is allocated by the host but updated by the firmware, so, it must be
-> in the firmware state.  Additionally, the TMR memory must be a 2MB aligned
-> instead of the 1MB, and the TMR length need to be 2MB instead of 1MB.
-> The helper __snp_{alloc,free}_firmware_pages() can be used for allocating
-> and freeing the memory used by the firmware.
+tl;dr: We have been looking into various options to reduce the kernel drive=
+r size and ABI surface, such as moving more responsibility to user space, r=
+eusing existing kernel modules (uacce, for example), and converting functio=
+nality from ioctl to sysfs. End result 10 ioctls will be replaced by sysfs,=
+ the rest of them (20 ioctls) will be replaced by configfs. Some concepts a=
+re moved to device-special files rather than ioctls that produce file descr=
+iptors.
 
-None of this actually states what the patch does, e.g. it's not clear whether
-all allocations are being converted to 2mb or just the SNP.  Looks like it's
-just SNP.  Something like this?
+Details:
+We investigated the possibility of using uacce (https://www.kernel.org/doc/=
+html/latest/misc-devices/uacce.html) in our kernel driver.  The uacce inter=
+face fits well with accelerators that process user data with known source a=
+nd destination addresses. For a DLB (Dynamic Load Balancer), however,  the =
+destination port depends on the system load and is unknown to the applicati=
+on. While uacce exposes  "queues" to user, the dlb driver has to handle muc=
+h complicated resource managements, such as credits, ports, queues and doma=
+ins. We would have to add a lot of more concepts and code, which are not us=
+eful for other accelerators,  in uacce to make it working for DLB. This may=
+ also lead to a bigger code size over all.
 
-  Allocate the Trusted Memory Region (TMR) as a 2mb sized/aligned region when
-  SNP is enabled to satisfy new requirements for SNP.  Continue allocating a
-  1mb region for !SNP configuration.
+We also took a another look at moving resource management functionality fro=
+m kernel space to user space. Much of kernel driver supports both PF (Physi=
+cal Function) on host and VFs (Virtual Functions) on VMs. Since only the PF=
+ on the host has permissions to setup resource and configure the DLB HW, al=
+l the requests on VFs are forwarded to PF via the VF-PF mail boxes, which a=
+re handled by the kernel driver. The driver also maintains various virtual =
+id to physical id translations (for VFs, ports, queues, etc), and provides =
+virtual-to-physical id mapping info DLB HW so that an application in VM can=
+ access the resources with virtual IDs only. Because of the VF/VDEV support=
+, we have to keep the resource management, which is more than one half of t=
+he code size, in the driver.
 
-> While at it, provide API that can be used by others to allocate a page
-> that can be used by the firmware. The immediate user for this API will
-> be the KVM driver. The KVM driver to need to allocate a firmware context
-> page during the guest creation. The context page need to be updated
-> by the firmware. See the SEV-SNP specification for further details.
+To simplify the user interface, we explored the ways to reduce/eliminate io=
+ctl interface, and found that we can utilize configfs for many of the DLB f=
+unctionalities. Our current plan is to replace all the ioctls in the driver=
+ with sysfs and configfs. We will use configfs for most of setup and config=
+uration for both physical function and virtual functions. This may not redu=
+ce the overall driver size greatly, but it will lessen much of ABI maintena=
+nce burden (with the elimination of ioctls).  I hope this is something that=
+ is in line with what you like to see for the driver.
 
-...
-
-> @@ -1153,8 +1269,10 @@ static void sev_firmware_shutdown(struct sev_device *sev)
->  		/* The TMR area was encrypted, flush it from the cache */
->  		wbinvd_on_all_cpus();
->  
-> -		free_pages((unsigned long)sev_es_tmr,
-> -			   get_order(SEV_ES_TMR_SIZE));
-> +
-> +		__snp_free_firmware_pages(virt_to_page(sev_es_tmr),
-> +					  get_order(sev_es_tmr_size),
-> +					  false);
->  		sev_es_tmr = NULL;
->  	}
->  
-> @@ -1204,16 +1322,6 @@ void sev_pci_init(void)
->  	    sev_update_firmware(sev->dev) == 0)
->  		sev_get_api_version();
->  
-> -	/* Obtain the TMR memory area for SEV-ES use */
-> -	tmr_page = alloc_pages(GFP_KERNEL, get_order(SEV_ES_TMR_SIZE));
-> -	if (tmr_page) {
-> -		sev_es_tmr = page_address(tmr_page);
-> -	} else {
-> -		sev_es_tmr = NULL;
-> -		dev_warn(sev->dev,
-> -			 "SEV: TMR allocation failed, SEV-ES support unavailable\n");
-> -	}
-> -
->  	/*
->  	 * If boot CPU supports the SNP, then first attempt to initialize
->  	 * the SNP firmware.
-> @@ -1229,6 +1337,16 @@ void sev_pci_init(void)
->  		}
->  	}
->  
-> +	/* Obtain the TMR memory area for SEV-ES use */
-> +	tmr_page = __snp_alloc_firmware_pages(GFP_KERNEL, get_order(sev_es_tmr_size), false);
-> +	if (tmr_page) {
-> +		sev_es_tmr = page_address(tmr_page);
-> +	} else {
-> +		sev_es_tmr = NULL;
-> +		dev_warn(sev->dev,
-> +			 "SEV: TMR allocation failed, SEV-ES support unavailable\n");
-> +	}
-
-I think your patch ordering got a bit wonky.  AFAICT, the chunk that added
-sev_snp_init() and friends in the previous patch 14 should have landed above
-the TMR allocation, i.e. the code movement here should be unnecessary.
-
->  	/* Initialize the platform */
->  	rc = sev_platform_init(&error);
->  	if (rc && (error == SEV_RET_SECURE_DATA_INVALID)) {
-
-...
-
-> @@ -961,6 +965,13 @@ static inline int snp_guest_dbg_decrypt(struct sev_data_snp_dbg *data, int *erro
->  	return -ENODEV;
->  }
->  
-> +static inline void *snp_alloc_firmware_page(gfp_t mask)
-> +{
-> +	return NULL;
-> +}
-> +
-> +static inline void snp_free_firmware_page(void *addr) { }
-
-Hmm, I think we should probably bite the bullet and #ifdef and/or stub out large
-swaths of svm/sev.c before adding SNP support.  sev.c is getting quite massive,
-and we're accumulating more and more stubs outside of KVM because its SEV code
-is compiled unconditionally.
+Thanks
+Mike
