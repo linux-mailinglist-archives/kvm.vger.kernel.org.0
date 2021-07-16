@@ -2,160 +2,171 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9AF633CBE31
-	for <lists+kvm@lfdr.de>; Fri, 16 Jul 2021 23:09:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 053733CBE43
+	for <lists+kvm@lfdr.de>; Fri, 16 Jul 2021 23:14:32 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235005AbhGPVKT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 16 Jul 2021 17:10:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48180 "EHLO
+        id S235005AbhGPVRT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 16 Jul 2021 17:17:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49786 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234760AbhGPVKQ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 16 Jul 2021 17:10:16 -0400
-Received: from mail-ot1-x336.google.com (mail-ot1-x336.google.com [IPv6:2607:f8b0:4864:20::336])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3B64EC06175F
-        for <kvm@vger.kernel.org>; Fri, 16 Jul 2021 14:07:20 -0700 (PDT)
-Received: by mail-ot1-x336.google.com with SMTP id 59-20020a9d0ac10000b0290462f0ab0800so11241241otq.11
-        for <kvm@vger.kernel.org>; Fri, 16 Jul 2021 14:07:20 -0700 (PDT)
+        with ESMTP id S234405AbhGPVRR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 16 Jul 2021 17:17:17 -0400
+Received: from mail-pf1-x434.google.com (mail-pf1-x434.google.com [IPv6:2607:f8b0:4864:20::434])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 32D7FC061765
+        for <kvm@vger.kernel.org>; Fri, 16 Jul 2021 14:14:22 -0700 (PDT)
+Received: by mail-pf1-x434.google.com with SMTP id a127so9932170pfa.10
+        for <kvm@vger.kernel.org>; Fri, 16 Jul 2021 14:14:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=+KcxcljLGJIVJWS815GhZ8vwrKBLUZUCoehT4sKIick=;
-        b=QnfCOaF+t/airvvWleBWMXi4bMAV8F8C07l/T21uynV4up468L9W/0CdIOvo/1Ioa+
-         3Nq3QpfIdmG2aHxBU8+fchqhDTbq+QALYfwICHMMLDq2xDVmXKwD2p5A/zt1kpKgmcLR
-         3Rv9fl+CacqOqDy2bfRXC48IE+KHTvF2Fj0pDj4L+e0wif8olOH6OiHxTXNaS8IWhovm
-         srV6dFZmOAYSg23tqf7uOHyQWF/y5bZHWcW5dAlsRVqGgeI9zQQ+hdvMnRzy0XFHm7Yi
-         6uxumbS1rmq6jAdLTjZNdyULanX8BhvaeBdyZAj9dvJmJ+rB2bclMcsrAM+PV93H3FT1
-         /Ekg==
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=wHhC/u+Tz+YyCWTdNKVYJX34gL1qM4KNQ1J0r6VozT0=;
+        b=AGRyq/qLXmbKze3lJ72pJN2QN/c76K/csTSS8PXICwMCVK/EaEAzMwZxA3o3PZ1Qtt
+         gC0Bhr5bbahQFHLe/HTA6RMZAOcKRBBJeVVUC+uHdTDfBmW/V36F3wEFvo67Bt9rc8r3
+         5HwAsQBrgzKeb91PrTNi048jDDwGveiQTTWtvGKvulqf0D3cOo9WsQCK1BD78rEMgTGJ
+         cOfgcmwQiKsnj/PXZm6smL5sk3hlLIxtkYPebjodPnBHLoBG5088hMqzEaq2LfRwsuAq
+         bP919qg9TSZR+H2/ajzxyrUq9XVZ59DW4JTE/NKIYZ8LNzjsMBfzte6WfHhE0oFyV2rN
+         E0Bw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=+KcxcljLGJIVJWS815GhZ8vwrKBLUZUCoehT4sKIick=;
-        b=Yn8vULe8P2G7T5EvlWU/PSzc1714ZAfyD+IxmcCLjlvbwkjdrktjeni74hLTP9eTFL
-         1iezJtukHqi22MQeoQs+oYr+gj2e50sQ9pYqjJLb4pZPZbeIge3RoEK5fHVTdhfYTGQT
-         L78uyrp4kDE9Yx13j8YpZqwiDhFhtJebJZ48t5qrrhsddJ38it3t/NH/uhoDuiBa0KVV
-         9GwKndJWygVfPBul9g6Bwg1+5M9MCefWi0dCR88sQj+fWuX8Zx1gIKnSiC1/xlQyVd7q
-         hNRfx5kqJMbTwqpf/mGSa4L57pl/EFD+u11wRXBXT65u6D4cxLa/aplJeDPFjTmLDLRG
-         fCrg==
-X-Gm-Message-State: AOAM530DSOrPNgBtE0AyZe6AS7TkvaDnCOesbogtVMwAnrlSEPlT+oqC
-        1hXx8zYmFw15W/eAjhqE50TlH4gJPFghsmZgcoteng==
-X-Google-Smtp-Source: ABdhPJxZhcCMqABPArOjR6KxEAGcwcKS907SlOyiKyyWtfF7hMD1MQl52qvcSETXu2JFjm9Jid+Nc49wBRQrisucJHY=
-X-Received: by 2002:a9d:550e:: with SMTP id l14mr9890451oth.241.1626469639196;
- Fri, 16 Jul 2021 14:07:19 -0700 (PDT)
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=wHhC/u+Tz+YyCWTdNKVYJX34gL1qM4KNQ1J0r6VozT0=;
+        b=B8Iv0SUaJBFChk7C6z8FU6njrxe7CTGVdQ4fJILXrkaGwx8L+M4YOPUMxGFBRsbIym
+         Td+Ag0KJ2Hw4XKC2DgYBe95g/luTG+Q7OMoZVw4LuYpjxcuKqlDtjYRVzKYlmxrNgprc
+         472MWd7h+5d7K7WGPXHIpDLMXFOajSOCawmsjyQo8r3jfMDZfxms0GeeLVjKI8EXEaW0
+         loQqtquuZNxjv4upXGfsaGn4vAanWUGcmHmpPhodGqqIw6LlsGLV4f8f6R+g9P6PigVc
+         4NfkKAGOK5GFOb05cpEpUWwgkYh4qHA2kNb0rgSwBenjBxsRU2cyQUIQV+vSYLnkyVZW
+         4V8w==
+X-Gm-Message-State: AOAM531knFRBgoXp7CtMF4O3mjaF5gXtCszki9VgYqAtI374UfoXHNIY
+        LHs0HJXK5kLWfOp6egUbP+0XpTmIrpZmiA==
+X-Google-Smtp-Source: ABdhPJyy/03uRnhTJ2SiPB6qPk6MqOkswkGZYvq9jxHBfG5mcW0dG3s0jOK6gCGZRtU3oAwINdQ+HQ==
+X-Received: by 2002:aa7:90cd:0:b029:333:baa9:87b7 with SMTP id k13-20020aa790cd0000b0290333baa987b7mr7471263pfk.23.1626470061392;
+        Fri, 16 Jul 2021 14:14:21 -0700 (PDT)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id b1sm12659509pjn.11.2021.07.16.14.14.20
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 16 Jul 2021 14:14:20 -0700 (PDT)
+Date:   Fri, 16 Jul 2021 21:14:17 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Brijesh Singh <brijesh.singh@amd.com>
+Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
+        linux-coco@lists.linux.dev, linux-mm@kvack.org,
+        linux-crypto@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        David Rientjes <rientjes@google.com>,
+        Dov Murik <dovmurik@linux.ibm.com>,
+        Tobin Feldman-Fitzthum <tobin@ibm.com>,
+        Borislav Petkov <bp@alien8.de>,
+        Michael Roth <michael.roth@amd.com>,
+        Vlastimil Babka <vbabka@suse.cz>, tony.luck@intel.com,
+        npmccallum@redhat.com, brijesh.ksingh@gmail.com
+Subject: Re: [PATCH Part2 RFC v4 34/40] KVM: SVM: Add support to handle Page
+ State Change VMGEXIT
+Message-ID: <YPH2qRkkG6m0FT2X@google.com>
+References: <20210707183616.5620-1-brijesh.singh@amd.com>
+ <20210707183616.5620-35-brijesh.singh@amd.com>
 MIME-Version: 1.0
-References: <20210716085325.10300-1-lingshan.zhu@intel.com>
- <CALMp9eSz6RPN=spjN6zdD5iQY2ZZDwM2bHJ2R4qWijOt1A_6aw@mail.gmail.com> <b6568241-02e3-faf6-7507-c7ad1c4db281@linux.intel.com>
-In-Reply-To: <b6568241-02e3-faf6-7507-c7ad1c4db281@linux.intel.com>
-From:   Jim Mattson <jmattson@google.com>
-Date:   Fri, 16 Jul 2021 14:07:08 -0700
-Message-ID: <CALMp9eT48THXwEG23Kb0-QExyA8qZAtkXxrxc+6+pdvtvVVN0A@mail.gmail.com>
-Subject: Re: [PATCH V8 00/18] KVM: x86/pmu: Add *basic* support to enable
- guest PEBS via DS
-To:     "Liang, Kan" <kan.liang@linux.intel.com>
-Cc:     Zhu Lingshan <lingshan.zhu@intel.com>, peterz@infradead.org,
-        pbonzini@redhat.com, bp@alien8.de, seanjc@google.com,
-        vkuznets@redhat.com, wanpengli@tencent.com, joro@8bytes.org,
-        ak@linux.intel.com, wei.w.wang@intel.com, eranian@google.com,
-        liuxiangdong5@huawei.com, linux-kernel@vger.kernel.org,
-        x86@kernel.org, kvm@vger.kernel.org, like.xu.linux@gmail.com,
-        boris.ostrvsky@oracle.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210707183616.5620-35-brijesh.singh@amd.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Jul 16, 2021 at 12:00 PM Liang, Kan <kan.liang@linux.intel.com> wrote:
->
->
->
-> On 7/16/2021 1:02 PM, Jim Mattson wrote:
-> > On Fri, Jul 16, 2021 at 1:54 AM Zhu Lingshan <lingshan.zhu@intel.com> wrote:
-> >>
-> >> The guest Precise Event Based Sampling (PEBS) feature can provide an
-> >> architectural state of the instruction executed after the guest instruction
-> >> that exactly caused the event. It needs new hardware facility only available
-> >> on Intel Ice Lake Server platforms. This patch set enables the basic PEBS
-> >> feature for KVM guests on ICX.
-> >>
-> >> We can use PEBS feature on the Linux guest like native:
-> >>
-> >>     # echo 0 > /proc/sys/kernel/watchdog (on the host)
-> >>     # perf record -e instructions:ppp ./br_instr a
-> >>     # perf record -c 100000 -e instructions:pp ./br_instr a
-> >>
-> >> To emulate guest PEBS facility for the above perf usages,
-> >> we need to implement 2 code paths:
-> >>
-> >> 1) Fast path
-> >>
-> >> This is when the host assigned physical PMC has an identical index as the
-> >> virtual PMC (e.g. using physical PMC0 to emulate virtual PMC0).
-> >> This path is used in most common use cases.
-> >>
-> >> 2) Slow path
-> >>
-> >> This is when the host assigned physical PMC has a different index from the
-> >> virtual PMC (e.g. using physical PMC1 to emulate virtual PMC0) In this case,
-> >> KVM needs to rewrite the PEBS records to change the applicable counter indexes
-> >> to the virtual PMC indexes, which would otherwise contain the physical counter
-> >> index written by PEBS facility, and switch the counter reset values to the
-> >> offset corresponding to the physical counter indexes in the DS data structure.
-> >>
-> >> The previous version [0] enables both fast path and slow path, which seems
-> >> a bit more complex as the first step. In this patchset, we want to start with
-> >> the fast path to get the basic guest PEBS enabled while keeping the slow path
-> >> disabled. More focused discussion on the slow path [1] is planned to be put to
-> >> another patchset in the next step.
-> >>
-> >> Compared to later versions in subsequent steps, the functionality to support
-> >> host-guest PEBS both enabled and the functionality to emulate guest PEBS when
-> >> the counter is cross-mapped are missing in this patch set
-> >> (neither of these are typical scenarios).
-> >
-> > I'm not sure exactly what scenarios you're ruling out here. In our
-> > environment, we always have to be able to support host-level
-> > profiling, whether or not the guest is using the PMU (for PEBS or
-> > anything else). Hence, for our *basic* vPMU offering, we only expose
-> > two general purpose counters to the guest, so that we can keep two
-> > general purpose counters for the host. In this scenario, I would
-> > expect cross-mapped counters to be common. Are we going to be able to
-> > use this implementation?
-> >
->
-> Let's say we have 4 GP counters in HW.
-> Do you mean that the host owns 2 GP counters (counter 0 & 1) and the
-> guest own the other 2 GP counters (counter 2 & 3) in your envirinment?
-> We did a similar implementation in V1, but the proposal has been denied.
-> https://lore.kernel.org/kvm/20200306135317.GD12561@hirez.programming.kicks-ass.net/
+On Wed, Jul 07, 2021, Brijesh Singh wrote:
+> +static unsigned long snp_handle_psc(struct vcpu_svm *svm, struct ghcb *ghcb)
+> +{
+> +	struct kvm_vcpu *vcpu = &svm->vcpu;
+> +	int level, op, rc = PSC_UNDEF_ERR;
+> +	struct snp_psc_desc *info;
+> +	struct psc_entry *entry;
+> +	gpa_t gpa;
+> +
+> +	if (!sev_snp_guest(vcpu->kvm))
+> +		goto out;
+> +
+> +	if (!setup_vmgexit_scratch(svm, true, sizeof(ghcb->save.sw_scratch))) {
+> +		pr_err("vmgexit: scratch area is not setup.\n");
+> +		rc = PSC_INVALID_HDR;
+> +		goto out;
+> +	}
+> +
+> +	info = (struct snp_psc_desc *)svm->ghcb_sa;
+> +	entry = &info->entries[info->hdr.cur_entry];
 
-It's the other way around. AFAIK, there is no architectural way to
-specify that only counters 2 and 3 are available, so we have to give
-the guest counters 0 and 1.
+Grabbing "entry" here is unnecessary and confusing.
 
-> For the current proposal, both guest and host can see all 4 GP counters.
-> The counters are shared.
+> +
+> +	if ((info->hdr.cur_entry >= VMGEXIT_PSC_MAX_ENTRY) ||
+> +	    (info->hdr.end_entry >= VMGEXIT_PSC_MAX_ENTRY) ||
+> +	    (info->hdr.cur_entry > info->hdr.end_entry)) {
 
-I don't understand how that can work. If the host programs two
-counters, how can you give the guest four counters?
+There's a TOCTOU bug here if the guest uses the GHCB instead of a scratch area.
+If the guest uses the scratch area, then KVM makes a full copy into kernel memory.
+But if the guest uses the GHCB, then KVM maps the GHCB into kernel address space
+but doesn't make a full copy, i.e. the guest can modify the data while it's being
+processed by KVM.
 
-> The guest cannot know the availability of the counters. It may requires
-> a counter (e.g., counter 0) which may has been used by the host. Host
-> may provides another counter (e.g., counter 1) to the guest. This is the
-> case described in the slow path. For this case, we have to modify the
-> guest PEBS record. Because the counter index in the PEBS record is 1,
-> while the guest perf driver expects 0.
+IIRC, Peter and I discussed the sketchiness of the GHCB mapping offline a few
+times, but determined that there were no existing SEV-ES bugs because the guest
+could only submarine its own emulation request.  But here, it could coerce KVM
+into running off the end of a buffer.
 
-If we reserve counters 0 and 1 for the guest, this is not a problem
-(assuming we tell the guest it only has two counters). If we don't
-statically partition the counters, I don't see how you can ensure that
-the guest behaves as architected. For example, what do you do when the
-guest programs four counters and the host programs two?
+I think you can get away with capturing cur_entry/end_entry locally, though
+copying the GHCB would be more robust.  That would also make the code a bit
+prettier, e.g.
 
-> If counter 0 is available, guests can use counter 0. That's the fast
-> path. I think the fast path should be more common even both host and
-> guest are profiling. Because except for some specific events, we may
-> move the host event to the counters which are not required by guest if
-> we have enough resources.
+	cur = info->hdr.cur_entry;
+	end = info->hdr.end_entry;
 
-And if you don't have enough resources?
+> +		rc = PSC_INVALID_ENTRY;
+> +		goto out;
+> +	}
+> +
+> +	while (info->hdr.cur_entry <= info->hdr.end_entry) {
+
+Make this a for loop?
+
+	for ( ; cur_entry < end_entry; cur_entry++)
+
+> +		entry = &info->entries[info->hdr.cur_entry];
+
+Does this need array_index_nospec() treatment?
+
+> +		gpa = gfn_to_gpa(entry->gfn);
+> +		level = RMP_TO_X86_PG_LEVEL(entry->pagesize);
+> +		op = entry->operation;
+> +
+> +		if (!IS_ALIGNED(gpa, page_level_size(level))) {
+> +			rc = PSC_INVALID_ENTRY;
+> +			goto out;
+> +		}
+> +
+> +		rc = __snp_handle_psc(vcpu, op, gpa, level);
+> +		if (rc)
+> +			goto out;
+> +
+> +		info->hdr.cur_entry++;
+> +	}
+> +
+> +out:
+
+And for the copy case:
+
+	info->hdr.cur_entry = cur;
+
+> +	return rc ? map_to_psc_vmgexit_code(rc) : 0;
+> +}
