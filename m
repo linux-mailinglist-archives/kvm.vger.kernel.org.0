@@ -2,148 +2,142 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B474B3CB4E5
-	for <lists+kvm@lfdr.de>; Fri, 16 Jul 2021 10:55:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B03383CB508
+	for <lists+kvm@lfdr.de>; Fri, 16 Jul 2021 11:07:42 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239524AbhGPI6S (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 16 Jul 2021 04:58:18 -0400
-Received: from mga07.intel.com ([134.134.136.100]:48076 "EHLO mga07.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S239718AbhGPI6K (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 16 Jul 2021 04:58:10 -0400
-X-IronPort-AV: E=McAfee;i="6200,9189,10046"; a="274526448"
-X-IronPort-AV: E=Sophos;i="5.84,244,1620716400"; 
-   d="scan'208";a="274526448"
-Received: from fmsmga003.fm.intel.com ([10.253.24.29])
-  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Jul 2021 01:55:15 -0700
-X-IronPort-AV: E=Sophos;i="5.84,244,1620716400"; 
-   d="scan'208";a="495984199"
-Received: from vmm_a4_icx.sh.intel.com (HELO localhost.localdomain) ([10.239.53.245])
-  by fmsmga003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Jul 2021 01:55:11 -0700
-From:   Zhu Lingshan <lingshan.zhu@intel.com>
-To:     peterz@infradead.org, pbonzini@redhat.com
-Cc:     bp@alien8.de, seanjc@google.com, vkuznets@redhat.com,
-        wanpengli@tencent.com, jmattson@google.com, joro@8bytes.org,
-        kan.liang@linux.intel.com, ak@linux.intel.com,
-        wei.w.wang@intel.com, eranian@google.com, liuxiangdong5@huawei.com,
-        linux-kernel@vger.kernel.org, x86@kernel.org, kvm@vger.kernel.org,
-        like.xu.linux@gmail.com, boris.ostrvsky@oracle.com,
-        Like Xu <like.xu@linux.intel.com>,
-        Luwei Kang <luwei.kang@intel.com>,
-        Zhu Lingshan <lingshan.zhu@intel.com>
-Subject: [PATCH V8 18/18] KVM: x86/pmu: Expose CPUIDs feature bits PDCM, DS, DTES64
-Date:   Fri, 16 Jul 2021 16:53:25 +0800
-Message-Id: <20210716085325.10300-19-lingshan.zhu@intel.com>
-X-Mailer: git-send-email 2.27.0
-In-Reply-To: <20210716085325.10300-1-lingshan.zhu@intel.com>
-References: <20210716085325.10300-1-lingshan.zhu@intel.com>
+        id S230509AbhGPJKI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 16 Jul 2021 05:10:08 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:33974 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229833AbhGPJKH (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 16 Jul 2021 05:10:07 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1626426431;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=8efeVFyZdlNBLrGCgMRLF1YfAz+xaqWIbhcMsGEkt7E=;
+        b=gsSp1Z083f6y4rL5Msmn9u9c1/ww+/Zzvc5QEleeAxA7Eg8ILgOdSb5eqKFy3QjTOrio1y
+        ApTTmJoxBiWxmpUHouVpwVMkzxDhQYkZYQRjzejegjOv1E4g44cn+Kw7vK+r0pIP2smGJs
+        ya+veDMmv5kumcnTCmwId0a2yjXk1q4=
+Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
+ [209.85.218.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-477-sK5xDGkRNxy77g-Rwy9f3w-1; Fri, 16 Jul 2021 05:07:10 -0400
+X-MC-Unique: sK5xDGkRNxy77g-Rwy9f3w-1
+Received: by mail-ej1-f72.google.com with SMTP id sd15-20020a170906ce2fb0290512261c5475so3343178ejb.13
+        for <kvm@vger.kernel.org>; Fri, 16 Jul 2021 02:07:09 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
+         :message-id:mime-version;
+        bh=8efeVFyZdlNBLrGCgMRLF1YfAz+xaqWIbhcMsGEkt7E=;
+        b=VA15DEN80qJOe/C8XGdu+/r+SfFezjmmoof3Qs+xBxqSrKt7Q2tvDS49ls4QtSIZoD
+         +9al7qwiOjMws3PniKvYpMsYzaW64O/IK/zwJvJATQBo6+FBEYGPQCzjlgcaOXKQidF0
+         bQir5FSD36rcwxjq52qI/MGTxa+KVG1yPiHmacmN4+mq6LWDBO/Pw8aYk2Wu6l7cTiLZ
+         gcFIBK/zTuewblGMLqznEpZpfyNtzGDMMnByBGgSFzJpXE93nVTV0FRFJmov0qF5RGKK
+         Kbgy/dId/Aq7FqLKtHLKHy9Zbea+rUnyvVZI9PkOAz0Xjvs+SuSX9yWW/lhgufkzMy9Z
+         ie+g==
+X-Gm-Message-State: AOAM532xGFLXmLUxCR5HaQuB70dmK/DrvtNg92d0Fm3qosSx9+leM2mv
+        25paMP2DDiCNPcKhPCammdZHG3F1VAore4OV7jZzM9WYGWrt0RWOrsuEtnFpRAih5yG7q8+xMFd
+        PuzS/3YH7pE78
+X-Received: by 2002:a17:906:fc6:: with SMTP id c6mr10595297ejk.65.1626426428697;
+        Fri, 16 Jul 2021 02:07:08 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyGogOZixuFoShn9FSPdi0P8CvjTCPptdWEx0iq0Redq8XXB+R55o/2MXJV/XcG/kpOY93ArQ==
+X-Received: by 2002:a17:906:fc6:: with SMTP id c6mr10595286ejk.65.1626426428536;
+        Fri, 16 Jul 2021 02:07:08 -0700 (PDT)
+Received: from vitty.brq.redhat.com (g-server-2.ign.cz. [91.219.240.2])
+        by smtp.gmail.com with ESMTPSA id f15sm2662703ejc.61.2021.07.16.02.07.07
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 16 Jul 2021 02:07:08 -0700 (PDT)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     Peter Maydell <peter.maydell@linaro.org>,
+        Eduardo Habkost <ehabkost@redhat.com>
+Cc:     QEMU Developers <qemu-devel@nongnu.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        kvm-devel <kvm@vger.kernel.org>,
+        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Marcelo Tosatti <mtosatti@redhat.com>,
+        Richard Henderson <richard.henderson@linaro.org>
+Subject: Re: [PULL 04/11] i386: expand Hyper-V features during CPU feature
+ expansion time
+In-Reply-To: <CAFEAcA-nif_Z0guHx4q4NUg=FEyhUz8kkAvfZ58916yp6TXT7Q@mail.gmail.com>
+References: <20210713160957.3269017-1-ehabkost@redhat.com>
+ <20210713160957.3269017-5-ehabkost@redhat.com>
+ <CAFEAcA-nif_Z0guHx4q4NUg=FEyhUz8kkAvfZ58916yp6TXT7Q@mail.gmail.com>
+Date:   Fri, 16 Jul 2021 11:07:06 +0200
+Message-ID: <878s261vb9.fsf@vitty.brq.redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Like Xu <like.xu@linux.intel.com>
+Peter Maydell <peter.maydell@linaro.org> writes:
 
-The CPUID features PDCM, DS and DTES64 are required for PEBS feature.
-KVM would expose CPUID feature PDCM, DS and DTES64 to guest when PEBS
-is supported in the KVM on the Ice Lake server platforms.
+> On Tue, 13 Jul 2021 at 17:19, Eduardo Habkost <ehabkost@redhat.com> wrote:
+>>
+>> From: Vitaly Kuznetsov <vkuznets@redhat.com>
+>>
+>> To make Hyper-V features appear in e.g. QMP query-cpu-model-expansion we
+>> need to expand and set the corresponding CPUID leaves early. Modify
+>> x86_cpu_get_supported_feature_word() to call newly intoduced Hyper-V
+>> specific kvm_hv_get_supported_cpuid() instead of
+>> kvm_arch_get_supported_cpuid(). We can't use kvm_arch_get_supported_cpuid()
+>> as Hyper-V specific CPUID leaves intersect with KVM's.
+>>
+>> Note, early expansion will only happen when KVM supports system wide
+>> KVM_GET_SUPPORTED_HV_CPUID ioctl (KVM_CAP_SYS_HYPERV_CPUID).
+>>
+>> Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
+>> Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+>> Message-Id: <20210608120817.1325125-6-vkuznets@redhat.com>
+>> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+>
+> Hi; Coverity reports an issue in this code (CID 1458243):
+>
+>> -static bool hyperv_expand_features(CPUState *cs, Error **errp)
+>> +bool kvm_hyperv_expand_features(X86CPU *cpu, Error **errp)
+>>  {
+>> -    X86CPU *cpu = X86_CPU(cs);
+>> +    CPUState *cs = CPU(cpu);
+>>
+>>      if (!hyperv_enabled(cpu))
+>>          return true;
+>>
+>> +    /*
+>> +     * When kvm_hyperv_expand_features is called at CPU feature expansion
+>> +     * time per-CPU kvm_state is not available yet so we can only proceed
+>> +     * when KVM_CAP_SYS_HYPERV_CPUID is supported.
+>> +     */
+>> +    if (!cs->kvm_state &&
+>> +        !kvm_check_extension(kvm_state, KVM_CAP_SYS_HYPERV_CPUID))
+>> +        return true;
+>
+> Here we check whether cs->kvm_state is NULL, but even if it is
+> NULL we can still continue execution further through the function.
+>
+> Later in the function we call hv_cpuid_get_host(), which in turn
+> can call get_supported_hv_cpuid_legacy(), which can dereference
+> cs->kvm_state without checking it.
 
-Originally-by: Andi Kleen <ak@linux.intel.com>
-Co-developed-by: Kan Liang <kan.liang@linux.intel.com>
-Signed-off-by: Kan Liang <kan.liang@linux.intel.com>
-Co-developed-by: Luwei Kang <luwei.kang@intel.com>
-Signed-off-by: Luwei Kang <luwei.kang@intel.com>
-Signed-off-by: Like Xu <like.xu@linux.intel.com>
-Signed-off-by: Zhu Lingshan <lingshan.zhu@intel.com>
----
- arch/x86/kvm/vmx/capabilities.h | 26 ++++++++++++++++++--------
- arch/x86/kvm/vmx/vmx.c          | 15 +++++++++++++++
- 2 files changed, 33 insertions(+), 8 deletions(-)
+get_supported_hv_cpuid_legacy() is only called when KVM_CAP_HYPERV_CPUID
+is not supported and this is not possible with
+KVM_CAP_SYS_HYPERV_CPUID. Coverity, of course, can't know that.
 
-diff --git a/arch/x86/kvm/vmx/capabilities.h b/arch/x86/kvm/vmx/capabilities.h
-index 4705ad55abb5..41b0933abdb1 100644
---- a/arch/x86/kvm/vmx/capabilities.h
-+++ b/arch/x86/kvm/vmx/capabilities.h
-@@ -5,6 +5,7 @@
- #include <asm/vmx.h>
- 
- #include "lapic.h"
-+#include "pmu.h"
- 
- extern bool __read_mostly enable_vpid;
- extern bool __read_mostly flexpriority_enabled;
-@@ -376,20 +377,29 @@ static inline bool vmx_pt_mode_is_host_guest(void)
- 	return pt_mode == PT_MODE_HOST_GUEST;
- }
- 
--static inline u64 vmx_get_perf_capabilities(void)
-+static inline bool vmx_pebs_supported(void)
- {
--	u64 perf_cap = 0;
--
--	if (boot_cpu_has(X86_FEATURE_PDCM))
--		rdmsrl(MSR_IA32_PERF_CAPABILITIES, perf_cap);
--
--	perf_cap &= PMU_CAP_LBR_FMT;
-+	return boot_cpu_has(X86_FEATURE_PEBS) && kvm_pmu_cap.pebs_vmx;
-+}
- 
-+static inline u64 vmx_get_perf_capabilities(void)
-+{
- 	/*
- 	 * Since counters are virtualized, KVM would support full
- 	 * width counting unconditionally, even if the host lacks it.
- 	 */
--	return PMU_CAP_FW_WRITES | perf_cap;
-+	u64 perf_cap = PMU_CAP_FW_WRITES;
-+	u64 host_perf_cap = 0;
-+
-+	if (boot_cpu_has(X86_FEATURE_PDCM))
-+		rdmsrl(MSR_IA32_PERF_CAPABILITIES, host_perf_cap);
-+
-+	perf_cap |= host_perf_cap & PMU_CAP_LBR_FMT;
-+
-+	if (vmx_pebs_supported())
-+		perf_cap |= host_perf_cap & PERF_CAP_PEBS_MASK;
-+
-+	return perf_cap;
- }
- 
- static inline u64 vmx_supported_debugctl(void)
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index d0af51c1389d..32dd90707b0d 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -2224,6 +2224,17 @@ static int vmx_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
- 			if (!cpuid_model_is_consistent(vcpu))
- 				return 1;
- 		}
-+		if (data & PERF_CAP_PEBS_FORMAT) {
-+			if ((data & PERF_CAP_PEBS_MASK) !=
-+			    (vmx_get_perf_capabilities() & PERF_CAP_PEBS_MASK))
-+				return 1;
-+			if (!guest_cpuid_has(vcpu, X86_FEATURE_DS))
-+				return 1;
-+			if (!guest_cpuid_has(vcpu, X86_FEATURE_DTES64))
-+				return 1;
-+			if (!cpuid_model_is_consistent(vcpu))
-+				return 1;
-+		}
- 		ret = kvm_set_msr_common(vcpu, msr_info);
- 		break;
- 
-@@ -7225,6 +7236,10 @@ static __init void vmx_set_cpu_caps(void)
- 		kvm_cpu_cap_clear(X86_FEATURE_INVPCID);
- 	if (vmx_pt_mode_is_host_guest())
- 		kvm_cpu_cap_check_and_set(X86_FEATURE_INTEL_PT);
-+	if (vmx_pebs_supported()) {
-+		kvm_cpu_cap_check_and_set(X86_FEATURE_DS);
-+		kvm_cpu_cap_check_and_set(X86_FEATURE_DTES64);
-+	}
- 
- 	if (!enable_sgx) {
- 		kvm_cpu_cap_clear(X86_FEATURE_SGX);
+>
+> So either the check on cs->kvm_state above is unnecessary, or we
+> need to handle it being NULL in some way other than falling through.
+
+It seems an assert(cs) before calling get_supported_hv_cpuid_legacy()
+(with a proper comment) should do the job.
+
+>
+> Side note: this change isn't in line with our coding style, which
+> requires braces around the body of the if().
+
+My bad, will fix.
+
 -- 
-2.27.0
+Vitaly
 
