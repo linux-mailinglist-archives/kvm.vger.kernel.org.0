@@ -2,82 +2,115 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 61D2F3CBADD
-	for <lists+kvm@lfdr.de>; Fri, 16 Jul 2021 19:01:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C41643CBAE4
+	for <lists+kvm@lfdr.de>; Fri, 16 Jul 2021 19:03:12 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230191AbhGPRES (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 16 Jul 2021 13:04:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48682 "EHLO
+        id S229937AbhGPRGF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 16 Jul 2021 13:06:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49112 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229462AbhGPRER (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 16 Jul 2021 13:04:17 -0400
-Received: from mail-pj1-x102b.google.com (mail-pj1-x102b.google.com [IPv6:2607:f8b0:4864:20::102b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A935FC06175F
-        for <kvm@vger.kernel.org>; Fri, 16 Jul 2021 10:01:22 -0700 (PDT)
-Received: by mail-pj1-x102b.google.com with SMTP id b5-20020a17090a9905b029016fc06f6c5bso7396590pjp.5
-        for <kvm@vger.kernel.org>; Fri, 16 Jul 2021 10:01:22 -0700 (PDT)
+        with ESMTP id S229462AbhGPRGF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 16 Jul 2021 13:06:05 -0400
+Received: from mail-oi1-x232.google.com (mail-oi1-x232.google.com [IPv6:2607:f8b0:4864:20::232])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8BA6CC061760
+        for <kvm@vger.kernel.org>; Fri, 16 Jul 2021 10:03:10 -0700 (PDT)
+Received: by mail-oi1-x232.google.com with SMTP id y66so2213419oie.7
+        for <kvm@vger.kernel.org>; Fri, 16 Jul 2021 10:03:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=NmQnhTlbXOfRCbLf9y86Anaxj0U0hlxHDzqR53g42lw=;
-        b=m/uy5N0lDSdUUcEBsyohxPqG1FA3sC7JLvfidHa/D1BAOgIbSJpan54naFe4u/UBc5
-         HaKgGoIH0AaG36C9c8AdWbAyqN2RW1LfXZLQEMWVPbpgLe4buI07O1XovW2TBeaa1r/j
-         N+Y7ddaWUtRE8P+Fhr2N09VXZk/VlyFqaRkCeJnHhsEKvpsB6jFfJ/tRAUSdOlEBz264
-         Sn2R1yjvbhCwdKYGKLaZJ6TqmvxdFr5MLRwKpYyEby3wc3APffdwOcqDm+241Ql0polg
-         rAkvTMN5CvmDpuSpqfIFK/OLKDohaDI+an4dPU083cPjPpGyWy3aYwWuatd1PUuXDio2
-         dSVA==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=l5+sbnoetmWZo2JNdEqLWaey1bVFrcYQ13fx9gWuL+4=;
+        b=hzZyj0MCkTQEI714kBick4I22s4vTbHAm0FVKUrPd9kWwJaGfZjIiELv12bqvZq1f/
+         JyD9ZsuD7RVFB15M5VPOX4S3TrL4oO+aIXXEnpNxp7p2HOaZ9krO50+PN8n+t6IZY6XY
+         TkDXHGsWIE2/DpP41ZryBix+V+K11vBkpE+OVxl1VOcmbWVttNQgy5rMZtDlaQkb2fQ+
+         3XltIf1JG3/2aOstZtJRm2aGtcGkp4yDkF3HvSIneFTzHKj6VLtkjftx4clrYx+5JSeU
+         Q7vE3+v+uyjJl3hGoa3jOEL+uOEfyike6aJrHLRCaD7pbm5Qd4u7MVIEWmonDyZa2Wg4
+         qeGQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=NmQnhTlbXOfRCbLf9y86Anaxj0U0hlxHDzqR53g42lw=;
-        b=SZb/flBpyrZgXoU1F7uNQ+5xfhLpV3UVls8yRfu/Q0waDNLUOYfi42fYiHpbsBm8j1
-         VTzazH5vClond14GPApixvPvukVRpwY7fLGoA+q90CzCvJR8lYO7YzkU4ANtcFwEzB4v
-         ZwDRIpekgs4V0ggPR0VK7X+WnzPDjZm0beS9ZD34TExHbDuK0oyWwnbfUmPGf9nn6Vha
-         YWv0pnNER+06BTNrSirtiIxqt88/xpRgpqny4vTHMYf6309xhb9cfNV4aYXbyMzevV3P
-         1wYPSuGzXAPr2T2820AmX0Y1k7G9gE71dKwpuyjywYL2ycnK9VdAH7ZaFldRFUp0IOLD
-         SA0w==
-X-Gm-Message-State: AOAM532mMFGfB6Zwvbt8hjEAwrACVIMfgBgCuJNSC7YZuQ65f3clkCs1
-        QAUsdfUQwLGlqVUpWQ7uzyrJNVfmNGyVXQ==
-X-Google-Smtp-Source: ABdhPJwgnKcszg66mAGtsLOzmFzSVInsvHjsiqvW0a+0Z+ynIpjNPXpC70wcb8yyVlFKOqF0xXWQzg==
-X-Received: by 2002:a17:902:b90a:b029:12b:3338:1870 with SMTP id bf10-20020a170902b90ab029012b33381870mr8530661plb.73.1626454881971;
-        Fri, 16 Jul 2021 10:01:21 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id n32sm10565381pfv.59.2021.07.16.10.01.21
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 16 Jul 2021 10:01:21 -0700 (PDT)
-Date:   Fri, 16 Jul 2021 17:01:17 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Vitaly Kuznetsov <vkuznets@redhat.com>
-Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Maxim Levitsky <mlevitsk@redhat.com>,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] KVM: nSVM: Rename nested_svm_vmloadsave() to
- svm_copy_vmloadsave_state()
-Message-ID: <YPG7XVwkze/3YDaI@google.com>
-References: <20210716144104.465269-1-vkuznets@redhat.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=l5+sbnoetmWZo2JNdEqLWaey1bVFrcYQ13fx9gWuL+4=;
+        b=QF0CZ2WkQi9efRX5/n/KGLIn0YVhvVG4brqFBz/BhlVgoF/qzqnwWjkb/xcVXaW3II
+         fLBfFG9wgQCUtaQ5QA8i1FD3TMIUUnQqEgL9JOjv+1GvFyGojsxEarKXkhW6cCmOuwCB
+         LK4tozZEnvLV49srE9MarrOtOwCCNpROWirx1ZSOu6BhPWM4x7sh1vq7tr57TUFajOGb
+         ex7u1rchMFeKBy72k32R6HrXWDNfDSB2ehw3i0gCsfpM4vLAASvElCbN4kw7GTp4gyWV
+         Pfm2RWCkIND9KMoAQeyDXu56O8IPEvcZ7QwfIVkrbzHq4ZF21IgYrO+SylnEsT/0b0Zl
+         ogVw==
+X-Gm-Message-State: AOAM531UnVV7UngOuaqUkOi/CCgOvRTCR4GSH80milQrm/awfIWb4JE/
+        lAIlSMRCFQRwtm1cJ67NgIqcZogYSQygdUIV/+kCkA==
+X-Google-Smtp-Source: ABdhPJz2dddfX2tS4rHdQ9DqMKSJlrede30CF/SfUWxVe6cF+VvFPNN4iqgNsuQfgJ/t5rL3oSzeJcyqJk9P/RFjuOs=
+X-Received: by 2002:aca:1e07:: with SMTP id m7mr8420800oic.28.1626454989592;
+ Fri, 16 Jul 2021 10:03:09 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210716144104.465269-1-vkuznets@redhat.com>
+References: <20210716085325.10300-1-lingshan.zhu@intel.com>
+In-Reply-To: <20210716085325.10300-1-lingshan.zhu@intel.com>
+From:   Jim Mattson <jmattson@google.com>
+Date:   Fri, 16 Jul 2021 10:02:58 -0700
+Message-ID: <CALMp9eSz6RPN=spjN6zdD5iQY2ZZDwM2bHJ2R4qWijOt1A_6aw@mail.gmail.com>
+Subject: Re: [PATCH V8 00/18] KVM: x86/pmu: Add *basic* support to enable
+ guest PEBS via DS
+To:     Zhu Lingshan <lingshan.zhu@intel.com>
+Cc:     peterz@infradead.org, pbonzini@redhat.com, bp@alien8.de,
+        seanjc@google.com, vkuznets@redhat.com, wanpengli@tencent.com,
+        joro@8bytes.org, kan.liang@linux.intel.com, ak@linux.intel.com,
+        wei.w.wang@intel.com, eranian@google.com, liuxiangdong5@huawei.com,
+        linux-kernel@vger.kernel.org, x86@kernel.org, kvm@vger.kernel.org,
+        like.xu.linux@gmail.com, boris.ostrvsky@oracle.com
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Jul 16, 2021, Vitaly Kuznetsov wrote:
-> diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
-> index 3bd09c50c98b..8493592b63b4 100644
-> --- a/arch/x86/kvm/svm/nested.c
-> +++ b/arch/x86/kvm/svm/nested.c
-> @@ -722,7 +722,7 @@ void svm_copy_vmrun_state(struct vmcb_save_area *from_save,
->  	to_save->cpl = 0;
->  }
->  
-> -void nested_svm_vmloadsave(struct vmcb *from_vmcb, struct vmcb *to_vmcb)
-> +void svm_copy_vmloadsave_state(struct vmcb *from_vmcb, struct vmcb *to_vmcb)
+On Fri, Jul 16, 2021 at 1:54 AM Zhu Lingshan <lingshan.zhu@intel.com> wrote:
+>
+> The guest Precise Event Based Sampling (PEBS) feature can provide an
+> architectural state of the instruction executed after the guest instruction
+> that exactly caused the event. It needs new hardware facility only available
+> on Intel Ice Lake Server platforms. This patch set enables the basic PEBS
+> feature for KVM guests on ICX.
+>
+> We can use PEBS feature on the Linux guest like native:
+>
+>    # echo 0 > /proc/sys/kernel/watchdog (on the host)
+>    # perf record -e instructions:ppp ./br_instr a
+>    # perf record -c 100000 -e instructions:pp ./br_instr a
+>
+> To emulate guest PEBS facility for the above perf usages,
+> we need to implement 2 code paths:
+>
+> 1) Fast path
+>
+> This is when the host assigned physical PMC has an identical index as the
+> virtual PMC (e.g. using physical PMC0 to emulate virtual PMC0).
+> This path is used in most common use cases.
+>
+> 2) Slow path
+>
+> This is when the host assigned physical PMC has a different index from the
+> virtual PMC (e.g. using physical PMC1 to emulate virtual PMC0) In this case,
+> KVM needs to rewrite the PEBS records to change the applicable counter indexes
+> to the virtual PMC indexes, which would otherwise contain the physical counter
+> index written by PEBS facility, and switch the counter reset values to the
+> offset corresponding to the physical counter indexes in the DS data structure.
+>
+> The previous version [0] enables both fast path and slow path, which seems
+> a bit more complex as the first step. In this patchset, we want to start with
+> the fast path to get the basic guest PEBS enabled while keeping the slow path
+> disabled. More focused discussion on the slow path [1] is planned to be put to
+> another patchset in the next step.
+>
+> Compared to later versions in subsequent steps, the functionality to support
+> host-guest PEBS both enabled and the functionality to emulate guest PEBS when
+> the counter is cross-mapped are missing in this patch set
+> (neither of these are typical scenarios).
 
-And swap the parameter order for both functions in a follow-up patch?  I.e. have
-the destination first to match memcpy().
+I'm not sure exactly what scenarios you're ruling out here. In our
+environment, we always have to be able to support host-level
+profiling, whether or not the guest is using the PMU (for PEBS or
+anything else). Hence, for our *basic* vPMU offering, we only expose
+two general purpose counters to the guest, so that we can keep two
+general purpose counters for the host. In this scenario, I would
+expect cross-mapped counters to be common. Are we going to be able to
+use this implementation?
