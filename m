@@ -2,86 +2,115 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 76ADD3CB8F4
-	for <lists+kvm@lfdr.de>; Fri, 16 Jul 2021 16:41:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D8DC13CB8F2
+	for <lists+kvm@lfdr.de>; Fri, 16 Jul 2021 16:41:24 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240518AbhGPOoJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 16 Jul 2021 10:44:09 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:50402 "EHLO
+        id S240544AbhGPOoH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 16 Jul 2021 10:44:07 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:30783 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S240528AbhGPOoG (ORCPT
+        by vger.kernel.org with ESMTP id S240524AbhGPOoG (ORCPT
         <rfc822;kvm@vger.kernel.org>); Fri, 16 Jul 2021 10:44:06 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1626446471;
+        s=mimecast20190719; t=1626446470;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=Z8XgazHaSaFYbppKUAFPtdkOLmoZld8wNP3xTo/qIeI=;
-        b=Cm/+xLLfhEUHb2LGeKqVykdsOFM2JUsT6KtbnUc2RE/jRtzd1FwBsuMHFnDZg8bFUEGLk8
-        tN6mczHDVaBHtxNkXd4UJY+LzugZSa5b8Si3hL2TMXmk6KQMRvBeW5DQ3I0lBiQV2xPicp
-        WZWJwsWshyuTkvd9m6s+Z28Wwt78zWs=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-352-xBh7JsSsMD2ZZDeh4qspFA-1; Fri, 16 Jul 2021 10:41:07 -0400
-X-MC-Unique: xBh7JsSsMD2ZZDeh4qspFA-1
-Received: by mail-wm1-f72.google.com with SMTP id k8-20020a05600c1c88b02901b7134fb829so1294129wms.5
-        for <kvm@vger.kernel.org>; Fri, 16 Jul 2021 07:41:07 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:to:cc:references:from:subject:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=Z8XgazHaSaFYbppKUAFPtdkOLmoZld8wNP3xTo/qIeI=;
-        b=lMksT4vhQVGpHXAaWI46MOH/7Mn9WVHjdDyyndQLslfk3bl50ZW8RNoB1la8GwJYqV
-         BI7yO2mJuVCWJVAfoD+iJgOEArJNmcQBazP+KMhxYQQb+hhoqpkiSJT/idK+5/0qWGL8
-         a84mfbdgQrBG3g0MQqcC9UmnJ/gNUF2xfvpFiHFZiGcGcCNaUjIfZ2a9e6vC0UykMkKx
-         E4JRDYeWzvUY0MvNlchmPZBYHNzdjPOknXs3MgBdOVI7/l2xpwCLpoMCksOT4QKFn08x
-         CjeKrOzqxovJ8VQCNVxQ+2FCNimwUEf1Efv9tgGiYMxFg2KA1Bc85/mpY2RlojkzsPWU
-         Ys2w==
-X-Gm-Message-State: AOAM533jiGhvL0loKBGv6kjjl38fqmV66DgvGndKj/gFtaavl8n661Uj
-        B2HkDgzGrxtZoWesvYO0K64YrpXMBOP4kr8LLlemGPbFxmN3DdTZ5/qfFXOJWNK8zz88aP3rivM
-        QOlfbh4hYS3Tk
-X-Received: by 2002:a05:600c:1c08:: with SMTP id j8mr11154054wms.50.1626446466444;
-        Fri, 16 Jul 2021 07:41:06 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxWdoky2KjCr2ox5O8bhUTxWJ8ULL5wgA4y7xfyrLqCZMspJJ4SpfnI+K8oRPVEc6zZVQhJwA==
-X-Received: by 2002:a05:600c:1c08:: with SMTP id j8mr11154030wms.50.1626446466168;
-        Fri, 16 Jul 2021 07:41:06 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id 140sm8282837wmb.43.2021.07.16.07.41.05
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 16 Jul 2021 07:41:05 -0700 (PDT)
-To:     stsp <stsp2@yandex.ru>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org
-Cc:     stable@vger.kernel.org
-References: <20210714213846.854837-1-pbonzini@redhat.com>
- <6f2305c0-77a8-42af-f5e9-2664119b6b2e@yandex.ru>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH] KVM: x86: accept userspace interrupt only if no event is
- injected
-Message-ID: <f6bd5b5b-2a4a-64e2-0a7b-a2bcdd3f541d@redhat.com>
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=8ps4gOzEkG1hG/qJ2VWdaMcAGr+nQ0tVSLRPGFZQGhs=;
+        b=e0/FPRVNKDsEJc3SxRNmHYapZAOUt93K8vyuvJUHN7CUc9eGuZ06ytbLBvZvK8eUT8n/m4
+        635KFqylncZ4uF4NedlRZVfAMOjX1mK3jA85RxUzMsIJq5a4OFhk+lQ1wydnufcl7KBSoJ
+        CyoJT6bSq9MlGptlD82VoMmfN0tS1FY=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-272--9tmXt4lPDCHNpqMOS73ZA-1; Fri, 16 Jul 2021 10:41:09 -0400
+X-MC-Unique: -9tmXt4lPDCHNpqMOS73ZA-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 35D47192FDA0;
+        Fri, 16 Jul 2021 14:41:08 +0000 (UTC)
+Received: from vitty.brq.redhat.com (unknown [10.40.195.55])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id EFFF01062246;
+        Fri, 16 Jul 2021 14:41:05 +0000 (UTC)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Maxim Levitsky <mlevitsk@redhat.com>,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH] KVM: nSVM: Rename nested_svm_vmloadsave() to svm_copy_vmloadsave_state()
 Date:   Fri, 16 Jul 2021 16:41:04 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.11.0
+Message-Id: <20210716144104.465269-1-vkuznets@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <6f2305c0-77a8-42af-f5e9-2664119b6b2e@yandex.ru>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
 Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 16/07/21 09:27, stsp wrote:
->> +    if (kvm_event_needs_reinjection(vcpu))
->> +        return false;
->> +
-> 
-> kvm_event_needs_reinjection() seems
-> to miss exception.pending check.
-> Don't we need it too?
+To match svm_copy_vmrun_state(), rename nested_svm_vmloadsave() to
+svm_copy_vmloadsave_state().
 
-Yes, good point.
+Opportunistically add missing braces to 'else' branch in
+vmload_vmsave_interception().
 
-Paolo
+No functional change intended.
+
+Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
+Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+---
+ arch/x86/kvm/svm/nested.c | 2 +-
+ arch/x86/kvm/svm/svm.c    | 7 ++++---
+ arch/x86/kvm/svm/svm.h    | 2 +-
+ 3 files changed, 6 insertions(+), 5 deletions(-)
+
+diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
+index 3bd09c50c98b..8493592b63b4 100644
+--- a/arch/x86/kvm/svm/nested.c
++++ b/arch/x86/kvm/svm/nested.c
+@@ -722,7 +722,7 @@ void svm_copy_vmrun_state(struct vmcb_save_area *from_save,
+ 	to_save->cpl = 0;
+ }
+ 
+-void nested_svm_vmloadsave(struct vmcb *from_vmcb, struct vmcb *to_vmcb)
++void svm_copy_vmloadsave_state(struct vmcb *from_vmcb, struct vmcb *to_vmcb)
+ {
+ 	to_vmcb->save.fs = from_vmcb->save.fs;
+ 	to_vmcb->save.gs = from_vmcb->save.gs;
+diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+index 664d20f0689c..cfe165d74093 100644
+--- a/arch/x86/kvm/svm/svm.c
++++ b/arch/x86/kvm/svm/svm.c
+@@ -2147,11 +2147,12 @@ static int vmload_vmsave_interception(struct kvm_vcpu *vcpu, bool vmload)
+ 	ret = kvm_skip_emulated_instruction(vcpu);
+ 
+ 	if (vmload) {
+-		nested_svm_vmloadsave(vmcb12, svm->vmcb);
++		svm_copy_vmloadsave_state(vmcb12, svm->vmcb);
+ 		svm->sysenter_eip_hi = 0;
+ 		svm->sysenter_esp_hi = 0;
+-	} else
+-		nested_svm_vmloadsave(svm->vmcb, vmcb12);
++	} else {
++		svm_copy_vmloadsave_state(svm->vmcb, vmcb12);
++	}
+ 
+ 	kvm_vcpu_unmap(vcpu, &map, true);
+ 
+diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
+index 7e2090752d8f..1b65ee3a9569 100644
+--- a/arch/x86/kvm/svm/svm.h
++++ b/arch/x86/kvm/svm/svm.h
+@@ -466,7 +466,7 @@ int svm_allocate_nested(struct vcpu_svm *svm);
+ int nested_svm_vmrun(struct kvm_vcpu *vcpu);
+ void svm_copy_vmrun_state(struct vmcb_save_area *from_save,
+ 			  struct vmcb_save_area *to_save);
+-void nested_svm_vmloadsave(struct vmcb *from_vmcb, struct vmcb *to_vmcb);
++void svm_copy_vmloadsave_state(struct vmcb *from_vmcb, struct vmcb *to_vmcb);
+ int nested_svm_vmexit(struct vcpu_svm *svm);
+ 
+ static inline int nested_svm_simple_vmexit(struct vcpu_svm *svm, u32 exit_code)
+-- 
+2.31.1
 
