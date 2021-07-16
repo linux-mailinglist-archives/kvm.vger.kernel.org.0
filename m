@@ -2,115 +2,75 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D8DC13CB8F2
-	for <lists+kvm@lfdr.de>; Fri, 16 Jul 2021 16:41:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 17ACE3CB97E
+	for <lists+kvm@lfdr.de>; Fri, 16 Jul 2021 17:14:47 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240544AbhGPOoH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 16 Jul 2021 10:44:07 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:30783 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S240524AbhGPOoG (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 16 Jul 2021 10:44:06 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1626446470;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=8ps4gOzEkG1hG/qJ2VWdaMcAGr+nQ0tVSLRPGFZQGhs=;
-        b=e0/FPRVNKDsEJc3SxRNmHYapZAOUt93K8vyuvJUHN7CUc9eGuZ06ytbLBvZvK8eUT8n/m4
-        635KFqylncZ4uF4NedlRZVfAMOjX1mK3jA85RxUzMsIJq5a4OFhk+lQ1wydnufcl7KBSoJ
-        CyoJT6bSq9MlGptlD82VoMmfN0tS1FY=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-272--9tmXt4lPDCHNpqMOS73ZA-1; Fri, 16 Jul 2021 10:41:09 -0400
-X-MC-Unique: -9tmXt4lPDCHNpqMOS73ZA-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 35D47192FDA0;
-        Fri, 16 Jul 2021 14:41:08 +0000 (UTC)
-Received: from vitty.brq.redhat.com (unknown [10.40.195.55])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id EFFF01062246;
-        Fri, 16 Jul 2021 14:41:05 +0000 (UTC)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Maxim Levitsky <mlevitsk@redhat.com>,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH] KVM: nSVM: Rename nested_svm_vmloadsave() to svm_copy_vmloadsave_state()
-Date:   Fri, 16 Jul 2021 16:41:04 +0200
-Message-Id: <20210716144104.465269-1-vkuznets@redhat.com>
+        id S240551AbhGPPRg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 16 Jul 2021 11:17:36 -0400
+Received: from mail.kernel.org ([198.145.29.99]:49438 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S240514AbhGPPRg (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 16 Jul 2021 11:17:36 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id C4D4461408;
+        Fri, 16 Jul 2021 15:14:39 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1626448481;
+        bh=P+Aoq7iQ2gqlhK+iLjPpTY5cto67TEdWIgCwEVk2u2s=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=WYViLqT6w66JmUHsV5YHTGR1gus4ro94Q+CGqrtgNk6T/XikKrXmHyNfG0GVjksBx
+         b6AhT6Xhdp9X2+CzfYTFNFsyDTaRidGJwhubVs1kenmO6hGS2ORDw90RHJAuF62oIu
+         hhIy6Q3tAD83tMDTlo4DzKyCp0qRJEYxxa7nRLqUY22NeSt1r8Vqg3kOnzuDm+bjkt
+         aGL6j6uFeqx9JmK2H/Ypm146v6gpi//pD3ZFZp6sIBA6CGo2YxupQrSpAMnKSEKRAb
+         YSaT+5e6m39YnZ9Pqr/YnrOmZy92pnLEO66Qy3CYPe1Bn1WIYp7siVTbh6MrJwtriy
+         /NJKvDEq1vBdQ==
+From:   Will Deacon <will@kernel.org>
+To:     kvm@vger.kernel.org, julien.thierry.kdev@gmail.com,
+        Alexandru Elisei <alexandru.elisei@arm.com>
+Cc:     catalin.marinas@arm.com, kernel-team@android.com,
+        Will Deacon <will@kernel.org>, maz@kernel.org,
+        sami.mujawar@arm.com, lorenzo.pieralisi@arm.com,
+        pierre.gondois@arm.com, andre.przywara@arm.com
+Subject: Re: [PATCH v3 kvmtool 0/4] arm/arm64: PCI Express 1.1 support
+Date:   Fri, 16 Jul 2021 16:14:32 +0100
+Message-Id: <162644775452.1074809.4162170370958700594.b4-ty@kernel.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20210713170631.155595-1-alexandru.elisei@arm.com>
+References: <20210713170631.155595-1-alexandru.elisei@arm.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-To match svm_copy_vmrun_state(), rename nested_svm_vmloadsave() to
-svm_copy_vmloadsave_state().
+On Tue, 13 Jul 2021 18:06:27 +0100, Alexandru Elisei wrote:
+> Patches + EDK2 binary that I used for testing can be found at [5].
+> 
+> This series aims to add support for PCI Express 1.1. It is based on the
+> last patch [0] of the reassignable BAR series. The patch was discarded at
+> the time because there was no easy solution to solve the overlap between
+> the UART address and kvmtool's PCI I/O region, which made EDK2 and/or a
+> guest compiled with 64k pages very unhappy [1]. This is not the case
+> anymore, as the UART has been moved to address 0x1000000 in commit
+> 45b4968e0de1 ("hw/serial: ARM/arm64: Use MMIO at higher addresses").
+> 
+> [...]
 
-Opportunistically add missing braces to 'else' branch in
-vmload_vmsave_interception().
+Applied to kvmtool (master), thanks!
 
-No functional change intended.
+[1/4] Move fdt_irq_fn typedef to fdt.h
+      https://git.kernel.org/will/kvmtool/c/070fb918a563
+[2/4] arm/fdt.c: Don't generate the node if generator function is NULL
+      https://git.kernel.org/will/kvmtool/c/6b74f68fcf06
+[3/4] arm/arm64: Add PCI Express 1.1 support
+      https://git.kernel.org/will/kvmtool/c/e69b7663b06e
+[4/4] arm/arm64: vfio: Add PCI Express Capability Structure
+      https://git.kernel.org/will/kvmtool/c/25c1dc6c4942
 
-Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
-Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
----
- arch/x86/kvm/svm/nested.c | 2 +-
- arch/x86/kvm/svm/svm.c    | 7 ++++---
- arch/x86/kvm/svm/svm.h    | 2 +-
- 3 files changed, 6 insertions(+), 5 deletions(-)
-
-diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
-index 3bd09c50c98b..8493592b63b4 100644
---- a/arch/x86/kvm/svm/nested.c
-+++ b/arch/x86/kvm/svm/nested.c
-@@ -722,7 +722,7 @@ void svm_copy_vmrun_state(struct vmcb_save_area *from_save,
- 	to_save->cpl = 0;
- }
- 
--void nested_svm_vmloadsave(struct vmcb *from_vmcb, struct vmcb *to_vmcb)
-+void svm_copy_vmloadsave_state(struct vmcb *from_vmcb, struct vmcb *to_vmcb)
- {
- 	to_vmcb->save.fs = from_vmcb->save.fs;
- 	to_vmcb->save.gs = from_vmcb->save.gs;
-diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index 664d20f0689c..cfe165d74093 100644
---- a/arch/x86/kvm/svm/svm.c
-+++ b/arch/x86/kvm/svm/svm.c
-@@ -2147,11 +2147,12 @@ static int vmload_vmsave_interception(struct kvm_vcpu *vcpu, bool vmload)
- 	ret = kvm_skip_emulated_instruction(vcpu);
- 
- 	if (vmload) {
--		nested_svm_vmloadsave(vmcb12, svm->vmcb);
-+		svm_copy_vmloadsave_state(vmcb12, svm->vmcb);
- 		svm->sysenter_eip_hi = 0;
- 		svm->sysenter_esp_hi = 0;
--	} else
--		nested_svm_vmloadsave(svm->vmcb, vmcb12);
-+	} else {
-+		svm_copy_vmloadsave_state(svm->vmcb, vmcb12);
-+	}
- 
- 	kvm_vcpu_unmap(vcpu, &map, true);
- 
-diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
-index 7e2090752d8f..1b65ee3a9569 100644
---- a/arch/x86/kvm/svm/svm.h
-+++ b/arch/x86/kvm/svm/svm.h
-@@ -466,7 +466,7 @@ int svm_allocate_nested(struct vcpu_svm *svm);
- int nested_svm_vmrun(struct kvm_vcpu *vcpu);
- void svm_copy_vmrun_state(struct vmcb_save_area *from_save,
- 			  struct vmcb_save_area *to_save);
--void nested_svm_vmloadsave(struct vmcb *from_vmcb, struct vmcb *to_vmcb);
-+void svm_copy_vmloadsave_state(struct vmcb *from_vmcb, struct vmcb *to_vmcb);
- int nested_svm_vmexit(struct vcpu_svm *svm);
- 
- static inline int nested_svm_simple_vmexit(struct vcpu_svm *svm, u32 exit_code)
+Cheers,
 -- 
-2.31.1
+Will
 
+https://fixes.arm64.dev
+https://next.arm64.dev
+https://will.arm64.dev
