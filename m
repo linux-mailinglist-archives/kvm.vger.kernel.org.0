@@ -2,52 +2,52 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 144B73CBD9B
-	for <lists+kvm@lfdr.de>; Fri, 16 Jul 2021 22:18:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CBEC53CBDAE
+	for <lists+kvm@lfdr.de>; Fri, 16 Jul 2021 22:23:08 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230172AbhGPUVe (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 16 Jul 2021 16:21:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37094 "EHLO
+        id S233418AbhGPU0B (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 16 Jul 2021 16:26:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38162 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232957AbhGPUVa (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 16 Jul 2021 16:21:30 -0400
-Received: from mail-pf1-x436.google.com (mail-pf1-x436.google.com [IPv6:2607:f8b0:4864:20::436])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 359F1C061765
-        for <kvm@vger.kernel.org>; Fri, 16 Jul 2021 13:18:34 -0700 (PDT)
-Received: by mail-pf1-x436.google.com with SMTP id d12so9868824pfj.2
-        for <kvm@vger.kernel.org>; Fri, 16 Jul 2021 13:18:34 -0700 (PDT)
+        with ESMTP id S230172AbhGPUZ7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 16 Jul 2021 16:25:59 -0400
+Received: from mail-pg1-x52c.google.com (mail-pg1-x52c.google.com [IPv6:2607:f8b0:4864:20::52c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 50772C061764
+        for <kvm@vger.kernel.org>; Fri, 16 Jul 2021 13:23:04 -0700 (PDT)
+Received: by mail-pg1-x52c.google.com with SMTP id u14so11034546pga.11
+        for <kvm@vger.kernel.org>; Fri, 16 Jul 2021 13:23:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=7BfdE/UnNU5Cufvf6AxaiSfhYzH0BNSWGCMFhxKGx24=;
-        b=E/6CFLEks/63BAj+rvhYCFw8+j7smWigt7E6yUbBVKRWlRh4N7F8j6bfSFznq5Pexd
-         iEJCSF81FF07VW1In+vgw7fKVgU1GCERXQxf8aQZUNZbSALSG+CX2F+XKV7NUrUtAWJ7
-         ZfhTy9tv9CvIii44N6QwKBAajeafbJHnYCiBPRppBc7l6DZwSY9HDsTA6fAGWgC5XQl9
-         uHP0lCmDLTn/ZErBYw/dnr8p5AzKbvX/5t0q1qetAfHdGQm5eBeQuyiumdM3qN90KASo
-         4BWIk/iOoYKVnBz4sy81Zudtpai8KHzWDLeVVYFmFgedPtIMuywTSq6e+ol03K9nNUhB
-         oisQ==
+        bh=x85rFiYKbp37maDQJOeVsTrROe6NzpgrCb0rCmLZT5M=;
+        b=A3iaz5afAQGHEMb5dAx2xN1+E/Jkl1exglVeIMNRgB04QPj2THSJNWjFHH4urOC4dj
+         azzuyrfh/0lup7t52U45wwGHGx8zncavC+7HwrEL3oJwy/PeRI46jUEK0qujvYADefKM
+         ArovxtIPS/UAgoxpNVVFKG1HXyvqmh/SOMk3r2oZmO0lj0BNXSOSYxiq86oLWGpzEqzx
+         KFUbSDnqnzAODG1aEbYMh+kDC3D+M6SXrMy0/MM0ejw2dka6jMwj5/ZiAjC+QAPQ0dBB
+         tZ2XeFnfbp2L4X1kFk+q9un5p8BAkl8dwzio2EB2PCFjXW8QMJqBrsIbUOddU2P4I+C3
+         O5Pg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=7BfdE/UnNU5Cufvf6AxaiSfhYzH0BNSWGCMFhxKGx24=;
-        b=nRBWIY0iN/i+qwQp4K1F2N+U9HQNj7dCilK7gd6qs5sZD+Hki3iQHI63EXesbQPw7X
-         QTicUWBfYjnMnMK8tDLDm5A+WfzmyFTzl3xjF4eqHry7lrb3/EhNJ9caZkik283wtjRP
-         a5Cmceu1g1bWEpEsBGPzne0jcPdHwAdkloH9F7805iAB1dAsJ0klcj8acyd8F5UarAaF
-         /XRHfbwOZyLoqM2/DOTkxoqKKGOXBFA0NjLzwwFvc9dEWq1bP/QJDYTslvChTen/D/QJ
-         z0OpF7ZdqgOyZwQCXjaktZoxyBxB5W9uB8TabshWrWIRmjOAsSqAZxHFEqboNsP4WpHu
-         buHA==
-X-Gm-Message-State: AOAM532gkiapApSGpFp3uwUsZDColv+T0zfV4zI/pWujeqgzNZUOf65B
-        tAL223KfhEL/cQhNSTwJ+qBwyQ==
-X-Google-Smtp-Source: ABdhPJxGmVxKHvgAi++bhPO4+E3+foVmkz5V2tqUg30o5TimNltdIyo4I4VHmzy377lREouP3naHHw==
-X-Received: by 2002:a63:770c:: with SMTP id s12mr7009862pgc.339.1626466711719;
-        Fri, 16 Jul 2021 13:18:31 -0700 (PDT)
+        bh=x85rFiYKbp37maDQJOeVsTrROe6NzpgrCb0rCmLZT5M=;
+        b=Q83Rr0jL5wF6k9F09uOarW3z25GmBktV4z+0jj7kS9ACFSxq16yqd0RHv5tn4xW9+3
+         wAGvnw/HFEuWgI6pHEOOhxsqNFZU4u+z43dY6ytGXc4+jjGhMWOEQ3/seU5Deeh0juBv
+         pIr1dTYficOZd7zkfi1WXqXFCJJBNp4crlLXCBxs5qQyvX9x8MW1twSJUwGnP7jTzJrz
+         XiGNdsM7d7Ks9jp+uPemr8ilgvE2Rl2xU8kzunhUA/8JaFo1/O0MGyow/+b8c02jjWQy
+         DETFfwEJo1iU7y7HXjH9+BLCcgxzzvWYyrNLl3jzbj9V3LJovjujHfm6SK4Y5grtqSFs
+         WJIg==
+X-Gm-Message-State: AOAM532ZCS1VvQge7keZQ48GIx91hKcI8jwOGpQyFfzqjIfXIOZVZ/Sm
+        F/p1TJ2vh+aY7u5uYaNMLpGOlw==
+X-Google-Smtp-Source: ABdhPJxWNEVP2UwoOT65EqEX3Q4hJT3FKuvSXbD5nsfxrItaCDkJFf10AIQZc6tNG7uEGWx3oLscpg==
+X-Received: by 2002:a63:1e59:: with SMTP id p25mr11432905pgm.110.1626466983659;
+        Fri, 16 Jul 2021 13:23:03 -0700 (PDT)
 Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id k8sm3003625pfu.116.2021.07.16.13.18.31
+        by smtp.gmail.com with ESMTPSA id o134sm11534516pfg.62.2021.07.16.13.23.02
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 16 Jul 2021 13:18:31 -0700 (PDT)
-Date:   Fri, 16 Jul 2021 20:18:27 +0000
+        Fri, 16 Jul 2021 13:23:03 -0700 (PDT)
+Date:   Fri, 16 Jul 2021 20:22:59 +0000
 From:   Sean Christopherson <seanjc@google.com>
 To:     Brijesh Singh <brijesh.singh@amd.com>
 Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
@@ -73,82 +73,30 @@ Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
         Michael Roth <michael.roth@amd.com>,
         Vlastimil Babka <vbabka@suse.cz>, tony.luck@intel.com,
         npmccallum@redhat.com, brijesh.ksingh@gmail.com
-Subject: Re: [PATCH Part2 RFC v4 26/40] KVM: SVM: Add
- KVM_SEV_SNP_LAUNCH_FINISH command
-Message-ID: <YPHpk3RFSmE13ZXz@google.com>
+Subject: Re: [PATCH Part2 RFC v4 30/40] KVM: X86: Define new RMP check
+ related #NPF error bits
+Message-ID: <YPHqo+KefHLrAclx@google.com>
 References: <20210707183616.5620-1-brijesh.singh@amd.com>
- <20210707183616.5620-27-brijesh.singh@amd.com>
+ <20210707183616.5620-31-brijesh.singh@amd.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20210707183616.5620-27-brijesh.singh@amd.com>
+In-Reply-To: <20210707183616.5620-31-brijesh.singh@amd.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Nit, please use "KVM: x86:" for the shortlogs.  And ubernit, the "new" part is
+redundant and/or misleading, e.g. implies that more error code bits are being
+added to existing SNP/RMP checks.  E.g.
+
+  KVM: x86: Define RMP page fault error code bits for #NPT
+
 On Wed, Jul 07, 2021, Brijesh Singh wrote:
-> +        struct kvm_sev_snp_launch_finish {
-> +                __u64 id_block_uaddr;
-> +                __u64 id_auth_uaddr;
-> +                __u8 id_block_en;
-> +                __u8 auth_key_en;
-> +                __u8 host_data[32];
+> When SEV-SNP is enabled globally, the hardware places restrictions on all
+> memory accesses based on the RMP entry, whether the hyperviso or a VM,
 
-Pad this one too?
+Another typo.
 
-> +        };
-> +
-> +
-> +See SEV-SNP specification for further details on launch finish input parameters.
-
-...
-
-> +	data->gctx_paddr = __psp_pa(sev->snp_context);
-> +	ret = sev_issue_cmd(kvm, SEV_CMD_SNP_LAUNCH_FINISH, data, &argp->error);
-
-Shouldn't KVM unwind everything it did if LAUNCH_FINISH fails?  And if that's
-not possible, take steps to make the VM unusable?
-
-> +
-> +	kfree(id_auth);
-> +
-> +e_free_id_block:
-> +	kfree(id_block);
-> +
-> +e_free:
-> +	kfree(data);
-> +
-> +	return ret;
-> +}
-> +
-
-...
-
-> @@ -2346,8 +2454,25 @@ void sev_free_vcpu(struct kvm_vcpu *vcpu)
->  
->  	if (vcpu->arch.guest_state_protected)
->  		sev_flush_guest_memory(svm, svm->vmsa, PAGE_SIZE);
-> +
-> +	/*
-> +	 * If its an SNP guest, then VMSA was added in the RMP entry as a guest owned page.
-> +	 * Transition the page to hyperivosr state before releasing it back to the system.
-
-"hyperivosr" typo.  And please wrap at 80 chars.
-
-> +	 */
-> +	if (sev_snp_guest(vcpu->kvm)) {
-> +		struct rmpupdate e = {};
-> +		int rc;
-> +
-> +		rc = rmpupdate(virt_to_page(svm->vmsa), &e);
-
-So why does this not need to go through snp_page_reclaim()?
-
-> +		if (rc) {
-> +			pr_err("Failed to release SNP guest VMSA page (rc %d), leaking it\n", rc);
-
-Seems like a WARN would be simpler.  But the more I see the rmpupdate(..., {0})
-pattern, the more I believe that nuking an RMP entry needs a dedicated helper.
-
-> +			goto skip_vmsa_free;
-
+> performs the accesses. When hardware encounters an RMP access violation
+> during a guest access, it will cause a #VMEXIT(NPF).
