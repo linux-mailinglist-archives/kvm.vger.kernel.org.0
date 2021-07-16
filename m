@@ -2,179 +2,160 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5254D3CBE26
-	for <lists+kvm@lfdr.de>; Fri, 16 Jul 2021 23:04:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9AF633CBE31
+	for <lists+kvm@lfdr.de>; Fri, 16 Jul 2021 23:09:06 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234995AbhGPVHI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 16 Jul 2021 17:07:08 -0400
-Received: from mail-mw2nam12on2074.outbound.protection.outlook.com ([40.107.244.74]:4075
-        "EHLO NAM12-MW2-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S234645AbhGPVHE (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 16 Jul 2021 17:07:04 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=iG7Tsy1tvi2ZK2JewCnJwhmUsBKagbgh9vqbdYlsYIblhb7Eoora57NdXi1doO+RePG4T++joXlOZBmtI02e7OJ8ATl3tnZuYBn0iY3aMa+CeHg31XiaJt2zIpHaCiZJk4JSVlNZFJdr98mAta/GlV05CRND9Gq3pikN8zcr2F3ZheFX9mY/l+H4UpFii0aG7u6MP+yh5xEQBD4eSjVkT8gLSCQwp0ICtTsf/FK0IaQcZqWJrTkJL4uAS0LbP4ssa6Wzgwpf6LpDkF+QolmTv4StwbnXeSfwXUYr46S2leRxbhJjAiO0CHd/z1uWKzicCwb5x9cLBmnVo57kbEmy2w==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=zAfArWQ/ATZHt41qWz0zV1klf3ih37tfiAezn6UeIVo=;
- b=TokkDNL3AYa3JWjdUR+MA0iVWTajKngc7GCWDcLcvrny/phwxH5Rg+Q2aJMpa+t3Ekdr6aVRLCqv0Q8UnehqDQ11ThsPpS/9uL6sIPIu9VsMtEyJFUcddVL+3+ExwKfBDjpGuNTzn0I2fSIH2D5UXwc1PIZnSqEo3fetqtZPRe67nkvHie1ZDGMA2XZsAewtMF06PGX7a7kt0rwp6Po0wKCmxjAVhWJWO7d0yVqpW9jA+Fq2biZfxM6J0AHJoeGFiEvkDd1y0j7ZLqfpdPqcqjxjBG3yfalaAai4dI545IcOCqH4Mz56xeBgPi4ANanyUTDT0M3y0VBRxZDV8Bdpww==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=zAfArWQ/ATZHt41qWz0zV1klf3ih37tfiAezn6UeIVo=;
- b=rrrYpQ58A16VfBKucLPK1xOejvHxItD6O0AkqaH9z/fiHy3+Jnr4v4a2MzNWUT0CLftsT4xHVEQtpW4mz/lPTryENJP0NKwrK68FVxq7c7p+HeL12bfxgVshzRjyWLYjYt9OGxbF2P9iLmVyrj6OKeI2G1l/3MKuix9oGZjTXmA=
-Authentication-Results: gmail.com; dkim=none (message not signed)
- header.d=none;gmail.com; dmarc=none action=none header.from=amd.com;
-Received: from SN6PR12MB2718.namprd12.prod.outlook.com (2603:10b6:805:6f::22)
- by SN1PR12MB2447.namprd12.prod.outlook.com (2603:10b6:802:27::22) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4331.23; Fri, 16 Jul
- 2021 21:04:05 +0000
-Received: from SN6PR12MB2718.namprd12.prod.outlook.com
- ([fe80::a8a9:2aac:4fd1:88fa]) by SN6PR12MB2718.namprd12.prod.outlook.com
- ([fe80::a8a9:2aac:4fd1:88fa%3]) with mapi id 15.20.4331.024; Fri, 16 Jul 2021
- 21:04:05 +0000
-Cc:     brijesh.singh@amd.com, x86@kernel.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
-        linux-coco@lists.linux.dev, linux-mm@kvack.org,
-        linux-crypto@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
-        David Rientjes <rientjes@google.com>,
-        Dov Murik <dovmurik@linux.ibm.com>,
-        Tobin Feldman-Fitzthum <tobin@ibm.com>,
-        Borislav Petkov <bp@alien8.de>,
-        Michael Roth <michael.roth@amd.com>,
-        Vlastimil Babka <vbabka@suse.cz>, tony.luck@intel.com,
-        npmccallum@redhat.com, brijesh.ksingh@gmail.com
-Subject: Re: [PATCH Part2 RFC v4 21/40] KVM: SVM: Add initial SEV-SNP support
-To:     Sean Christopherson <seanjc@google.com>
-References: <20210707183616.5620-1-brijesh.singh@amd.com>
- <20210707183616.5620-22-brijesh.singh@amd.com> <YPHJOmUOR65QY+YY@google.com>
- <ae47ae6b-16b1-f282-38d5-429d813243a8@amd.com> <YPHekXKC/XhWYlZE@google.com>
-From:   Brijesh Singh <brijesh.singh@amd.com>
-Message-ID: <fb54b509-29a3-f2d2-5a23-eb8d9d661fac@amd.com>
-Date:   Fri, 16 Jul 2021 16:03:57 -0500
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0)
- Gecko/20100101 Thunderbird/78.12.0
-In-Reply-To: <YPHekXKC/XhWYlZE@google.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-X-ClientProxiedBy: SA9PR03CA0030.namprd03.prod.outlook.com
- (2603:10b6:806:20::35) To SN6PR12MB2718.namprd12.prod.outlook.com
- (2603:10b6:805:6f::22)
+        id S235005AbhGPVKT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 16 Jul 2021 17:10:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48180 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S234760AbhGPVKQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 16 Jul 2021 17:10:16 -0400
+Received: from mail-ot1-x336.google.com (mail-ot1-x336.google.com [IPv6:2607:f8b0:4864:20::336])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3B64EC06175F
+        for <kvm@vger.kernel.org>; Fri, 16 Jul 2021 14:07:20 -0700 (PDT)
+Received: by mail-ot1-x336.google.com with SMTP id 59-20020a9d0ac10000b0290462f0ab0800so11241241otq.11
+        for <kvm@vger.kernel.org>; Fri, 16 Jul 2021 14:07:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=+KcxcljLGJIVJWS815GhZ8vwrKBLUZUCoehT4sKIick=;
+        b=QnfCOaF+t/airvvWleBWMXi4bMAV8F8C07l/T21uynV4up468L9W/0CdIOvo/1Ioa+
+         3Nq3QpfIdmG2aHxBU8+fchqhDTbq+QALYfwICHMMLDq2xDVmXKwD2p5A/zt1kpKgmcLR
+         3Rv9fl+CacqOqDy2bfRXC48IE+KHTvF2Fj0pDj4L+e0wif8olOH6OiHxTXNaS8IWhovm
+         srV6dFZmOAYSg23tqf7uOHyQWF/y5bZHWcW5dAlsRVqGgeI9zQQ+hdvMnRzy0XFHm7Yi
+         6uxumbS1rmq6jAdLTjZNdyULanX8BhvaeBdyZAj9dvJmJ+rB2bclMcsrAM+PV93H3FT1
+         /Ekg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=+KcxcljLGJIVJWS815GhZ8vwrKBLUZUCoehT4sKIick=;
+        b=Yn8vULe8P2G7T5EvlWU/PSzc1714ZAfyD+IxmcCLjlvbwkjdrktjeni74hLTP9eTFL
+         1iezJtukHqi22MQeoQs+oYr+gj2e50sQ9pYqjJLb4pZPZbeIge3RoEK5fHVTdhfYTGQT
+         L78uyrp4kDE9Yx13j8YpZqwiDhFhtJebJZ48t5qrrhsddJ38it3t/NH/uhoDuiBa0KVV
+         9GwKndJWygVfPBul9g6Bwg1+5M9MCefWi0dCR88sQj+fWuX8Zx1gIKnSiC1/xlQyVd7q
+         hNRfx5kqJMbTwqpf/mGSa4L57pl/EFD+u11wRXBXT65u6D4cxLa/aplJeDPFjTmLDLRG
+         fCrg==
+X-Gm-Message-State: AOAM530DSOrPNgBtE0AyZe6AS7TkvaDnCOesbogtVMwAnrlSEPlT+oqC
+        1hXx8zYmFw15W/eAjhqE50TlH4gJPFghsmZgcoteng==
+X-Google-Smtp-Source: ABdhPJxZhcCMqABPArOjR6KxEAGcwcKS907SlOyiKyyWtfF7hMD1MQl52qvcSETXu2JFjm9Jid+Nc49wBRQrisucJHY=
+X-Received: by 2002:a9d:550e:: with SMTP id l14mr9890451oth.241.1626469639196;
+ Fri, 16 Jul 2021 14:07:19 -0700 (PDT)
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from Brijeshs-MacBook-Pro.local (70.112.153.56) by SA9PR03CA0030.namprd03.prod.outlook.com (2603:10b6:806:20::35) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4331.21 via Frontend Transport; Fri, 16 Jul 2021 21:03:59 +0000
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: d51fda21-626a-4454-8da4-08d9489d3ee7
-X-MS-TrafficTypeDiagnostic: SN1PR12MB2447:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <SN1PR12MB2447203EF2357F4000293A7DE5119@SN1PR12MB2447.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:10000;
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: flp3REkdRRhjGjBs2Enqe5CpEO5i2eW/3HlX91kvAklg0S+jsEJ8QilTm6i3wMWwsGdVIDQcFqEsgtILds4JiJLuUUMVpXjWclf9kpOUS2nCsdJis7yfpJ/3FU3gRbYTYLobpyuO1bndJFBtZ4h8hZIceFqNYCVyL5wzk0yS711xhCo+rT+jOypWk75kPthRWWDqLsBV89ovTZyqfrw7+4VPSn+cGejR7Rk+oQptRrjKoCMssIROgcK3XZTTg/upuMgKuX7tPBcVsa3lic2LyRi9Vd2OcMVoSchFN0zNPGTNeXlKAs5n9LSC3PIxNTiKB/ZviMGw2JOrmnTjyWLzRRWgrwhr4XoGdHRJjx4qNS9yDqj7jX4sySNGM2weGWDcDW416lSYSNXNrMbxtsf0z7XSW8w4jFHBsxrQlh4gKIqD5ylPSx5mLfibs9kj4O7H5Mh/3BHATSIak+yp0+/4jhqQ85UDjztPyTTep8CL8YpmkiMrxGwQX92NuIm+0btlZCL/Lt39QNJrghIFKZLFQxWut4njxQVGw56DVlYTf+AjrsVDITnKrZys3gL4BHRJaBm+EtS7je39SKUctgPs0AppEGe+HRQM+t6+ZNuqEP7Dk7DCIvb1EB4HCerweXg8A7m2oJPreuQRIYG43QA7N6U6icjldfg9aa5kcWNeB/F4415BrYXecSi43R7UXX0JGsPnyjPRknTTsdesTyZ94Gh7La8TLQXJBOTv3qIVBeQ0juj5RVZAEA35kpgcKx3vz6/fMBfqjhNCu6ar72xapg==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR12MB2718.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(396003)(376002)(39860400002)(346002)(136003)(366004)(86362001)(38350700002)(6486002)(38100700002)(6506007)(478600001)(2906002)(6512007)(31686004)(186003)(53546011)(36756003)(26005)(316002)(956004)(7406005)(7416002)(8936002)(66476007)(44832011)(54906003)(8676002)(83380400001)(52116002)(4326008)(66556008)(6916009)(31696002)(5660300002)(66946007)(2616005)(45980500001)(43740500002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?VVIxUTdBZnlLVlhTbk5pamxtNjI4WWFGV1dqOEFVdVhVWENsTi9PeHdHcW1h?=
- =?utf-8?B?MkdqSkdZdy85TXRUQ1FTWVl2ekNma0w1VFMxb0pqOW9La0dUVElnTG1wbWIx?=
- =?utf-8?B?aVpNZExRWHpTcHRHK1NwK2FhY2lFTDA0THZFQU80akxPd3FUTmZmLy80Z29q?=
- =?utf-8?B?bUZMSUVXc0x6VWc5Wjg1bUd0ajBXN3BFQmN4bWRXa3JqRXc4TGUybnJ6MDc3?=
- =?utf-8?B?RzdyekM2NkRHTVJlOGpnaFo2ZEdBTXdDdmR3eUhBYXFkT3NKWmd6MGpIamNQ?=
- =?utf-8?B?eW1CZ0RreTVMR3Y5QzdQclVOWVEzVGN2dXg3YmFFbUpqRnNNWXIycHJFaDFL?=
- =?utf-8?B?VmhSZUJpbDRleFlEQUk1Nk1nc0lrU0kxTEhhbWFCNVJCVm84dkplbEFrd21j?=
- =?utf-8?B?VGdhaFNpY2VyaVc0V1FpdjZFeTdLME9tUHpLbGFXYk9NdGpwQnRxU092czZQ?=
- =?utf-8?B?SEN1OXVKMjV0LytsZWZ6MFpGVkV3R2NJY0dibXVueXVHQjR1MFFWc282YkJi?=
- =?utf-8?B?cEJRbnQ2dXFhNFplcVZrWFBETDBicmJYVC9xUlg4VzlCV0RGaDRpK2JlRDdR?=
- =?utf-8?B?S29TeitRMlRJekRFOFk4OW1oYVdUR1MzUUVOMTBjNmhjdlJwL1ZZRVd2TjNn?=
- =?utf-8?B?akx6QWZZa1haT2ZpbHU5NWUyWjZWVGhXSzlGMm8xZ0RVUUlRRk01V3ZFWHlt?=
- =?utf-8?B?cThmcEVCU3dkS1ZDNHRReGRUYXEyQVdoblpKRnhKcG5uZkFoblFnRmhWTEUv?=
- =?utf-8?B?cndIOUJ4RVREV2lVek5rcDBnRFVQTjh6RHZFMmtuUHNwVnhwU3JaY2JDYWt3?=
- =?utf-8?B?MUlVVGZmT3FtOExEMXZ2Qk16RklSdmx3bndWRmxjWFIzQUF4dzdoaC9pMnFO?=
- =?utf-8?B?L0V5eHlFNm5Pc3Z5ZDBlQ0UzeE85cVlkVlBuajkyamErdVp2bVNYQTA5bFhw?=
- =?utf-8?B?OEZ5V3JodmxWZ3k2aFFKSXFuVGJPNUZHWVU0QUlDcmlxYlovQU1wN2t2bzhW?=
- =?utf-8?B?RUtqdlFsMldFT2ZwTjdueC9kOGNPby8xZGJTNnNiN2lCUG42ay96OWFmL3ZL?=
- =?utf-8?B?M3daVWpkRGwybFpLc0VCeHphdFFaNFRzdTJCdkRoQ0JmQ0dtZkx3RGRac0Y5?=
- =?utf-8?B?V29rc25adDdLbG0vdUkzSVZQWG5JODhiQVg0aWpJSkZHdVY3UWpraDVuWWow?=
- =?utf-8?B?bmxOVk1ocGRUOU9qOXhKOExDT1dvbS9nenNyWlRZRmFBdXp2Q0E4ckZDaTFN?=
- =?utf-8?B?UTc4dXZBM1ZCTGNSUXMyQVc2ZURkWDRhOWxKSWdaVGNFTC9qNWZUbkV1STRL?=
- =?utf-8?B?ZnR3dmc2cnM1MlJtam83Mjd5MmJNekxjSnVJNm9CTGlTczZJUnFCLzdka3hC?=
- =?utf-8?B?NmlRQXlEcW5yZ05nZUtpaldHcUxLRHVxN0FFM29DcTFJOW5FTEc3VHltNFBy?=
- =?utf-8?B?TURwYmZDK096VGtWNTJlQVhsTkVNSW1lWnNhck1BSi8yZXhZTXAwZW11c2ww?=
- =?utf-8?B?QVV6YXdPSHdtN3FMYTJQa083T1UwMjJrN2V2eVNLTEVsR0hNU0FRaWRvY20v?=
- =?utf-8?B?SG9TNUJMalJCSkhHcm9IWGxxQnl0bHI1UG5xUWE3NlN3V2lUWDlwZXhFVDVz?=
- =?utf-8?B?cStIRjhpVTVtRk4vYUlzV3J0UE9pcXBaTDA3Vk4vSEUzK0w0TDRURkNuWTRI?=
- =?utf-8?B?ZGxHekZna1lUL1NMR3RqSDltSlJoR2hLTXk4WURNOXREdjFqR1d1bXppRllq?=
- =?utf-8?Q?12U5SsN7HG2RCOHg2eUv9mLBp6z4KT04pPeYPzg?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: d51fda21-626a-4454-8da4-08d9489d3ee7
-X-MS-Exchange-CrossTenant-AuthSource: SN6PR12MB2718.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Jul 2021 21:04:05.4622
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: BrN8N0ouZ5ImIB2ObUuDiy2JKOlkK/aWGYA/SBhiNBkyJ1Kv4MtLMXgzMu7Sa6xK3mTwWCdSHk+lkw7YBRyjiw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN1PR12MB2447
+References: <20210716085325.10300-1-lingshan.zhu@intel.com>
+ <CALMp9eSz6RPN=spjN6zdD5iQY2ZZDwM2bHJ2R4qWijOt1A_6aw@mail.gmail.com> <b6568241-02e3-faf6-7507-c7ad1c4db281@linux.intel.com>
+In-Reply-To: <b6568241-02e3-faf6-7507-c7ad1c4db281@linux.intel.com>
+From:   Jim Mattson <jmattson@google.com>
+Date:   Fri, 16 Jul 2021 14:07:08 -0700
+Message-ID: <CALMp9eT48THXwEG23Kb0-QExyA8qZAtkXxrxc+6+pdvtvVVN0A@mail.gmail.com>
+Subject: Re: [PATCH V8 00/18] KVM: x86/pmu: Add *basic* support to enable
+ guest PEBS via DS
+To:     "Liang, Kan" <kan.liang@linux.intel.com>
+Cc:     Zhu Lingshan <lingshan.zhu@intel.com>, peterz@infradead.org,
+        pbonzini@redhat.com, bp@alien8.de, seanjc@google.com,
+        vkuznets@redhat.com, wanpengli@tencent.com, joro@8bytes.org,
+        ak@linux.intel.com, wei.w.wang@intel.com, eranian@google.com,
+        liuxiangdong5@huawei.com, linux-kernel@vger.kernel.org,
+        x86@kernel.org, kvm@vger.kernel.org, like.xu.linux@gmail.com,
+        boris.ostrvsky@oracle.com
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-On 7/16/21 2:31 PM, Sean Christopherson wrote:
-> That's not what I was asking.  My question is if KVM will break/fail if someone
-> runs a KVM build with SNP enabled halfway through the series.  E.g. if I make a
-> KVM build at patch 22, "KVM: SVM: Add KVM_SNP_INIT command", what will happen if
-> I attempt to launch an SNP guest?  Obviously it won't fully succeed, but will KVM
-> fail gracefully and do all the proper cleanup?  Repeat the question for all patches
-> between this one and the final patch of the series.
+On Fri, Jul 16, 2021 at 12:00 PM Liang, Kan <kan.liang@linux.intel.com> wrote:
 >
-> SNP simply not working is ok, but if KVM explodes or does weird things without
-> "full" SNP support, then at minimum the module param should be off by default
-> until it's safe to enable.  E.g. for the TDP MMU, I believe the approach was to
-> put all the machinery in place but not actually let userspace flip on the module
-> param until the full implementation was ready.  Bisecting and testing the
-> individual commits is a bit painful because it requires modifying KVM code, but
-> on the plus side unrelated bisects won't stumble into a half-baked state.
-
-There is one to two patches where I can think of that we may break the
-KVM if SNP guest is created before applying the full series. In one
-patch we add LAUNCH_UPDATE but reclaim is done in next patch. I like
-your idea to push the module init  later in the series.
-
-
 >
-> Ya, got that, but again not what I was asking :-)  Why use cpu_feature_enabled()
-> instead of boot_cpu_has()?  As a random developer, I would fully expect that
-> boot_cpu_has(X86_FEATURE_SEV_SNP) is true iff SNP is fully enabled by the kernel.
-
-I have to check but I think boot_cpu_has(X64_FEATURE_SEV_SNP) will
-return true even when the CONFIG_MEM_ENCRYPT is disabled.
-
-
 >
->> The approach here is similar to SEV/ES. IIRC, it was done mainly to
->> avoid adding dead code when CONFIG_KVM_AMD_SEV is disabled.
-> But this is already in an #ifdef, checking sev_es_guest() is pointless.
+> On 7/16/2021 1:02 PM, Jim Mattson wrote:
+> > On Fri, Jul 16, 2021 at 1:54 AM Zhu Lingshan <lingshan.zhu@intel.com> wrote:
+> >>
+> >> The guest Precise Event Based Sampling (PEBS) feature can provide an
+> >> architectural state of the instruction executed after the guest instruction
+> >> that exactly caused the event. It needs new hardware facility only available
+> >> on Intel Ice Lake Server platforms. This patch set enables the basic PEBS
+> >> feature for KVM guests on ICX.
+> >>
+> >> We can use PEBS feature on the Linux guest like native:
+> >>
+> >>     # echo 0 > /proc/sys/kernel/watchdog (on the host)
+> >>     # perf record -e instructions:ppp ./br_instr a
+> >>     # perf record -c 100000 -e instructions:pp ./br_instr a
+> >>
+> >> To emulate guest PEBS facility for the above perf usages,
+> >> we need to implement 2 code paths:
+> >>
+> >> 1) Fast path
+> >>
+> >> This is when the host assigned physical PMC has an identical index as the
+> >> virtual PMC (e.g. using physical PMC0 to emulate virtual PMC0).
+> >> This path is used in most common use cases.
+> >>
+> >> 2) Slow path
+> >>
+> >> This is when the host assigned physical PMC has a different index from the
+> >> virtual PMC (e.g. using physical PMC1 to emulate virtual PMC0) In this case,
+> >> KVM needs to rewrite the PEBS records to change the applicable counter indexes
+> >> to the virtual PMC indexes, which would otherwise contain the physical counter
+> >> index written by PEBS facility, and switch the counter reset values to the
+> >> offset corresponding to the physical counter indexes in the DS data structure.
+> >>
+> >> The previous version [0] enables both fast path and slow path, which seems
+> >> a bit more complex as the first step. In this patchset, we want to start with
+> >> the fast path to get the basic guest PEBS enabled while keeping the slow path
+> >> disabled. More focused discussion on the slow path [1] is planned to be put to
+> >> another patchset in the next step.
+> >>
+> >> Compared to later versions in subsequent steps, the functionality to support
+> >> host-guest PEBS both enabled and the functionality to emulate guest PEBS when
+> >> the counter is cross-mapped are missing in this patch set
+> >> (neither of these are typical scenarios).
+> >
+> > I'm not sure exactly what scenarios you're ruling out here. In our
+> > environment, we always have to be able to support host-level
+> > profiling, whether or not the guest is using the PMU (for PEBS or
+> > anything else). Hence, for our *basic* vPMU offering, we only expose
+> > two general purpose counters to the guest, so that we can keep two
+> > general purpose counters for the host. In this scenario, I would
+> > expect cross-mapped counters to be common. Are we going to be able to
+> > use this implementation?
+> >
+>
+> Let's say we have 4 GP counters in HW.
+> Do you mean that the host owns 2 GP counters (counter 0 & 1) and the
+> guest own the other 2 GP counters (counter 2 & 3) in your envirinment?
+> We did a similar implementation in V1, but the proposal has been denied.
+> https://lore.kernel.org/kvm/20200306135317.GD12561@hirez.programming.kicks-ass.net/
 
+It's the other way around. AFAIK, there is no architectural way to
+specify that only counters 2 and 3 are available, so we have to give
+the guest counters 0 and 1.
 
-Ah Good point.
+> For the current proposal, both guest and host can see all 4 GP counters.
+> The counters are shared.
 
+I don't understand how that can work. If the host programs two
+counters, how can you give the guest four counters?
 
+> The guest cannot know the availability of the counters. It may requires
+> a counter (e.g., counter 0) which may has been used by the host. Host
+> may provides another counter (e.g., counter 1) to the guest. This is the
+> case described in the slow path. For this case, we have to modify the
+> guest PEBS record. Because the counter index in the PEBS record is 1,
+> while the guest perf driver expects 0.
+
+If we reserve counters 0 and 1 for the guest, this is not a problem
+(assuming we tell the guest it only has two counters). If we don't
+statically partition the counters, I don't see how you can ensure that
+the guest behaves as architected. For example, what do you do when the
+guest programs four counters and the host programs two?
+
+> If counter 0 is available, guests can use counter 0. That's the fast
+> path. I think the fast path should be more common even both host and
+> guest are profiling. Because except for some specific events, we may
+> move the host event to the counters which are not required by guest if
+> we have enough resources.
+
+And if you don't have enough resources?
