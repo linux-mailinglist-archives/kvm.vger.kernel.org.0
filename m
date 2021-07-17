@@ -2,32 +2,31 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1597F3CC09C
-	for <lists+kvm@lfdr.de>; Sat, 17 Jul 2021 03:46:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 143A83CC0E2
+	for <lists+kvm@lfdr.de>; Sat, 17 Jul 2021 05:55:58 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232193AbhGQBtj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 16 Jul 2021 21:49:39 -0400
-Received: from mga05.intel.com ([192.55.52.43]:19713 "EHLO mga05.intel.com"
+        id S232454AbhGQD6r (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 16 Jul 2021 23:58:47 -0400
+Received: from mga18.intel.com ([134.134.136.126]:57567 "EHLO mga18.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S231772AbhGQBti (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 16 Jul 2021 21:49:38 -0400
-X-IronPort-AV: E=McAfee;i="6200,9189,10047"; a="296453344"
+        id S229982AbhGQD6q (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 16 Jul 2021 23:58:46 -0400
+X-IronPort-AV: E=McAfee;i="6200,9189,10047"; a="198076984"
 X-IronPort-AV: E=Sophos;i="5.84,246,1620716400"; 
-   d="scan'208";a="296453344"
+   d="scan'208";a="198076984"
 Received: from fmsmga003.fm.intel.com ([10.253.24.29])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Jul 2021 18:46:34 -0700
+  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Jul 2021 20:55:50 -0700
 X-IronPort-AV: E=Sophos;i="5.84,246,1620716400"; 
-   d="scan'208";a="497233277"
-Received: from zengguan-mobl.ccr.corp.intel.com (HELO [10.238.170.10]) ([10.238.170.10])
-  by fmsmga003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Jul 2021 18:46:29 -0700
-Subject: Re: [PATCH 0/5] IPI virtualization support for VM
-To:     Wanpeng Li <kernellwp@gmail.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+   d="scan'208";a="497327097"
+Received: from zengguan-mobl.ccr.corp.intel.com (HELO [10.254.211.215]) ([10.254.211.215])
+  by fmsmga003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Jul 2021 20:55:45 -0700
+Subject: Re: [PATCH 6/6] KVM: VMX: enable IPI virtualization
+To:     Paolo Bonzini <pbonzini@redhat.com>,
         Sean Christopherson <seanjc@google.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm <kvm@vger.kernel.org>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
         Dave Hansen <dave.hansen@linux.intel.com>,
         Tony Luck <tony.luck@intel.com>,
         Kan Liang <kan.liang@linux.intel.com>,
@@ -37,19 +36,20 @@ Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         Kim Phillips <kim.phillips@amd.com>,
         Jarkko Sakkinen <jarkko@kernel.org>,
         Jethro Beekman <jethro@fortanix.com>,
-        Kai Huang <kai.huang@intel.com>,
-        the arch/x86 maintainers <x86@kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Robert Hu <robert.hu@intel.com>, Gao Chao <chao.gao@intel.com>
+        Kai Huang <kai.huang@intel.com>
+Cc:     x86@kernel.org, linux-kernel@vger.kernel.org,
+        Robert Hu <robert.hu@intel.com>, Gao Chao <chao.gao@intel.com>,
+        Emanuele Giuseppe Esposito <eesposit@redhat.com>
 References: <20210716064808.14757-1-guang.zeng@intel.com>
- <CANRm+Cy=ncU-H7duei5q+CG+pm-kXvG8N8CiUQavQ3OEpDj9eg@mail.gmail.com>
+ <20210716064808.14757-7-guang.zeng@intel.com>
+ <8aed2541-082d-d115-09ac-e7fcc05f96dc@redhat.com>
 From:   Zeng Guang <guang.zeng@intel.com>
-Message-ID: <013e7d47-f3d6-4616-b1dc-1adc01b4058a@intel.com>
-Date:   Sat, 17 Jul 2021 09:46:18 +0800
+Message-ID: <89f240cb-cb3a-c362-7ded-ee500cc12dc3@intel.com>
+Date:   Sat, 17 Jul 2021 11:55:37 +0800
 User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
  Firefox/78.0 Thunderbird/78.11.0
 MIME-Version: 1.0
-In-Reply-To: <CANRm+Cy=ncU-H7duei5q+CG+pm-kXvG8N8CiUQavQ3OEpDj9eg@mail.gmail.com>
+In-Reply-To: <8aed2541-082d-d115-09ac-e7fcc05f96dc@redhat.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
 Content-Language: en-US
@@ -57,87 +57,59 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 7/16/2021 5:25 PM, Wanpeng Li wrote:
-> On Fri, 16 Jul 2021 at 15:14, Zeng Guang <guang.zeng@intel.com> wrote:
->> Current IPI process in guest VM will virtualize the writing to interrupt
->> command register(ICR) of the local APIC which will cause VM-exit anyway
->> on source vCPU. Frequent VM-exit could induce much overhead accumulated
->> if running IPI intensive task.
+On 7/16/2021 5:52 PM, Paolo Bonzini wrote:
+> On 16/07/21 08:48, Zeng Guang wrote:
 >>
->> IPI virtualization as a new VT-x feature targets to eliminate VM-exits
->> when issuing IPI on source vCPU. It introduces a new VM-execution
->> control - "IPI virtualization"(bit4) in the tertiary processor-based
->> VM-exection controls and a new data structure - "PID-pointer table
->> address" and "Last PID-pointer index" referenced by the VMCS. When "IPI
->> virtualization" is enabled, processor emulateds following kind of writes
->> to APIC registers that would send IPIs, moreover without causing VM-exits.
->> - Memory-mapped ICR writes
->> - MSR-mapped ICR writes
->> - SENDUIPI execution
->>
->> This patch series implement IPI virtualization support in KVM.
->>
->> Patches 1-3 add tertiary processor-based VM-execution support
->> framework.
->>
->> Patch 4 implement interrupt dispatch support in x2APIC mode with
->> APIC-write VM exit. In previous platform, no CPU would produce
->> APIC-write VM exit with exit qulification 300H when the "virtual x2APIC
->> mode" VM-execution control was 1.
->>
->> Patch 5 implement IPI virtualization related function including
->> feature enabling through tertiary processor-based VM-execution in
->> various scenario of VMCS configuration, PID table setup in vCPU creation
->> and vCPU block consideration.
->>
->> Document for IPI virtualization is now available at the latest "Intel
->> Architecture Instruction Set Extensions Programming Reference".
->>
->> Document Link:
->> https://software.intel.com/content/www/us/en/develop/download/intel-architecture-instruction-set-extensions-programming-reference.html
->>
->> We did experiment to measure average time sending IPI from source vCPU
->> to the target vCPU completing the IPI handling by kvm unittest w/ and
->> w/o IPI virtualization. When IPI virtualizatin enabled, it will reduce
->> 22.21% and 15.98% cycles comsuming in xAPIC mode and x2APIC mode
->> respectly.
->>
->> KMV unittest:vmexit/ipi, 2 vCPU, AP runs without halt to ensure no VM
->> exit impact on target vCPU.
->>
->>                  Cycles of IPI
->>                  xAPIC mode              x2APIC mode
->>          test    w/o IPIv  w/ IPIv       w/o IPIv  w/ IPIv
->>          1       6106      4816          4265      3768
->>          2       6244      4656          4404      3546
->>          3       6165      4658          4233      3474
->>          4       5992      4710          4363      3430
->>          5       6083      4741          4215      3551
->>          6       6238      4904          4304      3547
->>          7       6164      4617          4263      3709
->>          8       5984      4763          4518      3779
->>          9       5931      4712          4645      3667
->>          10      5955      4530          4332      3724
->>          11      5897      4673          4283      3569
->>          12      6140      4794          4178      3598
->>          13      6183      4728          4363      3628
->>          14      5991      4994          4509      3842
->>          15      5866      4665          4520      3739
->>          16      6032      4654          4229      3701
->>          17      6050      4653          4185      3726
->>          18      6004      4792          4319      3746
->>          19      5961      4626          4196      3392
->>          20      6194      4576          4433      3760
->>
->> Average cycles  6059      4713.1        4337.85   3644.8
->> %Reduction                -22.21%                 -15.98%
-> Commit a9ab13ff6e (KVM: X86: Improve latency for single target IPI
-> fastpath) mentioned that the whole ipi fastpath feature reduces the
-> latency from 4238 to 3293 around 22.3% on SKX server, why your IPIv
-> hardware acceleration is worse than software emulation? In addition,
-> please post the IPI microbenchmark score w/ and w/o the
-> patchset.(https://lore.kernel.org/kvm/20171219085010.4081-1-ynorov@caviumnetworks.com),
-> I found that the hardware acceleration is not always outstanding.
-> https://lore.kernel.org/kvm/CANRm+Cx597FNRUCyVz1D=B6Vs2GX3Sw57X7Muk+yMpi_hb+v1w@mail.gmail.com
-We will check on it and get back later.  Thanks for your point.
->      Wanpeng
+>> +    if (!(_cpu_based_3rd_exec_control & TERTIARY_EXEC_IPI_VIRT))
+>> +        enable_ipiv = 0;
+>> +
+>>       }
+>
+> Please move this to hardware_setup(), using a new function 
+> cpu_has_vmx_ipiv() in vmx/capabilities.h.
+>
+ok, we will change it to follow current framework.
+>>      if (_cpu_based_exec_control & 
+>> CPU_BASED_ACTIVATE_TERTIARY_CONTROLS) {
+>> -        u64 opt3 = 0;
+>> +        u64 opt3 = enable_ipiv ? TERTIARY_EXEC_IPI_VIRT : 0;
+>>          u64 min3 = 0;
+>
+> I like the idea of changing opt3, but it's different from how 
+> setup_vmcs_config works for the other execution controls.  Let me 
+> think if it makes sense to clean this up, and move the handling of 
+> other module parameters from hardware_setup() to setup_vmcs_config().
+>
+May be an exception for ipiv feature ?
+>> +
+>> +    if (vmx->ipiv_active)
+>> +        install_pid(vmx);
+>
+> This should be if (enable_ipiv) instead, I think.
+>
+> In fact, in all other places that are using vmx->ipiv_active, you can 
+> actually replace it with enable_ipiv; they are all reached only with 
+> kvm_vcpu_apicv_active(vcpu) == true.
+>
+enable_ipiv as a global variable indicates the hardware capability to 
+enable IPIv. Each VM may have different IPIv configuration according to 
+kvm_vcpu_apicv_active status. So we use ipiv_active per VM to enclose 
+IPIv related operations.
+>> +    if (!enable_apicv) {
+>> +        enable_ipiv = 0;
+>> +        vmcs_config.cpu_based_3rd_exec_ctrl &= ~TERTIARY_EXEC_IPI_VIRT;
+>> +    }
+>
+> The assignment to vmcs_config.cpu_based_3rd_exec_ctrl should not be 
+> necessary; kvm_vcpu_apicv_active will always be false in that case and 
+> IPI virtualization would never be enabled.
+>
+We originally intend to make vmcs_config consistent with the actual ipiv 
+capability and decouple it from other factors. As you mentioned , it's 
+not necessary to update vmcs_config.cpu_based_3rd_exec_ctrl in this 
+case. We will remove it.
+
+Thanks.
+
+> Paolo
+>
