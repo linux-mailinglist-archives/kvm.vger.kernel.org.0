@@ -2,83 +2,93 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 757193CBFCD
-	for <lists+kvm@lfdr.de>; Sat, 17 Jul 2021 01:34:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 562E73CC013
+	for <lists+kvm@lfdr.de>; Sat, 17 Jul 2021 02:24:55 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238173AbhGPXgq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 16 Jul 2021 19:36:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52832 "EHLO
+        id S232013AbhGQA1s (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 16 Jul 2021 20:27:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35666 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230104AbhGPXgp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 16 Jul 2021 19:36:45 -0400
-Received: from mail-ot1-x330.google.com (mail-ot1-x330.google.com [IPv6:2607:f8b0:4864:20::330])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9D39AC061760
-        for <kvm@vger.kernel.org>; Fri, 16 Jul 2021 16:33:48 -0700 (PDT)
-Received: by mail-ot1-x330.google.com with SMTP id f93-20020a9d03e60000b02904b1f1d7c5f4so11557083otf.9
-        for <kvm@vger.kernel.org>; Fri, 16 Jul 2021 16:33:48 -0700 (PDT)
+        with ESMTP id S231918AbhGQA1r (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 16 Jul 2021 20:27:47 -0400
+Received: from mail-pg1-x52a.google.com (mail-pg1-x52a.google.com [IPv6:2607:f8b0:4864:20::52a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C69E6C061760
+        for <kvm@vger.kernel.org>; Fri, 16 Jul 2021 17:24:50 -0700 (PDT)
+Received: by mail-pg1-x52a.google.com with SMTP id w15so11548600pgk.13
+        for <kvm@vger.kernel.org>; Fri, 16 Jul 2021 17:24:50 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=p4sJXPq51knQRXxfT1Fmba0meWahSlo3pLoib5wqgPM=;
-        b=XvjJnvEXW1hM1N8JQPVoI2NHYjOctl0J68IDS9lGsydmUOnoTmFyJkGSSvL6HHFMJY
-         T+3SmBIRcXxcc3fiVzzIn8MrysN19gt60URfcRYO8/Q+3aXhGVLQPsfZmk/abBH1jGXI
-         5pC5h4rpUz1B2wIDMe3rsweXiXxO2fnz86YriAmY5IPLPqxPswYf6NGMDomxDE6VoEhB
-         xIY98kP8U9rZC5P699W06KTtqoLB2Wvc6Ei6tGZQOBrzEr1yAo8yDXSqxVlE/TVAGMGI
-         JiXY/jFj56J+H/C35xYnzf8TLiU/cChv9ACa6l91zc6e1tv5A7WCPe2bkfyxdp7KaJU8
-         2yzQ==
+        d=chromium.org; s=google;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=kapKSccYf+3d8IEDbRUj0u/6LBJIHmDYeekKIvB07CM=;
+        b=QuPsbhLsvtd9XpYR91VosjMB3PPm7XoKqQ6bSM7zU6K4f+gIZy2K1PS2oodCR/B18p
+         Yz6wCLfZGeHBy1z9kRR9G4wgFRm7d61JzEsZHA+6wgD25K6Ly2FKbrd01HXNCL4U6hcb
+         7bIR+OqDG2FMe7TiHbP0UfPrSbNY6zOaXWZa0=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=p4sJXPq51knQRXxfT1Fmba0meWahSlo3pLoib5wqgPM=;
-        b=i4ox9xRIpEBUG1VN0ZSdxg1ceT5GLV+bwDzQGoXcX2zd4zHSoDbhAz74UMAV4GqWpX
-         thBq7AX2qxuKBiUlHI4jW57EBPHX2HwSLxapJ7rnLggvD+OEJi9UDiF9WFnLfSTgSj1S
-         fZllJw88W6Hh3BXSg7ZSA8CCDSTU4iYoZyWLLwLzZg1AdPKHv8s+49yOVnwFySY6R70l
-         7KLdyanJfpnSmw5uAhovNQ/1hwmiq1LCkdWU+s09WRO8RxvhdC99q+J3tqq5xvVs8R3H
-         MVsjoYaWmfHWuapZ5qgS02Zi4A/JhQeU93rQLdpskEKUvnR+2NZkEPqincfJAZ6g3PqY
-         mJ6A==
-X-Gm-Message-State: AOAM5321BJIWhMxkZKQNIZAOUthVIcm9dY91ghi9Ykjr4Hw7LtHkto+O
-        trBCQlltYTLNcDBdDjE+U3LF7ASdKEFV4t1kQOlO1A==
-X-Google-Smtp-Source: ABdhPJx8yOzbofIVDQTUnc+VNQJDvUAiVMIP+aWbMOFNH240uSnZ2wHaWt1+3bffRyEcm5kyO/gJeTb2hWnLCake18E=
-X-Received: by 2002:a9d:63c6:: with SMTP id e6mr9800065otl.295.1626478427511;
- Fri, 16 Jul 2021 16:33:47 -0700 (PDT)
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=kapKSccYf+3d8IEDbRUj0u/6LBJIHmDYeekKIvB07CM=;
+        b=gyxbHx4clBTHXGcVozanHlKW6YgRAlHEU/G7xXgWoZbYJFxS3PwttzY5G7eKWgHmeO
+         Ix6C0KWl/BQwVzwGOgJGB+DcRA/U/tD7SxO1KztG/FshFlD2PtGsrsOHXP8GWuKNZSZt
+         MyzV6RtyP2EvVaQwtKtvPSVrD6k+5zlFmsz/PkY9lP99WZjZ7teYRXnfwo5QMKfrw7pU
+         eyC3A4lTH9jEbaVnWVYzt7G5wX8W/0K5Fr105i55NZ3n7OI8UdIF5ZPt+oBEOUgaZyus
+         ByOSrKz8FBBzHpEZgRk+BcVl7gnfkVLroIOOuDoeSeJZvzWcT3I0W5Mhu1WY4lj+GU3E
+         WgPg==
+X-Gm-Message-State: AOAM5301yGo+PQ+M0qhEiiXJYVcZY6BCw5SHp02yf62hNREu3VEiqcs0
+        qYLWjIQ72VGGbua8pLVAnX8Usw==
+X-Google-Smtp-Source: ABdhPJzaA08Bg4H8f+oxijbl0pXZESDDUpg8+o2qUI2cA0P+MmccR8kd9Gy5hbpsXo1yaCaxLOIyHQ==
+X-Received: by 2002:a63:d014:: with SMTP id z20mr12457261pgf.203.1626481490358;
+        Fri, 16 Jul 2021 17:24:50 -0700 (PDT)
+Received: from google.com ([2409:10:2e40:5100:9be5:9410:eeb8:524e])
+        by smtp.gmail.com with ESMTPSA id o25sm12819698pgd.21.2021.07.16.17.24.46
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 16 Jul 2021 17:24:49 -0700 (PDT)
+Date:   Sat, 17 Jul 2021 09:24:43 +0900
+From:   Sergey Senozhatsky <senozhatsky@chromium.org>
+To:     Sergey Senozhatsky <senozhatsky@chromium.org>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Suleiman Souhlal <suleiman@google.com>,
+        "Paul E . McKenney" <paulmck@kernel.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [RFC PATCH] x86/kvm: do not touch watchdogs in pvclock
+Message-ID: <YPIjS2ZTksEkeiqK@google.com>
+References: <20210716053405.1243239-1-senozhatsky@chromium.org>
 MIME-Version: 1.0
-References: <1626425406-18582-1-git-send-email-weijiang.yang@intel.com> <1626425406-18582-5-git-send-email-weijiang.yang@intel.com>
-In-Reply-To: <1626425406-18582-5-git-send-email-weijiang.yang@intel.com>
-From:   Jim Mattson <jmattson@google.com>
-Date:   Fri, 16 Jul 2021 16:33:36 -0700
-Message-ID: <CALMp9eQR1u_iXWEg+EEtL0_4mVC_T4d_3QqWy-8a4gncN7CmHQ@mail.gmail.com>
-Subject: Re: [PATCH v6 04/12] KVM: vmx/pmu: Emulate MSR_ARCH_LBR_DEPTH for
- guest Arch LBR
-To:     Yang Weijiang <weijiang.yang@intel.com>
-Cc:     pbonzini@redhat.com, seanjc@google.com, vkuznets@redhat.com,
-        wei.w.wang@intel.com, like.xu.linux@gmail.com, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Like Xu <like.xu@linux.intel.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210716053405.1243239-1-senozhatsky@chromium.org>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Jul 16, 2021 at 1:36 AM Yang Weijiang <weijiang.yang@intel.com> wrote:
->
-> From: Like Xu <like.xu@linux.intel.com>
->
-> The number of Arch LBR entries available is determined by the value
-> in host MSR_ARCH_LBR_DEPTH.DEPTH. The supported LBR depth values are
-> enumerated in CPUID.(EAX=01CH, ECX=0):EAX[7:0]. For each bit "n" set
-> in this field, the MSR_ARCH_LBR_DEPTH.DEPTH value of "8*(n+1)" is
-> supported.
->
-> On a guest write to MSR_ARCH_LBR_DEPTH, all LBR entries are reset to 0.
-> KVM writes guest requested value to the native ARCH_LBR_DEPTH MSR
-> (this is safe because the two values will be the same) when the Arch LBR
-> records MSRs are pass-through to the guest.
->
-> Signed-off-by: Like Xu <like.xu@linux.intel.com>
-> Signed-off-by: Yang Weijiang <weijiang.yang@intel.com>
+On (21/07/16 14:34), Sergey Senozhatsky wrote:
+> 
+> <IRQ>
+> apic_timer_interrupt()
+>  smp_apic_timer_interrupt()
+>   hrtimer_interrupt()
+>    _raw_spin_lock_irqsave()
+>     lock_acquire()
+>      __lock_acquire()
+>       sched_clock_cpu()
+>        sched_clock()
+>         kvm_sched_clock_read()
+>          kvm_clock_read()
+>           pvclock_clocksource_read()
+>            pvclock_touch_watchdogs()
+> 
+> Since this is VM and VCPU resume path, jiffies still maybe
+> be outdated here, which is often the case on my device.
+> pvclock_clocksource_read() clears PVCLOCK_GUEST_STOPPED,
+> touches watchdogs, but it uses stale jiffies: 4294740764
+> (for example).
 
-It might be worth noting that KVM_SET_MSRS cannot be used to emulate a
-wrmsr instruction in the guest, but maybe that's already implicit.
-
-Reviewed-by: Jim Mattson <jmattson@google.com>
+Hmm, on the other hand, there is probably nothing that guarantees
+that the first watchdog hard IRQ we execute on a resuming VCPU is
+going to see updated jiffies, it still can use stale jiffies.
