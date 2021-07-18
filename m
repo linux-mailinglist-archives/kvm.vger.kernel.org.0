@@ -2,83 +2,90 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id DEDDE3CC491
-	for <lists+kvm@lfdr.de>; Sat, 17 Jul 2021 18:47:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 733453CC8A9
+	for <lists+kvm@lfdr.de>; Sun, 18 Jul 2021 12:57:43 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231642AbhGQQug (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 17 Jul 2021 12:50:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51530 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230386AbhGQQuf (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 17 Jul 2021 12:50:35 -0400
-Received: from mail-pj1-x1034.google.com (mail-pj1-x1034.google.com [IPv6:2607:f8b0:4864:20::1034])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 62085C06175F
-        for <kvm@vger.kernel.org>; Sat, 17 Jul 2021 09:47:38 -0700 (PDT)
-Received: by mail-pj1-x1034.google.com with SMTP id i16-20020a17090acf90b02901736d9d2218so9184531pju.1
-        for <kvm@vger.kernel.org>; Sat, 17 Jul 2021 09:47:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:from:date:message-id:subject:to;
-        bh=XAXtFfFWf5f+/PXzysLaTvO6Dw1X1ZBXX13BrclTvo4=;
-        b=fiYGCl/m5s3fBV5bsqvB+5v/3lbRBgvUOrMCqXvv4hiYFrqxTsVxeWJoczf3iBr3y+
-         Q6TZq5tqclKxtxygY4plVTPOSL9VesVG55oMb1GEnet3f6pAUe7aMWNr38Yqt8FXHwio
-         pftygZjyEYQeKwISzVm5EOE3cFlaVd5qGyfxrjbFSq37P9f80+8z42TMRrLUM19xUhsT
-         U5zNossQ3ZBiannaoIofW5lrjs0WNrIfmegTeq9DysqPgO5JYuVlT/GlBafmzCN/cSUR
-         +TGRYX4Sx3pQRZUc7A/SNc7WcFzW1vlwS9OoOfqHkwqhVB0tLicy/QPFdKqd4MH0xyOA
-         6EDg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
-        bh=XAXtFfFWf5f+/PXzysLaTvO6Dw1X1ZBXX13BrclTvo4=;
-        b=iGKXz5VDhEiiW920Ag6fgEpZ9Bv24kRdboCh6/vGaHhNCUi0Lt7606tdttyDDmEXxI
-         HWg2L1QxVW9TwhROf50vTtb1WI1vXavQ6w+5uybnvIVOlRkQiHoK6NODqnpHCuIsP2vO
-         Cy9rovmoeK1BfXOjk1HOs6+s2vL2bV0pRrd1pLN65xqGZRNWd8J9JKzgGXxVQJheaJJl
-         j2uyKxBObStbxrRbD5n+OrCgDWpqbbBTOPq0moKYbHCgC5ll8Ej45QhWKyMcdEfSMHfe
-         s/SuCzZ4ZNAkWFd8S616GUy010f1zyosA4+YJhjqrngbR2XKFjSf6D/vLQnMEyhpkY9L
-         bDdA==
-X-Gm-Message-State: AOAM5311FqE9A1No/DGBqISxIC7F2mU3bdcsjHIDU6Xbe0Rrj7BaCNF6
-        o+BQuCAM1SKgxiTPDSQlfkcW7rHA4tIP/nrjML3zi6KNTi4=
-X-Google-Smtp-Source: ABdhPJysIlE21gThAIJOuN295c3PTQmipPA3Lq5y41zJFdAsrBsS0u+uYf5VDkfGAyRUgzu85CKFpiobS2PLall6DjE=
-X-Received: by 2002:a17:90a:fa1:: with SMTP id 30mr1737459pjz.42.1626540457770;
- Sat, 17 Jul 2021 09:47:37 -0700 (PDT)
+        id S232831AbhGRK6a (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 18 Jul 2021 06:58:30 -0400
+Received: from mail.kernel.org ([198.145.29.99]:47752 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S232766AbhGRK63 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 18 Jul 2021 06:58:29 -0400
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id A8C2D60E09;
+        Sun, 18 Jul 2021 10:55:31 +0000 (UTC)
+Received: from sofa.misterjones.org ([185.219.108.64] helo=why.lan)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94.2)
+        (envelope-from <maz@kernel.org>)
+        id 1m54SH-00E3PG-Gb; Sun, 18 Jul 2021 11:55:29 +0100
+From:   Marc Zyngier <maz@kernel.org>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Andrew Jones <drjones@redhat.com>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Steven Price <steven.price@arm.com>,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org, kernel-team@android.com
+Subject: [GIT PULL] KVM/arm64 fixes for 5.14, take #1
+Date:   Sun, 18 Jul 2021 11:55:22 +0100
+Message-Id: <20210718105522.1490392-1-maz@kernel.org>
+X-Mailer: git-send-email 2.30.2
 MIME-Version: 1.0
-From:   Daniel Martin <consume.noise@gmail.com>
-Date:   Sat, 17 Jul 2021 18:47:26 +0200
-Message-ID: <CADscph1andcLtCbx4ot3FX5xdQYjkTaQ1q5L0BHLJyjFaE6L_w@mail.gmail.com>
-Subject: wiki: Mistake at page/Memory
-To:     kvm@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: pbonzini@redhat.com, drjones@redhat.com, catalin.marinas@arm.com, steven.price@arm.com, james.morse@arm.com, suzuki.poulose@arm.com, alexandru.elisei@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, kernel-team@android.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi folks,
+Hi Paolo,
 
-https://www.linux-kvm.org/page/Memory states: "A single access to a
-guest page can take up to 25 memory accesses to complete, which gets
-very costly. See this paper: ..."
+Here's the first batch of KVM/arm64 fixes for 5.14. The most important
+one is an embarrassing MTE one-liner, but we also have a couple of
+selftest changes courtesy of Andrew.
 
-First, the paper url changed to:
-http://developer.amd.com/wordpress/media/2012/10/NPT-WP-1%201-final-TM.pdf
+Please pull,
 
-Second, I can't find any "25" in the paper. Though a "24" in section
-4.2.2: "... In such a case a TLB miss cost can increase from 4 memory
-references in non-nested paging to 24 in nested paging unless caching
-is done. ..."
+	M.
 
-Anyone would like to fix that? I can't, as I don't get the
-confirmation mail, see below.
+The following changes since commit e73f0f0ee7541171d89f2e2491130c7771ba58d3:
 
-Cheers,
-    Daniel
+  Linux 5.14-rc1 (2021-07-11 15:07:40 -0700)
 
------8<-----
-KVM could not send your confirmation mail. Please check your email
-address for invalid characters.
+are available in the Git repository at:
 
-Mailer returned: authentication failure [SMTP: Invalid response code
-received from server (code: 535, response: 5.7.8 Username and Password
-not accepted. Learn more at 5.7.8
-https://support.google.com/mail/?p=BadCredentials f11sm4498579qtp.85 -
-gsmtp)]
------>8-----
+  git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kvmarm-fixes-5.14-1
+
+for you to fetch changes up to 5cf17746b302aa32a4f200cc6ce38865bfe4cf94:
+
+  KVM: arm64: selftests: get-reg-list: actually enable pmu regs in pmu sublist (2021-07-14 11:55:18 +0100)
+
+----------------------------------------------------------------
+KVM/arm64 fixes for 5.14, take #1
+
+- Fix MTE shared page detection
+
+- Fix selftest use of obsolete pthread_yield() in favour of sched_yield()
+
+- Enable selftest's use of PMU registers when asked to
+
+----------------------------------------------------------------
+Andrew Jones (2):
+      KVM: selftests: change pthread_yield to sched_yield
+      KVM: arm64: selftests: get-reg-list: actually enable pmu regs in pmu sublist
+
+Marc Zyngier (1):
+      KVM: arm64: Fix detection of shared VMAs on guest fault
+
+ arch/arm64/kvm/mmu.c                               | 2 +-
+ tools/testing/selftests/kvm/aarch64/get-reg-list.c | 3 ++-
+ tools/testing/selftests/kvm/steal_time.c           | 2 +-
+ 3 files changed, 4 insertions(+), 3 deletions(-)
