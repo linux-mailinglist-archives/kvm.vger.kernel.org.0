@@ -2,109 +2,166 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id EF8AB3CE055
-	for <lists+kvm@lfdr.de>; Mon, 19 Jul 2021 17:57:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EC3963CE264
+	for <lists+kvm@lfdr.de>; Mon, 19 Jul 2021 18:14:28 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345832AbhGSPQu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 19 Jul 2021 11:16:50 -0400
-Received: from mail.kernel.org ([198.145.29.99]:56116 "EHLO mail.kernel.org"
+        id S1348328AbhGSPaP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 19 Jul 2021 11:30:15 -0400
+Received: from mail.kernel.org ([198.145.29.99]:38042 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1347272AbhGSPP4 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 19 Jul 2021 11:15:56 -0400
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 033F6601FD;
-        Mon, 19 Jul 2021 15:56:36 +0000 (UTC)
-Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
-        by disco-boy.misterjones.org with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-        (Exim 4.94.2)
-        (envelope-from <maz@kernel.org>)
-        id 1m5VdC-00EGXH-BP; Mon, 19 Jul 2021 16:56:34 +0100
+        id S1348180AbhGSPYi (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 19 Jul 2021 11:24:38 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 1316B606A5;
+        Mon, 19 Jul 2021 16:02:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+        s=korg; t=1626710553;
+        bh=gkXu3sbTGyTrqtfgG5j2rg5rnTqyL/1tASBndj4S7fY=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=PqjHYO3TjnUVUVEBpfpm4AdYfyp6WxoS5CGRM98VwRbFuOaU+JreS6kq/0g9Fv7If
+         BByr6JqlDm2NPOC86npBdJtGhv8wmdG6sc7Btf/K8njZ6bprIcFfNzvuuSDpgbSD6n
+         W2/uQuo1S4DDrF5orGFaB8AaCn3dbuyexgPbE0PE=
+From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To:     linux-kernel@vger.kernel.org
+Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        stable@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+        kvm@vger.kernel.org, Hulk Robot <hulkci@huawei.com>,
+        Kefeng Wang <wangkefeng.wang@huawei.com>
+Subject: [PATCH 5.13 004/351] KVM: mmio: Fix use-after-free Read in kvm_vm_ioctl_unregister_coalesced_mmio
+Date:   Mon, 19 Jul 2021 16:49:10 +0200
+Message-Id: <20210719144944.680407844@linuxfoundation.org>
+X-Mailer: git-send-email 2.32.0
+In-Reply-To: <20210719144944.537151528@linuxfoundation.org>
+References: <20210719144944.537151528@linuxfoundation.org>
+User-Agent: quilt/0.66
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
-Content-Transfer-Encoding: 7bit
-Date:   Mon, 19 Jul 2021 16:56:34 +0100
-From:   Marc Zyngier <maz@kernel.org>
-To:     Alexandru Elisei <alexandru.elisei@arm.com>
-Cc:     linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org,
-        kvmarm@lists.cs.columbia.edu, James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Alexandre Chartre <alexandre.chartre@oracle.com>,
-        Robin Murphy <robin.murphy@arm.com>,
-        Andrew Jones <drjones@redhat.com>,
-        Russell King <linux@arm.linux.org.uk>, kernel-team@android.com,
-        Russell King <rmk+kernel@armlinux.org.uk>
-Subject: Re: [PATCH v2 1/4] KVM: arm64: Narrow PMU sysreg reset values to
- architectural requirements
-In-Reply-To: <171cca9d-2a6e-248c-8502-feba8ebbe55e@arm.com>
-References: <20210719123902.1493805-1-maz@kernel.org>
- <20210719123902.1493805-2-maz@kernel.org>
- <171cca9d-2a6e-248c-8502-feba8ebbe55e@arm.com>
-User-Agent: Roundcube Webmail/1.4.11
-Message-ID: <171834f3198b898d5c2aefa0270b65f2@kernel.org>
-X-Sender: maz@kernel.org
-X-SA-Exim-Connect-IP: 51.254.78.96
-X-SA-Exim-Rcpt-To: alexandru.elisei@arm.com, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, james.morse@arm.com, suzuki.poulose@arm.com, alexandre.chartre@oracle.com, robin.murphy@arm.com, drjones@redhat.com, linux@arm.linux.org.uk, kernel-team@android.com, rmk+kernel@armlinux.org.uk
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2021-07-19 16:55, Alexandru Elisei wrote:
-> Hi Marc,
-> 
-> On 7/19/21 1:38 PM, Marc Zyngier wrote:
->> A number of the PMU sysregs expose reset values that are not
->> compliant with the architecture (set bits in the RES0 ranges,
->> for example).
->> 
->> This in turn has the effect that we need to pointlessly mask
->> some register fields when using them.
->> 
->> Let's start by making sure we don't have illegal values in the
->> shadow registers at reset time. This affects all the registers
->> that dedicate one bit per counter, the counters themselves,
->> PMEVTYPERn_EL0 and PMSELR_EL0.
->> 
->> Reported-by: Alexandre Chartre <alexandre.chartre@oracle.com>
->> Reviewed-by: Alexandre Chartre <alexandre.chartre@oracle.com>
->> Acked-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
->> Signed-off-by: Marc Zyngier <maz@kernel.org>
->> ---
->>  arch/arm64/kvm/sys_regs.c | 43 
->> ++++++++++++++++++++++++++++++++++++---
->>  1 file changed, 40 insertions(+), 3 deletions(-)
->> 
->> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
->> index f6f126eb6ac1..96bdfa0e68b2 100644
->> --- a/arch/arm64/kvm/sys_regs.c
->> +++ b/arch/arm64/kvm/sys_regs.c
->> @@ -603,6 +603,41 @@ static unsigned int pmu_visibility(const struct 
->> kvm_vcpu *vcpu,
->>  	return REG_HIDDEN;
->>  }
->> 
->> +static void reset_pmu_reg(struct kvm_vcpu *vcpu, const struct 
->> sys_reg_desc *r)
->> +{
->> +	u64 n, mask = BIT(ARMV8_PMU_CYCLE_IDX);
->> +
->> +	/* No PMU available, any PMU reg may UNDEF... */
->> +	if (!kvm_arm_support_pmu_v3())
->> +		return;
->> +
->> +	n = read_sysreg(pmcr_el0) >> ARMV8_PMU_PMCR_N_SHIFT;
->> +	n &= ARMV8_PMU_PMCR_N_MASK;
->> +	if (n)
->> +		mask |= GENMASK(n - 1, 0);
-> 
-> Hm... seems to be missing the cycle counter.
+From: Kefeng Wang <wangkefeng.wang@huawei.com>
 
-Check the declaration for 'mask'... :-)
+commit 23fa2e46a5556f787ce2ea1a315d3ab93cced204 upstream.
 
-         M.
--- 
-Jazz is not dead. It just smells funny...
+BUG: KASAN: use-after-free in kvm_vm_ioctl_unregister_coalesced_mmio+0x7c/0x1ec arch/arm64/kvm/../../../virt/kvm/coalesced_mmio.c:183
+Read of size 8 at addr ffff0000c03a2500 by task syz-executor083/4269
+
+CPU: 5 PID: 4269 Comm: syz-executor083 Not tainted 5.10.0 #7
+Hardware name: linux,dummy-virt (DT)
+Call trace:
+ dump_backtrace+0x0/0x2d0 arch/arm64/kernel/stacktrace.c:132
+ show_stack+0x28/0x34 arch/arm64/kernel/stacktrace.c:196
+ __dump_stack lib/dump_stack.c:77 [inline]
+ dump_stack+0x110/0x164 lib/dump_stack.c:118
+ print_address_description+0x78/0x5c8 mm/kasan/report.c:385
+ __kasan_report mm/kasan/report.c:545 [inline]
+ kasan_report+0x148/0x1e4 mm/kasan/report.c:562
+ check_memory_region_inline mm/kasan/generic.c:183 [inline]
+ __asan_load8+0xb4/0xbc mm/kasan/generic.c:252
+ kvm_vm_ioctl_unregister_coalesced_mmio+0x7c/0x1ec arch/arm64/kvm/../../../virt/kvm/coalesced_mmio.c:183
+ kvm_vm_ioctl+0xe30/0x14c4 arch/arm64/kvm/../../../virt/kvm/kvm_main.c:3755
+ vfs_ioctl fs/ioctl.c:48 [inline]
+ __do_sys_ioctl fs/ioctl.c:753 [inline]
+ __se_sys_ioctl fs/ioctl.c:739 [inline]
+ __arm64_sys_ioctl+0xf88/0x131c fs/ioctl.c:739
+ __invoke_syscall arch/arm64/kernel/syscall.c:36 [inline]
+ invoke_syscall arch/arm64/kernel/syscall.c:48 [inline]
+ el0_svc_common arch/arm64/kernel/syscall.c:158 [inline]
+ do_el0_svc+0x120/0x290 arch/arm64/kernel/syscall.c:220
+ el0_svc+0x1c/0x28 arch/arm64/kernel/entry-common.c:367
+ el0_sync_handler+0x98/0x170 arch/arm64/kernel/entry-common.c:383
+ el0_sync+0x140/0x180 arch/arm64/kernel/entry.S:670
+
+Allocated by task 4269:
+ stack_trace_save+0x80/0xb8 kernel/stacktrace.c:121
+ kasan_save_stack mm/kasan/common.c:48 [inline]
+ kasan_set_track mm/kasan/common.c:56 [inline]
+ __kasan_kmalloc+0xdc/0x120 mm/kasan/common.c:461
+ kasan_kmalloc+0xc/0x14 mm/kasan/common.c:475
+ kmem_cache_alloc_trace include/linux/slab.h:450 [inline]
+ kmalloc include/linux/slab.h:552 [inline]
+ kzalloc include/linux/slab.h:664 [inline]
+ kvm_vm_ioctl_register_coalesced_mmio+0x78/0x1cc arch/arm64/kvm/../../../virt/kvm/coalesced_mmio.c:146
+ kvm_vm_ioctl+0x7e8/0x14c4 arch/arm64/kvm/../../../virt/kvm/kvm_main.c:3746
+ vfs_ioctl fs/ioctl.c:48 [inline]
+ __do_sys_ioctl fs/ioctl.c:753 [inline]
+ __se_sys_ioctl fs/ioctl.c:739 [inline]
+ __arm64_sys_ioctl+0xf88/0x131c fs/ioctl.c:739
+ __invoke_syscall arch/arm64/kernel/syscall.c:36 [inline]
+ invoke_syscall arch/arm64/kernel/syscall.c:48 [inline]
+ el0_svc_common arch/arm64/kernel/syscall.c:158 [inline]
+ do_el0_svc+0x120/0x290 arch/arm64/kernel/syscall.c:220
+ el0_svc+0x1c/0x28 arch/arm64/kernel/entry-common.c:367
+ el0_sync_handler+0x98/0x170 arch/arm64/kernel/entry-common.c:383
+ el0_sync+0x140/0x180 arch/arm64/kernel/entry.S:670
+
+Freed by task 4269:
+ stack_trace_save+0x80/0xb8 kernel/stacktrace.c:121
+ kasan_save_stack mm/kasan/common.c:48 [inline]
+ kasan_set_track+0x38/0x6c mm/kasan/common.c:56
+ kasan_set_free_info+0x20/0x40 mm/kasan/generic.c:355
+ __kasan_slab_free+0x124/0x150 mm/kasan/common.c:422
+ kasan_slab_free+0x10/0x1c mm/kasan/common.c:431
+ slab_free_hook mm/slub.c:1544 [inline]
+ slab_free_freelist_hook mm/slub.c:1577 [inline]
+ slab_free mm/slub.c:3142 [inline]
+ kfree+0x104/0x38c mm/slub.c:4124
+ coalesced_mmio_destructor+0x94/0xa4 arch/arm64/kvm/../../../virt/kvm/coalesced_mmio.c:102
+ kvm_iodevice_destructor include/kvm/iodev.h:61 [inline]
+ kvm_io_bus_unregister_dev+0x248/0x280 arch/arm64/kvm/../../../virt/kvm/kvm_main.c:4374
+ kvm_vm_ioctl_unregister_coalesced_mmio+0x158/0x1ec arch/arm64/kvm/../../../virt/kvm/coalesced_mmio.c:186
+ kvm_vm_ioctl+0xe30/0x14c4 arch/arm64/kvm/../../../virt/kvm/kvm_main.c:3755
+ vfs_ioctl fs/ioctl.c:48 [inline]
+ __do_sys_ioctl fs/ioctl.c:753 [inline]
+ __se_sys_ioctl fs/ioctl.c:739 [inline]
+ __arm64_sys_ioctl+0xf88/0x131c fs/ioctl.c:739
+ __invoke_syscall arch/arm64/kernel/syscall.c:36 [inline]
+ invoke_syscall arch/arm64/kernel/syscall.c:48 [inline]
+ el0_svc_common arch/arm64/kernel/syscall.c:158 [inline]
+ do_el0_svc+0x120/0x290 arch/arm64/kernel/syscall.c:220
+ el0_svc+0x1c/0x28 arch/arm64/kernel/entry-common.c:367
+ el0_sync_handler+0x98/0x170 arch/arm64/kernel/entry-common.c:383
+ el0_sync+0x140/0x180 arch/arm64/kernel/entry.S:670
+
+If kvm_io_bus_unregister_dev() return -ENOMEM, we already call kvm_iodevice_destructor()
+inside this function to delete 'struct kvm_coalesced_mmio_dev *dev' from list
+and free the dev, but kvm_iodevice_destructor() is called again, it will lead
+the above issue.
+
+Let's check the the return value of kvm_io_bus_unregister_dev(), only call
+kvm_iodevice_destructor() if the return value is 0.
+
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: kvm@vger.kernel.org
+Reported-by: Hulk Robot <hulkci@huawei.com>
+Signed-off-by: Kefeng Wang <wangkefeng.wang@huawei.com>
+Message-Id: <20210626070304.143456-1-wangkefeng.wang@huawei.com>
+Cc: stable@vger.kernel.org
+Fixes: 5d3c4c79384a ("KVM: Stop looking for coalesced MMIO zones if the bus is destroyed", 2021-04-20)
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+---
+ virt/kvm/coalesced_mmio.c |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+--- a/virt/kvm/coalesced_mmio.c
++++ b/virt/kvm/coalesced_mmio.c
+@@ -186,7 +186,6 @@ int kvm_vm_ioctl_unregister_coalesced_mm
+ 		    coalesced_mmio_in_range(dev, zone->addr, zone->size)) {
+ 			r = kvm_io_bus_unregister_dev(kvm,
+ 				zone->pio ? KVM_PIO_BUS : KVM_MMIO_BUS, &dev->dev);
+-			kvm_iodevice_destructor(&dev->dev);
+ 
+ 			/*
+ 			 * On failure, unregister destroys all devices on the
+@@ -196,6 +195,7 @@ int kvm_vm_ioctl_unregister_coalesced_mm
+ 			 */
+ 			if (r)
+ 				break;
++			kvm_iodevice_destructor(&dev->dev);
+ 		}
+ 	}
+ 
+
+
