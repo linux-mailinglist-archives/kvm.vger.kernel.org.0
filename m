@@ -2,69 +2,129 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id BAC873CCE4C
-	for <lists+kvm@lfdr.de>; Mon, 19 Jul 2021 09:13:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 95C853CCE6D
+	for <lists+kvm@lfdr.de>; Mon, 19 Jul 2021 09:22:22 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234728AbhGSHQ0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 19 Jul 2021 03:16:26 -0400
-Received: from mga04.intel.com ([192.55.52.120]:39757 "EHLO mga04.intel.com"
+        id S234833AbhGSHY3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 19 Jul 2021 03:24:29 -0400
+Received: from mga12.intel.com ([192.55.52.136]:26504 "EHLO mga12.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S234789AbhGSHQ0 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 19 Jul 2021 03:16:26 -0400
-X-IronPort-AV: E=McAfee;i="6200,9189,10049"; a="209102776"
+        id S234806AbhGSHY0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 19 Jul 2021 03:24:26 -0400
+X-IronPort-AV: E=McAfee;i="6200,9189,10049"; a="190595607"
 X-IronPort-AV: E=Sophos;i="5.84,251,1620716400"; 
-   d="scan'208";a="209102776"
-Received: from fmsmga003.fm.intel.com ([10.253.24.29])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Jul 2021 00:13:20 -0700
+   d="scan'208";a="190595607"
+Received: from fmsmga004.fm.intel.com ([10.253.24.48])
+  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Jul 2021 00:21:26 -0700
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.84,251,1620716400"; 
-   d="scan'208";a="499789742"
+   d="scan'208";a="493943626"
 Received: from michael-optiplex-9020.sh.intel.com (HELO localhost) ([10.239.159.182])
-  by FMSMGA003.fm.intel.com with ESMTP; 19 Jul 2021 00:13:16 -0700
-Date:   Mon, 19 Jul 2021 15:27:08 +0800
+  by fmsmga004.fm.intel.com with ESMTP; 19 Jul 2021 00:21:25 -0700
+Date:   Mon, 19 Jul 2021 15:35:16 +0800
 From:   Yang Weijiang <weijiang.yang@intel.com>
-To:     Jim Mattson <jmattson@google.com>
-Cc:     Yang Weijiang <weijiang.yang@intel.com>, pbonzini@redhat.com,
-        seanjc@google.com, vkuznets@redhat.com, wei.w.wang@intel.com,
-        like.xu.linux@gmail.com, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Like Xu <like.xu@linux.intel.com>
-Subject: Re: [PATCH v6 04/12] KVM: vmx/pmu: Emulate MSR_ARCH_LBR_DEPTH for
- guest Arch LBR
-Message-ID: <20210719072708.GA23208@intel.com>
-References: <1626425406-18582-1-git-send-email-weijiang.yang@intel.com>
- <1626425406-18582-5-git-send-email-weijiang.yang@intel.com>
- <CALMp9eQR1u_iXWEg+EEtL0_4mVC_T4d_3QqWy-8a4gncN7CmHQ@mail.gmail.com>
+To:     "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+Cc:     "Yang, Weijiang" <weijiang.yang@intel.com>
+Subject: Re: [PATCH v4 1/2] qdev-properties: Add a new macro with bitmask
+ check for uint64_t property
+Message-ID: <20210719073516.GA23232@intel.com>
+References: <1624156957-7223-1-git-send-email-weijiang.yang@intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CALMp9eQR1u_iXWEg+EEtL0_4mVC_T4d_3QqWy-8a4gncN7CmHQ@mail.gmail.com>
+In-Reply-To: <1624156957-7223-1-git-send-email-weijiang.yang@intel.com>
 User-Agent: Mutt/1.5.24 (2015-08-30)
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Jul 16, 2021 at 04:33:36PM -0700, Jim Mattson wrote:
-> On Fri, Jul 16, 2021 at 1:36 AM Yang Weijiang <weijiang.yang@intel.com> wrote:
-> >
-> > From: Like Xu <like.xu@linux.intel.com>
-> >
-> > The number of Arch LBR entries available is determined by the value
-> > in host MSR_ARCH_LBR_DEPTH.DEPTH. The supported LBR depth values are
-> > enumerated in CPUID.(EAX=01CH, ECX=0):EAX[7:0]. For each bit "n" set
-> > in this field, the MSR_ARCH_LBR_DEPTH.DEPTH value of "8*(n+1)" is
-> > supported.
-> >
-> > On a guest write to MSR_ARCH_LBR_DEPTH, all LBR entries are reset to 0.
-> > KVM writes guest requested value to the native ARCH_LBR_DEPTH MSR
-> > (this is safe because the two values will be the same) when the Arch LBR
-> > records MSRs are pass-through to the guest.
-> >
-> > Signed-off-by: Like Xu <like.xu@linux.intel.com>
-> > Signed-off-by: Yang Weijiang <weijiang.yang@intel.com>
-> 
-> It might be worth noting that KVM_SET_MSRS cannot be used to emulate a
-> wrmsr instruction in the guest, but maybe that's already implicit.
-> 
-> Reviewed-by: Jim Mattson <jmattson@google.com>
+Hello, maintainers,
 
-Thanks Jim. Yes, guest wrmsr read/write emulation shares none-host initiated path.
+Could you review this patch series kindly since the legacy LBR patches
+have been merged in 5.12 kernel tree?
+
+Thanks!
+
+On Sun, Jun 20, 2021 at 10:42:36AM +0800, Yang, Weijiang wrote:
+> The DEFINE_PROP_UINT64_CHECKMASK maro applies certain mask check agaist
+> user-supplied property value, reject the value if it violates the bitmask.
+> 
+> Co-developed-by: Like Xu <like.xu@linux.intel.com>
+> Signed-off-by: Like Xu <like.xu@linux.intel.com>
+> Signed-off-by: Yang Weijiang <weijiang.yang@intel.com>
+> ---
+>  hw/core/qdev-properties.c    | 19 +++++++++++++++++++
+>  include/hw/qdev-properties.h | 12 ++++++++++++
+>  2 files changed, 31 insertions(+)
+> 
+> diff --git a/hw/core/qdev-properties.c b/hw/core/qdev-properties.c
+> index 50f40949f5..343a200784 100644
+> --- a/hw/core/qdev-properties.c
+> +++ b/hw/core/qdev-properties.c
+> @@ -428,6 +428,25 @@ const PropertyInfo qdev_prop_int64 = {
+>      .set_default_value = qdev_propinfo_set_default_value_int,
+>  };
+>  
+> +static void set_uint64_checkmask(Object *obj, Visitor *v, const char *name,
+> +                      void *opaque, Error **errp)
+> +{
+> +    Property *prop = opaque;
+> +    uint64_t *ptr = object_field_prop_ptr(obj, prop);
+> +
+> +    visit_type_uint64(v, name, ptr, errp);
+> +    if (*ptr & ~prop->bitmask) {
+> +        error_setg(errp, "Property value for '%s' violates bitmask '0x%lx'",
+> +                   name, prop->bitmask);
+> +    }
+> +}
+> +
+> +const PropertyInfo qdev_prop_uint64_checkmask = {
+> +    .name  = "uint64",
+> +    .get   = get_uint64,
+> +    .set   = set_uint64_checkmask,
+> +};
+> +
+>  /* --- string --- */
+>  
+>  static void release_string(Object *obj, const char *name, void *opaque)
+> diff --git a/include/hw/qdev-properties.h b/include/hw/qdev-properties.h
+> index 0ef97d60ce..075882e8c1 100644
+> --- a/include/hw/qdev-properties.h
+> +++ b/include/hw/qdev-properties.h
+> @@ -17,6 +17,7 @@ struct Property {
+>      const PropertyInfo *info;
+>      ptrdiff_t    offset;
+>      uint8_t      bitnr;
+> +    uint64_t     bitmask;
+>      bool         set_default;
+>      union {
+>          int64_t i;
+> @@ -53,6 +54,7 @@ extern const PropertyInfo qdev_prop_uint16;
+>  extern const PropertyInfo qdev_prop_uint32;
+>  extern const PropertyInfo qdev_prop_int32;
+>  extern const PropertyInfo qdev_prop_uint64;
+> +extern const PropertyInfo qdev_prop_uint64_checkmask;
+>  extern const PropertyInfo qdev_prop_int64;
+>  extern const PropertyInfo qdev_prop_size;
+>  extern const PropertyInfo qdev_prop_string;
+> @@ -102,6 +104,16 @@ extern const PropertyInfo qdev_prop_link;
+>                  .set_default = true,                         \
+>                  .defval.u    = (bool)_defval)
+>  
+> +/**
+> + * The DEFINE_PROP_UINT64_CHECKMASK macro checks a user-supplied value
+> + * against corresponding bitmask, rejects the value if it violates.
+> + * The default value is set in instance_init().
+> + */
+> +#define DEFINE_PROP_UINT64_CHECKMASK(_name, _state, _field, _bitmask)   \
+> +    DEFINE_PROP(_name, _state, _field, qdev_prop_uint64_checkmask, uint64_t, \
+> +                .bitmask    = (_bitmask),                     \
+> +                .set_default = false)
+> +
+>  #define PROP_ARRAY_LEN_PREFIX "len-"
+>  
+>  /**
+> -- 
+> 2.21.1
