@@ -2,159 +2,178 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A77D13CCFE5
-	for <lists+kvm@lfdr.de>; Mon, 19 Jul 2021 11:04:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 01D303CD09B
+	for <lists+kvm@lfdr.de>; Mon, 19 Jul 2021 11:26:36 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235769AbhGSIWu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 19 Jul 2021 04:22:50 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:23398 "EHLO
+        id S235888AbhGSInC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 19 Jul 2021 04:43:02 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:59229 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S235073AbhGSIWt (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 19 Jul 2021 04:22:49 -0400
+        by vger.kernel.org with ESMTP id S235404AbhGSInB (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 19 Jul 2021 04:43:01 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1626685409;
+        s=mimecast20190719; t=1626686621;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=3hEOQcTnDPmOyh7Lvu4AtIr/eiP9Wa6mbvXp76RMLz4=;
-        b=epuGP5UDuiPhLEtizEn7KgZ5JPaSHATxFBm0hdTLgSj8H2Fd9lMbGYNhmS1SiAfzBRMA/e
-        nJnRBgp35oAuee9f8EAI7bppyLiRNsJYBqZ67uNC+EnN0eMfbReI4Plo47MGoSERWyF2tH
-        +9cm9K9ndKHtijhoJihMaksD+HFAkg4=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-568-Aa3bRiUdN4GqQ-MSt-3Ruw-1; Mon, 19 Jul 2021 05:03:27 -0400
-X-MC-Unique: Aa3bRiUdN4GqQ-MSt-3Ruw-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 90E06804300;
-        Mon, 19 Jul 2021 09:03:26 +0000 (UTC)
-Received: from vitty.brq.redhat.com (unknown [10.40.194.232])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id D8C285DA2D;
-        Mon, 19 Jul 2021 09:03:23 +0000 (UTC)
+        bh=9GqID4T7OaGpULAvBbxYFa5ax0SCEaOJ8PLyIMtOMSM=;
+        b=L7Owi3r+Kv50EFlCOseqJQapUdDNGwB8eerhT0OOEb0Bod90vqdSd3+DXGskyq1r5Q/WM7
+        3Cde9c4lz0cJAgIMcQSioB0OQ9wj69+9hv4DbmZtGHc780PQLkiZNjYNP5+HLkaljn5r2w
+        whiTcElm+206cxmjFXfaRrJIbpwx16s=
+Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
+ [209.85.208.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-100-95PjW8F0NOekY9lWkiABiw-1; Mon, 19 Jul 2021 05:23:39 -0400
+X-MC-Unique: 95PjW8F0NOekY9lWkiABiw-1
+Received: by mail-ed1-f69.google.com with SMTP id v14-20020a056402184eb029039994f9cab9so8258855edy.22
+        for <kvm@vger.kernel.org>; Mon, 19 Jul 2021 02:23:39 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
+         :message-id:mime-version;
+        bh=9GqID4T7OaGpULAvBbxYFa5ax0SCEaOJ8PLyIMtOMSM=;
+        b=MFTqC4V6/bHBurNrd1WfGbub3QRlKzCUmn+Ssfa0L3KBJL+aLs9nmZQxAKtIv6JVCs
+         r8jlcFUlFGyai4yxhXJR/PakvXAwphDYYPxsLmdAhDJOmv+XP6HD1hdB8yv8DJjDa5Av
+         9WsUJYU3ecd+lPWPHKYOkedm9407DlfXHlQ1XzVsrVflFy4iZJbbTIq78Qme/XTSTkFK
+         t5ayaOWzjlkfiAQIY6lnkZjALIVnZPsk5PybKnuxgu6VyehxejGqGS0S9F83NjtLUb83
+         A/Rfr0mq5XVoYFcnnNJ1bGUMKouVFdTAzLyvc+xApeSgxo90LCRKCDDIfZxxAVqlC7/1
+         erSg==
+X-Gm-Message-State: AOAM530CuDdIadNnZ+9aZ2XfQJFrzeNoo0KyQKUWaYnZHPnp4oJH3aws
+        aksGr9YiaPnaZ7Vd0Ez2tl5W19OrwpNXMGLyzm5TnA9Cp/twocY1I+MnV3jrPdqXvqKhKiAVRv9
+        wHPbu3nEG5owh
+X-Received: by 2002:a05:6402:216:: with SMTP id t22mr32665958edv.70.1626686618714;
+        Mon, 19 Jul 2021 02:23:38 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzDoq6MqXcKUH37retGzkvPJnNJR2T4LyDxSw6U1qF5+Rn1F1pvug2dt5BUszcakXHhyZ9sBg==
+X-Received: by 2002:a05:6402:216:: with SMTP id t22mr32665939edv.70.1626686618525;
+        Mon, 19 Jul 2021 02:23:38 -0700 (PDT)
+Received: from vitty.brq.redhat.com (g-server-2.ign.cz. [91.219.240.2])
+        by smtp.gmail.com with ESMTPSA id ee29sm7569047edb.39.2021.07.19.02.23.37
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 19 Jul 2021 02:23:38 -0700 (PDT)
 From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Sean Christopherson <seanjc@google.com>,
+To:     Maxim Levitsky <mlevitsk@redhat.com>, kvm@vger.kernel.org
+Cc:     "open list:X86 ARCHITECTURE (32-BIT AND 64-BIT)" 
+        <linux-kernel@vger.kernel.org>, Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, Borislav Petkov <bp@alien8.de>,
         Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Maxim Levitsky <mlevitsk@redhat.com>,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH 2/1] KVM: nSVM: Swap the parameter order for svm_copy_vmrun_state()/svm_copy_vmloadsave_state()
-Date:   Mon, 19 Jul 2021 11:03:22 +0200
-Message-Id: <20210719090322.625277-1-vkuznets@redhat.com>
-In-Reply-To: <20210716144104.465269-1-vkuznets@redhat.com>
-References: <20210716144104.465269-1-vkuznets@redhat.com>
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ingo Molnar <mingo@redhat.com>,
+        "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
+        Sean Christopherson <seanjc@google.com>
+Subject: Re: [PATCH v2 8/8] KVM: x86: hyper-v: Deactivate APICv only when
+ AutoEOI feature is in use
+In-Reply-To: <b2978f4868437db23208718b3850b8fb6c0409eb.camel@redhat.com>
+References: <20210713142023.106183-1-mlevitsk@redhat.com>
+ <20210713142023.106183-9-mlevitsk@redhat.com>
+ <c51d3f0b46bb3f73d82d66fae92425be76b84a68.camel@redhat.com>
+ <87wnpmzqw3.fsf@vitty.brq.redhat.com>
+ <b2978f4868437db23208718b3850b8fb6c0409eb.camel@redhat.com>
+Date:   Mon, 19 Jul 2021 11:23:36 +0200
+Message-ID: <87tukqzmg7.fsf@vitty.brq.redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Make svm_copy_vmrun_state()/svm_copy_vmloadsave_state() interface match
-'memcpy(dest, src)' to avoid any confusion.
+Maxim Levitsky <mlevitsk@redhat.com> writes:
 
-No functional change intended.
+> On Mon, 2021-07-19 at 09:47 +0200, Vitaly Kuznetsov wrote:
+>> Maxim Levitsky <mlevitsk@redhat.com> writes:
+>> 
+>> > On Tue, 2021-07-13 at 17:20 +0300, Maxim Levitsky wrote:
+>> > > From: Vitaly Kuznetsov <vkuznets@redhat.com>
+>> > > 
+>> > > APICV_INHIBIT_REASON_HYPERV is currently unconditionally forced upon
+>> > > SynIC activation as SynIC's AutoEOI is incompatible with APICv/AVIC. It is,
+>> > > however, possible to track whether the feature was actually used by the
+>> > > guest and only inhibit APICv/AVIC when needed.
+>> > > 
+>> > > TLFS suggests a dedicated 'HV_DEPRECATING_AEOI_RECOMMENDED' flag to let
+>> > > Windows know that AutoEOI feature should be avoided. While it's up to
+>> > > KVM userspace to set the flag, KVM can help a bit by exposing global
+>> > > APICv/AVIC enablement: in case APICv/AVIC usage is impossible, AutoEOI
+>> > > is still preferred.
+>> > > Maxim:
+>> > >    - added SRCU lock drop around call to kvm_request_apicv_update
+>> > >    - always set HV_DEPRECATING_AEOI_RECOMMENDED in kvm_get_hv_cpuid,
+>> > >      since this feature can be used regardless of AVIC
+>> > > 
+>> > > Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+>> > > Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
+>> > > ---
+>> > >  arch/x86/include/asm/kvm_host.h |  3 +++
+>> > >  arch/x86/kvm/hyperv.c           | 34 +++++++++++++++++++++++++++------
+>> > >  2 files changed, 31 insertions(+), 6 deletions(-)
+>> > > 
+>> > > diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+>> > > index e11d64aa0bcd..f900dca58af8 100644
+>> > > --- a/arch/x86/include/asm/kvm_host.h
+>> > > +++ b/arch/x86/include/asm/kvm_host.h
+>> > > @@ -956,6 +956,9 @@ struct kvm_hv {
+>> > >  	/* How many vCPUs have VP index != vCPU index */
+>> > >  	atomic_t num_mismatched_vp_indexes;
+>> > >  
+>> > > +	/* How many SynICs use 'AutoEOI' feature */
+>> > > +	atomic_t synic_auto_eoi_used;
+>> > > +
+>> > >  	struct hv_partition_assist_pg *hv_pa_pg;
+>> > >  	struct kvm_hv_syndbg hv_syndbg;
+>> > >  };
+>> > > diff --git a/arch/x86/kvm/hyperv.c b/arch/x86/kvm/hyperv.c
+>> > > index b07592ca92f0..6bf47a583d0e 100644
+>> > > --- a/arch/x86/kvm/hyperv.c
+>> > > +++ b/arch/x86/kvm/hyperv.c
+>> > > @@ -85,9 +85,22 @@ static bool synic_has_vector_auto_eoi(struct kvm_vcpu_hv_synic *synic,
+>> > >  	return false;
+>> > >  }
+>> > >  
+>> > > +
+>> > > +static void synic_toggle_avic(struct kvm_vcpu *vcpu, bool activate)
+>> > > +{
+>> > > +	srcu_read_unlock(&vcpu->kvm->srcu, vcpu->srcu_idx);
+>> > > +	kvm_request_apicv_update(vcpu->kvm, activate,
+>> > > +			APICV_INHIBIT_REASON_HYPERV);
+>> > > +	vcpu->srcu_idx = srcu_read_lock(&vcpu->kvm->srcu);
+>> > > +}
+>> > 
+>> > Well turns out that this patch still doesn't work (on this
+>> > weekend I found out that all my AVIC enabled VMs hang on reboot).
+>> > 
+>> > I finally found out what prompted me back then to make srcu lock drop
+>> > in synic_update_vector conditional on whether the write was done
+>> > by the host.
+>> >  
+>> > Turns out that while KVM_SET_MSRS does take the kvm->srcu lock,
+>> > it stores the returned srcu index in a local variable and not
+>> > in vcpu->srcu_idx, thus the lock drop in synic_toggle_avic
+>> > doesn't work.
+>> >  
+>> > So it is likely that I have seen it not work, and blamed 
+>> > KVM_SET_MSRS for not taking the srcu lock which was a wrong assumption.
+>> >  
+>> > I am more inclined to fix this by just tracking if we hold the srcu
+>> > lock on each VCPU manually, just as we track the srcu index anyway,
+>> > and then kvm_request_apicv_update can use this to drop the srcu
+>> > lock when needed.
+>> > 
+>> 
+>> Would it be possible to use some magic value in 'vcpu->srcu_idx' and not
+>> introduce a new 'srcu_ls_locked' flag?
+>
+> Well, currently the returned index value from srcu_read_lock is opaque 
+> (and we have two SRCU implementations and both I think return small positive numbers, 
+> but I haven't studied them in depth).
+>  
+> We can ask the people that maintain SRCU to reserve a number (like -1)
+> or so.
+> I probably first add the 'srcu_is_locked' thought and then as a follow up patch
+> remove it if they agree.
+>
 
-Suggested-by: Sean Christopherson <seanjc@google.com>
-Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
----
- arch/x86/kvm/svm/nested.c |  8 ++++----
- arch/x86/kvm/svm/svm.c    | 12 ++++++------
- arch/x86/kvm/svm/svm.h    |  6 +++---
- 3 files changed, 13 insertions(+), 13 deletions(-)
+Ah, OK. BTW, I've just discovered srcu_read_lock_held() which sounds
+like the function we need but unfortunately it is not.
 
-diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
-index 8493592b63b4..1c2a0414a88d 100644
---- a/arch/x86/kvm/svm/nested.c
-+++ b/arch/x86/kvm/svm/nested.c
-@@ -702,8 +702,8 @@ int nested_svm_vmrun(struct kvm_vcpu *vcpu)
- }
- 
- /* Copy state save area fields which are handled by VMRUN */
--void svm_copy_vmrun_state(struct vmcb_save_area *from_save,
--			  struct vmcb_save_area *to_save)
-+void svm_copy_vmrun_state(struct vmcb_save_area *to_save,
-+			  struct vmcb_save_area *from_save)
- {
- 	to_save->es = from_save->es;
- 	to_save->cs = from_save->cs;
-@@ -722,7 +722,7 @@ void svm_copy_vmrun_state(struct vmcb_save_area *from_save,
- 	to_save->cpl = 0;
- }
- 
--void svm_copy_vmloadsave_state(struct vmcb *from_vmcb, struct vmcb *to_vmcb)
-+void svm_copy_vmloadsave_state(struct vmcb *to_vmcb, struct vmcb *from_vmcb)
- {
- 	to_vmcb->save.fs = from_vmcb->save.fs;
- 	to_vmcb->save.gs = from_vmcb->save.gs;
-@@ -1385,7 +1385,7 @@ static int svm_set_nested_state(struct kvm_vcpu *vcpu,
- 
- 	svm->nested.vmcb12_gpa = kvm_state->hdr.svm.vmcb_pa;
- 
--	svm_copy_vmrun_state(save, &svm->vmcb01.ptr->save);
-+	svm_copy_vmrun_state(&svm->vmcb01.ptr->save, save);
- 	nested_load_control_from_vmcb12(svm, ctl);
- 
- 	svm_switch_vmcb(svm, &svm->nested.vmcb02);
-diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index cfe165d74093..9a6987549e1b 100644
---- a/arch/x86/kvm/svm/svm.c
-+++ b/arch/x86/kvm/svm/svm.c
-@@ -2147,11 +2147,11 @@ static int vmload_vmsave_interception(struct kvm_vcpu *vcpu, bool vmload)
- 	ret = kvm_skip_emulated_instruction(vcpu);
- 
- 	if (vmload) {
--		svm_copy_vmloadsave_state(vmcb12, svm->vmcb);
-+		svm_copy_vmloadsave_state(svm->vmcb, vmcb12);
- 		svm->sysenter_eip_hi = 0;
- 		svm->sysenter_esp_hi = 0;
- 	} else {
--		svm_copy_vmloadsave_state(svm->vmcb, vmcb12);
-+		svm_copy_vmloadsave_state(vmcb12, svm->vmcb);
- 	}
- 
- 	kvm_vcpu_unmap(vcpu, &map, true);
-@@ -4345,8 +4345,8 @@ static int svm_enter_smm(struct kvm_vcpu *vcpu, char *smstate)
- 
- 		BUILD_BUG_ON(offsetof(struct vmcb, save) != 0x400);
- 
--		svm_copy_vmrun_state(&svm->vmcb01.ptr->save,
--				     map_save.hva + 0x400);
-+		svm_copy_vmrun_state(map_save.hva + 0x400,
-+				     &svm->vmcb01.ptr->save);
- 
- 		kvm_vcpu_unmap(vcpu, &map_save, true);
- 	}
-@@ -4394,8 +4394,8 @@ static int svm_leave_smm(struct kvm_vcpu *vcpu, const char *smstate)
- 					 &map_save) == -EINVAL)
- 				return 1;
- 
--			svm_copy_vmrun_state(map_save.hva + 0x400,
--					     &svm->vmcb01.ptr->save);
-+			svm_copy_vmrun_state(&svm->vmcb01.ptr->save,
-+					     map_save.hva + 0x400);
- 
- 			kvm_vcpu_unmap(vcpu, &map_save, true);
- 		}
-diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
-index 1b65ee3a9569..bd0fe94c2920 100644
---- a/arch/x86/kvm/svm/svm.h
-+++ b/arch/x86/kvm/svm/svm.h
-@@ -464,9 +464,9 @@ void svm_leave_nested(struct vcpu_svm *svm);
- void svm_free_nested(struct vcpu_svm *svm);
- int svm_allocate_nested(struct vcpu_svm *svm);
- int nested_svm_vmrun(struct kvm_vcpu *vcpu);
--void svm_copy_vmrun_state(struct vmcb_save_area *from_save,
--			  struct vmcb_save_area *to_save);
--void svm_copy_vmloadsave_state(struct vmcb *from_vmcb, struct vmcb *to_vmcb);
-+void svm_copy_vmrun_state(struct vmcb_save_area *to_save,
-+			  struct vmcb_save_area *from_save);
-+void svm_copy_vmloadsave_state(struct vmcb *to_vmcb, struct vmcb *from_vmcb);
- int nested_svm_vmexit(struct vcpu_svm *svm);
- 
- static inline int nested_svm_simple_vmexit(struct vcpu_svm *svm, u32 exit_code)
 -- 
-2.31.1
+Vitaly
 
