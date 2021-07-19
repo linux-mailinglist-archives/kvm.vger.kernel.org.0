@@ -2,192 +2,175 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D9FDC3CD555
-	for <lists+kvm@lfdr.de>; Mon, 19 Jul 2021 15:01:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E5B9C3CD557
+	for <lists+kvm@lfdr.de>; Mon, 19 Jul 2021 15:01:38 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237129AbhGSMUd (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 19 Jul 2021 08:20:33 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:29016 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S236780AbhGSMUd (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 19 Jul 2021 08:20:33 -0400
-Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 16JCZ5XC068579;
-        Mon, 19 Jul 2021 09:01:02 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=zI9IsPXOZ/pth+cYFUA6cViBl/XUuGrBrhq4P620G7w=;
- b=s1/5EawJiiPUIXpZbd6ZOBp3p7fWC9HF6cblfe/AarGkNqqbPkvFI6LEG2/QM2xnnpFW
- A1vxfkNeSMrb5/TFVTbz7IhTatNHCCUTn9OImxeqm9Veqjp2xekT1Q/c99xximlEmDjl
- Ggfl1OGv4K9DPXJ2qM9IY4YzxpB5F2er2UK0TRSwNjMtMITX77a2e58kJPNsHEDuRSzb
- J/LNT0K1UI0UGL/mrKAvU7ult+xiCaXJV1B9tCDo50DCILbl+aBb4UmLdA3JjbNs6Yey
- FdXxtMVtZBKN0X4VH5jPQiAvO7duGZJktyLkzmrKb6w1v8N7hDp8N6suOZNX2+exLWgG AA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 39w8w8j31s-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 19 Jul 2021 09:01:01 -0400
-Received: from m0098414.ppops.net (m0098414.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 16JCZ7vr068816;
-        Mon, 19 Jul 2021 09:01:01 -0400
-Received: from ppma05wdc.us.ibm.com (1b.90.2fa9.ip4.static.sl-reverse.com [169.47.144.27])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 39w8w8j31b-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 19 Jul 2021 09:01:01 -0400
-Received: from pps.filterd (ppma05wdc.us.ibm.com [127.0.0.1])
-        by ppma05wdc.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 16JCvQ3Y023795;
-        Mon, 19 Jul 2021 13:01:00 GMT
-Received: from b01cxnp23033.gho.pok.ibm.com (b01cxnp23033.gho.pok.ibm.com [9.57.198.28])
-        by ppma05wdc.us.ibm.com with ESMTP id 39upua6mam-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 19 Jul 2021 13:01:00 +0000
-Received: from b01ledav002.gho.pok.ibm.com (b01ledav002.gho.pok.ibm.com [9.57.199.107])
-        by b01cxnp23033.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 16JD10u139453182
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 19 Jul 2021 13:01:00 GMT
-Received: from b01ledav002.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 0373512405A;
-        Mon, 19 Jul 2021 13:01:00 +0000 (GMT)
-Received: from b01ledav002.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 30635124053;
-        Mon, 19 Jul 2021 13:00:57 +0000 (GMT)
-Received: from [9.65.195.237] (unknown [9.65.195.237])
-        by b01ledav002.gho.pok.ibm.com (Postfix) with ESMTP;
-        Mon, 19 Jul 2021 13:00:56 +0000 (GMT)
-Subject: Re: [RFC PATCH 5/6] i386/sev: add support to encrypt BIOS when
- SEV-SNP is enabled
-To:     Brijesh Singh <brijesh.singh@amd.com>, qemu-devel@nongnu.org
-Cc:     Connor Kuehl <ckuehl@redhat.com>,
-        =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
-        "Michael S . Tsirkin" <mst@redhat.com>,
-        James Bottomley <jejb@linux.ibm.com>,
-        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        David Gibson <david@gibson.dropbear.id.au>,
-        =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
-        kvm@vger.kernel.org, Michael Roth <michael.roth@amd.com>,
-        Eduardo Habkost <ehabkost@redhat.com>,
-        Dov Murik <dovmurik@linux.ibm.com>
-References: <20210709215550.32496-1-brijesh.singh@amd.com>
- <20210709215550.32496-6-brijesh.singh@amd.com>
-From:   Dov Murik <dovmurik@linux.ibm.com>
-Message-ID: <0ab7b398-238e-38c5-aed1-fd39fd9c7f7c@linux.ibm.com>
-Date:   Mon, 19 Jul 2021 16:00:55 +0300
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.12.0
+        id S237134AbhGSMU5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 19 Jul 2021 08:20:57 -0400
+Received: from mail-mw2nam10hn2238.outbound.protection.outlook.com ([52.100.157.238]:3013
+        "EHLO NAM10-MW2-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S237130AbhGSMU4 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 19 Jul 2021 08:20:56 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=fVI7BM/c4HCUfRh4cIHiqOjK3+SFLV6EhPtW9c7pRVL+f9NKA9U68oQ8e/SCOwYNaN9b1/T/7V/iOeAMORgIYXlN5t8ANNY6aLJgpWbt5lfO+1oZFVNBH+1Ba6XSyKBYB5GWeRQxTTOD/Gfjk4zx4ll/gpoNTPtytlhsmW1YaJPTNoZd0WsbyfyNbFj9tiAqwtDar0j1BBXKQxvvjBhHZdptDaUAwesVcaQS7THPhAkNoSJ4yBDHk7kPiTI6dmSbOlYsg/3KU3zpKHXZyeBqiy4imPNkf95NJOC9mldQyDBTOXKmGvPLm6u8/63+sdIG3iXMeUVQnjBsFA6YmZM/LA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=LklVu4oYDEr0pY/4vez7iS1ynH+MZLUhu24FYyL80yA=;
+ b=D5b68j5wGAktcv8H7RGTJ2agBWhN9azL6cjbXksz1VYLg7uWUFGoIWAmUlCETD3PyfUXo5BXwkd+XLLWBk6mKXWXg45O/x97Vikl1nQIhlZ8RK3CBlRrq2lRN0M8XIq3lAAxyK/80rMKQFk6NAMqHv1UlumcQSF1YaGr1ax6X0D8JgBu9zSmvxl+lm4JExF8E/g1kqH2/JailNeSbnfIICxdjkkXPswcZMLI0RSj9WOTWpCmBeGKjemWCMkUPp6ui9EGSML/2GukFxmYShX0woWLExTwwmejg78UGVE/szMeOuldo+x92wrDhklVUJ7cb0OiRU9oRCwmQQY2ePGGPw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=LklVu4oYDEr0pY/4vez7iS1ynH+MZLUhu24FYyL80yA=;
+ b=aK7Ky1e/8kGpojSdpT/ZuPD943cvImZuBUbYVKQ2vLQaZaW+3FLL/Ex1UQKHany7HZ3fnThdlnXZn5eV1SdFAEFHeTjG+CJFE1rUXqlf2wFzr+z87TZ0oUlrH8IxuzdOlAYYa8MU3GxCUszjQWRU9M+QUvkRzIg8VzDBRtWb9sZDbLwLTsbv3uSFXpWhY2AnGCNYBFDNdO8cYtvoWqHCTZR6F1BqFEEsyetrgc/O8L4JRGYvWvTUPWsWBI0yZI5r0DAov9M3nx368ng41AQGu9aa6gUobK1kqxhvIKOUTeFV4JeOLPTCFBO4TgxkUYn8NKHqf40ME9Sklo7x/6kYfw==
+Authentication-Results: redhat.com; dkim=none (message not signed)
+ header.d=none;redhat.com; dmarc=none action=none header.from=nvidia.com;
+Received: from BL0PR12MB5506.namprd12.prod.outlook.com (2603:10b6:208:1cb::22)
+ by BL1PR12MB5304.namprd12.prod.outlook.com (2603:10b6:208:314::13) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4331.31; Mon, 19 Jul
+ 2021 13:01:33 +0000
+Received: from BL0PR12MB5506.namprd12.prod.outlook.com
+ ([fe80::d017:af2f:7049:5482]) by BL0PR12MB5506.namprd12.prod.outlook.com
+ ([fe80::d017:af2f:7049:5482%5]) with mapi id 15.20.4331.033; Mon, 19 Jul 2021
+ 13:01:33 +0000
+Date:   Mon, 19 Jul 2021 10:01:31 -0300
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     Cornelia Huck <cohuck@redhat.com>
+Cc:     David Airlie <airlied@linux.ie>,
+        Tony Krowiak <akrowiak@linux.ibm.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        Diana Craciun <diana.craciun@oss.nxp.com>,
+        dri-devel@lists.freedesktop.org,
+        Eric Auger <eric.auger@redhat.com>,
+        Eric Farman <farman@linux.ibm.com>,
+        Harald Freudenberger <freude@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        intel-gfx@lists.freedesktop.org,
+        intel-gvt-dev@lists.freedesktop.org,
+        Jani Nikula <jani.nikula@linux.intel.com>,
+        Jason Herne <jjherne@linux.ibm.com>,
+        Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
+        kvm@vger.kernel.org, Kirti Wankhede <kwankhede@nvidia.com>,
+        linux-doc@vger.kernel.org, linux-s390@vger.kernel.org,
+        Matthew Rosato <mjrosato@linux.ibm.com>,
+        Peter Oberparleiter <oberpar@linux.ibm.com>,
+        Halil Pasic <pasic@linux.ibm.com>,
+        Rodrigo Vivi <rodrigo.vivi@intel.com>,
+        Vineeth Vijayan <vneethv@linux.ibm.com>,
+        Zhenyu Wang <zhenyuw@linux.intel.com>,
+        Zhi Wang <zhi.a.wang@intel.com>,
+        "Raj, Ashok" <ashok.raj@intel.com>, Christoph Hellwig <hch@lst.de>,
+        Leon Romanovsky <leonro@nvidia.com>,
+        Max Gurtovoy <mgurtovoy@nvidia.com>,
+        Yishai Hadas <yishaih@nvidia.com>
+Subject: Re: [PATCH 03/13] vfio: Provide better generic support for
+ open/release vfio_device_ops
+Message-ID: <20210719130131.GQ543781@nvidia.com>
+References: <3-v1-eaf3ccbba33c+1add0-vfio_reflck_jgg@nvidia.com>
+ <87wnpma299.fsf@redhat.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <87wnpma299.fsf@redhat.com>
+X-ClientProxiedBy: MN2PR06CA0027.namprd06.prod.outlook.com
+ (2603:10b6:208:23d::32) To BL0PR12MB5506.namprd12.prod.outlook.com
+ (2603:10b6:208:1cb::22)
 MIME-Version: 1.0
-In-Reply-To: <20210709215550.32496-6-brijesh.singh@amd.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: bd-Q-Ylrryquhx6cR2t5G70vOxixS09J
-X-Proofpoint-GUID: ZBuzWph7wexbdrcXb7aqGoMKAZ8ZmYeL
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.790
- definitions=2021-07-19_05:2021-07-19,2021-07-19 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=999 mlxscore=0
- priorityscore=1501 lowpriorityscore=0 phishscore=0 adultscore=0
- suspectscore=0 clxscore=1015 impostorscore=0 spamscore=0 bulkscore=0
- malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2104190000 definitions=main-2107190069
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from mlx.ziepe.ca (142.162.113.129) by MN2PR06CA0027.namprd06.prod.outlook.com (2603:10b6:208:23d::32) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4331.21 via Frontend Transport; Mon, 19 Jul 2021 13:01:33 +0000
+Received: from jgg by mlx with local (Exim 4.94)        (envelope-from <jgg@nvidia.com>)        id 1m5Stn-004QAT-Te; Mon, 19 Jul 2021 10:01:31 -0300
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: ddec79e2-62af-401e-66bb-08d94ab55574
+X-MS-TrafficTypeDiagnostic: BL1PR12MB5304:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <BL1PR12MB53040EA018057BD68941EA8DC2E19@BL1PR12MB5304.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:3968;
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: =?us-ascii?Q?Esqu1HQ/v2Ir1ltm3aEcOkcmyZkLUHZSax3ATg4xJE8NPbiADFQbGR0zHTGf?=
+ =?us-ascii?Q?y37CdKt0dFVpPbzRdTln4L2rlKCq3x916+ScJyTqwb+TikZqbRUSr8hhVgbk?=
+ =?us-ascii?Q?fJCNUCafeHRNa863bzI/IBQYmZvha8kQ2z9LQSmdgGcYzJ2QuPnvrw92W+oX?=
+ =?us-ascii?Q?xoC0IQ5qsLT6PJolMJpioz6E5LfBi4svNSrZam26DBY1yRWMkHEsqNfusZ5K?=
+ =?us-ascii?Q?Zs09eqqCH65eua9OjLCAR6ochdCk5Im3Ls+9YJEHCTFwAT2ase63g8NrzrUI?=
+ =?us-ascii?Q?kfKWAmfefRUo1fT9vF45CK3LpOu7oyqMZ/Aivc8Bc5wstTgDvaUvwM5wuGrP?=
+ =?us-ascii?Q?cVmTdOSvO/V1U89OBJmXlxLpGePSV43Fib6vkeuWuK7Aphumor3sztJIAtLK?=
+ =?us-ascii?Q?A4PiGQfKryYvoOwNJA8jBJbLEStC+WgAPjG/CdKAlfVLTC5MngknXcaoWq2m?=
+ =?us-ascii?Q?c+mRXIvT/eZKJwst81zOOIlTnGBmbS2w8V60uAHLFWNYOd//wgASSb8zctaZ?=
+ =?us-ascii?Q?tTBmdR0VCx8eDVtqge2+a5PpBiI0I2UiPmWvaEO8pz60uMkTahQrFD4QmrIf?=
+ =?us-ascii?Q?7Tkb+0IOg8g6AV9rHAbzBm/FhawsgB/RE697oxYvSQ/yA23j8ng9/+AGQEFR?=
+ =?us-ascii?Q?FaZxwAwo9cMkJLtDWMU9KscP6b1kxb+LS0UoXaXHEzH0ETxFe1kuMa2Qs+pZ?=
+ =?us-ascii?Q?21FI7wXRuBRj3pDDVTbW+MaZF3U/ctbA9A1q2PLFWTFpbfol0H6fPLFFjVUd?=
+ =?us-ascii?Q?xHdqwn3faiypB3YgDOB8bJklTF8TTFpPQwiha4zXutI+XMzZ8hYWYsDsweoN?=
+ =?us-ascii?Q?aQARE1huIJlGlMvaEkrHY3h128BHP2ea0Pl3uUjduDj5JDvayihjI701u2W9?=
+ =?us-ascii?Q?nEuENADG746zsMMdNmdirEOdQLtpQgvkKpLal/lrkFgky3wnimevl54IDBcz?=
+ =?us-ascii?Q?WDY6B5v0xS9pKoc5EdmsgJ1u0UqpLnjEq32AsOw3kNxIG9cAtRyQeifpSCdY?=
+ =?us-ascii?Q?8PwsjrrmJPnSXUAyOMEH2VPpS21Xp0+BTKc3ZTDfTvdv1lI=3D?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:5;SRV:;IPV:NLI;SFV:SPM;H:BL0PR12MB5506.namprd12.prod.outlook.com;PTR:;CAT:OSPM;SFS:(4636009)(376002)(39860400002)(136003)(396003)(366004)(346002)(83380400001)(4744005)(426003)(1076003)(2616005)(316002)(9746002)(9786002)(86362001)(2906002)(36756003)(66476007)(66556008)(8936002)(8676002)(54906003)(66946007)(6916009)(4326008)(5660300002)(38100700002)(33656002)(7406005)(186003)(7416002)(26005)(478600001)(107886003)(27376004)(41533002);DIR:OUT;SFP:1501;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?LBGOoZ3j9eYZ7AQi+svk+xPSgtqIHM77IG66AhmB0BzZT3P3RikyC4qmdUcU?=
+ =?us-ascii?Q?uavKJE0CJKCYZRaojy7FR63M6jayg2mmpib674Y8j8zKjSlPy/697MzTSDir?=
+ =?us-ascii?Q?G4hNWWQQOwMtTRwnNIKQdbscfuLTRUwkhZdmNnWOX/om1oZDpPruz3MjIZZC?=
+ =?us-ascii?Q?t1XUcr1pUVzmP/AD/SUV4uewvYRglQJ64XnSQl8pA3GKW1zjPJnoN2VVTqwE?=
+ =?us-ascii?Q?QE/bHA90cPvGMTDgJw9H2VfmrAUe7hHbNLZYY6bpV7Oihal5PPdvudXzVwZT?=
+ =?us-ascii?Q?+8h7aHrNYdcl9aSuxnZPyrepVQ0YwRjYp7BBQqd/v5KYMBj4lB/wmNXYWqh4?=
+ =?us-ascii?Q?pdcfmlGalLErFYrLqUYf5mdYQlw4UXrkDrBeIf0+bVfsjQ6Ptz6YLqQYC5iB?=
+ =?us-ascii?Q?UFWq3x9w0vc4C3/bjUDFcK/o7JOZZDAY+8PhK3zf1Uyj2S4uL7mAypu5VblU?=
+ =?us-ascii?Q?e8X/pqwHEg4lin3j4OxhGGDlIIrppsQWlgq9/MbgnfAjcnV6WhlUMoVH7l9Y?=
+ =?us-ascii?Q?j5KZ36Jn6dYB4guRF3LYT/+X1zADABWq9255jX3HALV6L86RIWusU5mQB4u4?=
+ =?us-ascii?Q?F2S0N2K+eLx9hQSmD456xCHN7M94NvbgXSm6pUJk/9sGUehtdPSJ7qnCVjIW?=
+ =?us-ascii?Q?gPEKsT1BzGplZ6k2Q4y0HfA4gyHe4JcEystStiaxUGfV4es2wVkBX0ieIN38?=
+ =?us-ascii?Q?Iy41d1us6IrUQay798xUork8NCBc9G3UeaGoLImnNus2uK19p6R9Zsh8b/JV?=
+ =?us-ascii?Q?Gtm7v0gqLNIsoPyCxhsp1M0rKor3barwwqQHdwLlaCCUmEwRFvfq7DcXoQLp?=
+ =?us-ascii?Q?xnIlGuHItsM5ijE8kf53dAunUd0XeAqNUP+YIwVfBtB0cPTGSIr0LL9wyXOQ?=
+ =?us-ascii?Q?zYzJ71u2WFZJU3lrn+XiAg1aiHqR/awD7T4RYEZlLCY0kV9HgF7p+VkzmFlD?=
+ =?us-ascii?Q?N7jtLskAICQkdzHkUXGvlFLc+quH9GXR9gV7WsYFxQMNpVIaMh6KOnaF+FxZ?=
+ =?us-ascii?Q?9sVPbluuQt4G3nlH3Y5ZKbQQ+hAdiryNjbBSs4u1TsHSqtbIf8c89d5Caue2?=
+ =?us-ascii?Q?rJG2OMt8EB0n+nEoebEECJk2THJwUWrtKE7Y+hOGX1ovuCtZo2QGIlWELZJj?=
+ =?us-ascii?Q?3N3DBxM+BCzHTvMwfoHMDLncNbkGBppgKDTF4i/b6xHLB7MtPGTo2HRUQ8ui?=
+ =?us-ascii?Q?neTdHNv82u9iM5IwyZk/PhHblVSgpIZ0S8/rrXPIbTCPu5ZCCYBQ13tjK06Q?=
+ =?us-ascii?Q?xVTzvvWHamA+pIDpthNOUMFFlHX2U6XK9WTMY+hyYCBVFzEUAOJ7/sB6hbHN?=
+ =?us-ascii?Q?daJvtl2XSg5GIazrWM3cNl0Y?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: ddec79e2-62af-401e-66bb-08d94ab55574
+X-MS-Exchange-CrossTenant-AuthSource: BL0PR12MB5506.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Jul 2021 13:01:33.6627
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 1uTsOQpqhqeG/XZY0JeS7hLv2VqnQsodbSzFSsvtB8Mk/iwWgpJ0hnU+KOYbPWyu
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL1PR12MB5304
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-
-On 10/07/2021 0:55, Brijesh Singh wrote:
-> The KVM_SEV_SNP_LAUNCH_UPDATE command is used for encrypting the bios
-> image used for booting the SEV-SNP guest.
+On Mon, Jul 19, 2021 at 02:58:58PM +0200, Cornelia Huck wrote:
+> > -	ret = device->ops->open(device);
+> > -	if (ret) {
+> > -		module_put(device->dev->driver->owner);
+> > -		vfio_device_put(device);
+> > -		return ret;
+> > +	mutex_lock(&device->dev_set->lock);
+> > +	device->open_count++;
+> > +	if (device->open_count == 1 && device->ops->open_device) {
+> > +		ret = device->ops->open_device(device);
+> > +		if (ret)
+> > +			goto err_undo_count;
 > 
-> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
-> ---
->  target/i386/sev.c        | 33 ++++++++++++++++++++++++++++++++-
->  target/i386/trace-events |  1 +
->  2 files changed, 33 insertions(+), 1 deletion(-)
-> 
-> diff --git a/target/i386/sev.c b/target/i386/sev.c
-> index 259408a8f1..41dcb084d1 100644
-> --- a/target/i386/sev.c
-> +++ b/target/i386/sev.c
-> @@ -883,6 +883,30 @@ out:
->      return ret;
->  }
->  
-> +static int
-> +sev_snp_launch_update(SevGuestState *sev, uint8_t *addr, uint64_t len, int type)
+> Won't that fail for mdev devices, until the patches later in this series
+> have been applied? (i.e. bad for bisect)
 
-This seems similar to the SEV LAUNCH_UPDATE_DATA API (with the added
-`type` argument).  In SEV API these are the limitations (from the SEV
-API document):
+What are you seeing? At this point all devices will have a NULL
+open_device and skip this logic?
 
-* PADDR - System physical address of the data to be encrypted.
-          Must be 16 B aligned.
-* LENGTH - Length of the data to be encrypted.
-           Must be a multiple of 16 B.
-
-But in SNP_LAUNCH_UPDATE it is my understanding that addr must be page
-aligned (4KB) and length must be in whole pages (because the underlying
-types are PAGE_TYPE_NORMAL, PAGE_TYPE_ZERO, ...).
-
-So what happens if we call sev_encrypt_flash with a non-page-aligned
-addr / length?
-
-Or maybe I misunderstood the SNP ABI document?
-
--Dov
-
-
-
-> +{
-> +    int ret, fw_error;
-> +    struct kvm_sev_snp_launch_update update = {};
-> +
-> +    if (!addr || !len) {
-> +        return 1;
-> +    }
-> +
-> +    update.uaddr = (__u64)(unsigned long)addr;
-> +    update.len = len;
-> +    update.page_type = type;
-> +    trace_kvm_sev_snp_launch_update(addr, len, type);
-> +    ret = sev_ioctl(sev->sev_fd, KVM_SEV_SNP_LAUNCH_UPDATE,
-> +                    &update, &fw_error);
-> +    if (ret) {
-> +        error_report("%s: SNP_LAUNCH_UPDATE ret=%d fw_error=%d '%s'",
-> +                __func__, ret, fw_error, fw_error_to_str(fw_error));
-> +    }
-> +
-> +    return ret;
-> +}
-> +
->  static int
->  sev_launch_update_data(SevGuestState *sev, uint8_t *addr, uint64_t len)
->  {
-> @@ -1161,7 +1185,14 @@ sev_encrypt_flash(uint8_t *ptr, uint64_t len, Error **errp)
->  
->      /* if SEV is in update state then encrypt the data else do nothing */
->      if (sev_check_state(sev_guest, SEV_STATE_LAUNCH_UPDATE)) {
-> -        int ret = sev_launch_update_data(sev_guest, ptr, len);
-> +        int ret;
-> +
-> +        if (sev_snp_enabled()) {
-> +            ret = sev_snp_launch_update(sev_guest, ptr, len,
-> +                                        KVM_SEV_SNP_PAGE_TYPE_NORMAL);
-> +        } else {
-> +            ret = sev_launch_update_data(sev_guest, ptr, len);
-> +        }
->          if (ret < 0) {
->              error_setg(errp, "failed to encrypt pflash rom");
->              return ret;
-> diff --git a/target/i386/trace-events b/target/i386/trace-events
-> index 18cc14b956..0c2d250206 100644
-> --- a/target/i386/trace-events
-> +++ b/target/i386/trace-events
-> @@ -12,3 +12,4 @@ kvm_sev_launch_finish(void) ""
->  kvm_sev_launch_secret(uint64_t hpa, uint64_t hva, uint64_t secret, int len) "hpa 0x%" PRIx64 " hva 0x%" PRIx64 " data 0x%" PRIx64 " len %d"
->  kvm_sev_attestation_report(const char *mnonce, const char *data) "mnonce %s data %s"
->  kvm_sev_snp_launch_start(uint64_t policy) "policy 0x%" PRIx64
-> +kvm_sev_snp_launch_update(void *addr, uint64_t len, int type) "addr %p len 0x%" PRIx64 " type %d"
-> 
+Jason
