@@ -2,146 +2,146 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A4C713CE984
-	for <lists+kvm@lfdr.de>; Mon, 19 Jul 2021 19:53:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3E3883CEC69
+	for <lists+kvm@lfdr.de>; Mon, 19 Jul 2021 22:18:32 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1353216AbhGSQ5O (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 19 Jul 2021 12:57:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39932 "EHLO
+        id S1377756AbhGSRcI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 19 Jul 2021 13:32:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47582 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1357729AbhGSQwQ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 19 Jul 2021 12:52:16 -0400
-Received: from mail-pg1-x52d.google.com (mail-pg1-x52d.google.com [IPv6:2607:f8b0:4864:20::52d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CF3C3C0613A6
-        for <kvm@vger.kernel.org>; Mon, 19 Jul 2021 09:59:06 -0700 (PDT)
-Received: by mail-pg1-x52d.google.com with SMTP id i16so2125510pgi.9
-        for <kvm@vger.kernel.org>; Mon, 19 Jul 2021 10:18:38 -0700 (PDT)
+        with ESMTP id S1378915AbhGSR0c (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 19 Jul 2021 13:26:32 -0400
+Received: from mail-ed1-x52d.google.com (mail-ed1-x52d.google.com [IPv6:2a00:1450:4864:20::52d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 98A69C05BD3B
+        for <kvm@vger.kernel.org>; Mon, 19 Jul 2021 10:46:39 -0700 (PDT)
+Received: by mail-ed1-x52d.google.com with SMTP id ec55so25204996edb.1
+        for <kvm@vger.kernel.org>; Mon, 19 Jul 2021 11:02:31 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
+        d=linaro.org; s=google;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=Watgo1ybuVmA6y/DrRzi5+dx21PvaWB/uBndaAl0SS4=;
-        b=oCgIveufWJo78leCKxNHNdT0SARRh3FWP7aybu743zIm31cBc+7B6SDrREeewdKMu0
-         WK8025dOapp+KTQnic/FqQx3BJPDTVKgKN4R/nAP1FfE+9IVa1JsTI6XcqeFXLTXkrub
-         pK47v2RnQhmDFRweGxQ08Eu2uN6icbJSi+79M9iV7yDiDUo5BfcPGBPfvF1PWXr3DElx
-         +iPdsV4Dheg/zuh9lxfH6daw97lFZfTSJR+G5k9ogbLlO7ybM5nyLBfXjiuMcQPhqG7Y
-         5jSPI3VKBNZW7RUu9i990b22uE/YYqoYRbJOvdhR2U1l3xURwRf9s/5VV9tO/E9ww9M1
-         blYA==
+        bh=iwY647XqSBr0nhop6u+nJOZDJO2ojgmzAbMlPyzAP2A=;
+        b=de4dSCIFeNoXczBGIJKhs+9cQ67ihAH384iDNj7/ghw8A521i45BAOlb9Wj5VrML2B
+         ts5bNRNWddT+aI1DLJIMor+SL4/f3zNwEtrLVZsD2tjcjsRkzEr1TRxdDN0DwJUJ6pq2
+         vSViocJn6F9z759rRSS8/3I8kikyFNECOd2Jum/ADid6KfFaxXYT7kzrn3v/uD/drMMG
+         QmB7VB6/FnvNvlUQU1yQ7RgVec5cXCMQW4i7ue70iiKVBvUrwW3xqoF7vRTo45xa+TQV
+         ER89LXFuY7yD0DDbzZMfbrV5Of00o5bIHTQbJFYMZNcVBnBX+yL0g9CKq1SafiocuodB
+         XvpA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=Watgo1ybuVmA6y/DrRzi5+dx21PvaWB/uBndaAl0SS4=;
-        b=fQT8Mr1bThFWACwZefxIQ6agBvNB0uH1ID5n6bUUiSCndJW9UCvsn5Q5FKs4iYeENM
-         r9GciEdjAYCNK7HSo9o16MRKkMdukh6GffHE97MuNAPAyfQCWR3C+/JFtNv7gdrPbQBC
-         16immdQsE5B2RQVwyC4/7nZ7h6QiFcnt62hBSrXRv/kWGFayj2fZGPuz/xKr7vB66w4u
-         8y+ahO+QyNJnaKXpeC26dt/P1cYkyZ++V3rFcunNtLFolgq5cPNI/cUdejT+wfooiUdI
-         9SKO8PGTHuS2oSej/a9rnLEYfvzI51AAmbSlHedJ1B1GtGQYM8sZXZXwuwFNHBD/3u09
-         ejrw==
-X-Gm-Message-State: AOAM532rqYjRIxSmrDaAP8Bkf7A2wFt6m/efjlUtPYq7WK3bMvXcNLGn
-        ipunJhlJiLchjIsbQZVPreyxGg==
-X-Google-Smtp-Source: ABdhPJyOBiASdK1PworiTDewkYK+q+KqQSKd5RlcoQ9d+PE/Jh2uzg1AmF2ErgsFE2d5KPOR3/ALxA==
-X-Received: by 2002:a63:1f5c:: with SMTP id q28mr26144545pgm.114.1626715117362;
-        Mon, 19 Jul 2021 10:18:37 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id e13sm21516384pfd.11.2021.07.19.10.18.36
+        bh=iwY647XqSBr0nhop6u+nJOZDJO2ojgmzAbMlPyzAP2A=;
+        b=a2itH0lTRTgVz3YJwJFILJh+g/P+VOw/jGt7DIOS1J8PnnaV0YZAXQ37USiFji5diA
+         XANm1sMziIGHmzdAanEf13VK+n4+V5QDJwHF/RzaqLVAq4J7hr5QmmSvyIT+/H2wyGIK
+         pM09Ooc3TM/WNGQLNCP359roTDqQbNxGlCZPA7qMO2jiJdfcKWbdOOmdxRu4OLGcdFbG
+         +wMaKxmAQozCDrkb9aWyqb8G/uG66uWrpKZ+fiY1y2t3wih0KzTJWI1ThGf4rv/iKFyY
+         /VcaLbTsOYHkFAnyQOV3hHjfKB9GWJqaJ9JpBDfXPvXY0hRf4lacG7WQ1X32Szab9pnJ
+         GLHw==
+X-Gm-Message-State: AOAM533THxmrxYppiszzh9uJMDjZIm65BK9U+kaqWxN14FFzNPdMqbza
+        p5/UR/7SUsVmehRKGkHEyMIbUw==
+X-Google-Smtp-Source: ABdhPJyQlO0WF1yuY/72pvxqzE/S/j0RUDWpsZG3FB/CGPHlXlZjXIrduqfJdRb/baD0ksNgkAUGWw==
+X-Received: by 2002:a05:6402:1592:: with SMTP id c18mr35924631edv.243.1626717749925;
+        Mon, 19 Jul 2021 11:02:29 -0700 (PDT)
+Received: from myrica (adsl-84-226-111-173.adslplus.ch. [84.226.111.173])
+        by smtp.gmail.com with ESMTPSA id n14sm8178314edo.23.2021.07.19.11.02.28
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 19 Jul 2021 10:18:37 -0700 (PDT)
-Date:   Mon, 19 Jul 2021 17:18:33 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Brijesh Singh <brijesh.singh@amd.com>
-Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
-        linux-coco@lists.linux.dev, linux-mm@kvack.org,
-        linux-crypto@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
-        David Rientjes <rientjes@google.com>,
-        Dov Murik <dovmurik@linux.ibm.com>,
-        Tobin Feldman-Fitzthum <tobin@ibm.com>,
-        Borislav Petkov <bp@alien8.de>,
-        Michael Roth <michael.roth@amd.com>,
-        Vlastimil Babka <vbabka@suse.cz>, tony.luck@intel.com,
-        npmccallum@redhat.com, brijesh.ksingh@gmail.com
-Subject: Re: [PATCH Part2 RFC v4 25/40] KVM: SVM: Reclaim the guest pages
- when SEV-SNP VM terminates
-Message-ID: <YPWz6YwjDZcla5/+@google.com>
-References: <20210707183616.5620-1-brijesh.singh@amd.com>
- <20210707183616.5620-26-brijesh.singh@amd.com>
- <YPHnb5pW9IoTcwWU@google.com>
- <2711d9f9-21a0-7baa-d0ff-2c0f69ca6949@amd.com>
- <YPIoaoDCjNVzn2ZM@google.com>
- <e1cc1e21-e7b7-5930-1c01-8f4bb6e43b3a@amd.com>
+        Mon, 19 Jul 2021 11:02:29 -0700 (PDT)
+Date:   Mon, 19 Jul 2021 20:02:06 +0200
+From:   Jean-Philippe Brucker <jean-philippe@linaro.org>
+To:     Alexandru Elisei <alexandru.elisei@arm.com>
+Cc:     maz@kernel.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
+        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+        pbonzini@redhat.com, corbet@lwn.net, james.morse@arm.com,
+        suzuki.poulose@arm.com, catalin.marinas@arm.com, will@kernel.org,
+        lorenzo.pieralisi@arm.com, salil.mehta@huawei.com,
+        shameerali.kolothum.thodi@huawei.com, jonathan.cameron@huawei.com
+Subject: Re: [RFC PATCH 0/5] KVM: arm64: Pass PSCI to userspace
+Message-ID: <YPW+Hv3r586zKxpY@myrica>
+References: <20210608154805.216869-1-jean-philippe@linaro.org>
+ <c29ff5c8-9c94-6a6c-6142-3bed440676bf@arm.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <e1cc1e21-e7b7-5930-1c01-8f4bb6e43b3a@amd.com>
+In-Reply-To: <c29ff5c8-9c94-6a6c-6142-3bed440676bf@arm.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Jul 19, 2021, Brijesh Singh wrote:
-> 
-> On 7/16/21 7:46 PM, Sean Christopherson wrote:
-> 
-> > takes the page size as a parameter even though it unconditionally zeros the page
-> > size flag in the RMP entry for unassigned pages.
-> >
-> > A wrapper around rmpupdate() would definitely help, e.g. (though level might need
-> > to be an "int" to avoid a bunch of casts).
-> >
-> >   int rmp_make_shared(u64 pfn, enum pg_level level);
-> >
-> > Wrappers for "private" and "firmware" would probably be helpful too.  And if you
-> > do that, I think you can bury both "struct rmpupdate", rmpupdate(), and
-> > X86_TO_RMP_PG_LEVEL() in arch/x86/kernel/sev.c.  snp_set_rmptable_state() might
-> > need some refactoring to avoid three booleans, but I guess maybe that could be
-> > an exception?  Not sure.  Anyways, was thinking something like:
-> >
-> >   int rmp_make_private(u64 pfn, u64 gpa, enum pg_level level, int asid);
-> >   int rmp_make_firmware(u64 pfn);
-> >
-> > It would consolidate a bit of code, and more importantly it would give visual
-> > cues to the reader, e.g. it's easy to overlook "val = {0}" meaning "make shared".
-> 
-> Okay, I will add helper to make things easier. One case where we will
-> need to directly call the rmpupdate() is during the LAUNCH_UPDATE
-> command. In that case the page is private and its immutable bit is also
-> set. This is because the firmware makes change to the page, and we are
-> required to set the immutable bit before the call.
+Hi Alex,
 
-Or do "int rmp_make_firmware(u64 pfn, bool immutable)"?
+I'm not planning to resend this work at the moment, because it looks like
+vcpu hot-add will go a different way so I don't have a user. But I'll
+probably address the feedback so far and park it on some branch, in case
+anyone else needs it.
 
-> > And one architectural question: what prevents a malicious VMM from punching a 4k
-> > shared page into a 2mb private page?  E.g.
-> >
-> >   rmpupdate(1 << 20, [private, 2mb]);
-> >   rmpupdate(1 << 20 + 4096, [shared, 4kb]);
-> >
-> > I don't see any checks in the pseudocode that will detect this, and presumably the
-> > whole point of a 2mb private RMP entry is to not have to go walk the individual
-> > 4kb entries on a private access.
+On Mon, Jul 19, 2021 at 04:29:18PM +0100, Alexandru Elisei wrote:
+> 1. Why forwarding PSCI calls to userspace depend on enabling forwarding for other
+> HVC calls? As I understand from the patches, those handle distinct function IDs.
+
+The HVC cap from patch 4 enables returning from the VCPU_RUN ioctl with
+KVM_EXIT_HYPERCALL, for any HVC not handled by KVM. This one should
+definitely be improved, either by letting userspace choose the ranges of
+HVC it wants, or at least by reporting ranges reserved by KVM to
+userspace.
+
+The PSCI cap from patch 5 disables the in-kernel PSCI implementation. As a
+result those HVCs are forwarded to userspace.
+
+It was suggested that other users will want to handle HVC calls (SDEI for
+example [1]), hence splitting into two capabilities rather than just the
+PSCI cap. In v5.14 x86 added KVM_CAP_EXIT_HYPERCALL [2], which lets
+userspace receive specific hypercalls. We could reuse that and have PSCI
+be one bit of that capability's parameter.
+
+[1] https://lore.kernel.org/linux-arm-kernel/20170808164616.25949-12-james.morse@arm.com/
+[2] https://lore.kernel.org/kvm/90778988e1ee01926ff9cac447aacb745f954c8c.1623174621.git.ashish.kalra@amd.com/
+
+> 2. HVC call forwarding to userspace also forwards PSCI functions which are defined
+> in ARM DEN 0022D, but not (yet) implemented by KVM. What happens if KVM's PSCI
+> implementation gets support for one of those functions? How does userspace know
+> that now it also needs to enable PSCI call forwarding to be able to handle that
+> function?
+
+We forward the whole PSCI function range, so it's either KVM or userspace.
+If KVM manages PSCI and the guest calls an unimplemented function, that
+returns directly to the guest without going to userspace.
+
+The concern is valid for any other range, though. If userspace enables the
+HVC cap it receives function calls that at some point KVM might need to
+handle itself. So we need some negotiation between user and KVM about the
+specific HVC ranges that userspace can and will handle.
+
+> It looks to me like the boundary between the functions that are forwarded when HVC
+> call forwarding is enabled and the functions that are forwarded when PSCI call
+> forwarding is enabled is based on what Linux v5.13 handles. Have you considered
+> choosing this boundary based on something less arbitrary, like the function types
+> specified in ARM DEN 0028C, table 2-1?
+
+For PSCI I've used the range 0-0x1f as the boundary, which is reserved for
+PSCI by SMCCC (table 6-4 in that document).
+
 > 
-> I believe pseudo-code is not meant to be exactly accurate and
-> comprehensive, but it is intended to summarize the HW behavior and
-> explain what can cause the different fault cases. In the real design we
-> may have a separate checks to catch the above issue. I just tested on
-> the hardware to ensure that HW correctly detects the above error
-> condition. However, in this case we are missing a significant check (at
-> least the check that the 2M region is not already assigned). I have
-> raised the concern with the hardware team to look into updating the APM.
+> In my opinion, setting the MP state to HALTED looks like a sensible approach to
+> implementing PSCI_SUSPEND. I'll take a closer look at the patches after I get a
+> better understanding about what is going on.
+> 
+> On 6/8/21 4:48 PM, Jean-Philippe Brucker wrote:
+> > Allow userspace to request handling PSCI calls from guests. Our goal is
+> > to enable a vCPU hot-add solution for Arm where the VMM presents
+> > possible resources to the guest at boot, and controls which vCPUs can be
+> > brought up by allowing or denying PSCI CPU_ON calls. Passing HVC and
+> > PSCI to userspace has been discussed on the list in the context of vCPU
+> > hot-add [1,2] but it can also be useful for implementing other SMCCC and
+> > vendor hypercalls [3,4,5].
+> >
+> > Patches 1-3 allow userspace to request WFI to be executed in KVM. That
+> 
+> I don't understand this. KVM, in kvm_vcpu_block(), does not execute an WFI.
+> PSCI_SUSPEND is documented as being indistinguishable from an WFI from the guest's
+> point of view, but it's implementation is not architecturally defined.
 
-Thanks!  While you have their ear, please emphasive the importance of the pseudocode
-for us software folks.  It's perfectly ok to omit or gloss over microarchitectural
-details, but ISA pseudocode is often the source of truth for behavior that is
-architecturally visible.
+Yes that was an oversimplification on my part
+
+Thanks,
+Jean
