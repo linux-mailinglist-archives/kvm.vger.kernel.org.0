@@ -2,37 +2,39 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D0DE23CE044
-	for <lists+kvm@lfdr.de>; Mon, 19 Jul 2021 17:57:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 860CC3CDEEC
+	for <lists+kvm@lfdr.de>; Mon, 19 Jul 2021 17:50:03 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1347386AbhGSPQH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 19 Jul 2021 11:16:07 -0400
-Received: from mail.kernel.org ([198.145.29.99]:49596 "EHLO mail.kernel.org"
+        id S1344803AbhGSPGx (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 19 Jul 2021 11:06:53 -0400
+Received: from mail.kernel.org ([198.145.29.99]:38316 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1345535AbhGSPNS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 19 Jul 2021 11:13:18 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 3602F61363;
-        Mon, 19 Jul 2021 15:53:11 +0000 (UTC)
+        id S1346172AbhGSPFR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 19 Jul 2021 11:05:17 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 11D5660238;
+        Mon, 19 Jul 2021 15:45:55 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-        s=korg; t=1626709991;
-        bh=gkXu3sbTGyTrqtfgG5j2rg5rnTqyL/1tASBndj4S7fY=;
+        s=korg; t=1626709556;
+        bh=v5VR3ML5WWx7WsjA2n/GGkbhcKCR+pId0vcZ6ZoDZzo=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=UDIbpyhm4jdBzqB+QQBWG2papbxYjGSHsLhpim6uIxtFohTvtfMWd1Ah4ISB9ub0P
-         iVuOWCvTzSBdfkEBcQlU1qa2acII/58rkFrMn6cX3TZ4bva6h8XyM3fK1gsmnfdRLE
-         z7UD8mV+YK0tYmTGnCvueG/qcjb2/7K2UOA+ZdGw=
+        b=rHsYpqr5V7+/tfrRw1hTX0P6Z4zJ2xMyd1GctO2bLET+uqwPtqufYOOYnOfJKSmQr
+         m/m+eb3Dimsd6FCU7UWEZDSG6kRIFgMXTdBtJ819BgjJK5LPgZz9KtMAq7mCXIHLYD
+         8qpXUh09brNU/ywbySqNJGyDIGzdjehrWx5rq4l4=
 From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 To:     linux-kernel@vger.kernel.org
 Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         stable@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
         kvm@vger.kernel.org, Hulk Robot <hulkci@huawei.com>,
         Kefeng Wang <wangkefeng.wang@huawei.com>
-Subject: [PATCH 5.10 003/243] KVM: mmio: Fix use-after-free Read in kvm_vm_ioctl_unregister_coalesced_mmio
-Date:   Mon, 19 Jul 2021 16:50:32 +0200
-Message-Id: <20210719144941.027466727@linuxfoundation.org>
+Subject: [PATCH 5.4 001/149] KVM: mmio: Fix use-after-free Read in kvm_vm_ioctl_unregister_coalesced_mmio
+Date:   Mon, 19 Jul 2021 16:51:49 +0200
+Message-Id: <20210719144901.709931996@linuxfoundation.org>
 X-Mailer: git-send-email 2.32.0
-In-Reply-To: <20210719144940.904087935@linuxfoundation.org>
-References: <20210719144940.904087935@linuxfoundation.org>
+In-Reply-To: <20210719144901.370365147@linuxfoundation.org>
+References: <20210719144901.370365147@linuxfoundation.org>
 User-Agent: quilt/0.66
+X-stable: review
+X-Patchwork-Hint: ignore
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
@@ -147,7 +149,7 @@ Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 
 --- a/virt/kvm/coalesced_mmio.c
 +++ b/virt/kvm/coalesced_mmio.c
-@@ -186,7 +186,6 @@ int kvm_vm_ioctl_unregister_coalesced_mm
+@@ -190,7 +190,6 @@ int kvm_vm_ioctl_unregister_coalesced_mm
  		    coalesced_mmio_in_range(dev, zone->addr, zone->size)) {
  			r = kvm_io_bus_unregister_dev(kvm,
  				zone->pio ? KVM_PIO_BUS : KVM_MMIO_BUS, &dev->dev);
@@ -155,7 +157,7 @@ Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
  
  			/*
  			 * On failure, unregister destroys all devices on the
-@@ -196,6 +195,7 @@ int kvm_vm_ioctl_unregister_coalesced_mm
+@@ -200,6 +199,7 @@ int kvm_vm_ioctl_unregister_coalesced_mm
  			 */
  			if (r)
  				break;
