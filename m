@@ -2,55 +2,55 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 073CB3CE4FC
-	for <lists+kvm@lfdr.de>; Mon, 19 Jul 2021 18:36:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D56913CE4F9
+	for <lists+kvm@lfdr.de>; Mon, 19 Jul 2021 18:36:21 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1346995AbhGSPrZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 19 Jul 2021 11:47:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52236 "EHLO
+        id S1346872AbhGSPrX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 19 Jul 2021 11:47:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52200 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1350252AbhGSPpp (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S1350251AbhGSPpp (ORCPT <rfc822;kvm@vger.kernel.org>);
         Mon, 19 Jul 2021 11:45:45 -0400
-Received: from mail-ed1-x54a.google.com (mail-ed1-x54a.google.com [IPv6:2a00:1450:4864:20::54a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8B356C0225AF
-        for <kvm@vger.kernel.org>; Mon, 19 Jul 2021 08:38:07 -0700 (PDT)
-Received: by mail-ed1-x54a.google.com with SMTP id m21-20020a50ef150000b029039c013d5b80so9548591eds.7
-        for <kvm@vger.kernel.org>; Mon, 19 Jul 2021 09:03:52 -0700 (PDT)
+Received: from mail-wm1-x349.google.com (mail-wm1-x349.google.com [IPv6:2a00:1450:4864:20::349])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2955AC0225B0
+        for <kvm@vger.kernel.org>; Mon, 19 Jul 2021 08:38:09 -0700 (PDT)
+Received: by mail-wm1-x349.google.com with SMTP id m6-20020a05600c4f46b0290205f5e73b37so174907wmq.3
+        for <kvm@vger.kernel.org>; Mon, 19 Jul 2021 09:03:53 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=date:in-reply-to:message-id:mime-version:references:subject:from:to
          :cc;
-        bh=7wkujqQey68d/8KAgY7QxLbL3Tk3E6zx35InqbFhZk8=;
-        b=cI1pqIS70PpjVvFSr5jOtpULbEY43W4Q5k3H2M3+Pe6zycfUQ8J+47luWmyhdcQtj7
-         LNxHqrAvDi7k9ZrQ99sbopcAZrp3nHUyLPCcBPNXNHZvx6IO2Sjq+TT+uUNxgcRWX4D0
-         hrK/zoz2PS3l1iEKbpT8oLy9lelodxEKSRRmt9VX3F0p6thfu4rojU+4Yd/qLgMHp/ez
-         VpGefh79ZC7n9pleIODX29EDlrGxzFeLjbnMF+IlxpHlSfvFqr0ESZ0EtoJF7DVEoOGw
-         ZvzS7Ubj2jPwojVsgNF86jX6jRATNvOjxY9RH1HXtLXAJxT+9Z3pMek+apc2yM7iYbcI
-         +qxA==
+        bh=zOaafQqyYiyHibWQyje/Aynnw7U7p4mRVaT60bMRHgo=;
+        b=nWlb7jQnf7aLbh5SVAzsTk/wgS94APyUEE+NCtodxaQ41ISqv64Pg4TTOdKa31klUM
+         2IFPHGIdLyBb1r/924z1/CVUfJ6Gbh9MyThu10slfEElIanSTaK2Xrvme76pgvmbSFCH
+         N5nni3DLR4raUtJ524bPh8IxjbJL+3zBUV2mUbvmiWkw5MAmQuE1OaDOKDIh57Knac5k
+         ft7C1wO51OpA4Fbmn8A5ZC5EVkDZqaUXb7cLz0/gmcHieLgWkokq9ChNC4M8t8wtaMzp
+         DjWp23vlGA2BSdE5f7Ci94dCtmP8KdhytQACldFy38d2towoK/fUUMqNhfVSX0RwLwHW
+         AmbA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=7wkujqQey68d/8KAgY7QxLbL3Tk3E6zx35InqbFhZk8=;
-        b=MN8xXu6jl1AfA11M5yYPqEdmQ5gDQz99ATAcHFH6HMtxVBsKWejKfTYq1aTn4hCPrC
-         XBcu4xWP6uS5lug0AOHkhKeaQ9IyJpDjBfYyCFgkcP+9HolHbuQkBXqsL2yqiASYS+zJ
-         NzZhAKeAiXagoPjBv+TfA0uo8MSojcbjU0CIV4+Vf1Qxs+zs+iF9yrhI3qb+3DHiMjEi
-         L+Res7kkQRxdC2ql8gQB51GRu5qv+oNYTcC7wgcKDxZkkzDwL9LHp6VRieht3hhhu5NQ
-         c2AmtDBakNGA/WD3K5RnON4swCHktnT9RMa5Ff81mY25crQV+yBGgZgf75M+ex5SNOwE
-         relQ==
-X-Gm-Message-State: AOAM533CrfJCBULfS1g0Q8hwqFrA+mbUq+R+LsxU4x9jE7Hef2rXGZ0G
-        uvzenxDN4ocC46aUfNHCrB8/FljJ0Q==
-X-Google-Smtp-Source: ABdhPJw45jb2VfQ2x2siX2+8lyhQyXfGajRdkU6yAqPnufGi+Y4rw/053/SjjPHbtJCrsvDdQe7auRMpSw==
+        bh=zOaafQqyYiyHibWQyje/Aynnw7U7p4mRVaT60bMRHgo=;
+        b=f2/2bEQUVToWipYzZzgndkuIh6DYSfNsAZelkORMuOakSpJ/9qd6nmXIH135Q2C/9Q
+         omFe+RcC+CZBjJlxzpV9Ps7l9WmZbYpa3ZWiAKDTDdRWLK3ZhtDG27BLkz6STZNt7SAK
+         jnXxWIEvg1dFQHE0PTU1ysS0WnOZUH2FTFQVuc9WfT8Po1b+b4ZkaFhcbVDNKHC3dJ2q
+         n2+uPZlKp0siqE9jZraVEDp+Z4jCXx8p6VaFzdWUwCpOmhYDic4KsJiNV/XPVdctJfd2
+         41V59gwiZRoZkvlo5Lf2lWmDKkqQfcLP6RqGs9NuqunGRHKP1ePfO7Ka5v2AT0xTYtxd
+         Gdog==
+X-Gm-Message-State: AOAM530zXCQE1xKrdjKnY+pGyUQV4/8SPhjzkQROi/d0uONSMes7XRH2
+        XfW96/aeLQISHF7FeRcg5TIJVotJxg==
+X-Google-Smtp-Source: ABdhPJzgAMHslu1b44ODrq5vEN3TN0CYJuhq+aKYnb5flV5+UR/uab1rElFZAm5fgeicP7WXI7gWQnwCFw==
 X-Received: from tabba.c.googlers.com ([fda3:e722:ac3:cc00:28:9cb1:c0a8:482])
- (user=tabba job=sendgmr) by 2002:a05:6402:2228:: with SMTP id
- cr8mr35901384edb.309.1626710630758; Mon, 19 Jul 2021 09:03:50 -0700 (PDT)
-Date:   Mon, 19 Jul 2021 17:03:32 +0100
+ (user=tabba job=sendgmr) by 2002:a7b:c083:: with SMTP id r3mr26930447wmh.97.1626710632666;
+ Mon, 19 Jul 2021 09:03:52 -0700 (PDT)
+Date:   Mon, 19 Jul 2021 17:03:33 +0100
 In-Reply-To: <20210719160346.609914-1-tabba@google.com>
-Message-Id: <20210719160346.609914-2-tabba@google.com>
+Message-Id: <20210719160346.609914-3-tabba@google.com>
 Mime-Version: 1.0
 References: <20210719160346.609914-1-tabba@google.com>
 X-Mailer: git-send-email 2.32.0.402.g57bb445576-goog
-Subject: [PATCH v3 01/15] KVM: arm64: placeholder to check if VM is protected
+Subject: [PATCH v3 02/15] KVM: arm64: Remove trailing whitespace in comment
 From:   Fuad Tabba <tabba@google.com>
 To:     kvmarm@lists.cs.columbia.edu
 Cc:     maz@kernel.org, will@kernel.org, james.morse@arm.com,
@@ -64,37 +64,36 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Add a function to check whether a VM is protected (under pKVM).
-Since the creation of protected VMs isn't enabled yet, this is a
-placeholder that always returns false. The intention is for this
-to become a check for protected VMs in the future (see Will's RFC
-[*]).
+Remove trailing whitespace from comment in trap_dbgauthstatus_el1().
 
 No functional change intended.
 
 Signed-off-by: Fuad Tabba <tabba@google.com>
-
-[*] https://lore.kernel.org/kvmarm/20210603183347.1695-1-will@kernel.org/
 ---
- arch/arm64/include/asm/kvm_host.h | 5 +++++
- 1 file changed, 5 insertions(+)
+ arch/arm64/kvm/sys_regs.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 41911585ae0c..347781f99b6a 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -771,6 +771,11 @@ void kvm_arch_free_vm(struct kvm *kvm);
- 
- int kvm_arm_setup_stage2(struct kvm *kvm, unsigned long type);
- 
-+static inline bool kvm_vm_is_protected(struct kvm *kvm)
-+{
-+	return false;
-+}
-+
- int kvm_arm_vcpu_finalize(struct kvm_vcpu *vcpu, int feature);
- bool kvm_arm_vcpu_is_finalized(struct kvm_vcpu *vcpu);
- 
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index f6f126eb6ac1..80a6e41cadad 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -318,14 +318,14 @@ static bool trap_dbgauthstatus_el1(struct kvm_vcpu *vcpu,
+ /*
+  * We want to avoid world-switching all the DBG registers all the
+  * time:
+- * 
++ *
+  * - If we've touched any debug register, it is likely that we're
+  *   going to touch more of them. It then makes sense to disable the
+  *   traps and start doing the save/restore dance
+  * - If debug is active (DBG_MDSCR_KDE or DBG_MDSCR_MDE set), it is
+  *   then mandatory to save/restore the registers, as the guest
+  *   depends on them.
+- * 
++ *
+  * For this, we use a DIRTY bit, indicating the guest has modified the
+  * debug registers, used as follow:
+  *
 -- 
 2.32.0.402.g57bb445576-goog
 
