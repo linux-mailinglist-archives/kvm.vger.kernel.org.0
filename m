@@ -2,134 +2,165 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id AB3723CEE6B
+	by mail.lfdr.de (Postfix) with ESMTP id 004783CEE6C
 	for <lists+kvm@lfdr.de>; Mon, 19 Jul 2021 23:44:26 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1388109AbhGSUnD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 19 Jul 2021 16:43:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43518 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1385585AbhGSTDS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 19 Jul 2021 15:03:18 -0400
-Received: from mail-lf1-x12c.google.com (mail-lf1-x12c.google.com [IPv6:2a00:1450:4864:20::12c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 20D29C061574
-        for <kvm@vger.kernel.org>; Mon, 19 Jul 2021 12:36:31 -0700 (PDT)
-Received: by mail-lf1-x12c.google.com with SMTP id q16so32176687lfa.5
-        for <kvm@vger.kernel.org>; Mon, 19 Jul 2021 12:43:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=Gmu9FJSBhEcTSsmtt+iIhZ+8zB3ttk3MjsTqKSz3Yrw=;
-        b=ibg8A6Fhp+23S6tzVmCXeCEtj3odd8AVkQbrVXxhoRY4hnV6gHo2WGoSgPOUVxw0xp
-         qAkVNVkfWmVR4/Ha1068xBHFDcyEuYHenDejQPoKAOL/4l8/Sp5ILgH9PU4FUlqE6Wjp
-         29uaJBXcRd++t/O167Y4BlwyJMNAdiTbX3Uft4nOjOFo+2E+VuhE47aAGYI8g6tAPjEX
-         sEQxADLvqI+UDxQRTpx0KbQADJ4BSKAjek4vY4hqD1AeNo8VoiJydWppvu7wTge17KFl
-         WePVEJ1ETYzJulqcA7YDnUIsSV1ux5dQ9HEuz9EhiytfdiDIsiVfs8JzFgK88b0heUw7
-         v9TQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=Gmu9FJSBhEcTSsmtt+iIhZ+8zB3ttk3MjsTqKSz3Yrw=;
-        b=WdfsQjiaqFGpQTn6WReQK6tLj+kWfdyVlizcwydrpg0WAe+AsBEXeJwpsyc/EK7WjF
-         ibSF9YQgvEFbuIskj6HXe4j6zORwY8hP11msglAWwfASIxvrthpEGyU0RmeLW71JuJeu
-         fuBV1lsDTwD+x/axhYlYWM948PbEWhvaQ/7miVi6tBc64S3uB+QV1aAMcDUWpw7nWGgd
-         /oqIzPPt9xh41m2VognQbPfGwxWyfH5VPnuLLXbEOiEUSeITU5y4NshdhXPYotgs8lH0
-         b4FUAK/S86CzUw9EvkBLLas3b1gXEL5MZkMvacdnIgxLBSGApCPbsoA/NbG/VeH7Ztj1
-         UArA==
-X-Gm-Message-State: AOAM531G3WIQx6Ip8IwJXy27qbKcQpmHH8ERBi+D0XjVhcttr04N0jOV
-        3BihggtVf1L/zeHqvRVLV3a2BPP8+K2FOyfbUfj70w==
-X-Google-Smtp-Source: ABdhPJwHb2gGExmEkhtp61ra3gEDYpWPNEBUJorQ1IC6P0PEeGqqusawSvPdSUGD+XYIHJG6fexg/5948QAeT1sZEv8=
-X-Received: by 2002:a05:6512:3237:: with SMTP id f23mr17557452lfe.524.1626723832655;
- Mon, 19 Jul 2021 12:43:52 -0700 (PDT)
+        id S1388114AbhGSUnL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 19 Jul 2021 16:43:11 -0400
+Received: from mail-dm6nam08on2079.outbound.protection.outlook.com ([40.107.102.79]:29513
+        "EHLO NAM04-DM6-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1385753AbhGSTIv (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 19 Jul 2021 15:08:51 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=P8VKRy9lrrTJMAN6uP3MwkEsOHNyCtj7x304WnIdNvXMxDd0SG/NGFXsXjzCjDf6lcU6txNX2SZqBQCRRgpj45zZBSwYZTb4pQ2PlAy21I+qGoNhnIaPILq37h5N8dVevqTttS8wGPfvzfKM7wxMOcw0V31JrboOnRwWmjzeWFeGQa0+gw2hFYPUnAcjNB5fKRjs+Gvi7Fhjk/wUJq1DVNZjAx2NFnqBuIFPgx9w2HEihpsWfS+eZy+bD6TUJJbi3qupqLpUstE13ONol4QJo2z9Gh86J/0d4VmdYgAO+5Bu81CCCjneLu6mzexw6HWNuK6C4PlLb29x4lAMgWpCNQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=MRCj4MLU/VvsXQvvBUccErv/rJ/yWmYT+vzfys1y+5I=;
+ b=cOhAhw06Ac5TN9mgon/eNwD06V5mfTlBRScAdCO+oVlV5pskxqEwTq3jN91Im3fM3k6G4m072dZdmCMYnXsVByNhTlfAvAyZEhL5OCmSjhdn8GexMLODcTrmjTGPGtqG323mGn3V723OB3+0Yt486OJx7x09z9xZTQOkXTeOso/Mp5lu2rw9kMec067bbZZ12uQ4qY/aLr55wr0VBMzdqv2DOgjRGA/LQzSPjz+amMh9IFLtCxwzPLNZqh9V5PaRmw3r5y4rnkDWtelUCjMGD8D5W98Hit94WGsPsS3fpyT1OLO4rJWHey9QADzCxQ34TJm7TqNw8VZLXLNf6sTpxg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=MRCj4MLU/VvsXQvvBUccErv/rJ/yWmYT+vzfys1y+5I=;
+ b=UuguPCQaPfqPGCZh2ToQUhPBN5UAy6nA4O6ipJZ5bvYaU2ViMPIupHOQUI8IBRSA5vOtLBBhUUe+m6WhKLVG7naMkWR1/idKvxkPXEXVVUr2HEGPpoo6GVB10S8ZLMalk+my1odoUT0r6Lt8T1joe3KcZ1Ie/fJ0Yhw809DQEks=
+Authentication-Results: gmail.com; dkim=none (message not signed)
+ header.d=none;gmail.com; dmarc=none action=none header.from=amd.com;
+Received: from SN6PR12MB2718.namprd12.prod.outlook.com (2603:10b6:805:6f::22)
+ by SA0PR12MB4384.namprd12.prod.outlook.com (2603:10b6:806:9f::22) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4331.21; Mon, 19 Jul
+ 2021 19:49:29 +0000
+Received: from SN6PR12MB2718.namprd12.prod.outlook.com
+ ([fe80::a8a9:2aac:4fd1:88fa]) by SN6PR12MB2718.namprd12.prod.outlook.com
+ ([fe80::a8a9:2aac:4fd1:88fa%3]) with mapi id 15.20.4331.033; Mon, 19 Jul 2021
+ 19:49:29 +0000
+Cc:     brijesh.singh@amd.com, x86@kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
+        linux-coco@lists.linux.dev, linux-mm@kvack.org,
+        linux-crypto@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        David Rientjes <rientjes@google.com>,
+        Dov Murik <dovmurik@linux.ibm.com>,
+        Tobin Feldman-Fitzthum <tobin@ibm.com>,
+        Borislav Petkov <bp@alien8.de>,
+        Michael Roth <michael.roth@amd.com>,
+        Vlastimil Babka <vbabka@suse.cz>, tony.luck@intel.com,
+        npmccallum@redhat.com, brijesh.ksingh@gmail.com
+Subject: Re: [PATCH Part2 RFC v4 26/40] KVM: SVM: Add
+ KVM_SEV_SNP_LAUNCH_FINISH command
+To:     Sean Christopherson <seanjc@google.com>
+References: <20210707183616.5620-1-brijesh.singh@amd.com>
+ <20210707183616.5620-27-brijesh.singh@amd.com> <YPHpk3RFSmE13ZXz@google.com>
+ <9ee5a991-3e43-3489-5ee1-ff8c66cfabc1@amd.com> <YPWuVY+rKU2/DVUS@google.com>
+ <379fd4da-3ca9-3205-535b-8d1891b3a75a@amd.com> <YPXPKLW8DvqK7yak@google.com>
+From:   Brijesh Singh <brijesh.singh@amd.com>
+Message-ID: <f056d0ea-42ff-bc35-8154-a528105309a4@amd.com>
+Date:   Mon, 19 Jul 2021 14:49:26 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.11.0
+In-Reply-To: <YPXPKLW8DvqK7yak@google.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: SN4PR0501CA0065.namprd05.prod.outlook.com
+ (2603:10b6:803:41::42) To SN6PR12MB2718.namprd12.prod.outlook.com
+ (2603:10b6:805:6f::22)
 MIME-Version: 1.0
-References: <20210719160346.609914-1-tabba@google.com> <20210719160346.609914-15-tabba@google.com>
-In-Reply-To: <20210719160346.609914-15-tabba@google.com>
-From:   Oliver Upton <oupton@google.com>
-Date:   Mon, 19 Jul 2021 12:43:41 -0700
-Message-ID: <CAOQ_Qshr4dmvFSd7Cr0tBg0iy2Fvp78RvyCteJ3vSBFVoBrN8Q@mail.gmail.com>
-Subject: Re: [PATCH v3 14/15] KVM: arm64: Handle protected guests at 32 bits
-To:     Fuad Tabba <tabba@google.com>
-Cc:     kvmarm@lists.cs.columbia.edu, kernel-team@android.com,
-        kvm@vger.kernel.org, maz@kernel.org, pbonzini@redhat.com,
-        will@kernel.org, linux-arm-kernel@lists.infradead.org
-Content-Type: text/plain; charset="UTF-8"
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from [10.236.31.95] (165.204.77.1) by SN4PR0501CA0065.namprd05.prod.outlook.com (2603:10b6:803:41::42) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4352.15 via Frontend Transport; Mon, 19 Jul 2021 19:49:27 +0000
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 39973985-0ebe-4b5c-2527-08d94aee5216
+X-MS-TrafficTypeDiagnostic: SA0PR12MB4384:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <SA0PR12MB4384557283C30FB393D2B848E5E19@SA0PR12MB4384.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:7691;
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: GLyCpXhn1hDvUfGADAEqNWM51tdv1KTy/zo6iJW90OFdNby6vw4Zx8QsZwzEMx1aiQgxmg+ZB+N4NakFY9cjxf/peDaJQyQbtXIcfpvNhXjP+7l82fsEAfRDxOvLucsTR2+kxah2dXN5AKdB97Vtx8Mcal3xo6UdrVu52xvchKNTswoMXA/Z/rsSHm4wyBsXLNDwqy5druyPj9D8xWbEAM1WF9KWxBk0cCyyN8QNnKEViexPJaRkeYzi4pZ9A3h7Ne3rR1UbvEzTqb3WfgBEm1KkMomeFo/xdKxmVbKGcuPks30y78PPM/dgjvzay1llF+vDUkOAk+2llUximE58KCOjYexGqbidYdIZsQ4AmYR186HVdx7pzm6Ps54MODHGCLrJSvxW2fW5sZrM/Rf16iCaKHXQbhzxhUpGv2y6vF0pq2eMGY8QrQtuYoKPuP51OfPkDzLbmF2vAc1mATq3kC53GIZLj+LM/qRTfJA4Xh3Rituu8AnnHPUc2/0voWE3XDRtIgjL9+pAd0t9uxaksaxn6KnP7vL1l9etDLLwmJHJzwZwrrB+ClejGvvPW1zesC4N5r71QkZ3TByczVmMRvdylClYuPvlFbE5OmlM7wBoaxm9+RhracKyQaQFbwhGPPEaT+xzvPJDwrwOOzdfNkLyFu4EfHQ4PfNJ4LFmCZU2nehMOFr4WnDiD2JeCghjkajIaGvJseBfVrPvblu8upsBqdRv3gd501E33gj6PUeT9sFd4elNU109uawbpf1X9MWbtDori6fW2XzJ0VcgKj7Y5On1yxErmYPUYu6ESHJqsEnnE9MxVR/p+dBZc87MM9xmF2kD8o3BqSXy5Bp6CenJitAarNLsDA/w/D1GykY=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR12MB2718.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(39860400002)(366004)(396003)(136003)(376002)(346002)(66476007)(966005)(66556008)(31686004)(8936002)(7416002)(6486002)(66946007)(36756003)(478600001)(52116002)(38350700002)(38100700002)(4326008)(316002)(16576012)(4744005)(53546011)(6916009)(7406005)(2906002)(31696002)(5660300002)(186003)(26005)(83380400001)(54906003)(8676002)(86362001)(956004)(2616005)(44832011)(45980500001)(43740500002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?N1NKRHdjM09CenpQTTNDdHM5SkQzcWVKVy8wQk1kcTdmb1VCR1BvOUUvOThz?=
+ =?utf-8?B?eEZFUmJEVG9CQ2xnNWxnc3d1d2g3MWNCRHBaVFYzS28wbE5XMmFrSktDTG5y?=
+ =?utf-8?B?dEJQUmZjamZ4c3NTYlNCOG9VSC84dlQ1cy92dkVQcytLSDBnNEtmeFRjYlZv?=
+ =?utf-8?B?YUFpVDhKZWdnVHZteUkxdkRTQ0tHbG1JL1k0aUFGL0hINDU1VWVSdFZXbU9W?=
+ =?utf-8?B?RmJOYXcxSlJ3R0FIN0Y4cFVCbG9CWlBrZ24waVFVbHZNNmlvd2JoZWRIc3Ay?=
+ =?utf-8?B?cGl4TW50YWxBQmZRV0NmQU80T2RzWnZocWtIbHJydkNRSTdTWnMvZ0dVSEd1?=
+ =?utf-8?B?R29FWkV1MzlVVDh0VmdjLzJrM0V0c2pNQUZMZWVyeGZVbHIySnVhc2ZIYlNq?=
+ =?utf-8?B?bmt4c1JCTS82N0c3Y1RTeE9JdUd6eE1rN0pPeUJpQjBsQnFCK0E4QlZDUENo?=
+ =?utf-8?B?UmVMMjRGZnJ5eG1BbVNyRzNtYVpPckVMVnFTSm04REJXcHptNkJ4VW80d2lN?=
+ =?utf-8?B?M05TTVE1alVFUytCb2QvcEhXMElCNHM2K0JyVGxWLzRSbWtuMHZpNzB5eFJ5?=
+ =?utf-8?B?M1BxenpIMnI0TE9RSUx3d2p1S1FvZWk4a2NLWmdpSzRrQlpTL2pKeHl2NVBa?=
+ =?utf-8?B?MysrZjdsSHcwZW9xc2tTbWQrdjNPMUdNbUxOUDNqMHJmenZ6WVU1TmtSTnA4?=
+ =?utf-8?B?d1JheEEyWUUwYlVDdmZkeUQxVVFuekFhck4yRFpTUVdzRTFaK0lrRmxGYjZK?=
+ =?utf-8?B?cDI5bENlY0FHaEdwRWIxdGhLbHpvTTIrdXVERkNmU3lOWmJQM1JRTkNOdmJ0?=
+ =?utf-8?B?WE0xaUZZc1kzTjgyWnQrMEhnT0pyQ085Q09GSWhxeWdRTWoyeUg1S1I5WFpE?=
+ =?utf-8?B?ZXc2aXoyTEUyTnZ3ODRzTmMra3o0a0VIWlNRcWFCQUR0dkdXR2M5TFRIblFP?=
+ =?utf-8?B?ZytCcHVsNm9uZEdaaDJnVjYxR2twS0FET2dDRlZLZE1WNWNjVTJZY1ppYm5X?=
+ =?utf-8?B?c0U2ZFlWTlYzUHducG1lYTVBa3VKR3F1aURNaUpkelBtVk10WkdJdG9wR0Vu?=
+ =?utf-8?B?eE9xcE5PdjV4SlhDZVVtT1JmNnIyOTE3MnBqQW5LRFpqcy9uRFlPWXhqVnNp?=
+ =?utf-8?B?YXczS2JpQk9qZ2NFYTB3NG1CeTdKNW5CeVF3dW1rQlRRTlJ0c2wwU3RYUXFa?=
+ =?utf-8?B?UDhwdldyZ3p5WGdtVFJvQWo4czNVV29iclV5OGNrVllvemRqVUxMWE1sVlZo?=
+ =?utf-8?B?a0ZDNHNBTjdvS2ZSeVZzRXczOWdqUjEvUWJVQUd4cTlSYlhKWkxDNEpMNGJV?=
+ =?utf-8?B?ckZZUzVxQXdhTEtGeFU2ZEVPSVg1OEkzS0FkS3hzRTlTckNDM2d6ZE9KMWND?=
+ =?utf-8?B?RWRWRnRMNmpHQ2daeVU1VDBwdzJoMXJ0emY4WkMvYStocm93UmtBWTcyNlVa?=
+ =?utf-8?B?NW5wN2NvYzRrMlVrN1dsUDZsM0hCajIzdlVpZWtncHFEMDJnOGl1d21oOEwz?=
+ =?utf-8?B?OCtJV0I3L2M2bHMwY0FzbVJxdUpNc2lZeElyNVRxbmNPVjQ5RWVrN2d2TEY4?=
+ =?utf-8?B?QVBqTmFsN2ErR3pwUlI1VGpFd29wOEhiaXArVTQrQkJLYndGVTdET3d1OHZQ?=
+ =?utf-8?B?NUI5MjVpaTNWWTZOemlaRit0RWV4eHdBZDFFcG84YjJFdTZQZHlneXV5aGo4?=
+ =?utf-8?B?cVB1NWE2ZVI1UzF6dHZ5VlpaQ0xrRDZFckJtTlQwdllwSFBoQ2hrQXlDODE3?=
+ =?utf-8?Q?tgUVcikoTDnjhywfQ5La0bJDPxWPuvrCZPRwhpx?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 39973985-0ebe-4b5c-2527-08d94aee5216
+X-MS-Exchange-CrossTenant-AuthSource: SN6PR12MB2718.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Jul 2021 19:49:29.1829
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: vhsr6kFfNfEvEOiwu9tTO1j+KeJQJg9XcTdrPX0pU0Fd3/IUNBHaLjN8GFAt9/OE3haohGFNSxoQlHTKYmxnXw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA0PR12MB4384
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Jul 19, 2021 at 9:04 AM Fuad Tabba <tabba@google.com> wrote:
->
-> Protected KVM does not support protected AArch32 guests. However,
-> it is possible for the guest to force run AArch32, potentially
-> causing problems. Add an extra check so that if the hypervisor
-> catches the guest doing that, it can prevent the guest from
-> running again by resetting vcpu->arch.target and returning
-> ARM_EXCEPTION_IL.
->
-> Adapted from commit 22f553842b14 ("KVM: arm64: Handle Asymmetric
-> AArch32 systems")
->
-> Signed-off-by: Fuad Tabba <tabba@google.com>
 
-Would it make sense to document how we handle misbehaved guests, in
-case a particular VMM wants to clean up the mess afterwards?
 
---
-Thanks,
-Oliver
+On 7/19/21 2:14 PM, Sean Christopherson wrote:
 
-> ---
->  arch/arm64/kvm/hyp/include/hyp/switch.h | 24 ++++++++++++++++++++++++
->  1 file changed, 24 insertions(+)
->
-> diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
-> index 8431f1514280..f09343e15a80 100644
-> --- a/arch/arm64/kvm/hyp/include/hyp/switch.h
-> +++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
-> @@ -23,6 +23,7 @@
->  #include <asm/kprobes.h>
->  #include <asm/kvm_asm.h>
->  #include <asm/kvm_emulate.h>
-> +#include <asm/kvm_fixed_config.h>
->  #include <asm/kvm_hyp.h>
->  #include <asm/kvm_mmu.h>
->  #include <asm/fpsimd.h>
-> @@ -477,6 +478,29 @@ static inline bool fixup_guest_exit(struct kvm_vcpu *vcpu, u64 *exit_code)
->                         write_sysreg_el2(read_sysreg_el2(SYS_ELR) - 4, SYS_ELR);
->         }
->
-> +       /*
-> +        * Protected VMs might not be allowed to run in AArch32. The check below
-> +        * is based on the one in kvm_arch_vcpu_ioctl_run().
-> +        * The ARMv8 architecture doesn't give the hypervisor a mechanism to
-> +        * prevent a guest from dropping to AArch32 EL0 if implemented by the
-> +        * CPU. If the hypervisor spots a guest in such a state ensure it is
-> +        * handled, and don't trust the host to spot or fix it.
-> +        */
-> +       if (unlikely(is_nvhe_hyp_code() &&
-> +                    kvm_vm_is_protected(kern_hyp_va(vcpu->kvm)) &&
-> +                    FIELD_GET(FEATURE(ID_AA64PFR0_EL0),
-> +                              PVM_ID_AA64PFR0_ALLOW) <
-> +                            ID_AA64PFR0_ELx_32BIT_64BIT &&
-> +                    vcpu_mode_is_32bit(vcpu))) {
-> +               /*
-> +                * As we have caught the guest red-handed, decide that it isn't
-> +                * fit for purpose anymore by making the vcpu invalid.
-> +                */
-> +               vcpu->arch.target = -1;
-> +               *exit_code = ARM_EXCEPTION_IL;
-> +               goto exit;
-> +       }
-> +
->         /*
->          * We're using the raw exception code in order to only process
->          * the trap if no SError is pending. We will come back to the
-> --
-> 2.32.0.402.g57bb445576-goog
->
-> _______________________________________________
-> kvmarm mailing list
-> kvmarm@lists.cs.columbia.edu
-> https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+> 
+> Where?  I feel like I'm missing something.  The only change to sev_free_vcpu() I
+> see is that addition of the rmpupdate(), I don't see any reclaim path.
+
+Clearing of the immutable bit (aka reclaim) is done by the firmware 
+after the command was successful. See the section 8.14.2.1 of the 
+SEV-SNP spec[1].
+
+   The firmware encrypts the page with the VEK in place. The firmware
+   sets the RMP.VMSA of the page to 1. The firmware sets the VMPL
+   permissions for the page and transitions the page to Guest-Valid.
+
+The Guest-Valid state means the immutable bit is cleared.  In this case,
+the hypervisor just need to make the page shared and that's what the 
+sev_free_vcpu() does to ensure that page is transitioned from the 
+Guest-Valid to Hypervisor.
+
+[1] https://www.amd.com/system/files/TechDocs/56860.pdf
+
+thanks
