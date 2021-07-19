@@ -2,202 +2,387 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 881E73CEE51
-	for <lists+kvm@lfdr.de>; Mon, 19 Jul 2021 23:44:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5BD1F3CEE58
+	for <lists+kvm@lfdr.de>; Mon, 19 Jul 2021 23:44:20 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1387527AbhGSUe5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 19 Jul 2021 16:34:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58272 "EHLO
+        id S1387879AbhGSUg3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 19 Jul 2021 16:36:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57936 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1383721AbhGSSJV (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 19 Jul 2021 14:09:21 -0400
-Received: from mail-pj1-x102d.google.com (mail-pj1-x102d.google.com [IPv6:2607:f8b0:4864:20::102d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 48A46C061786
-        for <kvm@vger.kernel.org>; Mon, 19 Jul 2021 11:37:49 -0700 (PDT)
-Received: by mail-pj1-x102d.google.com with SMTP id g24so11995288pji.4
-        for <kvm@vger.kernel.org>; Mon, 19 Jul 2021 11:49:44 -0700 (PDT)
+        with ESMTP id S1383750AbhGSSKF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 19 Jul 2021 14:10:05 -0400
+Received: from mail-qk1-x74a.google.com (mail-qk1-x74a.google.com [IPv6:2607:f8b0:4864:20::74a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 35884C0613E4
+        for <kvm@vger.kernel.org>; Mon, 19 Jul 2021 11:38:10 -0700 (PDT)
+Received: by mail-qk1-x74a.google.com with SMTP id y3-20020ae9f4030000b02903b916ae903fso8690663qkl.6
+        for <kvm@vger.kernel.org>; Mon, 19 Jul 2021 11:50:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=Xs0QjZTAxJ4hJWmqebyF0esmS5yFAGMicwR/GdEGj2c=;
-        b=gnHG4ARHZtOcS3KynjUaW5BMR4pFmlGR6R81Q9pRmaNF/LzBno9XrxaoMNOTUjUF16
-         NQvdnvfs6sOOIuJiZYqUSh+BVmEQuyk2L6GE/6M9medSMcCB6gb+G+V7jLFKvEPut6gr
-         sg4tqMHMdh02cHG0pZzQpax+OpxaMR0VHK9RnG/2xQNeH63SxgNAvwmCpcsrIYEiW+cU
-         1bZvztlNPa0pYzUSE61XskbZ3a8G0kgdDivxAqeHIGlr4rsGNmXmZ7FyW+oV7hQ3b8rJ
-         9Kd0VjOMADXRtRDdl6g47w9LTNX/SmT8c7C4hCSYbeffEJcflraEacKpYWOjy2K6Erbm
-         nHHw==
+        h=date:in-reply-to:message-id:mime-version:references:subject:from:to
+         :cc;
+        bh=gVY1OcKTRkdtAsXEWyCj2ppxRNB8jvE/V1F4Gd0MP+c=;
+        b=rIe4EYIHZTwOJ/LUiUNHR7ZP9KqycOwxusCIiH31hPQqFcVGTBc1V7P3yBAW5nLMOf
+         rVtsH9MK/R3IUquzLnJFycOUHo+NDeEQOzM3VNusblsfRBTvJvyA9sd/uVCjpaPYgN2Z
+         Pqzh/O7c+NxCnojD2tFCdhNGFve1zeafT1c2aRlALZVA49Yfo4japt7RG6fVIAICydTj
+         nAVp6rKK4uOqi8/bJIJm8Lkmta2iqxjy19MO47gej1GC/N5QLDS8F2hW84QKHy1HuqZo
+         FOPG6e4fTJXX8F2b/SlCENE/xNxwWvK6F0wJDI3/YzAyW4CkWurni2c52QqsedvFxsJ2
+         vwMw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=Xs0QjZTAxJ4hJWmqebyF0esmS5yFAGMicwR/GdEGj2c=;
-        b=sQ6FwajFz9WJGkma4h/T7wqvphxcfvnE4Mwdpm9pupq4fJuDaCQCTqtgrO58UmjlLr
-         JmXTVgcpwRTGFsD6UFFmytqxPSrS8mqjcURQnlq98MClvMt+oxl5pFBM2lIYV+Nz3Hao
-         cC+bWVqpnIKSEpHf+CPlH96nm1JNsWjXZozuvbCVtORhv6Cqz3xmPveENo1KGymWEnt3
-         wXtrA+CEXRLmDKiC/ovoADk6i0nkhvRydLWGy5D+KJWnahVlYDKc6QaNueFmqNbovMEN
-         T1f0DiPJWWhr0sqwVBmzC/5EFEDmHyQltMbOmXBJ2nuKZEt0Y/6M/yVY/sN/6407R5ID
-         tuPw==
-X-Gm-Message-State: AOAM530whyI+ONHuGfW2NaPtZvCrA3AdQXQG4yek+WwvmWFcOFNyvb8k
-        34aPRnr+MPHJ4NywkG5wdEk4K3ySo6f/vg==
-X-Google-Smtp-Source: ABdhPJyhoFt4sUCN2ajarBa7UvBpTh5hkuUpsoUV1xzwnnJa437MyM26Q8Ace9LMYPUCkke+XACaig==
-X-Received: by 2002:a17:902:f282:b029:12b:2b93:fbdd with SMTP id k2-20020a170902f282b029012b2b93fbddmr20432780plc.35.1626720584273;
-        Mon, 19 Jul 2021 11:49:44 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id b3sm21272139pfi.179.2021.07.19.11.49.43
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 19 Jul 2021 11:49:43 -0700 (PDT)
-Date:   Mon, 19 Jul 2021 18:49:39 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Maxim Levitsky <mlevitsk@redhat.com>
-Cc:     kvm@vger.kernel.org,
-        "open list:X86 ARCHITECTURE (32-BIT AND 64-BIT)" 
-        <linux-kernel@vger.kernel.org>, Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, Borislav Petkov <bp@alien8.de>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ingo Molnar <mingo@redhat.com>,
-        "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>
-Subject: Re: [PATCH v2 8/8] KVM: x86: hyper-v: Deactivate APICv only when
- AutoEOI feature is in use
-Message-ID: <YPXJQxLaJuoF6aXl@google.com>
-References: <20210713142023.106183-1-mlevitsk@redhat.com>
- <20210713142023.106183-9-mlevitsk@redhat.com>
- <c51d3f0b46bb3f73d82d66fae92425be76b84a68.camel@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <c51d3f0b46bb3f73d82d66fae92425be76b84a68.camel@redhat.com>
+        h=x-gm-message-state:date:in-reply-to:message-id:mime-version
+         :references:subject:from:to:cc;
+        bh=gVY1OcKTRkdtAsXEWyCj2ppxRNB8jvE/V1F4Gd0MP+c=;
+        b=Bi+b+qrynnfN016T1sbGUkz7yz/jfJxFf/hwW6Dx0aZ0a3MfztI6UhjoGpiw3pb4RE
+         3PqmbKqg78W/xknRheKHGOVne4RIf1FR4loz4Gdq//pHpeHgTa68iGxJGk72CU7VIbSJ
+         UU50SaIRSWmN3QvoKYiZgqapNVBWlfvXr6p2TPBMXvfJ2UT+F0hg7qljj2SBdtmHqxLd
+         FP093ihX/D1pJfViRWUcwwqQqoTRvwUaOaOKXCHa2iRXbzom2Q95gAZYlF6Q6PrwDe5p
+         nTmi8MuiBzHk+cvB8OQy/UeGsVGKNgDfhIGUMVxnsVDjS5p1RdY8YRgOP95e/xYUbWCH
+         2+9g==
+X-Gm-Message-State: AOAM533ZY6vCXQMZMhxJvPjaJ/fAibKHuwtHTG6bwfCQ2RufNrwGVpZ6
+        ycRsFRpeUaGT4ApkajieOhThIlEPADT97qXNjd62z84IfsTMVn79P8ZciyVF7w5kQ0/suRvF5e/
+        HHdsAGs8jqaQ7tr5GAY90GEQgkGEAZs5uV9eHlOaEB4ic8rQopQROlomrFw==
+X-Google-Smtp-Source: ABdhPJwMtLpMckHH8SI1H19lvBkJcK8ZOjmQJ0hNe6s1ExY+akygtzdlgbYmN9GT8ZpsFuaNtAn7yVUJPzI=
+X-Received: from oupton.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:404])
+ (user=oupton job=sendgmr) by 2002:a05:6214:16ca:: with SMTP id
+ d10mr25973873qvz.59.1626720603342; Mon, 19 Jul 2021 11:50:03 -0700 (PDT)
+Date:   Mon, 19 Jul 2021 18:49:40 +0000
+In-Reply-To: <20210719184949.1385910-1-oupton@google.com>
+Message-Id: <20210719184949.1385910-4-oupton@google.com>
+Mime-Version: 1.0
+References: <20210719184949.1385910-1-oupton@google.com>
+X-Mailer: git-send-email 2.32.0.402.g57bb445576-goog
+Subject: [PATCH v3 03/12] KVM: x86: Expose TSC offset controls to userspace
+From:   Oliver Upton <oupton@google.com>
+To:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Marc Zyngier <maz@kernel.org>, Peter Shier <pshier@google.com>,
+        Jim Mattson <jmattson@google.com>,
+        David Matlack <dmatlack@google.com>,
+        Ricardo Koller <ricarkol@google.com>,
+        Jing Zhang <jingzhangos@google.com>,
+        Raghavendra Rao Anata <rananta@google.com>,
+        James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        linux-arm-kernel@lists.infradead.org,
+        Oliver Upton <oupton@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sun, Jul 18, 2021, Maxim Levitsky wrote:
-> I am more inclined to fix this by just tracking if we hold the srcu
-> lock on each VCPU manually, just as we track the srcu index anyway,
-> and then kvm_request_apicv_update can use this to drop the srcu
-> lock when needed.
+To date, VMM-directed TSC synchronization and migration has been a bit
+messy. KVM has some baked-in heuristics around TSC writes to infer if
+the VMM is attempting to synchronize. This is problematic, as it depends
+on host userspace writing to the guest's TSC within 1 second of the last
+write.
 
-The entire approach of dynamically adding/removing the memslot seems doomed to
-failure, and is likely responsible for the performance issues with AVIC, e.g. a
-single vCPU temporarily inhibiting AVIC will zap all SPTEs _twice_; on disable
-and again on re-enable.
+A much cleaner approach to configuring the guest's views of the TSC is to
+simply migrate the TSC offset for every vCPU. Offsets are idempotent,
+and thus not subject to change depending on when the VMM actually
+reads/writes values from/to KVM. The VMM can then read the TSC once with
+KVM_GET_CLOCK to capture a (realtime, host_tsc) pair at the instant when
+the guest is paused.
 
-Rather than pile on more gunk, what about special casing the APIC access page
-memslot in try_async_pf()?  E.g. zap the GFN in avic_update_access_page() when
-disabling (and bounce through kvm_{inc,dec}_notifier_count()), and have the page
-fault path skip directly to MMIO emulation without caching the MMIO info.  It'd
-also give us a good excuse to rename try_async_pf() :-)
+Cc: David Matlack <dmatlack@google.com>
+Signed-off-by: Oliver Upton <oupton@google.com>
+---
+ Documentation/virt/kvm/devices/vcpu.rst |  57 ++++++++
+ arch/x86/include/asm/kvm_host.h         |   1 +
+ arch/x86/include/uapi/asm/kvm.h         |   4 +
+ arch/x86/kvm/x86.c                      | 167 ++++++++++++++++++++++++
+ 4 files changed, 229 insertions(+)
 
-If lack of MMIO caching is a performance problem, an alternative solution would
-be to allow caching but add a helper to zap the MMIO SPTE and request all vCPUs to
-clear their cache.
-
-It's all a bit gross, especially hijacking the mmu_notifier path, but IMO it'd be
-less awful than the current memslot+SRCU mess.
-
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index f4d35289f59e..ea434d76cfb0 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -3767,9 +3767,9 @@ static bool kvm_arch_setup_async_pf(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa,
-                                  kvm_vcpu_gfn_to_hva(vcpu, gfn), &arch);
- }
-
--static bool try_async_pf(struct kvm_vcpu *vcpu, bool prefault, gfn_t gfn,
--                        gpa_t cr2_or_gpa, kvm_pfn_t *pfn, hva_t *hva,
--                        bool write, bool *writable)
-+static bool kvm_faultin_pfn(struct kvm_vcpu *vcpu, bool prefault, gfn_t gfn,
-+                           gpa_t cr2_or_gpa, kvm_pfn_t *pfn, hva_t *hva,
-+                           bool write, bool *writable, int *r)
- {
-        struct kvm_memory_slot *slot = kvm_vcpu_gfn_to_memslot(vcpu, gfn);
-        bool async;
-@@ -3780,13 +3780,26 @@ static bool try_async_pf(struct kvm_vcpu *vcpu, bool prefault, gfn_t gfn,
-         * be zapped before KVM inserts a new MMIO SPTE for the gfn.
-         */
-        if (slot && (slot->flags & KVM_MEMSLOT_INVALID))
--               return true;
-+               goto out_retry;
-
--       /* Don't expose private memslots to L2. */
--       if (is_guest_mode(vcpu) && !kvm_is_visible_memslot(slot)) {
--               *pfn = KVM_PFN_NOSLOT;
--               *writable = false;
--               return false;
-+       if (!kvm_is_visible_memslot(slot)) {
-+               /* Don't expose private memslots to L2. */
-+               if (is_guest_mode(vcpu)) {
-+                       *pfn = KVM_PFN_NOSLOT;
-+                       *writable = false;
-+                       return false;
-+               }
-+               /*
-+                * If the APIC access page exists but is disabled, go directly
-+                * to emulation without caching the MMIO access or creating a
-+                * MMIO SPTE.  That way the cache doesn't need to be purged
-+                * when the AVIC is re-enabled.
-+                */
-+               if (slot->id == APIC_ACCESS_PAGE_PRIVATE_MEMSLOT &&
-+                   !vcpu->kvm->arch.apic_access_memslot_enabled) {
-+                       *r = RET_PF_EMULATE;
-+                       return true;
-+               }
-        }
-
-        async = false;
-@@ -3800,14 +3813,19 @@ static bool try_async_pf(struct kvm_vcpu *vcpu, bool prefault, gfn_t gfn,
-                if (kvm_find_async_pf_gfn(vcpu, gfn)) {
-                        trace_kvm_async_pf_doublefault(cr2_or_gpa, gfn);
-                        kvm_make_request(KVM_REQ_APF_HALT, vcpu);
--                       return true;
--               } else if (kvm_arch_setup_async_pf(vcpu, cr2_or_gpa, gfn))
--                       return true;
-+                       goto out_retry;
-+               } else if (kvm_arch_setup_async_pf(vcpu, cr2_or_gpa, gfn)) {
-+                       goto out_retry;
-+               }
-        }
-
-        *pfn = __gfn_to_pfn_memslot(slot, gfn, false, NULL,
-                                    write, writable, hva);
-        return false;
+diff --git a/Documentation/virt/kvm/devices/vcpu.rst b/Documentation/virt/kvm/devices/vcpu.rst
+index 2acec3b9ef65..b46d5f742e69 100644
+--- a/Documentation/virt/kvm/devices/vcpu.rst
++++ b/Documentation/virt/kvm/devices/vcpu.rst
+@@ -161,3 +161,60 @@ Specifies the base address of the stolen time structure for this VCPU. The
+ base address must be 64 byte aligned and exist within a valid guest memory
+ region. See Documentation/virt/kvm/arm/pvtime.rst for more information
+ including the layout of the stolen time structure.
 +
-+out_retry:
-+       *r = RET_PF_RETRY;
-+       return true;
++4. GROUP: KVM_VCPU_TSC_CTRL
++===========================
++
++:Architectures: x86
++
++4.1 ATTRIBUTE: KVM_VCPU_TSC_OFFSET
++
++:Parameters: 64-bit unsigned TSC offset
++
++Returns:
++
++	 ======= ======================================
++	 -EFAULT Error reading/writing the provided
++	 	 parameter address.
++	 -ENXIO  Attribute not supported
++	 ======= ======================================
++
++Specifies the guest's TSC offset relative to the host's TSC. The guest's
++TSC is then derived by the following equation:
++
++  guest_tsc = host_tsc + KVM_VCPU_TSC_OFFSET
++
++This attribute is useful for the precise migration of a guest's TSC. The
++following describes a possible algorithm to use for the migration of a
++guest's TSC:
++
++From the source VMM process:
++
++1. Invoke the KVM_GET_CLOCK ioctl to record the host TSC (t_0),
++   kvmclock nanoseconds (k_0), and realtime nanoseconds (r_0).
++
++2. Read the KVM_VCPU_TSC_OFFSET attribute for every vCPU to record the
++   guest TSC offset (off_n).
++
++3. Invoke the KVM_GET_TSC_KHZ ioctl to record the frequency of the
++   guest's TSC (freq).
++
++From the destination VMM process:
++
++4. Invoke the KVM_SET_CLOCK ioctl, providing the kvmclock nanoseconds
++   (k_0) and realtime nanoseconds (r_0) in their respective fields.
++   Ensure that the KVM_CLOCK_REALTIME flag is set in the provided
++   structure. KVM will advance the VM's kvmclock to account for elapsed
++   time since recording the clock values.
++
++5. Invoke the KVM_GET_CLOCK ioctl to record the host TSC (t_1) and
++   kvmclock nanoseconds (k_1).
++
++6. Adjust the guest TSC offsets for every vCPU to account for (1) time
++   elapsed since recording state and (2) difference in TSCs between the
++   source and destination machine:
++
++   new_off_n = t_0 + off_n = (k_1 - k_0) * freq - t_1
++
++7. Write the KVM_VCPU_TSC_OFFSET attribute for every vCPU with the
++   respective value derived in the previous step.
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index 3fb2b9270d01..5f2e909b83eb 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -1070,6 +1070,7 @@ struct kvm_arch {
+ 	u64 last_tsc_nsec;
+ 	u64 last_tsc_write;
+ 	u32 last_tsc_khz;
++	u64 last_tsc_offset;
+ 	u64 cur_tsc_nsec;
+ 	u64 cur_tsc_write;
+ 	u64 cur_tsc_offset;
+diff --git a/arch/x86/include/uapi/asm/kvm.h b/arch/x86/include/uapi/asm/kvm.h
+index a6c327f8ad9e..0b22e1e84e78 100644
+--- a/arch/x86/include/uapi/asm/kvm.h
++++ b/arch/x86/include/uapi/asm/kvm.h
+@@ -503,4 +503,8 @@ struct kvm_pmu_event_filter {
+ #define KVM_PMU_EVENT_ALLOW 0
+ #define KVM_PMU_EVENT_DENY 1
+ 
++/* for KVM_{GET,SET,HAS}_DEVICE_ATTR */
++#define KVM_VCPU_TSC_CTRL 0 /* control group for the timestamp counter (TSC) */
++#define   KVM_VCPU_TSC_OFFSET 0 /* attribute for the TSC offset */
++
+ #endif /* _ASM_X86_KVM_H */
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 580ba0e86687..9e7867410091 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -2411,6 +2411,11 @@ static void kvm_vcpu_write_tsc_offset(struct kvm_vcpu *vcpu, u64 l1_offset)
+ 	static_call(kvm_x86_write_tsc_offset)(vcpu, vcpu->arch.tsc_offset);
  }
-
- static int direct_page_fault(struct kvm_vcpu *vcpu, gpa_t gpa, u32 error_code,
-@@ -3839,9 +3857,9 @@ static int direct_page_fault(struct kvm_vcpu *vcpu, gpa_t gpa, u32 error_code,
-        mmu_seq = vcpu->kvm->mmu_notifier_seq;
-        smp_rmb();
-
--       if (try_async_pf(vcpu, prefault, gfn, gpa, &pfn, &hva,
--                        write, &map_writable))
--               return RET_PF_RETRY;
-+       if (kvm_faultin_pfn(vcpu, prefault, gfn, gpa, &pfn, &hva, write,
-+                           &map_writable, &r))
-+               return r;
-
-        if (handle_abnormal_pfn(vcpu, is_tdp ? 0 : gpa, gfn, pfn, ACC_ALL, &r))
-                return r;
-diff --git a/arch/x86/kvm/mmu/paging_tmpl.h b/arch/x86/kvm/mmu/paging_tmpl.h
-index 490a028ddabe..9747124b877d 100644
---- a/arch/x86/kvm/mmu/paging_tmpl.h
-+++ b/arch/x86/kvm/mmu/paging_tmpl.h
-@@ -881,9 +881,9 @@ static int FNAME(page_fault)(struct kvm_vcpu *vcpu, gpa_t addr, u32 error_code,
-        mmu_seq = vcpu->kvm->mmu_notifier_seq;
-        smp_rmb();
  
--       if (try_async_pf(vcpu, prefault, walker.gfn, addr, &pfn, &hva,
--                        write_fault, &map_writable))
--               return RET_PF_RETRY;
-+       if (kvm_faultin_pfn(vcpu, prefault, walker.gfn, addr, &pfn, &hva,
-+                           write_fault, &map_writable, &r))
-+               return r;
++static u64 kvm_vcpu_read_tsc_offset(struct kvm_vcpu *vcpu)
++{
++	return vcpu->arch.l1_tsc_offset;
++}
++
+ static void kvm_vcpu_write_tsc_multiplier(struct kvm_vcpu *vcpu, u64 l1_multiplier)
+ {
+ 	vcpu->arch.l1_tsc_scaling_ratio = l1_multiplier;
+@@ -2467,6 +2472,7 @@ static void __kvm_synchronize_tsc(struct kvm_vcpu *vcpu, u64 offset, u64 tsc,
+ 	kvm->arch.last_tsc_nsec = ns;
+ 	kvm->arch.last_tsc_write = tsc;
+ 	kvm->arch.last_tsc_khz = vcpu->arch.virtual_tsc_khz;
++	kvm->arch.last_tsc_offset = offset;
  
-        if (handle_abnormal_pfn(vcpu, addr, walker.gfn, pfn, walker.pte_access, &r))
-                return r;
+ 	vcpu->arch.last_guest_tsc = tsc;
+ 
+@@ -4914,6 +4920,137 @@ static int kvm_set_guest_paused(struct kvm_vcpu *vcpu)
+ 	return 0;
+ }
+ 
++static int kvm_arch_tsc_has_attr(struct kvm_vcpu *vcpu,
++				 struct kvm_device_attr *attr)
++{
++	int r;
++
++	switch (attr->attr) {
++	case KVM_VCPU_TSC_OFFSET:
++		r = 0;
++		break;
++	default:
++		r = -ENXIO;
++	}
++
++	return r;
++}
++
++static int kvm_arch_tsc_get_attr(struct kvm_vcpu *vcpu,
++				 struct kvm_device_attr *attr)
++{
++	void __user *uaddr = (void __user *)attr->addr;
++	int r;
++
++	switch (attr->attr) {
++	case KVM_VCPU_TSC_OFFSET: {
++		u64 offset;
++
++		offset = kvm_vcpu_read_tsc_offset(vcpu);
++		r = -EFAULT;
++		if (copy_to_user(uaddr, &offset, sizeof(offset)))
++			break;
++
++		r = 0;
++		break;
++	}
++	default:
++		r = -ENXIO;
++	}
++
++	return r;
++}
++
++static int kvm_arch_tsc_set_attr(struct kvm_vcpu *vcpu,
++				 struct kvm_device_attr *attr)
++{
++	void __user *uaddr = (void __user *)attr->addr;
++	struct kvm *kvm = vcpu->kvm;
++	int r;
++
++	switch (attr->attr) {
++	case KVM_VCPU_TSC_OFFSET: {
++		u64 offset, tsc, ns;
++		unsigned long flags;
++		bool matched;
++
++		r = -EFAULT;
++		if (copy_from_user(&offset, uaddr, sizeof(offset)))
++			break;
++
++		raw_spin_lock_irqsave(&kvm->arch.tsc_write_lock, flags);
++
++		matched = (vcpu->arch.virtual_tsc_khz &&
++			   kvm->arch.last_tsc_khz == vcpu->arch.virtual_tsc_khz &&
++			   kvm->arch.last_tsc_offset == offset);
++
++		tsc = kvm_scale_tsc(vcpu, rdtsc(), vcpu->arch.l1_tsc_scaling_ratio) + offset;
++		ns = get_kvmclock_base_ns();
++
++		__kvm_synchronize_tsc(vcpu, offset, tsc, ns, matched);
++		raw_spin_unlock_irqrestore(&kvm->arch.tsc_write_lock, flags);
++
++		r = 0;
++		break;
++	}
++	default:
++		r = -ENXIO;
++	}
++
++	return r;
++}
++
++static int kvm_vcpu_ioctl_has_device_attr(struct kvm_vcpu *vcpu,
++					  struct kvm_device_attr *attr)
++{
++	int r;
++
++	switch (attr->group) {
++	case KVM_VCPU_TSC_CTRL:
++		r = kvm_arch_tsc_has_attr(vcpu, attr);
++		break;
++	default:
++		r = -ENXIO;
++		break;
++	}
++
++	return r;
++}
++
++static int kvm_vcpu_ioctl_get_device_attr(struct kvm_vcpu *vcpu,
++					  struct kvm_device_attr *attr)
++{
++	int r;
++
++	switch (attr->group) {
++	case KVM_VCPU_TSC_CTRL:
++		r = kvm_arch_tsc_get_attr(vcpu, attr);
++		break;
++	default:
++		r = -ENXIO;
++		break;
++	}
++
++	return r;
++}
++
++static int kvm_vcpu_ioctl_set_device_attr(struct kvm_vcpu *vcpu,
++					  struct kvm_device_attr *attr)
++{
++	int r;
++
++	switch (attr->group) {
++	case KVM_VCPU_TSC_CTRL:
++		r = kvm_arch_tsc_set_attr(vcpu, attr);
++		break;
++	default:
++		r = -ENXIO;
++		break;
++	}
++
++	return r;
++}
++
+ static int kvm_vcpu_ioctl_enable_cap(struct kvm_vcpu *vcpu,
+ 				     struct kvm_enable_cap *cap)
+ {
+@@ -5368,6 +5505,36 @@ long kvm_arch_vcpu_ioctl(struct file *filp,
+ 		r = __set_sregs2(vcpu, u.sregs2);
+ 		break;
+ 	}
++	case KVM_HAS_DEVICE_ATTR: {
++		struct kvm_device_attr attr;
++
++		r = -EFAULT;
++		if (copy_from_user(&attr, argp, sizeof(attr)))
++			goto out;
++
++		r = kvm_vcpu_ioctl_has_device_attr(vcpu, &attr);
++		break;
++	}
++	case KVM_GET_DEVICE_ATTR: {
++		struct kvm_device_attr attr;
++
++		r = -EFAULT;
++		if (copy_from_user(&attr, argp, sizeof(attr)))
++			goto out;
++
++		r = kvm_vcpu_ioctl_get_device_attr(vcpu, &attr);
++		break;
++	}
++	case KVM_SET_DEVICE_ATTR: {
++		struct kvm_device_attr attr;
++
++		r = -EFAULT;
++		if (copy_from_user(&attr, argp, sizeof(attr)))
++			goto out;
++
++		r = kvm_vcpu_ioctl_set_device_attr(vcpu, &attr);
++		break;
++	}
+ 	default:
+ 		r = -EINVAL;
+ 	}
+-- 
+2.32.0.402.g57bb445576-goog
+
