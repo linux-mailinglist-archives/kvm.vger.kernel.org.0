@@ -2,98 +2,166 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id F0F883CD727
-	for <lists+kvm@lfdr.de>; Mon, 19 Jul 2021 16:52:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D0DE23CE044
+	for <lists+kvm@lfdr.de>; Mon, 19 Jul 2021 17:57:35 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232414AbhGSOLT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 19 Jul 2021 10:11:19 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:53818 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S241280AbhGSOHO (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 19 Jul 2021 10:07:14 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1626706073;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=4+c2mimUJxS/GfqKAMPDQnAMd4K+lxrp07r5+X88g/E=;
-        b=Ira+omgtxEKaUJd6woxzVy98XBlRSJM3RtVlouEuI5i0YhxntnpMHiKqyx+v+qlREw7v7E
-        BK+SQ5oxvtEAWWCdJ8KuFb3QgCMlL4xqMF4C74BA2jE4rb60pT4L470omh667Vrw6qaChb
-        gRWUcLz5kagwZILlhLCfu8L6WhKzJGg=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-587-i1pU7SFlN4-XnU6s5O2Fxg-1; Mon, 19 Jul 2021 10:47:52 -0400
-X-MC-Unique: i1pU7SFlN4-XnU6s5O2Fxg-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4BA6BC73A1;
-        Mon, 19 Jul 2021 14:47:48 +0000 (UTC)
-Received: from localhost (ovpn-112-158.ams2.redhat.com [10.36.112.158])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 727BE5D9DC;
-        Mon, 19 Jul 2021 14:47:40 +0000 (UTC)
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Jason Gunthorpe <jgg@nvidia.com>, David Airlie <airlied@linux.ie>,
-        Tony Krowiak <akrowiak@linux.ibm.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Daniel Vetter <daniel@ffwll.ch>,
-        Diana Craciun <diana.craciun@oss.nxp.com>,
-        dri-devel@lists.freedesktop.org,
-        Eric Auger <eric.auger@redhat.com>,
-        Eric Farman <farman@linux.ibm.com>,
-        Harald Freudenberger <freude@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        intel-gfx@lists.freedesktop.org,
-        intel-gvt-dev@lists.freedesktop.org,
-        Jani Nikula <jani.nikula@linux.intel.com>,
-        Jason Herne <jjherne@linux.ibm.com>,
-        Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
-        kvm@vger.kernel.org, Kirti Wankhede <kwankhede@nvidia.com>,
-        linux-doc@vger.kernel.org, linux-s390@vger.kernel.org,
-        Matthew Rosato <mjrosato@linux.ibm.com>,
-        Peter Oberparleiter <oberpar@linux.ibm.com>,
-        Halil Pasic <pasic@linux.ibm.com>,
-        Rodrigo Vivi <rodrigo.vivi@intel.com>,
-        Vineeth Vijayan <vneethv@linux.ibm.com>,
-        Zhenyu Wang <zhenyuw@linux.intel.com>,
-        Zhi Wang <zhi.a.wang@intel.com>
-Cc:     "Raj, Ashok" <ashok.raj@intel.com>, Christoph Hellwig <hch@lst.de>,
-        Leon Romanovsky <leonro@nvidia.com>,
-        Max Gurtovoy <mgurtovoy@nvidia.com>,
-        Yishai Hadas <yishaih@nvidia.com>
-Subject: Re: [PATCH 12/13] vfio/gvt: Fix open/close when multiple device FDs
- are open
-In-Reply-To: <12-v1-eaf3ccbba33c+1add0-vfio_reflck_jgg@nvidia.com>
-Organization: Red Hat GmbH
-References: <12-v1-eaf3ccbba33c+1add0-vfio_reflck_jgg@nvidia.com>
-User-Agent: Notmuch/0.32.1 (https://notmuchmail.org)
-Date:   Mon, 19 Jul 2021 16:47:38 +0200
-Message-ID: <87lf629x85.fsf@redhat.com>
+        id S1347386AbhGSPQH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 19 Jul 2021 11:16:07 -0400
+Received: from mail.kernel.org ([198.145.29.99]:49596 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1345535AbhGSPNS (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 19 Jul 2021 11:13:18 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 3602F61363;
+        Mon, 19 Jul 2021 15:53:11 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+        s=korg; t=1626709991;
+        bh=gkXu3sbTGyTrqtfgG5j2rg5rnTqyL/1tASBndj4S7fY=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=UDIbpyhm4jdBzqB+QQBWG2papbxYjGSHsLhpim6uIxtFohTvtfMWd1Ah4ISB9ub0P
+         iVuOWCvTzSBdfkEBcQlU1qa2acII/58rkFrMn6cX3TZ4bva6h8XyM3fK1gsmnfdRLE
+         z7UD8mV+YK0tYmTGnCvueG/qcjb2/7K2UOA+ZdGw=
+From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To:     linux-kernel@vger.kernel.org
+Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        stable@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+        kvm@vger.kernel.org, Hulk Robot <hulkci@huawei.com>,
+        Kefeng Wang <wangkefeng.wang@huawei.com>
+Subject: [PATCH 5.10 003/243] KVM: mmio: Fix use-after-free Read in kvm_vm_ioctl_unregister_coalesced_mmio
+Date:   Mon, 19 Jul 2021 16:50:32 +0200
+Message-Id: <20210719144941.027466727@linuxfoundation.org>
+X-Mailer: git-send-email 2.32.0
+In-Reply-To: <20210719144940.904087935@linuxfoundation.org>
+References: <20210719144940.904087935@linuxfoundation.org>
+User-Agent: quilt/0.66
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jul 14 2021, Jason Gunthorpe <jgg@nvidia.com> wrote:
+From: Kefeng Wang <wangkefeng.wang@huawei.com>
 
-> The user can open multiple device FDs if it likes, however the open
-> function calls vfio_register_notifier() on device global state. Calling
-> vfio_register_notifier() twice will trigger a WARN_ON from
-> notifier_chain_register() and the first close will wrongly delete the
-> notifier and more.
->
-> Since these really want the new open/close_device() semantics just change
-> the function over.
->
-> Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
-> ---
->  drivers/gpu/drm/i915/gvt/kvmgt.c | 8 ++++----
->  1 file changed, 4 insertions(+), 4 deletions(-)
+commit 23fa2e46a5556f787ce2ea1a315d3ab93cced204 upstream.
 
-Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+BUG: KASAN: use-after-free in kvm_vm_ioctl_unregister_coalesced_mmio+0x7c/0x1ec arch/arm64/kvm/../../../virt/kvm/coalesced_mmio.c:183
+Read of size 8 at addr ffff0000c03a2500 by task syz-executor083/4269
+
+CPU: 5 PID: 4269 Comm: syz-executor083 Not tainted 5.10.0 #7
+Hardware name: linux,dummy-virt (DT)
+Call trace:
+ dump_backtrace+0x0/0x2d0 arch/arm64/kernel/stacktrace.c:132
+ show_stack+0x28/0x34 arch/arm64/kernel/stacktrace.c:196
+ __dump_stack lib/dump_stack.c:77 [inline]
+ dump_stack+0x110/0x164 lib/dump_stack.c:118
+ print_address_description+0x78/0x5c8 mm/kasan/report.c:385
+ __kasan_report mm/kasan/report.c:545 [inline]
+ kasan_report+0x148/0x1e4 mm/kasan/report.c:562
+ check_memory_region_inline mm/kasan/generic.c:183 [inline]
+ __asan_load8+0xb4/0xbc mm/kasan/generic.c:252
+ kvm_vm_ioctl_unregister_coalesced_mmio+0x7c/0x1ec arch/arm64/kvm/../../../virt/kvm/coalesced_mmio.c:183
+ kvm_vm_ioctl+0xe30/0x14c4 arch/arm64/kvm/../../../virt/kvm/kvm_main.c:3755
+ vfs_ioctl fs/ioctl.c:48 [inline]
+ __do_sys_ioctl fs/ioctl.c:753 [inline]
+ __se_sys_ioctl fs/ioctl.c:739 [inline]
+ __arm64_sys_ioctl+0xf88/0x131c fs/ioctl.c:739
+ __invoke_syscall arch/arm64/kernel/syscall.c:36 [inline]
+ invoke_syscall arch/arm64/kernel/syscall.c:48 [inline]
+ el0_svc_common arch/arm64/kernel/syscall.c:158 [inline]
+ do_el0_svc+0x120/0x290 arch/arm64/kernel/syscall.c:220
+ el0_svc+0x1c/0x28 arch/arm64/kernel/entry-common.c:367
+ el0_sync_handler+0x98/0x170 arch/arm64/kernel/entry-common.c:383
+ el0_sync+0x140/0x180 arch/arm64/kernel/entry.S:670
+
+Allocated by task 4269:
+ stack_trace_save+0x80/0xb8 kernel/stacktrace.c:121
+ kasan_save_stack mm/kasan/common.c:48 [inline]
+ kasan_set_track mm/kasan/common.c:56 [inline]
+ __kasan_kmalloc+0xdc/0x120 mm/kasan/common.c:461
+ kasan_kmalloc+0xc/0x14 mm/kasan/common.c:475
+ kmem_cache_alloc_trace include/linux/slab.h:450 [inline]
+ kmalloc include/linux/slab.h:552 [inline]
+ kzalloc include/linux/slab.h:664 [inline]
+ kvm_vm_ioctl_register_coalesced_mmio+0x78/0x1cc arch/arm64/kvm/../../../virt/kvm/coalesced_mmio.c:146
+ kvm_vm_ioctl+0x7e8/0x14c4 arch/arm64/kvm/../../../virt/kvm/kvm_main.c:3746
+ vfs_ioctl fs/ioctl.c:48 [inline]
+ __do_sys_ioctl fs/ioctl.c:753 [inline]
+ __se_sys_ioctl fs/ioctl.c:739 [inline]
+ __arm64_sys_ioctl+0xf88/0x131c fs/ioctl.c:739
+ __invoke_syscall arch/arm64/kernel/syscall.c:36 [inline]
+ invoke_syscall arch/arm64/kernel/syscall.c:48 [inline]
+ el0_svc_common arch/arm64/kernel/syscall.c:158 [inline]
+ do_el0_svc+0x120/0x290 arch/arm64/kernel/syscall.c:220
+ el0_svc+0x1c/0x28 arch/arm64/kernel/entry-common.c:367
+ el0_sync_handler+0x98/0x170 arch/arm64/kernel/entry-common.c:383
+ el0_sync+0x140/0x180 arch/arm64/kernel/entry.S:670
+
+Freed by task 4269:
+ stack_trace_save+0x80/0xb8 kernel/stacktrace.c:121
+ kasan_save_stack mm/kasan/common.c:48 [inline]
+ kasan_set_track+0x38/0x6c mm/kasan/common.c:56
+ kasan_set_free_info+0x20/0x40 mm/kasan/generic.c:355
+ __kasan_slab_free+0x124/0x150 mm/kasan/common.c:422
+ kasan_slab_free+0x10/0x1c mm/kasan/common.c:431
+ slab_free_hook mm/slub.c:1544 [inline]
+ slab_free_freelist_hook mm/slub.c:1577 [inline]
+ slab_free mm/slub.c:3142 [inline]
+ kfree+0x104/0x38c mm/slub.c:4124
+ coalesced_mmio_destructor+0x94/0xa4 arch/arm64/kvm/../../../virt/kvm/coalesced_mmio.c:102
+ kvm_iodevice_destructor include/kvm/iodev.h:61 [inline]
+ kvm_io_bus_unregister_dev+0x248/0x280 arch/arm64/kvm/../../../virt/kvm/kvm_main.c:4374
+ kvm_vm_ioctl_unregister_coalesced_mmio+0x158/0x1ec arch/arm64/kvm/../../../virt/kvm/coalesced_mmio.c:186
+ kvm_vm_ioctl+0xe30/0x14c4 arch/arm64/kvm/../../../virt/kvm/kvm_main.c:3755
+ vfs_ioctl fs/ioctl.c:48 [inline]
+ __do_sys_ioctl fs/ioctl.c:753 [inline]
+ __se_sys_ioctl fs/ioctl.c:739 [inline]
+ __arm64_sys_ioctl+0xf88/0x131c fs/ioctl.c:739
+ __invoke_syscall arch/arm64/kernel/syscall.c:36 [inline]
+ invoke_syscall arch/arm64/kernel/syscall.c:48 [inline]
+ el0_svc_common arch/arm64/kernel/syscall.c:158 [inline]
+ do_el0_svc+0x120/0x290 arch/arm64/kernel/syscall.c:220
+ el0_svc+0x1c/0x28 arch/arm64/kernel/entry-common.c:367
+ el0_sync_handler+0x98/0x170 arch/arm64/kernel/entry-common.c:383
+ el0_sync+0x140/0x180 arch/arm64/kernel/entry.S:670
+
+If kvm_io_bus_unregister_dev() return -ENOMEM, we already call kvm_iodevice_destructor()
+inside this function to delete 'struct kvm_coalesced_mmio_dev *dev' from list
+and free the dev, but kvm_iodevice_destructor() is called again, it will lead
+the above issue.
+
+Let's check the the return value of kvm_io_bus_unregister_dev(), only call
+kvm_iodevice_destructor() if the return value is 0.
+
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: kvm@vger.kernel.org
+Reported-by: Hulk Robot <hulkci@huawei.com>
+Signed-off-by: Kefeng Wang <wangkefeng.wang@huawei.com>
+Message-Id: <20210626070304.143456-1-wangkefeng.wang@huawei.com>
+Cc: stable@vger.kernel.org
+Fixes: 5d3c4c79384a ("KVM: Stop looking for coalesced MMIO zones if the bus is destroyed", 2021-04-20)
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+---
+ virt/kvm/coalesced_mmio.c |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+--- a/virt/kvm/coalesced_mmio.c
++++ b/virt/kvm/coalesced_mmio.c
+@@ -186,7 +186,6 @@ int kvm_vm_ioctl_unregister_coalesced_mm
+ 		    coalesced_mmio_in_range(dev, zone->addr, zone->size)) {
+ 			r = kvm_io_bus_unregister_dev(kvm,
+ 				zone->pio ? KVM_PIO_BUS : KVM_MMIO_BUS, &dev->dev);
+-			kvm_iodevice_destructor(&dev->dev);
+ 
+ 			/*
+ 			 * On failure, unregister destroys all devices on the
+@@ -196,6 +195,7 @@ int kvm_vm_ioctl_unregister_coalesced_mm
+ 			 */
+ 			if (r)
+ 				break;
++			kvm_iodevice_destructor(&dev->dev);
+ 		}
+ 	}
+ 
+
 
