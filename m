@@ -2,191 +2,177 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 007763CD486
-	for <lists+kvm@lfdr.de>; Mon, 19 Jul 2021 14:17:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 66A073CD4D7
+	for <lists+kvm@lfdr.de>; Mon, 19 Jul 2021 14:35:09 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236906AbhGSLgy (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 19 Jul 2021 07:36:54 -0400
-Received: from mail-bn8nam12on2068.outbound.protection.outlook.com ([40.107.237.68]:53089
-        "EHLO NAM12-BN8-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S236758AbhGSLgx (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 19 Jul 2021 07:36:53 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Yb1tkqwzyWJvM6fV1SLDcsfzlBdD3J6RUTiSorGOB/4H0EzD5qjHAq0q486FOns8ygaJ6cmfHTeSJadWo2YR32zyFY/kiI4G/tjxXD4IVkyYdFsktTM3PTAPSDhmenN6ZgJFmSXE8p5820NxrVl8FKn4TmsQqqVUxASPAZoEMYMPPWnbEcQuCNvONojF+JVZ41y3y5QMgHW4wfyenwk8Ya5EpcGmu0Uez6ZDqRVW1CEintbXuv8fwzN9xwn/tdpifReIEBAHZmloiUvL1LUgeo9A3uqtlLYNyVq4IP8FalcF/nIMnblSsxbuFMjZ9Wzyr9Iv/tps7InQdE8f0ODNSg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Er6h1P4BRntWXmKNpRsCtmjD3qBOzKa8IZbD3A9EC7k=;
- b=iPGrkh8alL4QPhS8/lHRPIepmmvV51frMnifDh0vrbBoKow7SAcJzMV0Z56bZe26KO6Os4T7Mzb44hCnt8k6qgZkPG6lHNJMGj/ktmNDQEUmoLx66Br24cmf6v0s0V+F1t7fa4MDwBaiGfSanBHygLQxzHNgSCWT9LGO+C0OyuBcndnHFHZr//m4BCgxxiJWvaXHcKG34eBBWcmayII224pxLwrZxkpyCABIIqIIyJE2CKt5NWwylgRAbgrcSTUeRZ8K7FrIYq50/EQmkXl1uytojpZgw4fIEXh7j70Cjs1quhhnhTPBbWfKb7OGZQM2gv1/IQ1YiHqbCZSWueWhqQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Er6h1P4BRntWXmKNpRsCtmjD3qBOzKa8IZbD3A9EC7k=;
- b=gREkG0ediQCpYxT6Q4pJDiNNiX2uj2pjuqg1cg6NM9llJSYlhv2g0rnU+TYpPHzZInKeeSJI40vI9n5HDsGK2YbSExD27/gsQyaiD4l0hL6ygUQHiEGn11z4aspl2Gu1JNkuvn8SgCgNru7Zgv7UVtDLdAmzn21WX706VP/gUzZPln5hicSbAhUU34wcP0SgBjGT0CKJzXpu9s5Wq4onCTfJO2mu43xL/VCjwEjlzwNR2AtrlakOquBLOTG+R+IzQvggwSnX18szz4G3m7BgmCSSCgEJrqaItpG55hikK0/lROE/8OGvvszYX75XPBQS4udcBb7tetH/3i3FllS6ew==
-Authentication-Results: redhat.com; dkim=none (message not signed)
- header.d=none;redhat.com; dmarc=none action=none header.from=nvidia.com;
-Received: from BL0PR12MB5506.namprd12.prod.outlook.com (2603:10b6:208:1cb::22)
- by BL1PR12MB5192.namprd12.prod.outlook.com (2603:10b6:208:311::16) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4331.21; Mon, 19 Jul
- 2021 12:17:32 +0000
-Received: from BL0PR12MB5506.namprd12.prod.outlook.com
- ([fe80::d017:af2f:7049:5482]) by BL0PR12MB5506.namprd12.prod.outlook.com
- ([fe80::d017:af2f:7049:5482%5]) with mapi id 15.20.4331.033; Mon, 19 Jul 2021
- 12:17:32 +0000
-Date:   Mon, 19 Jul 2021 09:17:30 -0300
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     Cornelia Huck <cohuck@redhat.com>
-Cc:     David Airlie <airlied@linux.ie>,
-        Tony Krowiak <akrowiak@linux.ibm.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Daniel Vetter <daniel@ffwll.ch>,
-        Diana Craciun <diana.craciun@oss.nxp.com>,
-        dri-devel@lists.freedesktop.org,
-        Eric Auger <eric.auger@redhat.com>,
-        Eric Farman <farman@linux.ibm.com>,
-        Harald Freudenberger <freude@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        intel-gfx@lists.freedesktop.org,
-        intel-gvt-dev@lists.freedesktop.org,
-        Jani Nikula <jani.nikula@linux.intel.com>,
-        Jason Herne <jjherne@linux.ibm.com>,
-        Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
-        kvm@vger.kernel.org, Kirti Wankhede <kwankhede@nvidia.com>,
-        linux-doc@vger.kernel.org, linux-s390@vger.kernel.org,
-        Matthew Rosato <mjrosato@linux.ibm.com>,
-        Peter Oberparleiter <oberpar@linux.ibm.com>,
-        Halil Pasic <pasic@linux.ibm.com>,
-        Rodrigo Vivi <rodrigo.vivi@intel.com>,
-        Vineeth Vijayan <vneethv@linux.ibm.com>,
-        Zhenyu Wang <zhenyuw@linux.intel.com>,
-        Zhi Wang <zhi.a.wang@intel.com>,
-        "Raj, Ashok" <ashok.raj@intel.com>, Christoph Hellwig <hch@lst.de>,
-        Leon Romanovsky <leonro@nvidia.com>,
-        Max Gurtovoy <mgurtovoy@nvidia.com>,
-        Yishai Hadas <yishaih@nvidia.com>
-Subject: Re: [PATCH 02/13] vfio: Introduce a vfio_uninit_group_dev() API call
-Message-ID: <20210719121730.GP543781@nvidia.com>
-References: <2-v1-eaf3ccbba33c+1add0-vfio_reflck_jgg@nvidia.com>
- <8735sabj0l.fsf@redhat.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <8735sabj0l.fsf@redhat.com>
-X-ClientProxiedBy: BL1PR13CA0090.namprd13.prod.outlook.com
- (2603:10b6:208:2b8::35) To BL0PR12MB5506.namprd12.prod.outlook.com
- (2603:10b6:208:1cb::22)
+        id S236690AbhGSLy0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 19 Jul 2021 07:54:26 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:12570 "EHLO
+        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S231388AbhGSLyZ (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 19 Jul 2021 07:54:25 -0400
+Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 16JCXkaJ119961;
+        Mon, 19 Jul 2021 08:34:55 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=2wMrOmOaMfVeFVX7tNb5AIsXI9mO7cENkLTsH3g4nNE=;
+ b=PsE7PE+B6AVN4YkQYybLkXpNnK/T2zYj/pZLzMdefyOxY3TklaXLwV6RVQs3aSvn76M5
+ 75tUCUSg9pfTZEMhlxXeeATHLKtWyOotsMYnBNqQu2xE9SG10k4wpldTdFkEoGKJ9Cck
+ /o220vZnKSfsLb/Szo4HQ1FO7UT7ZRZA8mMRDbSuoDbEb3fUcvxcEs4CdOxysvXd9oAV
+ 8R3U6tS6Bzvpe56NmbZlHS1+8pmQSui9XEBb+DcWYWcr/YZzEW5OXO5iqEAsakkRdOvd
+ EAsR7HSuSEb9DdI0HdHJKcdOYej/prWQx7bixC/Oig4B9SPEKnGxcNItbB9+m4Dzv6i9 JQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 39w7ykugej-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 19 Jul 2021 08:34:55 -0400
+Received: from m0127361.ppops.net (m0127361.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 16JCXll3119999;
+        Mon, 19 Jul 2021 08:34:54 -0400
+Received: from ppma02dal.us.ibm.com (a.bd.3ea9.ip4.static.sl-reverse.com [169.62.189.10])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 39w7ykugdx-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 19 Jul 2021 08:34:54 -0400
+Received: from pps.filterd (ppma02dal.us.ibm.com [127.0.0.1])
+        by ppma02dal.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 16JCSs1a031965;
+        Mon, 19 Jul 2021 12:34:53 GMT
+Received: from b01cxnp23033.gho.pok.ibm.com (b01cxnp23033.gho.pok.ibm.com [9.57.198.28])
+        by ppma02dal.us.ibm.com with ESMTP id 39vuk3x47p-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 19 Jul 2021 12:34:53 +0000
+Received: from b01ledav002.gho.pok.ibm.com (b01ledav002.gho.pok.ibm.com [9.57.199.107])
+        by b01cxnp23033.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 16JCYqi936372798
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 19 Jul 2021 12:34:52 GMT
+Received: from b01ledav002.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id A395812405A;
+        Mon, 19 Jul 2021 12:34:52 +0000 (GMT)
+Received: from b01ledav002.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id E9197124054;
+        Mon, 19 Jul 2021 12:34:48 +0000 (GMT)
+Received: from [9.65.195.237] (unknown [9.65.195.237])
+        by b01ledav002.gho.pok.ibm.com (Postfix) with ESMTP;
+        Mon, 19 Jul 2021 12:34:48 +0000 (GMT)
+Subject: Re: [RFC PATCH 4/6] i386/sev: add the SNP launch start context
+To:     Brijesh Singh <brijesh.singh@amd.com>, qemu-devel@nongnu.org
+Cc:     Connor Kuehl <ckuehl@redhat.com>,
+        =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+        "Michael S . Tsirkin" <mst@redhat.com>,
+        James Bottomley <jejb@linux.ibm.com>,
+        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        David Gibson <david@gibson.dropbear.id.au>,
+        =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
+        kvm@vger.kernel.org, Michael Roth <michael.roth@amd.com>,
+        Eduardo Habkost <ehabkost@redhat.com>,
+        Dov Murik <dovmurik@linux.ibm.com>
+References: <20210709215550.32496-1-brijesh.singh@amd.com>
+ <20210709215550.32496-5-brijesh.singh@amd.com>
+From:   Dov Murik <dovmurik@linux.ibm.com>
+Message-ID: <d38d99dd-0248-bc96-cb4d-82ec8cc782f2@linux.ibm.com>
+Date:   Mon, 19 Jul 2021 15:34:47 +0300
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.12.0
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from mlx.ziepe.ca (142.162.113.129) by BL1PR13CA0090.namprd13.prod.outlook.com (2603:10b6:208:2b8::35) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4352.11 via Frontend Transport; Mon, 19 Jul 2021 12:17:31 +0000
-Received: from jgg by mlx with local (Exim 4.94)        (envelope-from <jgg@nvidia.com>)        id 1m5SDC-004Oww-Po; Mon, 19 Jul 2021 09:17:30 -0300
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: a1826334-edac-42c9-cc23-08d94aaf2ee8
-X-MS-TrafficTypeDiagnostic: BL1PR12MB5192:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <BL1PR12MB5192FA9FB1996E6EFBC1D113C2E19@BL1PR12MB5192.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:8882;
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: vfbphvBZgEDojfh2ZkX8FHGy6XIIK7qN+q7RzAIoUGTtspXwl94qaHLgq8QaefAwDVf+lISsioD01zB70a2xPLQezeiIsaLLsUlbRQnt8YvRgh7GGMsb+Y8lU+YAvj7mOTgsLFI4xSVU4Zfv/CzDnpZpu1Gp7xSPoeFwdAPmZ0hkSVuV+KZ5p0osEln7c53kBkNmUgfmcQe70t6juWhRCxzah/FPxq+C8s5SToZbSenkenDzMzh/JHMrurGuEg25EklUmpVbEVYQzHP+yDOunT9uNPoYxaCn508xyPDtLqJhSV7SLDZN7mNTTPZzhgp8T/+4AArZYHDsKVZMq8+JZPYBz2bViqsOwy7QD4BMtJ4D9QeLlgNNogC7eMzT4aYaMYIJXTJ5+wsNDqn9eS3KNWFYcG31FVP+QM/j8FL6BQYV1ZOIhJGxM9pgCD1tTrsqXVoFO03BBFu/5+7Xrs0knNu/opmaCVnUpukk5krbZu6OQeXGSw/Q1HmeY0IWDivln24XsR1Bg7eA/tDEcQPb6MUbS6jv3IjKptDHSbq6/GoF30SnHG6eMNilvVDVKCXcNeWnCVztt7YyG+sICywNjPHmn/nyLfvrXHYMhGvD5lnKCIgPlhIMbVbvr4FeAmdCtkio7E2E7DpWsxJT6lQfX6zipKvFOBmtCB5N8kpvtTJsPD0QIB0GUndy6Sp5NjoIUDPWlUQUAll/9unUeFI+0A==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL0PR12MB5506.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(346002)(39860400002)(396003)(136003)(376002)(366004)(8936002)(1076003)(36756003)(8676002)(5660300002)(107886003)(2616005)(66946007)(66476007)(66556008)(6916009)(38100700002)(426003)(83380400001)(26005)(4326008)(86362001)(7416002)(478600001)(7406005)(186003)(2906002)(316002)(33656002)(9786002)(9746002)(54906003)(27376004);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?ms0XHKCDVxPO8H+Ic4dR39XdggPfVQ/017drGafk33L3jQb1cIF8M27XKFOa?=
- =?us-ascii?Q?19I3NZL5fBC47vsX+0zNCXE4EF18Zcj10pu1GCkV/14DgKno2pO/PhJnsQVC?=
- =?us-ascii?Q?vNRKWanTKh4sN4WvvjMMbHKXwtCLgVNfdnftqEbKujzLrgrzjU3NRC0hccZa?=
- =?us-ascii?Q?7GXSc7QIRyEc1PKSJZYh2xoU5CN6R1okCtjlyufG7euq3anqLJYUKRZZuIA7?=
- =?us-ascii?Q?6I3JiJ9pCnhqUM/rLduV4CkjX+QYcEkjii7tQQABggG1jGTnjwWeqIdZt59S?=
- =?us-ascii?Q?bErA8iF6/1NXzZpsVV7oGFJdtuzY7NV//i0nXPRB34h330wiuommWJdpFo+l?=
- =?us-ascii?Q?n263PrN6vaGKs43nfSiYZvQhFTsAhZ5nqgQNeJ/RCZUKDaatETDkQvAVa+wr?=
- =?us-ascii?Q?q8tr6tA0lXHtrXrqw5py2bGReCIhSNQ/6tuIuSPLHGZzvnghV5o3HMRnVYMi?=
- =?us-ascii?Q?DdUkieq00K2ubB4ZcKWVtZDgRWbI5XTaKfNMf9kltlvPxGg/TZzvr6az2tjz?=
- =?us-ascii?Q?SxmC8++VRzyUUMyWBCp5xuG2YAdmH/RHBZ7ZFrf4iq7oWTVYGrry2gn2JBlW?=
- =?us-ascii?Q?BUrBDS94i9YEracIMvv3RZwxw4oj5CFV3DJ6Yu1WQfwgyoM8oG9Ej0p6cdga?=
- =?us-ascii?Q?lNlC+gfiolMYOJaiYVR/4Uu2wKKX1NL4MaHnofdpf0vWrjCjeMvtNzevPMLG?=
- =?us-ascii?Q?oWFb+AxjA5o1SF2R9SNtZSkv+YdGzv2HAstcjD6koGCblNz6+jbqYG95Mpt1?=
- =?us-ascii?Q?rMlRV4bEADeu8T6WTrDaHfSnfjkj3xMwg2XLmbPMoQWYe5ZcZ0wcmDoeC+tt?=
- =?us-ascii?Q?XMrKMJmDsPWI0zjlmBbbckKqZDlmekDyB6uN3qRGvakTFWONoO2zfE5wpxaY?=
- =?us-ascii?Q?lyogP7cFI9Bk5DgjJNW80K2F3h2vbGIX7yhTTalyQRL1AXoPtn5vz11HvT65?=
- =?us-ascii?Q?KfCV0PzhNxnfkBiZ6SUiz3CAz1SadrpUEkzyP/CgttVAhXOZitPTsdGDf+eO?=
- =?us-ascii?Q?VekwEr7K/ZX474McMbGgbTK+HAtVL7/CnY//WdcUgMtp4XAxEjF4YvCEsRXg?=
- =?us-ascii?Q?p/VGZ9D3thd675NxJk4GdllfOzNh7QN8JmFXj5twmPIEeaPXQy97otOug32D?=
- =?us-ascii?Q?ByALN/0NfNOMU/yIz7VOAL4BS2+Rf4Nk5A5K9Bv7MRll6dAC1l8mzc0nN9it?=
- =?us-ascii?Q?6DzwbkPKOhF3fE6xpsXqQfb5Nh7dy1ZDCwkCMgrDNvF4N6L6fyPjbjyw4F/S?=
- =?us-ascii?Q?qf+JuOC3b5zX6XXd2YcZAzoM0Pde1SR1DCjyu1pvkpc/UIEv2l5rNQJjBeRP?=
- =?us-ascii?Q?T3AMMOA/UUIuwSvTVOh7PmAB?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: a1826334-edac-42c9-cc23-08d94aaf2ee8
-X-MS-Exchange-CrossTenant-AuthSource: BL0PR12MB5506.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Jul 2021 12:17:31.9642
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: DmIlKk61YhN4HKQgvc5WLZmHlIRWY0GmZ1jNcrEJckSypuh5l0ovqvW4v6sBtLgB
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL1PR12MB5192
+In-Reply-To: <20210709215550.32496-5-brijesh.singh@amd.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: mzMUnhXLv0GHVr23VtPdoX38i_7122-u
+X-Proofpoint-ORIG-GUID: wwY5Lok3vEV7-sSpUstUjp4CpIrosZSa
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.790
+ definitions=2021-07-19_05:2021-07-19,2021-07-19 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015
+ priorityscore=1501 malwarescore=0 impostorscore=0 mlxscore=0 phishscore=0
+ adultscore=0 spamscore=0 lowpriorityscore=0 bulkscore=0 mlxlogscore=999
+ suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2104190000 definitions=main-2107190072
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Jul 19, 2021 at 02:11:38PM +0200, Cornelia Huck wrote:
-> On Wed, Jul 14 2021, Jason Gunthorpe <jgg@nvidia.com> wrote:
-> 
-> > From: Max Gurtovoy <mgurtovoy@nvidia.com>
-> >
-> > This pairs with vfio_init_group_dev() and allows undoing any state that is
-> > stored in the vfio_device unrelated to registration. Add appropriately
-> > placed calls to all the drivers.
-> >
-> > The following patch will use this to add pre-registration state for the
-> > device set.
-> >
-> > Signed-off-by: Max Gurtovoy <mgurtovoy@nvidia.com>
-> > Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
-> >  Documentation/driver-api/vfio.rst            |  4 ++-
-> >  drivers/vfio/fsl-mc/vfio_fsl_mc.c            |  6 +++--
-> >  drivers/vfio/mdev/vfio_mdev.c                | 13 +++++++---
-> >  drivers/vfio/pci/vfio_pci.c                  |  6 +++--
-> >  drivers/vfio/platform/vfio_platform_common.c |  7 +++--
-> >  drivers/vfio/vfio.c                          |  5 ++++
-> >  include/linux/vfio.h                         |  1 +
-> >  samples/vfio-mdev/mbochs.c                   |  2 ++
-> >  samples/vfio-mdev/mdpy.c                     | 25 ++++++++++--------
-> >  samples/vfio-mdev/mtty.c                     | 27 ++++++++++++--------
-> >  10 files changed, 64 insertions(+), 32 deletions(-)
-> 
-> (...)
-> 
-> > diff --git a/samples/vfio-mdev/mbochs.c b/samples/vfio-mdev/mbochs.c
-> > index e81b875b4d87b4..cf264d0bf11053 100644
-> > +++ b/samples/vfio-mdev/mbochs.c
-> > @@ -558,6 +558,7 @@ static int mbochs_probe(struct mdev_device *mdev)
-> >  	return 0;
-> >  
-> >  err_mem:
-> > +	vfio_uninit_group_dev(&mdev_state->vdev);
-> >  	kfree(mdev_state->vconfig);
-> >  	kfree(mdev_state);
-> >  	return ret;
+Hi Brijesh,
 
-Doesn't this leak pages? Sigh.
-
-> > @@ -571,6 +572,7 @@ static void mbochs_remove(struct mdev_device *mdev)
-> >  	vfio_unregister_group_dev(&mdev_state->vdev);
-> >  	kfree(mdev_state->pages);
-> >  	kfree(mdev_state->vconfig);
-> > +	vfio_uninit_group_dev(&mdev_state->vdev);
+On 10/07/2021 0:55, Brijesh Singh wrote:
+> The SNP_LAUNCH_START is called first to create a cryptographic launch
+> context within the firmware.
 > 
-> Does the location of the uninit vs the kfree matter? Even if not, it
-> might be good to keep it consistent.
+> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
+> ---
+>  target/i386/sev.c        | 30 +++++++++++++++++++++++++++++-
+>  target/i386/trace-events |  1 +
+>  2 files changed, 30 insertions(+), 1 deletion(-)
+> 
+> diff --git a/target/i386/sev.c b/target/i386/sev.c
+> index 84ae244af0..259408a8f1 100644
+> --- a/target/i386/sev.c
+> +++ b/target/i386/sev.c
+> @@ -812,6 +812,29 @@ sev_read_file_base64(const char *filename, guchar **data, gsize *len)
+>      return 0;
+>  }
+>  
+> +static int
+> +sev_snp_launch_start(SevGuestState *sev)
+> +{
+> +    int ret = 1;
+> +    int fw_error, rc;
+> +    struct kvm_sev_snp_launch_start *start = &sev->snp_config.start;
+> +
+> +    trace_kvm_sev_snp_launch_start(start->policy);
+> +
+> +    rc = sev_ioctl(sev->sev_fd, KVM_SEV_SNP_LAUNCH_START, start, &fw_error);
+> +    if (rc < 0) {
+> +        error_report("%s: SNP_LAUNCH_START ret=%d fw_error=%d '%s'",
+> +                __func__, ret, fw_error, fw_error_to_str(fw_error));
 
-It does not, but I will reorder it anyhow
+Did you mean to report the value of ret or rc?
 
-Jason
+
+> +        goto out;
+
+Suggestion:
+
+Remove the `ret` variable.
+Here: simply `return 1`.
+At the end: remove the `out:` label; simply `return 0`.
+
+
+> +    }
+> +
+> +    sev_set_guest_state(sev, SEV_STATE_LAUNCH_UPDATE);
+> +    ret = 0;
+> +
+> +out:
+> +    return ret;
+> +}
+> +
+>  static int
+>  sev_launch_start(SevGuestState *sev)
+>  {
+> @@ -1105,7 +1128,12 @@ int sev_kvm_init(ConfidentialGuestSupport *cgs, Error **errp)
+>          goto err;
+>      }
+>  
+> -    ret = sev_launch_start(sev);
+> +    if (sev_snp_enabled()) {
+> +        ret = sev_snp_launch_start(sev);
+> +    } else {
+> +        ret = sev_launch_start(sev);
+> +    }
+> +
+>      if (ret) {
+>          error_setg(errp, "%s: failed to create encryption context", __func__);
+>          goto err;
+> diff --git a/target/i386/trace-events b/target/i386/trace-events
+> index 2cd8726eeb..18cc14b956 100644
+> --- a/target/i386/trace-events
+> +++ b/target/i386/trace-events
+> @@ -11,3 +11,4 @@ kvm_sev_launch_measurement(const char *value) "data %s"
+>  kvm_sev_launch_finish(void) ""
+>  kvm_sev_launch_secret(uint64_t hpa, uint64_t hva, uint64_t secret, int len) "hpa 0x%" PRIx64 " hva 0x%" PRIx64 " data 0x%" PRIx64 " len %d"
+>  kvm_sev_attestation_report(const char *mnonce, const char *data) "mnonce %s data %s"
+> +kvm_sev_snp_launch_start(uint64_t policy) "policy 0x%" PRIx64
+> 
