@@ -2,57 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id F23E43CCDEF
-	for <lists+kvm@lfdr.de>; Mon, 19 Jul 2021 08:31:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D2FAE3CCDF1
+	for <lists+kvm@lfdr.de>; Mon, 19 Jul 2021 08:31:47 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234171AbhGSGee (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 19 Jul 2021 02:34:34 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:47776 "EHLO
+        id S234345AbhGSGep (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 19 Jul 2021 02:34:45 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:23476 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S233048AbhGSGee (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 19 Jul 2021 02:34:34 -0400
+        by vger.kernel.org with ESMTP id S233048AbhGSGeo (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 19 Jul 2021 02:34:44 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1626676294;
+        s=mimecast20190719; t=1626676304;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=+196Kfl7I/cOggKI9/d0VaO8T5ekNSjAsbN7j2ytW0I=;
-        b=DYDqEtkDcmtAFVTBbcWk+rI8OW8CkRjagF+0reqs0jXdOJUUqcthFrNiirJyZ/Moj4CioO
-        D/CCPH7/vxFxGemBatsgjqw7K9WujauhREZ8A8ptesTxAX6BkQOWRmEzhvYYEeQlsK+jMO
-        uyJtSTnL//GagGYepc3kuED0C9CZit4=
-Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
- [209.85.218.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-159-gPQHd34hNy2KwqU2Yug8uQ-1; Mon, 19 Jul 2021 02:31:33 -0400
-X-MC-Unique: gPQHd34hNy2KwqU2Yug8uQ-1
-Received: by mail-ej1-f72.google.com with SMTP id bl17-20020a170906c251b029052292d7c3b4so4858049ejb.9
-        for <kvm@vger.kernel.org>; Sun, 18 Jul 2021 23:31:32 -0700 (PDT)
+        bh=sDl9zJ8yJigPizUQxq5VDfedGB5Y2mU/bObQ9LMf+NY=;
+        b=gUQKFzVvF5M3lxyEmJpdtrfsz/7OWEVfY5ZBubdeBv2QHhrlvxuZ/iM9vUZnq+10eN6jdw
+        EMeS8lYzDn6IO+VUlY9exNZOe/+S67I2dEUMlB33nXE7lmJQFocLmLqObYCQ6y7Y+74luC
+        fSNnYR57sQmv3L8NKEsPT5Jv9TFtD6Y=
+Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
+ [209.85.208.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-122-PiUcYVZINui7BSlVU_s8TA-1; Mon, 19 Jul 2021 02:31:43 -0400
+X-MC-Unique: PiUcYVZINui7BSlVU_s8TA-1
+Received: by mail-ed1-f71.google.com with SMTP id g23-20020aa7c8570000b02903954c05c938so3121239edt.3
+        for <kvm@vger.kernel.org>; Sun, 18 Jul 2021 23:31:43 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=+196Kfl7I/cOggKI9/d0VaO8T5ekNSjAsbN7j2ytW0I=;
-        b=kw3eSpj6UccXg/cbhnwCkAKz56eEPNRb03vKcWh43XuNWPoe9qp3/b4AVn6n60BnRA
-         geKI8sTXDFEzaMT66P+wnrI48BOXt6OPtAoHep1rwiGI7kN6cgzU7yKVGiqzdMXuxj2O
-         CPsHxm6JHiYVtjfWyh+edjpBYa4u3d2ZNwoMZexuE8BFgwzjH9n9qtKDK+K4Cp3K0+xU
-         sWPTmdaMe6269wuFfiBkHGx/nbba/0TIfJSmED3m9t2IprLtfdg3MLRpgZC2Fw9eOpxh
-         Vmv7f+eeNAJBxXfEarDVUJwic7xRkPfb+0XfZpzIZH66UTo/Yv6HVvPhXX+jm0OdDupd
-         tWOQ==
-X-Gm-Message-State: AOAM533HDV8LNp3fkbdDXD25H9J0QVV0T688l6iiZwwO3wAKu+QfyhvV
-        d16ZxFUoCaianf/zl6ODnMEZHYC8N4yHgym/B53Wx8XtBjmq9us2nei3+CJdLw6pZ/4hkiP6vGX
-        ewTF0eINy5eBW
-X-Received: by 2002:a17:906:5f99:: with SMTP id a25mr26054141eju.101.1626676292000;
-        Sun, 18 Jul 2021 23:31:32 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwOvrTC0xug9PjA728zKCBsRdaYWyJcTPeNv01/Z04ULpdx8WvrT0arC7Gk/HA8qvC4THAFuA==
-X-Received: by 2002:a17:906:5f99:: with SMTP id a25mr26054125eju.101.1626676291767;
-        Sun, 18 Jul 2021 23:31:31 -0700 (PDT)
+        bh=sDl9zJ8yJigPizUQxq5VDfedGB5Y2mU/bObQ9LMf+NY=;
+        b=hHxnSObWQOTsEk0bi9qJsm8mt1UFKV+wVVcEvR3/5Gf4mI4mZ5Fgp+QZi/evClwkcT
+         nEXUU03bnKBbNNNYIQRmoXUc1GTqV4Gso2MmkcrpKY1Lkr1nKb+ftcG/NDh0erA1vkBI
+         Sm/ujS6tIJXDaq458dwz52Wj1a0rk8JH13IRaUD7DLQsb5mqEdePK28vJGq/eAZsHzbQ
+         RGH2O0d9Dv3Vy/V3mPPcXPOCQdc9AfcosZ+4VvqXcWtgpjQLOp5vdNM7MBu10AkTlYeU
+         R/vwbOrWkXFBjJ31r1VEIffPP338XDUbViHVRbrI7I4qgohQPFD1Jb/a9NomjtTkQr6i
+         9YeA==
+X-Gm-Message-State: AOAM530Y1QYHo+JWjIhED3v5RMk7lVcfydIa8waHjDJE29oEg7R6u2+D
+        9HmW65kGy2n5s2fFFqeFFfiNLSo2NTse5Rp45x+NxbOvb23T8KQd9jmWbe1EeDM984V3HYlmzxT
+        DWaURo37lRSU5
+X-Received: by 2002:a05:6402:692:: with SMTP id f18mr33054710edy.327.1626676302243;
+        Sun, 18 Jul 2021 23:31:42 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJy03G7eb3Ni5bq5T+4u9WmKa5rbbWmLEfjZhNZllL+I9GCy7NjuQxCbsv+toB/S7ycv5irrnA==
+X-Received: by 2002:a05:6402:692:: with SMTP id f18mr33054692edy.327.1626676302062;
+        Sun, 18 Jul 2021 23:31:42 -0700 (PDT)
 Received: from ?IPv6:2001:b07:6468:f312:63a7:c72e:ea0e:6045? ([2001:b07:6468:f312:63a7:c72e:ea0e:6045])
-        by smtp.gmail.com with ESMTPSA id f20sm5511280ejz.30.2021.07.18.23.31.30
+        by smtp.gmail.com with ESMTPSA id i10sm7237674edf.12.2021.07.18.23.31.40
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 18 Jul 2021 23:31:31 -0700 (PDT)
-Subject: Re: [PATCH 1/5] KVM: arm64: Walk userspace page tables to compute the
- THP mapping size
+        Sun, 18 Jul 2021 23:31:41 -0700 (PDT)
+Subject: Re: [PATCH 3/5] KVM: Remove kvm_is_transparent_hugepage() and
+ PageTransCompoundMap()
 To:     Marc Zyngier <maz@kernel.org>,
         linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org,
         kvmarm@lists.cs.columbia.edu, linux-mm@kvack.org
@@ -65,14 +65,14 @@ Cc:     Sean Christopherson <seanjc@google.com>,
         Alexandru Elisei <alexandru.elisei@arm.com>,
         kernel-team@android.com
 References: <20210717095541.1486210-1-maz@kernel.org>
- <20210717095541.1486210-2-maz@kernel.org>
+ <20210717095541.1486210-4-maz@kernel.org>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <c04fc75d-0f2a-3a3f-f698-eaf5e2aa00bd@redhat.com>
-Date:   Mon, 19 Jul 2021 08:31:30 +0200
+Message-ID: <fc371325-1e4c-b842-1b37-ec197175cb3b@redhat.com>
+Date:   Mon, 19 Jul 2021 08:31:40 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.11.0
 MIME-Version: 1.0
-In-Reply-To: <20210717095541.1486210-2-maz@kernel.org>
+In-Reply-To: <20210717095541.1486210-4-maz@kernel.org>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -81,112 +81,86 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 On 17/07/21 11:55, Marc Zyngier wrote:
-> We currently rely on the kvm_is_transparent_hugepage() helper to
-> discover whether a given page has the potential to be mapped as
-> a block mapping.
-> 
-> However, this API doesn't really give un everything we want:
-> - we don't get the size: this is not crucial today as we only
->    support PMD-sized THPs, but we'd like to have larger sizes
->    in the future
-> - we're the only user left of the API, and there is a will
->    to remove it altogether
-> 
-> To address the above, implement a simple walker using the existing
-> page table infrastructure, and plumb it into transparent_hugepage_adjust().
-> No new page sizes are supported in the process.
+> Now that arm64 has stopped using kvm_is_transparent_hugepage(),
+> we can remove it, as well as PageTransCompoundMap() which was
+> only used by the former.
 > 
 > Signed-off-by: Marc Zyngier <maz@kernel.org>
-
-If it's okay for you to reuse the KVM page walker that's fine of course, 
-but the arch/x86/mm functions lookup_address_in_{mm,pgd} are mostly 
-machine-independent and it may make sense to move them to mm/.
-
-That would also allow reusing the x86 function host_pfn_mapping_level.
-
-Paolo
-
 > ---
->   arch/arm64/kvm/mmu.c | 46 ++++++++++++++++++++++++++++++++++++++++----
->   1 file changed, 42 insertions(+), 4 deletions(-)
+>   include/linux/page-flags.h | 37 -------------------------------------
+>   virt/kvm/kvm_main.c        | 10 ----------
+>   2 files changed, 47 deletions(-)
 > 
-> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> index 3155c9e778f0..db6314b93e99 100644
-> --- a/arch/arm64/kvm/mmu.c
-> +++ b/arch/arm64/kvm/mmu.c
-> @@ -433,6 +433,44 @@ int create_hyp_exec_mappings(phys_addr_t phys_addr, size_t size,
->   	return 0;
+> diff --git a/include/linux/page-flags.h b/include/linux/page-flags.h
+> index 5922031ffab6..1ace27c4a8e0 100644
+> --- a/include/linux/page-flags.h
+> +++ b/include/linux/page-flags.h
+> @@ -632,43 +632,6 @@ static inline int PageTransCompound(struct page *page)
+>   	return PageCompound(page);
 >   }
 >   
-> +static struct kvm_pgtable_mm_ops kvm_user_mm_ops = {
-> +	/* We shouldn't need any other callback to walk the PT */
-> +	.phys_to_virt		= kvm_host_va,
-> +};
-> +
-> +struct user_walk_data {
-> +	u32	level;
-> +};
-> +
-> +static int user_walker(u64 addr, u64 end, u32 level, kvm_pte_t *ptep,
-> +		       enum kvm_pgtable_walk_flags flag, void * const arg)
-> +{
-> +	struct user_walk_data *data = arg;
-> +
-> +	data->level = level;
-> +	return 0;
-> +}
-> +
-> +static int get_user_mapping_size(struct kvm *kvm, u64 addr)
-> +{
-> +	struct user_walk_data data;
-> +	struct kvm_pgtable pgt = {
-> +		.pgd		= (kvm_pte_t *)kvm->mm->pgd,
-> +		.ia_bits	= VA_BITS,
-> +		.start_level	= 4 - CONFIG_PGTABLE_LEVELS,
-> +		.mm_ops		= &kvm_user_mm_ops,
-> +	};
-> +	struct kvm_pgtable_walker walker = {
-> +		.cb		= user_walker,
-> +		.flags		= KVM_PGTABLE_WALK_LEAF,
-> +		.arg		= &data,
-> +	};
-> +
-> +	kvm_pgtable_walk(&pgt, ALIGN_DOWN(addr, PAGE_SIZE), PAGE_SIZE, &walker);
-> +
-> +	return BIT(ARM64_HW_PGTABLE_LEVEL_SHIFT(data.level));
-> +}
-> +
->   static struct kvm_pgtable_mm_ops kvm_s2_mm_ops = {
->   	.zalloc_page		= stage2_memcache_zalloc_page,
->   	.zalloc_pages_exact	= kvm_host_zalloc_pages_exact,
-> @@ -780,7 +818,7 @@ static bool fault_supports_stage2_huge_mapping(struct kvm_memory_slot *memslot,
->    * Returns the size of the mapping.
->    */
->   static unsigned long
-> -transparent_hugepage_adjust(struct kvm_memory_slot *memslot,
-> +transparent_hugepage_adjust(struct kvm *kvm, struct kvm_memory_slot *memslot,
->   			    unsigned long hva, kvm_pfn_t *pfnp,
->   			    phys_addr_t *ipap)
->   {
-> @@ -791,8 +829,8 @@ transparent_hugepage_adjust(struct kvm_memory_slot *memslot,
->   	 * sure that the HVA and IPA are sufficiently aligned and that the
->   	 * block map is contained within the memslot.
->   	 */
-> -	if (kvm_is_transparent_hugepage(pfn) &&
-> -	    fault_supports_stage2_huge_mapping(memslot, hva, PMD_SIZE)) {
-> +	if (fault_supports_stage2_huge_mapping(memslot, hva, PMD_SIZE) &&
-> +	    get_user_mapping_size(kvm, hva) >= PMD_SIZE) {
->   		/*
->   		 * The address we faulted on is backed by a transparent huge
->   		 * page.  However, because we map the compound huge page and
-> @@ -1051,7 +1089,7 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
->   	 * backed by a THP and thus use block mapping if possible.
->   	 */
->   	if (vma_pagesize == PAGE_SIZE && !(force_pte || device))
-> -		vma_pagesize = transparent_hugepage_adjust(memslot, hva,
-> +		vma_pagesize = transparent_hugepage_adjust(kvm, memslot, hva,
->   							   &pfn, &fault_ipa);
+> -/*
+> - * PageTransCompoundMap is the same as PageTransCompound, but it also
+> - * guarantees the primary MMU has the entire compound page mapped
+> - * through pmd_trans_huge, which in turn guarantees the secondary MMUs
+> - * can also map the entire compound page. This allows the secondary
+> - * MMUs to call get_user_pages() only once for each compound page and
+> - * to immediately map the entire compound page with a single secondary
+> - * MMU fault. If there will be a pmd split later, the secondary MMUs
+> - * will get an update through the MMU notifier invalidation through
+> - * split_huge_pmd().
+> - *
+> - * Unlike PageTransCompound, this is safe to be called only while
+> - * split_huge_pmd() cannot run from under us, like if protected by the
+> - * MMU notifier, otherwise it may result in page->_mapcount check false
+> - * positives.
+> - *
+> - * We have to treat page cache THP differently since every subpage of it
+> - * would get _mapcount inc'ed once it is PMD mapped.  But, it may be PTE
+> - * mapped in the current process so comparing subpage's _mapcount to
+> - * compound_mapcount to filter out PTE mapped case.
+> - */
+> -static inline int PageTransCompoundMap(struct page *page)
+> -{
+> -	struct page *head;
+> -
+> -	if (!PageTransCompound(page))
+> -		return 0;
+> -
+> -	if (PageAnon(page))
+> -		return atomic_read(&page->_mapcount) < 0;
+> -
+> -	head = compound_head(page);
+> -	/* File THP is PMD mapped and not PTE mapped */
+> -	return atomic_read(&page->_mapcount) ==
+> -	       atomic_read(compound_mapcount_ptr(head));
+> -}
+> -
+>   /*
+>    * PageTransTail returns true for both transparent huge pages
+>    * and hugetlbfs pages, so it should only be called when it's known
+> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> index 7d95126cda9e..2e410a8a6a67 100644
+> --- a/virt/kvm/kvm_main.c
+> +++ b/virt/kvm/kvm_main.c
+> @@ -189,16 +189,6 @@ bool kvm_is_reserved_pfn(kvm_pfn_t pfn)
+>   	return true;
+>   }
 >   
->   	if (fault_status != FSC_PERM && !device && kvm_has_mte(kvm)) {
+> -bool kvm_is_transparent_hugepage(kvm_pfn_t pfn)
+> -{
+> -	struct page *page = pfn_to_page(pfn);
+> -
+> -	if (!PageTransCompoundMap(page))
+> -		return false;
+> -
+> -	return is_transparent_hugepage(compound_head(page));
+> -}
+> -
+>   /*
+>    * Switches to specified vcpu, until a matching vcpu_put()
+>    */
 > 
+
+Acked-by: Paolo Bonzini <pbonzini@redhat.com>
 
