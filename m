@@ -2,122 +2,186 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A0E2F3CF130
-	for <lists+kvm@lfdr.de>; Tue, 20 Jul 2021 03:14:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 904693CF226
+	for <lists+kvm@lfdr.de>; Tue, 20 Jul 2021 04:42:21 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1348807AbhGTAc4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 19 Jul 2021 20:32:56 -0400
-Received: from mga11.intel.com ([192.55.52.93]:17054 "EHLO mga11.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1356817AbhGTA1Y (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 19 Jul 2021 20:27:24 -0400
-X-IronPort-AV: E=McAfee;i="6200,9189,10050"; a="208041870"
-X-IronPort-AV: E=Sophos;i="5.84,253,1620716400"; 
-   d="scan'208";a="208041870"
-Received: from fmsmga002.fm.intel.com ([10.253.24.26])
-  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Jul 2021 18:07:42 -0700
-X-IronPort-AV: E=Sophos;i="5.84,253,1620716400"; 
-   d="scan'208";a="509573965"
-Received: from zengguan-mobl.ccr.corp.intel.com (HELO [10.238.0.133]) ([10.238.0.133])
-  by fmsmga002-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Jul 2021 18:07:37 -0700
-Subject: Re: [PATCH 6/6] KVM: VMX: enable IPI virtualization
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
+        id S1345449AbhGTCBh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 19 Jul 2021 22:01:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38316 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1442173AbhGSWxW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 19 Jul 2021 18:53:22 -0400
+Received: from mail-pg1-x529.google.com (mail-pg1-x529.google.com [IPv6:2607:f8b0:4864:20::529])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E4158C0612E9
+        for <kvm@vger.kernel.org>; Mon, 19 Jul 2021 16:30:31 -0700 (PDT)
+Received: by mail-pg1-x529.google.com with SMTP id y17so20811374pgf.12
+        for <kvm@vger.kernel.org>; Mon, 19 Jul 2021 16:30:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=ml3Q/kTxZiD4jac4rsa9z6q3oqgw/koE0r8JlYAWEoE=;
+        b=sMaBLc6xZX7zehQ8U1kn7T2/C76fdCJIRBEmJcwUdtN+Ur6xNDVNIA4wnj+n5MAgrI
+         fRKop8qSFfB5cJj5Qd7DEJPBG9n2V1DApSvIFOjQinvQRz7V6ozyOBexcCug8btYPM+J
+         MMZqkMfsPwKR7hJ8KfXCbL9q5j/u8ILTW+OotIbqxzJ+akWq3OX+Rux7DSgW64emjSxx
+         /G3uagHiW/9cKFWa857nddfAl6IcWtZDkPwv7s7H35o+5FI3X0D2AEhUoR4OdKHktGMB
+         5lpjpv8BqF9q2yg/iuIW7lEANMTukouIkKW+oDuuhgdavYXnIqR/tPR7p66hSzMduya7
+         pthQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=ml3Q/kTxZiD4jac4rsa9z6q3oqgw/koE0r8JlYAWEoE=;
+        b=Gc/siZJsew20uRtqaEInPJQVBpufFmabii+uzbbQHRglKExhi+6dlo8tvuFYz++XQB
+         hIsBHJwsHnzRoJoCTVWQ+Z5O/Rj/wJ8AlQ2smwXu+HLy1rOUsbfJxYrbV9DEc5xyv95o
+         Iw307FTCPhOA9OjwoVJuh3RHiwLqV0xmHeY3GRF7rmEsQW2BhsgJH3gLx0uuI0kNr+Ek
+         fDJyR3WapAieZUo780YqFLJuGIY5pZsQ0pMNflqTgsk3WIWu98MpKlthWmtvIz7cPyvL
+         Dbr209s0/miYzkza6bkdUelA6iqjcXD/0asDu2z0Jn4Gsjr0jxaza4AV6mb+0+urtXmW
+         mcJA==
+X-Gm-Message-State: AOAM532BnqfHQzBMW08E8//GrJJNHDYBNIv6qZE5BuRALD9OGbHywx8m
+        f7K8oOy4CJoIw6dt4c2TJ7Q33A==
+X-Google-Smtp-Source: ABdhPJxkrxZk/0Zz1bAor5ysJ9w0e2+YW2IaG8snr9Fl4r2Iz1JNpsaNu5NP3/nbL6PnRtlutO5udg==
+X-Received: by 2002:a62:4e0f:0:b029:329:20be:287a with SMTP id c15-20020a624e0f0000b029032920be287amr28021297pfb.55.1626737431050;
+        Mon, 19 Jul 2021 16:30:31 -0700 (PDT)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id bt17sm571551pjb.40.2021.07.19.16.30.30
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 19 Jul 2021 16:30:30 -0700 (PDT)
+Date:   Mon, 19 Jul 2021 23:30:26 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Brijesh Singh <brijesh.singh@amd.com>
+Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
+        linux-coco@lists.linux.dev, linux-mm@kvack.org,
+        linux-crypto@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        Andy Lutomirski <luto@kernel.org>,
         Dave Hansen <dave.hansen@linux.intel.com>,
-        "Luck, Tony" <tony.luck@intel.com>,
-        Kan Liang <kan.liang@linux.intel.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Kim Phillips <kim.phillips@amd.com>,
-        Jarkko Sakkinen <jarkko@kernel.org>,
-        Jethro Beekman <jethro@fortanix.com>,
-        "Huang, Kai" <kai.huang@intel.com>
-Cc:     "x86@kernel.org" <x86@kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "Hu, Robert" <robert.hu@intel.com>,
-        "Gao, Chao" <chao.gao@intel.com>,
-        Emanuele Giuseppe Esposito <eesposit@redhat.com>
-References: <20210716064808.14757-1-guang.zeng@intel.com>
- <20210716064808.14757-7-guang.zeng@intel.com>
- <8aed2541-082d-d115-09ac-e7fcc05f96dc@redhat.com>
- <89f240cb-cb3a-c362-7ded-ee500cc12dc3@intel.com>
- <0d6f7852-95b3-d628-955b-f44d88a86478@redhat.com>
- <949abcb7-5f24-2107-a089-5e6c1bee8cf2@intel.com>
- <223af27a-2412-40f6-f4a6-e0a662041855@redhat.com>
-From:   Zeng Guang <guang.zeng@intel.com>
-Message-ID: <f1bcb885-d083-c260-d156-41fdc5db515a@intel.com>
-Date:   Tue, 20 Jul 2021 09:07:22 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
- Firefox/78.0 Thunderbird/78.12.0
+        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        David Rientjes <rientjes@google.com>,
+        Dov Murik <dovmurik@linux.ibm.com>,
+        Tobin Feldman-Fitzthum <tobin@ibm.com>,
+        Borislav Petkov <bp@alien8.de>,
+        Michael Roth <michael.roth@amd.com>,
+        Vlastimil Babka <vbabka@suse.cz>, tony.luck@intel.com,
+        npmccallum@redhat.com, brijesh.ksingh@gmail.com
+Subject: Re: [PATCH Part2 RFC v4 35/40] KVM: Add arch hooks to track the host
+ write to guest memory
+Message-ID: <YPYLEksyzOWHZwpA@google.com>
+References: <20210707183616.5620-1-brijesh.singh@amd.com>
+ <20210707183616.5620-36-brijesh.singh@amd.com>
 MIME-Version: 1.0
-In-Reply-To: <223af27a-2412-40f6-f4a6-e0a662041855@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210707183616.5620-36-brijesh.singh@amd.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 7/19/2021 9:58 PM, Paolo Bonzini wrote:
-> On 19/07/21 14:38, Zeng Guang wrote:
->>> Understood, but in practice all uses of vmx->ipiv_active are
->>> guarded by kvm_vcpu_apicv_active so they are always reached with
->>> vmx->ipiv_active == enable_ipiv.
->>>
->>> The one above instead seems wrong and should just use enable_ipiv.
->> enable_ipiv associate with "IPI virtualization" setting in tertiary
->> exec controls and enable_apicv which depends on cpu_has_vmx_apicv().
->> kvm_vcpu_apicv_active still can be false even if enable_ipiv is true,
->> e.g. in case irqchip not emulated in kernel.
-> Right, kvm_vcpu_apicv_active *is* set in init_vmcs.  But there's an
->       "if (kvm_vcpu_apicv_active(&vmx->vcpu))" above.  You can just stick
->
-> 	if (enable_ipicv)
-> 		install_pid(vmx);
-Ok, got your point now. I will revise to remove vmx->ipiv_active. Thanks.
-> inside there.  As to the other occurrences of vmx->ipiv_active, look here:
->
->> +	if (!kvm_vcpu_apicv_active(vcpu))
->> +		return;
->> +
->> +	if ((!kvm_arch_has_assigned_device(vcpu->kvm) ||
->> +		!irq_remapping_cap(IRQ_POSTING_CAP)) &&
->> +		!to_vmx(vcpu)->ipiv_active)
->>   		return;
->>   
-> This one can be enable_ipiv because APICv must be active.
->
->> +	if (!kvm_vcpu_apicv_active(vcpu))
->> +		return 0;
->> +
->> +	/* Put vCPU into a list and set NV to wakeup vector if it is
->> +	 * one of the following cases:
->> +	 * 1. any assigned device is in use.
->> +	 * 2. IPI virtualization is enabled.
->> +	 */
->> +	if ((!kvm_arch_has_assigned_device(vcpu->kvm) ||
->> +		!irq_remapping_cap(IRQ_POSTING_CAP)) && !to_vmx(vcpu)->ipiv_active)
->>   		return 0;
-> This one can be !enable_ipiv because APICv must be active.
->
->> @@ -3870,6 +3877,8 @@ static void vmx_update_msr_bitmap_x2apic(struct kvm_vcpu *vcpu, u8 mode)
->>   		vmx_enable_intercept_for_msr(vcpu, X2APIC_MSR(APIC_TMCCT), MSR_TYPE_RW);
->>   		vmx_disable_intercept_for_msr(vcpu, X2APIC_MSR(APIC_EOI), MSR_TYPE_W);
->>   		vmx_disable_intercept_for_msr(vcpu, X2APIC_MSR(APIC_SELF_IPI), MSR_TYPE_W);
->> +		vmx_set_intercept_for_msr(vcpu, X2APIC_MSR(APIC_ICR),
->> +				MSR_TYPE_RW, !to_vmx(vcpu)->ipiv_active);
->>   	}
->>   }
-> Is inside "if (mode & MSR_BITMAP_MODE_X2APIC_APICV)" so APICv must be
-> activ; so it can be enable_ipiv as well.
->
-> In conclusion, you do not need vmx->ipiv_active.
->
-> Paolo
->
+On Wed, Jul 07, 2021, Brijesh Singh wrote:
+> The kvm_write_guest{_page} and kvm_vcpu_write_guest{_page} are used by
+> the hypevisor to write to the guest memory. The kvm_vcpu_map() and
+> kvm_map_gfn() are used by the hypervisor to map the guest memory and
+> and access it later.
+> 
+> When SEV-SNP is enabled in the guest VM, the guest memory pages can
+> either be a private or shared. A write from the hypervisor goes through
+> the RMP checks. If hardware sees that hypervisor is attempting to write
+> to a guest private page, then it triggers an RMP violation (i.e, #PF with
+> RMP bit set).
+> 
+> Enhance the KVM guest write helpers to invoke an architecture specific
+> hooks (kvm_arch_write_gfn_{begin,end}) to track the write access from the
+> hypervisor.
+> 
+> When SEV-SNP is enabled, the guest uses the PAGE_STATE vmgexit to ask the
+> hypervisor to change the page state from shared to private or vice versa.
+> While changing the page state to private, use the
+> kvm_host_write_track_is_active() to check whether the page is being
+> tracked for the host write access (i.e either mapped or kvm_write_guest
+> is in progress). If its tracked, then do not change the page state.
+> 
+> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
+> ---
+
+...
+
+> @@ -3468,3 +3489,33 @@ int sev_get_tdp_max_page_level(struct kvm_vcpu *vcpu, gpa_t gpa, int max_level)
+>  
+>  	return min_t(uint32_t, level, max_level);
+>  }
+> +
+> +void sev_snp_write_page_begin(struct kvm *kvm, struct kvm_memory_slot *slot, gfn_t gfn)
+> +{
+> +	struct rmpentry *e;
+> +	int level, rc;
+> +	kvm_pfn_t pfn;
+> +
+> +	if (!sev_snp_guest(kvm))
+> +		return;
+> +
+> +	pfn = gfn_to_pfn(kvm, gfn);
+> +	if (is_error_noslot_pfn(pfn))
+> +		return;
+> +
+> +	e = snp_lookup_page_in_rmptable(pfn_to_page(pfn), &level);
+> +	if (unlikely(!e))
+> +		return;
+> +
+> +	/*
+> +	 * A hypervisor should never write to the guest private page. A write to the
+> +	 * guest private will cause an RMP violation. If the guest page is private,
+> +	 * then make it shared.
+
+NAK on converting RMP entries in response to guest accesses.  Corrupting guest
+data (due to dropping the "validated" flag) on a rogue/incorrect guest emulation
+request or misconfigured PV feature is double ungood.  The potential kernel panic
+below isn't much better.
+
+And I also don't think we need this heavyweight flow for user access, e.g.
+__copy_to_user(), just eat the RMP violation #PF like all other #PFs and exit
+to userspace with -EFAULT.
+
+kvm_vcpu_map() and friends might need the manual lookup, at least initially, but
+in an ideal world that would be naturally handled by gup(), e.g. by unmapping
+guest private memory or whatever approach TDX ends up employing to avoid #MCs.
+
+> +	 */
+> +	if (rmpentry_assigned(e)) {
+> +		pr_err("SEV-SNP: write to guest private gfn %llx\n", gfn);
+> +		rc = snp_make_page_shared(kvm_get_vcpu(kvm, 0),
+> +				gfn << PAGE_SHIFT, pfn, PG_LEVEL_4K);
+> +		BUG_ON(rc != 0);
+> +	}
+> +}
+
+...
+
+> +void kvm_arch_write_gfn_begin(struct kvm *kvm, struct kvm_memory_slot *slot, gfn_t gfn)
+> +{
+> +	update_gfn_track(slot, gfn, KVM_PAGE_TRACK_WRITE, 1);
+
+Tracking only writes isn't correct, as KVM reads to guest private memory will
+return garbage.  Pulling the rug out from under KVM reads won't fail as
+spectacularly as writes (at least not right away), but they'll still fail.  I'm
+actually ok reading garbage if the guest screws up, but KVM needs consistent
+semantics.
+
+Good news is that per-gfn tracking is probably overkill anyways.  As mentioned
+above, user access don't need extra magic, they either fail or they don't.
+
+For kvm_vcpu_map(), one thought would be to add a "short-term" map variant that
+is not allowed to be retained across VM-Entry, and then use e.g. SRCU to block
+PSC requests until there are no consumers.
+
+> +	if (kvm_x86_ops.write_page_begin)
+> +		kvm_x86_ops.write_page_begin(kvm, slot, gfn);
+> +}
