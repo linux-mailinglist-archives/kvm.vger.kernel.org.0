@@ -2,173 +2,173 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7F37B3CFBC5
-	for <lists+kvm@lfdr.de>; Tue, 20 Jul 2021 16:14:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7F6D23CFC40
+	for <lists+kvm@lfdr.de>; Tue, 20 Jul 2021 16:28:10 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239363AbhGTNdw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 20 Jul 2021 09:33:52 -0400
-Received: from mail-dm6nam12on2089.outbound.protection.outlook.com ([40.107.243.89]:42940
-        "EHLO NAM12-DM6-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S238622AbhGTNbk (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 20 Jul 2021 09:31:40 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=XpCiUvhLx5OLsvXTGTuCymKJpz4s0r014oIHmpXBNBjrecVT8SZXfIijaVP/pBbFRnUxFCotfdh5mwsQaY5y13PsCZsHBZQkd4sWoAnwBHppoA6DSljv+izLfbgQ4ULHhSvCzhD8Ml+9Ff7n2dEb2PpV5ykCK3aYD6m6EDcxAnoYklnqP0qougurL8yrYGq0xi508hDlIp88rYjBJj25V9foPaum4TlF8op91+jnE/bgqDbCfdaqFKT/mRw2Jt9DN0d6V5nlC2ieQAno2EcplyjsP537Li+H3Kp2/whGsiOgyFA806XDgeqvKxc49nwOt7JBxmQVKPHZ1d1ByQXrlg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=UG+tW3XN0U8V8DN0N/6vJ6TL6+v4JJo4WujEsfL1CJo=;
- b=WoCbvvCkKiOguWWUwvMWWe/MYBGEg2upIjtraDng/rsWTk2/kx0ZfgH3qX1a6IL0/JBhU0M3NIKXmNpIZnfH8QVRavOLFWk7/TbQPDdW8RIhkRqWPGwpk09+MleZE8vAUmy+uaCYkohkT5ExdfuckG7Z5xpQateev1YdioUIhdt9KBjM+wh+X0ZjqewJ5rPVONwXvynSzy8N5xxko6whL1Aa6Ld7Wl48TbPA2VC9mjYVNygKuJZM3KmI7xUoFfS3e4EQ8VxPPHjRD5u+3dTez6mPQOi4uki27vIYD4Keq+Zvo5gAsGF7wXREIxSTwFMTkqXtfvSdTGUbEedvnXxsiw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=UG+tW3XN0U8V8DN0N/6vJ6TL6+v4JJo4WujEsfL1CJo=;
- b=LQ/whawcqfyg08aZE1OmzJRj1A8fl7bMmWSpkwSR/kKcRR0cH4mYLDIbgA0fwFDxnfHjImV2cyltnFghgF2kn5EMLttEB7ewLimcra6wV7GumDGHcJkmmKofJQMZ68cT84mYb5Ata2idgo87bTDh/8J624wT0bt7sNsIIYOudhA=
-Authentication-Results: vger.kernel.org; dkim=none (message not signed)
- header.d=none;vger.kernel.org; dmarc=none action=none header.from=amd.com;
-Received: from MN2PR12MB3775.namprd12.prod.outlook.com (2603:10b6:208:159::19)
- by MN2PR12MB4374.namprd12.prod.outlook.com (2603:10b6:208:266::9) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4331.21; Tue, 20 Jul
- 2021 14:12:14 +0000
-Received: from MN2PR12MB3775.namprd12.prod.outlook.com
- ([fe80::6c9e:1e08:7617:f756]) by MN2PR12MB3775.namprd12.prod.outlook.com
- ([fe80::6c9e:1e08:7617:f756%5]) with mapi id 15.20.4331.034; Tue, 20 Jul 2021
- 14:12:14 +0000
-Subject: Re: [PATCH 1/7] vgaarb: remove VGA_DEFAULT_DEVICE
-To:     Daniel Vetter <daniel@ffwll.ch>
-Cc:     Christoph Hellwig <hch@lst.de>, David Airlie <airlied@linux.ie>,
-        Alex Deucher <alexander.deucher@amd.com>,
-        "Pan, Xinhui" <Xinhui.Pan@amd.com>,
-        Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
-        Maxime Ripard <mripard@kernel.org>,
-        Thomas Zimmermann <tzimmermann@suse.de>,
-        Jani Nikula <jani.nikula@linux.intel.com>,
-        Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
-        Rodrigo Vivi <rodrigo.vivi@intel.com>,
-        Ben Skeggs <bskeggs@redhat.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        amd-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
-        intel-gfx@lists.freedesktop.org, nouveau@lists.freedesktop.org,
-        kvm@vger.kernel.org
-References: <20210716061634.2446357-1-hch@lst.de>
- <20210716061634.2446357-2-hch@lst.de>
- <f171831b-3281-5a5a-04d3-2d69cb77f1a2@amd.com>
- <YPbUvIYmu3WfyM2C@phenom.ffwll.local>
-From:   =?UTF-8?Q?Christian_K=c3=b6nig?= <christian.koenig@amd.com>
-Message-ID: <b846ec6e-dc9a-dfb5-a854-d819a4978322@amd.com>
-Date:   Tue, 20 Jul 2021 16:12:06 +0200
+        id S229944AbhGTNrZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 20 Jul 2021 09:47:25 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:19406 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S238463AbhGTNpU (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 20 Jul 2021 09:45:20 -0400
+Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 16KE63IH086006;
+        Tue, 20 Jul 2021 10:25:44 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=6ZxlFXPrsd/fsarVq1ctAW2etfUTeiHa1pr/LQKxuI4=;
+ b=PtJ/F/5jojBAXjyhpuBBxyjxpHkyBsmInV89gFddE1+ZF76XW+FB9VClFcAUnqxKPub7
+ 9t8tNWNLu9GMpECJYVQir7oe2vSZ+7lCmF93Z8HEaKBpzXCjJ6wdegIPQ4mkWsRBKDHS
+ EsFZXIeE1TSiQyh43BSkw1H0YK1SH89Y8KobUT7TTGsrf7rtait9sZTE/auQLT1Fju8e
+ /qMfMSvNQwjzGU9i06k1tl0hVLUk6OMV1du7F/f+Yio0cSw8nWc6CESdJW1RGoJ4JOka
+ cv9zN3ADwJk0JczVjQUrszyfG3v3mWmMsRr5u4Q2PC6kLgDsbZVBDMHZd8nstRT227sJ /w== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 39wv47pywd-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 20 Jul 2021 10:25:44 -0400
+Received: from m0098404.ppops.net (m0098404.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 16KE6fQG090841;
+        Tue, 20 Jul 2021 10:25:43 -0400
+Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 39wv47pyv8-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 20 Jul 2021 10:25:43 -0400
+Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
+        by ppma03ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 16KEFKVJ005875;
+        Tue, 20 Jul 2021 14:25:41 GMT
+Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
+        by ppma03ams.nl.ibm.com with ESMTP id 39upu89c5t-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 20 Jul 2021 14:25:41 +0000
+Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
+        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 16KEPcMu27263320
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 20 Jul 2021 14:25:38 GMT
+Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 112B55204F;
+        Tue, 20 Jul 2021 14:25:38 +0000 (GMT)
+Received: from oc7455500831.ibm.com (unknown [9.145.91.99])
+        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id 6F55652065;
+        Tue, 20 Jul 2021 14:25:37 +0000 (GMT)
+Subject: Re: [PATCH] mm,do_huge_pmd_numa_page: remove unnecessary TLB flushing
+ code
+To:     Huang Ying <ying.huang@intel.com>,
+        Andrew Morton <akpm@linux-foundation.org>
+Cc:     linux-mm@kvack.org, linux-kernel@vger.kernel.org,
+        Yang Shi <shy828301@gmail.com>,
+        Dan Carpenter <dan.carpenter@oracle.com>,
+        Mel Gorman <mgorman@suse.de>,
+        Gerald Schaefer <gerald.schaefer@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Hugh Dickins <hughd@google.com>,
+        Andrea Arcangeli <aarcange@redhat.com>,
+        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
+        Michal Hocko <mhocko@suse.com>,
+        Vasily Gorbik <gor@linux.ibm.com>, Zi Yan <ziy@nvidia.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        kvm list <kvm@vger.kernel.org>
+References: <20210720065529.716031-1-ying.huang@intel.com>
+From:   Christian Borntraeger <borntraeger@de.ibm.com>
+Message-ID: <eadff602-3824-f69d-e110-466b37535c99@de.ibm.com>
+Date:   Tue, 20 Jul 2021 16:25:37 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.11.0
-In-Reply-To: <YPbUvIYmu3WfyM2C@phenom.ffwll.local>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-X-ClientProxiedBy: PR0P264CA0076.FRAP264.PROD.OUTLOOK.COM
- (2603:10a6:100:18::16) To MN2PR12MB3775.namprd12.prod.outlook.com
- (2603:10b6:208:159::19)
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from [IPv6:2a02:908:1252:fb60:8651:5b5e:8648:2fd0] (2a02:908:1252:fb60:8651:5b5e:8648:2fd0) by PR0P264CA0076.FRAP264.PROD.OUTLOOK.COM (2603:10a6:100:18::16) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4331.21 via Frontend Transport; Tue, 20 Jul 2021 14:12:11 +0000
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 37138ed6-02b7-4faf-0240-08d94b885f7f
-X-MS-TrafficTypeDiagnostic: MN2PR12MB4374:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <MN2PR12MB4374B5A57E0847871BA0CA7A83E29@MN2PR12MB4374.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:4125;
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: qzONWVKxrl5UQf66w4oSeCBbqtkT/I/+/qLT5fUHUCLF34ZNoVhRs+hIw0hB6fNjaw6L6mvp4G0q62ufSQIwf2O4oHa+97rN2Cpn9dboHiWEsn7WBMzXPId5qi10xV6WTYuBg6A9LTlAD/LFfpTiZ81PL7Ui1odh8Jy94ypcBwR7PzY90QTyzBiplV4EoWbHdb5NbjHkwDPT6uxN0FaMj7ttqapj3z1JlK2TfIV0pa/vEUCSywJ1znuh/Qz1rf4NMP+mJNYgt/H05JkO46LVAe5pUiJzKGItqclt0pfG6hg4vu9D7BZg2BvHM4ZZRvdwcHEjuZpeglcNbtrDYdnu155RPj9TU70tPKCthI/Ra+2GYUYdEV1C83o59RaEzI3vsbUoqqbNV0B+Y1s1woi+Ir29aTqNWXbQRw0Jt44BbmyuAq4p/GKAPPLjXvpRr91e+8loBIhzLHFLADyZYD6Rpqc1RrXP+LMH5xZ8IsqbE5al8m4Zq3d2R025bqMqdkcnv4PKvLPEDfNGW0RlDNMtk3YtLfrjSeA4w/UK278E8Cq+tj8NJpYvztScS6D3axQ7Fl9sklNAsBouKoIf6QIXJbvD+pLMTi6X/WADXhR6SDVBO7w8CrPp1xT95D9vsavM3Og0qSiZRhwUkWmZ+XgiK6/8Fi9c5e0uGCcur00H/8ixT4wbRO7EYxAKxAnXinMldBMMJS7NIGZFDV7dDxfeecvVCPgYjWnWSRB5BQ7nJHR2Rbr/0SaZ1loDp3JiZWok
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN2PR12MB3775.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(136003)(346002)(396003)(376002)(366004)(39860400002)(54906003)(7416002)(2906002)(8936002)(38100700002)(66946007)(6666004)(478600001)(31696002)(6916009)(8676002)(4326008)(66574015)(83380400001)(66476007)(6486002)(316002)(86362001)(186003)(36756003)(2616005)(5660300002)(31686004)(66556008)(43740500002)(45980500001);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?YzJwcDBaM1M0Y081RUttVU5WeTVkVFRLUTF5M2RkOUlpVURpZzRaN3REM1o1?=
- =?utf-8?B?QVh4VjdWdllHc2hQcWJoakIzR1VtV0hROU5vWFBjQmxDbUU1N2R3bVBqckRm?=
- =?utf-8?B?VWx3TVlTT3FHQUYzTWdIYlRva3dtKytjaysxVlpxZDJsbVVzb3BkZm5JSVVy?=
- =?utf-8?B?UlFyNnRzWkdCSlI2ancrU2EyMklUTkNZSm44V0N3dTc3ODNoWWI2R2JGcEQ0?=
- =?utf-8?B?OVNpVUx1R2t3NU1UYkhMRWtIYkN6UmtaTkpRV0Noc3JHanBoRFlhTTcrUzZI?=
- =?utf-8?B?NG1xUDVjZ2NPR1F3aCs1VUtFV3ZkdE1DNjNQaURjd0dSV1MrYTVHYnFkWGlK?=
- =?utf-8?B?OC9vOHROaStHWmNTelVNU2p1dzdnSTdjK3k2ZG53UkE3TGhZcHBJWEhIZUpk?=
- =?utf-8?B?bGRmanJjRHo4NkhJYkhTcGhtMmxGa2MwbjA3K09tNlVRbkFuTnRPZkFhMFNB?=
- =?utf-8?B?YnZyWnhpYWY5SzVXWkx5ZnZxOXE0UkpWblkwVElQd2plSVZ6RnZJWWgrY09R?=
- =?utf-8?B?bCtWMmY2MXhJUVM2OEg2ckN6TzN3ZVRoUWZzQktONGdlcmE4UjVXbzdrNG1E?=
- =?utf-8?B?b3QyS3VmemlLNzczejdmbEFIZWd5b0FZRzlxU2dmMnBzeUFPckgyTVFpRW82?=
- =?utf-8?B?SFRDWVA3REdiK1Jma0E1MFpwblVnNU1vc2JwYmJvNnlxSTBhZlowYjFGd0px?=
- =?utf-8?B?eXpTdnVTbTFkT3dibjJieWNUKzhxKzNpRUpXQnpieFltZHRNNU5zUk0rQkMw?=
- =?utf-8?B?SS9sMTlYT01BeWVJaVlYUGhFVkpXRU5udmlldHRCOXhESXh2VW45UkE4Sm1T?=
- =?utf-8?B?MUovSm5KRWwwNlgrTVNncjZQM2Vvc0V1MFNyK3JkR1VSVFcxakNtQitjTnhl?=
- =?utf-8?B?NTZvNndUMVYrRnBJdVRNU0FUR3ZadC9TclFmUXowcStueWV5Z2M5eHB0STlZ?=
- =?utf-8?B?K0pZQkIwdEhSalE1WHUyQk5SeTA0Ri9SVFhaTHRYWXBheG5sSEVERHZYRm5h?=
- =?utf-8?B?Qi8vckVDSVB4RVhTTlNNYXRLbXVEMUgxbGZvemhBSmJCQitSTk5pV01weXZx?=
- =?utf-8?B?YXRXc1dKVUJUQ21iQzhYSnF5YlhwdytBWE9BVTQ0a3pBVFJHQlcwV2RSWkk1?=
- =?utf-8?B?Y0E4aFc0QzVWMnlGMzVDeFV3SldqR2F6dkp5K3RTSkdwN0UzYy9CZVFXNVZu?=
- =?utf-8?B?ZHRQZ0FaM3N0ZlA4cUUyanVNU20zRTdKdmpKZW1XVjFYcTJYWnJqWTRNbDdW?=
- =?utf-8?B?U0tTRDN5M1QrYXBESDcyOEhkS3hMRkhJOFVIWjI4M1drT2xDSWk0UENwekFi?=
- =?utf-8?B?M0tkQTIxT3VJZE1aUE1yb3RYZXhqcXhnS2NQcE5FNDBLeXYvWU82WitlK0lh?=
- =?utf-8?B?R2U5QXludlVYL0x6V21EOUFidGpqWXl0ZVBPVHFFZEkvcEtCM0lvdVhBZkhk?=
- =?utf-8?B?TzhWTVR1UE5XVzg3bVN0TEp4TFdUMmlWUzdyOFR4dFhaUm04NnplT1VicjFE?=
- =?utf-8?B?dkg4RzRNYThUT0grdXVDZzNlREVPTjlPY3owV0V3OUloSE53QXY1aHBLOTJl?=
- =?utf-8?B?bnJqRzJ4U0toTkR4VFlhdmFnSG53UHNjcDdDTjFqOVFnU0ZzU2NxT0pwUDA1?=
- =?utf-8?B?RzY1dGNCcHNzeWRXL1dyU2FCeUwrZmhrK242aGN4SDNVbmo2L0xmbnB4dC91?=
- =?utf-8?B?NHA3UlpoQkVKTXVEcllzMDNkOG1BRFIwaWpVdWx2ZCs2bTVuZUlNQ0wrelhJ?=
- =?utf-8?B?K2ZwRS93UzM0MlluY3NsWUFrT1RhNHRlZ1VVUkpUdFBheFlQOGR5cExhZGsx?=
- =?utf-8?B?YjRkb2ZrRUxMU0huV0tKVDRYOVNQNW9CYnp5b1ZEYjl2WG1aS043RHpvL0V4?=
- =?utf-8?Q?LJ2HahX6Jcdg2?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 37138ed6-02b7-4faf-0240-08d94b885f7f
-X-MS-Exchange-CrossTenant-AuthSource: MN2PR12MB3775.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Jul 2021 14:12:14.2618
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: lqkhwHDUBFU1eMjv2dbYh/F+g86RmJpnQEYVwvc/i7bPdbyFJK2n3qXUGaBQxdDX
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR12MB4374
+In-Reply-To: <20210720065529.716031-1-ying.huang@intel.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: FU4yu0Zn1I8QZgVMsco2mndyx-fhnmiq
+X-Proofpoint-GUID: LYxMiQJt1hqM8Xe1uAAPGe35_SqVz3wM
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.790
+ definitions=2021-07-20_07:2021-07-19,2021-07-20 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 spamscore=0
+ adultscore=0 impostorscore=0 mlxscore=0 suspectscore=0 mlxlogscore=999
+ bulkscore=0 lowpriorityscore=0 clxscore=1011 phishscore=0
+ priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2104190000 definitions=main-2107200089
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Am 20.07.21 um 15:50 schrieb Daniel Vetter:
-> On Fri, Jul 16, 2021 at 09:14:02AM +0200, Christian König wrote:
->> Am 16.07.21 um 08:16 schrieb Christoph Hellwig:
->>> The define is entirely unused.
->>>
->>> Signed-off-by: Christoph Hellwig <hch@lst.de>
->> I'm not an expert for this particular code, but at least of hand everything
->> you do here makes totally sense.
->>
->> Whole series is Acked-by: Christian König <christian.koenig@amd.com>
-> Care to also push this into drm-misc-next since you looked already?
 
-Sure, but Christoph doesn't has push access himself?
 
-Christian.
+On 20.07.21 08:55, Huang Ying wrote:
+> Before the commit c5b5a3dd2c1f ("mm: thp: refactor NUMA fault
+> handling"), the TLB flushing is done in do_huge_pmd_numa_page() itself
+> via flush_tlb_range().
+> 
+> But after commit c5b5a3dd2c1f ("mm: thp: refactor NUMA fault
+> handling"), the TLB flushing is done in migrate_pages() as in the
+> following code path anyway.
+> 
+> do_huge_pmd_numa_page
+>    migrate_misplaced_page
+>      migrate_pages
+> 
+> So now, the TLB flushing code in do_huge_pmd_numa_page() becomes
+> unnecessary.  So the code is deleted in this patch to simplify the
+> code.  This is only code cleanup, there's no visible performance
+> difference.
+> 
+> Signed-off-by: "Huang, Ying" <ying.huang@intel.com>
+> Cc: Yang Shi <shy828301@gmail.com>
+> Cc: Dan Carpenter <dan.carpenter@oracle.com>
+> Cc: Mel Gorman <mgorman@suse.de>
+> Cc: Christian Borntraeger <borntraeger@de.ibm.com>
+> Cc: Gerald Schaefer <gerald.schaefer@linux.ibm.com>
+> Cc: Heiko Carstens <hca@linux.ibm.com>
+> Cc: Hugh Dickins <hughd@google.com>
+> Cc: Andrea Arcangeli <aarcange@redhat.com>
+> Cc: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
+> Cc: Michal Hocko <mhocko@suse.com>
+> Cc: Vasily Gorbik <gor@linux.ibm.com>
+> Cc: Zi Yan <ziy@nvidia.com>
+> ---
+>   mm/huge_memory.c | 26 --------------------------
+>   1 file changed, 26 deletions(-)
+> 
+> diff --git a/mm/huge_memory.c b/mm/huge_memory.c
+> index afff3ac87067..9f21e44c9030 100644
+> --- a/mm/huge_memory.c
+> +++ b/mm/huge_memory.c
+> @@ -1440,32 +1440,6 @@ vm_fault_t do_huge_pmd_numa_page(struct vm_fault *vmf)
+>   		goto out;
+>   	}
+>   
+> -	/*
+> -	 * Since we took the NUMA fault, we must have observed the !accessible
+> -	 * bit. Make sure all other CPUs agree with that, to avoid them
+> -	 * modifying the page we're about to migrate.
+> -	 *
+> -	 * Must be done under PTL such that we'll observe the relevant
+> -	 * inc_tlb_flush_pending().
+> -	 *
+> -	 * We are not sure a pending tlb flush here is for a huge page
+> -	 * mapping or not. Hence use the tlb range variant
+> -	 */
+> -	if (mm_tlb_flush_pending(vma->vm_mm)) {
+> -		flush_tlb_range(vma, haddr, haddr + HPAGE_PMD_SIZE);
+> -		/*
+> -		 * change_huge_pmd() released the pmd lock before
+> -		 * invalidating the secondary MMUs sharing the primary
+> -		 * MMU pagetables (with ->invalidate_range()). The
+> -		 * mmu_notifier_invalidate_range_end() (which
+> -		 * internally calls ->invalidate_range()) in
+> -		 * change_pmd_range() will run after us, so we can't
+> -		 * rely on it here and we need an explicit invalidate.
+> -		 */
+> -		mmu_notifier_invalidate_range(vma->vm_mm, haddr,
+> -					      haddr + HPAGE_PMD_SIZE);
+> -	}
+> CC Paolo/KVM list so we also remove the mmu notifier here. Do we need those
+now in migrate_pages? I am not an expert in that code, but I cant find
+an equivalent mmu_notifier in migrate_misplaced_pages.
+I might be totally wrong, just something that I noticed.
 
-> -Daniel
->
->> Regards,
->> Christian.
->>
->>> ---
->>>    include/linux/vgaarb.h | 6 ------
->>>    1 file changed, 6 deletions(-)
->>>
->>> diff --git a/include/linux/vgaarb.h b/include/linux/vgaarb.h
->>> index dc6ddce92066..26ec8a057d2a 100644
->>> --- a/include/linux/vgaarb.h
->>> +++ b/include/linux/vgaarb.h
->>> @@ -42,12 +42,6 @@
->>>    #define VGA_RSRC_NORMAL_IO     0x04
->>>    #define VGA_RSRC_NORMAL_MEM    0x08
->>> -/* Passing that instead of a pci_dev to use the system "default"
->>> - * device, that is the one used by vgacon. Archs will probably
->>> - * have to provide their own vga_default_device();
->>> - */
->>> -#define VGA_DEFAULT_DEVICE     (NULL)
->>> -
->>>    struct pci_dev;
->>>    /* For use by clients */
-
+>   	pmd = pmd_modify(oldpmd, vma->vm_page_prot);
+>   	page = vm_normal_page_pmd(vma, haddr, pmd);
+>   	if (!page)
+> 
