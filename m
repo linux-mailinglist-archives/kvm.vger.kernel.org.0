@@ -2,145 +2,242 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2E0F73CFF5C
-	for <lists+kvm@lfdr.de>; Tue, 20 Jul 2021 18:26:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C045C3CFF72
+	for <lists+kvm@lfdr.de>; Tue, 20 Jul 2021 18:30:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236024AbhGTPqC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 20 Jul 2021 11:46:02 -0400
-Received: from mail-mw2nam12on2082.outbound.protection.outlook.com ([40.107.244.82]:36961
-        "EHLO NAM12-MW2-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S238108AbhGTPod (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 20 Jul 2021 11:44:33 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=CWvNZdraR7WU+d5394CpDCi0aHMxf1VqzSOD5jmUueChURr78S+nOaBBQSQrLNdtWztWnlIyetQOgF6Qwj6AOxGw1Qfbb3a+6wX50f3P9cDplnc/wslbhBaduna08sTvTokv+W1dOPZuQHf+1bldgAEzmed4lC4eW3xrNyhLeIGIt+v4+CV8TXYsFL4QEFoejVcxjgc3ybUplo4O7YWTg0C9HZgAXJmF+cAxSJSoVxIaKwTl6zyctZzwdvbShMEU05KpTiTlO+G1hR1WYgi+xmJ69vlAg92qCIJgXE9VR73y3Z4D+xDm/hOYutYo7dpxejKaCzWMtrstUVfgUTrNaw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=eXhr7NBtAh2g1mdiedm7a00Qpu1WBxx3T+l9CwzOyVc=;
- b=lROAeYD5Ip17BIC8WgcoTx6XXkktk3MFSVciF6tpWbYIRVx8jzUtS78DGY1u+QuZZ9hYodsek5XucFglfVeV43WB9qpJgyR9+322TLcoQmRLe54c6jVVd0oQxWbzvyNEawk5L3RXXwh8dswCDPEGgiyqowC3IK61qt9GaMEqQ+9qCKyu13rrKVdRH+wT0sgeTtXpQN1KvFrE+K7I4yLEqmFBhxEYFUlU+AhIU0dxCRGXL0hcTVw8vhp1rTXJWSTFy/ZUhPflMiR8DPUdKATJgZpUo8eSogvSVuS7EI2nDRINVF1kdAVJoWFcGjsyknhNICb+PutOgpH3hBLQvJ4kVg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=eXhr7NBtAh2g1mdiedm7a00Qpu1WBxx3T+l9CwzOyVc=;
- b=guFPICwIMBUQ+bEfPicT/GzHw+ii4l/AAlwvi/OFAYhYuCcP2TD9Hj+DY3rNPpO6rvMixYw5Byo0/X4iHbd906wNLwmf+mjBUuwpEt9DaHo+uN4uQUwEOap5Tn0MrR6vgjbEqhYZGd5bvNyeAtsaLee/JZMSFY17XdKwZjRsVvs6aD2WiSDv7CXTncqZQx2bIuGuHffNAMoxhn7nruPxio6qLrWM7cx3OWRdYJ6EZ8sDFpZLVukkWZ/PG+B9YaJSBSRRySBWGWe/9E96yml8dULG9gSoJT8i+XS+35Wm98zE4yWWny2tVuVeNPtZdD0STqNBVrpLh/60MQFpUtI7pw==
-Authentication-Results: oss.nxp.com; dkim=none (message not signed)
- header.d=none;oss.nxp.com; dmarc=none action=none header.from=nvidia.com;
-Received: from BL0PR12MB5506.namprd12.prod.outlook.com (2603:10b6:208:1cb::22)
- by BL1PR12MB5032.namprd12.prod.outlook.com (2603:10b6:208:30a::12) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4331.21; Tue, 20 Jul
- 2021 16:25:09 +0000
-Received: from BL0PR12MB5506.namprd12.prod.outlook.com
- ([fe80::d017:af2f:7049:5482]) by BL0PR12MB5506.namprd12.prod.outlook.com
- ([fe80::d017:af2f:7049:5482%5]) with mapi id 15.20.4331.034; Tue, 20 Jul 2021
- 16:25:09 +0000
-Date:   Tue, 20 Jul 2021 13:25:07 -0300
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     Diana Craciun OSS <diana.craciun@oss.nxp.com>
-Cc:     David Airlie <airlied@linux.ie>,
-        Tony Krowiak <akrowiak@linux.ibm.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Daniel Vetter <daniel@ffwll.ch>,
-        dri-devel@lists.freedesktop.org,
-        Eric Auger <eric.auger@redhat.com>,
-        Eric Farman <farman@linux.ibm.com>,
-        Harald Freudenberger <freude@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        intel-gfx@lists.freedesktop.org,
-        intel-gvt-dev@lists.freedesktop.org,
-        Jani Nikula <jani.nikula@linux.intel.com>,
-        Jason Herne <jjherne@linux.ibm.com>,
-        Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
-        kvm@vger.kernel.org, Kirti Wankhede <kwankhede@nvidia.com>,
-        linux-doc@vger.kernel.org, linux-s390@vger.kernel.org,
-        Matthew Rosato <mjrosato@linux.ibm.com>,
-        Peter Oberparleiter <oberpar@linux.ibm.com>,
-        Halil Pasic <pasic@linux.ibm.com>,
-        Rodrigo Vivi <rodrigo.vivi@intel.com>,
-        Vineeth Vijayan <vneethv@linux.ibm.com>,
-        Zhenyu Wang <zhenyuw@linux.intel.com>,
-        Zhi Wang <zhi.a.wang@intel.com>,
-        "Raj, Ashok" <ashok.raj@intel.com>, Christoph Hellwig <hch@lst.de>,
-        Leon Romanovsky <leonro@nvidia.com>,
-        Max Gurtovoy <mgurtovoy@nvidia.com>,
-        Yishai Hadas <yishaih@nvidia.com>
-Subject: Re: [PATCH 05/13] vfio/fsl: Move to the device set infrastructure
-Message-ID: <20210720162507.GC1117491@nvidia.com>
-References: <5-v1-eaf3ccbba33c+1add0-vfio_reflck_jgg@nvidia.com>
- <44639398-d50f-ac6a-d52b-4e964465ca6f@oss.nxp.com>
- <20210720161713.GB1117491@nvidia.com>
- <5181d7f9-0a4f-c594-c5e9-820bdf97f6f2@oss.nxp.com>
+        id S229675AbhGTPtA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 20 Jul 2021 11:49:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41490 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231993AbhGTPsY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 20 Jul 2021 11:48:24 -0400
+Received: from mail-pj1-x1036.google.com (mail-pj1-x1036.google.com [IPv6:2607:f8b0:4864:20::1036])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B60D8C0613DD
+        for <kvm@vger.kernel.org>; Tue, 20 Jul 2021 09:29:02 -0700 (PDT)
+Received: by mail-pj1-x1036.google.com with SMTP id i16-20020a17090acf90b02901736d9d2218so2757448pju.1
+        for <kvm@vger.kernel.org>; Tue, 20 Jul 2021 09:29:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=5BH3R6Avka1nQpq+/eM8bvTfGscM9D0ho6TsiS6Akvo=;
+        b=aSu+zS46PGf/WuVBEqvyZ3YlJH7UpgN7b7W55IBVQfm+nRT8TnxJpUy085DLjvw2OO
+         f8ZqvaOXbjfbEgb5gDz9C81NKjhq0Q3tWLCyTwqLgROT6kmsDrpjqaF+WcZn3VUeTi1F
+         c6NPte8/92ZnB/pvUIh6L8cq5aU84BK8G4VIhr+QbdRTZgs4BS4djKUHt5F7ggk5sYmf
+         0aCJCVM7OKC+nORGR3v0q/mVmnbXfTUkIcNRSGMjiVurYAnML24JrtNzDjGOP1Glm214
+         ieLZLBxWJWIR1WMAJZSv6ETDq5cLF3+g0WdMwV3dVwux3n05hX4GLOX3qsbKfVxV6+gD
+         3PAQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=5BH3R6Avka1nQpq+/eM8bvTfGscM9D0ho6TsiS6Akvo=;
+        b=o2kKvlCVZL7+7plxAM0KLCsvZX7VN/4Upq2XRenmuWlroileb7hb0fsN049WytLuJQ
+         OmEh0LFvqU4qPwHOVt1DcO3Gxi+w6bcV2kFYcSl8swZkq3VaQzlmhQynfuwpMBqLw0QK
+         +5jkXhN3oKFTSLQ/9WlnzOfOGmfJ1vXcHaZ1xMEFzAGsDTJqZHX2E+O3m9+cpgaO0col
+         lx5dnHkB5r87HHOsWZMfS/aEWJtS0OSiX7zOlA6JPXPKFMg3uzLDC0vns3a5mcYyRU0a
+         GQnV/TW1DHQjKMpF1N7HCQIgZMvsSmdPl34c98/oOfsEPVxPZufvGePAmC/m2xVJVfeZ
+         8pOA==
+X-Gm-Message-State: AOAM532eAadU02AGmkCxLH4XshGqxt4sWw1ud1qwv7NE8edTQ6b4VbWZ
+        gjBHVr7HVR3MnVKcT18y/zxTYA==
+X-Google-Smtp-Source: ABdhPJyBMjFHfdhrrQYz6sljADtLM0FyBdqBN9AsTvuwzS0vivWnLCYQIoLuo5sdH5eRngpRMsyuHg==
+X-Received: by 2002:a17:90a:5b04:: with SMTP id o4mr31185589pji.210.1626798541972;
+        Tue, 20 Jul 2021 09:29:01 -0700 (PDT)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id l1sm135113pjq.1.2021.07.20.09.29.01
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 20 Jul 2021 09:29:01 -0700 (PDT)
+Date:   Tue, 20 Jul 2021 16:28:57 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Brijesh Singh <brijesh.singh@amd.com>
+Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
+        linux-coco@lists.linux.dev, linux-mm@kvack.org,
+        linux-crypto@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        David Rientjes <rientjes@google.com>,
+        Dov Murik <dovmurik@linux.ibm.com>,
+        Tobin Feldman-Fitzthum <tobin@ibm.com>,
+        Borislav Petkov <bp@alien8.de>,
+        Michael Roth <michael.roth@amd.com>,
+        Vlastimil Babka <vbabka@suse.cz>, tony.luck@intel.com,
+        npmccallum@redhat.com, brijesh.ksingh@gmail.com
+Subject: Re: [PATCH Part2 RFC v4 38/40] KVM: SVM: Provide support for
+ SNP_GUEST_REQUEST NAE event
+Message-ID: <YPb5yfKEyJjvDbOl@google.com>
+References: <20210707183616.5620-1-brijesh.singh@amd.com>
+ <20210707183616.5620-39-brijesh.singh@amd.com>
+ <YPYBmlCuERUIO5+M@google.com>
+ <68ea014c-51bc-6ed4-a77e-dd7ce1a09aaf@amd.com>
+MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <5181d7f9-0a4f-c594-c5e9-820bdf97f6f2@oss.nxp.com>
-X-ClientProxiedBy: BL1PR13CA0368.namprd13.prod.outlook.com
- (2603:10b6:208:2c0::13) To BL0PR12MB5506.namprd12.prod.outlook.com
- (2603:10b6:208:1cb::22)
-MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from mlx.ziepe.ca (142.162.113.129) by BL1PR13CA0368.namprd13.prod.outlook.com (2603:10b6:208:2c0::13) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4352.11 via Frontend Transport; Tue, 20 Jul 2021 16:25:09 +0000
-Received: from jgg by mlx with local (Exim 4.94)        (envelope-from <jgg@nvidia.com>)        id 1m5sYN-004z4U-Vr; Tue, 20 Jul 2021 13:25:08 -0300
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: b5b23f0a-22a7-4b7c-f0e4-08d94b9af100
-X-MS-TrafficTypeDiagnostic: BL1PR12MB5032:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <BL1PR12MB503260152401C8A62F71F4A8C2E29@BL1PR12MB5032.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:3513;
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: LDIbS/xyqPxpEW23U+JZTvpVnNKBILzbuTBgH387MIDXQZ9dY6PgU0wjUi91BV1z7uDojIJlMO4LZB636x1WU45PGR+fCkesA6Xjcg1xFZilrpZpnrn+IybEgGcLYi2/pHSGKBm9644k66vjWReTvefFrb0fLZqfI2uFSfd0etDgE/7UnoP94hrLnRa1aXn6zAQZwW59xgYNbv0tqTGf7GC/LA9x2h4zWVJ0TWCtOOlZrATTqYCHszS30hZJpTg5bPR+pHuQqdiYRcsVcIW3jH0MyPkcouoQW1dKpZq3G57M+o4IPk0/gSBpGxOH5FKi3nUgKUO9b645vTv5v55Z7qkf44MMHdKnQFfAQpTW8IZXiz1MbHxfsTV6R1NzOHVIoI5Co1r1na2B0SRVnVn0iVEQNucz5jd5itfO3WaPMFcOur5bEFDdfHiGYUfRmv+gbepdwz5jGYyUxchlmSR/QeQxvVEoe1zfV0ZcuRdFa5/K8ls8mz4b5O0eOUX44HZvYFjeMVdtn0/hYsWQrPWUpYR8RRM8bxvAFIRGR3IWu/EWmn9cOEH67fj8NNhWoNredRRBCjv7x7LVSf/NOhGYvwUFb6TiaRzDcExU9IGbsQT6jpri8J82uz9RxLxGhv8PdGLrXQKvrzP24hPuqZCm5g==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL0PR12MB5506.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(396003)(39860400002)(376002)(136003)(366004)(346002)(8676002)(5660300002)(36756003)(33656002)(38100700002)(8936002)(426003)(2616005)(66946007)(26005)(9746002)(86362001)(2906002)(6916009)(107886003)(558084003)(66556008)(66476007)(9786002)(54906003)(1076003)(186003)(4326008)(478600001)(7416002)(7406005)(316002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?Wde9/8ozJXweuptQVF+V//lJxYFKqGMYXaUJl+YrSWEFx2je/8GZehwPN5ge?=
- =?us-ascii?Q?+mw7r/suLrUae66qbhDF63JZ1poBQQcNjE5QQZy9tYmnV6hoZMgR+U1voU6x?=
- =?us-ascii?Q?nkOlHwlYCchfUb6KOXvI65hJH8mQmayDnnw9jMdkfTpSnjDY3n7se+CnWb8f?=
- =?us-ascii?Q?0uLDcyFuVqCeA0sH61LCfCKSsnmetoygLOvmK0knzycfMIFdWmP9S9tfaCPx?=
- =?us-ascii?Q?2VN7T63mc13Zpb23c4C+7xDXHpk68kU/6qGM8Mrjp9tRbU2pLobo2GdDJ3wH?=
- =?us-ascii?Q?vysR1KWWn9W9kdD59IrrHvuFtgGWAnZtF0KLxZmQYFUUOlmqo53qjxby/CPX?=
- =?us-ascii?Q?v5/9RWQaVwed98Qr6eW3VKeg+wxg2NfFoel45IK0fqTeoTPEoS0vprIZJ95/?=
- =?us-ascii?Q?Ed2NzTR10O57AQPfesoy9kketjrpDFqCVmiPu5RkvlAgyu6/jOza0iwq1dwk?=
- =?us-ascii?Q?eHdthldYdA8/pmxLiW9RZJj5XQ2mYDkvubxBryE3ItHLdO3dm6zLFUNJECEY?=
- =?us-ascii?Q?O0f7NSbnK0bE43nVR8WNghSBrk9Uj+Mjx7JxBr1ce/HGdX0UR4JVphvJHaaz?=
- =?us-ascii?Q?sGU7sRTWPHC6wJ9LY8EFspOtnJnY9wTYxoXc3s3ZgkTOVAYYmpVbQCg8MNQP?=
- =?us-ascii?Q?jZuuP26nZXV3l4xiqDNoQCq+tSKXNOs67Oi2HAXyLT7RsPKTUGTidmZ6yaz2?=
- =?us-ascii?Q?NEicZ/YFwlefQdDFVIFvivOQhd9YyxpVKGvnk4KYb5pJ/oh4voJ1EqLKCRIk?=
- =?us-ascii?Q?zBdRIPnfGN5CXG8jZwVhGrZajuIUjVLRD5c4qKkRD43PPBKKH4gMszaaIwSC?=
- =?us-ascii?Q?WiVbpVdIY+ZkfqYZTiH1ZbdvR1nVVQsQLlZRHC/7k9DMTA+2RnTpQKKSIxgL?=
- =?us-ascii?Q?JktLPalP2Qeu/a+KjbW4rGr6tfVlzb81/Slo2Hv4I/P00Z8IGpqSNKY9QTTu?=
- =?us-ascii?Q?Msqb+VLoszk4p5wsE5ImklB3t36bMaLqcV0SLNL64MBz71ja8CkWKjpJUint?=
- =?us-ascii?Q?m2JQIXOHRW1JLqrU8qXSLds0tDLnJ5GkAhrmAJlVenclSKvuJdAisYznTnmD?=
- =?us-ascii?Q?GjQG7nlxmb+ds/ioYVRPJCSDZfVUTQcPciqt+zgxIwVrZejoCsL1LxCQqIIX?=
- =?us-ascii?Q?wkWITJ8LmSMDUQN7BUuDZMTB7AiRjxwpaxsWGu29svXRluoTxBDui7/ehncF?=
- =?us-ascii?Q?OSpYsZvJtghI2KGMe+2w+oExIwMY7DekPf++sLl5s6XDL6ZtDs7rqv1kDlHq?=
- =?us-ascii?Q?qYePcABufU7synqjMZ8PIaEIj5macbL//Hhf50/WECfX3MYsk1PHxMxUrNrG?=
- =?us-ascii?Q?1hBa0DHtQGQqp4E5/oi4gKU4?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: b5b23f0a-22a7-4b7c-f0e4-08d94b9af100
-X-MS-Exchange-CrossTenant-AuthSource: BL0PR12MB5506.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Jul 2021 16:25:09.2482
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: yXliKp6dUsJ/NZsxaIYirzdXmQmwhJZA1kWJrgpjuNcZta5Btld/v07RFWsyr6Qw
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL1PR12MB5032
+In-Reply-To: <68ea014c-51bc-6ed4-a77e-dd7ce1a09aaf@amd.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jul 20, 2021 at 07:23:35PM +0300, Diana Craciun OSS wrote:
-> I have tested the changes and everything works as expected.
+On Tue, Jul 20, 2021, Brijesh Singh wrote:
+> 
+> On 7/19/21 5:50 PM, Sean Christopherson wrote:
+> ...
+> > 
+> > IIUC, this snippet in the spec means KVM can't restrict what requests are made
+> > by the guests.  If so, that makes it difficult to detect/ratelimit a misbehaving
+> > guest, and also limits our options if there are firmware issues (hopefully there
+> > aren't).  E.g. ratelimiting a guest after KVM has explicitly requested it to
+> > migrate is not exactly desirable.
+> > 
+> 
+> The guest message page contains a message header followed by the encrypted
+> payload. So, technically KVM can peek into the message header format to
+> determine the message request type. If needed, we can ratelimit based on the
+> message type.
 
-Great, thanks, I added a Tested-by for you
+Ah, I got confused by this code in snp_build_guest_buf():
 
-Jason
+	data->req_paddr = __sme_set(req_pfn << PAGE_SHIFT);
+
+I was thinking that setting the C-bit meant the memory was guest private, but
+that's setting the C-bit for the HPA, which is correct since KVM installs guest
+memory with C-bit=1 in the NPT, i.e. encrypts shared memory with the host key.
+
+Tangetially related question, is it correct to say that the host can _read_ memory
+from a page that is assigned=1, but has asid=0?  I.e. KVM can read the response
+page in order to copy it into the guest, even though it is a firmware page?
+
+	/* Copy the response after the firmware returns success. */
+	rc = kvm_write_guest(kvm, resp_gpa, sev->snp_resp_page, PAGE_SIZE);
+
+> In the current series we don't support migration etc so I decided to
+> ratelimit unconditionally.
+
+Since KVM can peek at the request header, KVM should flat out disallow requests
+that KVM doesn't explicitly support.  E.g. migration requests should not be sent
+to the PSP.
+
+One concern though: How does the guest query what requests are supported?  This
+snippet implies there's some form of enumeration:
+
+  Note: This guest message may be removed in future versions as it is redundant
+  with the CPUID page in SNP_LAUNCH_UPDATE (see Section 8.14).
+
+But all I can find is a "Message Version" in "Table 94. Message Type Encodings",
+which implies that request support is all or nothing for a given version.  That
+would be rather unfortunate as KVM has no way to tell the guest that something
+is unsupported :-(
+
+> > Is this exposed to userspace in any way?  This feels very much like a knob that
+> > needs to be configurable per-VM.
+> 
+> It's not exposed to the userspace and I am not sure if userspace care about
+> this knob.
+
+Userspace definitely cares, otherwise the system would need to be rebooted just to
+tune the ratelimiting.  And userspace may want to disable ratelimiting entirely,
+e.g. if the entire system is dedicated to a single VM.
+
+> > Also, what are the estimated latencies of a guest request?  If the worst case
+> > latency is >200ms, a default ratelimit frequency of 5hz isn't going to do a whole
+> > lot.
+> > 
+> 
+> The latency will depend on what else is going in the system at the time the
+> request comes to the hypervisor. Access to the PSP is serialized so other
+> parallel PSP command execution will contribute to the latency.
+
+I get that it will be variable, but what are some ballpark latencies?  E.g. what's
+the latency of the slowest command without PSP contention?
+
+> > Question on the VMPCK sequences.  The firmware ABI says:
+> > 
+> >     Each guest has four VMPCKs ... Each message contains a sequence number per
+> >     VMPCK. The sequence number is incremented with each message sent. Messages
+> >     sent by the guest to the firmware and by the firmware to the guest must be
+> >     delivered in order. If not, the firmware will reject subsequent messages ...
+> > 
+> > Does that mean there are four independent sequences, i.e. four streams the guest
+> > can use "concurrently", or does it mean the overall freshess/integrity check is
+> > composed from four VMPCK sequences, all of which must be correct for the message
+> > to be valid?
+> > 
+> 
+> There are four independent sequence counter and in theory guest can use them
+> concurrently. But the access to the PSP must be serialized.
+
+Technically that's not required from the guest's perspective, correct?  The guest
+only cares about the sequence numbers for a given VMPCK, e.g. it can have one
+in-flight request per VMPCK and expect that to work, even without fully serializing
+its own requests.
+
+Out of curiosity, why 4 VMPCKs?  It seems completely arbitrary.
+
+> Currently, the guest driver uses the VMPCK0 key to communicate with the PSP.
+> 
+> 
+> > If it's the latter, then a traditional mutex isn't really necessary because the
+> > guest must implement its own serialization, e.g. it's own mutex or whatever, to
+> > ensure there is at most one request in-flight at any given time.
+> 
+> The guest driver uses the its own serialization to ensure that there is
+> *exactly* one request in-flight.
+
+But KVM can't rely on that because it doesn't control the guest, e.g. it may be
+running a non-Linux guest.
+
+> The mutex used here is to protect the KVM's internal firmware response
+> buffer.
+
+Ya, where I was going with my question was that if the guest was architecturally
+restricted to a single in-flight request, then KVM could do something like this
+instead of taking kvm->lock (bad pseudocode):
+
+	if (test_and_set(sev->guest_request)) {
+		rc = AEAD_OFLOW;
+		goto fail;
+	}
+
+	<do request>
+
+	clear_bit(...)
+
+I.e. multiple in-flight requests can't work because the guest can guarantee
+ordering between vCPUs.  But, because the guest can theoretically have up to four
+in-flight requests, it's not that simple.
+
+The reason I'm going down this path is that taking kvm->lock inside vcpu->mutex
+violates KVM's locking rules, i.e. is susceptibl to deadlocks.  Per kvm/locking.rst,
+
+  - kvm->lock is taken outside vcpu->mutex
+
+That means a different mutex is needed to protect the guest request pages.
+
+	
+> > And on the KVM side it means KVM can simpy reject requests if there is
+> > already an in-flight request.  It might also give us more/better options
+> > for ratelimiting?
+> 
+> I don't think we should be running into this scenario unless there is a bug
+> in the guest kernel. The guest kernel support and CCP driver both ensure
+> that request to the PSP is serialized.
+
+Again, what the Linux kernel does is irrelevant.  What matters is what is
+architecturally allowed.
+
+> In normal operation we may see 1 to 2 quest requests for the entire guest
+> lifetime. I am thinking first request maybe for the attestation report and
+> second maybe to derive keys etc. It may change slightly when we add the
+> migration command; I have not looked into a great detail yet.
+
+
