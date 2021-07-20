@@ -2,21 +2,21 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 23BD53CF295
-	for <lists+kvm@lfdr.de>; Tue, 20 Jul 2021 05:29:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CEE203CF294
+	for <lists+kvm@lfdr.de>; Tue, 20 Jul 2021 05:29:23 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1346622AbhGTCry (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 19 Jul 2021 22:47:54 -0400
-Received: from angie.orcam.me.uk ([78.133.224.34]:60778 "EHLO
+        id S1346640AbhGTCrw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 19 Jul 2021 22:47:52 -0400
+Received: from angie.orcam.me.uk ([78.133.224.34]:60826 "EHLO
         angie.orcam.me.uk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S243525AbhGTCrK (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 19 Jul 2021 22:47:10 -0400
+        with ESMTP id S236705AbhGTCrP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 19 Jul 2021 22:47:15 -0400
 Received: by angie.orcam.me.uk (Postfix, from userid 500)
-        id 6A75492009C; Tue, 20 Jul 2021 05:27:43 +0200 (CEST)
+        id 67F0892009D; Tue, 20 Jul 2021 05:27:49 +0200 (CEST)
 Received: from localhost (localhost [127.0.0.1])
-        by angie.orcam.me.uk (Postfix) with ESMTP id 62D8692009B;
-        Tue, 20 Jul 2021 05:27:43 +0200 (CEST)
-Date:   Tue, 20 Jul 2021 05:27:43 +0200 (CEST)
+        by angie.orcam.me.uk (Postfix) with ESMTP id 609F192009B;
+        Tue, 20 Jul 2021 05:27:49 +0200 (CEST)
+Date:   Tue, 20 Jul 2021 05:27:49 +0200 (CEST)
 From:   "Maciej W. Rozycki" <macro@orcam.me.uk>
 To:     Nikolai Zhubr <zhubr.2@gmail.com>,
         Thomas Gleixner <tglx@linutronix.de>,
@@ -34,8 +34,11 @@ To:     Nikolai Zhubr <zhubr.2@gmail.com>,
 cc:     x86@kernel.org, linux-pci@vger.kernel.org,
         linux-pm@vger.kernel.org, kvm@vger.kernel.org,
         linux-kernel@vger.kernel.org
-Subject: [PATCH 0/6] x86: PIRQ/ELCR-related fixes and updates
-Message-ID: <alpine.DEB.2.21.2107171813230.9461@angie.orcam.me.uk>
+Subject: [PATCH 1/6] x86: Add support for 0x22/0x23 port I/O configuration
+ space
+In-Reply-To: <alpine.DEB.2.21.2107171813230.9461@angie.orcam.me.uk>
+Message-ID: <alpine.DEB.2.21.2107182353140.9461@angie.orcam.me.uk>
+References: <alpine.DEB.2.21.2107171813230.9461@angie.orcam.me.uk>
 User-Agent: Alpine 2.21 (DEB 202 2017-01-01)
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
@@ -43,68 +46,174 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi,
+Define macros and accessors for the configuration space addressed 
+indirectly with an index register and a data register at the port I/O 
+locations of 0x22 and 0x23 respectively.
 
- In the course of adding PIRQ routing support for Nikolai's FinALi system 
-I realised we need to have some infrastructure for the indirectly accessed
-configuration space implemented by some chipsets as well as Cyrix CPUs and 
-also included with the Intel MP spec for the IMCR register via port I/O 
-space locations 0x22/0x23.  With that in place I implemented PIRQ support 
-for the Intel PCEB/ESC combined EISA southbridge using the same scheme to 
-access the relevant registers and for the final remaining Intel chipset of 
-the era, that is the i420EX.
+This space is defined by the Intel MultiProcessor Specification for the 
+IMCR register used to switch between the PIC and the APIC mode[1], by 
+Cyrix processors for their configuration[2][3], and also some chipsets.
 
- While at it I chose to rewrite ELCR register accesses to avoid using 
-magic numbers scattered across our code and use proper macros like with 
-the remaining PIC registers, and while at it again I noticed and fixed a 
-number of typos: s/ECLR/ELCR/.
+Given the lack of atomicity with the indirect addressing a spinlock is 
+required to protect accesses, although for Cyrix processors it is enough 
+if accesses are executed with interrupts locally disabled, because the 
+registers are local to the accessing CPU, and IMCR is only ever poked at 
+by the BSP and early enough for interrupts not to have been configured 
+yet.  Therefore existing code does not have to change or use the new 
+spinlock and neither it does.
 
- Since there are mechanical dependencies between the patches (except for 
-typo fixes) I chose to send them as a series rather than individually, 
-though 3/6 depends on: <https://lore.kernel.org/patchwork/patch/1452772/> 
-necessarily as well, the fate of which is currently unclear to me.
+Put the spinlock in a library file then, so that it does not get pulled 
+unnecessarily for configurations that do not refer it.
 
- See individual change descriptions for details.
+Convert Cyrix accessors to wrappers so as to retain the brevity and 
+clarity of the `getCx86' and `setCx86' calls.
 
- Nikolai: for your system only 1/6 and 2/6 are required, though you are 
-free to experiment with all the patches.  Mind that 3/6 mechanically 
-depends on the earlier change for the SIO PIRQ router referred above.  In 
-any case please use the debug patch for PCI code as well as the earlier 
-patches for your other system and send the resulting bootstrap log for 
-confirmation.
+References:
 
- Ideally this would be verified with PCI interrupt sharing, but for that 
-you'd have to track down one or more multifunction option cards (USB 2.0 
-interfaces with legacy 1.1 functions or serial/parallel multi-I/O cards 
-are good candidates, but of course there are more) or option devices with 
-PCI-to-PCI bridges, and then actually use some of these devices as well.  
-Any interrupt sharing will be reported, e.g.:
+[1] "MultiProcessor Specification", Version 1.4, Intel Corporation, 
+    Order Number: 242016-006, May 1997, Section 3.6.2.1 "PIC Mode", pp. 
+    3-7, 3-8
 
-pci 0000:00:07.0: SIO/PIIX/ICH IRQ router [8086:7000]
-pci 0000:00:11.0: PCI INT A -> PIRQ 63, mask deb8, excl 0c20
-pci 0000:00:11.0: PCI INT A -> newirq 0
-PCI: setting IRQ 11 as level-triggered
-pci 0000:00:11.0: found PCI INT A -> IRQ 11
-pci 0000:00:11.0: sharing IRQ 11 with 0000:00:07.2
-pci 0000:02:00.0: using bridge 0000:00:11.0 INT A to get INT A
-pci 0000:00:11.0: sharing IRQ 11 with 0000:02:00.0
-pci 0000:02:01.0: using bridge 0000:00:11.0 INT B to get INT A
-pci 0000:02:02.0: using bridge 0000:00:11.0 INT C to get INT A
-pci 0000:03:00.0: using bridge 0000:00:11.0 INT A to get INT A
-pci 0000:00:11.0: sharing IRQ 11 with 0000:03:00.0
-pci 0000:04:00.0: using bridge 0000:00:11.0 INT B to get INT A
-pci 0000:04:00.3: using bridge 0000:00:11.0 INT A to get INT D
-pci 0000:00:11.0: sharing IRQ 11 with 0000:04:00.3
-pci 0000:06:05.0: using bridge 0000:00:11.0 INT D to get INT A
-pci 0000:06:08.0: using bridge 0000:00:11.0 INT C to get INT A
-pci 0000:06:08.1: using bridge 0000:00:11.0 INT D to get INT B
-pci 0000:06:08.2: using bridge 0000:00:11.0 INT A to get INT C
-pci 0000:00:11.0: sharing IRQ 11 with 0000:06:08.2
+[2] "5x86 Microprocessor", Cyrix Corporation, Order Number: 94192-00, 
+    July 1995, Section 2.3.2.4 "Configuration Registers", p. 2-23
 
--- a lot of sharing and swizzling here. :)  You'd most definitely need: 
-<https://lore.kernel.org/patchwork/patch/1454747/> for that though, as I 
-can't imagine PCI BIOS 2.1 PIRQ routers to commonly enumerate devices 
-behind PCI-to-PCI bridges, given that they fail to cope with more complex 
-bus topologies created by option devices in the first place.
+[3] "6x86 Processor", Cyrix Corporation, Order Number: 94175-01, March 
+    1996, Section 2.4.4 "6x86 Configuration Registers", p. 2-23
 
-  Maciej
+Signed-off-by: Maciej W. Rozycki <macro@orcam.me.uk>
+---
+Verified with `objdump' not to change arch/x86/kernel/apic/apic.o or 
+arch/x86/kernel/cpu/cyrix.o code produced.
+---
+ arch/x86/include/asm/pc-conf-reg.h     |   33 +++++++++++++++++++++++++++++++++
+ arch/x86/include/asm/processor-cyrix.h |    8 ++++----
+ arch/x86/kernel/apic/apic.c            |    9 +++------
+ arch/x86/lib/Makefile                  |    1 +
+ arch/x86/lib/pc-conf-reg.c             |   13 +++++++++++++
+ 5 files changed, 54 insertions(+), 10 deletions(-)
+
+linux-x86-pc-conf-reg.diff
+Index: linux-macro-pirq/arch/x86/include/asm/pc-conf-reg.h
+===================================================================
+--- /dev/null
++++ linux-macro-pirq/arch/x86/include/asm/pc-conf-reg.h
+@@ -0,0 +1,33 @@
++/* SPDX-License-Identifier: GPL-2.0 */
++/*
++ * Support for the configuration register space at port I/O locations
++ * 0x22 and 0x23 variously used by PC architectures, e.g. the MP Spec,
++ * Cyrix CPUs, numerous chipsets.
++ */
++#ifndef _ASM_X86_PC_CONF_REG_H
++#define _ASM_X86_PC_CONF_REG_H
++
++#include <linux/io.h>
++#include <linux/spinlock.h>
++#include <linux/types.h>
++
++#define PC_CONF_INDEX		0x22
++#define PC_CONF_DATA		0x23
++
++#define PC_CONF_MPS_IMCR	0x70
++
++extern raw_spinlock_t pc_conf_lock;
++
++static inline u8 pc_conf_get(u8 reg)
++{
++	outb(reg, PC_CONF_INDEX);
++	return inb(PC_CONF_DATA);
++}
++
++static inline void pc_conf_set(u8 reg, u8 data)
++{
++	outb(reg, PC_CONF_INDEX);
++	outb(data, PC_CONF_DATA);
++}
++
++#endif /* _ASM_X86_PC_CONF_REG_H */
+Index: linux-macro-pirq/arch/x86/include/asm/processor-cyrix.h
+===================================================================
+--- linux-macro-pirq.orig/arch/x86/include/asm/processor-cyrix.h
++++ linux-macro-pirq/arch/x86/include/asm/processor-cyrix.h
+@@ -5,14 +5,14 @@
+  * Access order is always 0x22 (=offset), 0x23 (=value)
+  */
+ 
++#include <asm/pc-conf-reg.h>
++
+ static inline u8 getCx86(u8 reg)
+ {
+-	outb(reg, 0x22);
+-	return inb(0x23);
++	return pc_conf_get(reg);
+ }
+ 
+ static inline void setCx86(u8 reg, u8 data)
+ {
+-	outb(reg, 0x22);
+-	outb(data, 0x23);
++	pc_conf_set(reg, data);
+ }
+Index: linux-macro-pirq/arch/x86/kernel/apic/apic.c
+===================================================================
+--- linux-macro-pirq.orig/arch/x86/kernel/apic/apic.c
++++ linux-macro-pirq/arch/x86/kernel/apic/apic.c
+@@ -38,6 +38,7 @@
+ 
+ #include <asm/trace/irq_vectors.h>
+ #include <asm/irq_remapping.h>
++#include <asm/pc-conf-reg.h>
+ #include <asm/perf_event.h>
+ #include <asm/x86_init.h>
+ #include <linux/atomic.h>
+@@ -132,18 +133,14 @@ static int enabled_via_apicbase __ro_aft
+  */
+ static inline void imcr_pic_to_apic(void)
+ {
+-	/* select IMCR register */
+-	outb(0x70, 0x22);
+ 	/* NMI and 8259 INTR go through APIC */
+-	outb(0x01, 0x23);
++	pc_conf_set(PC_CONF_MPS_IMCR, 0x01);
+ }
+ 
+ static inline void imcr_apic_to_pic(void)
+ {
+-	/* select IMCR register */
+-	outb(0x70, 0x22);
+ 	/* NMI and 8259 INTR go directly to BSP */
+-	outb(0x00, 0x23);
++	pc_conf_set(PC_CONF_MPS_IMCR, 0x00);
+ }
+ #endif
+ 
+Index: linux-macro-pirq/arch/x86/lib/Makefile
+===================================================================
+--- linux-macro-pirq.orig/arch/x86/lib/Makefile
++++ linux-macro-pirq/arch/x86/lib/Makefile
+@@ -44,6 +44,7 @@ obj-$(CONFIG_SMP) += msr-smp.o cache-smp
+ lib-y := delay.o misc.o cmdline.o cpu.o
+ lib-y += usercopy_$(BITS).o usercopy.o getuser.o putuser.o
+ lib-y += memcpy_$(BITS).o
++lib-y += pc-conf-reg.o
+ lib-$(CONFIG_ARCH_HAS_COPY_MC) += copy_mc.o copy_mc_64.o
+ lib-$(CONFIG_INSTRUCTION_DECODER) += insn.o inat.o insn-eval.o
+ lib-$(CONFIG_RANDOMIZE_BASE) += kaslr.o
+Index: linux-macro-pirq/arch/x86/lib/pc-conf-reg.c
+===================================================================
+--- /dev/null
++++ linux-macro-pirq/arch/x86/lib/pc-conf-reg.c
+@@ -0,0 +1,13 @@
++// SPDX-License-Identifier: GPL-2.0
++/*
++ * Support for the configuration register space at port I/O locations
++ * 0x22 and 0x23 variously used by PC architectures, e.g. the MP Spec,
++ * Cyrix CPUs, numerous chipsets.  As the space is indirectly addressed
++ * it may have to be protected with a spinlock, depending on the context.
++ */
++
++#include <linux/spinlock.h>
++
++#include <asm/pc-conf-reg.h>
++
++DEFINE_RAW_SPINLOCK(pc_conf_lock);
