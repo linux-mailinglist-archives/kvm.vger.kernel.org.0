@@ -2,21 +2,21 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2CCAE3CF286
-	for <lists+kvm@lfdr.de>; Tue, 20 Jul 2021 05:29:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BAB923CF297
+	for <lists+kvm@lfdr.de>; Tue, 20 Jul 2021 05:29:24 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244919AbhGTCrk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 19 Jul 2021 22:47:40 -0400
-Received: from angie.orcam.me.uk ([78.133.224.34]:60864 "EHLO
+        id S237620AbhGTCro (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 19 Jul 2021 22:47:44 -0400
+Received: from angie.orcam.me.uk ([78.133.224.34]:60906 "EHLO
         angie.orcam.me.uk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242706AbhGTCrW (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 19 Jul 2021 22:47:22 -0400
+        with ESMTP id S242865AbhGTCr0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 19 Jul 2021 22:47:26 -0400
 Received: by angie.orcam.me.uk (Postfix, from userid 500)
-        id C65E19200B4; Tue, 20 Jul 2021 05:27:59 +0200 (CEST)
+        id 32C1C9200BC; Tue, 20 Jul 2021 05:28:04 +0200 (CEST)
 Received: from localhost (localhost [127.0.0.1])
-        by angie.orcam.me.uk (Postfix) with ESMTP id BF5179200B3;
-        Tue, 20 Jul 2021 05:27:59 +0200 (CEST)
-Date:   Tue, 20 Jul 2021 05:27:59 +0200 (CEST)
+        by angie.orcam.me.uk (Postfix) with ESMTP id 2B64C9200BB;
+        Tue, 20 Jul 2021 05:28:04 +0200 (CEST)
+Date:   Tue, 20 Jul 2021 05:28:04 +0200 (CEST)
 From:   "Maciej W. Rozycki" <macro@orcam.me.uk>
 To:     Nikolai Zhubr <zhubr.2@gmail.com>,
         Thomas Gleixner <tglx@linutronix.de>,
@@ -34,10 +34,9 @@ To:     Nikolai Zhubr <zhubr.2@gmail.com>,
 cc:     x86@kernel.org, linux-pci@vger.kernel.org,
         linux-pm@vger.kernel.org, kvm@vger.kernel.org,
         linux-kernel@vger.kernel.org
-Subject: [PATCH 3/6] x86/PCI: Add support for the Intel 82374EB/82374SB (ESC)
- PIRQ router
+Subject: [PATCH 4/6] x86/PCI: Add support for the Intel 82426EX PIRQ router
 In-Reply-To: <alpine.DEB.2.21.2107171813230.9461@angie.orcam.me.uk>
-Message-ID: <alpine.DEB.2.21.2107192023450.9461@angie.orcam.me.uk>
+Message-ID: <alpine.DEB.2.21.2107200213490.9461@angie.orcam.me.uk>
 References: <alpine.DEB.2.21.2107171813230.9461@angie.orcam.me.uk>
 User-Agent: Alpine 2.21 (DEB 202 2017-01-01)
 MIME-Version: 1.0
@@ -46,139 +45,113 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The Intel 82374EB/82374SB EISA System Component (ESC) devices implement 
-PCI interrupt steering with a PIRQ router[1] in the form of four PIRQ 
-Route Control registers, available in the port I/O space accessible 
-indirectly via the index/data register pair at 0x22/0x23, located at 
-indices 0x60/0x61/0x62/0x63 for the PIRQ0/1/2/3# lines respectively.  
+The Intel 82426EX ISA Bridge (IB), a part of the Intel 82420EX PCIset, 
+implements PCI interrupt steering with a PIRQ router in the form of two 
+PIRQ Route Control registers, available in the PCI configuration space 
+at locations 0x66 and 0x67 for the PIRQ0# and PIRQ1# lines respectively.
 
-The semantics is the same as with the PIIX router, however it is not 
-clear if BIOSes use register indices or line numbers as the cookie to 
-identify PCI interrupts in their routing tables and therefore support 
+The semantics is the same as with the PIIX router, however it is not
+clear if BIOSes use register indices or line numbers as the cookie to
+identify PCI interrupts in their routing tables and therefore support
 either scheme.
 
-Accesses to the port I/O space concerned here need to be unlocked by 
-writing the value of 0x0f to the ESC ID Register at index 0x02 
-beforehand[2].  Do so then and then lock access after use for safety. 
-
-This locking could possibly interfere with accesses to the Intel MP spec 
-IMCR register, implemented by the 82374SB variant of the ESC only as the 
-PCI/APIC Control Register at index 0x70[3], for which leaving access to 
-the configuration space concerned unlocked may have been a requirement 
-for the BIOS to remain compliant with the MP spec.  However we only poke 
-at the IMCR register if the APIC mode is used, in which case the PIRQ 
-router is not, so this arrangement is not going to interfere with IMCR 
-access code.
-
-The ESC is implemented as a part of the combined southbridge also made 
-of 82375EB/82375SB PCI-EISA Bridge (PCEB) and does itself appear in the 
-PCI configuration space.  Use the PCEB's device identification then for
-determining the presence of the ESC.
+The IB is directly attached to the Intel 82425EX PCI System Controller 
+(PSC) component of the chipset via a dedicated PSC/IB Link interface 
+rather than the host bus or PCI.  Therefore it does not itself appear in 
+the PCI configuration space even though it responds to configuration 
+cycles addressing registers it implements.  Use 82425EX's identification 
+then for determining the presence of the IB.
 
 References:
 
-[1] "82374EB/82374SB EISA System Component (ESC)", Intel Corporation, 
-    Order Number: 290476-004, March 1996, Section 3.1.12 
-    "PIRQ[0:3]#--PIRQ Route Control Registers", pp. 44-45
-
-[2] same, Section 3.1.1 "ESCID--ESC ID Register", p. 36
-
-[3] same, Section 3.1.17 "PAC--PCI/APIC Control Register", p. 47
+[1] "82420EX PCIset Data Sheet, 82425EX PCI System Controller (PSC) and 
+    82426EX ISA Bridge (IB)", Intel Corporation, Order Number: 
+    290488-004, December 1995, Section 3.3.18 "PIRQ1RC/PIRQ0RC--PIRQ 
+    Route Control Registers", p. 61
 
 Signed-off-by: Maciej W. Rozycki <macro@orcam.me.uk>
 ---
- arch/x86/pci/irq.c |   73 +++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 73 insertions(+)
+ arch/x86/pci/irq.c      |   49 ++++++++++++++++++++++++++++++++++++++++++++++++
+ include/linux/pci_ids.h |    1 
+ 2 files changed, 50 insertions(+)
 
-linux-x86-pirq-router-esc.diff
+linux-x86-pirq-router-ib.diff
 Index: linux-macro-pirq/arch/x86/pci/irq.c
 ===================================================================
 --- linux-macro-pirq.orig/arch/x86/pci/irq.c
 +++ linux-macro-pirq/arch/x86/pci/irq.c
-@@ -359,6 +359,74 @@ static int pirq_ali_set(struct pci_dev *
+@@ -447,6 +447,50 @@ static int pirq_piix_set(struct pci_dev
  }
  
  /*
-+ *	PIRQ routing for the 82374EB/82374SB EISA System Component (ESC)
-+ *	ASIC used with the Intel 82420 and 82430 PCIsets.  The ESC is not
-+ *	decoded in the PCI configuration space, so we identify it by the
-+ *	accompanying 82375EB/82375SB PCI-EISA Bridge (PCEB) ASIC.
++ *	PIRQ routing for the 82426EX ISA Bridge (IB) ASIC used with the
++ *	Intel 82420EX PCIset.
 + *
-+ *	There are four PIRQ Route Control registers, available in the
-+ *	port I/O space accessible indirectly via the index/data register
-+ *	pair at 0x22/0x23, located at indices 0x60/0x61/0x62/0x63 for the
-+ *	PIRQ0/1/2/3# lines respectively.  The semantics is the same as
-+ *	with the PIIX router.
-+ *
-+ *	Accesses to the port I/O space concerned here need to be unlocked
-+ *	by writing the value of 0x0f to the ESC ID Register at index 0x02
-+ *	beforehand.  Any other value written to said register prevents
-+ *	further accesses from reaching the register file, except for the
-+ *	ESC ID Register being written with 0x0f again.
++ *	There are only two PIRQ Route Control registers, available in the
++ *	combined 82425EX/82426EX PCI configuration space, at 0x66 and 0x67
++ *	for the PIRQ0# and PIRQ1# lines respectively.  The semantics is
++ *	the same as with the PIIX router.
 + *
 + *	References:
 + *
-+ *	"82374EB/82374SB EISA System Component (ESC)", Intel Corporation,
-+ *	Order Number: 290476-004, March 1996
-+ *
-+ *	"82375EB/82375SB PCI-EISA Bridge (PCEB)", Intel Corporation, Order
-+ *	Number: 290477-004, March 1996
++ *	"82420EX PCIset Data Sheet, 82425EX PCI System Controller (PSC)
++ *	and 82426EX ISA Bridge (IB)", Intel Corporation, Order Number:
++ *	290488-004, December 1995
 + */
 +
-+#define PC_CONF_I82374_ESC_ID			0x02u
-+#define PC_CONF_I82374_PIRQ_ROUTE_CONTROL	0x60u
++#define PCI_I82426EX_PIRQ_ROUTE_CONTROL	0x66u
 +
-+#define PC_CONF_I82374_ESC_ID_KEY		0x0fu
-+
-+static int pirq_esc_get(struct pci_dev *router, struct pci_dev *dev, int pirq)
++static int pirq_ib_get(struct pci_dev *router, struct pci_dev *dev, int pirq)
 +{
-+	unsigned long flags;
 +	int reg;
 +	u8 x;
 +
 +	reg = pirq;
-+	if (reg >= 1 && reg <= 4)
-+		reg += PC_CONF_I82374_PIRQ_ROUTE_CONTROL - 1;
++	if (reg >= 1 && reg <= 2)
++		reg += PCI_I82426EX_PIRQ_ROUTE_CONTROL - 1;
 +
-+	raw_spin_lock_irqsave(&pc_conf_lock, flags);
-+	pc_conf_set(PC_CONF_I82374_ESC_ID, PC_CONF_I82374_ESC_ID_KEY);
-+	x = pc_conf_get(reg);
-+	pc_conf_set(PC_CONF_I82374_ESC_ID, 0);
-+	raw_spin_unlock_irqrestore(&pc_conf_lock, flags);
++	pci_read_config_byte(router, reg, &x);
 +	return (x < 16) ? x : 0;
 +}
 +
-+static int pirq_esc_set(struct pci_dev *router, struct pci_dev *dev, int pirq,
++static int pirq_ib_set(struct pci_dev *router, struct pci_dev *dev, int pirq,
 +		       int irq)
 +{
-+	unsigned long flags;
 +	int reg;
 +
 +	reg = pirq;
-+	if (reg >= 1 && reg <= 4)
-+		reg += PC_CONF_I82374_PIRQ_ROUTE_CONTROL - 1;
++	if (reg >= 1 && reg <= 2)
++		reg += PCI_I82426EX_PIRQ_ROUTE_CONTROL - 1;
 +
-+	raw_spin_lock_irqsave(&pc_conf_lock, flags);
-+	pc_conf_set(PC_CONF_I82374_ESC_ID, PC_CONF_I82374_ESC_ID_KEY);
-+	pc_conf_set(reg, irq);
-+	pc_conf_set(PC_CONF_I82374_ESC_ID, 0);
-+	raw_spin_unlock_irqrestore(&pc_conf_lock, flags);
++	pci_write_config_byte(router, reg, irq);
 +	return 1;
 +}
 +
 +/*
-  * The Intel PIIX4 pirq rules are fairly simple: "pirq" is
-  * just a pointer to the config space.
-  */
-@@ -768,6 +836,11 @@ static __init int intel_router_probe(str
- 
- 	switch (device) {
- 		u8 rid;
-+	case PCI_DEVICE_ID_INTEL_82375:
-+		r->name = "PCEB/ESC";
-+		r->get = pirq_esc_get;
-+		r->set = pirq_esc_set;
+  * The VIA pirq rules are nibble-based, like ALI,
+  * but without the ugly irq number munging.
+  * However, PIRQD is in the upper instead of lower 4 bits.
+@@ -892,6 +936,11 @@ static __init int intel_router_probe(str
+ 		r->get = pirq_piix_get;
+ 		r->set = pirq_piix_set;
+ 		return 1;
++	case PCI_DEVICE_ID_INTEL_82425:
++		r->name = "PSC/IB";
++		r->get = pirq_ib_get;
++		r->set = pirq_ib_set;
 +		return 1;
- 	case PCI_DEVICE_ID_INTEL_82378:
- 		pci_read_config_byte(router, PCI_REVISION_ID, &rid);
- 		/* Tell 82378IB (rev < 3) and 82378ZB/82379AB apart.  */
+ 	}
+ 
+ 	if ((device >= PCI_DEVICE_ID_INTEL_5_3400_SERIES_LPC_MIN && 
+Index: linux-macro-pirq/include/linux/pci_ids.h
+===================================================================
+--- linux-macro-pirq.orig/include/linux/pci_ids.h
++++ linux-macro-pirq/include/linux/pci_ids.h
+@@ -2644,6 +2644,7 @@
+ #define PCI_DEVICE_ID_INTEL_82375	0x0482
+ #define PCI_DEVICE_ID_INTEL_82424	0x0483
+ #define PCI_DEVICE_ID_INTEL_82378	0x0484
++#define PCI_DEVICE_ID_INTEL_82425	0x0486
+ #define PCI_DEVICE_ID_INTEL_MRST_SD0	0x0807
+ #define PCI_DEVICE_ID_INTEL_MRST_SD1	0x0808
+ #define PCI_DEVICE_ID_INTEL_MFD_SD	0x0820
