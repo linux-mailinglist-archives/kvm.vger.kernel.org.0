@@ -2,52 +2,52 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E48833CF8A8
-	for <lists+kvm@lfdr.de>; Tue, 20 Jul 2021 13:13:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7FB1E3CF8B2
+	for <lists+kvm@lfdr.de>; Tue, 20 Jul 2021 13:17:16 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236458AbhGTKcw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 20 Jul 2021 06:32:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54592 "EHLO
+        id S236425AbhGTKg3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 20 Jul 2021 06:36:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55274 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233406AbhGTKcr (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 20 Jul 2021 06:32:47 -0400
-Received: from mail-wr1-x42d.google.com (mail-wr1-x42d.google.com [IPv6:2a00:1450:4864:20::42d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 73423C061574
-        for <kvm@vger.kernel.org>; Tue, 20 Jul 2021 04:13:25 -0700 (PDT)
-Received: by mail-wr1-x42d.google.com with SMTP id d2so25622504wrn.0
-        for <kvm@vger.kernel.org>; Tue, 20 Jul 2021 04:13:25 -0700 (PDT)
+        with ESMTP id S237160AbhGTKfq (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 20 Jul 2021 06:35:46 -0400
+Received: from mail-wr1-x432.google.com (mail-wr1-x432.google.com [IPv6:2a00:1450:4864:20::432])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AA16FC061762
+        for <kvm@vger.kernel.org>; Tue, 20 Jul 2021 04:16:22 -0700 (PDT)
+Received: by mail-wr1-x432.google.com with SMTP id i94so25571451wri.4
+        for <kvm@vger.kernel.org>; Tue, 20 Jul 2021 04:16:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=rssW9MvuSrY18dvpw7amkf+MYjvhgV8BCmj8r2D+edQ=;
-        b=K7vq3dVJv9e19grP2qCy6RAOZY+bX+Abe2GwleQgCAThD/Ktphh7T6Hk8e+U7dOn5Q
-         ymRWUaww5B0nvzeT//Q1p6BowVr0oYbwsyreIyOlK5N8DlZfrIu1zZ9o2opKWlKnBrnk
-         LUCsiCUbO1X92FsH9QqgOFn2KjjXTQLsmYrpMUzxGFAZ/jOUz4jDfZzKO9QRDCm+1dEQ
-         GVPLQBeAySBxe19MQruR5u16/OFBNBl8de3UVr0Z42Ef1FQxlvPify25KeQg4iRdsigB
-         Lo4yVb2io4tvTVln2XGFG39wJoQ/PpjT9OhOUm+uJojX6OCXNmOmMF/3IjDmn6neevRp
-         om0A==
+        bh=lpz51H3kvzr0DXJiE5RSxJNphxVtTP/JsLlCDtT69nE=;
+        b=qIC8S+W4YEqX+/j1F2FfOOKMPB60fsBSS7jpd0cT0fUpSNivYVwV9Lc7AMV3WoXmMw
+         v9CgSh/vI2qWbAPurBZw5TN+KhWhe340MqIv4ApDr2YkuHg+Csl3bWm9i8QeClaaikDF
+         uMaiwpDXgtAjXyOpfnmR2iYIblGFLYIY3j+yTDSwccOVQiIL8S3kXlqDClfWK41H+kgw
+         kmra3575DBZwkejSgK4e4RWzFoz1f0sOdv7uO07ytjh1dww1naA5hdZhhZFRFHVDi3Yj
+         hQdxBPLQFqiPS5CCQ0OE+yh0ewTntdOyy+voxTzTeMDdMan7IlXYk0lQLYB1dMXeHg6A
+         /60Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=rssW9MvuSrY18dvpw7amkf+MYjvhgV8BCmj8r2D+edQ=;
-        b=GcThxpDz1XtMAqxmvMkg0hBuIK+VbSPCS1G498k2vmP3hQ2v+awLKVGJ80jb4dELhn
-         NXFFRi2K8af9Ua4VJ/EfnxZ6AOR0dfIzdECzxtuB4OJE/ZgmzCKi6ILj3ag7ypQ24r+4
-         eilIacZ4RXExG6XkbLjeQNdk/vsR1NjlPrpBAXb4oxk6C3LzpawGlyI0A7+XOVcVqjnb
-         rjNU00JAaCdRiOZCiVbhD8ADkRhMO3dhp/CLYSSqm4mrdT/Op++sugTwxwLqtrrGKBiD
-         WaPEKsj2ESM78Fcy6JkWg4mT94/MsPm2qGye79OnAsrzUILB+mHsDLtTsWf8BdF78g86
-         Nitw==
-X-Gm-Message-State: AOAM533v+09fOSG6SuH1ZujjCzkFLn5odqHYwK+GPGE5Q7CCvA21ChqB
-        wirKBuCEMjcWSg31nphCZtFKkg==
-X-Google-Smtp-Source: ABdhPJxucLoq3tJ6ywks6cNiyi6pYtOe5W3MkGbCfwenZlNTGXHtenBEwmkjoTj+HN+TgHpbImyIYQ==
-X-Received: by 2002:adf:f74f:: with SMTP id z15mr35360657wrp.54.1626779603785;
-        Tue, 20 Jul 2021 04:13:23 -0700 (PDT)
+        bh=lpz51H3kvzr0DXJiE5RSxJNphxVtTP/JsLlCDtT69nE=;
+        b=WbI9qsvHs2lMC+joS16PTOfWBnWhlXJtPyuAZuI902aGt9og9FdGaLmft/9diLfCxq
+         fJTSA0MEMTaaqmMkJM20Z4kaJClFGFfxIW1mJSg5yivEwiMPk+HzGfQC4Z3Wt0ELF3GZ
+         +cTVu12RLdz/yUZw/HjLuYXUm06EFSDFptFce9iQXlhVrogCmtRHcDZ8LAr3ObeMqoh3
+         S9TeyLFr0+wjCe6piEn6Man9bP+CTOiP1bMbAIMVxJL6tWOWqOS4uXH3Ua1U795p2GDy
+         SBuqmo/N86td6bnW5gymst8cJzpVD3pdIkrEON4qcEWgMgknojY/RkKnMoNFxGRi/a/H
+         MUJQ==
+X-Gm-Message-State: AOAM5333KYLANAcWLRx7OuoPoCE/zzyuj3SphgRxksMaVOMpbvR2GYyg
+        XnbJBv9p/8CjZuOPblgrXrZXrg==
+X-Google-Smtp-Source: ABdhPJzyDbPtX+5Q7MPnRmTCUDtOQw0hbyz28e4E5BQ9dsfjysvHdxUpebOfYRKz9mVC05s+yeb7VQ==
+X-Received: by 2002:a05:6000:102:: with SMTP id o2mr35120793wrx.299.1626779781184;
+        Tue, 20 Jul 2021 04:16:21 -0700 (PDT)
 Received: from google.com ([2a00:79e0:d:210:83e0:11ac:c870:2b97])
-        by smtp.gmail.com with ESMTPSA id y3sm23651964wrh.16.2021.07.20.04.13.23
+        by smtp.gmail.com with ESMTPSA id a8sm23462978wrt.61.2021.07.20.04.16.20
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 20 Jul 2021 04:13:23 -0700 (PDT)
-Date:   Tue, 20 Jul 2021 12:13:20 +0100
+        Tue, 20 Jul 2021 04:16:20 -0700 (PDT)
+Date:   Tue, 20 Jul 2021 12:16:17 +0100
 From:   Quentin Perret <qperret@google.com>
 To:     Marc Zyngier <maz@kernel.org>
 Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
@@ -58,59 +58,71 @@ Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
         Suzuki K Poulose <suzuki.poulose@arm.com>,
         Alexandru Elisei <alexandru.elisei@arm.com>,
         kernel-team@android.com
-Subject: Re: [PATCH 04/16] KVM: arm64: Add MMIO checking infrastructure
-Message-ID: <YPav0Hye5Dat/yoL@google.com>
+Subject: Re: [PATCH 15/16] arm64: Add a helper to retrieve the PTE of a fixmap
+Message-ID: <YPawgYJYfD+EfXBW@google.com>
 References: <20210715163159.1480168-1-maz@kernel.org>
- <20210715163159.1480168-5-maz@kernel.org>
+ <20210715163159.1480168-16-maz@kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20210715163159.1480168-5-maz@kernel.org>
+In-Reply-To: <20210715163159.1480168-16-maz@kernel.org>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thursday 15 Jul 2021 at 17:31:47 (+0100), Marc Zyngier wrote:
-> +struct s2_walk_data {
-> +	kvm_pte_t	pteval;
-> +	u32		level;
-> +};
+On Thursday 15 Jul 2021 at 17:31:58 (+0100), Marc Zyngier wrote:
+> In order to transfer the early mapping state into KVM's MMIO
+> guard infrastucture, provide a small helper that will retrieve
+> the associated PTE.
+> 
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> ---
+>  arch/arm64/include/asm/fixmap.h |  2 ++
+>  arch/arm64/mm/mmu.c             | 15 +++++++++++++++
+>  2 files changed, 17 insertions(+)
+> 
+> diff --git a/arch/arm64/include/asm/fixmap.h b/arch/arm64/include/asm/fixmap.h
+> index 4335800201c9..1aae625b944f 100644
+> --- a/arch/arm64/include/asm/fixmap.h
+> +++ b/arch/arm64/include/asm/fixmap.h
+> @@ -105,6 +105,8 @@ void __init early_fixmap_init(void);
+>  
+>  extern void __set_fixmap(enum fixed_addresses idx, phys_addr_t phys, pgprot_t prot);
+>  
+> +extern pte_t *__get_fixmap_pte(enum fixed_addresses idx);
 > +
-> +static int s2_walker(u64 addr, u64 end, u32 level, kvm_pte_t *ptep,
-> +		     enum kvm_pgtable_walk_flags flag, void * const arg)
+>  #include <asm-generic/fixmap.h>
+>  
+>  #endif /* !__ASSEMBLY__ */
+> diff --git a/arch/arm64/mm/mmu.c b/arch/arm64/mm/mmu.c
+> index d74586508448..f1b7abd04025 100644
+> --- a/arch/arm64/mm/mmu.c
+> +++ b/arch/arm64/mm/mmu.c
+> @@ -1286,6 +1286,21 @@ void __set_fixmap(enum fixed_addresses idx,
+>  	}
+>  }
+>  
+> +pte_t *__get_fixmap_pte(enum fixed_addresses idx)
 > +{
-> +	struct s2_walk_data *data = arg;
+> +	unsigned long 	addr = __fix_to_virt(idx);
+
+Nit: odd spacing here.
+
+> +	pte_t *ptep;
 > +
-> +	data->level = level;
-> +	data->pteval = *ptep;
-> +	return 0;
+> +	BUG_ON(idx <= FIX_HOLE || idx >= __end_of_fixed_addresses);
+> +
+> +	ptep = fixmap_pte(addr);
+> +
+> +	if (!pte_valid(*ptep))
+> +		return NULL;
+> +
+> +	return ptep;
 > +}
 > +
-> +/* Assumes mmu_lock taken */
-> +static bool __check_ioguard_page(struct kvm_vcpu *vcpu, gpa_t ipa)
-> +{
-> +	struct s2_walk_data data;
-> +	struct kvm_pgtable_walker walker = {
-> +		.cb             = s2_walker,
-> +		.flags          = KVM_PGTABLE_WALK_LEAF,
-> +		.arg            = &data,
-> +	};
-> +
-> +	kvm_pgtable_walk(vcpu->arch.hw_mmu->pgt, ALIGN_DOWN(ipa, PAGE_SIZE),
-> +			 PAGE_SIZE, &walker);
-> +
-> +	/* Must be a PAGE_SIZE mapping with our annotation */
-> +	return (BIT(ARM64_HW_PGTABLE_LEVEL_SHIFT(data.level)) == PAGE_SIZE &&
-> +		data.pteval == MMIO_NOTE);
-
-Nit: you could do this check in the walker directly and check the return
-value of kvm_pgtable_walk() instead. That would allow to get rid of
-struct s2_walk_data.
-
-Also, though the compiler might be able to optimize, maybe simplify the
-level check to level == (KVM_PGTABLE_MAX_LEVELS - 1)?
-
-Thanks,
-Quentin
-
-> +}
+>  void *__init fixmap_remap_fdt(phys_addr_t dt_phys, int *size, pgprot_t prot)
+>  {
+>  	const u64 dt_virt_base = __fix_to_virt(FIX_FDT);
+> -- 
+> 2.30.2
+> 
