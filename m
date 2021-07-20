@@ -2,231 +2,209 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6771E3CFCDF
-	for <lists+kvm@lfdr.de>; Tue, 20 Jul 2021 17:04:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8A39C3CFE90
+	for <lists+kvm@lfdr.de>; Tue, 20 Jul 2021 18:03:49 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238653AbhGTOVH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 20 Jul 2021 10:21:07 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:26992 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S234968AbhGTOMt (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 20 Jul 2021 10:12:49 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1626792785;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=AJ3a+l7HYygfc5k+wq8ZfjE4bAmzGHq+jXXRV2Bhjoc=;
-        b=IqcB5mjK2Ad+qObCfNaYy4Ooz7RJE1Nq00AOF3QzIj/5dPKUIycXxdAnsPNnB67KX8OiCt
-        iB9kT0t/YlCOibDxPZiUsZAN2xCEg3qxKHTgozyJU5+q3Dc95QOy38i/sM0Tj5AOqpGrib
-        bz8RnXMl2CS4G62hXEIylL9xFWCBepU=
-Received: from mail-il1-f199.google.com (mail-il1-f199.google.com
- [209.85.166.199]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-345-K66-J-woOpKzyaqMFu1_AQ-1; Tue, 20 Jul 2021 10:53:01 -0400
-X-MC-Unique: K66-J-woOpKzyaqMFu1_AQ-1
-Received: by mail-il1-f199.google.com with SMTP id c7-20020a92b7470000b0290205c6edd752so13250287ilm.14
-        for <kvm@vger.kernel.org>; Tue, 20 Jul 2021 07:53:01 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=AJ3a+l7HYygfc5k+wq8ZfjE4bAmzGHq+jXXRV2Bhjoc=;
-        b=d+wJSn7YKpKIG3gzmVFnVmNmQvgMkZa2+8OhpzaMFPxH3wr0Kz4rw32PYg9RajKROo
-         Nsjt0Tfk/CAekaTNnyZebA2cEI70XHNZcFZL+N5M4Q7PMmM97/21kfyuWTssT8kS0R7D
-         XKwJOntyp3FVKxu534APUsV6/z2Gtxs3HWF1bcFFhFTTfK/RXfxcJd2O6ZDqAGVzvo4Z
-         RmWF+2cEbPfLveT8OaVxY5dSX9cvBy+b0xIuUmyawSOgEFtvLEJVnX58t0GbXebJ+r1q
-         9jac5DLFKqXJ6wtyNUOPI0NSI9plyjPrWpg8FLxBM5K7h0UQM2QBP3bUyM7LvdtkQ+Fz
-         O/9w==
-X-Gm-Message-State: AOAM531vAsY24BWT0djUjqz/Q0SXyzNlWnSd/0HEMXF031Wr51we6Bzo
-        A/7i9h3mHmcNvMNk5xhquo9snD2bQNbTrcEd8ZNz4i6rc9zwR9y84rrd7BfehRNDdxCRQRRNvxd
-        AhR8yJn47vCX9
-X-Received: by 2002:a92:ab0a:: with SMTP id v10mr6070833ilh.17.1626792781052;
-        Tue, 20 Jul 2021 07:53:01 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJytAJej/L/uU7XclEttOrrPj1uCh7eLW+Gj07JbLiTweYRkQoA4op5Sy4dx4Bzh1ky2IX4HwQ==
-X-Received: by 2002:a92:ab0a:: with SMTP id v10mr6070822ilh.17.1626792780811;
-        Tue, 20 Jul 2021 07:53:00 -0700 (PDT)
-Received: from gator ([140.82.166.162])
-        by smtp.gmail.com with ESMTPSA id g26sm10093279ioh.48.2021.07.20.07.52.59
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 20 Jul 2021 07:53:00 -0700 (PDT)
-Date:   Tue, 20 Jul 2021 16:52:58 +0200
-From:   Andrew Jones <drjones@redhat.com>
-To:     Fuad Tabba <tabba@google.com>
-Cc:     kvmarm@lists.cs.columbia.edu, maz@kernel.org, will@kernel.org,
-        james.morse@arm.com, alexandru.elisei@arm.com,
-        suzuki.poulose@arm.com, mark.rutland@arm.com,
-        christoffer.dall@arm.com, pbonzini@redhat.com, qperret@google.com,
-        kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        kernel-team@android.com
-Subject: Re: [PATCH v3 06/15] KVM: arm64: Restore mdcr_el2 from vcpu
-Message-ID: <20210720145258.axhqog3abdvtpqhw@gator>
-References: <20210719160346.609914-1-tabba@google.com>
- <20210719160346.609914-7-tabba@google.com>
+        id S237781AbhGTPWY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 20 Jul 2021 11:22:24 -0400
+Received: from mail-dm6nam10on2052.outbound.protection.outlook.com ([40.107.93.52]:50465
+        "EHLO NAM10-DM6-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S239888AbhGTOeo (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 20 Jul 2021 10:34:44 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=YQqVsdyN5qA/gsfIBdVV1+zpx7q5KN0vnlrYNHpWMJLehiScu40UAuxlDDKS1bPvLwB0F9uLheYrHF6adKYH5TBLrLCyJni/dCdLOr1lWSCcMfnq9SlZYTLMgwmwL8X4b8rdhFXfZz3mAJmMF7LCbDTo1FV16Gnay6fFQ6PTvoUlaN/XMSsW3ixGAlhumI6SKo6pyJxk2WOXdQzwx7RLDD3P1OUrQyRKix+ASsA3bCITmT2BGkOji8I96n1WanGyWQhhDgkEmWV36ZRLOs25p1uGTLhl8MCWBpEz54BixpBY/ghSj1pjvS3M/nIw2VbK4DJ9qkJeoGMFkpahkyw06A==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=sTgst8U5HGd8fa4h78KgvbfawLz9emEzbOPzAeE0J38=;
+ b=YWrjoacL/UtMlXo8LoiRQnGP+yZ20CuGQ5KgOiljGMrhlCdipib6BZbRqahVH1ER0Fo0FBfTp1j+4tgjtSYdTJnJs4SrKHL487KecQhAeGN+TyccKGfZXRIuyj7pQa3KI5CmkcJTQ+OpbkY76ZZCfhm1J0qKq9O6tUEZK0AX3rdmBTIN5w7c90wPt28abm5zrgxXrLh6D1TNlQBCJRVBcnhwNOq5ZmZQ9sAPp3HVl05+Koa6dcuRWoJuaZlXMsXO4+9KXKBd6w5qQpPF3BwGYAuzSfk4b8OIkr8uhHbbhJ7EfNXh6+uS0U1bGcWHHAh5mv2OroSfcoqsghThSzAiHQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=sTgst8U5HGd8fa4h78KgvbfawLz9emEzbOPzAeE0J38=;
+ b=LcPF5x2OsDjTrRrvcru25gE4Ui2HVQSqxLUde6uVbCh6OMMz/5ms4+1/DpOuT/6JyXJmfnscbpkvGsFFWB654UDJCfgWfgmztrWV/6kU150dWSQlMb+s9ti9iRuVQJj/252fFMnqILtT2m9equzFYVRkHqKBCGXib7I9idNkBuc=
+Authentication-Results: gmail.com; dkim=none (message not signed)
+ header.d=none;gmail.com; dmarc=none action=none header.from=amd.com;
+Received: from SN6PR12MB2718.namprd12.prod.outlook.com (2603:10b6:805:6f::22)
+ by SA0PR12MB4592.namprd12.prod.outlook.com (2603:10b6:806:9b::16) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4331.23; Tue, 20 Jul
+ 2021 15:15:20 +0000
+Received: from SN6PR12MB2718.namprd12.prod.outlook.com
+ ([fe80::a8a9:2aac:4fd1:88fa]) by SN6PR12MB2718.namprd12.prod.outlook.com
+ ([fe80::a8a9:2aac:4fd1:88fa%3]) with mapi id 15.20.4331.034; Tue, 20 Jul 2021
+ 15:15:19 +0000
+Cc:     brijesh.singh@amd.com, x86@kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
+        linux-coco@lists.linux.dev, linux-mm@kvack.org,
+        linux-crypto@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        David Rientjes <rientjes@google.com>,
+        Dov Murik <dovmurik@linux.ibm.com>,
+        Tobin Feldman-Fitzthum <tobin@ibm.com>,
+        Borislav Petkov <bp@alien8.de>,
+        Michael Roth <michael.roth@amd.com>,
+        Vlastimil Babka <vbabka@suse.cz>, tony.luck@intel.com,
+        npmccallum@redhat.com, brijesh.ksingh@gmail.com
+Subject: Re: [PATCH Part2 RFC v4 35/40] KVM: Add arch hooks to track the host
+ write to guest memory
+To:     Sean Christopherson <seanjc@google.com>
+References: <20210707183616.5620-1-brijesh.singh@amd.com>
+ <20210707183616.5620-36-brijesh.singh@amd.com> <YPYLEksyzOWHZwpA@google.com>
+From:   Brijesh Singh <brijesh.singh@amd.com>
+Message-ID: <1f65ccb2-a627-8631-7638-d02186f7e1bc@amd.com>
+Date:   Tue, 20 Jul 2021 10:15:17 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.11.0
+In-Reply-To: <YPYLEksyzOWHZwpA@google.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: SA0PR11CA0170.namprd11.prod.outlook.com
+ (2603:10b6:806:1bb::25) To SN6PR12MB2718.namprd12.prod.outlook.com
+ (2603:10b6:805:6f::22)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210719160346.609914-7-tabba@google.com>
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from [10.236.31.95] (165.204.77.1) by SA0PR11CA0170.namprd11.prod.outlook.com (2603:10b6:806:1bb::25) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4331.22 via Frontend Transport; Tue, 20 Jul 2021 15:15:18 +0000
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: eed7d445-ca15-452d-8aec-08d94b912fdc
+X-MS-TrafficTypeDiagnostic: SA0PR12MB4592:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <SA0PR12MB4592F514E01D86926B4DBB06E5E29@SA0PR12MB4592.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:9508;
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: KqkfqpO4QiGdrTulybgw/CCbYjcDaSzlksB0B3geox8MuOn436W2krgRPDUNlh8XcluquGx4iyXb9fl1qcPaqPA2PxDYVkUXqmGiDOfz8mm67zwOMtCaKPcWXeFnZEm/t25nYkY5CYMDwINLeZrd7SBYpn55muVberaWNfLfkeoR2AlHgvKGfCPLxVVIxIspz6q/YlvXVecEQ6i+vm9+YSGriSK0yUKkQkHOVt9JjDAt7Nxu3KMSWDlet5vPy3B2ySN86aZe3IwSwPaen9vWTQ+LRsVGPSwYOYmWhyqlCrhM1ByD38wMctEMyxYVqeoyEGL01vLLm/ZpbDag2flVNkappeIDz94BCN3W2r31OR3j9AHu2+7ltp79KDj8NxCa7Co8icnYvPRaSNdj0mg83KxQj27brB6YMT8FrqKl+Rtjc7TOkGGy6WD8Xqd0a/HDyeIUYwTxDuwEjho7A1yN4iJt/9a8nqAs8vKNjEIsvLxJqxjLizzkntbBbcbZr2S8yEiby6MgD9G9RkuP998D17c6sBDPd7/n99ebuz9+mfq9c9xw0nAYePTHIrsVFaR0AJk+eR/EfHYZVT29vQnMRKTluE2Ydy+vT2GjUGWqCO7c/8Pab2zh1qOWHigTNqG0yT+jzmOupMqfPhrds8sFGeM5G6sw44hA7u+LT9ATSPRGXYrl/xyaPtLBBvufbTNVSZgFLkcQyRu3fBsM2lLrOENUoa9o2Swl8CkoKROSdgTuvIXvTQD3wY+e3qGf7+I+
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR12MB2718.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(39860400002)(346002)(396003)(376002)(366004)(136003)(31686004)(66946007)(7416002)(956004)(2616005)(54906003)(6916009)(5660300002)(52116002)(478600001)(53546011)(4326008)(7406005)(66556008)(66476007)(8676002)(86362001)(2906002)(16576012)(316002)(186003)(8936002)(83380400001)(36756003)(38350700002)(38100700002)(26005)(31696002)(6486002)(44832011)(45980500001)(43740500002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?TktCUlVMTHovNmNwcnhTUERxU1JSK1Rjd1h1UWRYRjdlM1lESlBJdndHOVY5?=
+ =?utf-8?B?Q2NyTDFqZUNPNW85MFYzbGdFemZwdkQ3RHNWNkxkSzZlTEZyWkpMbEtseFA0?=
+ =?utf-8?B?ZGxlVjRHS0h4eXovb2lVd2l3V0F1c1hycHRaa1d4MGRlNkhkOXplSEh3TzBF?=
+ =?utf-8?B?LzRRT2l1VnVadXhlbkV3WUtRUkdXQnRIWkNMN0gwamIrRU1PaDNPUjQrN0Ja?=
+ =?utf-8?B?bEsxNXN2b1NvTTJJcWU2MloxK1ZSbjYrRlNzL1MvU3VtWUhTdHVQZTN5S3Az?=
+ =?utf-8?B?QzdlSFhCZWd3M0hNcnlrRFMxN0ZXa3VlYmo3S1pSem5aZEF0ZDVqeTcyTkxQ?=
+ =?utf-8?B?NXlRNGNtblI0U3BNSFd4S0xXc2VTd1NlRDVKdWN1UllYTjZmcG1QZk8wVS9M?=
+ =?utf-8?B?UzJZem5rb3JhS1pUcHVqYmRqOEQ4MUFJZllCZnFRcmowSU90alJTVUJTTlZn?=
+ =?utf-8?B?NXlremRiWGx1K3V6OTBRMXd2aFgxM3ZQZjIreHlIUTlkRkpIMDA0WXMwNVN0?=
+ =?utf-8?B?Qlp5bWIyRnNKSUU5cUl1TVh0ZzZtMUl2OTVvb2MvU2xiZ0Rob0RXV2tQL2hN?=
+ =?utf-8?B?U3VIdDl5VVB3d3VwNzJPSTgvVTBTQzIwQWtJQUZMdGRqSGlRZEZBcmJrQnM5?=
+ =?utf-8?B?M0lWeTRLM203ejlVMnFVdlFENVlNcGRocmhZeStUTXltUUlsdjRMM2tlRkEr?=
+ =?utf-8?B?WHBNRnJwb2Ixd0FRclVWcWpmZ1hKcGtYWFV5eGw5VjM0RHByMUxJOXVMYWs2?=
+ =?utf-8?B?bDQrUGs2K0MvOEFwY21PU001bkpadGRBOGF0VHdUbmNtSngvTy8weGdpTUs2?=
+ =?utf-8?B?QXp1dWlMaTlYUEJUeDlhNkI0bzJHbHlleGR6TldBTEp2SzBSdnZXYno5b2RX?=
+ =?utf-8?B?WCt5c0dra2JRUWoyZVFXZUN1bDVOQ3RRb3RwYndsMVdvN0xvaFdVVkZMMkl0?=
+ =?utf-8?B?SVIvNm1lWmZIdEZxdTd0em0ySTducWNrVnpKbFRRdEFWY1pIdDhITmZFWU1Q?=
+ =?utf-8?B?V0ZRTHl6UDBxaE1FOTdqVXkzT2NBU1JPbGdPdVovWVBWQm5VejZIdWZKVG9W?=
+ =?utf-8?B?dHRLallXM1dHY0M1b2dZNnh1aW91ZzQvZVQyMEFUeTdaaGZnM1VMSkdjR1pB?=
+ =?utf-8?B?eDlPM1EzT0g3aGF0dGZGZWFlR0Qybk5GVFNvZGVtUmpzUDJaZks4cFRSK1I1?=
+ =?utf-8?B?cHYxVWFEcWpxT29VUmMxZ1gxcyt3SytyV1FJaER6ckcvTFphb0dRZ3pnaWRt?=
+ =?utf-8?B?QzBrWmlrdjZ1Q2hVd2Z2TktWMnVITUJvT1JoVnhid0hhNEJpNVkwTWl2bU1H?=
+ =?utf-8?B?OEpRNkUzaXN4WTE2c2laSmFaWEszUXcwY2hOSXZRR0k1bVF2b1IwUnN4VXd3?=
+ =?utf-8?B?TitSZW9BQzNhZkRVY2V4a0FBOGlndFU3aU1VZERSWUtFTnhhMzdQbGQrWWdj?=
+ =?utf-8?B?Zm1nZXBkWlVqM3VQSDJVNmY1MDlQMnhBWlVCSHl6aW9idjUvQXdDVGVhV2p4?=
+ =?utf-8?B?R2JFUjFlTUNJcjdVaHpyd3AzTGxqWVMvMzd2R1RNRlhWWkNsU1BYM2JudHBB?=
+ =?utf-8?B?d3puMnpYSzNzdXhLRDFoTkFGWUlSUzZmQ1JTbjQ0RFdCL1NycmdqRCtSWXNt?=
+ =?utf-8?B?bGJiRGtGUG5BZW0vSXVDSU9kNVk3SFZJbkRYdFc2RFFBVEZzeVJPc1dLUGlK?=
+ =?utf-8?B?N1B1Sm5nRTNnTmQ1UWl2dE1JaklvVGkvKzY0M0hQYlA1Q1MxOW85RUtNdjJr?=
+ =?utf-8?Q?zgprbwhv0F+AGBLNgRyjdsrpSVCQL1I6yPB99dk?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: eed7d445-ca15-452d-8aec-08d94b912fdc
+X-MS-Exchange-CrossTenant-AuthSource: SN6PR12MB2718.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Jul 2021 15:15:19.7807
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: yOJWzogUwb3x2Jr0DcuWXwk8tm7R+PWjcPKt8yGLpX37pycvJmYx7EdlDiXZInH/STGHFp+3AOkN61oSvSGzxQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA0PR12MB4592
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Jul 19, 2021 at 05:03:37PM +0100, Fuad Tabba wrote:
-> On deactivating traps, restore the value of mdcr_el2 from the
-> newly created and preserved host value vcpu context, rather than
-> directly reading the hardware register.
-> 
-> Up until and including this patch the two values are the same,
-> i.e., the hardware register and the vcpu one. A future patch will
-> be changing the value of mdcr_el2 on activating traps, and this
-> ensures that its value will be restored.
-> 
-> No functional change intended.
 
-I'm probably missing something, but I can't convince myself that the host
-will end up with the same mdcr_el2 value after deactivating traps after
-this patch as before. We clearly now restore whatever we had when
-activating traps (presumably whatever we configured at init_el2_state
-time), but is that equivalent to what we had before with the masking and
-ORing that this patch drops?
 
-Thanks,
-drew
-
-> 
-> Signed-off-by: Fuad Tabba <tabba@google.com>
-> ---
->  arch/arm64/include/asm/kvm_host.h       |  5 ++++-
->  arch/arm64/include/asm/kvm_hyp.h        |  2 +-
->  arch/arm64/kvm/hyp/include/hyp/switch.h |  6 +++++-
->  arch/arm64/kvm/hyp/nvhe/switch.c        | 11 ++---------
->  arch/arm64/kvm/hyp/vhe/switch.c         | 12 ++----------
->  arch/arm64/kvm/hyp/vhe/sysreg-sr.c      |  2 +-
->  6 files changed, 15 insertions(+), 23 deletions(-)
-> 
-> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> index 4d2d974c1522..76462c6a91ee 100644
-> --- a/arch/arm64/include/asm/kvm_host.h
-> +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -287,10 +287,13 @@ struct kvm_vcpu_arch {
->  	/* Stage 2 paging state used by the hardware on next switch */
->  	struct kvm_s2_mmu *hw_mmu;
->  
-> -	/* HYP configuration */
-> +	/* Values of trap registers for the guest. */
->  	u64 hcr_el2;
->  	u64 mdcr_el2;
->  
-> +	/* Values of trap registers for the host before guest entry. */
-> +	u64 mdcr_el2_host;
-> +
->  	/* Exception Information */
->  	struct kvm_vcpu_fault_info fault;
->  
-> diff --git a/arch/arm64/include/asm/kvm_hyp.h b/arch/arm64/include/asm/kvm_hyp.h
-> index 9d60b3006efc..657d0c94cf82 100644
-> --- a/arch/arm64/include/asm/kvm_hyp.h
-> +++ b/arch/arm64/include/asm/kvm_hyp.h
-> @@ -95,7 +95,7 @@ void __sve_restore_state(void *sve_pffr, u32 *fpsr);
->  
->  #ifndef __KVM_NVHE_HYPERVISOR__
->  void activate_traps_vhe_load(struct kvm_vcpu *vcpu);
-> -void deactivate_traps_vhe_put(void);
-> +void deactivate_traps_vhe_put(struct kvm_vcpu *vcpu);
->  #endif
->  
->  u64 __guest_enter(struct kvm_vcpu *vcpu);
-> diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
-> index e4a2f295a394..a0e78a6027be 100644
-> --- a/arch/arm64/kvm/hyp/include/hyp/switch.h
-> +++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
-> @@ -92,11 +92,15 @@ static inline void __activate_traps_common(struct kvm_vcpu *vcpu)
->  		write_sysreg(0, pmselr_el0);
->  		write_sysreg(ARMV8_PMU_USERENR_MASK, pmuserenr_el0);
->  	}
-> +
-> +	vcpu->arch.mdcr_el2_host = read_sysreg(mdcr_el2);
->  	write_sysreg(vcpu->arch.mdcr_el2, mdcr_el2);
->  }
->  
-> -static inline void __deactivate_traps_common(void)
-> +static inline void __deactivate_traps_common(struct kvm_vcpu *vcpu)
->  {
-> +	write_sysreg(vcpu->arch.mdcr_el2_host, mdcr_el2);
-> +
->  	write_sysreg(0, hstr_el2);
->  	if (kvm_arm_support_pmu_v3())
->  		write_sysreg(0, pmuserenr_el0);
-> diff --git a/arch/arm64/kvm/hyp/nvhe/switch.c b/arch/arm64/kvm/hyp/nvhe/switch.c
-> index f7af9688c1f7..1778593a08a9 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/switch.c
-> +++ b/arch/arm64/kvm/hyp/nvhe/switch.c
-> @@ -69,12 +69,10 @@ static void __activate_traps(struct kvm_vcpu *vcpu)
->  static void __deactivate_traps(struct kvm_vcpu *vcpu)
->  {
->  	extern char __kvm_hyp_host_vector[];
-> -	u64 mdcr_el2, cptr;
-> +	u64 cptr;
->  
->  	___deactivate_traps(vcpu);
->  
-> -	mdcr_el2 = read_sysreg(mdcr_el2);
-> -
->  	if (cpus_have_final_cap(ARM64_WORKAROUND_SPECULATIVE_AT)) {
->  		u64 val;
->  
-> @@ -92,13 +90,8 @@ static void __deactivate_traps(struct kvm_vcpu *vcpu)
->  		isb();
->  	}
->  
-> -	__deactivate_traps_common();
-> -
-> -	mdcr_el2 &= MDCR_EL2_HPMN_MASK;
-> -	mdcr_el2 |= MDCR_EL2_E2PB_MASK << MDCR_EL2_E2PB_SHIFT;
-> -	mdcr_el2 |= MDCR_EL2_E2TB_MASK << MDCR_EL2_E2TB_SHIFT;
-> +	__deactivate_traps_common(vcpu);
->  
-> -	write_sysreg(mdcr_el2, mdcr_el2);
->  	write_sysreg(this_cpu_ptr(&kvm_init_params)->hcr_el2, hcr_el2);
->  
->  	cptr = CPTR_EL2_DEFAULT;
-> diff --git a/arch/arm64/kvm/hyp/vhe/switch.c b/arch/arm64/kvm/hyp/vhe/switch.c
-> index b3229924d243..0d0c9550fb08 100644
-> --- a/arch/arm64/kvm/hyp/vhe/switch.c
-> +++ b/arch/arm64/kvm/hyp/vhe/switch.c
-> @@ -91,17 +91,9 @@ void activate_traps_vhe_load(struct kvm_vcpu *vcpu)
->  	__activate_traps_common(vcpu);
->  }
->  
-> -void deactivate_traps_vhe_put(void)
-> +void deactivate_traps_vhe_put(struct kvm_vcpu *vcpu)
->  {
-> -	u64 mdcr_el2 = read_sysreg(mdcr_el2);
-> -
-> -	mdcr_el2 &= MDCR_EL2_HPMN_MASK |
-> -		    MDCR_EL2_E2PB_MASK << MDCR_EL2_E2PB_SHIFT |
-> -		    MDCR_EL2_TPMS;
-> -
-> -	write_sysreg(mdcr_el2, mdcr_el2);
-> -
-> -	__deactivate_traps_common();
-> +	__deactivate_traps_common(vcpu);
->  }
->  
->  /* Switch to the guest for VHE systems running in EL2 */
-> diff --git a/arch/arm64/kvm/hyp/vhe/sysreg-sr.c b/arch/arm64/kvm/hyp/vhe/sysreg-sr.c
-> index 2a0b8c88d74f..007a12dd4351 100644
-> --- a/arch/arm64/kvm/hyp/vhe/sysreg-sr.c
-> +++ b/arch/arm64/kvm/hyp/vhe/sysreg-sr.c
-> @@ -101,7 +101,7 @@ void kvm_vcpu_put_sysregs_vhe(struct kvm_vcpu *vcpu)
->  	struct kvm_cpu_context *host_ctxt;
->  
->  	host_ctxt = &this_cpu_ptr(&kvm_host_data)->host_ctxt;
-> -	deactivate_traps_vhe_put();
-> +	deactivate_traps_vhe_put(vcpu);
->  
->  	__sysreg_save_el1_state(guest_ctxt);
->  	__sysreg_save_user_state(guest_ctxt);
-> -- 
-> 2.32.0.402.g57bb445576-goog
+On 7/19/21 6:30 PM, Sean Christopherson wrote:
+...>
+> NAK on converting RMP entries in response to guest accesses.  Corrupting guest
+> data (due to dropping the "validated" flag) on a rogue/incorrect guest emulation
+> request or misconfigured PV feature is double ungood.  The potential kernel panic
+> below isn't much better.
 > 
 
+I also debated myself whether its okay to transition the page state to 
+shared to complete the write operation. I am good with removing the 
+converting RMP entries from the patch, and that will also remove the 
+kernel panic code.
+
+
+> And I also don't think we need this heavyweight flow for user access, e.g.
+> __copy_to_user(), just eat the RMP violation #PF like all other #PFs and exit
+> to userspace with -EFAULT.
+>
+
+Yes, we could improve the __copy_to_user() to eat the RMP violation. I 
+was tempted to go on that path but struggled to find a strong reason for 
+it and was not sure if that accepted. I can add that support in next rev.
+
+
+
+> kvm_vcpu_map() and friends might need the manual lookup, at least initially, 
+
+Yes, the enhancement to the __copy_to_user() does not solve this problem 
+and for it we need to do the manually lookup.
+
+
+but
+> in an ideal world that would be naturally handled by gup(), e.g. by unmapping
+> guest private memory or whatever approach TDX ends up employing to avoid #MCs.
+
+> 
+>> +	 */
+>> +	if (rmpentry_assigned(e)) {
+>> +		pr_err("SEV-SNP: write to guest private gfn %llx\n", gfn);
+>> +		rc = snp_make_page_shared(kvm_get_vcpu(kvm, 0),
+>> +				gfn << PAGE_SHIFT, pfn, PG_LEVEL_4K);
+>> +		BUG_ON(rc != 0);
+>> +	}
+>> +}
+> 
+> ...
+> 
+>> +void kvm_arch_write_gfn_begin(struct kvm *kvm, struct kvm_memory_slot *slot, gfn_t gfn)
+>> +{
+>> +	update_gfn_track(slot, gfn, KVM_PAGE_TRACK_WRITE, 1);
+> 
+> Tracking only writes isn't correct, as KVM reads to guest private memory will
+> return garbage.  Pulling the rug out from under KVM reads won't fail as
+> spectacularly as writes (at least not right away), but they'll still fail.  I'm
+> actually ok reading garbage if the guest screws up, but KVM needs consistent
+> semantics.
+> 
+> Good news is that per-gfn tracking is probably overkill anyways.  As mentioned
+> above, user access don't need extra magic, they either fail or they don't.
+> 
+> For kvm_vcpu_map(), one thought would be to add a "short-term" map variant that
+> is not allowed to be retained across VM-Entry, and then use e.g. SRCU to block
+> PSC requests until there are no consumers.
+> 
+
+Sounds good to me, i will add the support in the next rev.
+
+thanks
