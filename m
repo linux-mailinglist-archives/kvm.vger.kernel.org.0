@@ -2,236 +2,122 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id CE1D83CFADB
-	for <lists+kvm@lfdr.de>; Tue, 20 Jul 2021 15:41:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 12DB53CFB47
+	for <lists+kvm@lfdr.de>; Tue, 20 Jul 2021 15:53:54 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238603AbhGTM7F (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 20 Jul 2021 08:59:05 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:40616 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S237225AbhGTM5m (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 20 Jul 2021 08:57:42 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1626788296;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=vU/6bjwZL5Bd6mANqCXpmHsjLsH8+dFlpfCQrauhKS0=;
-        b=AcuoE5vI4XT6VOw1F7tuxgaJq3oPif4DO4XrC6NUz8PBWESf/gqGW4OVTT8a09CxwSDZ6D
-        G8JK7tzU+GWCJPPIY17f+F0etm+y6PPZVmKb5ANObOHCB1b4VYeOtjaApKdbgL8bb4exI7
-        uP34M6nH74Q7NsuPX9kxOExdvpAr0yc=
-Received: from mail-il1-f198.google.com (mail-il1-f198.google.com
- [209.85.166.198]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-353-H63QHwxpNT-RT3Xg3yrZBg-1; Tue, 20 Jul 2021 09:38:15 -0400
-X-MC-Unique: H63QHwxpNT-RT3Xg3yrZBg-1
-Received: by mail-il1-f198.google.com with SMTP id e16-20020a056e0204b0b029020c886c9370so13090832ils.10
-        for <kvm@vger.kernel.org>; Tue, 20 Jul 2021 06:38:14 -0700 (PDT)
+        id S239003AbhGTNNE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 20 Jul 2021 09:13:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33900 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S239242AbhGTNKp (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 20 Jul 2021 09:10:45 -0400
+Received: from mail-wr1-x436.google.com (mail-wr1-x436.google.com [IPv6:2a00:1450:4864:20::436])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F33CAC0613E2
+        for <kvm@vger.kernel.org>; Tue, 20 Jul 2021 06:50:56 -0700 (PDT)
+Received: by mail-wr1-x436.google.com with SMTP id l7so26080389wrv.7
+        for <kvm@vger.kernel.org>; Tue, 20 Jul 2021 06:50:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ffwll.ch; s=google;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:content-transfer-encoding:in-reply-to;
+        bh=sI4lOFqRzupKkYq98Gmd5BUFkdbcZOoG/UvAcZHjLDY=;
+        b=QBbwhpFEg138cFF13OlHokR7JOS4muXESJoP0GE8o7KEv35eNms/xuto9Ggx61MJnV
+         pv5yMUhlTXtwC0gs7+LZigEVtzx6FeEYFBjFZISkgcMiS1iksMJxxE9AQ75qX/XxMULb
+         sMeC2UURwOTw9xD6wYT2FjKji3DINZHhYE1LY=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=vU/6bjwZL5Bd6mANqCXpmHsjLsH8+dFlpfCQrauhKS0=;
-        b=Bes/a6h/HnDeFAd7Cim7XhN+LeF00AQ9h+RPLV/kxpqHOKdhUvXNlMnFzTI/nRBUJQ
-         3DrTpxunpt6sv1tXK10hCStWQ6mk2sOml77HHAniBzB+RBkF4jZcpdwv+DYnwRcsBH0N
-         ejnZHxu4HY/Pcve8N0gUHSWzAyYUg+jJn9tGyxiE58pKeriLOit2DO5wfVMWUM/Asp5T
-         PHtKT2aBwoMI2MnHl2qPGW6Yp3KhXZkGlZ6rjHhPqMmjrm/Mdx4/vom4M67yBkxaJoXv
-         lqLBXjPnlOiRle2Hlj3NGrCihpdbATfi1jQGhLaLAHStZjDA/L06iRIjabaKhVfl0Yy6
-         oNrg==
-X-Gm-Message-State: AOAM533ZHjJnJHGHAAk94vTGjIBs8kgx4UPR6DPyiEzuOx5Zt8trJhp/
-        +YNDXKidx9P5lcw/XZ7agGFhOd1Y8BwQA6Aen6ECozdMSKpbFgn5+aoiP/58cVsNAiEmoCBoB/w
-        jf2fjun+vz0AC
-X-Received: by 2002:a05:6e02:2162:: with SMTP id s2mr20749929ilv.99.1626788294459;
-        Tue, 20 Jul 2021 06:38:14 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJx2c+KuF4Es06cQJtPkV9Pm8wrKxtYAjfiHMsDibZFB3bZtEeXiPfi39fOPzymmy4PgDZFt1Q==
-X-Received: by 2002:a05:6e02:2162:: with SMTP id s2mr20749917ilv.99.1626788294272;
-        Tue, 20 Jul 2021 06:38:14 -0700 (PDT)
-Received: from gator ([140.82.166.162])
-        by smtp.gmail.com with ESMTPSA id e9sm11345255ils.61.2021.07.20.06.38.12
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to;
+        bh=sI4lOFqRzupKkYq98Gmd5BUFkdbcZOoG/UvAcZHjLDY=;
+        b=OUrhfpqUvL4ROyXCNydK1AVjckdEr0w4IFF3XcWOLYkHRjIRBOQiNtclWqMaDKv0BA
+         rgt2XdNH29+u70wBFWxEBDiV2fbm0o6qKybxMalSqmaseq9iMcbPKuFfI1DPPNaPCeki
+         mu+BGKbepYvMZMxfa8MZxIyibhq4rUBiJ1e8ZHwZTPb2qXa3BsIxquBJjph5TwnAsAgL
+         C3xAxT0Dp+z+RqiTH/y0i/k3N2SZ4nPoylpLqsK8EK9Qjz85V7ym3X7sUsWaiYJQQeXK
+         8N4cwDpxTupuKEhKb+prXlY8QeDG8Rz6gD1oH5D/RY7E/s7KqyUQ80/rTjVrOcKzd1h7
+         LOiw==
+X-Gm-Message-State: AOAM530aKEE2fW/c2Rcy6zQe8xDozPbIcDLB1vbGNfZNcyCmKwvxNXJ7
+        1vb5UFhEgs1afaoUGteqOJx5DQ==
+X-Google-Smtp-Source: ABdhPJxQV3Ee2pwcwbIe/vS8ucyfghhnzHjKP4KrgLfr14bAgT3gr9xSuwjFXjaR+rGwh3KUvvzTOA==
+X-Received: by 2002:adf:c803:: with SMTP id d3mr30463317wrh.345.1626789055598;
+        Tue, 20 Jul 2021 06:50:55 -0700 (PDT)
+Received: from phenom.ffwll.local ([2a02:168:57f4:0:efd0:b9e5:5ae6:c2fa])
+        by smtp.gmail.com with ESMTPSA id f2sm23731613wrq.69.2021.07.20.06.50.54
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 20 Jul 2021 06:38:13 -0700 (PDT)
-Date:   Tue, 20 Jul 2021 15:38:10 +0200
-From:   Andrew Jones <drjones@redhat.com>
-To:     Fuad Tabba <tabba@google.com>
-Cc:     kvmarm@lists.cs.columbia.edu, maz@kernel.org, will@kernel.org,
-        james.morse@arm.com, alexandru.elisei@arm.com,
-        suzuki.poulose@arm.com, mark.rutland@arm.com,
-        christoffer.dall@arm.com, pbonzini@redhat.com, qperret@google.com,
-        kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        kernel-team@android.com
-Subject: Re: [PATCH v3 05/15] KVM: arm64: Refactor sys_regs.h,c for nVHE reuse
-Message-ID: <20210720133810.7q4k2yde57okgvmm@gator>
-References: <20210719160346.609914-1-tabba@google.com>
- <20210719160346.609914-6-tabba@google.com>
+        Tue, 20 Jul 2021 06:50:54 -0700 (PDT)
+Date:   Tue, 20 Jul 2021 15:50:52 +0200
+From:   Daniel Vetter <daniel@ffwll.ch>
+To:     Christian =?iso-8859-1?Q?K=F6nig?= <christian.koenig@amd.com>
+Cc:     Christoph Hellwig <hch@lst.de>, David Airlie <airlied@linux.ie>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        Alex Deucher <alexander.deucher@amd.com>,
+        "Pan, Xinhui" <Xinhui.Pan@amd.com>,
+        Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
+        Maxime Ripard <mripard@kernel.org>,
+        Thomas Zimmermann <tzimmermann@suse.de>,
+        Jani Nikula <jani.nikula@linux.intel.com>,
+        Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
+        Rodrigo Vivi <rodrigo.vivi@intel.com>,
+        Ben Skeggs <bskeggs@redhat.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        amd-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
+        intel-gfx@lists.freedesktop.org, nouveau@lists.freedesktop.org,
+        kvm@vger.kernel.org
+Subject: Re: [PATCH 1/7] vgaarb: remove VGA_DEFAULT_DEVICE
+Message-ID: <YPbUvIYmu3WfyM2C@phenom.ffwll.local>
+References: <20210716061634.2446357-1-hch@lst.de>
+ <20210716061634.2446357-2-hch@lst.de>
+ <f171831b-3281-5a5a-04d3-2d69cb77f1a2@amd.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <20210719160346.609914-6-tabba@google.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <f171831b-3281-5a5a-04d3-2d69cb77f1a2@amd.com>
+X-Operating-System: Linux phenom 5.10.0-7-amd64 
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Jul 19, 2021 at 05:03:36PM +0100, Fuad Tabba wrote:
-> Refactor sys_regs.h and sys_regs.c to make it easier to reuse
-> common code. It will be used in nVHE in a later patch.
+On Fri, Jul 16, 2021 at 09:14:02AM +0200, Christian König wrote:
+> Am 16.07.21 um 08:16 schrieb Christoph Hellwig:
+> > The define is entirely unused.
+> > 
+> > Signed-off-by: Christoph Hellwig <hch@lst.de>
 > 
-> Note that the refactored code uses __inline_bsearch for find_reg
-> instead of bsearch to avoid copying the bsearch code for nVHE.
+> I'm not an expert for this particular code, but at least of hand everything
+> you do here makes totally sense.
 > 
-> No functional change intended.
+> Whole series is Acked-by: Christian König <christian.koenig@amd.com>
+
+Care to also push this into drm-misc-next since you looked already?
+-Daniel
+
 > 
-> Signed-off-by: Fuad Tabba <tabba@google.com>
-> ---
->  arch/arm64/include/asm/sysreg.h |  3 +++
->  arch/arm64/kvm/sys_regs.c       | 30 +-----------------------------
->  arch/arm64/kvm/sys_regs.h       | 31 +++++++++++++++++++++++++++++++
->  3 files changed, 35 insertions(+), 29 deletions(-)
+> Regards,
+> Christian.
 > 
-> diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
-> index 7b9c3acba684..326f49e7bd42 100644
-> --- a/arch/arm64/include/asm/sysreg.h
-> +++ b/arch/arm64/include/asm/sysreg.h
-> @@ -1153,6 +1153,9 @@
->  #define ICH_VTR_A3V_SHIFT	21
->  #define ICH_VTR_A3V_MASK	(1 << ICH_VTR_A3V_SHIFT)
->  
-> +/* Extract the feature specified from the feature id register. */
-> +#define FEATURE(x)	(GENMASK_ULL(x##_SHIFT + 3, x##_SHIFT))
+> > ---
+> >   include/linux/vgaarb.h | 6 ------
+> >   1 file changed, 6 deletions(-)
+> > 
+> > diff --git a/include/linux/vgaarb.h b/include/linux/vgaarb.h
+> > index dc6ddce92066..26ec8a057d2a 100644
+> > --- a/include/linux/vgaarb.h
+> > +++ b/include/linux/vgaarb.h
+> > @@ -42,12 +42,6 @@
+> >   #define VGA_RSRC_NORMAL_IO     0x04
+> >   #define VGA_RSRC_NORMAL_MEM    0x08
+> > -/* Passing that instead of a pci_dev to use the system "default"
+> > - * device, that is the one used by vgacon. Archs will probably
+> > - * have to provide their own vga_default_device();
+> > - */
+> > -#define VGA_DEFAULT_DEVICE     (NULL)
+> > -
+> >   struct pci_dev;
+> >   /* For use by clients */
+> 
 
-I think the comment would be better as
-
- Create a mask for the feature bits of the specified feature.
-
-And, I think a more specific name than FEATURE would be better. Maybe
-FEATURE_MASK or even ARM64_FEATURE_MASK ?
-
-> +
->  #ifdef __ASSEMBLY__
->  
->  	.irp	num,0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30
-> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> index 80a6e41cadad..1a939c464858 100644
-> --- a/arch/arm64/kvm/sys_regs.c
-> +++ b/arch/arm64/kvm/sys_regs.c
-> @@ -44,10 +44,6 @@
->   * 64bit interface.
->   */
->  
-> -#define reg_to_encoding(x)						\
-> -	sys_reg((u32)(x)->Op0, (u32)(x)->Op1,				\
-> -		(u32)(x)->CRn, (u32)(x)->CRm, (u32)(x)->Op2)
-> -
->  static bool read_from_write_only(struct kvm_vcpu *vcpu,
->  				 struct sys_reg_params *params,
->  				 const struct sys_reg_desc *r)
-> @@ -1026,8 +1022,6 @@ static bool access_arch_timer(struct kvm_vcpu *vcpu,
->  	return true;
->  }
->  
-> -#define FEATURE(x)	(GENMASK_ULL(x##_SHIFT + 3, x##_SHIFT))
-> -
->  /* Read a sanitised cpufeature ID register by sys_reg_desc */
->  static u64 read_id_reg(const struct kvm_vcpu *vcpu,
->  		struct sys_reg_desc const *r, bool raz)
-> @@ -2106,23 +2100,6 @@ static int check_sysreg_table(const struct sys_reg_desc *table, unsigned int n,
->  	return 0;
->  }
->  
-> -static int match_sys_reg(const void *key, const void *elt)
-> -{
-> -	const unsigned long pval = (unsigned long)key;
-> -	const struct sys_reg_desc *r = elt;
-> -
-> -	return pval - reg_to_encoding(r);
-> -}
-> -
-> -static const struct sys_reg_desc *find_reg(const struct sys_reg_params *params,
-> -					 const struct sys_reg_desc table[],
-> -					 unsigned int num)
-> -{
-> -	unsigned long pval = reg_to_encoding(params);
-> -
-> -	return bsearch((void *)pval, table, num, sizeof(table[0]), match_sys_reg);
-> -}
-> -
->  int kvm_handle_cp14_load_store(struct kvm_vcpu *vcpu)
->  {
->  	kvm_inject_undefined(vcpu);
-> @@ -2365,13 +2342,8 @@ int kvm_handle_sys_reg(struct kvm_vcpu *vcpu)
->  
->  	trace_kvm_handle_sys_reg(esr);
->  
-> -	params.Op0 = (esr >> 20) & 3;
-> -	params.Op1 = (esr >> 14) & 0x7;
-> -	params.CRn = (esr >> 10) & 0xf;
-> -	params.CRm = (esr >> 1) & 0xf;
-> -	params.Op2 = (esr >> 17) & 0x7;
-> +	params = esr_sys64_to_params(esr);
->  	params.regval = vcpu_get_reg(vcpu, Rt);
-> -	params.is_write = !(esr & 1);
->  
->  	ret = emulate_sys_reg(vcpu, &params);
->  
-> diff --git a/arch/arm64/kvm/sys_regs.h b/arch/arm64/kvm/sys_regs.h
-> index 9d0621417c2a..cc0cc95a0280 100644
-> --- a/arch/arm64/kvm/sys_regs.h
-> +++ b/arch/arm64/kvm/sys_regs.h
-> @@ -11,6 +11,12 @@
->  #ifndef __ARM64_KVM_SYS_REGS_LOCAL_H__
->  #define __ARM64_KVM_SYS_REGS_LOCAL_H__
->  
-> +#include <linux/bsearch.h>
-> +
-> +#define reg_to_encoding(x)						\
-> +	sys_reg((u32)(x)->Op0, (u32)(x)->Op1,				\
-> +		(u32)(x)->CRn, (u32)(x)->CRm, (u32)(x)->Op2)
-> +
->  struct sys_reg_params {
->  	u8	Op0;
->  	u8	Op1;
-> @@ -21,6 +27,14 @@ struct sys_reg_params {
->  	bool	is_write;
->  };
->  
-> +#define esr_sys64_to_params(esr)                                               \
-> +	((struct sys_reg_params){ .Op0 = ((esr) >> 20) & 3,                    \
-> +				  .Op1 = ((esr) >> 14) & 0x7,                  \
-> +				  .CRn = ((esr) >> 10) & 0xf,                  \
-> +				  .CRm = ((esr) >> 1) & 0xf,                   \
-> +				  .Op2 = ((esr) >> 17) & 0x7,                  \
-> +				  .is_write = !((esr) & 1) })
-> +
->  struct sys_reg_desc {
->  	/* Sysreg string for debug */
->  	const char *name;
-> @@ -152,6 +166,23 @@ static inline int cmp_sys_reg(const struct sys_reg_desc *i1,
->  	return i1->Op2 - i2->Op2;
->  }
->  
-> +static inline int match_sys_reg(const void *key, const void *elt)
-> +{
-> +	const unsigned long pval = (unsigned long)key;
-> +	const struct sys_reg_desc *r = elt;
-> +
-> +	return pval - reg_to_encoding(r);
-> +}
-> +
-> +static inline const struct sys_reg_desc *
-> +find_reg(const struct sys_reg_params *params, const struct sys_reg_desc table[],
-> +	 unsigned int num)
-> +{
-> +	unsigned long pval = reg_to_encoding(params);
-> +
-> +	return __inline_bsearch((void *)pval, table, num, sizeof(table[0]), match_sys_reg);
-> +}
-> +
->  const struct sys_reg_desc *find_reg_by_id(u64 id,
->  					  struct sys_reg_params *params,
->  					  const struct sys_reg_desc table[],
-> -- 
-> 2.32.0.402.g57bb445576-goog
->
-
-Otherwise
-
-Reviewed-by: Andrew Jones <drjones@redhat.com>
-
+-- 
+Daniel Vetter
+Software Engineer, Intel Corporation
+http://blog.ffwll.ch
