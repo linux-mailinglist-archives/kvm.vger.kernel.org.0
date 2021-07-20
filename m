@@ -2,96 +2,104 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C5F1E3CF370
-	for <lists+kvm@lfdr.de>; Tue, 20 Jul 2021 06:42:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C39603CF476
+	for <lists+kvm@lfdr.de>; Tue, 20 Jul 2021 08:25:57 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1347488AbhGTD5X (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 19 Jul 2021 23:57:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50000 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1347030AbhGTD46 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 19 Jul 2021 23:56:58 -0400
-Received: from mail-pj1-x102f.google.com (mail-pj1-x102f.google.com [IPv6:2607:f8b0:4864:20::102f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B472CC061574
-        for <kvm@vger.kernel.org>; Mon, 19 Jul 2021 21:37:35 -0700 (PDT)
-Received: by mail-pj1-x102f.google.com with SMTP id v18-20020a17090ac912b0290173b9578f1cso1229254pjt.0
-        for <kvm@vger.kernel.org>; Mon, 19 Jul 2021 21:37:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=46YiW0nFolbiSZgwAc3PrG6zYtjxfn1ha8Vdp9eDooo=;
-        b=Ci/son6LKUEfJz7NbNrm9oP7xfe8wMZt5cdWShgSBEse1zHK8alLLyN3acSdmSFcYJ
-         GRVbHiuZfFldnxhDp2I/QnEd+9K+BpIZdE8ScDx4yd9PVTQ8kNPqlD9NqvPKA+gtbCu/
-         z90qvLhBbusOdk37sxI5f0obyE7TuEayqvZzTy8D1q5bD3deNiVAO87uJkg/0EthAo9z
-         /NmiH4AMkfPA9FKG5R48l/NtLIj/aAnU46L3fBvL8Bi0GLfYFd9BFqB9Du5pB8ne86st
-         FEGs+ouFyBFB2sTpiBRPqX5EQc5bN53NI+mzYjQeuuWcSM3EWPybsAPFU85zjX1jnykp
-         NHLg==
+        id S234688AbhGTFpL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 20 Jul 2021 01:45:11 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:56497 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S231852AbhGTFo6 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 20 Jul 2021 01:44:58 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1626762337;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=+pFjrkcG2ZRzROzSDXE/qK9WLlZjt36K6e23WeKajZ8=;
+        b=cfEzMyi4dscivap6mZVQ4CYHeSuu/QvSwU+v+ncbOTvPfbMyG7o4VNOXdzVToTHF2Krw4h
+        nR2WIewAC3V380eEeWMjma+PgViEwVPofS6XSIxTInaYIbg3eKARlcyGvggWqO60GdVBxH
+        a5zpDokfKyC0bdFWcZvCq/Jgy/tLvo4=
+Received: from mail-pg1-f198.google.com (mail-pg1-f198.google.com
+ [209.85.215.198]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-199-7KOJucwCP22C3NhiAO7Szg-1; Tue, 20 Jul 2021 02:25:35 -0400
+X-MC-Unique: 7KOJucwCP22C3NhiAO7Szg-1
+Received: by mail-pg1-f198.google.com with SMTP id f16-20020a6562900000b029022c3e789d78so17058510pgv.6
+        for <kvm@vger.kernel.org>; Mon, 19 Jul 2021 23:25:35 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=46YiW0nFolbiSZgwAc3PrG6zYtjxfn1ha8Vdp9eDooo=;
-        b=crEXrnjYayXJmN7tFb5mETINOt4RzgpzHNXzQgFoaoVB+5NnZAoijvGcJd/v6COUiD
-         GQ/QRpjd0QgRSuPG2jI8x4I8+DeCcReMnVGf15P50DVjk+OwpfAZvBHejlYVCK/fdT34
-         98DC6ke06C5I7Xcm11Ii662/rjDL5LX2l7YBsqn6r8xA4FM3Qzw6vf0ER7eF5C1n9HRb
-         xKlvbkrGlNde9E4Jo3cagwlHWCzWe8dn2ryz3FqFne1b28/HEpaqIO0zX8aP6W8gpVPk
-         8KJ1gJWmj7jcJvEYvav7WpypVXSEheQP+DvUqE5XmeGtLFUvfuPMQ4iMVl27ynsDoJWW
-         tVCw==
-X-Gm-Message-State: AOAM532Yr/qKWPc2WpbJo1bw9YhQlKtvxPFmNTch7732894ITjtfSKsC
-        AQVwxeQ5x1dM/aOm9cuCw8G9f/mefgZrJmQ0y/+Lbg==
-X-Google-Smtp-Source: ABdhPJw+RvTs5nygHUL9AvkEFzczhJB6ea8NCydt9Rh5DZUTdWijbP6KbaHl7TSPmHUWBG0y4pZeLjG30Yd4I/x096E=
-X-Received: by 2002:a17:90b:1b4d:: with SMTP id nv13mr28144573pjb.216.1626755855130;
- Mon, 19 Jul 2021 21:37:35 -0700 (PDT)
-MIME-Version: 1.0
-References: <20210713163324.627647-1-seanjc@google.com> <20210713163324.627647-47-seanjc@google.com>
-In-Reply-To: <20210713163324.627647-47-seanjc@google.com>
-From:   Reiji Watanabe <reijiw@google.com>
-Date:   Mon, 19 Jul 2021 21:37:19 -0700
-Message-ID: <CAAeT=FzGDUr8MK5Uf3jyUxtf+2jCf=bgG760L0mjjM3vRsXKSg@mail.gmail.com>
-Subject: Re: [PATCH v2 46/46] KVM: x86: Preserve guest's CR0.CD/NW on INIT
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-transfer-encoding
+         :content-language;
+        bh=+pFjrkcG2ZRzROzSDXE/qK9WLlZjt36K6e23WeKajZ8=;
+        b=crhRg6hZqgDPq/XdWoM7dW2O9eYSk0Wjc4bLOjol/6GAuIdVzLL9m8jVtnItQvVAJ6
+         ZLF06T1ul5HAOeRoBDjvvYYeoud8fi/lKdd0vlK1r//8Q4fVoCtGx8p0T4HLwt2S+K3F
+         XdIk49yZzak/UfQjFKB0IjJ5TPQO1gdPZZ7Loq8YNqMhq2dOu85EZ8DH/YULZrQO0O/r
+         R+qrln1OK6ix2amm1zAI5cqMBTU7n1GTCK6RTJ7rNYDY9EjDXBbf0Xc/fRfwQz17c9Qy
+         TUgAQExEDNQVzz92pLnrzyYpF53v+frCZiOtC7myKM3M45Ov3OWqLeLY9Pt4KDU2Ualy
+         8KmQ==
+X-Gm-Message-State: AOAM532ChaXpZt1TCfHSXBID3B7rtH4eZMzorl109Re44vcfTEm5pi6i
+        tkRVGYJ1IpEfke+YZkdbNJc7fmmghTk36L0r5aaEPGArep+ocNeS19fUNhCc83S7mKdtTCct9XA
+        41Vwiuo3vpDoW
+X-Received: by 2002:a63:2041:: with SMTP id r1mr14924114pgm.59.1626762334871;
+        Mon, 19 Jul 2021 23:25:34 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzJFTlgkaKXwIn+1kT2a5RmA050X86XDvyy0tTwV3OcM/kDFkzn7QDPYu1L0FUL3OWMF00cPA==
+X-Received: by 2002:a63:2041:: with SMTP id r1mr14924097pgm.59.1626762334630;
+        Mon, 19 Jul 2021 23:25:34 -0700 (PDT)
+Received: from wangxiaodeMacBook-Air.local ([209.132.188.80])
+        by smtp.gmail.com with ESMTPSA id d13sm21831104pfn.136.2021.07.19.23.25.31
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 19 Jul 2021 23:25:34 -0700 (PDT)
+Subject: Re: [PATCH] vsock/virtio: set vsock frontend ready in
+ virtio_vsock_probe()
+To:     Xianting Tian <tianxianting.txt@linux.alibaba.com>,
+        stefanha@redhat.com, sgarzare@redhat.com, davem@davemloft.net,
+        kuba@kernel.org
+Cc:     kvm@vger.kernel.org, netdev@vger.kernel.org,
         linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+References: <20210720034039.1351-1-tianxianting.txt@linux.alibaba.com>
+From:   Jason Wang <jasowang@redhat.com>
+Message-ID: <9a790a52-8f14-1a9a-51e0-9c35a03d33dd@redhat.com>
+Date:   Tue, 20 Jul 2021 14:25:29 +0800
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0)
+ Gecko/20100101 Thunderbird/78.11.0
+MIME-Version: 1.0
+In-Reply-To: <20210720034039.1351-1-tianxianting.txt@linux.alibaba.com>
+Content-Type: text/plain; charset=gbk; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jul 13, 2021 at 9:35 AM Sean Christopherson <seanjc@google.com> wrote:
->
-> Preserve CR0.CD and CR0.NW on INIT instead of forcing them to '1', as
-> defined by both Intel's SDM and AMD's APM.
->
-> Note, current versions of Intel's SDM are very poorly written with
-> respect to INIT behavior.  Table 9-1. "IA-32 and Intel 64 Processor
-> States Following Power-up, Reset, or INIT" quite clearly lists power-up,
-> RESET, _and_ INIT as setting CR0=60000010H, i.e. CD/NW=1.  But the SDM
-> then attempts to qualify CD/NW behavior in a footnote:
->
->   2. The CD and NW flags are unchanged, bit 4 is set to 1, all other bits
->      are cleared.
->
-> Presumably that footnote is only meant for INIT, as the RESET case and
-> especially the power-up case are rather non-sensical.  Another footnote
-> all but confirms that:
->
->   6. Internal caches are invalid after power-up and RESET, but left
->      unchanged with an INIT.
->
-> Bare metal testing shows that CD/NW are indeed preserved on INIT (someone
-> else can hack their BIOS to check RESET and power-up :-D).
->
-> Reported-by: Reiji Watanabe <reijiw@google.com>
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
 
-Reviewed-by: Reiji Watanabe <reijiw@google.com>
+ÔÚ 2021/7/20 ÉÏÎç11:40, Xianting Tian Ð´µÀ:
+> Add the missed virtio_device_ready() to set vsock frontend ready.
+>
+> Signed-off-by: Xianting Tian <tianxianting.txt@linux.alibaba.com>
+> ---
+>   net/vmw_vsock/virtio_transport.c | 2 ++
+>   1 file changed, 2 insertions(+)
+>
+> diff --git a/net/vmw_vsock/virtio_transport.c b/net/vmw_vsock/virtio_transport.c
+> index e0c2c992a..eb4c607c4 100644
+> --- a/net/vmw_vsock/virtio_transport.c
+> +++ b/net/vmw_vsock/virtio_transport.c
+> @@ -637,6 +637,8 @@ static int virtio_vsock_probe(struct virtio_device *vdev)
+>   	vdev->priv = vsock;
+>   	rcu_assign_pointer(the_virtio_vsock, vsock);
+>   
+> +	virtio_device_ready(vdev);
+> +
+>   	mutex_unlock(&the_virtio_vsock_mutex);
 
-Thank you for the fix and checking the CD/NW with the bare metal testing.
 
-Regards,
-Reiji
+It's better to do this after the mutex.
+
+Thanks
+
+
+>   
+>   	return 0;
+
