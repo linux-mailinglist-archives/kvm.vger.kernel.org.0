@@ -2,120 +2,135 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 057BE3CF8E9
-	for <lists+kvm@lfdr.de>; Tue, 20 Jul 2021 13:37:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1B5E33CFA3F
+	for <lists+kvm@lfdr.de>; Tue, 20 Jul 2021 15:13:37 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236213AbhGTK44 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 20 Jul 2021 06:56:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59852 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235544AbhGTKzt (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 20 Jul 2021 06:55:49 -0400
-Received: from mail-wr1-x432.google.com (mail-wr1-x432.google.com [IPv6:2a00:1450:4864:20::432])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E5C39C061574
-        for <kvm@vger.kernel.org>; Tue, 20 Jul 2021 04:36:26 -0700 (PDT)
-Received: by mail-wr1-x432.google.com with SMTP id m2so25665855wrq.2
-        for <kvm@vger.kernel.org>; Tue, 20 Jul 2021 04:36:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=d5WGGczUDQ+z5x6mRYmC5MZD9AX2DybKW9Ucl1ZZ5x4=;
-        b=GGHkZUBInNS2eawKVqyh2dZiBgqBA0ZAt6XqWzq6FhWyVhlXFPbnrSHWOAFPS8Z9ZR
-         dVibOwR1wemIROQr4YCp1xwVf64z1Rg6WMpiGmIbfEBFWPrx7MmRdjb8gV3/SgBP2ZFz
-         a9equnKu6rHXrtF1/q3vcbOQPyLeVxfwNuL+UDob2YQyCPEw22TnPSzcp86A1o8wmep8
-         1ovlB+LtfWokYN7bMc5KLPeyi/66y6j4HTX1EvxJshk2q4Z+Mrbh6HeBmZDHYOODRsRw
-         ktVTLWOHs/HMh+a+mLrAgjBio5S/1PCoIAKLdzp+GyxBK5Ra+Tjpp58IHq5VCMfwp/Vd
-         YXZw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=d5WGGczUDQ+z5x6mRYmC5MZD9AX2DybKW9Ucl1ZZ5x4=;
-        b=lLBHImpJRyJ/zhHCAvN998Mrjdwm+wbsQmT0pCpqNsZaM0UbS66qwlCtb9ctF96PP1
-         B7DLmygWnwDYHtBVGrJVpCLQSho4B7FbebpTJSRxVmHY7+IzQ1ibr8Ar6sAwuTVLl/os
-         pnZz+R4Dxwfd2T7I/t/AuCC8L18jFqg7jYccuAGjYbCC/f2qUiGKKxyEUVeu9guJPWb6
-         aY+Gx8ZTTA/5lnPr/Kq1plfZTDSbCj96yqebiXOiN4+uQhoDz4BlY5HE37zjvgNkA0g1
-         M7VLiacplztXzFSYnCkuxsRFf3aEzaSETOrEXaLiiXvU62xZj+zbwuYzxNJ7zkN9InOP
-         407Q==
-X-Gm-Message-State: AOAM532bI8SK0OC3/1+eZYmpGAhk4mb2K3oqw5dySzU0D83wcJ8BzK9m
-        B6J8l7TJHHN3aEhSOWhU7ByR3w==
-X-Google-Smtp-Source: ABdhPJxWCOn5XF/Z6Scsndh/Ax3SBXXxu2JEXA+6Z/V9aXahHy5B6KiYzK39pJgPk6HYOKcI6cp8rA==
-X-Received: by 2002:a5d:6589:: with SMTP id q9mr2297646wru.284.1626780985461;
-        Tue, 20 Jul 2021 04:36:25 -0700 (PDT)
-Received: from google.com ([2a00:79e0:d:210:83e0:11ac:c870:2b97])
-        by smtp.gmail.com with ESMTPSA id d9sm23135294wrx.76.2021.07.20.04.36.24
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 20 Jul 2021 04:36:25 -0700 (PDT)
-Date:   Tue, 20 Jul 2021 12:36:21 +0100
-From:   Quentin Perret <qperret@google.com>
-To:     Marc Zyngier <maz@kernel.org>
-Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org, will@kernel.org,
-        dbrazdil@google.com, Srivatsa Vaddagiri <vatsa@codeaurora.org>,
-        Shanker R Donthineni <sdonthineni@nvidia.com>,
-        James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        kernel-team@android.com
-Subject: Re: [PATCH 03/16] KVM: arm64: Turn kvm_pgtable_stage2_set_owner into
- kvm_pgtable_stage2_annotate
-Message-ID: <YPa1NfbEDY3kVHzr@google.com>
-References: <20210715163159.1480168-1-maz@kernel.org>
- <20210715163159.1480168-4-maz@kernel.org>
- <YPag0YQHB0nph5ji@google.com>
- <871r7t9tgi.wl-maz@kernel.org>
- <YPanmXfdr9rqnICK@google.com>
- <87zguh8c4l.wl-maz@kernel.org>
+        id S238463AbhGTMcn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 20 Jul 2021 08:32:43 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:34889 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S238370AbhGTMcS (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 20 Jul 2021 08:32:18 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1626786774;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=9nf1v6P0JlGIoFjMRuRD5r+S7g6x4hJlGGenaSoSM68=;
+        b=T4zzYBXQtVFlKWltPSuANPjcUSbGkrWIaZ9yMXrjteIwSEF+Z5g1qDLBukataLiYL/jOzC
+        nxOtISRWRfUbebE9jNNSyvamm/DL2UZZR1i12v+5ETTfW2BYYM6feHQjYklON/5zW10H/M
+        2WWlW3+6TVo8hgQqIAVhqJvi4awEe2I=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-24-fR5MrqLFMlC5Xp2S6MrlEw-1; Tue, 20 Jul 2021 09:12:52 -0400
+X-MC-Unique: fR5MrqLFMlC5Xp2S6MrlEw-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5A6F0100C660;
+        Tue, 20 Jul 2021 13:12:51 +0000 (UTC)
+Received: from localhost (ovpn-114-103.ams2.redhat.com [10.36.114.103])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 011C560C82;
+        Tue, 20 Jul 2021 13:12:50 +0000 (UTC)
+Date:   Tue, 20 Jul 2021 14:12:49 +0100
+From:   Stefan Hajnoczi <stefanha@redhat.com>
+To:     Xianting Tian <xianting.tian@linux.alibaba.com>
+Cc:     sgarzare@redhat.com, davem@davemloft.net, kuba@kernel.org,
+        jasowang@redhat.com, kvm@vger.kernel.org, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2] vsock/virtio: set vsock frontend ready in
+ virtio_vsock_probe()
+Message-ID: <YPbL0QIgbAh/PBuC@stefanha-x1.localdomain>
+References: <20210720071337.1995-1-xianting.tian@linux.alibaba.com>
+ <YPakBTVDbgVcTGQX@stefanha-x1.localdomain>
+ <b48bd02d-9514-ec0c-3779-fd5ddc5c2d3d@linux.alibaba.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: multipart/signed; micalg=pgp-sha256;
+        protocol="application/pgp-signature"; boundary="ECpNC9XLSuXAI6rm"
 Content-Disposition: inline
-In-Reply-To: <87zguh8c4l.wl-maz@kernel.org>
+In-Reply-To: <b48bd02d-9514-ec0c-3779-fd5ddc5c2d3d@linux.alibaba.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tuesday 20 Jul 2021 at 12:20:58 (+0100), Marc Zyngier wrote:
-> On Tue, 20 Jul 2021 11:38:17 +0100,
-> Quentin Perret <qperret@google.com> wrote:
-> > 
-> > On Tuesday 20 Jul 2021 at 11:21:17 (+0100), Marc Zyngier wrote:
-> > > On Tue, 20 Jul 2021 11:09:21 +0100,
-> > > Quentin Perret <qperret@google.com> wrote:
-> > > > 
-> > > > On Thursday 15 Jul 2021 at 17:31:46 (+0100), Marc Zyngier wrote:
-> > > > > @@ -815,7 +807,7 @@ int kvm_pgtable_stage2_set_owner(struct kvm_pgtable *pgt, u64 addr, u64 size,
-> > > > >  		.arg		= &map_data,
-> > > > >  	};
-> > > > >  
-> > > > > -	if (owner_id > KVM_MAX_OWNER_ID)
-> > > > > +	if (!annotation || (annotation & PTE_VALID))
-> > > > >  		return -EINVAL;
-> > > > 
-> > > > Why do you consider annotation==0 invalid? The assumption so far has
-> > > > been that the owner_id for the host is 0, so annotating a range with 0s
-> > > > should be a valid operation -- this will be required when e.g.
-> > > > transferring ownership of a page back to the host.
-> > > 
-> > > How do you then distinguish it from an empty entry that doesn't map to
-> > > anything at all?
-> > 
-> > You don't, but that's beauty of it :)
-> > 
-> > The host starts with a PGD full of zeroes, which in terms of ownership
-> > means that it owns the entire (I)PA space. And it loses ownership of a
-> > page only when we explicitly annotate it with an owner id != 0.
-> 
-> Right. But this scheme doesn't apply to the guests, does it?
 
-Right, the meaning of a NULL PTE in guests will clearly be something
-different, but I guess the interpretation of what invalid mappings mean
-is up to the caller.
+--ECpNC9XLSuXAI6rm
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-> Don't we
-> need something that is non-null to preserve the table refcounting?
+On Tue, Jul 20, 2021 at 07:05:39PM +0800, Xianting Tian wrote:
+>=20
+> =E5=9C=A8 2021/7/20 =E4=B8=8B=E5=8D=886:23, Stefan Hajnoczi =E5=86=99=E9=
+=81=93:
+> > On Tue, Jul 20, 2021 at 03:13:37PM +0800, Xianting Tian wrote:
+> > > Add the missed virtio_device_ready() to set vsock frontend ready.
+> > >=20
+> > > Signed-off-by: Xianting Tian<xianting.tian@linux.alibaba.com>
+> > > ---
+> > >   net/vmw_vsock/virtio_transport.c | 2 ++
+> > >   1 file changed, 2 insertions(+)
+> > Please include a changelog when you send v2, v3, etc patches.
+> OK, thanks.
+> > > diff --git a/net/vmw_vsock/virtio_transport.c b/net/vmw_vsock/virtio_=
+transport.c
+> > > index e0c2c992a..dc834b8fd 100644
+> > > --- a/net/vmw_vsock/virtio_transport.c
+> > > +++ b/net/vmw_vsock/virtio_transport.c
+> > > @@ -639,6 +639,8 @@ static int virtio_vsock_probe(struct virtio_devic=
+e *vdev)
+> > >   	mutex_unlock(&the_virtio_vsock_mutex);
+> > > +	virtio_device_ready(vdev);
+> > Why is this patch necessary?
+>=20
+> Sorry, I didn't notice the check in virtio_dev_probe(),
+>=20
+> As Jason comment,=C2=A0 I alsoe think we need to be consistent: switch to=
+ use
+> virtio_device_ready() for all the drivers. What's opinion about this?
 
-Sure, but do we care? If the table entry gets zeroed we're then
-basically using an 'invalid block' mapping to annotate the entire block
-range with '0', whatever that means. For guests it won't mean much, but
-for the host that would mean sole ownership of the entire range.
+According to the documentation the virtio_device_read() API is optional:
+
+  /**
+   * virtio_device_ready - enable vq use in probe function
+   * @vdev: the device
+   *
+   * Driver must call this to use vqs in the probe function.
+     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   *
+   * Note: vqs are enabled automatically after probe returns.
+     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   */
+
+Many drivers do not use vqs during the ->probe() function. They don't
+need to call virtio_device_ready(). That's why the virtio_vsock driver
+doesn't call it.
+
+But if a ->probe() function needs to send virtqueue buffers, e.g. to
+query the device or activate some device feature, then the driver will
+need to call it explicitly.
+
+The documentation is clear and this design is less error-prone than
+relying on all drivers to call it manually. I suggest leaving things
+unchanged.
+
+Stefan
+
+--ECpNC9XLSuXAI6rm
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAmD2y9EACgkQnKSrs4Gr
+c8jrqgf/S6HrkKdnFqfK+QSbiUl+UXuX9y6rWg6umKeM+V6GAOPrPw/+WZd1dM9Q
+AdhHLvjaR4MNNIQj7Vm8gG7aBs4s0FO2QTH4atfH6E3bEOXBWn1sB+lduzEk87Bf
+5Y/tUog1kjgiU0eTkwLAYgXs9D8dA7SkJunRPjM+prsdvYDdWo5ulpEiLsexjPSy
+ye84Yg5CMWDTPCmk9yvcXBxAQaHu3jaZQChJsT72GgO4s11DgjLFqgWAMc/vs6X1
+bYfP0oDKHQiJ7ag81nYxdyyNcUcf2xaX1tvfg54WwdM+oMP6vk6FqFOYuksvA8PP
+Lj+uqiNg4gqv2n6SDm0v+mYH9g2QpA==
+=I41d
+-----END PGP SIGNATURE-----
+
+--ECpNC9XLSuXAI6rm--
+
