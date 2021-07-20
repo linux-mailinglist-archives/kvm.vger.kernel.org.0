@@ -2,45 +2,44 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3B4A93CFF2E
-	for <lists+kvm@lfdr.de>; Tue, 20 Jul 2021 18:23:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9B1B83CFF57
+	for <lists+kvm@lfdr.de>; Tue, 20 Jul 2021 18:26:39 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233590AbhGTPit (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 20 Jul 2021 11:38:49 -0400
-Received: from mail-bn8nam11on2054.outbound.protection.outlook.com ([40.107.236.54]:18305
-        "EHLO NAM11-BN8-obe.outbound.protection.outlook.com"
+        id S232465AbhGTPp7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 20 Jul 2021 11:45:59 -0400
+Received: from mail-eopbgr80053.outbound.protection.outlook.com ([40.107.8.53]:27749
+        "EHLO EUR04-VI1-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S235406AbhGTPgi (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 20 Jul 2021 11:36:38 -0400
+        id S234708AbhGTPoF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 20 Jul 2021 11:44:05 -0400
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=hksGAYTD4Jn1zzf7L8uSYDn5ks/XeaMEQ400Qc7NoFOswF6BciOrvZRUKlLmltWxQ0t/CUfk9pdjihZB9LJar/HhQdEdR4vJaI/hqPPovR8xjyuOe7JEpP1iouFQSIUO1Zdfvu2QvMkyVx8DpewqCU/6OtM+X1UVd7CjyV4RnZqK45lnNtTb1HaPp1E25YAYX3Sn5BPMYVHCi7EWN5OBh+fznE1d+bJASaKIQISdBakejO7IQJttT7BfzqZsWkzbJcv+6vLX5VSIvQu2Ewkvo/PFBYAkqiPcT+94YPmGP9eypuDqhCrSdBdFO2eIiI8ms0VgcSWdONpqwa5zNCmFWg==
+ b=a39oUMFeEEB9IandKct/tGfoXChQkjAM7XpoiMzE3SbTHbrF/P6EhFdk6iKN8+pWehT+PvoBrqEa4k3ME1rRxISRqDgXlQKl0FFEsZYt67obaETaDMATRgkbjRaJK8uakY/wTXLMrbX+y4Hr63z0h+jqR+JCuKS6xTsXG8ZBeASjmp+fhUnXi0/BNAfaT0U4JzlsE/sUbG6MHtlxh2CJHWKsVkrxsAX3RtuH/imQ4nzICG3d38NAya8RQO8bYVH6ZCg59ki+YU7icxTTDdYasA21R4mNE41A1C22XxIVdbM4lQ3hr50SwzwDrvw6ZTfzHy31hs5x6N5+U0L4s0KTjA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=qqPUoyds8KdUnJuCf2kr1fz19OwmfvxJeXpims53vos=;
- b=MunBjocSHDPDY6AuqzvjQ8W6h4ggvPBRzI05d+B/qRiU/sULsk+9EIdhNrA5UKcFgv9MBGxniKXb52r2r3R5W5NemwlTPZ+ZO+z3Ch9hp+vb+zIeyFiWwo6MHMgxGr/9hGWP0wPj2eEBQEoY1VAOa2ZFCcrQ73Y6sgL5HFduHhdT8F5+hi9CSZOPzYgFNxcxecU56d221pobAoJDey8LGSgSRO9RBRRMVNE6zNsVP4RZ5K1s0f8Os2RV8FvAJeB5akHejvVDTkpEfua0ZEGyKeQUBhb0U8OJTb37QAB5lWmUmXbmCMnYi2UtqLzvLLK2Pykc+AOg0Ep9RT0tljVm5g==
+ bh=raDI1fzGPc6dGjz2Gh9/XBlvvSdVsDrlWoOtLG0MYN4=;
+ b=TVYBnA+hS4eerrUwGOsk8Iz3IrFLe3/PVSdFki/YZbUpRTRseHnYxEhm71CWKyvFt66JL8MOPw9bPNr7h2lV+5A22h0Ptgmurv1f5xxBHnrHPFoBT8s/DR/2BGnkleS2JXNJ7tbiLDCcLve7fH7oRWOt7Avc9vo2AEs9sjRtMf9svD/DBw5pyUiSancnzSSV/awVvojWiDLQXjA8qsKFbL2II0ncablNlsMRuYkdd6gQcfQAo5DRw8ij6FJnH1L2LmK2yz3WIMgI3yJCA2fShaQisLHQUVx8JivGpK6jMio8CIO/vVza9KkB5RK35ZKemIuT1L1+Xjt2SMF2T7Hfzw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
+ smtp.mailfrom=oss.nxp.com; dmarc=pass action=none header.from=oss.nxp.com;
+ dkim=pass header.d=oss.nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=NXP1.onmicrosoft.com;
+ s=selector2-NXP1-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=qqPUoyds8KdUnJuCf2kr1fz19OwmfvxJeXpims53vos=;
- b=Xyfp8iW06k63Q+JYLp4WpVQnSQQVgTcUwfSe96Ha5wnVSmgq6jzH7EnACe0KG3DkDzZYg1t2yvXf0LyWSYS+kT70YlTVEQX7BqzXQxTg8DpHYtQVo/+qJDleMRp6S64wdXq1WYVIVhZotTVBsRSsQwzDSvgsxELAg1Zjmcka9yr3LeLb3bOUNFOu9pGoUQZ85j0+KDo4I9aoMbEv9ZC3DAs2FS0KOTeHag1iuZThNwer5T4oYvr6W4OyDp4eYhsF0E6ue/Oubzfs0l7Pm3o2UFDfzl50X5y6lG27Pc+47nATqWqCAKjdfKKUJpeg5MVmHBzfuMFePPbBbGtXiuq1Mw==
-Authentication-Results: oss.nxp.com; dkim=none (message not signed)
- header.d=none;oss.nxp.com; dmarc=none action=none header.from=nvidia.com;
-Received: from BL0PR12MB5506.namprd12.prod.outlook.com (2603:10b6:208:1cb::22)
- by BL1PR12MB5380.namprd12.prod.outlook.com (2603:10b6:208:314::7) with
+ bh=raDI1fzGPc6dGjz2Gh9/XBlvvSdVsDrlWoOtLG0MYN4=;
+ b=MIg4EjtYHxwvgHVBVhZiz4xi0/MFpDHaobAK9RwzMbaueAQOoqqazwioLb5y2tvkVhhfbOvehiICiO1DUhAnuNrgN3TCz1tkRItWWaWiVjqez7/EqhrOfeqO+ggPyk3VHpSS9TEYbto2fQqTtE4m8VY0DLJOjsE+ytqcY9yhDFE=
+Authentication-Results: nvidia.com; dkim=none (message not signed)
+ header.d=none;nvidia.com; dmarc=none action=none header.from=oss.nxp.com;
+Received: from VI1PR0402MB3503.eurprd04.prod.outlook.com (2603:10a6:803:d::26)
+ by VI1PR04MB4160.eurprd04.prod.outlook.com (2603:10a6:803:41::12) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4331.34; Tue, 20 Jul
- 2021 16:17:14 +0000
-Received: from BL0PR12MB5506.namprd12.prod.outlook.com
- ([fe80::d017:af2f:7049:5482]) by BL0PR12MB5506.namprd12.prod.outlook.com
- ([fe80::d017:af2f:7049:5482%5]) with mapi id 15.20.4331.034; Tue, 20 Jul 2021
- 16:17:14 +0000
-Date:   Tue, 20 Jul 2021 13:17:13 -0300
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     Diana Craciun OSS <diana.craciun@oss.nxp.com>
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4331.21; Tue, 20 Jul
+ 2021 16:23:52 +0000
+Received: from VI1PR0402MB3503.eurprd04.prod.outlook.com
+ ([fe80::c401:1dd0:8b6d:27a5]) by VI1PR0402MB3503.eurprd04.prod.outlook.com
+ ([fe80::c401:1dd0:8b6d:27a5%5]) with mapi id 15.20.4331.034; Tue, 20 Jul 2021
+ 16:23:51 +0000
+Subject: Re: [PATCH 05/13] vfio/fsl: Move to the device set infrastructure
+To:     Jason Gunthorpe <jgg@nvidia.com>
 Cc:     David Airlie <airlied@linux.ie>,
         Tony Krowiak <akrowiak@linux.ibm.com>,
         Alex Williamson <alex.williamson@redhat.com>,
@@ -72,138 +71,163 @@ Cc:     David Airlie <airlied@linux.ie>,
         Leon Romanovsky <leonro@nvidia.com>,
         Max Gurtovoy <mgurtovoy@nvidia.com>,
         Yishai Hadas <yishaih@nvidia.com>
-Subject: Re: [PATCH 05/13] vfio/fsl: Move to the device set infrastructure
-Message-ID: <20210720161713.GB1117491@nvidia.com>
 References: <5-v1-eaf3ccbba33c+1add0-vfio_reflck_jgg@nvidia.com>
  <44639398-d50f-ac6a-d52b-4e964465ca6f@oss.nxp.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <44639398-d50f-ac6a-d52b-4e964465ca6f@oss.nxp.com>
-X-ClientProxiedBy: BL1PR13CA0389.namprd13.prod.outlook.com
- (2603:10b6:208:2c0::34) To BL0PR12MB5506.namprd12.prod.outlook.com
- (2603:10b6:208:1cb::22)
+ <20210720161713.GB1117491@nvidia.com>
+From:   Diana Craciun OSS <diana.craciun@oss.nxp.com>
+Message-ID: <5181d7f9-0a4f-c594-c5e9-820bdf97f6f2@oss.nxp.com>
+Date:   Tue, 20 Jul 2021 19:23:35 +0300
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.12.0
+In-Reply-To: <20210720161713.GB1117491@nvidia.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: AM0PR01CA0161.eurprd01.prod.exchangelabs.com
+ (2603:10a6:208:aa::30) To VI1PR0402MB3503.eurprd04.prod.outlook.com
+ (2603:10a6:803:d::26)
 MIME-Version: 1.0
 X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from mlx.ziepe.ca (142.162.113.129) by BL1PR13CA0389.namprd13.prod.outlook.com (2603:10b6:208:2c0::34) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4352.13 via Frontend Transport; Tue, 20 Jul 2021 16:17:14 +0000
-Received: from jgg by mlx with local (Exim 4.94)        (envelope-from <jgg@nvidia.com>)        id 1m5sQj-004yv2-Nq; Tue, 20 Jul 2021 13:17:13 -0300
+Received: from [192.168.1.211] (86.126.4.153) by AM0PR01CA0161.eurprd01.prod.exchangelabs.com (2603:10a6:208:aa::30) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4331.21 via Frontend Transport; Tue, 20 Jul 2021 16:23:39 +0000
 X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 086f1c93-3705-4852-b4d7-08d94b99d630
-X-MS-TrafficTypeDiagnostic: BL1PR12MB5380:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <BL1PR12MB53809ECD44DFCCB9350231ACC2E29@BL1PR12MB5380.namprd12.prod.outlook.com>
+X-MS-Office365-Filtering-Correlation-Id: 18f77e96-cd4a-495d-a7f8-08d94b9ac2be
+X-MS-TrafficTypeDiagnostic: VI1PR04MB4160:
+X-MS-Exchange-SharedMailbox-RoutingAgent-Processed: True
+X-Microsoft-Antispam-PRVS: <VI1PR04MB4160179399F5768932D398B0BEE29@VI1PR04MB4160.eurprd04.prod.outlook.com>
 X-MS-Oob-TLC-OOBClassifiers: OLM:9508;
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: I787L4j6c6r+csd7BNMfAt3o+Rr30yViIIhOYh3qhkx7xKK8ysSM6c3tZZu6NRrbjslMZQRHmyPGXNcjqL8btRSrjPf7JZXTlrwWWog7u8Bi330cNjEK6qhmUU2jX23zFFGphDj2lvQy3oNMaH2B0CtHYXIkb0lXKl8uQvzyrd7L4QRPbWS9lfpApeAT5aUebI1AXGZHu3/G/v29b80KwTfOGn7PYF/XZg6Jc6KFo+y0NfJBAwX0I3NwyH58EkExvI/DprG3ytfkU1HBLi/ip6Zcgz8cizGJUmiVh2Taqcmp/qRY/9Deal0e2/7k0FYkEWpXL0PaFCa53VKXWqxvjNpqSfPbX90vrwSZeDaRMC7OJAqQIO1tjdoH0vXjQihvYy57EUSwg2i0YGdwu+WGJV/3wKsi4qHCeeNEZDTiDTOj04u3D5foIpJrHfnuMDuJOwogukr0tf7IpAV0gmx+SoyonNU0q3jSmbyPBdrrODNHE/3I5P/ausaQREpl+ppiWMXn/+8XptsbaEH1tR0Bp8rtTicOKM917+O1fuc+2s3IvV5nghVeapWARM/S/sz418RZ0Z+SZWEaw+znUX5PMfMv1VwoJqbB0SpSztEFgItDVRGXB/qNDTpAN44m8mpHFcrPX3+3K1HQqC1cbAPGnA==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL0PR12MB5506.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(39860400002)(366004)(136003)(346002)(396003)(376002)(38100700002)(2906002)(66946007)(7416002)(7406005)(54906003)(53546011)(66476007)(36756003)(66556008)(5660300002)(1076003)(2616005)(426003)(316002)(8676002)(186003)(86362001)(478600001)(26005)(33656002)(4326008)(107886003)(6916009)(8936002)(9786002)(83380400001)(9746002);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam-Message-Info: WaedbUM83DxpNlQhdIOJUJDmPzkeDF3Be13nz9KLx2ZsDF7uMMyQov3KfWf5HDAJWOEz2rzmZ00wNCdoJ3IxLUysOlxKlvyEdyocvXM3L/geogsVe+wp41NKRYASFMi12x+kEajUcBS6qwXjEBPhdZTcxqmCM9Qgvmdr+hWVl+miLLJDZ95t8/btgLg4aGlanP4GI5EyAuFOuqCIbLQhudz0mQJYvxi7zdl3xcF497nSUecw5FtCVjAgYc/Y2XVinSg6Xqwiu1F7LKj+tIRvWKtLNANmm38NxEo4zNRVxEsLqmRXDgFETlmnBYNJDT4kHgbvYpwlECE205hLcToi2tujdZ2mKtr8TtAJ5TeiaSQQSNN6/UU0huOWYkX+Tl+FN41myO+Qy+io8uL4SV06Wwg1EU9jl1R0phqoNsr2VdPV4qfF+DcRdMLxa0IfB/AaiuDssiGIk9otfgFRCSmjqtRTQoHLLMoO5EVpK0mDdTzKtDTb90JIqoWvsq8TGFbS+xAhM5vLrNz+M5PibuBRAdP2wQYKE7gRApkiEqzRgDh114OEjo9FpeQ+Oi+fdO5yWbD7X9y9aso6hXIAgKUnI19rJp9NItj4+4KrPyd2WfO+MNfeSf++hkJbVtLnWwmgHcrjtIhufAYrNTEAzsPgBU10NC9p7T7EkEU9UqM0JG2wRWYlctpaIB0QisD8AIsEXde2sSRq8XpM1ZWcvuL6ffQI/r0A4M4M0Rvwws7phsg=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:VI1PR0402MB3503.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(346002)(376002)(366004)(39840400004)(396003)(136003)(316002)(38350700002)(38100700002)(5660300002)(66946007)(66556008)(16576012)(66476007)(53546011)(2616005)(956004)(31696002)(8676002)(2906002)(6916009)(83380400001)(4326008)(6666004)(54906003)(86362001)(31686004)(26005)(6486002)(52116002)(7416002)(7406005)(186003)(478600001)(8936002)(43740500002);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?Js7nwKvqfQP/Qi9xvqhR99D3EdDrxEWTJioa3inHFWDw5bXA/mriys4kSzZe?=
- =?us-ascii?Q?55dguNTUXmP0SbmriCL5UmfUepVkTiiGCAiM29my5ckuHeLLYslXM0xv3ScA?=
- =?us-ascii?Q?6yDm+ycK+F642vEKWyROe6bSjbxzVr4nnO8Y3VCYW1MKtNBX2FFgJ8ddAXy6?=
- =?us-ascii?Q?+Xg1rxqwd1C61uXuqwXk2/ul370XKKqUHJKbtAazUi8iKhix5g3k5V+KGGPP?=
- =?us-ascii?Q?JQ7fLQoJETbfzWrCnHEISo0zGo5ZN6BirJvOz/NbW2SMEGPTzSdojanEqDYh?=
- =?us-ascii?Q?lNNFNSHalyWNPsb3GLHYyyVKoH6TMq7KxbySUXusTWPKKyDR8+QRbfE+sP7L?=
- =?us-ascii?Q?U+OPAi5drF0KOsQNUlzN2CGkTE3eKDwpKHR+DTLf74qy+4sIfBI0EWNRz1SA?=
- =?us-ascii?Q?cGfJJ2EWdJc4V70e5wIFv6+w/tt5p5Y+q64KAdvWTv+s9wBq3lIyhxmxRJbG?=
- =?us-ascii?Q?GwwwIGb+mrQMqi4Q3IXjMmdlxULs/6mQsle4nafwmtlhVUayR/ldAPUHP8Kb?=
- =?us-ascii?Q?5zgH2vjxOxfo6MGrFAerDBkSoNWEEK8Cqy3mATp2qygKnoo+XHtHvPzqiRjS?=
- =?us-ascii?Q?0cCdrlZaa7kQ92BQ9RFrUhxVBYfoxXmCjVCQToaBQsqrQRHNN+1TYJanOt9Z?=
- =?us-ascii?Q?2WSoxpTbziHavY/FwD0IZKVRLjeZS9XKiVhGXJd07DgUTlimytWJX85JAw0m?=
- =?us-ascii?Q?p6cYzF0+8WUGCMetZ+Od+9xO3dGx3r+pKxilmbsp2SKAw3Dg3Ohr92kViJrj?=
- =?us-ascii?Q?06VYv8WKd6aDH4F4A89oyPynOLd1eqPgEm+09xow2Zsw96g/GL032UDKMiu1?=
- =?us-ascii?Q?zDoyQzSFZr7QcRgzmC2XvojdBjaUNCBX2Sulc8i+lYt0thrPor8fNyKVZ+FL?=
- =?us-ascii?Q?NNeUb8vdaQQlbv8yB7nAwXBJm0v02vWc7RH+K6P5xWZU4AVNsHkE+nmxyb3k?=
- =?us-ascii?Q?1cta2JCIvwr9zpleLt4anZJ64prfJ87j8kPxdGR9zwMl4sOIKNdBYwWfLXv6?=
- =?us-ascii?Q?fMg4ed1RxdXOq0T/pN/xJQLf1hImdlFr7JfGR6hxDujVXUWtOgpZRu2jTyCY?=
- =?us-ascii?Q?EfPhH7+or1JFbmSS8JXafdj2ht6DzL81fF8aZyDRV+lTuQoGSXOfgEfLV5VK?=
- =?us-ascii?Q?vPKEUPTVQAl0lcuWFo70HSnzFoVKRkYvQphtpNlGsX0+jDlI5jiTqGQuuT5Y?=
- =?us-ascii?Q?hDYNkIUvNCFt+8+JHPUZu7Uhpxjq/wQj3jk3znjhi5SeaUk/pU1LjAlZPTTh?=
- =?us-ascii?Q?PTYqwmaKXQF7FOMHZ0nYC2pVZKJt5bdlJTUQitlmtLSGyB8Pc7INOopppN6T?=
- =?us-ascii?Q?QtoOHl4CpFPlDuu9+YJEPKq6?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 086f1c93-3705-4852-b4d7-08d94b99d630
-X-MS-Exchange-CrossTenant-AuthSource: BL0PR12MB5506.namprd12.prod.outlook.com
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?SVR5UERxRk0zelI1RU45NFBPWVA1WUZUb0QrZmpGWS9Md1FpZ1dpbm9jYkxk?=
+ =?utf-8?B?dE9aWnRxR3FneTlmeDJIeWNUM0hNeWQ2UGRneDJFenVhNmNlTmhPT0hWZ3ZH?=
+ =?utf-8?B?TjJPLytCeFdETVhIMGIrSmI1MVBqazJVTVhDVGl5c0dkMkE0WWN4RitaWUFV?=
+ =?utf-8?B?WWI2ZVRCTG55QVBzRWJBaWdmbjR1WlMxdjBnVnVvdGZaMG1GQnFKMWVqUnhn?=
+ =?utf-8?B?ckUveWZhU0xETHpsNFp1WGJ1N3hjVWdOZXZyWXN0dlBWKzlGYVMveWQzcHZP?=
+ =?utf-8?B?clhnTlFsZkhqRDhCdll3N2phN1QwZnB0NVE2bCsxZ012WlMzQXpoM0Q5TUxo?=
+ =?utf-8?B?TTlGWThHRDgwbVFOcnEwNjZKdVhFTEFESE5kcFpnbk82MmpwK050SWozdm9X?=
+ =?utf-8?B?OEVjeTlKNEZIcTB2Zi9vZjduNW8yN1l3bTA1UHlmQTYxTER2MVN3cENpRWRK?=
+ =?utf-8?B?dkFtMTBDc1VXa0xBZ2JBbFdyZlBCUjl5RXhYTDdPUDYxSkkyV05FbnNjZXAx?=
+ =?utf-8?B?VEhaclIvNzNRWVdmSWVwWjFDME10aTQ0d0RMYkduNEpUaEdxNjR5MURaanRZ?=
+ =?utf-8?B?SVRJZVhrRGVIeERPdi9BUnJPSUhFcmRIZHBNUGh0Q3RiSEFMdjJlTEFET2lj?=
+ =?utf-8?B?YWZVOW1jRFZNdG5MRHo5RFpoTWwyQUhSNFV5MGgrVWVjbDhHWTBSbDE0bXRK?=
+ =?utf-8?B?Um1kclc2c09VUkpnZGhPSTRTYUdUQ3lBWmZyZG5YUTA1WGlEYnU3ZjMwVy9D?=
+ =?utf-8?B?cTh1M0VWSjFjYjQrdG51SXJtTzQwV2pldlFKTGdEUmNGNEVaaU9lVHpaWis2?=
+ =?utf-8?B?bVlYa25pN1l4cytlYTZjendiY2wxR1BNeDlvNkJzQ3BDTUxidjVLUHh0QlJO?=
+ =?utf-8?B?U1FBMnpUN3drMHpoTTM5alBkblZQT3piV1d3Z0VVOHJwbWhZb2lxeXZJbE9t?=
+ =?utf-8?B?blQ2OVpvQW5VL3NlL3FQeUdUeFV4V0ZxZjZHSE9DenJyN3JqTDVMUDRBNHZY?=
+ =?utf-8?B?R2Z2emNvUWpqK0RGRmw4QTAxTHhRSlJnUm0wT2RyaU43OXFqLzNaeEhEZDV6?=
+ =?utf-8?B?TnBJWnUrdlg2T25LVmhkSUtLd1NQUHo0L2dyeGNhSzBwN1RoT1Y1eWhXTlpu?=
+ =?utf-8?B?MG1RRThGWFNVb0g1SG9EV3MzYTFPZ290SHVSQ0xqR3dqNUQwdFB5TE1tOS9a?=
+ =?utf-8?B?OFdIVkNHblhmRlhQL2twUXZ4dHZ2SGYxNi9aOE9MVXNHT2lsczlJd2YrbEZ6?=
+ =?utf-8?B?U2RSV2dtK1VrQkhoUjhDeHVyUGNsMWE4VFlFZXZXYXNQdjhqeVgwUjVXUklC?=
+ =?utf-8?B?aW0zanR6Q29aUTNFcGRIQW1XUHBYUXlibGFVa2p6SDI5Vi9tU2x4WWR1Q01B?=
+ =?utf-8?B?ZVYwanVIRUttNXo0VUlOZFhGVW45OVNValRpY3ZZUi9kUHl3M2luVmxpV3Ir?=
+ =?utf-8?B?MXkzdXYxaDlSdzFFSlJacVduUjkrbGJmM3l4SVJwZkZ3Y3R2QzAwVnZEOXEx?=
+ =?utf-8?B?dG1EWnJIQjExWXFmTTE2L3ZTR2o3VzlyNUtZVHpmY3VHMjAwejFSYTV3OWtH?=
+ =?utf-8?B?RjNxL0hpZG81RGJCbDRhRFV6L3h2TDVWUWpmQ0dEeG9aR01icEhZUXpBL2V5?=
+ =?utf-8?B?QkoyQVJ3SEswVnF2ckdacGw2NzhDcUFzWEszNmVKUU50clJzUk5BckMrQ3RF?=
+ =?utf-8?B?amgzR21wcURoVTcxQVpVOU40WHBWUCtObDRSb1hLUDU1ZVcxc1RHNE91Z0hL?=
+ =?utf-8?Q?yPbZi10RWcMomRhC7SgTqcNYGOs1Y7lSENLuDVW?=
+X-OriginatorOrg: oss.nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 18f77e96-cd4a-495d-a7f8-08d94b9ac2be
+X-MS-Exchange-CrossTenant-AuthSource: VI1PR0402MB3503.eurprd04.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Jul 2021 16:17:14.7551
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Jul 2021 16:23:51.7975
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 1Riy5h3ND3IsctNXgueojJbLTB89u8npd/y0lqsOai9PD9lgEYsBzE6u6pF/+wKz
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL1PR12MB5380
+X-MS-Exchange-CrossTenant-UserPrincipalName: xdXNUXFHh4srNMNqMsOHPYtwXBkld2ElYcjhIuhZy0steB7MZxar0LQz0XnVEVxjkjrjTfQjeV5howg8ol7mKQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR04MB4160
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jul 20, 2021 at 07:12:26PM +0300, Diana Craciun OSS wrote:
-> On 7/15/2021 3:20 AM, Jason Gunthorpe wrote:
-> > FSL uses the internal reflck to implement the open_device() functionality,
-> > conversion to the core code is straightforward.
-> > 
-> > The decision on which set to be part of is trivially based on the
-> > is_fsl_mc_bus_dprc() and we use a 'struct device *' pointer as the set_id.
-> > 
-> > It isn't entirely clear what the device set lock is actually protecting,
-> > but I think it is related to the interrupt setup.
+On 7/20/2021 7:17 PM, Jason Gunthorpe wrote:
+> On Tue, Jul 20, 2021 at 07:12:26PM +0300, Diana Craciun OSS wrote:
+>> On 7/15/2021 3:20 AM, Jason Gunthorpe wrote:
+>>> FSL uses the internal reflck to implement the open_device() functionality,
+>>> conversion to the core code is straightforward.
+>>>
+>>> The decision on which set to be part of is trivially based on the
+>>> is_fsl_mc_bus_dprc() and we use a 'struct device *' pointer as the set_id.
+>>>
+>>> It isn't entirely clear what the device set lock is actually protecting,
+>>> but I think it is related to the interrupt setup.
+>>
+>> Yes, it is protecting the interrupts setup. The FSL MC devices are using
+>> MSIs and only the DPRC device is allocating the MSIs from the MSI domain.
+>> The other devices just take interrupts from a pool. The lock is protecting
+>> the access to this pool.
 > 
-> Yes, it is protecting the interrupts setup. The FSL MC devices are using
-> MSIs and only the DPRC device is allocating the MSIs from the MSI domain.
-> The other devices just take interrupts from a pool. The lock is protecting
-> the access to this pool.
+> It would be much clearer if the lock was near the data it was
+> protecting, the DPRC pool seems in an entirely different layer..
 
-It would be much clearer if the lock was near the data it was
-protecting, the DPRC pool seems in an entirely different layer..
+Yes, I agree. I will think about of a more clearer design for a future 
+improvement.
 
-> > -static void vfio_fsl_mc_release(struct vfio_device *core_vdev)
-> > +static void vfio_fsl_mc_close_device(struct vfio_device *core_vdev)
-> >   {
-> >   	struct vfio_fsl_mc_device *vdev =
-> >   		container_of(core_vdev, struct vfio_fsl_mc_device, vdev);
-> > +	struct fsl_mc_device *mc_dev = vdev->mc_dev;
-> > +	struct device *cont_dev = fsl_mc_cont_dev(&mc_dev->dev);
-> > +	struct fsl_mc_device *mc_cont = to_fsl_mc_device(cont_dev);
-> >   	int ret;
-> > -	mutex_lock(&vdev->reflck->lock);
-> > +	vfio_fsl_mc_regions_cleanup(vdev);
-> > -	if (!(--vdev->refcnt)) {
-> > -		struct fsl_mc_device *mc_dev = vdev->mc_dev;
-> > -		struct device *cont_dev = fsl_mc_cont_dev(&mc_dev->dev);
-> > -		struct fsl_mc_device *mc_cont = to_fsl_mc_device(cont_dev);
-> > -
-> > -		vfio_fsl_mc_regions_cleanup(vdev);
-> > +	/* reset the device before cleaning up the interrupts */
-> > +	ret = dprc_reset_container(mc_cont->mc_io, 0, mc_cont->mc_handle,
-> > +				   mc_cont->obj_desc.id,
-> > +				   DPRC_RESET_OPTION_NON_RECURSIVE);
-> > -		/* reset the device before cleaning up the interrupts */
-> > -		ret = dprc_reset_container(mc_cont->mc_io, 0,
-> > -		      mc_cont->mc_handle,
-> > -			  mc_cont->obj_desc.id,
-> > -			  DPRC_RESET_OPTION_NON_RECURSIVE);
-> > +	if (WARN_ON(ret))
-> > +		dev_warn(&mc_cont->dev,
-> > +			 "VFIO_FLS_MC: reset device has failed (%d)\n", ret);
-> > -		if (ret) {
-> > -			dev_warn(&mc_cont->dev, "VFIO_FLS_MC: reset device has failed (%d)\n",
-> > -				 ret);
-> > -			WARN_ON(1);
-> > -		}
-> > +	vfio_fsl_mc_irqs_cleanup(vdev);
-> > -		vfio_fsl_mc_irqs_cleanup(vdev);
-> > -
-> > -		fsl_mc_cleanup_irq_pool(mc_cont);
 > 
-> There is also a need for the lock here. Eventhough the close function is
-> called only once, there might be a race between the devices in the
-> set. 
+>>> -static void vfio_fsl_mc_release(struct vfio_device *core_vdev)
+>>> +static void vfio_fsl_mc_close_device(struct vfio_device *core_vdev)
+>>>    {
+>>>    	struct vfio_fsl_mc_device *vdev =
+>>>    		container_of(core_vdev, struct vfio_fsl_mc_device, vdev);
+>>> +	struct fsl_mc_device *mc_dev = vdev->mc_dev;
+>>> +	struct device *cont_dev = fsl_mc_cont_dev(&mc_dev->dev);
+>>> +	struct fsl_mc_device *mc_cont = to_fsl_mc_device(cont_dev);
+>>>    	int ret;
+>>> -	mutex_lock(&vdev->reflck->lock);
+>>> +	vfio_fsl_mc_regions_cleanup(vdev);
+>>> -	if (!(--vdev->refcnt)) {
+>>> -		struct fsl_mc_device *mc_dev = vdev->mc_dev;
+>>> -		struct device *cont_dev = fsl_mc_cont_dev(&mc_dev->dev);
+>>> -		struct fsl_mc_device *mc_cont = to_fsl_mc_device(cont_dev);
+>>> -
+>>> -		vfio_fsl_mc_regions_cleanup(vdev);
+>>> +	/* reset the device before cleaning up the interrupts */
+>>> +	ret = dprc_reset_container(mc_cont->mc_io, 0, mc_cont->mc_handle,
+>>> +				   mc_cont->obj_desc.id,
+>>> +				   DPRC_RESET_OPTION_NON_RECURSIVE);
+>>> -		/* reset the device before cleaning up the interrupts */
+>>> -		ret = dprc_reset_container(mc_cont->mc_io, 0,
+>>> -		      mc_cont->mc_handle,
+>>> -			  mc_cont->obj_desc.id,
+>>> -			  DPRC_RESET_OPTION_NON_RECURSIVE);
+>>> +	if (WARN_ON(ret))
+>>> +		dev_warn(&mc_cont->dev,
+>>> +			 "VFIO_FLS_MC: reset device has failed (%d)\n", ret);
+>>> -		if (ret) {
+>>> -			dev_warn(&mc_cont->dev, "VFIO_FLS_MC: reset device has failed (%d)\n",
+>>> -				 ret);
+>>> -			WARN_ON(1);
+>>> -		}
+>>> +	vfio_fsl_mc_irqs_cleanup(vdev);
+>>> -		vfio_fsl_mc_irqs_cleanup(vdev);
+>>> -
+>>> -		fsl_mc_cleanup_irq_pool(mc_cont);
+>>
+>> There is also a need for the lock here. Eventhough the close function is
+>> called only once, there might be a race between the devices in the
+>> set.
+> 
+> vfio_fsl_mc_close_device() is already called under this lock:
+> 
+> 	mutex_lock(&device->dev_set->lock);
+> 	if (!--device->open_count && device->ops->close_device)
+> 		device->ops->close_device(device);
+> 	mutex_unlock(&device->dev_set->lock);
+> 
 
-vfio_fsl_mc_close_device() is already called under this lock:
+OK, I missed that.
 
-	mutex_lock(&device->dev_set->lock);
-	if (!--device->open_count && device->ops->close_device)
-		device->ops->close_device(device);
-	mutex_unlock(&device->dev_set->lock);
+> Thanks,
+> Jason
+> 
+
+I have tested the changes and everything works as expected.
 
 Thanks,
-Jason
+Diana
