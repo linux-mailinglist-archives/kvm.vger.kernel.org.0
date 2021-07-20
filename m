@@ -2,234 +2,162 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 628303D0432
-	for <lists+kvm@lfdr.de>; Wed, 21 Jul 2021 00:02:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A985A3D043B
+	for <lists+kvm@lfdr.de>; Wed, 21 Jul 2021 00:06:39 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231272AbhGTVVg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 20 Jul 2021 17:21:36 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:31508 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231411AbhGTVVP (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 20 Jul 2021 17:21:15 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1626818493;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=DGxLxC73Q30FLZh4kHloeV2LTAZ2CJRDqzZBDuBEMfM=;
-        b=Ty6BN3NVh1tbncLXYO5K+ZGbp3ho5S8x+Hry/Nlf+J2EDkFSAFfLt4jbi3QTpiBM9zALCR
-        owCtdHz5w6tODcx7oUteVm1faC9NtzB0HQyDwr4LgKQCDL2gBPIeVy6gY+06lqzLZx3HB3
-        r3azSQQqPJPHLyYTHwl31Vj7CZvtG9E=
-Received: from mail-oo1-f72.google.com (mail-oo1-f72.google.com
- [209.85.161.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-29-MbFakLFoODyf290k-Go_iQ-1; Tue, 20 Jul 2021 18:01:32 -0400
-X-MC-Unique: MbFakLFoODyf290k-Go_iQ-1
-Received: by mail-oo1-f72.google.com with SMTP id z4-20020a4ac2040000b029020e67cc1879so217065oop.18
-        for <kvm@vger.kernel.org>; Tue, 20 Jul 2021 15:01:32 -0700 (PDT)
+        id S229818AbhGTVZ6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 20 Jul 2021 17:25:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32978 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229830AbhGTVZy (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 20 Jul 2021 17:25:54 -0400
+Received: from mail-pj1-x102c.google.com (mail-pj1-x102c.google.com [IPv6:2607:f8b0:4864:20::102c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 70641C061766
+        for <kvm@vger.kernel.org>; Tue, 20 Jul 2021 15:06:29 -0700 (PDT)
+Received: by mail-pj1-x102c.google.com with SMTP id v18-20020a17090ac912b0290173b9578f1cso2596058pjt.0
+        for <kvm@vger.kernel.org>; Tue, 20 Jul 2021 15:06:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:content-transfer-encoding:in-reply-to;
+        bh=BB0NGsGv3epWhxiQYCc03cLFHcDOFlK36/5xOhr9iGo=;
+        b=G60QHWuyRH6eWtLou5HaWRxEN7Yq6nKV9T1iAIqyAq6fVrq1WWQgHIEV53g1ohgNc9
+         EQohQSGMoRnwcSERx2WtsFUY2oBHP2L7o6RLWdjM/8DnxS/jS2gR62e2ZdzQzsD/Cfqi
+         t26NKDlXSIHcL8jfXQ4F7qrg5pPOvQuoI2mBqA5sqIxf4jaH3gQ080WBkK8r5zzKZj6Q
+         G/9z8dSeMgvga8DzcwvEltKCTyVWefclmiDtlzTovNTWLqmL4Y7wltkF8n7JL2lbJV27
+         Rqq2Y/zqOcIZ3UnQEC1ynwVVGlNk1MtMr3wIXyYacV1olaGdhCMiOjk/TQIOvra62SgO
+         XgXg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=DGxLxC73Q30FLZh4kHloeV2LTAZ2CJRDqzZBDuBEMfM=;
-        b=J0wir+PFRF1r2fps6qzO6rPf6+4+YuYykVACgfVcXkQu5N8XZsvu4Uomw0smfyFNq1
-         4+/HLT1Xg5DuCxpMY/pwqd1dbyiQLjGU9P8Fa5ljbqi3p7bfHgGTps1tvP3UGNniDdJf
-         S1CmwbyJbjE2M4lN3kxJZuNxsw8AAzjCDYNpKc6IQT8q7LWvfVhxKpINivTMx3y4JNK/
-         nVybXKSCeZG10X+8FSHLPXdlS3Aez6cSrvH2tFnH3Dkq3+itC6tCN+M3YfIvPxkjq/Yd
-         biKy72HDjzjaWFyhTywtPTqBHzt5YexMLHnEvcqpi9vCBT+eZFRNtUZj98oKVUy3eoUC
-         acYQ==
-X-Gm-Message-State: AOAM533S7JeLMkqEX7stgHX/0iD4fgRBaoomvMB9pPHgGqcqDJBx0ONc
-        Ae1Pv1pQzdkktmJNnzc84h72yhqSgFOw3m8f/986oFPrhprfXgy/vZRD8wv8qDs2/DOKWDIkblq
-        auf+A313TjCtg
-X-Received: by 2002:a05:6808:aa3:: with SMTP id r3mr18166256oij.133.1626818491769;
-        Tue, 20 Jul 2021 15:01:31 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwuyDIfTXjm5YKo9TBgR+HrFk2cZEkVnlsdeNA/JOY8RcUjz3Wmb8/jGMHDDitpmXWLkurNEg==
-X-Received: by 2002:a05:6808:aa3:: with SMTP id r3mr18166225oij.133.1626818491525;
-        Tue, 20 Jul 2021 15:01:31 -0700 (PDT)
-Received: from redhat.com ([198.99.80.109])
-        by smtp.gmail.com with ESMTPSA id q187sm259680oif.2.2021.07.20.15.01.29
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to;
+        bh=BB0NGsGv3epWhxiQYCc03cLFHcDOFlK36/5xOhr9iGo=;
+        b=fA+MtbUpDw0bmhwqEa+9Ryhfqb2hMgkMlQgTZbOrq2L+2wtcKOZcZKw+DyCKoEvvvD
+         QATILSMtJ1Cp7wcqGyMQ7rMz5N1u/LVuNBK8pLtI74Z1hWEKN/YcRv53C3/iWr89j+G/
+         pckdQemDzYYs5wqwifn6qdx8vuW0S3RbrsfmMcwPcA1ioy1qKN7M670UC9GwbYQyyvMb
+         FcyDbO8qrTeIkVidgUHjk8p8tLmWuA9BJSus3d+1QDNXihSqPpsB+UPwyJG2ej+5OTn7
+         ffcdfMppv3lU0xWmXahqHcyFoFBgjN/cbKNk0Zj/47AfM0PbAec0OD+lI6zIfe0ksJIJ
+         u6fA==
+X-Gm-Message-State: AOAM533+NKKDzl8hKWESEHR8SJyRw0HrBaIwdhAdPw8VOq9Jow9aUlk/
+        +LxZMMTT5L3zCMDmwH3Fb60W/w==
+X-Google-Smtp-Source: ABdhPJwDD9+zuJ6DYICNGOinctEj1Edxq+hD2yj+AdZXjLWVr+ao/12i42Q3S8W5xw+1pKf5QwmK4Q==
+X-Received: by 2002:a17:90a:4295:: with SMTP id p21mr30863822pjg.149.1626818788641;
+        Tue, 20 Jul 2021 15:06:28 -0700 (PDT)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id w184sm419793pfw.85.2021.07.20.15.06.27
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 20 Jul 2021 15:01:30 -0700 (PDT)
-Date:   Tue, 20 Jul 2021 16:01:27 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Jason Gunthorpe <jgg@nvidia.com>
-Cc:     David Airlie <airlied@linux.ie>,
-        Tony Krowiak <akrowiak@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Daniel Vetter <daniel@ffwll.ch>,
-        Diana Craciun <diana.craciun@oss.nxp.com>,
-        dri-devel@lists.freedesktop.org,
-        Eric Auger <eric.auger@redhat.com>,
-        Eric Farman <farman@linux.ibm.com>,
-        Harald Freudenberger <freude@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        intel-gfx@lists.freedesktop.org,
-        intel-gvt-dev@lists.freedesktop.org,
-        Jani Nikula <jani.nikula@linux.intel.com>,
-        Jason Herne <jjherne@linux.ibm.com>,
-        Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
-        kvm@vger.kernel.org, Kirti Wankhede <kwankhede@nvidia.com>,
-        linux-doc@vger.kernel.org, linux-s390@vger.kernel.org,
-        Matthew Rosato <mjrosato@linux.ibm.com>,
-        Peter Oberparleiter <oberpar@linux.ibm.com>,
-        Halil Pasic <pasic@linux.ibm.com>,
-        Rodrigo Vivi <rodrigo.vivi@intel.com>,
-        Vineeth Vijayan <vneethv@linux.ibm.com>,
-        Zhi Wang <zhi.a.wang@intel.com>,
-        "Raj, Ashok" <ashok.raj@intel.com>, Christoph Hellwig <hch@lst.de>,
-        Leon Romanovsky <leonro@nvidia.com>,
-        Max Gurtovoy <mgurtovoy@nvidia.com>,
-        Yishai Hadas <yishaih@nvidia.com>,
-        Zhenyu Wang <zhenyuw@linux.intel.com>
-Subject: Re: [PATCH v2 02/14] vfio/mbochs: Fix missing error unwind in
- mbochs_probe()
-Message-ID: <20210720160127.17bf3c19.alex.williamson@redhat.com>
-In-Reply-To: <2-v2-b6a5582525c9+ff96-vfio_reflck_jgg@nvidia.com>
-References: <0-v2-b6a5582525c9+ff96-vfio_reflck_jgg@nvidia.com>
-        <2-v2-b6a5582525c9+ff96-vfio_reflck_jgg@nvidia.com>
-X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
+        Tue, 20 Jul 2021 15:06:27 -0700 (PDT)
+Date:   Tue, 20 Jul 2021 22:06:24 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Brijesh Singh <brijesh.singh@amd.com>
+Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
+        linux-coco@lists.linux.dev, linux-mm@kvack.org,
+        linux-crypto@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        David Rientjes <rientjes@google.com>,
+        Dov Murik <dovmurik@linux.ibm.com>,
+        Tobin Feldman-Fitzthum <tobin@ibm.com>,
+        Borislav Petkov <bp@alien8.de>,
+        Michael Roth <michael.roth@amd.com>,
+        Vlastimil Babka <vbabka@suse.cz>, tony.luck@intel.com,
+        npmccallum@redhat.com, brijesh.ksingh@gmail.com
+Subject: Re: [PATCH Part2 RFC v4 05/40] x86/sev: Add RMP entry lookup helpers
+Message-ID: <YPdI4JLrJJdPxy7e@google.com>
+References: <20210707183616.5620-1-brijesh.singh@amd.com>
+ <20210707183616.5620-6-brijesh.singh@amd.com>
+ <YPCAZaROOHNskGlO@google.com>
+ <437a5230-64fc-64ab-9378-612c34e1b641@amd.com>
+ <39be0f79-e8e4-fd4a-5c4a-47731c61740d@amd.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <39be0f79-e8e4-fd4a-5c4a-47731c61740d@amd.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 20 Jul 2021 14:42:48 -0300
-Jason Gunthorpe <jgg@nvidia.com> wrote:
-
-> Compared to mbochs_remove() two cases are missing from the
-> vfio_register_group_dev() unwind. Add them in.
+On Fri, Jul 16, 2021, Brijesh Singh wrote:
 > 
-> Fixes: 681c1615f891 ("vfio/mbochs: Convert to use vfio_register_group_dev()")
-> Reported-by: Cornelia Huck <cohuck@redhat.com>
-> Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
-> ---
->  samples/vfio-mdev/mbochs.c | 7 +++++--
->  1 file changed, 5 insertions(+), 2 deletions(-)
+> On 7/15/21 2:28 PM, Brijesh Singh wrote:
+> >> Looking at the future patches, dump_rmpentry() is the only power user,
+> >> e.g.  everything else mostly looks at "assigned" and "level" (and one
+> >> ratelimited warn on "validated" in snp_make_page_shared(), but I suspect
+> >> that particular check can and should be dropped).
+> >
+> > Yes, we need "assigned" and "level" and other entries are mainly for
+> > the debug purposes.
+> >
+> For the debug purposes, we would like to dump additional RMP entries. If
+> we go with your proposed function then how do we get those information
+> in the dump_rmpentry()?
+
+As suggested below, move dump_rmpentry() into sev.c so that it can use the
+microarchitectural version.  For debug, I'm pretty that's what we'll want anyways,
+e.g. dump the raw value along with the meaning of various bits.
+
+> How about if we provide two functions; the first
+> function provides architectural format and second provides the raw
+> values which can be used by the dump_rmpentry() helper.
 > 
-> diff --git a/samples/vfio-mdev/mbochs.c b/samples/vfio-mdev/mbochs.c
-> index e81b875b4d87b4..501845b08c0974 100644
-> --- a/samples/vfio-mdev/mbochs.c
-> +++ b/samples/vfio-mdev/mbochs.c
-> @@ -553,11 +553,14 @@ static int mbochs_probe(struct mdev_device *mdev)
->  
->  	ret = vfio_register_group_dev(&mdev_state->vdev);
->  	if (ret)
-> -		goto err_mem;
-> +		goto err_bytes;
->  	dev_set_drvdata(&mdev->dev, mdev_state);
->  	return 0;
->  
-> +err_bytes:
-> +	mbochs_used_mbytes -= mdev_state->type->mbytes;
->  err_mem:
-> +	kfree(mdev_state->pages);
->  	kfree(mdev_state->vconfig);
->  	kfree(mdev_state);
->  	return ret;
-> @@ -567,8 +570,8 @@ static void mbochs_remove(struct mdev_device *mdev)
->  {
->  	struct mdev_state *mdev_state = dev_get_drvdata(&mdev->dev);
->  
-> -	mbochs_used_mbytes -= mdev_state->type->mbytes;
->  	vfio_unregister_group_dev(&mdev_state->vdev);
-> +	mbochs_used_mbytes -= mdev_state->type->mbytes;
->  	kfree(mdev_state->pages);
->  	kfree(mdev_state->vconfig);
->  	kfree(mdev_state);
+> struct rmpentry *snp_lookup_rmpentry(unsigned long paddr, int *level);
+> 
+> The 'struct rmpentry' uses the format defined in APM Table 15-36.
+> 
+> struct _rmpentry *_snp_lookup_rmpentry(unsigned long paddr, int *level);
+> 
+> The 'struct _rmpentry' will use include the PPR definition (basically
+> what we have today in this patch).
+> 
+> Thoughts ?
 
-Hmm, doesn't this suggest we need another atomic conversion?  (untested)
+Why define an architectural "struct rmpentry"?  IIUC, there isn't a true
+architectural RMP entry; the APM defines architectural fields but doesn't define
+a layout.  Functionally, making up our own struct isn't a problem, I just don't
+see the point since all use cases only care about Assigned and Page-Size, and
+we can do them a favor by translating Page-Size to X86_PG_LEVEL.
 
-diff --git a/samples/vfio-mdev/mbochs.c b/samples/vfio-mdev/mbochs.c
-index e81b875b4d87..842819e29c6b 100644
---- a/samples/vfio-mdev/mbochs.c
-+++ b/samples/vfio-mdev/mbochs.c
-@@ -129,7 +129,7 @@ static dev_t		mbochs_devt;
- static struct class	*mbochs_class;
- static struct cdev	mbochs_cdev;
- static struct device	mbochs_dev;
--static int		mbochs_used_mbytes;
-+static atomic_t		mbochs_avail_mbytes;
- static const struct vfio_device_ops mbochs_dev_ops;
- 
- struct vfio_region_info_ext {
-@@ -511,14 +511,19 @@ static int mbochs_probe(struct mdev_device *mdev)
- 		&mbochs_types[mdev_get_type_group_id(mdev)];
- 	struct device *dev = mdev_dev(mdev);
- 	struct mdev_state *mdev_state;
-+	int avail_mbytes = atomic_read(&mbochs_avail_mbytes);
- 	int ret = -ENOMEM;
- 
--	if (type->mbytes + mbochs_used_mbytes > max_mbytes)
--		return -ENOMEM;
-+	do {
-+		if (avail_mbytes < type->mbytes)
-+			return ret;
-+	} while (!atomic_try_cmpxchg(&mbochs_avail_mbytes, &avail_mbytes,
-+				     avail_mbytes - type->mbytes));
- 
- 	mdev_state = kzalloc(sizeof(struct mdev_state), GFP_KERNEL);
- 	if (mdev_state == NULL)
--		return -ENOMEM;
-+		goto err_resv;
-+
- 	vfio_init_group_dev(&mdev_state->vdev, &mdev->dev, &mbochs_dev_ops);
- 
- 	mdev_state->vconfig = kzalloc(MBOCHS_CONFIG_SPACE_SIZE, GFP_KERNEL);
-@@ -549,8 +554,6 @@ static int mbochs_probe(struct mdev_device *mdev)
- 	mbochs_create_config_space(mdev_state);
- 	mbochs_reset(mdev_state);
- 
--	mbochs_used_mbytes += type->mbytes;
--
- 	ret = vfio_register_group_dev(&mdev_state->vdev);
- 	if (ret)
- 		goto err_mem;
-@@ -558,8 +561,11 @@ static int mbochs_probe(struct mdev_device *mdev)
- 	return 0;
- 
- err_mem:
-+	kfree(mdev_state->pages);
- 	kfree(mdev_state->vconfig);
- 	kfree(mdev_state);
-+err_resv:
-+	atomic_add(mdev_state->type->mbytes, &mbochs_avail_mbytes);
- 	return ret;
- }
- 
-@@ -567,11 +573,11 @@ static void mbochs_remove(struct mdev_device *mdev)
- {
- 	struct mdev_state *mdev_state = dev_get_drvdata(&mdev->dev);
- 
--	mbochs_used_mbytes -= mdev_state->type->mbytes;
- 	vfio_unregister_group_dev(&mdev_state->vdev);
- 	kfree(mdev_state->pages);
- 	kfree(mdev_state->vconfig);
- 	kfree(mdev_state);
-+	atomic_add(mdev_state->type->mbytes, &mbochs_avail_mbytes);
- }
- 
- static ssize_t mbochs_read(struct vfio_device *vdev, char __user *buf,
-@@ -1351,7 +1357,7 @@ static ssize_t available_instances_show(struct mdev_type *mtype,
- {
- 	const struct mbochs_type *type =
- 		&mbochs_types[mtype_get_type_group_id(mtype)];
--	int count = (max_mbytes - mbochs_used_mbytes) / type->mbytes;
-+	int count = atomic_read(&mbochs_avail_mbytes) / type->mbytes;
- 
- 	return sprintf(buf, "%d\n", count);
- }
-@@ -1460,6 +1466,8 @@ static int __init mbochs_dev_init(void)
- 	if (ret)
- 		goto err_class;
- 
-+	atomic_set(&mbochs_avail_mbytes, max_mbytes);
-+
- 	ret = mdev_register_device(&mbochs_dev, &mdev_fops);
- 	if (ret)
- 		goto err_device;
-
+> >> /*
+> >>   * Returns 1 if the RMP entry is assigned, 0 if it exists but is not
+> >>   * assigned, and -errno if there is no corresponding RMP entry.
+> >>   */
+> >> int snp_lookup_rmpentry(struct page *page, int *level)
+> >> {
+> >>     unsigned long phys = page_to_pfn(page) << PAGE_SHIFT;
+> >>     struct rmpentry *entry, *large_entry;
+> >>     unsigned long vaddr;
+> >>
+> >>     if (!cpu_feature_enabled(X86_FEATURE_SEV_SNP))
+> >>         return -ENXIO;
+> >>
+> >>     vaddr = rmptable_start + rmptable_page_offset(phys);
+> >>     if (unlikely(vaddr > rmptable_end))
+> >>         return -EXNIO;
+> >>
+> >>     entry = (struct rmpentry *)vaddr;
+> >>
+> >>     /* Read a large RMP entry to get the correct page level used in
+> >> RMP entry. */
+> >>     vaddr = rmptable_start + rmptable_page_offset(phys & PMD_MASK);
+> >>     large_entry = (struct rmpentry *)vaddr;
+> >>     *level = RMP_TO_X86_PG_LEVEL(rmpentry_pagesize(large_entry));
+> >>
+> >>     return !!entry->assigned;
+> >> }
+> >>
+> >>
+> >> And then move dump_rmpentry() (or add a helper) in sev.c so that "struct
+> >> rmpentry" can be declared in sev.c.
