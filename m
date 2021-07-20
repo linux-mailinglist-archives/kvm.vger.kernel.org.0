@@ -2,140 +2,200 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6F7C63D04A5
-	for <lists+kvm@lfdr.de>; Wed, 21 Jul 2021 00:31:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EA7353D04CE
+	for <lists+kvm@lfdr.de>; Wed, 21 Jul 2021 00:51:26 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230338AbhGTVvK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 20 Jul 2021 17:51:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38702 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229886AbhGTVvC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 20 Jul 2021 17:51:02 -0400
-Received: from mail-pf1-x42d.google.com (mail-pf1-x42d.google.com [IPv6:2607:f8b0:4864:20::42d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D86DAC061767
-        for <kvm@vger.kernel.org>; Tue, 20 Jul 2021 15:31:39 -0700 (PDT)
-Received: by mail-pf1-x42d.google.com with SMTP id c1so702363pfc.13
-        for <kvm@vger.kernel.org>; Tue, 20 Jul 2021 15:31:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=AUrpqM7EFCXw9fZsFBephub57NHu0f56SMcR8ChIC2w=;
-        b=Xf67p1gIpTUa0N9bF53hw4Pso0MHOTykJkzRFBpE6Liqej39JSMiNH/yQGUIUlvrlq
-         BIXMpPa7XCxUib8ZcXcNx8kghXf0V3BijM/fTIGAzWNk45BB2s0ZQ4pkvWM8oxYYhfYL
-         4+unUB5lFyqAW183cAe1BcUGRmzWZU8tBCzK3VC47os2coH4Lb/Os99Fo9i/2uAmevrk
-         TzLsFgcQg0DSOnqLzToknLUTZrAA3BMRS4A1fHCLsRZtGT1XX0znha6Aja3xonwxm0pv
-         BYYbRNzfFe1iXBpuuhSQauwXaHJYY58Ml8gw6j3skd4C1vsEYU9AcuHBUQVQnjVAtVMF
-         tj8w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=AUrpqM7EFCXw9fZsFBephub57NHu0f56SMcR8ChIC2w=;
-        b=FIsaMpD95QDpJ+rO89CWjzlmQhQRgTaZ1Hhounq7Jz1Fwxrki8rYe6zVti5vVyX/AK
-         ZI4HdCCL/sPJF271MgrpuOPfWcB/MHZ+pwD9VRc4W8az/sjfeETvwWwyR9FXph2Byf1Y
-         i/P2tDN8l7ylI+mSiOw1enzlG/9DdZ8n+6RoDM3FKj6weAsECgOkVtQbsnKrkbF06ebB
-         mWvM+VYiacv60gC2bG828iTcsiOYnwBamYopZr0gjqHSR9lad429UyQtHzUWewkIUB+F
-         u+m6cAtL9oMmmgBgtlf09n8E59+IjrqPf3Xbp4nH6mIUx1ggZBjnfiiVwPjYvv1XL4yl
-         rugw==
-X-Gm-Message-State: AOAM533kdgGBBlKQqC+O1eApS8BpJuSHpR9J1NrheqfxtJK9k18gxpmb
-        q5eOFB7U+Q7rOLlJ88Ii/4bMYA==
-X-Google-Smtp-Source: ABdhPJyGCIJWkhxVxYTObBcNLjwnF+6O7AyjvJyweoOlaa1ix7nfiAIzNUmYXM3xG7qIUTl6T+uQxg==
-X-Received: by 2002:aa7:804f:0:b029:334:4951:da88 with SMTP id y15-20020aa7804f0000b02903344951da88mr27399387pfm.29.1626820298460;
-        Tue, 20 Jul 2021 15:31:38 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id 202sm27151546pfy.198.2021.07.20.15.31.37
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 20 Jul 2021 15:31:37 -0700 (PDT)
-Date:   Tue, 20 Jul 2021 22:31:34 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Brijesh Singh <brijesh.singh@amd.com>
-Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
-        linux-coco@lists.linux.dev, linux-mm@kvack.org,
-        linux-crypto@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
-        David Rientjes <rientjes@google.com>,
-        Dov Murik <dovmurik@linux.ibm.com>,
-        Tobin Feldman-Fitzthum <tobin@ibm.com>,
-        Borislav Petkov <bp@alien8.de>,
-        Michael Roth <michael.roth@amd.com>,
-        Vlastimil Babka <vbabka@suse.cz>, tony.luck@intel.com,
-        npmccallum@redhat.com, brijesh.ksingh@gmail.com
-Subject: Re: [PATCH Part2 RFC v4 37/40] KVM: SVM: Add support to handle the
- RMP nested page fault
-Message-ID: <YPdOxrIA6o3uymq2@google.com>
-References: <20210707183616.5620-1-brijesh.singh@amd.com>
- <20210707183616.5620-38-brijesh.singh@amd.com>
- <YPYUe8hAz5/c7IW9@google.com>
- <bff43050-aed7-011c-89e5-9899bd1df414@amd.com>
-MIME-Version: 1.0
+        id S231785AbhGTWJ7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 20 Jul 2021 18:09:59 -0400
+Received: from mail-dm6nam11on2076.outbound.protection.outlook.com ([40.107.223.76]:7008
+        "EHLO NAM11-DM6-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S231679AbhGTWJU (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 20 Jul 2021 18:09:20 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=c0xx9U4ljDSuzVXDf2FTdiFzD2n27NxvPtp2YWNMavkXnHnj7hvTfWP2AjD/Q2gzVGLJw8TlONYPjZpeF0w4VX19BuwTELl0kbZV2QKMbTrP8v6vP+131d13dMa01ohDrh7GMkPNP5aYi+sxOhlcD5NpztWpIl2fS7Oy8evgbQ2wiG0p2NlkoIAyEn2v4BbwidKGgZI/JpRb4AR6yM8yqIQb22G51vEoIcPXDBptdpz5RBRZB86+WEOviunJkdi7F402+dlwAa5fLgMuDK/eBe3Qb7hyxxYkqdQdrCd5iJcT3EK/OB6dhYmYTIB5jru2rTZHwPS1atcfew4ac/rVFg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=cEzZa841vkeBoC2mxG/NMGrzpkXdRWDE4qhF5crkf3M=;
+ b=XAzQAR9ug/xqBMGerkJioTYojxTvtzDv6ENn1CEzmvDmKGtU2XjOrYYCDONmE54Bal3JEWqy0z/r8rj8Mi4EaOVUDxS1WW6Rwlw54V74M0a2HNpUzxGFWvtwi5RWgLdibKWMNcSv8ePO7ffa82HCwfh7NS/gEyujSQWbeu4U3dg95k9kkaPF9/qNysHbzY3n2crLNGL4p0O9VJpebaUCrP+Q2bLIGsKm+Pr0h4Am+lEElL2ef1k73Mknxnvf4/mmh0gjw9GVE7UvEy6Oxm6DbRWD9fdfCzYUO9axEElrnQBUNBIw5YuWtV4efzU1kTQ+M5yGpbg5l4HqHrAcBYMSwA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=cEzZa841vkeBoC2mxG/NMGrzpkXdRWDE4qhF5crkf3M=;
+ b=PQF0uLxHdqWTKdmgDzVnbX0/VGjfFrkW//h6oMm8zT1SdEefOrEuPiukiM8kHxCHQ5xKCiRLr8KdAXBHOa78wTZ7nkap83xGfW96DQyrv8jCeSewe+jOTnM8VOKoZayNXLrhapzGCqN5qrWA6kgG6Uum3wA0HMadyRdQNOG8QtXSOAeaXROexODKJ1I4wY0lcZA9y1317Jo5X1zDzDyRGICZPsoIpwlSHgQH+7pAwjPuoXbD8j4skIKp7SWw1quWNFYJADoq4CWk5ZSqvBdu/vYqsLT+e2JCzwtOhgAGy3HJScYLpxTVA0X3vGutorwQ1y0DZiiGTKisN1DvKT9HPg==
+Authentication-Results: redhat.com; dkim=none (message not signed)
+ header.d=none;redhat.com; dmarc=none action=none header.from=nvidia.com;
+Received: from BL0PR12MB5506.namprd12.prod.outlook.com (2603:10b6:208:1cb::22)
+ by BL1PR12MB5093.namprd12.prod.outlook.com (2603:10b6:208:309::22) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4331.24; Tue, 20 Jul
+ 2021 22:49:56 +0000
+Received: from BL0PR12MB5506.namprd12.prod.outlook.com
+ ([fe80::d017:af2f:7049:5482]) by BL0PR12MB5506.namprd12.prod.outlook.com
+ ([fe80::d017:af2f:7049:5482%5]) with mapi id 15.20.4331.034; Tue, 20 Jul 2021
+ 22:49:56 +0000
+Date:   Tue, 20 Jul 2021 19:49:55 -0300
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     Alex Williamson <alex.williamson@redhat.com>
+Cc:     David Airlie <airlied@linux.ie>,
+        Tony Krowiak <akrowiak@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        Diana Craciun <diana.craciun@oss.nxp.com>,
+        dri-devel@lists.freedesktop.org,
+        Eric Auger <eric.auger@redhat.com>,
+        Eric Farman <farman@linux.ibm.com>,
+        Harald Freudenberger <freude@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        intel-gfx@lists.freedesktop.org,
+        intel-gvt-dev@lists.freedesktop.org,
+        Jani Nikula <jani.nikula@linux.intel.com>,
+        Jason Herne <jjherne@linux.ibm.com>,
+        Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
+        kvm@vger.kernel.org, Kirti Wankhede <kwankhede@nvidia.com>,
+        linux-doc@vger.kernel.org, linux-s390@vger.kernel.org,
+        Matthew Rosato <mjrosato@linux.ibm.com>,
+        Peter Oberparleiter <oberpar@linux.ibm.com>,
+        Halil Pasic <pasic@linux.ibm.com>,
+        Rodrigo Vivi <rodrigo.vivi@intel.com>,
+        Vineeth Vijayan <vneethv@linux.ibm.com>,
+        Zhi Wang <zhi.a.wang@intel.com>,
+        "Raj, Ashok" <ashok.raj@intel.com>, Christoph Hellwig <hch@lst.de>,
+        Leon Romanovsky <leonro@nvidia.com>,
+        Max Gurtovoy <mgurtovoy@nvidia.com>,
+        Yishai Hadas <yishaih@nvidia.com>,
+        Zhenyu Wang <zhenyuw@linux.intel.com>
+Subject: Re: [PATCH v2 02/14] vfio/mbochs: Fix missing error unwind in
+ mbochs_probe()
+Message-ID: <20210720224955.GD1117491@nvidia.com>
+References: <0-v2-b6a5582525c9+ff96-vfio_reflck_jgg@nvidia.com>
+ <2-v2-b6a5582525c9+ff96-vfio_reflck_jgg@nvidia.com>
+ <20210720160127.17bf3c19.alex.williamson@redhat.com>
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <bff43050-aed7-011c-89e5-9899bd1df414@amd.com>
+In-Reply-To: <20210720160127.17bf3c19.alex.williamson@redhat.com>
+X-ClientProxiedBy: BL1PR13CA0127.namprd13.prod.outlook.com
+ (2603:10b6:208:2bb::12) To BL0PR12MB5506.namprd12.prod.outlook.com
+ (2603:10b6:208:1cb::22)
+MIME-Version: 1.0
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from mlx.ziepe.ca (142.162.113.129) by BL1PR13CA0127.namprd13.prod.outlook.com (2603:10b6:208:2bb::12) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4352.14 via Frontend Transport; Tue, 20 Jul 2021 22:49:56 +0000
+Received: from jgg by mlx with local (Exim 4.94)        (envelope-from <jgg@nvidia.com>)        id 1m5yYl-005FvT-GW; Tue, 20 Jul 2021 19:49:55 -0300
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 7e149845-a2b7-42d8-af5d-08d94bd0b215
+X-MS-TrafficTypeDiagnostic: BL1PR12MB5093:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <BL1PR12MB5093002E4432772CED8815FAC2E29@BL1PR12MB5093.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:9508;
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: izSsyVeA01tMbZ9LxfYyca9ju7t7qPT/SkFHz/Sl0j0wKP5NBy8nDkxtafo8429B/Y0wNYvUICYKaTxHoQdA1NJcBby6XHhWMn8pGJ9rMylCPz6iykqD5nia71KHek2r0sPQwcdodrpQnm54LMoLR4Iqn4xW3NZEChuQNIJjoHctj2TQ9abMFzvAqxkarQQLrQdTtZ1f+AQ4yiSdpKkLdKS1Et/SzKX3TctYq+FIsbArOTLv8D42BZDcCFV4SM7Zg9o0XjTLvRa6WqRfcI1cnZw3LUYJ6iRrGpsiRBlF56vaDzxD5X6nTdBo7y7+i32YROH5DZKrIY/5V7W2r3viiTI9YQ4Q08iTtWMU43BVKpLa4dBYL9xqYuLMTM8qVJTv/pOKAr0J7UX4Gd0VhO16nv/IDsuccoyOP4/wPcuMDtCpNXDwDIQEmoz6hdK2Pkw8f9XB25Puj3kNocWO3zvnvYwFldMmvg5Wyt1Rg7WQe1aH8GKgGNUlQRuoim39JkOhMa6xFrXoGI59w1fcKzqr+aXHq4NlRQ0lDJZR2+X7WzoTJzLrx1ivQ0RnaiIHfwL5Fb4yguggRwmaIFe/V593BAVjKzszlGP/2+qjDzxxQaoXYm1VodLWt1yELsETM98M1YlWdSWQhyVKaONLisjf9g==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL0PR12MB5506.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(396003)(136003)(39860400002)(376002)(366004)(346002)(7406005)(7416002)(38100700002)(5660300002)(36756003)(6916009)(26005)(83380400001)(2906002)(1076003)(33656002)(86362001)(9746002)(66476007)(66946007)(8936002)(186003)(8676002)(2616005)(426003)(54906003)(316002)(66556008)(478600001)(9786002)(4326008);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?6voRhEnl9cUve/9Gf1xKFyVnrrkcTJ4oDBhyDqSDt7lsc5PSA4jjkr7LpshN?=
+ =?us-ascii?Q?+wQVlZDIS9g4lVJyMDwGJefYZtKwZzmNVLfbfdchSoEpLWtDy+bbKznKBvNf?=
+ =?us-ascii?Q?E9FwIAz7m+WEvGJdxynxA1/z7N8G0RukAP3EkGZzBxMPJcIJWuFPacos2CVF?=
+ =?us-ascii?Q?qju3nzfAJvjKYQ/1a9aic8GlXjSOUZjKJIqL1VZnzx8oZ9bBwPIYxdd+rVPB?=
+ =?us-ascii?Q?on15VU0srb85L8z6NaV3K5mhfWWSiD4u1BCQyBqQH51vYA97ydYSYX9jWRjD?=
+ =?us-ascii?Q?hmWne5HKUNR8aTW4VHTjb2dZJd71LS8Ny428xlTQPRhirvpS3T3cRKqGc4oI?=
+ =?us-ascii?Q?YDH7a/dY0dqqprEYCVZ6A5z8NAJZy4Q8IG7nJA/JGV+Lar9ThwAjUTW1FFvh?=
+ =?us-ascii?Q?c92jhU0vzSBsdiUlDNYIs6yxe8icGAbuFupfqx/5B8QlR+pLMvGaoL8/gktm?=
+ =?us-ascii?Q?cY0AZqXInkOwo0CuVQdqA7L8KdBjBkzTHwr/wl5DqbFuFYbg4IBRHLMZxwmb?=
+ =?us-ascii?Q?OMfF/B+A+quWw23i3f7esRX3UAxHewCsv/svoaZhA9iwphv+cjxvkMPLFyna?=
+ =?us-ascii?Q?WKfrhwa/QUBbTe+86rnX+5SyPFmqNq92veAapAccPw275yS9sXg9vwjBZ1kn?=
+ =?us-ascii?Q?zLI0ZMxggWa8fcynWAv8W+U6otLDzyHD5cQ8scwaZ27u69awlz4LEenajPgn?=
+ =?us-ascii?Q?Ooi7BAfMcflsQyfBOnLOZtU4L20bQhY0CIcHkEWVPZj13TWC4dcX6f3qiv9j?=
+ =?us-ascii?Q?lWEUMLbbUwQGxR/CkuVyb9d5P3MuFgEHeaYjh7A/2kWkAWIEahvzSUx/9641?=
+ =?us-ascii?Q?kqsTqAQ35e8SQ3XzH88jWbkMPKmks2Cmd0zdFuknvZZhVpfMJUwUD8zWRmqq?=
+ =?us-ascii?Q?PJN75d/9nI25OIYPUuFy+uSg3EyfPqo0AXcoOqxIEccPCiBKoiB2AYYNnjwb?=
+ =?us-ascii?Q?njUlquTXm6pkBH+7h/UeU3wZCuJRZA+QdNLtALmEl9DAQQkc0DIQJ0t4RjYz?=
+ =?us-ascii?Q?pM5R2SgvB2rm7wrAIlBDr9tuK9J30AQ6TTcZSVEWQQV3E0GxS3IZStRXfXZX?=
+ =?us-ascii?Q?qI8MqMvFiIli2Wc4O7ddKLakfzDvlfxslMsoggTdEwX0mPU3l2cuvhrQrZ7W?=
+ =?us-ascii?Q?XhTv//1jG5jWlifFq/aHqN36tGi2wOHYONG+odN4J5H7fgLWatyG+F191ubE?=
+ =?us-ascii?Q?oj6RKX6F0YZYWHtTpluSv3ouuJ+x1pasNijJVr+PBuGI+eCuE8UTp1LSH8WQ?=
+ =?us-ascii?Q?gWOAMmQho8GCg6ALW8Jpkcw7CUlW/s5QPB5jLrBvmn4js6qAQ068jcbWC9ef?=
+ =?us-ascii?Q?ZZT4Na8XCekWBOlDVgKslBSs?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 7e149845-a2b7-42d8-af5d-08d94bd0b215
+X-MS-Exchange-CrossTenant-AuthSource: BL0PR12MB5506.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Jul 2021 22:49:56.5529
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: +ULIbNaI/rq0lQXSR/MjpYJwcaIUYXJVinwrAmjUEfjP9jIiIHwD3CNeQ2gr513w
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL1PR12MB5093
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jul 20, 2021, Brijesh Singh wrote:
+On Tue, Jul 20, 2021 at 04:01:27PM -0600, Alex Williamson wrote:
+> On Tue, 20 Jul 2021 14:42:48 -0300
+> Jason Gunthorpe <jgg@nvidia.com> wrote:
 > 
-> On 7/19/21 7:10 PM, Sean Christopherson wrote:
-> > On Wed, Jul 07, 2021, Brijesh Singh wrote:
-> > > Follow the recommendation from APM2 section 15.36.10 and 15.36.11 to
-> > > resolve the RMP violation encountered during the NPT table walk.
+> > Compared to mbochs_remove() two cases are missing from the
+> > vfio_register_group_dev() unwind. Add them in.
 > > 
-> > Heh, please elaborate on exactly what that recommendation is.  A recommendation
-> > isn't exactly architectural, i.e. is subject to change :-)
-> 
-> I will try to expand it :)
-> 
+> > Fixes: 681c1615f891 ("vfio/mbochs: Convert to use vfio_register_group_dev()")
+> > Reported-by: Cornelia Huck <cohuck@redhat.com>
+> > Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
+> >  samples/vfio-mdev/mbochs.c | 7 +++++--
+> >  1 file changed, 5 insertions(+), 2 deletions(-)
 > > 
-> > And, do we have to follow the APM's recommendation?
+> > diff --git a/samples/vfio-mdev/mbochs.c b/samples/vfio-mdev/mbochs.c
+> > index e81b875b4d87b4..501845b08c0974 100644
+> > +++ b/samples/vfio-mdev/mbochs.c
+> > @@ -553,11 +553,14 @@ static int mbochs_probe(struct mdev_device *mdev)
+> >  
+> >  	ret = vfio_register_group_dev(&mdev_state->vdev);
+> >  	if (ret)
+> > -		goto err_mem;
+> > +		goto err_bytes;
+> >  	dev_set_drvdata(&mdev->dev, mdev_state);
+> >  	return 0;
+> >  
+> > +err_bytes:
+> > +	mbochs_used_mbytes -= mdev_state->type->mbytes;
+> >  err_mem:
+> > +	kfree(mdev_state->pages);
+> >  	kfree(mdev_state->vconfig);
+> >  	kfree(mdev_state);
+> >  	return ret;
+> > @@ -567,8 +570,8 @@ static void mbochs_remove(struct mdev_device *mdev)
+> >  {
+> >  	struct mdev_state *mdev_state = dev_get_drvdata(&mdev->dev);
+> >  
+> > -	mbochs_used_mbytes -= mdev_state->type->mbytes;
+> >  	vfio_unregister_group_dev(&mdev_state->vdev);
+> > +	mbochs_used_mbytes -= mdev_state->type->mbytes;
+> >  	kfree(mdev_state->pages);
+> >  	kfree(mdev_state->vconfig);
+> >  	kfree(mdev_state);
 > 
-> Yes, unless we want to be very strict on what a guest can do.
-> 
-> > Specifically, can KVM treat #NPF RMP violations as guest errors, or is that
-> > not allowed by the GHCB spec?
-> 
-> The GHCB spec does not say anything about the #NPF RMP violation error. And
-> not all #NPF RMP is a guest error (mainly those size mismatch etc).
-> 
-> > I.e. can we mandate accesses be preceded by page state change requests?
-> 
-> This is a good question, the GHCB spec does not enforce that a guest *must*
-> use page state. If the page state changes is not done by the guest then it
-> will cause #NPF and its up to the hypervisor to decide on what it wants to
-> do.
+> Hmm, doesn't this suggest we need another atomic conversion?  (untested)
 
-Drat.  Is there any hope of pushing through a GHCB change to require the guest
-to use PSC?
+Sure why not, I can add this as another patch
 
-> > It would simplify KVM (albeit not much of a simplificiation) and would also
-> > make debugging easier since transitions would require an explicit guest
-> > request and guest bugs would result in errors instead of random
-> > corruption/weirdness.
-> 
-> I am good with enforcing this from the KVM. But the question is, what fault
-> we should inject in the guest when KVM detects that guest has issued the
-> page state change.
+> @@ -567,11 +573,11 @@ static void mbochs_remove(struct mdev_device *mdev)
+>  {
+>  	struct mdev_state *mdev_state = dev_get_drvdata(&mdev->dev);
+>  
+> -	mbochs_used_mbytes -= mdev_state->type->mbytes;
+>  	vfio_unregister_group_dev(&mdev_state->vdev);
+>  	kfree(mdev_state->pages);
+>  	kfree(mdev_state->vconfig);
+>  	kfree(mdev_state);
+> +	atomic_add(mdev_state->type->mbytes, &mbochs_avail_mbytes);
 
-Injecting a fault, at least from KVM, isn't an option since there's no architectural
-behavior we can leverage.  E.g. a guest that isn't enlightened enough to properly
-use PSC isn't going to do anything useful with a #MC or #VC.
+This should be up after the vfio_unregister_group_dev(), it is a use after free?
 
-Sadly, as is I think our only options are to either automatically convert RMP
-entries as need, or to punt the exit to userspace.  Maybe we could do both, e.g.
-have a module param to control the behavior?  The problem with punting to userspace
-is that KVM would also need a way for userspace to fix the issue, otherwise we're
-just taking longer to kill the guest :-/
+Jason
