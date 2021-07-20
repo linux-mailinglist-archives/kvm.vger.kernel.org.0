@@ -2,122 +2,240 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 12DB53CFB47
-	for <lists+kvm@lfdr.de>; Tue, 20 Jul 2021 15:53:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1A7713CFBDB
+	for <lists+kvm@lfdr.de>; Tue, 20 Jul 2021 16:17:38 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239003AbhGTNNE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 20 Jul 2021 09:13:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33900 "EHLO
+        id S239671AbhGTNfr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 20 Jul 2021 09:35:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39286 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239242AbhGTNKp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 20 Jul 2021 09:10:45 -0400
-Received: from mail-wr1-x436.google.com (mail-wr1-x436.google.com [IPv6:2a00:1450:4864:20::436])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F33CAC0613E2
-        for <kvm@vger.kernel.org>; Tue, 20 Jul 2021 06:50:56 -0700 (PDT)
-Received: by mail-wr1-x436.google.com with SMTP id l7so26080389wrv.7
-        for <kvm@vger.kernel.org>; Tue, 20 Jul 2021 06:50:56 -0700 (PDT)
+        with ESMTP id S239759AbhGTNeu (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 20 Jul 2021 09:34:50 -0400
+Received: from mail-oi1-x22b.google.com (mail-oi1-x22b.google.com [IPv6:2607:f8b0:4864:20::22b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 68487C06178C
+        for <kvm@vger.kernel.org>; Tue, 20 Jul 2021 07:03:50 -0700 (PDT)
+Received: by mail-oi1-x22b.google.com with SMTP id u15so24624652oiw.3
+        for <kvm@vger.kernel.org>; Tue, 20 Jul 2021 07:03:50 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ffwll.ch; s=google;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:content-transfer-encoding:in-reply-to;
-        bh=sI4lOFqRzupKkYq98Gmd5BUFkdbcZOoG/UvAcZHjLDY=;
-        b=QBbwhpFEg138cFF13OlHokR7JOS4muXESJoP0GE8o7KEv35eNms/xuto9Ggx61MJnV
-         pv5yMUhlTXtwC0gs7+LZigEVtzx6FeEYFBjFZISkgcMiS1iksMJxxE9AQ75qX/XxMULb
-         sMeC2UURwOTw9xD6wYT2FjKji3DINZHhYE1LY=
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=3pAi2IUwv7EdpJAk0boQH8aQmdEiZAI8a1a0cHarpI4=;
+        b=tOwo8JvOI333zTSShr7G1VQA9f36JvMMNfNy1R4+AFu6wyd+zUTDRc3727tpBO3PTO
+         CollJtLxZ1ie8UmiMdFJ2EwmFnHL7LVTZ1MwOUnb0/9VJ40wFwvdA4u4VoYw3xKLcRq+
+         j3BiNhWmklGXaozYmLVL87ARe8dSQ+G0O6BuuPS+1jkZHknx87nIzCb0U5wh5fb1Pj9k
+         z6Rj9DPISr0X2Wc9vqLTM4EmCRb4uz0xKXGaqCwwLg5xN811WE56OjyoHuKePwn7UC+F
+         9sCfaWQsLxa5QsFKDhwvoDHoKWtadr3X89+6EWT/j+Lj1Dmv0luQacJyQiqYXxY2Nf23
+         FpJw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to;
-        bh=sI4lOFqRzupKkYq98Gmd5BUFkdbcZOoG/UvAcZHjLDY=;
-        b=OUrhfpqUvL4ROyXCNydK1AVjckdEr0w4IFF3XcWOLYkHRjIRBOQiNtclWqMaDKv0BA
-         rgt2XdNH29+u70wBFWxEBDiV2fbm0o6qKybxMalSqmaseq9iMcbPKuFfI1DPPNaPCeki
-         mu+BGKbepYvMZMxfa8MZxIyibhq4rUBiJ1e8ZHwZTPb2qXa3BsIxquBJjph5TwnAsAgL
-         C3xAxT0Dp+z+RqiTH/y0i/k3N2SZ4nPoylpLqsK8EK9Qjz85V7ym3X7sUsWaiYJQQeXK
-         8N4cwDpxTupuKEhKb+prXlY8QeDG8Rz6gD1oH5D/RY7E/s7KqyUQ80/rTjVrOcKzd1h7
-         LOiw==
-X-Gm-Message-State: AOAM530aKEE2fW/c2Rcy6zQe8xDozPbIcDLB1vbGNfZNcyCmKwvxNXJ7
-        1vb5UFhEgs1afaoUGteqOJx5DQ==
-X-Google-Smtp-Source: ABdhPJxQV3Ee2pwcwbIe/vS8ucyfghhnzHjKP4KrgLfr14bAgT3gr9xSuwjFXjaR+rGwh3KUvvzTOA==
-X-Received: by 2002:adf:c803:: with SMTP id d3mr30463317wrh.345.1626789055598;
-        Tue, 20 Jul 2021 06:50:55 -0700 (PDT)
-Received: from phenom.ffwll.local ([2a02:168:57f4:0:efd0:b9e5:5ae6:c2fa])
-        by smtp.gmail.com with ESMTPSA id f2sm23731613wrq.69.2021.07.20.06.50.54
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 20 Jul 2021 06:50:54 -0700 (PDT)
-Date:   Tue, 20 Jul 2021 15:50:52 +0200
-From:   Daniel Vetter <daniel@ffwll.ch>
-To:     Christian =?iso-8859-1?Q?K=F6nig?= <christian.koenig@amd.com>
-Cc:     Christoph Hellwig <hch@lst.de>, David Airlie <airlied@linux.ie>,
-        Daniel Vetter <daniel@ffwll.ch>,
-        Alex Deucher <alexander.deucher@amd.com>,
-        "Pan, Xinhui" <Xinhui.Pan@amd.com>,
-        Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
-        Maxime Ripard <mripard@kernel.org>,
-        Thomas Zimmermann <tzimmermann@suse.de>,
-        Jani Nikula <jani.nikula@linux.intel.com>,
-        Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
-        Rodrigo Vivi <rodrigo.vivi@intel.com>,
-        Ben Skeggs <bskeggs@redhat.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        amd-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
-        intel-gfx@lists.freedesktop.org, nouveau@lists.freedesktop.org,
-        kvm@vger.kernel.org
-Subject: Re: [PATCH 1/7] vgaarb: remove VGA_DEFAULT_DEVICE
-Message-ID: <YPbUvIYmu3WfyM2C@phenom.ffwll.local>
-References: <20210716061634.2446357-1-hch@lst.de>
- <20210716061634.2446357-2-hch@lst.de>
- <f171831b-3281-5a5a-04d3-2d69cb77f1a2@amd.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=3pAi2IUwv7EdpJAk0boQH8aQmdEiZAI8a1a0cHarpI4=;
+        b=GYA7iTxCeYlzgTJK3FBY+Pay5VKX2CAwXJ9q3DdY0uGAUXQYawuVcrk3GyDWTOALyU
+         oBdCziNOzVY1hByJmEalVdCtenVmqxwZJPv+KzOVdsDAnucXjxT+ZEzgs9yBJZtoD7rv
+         bVJZ8YZzQ4UHq6QsYPRY2uc6+tL6vg52GA5NgyWV0uXEncB4QfZ14gxxum4qOngLPjsq
+         T88ArUrKxF23QX7hfypu42JOlmI1rHczVl1HCTQI20yI+dIWxGa3WSs7f2+6y5TIORL7
+         /z37eU6QNzUgxo9m2sEgY7FIgiWc4YfQNuXzL+8G4HBp8BAf/Tzn97gaYf2rn2uUi+Bt
+         I+gg==
+X-Gm-Message-State: AOAM533HyRjADqKznsJA/UzXi1p8MqZpH2jj17q0X2Ffpmkig/llo0Nc
+        AoItYQrsLrPcQrISYi29bnVC7Ut9Q8h/6JjTWyf1ng==
+X-Google-Smtp-Source: ABdhPJy67+4yt2CQ9gqDe2NPUt44b6Ljx8YHSPr8w0AM4pzGQ7GWeDm6CdAiYnsIJo8vfqE2nz3OKjDc0mNnw3K+NQk=
+X-Received: by 2002:a05:6808:5a:: with SMTP id v26mr12146167oic.90.1626789829100;
+ Tue, 20 Jul 2021 07:03:49 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <f171831b-3281-5a5a-04d3-2d69cb77f1a2@amd.com>
-X-Operating-System: Linux phenom 5.10.0-7-amd64 
+References: <20210719160346.609914-1-tabba@google.com> <20210719160346.609914-6-tabba@google.com>
+ <20210720133810.7q4k2yde57okgvmm@gator>
+In-Reply-To: <20210720133810.7q4k2yde57okgvmm@gator>
+From:   Fuad Tabba <tabba@google.com>
+Date:   Tue, 20 Jul 2021 15:03:12 +0100
+Message-ID: <CA+EHjTzW=GnG_zE=eregR7+WTLD-ASzajrMkinUMX=+Lfq3RcA@mail.gmail.com>
+Subject: Re: [PATCH v3 05/15] KVM: arm64: Refactor sys_regs.h,c for nVHE reuse
+To:     Andrew Jones <drjones@redhat.com>
+Cc:     kvmarm@lists.cs.columbia.edu, maz@kernel.org, will@kernel.org,
+        james.morse@arm.com, alexandru.elisei@arm.com,
+        suzuki.poulose@arm.com, mark.rutland@arm.com,
+        christoffer.dall@arm.com, pbonzini@redhat.com, qperret@google.com,
+        kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        kernel-team@android.com
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Jul 16, 2021 at 09:14:02AM +0200, Christian König wrote:
-> Am 16.07.21 um 08:16 schrieb Christoph Hellwig:
-> > The define is entirely unused.
-> > 
-> > Signed-off-by: Christoph Hellwig <hch@lst.de>
-> 
-> I'm not an expert for this particular code, but at least of hand everything
-> you do here makes totally sense.
-> 
-> Whole series is Acked-by: Christian König <christian.koenig@amd.com>
+Hi,
 
-Care to also push this into drm-misc-next since you looked already?
--Daniel
-
-> 
-> Regards,
-> Christian.
-> 
+On Tue, Jul 20, 2021 at 2:38 PM Andrew Jones <drjones@redhat.com> wrote:
+>
+> On Mon, Jul 19, 2021 at 05:03:36PM +0100, Fuad Tabba wrote:
+> > Refactor sys_regs.h and sys_regs.c to make it easier to reuse
+> > common code. It will be used in nVHE in a later patch.
+> >
+> > Note that the refactored code uses __inline_bsearch for find_reg
+> > instead of bsearch to avoid copying the bsearch code for nVHE.
+> >
+> > No functional change intended.
+> >
+> > Signed-off-by: Fuad Tabba <tabba@google.com>
 > > ---
-> >   include/linux/vgaarb.h | 6 ------
-> >   1 file changed, 6 deletions(-)
-> > 
-> > diff --git a/include/linux/vgaarb.h b/include/linux/vgaarb.h
-> > index dc6ddce92066..26ec8a057d2a 100644
-> > --- a/include/linux/vgaarb.h
-> > +++ b/include/linux/vgaarb.h
-> > @@ -42,12 +42,6 @@
-> >   #define VGA_RSRC_NORMAL_IO     0x04
-> >   #define VGA_RSRC_NORMAL_MEM    0x08
-> > -/* Passing that instead of a pci_dev to use the system "default"
-> > - * device, that is the one used by vgacon. Archs will probably
-> > - * have to provide their own vga_default_device();
-> > - */
-> > -#define VGA_DEFAULT_DEVICE     (NULL)
-> > -
-> >   struct pci_dev;
-> >   /* For use by clients */
-> 
+> >  arch/arm64/include/asm/sysreg.h |  3 +++
+> >  arch/arm64/kvm/sys_regs.c       | 30 +-----------------------------
+> >  arch/arm64/kvm/sys_regs.h       | 31 +++++++++++++++++++++++++++++++
+> >  3 files changed, 35 insertions(+), 29 deletions(-)
+> >
+> > diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
+> > index 7b9c3acba684..326f49e7bd42 100644
+> > --- a/arch/arm64/include/asm/sysreg.h
+> > +++ b/arch/arm64/include/asm/sysreg.h
+> > @@ -1153,6 +1153,9 @@
+> >  #define ICH_VTR_A3V_SHIFT    21
+> >  #define ICH_VTR_A3V_MASK     (1 << ICH_VTR_A3V_SHIFT)
+> >
+> > +/* Extract the feature specified from the feature id register. */
+> > +#define FEATURE(x)   (GENMASK_ULL(x##_SHIFT + 3, x##_SHIFT))
+>
+> I think the comment would be better as
+>
+>  Create a mask for the feature bits of the specified feature.
 
--- 
-Daniel Vetter
-Software Engineer, Intel Corporation
-http://blog.ffwll.ch
+I agree. I'll use this instead.
+
+> And, I think a more specific name than FEATURE would be better. Maybe
+> FEATURE_MASK or even ARM64_FEATURE_MASK ?
+
+I think so too. ARM64_FEATURE_MASK is more descriptive than just FEATURE.
+
+Thanks,
+/fuad
+
+> > +
+> >  #ifdef __ASSEMBLY__
+> >
+> >       .irp    num,0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30
+> > diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> > index 80a6e41cadad..1a939c464858 100644
+> > --- a/arch/arm64/kvm/sys_regs.c
+> > +++ b/arch/arm64/kvm/sys_regs.c
+> > @@ -44,10 +44,6 @@
+> >   * 64bit interface.
+> >   */
+> >
+> > -#define reg_to_encoding(x)                                           \
+> > -     sys_reg((u32)(x)->Op0, (u32)(x)->Op1,                           \
+> > -             (u32)(x)->CRn, (u32)(x)->CRm, (u32)(x)->Op2)
+> > -
+> >  static bool read_from_write_only(struct kvm_vcpu *vcpu,
+> >                                struct sys_reg_params *params,
+> >                                const struct sys_reg_desc *r)
+> > @@ -1026,8 +1022,6 @@ static bool access_arch_timer(struct kvm_vcpu *vcpu,
+> >       return true;
+> >  }
+> >
+> > -#define FEATURE(x)   (GENMASK_ULL(x##_SHIFT + 3, x##_SHIFT))
+> > -
+> >  /* Read a sanitised cpufeature ID register by sys_reg_desc */
+> >  static u64 read_id_reg(const struct kvm_vcpu *vcpu,
+> >               struct sys_reg_desc const *r, bool raz)
+> > @@ -2106,23 +2100,6 @@ static int check_sysreg_table(const struct sys_reg_desc *table, unsigned int n,
+> >       return 0;
+> >  }
+> >
+> > -static int match_sys_reg(const void *key, const void *elt)
+> > -{
+> > -     const unsigned long pval = (unsigned long)key;
+> > -     const struct sys_reg_desc *r = elt;
+> > -
+> > -     return pval - reg_to_encoding(r);
+> > -}
+> > -
+> > -static const struct sys_reg_desc *find_reg(const struct sys_reg_params *params,
+> > -                                      const struct sys_reg_desc table[],
+> > -                                      unsigned int num)
+> > -{
+> > -     unsigned long pval = reg_to_encoding(params);
+> > -
+> > -     return bsearch((void *)pval, table, num, sizeof(table[0]), match_sys_reg);
+> > -}
+> > -
+> >  int kvm_handle_cp14_load_store(struct kvm_vcpu *vcpu)
+> >  {
+> >       kvm_inject_undefined(vcpu);
+> > @@ -2365,13 +2342,8 @@ int kvm_handle_sys_reg(struct kvm_vcpu *vcpu)
+> >
+> >       trace_kvm_handle_sys_reg(esr);
+> >
+> > -     params.Op0 = (esr >> 20) & 3;
+> > -     params.Op1 = (esr >> 14) & 0x7;
+> > -     params.CRn = (esr >> 10) & 0xf;
+> > -     params.CRm = (esr >> 1) & 0xf;
+> > -     params.Op2 = (esr >> 17) & 0x7;
+> > +     params = esr_sys64_to_params(esr);
+> >       params.regval = vcpu_get_reg(vcpu, Rt);
+> > -     params.is_write = !(esr & 1);
+> >
+> >       ret = emulate_sys_reg(vcpu, &params);
+> >
+> > diff --git a/arch/arm64/kvm/sys_regs.h b/arch/arm64/kvm/sys_regs.h
+> > index 9d0621417c2a..cc0cc95a0280 100644
+> > --- a/arch/arm64/kvm/sys_regs.h
+> > +++ b/arch/arm64/kvm/sys_regs.h
+> > @@ -11,6 +11,12 @@
+> >  #ifndef __ARM64_KVM_SYS_REGS_LOCAL_H__
+> >  #define __ARM64_KVM_SYS_REGS_LOCAL_H__
+> >
+> > +#include <linux/bsearch.h>
+> > +
+> > +#define reg_to_encoding(x)                                           \
+> > +     sys_reg((u32)(x)->Op0, (u32)(x)->Op1,                           \
+> > +             (u32)(x)->CRn, (u32)(x)->CRm, (u32)(x)->Op2)
+> > +
+> >  struct sys_reg_params {
+> >       u8      Op0;
+> >       u8      Op1;
+> > @@ -21,6 +27,14 @@ struct sys_reg_params {
+> >       bool    is_write;
+> >  };
+> >
+> > +#define esr_sys64_to_params(esr)                                               \
+> > +     ((struct sys_reg_params){ .Op0 = ((esr) >> 20) & 3,                    \
+> > +                               .Op1 = ((esr) >> 14) & 0x7,                  \
+> > +                               .CRn = ((esr) >> 10) & 0xf,                  \
+> > +                               .CRm = ((esr) >> 1) & 0xf,                   \
+> > +                               .Op2 = ((esr) >> 17) & 0x7,                  \
+> > +                               .is_write = !((esr) & 1) })
+> > +
+> >  struct sys_reg_desc {
+> >       /* Sysreg string for debug */
+> >       const char *name;
+> > @@ -152,6 +166,23 @@ static inline int cmp_sys_reg(const struct sys_reg_desc *i1,
+> >       return i1->Op2 - i2->Op2;
+> >  }
+> >
+> > +static inline int match_sys_reg(const void *key, const void *elt)
+> > +{
+> > +     const unsigned long pval = (unsigned long)key;
+> > +     const struct sys_reg_desc *r = elt;
+> > +
+> > +     return pval - reg_to_encoding(r);
+> > +}
+> > +
+> > +static inline const struct sys_reg_desc *
+> > +find_reg(const struct sys_reg_params *params, const struct sys_reg_desc table[],
+> > +      unsigned int num)
+> > +{
+> > +     unsigned long pval = reg_to_encoding(params);
+> > +
+> > +     return __inline_bsearch((void *)pval, table, num, sizeof(table[0]), match_sys_reg);
+> > +}
+> > +
+> >  const struct sys_reg_desc *find_reg_by_id(u64 id,
+> >                                         struct sys_reg_params *params,
+> >                                         const struct sys_reg_desc table[],
+> > --
+> > 2.32.0.402.g57bb445576-goog
+> >
+>
+> Otherwise
+>
+> Reviewed-by: Andrew Jones <drjones@redhat.com>
+>
