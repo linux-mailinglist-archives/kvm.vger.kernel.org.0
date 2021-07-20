@@ -2,127 +2,160 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A49FD3CFFB1
-	for <lists+kvm@lfdr.de>; Tue, 20 Jul 2021 18:40:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E2E303CFFBC
+	for <lists+kvm@lfdr.de>; Tue, 20 Jul 2021 18:45:44 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232356AbhGTQAN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 20 Jul 2021 12:00:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44182 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236898AbhGTP7q (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 20 Jul 2021 11:59:46 -0400
-Received: from mail-pj1-x102d.google.com (mail-pj1-x102d.google.com [IPv6:2607:f8b0:4864:20::102d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B3041C061767
-        for <kvm@vger.kernel.org>; Tue, 20 Jul 2021 09:40:24 -0700 (PDT)
-Received: by mail-pj1-x102d.google.com with SMTP id p9so13993298pjl.3
-        for <kvm@vger.kernel.org>; Tue, 20 Jul 2021 09:40:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=ll0RiUGMAmvrONO+nzQxFqpEs/97py7ihZNr5b1dhP0=;
-        b=PEZtiQtiWMdi7vFzMSbRev47alSkv5RYM7hOiBpVFjrIkQB6RVc6YkKqKcOefW/fKP
-         Y42zRAQKBib8tKzc4/Oeif2decwbJFIYi9dJXDc6MugQE+ryuq7DQHauE/2g/akaFlnX
-         kYfS9YpWsG5CTHYxQnlED4GDEP4F1teLpG4M0cHXDCdsJMdbMjc9/eKJKYEDF5Vqq3aU
-         5oSXV+xP6qAX91AZNaByWJKOQ7OCNnRasAVpNbY2ZV+EABYACD7yCw2YM92GJ1aTvl6U
-         ip/9lfrG9+yIYkquVRRv+8hW4RYPu57N4/E0TZNqFzlUQchnuVkuSktjys7zqFmAJoDs
-         gJ3w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=ll0RiUGMAmvrONO+nzQxFqpEs/97py7ihZNr5b1dhP0=;
-        b=dbFYfgdJehPsn2KeC61MAdkza2EruITY0ezzHfk9OXQE77oqH35CS0lAILwZf5urwX
-         kRuQIf3GojBo7nOFsg8ZcRuP9JbAhQPvH5skGz0hkl1Wiv0cHsuYPy6PSFMiVhIjXq+C
-         nMGkk2rHZCTUihR1PBtVguEVeL1tWmxE2gUTdTIAnvdNQQZruT/At3otn5x4b0KtLxnw
-         l8JtUsmiPng03d+51A8ZFLjNxU7i+0r2jWVtFYyq1ygamUUjSDs1nMAo4IXdNpPnT5mF
-         CTpSgYJKYFgg/vaARfhmiKESAIr+D6qsJtAjctGOZKyFeQTvjwpNvo682jygiY4VHPrO
-         jQmw==
-X-Gm-Message-State: AOAM533g13kjBUB3XykkdXDpiiWPGDH0+W6Yam0q4QR6WrXez5GEPevG
-        TNIUtg/nQiwZ/epXZ45u/RC5rQ==
-X-Google-Smtp-Source: ABdhPJyroP8tgh93DCfc3z5U9V+qQ+qSioQG+b9tGScCAvFrwti9nKvzMBMeyynwyPM0BW+TNCCkEg==
-X-Received: by 2002:a17:90a:df04:: with SMTP id gp4mr36464585pjb.164.1626799224059;
-        Tue, 20 Jul 2021 09:40:24 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id v10sm25322836pfg.160.2021.07.20.09.40.23
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 20 Jul 2021 09:40:23 -0700 (PDT)
-Date:   Tue, 20 Jul 2021 16:40:19 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Brijesh Singh <brijesh.singh@amd.com>
-Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
-        linux-coco@lists.linux.dev, linux-mm@kvack.org,
-        linux-crypto@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
-        David Rientjes <rientjes@google.com>,
-        Dov Murik <dovmurik@linux.ibm.com>,
-        Tobin Feldman-Fitzthum <tobin@ibm.com>,
-        Borislav Petkov <bp@alien8.de>,
-        Michael Roth <michael.roth@amd.com>,
-        Vlastimil Babka <vbabka@suse.cz>, tony.luck@intel.com,
-        npmccallum@redhat.com, brijesh.ksingh@gmail.com
-Subject: Re: [PATCH Part2 RFC v4 25/40] KVM: SVM: Reclaim the guest pages
- when SEV-SNP VM terminates
-Message-ID: <YPb8c5qlZ6JuDR05@google.com>
-References: <20210707183616.5620-1-brijesh.singh@amd.com>
- <20210707183616.5620-26-brijesh.singh@amd.com>
- <YPHnb5pW9IoTcwWU@google.com>
- <2711d9f9-21a0-7baa-d0ff-2c0f69ca6949@amd.com>
- <YPIoaoDCjNVzn2ZM@google.com>
- <e1cc1e21-e7b7-5930-1c01-8f4bb6e43b3a@amd.com>
- <YPWz6YwjDZcla5/+@google.com>
- <912c929c-06ba-a391-36bb-050384907d81@amd.com>
- <YPXMas+9O1Y5910b@google.com>
- <96154428-4c18-9e5f-3742-d0446a8d9848@amd.com>
+        id S232324AbhGTQEC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 20 Jul 2021 12:04:02 -0400
+Received: from foss.arm.com ([217.140.110.172]:34722 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S230092AbhGTQDI (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 20 Jul 2021 12:03:08 -0400
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id A154C31B;
+        Tue, 20 Jul 2021 09:43:34 -0700 (PDT)
+Received: from [192.168.0.110] (unknown [172.31.20.19])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id DA2B33F694;
+        Tue, 20 Jul 2021 09:43:32 -0700 (PDT)
+Subject: Re: [PATCH v2 4/4] KVM: arm64: Remove PMSWINC_EL0 shadow register
+To:     Marc Zyngier <maz@kernel.org>
+Cc:     linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org,
+        kvmarm@lists.cs.columbia.edu, James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Alexandre Chartre <alexandre.chartre@oracle.com>,
+        Robin Murphy <robin.murphy@arm.com>,
+        Andrew Jones <drjones@redhat.com>,
+        Russell King <linux@arm.linux.org.uk>, kernel-team@android.com
+References: <20210719123902.1493805-1-maz@kernel.org>
+ <20210719123902.1493805-5-maz@kernel.org>
+ <c1a63908-b55c-bdf8-b8ba-5a43f2e99e1f@arm.com>
+ <f2b655d0977cde5483716f58ba2ab739@kernel.org>
+From:   Alexandru Elisei <alexandru.elisei@arm.com>
+Message-ID: <9ad0f6a5-fcd0-0179-efa7-7b35ed36e2ff@arm.com>
+Date:   Tue, 20 Jul 2021 17:44:32 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.12.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <96154428-4c18-9e5f-3742-d0446a8d9848@amd.com>
+In-Reply-To: <f2b655d0977cde5483716f58ba2ab739@kernel.org>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Jul 19, 2021, Brijesh Singh wrote:
-> 
-> On 7/19/21 2:03 PM, Sean Christopherson wrote:
-> > On Mon, Jul 19, 2021, Brijesh Singh wrote:
-> > Ah, not firmwrare, gotcha.  But we can still use a helper, e.g. an inner
-> > double-underscore helper, __rmp_make_private().
-> 
-> In that case we are basically passing the all the fields defined in the
-> 'struct rmpupdate' as individual arguments.
+Hi Marc,
 
-Yes, but (a) not _all_ fields, (b) it would allow hiding "struct rmpupdate", and
-(c) this is much friendlier to readers:
+On 7/19/21 5:56 PM, Marc Zyngier wrote:
+> Hi Alex,
+>
+> On 2021-07-19 17:35, Alexandru Elisei wrote:
+>> Hi Marc,
+>>
+>> On 7/19/21 1:39 PM, Marc Zyngier wrote:
+>>> We keep an entry for the PMSWINC_EL0 register in the vcpu structure,
+>>> while *never* writing anything there outside of reset.
+>>>
+>>> Given that the register is defined as write-only, that we always
+>>> trap when this register is accessed, there is little point in saving
+>>> anything anyway.
+>>>
+>>> Get rid of the entry, and save a mighty 8 bytes per vcpu structure.
+>>>
+>>> We still need to keep it exposed to userspace in order to preserve
+>>> backward compatibility with previously saved VMs. Since userspace
+>>> cannot expect any effect of writing to PMSWINC_EL0, treat the
+>>> register as RAZ/WI for the purpose of userspace access.
+>>>
+>>> Signed-off-by: Marc Zyngier <maz@kernel.org>
+>>> ---
+>>>  arch/arm64/include/asm/kvm_host.h |  1 -
+>>>  arch/arm64/kvm/sys_regs.c         | 21 ++++++++++++++++++++-
+>>>  2 files changed, 20 insertions(+), 2 deletions(-)
+>>>
+>>> diff --git a/arch/arm64/include/asm/kvm_host.h
+>>> b/arch/arm64/include/asm/kvm_host.h
+>>> index 41911585ae0c..afc169630884 100644
+>>> --- a/arch/arm64/include/asm/kvm_host.h
+>>> +++ b/arch/arm64/include/asm/kvm_host.h
+>>> @@ -185,7 +185,6 @@ enum vcpu_sysreg {
+>>>      PMCNTENSET_EL0,    /* Count Enable Set Register */
+>>>      PMINTENSET_EL1,    /* Interrupt Enable Set Register */
+>>>      PMOVSSET_EL0,    /* Overflow Flag Status Set Register */
+>>> -    PMSWINC_EL0,    /* Software Increment Register */
+>>>      PMUSERENR_EL0,    /* User Enable Register */
+>>>
+>>>      /* Pointer Authentication Registers in a strict increasing order. */
+>>> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+>>> index f22139658e48..a1f5101f49a3 100644
+>>> --- a/arch/arm64/kvm/sys_regs.c
+>>> +++ b/arch/arm64/kvm/sys_regs.c
+>>> @@ -1286,6 +1286,20 @@ static int set_raz_id_reg(struct kvm_vcpu *vcpu, const
+>>> struct sys_reg_desc *rd,
+>>>      return __set_id_reg(vcpu, rd, uaddr, true);
+>>>  }
+>>>
+>>> +static int set_wi_reg(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd,
+>>> +              const struct kvm_one_reg *reg, void __user *uaddr)
+>>> +{
+>>> +    int err;
+>>> +    u64 val;
+>>> +
+>>> +    /* Perform the access even if we are going to ignore the value */
+>>> +    err = reg_from_user(&val, uaddr, sys_reg_to_index(rd));
+>>
+>> I don't understand why the read still happens if the value is ignored.
+>> Just so KVM
+>> preserves the previous behaviour and tells userspace there was an error?
+>
+> If userspace has given us a duff pointer, it needs to know about it.
 
-	__rmp_make_private(pfn, gpa, PG_LEVEL_4K, svm->asid, true);
+Makes sense, thanks.
 
-than:
+>
+>>> +    if (err)
+>>> +        return err;
+>>> +
+>>> +    return 0;
+>>> +}
+>>> +
+>>>  static bool access_ctr(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
+>>>                 const struct sys_reg_desc *r)
+>>>  {
+>>> @@ -1629,8 +1643,13 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+>>>        .access = access_pmcnten, .reg = PMCNTENSET_EL0 },
+>>>      { PMU_SYS_REG(SYS_PMOVSCLR_EL0),
+>>>        .access = access_pmovs, .reg = PMOVSSET_EL0 },
+>>> +    /*
+>>> +     * PM_SWINC_EL0 is exposed to userspace as RAZ/WI, as it was
+>>> +     * previously (and pointlessly) advertised in the past...
+>>> +     */
+>>>      { PMU_SYS_REG(SYS_PMSWINC_EL0),
+>>> -      .access = access_pmswinc, .reg = PMSWINC_EL0 },
+>>> +      .get_user = get_raz_id_reg, .set_user = set_wi_reg,
+>>
+>> In my opinion, the call chain to return 0 looks pretty confusing to me, as the
+>> functions seemed made for ID register accesses, and the leaf function,
+>> read_id_reg(), tries to match this register with a list of ID
+>> registers. Since we
+>> have already added a new function just for PMSWINC_EL0, I was
+>> wondering if adding
+>> another function, something like get_raz_reg(), would make more sense.
+>
+> In that case, I'd rather just kill get_raz_id_reg() and replace it with
+> this get_raz_reg(). If we trat something as RAZ, who cares whether it is
+> an idreg or not?
 
-	rmpupdate(&rmpupdate);
+I agree, the Arm ARM doesn't make the distinction between ID registers and other
+system registers in the definition of RAZ, I don't think KVM should either. And
+the way read_id_reg() is written allows returning a value different than 0 even if
+raz is true, which in my opinion could only happen because of a bug in KVM.
 
-For the former, I can see in a single line of code that KVM is creating a 4k
-private, immutable guest page.  With the latter, I need to go hunt down all code
-that modifies rmpupdate to understand what the code is doing.
+I can have a go at writing the patch(es) on top of this series, if you want. At
+the moment I'm rewriting the KVM SPE series, so it will be a few weeks until I get
+around to doing it though.
 
-> How about something like this:
-> 
-> * core kernel exports the rmpupdate()
-> * the include/linux/sev.h header file defines the helper functions
-> 
->   int rmp_make_private(u64 pfn, u64 gpa, int psize, int asid)
+Thanks,
 
-I think we'll want s/psize/level, i.e. make it more obvious clear that the input
-is PG_LEVEL_*.  
+Alex
+
