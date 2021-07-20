@@ -2,27 +2,27 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E140F3CFA52
-	for <lists+kvm@lfdr.de>; Tue, 20 Jul 2021 15:15:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 726683CFA66
+	for <lists+kvm@lfdr.de>; Tue, 20 Jul 2021 15:17:02 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238618AbhGTMdt (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 20 Jul 2021 08:33:49 -0400
-Received: from mail.kernel.org ([198.145.29.99]:51918 "EHLO mail.kernel.org"
+        id S238596AbhGTMgU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 20 Jul 2021 08:36:20 -0400
+Received: from mail.kernel.org ([198.145.29.99]:52714 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S238424AbhGTMdY (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 20 Jul 2021 08:33:24 -0400
+        id S238700AbhGTMfU (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 20 Jul 2021 08:35:20 -0400
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 5969A610CC;
-        Tue, 20 Jul 2021 13:14:02 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id EFFE4610D2;
+        Tue, 20 Jul 2021 13:15:58 +0000 (UTC)
 Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
         by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
         (Exim 4.94.2)
         (envelope-from <maz@kernel.org>)
-        id 1m5pZQ-00EVoq-8p; Tue, 20 Jul 2021 14:14:00 +0100
-Date:   Tue, 20 Jul 2021 14:13:59 +0100
-Message-ID: <87y2a186w8.wl-maz@kernel.org>
+        id 1m5pbI-00EVqR-FY; Tue, 20 Jul 2021 14:15:57 +0100
+Date:   Tue, 20 Jul 2021 14:15:56 +0100
+Message-ID: <87wnpl86sz.wl-maz@kernel.org>
 From:   Marc Zyngier <maz@kernel.org>
 To:     Quentin Perret <qperret@google.com>
 Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
@@ -33,15 +33,11 @@ Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
         Suzuki K Poulose <suzuki.poulose@arm.com>,
         Alexandru Elisei <alexandru.elisei@arm.com>,
         kernel-team@android.com
-Subject: Re: [PATCH 03/16] KVM: arm64: Turn kvm_pgtable_stage2_set_owner into kvm_pgtable_stage2_annotate
-In-Reply-To: <YPa1NfbEDY3kVHzr@google.com>
+Subject: Re: [PATCH 04/16] KVM: arm64: Add MMIO checking infrastructure
+In-Reply-To: <YPav0Hye5Dat/yoL@google.com>
 References: <20210715163159.1480168-1-maz@kernel.org>
-        <20210715163159.1480168-4-maz@kernel.org>
-        <YPag0YQHB0nph5ji@google.com>
-        <871r7t9tgi.wl-maz@kernel.org>
-        <YPanmXfdr9rqnICK@google.com>
-        <87zguh8c4l.wl-maz@kernel.org>
-        <YPa1NfbEDY3kVHzr@google.com>
+        <20210715163159.1480168-5-maz@kernel.org>
+        <YPav0Hye5Dat/yoL@google.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
  (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -55,60 +51,51 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 20 Jul 2021 12:36:21 +0100,
+On Tue, 20 Jul 2021 12:13:20 +0100,
 Quentin Perret <qperret@google.com> wrote:
 > 
-> On Tuesday 20 Jul 2021 at 12:20:58 (+0100), Marc Zyngier wrote:
-> > On Tue, 20 Jul 2021 11:38:17 +0100,
-> > Quentin Perret <qperret@google.com> wrote:
-> > > 
-> > > On Tuesday 20 Jul 2021 at 11:21:17 (+0100), Marc Zyngier wrote:
-> > > > On Tue, 20 Jul 2021 11:09:21 +0100,
-> > > > Quentin Perret <qperret@google.com> wrote:
-> > > > > 
-> > > > > On Thursday 15 Jul 2021 at 17:31:46 (+0100), Marc Zyngier wrote:
-> > > > > > @@ -815,7 +807,7 @@ int kvm_pgtable_stage2_set_owner(struct kvm_pgtable *pgt, u64 addr, u64 size,
-> > > > > >  		.arg		= &map_data,
-> > > > > >  	};
-> > > > > >  
-> > > > > > -	if (owner_id > KVM_MAX_OWNER_ID)
-> > > > > > +	if (!annotation || (annotation & PTE_VALID))
-> > > > > >  		return -EINVAL;
-> > > > > 
-> > > > > Why do you consider annotation==0 invalid? The assumption so far has
-> > > > > been that the owner_id for the host is 0, so annotating a range with 0s
-> > > > > should be a valid operation -- this will be required when e.g.
-> > > > > transferring ownership of a page back to the host.
-> > > > 
-> > > > How do you then distinguish it from an empty entry that doesn't map to
-> > > > anything at all?
-> > > 
-> > > You don't, but that's beauty of it :)
-> > > 
-> > > The host starts with a PGD full of zeroes, which in terms of ownership
-> > > means that it owns the entire (I)PA space. And it loses ownership of a
-> > > page only when we explicitly annotate it with an owner id != 0.
-> > 
-> > Right. But this scheme doesn't apply to the guests, does it?
+> On Thursday 15 Jul 2021 at 17:31:47 (+0100), Marc Zyngier wrote:
+> > +struct s2_walk_data {
+> > +	kvm_pte_t	pteval;
+> > +	u32		level;
+> > +};
+> > +
+> > +static int s2_walker(u64 addr, u64 end, u32 level, kvm_pte_t *ptep,
+> > +		     enum kvm_pgtable_walk_flags flag, void * const arg)
+> > +{
+> > +	struct s2_walk_data *data = arg;
+> > +
+> > +	data->level = level;
+> > +	data->pteval = *ptep;
+> > +	return 0;
+> > +}
+> > +
+> > +/* Assumes mmu_lock taken */
+> > +static bool __check_ioguard_page(struct kvm_vcpu *vcpu, gpa_t ipa)
+> > +{
+> > +	struct s2_walk_data data;
+> > +	struct kvm_pgtable_walker walker = {
+> > +		.cb             = s2_walker,
+> > +		.flags          = KVM_PGTABLE_WALK_LEAF,
+> > +		.arg            = &data,
+> > +	};
+> > +
+> > +	kvm_pgtable_walk(vcpu->arch.hw_mmu->pgt, ALIGN_DOWN(ipa, PAGE_SIZE),
+> > +			 PAGE_SIZE, &walker);
+> > +
+> > +	/* Must be a PAGE_SIZE mapping with our annotation */
+> > +	return (BIT(ARM64_HW_PGTABLE_LEVEL_SHIFT(data.level)) == PAGE_SIZE &&
+> > +		data.pteval == MMIO_NOTE);
 > 
-> Right, the meaning of a NULL PTE in guests will clearly be something
-> different, but I guess the interpretation of what invalid mappings mean
-> is up to the caller.
+> Nit: you could do this check in the walker directly and check the return
+> value of kvm_pgtable_walk() instead. That would allow to get rid of
+> struct s2_walk_data.
 > 
-> > Don't we
-> > need something that is non-null to preserve the table refcounting?
-> 
-> Sure, but do we care? If the table entry gets zeroed we're then
-> basically using an 'invalid block' mapping to annotate the entire block
-> range with '0', whatever that means. For guests it won't mean much, but
-> for the host that would mean sole ownership of the entire range.
+> Also, though the compiler might be able to optimize, maybe simplify the
+> level check to level == (KVM_PGTABLE_MAX_LEVELS - 1)?
 
-I see. You let the refcount drop to 0, unmap the table and let
-transfer the 0 annotation one level up, covering the whole block.
-
-I guess I'll revert back to allowing 0, but I'd like to make sure we
-don't do that for guests unless we actually tear down the address
-space (checking for KVM_PGTABLE_S2_IDMAP should work).
+Yup, all good points. I guess I could do the same in my other series
+that parses the userspace PT to extract the level.
 
 Thanks,
 
