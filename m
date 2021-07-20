@@ -2,162 +2,236 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E4B083D0234
-	for <lists+kvm@lfdr.de>; Tue, 20 Jul 2021 21:39:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E9E883D023C
+	for <lists+kvm@lfdr.de>; Tue, 20 Jul 2021 21:44:19 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232230AbhGTS6U (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 20 Jul 2021 14:58:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56344 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230030AbhGTS5m (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 20 Jul 2021 14:57:42 -0400
-Received: from mail-pf1-x430.google.com (mail-pf1-x430.google.com [IPv6:2607:f8b0:4864:20::430])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CFFC1C061768
-        for <kvm@vger.kernel.org>; Tue, 20 Jul 2021 12:38:19 -0700 (PDT)
-Received: by mail-pf1-x430.google.com with SMTP id q10so361637pfj.12
-        for <kvm@vger.kernel.org>; Tue, 20 Jul 2021 12:38:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:content-transfer-encoding:in-reply-to;
-        bh=opGYJ8ATKeLRJGjAJK6R9tbhbI7CJxP6XB4aUSj1rRc=;
-        b=U3suekfYP80TfhnSWCdW0AeB5YxRYqo2o3/gq9NjySLOotsA/QHsKv4nrfgs9Q6OW4
-         KjSFSlK0XO5pyVT8FlownP4GS3PcIrtF/1itOWU4Pga+6PwG15GCcUmAHgnsNMPMi4LX
-         DxT0uRyt0039tsJZa4N+W8sH3nZ3ORXDV7KdShXCKvh6oAxgtZUERz3/kYRLyJ5E2nWy
-         NESQv+xyyGvE5IhgT/cYsM8bQaF8F8f+olP6Pv+1dQQcP53pETJLgqGRDE75b9vRhf5t
-         erL1h5JQ4WgB3pRfhQQaD4CT4UWWh7xaKg8C46eFTZOacYR8kBVBLxEUzPFoFCtyV1A7
-         oJRA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to;
-        bh=opGYJ8ATKeLRJGjAJK6R9tbhbI7CJxP6XB4aUSj1rRc=;
-        b=WDEE3DX/uzldIGS7J8Jfho4tjQWXtgAH24cmALDnGwoYXZ22NTOJGkMkujLdKme4ty
-         loTHlfjzBxaX7MWrd2/mHiw3KUjzUovOIHnMqBETSi16zjemB3EOZNjkLp1ADATJwc5E
-         LSGBDC6pBBFilwZH3/OZfSo2r2Nw+UROGAeaI1vG9HM1P+jVetfxDZ80typKVkvguyvb
-         qbX54wG6ODS/c6rhy027clGa/1uah4rN/7p/7HsKyZ+uo1F3VeGn8WxzvyJFaonXSFaD
-         uFTV/RYspV9g0NyVl/4Rq3P1i6BIrhn6ZwYKhv6qTvcft6RHVj4+4nZI5d0rnYvbgboJ
-         6qGw==
-X-Gm-Message-State: AOAM533GHlsSglv3xdOWjDEVCgFc7itMuWgXhajgRVaY50vnZFtNBFag
-        mE2THuOmxcufJ7Zfic4gTHheUw==
-X-Google-Smtp-Source: ABdhPJxaIdbx05Hn/m0/ilrMVvfZTLe2YGc+vQnLw4+1SqOXt5bk80Vq8MgVTJaPuxiVmjKAyXSIhA==
-X-Received: by 2002:a63:5620:: with SMTP id k32mr6362897pgb.32.1626809898963;
-        Tue, 20 Jul 2021 12:38:18 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id a20sm23827514pfv.101.2021.07.20.12.38.18
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 20 Jul 2021 12:38:18 -0700 (PDT)
-Date:   Tue, 20 Jul 2021 19:38:14 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Brijesh Singh <brijesh.singh@amd.com>
-Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
-        linux-coco@lists.linux.dev, linux-mm@kvack.org,
-        linux-crypto@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
+        id S229750AbhGTTCH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 20 Jul 2021 15:02:07 -0400
+Received: from mail-dm6nam12on2054.outbound.protection.outlook.com ([40.107.243.54]:50529
+        "EHLO NAM12-DM6-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S229554AbhGTTB7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 20 Jul 2021 15:01:59 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=XwvMQ4V0KZklGP2EQ3Eky4xN8bdwJa6+OmXpHa7yjDy6sGTV1inr2zukdNLwYO43r0h4cl7at9exr8E5XpUcyysWBQTRKn84xF0+jMCKertkLxkeeFiSCft8f037OR6XF+D4r/UvisFNAgwJyY2QVxoXEcy1jWCwGxkprFcYl12TH9ujDhcK5gpAO1deV1R8CUowyf73SW699sANTsqrd8RF2sX0XQmgu4i0JIaPeNU3akwhFg6bc4VLI0WXB/Jchn7XROwlj5u2Lnfvoa5zQ4xPqfMUgoGulfLodqwcDSVoDqRoivdBmDAu1Ip/iO9KOBFSU1pqSnWBP6LVuViVuw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=wxQ+D5CbxONi4hIPUlXYl/984y7Io33oqCyobhdciM0=;
+ b=X8ihJWV1Yj8OmJVe9V6vEXhGc+awWfc7Mfrw0AknQsUoerqUhfM9Wx5qz0DhA9bWDMSetZyWdUG7PhU2q99Tv4ULkJuFi3yK8RyFZJyf5bHAJRWsdMYCvG4RLm2g4pS0tjG6BRcbo3Dq8eONxlA1vSTzHiLGQkp5/gw+BtOjXYBOrq9kYuG0L6wjg9SFa4BKfp984hphNbRocSLZCsCU7LpWirQZ9xpTqma591YGOKgMQwTcYzo2VqnILFW8OpCcP69yPtRvZ36z2P4U74Zm6JRxggJt7LaRqt5+19n77FbmEbTvE12EMgdtrhucbQljWXFfyMGirhV7XFnqLIF7Ug==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=wxQ+D5CbxONi4hIPUlXYl/984y7Io33oqCyobhdciM0=;
+ b=5P8LmKUECAnatdjRLSYcIUwt+LufJWSVp9E/+rWlIUh39TT6H87Xjul+QNHJha8I5aae31oss9+WiF124pn+G3dk4sP0oS19WB5GMkKYoP51pD0WZyuLyqdKvm3nwwvVrIMUdGEy2Vcx/NifGqhEw/bciJpbpybffdNdeCqlQlQ=
+Authentication-Results: redhat.com; dkim=none (message not signed)
+ header.d=none;redhat.com; dmarc=none action=none header.from=amd.com;
+Received: from CH2PR12MB4133.namprd12.prod.outlook.com (2603:10b6:610:7a::13)
+ by CH2PR12MB4277.namprd12.prod.outlook.com (2603:10b6:610:ae::23) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4331.25; Tue, 20 Jul
+ 2021 19:42:29 +0000
+Received: from CH2PR12MB4133.namprd12.prod.outlook.com
+ ([fe80::d19e:b657:5259:24d0]) by CH2PR12MB4133.namprd12.prod.outlook.com
+ ([fe80::d19e:b657:5259:24d0%9]) with mapi id 15.20.4331.034; Tue, 20 Jul 2021
+ 19:42:29 +0000
+Date:   Tue, 20 Jul 2021 14:42:12 -0500
+From:   Michael Roth <michael.roth@amd.com>
+To:     Markus Armbruster <armbru@redhat.com>,
+        Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Cc:     Brijesh Singh <brijesh.singh@amd.com>, qemu-devel@nongnu.org,
+        Connor Kuehl <ckuehl@redhat.com>,
+        Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+        "Michael S . Tsirkin" <mst@redhat.com>,
+        James Bottomley <jejb@linux.ibm.com>,
+        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
         Tom Lendacky <thomas.lendacky@amd.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
-        David Rientjes <rientjes@google.com>,
         Dov Murik <dovmurik@linux.ibm.com>,
-        Tobin Feldman-Fitzthum <tobin@ibm.com>,
-        Borislav Petkov <bp@alien8.de>,
-        Michael Roth <michael.roth@amd.com>,
-        Vlastimil Babka <vbabka@suse.cz>, tony.luck@intel.com,
-        npmccallum@redhat.com, brijesh.ksingh@gmail.com
-Subject: Re: [PATCH Part2 RFC v4 27/40] KVM: X86: Add kvm_x86_ops to get the
- max page level for the TDP
-Message-ID: <YPcmJuKHFYjCgpqd@google.com>
-References: <20210707183616.5620-1-brijesh.singh@amd.com>
- <20210707183616.5620-28-brijesh.singh@amd.com>
- <YPHbxAVbuFk6Xtkj@google.com>
- <1ed3c439-a02c-7182-b140-32cddd5e4f34@amd.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+        David Gibson <david@gibson.dropbear.id.au>,
+        kvm@vger.kernel.org, Eduardo Habkost <ehabkost@redhat.com>
+Subject: Re: [RFC PATCH 2/6] i386/sev: extend sev-guest property to include
+ SEV-SNP
+Message-ID: <20210720194212.vjmsktx2ti3apv2d@amd.com>
+References: <20210709215550.32496-1-brijesh.singh@amd.com>
+ <20210709215550.32496-3-brijesh.singh@amd.com>
+ <87h7gy4990.fsf@dusky.pond.sub.org>
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <1ed3c439-a02c-7182-b140-32cddd5e4f34@amd.com>
+In-Reply-To: <87h7gy4990.fsf@dusky.pond.sub.org>
+X-ClientProxiedBy: SA9PR10CA0002.namprd10.prod.outlook.com
+ (2603:10b6:806:a7::7) To CH2PR12MB4133.namprd12.prod.outlook.com
+ (2603:10b6:610:7a::13)
+MIME-Version: 1.0
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from localhost (165.204.77.1) by SA9PR10CA0002.namprd10.prod.outlook.com (2603:10b6:806:a7::7) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4331.21 via Frontend Transport; Tue, 20 Jul 2021 19:42:29 +0000
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 77f043ec-d94d-4324-0c23-08d94bb68256
+X-MS-TrafficTypeDiagnostic: CH2PR12MB4277:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <CH2PR12MB4277D39CD43F8D6C480D161F95E29@CH2PR12MB4277.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:10000;
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: TUQuG1lW/YHlBy6AO5Ikwa3v6zMRw8DH+Fy6AeEMJh5oxPyE4G9kyIc/kQjAQSRT1x6ZbCD7X9TMNkZoqmiz3FmSQlPEx65hQWiZorHpuexB5BwMuQX5BlNWnv+On/MrV2XZ5EktPju+uNKta8cLcsbopcSCIzLHdr2Z0q4mQDLQvQ97w+AOH6ngQ+2yM2724JkHw3OAdQs39W0BCMzCGd0L9iYCq8bp24PwT3E47eCitHAj07T+NFiQ5+oW33/Qw4E/XO9AIS9YcP0kBI9XPxEg7mQnvYyQ75R2vHi4Vpcx5oQc08iT2ktVGVLgqwBwwlMB1a9hWd2Krsq7OK/UamawLmdr2hIZ4Wo4CvbObfGuHztvB5WS8nGxCuZIdLMDPyVXKnAvOKg7rJA2hHaUnX9f06hOHgjxz8FIho7M4eMWQPG+nzZJKYBJoEnHhcEjJnVG19HE5zGjHQHODgy4IKy8m96lcwL2704Dk3Qnx+waZVtv5lXN/3fjP5/uhzbUZJreP6M/Njl4UaiPJR92LvTQc+c7cawdkgfS0zOTiYh98Ammor0N22DTdWBBohjRBDIncZDI13UQgMzYMtkns1lAyCY+KILpIatebu5T74Ab9UbrVfLs+aaqRJoYMncZWz1GdC6HtrNvvR6Hf3Rsw/o4EyKLZbE6HIp445frUgzpXcgwleF7OsCtrX7UkCM12OyLeWQNYewWbQTJ6I0Qm8OWD1OSr7IKmdHsfR+6enZCzptxir6JeuBgjMOZxgw8yOeCoJhykyw4WFGKOVDqC3/STHTwLxZKsGa8dqBa7WY=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH2PR12MB4133.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(376002)(396003)(39860400002)(136003)(346002)(366004)(4326008)(6666004)(478600001)(66946007)(36756003)(186003)(7416002)(8676002)(66556008)(8936002)(86362001)(83380400001)(110136005)(54906003)(66476007)(6486002)(5660300002)(956004)(966005)(26005)(2616005)(6496006)(52116002)(2906002)(44832011)(316002)(1076003)(38100700002)(38350700002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?jUEiv9GmhDVHyNpIOnZLtfUEqkGcrTbE8wIp4rf4DEOqikAhycroHkSCcJRT?=
+ =?us-ascii?Q?LaUtArgFzA1sksiUQYEuZNQdaLYED5t/GtwCHx3iFtEJLWLL0WbS8ZgjeH9k?=
+ =?us-ascii?Q?Cu6Cd6pZSpRQ+CnH2nDvfIpkP7Cyj8TTnE+d9Zx3opq/l0xz47uxMe7UaqGN?=
+ =?us-ascii?Q?2RuP8sf+F+ls/dOrZNDZX2y089+IfmVly5O/Wlk157hTyIrdrTOdTJeu4FCt?=
+ =?us-ascii?Q?O9iuwcYerDyOsnfvbq0KBuT7tJtjxSKxgQIklF9BbGf+7seorpQEuT+il/bK?=
+ =?us-ascii?Q?11JmlSWq64GyZ/y6h4Jo85AqeCDHdMfiHfmH2tBqCMyGjuZLWtOnn38z1NXH?=
+ =?us-ascii?Q?IPVyNvK1j0sEjRBrG7LLKnvF8ILGNp+Y0whKypgY6G0yxJbFGkuRxmq9NoKQ?=
+ =?us-ascii?Q?iEECrujdkS0t5Q+93KN49W1wUD9viW8ydAD1uecbCtmZO8ubAhd32Sj/wh7N?=
+ =?us-ascii?Q?jvz5PMxMLKhM1oJFBLqfVnz9Iqm1dyn7++MDPtUS++AIxFPs3xEkKrGoAP39?=
+ =?us-ascii?Q?WnhCTLFcvTpX9gvXPxmp8Ne9Q3Qp+BBu1KEroa2KrUglT44meAKcDHPU4YyA?=
+ =?us-ascii?Q?3bhklXsXVF29olRPRq4DScS1IoWTOWD0UAp0mrErSrMGtj3OiqWHR541eTOM?=
+ =?us-ascii?Q?dmmeCqTSuctfQTlb0DHHicqkh8f9vFQKsaslvdlgKKRLExwB7v7kuY6bbPXg?=
+ =?us-ascii?Q?ckubAxxJezrHYiK9SM2nkbf6GHRUTVOjU0SEWpKtgy1GOOCWN+eaKb89TexY?=
+ =?us-ascii?Q?7wPpNJECWtvq6DfQouNbBhUWgYpQ8zkNMkssF45Sq3YXWQgNOZYB9sNBnP4H?=
+ =?us-ascii?Q?cLzPFXS2Erq5dvRT24wgWxNh1Ham/lrrbA7xAUHHA3DjcBQfPAB8JZAElrLG?=
+ =?us-ascii?Q?XuFZ/qI8AdUEyQfgv9EKZi9DQSWLx0vHC3/TfbfSg2FntsBIP4L7Q/LS06Mm?=
+ =?us-ascii?Q?17DtMrjACOP3pMC+7LJlcXL8F4SB3gMCGKiE5dsN+l0TCvAMaNr4bUWSn4/V?=
+ =?us-ascii?Q?MdxZvav/81aBjWlBOsQtAOHTIZW1hWrncgMOoqm/MpcDIgff8fuDL6W7yrl5?=
+ =?us-ascii?Q?PsCbPDLKPSo6l/GZRlE4EJ/3tPhZL+pL+3AEiugO/9U3crHq3QwgLxkN88p7?=
+ =?us-ascii?Q?Tz812Lp03GqoVs+C7eRlC76bHfHWhn1LMea/U3MuGEpk5J47lSCPtWYhe3a6?=
+ =?us-ascii?Q?FjETrkhs0D4bfmAyKbB310gIar8ZRqMfMTwQpN3g8fHyTMQNzk9K2qGn6w6Z?=
+ =?us-ascii?Q?M4KlzZZsZOK+37Kq0SOtEY1suHN+t90W8T1TDhGSnqJOeHAicDX2TRzr/7iE?=
+ =?us-ascii?Q?fsET1AYK9iJn9kpYOpdQpvzg?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 77f043ec-d94d-4324-0c23-08d94bb68256
+X-MS-Exchange-CrossTenant-AuthSource: CH2PR12MB4133.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Jul 2021 19:42:29.5271
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: spqPzsncBBF6pTAdG+OoZUmyLbvcsGHxuU4nO6IVk+YlxaIHQAJGHtBZsrivElIK7G1pSqXWbub0Io7LMeGdXQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH2PR12MB4277
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Jul 16, 2021, Brijesh Singh wrote:
-> On 7/16/21 2:19 PM, Sean Christopherson wrote:
-> > On Wed, Jul 07, 2021, Brijesh Singh wrote:
-> > Another option would be to drop the kvm_x86_ops hooks entirely and call
-> > snp_lookup_page_in_rmptable() directly from MMU code.  That would require tracking
-> > that a VM is SNP-enabled in arch code, but I'm pretty sure info has already bled
-> > into common KVM in one form or another.
+On Tue, Jul 13, 2021 at 03:46:19PM +0200, Markus Armbruster wrote:
+> Brijesh Singh <brijesh.singh@amd.com> writes:
 > 
-> I would prefer this as it eliminates some of the other unnecessary call
-> sites. Unfortunately, currently there is no generic way to know if its
-> an SEV guest (outside the svm/*).  So far there was no need as such but
-> with SNP having such information would help. Should we extend the
-> 'struct kvm' to include a new field that can be used to determine the
-> guest type. Something like
+> > To launch the SEV-SNP guest, a user can specify up to 8 parameters.
+> > Passing all parameters through command line can be difficult. To simplify
+> > the launch parameter passing, introduce a .ini-like config file that can be
+> > used for passing the parameters to the launch flow.
+> >
+> > The contents of the config file will look like this:
+> >
+> > $ cat snp-launch.init
+> >
+> > # SNP launch parameters
+> > [SEV-SNP]
+> > init_flags = 0
+> > policy = 0x1000
+> > id_block = "YWFhYWFhYWFhYWFhYWFhCg=="
+> >
+> >
+> > Add 'snp' property that can be used to indicate that SEV guest launch
+> > should enable the SNP support.
+> >
+> > SEV-SNP guest launch examples:
+> >
+> > 1) launch without additional parameters
+> >
+> >   $(QEMU_CLI) \
+> >     -object sev-guest,id=sev0,snp=on
+> >
+> > 2) launch with optional parameters
+> >   $(QEMU_CLI) \
+> >     -object sev-guest,id=sev0,snp=on,launch-config=<file>
+> >
+> > Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
 > 
-> enum {
+> I acknowledge doing complex configuration on the command line can be
+> awkward.  But if we added a separate configuration file for every
+> configurable thing where that's the case, we'd have too many already,
+> and we'd constantly grow more.  I don't think this is a viable solution.
 > 
->    GUEST_TYPE_SEV,
+> In my opinion, much of what we do on the command line should be done in
+> configuration files instead.  Not in several different configuration
+> languages, mind, but using one common language for all our configuration
+> needs.
 > 
->    GUEST_TYPE_SEV_ES,
+> Some of us argue this language already exists: QMP.  It can't do
+> everything the command line can do, but that's a matter of putting in
+> the work.  However, JSON isn't a good configuration language[1].  To get
+> a decent one, we'd have to to extend JSON[2], or wrap another concrete
+> syntax around QMP's abstract syntax.
 > 
->    GUEST_TYPE_SEV_SNP,
+> But this doesn't help you at all *now*.
 > 
-> };
+> I recommend to do exactly what we've done before for complex
+> configuration: define it in the QAPI schema, so we can use both dotted
+> keys and JSON on the command line, and can have QMP, too.  Examples:
+> -blockdev, -display, -compat.
 > 
-> struct kvm {
-> 
->    ...
-> 
->   u64 enc_type;
-> 
-> };
-> 
-> bool kvm_guest_enc_type(struct kvm *kvm, enum type); {
-> 
->     return !!kvm->enc_type & type;
-> 
-> }
-> 
-> The mmu.c can then call kvm_guest_enc_type() to check if its SNP guest
-> and use the SNP lookup directly to determine the pagesize.
+> Questions?
 
-The other option is to use vm_type, which TDX is already planning on leveraging.
-Paolo raised the question of whether or not the TDX type could be reused for SNP.
-We should definitely sort that out before merging either series.  I'm personally
-in favor of separating TDX and SNP, it seems inevitable that common code will
-want to differentiate between the two.
+Hi Markus, Daniel,
 
-https://lkml.kernel.org/r/8eb87cd52a89d957af03f93a9ece5634426a7757.1625186503.git.isaku.yamahata@intel.com
+I'm dealing with similar considerations with some SNP config options
+relating to CPUID enforcement, so I've started looking into this as
+well, but am still a little confused on the best way to proceed.
 
-> > As the APM is currently worded, this is wrong, and the whole "tdp_max_page_level"
-> > name is wrong.  As noted above, the Page-Size bullet points states that 2mb/1gb
-> > pages in the NPT _must_ have RMP.page_size=1, and 4kb pages in the NPT _must_
-> > have RMP.page_size=0.  That means that the RMP adjustment is not a constraint,
-> > it's an exact requirement.  Specifically, if the RMP is a 2mb page then KVM must
-> > install a 2mb (or 1gb) page.  Maybe it works because KVM will PSMASH the RMP
-> > after installing a bogus 4kb NPT and taking an RMP violation, but that's a very
-> > convoluted and sub-optimal solution.
+I see that -blockdev supports both JSON command-line arguments (via
+qobject_input_visitor_new) and dotted keys
+(via qobject_input_vistior_new_keyval).
+
+We could introduce a new config group do the same, maybe something specific
+to ConfidentialGuestSupport objects, e.g.:
+
+  -confidential-guest-support sev-guest,id=sev0,key_a.subkey_b=...
+
+and use the same mechanisms to parse the options, but this seems to
+either involve adding a layer of option translations between command-line
+and the underlying object properties, or, if we keep the 1:1 mapping
+between QAPI-defined keys and object properties, it basically becomes a
+way to pass a different Visitor implementation into object_property_set(),
+in this case one created by object_input_visitor_new_keyval() instead of
+opts_visitor_new().
+
+In either case, genericizing it beyond CGS/SEV would basically be
+introducing:
+
+  -object2 sev-guest,id=sev0,key_a.subkey_b=...
+
+Which one seems preferable? Or is the answer neither?
+
+I've also been looking at whether this could all be handled via -object,
+and it seems -object already supports JSON command-line arguments, and that
+switching it from using OptsVisitor to QObjectVisitor for non-JSON case
+would be enough to have it handle dotted keys, but I'm not sure what the
+fall-out would be compatibility-wise.
+
+All lot of that falls under making sure the QObject/keyval parser is
+compatible with existing command-lines parsed via OptsVisitor. One example
+where there still seems to be a difference is lack of support for ranges
+such as "cpus=1-4" in keyval parser. Daniel had a series that addressed
+this:
+
+  https://lists.gnu.org/archive/html/qemu-devel/2016-09/msg08248.html
+
+but it doesn't seem to have made it into the tree, which is why I feel like
+maybe there are complications with this approach I haven't considered?
+
+Thanks!
+
+-Mike
+
 > 
-> This is why I was passing the preferred max_level in the pre-fault
-> handle then later query the npt level; use the npt level in the RMP to
-> make sure they are in sync.
 > 
-> There is yet another reason why we can't avoid the PSMASH after doing
-> everything to ensure that NPT and RMP are in sync. e.g if NPT and RMP
-> are programmed with 2mb size but the guest tries to PVALIDATE the page
-> as a 4k. In that case, we will see #NPF with page size mismatch and have
-> to perform psmash.
-
-Boo, there's no way to communicate to the guest that it's doing PVALIDATE wrong
-is there?
+> [1] https://www.lucidchart.com/techblog/2018/07/16/why-json-isnt-a-good-configuration-language/
+> 
+> [2] Thanks, but no thanks.  Let's make new and interesting mistakes
+> instead of repeating old and tired ones.
+> 
