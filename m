@@ -2,454 +2,121 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 38A293D05FF
-	for <lists+kvm@lfdr.de>; Wed, 21 Jul 2021 02:03:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EB9333D0620
+	for <lists+kvm@lfdr.de>; Wed, 21 Jul 2021 02:18:22 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232105AbhGTXVv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 20 Jul 2021 19:21:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58656 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234888AbhGTXUv (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 20 Jul 2021 19:20:51 -0400
-Received: from mail-pf1-x42f.google.com (mail-pf1-x42f.google.com [IPv6:2607:f8b0:4864:20::42f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8171FC0613DE
-        for <kvm@vger.kernel.org>; Tue, 20 Jul 2021 17:01:07 -0700 (PDT)
-Received: by mail-pf1-x42f.google.com with SMTP id q10so845691pfj.12
-        for <kvm@vger.kernel.org>; Tue, 20 Jul 2021 17:01:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=Lum8dVJc7G50BxYk9/1dYB3tGiIuTpK8uY2nNSlk3dE=;
-        b=R0iJ8Ik/WdN/lAIRJHKRjSgWCUsEdYGJsvS/5sycB/cD8uuLC6uBtYzOXctsll3h7E
-         UR+8c8+msAVu68F7a/tG6+pgNMLHbXkbpWWUG+oslg+uDNLWLCfYsMCvoh5GH1xuB+Zt
-         EqKdNywQKv03nnTEj+Mzu17GLZyqrw5yW6d1BOr7VqMc/qF/4MCa/gsOV9VF0PU8rlKa
-         cYty9x+6qm9GPFY3y6cODumpiQk4OydzLyCZNXTSRZ8+Cr8xWiqicLEqIKNkmlGQUZNk
-         VxtMHnZS++Q7vRk24GjSRIotNXI37TEOIjNUFjqcslkcZWxWSxhx7EIWoprA+1tAAf9V
-         okSg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=Lum8dVJc7G50BxYk9/1dYB3tGiIuTpK8uY2nNSlk3dE=;
-        b=WPLcZFDDQmyLNqLYBsMokesSbmvwHKr76TL2L0aU0iQgU4BY62K+DZkf80UchCRZj1
-         rSdjPMcyQHMQEcLr/8sZqEI3oVUALoFyZpb/sbU8EX8aYZvKFrwEsEqpQztVMgLEx5sN
-         zizPC632zrJYXGLGP0cI7DQyw3gVuFLPCHZZVRCwwqsN76zTu0QV//PScG/3Kn+XqmaL
-         wfw3YpEFDJIDdfRL+TclM0TZhJasbO8XvP2cmg6J37xuc+lFHJKzpWgHM9+eWeKRtLAo
-         OkCdiw//Ey8bYYJhFvoe/tcUZMSMqjvT2Zv6n6D3Br6QIOIp8kVNLHzPxmjOTBG+DvY0
-         w31w==
-X-Gm-Message-State: AOAM531UGkKq/ekt6yUprU6dMPian0Pw/lDCbsyvsJJimCxOIrPY05jY
-        aSJset7EyrzWThY0nEOjyfg/tQ==
-X-Google-Smtp-Source: ABdhPJwoSMiOPviBOPxSBVGsElPe5h6bapyfNdTTdYIerJGRtQ5MBKc1GgdSz4SXUlGE9WgTLRKisw==
-X-Received: by 2002:a63:e316:: with SMTP id f22mr33137325pgh.100.1626825666688;
-        Tue, 20 Jul 2021 17:01:06 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id x23sm27344102pgk.90.2021.07.20.17.01.05
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 20 Jul 2021 17:01:06 -0700 (PDT)
-Date:   Wed, 21 Jul 2021 00:01:01 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Brijesh Singh <brijesh.singh@amd.com>
-Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
-        linux-coco@lists.linux.dev, linux-mm@kvack.org,
-        linux-crypto@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
+        id S232351AbhGTXcK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 20 Jul 2021 19:32:10 -0400
+Received: from mail.kernel.org ([198.145.29.99]:34966 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S231765AbhGTXcB (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 20 Jul 2021 19:32:01 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id F19266101B;
+        Wed, 21 Jul 2021 00:12:38 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1626826359;
+        bh=lYXkX3S8CqeBNBxz55FI+vEABUN7e84q0v25YCXZZBo=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:From;
+        b=e7xYcm5OiSAtCgBJ1qa025M+AK2LwAiCsPvYKn3YRJr+nHuQUzKmDRiVhSFBMV2Pq
+         dCq6WtI4SueU/mhACB9slwpzSqgsEld/13OFoZVjMIifnk0UqX4rgqx12pt+zGVIF/
+         BbWkY+wWfCRujX2WzLx5zQar7xv6+IpJq2qeZR26rWoSGZ2MmfEYf1rxKv5i3G5SVN
+         G2JsxPbjg+YEr6yUKHCbcLf9lJuey/yuXwbw+TDGQBc/pKVEaTVW5sP2DZppCSsjVv
+         ntGhFKgEbrIvr+V9Mmb/20uQDlq3Z7uSs6UWP+0OO+6DW4T18t1MbhLOz/gJsTF4a6
+         IGPJreV/BIlYg==
+Date:   Tue, 20 Jul 2021 19:12:37 -0500
+From:   Bjorn Helgaas <helgaas@kernel.org>
+To:     "Maciej W. Rozycki" <macro@orcam.me.uk>
+Cc:     Nikolai Zhubr <zhubr.2@gmail.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Bjorn Helgaas <bhelgaas@google.com>,
+        "Rafael J. Wysocki" <rjw@rjwysocki.net>,
+        Len Brown <len.brown@intel.com>, Pavel Machek <pavel@ucw.cz>,
         Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
-        David Rientjes <rientjes@google.com>,
-        Dov Murik <dovmurik@linux.ibm.com>,
-        Tobin Feldman-Fitzthum <tobin@ibm.com>,
-        Borislav Petkov <bp@alien8.de>,
-        Michael Roth <michael.roth@amd.com>,
-        Vlastimil Babka <vbabka@suse.cz>, tony.luck@intel.com,
-        npmccallum@redhat.com, brijesh.ksingh@gmail.com
-Subject: Re: [PATCH Part2 RFC v4 40/40] KVM: SVM: Support SEV-SNP AP Creation
- NAE event
-Message-ID: <YPdjvca28JaWPZRb@google.com>
-References: <20210707183616.5620-1-brijesh.singh@amd.com>
- <20210707183616.5620-41-brijesh.singh@amd.com>
+        Joerg Roedel <joro@8bytes.org>, x86@kernel.org,
+        linux-pci@vger.kernel.org, linux-pm@vger.kernel.org,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 0/6] x86: PIRQ/ELCR-related fixes and updates
+Message-ID: <20210721001237.GA144325@bjorn-Precision-5520>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20210707183616.5620-41-brijesh.singh@amd.com>
+In-Reply-To: <alpine.DEB.2.21.2107171813230.9461@angie.orcam.me.uk>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jul 07, 2021, Brijesh Singh wrote:
-> From: Tom Lendacky <thomas.lendacky@amd.com>
+On Tue, Jul 20, 2021 at 05:27:43AM +0200, Maciej W. Rozycki wrote:
+> Hi,
 > 
-> Add support for the SEV-SNP AP Creation NAE event. This allows SEV-SNP
-> guests to create and start APs on their own.
-
-The changelog really needs to clarify that this doesn't allow the guest to create
-arbitrary vCPUs.  The GHCB uses CREATE/DESTROY terminology, but this patch and its
-comments/documentation should very clearly call out that KVM's implementation is
-more along the line of vCPU online/offline.
-
-It should also be noted that KVM still onlines APs by default.  That also raises
-the question of whether or not KVM should support creating an offlined vCPU.
-E.g. several of the use cases I'm aware of want to do something along the lines
-of creating a VM with the max number of theoretical vCPUs, but in most instances
-only run a handful of vCPUs.  That's a fair amount of potential memory savings
-if the max theoretical number of vCPUs is high.
-
-> A new event, KVM_REQ_UPDATE_PROTECTED_GUEST_STATE, is created and used
-> so as to avoid updating the VMSA pointer while the vCPU is running.
+>  In the course of adding PIRQ routing support for Nikolai's FinALi system 
+> I realised we need to have some infrastructure for the indirectly accessed
+> configuration space implemented by some chipsets as well as Cyrix CPUs and 
+> also included with the Intel MP spec for the IMCR register via port I/O 
+> space locations 0x22/0x23.  With that in place I implemented PIRQ support 
+> for the Intel PCEB/ESC combined EISA southbridge using the same scheme to 
+> access the relevant registers and for the final remaining Intel chipset of 
+> the era, that is the i420EX.
 > 
-> For CREATE
->   The guest supplies the GPA of the VMSA to be used for the vCPU with the
->   specified APIC ID. The GPA is saved in the svm struct of the target
->   vCPU, the KVM_REQ_UPDATE_PROTECTED_GUEST_STATE event is added to the
->   vCPU and then the vCPU is kicked.
+>  While at it I chose to rewrite ELCR register accesses to avoid using 
+> magic numbers scattered across our code and use proper macros like with 
+> the remaining PIC registers, and while at it again I noticed and fixed a 
+> number of typos: s/ECLR/ELCR/.
 > 
-> For CREATE_ON_INIT:
->   The guest supplies the GPA of the VMSA to be used for the vCPU with the
->   specified APIC ID the next time an INIT is performed. The GPA is saved
->   in the svm struct of the target vCPU.
+>  Since there are mechanical dependencies between the patches (except for 
+> typo fixes) I chose to send them as a series rather than individually, 
+> though 3/6 depends on: <https://lore.kernel.org/patchwork/patch/1452772/> 
+> necessarily as well, the fate of which is currently unclear to me.
 > 
-> For DESTROY:
->   The guest indicates it wishes to stop the vCPU. The GPA is cleared from
->   the svm struct, the KVM_REQ_UPDATE_PROTECTED_GUEST_STATE event is added
->   to vCPU and then the vCPU is kicked.
+>  See individual change descriptions for details.
 > 
+>  Nikolai: for your system only 1/6 and 2/6 are required, though you are 
+> free to experiment with all the patches.  Mind that 3/6 mechanically 
+> depends on the earlier change for the SIO PIRQ router referred above.  In 
+> any case please use the debug patch for PCI code as well as the earlier 
+> patches for your other system and send the resulting bootstrap log for 
+> confirmation.
 > 
-> The KVM_REQ_UPDATE_PROTECTED_GUEST_STATE event handler will be invoked as
-> a result of the event or as a result of an INIT. The handler sets the vCPU
-> to the KVM_MP_STATE_UNINITIALIZED state, so that any errors will leave the
-> vCPU as not runnable. Any previous VMSA pages that were installed as
-> part of an SEV-SNP AP Creation NAE event are un-pinned. If a new VMSA is
-> to be installed, the VMSA guest page is pinned and set as the VMSA in the
-> vCPU VMCB and the vCPU state is set to KVM_MP_STATE_RUNNABLE. If a new
-> VMSA is not to be installed, the VMSA is cleared in the vCPU VMCB and the
-> vCPU state is left as KVM_MP_STATE_UNINITIALIZED to prevent it from being
-> run.
+>  Ideally this would be verified with PCI interrupt sharing, but for that 
+> you'd have to track down one or more multifunction option cards (USB 2.0 
+> interfaces with legacy 1.1 functions or serial/parallel multi-I/O cards 
+> are good candidates, but of course there are more) or option devices with 
+> PCI-to-PCI bridges, and then actually use some of these devices as well.  
+> Any interrupt sharing will be reported, e.g.:
 > 
-> Signed-off-by: Tom Lendacky <thomas.lendacky@amd.com>
-> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
-> ---
->  arch/x86/include/asm/kvm_host.h |   3 +
->  arch/x86/include/asm/svm.h      |   3 +
->  arch/x86/kvm/svm/sev.c          | 133 ++++++++++++++++++++++++++++++++
->  arch/x86/kvm/svm/svm.c          |   7 +-
->  arch/x86/kvm/svm/svm.h          |  16 +++-
->  arch/x86/kvm/x86.c              |  11 ++-
->  6 files changed, 170 insertions(+), 3 deletions(-)
+> pci 0000:00:07.0: SIO/PIIX/ICH IRQ router [8086:7000]
+> pci 0000:00:11.0: PCI INT A -> PIRQ 63, mask deb8, excl 0c20
+> pci 0000:00:11.0: PCI INT A -> newirq 0
+> PCI: setting IRQ 11 as level-triggered
+> pci 0000:00:11.0: found PCI INT A -> IRQ 11
+> pci 0000:00:11.0: sharing IRQ 11 with 0000:00:07.2
+> pci 0000:02:00.0: using bridge 0000:00:11.0 INT A to get INT A
+> pci 0000:00:11.0: sharing IRQ 11 with 0000:02:00.0
+> pci 0000:02:01.0: using bridge 0000:00:11.0 INT B to get INT A
+> pci 0000:02:02.0: using bridge 0000:00:11.0 INT C to get INT A
+> pci 0000:03:00.0: using bridge 0000:00:11.0 INT A to get INT A
+> pci 0000:00:11.0: sharing IRQ 11 with 0000:03:00.0
+> pci 0000:04:00.0: using bridge 0000:00:11.0 INT B to get INT A
+> pci 0000:04:00.3: using bridge 0000:00:11.0 INT A to get INT D
+> pci 0000:00:11.0: sharing IRQ 11 with 0000:04:00.3
+> pci 0000:06:05.0: using bridge 0000:00:11.0 INT D to get INT A
+> pci 0000:06:08.0: using bridge 0000:00:11.0 INT C to get INT A
+> pci 0000:06:08.1: using bridge 0000:00:11.0 INT D to get INT B
+> pci 0000:06:08.2: using bridge 0000:00:11.0 INT A to get INT C
+> pci 0000:00:11.0: sharing IRQ 11 with 0000:06:08.2
 > 
-> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-> index 117e2e08d7ed..881e05b3f74e 100644
-> --- a/arch/x86/include/asm/kvm_host.h
-> +++ b/arch/x86/include/asm/kvm_host.h
-> @@ -91,6 +91,7 @@
->  #define KVM_REQ_MSR_FILTER_CHANGED	KVM_ARCH_REQ(29)
->  #define KVM_REQ_UPDATE_CPU_DIRTY_LOGGING \
->  	KVM_ARCH_REQ_FLAGS(30, KVM_REQUEST_WAIT | KVM_REQUEST_NO_WAKEUP)
-> +#define KVM_REQ_UPDATE_PROTECTED_GUEST_STATE	KVM_ARCH_REQ(31)
->  
->  #define CR0_RESERVED_BITS                                               \
->  	(~(unsigned long)(X86_CR0_PE | X86_CR0_MP | X86_CR0_EM | X86_CR0_TS \
-> @@ -1402,6 +1403,8 @@ struct kvm_x86_ops {
->  
->  	int (*handle_rmp_page_fault)(struct kvm_vcpu *vcpu, gpa_t gpa, kvm_pfn_t pfn,
->  			int level, u64 error_code);
-> +
-> +	void (*update_protected_guest_state)(struct kvm_vcpu *vcpu);
->  };
->  
->  struct kvm_x86_nested_ops {
-> diff --git a/arch/x86/include/asm/svm.h b/arch/x86/include/asm/svm.h
-> index 5e72faa00cf2..6634a952563e 100644
-> --- a/arch/x86/include/asm/svm.h
-> +++ b/arch/x86/include/asm/svm.h
-> @@ -220,6 +220,9 @@ struct __attribute__ ((__packed__)) vmcb_control_area {
->  #define SVM_SEV_FEATURES_DEBUG_SWAP		BIT(5)
->  #define SVM_SEV_FEATURES_PREVENT_HOST_IBS	BIT(6)
->  #define SVM_SEV_FEATURES_BTB_ISOLATION		BIT(7)
-> +#define SVM_SEV_FEATURES_INT_INJ_MODES			\
-> +	(SVM_SEV_FEATURES_RESTRICTED_INJECTION |	\
-> +	 SVM_SEV_FEATURES_ALTERNATE_INJECTION)
->  
->  struct vmcb_seg {
->  	u16 selector;
-> diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-> index d8ad6dd58c87..95f5d25b4f08 100644
-> --- a/arch/x86/kvm/svm/sev.c
-> +++ b/arch/x86/kvm/svm/sev.c
-> @@ -582,6 +582,7 @@ static int sev_launch_update_data(struct kvm *kvm, struct kvm_sev_cmd *argp)
->  
->  static int sev_es_sync_vmsa(struct vcpu_svm *svm)
->  {
-> +	struct kvm_sev_info *sev = &to_kvm_svm(svm->vcpu.kvm)->sev_info;
->  	struct sev_es_save_area *save = svm->vmsa;
->  
->  	/* Check some debug related fields before encrypting the VMSA */
-> @@ -625,6 +626,12 @@ static int sev_es_sync_vmsa(struct vcpu_svm *svm)
->  	if (sev_snp_guest(svm->vcpu.kvm))
->  		save->sev_features |= SVM_SEV_FEATURES_SNP_ACTIVE;
->  
-> +	/*
-> +	 * Save the VMSA synced SEV features. For now, they are the same for
-> +	 * all vCPUs, so just save each time.
-> +	 */
-> +	sev->sev_features = save->sev_features;
-> +
->  	return 0;
->  }
->  
-> @@ -2682,6 +2689,10 @@ static int sev_es_validate_vmgexit(struct vcpu_svm *svm)
->  		if (!ghcb_sw_scratch_is_valid(ghcb))
->  			goto vmgexit_err;
->  		break;
-> +	case SVM_VMGEXIT_AP_CREATION:
-> +		if (!ghcb_rax_is_valid(ghcb))
-> +			goto vmgexit_err;
-> +		break;
->  	case SVM_VMGEXIT_NMI_COMPLETE:
->  	case SVM_VMGEXIT_AP_HLT_LOOP:
->  	case SVM_VMGEXIT_AP_JUMP_TABLE:
-> @@ -3395,6 +3406,121 @@ static int sev_handle_vmgexit_msr_protocol(struct vcpu_svm *svm)
->  	return ret;
->  }
->  
-> +void sev_snp_update_protected_guest_state(struct kvm_vcpu *vcpu)
-> +{
-> +	struct vcpu_svm *svm = to_svm(vcpu);
-> +	kvm_pfn_t pfn;
-> +
-> +	mutex_lock(&svm->snp_vmsa_mutex);
-> +
-> +	vcpu->arch.mp_state = KVM_MP_STATE_UNINITIALIZED;
-> +
-> +	/* Clear use of the VMSA in the sev_es_init_vmcb() path */
-> +	svm->vmsa_pa = 0;
-> +
-> +	/* Clear use of the VMSA from the VMCB */
-> +	svm->vmcb->control.vmsa_pa = 0;
+> -- a lot of sharing and swizzling here. :)  You'd most definitely need: 
+> <https://lore.kernel.org/patchwork/patch/1454747/> for that though, as I 
+> can't imagine PCI BIOS 2.1 PIRQ routers to commonly enumerate devices 
+> behind PCI-to-PCI bridges, given that they fail to cope with more complex 
+> bus topologies created by option devices in the first place.
 
-PA=0 is not an invalid address.  I don't care what value the GHCB uses for
-"invalid GPA", KVM should always use INVALID_PAGE to track an invalid physical
-address.
+Looks nicely done but I have no ability to review or test, so I assume
+the x86 folks will take care of this.
 
-> +	/* Un-pin previous VMSA */
-> +	if (svm->snp_vmsa_pfn) {
-> +		kvm_release_pfn_dirty(svm->snp_vmsa_pfn);
-
-Oof, I was wondering why KVM tracks three versions of VMSA.  Actually, I'm still
-wondering why there are three versions.  Aren't snp_vmsa_pfn and vmsa_pa tracking
-the same thing?  Ah, finally figured it out.  vmsa_pa points at svm->vmsa by
-default.  Blech.
-
-> +		svm->snp_vmsa_pfn = 0;
-> +	}
-> +
-> +	if (svm->snp_vmsa_gpa) {
-
-This is bogus, GPA=0 is perfectly valid.  As above, use INVALID_PAGE.  A comment
-explaining that the vCPU is offline when VMSA is invalid would also be helpful.
-
-> +		/* Validate that the GPA is page aligned */
-> +		if (!PAGE_ALIGNED(svm->snp_vmsa_gpa))
-
-This needs to be moved to the VMGEXIT, and it should use page_address_valid() so
-that KVM also checks for a legal GPA.
-
-> +			goto e_unlock;
-> +
-> +		/*
-> +		 * The VMSA is referenced by thy hypervisor physical address,
-
-s/thy/the, although converting to archaic English could be hilarious...
-
-> +		 * so retrieve the PFN and pin it.
-> +		 */
-> +		pfn = gfn_to_pfn(vcpu->kvm, gpa_to_gfn(svm->snp_vmsa_gpa));
-> +		if (is_error_pfn(pfn))
-> +			goto e_unlock;
-
-Silently ignoring the guest request is bad behavior, at worst KVM should exit to
-userspace with an emulation error.
-
-> +
-> +		svm->snp_vmsa_pfn = pfn;
-> +
-> +		/* Use the new VMSA in the sev_es_init_vmcb() path */
-> +		svm->vmsa_pa = pfn_to_hpa(pfn);
-> +		svm->vmcb->control.vmsa_pa = svm->vmsa_pa;
-> +
-> +		vcpu->arch.mp_state = KVM_MP_STATE_RUNNABLE;
-> +	} else {
-> +		vcpu->arch.pv.pv_unhalted = false;
-
-Shouldn't the RUNNABLE path also clear pv_unhalted?
-
-> +		vcpu->arch.mp_state = KVM_MP_STATE_UNINITIALIZED;
-
-What happens if userspace calls kvm_arch_vcpu_ioctl_set_mpstate, or even worse
-the guest sends INIT-SIPI?  Unless I'm mistaken, either case will cause KVM to
-run the vCPU with vmcb->control.vmsa_pa==0.
-
-My initial reaction is that the "offline" case needs a new mp_state, or maybe
-just use KVM_MP_STATE_STOPPED.
-
-> +	}
-> +
-> +e_unlock:
-> +	mutex_unlock(&svm->snp_vmsa_mutex);
-> +}
-> +
-> +static void sev_snp_ap_creation(struct vcpu_svm *svm)
-> +{
-> +	struct kvm_sev_info *sev = &to_kvm_svm(svm->vcpu.kvm)->sev_info;
-> +	struct kvm_vcpu *vcpu = &svm->vcpu;
-> +	struct kvm_vcpu *target_vcpu;
-> +	struct vcpu_svm *target_svm;
-> +	unsigned int request;
-> +	unsigned int apic_id;
-> +	bool kick;
-> +
-> +	request = lower_32_bits(svm->vmcb->control.exit_info_1);
-> +	apic_id = upper_32_bits(svm->vmcb->control.exit_info_1);
-> +
-> +	/* Validate the APIC ID */
-> +	target_vcpu = kvm_get_vcpu_by_id(vcpu->kvm, apic_id);
-> +	if (!target_vcpu)
-> +		return;
-
-KVM should not silently ignore bad requests, this needs to return an error to the
-guest.
-
-> +
-> +	target_svm = to_svm(target_vcpu);
-> +
-> +	kick = true;
-
-This is wrong, e.g. KVM will kick the target vCPU even if the request fails.
-I suspect the correct behavior would be to:
-
-  1. do all sanity checks
-  2. take the necessary lock(s)
-  3. modify target vCPU state
-  4. kick target vCPU unless request==SVM_VMGEXIT_AP_CREATE_ON_INIT
-
-> +	mutex_lock(&target_svm->snp_vmsa_mutex);
-
-This seems like it's missing a big pile of sanity checks.  E.g. KVM should reject
-SVM_VMGEXIT_AP_CREATE if the target vCPU is already "created", including the case
-where it was "created_on_init" but hasn't yet received INIT-SIPI.
-
-> +
-> +	target_svm->snp_vmsa_gpa = 0;
-> +	target_svm->snp_vmsa_update_on_init = false;
-> +
-> +	/* Interrupt injection mode shouldn't change for AP creation */
-> +	if (request < SVM_VMGEXIT_AP_DESTROY) {
-> +		u64 sev_features;
-> +
-> +		sev_features = vcpu->arch.regs[VCPU_REGS_RAX];
-> +		sev_features ^= sev->sev_features;
-> +		if (sev_features & SVM_SEV_FEATURES_INT_INJ_MODES) {
-
-Why is only INT_INJ_MODES checked?  The new comment in sev_es_sync_vmsa() explicitly
-states that sev_features are the same for all vCPUs, but that's not enforced here.
-At a bare minimum I would expect this to sanity check SVM_SEV_FEATURES_SNP_ACTIVE.
-
-> +			vcpu_unimpl(vcpu, "vmgexit: invalid AP injection mode [%#lx] from guest\n",
-> +				    vcpu->arch.regs[VCPU_REGS_RAX]);
-> +			goto out;
-> +		}
-> +	}
-> +
-> +	switch (request) {
-> +	case SVM_VMGEXIT_AP_CREATE_ON_INIT:
-
-Out of curiosity, what's the use case for this variant?  I assume the guest has
-to preconfigure the VMSA and ensure the target vCPU's RIP points at something
-sane anyways, otherwise the hypervisor could attack the guest by immediately
-attempting to run the deferred vCPU.  At that point, a guest could simply use an
-existing mechanism to put the target vCPU into a holding pattern.
-
-> +		kick = false;
-> +		target_svm->snp_vmsa_update_on_init = true;
-> +		fallthrough;
-> +	case SVM_VMGEXIT_AP_CREATE:
-> +		target_svm->snp_vmsa_gpa = svm->vmcb->control.exit_info_2;
-
-The incoming GPA needs to be checked for validity, at least as much possible.
-E.g. the PAGE_ALIGNED() check should be done here and be morphed to a synchronous
-error for the guest, not a silent "oops, didn't run your vCPU".
-
-> +		break;
-> +	case SVM_VMGEXIT_AP_DESTROY:
-> +		break;
-> +	default:
-> +		vcpu_unimpl(vcpu, "vmgexit: invalid AP creation request [%#x] from guest\n",
-> +			    request);
-> +		break;
-> +	}
-> +
-> +out:
-> +	mutex_unlock(&target_svm->snp_vmsa_mutex);
-> +
-> +	if (kick) {
-> +		kvm_make_request(KVM_REQ_UPDATE_PROTECTED_GUEST_STATE, target_vcpu);
-> +		kvm_vcpu_kick(target_vcpu);
-> +	}
-> +}
-> +
->  int sev_handle_vmgexit(struct kvm_vcpu *vcpu)
->  {
->  	struct vcpu_svm *svm = to_svm(vcpu);
-> @@ -3523,6 +3649,11 @@ int sev_handle_vmgexit(struct kvm_vcpu *vcpu)
->  		ret = 1;
->  		break;
->  	}
-> +	case SVM_VMGEXIT_AP_CREATION:
-> +		sev_snp_ap_creation(svm);
-> +
-> +		ret = 1;
-> +		break;
->  	case SVM_VMGEXIT_UNSUPPORTED_EVENT:
->  		vcpu_unimpl(vcpu,
->  			    "vmgexit: unsupported event - exit_info_1=%#llx, exit_info_2=%#llx\n",
-> @@ -3597,6 +3728,8 @@ void sev_es_create_vcpu(struct vcpu_svm *svm)
->  	set_ghcb_msr(svm, GHCB_MSR_SEV_INFO(GHCB_VERSION_MAX,
->  					    GHCB_VERSION_MIN,
->  					    sev_enc_bit));
-> +
-> +	mutex_init(&svm->snp_vmsa_mutex);
->  }
->  
->  void sev_es_prepare_guest_switch(struct vcpu_svm *svm, unsigned int cpu)
-> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-> index 74bc635c9608..078a569c85a8 100644
-> --- a/arch/x86/kvm/svm/svm.c
-> +++ b/arch/x86/kvm/svm/svm.c
-> @@ -1304,7 +1304,10 @@ static void svm_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event)
->  	svm->spec_ctrl = 0;
->  	svm->virt_spec_ctrl = 0;
->  
-> -	if (!init_event) {
-> +	if (init_event && svm->snp_vmsa_update_on_init) {
-
-This can race with sev_snp_ap_creation() since the new snp_vmsa_mutex isn't held.
-There needs to be smp_rmb() and smp_wmb() barriers to ensure correct ordering
-between snp_vmsa_update_on_init and consuming the new VMSA gpa.  And of course
-sev_snp_ap_creation() needs to have correct ordering, e.g. as is this code can
-see snp_vmsa_update_on_init=true before the new snp_vmsa_gpa is set.
-
-> +		svm->snp_vmsa_update_on_init = false;
-> +		sev_snp_update_protected_guest_state(vcpu);
-> +	} else {
->  		vcpu->arch.apic_base = APIC_DEFAULT_PHYS_BASE |
->  				       MSR_IA32_APICBASE_ENABLE;
->  		if (kvm_vcpu_is_reset_bsp(vcpu))
+Bjorn
