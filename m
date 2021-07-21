@@ -2,227 +2,221 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id CFE143D0CC4
-	for <lists+kvm@lfdr.de>; Wed, 21 Jul 2021 13:09:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2509D3D0CC5
+	for <lists+kvm@lfdr.de>; Wed, 21 Jul 2021 13:09:34 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238151AbhGUJsS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 21 Jul 2021 05:48:18 -0400
-Received: from mga06.intel.com ([134.134.136.31]:58471 "EHLO mga06.intel.com"
+        id S238381AbhGUJsw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 21 Jul 2021 05:48:52 -0400
+Received: from mail.kernel.org ([198.145.29.99]:47472 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S237919AbhGUJVh (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 21 Jul 2021 05:21:37 -0400
-X-IronPort-AV: E=McAfee;i="6200,9189,10051"; a="272521459"
-X-IronPort-AV: E=Sophos;i="5.84,257,1620716400"; 
-   d="scan'208";a="272521459"
-Received: from fmsmga008.fm.intel.com ([10.253.24.58])
-  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Jul 2021 03:02:06 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.84,257,1620716400"; 
-   d="scan'208";a="470107477"
-Received: from fmsmsx606.amr.corp.intel.com ([10.18.126.86])
-  by fmsmga008.fm.intel.com with ESMTP; 21 Jul 2021 03:02:06 -0700
-Received: from fmsmsx607.amr.corp.intel.com (10.18.126.87) by
- fmsmsx606.amr.corp.intel.com (10.18.126.86) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2242.10; Wed, 21 Jul 2021 03:02:05 -0700
-Received: from fmsedg602.ED.cps.intel.com (10.1.192.136) by
- fmsmsx607.amr.corp.intel.com (10.18.126.87) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2242.10 via Frontend Transport; Wed, 21 Jul 2021 03:02:05 -0700
-Received: from NAM11-DM6-obe.outbound.protection.outlook.com (104.47.57.173)
- by edgegateway.intel.com (192.55.55.71) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2242.10; Wed, 21 Jul 2021 03:02:05 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=O7tnOp0+vwjT9+RdxvgxXbmT1y+T1iNg0k0V2J+55JBKkwL05QSKx0KtFnuVA5bVXu2VCjqz0URQcOdGAR1N+IRiI0LdkEXPuWDvZ7fGQ7lIH7h1rKfFtbZaO8p0JL8pxQBhKeWMjnDm96sgq+X0Gj4BMnObg90das37WGqo1UoeG6H8C8eMh++/IJ1MERc+IMJ5d4Wp2zOc276kki2Sbz73HZy/KnVKLIymm++jT7gNwiuPI16ViFy3KndMsF0rAcqw73Xu0AZko2quDt4aj85FiorZK6W/MZCeM3H5MZ2vL6ccNIOwIAhP9s7UomzezWnC9TIAZK+GZhADIpQQXQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=zAWjP+Vp2B+XLtJjxmEvx5hz2qErRTfk/uA2/Lc5QlQ=;
- b=GgYYHrGLXn5zIhFHUaPYCufPt8qRWUBJNiXycJI+RipFdKlZ+eSUMRihZi4RR+lrg3gz0lHQyrgio38bptVup0PFxm/gdyNj0WFTRSJmWIemRekm5vQ7XMi2cAd6pEqXBa8rwffiQpLMmsLMQRckWC/NajQ4PUARUpm3rBHU+MBG6W2cREHlsNwmajgsheR1OHS6cdkyeC1CQYEKjpS9NJ4PsBJN4FCYmbwmwrvBO86ujNFmm//A+Z+EjXPxafVYkf5bHAe4OKVGmaP9tBCUxWaysokytkrU3E0UngRGUEHrJ787xUWmgbJJkXa/mUlPfLZ6K36NyjnwxYnMr1vfsQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=intel.onmicrosoft.com;
- s=selector2-intel-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=zAWjP+Vp2B+XLtJjxmEvx5hz2qErRTfk/uA2/Lc5QlQ=;
- b=QVkS/OLLdCwMNvDua6aLZuyWN6jKuNsQxzZXRQm0TS3sA+ZaC1IA0Kzjkk73trS3DvagyQgc64YQGAZMRLufs1h5EsQajQoOeW5QKTOqBaXhNIGKgsT/fGmxFVTnHJ1UicaPC6IKl3DBrulyOB7rjnWgT6DXlKV3mFPfKxX9fFA=
-Received: from DM4PR11MB5453.namprd11.prod.outlook.com (2603:10b6:5:398::15)
- by DM4PR11MB5551.namprd11.prod.outlook.com (2603:10b6:5:392::24) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4331.32; Wed, 21 Jul
- 2021 10:02:04 +0000
-Received: from DM4PR11MB5453.namprd11.prod.outlook.com
- ([fe80::38aa:9c52:efcd:4652]) by DM4PR11MB5453.namprd11.prod.outlook.com
- ([fe80::38aa:9c52:efcd:4652%3]) with mapi id 15.20.4331.034; Wed, 21 Jul 2021
- 10:02:03 +0000
-From:   "Hu, Robert" <robert.hu@intel.com>
-To:     Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-CC:     Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        Robert Hoo <robert.hu@linux.intel.com>
-Subject: RE: [PATCH] KVM: nVMX: Dynamically compute max VMCS index for vmcs12
-Thread-Topic: [PATCH] KVM: nVMX: Dynamically compute max VMCS index for vmcs12
-Thread-Index: AQHXZIuB9zPySR3qkk2RxIcrlGLzAKseKLEAgAAIJYCALy/4cA==
-Date:   Wed, 21 Jul 2021 10:02:03 +0000
-Message-ID: <DM4PR11MB5453A57DAAC025417C22BCA4E0E39@DM4PR11MB5453.namprd11.prod.outlook.com>
-References: <20210618214658.2700765-1-seanjc@google.com>
- <c847e00a-e422-cdc9-3317-fbbd82b6e418@redhat.com>
- <YNDHfX0cntj72sk6@google.com>
-In-Reply-To: <YNDHfX0cntj72sk6@google.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-dlp-version: 11.5.1.3
-dlp-reaction: no-action
-dlp-product: dlpe-windows
-authentication-results: google.com; dkim=none (message not signed)
- header.d=none;google.com; dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 4be4a210-c5f7-49b2-d3fb-08d94c2e9745
-x-ms-traffictypediagnostic: DM4PR11MB5551:
-x-microsoft-antispam-prvs: <DM4PR11MB55516D3FE3F9ECB0D098D91FE0E39@DM4PR11MB5551.namprd11.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:10000;
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: PqqWt4jY924UDURcYdVHyztEhtp/h57Ma2BDCv24bsQbI5uC2Wy9FYHCAYAGmfyTpuFCWlKUrGneFqY5bGNMUosLRhleRk5x3Y/lz5hCNdvnduu4choGAbYb+Zwok6UQgh+7cOFv1E5URz7OCRxVCSTRzTL8i7PDYlaPnrHUv+g8owN62ltVe0QIWcpXc5yzHDYTMeepopctmtoitmjNYi3QN1EVjJjpH82+cMTBFC5ekMmEv3P77XOgmIzjtCdhHytxPLBTVRNUclLflUfBWJjmNUUL894xuF/w7YiK1BW1QZgjheV2bc5Z++VeDSAoRAq/MRsJ23QjYoT/81ZWpmraiNRWhFk4wDEwvruvnVHa4T1LmO6ZyWfFdEWgGowhiUyBXtzoGe7DfDbrfZQqJBfE5ywwA/HxD1wxEGPlk+/9+Xtl59ujGrC8IA2NbEcCcdzOj8BU9FGp6W7nqMwuJXKxSiGY0Gtn7w8mD+4jiX3QBS3IYEsjSoufkxDH4v9NbtzwJKhzIZvTQnu354aUdkbpT0nUu0wYcHpKLYC5yOapM4q+PV8PPKef71qWKNMZf9SimLVywqaYR/oaM5Sfjci6C0Rwo7M/bmMGsdxf9axGi9jrLyOZku1ynwp7tBx4z2CSZVXRua1v/jGDDx1z565WVhMTeIWMWnrsJDveI6hI3aNTp9tirrQZnAAqZI2RwRS9jd5Sm8M+UcatMOqO0w==
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR11MB5453.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(396003)(346002)(136003)(366004)(39860400002)(376002)(7696005)(8936002)(8676002)(186003)(55016002)(83380400001)(52536014)(71200400001)(86362001)(110136005)(54906003)(5660300002)(64756008)(66446008)(6506007)(66556008)(4326008)(66476007)(76116006)(26005)(53546011)(316002)(66946007)(122000001)(38100700002)(478600001)(2906002)(9686003)(33656002)(38070700004);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?tu+6aGt0+DQwt0K4atvtuMnGSnqvyGn7Ba7pHY2z4TiBjXs+qR5VmdBAmRk6?=
- =?us-ascii?Q?Z8DIgg8W3bkrwMiNlaiNXm83Aj+w+W+LvIqxDH/ZjM2Om+W8YITG9zL0KlsE?=
- =?us-ascii?Q?PR2Mh/N+gazQb6y/tQWcpkVxu801vm0ap3qcEZjw75FGpuQpVG1EutahJ596?=
- =?us-ascii?Q?+QE2Gv+slyWN/XpIZ1PTBKuuFDLgzVg/BH/um3tP+2QJQ/eHbwl1BlR/KHCn?=
- =?us-ascii?Q?XkkuXtnaeZ7+Zd7ln/o+6eKhpjy9Ip/dHZyUVNg7l7WpU1MwcyRwX7IoYHJ1?=
- =?us-ascii?Q?89RAVpoeWOLHpokXLRjlA1dLKpUStl1V8+uMhtP8Mo8TysL5IFOISeN3dGTg?=
- =?us-ascii?Q?pebWc9TaQ+u9KAN342yc5rgN1/rRRjDw6Q79OzuiXJZnk17ZlvWr61T/OPcp?=
- =?us-ascii?Q?ZHvJY0k2c+IPbVuDwDORQO7bwSZNmT+o2Y6wUAryGdbiMQiqAlCD28alRAZ7?=
- =?us-ascii?Q?0H/TD3ydUfSoqR8kNgx4xifmWKVt6Vf66BfZatUwsF4TjirXK1OPcL5wxtru?=
- =?us-ascii?Q?BksICNnO//F0y+GU9fmRsZC8OxDgsP8nLYpUMyOLkJJb0govJBfbffdF3Xjf?=
- =?us-ascii?Q?Mqmdg+7SZhzCYRC49NyMmlPg4WJ5Eglwl34A2SGZzTcDkMyX755TQcgl8u3k?=
- =?us-ascii?Q?iE8Srw608nj8CpWyVZ6rXi3HXI/2GRXp8gCPX1OiKJ+6x/Ck6nSJHnK07SuH?=
- =?us-ascii?Q?G/WXIuYtYPauRNRTlfU2uyXeaJ/gbbEfpwV3zskLHHYrXQWvW7BL3iRexVgG?=
- =?us-ascii?Q?v9uKYqrfmE5xB+XBMX5EhQmYhiIAnu0TaK/3342ZHCtNb6SywDcZ9IhcPQ6m?=
- =?us-ascii?Q?aEJTmBWxOym+13kU6LTpnXJRX/wVUwk/CysO69Of1l3k7nvcIIFiUMwnatmU?=
- =?us-ascii?Q?8bMpkk0kQJ903hhxH8GMzc6ruF/BPta7h6U60TS71Y/67+zHhOhhKum27wo8?=
- =?us-ascii?Q?5Q6+bE0n6vYcUTJajRZDoxFrjdXKrvS5MPTIwwRbvMggjIrX1s/LW5GhChxJ?=
- =?us-ascii?Q?5+6pIZ3JUVDRzHmnSmvghyV2NpJMfgQ4QI4wukxqD+3ijOYnvAbH29khVsMT?=
- =?us-ascii?Q?HPYA2tnn6Ri207DZ8Z5tD+VHGcqN9AZWpBbT0gqWxdeBMAbDjaiTqCLvvXI1?=
- =?us-ascii?Q?e8dqZYBHrjaQGHwNxZbxYFKSSVRlZ8eul4/7PtJmhzTNnGCL83hUorfrUhef?=
- =?us-ascii?Q?7XWaO6IhNYJ1bmlLMncEqAV7nBWbt2MonLHa3uEsMHgceuqbeiVXg4YZDvBD?=
- =?us-ascii?Q?FY6EqZCYpLuDeJeB4BGrJBaRghd6VTCeQL3zobiEOJ2lGrP3DDnRcK0OTLJm?=
- =?us-ascii?Q?p+cR6iBdrwuwjlpuaUjYZOnE?=
-x-ms-exchange-transport-forked: True
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+        id S238695AbhGUJ3J (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 21 Jul 2021 05:29:09 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 0BAC960FE7;
+        Wed, 21 Jul 2021 10:09:43 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+        s=korg; t=1626862185;
+        bh=AkCAzoeKK4dm3J0IYr3eqKdLUog3VqnY+aXSEhth1R0=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=c1tD+1+8N7ya+U+R4FoCk5r1AY0+njsEQDtKrpnu5fKg2Nsyw8ad0RAbDRa8LMlYN
+         kIGK/SB0S4EC/Bt9LoElGD8+QX12QgKfoR1683w3NYrmezl45haNH7nWDa/e7NVumf
+         ZIzS+wQ0FwO2WzFS4jJEXOjj+Re557OYzd+zf9Xc=
+Date:   Wed, 21 Jul 2021 12:09:41 +0200
+From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To:     Uwe =?iso-8859-1?Q?Kleine-K=F6nig?= 
+        <u.kleine-koenig@pengutronix.de>
+Cc:     kernel@pengutronix.de,
+        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+        Alexandre Belloni <alexandre.belloni@bootlin.com>,
+        Alexandre Bounine <alex.bou9@gmail.com>,
+        Alex Dubov <oakad@yahoo.com>, Alex Elder <elder@kernel.org>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Alison Schofield <alison.schofield@intel.com>,
+        Allen Hubbe <allenbh@gmail.com>,
+        Andreas Noever <andreas.noever@gmail.com>,
+        Andy Gross <agross@kernel.org>, Arnd Bergmann <arnd@arndb.de>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        Benjamin Tissoires <benjamin.tissoires@redhat.com>,
+        Ben Widawsky <ben.widawsky@intel.com>,
+        Bjorn Andersson <bjorn.andersson@linaro.org>,
+        Bjorn Helgaas <bhelgaas@google.com>,
+        Bodo Stroesser <bostroesser@gmail.com>,
+        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
+        Chen-Yu Tsai <wens@csie.org>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Cristian Marussi <cristian.marussi@arm.com>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Dave Jiang <dave.jiang@intel.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        David Woodhouse <dwmw@amazon.co.uk>,
+        Dexuan Cui <decui@microsoft.com>,
+        Dmitry Torokhov <dmitry.torokhov@gmail.com>,
+        Dominik Brodowski <linux@dominikbrodowski.net>,
+        Eric Farman <farman@linux.ibm.com>,
+        Finn Thain <fthain@linux-m68k.org>,
+        Florian Fainelli <f.fainelli@gmail.com>,
+        Frank Li <lznuaa@gmail.com>,
+        Geert Uytterhoeven <geert@linux-m68k.org>,
+        Geoff Levand <geoff@infradead.org>,
+        Haiyang Zhang <haiyangz@microsoft.com>,
+        Halil Pasic <pasic@linux.ibm.com>,
+        Hannes Reinecke <hare@suse.de>,
+        Hans de Goede <hdegoede@redhat.com>,
+        Harald Freudenberger <freude@linux.ibm.com>,
+        Heikki Krogerus <heikki.krogerus@linux.intel.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Helge Deller <deller@gmx.de>, Ira Weiny <ira.weiny@intel.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        "James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>,
+        Jaroslav Kysela <perex@perex.cz>,
+        Jason Wang <jasowang@redhat.com>,
+        Jens Taprogge <jens.taprogge@taprogge.org>,
+        Jernej Skrabec <jernej.skrabec@gmail.com>,
+        Jiri Kosina <jikos@kernel.org>,
+        Jiri Slaby <jirislaby@kernel.org>,
+        Joey Pabalan <jpabalanb@gmail.com>,
+        Johan Hovold <johan@kernel.org>,
+        Johannes Berg <johannes@sipsolutions.net>,
+        Johannes Thumshirn <morbidrsa@gmail.com>,
+        Jon Mason <jdmason@kudzu.us>, Juergen Gross <jgross@suse.com>,
+        Julien Grall <jgrall@amazon.com>,
+        Kai-Heng Feng <kai.heng.feng@canonical.com>,
+        Kirti Wankhede <kwankhede@nvidia.com>,
+        Kishon Vijay Abraham I <kishon@ti.com>,
+        Krzysztof =?utf-8?Q?Wilczy=C5=84ski?= <kw@linux.com>,
+        "K. Y. Srinivasan" <kys@microsoft.com>,
+        Lee Jones <lee.jones@linaro.org>, Len Brown <lenb@kernel.org>,
+        Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>,
+        Manohar Vanga <manohar.vanga@gmail.com>,
+        Marc Zyngier <maz@kernel.org>, Mark Brown <broonie@kernel.org>,
+        Mark Gross <mgross@linux.intel.com>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Martyn Welch <martyn@welchs.me.uk>,
+        Mathieu Poirier <mathieu.poirier@linaro.org>,
+        Matthew Rosato <mjrosato@linux.ibm.com>,
+        Matt Porter <mporter@kernel.crashing.org>,
+        Mauro Carvalho Chehab <mchehab@kernel.org>,
+        Maxime Ripard <mripard@kernel.org>,
+        Maximilian Luz <luzmaximilian@gmail.com>,
+        Maxim Levitsky <maximlevitsky@gmail.com>,
+        Michael Buesch <m@bues.ch>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Michael Jamet <michael.jamet@intel.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Mika Westerberg <mika.westerberg@linux.intel.com>,
+        Mike Christie <michael.christie@oracle.com>,
+        Moritz Fischer <mdf@kernel.org>,
+        Ohad Ben-Cohen <ohad@wizery.com>,
+        Pali =?iso-8859-1?Q?Roh=E1r?= <pali@kernel.org>,
+        Paul Mackerras <paulus@samba.org>,
+        Peter Oberparleiter <oberpar@linux.ibm.com>,
+        "Rafael J. Wysocki" <rjw@rjwysocki.net>,
+        =?utf-8?B?UmFmYcWCIE1pxYJlY2tp?= <zajec5@gmail.com>,
+        Rich Felker <dalias@libc.org>,
+        Rikard Falkeborn <rikard.falkeborn@gmail.com>,
+        Rob Herring <robh@kernel.org>,
+        Russell King <linux@armlinux.org.uk>,
+        "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
+        Samuel Holland <samuel@sholland.org>,
+        Samuel Iglesias Gonsalvez <siglesias@igalia.com>,
+        SeongJae Park <sjpark@amazon.de>,
+        Srinivas Kandagatla <srinivas.kandagatla@linaro.org>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        Stefano Stabellini <sstabellini@kernel.org>,
+        Stefan Richter <stefanr@s5r6.in-berlin.de>,
+        Stephen Boyd <sboyd@kernel.org>,
+        Stephen Hemminger <sthemmin@microsoft.com>,
+        Sudeep Holla <sudeep.holla@arm.com>,
+        Sven Van Asbroeck <TheSven73@gmail.com>,
+        Takashi Iwai <tiwai@suse.com>,
+        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+        Thorsten Scherer <t.scherer@eckelmann.de>,
+        Tomas Winkler <tomas.winkler@intel.com>,
+        Tom Rix <trix@redhat.com>,
+        Tyrel Datwyler <tyreld@linux.ibm.com>,
+        Ulf Hansson <ulf.hansson@linaro.org>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Vineeth Vijayan <vneethv@linux.ibm.com>,
+        Vinod Koul <vkoul@kernel.org>,
+        Vishal Verma <vishal.l.verma@intel.com>,
+        Wei Liu <wei.liu@kernel.org>,
+        William Breathitt Gray <vilhelm.gray@gmail.com>,
+        Wolfram Sang <wsa@kernel.org>, Wu Hao <hao.wu@intel.com>,
+        Yehezkel Bernat <YehezkelShB@gmail.com>,
+        Yoshinori Sato <ysato@users.sourceforge.jp>,
+        YueHaibing <yuehaibing@huawei.com>,
+        Yufen Yu <yuyufen@huawei.com>, alsa-devel@alsa-project.org,
+        dmaengine@vger.kernel.org, greybus-dev@lists.linaro.org,
+        industrypack-devel@lists.sourceforge.net, kvm@vger.kernel.org,
+        linux1394-devel@lists.sourceforge.net, linux-acpi@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org,
+        linux-arm-msm@vger.kernel.org, linux-cxl@vger.kernel.org,
+        linux-fpga@vger.kernel.org, linux-hyperv@vger.kernel.org,
+        linux-i2c@vger.kernel.org, linux-i3c@lists.infradead.org,
+        linux-input@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-m68k@lists.linux-m68k.org, linux-media@vger.kernel.org,
+        linux-mips@vger.kernel.org, linux-mmc@vger.kernel.org,
+        linux-ntb@googlegroups.com, linux-parisc@vger.kernel.org,
+        linux-pci@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+        linux-remoteproc@vger.kernel.org, linux-s390@vger.kernel.org,
+        linux-scsi@vger.kernel.org, linux-serial@vger.kernel.org,
+        linux-sh@vger.kernel.org, linux-spi@vger.kernel.org,
+        linux-staging@lists.linux.dev, linux-sunxi@lists.linux.dev,
+        linux-usb@vger.kernel.org, linux-wireless@vger.kernel.org,
+        netdev@vger.kernel.org, nvdimm@lists.linux.dev,
+        platform-driver-x86@vger.kernel.org, sparclinux@vger.kernel.org,
+        target-devel@vger.kernel.org,
+        virtualization@lists.linux-foundation.org,
+        xen-devel@lists.xenproject.org
+Subject: Re: [PATCH v4 0/5] bus: Make remove callback return void
+Message-ID: <YPfyZen4Y0uDKqDT@kroah.com>
+References: <20210713193522.1770306-1-u.kleine-koenig@pengutronix.de>
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: DM4PR11MB5453.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 4be4a210-c5f7-49b2-d3fb-08d94c2e9745
-X-MS-Exchange-CrossTenant-originalarrivaltime: 21 Jul 2021 10:02:03.8513
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: /e6MpeGZ+cI+mZ/rXVQ//TPjz8ALt2LbMibJomJJVkICEugJoi91zNCZRHDOAnrCpMHLW6cCGu2RQLHFxxs3MQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR11MB5551
-X-OriginatorOrg: intel.com
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20210713193522.1770306-1-u.kleine-koenig@pengutronix.de>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-> -----Original Message-----
-> From: Sean Christopherson <seanjc@google.com>
-> Sent: Tuesday, June 22, 2021 01:08
-> To: Paolo Bonzini <pbonzini@redhat.com>
-> Cc: Vitaly Kuznetsov <vkuznets@redhat.com>; Wanpeng Li
-> <wanpengli@tencent.com>; Jim Mattson <jmattson@google.com>; Joerg
-> Roedel <joro@8bytes.org>; kvm@vger.kernel.org; linux-kernel@vger.kernel.o=
-rg
-> Subject: Re: [PATCH] KVM: nVMX: Dynamically compute max VMCS index for
-> vmcs12
->=20
-> On Mon, Jun 21, 2021, Paolo Bonzini wrote:
-> > On 18/06/21 23:46, Sean Christopherson wrote:
-> > > Calculate the max VMCS index for vmcs12 by walking the array to find
-> > > the actual max index.  Hardcoding the index is prone to bitrot, and
-> > > the calculation is only done on KVM bringup (albeit on every CPU,
-> > > but there aren't _that_ many null entries in the array).
-> > >
-> > > Fixes: 3c0f99366e34 ("KVM: nVMX: Add a TSC multiplier field in
-> > > VMCS12")
-> > > Signed-off-by: Sean Christopherson <seanjc@google.com>
-> > > ---
-> > >
-> > > Note, the vmx test in kvm-unit-tests will still fail using stock
-> > > QEMU, as QEMU also hardcodes and overwrites the MSR.  The test
-> > > passes if I hack KVM to ignore userspace (it was easier than rebuildi=
-ng
-> QEMU).
-> >
-> > Queued, thanks.  Without having checked the kvm-unit-tests sources
-> > very thoroughly, this might be a configuration issue in
-> > kvm-unit-tests; in theory "-cpu host" (unlike "-cpu
-> > host,migratable=3Dno") should not enable TSC scaling.
->=20
-> As noted in the code comments, KVM allows VMREAD/VMWRITE to all defined
-> fields, whether or not the field should actually exist for the vCPU model=
- doesn't
-> enter into the equation.  That's technically wrong as there are a number =
-of
-> fields that the SDM explicitly states exist iff a certain feature is supp=
-orted. =20
-[Hu, Robert]=20
-It's right that a number of fields' existence depends on some certain featu=
-re.
-Meanwhile, "IA32_VMX_VMCS_ENUM indicates to software the highest index
-value used in the encoding of any field *supported* by the processor", rath=
-er than
-*existed*.
-So my understanding is no matter what VMCS exec control field's value is se=
-t, value
-of IA32_VMX_VMCS_ENUM shall not be affected, as it reports the physical CPU=
-'s capability
-rather than runtime VMCS configuration.
-Back to nested case, L1's VMCS configuration lays the "physical" capability=
- for L2, right?
-nested_vmx_msrs or at least nested_vmx_msrs.vmcs_enum shall be put to vcpu
-scope, rather than current kvm global.
-Current nested_vmx_calc_vmcs_enum_msr() is invoked at early stage, before v=
-cpu features
-are settled. I think should be moved to later stage as well.
-=20
-> To fix that we'd need to add a "feature flag" to vmcs_field_to_offset_tab=
-le that is
-> checked against the vCPU model, though updating the MSR would probably fa=
-ll
-> onto userspace's shoulders?
->=20
-> And FWIW, this is the QEMU code:
->=20
->   #define VMCS12_MAX_FIELD_INDEX (0x17)
->=20
->   static void kvm_msr_entry_add_vmx(X86CPU *cpu, FeatureWordArray f)
->   {
->       ...
->=20
->       /*
->        * Just to be safe, write these with constant values.  The CRn_FIXE=
-D1
->        * MSRs are generated by KVM based on the vCPU's CPUID.
->        */
->       kvm_msr_entry_add(cpu, MSR_IA32_VMX_CR0_FIXED0,
->                         CR0_PE_MASK | CR0_PG_MASK | CR0_NE_MASK);
->       kvm_msr_entry_add(cpu, MSR_IA32_VMX_CR4_FIXED0,
->                         CR4_VMXE_MASK);
->       kvm_msr_entry_add(cpu, MSR_IA32_VMX_VMCS_ENUM,
->                         VMCS12_MAX_FIELD_INDEX << 1);
->   }
+On Tue, Jul 13, 2021 at 09:35:17PM +0200, Uwe Kleine-König wrote:
+> Hello,
+> 
+> this is v4 of the final patch set for my effort to make struct
+> bus_type::remove return void.
+> 
+> The first four patches contain cleanups that make some of these
+> callbacks (more obviously) always return 0. They are acked by the
+> respective maintainers. Bjorn Helgaas explicitly asked to include the
+> pci patch (#1) into this series, so Greg taking this is fine. I assume
+> the s390 people are fine with Greg taking patches #2 to #4, too, they
+> didn't explicitly said so though.
+> 
+> The last patch actually changes the prototype and so touches quite some
+> drivers and has the potential to conflict with future developments, so I
+> consider it beneficial to put these patches into next soon. I expect
+> that it will be Greg who takes the complete series, he already confirmed
+> via irc (for v2) to look into this series.
+> 
+> The only change compared to v3 is in the fourth patch where I modified a
+> few more drivers to fix build failures. Some of them were found by build
+> bots (thanks!), some of them I found myself using a regular expression
+> search. The newly modified files are:
+> 
+>  arch/sparc/kernel/vio.c
+>  drivers/nubus/bus.c
+>  drivers/sh/superhyway/superhyway.c
+>  drivers/vlynq/vlynq.c
+>  drivers/zorro/zorro-driver.c
+>  sound/ac97/bus.c
+> 
+> Best regards
+> Uwe
 
+Now queued up.  I can go make a git tag that people can pull from after
+0-day is finished testing this to verify all is good, if others need it.
+
+thanks,
+
+greg k-h
