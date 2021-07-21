@@ -2,108 +2,103 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B58283D0E34
-	for <lists+kvm@lfdr.de>; Wed, 21 Jul 2021 13:56:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 852613D0E72
+	for <lists+kvm@lfdr.de>; Wed, 21 Jul 2021 14:03:53 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238751AbhGULOz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 21 Jul 2021 07:14:55 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:28587 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S237768AbhGUKxM (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 21 Jul 2021 06:53:12 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1626867224;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=00OcMiF0F2gS1ZNqukAXzYGpVfpA2IKDuUHwrSni+LI=;
-        b=QlLvIsTAzVlCHnce7dFAPrTNmhByCL0HqjFkDqBaZnfO1GZC7Ejfvrm3zeBKkqbp5MiZWq
-        qh6XlcpgS8w99If2LHMGuxBcOEhWcH4IA6JN867XQXarx64+dM1ZFgvZc7R42RXc03625q
-        t8dMY9KsBkY66SOFsWxyN28veCQfIZM=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-364-zkp5VfsMM6-lurNQyTFRCA-1; Wed, 21 Jul 2021 07:33:43 -0400
-X-MC-Unique: zkp5VfsMM6-lurNQyTFRCA-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8D34510086C4;
-        Wed, 21 Jul 2021 11:33:39 +0000 (UTC)
-Received: from localhost (ovpn-112-135.ams2.redhat.com [10.36.112.135])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id E28BB60854;
-        Wed, 21 Jul 2021 11:33:30 +0000 (UTC)
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Jason Gunthorpe <jgg@nvidia.com>, David Airlie <airlied@linux.ie>,
-        Tony Krowiak <akrowiak@linux.ibm.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Daniel Vetter <daniel@ffwll.ch>,
-        Diana Craciun <diana.craciun@oss.nxp.com>,
-        dri-devel@lists.freedesktop.org,
-        Eric Auger <eric.auger@redhat.com>,
-        Eric Farman <farman@linux.ibm.com>,
-        Harald Freudenberger <freude@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        intel-gfx@lists.freedesktop.org,
-        intel-gvt-dev@lists.freedesktop.org,
-        Jani Nikula <jani.nikula@linux.intel.com>,
-        Jason Herne <jjherne@linux.ibm.com>,
-        Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
-        kvm@vger.kernel.org, Kirti Wankhede <kwankhede@nvidia.com>,
-        linux-doc@vger.kernel.org, linux-s390@vger.kernel.org,
-        Matthew Rosato <mjrosato@linux.ibm.com>,
-        Peter Oberparleiter <oberpar@linux.ibm.com>,
-        Halil Pasic <pasic@linux.ibm.com>,
-        Rodrigo Vivi <rodrigo.vivi@intel.com>,
-        Vineeth Vijayan <vneethv@linux.ibm.com>,
-        Zhi Wang <zhi.a.wang@intel.com>
-Cc:     "Raj, Ashok" <ashok.raj@intel.com>, Christoph Hellwig <hch@lst.de>,
-        Leon Romanovsky <leonro@nvidia.com>,
-        Max Gurtovoy <mgurtovoy@nvidia.com>,
-        Yishai Hadas <yishaih@nvidia.com>,
-        Zhenyu Wang <zhenyuw@linux.intel.com>
-Subject: Re: [PATCH v2 03/14] vfio: Introduce a vfio_uninit_group_dev() API
- call
-In-Reply-To: <3-v2-b6a5582525c9+ff96-vfio_reflck_jgg@nvidia.com>
-Organization: Red Hat GmbH
-References: <3-v2-b6a5582525c9+ff96-vfio_reflck_jgg@nvidia.com>
-User-Agent: Notmuch/0.32.1 (https://notmuchmail.org)
-Date:   Wed, 21 Jul 2021 13:33:29 +0200
-Message-ID: <877dhj9a0m.fsf@redhat.com>
+        id S238980AbhGULWo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 21 Jul 2021 07:22:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49286 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S238612AbhGULRQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 21 Jul 2021 07:17:16 -0400
+Received: from mail-pg1-x531.google.com (mail-pg1-x531.google.com [IPv6:2607:f8b0:4864:20::531])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 09B08C0613F0;
+        Wed, 21 Jul 2021 04:57:15 -0700 (PDT)
+Received: by mail-pg1-x531.google.com with SMTP id r21so1604708pgv.13;
+        Wed, 21 Jul 2021 04:57:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=to:cc:references:from:subject:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=1aayxhP7LR5pbpYNWPExB3m6iym6gHf5XQMlRKlxp94=;
+        b=Gb3sYMtxc/kWDCMnCmYUN5o70Tvt9W/hvjABaQVw6GepiW6AF7jJcANbzNBRV1gq0H
+         KVgsqId2MY+RXzDpDGY6dPw0M9zOWZUAQNGPy7PM2rys/HzrGgdYJ1JWxUE1QI9btZVV
+         O6Nge5AQbsqTmzXcQomJIje10kgbOVDLOw6CAEgavNSXA2gO45gvZInn+kY7JYMZv+qO
+         7oKYPWFeZHS6IplBXQIb7MGoEHkzU7p7v5SEAUS6Qb0XpyY5ciKG5wbqqw5mBV2thXmN
+         kc5wkdciG83RddYCL0ig7AXvXY6vLlAn6fNTtakKWWWjb2B/kLBoNRRLEWJHhmSw7M5h
+         laRg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:to:cc:references:from:subject:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=1aayxhP7LR5pbpYNWPExB3m6iym6gHf5XQMlRKlxp94=;
+        b=uJEdn8tjxHhJCruSReDaV0ZOgAvLnu9yr9M4loyMMjVorvNRI0CYggM0nItHGV/y4v
+         fieSuGoLFpwDT/XXuS+gM64Sjj0W6AT5HzwrX5Ph0y7uv3PDcgLT7PLn6tZJVll5MGVN
+         yFpU9xFiWxc5uFdr6rDxXqPFTVigl6yPKDvLp+s84o2uk6AYbXAsy45gr3OG6doqqLu0
+         DrpvWLutgCnYfW50E/71xlc5Jj+GljbnAHdkxKsPZ924ifcjGuJ+IjRAfwGqCS+dElAA
+         B+Sp4menyDj3PuG6tPvkbLsTyvNjXT9vq5CBuKjC883hThd2b6/yTQ8dxca48gHY6Ifh
+         LV3Q==
+X-Gm-Message-State: AOAM532FYp72Pa9LPt1LJFVv3hWiXCVJRtTJ2D8LnsQ3tTnqiaOlNSnA
+        MN8mlY8IECGg3QQjRsIPyyQ=
+X-Google-Smtp-Source: ABdhPJx8Jc6D+8J2xe+jplPG6WjflufBXyqLNydLZmg9K2ukmxfm1tClEJcFPfqxf5GDpWMtdTO8gQ==
+X-Received: by 2002:a63:a01:: with SMTP id 1mr35267098pgk.360.1626868633306;
+        Wed, 21 Jul 2021 04:57:13 -0700 (PDT)
+Received: from Likes-MacBook-Pro.local ([103.7.29.32])
+        by smtp.gmail.com with ESMTPSA id j12sm25930570pfj.208.2021.07.21.04.57.06
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 21 Jul 2021 04:57:12 -0700 (PDT)
+To:     Zhu Lingshan <lingshan.zhu@intel.com>
+Cc:     bp@alien8.de, seanjc@google.com, vkuznets@redhat.com,
+        wanpengli@tencent.com, jmattson@google.com, joro@8bytes.org,
+        kan.liang@linux.intel.com, ak@linux.intel.com,
+        wei.w.wang@intel.com, eranian@google.com, liuxiangdong5@huawei.com,
+        linux-kernel@vger.kernel.org, x86@kernel.org, kvm@vger.kernel.org,
+        boris.ostrvsky@oracle.com, Like Xu <like.xu@linux.intel.com>,
+        Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>,
+        Guo Ren <guoren@kernel.org>, Nick Hu <nickhu@andestech.com>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        linux-csky@vger.kernel.org, linux-riscv@lists.infradead.org,
+        xen-devel@lists.xenproject.org,
+        Peter Zijlstra <peterz@infradead.org>,
+        Paolo Bonzini <pbonzini@redhat.com>
+References: <20210716085325.10300-1-lingshan.zhu@intel.com>
+ <20210716085325.10300-2-lingshan.zhu@intel.com>
+From:   Like Xu <like.xu.linux@gmail.com>
+Subject: Re: [PATCH V8 01/18] perf/core: Use static_call to optimize
+ perf_guest_info_callbacks
+Message-ID: <fd117e37-8063-63a4-43cd-7cb555e5bab5@gmail.com>
+Date:   Wed, 21 Jul 2021 19:57:01 +0800
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0)
+ Gecko/20100101 Thunderbird/78.12.0
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+In-Reply-To: <20210716085325.10300-2-lingshan.zhu@intel.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jul 20 2021, Jason Gunthorpe <jgg@nvidia.com> wrote:
+On 16/7/2021 4:53 pm, Zhu Lingshan wrote:
+> +	} else if (xenpmu_data->pmu.r.regs.cpl & 3)
 
-> From: Max Gurtovoy <mgurtovoy@nvidia.com>
->
-> This pairs with vfio_init_group_dev() and allows undoing any state that is
-> stored in the vfio_device unrelated to registration. Add appropriately
-> placed calls to all the drivers.
->
-> The following patch will use this to add pre-registration state for the
-> device set.
->
-> Signed-off-by: Max Gurtovoy <mgurtovoy@nvidia.com>
-> Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
-> ---
->  Documentation/driver-api/vfio.rst            |  4 ++-
->  drivers/vfio/fsl-mc/vfio_fsl_mc.c            |  7 ++---
->  drivers/vfio/mdev/vfio_mdev.c                | 13 +++++++---
->  drivers/vfio/pci/vfio_pci.c                  |  6 +++--
->  drivers/vfio/platform/vfio_platform_common.c |  7 +++--
->  drivers/vfio/vfio.c                          |  5 ++++
->  include/linux/vfio.h                         |  1 +
->  samples/vfio-mdev/mbochs.c                   |  2 ++
->  samples/vfio-mdev/mdpy.c                     | 25 ++++++++++--------
->  samples/vfio-mdev/mtty.c                     | 27 ++++++++++++--------
->  10 files changed, 64 insertions(+), 33 deletions(-)
+Lingshan, serious for this version ?
 
-Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+arch/x86/xen/pmu.c:438:9: error: expected identifier or ‘(’ before ‘return’
+   438 |         return state;
+       |         ^~~~~~
+arch/x86/xen/pmu.c:439:1: error: expected identifier or ‘(’ before ‘}’ token
+   439 | }
+       | ^
+arch/x86/xen/pmu.c: In function ‘xen_guest_state’:
+arch/x86/xen/pmu.c:436:9: error: control reaches end of non-void 
+function [-Werror=return-type]
+   436 |         }
+       |         ^
+cc1: some warnings being treated as errors
 
+> +			state |= PERF_GUEST_USER;
+>   	}
