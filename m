@@ -2,93 +2,114 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id EB04E3D1538
-	for <lists+kvm@lfdr.de>; Wed, 21 Jul 2021 19:40:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 447373D155B
+	for <lists+kvm@lfdr.de>; Wed, 21 Jul 2021 19:46:59 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229975AbhGUQ7W (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 21 Jul 2021 12:59:22 -0400
-Received: from mail.kernel.org ([198.145.29.99]:52332 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229597AbhGUQ7W (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 21 Jul 2021 12:59:22 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 9CCB960BD3;
-        Wed, 21 Jul 2021 17:39:57 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1626889198;
-        bh=vxkURe61iwE39hj0EF+5bZCTtjoEwnhfxCFjfgtQ36o=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=RdtxAIqyvftI0HvvwlX5/SxdplcftLcb7cHzSZzSBeVa053tupBtoEUKK+jimZAgJ
-         tkbIIqTOuadoy+qdAfeIwXRtAxi/Kj5wQCCqhizUXhqKy2B82y+oLePK4giBu6pt6R
-         T0KR7cKCQR7Nx7Pkp10A6FaE9CpMSnwN1fCoT0xROCJANG6NU+Yks+lR9+4zDGz9Ho
-         I9SrNfzJZbdDUxQYd1jQXzdOHKC1/tvvCPf8Ahi7a6lhaFHer4LpllGZif9PS8einL
-         3MruM1W5dRoxn6n0H6TMJSVkAdtto1AscM8fUMR60Z/NVHZqCzbZVYB/YJupz86Ask
-         /e+RQ5VmxKTTQ==
-Date:   Wed, 21 Jul 2021 20:39:54 +0300
-From:   Leon Romanovsky <leonro@kernel.org>
-To:     Yishai Hadas <yishaih@nvidia.com>
-Cc:     bhelgaas@google.com, corbet@lwn.net, alex.williamson@redhat.com,
-        diana.craciun@oss.nxp.com, kwankhede@nvidia.com,
-        eric.auger@redhat.com, masahiroy@kernel.org,
-        michal.lkml@markovi.net, linux-pci@vger.kernel.org,
-        linux-doc@vger.kernel.org, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org, linux-kbuild@vger.kernel.org,
-        mgurtovoy@nvidia.com, jgg@nvidia.com, maorg@nvidia.com
-Subject: Re: [PATCH 12/12] vfio/pci: Introduce vfio_pci_core.ko
-Message-ID: <YPhb6o06fX+/FiTY@unreal>
-References: <20210721161609.68223-1-yishaih@nvidia.com>
- <20210721161609.68223-13-yishaih@nvidia.com>
+        id S236484AbhGURGV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 21 Jul 2021 13:06:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45580 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229794AbhGURGU (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 21 Jul 2021 13:06:20 -0400
+Received: from mail-ej1-x629.google.com (mail-ej1-x629.google.com [IPv6:2a00:1450:4864:20::629])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EB6ADC061575
+        for <kvm@vger.kernel.org>; Wed, 21 Jul 2021 10:46:56 -0700 (PDT)
+Received: by mail-ej1-x629.google.com with SMTP id oz7so4490291ejc.2
+        for <kvm@vger.kernel.org>; Wed, 21 Jul 2021 10:46:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=AxTvururg15eAgQqT/Vw3IaCmq/AtpICOLNE7tzoQWM=;
+        b=s0WASEAsAruBpiL/ESXJp2VeA5h+VTH0uEnk+LjAD3MHgy72GUAmI0zBPcvrD8s0SA
+         BWd9ei0B8Hv1rK7VYNbIu6CBlaBhnbfO64qTWXLIdQniLZyup1q2j9Bl5Ub6BeGijcX8
+         o2GowuJAhyePRBqL1PylmSGGCsNgtoGiloJFlPnxkrNT2U81r5Mxayn2fG2GDKvW/6Wr
+         JHGyMNfwDGxoCXuUwC54Cph9OIE9di/Zn5VNuNjuxY1xSE8IY6oZOFZOwV1+s5UgN5EL
+         WdegzQ2TXCJbEAUWTyI+Nys4iqZoAnBRb0CZnuj1SZTVekfvqquMS7B2ygo0sDqp4kYi
+         SlKA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=AxTvururg15eAgQqT/Vw3IaCmq/AtpICOLNE7tzoQWM=;
+        b=Lh5/h/fqvlCyktXHW2c2tOTR9wpNy9KQcQDC5H0D+i+ii9XuOWPrBQM42L2+SUZVeE
+         jZLNMeEbs/FNmHm93+4u5/XhXwuf8AANvRSsf09lZZ3XX3Ofi41nMgsM8sSwXcb4HhDR
+         DSr1VWQfnWxhBldxDFxD4GcGrs4uXuO98bXM6uTEDUlD0mdHvSo+S5yx1fv/ofvDOhmm
+         1yFSu5mqpbhzmAuJkk302ChGNd8DVQ2SdTMzzIeABS+ikWRUpXurnc3QgYfWTMYKhULX
+         a9dubutpOLXBwde+xzvNuQUyZC26o91uF4pI4y5P2Uw2YXCyxtARp6Ieg9cUnVNRB3JT
+         CpdA==
+X-Gm-Message-State: AOAM532y45m+GZshvJJfELl63mcMFkLfEYFBsJTV2vjjcg6tbP2KJaBI
+        VR0pz8hWg3gyk9ODD2jUIitCTA==
+X-Google-Smtp-Source: ABdhPJy4TQnKuFecqxFoIlEfztLPuXcjzFwaiFkqmvuxoQO+VS6qVLl59Uri6H53MV/Z29iViIl6mw==
+X-Received: by 2002:a17:907:170c:: with SMTP id le12mr41029420ejc.288.1626889615495;
+        Wed, 21 Jul 2021 10:46:55 -0700 (PDT)
+Received: from myrica (adsl-84-226-111-173.adslplus.ch. [84.226.111.173])
+        by smtp.gmail.com with ESMTPSA id qo6sm8570087ejb.122.2021.07.21.10.46.54
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 21 Jul 2021 10:46:55 -0700 (PDT)
+Date:   Wed, 21 Jul 2021 19:46:34 +0200
+From:   Jean-Philippe Brucker <jean-philippe@linaro.org>
+To:     Oliver Upton <oupton@google.com>
+Cc:     Alexandru Elisei <Alexandru.Elisei@arm.com>,
+        salil.mehta@huawei.com, lorenzo.pieralisi@arm.com,
+        kvm@vger.kernel.org, corbet@lwn.net, maz@kernel.org,
+        linux-kernel@vger.kernel.org, jonathan.cameron@huawei.com,
+        catalin.marinas@arm.com, pbonzini@redhat.com, will@kernel.org,
+        kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Subject: Re: [RFC PATCH 0/5] KVM: arm64: Pass PSCI to userspace
+Message-ID: <YPhdehJ2m/EEGkdT@myrica>
+References: <20210608154805.216869-1-jean-philippe@linaro.org>
+ <c29ff5c8-9c94-6a6c-6142-3bed440676bf@arm.com>
+ <YPW+Hv3r586zKxpY@myrica>
+ <CAOQ_QsjyP0PMGOorTss2Fpn011mHPwVqQ72x26Gs2L0bg2amsQ@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20210721161609.68223-13-yishaih@nvidia.com>
+In-Reply-To: <CAOQ_QsjyP0PMGOorTss2Fpn011mHPwVqQ72x26Gs2L0bg2amsQ@mail.gmail.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jul 21, 2021 at 07:16:09PM +0300, Yishai Hadas wrote:
-> From: Max Gurtovoy <mgurtovoy@nvidia.com>
+On Mon, Jul 19, 2021 at 12:37:52PM -0700, Oliver Upton wrote:
+> On Mon, Jul 19, 2021 at 11:02 AM Jean-Philippe Brucker
+> <jean-philippe@linaro.org> wrote:
+> > We forward the whole PSCI function range, so it's either KVM or userspace.
+> > If KVM manages PSCI and the guest calls an unimplemented function, that
+> > returns directly to the guest without going to userspace.
+> >
+> > The concern is valid for any other range, though. If userspace enables the
+> > HVC cap it receives function calls that at some point KVM might need to
+> > handle itself. So we need some negotiation between user and KVM about the
+> > specific HVC ranges that userspace can and will handle.
 > 
-> Now that vfio_pci has been split into two source modules, one focusing
-> on the "struct pci_driver" (vfio_pci.c) and a toolbox library of code
-> (vfio_pci_core.c), complete the split and move them into two different
-> kernel modules.
+> Are we going to use KVM_CAPs for every interesting HVC range that
+> userspace may want to trap? I wonder if a more generic interface for
+> hypercall filtering would have merit to handle the aforementioned
+> cases, and whatever else a VMM will want to intercept down the line.
 > 
-> As before vfio_pci.ko continues to present the same interface under
-> sysfs and this change will have no functional impact.
-> 
-> Splitting into another module and adding exports allows creating new HW
-> specific VFIO PCI drivers that can implement device specific
-> functionality, such as VFIO migration interfaces or specialized device
-> requirements.
-> 
-> Signed-off-by: Max Gurtovoy <mgurtovoy@nvidia.com>
-> Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
-> Signed-off-by: Yishai Hadas <yishaih@nvidia.com>
-> ---
->  drivers/vfio/pci/Kconfig                      | 30 ++++++++------
->  drivers/vfio/pci/Makefile                     |  8 ++--
->  drivers/vfio/pci/vfio_pci.c                   | 14 ++-----
->  drivers/vfio/pci/vfio_pci_config.c            |  2 +-
->  drivers/vfio/pci/vfio_pci_core.c              | 41 ++++++++++++++++---
->  drivers/vfio/pci/vfio_pci_igd.c               |  2 +-
->  drivers/vfio/pci/vfio_pci_intrs.c             |  2 +-
->  drivers/vfio/pci/vfio_pci_rdwr.c              |  2 +-
->  drivers/vfio/pci/vfio_pci_zdev.c              |  2 +-
->  .../pci => include/linux}/vfio_pci_core.h     |  2 -
->  10 files changed, 66 insertions(+), 39 deletions(-)
->  rename {drivers/vfio/pci => include/linux}/vfio_pci_core.h (99%)
+> For example, x86 has the concept of 'MSR filtering', wherein userspace
+> can specify a set of registers that it wants to intercept. Doing
+> something similar for HVCs would avoid the need for a kernel change
+> each time a VMM wishes to intercept a new hypercall.
 
-<...>
+Yes we could introduce a VM device group for this:
+* User reads attribute KVM_ARM_VM_HVC_NR_SLOTS, which defines the number
+  of available HVC ranges.
+* User writes attribute KVM_ARM_VM_HVC_SET_RANGE with one range
+  struct kvm_arm_hvc_range {
+          __u32 slot;
+  #define KVM_ARM_HVC_USER (1 << 0) /* Enable range. 0 disables it */
+          __u16 flags;
+	  __u16 imm;
+          __u32 fn_start;
+          __u32 fn_end;
+  };
+* KVM forwards any HVC within this range to userspace.
+* If one of the ranges is PSCI functions, disable KVM PSCI.
 
-> -#include "vfio_pci_core.h"
-> +#include <linux/vfio_pci_core.h>
-> +
-> +#define DRIVER_VERSION  "0.2"
+Since it's more work for KVM to keep track of ranges, I didn't include it
+in the RFC, and I'm going to leave it to the next person dealing with this
+stuff :)
 
-<...>
-
-> +MODULE_VERSION(DRIVER_VERSION);
-
-Please don't add driver versions to the upstream kernel, they useless.
-
-Thanks
+Thanks,
+Jean
