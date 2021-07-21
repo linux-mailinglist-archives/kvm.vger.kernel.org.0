@@ -2,134 +2,102 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id CD6B63D1159
-	for <lists+kvm@lfdr.de>; Wed, 21 Jul 2021 16:30:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5CAE43D11C0
+	for <lists+kvm@lfdr.de>; Wed, 21 Jul 2021 16:58:42 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237349AbhGUNtm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 21 Jul 2021 09:49:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55944 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231791AbhGUNtj (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 21 Jul 2021 09:49:39 -0400
-Received: from mail-wr1-x42d.google.com (mail-wr1-x42d.google.com [IPv6:2a00:1450:4864:20::42d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A5965C061575
-        for <kvm@vger.kernel.org>; Wed, 21 Jul 2021 07:30:15 -0700 (PDT)
-Received: by mail-wr1-x42d.google.com with SMTP id i94so2430589wri.4
-        for <kvm@vger.kernel.org>; Wed, 21 Jul 2021 07:30:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=LsCZd4JYUlf4DgBXgVbea7RBOXoDbg1vUKFjYIRULao=;
-        b=aRMmcMrQz3DNodcGZGJNIgwPB9ul8Scws6Wh44encugspS+AkIqOs1L5KeTTCR2oCr
-         xm3up+Q1gK1r4UgRJfAUz0oWx54v97ib7+QiXJpg427VUpaTcC+kpFi2/kD7Pi2HuD9n
-         amhCyXF4Un6rMyMpJ7diOOYjlg1OEoudCOCJAHmUH2+Lk8EDjkFIEdZo6zCvF/+FEnum
-         pDNnXX42eNYuz/mqaozaReZ1dbcX5I19N5au4G2LtPAwqeEe/DqaFnJhKhtJjH0Ag/oC
-         S9iAWmdAyeBp8wGcibVN1oM45ePOc9cSysgEkLqnvI5ihNEyG+lZ2phdaums+IGcpXAw
-         ALBg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=LsCZd4JYUlf4DgBXgVbea7RBOXoDbg1vUKFjYIRULao=;
-        b=sVCz5pheiW6HcTxCltk7bPIyY6hm9+6JeWULMN/UMpjnjq24xSSad5ZNssqZrZSmSI
-         ogiY1dINtd0o+hzkWPycYUc2SFC2rAehm9vQh/ftQJBFT/Ai70qxZCQdpFLYAUhMcjeh
-         EkEDnwOiDlmTQ3TgLLPPZuNxzkg0N7WDMsEObmb7Coy/AkjALV46GdtrveY1UuPqeyMi
-         1lO/5T7x1jHrS3DgbRRFbSVCZpxsVVSc4w3zwGyokhLWbBZX2OOmTpke6jU4crYGcmHC
-         Wun4oHtZSxyi+qxwo9ecNaUKxhQ+AY1zaac+IdWr+gthwK4nTah0gWepns5MUyYEh03k
-         G6bA==
-X-Gm-Message-State: AOAM530wqRv9POvFZA/wej5lvh5R06Jgwc41uIIKwnm7RNHG3H+KS91o
-        /7HewSkTbOGCCONQTGg8NsK03/N1FiEJOw==
-X-Google-Smtp-Source: ABdhPJy+FE5eryA5W6yWBtAOKXEQABDp/4ZN/cKYH6WivHT4TnZA/3j3HuxrxR7/mHKgfaB1peeREg==
-X-Received: by 2002:adf:f149:: with SMTP id y9mr42188978wro.85.1626877814260;
-        Wed, 21 Jul 2021 07:30:14 -0700 (PDT)
-Received: from localhost.localdomain ([31.124.24.141])
-        by smtp.gmail.com with ESMTPSA id 19sm133900wmj.2.2021.07.21.07.30.13
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 21 Jul 2021 07:30:13 -0700 (PDT)
-From:   Lee Jones <lee.jones@linaro.org>
-To:     lee.jones@linaro.org
-Cc:     linux-kernel@vger.kernel.org, Ram Muthiah <rammuthiah@google.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Stefano Garzarella <sgarzare@redhat.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
-        netdev@vger.kernel.org
-Subject: [PATCH 1/1] virtio/vsock: Make vsock virtio packet buff size configurable
-Date:   Wed, 21 Jul 2021 15:30:00 +0100
-Message-Id: <20210721143001.182009-1-lee.jones@linaro.org>
-X-Mailer: git-send-email 2.32.0.402.g57bb445576-goog
+        id S239299AbhGUOSD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 21 Jul 2021 10:18:03 -0400
+Received: from mail.kernel.org ([198.145.29.99]:56312 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S233151AbhGUOR6 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 21 Jul 2021 10:17:58 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id BBCC06100C;
+        Wed, 21 Jul 2021 14:58:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1626879514;
+        bh=5qyI/dHQJICF0PI2wKZT99Bdl/k2f3fmU1dVHwc/8s0=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=hIb2Qs9AMnjjTxASv+1K/W04SwruC8bJ3jE/kKRcHTiVA/VFjxNybv99GVYp5KJU+
+         Y9u1tG5xl86/3dBZd1IFXJx/eB/TxK16lWKrYe/jfUd7h9f7i4ljjV8yJb2AUF8m6G
+         LADuVspziD0GkzprmshJpVafgcrM2WoDclvJdF+NK7RXhekmCNf9jPrq0p1WnPMIGa
+         vhSY6VVHZB/R6uitg1ZBSrNiVmFtFbrUTJXFnXDAGBe2bCnbj5i1728wtIOCXad7ge
+         GZYrChF0IGZadDFcqJAeoC7y30hxdZNFReq3dRRpHfMULW6Qa3ftNd3EgPIhn0YGz/
+         8aK3eBOhBjhZw==
+Date:   Wed, 21 Jul 2021 15:58:29 +0100
+From:   Will Deacon <will@kernel.org>
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Alexandru Elisei <alexandru.elisei@arm.com>,
+        Marc Zyngier <maz@kernel.org>,
+        linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org,
+        kvmarm@lists.cs.columbia.edu, linux-mm@kvack.org,
+        Matthew Wilcox <willy@infradead.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Quentin Perret <qperret@google.com>,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        kernel-team@android.com
+Subject: Re: [PATCH 1/5] KVM: arm64: Walk userspace page tables to compute
+ the THP mapping size
+Message-ID: <20210721145828.GA11003@willie-the-truck>
+References: <20210717095541.1486210-1-maz@kernel.org>
+ <20210717095541.1486210-2-maz@kernel.org>
+ <f09c297b-21dd-a6fa-6e72-49587ba80fe5@arm.com>
+ <YPczKoLqlKElLxzb@google.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <YPczKoLqlKElLxzb@google.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Ram Muthiah <rammuthiah@google.com>
+Hey Sean,
 
-After a virtual device has been running for some time, the SLAB
-sustains ever increasing fragmentation. Contributing to this
-fragmentation are the virtio packet buffer allocations which
-are a drain on 64Kb compound pages. Eventually these can't be
-allocated due to fragmentation.
+On Tue, Jul 20, 2021 at 08:33:46PM +0000, Sean Christopherson wrote:
+> On Tue, Jul 20, 2021, Alexandru Elisei wrote:
+> > I just can't figure out why having the mmap lock is not needed to walk the
+> > userspace page tables. Any hints? Or am I not seeing where it's taken?
+> 
+> Disclaimer: I'm not super familiar with arm64's page tables, but the relevant KVM
+> functionality is common across x86 and arm64.
 
-To enable successful allocations for this packet buffer, the
-packet buffer's size needs to be reduced.
+No need for the disclaimer, there are so many moving parts here that I don't
+think it's possible to be familiar with them all! Thanks for taking the time
+to write it up so clearly.
 
-In order to enable a reduction without impacting current users,
-this variable is being exposed as a command line parameter.
+> KVM arm64 (and x86) unconditionally registers a mmu_notifier for the mm_struct
+> associated with the VM, and disallows calling ioctls from a different process,
+> i.e. walking the page tables during KVM_RUN is guaranteed to use the mm for which
+> KVM registered the mmu_notifier.  As part of registration, the mmu_notifier
+> does mmgrab() and doesn't do mmdrop() until it's unregistered.  That ensures the
+> mm_struct itself is live.
+> 
+> For the page tables liveliness, KVM implements mmu_notifier_ops.release, which is
+> invoked at the beginning of exit_mmap(), before the page tables are freed.  In
+> its implementation, KVM takes mmu_lock and zaps all its shadow page tables, a.k.a.
+> the stage2 tables in KVM arm64.  The flow in question, get_user_mapping_size(),
+> also runs under mmu_lock, and so effectively blocks exit_mmap() and thus is
+> guaranteed to run with live userspace tables.
 
-Cc: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Jason Wang <jasowang@redhat.com>
-Cc: Stefan Hajnoczi <stefanha@redhat.com>
-Cc: Stefano Garzarella <sgarzare@redhat.com>
-Cc: "David S. Miller" <davem@davemloft.net>
-Cc: Jakub Kicinski <kuba@kernel.org>
-Cc: virtualization@lists.linux-foundation.org
-Cc: kvm@vger.kernel.org
-Cc: netdev@vger.kernel.org
-Signed-off-by: Ram Muthiah <rammuthiah@google.com>
-Signed-off-by: Lee Jones <lee.jones@linaro.org>
----
- include/linux/virtio_vsock.h            | 4 +++-
- net/vmw_vsock/virtio_transport_common.c | 4 ++++
- 2 files changed, 7 insertions(+), 1 deletion(-)
+Unless I missed a case, exit_mmap() only runs when mm_struct::mm_users drops
+to zero, right? The vCPU tasks should hold references to that afaict, so I
+don't think it should be possible for exit_mmap() to run while there are
+vCPUs running with the corresponding page-table.
 
-diff --git a/include/linux/virtio_vsock.h b/include/linux/virtio_vsock.h
-index 35d7eedb5e8e4..8c77d60a74d34 100644
---- a/include/linux/virtio_vsock.h
-+++ b/include/linux/virtio_vsock.h
-@@ -7,9 +7,11 @@
- #include <net/sock.h>
- #include <net/af_vsock.h>
- 
-+extern uint virtio_transport_max_vsock_pkt_buf_size;
-+
- #define VIRTIO_VSOCK_DEFAULT_RX_BUF_SIZE	(1024 * 4)
- #define VIRTIO_VSOCK_MAX_BUF_SIZE		0xFFFFFFFFUL
--#define VIRTIO_VSOCK_MAX_PKT_BUF_SIZE		(1024 * 64)
-+#define VIRTIO_VSOCK_MAX_PKT_BUF_SIZE		virtio_transport_max_vsock_pkt_buf_size
- 
- enum {
- 	VSOCK_VQ_RX     = 0, /* for host to guest data */
-diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
-index 169ba8b72a630..d0d913afec8b6 100644
---- a/net/vmw_vsock/virtio_transport_common.c
-+++ b/net/vmw_vsock/virtio_transport_common.c
-@@ -26,6 +26,10 @@
- /* Threshold for detecting small packets to copy */
- #define GOOD_COPY_LEN  128
- 
-+uint virtio_transport_max_vsock_pkt_buf_size = 1024 * 64;
-+module_param(virtio_transport_max_vsock_pkt_buf_size, uint, 0444);
-+EXPORT_SYMBOL_GPL(virtio_transport_max_vsock_pkt_buf_size);
-+
- static const struct virtio_transport *
- virtio_transport_get_ops(struct vsock_sock *vsk)
- {
--- 
-2.32.0.402.g57bb445576-goog
+> Looking at the arm64 code, one thing I'm not clear on is whether arm64 correctly
+> handles the case where exit_mmap() wins the race.  The invalidate_range hooks will
+> still be called, so userspace page tables aren't a problem, but
+> kvm_arch_flush_shadow_all() -> kvm_free_stage2_pgd() nullifies mmu->pgt without
+> any additional notifications that I see.  x86 deals with this by ensuring its
+> top-level TDP entry (stage2 equivalent) is valid while the page fault handler is
+> running.
 
+But the fact that x86 handles this race has me worried. What am I missing?
+
+I agree that, if the race can occur, we don't appear to handle it in the
+arm64 backend.
+
+Cheers,
+
+Will
