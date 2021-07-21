@@ -2,247 +2,139 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 924803D139D
-	for <lists+kvm@lfdr.de>; Wed, 21 Jul 2021 18:16:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0A83B3D13EA
+	for <lists+kvm@lfdr.de>; Wed, 21 Jul 2021 18:19:03 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231756AbhGUPgB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 21 Jul 2021 11:36:01 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:41021 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230336AbhGUPgB (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 21 Jul 2021 11:36:01 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1626884197;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=IcSV6p3DsGPg3q7H9uG8rdf3PK9RYtHNWHXgMTJFgSw=;
-        b=NMUKOohnIJCthc4CkZnP9I08yNYMSMWd9mvOpv8lkKKpil9x3PJuAs22Pwui+O5DyT3PVa
-        fhSSmhUH/g9zXAKaav3cZn5yCR5gfRCSl5FeE1Q3Xt0cDC5xrZDln9BsizuNWR7lOzH8yJ
-        cMBcj7yi5CHtZdDYzYQSGNBL6chQmFE=
-Received: from mail-io1-f71.google.com (mail-io1-f71.google.com
- [209.85.166.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-264-bany-qnsPGuOTxXgxNKe9A-1; Wed, 21 Jul 2021 12:16:35 -0400
-X-MC-Unique: bany-qnsPGuOTxXgxNKe9A-1
-Received: by mail-io1-f71.google.com with SMTP id l15-20020a5e820f0000b02904bd1794d00eso1921101iom.7
-        for <kvm@vger.kernel.org>; Wed, 21 Jul 2021 09:16:35 -0700 (PDT)
+        id S234164AbhGUPiV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 21 Jul 2021 11:38:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53408 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S234351AbhGUPiT (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 21 Jul 2021 11:38:19 -0400
+Received: from mail-pg1-x536.google.com (mail-pg1-x536.google.com [IPv6:2607:f8b0:4864:20::536])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CA0F6C061575
+        for <kvm@vger.kernel.org>; Wed, 21 Jul 2021 09:18:54 -0700 (PDT)
+Received: by mail-pg1-x536.google.com with SMTP id u14so2345874pga.11
+        for <kvm@vger.kernel.org>; Wed, 21 Jul 2021 09:18:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=jlmR2FOonmL/63pitZehwQRYMbA6yhFj8rYQ3kGrZEU=;
+        b=eERMJWoVCwQq7vzCp2h2L4u/l2Dbh92XhsPYNxRqSp+TANc2GKl/AT6hkZ7ojAEPkT
+         tawMnFE6vYyiQ/KJJHuCBiwK4gubkcZmtjwEIx1oUjyEk2dakeOR7ObH0ozBjK4usQBH
+         /zFi2nzhqH4JSAAIUyWeFSwR/y7RPZXwQvW7NwMvhuPEkRczlP2zsxB4ivRpxe+davpW
+         mzmDUVAVuhL+8735q+I8RQ4KIkyW0wOZg5ZpwQxrhtUSVkHmXr6nwG37bwtGUjDWbsvY
+         xiIPWi4rHBryhy97/DNZXGiS62bVpZLbz3nICb5/dtMnPB5kRGkpJ02WG02K8bnyIILL
+         i9VA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=IcSV6p3DsGPg3q7H9uG8rdf3PK9RYtHNWHXgMTJFgSw=;
-        b=hvIAULJRqlPWkGpcWEOwmgBK9FF+1QfMBBTNoXSaBYmspPtz01uWEGbpEYH/es7bOT
-         ROpJ+JpjtQI6YPlcQ1i1ePjv7TnCavu9UCMAIY/NhMx0A2gb5kEH5Ac7jX9trI44Jf7V
-         N3MF20PWF9utGBJ99LttcRNBD5wV04o9ii/FRR/dG1r0rMJxT6fc+aO3OYYSn2Ed7OM8
-         heQ4rRW+Xjdm+se3soJd8PTdtjs3yW5UU2QPqotCXIJyC6DNJu0GhcPaYHi0P1N0soGN
-         o9fTWloWrlylKCjaSWUgM5EkbGRelxzNeCI30TV0x3UbU4u43LB8g2S4lj2ksHzZEtZ+
-         GKeQ==
-X-Gm-Message-State: AOAM531Yu/mNcfxE4HFnQGE4wt04g/s+El0T5f/up1oXCOL7yjBVuOhE
-        V8en7UZtnfgqFUWLrVGfs4aGbEIepWFS5ely4d+i9w5B7irt69OUtgkMYvFSpQ9LXHzwb+FdLdH
-        uC16Kx0FidOpP
-X-Received: by 2002:a05:6e02:ea9:: with SMTP id u9mr24497384ilj.174.1626884194626;
-        Wed, 21 Jul 2021 09:16:34 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJy/IBOod66B4GglMJLgXKr35GBUPC3amMbq6Jd0LtCJ6mFrJw0uOyg05WtQr7pLrGObTD7EEQ==
-X-Received: by 2002:a05:6e02:ea9:: with SMTP id u9mr24497370ilj.174.1626884194383;
-        Wed, 21 Jul 2021 09:16:34 -0700 (PDT)
-Received: from gator ([140.82.166.162])
-        by smtp.gmail.com with ESMTPSA id w14sm10296889ilj.76.2021.07.21.09.16.33
+        bh=jlmR2FOonmL/63pitZehwQRYMbA6yhFj8rYQ3kGrZEU=;
+        b=aBzIX2CsOxf1Fa7HqPlSkFp7/Iim9DWnSIXzUIz2VQlRbvgNXcGHip1z1Z2zAjtvGx
+         uy0bUQYPCtaitnanOqID9f2nh2NKKK0GEhUhwc/vPj8phbEAKyiIDF/srxCB955vh+gg
+         7OrzE74lX2i7QQ6AXjFs6Fh1O1qivTQ8jTG2iUmVRX106dPstFjTf+LTGw66Qd8+A9Fl
+         jJ47oMHJG9Ku3Bek02JzF/8CAIHLmnc2x/MsnnataXHpBU9EIedD3R3LRDTm2s5HHETU
+         b5Q0m1/jPJwSf04Cxhekto4eZJpEJK/OrDg/flOxSlD7X9kyS+9Xa3ht3CmAOyJoItfs
+         +VUQ==
+X-Gm-Message-State: AOAM5335bC8JXrMtgldCeSoe2tQbvZboCTky5eu3HG2nGj6eUmueQcPQ
+        2GNdLe4yIqwhLj6k95Vs4n1i7w==
+X-Google-Smtp-Source: ABdhPJwu8EMHORLpQ830hmtLewIMD4KzJnBIqmBF2yvCCsegIA/zYboFShntBB7PCCxumgWRDD4QNQ==
+X-Received: by 2002:a65:5186:: with SMTP id h6mr36710306pgq.62.1626884333648;
+        Wed, 21 Jul 2021 09:18:53 -0700 (PDT)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id z12sm22075927pjd.39.2021.07.21.09.18.52
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 21 Jul 2021 09:16:33 -0700 (PDT)
-Date:   Wed, 21 Jul 2021 18:16:31 +0200
-From:   Andrew Jones <drjones@redhat.com>
-To:     Oliver Upton <oupton@google.com>
-Cc:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
-        Marc Zyngier <maz@kernel.org>,
-        Raghavendra Rao Anata <rananta@google.com>,
-        Peter Shier <pshier@google.com>,
-        Sean Christopherson <seanjc@google.com>,
-        David Matlack <dmatlack@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        linux-arm-kernel@lists.infradead.org,
-        Jim Mattson <jmattson@google.com>
-Subject: Re: [PATCH v3 08/12] KVM: arm64: Allow userspace to configure a
- vCPU's virtual offset
-Message-ID: <20210721161631.mrfiuusc5zou4we5@gator>
-References: <20210719184949.1385910-1-oupton@google.com>
- <20210719184949.1385910-9-oupton@google.com>
+        Wed, 21 Jul 2021 09:18:53 -0700 (PDT)
+Date:   Wed, 21 Jul 2021 16:18:49 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     "Hu, Robert" <robert.hu@intel.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        Robert Hoo <robert.hu@linux.intel.com>
+Subject: Re: [PATCH] KVM: nVMX: Dynamically compute max VMCS index for vmcs12
+Message-ID: <YPhI6en2031rLpVT@google.com>
+References: <20210618214658.2700765-1-seanjc@google.com>
+ <c847e00a-e422-cdc9-3317-fbbd82b6e418@redhat.com>
+ <YNDHfX0cntj72sk6@google.com>
+ <DM4PR11MB5453A57DAAC025417C22BCA4E0E39@DM4PR11MB5453.namprd11.prod.outlook.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20210719184949.1385910-9-oupton@google.com>
+In-Reply-To: <DM4PR11MB5453A57DAAC025417C22BCA4E0E39@DM4PR11MB5453.namprd11.prod.outlook.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Jul 19, 2021 at 06:49:45PM +0000, Oliver Upton wrote:
-> Add a new vCPU attribute that allows userspace to directly manipulate
-> the virtual counter-timer offset. Exposing such an interface allows for
-> the precise migration of guest virtual counter-timers, as it is an
-> indepotent interface.
-> 
-> Uphold the existing behavior of writes to CNTVOFF_EL2 for this new
-> interface, wherein a write to a single vCPU is broadcasted to all vCPUs
-> within a VM.
-> 
-> Signed-off-by: Oliver Upton <oupton@google.com>
-> ---
->  Documentation/virt/kvm/devices/vcpu.rst | 22 ++++++++
->  arch/arm64/include/uapi/asm/kvm.h       |  1 +
->  arch/arm64/kvm/arch_timer.c             | 68 ++++++++++++++++++++++++-
->  3 files changed, 89 insertions(+), 2 deletions(-)
-> 
-> diff --git a/Documentation/virt/kvm/devices/vcpu.rst b/Documentation/virt/kvm/devices/vcpu.rst
-> index b46d5f742e69..7b57cba3416a 100644
-> --- a/Documentation/virt/kvm/devices/vcpu.rst
-> +++ b/Documentation/virt/kvm/devices/vcpu.rst
-> @@ -139,6 +139,28 @@ configured values on other VCPUs.  Userspace should configure the interrupt
->  numbers on at least one VCPU after creating all VCPUs and before running any
->  VCPUs.
->  
-> +2.2. ATTRIBUTE: KVM_ARM_VCPU_TIMER_OFFSET_VTIMER
-> +------------------------------------------------
-> +
-> +:Parameters: Pointer to a 64-bit unsigned counter-timer offset.
-> +
-> +Returns:
-> +
-> +	 ======= ======================================
-> +	 -EFAULT Error reading/writing the provided
-> +	 	 parameter address
-> +	 -ENXIO  Attribute not supported
-> +	 ======= ======================================
-> +
-> +Specifies the guest's virtual counter-timer offset from the host's
-> +virtual counter. The guest's virtual counter is then derived by
-> +the following equation:
-> +
-> +  guest_cntvct = host_cntvct - KVM_ARM_VCPU_TIMER_OFFSET_VTIMER
-> +
-> +KVM does not allow the use of varying offset values for different vCPUs;
-> +the last written offset value will be broadcasted to all vCPUs in a VM.
-> +
->  3. GROUP: KVM_ARM_VCPU_PVTIME_CTRL
->  ==================================
->  
-> diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
-> index b3edde68bc3e..008d0518d2b1 100644
-> --- a/arch/arm64/include/uapi/asm/kvm.h
-> +++ b/arch/arm64/include/uapi/asm/kvm.h
-> @@ -365,6 +365,7 @@ struct kvm_arm_copy_mte_tags {
->  #define KVM_ARM_VCPU_TIMER_CTRL		1
->  #define   KVM_ARM_VCPU_TIMER_IRQ_VTIMER		0
->  #define   KVM_ARM_VCPU_TIMER_IRQ_PTIMER		1
-> +#define   KVM_ARM_VCPU_TIMER_OFFSET_VTIMER	2
->  #define KVM_ARM_VCPU_PVTIME_CTRL	2
->  #define   KVM_ARM_VCPU_PVTIME_IPA	0
->  
-> diff --git a/arch/arm64/kvm/arch_timer.c b/arch/arm64/kvm/arch_timer.c
-> index 3df67c127489..d2b1b13af658 100644
-> --- a/arch/arm64/kvm/arch_timer.c
-> +++ b/arch/arm64/kvm/arch_timer.c
-> @@ -1305,7 +1305,7 @@ static void set_timer_irqs(struct kvm *kvm, int vtimer_irq, int ptimer_irq)
->  	}
->  }
->  
-> -int kvm_arm_timer_set_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr)
-> +int kvm_arm_timer_set_attr_irq(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr)
->  {
->  	int __user *uaddr = (int __user *)(long)attr->addr;
->  	struct arch_timer_context *vtimer = vcpu_vtimer(vcpu);
-> @@ -1338,7 +1338,39 @@ int kvm_arm_timer_set_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr)
->  	return 0;
->  }
->  
-> -int kvm_arm_timer_get_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr)
-> +int kvm_arm_timer_set_attr_offset(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr)
-> +{
-> +	u64 __user *uaddr = (u64 __user *)(long)attr->addr;
-> +	u64 offset;
-> +
-> +	if (get_user(offset, uaddr))
-> +		return -EFAULT;
-> +
-> +	switch (attr->attr) {
-> +	case KVM_ARM_VCPU_TIMER_OFFSET_VTIMER:
-> +		update_vtimer_cntvoff(vcpu, offset);
-> +		break;
-> +	default:
-> +		return -ENXIO;
-> +	}
-> +
-> +	return 0;
-> +}
-> +
-> +int kvm_arm_timer_set_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr)
-> +{
-> +	switch (attr->attr) {
-> +	case KVM_ARM_VCPU_TIMER_IRQ_VTIMER:
-> +	case KVM_ARM_VCPU_TIMER_IRQ_PTIMER:
-> +		return kvm_arm_timer_set_attr_irq(vcpu, attr);
-> +	case KVM_ARM_VCPU_TIMER_OFFSET_VTIMER:
-> +		return kvm_arm_timer_set_attr_offset(vcpu, attr);
-> +	}
-> +
-> +	return -ENXIO;
-> +}
-> +
-> +int kvm_arm_timer_get_attr_irq(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr)
->  {
->  	int __user *uaddr = (int __user *)(long)attr->addr;
->  	struct arch_timer_context *timer;
-> @@ -1359,11 +1391,43 @@ int kvm_arm_timer_get_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr)
->  	return put_user(irq, uaddr);
->  }
->  
-> +int kvm_arm_timer_get_attr_offset(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr)
-> +{
-> +	u64 __user *uaddr = (u64 __user *)(long)attr->addr;
-> +	struct arch_timer_context *timer;
-> +	u64 offset;
-> +
-> +	switch (attr->attr) {
-> +	case KVM_ARM_VCPU_TIMER_OFFSET_VTIMER:
-> +		timer = vcpu_vtimer(vcpu);
-> +		break;
-> +	default:
-> +		return -ENXIO;
-> +	}
-> +
-> +	offset = timer_get_offset(timer);
-> +	return put_user(offset, uaddr);
-> +}
-> +
-> +int kvm_arm_timer_get_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr)
-> +{
-> +	switch (attr->attr) {
-> +	case KVM_ARM_VCPU_TIMER_IRQ_VTIMER:
-> +	case KVM_ARM_VCPU_TIMER_IRQ_PTIMER:
-> +		return kvm_arm_timer_get_attr_irq(vcpu, attr);
-> +	case KVM_ARM_VCPU_TIMER_OFFSET_VTIMER:
-> +		return kvm_arm_timer_get_attr_offset(vcpu, attr);
-> +	}
-> +
-> +	return -ENXIO;
-> +}
-> +
->  int kvm_arm_timer_has_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr)
->  {
->  	switch (attr->attr) {
->  	case KVM_ARM_VCPU_TIMER_IRQ_VTIMER:
->  	case KVM_ARM_VCPU_TIMER_IRQ_PTIMER:
-> +	case KVM_ARM_VCPU_TIMER_OFFSET_VTIMER:
->  		return 0;
->  	}
->  
-> -- 
-> 2.32.0.402.g57bb445576-goog
-> 
-> _______________________________________________
-> kvmarm mailing list
-> kvmarm@lists.cs.columbia.edu
-> https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+On Wed, Jul 21, 2021, Hu, Robert wrote:
+> > > Queued, thanks.  Without having checked the kvm-unit-tests sources
+> > > very thoroughly, this might be a configuration issue in
+> > > kvm-unit-tests; in theory "-cpu host" (unlike "-cpu
+> > > host,migratable=no") should not enable TSC scaling.
+> > 
+> > As noted in the code comments, KVM allows VMREAD/VMWRITE to all defined
+> > fields, whether or not the field should actually exist for the vCPU model doesn't
+> > enter into the equation.  That's technically wrong as there are a number of
+> > fields that the SDM explicitly states exist iff a certain feature is supported.  
 >
+> It's right that a number of fields' existence depends on some certain feature.
+> Meanwhile, "IA32_VMX_VMCS_ENUM indicates to software the highest index
+> value used in the encoding of any field *supported* by the processor", rather than
+> *existed*.
 
- 
-Reviewed-by: Andrew Jones <drjones@redhat.com>
+Yes.
 
+> So my understanding is no matter what VMCS exec control field's value is set,
+> value of IA32_VMX_VMCS_ENUM shall not be affected, as it reports the physical
+> CPU's capability rather than runtime VMCS configuration.
+
+Yes.
+
+> Back to nested case, L1's VMCS configuration lays the "physical" capability
+> for L2, right?
+
+Yes. 
+
+> nested_vmx_msrs or at least nested_vmx_msrs.vmcs_enum shall be put to vcpu
+> scope, rather than current kvm global.
+>
+> Current nested_vmx_calc_vmcs_enum_msr() is invoked at early stage, before
+> vcpu features are settled. I think should be moved to later stage as well.
+
+Just moving the helper (or adding another call) wouldn't fix the underlying
+problem that KVM doesn't correctly model the interplay between VMX features and
+VMCS fields.  It's arguably less wrong than letting userspace stuff an incorrect
+value, but it's not 100% correct and ignoring/overriding userspace is sketchy at
+best.  As suggested below, the full fix is to fail VMREAD/VMWRITE to fields that
+shouldn't exist given the vCPU model.
+
+> > To fix that we'd need to add a "feature flag" to vmcs_field_to_offset_table
+> > that is checked against the vCPU model, though updating the MSR would
+> > probably fall onto userspace's shoulders?
+> > 
+> > And FWIW, this is the QEMU code:
+> > 
+> >   #define VMCS12_MAX_FIELD_INDEX (0x17)
+> > 
+> >   static void kvm_msr_entry_add_vmx(X86CPU *cpu, FeatureWordArray f)
+> >   {
+> >       ...
+> > 
+> >       /*
+> >        * Just to be safe, write these with constant values.  The CRn_FIXED1
+> >        * MSRs are generated by KVM based on the vCPU's CPUID.
+> >        */
+> >       kvm_msr_entry_add(cpu, MSR_IA32_VMX_CR0_FIXED0,
+> >                         CR0_PE_MASK | CR0_PG_MASK | CR0_NE_MASK);
+> >       kvm_msr_entry_add(cpu, MSR_IA32_VMX_CR4_FIXED0,
+> >                         CR4_VMXE_MASK);
+> >       kvm_msr_entry_add(cpu, MSR_IA32_VMX_VMCS_ENUM,
+> >                         VMCS12_MAX_FIELD_INDEX << 1);
+> >   }
+> 
