@@ -2,210 +2,211 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 88B553D18DD
-	for <lists+kvm@lfdr.de>; Wed, 21 Jul 2021 23:17:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B579C3D18E2
+	for <lists+kvm@lfdr.de>; Wed, 21 Jul 2021 23:17:53 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229985AbhGUUhI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 21 Jul 2021 16:37:08 -0400
-Received: from mail-bn7nam10on2048.outbound.protection.outlook.com ([40.107.92.48]:51777
-        "EHLO NAM10-BN7-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S229748AbhGUUhI (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 21 Jul 2021 16:37:08 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=ST5CU+btcpaOJV+xPpbGFnZhyp/+Pna3m6tzfyTg1d90LJck+04pPLGght9NwlpMwJvks12BUYd1Zsw+/hyEr9F18cK+fbVSC0AoQjZG6A/tcevLCQYDyeTAho7KNRCWS+KJrwnxD4FQ5izMkaKWfeddjp0GQYSBW0AjsMkYfQIWEkQgtGMSKrDLANDvKX10KzerR5KJvemn6NHuL0O3EiPOckhuCHBiJktuCLZAI0Cz24M6pmRVsYDFOwzkDKDqhwY3XtyukeyZ+UhbClX36jJEwR7ATW5F7vWEUuJTf6A+Ih48T6ivfZsTCAG4ETiDnEQB+vezwRE3R28/VFpA9w==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=t+qkSGxcmLTfG0eDpBfX0+qiJAwxc3MsmwMXfR2oBmA=;
- b=QqtA/2sf9jhPqQ9ssR3bSgEOrbIvwG/hQTJbHNjEU+femAyOsHbDfzLIHmw7pnE+wKF5E0Ov79sCRSVWdQggKVE4UP5G7Wz3rhi8gYo98d4ldno2L8LGDKUboOUzMPessjUIPrUqRUqtVnvjJZwBpMvSA2ZTwxA0OMWyNaLgSmZN6GmEQYkeUcohoy2TuW5/+A+CpG5K8iTUYflcXowQDKZO06EWC4oUES9LsVuX/T0aor0+vYA+0jTwQbJYIfA7HauyKU7Ewi6md+6GRQSHR1jVDFuE+E+CR19M1Qm7fra+3zRrhMfcZzQI6+3ObjAHWW7yBvoUj5H0j+jkf55Qng==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=t+qkSGxcmLTfG0eDpBfX0+qiJAwxc3MsmwMXfR2oBmA=;
- b=ZHHyW6fNY6sajifXjhEAmu3KSNN9UWIzxVLjrnA+lwy5p9O6QgTlfY/8XCEsE5P1vfXR957i8M8v3bPPvAj6OQCGlgrKT/JMdtmo2eH+IfV0+rEoaTd2DP0PIBHRsj362bypfCnBS03zSrP7M8NNcdx4aoDucMT+tG9xBmXrXDA=
-Authentication-Results: lists.linux-foundation.org; dkim=none (message not
- signed) header.d=none;lists.linux-foundation.org; dmarc=none action=none
- header.from=amd.com;
-Received: from DM4PR12MB5229.namprd12.prod.outlook.com (2603:10b6:5:398::12)
- by DM8PR12MB5413.namprd12.prod.outlook.com (2603:10b6:8:3b::8) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.4331.32; Wed, 21 Jul 2021 21:17:41 +0000
-Received: from DM4PR12MB5229.namprd12.prod.outlook.com
- ([fe80::73:2581:970b:3208]) by DM4PR12MB5229.namprd12.prod.outlook.com
- ([fe80::73:2581:970b:3208%3]) with mapi id 15.20.4331.034; Wed, 21 Jul 2021
- 21:17:41 +0000
-Subject: Re: [PATCH 04/12] x86/sev: Do not hardcode GHCB protocol version
-To:     Joerg Roedel <joro@8bytes.org>, x86@kernel.org,
-        Eric Biederman <ebiederm@xmission.com>
-Cc:     kexec@lists.infradead.org, Joerg Roedel <jroedel@suse.de>,
-        hpa@zytor.com, Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Jiri Slaby <jslaby@suse.cz>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Juergen Gross <jgross@suse.com>,
-        Kees Cook <keescook@chromium.org>,
-        David Rientjes <rientjes@google.com>,
-        Cfir Cohen <cfir@google.com>,
-        Erdem Aktas <erdemaktas@google.com>,
-        Masami Hiramatsu <mhiramat@kernel.org>,
-        Mike Stunes <mstunes@vmware.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Martin Radev <martin.b.radev@gmail.com>,
-        Arvind Sankar <nivedita@alum.mit.edu>,
-        linux-coco@lists.linux.dev, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org
-References: <20210721142015.1401-1-joro@8bytes.org>
- <20210721142015.1401-5-joro@8bytes.org>
-From:   Tom Lendacky <thomas.lendacky@amd.com>
-Message-ID: <1eef6235-a8d0-1012-969e-ef6f0804d054@amd.com>
-Date:   Wed, 21 Jul 2021 16:17:38 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.11.0
-In-Reply-To: <20210721142015.1401-5-joro@8bytes.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: SA9PR13CA0026.namprd13.prod.outlook.com
- (2603:10b6:806:21::31) To DM4PR12MB5229.namprd12.prod.outlook.com
- (2603:10b6:5:398::12)
+        id S230079AbhGUUhN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 21 Jul 2021 16:37:13 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:58862 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S230034AbhGUUhN (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 21 Jul 2021 16:37:13 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1626902268;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=xS7zB88wP1Ct8tl3wZJBYvmGfA8uHUm0YRA5Jgo14nI=;
+        b=ClAqKbgyO5HD9JCMouZvHML1KjxMxp2XLFa/bDP04Ue+UFTDPznZpzM3YqxaVjmSXERr6K
+        8HOlCwinhsPe/gaZsZdSZyKPJDS0d1Pz7w+Uh1rQyAD+xB5U5t3GDTaZz7nJ0MDDIXqLXe
+        bg44uv0v5+KN67NyDXmFanq7hgbob4c=
+Received: from mail-il1-f197.google.com (mail-il1-f197.google.com
+ [209.85.166.197]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-473-jy7tl7CINNek5gtlop-z3g-1; Wed, 21 Jul 2021 17:17:47 -0400
+X-MC-Unique: jy7tl7CINNek5gtlop-z3g-1
+Received: by mail-il1-f197.google.com with SMTP id m15-20020a923f0f0000b02901ee102ac952so2295089ila.8
+        for <kvm@vger.kernel.org>; Wed, 21 Jul 2021 14:17:47 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=xS7zB88wP1Ct8tl3wZJBYvmGfA8uHUm0YRA5Jgo14nI=;
+        b=Nv6yvi9/A+Rcl86FjbCeeNWmsZsDmi90Yzcri8Rmwj/URpxC6LUCV6+ihvp5styjxq
+         uI2liHB2DCdKSXcMenPPIFNIRl5WxrSzVV3MkEXsYXVqRLZur6pJUIjWU3yPq2M3owny
+         5Fd4RasdAawrH6zgI2SPGlhXFPC4RY4h1yWo08/5wXwVQOm04abvURpoUMu0xx2Kh/lm
+         uHEa9/u3bVY2x4/bHGVDwz4ip08/6HD6onYKHbL04BW5qS3Bx38rvsuUwguJdxE6P4Pp
+         EKt9+aofrO4xMlf0v4je2kzv01fTzN1J2+LJ3h4fmyczRyt7YDeuGoNepqJZuRlwU8hj
+         CmaA==
+X-Gm-Message-State: AOAM532+EMkMc/3HIh9+4nlrLgZ02P9yduc/lCTTePmnSao0VmtBsCar
+        99saM6S1fh90jzrbMe8f+FxWF3/BsOkQWXDbp0ZJQgSZUqReGKze1w5wd2MungtVV4TdS65Xwiy
+        Q8SlRFJjSPXHx
+X-Received: by 2002:a05:6638:240c:: with SMTP id z12mr32205859jat.41.1626902266820;
+        Wed, 21 Jul 2021 14:17:46 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzBlvz5/fIzXCPHPyLAiDDc3sODGKzE5IDkrPThRVZQuX/uKMDGuLWG9b8A3eweAr3W8umHRw==
+X-Received: by 2002:a05:6638:240c:: with SMTP id z12mr32205837jat.41.1626902266587;
+        Wed, 21 Jul 2021 14:17:46 -0700 (PDT)
+Received: from gator ([140.82.166.162])
+        by smtp.gmail.com with ESMTPSA id w21sm14507636iol.52.2021.07.21.14.17.45
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 21 Jul 2021 14:17:45 -0700 (PDT)
+Date:   Wed, 21 Jul 2021 23:17:43 +0200
+From:   Andrew Jones <drjones@redhat.com>
+To:     Marc Zyngier <maz@kernel.org>
+Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        kernel-team@android.com, Srivatsa Vaddagiri <vatsa@codeaurora.org>,
+        Shanker R Donthineni <sdonthineni@nvidia.com>,
+        will@kernel.org
+Subject: Re: [PATCH 10/16] KVM: arm64: Add some documentation for the MMIO
+ guard feature
+Message-ID: <20210721211743.hb2cxghhwl2y22yh@gator>
+References: <20210715163159.1480168-1-maz@kernel.org>
+ <20210715163159.1480168-11-maz@kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from [10.236.30.241] (165.204.77.1) by SA9PR13CA0026.namprd13.prod.outlook.com (2603:10b6:806:21::31) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4373.7 via Frontend Transport; Wed, 21 Jul 2021 21:17:39 +0000
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: ade37281-6cd2-4a06-0c9e-08d94c8cf928
-X-MS-TrafficTypeDiagnostic: DM8PR12MB5413:
-X-Microsoft-Antispam-PRVS: <DM8PR12MB5413A78EDB749733D74224CEECE39@DM8PR12MB5413.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:7219;
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: iCKoYgpSZL/OpwOapXNZYNvUS9vJkHaCGvub9oMHGCtUJXyzmMotkbohZn5RGHot6qYaxMVHLnGfcZMHswSEgSOhOzcDAG5AE+x6CwQFQva75xPjfkvQMppd03FxMShHrZLyhtfcVEYwuuYiCyIbSwJa43stwfcia2FHWbmH1OOwUag4UpVC5tkX9WCSEaO2g84g954fdd75lIezlb9x6zn3nG8xgtBMCa4im6dM3BewlX/TnenF6li6ZiQlQrt1A9033CAB/keXa07S7UbZ4a6R5WMxneNk+53MLu/QBbfuRMzyvA5beE8QRuem6elXmdoktMtN4wCuYgVFHLtfDU4IaM9Rvw4JoMIGH8fAZUPOqeK2idEDLlWWm9693Ms22GQ7k3qobDwFarLVf93MN4o0Z0U+ADMMxjjDFSws7uGFw8Ijoz1HmeT9YpuNn88noaPWuwGCijlyjT5Q02gur/0lTzuxsa84ewSbXqYRM1IXlpFSYvnSusWsQEH1Ekm51iNkuo7FtkwxvPfI8+jPijyl76A7Z3uEiI+qU8oN7kV+tGhvTbMcB3ubHgeuIpXd1psZ0aau9a9eRc43uc4ibMdSPheLhf0AFx4zxXZ10D6/VRnVJ62M8dz0moOV9HwuOXtP00mzW7ST27xW9ozRtUiDzmC4KzuagV/K2S2CeGAcRVr9j2BhteJ0JthtC6Z4gBkjluNUVm30utj71qGQo/KjskM20MVJRwqn1UT68oYfivkSk9fWaLuiSxBpUY88
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR12MB5229.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(396003)(39860400002)(346002)(366004)(376002)(136003)(36756003)(38100700002)(31696002)(86362001)(8936002)(83380400001)(4326008)(53546011)(8676002)(5660300002)(16576012)(66476007)(26005)(66556008)(7416002)(66946007)(186003)(110136005)(31686004)(6486002)(478600001)(316002)(54906003)(956004)(2616005)(2906002)(43740500002)(45980500001);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?dG1LUzRZeUdsREVMM2JHL2hvVWpzTmhjOWRIS210dXNLdjAvZ251OWFxNGxQ?=
- =?utf-8?B?ZzJwSm5qejV6MjlCWVZtNms2QXhZaUlINWZEUmREWmg1MUorcHBvbkZ4RW84?=
- =?utf-8?B?QXBDS1hvWnAvNmtpejhMZUZ6bkVxbHJWRnAwTCs5bjNxak1ZeTdLN0ErcURJ?=
- =?utf-8?B?UEs3MG01cmJVUlhyVEtLYkJwRno5N1ZkY0srSUJ1dlJpcms4emNjMUg3SEJw?=
- =?utf-8?B?RFdVOUo0aDlLRTU2SlhsTEhxemtKVG9QdjRSTForaFVjNGxrSXZmbkdTcU00?=
- =?utf-8?B?Y2l3cVJVYStENXFwY1dkRStIMCtCb1p0UlNwZWFMcUhPbnpVSDBqSVJsNm1Y?=
- =?utf-8?B?STBKNVJUVTFKOVJ5S2xMeStKUDFwcUFrWUlQdTdhR0xIN1dzYmdPNi95NE8w?=
- =?utf-8?B?aUpLdk9nZ3dCWmpPalgxRG11ZGFsaVdJMFRvaGVYa2JKdHJDYXN3V3NWTHRP?=
- =?utf-8?B?SmcrQThQaXg5WVVQTDN5TStlMjlFVmpXTGtQSkFmVXdBY2IzMnpkT2oxc2J3?=
- =?utf-8?B?M05VeG1JeW45RC9QYnZlRkZkZ054Q2M5aEtnWERaZjgwenRIRjN0Mk5KS2VP?=
- =?utf-8?B?aUNkb0V2Q3k5Z2hZUjB0RlBZODVCV2tCQnNtK1YxdDJzbE8xQ3Q3M00yY0dO?=
- =?utf-8?B?TUFNWUJ4dmJBN3E0Mkp1VmN5U0tXM29FWUFza0wvNCt4Y2w5VXN5a1dQYlh0?=
- =?utf-8?B?MXJHR1JVOU9iWGdMeDI5d2lxaFIvR2NvL2tDR1RaN2ViRnNGdUx2b3V5V2ZQ?=
- =?utf-8?B?Q1luVVRIaEVlcmk2K3lNTzRNbTJXdmdWZnVwejcxN296Y25wdVY5VXNlSTRF?=
- =?utf-8?B?dnBUeUhoamFsY0QzaDUyQnNiSzRWbWpvSXdqZS9pOFNWYW9SVVljK0JSaHFC?=
- =?utf-8?B?WmhiY2xoZlR5SVlvWXJKZFozTUNGWTcyQ1BsOTR2TmhvQWpMSnh4QmNKQ3N5?=
- =?utf-8?B?KzBmamlpY0tSTzVITW51dkoyQXJqRkcvRkpyVU1pbDF6Z3BxMk9mOFRCWFhW?=
- =?utf-8?B?US9URnBYcDh2cENUWlo2THhWMlJNTnhUNXZMcTZRWCs3UWtodUJRKzVqWUxC?=
- =?utf-8?B?eC9zZGE2TVFERFBCQnQweisyRDl6OUdOaWpqbmFXSHRkU2w3ckUrcVRsZURF?=
- =?utf-8?B?Vjd2ZVNZOWxPaXoydm1ydmprd1FpNitSeWROUkRwS1RYOVAyUFp5MnFlMXha?=
- =?utf-8?B?SEdoSEFjOGtWOHZGcUZBMEl4QkFnR0xCbHVncTlGS3o5Vk9VMTFNYVU5ckFL?=
- =?utf-8?B?ZUkvWDdTd2tCSEdkVmV6UzFuODZCTnRMNzVOVzJSQytleDRUMS8rbmtLOGN4?=
- =?utf-8?B?KzFzL21zNjVaUVlxR2JlUkFQWjUwUTk2VFBNR3paaDlHVVRXK25ZeG93bHNE?=
- =?utf-8?B?VkhMRzFPVGNwOXNiaWVGcGhBSzhXNVdtNXlLNEFJNkNPN3NYQUFxNytWN1Fz?=
- =?utf-8?B?STdjR1BWcTNTdEo0cDNaSTkrRFJOQ1Nxcm83Z2ttUk1oTlc2blpzbVdid2tE?=
- =?utf-8?B?UDF3QTU3enlvaEVGOUljd1hzb1dUdzZPUWFMZmVKb1NrSHJlRUNVbUpXQ01z?=
- =?utf-8?B?aFJBSDJTcEJ4Y2c2Mk9YWmhQanZBeTRvV2dmT0VOb2RmZHJrM2hMR2xPZER2?=
- =?utf-8?B?MzRVL3pwYVk4bVk0b0tUemFzZzB2M2IxaWZiUHc1dmhWdzQraTJYamVLWlY3?=
- =?utf-8?B?ZE1iZjgwUVVNZ3hGS3ZTTThoTldINFI0cHlWVFozMnJJaHNXUk5WOEhEdXBQ?=
- =?utf-8?Q?VzbIlsMlYOTb9/tJ9HwOPMm014I2L/tL8yBa/Dy?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: ade37281-6cd2-4a06-0c9e-08d94c8cf928
-X-MS-Exchange-CrossTenant-AuthSource: DM4PR12MB5229.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Jul 2021 21:17:41.1309
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 9iPkJuLHNLE7q41GfmjuHActjg00e8OvXmtpDfk6/OUjgzkBF0l+InwvU9M5Ht5E7erNR4/+c2oXhtiMekzSnA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM8PR12MB5413
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210715163159.1480168-11-maz@kernel.org>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 7/21/21 9:20 AM, Joerg Roedel wrote:
-> From: Joerg Roedel <jroedel@suse.de>
+On Thu, Jul 15, 2021 at 05:31:53PM +0100, Marc Zyngier wrote:
+> Document the hypercalls user for the MMIO guard infrastructure.
 > 
-> Introduce the sev_get_ghcb_proto_ver() which will return the negotiated
-> GHCB protocol version and use it to set the version field in the GHCB.
-> 
-> Signed-off-by: Joerg Roedel <jroedel@suse.de>
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
 > ---
->  arch/x86/boot/compressed/sev.c | 5 +++++
->  arch/x86/kernel/sev-shared.c   | 5 ++++-
->  arch/x86/kernel/sev.c          | 5 +++++
->  3 files changed, 14 insertions(+), 1 deletion(-)
+>  Documentation/virt/kvm/arm/index.rst      |  1 +
+>  Documentation/virt/kvm/arm/mmio-guard.rst | 73 +++++++++++++++++++++++
+>  2 files changed, 74 insertions(+)
+>  create mode 100644 Documentation/virt/kvm/arm/mmio-guard.rst
 > 
-> diff --git a/arch/x86/boot/compressed/sev.c b/arch/x86/boot/compressed/sev.c
-> index 1a2e49730f8b..101e08c67296 100644
-> --- a/arch/x86/boot/compressed/sev.c
-> +++ b/arch/x86/boot/compressed/sev.c
-> @@ -119,6 +119,11 @@ static enum es_result vc_read_mem(struct es_em_ctxt *ctxt,
->  /* Include code for early handlers */
->  #include "../../kernel/sev-shared.c"
->  
-> +static u64 sev_get_ghcb_proto_ver(void)
-> +{
-> +	return GHCB_PROTOCOL_MAX;
-> +}
+> diff --git a/Documentation/virt/kvm/arm/index.rst b/Documentation/virt/kvm/arm/index.rst
+> index 78a9b670aafe..e77a0ee2e2d4 100644
+> --- a/Documentation/virt/kvm/arm/index.rst
+> +++ b/Documentation/virt/kvm/arm/index.rst
+> @@ -11,3 +11,4 @@ ARM
+>     psci
+>     pvtime
+>     ptp_kvm
+> +   mmio-guard
+> diff --git a/Documentation/virt/kvm/arm/mmio-guard.rst b/Documentation/virt/kvm/arm/mmio-guard.rst
+> new file mode 100644
+> index 000000000000..a5563a3e12cc
+> --- /dev/null
+> +++ b/Documentation/virt/kvm/arm/mmio-guard.rst
+> @@ -0,0 +1,73 @@
+> +.. SPDX-License-Identifier: GPL-2.0
 > +
->  static bool early_setup_sev_es(void)
->  {
->  	if (!sev_es_negotiate_protocol(NULL))
-> diff --git a/arch/x86/kernel/sev-shared.c b/arch/x86/kernel/sev-shared.c
-> index 73eeb5897d16..36eaac2773ed 100644
-> --- a/arch/x86/kernel/sev-shared.c
-> +++ b/arch/x86/kernel/sev-shared.c
-> @@ -28,6 +28,9 @@ struct sev_ghcb_protocol_info {
->  	unsigned int vm_proto;
->  };
->  
-> +/* Returns the negotiated GHCB Protocol version */
-> +static u64 sev_get_ghcb_proto_ver(void);
+> +==============
+> +KVM MMIO guard
+> +==============
 > +
->  static bool __init sev_es_check_cpu_features(void)
->  {
->  	if (!has_cpuflag(X86_FEATURE_RDRAND)) {
-> @@ -122,7 +125,7 @@ static enum es_result sev_es_ghcb_hv_call(struct ghcb *ghcb,
->  	enum es_result ret;
->  
->  	/* Fill in protocol and format specifiers */
-> -	ghcb->protocol_version = GHCB_PROTOCOL_MAX;
-> +	ghcb->protocol_version = sev_get_ghcb_proto_ver();
+> +KVM implements device emulation by handling translation faults to any
+> +IPA range that is not contained a memory slot. Such translation fault
+                                  ^ in                ^ a
 
-So this probably needs better clarification in the spec, but the GHCB
-version field is for the GHCB structure layout. So if you don't plan to
-use the XSS field that was added for version 2 of the layout, then you
-should report the GHCB structure version as 1.
+> +is in most cases passed on to userspace (or in rare cases to the host
+> +kernel) with the address, size and possibly data of the access for
+> +emulation.
+> +
+> +Should the guest exit with an address that is not one that corresponds
+> +to an emulatable device, userspace may take measures that are not the
+> +most graceful as far as the guest is concerned (such as terminating it
+> +or delivering a fatal exception).
+> +
+> +There is also an element of trust: by forwarding the request to
+> +userspace, the kernel asumes that the guest trusts userspace to do the
+
+assumes
+  
+> +right thing.
+> +
+> +The KVM MMIO guard offers a way to mitigate this last point: a guest
+> +can request that only certainly regions of the IPA space are valid as
+
+certain
+
+> +MMIO. Only these regions will be handled as an MMIO, and any other
+> +will result in an exception being delivered to the guest.
+> +
+> +This relies on a set of hypercalls defined in the KVM-specific range,
+> +using the HVC64 calling convention.
+> +
+> +* ARM_SMCCC_KVM_FUNC_MMIO_GUARD_INFO
+> +
+> +    ==============    ========    ================================
+> +    Function ID:      (uint32)    0xC6000002
+> +    Arguments:        none
+> +    Return Values:    (int64)     NOT_SUPPORTED(-1) on error, or
+> +                      (uint64)    Protection Granule (PG) size in
+> +		                  bytes (r0)
+> +    ==============    ========    ================================
+> +
+> +* ARM_SMCCC_KVM_FUNC_MMIO_GUARD_ENROLL
+> +
+> +    ==============    ========    ==============================
+> +    Function ID:      (uint32)    0xC6000003
+> +    Arguments:        none
+> +    Return Values:    (int64)     NOT_SUPPORTED(-1) on error, or
+> +                                  RET_SUCCESS(0) (r0)
+> +    ==============    ========    ==============================
+> +
+> +* ARM_SMCCC_KVM_FUNC_MMIO_GUARD_MAP
+> +
+> +    ==============    ========    ======================================
+> +    Function ID:      (uint32)    0xC6000004
+> +    Arguments:        (uint64)    The base of the PG-sized IPA range
+> +                                  that is allowed to be accessed as
+> +				  MMIO. Must aligned to the PG size (r1)
+
+align
+
+> +                      (uint64)    Index in the MAIR_EL1 register
+> +		                  providing the memory attribute that
+> +				  is used by the guest (r2)
+> +    Return Values:    (int64)     NOT_SUPPORTED(-1) on error, or
+> +                                  RET_SUCCESS(0) (r0)
+> +    ==============    ========    ======================================
+> +
+> +* ARM_SMCCC_KVM_FUNC_MMIO_GUARD_UNMAP
+> +
+> +    ==============    ========    ======================================
+> +    Function ID:      (uint32)    0xC6000004
+
+copy+paste error, should be 0xC6000005
+
+> +    Arguments:        (uint64)    The base of the PG-sized IPA range
+> +                                  that is forbidden to be accessed as
+
+is now forbidden
+
+or
+
+was allowed
+
+or just drop that part of the sentence because its covered by the "and
+have been previously mapped" part. Something like
+
+PG-sized IPA range aligned to the PG size which has been previously mapped
+(r1)
+
+> +				  MMIO. Must aligned to the PG size
+
+align
+
+> +				  and have been previously mapped (r1)
+> +    Return Values:    (int64)     NOT_SUPPORTED(-1) on error, or
+> +                                  RET_SUCCESS(0) (r0)
+> +    ==============    ========    ======================================
+> -- 
+> 2.30.2
+> 
+> _______________________________________________
+> kvmarm mailing list
+> kvmarm@lists.cs.columbia.edu
+> https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+> 
 
 Thanks,
-Tom
+drew
 
->  	ghcb->ghcb_usage       = GHCB_DEFAULT_USAGE;
->  
->  	ghcb_set_sw_exit_code(ghcb, exit_code);
-> diff --git a/arch/x86/kernel/sev.c b/arch/x86/kernel/sev.c
-> index 8084bfd7cce1..5d3422e8b25e 100644
-> --- a/arch/x86/kernel/sev.c
-> +++ b/arch/x86/kernel/sev.c
-> @@ -498,6 +498,11 @@ static enum es_result vc_slow_virt_to_phys(struct ghcb *ghcb, struct es_em_ctxt
->  /* Negotiated GHCB protocol version */
->  static struct sev_ghcb_protocol_info ghcb_protocol_info __ro_after_init;
->  
-> +static u64 sev_get_ghcb_proto_ver(void)
-> +{
-> +	return ghcb_protocol_info.vm_proto;
-> +}
-> +
->  static noinstr void __sev_put_ghcb(struct ghcb_state *state)
->  {
->  	struct sev_es_runtime_data *data;
-> 
