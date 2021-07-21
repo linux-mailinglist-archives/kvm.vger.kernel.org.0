@@ -2,359 +2,189 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E9E1A3D16B9
-	for <lists+kvm@lfdr.de>; Wed, 21 Jul 2021 20:59:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9C4E73D1768
+	for <lists+kvm@lfdr.de>; Wed, 21 Jul 2021 22:00:15 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232706AbhGUSSc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 21 Jul 2021 14:18:32 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:59805 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231215AbhGUSSb (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 21 Jul 2021 14:18:31 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1626893947;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=iBmGCL7jPFnHI9C3ijkGqsP0JNbW0XOP1l5/J0Ba0Dc=;
-        b=Y+hupfBmsP7QXHDkcYVmu9k9hp49iOFZ2bZqoTh+lOUHd0UIkgUIPj17kw+SMU0GNrCo4p
-        6fu7kz5LR7vXNG7zSLt/5c+O6Ixo5UDSj6gnALDTuaSgHaFgQSYxJOg0ty5FQfs0uxnT9o
-        mtIK8Maab4DEHabH7jj/JCFqxDVhSeA=
-Received: from mail-io1-f69.google.com (mail-io1-f69.google.com
- [209.85.166.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-24-r0zqu-TBNPCI10CQm7SkOw-1; Wed, 21 Jul 2021 14:59:06 -0400
-X-MC-Unique: r0zqu-TBNPCI10CQm7SkOw-1
-Received: by mail-io1-f69.google.com with SMTP id h7-20020a6bb7070000b0290525efa1b760so2210341iof.16
-        for <kvm@vger.kernel.org>; Wed, 21 Jul 2021 11:59:06 -0700 (PDT)
+        id S239831AbhGUTM1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 21 Jul 2021 15:12:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46068 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S239730AbhGUTM0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 21 Jul 2021 15:12:26 -0400
+Received: from mail-pl1-x62d.google.com (mail-pl1-x62d.google.com [IPv6:2607:f8b0:4864:20::62d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 63F32C061757
+        for <kvm@vger.kernel.org>; Wed, 21 Jul 2021 12:53:01 -0700 (PDT)
+Received: by mail-pl1-x62d.google.com with SMTP id q13so700597plx.7
+        for <kvm@vger.kernel.org>; Wed, 21 Jul 2021 12:53:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=1ZFdogakN+U+D6SX6LhX2SwuYGYaPQsFnYtn2JJoTak=;
+        b=tvsyIWhNU3cg/xV3WaOgqDwBpspmMJ50HUSKczTQOHxoia0Gf97fLeNPk6repjxMxU
+         5jlQjcRGy7FAvAeYmsOGOEYiTkvB0EteJixLlWUNljGhhG0PxH0M7Jr0YMrWsiBC+SVB
+         pIOpLAoFAx54KbgFB0OJI2cv1cLaVXjySbSkqcTiKacy5Jiswx7XbaxYaezXwq5abeO8
+         d9qYtq/rp/48EjBy9Fe3JmA2tU0HXYTEFUlhqjbmenaY06xhIi59kAojLPYzjgdIIkUG
+         pwhusBBAxUzr7N/6g9a8yVt99NfLdGGQmtyY79jbo2dQWDvQacDkC6QpUzuye67Hh0CG
+         pWSQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=iBmGCL7jPFnHI9C3ijkGqsP0JNbW0XOP1l5/J0Ba0Dc=;
-        b=m3Q+mJcMyFRbOyNGx3mDvsdWtTmuYaXUI7JlM3WWV0cWJ9vanUNn6tpRaco3jSgdmX
-         rvVQKFxKsXVDgsBSOeswsMqa+pIfhJgvqOY1vBE3T7IXgIFmxD6X0jFfZeAde3CTXo9a
-         gl8czlDECcXLknA8NNQiB4YBNm68rjL0ubMjOVjk6TgBiatqKM0AAlpHf46HCI2YI9LM
-         4umDfzV2vfUbeQ3vB/AeMrmYH0aw1VKm+4mJEvNpDWoU+e2gppGkvZyClR3b7NqK3XXo
-         eRoUxzYR/sEhsOnKc8ES9dF3J0L7bvwMM2GG5CMenAHEn75cVfm/RK76EpXsZHQJUmAi
-         VQ3w==
-X-Gm-Message-State: AOAM533ySOgxgBDla4CgkM7EFhWHPqmbwT5NOobTbNGME6SusUtvhtjK
-        5mkEiBdTwYHF2EkelBA4Svaam3uEnp4QuaRL6z1o78U9d3EMF5gFcYOwZAM1pDe9kOsuNMiMYVr
-        CfiF5Bf+rCNu0
-X-Received: by 2002:a92:b111:: with SMTP id t17mr26160431ilh.208.1626893945688;
-        Wed, 21 Jul 2021 11:59:05 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwQ4mMJK3pXkXKSexNYDbrE2sP+tp5hb8uptHNQl5fEFcJFBTu/FZLububJb1KHAUh4923ujA==
-X-Received: by 2002:a92:b111:: with SMTP id t17mr26160408ilh.208.1626893945154;
-        Wed, 21 Jul 2021 11:59:05 -0700 (PDT)
-Received: from gator ([140.82.166.162])
-        by smtp.gmail.com with ESMTPSA id j13sm8789953ila.38.2021.07.21.11.59.04
+        bh=1ZFdogakN+U+D6SX6LhX2SwuYGYaPQsFnYtn2JJoTak=;
+        b=gIIdfKM12EYpgUrtlHLVZvPZMn60Ud2wL14lERbHmKKN/NFFOv80FP5PXEzEXGUeWj
+         Hn9nLMJyLA5x7SzUwtv+nW892H984x3N2nB8W1TLciDMF9kMbntv/VwzhavmwGbQUOcI
+         ru7zg3/URO95WY0WGw1i2eiJ7CyNT/IeqdCTUAd9GwZ/mZ3wOhAczWvywbfCR6+8JPH3
+         FAAzeO8JEClYcxUwjnjkxYuBpoJ7Vyao+WGXh8Yswd9R2U1ktZaTVf8bNENIWoOj0VV2
+         rfQBoXOljhCqLjr6NhqJ3RTh3gfpWutZsr3ZnLNQ+qgA/QN10rYQ1N3mAm/+VlsFVwoQ
+         sjWg==
+X-Gm-Message-State: AOAM533ZD5Qt8+Urh3IAmmItwO59zs1utwbFzs8HlDC7qu5QC+WDJdMX
+        jaE+lUBdz3jadwm4+LRs5pqcKA==
+X-Google-Smtp-Source: ABdhPJx0SNXBSozA1zqonbwhhcSmrLxNop72v66ohRghPV4r836hvfWk3fIwfoZPziXuNwE9t9Hl/Q==
+X-Received: by 2002:a17:90b:2382:: with SMTP id mr2mr5315994pjb.169.1626897180725;
+        Wed, 21 Jul 2021 12:53:00 -0700 (PDT)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id 5sm31461466pgv.25.2021.07.21.12.52.59
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 21 Jul 2021 11:59:04 -0700 (PDT)
-Date:   Wed, 21 Jul 2021 20:59:02 +0200
-From:   Andrew Jones <drjones@redhat.com>
-To:     Oliver Upton <oupton@google.com>
-Cc:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
-        Marc Zyngier <maz@kernel.org>,
-        Raghavendra Rao Anata <rananta@google.com>,
-        Peter Shier <pshier@google.com>,
-        Sean Christopherson <seanjc@google.com>,
-        David Matlack <dmatlack@google.com>,
+        Wed, 21 Jul 2021 12:52:59 -0700 (PDT)
+Date:   Wed, 21 Jul 2021 19:52:55 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Tom Lendacky <thomas.lendacky@amd.com>
+Cc:     Brijesh Singh <brijesh.singh@amd.com>, x86@kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
+        linux-coco@lists.linux.dev, linux-mm@kvack.org,
+        linux-crypto@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        linux-arm-kernel@lists.infradead.org,
-        Jim Mattson <jmattson@google.com>
-Subject: Re: [PATCH v3 12/12] selftests: KVM: Add counter emulation benchmark
-Message-ID: <20210721185902.dbuv3vv4aorpgn54@gator>
-References: <20210719184949.1385910-1-oupton@google.com>
- <20210719184949.1385910-13-oupton@google.com>
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        David Rientjes <rientjes@google.com>,
+        Dov Murik <dovmurik@linux.ibm.com>,
+        Tobin Feldman-Fitzthum <tobin@ibm.com>,
+        Borislav Petkov <bp@alien8.de>,
+        Michael Roth <michael.roth@amd.com>,
+        Vlastimil Babka <vbabka@suse.cz>, tony.luck@intel.com,
+        npmccallum@redhat.com, brijesh.ksingh@gmail.com
+Subject: Re: [PATCH Part2 RFC v4 40/40] KVM: SVM: Support SEV-SNP AP Creation
+ NAE event
+Message-ID: <YPh7F2talucL7FQ9@google.com>
+References: <20210707183616.5620-1-brijesh.singh@amd.com>
+ <20210707183616.5620-41-brijesh.singh@amd.com>
+ <YPdjvca28JaWPZRb@google.com>
+ <c007821a-3a79-d270-07af-eb7d4c2d0862@amd.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20210719184949.1385910-13-oupton@google.com>
+In-Reply-To: <c007821a-3a79-d270-07af-eb7d4c2d0862@amd.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Jul 19, 2021 at 06:49:49PM +0000, Oliver Upton wrote:
-> Add a test case for counter emulation on arm64. A side effect of how KVM
-> handles physical counter offsetting on non-ECV systems is that the
-> virtual counter will always hit hardware and the physical could be
-> emulated. Force emulation by writing a nonzero offset to the physical
-> counter and compare the elapsed cycles to a direct read of the hardware
-> register.
+On Wed, Jul 21, 2021, Tom Lendacky wrote:
+> On 7/20/21 7:01 PM, Sean Christopherson wrote:
+> > On Wed, Jul 07, 2021, Brijesh Singh wrote:
+> >> From: Tom Lendacky <thomas.lendacky@amd.com>
+> >> +
+> >> +		svm->snp_vmsa_pfn = pfn;
+> >> +
+> >> +		/* Use the new VMSA in the sev_es_init_vmcb() path */
+> >> +		svm->vmsa_pa = pfn_to_hpa(pfn);
+> >> +		svm->vmcb->control.vmsa_pa = svm->vmsa_pa;
+> >> +
+> >> +		vcpu->arch.mp_state = KVM_MP_STATE_RUNNABLE;
+> >> +	} else {
+> >> +		vcpu->arch.pv.pv_unhalted = false;
+> > 
+> > Shouldn't the RUNNABLE path also clear pv_unhalted?
 > 
-> Reviewed-by: Ricardo Koller <ricarkol@google.com>
-> Signed-off-by: Oliver Upton <oupton@google.com>
-> ---
->  tools/testing/selftests/kvm/.gitignore        |   1 +
->  tools/testing/selftests/kvm/Makefile          |   1 +
->  .../kvm/aarch64/counter_emulation_benchmark.c | 215 ++++++++++++++++++
->  3 files changed, 217 insertions(+)
->  create mode 100644 tools/testing/selftests/kvm/aarch64/counter_emulation_benchmark.c
+> If anything it should set it, since it will be "unhalted" now. But, I
+> looked through the code to try and understand if there was a need to set
+> it and didn't really see any reason. It is only ever set (at least
+> directly) in one place and is cleared everywhere else. It was odd to me.
+
+pv_unhalted is specifically used for a "magic" IPI (KVM hijacked a defunct
+IPI type) in the context of PV spinlocks.  The idea is that a vCPU that's releasing
+a spinlock can kick the next vCPU in the queue, and KVM will directly yield to the
+vCPU being kicked so that the guest can efficiently make forward progress.
+
+So it's not wrong to leave pv_unhalted as is, but it's odd to clear it in the
+DESTROY case but not CREATE_INIT case.  It should be a moot point, as a sane
+implementation should make it impossible to get to CREATE with pv_unhalted=1.
+
+> >> +		vcpu->arch.mp_state = KVM_MP_STATE_UNINITIALIZED;
+> > 
+> > What happens if userspace calls kvm_arch_vcpu_ioctl_set_mpstate, or even worse
+> > the guest sends INIT-SIPI?  Unless I'm mistaken, either case will cause KVM to
+> > run the vCPU with vmcb->control.vmsa_pa==0.
 > 
-> diff --git a/tools/testing/selftests/kvm/.gitignore b/tools/testing/selftests/kvm/.gitignore
-> index 2752813d5090..1d811c6a769b 100644
-> --- a/tools/testing/selftests/kvm/.gitignore
-> +++ b/tools/testing/selftests/kvm/.gitignore
-> @@ -1,5 +1,6 @@
->  # SPDX-License-Identifier: GPL-2.0-only
->  /aarch64/debug-exceptions
-> +/aarch64/counter_emulation_benchmark
-
-alphabetic order please
-
->  /aarch64/get-reg-list
->  /aarch64/vgic_init
->  /s390x/memop
-> diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
-> index d89908108c97..e560a3e74bc2 100644
-> --- a/tools/testing/selftests/kvm/Makefile
-> +++ b/tools/testing/selftests/kvm/Makefile
-> @@ -86,6 +86,7 @@ TEST_GEN_PROGS_x86_64 += kvm_binary_stats_test
->  TEST_GEN_PROGS_x86_64 += system_counter_offset_test
->  
->  TEST_GEN_PROGS_aarch64 += aarch64/debug-exceptions
-> +TEST_GEN_PROGS_aarch64 += aarch64/counter_emulation_benchmark
-
-alphabetic order please
-
->  TEST_GEN_PROGS_aarch64 += aarch64/get-reg-list
->  TEST_GEN_PROGS_aarch64 += aarch64/vgic_init
->  TEST_GEN_PROGS_aarch64 += demand_paging_test
-> diff --git a/tools/testing/selftests/kvm/aarch64/counter_emulation_benchmark.c b/tools/testing/selftests/kvm/aarch64/counter_emulation_benchmark.c
-> new file mode 100644
-> index 000000000000..73aeb6cdebfe
-> --- /dev/null
-> +++ b/tools/testing/selftests/kvm/aarch64/counter_emulation_benchmark.c
-> @@ -0,0 +1,215 @@
-> +// SPDX-License-Identifier: GPL-2.0
-> +/*
-> + * counter_emulation_benchmark.c -- test to measure the effects of counter
-> + * emulation on guest reads of the physical counter.
-> + *
-> + * Copyright (c) 2021, Google LLC.
-> + */
-> +
-> +#define _GNU_SOURCE
-> +#include <asm/kvm.h>
-> +#include <linux/kvm.h>
-> +#include <stdio.h>
-> +#include <stdint.h>
-> +#include <stdlib.h>
-> +#include <unistd.h>
-> +
-> +#include "kvm_util.h"
-> +#include "processor.h"
-> +#include "test_util.h"
-> +
-> +#define VCPU_ID 0
-> +
-> +static struct counter_values {
-> +	uint64_t cntvct_start;
-> +	uint64_t cntpct;
-> +	uint64_t cntvct_end;
-> +} counter_values;
-> +
-> +static uint64_t nr_iterations = 1000;
-> +
-> +static void do_test(void)
-> +{
-> +	/*
-> +	 * Open-coded approach instead of using helper methods to keep a tight
-> +	 * interval around the physical counter read.
-> +	 */
-> +	asm volatile("isb\n\t"
-> +		     "mrs %[cntvct_start], cntvct_el0\n\t"
-> +		     "isb\n\t"
-> +		     "mrs %[cntpct], cntpct_el0\n\t"
-> +		     "isb\n\t"
-> +		     "mrs %[cntvct_end], cntvct_el0\n\t"
-> +		     "isb\n\t"
-> +		     : [cntvct_start] "=r"(counter_values.cntvct_start),
-> +		     [cntpct] "=r"(counter_values.cntpct),
-> +		     [cntvct_end] "=r"(counter_values.cntvct_end));
-> +}
-> +
-> +static void guest_main(void)
-> +{
-> +	int i;
-> +
-> +	for (i = 0; i < nr_iterations; i++) {
-> +		do_test();
-> +		GUEST_SYNC(i);
-> +	}
-> +
-> +	for (i = 0; i < nr_iterations; i++) {
-> +		do_test();
-> +		GUEST_SYNC(i);
-> +	}
-> +
-> +	GUEST_DONE();
-> +}
-> +
-> +static bool enter_guest(struct kvm_vm *vm)
-> +{
-> +	struct ucall uc;
-> +
-> +	vcpu_ioctl(vm, VCPU_ID, KVM_RUN, NULL);
-> +
-> +	switch (get_ucall(vm, VCPU_ID, &uc)) {
-> +	case UCALL_DONE:
-> +		return true;
-> +	case UCALL_SYNC:
-> +		break;
-> +	case UCALL_ABORT:
-> +		TEST_ASSERT(false, "%s at %s:%ld", (const char *)uc.args[0],
-> +			    __FILE__, uc.args[1]);
-> +		break;
-> +	default:
-> +		TEST_ASSERT(false, "unexpected exit: %s",
-> +			    exit_reason_str(vcpu_state(vm, VCPU_ID)->exit_reason));
-> +		break;
-> +	}
-> +
-> +	/* more work to do in the guest */
-> +	return false;
-> +}
-> +
-> +static double counter_frequency(void)
-> +{
-> +	uint32_t freq;
-> +
-> +	asm volatile("mrs %0, cntfrq_el0"
-> +		     : "=r" (freq));
-> +
-> +	return freq / 1000000.0;
-> +}
-> +
-> +static void log_csv(FILE *csv, bool trapped)
-> +{
-> +	double freq = counter_frequency();
-> +
-> +	fprintf(csv, "%s,%.02f,%lu,%lu,%lu\n",
-> +		trapped ? "true" : "false", freq,
-> +		counter_values.cntvct_start,
-> +		counter_values.cntpct,
-> +		counter_values.cntvct_end);
-> +}
-> +
-> +static double run_loop(struct kvm_vm *vm, FILE *csv, bool trapped)
-> +{
-> +	double avg = 0;
-> +	int i;
-> +
-> +	for (i = 0; i < nr_iterations; i++) {
-> +		uint64_t delta;
-> +
-> +		TEST_ASSERT(!enter_guest(vm), "guest exited unexpectedly");
-
-UCALL_DONE would assert, but we never do a UCALL_DONE because we're
-entering the guest nr_iterations times but [would] exit it
-2 * nr_iterations times before GUEST_DONE() gets called. IOW, the
-logic of the run loop looks like it could use some cleanup.
-
-> +		sync_global_from_guest(vm, counter_values);
-> +
-> +		if (csv)
-> +			log_csv(csv, trapped);
-> +
-> +		delta = counter_values.cntvct_end - counter_values.cntvct_start;
-> +		avg = ((avg * i) + delta) / (i + 1);
-> +	}
-> +
-> +	return avg;
-> +}
-> +
-> +static void setup_counter(struct kvm_vm *vm, uint64_t offset)
-> +{
-> +	vcpu_access_device_attr(vm, VCPU_ID, KVM_ARM_VCPU_TIMER_CTRL,
-> +				KVM_ARM_VCPU_TIMER_OFFSET_PTIMER, &offset,
-> +				true);
-> +}
-> +
-> +static void run_tests(struct kvm_vm *vm, FILE *csv)
-> +{
-> +	double avg_trapped, avg_native, freq;
-> +
-> +	freq = counter_frequency();
-> +
-> +	if (csv)
-> +		fputs("trapped,freq_mhz,cntvct_start,cntpct,cntvct_end\n", csv);
-> +
-> +	/* no physical offsetting; kvm allows reads of cntpct_el0 */
-> +	setup_counter(vm, 0);
-> +	avg_native = run_loop(vm, csv, false);
-> +
-> +	/* force emulation of the physical counter */
-> +	setup_counter(vm, 1);
-> +	avg_trapped = run_loop(vm, csv, true);
-> +
-> +	TEST_ASSERT(enter_guest(vm), "guest didn't run to completion");
-> +	pr_info("%lu iterations: average cycles (@%.02fMHz) native: %.02f, trapped: %.02f\n",
-> +		nr_iterations, freq, avg_native, avg_trapped);
-> +}
-> +
-> +static void usage(const char *program_name)
-> +{
-> +	fprintf(stderr,
-> +		"Usage: %s [-h] [-o csv_file] [-n iterations]\n"
-> +		"  -h prints this message\n"
-> +		"  -n number of test iterations (default: %lu)\n"
-> +		"  -o csv file to write data\n",
-> +		program_name, nr_iterations);
-> +}
-> +
-> +int main(int argc, char **argv)
-> +{
-> +	struct kvm_vm *vm;
-> +	FILE *csv = NULL;
-> +	int opt;
-> +
-> +	while ((opt = getopt(argc, argv, "hn:o:")) != -1) {
-> +		switch (opt) {
-> +		case 'o':
-> +			csv = fopen(optarg, "w");
-> +			if (!csv) {
-> +				fprintf(stderr, "failed to open file '%s': %d\n",
-> +					optarg, errno);
-> +				exit(1);
-> +			}
-> +			break;
-> +		case 'n':
-> +			nr_iterations = strtoul(optarg, NULL, 0);
-> +			break;
-> +		default:
-> +			fprintf(stderr, "unrecognized option: '-%c'\n", opt);
-> +			/* fallthrough */
-> +		case 'h':
-> +			usage(argv[0]);
-> +			exit(1);
-> +		}
-> +	}
-> +
-> +	vm = vm_create_default(VCPU_ID, 0, guest_main);
-> +	sync_global_to_guest(vm, nr_iterations);
-> +	ucall_init(vm, NULL);
-> +
-> +	if (_vcpu_has_device_attr(vm, VCPU_ID, KVM_ARM_VCPU_TIMER_CTRL,
-> +				  KVM_ARM_VCPU_TIMER_OFFSET_PTIMER)) {
-> +		print_skip("KVM_ARM_VCPU_TIMER_OFFSET_PTIMER not supported.");
-> +		exit(KSFT_SKIP);
-> +	}
-> +
-> +	run_tests(vm, csv);
-> +	kvm_vm_free(vm);
-> +
-> +	if (csv)
-> +		fclose(csv);
-> +}
-> -- 
-> 2.32.0.402.g57bb445576-goog
+> Using the INVALID_PAGE value now (and even when it was 0), you'll get a
+> VMRUN failure.
 > 
-> _______________________________________________
-> kvmarm mailing list
-> kvmarm@lists.cs.columbia.edu
-> https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
->
+> The AP CREATE_ON_INIT is meant to be used with INIT-SIPI, so if the guest
+> hasn't done the right thing, then it will fail on VMRUN.
+> 
+> > 
+> > My initial reaction is that the "offline" case needs a new mp_state, or maybe
+> > just use KVM_MP_STATE_STOPPED.
+> 
+> I'll look at KVM_MP_STATE_STOPPED. Qemu doesn't reference that state at
+> all in the i386 support, though, which is why I went with UNINITIALIZED.
 
-Thanks,
-drew 
+Ya, it'd effectively be a new feature.  My concern with UNINITIALIZED is that it
+be impossible for KVM to differentiate between "never run" and "destroyed and may
+have an invalid VMSA" without looking at the VMSA.
 
+> >> +	mutex_lock(&target_svm->snp_vmsa_mutex);
+> > 
+> > This seems like it's missing a big pile of sanity checks.  E.g. KVM should reject
+> > SVM_VMGEXIT_AP_CREATE if the target vCPU is already "created", including the case
+> > where it was "created_on_init" but hasn't yet received INIT-SIPI.
+> 
+> Why? If the guest wants to call it multiple times I guess I don't see a
+> reason that it would need to call DESTROY first and then CREATE. I don't
+> know why a guest would want to do that, but I don't think we should
+> prevent it.
+
+Because "creating" a vCPU that already exists is non-sensical.  Ditto for
+onlining a vCPU that is already onlined.  E.g. from the guest's perspective, I
+would fully expect a SVM_VMGEXIT_AP_CREATE to fail, not effectively send the vCPU
+to an arbitrary state.
+
+Any ambiguity as to the legality of CREATE/DESTROY absolutely needs to be clarified
+in the GHCB.
+
+> >> +
+> >> +	target_svm->snp_vmsa_gpa = 0;
+> >> +	target_svm->snp_vmsa_update_on_init = false;
+> >> +
+> >> +	/* Interrupt injection mode shouldn't change for AP creation */
+> >> +	if (request < SVM_VMGEXIT_AP_DESTROY) {
+> >> +		u64 sev_features;
+> >> +
+> >> +		sev_features = vcpu->arch.regs[VCPU_REGS_RAX];
+> >> +		sev_features ^= sev->sev_features;
+> >> +		if (sev_features & SVM_SEV_FEATURES_INT_INJ_MODES) {
+> > 
+> > Why is only INT_INJ_MODES checked?  The new comment in sev_es_sync_vmsa() explicitly
+> > states that sev_features are the same for all vCPUs, but that's not enforced here.
+> > At a bare minimum I would expect this to sanity check SVM_SEV_FEATURES_SNP_ACTIVE.
+> 
+> That's because we can't really enforce it. The SEV_FEATURES value is part
+> of the VMSA, of which the hypervisor has no insight into (its encrypted).
+> 
+> The interrupt injection mechanism was specifically requested as a sanity
+> check type of thing during the GHCB review, and as there were no
+> objections, it was added (see the end of section 4.1.9).
+> 
+> I can definitely add the check for the SNP_ACTIVE bit, but it isn't required.
+
+I'm confused.  If we've no insight into what the guest is actually using, what's
+the point of the INT_INJ_MODES check?
