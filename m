@@ -2,548 +2,247 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2F0EC3D13E9
-	for <lists+kvm@lfdr.de>; Wed, 21 Jul 2021 18:18:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 924803D139D
+	for <lists+kvm@lfdr.de>; Wed, 21 Jul 2021 18:16:39 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234258AbhGUPhp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 21 Jul 2021 11:37:45 -0400
-Received: from mail-dm6nam10on2083.outbound.protection.outlook.com ([40.107.93.83]:54881
-        "EHLO NAM10-DM6-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S229726AbhGUPhn (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 21 Jul 2021 11:37:43 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=WiFhB6stDZijCtUubuhRNGoaRL19h9V6xX2b7daHkCQQ9l5u1D4+59iSxD9WhaJVC4YeGzjSd14CBeaoI4c/MnXZ64DLSUMaN745ZoFtxRi5hzOUxvxnm8W8JB2wgZ6qcAe1xtxlQb0SPca11gIg1jQwYHtYuXR1gQQ+9RdxIbxIIvZAHFe4Po7K3uOiX0JIjxhqafTVHeztPyyG17UKN7jF9jboI4Je3U9CDn5X8i11SLDqjcbtZIXVqXDPGVRzgF9E+clfRQ5oH7dkQWbb1Su/J521XYaU/Jw7fSt93rotQlxKY6yBP28BRAjOy6GFrAnlq30KiTxEHQKTsF85IA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=N8ZlsYrqdXr/iTEFamlYXIh1/D1tH+YmtqkEtGfurFc=;
- b=AEda/EmqkuB7hzgrD2+vrCjZbbuYwDX+SOeWZuDdKW4L0pcHVF025WD644g95CBcuFYohW9UmoA/LuhoLLF1ju1Pbl1viURaJRDQzKPOWv6jIPj3s/P/ON1sGxLmAnxGb/I6j8TqklGjXqYcAmNUc67Hthppov5NPA4/vNk/tA1ewg2/3o16dGI3mT1UFnAOk0Xj3fRwZvgW7TdU67NCgxurWy/sYz63ZUH2wwXq6aTsHBQ3YTU0cTaBR6H4HahJCYDf6sR8/+xXCsgwzLFz1+YGGshqVZ9ADcn/MGTujeZ2dTy02Fne/NJFiwiSUZFIghxJGQhPXIHbcDHi2dLygw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.112.36) smtp.rcpttodomain=markovi.net smtp.mailfrom=nvidia.com;
- dmarc=pass (p=quarantine sp=none pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=N8ZlsYrqdXr/iTEFamlYXIh1/D1tH+YmtqkEtGfurFc=;
- b=LN2yh7U0Ou3lFJ8bP2m/oCyXI/Jw81Cc1Zvrd/zhOaVXlHl7plkoqLJUQ0ez171ATcfKf4L8uVZFr4J4HMKXPvFg4siR8E36baHEdqa9UeRsGz50rdXnMs4bIEqJvbat4w4tajmR00iIHQ0cx0qNPKHC4t4LWGcVaFy1iaB8cYgpdSAZWlWwDnl/492Ia/vFPtb9vv69C5sCY0AHvg72vK9qbvGx8lMau+lFucg50mFj+SkIgL+5Y+oAAk54z90Gnx5rKiPgZJyOju1qqnJLtk7RwB1GZcs7EJyr3FPm4s2OQCu64ElAJyRSLQIIWj1+Loej7wzUFVr8RjY9iWKxug==
-Received: from MW4PR04CA0060.namprd04.prod.outlook.com (2603:10b6:303:6a::35)
- by BN6PR1201MB0036.namprd12.prod.outlook.com (2603:10b6:405:4e::21) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4331.23; Wed, 21 Jul
- 2021 16:18:18 +0000
-Received: from CO1NAM11FT039.eop-nam11.prod.protection.outlook.com
- (2603:10b6:303:6a:cafe::81) by MW4PR04CA0060.outlook.office365.com
- (2603:10b6:303:6a::35) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4331.22 via Frontend
- Transport; Wed, 21 Jul 2021 16:18:18 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.112.36)
- smtp.mailfrom=nvidia.com; markovi.net; dkim=none (message not signed)
- header.d=none;markovi.net; dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.112.36 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.112.36; helo=mail.nvidia.com;
-Received: from mail.nvidia.com (216.228.112.36) by
- CO1NAM11FT039.mail.protection.outlook.com (10.13.174.110) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
- 15.20.4352.24 via Frontend Transport; Wed, 21 Jul 2021 16:18:16 +0000
-Received: from HQMAIL105.nvidia.com (172.20.187.12) by HQMAIL101.nvidia.com
- (172.20.187.10) with Microsoft SMTP Server (TLS) id 15.0.1497.2; Wed, 21 Jul
- 2021 16:18:14 +0000
-Received: from HQMAIL105.nvidia.com (172.20.187.12) by HQMAIL105.nvidia.com
- (172.20.187.12) with Microsoft SMTP Server (TLS) id 15.0.1497.2; Wed, 21 Jul
- 2021 16:18:13 +0000
-Received: from vdi.nvidia.com (172.20.187.6) by mail.nvidia.com
- (172.20.187.12) with Microsoft SMTP Server id 15.0.1497.2 via Frontend
- Transport; Wed, 21 Jul 2021 16:18:09 +0000
-From:   Yishai Hadas <yishaih@nvidia.com>
-To:     <bhelgaas@google.com>, <corbet@lwn.net>,
-        <alex.williamson@redhat.com>, <diana.craciun@oss.nxp.com>,
-        <kwankhede@nvidia.com>, <eric.auger@redhat.com>,
-        <masahiroy@kernel.org>, <michal.lkml@markovi.net>
-CC:     <linux-pci@vger.kernel.org>, <linux-doc@vger.kernel.org>,
-        <kvm@vger.kernel.org>, <linux-s390@vger.kernel.org>,
-        <linux-kbuild@vger.kernel.org>, <mgurtovoy@nvidia.com>,
-        <jgg@nvidia.com>, <yishaih@nvidia.com>, <maorg@nvidia.com>,
-        <leonro@nvidia.com>
-Subject: [PATCH 12/12] vfio/pci: Introduce vfio_pci_core.ko
-Date:   Wed, 21 Jul 2021 19:16:09 +0300
-Message-ID: <20210721161609.68223-13-yishaih@nvidia.com>
-X-Mailer: git-send-email 2.21.0
-In-Reply-To: <20210721161609.68223-1-yishaih@nvidia.com>
-References: <20210721161609.68223-1-yishaih@nvidia.com>
+        id S231756AbhGUPgB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 21 Jul 2021 11:36:01 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:41021 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S230336AbhGUPgB (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 21 Jul 2021 11:36:01 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1626884197;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=IcSV6p3DsGPg3q7H9uG8rdf3PK9RYtHNWHXgMTJFgSw=;
+        b=NMUKOohnIJCthc4CkZnP9I08yNYMSMWd9mvOpv8lkKKpil9x3PJuAs22Pwui+O5DyT3PVa
+        fhSSmhUH/g9zXAKaav3cZn5yCR5gfRCSl5FeE1Q3Xt0cDC5xrZDln9BsizuNWR7lOzH8yJ
+        cMBcj7yi5CHtZdDYzYQSGNBL6chQmFE=
+Received: from mail-io1-f71.google.com (mail-io1-f71.google.com
+ [209.85.166.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-264-bany-qnsPGuOTxXgxNKe9A-1; Wed, 21 Jul 2021 12:16:35 -0400
+X-MC-Unique: bany-qnsPGuOTxXgxNKe9A-1
+Received: by mail-io1-f71.google.com with SMTP id l15-20020a5e820f0000b02904bd1794d00eso1921101iom.7
+        for <kvm@vger.kernel.org>; Wed, 21 Jul 2021 09:16:35 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=IcSV6p3DsGPg3q7H9uG8rdf3PK9RYtHNWHXgMTJFgSw=;
+        b=hvIAULJRqlPWkGpcWEOwmgBK9FF+1QfMBBTNoXSaBYmspPtz01uWEGbpEYH/es7bOT
+         ROpJ+JpjtQI6YPlcQ1i1ePjv7TnCavu9UCMAIY/NhMx0A2gb5kEH5Ac7jX9trI44Jf7V
+         N3MF20PWF9utGBJ99LttcRNBD5wV04o9ii/FRR/dG1r0rMJxT6fc+aO3OYYSn2Ed7OM8
+         heQ4rRW+Xjdm+se3soJd8PTdtjs3yW5UU2QPqotCXIJyC6DNJu0GhcPaYHi0P1N0soGN
+         o9fTWloWrlylKCjaSWUgM5EkbGRelxzNeCI30TV0x3UbU4u43LB8g2S4lj2ksHzZEtZ+
+         GKeQ==
+X-Gm-Message-State: AOAM531Yu/mNcfxE4HFnQGE4wt04g/s+El0T5f/up1oXCOL7yjBVuOhE
+        V8en7UZtnfgqFUWLrVGfs4aGbEIepWFS5ely4d+i9w5B7irt69OUtgkMYvFSpQ9LXHzwb+FdLdH
+        uC16Kx0FidOpP
+X-Received: by 2002:a05:6e02:ea9:: with SMTP id u9mr24497384ilj.174.1626884194626;
+        Wed, 21 Jul 2021 09:16:34 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJy/IBOod66B4GglMJLgXKr35GBUPC3amMbq6Jd0LtCJ6mFrJw0uOyg05WtQr7pLrGObTD7EEQ==
+X-Received: by 2002:a05:6e02:ea9:: with SMTP id u9mr24497370ilj.174.1626884194383;
+        Wed, 21 Jul 2021 09:16:34 -0700 (PDT)
+Received: from gator ([140.82.166.162])
+        by smtp.gmail.com with ESMTPSA id w14sm10296889ilj.76.2021.07.21.09.16.33
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 21 Jul 2021 09:16:33 -0700 (PDT)
+Date:   Wed, 21 Jul 2021 18:16:31 +0200
+From:   Andrew Jones <drjones@redhat.com>
+To:     Oliver Upton <oupton@google.com>
+Cc:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
+        Marc Zyngier <maz@kernel.org>,
+        Raghavendra Rao Anata <rananta@google.com>,
+        Peter Shier <pshier@google.com>,
+        Sean Christopherson <seanjc@google.com>,
+        David Matlack <dmatlack@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        linux-arm-kernel@lists.infradead.org,
+        Jim Mattson <jmattson@google.com>
+Subject: Re: [PATCH v3 08/12] KVM: arm64: Allow userspace to configure a
+ vCPU's virtual offset
+Message-ID: <20210721161631.mrfiuusc5zou4we5@gator>
+References: <20210719184949.1385910-1-oupton@google.com>
+ <20210719184949.1385910-9-oupton@google.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 0339a154-040a-49de-0478-08d94c6325da
-X-MS-TrafficTypeDiagnostic: BN6PR1201MB0036:
-X-Microsoft-Antispam-PRVS: <BN6PR1201MB0036B8904AF1363C2692CADFC3E39@BN6PR1201MB0036.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:3276;
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: THduhGpQYk4GSIm6c6HyOKahIZGl0yjsHXRyf88j6dKIhCKyAyFw6LKVNQ5dKJaN8cDDckouGzr+uEApiIWLCMFc2eAIo2ZxahvJ31/V7z8Un70FdjJRRd/fYCVeReuxJ8+ErT+sVlE0i3emIxiin2gzVVcTdBjr2wZf2AoZXShqIYFBfXywl5H16HLuW6Q/WGCpiay551dQ5LQPhwCOfgZaF2cjdxRQbVkd9O7oi1hfJcxY9iuuHR3+67czyN9KfqKqg9D9n8MalCOIHiKFCR14Lp7lrXiDLsZPjmvITqtxCiX2X6I/9IXhQvXmypZNI5NO+faiOMpc6BhkTm9hZu6X4CpR19yrN9j8/cGlAgSp5Mgo4n3VfA+tFgPPUSDiwuFyTchilkd2t0kw4c5QUp7OrHvJN0BI/kYfPp8Pb3sR83qo2ZDAGBbZheXudEXprP1UQivOM3M6FW5VI55kZgCpnm56tyMhdcu5/86aUnQNzEzv8yZeTYfPoKEpiQsX2v5/NM/nQliLM6KyAkXsIP+c6lOYdLC/fYy4TC9jXQXQNNVzDkjVbxxiniHxW5nhRY7+yyChSeCkj9pT3rBptSO7teL/ESNcVnxZEfqKb6cIJcrKDPVx1JqIwS1JfTo2VK7o+T6VqorUGg1nYmZjPyNlCLxPwb1FTE7rxNPRHB+4G19PvX5kPWViZptkoC4lU8BSees687y/IA8BXYm9swz6IPqUB+BY6t0yt7me/Y4=
-X-Forefront-Antispam-Report: CIP:216.228.112.36;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:schybrid05.nvidia.com;CAT:NONE;SFS:(4636009)(346002)(39860400002)(136003)(396003)(376002)(46966006)(36840700001)(82310400003)(47076005)(7636003)(83380400001)(316002)(36756003)(356005)(82740400003)(86362001)(478600001)(36860700001)(36906005)(5660300002)(336012)(426003)(8936002)(110136005)(8676002)(2906002)(70206006)(107886003)(7696005)(4326008)(70586007)(7416002)(26005)(1076003)(30864003)(186003)(2616005)(54906003)(2101003);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Jul 2021 16:18:16.8764
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 0339a154-040a-49de-0478-08d94c6325da
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.112.36];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource: CO1NAM11FT039.eop-nam11.prod.protection.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN6PR1201MB0036
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210719184949.1385910-9-oupton@google.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Max Gurtovoy <mgurtovoy@nvidia.com>
+On Mon, Jul 19, 2021 at 06:49:45PM +0000, Oliver Upton wrote:
+> Add a new vCPU attribute that allows userspace to directly manipulate
+> the virtual counter-timer offset. Exposing such an interface allows for
+> the precise migration of guest virtual counter-timers, as it is an
+> indepotent interface.
+> 
+> Uphold the existing behavior of writes to CNTVOFF_EL2 for this new
+> interface, wherein a write to a single vCPU is broadcasted to all vCPUs
+> within a VM.
+> 
+> Signed-off-by: Oliver Upton <oupton@google.com>
+> ---
+>  Documentation/virt/kvm/devices/vcpu.rst | 22 ++++++++
+>  arch/arm64/include/uapi/asm/kvm.h       |  1 +
+>  arch/arm64/kvm/arch_timer.c             | 68 ++++++++++++++++++++++++-
+>  3 files changed, 89 insertions(+), 2 deletions(-)
+> 
+> diff --git a/Documentation/virt/kvm/devices/vcpu.rst b/Documentation/virt/kvm/devices/vcpu.rst
+> index b46d5f742e69..7b57cba3416a 100644
+> --- a/Documentation/virt/kvm/devices/vcpu.rst
+> +++ b/Documentation/virt/kvm/devices/vcpu.rst
+> @@ -139,6 +139,28 @@ configured values on other VCPUs.  Userspace should configure the interrupt
+>  numbers on at least one VCPU after creating all VCPUs and before running any
+>  VCPUs.
+>  
+> +2.2. ATTRIBUTE: KVM_ARM_VCPU_TIMER_OFFSET_VTIMER
+> +------------------------------------------------
+> +
+> +:Parameters: Pointer to a 64-bit unsigned counter-timer offset.
+> +
+> +Returns:
+> +
+> +	 ======= ======================================
+> +	 -EFAULT Error reading/writing the provided
+> +	 	 parameter address
+> +	 -ENXIO  Attribute not supported
+> +	 ======= ======================================
+> +
+> +Specifies the guest's virtual counter-timer offset from the host's
+> +virtual counter. The guest's virtual counter is then derived by
+> +the following equation:
+> +
+> +  guest_cntvct = host_cntvct - KVM_ARM_VCPU_TIMER_OFFSET_VTIMER
+> +
+> +KVM does not allow the use of varying offset values for different vCPUs;
+> +the last written offset value will be broadcasted to all vCPUs in a VM.
+> +
+>  3. GROUP: KVM_ARM_VCPU_PVTIME_CTRL
+>  ==================================
+>  
+> diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
+> index b3edde68bc3e..008d0518d2b1 100644
+> --- a/arch/arm64/include/uapi/asm/kvm.h
+> +++ b/arch/arm64/include/uapi/asm/kvm.h
+> @@ -365,6 +365,7 @@ struct kvm_arm_copy_mte_tags {
+>  #define KVM_ARM_VCPU_TIMER_CTRL		1
+>  #define   KVM_ARM_VCPU_TIMER_IRQ_VTIMER		0
+>  #define   KVM_ARM_VCPU_TIMER_IRQ_PTIMER		1
+> +#define   KVM_ARM_VCPU_TIMER_OFFSET_VTIMER	2
+>  #define KVM_ARM_VCPU_PVTIME_CTRL	2
+>  #define   KVM_ARM_VCPU_PVTIME_IPA	0
+>  
+> diff --git a/arch/arm64/kvm/arch_timer.c b/arch/arm64/kvm/arch_timer.c
+> index 3df67c127489..d2b1b13af658 100644
+> --- a/arch/arm64/kvm/arch_timer.c
+> +++ b/arch/arm64/kvm/arch_timer.c
+> @@ -1305,7 +1305,7 @@ static void set_timer_irqs(struct kvm *kvm, int vtimer_irq, int ptimer_irq)
+>  	}
+>  }
+>  
+> -int kvm_arm_timer_set_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr)
+> +int kvm_arm_timer_set_attr_irq(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr)
+>  {
+>  	int __user *uaddr = (int __user *)(long)attr->addr;
+>  	struct arch_timer_context *vtimer = vcpu_vtimer(vcpu);
+> @@ -1338,7 +1338,39 @@ int kvm_arm_timer_set_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr)
+>  	return 0;
+>  }
+>  
+> -int kvm_arm_timer_get_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr)
+> +int kvm_arm_timer_set_attr_offset(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr)
+> +{
+> +	u64 __user *uaddr = (u64 __user *)(long)attr->addr;
+> +	u64 offset;
+> +
+> +	if (get_user(offset, uaddr))
+> +		return -EFAULT;
+> +
+> +	switch (attr->attr) {
+> +	case KVM_ARM_VCPU_TIMER_OFFSET_VTIMER:
+> +		update_vtimer_cntvoff(vcpu, offset);
+> +		break;
+> +	default:
+> +		return -ENXIO;
+> +	}
+> +
+> +	return 0;
+> +}
+> +
+> +int kvm_arm_timer_set_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr)
+> +{
+> +	switch (attr->attr) {
+> +	case KVM_ARM_VCPU_TIMER_IRQ_VTIMER:
+> +	case KVM_ARM_VCPU_TIMER_IRQ_PTIMER:
+> +		return kvm_arm_timer_set_attr_irq(vcpu, attr);
+> +	case KVM_ARM_VCPU_TIMER_OFFSET_VTIMER:
+> +		return kvm_arm_timer_set_attr_offset(vcpu, attr);
+> +	}
+> +
+> +	return -ENXIO;
+> +}
+> +
+> +int kvm_arm_timer_get_attr_irq(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr)
+>  {
+>  	int __user *uaddr = (int __user *)(long)attr->addr;
+>  	struct arch_timer_context *timer;
+> @@ -1359,11 +1391,43 @@ int kvm_arm_timer_get_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr)
+>  	return put_user(irq, uaddr);
+>  }
+>  
+> +int kvm_arm_timer_get_attr_offset(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr)
+> +{
+> +	u64 __user *uaddr = (u64 __user *)(long)attr->addr;
+> +	struct arch_timer_context *timer;
+> +	u64 offset;
+> +
+> +	switch (attr->attr) {
+> +	case KVM_ARM_VCPU_TIMER_OFFSET_VTIMER:
+> +		timer = vcpu_vtimer(vcpu);
+> +		break;
+> +	default:
+> +		return -ENXIO;
+> +	}
+> +
+> +	offset = timer_get_offset(timer);
+> +	return put_user(offset, uaddr);
+> +}
+> +
+> +int kvm_arm_timer_get_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr)
+> +{
+> +	switch (attr->attr) {
+> +	case KVM_ARM_VCPU_TIMER_IRQ_VTIMER:
+> +	case KVM_ARM_VCPU_TIMER_IRQ_PTIMER:
+> +		return kvm_arm_timer_get_attr_irq(vcpu, attr);
+> +	case KVM_ARM_VCPU_TIMER_OFFSET_VTIMER:
+> +		return kvm_arm_timer_get_attr_offset(vcpu, attr);
+> +	}
+> +
+> +	return -ENXIO;
+> +}
+> +
+>  int kvm_arm_timer_has_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr)
+>  {
+>  	switch (attr->attr) {
+>  	case KVM_ARM_VCPU_TIMER_IRQ_VTIMER:
+>  	case KVM_ARM_VCPU_TIMER_IRQ_PTIMER:
+> +	case KVM_ARM_VCPU_TIMER_OFFSET_VTIMER:
+>  		return 0;
+>  	}
+>  
+> -- 
+> 2.32.0.402.g57bb445576-goog
+> 
+> _______________________________________________
+> kvmarm mailing list
+> kvmarm@lists.cs.columbia.edu
+> https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+>
 
-Now that vfio_pci has been split into two source modules, one focusing
-on the "struct pci_driver" (vfio_pci.c) and a toolbox library of code
-(vfio_pci_core.c), complete the split and move them into two different
-kernel modules.
-
-As before vfio_pci.ko continues to present the same interface under
-sysfs and this change will have no functional impact.
-
-Splitting into another module and adding exports allows creating new HW
-specific VFIO PCI drivers that can implement device specific
-functionality, such as VFIO migration interfaces or specialized device
-requirements.
-
-Signed-off-by: Max Gurtovoy <mgurtovoy@nvidia.com>
-Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
-Signed-off-by: Yishai Hadas <yishaih@nvidia.com>
----
- drivers/vfio/pci/Kconfig                      | 30 ++++++++------
- drivers/vfio/pci/Makefile                     |  8 ++--
- drivers/vfio/pci/vfio_pci.c                   | 14 ++-----
- drivers/vfio/pci/vfio_pci_config.c            |  2 +-
- drivers/vfio/pci/vfio_pci_core.c              | 41 ++++++++++++++++---
- drivers/vfio/pci/vfio_pci_igd.c               |  2 +-
- drivers/vfio/pci/vfio_pci_intrs.c             |  2 +-
- drivers/vfio/pci/vfio_pci_rdwr.c              |  2 +-
- drivers/vfio/pci/vfio_pci_zdev.c              |  2 +-
- .../pci => include/linux}/vfio_pci_core.h     |  2 -
- 10 files changed, 66 insertions(+), 39 deletions(-)
- rename {drivers/vfio/pci => include/linux}/vfio_pci_core.h (99%)
-
-diff --git a/drivers/vfio/pci/Kconfig b/drivers/vfio/pci/Kconfig
-index afdab7d71e98..18898ae49919 100644
---- a/drivers/vfio/pci/Kconfig
-+++ b/drivers/vfio/pci/Kconfig
-@@ -1,19 +1,31 @@
- # SPDX-License-Identifier: GPL-2.0-only
--config VFIO_PCI
-+config VFIO_PCI_CORE
- 	tristate "VFIO support for PCI devices"
- 	depends on PCI
- 	depends on MMU
- 	select VFIO_VIRQFD
- 	select IRQ_BYPASS_MANAGER
- 	help
--	  Support for the PCI VFIO bus driver.  This is required to make
--	  use of PCI drivers using the VFIO framework.
-+	  Support for using PCI devices with VFIO.
-+
-+if VFIO_PCI_CORE
-+config VFIO_PCI_MMAP
-+	def_bool y if !S390
-+
-+config VFIO_PCI_INTX
-+	def_bool y if !S390
-+
-+config VFIO_PCI
-+	tristate "Generic VFIO support for any PCI device"
-+	help
-+	  Support for the generic PCI VFIO bus driver which can connect any
-+	  PCI device to the VFIO framework.
  
- 	  If you don't know what to do here, say N.
- 
- if VFIO_PCI
- config VFIO_PCI_VGA
--	bool "VFIO PCI support for VGA devices"
-+	bool "Generic VFIO PCI support for VGA devices"
- 	depends on X86 && VGA_ARB
- 	help
- 	  Support for VGA extension to VFIO PCI.  This exposes an additional
-@@ -22,14 +34,8 @@ config VFIO_PCI_VGA
- 
- 	  If you don't know what to do here, say N.
- 
--config VFIO_PCI_MMAP
--	def_bool y if !S390
--
--config VFIO_PCI_INTX
--	def_bool y if !S390
--
- config VFIO_PCI_IGD
--	bool "VFIO PCI extensions for Intel graphics (GVT-d)"
-+	bool "Generic VFIO PCI extensions for Intel graphics (GVT-d)"
- 	depends on X86
- 	default y
- 	help
-@@ -39,5 +45,5 @@ config VFIO_PCI_IGD
- 	  and LPC bridge config space.
- 
- 	  To enable Intel IGD assignment through vfio-pci, say Y.
--
-+endif
- endif
-diff --git a/drivers/vfio/pci/Makefile b/drivers/vfio/pci/Makefile
-index 8aa517b4b671..349d68d242b4 100644
---- a/drivers/vfio/pci/Makefile
-+++ b/drivers/vfio/pci/Makefile
-@@ -1,7 +1,9 @@
- # SPDX-License-Identifier: GPL-2.0-only
- 
--vfio-pci-y := vfio_pci.o vfio_pci_core.o vfio_pci_intrs.o vfio_pci_rdwr.o vfio_pci_config.o
--vfio-pci-$(CONFIG_VFIO_PCI_IGD) += vfio_pci_igd.o
--vfio-pci-$(CONFIG_S390) += vfio_pci_zdev.o
-+vfio-pci-core-y := vfio_pci_core.o vfio_pci_intrs.o vfio_pci_rdwr.o vfio_pci_config.o
-+vfio-pci-core-$(CONFIG_S390) += vfio_pci_zdev.o
-+obj-$(CONFIG_VFIO_PCI_CORE) += vfio-pci-core.o
- 
-+vfio-pci-y := vfio_pci.o
-+vfio-pci-$(CONFIG_VFIO_PCI_IGD) += vfio_pci_igd.o
- obj-$(CONFIG_VFIO_PCI) += vfio-pci.o
-diff --git a/drivers/vfio/pci/vfio_pci.c b/drivers/vfio/pci/vfio_pci.c
-index 7a43edbe8618..41b4742aef20 100644
---- a/drivers/vfio/pci/vfio_pci.c
-+++ b/drivers/vfio/pci/vfio_pci.c
-@@ -25,7 +25,7 @@
- #include <linux/types.h>
- #include <linux/uaccess.h>
- 
--#include "vfio_pci_core.h"
-+#include <linux/vfio_pci_core.h>
- 
- #define DRIVER_VERSION  "0.2"
- #define DRIVER_AUTHOR   "Alex Williamson <alex.williamson@redhat.com>"
-@@ -154,6 +154,7 @@ static int vfio_pci_probe(struct pci_dev *pdev, const struct pci_device_id *id)
- 	ret = vfio_pci_core_register_device(vdev);
- 	if (ret)
- 		goto out_free;
-+	dev_set_drvdata(&pdev->dev, vdev);
- 	return 0;
- 
- out_free:
-@@ -249,14 +250,10 @@ static int __init vfio_pci_init(void)
- 
- 	vfio_pci_core_set_params(nointxmask, is_disable_vga, disable_idle_d3);
- 
--	ret = vfio_pci_core_init();
--	if (ret)
--		return ret;
--
- 	/* Register and scan for devices */
- 	ret = pci_register_driver(&vfio_pci_driver);
- 	if (ret)
--		goto out;
-+		return ret;
- 
- 	vfio_pci_fill_ids();
- 
-@@ -264,17 +261,12 @@ static int __init vfio_pci_init(void)
- 		pr_warn("device denylist disabled.\n");
- 
- 	return 0;
--
--out:
--	vfio_pci_core_cleanup();
--	return ret;
- }
- module_init(vfio_pci_init);
- 
- static void __exit vfio_pci_cleanup(void)
- {
- 	pci_unregister_driver(&vfio_pci_driver);
--	vfio_pci_core_cleanup();
- }
- module_exit(vfio_pci_cleanup);
- 
-diff --git a/drivers/vfio/pci/vfio_pci_config.c b/drivers/vfio/pci/vfio_pci_config.c
-index 1f034f768a27..6e58b4bf7a60 100644
---- a/drivers/vfio/pci/vfio_pci_config.c
-+++ b/drivers/vfio/pci/vfio_pci_config.c
-@@ -26,7 +26,7 @@
- #include <linux/vfio.h>
- #include <linux/slab.h>
- 
--#include "vfio_pci_core.h"
-+#include <linux/vfio_pci_core.h>
- 
- /* Fake capability ID for standard config space */
- #define PCI_CAP_ID_BASIC	0
-diff --git a/drivers/vfio/pci/vfio_pci_core.c b/drivers/vfio/pci/vfio_pci_core.c
-index e65b154f17c3..3a5b6d889a69 100644
---- a/drivers/vfio/pci/vfio_pci_core.c
-+++ b/drivers/vfio/pci/vfio_pci_core.c
-@@ -8,6 +8,8 @@
-  * Author: Tom Lyon, pugs@cisco.com
-  */
- 
-+#define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
-+
- #include <linux/device.h>
- #include <linux/eventfd.h>
- #include <linux/file.h>
-@@ -25,7 +27,11 @@
- #include <linux/nospec.h>
- #include <linux/sched/mm.h>
- 
--#include "vfio_pci_core.h"
-+#include <linux/vfio_pci_core.h>
-+
-+#define DRIVER_VERSION  "0.2"
-+#define DRIVER_AUTHOR   "Alex Williamson <alex.williamson@redhat.com>"
-+#define DRIVER_DESC "core driver for VFIO based PCI devices"
- 
- static bool nointxmask;
- static bool disable_vga;
-@@ -306,6 +312,7 @@ int vfio_pci_core_enable(struct vfio_pci_core_device *vdev)
- 
- 	return 0;
- }
-+EXPORT_SYMBOL_GPL(vfio_pci_core_enable);
- 
- void vfio_pci_core_disable(struct vfio_pci_core_device *vdev)
- {
-@@ -405,6 +412,7 @@ void vfio_pci_core_disable(struct vfio_pci_core_device *vdev)
- 	if (!disable_idle_d3)
- 		vfio_pci_set_power_state(vdev, PCI_D3hot);
- }
-+EXPORT_SYMBOL_GPL(vfio_pci_core_disable);
- 
- static struct vfio_pci_core_device *get_pf_vdev(struct vfio_pci_core_device *vdev)
- {
-@@ -461,6 +469,7 @@ void vfio_pci_core_close_device(struct vfio_device *core_vdev)
- 	}
- 	mutex_unlock(&vdev->igate);
- }
-+EXPORT_SYMBOL_GPL(vfio_pci_core_close_device);
- 
- void vfio_pci_core_finish_enable(struct vfio_pci_core_device *vdev)
- {
-@@ -468,6 +477,7 @@ void vfio_pci_core_finish_enable(struct vfio_pci_core_device *vdev)
- 	vfio_spapr_pci_eeh_open(vdev->pdev);
- 	vfio_pci_vf_token_user_add(vdev, 1);
- }
-+EXPORT_SYMBOL_GPL(vfio_pci_core_finish_enable);
- 
- static int vfio_pci_get_irq_count(struct vfio_pci_core_device *vdev, int irq_type)
- {
-@@ -626,6 +636,7 @@ int vfio_pci_register_dev_region(struct vfio_pci_core_device *vdev,
- 
- 	return 0;
- }
-+EXPORT_SYMBOL_GPL(vfio_pci_register_dev_region);
- 
- long vfio_pci_core_ioctl(struct vfio_device *core_vdev, unsigned int cmd,
- 		unsigned long arg)
-@@ -1170,6 +1181,7 @@ long vfio_pci_core_ioctl(struct vfio_device *core_vdev, unsigned int cmd,
- 
- 	return -ENOTTY;
- }
-+EXPORT_SYMBOL_GPL(vfio_pci_core_ioctl);
- 
- static ssize_t vfio_pci_rw(struct vfio_pci_core_device *vdev, char __user *buf,
- 			   size_t count, loff_t *ppos, bool iswrite)
-@@ -1213,6 +1225,7 @@ ssize_t vfio_pci_core_read(struct vfio_device *core_vdev, char __user *buf,
- 
- 	return vfio_pci_rw(vdev, buf, count, ppos, false);
- }
-+EXPORT_SYMBOL_GPL(vfio_pci_core_read);
- 
- ssize_t vfio_pci_core_write(struct vfio_device *core_vdev, const char __user *buf,
- 		size_t count, loff_t *ppos)
-@@ -1225,6 +1238,7 @@ ssize_t vfio_pci_core_write(struct vfio_device *core_vdev, const char __user *bu
- 
- 	return vfio_pci_rw(vdev, (char __user *)buf, count, ppos, true);
- }
-+EXPORT_SYMBOL_GPL(vfio_pci_core_write);
- 
- /* Return 1 on zap and vma_lock acquired, 0 on contention (only with @try) */
- static int vfio_pci_zap_and_vma_lock(struct vfio_pci_core_device *vdev, bool try)
-@@ -1503,6 +1517,7 @@ int vfio_pci_core_mmap(struct vfio_device *core_vdev, struct vm_area_struct *vma
- 
- 	return 0;
- }
-+EXPORT_SYMBOL_GPL(vfio_pci_core_mmap);
- 
- void vfio_pci_core_request(struct vfio_device *core_vdev, unsigned int count)
- {
-@@ -1525,6 +1540,7 @@ void vfio_pci_core_request(struct vfio_device *core_vdev, unsigned int count)
- 
- 	mutex_unlock(&vdev->igate);
- }
-+EXPORT_SYMBOL_GPL(vfio_pci_core_request);
- 
- static int vfio_pci_validate_vf_token(struct vfio_pci_core_device *vdev,
- 				      bool vf_token, uuid_t *uuid)
-@@ -1669,6 +1685,7 @@ int vfio_pci_core_match(struct vfio_device *core_vdev, char *buf)
- 
- 	return 1; /* Match */
- }
-+EXPORT_SYMBOL_GPL(vfio_pci_core_match);
- 
- static int vfio_pci_bus_notifier(struct notifier_block *nb,
- 				 unsigned long action, void *data)
-@@ -1776,6 +1793,7 @@ void vfio_pci_core_init_device(struct vfio_pci_core_device *vdev,
- 	INIT_LIST_HEAD(&vdev->vma_list);
- 	init_rwsem(&vdev->memory_lock);
- }
-+EXPORT_SYMBOL_GPL(vfio_pci_core_init_device);
- 
- void vfio_pci_core_uninit_device(struct vfio_pci_core_device *vdev)
- {
-@@ -1786,6 +1804,7 @@ void vfio_pci_core_uninit_device(struct vfio_pci_core_device *vdev)
- 	kfree(vdev->region);
- 	kfree(vdev->pm_save);
- }
-+EXPORT_SYMBOL_GPL(vfio_pci_core_uninit_device);
- 
- int vfio_pci_core_register_device(struct vfio_pci_core_device *vdev)
- {
-@@ -1847,7 +1866,6 @@ int vfio_pci_core_register_device(struct vfio_pci_core_device *vdev)
- 	ret = vfio_register_group_dev(&vdev->vdev);
- 	if (ret)
- 		goto out_power;
--	dev_set_drvdata(&pdev->dev, vdev);
- 	return 0;
- 
- out_power:
-@@ -1859,6 +1877,7 @@ int vfio_pci_core_register_device(struct vfio_pci_core_device *vdev)
- 	vfio_iommu_group_put(group, &pdev->dev);
- 	return ret;
- }
-+EXPORT_SYMBOL_GPL(vfio_pci_core_register_device);
- 
- void vfio_pci_core_unregister_device(struct vfio_pci_core_device *vdev)
- {
-@@ -1876,6 +1895,7 @@ void vfio_pci_core_unregister_device(struct vfio_pci_core_device *vdev)
- 	if (!disable_idle_d3)
- 		vfio_pci_set_power_state(vdev, PCI_D0);
- }
-+EXPORT_SYMBOL_GPL(vfio_pci_core_unregister_device);
- 
- static pci_ers_result_t vfio_pci_aer_err_detected(struct pci_dev *pdev,
- 						  pci_channel_state_t state)
-@@ -1921,10 +1941,12 @@ int vfio_pci_core_sriov_configure(struct pci_dev *pdev, int nr_virtfn)
- 
- 	return ret < 0 ? ret : nr_virtfn;
- }
-+EXPORT_SYMBOL_GPL(vfio_pci_core_sriov_configure);
- 
- const struct pci_error_handlers vfio_pci_core_err_handlers = {
- 	.error_detected = vfio_pci_aer_err_detected,
- };
-+EXPORT_SYMBOL_GPL(vfio_pci_core_err_handlers);
- 
- static int vfio_pci_check_all_devices_bound(struct pci_dev *pdev, void *data)
- {
-@@ -2094,16 +2116,23 @@ void vfio_pci_core_set_params(bool is_nointxmask, bool is_disable_vga,
- 	disable_vga = is_disable_vga;
- 	disable_idle_d3 = is_disable_idle_d3;
- }
-+EXPORT_SYMBOL_GPL(vfio_pci_core_set_params);
- 
--/* This will become the __exit function of vfio_pci_core.ko */
--void vfio_pci_core_cleanup(void)
-+static void vfio_pci_core_cleanup(void)
- {
- 	vfio_pci_uninit_perm_bits();
- }
- 
--/* This will become the __init function of vfio_pci_core.ko */
--int __init vfio_pci_core_init(void)
-+static int __init vfio_pci_core_init(void)
- {
- 	/* Allocate shared config space permission data used by all devices */
- 	return vfio_pci_init_perm_bits();
- }
-+
-+module_init(vfio_pci_core_init);
-+module_exit(vfio_pci_core_cleanup);
-+
-+MODULE_VERSION(DRIVER_VERSION);
-+MODULE_LICENSE("GPL v2");
-+MODULE_AUTHOR(DRIVER_AUTHOR);
-+MODULE_DESCRIPTION(DRIVER_DESC);
-diff --git a/drivers/vfio/pci/vfio_pci_igd.c b/drivers/vfio/pci/vfio_pci_igd.c
-index a324ca7e6b5a..7ca4109bba48 100644
---- a/drivers/vfio/pci/vfio_pci_igd.c
-+++ b/drivers/vfio/pci/vfio_pci_igd.c
-@@ -15,7 +15,7 @@
- #include <linux/uaccess.h>
- #include <linux/vfio.h>
- 
--#include "vfio_pci_core.h"
-+#include <linux/vfio_pci_core.h>
- 
- #define OPREGION_SIGNATURE	"IntelGraphicsMem"
- #define OPREGION_SIZE		(8 * 1024)
-diff --git a/drivers/vfio/pci/vfio_pci_intrs.c b/drivers/vfio/pci/vfio_pci_intrs.c
-index 945ddbdf4d11..6069a11fb51a 100644
---- a/drivers/vfio/pci/vfio_pci_intrs.c
-+++ b/drivers/vfio/pci/vfio_pci_intrs.c
-@@ -20,7 +20,7 @@
- #include <linux/wait.h>
- #include <linux/slab.h>
- 
--#include "vfio_pci_core.h"
-+#include <linux/vfio_pci_core.h>
- 
- /*
-  * INTx
-diff --git a/drivers/vfio/pci/vfio_pci_rdwr.c b/drivers/vfio/pci/vfio_pci_rdwr.c
-index 8fff4689dd44..57d3b2cbbd8e 100644
---- a/drivers/vfio/pci/vfio_pci_rdwr.c
-+++ b/drivers/vfio/pci/vfio_pci_rdwr.c
-@@ -17,7 +17,7 @@
- #include <linux/vfio.h>
- #include <linux/vgaarb.h>
- 
--#include "vfio_pci_core.h"
-+#include <linux/vfio_pci_core.h>
- 
- #ifdef __LITTLE_ENDIAN
- #define vfio_ioread64	ioread64
-diff --git a/drivers/vfio/pci/vfio_pci_zdev.c b/drivers/vfio/pci/vfio_pci_zdev.c
-index 2ffbdc11f089..fe4def9ffffb 100644
---- a/drivers/vfio/pci/vfio_pci_zdev.c
-+++ b/drivers/vfio/pci/vfio_pci_zdev.c
-@@ -19,7 +19,7 @@
- #include <asm/pci_clp.h>
- #include <asm/pci_io.h>
- 
--#include "vfio_pci_core.h"
-+#include <linux/vfio_pci_core.h>
- 
- /*
-  * Add the Base PCI Function information to the device info region.
-diff --git a/drivers/vfio/pci/vfio_pci_core.h b/include/linux/vfio_pci_core.h
-similarity index 99%
-rename from drivers/vfio/pci/vfio_pci_core.h
-rename to include/linux/vfio_pci_core.h
-index 7a2da1e14de3..ef9a44b6cf5d 100644
---- a/drivers/vfio/pci/vfio_pci_core.h
-+++ b/include/linux/vfio_pci_core.h
-@@ -207,8 +207,6 @@ static inline int vfio_pci_info_zdev_add_caps(struct vfio_pci_core_device *vdev,
- #endif
- 
- /* Will be exported for vfio pci drivers usage */
--void vfio_pci_core_cleanup(void);
--int vfio_pci_core_init(void);
- void vfio_pci_core_set_params(bool nointxmask, bool is_disable_vga,
- 			      bool is_disable_idle_d3);
- void vfio_pci_core_close_device(struct vfio_device *core_vdev);
--- 
-2.18.1
+Reviewed-by: Andrew Jones <drjones@redhat.com>
 
