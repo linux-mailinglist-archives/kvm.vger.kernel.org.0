@@ -2,121 +2,137 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3F3DA3D142C
-	for <lists+kvm@lfdr.de>; Wed, 21 Jul 2021 18:27:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 29AF93D144C
+	for <lists+kvm@lfdr.de>; Wed, 21 Jul 2021 18:37:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233838AbhGUPqn (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 21 Jul 2021 11:46:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55508 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235143AbhGUPqm (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 21 Jul 2021 11:46:42 -0400
-Received: from mail-pf1-x436.google.com (mail-pf1-x436.google.com [IPv6:2607:f8b0:4864:20::436])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 54C23C061575
-        for <kvm@vger.kernel.org>; Wed, 21 Jul 2021 09:27:18 -0700 (PDT)
-Received: by mail-pf1-x436.google.com with SMTP id p36so2578551pfw.11
-        for <kvm@vger.kernel.org>; Wed, 21 Jul 2021 09:27:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=EOyMsqYYxFEJg5167GekGU1nLM6DMcAQaXLUu9iRJuk=;
-        b=U8/ZhQ1GBVmiGpxovBk+Jo6oNPpXh4tyTGDvHPNbic392KiTgOBe1xqPWOWjzi2VSC
-         iKvU8GS/EqgUjbHTuERAqTyRr0nWfR+VQLdWYZNJyrU1XXBRK751Ln9cba089TDYEWcn
-         r1BSFWbAUNCQ6CDmDtPJgrjMaMBOuCknBC9gDZUXUIvFXjm+cV40QeI4ZeJgbNSIvBm/
-         TFGBpIi1Br4wA0T1+yFEFwk6nE19KNEyPaX7I7Qou0cJEVMYnX3PPjBC3OpGxFdP89cj
-         DV/ebacOEYLg2/0dUiT04/4UbW/KtTnLDB2hnLLMGwKuOEykMh+T9Ba150RZnDEwNDPW
-         8n4A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=EOyMsqYYxFEJg5167GekGU1nLM6DMcAQaXLUu9iRJuk=;
-        b=nV50uKIXBvIAXahrwCI4fw+SdeI4vHpUzQH37VME6PojGF+20k6B7k5B/8oVUQPZiW
-         Z+guD83DevgByilvcLr+3CUZOvqTyUsRoQvTCo6bxkM9c5KN2DHvauyijWxLahNoo5/o
-         jkXnRtaA1bktYCeqk8i5kLVx1/TYWPxmt6HH2rItVmSq04kQ5iantlDciYw39w8yymPQ
-         btSUgB9QjG7bH2f9RbBXCbDSX5e9WghV8bBNKN533yz8ZGlJ0NK3aSXpFeV6BppiPOGO
-         3LHTi2BfwOs62DV1mkhP5NOB7diC+eyOIhTexoMJaPp+pfw6YpDNR417ZwGoF6S6Jfbb
-         TIfQ==
-X-Gm-Message-State: AOAM531SojUe3tsujKAhAbYe1CVoCXCtECL8ee4YtJe5eynuMmjZHllA
-        aQ7I5Q21NHtXCffMIWuFYG8e4A==
-X-Google-Smtp-Source: ABdhPJz+a1l6GyEjbeb1OY9yjcDv2L9ziThUACSvWYeZ7yb7v/OXYS3KXN8jSszbmx9yLLwnjtq/yg==
-X-Received: by 2002:a62:804b:0:b029:328:db41:1f47 with SMTP id j72-20020a62804b0000b0290328db411f47mr37344114pfd.43.1626884837588;
-        Wed, 21 Jul 2021 09:27:17 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id 11sm27397005pfl.41.2021.07.21.09.27.16
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 21 Jul 2021 09:27:17 -0700 (PDT)
-Date:   Wed, 21 Jul 2021 16:27:13 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Mingwei Zhang <mizhang@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Ben Gardon <bgardon@google.com>,
-        Jing Zhang <jingzhangos@google.com>
-Subject: Re: [PATCH 1/2] kvm: mmu/x86: Remove redundant spte present check in
- mmu_set_spte
-Message-ID: <YPhK4axwgv7+N5OG@google.com>
-References: <20210721051247.355435-1-mizhang@google.com>
- <20210721051247.355435-2-mizhang@google.com>
+        id S232712AbhGUP4i (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 21 Jul 2021 11:56:38 -0400
+Received: from foss.arm.com ([217.140.110.172]:59396 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S230378AbhGUP4N (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 21 Jul 2021 11:56:13 -0400
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 561AB1FB;
+        Wed, 21 Jul 2021 09:36:14 -0700 (PDT)
+Received: from [192.168.0.110] (unknown [172.31.20.19])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 46B1A3F73D;
+        Wed, 21 Jul 2021 09:36:12 -0700 (PDT)
+Subject: Re: [PATCH 1/5] KVM: arm64: Walk userspace page tables to compute the
+ THP mapping size
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Marc Zyngier <maz@kernel.org>,
+        linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org,
+        kvmarm@lists.cs.columbia.edu, linux-mm@kvack.org,
+        Matthew Wilcox <willy@infradead.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Will Deacon <will@kernel.org>,
+        Quentin Perret <qperret@google.com>,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        kernel-team@android.com
+References: <20210717095541.1486210-1-maz@kernel.org>
+ <20210717095541.1486210-2-maz@kernel.org>
+ <f09c297b-21dd-a6fa-6e72-49587ba80fe5@arm.com> <YPczKoLqlKElLxzb@google.com>
+From:   Alexandru Elisei <alexandru.elisei@arm.com>
+Message-ID: <568c571a-17f5-24a5-4aec-8b508f21eddd@arm.com>
+Date:   Wed, 21 Jul 2021 17:37:16 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.12.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210721051247.355435-2-mizhang@google.com>
+In-Reply-To: <YPczKoLqlKElLxzb@google.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jul 20, 2021, Mingwei Zhang wrote:
-> Drop an unnecessary is_shadow_present_pte() check when updating the rmaps
-> after installing a non-MMIO SPTE.  set_spte() is used only to create
-> shadow-present SPTEs, e.g. MMIO SPTEs are handled early on, mmu_set_spte()
-> runs with mmu_lock held for write, i.e. the SPTE can't be zapped between
-> writing the SPTE and updating the rmaps.
-> 
-> Opportunistically combine the "new SPTE" logic for large pages and rmaps.
+Hi Sean,
 
-Heh, except you forgot to actually do this in the code.
+Thank you for writing this, it explains exactly what I wanted to know.
 
-> No functional change intended.
-> 
-> Suggested-by: Ben Gardon <bgardon@google.com>
-> Signed-off-by: Mingwei Zhang <mizhang@google.com>
-> ---
->  arch/x86/kvm/mmu/mmu.c | 10 ++++------
->  1 file changed, 4 insertions(+), 6 deletions(-)
-> 
-> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> index b888385d1933..c45ddd2c964f 100644
-> --- a/arch/x86/kvm/mmu/mmu.c
-> +++ b/arch/x86/kvm/mmu/mmu.c
-> @@ -2693,12 +2693,10 @@ static int mmu_set_spte(struct kvm_vcpu *vcpu, u64 *sptep,
->  	if (!was_rmapped && is_large_pte(*sptep))
->  		++vcpu->kvm->stat.lpages;
->  
-> -	if (is_shadow_present_pte(*sptep)) {
-> -		if (!was_rmapped) {
-> -			rmap_count = rmap_add(vcpu, sptep, gfn);
-> -			if (rmap_count > RMAP_RECYCLE_THRESHOLD)
-> -				rmap_recycle(vcpu, sptep, gfn);
-> -		}
-> +	if (!was_rmapped) {
-
-As above, this should be:
-
-	if (!was_rmapped) {
-		if (is_large_pte(*sptep))
-			++vcpu->kvm->stat.lpages;
-
-> +		rmap_count = rmap_add(vcpu, sptep, gfn);
-> +		if (rmap_count > RMAP_RECYCLE_THRESHOLD)
-> +			rmap_recycle(vcpu, sptep, gfn);
->  	}
->  
->  	return ret;
-> -- 
-> 2.32.0.402.g57bb445576-goog
-> 
+On 7/20/21 9:33 PM, Sean Christopherson wrote:
+> On Tue, Jul 20, 2021, Alexandru Elisei wrote:
+>> Hi Marc,
+>>
+>> I just can't figure out why having the mmap lock is not needed to walk the
+>> userspace page tables. Any hints? Or am I not seeing where it's taken?
+> Disclaimer: I'm not super familiar with arm64's page tables, but the relevant KVM
+> functionality is common across x86 and arm64.
+>
+> KVM arm64 (and x86) unconditionally registers a mmu_notifier for the mm_struct
+> associated with the VM, and disallows calling ioctls from a different process,
+> i.e. walking the page tables during KVM_RUN is guaranteed to use the mm for which
+> KVM registered the mmu_notifier.  As part of registration, the mmu_notifier
+> does mmgrab() and doesn't do mmdrop() until it's unregistered.  That ensures the
+> mm_struct itself is live.
+>
+> For the page tables liveliness, KVM implements mmu_notifier_ops.release, which is
+> invoked at the beginning of exit_mmap(), before the page tables are freed.  In
+> its implementation, KVM takes mmu_lock and zaps all its shadow page tables, a.k.a.
+> the stage2 tables in KVM arm64.  The flow in question, get_user_mapping_size(),
+> also runs under mmu_lock, and so effectively blocks exit_mmap() and thus is
+> guaranteed to run with live userspace tables.
+>
+> Lastly, KVM also implements mmu_notifier_ops.invalidate_range_{start,end}.  KVM's
+> invalidate_range implementations also take mmu_lock, and also update a sequence
+> counter and a flag stating that there's an invalidation in progress.  When
+> installing a stage2 entry, KVM snapshots the sequence counter before taking
+> mmu_lock, and then checks it again after acquiring mmu_lock.  If the counter
+> mismatches, or an invalidation is in-progress, then KVM bails and resumes the
+> guest without fixing the fault.
+>
+> E.g. if the host zaps userspace page tables and KVM "wins" the race, the subsequent
+> kvm_mmu_notifier_invalidate_range_start() will zap the recently installed stage2
+> entries.  And if the host zap "wins" the race, KVM will resume the guest, which
+> in normal operation will hit the exception again and go back through the entire
+> process of installing stage2 entries.
+>
+> Looking at the arm64 code, one thing I'm not clear on is whether arm64 correctly
+> handles the case where exit_mmap() wins the race.  The invalidate_range hooks will
+> still be called, so userspace page tables aren't a problem, but
+> kvm_arch_flush_shadow_all() -> kvm_free_stage2_pgd() nullifies mmu->pgt without
+> any additional notifications that I see.  x86 deals with this by ensuring its
+> top-level TDP entry (stage2 equivalent) is valid while the page fault handler is
+> running.
+>
+>   void kvm_free_stage2_pgd(struct kvm_s2_mmu *mmu)
+>   {
+> 	struct kvm *kvm = kvm_s2_mmu_to_kvm(mmu);
+> 	struct kvm_pgtable *pgt = NULL;
+>
+> 	spin_lock(&kvm->mmu_lock);
+> 	pgt = mmu->pgt;
+> 	if (pgt) {
+> 		mmu->pgd_phys = 0;
+> 		mmu->pgt = NULL;
+> 		free_percpu(mmu->last_vcpu_ran);
+> 	}
+> 	spin_unlock(&kvm->mmu_lock);
+>
+> 	...
+>   }
+>
+> AFAICT, nothing in user_mem_abort() would prevent consuming that null mmu->pgt
+> if exit_mmap() collidied with user_mem_abort().
+>
+>   static int user_mem_abort(...)
+>   {
+>
+> 	...
+>
+> 	spin_lock(&kvm->mmu_lock);
+> 	pgt = vcpu->arch.hw_mmu->pgt;         <-- hw_mmu->pgt may be NULL (hw_mmu points at vcpu->kvm->arch.mmu)
+> 	if (mmu_notifier_retry(kvm, mmu_seq)) <-- mmu_seq not guaranteed to change
+> 		goto out_unlock;
+>
+> 	...
+>
+> 	if (fault_status == FSC_PERM && vma_pagesize == fault_granule) {
+> 		ret = kvm_pgtable_stage2_relax_perms(pgt, fault_ipa, prot);
+> 	} else {
+> 		ret = kvm_pgtable_stage2_map(pgt, fault_ipa, vma_pagesize,
+> 					     __pfn_to_phys(pfn), prot,
+> 					     memcache);
+> 	}
+>   }
