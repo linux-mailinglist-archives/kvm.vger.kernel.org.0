@@ -2,117 +2,85 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 74E033D1592
-	for <lists+kvm@lfdr.de>; Wed, 21 Jul 2021 19:53:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 269983D15BE
+	for <lists+kvm@lfdr.de>; Wed, 21 Jul 2021 19:56:57 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233176AbhGURM7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 21 Jul 2021 13:12:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47178 "EHLO
+        id S230501AbhGURQN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 21 Jul 2021 13:16:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47982 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230479AbhGURM6 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 21 Jul 2021 13:12:58 -0400
-Received: from mail-qk1-x733.google.com (mail-qk1-x733.google.com [IPv6:2607:f8b0:4864:20::733])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B2BA1C0613D3
-        for <kvm@vger.kernel.org>; Wed, 21 Jul 2021 10:53:34 -0700 (PDT)
-Received: by mail-qk1-x733.google.com with SMTP id s193so2879646qke.4
-        for <kvm@vger.kernel.org>; Wed, 21 Jul 2021 10:53:34 -0700 (PDT)
+        with ESMTP id S233176AbhGURQM (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 21 Jul 2021 13:16:12 -0400
+Received: from mail-ej1-x635.google.com (mail-ej1-x635.google.com [IPv6:2a00:1450:4864:20::635])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3CA4BC061575
+        for <kvm@vger.kernel.org>; Wed, 21 Jul 2021 10:56:48 -0700 (PDT)
+Received: by mail-ej1-x635.google.com with SMTP id qb4so4467604ejc.11
+        for <kvm@vger.kernel.org>; Wed, 21 Jul 2021 10:56:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=6yFvLCK83EARCEJW2USL66XPk2Snwg9rOn4V8eQnKq4=;
-        b=LmYH4vBpP8tsrP/2QQX/a4c4LvuM1+b4/24JikG+Eg3ffRRWq1sLdvVWqmdZSpffFs
-         zYMHn1k1Y7JSxueTKglktRFPafjcur+BGgT8Ux3LXzZB1CNjBqPF55WMoTS3UHR/naUy
-         5HN4fHlgHkJlsYXgo1YafStP4kmIs1l/2txFBajcHQd5DgvTLQTHypzSg1u2dEsyWtNa
-         1Gnt5R/qqXAZ4zGACvt2zRiwgMwtDzYJEII9SZ5Ev6ztWv9+tg0z29/yQFcibOFahdej
-         SPDfQhV5wiSgG/WdTlqfqtvyXLh0cVDvfnKvx7ZZJF7FSQsGy43aezRKof8MJZkcTPGM
-         o0VQ==
+        d=linaro.org; s=google;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=vrMphr3tpItn2w3bBK1L8WnMR/wafltXE6Any2pLriw=;
+        b=rtdiKAHwaRqh8X+FKuOHGfbcpYhyq06wimQpNcQgPkZTz6/eAvUT1D1HBNHj5YoaLE
+         X+vmixOJr4r15Dzo1zBi6hI0mIbdzMsUdGxXCqFMnKc5ROVW3dXItOh2of/2WPOU8+Yk
+         6V2CFYdkbmpsPZis/khwXfYZdxSav5Eai2B/Qj1bjP3yeYHdYbkjQXkMCXkWzO3pm9JG
+         LVxyY1yhCYvmuCdyV/944q6XZ0Dbz/mXKkDAqlCUF+JXdM6e/0elAqQoszltebGx1Rbq
+         6siHkU46e8dFc3XhRcnMXXQl+lv0FrdkasnCdiQWlL0cSBohyrZ5lqB197OkMaJYMuzB
+         dNNA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=6yFvLCK83EARCEJW2USL66XPk2Snwg9rOn4V8eQnKq4=;
-        b=QWxzRL7y8n2xbHgRsVBBYokUeTKb76YE+jWgQbJO99lj+r2JGR1MSRpDX9V9qK2TvF
-         XsrCGRgRsm2/6t+uh02fpgoeRQP3ZNRwW2ZkWueNpu5ceMZwNgwySseyFxMEZVLw4459
-         Wbyhqe9yTaPQrcmxHoB8eqML0WvgAdjsMmOgpgUipqsXRWARibQzZMCBI02i8ZCT0U2k
-         Gwy1g/SeQDVdJmisaGvlPBgmmc5i9jUdrEF4ZtZKCOtamLetvtHoBWGwKJf2hDGpUXWk
-         aw8VG8ttJOFMCJy0QAqi/oceyeQH+QsJ1Q8njWX/17OvoE90zf+7l4V/2M2JGrCwNVbN
-         UdZQ==
-X-Gm-Message-State: AOAM530464zuJgLOMZvixIKUbq5pFU58WH9dW3mvGTCS/O5klGFYTMUm
-        ni1IuE8R7sFJDLTqEA4N52d1CdOmBGt3O/cXAbPFaA==
-X-Google-Smtp-Source: ABdhPJzkyyOAFQakNLKPpJl5joOFjae/AcNTO5l2I8TPcjJJXSsAIKXc+xGIz33Gsbm9HQbKLCjKhxqfB9nnHVogi3Y=
-X-Received: by 2002:a37:8044:: with SMTP id b65mr22312539qkd.150.1626890013396;
- Wed, 21 Jul 2021 10:53:33 -0700 (PDT)
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=vrMphr3tpItn2w3bBK1L8WnMR/wafltXE6Any2pLriw=;
+        b=czP4on8F+64ckFm00HN/CWDgc9EqEjaHFI5z27SUSVJx+kk3zqZtDKYB8VaNEngK1+
+         ++sizfXbmCBVVXZ2qNK8JOhNNQzq1AnPJ2OlCdLBZu79SE7v03pe12comAWE3ikCsrfj
+         k7bCI4K/YE2ICl+pIwKpgbY5KC4iznJSMYss38E8nzoiKTv2YhLUOUeoqtzuwx4R07r7
+         rZrtqexTMOVlqtStEQYWJ7auwvDttutKCFuE6Qv2pd7MWhNqXKxWCj1h0ybrmrGKv0Ph
+         ruyk80mj4AaeSdO9ZYmd09ootL9yJdfg00HBTUbBPk8bZRANT3yeSX7hNlz3JU+khBvY
+         izeA==
+X-Gm-Message-State: AOAM531t6xJvLAiVcgbuX+JTQntX7hiw+4uD9kdR7n5B34udaKNN/Uic
+        X+yIV73/tQcfPznNcuAxXismcw==
+X-Google-Smtp-Source: ABdhPJztICbLBjabcxqrQBD4WycfWu5/hNk/dhR2NO6b/fMWzVqkTTn/NuY6CqSY8ILFXvSFOtrYAg==
+X-Received: by 2002:a17:906:4ad9:: with SMTP id u25mr39222251ejt.174.1626890206835;
+        Wed, 21 Jul 2021 10:56:46 -0700 (PDT)
+Received: from myrica (adsl-84-226-111-173.adslplus.ch. [84.226.111.173])
+        by smtp.gmail.com with ESMTPSA id p5sm6130708ejl.73.2021.07.21.10.56.45
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 21 Jul 2021 10:56:46 -0700 (PDT)
+Date:   Wed, 21 Jul 2021 19:56:25 +0200
+From:   Jean-Philippe Brucker <jean-philippe@linaro.org>
+To:     maz@kernel.org
+Cc:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
+        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+        pbonzini@redhat.com, corbet@lwn.net, james.morse@arm.com,
+        alexandru.elisei@arm.com, suzuki.poulose@arm.com,
+        catalin.marinas@arm.com, will@kernel.org,
+        lorenzo.pieralisi@arm.com, salil.mehta@huawei.com,
+        shameerali.kolothum.thodi@huawei.com, jonathan.cameron@huawei.com,
+        tabba@google.com, oupton@google.com
+Subject: Re: [RFC PATCH 0/5] KVM: arm64: Pass PSCI to userspace
+Message-ID: <YPhfyVUIKHW9xF22@myrica>
+References: <20210608154805.216869-1-jean-philippe@linaro.org>
 MIME-Version: 1.0
-References: <20210707183616.5620-1-brijesh.singh@amd.com> <20210707183616.5620-27-brijesh.singh@amd.com>
- <YPHpk3RFSmE13ZXz@google.com> <9ee5a991-3e43-3489-5ee1-ff8c66cfabc1@amd.com> <YPWuVY+rKU2/DVUS@google.com>
-In-Reply-To: <YPWuVY+rKU2/DVUS@google.com>
-From:   Marc Orr <marcorr@google.com>
-Date:   Wed, 21 Jul 2021 10:53:22 -0700
-Message-ID: <CAA03e5EW1HUZW7xWbMyYMC1Q+A18G=91qfKT-ew=X0XNGHbVtg@mail.gmail.com>
-Subject: Re: [PATCH Part2 RFC v4 26/40] KVM: SVM: Add KVM_SEV_SNP_LAUNCH_FINISH
- command
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Brijesh Singh <brijesh.singh@amd.com>, x86@kernel.org,
-        linux-kernel@vger.kernel.org, kvm list <kvm@vger.kernel.org>,
-        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
-        linux-coco@lists.linux.dev, linux-mm@kvack.org,
-        linux-crypto@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
-        David Rientjes <rientjes@google.com>,
-        Dov Murik <dovmurik@linux.ibm.com>,
-        Tobin Feldman-Fitzthum <tobin@ibm.com>,
-        Borislav Petkov <bp@alien8.de>,
-        Michael Roth <michael.roth@amd.com>,
-        Vlastimil Babka <vbabka@suse.cz>, tony.luck@intel.com,
-        npmccallum@redhat.com, brijesh.ksingh@gmail.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210608154805.216869-1-jean-philippe@linaro.org>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Jul 19, 2021 at 9:54 AM Sean Christopherson <seanjc@google.com> wrote:
->
-> On Fri, Jul 16, 2021, Brijesh Singh wrote:
-> >
-> > On 7/16/21 3:18 PM, Sean Christopherson wrote:
-> > > On Wed, Jul 07, 2021, Brijesh Singh wrote:
-> > >> +  data->gctx_paddr = __psp_pa(sev->snp_context);
-> > >> +  ret = sev_issue_cmd(kvm, SEV_CMD_SNP_LAUNCH_FINISH, data, &argp->error);
-> > > Shouldn't KVM unwind everything it did if LAUNCH_FINISH fails?  And if that's
-> > > not possible, take steps to make the VM unusable?
-> >
-> > Well, I am not sure if VM need to unwind. If the command fail but VMM decide
-> > to ignore the error then VMRUN will probably fail and user will get the KVM
-> > shutdown event. The LAUNCH_FINISH command finalizes the VM launch process,
-> > the firmware will probably not load the memory encryption keys until it moves
-> > to the running state.
->
-> Within reason, KVM needs to provide consistent, deterministic behavior.  Yes, more
-> than likely failure at this point will be fatal to the VM, but that doesn't justify
-> leaving the VM in a random/bogus state.  In addition to being a poor ABI, it also
-> makes it more difficult to reason about what is/isn't possible in KVM.
+On Tue, Jun 08, 2021 at 05:48:01PM +0200, Jean-Philippe Brucker wrote:
+> Allow userspace to request handling PSCI calls from guests. Our goal is
+> to enable a vCPU hot-add solution for Arm where the VMM presents
+> possible resources to the guest at boot, and controls which vCPUs can be
+> brought up by allowing or denying PSCI CPU_ON calls.
 
-+1 to Sean's feedback to unwind everything here properly here.
-Comments of the nature of "XYZ should happen" -- without a test (e.g.,
-selftest or kvm-unit-test) to ensure the XYZ _does_ happen -- are a
-time bomb waiting to happen.
+Since it looks like vCPU hot-add will be implemented differently, I don't
+intend to resend this series at the moment. But some of it could be
+useful for other projects and to avoid the helpful review effort going to
+waste, I fixed it up and will leave it on branch
+https://jpbrucker.net/git/linux/log/?h=kvm/psci-to-userspace
+It now only uses KVM_CAP_EXIT_HYPERCALL introduced in v5.14.
 
-Also, I wonder if we leave pages, RMPUPDATE'd to immutable in previous
-loop iterations, is it possible for them to remain as immutable and be
-reused later on (after this guest is destroyed)? And if this happens,
-will we get an RMP violation? Even if the answer is no -- go read this
-code 2,000 lines away -- it handles this case. That's still not a very
-satisfying answer. I'd rather see things cleaned up ASAP as soon as
-the code starts to go off the rails.
+Thanks,
+Jean
