@@ -2,70 +2,84 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 89AC43D2336
-	for <lists+kvm@lfdr.de>; Thu, 22 Jul 2021 14:17:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7A8413D2357
+	for <lists+kvm@lfdr.de>; Thu, 22 Jul 2021 14:30:27 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231838AbhGVLgX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 22 Jul 2021 07:36:23 -0400
-Received: from mx21.baidu.com ([220.181.3.85]:34472 "EHLO baidu.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S231724AbhGVLgX (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 22 Jul 2021 07:36:23 -0400
-Received: from BC-Mail-Ex25.internal.baidu.com (unknown [172.31.51.19])
-        by Forcepoint Email with ESMTPS id 7A46AD832354F75AE26A;
-        Thu, 22 Jul 2021 20:16:54 +0800 (CST)
-Received: from BJHW-Mail-Ex16.internal.baidu.com (10.127.64.39) by
- BC-Mail-Ex25.internal.baidu.com (172.31.51.19) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
- 15.1.2242.12; Thu, 22 Jul 2021 20:16:54 +0800
-Received: from BJHW-Mail-Ex15.internal.baidu.com (10.127.64.38) by
- BJHW-Mail-Ex16.internal.baidu.com (10.127.64.39) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
- 15.1.2308.14; Thu, 22 Jul 2021 20:16:54 +0800
-Received: from BJHW-Mail-Ex15.internal.baidu.com ([100.100.100.38]) by
- BJHW-Mail-Ex15.internal.baidu.com ([100.100.100.38]) with mapi id
- 15.01.2308.014; Thu, 22 Jul 2021 20:16:54 +0800
-From:   "Li,Rongqing" <lirongqing@baidu.com>
-To:     Wanpeng Li <kernellwp@gmail.com>
-CC:     Paolo Bonzini <pbonzini@redhat.com>,
-        Ingo Molnar <mingo@redhat.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        kvm <kvm@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>
-Subject: =?utf-8?B?562U5aSNOiBbUEFUQ0hdIEtWTTogQ29uc2lkZXIgU01UIGlkbGUgc3RhdHVz?=
- =?utf-8?Q?_when_halt_polling?=
-Thread-Topic: [PATCH] KVM: Consider SMT idle status when halt polling
-Thread-Index: AQHXfr4fbqZtloIq0E2JewUw/QgE86tOkBDQgABUwoA=
-Date:   Thu, 22 Jul 2021 12:16:53 +0000
-Message-ID: <4efe4fdb91b747da93d7980c10d016c9@baidu.com>
-References: <20210722035807.36937-1-lirongqing@baidu.com>
- <CANRm+Cx-5Yyxx5A4+qkYa01MG4BCdwXPd++bmxzOid+XL267cQ@mail.gmail.com> 
-Accept-Language: zh-CN, en-US
-Content-Language: zh-CN
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [172.22.194.42]
-x-baidu-bdmsfe-datecheck: 1_BJHW-Mail-Ex16_2021-07-22 20:16:54:183
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+        id S231874AbhGVLtu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 22 Jul 2021 07:49:50 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:26720 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S231772AbhGVLtu (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 22 Jul 2021 07:49:50 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1626957025;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=WSL7ZJVKiQveNIWfD94p7ezZFAiUNBxVvFp4267kOUk=;
+        b=Ej5sJqC5YV2WBYZJKU9H9IsOaRXkiSrkiZCN/2LY9yLf+3jVLU4aRH5r45vuBs/PmanMFf
+        jLReZJ8qHudpM/HKP1pYv8MeDgT1Tq8Rv3RpzRFJ3IQAJOR8DEXhzXQUqMaSGMAOJXkDQb
+        r78t5K6zdX/v+zzwguXosrlXwJvoCh4=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-391-D2Z8quUJPO-raM6b1OQUyQ-1; Thu, 22 Jul 2021 08:30:23 -0400
+X-MC-Unique: D2Z8quUJPO-raM6b1OQUyQ-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 67CA98B0604;
+        Thu, 22 Jul 2021 12:30:22 +0000 (UTC)
+Received: from vitty.brq.redhat.com (unknown [10.40.195.41])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id C391D10016F2;
+        Thu, 22 Jul 2021 12:30:19 +0000 (UTC)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Oliver Upton <oupton@google.com>, linux-kernel@vger.kernel.org
+Subject: [PATCH] KVM: x86: Check the right feature bit for MSR_KVM_ASYNC_PF_ACK access
+Date:   Thu, 22 Jul 2021 14:30:18 +0200
+Message-Id: <20210722123018.260035-1-vkuznets@redhat.com>
 MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-PiA+ID4gU01UIHNpYmxpbmdzIHNoYXJlIGNhY2hlcyBhbmQgb3RoZXIgaGFyZHdhcmUsIGhhbHQg
-cG9sbGluZyB3aWxsDQo+ID4gPiBkZWdyYWRlIGl0cyBzaWJsaW5nIHBlcmZvcm1hbmNlIGlmIGl0
-cyBzaWJsaW5nIGlzIGJ1c3kNCj4gPg0KPiA+IERvIHlvdSBoYXZlIGFueSByZWFsIHNjZW5hcmlv
-IGJlbmVmaXRzPyBBcyB0aGUgcG9sbGluZyBuYXR1cmUsIHNvbWUNCj4gPiBjbG91ZCBwcm92aWRl
-cnMgd2lsbCBjb25maWd1cmUgdG8gdGhlaXIgcHJlZmVycmVkIGJhbGFuY2Ugb2YgY3B1IHVzYWdl
-DQo+ID4gYW5kIHBlcmZvcm1hbmNlLCBhbmQgb3RoZXIgY2xvdWQgcHJvdmlkZXJzIGZvciB0aGVp
-ciBORlYgc2NlbmFyaW9zDQo+ID4gd2hpY2ggYXJlIG1vcmUgc2Vuc2l0aXZlIHRvIGxhdGVuY3kg
-YXJlIHZDUFUgYW5kIHBDUFUgMToxIHBpbu+8jHlvdQ0KPiA+IGRlc3Ryb3kgdGhlc2Ugc2V0dXBz
-Lg0KPiA+DQo+ID4gICAgIFdhbnBlbmcNCj4gDQoNCg0KUnVuIGEgY29weSAoc2luZ2xlIHRocmVh
-ZCkgVW5peGJlbmNoLCB3aXRoIG9yIHdpdGhvdXQgYSBidXN5IHBvbGwgcHJvZ3JhbSBpbiBpdHMg
-U01UIHNpYmxpbmcsICBhbmQgVW5peGJlbmNoIHNjb3JlIGNhbiBsb3dlciAxLzMgd2l0aCBTTVQg
-YnVzeSBwb2xsaW5nIHByb2dyYW0NCg0KQ2FuIHRoaXMgY2FzZSBzaG93IHRoaXMgaXNzdWU/DQoN
-Ci1MaSANCg0KDQo+IFRydWUsIGl0IGJlbmVmaXRzIGZvciBvdXIgcmVhbCBzY2VuYXJpby4NCj4g
-DQo+IHRoaXMgcGF0Y2ggY2FuIGxvd2VyIG91ciB3b3JrbG9hZCBjb21wdXRlIGxhdGVuY3kgaW4g
-b3VyIG11bHRpcGxlIGNvcmVzIFZNDQo+IHdoaWNoIHZDUFUgYW5kIHBDUFUgaXMgMToxIHBpbiwg
-YW5kIHRoZSB3b3JrbG9hZCB3aXRoIGxvdHMgb2YgY29tcHV0YXRpb24gYW5kDQo+IG5ldHdvcmtp
-bmcgcGFja2V0cy4NCj4gDQo+IC1MaQ0K
+MSR_KVM_ASYNC_PF_ACK MSR is part of interrupt based asynchronous page fault
+interface and not the original (deprecated) KVM_FEATURE_ASYNC_PF. This is
+stated in Documentation/virt/kvm/msr.rst.
+
+Fixes: 66570e966dd9 ("kvm: x86: only provide PV features if enabled in guest's CPUID")
+Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+---
+ arch/x86/kvm/x86.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index d715ae9f9108..88ff7a1af198 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -3406,7 +3406,7 @@ int kvm_set_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+ 			return 1;
+ 		break;
+ 	case MSR_KVM_ASYNC_PF_ACK:
+-		if (!guest_pv_has(vcpu, KVM_FEATURE_ASYNC_PF))
++		if (!guest_pv_has(vcpu, KVM_FEATURE_ASYNC_PF_INT))
+ 			return 1;
+ 		if (data & 0x1) {
+ 			vcpu->arch.apf.pageready_pending = false;
+@@ -3745,7 +3745,7 @@ int kvm_get_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+ 		msr_info->data = vcpu->arch.apf.msr_int_val;
+ 		break;
+ 	case MSR_KVM_ASYNC_PF_ACK:
+-		if (!guest_pv_has(vcpu, KVM_FEATURE_ASYNC_PF))
++		if (!guest_pv_has(vcpu, KVM_FEATURE_ASYNC_PF_INT))
+ 			return 1;
+ 
+ 		msr_info->data = 0;
+-- 
+2.31.1
+
