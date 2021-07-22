@@ -2,24 +2,24 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8161C3D1DA9
-	for <lists+kvm@lfdr.de>; Thu, 22 Jul 2021 07:43:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2A40A3D1DB0
+	for <lists+kvm@lfdr.de>; Thu, 22 Jul 2021 07:45:14 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231250AbhGVFDD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 22 Jul 2021 01:03:03 -0400
-Received: from mga06.intel.com ([134.134.136.31]:24089 "EHLO mga06.intel.com"
+        id S231286AbhGVFDm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 22 Jul 2021 01:03:42 -0400
+Received: from mga06.intel.com ([134.134.136.31]:24019 "EHLO mga06.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S231169AbhGVFCp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 22 Jul 2021 01:02:45 -0400
-X-IronPort-AV: E=McAfee;i="6200,9189,10052"; a="272686978"
+        id S230517AbhGVFD3 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 22 Jul 2021 01:03:29 -0400
+X-IronPort-AV: E=McAfee;i="6200,9189,10052"; a="272686993"
 X-IronPort-AV: E=Sophos;i="5.84,260,1620716400"; 
-   d="scan'208";a="272686978"
+   d="scan'208";a="272686993"
 Received: from fmsmga002.fm.intel.com ([10.253.24.26])
-  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Jul 2021 22:43:20 -0700
+  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Jul 2021 22:43:24 -0700
 X-IronPort-AV: E=Sophos;i="5.84,260,1620716400"; 
-   d="scan'208";a="512372563"
+   d="scan'208";a="512372590"
 Received: from vmm_a4_icx.sh.intel.com (HELO localhost.localdomain) ([10.239.53.245])
-  by fmsmga002-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Jul 2021 22:43:16 -0700
+  by fmsmga002-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Jul 2021 22:43:20 -0700
 From:   Zhu Lingshan <lingshan.zhu@intel.com>
 To:     peterz@infradead.org, pbonzini@redhat.com
 Cc:     bp@alien8.de, seanjc@google.com, vkuznets@redhat.com,
@@ -30,9 +30,9 @@ Cc:     bp@alien8.de, seanjc@google.com, vkuznets@redhat.com,
         like.xu.linux@gmail.com, boris.ostrvsky@oracle.com,
         Like Xu <like.xu@linux.intel.com>,
         Zhu Lingshan <lingshan.zhu@intel.com>
-Subject: [PATCH V9 13/18] KVM: x86: Set PEBS_UNAVAIL in IA32_MISC_ENABLE when PEBS is enabled
-Date:   Thu, 22 Jul 2021 13:41:54 +0800
-Message-Id: <20210722054159.4459-14-lingshan.zhu@intel.com>
+Subject: [PATCH V9 14/18] KVM: x86/pmu: Move pmc_speculative_in_use() to arch/x86/kvm/pmu.h
+Date:   Thu, 22 Jul 2021 13:41:55 +0800
+Message-Id: <20210722054159.4459-15-lingshan.zhu@intel.com>
 X-Mailer: git-send-email 2.27.0
 In-Reply-To: <20210722054159.4459-1-lingshan.zhu@intel.com>
 References: <20210722054159.4459-1-lingshan.zhu@intel.com>
@@ -44,55 +44,60 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Like Xu <like.xu@linux.intel.com>
 
-The bit 12 represents "Processor Event Based Sampling Unavailable (RO)" :
-	1 = PEBS is not supported.
-	0 = PEBS is supported.
-
-A write to this PEBS_UNAVL available bit will bring #GP(0) when guest PEBS
-is enabled. Some PEBS drivers in guest may care about this bit.
+It allows this inline function to be reused by more callers in
+more files, such as pmu_intel.c.
 
 Signed-off-by: Like Xu <like.xu@linux.intel.com>
 Signed-off-by: Zhu Lingshan <lingshan.zhu@intel.com>
 ---
- arch/x86/kvm/vmx/pmu_intel.c | 2 ++
- arch/x86/kvm/x86.c           | 4 ++++
- 2 files changed, 6 insertions(+)
+ arch/x86/kvm/pmu.c | 11 -----------
+ arch/x86/kvm/pmu.h | 11 +++++++++++
+ 2 files changed, 11 insertions(+), 11 deletions(-)
 
-diff --git a/arch/x86/kvm/vmx/pmu_intel.c b/arch/x86/kvm/vmx/pmu_intel.c
-index 58f32a55cc2e..296246bf253d 100644
---- a/arch/x86/kvm/vmx/pmu_intel.c
-+++ b/arch/x86/kvm/vmx/pmu_intel.c
-@@ -588,6 +588,7 @@ static void intel_pmu_refresh(struct kvm_vcpu *vcpu)
- 		bitmap_set(pmu->all_valid_pmc_idx, INTEL_PMC_IDX_FIXED_VLBR, 1);
- 
- 	if (vcpu->arch.perf_capabilities & PERF_CAP_PEBS_FORMAT) {
-+		vcpu->arch.ia32_misc_enable_msr &= ~MSR_IA32_MISC_ENABLE_PEBS_UNAVAIL;
- 		if (vcpu->arch.perf_capabilities & PERF_CAP_PEBS_BASELINE) {
- 			pmu->pebs_enable_mask = ~pmu->global_ctrl;
- 			pmu->reserved_bits &= ~ICL_EVENTSEL_ADAPTIVE;
-@@ -601,6 +602,7 @@ static void intel_pmu_refresh(struct kvm_vcpu *vcpu)
- 				~((1ull << pmu->nr_arch_gp_counters) - 1);
- 		}
- 	} else {
-+		vcpu->arch.ia32_misc_enable_msr |= MSR_IA32_MISC_ENABLE_PEBS_UNAVAIL;
- 		vcpu->arch.perf_capabilities &= ~PERF_CAP_PEBS_MASK;
- 	}
+diff --git a/arch/x86/kvm/pmu.c b/arch/x86/kvm/pmu.c
+index b907aba35ff3..d957c1e83ec9 100644
+--- a/arch/x86/kvm/pmu.c
++++ b/arch/x86/kvm/pmu.c
+@@ -481,17 +481,6 @@ void kvm_pmu_init(struct kvm_vcpu *vcpu)
+ 	kvm_pmu_refresh(vcpu);
  }
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 2f5d1ed00e4a..d3987a217ebe 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -3322,6 +3322,10 @@ int kvm_set_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
- 		break;
- 	case MSR_IA32_MISC_ENABLE:
- 		data &= ~MSR_IA32_MISC_ENABLE_EMON;
-+		if (!msr_info->host_initiated &&
-+		    (vcpu->arch.perf_capabilities & PERF_CAP_PEBS_FORMAT) &&
-+		    (data & MSR_IA32_MISC_ENABLE_PEBS_UNAVAIL))
-+			return 1;
- 		if (!kvm_check_has_quirk(vcpu->kvm, KVM_X86_QUIRK_MISC_ENABLE_NO_MWAIT) &&
- 		    ((vcpu->arch.ia32_misc_enable_msr ^ data) & MSR_IA32_MISC_ENABLE_MWAIT)) {
- 			if (!guest_cpuid_has(vcpu, X86_FEATURE_XMM3))
+ 
+-static inline bool pmc_speculative_in_use(struct kvm_pmc *pmc)
+-{
+-	struct kvm_pmu *pmu = pmc_to_pmu(pmc);
+-
+-	if (pmc_is_fixed(pmc))
+-		return fixed_ctrl_field(pmu->fixed_ctr_ctrl,
+-			pmc->idx - INTEL_PMC_IDX_FIXED) & 0x3;
+-
+-	return pmc->eventsel & ARCH_PERFMON_EVENTSEL_ENABLE;
+-}
+-
+ /* Release perf_events for vPMCs that have been unused for a full time slice.  */
+ void kvm_pmu_cleanup(struct kvm_vcpu *vcpu)
+ {
+diff --git a/arch/x86/kvm/pmu.h b/arch/x86/kvm/pmu.h
+index 1af86ae1d3f2..5795bb113e76 100644
+--- a/arch/x86/kvm/pmu.h
++++ b/arch/x86/kvm/pmu.h
+@@ -149,6 +149,17 @@ static inline u64 get_sample_period(struct kvm_pmc *pmc, u64 counter_value)
+ 	return sample_period;
+ }
+ 
++static inline bool pmc_speculative_in_use(struct kvm_pmc *pmc)
++{
++	struct kvm_pmu *pmu = pmc_to_pmu(pmc);
++
++	if (pmc_is_fixed(pmc))
++		return fixed_ctrl_field(pmu->fixed_ctr_ctrl,
++					pmc->idx - INTEL_PMC_IDX_FIXED) & 0x3;
++
++	return pmc->eventsel & ARCH_PERFMON_EVENTSEL_ENABLE;
++}
++
+ void reprogram_gp_counter(struct kvm_pmc *pmc, u64 eventsel);
+ void reprogram_fixed_counter(struct kvm_pmc *pmc, u8 ctrl, int fixed_idx);
+ void reprogram_counter(struct kvm_pmu *pmu, int pmc_idx);
 -- 
 2.27.0
 
