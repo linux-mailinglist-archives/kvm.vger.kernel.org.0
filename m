@@ -2,20 +2,20 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 593813D22F3
+	by mail.lfdr.de (Postfix) with ESMTP id 97EFA3D22F4
 	for <lists+kvm@lfdr.de>; Thu, 22 Jul 2021 13:53:01 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231802AbhGVLMX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        id S231809AbhGVLMX (ORCPT <rfc822;lists+kvm@lfdr.de>);
         Thu, 22 Jul 2021 07:12:23 -0400
-Received: from 8bytes.org ([81.169.241.247]:44212 "EHLO theia.8bytes.org"
+Received: from 8bytes.org ([81.169.241.247]:44224 "EHLO theia.8bytes.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S231784AbhGVLMT (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 22 Jul 2021 07:12:19 -0400
+        id S231785AbhGVLMU (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 22 Jul 2021 07:12:20 -0400
 Received: from cap.home.8bytes.org (p4ff2b1ea.dip0.t-ipconnect.de [79.242.177.234])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
         (No client certificate requested)
-        by theia.8bytes.org (Postfix) with ESMTPSA id F07943D0;
-        Thu, 22 Jul 2021 13:52:52 +0200 (CEST)
+        by theia.8bytes.org (Postfix) with ESMTPSA id 4BE43451;
+        Thu, 22 Jul 2021 13:52:53 +0200 (CEST)
 From:   Joerg Roedel <joro@8bytes.org>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     Sean Christopherson <seanjc@google.com>,
@@ -27,9 +27,9 @@ Cc:     Sean Christopherson <seanjc@google.com>,
         Tom Lendacky <thomas.lendacky@amd.com>, kvm@vger.kernel.org,
         linux-kernel@vger.kernel.org, linux-coco@lists.linux.dev,
         Joerg Roedel <jroedel@suse.de>
-Subject: [PATCH v2 1/4] KVM: SVM: Get rid of *ghcb_msr_bits() functions
-Date:   Thu, 22 Jul 2021 13:52:42 +0200
-Message-Id: <20210722115245.16084-2-joro@8bytes.org>
+Subject: [PATCH v2 2/4] KVM: SVM: Add support to handle AP reset MSR protocol
+Date:   Thu, 22 Jul 2021 13:52:43 +0200
+Message-Id: <20210722115245.16084-3-joro@8bytes.org>
 X-Mailer: git-send-email 2.31.1
 In-Reply-To: <20210722115245.16084-1-joro@8bytes.org>
 References: <20210722115245.16084-1-joro@8bytes.org>
@@ -39,129 +39,186 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Joerg Roedel <jroedel@suse.de>
+From: Tom Lendacky <thomas.lendacky@amd.com>
 
-Replace the get function with macros and the set function with
-hypercall specific setters. This will avoid preserving any previous
-bits in the GHCB-MSR and improved code readability.
+Add support for AP Reset Hold being invoked using the GHCB MSR protocol,
+available in version 2 of the GHCB specification.
 
-Suggested-by: Sean Christopherson <seanjc@google.com>
+Signed-off-by: Tom Lendacky <thomas.lendacky@amd.com>
+Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
 Signed-off-by: Joerg Roedel <jroedel@suse.de>
 ---
- arch/x86/include/asm/sev-common.h |  9 +++++++
- arch/x86/kvm/svm/sev.c            | 41 +++++++++++--------------------
- 2 files changed, 24 insertions(+), 26 deletions(-)
+ arch/x86/include/asm/kvm_host.h   | 10 ++++++-
+ arch/x86/include/asm/sev-common.h |  1 +
+ arch/x86/include/asm/svm.h        |  1 -
+ arch/x86/kvm/svm/sev.c            | 49 ++++++++++++++++++++++++-------
+ arch/x86/kvm/x86.c                |  5 +++-
+ 5 files changed, 53 insertions(+), 13 deletions(-)
 
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index 974cbfb1eefe..9afd9d33819a 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -231,6 +231,11 @@ enum x86_intercept_stage;
+ 	KVM_GUESTDBG_INJECT_BP | \
+ 	KVM_GUESTDBG_INJECT_DB)
+ 
++enum ap_reset_hold_type {
++	AP_RESET_HOLD_NONE,
++	AP_RESET_HOLD_NAE_EVENT,
++	AP_RESET_HOLD_MSR_PROTO,
++};
+ 
+ #define PFERR_PRESENT_BIT 0
+ #define PFERR_WRITE_BIT 1
+@@ -903,6 +908,8 @@ struct kvm_vcpu_arch {
+ #if IS_ENABLED(CONFIG_HYPERV)
+ 	hpa_t hv_root_tdp;
+ #endif
++
++	enum ap_reset_hold_type reset_hold_type;
+ };
+ 
+ struct kvm_lpage_info {
+@@ -1647,7 +1654,8 @@ int kvm_fast_pio(struct kvm_vcpu *vcpu, int size, unsigned short port, int in);
+ int kvm_emulate_cpuid(struct kvm_vcpu *vcpu);
+ int kvm_emulate_halt(struct kvm_vcpu *vcpu);
+ int kvm_vcpu_halt(struct kvm_vcpu *vcpu);
+-int kvm_emulate_ap_reset_hold(struct kvm_vcpu *vcpu);
++int kvm_emulate_ap_reset_hold(struct kvm_vcpu *vcpu,
++			      enum ap_reset_hold_type type);
+ int kvm_emulate_wbinvd(struct kvm_vcpu *vcpu);
+ 
+ void kvm_get_segment(struct kvm_vcpu *vcpu, struct kvm_segment *var, int seg);
 diff --git a/arch/x86/include/asm/sev-common.h b/arch/x86/include/asm/sev-common.h
-index 2cef6c5a52c2..8540972cad04 100644
+index 8540972cad04..04470aab421b 100644
 --- a/arch/x86/include/asm/sev-common.h
 +++ b/arch/x86/include/asm/sev-common.h
-@@ -50,6 +50,10 @@
- 		(GHCB_MSR_CPUID_REQ | \
- 		(((unsigned long)reg & GHCB_MSR_CPUID_REG_MASK) << GHCB_MSR_CPUID_REG_POS) | \
- 		(((unsigned long)fn) << GHCB_MSR_CPUID_FUNC_POS))
-+#define GHCB_MSR_CPUID_FN(msr)		\
-+	(((msr) >> GHCB_MSR_CPUID_FUNC_POS) & GHCB_MSR_CPUID_FUNC_MASK)
-+#define GHCB_MSR_CPUID_REG(msr)		\
-+	(((msr) >> GHCB_MSR_CPUID_REG_POS) & GHCB_MSR_CPUID_REG_MASK)
+@@ -11,6 +11,7 @@
+ #define GHCB_MSR_INFO_POS		0
+ #define GHCB_DATA_LOW			12
+ #define GHCB_MSR_INFO_MASK		(BIT_ULL(GHCB_DATA_LOW) - 1)
++#define GHCB_DATA_MASK			GENMASK_ULL(51, 0)
  
- /* AP Reset Hold */
- #define GHCB_MSR_AP_RESET_HOLD_REQ		0x006
-@@ -67,6 +71,11 @@
- #define GHCB_SEV_TERM_REASON(reason_set, reason_val)						  \
- 	(((((u64)reason_set) &  GHCB_MSR_TERM_REASON_SET_MASK) << GHCB_MSR_TERM_REASON_SET_POS) | \
- 	((((u64)reason_val) & GHCB_MSR_TERM_REASON_MASK) << GHCB_MSR_TERM_REASON_POS))
-+#define GHCB_MSR_TERM_REASON_SET(msr)	\
-+	(((msr) >> GHCB_MSR_TERM_REASON_SET_POS) & GHCB_MSR_TERM_REASON_SET_MASK)
-+#define GHCB_MSR_TERM_REASON(msr)	\
-+	(((msr) >> GHCB_MSR_TERM_REASON_POS) & GHCB_MSR_TERM_REASON_MASK)
-+
+ #define GHCB_DATA(v)			\
+ 	(((unsigned long)(v) & ~GHCB_MSR_INFO_MASK) >> GHCB_DATA_LOW)
+diff --git a/arch/x86/include/asm/svm.h b/arch/x86/include/asm/svm.h
+index e322676039f4..5a28f223a9a8 100644
+--- a/arch/x86/include/asm/svm.h
++++ b/arch/x86/include/asm/svm.h
+@@ -164,7 +164,6 @@ struct __attribute__ ((__packed__)) vmcb_control_area {
+ 	u8 reserved_sw[32];
+ };
  
- #define GHCB_SEV_ES_REASON_GENERAL_REQUEST	0
- #define GHCB_SEV_ES_REASON_PROTOCOL_UNSUPPORTED	1
+-
+ #define TLB_CONTROL_DO_NOTHING 0
+ #define TLB_CONTROL_FLUSH_ALL_ASID 1
+ #define TLB_CONTROL_FLUSH_ASID 3
 diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-index 6710d9ee2e4b..d7b3557b8dbb 100644
+index d7b3557b8dbb..a32ef011025f 100644
 --- a/arch/x86/kvm/svm/sev.c
 +++ b/arch/x86/kvm/svm/sev.c
-@@ -2342,16 +2342,15 @@ static bool setup_vmgexit_scratch(struct vcpu_svm *svm, bool sync, u64 len)
- 	return true;
- }
+@@ -2210,6 +2210,9 @@ static int sev_es_validate_vmgexit(struct vcpu_svm *svm)
  
--static void set_ghcb_msr_bits(struct vcpu_svm *svm, u64 value, u64 mask,
--			      unsigned int pos)
-+static void set_ghcb_msr_cpuid_resp(struct vcpu_svm *svm, u64 reg, u64 value)
+ void sev_es_unmap_ghcb(struct vcpu_svm *svm)
  {
--	svm->vmcb->control.ghcb_gpa &= ~(mask << pos);
--	svm->vmcb->control.ghcb_gpa |= (value & mask) << pos;
--}
-+	u64 msr;
- 
--static u64 get_ghcb_msr_bits(struct vcpu_svm *svm, u64 mask, unsigned int pos)
--{
--	return (svm->vmcb->control.ghcb_gpa >> pos) & mask;
-+	msr  = GHCB_MSR_CPUID_RESP;
-+	msr |= (reg & GHCB_MSR_CPUID_REG_MASK) << GHCB_MSR_CPUID_REG_POS;
-+	msr |= (value & GHCB_MSR_CPUID_VALUE_MASK) << GHCB_MSR_CPUID_VALUE_POS;
++	/* Clear any indication that the vCPU is in a type of AP Reset Hold */
++	svm->vcpu.arch.reset_hold_type = AP_RESET_HOLD_NONE;
 +
-+	svm->vmcb->control.ghcb_gpa = msr;
+ 	if (!svm->ghcb)
+ 		return;
+ 
+@@ -2353,6 +2356,11 @@ static void set_ghcb_msr_cpuid_resp(struct vcpu_svm *svm, u64 reg, u64 value)
+ 	svm->vmcb->control.ghcb_gpa = msr;
  }
  
- static void set_ghcb_msr(struct vcpu_svm *svm, u64 value)
-@@ -2380,9 +2379,7 @@ static int sev_handle_vmgexit_msr_protocol(struct vcpu_svm *svm)
- 	case GHCB_MSR_CPUID_REQ: {
- 		u64 cpuid_fn, cpuid_reg, cpuid_value;
- 
--		cpuid_fn = get_ghcb_msr_bits(svm,
--					     GHCB_MSR_CPUID_FUNC_MASK,
--					     GHCB_MSR_CPUID_FUNC_POS);
-+		cpuid_fn = GHCB_MSR_CPUID_FN(control->ghcb_gpa);
- 
- 		/* Initialize the registers needed by the CPUID intercept */
- 		vcpu->arch.regs[VCPU_REGS_RAX] = cpuid_fn;
-@@ -2394,9 +2391,8 @@ static int sev_handle_vmgexit_msr_protocol(struct vcpu_svm *svm)
- 			break;
- 		}
- 
--		cpuid_reg = get_ghcb_msr_bits(svm,
--					      GHCB_MSR_CPUID_REG_MASK,
--					      GHCB_MSR_CPUID_REG_POS);
-+		cpuid_reg = GHCB_MSR_CPUID_REG(control->ghcb_gpa);
++static void set_ghcb_msr_ap_rst_resp(struct vcpu_svm *svm, u64 value)
++{
++	svm->vmcb->control.ghcb_gpa = GHCB_MSR_AP_RESET_HOLD_RESP | (value << GHCB_DATA_LOW);
++}
 +
- 		if (cpuid_reg == 0)
- 			cpuid_value = vcpu->arch.regs[VCPU_REGS_RAX];
- 		else if (cpuid_reg == 1)
-@@ -2406,26 +2402,19 @@ static int sev_handle_vmgexit_msr_protocol(struct vcpu_svm *svm)
- 		else
- 			cpuid_value = vcpu->arch.regs[VCPU_REGS_RDX];
+ static void set_ghcb_msr(struct vcpu_svm *svm, u64 value)
+ {
+ 	svm->vmcb->control.ghcb_gpa = value;
+@@ -2406,6 +2414,17 @@ static int sev_handle_vmgexit_msr_protocol(struct vcpu_svm *svm)
  
--		set_ghcb_msr_bits(svm, cpuid_value,
--				  GHCB_MSR_CPUID_VALUE_MASK,
--				  GHCB_MSR_CPUID_VALUE_POS);
-+		set_ghcb_msr_cpuid_resp(svm, cpuid_reg, cpuid_value);
- 
--		set_ghcb_msr_bits(svm, GHCB_MSR_CPUID_RESP,
--				  GHCB_MSR_INFO_MASK,
--				  GHCB_MSR_INFO_POS);
  		break;
  	}
++	case GHCB_MSR_AP_RESET_HOLD_REQ: {
++		ret = kvm_emulate_ap_reset_hold(&svm->vcpu, AP_RESET_HOLD_MSR_PROTO);
++
++		/*
++		 * Preset the result to a non-SIPI return and then only set
++		 * the result to non-zero when delivering a SIPI.
++		 */
++		set_ghcb_msr_ap_rst_resp(svm, 0);
++
++		break;
++	}
  	case GHCB_MSR_TERM_REQ: {
  		u64 reason_set, reason_code;
  
--		reason_set = get_ghcb_msr_bits(svm,
--					       GHCB_MSR_TERM_REASON_SET_MASK,
--					       GHCB_MSR_TERM_REASON_SET_POS);
--		reason_code = get_ghcb_msr_bits(svm,
--						GHCB_MSR_TERM_REASON_MASK,
--						GHCB_MSR_TERM_REASON_POS);
-+		reason_set  = GHCB_MSR_TERM_REASON_SET(control->ghcb_gpa);
-+		reason_code = GHCB_MSR_TERM_REASON(control->ghcb_gpa);
-+
- 		pr_info("SEV-ES guest requested termination: %#llx:%#llx\n",
- 			reason_set, reason_code);
-+
- 		fallthrough;
+@@ -2491,7 +2510,7 @@ int sev_handle_vmgexit(struct kvm_vcpu *vcpu)
+ 		ret = svm_invoke_exit_handler(vcpu, SVM_EXIT_IRET);
+ 		break;
+ 	case SVM_VMGEXIT_AP_HLT_LOOP:
+-		ret = kvm_emulate_ap_reset_hold(vcpu);
++		ret = kvm_emulate_ap_reset_hold(vcpu, AP_RESET_HOLD_NAE_EVENT);
+ 		break;
+ 	case SVM_VMGEXIT_AP_JUMP_TABLE: {
+ 		struct kvm_sev_info *sev = &to_kvm_svm(vcpu->kvm)->sev_info;
+@@ -2628,13 +2647,23 @@ void sev_vcpu_deliver_sipi_vector(struct kvm_vcpu *vcpu, u8 vector)
+ 		return;
  	}
- 	default:
+ 
+-	/*
+-	 * Subsequent SIPI: Return from an AP Reset Hold VMGEXIT, where
+-	 * the guest will set the CS and RIP. Set SW_EXIT_INFO_2 to a
+-	 * non-zero value.
+-	 */
+-	if (!svm->ghcb)
+-		return;
+-
+-	ghcb_set_sw_exit_info_2(svm->ghcb, 1);
++	/* Subsequent SIPI */
++	switch (vcpu->arch.reset_hold_type) {
++	case AP_RESET_HOLD_NAE_EVENT:
++		/*
++		 * Return from an AP Reset Hold VMGEXIT, where the guest will
++		 * set the CS and RIP. Set SW_EXIT_INFO_2 to a non-zero value.
++		 */
++		ghcb_set_sw_exit_info_2(svm->ghcb, 1);
++		break;
++	case AP_RESET_HOLD_MSR_PROTO:
++		/*
++		 * Return from an AP Reset Hold VMGEXIT, where the guest will
++		 * set the CS and RIP. Set GHCB data field to a non-zero value.
++		 */
++		set_ghcb_msr_ap_rst_resp(svm, 1);
++		break;
++	default:
++		break;
++	}
+ }
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index a4fd10604f72..927ef55bdb2d 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -8504,10 +8504,13 @@ int kvm_emulate_halt(struct kvm_vcpu *vcpu)
+ }
+ EXPORT_SYMBOL_GPL(kvm_emulate_halt);
+ 
+-int kvm_emulate_ap_reset_hold(struct kvm_vcpu *vcpu)
++int kvm_emulate_ap_reset_hold(struct kvm_vcpu *vcpu,
++			      enum ap_reset_hold_type type)
+ {
+ 	int ret = kvm_skip_emulated_instruction(vcpu);
+ 
++	vcpu->arch.reset_hold_type = type;
++
+ 	return __kvm_vcpu_halt(vcpu, KVM_MP_STATE_AP_RESET_HOLD, KVM_EXIT_AP_RESET_HOLD) && ret;
+ }
+ EXPORT_SYMBOL_GPL(kvm_emulate_ap_reset_hold);
 -- 
 2.31.1
 
