@@ -2,116 +2,106 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 280153D2AC1
-	for <lists+kvm@lfdr.de>; Thu, 22 Jul 2021 19:08:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E25B23D2B02
+	for <lists+kvm@lfdr.de>; Thu, 22 Jul 2021 19:19:56 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231210AbhGVQWT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 22 Jul 2021 12:22:19 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:54678 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S233829AbhGVQWO (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 22 Jul 2021 12:22:14 -0400
-Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 16MGlT0K062493;
-        Thu, 22 Jul 2021 13:02:48 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : in-reply-to : references; s=pp1;
- bh=6TVmLsoFKmvY10YxmHyVkALKccJ2y7fUYOrKlnLe6lg=;
- b=noRGTNpBUO1u6JVoOFWbr78dQa5xBu6W262JVDliQknGzxWXAE1wj7KL6/8z44v64VGE
- NKCISGTig7eFH0XbkOmy56b8WGq2uwzaABIex0SHlEKZ17eMf9DFUavhISg3JtxYDnuA
- jBI/Iroir7NcO1VUbx/DsEe2bGOWhc4Le61Q0Z7HvzKRThK8E9cnQMj+oNLGalAvkneH
- 8EpZ2BtvfzUoOsRvMq0mS3Zi2hoOBlcPZWRQf+ZlWr5TJ8V9qOCHPavwQ1glNa+5Rf8y
- O2G02hSLiNs1pHt1ijYSTMT73F9a/5NtVEMfF2GmeNwAwaQBKwpkZcjlB359m03Okmpe wA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 39ycge8d43-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 22 Jul 2021 13:02:48 -0400
-Received: from m0098420.ppops.net (m0098420.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 16MGpGY3081012;
-        Thu, 22 Jul 2021 13:02:48 -0400
-Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 39ycge8d2f-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 22 Jul 2021 13:02:48 -0400
-Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
-        by ppma06ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 16MGxHWt032723;
-        Thu, 22 Jul 2021 17:02:45 GMT
-Received: from b06cxnps3074.portsmouth.uk.ibm.com (d06relay09.portsmouth.uk.ibm.com [9.149.109.194])
-        by ppma06ams.nl.ibm.com with ESMTP id 39vng727gr-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 22 Jul 2021 17:02:45 +0000
-Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
-        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 16MH2gvt11796872
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 22 Jul 2021 17:02:42 GMT
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 88973AE057;
-        Thu, 22 Jul 2021 17:02:42 +0000 (GMT)
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 05AC6AE051;
-        Thu, 22 Jul 2021 17:02:42 +0000 (GMT)
-Received: from oc3016276355.ibm.com (unknown [9.145.18.177])
-        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Thu, 22 Jul 2021 17:02:41 +0000 (GMT)
-From:   Pierre Morel <pmorel@linux.ibm.com>
-To:     kvm@vger.kernel.org
-Cc:     linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
-        borntraeger@de.ibm.com, frankja@linux.ibm.com, cohuck@redhat.com,
-        david@redhat.com, thuth@redhat.com, imbrenda@linux.ibm.com,
-        hca@linux.ibm.com, gor@linux.ibm.com, pmorel@linux.ibm.com
-Subject: [PATCH v2 2/2] s390:kvm: Topology expose TOPOLOGY facility
-Date:   Thu, 22 Jul 2021 19:02:33 +0200
-Message-Id: <1626973353-17446-3-git-send-email-pmorel@linux.ibm.com>
-X-Mailer: git-send-email 1.8.3.1
-In-Reply-To: <1626973353-17446-1-git-send-email-pmorel@linux.ibm.com>
-References: <1626973353-17446-1-git-send-email-pmorel@linux.ibm.com>
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: sySRMIDBn7Mv9FaU3s-Lz0DAHNirrAQC
-X-Proofpoint-ORIG-GUID: TLueNPNqU5m56NNm0OnoDyqZnKYayh2g
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.790
- definitions=2021-07-22_09:2021-07-22,2021-07-22 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 clxscore=1015
- mlxscore=0 spamscore=0 malwarescore=0 suspectscore=0 impostorscore=0
- bulkscore=0 phishscore=0 priorityscore=1501 lowpriorityscore=0
- mlxlogscore=999 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2104190000 definitions=main-2107220110
+        id S229667AbhGVQjI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 22 Jul 2021 12:39:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57480 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229456AbhGVQjE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 22 Jul 2021 12:39:04 -0400
+Received: from mail-pj1-x1030.google.com (mail-pj1-x1030.google.com [IPv6:2607:f8b0:4864:20::1030])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A0207C061757
+        for <kvm@vger.kernel.org>; Thu, 22 Jul 2021 10:19:39 -0700 (PDT)
+Received: by mail-pj1-x1030.google.com with SMTP id j1so5414328pjj.4
+        for <kvm@vger.kernel.org>; Thu, 22 Jul 2021 10:19:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=/3Yn5lGftevaZzFptJqzp7AFik0P8z+gOE4aOsnOdoI=;
+        b=GAt81+CoV1RZ3kbS40olQxYkXRKHjw9dJtksmAc1gHtHUrzcOZp6iI7SF2bNxm28yk
+         xk1dfU21iZbNpdMP2kDu2IShr/fL8wgNIA0idIDI3v9oCJc5g34bRcvQApg4hSEDKA9R
+         N/WX9ERrbi9bZQmFtXQ5ANLvQn0DdPB6lfHvTfO1dQvNzNqQsKu+AIx1sP4XK5EfAVJi
+         4J+CeD4pNY42EPReEReDWC6XqWJvTq1Z0NYAMyi94BesrR7hhQRTL9wYZDYnutxIH76m
+         LMPDJxp/13zHN/W7f6Udoj0doWM+V0/M5wrvnJkEUTjahSLPO+JoBrGyCPE4VM2z/xde
+         xdlA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=/3Yn5lGftevaZzFptJqzp7AFik0P8z+gOE4aOsnOdoI=;
+        b=fpS3E8qgHq9t4xq4+WD3/yiSV0k9E7GTTGMjfbleDGXZGZbrJaJwpm1Xhiex+MJK6V
+         QMIDANjKldNjjNZXJBdqdZrSm+sO+BbucJpxAgqASHu05QkdUD2SNDBbahNaVQcKNzFB
+         Olmmq9BaYuQ5QbmJVlBz41YMFhQs4etw/jJtYihcvmkINOOU0GVg/3WLTysLgduY+VYo
+         H5fMkLFNAMtAdid8od+un/zAJ9+UNH4v25/YE40+DXAYstp2qmjHoFwO9BcpMQ6ocDr5
+         /GjtHM6jTTTXWNTj2mVbXnKjJ1IN3rRYk/SkcdmYtaWgol8YPQn3PiXGyhhA+EDgiWAb
+         CfJQ==
+X-Gm-Message-State: AOAM533/iPvtf9/epN14+bB+eLVbu2rWCZ5C3yKwSH696Oaod2jFGMA4
+        /F8KJEqLChz16d+siZvRa3kukw==
+X-Google-Smtp-Source: ABdhPJzjKVMoAhpFwjzPcAUiY4cQADpfp1cv8osXVPebG3Yzibvqa7nPcInu/39qlg6bnXxuirch7A==
+X-Received: by 2002:a17:902:8f95:b029:12b:7e4b:f191 with SMTP id z21-20020a1709028f95b029012b7e4bf191mr529478plo.63.1626974378943;
+        Thu, 22 Jul 2021 10:19:38 -0700 (PDT)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id u190sm17954046pfb.95.2021.07.22.10.19.38
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 22 Jul 2021 10:19:38 -0700 (PDT)
+Date:   Thu, 22 Jul 2021 17:19:34 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Vitaly Kuznetsov <vkuznets@redhat.com>
+Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Oliver Upton <oupton@google.com>, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] KVM: x86: Check the right feature bit for
+ MSR_KVM_ASYNC_PF_ACK access
+Message-ID: <YPmopoGY4hwuVHAp@google.com>
+References: <20210722123018.260035-1-vkuznets@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210722123018.260035-1-vkuznets@redhat.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-We add a KVM extension KVM_CAP_S390_CPU_TOPOLOGY to tell the
-userland hypervisor it is safe to activate the CPU Topology facility.
+On Thu, Jul 22, 2021, Vitaly Kuznetsov wrote:
+> MSR_KVM_ASYNC_PF_ACK MSR is part of interrupt based asynchronous page fault
+> interface and not the original (deprecated) KVM_FEATURE_ASYNC_PF. This is
+> stated in Documentation/virt/kvm/msr.rst.
+> 
+> Fixes: 66570e966dd9 ("kvm: x86: only provide PV features if enabled in guest's CPUID")
+> Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+> ---
+>  arch/x86/kvm/x86.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index d715ae9f9108..88ff7a1af198 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -3406,7 +3406,7 @@ int kvm_set_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+>  			return 1;
+>  		break;
+>  	case MSR_KVM_ASYNC_PF_ACK:
+> -		if (!guest_pv_has(vcpu, KVM_FEATURE_ASYNC_PF))
+> +		if (!guest_pv_has(vcpu, KVM_FEATURE_ASYNC_PF_INT))
 
-Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
----
- arch/s390/kvm/kvm-s390.c | 1 +
- include/uapi/linux/kvm.h | 1 +
- 2 files changed, 2 insertions(+)
+Do we want to require both, or do we want to let userspace be stupid?
 
-diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
-index b655a7d82bf0..8c695ee79612 100644
---- a/arch/s390/kvm/kvm-s390.c
-+++ b/arch/s390/kvm/kvm-s390.c
-@@ -568,6 +568,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
- 	case KVM_CAP_S390_VCPU_RESETS:
- 	case KVM_CAP_SET_GUEST_DEBUG:
- 	case KVM_CAP_S390_DIAG318:
-+	case KVM_CAP_S390_CPU_TOPOLOGY:
- 		r = 1;
- 		break;
- 	case KVM_CAP_SET_GUEST_DEBUG2:
-diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-index d9e4aabcb31a..081ce0cd44b9 100644
---- a/include/uapi/linux/kvm.h
-+++ b/include/uapi/linux/kvm.h
-@@ -1112,6 +1112,7 @@ struct kvm_ppc_resize_hpt {
- #define KVM_CAP_BINARY_STATS_FD 203
- #define KVM_CAP_EXIT_ON_EMULATION_FAILURE 204
- #define KVM_CAP_ARM_MTE 205
-+#define KVM_CAP_S390_CPU_TOPOLOGY 206
- 
- #ifdef KVM_CAP_IRQ_ROUTING
- 
--- 
-2.25.1
-
+>  			return 1;
+>  		if (data & 0x1) {
+>  			vcpu->arch.apf.pageready_pending = false;
+> @@ -3745,7 +3745,7 @@ int kvm_get_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+>  		msr_info->data = vcpu->arch.apf.msr_int_val;
+>  		break;
+>  	case MSR_KVM_ASYNC_PF_ACK:
+> -		if (!guest_pv_has(vcpu, KVM_FEATURE_ASYNC_PF))
+> +		if (!guest_pv_has(vcpu, KVM_FEATURE_ASYNC_PF_INT))
+>  			return 1;
+>  
+>  		msr_info->data = 0;
+> -- 
+> 2.31.1
+> 
