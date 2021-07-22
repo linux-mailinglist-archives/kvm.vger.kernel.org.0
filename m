@@ -2,87 +2,85 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9B2D53D1AB7
-	for <lists+kvm@lfdr.de>; Thu, 22 Jul 2021 02:26:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 30E333D1BD3
+	for <lists+kvm@lfdr.de>; Thu, 22 Jul 2021 04:38:42 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229890AbhGUXqF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 21 Jul 2021 19:46:05 -0400
-Received: from mga17.intel.com ([192.55.52.151]:39215 "EHLO mga17.intel.com"
+        id S230390AbhGVB5g (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 21 Jul 2021 21:57:36 -0400
+Received: from mga03.intel.com ([134.134.136.65]:49574 "EHLO mga03.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229600AbhGUXqE (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 21 Jul 2021 19:46:04 -0400
-X-IronPort-AV: E=McAfee;i="6200,9189,10052"; a="191814944"
+        id S230367AbhGVB5e (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 21 Jul 2021 21:57:34 -0400
+X-IronPort-AV: E=McAfee;i="6200,9189,10052"; a="211612850"
 X-IronPort-AV: E=Sophos;i="5.84,259,1620716400"; 
-   d="scan'208";a="191814944"
-Received: from fmsmga003.fm.intel.com ([10.253.24.29])
-  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Jul 2021 17:26:40 -0700
+   d="scan'208";a="211612850"
+Received: from fmsmga002.fm.intel.com ([10.253.24.26])
+  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Jul 2021 19:38:09 -0700
 X-IronPort-AV: E=Sophos;i="5.84,259,1620716400"; 
-   d="scan'208";a="501534993"
-Received: from yhuang6-desk2.sh.intel.com (HELO yhuang6-desk2.ccr.corp.intel.com) ([10.239.159.119])
-  by fmsmga003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Jul 2021 17:26:36 -0700
-From:   "Huang, Ying" <ying.huang@intel.com>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Yang Shi <shy828301@gmail.com>, Zi Yan <ziy@nvidia.com>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Linux MM <linux-mm@kvack.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Dan Carpenter <dan.carpenter@oracle.com>,
-        Mel Gorman <mgorman@suse.de>,
-        Gerald Schaefer <gerald.schaefer@linux.ibm.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Hugh Dickins <hughd@google.com>,
-        Andrea Arcangeli <aarcange@redhat.com>,
-        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
-        Michal Hocko <mhocko@suse.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        kvm list <kvm@vger.kernel.org>
-Subject: Re: [PATCH] mm,do_huge_pmd_numa_page: remove unnecessary TLB
- flushing code
-References: <20210720065529.716031-1-ying.huang@intel.com>
-        <eadff602-3824-f69d-e110-466b37535c99@de.ibm.com>
-        <CAHbLzkp6LDLUK9TLM+geQM6+X6+toxAGi53UBd49Zm5xgc5aWQ@mail.gmail.com>
-        <0D75A92F-E2AA-480C-9E9A-0B6EE7897757@nvidia.com>
-        <CAHbLzkqZZEic7+H0ky9u+aKO5o_cF0N5xQ=JO2tMpc8jg8RcnQ@mail.gmail.com>
-        <YPhAEcHOCZ5yII/T@google.com>
-Date:   Thu, 22 Jul 2021 08:26:34 +0800
-In-Reply-To: <YPhAEcHOCZ5yII/T@google.com> (Sean Christopherson's message of
-        "Wed, 21 Jul 2021 15:41:05 +0000")
-Message-ID: <87lf5z9osl.fsf@yhuang6-desk2.ccr.corp.intel.com>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/27.1 (gnu/linux)
+   d="scan'208";a="512014134"
+Received: from lingshan-mobl5.ccr.corp.intel.com (HELO [10.255.29.38]) ([10.255.29.38])
+  by fmsmga002-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Jul 2021 19:38:02 -0700
+Subject: Re: [PATCH V8 01/18] perf/core: Use static_call to optimize
+ perf_guest_info_callbacks
+To:     Like Xu <like.xu.linux@gmail.com>
+Cc:     bp@alien8.de, seanjc@google.com, vkuznets@redhat.com,
+        wanpengli@tencent.com, jmattson@google.com, joro@8bytes.org,
+        kan.liang@linux.intel.com, ak@linux.intel.com,
+        wei.w.wang@intel.com, eranian@google.com, liuxiangdong5@huawei.com,
+        linux-kernel@vger.kernel.org, x86@kernel.org, kvm@vger.kernel.org,
+        boris.ostrvsky@oracle.com, Like Xu <like.xu@linux.intel.com>,
+        Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>,
+        Guo Ren <guoren@kernel.org>, Nick Hu <nickhu@andestech.com>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        linux-csky@vger.kernel.org, linux-riscv@lists.infradead.org,
+        xen-devel@lists.xenproject.org,
+        Peter Zijlstra <peterz@infradead.org>,
+        Paolo Bonzini <pbonzini@redhat.com>
+References: <20210716085325.10300-1-lingshan.zhu@intel.com>
+ <20210716085325.10300-2-lingshan.zhu@intel.com>
+ <fd117e37-8063-63a4-43cd-7cb555e5bab5@gmail.com>
+From:   "Zhu, Lingshan" <lingshan.zhu@intel.com>
+Message-ID: <c5fad2b5-2c2f-9b06-6f45-629776a690fa@intel.com>
+Date:   Thu, 22 Jul 2021 10:38:00 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Firefox/78.0 Thunderbird/78.12.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=ascii
+In-Reply-To: <fd117e37-8063-63a4-43cd-7cb555e5bab5@gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Sean Christopherson <seanjc@google.com> writes:
->> 
->> Thanks, I think you are correct. By looking into commit 7066f0f933a1
->> ("mm: thp: fix mmu_notifier in migrate_misplaced_transhuge_page()"),
->> the tlb flush and mmu notifier invalidate were needed since the old
->> numa fault implementation didn't change PTE to migration entry so it
->> may cause data corruption due to the writes from GPU secondary MMU.
->> 
->> The refactor does use the generic migration code which converts PTE to
->> migration entry before copying data to the new page.
->
-> That's my understanding as well, based on this blurb from commit 7066f0f933a1.
->
->     The standard PAGE_SIZEd migrate_misplaced_page is less accelerated and
->     uses the generic migrate_pages which transitions the pte from
->     numa/protnone to a migration entry in try_to_unmap_one() and flushes TLBs
->     and all mmu notifiers there before copying the page.
->
-> That analysis/justification for removing the invalidate_range() call should be
-> captured in the changelog.  Confirmation from Andrea would be a nice bonus.
 
-When we flush CPU TLB for a page that may be shared with device/VM TLB,
-we will call MMU notifiers for the page to flush the device/VM TLB.
-Right?  So when we replaced CPU TLB flushing in do_huge_pmd_numa_page()
-with that in try_to_migrate_one(), we will replace the MMU notifiers
-calling too.  Do you agree?
 
-Best Regards,
-Huang, Ying
+On 7/21/2021 7:57 PM, Like Xu wrote:
+> On 16/7/2021 4:53 pm, Zhu Lingshan wrote:
+>> +    } else if (xenpmu_data->pmu.r.regs.cpl & 3)
+oh, my typo, will fix in V9
+
+Thanks
+>
+> Lingshan, serious for this version ?
+>
+> arch/x86/xen/pmu.c:438:9: error: expected identifier or ‘(’ before 
+> ‘return’
+>   438 |         return state;
+>       |         ^~~~~~
+> arch/x86/xen/pmu.c:439:1: error: expected identifier or ‘(’ before ‘}’ 
+> token
+>   439 | }
+>       | ^
+> arch/x86/xen/pmu.c: In function ‘xen_guest_state’:
+> arch/x86/xen/pmu.c:436:9: error: control reaches end of non-void 
+> function [-Werror=return-type]
+>   436 |         }
+>       |         ^
+> cc1: some warnings being treated as errors
+>
+>> +            state |= PERF_GUEST_USER;
+>>       }
+
