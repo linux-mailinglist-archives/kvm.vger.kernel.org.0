@@ -2,89 +2,72 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id BE6CC3D1E64
-	for <lists+kvm@lfdr.de>; Thu, 22 Jul 2021 08:40:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6BD4D3D1EB6
+	for <lists+kvm@lfdr.de>; Thu, 22 Jul 2021 09:11:03 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230371AbhGVF7r (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 22 Jul 2021 01:59:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51136 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229918AbhGVF7r (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 22 Jul 2021 01:59:47 -0400
-Received: from mail-lf1-x129.google.com (mail-lf1-x129.google.com [IPv6:2a00:1450:4864:20::129])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CF533C061575;
-        Wed, 21 Jul 2021 23:40:22 -0700 (PDT)
-Received: by mail-lf1-x129.google.com with SMTP id m16so6835888lfg.13;
-        Wed, 21 Jul 2021 23:40:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=492xaH9XskXIclTeD22F++BxCoQwu3EAB4wNMkhV3+I=;
-        b=UBf4kRx2uM7bZiE9TaM+KGMq00abCQsDBJ5ZR7AHeTFfw3d36MA3MhkdHw9DrgwPNh
-         vh91KmBF3+AzO06S771Y9JfM6hjstKYeHbTPOdu0+u2GvWgW/3FO0ckqGHBcX2ADqSOS
-         P8e7ZUchfJL1/bOt1rMhfsTe7nyWiR7D/xTkqaObVnDaY/idmu57nITJR5XbMN4fmZoT
-         PnXPOPqnqCdW10OK8qC7Y3tWKu+qGjiX8jez90t7Y7wqz+bnbzOEQrlb9LKdxKs1AMmN
-         QUtnrz7xGypyvJb67cKgJ17HtIEniV32pUOaFXhEWCjRgfOApuxFWeUKIRprJOElQUMU
-         JUvQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=492xaH9XskXIclTeD22F++BxCoQwu3EAB4wNMkhV3+I=;
-        b=cKZRVaZPBCsEEn3cwNDUd/AcBzi7aNMIBfBNOA8Y5kfNAWlE+MKnrco7aWd+asB4hY
-         Y8CfsUDjAyNVWqML1/ojOBzdkJUiqAYfnTLIA1R8fY/yrp5vZw6InZZihlyPKsMa/mLc
-         wPpeWT1kGtepT/dfkUftTl7uZjIBdhNXgc9bPHPzGKlyqU5K/wlmUw0zN1/BCxzx4o4j
-         VAaOUdnpfjoZfSj1N9zLYeBIXtWiuWGWhfeuzN79IefesxMNt65/YEsL4M3vrYAQ4PZ8
-         3mgocLvIgxp6sU8FyWaWRbD+Jd+J+Fx89FzAJJac4EbkLpJC2uXYkSdO5vDKMFkbYU8K
-         nw4A==
-X-Gm-Message-State: AOAM531eKUPF54GCUgaGVX+ja+6NDO6r5emwbnUKdBnoNmXOZ30T5zWO
-        0j8qXMgxbr/reT07tfQShqXAnkDdrnRnLfSbNw==
-X-Google-Smtp-Source: ABdhPJzEsGglyTKJ2RljA2HYhKjC4ug+v2N8YFrUjpEGlyyYnYP1l9K+f7G5w+r8ICP7FaInxusXSg==
-X-Received: by 2002:ac2:44cc:: with SMTP id d12mr27963210lfm.264.1626936021062;
-        Wed, 21 Jul 2021 23:40:21 -0700 (PDT)
-Received: from localhost.localdomain (91-145-109-188.bb.dnainternet.fi. [91.145.109.188])
-        by smtp.gmail.com with ESMTPSA id b24sm790695lfp.26.2021.07.21.23.40.20
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 21 Jul 2021 23:40:20 -0700 (PDT)
-From:   mika.penttila@gmail.com
-To:     linux-kernel@vger.kernel.org
-Cc:     lirongqing@baidu.com, pbonzini@redhat.com, mingo@redhat.com,
-        peterz@infradead.org, kvm@vger.kernel.org,
-        =?UTF-8?q?Mika=20Penttil=C3=A4?= <mika.penttila@gmail.com>
-Subject: [PATCH] is_core_idle() is using a wrong variable
-Date:   Thu, 22 Jul 2021 09:39:46 +0300
-Message-Id: <20210722063946.28951-1-mika.penttila@gmail.com>
-X-Mailer: git-send-email 2.17.1
+        id S231124AbhGVGa0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 22 Jul 2021 02:30:26 -0400
+Received: from mx21.baidu.com ([220.181.3.85]:57046 "EHLO baidu.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S229969AbhGVGaY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 22 Jul 2021 02:30:24 -0400
+Received: from BJHW-Mail-Ex13.internal.baidu.com (unknown [10.127.64.36])
+        by Forcepoint Email with ESMTPS id 66883EBB53FD7BC60DC8;
+        Thu, 22 Jul 2021 15:10:55 +0800 (CST)
+Received: from BJHW-Mail-Ex15.internal.baidu.com (10.127.64.38) by
+ BJHW-Mail-Ex13.internal.baidu.com (10.127.64.36) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
+ 15.1.2308.14; Thu, 22 Jul 2021 15:10:55 +0800
+Received: from BJHW-Mail-Ex15.internal.baidu.com ([100.100.100.38]) by
+ BJHW-Mail-Ex15.internal.baidu.com ([100.100.100.38]) with mapi id
+ 15.01.2308.014; Thu, 22 Jul 2021 15:10:55 +0800
+From:   "Li,Rongqing" <lirongqing@baidu.com>
+To:     Wanpeng Li <kernellwp@gmail.com>
+CC:     Paolo Bonzini <pbonzini@redhat.com>,
+        Ingo Molnar <mingo@redhat.com>,
+        "Peter Zijlstra" <peterz@infradead.org>, kvm <kvm@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>
+Subject: =?utf-8?B?562U5aSNOiBbUEFUQ0hdIEtWTTogQ29uc2lkZXIgU01UIGlkbGUgc3RhdHVz?=
+ =?utf-8?Q?_when_halt_polling?=
+Thread-Topic: [PATCH] KVM: Consider SMT idle status when halt polling
+Thread-Index: AQHXfr4fbqZtloIq0E2JewUw/QgE86tOkBDQ
+Date:   Thu, 22 Jul 2021 07:10:55 +0000
+Message-ID: <1c26ad3589f8495f9f30fdab485d353d@baidu.com>
+References: <20210722035807.36937-1-lirongqing@baidu.com>
+ <CANRm+Cx-5Yyxx5A4+qkYa01MG4BCdwXPd++bmxzOid+XL267cQ@mail.gmail.com>
+In-Reply-To: <CANRm+Cx-5Yyxx5A4+qkYa01MG4BCdwXPd++bmxzOid+XL267cQ@mail.gmail.com>
+Accept-Language: zh-CN, en-US
+Content-Language: zh-CN
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [172.22.194.42]
+x-baidu-bdmsfe-datecheck: 1_BJHW-Mail-Ex13_2021-07-22 15:10:55:398
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Mika Penttilä <mika.penttila@gmail.com>
-
-is_core_idle() was using a wrong variable in the loop test. Fix it.
-
-Signed-off-by: Mika Penttilä <mika.penttila@gmail.com>
----
- kernel/sched/fair.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/kernel/sched/fair.c b/kernel/sched/fair.c
-index 44c452072a1b..30a6984a58f7 100644
---- a/kernel/sched/fair.c
-+++ b/kernel/sched/fair.c
-@@ -1486,7 +1486,7 @@ static inline bool is_core_idle(int cpu)
- 		if (cpu == sibling)
- 			continue;
- 
--		if (!idle_cpu(cpu))
-+		if (!idle_cpu(sibling))
- 			return false;
- 	}
- #endif
--- 
-2.17.1
-
+DQoNCj4gLS0tLS3pgq7ku7bljp/ku7YtLS0tLQ0KPiDlj5Hku7bkuro6IFdhbnBlbmcgTGkgPGtl
+cm5lbGx3cEBnbWFpbC5jb20+DQo+IOWPkemAgeaXtumXtDogMjAyMeW5tDfmnIgyMuaXpSAxMzo1
+NQ0KPiDmlLbku7bkuro6IExpLFJvbmdxaW5nIDxsaXJvbmdxaW5nQGJhaWR1LmNvbT4NCj4g5oqE
+6YCBOiBQYW9sbyBCb256aW5pIDxwYm9uemluaUByZWRoYXQuY29tPjsgSW5nbyBNb2xuYXINCj4g
+PG1pbmdvQHJlZGhhdC5jb20+OyBQZXRlciBaaWpsc3RyYSA8cGV0ZXJ6QGluZnJhZGVhZC5vcmc+
+OyBrdm0NCj4gPGt2bUB2Z2VyLmtlcm5lbC5vcmc+OyBMS01MIDxsaW51eC1rZXJuZWxAdmdlci5r
+ZXJuZWwub3JnPg0KPiDkuLvpopg6IFJlOiBbUEFUQ0hdIEtWTTogQ29uc2lkZXIgU01UIGlkbGUg
+c3RhdHVzIHdoZW4gaGFsdCBwb2xsaW5nDQo+IA0KPiBPbiBUaHUsIDIyIEp1bCAyMDIxIGF0IDEy
+OjA3LCBMaSBSb25nUWluZyA8bGlyb25ncWluZ0BiYWlkdS5jb20+IHdyb3RlOg0KPiA+DQo+ID4g
+U01UIHNpYmxpbmdzIHNoYXJlIGNhY2hlcyBhbmQgb3RoZXIgaGFyZHdhcmUsIGhhbHQgcG9sbGlu
+ZyB3aWxsDQo+ID4gZGVncmFkZSBpdHMgc2libGluZyBwZXJmb3JtYW5jZSBpZiBpdHMgc2libGlu
+ZyBpcyBidXN5DQo+IA0KPiBEbyB5b3UgaGF2ZSBhbnkgcmVhbCBzY2VuYXJpbyBiZW5lZml0cz8g
+QXMgdGhlIHBvbGxpbmcgbmF0dXJlLCBzb21lIGNsb3VkDQo+IHByb3ZpZGVycyB3aWxsIGNvbmZp
+Z3VyZSB0byB0aGVpciBwcmVmZXJyZWQgYmFsYW5jZSBvZiBjcHUgdXNhZ2UgYW5kDQo+IHBlcmZv
+cm1hbmNlLCBhbmQgb3RoZXIgY2xvdWQgcHJvdmlkZXJzIGZvciB0aGVpciBORlYgc2NlbmFyaW9z
+IHdoaWNoIGFyZSBtb3JlDQo+IHNlbnNpdGl2ZSB0byBsYXRlbmN5IGFyZSB2Q1BVIGFuZCBwQ1BV
+IDE6MSBwaW7vvIx5b3UNCj4gZGVzdHJveSB0aGVzZSBzZXR1cHMuDQo+DQo+ICAgICBXYW5wZW5n
+DQoNClRydWUsIGl0IGJlbmVmaXRzIGZvciBvdXIgcmVhbCBzY2VuYXJpby4NCg0KdGhpcyBwYXRj
+aCBjYW4gbG93ZXIgb3VyIHdvcmtsb2FkIGNvbXB1dGUgbGF0ZW5jeSBpbiBvdXIgbXVsdGlwbGUg
+Y29yZXMgVk0gd2hpY2ggdkNQVSBhbmQgcENQVSBpcyAxOjEgcGluLCBhbmQgdGhlIHdvcmtsb2Fk
+IHdpdGggbG90cyBvZiBjb21wdXRhdGlvbiBhbmQgbmV0d29ya2luZyBwYWNrZXRzLg0KDQotTGkN
+Cg==
