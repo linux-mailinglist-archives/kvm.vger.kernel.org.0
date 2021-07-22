@@ -2,132 +2,70 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 746363D230E
-	for <lists+kvm@lfdr.de>; Thu, 22 Jul 2021 14:02:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 89AC43D2336
+	for <lists+kvm@lfdr.de>; Thu, 22 Jul 2021 14:17:00 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231728AbhGVLVc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 22 Jul 2021 07:21:32 -0400
-Received: from 8bytes.org ([81.169.241.247]:44266 "EHLO theia.8bytes.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S231712AbhGVLVb (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 22 Jul 2021 07:21:31 -0400
-Received: by theia.8bytes.org (Postfix, from userid 1000)
-        id 1043E3D0; Thu, 22 Jul 2021 14:02:04 +0200 (CEST)
-Date:   Thu, 22 Jul 2021 14:01:56 +0200
-From:   Joerg Roedel <joro@8bytes.org>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Brijesh Singh <brijesh.singh@amd.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-coco@lists.linux.dev,
-        Joerg Roedel <jroedel@suse.de>
-Subject: [PATCH v2.1 3/4] KVM: SVM: Add support for Hypervisor Feature
- support MSR protocol
-Message-ID: <YPleNFvmsEi3kBZk@8bytes.org>
-References: <20210722115245.16084-1-joro@8bytes.org>
- <20210722115245.16084-4-joro@8bytes.org>
+        id S231838AbhGVLgX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 22 Jul 2021 07:36:23 -0400
+Received: from mx21.baidu.com ([220.181.3.85]:34472 "EHLO baidu.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S231724AbhGVLgX (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 22 Jul 2021 07:36:23 -0400
+Received: from BC-Mail-Ex25.internal.baidu.com (unknown [172.31.51.19])
+        by Forcepoint Email with ESMTPS id 7A46AD832354F75AE26A;
+        Thu, 22 Jul 2021 20:16:54 +0800 (CST)
+Received: from BJHW-Mail-Ex16.internal.baidu.com (10.127.64.39) by
+ BC-Mail-Ex25.internal.baidu.com (172.31.51.19) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
+ 15.1.2242.12; Thu, 22 Jul 2021 20:16:54 +0800
+Received: from BJHW-Mail-Ex15.internal.baidu.com (10.127.64.38) by
+ BJHW-Mail-Ex16.internal.baidu.com (10.127.64.39) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
+ 15.1.2308.14; Thu, 22 Jul 2021 20:16:54 +0800
+Received: from BJHW-Mail-Ex15.internal.baidu.com ([100.100.100.38]) by
+ BJHW-Mail-Ex15.internal.baidu.com ([100.100.100.38]) with mapi id
+ 15.01.2308.014; Thu, 22 Jul 2021 20:16:54 +0800
+From:   "Li,Rongqing" <lirongqing@baidu.com>
+To:     Wanpeng Li <kernellwp@gmail.com>
+CC:     Paolo Bonzini <pbonzini@redhat.com>,
+        Ingo Molnar <mingo@redhat.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        kvm <kvm@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>
+Subject: =?utf-8?B?562U5aSNOiBbUEFUQ0hdIEtWTTogQ29uc2lkZXIgU01UIGlkbGUgc3RhdHVz?=
+ =?utf-8?Q?_when_halt_polling?=
+Thread-Topic: [PATCH] KVM: Consider SMT idle status when halt polling
+Thread-Index: AQHXfr4fbqZtloIq0E2JewUw/QgE86tOkBDQgABUwoA=
+Date:   Thu, 22 Jul 2021 12:16:53 +0000
+Message-ID: <4efe4fdb91b747da93d7980c10d016c9@baidu.com>
+References: <20210722035807.36937-1-lirongqing@baidu.com>
+ <CANRm+Cx-5Yyxx5A4+qkYa01MG4BCdwXPd++bmxzOid+XL267cQ@mail.gmail.com> 
+Accept-Language: zh-CN, en-US
+Content-Language: zh-CN
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [172.22.194.42]
+x-baidu-bdmsfe-datecheck: 1_BJHW-Mail-Ex16_2021-07-22 20:16:54:183
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210722115245.16084-4-joro@8bytes.org>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Brijesh Singh <brijesh.singh@amd.com>
-
-Version 2 of the GHCB specification introduced advertisement of
-supported Hypervisor SEV features. This request is required to support
-a the GHCB version 2 protocol.
-
-Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
-Signed-off-by: Joerg Roedel <jroedel@suse.de>
----
- arch/x86/include/uapi/asm/svm.h |  1 +
- arch/x86/kvm/svm/sev.c          | 21 +++++++++++++++++++++
- arch/x86/kvm/svm/svm.h          |  1 +
- 3 files changed, 23 insertions(+)
-
-diff --git a/arch/x86/include/uapi/asm/svm.h b/arch/x86/include/uapi/asm/svm.h
-index efa969325ede..fbb6f8d27a80 100644
---- a/arch/x86/include/uapi/asm/svm.h
-+++ b/arch/x86/include/uapi/asm/svm.h
-@@ -108,6 +108,7 @@
- #define SVM_VMGEXIT_AP_JUMP_TABLE		0x80000005
- #define SVM_VMGEXIT_SET_AP_JUMP_TABLE		0
- #define SVM_VMGEXIT_GET_AP_JUMP_TABLE		1
-+#define SVM_VMGEXIT_HV_FT			0x8000fffd
- #define SVM_VMGEXIT_UNSUPPORTED_EVENT		0x8000ffff
- 
- /* Exit code reserved for hypervisor/software use */
-diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-index a32ef011025f..4565c360d87d 100644
---- a/arch/x86/kvm/svm/sev.c
-+++ b/arch/x86/kvm/svm/sev.c
-@@ -2180,6 +2180,7 @@ static int sev_es_validate_vmgexit(struct vcpu_svm *svm)
- 	case SVM_VMGEXIT_AP_HLT_LOOP:
- 	case SVM_VMGEXIT_AP_JUMP_TABLE:
- 	case SVM_VMGEXIT_UNSUPPORTED_EVENT:
-+	case SVM_VMGEXIT_HV_FT:
- 		break;
- 	default:
- 		goto vmgexit_err;
-@@ -2361,6 +2362,16 @@ static void set_ghcb_msr_ap_rst_resp(struct vcpu_svm *svm, u64 value)
- 	svm->vmcb->control.ghcb_gpa = GHCB_MSR_AP_RESET_HOLD_RESP | (value << GHCB_DATA_LOW);
- }
- 
-+static void set_ghcb_msr_hv_feat_resp(struct vcpu_svm *svm, u64 value)
-+{
-+	u64 msr;
-+
-+	msr  = GHCB_MSR_HV_FT_RESP;
-+	msr |= (value << GHCB_DATA_LOW);
-+
-+	svm->vmcb->control.ghcb_gpa = msr;
-+}
-+
- static void set_ghcb_msr(struct vcpu_svm *svm, u64 value)
- {
- 	svm->vmcb->control.ghcb_gpa = value;
-@@ -2425,6 +2436,10 @@ static int sev_handle_vmgexit_msr_protocol(struct vcpu_svm *svm)
- 
- 		break;
- 	}
-+	case GHCB_MSR_HV_FT_REQ: {
-+		set_ghcb_msr_hv_feat_resp(svm, GHCB_HV_FT_SUPPORTED);
-+		break;
-+	}
- 	case GHCB_MSR_TERM_REQ: {
- 		u64 reason_set, reason_code;
- 
-@@ -2537,6 +2552,12 @@ int sev_handle_vmgexit(struct kvm_vcpu *vcpu)
- 		ret = 1;
- 		break;
- 	}
-+	case SVM_VMGEXIT_HV_FT: {
-+		ghcb_set_sw_exit_info_2(ghcb, GHCB_HV_FT_SUPPORTED);
-+
-+		ret = 1;
-+		break;
-+	}
- 	case SVM_VMGEXIT_UNSUPPORTED_EVENT:
- 		vcpu_unimpl(vcpu,
- 			    "vmgexit: unsupported event - exit_info_1=%#llx, exit_info_2=%#llx\n",
-diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
-index 7e2090752d8f..9cafeba3340e 100644
---- a/arch/x86/kvm/svm/svm.h
-+++ b/arch/x86/kvm/svm/svm.h
-@@ -550,6 +550,7 @@ void svm_vcpu_unblocking(struct kvm_vcpu *vcpu);
- #define GHCB_VERSION_MAX	1ULL
- #define GHCB_VERSION_MIN	1ULL
- 
-+#define GHCB_HV_FT_SUPPORTED	0
- 
- extern unsigned int max_sev_asid;
- 
--- 
-2.31.1
-
+PiA+ID4gU01UIHNpYmxpbmdzIHNoYXJlIGNhY2hlcyBhbmQgb3RoZXIgaGFyZHdhcmUsIGhhbHQg
+cG9sbGluZyB3aWxsDQo+ID4gPiBkZWdyYWRlIGl0cyBzaWJsaW5nIHBlcmZvcm1hbmNlIGlmIGl0
+cyBzaWJsaW5nIGlzIGJ1c3kNCj4gPg0KPiA+IERvIHlvdSBoYXZlIGFueSByZWFsIHNjZW5hcmlv
+IGJlbmVmaXRzPyBBcyB0aGUgcG9sbGluZyBuYXR1cmUsIHNvbWUNCj4gPiBjbG91ZCBwcm92aWRl
+cnMgd2lsbCBjb25maWd1cmUgdG8gdGhlaXIgcHJlZmVycmVkIGJhbGFuY2Ugb2YgY3B1IHVzYWdl
+DQo+ID4gYW5kIHBlcmZvcm1hbmNlLCBhbmQgb3RoZXIgY2xvdWQgcHJvdmlkZXJzIGZvciB0aGVp
+ciBORlYgc2NlbmFyaW9zDQo+ID4gd2hpY2ggYXJlIG1vcmUgc2Vuc2l0aXZlIHRvIGxhdGVuY3kg
+YXJlIHZDUFUgYW5kIHBDUFUgMToxIHBpbu+8jHlvdQ0KPiA+IGRlc3Ryb3kgdGhlc2Ugc2V0dXBz
+Lg0KPiA+DQo+ID4gICAgIFdhbnBlbmcNCj4gDQoNCg0KUnVuIGEgY29weSAoc2luZ2xlIHRocmVh
+ZCkgVW5peGJlbmNoLCB3aXRoIG9yIHdpdGhvdXQgYSBidXN5IHBvbGwgcHJvZ3JhbSBpbiBpdHMg
+U01UIHNpYmxpbmcsICBhbmQgVW5peGJlbmNoIHNjb3JlIGNhbiBsb3dlciAxLzMgd2l0aCBTTVQg
+YnVzeSBwb2xsaW5nIHByb2dyYW0NCg0KQ2FuIHRoaXMgY2FzZSBzaG93IHRoaXMgaXNzdWU/DQoN
+Ci1MaSANCg0KDQo+IFRydWUsIGl0IGJlbmVmaXRzIGZvciBvdXIgcmVhbCBzY2VuYXJpby4NCj4g
+DQo+IHRoaXMgcGF0Y2ggY2FuIGxvd2VyIG91ciB3b3JrbG9hZCBjb21wdXRlIGxhdGVuY3kgaW4g
+b3VyIG11bHRpcGxlIGNvcmVzIFZNDQo+IHdoaWNoIHZDUFUgYW5kIHBDUFUgaXMgMToxIHBpbiwg
+YW5kIHRoZSB3b3JrbG9hZCB3aXRoIGxvdHMgb2YgY29tcHV0YXRpb24gYW5kDQo+IG5ldHdvcmtp
+bmcgcGFja2V0cy4NCj4gDQo+IC1MaQ0K
