@@ -2,24 +2,24 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id DE94F3D1DA1
-	for <lists+kvm@lfdr.de>; Thu, 22 Jul 2021 07:43:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id AD3043D1DA3
+	for <lists+kvm@lfdr.de>; Thu, 22 Jul 2021 07:43:22 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231221AbhGVFCk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 22 Jul 2021 01:02:40 -0400
-Received: from mga06.intel.com ([134.134.136.31]:24019 "EHLO mga06.intel.com"
+        id S231135AbhGVFCm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 22 Jul 2021 01:02:42 -0400
+Received: from mga06.intel.com ([134.134.136.31]:24064 "EHLO mga06.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S230517AbhGVFC1 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 22 Jul 2021 01:02:27 -0400
-X-IronPort-AV: E=McAfee;i="6200,9189,10052"; a="272686947"
+        id S231150AbhGVFCb (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 22 Jul 2021 01:02:31 -0400
+X-IronPort-AV: E=McAfee;i="6200,9189,10052"; a="272686953"
 X-IronPort-AV: E=Sophos;i="5.84,260,1620716400"; 
-   d="scan'208";a="272686947"
+   d="scan'208";a="272686953"
 Received: from fmsmga002.fm.intel.com ([10.253.24.26])
-  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Jul 2021 22:43:02 -0700
+  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Jul 2021 22:43:07 -0700
 X-IronPort-AV: E=Sophos;i="5.84,260,1620716400"; 
-   d="scan'208";a="512372474"
+   d="scan'208";a="512372499"
 Received: from vmm_a4_icx.sh.intel.com (HELO localhost.localdomain) ([10.239.53.245])
-  by fmsmga002-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Jul 2021 22:42:58 -0700
+  by fmsmga002-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Jul 2021 22:43:03 -0700
 From:   Zhu Lingshan <lingshan.zhu@intel.com>
 To:     peterz@infradead.org, pbonzini@redhat.com
 Cc:     bp@alien8.de, seanjc@google.com, vkuznets@redhat.com,
@@ -30,9 +30,9 @@ Cc:     bp@alien8.de, seanjc@google.com, vkuznets@redhat.com,
         like.xu.linux@gmail.com, boris.ostrvsky@oracle.com,
         Like Xu <like.xu@linux.intel.com>,
         Zhu Lingshan <lingshan.zhu@intel.com>
-Subject: [PATCH V9 09/18] KVM: x86/pmu: Reprogram PEBS event to emulate guest PEBS counter
-Date:   Thu, 22 Jul 2021 13:41:50 +0800
-Message-Id: <20210722054159.4459-10-lingshan.zhu@intel.com>
+Subject: [PATCH V9 10/18] KVM: x86/pmu: Adjust precise_ip to emulate Ice Lake guest PDIR counter
+Date:   Thu, 22 Jul 2021 13:41:51 +0800
+Message-Id: <20210722054159.4459-11-lingshan.zhu@intel.com>
 X-Mailer: git-send-email 2.27.0
 In-Reply-To: <20210722054159.4459-1-lingshan.zhu@intel.com>
 References: <20210722054159.4459-1-lingshan.zhu@intel.com>
@@ -44,112 +44,59 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Like Xu <like.xu@linux.intel.com>
 
-When a guest counter is configured as a PEBS counter through
-IA32_PEBS_ENABLE, a guest PEBS event will be reprogrammed by
-configuring a non-zero precision level in the perf_event_attr.
+The PEBS-PDIR facility on Ice Lake server is supported on IA31_FIXED0 only.
+If the guest configures counter 32 and PEBS is enabled, the PEBS-PDIR
+facility is supposed to be used, in which case KVM adjusts attr.precise_ip
+to 3 and request host perf to assign the exactly requested counter or fail.
 
-The guest PEBS overflow PMI bit would be set in the guest
-GLOBAL_STATUS MSR when PEBS facility generates a PEBS
-overflow PMI based on guest IA32_DS_AREA MSR.
+The CPU model check is also required since some platforms may place the
+PEBS-PDIR facility in another counter index.
 
-Even with the same counter index and the same event code and
-mask, guest PEBS events will not be reused for non-PEBS events.
-
-Originally-by: Andi Kleen <ak@linux.intel.com>
-Co-developed-by: Kan Liang <kan.liang@linux.intel.com>
-Signed-off-by: Kan Liang <kan.liang@linux.intel.com>
 Signed-off-by: Like Xu <like.xu@linux.intel.com>
 Signed-off-by: Zhu Lingshan <lingshan.zhu@intel.com>
 ---
- arch/x86/kvm/pmu.c | 42 ++++++++++++++++++++++++++++++++++++++----
- 1 file changed, 38 insertions(+), 4 deletions(-)
+ arch/x86/kvm/pmu.c | 2 ++
+ arch/x86/kvm/pmu.h | 7 +++++++
+ 2 files changed, 9 insertions(+)
 
 diff --git a/arch/x86/kvm/pmu.c b/arch/x86/kvm/pmu.c
-index 2dcbd1b30004..d76b0a5d80d7 100644
+index d76b0a5d80d7..b907aba35ff3 100644
 --- a/arch/x86/kvm/pmu.c
 +++ b/arch/x86/kvm/pmu.c
-@@ -74,11 +74,21 @@ static void kvm_perf_overflow_intr(struct perf_event *perf_event,
- {
- 	struct kvm_pmc *pmc = perf_event->overflow_handler_context;
- 	struct kvm_pmu *pmu = pmc_to_pmu(pmc);
-+	bool skip_pmi = false;
- 
- 	if (!test_and_set_bit(pmc->idx, pmu->reprogram_pmi)) {
--		__set_bit(pmc->idx, (unsigned long *)&pmu->global_status);
-+		if (perf_event->attr.precise_ip) {
-+			/* Indicate PEBS overflow PMI to guest. */
-+			skip_pmi = __test_and_set_bit(GLOBAL_STATUS_BUFFER_OVF_BIT,
-+						      (unsigned long *)&pmu->global_status);
-+		} else {
-+			__set_bit(pmc->idx, (unsigned long *)&pmu->global_status);
-+		}
- 		kvm_make_request(KVM_REQ_PMU, pmc->vcpu);
- 
-+		if (skip_pmi)
-+			return;
-+
- 		/*
- 		 * Inject PMI. If vcpu was in a guest mode during NMI PMI
- 		 * can be ejected on a guest mode re-entry. Otherwise we can't
-@@ -99,6 +109,7 @@ static void pmc_reprogram_counter(struct kvm_pmc *pmc, u32 type,
- 				  bool exclude_kernel, bool intr,
- 				  bool in_tx, bool in_tx_cp)
- {
-+	struct kvm_pmu *pmu = vcpu_to_pmu(pmc->vcpu);
- 	struct perf_event *event;
- 	struct perf_event_attr attr = {
- 		.type = type,
-@@ -110,6 +121,8 @@ static void pmc_reprogram_counter(struct kvm_pmc *pmc, u32 type,
- 		.exclude_kernel = exclude_kernel,
- 		.config = config,
- 	};
-+	bool pebs = test_bit(pmc->idx, (unsigned long *)&pmu->pebs_enable);
-+	perf_overflow_handler_t ovf = kvm_perf_overflow;
- 
- 	attr.sample_period = get_sample_period(pmc, pmc->counter);
- 
-@@ -124,10 +137,27 @@ static void pmc_reprogram_counter(struct kvm_pmc *pmc, u32 type,
- 		attr.sample_period = 0;
- 		attr.config |= HSW_IN_TX_CHECKPOINTED;
+@@ -153,6 +153,8 @@ static void pmc_reprogram_counter(struct kvm_pmc *pmc, u32 type,
+ 		 * could possibly care here is unsupported and needs changes.
+ 		 */
+ 		attr.precise_ip = 1;
++		if (x86_match_cpu(vmx_icl_pebs_cpu) && pmc->idx == 32)
++			attr.precise_ip = 3;
  	}
-+	if (pebs) {
-+		/*
-+		 * The non-zero precision level of guest event makes the ordinary
-+		 * guest event becomes a guest PEBS event and triggers the host
-+		 * PEBS PMI handler to determine whether the PEBS overflow PMI
-+		 * comes from the host counters or the guest.
-+		 *
-+		 * For most PEBS hardware events, the difference in the software
-+		 * precision levels of guest and host PEBS events will not affect
-+		 * the accuracy of the PEBS profiling result, because the "event IP"
-+		 * in the PEBS record is calibrated on the guest side.
-+		 *
-+		 * On Icelake everything is fine. Other hardware (GLC+, TNT+) that
-+		 * could possibly care here is unsupported and needs changes.
-+		 */
-+		attr.precise_ip = 1;
-+	}
-+	if (pebs || intr)
-+		ovf = kvm_perf_overflow_intr;
+ 	if (pebs || intr)
+ 		ovf = kvm_perf_overflow_intr;
+diff --git a/arch/x86/kvm/pmu.h b/arch/x86/kvm/pmu.h
+index 67e753edfa22..1af86ae1d3f2 100644
+--- a/arch/x86/kvm/pmu.h
++++ b/arch/x86/kvm/pmu.h
+@@ -4,6 +4,8 @@
  
--	event = perf_event_create_kernel_counter(&attr, -1, current,
--						 intr ? kvm_perf_overflow_intr :
--						 kvm_perf_overflow, pmc);
-+	event = perf_event_create_kernel_counter(&attr, -1, current, ovf, pmc);
- 	if (IS_ERR(event)) {
- 		pr_debug_ratelimited("kvm_pmu: event creation failed %ld for pmc->idx = %d\n",
- 			    PTR_ERR(event), pmc->idx);
-@@ -161,6 +191,10 @@ static bool pmc_resume_counter(struct kvm_pmc *pmc)
- 			      get_sample_period(pmc, pmc->counter)))
- 		return false;
+ #include <linux/nospec.h>
  
-+	if (!test_bit(pmc->idx, (unsigned long *)&pmc_to_pmu(pmc)->pebs_enable) &&
-+	    pmc->perf_event->attr.precise_ip)
-+		return false;
++#include <asm/cpu_device_id.h>
 +
- 	/* reuse perf_event to serve as pmc_reprogram_counter() does*/
- 	perf_event_enable(pmc->perf_event);
+ #define vcpu_to_pmu(vcpu) (&(vcpu)->arch.pmu)
+ #define pmu_to_vcpu(pmu)  (container_of((pmu), struct kvm_vcpu, arch.pmu))
+ #define pmc_to_pmu(pmc)   (&(pmc)->vcpu->arch.pmu)
+@@ -16,6 +18,11 @@
+ #define VMWARE_BACKDOOR_PMC_APPARENT_TIME	0x10002
  
+ #define MAX_FIXED_COUNTERS	3
++static const struct x86_cpu_id vmx_icl_pebs_cpu[] = {
++	X86_MATCH_INTEL_FAM6_MODEL(ICELAKE_D, NULL),
++	X86_MATCH_INTEL_FAM6_MODEL(ICELAKE_X, NULL),
++	{}
++};
+ 
+ struct kvm_event_hw_type_mapping {
+ 	u8 eventsel;
 -- 
 2.27.0
 
