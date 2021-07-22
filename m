@@ -2,155 +2,194 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 431D63D205B
-	for <lists+kvm@lfdr.de>; Thu, 22 Jul 2021 11:06:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5F6B13D2099
+	for <lists+kvm@lfdr.de>; Thu, 22 Jul 2021 11:12:57 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231259AbhGVI0G (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 22 Jul 2021 04:26:06 -0400
-Received: from mail-bn8nam12on2082.outbound.protection.outlook.com ([40.107.237.82]:16657
-        "EHLO NAM12-BN8-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S230419AbhGVI0F (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 22 Jul 2021 04:26:05 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=SpxXL8t+OxbNDcl70Ogb0ztVca3O0OC/Xt1e2GeINDdbdB5hx0DqGBZwlpJCgdKVIGf0iXNYiyIeeSNskDjicPGQpw4IDdemENTMBpCnSLOhD9FeB3jGlOX0VMqo0CsmnJKUyx+4dyiwQmsiCM2gnIrHBdzI0dGNBer11GmhPjaD0oNpKO0lreOEzD7OsP99UQjMvA+3laqdJlSi5HQCcnt1B1ZmAo2ymcC5liNJWo3abXd+i+znVqPSgLCT4aqfjnud6v+c43XY8uT+nvDudeBMcCmt2rKGXWY7a01tUveBdND5nUd7RC4QKDeXO/Rq2wvb1lA48L2b2rivvuHxUg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=YXlbI3v/FcFzaAP4ATY9J36ylt24lciBYySY/nxBpAo=;
- b=Wa6LGJhrTa4+8/ev+iXIcLBVYKhRflUUqcwLGP6WqIs9XukICN4K2K8QXmSSrufO2o3YYN0ee0jX6CvFT1l7jOgOmU3r5KTfwzd0Sh0WbZwAu6zSWHf/daftHRxQX2pFYWwZdNT0h9f17Jpz6AsLy+iGTQMQeTTIVRDdf0od1CDDbNwQt/ob36oLQFAGyIBDq8RxpDR+kZTRVL73AfS/aED5wIVOcICUyrXUfXDCZWehYC3DmSngJ/tgMcqPc0jO/KP2nCZD6lJKksjPko7pyG7+kWzOOdpEpIA8zp+iQ/6IJsM9V3h19TDbmMb8LoFcP2TIjvJVHHFDNgSQDoeLaA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.112.34) smtp.rcpttodomain=redhat.com smtp.mailfrom=nvidia.com;
- dmarc=pass (p=quarantine sp=none pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=YXlbI3v/FcFzaAP4ATY9J36ylt24lciBYySY/nxBpAo=;
- b=nDI5BwzLfQrKHcylpEdSWXH8xU7GqHX4LWOBJ2x/5+kdLxxJxr2ahJPaG1m50UcgixYwFg92w8k+7sq+7RlkUQ7AQJERAsF33h/B8cd/gnxp1+TzOpaCWX6DFjs410W1rl8oa4jwpNRGsALCtgHTyAj9VgUbO8CrueKjcc7C+3NUBKNO9Kn9JwsHGfDsYLFSu4jlGfex/HFouskHpF++jftXeslHhlG4f7D17SUXPVfWDNwBPZBocLq90j8Dlm5W6SpuNQKwxzQT/Y6Vgip65iins5mt+23JDgI2XDWCVZXzmC43sARmrmPHvP5sTgSx1Qi5QeCTGphk9ZNeFXtU6A==
-Received: from DM6PR03CA0062.namprd03.prod.outlook.com (2603:10b6:5:100::39)
- by CY4PR12MB1863.namprd12.prod.outlook.com (2603:10b6:903:120::23) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4331.29; Thu, 22 Jul
- 2021 09:06:38 +0000
-Received: from DM6NAM11FT006.eop-nam11.prod.protection.outlook.com
- (2603:10b6:5:100:cafe::96) by DM6PR03CA0062.outlook.office365.com
- (2603:10b6:5:100::39) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4352.26 via Frontend
- Transport; Thu, 22 Jul 2021 09:06:38 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.112.34)
- smtp.mailfrom=nvidia.com; redhat.com; dkim=none (message not signed)
- header.d=none;redhat.com; dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.112.34 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.112.34; helo=mail.nvidia.com;
-Received: from mail.nvidia.com (216.228.112.34) by
- DM6NAM11FT006.mail.protection.outlook.com (10.13.173.104) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
- 15.20.4352.24 via Frontend Transport; Thu, 22 Jul 2021 09:06:38 +0000
-Received: from [172.27.13.232] (172.20.187.5) by HQMAIL107.nvidia.com
- (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1497.2; Thu, 22 Jul
- 2021 09:06:33 +0000
-Subject: Re: [PATCH 12/12] vfio/pci: Introduce vfio_pci_core.ko
-To:     Leon Romanovsky <leonro@kernel.org>
-CC:     <bhelgaas@google.com>, <corbet@lwn.net>,
-        <alex.williamson@redhat.com>, <diana.craciun@oss.nxp.com>,
-        <kwankhede@nvidia.com>, <eric.auger@redhat.com>,
-        <masahiroy@kernel.org>, <michal.lkml@markovi.net>,
-        <linux-pci@vger.kernel.org>, <linux-doc@vger.kernel.org>,
-        <kvm@vger.kernel.org>, <linux-s390@vger.kernel.org>,
-        <linux-kbuild@vger.kernel.org>, <mgurtovoy@nvidia.com>,
-        <jgg@nvidia.com>, <maorg@nvidia.com>
-References: <20210721161609.68223-1-yishaih@nvidia.com>
- <20210721161609.68223-13-yishaih@nvidia.com> <YPhb6o06fX+/FiTY@unreal>
-From:   Yishai Hadas <yishaih@nvidia.com>
-Message-ID: <0b8db422-749d-9d93-6b3b-957259f3d0cb@nvidia.com>
-Date:   Thu, 22 Jul 2021 12:06:30 +0300
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.12.0
+        id S231407AbhGVIcS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 22 Jul 2021 04:32:18 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:58238 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S231355AbhGVIcR (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 22 Jul 2021 04:32:17 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1626945172;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=LHB99QQaMZardK9UK+e9K5UaHg4KNzxvFPUevQaZZsM=;
+        b=dnafXX6FX10MmyZiN/r7ZFG18wkwq5bQmokg0ztnOX4ksEjft8X90HZqLPnrNKB7g+tafW
+        ky4WssdiuXvLXSI+21yTvbElmz53JVUEtFno2xt09zV6l1XyfnTEUOylN3fOHOKypQPLRR
+        IjnfUK7vWiPWk3SOd5aSIpfe7WY/Pjg=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-181-frr_6tsXPaSZpkJny4SU8w-1; Thu, 22 Jul 2021 05:12:51 -0400
+X-MC-Unique: frr_6tsXPaSZpkJny4SU8w-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2BA7B107465F;
+        Thu, 22 Jul 2021 09:12:49 +0000 (UTC)
+Received: from starship (unknown [10.40.192.10])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id D149919D9B;
+        Thu, 22 Jul 2021 09:12:44 +0000 (UTC)
+Message-ID: <564fd4461c73a4ec08d68e2364401db981ecba3a.camel@redhat.com>
+Subject: KVM's support for non default APIC base
+From:   Maxim Levitsky <mlevitsk@redhat.com>
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     kvm@vger.kernel.org,
+        "open list:X86 ARCHITECTURE (32-BIT AND 64-BIT)" 
+        <linux-kernel@vger.kernel.org>, Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, Borislav Petkov <bp@alien8.de>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ingo Molnar <mingo@redhat.com>,
+        "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>
+Date:   Thu, 22 Jul 2021 12:12:43 +0300
+In-Reply-To: <YPXJQxLaJuoF6aXl@google.com>
+References: <20210713142023.106183-1-mlevitsk@redhat.com>
+         <20210713142023.106183-9-mlevitsk@redhat.com>
+         <c51d3f0b46bb3f73d82d66fae92425be76b84a68.camel@redhat.com>
+         <YPXJQxLaJuoF6aXl@google.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
 MIME-Version: 1.0
-In-Reply-To: <YPhb6o06fX+/FiTY@unreal>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-X-Originating-IP: [172.20.187.5]
-X-ClientProxiedBy: HQMAIL105.nvidia.com (172.20.187.12) To
- HQMAIL107.nvidia.com (172.20.187.13)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 50b3dd1f-319c-4473-7fde-08d94cf00374
-X-MS-TrafficTypeDiagnostic: CY4PR12MB1863:
-X-Microsoft-Antispam-PRVS: <CY4PR12MB1863197A0CD88EE047542BD1C3E49@CY4PR12MB1863.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:10000;
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: xmE6X9B/FKL8rN/JxtBqEd5bjaXB/SB4/4MGsgGZWC+ZuQ8mH/lCzn/XlemM5TLxE1zpGvQprMY2ktGXWx8gyUUSUDhNzsna5ztnXeeGOeHt7mz3eRD4AUQu1s8+t2It2ys/fhHR+Q2UkgvnaNrj6Ezxk6HwPZMfPA7iUHWInsJOYiXUqZHYuWgDVE+i/mgY5xllpDz5B+d3dBLXBm9KooiKhi4lELq3Zo9KmmRvG9zrmkqkFvIBNgiKnLKimGs8ImMRDpS+jC+k/0V2zI6nSUYClbwVXPYlemcM0fGifoPO3rgmQSuN/6EJ7o0m33GCd3QXW6+lC1/VmeCkNAY12Aa3crYYGw+Eeu+Fb246iXIUXyynTaqzp3+oVg8EeE5tlDMzhZ6AmHAfuUnB4VeFE/EwHBP2jPXmXu1Gq4JvphRK3o9yDoGslm7DVxVkJv83EknGv4rvSzDN5+9OV5wsHZE0xn7E4nVFosfoyP0RVejqm2dPaSpQy7B8P6Y8xz0w4bMSWPoAKe+pb27wpVXMNexy82gDZm+ZlExY3MY8p7imJZST/1/C05H5TD2Leuo6z0JF3ALuMOYhhVDm0wa6ZlLIttY+1z8QylkXUT1cKhB8x+Yo3+BXNIB+pKWssINQfJ9MbpRKKr6x/Rl/wIs6yfsrIK4Aq/GXIiBEnH/NSeyDNraBy4lGJWxFlTWci4PAvFTmbMB6UCQOPKaC7Ycs1vZCpkXOhS5pv47ZQqXD/X0=
-X-Forefront-Antispam-Report: CIP:216.228.112.34;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:schybrid03.nvidia.com;CAT:NONE;SFS:(4636009)(376002)(396003)(136003)(39860400002)(346002)(36840700001)(46966006)(4326008)(336012)(82740400003)(16526019)(2616005)(107886003)(36906005)(5660300002)(82310400003)(186003)(7416002)(356005)(47076005)(53546011)(26005)(36756003)(31696002)(7636003)(70586007)(70206006)(83380400001)(86362001)(36860700001)(8676002)(316002)(478600001)(31686004)(2906002)(6916009)(8936002)(54906003)(426003)(16576012)(43740500002);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Jul 2021 09:06:38.2335
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 50b3dd1f-319c-4473-7fde-08d94cf00374
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.112.34];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource: DM6NAM11FT006.eop-nam11.prod.protection.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY4PR12MB1863
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 7/21/2021 8:39 PM, Leon Romanovsky wrote:
-> On Wed, Jul 21, 2021 at 07:16:09PM +0300, Yishai Hadas wrote:
->> From: Max Gurtovoy <mgurtovoy@nvidia.com>
->>
->> Now that vfio_pci has been split into two source modules, one focusing
->> on the "struct pci_driver" (vfio_pci.c) and a toolbox library of code
->> (vfio_pci_core.c), complete the split and move them into two different
->> kernel modules.
->>
->> As before vfio_pci.ko continues to present the same interface under
->> sysfs and this change will have no functional impact.
->>
->> Splitting into another module and adding exports allows creating new HW
->> specific VFIO PCI drivers that can implement device specific
->> functionality, such as VFIO migration interfaces or specialized device
->> requirements.
->>
->> Signed-off-by: Max Gurtovoy <mgurtovoy@nvidia.com>
->> Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
->> Signed-off-by: Yishai Hadas <yishaih@nvidia.com>
->> ---
->>   drivers/vfio/pci/Kconfig                      | 30 ++++++++------
->>   drivers/vfio/pci/Makefile                     |  8 ++--
->>   drivers/vfio/pci/vfio_pci.c                   | 14 ++-----
->>   drivers/vfio/pci/vfio_pci_config.c            |  2 +-
->>   drivers/vfio/pci/vfio_pci_core.c              | 41 ++++++++++++++++---
->>   drivers/vfio/pci/vfio_pci_igd.c               |  2 +-
->>   drivers/vfio/pci/vfio_pci_intrs.c             |  2 +-
->>   drivers/vfio/pci/vfio_pci_rdwr.c              |  2 +-
->>   drivers/vfio/pci/vfio_pci_zdev.c              |  2 +-
->>   .../pci => include/linux}/vfio_pci_core.h     |  2 -
->>   10 files changed, 66 insertions(+), 39 deletions(-)
->>   rename {drivers/vfio/pci => include/linux}/vfio_pci_core.h (99%)
-> <...>
->
->> -#include "vfio_pci_core.h"
->> +#include <linux/vfio_pci_core.h>
->> +
->> +#define DRIVER_VERSION  "0.2"
-> <...>
->
->> +MODULE_VERSION(DRIVER_VERSION);
-> Please don't add driver versions to the upstream kernel, they useless.
->
-> Thanks
+On Mon, 2021-07-19 at 18:49 +0000, Sean Christopherson wrote:
+> On Sun, Jul 18, 2021, Maxim Levitsky wrote:
+> > I am more inclined to fix this by just tracking if we hold the srcu
+> > lock on each VCPU manually, just as we track the srcu index anyway,
+> > and then kvm_request_apicv_update can use this to drop the srcu
+> > lock when needed.
+> 
+> The entire approach of dynamically adding/removing the memslot seems doomed to
+> failure, and is likely responsible for the performance issues with AVIC, e.g. a
+> single vCPU temporarily inhibiting AVIC will zap all SPTEs _twice_; on disable
+> and again on re-enable.
+> 
+> Rather than pile on more gunk, what about special casing the APIC access page
+> memslot in try_async_pf()?  E.g. zap the GFN in avic_update_access_page() when
+> disabling (and bounce through kvm_{inc,dec}_notifier_count()), and have the page
+> fault path skip directly to MMIO emulation without caching the MMIO info.  It'd
+> also give us a good excuse to rename try_async_pf() :-)
+> 
+> If lack of MMIO caching is a performance problem, an alternative solution would
+> be to allow caching but add a helper to zap the MMIO SPTE and request all vCPUs to
+> clear their cache.
+> 
+> It's all a bit gross, especially hijacking the mmu_notifier path, but IMO it'd be
+> less awful than the current memslot+SRCU mess
 
-This just preserves the code for driver/module version that was in 
-vfio_pci.ko before the split.
+Hi Sean, Paolo and everyone else:
 
-However,  this can be removed in V2 if we may need to have.
+I am exploring the approach that you proposed and I noticed that we have very inconsistient
+code that handles the APIC base relocation for in-kernel local apic.
+I do know that APIC base relocation is not supported, and I don't have anything against
+this as long as VMs don't use that feature, but I do want this to be consistent.
 
-Yishai
+I did a study of the code that is involved in this mess and I would like to hear your opinion:
+
+There are basically 3 modes of operation of in kernel local apic:
+
+Regular unaccelerated local apic:
+
+-> APIC MMIO base address is stored at 'apic->base_address', and updated in 
+   kvm_lapic_set_base which is called from  msr write of 'MSR_IA32_APICBASE'
+   (both by SVM and VMX).
+   The value is even migrated.
+
+-> APIC mmio read/write is done from MMU, when we access MMIO page:
+	vcpu_mmio_write always calls apic_mmio_write which checks if the write is in 
+	apic->base_address page and if so forwards the write local apic with offset
+	in this page.
+
+-> APIC MMIO area has to be MMIO for 'apic_mmio_write' to be called,
+   thus must contain no guest memslots.
+   If the guest relocates the APIC base somewhere where we have a memslot, 
+   memslot will take priority, while on real hardware, LAPIC is likely to
+   take priority.
+
+APICv:
+
+-> The default apic MMIO base (0xfee00000) is covered by a dummy page which is
+   allocated from qemu's process  using __x86_set_memory_region.
+   
+   This is done once in alloc_apic_access_page which is called on vcpu creation,
+   (but only once when the memslot is not yet enabled)
+
+-> to avoid pinning this page into qemu's memory, reference to it
+   is dropped in alloc_apic_access_page.
+   (see commit c24ae0dcd3e8695efa43e71704d1fc4bc7e29e9b)
+
+-> kvm_arch_mmu_notifier_invalidate_range -> checks if we invalidate GPA 0xfee00000 
+   and if so, raises KVM_REQ_APIC_PAGE_RELOAD request.
+
+-> kvm_vcpu_reload_apic_access_page handles the KVM_REQ_APIC_PAGE_RELOAD request by calling
+   kvm_x86_ops.set_apic_access_page_addr which is only implemented on VMX
+   (vmx_set_apic_access_page_addr)
+
+-> vmx_set_apic_access_page_addr does gfn_to_page on 0xfee00000 GPA,
+   and if the result is valid, writes the physical address of this page to APIC_ACCESS_ADDR vmcs field.
+
+   (This is a major difference from the AVIC - AVIC's avic_vapic_bar is *GPA*, while APIC_ACCESS_ADDR
+   is host physical address which the hypervisor is supposed to map at APIC MMIO GPA using EPT)
+
+   Note that if we have an error here, we might end with invalid APIC_ACCESS_ADDR field.
+
+-> writes to the  HPA of that special page (which has GPA of 0xfee00000, and mapped via EPT) go to
+   APICv or cause special VM exits: (EXIT_REASON_APIC_ACCESS, EXIT_REASON_APIC_WRITE)
+
+   * EXIT_REASON_APIC_ACCESS (which is used for older limited 'flexpriotiy' mode which only emulates TPR practically) 
+     actually emulates the instruction to know the written value,
+     but we have a special case in vcpu_is_mmio_gpa which makes the emulation treat the access to the default
+     apic base as MMIO.
+   
+   * EXIT_REASON_APIC_WRITE is a trap VMexit which comes with full APICv, and since it also has offset
+     qualification and the value is already in the apic page, this info is just passed to kvm_lapic_reg_write
+
+
+-> If APIC base is relocated, the APICv isn't aware of it, and the writes to new APIC base,
+   (assuming that we have no memslots covering it) will go through standard APIC MMIO emulation,
+   and *might* create a mess.
+
+AVIC:
+
+-> The default apic MMIO base (0xfee00000) 
+   is also covered by a dummy page which is allocated from qemu's process using __x86_set_memory_region 
+   in avic_update_access_page which is called also on vcpu creation (also only once),
+   and from SVM's dynamic AVIC inhibition.
+
+-> The reference to this page is not dropped thus there is no KVM_REQ_APIC_PAGE_RELOAD handler.
+   I think we should do the same we do for APICv here?
+
+-> avic_vapic_bar is GPA and thus contains 0xfee00000 but writes to MSR_IA32_APICBASE do update it
+   (avic_update_vapic_bar which is called from MSR_IA32_APICBASE write in SVM code)
+
+   thus if the guest relocates the APIC base to a writable memory page, actually AVIC would happen to work.
+   (opposite from the stock xAPIC handlilng, which only works when apic base is in MMIO area.)
+
+-> writes to the GPA in avic_vapic_bar are first checked in NPT (but HPA written there ignored),
+   and then either go to AVIC or cause SVM_EXIT_AVIC_UNACCELERATED_ACCESS which has offset of the write
+   in the exit_info_1
+   (there is also SVM_EXIT_AVIC_INCOMPLETE_IPI which is called on some ICR writes)
+
+
+As far as I know the only good reason to relocate APIC base is to access it from the real mode
+which is not something that is done these days by modern BIOSes.
+
+I vote to make it read only (#GP on MSR_IA32_APICBASE write when non default base is set and apic enabled) 
+and remove all remains of the support for variable APIC base.
+(we already have a warning when APIC base is set to non default value)
+
+
+Best regards,
+	Maxim Levitsky
+
 
