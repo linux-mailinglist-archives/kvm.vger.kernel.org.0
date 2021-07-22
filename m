@@ -2,354 +2,155 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 69C773D2009
-	for <lists+kvm@lfdr.de>; Thu, 22 Jul 2021 10:46:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 431D63D205B
+	for <lists+kvm@lfdr.de>; Thu, 22 Jul 2021 11:06:44 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231307AbhGVIF0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 22 Jul 2021 04:05:26 -0400
-Received: from mail.kernel.org ([198.145.29.99]:55882 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S231189AbhGVIFZ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 22 Jul 2021 04:05:25 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id A43AE6128C;
-        Thu, 22 Jul 2021 08:45:57 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-        s=korg; t=1626943559;
-        bh=iHEKpKP05yPtSDo0WVw13tR4OsPIw3x7iurEQu7Pc7Q=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=d2l4V14jYNVya/romP2w2ezg4x2LnX47K9dLSJmCxQOKyIqkdonEoIsuSyzycFfD4
-         aHamBXJweC7B8K4Qi3lPBaud6oc7vHctb7fViEzj6oXWZWpeL9VSuOZpThr23TyNei
-         Kh7xAATxCTMeB2NBX21iFqK668swZChaCi9FSwpo=
-Date:   Thu, 22 Jul 2021 10:45:55 +0200
-From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To:     Uwe =?iso-8859-1?Q?Kleine-K=F6nig?= 
-        <u.kleine-koenig@pengutronix.de>
-Cc:     kernel@pengutronix.de,
-        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
-        Alexandre Belloni <alexandre.belloni@bootlin.com>,
-        Alexandre Bounine <alex.bou9@gmail.com>,
-        Alex Dubov <oakad@yahoo.com>, Alex Elder <elder@kernel.org>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Alison Schofield <alison.schofield@intel.com>,
-        Allen Hubbe <allenbh@gmail.com>,
-        Andreas Noever <andreas.noever@gmail.com>,
-        Andy Gross <agross@kernel.org>, Arnd Bergmann <arnd@arndb.de>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        Benjamin Tissoires <benjamin.tissoires@redhat.com>,
-        Ben Widawsky <ben.widawsky@intel.com>,
-        Bjorn Andersson <bjorn.andersson@linaro.org>,
-        Bjorn Helgaas <bhelgaas@google.com>,
-        Bodo Stroesser <bostroesser@gmail.com>,
-        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
-        Chen-Yu Tsai <wens@csie.org>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Cristian Marussi <cristian.marussi@arm.com>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Dave Jiang <dave.jiang@intel.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        David Woodhouse <dwmw@amazon.co.uk>,
-        Dexuan Cui <decui@microsoft.com>,
-        Dmitry Torokhov <dmitry.torokhov@gmail.com>,
-        Dominik Brodowski <linux@dominikbrodowski.net>,
-        Eric Farman <farman@linux.ibm.com>,
-        Finn Thain <fthain@linux-m68k.org>,
-        Florian Fainelli <f.fainelli@gmail.com>,
-        Frank Li <lznuaa@gmail.com>,
-        Geert Uytterhoeven <geert@linux-m68k.org>,
-        Geoff Levand <geoff@infradead.org>,
-        Haiyang Zhang <haiyangz@microsoft.com>,
-        Halil Pasic <pasic@linux.ibm.com>,
-        Hannes Reinecke <hare@suse.de>,
-        Hans de Goede <hdegoede@redhat.com>,
-        Harald Freudenberger <freude@linux.ibm.com>,
-        Heikki Krogerus <heikki.krogerus@linux.intel.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Helge Deller <deller@gmx.de>, Ira Weiny <ira.weiny@intel.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        "James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>,
-        Jaroslav Kysela <perex@perex.cz>,
-        Jason Wang <jasowang@redhat.com>,
-        Jens Taprogge <jens.taprogge@taprogge.org>,
-        Jernej Skrabec <jernej.skrabec@gmail.com>,
-        Jiri Kosina <jikos@kernel.org>,
-        Jiri Slaby <jirislaby@kernel.org>,
-        Joey Pabalan <jpabalanb@gmail.com>,
-        Johan Hovold <johan@kernel.org>,
-        Johannes Berg <johannes@sipsolutions.net>,
-        Johannes Thumshirn <morbidrsa@gmail.com>,
-        Jon Mason <jdmason@kudzu.us>, Juergen Gross <jgross@suse.com>,
-        Julien Grall <jgrall@amazon.com>,
-        Kai-Heng Feng <kai.heng.feng@canonical.com>,
-        Kirti Wankhede <kwankhede@nvidia.com>,
-        Kishon Vijay Abraham I <kishon@ti.com>,
-        Krzysztof =?utf-8?Q?Wilczy=C5=84ski?= <kw@linux.com>,
-        "K. Y. Srinivasan" <kys@microsoft.com>,
-        Lee Jones <lee.jones@linaro.org>, Len Brown <lenb@kernel.org>,
-        Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>,
-        Manohar Vanga <manohar.vanga@gmail.com>,
-        Marc Zyngier <maz@kernel.org>, Mark Brown <broonie@kernel.org>,
-        Mark Gross <mgross@linux.intel.com>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        Martyn Welch <martyn@welchs.me.uk>,
-        Mathieu Poirier <mathieu.poirier@linaro.org>,
-        Matthew Rosato <mjrosato@linux.ibm.com>,
-        Matt Porter <mporter@kernel.crashing.org>,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        Maxime Ripard <mripard@kernel.org>,
-        Maximilian Luz <luzmaximilian@gmail.com>,
-        Maxim Levitsky <maximlevitsky@gmail.com>,
-        Michael Buesch <m@bues.ch>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Michael Jamet <michael.jamet@intel.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Mika Westerberg <mika.westerberg@linux.intel.com>,
-        Mike Christie <michael.christie@oracle.com>,
-        Moritz Fischer <mdf@kernel.org>,
-        Ohad Ben-Cohen <ohad@wizery.com>,
-        Pali =?iso-8859-1?Q?Roh=E1r?= <pali@kernel.org>,
-        Paul Mackerras <paulus@samba.org>,
-        Peter Oberparleiter <oberpar@linux.ibm.com>,
-        "Rafael J. Wysocki" <rjw@rjwysocki.net>,
-        =?utf-8?B?UmFmYcWCIE1pxYJlY2tp?= <zajec5@gmail.com>,
-        Rich Felker <dalias@libc.org>,
-        Rikard Falkeborn <rikard.falkeborn@gmail.com>,
-        Rob Herring <robh@kernel.org>,
-        Russell King <linux@armlinux.org.uk>,
-        "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
-        Samuel Holland <samuel@sholland.org>,
-        Samuel Iglesias Gonsalvez <siglesias@igalia.com>,
-        SeongJae Park <sjpark@amazon.de>,
-        Srinivas Kandagatla <srinivas.kandagatla@linaro.org>,
-        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
-        Stefano Stabellini <sstabellini@kernel.org>,
-        Stefan Richter <stefanr@s5r6.in-berlin.de>,
-        Stephen Boyd <sboyd@kernel.org>,
-        Stephen Hemminger <sthemmin@microsoft.com>,
-        Sudeep Holla <sudeep.holla@arm.com>,
-        Sven Van Asbroeck <TheSven73@gmail.com>,
-        Takashi Iwai <tiwai@suse.com>,
-        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
-        Thorsten Scherer <t.scherer@eckelmann.de>,
-        Tomas Winkler <tomas.winkler@intel.com>,
-        Tom Rix <trix@redhat.com>,
-        Tyrel Datwyler <tyreld@linux.ibm.com>,
-        Ulf Hansson <ulf.hansson@linaro.org>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Vineeth Vijayan <vneethv@linux.ibm.com>,
-        Vinod Koul <vkoul@kernel.org>,
-        Vishal Verma <vishal.l.verma@intel.com>,
-        Wei Liu <wei.liu@kernel.org>,
-        William Breathitt Gray <vilhelm.gray@gmail.com>,
-        Wolfram Sang <wsa@kernel.org>, Wu Hao <hao.wu@intel.com>,
-        Yehezkel Bernat <YehezkelShB@gmail.com>,
-        Yoshinori Sato <ysato@users.sourceforge.jp>,
-        YueHaibing <yuehaibing@huawei.com>,
-        Yufen Yu <yuyufen@huawei.com>, alsa-devel@alsa-project.org,
-        dmaengine@vger.kernel.org, greybus-dev@lists.linaro.org,
-        industrypack-devel@lists.sourceforge.net, kvm@vger.kernel.org,
-        linux1394-devel@lists.sourceforge.net, linux-acpi@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org,
-        linux-arm-msm@vger.kernel.org, linux-cxl@vger.kernel.org,
-        linux-fpga@vger.kernel.org, linux-hyperv@vger.kernel.org,
-        linux-i2c@vger.kernel.org, linux-i3c@lists.infradead.org,
-        linux-input@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-m68k@lists.linux-m68k.org, linux-media@vger.kernel.org,
-        linux-mips@vger.kernel.org, linux-mmc@vger.kernel.org,
-        linux-ntb@googlegroups.com, linux-parisc@vger.kernel.org,
-        linux-pci@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-        linux-remoteproc@vger.kernel.org, linux-s390@vger.kernel.org,
-        linux-scsi@vger.kernel.org, linux-serial@vger.kernel.org,
-        linux-sh@vger.kernel.org, linux-spi@vger.kernel.org,
-        linux-staging@lists.linux.dev, linux-sunxi@lists.linux.dev,
-        linux-usb@vger.kernel.org, linux-wireless@vger.kernel.org,
-        netdev@vger.kernel.org, nvdimm@lists.linux.dev,
-        platform-driver-x86@vger.kernel.org, sparclinux@vger.kernel.org,
-        target-devel@vger.kernel.org,
-        virtualization@lists.linux-foundation.org,
-        xen-devel@lists.xenproject.org
-Subject: Re: [PATCH v4 0/5] bus: Make remove callback return void
-Message-ID: <YPkwQwf0dUKnGA7L@kroah.com>
-References: <20210713193522.1770306-1-u.kleine-koenig@pengutronix.de>
- <YPfyZen4Y0uDKqDT@kroah.com>
+        id S231259AbhGVI0G (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 22 Jul 2021 04:26:06 -0400
+Received: from mail-bn8nam12on2082.outbound.protection.outlook.com ([40.107.237.82]:16657
+        "EHLO NAM12-BN8-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S230419AbhGVI0F (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 22 Jul 2021 04:26:05 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=SpxXL8t+OxbNDcl70Ogb0ztVca3O0OC/Xt1e2GeINDdbdB5hx0DqGBZwlpJCgdKVIGf0iXNYiyIeeSNskDjicPGQpw4IDdemENTMBpCnSLOhD9FeB3jGlOX0VMqo0CsmnJKUyx+4dyiwQmsiCM2gnIrHBdzI0dGNBer11GmhPjaD0oNpKO0lreOEzD7OsP99UQjMvA+3laqdJlSi5HQCcnt1B1ZmAo2ymcC5liNJWo3abXd+i+znVqPSgLCT4aqfjnud6v+c43XY8uT+nvDudeBMcCmt2rKGXWY7a01tUveBdND5nUd7RC4QKDeXO/Rq2wvb1lA48L2b2rivvuHxUg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=YXlbI3v/FcFzaAP4ATY9J36ylt24lciBYySY/nxBpAo=;
+ b=Wa6LGJhrTa4+8/ev+iXIcLBVYKhRflUUqcwLGP6WqIs9XukICN4K2K8QXmSSrufO2o3YYN0ee0jX6CvFT1l7jOgOmU3r5KTfwzd0Sh0WbZwAu6zSWHf/daftHRxQX2pFYWwZdNT0h9f17Jpz6AsLy+iGTQMQeTTIVRDdf0od1CDDbNwQt/ob36oLQFAGyIBDq8RxpDR+kZTRVL73AfS/aED5wIVOcICUyrXUfXDCZWehYC3DmSngJ/tgMcqPc0jO/KP2nCZD6lJKksjPko7pyG7+kWzOOdpEpIA8zp+iQ/6IJsM9V3h19TDbmMb8LoFcP2TIjvJVHHFDNgSQDoeLaA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.112.34) smtp.rcpttodomain=redhat.com smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=quarantine sp=none pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=YXlbI3v/FcFzaAP4ATY9J36ylt24lciBYySY/nxBpAo=;
+ b=nDI5BwzLfQrKHcylpEdSWXH8xU7GqHX4LWOBJ2x/5+kdLxxJxr2ahJPaG1m50UcgixYwFg92w8k+7sq+7RlkUQ7AQJERAsF33h/B8cd/gnxp1+TzOpaCWX6DFjs410W1rl8oa4jwpNRGsALCtgHTyAj9VgUbO8CrueKjcc7C+3NUBKNO9Kn9JwsHGfDsYLFSu4jlGfex/HFouskHpF++jftXeslHhlG4f7D17SUXPVfWDNwBPZBocLq90j8Dlm5W6SpuNQKwxzQT/Y6Vgip65iins5mt+23JDgI2XDWCVZXzmC43sARmrmPHvP5sTgSx1Qi5QeCTGphk9ZNeFXtU6A==
+Received: from DM6PR03CA0062.namprd03.prod.outlook.com (2603:10b6:5:100::39)
+ by CY4PR12MB1863.namprd12.prod.outlook.com (2603:10b6:903:120::23) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4331.29; Thu, 22 Jul
+ 2021 09:06:38 +0000
+Received: from DM6NAM11FT006.eop-nam11.prod.protection.outlook.com
+ (2603:10b6:5:100:cafe::96) by DM6PR03CA0062.outlook.office365.com
+ (2603:10b6:5:100::39) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4352.26 via Frontend
+ Transport; Thu, 22 Jul 2021 09:06:38 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.112.34)
+ smtp.mailfrom=nvidia.com; redhat.com; dkim=none (message not signed)
+ header.d=none;redhat.com; dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.112.34 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.112.34; helo=mail.nvidia.com;
+Received: from mail.nvidia.com (216.228.112.34) by
+ DM6NAM11FT006.mail.protection.outlook.com (10.13.173.104) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
+ 15.20.4352.24 via Frontend Transport; Thu, 22 Jul 2021 09:06:38 +0000
+Received: from [172.27.13.232] (172.20.187.5) by HQMAIL107.nvidia.com
+ (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1497.2; Thu, 22 Jul
+ 2021 09:06:33 +0000
+Subject: Re: [PATCH 12/12] vfio/pci: Introduce vfio_pci_core.ko
+To:     Leon Romanovsky <leonro@kernel.org>
+CC:     <bhelgaas@google.com>, <corbet@lwn.net>,
+        <alex.williamson@redhat.com>, <diana.craciun@oss.nxp.com>,
+        <kwankhede@nvidia.com>, <eric.auger@redhat.com>,
+        <masahiroy@kernel.org>, <michal.lkml@markovi.net>,
+        <linux-pci@vger.kernel.org>, <linux-doc@vger.kernel.org>,
+        <kvm@vger.kernel.org>, <linux-s390@vger.kernel.org>,
+        <linux-kbuild@vger.kernel.org>, <mgurtovoy@nvidia.com>,
+        <jgg@nvidia.com>, <maorg@nvidia.com>
+References: <20210721161609.68223-1-yishaih@nvidia.com>
+ <20210721161609.68223-13-yishaih@nvidia.com> <YPhb6o06fX+/FiTY@unreal>
+From:   Yishai Hadas <yishaih@nvidia.com>
+Message-ID: <0b8db422-749d-9d93-6b3b-957259f3d0cb@nvidia.com>
+Date:   Thu, 22 Jul 2021 12:06:30 +0300
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.12.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
+In-Reply-To: <YPhb6o06fX+/FiTY@unreal>
+Content-Type: text/plain; charset="utf-8"; format=flowed
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <YPfyZen4Y0uDKqDT@kroah.com>
+Content-Language: en-US
+X-Originating-IP: [172.20.187.5]
+X-ClientProxiedBy: HQMAIL105.nvidia.com (172.20.187.12) To
+ HQMAIL107.nvidia.com (172.20.187.13)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 50b3dd1f-319c-4473-7fde-08d94cf00374
+X-MS-TrafficTypeDiagnostic: CY4PR12MB1863:
+X-Microsoft-Antispam-PRVS: <CY4PR12MB1863197A0CD88EE047542BD1C3E49@CY4PR12MB1863.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:10000;
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: xmE6X9B/FKL8rN/JxtBqEd5bjaXB/SB4/4MGsgGZWC+ZuQ8mH/lCzn/XlemM5TLxE1zpGvQprMY2ktGXWx8gyUUSUDhNzsna5ztnXeeGOeHt7mz3eRD4AUQu1s8+t2It2ys/fhHR+Q2UkgvnaNrj6Ezxk6HwPZMfPA7iUHWInsJOYiXUqZHYuWgDVE+i/mgY5xllpDz5B+d3dBLXBm9KooiKhi4lELq3Zo9KmmRvG9zrmkqkFvIBNgiKnLKimGs8ImMRDpS+jC+k/0V2zI6nSUYClbwVXPYlemcM0fGifoPO3rgmQSuN/6EJ7o0m33GCd3QXW6+lC1/VmeCkNAY12Aa3crYYGw+Eeu+Fb246iXIUXyynTaqzp3+oVg8EeE5tlDMzhZ6AmHAfuUnB4VeFE/EwHBP2jPXmXu1Gq4JvphRK3o9yDoGslm7DVxVkJv83EknGv4rvSzDN5+9OV5wsHZE0xn7E4nVFosfoyP0RVejqm2dPaSpQy7B8P6Y8xz0w4bMSWPoAKe+pb27wpVXMNexy82gDZm+ZlExY3MY8p7imJZST/1/C05H5TD2Leuo6z0JF3ALuMOYhhVDm0wa6ZlLIttY+1z8QylkXUT1cKhB8x+Yo3+BXNIB+pKWssINQfJ9MbpRKKr6x/Rl/wIs6yfsrIK4Aq/GXIiBEnH/NSeyDNraBy4lGJWxFlTWci4PAvFTmbMB6UCQOPKaC7Ycs1vZCpkXOhS5pv47ZQqXD/X0=
+X-Forefront-Antispam-Report: CIP:216.228.112.34;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:schybrid03.nvidia.com;CAT:NONE;SFS:(4636009)(376002)(396003)(136003)(39860400002)(346002)(36840700001)(46966006)(4326008)(336012)(82740400003)(16526019)(2616005)(107886003)(36906005)(5660300002)(82310400003)(186003)(7416002)(356005)(47076005)(53546011)(26005)(36756003)(31696002)(7636003)(70586007)(70206006)(83380400001)(86362001)(36860700001)(8676002)(316002)(478600001)(31686004)(2906002)(6916009)(8936002)(54906003)(426003)(16576012)(43740500002);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Jul 2021 09:06:38.2335
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 50b3dd1f-319c-4473-7fde-08d94cf00374
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.112.34];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource: DM6NAM11FT006.eop-nam11.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY4PR12MB1863
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jul 21, 2021 at 12:09:41PM +0200, Greg Kroah-Hartman wrote:
-> On Tue, Jul 13, 2021 at 09:35:17PM +0200, Uwe Kleine-König wrote:
-> > Hello,
-> > 
-> > this is v4 of the final patch set for my effort to make struct
-> > bus_type::remove return void.
-> > 
-> > The first four patches contain cleanups that make some of these
-> > callbacks (more obviously) always return 0. They are acked by the
-> > respective maintainers. Bjorn Helgaas explicitly asked to include the
-> > pci patch (#1) into this series, so Greg taking this is fine. I assume
-> > the s390 people are fine with Greg taking patches #2 to #4, too, they
-> > didn't explicitly said so though.
-> > 
-> > The last patch actually changes the prototype and so touches quite some
-> > drivers and has the potential to conflict with future developments, so I
-> > consider it beneficial to put these patches into next soon. I expect
-> > that it will be Greg who takes the complete series, he already confirmed
-> > via irc (for v2) to look into this series.
-> > 
-> > The only change compared to v3 is in the fourth patch where I modified a
-> > few more drivers to fix build failures. Some of them were found by build
-> > bots (thanks!), some of them I found myself using a regular expression
-> > search. The newly modified files are:
-> > 
-> >  arch/sparc/kernel/vio.c
-> >  drivers/nubus/bus.c
-> >  drivers/sh/superhyway/superhyway.c
-> >  drivers/vlynq/vlynq.c
-> >  drivers/zorro/zorro-driver.c
-> >  sound/ac97/bus.c
-> > 
-> > Best regards
-> > Uwe
-> 
-> Now queued up.  I can go make a git tag that people can pull from after
-> 0-day is finished testing this to verify all is good, if others need it.
+On 7/21/2021 8:39 PM, Leon Romanovsky wrote:
+> On Wed, Jul 21, 2021 at 07:16:09PM +0300, Yishai Hadas wrote:
+>> From: Max Gurtovoy <mgurtovoy@nvidia.com>
+>>
+>> Now that vfio_pci has been split into two source modules, one focusing
+>> on the "struct pci_driver" (vfio_pci.c) and a toolbox library of code
+>> (vfio_pci_core.c), complete the split and move them into two different
+>> kernel modules.
+>>
+>> As before vfio_pci.ko continues to present the same interface under
+>> sysfs and this change will have no functional impact.
+>>
+>> Splitting into another module and adding exports allows creating new HW
+>> specific VFIO PCI drivers that can implement device specific
+>> functionality, such as VFIO migration interfaces or specialized device
+>> requirements.
+>>
+>> Signed-off-by: Max Gurtovoy <mgurtovoy@nvidia.com>
+>> Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
+>> Signed-off-by: Yishai Hadas <yishaih@nvidia.com>
+>> ---
+>>   drivers/vfio/pci/Kconfig                      | 30 ++++++++------
+>>   drivers/vfio/pci/Makefile                     |  8 ++--
+>>   drivers/vfio/pci/vfio_pci.c                   | 14 ++-----
+>>   drivers/vfio/pci/vfio_pci_config.c            |  2 +-
+>>   drivers/vfio/pci/vfio_pci_core.c              | 41 ++++++++++++++++---
+>>   drivers/vfio/pci/vfio_pci_igd.c               |  2 +-
+>>   drivers/vfio/pci/vfio_pci_intrs.c             |  2 +-
+>>   drivers/vfio/pci/vfio_pci_rdwr.c              |  2 +-
+>>   drivers/vfio/pci/vfio_pci_zdev.c              |  2 +-
+>>   .../pci => include/linux}/vfio_pci_core.h     |  2 -
+>>   10 files changed, 66 insertions(+), 39 deletions(-)
+>>   rename {drivers/vfio/pci => include/linux}/vfio_pci_core.h (99%)
+> <...>
+>
+>> -#include "vfio_pci_core.h"
+>> +#include <linux/vfio_pci_core.h>
+>> +
+>> +#define DRIVER_VERSION  "0.2"
+> <...>
+>
+>> +MODULE_VERSION(DRIVER_VERSION);
+> Please don't add driver versions to the upstream kernel, they useless.
+>
+> Thanks
 
-Ok, here's a tag that any other subsystem can pull from if they want
-these changes in their tree before 5.15-rc1 is out.  I might pull it
-into my char-misc-next tree as well just to keep that tree sane as it
-seems to pick up new busses on a regular basis...
+This just preserves the code for driver/module version that was in 
+vfio_pci.ko before the split.
 
-thanks,
+However,Â  this can be removed in V2 if we may need to have.
 
-greg k-h
+Yishai
 
------------------------------------
-
-
-The following changes since commit 2734d6c1b1a089fb593ef6a23d4b70903526fe0c:
-
-  Linux 5.14-rc2 (2021-07-18 14:13:49 -0700)
-
-are available in the Git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/gregkh/driver-core.git tags/bus_remove_return_void-5.15
-
-for you to fetch changes up to fc7a6209d5710618eb4f72a77cd81b8d694ecf89:
-
-  bus: Make remove callback return void (2021-07-21 11:53:42 +0200)
-
-----------------------------------------------------------------
-Bus: Make remove callback return void tag
-
-Tag for other trees/branches to pull from in order to have a stable
-place to build off of if they want to add new busses for 5.15.
-
-Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-
-----------------------------------------------------------------
-Uwe Kleine-König (5):
-      PCI: endpoint: Make struct pci_epf_driver::remove return void
-      s390/cio: Make struct css_driver::remove return void
-      s390/ccwgroup: Drop if with an always false condition
-      s390/scm: Make struct scm_driver::remove return void
-      bus: Make remove callback return void
-
- arch/arm/common/locomo.c                  | 3 +--
- arch/arm/common/sa1111.c                  | 4 +---
- arch/arm/mach-rpc/ecard.c                 | 4 +---
- arch/mips/sgi-ip22/ip22-gio.c             | 3 +--
- arch/parisc/kernel/drivers.c              | 5 ++---
- arch/powerpc/platforms/ps3/system-bus.c   | 3 +--
- arch/powerpc/platforms/pseries/ibmebus.c  | 3 +--
- arch/powerpc/platforms/pseries/vio.c      | 3 +--
- arch/s390/include/asm/eadm.h              | 2 +-
- arch/sparc/kernel/vio.c                   | 4 +---
- drivers/acpi/bus.c                        | 3 +--
- drivers/amba/bus.c                        | 4 +---
- drivers/base/auxiliary.c                  | 4 +---
- drivers/base/isa.c                        | 4 +---
- drivers/base/platform.c                   | 4 +---
- drivers/bcma/main.c                       | 6 ++----
- drivers/bus/sunxi-rsb.c                   | 4 +---
- drivers/cxl/core.c                        | 3 +--
- drivers/dax/bus.c                         | 4 +---
- drivers/dma/idxd/sysfs.c                  | 4 +---
- drivers/firewire/core-device.c            | 4 +---
- drivers/firmware/arm_scmi/bus.c           | 4 +---
- drivers/firmware/google/coreboot_table.c  | 4 +---
- drivers/fpga/dfl.c                        | 4 +---
- drivers/hid/hid-core.c                    | 4 +---
- drivers/hid/intel-ish-hid/ishtp/bus.c     | 4 +---
- drivers/hv/vmbus_drv.c                    | 5 +----
- drivers/hwtracing/intel_th/core.c         | 4 +---
- drivers/i2c/i2c-core-base.c               | 5 +----
- drivers/i3c/master.c                      | 4 +---
- drivers/input/gameport/gameport.c         | 3 +--
- drivers/input/serio/serio.c               | 3 +--
- drivers/ipack/ipack.c                     | 4 +---
- drivers/macintosh/macio_asic.c            | 4 +---
- drivers/mcb/mcb-core.c                    | 4 +---
- drivers/media/pci/bt8xx/bttv-gpio.c       | 3 +--
- drivers/memstick/core/memstick.c          | 3 +--
- drivers/mfd/mcp-core.c                    | 3 +--
- drivers/misc/mei/bus.c                    | 4 +---
- drivers/misc/tifm_core.c                  | 3 +--
- drivers/mmc/core/bus.c                    | 4 +---
- drivers/mmc/core/sdio_bus.c               | 4 +---
- drivers/net/netdevsim/bus.c               | 3 +--
- drivers/ntb/core.c                        | 4 +---
- drivers/ntb/ntb_transport.c               | 4 +---
- drivers/nubus/bus.c                       | 6 ++----
- drivers/nvdimm/bus.c                      | 3 +--
- drivers/pci/endpoint/pci-epf-core.c       | 7 ++-----
- drivers/pci/pci-driver.c                  | 3 +--
- drivers/pcmcia/ds.c                       | 4 +---
- drivers/platform/surface/aggregator/bus.c | 4 +---
- drivers/platform/x86/wmi.c                | 4 +---
- drivers/pnp/driver.c                      | 3 +--
- drivers/rapidio/rio-driver.c              | 4 +---
- drivers/rpmsg/rpmsg_core.c                | 7 ++-----
- drivers/s390/block/scm_drv.c              | 4 +---
- drivers/s390/cio/ccwgroup.c               | 6 +-----
- drivers/s390/cio/chsc_sch.c               | 3 +--
- drivers/s390/cio/css.c                    | 7 +++----
- drivers/s390/cio/css.h                    | 2 +-
- drivers/s390/cio/device.c                 | 9 +++------
- drivers/s390/cio/eadm_sch.c               | 4 +---
- drivers/s390/cio/scm.c                    | 5 +++--
- drivers/s390/cio/vfio_ccw_drv.c           | 3 +--
- drivers/s390/crypto/ap_bus.c              | 4 +---
- drivers/scsi/scsi_debug.c                 | 3 +--
- drivers/sh/superhyway/superhyway.c        | 8 ++------
- drivers/siox/siox-core.c                  | 4 +---
- drivers/slimbus/core.c                    | 4 +---
- drivers/soc/qcom/apr.c                    | 4 +---
- drivers/spi/spi.c                         | 4 +---
- drivers/spmi/spmi.c                       | 3 +--
- drivers/ssb/main.c                        | 4 +---
- drivers/staging/fieldbus/anybuss/host.c   | 4 +---
- drivers/staging/greybus/gbphy.c           | 4 +---
- drivers/target/loopback/tcm_loop.c        | 5 ++---
- drivers/thunderbolt/domain.c              | 4 +---
- drivers/tty/serdev/core.c                 | 4 +---
- drivers/usb/common/ulpi.c                 | 4 +---
- drivers/usb/serial/bus.c                  | 4 +---
- drivers/usb/typec/bus.c                   | 4 +---
- drivers/vdpa/vdpa.c                       | 4 +---
- drivers/vfio/mdev/mdev_driver.c           | 4 +---
- drivers/virtio/virtio.c                   | 3 +--
- drivers/vlynq/vlynq.c                     | 4 +---
- drivers/vme/vme.c                         | 4 +---
- drivers/xen/xenbus/xenbus.h               | 2 +-
- drivers/xen/xenbus/xenbus_probe.c         | 4 +---
- drivers/zorro/zorro-driver.c              | 3 +--
- include/linux/device/bus.h                | 2 +-
- include/linux/pci-epf.h                   | 2 +-
- sound/ac97/bus.c                          | 6 ++----
- sound/aoa/soundbus/core.c                 | 4 +---
- 93 files changed, 107 insertions(+), 263 deletions(-)
