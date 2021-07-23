@@ -2,24 +2,24 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8E5793D342F
-	for <lists+kvm@lfdr.de>; Fri, 23 Jul 2021 07:41:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 55F6D3D3431
+	for <lists+kvm@lfdr.de>; Fri, 23 Jul 2021 07:41:23 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233787AbhGWFAp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 23 Jul 2021 01:00:45 -0400
+        id S233822AbhGWFAr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 23 Jul 2021 01:00:47 -0400
 Received: from mga17.intel.com ([192.55.52.151]:23861 "EHLO mga17.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S233712AbhGWFAl (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 23 Jul 2021 01:00:41 -0400
-X-IronPort-AV: E=McAfee;i="6200,9189,10053"; a="192086797"
+        id S233812AbhGWFAq (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 23 Jul 2021 01:00:46 -0400
+X-IronPort-AV: E=McAfee;i="6200,9189,10053"; a="192086807"
 X-IronPort-AV: E=Sophos;i="5.84,263,1620716400"; 
-   d="scan'208";a="192086797"
+   d="scan'208";a="192086807"
 Received: from fmsmga003.fm.intel.com ([10.253.24.29])
-  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Jul 2021 22:41:15 -0700
+  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Jul 2021 22:41:20 -0700
 X-IronPort-AV: E=Sophos;i="5.84,263,1620716400"; 
-   d="scan'208";a="502383452"
+   d="scan'208";a="502383479"
 Received: from arthur-vostro-3668.sh.intel.com ([10.239.13.1])
-  by fmsmga003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Jul 2021 22:41:10 -0700
+  by fmsmga003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Jul 2021 22:41:15 -0700
 From:   Zeng Guang <guang.zeng@intel.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>,
         Sean Christopherson <seanjc@google.com>,
@@ -41,9 +41,9 @@ Cc:     x86@kernel.org, linux-kernel@vger.kernel.org,
         Robert Hu <robert.hu@intel.com>, Gao Chao <chao.gao@intel.com>,
         Zeng Guang <guang.zeng@intel.com>,
         Robert Hoo <robert.hu@linux.intel.com>
-Subject: [PATCH v2 1/6] x86/feat_ctl: Add new VMX feature, Tertiary VM-Execution control
-Date:   Fri, 23 Jul 2021 13:16:21 +0800
-Message-Id: <20210723051626.18364-2-guang.zeng@intel.com>
+Subject: [PATCH v2 2/6] KVM: VMX: Extend BUILD_CONTROLS_SHADOW macro to support 64-bit variation
+Date:   Fri, 23 Jul 2021 13:16:22 +0800
+Message-Id: <20210723051626.18364-3-guang.zeng@intel.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20210723051626.18364-1-guang.zeng@intel.com>
 References: <20210723051626.18364-1-guang.zeng@intel.com>
@@ -53,80 +53,66 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Robert Hoo <robert.hu@linux.intel.com>
 
-New VMX capability MSR IA32_VMX_PROCBASED_CTLS3 conresponse to this new
-VM-Execution control field. And it is 64bit allow-1 semantics, not like
-previous capability MSRs 32bit allow-0 and 32bit allow-1. So with Tertiary
-VM-Execution control field introduced, 2 vmx_feature leaves are introduced,
-TERTIARY_CTLS_LOW and TERTIARY_CTLS_HIGH.
+The Tertiary VM-Exec Control, different from previous control fields, is 64
+bit. So extend BUILD_CONTROLS_SHADOW() by adding a 'bit' parameter, to
+support both 32 bit and 64 bit fields' auxiliary functions building.
+Also, define the auxiliary functions for Tertiary control field here, using
+the new BUILD_CONTROLS_SHADOW().
 
+Suggested-by: Sean Christopherson <seanjc@google.com>
 Signed-off-by: Robert Hoo <robert.hu@linux.intel.com>
-Signed-off-by: Zeng Guang <guang.zeng@intel.com>
 ---
- arch/x86/include/asm/msr-index.h   | 1 +
- arch/x86/include/asm/vmxfeatures.h | 3 ++-
- arch/x86/kernel/cpu/feat_ctl.c     | 9 +++++++++
- 3 files changed, 12 insertions(+), 1 deletion(-)
+ arch/x86/kvm/vmx/vmx.h | 23 ++++++++++++-----------
+ 1 file changed, 12 insertions(+), 11 deletions(-)
 
-diff --git a/arch/x86/include/asm/msr-index.h b/arch/x86/include/asm/msr-index.h
-index a7c413432b33..3df26e27b554 100644
---- a/arch/x86/include/asm/msr-index.h
-+++ b/arch/x86/include/asm/msr-index.h
-@@ -919,6 +919,7 @@
- #define MSR_IA32_VMX_TRUE_EXIT_CTLS      0x0000048f
- #define MSR_IA32_VMX_TRUE_ENTRY_CTLS     0x00000490
- #define MSR_IA32_VMX_VMFUNC             0x00000491
-+#define MSR_IA32_VMX_PROCBASED_CTLS3	0x00000492
+diff --git a/arch/x86/kvm/vmx/vmx.h b/arch/x86/kvm/vmx/vmx.h
+index 3979a947933a..945c6639ce24 100644
+--- a/arch/x86/kvm/vmx/vmx.h
++++ b/arch/x86/kvm/vmx/vmx.h
+@@ -413,31 +413,32 @@ static inline u8 vmx_get_rvi(void)
+ 	return vmcs_read16(GUEST_INTR_STATUS) & 0xff;
+ }
  
- /* VMX_BASIC bits and bitmasks */
- #define VMX_BASIC_VMCS_SIZE_SHIFT	32
-diff --git a/arch/x86/include/asm/vmxfeatures.h b/arch/x86/include/asm/vmxfeatures.h
-index d9a74681a77d..27e76eeca05b 100644
---- a/arch/x86/include/asm/vmxfeatures.h
-+++ b/arch/x86/include/asm/vmxfeatures.h
-@@ -5,7 +5,7 @@
- /*
-  * Defines VMX CPU feature bits
-  */
--#define NVMXINTS			3 /* N 32-bit words worth of info */
-+#define NVMXINTS			5 /* N 32-bit words worth of info */
+-#define BUILD_CONTROLS_SHADOW(lname, uname)				    \
+-static inline void lname##_controls_set(struct vcpu_vmx *vmx, u32 val)	    \
++#define BUILD_CONTROLS_SHADOW(lname, uname, bits)			    \
++static inline void lname##_controls_set(struct vcpu_vmx *vmx, u##bits val) \
+ {									    \
+ 	if (vmx->loaded_vmcs->controls_shadow.lname != val) {		    \
+-		vmcs_write32(uname, val);				    \
++		vmcs_write##bits(uname, val);				    \
+ 		vmx->loaded_vmcs->controls_shadow.lname = val;		    \
+ 	}								    \
+ }									    \
+-static inline u32 lname##_controls_get(struct vcpu_vmx *vmx)		    \
++static inline u##bits lname##_controls_get(struct vcpu_vmx *vmx)	    \
+ {									    \
+ 	return vmx->loaded_vmcs->controls_shadow.lname;			    \
+ }									    \
+-static inline void lname##_controls_setbit(struct vcpu_vmx *vmx, u32 val)   \
++static inline void lname##_controls_setbit(struct vcpu_vmx *vmx, u##bits val)   \
+ {									    \
+ 	lname##_controls_set(vmx, lname##_controls_get(vmx) | val);	    \
+ }									    \
+-static inline void lname##_controls_clearbit(struct vcpu_vmx *vmx, u32 val) \
++static inline void lname##_controls_clearbit(struct vcpu_vmx *vmx, u##bits val) \
+ {									    \
+ 	lname##_controls_set(vmx, lname##_controls_get(vmx) & ~val);	    \
+ }
+-BUILD_CONTROLS_SHADOW(vm_entry, VM_ENTRY_CONTROLS)
+-BUILD_CONTROLS_SHADOW(vm_exit, VM_EXIT_CONTROLS)
+-BUILD_CONTROLS_SHADOW(pin, PIN_BASED_VM_EXEC_CONTROL)
+-BUILD_CONTROLS_SHADOW(exec, CPU_BASED_VM_EXEC_CONTROL)
+-BUILD_CONTROLS_SHADOW(secondary_exec, SECONDARY_VM_EXEC_CONTROL)
++BUILD_CONTROLS_SHADOW(vm_entry, VM_ENTRY_CONTROLS, 32)
++BUILD_CONTROLS_SHADOW(vm_exit, VM_EXIT_CONTROLS, 32)
++BUILD_CONTROLS_SHADOW(pin, PIN_BASED_VM_EXEC_CONTROL, 32)
++BUILD_CONTROLS_SHADOW(exec, CPU_BASED_VM_EXEC_CONTROL, 32)
++BUILD_CONTROLS_SHADOW(secondary_exec, SECONDARY_VM_EXEC_CONTROL, 32)
++BUILD_CONTROLS_SHADOW(tertiary_exec, TERTIARY_VM_EXEC_CONTROL, 64)
  
- /*
-  * Note: If the comment begins with a quoted string, that string is used
-@@ -43,6 +43,7 @@
- #define VMX_FEATURE_RDTSC_EXITING	( 1*32+ 12) /* "" VM-Exit on RDTSC */
- #define VMX_FEATURE_CR3_LOAD_EXITING	( 1*32+ 15) /* "" VM-Exit on writes to CR3 */
- #define VMX_FEATURE_CR3_STORE_EXITING	( 1*32+ 16) /* "" VM-Exit on reads from CR3 */
-+#define VMX_FEATURE_TER_CONTROLS	(1*32 + 17) /* "" Enable Tertiary VM-Execution Controls */
- #define VMX_FEATURE_CR8_LOAD_EXITING	( 1*32+ 19) /* "" VM-Exit on writes to CR8 */
- #define VMX_FEATURE_CR8_STORE_EXITING	( 1*32+ 20) /* "" VM-Exit on reads from CR8 */
- #define VMX_FEATURE_VIRTUAL_TPR		( 1*32+ 21) /* "vtpr" TPR virtualization, a.k.a. TPR shadow */
-diff --git a/arch/x86/kernel/cpu/feat_ctl.c b/arch/x86/kernel/cpu/feat_ctl.c
-index da696eb4821a..2e0272d127e4 100644
---- a/arch/x86/kernel/cpu/feat_ctl.c
-+++ b/arch/x86/kernel/cpu/feat_ctl.c
-@@ -15,6 +15,8 @@ enum vmx_feature_leafs {
- 	MISC_FEATURES = 0,
- 	PRIMARY_CTLS,
- 	SECONDARY_CTLS,
-+	TERTIARY_CTLS_LOW,
-+	TERTIARY_CTLS_HIGH,
- 	NR_VMX_FEATURE_WORDS,
- };
- 
-@@ -42,6 +44,13 @@ static void init_vmx_capabilities(struct cpuinfo_x86 *c)
- 	rdmsr_safe(MSR_IA32_VMX_PROCBASED_CTLS2, &ign, &supported);
- 	c->vmx_capability[SECONDARY_CTLS] = supported;
- 
-+	/*
-+	 * For tertiary execution controls MSR, it's actually a 64bit allowed-1.
-+	 */
-+	rdmsr_safe(MSR_IA32_VMX_PROCBASED_CTLS3, &ign, &supported);
-+	c->vmx_capability[TERTIARY_CTLS_LOW] = ign;
-+	c->vmx_capability[TERTIARY_CTLS_HIGH] = supported;
-+
- 	rdmsr(MSR_IA32_VMX_PINBASED_CTLS, ign, supported);
- 	rdmsr_safe(MSR_IA32_VMX_VMFUNC, &ign, &funcs);
- 
+ static inline void vmx_register_cache_reset(struct kvm_vcpu *vcpu)
+ {
 -- 
 2.25.1
 
