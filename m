@@ -2,164 +2,86 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7F8103D38A1
-	for <lists+kvm@lfdr.de>; Fri, 23 Jul 2021 12:25:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5A8963D3878
+	for <lists+kvm@lfdr.de>; Fri, 23 Jul 2021 12:17:04 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231843AbhGWJoq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 23 Jul 2021 05:44:46 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:6764 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230238AbhGWJop (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 23 Jul 2021 05:44:45 -0400
-Received: from pps.filterd (m0187473.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 16NA2xmG121913;
-        Fri, 23 Jul 2021 06:25:19 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=N/koVr3+xhFPghqYOt9mOVwoH+tNbDMOMFc9SDer/Ss=;
- b=plzuDKZQld9znk+xBx3W5/IZWhfDGUrVj/gszu+drYs5HGamMsapCz5JVOstXkggQFix
- u1LKzVTcTp39AmBtrjjQ5snNgX8a8F4n8y+IVXPaB+QO7buMyILE253vlc3Od98pwI+j
- L1tGxmT7TKndK/vvHiJHx1i/lpY99ycN2ksAEobI2UxQkzkgl8LiosqeNjHvx595J/Yn
- A/07aOh1heYUjHTRHUeAObTh01MNzhpc/EXIjP8enPxMtMQQtOWrI866k5rirlkNnRaa
- 7LV4VfcZWyVyjAufZikbiWO/ZzYsXOuaHUH/d/Xd6bw19wWp47qENmooEvJBeKb8Xx3u UQ== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 39yuj4rsuv-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 23 Jul 2021 06:25:19 -0400
-Received: from m0187473.ppops.net (m0187473.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 16NA31Cp122076;
-        Fri, 23 Jul 2021 06:25:19 -0400
-Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 39yuj4rsub-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 23 Jul 2021 06:25:18 -0400
-Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
-        by ppma04ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 16NA7MKU012133;
-        Fri, 23 Jul 2021 10:10:09 GMT
-Received: from b06cxnps3074.portsmouth.uk.ibm.com (d06relay09.portsmouth.uk.ibm.com [9.149.109.194])
-        by ppma04ams.nl.ibm.com with ESMTP id 39xhx4951t-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 23 Jul 2021 10:10:09 +0000
-Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
-        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 16NAA4GL24445200
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 23 Jul 2021 10:10:04 GMT
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 99409AE045;
-        Fri, 23 Jul 2021 10:10:04 +0000 (GMT)
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 07C87AE04D;
-        Fri, 23 Jul 2021 10:10:04 +0000 (GMT)
-Received: from oc3016276355.ibm.com (unknown [9.145.58.144])
-        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Fri, 23 Jul 2021 10:10:03 +0000 (GMT)
-Subject: Re: [PATCH v2 2/2] s390:kvm: Topology expose TOPOLOGY facility
-To:     Christian Borntraeger <borntraeger@de.ibm.com>,
-        Cornelia Huck <cohuck@redhat.com>, kvm@vger.kernel.org
-Cc:     linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
-        frankja@linux.ibm.com, david@redhat.com, thuth@redhat.com,
-        imbrenda@linux.ibm.com, hca@linux.ibm.com, gor@linux.ibm.com
-References: <1626973353-17446-1-git-send-email-pmorel@linux.ibm.com>
- <1626973353-17446-3-git-send-email-pmorel@linux.ibm.com>
- <7163cf4a-479a-3121-2261-cfb6e4024d0c@de.ibm.com> <87wnph5rz7.fsf@redhat.com>
- <46229585-507d-70a2-cc60-c06fb172fbfd@de.ibm.com>
-From:   Pierre Morel <pmorel@linux.ibm.com>
-Message-ID: <68c2e0d0-b591-7701-700c-400f1f040ca9@linux.ibm.com>
-Date:   Fri, 23 Jul 2021 12:10:03 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.11.0
+        id S231732AbhGWJgY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 23 Jul 2021 05:36:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33782 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231623AbhGWJgU (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 23 Jul 2021 05:36:20 -0400
+Received: from mail-wm1-x335.google.com (mail-wm1-x335.google.com [IPv6:2a00:1450:4864:20::335])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9E334C061757
+        for <kvm@vger.kernel.org>; Fri, 23 Jul 2021 03:16:53 -0700 (PDT)
+Received: by mail-wm1-x335.google.com with SMTP id k14-20020a05600c1c8eb02901f13dd1672aso3940872wms.0
+        for <kvm@vger.kernel.org>; Fri, 23 Jul 2021 03:16:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=QO4j2IzOM4wXld1oT8EabRjAV6YqFAKfUcj8YzHBVaI=;
+        b=p4cx62NpsnLzf2m+W/3JJq7BI22oWbvFv0i1JckRLSteAer4gZOuRH15gI/fN+lg9w
+         siVxMEdqDosI3aqGGl9F6jnZHnetBuNBnSOem3WOdiUGAbldFFYf8ZssKFnvBDLp0RmS
+         3gn6RnAHQRVq8oJ/fgyOTBg0dO5t/3UaGWuOhKn1C9AVTXq6HOqPeiYtXBBZhgMuXzv1
+         mZ++vZrTNqqnqGbbaJTUK5ct3SLLBA3pCzneAjbKfInzuveVP9XdaZMHWxkKSeNCS3rp
+         FLE94xYozdI0j4m4CdozhSUBM55Yt7y2y2xXVT+7nPx6aMKsta55M6MB6/snld9AMeTX
+         5mtA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=QO4j2IzOM4wXld1oT8EabRjAV6YqFAKfUcj8YzHBVaI=;
+        b=IfX62x3ppnD64zV0wRG8o68jAin631j1tovupeE3BplHiE0tmhTf/OwsxjzLIncpJZ
+         qfOE5pJm99LZif+ErRVGb2lQJdHrBCiKcmsXTgNPjzCVUBNyW3rmVYi5sPSrevTCRUKl
+         /tDfwTubhUv7/Xg8Wmsxd3PYbNy6p34Tmkn2Cs9ZSS3d3j9LVlv8qaY/w9BDvg4NE2X3
+         t/EW5X8B9eXc74X5VCjMyewOuaFiO9lZnHvRuBl0JUiL7yKAY5nNgdEx/vh0tQy5y+nN
+         2mhhn4LeIMlNmK9NhMUgLT+urMbgnj0rvDtEgbn8QiAU00R3UEOwv7ZfTZiXmsWrbXPr
+         4fSA==
+X-Gm-Message-State: AOAM530ZVNSvFLTTp6eJ5LcbLq90VX35HcV5RYVtijLi9mgHq1bCrAhn
+        xJHqo6dQH3ENDM7+v0IBFWAXwQ==
+X-Google-Smtp-Source: ABdhPJwcozbpoFVBs05Zwspcd461WuCRshxtkqBNwhnzq02piQroC4Xf8Z0bCbz4m8KGE6IV7yRefw==
+X-Received: by 2002:a1c:7410:: with SMTP id p16mr12979418wmc.6.1627035412079;
+        Fri, 23 Jul 2021 03:16:52 -0700 (PDT)
+Received: from google.com ([2a00:79e0:d:210:a74:efb2:dddd:7915])
+        by smtp.gmail.com with ESMTPSA id f7sm32325442wru.11.2021.07.23.03.16.51
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 23 Jul 2021 03:16:51 -0700 (PDT)
+Date:   Fri, 23 Jul 2021 11:16:45 +0100
+From:   Quentin Perret <qperret@google.com>
+To:     Marc Zyngier <maz@kernel.org>
+Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org, will@kernel.org,
+        dbrazdil@google.com, Srivatsa Vaddagiri <vatsa@codeaurora.org>,
+        Shanker R Donthineni <sdonthineni@nvidia.com>,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        kernel-team@android.com
+Subject: Re: [PATCH 04/16] KVM: arm64: Add MMIO checking infrastructure
+Message-ID: <YPqXDeRMZOX8bmNh@google.com>
+References: <20210715163159.1480168-1-maz@kernel.org>
+ <20210715163159.1480168-5-maz@kernel.org>
+ <YPav0Hye5Dat/yoL@google.com>
+ <87wnpl86sz.wl-maz@kernel.org>
+ <YPbwmVk1YD9+y7tr@google.com>
+ <87wnpi1ayc.wl-maz@kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <46229585-507d-70a2-cc60-c06fb172fbfd@de.ibm.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: FggXFHKmBJgcV2M6_fFBljP3kKkKCDJE
-X-Proofpoint-GUID: xJDIfJDElQ0JizbTpjP8uYX8Iv33LbFg
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.790
- definitions=2021-07-23_04:2021-07-23,2021-07-23 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- impostorscore=0 bulkscore=0 spamscore=0 clxscore=1015 phishscore=0
- malwarescore=0 adultscore=0 mlxscore=0 lowpriorityscore=0 mlxlogscore=999
- suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2104190000 definitions=main-2107230058
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <87wnpi1ayc.wl-maz@kernel.org>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Thursday 22 Jul 2021 at 19:04:59 (+0100), Marc Zyngier wrote:
+> So FWIW, I've now pushed out an updated series for the THP changes[1],
+> and you will find a similar patch at the base of the branch. Please
+> have a look and let me know what you think!
 
+I Like the look of it! I'll pull this patch in my series and rebase on
+top -- that should introduce three new users or so, and allow a few nice
+cleanups.
 
-On 7/23/21 11:28 AM, Christian Borntraeger wrote:
-> 
-> 
-> On 23.07.21 10:55, Cornelia Huck wrote:
->> On Fri, Jul 23 2021, Christian Borntraeger <borntraeger@de.ibm.com> 
->> wrote:
->>
->>> On 22.07.21 19:02, Pierre Morel wrote:
->>>> We add a KVM extension KVM_CAP_S390_CPU_TOPOLOGY to tell the
->>>> userland hypervisor it is safe to activate the CPU Topology facility.
->>>
->>> I think the old variant of using the CPU model was actually better.
->>> It was just the patch description that was wrong.
->>
->> I thought we wanted a cap that userspace can enable to get ptf
->> intercepts? I'm confused.
->>
-> 
-> PTF goes to userspace in any case as every instruction that is
-> not handled by kvm and where interpretion is not enabled.
-> Now, having said that, we actually want PTF interpretion to be enabled
-> for "Check topology-change status" as this is supposed to be a fast
-> operation. Some OSes do query that in their interrupt handlers.
-> 
-
-An old QEMU getting the PTF instruction will send a OPERATION exception 
-to the guest if the facility 11 is actzivated.
-Facility 11 is in QEMU since GAEN10_GA1, if I enable the facility in the 
-CPU model all cpu model starting with GEN10_GA1 will panic on PTF.
-
-So I think we need the capability so that new QEMU enable the facility 
-once it has the right handling for PTF.
-
-
-> 
->>>> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
->>>> ---
->>>>    arch/s390/kvm/kvm-s390.c | 1 +
->>>>    include/uapi/linux/kvm.h | 1 +
->>>>    2 files changed, 2 insertions(+)
->>>>
->>>> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
->>>> index b655a7d82bf0..8c695ee79612 100644
->>>> --- a/arch/s390/kvm/kvm-s390.c
->>>> +++ b/arch/s390/kvm/kvm-s390.c
->>>> @@ -568,6 +568,7 @@ int kvm_vm_ioctl_check_extension(struct kvm 
->>>> *kvm, long ext)
->>>>        case KVM_CAP_S390_VCPU_RESETS:
->>>>        case KVM_CAP_SET_GUEST_DEBUG:
->>>>        case KVM_CAP_S390_DIAG318:
->>>> +    case KVM_CAP_S390_CPU_TOPOLOGY:
->>>>            r = 1;
->>>>            break;
->>>>        case KVM_CAP_SET_GUEST_DEBUG2:
->>>> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
->>>> index d9e4aabcb31a..081ce0cd44b9 100644
->>>> --- a/include/uapi/linux/kvm.h
->>>> +++ b/include/uapi/linux/kvm.h
->>>> @@ -1112,6 +1112,7 @@ struct kvm_ppc_resize_hpt {
->>>>    #define KVM_CAP_BINARY_STATS_FD 203
->>>>    #define KVM_CAP_EXIT_ON_EMULATION_FAILURE 204
->>>>    #define KVM_CAP_ARM_MTE 205
->>>> +#define KVM_CAP_S390_CPU_TOPOLOGY 206
->>>>    #ifdef KVM_CAP_IRQ_ROUTING
->>>>
->>
->> Regardless of what we end up with: we need documentation for any new cap
->> :)
->>
-
--- 
-Pierre Morel
-IBM Lab Boeblingen
+Thanks!
+Quentin
