@@ -2,131 +2,153 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 59E6A3D36E9
-	for <lists+kvm@lfdr.de>; Fri, 23 Jul 2021 10:39:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EA27D3D3704
+	for <lists+kvm@lfdr.de>; Fri, 23 Jul 2021 10:48:34 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234276AbhGWH6m (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 23 Jul 2021 03:58:42 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:55324 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S229907AbhGWH6k (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 23 Jul 2021 03:58:40 -0400
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 16N8aau6131682;
-        Fri, 23 Jul 2021 04:39:14 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=AURgLZcq+PGnRLM9eNyRT8YvJ+Qv7YxFboCX2OOW/4k=;
- b=LW4i4BcBltdgcd9CYf90PkKXs0DGeDbyEQZ/+XLCkAbvWj//z/p4Fh2of5UaCFCV8KJz
- 78R18ID3gTBarjnup5gSFT8VZf8BEXPVzyGB6ebMizVzNwuDs5Lw9hmoC5qq1HZFBRLo
- uszqNawUmct0kgB8xsve7/Pnxe5GuSjm8UFQDw41HtmJ93SMmNrzzt4adOF8Yva4Ti39
- m2hzeZhZTvsf1oaiJUc9SXuc3uC/Dkgw2MNnsp+sCiSuj91L60Z+CmrAXQpp/A/7xrij
- HMv06w4WnsfmhMMFZCqrg+vu+LuHkm21PpTDckELUkCCVPS7JLcKQEEizWNLkQ4N7DDO gA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 39ypjedpg9-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 23 Jul 2021 04:39:13 -0400
-Received: from m0098419.ppops.net (m0098419.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 16N8aoSt133323;
-        Fri, 23 Jul 2021 04:39:13 -0400
-Received: from ppma04fra.de.ibm.com (6a.4a.5195.ip4.static.sl-reverse.com [149.81.74.106])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 39ypjedpfe-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 23 Jul 2021 04:39:13 -0400
-Received: from pps.filterd (ppma04fra.de.ibm.com [127.0.0.1])
-        by ppma04fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 16N8XCY7004112;
-        Fri, 23 Jul 2021 08:34:11 GMT
-Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
-        by ppma04fra.de.ibm.com with ESMTP id 39upu89s87-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 23 Jul 2021 08:34:11 +0000
-Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
-        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 16N8Y78L29229448
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 23 Jul 2021 08:34:07 GMT
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 917C111C05E;
-        Fri, 23 Jul 2021 08:34:07 +0000 (GMT)
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 0FE6111C052;
-        Fri, 23 Jul 2021 08:34:07 +0000 (GMT)
-Received: from oc7455500831.ibm.com (unknown [9.145.25.128])
-        by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Fri, 23 Jul 2021 08:34:06 +0000 (GMT)
-Subject: Re: [PATCH v2 1/2] s390x: KVM: accept STSI for CPU topology
- information
-To:     Pierre Morel <pmorel@linux.ibm.com>, kvm@vger.kernel.org
-Cc:     linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
-        frankja@linux.ibm.com, cohuck@redhat.com, david@redhat.com,
-        thuth@redhat.com, imbrenda@linux.ibm.com, hca@linux.ibm.com,
-        gor@linux.ibm.com
-References: <1626973353-17446-1-git-send-email-pmorel@linux.ibm.com>
- <1626973353-17446-2-git-send-email-pmorel@linux.ibm.com>
-From:   Christian Borntraeger <borntraeger@de.ibm.com>
-Message-ID: <9af7e42f-2d01-08d6-f27f-9e7b5bec360f@de.ibm.com>
-Date:   Fri, 23 Jul 2021 10:34:06 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.11.0
-MIME-Version: 1.0
-In-Reply-To: <1626973353-17446-2-git-send-email-pmorel@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: 9DGc1GyTj-GwmXfl1qUJbxqyEbZ6IH-L
-X-Proofpoint-ORIG-GUID: sULkz_THbiT9g3_tsk9utUx-RFz9_A4Z
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.790
- definitions=2021-07-23_03:2021-07-23,2021-07-23 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 adultscore=0
- clxscore=1015 priorityscore=1501 spamscore=0 lowpriorityscore=0 mlxscore=0
- bulkscore=0 phishscore=0 suspectscore=0 impostorscore=0 mlxlogscore=999
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2104190000
- definitions=main-2107230049
+        id S234372AbhGWIH6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 23 Jul 2021 04:07:58 -0400
+Received: from mail.kernel.org ([198.145.29.99]:47380 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229907AbhGWIH6 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 23 Jul 2021 04:07:58 -0400
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id E98D460EBD;
+        Fri, 23 Jul 2021 08:48:31 +0000 (UTC)
+Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94.2)
+        (envelope-from <maz@kernel.org>)
+        id 1m6qr7-000Rwv-Vv; Fri, 23 Jul 2021 09:48:30 +0100
+Date:   Fri, 23 Jul 2021 09:48:29 +0100
+Message-ID: <871r7p2z6q.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Alexandru Elisei <alexandru.elisei@arm.com>
+Cc:     linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org,
+        kvmarm@lists.cs.columbia.edu, linux-mm@kvack.org,
+        Sean Christopherson <seanjc@google.com>,
+        Matthew Wilcox <willy@infradead.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Will Deacon <will@kernel.org>,
+        Quentin Perret <qperret@google.com>,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        kernel-team@android.com
+Subject: Re: [PATCH 1/5] KVM: arm64: Walk userspace page tables to compute the THP mapping size
+In-Reply-To: <f09c297b-21dd-a6fa-6e72-49587ba80fe5@arm.com>
+References: <20210717095541.1486210-1-maz@kernel.org>
+        <20210717095541.1486210-2-maz@kernel.org>
+        <f09c297b-21dd-a6fa-6e72-49587ba80fe5@arm.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: alexandru.elisei@arm.com, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-mm@kvack.org, seanjc@google.com, willy@infradead.org, pbonzini@redhat.com, will@kernel.org, qperret@google.com, james.morse@arm.com, suzuki.poulose@arm.com, kernel-team@android.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-
-On 22.07.21 19:02, Pierre Morel wrote:
-> STSI(15.1.x) gives information on the CPU configuration topology.
-> Let's accept the interception of STSI with the function code 15 and
-> let the userland part of the hypervisor handle it when userland
-> support the CPU Topology facility.
+On Tue, 20 Jul 2021 18:23:02 +0100,
+Alexandru Elisei <alexandru.elisei@arm.com> wrote:
 > 
-> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
-> ---
->   arch/s390/kvm/priv.c | 7 ++++++-
->   1 file changed, 6 insertions(+), 1 deletion(-)
+> Hi Marc,
 > 
-> diff --git a/arch/s390/kvm/priv.c b/arch/s390/kvm/priv.c
-> index 9928f785c677..8581b6881212 100644
-> --- a/arch/s390/kvm/priv.c
-> +++ b/arch/s390/kvm/priv.c
-> @@ -856,7 +856,8 @@ static int handle_stsi(struct kvm_vcpu *vcpu)
->   	if (vcpu->arch.sie_block->gpsw.mask & PSW_MASK_PSTATE)
->   		return kvm_s390_inject_program_int(vcpu, PGM_PRIVILEGED_OP);
->   
-> -	if (fc > 3) {
-> +	if ((fc > 3 && fc != 15) ||
-> +	    (fc == 15 && !test_kvm_facility(vcpu->kvm, 11))) {
+> I just can't figure out why having the mmap lock is not needed to walk the
+> userspace page tables. Any hints? Or am I not seeing where it's taken?
 
-Especially as you use test_kvm_facility here you really want to have the cpu
-model in patch 2 (and not CAP).
+I trust Sean's explanation was complete enough!
 
->   		kvm_s390_set_psw_cc(vcpu, 3);
->   		return 0;
->   	}
-> @@ -893,6 +894,10 @@ static int handle_stsi(struct kvm_vcpu *vcpu)
->   			goto out_no_data;
->   		handle_stsi_3_2_2(vcpu, (void *) mem);
->   		break;
-> +	case 15:
-> +		trace_kvm_s390_handle_stsi(vcpu, fc, sel1, sel2, operand2);
-> +		insert_stsi_usr_data(vcpu, operand2, ar, fc, sel1, sel2);
-> +		return -EREMOTE;
->   	}
->   	if (kvm_s390_pv_cpu_is_protected(vcpu)) {
->   		memcpy((void *)sida_origin(vcpu->arch.sie_block), (void *)mem,
+> On 7/17/21 10:55 AM, Marc Zyngier wrote:
+> > We currently rely on the kvm_is_transparent_hugepage() helper to
+> > discover whether a given page has the potential to be mapped as
+> > a block mapping.
+> >
+> > However, this API doesn't really give un everything we want:
+> > - we don't get the size: this is not crucial today as we only
+> >   support PMD-sized THPs, but we'd like to have larger sizes
+> >   in the future
+> > - we're the only user left of the API, and there is a will
+> >   to remove it altogether
+> >
+> > To address the above, implement a simple walker using the existing
+> > page table infrastructure, and plumb it into transparent_hugepage_adjust().
+> > No new page sizes are supported in the process.
+> >
+> > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> > ---
+> >  arch/arm64/kvm/mmu.c | 46 ++++++++++++++++++++++++++++++++++++++++----
+> >  1 file changed, 42 insertions(+), 4 deletions(-)
+> >
+> > diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+> > index 3155c9e778f0..db6314b93e99 100644
+> > --- a/arch/arm64/kvm/mmu.c
+> > +++ b/arch/arm64/kvm/mmu.c
+> > @@ -433,6 +433,44 @@ int create_hyp_exec_mappings(phys_addr_t phys_addr, size_t size,
+> >  	return 0;
+> >  }
+> >  
+> > +static struct kvm_pgtable_mm_ops kvm_user_mm_ops = {
+> > +	/* We shouldn't need any other callback to walk the PT */
+> > +	.phys_to_virt		= kvm_host_va,
+> > +};
+> > +
+> > +struct user_walk_data {
+> > +	u32	level;
+> > +};
+> > +
+> > +static int user_walker(u64 addr, u64 end, u32 level, kvm_pte_t *ptep,
+> > +		       enum kvm_pgtable_walk_flags flag, void * const arg)
+> > +{
+> > +	struct user_walk_data *data = arg;
+> > +
+> > +	data->level = level;
+> > +	return 0;
+> > +}
+> > +
+> > +static int get_user_mapping_size(struct kvm *kvm, u64 addr)
+> > +{
+> > +	struct user_walk_data data;
+> > +	struct kvm_pgtable pgt = {
+> > +		.pgd		= (kvm_pte_t *)kvm->mm->pgd,
+> > +		.ia_bits	= VA_BITS,
+> > +		.start_level	= 4 - CONFIG_PGTABLE_LEVELS,
+> > +		.mm_ops		= &kvm_user_mm_ops,
+> > +	};
+> > +	struct kvm_pgtable_walker walker = {
+> > +		.cb		= user_walker,
+> > +		.flags		= KVM_PGTABLE_WALK_LEAF,
+> > +		.arg		= &data,
+> > +	};
+> > +
+> > +	kvm_pgtable_walk(&pgt, ALIGN_DOWN(addr, PAGE_SIZE), PAGE_SIZE, &walker);
 > 
+> I take it that it is guaranteed that kvm_pgtable_walk() will never
+> fail? For example, I can see it failing if someone messes with
+> KVM_PGTABLE_MAX_LEVELS.
+
+But that's an architectural constant. How could it be messed with?
+When we introduce 5 levels of page tables, we'll have to check all
+this anyway.
+
+> To be honest, I would rather have a check here instead of
+> potentially feeding a bogus value to ARM64_HW_PGTABLE_LEVEL_SHIFT.
+> It could be a VM_WARN_ON, so there's no runtime overhead unless
+> CONFIG_DEBUG_VM.
+
+Fair enough. That's easy enough to check.
+
+> The patch looks good to me so far, but I want to give it another
+> look (or two) after I figure out why the mmap semaphone is not
+> needed.
+
+Thanks,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
