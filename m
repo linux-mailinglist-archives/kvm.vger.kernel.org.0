@@ -2,371 +2,176 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id DB8F63D3439
-	for <lists+kvm@lfdr.de>; Fri, 23 Jul 2021 07:42:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6E4123D3424
+	for <lists+kvm@lfdr.de>; Fri, 23 Jul 2021 07:36:29 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233910AbhGWFBG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 23 Jul 2021 01:01:06 -0400
-Received: from mga09.intel.com ([134.134.136.24]:34189 "EHLO mga09.intel.com"
+        id S233637AbhGWEzy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 23 Jul 2021 00:55:54 -0400
+Received: from mga03.intel.com ([134.134.136.65]:13503 "EHLO mga03.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S233899AbhGWFBG (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 23 Jul 2021 01:01:06 -0400
-X-IronPort-AV: E=McAfee;i="6200,9189,10053"; a="211818982"
+        id S229904AbhGWEzx (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 23 Jul 2021 00:55:53 -0400
+X-IronPort-AV: E=McAfee;i="6200,9189,10053"; a="211871928"
 X-IronPort-AV: E=Sophos;i="5.84,263,1620716400"; 
-   d="scan'208";a="211818982"
+   d="scan'208";a="211871928"
 Received: from fmsmga003.fm.intel.com ([10.253.24.29])
-  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Jul 2021 22:41:40 -0700
+  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Jul 2021 22:36:25 -0700
+X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.84,263,1620716400"; 
-   d="scan'208";a="502383605"
-Received: from arthur-vostro-3668.sh.intel.com ([10.239.13.1])
-  by fmsmga003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Jul 2021 22:41:35 -0700
-From:   Zeng Guang <guang.zeng@intel.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Tony Luck <tony.luck@intel.com>,
-        Kan Liang <kan.liang@linux.intel.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Kim Phillips <kim.phillips@amd.com>,
-        Jarkko Sakkinen <jarkko@kernel.org>,
-        Jethro Beekman <jethro@fortanix.com>,
-        Kai Huang <kai.huang@intel.com>
-Cc:     x86@kernel.org, linux-kernel@vger.kernel.org,
-        Robert Hu <robert.hu@intel.com>, Gao Chao <chao.gao@intel.com>,
-        Zeng Guang <guang.zeng@intel.com>
-Subject: [PATCH v2 6/6] KVM: VMX: enable IPI virtualization
-Date:   Fri, 23 Jul 2021 13:16:26 +0800
-Message-Id: <20210723051626.18364-7-guang.zeng@intel.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20210723051626.18364-1-guang.zeng@intel.com>
-References: <20210723051626.18364-1-guang.zeng@intel.com>
+   d="scan'208";a="502382136"
+Received: from orsmsx601.amr.corp.intel.com ([10.22.229.14])
+  by FMSMGA003.fm.intel.com with ESMTP; 22 Jul 2021 22:36:24 -0700
+Received: from orsmsx607.amr.corp.intel.com (10.22.229.20) by
+ ORSMSX601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2242.10; Thu, 22 Jul 2021 22:36:24 -0700
+Received: from orsmsx603.amr.corp.intel.com (10.22.229.16) by
+ ORSMSX607.amr.corp.intel.com (10.22.229.20) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2242.10; Thu, 22 Jul 2021 22:36:23 -0700
+Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
+ orsmsx603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2242.10 via Frontend Transport; Thu, 22 Jul 2021 22:36:23 -0700
+Received: from NAM10-DM6-obe.outbound.protection.outlook.com (104.47.58.101)
+ by edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2242.10; Thu, 22 Jul 2021 22:36:23 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=J8BqKjpGfusf5QGjUlwnAPhS0Fmpklfsxgx3+mpOWcMn+qZXzdmEcoLbHOxyfKfqzMiNwaDncDvOxAV3KovDgdKfM75eM8YHmft0NGSpHBbJFkbWJX08jdrnRKQtiAi19xhnWTCCXwahOW5K5JLVKahadcUWhGNSP7N0OQrgH9v8HuqoGRjmEZICFX5C60OUm0nBqyeB5ZBRoJr3Ts3FC3NbTmPZHMlBOMrWP8BCRFmDTC5y+K0A1dF6qMFqAQmoEDaNrYuDee2fShNuk2NnKrQ/K0ldzrZjVlP89sVYeRVvd+/qFiph5US4Ap/sN/eBefG04carpprfMAlLStnCcA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Xdvfr45L4oKLxNIykf2fFQ5qCyeOPfAOTSmDqggWI5w=;
+ b=jw3vfi8j/g/AwAWcI54RRY4hEJ6Tb1P4hc9PMsDvDtdQoOUJUdj1CXHX207dngBu3BxZ3FONb2hCrrukilgV3HafS7t+RImaEoQVuJwHXqAIVYdLPU3WmiQJZbtxlBLnvCNUwxaKqWFA0vcsjeOJdfLtwpBq9BWyiHy25PgXZ6rDSv1h0ebSD3H5WW2HSF4EcyjbeydCGcQP8Ej32fxyN7Zw5i0CVGa84OhTye7GAg9uiQZoM2JDhWbfxDCqPfJAviIhaqsXafDYVTJVIIsvWHQFci+Bw+dAR1OP1CAkVq24XFVNXU0FIT2X39l8gJOFbhNx+iKP5N2iuYwEb9avYg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=intel.onmicrosoft.com;
+ s=selector2-intel-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Xdvfr45L4oKLxNIykf2fFQ5qCyeOPfAOTSmDqggWI5w=;
+ b=Ht0YnspyjNU3xP6Bi6sXnLd38Dpit2DpqyL9qawdqv7nkXw2QITWMAN+ZYlCXhxFpifS3ItrW45euIVn0j1MTvSeaQXvPR7W/NfK1bNbDK9jw2GQmESgFHDo7oqzdanmkS6/JPcQLH/95XD+IsTvfcN/BfdB66theHWCx7aG7ZM=
+Received: from BN9PR11MB5433.namprd11.prod.outlook.com (2603:10b6:408:11e::13)
+ by BN6PR11MB1940.namprd11.prod.outlook.com (2603:10b6:404:104::16) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4331.29; Fri, 23 Jul
+ 2021 05:36:17 +0000
+Received: from BN9PR11MB5433.namprd11.prod.outlook.com
+ ([fe80::fd4b:cdde:6790:134]) by BN9PR11MB5433.namprd11.prod.outlook.com
+ ([fe80::fd4b:cdde:6790:134%9]) with mapi id 15.20.4352.026; Fri, 23 Jul 2021
+ 05:36:17 +0000
+From:   "Tian, Kevin" <kevin.tian@intel.com>
+To:     Christoph Hellwig <hch@lst.de>
+CC:     Joerg Roedel <joro@8bytes.org>, Jason Gunthorpe <jgg@ziepe.ca>,
+        "Alex Williamson" <alex.williamson@redhat.com>,
+        David Woodhouse <dwmw2@infradead.org>,
+        Lu Baolu <baolu.lu@linux.intel.com>,
+        Will Deacon <will@kernel.org>,
+        Kirti Wankhede <kwankhede@nvidia.com>,
+        "linux-arm-kernel@lists.infradead.org" 
+        <linux-arm-kernel@lists.infradead.org>,
+        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        Robin Murphy <robin.murphy@arm.com>
+Subject: RE: [PATCH 3/6] vfio: remove the unused mdev iommu hook
+Thread-Topic: [PATCH 3/6] vfio: remove the unused mdev iommu hook
+Thread-Index: AQHXRWldX98a1U6w60C1HwYkmNlXK6rc3tAAgAPcBcCAAJmdAIABJmdggAASuMCAAF5dgIAAAFGAgAAT44CABKOLAIAAAkEAgAAGdACAAAupAIAAIZMAgESRwUCAIwZ+AIABCmGQ
+Date:   Fri, 23 Jul 2021 05:36:17 +0000
+Message-ID: <BN9PR11MB5433440EED4E291C0DCD44BA8CE59@BN9PR11MB5433.namprd11.prod.outlook.com>
+References: <MWHPR11MB1886B92507ED9015831A0CEA8C509@MWHPR11MB1886.namprd11.prod.outlook.com>
+ <20210514121925.GI1096940@ziepe.ca>
+ <MWHPR11MB18866205125E566FE05867A78C509@MWHPR11MB1886.namprd11.prod.outlook.com>
+ <20210514133143.GK1096940@ziepe.ca> <YKJf7mphTHZoi7Qr@8bytes.org>
+ <20210517123010.GO1096940@ziepe.ca> <YKJnPGonR+d8rbu/@8bytes.org>
+ <20210517133500.GP1096940@ziepe.ca> <YKKNLrdQ4QjhLrKX@8bytes.org>
+ <BN9PR11MB54331FC6BB31E8CBF11914A48C019@BN9PR11MB5433.namprd11.prod.outlook.com>
+ <20210722133450.GA29155@lst.de>
+In-Reply-To: <20210722133450.GA29155@lst.de>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+dlp-version: 11.5.1.3
+dlp-product: dlpe-windows
+dlp-reaction: no-action
+authentication-results: lst.de; dkim=none (message not signed)
+ header.d=none;lst.de; dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: d30a1f1c-1919-4836-f98b-08d94d9bcb2a
+x-ms-traffictypediagnostic: BN6PR11MB1940:
+x-microsoft-antispam-prvs: <BN6PR11MB1940672A274813749F0536F48CE59@BN6PR11MB1940.namprd11.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:5236;
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: ceWitNytzc4hQP1OFEJILxozJaG1TwjP44veWXPns0TszStkS5PjfGis+9OqLc37w4w8ZmjmaedmcUxIyIiGXA1354bs2cak51soxVzWu6gIyd5ZP2/cuGi3s/yMYwdRv6OU5R7PplwYeQY3DV8uCWA/MIw1t03/FUE0Gz+NWf9L6m+pl++JBebLqRTx1j3yA9TihHLOTybZfCIdTiPPwOVRiSQxYk1fM6rGREkr+PBKcgDSLra0/V6qVs5voFWrxz7yZ98GMd3cO4u9TMVPVrccG3Eq3PeVYHRq2LLgsw9UiDN4ANji84rnV8ggUhC5dIO+VVDKjG0tkrU4i6o8TTAu6t44YO3dAyTlIgvttk8mprzFojdW/yKLbDXCb01gbSXNK1i3ZylSz0G/uQuWnlv/bCsVtGm7kyrZSQia9UdCB3iD5pIBIL28J1mBewjgkq7/uQ1TF9YuIHP0dU+abgBfJYP0Eaw9sBWBL0MBCaQAnutp0hqgaXMugUBRrtQfhjcV59AG+1eP4iNB0nu5ShZPGTUmctVx59knLmqYlsl0FSxBwP/2jOS2ucdbbLeFQt/oG7NAfvZkQNMcp4YyYelhBO8ldKSZZKzx9m+ZrHubHYLMjwIomJ3QC8SMbfQuOtyGQVs+KCY97sPB/mxCMFjcpFGbhVfk+jYGbq4P2kRzaf7vInLxEd4arJgSmAkw24fUOXtBvxsY+RJmWjNMrg==
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BN9PR11MB5433.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(376002)(346002)(366004)(39860400002)(136003)(396003)(26005)(55016002)(5660300002)(8676002)(2906002)(9686003)(7416002)(316002)(33656002)(122000001)(6916009)(8936002)(38100700002)(86362001)(83380400001)(54906003)(4744005)(4326008)(7696005)(66946007)(478600001)(52536014)(64756008)(71200400001)(6506007)(76116006)(66476007)(186003)(66446008)(66556008)(38070700004);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?ngAd08Ui9PKcaJ64sAwK6llckwQJD0w9f20gyu15MXK6huiSFye2SwLwDDft?=
+ =?us-ascii?Q?dh2WUXfYVEV+mLwr3Nt0kZjjnz9nZiEVKh2ROgXqPptUuwOCzye2JSIsc1qc?=
+ =?us-ascii?Q?1Crm2udUpIUBEc19TyP67o/3yMxo1x5MTW44tJWIUxVJEVUrX8jvcSpJ00eZ?=
+ =?us-ascii?Q?7NYB+8tTONPiMLEMgGO/U8vT/JcN6CETubFf0WBXmlarSBpSEpYL/EYVWXVh?=
+ =?us-ascii?Q?plXGkyAIaBh4CYCl9eMZ5NZu6W3kuEpCipt2bhpJoP6AH6fA1BpifLo13qrg?=
+ =?us-ascii?Q?lELhA7eLVnxJQZLVaEFSsmRsqvbI0urilMNeG/oJXIXdb3dWsKex0LAD/kwO?=
+ =?us-ascii?Q?Xgruo+mrUZ0Qp6+Ld8qvhhIQWXeO5DRBHyPiGZ8H1QnGYfRs6SWcd12HKxFT?=
+ =?us-ascii?Q?+8H7uEVv47ac8cJIQmGkeEbV6RczqmRw6bJ9dOpY6bqhF1mfE1Tc40RFL/0c?=
+ =?us-ascii?Q?6Ez2H+g5jdRt8l8jB0SXiIKIs8BUd5Nfq2M0IB73yt9ZyIGE+Oyo6Hqllm8N?=
+ =?us-ascii?Q?4a4hxEefaRPf90rj0PMf7XjV+3mFP2K/7hb65QnGuBGbNoeC4R8zhpUdc9Ug?=
+ =?us-ascii?Q?9MGb1CtWfgQdyE1ZlKy9V+JghUHhYYHFOFj0i6JTWSi3h7B7BGuy2ZxhQJfx?=
+ =?us-ascii?Q?bsnurocQ7sk8iIHGQgQbJ4HIi0V8tN+sNvm6sGRP8qOxm2VuS2umk/nE+9wK?=
+ =?us-ascii?Q?6+joI6AAEmOoVOszOwx9ATYAZpy0rQYKuFA8/SIgqtGTzp1+/G5l01GBFd/b?=
+ =?us-ascii?Q?qJ3Bypq4QtY4JWWnvWsmDXa8EeBy3ITjLbBia3RCSNvTTc6WIqdEYWtYjeSC?=
+ =?us-ascii?Q?cY55jC+N16OPaBZGiw7+7gGXWw0Pzcw9vgvz9FBVV4sxQiPs8z1A4dl0OYkt?=
+ =?us-ascii?Q?Wr95tSpuvpVgvsqWrwuuBDjFUFE7fpSa7aBDqIpbvdMp6w/Ci4wPV44MSFO+?=
+ =?us-ascii?Q?QYsqn/g9JZxwE9DK7KA/xTGVTp6NNP3qiJcSSwzlKhfvFu+8ucxP4Pw32zgT?=
+ =?us-ascii?Q?jR06kSUrXl6nVyYMYHhSZ9Bvx8Z2eUsrkp4jg3WulHNee+6EdoXgOs+fcByf?=
+ =?us-ascii?Q?/LvO+we3KI3pcPyT/cSQhSELvTH5nm/fFBs71bhE3Iq2NyV9ZGlSLwrexMSO?=
+ =?us-ascii?Q?Cxp9MNBlpqOR47oxBvmakKCRLw7e6XiUZrP/eGtOwvKCQ3mDHJW1On8tgGNf?=
+ =?us-ascii?Q?PCmsrzoZLCWmg72Lx7DFOBHkJIPcToOi3ZXYBAX8w3AoPwMBIwbMMo8GKSAJ?=
+ =?us-ascii?Q?I7PCtMaewgGk0icjk3QANObF3L20vl4HHLB/AbbIJlTZcSdLrdTiaPbpSNIU?=
+ =?us-ascii?Q?SnStu2inyM+142KDpihL7ho1?=
+x-ms-exchange-transport-forked: True
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: BN9PR11MB5433.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: d30a1f1c-1919-4836-f98b-08d94d9bcb2a
+X-MS-Exchange-CrossTenant-originalarrivaltime: 23 Jul 2021 05:36:17.2272
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: Af1p1HMNyXGOB4hxAGkZDFkzFll+9z3SZj9jD0kJo8QZySgFQgN6ksbyZGeJVq/vl4FwgvwjpUd8nxPSwWMT5A==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN6PR11MB1940
+X-OriginatorOrg: intel.com
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Gao Chao <chao.gao@intel.com>
+> From: Christoph Hellwig <hch@lst.de>
+> Sent: Thursday, July 22, 2021 9:35 PM
+>=20
+> On Wed, Jun 30, 2021 at 09:08:19AM +0000, Tian, Kevin wrote:
+> > The iommu layer should maintain above attaching status per device and
+> per
+> > iommu domain. There is no mdev/subdev concept in the iommu layer. It's
+> > just about RID or PASID.
+>=20
+> Yes, I think that makes sense.
+>=20
+> > And a new set of IOMMU-API:
+> >
+> >     - iommu_{un}bind_pgtable(domain, dev, addr);
+> >     - iommu_{un}bind_pgtable_pasid(domain, dev, addr, pasid);
+> >     - iommu_cache_invalidate(domain, dev, invalid_info);
+>=20
+> What caches is this supposed to "invalidate"?
 
-With IPI virtualization enabled, the processor emulates writes
-to APIC registers that would send IPIs. The processor sets the
-bit corresponding to the vector in target vCPU's PIR and may send
-a notification (IPI) specified by NDST and NV fields in target vCPU's
-PID. It is similar to what IOMMU engine does when dealing with posted
-interrupt from devices.
+pasid cache, iotlb or dev_iotlb entries that are related to the bound=20
+pgtable. the actual affected cache type and granularity (device-wide,
+pasid-wide, selected addr-range) are specified by the caller.
 
-A PID-pointer table is used by the processor to locate the PID of a
-vCPU with the vCPU's APIC ID.
-
-Like VT-d PI, if a vCPU goes to blocked state, VMM needs to switch its
-notification vector to wakeup vector. This can ensure that when an IPI
-for blocked vCPUs arrives, VMM can get control and wake up blocked
-vCPUs. And if a VCPU is preempted, its posted interrupt notification
-is suppressed.
-
-Note that IPI virtualization can only virualize physical-addressing,
-flat mode, unicast IPIs. Sending other IPIs would still cause a
-VM exit and need to be handled by VMM.
-
-Signed-off-by: Gao Chao <chao.gao@intel.com>
-Signed-off-by: Zeng Guang <guang.zeng@intel.com>
----
- arch/x86/include/asm/vmx.h         |  8 ++++
- arch/x86/include/asm/vmxfeatures.h |  2 +
- arch/x86/kvm/vmx/capabilities.h    |  7 ++++
- arch/x86/kvm/vmx/posted_intr.c     | 22 +++++++---
- arch/x86/kvm/vmx/vmx.c             | 65 ++++++++++++++++++++++++++++--
- arch/x86/kvm/vmx/vmx.h             |  3 ++
- 6 files changed, 98 insertions(+), 9 deletions(-)
-
-diff --git a/arch/x86/include/asm/vmx.h b/arch/x86/include/asm/vmx.h
-index 15652047f2db..e97cf7b9ff12 100644
---- a/arch/x86/include/asm/vmx.h
-+++ b/arch/x86/include/asm/vmx.h
-@@ -76,6 +76,11 @@
- #define SECONDARY_EXEC_ENABLE_USR_WAIT_PAUSE	VMCS_CONTROL_BIT(USR_WAIT_PAUSE)
- #define SECONDARY_EXEC_BUS_LOCK_DETECTION	VMCS_CONTROL_BIT(BUS_LOCK_DETECTION)
- 
-+/*
-+ * Definitions of Tertiary Processor-Based VM-Execution Controls.
-+ */
-+#define TERTIARY_EXEC_IPI_VIRT			VMCS_CONTROL_BIT(IPI_VIRT)
-+
- #define PIN_BASED_EXT_INTR_MASK                 VMCS_CONTROL_BIT(INTR_EXITING)
- #define PIN_BASED_NMI_EXITING                   VMCS_CONTROL_BIT(NMI_EXITING)
- #define PIN_BASED_VIRTUAL_NMIS                  VMCS_CONTROL_BIT(VIRTUAL_NMIS)
-@@ -159,6 +164,7 @@ static inline int vmx_misc_mseg_revid(u64 vmx_misc)
- enum vmcs_field {
- 	VIRTUAL_PROCESSOR_ID            = 0x00000000,
- 	POSTED_INTR_NV                  = 0x00000002,
-+	LAST_PID_POINTER_INDEX		= 0x00000008,
- 	GUEST_ES_SELECTOR               = 0x00000800,
- 	GUEST_CS_SELECTOR               = 0x00000802,
- 	GUEST_SS_SELECTOR               = 0x00000804,
-@@ -224,6 +230,8 @@ enum vmcs_field {
- 	TSC_MULTIPLIER_HIGH             = 0x00002033,
- 	TERTIARY_VM_EXEC_CONTROL	= 0x00002034,
- 	TERTIARY_VM_EXEC_CONTROL_HIGH	= 0x00002035,
-+	PID_POINTER_TABLE		= 0x00002042,
-+	PID_POINTER_TABLE_HIGH		= 0x00002043,
- 	GUEST_PHYSICAL_ADDRESS          = 0x00002400,
- 	GUEST_PHYSICAL_ADDRESS_HIGH     = 0x00002401,
- 	VMCS_LINK_POINTER               = 0x00002800,
-diff --git a/arch/x86/include/asm/vmxfeatures.h b/arch/x86/include/asm/vmxfeatures.h
-index 27e76eeca05b..e821e8126097 100644
---- a/arch/x86/include/asm/vmxfeatures.h
-+++ b/arch/x86/include/asm/vmxfeatures.h
-@@ -86,4 +86,6 @@
- #define VMX_FEATURE_ENCLV_EXITING	( 2*32+ 28) /* "" VM-Exit on ENCLV (leaf dependent) */
- #define VMX_FEATURE_BUS_LOCK_DETECTION	( 2*32+ 30) /* "" VM-Exit when bus lock caused */
- 
-+/* Tertiary Processor-Based VM-Execution Controls, word 3 */
-+#define VMX_FEATURE_IPI_VIRT		( 3*32 + 4) /* "" Enable IPI virtualization */
- #endif /* _ASM_X86_VMXFEATURES_H */
-diff --git a/arch/x86/kvm/vmx/capabilities.h b/arch/x86/kvm/vmx/capabilities.h
-index 38d414f64e61..78b0525dd991 100644
---- a/arch/x86/kvm/vmx/capabilities.h
-+++ b/arch/x86/kvm/vmx/capabilities.h
-@@ -12,6 +12,7 @@ extern bool __read_mostly enable_ept;
- extern bool __read_mostly enable_unrestricted_guest;
- extern bool __read_mostly enable_ept_ad_bits;
- extern bool __read_mostly enable_pml;
-+extern bool __read_mostly enable_ipiv;
- extern int __read_mostly pt_mode;
- 
- #define PT_MODE_SYSTEM		0
-@@ -283,6 +284,12 @@ static inline bool cpu_has_vmx_apicv(void)
- 		cpu_has_vmx_posted_intr();
- }
- 
-+static inline bool cpu_has_vmx_ipiv(void)
-+{
-+	return vmcs_config.cpu_based_3rd_exec_ctrl &
-+		TERTIARY_EXEC_IPI_VIRT;
-+}
-+
- static inline bool cpu_has_vmx_flexpriority(void)
- {
- 	return cpu_has_vmx_tpr_shadow() &&
-diff --git a/arch/x86/kvm/vmx/posted_intr.c b/arch/x86/kvm/vmx/posted_intr.c
-index 5f81ef092bd4..8c1400aaa1e7 100644
---- a/arch/x86/kvm/vmx/posted_intr.c
-+++ b/arch/x86/kvm/vmx/posted_intr.c
-@@ -81,9 +81,12 @@ void vmx_vcpu_pi_put(struct kvm_vcpu *vcpu)
- {
- 	struct pi_desc *pi_desc = vcpu_to_pi_desc(vcpu);
- 
--	if (!kvm_arch_has_assigned_device(vcpu->kvm) ||
--		!irq_remapping_cap(IRQ_POSTING_CAP)  ||
--		!kvm_vcpu_apicv_active(vcpu))
-+	if (!kvm_vcpu_apicv_active(vcpu))
-+		return;
-+
-+	if ((!kvm_arch_has_assigned_device(vcpu->kvm) ||
-+		!irq_remapping_cap(IRQ_POSTING_CAP)) &&
-+		!enable_ipiv)
- 		return;
- 
- 	/* Set SN when the vCPU is preempted */
-@@ -141,9 +144,16 @@ int pi_pre_block(struct kvm_vcpu *vcpu)
- 	struct pi_desc old, new;
- 	struct pi_desc *pi_desc = vcpu_to_pi_desc(vcpu);
- 
--	if (!kvm_arch_has_assigned_device(vcpu->kvm) ||
--		!irq_remapping_cap(IRQ_POSTING_CAP)  ||
--		!kvm_vcpu_apicv_active(vcpu))
-+	if (!kvm_vcpu_apicv_active(vcpu))
-+		return 0;
-+
-+	/* Put vCPU into a list and set NV to wakeup vector if it is
-+	 * one of the following cases:
-+	 * 1. any assigned device is in use.
-+	 * 2. IPI virtualization is enabled.
-+	 */
-+	if ((!kvm_arch_has_assigned_device(vcpu->kvm) ||
-+		!irq_remapping_cap(IRQ_POSTING_CAP)) && !enable_ipiv)
- 		return 0;
- 
- 	WARN_ON(irqs_disabled());
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index 820fc131d258..077474c52380 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -104,6 +104,9 @@ module_param(fasteoi, bool, S_IRUGO);
- 
- module_param(enable_apicv, bool, S_IRUGO);
- 
-+bool __read_mostly enable_ipiv = 1;
-+module_param(enable_ipiv, bool, S_IRUGO);
-+
- /*
-  * If nested=1, nested virtualization is supported, i.e., guests may use
-  * VMX and be a hypervisor for its own guests. If nested=0, guests may not
-@@ -225,6 +228,7 @@ static const struct {
- };
- 
- #define L1D_CACHE_ORDER 4
-+#define PID_TABLE_ORDER get_order(KVM_MAX_VCPU_ID << 3)
- static void *vmx_l1d_flush_pages;
- 
- static int vmx_setup_l1d_flush(enum vmx_l1d_flush_state l1tf)
-@@ -2514,7 +2518,7 @@ static __init int setup_vmcs_config(struct vmcs_config *vmcs_conf,
- 	}
- 
- 	if (_cpu_based_exec_control & CPU_BASED_ACTIVATE_TERTIARY_CONTROLS) {
--		u64 opt3 = 0;
-+		u64 opt3 = enable_ipiv ? TERTIARY_EXEC_IPI_VIRT : 0;
- 		u64 min3 = 0;
- 
- 		if (adjust_vmx_controls_64(min3, opt3,
-@@ -3870,6 +3874,8 @@ static void vmx_update_msr_bitmap_x2apic(struct kvm_vcpu *vcpu, u8 mode)
- 		vmx_enable_intercept_for_msr(vcpu, X2APIC_MSR(APIC_TMCCT), MSR_TYPE_RW);
- 		vmx_disable_intercept_for_msr(vcpu, X2APIC_MSR(APIC_EOI), MSR_TYPE_W);
- 		vmx_disable_intercept_for_msr(vcpu, X2APIC_MSR(APIC_SELF_IPI), MSR_TYPE_W);
-+		vmx_set_intercept_for_msr(vcpu, X2APIC_MSR(APIC_ICR),
-+				MSR_TYPE_RW, !enable_ipiv);
- 	}
- }
- 
-@@ -4138,14 +4144,21 @@ static void vmx_refresh_apicv_exec_ctrl(struct kvm_vcpu *vcpu)
- 
- 	pin_controls_set(vmx, vmx_pin_based_exec_ctrl(vmx));
- 	if (cpu_has_secondary_exec_ctrls()) {
--		if (kvm_vcpu_apicv_active(vcpu))
-+		if (kvm_vcpu_apicv_active(vcpu)) {
- 			secondary_exec_controls_setbit(vmx,
- 				      SECONDARY_EXEC_APIC_REGISTER_VIRT |
- 				      SECONDARY_EXEC_VIRTUAL_INTR_DELIVERY);
--		else
-+			if (cpu_has_tertiary_exec_ctrls() && enable_ipiv)
-+				tertiary_exec_controls_setbit(vmx,
-+					TERTIARY_EXEC_IPI_VIRT);
-+		} else {
- 			secondary_exec_controls_clearbit(vmx,
- 					SECONDARY_EXEC_APIC_REGISTER_VIRT |
- 					SECONDARY_EXEC_VIRTUAL_INTR_DELIVERY);
-+			if (cpu_has_tertiary_exec_ctrls())
-+				tertiary_exec_controls_clearbit(vmx,
-+					TERTIARY_EXEC_IPI_VIRT);
-+		}
- 	}
- 
- 	if (cpu_has_vmx_msr_bitmap())
-@@ -4236,8 +4249,12 @@ vmx_adjust_secondary_exec_control(struct vcpu_vmx *vmx, u32 *exec_control,
- 
- static void vmx_compute_tertiary_exec_control(struct vcpu_vmx *vmx)
- {
-+	struct kvm_vcpu *vcpu = &vmx->vcpu;
- 	u32 exec_control = vmcs_config.cpu_based_3rd_exec_ctrl;
- 
-+	if (!kvm_vcpu_apicv_active(vcpu))
-+		exec_control &= ~TERTIARY_EXEC_IPI_VIRT;
-+
- 	vmx->tertiary_exec_control = exec_control;
- }
- 
-@@ -4332,6 +4349,17 @@ static void vmx_compute_secondary_exec_control(struct vcpu_vmx *vmx)
- 
- #define VMX_XSS_EXIT_BITMAP 0
- 
-+static void install_pid(struct vcpu_vmx *vmx)
-+{
-+	struct kvm_vmx *kvm_vmx = to_kvm_vmx(vmx->vcpu.kvm);
-+
-+	BUG_ON(vmx->vcpu.vcpu_id > kvm_vmx->pid_last_index);
-+	/* Bit 0 is the valid bit */
-+	kvm_vmx->pid_table[vmx->vcpu.vcpu_id] = __pa(&vmx->pi_desc) | 1;
-+	vmcs_write64(PID_POINTER_TABLE, __pa(kvm_vmx->pid_table));
-+	vmcs_write16(LAST_PID_POINTER_INDEX, kvm_vmx->pid_last_index);
-+}
-+
- /*
-  * Noting that the initialization of Guest-state Area of VMCS is in
-  * vmx_vcpu_reset().
-@@ -4371,6 +4399,9 @@ static void init_vmcs(struct vcpu_vmx *vmx)
- 
- 		vmcs_write16(POSTED_INTR_NV, POSTED_INTR_VECTOR);
- 		vmcs_write64(POSTED_INTR_DESC_ADDR, __pa((&vmx->pi_desc)));
-+
-+		if (enable_ipiv)
-+			install_pid(vmx);
- 	}
- 
- 	if (!kvm_pause_in_guest(vmx->vcpu.kvm)) {
-@@ -6969,6 +7000,22 @@ static int vmx_vm_init(struct kvm *kvm)
- 			break;
- 		}
- 	}
-+
-+	if (enable_ipiv) {
-+		struct page *pages;
-+
-+		/* Allocate pages for PID table in order of PID_TABLE_ORDER
-+		 * depending on KVM_MAX_VCPU_ID. Each PID entry is 8 bytes.
-+		 */
-+		pages = alloc_pages(GFP_KERNEL | __GFP_ZERO, PID_TABLE_ORDER);
-+
-+		if (!pages)
-+			return -ENOMEM;
-+
-+		to_kvm_vmx(kvm)->pid_table = (void *)page_address(pages);
-+		to_kvm_vmx(kvm)->pid_last_index = KVM_MAX_VCPU_ID;
-+	}
-+
- 	return 0;
- }
- 
-@@ -7579,6 +7626,14 @@ static bool vmx_check_apicv_inhibit_reasons(ulong bit)
- 	return supported & BIT(bit);
- }
- 
-+static void vmx_vm_destroy(struct kvm *kvm)
-+{
-+	struct kvm_vmx *kvm_vmx = to_kvm_vmx(kvm);
-+
-+	if (kvm_vmx->pid_table)
-+		free_pages((unsigned long)kvm_vmx->pid_table, PID_TABLE_ORDER);
-+}
-+
- static struct kvm_x86_ops vmx_x86_ops __initdata = {
- 	.hardware_unsetup = hardware_unsetup,
- 
-@@ -7589,6 +7644,7 @@ static struct kvm_x86_ops vmx_x86_ops __initdata = {
- 
- 	.vm_size = sizeof(struct kvm_vmx),
- 	.vm_init = vmx_vm_init,
-+	.vm_destroy = vmx_vm_destroy,
- 
- 	.vcpu_create = vmx_create_vcpu,
- 	.vcpu_free = vmx_free_vcpu,
-@@ -7828,6 +7884,9 @@ static __init int hardware_setup(void)
- 		vmx_x86_ops.sync_pir_to_irr = NULL;
- 	}
- 
-+	if (!enable_apicv || !cpu_has_vmx_ipiv())
-+		enable_ipiv = 0;
-+
- 	if (cpu_has_vmx_tsc_scaling()) {
- 		kvm_has_tsc_control = true;
- 		kvm_max_tsc_scaling_ratio = KVM_VMX_TSC_MULTIPLIER_MAX;
-diff --git a/arch/x86/kvm/vmx/vmx.h b/arch/x86/kvm/vmx/vmx.h
-index c356ceebe84c..cfab065661a8 100644
---- a/arch/x86/kvm/vmx/vmx.h
-+++ b/arch/x86/kvm/vmx/vmx.h
-@@ -352,6 +352,9 @@ struct kvm_vmx {
- 	unsigned int tss_addr;
- 	bool ept_identity_pagetable_done;
- 	gpa_t ept_identity_map_addr;
-+	/* PID table for IPI virtualization */
-+	u64 *pid_table;
-+	u16 pid_last_index;
- };
- 
- bool nested_vmx_allowed(struct kvm_vcpu *vcpu);
--- 
-2.25.1
-
+Thanks
+Kevin
