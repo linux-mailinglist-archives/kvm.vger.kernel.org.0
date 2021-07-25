@@ -2,72 +2,83 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id CF8393D4FEB
-	for <lists+kvm@lfdr.de>; Sun, 25 Jul 2021 22:36:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E442E3D5021
+	for <lists+kvm@lfdr.de>; Sun, 25 Jul 2021 23:34:19 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230343AbhGYTzw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 25 Jul 2021 15:55:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42554 "EHLO
+        id S229604AbhGYUxs (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 25 Jul 2021 16:53:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55184 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229661AbhGYTzw (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 25 Jul 2021 15:55:52 -0400
-Received: from ms.lwn.net (ms.lwn.net [IPv6:2600:3c01:e000:3a1::42])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 24232C061757;
-        Sun, 25 Jul 2021 13:36:22 -0700 (PDT)
-Received: from localhost (unknown [IPv6:2601:281:8300:104d::5f6])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ms.lwn.net (Postfix) with ESMTPSA id D918C2E6;
-        Sun, 25 Jul 2021 20:36:21 +0000 (UTC)
-DKIM-Filter: OpenDKIM Filter v2.11.0 ms.lwn.net D918C2E6
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=lwn.net; s=20201203;
-        t=1627245382; bh=PWJqoRENwRfHbihAwLZLmHYgX4yVLVVGbNyyEZbIyM4=;
-        h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
-        b=Uk3oi7fUfB1+rPVN4shaOs8zTN7+0hE7QY9VhD347yQq+A/BEFwLnSe/FDM2nEJpQ
-         IqVbCFmMEVjw8/Z+Z0yiJQjad1fvc135pW+Le7n63O8kDyzos4F7Z7zfNs/+nJUI3z
-         zwe+6mEIjkemi7G+qpiBhQsRZ6ptx8QDGFWsvla6UsdNrlcBvaSYId9ZLp7uqTwHXw
-         KgxZt+nRFB9Plzlkp/ZiBEkxAUFFO9RK1qNrUsB0l9nGcubF0zLuhxtSMr9AzjZZer
-         YbEqyUf/VF3NgUHKKepPH84ZO5SizCDwr7gsaEW8M3mCQyNcg2+MJwdRB2aCmkuw6a
-         saGsVjE6talyw==
-From:   Jonathan Corbet <corbet@lwn.net>
-To:     Mauro Carvalho Chehab <mchehab+huawei@kernel.org>,
-        Linux Doc Mailing List <linux-doc@vger.kernel.org>
-Cc:     Mauro Carvalho Chehab <mchehab+huawei@kernel.org>,
-        linux-kernel@vger.kernel.org, Jaroslav Kysela <perex@perex.cz>,
-        alsa-devel@alsa-project.org, kvm@vger.kernel.org,
-        linux-acpi@vger.kernel.org
-Subject: Re: [PATCH 0/3] Get rid of some undesirable characters
-In-Reply-To: <cover.1626947264.git.mchehab+huawei@kernel.org>
-References: <cover.1626947264.git.mchehab+huawei@kernel.org>
-Date:   Sun, 25 Jul 2021 14:36:21 -0600
-Message-ID: <87fsw2uo56.fsf@meer.lwn.net>
+        with ESMTP id S229531AbhGYUxr (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 25 Jul 2021 16:53:47 -0400
+Received: from mail-lf1-x133.google.com (mail-lf1-x133.google.com [IPv6:2a00:1450:4864:20::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CDA03C061757
+        for <kvm@vger.kernel.org>; Sun, 25 Jul 2021 14:34:15 -0700 (PDT)
+Received: by mail-lf1-x133.google.com with SMTP id a26so11793283lfr.11
+        for <kvm@vger.kernel.org>; Sun, 25 Jul 2021 14:34:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:reply-to:from:date:message-id:subject:to
+         :content-transfer-encoding;
+        bh=m38rqzWdCB9ASoXtganWd6kv7kmkcMjinzQv5fmIioY=;
+        b=XRuamnikcIBAduKjAIx21oGJW9UbeWIDjXBWHy01bJwJ7Lj5vafZHkfUdDIgoqgI7j
+         P0JOyBzri8KCm8BacpMPb09+PoEaHxomkmUpMq9elOvJ3rJmNtQ4NVxnHxfNN1igYCPj
+         nocAsm8VSnIF9tWIWfOYwT7he/iava6SCpn4TXtvzmmWTetkfWsTDabKaZOCP5bC+7UV
+         hu5LIAlVCJtX+ErIb8WFZpmWkF+NFfLzqm48js+9MOGLfQC6aMFiHkhLh8PmFk7okkP/
+         RGm38aN9h+jzUTfS8ujIPwQl1VVic669YwMrc0ZmxpIgI/SJggzsfsk+Rt0GoWUUZzCu
+         qtMA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:reply-to:from:date:message-id
+         :subject:to:content-transfer-encoding;
+        bh=m38rqzWdCB9ASoXtganWd6kv7kmkcMjinzQv5fmIioY=;
+        b=HDcCviBzr7h8MzmxdGWh+kpHs/C/8Qv9k6WsEaUNXTUZE063tL2zbmnqYm8NL/yP59
+         r5oz7yc8N+g3U30iH+vrfaQymRftFH4ZRnADY1crrxbskZR7mR7lOXB0YJCy6V01gkaU
+         MCK9CI6ry/L2GuRSp/Ipe+zhKRPNoHZgrskF1FZaProZ5bwdaec6/Zi0/4eZEB3YDVbj
+         0boeTtYRE58HzuCOlSYBvg2U88dWIk0V8s5Yf+YXU7e6mSGfyn5swoj8MdnLNFbHl51p
+         2pT6DULwuMjyGKolmuZTvt3fC6VqpBIvhQK1+gjovLfBPV3nVbMNpSIAkRcmtMbCxI05
+         rXcg==
+X-Gm-Message-State: AOAM532wO5w5zvHn5HodndQ4YKKd9RozySN5tuufMtVGCInBBktRKVW8
+        aTGnd15P0VrL1hzDI4mAwYukP75j67yKULal2Tw=
+X-Google-Smtp-Source: ABdhPJxSozkORGdGRtRx7lChHFFSsbq4CJDXdDN1imuR5SH+ddD0cuEv2cE2KMOlJUbeKqYr0cOG8g+5BugDQ+t1IO0=
+X-Received: by 2002:a05:6512:3091:: with SMTP id z17mr10614373lfd.395.1627248854105;
+ Sun, 25 Jul 2021 14:34:14 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain
+Received: by 2002:a2e:b4a8:0:0:0:0:0 with HTTP; Sun, 25 Jul 2021 14:34:13
+ -0700 (PDT)
+Reply-To: david.djossa01@yahoo.com
+From:   "MR.DAVID DJOSSA" <walleady.colla1@gmail.com>
+Date:   Mon, 26 Jul 2021 00:34:13 +0300
+Message-ID: <CA+RujsAQhd8mu7nP_mUL7Eje1wL5zkvo0gNtc6GNK+XMp2H5PA@mail.gmail.com>
+Subject: Give This Attention
+To:     undisclosed-recipients:;
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Mauro Carvalho Chehab <mchehab+huawei@kernel.org> writes:
+Dear Recipient;
 
-> Hi Jon,
->
-> While rebasing my docs tree, I noticed that there are three remaining
-> patches from my past series that replace some UTF-8 chars by ASCII
-> ones that aren't applied yet. Not sure what happened here.
->
-> Anyway, those are the missing ones.
->
-> Mauro Carvalho Chehab (3):
->   docs: sound: kernel-api: writing-an-alsa-driver.rst: replace some
->     characters
->   docs: firmware-guide: acpi: dsd: graph.rst: replace some characters
->   docs: virt: kvm: api.rst: replace some characters
->
->  .../firmware-guide/acpi/dsd/graph.rst         |  2 +-
->  .../kernel-api/writing-an-alsa-driver.rst     |  2 +-
->  Documentation/virt/kvm/api.rst                | 28 +++++++++----------
->  3 files changed, 16 insertions(+), 16 deletions(-)
 
-Applied, thanks.
+Please for your information, this proposal is not a scam. Could you be
+so kind to collaborate with me to run a business deal that would be
+yielding USD5, 000.00 (per day) into your hands till March 2023? You
+will be earning =E2=80=9CUnited States Dollar=E2=80=9D (US$2500) daily as y=
+our own
+(personal share) till March 2023.It=E2=80=99s a cool business deal; therefo=
+re,
+if you are available and interested to know more about the business
+before to decide doing it, reply me URGENTLY for full details.
 
-jon
+
+
+P.S: You might receive this message in your inbox; spam or junk
+folders; depending on your web host or server network. I will be
+waiting for your respond, including your Mobile Phone Number:
+
+
++00____________________________for Short Message Service (SMS) or Text Mass=
+age.
+Yours Sincerely
+MR. DAVID DJOSSA
