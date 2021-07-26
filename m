@@ -2,136 +2,101 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 63C793D64DE
-	for <lists+kvm@lfdr.de>; Mon, 26 Jul 2021 18:54:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D2D713D64DC
+	for <lists+kvm@lfdr.de>; Mon, 26 Jul 2021 18:54:06 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240265AbhGZQMs (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 26 Jul 2021 12:12:48 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60946 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239942AbhGZQKo (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 26 Jul 2021 12:10:44 -0400
-Received: from mail-io1-xd2e.google.com (mail-io1-xd2e.google.com [IPv6:2607:f8b0:4864:20::d2e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0EDB4C0619C4
-        for <kvm@vger.kernel.org>; Mon, 26 Jul 2021 09:47:56 -0700 (PDT)
-Received: by mail-io1-xd2e.google.com with SMTP id 185so12650226iou.10
-        for <kvm@vger.kernel.org>; Mon, 26 Jul 2021 09:47:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=/gscgTlqJAwtBK+aPZMSmpPlTZ1wrLA7ddYUtDzkea4=;
-        b=eW2pP1eixo09AKQQCwkoPmgJHcZI3HV8mvMeiWS1KO8EZLVBQkXJAew6ayYLiCXrgb
-         hBYt64Uiv5loTWdc4hWxUIwtlFY0XAVA30oRfO+3MbymozhW8PHxTmvZHa4eRZS7kFe4
-         nU6mLDn5U0IASGb7EGVmMTlmPhTNKXxbY2JqCc1LpO2HNYUwsLhzBQawLAIyl6Cl/zl0
-         XWCc73CrP33zU2wcyw2gWwd8OqO8t2AGGPcnKccb09SNnMu9O8xYRjjJmBK9nAsP97Sw
-         dlMLXrR1YTqyvCNAAgyHz9MaxHlanZnh5yrHWOrLmCN1/2Zy3HwR6r8NgERBntMlLGkL
-         8Rwg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=/gscgTlqJAwtBK+aPZMSmpPlTZ1wrLA7ddYUtDzkea4=;
-        b=P6EN31LFZX41Vn60d5GnjNk1HCOaksd3RGUQZ/fl651sI+9xPEWTNBHKuQMk8Gf0LM
-         G783uidlCN8DRKqlVl4jWyIw7lSy0Tok05R/xoz1BToiMa2Q5nJzC06/mwkac7/ZJwGt
-         stfC7rscxdJIC9KS0jGad4IyCg0qTA7IPynXMFLBUJpzRaOCWiXSNLWvc87o7LLc+nS9
-         bIlCxJgGEoqcKoGH1SizVAiqouAIkhy+8joWhsZNNHBWp45Q4/MJAS/VW4kf5gdGjm+N
-         KjgygilYLeVij10n12kA34vdNz8Z61D0dqRMGKQn5jWTNKDld3+2Ciwk0GxSIG9KfQor
-         y6Kg==
-X-Gm-Message-State: AOAM532O66Fi8bSErpSoKeTdwRc/UDg4ZLcPdBch8T/or0hiKbS5+fGc
-        xBO4423eGPnJ0OpKbBxSoQR112MTTTmhkJmcwMidqg==
-X-Google-Smtp-Source: ABdhPJxr2DHNlsY36LedoSQBviPFgzyvH39XXlAV2YkiSqJAmkTNXF+z2xtRX/2vLLVAdpZto6928JLGRTlM46IpnGc=
-X-Received: by 2002:a05:6638:2416:: with SMTP id z22mr17318372jat.57.1627318075369;
- Mon, 26 Jul 2021 09:47:55 -0700 (PDT)
+        id S239934AbhGZQLi (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 26 Jul 2021 12:11:38 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:28516 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S235735AbhGZQJi (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 26 Jul 2021 12:09:38 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1627318206;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=avwuTKw/R829e7k0vzWCG0fx07vpyZttwZixO5lwurs=;
+        b=ObC3KAbnpeMxh+yW1c+HhRlIajihp0Ed82v7hB0WFFx5EamW1UWXxlTwlcGQcSoCHacxuc
+        E3rnteJC7KnG4+8WVTwN38azW5v6Gdz9739oaGhNpfhdg/mN0qFwHxm2oyBgKKVxF9Rq2X
+        z5mf/5z7XdaktTdOCUbTEC8iB/Z7T0E=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-13-XApmllMIMRWRAuyo1dG2jw-1; Mon, 26 Jul 2021 12:50:01 -0400
+X-MC-Unique: XApmllMIMRWRAuyo1dG2jw-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 70BAF8070ED;
+        Mon, 26 Jul 2021 16:50:00 +0000 (UTC)
+Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 101D26E6E2;
+        Mon, 26 Jul 2021 16:50:00 +0000 (UTC)
+From:   Paolo Bonzini <pbonzini@redhat.com>
+To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Cc:     Dan Carpenter <dan.carpenter@oracle.com>,
+        Vineeth Pillai <viremana@linux.microsoft.com>
+Subject: [PATCH] KVM: SVM: delay svm_vcpu_init_msrpm after svm->vmcb is initialized
+Date:   Mon, 26 Jul 2021 12:49:59 -0400
+Message-Id: <20210726164959.1436607-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-References: <20210726075238.GA10030@kili>
-In-Reply-To: <20210726075238.GA10030@kili>
-From:   Ben Gardon <bgardon@google.com>
-Date:   Mon, 26 Jul 2021 09:47:43 -0700
-Message-ID: <CANgfPd-H3a7zdEeV2rtyCTcHinYOwTB=KFFRXYSnYCG8e+tq6w@mail.gmail.com>
-Subject: Re: [bug report] KVM: x86/mmu: Use an rwlock for the x86 MMU
-To:     Dan Carpenter <dan.carpenter@oracle.com>
-Cc:     kvm <kvm@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Jul 26, 2021 at 12:52 AM Dan Carpenter <dan.carpenter@oracle.com> wrote:
->
-> [ This is not the correct patch to blame, but there is something going
->   on here which I don't understand so this email is more about me
->   learning rather than reporting bugs. - dan ]
->
-> Hello Ben Gardon,
->
-> The patch 531810caa9f4: "KVM: x86/mmu: Use an rwlock for the x86 MMU"
-> from Feb 2, 2021, leads to the following static checker warning:
->
->         arch/x86/kvm/mmu/mmu.c:5769 kvm_mmu_zap_all()
->         warn: sleeping in atomic context
->
-> arch/x86/kvm/mmu/mmu.c
->     5756 void kvm_mmu_zap_all(struct kvm *kvm)
->     5757 {
->     5758        struct kvm_mmu_page *sp, *node;
->     5759        LIST_HEAD(invalid_list);
->     5760        int ign;
->     5761
->     5762        write_lock(&kvm->mmu_lock);
->                 ^^^^^^^^^^^^^^^^^^^^^^^^^^
-> This line bumps the preempt count.
->
->     5763 restart:
->     5764        list_for_each_entry_safe(sp, node, &kvm->arch.active_mmu_pages, link) {
->     5765                if (WARN_ON(sp->role.invalid))
->     5766                        continue;
->     5767                if (__kvm_mmu_prepare_zap_page(kvm, sp, &invalid_list, &ign))
->     5768                        goto restart;
-> --> 5769                if (cond_resched_rwlock_write(&kvm->mmu_lock))
->                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-> This line triggers a sleeping in atomic warning.  What's going on here
-> that I'm not understanding?
+Right now, svm_hv_vmcb_dirty_nested_enlightenments has an incorrect
+dereference of vmcb->control.reserved_sw before the vmcb is checked
+for being non-NULL.  The compiler is usually sinking the dereference
+after the check; instead of doing this ourselves in the source,
+ensure that svm_hv_vmcb_dirty_nested_enlightenments is only called
+with a non-NULL VMCB.
 
+Reported-by: Dan Carpenter <dan.carpenter@oracle.com>
+Cc: Vineeth Pillai <viremana@linux.microsoft.com>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+[Untested for now due to issues with my AMD machine. - Paolo]
+---
+ arch/x86/kvm/svm/svm.c          | 4 ++--
+ arch/x86/kvm/svm/svm_onhyperv.h | 2 +-
+ 2 files changed, 3 insertions(+), 3 deletions(-)
 
-Hi Dan,
+diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+index 9a6987549e1b..4bcb95bb8ed7 100644
+--- a/arch/x86/kvm/svm/svm.c
++++ b/arch/x86/kvm/svm/svm.c
+@@ -1406,8 +1406,6 @@ static int svm_create_vcpu(struct kvm_vcpu *vcpu)
+ 		goto error_free_vmsa_page;
+ 	}
+ 
+-	svm_vcpu_init_msrpm(vcpu, svm->msrpm);
+-
+ 	svm->vmcb01.ptr = page_address(vmcb01_page);
+ 	svm->vmcb01.pa = __sme_set(page_to_pfn(vmcb01_page) << PAGE_SHIFT);
+ 
+@@ -1419,6 +1417,8 @@ static int svm_create_vcpu(struct kvm_vcpu *vcpu)
+ 	svm_switch_vmcb(svm, &svm->vmcb01);
+ 	init_vmcb(vcpu);
+ 
++	svm_vcpu_init_msrpm(vcpu, svm->msrpm);
++
+ 	svm_init_osvw(vcpu);
+ 	vcpu->arch.microcode_version = 0x01000065;
+ 
+diff --git a/arch/x86/kvm/svm/svm_onhyperv.h b/arch/x86/kvm/svm/svm_onhyperv.h
+index 9b9a55abc29f..c53b8bf8d013 100644
+--- a/arch/x86/kvm/svm/svm_onhyperv.h
++++ b/arch/x86/kvm/svm/svm_onhyperv.h
+@@ -89,7 +89,7 @@ static inline void svm_hv_vmcb_dirty_nested_enlightenments(
+ 	 * as we mark it dirty unconditionally towards end of vcpu
+ 	 * init phase.
+ 	 */
+-	if (vmcb && vmcb_is_clean(vmcb, VMCB_HV_NESTED_ENLIGHTENMENTS) &&
++	if (vmcb_is_clean(vmcb, VMCB_HV_NESTED_ENLIGHTENMENTS) &&
+ 	    hve->hv_enlightenments_control.msr_bitmap)
+ 		vmcb_mark_dirty(vmcb, VMCB_HV_NESTED_ENLIGHTENMENTS);
+ }
+-- 
+2.27.0
 
-Thanks for sending this. I'm confused by this sequence too. I'm not
-sure how this could sleep in an atomic context.
-My first thought was that there might be something going on with the
-qrwlock's wait_lock, but since this thread already acquired the
-rwlock, it can't be holding / waiting on the wait_lock.
-
-Then I thought the __might_sleep could be in the wrong place, but it's
-in the same place for a regular spinlock, so I think that's fine.
-
-I do note that __cond_resched_rwlock does not check rwlock_needbreak
-like __cond_resched_lock checks spin_needbreak. That seems like an
-oversight, but I don't see how it could cause this warning.
-
-I'm as confused by this as you. Did you confirm that this sleeping in
-atomic warning does not happen before this commit? What kind of
-configuration are you able to reproduce this on?
-
-It might be worth asking some sched / locking folks about this as
-they'll likely have a better understanding of all the intricacies of
-the layers of locking macros.
-I'm very curious to understand what's causing this too.
-
-Ben
-
->
->
->     5770                        goto restart;
->     5771        }
->     5772
->     5773        kvm_mmu_commit_zap_page(kvm, &invalid_list);
->     5774
->     5775        if (is_tdp_mmu_enabled(kvm))
->     5776                kvm_tdp_mmu_zap_all(kvm);
->     5777
->     5778        write_unlock(&kvm->mmu_lock);
->     5779 }
->
-> regards,
-> dan carpenter
