@@ -2,81 +2,70 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 726E53D5A81
-	for <lists+kvm@lfdr.de>; Mon, 26 Jul 2021 15:41:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 94D023D5A97
+	for <lists+kvm@lfdr.de>; Mon, 26 Jul 2021 15:43:02 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234116AbhGZNAz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 26 Jul 2021 09:00:55 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:30163 "EHLO
+        id S234368AbhGZNCa (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 26 Jul 2021 09:02:30 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:45905 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S234161AbhGZNAp (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 26 Jul 2021 09:00:45 -0400
+        by vger.kernel.org with ESMTP id S234359AbhGZNCC (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 26 Jul 2021 09:02:02 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1627306873;
+        s=mimecast20190719; t=1627306950;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=iwb+gJ5kZupdhuNB/HcDQBwyIfUYDI68vwzalsg6VHw=;
-        b=U4X4iDQOSh2zIFRsXKCqbVwmVGSiZxCzDTGoSrqkEa4Y0PysciG6fWM8tdjuxhmzPL0W4/
-        3b6TsFbgwaW2UcE/RI54Y3A88HodkoSjXNklDt3UD2dFPtfU7aOc0sPr2iQOMqmIub6nvH
-        j2v/Q6d31mtZP0/IpkGA8xENz5CZCxI=
-Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
- [209.85.218.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-232-mi8YT51_N0msMnZh4tfRdw-1; Mon, 26 Jul 2021 09:41:12 -0400
-X-MC-Unique: mi8YT51_N0msMnZh4tfRdw-1
-Received: by mail-ej1-f71.google.com with SMTP id g21-20020a1709061e15b029052292d7c3b4so2090097ejj.9
-        for <kvm@vger.kernel.org>; Mon, 26 Jul 2021 06:41:12 -0700 (PDT)
+        bh=DbUVtvqYLIV2IExPgkbfEc3dRpkF1ai0qjs2lZ3kNnE=;
+        b=XxT+eThnIsT2vAcPTRRP3rwn2IXdcRneeMwKwbJEnMhLeDQ6QFd7bQGKK5dIW05cQVXEVj
+        XJ7k4NWTjs80+ninQped+T2zfIl4y8HWlNEnn9oyLEm2GJvweWDls+6qgtaThvY36mDSKW
+        TRHjgnMYdcVODCzoWEZx2uh35vZR1t8=
+Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
+ [209.85.208.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-199-2ljmw5joOeyjejhQbzZldw-1; Mon, 26 Jul 2021 09:42:27 -0400
+X-MC-Unique: 2ljmw5joOeyjejhQbzZldw-1
+Received: by mail-ed1-f69.google.com with SMTP id d12-20020a50fe8c0000b02903a4b519b413so4756670edt.9
+        for <kvm@vger.kernel.org>; Mon, 26 Jul 2021 06:42:27 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=iwb+gJ5kZupdhuNB/HcDQBwyIfUYDI68vwzalsg6VHw=;
-        b=qESX/uEwyxx4Y0jIDy/2LKElrfxQTRWq4JA1qCVVe1GYdnTTYDs4DQE3dS+BojQvyE
-         /UeKDmflf1qpGM/3IKkE94ScwNSdA3gAobhsKJ2mo8CNaXmZ3BxA09dahrg1rOC5hqnD
-         XhXqA2qxj7TJLw3AbOkoQ3pf3696kY+rJ0ZtG1y23Ad+xo7V5ijBEqY1UCmZfreuYs7Y
-         FkR5snhQ4eoLFFCRpOj+twQ1KQ+mwDdmFfkWyud12MBnsBST7Yw0/yok6D0QYWdGHpD4
-         0zCZDjZaoyczjyjU79T4D55o0bNfFXc+lGSaOgkfAnnaFPpLbqZ6nbC2P0RsPVBP6a7E
-         fVPA==
-X-Gm-Message-State: AOAM530dsmy4Jxwo2GPL5YEKIkGv4/DInMcB9lI2VbnKYPImN7I0ofn0
-        Txg/r70W9vhJerA8opDfISi3ZJNlg71RxRRh9ETYyD5I1iyIZg5a5mxjhMb6SYZn9E2kJTNBSXT
-        HwDhxfGOdwAHC
-X-Received: by 2002:a17:907:62a7:: with SMTP id nd39mr17088023ejc.502.1627306871203;
-        Mon, 26 Jul 2021 06:41:11 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzT0bYvy/TK8+n6Y6c+hBewPc87dvCIB4DeEysL1icefAhm31DZ7CDgxzd8DglLWWJepno96g==
-X-Received: by 2002:a17:907:62a7:: with SMTP id nd39mr17088011ejc.502.1627306871006;
-        Mon, 26 Jul 2021 06:41:11 -0700 (PDT)
+        bh=DbUVtvqYLIV2IExPgkbfEc3dRpkF1ai0qjs2lZ3kNnE=;
+        b=ixvDDdrLP/iqt23QGHh1Kgxg5FuMvjH7uFZI+poF6B6xifgbpWMm3M7MTjHKQ1LzGr
+         iUbxEhY2MM3xkGc/Dn8rjAYOQhSXKZRdGSuMH/pygtim7laYFNhHjQcWrDZ8mujN8x3N
+         mGTI1J7WJoFjWp+HSrXizM7KZllreqqFQAijVMByiwIBafd+5uz2RP813WqXlQZz7T8i
+         c9gKSj8MXvt62/2uznV1r4BIjertoJ6R1IBfnOzDsIQI6nw2Gmu9Uul8TD3lQ56Svy1C
+         fAVfNGnNuVCCvTgexYHFPpEvz1LdhOoWPnkLK4ac2m/bQSZfDG63Nu5Y/oGUi+i6yH4o
+         Nyag==
+X-Gm-Message-State: AOAM530t9KQFp44FpBur6misWWvT3FIGpqsPdRaVw5OqZL8RNfcFiZTT
+        J4lg/7aN9zj9l/Prd72qaviwwmr7cPLe6ZbMRkU/9I88VYQPTkE/WuA+PPHYL2AkIFA8xBQhp2v
+        nnBdNh60CRgZz
+X-Received: by 2002:a05:6402:31a4:: with SMTP id dj4mr10088527edb.350.1627306946113;
+        Mon, 26 Jul 2021 06:42:26 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzaPhxnXEkX5ZgOuE+meod+XZ3vfb4y3Q1rF5NA9yq0QtYo6bz/rfrexS5Pw1vje0rYXFomiQ==
+X-Received: by 2002:a05:6402:31a4:: with SMTP id dj4mr10088510edb.350.1627306945972;
+        Mon, 26 Jul 2021 06:42:25 -0700 (PDT)
 Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id c15sm12639677edu.78.2021.07.26.06.41.09
+        by smtp.gmail.com with ESMTPSA id k21sm18837408edo.41.2021.07.26.06.42.25
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 26 Jul 2021 06:41:10 -0700 (PDT)
-Subject: Re: [PATCH 0/6] x86/kvm: add boot parameters for max vcpu configs
-To:     Juergen Gross <jgross@suse.com>, linux-kernel@vger.kernel.org,
-        x86@kernel.org, kvm@vger.kernel.org, linux-doc@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        "H. Peter Anvin" <hpa@zytor.com>, Jonathan Corbet <corbet@lwn.net>,
-        Marc Zyngier <maz@kernel.org>,
-        James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu
-References: <20210701154105.23215-1-jgross@suse.com>
+        Mon, 26 Jul 2021 06:42:25 -0700 (PDT)
+Subject: Re: [PATCH v2 2/9] KVM: Introduce kvm_get_kvm_safe()
+To:     Peter Xu <peterx@redhat.com>, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org
+Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Maxim Levitsky <mlevitsk@redhat.com>
+References: <20210625153214.43106-1-peterx@redhat.com>
+ <20210625153214.43106-3-peterx@redhat.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <b05371ad-05e3-9d99-702e-d8296be492f0@redhat.com>
-Date:   Mon, 26 Jul 2021 15:41:09 +0200
+Message-ID: <35d133ab-5f21-7693-51ae-1a6ae81e76f4@redhat.com>
+Date:   Mon, 26 Jul 2021 15:42:24 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.11.0
 MIME-Version: 1.0
-In-Reply-To: <20210701154105.23215-1-jgross@suse.com>
+In-Reply-To: <20210625153214.43106-3-peterx@redhat.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -84,47 +73,15 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 01/07/21 17:40, Juergen Gross wrote:
-> In order to be able to have a single kernel for supporting even huge
-> numbers of vcpus per guest some arrays should be sized dynamically.
-> 
-> The easiest way to do that is to add boot parameters for the maximum
-> number of vcpus and the highest supported vcpu-id overwriting the
-> normal default.
-> 
-> This patch series is doing that for x86. The same scheme can be easily
-> adapted to other architectures, but I don't want to do that in the
-> first iteration.
-> 
-> In the long term I'd suggest to have a per-guest setting of the two
-> parameters allowing to spare some memory for smaller guests. OTOH this
-> would require new ioctl()s and respective qemu modifications, so I let
-> those away for now.
-> 
-> I've tested the series not to break normal guest operation and the new
-> parameters to be effective on x86. For Arm64 I did a compile test only.
-> 
-> Juergen Gross (6):
->    x86/kvm: fix vcpu-id indexed array sizes
->    x86/kvm: remove non-x86 stuff from arch/x86/kvm/ioapic.h
->    x86/kvm: add boot parameter for maximum vcpu-id
->    x86/kvm: introduce per cpu vcpu masks
->    kvm: allocate vcpu pointer array separately
->    x86/kvm: add boot parameter for setting max number of vcpus per guest
-> 
->   .../admin-guide/kernel-parameters.txt         | 18 +++++++
->   arch/arm64/kvm/arm.c                          | 28 +++++++++--
->   arch/x86/include/asm/kvm_host.h               | 22 ++++++---
->   arch/x86/kvm/hyperv.c                         | 25 +++++++---
->   arch/x86/kvm/ioapic.c                         | 14 +++++-
->   arch/x86/kvm/ioapic.h                         |  8 +--
->   arch/x86/kvm/irq_comm.c                       |  9 +++-
->   arch/x86/kvm/x86.c                            | 49 ++++++++++++++++++-
->   include/linux/kvm_host.h                      | 17 ++++++-
->   9 files changed, 160 insertions(+), 30 deletions(-)
-> 
+On 25/06/21 17:32, Peter Xu wrote:
+> -	/* The debugfs files are a reference to the kvm struct which
+> -	 * is still valid when kvm_destroy_vm is called.
+> -	 * To avoid the race between open and the removal of the debugfs
+> -	 * directory we test against the users count.
+> -	 */
+> -	if (!refcount_inc_not_zero(&stat_data->kvm
 
-Queued patches 1-2, thanks (1 for stable too).
+Better keep the comment here (but nothing to do on your part).
 
 Paolo
 
