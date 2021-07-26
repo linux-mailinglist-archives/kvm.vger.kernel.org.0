@@ -2,72 +2,80 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7FA123D66CE
-	for <lists+kvm@lfdr.de>; Mon, 26 Jul 2021 20:41:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2704A3D66D1
+	for <lists+kvm@lfdr.de>; Mon, 26 Jul 2021 20:41:48 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231548AbhGZSAy (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 26 Jul 2021 14:00:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60562 "EHLO
+        id S231787AbhGZSBS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 26 Jul 2021 14:01:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60676 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229489AbhGZSAx (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 26 Jul 2021 14:00:53 -0400
-Received: from mail-pj1-x104a.google.com (mail-pj1-x104a.google.com [IPv6:2607:f8b0:4864:20::104a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E78F6C061757
-        for <kvm@vger.kernel.org>; Mon, 26 Jul 2021 11:41:21 -0700 (PDT)
-Received: by mail-pj1-x104a.google.com with SMTP id nn2-20020a17090b38c2b02901738be23a47so1103826pjb.7
-        for <kvm@vger.kernel.org>; Mon, 26 Jul 2021 11:41:21 -0700 (PDT)
+        with ESMTP id S230032AbhGZSBR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 26 Jul 2021 14:01:17 -0400
+Received: from mail-pj1-x1049.google.com (mail-pj1-x1049.google.com [IPv6:2607:f8b0:4864:20::1049])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1214AC061760
+        for <kvm@vger.kernel.org>; Mon, 26 Jul 2021 11:41:46 -0700 (PDT)
+Received: by mail-pj1-x1049.google.com with SMTP id g14-20020a17090a4b0eb029017395ea5199so1101891pjh.6
+        for <kvm@vger.kernel.org>; Mon, 26 Jul 2021 11:41:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
-        h=date:message-id:mime-version:subject:from:to:cc;
-        bh=iEmiK8Z2pf1Smw+rofDrwaZXK2WpNJEBwftoW1LRiJo=;
-        b=FYQIip9d4viByvDmbXAF3NaBRNWa3pbSBKRHDqmiOKEXS/NX2SxDWrm/ptdtS4h7UG
-         79WMEe1q7yHzPmMz/hHisngDjdF3IOjk68nffGqGyVRopv3NykusOYdU+mq1HZ4XHuQ/
-         K49l6ZRa/kISjgt0DiwDu6SYaomjmzzXiOc+ZVRJuLb3dRZlPSsu4V9PSYNlID+50g1R
-         a1fJq0D8DUhXAn1vaGxI4OgqrJqbsuibpsKgk+vPfA5dcMiYKNV5e2VWTue4a1Pqo/Gp
-         Dm/bWehxUQ6vQwYPpvqJ5qJHloPNGZ6qFhIZvQezoQ2z9JpDak6SZgLYcm4GszUk5bmB
-         RKCg==
+        h=date:in-reply-to:message-id:mime-version:references:subject:from:to
+         :cc;
+        bh=8yNu6qbpILTbh+UzH48Yh1lHlgrQw9nlbePevAAANOg=;
+        b=BQ6cipGmLFFAawNsq6cd/QslSsDWcxh/L0hhNO4UuL0lYHSTgbshPfw5nzgolWJ3Ag
+         7TmKWWgq4/Y4Y8Yh2fkaUu4KgXAXMKgqRMy0zY/0CYYgUqGbJ3xzq75uFIDwfDGoo2tT
+         OxHxH2NbA/BUbQoB7IHbrm8wacMpD9VBnjoeka6zPF7POsIGOaRnRPZckDy1Queg45jM
+         YSQTjMrBia2dBUpUINRjDtfMtAmwyEFcgWPmHhQJM2zqyvRVWTlXIs/HQuhHFgfE9z3R
+         izOUEKZ3NbCjEe6RSqJ9Au1l90EQiFftdccyc/Fx+4FsMKIJQlJGa3fXfxVSVpQKzPjT
+         380w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
-        bh=iEmiK8Z2pf1Smw+rofDrwaZXK2WpNJEBwftoW1LRiJo=;
-        b=k00Zf2OkJn2d2bsD3AYnYpaA4N4ZS9ddmwse+fG9Gtc9Ryy8+XFehNVQXuomFHD6DH
-         6JUPwX9MSyiA3V65a9W+UeOBk4aFovkHqZPt8CVe/OojT52R4h+OD7OnM9w0bRpqzf8S
-         FXHk6rkQ/NOLUM262Sr8FSCsgpUDAbtWb+wwoaOgewlV3et+GkuJ5zxyojC+xT4EjP79
-         8yys6hxGcX/KmVm55mVMoyNTSP3HlnILvX9V/vQfJ8RRxz7eHtnKDEyKN2cGr5uG8KGj
-         eFY32UPuCR6r1Lg4wOJ3Q47uabCHG4ctd/Ok7lX0d5quNRMAnEhk7ejArZi3MouMzo9P
-         Md6Q==
-X-Gm-Message-State: AOAM532vwBj4AaB94H+DMrkzIDsuWTU4m4/bLXyota1carzgSzpt4plO
-        s8nCZlb7QaFO4BH7wlD6JDGDS2ZH5IjVYGwj
-X-Google-Smtp-Source: ABdhPJwhyw2nDMfdUBXFrDmSb5jH2sLfPxtEUlcwhkFsZvtG0pnBJ5f7eIcUAw0aasQ0PV8e/dbbCXMyJSv055Nd
+        h=x-gm-message-state:date:in-reply-to:message-id:mime-version
+         :references:subject:from:to:cc;
+        bh=8yNu6qbpILTbh+UzH48Yh1lHlgrQw9nlbePevAAANOg=;
+        b=k4v+DPaLiEiPNyDHcXG0y4l2OMWfEtFIfAAVk2sVDgtsHCVmYMx58zxVYPxYSLU+qp
+         rNYBeNGDwhZm2loQk4BkY1+A4B5Zt/j4aXdSGZvx8TMmCRZOPkcz0uNrxPjdxzE0GaEw
+         FK09AKFxVDKUMZl87wnn8SC/iJfx4FEmexvPqw1u1Tp5GX2RPIKIVwlv4cSR4BuPo1Fx
+         6mHFN7hRMxXQxM4rWNBfQE9gqAaP8QM+nfjcZEg4TSCuoEoD2v6Ckszs4bVoNSNwkxSU
+         t/97QJf9JRaH6WBav2ZDxJ78gRL9ST8XCHgWGgiFGdIoaMU4Czy3VZvLDs5kEQBQ5YJn
+         ozbw==
+X-Gm-Message-State: AOAM533GFiabOaAsNb960K6eS/nhoi3qn1Zklt9Q2c9vivregXDYIleW
+        7la4aWEFxpqDqt2FOOSGFd1jNINXyiNw4BUt
+X-Google-Smtp-Source: ABdhPJyaBOAU4+6aPwZeRlAPbdxdr7qCKLg3yTiDRI5/sBA671QngyaXBDjyzuLGuSpSspJt+iZgMBn/nDpy8nzq
 X-Received: from nehir.kir.corp.google.com ([2620:15c:29:204:e222:115f:790c:cd0f])
- (user=erdemaktas job=sendgmr) by 2002:a17:90a:7789:: with SMTP id
- v9mr19208144pjk.159.1627324881416; Mon, 26 Jul 2021 11:41:21 -0700 (PDT)
-Date:   Mon, 26 Jul 2021 11:37:53 -0700
-Message-Id: <20210726183816.1343022-1-erdemaktas@google.com>
+ (user=erdemaktas job=sendgmr) by 2002:a05:6a00:b46:b029:334:54db:af17 with
+ SMTP id p6-20020a056a000b46b029033454dbaf17mr19321862pfo.26.1627324905486;
+ Mon, 26 Jul 2021 11:41:45 -0700 (PDT)
+Date:   Mon, 26 Jul 2021 11:37:54 -0700
+In-Reply-To: <20210726183816.1343022-1-erdemaktas@google.com>
+Message-Id: <20210726183816.1343022-2-erdemaktas@google.com>
 Mime-Version: 1.0
+References: <20210726183816.1343022-1-erdemaktas@google.com>
 X-Mailer: git-send-email 2.32.0.432.gabb21c7263-goog
-Subject: [RFC PATCH 0/4] TDX KVM selftests
+Subject: [RFC PATCH 1/4] KVM: selftests: Add support for creating non-default
+ type VMs
 From:   Erdem Aktas <erdemaktas@google.com>
 To:     linux-kselftest@vger.kernel.org
-Cc:     erdemaktas@google.com, Paolo Bonzini <pbonzini@redhat.com>,
+Cc:     erdemaktas@google.com, Sean Christopherson <seanjc@google.com>,
+        Peter Gonda <pgonda@google.com>, Marc Orr <marcorr@google.com>,
+        Sagi Shahar <sagis@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
         Shuah Khan <shuah@kernel.org>,
         Andrew Jones <drjones@redhat.com>,
         Ben Gardon <bgardon@google.com>, Peter Xu <peterx@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Eric Auger <eric.auger@redhat.com>,
+        David Matlack <dmatlack@google.com>,
         Emanuele Giuseppe Esposito <eesposit@redhat.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
         Ricardo Koller <ricarkol@google.com>,
-        Zhenzhong Duan <zhenzhong.duan@intel.com>,
+        Eric Auger <eric.auger@redhat.com>,
+        Yanan Wang <wangyanan55@huawei.com>,
         Aaron Lewis <aaronlewis@google.com>,
         Jim Mattson <jmattson@google.com>,
         Oliver Upton <oupton@google.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Peter Shier <pshier@google.com>,
         Axel Rasmussen <axelrasmussen@google.com>,
-        Yanan Wang <wangyanan55@huawei.com>,
+        Zhenzhong Duan <zhenzhong.duan@intel.com>,
         "Maciej S. Szmigiero" <maciej.szmigiero@oracle.com>,
-        David Matlack <dmatlack@google.com>,
         Like Xu <like.xu@linux.intel.com>,
         open list <linux-kernel@vger.kernel.org>,
         "open list:KERNEL VIRTUAL MACHINE (KVM)" <kvm@vger.kernel.org>
@@ -76,103 +84,84 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-TDX stands for Trust Domain Extensions which isolates VMs from the
-virtual-machine manager (VMM)/hypervisor and any other software on the
-platform.
+Currently vm_create function only creates KVM_X86_LEGACY_VM type VMs.
+Changing the vm_create function to accept type parameter to create
+new VM types.
 
-Intel has recently submitted a set of RFC patches for KVM support for
-TDX and more information can be found on the latest TDX Support 
-Patches: https://lkml.org/lkml/2021/7/2/558
+Signed-off-by: Erdem Aktas <erdemaktas@google.com>
+Reviewed-by: Sean Christopherson <seanjc@google.com>
+Reviewed-by: Peter Gonda <pgonda@google.com>
+Reviewed-by: Marc Orr <marcorr@google.com>
+Reviewed-by: Sagi Shahar <sagis@google.com>
+---
+ .../testing/selftests/kvm/include/kvm_util.h  |  1 +
+ tools/testing/selftests/kvm/lib/kvm_util.c    | 29 +++++++++++++++++--
+ 2 files changed, 27 insertions(+), 3 deletions(-)
 
-Due to the nature of the confidential computing environment that TDX
-provides, it is very difficult to verify/test the KVM support. TDX
-requires UEFI and the guest kernel to be enlightened which are all under
-development.
-
-We are working on a set of selftests to close this gap and be able to
-verify the KVM functionality to support TDX lifecycle and GHCI [1]
-interface.
-
-We are looking for any feedback on:
-- Patch series itself
-- Any suggestion on how we should approach testing TDX functionality.
-Does selftests seems reasonable or should we switch to using KVM
-unit tests. I would be happy to get some perspective on how KVM unit
-tests can help us more.
-- Any test case or scenario that we should add.
-- Anything else I have not thought of yet.
-
-Current patch series provide the following capabilities:
-
-- Provide helper functions to create a TD (Trusted Domain) using the KVM
-  ioctls
-- Provide helper functions to create a guest image that can include any
-  testing code
-- Provide helper functions and wrapper functions to write testing code
-  using GHCI interface
-- Add a test case that verifies TDX life cycle 
-- Add a test case that verifies TDX GHCI port IO 
-
-TODOs:
-- Use existing function to create page tables dynamically 
-  (ie __virt_pg_map())
-- Remove arbitrary defined magic numbers for data structure offsets
-- Add TDVMCALL for error reporting
-- Add additional test cases as some listed below
-- Add #VE handlers to help testing more complicated test cases
-
-Other test cases that we are planning to add:
-(with credit to sagis@google.com)
-
-VM call interface        Input                        Output                Result
-GetTdVmCallInfo          R12=0                        None                VMCALL_SUCCESS
-MapGPA                   Map private page (GPA.S=0)                       VMCALL_SUCCESS
-MapGPA                   Map shared page (GPA.S=1)                        VMCALL_SUCCESS
-MapGPA                   Map already private page as private              VMCALL_INVALID_OPERAND
-MapGPA                   Map already shared page as shared                VMCALL_INVALID_OPERAND
-GetQuote                        
-ReportFatalError                        
-SetupEventNotifyInterrupt   Valid interrupt value (32:255)                 VMCALL_SUCCESS
-SetupEventNotifyInterrupt   Invalid value (>255)                          VMCALL_INVALID_OPERAND
-Instruction.CPUID        R12(EAX)=1, R13(ECX)=0       EBX[8:15]=0x8        
-                                                      EBX[16:23]=X        
-                                                      EBX[24:31]=vcpu_id        
-                                                      ECX[0]=1        
-                                                      ECX[12]=Y        
-Instruction.CPUID       R12(EAX)=1, R13(ECX)=4                            VMCALL_INVALID_OPERAND
-VE.RequestMMIO                        
-Instruction.HLT                                                           VMCALL_SUCCESS
-Instruction.IO          Read/Write 1/2/4 bytes                            VMCALL_SUCCESS
-Instruction.IO          Read/Write 3 bytes                                VMCALL_INVALID_OPERAND
-Instruction.RDMSR       Accessible register           R11=msr_value       VMCALL_SUCCESS
-                        Inaccessible register                             VMCALL_INVALID_OPERAND
-Instruction.RDMSR       Accessible register                               VMCALL_SUCCESS
-                        Inaccessible register                             VMCALL_INVALID_OPERAND
-INSTRUCTION.PCONFIG                        
-
-[1] Intel TDX Guest-Hypervisor Communication Interface
-    https://software.intel.com/content/dam/develop/external/us/en/documents/intel-tdx-guest-hypervisor-communication-interface.pdf
-
-
-Erdem Aktas (4):
-  KVM: selftests: Add support for creating non-default type VMs
-  KVM: selftest: Add helper functions to create TDX VMs
-  KVM: selftest: Adding TDX life cycle test.
-  KVM: selftest: Adding test case for TDX port IO
-
- tools/testing/selftests/kvm/Makefile          |   6 +-
- .../testing/selftests/kvm/include/kvm_util.h  |   1 +
- .../selftests/kvm/include/x86_64/processor.h  |   5 +
- tools/testing/selftests/kvm/lib/kvm_util.c    |  29 +-
- .../selftests/kvm/lib/x86_64/processor.c      |  23 ++
- tools/testing/selftests/kvm/lib/x86_64/tdx.h  | 220 ++++++++++++
- .../selftests/kvm/lib/x86_64/tdx_lib.c        | 314 ++++++++++++++++++
- .../selftests/kvm/x86_64/tdx_vm_tests.c       | 209 ++++++++++++
- 8 files changed, 800 insertions(+), 7 deletions(-)
- create mode 100644 tools/testing/selftests/kvm/lib/x86_64/tdx.h
- create mode 100644 tools/testing/selftests/kvm/lib/x86_64/tdx_lib.c
- create mode 100644 tools/testing/selftests/kvm/x86_64/tdx_vm_tests.c
-
+diff --git a/tools/testing/selftests/kvm/include/kvm_util.h b/tools/testing/selftests/kvm/include/kvm_util.h
+index d53bfadd2..c63df42d6 100644
+--- a/tools/testing/selftests/kvm/include/kvm_util.h
++++ b/tools/testing/selftests/kvm/include/kvm_util.h
+@@ -88,6 +88,7 @@ int vcpu_enable_cap(struct kvm_vm *vm, uint32_t vcpu_id,
+ void vm_enable_dirty_ring(struct kvm_vm *vm, uint32_t ring_size);
+ 
+ struct kvm_vm *vm_create(enum vm_guest_mode mode, uint64_t phy_pages, int perm);
++struct kvm_vm *__vm_create(enum vm_guest_mode mode, uint64_t phy_pages, int perm, int type);
+ void kvm_vm_free(struct kvm_vm *vmp);
+ void kvm_vm_restart(struct kvm_vm *vmp, int perm);
+ void kvm_vm_release(struct kvm_vm *vmp);
+diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
+index e5fbf16f7..70caa3882 100644
+--- a/tools/testing/selftests/kvm/lib/kvm_util.c
++++ b/tools/testing/selftests/kvm/lib/kvm_util.c
+@@ -180,13 +180,36 @@ _Static_assert(sizeof(vm_guest_mode_params)/sizeof(struct vm_guest_mode_params)
+  * Return:
+  *   Pointer to opaque structure that describes the created VM.
+  *
+- * Creates a VM with the mode specified by mode (e.g. VM_MODE_P52V48_4K).
++ * Wrapper VM Create function to create a VM with default type (0).
++ */
++struct kvm_vm *vm_create(enum vm_guest_mode mode, uint64_t phy_pages, int perm)
++{
++	return __vm_create(mode, phy_pages, perm, 0);
++}
++
++/*
++ * VM Create with a custom type
++ *
++ * Input Args:
++ *   mode - VM Mode (e.g. VM_MODE_P52V48_4K)
++ *   phy_pages - Physical memory pages
++ *   perm - permission
++ *   type - VM type
++ *
++ * Output Args: None
++ *
++ * Return:
++ *   Pointer to opaque structure that describes the created VM.
++ *
++ * Creates a VM with the mode specified by mode (e.g. VM_MODE_P52V48_4K) and the
++ * type specified in type (e.g. KVM_X86_LEGACY_VM, KVM_X86_TDX_VM ...).
+  * When phy_pages is non-zero, a memory region of phy_pages physical pages
+  * is created and mapped starting at guest physical address 0.  The file
+  * descriptor to control the created VM is created with the permissions
+  * given by perm (e.g. O_RDWR).
+  */
+-struct kvm_vm *vm_create(enum vm_guest_mode mode, uint64_t phy_pages, int perm)
++struct kvm_vm *__vm_create(enum vm_guest_mode mode, uint64_t phy_pages,
++			    int perm, int type)
+ {
+ 	struct kvm_vm *vm;
+ 
+@@ -200,7 +223,7 @@ struct kvm_vm *vm_create(enum vm_guest_mode mode, uint64_t phy_pages, int perm)
+ 	INIT_LIST_HEAD(&vm->userspace_mem_regions);
+ 
+ 	vm->mode = mode;
+-	vm->type = 0;
++	vm->type = type;
+ 
+ 	vm->pa_bits = vm_guest_mode_params[mode].pa_bits;
+ 	vm->va_bits = vm_guest_mode_params[mode].va_bits;
 -- 
 2.32.0.432.gabb21c7263-goog
 
