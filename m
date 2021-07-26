@@ -2,178 +2,136 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1351B3D6451
-	for <lists+kvm@lfdr.de>; Mon, 26 Jul 2021 18:47:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 63C793D64DE
+	for <lists+kvm@lfdr.de>; Mon, 26 Jul 2021 18:54:09 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236013AbhGZP40 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 26 Jul 2021 11:56:26 -0400
-Received: from mx12.kaspersky-labs.com ([91.103.66.155]:31569 "EHLO
-        mx12.kaspersky-labs.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239718AbhGZPyU (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 26 Jul 2021 11:54:20 -0400
-Received: from relay12.kaspersky-labs.com (unknown [127.0.0.10])
-        by relay12.kaspersky-labs.com (Postfix) with ESMTP id 1580C76F83;
-        Mon, 26 Jul 2021 19:34:45 +0300 (MSK)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kaspersky.com;
-        s=mail202102; t=1627317285;
-        bh=n+/jCIqxkPc+U7K95IHIZEpB480Cz8N7WMX1G4wnx/0=;
-        h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type;
-        b=T6w5oTxIDKx/VGRU6umbF/Xtv1+F+MRIe5UKZf/CqQU/F49HTPYwB0ZFz5NtpSf1y
-         6ijodCps9vR6967bHFjWFFwPFD9HMLyQBttGJ2OsS13T+VmnxLOe2X3ZB8mL/ylaiX
-         9hkB/WpJZpsh9kQeJjTygMPrTratDwQR8LjAQX8U9D+98RfO4vasgRYPoHe8hu3zhB
-         AOJSluxn/XxEb5yurGnAdqS3Y+oRw0Jn42H+lZTsdeimbMURbUctCY7GG9l9Ia8xQm
-         Q+SvDklFdY7wF89uYT8AtitJ14UpITcUgp7YUK7WGktnPEpqyCmZvQTnEDyWk1mfBs
-         vgCH635chgy7Q==
-Received: from mail-hq2.kaspersky.com (unknown [91.103.66.206])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-SHA256 (128/128 bits))
-        (Client CN "mail-hq2.kaspersky.com", Issuer "Kaspersky MailRelays CA G3" (verified OK))
-        by mailhub12.kaspersky-labs.com (Postfix) with ESMTPS id D1DF576F89;
-        Mon, 26 Jul 2021 19:34:44 +0300 (MSK)
-Received: from arseniy-pc.avp.ru (10.64.68.128) by hqmailmbx3.avp.ru
- (10.64.67.243) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2308.14; Mon, 26
- Jul 2021 19:34:44 +0300
-From:   Arseny Krasnov <arseny.krasnov@kaspersky.com>
-To:     Stefan Hajnoczi <stefanha@redhat.com>,
-        Stefano Garzarella <sgarzare@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Arseny Krasnov <arseny.krasnov@kaspersky.com>,
-        Jorgen Hansen <jhansen@vmware.com>,
-        Andra Paraschiv <andraprs@amazon.com>,
-        Colin Ian King <colin.king@canonical.com>,
-        Norbert Slusarek <nslusarek@gmx.net>
-CC:     <kvm@vger.kernel.org>, <virtualization@lists.linux-foundation.org>,
-        <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <oxffffaa@gmail.com>
-Subject: [RFC PATCH v1 7/7] vsock_test: 'SO_RCVTIMEO' test for SEQPACKET
-Date:   Mon, 26 Jul 2021 19:34:36 +0300
-Message-ID: <20210726163439.2590222-1-arseny.krasnov@kaspersky.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20210726163137.2589102-1-arseny.krasnov@kaspersky.com>
-References: <20210726163137.2589102-1-arseny.krasnov@kaspersky.com>
+        id S240265AbhGZQMs (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 26 Jul 2021 12:12:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60946 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S239942AbhGZQKo (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 26 Jul 2021 12:10:44 -0400
+Received: from mail-io1-xd2e.google.com (mail-io1-xd2e.google.com [IPv6:2607:f8b0:4864:20::d2e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0EDB4C0619C4
+        for <kvm@vger.kernel.org>; Mon, 26 Jul 2021 09:47:56 -0700 (PDT)
+Received: by mail-io1-xd2e.google.com with SMTP id 185so12650226iou.10
+        for <kvm@vger.kernel.org>; Mon, 26 Jul 2021 09:47:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=/gscgTlqJAwtBK+aPZMSmpPlTZ1wrLA7ddYUtDzkea4=;
+        b=eW2pP1eixo09AKQQCwkoPmgJHcZI3HV8mvMeiWS1KO8EZLVBQkXJAew6ayYLiCXrgb
+         hBYt64Uiv5loTWdc4hWxUIwtlFY0XAVA30oRfO+3MbymozhW8PHxTmvZHa4eRZS7kFe4
+         nU6mLDn5U0IASGb7EGVmMTlmPhTNKXxbY2JqCc1LpO2HNYUwsLhzBQawLAIyl6Cl/zl0
+         XWCc73CrP33zU2wcyw2gWwd8OqO8t2AGGPcnKccb09SNnMu9O8xYRjjJmBK9nAsP97Sw
+         dlMLXrR1YTqyvCNAAgyHz9MaxHlanZnh5yrHWOrLmCN1/2Zy3HwR6r8NgERBntMlLGkL
+         8Rwg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=/gscgTlqJAwtBK+aPZMSmpPlTZ1wrLA7ddYUtDzkea4=;
+        b=P6EN31LFZX41Vn60d5GnjNk1HCOaksd3RGUQZ/fl651sI+9xPEWTNBHKuQMk8Gf0LM
+         G783uidlCN8DRKqlVl4jWyIw7lSy0Tok05R/xoz1BToiMa2Q5nJzC06/mwkac7/ZJwGt
+         stfC7rscxdJIC9KS0jGad4IyCg0qTA7IPynXMFLBUJpzRaOCWiXSNLWvc87o7LLc+nS9
+         bIlCxJgGEoqcKoGH1SizVAiqouAIkhy+8joWhsZNNHBWp45Q4/MJAS/VW4kf5gdGjm+N
+         KjgygilYLeVij10n12kA34vdNz8Z61D0dqRMGKQn5jWTNKDld3+2Ciwk0GxSIG9KfQor
+         y6Kg==
+X-Gm-Message-State: AOAM532O66Fi8bSErpSoKeTdwRc/UDg4ZLcPdBch8T/or0hiKbS5+fGc
+        xBO4423eGPnJ0OpKbBxSoQR112MTTTmhkJmcwMidqg==
+X-Google-Smtp-Source: ABdhPJxr2DHNlsY36LedoSQBviPFgzyvH39XXlAV2YkiSqJAmkTNXF+z2xtRX/2vLLVAdpZto6928JLGRTlM46IpnGc=
+X-Received: by 2002:a05:6638:2416:: with SMTP id z22mr17318372jat.57.1627318075369;
+ Mon, 26 Jul 2021 09:47:55 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Originating-IP: [10.64.68.128]
-X-ClientProxiedBy: hqmailmbx2.avp.ru (10.64.67.242) To hqmailmbx3.avp.ru
- (10.64.67.243)
-X-KSE-ServerInfo: hqmailmbx3.avp.ru, 9
-X-KSE-AntiSpam-Interceptor-Info: scan successful
-X-KSE-AntiSpam-Version: 5.9.20, Database issued on: 07/26/2021 16:13:33
-X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
-X-KSE-AntiSpam-Method: none
-X-KSE-AntiSpam-Rate: 0
-X-KSE-AntiSpam-Info: Lua profiles 165254 [Jul 26 2021]
-X-KSE-AntiSpam-Info: Version: 5.9.20.0
-X-KSE-AntiSpam-Info: Envelope from: arseny.krasnov@kaspersky.com
-X-KSE-AntiSpam-Info: LuaCore: 449 449 5db59deca4a4f5e6ea34a93b13bc730e229092f4
-X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
-X-KSE-AntiSpam-Info: arseniy-pc.avp.ru:7.1.1;kaspersky.com:7.1.1;127.0.0.199:7.1.2;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1
-X-KSE-AntiSpam-Info: Rate: 0
-X-KSE-AntiSpam-Info: Status: not_detected
-X-KSE-AntiSpam-Info: Method: none
-X-KSE-Antiphishing-Info: Clean
-X-KSE-Antiphishing-ScanningType: Deterministic
-X-KSE-Antiphishing-Method: None
-X-KSE-Antiphishing-Bases: 07/26/2021 16:15:00
-X-KSE-AttachmentFiltering-Interceptor-Info: no applicable attachment filtering
- rules found
-X-KSE-Antivirus-Interceptor-Info: scan successful
-X-KSE-Antivirus-Info: Clean, bases: 26.07.2021 14:57:00
-X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
-X-KSE-AttachmentFiltering-Interceptor-Info: no applicable attachment filtering
- rules found
-X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
-X-KLMS-Rule-ID: 52
-X-KLMS-Message-Action: clean
-X-KLMS-AntiSpam-Status: not scanned, disabled by settings
-X-KLMS-AntiSpam-Interceptor-Info: not scanned
-X-KLMS-AntiPhishing: Clean, bases: 2021/07/26 14:52:00
-X-KLMS-AntiVirus: Kaspersky Security for Linux Mail Server, version 8.0.3.30, bases: 2021/07/26 14:01:00 #16958312
-X-KLMS-AntiVirus-Status: Clean, skipped
+References: <20210726075238.GA10030@kili>
+In-Reply-To: <20210726075238.GA10030@kili>
+From:   Ben Gardon <bgardon@google.com>
+Date:   Mon, 26 Jul 2021 09:47:43 -0700
+Message-ID: <CANgfPd-H3a7zdEeV2rtyCTcHinYOwTB=KFFRXYSnYCG8e+tq6w@mail.gmail.com>
+Subject: Re: [bug report] KVM: x86/mmu: Use an rwlock for the x86 MMU
+To:     Dan Carpenter <dan.carpenter@oracle.com>
+Cc:     kvm <kvm@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Test for receive timeout check: connection is established,
-receiver sets timeout, but sender does nothing. Receiver's
-'read()' call must return EAGAIN.
+On Mon, Jul 26, 2021 at 12:52 AM Dan Carpenter <dan.carpenter@oracle.com> wrote:
+>
+> [ This is not the correct patch to blame, but there is something going
+>   on here which I don't understand so this email is more about me
+>   learning rather than reporting bugs. - dan ]
+>
+> Hello Ben Gardon,
+>
+> The patch 531810caa9f4: "KVM: x86/mmu: Use an rwlock for the x86 MMU"
+> from Feb 2, 2021, leads to the following static checker warning:
+>
+>         arch/x86/kvm/mmu/mmu.c:5769 kvm_mmu_zap_all()
+>         warn: sleeping in atomic context
+>
+> arch/x86/kvm/mmu/mmu.c
+>     5756 void kvm_mmu_zap_all(struct kvm *kvm)
+>     5757 {
+>     5758        struct kvm_mmu_page *sp, *node;
+>     5759        LIST_HEAD(invalid_list);
+>     5760        int ign;
+>     5761
+>     5762        write_lock(&kvm->mmu_lock);
+>                 ^^^^^^^^^^^^^^^^^^^^^^^^^^
+> This line bumps the preempt count.
+>
+>     5763 restart:
+>     5764        list_for_each_entry_safe(sp, node, &kvm->arch.active_mmu_pages, link) {
+>     5765                if (WARN_ON(sp->role.invalid))
+>     5766                        continue;
+>     5767                if (__kvm_mmu_prepare_zap_page(kvm, sp, &invalid_list, &ign))
+>     5768                        goto restart;
+> --> 5769                if (cond_resched_rwlock_write(&kvm->mmu_lock))
+>                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> This line triggers a sleeping in atomic warning.  What's going on here
+> that I'm not understanding?
 
-Signed-off-by: Arseny Krasnov <arseny.krasnov@kaspersky.com>
----
- tools/testing/vsock/vsock_test.c | 49 ++++++++++++++++++++++++++++++++
- 1 file changed, 49 insertions(+)
 
-diff --git a/tools/testing/vsock/vsock_test.c b/tools/testing/vsock/vsock_test.c
-index 2a3638c0a008..aa2de27d0f77 100644
---- a/tools/testing/vsock/vsock_test.c
-+++ b/tools/testing/vsock/vsock_test.c
-@@ -391,6 +391,50 @@ static void test_seqpacket_msg_trunc_server(const struct test_opts *opts)
- 	close(fd);
- }
- 
-+static void test_seqpacket_timeout_client(const struct test_opts *opts)
-+{
-+	int fd;
-+	struct timeval tv;
-+	char dummy;
-+
-+	fd = vsock_seqpacket_connect(opts->peer_cid, 1234);
-+	if (fd < 0) {
-+		perror("connect");
-+		exit(EXIT_FAILURE);
-+	}
-+
-+	tv.tv_sec = 1;
-+	tv.tv_usec = 0;
-+
-+	if (setsockopt(fd, SOL_SOCKET, SO_RCVTIMEO, (void *)&tv, sizeof(tv)) == -1) {
-+		perror("setsockopt 'SO_RCVTIMEO'");
-+		exit(EXIT_FAILURE);
-+	}
-+
-+	if ((read(fd, &dummy, sizeof(dummy)) != -1) ||
-+	    (errno != EAGAIN)) {
-+		perror("EAGAIN expected");
-+		exit(EXIT_FAILURE);
-+	}
-+
-+	control_writeln("WAITDONE");
-+	close(fd);
-+}
-+
-+static void test_seqpacket_timeout_server(const struct test_opts *opts)
-+{
-+	int fd;
-+
-+	fd = vsock_seqpacket_accept(VMADDR_CID_ANY, 1234, NULL);
-+	if (fd < 0) {
-+		perror("accept");
-+		exit(EXIT_FAILURE);
-+	}
-+
-+	control_expectln("WAITDONE");
-+	close(fd);
-+}
-+
- static struct test_case test_cases[] = {
- 	{
- 		.name = "SOCK_STREAM connection reset",
-@@ -431,6 +475,11 @@ static struct test_case test_cases[] = {
- 		.run_client = test_seqpacket_msg_trunc_client,
- 		.run_server = test_seqpacket_msg_trunc_server,
- 	},
-+	{
-+		.name = "SOCK_SEQPACKET timeout",
-+		.run_client = test_seqpacket_timeout_client,
-+		.run_server = test_seqpacket_timeout_server,
-+	},
- 	{},
- };
- 
--- 
-2.25.1
+Hi Dan,
 
+Thanks for sending this. I'm confused by this sequence too. I'm not
+sure how this could sleep in an atomic context.
+My first thought was that there might be something going on with the
+qrwlock's wait_lock, but since this thread already acquired the
+rwlock, it can't be holding / waiting on the wait_lock.
+
+Then I thought the __might_sleep could be in the wrong place, but it's
+in the same place for a regular spinlock, so I think that's fine.
+
+I do note that __cond_resched_rwlock does not check rwlock_needbreak
+like __cond_resched_lock checks spin_needbreak. That seems like an
+oversight, but I don't see how it could cause this warning.
+
+I'm as confused by this as you. Did you confirm that this sleeping in
+atomic warning does not happen before this commit? What kind of
+configuration are you able to reproduce this on?
+
+It might be worth asking some sched / locking folks about this as
+they'll likely have a better understanding of all the intricacies of
+the layers of locking macros.
+I'm very curious to understand what's causing this too.
+
+Ben
+
+>
+>
+>     5770                        goto restart;
+>     5771        }
+>     5772
+>     5773        kvm_mmu_commit_zap_page(kvm, &invalid_list);
+>     5774
+>     5775        if (is_tdp_mmu_enabled(kvm))
+>     5776                kvm_tdp_mmu_zap_all(kvm);
+>     5777
+>     5778        write_unlock(&kvm->mmu_lock);
+>     5779 }
+>
+> regards,
+> dan carpenter
