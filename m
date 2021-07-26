@@ -2,225 +2,151 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8F0233D5A76
-	for <lists+kvm@lfdr.de>; Mon, 26 Jul 2021 15:40:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 975523D5A7A
+	for <lists+kvm@lfdr.de>; Mon, 26 Jul 2021 15:41:12 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233780AbhGZM7q (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 26 Jul 2021 08:59:46 -0400
-Received: from smtp-out2.suse.de ([195.135.220.29]:41966 "EHLO
-        smtp-out2.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233502AbhGZM6j (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 26 Jul 2021 08:58:39 -0400
-Received: from imap1.suse-dmz.suse.de (imap1.suse-dmz.suse.de [192.168.254.73])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out2.suse.de (Postfix) with ESMTPS id 06ECF1FE94;
-        Mon, 26 Jul 2021 13:38:55 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
-        t=1627306735; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
+        id S233961AbhGZNA1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 26 Jul 2021 09:00:27 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:58500 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S233815AbhGZM7z (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 26 Jul 2021 08:59:55 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1627306823;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=6YlLhaB/isQMil/Mxrn5CPmlxIJWQ/6zmnTM2otfS7c=;
-        b=DDDY4MofL2lNDmmKxdRg5610RILHcP7jHd2Jl2VEU3bPcXlg1aMmIsr08gwoNSp3cba4Ro
-        s5ZkOh7/KfESHPODv5d2TcMQS41FGrcTsnCp7XQ3ON1/gINol7o9fwJpCEmmHE7D+GoXZM
-        d11fIAUwi/9XbJJnZ66DHdc0R66a4rE=
-Received: from imap1.suse-dmz.suse.de (imap1.suse-dmz.suse.de [192.168.254.73])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap1.suse-dmz.suse.de (Postfix) with ESMTPS id AFEB213A96;
-        Mon, 26 Jul 2021 13:38:54 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap1.suse-dmz.suse.de with ESMTPSA
-        id Vg/AKe66/mA8AgAAGKfGzw
-        (envelope-from <jgross@suse.com>); Mon, 26 Jul 2021 13:38:54 +0000
-Subject: Re: [PATCH 4/6] x86/kvm: introduce per cpu vcpu masks
-To:     Paolo Bonzini <pbonzini@redhat.com>, linux-kernel@vger.kernel.org,
-        x86@kernel.org, kvm@vger.kernel.org
-Cc:     Sean Christopherson <seanjc@google.com>,
+        bh=hCZfOAl7ts2DxmB2QUu9PfkSKpATBw/UVjJQZQ4MLGY=;
+        b=TQttGfI2IB7AJgKM+hx4k3foZbdof96W9QdthdKXsYEL3oHfsRlXDezVnegrwnSVdWAfLn
+        jTOyBND01ybq0n7djo0SSQiZ+eHCs6rZ77aauMrOeRGISrSplP+OhX9T7fmrIyi1F54oH2
+        DCkVhodJcddZH0dWcP6G8JSUL25fi1Q=
+Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
+ [209.85.218.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-545-bIWQWe7PN9yWzTj_qclA9w-1; Mon, 26 Jul 2021 09:40:22 -0400
+X-MC-Unique: bIWQWe7PN9yWzTj_qclA9w-1
+Received: by mail-ej1-f70.google.com with SMTP id hb18-20020a1709071612b029052883e9de3eso2059172ejc.19
+        for <kvm@vger.kernel.org>; Mon, 26 Jul 2021 06:40:22 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=hCZfOAl7ts2DxmB2QUu9PfkSKpATBw/UVjJQZQ4MLGY=;
+        b=GN8bQGmkwj0ZKF/JFP40meY8zdU6vbe/a94dGL17iLER9cuHIxlwEQPPUpGq6rIU1Q
+         sfcsWmw3t8Kb7Ft05tHaaXG0Q4IGpPvtTApO4yrWdPAaBT9gIzrZRsn2N2UIXyBq/O1F
+         xrcVrB3olxy8aKI1MTRlz426sawiEfd6bYhvlPUJ2x17b+0h1SFPfC6Jn7V5CefbomTt
+         zTxtsgpL9nKxiGKC6xPZ+VMqDyJK+1aOK9S0np+1MXSqmzqSxQxg/fReLJypGwWo6pf0
+         TEnsNxq7L5QCYwsBHPkWdix8KC7CI4Wv0fen74BazVW5uWZ/m8bM8sbWdadiDjPAiG+j
+         lneQ==
+X-Gm-Message-State: AOAM532VklbbDz0zijClJQHMtEpBZLoskBmU0zZUwQi2zWarKZUo/Cuy
+        PV/Ln8QZbQ8jqeraf8UxaaBFRQ0KdM0QMh96bbx5V+lnjwG3QpSONtJMqD1hPALWl9jea5Nfvb7
+        l9WrpIbCBBWbF
+X-Received: by 2002:a17:906:7a56:: with SMTP id i22mr16702987ejo.94.1627306821450;
+        Mon, 26 Jul 2021 06:40:21 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzko4dcZu7JrLLGnLsOcz5h39r9ijD0U3NL4kNBCRhF6IB2UvPA+rdkEJbNblOqI4Hx/b10gw==
+X-Received: by 2002:a17:906:7a56:: with SMTP id i22mr16702963ejo.94.1627306821229;
+        Mon, 26 Jul 2021 06:40:21 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+        by smtp.gmail.com with ESMTPSA id r11sm14254275ejy.71.2021.07.26.06.40.19
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 26 Jul 2021 06:40:20 -0700 (PDT)
+Subject: Re: [PATCH 5/6] kvm: allocate vcpu pointer array separately
+To:     Juergen Gross <jgross@suse.com>, linux-kernel@vger.kernel.org,
+        x86@kernel.org, linux-arm-kernel@lists.infradead.org,
+        kvm@vger.kernel.org
+Cc:     Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Will Deacon <will@kernel.org>,
+        Sean Christopherson <seanjc@google.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
         Joerg Roedel <joro@8bytes.org>,
         Thomas Gleixner <tglx@linutronix.de>,
         Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        "H. Peter Anvin" <hpa@zytor.com>
+        "H. Peter Anvin" <hpa@zytor.com>, kvmarm@lists.cs.columbia.edu
 References: <20210701154105.23215-1-jgross@suse.com>
- <20210701154105.23215-5-jgross@suse.com>
- <98cb06ed-acd2-a954-9c85-3c9847631106@redhat.com>
-From:   Juergen Gross <jgross@suse.com>
-Message-ID: <24b616c4-bbab-a1c8-1be2-a912a2c672d3@suse.com>
-Date:   Mon, 26 Jul 2021 15:38:54 +0200
+ <20210701154105.23215-6-jgross@suse.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <001b7eab-ed7b-da27-a623-057781cf1211@redhat.com>
+Date:   Mon, 26 Jul 2021 15:40:19 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.11.0
 MIME-Version: 1.0
-In-Reply-To: <98cb06ed-acd2-a954-9c85-3c9847631106@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="WoNYRQQhyV0z59oyrRXdoCbOHu7cc9XpB"
+In-Reply-To: <20210701154105.23215-6-jgross@suse.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---WoNYRQQhyV0z59oyrRXdoCbOHu7cc9XpB
-Content-Type: multipart/mixed; boundary="0bwJsygxOOIO7iDMil1cccpk1YtVxWLzk";
- protected-headers="v1"
-From: Juergen Gross <jgross@suse.com>
-To: Paolo Bonzini <pbonzini@redhat.com>, linux-kernel@vger.kernel.org,
- x86@kernel.org, kvm@vger.kernel.org
-Cc: Sean Christopherson <seanjc@google.com>,
- Vitaly Kuznetsov <vkuznets@redhat.com>, Wanpeng Li <wanpengli@tencent.com>,
- Jim Mattson <jmattson@google.com>, Joerg Roedel <joro@8bytes.org>,
- Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>,
- Borislav Petkov <bp@alien8.de>, "H. Peter Anvin" <hpa@zytor.com>
-Message-ID: <24b616c4-bbab-a1c8-1be2-a912a2c672d3@suse.com>
-Subject: Re: [PATCH 4/6] x86/kvm: introduce per cpu vcpu masks
-References: <20210701154105.23215-1-jgross@suse.com>
- <20210701154105.23215-5-jgross@suse.com>
- <98cb06ed-acd2-a954-9c85-3c9847631106@redhat.com>
-In-Reply-To: <98cb06ed-acd2-a954-9c85-3c9847631106@redhat.com>
+On 01/07/21 17:41, Juergen Gross wrote:
+>   {
+> -	if (!has_vhe())
+> +	if (!has_vhe()) {
+> +		kfree(kvm->vcpus);
+>   		kfree(kvm);
+> -	else
+> +	} else {
+> +		vfree(kvm->vcpus);
+>   		vfree(kvm);
+> +	}
+>   }
+>   
+>   int kvm_arch_vcpu_precreate(struct kvm *kvm, unsigned int id)
+> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+> index 79138c91f83d..39cbc4b6bffb 100644
+> --- a/arch/x86/include/asm/kvm_host.h
+> +++ b/arch/x86/include/asm/kvm_host.h
+> @@ -1440,10 +1440,7 @@ static inline void kvm_ops_static_call_update(void)
+>   }
+>   
+>   #define __KVM_HAVE_ARCH_VM_ALLOC
+> -static inline struct kvm *kvm_arch_alloc_vm(void)
+> -{
+> -	return __vmalloc(kvm_x86_ops.vm_size, GFP_KERNEL_ACCOUNT | __GFP_ZERO);
+> -}
+> +struct kvm *kvm_arch_alloc_vm(void);
+>   void kvm_arch_free_vm(struct kvm *kvm);
+>   
+>   #define __KVM_HAVE_ARCH_FLUSH_REMOTE_TLB
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index 3af398ef1fc9..a9b0bb2221ea 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -10741,9 +10741,28 @@ void kvm_arch_sched_in(struct kvm_vcpu *vcpu, int cpu)
+>   	static_call(kvm_x86_sched_in)(vcpu, cpu);
+>   }
+>   
+> +struct kvm *kvm_arch_alloc_vm(void)
+> +{
+> +	struct kvm *kvm;
+> +
+> +	kvm = __vmalloc(kvm_x86_ops.vm_size, GFP_KERNEL_ACCOUNT | __GFP_ZERO);
+> +	if (!kvm)
+> +		return NULL;
+> +
+> +	kvm->vcpus = __vmalloc(KVM_MAX_VCPUS * sizeof(void *),
+> +			       GFP_KERNEL_ACCOUNT | __GFP_ZERO);
+> +	if (!kvm->vcpus) {
+> +		vfree(kvm);
+> +		kvm = NULL;
+> +	}
+> +
 
---0bwJsygxOOIO7iDMil1cccpk1YtVxWLzk
-Content-Type: multipart/mixed;
- boundary="------------262649A256EB5C0E4EB399EE"
-Content-Language: en-US
+Let's keep this cleaner:
 
-This is a multi-part message in MIME format.
---------------262649A256EB5C0E4EB399EE
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
+1) use kvfree in the common version of kvm_arch_free_vm
 
-On 26.07.21 15:32, Paolo Bonzini wrote:
-> On 01/07/21 17:41, Juergen Gross wrote:
->> In order to support high vcpu numbers per guest don't use on stack
->> vcpu bitmasks. As all those currently used bitmasks are not used in
->> functions subject to recursion it is fairly easy to replace them with
->> percpu bitmasks.
->>
->> Disable preemption while such a bitmask is being used in order to
->> avoid double usage in case we'd switch cpus.
->>
->> Signed-off-by: Juergen Gross <jgross@suse.com>
->=20
-> Please use a local_lock instead of disabling preemption.
+2) split __KVM_HAVE_ARCH_VM_ALLOC and __KVM_HAVE_ARCH_VM_FREE (ARM does 
+not need it once kvfree is used)
 
-Okay.
+3) define a __kvm_arch_free_vm version that is defined even if 
+!__KVM_HAVE_ARCH_VM_FREE, and which can be used on x86.
 
+Paolo
 
-Juergen
-
---------------262649A256EB5C0E4EB399EE
-Content-Type: application/pgp-keys;
- name="OpenPGP_0xB0DE9DD628BF132F.asc"
-Content-Transfer-Encoding: quoted-printable
-Content-Description: OpenPGP public key
-Content-Disposition: attachment;
- filename="OpenPGP_0xB0DE9DD628BF132F.asc"
-
------BEGIN PGP PUBLIC KEY BLOCK-----
-
-xsBNBFOMcBYBCACgGjqjoGvbEouQZw/ToiBg9W98AlM2QHV+iNHsEs7kxWhKMjrioyspZKOBy=
-cWx
-w3ie3j9uvg9EOB3aN4xiTv4qbnGiTr3oJhkB1gsb6ToJQZ8uxGq2kaV2KL9650I1SJvedYm8O=
-f8Z
-d621lSmoKOwlNClALZNew72NjJLEzTalU1OdT7/i1TXkH09XSSI8mEQ/ouNcMvIJNwQpd369y=
-9bf
-IhWUiVXEK7MlRgUG6MvIj6Y3Am/BBLUVbDa4+gmzDC9ezlZkTZG2t14zWPvxXP3FAp2pkW0xq=
-G7/
-377qptDmrk42GlSKN4z76ELnLxussxc7I2hx18NUcbP8+uty4bMxABEBAAHNHEp1ZXJnZW4gR=
-3Jv
-c3MgPGpnQHBmdXBmLm5ldD7CwHkEEwECACMFAlOMcBYCGwMHCwkIBwMCAQYVCAIJCgsEFgIDA=
-QIe
-AQIXgAAKCRCw3p3WKL8TL0KdB/93FcIZ3GCNwFU0u3EjNbNjmXBKDY4FUGNQH2lvWAUy+dnyT=
-hpw
-dtF/jQ6j9RwE8VP0+NXcYpGJDWlNb9/JmYqLiX2Q3TyevpB0CA3dbBQp0OW0fgCetToGIQrg0=
-MbD
-1C/sEOv8Mr4NAfbauXjZlvTj30H2jO0u+6WGM6nHwbh2l5O8ZiHkH32iaSTfN7Eu5RnNVUJbv=
-oPH
-Z8SlM4KWm8rG+lIkGurqqu5gu8q8ZMKdsdGC4bBxdQKDKHEFExLJK/nRPFmAuGlId1E3fe10v=
-5QL
-+qHI3EIPtyfE7i9Hz6rVwi7lWKgh7pe0ZvatAudZ+JNIlBKptb64FaiIOAWDCx1SzR9KdWVyZ=
-2Vu
-IEdyb3NzIDxqZ3Jvc3NAc3VzZS5jb20+wsB5BBMBAgAjBQJTjHCvAhsDBwsJCAcDAgEGFQgCC=
-QoL
-BBYCAwECHgECF4AACgkQsN6d1ii/Ey/HmQf/RtI7kv5A2PS4RF7HoZhPVPogNVbC4YA6lW7Dr=
-Wf0
-teC0RR3MzXfy6pJ+7KLgkqMlrAbN/8Dvjoz78X+5vhH/rDLa9BuZQlhFmvcGtCF8eR0T1v0nC=
-/nu
-AFVGy+67q2DH8As3KPu0344TBDpAvr2uYM4tSqxK4DURx5INz4ZZ0WNFHcqsfvlGJALDeE0Lh=
-ITT
-d9jLzdDad1pQSToCnLl6SBJZjDOX9QQcyUigZFtCXFst4dlsvddrxyqT1f17+2cFSdu7+ynLm=
-XBK
-7abQ3rwJY8SbRO2iRulogc5vr/RLMMlscDAiDkaFQWLoqHHOdfO9rURssHNN8WkMnQfvUewRz=
-80h
-SnVlcmdlbiBHcm9zcyA8amdyb3NzQG5vdmVsbC5jb20+wsB5BBMBAgAjBQJTjHDXAhsDBwsJC=
-AcD
-AgEGFQgCCQoLBBYCAwECHgECF4AACgkQsN6d1ii/Ey8PUQf/ehmgCI9jB9hlgexLvgOtf7PJn=
-FOX
-gMLdBQgBlVPO3/D9R8LtF9DBAFPNhlrsfIG/SqICoRCqUcJ96Pn3P7UUinFG/I0ECGF4EvTE1=
-jnD
-kfJZr6jrbjgyoZHiw/4BNwSTL9rWASyLgqlA8u1mf+c2yUwcGhgkRAd1gOwungxcwzwqgljf0=
-N51
-N5JfVRHRtyfwq/ge+YEkDGcTU6Y0sPOuj4Dyfm8fJzdfHNQsWq3PnczLVELStJNdapwPOoE+l=
-otu
-fe3AM2vAEYJ9rTz3Cki4JFUsgLkHFqGZarrPGi1eyQcXeluldO3m91NK/1xMI3/+8jbO0tsn1=
-tqS
-EUGIJi7ox80eSnVlcmdlbiBHcm9zcyA8amdyb3NzQHN1c2UuZGU+wsB5BBMBAgAjBQJTjHDrA=
-hsD
-BwsJCAcDAgEGFQgCCQoLBBYCAwECHgECF4AACgkQsN6d1ii/Ey+LhQf9GL45eU5vOowA2u5N3=
-g3O
-ZUEBmDHVVbqMtzwlmNC4k9Kx39r5s2vcFl4tXqW7g9/ViXYuiDXb0RfUpZiIUW89siKrkzmQ5=
-dM7
-wRqzgJpJwK8Bn2MIxAKArekWpiCKvBOB/Cc+3EXE78XdlxLyOi/NrmSGRIov0karw2RzMNOu5=
-D+j
-LRZQd1Sv27AR+IP3I8U4aqnhLpwhK7MEy9oCILlgZ1QZe49kpcumcZKORmzBTNh30FVKK1Evm=
-V2x
-AKDoaEOgQB4iFQLhJCdP1I5aSgM5IVFdn7v5YgEYuJYx37IoN1EblHI//x/e2AaIHpzK5h88N=
-Eaw
-QsaNRpNSrcfbFmAg987ATQRTjHAWAQgAyzH6AOODMBjgfWE9VeCgsrwH3exNAU32gLq2xvjpW=
-nHI
-s98ndPUDpnoxWQugJ6MpMncr0xSwFmHEgnSEjK/PAjppgmyc57BwKII3sV4on+gDVFJR6Y8ZR=
-wgn
-BC5mVM6JjQ5xDk8WRXljExRfUX9pNhdE5eBOZJrDRoLUmmjDtKzWaDhIg/+1Hzz93X4fCQkNV=
-bVF
-LELU9bMaLPBG/x5q4iYZ2k2ex6d47YE1ZFdMm6YBYMOljGkZKwYde5ldM9mo45mmwe0icXKLk=
-pEd
-IXKTZeKDO+Hdv1aqFuAcccTg9RXDQjmwhC3yEmrmcfl0+rPghO0Iv3OOImwTEe4co3c1mwARA=
-QAB
-wsBfBBgBAgAJBQJTjHAWAhsMAAoJELDendYovxMvQ/gH/1ha96vm4P/L+bQpJwrZ/dneZcmEw=
-Tbe
-8YFsw2V/Buv6Z4Mysln3nQK5ZadD534CF7TDVft7fC4tU4PONxF5D+/tvgkPfDAfF77zy2AH1=
-vJz
-Q1fOU8lYFpZXTXIHb+559UqvIB8AdgR3SAJGHHt4RKA0F7f5ipYBBrC6cyXJyyoprT10EMvU8=
-VGi
-wXvTyJz3fjoYsdFzpWPlJEBRMedCot60g5dmbdrZ5DWClAr0yau47zpWj3enf1tLWaqcsuylW=
-svi
-uGjKGw7KHQd3bxALOknAp4dN3QwBYCKuZ7AddY9yjynVaD5X7nF9nO5BjR/i1DG86lem3iBDX=
-zXs
-ZDn8R38=3D
-=3D2wuH
------END PGP PUBLIC KEY BLOCK-----
-
---------------262649A256EB5C0E4EB399EE--
-
---0bwJsygxOOIO7iDMil1cccpk1YtVxWLzk--
-
---WoNYRQQhyV0z59oyrRXdoCbOHu7cc9XpB
-Content-Type: application/pgp-signature; name="OpenPGP_signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="OpenPGP_signature"
-
------BEGIN PGP SIGNATURE-----
-
-wsB5BAABCAAjFiEEhRJncuj2BJSl0Jf3sN6d1ii/Ey8FAmD+uu4FAwAAAAAACgkQsN6d1ii/Ey/3
-Bgf9Gu8Ty758S6rtsWty77HC88hUmLzZSm23bGu5TKOFJpuMu3RroQG1/BU0ksY7kA1daqND1GMz
-h/Q2cJVBIPWFWG40nX2CkvumgLdxbroL/szR+EbfAbUBbBjde5X+QGWVa7HcTSIaEOLSFtoA+TqT
-5ZE6lQklweSQKc7iSAO+vSh5bEZPfSbRZH1YK9cM4MOumfZ1WyUzlkjXQMSEw294Jn/dD+ckyb5b
-gPJ5L1g2/iM93wixg3+mNMfh91Mt2oxGeKMlS2fyF/4CociVSlewINFQpAVwmIpYzlqUxfTVy7Lb
-5LjpCdKX2yOcLm2l4POoStyxnZ8L2vkuzmZtWy+new==
-=0YPk
------END PGP SIGNATURE-----
-
---WoNYRQQhyV0z59oyrRXdoCbOHu7cc9XpB--
