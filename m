@@ -2,91 +2,179 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 025C53D696C
-	for <lists+kvm@lfdr.de>; Tue, 27 Jul 2021 00:23:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DB85E3D697F
+	for <lists+kvm@lfdr.de>; Tue, 27 Jul 2021 00:26:24 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233137AbhGZVma (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 26 Jul 2021 17:42:30 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:54729 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231959AbhGZVm3 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 26 Jul 2021 17:42:29 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1627338177;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=Q9dAuuhQeXJnHY9YOxmU0U5Agmhqw2dB6e5Zy44E0hE=;
-        b=jICSysVYGOpqUKNL/UcgbjYUVCcYeuCSq7QPUzUG3QTboykUgU6+8/wE7EVot3sQ8K6IKV
-        ylFu4lSHmLShEncwY6pcT9/Bnsor8dRne0qjtjatgrL+foQh3LWjP0e/96akcSbweN1P5o
-        2aY+2pzqEG4oJqJW+omIC6VWcHLBqvM=
-Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
- [209.85.208.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-28-Kvy_pSutOMWT3LTmNNgumQ-1; Mon, 26 Jul 2021 18:22:56 -0400
-X-MC-Unique: Kvy_pSutOMWT3LTmNNgumQ-1
-Received: by mail-ed1-f71.google.com with SMTP id n24-20020aa7c7980000b02903bb4e1d45aaso3753907eds.15
-        for <kvm@vger.kernel.org>; Mon, 26 Jul 2021 15:22:55 -0700 (PDT)
+        id S233704AbhGZVpy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 26 Jul 2021 17:45:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55320 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S233666AbhGZVpx (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 26 Jul 2021 17:45:53 -0400
+Received: from mail-pl1-x62b.google.com (mail-pl1-x62b.google.com [IPv6:2607:f8b0:4864:20::62b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 66211C061764
+        for <kvm@vger.kernel.org>; Mon, 26 Jul 2021 15:26:21 -0700 (PDT)
+Received: by mail-pl1-x62b.google.com with SMTP id i1so13417013plr.9
+        for <kvm@vger.kernel.org>; Mon, 26 Jul 2021 15:26:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=/+BJHwQCEyZHcaZdbprSZPe+y/dzPxjT0mqjzI4mft8=;
+        b=XOJ4As13Ddv1Zv4Si7aLITV2FNguggs9creN7NCAOdJd2JF1ie5suTQ4egOzyTjaIa
+         Hl03gr+MUKSixpTDfESt41Oa3w7ZSO8SE1bBV5CEJDM9XXjwljH1ju+CukWQI2QA+Szp
+         0QMWPQfGn4fOJmzugVf6Q+dDjuIuqolyhzxS37dqEhZsAYP9qCoX2VTwT3U6bbV8dghG
+         EYr4ojU2daMUKvsrk+/UqV2Pl+kEr97qTAubdYzr2+WOKVxn1hGHlcrAvY53oJi3DKz+
+         E6qODtV39JkV9ddgkitlEIWvlby+eNxoMft+bxN0OGC7YUwNi9UnWmIn+ZTeLNJK0vuz
+         mq5w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=Q9dAuuhQeXJnHY9YOxmU0U5Agmhqw2dB6e5Zy44E0hE=;
-        b=Pl/9iLB3M7aK273vypndnU726crfIDXZayzLQLl+whMzln6SYgvHuP9R5XHcl7Sod/
-         q2KXXUoRUXntdSR/hNl3UB1Y+/RckxW4crlUy8tHUzNi8tu/q+wcKXidRcGj0OMZSw3E
-         NH+YEbm3zWa767AUd8hyr9DTWBDP8qJoMkWdAqvFj76dTPoVKSFhIbWHO2uXFylemQic
-         OcxEc/yX6kE2Xn27RWk3g5l0DII6SeShen6sz++d8mUd4lxOCyzkSQVRdo6px7Q6Hidh
-         eoKpHcsMlUasM/GZN6GJa28z4P/Gpc2dPs1Rx9poQm1xil0qNbDgZTNo6hLCk/KQ1I+b
-         4oTA==
-X-Gm-Message-State: AOAM530hqC0H6VKoi67bkYbuoRkC9xi4W/WF2E6/3mXSuHg3yZSDs8dL
-        tWzHa2r4mM4GZreBFEb+jXivMT8BKL4NUNPdkitZSY6a7AfSHdCWuPWyzLYgVT5PN2MM/62pGAa
-        ypdOzAeCyYg9N
-X-Received: by 2002:a17:906:4f01:: with SMTP id t1mr10810092eju.388.1627338174804;
-        Mon, 26 Jul 2021 15:22:54 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzl1rSXlpY7vfcBbP4lSuX0aLNAwNQhSLeSGAi2brZYkcDm0gFPy32/jKoIa+cofv3hQjwuLA==
-X-Received: by 2002:a17:906:4f01:: with SMTP id t1mr10810071eju.388.1627338174573;
-        Mon, 26 Jul 2021 15:22:54 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:63a7:c72e:ea0e:6045? ([2001:b07:6468:f312:63a7:c72e:ea0e:6045])
-        by smtp.gmail.com with ESMTPSA id l7sm284712ejk.53.2021.07.26.15.22.53
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 26 Jul 2021 15:22:53 -0700 (PDT)
-Subject: Re: [PATCH v2 41/46] KVM: VMX: Smush x2APIC MSR bitmap adjustments
- into single function
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=/+BJHwQCEyZHcaZdbprSZPe+y/dzPxjT0mqjzI4mft8=;
+        b=TN15yQwZGLb00lNoEVj+TbdG1FycvYXH19TRuXMMb9jSy94CmLf2LqMv85sCFhzIzz
+         4SnOD3dofuy87BvIzdnPYmigeaDqHAzzmwFfK6Ex55GE8Fk6jqvpvDSYS6COP/JW5sQO
+         8q57IgFUEJpEiz5KIUxjQ6FBjrp6Sfqy9YF4hu2EJtDhPdqniwuxwmCA6TD+qJx2Bbdm
+         fAFILyyy168gIfTtJDwv4nApfuAcUMM3T2q+mVcfWL+4PsZlpbgMCR6pNXKVLWvdTPEQ
+         gkyF9HvpmPzaTgfJCmWlKlAns5HpvxZjE1+SMxEn8wsTO8QDn3lSmDzVTDOhWYSL4xDb
+         b/iQ==
+X-Gm-Message-State: AOAM531ja8h/wpRBDva9UoLc55L8q6Mt9oBdCNT5O+elI0rzg9RPxuUI
+        UgvjfRGja71Txx8i8fvH3+GpiA==
+X-Google-Smtp-Source: ABdhPJw/Gh8+1NKDnRtUWhULZWuiVZb6OyXZ9UngoYoN+DX3SJ++9aiaqB5a3wtleH0WP6vP5l1VFQ==
+X-Received: by 2002:aa7:9e5c:0:b029:32b:4e2a:e549 with SMTP id z28-20020aa79e5c0000b029032b4e2ae549mr20136064pfq.68.1627338380586;
+        Mon, 26 Jul 2021 15:26:20 -0700 (PDT)
+Received: from google.com (254.80.82.34.bc.googleusercontent.com. [34.82.80.254])
+        by smtp.gmail.com with ESMTPSA id h9sm597057pjk.56.2021.07.26.15.26.19
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 26 Jul 2021 15:26:19 -0700 (PDT)
+Date:   Mon, 26 Jul 2021 22:26:16 +0000
+From:   David Matlack <dmatlack@google.com>
+To:     Erdem Aktas <erdemaktas@google.com>
+Cc:     linux-kselftest@vger.kernel.org,
+        Sean Christopherson <seanjc@google.com>,
+        Peter Gonda <pgonda@google.com>, Marc Orr <marcorr@google.com>,
+        Sagi Shahar <sagis@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Shuah Khan <shuah@kernel.org>,
+        Andrew Jones <drjones@redhat.com>,
+        Ben Gardon <bgardon@google.com>, Peter Xu <peterx@redhat.com>,
+        Emanuele Giuseppe Esposito <eesposit@redhat.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Ricardo Koller <ricarkol@google.com>,
+        Eric Auger <eric.auger@redhat.com>,
+        Yanan Wang <wangyanan55@huawei.com>,
+        Aaron Lewis <aaronlewis@google.com>,
         Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Reiji Watanabe <reijiw@google.com>
-References: <20210713163324.627647-1-seanjc@google.com>
- <20210713163324.627647-42-seanjc@google.com>
- <7ddb5bfb-f274-9867-3efb-0b6ba5224aa2@redhat.com>
- <YP81dzqaD//iNr5L@google.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <f50126e3-f28e-b8e5-d09d-27c2fe25e141@redhat.com>
-Date:   Tue, 27 Jul 2021 00:22:52 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.11.0
+        Oliver Upton <oupton@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Peter Shier <pshier@google.com>,
+        Axel Rasmussen <axelrasmussen@google.com>,
+        Zhenzhong Duan <zhenzhong.duan@intel.com>,
+        "Maciej S. Szmigiero" <maciej.szmigiero@oracle.com>,
+        Like Xu <like.xu@linux.intel.com>,
+        open list <linux-kernel@vger.kernel.org>,
+        "open list:KERNEL VIRTUAL MACHINE (KVM)" <kvm@vger.kernel.org>
+Subject: Re: [RFC PATCH 1/4] KVM: selftests: Add support for creating
+ non-default type VMs
+Message-ID: <YP82iIe3vM/+fRAh@google.com>
+References: <20210726183816.1343022-1-erdemaktas@google.com>
+ <20210726183816.1343022-2-erdemaktas@google.com>
 MIME-Version: 1.0
-In-Reply-To: <YP81dzqaD//iNr5L@google.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210726183816.1343022-2-erdemaktas@google.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 27/07/21 00:21, Sean Christopherson wrote:
-> On Mon, Jul 26, 2021, Paolo Bonzini wrote:
->> On 13/07/21 18:33, Sean Christopherson wrote:
->>> +	if (!(mode ^ vmx->x2apic_msr_bitmap_mode))
->>> +		return;
->> Just !=, I guess?
-> Ha, yeah.  Forgot to do a bit of critical thinking after refactoring.
+On Mon, Jul 26, 2021 at 11:37:54AM -0700, Erdem Aktas wrote:
+> Currently vm_create function only creates KVM_X86_LEGACY_VM type VMs.
+> Changing the vm_create function to accept type parameter to create
+> new VM types.
 > 
+> Signed-off-by: Erdem Aktas <erdemaktas@google.com>
+> Reviewed-by: Sean Christopherson <seanjc@google.com>
+> Reviewed-by: Peter Gonda <pgonda@google.com>
+> Reviewed-by: Marc Orr <marcorr@google.com>
+> Reviewed-by: Sagi Shahar <sagis@google.com>
 
-Well, == even since I assume you don't want the ! in front. :)
+Reviewed-by: David Matlack <dmatlack@google.com>
 
-Paolo
+(aside from the nit below)
 
+> ---
+>  .../testing/selftests/kvm/include/kvm_util.h  |  1 +
+>  tools/testing/selftests/kvm/lib/kvm_util.c    | 29 +++++++++++++++++--
+>  2 files changed, 27 insertions(+), 3 deletions(-)
+> 
+> diff --git a/tools/testing/selftests/kvm/include/kvm_util.h b/tools/testing/selftests/kvm/include/kvm_util.h
+> index d53bfadd2..c63df42d6 100644
+> --- a/tools/testing/selftests/kvm/include/kvm_util.h
+> +++ b/tools/testing/selftests/kvm/include/kvm_util.h
+> @@ -88,6 +88,7 @@ int vcpu_enable_cap(struct kvm_vm *vm, uint32_t vcpu_id,
+>  void vm_enable_dirty_ring(struct kvm_vm *vm, uint32_t ring_size);
+>  
+>  struct kvm_vm *vm_create(enum vm_guest_mode mode, uint64_t phy_pages, int perm);
+> +struct kvm_vm *__vm_create(enum vm_guest_mode mode, uint64_t phy_pages, int perm, int type);
+
+nit: Consider using a more readable function name such as
+vm_create_with_type().
+
+>  void kvm_vm_free(struct kvm_vm *vmp);
+>  void kvm_vm_restart(struct kvm_vm *vmp, int perm);
+>  void kvm_vm_release(struct kvm_vm *vmp);
+> diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
+> index e5fbf16f7..70caa3882 100644
+> --- a/tools/testing/selftests/kvm/lib/kvm_util.c
+> +++ b/tools/testing/selftests/kvm/lib/kvm_util.c
+> @@ -180,13 +180,36 @@ _Static_assert(sizeof(vm_guest_mode_params)/sizeof(struct vm_guest_mode_params)
+>   * Return:
+>   *   Pointer to opaque structure that describes the created VM.
+>   *
+> - * Creates a VM with the mode specified by mode (e.g. VM_MODE_P52V48_4K).
+> + * Wrapper VM Create function to create a VM with default type (0).
+> + */
+> +struct kvm_vm *vm_create(enum vm_guest_mode mode, uint64_t phy_pages, int perm)
+> +{
+> +	return __vm_create(mode, phy_pages, perm, 0);
+> +}
+> +
+> +/*
+> + * VM Create with a custom type
+> + *
+> + * Input Args:
+> + *   mode - VM Mode (e.g. VM_MODE_P52V48_4K)
+> + *   phy_pages - Physical memory pages
+> + *   perm - permission
+> + *   type - VM type
+> + *
+> + * Output Args: None
+> + *
+> + * Return:
+> + *   Pointer to opaque structure that describes the created VM.
+> + *
+> + * Creates a VM with the mode specified by mode (e.g. VM_MODE_P52V48_4K) and the
+> + * type specified in type (e.g. KVM_X86_LEGACY_VM, KVM_X86_TDX_VM ...).
+>   * When phy_pages is non-zero, a memory region of phy_pages physical pages
+>   * is created and mapped starting at guest physical address 0.  The file
+>   * descriptor to control the created VM is created with the permissions
+>   * given by perm (e.g. O_RDWR).
+>   */
+> -struct kvm_vm *vm_create(enum vm_guest_mode mode, uint64_t phy_pages, int perm)
+> +struct kvm_vm *__vm_create(enum vm_guest_mode mode, uint64_t phy_pages,
+> +			    int perm, int type)
+>  {
+>  	struct kvm_vm *vm;
+>  
+> @@ -200,7 +223,7 @@ struct kvm_vm *vm_create(enum vm_guest_mode mode, uint64_t phy_pages, int perm)
+>  	INIT_LIST_HEAD(&vm->userspace_mem_regions);
+>  
+>  	vm->mode = mode;
+> -	vm->type = 0;
+> +	vm->type = type;
+>  
+>  	vm->pa_bits = vm_guest_mode_params[mode].pa_bits;
+>  	vm->va_bits = vm_guest_mode_params[mode].va_bits;
+> -- 
+> 2.32.0.432.gabb21c7263-goog
+> 
