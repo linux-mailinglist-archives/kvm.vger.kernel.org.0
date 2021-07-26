@@ -2,141 +2,89 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C96BD3D6860
-	for <lists+kvm@lfdr.de>; Mon, 26 Jul 2021 23:02:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3F5873D6868
+	for <lists+kvm@lfdr.de>; Mon, 26 Jul 2021 23:05:09 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233006AbhGZUWO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 26 Jul 2021 16:22:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36216 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232922AbhGZUWN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 26 Jul 2021 16:22:13 -0400
-Received: from mail-io1-xd2d.google.com (mail-io1-xd2d.google.com [IPv6:2607:f8b0:4864:20::d2d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C085EC061760
-        for <kvm@vger.kernel.org>; Mon, 26 Jul 2021 14:02:40 -0700 (PDT)
-Received: by mail-io1-xd2d.google.com with SMTP id y9so13645416iox.2
-        for <kvm@vger.kernel.org>; Mon, 26 Jul 2021 14:02:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=6IT8x9lzIx6n/BJ/OVx0lxvbExZ5qOlfUXixHe0bbys=;
-        b=pDMgqn4vHsn0oX7XfuvhKNIaiMD0p27Xd/46lgidJzEQgnLDi7rh4obI6GXlO5KNhz
-         uW3JEdP8KUx77Bp+uaLK6lESAfW/bwcJVgwXCB4UjsN2H6PJwSA1anMG35GDUNATQzLZ
-         LSqba8zm3DJLWHBQJH7HYrodbAkYRb3of4F6lEM1vXdb/HuhkUciAscbG3BRrgwCbVkF
-         nqQFVxtqErHql/RTTVnYqZqBslRYsMuaY6pLWoPMpSnsW3X6kl3kVmzB8bq77HzJr3tJ
-         xBvSG3fYigdlMKXD4uaGugG3yTbJAgn3ilGhJG4hyNCksDNZLDJ7XvqWVqNKDGQ73KIn
-         U7Yw==
+        id S233230AbhGZUYj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 26 Jul 2021 16:24:39 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:56172 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S232772AbhGZUYi (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 26 Jul 2021 16:24:38 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1627333506;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=nsAdnl9z18qs+3xP5OpyMQ6xLIDE+aQIuQ62ZMIj5qo=;
+        b=drPHbmBcotkaPqnqHPQ4TnWethu7zlOZZsGsIjNGX+P/ZB/JCjQ8CNosUs0jGZIh2xgIMH
+        gMONzSd72odexRHzLjPoggkUrr0QfG+4+hI1iqZI1QUf5uY7sLv187U6fMAi2OBy8Q7+hG
+        wTjasPd4myewEcGDLOzoDy13UzNek7M=
+Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
+ [209.85.208.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-61-Y0ev6wepOV6w3W4ZjMJAaw-1; Mon, 26 Jul 2021 17:05:05 -0400
+X-MC-Unique: Y0ev6wepOV6w3W4ZjMJAaw-1
+Received: by mail-ed1-f69.google.com with SMTP id c20-20020a0564021014b029039994f9cab9so5325074edu.22
+        for <kvm@vger.kernel.org>; Mon, 26 Jul 2021 14:05:04 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=6IT8x9lzIx6n/BJ/OVx0lxvbExZ5qOlfUXixHe0bbys=;
-        b=mh+FkDDdwcwMJ4NgwZ820wvka3oHhQaJKchcgRgFjXXXyhIzOuxC3/2Rb8KoTSe8Uw
-         6aqbuu/VZvXZScT2vpW6/7YxppwWnC1RdLFBmz9QUuClfrZ6GXGXEfvza0P3TSDw/jI3
-         eIMY+21j6Pjzs6M9zpXGJSkZ+QECxueCCmEirCEshTmHWWoVEfN9DRiBHuopmpUGt0YQ
-         Fzux5wMml7zTPr2M0VWfYCUHJp+mNc5eyaxKvNV7ZZpkbXAVlK6r/yQ+hhdyo1z7/WoO
-         TiKsI8ouxf/OmRmS4w+BEvpVkTJL0G9ZAvmmvKmq+XhwC66M/UwpPZKCWdGTuaB6e6OB
-         8mNA==
-X-Gm-Message-State: AOAM531qoTw48ymNRNoW7LZf2LTVM8wytwsT8u1kvuMlW5QDHZ0WJ5ej
-        A8GE95j3FwjWp/XKNIEii7WVKeqSEp5nm4LceGGDEQ==
-X-Google-Smtp-Source: ABdhPJyhGOvmp7xt5phBoDKVbyUJAWhk7mWImU5UN9SLg1JqYvVSLQ0kO7HYjwjDv0jwPBBN3364p2rxepSoPqthNCc=
-X-Received: by 2002:a6b:2bd4:: with SMTP id r203mr11606325ior.157.1627333360050;
- Mon, 26 Jul 2021 14:02:40 -0700 (PDT)
-MIME-Version: 1.0
-References: <20210726175357.1572951-1-mizhang@google.com> <20210726175357.1572951-3-mizhang@google.com>
-In-Reply-To: <20210726175357.1572951-3-mizhang@google.com>
-From:   Ben Gardon <bgardon@google.com>
-Date:   Mon, 26 Jul 2021 14:02:27 -0700
-Message-ID: <CANgfPd95-FSeouU9Aa-6E4UYUy8St+-4Wswbo1dF2AWZo5BoQQ@mail.gmail.com>
-Subject: Re: [PATCH v2 2/3] KVM: x86/mmu: Avoid collision with !PRESENT SPTEs
- in TDP MMU lpage stats
-To:     Mingwei Zhang <mizhang@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=nsAdnl9z18qs+3xP5OpyMQ6xLIDE+aQIuQ62ZMIj5qo=;
+        b=j80XxO20QeNekr1osS5wyXWV24oTlzmvignUAJYDBkDTADb3W9qQhC0hjm5nP5QDoQ
+         dVqgFspvsrKL2QeThhQ6KfLORKs6E0tE9uSOcypfoV2PxsyQdKluJX2HyOGk5nmtF3B3
+         L9zr1o3vUXbeo2Ti13dopMgUL6f/GAInBL9Vp0EQYMfweR7cAIjanukE+TKoxwuVCSDA
+         0U4RYsDLsayWO9QfQJ5clyoXo2URoaVAIWOTkd0wqT8cWfUQuk43jPxVz76pH/OcE6vL
+         pH0LAaoB5XiNXx9A2uCApY56elEX3YXTPGd6IRMGubjV+MaGvJxH0w9nmf+gY9BugECB
+         bEdw==
+X-Gm-Message-State: AOAM533An1xyqBcj7wjIGpc9M77QdFTE7POD6iMfvolyrnCXzCnnsRHn
+        f0ouRs7xVoneOFFEOZfMTudZI1cEjVOARK0JBqUqMqt6GrMJaC0AyA8TM9UzMYL3T0tT6CD7nmF
+        +aV1u9bXXiH+Q
+X-Received: by 2002:a17:906:4097:: with SMTP id u23mr4283059ejj.98.1627333504002;
+        Mon, 26 Jul 2021 14:05:04 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyJmpito0eoGb/asuoiq9cKZaDuLXEqU/j/+/G2DXClJMx/169UBBWWLSlR+E4w1QqdfrbbWA==
+X-Received: by 2002:a17:906:4097:: with SMTP id u23mr4283049ejj.98.1627333503819;
+        Mon, 26 Jul 2021 14:05:03 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e? ([2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e])
+        by smtp.gmail.com with ESMTPSA id n13sm389090eda.36.2021.07.26.14.05.01
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 26 Jul 2021 14:05:03 -0700 (PDT)
+Subject: Re: [PATCH v2 45/46] KVM: SVM: Drop redundant clearing of
+ vcpu->arch.hflags at INIT/RESET
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm <kvm@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Jing Zhang <jingzhangos@google.com>
-Content-Type: text/plain; charset="UTF-8"
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Reiji Watanabe <reijiw@google.com>
+References: <20210713163324.627647-1-seanjc@google.com>
+ <20210713163324.627647-46-seanjc@google.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <47679db7-5662-100d-c9be-b3df8e2d647e@redhat.com>
+Date:   Mon, 26 Jul 2021 23:04:55 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.11.0
+MIME-Version: 1.0
+In-Reply-To: <20210713163324.627647-46-seanjc@google.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Jul 26, 2021 at 10:54 AM Mingwei Zhang <mizhang@google.com> wrote:
->
-> Factor in whether or not the old/new SPTEs are shadow-present when
-> adjusting the large page stats in the TDP MMU. A modified MMIO SPTE can
-> toggle the page size bit, as bit 7 is used to store the MMIO generation,
-> i.e. is_large_pte() can get a false positive when called on a MMIO SPTE.
-> Ditto for nuking SPTEs with REMOVED_SPTE, which sets bit 7 in its magic
-> value.
->
-> Opportunistically move the logic below the check to verify at least one
-> of the old/new SPTEs is shadow present.
->
-> Use is/was_leaf even though is/was_present would suffice.  The code
-> generation is roughly equivalent since all flags need to be computed
-> prior to the code in question, and using the *_leaf flags will minimize
-> the diff in a future enhancement to account all pages, i.e. will change
-> the check to "is_leaf != was_leaf".
->
-> Suggested-by: Sean Christopherson <seanjc@google.com>
-> Signed-off-by: Mingwei Zhang <mizhang@google.com>
+On 13/07/21 18:33, Sean Christopherson wrote:
+> Drop redundant clears of vcpu->arch.hflags in init_vmcb() now that
+> init_vmcb() is invoked only through kvm_vcpu_reset(),
 
-Reviewed-by: Ben Gardon <bgardon@google.com>
+Not true if patch 9 is kept, but at this point hflags is zero anyway, so 
+the patch is okay.
 
-> ---
->  arch/x86/kvm/mmu/tdp_mmu.c | 20 +++++++++++++-------
->  1 file changed, 13 insertions(+), 7 deletions(-)
->
-> diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
-> index caac4ddb46df..cba2ab5db2a0 100644
-> --- a/arch/x86/kvm/mmu/tdp_mmu.c
-> +++ b/arch/x86/kvm/mmu/tdp_mmu.c
-> @@ -413,6 +413,7 @@ static void __handle_changed_spte(struct kvm *kvm, int as_id, gfn_t gfn,
->         bool was_leaf = was_present && is_last_spte(old_spte, level);
->         bool is_leaf = is_present && is_last_spte(new_spte, level);
->         bool pfn_changed = spte_to_pfn(old_spte) != spte_to_pfn(new_spte);
-> +       bool was_large, is_large;
->
->         WARN_ON(level > PT64_ROOT_MAX_LEVEL);
->         WARN_ON(level < PG_LEVEL_4K);
-> @@ -446,13 +447,6 @@ static void __handle_changed_spte(struct kvm *kvm, int as_id, gfn_t gfn,
->
->         trace_kvm_tdp_mmu_spte_changed(as_id, gfn, level, old_spte, new_spte);
->
-> -       if (is_large_pte(old_spte) != is_large_pte(new_spte)) {
-> -               if (is_large_pte(old_spte))
-> -                       atomic64_sub(1, (atomic64_t*)&kvm->stat.lpages);
-> -               else
-> -                       atomic64_add(1, (atomic64_t*)&kvm->stat.lpages);
-> -       }
-> -
->         /*
->          * The only times a SPTE should be changed from a non-present to
->          * non-present state is when an MMIO entry is installed/modified/
-> @@ -478,6 +472,18 @@ static void __handle_changed_spte(struct kvm *kvm, int as_id, gfn_t gfn,
->                 return;
->         }
->
-> +       /*
-> +        * Update large page stats if a large page is being zapped, created, or
-> +        * is replacing an existing shadow page.
-> +        */
-> +       was_large = was_leaf && is_large_pte(old_spte);
-> +       is_large = is_leaf && is_large_pte(new_spte);
-> +       if (was_large != is_large) {
-> +               if (was_large)
-> +                       atomic64_sub(1, (atomic64_t *)&kvm->stat.lpages);
-> +               else
-> +                       atomic64_add(1, (atomic64_t *)&kvm->stat.lpages);
-> +       }
->
->         if (was_leaf && is_dirty_spte(old_spte) &&
->             (!is_present || !is_dirty_spte(new_spte) || pfn_changed))
-> --
-> 2.32.0.432.gabb21c7263-goog
->
+Paolo
+
+> which always clears
+> hflags.  And of course, the second clearing in init_vmcb() was always
+> redundant.
+
