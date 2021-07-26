@@ -2,372 +2,132 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 287973D69B2
-	for <lists+kvm@lfdr.de>; Tue, 27 Jul 2021 00:42:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8B0D23D69EC
+	for <lists+kvm@lfdr.de>; Tue, 27 Jul 2021 01:07:01 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233843AbhGZWCN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 26 Jul 2021 18:02:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59050 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233797AbhGZWCM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 26 Jul 2021 18:02:12 -0400
-Received: from mail-pj1-x1033.google.com (mail-pj1-x1033.google.com [IPv6:2607:f8b0:4864:20::1033])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F229DC061760
-        for <kvm@vger.kernel.org>; Mon, 26 Jul 2021 15:42:39 -0700 (PDT)
-Received: by mail-pj1-x1033.google.com with SMTP id l19so15124124pjz.0
-        for <kvm@vger.kernel.org>; Mon, 26 Jul 2021 15:42:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=gpPylGradzri7jZQEgnaCb90MhFsNsNJOclbaVSSJJA=;
-        b=tAl8g8CNMQnqIUD1Sqt79+zltxfnw/yh7kopLk9LnNi5kZrWoxHS7MB1aDT70Ro3oS
-         kH7R1yMHijLm1uHQAFbrQBaCUA50TV1GzjAr//nwVGzfyI2lfQDrf5AJ8yrloHGEScVs
-         +bFGoFuw2mM2Gsu78m1Ap2knEzY5e8otE4wP0ofOrYj/NvgBHcKV3djRYJKMaFH/xNv/
-         m5GO0l0glRiJfhF4A82zwPqsubsD9niVNVARrU2h5loxuxoegm9I+x8MoTzwLogO/uWd
-         /VN7TTSYgULcgmCZyTrurnWzKjvc51okMImIH6ZckZZSjB0wMNTWx2nMJhDMhJmu7dMg
-         KRMg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=gpPylGradzri7jZQEgnaCb90MhFsNsNJOclbaVSSJJA=;
-        b=T0EwEo0MlBS5zIj5CcaajTpFHrTZ37fh56pYCOQCki95AZ7/7PfpEvV2MFdNCnKPk/
-         Ly67/9TeYkNN6ADRAl0Ykkm/7st5CEc1NHkd2lThi4B9gR39IZ+MSD43aXQWrNTPC5zE
-         2RMAUh1T/Rgk0whwmWql66ZVcnh1sAk++nQiLp/52i0Fv8urI86+Y7QS+zW3UKQ4nX3p
-         PN4YGPL/rU+StFvXxtU3WSLXs3liYfGrVMTEntmfPraZk8wwfAnkp0ZVCZ8HU+kia2Zm
-         NNVaWlaKgQ0k6Z1frUPH3LqoEi75JaGcpmUMfO1LGdgmsBPu1AfCXMPLkIeM/dzbeEX9
-         SH9g==
-X-Gm-Message-State: AOAM5310nZfFGOSaccWx+lcQcmAnTuqcD5OnaB84RrjhAtrB89LeotIy
-        TNZ2EmxcG/O4VTckYTUxpSfjXA==
-X-Google-Smtp-Source: ABdhPJxNrYGezkH2+BhQ8ZqeNHFY6D7Z6KW+mblac4ZJyV9YdhOd3fOtO0fAzHCOjYGQzGxj8KXkdw==
-X-Received: by 2002:a65:648f:: with SMTP id e15mr20207308pgv.165.1627339359049;
-        Mon, 26 Jul 2021 15:42:39 -0700 (PDT)
-Received: from google.com (254.80.82.34.bc.googleusercontent.com. [34.82.80.254])
-        by smtp.gmail.com with ESMTPSA id 21sm1054936pfp.211.2021.07.26.15.42.38
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 26 Jul 2021 15:42:38 -0700 (PDT)
-Date:   Mon, 26 Jul 2021 22:42:34 +0000
-From:   David Matlack <dmatlack@google.com>
-To:     Erdem Aktas <erdemaktas@google.com>
-Cc:     linux-kselftest@vger.kernel.org,
-        Sean Christopherson <seanjc@google.com>,
-        Peter Gonda <pgonda@google.com>, Marc Orr <marcorr@google.com>,
-        Sagi Shahar <sagis@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Shuah Khan <shuah@kernel.org>,
-        Andrew Jones <drjones@redhat.com>,
-        Ben Gardon <bgardon@google.com>, Peter Xu <peterx@redhat.com>,
-        Ricardo Koller <ricarkol@google.com>,
-        Eric Auger <eric.auger@redhat.com>,
-        Zhenzhong Duan <zhenzhong.duan@intel.com>,
-        Aaron Lewis <aaronlewis@google.com>,
-        Jim Mattson <jmattson@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Peter Shier <pshier@google.com>,
-        Oliver Upton <oupton@google.com>,
-        Axel Rasmussen <axelrasmussen@google.com>,
-        Yanan Wang <wangyanan55@huawei.com>,
-        "Maciej S. Szmigiero" <maciej.szmigiero@oracle.com>,
-        Like Xu <like.xu@linux.intel.com>,
-        open list <linux-kernel@vger.kernel.org>,
-        "open list:KERNEL VIRTUAL MACHINE (KVM)" <kvm@vger.kernel.org>
-Subject: Re: [RFC PATCH 3/4] KVM: selftest: Adding TDX life cycle test.
-Message-ID: <YP86WvG0aq39l5K6@google.com>
-References: <20210726183816.1343022-1-erdemaktas@google.com>
- <20210726183816.1343022-4-erdemaktas@google.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+        id S233841AbhGZW0b (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 26 Jul 2021 18:26:31 -0400
+Received: from mail-bn7nam10on2078.outbound.protection.outlook.com ([40.107.92.78]:17772
+        "EHLO NAM10-BN7-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S233491AbhGZW0b (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 26 Jul 2021 18:26:31 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=XE++IJC5ZEWcoSjjtSbBzF4Mlrn3UgjLzulhlgAdXaTTEeF2MEuK1/cqLIlIVIrWyuERYyITjhpwKieRaHBeoh8UHcHY1c5YDSXf+lIMaBSvXdeN/Sm3OoanGd4ERtbQuRKh3PxWbjXD+Gu+umOLGnJMRrQKG0fseiXpWfDoH6bmTp9zqYjEQd0bVDpaN9y/1BSlo/D+8ajqwoV8JwrxrLGWlH8xyLuPI3zW/CHFDNABqucAXUlIYIJNgO71MVMsHYKPEi6Vz9LXgPDu88nRFnMcj/Vxu0hmzA/UGaOEr2S7wbu6hnHVR3w5CebHpGeL/mfcHYBRUScdEFkn8jtw4Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=16vsLKJACsqoDmi3Z+RMnp2JuJKDnguuLdwJ+CwEpvE=;
+ b=jZDNK0InI+z4udzc+GpmZXi5zWOtJOt1M0DMetOCzZnGTTi/h8k3N4qVJ/iyAwzEeYPKx9bogq5CMWm4z7awvnfU4oIktattyWsNa+JcEbpANbUY7N1pzIakdnz7ZfbSFXZbxF2HrKT67S6YRauMZBP0h/vNXVPtEdiqZBPyqjfBgY6AQDB4kXbs10YprDuDcao4HuOD70i1qCjj/XPOxmCJRVeMx/SIUxJbqg9br6fuZbQTMju0/NtZIFgP2oVBPf+WTDp6xo7Wy0TusiasAN+FF4XenzPOHsoftSUHx+vcW7iylc1C7JUg/ep+cKOxPqrqj1+ZmwIHfxm6uRLfRg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=16vsLKJACsqoDmi3Z+RMnp2JuJKDnguuLdwJ+CwEpvE=;
+ b=t7QNYL0yMSr2WLkPPYTtQ7yQCu4I1zGjA4DeExrjZTLB7yzOLbOvnUbhMkFwdMkZj2iEnhToM9R1w1toJjqIvHcgfRpI0hmH37TfoGjUXJ7jImiA0qaBlX9ksfPLRocKPCTWcenn7g0C8t/MjQUzXeGsSkcTeH16eBEe5aTtbcuH1ArgSGOQmJp9eazQ3MJ5yKCUX9HjNfs9Eg+StN93dn27mfYcbonA6fq/MB+Tga8dAE8dlq0kOTT9Us/1HnXgxpYBo4ZIMwjaZEb/2VdbkTyqIu3hMDSIMIGLzaW6L3g1tcrf1xGYpCCf3sSsUuPo17L1VPk3i9HIeL+CDkoNww==
+Authentication-Results: lst.de; dkim=none (message not signed)
+ header.d=none;lst.de; dmarc=none action=none header.from=nvidia.com;
+Received: from BL0PR12MB5506.namprd12.prod.outlook.com (2603:10b6:208:1cb::22)
+ by BL1PR12MB5110.namprd12.prod.outlook.com (2603:10b6:208:312::12) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4352.24; Mon, 26 Jul
+ 2021 23:06:57 +0000
+Received: from BL0PR12MB5506.namprd12.prod.outlook.com
+ ([fe80::d017:af2f:7049:5482]) by BL0PR12MB5506.namprd12.prod.outlook.com
+ ([fe80::d017:af2f:7049:5482%4]) with mapi id 15.20.4352.031; Mon, 26 Jul 2021
+ 23:06:57 +0000
+Date:   Mon, 26 Jul 2021 20:06:56 -0300
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Kirti Wankhede <kwankhede@nvidia.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 1/2] vfio/mdev: turn mdev_init into a subsys_initcall
+Message-ID: <20210726230656.GB1721383@nvidia.com>
+References: <20210726143524.155779-1-hch@lst.de>
+ <20210726143524.155779-2-hch@lst.de>
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20210726183816.1343022-4-erdemaktas@google.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20210726143524.155779-2-hch@lst.de>
+X-ClientProxiedBy: BL1PR13CA0041.namprd13.prod.outlook.com
+ (2603:10b6:208:257::16) To BL0PR12MB5506.namprd12.prod.outlook.com
+ (2603:10b6:208:1cb::22)
+MIME-Version: 1.0
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from mlx.ziepe.ca (142.162.113.129) by BL1PR13CA0041.namprd13.prod.outlook.com (2603:10b6:208:257::16) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4373.16 via Frontend Transport; Mon, 26 Jul 2021 23:06:57 +0000
+Received: from jgg by mlx with local (Exim 4.94)        (envelope-from <jgg@nvidia.com>)        id 1m89gW-008qch-OC; Mon, 26 Jul 2021 20:06:56 -0300
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: bb31d494-0be9-41db-b118-08d9508a1156
+X-MS-TrafficTypeDiagnostic: BL1PR12MB5110:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <BL1PR12MB51103CC38C93D455180C1803C2E89@BL1PR12MB5110.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:6430;
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: mxoJIfrA/JDY6WP1MsvvKfx6uGMLnbV17c5nBrW8yHmugqeH8P7HGiZ44jCd96floGP7/GEhzKAZovaNLVjVnbbwdvYCkRluW+WTV3mIcN5u6GO+cSDVIDQkSGZJnsL1dAtjkMzqUTTO4le+ma506cR7skvD/zgBFVZoSCNE6MSS7DzYSKjk0k5OapFS8IVt17SViGegfLCcwXH30BNVFW5fCtIPijcjRQwRy+OzFD+alGAY2MK/6LMjTuBws2JtJ9f8oJ9ifHQ7QJGvCsUxYZvzc9xRX2szKks9wyHWKKmqe3GKIp2wouJUvzzlpB43VpAmo6d37bfQVyjoY1nw55bJi5+HSFGE/aXXLpdc2NtOAS4W2BLPH7+RcORUegtgUl+KCxlhArFcC150T7tZFYdyg4WZwk4TOTIbFejJL5o/zAWrEPN8HFXDsoFjtZUzTAcs9OWCPJBLsFtMrHHW90wGbVM3lD5O7py6ZRnHU7c6bmiTP/Rv5Da9znBQ3+KlyiC6KkcKJd5fYXizlpJCDcgWMtE3n95dHvBRcDu1SUgSj6On9oizEk+LA1FnzdLv1KtZbBUPwutwVQJU+gQlFzuGDstaulN3A2Vrzs9/8woh10090AavQIJDzOfuZfTm3ePUYWX+6bxMhkNoPP7TjQ==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL0PR12MB5506.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(376002)(39860400002)(136003)(366004)(346002)(396003)(8676002)(38100700002)(33656002)(66574015)(1076003)(8936002)(426003)(86362001)(54906003)(66476007)(66556008)(66946007)(478600001)(83380400001)(9746002)(186003)(4326008)(4744005)(9786002)(26005)(6916009)(2616005)(36756003)(2906002)(316002)(5660300002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?V3JkZkl2VU1rKzBLVGRpNEpwSlAyaVJNRnhINXgxM29sdFg1SDZNVktyUTc5?=
+ =?utf-8?B?dEJxMElVeE8wMkJRb1FRWFpIM0FrOFg4WmpGeFBzZFBQSzBaSVc2bkNpUzNQ?=
+ =?utf-8?B?Sm9DK1REdkFHSCs0eWF0d1B6VVRmSlhhakNqaHl2K0Y0MTA2Mi9QTUErRWRY?=
+ =?utf-8?B?ZXFIeldsYTREcUtwbzljL2IyM3Z4OTh6aS96aENOckdBSVBkWVJ3NXp5bGlU?=
+ =?utf-8?B?a0RhdjY5UllLWG42R2ppR0d3ZFUzNFBUd2x3azNZQTNLSU04eG9adjh2Zi9M?=
+ =?utf-8?B?MzZTYXlrWFg1R3dNRFJ0OE0yNDhDWEd0SGVaZGZ6KzMrbnh4NU9qY3dGMWg2?=
+ =?utf-8?B?R2VTRktJVWYxdWdRdUU3M1l5NTlESHBaMmM1STZNUjVMK0U5VnlSRCswc0Vv?=
+ =?utf-8?B?MVNDenNXYkNaZU9GNHFCMjNOTCtZNHdBMUpOOWFOK3lVTnhjcWE1Qk9tZXA2?=
+ =?utf-8?B?VENKNUdoNUxyc2QvcEgzR0VSSW9ZRzZORDhjZzhINUVsVjBJakhSZkNzeWxY?=
+ =?utf-8?B?REhoSkprNlp6YWpkTFJJSS84cE1RVE5KRVBySmhtQmhpaHc0OTl2SUJKRzdt?=
+ =?utf-8?B?eDFCMmJJdm9WSHNiL2F1QmQzS1hZRkFxNDYxLzNid1FlQXBVN2RVV01pWVRt?=
+ =?utf-8?B?ZnJ4dDlyRDVkTFdmb0NSNE5Ybzl0TmFyQkFxQVR0MmVCMnhUK1Z4N2hkOGQy?=
+ =?utf-8?B?elUrdTJuSnpYTFhWSURFN2s3aGFmRDNsWjh1dE5oSW9qWEIrN1IxR2kveWF4?=
+ =?utf-8?B?ZTdQS2wvWEFIN0VrUXBPcG5RWTQ3YlBoTnFsMzgzRWlDQXZLQmpwMkNoM1Y1?=
+ =?utf-8?B?OXhtN1NLUkhPOFhVZUsySXNGZndySVJZYVFpWFlBa3UwNENvbVpTYVpXN2ZF?=
+ =?utf-8?B?K2dHRjRaSUlBZHZlOWJLL29IUEJTelE2VHFRYTh2Q0RRTkM0aGkvejRsYXdu?=
+ =?utf-8?B?bTkrQ0VHeWJLQXFMUnFtdVBxMUVaOXBrUThvRnEvUU5CVXNZSFJocWNRa0JK?=
+ =?utf-8?B?c0paWG1RM2hTRk95aFZrUnJzYVB6R1FmRFdwY0RRNWZENzJMWnBaU2o3YmU1?=
+ =?utf-8?B?cjFnMm5WMUlrQmRtZXR5QmVFMm1zUDg2WFZDNkcxYXRQVFBvbi9BVGZpZ2xJ?=
+ =?utf-8?B?WjV6VDlVejhGcjBoS01DTnJVbTlrTGR3aEZFVGtnNERhaGFCaFZZYlp4ZXFT?=
+ =?utf-8?B?V2VEVGo3ZWtZOEl4ZzgyYmVtU1YrcUp6UG9kaXIwakdFZ3J0SGVjZkxrN1lP?=
+ =?utf-8?B?UGh5ZnNyd25vaGRIeThDbzJQYndXQm1OakpScDArN0Z2NkY1TXJpMTd0UTVs?=
+ =?utf-8?B?czI3SDNqTCtldEZhekFVVDV3SmlZRG02aXhYaWppand3M2REUzdsZDFPbDMv?=
+ =?utf-8?B?NndEQUM2ZDBFZWJNWjlLb2ZUamtuRVA0cWZtZVR5NCtJN3ZJUVJjRmVJWDd1?=
+ =?utf-8?B?RGtENjFTcUkwSGlLQnV0OGYwazNhZjYwMlM0T0dsSDZuV2g3cmtHaWlGdUh0?=
+ =?utf-8?B?QlRFUnQ2cUkxMjJDSVZiVmJubzBzREpZSnVzSHk5aGw1d3dzbndoYnRRbDBG?=
+ =?utf-8?B?d2lLd2FJOVRWMzFiaHBRTktKU01WdUNaV2Y4QUZWU0w3U1Z1Q0RXUm9tSmtj?=
+ =?utf-8?B?OG9ub2ZJZGxJdjArVGh4ZitmOGd0aXNUZEZ3VHd4THZsNUtSUlJoWEFTTEF1?=
+ =?utf-8?B?VEdobUhTTDBFa3loU1Iwc0RqUG5yMmVPYVFlc2ZJak41aTVaYkwvTG9XRnpu?=
+ =?utf-8?Q?oDsz+V8Y/nrf2PKCOQHIBkzMMp+xw0UDfrkqNzk?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: bb31d494-0be9-41db-b118-08d9508a1156
+X-MS-Exchange-CrossTenant-AuthSource: BL0PR12MB5506.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 Jul 2021 23:06:57.8379
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: OFDlcwIGLdMjSAduYiKBjBnLDsH2QL0nTF4F73aRX7yFdKcWps3N1OHJVChcX7CC
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL1PR12MB5110
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Jul 26, 2021 at 11:37:56AM -0700, Erdem Aktas wrote:
-> Adding a test to verify TDX lifecycle by creating a TD and running a
-> dummy TDVMCALL<INSTRUCTION.IO> inside it.
+On Mon, Jul 26, 2021 at 04:35:23PM +0200, Christoph Hellwig wrote:
+> Without this setups with buіlt-in mdev and mdev-drivers fail to
+> register like this:
 > 
-> Signed-off-by: Erdem Aktas <erdemaktas@google.com>
-> Reviewed-by: Sean Christopherson <seanjc@google.com>
-> Reviewed-by: Peter Gonda <pgonda@google.com>
-> Reviewed-by: Marc Orr <marcorr@google.com>
-> Reviewed-by: Sagi Shahar <sagis@google.com>
+> [1.903149] Driver 'intel_vgpu_mdev' was unable to register with bus_type 'mdev' because the bus was not initialized.
+> 
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
 > ---
->  tools/testing/selftests/kvm/Makefile          |   1 +
->  tools/testing/selftests/kvm/lib/x86_64/tdx.h  | 131 ++++++++++++++++++
->  .../selftests/kvm/x86_64/tdx_vm_tests.c       | 102 ++++++++++++++
->  3 files changed, 234 insertions(+)
->  create mode 100644 tools/testing/selftests/kvm/x86_64/tdx_vm_tests.c
-> 
-> diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
-> index d84c09b5e..259be634c 100644
-> --- a/tools/testing/selftests/kvm/Makefile
-> +++ b/tools/testing/selftests/kvm/Makefile
-> @@ -72,6 +72,7 @@ TEST_GEN_PROGS_x86_64 += kvm_create_max_vcpus
->  TEST_GEN_PROGS_x86_64 += memslot_modification_stress_test
->  TEST_GEN_PROGS_x86_64 += set_memory_region_test
->  TEST_GEN_PROGS_x86_64 += steal_time
->  TEST_GEN_PROGS_x86_64 += kvm_binary_stats_test
-> +TEST_GEN_PROGS_x86_64 += x86_64/tdx_vm_tests
-> 
->  TEST_GEN_PROGS_aarch64 += aarch64/debug-exceptions
->  TEST_GEN_PROGS_aarch64 += aarch64/get-reg-list
-> diff --git a/tools/testing/selftests/kvm/lib/x86_64/tdx.h b/tools/testing/selftests/kvm/lib/x86_64/tdx.h
-> index 6e3e8384e..395be3c81 100644
-> --- a/tools/testing/selftests/kvm/lib/x86_64/tdx.h
-> +++ b/tools/testing/selftests/kvm/lib/x86_64/tdx.h
-> @@ -86,4 +86,135 @@ void prepare_source_image(struct kvm_vm *vm, void *guest_code,
->  			  size_t guest_code_size,
->  			  uint64_t guest_code_signature);
->  
-> +/*
-> + * Generic TDCALL function that can be used to communicate with TDX module or
-> + * VMM.
-> + * Input operands: rax, rbx, rcx, rdx, r8-r15, rbp, rsi, rdi
-> + * Output operands: rax, r8-r15, rbx, rdx, rdi, rsi
-> + * rcx is actually a bitmap to tell TDX module which register values will be
-> + * exposed to the VMM.
-> + * XMM0-XMM15 registers can be used as input operands but the current
-> + * implementation does not support it yet.
-> + */
-> +static inline void tdcall(struct kvm_regs *regs)
-> +{
-> +	asm volatile (
-> +			"mov %13, %%rax;\n\t"
-> +			"mov %14, %%rbx;\n\t"
-> +			"mov %15, %%rcx;\n\t"
-> +			"mov %16, %%rdx;\n\t"
-> +			"mov %17, %%r8;\n\t"
-> +			"mov %18, %%r9;\n\t"
-> +			"mov %19, %%r10;\n\t"
-> +			"mov %20, %%r11;\n\t"
-> +			"mov %21, %%r12;\n\t"
-> +			"mov %22, %%r13;\n\t"
-> +			"mov %23, %%r14;\n\t"
-> +			"mov %24, %%r15;\n\t"
-> +			"mov %25, %%rbp;\n\t"
-> +			"mov %26, %%rsi;\n\t"
-> +			"mov %27, %%rdi;\n\t"
-> +			".byte 0x66, 0x0F, 0x01, 0xCC;\n\t"
-> +			"mov %%rax, %0;\n\t"
-> +			"mov %%rbx, %1;\n\t"
-> +			"mov %%rdx, %2;\n\t"
-> +			"mov %%r8, %3;\n\t"
-> +			"mov %%r9, %4;\n\t"
-> +			"mov %%r10, %5;\n\t"
-> +			"mov %%r11, %6;\n\t"
-> +			"mov %%r12, %7;\n\t"
-> +			"mov %%r13, %8;\n\t"
-> +			"mov %%r14, %9;\n\t"
-> +			"mov %%r15, %10;\n\t"
-> +			"mov %%rsi, %11;\n\t"
-> +			"mov %%rdi, %12;\n\t"
-> +			: "=m" (regs->rax), "=m" (regs->rbx), "=m" (regs->rdx),
-> +			"=m" (regs->r8), "=m" (regs->r9), "=m" (regs->r10),
-> +			"=m" (regs->r11), "=m" (regs->r12), "=m" (regs->r13),
-> +			"=m" (regs->r14), "=m" (regs->r15), "=m" (regs->rsi),
-> +			"=m" (regs->rdi)
-> +			: "m" (regs->rax), "m" (regs->rbx), "m" (regs->rcx),
-> +			"m" (regs->rdx), "m" (regs->r8), "m" (regs->r9),
-> +			"m" (regs->r10), "m" (regs->r11), "m" (regs->r12),
-> +			"m" (regs->r13), "m" (regs->r14), "m" (regs->r15),
-> +			"m" (regs->rbp), "m" (regs->rsi), "m" (regs->rdi)
-> +			: "rax", "rbx", "rcx", "rdx", "r8", "r9", "r10", "r11",
-> +			"r12", "r13", "r14", "r15", "rbp", "rsi", "rdi");
-> +}
-> +
-> +
-> +/*
-> + * Do a TDVMCALL IO request
-> + *
-> + * Input Args:
-> + *  port - IO port to do read/write
-> + *  size - Number of bytes to read/write. 1=1byte, 2=2bytes, 4=4bytes.
-> + *  write - 1=IO write 0=IO read
-> + *  data - pointer for the data to write
-> + *
-> + * Output Args:
-> + *  data - pointer for data to be read
-> + *
-> + * Return:
-> + *   On success, return 0. For Invalid-IO-Port error, returns -1.
-> + *
-> + * Does an IO operation using the following tdvmcall interface.
-> + *
-> + * TDG.VP.VMCALL<Instruction.IO>-Input Operands
-> + * R11 30 for IO
-> + *
-> + * R12 Size of access. 1=1byte, 2=2bytes, 4=4bytes.
-> + * R13 Direction. 0=Read, 1=Write.
-> + * R14 Port number
-> + * R15 Data to write, if R13 is 1.
-> + *
-> + * TDG.VP.VMCALL<Instruction.IO>-Output Operands
-> + * R10 TDG.VP.VMCALL-return code.
-> + * R11 Data to read, if R13 is 0.
-> + *
-> + * TDG.VP.VMCALL<Instruction.IO>-Status Codes
-> + * Error Code Value Description
-> + * TDG.VP.VMCALL_SUCCESS 0x0 TDG.VP.VMCALL is successful
-> + * TDG.VP.VMCALL_INVALID_OPERAND 0x80000000 00000000 Invalid-IO-Port access
-> + */
-> +static inline int tdvmcall_io(uint64_t port, uint64_t size,
-> +			      uint64_t write, uint64_t *data)
-> +{
-> +	struct kvm_regs regs;
-> +
-> +	memset(&regs, 0, sizeof(regs));
-> +	regs.r11 = 30;
-> +	regs.r12 = size;
-> +	regs.r13 = write;
-> +	regs.r14 = port;
-> +	if (write)
-> +		regs.r15 = *data;
-> +	/* TODO: update the bitmap register with only the relavent registers */
-> +	regs.rcx = 0xFC00;
-> +	tdcall(&regs);
-> +	if (!write)
-> +		*data = regs.r11;
-> +	return regs.r10;
-> +}
-> +
-> +
-> +#define TDX_FUNCTION_SIZE(name) ((uint64_t)&__stop_sec_ ## name -\
-> +			   (uint64_t)&__start_sec_ ## name) \
-> +
-> +#define TDX_GUEST_FUNCTION__(name, section_name) \
-> +extern char *__start_sec_ ## name ; \
-> +extern char *__stop_sec_ ## name ; \
-> +static void \
-> +__attribute__((__flatten__, section(section_name))) name(void *arg)
-> +
-> +
-> +#define STRINGIFY2(x) #x
-> +#define STRINGIFY(x) STRINGIFY2(x)
-> +#define CONCAT2(a, b) a##b
-> +#define CONCAT(a, b) CONCAT2(a, b)
-> +
-> +
-> +#define TDX_GUEST_FUNCTION(name) \
-> +TDX_GUEST_FUNCTION__(name, STRINGIFY(CONCAT(sec_, name)))
-> +
->  #endif  // KVM_LIB_TDX_H_
-> diff --git a/tools/testing/selftests/kvm/x86_64/tdx_vm_tests.c b/tools/testing/selftests/kvm/x86_64/tdx_vm_tests.c
-> new file mode 100644
-> index 000000000..da7ea67b1
-> --- /dev/null
-> +++ b/tools/testing/selftests/kvm/x86_64/tdx_vm_tests.c
-> @@ -0,0 +1,102 @@
-> +// SPDX-License-Identifier: GPL-2.0-only
-> +
-> +#include <fcntl.h>
-> +#include <limits.h>
-> +#include <kvm_util.h>
-> +#include "../lib/kvm_util_internal.h"
-> +#include "../lib/x86_64/tdx.h"
-> +#include <linux/kvm.h>
-> +#include <stdio.h>
-> +#include <stdlib.h>
-> +#include <string.h>
-> +#include <sys/ioctl.h>
-> +#include <sys/types.h>
-> +#include <test_util.h>
-> +#include <unistd.h>
-> +#include <processor.h>
-> +#include <time.h>
-> +#include <sys/mman.h>
-> +#include<sys/wait.h>
-> +
-> +/*
-> + * There might be multiple tests we are running and if one test fails, it will
-> + * prevent the subsequent tests to run due to how tests are failing with
-> + * TEST_ASSERT function. The run_in_new_process function will run a test in a
-> + * new process context and wait for it to finish or fail to prevent TEST_ASSERT
-> + * to kill the main testing process.
-> + */
-> +void run_in_new_process(void (*func)(void))
-> +{
-> +	if (fork() == 0) {
-> +		func();
-> +		exit(0);
-> +	}
-> +	wait(NULL);
-> +}
-> +
-> +/*
-> + * Verify that the TDX  is supported by the KVM.
-> + */
-> +bool is_tdx_enabled(void)
-> +{
-> +	return !!(kvm_check_cap(KVM_CAP_VM_TYPES) & BIT(KVM_X86_TDX_VM));
-> +}
-> +
-> +/*
-> + * Do a dummy io exit to verify that the TD has been initialized correctly and
-> + * guest can run some code inside.
-> + */
-> +TDX_GUEST_FUNCTION(guest_dummy_exit)
-> +{
-> +	uint64_t data;
-> +
-> +	data = 0xAB;
-> +	tdvmcall_io(TDX_TEST_PORT, 1, 1, &data);
-> +}
-> +
-> +/*
-> + * TD lifecycle test will create a TD which runs a dumy IO exit to verify that
-> + * the guest TD has been created correctly.
-> + */
-> +void  verify_td_lifecycle(void)
-> +{
-> +	struct kvm_vm *vm;
-> +	struct kvm_run *run;
-> +
-> +	printf("Verifying TD lifecycle:\n");
-> +	/* Create a TD VM with no memory.*/
-> +	vm = __vm_create(VM_MODE_DEFAULT, 0, O_RDWR, KVM_X86_TDX_VM);
-> +
-> +	/* Allocate TD guest memory and initialize the TD.*/
-> +	initialize_td(vm);
-> +
-> +	/* Initialize the TD vcpu and copy the test code to the guest memory.*/
-> +	vm_vcpu_add_tdx(vm, 0);
-> +
-> +	/* Setup and initialize VM memory */
-> +	prepare_source_image(vm, guest_dummy_exit,
-> +			     TDX_FUNCTION_SIZE(guest_dummy_exit), 0);
-> +	finalize_td_memory(vm);
-> +
-> +	run = vcpu_state(vm, 0);
-> +	vcpu_run(vm, 0);
-> +	TEST_ASSERT(run->exit_reason == KVM_EXIT_IO,
-> +		    "Got exit_reason other than KVM_EXIT_IO: %u (%s)\n",
-> +		    run->exit_reason,
-> +		    exit_reason_str(run->exit_reason));
-> +
-> +	kvm_vm_free(vm);
-> +	printf("\t ... PASSED\n");
-> +}
-> +int main(int argc, char **argv)
-> +{
-> +	if (!is_tdx_enabled()) {
-> +		printf("TDX is not supported by the KVM\n"
-> +		       "Skipping the TDX tests.\n");
+>  drivers/vfio/mdev/mdev_core.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 
-Use print_skip() to emit the standard "skipping test" message.
+Reviewed-by: Jason Gunthorpe <jgg@nvidia.com>
 
-> +		return 0;
-
-Exit with KSFT_SKIP so that test runners know that this test was skipped
-(rather than running and passing).
-
-> +	}
-> +
-> +	run_in_new_process(&verify_td_lifecycle);
-> +
-> +	return 0;
-> +}
-> -- 
-> 2.32.0.432.gabb21c7263-goog
-> 
+Jason
