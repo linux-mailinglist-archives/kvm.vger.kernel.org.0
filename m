@@ -2,25 +2,25 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8BE3B3D5D1D
-	for <lists+kvm@lfdr.de>; Mon, 26 Jul 2021 17:36:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4CB383D5D20
+	for <lists+kvm@lfdr.de>; Mon, 26 Jul 2021 17:36:05 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235079AbhGZOzb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 26 Jul 2021 10:55:31 -0400
-Received: from mail.kernel.org ([198.145.29.99]:37230 "EHLO mail.kernel.org"
+        id S235030AbhGZOzc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 26 Jul 2021 10:55:32 -0400
+Received: from mail.kernel.org ([198.145.29.99]:37268 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S235030AbhGZOz3 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 26 Jul 2021 10:55:29 -0400
+        id S235041AbhGZOza (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 26 Jul 2021 10:55:30 -0400
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 8539660F38;
+        by mail.kernel.org (Postfix) with ESMTPSA id E40DB60E08;
         Mon, 26 Jul 2021 15:35:58 +0000 (UTC)
 Received: from sofa.misterjones.org ([185.219.108.64] helo=why.lan)
         by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
         (Exim 4.94.2)
         (envelope-from <maz@kernel.org>)
-        id 1m82e4-001511-TL; Mon, 26 Jul 2021 16:35:56 +0100
+        id 1m82e5-001511-7e; Mon, 26 Jul 2021 16:35:57 +0100
 From:   Marc Zyngier <maz@kernel.org>
 To:     linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org,
         kvmarm@lists.cs.columbia.edu, linux-mm@kvack.org
@@ -33,9 +33,9 @@ Cc:     Sean Christopherson <seanjc@google.com>,
         Suzuki K Poulose <suzuki.poulose@arm.com>,
         Alexandru Elisei <alexandru.elisei@arm.com>,
         kernel-team@android.com
-Subject: [PATCH v2 4/6] KVM: Remove kvm_is_transparent_hugepage() and PageTransCompoundMap()
-Date:   Mon, 26 Jul 2021 16:35:50 +0100
-Message-Id: <20210726153552.1535838-5-maz@kernel.org>
+Subject: [PATCH v2 5/6] KVM: arm64: Use get_page() instead of kvm_get_pfn()
+Date:   Mon, 26 Jul 2021 16:35:51 +0100
+Message-Id: <20210726153552.1535838-6-maz@kernel.org>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20210726153552.1535838-1-maz@kernel.org>
 References: <20210726153552.1535838-1-maz@kernel.org>
@@ -49,86 +49,29 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Now that arm64 has stopped using kvm_is_transparent_hugepage(),
-we can remove it, as well as PageTransCompoundMap() which was
-only used by the former.
+When mapping a THP, we are guaranteed that the page isn't reserved,
+and we can safely avoid the kvm_is_reserved_pfn() call.
 
-Acked-by: Paolo Bonzini <pbonzini@redhat.com>
+Replace kvm_get_pfn() with get_page(pfn_to_page()).
+
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- include/linux/page-flags.h | 37 -------------------------------------
- virt/kvm/kvm_main.c        | 10 ----------
- 2 files changed, 47 deletions(-)
+ arch/arm64/kvm/mmu.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/include/linux/page-flags.h b/include/linux/page-flags.h
-index 5922031ffab6..1ace27c4a8e0 100644
---- a/include/linux/page-flags.h
-+++ b/include/linux/page-flags.h
-@@ -632,43 +632,6 @@ static inline int PageTransCompound(struct page *page)
- 	return PageCompound(page);
- }
+diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+index ebb28dd4f2c9..b303aa143592 100644
+--- a/arch/arm64/kvm/mmu.c
++++ b/arch/arm64/kvm/mmu.c
+@@ -840,7 +840,7 @@ transparent_hugepage_adjust(struct kvm *kvm, struct kvm_memory_slot *memslot,
+ 		*ipap &= PMD_MASK;
+ 		kvm_release_pfn_clean(pfn);
+ 		pfn &= ~(PTRS_PER_PMD - 1);
+-		kvm_get_pfn(pfn);
++		get_page(pfn_to_page(pfn));
+ 		*pfnp = pfn;
  
--/*
-- * PageTransCompoundMap is the same as PageTransCompound, but it also
-- * guarantees the primary MMU has the entire compound page mapped
-- * through pmd_trans_huge, which in turn guarantees the secondary MMUs
-- * can also map the entire compound page. This allows the secondary
-- * MMUs to call get_user_pages() only once for each compound page and
-- * to immediately map the entire compound page with a single secondary
-- * MMU fault. If there will be a pmd split later, the secondary MMUs
-- * will get an update through the MMU notifier invalidation through
-- * split_huge_pmd().
-- *
-- * Unlike PageTransCompound, this is safe to be called only while
-- * split_huge_pmd() cannot run from under us, like if protected by the
-- * MMU notifier, otherwise it may result in page->_mapcount check false
-- * positives.
-- *
-- * We have to treat page cache THP differently since every subpage of it
-- * would get _mapcount inc'ed once it is PMD mapped.  But, it may be PTE
-- * mapped in the current process so comparing subpage's _mapcount to
-- * compound_mapcount to filter out PTE mapped case.
-- */
--static inline int PageTransCompoundMap(struct page *page)
--{
--	struct page *head;
--
--	if (!PageTransCompound(page))
--		return 0;
--
--	if (PageAnon(page))
--		return atomic_read(&page->_mapcount) < 0;
--
--	head = compound_head(page);
--	/* File THP is PMD mapped and not PTE mapped */
--	return atomic_read(&page->_mapcount) ==
--	       atomic_read(compound_mapcount_ptr(head));
--}
--
- /*
-  * PageTransTail returns true for both transparent huge pages
-  * and hugetlbfs pages, so it should only be called when it's known
-diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index 986959833d70..956ef6ddce7f 100644
---- a/virt/kvm/kvm_main.c
-+++ b/virt/kvm/kvm_main.c
-@@ -189,16 +189,6 @@ bool kvm_is_reserved_pfn(kvm_pfn_t pfn)
- 	return true;
- }
- 
--bool kvm_is_transparent_hugepage(kvm_pfn_t pfn)
--{
--	struct page *page = pfn_to_page(pfn);
--
--	if (!PageTransCompoundMap(page))
--		return false;
--
--	return is_transparent_hugepage(compound_head(page));
--}
--
- /*
-  * Switches to specified vcpu, until a matching vcpu_put()
-  */
+ 		return PMD_SIZE;
 -- 
 2.30.2
 
