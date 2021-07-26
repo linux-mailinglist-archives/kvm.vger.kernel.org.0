@@ -2,309 +2,179 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8902F3D686D
-	for <lists+kvm@lfdr.de>; Mon, 26 Jul 2021 23:06:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id ABB7A3D6875
+	for <lists+kvm@lfdr.de>; Mon, 26 Jul 2021 23:12:19 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233452AbhGZUZq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 26 Jul 2021 16:25:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37032 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233327AbhGZUZo (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 26 Jul 2021 16:25:44 -0400
-Received: from mail-io1-xd31.google.com (mail-io1-xd31.google.com [IPv6:2607:f8b0:4864:20::d31])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C6F1AC061760
-        for <kvm@vger.kernel.org>; Mon, 26 Jul 2021 14:06:11 -0700 (PDT)
-Received: by mail-io1-xd31.google.com with SMTP id a13so13634896iol.5
-        for <kvm@vger.kernel.org>; Mon, 26 Jul 2021 14:06:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=Rkig7bE4hOxzHEgCJPd82apljPN10pQgvqX3gsxGQr8=;
-        b=Dc1ZNs5zRFS+ENDVWCGOlGoSGiMpxdR7eVys+pUw/0VgibLj7iYul3jE5hlZLZ5IqY
-         Ve9c4GJ/vNyHDdYgCSxe6N4QoCJ784+vSsXyPptEYwHSUNmsgO8n+gr1pcR9dcLVFMau
-         V5yO+pytXFDojUXypN6sd+/D1J2EFMgsz1Z2X/zO505WAARzHskCULPZy6nWnESomYd7
-         blbB67Kd/cSiXf2mQo0FHyL3TpTZ3Vz8BaDclFuMgb6PHcukr3O94YuE0VO9yYjx50n5
-         oO60e1Qwn7AURxIN0RLvfcV/IhfuXdEWrU5O0SB673yMTW0P7mZCGZJZ8ULLQ59L1zCy
-         yIpw==
+        id S233258AbhGZUbt (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 26 Jul 2021 16:31:49 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:42380 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S233162AbhGZUbs (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 26 Jul 2021 16:31:48 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1627333936;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=GSObEM4AEGGdRTXQ6Y6EvNaI/wD9NZAhPCl3zKiUAv0=;
+        b=UBJk/qqBisVzjNVEkEMs/SXN7Y0TfHobv3vf+pdXIXwTdY5l6hg1VhmImEkbAeJK31ip74
+        NNU2Ta2HbG7D65n0JwOOIUe++wCpzxLpz0X0uVOqoi4soSaOG9rOgl3HknTGEM4FKuMS9V
+        71Jr69Bkbe3tMW3VVBhvkVsreTrsNs4=
+Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
+ [209.85.208.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-31-CSyE9ySEOgWzCp8wweZUOg-1; Mon, 26 Jul 2021 17:12:14 -0400
+X-MC-Unique: CSyE9ySEOgWzCp8wweZUOg-1
+Received: by mail-ed1-f70.google.com with SMTP id f24-20020a0564021618b02903954c05c938so5381184edv.3
+        for <kvm@vger.kernel.org>; Mon, 26 Jul 2021 14:12:14 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=Rkig7bE4hOxzHEgCJPd82apljPN10pQgvqX3gsxGQr8=;
-        b=IZNCwdudu7e6G8DX9ZzAUOs4LglyvyAy/YOoZEVJyj3vdxqqMLQAGVpLJEY2tGDuwb
-         L+o2L+aZhkysbqVUASvopRhwmyvwnQdrQ0qTHzH+AcmLXXkwxefIAxw6Vvg1OzKU6uWo
-         Lw0jFiGtaUNRrJLfzTSlPelK+OhJZck1yOf/Q8Fa3yvlm4zXJf4PyzbsEdI0BHmOUEcb
-         4RmIEc0emwG7mml6Ov2W7gKiJOe89iuZiFjNofacwsUF9puGPgwYGqIxWsHxUJN+9wH6
-         0leZSWa3syv2/RdR9rquLkfodH9mEe6ylzhwm+qaAUT8UyErktfRyCay96YG9nG9+ynW
-         I+KA==
-X-Gm-Message-State: AOAM531B9z+4C2Jn6e3kUYgGOJ5gosTGwGVB6JHaAFrAgmWu3Se3JK2e
-        RIyLc4d8bbvi1bGVNtS+IMr/Qg7rP56tP3+sno2sRA==
-X-Google-Smtp-Source: ABdhPJxHQ4/K8JqyV+8xDhbhj04xPAp2EiPk5By73klotblAAQyaQoPbqIelufbMjYI1TcjgvZiX+UFVw22JoXT+nrA=
-X-Received: by 2002:a5e:c912:: with SMTP id z18mr16302923iol.9.1627333571083;
- Mon, 26 Jul 2021 14:06:11 -0700 (PDT)
-MIME-Version: 1.0
-References: <20210726175357.1572951-1-mizhang@google.com> <20210726175357.1572951-4-mizhang@google.com>
- <CANgfPd8iohgpauQEEAFAQjLPXqHQw1Swguc7C0exHcz985igcw@mail.gmail.com>
-In-Reply-To: <CANgfPd8iohgpauQEEAFAQjLPXqHQw1Swguc7C0exHcz985igcw@mail.gmail.com>
-From:   Ben Gardon <bgardon@google.com>
-Date:   Mon, 26 Jul 2021 14:06:00 -0700
-Message-ID: <CANgfPd9PD4pLkZ9zLWHRmWRk2uJ3qvqZaio0C_hs7g161NmOow@mail.gmail.com>
-Subject: Re: [PATCH v2 3/3] KVM: x86/mmu: Add detailed page size stats
-To:     Mingwei Zhang <mizhang@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        h=x-gm-message-state:to:cc:references:from:subject:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=GSObEM4AEGGdRTXQ6Y6EvNaI/wD9NZAhPCl3zKiUAv0=;
+        b=pRX6pajO3Rsvlh+6/UeGCKtSlusK3SxdtahnK3EojLJMfNazGnbFwRok2+iNCKgcap
+         c7+Fk0rh3oTW/S6tPIDDulHeGyRXq2TJ1zUZ/vJbnVepPNEiqHfJTaY7Nh/2TZZ/8Z2y
+         F20DpP3oq8w0byP7VffxqMsru/QTZ1mHaztApmkkeZmdV/Jf4/e3FsYc1sdeRAEyq2+E
+         2TvROstDNQmnYAIeP8LMqC8FtK7a9lljt2x4cvKu+cK9zP8q5H4u50NYXy/jja/XI158
+         wuQPzpq0PlT+3MPmOgpqoNI1Jt2r9Ux6INpFUIRVrzYos8LSG0MAuO5FKBbDHevhekX/
+         FYyw==
+X-Gm-Message-State: AOAM533CPBAzGHybl9irzcGRDAks/LyfykL2WryI7Voo4hb4ewYf2q0T
+        Biztpe/ptrFIn0llowOlOpTq1RG4O8+LA8APhBjsCCTmIFIYR4L9holSTITQoFMlWMKEHgLh7GH
+        n90eVylasmNh4
+X-Received: by 2002:aa7:ccc1:: with SMTP id y1mr23542095edt.321.1627333933725;
+        Mon, 26 Jul 2021 14:12:13 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxyT64Mwq0V+1NZBNjc/2ncdGQChN2iFhzEKjOGwYIyaHPCUy425QTZPpFeBHXXyiHEURvlSw==
+X-Received: by 2002:aa7:ccc1:: with SMTP id y1mr23542074edt.321.1627333933578;
+        Mon, 26 Jul 2021 14:12:13 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e? ([2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e])
+        by smtp.gmail.com with ESMTPSA id f15sm236675ejt.75.2021.07.26.14.12.12
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 26 Jul 2021 14:12:13 -0700 (PDT)
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm <kvm@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Jing Zhang <jingzhangos@google.com>
-Content-Type: text/plain; charset="UTF-8"
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Reiji Watanabe <reijiw@google.com>
+References: <20210713163324.627647-1-seanjc@google.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [PATCH v2 00/46] KVM: x86: vCPU RESET/INIT fixes and
+ consolidation
+Message-ID: <c3563870-62c3-897d-3148-e48bb755310c@redhat.com>
+Date:   Mon, 26 Jul 2021 23:12:11 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.11.0
+MIME-Version: 1.0
+In-Reply-To: <20210713163324.627647-1-seanjc@google.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Jul 26, 2021 at 1:41 PM Ben Gardon <bgardon@google.com> wrote:
->
-> On Mon, Jul 26, 2021 at 10:54 AM Mingwei Zhang <mizhang@google.com> wrote:
-> >
-> > Existing KVM code tracks the number of large pages regardless of their
-> > sizes. Therefore, when large page of 1GB (or larger) is adopted, the
-> > information becomes less useful because lpages counts a mix of 1G and 2M
-> > pages.
-> >
-> > So remove the lpages since it is easy for user space to aggregate the info.
-> > Instead, provide a comprehensive page stats of all sizes from 4K to 512G.
-> >
-> > Suggested-by: Ben Gardon <bgardon@google.com>
-> > Suggested-by: Jing Zhang <jingzhangos@google.com>
-> > Signed-off-by: Mingwei Zhang <mizhang@google.com>
+On 13/07/21 18:32, Sean Christopherson wrote:
+> The end goal of this series is to consolidate the RESET/INIT code, both to
+> deduplicate code and to try to avoid divergent behavior/bugs, e.g. SVM only
+> recently started updating vcpu->arch.cr4 on INIT.
+> 
+> The TL;DR of why it takes 40+ patches to get there is that the RESET/INIT
+> flows have multiple latent bugs and hidden dependencies, but "work"
+> because they're rarely touched, are mostly fixed flows in both KVM and the
+> guest, and because guests don't sanity check state after INIT.
+> 
+> While several of the patches have Fixes tags, I am absolutely terrified of
+> backporting most of them due to the likelihood of breaking a different
+> version of KVM.  And, for the most part the bugs are benign in the sense
+> no guest has actually encountered any of these bugs.  For that reason, I
+> intentionally omitted stable@ entirely.  The only patches I would consider
+> even remotely safe for backporting are the first four patches in the series.
+> 
+> v2:
+>    - Collect Reviews. [Reiji]
+>    - Fix an apic->base_address initialization goof. [Reiji]
+>    - Add patch to flush TLB on INIT. [Reiji]
+>    - Add patch to preserved CR0.CD/NW on INIT. [Reiji]
+>    - Add patch to emulate #INIT after shutdown on SVM. [Reiji]
+>    - Add patch to consolidate arch.hflags code. [Reiji]
+>    - Drop patch to omit VMWRITE zeroing. [Paolo, Jim]
+>    - Drop several MMU patches (moved to other series).
+> 
+> v1: https://lkml.kernel.org/r/20210424004645.3950558-1-seanjc@google.com
+> 
+> Sean Christopherson (46):
+>    KVM: x86: Flush the guest's TLB on INIT
+>    KVM: nVMX: Set LDTR to its architecturally defined value on nested
+>      VM-Exit
+>    KVM: SVM: Zero out GDTR.base and IDTR.base on INIT
+>    KVM: VMX: Set EDX at INIT with CPUID.0x1, Family-Model-Stepping
+>    KVM: SVM: Require exact CPUID.0x1 match when stuffing EDX at INIT
+>    KVM: SVM: Fall back to KVM's hardcoded value for EDX at RESET/INIT
+>    KVM: VMX: Remove explicit MMU reset in enter_rmode()
+>    KVM: SVM: Drop explicit MMU reset at RESET/INIT
+>    KVM: SVM: Drop a redundant init_vmcb() from svm_create_vcpu()
+>    KVM: VMX: Move init_vmcs() invocation to vmx_vcpu_reset()
+>    KVM: x86: WARN if the APIC map is dirty without an in-kernel local
+>      APIC
+>    KVM: x86: Remove defunct BSP "update" in local APIC reset
+>    KVM: x86: Migrate the PIT only if vcpu0 is migrated, not any BSP
+>    KVM: x86: Don't force set BSP bit when local APIC is managed by
+>      userspace
+>    KVM: x86: Set BSP bit in reset BSP vCPU's APIC base by default
+>    KVM: VMX: Stuff vcpu->arch.apic_base directly at vCPU RESET
+>    KVM: x86: Open code necessary bits of kvm_lapic_set_base() at vCPU
+>      RESET
+>    KVM: x86: Consolidate APIC base RESET initialization code
+>    KVM: x86: Move EDX initialization at vCPU RESET to common code
+>    KVM: SVM: Don't bother writing vmcb->save.rip at vCPU RESET/INIT
+>    KVM: VMX: Invert handling of CR0.WP for EPT without unrestricted guest
+>    KVM: VMX: Remove direct write to vcpu->arch.cr0 during vCPU RESET/INIT
+>    KVM: VMX: Fold ept_update_paging_mode_cr0() back into vmx_set_cr0()
+>    KVM: nVMX: Do not clear CR3 load/store exiting bits if L1 wants 'em
+>    KVM: VMX: Pull GUEST_CR3 from the VMCS iff CR3 load exiting is
+>      disabled
+>    KVM: x86/mmu: Skip the permission_fault() check on MMIO if CR0.PG=0
+>    KVM: VMX: Process CR0.PG side effects after setting CR0 assets
+>    KVM: VMX: Skip emulation required checks during pmode/rmode
+>      transitions
+>    KVM: nVMX: Don't evaluate "emulation required" on nested VM-Exit
+>    KVM: SVM: Tweak order of cr0/cr4/efer writes at RESET/INIT
+>    KVM: SVM: Drop redundant writes to vmcb->save.cr4 at RESET/INIT
+>    KVM: SVM: Stuff save->dr6 at during VMSA sync, not at RESET/INIT
+>    KVM: VMX: Skip pointless MSR bitmap update when setting EFER
+>    KVM: VMX: Refresh list of user return MSRs after setting guest CPUID
+>    KVM: VMX: Don't _explicitly_ reconfigure user return MSRs on vCPU INIT
+>    KVM: x86: Move setting of sregs during vCPU RESET/INIT to common x86
+>    KVM: VMX: Remove obsolete MSR bitmap refresh at vCPU RESET/INIT
+>    KVM: nVMX: Remove obsolete MSR bitmap refresh at nested transitions
+>    KVM: VMX: Don't redo x2APIC MSR bitmaps when userspace filter is
+>      changed
+>    KVM: VMX: Remove unnecessary initialization of msr_bitmap_mode
+>    KVM: VMX: Smush x2APIC MSR bitmap adjustments into single function
+>    KVM: VMX: Remove redundant write to set vCPU as active at RESET/INIT
+>    KVM: VMX: Move RESET-only VMWRITE sequences to init_vmcs()
+>    KVM: SVM: Emulate #INIT in response to triple fault shutdown
+>    KVM: SVM: Drop redundant clearing of vcpu->arch.hflags at INIT/RESET
+>    KVM: x86: Preserve guest's CR0.CD/NW on INIT
+> 
+>   arch/x86/include/asm/kvm_host.h |   5 -
+>   arch/x86/kvm/i8254.c            |   3 +-
+>   arch/x86/kvm/lapic.c            |  26 +--
+>   arch/x86/kvm/svm/sev.c          |   1 +
+>   arch/x86/kvm/svm/svm.c          |  48 ++----
+>   arch/x86/kvm/vmx/nested.c       |  24 ++-
+>   arch/x86/kvm/vmx/vmx.c          | 270 +++++++++++++++-----------------
+>   arch/x86/kvm/vmx/vmx.h          |   5 +-
+>   arch/x86/kvm/x86.c              |  52 +++++-
+>   9 files changed, 211 insertions(+), 223 deletions(-)
+> 
 
-Besides the check which can be dropped in mmu_spte_clear_track_bits,
-this looks good to me.
+Queued, except for patches 9-10.
 
-Reviewed-by: Ben Gardon <bgardon@google.com>
+I'd rather have init_vmcb/svm_vcpu_reset look more like the VMX code, 
+with the INIT code moved to svm_vcpu_reset and the rest remaining in 
+init_vmcb.
 
-> > ---
-> >  arch/x86/include/asm/kvm_host.h | 10 +++++++++-
-> >  arch/x86/kvm/mmu.h              |  2 ++
-> >  arch/x86/kvm/mmu/mmu.c          | 32 +++++++++++++++++++-------------
-> >  arch/x86/kvm/mmu/tdp_mmu.c      | 15 ++-------------
-> >  arch/x86/kvm/x86.c              |  7 +++++--
-> >  5 files changed, 37 insertions(+), 29 deletions(-)
-> >
-> > diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-> > index 974cbfb1eefe..2e4b6fd36e62 100644
-> > --- a/arch/x86/include/asm/kvm_host.h
-> > +++ b/arch/x86/include/asm/kvm_host.h
-> > @@ -1206,9 +1206,17 @@ struct kvm_vm_stat {
-> >         u64 mmu_recycled;
-> >         u64 mmu_cache_miss;
-> >         u64 mmu_unsync;
-> > -       u64 lpages;
-> >         u64 nx_lpage_splits;
-> >         u64 max_mmu_page_hash_collisions;
-> > +       union {
-> > +               struct {
-> > +                       atomic64_t pages_4k;
-> > +                       atomic64_t pages_2m;
-> > +                       atomic64_t pages_1g;
-> > +                       atomic64_t pages_512g;
-> > +               };
-> > +               atomic64_t pages[4];
-> > +       } page_stats;
-> >  };
-> >
-> >  struct kvm_vcpu_stat {
-> > diff --git a/arch/x86/kvm/mmu.h b/arch/x86/kvm/mmu.h
-> > index 83e6c6965f1e..ad5638815311 100644
-> > --- a/arch/x86/kvm/mmu.h
-> > +++ b/arch/x86/kvm/mmu.h
-> > @@ -240,4 +240,6 @@ static inline bool kvm_memslots_have_rmaps(struct kvm *kvm)
-> >         return smp_load_acquire(&kvm->arch.memslots_have_rmaps);
-> >  }
-> >
-> > +void kvm_update_page_stats(struct kvm *kvm, int level, int count);
-> > +
-> >  #endif
-> > diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> > index 442cc554ebd6..7e0fc760739b 100644
-> > --- a/arch/x86/kvm/mmu/mmu.c
-> > +++ b/arch/x86/kvm/mmu/mmu.c
-> > @@ -588,16 +588,22 @@ static bool mmu_spte_update(u64 *sptep, u64 new_spte)
-> >         return flush;
-> >  }
-> >
-> > +void kvm_update_page_stats(struct kvm *kvm, int level, int count)
-> > +{
-> > +       atomic64_add(count, &kvm->stat.page_stats.pages[level - 1]);
-> > +}
-> > +
-> >  /*
-> >   * Rules for using mmu_spte_clear_track_bits:
-> >   * It sets the sptep from present to nonpresent, and track the
-> >   * state bits, it is used to clear the last level sptep.
-> >   * Returns non-zero if the PTE was previously valid.
-> >   */
-> > -static int mmu_spte_clear_track_bits(u64 *sptep)
-> > +static int mmu_spte_clear_track_bits(struct kvm *kvm, u64 *sptep)
-> >  {
-> >         kvm_pfn_t pfn;
-> >         u64 old_spte = *sptep;
-> > +       int level = sptep_to_sp(sptep)->role.level;
-> >
-> >         if (!spte_has_volatile_bits(old_spte))
-> >                 __update_clear_spte_fast(sptep, 0ull);
-> > @@ -607,6 +613,9 @@ static int mmu_spte_clear_track_bits(u64 *sptep)
-> >         if (!is_shadow_present_pte(old_spte))
-> >                 return 0;
-> >
-> > +       if (is_last_spte(old_spte, level))
->
-> You can drop this check since it's part of the contract for calling
-> this function.
->
-> > +               kvm_update_page_stats(kvm, level, -1);
-> > +
-> >         pfn = spte_to_pfn(old_spte);
-> >
-> >         /*
-> > @@ -984,9 +993,10 @@ static void __pte_list_remove(u64 *spte, struct kvm_rmap_head *rmap_head)
-> >         }
-> >  }
-> >
-> > -static void pte_list_remove(struct kvm_rmap_head *rmap_head, u64 *sptep)
-> > +static void pte_list_remove(struct kvm *kvm, struct kvm_rmap_head *rmap_head,
-> > +                           u64 *sptep)
-> >  {
-> > -       mmu_spte_clear_track_bits(sptep);
-> > +       mmu_spte_clear_track_bits(kvm, sptep);
-> >         __pte_list_remove(sptep, rmap_head);
-> >  }
-> >
-> > @@ -1119,7 +1129,7 @@ static u64 *rmap_get_next(struct rmap_iterator *iter)
-> >
-> >  static void drop_spte(struct kvm *kvm, u64 *sptep)
-> >  {
-> > -       if (mmu_spte_clear_track_bits(sptep))
-> > +       if (mmu_spte_clear_track_bits(kvm, sptep))
-> >                 rmap_remove(kvm, sptep);
-> >  }
-> >
-> > @@ -1129,7 +1139,6 @@ static bool __drop_large_spte(struct kvm *kvm, u64 *sptep)
-> >         if (is_large_pte(*sptep)) {
-> >                 WARN_ON(sptep_to_sp(sptep)->role.level == PG_LEVEL_4K);
-> >                 drop_spte(kvm, sptep);
-> > -               --kvm->stat.lpages;
-> >                 return true;
-> >         }
-> >
-> > @@ -1386,7 +1395,7 @@ static bool kvm_zap_rmapp(struct kvm *kvm, struct kvm_rmap_head *rmap_head,
-> >         while ((sptep = rmap_get_first(rmap_head, &iter))) {
-> >                 rmap_printk("spte %p %llx.\n", sptep, *sptep);
-> >
-> > -               pte_list_remove(rmap_head, sptep);
-> > +               pte_list_remove(kvm, rmap_head, sptep);
-> >                 flush = true;
-> >         }
-> >
-> > @@ -1421,13 +1430,13 @@ static bool kvm_set_pte_rmapp(struct kvm *kvm, struct kvm_rmap_head *rmap_head,
-> >                 need_flush = 1;
-> >
-> >                 if (pte_write(pte)) {
-> > -                       pte_list_remove(rmap_head, sptep);
-> > +                       pte_list_remove(kvm, rmap_head, sptep);
-> >                         goto restart;
-> >                 } else {
-> >                         new_spte = kvm_mmu_changed_pte_notifier_make_spte(
-> >                                         *sptep, new_pfn);
-> >
-> > -                       mmu_spte_clear_track_bits(sptep);
-> > +                       mmu_spte_clear_track_bits(kvm, sptep);
-> >                         mmu_spte_set(sptep, new_spte);
-> >                 }
-> >         }
-> > @@ -2232,8 +2241,6 @@ static int mmu_page_zap_pte(struct kvm *kvm, struct kvm_mmu_page *sp,
-> >         if (is_shadow_present_pte(pte)) {
-> >                 if (is_last_spte(pte, sp->role.level)) {
-> >                         drop_spte(kvm, spte);
-> > -                       if (is_large_pte(pte))
-> > -                               --kvm->stat.lpages;
-> >                 } else {
-> >                         child = to_shadow_page(pte & PT64_BASE_ADDR_MASK);
-> >                         drop_parent_pte(child, spte);
-> > @@ -2692,8 +2699,7 @@ static int mmu_set_spte(struct kvm_vcpu *vcpu, u64 *sptep,
-> >         trace_kvm_mmu_set_spte(level, gfn, sptep);
-> >
-> >         if (!was_rmapped) {
-> > -               if (is_large_pte(*sptep))
-> > -                       ++vcpu->kvm->stat.lpages;
-> > +               kvm_update_page_stats(vcpu->kvm, level, 1);
-> >                 rmap_count = rmap_add(vcpu, sptep, gfn);
-> >                 if (rmap_count > RMAP_RECYCLE_THRESHOLD)
-> >                         rmap_recycle(vcpu, sptep, gfn);
-> > @@ -5669,7 +5675,7 @@ static bool kvm_mmu_zap_collapsible_spte(struct kvm *kvm,
-> >                 if (sp->role.direct && !kvm_is_reserved_pfn(pfn) &&
-> >                     sp->role.level < kvm_mmu_max_mapping_level(kvm, slot, sp->gfn,
-> >                                                                pfn, PG_LEVEL_NUM)) {
-> > -                       pte_list_remove(rmap_head, sptep);
-> > +                       pte_list_remove(kvm, rmap_head, sptep);
-> >
-> >                         if (kvm_available_flush_tlb_with_range())
-> >                                 kvm_flush_remote_tlbs_with_address(kvm, sp->gfn,
-> > diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
-> > index cba2ab5db2a0..eae404c15364 100644
-> > --- a/arch/x86/kvm/mmu/tdp_mmu.c
-> > +++ b/arch/x86/kvm/mmu/tdp_mmu.c
-> > @@ -413,7 +413,6 @@ static void __handle_changed_spte(struct kvm *kvm, int as_id, gfn_t gfn,
-> >         bool was_leaf = was_present && is_last_spte(old_spte, level);
-> >         bool is_leaf = is_present && is_last_spte(new_spte, level);
-> >         bool pfn_changed = spte_to_pfn(old_spte) != spte_to_pfn(new_spte);
-> > -       bool was_large, is_large;
-> >
-> >         WARN_ON(level > PT64_ROOT_MAX_LEVEL);
-> >         WARN_ON(level < PG_LEVEL_4K);
-> > @@ -472,18 +471,8 @@ static void __handle_changed_spte(struct kvm *kvm, int as_id, gfn_t gfn,
-> >                 return;
-> >         }
-> >
-> > -       /*
-> > -        * Update large page stats if a large page is being zapped, created, or
-> > -        * is replacing an existing shadow page.
-> > -        */
-> > -       was_large = was_leaf && is_large_pte(old_spte);
-> > -       is_large = is_leaf && is_large_pte(new_spte);
-> > -       if (was_large != is_large) {
-> > -               if (was_large)
-> > -                       atomic64_sub(1, (atomic64_t *)&kvm->stat.lpages);
-> > -               else
-> > -                       atomic64_add(1, (atomic64_t *)&kvm->stat.lpages);
-> > -       }
-> > +       if (is_leaf != was_leaf)
-> > +               kvm_update_page_stats(kvm, level, is_leaf ? 1 : -1);
-> >
-> >         if (was_leaf && is_dirty_spte(old_spte) &&
-> >             (!is_present || !is_dirty_spte(new_spte) || pfn_changed))
-> > diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> > index 8166ad113fb2..3858d36d3c49 100644
-> > --- a/arch/x86/kvm/x86.c
-> > +++ b/arch/x86/kvm/x86.c
-> > @@ -235,9 +235,12 @@ const struct _kvm_stats_desc kvm_vm_stats_desc[] = {
-> >         STATS_DESC_COUNTER(VM, mmu_recycled),
-> >         STATS_DESC_COUNTER(VM, mmu_cache_miss),
-> >         STATS_DESC_ICOUNTER(VM, mmu_unsync),
-> > -       STATS_DESC_ICOUNTER(VM, lpages),
-> >         STATS_DESC_ICOUNTER(VM, nx_lpage_splits),
-> > -       STATS_DESC_PCOUNTER(VM, max_mmu_page_hash_collisions)
-> > +       STATS_DESC_PCOUNTER(VM, max_mmu_page_hash_collisions),
-> > +       STATS_DESC_ICOUNTER(VM, page_stats.pages_4k),
-> > +       STATS_DESC_ICOUNTER(VM, page_stats.pages_2m),
-> > +       STATS_DESC_ICOUNTER(VM, page_stats.pages_1g),
-> > +       STATS_DESC_ICOUNTER(VM, page_stats.pages_512g)
-> >  };
-> >  static_assert(ARRAY_SIZE(kvm_vm_stats_desc) ==
-> >                 sizeof(struct kvm_vm_stat) / sizeof(u64));
-> > --
-> > 2.32.0.432.gabb21c7263-goog
-> >
+Paolo
+
