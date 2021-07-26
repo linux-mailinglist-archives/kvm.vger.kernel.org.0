@@ -2,53 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4C3F33D6610
-	for <lists+kvm@lfdr.de>; Mon, 26 Jul 2021 19:54:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0E11A3D6611
+	for <lists+kvm@lfdr.de>; Mon, 26 Jul 2021 19:54:11 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231954AbhGZRNk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 26 Jul 2021 13:13:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49034 "EHLO
+        id S232031AbhGZRNl (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 26 Jul 2021 13:13:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49042 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231808AbhGZRNi (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 26 Jul 2021 13:13:38 -0400
-Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9217EC061757
-        for <kvm@vger.kernel.org>; Mon, 26 Jul 2021 10:54:05 -0700 (PDT)
-Received: by mail-yb1-xb4a.google.com with SMTP id v4-20020a2583c40000b029055bc7fcfebdso14880475ybm.12
-        for <kvm@vger.kernel.org>; Mon, 26 Jul 2021 10:54:05 -0700 (PDT)
+        with ESMTP id S231844AbhGZRNj (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 26 Jul 2021 13:13:39 -0400
+Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4BEE7C061765
+        for <kvm@vger.kernel.org>; Mon, 26 Jul 2021 10:54:07 -0700 (PDT)
+Received: by mail-yb1-xb49.google.com with SMTP id a6-20020a25ae060000b0290551bbd99700so15027153ybj.6
+        for <kvm@vger.kernel.org>; Mon, 26 Jul 2021 10:54:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
-        h=reply-to:date:message-id:mime-version:subject:from:to:cc;
-        bh=iNYVBs0AlyXj+Pf0K8g701Ap0orIY/meGZcAzDBxrDo=;
-        b=miNHBH7hW6kovC9YoXVCmEdbzW6eUBOxsUtgNC4b4MUvD8pPcWEruRp8oeVgH1Skv1
-         dkWtMY7BRyi+AuFvN58gaTYjrNZ10owOzNdVhhybXi6vd/yQ4bICtHj6X68Brc4DeS65
-         zn5VDwtZTvQneWEWiA2q9cax/fV998DIpP4VxrdR14uIVxe25nxAJvDQrX/XAFb4C5/e
-         gf9r05QYo3lQ/EOR794XMEBqFLjBWsYcDcETYC05fNoSWbMV7RRH+FMP0EihEoLXvJYm
-         J/bV6x/rsFZ7lTZ6k7MMvea8dwxU6KHhDCGX/F4+N6EJjRrBa64R0WHJaDjVo9RMGTg7
-         +fIg==
+        h=reply-to:date:in-reply-to:message-id:mime-version:references
+         :subject:from:to:cc;
+        bh=btPFck1XzpE3aBH1Nm3kzDvWZMQLegGwPNOaeKtJDeI=;
+        b=Uw2Y7dstn1klTtFavjKJYv6imv/nRJZdjGus8S7vEDypmeFKTEeiTiAPic5mjTvmN1
+         SmFPjksQQazwFhsaqlxv9rSFVtbtkGRmdSPSI3iwLrtUahPoCVWTAZj73EDjzLbLFAdQ
+         AIrh+YYmw7qYqA59UIL2dy0K5Gfk10WTJiXEe2RSPZgYZAalpxsTnCrG+xu/Wa3055QL
+         UdRKL4B7EG/FY7iKu6xGvo/UGhmNLgrxgfR8P16tABrGA6zgEsawICui24GeBiHI0u9D
+         YVjIS+7JOy/MX9Jymr2azwpOE2vUjy7RuOKBL94dNVcD2VUFU4lXki6FOyasHwnuXMAu
+         i96g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:reply-to:date:message-id:mime-version:subject
-         :from:to:cc;
-        bh=iNYVBs0AlyXj+Pf0K8g701Ap0orIY/meGZcAzDBxrDo=;
-        b=nt1G45ye0XHLXQGAWF6ktHpyZV18xI7WBUB4mp+M94iqVFRHe4F9YqYXxQAOyUvieA
-         5RBu9pHntAGhZJkuDoJIeKS949iw6J3gIhevQcsTEN+5YEil83nbxUAzjGpdVr3XkzF+
-         r5+zFn8U+EcCKYeigv2j6hfYUYRXSPKK8Ud9ZnagFlJyY7jc/s8/r9oi++mREnRS2VWv
-         fS4dYlXZE8pSmiVDnGv03FUgZWd/1aH7d/z5EVqgwH9p5c5FkDXnBqa2v/EVHAv+q+al
-         /3CgHEddG3qhl46ww4jCAkV5XCgv2MOV+1KyNoUP6QWAUJXYepG0cXPMKv+jwHuLJakr
-         PRdQ==
-X-Gm-Message-State: AOAM5302CnBQQymjsmK4GEHpOAGYmXSl7s5Q43RZI0oPxyPeLqtDMC+9
-        Js+ZjsrqxarX8vk2UtrIFV5x42gqVSwN
-X-Google-Smtp-Source: ABdhPJzBRwQ5cz8oPwaWPe/0CHP+jy8rc7ewZVqFa91UsySUdk/6f43vkM/EVwWiu8a1sdoYQy9KnvTLMOb0
+        h=x-gm-message-state:reply-to:date:in-reply-to:message-id
+         :mime-version:references:subject:from:to:cc;
+        bh=btPFck1XzpE3aBH1Nm3kzDvWZMQLegGwPNOaeKtJDeI=;
+        b=Bj18LqF8zYYHpe8Y/yPtbcOvD2XIc69RCyIkQimiGcVqy5Kh2sHOxz+0m0cD3zGQbd
+         ZRvGhlPtKRRM4hxbFjV3cna3fThYZWygY+atoHuKj85cxqUqAV7q0w3FDNzYfMDC3B46
+         U2D42MnKMkUzCUL3u3J7bXfKTvp/cx1MVUlExMeu1ztqI1RT3e/TbxTC/1bzI/kwytbd
+         0dfgPUvyiDmUdpzqNKt/RWmmrWfnBKB8oHzwpEKclBRmFS/nky/UI6siJQhGTRMK/qea
+         lBmTJZ4lG6oPsCqJ766SKJ8W3TF0mIN18iPNvq4bjZKDgcj+038gdikL/4WAAjo/wmjM
+         uqLg==
+X-Gm-Message-State: AOAM531Mv6CkA4qE2IlWIj7HQ2Zsv0Goc8ZzytjMm7mYgy9UN1f4D5cR
+        I1hsaJoQPmJLarEl14f97vL/U4fOOwZu
+X-Google-Smtp-Source: ABdhPJxbWjqm+qvuS5zbnPd0y4Yutx6fHaBzxcJFAe0ph999LdcGRPHqHceXJ/pOUHzCB2QSmmaKGjh4nkGh
 X-Received: from mihenry-linux-desktop.kir.corp.google.com ([2620:15c:29:204:93c5:105:4dbc:13cf])
- (user=mizhang job=sendgmr) by 2002:a25:7685:: with SMTP id
- r127mr4507241ybc.30.1627322044744; Mon, 26 Jul 2021 10:54:04 -0700 (PDT)
+ (user=mizhang job=sendgmr) by 2002:a25:188b:: with SMTP id
+ 133mr24756922yby.80.1627322046468; Mon, 26 Jul 2021 10:54:06 -0700 (PDT)
 Reply-To: Mingwei Zhang <mizhang@google.com>
-Date:   Mon, 26 Jul 2021 10:53:54 -0700
-Message-Id: <20210726175357.1572951-1-mizhang@google.com>
+Date:   Mon, 26 Jul 2021 10:53:55 -0700
+In-Reply-To: <20210726175357.1572951-1-mizhang@google.com>
+Message-Id: <20210726175357.1572951-2-mizhang@google.com>
 Mime-Version: 1.0
+References: <20210726175357.1572951-1-mizhang@google.com>
 X-Mailer: git-send-email 2.32.0.432.gabb21c7263-goog
-Subject: [PATCH v2 0/3] Add detailed page size stats in KVM stats
+Subject: [PATCH v2 1/3] KVM: x86/mmu: Remove redundant spte present check in mmu_set_spte
 From:   Mingwei Zhang <mizhang@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     Sean Christopherson <seanjc@google.com>,
@@ -64,38 +67,48 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This commit basically adds detailed (large and regular) page size info to
-KVM stats and deprecate the old one: lpages.
+Drop an unnecessary is_shadow_present_pte() check when updating the rmaps
+after installing a non-MMIO SPTE.  set_spte() is used only to create
+shadow-present SPTEs, e.g. MMIO SPTEs are handled early on, mmu_set_spte()
+runs with mmu_lock held for write, i.e. the SPTE can't be zapped between
+writing the SPTE and updating the rmaps.
 
-To support legacy MMU and TDP mmu, we use atomic type for all page stats.
+Opportunistically combine the "new SPTE" logic for large pages and rmaps.
 
-v1 -> v2:
- - refactor kvm_update_page_stats and remove 'spte' argument. [sean]
- - remove 'lpages' as it can be aggregated by user level [sean]
- - fix lpages stats update issue in __handle_change_pte [sean]
- - fix style issues and typos. [ben/sean]
+No functional change intended.
 
-pre-v1 (internal reviewers):
- - use atomic in all page stats and use 'level' as index. [sean]
- - use an extra argument in kvm_update_page_stats for atomic/non-atomic.
-   [bgardon]
- - should be careful on the difference between legacy mmu and tdp mmu.
-   [jingzhangos]
+Suggested-by: Ben Gardon <bgardon@google.com>
+Signed-off-by: Mingwei Zhang <mizhang@google.com>
+---
+ arch/x86/kvm/mmu/mmu.c | 14 ++++++--------
+ 1 file changed, 6 insertions(+), 8 deletions(-)
 
-
-Mingwei Zhang (3):
-  kvm: mmu/x86: Remove redundant spte present check in mmu_set_spte
-  KVM: x86/mmu: Avoid collision with !PRESENT SPTEs in TDP MMU lpage
-    stats
-  kvm: mmu/x86: Add detailed page size stats
-
- arch/x86/include/asm/kvm_host.h | 10 +++++++-
- arch/x86/kvm/mmu.h              |  2 ++
- arch/x86/kvm/mmu/mmu.c          | 42 ++++++++++++++++++---------------
- arch/x86/kvm/mmu/tdp_mmu.c      |  9 ++-----
- arch/x86/kvm/x86.c              |  7 ++++--
- 5 files changed, 41 insertions(+), 29 deletions(-)
-
---
+diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+index b888385d1933..442cc554ebd6 100644
+--- a/arch/x86/kvm/mmu/mmu.c
++++ b/arch/x86/kvm/mmu/mmu.c
+@@ -2690,15 +2690,13 @@ static int mmu_set_spte(struct kvm_vcpu *vcpu, u64 *sptep,
+ 
+ 	pgprintk("%s: setting spte %llx\n", __func__, *sptep);
+ 	trace_kvm_mmu_set_spte(level, gfn, sptep);
+-	if (!was_rmapped && is_large_pte(*sptep))
+-		++vcpu->kvm->stat.lpages;
+ 
+-	if (is_shadow_present_pte(*sptep)) {
+-		if (!was_rmapped) {
+-			rmap_count = rmap_add(vcpu, sptep, gfn);
+-			if (rmap_count > RMAP_RECYCLE_THRESHOLD)
+-				rmap_recycle(vcpu, sptep, gfn);
+-		}
++	if (!was_rmapped) {
++		if (is_large_pte(*sptep))
++			++vcpu->kvm->stat.lpages;
++		rmap_count = rmap_add(vcpu, sptep, gfn);
++		if (rmap_count > RMAP_RECYCLE_THRESHOLD)
++			rmap_recycle(vcpu, sptep, gfn);
+ 	}
+ 
+ 	return ret;
+-- 
 2.32.0.432.gabb21c7263-goog
 
