@@ -2,72 +2,68 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A76103D592C
-	for <lists+kvm@lfdr.de>; Mon, 26 Jul 2021 14:10:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C2C043D593C
+	for <lists+kvm@lfdr.de>; Mon, 26 Jul 2021 14:14:31 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233788AbhGZL3a (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 26 Jul 2021 07:29:30 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:24039 "EHLO
+        id S233787AbhGZLeB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 26 Jul 2021 07:34:01 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:45249 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S233763AbhGZL33 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 26 Jul 2021 07:29:29 -0400
+        by vger.kernel.org with ESMTP id S233713AbhGZLeA (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 26 Jul 2021 07:34:00 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1627301397;
+        s=mimecast20190719; t=1627301669;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=dR3iMn5XpVkez/+wHkSECFYP9sgFxn9jkjpt8nIR5Uc=;
-        b=bDZHSofPgtZaqb51+KbSQkDtLS5KMarZZFI65RhXPkP8M91OXFz8j+dmvxC+43nnEu2lJf
-        89tX/FLOv90NrcGyr2xMq6VCpH6ZyhXdNV1RwYCD+m1GwlFDEcmR8xXhF4JcedZXH2E6og
-        eyWWR/KhutzFpzRhKafiObPt6KKVEJQ=
-Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
- [209.85.218.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-420-1ctmpAOSNz-AR7BSf5kTiw-1; Mon, 26 Jul 2021 08:09:56 -0400
-X-MC-Unique: 1ctmpAOSNz-AR7BSf5kTiw-1
-Received: by mail-ej1-f72.google.com with SMTP id lu19-20020a170906fad3b029058768348f55so75680ejb.12
-        for <kvm@vger.kernel.org>; Mon, 26 Jul 2021 05:09:56 -0700 (PDT)
+        bh=l8qGiQz3VQ7BrS8Z7XwbbqFHsjEr3JqzjnNgGqy5mwQ=;
+        b=V+R0vNmsStFvG11SAwzteagd7TpI68+aaa+kgmqZp9oNb/WbgPHQUW3ZvHTwFt+HT6y/MB
+        C9CEGQsgAcq9kgmEsxCq3RXuxpNVJWntCR10di1uQ2rmgvcPUda5RYtF7Xgkk4TDGY8xMV
+        kOiPpxVPTVCvPgpKhh/aXbPfAvP6tms=
+Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
+ [209.85.208.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-438-uJdiJ5TeMDSP3ABAT0GfvQ-1; Mon, 26 Jul 2021 08:14:27 -0400
+X-MC-Unique: uJdiJ5TeMDSP3ABAT0GfvQ-1
+Received: by mail-ed1-f72.google.com with SMTP id c1-20020aa7df010000b02903bb5c6f746eso2283466edy.10
+        for <kvm@vger.kernel.org>; Mon, 26 Jul 2021 05:14:27 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=dR3iMn5XpVkez/+wHkSECFYP9sgFxn9jkjpt8nIR5Uc=;
-        b=IRQA4wbasaUfob/um44+AyOKXMYpxDhdlPmiyzW8BWIYVVYICnWPkaC8KufmXXiKH/
-         fYsDyXD2AoZZdjkA5+gcDrBHLCPUX4mrQ+3zkwisXm90aiiLrzOxB/Z9iHiaFZqp7llD
-         ypN3XRWcgnV0WCSUb0ZrLMdioWhSQfXTT6mNSW6L2M8tMud8EefsUoyXhqn4v8Tnifm6
-         fZQakCc4zAoaqMvVvJm97Vova7ubARBMsxhOln32x0D6DmSKH6emJpWGu93fvKrWVRWz
-         2qlrpMho1DfTqFJMnj3begcV0sV5ttGbwNcBRQ761Cenx3twovyvdTfkaStqvk8UQP/Q
-         HKqw==
-X-Gm-Message-State: AOAM531xwZI+ixqJdfHtnRShSqPMQlVOEHXFI/0kYOFKNGBHzEzOkFbe
-        XbPnrKdpvehOR+7vJvhstF5qK+sRnilvOwnbNBRHnGJmMsTeS7k1DdVZoYl/8b6aoLEknDpDSI/
-        TfE0yrL7tpiXz
-X-Received: by 2002:a05:6402:278e:: with SMTP id b14mr20836482ede.277.1627301394782;
-        Mon, 26 Jul 2021 05:09:54 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxG/K6orRo8FdAJeANVHYVJ7oWfky5S48VStZ68j2xJl+uCgPs+Dvd7uIrzacxbfwHidHnLqw==
-X-Received: by 2002:a05:6402:278e:: with SMTP id b14mr20836460ede.277.1627301394623;
-        Mon, 26 Jul 2021 05:09:54 -0700 (PDT)
+        bh=l8qGiQz3VQ7BrS8Z7XwbbqFHsjEr3JqzjnNgGqy5mwQ=;
+        b=p6+2WsU+Y0H33BttLHpVyFsoXDDWZhq5ZZ+dr3aOr5OMBCutDzm3uiQt5KPzdtvjnW
+         RcErlw9YR5pfnjm8WMb5mFKgbo3+97EcQMmv/A0daVIM0rv/jYOJ2XVCXgMo9XGi0Jtw
+         u0l56c3LjVN38VcDP2qLdgd+Pcsli6DBe6nWkIbfr9iviC38TiFG1AO7WjmyoNleHwV2
+         sZsvw1ld4SmoaCC2F9L+pNLjkBL5xSgL7I/HEPZE6lgVdjmzQQPzzfWad7lpC5G3a7xK
+         RzqViomsEcXQJnoXB2ocG0aZMbRPb2bl7ACcaM0aXzJlJPH7pdxVtmHHtOuPbMtaQmNo
+         jWkg==
+X-Gm-Message-State: AOAM532B9tORbBsMkqQjnq4mpXM5F+GEzHnpKAPyRKk3et4ph+SH8BGK
+        /WDxzX60IGONfiWKN8rzeTVp7SoUPKQ5L/oT1rbBOuV0yeNozrAdm8PSpsfjGZsnyD5d6ZhTK7R
+        bmZ2lQn9Z60aj
+X-Received: by 2002:a17:906:cb8b:: with SMTP id mf11mr16699915ejb.297.1627301666760;
+        Mon, 26 Jul 2021 05:14:26 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJw2NZQjmaWm/QTte07gegfpOX0ZgghxEic+eXOFALiBVmq37R+ta/ALWSWiHyMd0qZy53433Q==
+X-Received: by 2002:a17:906:cb8b:: with SMTP id mf11mr16699904ejb.297.1627301666586;
+        Mon, 26 Jul 2021 05:14:26 -0700 (PDT)
 Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id em9sm14213522ejc.88.2021.07.26.05.09.53
+        by smtp.gmail.com with ESMTPSA id i6sm14083783ejr.68.2021.07.26.05.14.25
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 26 Jul 2021 05:09:54 -0700 (PDT)
-Subject: Re: [PATCH] KVM: nSVM: Rename nested_svm_vmloadsave() to
- svm_copy_vmloadsave_state()
-To:     Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>
-Cc:     kvm@vger.kernel.org, Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Maxim Levitsky <mlevitsk@redhat.com>,
-        linux-kernel@vger.kernel.org
-References: <20210716144104.465269-1-vkuznets@redhat.com>
- <YPG7XVwkze/3YDaI@google.com>
+        Mon, 26 Jul 2021 05:14:26 -0700 (PDT)
+Subject: Re: [PATCH 0/2 v2] Test: nSVM: Test the effect of guest EFLAGS.TF on
+ VMRUN
+To:     Krish Sadhukhan <krish.sadhukhan@oracle.com>, kvm@vger.kernel.org
+Cc:     jmattson@google.com, seanjc@google.com, vkuznets@redhat.com,
+        wanpengli@tencent.com, joro@8bytes.org
+References: <20210719174617.241568-1-krish.sadhukhan@oracle.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <a28699c3-d557-2c8f-f79e-c97a5cdb9035@redhat.com>
-Date:   Mon, 26 Jul 2021 14:09:53 +0200
+Message-ID: <e1549127-8a11-cf5d-6ea3-890cbe14e374@redhat.com>
+Date:   Mon, 26 Jul 2021 14:14:25 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.11.0
 MIME-Version: 1.0
-In-Reply-To: <YPG7XVwkze/3YDaI@google.com>
+In-Reply-To: <20210719174617.241568-1-krish.sadhukhan@oracle.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -75,24 +71,32 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 16/07/21 19:01, Sean Christopherson wrote:
-> On Fri, Jul 16, 2021, Vitaly Kuznetsov wrote:
->> diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
->> index 3bd09c50c98b..8493592b63b4 100644
->> --- a/arch/x86/kvm/svm/nested.c
->> +++ b/arch/x86/kvm/svm/nested.c
->> @@ -722,7 +722,7 @@ void svm_copy_vmrun_state(struct vmcb_save_area *from_save,
->>   	to_save->cpl = 0;
->>   }
->>   
->> -void nested_svm_vmloadsave(struct vmcb *from_vmcb, struct vmcb *to_vmcb)
->> +void svm_copy_vmloadsave_state(struct vmcb *from_vmcb, struct vmcb *to_vmcb)
+On 19/07/21 19:46, Krish Sadhukhan wrote:
+> v1 -> v2:
+> 	In patch# 1, the new function is now called __svm_vmrun() per
+> 	suggestion from Sean. I have also adjusted the commit header and
+> 	the commit message.
 > 
-> And swap the parameter order for both functions in a follow-up patch?  I.e. have
-> the destination first to match memcpy().
+> 
+> Patch# 1: Adds a variant of svm_vmrun() so that custom guest code can be used.
+> Patch# 2: Tests the effects of guest EFLAGS.TF on VMRUN.
+> 
+> [PATCH 1/2 v2] nSVM: Add a variant of svm_vmrun() for setting guest RIP
+> [PATCH 2/2 v2] Test: nSVM: Test the effect of guest EFLAGS.TF on VMRUN
+> 
+>   x86/svm.c       |  9 +++++++--
+>   x86/svm.h       |  1 +
+>   x86/svm_tests.c | 61 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+>   3 files changed, 69 insertions(+), 2 deletions(-)
+> 
+> Krish Sadhukhan (2):
+>        nSVM: Add a variant of svm_vmrun() for setting guest RIP to custom code
+>        Test: nSVM: Test the effect of guest EFLAGS.TF on VMRUN
 > 
 
-Queued, thanks.
+Queued, thanks.  However, I placed this in a different test than 
+svm_guest_state_test, since that one is more evaluating invalid (or 
+silently canonicalized) data.
 
 Paolo
 
