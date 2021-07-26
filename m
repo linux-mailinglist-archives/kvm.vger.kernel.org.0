@@ -2,68 +2,71 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C2C043D593C
-	for <lists+kvm@lfdr.de>; Mon, 26 Jul 2021 14:14:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2BE453D5961
+	for <lists+kvm@lfdr.de>; Mon, 26 Jul 2021 14:24:43 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233787AbhGZLeB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 26 Jul 2021 07:34:01 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:45249 "EHLO
+        id S233953AbhGZLoM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 26 Jul 2021 07:44:12 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:44812 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S233713AbhGZLeA (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 26 Jul 2021 07:34:00 -0400
+        by vger.kernel.org with ESMTP id S234011AbhGZLoL (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 26 Jul 2021 07:44:11 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1627301669;
+        s=mimecast20190719; t=1627302279;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=l8qGiQz3VQ7BrS8Z7XwbbqFHsjEr3JqzjnNgGqy5mwQ=;
-        b=V+R0vNmsStFvG11SAwzteagd7TpI68+aaa+kgmqZp9oNb/WbgPHQUW3ZvHTwFt+HT6y/MB
-        C9CEGQsgAcq9kgmEsxCq3RXuxpNVJWntCR10di1uQ2rmgvcPUda5RYtF7Xgkk4TDGY8xMV
-        kOiPpxVPTVCvPgpKhh/aXbPfAvP6tms=
-Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
- [209.85.208.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-438-uJdiJ5TeMDSP3ABAT0GfvQ-1; Mon, 26 Jul 2021 08:14:27 -0400
-X-MC-Unique: uJdiJ5TeMDSP3ABAT0GfvQ-1
-Received: by mail-ed1-f72.google.com with SMTP id c1-20020aa7df010000b02903bb5c6f746eso2283466edy.10
-        for <kvm@vger.kernel.org>; Mon, 26 Jul 2021 05:14:27 -0700 (PDT)
+        bh=DDjfF9jVeDMoFc1B4dOVhxT79PSNsJ6sGo3EB2J45Z8=;
+        b=Q+LKGuR30iPfG5lmBqgjassy0YRPr4Gh8D9reDp+kZmG6cYJYZo78d1fWwEgzvZTR4lw3I
+        MPDhWRwSdmvvvqlAljMNU+xlDLm9BoloJMO8KtxVtOCwGQ1xygfuUnaj0a71CKYSM17ge2
+        206+1tO7Sr99u1Bs/XuAvf4vvh9sQVc=
+Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
+ [209.85.218.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-403-rifgZKWbNhCw1oqvfeZc9g-1; Mon, 26 Jul 2021 08:24:38 -0400
+X-MC-Unique: rifgZKWbNhCw1oqvfeZc9g-1
+Received: by mail-ej1-f71.google.com with SMTP id u8-20020a170906c408b02904e0a2912b46so2035746ejz.7
+        for <kvm@vger.kernel.org>; Mon, 26 Jul 2021 05:24:38 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=l8qGiQz3VQ7BrS8Z7XwbbqFHsjEr3JqzjnNgGqy5mwQ=;
-        b=p6+2WsU+Y0H33BttLHpVyFsoXDDWZhq5ZZ+dr3aOr5OMBCutDzm3uiQt5KPzdtvjnW
-         RcErlw9YR5pfnjm8WMb5mFKgbo3+97EcQMmv/A0daVIM0rv/jYOJ2XVCXgMo9XGi0Jtw
-         u0l56c3LjVN38VcDP2qLdgd+Pcsli6DBe6nWkIbfr9iviC38TiFG1AO7WjmyoNleHwV2
-         sZsvw1ld4SmoaCC2F9L+pNLjkBL5xSgL7I/HEPZE6lgVdjmzQQPzzfWad7lpC5G3a7xK
-         RzqViomsEcXQJnoXB2ocG0aZMbRPb2bl7ACcaM0aXzJlJPH7pdxVtmHHtOuPbMtaQmNo
-         jWkg==
-X-Gm-Message-State: AOAM532B9tORbBsMkqQjnq4mpXM5F+GEzHnpKAPyRKk3et4ph+SH8BGK
-        /WDxzX60IGONfiWKN8rzeTVp7SoUPKQ5L/oT1rbBOuV0yeNozrAdm8PSpsfjGZsnyD5d6ZhTK7R
-        bmZ2lQn9Z60aj
-X-Received: by 2002:a17:906:cb8b:: with SMTP id mf11mr16699915ejb.297.1627301666760;
-        Mon, 26 Jul 2021 05:14:26 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJw2NZQjmaWm/QTte07gegfpOX0ZgghxEic+eXOFALiBVmq37R+ta/ALWSWiHyMd0qZy53433Q==
-X-Received: by 2002:a17:906:cb8b:: with SMTP id mf11mr16699904ejb.297.1627301666586;
-        Mon, 26 Jul 2021 05:14:26 -0700 (PDT)
+        bh=DDjfF9jVeDMoFc1B4dOVhxT79PSNsJ6sGo3EB2J45Z8=;
+        b=fBCyks3F/9miw6ZT85bz/QKgToKbx3V9KUA2R+YgXvO/jGxzMyiO+IQkRn/ApNbttm
+         HAPgIuvv9hLhbXes4pyYKfJKNvKM75bSexHYlUbOcudVvuyFzod+mq9+5TV5tvfYrrGB
+         U5hA6SD6giegVsWIh63bRtO0z4IVan51T7QK1bYWOO8KFwy0pYEmbqEnN1G+xKt7eavC
+         gFBythaYeVrRnBYSwtF01NaZrF2h70uPU/0cakNf3meODbUa+wbMOSJsOWICEcGmpfTU
+         DWmwz5MrhbaQwjVyVWjhr2Q5DVCFPh7/ikjmxBJzHwxLVfEh7C8WMrW2JBx4Ze5vb/TB
+         x+yA==
+X-Gm-Message-State: AOAM531DUdQYadEuAVCoQiWAiTPkOMwGwNu4j4b3MJjYoFsANEfWsvJo
+        A/K0Jt01O07nHeVIMH4uECxho+KgkMIxKvmR3Bsxpb8Wv6MsnKru5v7i6NAm8V4y17gHna25eDL
+        c1bYFvS/F3d0T
+X-Received: by 2002:a17:906:d182:: with SMTP id c2mr17290006ejz.111.1627302277400;
+        Mon, 26 Jul 2021 05:24:37 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyHIrfwkyZm8Yfwj+xDDNtyOpn8y/O1RuhdN7DCM8I94rvXBFT7vKWMLBIq7lE4HOVX1eYWeg==
+X-Received: by 2002:a17:906:d182:: with SMTP id c2mr17289991ejz.111.1627302277249;
+        Mon, 26 Jul 2021 05:24:37 -0700 (PDT)
 Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id i6sm14083783ejr.68.2021.07.26.05.14.25
+        by smtp.gmail.com with ESMTPSA id f5sm14029987ejj.45.2021.07.26.05.24.36
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 26 Jul 2021 05:14:26 -0700 (PDT)
-Subject: Re: [PATCH 0/2 v2] Test: nSVM: Test the effect of guest EFLAGS.TF on
- VMRUN
-To:     Krish Sadhukhan <krish.sadhukhan@oracle.com>, kvm@vger.kernel.org
-Cc:     jmattson@google.com, seanjc@google.com, vkuznets@redhat.com,
-        wanpengli@tencent.com, joro@8bytes.org
-References: <20210719174617.241568-1-krish.sadhukhan@oracle.com>
+        Mon, 26 Jul 2021 05:24:36 -0700 (PDT)
+Subject: Re: [PATCH] KVM: Documentation: Fix KVM_CAP_ENFORCE_PV_FEATURE_CPUID
+ name
+To:     Vitaly Kuznetsov <vkuznets@redhat.com>, kvm@vger.kernel.org
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
+        Jonathan Corbet <corbet@lwn.net>
+References: <20210722092628.236474-1-vkuznets@redhat.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <e1549127-8a11-cf5d-6ea3-890cbe14e374@redhat.com>
-Date:   Mon, 26 Jul 2021 14:14:25 +0200
+Message-ID: <614722bc-4538-042d-cf35-c3b2885a350a@redhat.com>
+Date:   Mon, 26 Jul 2021 14:24:35 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.11.0
 MIME-Version: 1.0
-In-Reply-To: <20210719174617.241568-1-krish.sadhukhan@oracle.com>
+In-Reply-To: <20210722092628.236474-1-vkuznets@redhat.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -71,32 +74,32 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 19/07/21 19:46, Krish Sadhukhan wrote:
-> v1 -> v2:
-> 	In patch# 1, the new function is now called __svm_vmrun() per
-> 	suggestion from Sean. I have also adjusted the commit header and
-> 	the commit message.
+On 22/07/21 11:26, Vitaly Kuznetsov wrote:
+> 'KVM_CAP_ENFORCE_PV_CPUID' doesn't match the define in
+> include/uapi/linux/kvm.h.
 > 
+> Signed-off-by: Vitaly Kuznetsov<vkuznets@redhat.com>
+> ---
+>   Documentation/virt/kvm/api.rst | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
 > 
-> Patch# 1: Adds a variant of svm_vmrun() so that custom guest code can be used.
-> Patch# 2: Tests the effects of guest EFLAGS.TF on VMRUN.
-> 
-> [PATCH 1/2 v2] nSVM: Add a variant of svm_vmrun() for setting guest RIP
-> [PATCH 2/2 v2] Test: nSVM: Test the effect of guest EFLAGS.TF on VMRUN
-> 
->   x86/svm.c       |  9 +++++++--
->   x86/svm.h       |  1 +
->   x86/svm_tests.c | 61 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
->   3 files changed, 69 insertions(+), 2 deletions(-)
-> 
-> Krish Sadhukhan (2):
->        nSVM: Add a variant of svm_vmrun() for setting guest RIP to custom code
->        Test: nSVM: Test the effect of guest EFLAGS.TF on VMRUN
+> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+> index b9ddce5638f5..52eba4a275ad 100644
+> --- a/Documentation/virt/kvm/api.rst
+> +++ b/Documentation/virt/kvm/api.rst
+> @@ -7049,7 +7049,7 @@ In combination with KVM_CAP_X86_USER_SPACE_MSR, this allows user space to
+>   trap and emulate MSRs that are outside of the scope of KVM as well as
+>   limit the attack surface on KVM's MSR emulation code.
+>   
+> -8.28 KVM_CAP_ENFORCE_PV_CPUID
+> +8.28 KVM_CAP_ENFORCE_PV_FEATURE_CPUID
+>   -----------------------------
+>   
+>   Architectures: x86
+> -- 2.31.1
 > 
 
-Queued, thanks.  However, I placed this in a different test than 
-svm_guest_state_test, since that one is more evaluating invalid (or 
-silently canonicalized) data.
+Queued, thanks.
 
 Paolo
 
