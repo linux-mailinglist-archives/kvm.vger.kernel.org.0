@@ -2,124 +2,170 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8DDF03D7E09
-	for <lists+kvm@lfdr.de>; Tue, 27 Jul 2021 20:53:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 232DB3D7E23
+	for <lists+kvm@lfdr.de>; Tue, 27 Jul 2021 20:57:32 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230334AbhG0SxO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 27 Jul 2021 14:53:14 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:26645 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229453AbhG0SxN (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 27 Jul 2021 14:53:13 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1627411993;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=pywaGuqiWa+m7IiTARlllehIqVu1cJ37vlNw1KlZgMk=;
-        b=M9ur1aRiiiQjgCaGe+rgz0Q+693/HPJ6+cetAo9uf9Cg3MEv9VSBUbH/Ru4Nh1u4uopbhk
-        MGmlBplY3tmeBs6LHjhWa8o9K2MJdcF1/7OCZ6rwxnLnX5plRLkagi0TErLd0cH71eP656
-        B4YNbv44NF5Pjumy/u+5yMGP0NvYsE0=
-Received: from mail-oo1-f69.google.com (mail-oo1-f69.google.com
- [209.85.161.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-278-QDsplI6cMymhTFA0lsrAeQ-1; Tue, 27 Jul 2021 14:53:11 -0400
-X-MC-Unique: QDsplI6cMymhTFA0lsrAeQ-1
-Received: by mail-oo1-f69.google.com with SMTP id u5-20020a4a97050000b029026a71f65966so43495ooi.2
-        for <kvm@vger.kernel.org>; Tue, 27 Jul 2021 11:53:11 -0700 (PDT)
+        id S230347AbhG0S52 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 27 Jul 2021 14:57:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54540 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229945AbhG0S51 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 27 Jul 2021 14:57:27 -0400
+Received: from mail-pj1-x102e.google.com (mail-pj1-x102e.google.com [IPv6:2607:f8b0:4864:20::102e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AB27EC061764
+        for <kvm@vger.kernel.org>; Tue, 27 Jul 2021 11:57:27 -0700 (PDT)
+Received: by mail-pj1-x102e.google.com with SMTP id ca5so971506pjb.5
+        for <kvm@vger.kernel.org>; Tue, 27 Jul 2021 11:57:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=from:to:cc:subject:references:date:in-reply-to:message-id
+         :user-agent:mime-version;
+        bh=NXlwJruXkpJ+yuRr3Ny47qE4ejJcWzcd0hJXzdTUy1o=;
+        b=H7UwOW/t/LEWHiQpFLro/pe3jEtcPO0eJPaadtLJ3pnvkadLizFuOiiY+oM8G9HD+P
+         Ocs++ENNM0TOk1oXv1vAS0WRHRKyItKZqj0gCjto78xvLekO7HX2suQDKD/hSpzsM3Xm
+         7DU1hLmwDBgTtzdkX9E5JOnVfwjWf1Xr6Gd6U8e17NZ6vRcUoUZ3UqsEZxgcSbszjN7X
+         PRoH+KWuLkOFv+6F1Bx+m+vtMT6tjucX+A7OSrtQCmrnYWOb2gy0/V0LMEdZnue7x/85
+         yArY/k1okB0FmJMpAlnf2PcM5WTrvfiMI+ArAsxb2sPRB5EONRckb9G3MJD59gPfNVzW
+         9+5Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
-         :references:organization:mime-version:content-transfer-encoding;
-        bh=pywaGuqiWa+m7IiTARlllehIqVu1cJ37vlNw1KlZgMk=;
-        b=RoB1III1/HJgPXJul+YSsxRafvffNNQa/MPzm24guHMDWvFrfwNAWW2PuFwLBHX2qp
-         WPqci08JC0/yeaBxtnqN2ZjiUqLUVV3QSa5p+4PEXPVTxXRsGyP2U4xhsoIo+OYhQKOG
-         R4pR8eb1ZIZVbXZ9X1sL0qRd9+257iWk/F3Fkjop6qlCWOa0be92jg6dCuqCsvQSNzI1
-         Zw4Mt8AHCTmKpsIBp1eVvgkURM+SoINU5o9BBdrVv4Yb9hUAzGG+rIvVQk4dE+E/XuaO
-         S3aTeCakns3pkkKDlzmz1dF+R9FqYlCLdvQoV/VsQjWEGzvt/n1ODXHVyY43UH3ybRJX
-         yC0A==
-X-Gm-Message-State: AOAM5311lDvRWZMkHWYOI8FjSiU5FIUuhUj/vt5USiWSj65unlX5Y4wc
-        acO4+KPMh2vbjy6jas3iO3E9ge0bj44RSipF9o0o9KYcAdDWQ5Op9AzcrzGvtD0b9zkT3wukJXv
-        bwQr726fna3Gs
-X-Received: by 2002:a05:6830:11d3:: with SMTP id v19mr17222653otq.98.1627411991238;
-        Tue, 27 Jul 2021 11:53:11 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyQACTDPYwC/EEIPJP2/Eptj4nf31Vq9hx3nse0SZ0K8pyRgSXydLLBvOMzEu23g7Kl+qQZQA==
-X-Received: by 2002:a05:6830:11d3:: with SMTP id v19mr17222644otq.98.1627411991056;
-        Tue, 27 Jul 2021 11:53:11 -0700 (PDT)
-Received: from redhat.com ([198.99.80.109])
-        by smtp.gmail.com with ESMTPSA id a7sm613602ooo.9.2021.07.27.11.53.10
+        h=x-gm-message-state:from:to:cc:subject:references:date:in-reply-to
+         :message-id:user-agent:mime-version;
+        bh=NXlwJruXkpJ+yuRr3Ny47qE4ejJcWzcd0hJXzdTUy1o=;
+        b=JL6sQxGhLq74m380KQU0J0X7E/F3aN6wmWuBAI5cEGz0mzwpwCcLfUkmmRJiE9UxfG
+         aWCmFAgvbnKNFaCWp5EWQKo85eXUebSFpJiOgGIO5kuiLIXSUY1ZpC/eL1hDnKkIuyhV
+         mQqYsjw5NX2DuUzvam5qNuolSqynbU4rOlJ5cJ3D6taEn2cEVAUUf44yvaiiQWkUiw4F
+         WdddvU5j8kXQi2P/Hek6L11Y6Q2ZVAG7+Aww6ZFMjTtjwDg/GH1OzT3idvwSftZHkrwF
+         rhgzQAWw0J7/+jhJ9xkSDMN9cmHYbYuMdaptqnkbS4y6E+gkKJoaplBID9TfJON8mozy
+         bDdQ==
+X-Gm-Message-State: AOAM532YL8ix2FCF5MEB3DEx/KG0l84K5kq0P4R/TxweeA9gSB8sSvZZ
+        On2Apd69RWLGmA+kTFUuQYPH3g==
+X-Google-Smtp-Source: ABdhPJzApcwZYWTEiTKzL5ZYv6E437W4sjpRLKR2IvWjZoE088wEQSwVMWXYyUTq+9+qN1FFpbpyRQ==
+X-Received: by 2002:a63:f241:: with SMTP id d1mr24813648pgk.424.1627412246933;
+        Tue, 27 Jul 2021 11:57:26 -0700 (PDT)
+Received: from bsegall-glaptop.localhost (c-73-71-82-80.hsd1.ca.comcast.net. [73.71.82.80])
+        by smtp.gmail.com with ESMTPSA id il2sm3338495pjb.29.2021.07.27.11.57.24
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 27 Jul 2021 11:53:10 -0700 (PDT)
-Date:   Tue, 27 Jul 2021 12:53:09 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Jason Gunthorpe <jgg@nvidia.com>
-Cc:     Cornelia Huck <cohuck@redhat.com>, Christoph Hellwig <hch@lst.de>,
-        Kirti Wankhede <kwankhede@nvidia.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 2/2] vfio/mdev: don't warn if ->request is not set
-Message-ID: <20210727125309.292b30c0.alex.williamson@redhat.com>
-In-Reply-To: <20210727173209.GG1721383@nvidia.com>
-References: <20210726143524.155779-1-hch@lst.de>
-        <20210726143524.155779-3-hch@lst.de>
-        <87zgu93sxz.fsf@redhat.com>
-        <20210726230906.GD1721383@nvidia.com>
-        <20210726172831.3a7978fd.alex.williamson@redhat.com>
-        <87wnpc47j3.fsf@redhat.com>
-        <20210727173209.GG1721383@nvidia.com>
-Organization: Red Hat
-X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
+        Tue, 27 Jul 2021 11:57:25 -0700 (PDT)
+From:   Benjamin Segall <bsegall@google.com>
+To:     Christian Borntraeger <borntraeger@de.ibm.com>
+Cc:     Mel Gorman <mgorman@techsingularity.net>, peterz@infradead.org,
+        bristot@redhat.com, dietmar.eggemann@arm.com, joshdon@google.com,
+        juri.lelli@redhat.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-s390@vger.kernel.org,
+        linux@rasmusvillemoes.dk, mgorman@suse.de, mingo@kernel.org,
+        rostedt@goodmis.org, valentin.schneider@arm.com,
+        vincent.guittot@linaro.org
+Subject: Re: [PATCH 1/1] sched/fair: improve yield_to vs fairness
+References: <YIlXQ43b6+7sUl+f@hirez.programming.kicks-ass.net>
+        <20210707123402.13999-1-borntraeger@de.ibm.com>
+        <20210707123402.13999-2-borntraeger@de.ibm.com>
+        <20210723093523.GX3809@techsingularity.net>
+        <ddb81bc9-1429-c392-adac-736e23977c84@de.ibm.com>
+        <20210723162137.GY3809@techsingularity.net>
+        <1acd7520-bd4b-d43d-302a-8dcacf6defa5@de.ibm.com>
+Date:   Tue, 27 Jul 2021 11:57:13 -0700
+In-Reply-To: <1acd7520-bd4b-d43d-302a-8dcacf6defa5@de.ibm.com> (Christian
+        Borntraeger's message of "Mon, 26 Jul 2021 20:41:15 +0200")
+Message-ID: <xm2635rza8l2.fsf@google.com>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/27.2 (gnu/linux)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 27 Jul 2021 14:32:09 -0300
-Jason Gunthorpe <jgg@nvidia.com> wrote:
+Christian Borntraeger <borntraeger@de.ibm.com> writes:
 
-> On Tue, Jul 27, 2021 at 08:04:16AM +0200, Cornelia Huck wrote:
-> > On Mon, Jul 26 2021, Alex Williamson <alex.williamson@redhat.com> wrote:
-> >   
-> > > On Mon, 26 Jul 2021 20:09:06 -0300
-> > > Jason Gunthorpe <jgg@nvidia.com> wrote:
-> > >  
-> > >> On Mon, Jul 26, 2021 at 07:07:04PM +0200, Cornelia Huck wrote:
-> > >>   
-> > >> > But I wonder why nobody else implements this? Lack of surprise removal?    
-> > >> 
-> > >> The only implementation triggers an eventfd that seems to be the same
-> > >> eventfd as the interrupt..
-> > >> 
-> > >> Do you know how this works in userspace? I'm surprised that the
-> > >> interrupt eventfd can trigger an observation that the kernel driver
-> > >> wants to be unplugged?  
-> > >
-> > > I think we're talking about ccw, but I see QEMU registering separate
-> > > eventfds for each of the 3 IRQ indexes and the mdev driver specifically
-> > > triggering the req_trigger...?  Thanks,
-> > >
-> > > Alex  
-> > 
-> > Exactly, ccw has a trigger for normal I/O interrupts, CRW (machine
-> > checks), and this one.  
-> 
-> If it is a dedicated eventfd for 'device being removed' why is it in
-> the CCW implementation and not core code?
+> On 23.07.21 18:21, Mel Gorman wrote:
+>> On Fri, Jul 23, 2021 at 02:36:21PM +0200, Christian Borntraeger wrote:
+>>>> sched: Do not select highest priority task to run if it should be skipped
+>>>>
+>>>> <SNIP>
+>>>>
+>>>> index 44c452072a1b..ddc0212d520f 100644
+>>>> --- a/kernel/sched/fair.c
+>>>> +++ b/kernel/sched/fair.c
+>>>> @@ -4522,7 +4522,8 @@ pick_next_entity(struct cfs_rq *cfs_rq, struct sched_entity *curr)
+>>>>    			se = second;
+>>>>    	}
+>>>> -	if (cfs_rq->next && wakeup_preempt_entity(cfs_rq->next, left) < 1) {
+>>>> +	if (cfs_rq->next &&
+>>>> +	    (cfs_rq->skip == left || wakeup_preempt_entity(cfs_rq->next, left) < 1)) {
+>>>>    		/*
+>>>>    		 * Someone really wants this to run. If it's not unfair, run it.
+>>>>    		 */
+>>>>
+>>>
+>>> I do see a reduction in ignored yields, but from a performance aspect for my
+>>> testcases this patch does not provide a benefit, while the the simple
+>>> 	curr->vruntime += sysctl_sched_min_granularity;
+>>> does.
+>> I'm still not a fan because vruntime gets distorted. From the docs
+>>     Small detail: on "ideal" hardware, at any time all tasks would have the
+>> same
+>>     p->se.vruntime value --- i.e., tasks would execute simultaneously and no task
+>>     would ever get "out of balance" from the "ideal" share of CPU time
+>> If yield_to impacts this "ideal share" then it could have other
+>> consequences.
+>> I think your patch may be performing better in your test case because every
+>> "wrong" task selected that is not the yield_to target gets penalised and
+>> so the yield_to target gets pushed up the list.
+>> 
+>>> I still think that your approach is probably the cleaner one, any chance to improve this
+>>> somehow?
+>>>
+>> Potentially. The patch was a bit off because while it noticed that skip
+>> was not being obeyed, the fix was clumsy and isolated. The current flow is
+>> 1. pick se == left as the candidate
+>> 2. try pick a different se if the "ideal" candidate is a skip candidate
+>> 3. Ignore the se update if next or last are set
+>> Step 3 looks off because it ignores skip if next or last buddies are set
+>> and I don't think that was intended. Can you try this?
+>> diff --git a/kernel/sched/fair.c b/kernel/sched/fair.c
+>> index 44c452072a1b..d56f7772a607 100644
+>> --- a/kernel/sched/fair.c
+>> +++ b/kernel/sched/fair.c
+>> @@ -4522,12 +4522,12 @@ pick_next_entity(struct cfs_rq *cfs_rq, struct sched_entity *curr)
+>>   			se = second;
+>>   	}
+>>   -	if (cfs_rq->next && wakeup_preempt_entity(cfs_rq->next, left) < 1) {
+>> +	if (cfs_rq->next && wakeup_preempt_entity(cfs_rq->next, se) < 1) {
+>>   		/*
+>>   		 * Someone really wants this to run. If it's not unfair, run it.
+>>   		 */
+>>   		se = cfs_rq->next;
+>> -	} else if (cfs_rq->last && wakeup_preempt_entity(cfs_rq->last, left) < 1) {
+>> +	} else if (cfs_rq->last && wakeup_preempt_entity(cfs_rq->last, se) < 1) {
+>>   		/*
+>>   		 * Prefer last buddy, try to return the CPU to a preempted task.
+>>   		 */
+>> 
+>
+> This one alone does not seem to make a difference. Neither in ignored yield, nor
+> in performance.
+>
+> Your first patch does really help in terms of ignored yields when
+> all threads are pinned to one host CPU. After that we do have no ignored yield
+> it seems. But it does not affect the performance of my testcase.
+> I did some more experiments and I removed the wakeup_preempt_entity checks in
+> pick_next_entity - assuming that this will result in source always being stopped
+> and target always being picked. But still, no performance difference.
+> As soon as I play with vruntime I do see a difference (but only without the cpu cgroup
+> controller). I will try to better understand the scheduler logic and do some more
+> testing. If you have anything that I should test, let me know.
+>
+> Christian
 
-The CCW implementation (likewise the vfio-pci implementation) owns the
-IRQ index address space and the decision to make this a signal to
-userspace rather than perhaps some handling a device might be able to
-do internally.  For instance an alternate vfio-pci implementation might
-zap all mmaps, block all r/w access, and turn this into a surprise
-removal.  Another implementation might be more aggressive to sending
-SIGKILL to the user process.  This was the thought behind why vfio-core
-triggers the driver request callback with a counter, leaving the policy
-to the driver.
+If both yielder and target are in the same cpu cgroup or the cpu cgroup
+is disabled (ie, if cfs_rq_of(p->se) matches), you could try
 
-> Is PCI doing the same?
+if (p->se.vruntime > rq->curr->se.vruntime)
+	swap(p->se.vruntime, rq->curr->se.vruntime)
 
-Yes, that's where this handling originated.  Thanks,
+as well as the existing buddy flags, as an entirely fair vruntime boost
+to the target.
 
-Alex
-
+For when they aren't direct siblings, you /could/ use find_matching_se,
+but it's much less clear that's desirable, since it would yield vruntime
+for the entire hierarchy to the target's hierarchy.
