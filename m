@@ -2,199 +2,103 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 545283D6FD5
-	for <lists+kvm@lfdr.de>; Tue, 27 Jul 2021 09:00:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0BEBF3D70B6
+	for <lists+kvm@lfdr.de>; Tue, 27 Jul 2021 09:59:58 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235508AbhG0HAQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 27 Jul 2021 03:00:16 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:34628 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S235471AbhG0HAI (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 27 Jul 2021 03:00:08 -0400
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 16R6i5br083563;
-        Tue, 27 Jul 2021 02:59:25 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=FiVabGtfjDnbtifvF/XqkM9qnKY88Q2VXsum59GwZGo=;
- b=P79yPCxHP+laYTtJrD09z1yfgvdV70oOGk6AlZzwf7AgPFwsxOok7xM89Wl8Mkukyee9
- FvCYlXFYiIkOVjrN47hievvEjU0XZZInZXvK9uglpuPWsbljnkUxL+xkctnGe4gN7+NG
- h6DSsnRivIGTZl9ZwSRY3fyjpnpoBWYt0FSa8SiB0KNNyKNTVQbrpsV4pObH0ZCnxJP7
- E8/eIHEubwHyJ73dhn/0cbTOU8AVhuZvey5u+Xpxx4JlxhSI0gDpx2MkWJH+4Q1KSHwk
- mjvNHxG7q2DZF+mnq48jmCHd1man4VIhPeXH3DBxElrotlo+yezTg1tVdRnCFDu7oAvn oQ== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3a2d4p0h5m-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 27 Jul 2021 02:59:25 -0400
-Received: from m0098404.ppops.net (m0098404.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 16R6iDZS084722;
-        Tue, 27 Jul 2021 02:59:24 -0400
-Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3a2d4p0h31-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 27 Jul 2021 02:59:22 -0400
-Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
-        by ppma03ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 16R62w77002265;
-        Tue, 27 Jul 2021 06:59:20 GMT
-Received: from b06avi18626390.portsmouth.uk.ibm.com (b06avi18626390.portsmouth.uk.ibm.com [9.149.26.192])
-        by ppma03ams.nl.ibm.com with ESMTP id 3a235yg7kw-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 27 Jul 2021 06:59:20 +0000
-Received: from d06av24.portsmouth.uk.ibm.com (d06av24.portsmouth.uk.ibm.com [9.149.105.60])
-        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 16R6uePl27787764
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 27 Jul 2021 06:56:41 GMT
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 7678A4203F;
-        Tue, 27 Jul 2021 06:59:17 +0000 (GMT)
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id C47F542047;
-        Tue, 27 Jul 2021 06:59:16 +0000 (GMT)
-Received: from oc7455500831.ibm.com (unknown [9.145.165.137])
-        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Tue, 27 Jul 2021 06:59:16 +0000 (GMT)
-Subject: Re: [PATCH 1/1] sched/fair: improve yield_to vs fairness
-To:     Mel Gorman <mgorman@techsingularity.net>
-Cc:     peterz@infradead.org, bristot@redhat.com, bsegall@google.com,
-        dietmar.eggemann@arm.com, joshdon@google.com,
-        juri.lelli@redhat.com, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-s390@vger.kernel.org,
-        linux@rasmusvillemoes.dk, mgorman@suse.de, mingo@kernel.org,
-        rostedt@goodmis.org, valentin.schneider@arm.com,
-        vincent.guittot@linaro.org
-References: <YIlXQ43b6+7sUl+f@hirez.programming.kicks-ass.net>
- <20210707123402.13999-1-borntraeger@de.ibm.com>
- <20210707123402.13999-2-borntraeger@de.ibm.com>
- <20210723093523.GX3809@techsingularity.net>
- <ddb81bc9-1429-c392-adac-736e23977c84@de.ibm.com>
- <20210723162137.GY3809@techsingularity.net>
- <1acd7520-bd4b-d43d-302a-8dcacf6defa5@de.ibm.com>
- <20210726193232.GZ3809@techsingularity.net>
-From:   Christian Borntraeger <borntraeger@de.ibm.com>
-Message-ID: <d4a8e694-a014-1532-9829-f1594f7c6d86@de.ibm.com>
-Date:   Tue, 27 Jul 2021 08:59:16 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.11.0
+        id S235847AbhG0H7y (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 27 Jul 2021 03:59:54 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:45217 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S235746AbhG0H7x (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 27 Jul 2021 03:59:53 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1627372793;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=/EIq4hrAP0Ac0pX1HeyNfiwT/0BIOEO0auXFwtqoKwk=;
+        b=RzWYwwJW0HI5LovkIL/n3eKTaJxruFQFZsnR+6nAOLc2j7Rglx9g3B3OO8/iwDMO3JJluO
+        bF9JqQ1V+P0JXy/QYLC698r4I7KJ8h8D419mWyLo6CPGB4Ma8XiPupjqQ/cqL7TbSRhrfT
+        0m1snXyA+r3o2E6pOolbXbCf7ywX2q0=
+Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
+ [209.85.208.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-164-9N9PUxbBPY-c7qxes-F5iQ-1; Tue, 27 Jul 2021 03:59:52 -0400
+X-MC-Unique: 9N9PUxbBPY-c7qxes-F5iQ-1
+Received: by mail-ed1-f71.google.com with SMTP id f24-20020a0564021618b02903954c05c938so6180536edv.3
+        for <kvm@vger.kernel.org>; Tue, 27 Jul 2021 00:59:52 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=/EIq4hrAP0Ac0pX1HeyNfiwT/0BIOEO0auXFwtqoKwk=;
+        b=YAND/s11q7E8rNTijZ9LOQCTGuokwuw2vIcJJMLZR2nK2NbvlGBxNqI6odpBS797g4
+         p0DWoYng5gV9gkulYEXMsFrEyxfFBvgRkBAlSGuXxk5lWxCJSAq/6n7U2CB77/IxDpTa
+         APih2GeNBzoaS8S5yvnnrx2cz47WQ4eOZRValJMQYUAbRjz2JKCrG9BIBobLL7ycR8W7
+         wzQQDt9D/DLDYBpgzRi8uVGXVePylwAl75Eog5iBgNUgCsiYIkDQ+yZfzwLxOaILDVBs
+         vFXdAJq+0W8jrz5E+9O/YPinQiGaIsAoX0EyHu9Z6FdXxNJqgu0EQk9A7NBFfPp4qq08
+         0I2w==
+X-Gm-Message-State: AOAM531jF6cQ7oo8iuc+8s4tcdFx5IkU9TcVMPU8TBBB6hroT/9JWSP5
+        otE2VyhAaUlzQNlen4B88DqwgyZXDBjVZOrKvJzInwjh/U6u90KNY1rThJ1esFI+1MZzrGl0ObZ
+        aJssTTCWl3tOv
+X-Received: by 2002:a05:6402:12c3:: with SMTP id k3mr11211298edx.11.1627372791441;
+        Tue, 27 Jul 2021 00:59:51 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwlCvS56tYgLWOzqJ8Wh70Fht2s02iJ7M5DydMmq9uVJaSBBqYQBS2qw7251aRYo+dt+iun8A==
+X-Received: by 2002:a05:6402:12c3:: with SMTP id k3mr11211285edx.11.1627372791319;
+        Tue, 27 Jul 2021 00:59:51 -0700 (PDT)
+Received: from steredhat (host-79-18-148-79.retail.telecomitalia.it. [79.18.148.79])
+        by smtp.gmail.com with ESMTPSA id i14sm613214eja.91.2021.07.27.00.59.50
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 27 Jul 2021 00:59:50 -0700 (PDT)
+Date:   Tue, 27 Jul 2021 09:59:48 +0200
+From:   Stefano Garzarella <sgarzare@redhat.com>
+To:     Arseny Krasnov <arseny.krasnov@kaspersky.com>
+Cc:     Stefan Hajnoczi <stefanha@redhat.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Colin Ian King <colin.king@canonical.com>,
+        Andra Paraschiv <andraprs@amazon.com>,
+        Norbert Slusarek <nslusarek@gmx.net>, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org, oxffffaa@gmail.com
+Subject: Re: [RFC PATCH v1 0/7] virtio/vsock: introduce MSG_EOR flag for
+ SEQPACKET
+Message-ID: <20210727075948.yl4w3foqa6rp4obg@steredhat>
+References: <20210726163137.2589102-1-arseny.krasnov@kaspersky.com>
 MIME-Version: 1.0
-In-Reply-To: <20210726193232.GZ3809@techsingularity.net>
-Content-Type: text/plain; charset=iso-8859-15; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: Jx2Fh_BmAj2jGHXNRIKpYHEiX0rnAWKv
-X-Proofpoint-GUID: SxmirhP_T-CJuWM4Ye5s7G2NZVr1dNVp
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.790
- definitions=2021-07-27_04:2021-07-27,2021-07-27 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
- impostorscore=0 phishscore=0 priorityscore=1501 suspectscore=0
- adultscore=0 bulkscore=0 clxscore=1015 mlxscore=0 mlxlogscore=999
- spamscore=0 malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2107140000 definitions=main-2107270038
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <20210726163137.2589102-1-arseny.krasnov@kaspersky.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Mon, Jul 26, 2021 at 07:31:33PM +0300, Arseny Krasnov wrote:
+>	This patchset implements support of MSG_EOR bit for SEQPACKET
+>AF_VSOCK sockets over virtio transport.
+>	Idea is to distinguish concepts of 'messages' and 'records'.
+>Message is result of sending calls: 'write()', 'send()', 'sendmsg()'
+>etc. It has fixed maximum length, and it bounds are visible using
+>return from receive calls: 'read()', 'recv()', 'recvmsg()' etc.
+>Current implementation based on message definition above.
+>	Record has unlimited length, it consists of multiple message,
+>and bounds of record are visible via MSG_EOR flag returned from
+>'recvmsg()' call. Sender passes MSG_EOR to sending system call and
+>receiver will see MSG_EOR when corresponding message will be processed.
+>	To support MSG_EOR new bit was added along with existing
+>'VIRTIO_VSOCK_SEQ_EOR': 'VIRTIO_VSOCK_SEQ_EOM'(end-of-message) - now it
+>works in the same way as 'VIRTIO_VSOCK_SEQ_EOR'. But 'VIRTIO_VSOCK_SEQ_EOR'
+>is used to mark 'MSG_EOR' bit passed from userspace.
 
+At this point it's probably better to rename the old flag, so we stay 
+compatible.
 
-On 26.07.21 21:32, Mel Gorman wrote:
-> On Mon, Jul 26, 2021 at 08:41:15PM +0200, Christian Borntraeger wrote:
->>> Potentially. The patch was a bit off because while it noticed that skip
->>> was not being obeyed, the fix was clumsy and isolated. The current flow is
->>>
->>> 1. pick se == left as the candidate
->>> 2. try pick a different se if the "ideal" candidate is a skip candidate
->>> 3. Ignore the se update if next or last are set
->>>
->>> Step 3 looks off because it ignores skip if next or last buddies are set
->>> and I don't think that was intended. Can you try this?
->>>
->>> diff --git a/kernel/sched/fair.c b/kernel/sched/fair.c
->>> index 44c452072a1b..d56f7772a607 100644
->>> --- a/kernel/sched/fair.c
->>> +++ b/kernel/sched/fair.c
->>> @@ -4522,12 +4522,12 @@ pick_next_entity(struct cfs_rq *cfs_rq, struct sched_entity *curr)
->>>    			se = second;
->>>    	}
->>> -	if (cfs_rq->next && wakeup_preempt_entity(cfs_rq->next, left) < 1) {
->>> +	if (cfs_rq->next && wakeup_preempt_entity(cfs_rq->next, se) < 1) {
->>>    		/*
->>>    		 * Someone really wants this to run. If it's not unfair, run it.
->>>    		 */
->>>    		se = cfs_rq->next;
->>> -	} else if (cfs_rq->last && wakeup_preempt_entity(cfs_rq->last, left) < 1) {
->>> +	} else if (cfs_rq->last && wakeup_preempt_entity(cfs_rq->last, se) < 1) {
->>>    		/*
->>>    		 * Prefer last buddy, try to return the CPU to a preempted task.
->>>    		 */
->>>
->>
->> This one alone does not seem to make a difference. Neither in ignored yield, nor
->> in performance.
->>
->> Your first patch does really help in terms of ignored yields when
->> all threads are pinned to one host CPU.
-> 
-> Ok, that tells us something. It implies, but does not prove, that the
-> block above that handles skip is failing either the entity_before()
-> test or the wakeup_preempt_entity() test. To what degree that should be
-> relaxed when cfs_rq->next is !NULL is harder to determine.
-> 
->> After that we do have no ignored yield
->> it seems. But it does not affect the performance of my testcase.
-> 
-> Ok, this is the first patch. The second patch is not improving ignored
-> yields at all so the above paragraph still applies. It would be nice
-> if you could instrument with trace_printk when cfs->rq_next is valid
-> whether it's the entity_before() check that is preventing the skip or
-> wakeup_preempt_entity. Would that be possible?
+What happens if one of the two peers does not support MSG_EOR handling, 
+while the other does?
 
-I will try that.
-> 
-> I still think the second patch is right independent of it helping your
-> test case because it makes no sense to me at all that the task after the
-> skip candidate is ignored if there is a next or last buddy.
+I'll do a closer review in the next few days.
 
-I agree.  This patch makes sense to me as a bug fix.
-And I think also the first patch makes sense on its own.
-> 
->> I did some more experiments and I removed the wakeup_preempt_entity checks in
->> pick_next_entity - assuming that this will result in source always being stopped
->> and target always being picked. But still, no performance difference.
->> As soon as I play with vruntime I do see a difference (but only without the cpu cgroup
->> controller). I will try to better understand the scheduler logic and do some more
->> testing. If you have anything that I should test, let me know.
->>
-> 
-> The fact that vruntime tricks only makes a difference when cgroups are
-> involved is interesting. Can you describe roughly what how the cgroup
-> is configured? 
+Thanks,
+Stefano
 
-Its the other way around. My vruntime patch ONLY helps WITHOUT the cpu cgroup controller.
-In other words this example on a 16CPU host (resulting in 4x overcommitment)
-time ( for ((d=0; d<16; d++)) ; do cgexec -g cpu:test$d qemu-system-s390x -enable-kvm -kernel /root/REPOS/kvm-unit-tests/s390x/diag9c.elf  -smp 4 -nographic -nodefaults -device sclpconsole,chardev=c2 -chardev file,path=/tmp/log$d.log,id=c2  & done; wait)
-does NOT benefit from the vruntime patch, but when I remove the "cgexec -g cpu:test$d" it does:
-time ( for ((d=0; d<16; d++)) ; do qemu-system-s390x -enable-kvm -kernel /root/REPOS/kvm-unit-tests/s390x/diag9c.elf  -smp 4 -nographic -nodefaults -device sclpconsole,chardev=c2 -chardev file,path=/tmp/log$d.log,id=c2  & done; wait)
-  
-
-Similarly, does your config have CONFIG_SCHED_AUTOGROUP
-> or CONFIG_FAIR_GROUP_SCHED set? I assume FAIR_GROUP_SCHED must be and
-
-Yes, both are set.
-> I wonder if the impact of your patch is dropping groups of tasks in
-> priority as opposed to individual tasks. I'm not that familiar with how
-> groups are handled in terms of how they are prioritised unfortunately.
-> 
-> I'm still hesitant to consider the vruntime hammer in case it causes
-> fairness problems when vruntime is no longer reflecting time spent on
-> the CPU.
-
-I understand your concerns. What about subtracting the same amount of
-vruntime from the target as we add on the yielder? Would that result in
-quicker rebalancing while still keeping everything in order?
-The reason why I am asking is that initially we
-realized that setting some tunables lower, e.g.
-kernel.sched_latency_ns = 2000000
-kernel.sched_migration_cost_ns = 100000
-makes things faster in a similar fashion. And that also works with cgroups.
-But ideally we find a solution without changing tuneables.
