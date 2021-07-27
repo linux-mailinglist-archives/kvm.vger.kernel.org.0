@@ -2,85 +2,185 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6BE0D3D749F
-	for <lists+kvm@lfdr.de>; Tue, 27 Jul 2021 13:55:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BBF8A3D7505
+	for <lists+kvm@lfdr.de>; Tue, 27 Jul 2021 14:26:32 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236284AbhG0Lzp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 27 Jul 2021 07:55:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40870 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231873AbhG0Lzo (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 27 Jul 2021 07:55:44 -0400
-Received: from mail-qk1-x730.google.com (mail-qk1-x730.google.com [IPv6:2607:f8b0:4864:20::730])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D5787C061760
-        for <kvm@vger.kernel.org>; Tue, 27 Jul 2021 04:55:44 -0700 (PDT)
-Received: by mail-qk1-x730.google.com with SMTP id 190so11964311qkk.12
-        for <kvm@vger.kernel.org>; Tue, 27 Jul 2021 04:55:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=xGmRZzizcfQYFWuVgpIlcNdw/vWl+k7h2lbS4vofnJw=;
-        b=Ni4l0KC28YLJ0zBw4u5zCVT+a0uTq1NH0NX62EZdIAcRxNlVDKkSFtuxBISrSsV2qh
-         LMpneYo5qc3DDIvftUiLHYCPBnxnxtTmdreqSCM0yUKYPY/0pgOvq2zUn09d6N0fc5Cm
-         bhqQXSrXCXWE+GkrWyF17Zh0mdUMjxPmDr2LgGOMKuNz5bRUFPOEjXyOq0+9b7Dav1cE
-         e1vj3HWYddD3EQ8J9DpKYImJheQH8FlLujgHc4r63ggQgvGx9jxszU2TcSARFEDLYD8s
-         k/MAe/n/xSSZfft0KE80hVZL/0K1VBzEBeE/0Chf/UbwYimioAmIODew4HbT5td5qNWZ
-         RLYA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=xGmRZzizcfQYFWuVgpIlcNdw/vWl+k7h2lbS4vofnJw=;
-        b=To+VvhT/V6QGiuN0ln6WeWlpsxTGXm3avzMfSbzb8ngq7Y5f8XB5NFxsam1RCDqEY9
-         Ls0uHle5YVDUCMiBRDPcf546ZlEydHQkmudScHn4ClUsl0owO17dnA1CuRrM17IsGcSM
-         I5R+3P4F7JtPfHoCvoQO7t9OdJdRGGqdesVNiUB5THvvc2UyligXyB2Jq7GRdjS5rwwm
-         1FyZVTLvF1vs+9RoBQKccMEITTSxjd2muKtjCLgQjpI+yynAfVyDbhywCjwgBG6yIlvH
-         LgCNW2xU6XwSnsmoZLpaFDzqZfAgl7XTNqJmFIBUUcHnPrTVzWTFprpwrqOTy6GKUcHk
-         Femw==
-X-Gm-Message-State: AOAM5316jYt0G5xf1gPZ64nQceOHqPpInG9p2wBwgTwqnKzWYMc3x02I
-        LucI1xwwp7aGUYH2fJPM5FcIjQ==
-X-Google-Smtp-Source: ABdhPJw+PgC1kl0T4uKspJqLwiD15ss6avKnjHT9BcvPyOnHJWMe0AyIYsLL7GC8glfwyTedjvmJmA==
-X-Received: by 2002:a37:9986:: with SMTP id b128mr22397903qke.485.1627386944024;
-        Tue, 27 Jul 2021 04:55:44 -0700 (PDT)
-Received: from ziepe.ca ([142.162.113.129])
-        by smtp.gmail.com with ESMTPSA id u19sm1215976qtx.48.2021.07.27.04.55.43
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 27 Jul 2021 04:55:43 -0700 (PDT)
-Received: from jgg by mlx with local (Exim 4.94)
-        (envelope-from <jgg@ziepe.ca>)
-        id 1m8LgU-0090AO-LY; Tue, 27 Jul 2021 08:55:42 -0300
-Date:   Tue, 27 Jul 2021 08:55:42 -0300
-From:   Jason Gunthorpe <jgg@ziepe.ca>
-To:     Cai Huoqing <caihuoqing@baidu.com>
-Cc:     alex.williamson@redhat.com, cohuck@redhat.com,
-        zhenyuw@linux.intel.com, swee.yee.fonn@intel.com,
-        hkallweit1@gmail.com, fred.gao@intel.com, mjrosato@linux.ibm.com,
-        yi.l.liu@intel.com, mgurtovoy@nvidia.com, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] vfio/pci: use "ssize_t" as a return value instead of
- "size_t"
-Message-ID: <20210727115542.GD543798@ziepe.ca>
-References: <20210727032433.457-1-caihuoqing@baidu.com>
+        id S236284AbhG0M0Y (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 27 Jul 2021 08:26:24 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:57242 "EHLO
+        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S231945AbhG0M0X (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 27 Jul 2021 08:26:23 -0400
+Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 16RCA1nU112067;
+        Tue, 27 Jul 2021 08:26:22 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=to : cc : references :
+ from : subject : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=6El7g2TSjD0AEc/u1X7g2qrGcACjAj8mtV94oT2TxSY=;
+ b=ruZnAv8f8HECW5w7/MP9lZ9Q3bGB8YJA298T8vQyuyrCFIt5UMV5Byr+Ky5LtRQCLzdj
+ Ukm8RcIqTtStRSQhVwNSlOzl5yM8Togep1yJFxqIxc4CRWW9NT+0XyviOEVasVOn6itG
+ GVTzJ2NlDYIHZGmetixK6EloWa/nP7pVInPs+1ufrphu7IyD2nx3Nr/8z7nbf+Ovm/kg
+ k1jnShFOSVLYDx5Ezts441sXSu6ungNy0+RRCaZzhzPM12VRvGGefILeAOCUuApNIkUb
+ AXoBkKq5SVTmUHB3Pp7kOGZOQ3mx35ltp0PdV3v29gU6jfpe6m/8/VkTmDSIemFFaH/a iw== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3a2hhns2uw-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 27 Jul 2021 08:26:21 -0400
+Received: from m0127361.ppops.net (m0127361.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 16RCA77P113101;
+        Tue, 27 Jul 2021 08:26:21 -0400
+Received: from ppma05fra.de.ibm.com (6c.4a.5195.ip4.static.sl-reverse.com [149.81.74.108])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3a2hhns2u3-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 27 Jul 2021 08:26:21 -0400
+Received: from pps.filterd (ppma05fra.de.ibm.com [127.0.0.1])
+        by ppma05fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 16RCPWvD006723;
+        Tue, 27 Jul 2021 12:26:19 GMT
+Received: from b06avi18626390.portsmouth.uk.ibm.com (b06avi18626390.portsmouth.uk.ibm.com [9.149.26.192])
+        by ppma05fra.de.ibm.com with ESMTP id 3a235pr8pj-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 27 Jul 2021 12:26:19 +0000
+Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
+        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 16RCNdhw21758408
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 27 Jul 2021 12:23:39 GMT
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 20D7BAE045;
+        Tue, 27 Jul 2021 12:26:16 +0000 (GMT)
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 99457AE055;
+        Tue, 27 Jul 2021 12:26:15 +0000 (GMT)
+Received: from localhost.localdomain (unknown [9.145.20.110])
+        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Tue, 27 Jul 2021 12:26:15 +0000 (GMT)
+To:     Janis Schoetterl-Glausch <scgl@linux.vnet.ibm.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Janis Schoetterl-Glausch <scgl@linux.ibm.com>,
+        Thomas Huth <thuth@redhat.com>,
+        David Hildenbrand <david@redhat.com>
+Cc:     Claudio Imbrenda <imbrenda@linux.ibm.com>, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
+References: <20210706115459.372749-1-scgl@linux.ibm.com>
+ <87v95jet9d.fsf@redhat.com>
+ <e5a5fa4a-c5c4-e3f8-3229-9c8e70dffb45@linux.vnet.ibm.com>
+From:   Janosch Frank <frankja@linux.ibm.com>
+Subject: Re: [kvm-unit-tests PATCH] s390x: Add specification exception test
+Message-ID: <70c1bf40-644d-dfa2-e256-2065ede545bb@linux.ibm.com>
+Date:   Tue, 27 Jul 2021 14:26:15 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.11.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210727032433.457-1-caihuoqing@baidu.com>
+In-Reply-To: <e5a5fa4a-c5c4-e3f8-3229-9c8e70dffb45@linux.vnet.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: q-ADN7C_kizON6UGCkGVoHhbHLJJFNdh
+X-Proofpoint-ORIG-GUID: 0N51fKi8lMu8Pv8OULttBgGLVFhgNpyj
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.790
+ definitions=2021-07-27_07:2021-07-27,2021-07-27 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
+ suspectscore=0 mlxlogscore=999 bulkscore=0 adultscore=0 mlxscore=0
+ clxscore=1015 impostorscore=0 malwarescore=0 priorityscore=1501
+ spamscore=0 phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2107140000 definitions=main-2107270071
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jul 27, 2021 at 11:24:33AM +0800, Cai Huoqing wrote:
-> should use ssize_t when it returns error code and size_t
+On 7/9/21 4:22 PM, Janis Schoetterl-Glausch wrote:
+> On 7/9/21 11:22 AM, Cornelia Huck wrote:
+>> On Tue, Jul 06 2021, Janis Schoetterl-Glausch <scgl@linux.ibm.com> wrote:
+>>
+>>> Generate specification exceptions and check that they occur.
+>>> Also generate specification exceptions during a transaction,
+>>> which results in another interruption code.
+>>> With the iterations argument one can check if specification
+>>> exception interpretation occurs, e.g. by using a high value and
+>>> checking that the debugfs counters are substantially lower.
+>>> The argument is also useful for estimating the performance benefit
+>>> of interpretation.
+>>>
+>>> Signed-off-by: Janis Schoetterl-Glausch <scgl@linux.ibm.com>
+>>> ---
+>>>  s390x/Makefile           |   1 +
+>>>  lib/s390x/asm/arch_def.h |   1 +
+>>>  s390x/spec_ex.c          | 344 +++++++++++++++++++++++++++++++++++++++
+>>>  s390x/unittests.cfg      |   3 +
+>>>  4 files changed, 349 insertions(+)
+>>>  create mode 100644 s390x/spec_ex.c
+>>
+>> (...)
+>>
+>>> +static void lpsw(uint64_t psw)
+>>
+>> Maybe call this load_psw(), as you do a bit more than a simple lpsw?
 > 
-> Signed-off-by: Cai Huoqing <caihuoqing@baidu.com>
-> ---
->  drivers/vfio/pci/vfio_pci_igd.c     | 4 ++--
->  drivers/vfio/pci/vfio_pci_private.h | 2 +-
->  2 files changed, 3 insertions(+), 3 deletions(-)
+> [...]
+> 
+>> The indentation looks a bit funny here.
+> 
+> [...]
+> 
+>> Here as well.
+> 
+> Ok, will fix.
+>>
+>>> +}
+>>
+>> (...)
+>>
+>>> +#define report_info_if(cond, fmt, ...)			\
+>>> +	do {						\
+>>> +		if (cond) {				\
+>>> +			report_info(fmt, ##__VA_ARGS__);\
+>>> +		}					\
+>>> +	} while (0)
+>>
+>> I'm wondering whether such a wrapper function could be generally useful.
+>>
+> 
+> I've found 9 occurrences with:
+> find . -type f \( -name "*.c" -o -name "*.h" \) -exec awk '/if\s*\(.*/{i=2;f=$0} /report_info/ && i>0{print FILENAME, NR-1 ":" f;r=4} r>1{print FILENAME, NR ":" $0;r--} r==1{print "--";r=0} {i--}' '{}' \;
+> 
 
-This is a dup of this patch:
+Looking at the occurrences below most of those also do other things in
+the conditional branches so for 90% we can't do a straight forward replace.
 
-https://lore.kernel.org/kvm/0-v3-5db12d1bf576+c910-vfio_rw_jgg@nvidia.com/
+Nevertheless I see some value in it and the 6 lines won't hurt us, so
+please create a separate patch for this and put the maintainers for the
+other arches and Paolo on CC for that patch so they know the new wrapper
+will be available.
 
-Jason
+Also I'd like having report_fail("Message"); and report_pass("Message");
+functions instead of report(0, "Message"); and report(1, "Message"); ...
+Those at least are straight forward replacements.
+
+
+> ./lib/s390x/css_lib.c 177:      if (cc) {
+> ./lib/s390x/css_lib.c 178:              report_info("stsch: updating sch %08x failed with cc=%d",
+> ./lib/s390x/css_lib.c 179:                          schid, cc);
+> ./lib/s390x/css_lib.c 180:              return false;
+> --
+> ./lib/s390x/css_lib.c 183:      if (!(pmcw->flags & PMCW_ENABLE)) {
+> ./lib/s390x/css_lib.c 184:              report_info("stsch: sch %08x not enabled", schid);
+> ./lib/s390x/css_lib.c 185:              return false;
+> ./lib/s390x/css_lib.c 186:      }
+> --
+> ./lib/s390x/css_lib.c 207:      if (cc) {
+> ./lib/s390x/css_lib.c 208:              report_info("stsch: sch %08x failed with cc=%d", schid, cc);
+> ./lib/s390x/css_lib.c 209:              return cc;
+> ./lib/s390x/css_lib.c 210:      }
+> --
+> ./lib/s390x/css_lib.c 213:      if ((pmcw->flags & (PMCW_ISC_MASK | PMCW_ENABLE)) == flags) {
+> ./lib/s390x/css_lib.c 214:              report_info("stsch: sch %08x already enabled", schid);
+> ./lib/s390x/css_lib.c 215:              return 0;
+> ./lib/s390x/css_lib.c 216:      }
+> --
+> ./lib/s390x/css_lib.c 269:      if (cc) {
+> ./lib/s390x/css_lib.c 270:              report_info("stsch: sch %08x failed with cc=%d", schid, cc);
+> ./lib/s390x/css_lib.c 271:              return false;
+> ./lib/s390x/css_lib.c 272:      }
+> --
+[...]
