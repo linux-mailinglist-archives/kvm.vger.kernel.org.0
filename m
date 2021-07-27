@@ -2,94 +2,91 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2496F3D7A54
-	for <lists+kvm@lfdr.de>; Tue, 27 Jul 2021 17:59:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 97E673D7AD0
+	for <lists+kvm@lfdr.de>; Tue, 27 Jul 2021 18:20:10 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236974AbhG0P73 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 27 Jul 2021 11:59:29 -0400
-Received: from foss.arm.com ([217.140.110.172]:40702 "EHLO foss.arm.com"
+        id S229553AbhG0QUI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 27 Jul 2021 12:20:08 -0400
+Received: from mga14.intel.com ([192.55.52.115]:10128 "EHLO mga14.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229569AbhG0P73 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 27 Jul 2021 11:59:29 -0400
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id D938A31B;
-        Tue, 27 Jul 2021 08:59:28 -0700 (PDT)
-Received: from [192.168.0.110] (unknown [172.31.20.19])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id C5A6A3F70D;
-        Tue, 27 Jul 2021 08:59:26 -0700 (PDT)
-Subject: Re: [PATCH v2 3/6] KVM: arm64: Avoid mapping size adjustment on
- permission fault
-To:     Marc Zyngier <maz@kernel.org>,
-        linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org,
-        kvmarm@lists.cs.columbia.edu, linux-mm@kvack.org
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Matthew Wilcox <willy@infradead.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Will Deacon <will@kernel.org>,
-        Quentin Perret <qperret@google.com>,
-        James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        kernel-team@android.com
-References: <20210726153552.1535838-1-maz@kernel.org>
- <20210726153552.1535838-4-maz@kernel.org>
-From:   Alexandru Elisei <alexandru.elisei@arm.com>
-Message-ID: <5216fbb0-1df2-325c-5e4d-98245c7470e6@arm.com>
-Date:   Tue, 27 Jul 2021 17:00:37 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.12.0
+        id S229441AbhG0QUH (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 27 Jul 2021 12:20:07 -0400
+X-IronPort-AV: E=McAfee;i="6200,9189,10057"; a="212201125"
+X-IronPort-AV: E=Sophos;i="5.84,274,1620716400"; 
+   d="scan'208";a="212201125"
+Received: from fmsmga003.fm.intel.com ([10.253.24.29])
+  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Jul 2021 09:20:02 -0700
+X-IronPort-AV: E=Sophos;i="5.84,274,1620716400"; 
+   d="scan'208";a="505949944"
+Received: from nwang2-mobl1.ccr.corp.intel.com (HELO localhost) ([10.249.173.89])
+  by fmsmga003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Jul 2021 09:19:59 -0700
+Date:   Wed, 28 Jul 2021 00:19:57 +0800
+From:   Yu Zhang <yu.c.zhang@linux.intel.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Ben Gardon <bgardon@google.com>
+Cc:     kvm@vger.kernel.org
+Subject: A question of TDP unloading.
+Message-ID: <20210727161957.lxevvmy37azm2h7z@linux.intel.com>
 MIME-Version: 1.0
-In-Reply-To: <20210726153552.1535838-4-maz@kernel.org>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+User-Agent: NeoMutt/20171215
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Marc,
+Hi all,
 
-On 7/26/21 4:35 PM, Marc Zyngier wrote:
-> Since we only support PMD-sized mappings for THP, getting
-> a permission fault on a level that results in a mapping
-> being larger than PAGE_SIZE is a sure indication that we have
-> already upgraded our mapping to a PMD.
->
-> In this case, there is no need to try and parse userspace page
-> tables, as the fault information already tells us everything.
->
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> ---
->  arch/arm64/kvm/mmu.c | 11 ++++++++---
->  1 file changed, 8 insertions(+), 3 deletions(-)
->
-> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> index 0adc1617c557..ebb28dd4f2c9 100644
-> --- a/arch/arm64/kvm/mmu.c
-> +++ b/arch/arm64/kvm/mmu.c
-> @@ -1076,9 +1076,14 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
->  	 * If we are not forced to use page mapping, check if we are
->  	 * backed by a THP and thus use block mapping if possible.
->  	 */
-> -	if (vma_pagesize == PAGE_SIZE && !(force_pte || device))
-> -		vma_pagesize = transparent_hugepage_adjust(kvm, memslot, hva,
-> -							   &pfn, &fault_ipa);
-> +	if (vma_pagesize == PAGE_SIZE && !(force_pte || device)) {
-> +		if (fault_status == FSC_PERM && fault_granule > PAGE_SIZE)
-> +			vma_pagesize = fault_granule;
-> +		else
-> +			vma_pagesize = transparent_hugepage_adjust(kvm, memslot,
-> +								   hva, &pfn,
-> +								   &fault_ipa);
-> +	}
+  I'd like to ask a question about kvm_reset_context(): is there any
+  reason that we must alway unload TDP root in kvm_mmu_reset_context()?
+  
+  As you know, KVM MMU needs to track guest paging mode changes, to
+  recalculate the mmu roles and reset callback routines(e.g., guest
+  page table walker). These are done in kvm_mmu_reset_context(). Also,
+  entering SMM, cpuid updates, and restoring L1 VMM's host state will
+  trigger kvm_mmu_reset_context() too.
+  
+  Meanwhile, another job done by kvm_mmu_reset_context() is to unload
+  the KVM MMU:
+  
+  - For shadow & legacy TDP, it means to unload the root shadow/TDP
+    page and reconstruct another one in kvm_mmu_reload(), before
+    entering guest. Old shadow/TDP pages will probably be reused later,
+    after future guest paging mode switches.
+  
+  - For TDP MMU, it is even more aggressive, all TDP pages will be
+    zapped, meaning a whole new TDP page table will be recontrustred,
+    with each paging mode change in the guest. I witnessed dozens of
+    rebuildings of TDP when booting a Linux guest(besides the ones
+    caused by memslots rearrangement).
+  
+  However, I am wondering, why do we need the unloading, if GPA->HPA
+  relationship is not changed? And if this is not a must, could we
+  find a way to refactor kvm_mmu_reset_context(), so that unloading
+  of TDP root is only performed when necessary(e.g, SMM switches and
+  maybe after cpuid updates which may change the level of TDP)? 
+  
+  I tried to add a parameter in kvm_mmu_reset_context(), to make the
+  unloading optional:  
 
-Looks good:
++void kvm_mmu_reset_context(struct kvm_vcpu *vcpu, bool force_tdp_unload)
+ {
+-       kvm_mmu_unload(vcpu);
++       if (!tdp_enabled || force_tdp_unload)
++               kvm_mmu_unload(vcpu);
++
+        kvm_init_mmu(vcpu);
+ }
 
-Reviewed-by: Alexandru Elisei <alexandru.elisei@arm.com>
+  But this change brings another problem - if we keep the TDP root, the
+  role of existing SPs will be obsolete after guest paging mode changes.
+  Altough I guess most role flags are irrelevant in TDP, I am not sure
+  if this could cause any trouble.
+  
+  Is there anyone looking at this issue? Or do you have any suggestion?
+  Thanks!
+  
+B.R.
+Yu
 
-Thanks,
-
-Alex
-
->  
->  	if (fault_status != FSC_PERM && !device && kvm_has_mte(kvm)) {
->  		/* Check the VMM hasn't introduced a new VM_SHARED VMA */
