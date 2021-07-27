@@ -2,119 +2,144 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 396343D6A7E
-	for <lists+kvm@lfdr.de>; Tue, 27 Jul 2021 02:01:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 906393D6AEA
+	for <lists+kvm@lfdr.de>; Tue, 27 Jul 2021 02:16:35 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234187AbhGZXVN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 26 Jul 2021 19:21:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48730 "EHLO
+        id S233959AbhGZXgE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 26 Jul 2021 19:36:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52128 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233770AbhGZXVL (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 26 Jul 2021 19:21:11 -0400
-Received: from mail-pl1-x632.google.com (mail-pl1-x632.google.com [IPv6:2607:f8b0:4864:20::632])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A2549C061757;
-        Mon, 26 Jul 2021 17:01:39 -0700 (PDT)
-Received: by mail-pl1-x632.google.com with SMTP id e14so13704984plh.8;
-        Mon, 26 Jul 2021 17:01:39 -0700 (PDT)
+        with ESMTP id S233770AbhGZXgD (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 26 Jul 2021 19:36:03 -0400
+Received: from mail-pj1-x1029.google.com (mail-pj1-x1029.google.com [IPv6:2607:f8b0:4864:20::1029])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 657A0C061757
+        for <kvm@vger.kernel.org>; Mon, 26 Jul 2021 17:16:30 -0700 (PDT)
+Received: by mail-pj1-x1029.google.com with SMTP id b1-20020a17090a8001b029017700de3903so1378396pjn.1
+        for <kvm@vger.kernel.org>; Mon, 26 Jul 2021 17:16:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:subject:from:in-reply-to:date:cc
-         :content-transfer-encoding:message-id:references:to;
-        bh=lUWjZQDXW1+VGvHm1XsC8R6KR/u25Shxim64XwKLYOc=;
-        b=uEhXO1WKKa7U5w07vZoUVJ/G/ZV0UXZnLHN+HefwplYIosDp46zvWVaF5zcladnDl0
-         F1nbjGv2t4jWtqGGiRG0rdinfdhPbH+ju8ESVkunzvISrjCeI8Y3FsRHRjFfTbVeS7qP
-         JwgK2gHQD3pbb147K11UE2cWhy76+Evp2R7apig9CdVjHhpWqn3TPhIwtvaMkC+p+F1T
-         XEzgDlicBT7LmNMOtbhe9YwOJC4YNiMdAgf05Rzdr69LitvupORdrpqEZxj1jpqebNUy
-         j7iD12JdTxUrhttr9rMF7kUomYJWVX5MftPwDb71rMtxmoEMjmXAFhnBSboSRiKWxW7r
-         uYfg==
+        d=google.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=zk0iqSB1ekVxBFavbcS07BJzicHkln1Ubagf95g9lFU=;
+        b=iQ4uKjQkBkcg9NXmmtkJdbG3r/aSubgEoxmw1PqKWpxvYMQsiQn9tfM/N1E7SXI+W9
+         ik+NjCORivZkSwcnT2+NjsPCWAOFjdxoEUQxE214+juzuQiODHr9613qAkMExKR8Cmu2
+         n4sO2DpgEFwzb8lfxsrvKI/fkEIPm4XozkewFkRLq/fLeRiG77tRBQr89SZoaIvEvYE2
+         BfJ8HCj7cTa+0oCJk2DGP288W3BgtuBYortNx5pxBxDJv71behiTVksKUmEC5zBW3jP+
+         ooNbtg93i7YzR4dExLnFjSJFzBXuewhHJHf2qDTyXGc00q921ABACnTXOtkgDl6wuoLy
+         r2cQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:subject:from:in-reply-to:date:cc
-         :content-transfer-encoding:message-id:references:to;
-        bh=lUWjZQDXW1+VGvHm1XsC8R6KR/u25Shxim64XwKLYOc=;
-        b=uJdQ2yuGDOdGUdwdru2Ew7gatGMRji7ViDqHnEUCs37DC0aWrpayxoLJ0NCbnmy0dW
-         TNtpJ2EbpM/89HbZ/CaGDIyCE0vX44yPBjF0P+S9hUullMfuYbLFGSJP/o8YHrOBqxSd
-         3/3COBHFVVfCJcU5fN8UEWGA/QJTii4qWzbvVDSRy5MxxoE1U3I2UzY5wS7B5AVMsy1E
-         yjsjKO+R0O0zMiZZY7wM0ihknIo5wIR+jwHkl1wuypKG4iCE7G0a6HlTZRRMXtRKXfvd
-         2YINzznDqdbbaXEVYihHwJ5b8tWImxvd9w3R5DgNxaSv+Nvn/pnoXgNyq1FroiWfbYee
-         DrIg==
-X-Gm-Message-State: AOAM530W6/jn0Yxe+t1Ep+zrfbRJKiLNNH/mk3+acsSzqO7gI3Hmc1Hp
-        vhnD6larKFMmLMCg6b15lgk=
-X-Google-Smtp-Source: ABdhPJxhNVQEpYqpNVd+k+C8FWNhN3WAWtV7aOMjjnpGW0pDOnJKwzW14lIHVW7BwU7gDICkPua42w==
-X-Received: by 2002:a62:1bc7:0:b029:328:f2c:8ff1 with SMTP id b190-20020a621bc70000b02903280f2c8ff1mr20156762pfb.18.1627344098894;
-        Mon, 26 Jul 2021 17:01:38 -0700 (PDT)
-Received: from smtpclient.apple (c-24-6-216-183.hsd1.ca.comcast.net. [24.6.216.183])
-        by smtp.gmail.com with ESMTPSA id q21sm981911pgk.71.2021.07.26.17.01.37
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 26 Jul 2021 17:01:38 -0700 (PDT)
-Content-Type: text/plain;
-        charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 14.0 \(3654.120.0.1.13\))
-Subject: Re: [PATCH v2 46/46] KVM: x86: Preserve guest's CR0.CD/NW on INIT
-From:   Nadav Amit <nadav.amit@gmail.com>
-In-Reply-To: <CAAeT=FzGDUr8MK5Uf3jyUxtf+2jCf=bgG760L0mjjM3vRsXKSg@mail.gmail.com>
-Date:   Mon, 26 Jul 2021 17:01:36 -0700
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, KVM <kvm@vger.kernel.org>,
-        linux-kernel@vger.kernel.org
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <A41676B6-2E9F-4F8E-B91E-8F9A077A2FA8@gmail.com>
-References: <20210713163324.627647-1-seanjc@google.com>
- <20210713163324.627647-47-seanjc@google.com>
- <CAAeT=FzGDUr8MK5Uf3jyUxtf+2jCf=bgG760L0mjjM3vRsXKSg@mail.gmail.com>
-To:     Reiji Watanabe <reijiw@google.com>
-X-Mailer: Apple Mail (2.3654.120.0.1.13)
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=zk0iqSB1ekVxBFavbcS07BJzicHkln1Ubagf95g9lFU=;
+        b=OvIUDLb+QgF7ZC+pTxmLAD6M5e7qPj+5c2vraStjJ3wj2zmMKN9hYIO8amate0XWB6
+         tTSp+d6mkXia8oAC/2xFGZgxfkEcbBB99WD0NU8BDDxZfkyxzs6pJNcjIdjqMM8khDSd
+         4o7FeKhg3QhmktWxzt3+WaN4CoWkGqGq1dPS0frEKYr8g7w7HhUCugH6IGiHzEjm36qJ
+         4fmo4OmU5K+p9ldmWRcP1LGbCq2kwTO6DCz8bEivYMuEZZe+nCflXe8qIzR3PTiXpqfa
+         ceJRomzrVGjOXRnz3VegbC6aSewXzlzS+ZdPqxxQFALPVepKar05YTYHnw0AOJ63RKxJ
+         MyLg==
+X-Gm-Message-State: AOAM5309MR9afaQXahw957bcmmCVODIlMVlGEcJwRgbnRYL/zmGKBztQ
+        yI3Upliy+m6fbvkdioQKriERnQIrrma2eg==
+X-Google-Smtp-Source: ABdhPJyfMOB4JTwlhNWlydYZuJSgZEQFvo61R8gohiRiFLXl21VY+hUhmj3GrF59rYb8HSyiwxsJrw==
+X-Received: by 2002:a17:903:31d1:b029:120:2863:cba2 with SMTP id v17-20020a17090331d1b02901202863cba2mr16606268ple.28.1627344989656;
+        Mon, 26 Jul 2021 17:16:29 -0700 (PDT)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id p17sm643377pjz.16.2021.07.26.17.16.28
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 26 Jul 2021 17:16:28 -0700 (PDT)
+Date:   Tue, 27 Jul 2021 00:16:25 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Ben Gardon <bgardon@google.com>
+Cc:     Dan Carpenter <dan.carpenter@oracle.com>, kvm <kvm@vger.kernel.org>
+Subject: Re: [bug report] KVM: x86/mmu: Use an rwlock for the x86 MMU
+Message-ID: <YP9QWT4FXYxOg2s8@google.com>
+References: <20210726075238.GA10030@kili>
+ <CANgfPd-H3a7zdEeV2rtyCTcHinYOwTB=KFFRXYSnYCG8e+tq6w@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CANgfPd-H3a7zdEeV2rtyCTcHinYOwTB=KFFRXYSnYCG8e+tq6w@mail.gmail.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Mon, Jul 26, 2021, Ben Gardon wrote:
+> On Mon, Jul 26, 2021 at 12:52 AM Dan Carpenter <dan.carpenter@oracle.com> wrote:
+> >
+> > [ This is not the correct patch to blame, but there is something going
+> >   on here which I don't understand so this email is more about me
+> >   learning rather than reporting bugs. - dan ]
+> >
+> > Hello Ben Gardon,
+> >
+> > The patch 531810caa9f4: "KVM: x86/mmu: Use an rwlock for the x86 MMU"
+> > from Feb 2, 2021, leads to the following static checker warning:
+> >
+> >         arch/x86/kvm/mmu/mmu.c:5769 kvm_mmu_zap_all()
+> >         warn: sleeping in atomic context
+> >
+> > arch/x86/kvm/mmu/mmu.c
+> >     5756 void kvm_mmu_zap_all(struct kvm *kvm)
+> >     5757 {
+> >     5758        struct kvm_mmu_page *sp, *node;
+> >     5759        LIST_HEAD(invalid_list);
+> >     5760        int ign;
+> >     5761
+> >     5762        write_lock(&kvm->mmu_lock);
+> >                 ^^^^^^^^^^^^^^^^^^^^^^^^^^
+> > This line bumps the preempt count.
+> >
+> >     5763 restart:
+> >     5764        list_for_each_entry_safe(sp, node, &kvm->arch.active_mmu_pages, link) {
+> >     5765                if (WARN_ON(sp->role.invalid))
+> >     5766                        continue;
+> >     5767                if (__kvm_mmu_prepare_zap_page(kvm, sp, &invalid_list, &ign))
+> >     5768                        goto restart;
+> > --> 5769                if (cond_resched_rwlock_write(&kvm->mmu_lock))
+> >                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> > This line triggers a sleeping in atomic warning.  What's going on here
+> > that I'm not understanding?
+> 
+> 
+> Hi Dan,
+> 
+> Thanks for sending this. I'm confused by this sequence too. I'm not
+> sure how this could sleep in an atomic context.
+> My first thought was that there might be something going on with the
+> qrwlock's wait_lock, but since this thread already acquired the
+> rwlock, it can't be holding / waiting on the wait_lock.
+> 
+> Then I thought the __might_sleep could be in the wrong place, but it's
+> in the same place for a regular spinlock, so I think that's fine.
 
-> On Jul 19, 2021, at 9:37 PM, Reiji Watanabe <reijiw@google.com> wrote:
->=20
-> On Tue, Jul 13, 2021 at 9:35 AM Sean Christopherson =
-<seanjc@google.com> wrote:
->>=20
->> Preserve CR0.CD and CR0.NW on INIT instead of forcing them to '1', as
->> defined by both Intel's SDM and AMD's APM.
->>=20
->> Note, current versions of Intel's SDM are very poorly written with
->> respect to INIT behavior.  Table 9-1. "IA-32 and Intel 64 Processor
->> States Following Power-up, Reset, or INIT" quite clearly lists =
-power-up,
->> RESET, _and_ INIT as setting CR0=3D60000010H, i.e. CD/NW=3D1.  But =
-the SDM
->> then attempts to qualify CD/NW behavior in a footnote:
->>=20
->>  2. The CD and NW flags are unchanged, bit 4 is set to 1, all other =
-bits
->>     are cleared.
->>=20
->> Presumably that footnote is only meant for INIT, as the RESET case =
-and
->> especially the power-up case are rather non-sensical.  Another =
-footnote
->> all but confirms that:
->>=20
->>  6. Internal caches are invalid after power-up and RESET, but left
->>     unchanged with an INIT.
->>=20
->> Bare metal testing shows that CD/NW are indeed preserved on INIT =
-(someone
->> else can hack their BIOS to check RESET and power-up :-D).
->>=20
->> Reported-by: Reiji Watanabe <reijiw@google.com>
->> Signed-off-by: Sean Christopherson <seanjc@google.com>
->=20
-> Reviewed-by: Reiji Watanabe <reijiw@google.com>
->=20
-> Thank you for the fix and checking the CD/NW with the bare metal =
-testing.
+The PREEMPT_LOCK_OFFSET parameter to __might_sleep()
 
-Interesting.
+  __might_sleep(__FILE__, __LINE__, PREEMPT_LOCK_OFFSET);	\
 
-Is there a kvm-unit-test to reproduce the issue by any chance?
+effectively tells it to exempt a single preemption count via preempt_count_equals()
 
+  void ___might_sleep(const char *file, int line, int preempt_offset)
+  {
+	...
+
+	if ((preempt_count_equals(preempt_offset) && !irqs_disabled() &&
+	     !is_idle_task(current) && !current->non_block_count) ||
+	    system_state == SYSTEM_BOOTING || system_state > SYSTEM_RUNNING ||
+	    oops_in_progress)
+		return;
+
+	...
+  }
+
+which returns true if the preempt count equals the passed in offset.
+PREEMPT_LOCK_OFFSET is just the vanilla preempt_disable() offset, which is why
+there's no special preemption call in the lock/unlock paths.
+
+  #define PREEMPT_LOCK_OFFSET	PREEMPT_DISABLE_OFFSET
+
+
+Dan, is this coming from Smatch?  If so, is this by chance a new, in-progress
+warning that has special code to handle cond_resched_lock()?  I couldn't find
+any matches on "sleeping in atomic context" in Smatch.  The rwlock variants,
+cond_resched_rwlock_{read,write}() were added specifically for KVM's TDP MMU,
+maybe they snuck in after a waiver for cond_resched_lock() was added?
