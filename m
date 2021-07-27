@@ -2,124 +2,124 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9C8B53D7D48
-	for <lists+kvm@lfdr.de>; Tue, 27 Jul 2021 20:17:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8DDF03D7E09
+	for <lists+kvm@lfdr.de>; Tue, 27 Jul 2021 20:53:15 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231971AbhG0SRl (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 27 Jul 2021 14:17:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45490 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229974AbhG0SRi (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 27 Jul 2021 14:17:38 -0400
-Received: from mail-pl1-x62b.google.com (mail-pl1-x62b.google.com [IPv6:2607:f8b0:4864:20::62b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CDEF1C061757
-        for <kvm@vger.kernel.org>; Tue, 27 Jul 2021 11:17:37 -0700 (PDT)
-Received: by mail-pl1-x62b.google.com with SMTP id e14so16788167plh.8
-        for <kvm@vger.kernel.org>; Tue, 27 Jul 2021 11:17:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=+s15nut/2SxrGQ322z8+gWVFmP+vDGNZBfdbvFgLxUE=;
-        b=Itw6lhNN5TGYy0Peur2pD3tsj4JAjzMGqY1gicu3nnEiQigCTChrZwCUEoe3sNQr0f
-         M1aym5fGw5OL4WEUnWMiYnQ0tHR+YjyiwuM7iCtbm0/FWYtlmIC5EbncykR0nQ5KbEHZ
-         MGPfxxSH7sxTTAOJfKUJHTP33N46xStQmPCjKu08VetOHx+Ry/CDTD1M+hUskSWieV7r
-         4SVbAbf6oQV3eS9qGiwAikzN//gkbd+2il7Oa0y0yKKF7YtQweFyQw/s/1ey2cejdWUG
-         G00EqJ97Ai7+bzGNtBgp6hp8fIY97Hs4c0Vdakp+ZH9ECCpSQXSM1CT1zS/RvphLrKMh
-         9Cvg==
+        id S230334AbhG0SxO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 27 Jul 2021 14:53:14 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:26645 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229453AbhG0SxN (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 27 Jul 2021 14:53:13 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1627411993;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=pywaGuqiWa+m7IiTARlllehIqVu1cJ37vlNw1KlZgMk=;
+        b=M9ur1aRiiiQjgCaGe+rgz0Q+693/HPJ6+cetAo9uf9Cg3MEv9VSBUbH/Ru4Nh1u4uopbhk
+        MGmlBplY3tmeBs6LHjhWa8o9K2MJdcF1/7OCZ6rwxnLnX5plRLkagi0TErLd0cH71eP656
+        B4YNbv44NF5Pjumy/u+5yMGP0NvYsE0=
+Received: from mail-oo1-f69.google.com (mail-oo1-f69.google.com
+ [209.85.161.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-278-QDsplI6cMymhTFA0lsrAeQ-1; Tue, 27 Jul 2021 14:53:11 -0400
+X-MC-Unique: QDsplI6cMymhTFA0lsrAeQ-1
+Received: by mail-oo1-f69.google.com with SMTP id u5-20020a4a97050000b029026a71f65966so43495ooi.2
+        for <kvm@vger.kernel.org>; Tue, 27 Jul 2021 11:53:11 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=+s15nut/2SxrGQ322z8+gWVFmP+vDGNZBfdbvFgLxUE=;
-        b=kMQUgnsrdymgK0z9a70GSe1V6M4f7AaSJTfeaBCM/2QlqG7nndjeX5o+tf/xyDYvat
-         qtlyKQ6mr1XrT8sQXiePJc+wkSR0+PvoRnY+6dFudcfg1FFyLlJ14vUijFmJjpA/ffdl
-         PEU8GTblei3EhMowH/V+TTaZhrEP1nfiZ5Jfy5wSIMoHV/hLfZ2aGYosIIS1A5Hn4dyk
-         wGpGgNL89bggt0IQ4XZ7KPrynbWfpBsOSokbPoCabgRKSa+qrlFyibBRXakm54At/6Ev
-         9rk4dzguz01voUQ5y1SYeTYwmUXazDz9qwwOIfml8w95tSXJh3u738M2LxzugEIGcZ8k
-         GFbg==
-X-Gm-Message-State: AOAM532Ny0EKR5IENX4e7voBO3eVNvD1ONbSJ4SimSjm8U0zPZGtG3oG
-        9FlEyLNl67Q8EIp4sw5hH12Z1g==
-X-Google-Smtp-Source: ABdhPJxnM+yVhevOr4ODOgBtLtNa4xe1T8NrWQtiNLb6khNrYl+l1cYuSHLE+Y3yLf20WBkkOWHmVA==
-X-Received: by 2002:a17:90a:19c2:: with SMTP id 2mr23625400pjj.233.1627409857193;
-        Tue, 27 Jul 2021 11:17:37 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id k198sm4509280pfd.148.2021.07.27.11.17.36
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
+         :references:organization:mime-version:content-transfer-encoding;
+        bh=pywaGuqiWa+m7IiTARlllehIqVu1cJ37vlNw1KlZgMk=;
+        b=RoB1III1/HJgPXJul+YSsxRafvffNNQa/MPzm24guHMDWvFrfwNAWW2PuFwLBHX2qp
+         WPqci08JC0/yeaBxtnqN2ZjiUqLUVV3QSa5p+4PEXPVTxXRsGyP2U4xhsoIo+OYhQKOG
+         R4pR8eb1ZIZVbXZ9X1sL0qRd9+257iWk/F3Fkjop6qlCWOa0be92jg6dCuqCsvQSNzI1
+         Zw4Mt8AHCTmKpsIBp1eVvgkURM+SoINU5o9BBdrVv4Yb9hUAzGG+rIvVQk4dE+E/XuaO
+         S3aTeCakns3pkkKDlzmz1dF+R9FqYlCLdvQoV/VsQjWEGzvt/n1ODXHVyY43UH3ybRJX
+         yC0A==
+X-Gm-Message-State: AOAM5311lDvRWZMkHWYOI8FjSiU5FIUuhUj/vt5USiWSj65unlX5Y4wc
+        acO4+KPMh2vbjy6jas3iO3E9ge0bj44RSipF9o0o9KYcAdDWQ5Op9AzcrzGvtD0b9zkT3wukJXv
+        bwQr726fna3Gs
+X-Received: by 2002:a05:6830:11d3:: with SMTP id v19mr17222653otq.98.1627411991238;
+        Tue, 27 Jul 2021 11:53:11 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyQACTDPYwC/EEIPJP2/Eptj4nf31Vq9hx3nse0SZ0K8pyRgSXydLLBvOMzEu23g7Kl+qQZQA==
+X-Received: by 2002:a05:6830:11d3:: with SMTP id v19mr17222644otq.98.1627411991056;
+        Tue, 27 Jul 2021 11:53:11 -0700 (PDT)
+Received: from redhat.com ([198.99.80.109])
+        by smtp.gmail.com with ESMTPSA id a7sm613602ooo.9.2021.07.27.11.53.10
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 27 Jul 2021 11:17:36 -0700 (PDT)
-Date:   Tue, 27 Jul 2021 18:17:32 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Ben Gardon <bgardon@google.com>
-Cc:     Maxim Levitsky <mlevitsk@redhat.com>, kvm <kvm@vger.kernel.org>,
-        "open list:X86 ARCHITECTURE (32-BIT AND 64-BIT)" 
-        <linux-kernel@vger.kernel.org>, Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, Borislav Petkov <bp@alien8.de>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ingo Molnar <mingo@redhat.com>,
-        "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>
-Subject: Re: [PATCH v2 8/8] KVM: x86: hyper-v: Deactivate APICv only when
- AutoEOI feature is in use
-Message-ID: <YQBNvLg8WZiKVLBx@google.com>
-References: <20210713142023.106183-1-mlevitsk@redhat.com>
- <20210713142023.106183-9-mlevitsk@redhat.com>
- <c51d3f0b46bb3f73d82d66fae92425be76b84a68.camel@redhat.com>
- <YPXJQxLaJuoF6aXl@google.com>
- <64ed28249c1895a59c9f2e2aa2e4c09a381f69e5.camel@redhat.com>
- <YPnBxHwMJkTSBHfC@google.com>
- <714b56eb83e94aca19e35a8c258e6f28edc0a60d.camel@redhat.com>
- <CANgfPd_o5==utejx6iG9xfWrbKtsvGWNbB4yrmuA-NVj_r_a9A@mail.gmail.com>
+        Tue, 27 Jul 2021 11:53:10 -0700 (PDT)
+Date:   Tue, 27 Jul 2021 12:53:09 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Jason Gunthorpe <jgg@nvidia.com>
+Cc:     Cornelia Huck <cohuck@redhat.com>, Christoph Hellwig <hch@lst.de>,
+        Kirti Wankhede <kwankhede@nvidia.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 2/2] vfio/mdev: don't warn if ->request is not set
+Message-ID: <20210727125309.292b30c0.alex.williamson@redhat.com>
+In-Reply-To: <20210727173209.GG1721383@nvidia.com>
+References: <20210726143524.155779-1-hch@lst.de>
+        <20210726143524.155779-3-hch@lst.de>
+        <87zgu93sxz.fsf@redhat.com>
+        <20210726230906.GD1721383@nvidia.com>
+        <20210726172831.3a7978fd.alex.williamson@redhat.com>
+        <87wnpc47j3.fsf@redhat.com>
+        <20210727173209.GG1721383@nvidia.com>
+Organization: Red Hat
+X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CANgfPd_o5==utejx6iG9xfWrbKtsvGWNbB4yrmuA-NVj_r_a9A@mail.gmail.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jul 27, 2021, Ben Gardon wrote:
-> On Tue, Jul 27, 2021 at 6:06 AM Maxim Levitsky <mlevitsk@redhat.com> wrote:
-> >
-> > On Thu, 2021-07-22 at 19:06 +0000, Sean Christopherson wrote:
-> > > The elevated mmu_notifier_count and/or changed mmu_notifier_seq will cause vCPU1
-> > > to bail and resume the guest without fixing the #NPF.  After acquiring mmu_lock,
-> > > vCPU1 will see the elevated mmu_notifier_count (if kvm_zap_gfn_range() is about
-> > > to be called, or just finised) and/or a modified mmu_notifier_seq (after the
-> > > count was decremented).
+On Tue, 27 Jul 2021 14:32:09 -0300
+Jason Gunthorpe <jgg@nvidia.com> wrote:
+
+> On Tue, Jul 27, 2021 at 08:04:16AM +0200, Cornelia Huck wrote:
+> > On Mon, Jul 26 2021, Alex Williamson <alex.williamson@redhat.com> wrote:
+> >   
+> > > On Mon, 26 Jul 2021 20:09:06 -0300
+> > > Jason Gunthorpe <jgg@nvidia.com> wrote:
+> > >  
+> > >> On Mon, Jul 26, 2021 at 07:07:04PM +0200, Cornelia Huck wrote:
+> > >>   
+> > >> > But I wonder why nobody else implements this? Lack of surprise removal?    
+> > >> 
+> > >> The only implementation triggers an eventfd that seems to be the same
+> > >> eventfd as the interrupt..
+> > >> 
+> > >> Do you know how this works in userspace? I'm surprised that the
+> > >> interrupt eventfd can trigger an observation that the kernel driver
+> > >> wants to be unplugged?  
 > > >
-> > > This is why kvm_zap_gfn_range() needs to take mmu_lock for write.  If it's allowed
-> > > to run in parallel with the page fault handler, there's no guarantee that the
-> > > correct apic_access_memslot_enabled will be observed.
-> >
-> > I understand now.
-> >
-> > So, Paolo, Ben Gardon, what do you think. Do you think this approach is feasable?
-> > Do you agree to revert the usage of the read lock?
-> >
-> > I will post a new series using this approach very soon, since I already have
-> > msot of the code done.
-> >
-> > Best regards,
-> >         Maxim Levitsky
+> > > I think we're talking about ccw, but I see QEMU registering separate
+> > > eventfds for each of the 3 IRQ indexes and the mdev driver specifically
+> > > triggering the req_trigger...?  Thanks,
+> > >
+> > > Alex  
+> > 
+> > Exactly, ccw has a trigger for normal I/O interrupts, CRW (machine
+> > checks), and this one.  
 > 
-> From reading through this thread, it seems like switching from read
-> lock to write lock is only necessary for a small range of GFNs, (i.e.
-> the APIC access page) is that correct?
+> If it is a dedicated eventfd for 'device being removed' why is it in
+> the CCW implementation and not core code?
 
-For the APICv case, yes, literally a single GFN (the default APIC base).
+The CCW implementation (likewise the vfio-pci implementation) owns the
+IRQ index address space and the decision to make this a signal to
+userspace rather than perhaps some handling a device might be able to
+do internally.  For instance an alternate vfio-pci implementation might
+zap all mmaps, block all r/w access, and turn this into a surprise
+removal.  Another implementation might be more aggressive to sending
+SIGKILL to the user process.  This was the thought behind why vfio-core
+triggers the driver request callback with a counter, leaving the policy
+to the driver.
 
-> My initial reaction was that switching kvm_zap_gfn_range back to the
-> write lock would be terrible for performance, but given its only two
-> callers, I think it would actually be fine.
+> Is PCI doing the same?
 
-And more importantly, the two callers are gated by kvm_arch_has_noncoherent_dma()
-and are very rare flows for the guest (updating MTRRs, toggling CR0.CD).
+Yes, that's where this handling originated.  Thanks,
 
-> If you do that though, you should pass shared=false to
-> kvm_tdp_mmu_zap_gfn_range in that function, so that it knows it's
-> operating with exclusive access to the MMU lock.
+Alex
 
-Ya, my suggested revert was to drop @shared entirely since kvm_zap_gfn_range() is
-the only caller that passes @shared=true.
