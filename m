@@ -2,119 +2,82 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B9EF93D7275
-	for <lists+kvm@lfdr.de>; Tue, 27 Jul 2021 11:58:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A74083D733A
+	for <lists+kvm@lfdr.de>; Tue, 27 Jul 2021 12:29:55 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236188AbhG0J6J (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 27 Jul 2021 05:58:09 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:33748 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S236106AbhG0J6J (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 27 Jul 2021 05:58:09 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1627379889;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=T2rQBG2yVNE7y1+uB+3b6lsmKXViZKQecoiM/1czVBA=;
-        b=Mg426BPKHiEYYUn6qqnuG/nyDQOJYDyb/m0yJ9SCdyQyFrbVZWvK4O6C/8bSJhPF8gZO/G
-        nHTn3GoCk0wG5MwAUysIh/DFJIaZ8gCsE5dqdeDmNjZZCdFR3ji7i6ztzV/5lJqDNCOs8v
-        zS+PIf3+QKLIzPjTx95po+Z97nyJyb8=
-Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
- [209.85.208.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-81-yAmY8BCPPreayAGH6owhag-1; Tue, 27 Jul 2021 05:58:07 -0400
-X-MC-Unique: yAmY8BCPPreayAGH6owhag-1
-Received: by mail-ed1-f70.google.com with SMTP id b13-20020a056402278db029039c013d5b80so6342026ede.7
-        for <kvm@vger.kernel.org>; Tue, 27 Jul 2021 02:58:07 -0700 (PDT)
+        id S236243AbhG0K3y (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 27 Jul 2021 06:29:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49438 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S236036AbhG0K3x (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 27 Jul 2021 06:29:53 -0400
+Received: from mail-wr1-x436.google.com (mail-wr1-x436.google.com [IPv6:2a00:1450:4864:20::436])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 78477C061757
+        for <kvm@vger.kernel.org>; Tue, 27 Jul 2021 03:29:53 -0700 (PDT)
+Received: by mail-wr1-x436.google.com with SMTP id g15so14611535wrd.3
+        for <kvm@vger.kernel.org>; Tue, 27 Jul 2021 03:29:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=sEVmfuf6SAseKM7IhWi4Jb0Zlgwxa7yzUBD2vot0gXo=;
+        b=jbMwd6Vf/veIiSMmFyck6MkZinWyb8unn2adULZu5hHXgBtUJvqcr7kHGRoDFsLTVF
+         Ht499ehIBB/nonP+vrMAjoWud6FMfahyup+Xc0MfU/qds5iHMcnX9oDDtGxhXfsmw2jQ
+         bOA+6T18uhuWrPr7HOF9DqvemNutUfebyAiFbMmlsk90+4cfzU35BkGVuzCOjlJzHABS
+         Cpt4iwJFPDMjI6lmrKwLeQlrPdYPUWBMpzRnzxhv7u586fgB5yOFDr74Z++FKEHYj7hv
+         vjMZy3Xh3I1JPjwJNfnFXsagRYMzf2VQSW6ySqNJ1lvGEY6NX0bBn2Dlb5HaqspF7peF
+         dfMA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=T2rQBG2yVNE7y1+uB+3b6lsmKXViZKQecoiM/1czVBA=;
-        b=igiR8KBjvueDr7tnMeyo0+xYEFut2PrPVNokaOeO6iINYjFLWMDkXN3mSdfeZFgnxp
-         B7+ZnroaEuI9BxED966rGl60/mZc0unkZCoHYSe6NgwmYB2/4S3c0V7hkxJ8DqaQ2jbf
-         5liC+Q3YhZ/FC+taNtZHwWYdbRz0VQwaMvRaLp3ARizhy1yZNBSkqgZNaLVKTLFwVnAB
-         PHie7+K6yqwzprFLACysdwpuo7fsekJmDRur9fVR9jTX1la2Vwxg+QELzvF6byEpXJV5
-         O87ZBMWeevIsuTXS29XElEjlaMyCn6p5bSUI8ijj/Ot4ycVNBQkXtcSDMyj1MXG+bpA9
-         GvYg==
-X-Gm-Message-State: AOAM533pq1Qm7yb5VRFsbLTHrwP/Xp1i3S9s1oV0FiaNXZUWUpRdB9+/
-        OEnLFlhxmG2msWLNYhE1fp6Lec071bhgnxqqyfCPTZRs1vy6ZtdYOufllv99oHx23b8cJIDMNkK
-        XH7Uc79CurTQI
-X-Received: by 2002:a17:906:ce47:: with SMTP id se7mr3742424ejb.240.1627379886418;
-        Tue, 27 Jul 2021 02:58:06 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJx8eyrbNlN1DVbEoRIS2U/HCt0SR/iGRuCNgiSKmvCYAIQaFF1wZB5TRpL7dxgdXFiMYR9Wkg==
-X-Received: by 2002:a17:906:ce47:: with SMTP id se7mr3742409ejb.240.1627379886242;
-        Tue, 27 Jul 2021 02:58:06 -0700 (PDT)
-Received: from steredhat (host-79-18-148-79.retail.telecomitalia.it. [79.18.148.79])
-        by smtp.gmail.com with ESMTPSA id f18sm726664ejx.23.2021.07.27.02.58.05
+        bh=sEVmfuf6SAseKM7IhWi4Jb0Zlgwxa7yzUBD2vot0gXo=;
+        b=ENzMiiTSe5X0qefg18agfVTh/5Q0kzryOLsst2QGKl+DqA9ak53LzYaQg8LTtPD/Vl
+         erFclH6VHTt5GXb78DvxgAu5JrGEgA0WVgiIhFnbrrGnzfrTMCGhwFxrKpAHTSlJHy0l
+         rQdmMa6n+0pW5gB2qW5TUVJSbh1yMRAnCFoklxQo9iRNyz7b2fiClh10Hh8J57yLOQRS
+         Cwa0S3Oav1QVDEKnm7xTgifswuVoQzMqRo7sw1nfC2EawwF3ZdcZklKf5MMVVsKoczQj
+         WwI8K7I3lna6aFB8FNtEOcEHP+4paMYGwG80cFgDtNvUBoG6IYQg2M/aN77NuLIP0+74
+         RHLg==
+X-Gm-Message-State: AOAM531NRLeN8P/lehR9/94hrgJdvZssTvbUfwS2bmWO1710kZ5uPQ6L
+        /0WMUPWaMWcJtboUhvFzs8YR0A==
+X-Google-Smtp-Source: ABdhPJyl4ddC3yvRFr3OUCBwgPccE+P0sn15kKofTfKQowfSw6BB1YRonRXV/ZY3mD3e5qu7Ph1vew==
+X-Received: by 2002:adf:f64b:: with SMTP id x11mr14340461wrp.155.1627381791958;
+        Tue, 27 Jul 2021 03:29:51 -0700 (PDT)
+Received: from google.com ([2a00:79e0:d:210:c468:e033:fa2b:3a6])
+        by smtp.gmail.com with ESMTPSA id w18sm2928774wrg.68.2021.07.27.03.29.51
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 27 Jul 2021 02:58:05 -0700 (PDT)
-Date:   Tue, 27 Jul 2021 11:58:03 +0200
-From:   Stefano Garzarella <sgarzare@redhat.com>
-To:     Arseny Krasnov <arseny.krasnov@kaspersky.com>
-Cc:     Stefan Hajnoczi <stefanha@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Colin Ian King <colin.king@canonical.com>,
-        Andra Paraschiv <andraprs@amazon.com>,
-        Norbert Slusarek <nslusarek@gmx.net>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "virtualization@lists.linux-foundation.org" 
-        <virtualization@lists.linux-foundation.org>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "oxffffaa@gmail.com" <oxffffaa@gmail.com>
-Subject: Re: [MASSMAIL KLMS] Re: [RFC PATCH v1 0/7] virtio/vsock: introduce
- MSG_EOR flag for SEQPACKET
-Message-ID: <20210727095803.s26subp3pgclqzvi@steredhat>
-References: <20210726163137.2589102-1-arseny.krasnov@kaspersky.com>
- <20210727075948.yl4w3foqa6rp4obg@steredhat>
- <2df68589-96b9-abd4-ad1c-e25918b908a9@kaspersky.com>
+        Tue, 27 Jul 2021 03:29:51 -0700 (PDT)
+Date:   Tue, 27 Jul 2021 11:29:48 +0100
+From:   Quentin Perret <qperret@google.com>
+To:     Marc Zyngier <maz@kernel.org>
+Cc:     linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org,
+        kvmarm@lists.cs.columbia.edu, linux-mm@kvack.org,
+        Sean Christopherson <seanjc@google.com>,
+        Matthew Wilcox <willy@infradead.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Will Deacon <will@kernel.org>,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        kernel-team@android.com
+Subject: Re: [PATCH v2 1/6] KVM: arm64: Introduce helper to retrieve a PTE
+ and its level
+Message-ID: <YP/gHGfhXgBBe7iD@google.com>
+References: <20210726153552.1535838-1-maz@kernel.org>
+ <20210726153552.1535838-2-maz@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <2df68589-96b9-abd4-ad1c-e25918b908a9@kaspersky.com>
+In-Reply-To: <20210726153552.1535838-2-maz@kernel.org>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jul 27, 2021 at 12:34:36PM +0300, Arseny Krasnov wrote:
->
->On 27.07.2021 10:59, Stefano Garzarella wrote:
->> Caution: This is an external email. Be cautious while opening links or attachments.
->>
->>
->>
->> On Mon, Jul 26, 2021 at 07:31:33PM +0300, Arseny Krasnov wrote:
->>>       This patchset implements support of MSG_EOR bit for SEQPACKET
->>> AF_VSOCK sockets over virtio transport.
->>>       Idea is to distinguish concepts of 'messages' and 'records'.
->>> Message is result of sending calls: 'write()', 'send()', 'sendmsg()'
->>> etc. It has fixed maximum length, and it bounds are visible using
->>> return from receive calls: 'read()', 'recv()', 'recvmsg()' etc.
->>> Current implementation based on message definition above.
->>>       Record has unlimited length, it consists of multiple message,
->>> and bounds of record are visible via MSG_EOR flag returned from
->>> 'recvmsg()' call. Sender passes MSG_EOR to sending system call and
->>> receiver will see MSG_EOR when corresponding message will be processed.
->>>       To support MSG_EOR new bit was added along with existing
->>> 'VIRTIO_VSOCK_SEQ_EOR': 'VIRTIO_VSOCK_SEQ_EOM'(end-of-message) - now it
->>> works in the same way as 'VIRTIO_VSOCK_SEQ_EOR'. But 'VIRTIO_VSOCK_SEQ_EOR'
->>> is used to mark 'MSG_EOR' bit passed from userspace.
->> At this point it's probably better to rename the old flag, so we stay
->> compatible.
->>
->> What happens if one of the two peers does not support MSG_EOR handling,
->> while the other does?
->>
->> I'll do a closer review in the next few days.
->Thank You, also i think MSG_EOR support must be described in spec
+On Monday 26 Jul 2021 at 16:35:47 (+0100), Marc Zyngier wrote:
+> It is becoming a common need to fetch the PTE for a given address
+> together with its level. Add such a helper.
 
-Yep, sure!
+Reviewed-by: Quentin Perret <qperret@google.com>
 
-What do you think about the concerns above?
-
-Stefano
-
+Thanks,
+Quentin
