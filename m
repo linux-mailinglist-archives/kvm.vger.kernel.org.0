@@ -2,41 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4D7A73D721E
-	for <lists+kvm@lfdr.de>; Tue, 27 Jul 2021 11:36:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B9EF93D7275
+	for <lists+kvm@lfdr.de>; Tue, 27 Jul 2021 11:58:11 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236106AbhG0JgD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 27 Jul 2021 05:36:03 -0400
-Received: from mx13.kaspersky-labs.com ([91.103.66.164]:59616 "EHLO
-        mx13.kaspersky-labs.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236010AbhG0JgC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 27 Jul 2021 05:36:02 -0400
-Received: from relay13.kaspersky-labs.com (unknown [127.0.0.10])
-        by relay13.kaspersky-labs.com (Postfix) with ESMTP id 8214E520D63;
-        Tue, 27 Jul 2021 12:36:01 +0300 (MSK)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kaspersky.com;
-        s=mail202102; t=1627378561;
-        bh=gNjZ/wMHVn8RWq+cyg+0erUeafwcxHpb0KBk5MSl57g=;
-        h=Subject:To:From:Message-ID:Date:MIME-Version:Content-Type;
-        b=LZENa+att54ismKTDjm0Z/NezKLKfEtmiCYtC2167Zuy43+OhEpshV+XP1crIfi96
-         it7qaB+Ido4fxwXJC7657IC19NRAwgbuW9dqNA99BfILycDxo57xEmtouZuXxiYnv3
-         a7yDYqjSxyf/YaZ67bgbvHCXQ0tNnP1sgnwnAvxIKhdk7ltpGRi1iyWkQRu+/UAyhK
-         i/DOirzuY5cfd21K+DSdbgm0Eiak26tIvO9SpG6deJo/pQCvsT5e7bUf88Ej5ofGnG
-         bBIN2b/J3SgG5kg4H2xgGFQ3ByZ/yAmKtXdA5kjw/ucJlbt5P4mn4qC1n1Htpk+MhV
-         TTlCynUHGOY/w==
-Received: from mail-hq2.kaspersky.com (unknown [91.103.66.206])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-SHA256 (128/128 bits))
-        (Client CN "mail-hq2.kaspersky.com", Issuer "Kaspersky MailRelays CA G3" (verified OK))
-        by mailhub13.kaspersky-labs.com (Postfix) with ESMTPS id C338D520EA0;
-        Tue, 27 Jul 2021 12:36:00 +0300 (MSK)
-Received: from [10.16.171.77] (10.64.68.129) by hqmailmbx3.avp.ru
- (10.64.67.243) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2308.14; Tue, 27
- Jul 2021 12:34:36 +0300
-Subject: Re: [MASSMAIL KLMS] Re: [RFC PATCH v1 0/7] virtio/vsock: introduce
- MSG_EOR flag for SEQPACKET
-To:     Stefano Garzarella <sgarzare@redhat.com>
-CC:     Stefan Hajnoczi <stefanha@redhat.com>,
+        id S236188AbhG0J6J (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 27 Jul 2021 05:58:09 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:33748 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S236106AbhG0J6J (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 27 Jul 2021 05:58:09 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1627379889;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=T2rQBG2yVNE7y1+uB+3b6lsmKXViZKQecoiM/1czVBA=;
+        b=Mg426BPKHiEYYUn6qqnuG/nyDQOJYDyb/m0yJ9SCdyQyFrbVZWvK4O6C/8bSJhPF8gZO/G
+        nHTn3GoCk0wG5MwAUysIh/DFJIaZ8gCsE5dqdeDmNjZZCdFR3ji7i6ztzV/5lJqDNCOs8v
+        zS+PIf3+QKLIzPjTx95po+Z97nyJyb8=
+Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
+ [209.85.208.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-81-yAmY8BCPPreayAGH6owhag-1; Tue, 27 Jul 2021 05:58:07 -0400
+X-MC-Unique: yAmY8BCPPreayAGH6owhag-1
+Received: by mail-ed1-f70.google.com with SMTP id b13-20020a056402278db029039c013d5b80so6342026ede.7
+        for <kvm@vger.kernel.org>; Tue, 27 Jul 2021 02:58:07 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=T2rQBG2yVNE7y1+uB+3b6lsmKXViZKQecoiM/1czVBA=;
+        b=igiR8KBjvueDr7tnMeyo0+xYEFut2PrPVNokaOeO6iINYjFLWMDkXN3mSdfeZFgnxp
+         B7+ZnroaEuI9BxED966rGl60/mZc0unkZCoHYSe6NgwmYB2/4S3c0V7hkxJ8DqaQ2jbf
+         5liC+Q3YhZ/FC+taNtZHwWYdbRz0VQwaMvRaLp3ARizhy1yZNBSkqgZNaLVKTLFwVnAB
+         PHie7+K6yqwzprFLACysdwpuo7fsekJmDRur9fVR9jTX1la2Vwxg+QELzvF6byEpXJV5
+         O87ZBMWeevIsuTXS29XElEjlaMyCn6p5bSUI8ijj/Ot4ycVNBQkXtcSDMyj1MXG+bpA9
+         GvYg==
+X-Gm-Message-State: AOAM533pq1Qm7yb5VRFsbLTHrwP/Xp1i3S9s1oV0FiaNXZUWUpRdB9+/
+        OEnLFlhxmG2msWLNYhE1fp6Lec071bhgnxqqyfCPTZRs1vy6ZtdYOufllv99oHx23b8cJIDMNkK
+        XH7Uc79CurTQI
+X-Received: by 2002:a17:906:ce47:: with SMTP id se7mr3742424ejb.240.1627379886418;
+        Tue, 27 Jul 2021 02:58:06 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJx8eyrbNlN1DVbEoRIS2U/HCt0SR/iGRuCNgiSKmvCYAIQaFF1wZB5TRpL7dxgdXFiMYR9Wkg==
+X-Received: by 2002:a17:906:ce47:: with SMTP id se7mr3742409ejb.240.1627379886242;
+        Tue, 27 Jul 2021 02:58:06 -0700 (PDT)
+Received: from steredhat (host-79-18-148-79.retail.telecomitalia.it. [79.18.148.79])
+        by smtp.gmail.com with ESMTPSA id f18sm726664ejx.23.2021.07.27.02.58.05
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 27 Jul 2021 02:58:05 -0700 (PDT)
+Date:   Tue, 27 Jul 2021 11:58:03 +0200
+From:   Stefano Garzarella <sgarzare@redhat.com>
+To:     Arseny Krasnov <arseny.krasnov@kaspersky.com>
+Cc:     Stefan Hajnoczi <stefanha@redhat.com>,
         "Michael S. Tsirkin" <mst@redhat.com>,
         Jason Wang <jasowang@redhat.com>,
         "David S. Miller" <davem@davemloft.net>,
@@ -50,91 +66,55 @@ CC:     Stefan Hajnoczi <stefanha@redhat.com>,
         "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
         "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
         "oxffffaa@gmail.com" <oxffffaa@gmail.com>
+Subject: Re: [MASSMAIL KLMS] Re: [RFC PATCH v1 0/7] virtio/vsock: introduce
+ MSG_EOR flag for SEQPACKET
+Message-ID: <20210727095803.s26subp3pgclqzvi@steredhat>
 References: <20210726163137.2589102-1-arseny.krasnov@kaspersky.com>
  <20210727075948.yl4w3foqa6rp4obg@steredhat>
-From:   Arseny Krasnov <arseny.krasnov@kaspersky.com>
-Message-ID: <2df68589-96b9-abd4-ad1c-e25918b908a9@kaspersky.com>
-Date:   Tue, 27 Jul 2021 12:34:36 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+ <2df68589-96b9-abd4-ad1c-e25918b908a9@kaspersky.com>
 MIME-Version: 1.0
-In-Reply-To: <20210727075948.yl4w3foqa6rp4obg@steredhat>
-Content-Type: text/plain; charset="windows-1252"
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-X-Originating-IP: [10.64.68.129]
-X-ClientProxiedBy: hqmailmbx3.avp.ru (10.64.67.243) To hqmailmbx3.avp.ru
- (10.64.67.243)
-X-KSE-ServerInfo: hqmailmbx3.avp.ru, 9
-X-KSE-AntiSpam-Interceptor-Info: scan successful
-X-KSE-AntiSpam-Version: 5.9.20, Database issued on: 07/27/2021 09:15:14
-X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
-X-KSE-AntiSpam-Method: none
-X-KSE-AntiSpam-Rate: 0
-X-KSE-AntiSpam-Info: Lua profiles 165263 [Jul 27 2021]
-X-KSE-AntiSpam-Info: Version: 5.9.20.0
-X-KSE-AntiSpam-Info: Envelope from: arseny.krasnov@kaspersky.com
-X-KSE-AntiSpam-Info: LuaCore: 449 449 5db59deca4a4f5e6ea34a93b13bc730e229092f4
-X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
-X-KSE-AntiSpam-Info: 127.0.0.199:7.1.2;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;kaspersky.com:7.1.1
-X-KSE-AntiSpam-Info: Rate: 0
-X-KSE-AntiSpam-Info: Status: not_detected
-X-KSE-AntiSpam-Info: Method: none
-X-KSE-Antiphishing-Info: Clean
-X-KSE-Antiphishing-ScanningType: Deterministic
-X-KSE-Antiphishing-Method: None
-X-KSE-Antiphishing-Bases: 07/27/2021 09:18:00
-X-KSE-AttachmentFiltering-Interceptor-Info: no applicable attachment filtering
- rules found
-X-KSE-Antivirus-Interceptor-Info: scan successful
-X-KSE-Antivirus-Info: Clean, bases: 27.07.2021 7:34:00
-X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
-X-KSE-AttachmentFiltering-Interceptor-Info: no applicable attachment filtering
- rules found
-X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
-X-KLMS-Rule-ID: 52
-X-KLMS-Message-Action: clean
-X-KLMS-AntiSpam-Status: not scanned, disabled by settings
-X-KLMS-AntiSpam-Interceptor-Info: not scanned
-X-KLMS-AntiPhishing: Clean, bases: 2021/07/27 08:44:00
-X-KLMS-AntiVirus: Kaspersky Security for Linux Mail Server, version 8.0.3.30, bases: 2021/07/27 07:34:00 #16962506
-X-KLMS-AntiVirus-Status: Clean, skipped
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <2df68589-96b9-abd4-ad1c-e25918b908a9@kaspersky.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Tue, Jul 27, 2021 at 12:34:36PM +0300, Arseny Krasnov wrote:
+>
+>On 27.07.2021 10:59, Stefano Garzarella wrote:
+>> Caution: This is an external email. Be cautious while opening links or attachments.
+>>
+>>
+>>
+>> On Mon, Jul 26, 2021 at 07:31:33PM +0300, Arseny Krasnov wrote:
+>>>       This patchset implements support of MSG_EOR bit for SEQPACKET
+>>> AF_VSOCK sockets over virtio transport.
+>>>       Idea is to distinguish concepts of 'messages' and 'records'.
+>>> Message is result of sending calls: 'write()', 'send()', 'sendmsg()'
+>>> etc. It has fixed maximum length, and it bounds are visible using
+>>> return from receive calls: 'read()', 'recv()', 'recvmsg()' etc.
+>>> Current implementation based on message definition above.
+>>>       Record has unlimited length, it consists of multiple message,
+>>> and bounds of record are visible via MSG_EOR flag returned from
+>>> 'recvmsg()' call. Sender passes MSG_EOR to sending system call and
+>>> receiver will see MSG_EOR when corresponding message will be processed.
+>>>       To support MSG_EOR new bit was added along with existing
+>>> 'VIRTIO_VSOCK_SEQ_EOR': 'VIRTIO_VSOCK_SEQ_EOM'(end-of-message) - now it
+>>> works in the same way as 'VIRTIO_VSOCK_SEQ_EOR'. But 'VIRTIO_VSOCK_SEQ_EOR'
+>>> is used to mark 'MSG_EOR' bit passed from userspace.
+>> At this point it's probably better to rename the old flag, so we stay
+>> compatible.
+>>
+>> What happens if one of the two peers does not support MSG_EOR handling,
+>> while the other does?
+>>
+>> I'll do a closer review in the next few days.
+>Thank You, also i think MSG_EOR support must be described in spec
 
-On 27.07.2021 10:59, Stefano Garzarella wrote:
-> Caution: This is an external email. Be cautious while opening links or attachments.
->
->
->
-> On Mon, Jul 26, 2021 at 07:31:33PM +0300, Arseny Krasnov wrote:
->>       This patchset implements support of MSG_EOR bit for SEQPACKET
->> AF_VSOCK sockets over virtio transport.
->>       Idea is to distinguish concepts of 'messages' and 'records'.
->> Message is result of sending calls: 'write()', 'send()', 'sendmsg()'
->> etc. It has fixed maximum length, and it bounds are visible using
->> return from receive calls: 'read()', 'recv()', 'recvmsg()' etc.
->> Current implementation based on message definition above.
->>       Record has unlimited length, it consists of multiple message,
->> and bounds of record are visible via MSG_EOR flag returned from
->> 'recvmsg()' call. Sender passes MSG_EOR to sending system call and
->> receiver will see MSG_EOR when corresponding message will be processed.
->>       To support MSG_EOR new bit was added along with existing
->> 'VIRTIO_VSOCK_SEQ_EOR': 'VIRTIO_VSOCK_SEQ_EOM'(end-of-message) - now it
->> works in the same way as 'VIRTIO_VSOCK_SEQ_EOR'. But 'VIRTIO_VSOCK_SEQ_EOR'
->> is used to mark 'MSG_EOR' bit passed from userspace.
-> At this point it's probably better to rename the old flag, so we stay
-> compatible.
->
-> What happens if one of the two peers does not support MSG_EOR handling,
-> while the other does?
->
-> I'll do a closer review in the next few days.
-Thank You, also i think MSG_EOR support must be described in spec
->
-> Thanks,
-> Stefano
->
->
+Yep, sure!
+
+What do you think about the concerns above?
+
+Stefano
+
