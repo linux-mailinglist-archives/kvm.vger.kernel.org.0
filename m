@@ -2,67 +2,98 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8ACFB3D7B11
-	for <lists+kvm@lfdr.de>; Tue, 27 Jul 2021 18:35:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B63323D7B94
+	for <lists+kvm@lfdr.de>; Tue, 27 Jul 2021 19:06:34 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230227AbhG0Qf3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 27 Jul 2021 12:35:29 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:39052 "EHLO
+        id S229815AbhG0RGd (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 27 Jul 2021 13:06:33 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:34807 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230106AbhG0Qf2 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 27 Jul 2021 12:35:28 -0400
+        by vger.kernel.org with ESMTP id S229818AbhG0RGc (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 27 Jul 2021 13:06:32 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1627403728;
+        s=mimecast20190719; t=1627405592;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=90tCfQVeRTH8MaC1o4KYlvgxHv2WwxCXpgUHehd5MrI=;
-        b=e9PtRDJgqgSgi1Zv12JFPCzmPXrZkBI+3BR/cCxN8BaZxSv28rGYlaTbE5xht0R63yw3RI
-        HWevbwAg6sdRukS6/C2S/jChEgVKbtmTSLmQidUKItoZPw5QHjcAUED0K1IYVcS+5iFI/e
-        HoZnx40BU4nvlmceuAN7Lz6tfqLu8G8=
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=j2qe/ijQLQToepBoJMzhqETg7K1u+t/Q843JAnPvZpU=;
+        b=IMX9HfNjIUQAP/bwssCp7mDQKXSQ/sYTA/9Uygq/ino3B0RkfGRwC2vrr8w8xJVdYDGHso
+        sCBGGbDww5tSGlcErKq0R1GMGEDpmMXsi8tHAkKROv8YOzWI/Z5wqQBAAua9oNPzh376EC
+        qGdawGTxUEj1oDuRUQqALc1tHe/kquA=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-494-PbhXqnTjOW6wEiU_ZuHt2w-1; Tue, 27 Jul 2021 12:35:27 -0400
-X-MC-Unique: PbhXqnTjOW6wEiU_ZuHt2w-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+ us-mta-232-WVSlZ9TlM5ylatKTca3tZA-1; Tue, 27 Jul 2021 13:06:22 -0400
+X-MC-Unique: WVSlZ9TlM5ylatKTca3tZA-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A9AB4802B9F;
-        Tue, 27 Jul 2021 16:35:24 +0000 (UTC)
-Received: from localhost (unknown [10.39.192.46])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 986A260862;
-        Tue, 27 Jul 2021 16:35:16 +0000 (UTC)
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Cai Huoqing <caihuoqing@baidu.com>, alex.williamson@redhat.com,
-        jgg@ziepe.ca, eric.auger@redhat.com, kevin.tian@intel.com,
-        giovanni.cabiddu@intel.com, mgurtovoy@nvidia.com, jannh@google.com
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Cai Huoqing <caihuoqing@baidu.com>
-Subject: Re: [PATCH] vfio: Add "#ifdef CONFIG_MMU" for vma operations
-In-Reply-To: <20210727034000.547-1-caihuoqing@baidu.com>
-Organization: Red Hat GmbH
-References: <20210727034000.547-1-caihuoqing@baidu.com>
-User-Agent: Notmuch/0.32.1 (https://notmuchmail.org)
-Date:   Tue, 27 Jul 2021 18:35:14 +0200
-Message-ID: <877dhb4svx.fsf@redhat.com>
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 08F0093921;
+        Tue, 27 Jul 2021 17:06:21 +0000 (UTC)
+Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 9FBD960BD9;
+        Tue, 27 Jul 2021 17:06:20 +0000 (UTC)
+From:   Paolo Bonzini <pbonzini@redhat.com>
+To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Cc:     stable@vger.kernel.org, Stas Sergeev <stsp2@yandex.ru>
+Subject: [PATCH v2] KVM: x86: accept userspace interrupt only if no event is injected
+Date:   Tue, 27 Jul 2021 13:06:20 -0400
+Message-Id: <20210727170620.1643969-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jul 27 2021, Cai Huoqing <caihuoqing@baidu.com> wrote:
+Once an exception has been injected, any side effects related to
+the exception (such as setting CR2 or DR6) have been taked place.
+Therefore, once KVM sets the VM-entry interruption information
+field or the AMD EVENTINJ field, the next VM-entry must deliver that
+exception.
 
-> Add "#ifdef CONFIG_MMU",
-> because vma mmap and vm_operations_struct depend on MMU
+Pending interrupts are processed after injected exceptions, so
+in theory it would not be a problem to use KVM_INTERRUPT when
+an injected exception is present.  However, DOSEMU is using
+run->ready_for_interrupt_injection to detect interrupt windows
+and then using KVM_SET_SREGS/KVM_SET_REGS to inject the
+interrupt manually.  For this to work, the interrupt window
+must be delayed after the completion of the previous event
+injection.
 
-vfio_pci already depends on MMU -- what problems are you trying to fix?
+Cc: stable@vger.kernel.org
+Reported-by: Stas Sergeev <stsp2@yandex.ru>
+Tested-by: Stas Sergeev <stsp2@yandex.ru>
+Fixes: 71cc849b7093 ("KVM: x86: Fix split-irqchip vs interrupt injection window request")
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+(cherry picked from commit 043264d97e9ab74cc9661c8b1f9c00c8ce24cad9)
+---
+ arch/x86/kvm/x86.c | 12 +++++++++++-
+ 1 file changed, 11 insertions(+), 1 deletion(-)
 
->
-> Signed-off-by: Cai Huoqing <caihuoqing@baidu.com>
-> ---
->  drivers/vfio/pci/vfio_pci.c | 4 ++++
->  drivers/vfio/vfio.c         | 8 ++++++++
->  2 files changed, 12 insertions(+)
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 4116567f3d44..5e921f1e00db 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -4358,8 +4358,18 @@ static int kvm_cpu_accept_dm_intr(struct kvm_vcpu *vcpu)
+ 
+ static int kvm_vcpu_ready_for_interrupt_injection(struct kvm_vcpu *vcpu)
+ {
++	/*
++	 * Do not cause an interrupt window exit if an exception
++	 * is pending or an event needs reinjection; userspace
++	 * might want to inject the interrupt manually using KVM_SET_REGS
++	 * or KVM_SET_SREGS.  For that to work, we must be at an
++	 * instruction boundary and with no events half-injected.
++	 */
+ 	return kvm_arch_interrupt_allowed(vcpu) &&
+-		kvm_cpu_accept_dm_intr(vcpu);
++		kvm_cpu_accept_dm_intr(vcpu) &&
++	        !kvm_event_needs_reinjection(vcpu)
++	        !vcpu->arch.exception.pending;
++
+ }
+ 
+ static int kvm_vcpu_ioctl_interrupt(struct kvm_vcpu *vcpu,
+-- 
+2.27.0
 
