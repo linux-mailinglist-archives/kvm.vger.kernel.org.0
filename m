@@ -2,129 +2,156 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 332B93D79A6
-	for <lists+kvm@lfdr.de>; Tue, 27 Jul 2021 17:25:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 220C43D79A8
+	for <lists+kvm@lfdr.de>; Tue, 27 Jul 2021 17:25:48 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237053AbhG0PZh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 27 Jul 2021 11:25:37 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:31393 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232643AbhG0PXh (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 27 Jul 2021 11:23:37 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1627399414;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=K9vnN9wL7bbivI7Hwt9tBs1nCKBEhS3YAOrtS2yFzAo=;
-        b=KRy2++35NySWkyrPA7SwjV68pgvVBJoVv38NqSEkmpTEYAhdx0tfUussUsxK9nfuzeabOm
-        um/tSzyL01gmeg6desNdMHFcbJbs0qy/tWFch8BmeSgOKwPEMvdRcLtAVSboqK9L8l7E2k
-        u76E+tvHJ61wKhv87f4tjiWHrNZYKgo=
-Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
- [209.85.218.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-599-uinpEqkTOt2hwFGDT_MnTQ-1; Tue, 27 Jul 2021 11:23:32 -0400
-X-MC-Unique: uinpEqkTOt2hwFGDT_MnTQ-1
-Received: by mail-ej1-f70.google.com with SMTP id n9-20020a1709063789b02905854bda39fcso1624632ejc.1
-        for <kvm@vger.kernel.org>; Tue, 27 Jul 2021 08:23:32 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
-         :message-id:mime-version;
-        bh=K9vnN9wL7bbivI7Hwt9tBs1nCKBEhS3YAOrtS2yFzAo=;
-        b=FcCke/vNiaZj+owB/uwMpRoKhXxSGrHSsTjpS0C++YOulRsYcyNwNqME2r8KdcYYfc
-         m54J9kQZ7NXjDaPabDwDUB3dF1+nJYpfSLZhtaqmexfRakj8nYa4S+c5Anc/gU6tOK00
-         6F057anwVnC+akdaPGvjNzWo/bJElLXhH+7jbrY38mGnYTaYhRNA6KczW1HL6Tad+TCE
-         EoFH84o4knOczYpz/daOIS+Sxc6kIvUX1VyCOZ4w+tH1PQmkjp3kYs2lJX4+HePE5Q4c
-         yVMWmSpkj9qe3itV9hZ5856Aazf3LF6/yTJEwTTgxqIlgzqXvlTPdugqoVAfRObfnoFF
-         rbhQ==
-X-Gm-Message-State: AOAM533AL3vPIBkT4cIVG/tLaCG9ArpBQ1JCqL9zC1oNUYtRBnF4+kKr
-        UWsctnnJ1lRd0ERNHpot+sbKPa4u3oEdsE31uRQuZa7n/+hplIvTJ4tOo8wFwlGlclXGLivScAG
-        X+JZObt5h+qMhhOCGyo3/j76UyjjTTEzSJZm0Cv4znd0/BJyGz/mDcU8MSdxEyrvJ
-X-Received: by 2002:aa7:c956:: with SMTP id h22mr27834809edt.378.1627399411381;
-        Tue, 27 Jul 2021 08:23:31 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJziLlMRBKgJ1MU+hRRcFdLOJqyAASXy4lbQBYorQQKdWpyIS4+ytKilfOPL91Ubb5c5gfus2A==
-X-Received: by 2002:aa7:c956:: with SMTP id h22mr27834785edt.378.1627399411116;
-        Tue, 27 Jul 2021 08:23:31 -0700 (PDT)
-Received: from vitty.brq.redhat.com (g-server-2.ign.cz. [91.219.240.2])
-        by smtp.gmail.com with ESMTPSA id l17sm1391591edt.52.2021.07.27.08.23.30
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 27 Jul 2021 08:23:30 -0700 (PDT)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Dan Carpenter <dan.carpenter@oracle.com>,
-        Vineeth Pillai <viremana@linux.microsoft.com>,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Subject: Re: [PATCH] KVM: SVM: delay svm_vcpu_init_msrpm after svm->vmcb is
- initialized
-In-Reply-To: <20210726165843.1441132-1-pbonzini@redhat.com>
-References: <20210726165843.1441132-1-pbonzini@redhat.com>
-Date:   Tue, 27 Jul 2021 17:23:29 +0200
-Message-ID: <87zgu76ary.fsf@vitty.brq.redhat.com>
+        id S237078AbhG0PZp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 27 Jul 2021 11:25:45 -0400
+Received: from foss.arm.com ([217.140.110.172]:40330 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S232634AbhG0PY4 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 27 Jul 2021 11:24:56 -0400
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 8DAF131B;
+        Tue, 27 Jul 2021 08:24:29 -0700 (PDT)
+Received: from [192.168.0.110] (unknown [172.31.20.19])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 782673F66F;
+        Tue, 27 Jul 2021 08:24:27 -0700 (PDT)
+Subject: Re: [PATCH v2 1/6] KVM: arm64: Introduce helper to retrieve a PTE and
+ its level
+To:     Marc Zyngier <maz@kernel.org>,
+        linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org,
+        kvmarm@lists.cs.columbia.edu, linux-mm@kvack.org
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Matthew Wilcox <willy@infradead.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Will Deacon <will@kernel.org>,
+        Quentin Perret <qperret@google.com>,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        kernel-team@android.com
+References: <20210726153552.1535838-1-maz@kernel.org>
+ <20210726153552.1535838-2-maz@kernel.org>
+From:   Alexandru Elisei <alexandru.elisei@arm.com>
+Message-ID: <11d5e176-ac47-e215-b82a-b8f074220bd6@arm.com>
+Date:   Tue, 27 Jul 2021 16:25:34 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.12.0
 MIME-Version: 1.0
-Content-Type: text/plain
+In-Reply-To: <20210726153552.1535838-2-maz@kernel.org>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Paolo Bonzini <pbonzini@redhat.com> writes:
+Hi Marc,
 
-> Right now, svm_hv_vmcb_dirty_nested_enlightenments has an incorrect
-> dereference of vmcb->control.reserved_sw before the vmcb is checked
-> for being non-NULL.  The compiler is usually sinking the dereference
-> after the check; instead of doing this ourselves in the source,
-> ensure that svm_hv_vmcb_dirty_nested_enlightenments is only called
-> with a non-NULL VMCB.
+On 7/26/21 4:35 PM, Marc Zyngier wrote:
+> It is becoming a common need to fetch the PTE for a given address
+> together with its level. Add such a helper.
 >
-> Reported-by: Dan Carpenter <dan.carpenter@oracle.com>
-> Cc: Vineeth Pillai <viremana@linux.microsoft.com>
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> [Untested for now due to issues with my AMD machine. - Paolo]
-
-At least this doesn't seem to break kvm-amd on bare metal, so
-
-Tested-by: Vitaly Kuznetsov <vkuznets@redhat.com>
-
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
 > ---
->  arch/x86/kvm/svm/svm.c          | 4 ++--
->  arch/x86/kvm/svm/svm_onhyperv.h | 2 +-
->  2 files changed, 3 insertions(+), 3 deletions(-)
+>  arch/arm64/include/asm/kvm_pgtable.h | 19 ++++++++++++++
+>  arch/arm64/kvm/hyp/pgtable.c         | 39 ++++++++++++++++++++++++++++
+>  2 files changed, 58 insertions(+)
 >
-> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-> index 9a6987549e1b..4bcb95bb8ed7 100644
-> --- a/arch/x86/kvm/svm/svm.c
-> +++ b/arch/x86/kvm/svm/svm.c
-> @@ -1406,8 +1406,6 @@ static int svm_create_vcpu(struct kvm_vcpu *vcpu)
->  		goto error_free_vmsa_page;
->  	}
+> diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
+> index f004c0115d89..082b9d65f40b 100644
+> --- a/arch/arm64/include/asm/kvm_pgtable.h
+> +++ b/arch/arm64/include/asm/kvm_pgtable.h
+> @@ -432,6 +432,25 @@ int kvm_pgtable_stage2_flush(struct kvm_pgtable *pgt, u64 addr, u64 size);
+>  int kvm_pgtable_walk(struct kvm_pgtable *pgt, u64 addr, u64 size,
+>  		     struct kvm_pgtable_walker *walker);
 >  
-> -	svm_vcpu_init_msrpm(vcpu, svm->msrpm);
-> -
->  	svm->vmcb01.ptr = page_address(vmcb01_page);
->  	svm->vmcb01.pa = __sme_set(page_to_pfn(vmcb01_page) << PAGE_SHIFT);
->  
-> @@ -1419,6 +1417,8 @@ static int svm_create_vcpu(struct kvm_vcpu *vcpu)
->  	svm_switch_vmcb(svm, &svm->vmcb01);
->  	init_vmcb(vcpu);
->  
-> +	svm_vcpu_init_msrpm(vcpu, svm->msrpm);
+> +/**
+> + * kvm_pgtable_get_leaf() - Walk a page-table and retrieve the leaf entry
+> + *			    with its level.
+> + * @pgt:	Page-table structure initialised by kvm_pgtable_*_init().
+
+Yet in the next patch you use a struct kvm_pgtable_pgt not initialized by any of
+the kvm_pgtable_*_init() functions. It doesn't hurt correctness, but it might
+confuse potential users of this function.
+
+> + * @addr:	Input address for the start of the walk.
+> + * @ptep:	Pointer to storage for the retrieved PTE.
+> + * @level:	Pointer to storage for the level of the retrieved PTE.
+> + *
+> + * The offset of @addr within a page is ignored.
+> + *
+> + * The walker will walk the page-table entries corresponding to the input
+> + * address specified, retrieving the leaf corresponding to this address.
+> + * Invalid entries are treated as leaf entries.
+> + *
+> + * Return: 0 on success, negative error code on failure.
+> + */
+> +int kvm_pgtable_get_leaf(struct kvm_pgtable *pgt, u64 addr,
+> +			 kvm_pte_t *ptep, u32 *level);
 > +
->  	svm_init_osvw(vcpu);
->  	vcpu->arch.microcode_version = 0x01000065;
->  
-> diff --git a/arch/x86/kvm/svm/svm_onhyperv.h b/arch/x86/kvm/svm/svm_onhyperv.h
-> index 9b9a55abc29f..c53b8bf8d013 100644
-> --- a/arch/x86/kvm/svm/svm_onhyperv.h
-> +++ b/arch/x86/kvm/svm/svm_onhyperv.h
-> @@ -89,7 +89,7 @@ static inline void svm_hv_vmcb_dirty_nested_enlightenments(
->  	 * as we mark it dirty unconditionally towards end of vcpu
->  	 * init phase.
->  	 */
-> -	if (vmcb && vmcb_is_clean(vmcb, VMCB_HV_NESTED_ENLIGHTENMENTS) &&
-> +	if (vmcb_is_clean(vmcb, VMCB_HV_NESTED_ENLIGHTENMENTS) &&
->  	    hve->hv_enlightenments_control.msr_bitmap)
->  		vmcb_mark_dirty(vmcb, VMCB_HV_NESTED_ENLIGHTENMENTS);
+>  /**
+>   * kvm_pgtable_stage2_find_range() - Find a range of Intermediate Physical
+>   *				     Addresses with compatible permission
+> diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
+> index 05321f4165e3..78f36bd5df6c 100644
+> --- a/arch/arm64/kvm/hyp/pgtable.c
+> +++ b/arch/arm64/kvm/hyp/pgtable.c
+> @@ -326,6 +326,45 @@ int kvm_pgtable_walk(struct kvm_pgtable *pgt, u64 addr, u64 size,
+>  	return _kvm_pgtable_walk(&walk_data);
 >  }
+>  
+> +struct leaf_walk_data {
+> +	kvm_pte_t	pte;
+> +	u32		level;
+> +};
+> +
+> +static int leaf_walker(u64 addr, u64 end, u32 level, kvm_pte_t *ptep,
+> +		       enum kvm_pgtable_walk_flags flag, void * const arg)
+> +{
+> +	struct leaf_walk_data *data = arg;
+> +
+> +	data->pte   = *ptep;
+> +	data->level = level;
+> +
+> +	return 0;
+> +}
+> +
+> +int kvm_pgtable_get_leaf(struct kvm_pgtable *pgt, u64 addr,
+> +			 kvm_pte_t *ptep, u32 *level)
+> +{
+> +	struct leaf_walk_data data;
+> +	struct kvm_pgtable_walker walker = {
+> +		.cb	= leaf_walker,
+> +		.flags	= KVM_PGTABLE_WALK_LEAF,
+> +		.arg	= &data,
+> +	};
+> +	int ret;
+> +
+> +	ret = kvm_pgtable_walk(pgt, ALIGN_DOWN(addr, PAGE_SIZE),
+> +			       PAGE_SIZE, &walker);
 
--- 
-Vitaly
+kvm_pgtable_walk() already aligns addr down to PAGE_SIZE, I don't think that's
+needed here. But not harmful either.
 
+Otherwise, the patch looks good to me:
+
+Reviewed-by: Alexandru Elisei <alexandru.elisei@arm.com>
+
+Thanks,
+
+Alex
+
+> +	if (!ret) {
+> +		if (ptep)
+> +			*ptep  = data.pte;
+> +		if (level)
+> +			*level = data.level;
+> +	}
+> +
+> +	return ret;
+> +}
+> +
+>  struct hyp_map_data {
+>  	u64				phys;
+>  	kvm_pte_t			attr;
