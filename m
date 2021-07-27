@@ -2,157 +2,199 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B7DCE3D7656
-	for <lists+kvm@lfdr.de>; Tue, 27 Jul 2021 15:27:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4E1BB3D7654
+	for <lists+kvm@lfdr.de>; Tue, 27 Jul 2021 15:27:45 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232186AbhG0N1t (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 27 Jul 2021 09:27:49 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:32873 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S236627AbhG0NWu (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 27 Jul 2021 09:22:50 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1627392170;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=KcIg/Lx6Su2LCnsmswDEv7xCBQIvYa+umdLL3a2VScU=;
-        b=Y6HT7L84DWf7IXGuKt+H0+0degBVtVcs6J0EqHYYvTeBoE2+6keiptzxv4GGNzQw7oLBYP
-        DZZGXW33PA0Zxe6crtVrJ5nrT/fLj7PAlrxv7bz5VChLHUjIO3YsA20RTR8nSrN/dwomB7
-        TdzXNlZBk130YH5LlDco6FwdjwQJytw=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-341-PnSYT2r1PBKHEOFBQ3xmEQ-1; Tue, 27 Jul 2021 09:22:48 -0400
-X-MC-Unique: PnSYT2r1PBKHEOFBQ3xmEQ-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D70BF760CE;
-        Tue, 27 Jul 2021 13:22:45 +0000 (UTC)
-Received: from starship (unknown [10.40.192.10])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id F34196A90B;
-        Tue, 27 Jul 2021 13:22:41 +0000 (UTC)
-Message-ID: <654e0b6aa25c15ef8907813b6ab17681c7f12f5f.camel@redhat.com>
-Subject: Re: [PATCH v2 5/8] KVM: x86: APICv: fix race in
- kvm_request_apicv_update on SVM
-From:   Maxim Levitsky <mlevitsk@redhat.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
-Cc:     "open list:X86 ARCHITECTURE (32-BIT AND 64-BIT)" 
-        <linux-kernel@vger.kernel.org>, Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, Borislav Petkov <bp@alien8.de>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ingo Molnar <mingo@redhat.com>,
-        "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
-        Sean Christopherson <seanjc@google.com>
-Date:   Tue, 27 Jul 2021 16:22:40 +0300
-In-Reply-To: <e8acf99c-0e3b-f0cc-c8ad-53074420d734@redhat.com>
-References: <20210713142023.106183-1-mlevitsk@redhat.com>
-         <20210713142023.106183-6-mlevitsk@redhat.com>
-         <e8acf99c-0e3b-f0cc-c8ad-53074420d734@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
+        id S236692AbhG0N1o (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 27 Jul 2021 09:27:44 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:9536 "EHLO
+        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S236682AbhG0NXg (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 27 Jul 2021 09:23:36 -0400
+Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 16RD43DL191043;
+        Tue, 27 Jul 2021 09:23:36 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=to : cc : references :
+ from : subject : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=lYeGq5erQMl2R+AaqCRsBkCp1M6AGhPYfNnsT3zY5xg=;
+ b=AiR2wBFuTPp53K7M145kmGbM1sGW02WEYF+bnxDt/rvByyvb5OZy/zDqnkAnRqaL9L/H
+ otI4qtjHZpoCuo7Q/gXdAyoLzxlOTE2Zhud07u6YZ5Zb9evJZVK0WmC/6v3IKhuRP6Wq
+ kvMuI979MYytk5LP8cViuDihJOAfPNM1tw0HIXUMI5irLJ6sbtc1lramESAhes05swIh
+ 15GrmQ82Mn90EUNZ7v18XGhGRwig1JrzY+mxJ0cWf8bj8vhSbYfcPWplwwEIyzfm1fhG
+ fhLFM8wN0dyLf4xAb5Gd/6fKa6pQ4TIFjy+2le8S1upSQCybBfRImS9IH71depJaaIJz 7w== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3a2hhnupuk-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 27 Jul 2021 09:23:36 -0400
+Received: from m0127361.ppops.net (m0127361.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 16RD57nE009640;
+        Tue, 27 Jul 2021 09:23:35 -0400
+Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3a2hhnuptg-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 27 Jul 2021 09:23:35 -0400
+Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
+        by ppma06ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 16RDJHOw027084;
+        Tue, 27 Jul 2021 13:23:33 GMT
+Received: from b06cxnps3074.portsmouth.uk.ibm.com (d06relay09.portsmouth.uk.ibm.com [9.149.109.194])
+        by ppma06ams.nl.ibm.com with ESMTP id 3a235kgems-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 27 Jul 2021 13:23:33 +0000
+Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
+        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 16RDNTnT20447556
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 27 Jul 2021 13:23:30 GMT
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id DC9CFAE055;
+        Tue, 27 Jul 2021 13:23:29 +0000 (GMT)
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id B9FBBAE056;
+        Tue, 27 Jul 2021 13:23:28 +0000 (GMT)
+Received: from localhost.localdomain (unknown [9.145.20.110])
+        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Tue, 27 Jul 2021 13:23:28 +0000 (GMT)
+To:     Thomas Huth <thuth@redhat.com>,
+        Janis Schoetterl-Glausch <scgl@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>
+Cc:     Cornelia Huck <cohuck@redhat.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org
+References: <20210706115724.372901-1-scgl@linux.ibm.com>
+ <709f6326-efcb-d359-bfac-59a162473c91@redhat.com>
+From:   Janosch Frank <frankja@linux.ibm.com>
+Subject: Re: [kvm-unit-tests PATCH] s390x: Add specification exception
+ interception test
+Message-ID: <4507bf8e-6eda-2cb3-f014-f0931c963ccd@linux.ibm.com>
+Date:   Tue, 27 Jul 2021 15:23:28 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.11.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+In-Reply-To: <709f6326-efcb-d359-bfac-59a162473c91@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: DdfLUNaDNEGpr5QMVhHAkyyTF35vQd15
+X-Proofpoint-ORIG-GUID: EAGhwUMqg-7VkrU1k3Ok2o0f3IO0l-wA
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.790
+ definitions=2021-07-27_07:2021-07-27,2021-07-27 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
+ suspectscore=0 mlxlogscore=999 bulkscore=0 adultscore=0 mlxscore=0
+ clxscore=1015 impostorscore=0 malwarescore=0 priorityscore=1501
+ spamscore=0 phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2107140000 definitions=main-2107270077
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 2021-07-27 at 00:34 +0200, Paolo Bonzini wrote:
-> On 13/07/21 16:20, Maxim Levitsky wrote:
-> > +	mutex_lock(&vcpu->kvm->apicv_update_lock);
-> > +
-> >  	vcpu->arch.apicv_active = kvm_apicv_activated(vcpu->kvm);
-> >  	kvm_apic_update_apicv(vcpu);
-> >  	static_call(kvm_x86_refresh_apicv_exec_ctrl)(vcpu);
-> > @@ -9246,6 +9248,8 @@ void kvm_vcpu_update_apicv(struct kvm_vcpu *vcpu)
-> >  	 */
-> >  	if (!vcpu->arch.apicv_active)
-> >  		kvm_make_request(KVM_REQ_EVENT, vcpu);
-> > +
-> > +	mutex_unlock(&vcpu->kvm->apicv_update_lock);
+On 7/22/21 11:28 AM, Thomas Huth wrote:
+> On 06/07/2021 13.57, Janis Schoetterl-Glausch wrote:
+>> Check that specification exceptions cause intercepts when
+>> specification exception interpretation is off.
+>> Check that specification exceptions caused by program new PSWs
+>> cause interceptions.
+>> We cannot assert that non program new PSW specification exceptions
+>> are interpreted because whether interpretation occurs or not is
+>> configuration dependent.
+>>
+>> Signed-off-by: Janis Schoetterl-Glausch <scgl@linux.ibm.com>
+>> ---
+>> The patch is based on the following patch sets by Janosch:
+>> [kvm-unit-tests PATCH 0/5] s390x: sie and uv cleanups
+>> [kvm-unit-tests PATCH v2 0/3] s390x: Add snippet support
+>>
+>>   s390x/Makefile             |  2 +
+>>   lib/s390x/sie.h            |  1 +
+>>   s390x/snippets/c/spec_ex.c | 13 ++++++
+>>   s390x/spec_ex-sie.c        | 91 ++++++++++++++++++++++++++++++++++++++
+>>   s390x/unittests.cfg        |  3 ++
+>>   5 files changed, 110 insertions(+)
+>>   create mode 100644 s390x/snippets/c/spec_ex.c
+>>   create mode 100644 s390x/spec_ex-sie.c
+>>
+>> diff --git a/s390x/Makefile b/s390x/Makefile
+>> index 07af26d..b1b6536 100644
+>> --- a/s390x/Makefile
+>> +++ b/s390x/Makefile
+>> @@ -24,6 +24,7 @@ tests += $(TEST_DIR)/mvpg.elf
+>>   tests += $(TEST_DIR)/uv-host.elf
+>>   tests += $(TEST_DIR)/edat.elf
+>>   tests += $(TEST_DIR)/mvpg-sie.elf
+>> +tests += $(TEST_DIR)/spec_ex-sie.elf
+>>   
+>>   tests_binary = $(patsubst %.elf,%.bin,$(tests))
+>>   ifneq ($(HOST_KEY_DOCUMENT),)
+>> @@ -84,6 +85,7 @@ snippet_asmlib = $(SNIPPET_DIR)/c/cstart.o
+>>   # perquisites (=guests) for the snippet hosts.
+>>   # $(TEST_DIR)/<snippet-host>.elf: snippets = $(SNIPPET_DIR)/<c/asm>/<snippet>.gbin
+>>   $(TEST_DIR)/mvpg-sie.elf: snippets = $(SNIPPET_DIR)/c/mvpg-snippet.gbin
+>> +$(TEST_DIR)/spec_ex-sie.elf: snippets = $(SNIPPET_DIR)/c/spec_ex.gbin
+>>   
+>>   $(SNIPPET_DIR)/asm/%.gbin: $(SNIPPET_DIR)/asm/%.o $(FLATLIBS)
+>>   	$(OBJCOPY) -O binary $(patsubst %.gbin,%.o,$@) $@
+>> diff --git a/lib/s390x/sie.h b/lib/s390x/sie.h
+>> index 6ba858a..a3b8623 100644
+>> --- a/lib/s390x/sie.h
+>> +++ b/lib/s390x/sie.h
+>> @@ -98,6 +98,7 @@ struct kvm_s390_sie_block {
+>>   	uint8_t		fpf;			/* 0x0060 */
+>>   #define ECB_GS		0x40
+>>   #define ECB_TE		0x10
+>> +#define ECB_SPECI	0x08
+>>   #define ECB_SRSI	0x04
+>>   #define ECB_HOSTPROTINT	0x02
+>>   	uint8_t		ecb;			/* 0x0061 */
+>> diff --git a/s390x/snippets/c/spec_ex.c b/s390x/snippets/c/spec_ex.c
+>> new file mode 100644
+>> index 0000000..f2daab5
+>> --- /dev/null
+>> +++ b/s390x/snippets/c/spec_ex.c
 > 
-> Does this whole piece of code need the lock/unlock?  Does it work and/or 
-> make sense to do the unlock immediately after mutex_lock()?  This makes 
-> it clearer that the mutex is being to synchronize against the requestor.
-
-Yes, I do need to hold the mutex for the whole duration.
-
-The requester does the following:
-
-1. Take the mutex
- 
-2. Kick all the vCPUs out of the guest mode with KVM_REQ_EVENT
-   At that point all these vCPUs will be (or soon will be) stuck on the mutex
-   and guaranteed to be outside of the guest mode.
-   which is exactly what I need to avoid them entering the guest
-   mode as long as the AVIC's memslot state is not up to date.
-
-3. Update kvm->arch.apicv_inhibit_reasons. I removed the cmpchg loop
-   since it is now protected under the lock anyway.
-   This step doesn't have to be done at this point, but should be done while mutex is held
-   so that there is no need to cmpchg and such.
-
-   This itself isn't the justification for the mutex.
- 
-4. Update the memslot
- 
-5. Release the mutex.
-   Only now all other vCPUs are permitted to enter the guest mode again
-   (since only now the memslot is up to date)
-   and they will also update their per-vcpu AVIC enablement prior to entering it.
- 
- 
-I think it might be possible to avoid the mutex, but I am not sure if this is worth it:
- 
-First of all, the above sync sequence is only really needed when we enable AVIC.
-
-(Because from the moment we enable the memslot and to the moment the vCPU enables the AVIC,
-it must not be in guest mode as otherwise it will access the dummy page in the memslot
-without VMexit, instead of going through AVIC vmexit/acceleration.
- 
-The other way around is OK. IF we disable the memslot, and a vCPU still has a enabled AVIC, 
-it will just get a page fault which will be correctly emulated as APIC read/write by
-the MMIO page fault.
- 
-If I had a guarantee that when I enable the memslot (either as it done today or
-using the kvm_zap_gfn_range (which I strongly prefer), would always raise a TLB
-flush request on all vCPUs, then I could (ab)use that request to update local
-AVIC state.
- 
-Or I can just always check if local AVIC state matches the memslot and update
-if it doesn't prior to guest mode entry.
- 
-I still think I would prefer a mutex to be 100% sure that there are no races,
-since the whole AVIC disablement isn't something that is done often anyway.
- 
-Best regards,
-	Maxim Levitsky
-
+> Please add a short header comment with the basic idea here + license 
+> information (e.g. SPDX identifier). Also in the other new file that you 
+> introduce in this patch.
 > 
-> > diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> > index ed4d1581d502..ba5d5d9ebc64 100644
-> > --- a/virt/kvm/kvm_main.c
-> > +++ b/virt/kvm/kvm_main.c
-> > @@ -943,6 +943,7 @@ static struct kvm *kvm_create_vm(unsigned long type)
-> >   	mutex_init(&kvm->irq_lock);
-> >   	mutex_init(&kvm->slots_lock);
-> >   	mutex_init(&kvm->slots_arch_lock);
-> > +	mutex_init(&kvm->apicv_update_lock);
-> >   	INIT_LIST_HEAD(&kvm->devices);
-> >   
-> >   	BUILD_BUG_ON(KVM_MEM_SLOTS_NUM > SHRT_MAX);
-> > 
+>> @@ -0,0 +1,13 @@
+>> +#include <stdint.h>
+>> +#include <asm/arch_def.h>
+>> +
+>> +__attribute__((section(".text"))) int main(void)
+>> +{
+>> +	uint64_t bad_psw = 0;
+>> +	struct psw *pgm_new = (struct psw *)464;
 > 
-> Please add comments above fields that are protected by this lock 
-> (anything but apicv_inhibit_reasons?), and especially move it to kvm->arch.
-I agree, I will do this.
+> Is it possible to use the lib/s390x/asm/arch_def.h in snippets? If so, I'd 
+> vote for using &lowcore->pgm_new_psw instead of the magic number 464.
 
+I think it should be, we don't print in arch_def.h and that's usually
+the biggest problem for snippets.
+
+But even if it doesn't work we can still use GEN_LC_PGM_NEW_PSW from
+asm-offsets.h
 
 > 
-> Paolo
+>> +	pgm_new->mask = 1UL << (63 - 12); //invalid program new PSW
+> 
+> Please add a space after the //
+> (also in the other spots in this patch)
+> 
+>> +	pgm_new->addr = 0xdeadbeef;
+> 
+> Are we testing the mask or the addr here? If we're testing the mask, I'd 
+> rather use an even addr here to make sure that we do not trap because of the 
+> uneven address. Or do we just don't care?
 
+If I remember correctly then the odd address would be a late exception
+and an invalid mask is an early exception. The whole topic of PSW
+exceptions is rather complex especially if you add the instructions that
+change the PSW into the consideration.
+
+> 
+>> +	asm volatile ("lpsw %0" :: "Q"(bad_psw));
+>> +	return 0;
+>> +}
+> 
+>   Thomas
+> 
 
