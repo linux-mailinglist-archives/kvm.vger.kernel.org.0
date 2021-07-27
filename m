@@ -2,82 +2,151 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id CEE1B3D7A14
-	for <lists+kvm@lfdr.de>; Tue, 27 Jul 2021 17:46:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7D6E63D7A3A
+	for <lists+kvm@lfdr.de>; Tue, 27 Jul 2021 17:54:36 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236848AbhG0PqR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 27 Jul 2021 11:46:17 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:54400 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229569AbhG0PqR (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 27 Jul 2021 11:46:17 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1627400776;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=qyu2Y2TRrxflVv9Re1ddIxikd/FHNJ3gk/I5zZBEQ38=;
-        b=I+HLilGqJ0edziQMxkDK0r7+lFWLygv/kgqIq5UhNf2HLo6bvTJu9EbUuzFKxD9PTCo8WK
-        LKuFpwPxzHrFbhKCxZuH/nKj3Bs+L8sfX6N4tdbFt6IwtMJK1bVCEmuzsh2BH3PDphwYy4
-        THozO+iCk6y/Ywi7uOr5QBrWKQ1yFyg=
-Received: from mail-qv1-f69.google.com (mail-qv1-f69.google.com
- [209.85.219.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-224-lnq_LN0uPrOevRmROBlhkA-1; Tue, 27 Jul 2021 11:46:15 -0400
-X-MC-Unique: lnq_LN0uPrOevRmROBlhkA-1
-Received: by mail-qv1-f69.google.com with SMTP id t18-20020a0cd4120000b02902fbda5d4988so10880074qvh.11
-        for <kvm@vger.kernel.org>; Tue, 27 Jul 2021 08:46:15 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=qyu2Y2TRrxflVv9Re1ddIxikd/FHNJ3gk/I5zZBEQ38=;
-        b=V4tbCj+nmd7b8hVdE6K0gBVb4ShxohCv8gNOWEOoAWfR49/FcBWjmWBcHSHtK+9x6j
-         jutU8busKB5iYUP3O4r4bFst5ZvMlClREjRJPyxQSJETOc5b1vjuGFZ7m4mjZzvrrByj
-         xPSwd+InqV5XBegxuYDuUg1jBFVZRxqemV+HvQLzo+YDZkdejm1wT44UYal4xYVdZx68
-         umX0ke/G9+BeShSK8BRDCebWi+5ffpdaxOBFOh+p7apHJpsNzbb7Lv+/RYzeoCUoKBDQ
-         gcvUp+3c8HXehjVDw8AScospcDVrLjaBt78/1weuZYUIYlvNtqRHbx1G1NXrHcoapOcK
-         o8hQ==
-X-Gm-Message-State: AOAM530MO+73YuzInwETfeE3GUfl9TDsxls6gNOTWXUHw14ZZxp6u/g+
-        olZmuXAxUHQ4dAP+QqPD72K+bxTF0lb0LsZyYzlQ+xGvxtaLMRg5eFkG+PaNR0LuMiSsLskvl3t
-        jcyBWUQHZJ16b
-X-Received: by 2002:a05:620a:1137:: with SMTP id p23mr23880575qkk.490.1627400775130;
-        Tue, 27 Jul 2021 08:46:15 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzhTawW9W+VTgqHYhIOqH2k2b/KQYhF35BYDKPB7IDZDwwML1ltc1GzD2gc42Ak+yJCkznYwA==
-X-Received: by 2002:a05:620a:1137:: with SMTP id p23mr23880554qkk.490.1627400774782;
-        Tue, 27 Jul 2021 08:46:14 -0700 (PDT)
-Received: from t490s (bras-base-toroon474qw-grc-65-184-144-111-238.dsl.bell.ca. [184.144.111.238])
-        by smtp.gmail.com with ESMTPSA id f3sm1570573qti.65.2021.07.27.08.46.13
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 27 Jul 2021 08:46:13 -0700 (PDT)
-Date:   Tue, 27 Jul 2021 11:46:12 -0400
-From:   Peter Xu <peterx@redhat.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        stable@vger.kernel.org
-Subject: Re: [PATCH] KVM: add missing compat KVM_CLEAR_DIRTY_LOG
-Message-ID: <YQAqRB7OPHHQNdJ+@t490s>
-References: <20210727124901.1466039-1-pbonzini@redhat.com>
+        id S229670AbhG0Pyf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 27 Jul 2021 11:54:35 -0400
+Received: from foss.arm.com ([217.140.110.172]:40618 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229537AbhG0Pye (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 27 Jul 2021 11:54:34 -0400
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 032BC31B;
+        Tue, 27 Jul 2021 08:54:34 -0700 (PDT)
+Received: from [192.168.0.110] (unknown [172.31.20.19])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id E7DC13F70D;
+        Tue, 27 Jul 2021 08:54:31 -0700 (PDT)
+Subject: Re: [PATCH v2 2/6] KVM: arm64: Walk userspace page tables to compute
+ the THP mapping size
+To:     Marc Zyngier <maz@kernel.org>,
+        linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org,
+        kvmarm@lists.cs.columbia.edu, linux-mm@kvack.org
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Matthew Wilcox <willy@infradead.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Will Deacon <will@kernel.org>,
+        Quentin Perret <qperret@google.com>,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        kernel-team@android.com
+References: <20210726153552.1535838-1-maz@kernel.org>
+ <20210726153552.1535838-3-maz@kernel.org>
+From:   Alexandru Elisei <alexandru.elisei@arm.com>
+Message-ID: <0cf6325c-a31b-0c0c-41dc-8a62a847a800@arm.com>
+Date:   Tue, 27 Jul 2021 16:55:42 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.12.0
 MIME-Version: 1.0
+In-Reply-To: <20210726153552.1535838-3-maz@kernel.org>
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20210727124901.1466039-1-pbonzini@redhat.com>
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jul 27, 2021 at 08:49:01AM -0400, Paolo Bonzini wrote:
-> The arguments to the KVM_CLEAR_DIRTY_LOG ioctl include a pointer,
-> therefore it needs a compat ioctl implementation.  Otherwise,
-> 32-bit userspace fails to invoke it on 64-bit kernels; for x86
-> it might work fine by chance if the padding is zero, but not
-> on big-endian architectures.
-> 
-> Reported-by: Thomas Sattler
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+Hi Marc,
 
-Reviewed-by: Peter Xu <peterx@redhat.com>
+On 7/26/21 4:35 PM, Marc Zyngier wrote:
+> We currently rely on the kvm_is_transparent_hugepage() helper to
+> discover whether a given page has the potential to be mapped as
+> a block mapping.
+>
+> However, this API doesn't really give un everything we want:
+> - we don't get the size: this is not crucial today as we only
+>   support PMD-sized THPs, but we'd like to have larger sizes
+>   in the future
+> - we're the only user left of the API, and there is a will
+>   to remove it altogether
+>
+> To address the above, implement a simple walker using the existing
+> page table infrastructure, and plumb it into transparent_hugepage_adjust().
+> No new page sizes are supported in the process.
+>
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> ---
+>  arch/arm64/kvm/mmu.c | 34 ++++++++++++++++++++++++++++++----
+>  1 file changed, 30 insertions(+), 4 deletions(-)
+>
+> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+> index 3155c9e778f0..0adc1617c557 100644
+> --- a/arch/arm64/kvm/mmu.c
+> +++ b/arch/arm64/kvm/mmu.c
+> @@ -433,6 +433,32 @@ int create_hyp_exec_mappings(phys_addr_t phys_addr, size_t size,
+>  	return 0;
+>  }
+>  
+> +static struct kvm_pgtable_mm_ops kvm_user_mm_ops = {
+> +	/* We shouldn't need any other callback to walk the PT */
 
--- 
-Peter Xu
+That looks correct to me, mm_ops is used in __kvm_pgtable_visit(), and then only
+the phys_to_virt field callback is used. kvm_host_va() is also the callback used
+by kvm_s2_mm_ops, which looks right to me.
+
+> +	.phys_to_virt		= kvm_host_va,
+> +};
+> +
+> +static int get_user_mapping_size(struct kvm *kvm, u64 addr)
+> +{
+> +	struct kvm_pgtable pgt = {
+> +		.pgd		= (kvm_pte_t *)kvm->mm->pgd,
+> +		.ia_bits	= VA_BITS,
+> +		.start_level	= (KVM_PGTABLE_MAX_LEVELS -
+> +				   CONFIG_PGTABLE_LEVELS),
+> +		.mm_ops		= &kvm_user_mm_ops,
+> +	};
+> +	kvm_pte_t pte = 0;	/* Keep GCC quiet... */
+> +	u32 level = ~0;
+> +	int ret;
+> +
+> +	ret = kvm_pgtable_get_leaf(&pgt, addr, &pte, &level);
+> +	VM_BUG_ON(ret);
+> +	VM_BUG_ON(level >= KVM_PGTABLE_MAX_LEVELS);
+> +	VM_BUG_ON(!(pte & PTE_VALID));
+> +
+> +	return BIT(ARM64_HW_PGTABLE_LEVEL_SHIFT(level));
+> +}
+> +
+>  static struct kvm_pgtable_mm_ops kvm_s2_mm_ops = {
+>  	.zalloc_page		= stage2_memcache_zalloc_page,
+>  	.zalloc_pages_exact	= kvm_host_zalloc_pages_exact,
+> @@ -780,7 +806,7 @@ static bool fault_supports_stage2_huge_mapping(struct kvm_memory_slot *memslot,
+>   * Returns the size of the mapping.
+>   */
+>  static unsigned long
+> -transparent_hugepage_adjust(struct kvm_memory_slot *memslot,
+> +transparent_hugepage_adjust(struct kvm *kvm, struct kvm_memory_slot *memslot,
+>  			    unsigned long hva, kvm_pfn_t *pfnp,
+>  			    phys_addr_t *ipap)
+>  {
+> @@ -791,8 +817,8 @@ transparent_hugepage_adjust(struct kvm_memory_slot *memslot,
+>  	 * sure that the HVA and IPA are sufficiently aligned and that the
+>  	 * block map is contained within the memslot.
+>  	 */
+> -	if (kvm_is_transparent_hugepage(pfn) &&
+> -	    fault_supports_stage2_huge_mapping(memslot, hva, PMD_SIZE)) {
+> +	if (fault_supports_stage2_huge_mapping(memslot, hva, PMD_SIZE) &&
+> +	    get_user_mapping_size(kvm, hva) >= PMD_SIZE) {
+>  		/*
+>  		 * The address we faulted on is backed by a transparent huge
+>  		 * page.  However, because we map the compound huge page and
+> @@ -1051,7 +1077,7 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+>  	 * backed by a THP and thus use block mapping if possible.
+>  	 */
+>  	if (vma_pagesize == PAGE_SIZE && !(force_pte || device))
+> -		vma_pagesize = transparent_hugepage_adjust(memslot, hva,
+> +		vma_pagesize = transparent_hugepage_adjust(kvm, memslot, hva,
+>  							   &pfn, &fault_ipa);
+>  
+>  	if (fault_status != FSC_PERM && !device && kvm_has_mte(kvm)) {
+
+Sean explained well why holding the mmap lock isn't needed here. The patch looks
+correct to me:
+
+Reviewed-by: Alexandru Elisei <alexandru.elisei@arm.com>
+
+Thanks,
+
+Alex
 
