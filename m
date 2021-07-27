@@ -2,229 +2,90 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3BCE63D7C8B
-	for <lists+kvm@lfdr.de>; Tue, 27 Jul 2021 19:48:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1D4403D7CFE
+	for <lists+kvm@lfdr.de>; Tue, 27 Jul 2021 20:01:24 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229915AbhG0Rsk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 27 Jul 2021 13:48:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38348 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229453AbhG0Rsj (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 27 Jul 2021 13:48:39 -0400
-Received: from mail-ot1-x331.google.com (mail-ot1-x331.google.com [IPv6:2607:f8b0:4864:20::331])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B9775C061760
-        for <kvm@vger.kernel.org>; Tue, 27 Jul 2021 10:48:38 -0700 (PDT)
-Received: by mail-ot1-x331.google.com with SMTP id h63-20020a9d14450000b02904ce97efee36so14261898oth.7
-        for <kvm@vger.kernel.org>; Tue, 27 Jul 2021 10:48:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=hirHjnieMlx0uLSMjf9Bez4E7tmDYC0RWntJ9sY1Y4U=;
-        b=DkiBe+CvNLt7y+5WnZWaoVX+BUITXOV+CQ36UKsztAvM1GKqvJpGLOjvLWMKoiz/nn
-         /p3QJBPV8mSmSgduJCPadwChAIDxrA70vHEtqoOf0z/eC3eXnQy8EEI38C1VZgGw8r1c
-         96AXn0NpYpp5eO13Z2CMyVIvxf2JbrSM/Zh8w50bqAygCKIxVvA0gNys9QzGI8AeJoOb
-         BJFEgGMxqpZRXlb377ZzyEevaWo0BzooJYilT2qQnsz/QFyWLrRGWlvA5Oymph0PkahV
-         8macs/6FMoWQfHGU+Xo6kdgQPF5sRqkP8oJ6a4+lkJF8efkSgN2MhKV9r2GVXzSiEhwj
-         peRg==
+        id S231362AbhG0SBX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 27 Jul 2021 14:01:23 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:24135 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229903AbhG0SBW (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 27 Jul 2021 14:01:22 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1627408881;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=l3ve2LBl56pycpmfaPjVOw8bmB5e513L10q/E/QV624=;
+        b=Vc/UF1nSeFL//6GK81EkcNS4osTZsobWIS7dRKcZY5JF7bBXBdqvIIp78SplYIz2I6qN0r
+        shn8MusvDE28/IAUxt228oRIVd55JHX8cb5QZx2styRApSEX7WerdgiaxwZ47PDb4zoEPj
+        9WA6c/2pdOyazTuwjlceOVVmt8P2j/Q=
+Received: from mail-ot1-f70.google.com (mail-ot1-f70.google.com
+ [209.85.210.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-181-wX0vUad_NV6NAipQc3SvEw-1; Tue, 27 Jul 2021 14:01:20 -0400
+X-MC-Unique: wX0vUad_NV6NAipQc3SvEw-1
+Received: by mail-ot1-f70.google.com with SMTP id m19-20020a9d6ad30000b02904b7c1fa2d7cso7733517otq.16
+        for <kvm@vger.kernel.org>; Tue, 27 Jul 2021 11:01:20 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=hirHjnieMlx0uLSMjf9Bez4E7tmDYC0RWntJ9sY1Y4U=;
-        b=IdU9hwr0c7vZWhLwL4pw+UVm+xaKpGoTs4jhqWuyyfgBlXB5nLI0ZSmUOtg/0ORxeF
-         tCWVIiquTxUb8ylqpkI5jMasGhX95WGV5/GWbP61vQq7bxjB68POobP2rXacYB+yn/DR
-         BiEnCOJbneuefPkFWEceF5jEexUBCur/7JKq9iY6GEfBq/zOy5o6qAoJAcv3h3ENWmkX
-         1iPHWhhGiEZXATgxkhJ3bX5v1BA6JJmyOx32MHjeBRgQF02WwwkRN/lgXgRAS5pP8m8Q
-         d+Rn3FBYjRkYYUSU4Asc0BX4n6NNXOszoRy4cxpcECIfj5o5Cbt24cc+LyRGUx217/8k
-         AI1w==
-X-Gm-Message-State: AOAM531ym11r/ehx5asIQ5K2XbKXpzDBXjFIln1MYBBD5QKYJcpIgl/K
-        5UlCFg4XcIyfwVtnCFu84Ze64VixXbwgK1W7pjaf8Q==
-X-Google-Smtp-Source: ABdhPJwVBE2V0DHG9jgGk0UMUwFyNZpcHTcrWnDWATpaskugd/LxnivlTpZvR+JQcDXwBp0NecAwJJnLuIt9/OKYH8k=
-X-Received: by 2002:a05:6830:242f:: with SMTP id k15mr16795416ots.72.1627408117842;
- Tue, 27 Jul 2021 10:48:37 -0700 (PDT)
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
+         :references:organization:mime-version:content-transfer-encoding;
+        bh=l3ve2LBl56pycpmfaPjVOw8bmB5e513L10q/E/QV624=;
+        b=I7i6pQvZJalKvSFTzasUh48BH+CHQ7cNe2JM0zFdooibSUIydCdr6D8y2eZLeNWgTr
+         wGCKSlL417O7H8UGzRu4wfLDyJoTqHbVuj3I9IrdeX0pPQdyQ31NKedrvMkbtJdtlZeF
+         Rsi79Jkd917QnQviJUNRkTa9rURi4HbelMHAR0zLM/nHHEg4D5TefxOb2CWoFHbbPtqJ
+         xF8elC/pdBqv2aONgcshVnOejF+Kjvouiquvtqv/7hobTiruAsfQ4QlzEXar2puNk/2N
+         A+JkNnVgIyg/+al3dt96AvvZG6HwP9WbL0yRC69bVtSLwmtaueYVMQEyRUj9wpH1qBNl
+         3nnQ==
+X-Gm-Message-State: AOAM531ZyDYtNCjcgvZHtOYMWlM6+olSPJqLJ1PtVPYs6rmFRuDBUh/I
+        L8pUu9LaPiNDf4pxcB0ehgNSHFH/BzwHfm+wX5Zw6CHdN03ZUTPleXJ1xt9tzjQLmzXxdSG4Vcn
+        Erc3XVRpMqHkA
+X-Received: by 2002:a05:6830:1290:: with SMTP id z16mr16147241otp.28.1627408879834;
+        Tue, 27 Jul 2021 11:01:19 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwxceHuuEWZyk5OIY/tJfuObz6ctGzXsZrPVW7DXIyY1hsrLGqacGF+MYgp+dgviBsUHRwmow==
+X-Received: by 2002:a05:6830:1290:: with SMTP id z16mr16147135otp.28.1627408878209;
+        Tue, 27 Jul 2021 11:01:18 -0700 (PDT)
+Received: from redhat.com ([198.99.80.109])
+        by smtp.gmail.com with ESMTPSA id y76sm664344oie.55.2021.07.27.11.01.17
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 27 Jul 2021 11:01:17 -0700 (PDT)
+Date:   Tue, 27 Jul 2021 12:01:16 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Cornelia Huck <cohuck@redhat.com>
+Cc:     Cai Huoqing <caihuoqing@baidu.com>, jgg@ziepe.ca,
+        eric.auger@redhat.com, kevin.tian@intel.com,
+        giovanni.cabiddu@intel.com, mgurtovoy@nvidia.com, jannh@google.com,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] vfio: Add "#ifdef CONFIG_MMU" for vma operations
+Message-ID: <20210727120116.61ba8e25.alex.williamson@redhat.com>
+In-Reply-To: <877dhb4svx.fsf@redhat.com>
+References: <20210727034000.547-1-caihuoqing@baidu.com>
+        <877dhb4svx.fsf@redhat.com>
+Organization: Red Hat
+X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-References: <20210713142023.106183-1-mlevitsk@redhat.com> <20210713142023.106183-9-mlevitsk@redhat.com>
- <c51d3f0b46bb3f73d82d66fae92425be76b84a68.camel@redhat.com>
- <YPXJQxLaJuoF6aXl@google.com> <64ed28249c1895a59c9f2e2aa2e4c09a381f69e5.camel@redhat.com>
- <YPnBxHwMJkTSBHfC@google.com> <714b56eb83e94aca19e35a8c258e6f28edc0a60d.camel@redhat.com>
-In-Reply-To: <714b56eb83e94aca19e35a8c258e6f28edc0a60d.camel@redhat.com>
-From:   Ben Gardon <bgardon@google.com>
-Date:   Tue, 27 Jul 2021 10:48:26 -0700
-Message-ID: <CANgfPd_o5==utejx6iG9xfWrbKtsvGWNbB4yrmuA-NVj_r_a9A@mail.gmail.com>
-Subject: Re: [PATCH v2 8/8] KVM: x86: hyper-v: Deactivate APICv only when
- AutoEOI feature is in use
-To:     Maxim Levitsky <mlevitsk@redhat.com>
-Cc:     Sean Christopherson <seanjc@google.com>, kvm <kvm@vger.kernel.org>,
-        "open list:X86 ARCHITECTURE (32-BIT AND 64-BIT)" 
-        <linux-kernel@vger.kernel.org>, Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, Borislav Petkov <bp@alien8.de>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ingo Molnar <mingo@redhat.com>,
-        "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jul 27, 2021 at 6:06 AM Maxim Levitsky <mlevitsk@redhat.com> wrote:
->
-> On Thu, 2021-07-22 at 19:06 +0000, Sean Christopherson wrote:
-> > +Ben
-> >
-> > On Thu, Jul 22, 2021, Maxim Levitsky wrote:
-> > > On Mon, 2021-07-19 at 18:49 +0000, Sean Christopherson wrote:
-> > > > On Sun, Jul 18, 2021, Maxim Levitsky wrote:
-> > > > > I am more inclined to fix this by just tracking if we hold the srcu
-> > > > > lock on each VCPU manually, just as we track the srcu index anyway,
-> > > > > and then kvm_request_apicv_update can use this to drop the srcu
-> > > > > lock when needed.
-> > > >
-> > > > The entire approach of dynamically adding/removing the memslot seems doomed to
-> > > > failure, and is likely responsible for the performance issues with AVIC, e.g. a
-> > > > single vCPU temporarily inhibiting AVIC will zap all SPTEs _twice_; on disable
-> > > > and again on re-enable.
-> > > >
-> > > > Rather than pile on more gunk, what about special casing the APIC access page
-> > > > memslot in try_async_pf()?  E.g. zap the GFN in avic_update_access_page() when
-> > > > disabling (and bounce through kvm_{inc,dec}_notifier_count()), and have the page
-> > > > fault path skip directly to MMIO emulation without caching the MMIO info.  It'd
-> > > > also give us a good excuse to rename try_async_pf() :-)
-> > > >
-> > > > If lack of MMIO caching is a performance problem, an alternative solution would
-> > > > be to allow caching but add a helper to zap the MMIO SPTE and request all vCPUs to
-> > > > clear their cache.
-> > > >
-> > > > It's all a bit gross, especially hijacking the mmu_notifier path, but IMO it'd be
-> > > > less awful than the current memslot+SRCU mess.
-> > >
-> > > Hi!
-> > >
-> > > I am testing your approach and it actually works very well! I can't seem to break it.
-> > >
-> > > Could you explain why do I need to do something with kvm_{inc,dec}_notifier_count()) ?
-> >
-> > Glad you asked, there's one more change needed.  kvm_zap_gfn_range() currently
-> > takes mmu_lock for read, but it needs to take mmu_lock for write for this case
-> > (more way below).
-> >
-> > The existing users, update_mtrr() and kvm_post_set_cr0(), are a bit sketchy.  The
-> > whole thing is a grey area because KVM is trying to ensure it honors the guest's
-> > UC memtype for non-coherent DMA, but the inputs (CR0 and MTRRs) are per-vCPU,
-> > i.e. for it to work correctly, the guest has to ensure all running vCPUs do the
-> > same transition.  So in practice there's likely no observable bug, but it also
-> > means that taking mmu_lock for read is likely pointless, because for things to
-> > work the guest has to serialize all running vCPUs.
-> >
-> > Ben, any objection to taking mmu_lock for write in kvm_zap_gfn_range()?  It would
-> > effectively revert commit 6103bc074048 ("KVM: x86/mmu: Allow zap gfn range to
-> > operate under the mmu read lock"); see attached patch.  And we could even bump
-> > the notifier count in that helper, e.g. on top of the attached:
-> >
-> > diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> > index b607e8763aa2..7174058e982b 100644
-> > --- a/arch/x86/kvm/mmu/mmu.c
-> > +++ b/arch/x86/kvm/mmu/mmu.c
-> > @@ -5568,6 +5568,8 @@ void kvm_zap_gfn_range(struct kvm *kvm, gfn_t gfn_start, gfn_t gfn_end)
-> >
-> >         write_lock(&kvm->mmu_lock);
-> >
-> > +       kvm_inc_notifier_count(kvm, gfn_start, gfn_end);
-> > +
-> >         if (kvm_memslots_have_rmaps(kvm)) {
-> >                 for (i = 0; i < KVM_ADDRESS_SPACE_NUM; i++) {
-> >                         slots = __kvm_memslots(kvm, i);
-> > @@ -5598,6 +5600,8 @@ void kvm_zap_gfn_range(struct kvm *kvm, gfn_t gfn_start, gfn_t gfn_end)
-> >         if (flush)
-> >                 kvm_flush_remote_tlbs_with_address(kvm, gfn_start, gfn_end);
-> >
-> > +       kvm_dec_notifier_count(kvm, gfn_start, gfn_end);
-> > +
-> >         write_unlock(&kvm->mmu_lock);
-> >  }
-> >
->
-> I understand what you mean now. I thought that I need to change to code of the
-> kvm_inc_notifier_count/kvm_dec_notifier_count.
->
->
->
->
-> >
-> >
-> >
-> > Back to Maxim's original question...
-> >
-> > Elevating mmu_notifier_count and bumping mmu_notifier_seq will will handle the case
-> > where APICv is being disabled while a different vCPU is concurrently faulting in a
-> > new mapping for the APIC page.  E.g. it handles this race:
-> >
-> >  vCPU0                                 vCPU1
-> >                                        apic_access_memslot_enabled = true;
-> >                                      #NPF on APIC
-> >                                      apic_access_memslot_enabled==true, proceed with #NPF
-> >  apic_access_memslot_enabled = false
-> >  kvm_zap_gfn_range(APIC);
-> >                                        __direct_map(APIC)
-> >
-> >  mov [APIC], 0 <-- succeeds, but KVM wants to intercept to emulate
->
-> I understand this now. I guess this can't happen with original memslot disable
-> which I guess has the needed locking and flushing to avoid this.
-> (I didnt' study the code in depth thought)
->
-> >
-> >
-> >
-> > The elevated mmu_notifier_count and/or changed mmu_notifier_seq will cause vCPU1
-> > to bail and resume the guest without fixing the #NPF.  After acquiring mmu_lock,
-> > vCPU1 will see the elevated mmu_notifier_count (if kvm_zap_gfn_range() is about
-> > to be called, or just finised) and/or a modified mmu_notifier_seq (after the
-> > count was decremented).
-> >
-> > This is why kvm_zap_gfn_range() needs to take mmu_lock for write.  If it's allowed
-> > to run in parallel with the page fault handler, there's no guarantee that the
-> > correct apic_access_memslot_enabled will be observed.
->
-> I understand now.
->
-> So, Paolo, Ben Gardon, what do you think. Do you think this approach is feasable?
-> Do you agree to revert the usage of the read lock?
->
-> I will post a new series using this approach very soon, since I already have
-> msot of the code done.
->
-> Best regards,
->         Maxim Levitsky
+On Tue, 27 Jul 2021 18:35:14 +0200
+Cornelia Huck <cohuck@redhat.com> wrote:
 
-From reading through this thread, it seems like switching from read
-lock to write lock is only necessary for a small range of GFNs, (i.e.
-the APIC access page) is that correct?
-My initial reaction was that switching kvm_zap_gfn_range back to the
-write lock would be terrible for performance, but given its only two
-callers, I think it would actually be fine.
-If you do that though, you should pass shared=false to
-kvm_tdp_mmu_zap_gfn_range in that function, so that it knows it's
-operating with exclusive access to the MMU lock.
+> On Tue, Jul 27 2021, Cai Huoqing <caihuoqing@baidu.com> wrote:
+> 
+> > Add "#ifdef CONFIG_MMU",
+> > because vma mmap and vm_operations_struct depend on MMU  
+> 
+> vfio_pci already depends on MMU -- what problems are you trying to fix?
 
->
-> >
-> >       if (is_tdp_mmu_fault)
-> >               read_lock(&vcpu->kvm->mmu_lock);
-> >       else
-> >               write_lock(&vcpu->kvm->mmu_lock);
-> >
-> >       if (!is_noslot_pfn(pfn) && mmu_notifier_retry_hva(vcpu->kvm, mmu_seq, hva)) <--- look here!
-> >               goto out_unlock;
-> >
-> >       if (is_tdp_mmu_fault)
-> >               r = kvm_tdp_mmu_map(vcpu, gpa, error_code, map_writable, max_level,
-> >                                   pfn, prefault);
-> >       else
-> >               r = __direct_map(vcpu, gpa, error_code, map_writable, max_level, pfn,
-> >                                prefault, is_tdp);
->
->
+Exactly my question, we silenced the randconfig builds without
+CONFIG_MMU in commit 2a55ca373501 ("vfio/pci: zap_vma_ptes() needs
+MMU").  Surely there are prototypes for vma_area_struct regardless of
+CONFIG_MMU and vfio-core having an mmap callback has no dependency on
+vm_operations_struct.  Thanks,
+
+Alex
+
