@@ -2,93 +2,119 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A817A3D6A33
-	for <lists+kvm@lfdr.de>; Tue, 27 Jul 2021 01:28:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 396343D6A7E
+	for <lists+kvm@lfdr.de>; Tue, 27 Jul 2021 02:01:43 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233927AbhGZWsI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 26 Jul 2021 18:48:08 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:43307 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S233491AbhGZWsG (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 26 Jul 2021 18:48:06 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1627342114;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=zGmsTgcyIKG5lma+qo/IbpdoduVKh2eYr03LqB0JH4c=;
-        b=EhXz8GJZQn9Oxw2BBdNcRLXI3Z7Qfo8R/Eb4Cwnnw1SEtx0DG30a/b8PtEhs+j5JvHCTYK
-        TqX3fkhg3nhcmzVYn5Oh7cJ3saWrQriNFcQD0fViGTSUzjh6tfZxH/hqZdcqChYCOPMpyM
-        EykmwM1M73LbAujM6n+3MqtPcLooZew=
-Received: from mail-oi1-f199.google.com (mail-oi1-f199.google.com
- [209.85.167.199]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-15-Vi1L4g3kNCiGLmp3-KuUsA-1; Mon, 26 Jul 2021 19:28:33 -0400
-X-MC-Unique: Vi1L4g3kNCiGLmp3-KuUsA-1
-Received: by mail-oi1-f199.google.com with SMTP id e17-20020a0568081491b02901f566a77bb8so7724120oiw.7
-        for <kvm@vger.kernel.org>; Mon, 26 Jul 2021 16:28:33 -0700 (PDT)
+        id S234187AbhGZXVN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 26 Jul 2021 19:21:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48730 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S233770AbhGZXVL (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 26 Jul 2021 19:21:11 -0400
+Received: from mail-pl1-x632.google.com (mail-pl1-x632.google.com [IPv6:2607:f8b0:4864:20::632])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A2549C061757;
+        Mon, 26 Jul 2021 17:01:39 -0700 (PDT)
+Received: by mail-pl1-x632.google.com with SMTP id e14so13704984plh.8;
+        Mon, 26 Jul 2021 17:01:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:subject:from:in-reply-to:date:cc
+         :content-transfer-encoding:message-id:references:to;
+        bh=lUWjZQDXW1+VGvHm1XsC8R6KR/u25Shxim64XwKLYOc=;
+        b=uEhXO1WKKa7U5w07vZoUVJ/G/ZV0UXZnLHN+HefwplYIosDp46zvWVaF5zcladnDl0
+         F1nbjGv2t4jWtqGGiRG0rdinfdhPbH+ju8ESVkunzvISrjCeI8Y3FsRHRjFfTbVeS7qP
+         JwgK2gHQD3pbb147K11UE2cWhy76+Evp2R7apig9CdVjHhpWqn3TPhIwtvaMkC+p+F1T
+         XEzgDlicBT7LmNMOtbhe9YwOJC4YNiMdAgf05Rzdr69LitvupORdrpqEZxj1jpqebNUy
+         j7iD12JdTxUrhttr9rMF7kUomYJWVX5MftPwDb71rMtxmoEMjmXAFhnBSboSRiKWxW7r
+         uYfg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
-         :references:organization:mime-version:content-transfer-encoding;
-        bh=zGmsTgcyIKG5lma+qo/IbpdoduVKh2eYr03LqB0JH4c=;
-        b=b1WHaiZ+PlRqODtXmuzecezbAaQVfLe/IDmnft0V5VKLKg07bg65U9G5k51JvAt6ia
-         Hr9zZ4Q1dIBBcR8jBqgI0VGsj+NRbJlaTzc4woy+nnW5UwZ36BwwG735ciLzxdA8Kbc8
-         GVTMabCIkUWEu36Lbbk4KbjdzC+V0dv9NOQ4yBc5VeraED1C6N0XLzdoIKurjjvFYc97
-         44EsWy89ULflbCIJHjkzsZVSIIG9y9AY+wP/Ia3po51L2hlceIhzI/CaXX3qzu+usEoa
-         ldXsAGAb8SEeCUt9eWkBppwd1GcD+xbMUeWqp5f9/UH1bxguGLhhpGJxNwfvI6SkNBpj
-         dfGA==
-X-Gm-Message-State: AOAM531atMF8J/Ow+8PG7HT1ZzLXhGwsBIIHQXgsJ7a1luNRaClJ4yfa
-        6i+tDQiM542pxrbUgJpE1fRj9cqOZqQfAhTG/uaJmXEZRbzUObqsDU7bdlOc7f6ciKstx9hj4aw
-        lmi1lFUwiJolT
-X-Received: by 2002:aca:a887:: with SMTP id r129mr1016703oie.128.1627342112662;
-        Mon, 26 Jul 2021 16:28:32 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJy3GADjIuORJLkoHf1pSPqO4kcuqx8II3jB98Pxdt6mv3Z6DUajXj/STasL7XqN3HL0GlGG5A==
-X-Received: by 2002:aca:a887:: with SMTP id r129mr1016693oie.128.1627342112452;
-        Mon, 26 Jul 2021 16:28:32 -0700 (PDT)
-Received: from redhat.com ([198.99.80.109])
-        by smtp.gmail.com with ESMTPSA id p4sm219061ooa.35.2021.07.26.16.28.31
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 26 Jul 2021 16:28:32 -0700 (PDT)
-Date:   Mon, 26 Jul 2021 17:28:31 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Jason Gunthorpe <jgg@nvidia.com>
-Cc:     Cornelia Huck <cohuck@redhat.com>, Christoph Hellwig <hch@lst.de>,
-        Kirti Wankhede <kwankhede@nvidia.com>, kvm@vger.kernel.org,
+        h=x-gm-message-state:mime-version:subject:from:in-reply-to:date:cc
+         :content-transfer-encoding:message-id:references:to;
+        bh=lUWjZQDXW1+VGvHm1XsC8R6KR/u25Shxim64XwKLYOc=;
+        b=uJdQ2yuGDOdGUdwdru2Ew7gatGMRji7ViDqHnEUCs37DC0aWrpayxoLJ0NCbnmy0dW
+         TNtpJ2EbpM/89HbZ/CaGDIyCE0vX44yPBjF0P+S9hUullMfuYbLFGSJP/o8YHrOBqxSd
+         3/3COBHFVVfCJcU5fN8UEWGA/QJTii4qWzbvVDSRy5MxxoE1U3I2UzY5wS7B5AVMsy1E
+         yjsjKO+R0O0zMiZZY7wM0ihknIo5wIR+jwHkl1wuypKG4iCE7G0a6HlTZRRMXtRKXfvd
+         2YINzznDqdbbaXEVYihHwJ5b8tWImxvd9w3R5DgNxaSv+Nvn/pnoXgNyq1FroiWfbYee
+         DrIg==
+X-Gm-Message-State: AOAM530W6/jn0Yxe+t1Ep+zrfbRJKiLNNH/mk3+acsSzqO7gI3Hmc1Hp
+        vhnD6larKFMmLMCg6b15lgk=
+X-Google-Smtp-Source: ABdhPJxhNVQEpYqpNVd+k+C8FWNhN3WAWtV7aOMjjnpGW0pDOnJKwzW14lIHVW7BwU7gDICkPua42w==
+X-Received: by 2002:a62:1bc7:0:b029:328:f2c:8ff1 with SMTP id b190-20020a621bc70000b02903280f2c8ff1mr20156762pfb.18.1627344098894;
+        Mon, 26 Jul 2021 17:01:38 -0700 (PDT)
+Received: from smtpclient.apple (c-24-6-216-183.hsd1.ca.comcast.net. [24.6.216.183])
+        by smtp.gmail.com with ESMTPSA id q21sm981911pgk.71.2021.07.26.17.01.37
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Mon, 26 Jul 2021 17:01:38 -0700 (PDT)
+Content-Type: text/plain;
+        charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 14.0 \(3654.120.0.1.13\))
+Subject: Re: [PATCH v2 46/46] KVM: x86: Preserve guest's CR0.CD/NW on INIT
+From:   Nadav Amit <nadav.amit@gmail.com>
+In-Reply-To: <CAAeT=FzGDUr8MK5Uf3jyUxtf+2jCf=bgG760L0mjjM3vRsXKSg@mail.gmail.com>
+Date:   Mon, 26 Jul 2021 17:01:36 -0700
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, KVM <kvm@vger.kernel.org>,
         linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 2/2] vfio/mdev: don't warn if ->request is not set
-Message-ID: <20210726172831.3a7978fd.alex.williamson@redhat.com>
-In-Reply-To: <20210726230906.GD1721383@nvidia.com>
-References: <20210726143524.155779-1-hch@lst.de>
-        <20210726143524.155779-3-hch@lst.de>
-        <87zgu93sxz.fsf@redhat.com>
-        <20210726230906.GD1721383@nvidia.com>
-Organization: Red Hat
-X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <A41676B6-2E9F-4F8E-B91E-8F9A077A2FA8@gmail.com>
+References: <20210713163324.627647-1-seanjc@google.com>
+ <20210713163324.627647-47-seanjc@google.com>
+ <CAAeT=FzGDUr8MK5Uf3jyUxtf+2jCf=bgG760L0mjjM3vRsXKSg@mail.gmail.com>
+To:     Reiji Watanabe <reijiw@google.com>
+X-Mailer: Apple Mail (2.3654.120.0.1.13)
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 26 Jul 2021 20:09:06 -0300
-Jason Gunthorpe <jgg@nvidia.com> wrote:
 
-> On Mon, Jul 26, 2021 at 07:07:04PM +0200, Cornelia Huck wrote:
-> 
-> > But I wonder why nobody else implements this? Lack of surprise removal?  
-> 
-> The only implementation triggers an eventfd that seems to be the same
-> eventfd as the interrupt..
-> 
-> Do you know how this works in userspace? I'm surprised that the
-> interrupt eventfd can trigger an observation that the kernel driver
-> wants to be unplugged?
+> On Jul 19, 2021, at 9:37 PM, Reiji Watanabe <reijiw@google.com> wrote:
+>=20
+> On Tue, Jul 13, 2021 at 9:35 AM Sean Christopherson =
+<seanjc@google.com> wrote:
+>>=20
+>> Preserve CR0.CD and CR0.NW on INIT instead of forcing them to '1', as
+>> defined by both Intel's SDM and AMD's APM.
+>>=20
+>> Note, current versions of Intel's SDM are very poorly written with
+>> respect to INIT behavior.  Table 9-1. "IA-32 and Intel 64 Processor
+>> States Following Power-up, Reset, or INIT" quite clearly lists =
+power-up,
+>> RESET, _and_ INIT as setting CR0=3D60000010H, i.e. CD/NW=3D1.  But =
+the SDM
+>> then attempts to qualify CD/NW behavior in a footnote:
+>>=20
+>>  2. The CD and NW flags are unchanged, bit 4 is set to 1, all other =
+bits
+>>     are cleared.
+>>=20
+>> Presumably that footnote is only meant for INIT, as the RESET case =
+and
+>> especially the power-up case are rather non-sensical.  Another =
+footnote
+>> all but confirms that:
+>>=20
+>>  6. Internal caches are invalid after power-up and RESET, but left
+>>     unchanged with an INIT.
+>>=20
+>> Bare metal testing shows that CD/NW are indeed preserved on INIT =
+(someone
+>> else can hack their BIOS to check RESET and power-up :-D).
+>>=20
+>> Reported-by: Reiji Watanabe <reijiw@google.com>
+>> Signed-off-by: Sean Christopherson <seanjc@google.com>
+>=20
+> Reviewed-by: Reiji Watanabe <reijiw@google.com>
+>=20
+> Thank you for the fix and checking the CD/NW with the bare metal =
+testing.
 
-I think we're talking about ccw, but I see QEMU registering separate
-eventfds for each of the 3 IRQ indexes and the mdev driver specifically
-triggering the req_trigger...?  Thanks,
+Interesting.
 
-Alex
+Is there a kvm-unit-test to reproduce the issue by any chance?
 
