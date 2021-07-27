@@ -2,108 +2,212 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A94873D754F
-	for <lists+kvm@lfdr.de>; Tue, 27 Jul 2021 14:49:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B7DFB3D758C
+	for <lists+kvm@lfdr.de>; Tue, 27 Jul 2021 15:06:01 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236508AbhG0MtK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 27 Jul 2021 08:49:10 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:20014 "EHLO
+        id S236509AbhG0NF7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 27 Jul 2021 09:05:59 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:39233 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231971AbhG0MtI (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 27 Jul 2021 08:49:08 -0400
+        by vger.kernel.org with ESMTP id S232106AbhG0NF6 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 27 Jul 2021 09:05:58 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1627390148;
+        s=mimecast20190719; t=1627391158;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=BdtEDp0+lwUk+eK3IyiXj+lptHD+lclVaf4zplQ8FEI=;
-        b=ZlFbBqXY0gr6fjSz+i4FyIy9n3zMLH7VY248Qn2RCcujfu4z3Xi4wQPNYJ7TGNnOe4E/Kt
-        NMr/2LkQQeATIgTfQW8lb9r34xGUOoGiO7BG6GfPR0CAWVFUKjyT3xlAAGg6qheYVLpgMT
-        O107H0h3DspF/6/t//9ARRtlgzcr8/g=
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=4iyFwz7NDHGpvmEymRU+iBXixcU4YZHYlAfb7sMtL3w=;
+        b=dkmPOpewd8inxQ4vSf+kko5ijbjWtsNAA3AsgxTi10DO+mEUofLXViqiE3GQr1ranwaTQM
+        fUfJTuBkR2C2XRZP2Xp8PQZbaS0y9GzGYAqBsiWFNKuEY10704muGRlDhupDPMjtWq41cS
+        3w+U4IHmzaIFQQmSKP+pfqJk5qlrmF0=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-120-sQIj6EnLNridOslQXE-snA-1; Tue, 27 Jul 2021 08:49:06 -0400
-X-MC-Unique: sQIj6EnLNridOslQXE-snA-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+ us-mta-425-3Gxch96uPMajIDtQMTua6w-1; Tue, 27 Jul 2021 09:05:56 -0400
+X-MC-Unique: 3Gxch96uPMajIDtQMTua6w-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B3D1218C89DD;
-        Tue, 27 Jul 2021 12:49:05 +0000 (UTC)
-Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id BD079226E7;
-        Tue, 27 Jul 2021 12:49:01 +0000 (UTC)
-From:   Paolo Bonzini <pbonzini@redhat.com>
-To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc:     peterx@redhat.com, stable@vger.kernel.org
-Subject: [PATCH] KVM: add missing compat KVM_CLEAR_DIRTY_LOG
-Date:   Tue, 27 Jul 2021 08:49:01 -0400
-Message-Id: <20210727124901.1466039-1-pbonzini@redhat.com>
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 743DC1932481;
+        Tue, 27 Jul 2021 13:05:54 +0000 (UTC)
+Received: from starship (unknown [10.40.192.10])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 627FA5C1B4;
+        Tue, 27 Jul 2021 13:05:49 +0000 (UTC)
+Message-ID: <714b56eb83e94aca19e35a8c258e6f28edc0a60d.camel@redhat.com>
+Subject: Re: [PATCH v2 8/8] KVM: x86: hyper-v: Deactivate APICv only when
+ AutoEOI feature is in use
+From:   Maxim Levitsky <mlevitsk@redhat.com>
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     kvm@vger.kernel.org,
+        "open list:X86 ARCHITECTURE (32-BIT AND 64-BIT)" 
+        <linux-kernel@vger.kernel.org>, Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, Borislav Petkov <bp@alien8.de>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ingo Molnar <mingo@redhat.com>,
+        "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
+        Ben Gardon <bgardon@google.com>
+Date:   Tue, 27 Jul 2021 16:05:48 +0300
+In-Reply-To: <YPnBxHwMJkTSBHfC@google.com>
+References: <20210713142023.106183-1-mlevitsk@redhat.com>
+         <20210713142023.106183-9-mlevitsk@redhat.com>
+         <c51d3f0b46bb3f73d82d66fae92425be76b84a68.camel@redhat.com>
+         <YPXJQxLaJuoF6aXl@google.com>
+         <64ed28249c1895a59c9f2e2aa2e4c09a381f69e5.camel@redhat.com>
+         <YPnBxHwMJkTSBHfC@google.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The arguments to the KVM_CLEAR_DIRTY_LOG ioctl include a pointer,
-therefore it needs a compat ioctl implementation.  Otherwise,
-32-bit userspace fails to invoke it on 64-bit kernels; for x86
-it might work fine by chance if the padding is zero, but not
-on big-endian architectures.
+On Thu, 2021-07-22 at 19:06 +0000, Sean Christopherson wrote:
+> +Ben
+> 
+> On Thu, Jul 22, 2021, Maxim Levitsky wrote:
+> > On Mon, 2021-07-19 at 18:49 +0000, Sean Christopherson wrote:
+> > > On Sun, Jul 18, 2021, Maxim Levitsky wrote:
+> > > > I am more inclined to fix this by just tracking if we hold the srcu
+> > > > lock on each VCPU manually, just as we track the srcu index anyway,
+> > > > and then kvm_request_apicv_update can use this to drop the srcu
+> > > > lock when needed.
+> > > 
+> > > The entire approach of dynamically adding/removing the memslot seems doomed to
+> > > failure, and is likely responsible for the performance issues with AVIC, e.g. a
+> > > single vCPU temporarily inhibiting AVIC will zap all SPTEs _twice_; on disable
+> > > and again on re-enable.
+> > > 
+> > > Rather than pile on more gunk, what about special casing the APIC access page
+> > > memslot in try_async_pf()?  E.g. zap the GFN in avic_update_access_page() when
+> > > disabling (and bounce through kvm_{inc,dec}_notifier_count()), and have the page
+> > > fault path skip directly to MMIO emulation without caching the MMIO info.  It'd
+> > > also give us a good excuse to rename try_async_pf() :-)
+> > > 
+> > > If lack of MMIO caching is a performance problem, an alternative solution would
+> > > be to allow caching but add a helper to zap the MMIO SPTE and request all vCPUs to
+> > > clear their cache.
+> > > 
+> > > It's all a bit gross, especially hijacking the mmu_notifier path, but IMO it'd be
+> > > less awful than the current memslot+SRCU mess.
+> > 
+> > Hi!
+> > 
+> > I am testing your approach and it actually works very well! I can't seem to break it.
+> > 
+> > Could you explain why do I need to do something with kvm_{inc,dec}_notifier_count()) ?
+> 
+> Glad you asked, there's one more change needed.  kvm_zap_gfn_range() currently
+> takes mmu_lock for read, but it needs to take mmu_lock for write for this case
+> (more way below).
+> 
+> The existing users, update_mtrr() and kvm_post_set_cr0(), are a bit sketchy.  The
+> whole thing is a grey area because KVM is trying to ensure it honors the guest's
+> UC memtype for non-coherent DMA, but the inputs (CR0 and MTRRs) are per-vCPU,
+> i.e. for it to work correctly, the guest has to ensure all running vCPUs do the
+> same transition.  So in practice there's likely no observable bug, but it also
+> means that taking mmu_lock for read is likely pointless, because for things to
+> work the guest has to serialize all running vCPUs.
+> 
+> Ben, any objection to taking mmu_lock for write in kvm_zap_gfn_range()?  It would
+> effectively revert commit 6103bc074048 ("KVM: x86/mmu: Allow zap gfn range to
+> operate under the mmu read lock"); see attached patch.  And we could even bump
+> the notifier count in that helper, e.g. on top of the attached:
+> 
+> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> index b607e8763aa2..7174058e982b 100644
+> --- a/arch/x86/kvm/mmu/mmu.c
+> +++ b/arch/x86/kvm/mmu/mmu.c
+> @@ -5568,6 +5568,8 @@ void kvm_zap_gfn_range(struct kvm *kvm, gfn_t gfn_start, gfn_t gfn_end)
+> 
+>         write_lock(&kvm->mmu_lock);
+> 
+> +       kvm_inc_notifier_count(kvm, gfn_start, gfn_end);
+> +
+>         if (kvm_memslots_have_rmaps(kvm)) {
+>                 for (i = 0; i < KVM_ADDRESS_SPACE_NUM; i++) {
+>                         slots = __kvm_memslots(kvm, i);
+> @@ -5598,6 +5600,8 @@ void kvm_zap_gfn_range(struct kvm *kvm, gfn_t gfn_start, gfn_t gfn_end)
+>         if (flush)
+>                 kvm_flush_remote_tlbs_with_address(kvm, gfn_start, gfn_end);
+> 
+> +       kvm_dec_notifier_count(kvm, gfn_start, gfn_end);
+> +
+>         write_unlock(&kvm->mmu_lock);
+>  }
+> 
 
-Reported-by: Thomas Sattler
-Cc: stable@vger.kernel.org
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- virt/kvm/kvm_main.c | 28 ++++++++++++++++++++++++++++
- 1 file changed, 28 insertions(+)
+I understand what you mean now. I thought that I need to change to code of the
+kvm_inc_notifier_count/kvm_dec_notifier_count.
 
-diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index 0d732813fa80..d20fba0fc290 100644
---- a/virt/kvm/kvm_main.c
-+++ b/virt/kvm/kvm_main.c
-@@ -4391,6 +4391,16 @@ struct compat_kvm_dirty_log {
- 	};
- };
- 
-+struct compat_kvm_clear_dirty_log {
-+	__u32 slot;
-+	__u32 num_pages;
-+	__u64 first_page;
-+	union {
-+		compat_uptr_t dirty_bitmap; /* one bit per page */
-+		__u64 padding2;
-+	};
-+};
-+
- static long kvm_vm_compat_ioctl(struct file *filp,
- 			   unsigned int ioctl, unsigned long arg)
- {
-@@ -4400,6 +4410,24 @@ static long kvm_vm_compat_ioctl(struct file *filp,
- 	if (kvm->mm != current->mm)
- 		return -EIO;
- 	switch (ioctl) {
-+#ifdef CONFIG_KVM_GENERIC_DIRTYLOG_READ_PROTECT
-+	case KVM_CLEAR_DIRTY_LOG: {
-+		struct compat_kvm_clear_dirty_log compat_log;
-+		struct kvm_clear_dirty_log log;
-+
-+		if (copy_from_user(&compat_log, (void __user *)arg,
-+				   sizeof(compat_log)))
-+			return -EFAULT;
-+		log.slot	 = compat_log.slot;
-+		log.num_pages	 = compat_log.num_pages;
-+		log.first_page	 = compat_log.first_page;
-+		log.padding2	 = compat_log.padding2;
-+		log.dirty_bitmap = compat_ptr(compat_log.dirty_bitmap);
-+
-+		r = kvm_vm_ioctl_clear_dirty_log(kvm, &log);
-+		break;
-+	}
-+#endif
- 	case KVM_GET_DIRTY_LOG: {
- 		struct compat_kvm_dirty_log compat_log;
- 		struct kvm_dirty_log log;
--- 
-2.27.0
+
+
+
+> 
+> 
+> 
+> Back to Maxim's original question...
+> 
+> Elevating mmu_notifier_count and bumping mmu_notifier_seq will will handle the case
+> where APICv is being disabled while a different vCPU is concurrently faulting in a
+> new mapping for the APIC page.  E.g. it handles this race:
+> 
+>  vCPU0                                 vCPU1
+>                                        apic_access_memslot_enabled = true;
+>  			               #NPF on APIC
+> 			               apic_access_memslot_enabled==true, proceed with #NPF
+>  apic_access_memslot_enabled = false 
+>  kvm_zap_gfn_range(APIC);
+>                                        __direct_map(APIC)
+> 
+>  mov [APIC], 0 <-- succeeds, but KVM wants to intercept to emulate
+
+I understand this now. I guess this can't happen with original memslot disable
+which I guess has the needed locking and flushing to avoid this.
+(I didnt' study the code in depth thought)
+
+> 
+> 
+> 
+> The elevated mmu_notifier_count and/or changed mmu_notifier_seq will cause vCPU1
+> to bail and resume the guest without fixing the #NPF.  After acquiring mmu_lock,
+> vCPU1 will see the elevated mmu_notifier_count (if kvm_zap_gfn_range() is about
+> to be called, or just finised) and/or a modified mmu_notifier_seq (after the
+> count was decremented).
+> 
+> This is why kvm_zap_gfn_range() needs to take mmu_lock for write.  If it's allowed
+> to run in parallel with the page fault handler, there's no guarantee that the
+> correct apic_access_memslot_enabled will be observed.
+
+I understand now.
+
+So, Paolo, Ben Gardon, what do you think. Do you think this approach is feasable?
+Do you agree to revert the usage of the read lock?
+
+I will post a new series using this approach very soon, since I already have
+msot of the code done.
+
+Best regards,
+	Maxim Levitsky
+
+> 
+> 	if (is_tdp_mmu_fault)
+> 		read_lock(&vcpu->kvm->mmu_lock);
+> 	else
+> 		write_lock(&vcpu->kvm->mmu_lock);
+> 
+> 	if (!is_noslot_pfn(pfn) && mmu_notifier_retry_hva(vcpu->kvm, mmu_seq, hva)) <--- look here!
+> 		goto out_unlock;
+> 
+> 	if (is_tdp_mmu_fault)
+> 		r = kvm_tdp_mmu_map(vcpu, gpa, error_code, map_writable, max_level,
+> 				    pfn, prefault);
+> 	else
+> 		r = __direct_map(vcpu, gpa, error_code, map_writable, max_level, pfn,
+> 				 prefault, is_tdp);
+
 
