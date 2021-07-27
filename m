@@ -2,81 +2,77 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id F19FE3D6EAA
-	for <lists+kvm@lfdr.de>; Tue, 27 Jul 2021 08:04:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7CB983D6F8E
+	for <lists+kvm@lfdr.de>; Tue, 27 Jul 2021 08:40:06 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235596AbhG0GE3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 27 Jul 2021 02:04:29 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:53091 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S235512AbhG0GE0 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 27 Jul 2021 02:04:26 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1627365867;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=M/b1lAkx30VoYdGCq4rZeKdpDBbSV2MTh3TK7cbWaIY=;
-        b=Xe7MOXFkhKJj3M3hcVnXhOzL1lUS1iMlSR3CWYw3gMZvvtqT/Dz3zInyV98nrwIcOHgr0i
-        kIMxvzK6mPMfJLnyZxOfclp3hKLCtGTnIXDa3loGFXzryAqVpr/qlrZzrgqkpAA15NVnVW
-        WL4dlKjJd1/+zFi9qwATtfMZWwKk154=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-234-de9TROPlNBiBNCLvs915UQ-1; Tue, 27 Jul 2021 02:04:23 -0400
-X-MC-Unique: de9TROPlNBiBNCLvs915UQ-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E7D5B801AE7;
-        Tue, 27 Jul 2021 06:04:21 +0000 (UTC)
-Received: from localhost (unknown [10.39.192.46])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 91390687D5;
-        Tue, 27 Jul 2021 06:04:17 +0000 (UTC)
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Alex Williamson <alex.williamson@redhat.com>,
-        Jason Gunthorpe <jgg@nvidia.com>
-Cc:     Christoph Hellwig <hch@lst.de>,
-        Kirti Wankhede <kwankhede@nvidia.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 2/2] vfio/mdev: don't warn if ->request is not set
-In-Reply-To: <20210726172831.3a7978fd.alex.williamson@redhat.com>
-Organization: Red Hat GmbH
-References: <20210726143524.155779-1-hch@lst.de>
- <20210726143524.155779-3-hch@lst.de> <87zgu93sxz.fsf@redhat.com>
- <20210726230906.GD1721383@nvidia.com>
- <20210726172831.3a7978fd.alex.williamson@redhat.com>
-User-Agent: Notmuch/0.32.1 (https://notmuchmail.org)
-Date:   Tue, 27 Jul 2021 08:04:16 +0200
-Message-ID: <87wnpc47j3.fsf@redhat.com>
+        id S235504AbhG0GkD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 27 Jul 2021 02:40:03 -0400
+Received: from mx20.baidu.com ([111.202.115.85]:56166 "EHLO baidu.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S234349AbhG0GkC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 27 Jul 2021 02:40:02 -0400
+Received: from BC-Mail-Ex14.internal.baidu.com (unknown [172.31.51.54])
+        by Forcepoint Email with ESMTPS id 674A8B6713C6F3DA0DD3;
+        Tue, 27 Jul 2021 14:39:58 +0800 (CST)
+Received: from BJHW-Mail-Ex15.internal.baidu.com (10.127.64.38) by
+ BC-Mail-Ex14.internal.baidu.com (172.31.51.54) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
+ 15.1.2242.12; Tue, 27 Jul 2021 14:39:58 +0800
+Received: from BJHW-Mail-Ex15.internal.baidu.com ([100.100.100.38]) by
+ BJHW-Mail-Ex15.internal.baidu.com ([100.100.100.38]) with mapi id
+ 15.01.2308.014; Tue, 27 Jul 2021 14:39:58 +0800
+From:   "Li,Rongqing" <lirongqing@baidu.com>
+To:     Sean Christopherson <seanjc@google.com>
+CC:     Wanpeng Li <kernellwp@gmail.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Ingo Molnar <mingo@redhat.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        kvm <kvm@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>
+Subject: =?utf-8?B?562U5aSNOiDnrZTlpI06IFtQQVRDSF0gS1ZNOiBDb25zaWRlciBTTVQgaWRs?=
+ =?utf-8?Q?e_status_when_halt_polling?=
+Thread-Topic: =?utf-8?B?562U5aSNOiBbUEFUQ0hdIEtWTTogQ29uc2lkZXIgU01UIGlkbGUgc3RhdHVz?=
+ =?utf-8?Q?_when_halt_polling?=
+Thread-Index: AQHXfr4fbqZtloIq0E2JewUw/QgE86tOkBDQgABUwoCABqQwgIAA3MfA
+Date:   Tue, 27 Jul 2021 06:39:58 +0000
+Message-ID: <e68a267a328648c484132bafd022671c@baidu.com>
+References: <20210722035807.36937-1-lirongqing@baidu.com>
+ <CANRm+Cx-5Yyxx5A4+qkYa01MG4BCdwXPd++bmxzOid+XL267cQ@mail.gmail.com>
+ <4efe4fdb91b747da93d7980c10d016c9@baidu.com> <YP9gkSk+CHdKLP/Q@google.com>
+In-Reply-To: <YP9gkSk+CHdKLP/Q@google.com>
+Accept-Language: zh-CN, en-US
+Content-Language: zh-CN
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [172.22.193.253]
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Jul 26 2021, Alex Williamson <alex.williamson@redhat.com> wrote:
-
-> On Mon, 26 Jul 2021 20:09:06 -0300
-> Jason Gunthorpe <jgg@nvidia.com> wrote:
->
->> On Mon, Jul 26, 2021 at 07:07:04PM +0200, Cornelia Huck wrote:
->> 
->> > But I wonder why nobody else implements this? Lack of surprise removal?  
->> 
->> The only implementation triggers an eventfd that seems to be the same
->> eventfd as the interrupt..
->> 
->> Do you know how this works in userspace? I'm surprised that the
->> interrupt eventfd can trigger an observation that the kernel driver
->> wants to be unplugged?
->
-> I think we're talking about ccw, but I see QEMU registering separate
-> eventfds for each of the 3 IRQ indexes and the mdev driver specifically
-> triggering the req_trigger...?  Thanks,
->
-> Alex
-
-Exactly, ccw has a trigger for normal I/O interrupts, CRW (machine
-checks), and this one.
-
+DQoNCj4gLS0tLS3pgq7ku7bljp/ku7YtLS0tLQ0KPiDlj5Hku7bkuro6IFNlYW4gQ2hyaXN0b3Bo
+ZXJzb24gPHNlYW5qY0Bnb29nbGUuY29tPg0KPiDlj5HpgIHml7bpl7Q6IDIwMjHlubQ35pyIMjfm
+l6UgOToyNg0KPiDmlLbku7bkuro6IExpLFJvbmdxaW5nIDxsaXJvbmdxaW5nQGJhaWR1LmNvbT4N
+Cj4g5oqE6YCBOiBXYW5wZW5nIExpIDxrZXJuZWxsd3BAZ21haWwuY29tPjsgUGFvbG8gQm9uemlu
+aQ0KPiA8cGJvbnppbmlAcmVkaGF0LmNvbT47IEluZ28gTW9sbmFyIDxtaW5nb0ByZWRoYXQuY29t
+PjsgUGV0ZXIgWmlqbHN0cmENCj4gPHBldGVyekBpbmZyYWRlYWQub3JnPjsga3ZtIDxrdm1Admdl
+ci5rZXJuZWwub3JnPjsgTEtNTA0KPiA8bGludXgta2VybmVsQHZnZXIua2VybmVsLm9yZz4NCj4g
+5Li76aKYOiBSZTog562U5aSNOiBbUEFUQ0hdIEtWTTogQ29uc2lkZXIgU01UIGlkbGUgc3RhdHVz
+IHdoZW4gaGFsdCBwb2xsaW5nDQo+IA0KPiBSYXRoZXIgdGhhbiBkaXNhbGxvd2luZyBoYWx0LXBv
+bGxpbmcgZW50aXJlbHksIG9uIHg4NiBpdCBzaG91bGQgYmUgc3VmZmljaWVudCB0bw0KPiBzaW1w
+bHkgaGF2ZSB0aGUgaGFyZHdhcmUgdGhyZWFkIHlpZWxkIHRvIGl0cyBzaWJsaW5nKHMpIHZpYSBQ
+QVVTRS4gIEl0IHByb2JhYmx5DQo+IHdvbid0IGdldCBiYWNrIGFsbCBwZXJmb3JtYW5jZSwgYnV0
+IEkgd291bGQgZXhwZWN0IGl0IHRvIGJlIGNsb3NlLg0KPiANCj4gVGhpcyBjb21waWxlcyBvbiBh
+bGwgS1ZNIGFyY2hpdGVjdHVyZXMsIGFuZCBBRkFJQ1QgdGhlIGludGVuZGVkIHVzYWdlIG9mDQo+
+IGNwdV9yZWxheCgpIGlzIGlkZW50aWNhbCBmb3IgYWxsIGFyY2hpdGVjdHVyZXMuDQo+IA0KDQpS
+ZWFzb25hYmxlLCB0aGFua3MsIEkgd2lsbCByZXNlbmQgaXQNCg0KLUxpDQoNCg0KPiBkaWZmIC0t
+Z2l0IGEvdmlydC9rdm0va3ZtX21haW4uYyBiL3ZpcnQva3ZtL2t2bV9tYWluLmMgaW5kZXgNCj4g
+Njk4MGRhYmU5ZGY1Li5hMDdlY2IzYzY3ZmIgMTAwNjQ0DQo+IC0tLSBhL3ZpcnQva3ZtL2t2bV9t
+YWluLmMNCj4gKysrIGIvdmlydC9rdm0va3ZtX21haW4uYw0KPiBAQCAtMzExMSw2ICszMTExLDcg
+QEAgdm9pZCBrdm1fdmNwdV9ibG9jayhzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUpDQo+ICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgZ290byBvdXQ7DQo+ICAgICAgICAgICAgICAgICAgICAg
+ICAgIH0NCj4gICAgICAgICAgICAgICAgICAgICAgICAgcG9sbF9lbmQgPSBjdXIgPSBrdGltZV9n
+ZXQoKTsNCj4gKyAgICAgICAgICAgICAgICAgICAgICAgY3B1X3JlbGF4KCk7DQo+ICAgICAgICAg
+ICAgICAgICB9IHdoaWxlIChrdm1fdmNwdV9jYW5fcG9sbChjdXIsIHN0b3ApKTsNCj4gICAgICAg
+ICB9DQo+IA0KDQo=
