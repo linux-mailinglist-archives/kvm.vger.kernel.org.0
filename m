@@ -2,110 +2,98 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 22DF23D80F6
-	for <lists+kvm@lfdr.de>; Tue, 27 Jul 2021 23:11:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 19D113D80F9
+	for <lists+kvm@lfdr.de>; Tue, 27 Jul 2021 23:11:09 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233310AbhG0VKE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 27 Jul 2021 17:10:04 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:50569 "EHLO
+        id S233629AbhG0VKG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 27 Jul 2021 17:10:06 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:36573 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232696AbhG0VIn (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 27 Jul 2021 17:08:43 -0400
+        by vger.kernel.org with ESMTP id S235297AbhG0VJX (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 27 Jul 2021 17:09:23 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1627420122;
+        s=mimecast20190719; t=1627420162;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=TUpUKaHU71NYL6/47as07mmBCcnbbXJebfKydCKE4tk=;
-        b=f10rzjpeX/QnzOkvue8r3z1fBx3nLM6NliSZv6A/yX6zt9Q9e0fGQ2bfUYH13RYZWdxaSo
-        d/Ya3HInZhACm5zNpw0Hutb7uhviW/BJZrU3f0hIQBbnEvDX2FkapQKXtsMTYlX4p/vyE8
-        WDMudzqXl2eu3qN+X7uTq631PeWrkJU=
-Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
- [209.85.218.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-292-NulbfrOWMiyPKYWg7CXS-w-1; Tue, 27 Jul 2021 17:08:41 -0400
-X-MC-Unique: NulbfrOWMiyPKYWg7CXS-w-1
-Received: by mail-ej1-f72.google.com with SMTP id kf3-20020a17090776c3b0290536d9b62eb6so165214ejc.2
-        for <kvm@vger.kernel.org>; Tue, 27 Jul 2021 14:08:41 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:to:cc:references:from:subject:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=TUpUKaHU71NYL6/47as07mmBCcnbbXJebfKydCKE4tk=;
-        b=JjAIrDx3q4LrZZ+KNpGXJ9KSz0qjTGTmffRiUDVDn1VMQTuo41gTnQqUZuf3IW9qMc
-         Ude6U0V7V8gJxzGWFJNonl5ZZ2J1n8M0NRoQIgtPKOexCiUq/YfvXLrQYjblhss3vy3u
-         3/Ugew1OPBEBSp0wPCjndR7ruiW53CjtUz/yzfpUaPdOE16K8hNZFShNgsMwnEzZM/ro
-         KWE/I7H90KxR4vAinZrKlQQOmkqzYvLCwVRzhQ/ta4+m/K5/QJQmTcX1O5rvJNW6TnQO
-         8vpLovSNTIpeaMELQAj1pUU9FneJaqJdL5W4cZmTT46hAimIPL93aoccCL326PDIk6IM
-         P68A==
-X-Gm-Message-State: AOAM533YY5Rt0EHgVJyAMLKDAp7Iz9CXzCvv9EGkiZEACNbu3xlDgrxa
-        KynDQoP0vGDAR+gPNmwlhhGcsp+UVBhtM5ZeT8ji3zZhqcv7i/SxHHt4+VujcIPPxqCG7Eo1avs
-        xfoPQkkSGwkLX
-X-Received: by 2002:a50:fd17:: with SMTP id i23mr30313190eds.270.1627420120369;
-        Tue, 27 Jul 2021 14:08:40 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxk1VtOYP3rrDEaPWF4C6xsoU2R3/eMAg1NRsJWDrGHre7V3ZZhApRMbe+bviVTVGcOJBusTg==
-X-Received: by 2002:a50:fd17:: with SMTP id i23mr30313172eds.270.1627420120204;
-        Tue, 27 Jul 2021 14:08:40 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e? ([2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e])
-        by smtp.gmail.com with ESMTPSA id u5sm1701982edv.64.2021.07.27.14.08.39
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 27 Jul 2021 14:08:39 -0700 (PDT)
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        stable@vger.kernel.org, Stas Sergeev <stsp2@yandex.ru>
-References: <20210727170620.1643969-1-pbonzini@redhat.com>
- <YQBzgtBXZ4SIz9jF@google.com>
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=epqNANSa//JBOqbfDJlxqgrU5mQ/ZOYCzCBkRvtlhEQ=;
+        b=fIFANsUTEron8+Eu12pb+XtY1X1cQRtVXZxvnoxhhuTsHERCtEOHtPYnMlr2Rw5Wtzy25h
+        AnkA+hZxPGTkVlHmQ0noppsiiYAp3Rc5Nzgs0rBB8Ye7RLalK9pt9hSE8ouppCHkl1bgbN
+        rvjLu4AFmywN79j/J62ssK5Vdn7uE8w=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-468-IR3A2OY7PgWndQt2uHqkyQ-1; Tue, 27 Jul 2021 17:09:18 -0400
+X-MC-Unique: IR3A2OY7PgWndQt2uHqkyQ-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9D52C8010F4;
+        Tue, 27 Jul 2021 21:09:17 +0000 (UTC)
+Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 27AE460C9F;
+        Tue, 27 Jul 2021 21:09:17 +0000 (UTC)
 From:   Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH v2] KVM: x86: accept userspace interrupt only if no event
- is injected
-Message-ID: <9ae42cf8-e3e5-b8aa-ba86-d680feb09830@redhat.com>
-Date:   Tue, 27 Jul 2021 23:08:38 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.11.0
+To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Cc:     seanjc@google.com, stable@vger.kernel.org,
+        Stas Sergeev <stsp2@yandex.ru>
+Subject: [PATCH v3] KVM: x86: accept userspace interrupt only if no event is injected
+Date:   Tue, 27 Jul 2021 17:09:16 -0400
+Message-Id: <20210727210916.1652841-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <YQBzgtBXZ4SIz9jF@google.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
 Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 27/07/21 22:58, Sean Christopherson wrote:
->> ---
->>   arch/x86/kvm/x86.c | 12 +++++++++++-
->>   1 file changed, 11 insertions(+), 1 deletion(-)
->>
->> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
->> index 4116567f3d44..5e921f1e00db 100644
->> --- a/arch/x86/kvm/x86.c
->> +++ b/arch/x86/kvm/x86.c
->> @@ -4358,8 +4358,18 @@ static int kvm_cpu_accept_dm_intr(struct kvm_vcpu *vcpu)
->>   
->>   static int kvm_vcpu_ready_for_interrupt_injection(struct kvm_vcpu *vcpu)
->>   {
->> +	/*
->> +	 * Do not cause an interrupt window exit if an exception
->> +	 * is pending or an event needs reinjection; userspace
->> +	 * might want to inject the interrupt manually using KVM_SET_REGS
->> +	 * or KVM_SET_SREGS.  For that to work, we must be at an
->> +	 * instruction boundary and with no events half-injected.
->> +	 */
->>   	return kvm_arch_interrupt_allowed(vcpu) &&
->> -		kvm_cpu_accept_dm_intr(vcpu);
->> +		kvm_cpu_accept_dm_intr(vcpu) &&
-> 
-> Opportunistically align this indentation?
+Once an exception has been injected, any side effects related to
+the exception (such as setting CR2 or DR6) have been taked place.
+Therefore, once KVM sets the VM-entry interruption information
+field or the AMD EVENTINJ field, the next VM-entry must deliver that
+exception.
 
-Yep, good idea.
+Pending interrupts are processed after injected exceptions, so
+in theory it would not be a problem to use KVM_INTERRUPT when
+an injected exception is present.  However, DOSEMU is using
+run->ready_for_interrupt_injection to detect interrupt windows
+and then using KVM_SET_SREGS/KVM_SET_REGS to inject the
+interrupt manually.  For this to work, the interrupt window
+must be delayed after the completion of the previous event
+injection.
 
->> +	        !kvm_event_needs_reinjection(vcpu)
-> 
-> Missing &&, apparently the mysterious cherry-pick didn't go so well :-)
+Cc: stable@vger.kernel.org
+Reported-by: Stas Sergeev <stsp2@yandex.ru>
+Tested-by: Stas Sergeev <stsp2@yandex.ru>
+Fixes: 71cc849b7093 ("KVM: x86: Fix split-irqchip vs interrupt injection window request")
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ arch/x86/kvm/x86.c | 13 +++++++++++--
+ 1 file changed, 11 insertions(+), 2 deletions(-)
 
-Well, yeah.  The only way I can excuse myself, is by not being the kind 
-of person that yells for such stupid things...
-
-Paolo
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 4116567f3d44..e5d5c5ed7dd4 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -4358,8 +4358,17 @@ static int kvm_cpu_accept_dm_intr(struct kvm_vcpu *vcpu)
+ 
+ static int kvm_vcpu_ready_for_interrupt_injection(struct kvm_vcpu *vcpu)
+ {
+-	return kvm_arch_interrupt_allowed(vcpu) &&
+-		kvm_cpu_accept_dm_intr(vcpu);
++	/*
++	 * Do not cause an interrupt window exit if an exception
++	 * is pending or an event needs reinjection; userspace
++	 * might want to inject the interrupt manually using KVM_SET_REGS
++	 * or KVM_SET_SREGS.  For that to work, we must be at an
++	 * instruction boundary and with no events half-injected.
++	 */
++	return (kvm_arch_interrupt_allowed(vcpu) &&
++		kvm_cpu_accept_dm_intr(vcpu) &&
++		!kvm_event_needs_reinjection(vcpu) &&
++		!vcpu->arch.exception.pending);
+ }
+ 
+ static int kvm_vcpu_ioctl_interrupt(struct kvm_vcpu *vcpu,
+-- 
+2.27.0
 
