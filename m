@@ -2,91 +2,102 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 405453D8E89
-	for <lists+kvm@lfdr.de>; Wed, 28 Jul 2021 15:08:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C37DC3D8E97
+	for <lists+kvm@lfdr.de>; Wed, 28 Jul 2021 15:08:52 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236292AbhG1NIT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 28 Jul 2021 09:08:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48194 "EHLO
+        id S236391AbhG1NIt (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 28 Jul 2021 09:08:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48234 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236273AbhG1NIR (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 28 Jul 2021 09:08:17 -0400
-Received: from mail-pl1-x633.google.com (mail-pl1-x633.google.com [IPv6:2607:f8b0:4864:20::633])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EAA77C0613C1
-        for <kvm@vger.kernel.org>; Wed, 28 Jul 2021 06:08:15 -0700 (PDT)
-Received: by mail-pl1-x633.google.com with SMTP id t21so2559485plr.13
-        for <kvm@vger.kernel.org>; Wed, 28 Jul 2021 06:08:15 -0700 (PDT)
+        with ESMTP id S236371AbhG1NIZ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 28 Jul 2021 09:08:25 -0400
+Received: from mail-pj1-x102f.google.com (mail-pj1-x102f.google.com [IPv6:2607:f8b0:4864:20::102f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9462EC061764
+        for <kvm@vger.kernel.org>; Wed, 28 Jul 2021 06:08:23 -0700 (PDT)
+Received: by mail-pj1-x102f.google.com with SMTP id u9-20020a17090a1f09b029017554809f35so9862978pja.5
+        for <kvm@vger.kernel.org>; Wed, 28 Jul 2021 06:08:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=bytedance-com.20150623.gappssmtp.com; s=20150623;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=jVck83D0NoOaryAJNBW2Tr6sIFbNz9st83cB9qkZAmE=;
-        b=jpxCyVBc75tNPG7TUIVt1G6Yp0dNuCyuSP5giSiEpra3EqyGuLn1ms6d/NkpiFoDeM
-         NbCZnk8yUDYpmOuhbzqYgKQwRVWu2846TAyFMqJ0Oms8o80Qg/Afaa34D7q2G5Y0F5bu
-         R8JRL/dOjeaz24gxA5bxeKec6rAQymi0unqtl4ykNwOh1yd4ClJLLWRP4ArWTXoPYXRL
-         yVJ4WjpVmQrP8dQMyloMqUBfTNgN2Ggn0PcvM5oeUBRaYGFnuUVGJEBvZ1b9iXpGdsVi
-         mX3yhNi6P697qVtjIf3TEt0D2lJYhKhd61aFNPBIjFtBpfwhXul5WqPCe0APK+i0C5rw
-         eeiA==
+        h=from:to:cc:subject:date:message-id:in-reply-to:references
+         :mime-version:content-transfer-encoding;
+        bh=XX70o1X1Cgw4fNpu8tzLJbjLTB/dJBQIRbJuCgl7gAQ=;
+        b=qjJyVPD23XAfvIMFBK0k3lyIPRo9qGbjwyUTtkfxUEQQduxjqJNo1w3+PU5CfpsMmn
+         waiUcOznQY7k7MkpnHIzRDkQ8WCOyVySkwmoWt3E2YVUmR1Oc+Ia/TuihSWljmPrwNkP
+         YLdTeervyYOsboUmbGXkh8awIeQJeR4eKFDHzB/ItLEkL2FLeYEG7vG8zrffMZr4qoIR
+         38tzc3iwVD5lsmYgMSVpahKHc7Tdd4oJR+tuXwa/GODFxCy7bg3slQdCio5v5xl239k5
+         AZau68DzYxvhjXBVylam9VNmDAHsmH4DJ+vERsePgfh044NfG8Z+BJZrha2i12Sx6pCA
+         Abzg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=jVck83D0NoOaryAJNBW2Tr6sIFbNz9st83cB9qkZAmE=;
-        b=iyg1qjEdEfAUgSuxYQddm7NjSFWa6RY/kySUwGmIck2bhlVzDnAhwPCW/1tNQ3HyVB
-         u1dbcNa6kB2Fs8D9iuaVeHWdIq6QeNT6w4p/KhOSFnhoJY7eDBhH9RxkxCv+otBiyY73
-         2XT/Arz36xN/P73dupijxlpcAQyquNU72YdqIfANgUyoPsotHrFh30wCHkQkoqSN3dci
-         MSex7/KMHbjh/esBUyxqjcmILaQ5gAvdjY2vkTwKYbPlNVlrw0G5js75RTZKydFiNmyM
-         NM+BBvTanRY5uGYS7zY5VA+hFPNFUh24YBk42XaloG77WZ6T0oYtB4P7YPBSnAGbjj/d
-         363A==
-X-Gm-Message-State: AOAM533kRkeGRn3An4jr4mWh8QVbm4xoeH0ayqtTi43PdicQathGS+rI
-        lWm7ya9kBFrsFFgfhpFfCVzg
-X-Google-Smtp-Source: ABdhPJwj2LI9vbGMfkXYwFFfuFlaPN1nro+LXWdF//Skckn1NaJpVjkWhyNMGYrEPaeIXqt6PENYPA==
-X-Received: by 2002:a17:902:d645:b029:12c:2759:ce2b with SMTP id y5-20020a170902d645b029012c2759ce2bmr12464164plh.58.1627477695330;
-        Wed, 28 Jul 2021 06:08:15 -0700 (PDT)
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=XX70o1X1Cgw4fNpu8tzLJbjLTB/dJBQIRbJuCgl7gAQ=;
+        b=DZRhv0m6EGcqBTDXfsb/4TYCqv/pENklz9z2C++nJgrN/uGpHiMqwlhlmhokH+oMOT
+         /Z4bBMD2qkBMU3DHd2XyDiQOqq9uCvh7Z3t9Eq9c8X30+D6F0NodpcqueaeTqtSDc3hr
+         CWuveWdgGFB754GKNpj68PGRLS0NydLX0AMjdlP5sg0RN7t+f/w1KK7hzoVpMaM1+9QP
+         +9iiJuN0MUkQp4KoIcqL0UaXhchTq6jNsqYSZyLVDQWrm4OE7aDs4hFmLLRtKFHHGUnh
+         lrRuTUNCSVsTdmfwwEU57uOuivcU77/3hnKwboxK2juUUKDiVNfMJU2102jySQgEp68t
+         3CEQ==
+X-Gm-Message-State: AOAM532PNL8bEdDVH9eD4ZRt6/13ZcPOyi1r+eR4QxaQOinowz2V36+g
+        PBySTlc8fmbBv2qVBFTqAN2r
+X-Google-Smtp-Source: ABdhPJz3HJJEY5ok/VLZC6bllUI2mC3K2btVzbWJ0mXyY5ky7iNv19XOgPjBOh4gziWaD4gfyYcEVw==
+X-Received: by 2002:a17:902:db0f:b029:12b:880b:ef38 with SMTP id m15-20020a170902db0fb029012b880bef38mr22513206plx.5.1627477703192;
+        Wed, 28 Jul 2021 06:08:23 -0700 (PDT)
 Received: from localhost ([139.177.225.253])
-        by smtp.gmail.com with ESMTPSA id m6sm8534165pgs.75.2021.07.28.06.08.13
+        by smtp.gmail.com with ESMTPSA id j128sm7789048pfd.38.2021.07.28.06.08.22
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 28 Jul 2021 06:08:14 -0700 (PDT)
+        Wed, 28 Jul 2021 06:08:22 -0700 (PDT)
 From:   Xie Yongji <xieyongji@bytedance.com>
 To:     mst@redhat.com, jasowang@redhat.com, dan.carpenter@oracle.com
 Cc:     virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
         linux-kernel@vger.kernel.org
-Subject: [PATCH v2 1/2] vhost-vdpa: Fix integer overflow in vhost_vdpa_process_iotlb_update()
-Date:   Wed, 28 Jul 2021 21:07:55 +0800
-Message-Id: <20210728130756.97-1-xieyongji@bytedance.com>
+Subject: [PATCH v2 2/2] vhost: Fix the calculation in vhost_overflow()
+Date:   Wed, 28 Jul 2021 21:07:56 +0800
+Message-Id: <20210728130756.97-2-xieyongji@bytedance.com>
 X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20210728130756.97-1-xieyongji@bytedance.com>
+References: <20210728130756.97-1-xieyongji@bytedance.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The "msg->iova + msg->size" addition can have an integer overflow
-if the iotlb message is from a malicious user space application.
-So let's fix it.
+This fixes the incorrect calculation for integer overflow
+when the last address of iova range is 0xffffffff.
 
-Fixes: 1b48dc03e575 ("vhost: vdpa: report iova range")
-Reported-by: Dan Carpenter <dan.carpenter@oracle.com>
+Fixes: ec33d031a14b ("vhost: detect 32 bit integer wrap around“)
+Reported-by: Jason Wang <jasowang@redhat.com>
 Signed-off-by: Xie Yongji <xieyongji@bytedance.com>
 Acked-by: Jason Wang <jasowang@redhat.com>
 ---
- drivers/vhost/vdpa.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ drivers/vhost/vhost.c | 10 ++++++++--
+ 1 file changed, 8 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/vhost/vdpa.c b/drivers/vhost/vdpa.c
-index 210ab35a7ebf..9479f7f79217 100644
---- a/drivers/vhost/vdpa.c
-+++ b/drivers/vhost/vdpa.c
-@@ -614,7 +614,8 @@ static int vhost_vdpa_process_iotlb_update(struct vhost_vdpa *v,
- 	long pinned;
- 	int ret = 0;
+diff --git a/drivers/vhost/vhost.c b/drivers/vhost/vhost.c
+index b9e853e6094d..59edb5a1ffe2 100644
+--- a/drivers/vhost/vhost.c
++++ b/drivers/vhost/vhost.c
+@@ -735,10 +735,16 @@ static bool log_access_ok(void __user *log_base, u64 addr, unsigned long sz)
+ 			 (sz + VHOST_PAGE_SIZE * 8 - 1) / VHOST_PAGE_SIZE / 8);
+ }
  
--	if (msg->iova < v->range.first ||
-+	if (msg->iova < v->range.first || !msg->size ||
-+	    msg->iova > U64_MAX - msg->size + 1 ||
- 	    msg->iova + msg->size - 1 > v->range.last)
- 		return -EINVAL;
++/* Make sure 64 bit math will not overflow. */
+ static bool vhost_overflow(u64 uaddr, u64 size)
+ {
+-	/* Make sure 64 bit math will not overflow. */
+-	return uaddr > ULONG_MAX || size > ULONG_MAX || uaddr > ULONG_MAX - size;
++	if (uaddr > ULONG_MAX || size > ULONG_MAX)
++		return true;
++
++	if (!size)
++		return false;
++
++	return uaddr > ULONG_MAX - size + 1;
+ }
  
+ /* Caller should have vq mutex and device mutex. */
 -- 
 2.11.0
 
