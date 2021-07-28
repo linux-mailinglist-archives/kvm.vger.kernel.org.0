@@ -2,73 +2,132 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4F3903D8EF0
-	for <lists+kvm@lfdr.de>; Wed, 28 Jul 2021 15:24:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D74133D8EF9
+	for <lists+kvm@lfdr.de>; Wed, 28 Jul 2021 15:25:12 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236279AbhG1NYR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 28 Jul 2021 09:24:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51930 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233315AbhG1NYR (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 28 Jul 2021 09:24:17 -0400
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A77F2C061757;
-        Wed, 28 Jul 2021 06:24:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=wyV5oHahoyFyDlkMKSruinnsahdkugSgLawjHfbEEjQ=; b=CxvZX41K0o1QkS+QNIrwd0eOBe
-        mqQ6PrksWIat6lXJKZPun+q1pAOQx0xLcn0dXI0f5/QwQmDJVibY4qE3c7TAdHgsIiPO3KhQic7GW
-        1eyfOJ6+e5m0vdD3PZ+UIsWjdf71Rv+qjxbud/TVWu09HUCIEgoxhatZ/TSoyrl9g8w0xVsK0qnJb
-        Ssgb2vj86C8FXbvbGsNNF9o/MH3FUfh7M9nUfPwhEPmwHvq/+B3ENaQ00GINALSLZBrB8jUNO3eAN
-        ZD343FSM3tMyDXd6949QP8wSOuEJ0mt327HB6lpEtnWhWjFhF6Z9hGOLbHanuC9ie9QiNGCSpAJVM
-        Xwq8/NVQ==;
-Received: from hch by casper.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1m8jWV-00G5AN-CH; Wed, 28 Jul 2021 13:23:16 +0000
-Date:   Wed, 28 Jul 2021 14:22:59 +0100
-From:   Christoph Hellwig <hch@infradead.org>
-To:     Tom Lendacky <thomas.lendacky@amd.com>
-Cc:     linux-kernel@vger.kernel.org, x86@kernel.org,
-        linuxppc-dev@lists.ozlabs.org, linux-s390@vger.kernel.org,
-        iommu@lists.linux-foundation.org, kvm@vger.kernel.org,
-        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
-        linux-graphics-maintainer@vmware.com,
-        amd-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
-        kexec@lists.infradead.org, linux-fsdevel@vger.kernel.org,
-        Andi Kleen <ak@linux.intel.com>,
-        Tianyu Lan <Tianyu.Lan@microsoft.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Andy Lutomirski <luto@kernel.org>,
-        Brijesh Singh <brijesh.singh@amd.com>,
-        Thomas Gleixner <tglx@linutronix.de>
-Subject: Re: [PATCH 02/11] x86/sev: Add an x86 version of prot_guest_has()
-Message-ID: <YQFaM7nOhD2d6SUQ@infradead.org>
-References: <cover.1627424773.git.thomas.lendacky@amd.com>
- <b3e929a77303dd47fd2adc2a1011009d3bfcee20.1627424774.git.thomas.lendacky@amd.com>
+        id S235324AbhG1NZN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 28 Jul 2021 09:25:13 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:28026 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S235346AbhG1NZL (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 28 Jul 2021 09:25:11 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1627478709;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=T2QVUgSAbCZQgRX2hiiGLyxOUXhXDucaWcjRj1g48i8=;
+        b=MMlQdrenJW2K3ym/on0GQxuXeeo631opvreukGQY9TjO6dDOPdwqC/O4ZS1lmvhoUbmwtM
+        fONqqT+d2N9zkMXMAWIgcoVFb+Aj2iZAqmp0TeP4t5JxBYjJosH41J0X4xtj+NUcT7oEp3
+        igtDxrxZVT7iwmrXMlhh2+cNJwrMwdA=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-585-H1VN7M9lO9SDzunYGqJPaw-1; Wed, 28 Jul 2021 09:25:06 -0400
+X-MC-Unique: H1VN7M9lO9SDzunYGqJPaw-1
+Received: by mail-wm1-f70.google.com with SMTP id o26-20020a05600c511ab0290252d0248251so949892wms.1
+        for <kvm@vger.kernel.org>; Wed, 28 Jul 2021 06:25:06 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=T2QVUgSAbCZQgRX2hiiGLyxOUXhXDucaWcjRj1g48i8=;
+        b=ssr7Qa1pTBPT5uoV13EPHkESywW198HeIDaZoCoGBfbkSTLvTH72C2EYyaOG0Hucmn
+         lNN9XXuGAAoddpTCxJfrVJJ1azfkU21tatyKmjQGmnJkFWNfAKtUG9t1DLsK1BXObuc6
+         8E9oiqej0WsmnT6SZJlpIxYVkf+Qk9tMJudtrRSHpZ77vBySGSyvYECgLERVzCL+jfL5
+         lT+g0Xv0y2tH9ehufI833z8RT7nj938EBs0BXFP6vfqgKr9gh1oIi2syBciTRfEfyRnp
+         t5OSBZAkW13i5CM+6vLfy4OYQ4wqyReDlinjV+9OD45dMJdGAHsVcYHliSIXRU1GV24U
+         bc2Q==
+X-Gm-Message-State: AOAM530OyVv9ofuTIL5zYWierD6/3QdfJxTVw6BynwRRsfnS6NkyzShJ
+        k5sxvj+7eGMdlYV9FhMK7eF9RFYo7586xQOorq7HEIozH3OPI55tE87ys2RfOXobecKeosJa4iU
+        Q0p8fhUSEGTs2
+X-Received: by 2002:a7b:ce10:: with SMTP id m16mr9081773wmc.75.1627478705178;
+        Wed, 28 Jul 2021 06:25:05 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzrkK+x/0SUpP1RX01qa1UdRsqt6PGPUfl+Mv0QvXAc2I4j6RaXUCVx8xwN//SplTE8fpSQCA==
+X-Received: by 2002:a7b:ce10:: with SMTP id m16mr9081752wmc.75.1627478704954;
+        Wed, 28 Jul 2021 06:25:04 -0700 (PDT)
+Received: from [192.168.1.36] (122.red-83-42-66.dynamicip.rima-tde.net. [83.42.66.122])
+        by smtp.gmail.com with ESMTPSA id q5sm6848793wrx.33.2021.07.28.06.25.03
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 28 Jul 2021 06:25:04 -0700 (PDT)
+Subject: Re: [PATCH-for-6.2 v12] qapi: introduce 'query-x86-cpuid' QMP
+ command.
+To:     Valeriy Vdovin <valeriy.vdovin@virtuozzo.com>,
+        qemu-devel@nongnu.org
+Cc:     Eduardo Habkost <ehabkost@redhat.com>,
+        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+        Eric Blake <eblake@redhat.com>,
+        Markus Armbruster <armbru@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Marcelo Tosatti <mtosatti@redhat.com>,
+        Richard Henderson <richard.henderson@linaro.org>,
+        Thomas Huth <thuth@redhat.com>,
+        Laurent Vivier <lvivier@redhat.com>, kvm@vger.kernel.org,
+        Denis Lunev <den@openvz.org>,
+        Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+References: <20210728125402.2496-1-valeriy.vdovin@virtuozzo.com>
+From:   =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <718458b1-cae1-02d2-c605-e9a31d971af1@redhat.com>
+Date:   Wed, 28 Jul 2021 15:25:03 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.11.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <b3e929a77303dd47fd2adc2a1011009d3bfcee20.1627424774.git.thomas.lendacky@amd.com>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
+In-Reply-To: <20210728125402.2496-1-valeriy.vdovin@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jul 27, 2021 at 05:26:05PM -0500, Tom Lendacky via iommu wrote:
-> Introduce an x86 version of the prot_guest_has() function. This will be
-> used in the more generic x86 code to replace vendor specific calls like
-> sev_active(), etc.
+On 7/28/21 2:54 PM, Valeriy Vdovin wrote:
+> Introducing new QMP command 'query-x86-cpuid'. This command can be used to
+> get virtualized cpu model info generated by QEMU during VM initialization in
+> the form of cpuid representation.
 > 
-> While the name suggests this is intended mainly for guests, it will
-> also be used for host memory encryption checks in place of sme_active().
+> Diving into more details about virtual CPU generation: QEMU first parses '-cpu'
+> command line option. From there it takes the name of the model as the basis for
+> feature set of the new virtual CPU. After that it uses trailing '-cpu' options,
+> that state if additional cpu features should be present on the virtual CPU or
+> excluded from it (tokens '+'/'-' or '=on'/'=off').
+> After that QEMU checks if the host's cpu can actually support the derived
+> feature set and applies host limitations to it.
+> After this initialization procedure, virtual CPU has it's model and
+> vendor names, and a working feature set and is ready for identification
+> instructions such as CPUID.
 > 
-> The amd_prot_guest_has() function does not use EXPORT_SYMBOL_GPL for the
-> same reasons previously stated when changing sme_active(), sev_active and
+> To learn exactly how virtual CPU is presented to the guest machine via CPUID
+> instruction, new QMP command can be used. By calling 'query-x86-cpuid'
+> command, one can get a full listing of all CPUID leaves with subleaves which are
+> supported by the initialized virtual CPU.
+> 
+> Other than debug, the command is useful in cases when we would like to
+> utilize QEMU's virtual CPU initialization routines and put the retrieved
+> values into kernel CPUID overriding mechanics for more precise control
+> over how various processes perceive its underlying hardware with
+> container processes as a good example.
+> 
+> The command is specific to x86. It is currenly only implemented for KVM acceleator.
+> 
+> Output format:
+> The output is a plain list of leaf/subleaf argument combinations, that
+> return 4 words in registers EAX, EBX, ECX, EDX.
+> 
+...
 
-None of that applies here as none of the callers get pulled into
-random macros.  The only case of that is sme_me_mask through
-sme_mask, but that's not something this series replaces as far as I can
-tell.
+> +##
+> +# @query-x86-cpuid:
+> +#
+> +# Returns raw data from the emulated CPUID table for the first VCPU.
+> +# The emulated CPUID table defines the response to the CPUID
+> +# instruction when executed by the guest operating system.
+> +#
+> +# Returns: a list of CpuidEntry
+> +#
+> +# Since: 6.1
+> +##
+
+Unfortunately too late for 6.1, so you'll have to update that to
+"6.2" (also in @CpuidEntry).
+
