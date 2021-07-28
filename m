@@ -2,148 +2,122 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 16BAF3D98ED
-	for <lists+kvm@lfdr.de>; Thu, 29 Jul 2021 00:32:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7491D3D9949
+	for <lists+kvm@lfdr.de>; Thu, 29 Jul 2021 01:11:19 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232282AbhG1WcA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 28 Jul 2021 18:32:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37024 "EHLO
+        id S232533AbhG1XLT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 28 Jul 2021 19:11:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45922 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231989AbhG1WcA (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 28 Jul 2021 18:32:00 -0400
-Received: from mail-pj1-x102f.google.com (mail-pj1-x102f.google.com [IPv6:2607:f8b0:4864:20::102f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D667AC0613D5
-        for <kvm@vger.kernel.org>; Wed, 28 Jul 2021 15:31:56 -0700 (PDT)
-Received: by mail-pj1-x102f.google.com with SMTP id o44-20020a17090a0a2fb0290176ca3e5a2fso6296720pjo.1
-        for <kvm@vger.kernel.org>; Wed, 28 Jul 2021 15:31:56 -0700 (PDT)
+        with ESMTP id S232392AbhG1XLS (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 28 Jul 2021 19:11:18 -0400
+Received: from mail-pj1-x102e.google.com (mail-pj1-x102e.google.com [IPv6:2607:f8b0:4864:20::102e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0E64DC061765
+        for <kvm@vger.kernel.org>; Wed, 28 Jul 2021 16:11:14 -0700 (PDT)
+Received: by mail-pj1-x102e.google.com with SMTP id a4-20020a17090aa504b0290176a0d2b67aso12607626pjq.2
+        for <kvm@vger.kernel.org>; Wed, 28 Jul 2021 16:11:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=4EOLGfIgju2Hvli/6D/hx+/lwjRcH7NCagC19mzzbto=;
-        b=Gb2lWfRRrZOCipzLboTCyd8ip2X5sq8STvhzVnNOKAdq7jJ6uEfSFYPOZ72YDwVjrL
-         MihCSGQvz9HHyLoJ+CWwfGQbVD3snRPPtI66AJGAylng4Mm8Ety+Kct7YXrDpLD0lU3x
-         smoI8LLyZQj4usYW6mQZK55CZUbz4ovZZfFul7UKu8eBWvat00CdoAOA0sqknqJ+vsZ4
-         mMId10tDUIfnpHVMG14BYAzC0XLD8xBYruSEWDIiMf2lje4qm/9MDsaw0ZeHunX1Rid/
-         Me/2A0gc5AaJ2kDXW3qTyTnbfYH322ZeFX15Pxu02PZFj4CUSqZ9OVqIiJ+RW/WIfrtp
-         OpnA==
+        bh=wjVZYNNKvkz+dEqnRUcvgnvoiUT+17D6nY+LOvQaqFM=;
+        b=LyMc9TiBuRMdPTTAqLyUditTfLnTTRPuRFiSp1/g8qRVaSD911B/hJ1JigdxNGzzZf
+         ZHDMhL9XPwZG0HIqkWCW3SRP6cYblxII2QqbZ8fV6TaLmbFo8yqjFMTib+i6WYFJT4sa
+         IS+58xCLXSpKvXmnCksM0Ei9UmmjMgvt+D6PsoZKlOXTW1JNEoz2ICejKZ4GhKjStROc
+         SVpNxF9wX1owUlE9qVtbjcXiGgU6XC57ml5EvUyT+9nNzkUIO+tvjupt7nbZBOwxAHDX
+         Lk5rYLBoFYdJENOhInfMC+gB4BDDNYozGaNPHUto8QY+oIZsV9E4sLKSqGMHV/oM9B3T
+         Y2Sg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=4EOLGfIgju2Hvli/6D/hx+/lwjRcH7NCagC19mzzbto=;
-        b=jFx9/gQzmZCfGraL+jINv4qrnxhQdKWVA+D7QvcgRdbOVDCtNs6rsN3JM6APs8gc6L
-         DaDsiwX61N2igVPX2VyPFszCS242pYOwvA+OWhRU7P6I1E0m7VP4UY2Fvjz04ot9dTpU
-         3TvpyPECdVDEGq96e/W6oLCGg/VZp1ptt8doMnvhrX4ZpsovoGa6X+elxe7FyLTIiWoN
-         nuK8igRX84ii9UjuNf/+OugXod8mQ98zR97ANQfvgPqvWaFaZ5Bo/XeiB+zAgbYsJXXH
-         xFqoBoQ4Qk10uJt/AX0cF9bG4ogmkKBSjVQzH2YSF8R0dEZbOD+SJvkwmM8pr21ijLgu
-         oS/Q==
-X-Gm-Message-State: AOAM532HzARMmQL8jc9beuwje875H0+7qzPy1EPO/Wx/Kv6ZBr5C6Im+
-        aZChrJm859NDbIOTNXJSFWdx5A==
-X-Google-Smtp-Source: ABdhPJyST6XeGLZhicf1sD0ee9ilIj+7CH1GqxSzZY42vuYPnjF9ZCYbt4p1c061Ll+/9L5OqLkUUQ==
-X-Received: by 2002:aa7:938c:0:b029:32a:1725:a3d7 with SMTP id t12-20020aa7938c0000b029032a1725a3d7mr1900553pfe.64.1627511516184;
-        Wed, 28 Jul 2021 15:31:56 -0700 (PDT)
+        bh=wjVZYNNKvkz+dEqnRUcvgnvoiUT+17D6nY+LOvQaqFM=;
+        b=rmA3pgXfL47fGwPobEnKoSIiz0FpB15qCkSZSJ4sYb09WDVOgE0bzEk0NzbpVI4rld
+         Sczs5KrSH+529NyBi/nk8mOqwQX3USWYRnXX6T5lQxAaKhJz0syfKsc2USZ+ZDDUyM28
+         tXXT1JwbqGTPU14hMqHvGpcvKBir5XWcUAgwekVgxbnwDa5z8CMLJ4uSs5Q0ORszRBDe
+         0xB0TPD6mk4IR94FalDApQUd2ux3Sf1HRR5Vr3Th1BBk71HkIMRCZIUt6OcU/GhpLuog
+         aPbzhd+iK3yySpnrOkUUmNBhvB7mSkC/QE+P77v7tybevFVqskyb0rPJEGHFP9P6YlWU
+         iwCQ==
+X-Gm-Message-State: AOAM531tKViDPKaFDucmTnUYQLeCr00sKymtvPUS2fdbm4c7J2gvtohX
+        95EcjxmdOQNLMifR0Zu5G1c0mg==
+X-Google-Smtp-Source: ABdhPJwa932+QRBDfM/6XzzlKH/E0wkeUZlFkYSZiAe7DrHhqPtKcatkq6xNejJSqEGJGcEs0DXqLA==
+X-Received: by 2002:a17:90a:bd06:: with SMTP id y6mr2147490pjr.6.1627513873271;
+        Wed, 28 Jul 2021 16:11:13 -0700 (PDT)
 Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id s36sm984091pgk.64.2021.07.28.15.31.55
+        by smtp.gmail.com with ESMTPSA id p17sm1058543pfh.33.2021.07.28.16.11.12
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 28 Jul 2021 15:31:55 -0700 (PDT)
-Date:   Wed, 28 Jul 2021 22:31:51 +0000
+        Wed, 28 Jul 2021 16:11:12 -0700 (PDT)
+Date:   Wed, 28 Jul 2021 23:11:08 +0000
 From:   Sean Christopherson <seanjc@google.com>
-To:     Peter Xu <peterx@redhat.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        Maxim Levitsky <mlevitsk@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH v2 9/9] KVM: X86: Optimize zapping rmap
-Message-ID: <YQHa1xuNKhqRr4Fq@google.com>
-References: <20210625153214.43106-1-peterx@redhat.com>
- <20210625153419.43671-1-peterx@redhat.com>
- <YQHOdhMoFW821HAu@google.com>
- <YQHTocEdMzsJQuzL@t490s>
+        stable@vger.kernel.org, Stas Sergeev <stsp2@yandex.ru>
+Subject: Re: [PATCH v3] KVM: x86: accept userspace interrupt only if no event
+ is injected
+Message-ID: <YQHkDDN+T3mFTcP+@google.com>
+References: <20210727210916.1652841-1-pbonzini@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <YQHTocEdMzsJQuzL@t490s>
+In-Reply-To: <20210727210916.1652841-1-pbonzini@redhat.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jul 28, 2021, Peter Xu wrote:
-> On Wed, Jul 28, 2021 at 09:39:02PM +0000, Sean Christopherson wrote:
-> > On Fri, Jun 25, 2021, Peter Xu wrote:
-> > Why implement this as a generic method with a callback?  gcc is suprisingly
-> > astute in optimizing callback(), but I don't see the point of adding a complex
-> > helper that has a single caller, and is extremely unlikely to gain new callers.
-> > Or is there another "zap everything" case I'm missing?
+On Tue, Jul 27, 2021, Paolo Bonzini wrote:
+> Once an exception has been injected, any side effects related to
+> the exception (such as setting CR2 or DR6) have been taked place.
+> Therefore, once KVM sets the VM-entry interruption information
+> field or the AMD EVENTINJ field, the next VM-entry must deliver that
+> exception.
 > 
-> No other case; it's just that pte_list_*() helpers will be more self-contained.
+> Pending interrupts are processed after injected exceptions, so
+> in theory it would not be a problem to use KVM_INTERRUPT when
+> an injected exception is present.  However, DOSEMU is using
+> run->ready_for_interrupt_injection to detect interrupt windows
+> and then using KVM_SET_SREGS/KVM_SET_REGS to inject the
+> interrupt manually.  For this to work, the interrupt window
+> must be delayed after the completion of the previous event
+> injection.
+> 
+> Cc: stable@vger.kernel.org
+> Reported-by: Stas Sergeev <stsp2@yandex.ru>
+> Tested-by: Stas Sergeev <stsp2@yandex.ru>
+> Fixes: 71cc849b7093 ("KVM: x86: Fix split-irqchip vs interrupt injection window request")
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> ---
+>  arch/x86/kvm/x86.c | 13 +++++++++++--
+>  1 file changed, 11 insertions(+), 2 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index 4116567f3d44..e5d5c5ed7dd4 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -4358,8 +4358,17 @@ static int kvm_cpu_accept_dm_intr(struct kvm_vcpu *vcpu)
+>  
+>  static int kvm_vcpu_ready_for_interrupt_injection(struct kvm_vcpu *vcpu)
+>  {
+> -	return kvm_arch_interrupt_allowed(vcpu) &&
+> -		kvm_cpu_accept_dm_intr(vcpu);
+> +	/*
+> +	 * Do not cause an interrupt window exit if an exception
+> +	 * is pending or an event needs reinjection; userspace
+> +	 * might want to inject the interrupt manually using KVM_SET_REGS
+> +	 * or KVM_SET_SREGS.  For that to work, we must be at an
+> +	 * instruction boundary and with no events half-injected.
+> +	 */
+> +	return (kvm_arch_interrupt_allowed(vcpu) &&
 
-Eh, but this flow is as much about rmaps as it is about pte_list.
+Ha, adding a '(' is one way to fix the indentation.
 
-> If that'll be a performance concern, no objection to hard code it.
+Reviewed-by: Sean Christopherson <seanjc@google.com> 
 
-It's more about unnecessary complexity than it is about performance, e.g. gcc-10
-generates identical code for both version (which did surprise the heck out of me).
-
-If we really want to isolate pte_list_destroy(), I would vote for something like
-this (squashed in).   pte_list_remove() already calls mmu_spte_clear_track_bits(),
-so that particular separation of concerns has already gone out the window.
-
- 
--/* Return true if rmap existed and callback called, false otherwise */
--static bool pte_list_destroy(struct kvm_rmap_head *rmap_head,
--                            void (*callback)(u64 *sptep))
-+static bool pte_list_destroy(struct kvm_rmap_head *rmap_head)
- {
-        struct pte_list_desc *desc, *next;
-        int i;
-@@ -1013,20 +1011,16 @@ static bool pte_list_destroy(struct kvm_rmap_head *rmap_head,
-                return false;
- 
-        if (!(rmap_head->val & 1)) {
--               if (callback)
--                       callback((u64 *)rmap_head->val);
-+               mmu_spte_clear_track_bits((u64 *)rmap_head->val);
-                goto out;
-        }
- 
-        desc = (struct pte_list_desc *)(rmap_head->val & ~1ul);
--
--       while (desc) {
--               if (callback)
--                       for (i = 0; i < desc->spte_count; i++)
--                               callback(desc->sptes[i]);
-+       for ( ; desc; desc = next) {
-+               for (i = 0; i < desc->spte_count; i++)
-+                       mmu_spte_clear_track_bits(desc->sptes[i]);
-                next = desc->more;
-                mmu_free_pte_list_desc(desc);
--               desc = next;
-        }
- out:
-        /* rmap_head is meaningless now, remember to reset it */
-@@ -1422,22 +1416,17 @@ static bool rmap_write_protect(struct kvm_vcpu *vcpu, u64 gfn)
-        return kvm_mmu_slot_gfn_write_protect(vcpu->kvm, slot, gfn, PG_LEVEL_4K);
- }
- 
--static void mmu_spte_clear_track_bits_cb(u64 *sptep)
--{
--       mmu_spte_clear_track_bits(sptep);
--}
--
- static bool kvm_zap_rmapp(struct kvm *kvm, struct kvm_rmap_head *rmap_head,
-                          const struct kvm_memory_slot *slot)
- {
--       return pte_list_destroy(rmap_head, mmu_spte_clear_track_bits_cb);
-+       return pte_list_destroy(rmap_head);
- }
- 
- static bool kvm_unmap_rmapp(struct kvm *kvm, struct kvm_rmap_head *rmap_head,
-                            struct kvm_memory_slot *slot, gfn_t gfn, int level,
-                            pte_t unused)
- {
--       return kvm_zap_rmapp(kvm, rmap_head, slot);
-+       return pte_list_destroy(rmap_head);
- }
- 
- static bool kvm_set_pte_rmapp(struct kvm *kvm, struct kvm_rmap_head *rmap_head,
+> +		kvm_cpu_accept_dm_intr(vcpu) &&
+> +		!kvm_event_needs_reinjection(vcpu) &&
+> +		!vcpu->arch.exception.pending);
+>  }
+>  
+>  static int kvm_vcpu_ioctl_interrupt(struct kvm_vcpu *vcpu,
+> -- 
+> 2.27.0
+> 
