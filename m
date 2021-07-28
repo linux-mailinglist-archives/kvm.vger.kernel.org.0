@@ -2,146 +2,125 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E21503D89A2
-	for <lists+kvm@lfdr.de>; Wed, 28 Jul 2021 10:18:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E210D3D8AF1
+	for <lists+kvm@lfdr.de>; Wed, 28 Jul 2021 11:41:05 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234974AbhG1ISo (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 28 Jul 2021 04:18:44 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:30877 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S234487AbhG1ISj (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 28 Jul 2021 04:18:39 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1627460318;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=crKmmuF3vSFeLNrZsABSm5kyODHNC6gu4soJ8ICOTvw=;
-        b=Y0qBJgnEXvh61l+Zk6jYrHPi9S+/aw3WwghmYkQGSTu86Fwt5HSx1oUgI3V85AE7A7GSmv
-        APAdERDhD5gLJliAdbFhIoz7G/pZgzNl7oV7iaL2iNI7GwUbysRGdR+ZtPhw0XsPMYmMN7
-        C4lmT2TI2oDkCbAU5kEUDUOldmxgGU4=
-Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
- [209.85.208.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-135-2wRsAZBoMY2jHt_ufrN2Vg-1; Wed, 28 Jul 2021 04:18:36 -0400
-X-MC-Unique: 2wRsAZBoMY2jHt_ufrN2Vg-1
-Received: by mail-ed1-f69.google.com with SMTP id c20-20020a0564021014b029039994f9cab9so851570edu.22
-        for <kvm@vger.kernel.org>; Wed, 28 Jul 2021 01:18:36 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
-         :message-id:mime-version;
-        bh=crKmmuF3vSFeLNrZsABSm5kyODHNC6gu4soJ8ICOTvw=;
-        b=hsZaM86zR43r0ceAy+ZV7APkcvV2ffvi51zu2aJ0SNGyghaqksY/oWEdag5qj+dy+H
-         3f8xiDG+1HbAeebm0tdP1FWbJvGGpn+Qj/4CH2wZ5n/z3Deg97cyPMDYfy+FOEOBu3n9
-         aV8UwwjZ6PW5oYa009ZqcKujhCnJaLH1lnteo8wZjxMUmkRlQxxJj/IqgAKAO80mEPLp
-         UXZ4Nb675rCv2A4gAkypCenTSBmSJV00KgGrn0nnNNg5C0ObUfGEr2TkmxpDL7bBGh7D
-         hEdjWkaW9aacDZ6QCEjWCvA9UMmvxkhB3vhlqEO5VR1EMu/sNtGXQIWFx4Alzp+Yfc0L
-         9lGQ==
-X-Gm-Message-State: AOAM530z2kQ0n5kwbF0qOcifxFy+r6R+50rMQl58BrcoIgx121iZnir7
-        VvzTvimvDfvpoxo0mbyyWgebGQM9GsMKZlwD3dZSDnC0kfiC6yHcZGV0IDEmAXHgmjyQ/UFxDmA
-        K1OWLSiS1LyHP
-X-Received: by 2002:a50:a456:: with SMTP id v22mr32224229edb.333.1627460315730;
-        Wed, 28 Jul 2021 01:18:35 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwRbmAu4lAhEfewYa9Hmlor8TFe5yKDcZw3jUIl3o2oxP/V0Eq5Q+BPPoJfCrH+1EnY8l1sBw==
-X-Received: by 2002:a50:a456:: with SMTP id v22mr32224202edb.333.1627460315603;
-        Wed, 28 Jul 2021 01:18:35 -0700 (PDT)
-Received: from vitty.brq.redhat.com (g-server-2.ign.cz. [91.219.240.2])
-        by smtp.gmail.com with ESMTPSA id h1sm1742941eji.46.2021.07.28.01.18.34
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 28 Jul 2021 01:18:35 -0700 (PDT)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     Suleiman Souhlal <suleiman@google.com>
-Cc:     ssouhlal@FreeBSD.org, joelaf@google.com, senozhatsky@chromium.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        Suleiman Souhlal <suleiman@google.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Juri Lelli <juri.lelli@redhat.com>,
-        Vincent Guittot <vincent.guittot@linaro.org>,
-        Dietmar Eggemann <dietmar.eggemann@arm.com>,
-        Steven Rostedt <rostedt@goodmis.org>,
-        Ben Segall <bsegall@google.com>, Mel Gorman <mgorman@suse.de>,
-        Daniel Bristot de Oliveira <bristot@redhat.com>
-Subject: Re: [RFC PATCH 2/2] kvm,x86: Report preempt_count to host.
-In-Reply-To: <20210728073700.120449-3-suleiman@google.com>
-References: <20210728073700.120449-1-suleiman@google.com>
- <20210728073700.120449-3-suleiman@google.com>
-Date:   Wed, 28 Jul 2021 10:18:33 +0200
-Message-ID: <87tuke6ecm.fsf@vitty.brq.redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain
+        id S235396AbhG1JlF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 28 Jul 2021 05:41:05 -0400
+Received: from mail.kernel.org ([198.145.29.99]:52636 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S231408AbhG1JlE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 28 Jul 2021 05:41:04 -0400
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 50B6260F9C;
+        Wed, 28 Jul 2021 09:41:03 +0000 (UTC)
+Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94.2)
+        (envelope-from <maz@kernel.org>)
+        id 1m8g3h-001Uxw-D0; Wed, 28 Jul 2021 10:41:01 +0100
+Date:   Wed, 28 Jul 2021 10:41:00 +0100
+Message-ID: <875ywuepxv.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Will Deacon <will@kernel.org>
+Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        qperret@google.com, dbrazdil@google.com,
+        Srivatsa Vaddagiri <vatsa@codeaurora.org>,
+        Shanker R Donthineni <sdonthineni@nvidia.com>,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        kernel-team@android.com
+Subject: Re: [PATCH 01/16] KVM: arm64: Generalise VM features into a set of flags
+In-Reply-To: <20210727181026.GA19173@willie-the-truck>
+References: <20210715163159.1480168-1-maz@kernel.org>
+        <20210715163159.1480168-2-maz@kernel.org>
+        <20210727181026.GA19173@willie-the-truck>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: will@kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, qperret@google.com, dbrazdil@google.com, vatsa@codeaurora.org, sdonthineni@nvidia.com, james.morse@arm.com, suzuki.poulose@arm.com, alexandru.elisei@arm.com, kernel-team@android.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Suleiman Souhlal <suleiman@google.com> writes:
+On Tue, 27 Jul 2021 19:10:27 +0100,
+Will Deacon <will@kernel.org> wrote:
+> 
+> On Thu, Jul 15, 2021 at 05:31:44PM +0100, Marc Zyngier wrote:
+> > We currently deal with a set of booleans for VM features,
+> > while they could be better represented as set of flags
+> > contained in an unsigned long, similarily to what we are
+> > doing on the CPU side.
+> > 
+> > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> > ---
+> >  arch/arm64/include/asm/kvm_host.h | 12 +++++++-----
+> >  arch/arm64/kvm/arm.c              |  5 +++--
+> >  arch/arm64/kvm/mmio.c             |  3 ++-
+> >  3 files changed, 12 insertions(+), 8 deletions(-)
+> > 
+> > diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> > index 41911585ae0c..4add6c27251f 100644
+> > --- a/arch/arm64/include/asm/kvm_host.h
+> > +++ b/arch/arm64/include/asm/kvm_host.h
+> > @@ -122,7 +122,10 @@ struct kvm_arch {
+> >  	 * should) opt in to this feature if KVM_CAP_ARM_NISV_TO_USER is
+> >  	 * supported.
+> >  	 */
+> > -	bool return_nisv_io_abort_to_user;
+> > +#define KVM_ARCH_FLAG_RETURN_NISV_IO_ABORT_TO_USER	0
+> > +	/* Memory Tagging Extension enabled for the guest */
+> > +#define KVM_ARCH_FLAG_MTE_ENABLED			1
+> > +	unsigned long flags;
+> 
+> One downside of packing all these together is that updating 'flags' now
+> requires an atomic rmw sequence (i.e. set_bit()). Then again, that's
+> probably for the best anyway given that kvm_vm_ioctl_enable_cap() looks
+> like it doesn't hold any locks.
 
-> When KVM_PREEMPT_COUNT_REPORTING is enabled, the host can use
-> preempt_count to determine if the guest is in a critical section,
-> if it also has CONFIG_KVM_HETEROGENEOUS_RT enabled, in order to
-> use heterogeneous RT VCPU configurations.
->
-> Signed-off-by: Suleiman Souhlal <suleiman@google.com>
-> ---
->  arch/x86/Kconfig      | 11 +++++++++++
->  arch/x86/kernel/kvm.c | 10 ++++++++++
->  2 files changed, 21 insertions(+)
->
-> diff --git a/arch/x86/Kconfig b/arch/x86/Kconfig
-> index 49270655e827..d8b62789df57 100644
-> --- a/arch/x86/Kconfig
-> +++ b/arch/x86/Kconfig
-> @@ -846,6 +846,17 @@ config PARAVIRT_TIME_ACCOUNTING
->  config PARAVIRT_CLOCK
->  	bool
->  
-> +config KVM_PREEMPT_COUNT_REPORTING
-> +	bool "KVM preempt_count reporting to the host"
-> +	depends on KVM_GUEST && PREEMPT_COUNT
-> +	default n
-> +	help
-> +	  Select this option to enable KVM preempt_count reporting to the host,
-> +	  which can be useful in cases where some VCPUs are RT and the rest
-> +	  aren't.
-> +
-> +	  If in doubt, say N here.
-> +
->  config JAILHOUSE_GUEST
->  	bool "Jailhouse non-root cell support"
->  	depends on X86_64 && PCI
-> diff --git a/arch/x86/kernel/kvm.c b/arch/x86/kernel/kvm.c
-> index a26643dc6bd6..7ec53ea3f979 100644
-> --- a/arch/x86/kernel/kvm.c
-> +++ b/arch/x86/kernel/kvm.c
-> @@ -363,6 +363,16 @@ static void kvm_guest_cpu_init(void)
->  
->  	if (has_steal_clock)
->  		kvm_register_steal_time();
-> +
-> +#ifdef CONFIG_KVM_PREEMPT_COUNT_REPORTING
-> +	if (kvm_para_has_feature(KVM_FEATURE_PREEMPT_COUNT)) {
-> +		unsigned long pa;
-> +
-> +		pa = slow_virt_to_phys(this_cpu_ptr(&__preempt_count)) |
-> +		    KVM_MSR_ENABLED;
-> +		wrmsrl(MSR_KVM_PREEMPT_COUNT, pa);
-> +	}
-> +#endif
->  }
+That, and these operations are supposed to be extremely rare anyway.
 
-Please also disable the feature in kvm_guest_cpu_offline() as e.g. upon
-kexec the memory address looses its meaning.
+> 
+> >  	/*
+> >  	 * VM-wide PMU filter, implemented as a bitmap and big enough for
+> > @@ -133,9 +136,6 @@ struct kvm_arch {
+> >  
+> >  	u8 pfr0_csv2;
+> >  	u8 pfr0_csv3;
+> > -
+> > -	/* Memory Tagging Extension enabled for the guest */
+> > -	bool mte_enabled;
+> >  };
+> >  
+> >  struct kvm_vcpu_fault_info {
+> > @@ -777,7 +777,9 @@ bool kvm_arm_vcpu_is_finalized(struct kvm_vcpu *vcpu);
+> >  #define kvm_arm_vcpu_sve_finalized(vcpu) \
+> >  	((vcpu)->arch.flags & KVM_ARM64_VCPU_SVE_FINALIZED)
+> >  
+> > -#define kvm_has_mte(kvm) (system_supports_mte() && (kvm)->arch.mte_enabled)
+> > +#define kvm_has_mte(kvm)					\
+> > +	(system_supports_mte() &&				\
+> > +	 test_bit(KVM_ARCH_FLAG_MTE_ENABLED, &(kvm)->arch.flags))
+> 
+> Not an issue with this patch, but I just noticed that the
+> system_supports_mte() check is redundant here as we only allow the flag to
+> be set if that's already the case.
 
->  
->  static void kvm_pv_disable_apf(void)
+It allows us to save a memory access if system_supports_mte() is false
+(it is eventually implemented as a static key). On the other hand,
+there is so much inlining due to it being a non-final cap that we
+probably lose on that too...
+
+	M.
 
 -- 
-Vitaly
-
+Without deviation from the norm, progress is not possible.
