@@ -2,122 +2,150 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7491D3D9949
-	for <lists+kvm@lfdr.de>; Thu, 29 Jul 2021 01:11:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C1A8D3D99AE
+	for <lists+kvm@lfdr.de>; Thu, 29 Jul 2021 01:44:49 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232533AbhG1XLT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 28 Jul 2021 19:11:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45922 "EHLO
+        id S232384AbhG1Xou (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 28 Jul 2021 19:44:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53436 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232392AbhG1XLS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 28 Jul 2021 19:11:18 -0400
-Received: from mail-pj1-x102e.google.com (mail-pj1-x102e.google.com [IPv6:2607:f8b0:4864:20::102e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0E64DC061765
-        for <kvm@vger.kernel.org>; Wed, 28 Jul 2021 16:11:14 -0700 (PDT)
-Received: by mail-pj1-x102e.google.com with SMTP id a4-20020a17090aa504b0290176a0d2b67aso12607626pjq.2
-        for <kvm@vger.kernel.org>; Wed, 28 Jul 2021 16:11:14 -0700 (PDT)
+        with ESMTP id S232671AbhG1Xot (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 28 Jul 2021 19:44:49 -0400
+Received: from mail-pl1-x630.google.com (mail-pl1-x630.google.com [IPv6:2607:f8b0:4864:20::630])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 47A15C061765
+        for <kvm@vger.kernel.org>; Wed, 28 Jul 2021 16:44:46 -0700 (PDT)
+Received: by mail-pl1-x630.google.com with SMTP id d1so4735837pll.1
+        for <kvm@vger.kernel.org>; Wed, 28 Jul 2021 16:44:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=wjVZYNNKvkz+dEqnRUcvgnvoiUT+17D6nY+LOvQaqFM=;
-        b=LyMc9TiBuRMdPTTAqLyUditTfLnTTRPuRFiSp1/g8qRVaSD911B/hJ1JigdxNGzzZf
-         ZHDMhL9XPwZG0HIqkWCW3SRP6cYblxII2QqbZ8fV6TaLmbFo8yqjFMTib+i6WYFJT4sa
-         IS+58xCLXSpKvXmnCksM0Ei9UmmjMgvt+D6PsoZKlOXTW1JNEoz2ICejKZ4GhKjStROc
-         SVpNxF9wX1owUlE9qVtbjcXiGgU6XC57ml5EvUyT+9nNzkUIO+tvjupt7nbZBOwxAHDX
-         Lk5rYLBoFYdJENOhInfMC+gB4BDDNYozGaNPHUto8QY+oIZsV9E4sLKSqGMHV/oM9B3T
-         Y2Sg==
+        bh=tIEw59iHMBzrooy5tG/1kAgE22g/jH7CuuEHVuy1wr0=;
+        b=CZ+DOXfSsm3oEh7nXvRFTxtMIbn7wy96G39QAKLMn+tFkZbCR33xFDaz2qiBxtaoS1
+         L69zU8I9Oi7MrQY1IPd+GjhYJ0gTnMZVKx8iTpfxpdRqnvRVnFkxtYzF/3hOPtylw7af
+         BmLi95cxc34OieRCmUTxztcn8eYjHOc1cbOBROItVMecgAf1IxYpogsisztyZFHyF4OO
+         PhCRHUkg/hVbCgapT6m4bpyG5Wnq+p1j0GJuBLRpzn/7HvYlXumAVhHzCyQd4mfDb1E+
+         Fs2cW3PesqbBr11WWuPwniuUcdQElKpZ9yiqjo+AewzlTVW9uzEyV3jbBxpO9P1aFUwb
+         gDuw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=wjVZYNNKvkz+dEqnRUcvgnvoiUT+17D6nY+LOvQaqFM=;
-        b=rmA3pgXfL47fGwPobEnKoSIiz0FpB15qCkSZSJ4sYb09WDVOgE0bzEk0NzbpVI4rld
-         Sczs5KrSH+529NyBi/nk8mOqwQX3USWYRnXX6T5lQxAaKhJz0syfKsc2USZ+ZDDUyM28
-         tXXT1JwbqGTPU14hMqHvGpcvKBir5XWcUAgwekVgxbnwDa5z8CMLJ4uSs5Q0ORszRBDe
-         0xB0TPD6mk4IR94FalDApQUd2ux3Sf1HRR5Vr3Th1BBk71HkIMRCZIUt6OcU/GhpLuog
-         aPbzhd+iK3yySpnrOkUUmNBhvB7mSkC/QE+P77v7tybevFVqskyb0rPJEGHFP9P6YlWU
-         iwCQ==
-X-Gm-Message-State: AOAM531tKViDPKaFDucmTnUYQLeCr00sKymtvPUS2fdbm4c7J2gvtohX
-        95EcjxmdOQNLMifR0Zu5G1c0mg==
-X-Google-Smtp-Source: ABdhPJwa932+QRBDfM/6XzzlKH/E0wkeUZlFkYSZiAe7DrHhqPtKcatkq6xNejJSqEGJGcEs0DXqLA==
-X-Received: by 2002:a17:90a:bd06:: with SMTP id y6mr2147490pjr.6.1627513873271;
-        Wed, 28 Jul 2021 16:11:13 -0700 (PDT)
+        bh=tIEw59iHMBzrooy5tG/1kAgE22g/jH7CuuEHVuy1wr0=;
+        b=lyK9UJ+nZyzpF69mJ69OKcv5gZbS9STlLIBfd3TPo6kZ/6Atw26eMNW6dAAa4U+9O2
+         pCIrwSn8lqrjstLdUxQKUiFMUiMckaZ9/0BJCKSuzPNI37YRB4r87tl0kcKau94BJpxM
+         O2g1OzzPsg8HYvjS5RYmP3hRPEljAh/I9VCWPkHfR4gdgAJpJUacuja12OhmYAscbfRs
+         1h/o1KUeFVDneVI8RWbJALTq2RVHB392C+mi3+RYLdNHPiiK1+UUFmEiy5pEenWTbQMl
+         o+uU15BU/bZn8FRpoxphZqt2wUpDPh9si2XD7gFa9uRy52HpI09A0fOeqqxqsFIdKeF8
+         1/6w==
+X-Gm-Message-State: AOAM533LC2PqcEWjUHnpxO3qKVRyu3xuxg0mP1JswuxNJSdaMrr/mRbo
+        BvoOoM3AssN7ZobgwDTthlL93A==
+X-Google-Smtp-Source: ABdhPJxplMSU5vtmBx2c12v3bc5j35rRpRrJTDuiWezzamAXnUfgUXTYhNwuBZ4T2/pRSdbsc5MsWQ==
+X-Received: by 2002:a17:90a:8c01:: with SMTP id a1mr2209266pjo.42.1627515885443;
+        Wed, 28 Jul 2021 16:44:45 -0700 (PDT)
 Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id p17sm1058543pfh.33.2021.07.28.16.11.12
+        by smtp.gmail.com with ESMTPSA id f31sm1131486pgm.1.2021.07.28.16.44.44
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 28 Jul 2021 16:11:12 -0700 (PDT)
-Date:   Wed, 28 Jul 2021 23:11:08 +0000
+        Wed, 28 Jul 2021 16:44:44 -0700 (PDT)
+Date:   Wed, 28 Jul 2021 23:44:41 +0000
 From:   Sean Christopherson <seanjc@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        stable@vger.kernel.org, Stas Sergeev <stsp2@yandex.ru>
-Subject: Re: [PATCH v3] KVM: x86: accept userspace interrupt only if no event
- is injected
-Message-ID: <YQHkDDN+T3mFTcP+@google.com>
-References: <20210727210916.1652841-1-pbonzini@redhat.com>
+To:     Zeng Guang <guang.zeng@intel.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Tony Luck <tony.luck@intel.com>,
+        Kan Liang <kan.liang@linux.intel.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Kim Phillips <kim.phillips@amd.com>,
+        Jarkko Sakkinen <jarkko@kernel.org>,
+        Jethro Beekman <jethro@fortanix.com>,
+        Kai Huang <kai.huang@intel.com>, x86@kernel.org,
+        linux-kernel@vger.kernel.org, Robert Hu <robert.hu@intel.com>,
+        Gao Chao <chao.gao@intel.com>,
+        Robert Hoo <robert.hu@linux.intel.com>
+Subject: Re: [PATCH 1/6] x86/feat_ctl: Add new VMX feature, Tertiary
+ VM-Execution control
+Message-ID: <YQHr6VvNOQclolfc@google.com>
+References: <20210716064808.14757-1-guang.zeng@intel.com>
+ <20210716064808.14757-2-guang.zeng@intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20210727210916.1652841-1-pbonzini@redhat.com>
+In-Reply-To: <20210716064808.14757-2-guang.zeng@intel.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jul 27, 2021, Paolo Bonzini wrote:
-> Once an exception has been injected, any side effects related to
-> the exception (such as setting CR2 or DR6) have been taked place.
-> Therefore, once KVM sets the VM-entry interruption information
-> field or the AMD EVENTINJ field, the next VM-entry must deliver that
-> exception.
+On Fri, Jul 16, 2021, Zeng Guang wrote:
+> From: Robert Hoo <robert.hu@linux.intel.com>
 > 
-> Pending interrupts are processed after injected exceptions, so
-> in theory it would not be a problem to use KVM_INTERRUPT when
-> an injected exception is present.  However, DOSEMU is using
-> run->ready_for_interrupt_injection to detect interrupt windows
-> and then using KVM_SET_SREGS/KVM_SET_REGS to inject the
-> interrupt manually.  For this to work, the interrupt window
-> must be delayed after the completion of the previous event
-> injection.
-> 
-> Cc: stable@vger.kernel.org
-> Reported-by: Stas Sergeev <stsp2@yandex.ru>
-> Tested-by: Stas Sergeev <stsp2@yandex.ru>
-> Fixes: 71cc849b7093 ("KVM: x86: Fix split-irqchip vs interrupt injection window request")
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> ---
->  arch/x86/kvm/x86.c | 13 +++++++++++--
->  1 file changed, 11 insertions(+), 2 deletions(-)
-> 
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index 4116567f3d44..e5d5c5ed7dd4 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -4358,8 +4358,17 @@ static int kvm_cpu_accept_dm_intr(struct kvm_vcpu *vcpu)
+> New VMX capability MSR IA32_VMX_PROCBASED_CTLS3 conresponse to this new
+> VM-Execution control field. And it is 64bit allow-1 semantics, not like
+> previous capability MSRs 32bit allow-0 and 32bit allow-1. So with Tertiary
+> VM-Execution control field introduced, 2 vmx_feature leaves are introduced,
+> TERTIARY_CTLS_LOW and TERTIARY_CTLS_HIGH.
+
+...
+
+>  /*
+>   * Note: If the comment begins with a quoted string, that string is used
+> @@ -43,6 +43,7 @@
+>  #define VMX_FEATURE_RDTSC_EXITING	( 1*32+ 12) /* "" VM-Exit on RDTSC */
+>  #define VMX_FEATURE_CR3_LOAD_EXITING	( 1*32+ 15) /* "" VM-Exit on writes to CR3 */
+>  #define VMX_FEATURE_CR3_STORE_EXITING	( 1*32+ 16) /* "" VM-Exit on reads from CR3 */
+> +#define VMX_FEATURE_TER_CONTROLS	(1*32 + 17) /* "" Enable Tertiary VM-Execution Controls */
+
+Maybe spell out TERTIARY?   SEC_CONTROLS is at least somewhat guessable, I doubt
+TERTIARY is the first thing that comes to mind for most people when seeing "TER" :-)
+
+>  #define VMX_FEATURE_CR8_LOAD_EXITING	( 1*32+ 19) /* "" VM-Exit on writes to CR8 */
+>  #define VMX_FEATURE_CR8_STORE_EXITING	( 1*32+ 20) /* "" VM-Exit on reads from CR8 */
+>  #define VMX_FEATURE_VIRTUAL_TPR		( 1*32+ 21) /* "vtpr" TPR virtualization, a.k.a. TPR shadow */
+> diff --git a/arch/x86/kernel/cpu/feat_ctl.c b/arch/x86/kernel/cpu/feat_ctl.c
+> index da696eb4821a..2e0272d127e4 100644
+> --- a/arch/x86/kernel/cpu/feat_ctl.c
+> +++ b/arch/x86/kernel/cpu/feat_ctl.c
+> @@ -15,6 +15,8 @@ enum vmx_feature_leafs {
+>  	MISC_FEATURES = 0,
+>  	PRIMARY_CTLS,
+>  	SECONDARY_CTLS,
+> +	TERTIARY_CTLS_LOW,
+> +	TERTIARY_CTLS_HIGH,
+>  	NR_VMX_FEATURE_WORDS,
+>  };
 >  
->  static int kvm_vcpu_ready_for_interrupt_injection(struct kvm_vcpu *vcpu)
->  {
-> -	return kvm_arch_interrupt_allowed(vcpu) &&
-> -		kvm_cpu_accept_dm_intr(vcpu);
+> @@ -42,6 +44,13 @@ static void init_vmx_capabilities(struct cpuinfo_x86 *c)
+>  	rdmsr_safe(MSR_IA32_VMX_PROCBASED_CTLS2, &ign, &supported);
+>  	c->vmx_capability[SECONDARY_CTLS] = supported;
+>  
 > +	/*
-> +	 * Do not cause an interrupt window exit if an exception
-> +	 * is pending or an event needs reinjection; userspace
-> +	 * might want to inject the interrupt manually using KVM_SET_REGS
-> +	 * or KVM_SET_SREGS.  For that to work, we must be at an
-> +	 * instruction boundary and with no events half-injected.
+> +	 * For tertiary execution controls MSR, it's actually a 64bit allowed-1.
 > +	 */
-> +	return (kvm_arch_interrupt_allowed(vcpu) &&
+> +	rdmsr_safe(MSR_IA32_VMX_PROCBASED_CTLS3, &ign, &supported);
+> +	c->vmx_capability[TERTIARY_CTLS_LOW] = ign;
+> +	c->vmx_capability[TERTIARY_CTLS_HIGH] = supported;
 
-Ha, adding a '(' is one way to fix the indentation.
+Assuming only the lower 32 bits are going to be used for the near future (next
+few years), what about defining just TERTIARY_CTLS_LOW and then doing:
 
-Reviewed-by: Sean Christopherson <seanjc@google.com> 
+	/*
+	 * Tertiary controls are 64-bit allowed-1, so unlikely other MSRs, the
+	 * upper bits are ignored (because they're not used, yet...).
+	 */
+	rdmsr_safe(MSR_IA32_VMX_PROCBASED_CTLS3, &supported, &ign);
+	c->vmx_capability[TERTIARY_CTLS_LOW] = supported;
 
-> +		kvm_cpu_accept_dm_intr(vcpu) &&
-> +		!kvm_event_needs_reinjection(vcpu) &&
-> +		!vcpu->arch.exception.pending);
->  }
+I.e. punt the ugliness issue down the road a few years.
+
+> +
+>  	rdmsr(MSR_IA32_VMX_PINBASED_CTLS, ign, supported);
+>  	rdmsr_safe(MSR_IA32_VMX_VMFUNC, &ign, &funcs);
 >  
->  static int kvm_vcpu_ioctl_interrupt(struct kvm_vcpu *vcpu,
 > -- 
-> 2.27.0
+> 2.25.1
 > 
