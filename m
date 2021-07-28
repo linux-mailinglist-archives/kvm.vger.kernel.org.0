@@ -2,197 +2,121 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D23BC3D8D77
-	for <lists+kvm@lfdr.de>; Wed, 28 Jul 2021 14:07:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8DE1F3D8D85
+	for <lists+kvm@lfdr.de>; Wed, 28 Jul 2021 14:12:36 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234956AbhG1MHT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 28 Jul 2021 08:07:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34252 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234758AbhG1MHR (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 28 Jul 2021 08:07:17 -0400
-Received: from mail-pl1-x632.google.com (mail-pl1-x632.google.com [IPv6:2607:f8b0:4864:20::632])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1E7E0C061757;
-        Wed, 28 Jul 2021 05:07:16 -0700 (PDT)
-Received: by mail-pl1-x632.google.com with SMTP id f13so2418886plj.2;
-        Wed, 28 Jul 2021 05:07:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=pzNje+eEaJYZU+DxBipnEI0TOsk5q1STrYyOmtqwUmw=;
-        b=e7qqtcYhnfdctT6rgsOSi4ZWSdffnSx0c8FrQXLY0JgJjKCB3So9UY8TWMVIjKwIBp
-         SK+mq1gckdIxGgRh/OYfuMuLMnAGIaZYUhwpJEQq9Bo/+Fh7XkjHHIKjkUpxfgu7zv8T
-         ltNIOkdq6vCCMmzizL57P/oKwnLO7wM/l0AUlUKk8g/Vft8QfbDNz02GGb4BXovNcMZt
-         P9xXfJxa2kLVe4VojHa52BLND4GFlpvarDTIl4anoUAZVd2UfdsqfxBx3OlDcI6A/5YS
-         8IpBfqayz+VfDftWwVp6eEyEBIrHCXnFMN4c6pBS+IGojkytvlo7hUSx+HVIeEAEBGcE
-         YuYQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=pzNje+eEaJYZU+DxBipnEI0TOsk5q1STrYyOmtqwUmw=;
-        b=t9XWMu1mIOji9j7bk8oyJscfMEjZfDthViCaXDjiWuuKL7sOprEeE2d9FEozpdylT7
-         c+tJEQfvLytY5+wl2slvEiJul62UCEjOwgFH+17pKTr50RUp01aA8IbMXYi8ewP3vTFF
-         Ku+Bwz+5w9vRfASxRi9k/gdmfT+dIR0qEWhz3Z/C7QdsC9cNBIaY4j7B0OdBT3HDO9Xv
-         NyNqgsIW2yhtEnL2PfJkYhRmRjtEh71r4/Gxj7UN6SuJTdmeLOeNLvStkx9AQfhYrAF9
-         ZTnhQIzOQBCNl8s8XEp3O0Yfpfz7Z4qLv/1qL4Q6dgoMwBYH0yT0NW5CP51AvdY9vYAT
-         5qcA==
-X-Gm-Message-State: AOAM533yQcHpakIj3teNx5fwJ2Q/N/JUuwZ753NnY/EAy6MJL1KJioLO
-        ENFOFY88KHY8QRwyU05jXNw=
-X-Google-Smtp-Source: ABdhPJxf/w2TK+hJYnsreVKPhj+fRyufvn+X6h+fruvET1ca3iuEj1Kh+w8bPIk/FSHYliEClzVlCA==
-X-Received: by 2002:a63:5506:: with SMTP id j6mr9677935pgb.19.1627474035630;
-        Wed, 28 Jul 2021 05:07:15 -0700 (PDT)
-Received: from localhost.localdomain ([103.7.29.32])
-        by smtp.gmail.com with ESMTPSA id i24sm5887142pfr.207.2021.07.28.05.07.12
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 28 Jul 2021 05:07:15 -0700 (PDT)
-From:   Like Xu <like.xu.linux@gmail.com>
-X-Google-Original-From: Like Xu <likexu@tencent.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>, kvm@vger.kernel.org,
-        x86@kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH] KVM: x86/pmu: Introduce pmc->is_paused to reduce the call time of perf interfaces
-Date:   Wed, 28 Jul 2021 20:07:05 +0800
-Message-Id: <20210728120705.6855-1-likexu@tencent.com>
-X-Mailer: git-send-email 2.32.0
+        id S236108AbhG1MMg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 28 Jul 2021 08:12:36 -0400
+Received: from mout.kundenserver.de ([212.227.17.24]:42833 "EHLO
+        mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S234758AbhG1MMf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 28 Jul 2021 08:12:35 -0400
+Received: from mail-wm1-f48.google.com ([209.85.128.48]) by
+ mrelayeu.kundenserver.de (mreue106 [213.165.67.113]) with ESMTPSA (Nemesis)
+ id 1MeC5x-1mjQkp1ZbD-00bObP; Wed, 28 Jul 2021 14:12:32 +0200
+Received: by mail-wm1-f48.google.com with SMTP id u15so1269692wmj.1;
+        Wed, 28 Jul 2021 05:12:32 -0700 (PDT)
+X-Gm-Message-State: AOAM532MpaqeO71mNQRW3YDRH16ST2k3YgQde3aNwDoikqA6sRXW6aW5
+        KdT0rQ7IbGyTIpPwCt+pqqvg0eMUctRq5MPx5GU=
+X-Google-Smtp-Source: ABdhPJxtjjFWzeF0bcDUjzb2WEgyyLb/YJ7SL+MS80Z9pRM49SN6JqmTZdBENGSfukT9DUUYsyY+SSfd5EqZgIJrm/o=
+X-Received: by 2002:a7b:ce10:: with SMTP id m16mr8756862wmc.75.1627474351802;
+ Wed, 28 Jul 2021 05:12:31 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20210721161609.68223-1-yishaih@nvidia.com> <20210721161609.68223-13-yishaih@nvidia.com>
+ <20210727155440.680ee22e.alex.williamson@redhat.com> <20210727230941.GL1721383@nvidia.com>
+ <20210728054306.GA3421@lst.de> <20210728120326.GQ1721383@nvidia.com>
+In-Reply-To: <20210728120326.GQ1721383@nvidia.com>
+From:   Arnd Bergmann <arnd@arndb.de>
+Date:   Wed, 28 Jul 2021 14:12:15 +0200
+X-Gmail-Original-Message-ID: <CAK8P3a1=sGwYqVoZzOdgrs7d6v3dwOFC9Q+pROnPB5F3Qe-5CA@mail.gmail.com>
+Message-ID: <CAK8P3a1=sGwYqVoZzOdgrs7d6v3dwOFC9Q+pROnPB5F3Qe-5CA@mail.gmail.com>
+Subject: Re: [PATCH 12/12] vfio/pci: Introduce vfio_pci_core.ko
+To:     Jason Gunthorpe <jgg@nvidia.com>
+Cc:     Christoph Hellwig <hch@lst.de>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Yishai Hadas <yishaih@nvidia.com>,
+        Bjorn Helgaas <bhelgaas@google.com>,
+        Jonathan Corbet <corbet@lwn.net>, diana.craciun@oss.nxp.com,
+        kwankhede@nvidia.com, Eric Auger <eric.auger@redhat.com>,
+        Masahiro Yamada <masahiroy@kernel.org>,
+        Michal Marek <michal.lkml@markovi.net>,
+        linux-pci <linux-pci@vger.kernel.org>,
+        "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>,
+        kvm list <kvm@vger.kernel.org>,
+        linux-s390 <linux-s390@vger.kernel.org>,
+        Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>,
+        mgurtovoy@nvidia.com, maorg@nvidia.com, leonro@nvidia.com
+Content-Type: text/plain; charset="UTF-8"
+X-Provags-ID: V03:K1:JWlaZN0i7V0mnUSFlIzSms4JvMbPeIKOGafbFT/ie0e4w8cE4Zc
+ aa2qt2LXCopJG8zY8Rd4jSPsyqZ3KdENQOyHaYxjI9hCKc7zeoo5eJhLqn/7prLzRl1K3nf
+ 7OjkcLLYt+7yw9qgLlzIyEtGWJ+wGxRJ7GbbbixntZRoNxBCrKnovCw702MQ7px1RaGcS9Y
+ EyM4lp6Z/1hz9nfOTFcJA==
+X-Spam-Flag: NO
+X-UI-Out-Filterresults: notjunk:1;V03:K0:vEgE7TX5Cpo=:WWvybrpF3ZTubhw6xNo79c
+ sV7p/i/sS+N98JL0maJm34sm2Mp4ePocIYqbcatJk0vxEJfPkEq/vgzwMGtTpsPh/vACKiIvs
+ E0hjXivE4vMmOWnpSF7TFQtwcaFamBmL++v1M49P0zhiH9BJNgPAb/OoJ14vy/RhLJMyZlRCP
+ fVlsf6RAaoFJ2edrxCMRxnvko7hy+XNdZchMQxA5uXa3Ronb6FPtfJbee7DWU+PztABoB0nEz
+ QDuqmPqck46jkrM/so19xIvdoGEXNiUXy6iHTcvRw2osu/J9lrljEJzKrfIGaBJQDs1IbbChq
+ kDjLWEUQMQ+E40iIjIji6QSg/rB3R0rseAN9VKZSyqYIy6Zmgqf5QiAIclEmPrDA+lC2e579q
+ NF5lBFR/COCYJkJJXF/xTWzY2U3MyN/ybuTYOlLnKVgJ4/A5ZfF/m5LymgJWP0E7yWk/VyU2I
+ SrOp4i5jTfZIwgjPaTS5CBgemjGC7bKelcWghUfsKnJNx/3+/4m8B5tE/vkx9E2sd4Xkx7kZg
+ q4lV7yZ13nyLwuW9C2/ptQ1NziR3WUKF4USr3luwrt9/dvvY9MEkVNvuPCBQxqWv5wUMHHYlr
+ yzfqTVH3T5FCIMQyw3oaGizKv8G+hELMXm4ExCpBkMzTvona2awfPgVGH/b9jwSmw7BgymFjF
+ 5WHmW2G945Llb7A+LeR9Xvb1kTW9Mps5sw1i9EiH9EZoVDL73dBr/mKrYK7sMSar7WmHpa6tD
+ bbTJAniZ+7bxddAwA9bPEjxHMnRvx45R2u8xgo29I+s5GLCBdoFxeEwsdoA2RNzf09jdyPTLt
+ vpbTwBYGyi+kJnc/QaUeec4wbEnSvQHeGQvjziQAw36oDz/dp8OGKHQYS/jK0doMAFrcn8Qki
+ He/FBVAYT+WVSXO0mBIDjWb4iIvA/fLcKNT3f3eQf4vsvOuQ61+N0/opBUrFXycipV2oWrxS5
+ XJeySE6pMAVXZug8cmgA2PW4LX4mi8c0DCfAETPmOyR3rfF04a1kd
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Like Xu <likexu@tencent.com>
+On Wed, Jul 28, 2021 at 2:03 PM Jason Gunthorpe <jgg@nvidia.com> wrote:
+>
+> On Wed, Jul 28, 2021 at 07:43:06AM +0200, Christoph Hellwig wrote:
+>
+> > > Which might reasonably be from an old kernel. 'make oldconfig' prompts:
+> > >
+> > > VFIO Non-Privileged userspace driver framework (VFIO) [Y/n/m/?] y
+> > >   VFIO No-IOMMU support (VFIO_NOIOMMU) [Y/n/?] y
+> > >   VFIO support for PCI devices (VFIO_PCI_CORE) [N/m/y/?] (NEW)
+> > >
+> > > Which is completely fine, IMHO.
+> >
+> > Why do we need to have VFIO_PCI_CORE as a user visible option?
+> > I'd just select it.
+>
+> I'm not great with kconfig, but AFAIK:
+>
+> - It controls building a module so it needs to be a tristate
+>
+> - tristates need to be exposed in the menu structure
+>
+> - As it builds a module it also has depends on other things
+>
+> - Select should not be used to target tristates
+>
+> - Select should not be used to target options in the menu tree
+>
+> - Select should not be used to target options that have depends
+>
+> Which leaves us with this arrangement unless we delete the
+> vfio_pci_core.ko module - which seems like a bad direction just for
+> kconfig backwards compatibility.
 
-Based on our observations, after any vm-exit associated with vPMU, there
-are at least two or more perf interfaces to be called for guest counter
-emulation, such as perf_event_{pause, read_value, period}(), and each one
-will {lock, unlock} the same perf_event_ctx. The frequency of calls becomes
-more severe when guest use counters in a multiplexed manner.
+I have not looked at the requirements for this particular patch, but
+generally speaking there is no problem with using 'select' on
+a tristate symbol.
 
-Holding a lock once and completing the KVM request operations in the perf
-context would introduce a set of impractical new interfaces. So we can
-further optimize the vPMU implementation by avoiding repeated calls to
-these interfaces in the KVM context for at least one pattern:
+The other points are correct though: you can not 'select' a symbol
+that has dependencies, unless the symbol selecting it already
+depends on those same options, and you should not 'select' user
+visible options or other subsystems.
 
-After we call perf_event_pause() once, the event will be disabled and its
-internal count will be reset to 0. So there is no need to pause it again
-or read its value. Once the event is paused, event period will not be
-updated until the next time it's resumed or reprogrammed. And there is
-also no need to call perf_event_period twice for a non-running counter,
-considering the perf_event for a running counter is never paused.
+One common mistake is to have a reverse dependency, where
+A uses 'select B' or 'depends on B', but then exports an ELF
+symbol that is consumed by B, as opposed to the other way round.
+I don't think that is a problem here though.
 
-Based on this implementation, for the following common usage of
-sampling 4 events using perf on a 4u8g guest:
-
-  echo 0 > /proc/sys/kernel/watchdog
-  echo 25 > /proc/sys/kernel/perf_cpu_time_max_percent
-  echo 10000 > /proc/sys/kernel/perf_event_max_sample_rate
-  echo 0 > /proc/sys/kernel/perf_cpu_time_max_percent
-  for i in `seq 1 1 10`
-  do
-  taskset -c 0 perf record \
-  -e cpu-cycles -e instructions -e branch-instructions -e cache-misses \
-  /root/br_instr a
-  done
-
-the average latency of the guest NMI handler is reduced from
-37646.7 ns to 32929.3 ns (~1.14x speed up) on the Intel ICX server.
-Also, in addition to collecting more samples, no loss of sampling
-accuracy was observed compared to before the optimization.
-
-Signed-off-by: Like Xu <likexu@tencent.com>
----
- arch/x86/include/asm/kvm_host.h | 1 +
- arch/x86/kvm/pmu.c              | 5 ++++-
- arch/x86/kvm/pmu.h              | 2 +-
- arch/x86/kvm/vmx/pmu_intel.c    | 4 ++--
- 4 files changed, 8 insertions(+), 4 deletions(-)
-
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index 99f37781a6fc..a079880d4cd5 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -482,6 +482,7 @@ struct kvm_pmc {
- 	 * ctrl value for fixed counters.
- 	 */
- 	u64 current_config;
-+	bool is_paused;
- };
- 
- struct kvm_pmu {
-diff --git a/arch/x86/kvm/pmu.c b/arch/x86/kvm/pmu.c
-index 827886c12c16..0772bad9165c 100644
---- a/arch/x86/kvm/pmu.c
-+++ b/arch/x86/kvm/pmu.c
-@@ -137,18 +137,20 @@ static void pmc_reprogram_counter(struct kvm_pmc *pmc, u32 type,
- 	pmc->perf_event = event;
- 	pmc_to_pmu(pmc)->event_count++;
- 	clear_bit(pmc->idx, pmc_to_pmu(pmc)->reprogram_pmi);
-+	pmc->is_paused = false;
- }
- 
- static void pmc_pause_counter(struct kvm_pmc *pmc)
- {
- 	u64 counter = pmc->counter;
- 
--	if (!pmc->perf_event)
-+	if (!pmc->perf_event || pmc->is_paused)
- 		return;
- 
- 	/* update counter, reset event value to avoid redundant accumulation */
- 	counter += perf_event_pause(pmc->perf_event, true);
- 	pmc->counter = counter & pmc_bitmask(pmc);
-+	pmc->is_paused = true;
- }
- 
- static bool pmc_resume_counter(struct kvm_pmc *pmc)
-@@ -163,6 +165,7 @@ static bool pmc_resume_counter(struct kvm_pmc *pmc)
- 
- 	/* reuse perf_event to serve as pmc_reprogram_counter() does*/
- 	perf_event_enable(pmc->perf_event);
-+	pmc->is_paused = false;
- 
- 	clear_bit(pmc->idx, (unsigned long *)&pmc_to_pmu(pmc)->reprogram_pmi);
- 	return true;
-diff --git a/arch/x86/kvm/pmu.h b/arch/x86/kvm/pmu.h
-index 67e753edfa22..0e4f2b1fa9fb 100644
---- a/arch/x86/kvm/pmu.h
-+++ b/arch/x86/kvm/pmu.h
-@@ -55,7 +55,7 @@ static inline u64 pmc_read_counter(struct kvm_pmc *pmc)
- 	u64 counter, enabled, running;
- 
- 	counter = pmc->counter;
--	if (pmc->perf_event)
-+	if (pmc->perf_event && !pmc->is_paused)
- 		counter += perf_event_read_value(pmc->perf_event,
- 						 &enabled, &running);
- 	/* FIXME: Scaling needed? */
-diff --git a/arch/x86/kvm/vmx/pmu_intel.c b/arch/x86/kvm/vmx/pmu_intel.c
-index 9efc1a6b8693..10cc4f65c4ef 100644
---- a/arch/x86/kvm/vmx/pmu_intel.c
-+++ b/arch/x86/kvm/vmx/pmu_intel.c
-@@ -437,13 +437,13 @@ static int intel_pmu_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
- 			    !(msr & MSR_PMC_FULL_WIDTH_BIT))
- 				data = (s64)(s32)data;
- 			pmc->counter += data - pmc_read_counter(pmc);
--			if (pmc->perf_event)
-+			if (pmc->perf_event && !pmc->is_paused)
- 				perf_event_period(pmc->perf_event,
- 						  get_sample_period(pmc, data));
- 			return 0;
- 		} else if ((pmc = get_fixed_pmc(pmu, msr))) {
- 			pmc->counter += data - pmc_read_counter(pmc);
--			if (pmc->perf_event)
-+			if (pmc->perf_event && !pmc->is_paused)
- 				perf_event_period(pmc->perf_event,
- 						  get_sample_period(pmc, data));
- 			return 0;
--- 
-2.32.0
-
+            Arnd
