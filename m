@@ -2,138 +2,82 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A2BD83D9561
-	for <lists+kvm@lfdr.de>; Wed, 28 Jul 2021 20:37:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CFB7C3D95B0
+	for <lists+kvm@lfdr.de>; Wed, 28 Jul 2021 21:00:16 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229835AbhG1Shq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 28 Jul 2021 14:37:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40670 "EHLO
+        id S230512AbhG1TAR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 28 Jul 2021 15:00:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45868 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230473AbhG1Shp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 28 Jul 2021 14:37:45 -0400
-Received: from mail-pl1-x62e.google.com (mail-pl1-x62e.google.com [IPv6:2607:f8b0:4864:20::62e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 66A8DC0613C1
-        for <kvm@vger.kernel.org>; Wed, 28 Jul 2021 11:37:43 -0700 (PDT)
-Received: by mail-pl1-x62e.google.com with SMTP id i10so3784814pla.3
-        for <kvm@vger.kernel.org>; Wed, 28 Jul 2021 11:37:43 -0700 (PDT)
+        with ESMTP id S229565AbhG1TAQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 28 Jul 2021 15:00:16 -0400
+Received: from mail-lj1-x22e.google.com (mail-lj1-x22e.google.com [IPv6:2a00:1450:4864:20::22e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8F1F0C0613C1
+        for <kvm@vger.kernel.org>; Wed, 28 Jul 2021 12:00:14 -0700 (PDT)
+Received: by mail-lj1-x22e.google.com with SMTP id q2so4311598ljq.5
+        for <kvm@vger.kernel.org>; Wed, 28 Jul 2021 12:00:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=wW0lGlO2h9W3l+Di2eQ8wNpleBt3TTs9VoxXJP2bqhY=;
-        b=SaEiXGhzkxEn1MWQT/R4Zq7ytFXEcYz3MXd3lp5qrtdccjSpDoTzlGuaXUTNa9yRv9
-         KzOSBYJOcpuNK3lhtcFCosgceBCDchPrcadfpybLXOpPcUgZFwy4jCpeClnxOUHeHOLW
-         nRLb/WkZIVIaOL/cOsRlVUvO1fd0XPwA8F1CT6elPr3fz8QBGoRGH0vr2czbFP5kBzYT
-         G9Q5LtiOyXkngqKaHhuUVBXpy4T4wSM6a4y4s8bbX1rraoFnYNaFQIPKpp5lM9ye/frP
-         +H50hWucuHricEkKA2OcuXgwidDmQCSUK6vQW2FK5Ww+WoLOPuABTobg0+WIYBm+HgH4
-         v6nQ==
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=CF9Ebtn1K2skoonIX3Kl5uPFwf6/mj0sEHZaqTsqkM8=;
+        b=HnOKhABiYVDpWHTEotvy8TRmCEC1QtjeZ/HFGLg2UBX2JmDkodXeXj7V8WiZhzYcQS
+         atrhZprD8sBKRVuteibupgTQvvlDMhN/zFROgRV4nT7LTYg0zAoNJXf32hK/4gVEQAP7
+         iGKgws00WNSaAoGZiUOGR6gHSsSQnLT0XdCP8hF4l+lBNffzWJUUbag8n0ukQZduUZ7B
+         f6YZC8A9czKHd8r+siKbxqI/iLbw8oEXwo82OXsgOkf/Oe0VixfheizX3VwZQTlJCgW8
+         iCsjCsQWvAQ260/Ej27hnSOky7yZ1ZnTTK05RB8qcWyE+whZDV+huaBZEIuYPOknBOVh
+         YrWg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=wW0lGlO2h9W3l+Di2eQ8wNpleBt3TTs9VoxXJP2bqhY=;
-        b=F9/+XFPRkZYwBATvTwmnh5x/g0vaYDHD7OjYYi7mQiadGDNtoTS/qTdhJ/5Cx2ZN5l
-         WJPAKyde4yKUlchGPbMvrUmVLNBaa2XFckfGzAWGHbYGwbuBmRy5yO0uBL6TMWO8RL/F
-         TypCIqRLhkmLhjGHgAnXJcBAepv3TAGjxDmhup+S7Tea2Aan+5r/HWsHxDVHJvjoCzBj
-         rSzthIEFj6odeee9DPboRyGILGh2rO+cLWgINkxjcaPuhBQKTlCIzgusLmi7CyXv9L7I
-         WQHgz7ADLppgaD5xZWBZSaEzSpRXLWi5535aZ8RBxaEQwhVfyPEXIuITn+saGGuvab89
-         nEqg==
-X-Gm-Message-State: AOAM531UWltboyVPU7xfTSYf5wB016K3ZWetF9EoQgCwrSVTqZSyiIFU
-        gUja/kd0FQrhypwNyQ/mt7cTrA==
-X-Google-Smtp-Source: ABdhPJyy3dDQk885MGzn7M+KECtE4gK+0BQ0MwF53res5Ld9E6AQOdOK7Or/i8NmeZV+/HMHp6Ayqg==
-X-Received: by 2002:a17:90a:ccc:: with SMTP id 12mr1081627pjt.57.1627497462769;
-        Wed, 28 Jul 2021 11:37:42 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id s18sm422579pjn.54.2021.07.28.11.37.42
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 28 Jul 2021 11:37:42 -0700 (PDT)
-Date:   Wed, 28 Jul 2021 18:37:38 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Yu Zhang <yu.c.zhang@linux.intel.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Ben Gardon <bgardon@google.com>, kvm@vger.kernel.org
-Subject: Re: A question of TDP unloading.
-Message-ID: <YQGj8gj7fpWDdLg5@google.com>
-References: <20210727161957.lxevvmy37azm2h7z@linux.intel.com>
- <YQBLZ/RrBFxE4G4w@google.com>
- <20210728065605.e4ql2hzrj5fkngux@linux.intel.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=CF9Ebtn1K2skoonIX3Kl5uPFwf6/mj0sEHZaqTsqkM8=;
+        b=A+DMNmhrwxaTNhXMIA3v+tMajC6uRhhpG+8pSSQfO6oDE2xCL0jzEZQAgULreGd6MA
+         OgCLesQ5PiH+wettfpL86dkUoboL/Y/6wNUkwBBSBCXaScOGw+fyfOI1wHb/WKDeL2TA
+         Jh8Kd0BdTDQYiNvJUZVh1wMKLGynDHnWaCPR9Fe0mvG75kkkEo87jkZT8ZOJUR5TzIR8
+         mI4Ed1OD7NVkGehY1ITnq8gCYPzO1mYuqIJAYUrBeNukDcxvvJLo/yMNSGovT9VhjPkn
+         FI46Z2RSgPXXCHK3T3q5vAAwZ21d+A2Xa0/rNYhoILh5/EFyxXZEfh/BEO3gUgYw8aSc
+         Y0DQ==
+X-Gm-Message-State: AOAM531IFKEwCy9vx9M0X0wH+aC8iPamavG9wGDVD1fSWZfwaGBODa0t
+        rxNNdiZJ0qhaPGJfGHpVxZXUjEmsSaFExW49pRo=
+X-Google-Smtp-Source: ABdhPJwMmzz0ZTVyuI9BEf3qiVK5oQzhKIRnHD1Mde34Q4f9D/LqLbWCY4pnghV5lqF94ZnmaBPOR9mX6adE6Y0eBfc=
+X-Received: by 2002:a2e:a90e:: with SMTP id j14mr751792ljq.250.1627498813006;
+ Wed, 28 Jul 2021 12:00:13 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210728065605.e4ql2hzrj5fkngux@linux.intel.com>
+References: <CA+-xGqNUX4dpzFV7coJSoJnPz6cE5gdPy1kzRKsQtGD371hyEg@mail.gmail.com>
+ <d79db3d7c443f392f5a8b3cf631e5607b72b6208.camel@redhat.com>
+ <CA+-xGqOdu1rjhkG0FhxfzF1N1Uiq+z0b3MBJ=sjuVStHP5TBKg@mail.gmail.com>
+ <d95d40428ec07ee07e7c583a383d5f324f89686a.camel@redhat.com>
+ <YOxYM+8qCIyV+rTJ@google.com> <CA+-xGqOSd0yhU4fEcobf3tW0mLb0TmLGycTwXNVUteyvvnXjdw@mail.gmail.com>
+ <YO8jPvScgCmtj0JP@google.com> <CA+-xGqOkH-hU1guGx=t-qtjsRdO92oX+8HhcO1eXnCigMc+NPw@mail.gmail.com>
+ <YPC1lgV5dZC0CyG0@google.com> <CA+-xGqN75O37cr9uh++dyPj57tKcYm0fD=+-GBErki8nGNcemQ@mail.gmail.com>
+ <YPiLBLA2IjwovNCP@google.com>
+In-Reply-To: <YPiLBLA2IjwovNCP@google.com>
+From:   harry harry <hiharryharryharry@gmail.com>
+Date:   Wed, 28 Jul 2021 14:00:01 -0500
+Message-ID: <CA+-xGqP7=m47cLD65DhTumOF8+sWZvc81gh+04aKMS56WWkVtA@mail.gmail.com>
+Subject: Re: About two-dimensional page translation (e.g., Intel EPT) and
+ shadow page table in Linux QEMU/KVM
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Maxim Levitsky <mlevitsk@redhat.com>, kvm@vger.kernel.org,
+        qemu-devel@nongnu.org,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Paolo Bonzini <pbonzini@redhat.com>, stefanha@redhat.com,
+        mathieu.tarral@protonmail.com
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jul 28, 2021, Yu Zhang wrote:
-> Thanks a lot for your reply, Sean.
-> 
-> On Tue, Jul 27, 2021 at 06:07:35PM +0000, Sean Christopherson wrote:
-> > On Wed, Jul 28, 2021, Yu Zhang wrote:
-> > > Hi all,
-> > > 
-> > >   I'd like to ask a question about kvm_reset_context(): is there any
-> > >   reason that we must alway unload TDP root in kvm_mmu_reset_context()?
-> > 
-> > The short answer is that mmu_role is changing, thus a new root shadow page is
-> > needed.
-> 
-> I saw the mmu_role is recalculated, but I have not figured out how this
-> change would affect TDP. May I ask a favor to give an example? Thanks!
-> 
-> I realized that if we only recalculate the mmu role, but do not unload
-> the TDP root(e.g., when guest efer.nx flips), base role of the SPs will
-> be inconsistent with the mmu context. But I do not understand why this
-> shall affect TDP. 
+Sean, sorry for the late reply. Thanks for your careful explanations.
 
-The SPTEs themselves are not affected if the base mmu_role doesn't change; note,
-this holds true for shadow paging, too.  What changes is all of the kvm_mmu
-knowledge about how to walk the guest PTEs, e.g. if a guest toggles CR4.SMAP,
-then KVM needs to recalculate the #PF permissions for guest accesses so that
-emulating instructions at CPL=0 does the right thing.
+> For emulation of any instruction/flow that starts with a guest virtual address.
+> On Intel CPUs, that includes quite literally any "full" instruction emulation,
+> since KVM needs to translate CS:RIP to a guest physical address in order to fetch
+> the guest's code stream.  KVM can't avoid "full" emulation unless the guest is
+> heavily enlightened, e.g. to avoid string I/O, among many other things.
 
-As for EFER.NX and CR0.WP, they are in the base page role because they need to
-be there for shadow paging, e.g. if the guest toggles EFER.NX, then the reserved
-bit and executable permissions change, and reusing shadow paging for the old
-EFER.NX could result in missed reserved #PF and/or incorrect executable #PF
-behavior.
-
-For simplicitly, it's far, far eaiser to reuse the same page role struct for
-TDP paging (both legacy and TDP MMUs) and shadow paging.
-
-However, I think we can safely ignore NX, WP, SMEP, and SMAP in direct shadow
-pages, which would allow reusing a TDP root across changes.  This is only a baby
-step (assuming it even works), as further changes to set_cr0/cr4/efer would be
-needed to fully realize the optimizations, e.g. to avoid complete teardown if
-the root_count hits zero.
-
-I'll put this on my todo list, I've been looking for an excuse to update the
-cr0/cr4/efer flows anyways :-).  If it works, the changes should be relatively
-minor, if it works...
-
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index a8cdfd8d45c4..700664fe163e 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -2077,8 +2077,20 @@ static struct kvm_mmu_page *kvm_mmu_get_page(struct kvm_vcpu *vcpu,
-        role = vcpu->arch.mmu->mmu_role.base;
-        role.level = level;
-        role.direct = direct;
--       if (role.direct)
-+       if (role.direct) {
-                role.gpte_is_8_bytes = true;
-+
-+               /*
-+                * Guest PTE permissions do not impact SPTE permissions for
-+                * direct MMUs.  Either there are no guest PTEs (CR0.PG=0) or
-+                * guest PTE permissions are enforced by the CPU (TDP enabled).
-+                */
-+               WARN_ON_ONCE(access != ACC_ALL);
-+               role.efer_nx = 0;
-+               role.cr0_wp = 0;
-+               role.smep_andnot_wp = 0;
-+               role.smap_andnot_wp = 0;
-+       }
-        role.access = access;
-        if (!direct_mmu && vcpu->arch.mmu->root_level <= PT32_ROOT_LEVEL) {
-                quadrant = gaddr >> (PAGE_SHIFT + (PT64_PT_BITS * level));
+Do you mean the emulated MMU is needed when it *only* wants to
+translate GVAs to GPAs in the guest level?
+In such cases, the hardware MMU cannot be used because hardware MMU
+can only translate GVAs to HPAs, right?
