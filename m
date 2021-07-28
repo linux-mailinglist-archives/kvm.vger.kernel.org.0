@@ -2,130 +2,111 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5EBC43D8855
-	for <lists+kvm@lfdr.de>; Wed, 28 Jul 2021 08:56:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 561A13D8881
+	for <lists+kvm@lfdr.de>; Wed, 28 Jul 2021 09:04:55 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233971AbhG1G4M (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 28 Jul 2021 02:56:12 -0400
-Received: from mga06.intel.com ([134.134.136.31]:50676 "EHLO mga06.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229939AbhG1G4L (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 28 Jul 2021 02:56:11 -0400
-X-IronPort-AV: E=McAfee;i="6200,9189,10058"; a="273673026"
-X-IronPort-AV: E=Sophos;i="5.84,275,1620716400"; 
-   d="scan'208";a="273673026"
-Received: from fmsmga003.fm.intel.com ([10.253.24.29])
-  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Jul 2021 23:56:09 -0700
-X-IronPort-AV: E=Sophos;i="5.84,275,1620716400"; 
-   d="scan'208";a="506293869"
-Received: from baiyun1-mobl1.ccr.corp.intel.com (HELO localhost) ([10.249.175.110])
-  by fmsmga003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Jul 2021 23:56:07 -0700
-Date:   Wed, 28 Jul 2021 14:56:05 +0800
-From:   Yu Zhang <yu.c.zhang@linux.intel.com>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Ben Gardon <bgardon@google.com>, kvm@vger.kernel.org
-Subject: Re: A question of TDP unloading.
-Message-ID: <20210728065605.e4ql2hzrj5fkngux@linux.intel.com>
-References: <20210727161957.lxevvmy37azm2h7z@linux.intel.com>
- <YQBLZ/RrBFxE4G4w@google.com>
+        id S233684AbhG1HEz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 28 Jul 2021 03:04:55 -0400
+Received: from mout.kundenserver.de ([212.227.17.13]:57487 "EHLO
+        mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229939AbhG1HEy (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 28 Jul 2021 03:04:54 -0400
+Received: from mail-wm1-f45.google.com ([209.85.128.45]) by
+ mrelayeu.kundenserver.de (mreue106 [213.165.67.113]) with ESMTPSA (Nemesis)
+ id 1N5FQJ-1n9Ipi13Bt-0117pO; Wed, 28 Jul 2021 09:04:51 +0200
+Received: by mail-wm1-f45.google.com with SMTP id n28-20020a05600c3b9cb02902552e60df56so922907wms.0;
+        Wed, 28 Jul 2021 00:04:51 -0700 (PDT)
+X-Gm-Message-State: AOAM5313lpJUfcDv78Dh6GGcjF/dUcJA84kHhrvqm6hxFWXBR6L9/9hM
+        vfekag4LmZwhS5UReejIy6UqimkJtFu+6mF3Fu4=
+X-Google-Smtp-Source: ABdhPJynD/9Il+Kw/wzVv2FoAI9EzaLkE/ynrgFuvxOuhTIZl8g9i0YgqUQZRMdYvUppf3KbqSXlK642XfMKR85CXEE=
+X-Received: by 2002:a1c:c90f:: with SMTP id f15mr7815803wmb.142.1627455890836;
+ Wed, 28 Jul 2021 00:04:50 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <YQBLZ/RrBFxE4G4w@google.com>
-User-Agent: NeoMutt/20171215
+References: <20210721161609.68223-1-yishaih@nvidia.com> <20210721161609.68223-13-yishaih@nvidia.com>
+ <20210727155440.680ee22e.alex.williamson@redhat.com> <20210727230941.GL1721383@nvidia.com>
+ <20210728054306.GA3421@lst.de>
+In-Reply-To: <20210728054306.GA3421@lst.de>
+From:   Arnd Bergmann <arnd@arndb.de>
+Date:   Wed, 28 Jul 2021 09:04:34 +0200
+X-Gmail-Original-Message-ID: <CAK8P3a3eSVoCYToP=7cNv97DO-fjV1G6a=-OnrNhXhsbBVU7Qg@mail.gmail.com>
+Message-ID: <CAK8P3a3eSVoCYToP=7cNv97DO-fjV1G6a=-OnrNhXhsbBVU7Qg@mail.gmail.com>
+Subject: Re: [PATCH 12/12] vfio/pci: Introduce vfio_pci_core.ko
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Jason Gunthorpe <jgg@nvidia.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Yishai Hadas <yishaih@nvidia.com>,
+        Bjorn Helgaas <bhelgaas@google.com>,
+        Jonathan Corbet <corbet@lwn.net>, diana.craciun@oss.nxp.com,
+        kwankhede@nvidia.com, Eric Auger <eric.auger@redhat.com>,
+        Masahiro Yamada <masahiroy@kernel.org>,
+        Michal Marek <michal.lkml@markovi.net>,
+        linux-pci <linux-pci@vger.kernel.org>,
+        "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>,
+        kvm list <kvm@vger.kernel.org>,
+        linux-s390 <linux-s390@vger.kernel.org>,
+        Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>,
+        mgurtovoy@nvidia.com, maorg@nvidia.com, leonro@nvidia.com
+Content-Type: text/plain; charset="UTF-8"
+X-Provags-ID: V03:K1:+f2qo4ua7/cksPQTjl1NeHfnGfT7wAnsfKlTOy/V9f/cIKCDU4Q
+ 2VTOnRHjOy+tvKnk1lEYzXGzMRqet4fiN7t1/mxOV2TDeDa0xGWLTPimgsCXdaKpX2zCv7R
+ n1WvBx4Fu4KHWc0uahadfNxt8V43q/H2FWirIDCprGgYrpWEy0dSRSSmShW2B6EZO86qkrB
+ hKYG7CQr0tzNmM1ipIWQw==
+X-Spam-Flag: NO
+X-UI-Out-Filterresults: notjunk:1;V03:K0:wm1Mt9kc0/k=:QUXNKlQGOBuDsiUq7keSe8
+ W0k4cMAQct3MqJNU0wxAL4V3brl58luotfZ5+yfJioS3VaIuJLhFLSw7Gu0MIzh28ClyxUCcf
+ HQoXWmK5DrP0KpPpnhTpTak5JLL+OU7yepJY8uI4I3SEtMa+AM8ujELMN4KgPU7HQuhNr8bNm
+ K4JADdEj181L/8r8/1xara1aShvnM/wIskSKvg0aY4JOSaYOEHmQALbHWxd65Q8ShbkCztSv9
+ Qeq7NyoSV00UB9V6LpYZmv2n1Nm5HrDLM2DvMyvXdNQs383OmONzrnHEuBQc97xDHfhskmDbw
+ nQgCNzXu0d5s4rE/nNUCaAPWenC9Ru58n45GzmpKuAKfQtxTB+yMDZhqR/ABGfMFCeoC27m37
+ RmJ+gFMgBimjmGraLc8d307bKXvTyta5UiLbnlnLxdaea2AztaEW9neAXpZLpX+XjT1zXPZeV
+ gXniN9bgh/6FI7ffcLWzKdtxgnr/epbx+yjqxeNPFE7fWG9FFHrbK+/2/tM7lr+Gk770c3MMZ
+ Tf698OLnPpLC0qtMNFz982BgryuR9qu0SSTII17xd/y+T860acPI8nAtpMSIVauRUK4IqS+Hn
+ k/toid48qel0gu5IhWqbXA3rkE0NU4qNxrHYkNaiakE7ycYRW0H+STXLqNFzgxZaLHa8BEIpb
+ JAGgW0FgSXXi7z94cvvwS2NWPW+FxOHY8AdRECyWYc/m50ro7wno++1tBH51xILlc/11niCx4
+ Rb43vSKQgYaIPYpG8x3ma1Ik9hPfxpjE5PV3y1Wc2U/ZEsfiyk/OvZd35MGMMqmxcR0Bjm+8V
+ u32m2E+iBBTed84zKqHVjYh7erU93iAPM7LWCllfs5Z94mYYaH/7W+6B+eFb7a547+GEScA
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Thanks a lot for your reply, Sean.
+On Wed, Jul 28, 2021 at 7:43 AM Christoph Hellwig <hch@lst.de> wrote:
+>
+> On Tue, Jul 27, 2021 at 08:09:41PM -0300, Jason Gunthorpe wrote:
+> > On Tue, Jul 27, 2021 at 03:54:40PM -0600, Alex Williamson wrote:
+> >
+> > > I'm still not happy with how this is likely to break users and even
+> > > downstreams when upgrading to a Kconfig with this change.
+> >
+> > I've never heard of Kconfig as stable ABI. Christoph/Arnd, have you
+> > heard of any cases where we want to keep it stable?
+>
+> It isn't an ABI, but we really do try to avoid breaking if we can and
+> I rember Linus shouting at people if they did that for common options.
 
-On Tue, Jul 27, 2021 at 06:07:35PM +0000, Sean Christopherson wrote:
-> On Wed, Jul 28, 2021, Yu Zhang wrote:
-> > Hi all,
-> > 
-> >   I'd like to ask a question about kvm_reset_context(): is there any
-> >   reason that we must alway unload TDP root in kvm_mmu_reset_context()?
-> 
-> The short answer is that mmu_role is changing, thus a new root shadow page is
-> needed.
+This is handled in very different ways depending on the maintainers,
+some people go to great lengths to avoid breaking 'make oldconfig'
+or 'make defconfig', others don't seem to mind at all.
 
-I saw the mmu_role is recalculated, but I have not figured out how this
-change would affect TDP. May I ask a favor to give an example? Thanks!
+CONFIG_USB_EHCI_TEGRA is an example of an option that was
+left in place to help users of old config files, another one is
+CONFIG_EXT3_FS. In both cases the idea is that the original
+code was changed, but the old option left in place to point to
+the replacement.
 
-I realized that if we only recalculate the mmu role, but do not unload
-the TDP root(e.g., when guest efer.nx flips), base role of the SPs will
-be inconsistent with the mmu context. But I do not understand why this
-shall affect TDP. 
+I think doing this is generally a good idea, but I would not consider
+this a stable ABI in the sense that we can never break it. Most users
+should have migrated to the new option after a few kernel releases,
+and then I would remove the old one.
 
-> 
-> >   As you know, KVM MMU needs to track guest paging mode changes, to
-> >   recalculate the mmu roles and reset callback routines(e.g., guest
-> >   page table walker). These are done in kvm_mmu_reset_context(). Also,
-> >   entering SMM, cpuid updates, and restoring L1 VMM's host state will
-> >   trigger kvm_mmu_reset_context() too.
-> >   
-> >   Meanwhile, another job done by kvm_mmu_reset_context() is to unload
-> >   the KVM MMU:
-> >   
-> >   - For shadow & legacy TDP, it means to unload the root shadow/TDP
-> >     page and reconstruct another one in kvm_mmu_reload(), before
-> >     entering guest. Old shadow/TDP pages will probably be reused later,
-> >     after future guest paging mode switches.
-> >   
-> >   - For TDP MMU, it is even more aggressive, all TDP pages will be
-> >     zapped, meaning a whole new TDP page table will be recontrustred,
-> >     with each paging mode change in the guest. I witnessed dozens of
-> >     rebuildings of TDP when booting a Linux guest(besides the ones
-> >     caused by memslots rearrangement).
-> >   
-> >   However, I am wondering, why do we need the unloading, if GPA->HPA
-> >   relationship is not changed? And if this is not a must, could we
-> >   find a way to refactor kvm_mmu_reset_context(), so that unloading
-> >   of TDP root is only performed when necessary(e.g, SMM switches and
-> >   maybe after cpuid updates which may change the level of TDP)? 
-> >   
-> >   I tried to add a parameter in kvm_mmu_reset_context(), to make the
-> >   unloading optional:  
-> > 
-> > +void kvm_mmu_reset_context(struct kvm_vcpu *vcpu, bool force_tdp_unload)
-> >  {
-> > -       kvm_mmu_unload(vcpu);
-> > +       if (!tdp_enabled || force_tdp_unload)
-> > +               kvm_mmu_unload(vcpu);
-> > +
-> >         kvm_init_mmu(vcpu);
-> >  }
-> > 
-> >   But this change brings another problem - if we keep the TDP root, the
-> >   role of existing SPs will be obsolete after guest paging mode changes.
-> >   Altough I guess most role flags are irrelevant in TDP, I am not sure
-> >   if this could cause any trouble.
-> >   
-> >   Is there anyone looking at this issue? Or do you have any suggestion?
-> 
-> What's the problem you're trying to solve?  kvm_mmu_reset_context() is most
-> definitely a big hammer, e.g. kvm_post_set_cr0() and kvm_post_set_cr4() in
-> particular could be reworked to do something like kvm_mmu_new_pgd() + kvm_init_mmu(),
-> but modifying mmu_role bits in CR0/CR4 should be a rare event, i.e. there hasn't
-> sufficient motivation to optimize CR0/CR4 changes.
+If a user upgrades across multiple kernel releases at once, usually
+all hope of reusing an old .config is lost anyway.
 
-Well, I noticed this when I was trying to find the reason why a single GFN
-can have multiple rmaps in TDP(not the SMM case, which uses different memslot).
-And the fact that guest paging mode change will cause the unloading of TDP
-looks counter-intuitive. I know I must have missed something important, and
-I have a strong desire to figure out why. :)
+> However lately for example the completely silly s/THUNDERBOLT/USB4/
+> change did slip through and did break my test setup with a vfio passed
+> through external nvme drive :(
 
-Then I tried with TDP MMU, yet to find the unloading is performed even more
-aggressively... 
+Another recent example is CONFIG_FB no longer being selected by
+the DRM subsystem, which broke a lot of defconfigs.
 
-> 
-> Note, most CR4 bits and CR0.PG are tracked in kvm_mmu_extended_role, not
-> kvm_mmu_page_role, which adds a minor wrinkle to the logic.
-> 
-
-The extended role is another pain point for me when reading KVM MMU code.
-I can understand it is useful in shadow, but does it also matters in TDP?
-
-B.R.
-Yu
+        Arnd
