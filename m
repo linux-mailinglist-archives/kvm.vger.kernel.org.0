@@ -2,174 +2,119 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 363053D8B88
-	for <lists+kvm@lfdr.de>; Wed, 28 Jul 2021 12:14:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9C8483D8BA2
+	for <lists+kvm@lfdr.de>; Wed, 28 Jul 2021 12:21:58 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235922AbhG1KOF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 28 Jul 2021 06:14:05 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:57242 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S231392AbhG1KOE (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 28 Jul 2021 06:14:04 -0400
-Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 16SA92Xf020977;
-        Wed, 28 Jul 2021 06:14:02 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding; s=pp1;
- bh=UgAVpsGwHapdSwi5xvEYmKK+0W5sxq9IyBy0pnemQ3E=;
- b=PE1o31qkGRRDNx3bnOu/gjSMwK4paoWyRixTW/f6gQaEiDJW78JELVu5fA6FsS8eJ5un
- x4M6cLr4SIr9fa0yzICyvmWrBkMFo2/zrSL+qE29tneaCxASTXJ/2y0r8pvm6mYeT2fA
- lTRRHqQLiCeE2CkINoeKlnaeqETwnVTEbJz8gIlJe4oAh4W4A4VgcD7N/+WkieiMK9uc
- WSRec4awegl3OxomeeOPJRApi3wys0/ZpRFkU+450u9ms/d2R5uCfMNjkU5NYFsaXLVT
- vG29DOFbfTB2u4xMZM0XT9T/J5J0QxFtWd11FTp4tqOY7W/mFiyix7DZ6dJ0nfSYeOEp 5Q== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 3a333x46tu-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 28 Jul 2021 06:14:02 -0400
-Received: from m0098420.ppops.net (m0098420.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 16SA9Yev026751;
-        Wed, 28 Jul 2021 06:14:01 -0400
-Received: from ppma03fra.de.ibm.com (6b.4a.5195.ip4.static.sl-reverse.com [149.81.74.107])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 3a333x46t7-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 28 Jul 2021 06:14:01 -0400
-Received: from pps.filterd (ppma03fra.de.ibm.com [127.0.0.1])
-        by ppma03fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 16SAD9YY027452;
-        Wed, 28 Jul 2021 10:14:00 GMT
-Received: from b06cxnps3074.portsmouth.uk.ibm.com (d06relay09.portsmouth.uk.ibm.com [9.149.109.194])
-        by ppma03fra.de.ibm.com with ESMTP id 3a235krmrm-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 28 Jul 2021 10:13:59 +0000
-Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
-        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 16SADvE733358126
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 28 Jul 2021 10:13:57 GMT
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 6C6F14C059;
-        Wed, 28 Jul 2021 10:13:57 +0000 (GMT)
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 17BCF4C040;
-        Wed, 28 Jul 2021 10:13:57 +0000 (GMT)
-Received: from t46lp67.lnxne.boe (unknown [9.152.108.100])
-        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Wed, 28 Jul 2021 10:13:57 +0000 (GMT)
-From:   Janosch Frank <frankja@linux.ibm.com>
-To:     kvm@vger.kernel.org
-Cc:     linux-s390@vger.kernel.org, imbrenda@linux.ibm.com,
-        david@redhat.com, thuth@redhat.com, cohuck@redhat.com
-Subject: [kvm-unit-tests PATCH 3/3] s390x: Fix my mail address in the headers
-Date:   Wed, 28 Jul 2021 10:13:28 +0000
-Message-Id: <20210728101328.51646-4-frankja@linux.ibm.com>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20210728101328.51646-1-frankja@linux.ibm.com>
-References: <20210728101328.51646-1-frankja@linux.ibm.com>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: kzeumPzKfkktDUcTAGVSeQivCIf7ugTv
-X-Proofpoint-ORIG-GUID: Hp9ytAGM0Dc-Xe4emcxUM-HVszKoLkDt
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.790
- definitions=2021-07-28_07:2021-07-27,2021-07-28 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0
- impostorscore=0 spamscore=0 mlxlogscore=999 adultscore=0 mlxscore=0
- priorityscore=1501 phishscore=0 bulkscore=0 suspectscore=0 clxscore=1015
- lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2107140000 definitions=main-2107280054
+        id S235612AbhG1KV5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 28 Jul 2021 06:21:57 -0400
+Received: from mail.kernel.org ([198.145.29.99]:41630 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229574AbhG1KV4 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 28 Jul 2021 06:21:56 -0400
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 5AA0160524;
+        Wed, 28 Jul 2021 10:21:55 +0000 (UTC)
+Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94.2)
+        (envelope-from <maz@kernel.org>)
+        id 1m8ghF-001VRt-94; Wed, 28 Jul 2021 11:21:53 +0100
+Date:   Wed, 28 Jul 2021 11:21:52 +0100
+Message-ID: <87y29qd9hb.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Will Deacon <will@kernel.org>
+Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        qperret@google.com, dbrazdil@google.com,
+        Srivatsa Vaddagiri <vatsa@codeaurora.org>,
+        Shanker R Donthineni <sdonthineni@nvidia.com>,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        kernel-team@android.com
+Subject: Re: [PATCH 05/16] KVM: arm64: Plumb MMIO checking into the fault handling
+In-Reply-To: <20210727181120.GD19173@willie-the-truck>
+References: <20210715163159.1480168-1-maz@kernel.org>
+        <20210715163159.1480168-6-maz@kernel.org>
+        <20210727181120.GD19173@willie-the-truck>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: will@kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, qperret@google.com, dbrazdil@google.com, vatsa@codeaurora.org, sdonthineni@nvidia.com, james.morse@arm.com, suzuki.poulose@arm.com, alexandru.elisei@arm.com, kernel-team@android.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-I used the wrong one once and then copied it over...
+On Tue, 27 Jul 2021 19:11:21 +0100,
+Will Deacon <will@kernel.org> wrote:
+> 
+> On Thu, Jul 15, 2021 at 05:31:48PM +0100, Marc Zyngier wrote:
+> > Plumb the MMIO checking code into the MMIO fault handling code.
+> > Nothing allows a region to be registered yet, so there should be
+> > no funtional change either.
+> 
+> Typo: functional
+> 
+> > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> > ---
+> >  arch/arm64/kvm/mmio.c | 10 ++++++++++
+> >  1 file changed, 10 insertions(+)
+> > 
+> > diff --git a/arch/arm64/kvm/mmio.c b/arch/arm64/kvm/mmio.c
+> > index 3dd38a151d2a..fd5747279d27 100644
+> > --- a/arch/arm64/kvm/mmio.c
+> > +++ b/arch/arm64/kvm/mmio.c
+> > @@ -6,6 +6,7 @@
+> >  
+> >  #include <linux/kvm_host.h>
+> >  #include <asm/kvm_emulate.h>
+> > +#include <asm/kvm_mmu.h>
+> >  #include <trace/events/kvm.h>
+> >  
+> >  #include "trace.h"
+> > @@ -130,6 +131,10 @@ int io_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa)
+> >  	int len;
+> >  	u8 data_buf[8];
+> >  
+> > +	/* Check failed? Return to the guest for debriefing... */
+> > +	if (!kvm_check_ioguard_page(vcpu, fault_ipa))
+> > +		return 1;
+> > +
+> >  	/*
+> >  	 * No valid syndrome? Ask userspace for help if it has
+> >  	 * volunteered to do so, and bail out otherwise.
+> > @@ -156,6 +161,11 @@ int io_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa)
+> >  	len = kvm_vcpu_dabt_get_as(vcpu);
+> >  	rt = kvm_vcpu_dabt_get_rd(vcpu);
+> >  
+> > +	/* If we cross a page boundary, check that too... */
+> > +	if (((fault_ipa + len - 1) & PAGE_MASK) != (fault_ipa & PAGE_MASK) &&
+> > +	    !kvm_check_ioguard_page(vcpu, fault_ipa + len - 1))
+> > +		return 1;
+> > +
+> 
+> I find this a little odd as the checks straddle the invalid syndrome check,
+> meaning that the relative priorities of KVM_ARCH_FLAG_MMIO_GUARD and
+> KVM_ARCH_FLAG_RETURN_NISV_IO_ABORT_TO_USER are unclear.
 
-Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
----
- lib/s390x/asm/mem.h | 2 +-
- lib/s390x/mmu.h     | 2 +-
- lib/s390x/stack.c   | 2 +-
- s390x/gs.c          | 2 +-
- s390x/iep.c         | 2 +-
- s390x/vector.c      | 2 +-
- 6 files changed, 6 insertions(+), 6 deletions(-)
+Good point. And the combination of both flags on its own is odd. Maybe
+KVM_ARCH_FLAG_RETURN_NISV_IO_ABORT_TO_USER should be ignored or deemed
+incompatible with the MMIO guard feature.
 
-diff --git a/lib/s390x/asm/mem.h b/lib/s390x/asm/mem.h
-index 1963cef7..40b22b63 100644
---- a/lib/s390x/asm/mem.h
-+++ b/lib/s390x/asm/mem.h
-@@ -3,7 +3,7 @@
-  * Physical memory management related functions and definitions.
-  *
-  * Copyright IBM Corp. 2018
-- * Author(s): Janosch Frank <frankja@de.ibm.com>
-+ * Author(s): Janosch Frank <frankja@linux.ibm.com>
-  */
- #ifndef _ASMS390X_MEM_H_
- #define _ASMS390X_MEM_H_
-diff --git a/lib/s390x/mmu.h b/lib/s390x/mmu.h
-index ab35d782..15f88e4f 100644
---- a/lib/s390x/mmu.h
-+++ b/lib/s390x/mmu.h
-@@ -5,7 +5,7 @@
-  * Copyright (c) 2018 IBM Corp
-  *
-  * Authors:
-- *	Janosch Frank <frankja@de.ibm.com>
-+ *	Janosch Frank <frankja@linux.ibm.com>
-  */
- #ifndef _S390X_MMU_H_
- #define _S390X_MMU_H_
-diff --git a/lib/s390x/stack.c b/lib/s390x/stack.c
-index 4cf80dae..e714e07c 100644
---- a/lib/s390x/stack.c
-+++ b/lib/s390x/stack.c
-@@ -8,7 +8,7 @@
-  * Authors:
-  *  Thomas Huth <thuth@redhat.com>
-  *  David Hildenbrand <david@redhat.com>
-- *  Janosch Frank <frankja@de.ibm.com>
-+ *  Janosch Frank <frankja@linux.ibm.com>
-  */
- #include <libcflat.h>
- #include <stack.h>
-diff --git a/s390x/gs.c b/s390x/gs.c
-index a017a97d..7567bb78 100644
---- a/s390x/gs.c
-+++ b/s390x/gs.c
-@@ -6,7 +6,7 @@
-  *
-  * Authors:
-  *    Martin Schwidefsky <schwidefsky@de.ibm.com>
-- *    Janosch Frank <frankja@de.ibm.com>
-+ *    Janosch Frank <frankja@linux.ibm.com>
-  */
- #include <libcflat.h>
- #include <asm/page.h>
-diff --git a/s390x/iep.c b/s390x/iep.c
-index 906c77b3..8d5e044b 100644
---- a/s390x/iep.c
-+++ b/s390x/iep.c
-@@ -5,7 +5,7 @@
-  * Copyright (c) 2018 IBM Corp
-  *
-  * Authors:
-- *	Janosch Frank <frankja@de.ibm.com>
-+ *	Janosch Frank <frankja@linux.ibm.com>
-  */
- #include <libcflat.h>
- #include <vmalloc.h>
-diff --git a/s390x/vector.c b/s390x/vector.c
-index fdb0eee2..c8c14e33 100644
---- a/s390x/vector.c
-+++ b/s390x/vector.c
-@@ -5,7 +5,7 @@
-  * Copyright 2018 IBM Corp.
-  *
-  * Authors:
-- *    Janosch Frank <frankja@de.ibm.com>
-+ *    Janosch Frank <frankja@linux.ibm.com>
-  */
- #include <libcflat.h>
- #include <asm/page.h>
+The lack of syndrome information means that we cannot really test for
+the boundaries of the access (len is invalid), so I'd be tempted to
+inject an abort in this case.
+
+Thoughts?
+
+	M.
+
 -- 
-2.30.2
-
+Without deviation from the norm, progress is not possible.
