@@ -2,89 +2,132 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 136C83D90C0
-	for <lists+kvm@lfdr.de>; Wed, 28 Jul 2021 16:35:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6F1233D90EA
+	for <lists+kvm@lfdr.de>; Wed, 28 Jul 2021 16:51:06 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236686AbhG1Ofq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 28 Jul 2021 10:35:46 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:52239 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S235420AbhG1Ofo (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 28 Jul 2021 10:35:44 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1627482941;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=Ns4+hvb10pCv09UW5xpgn10rDpJ/aUkX8DQEOdyq8JY=;
-        b=IfaZdKaXnSgLTo5YAIGQ+ZNt1lreaUakh64ESLzCW7jKwnPPF1mVFqmV++JhUaSY160Mxd
-        AuuBIi0ZhQo3+waaoowvqsyBZ/rR5x6JjDR4adJ6TAoco0A5xD2YT73Z9nX76fd7alg8p3
-        26ZXVKgm6jtyl8V/J7IZH0NI0kcU7EE=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-36-GcexpFPnMkCcL5SrrGEA4w-1; Wed, 28 Jul 2021 10:35:39 -0400
-X-MC-Unique: GcexpFPnMkCcL5SrrGEA4w-1
-Received: by mail-wm1-f71.google.com with SMTP id 25-20020a05600c0219b029024ebb12928cso1016331wmi.3
-        for <kvm@vger.kernel.org>; Wed, 28 Jul 2021 07:35:39 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=Ns4+hvb10pCv09UW5xpgn10rDpJ/aUkX8DQEOdyq8JY=;
-        b=U0iU5eItx/nCFpKxqzA53fmobuh+BMZsPHHjXM1v+D7I3Oux2GUZqkb0TOAN/2Fzqo
-         IkB8eA62W7DGkH0cZozpcnSCaEwdGO3SueI32FZTdx33N6IE6wxtRM7nERTnY5EwAy0R
-         4zeeduwYa+8WWJO9+B4r+RuqPu7Z9zqwcSq3YQJCxSlqn6+Yg0MXBKOLg+ch/hrtsQ1f
-         bGulbHZrRQ0E1tHaV+IVfK4dIabmMRNJdsWOxZRZXPoVeFMa9IN9EstA+7ZBZe5EmWnq
-         /rDgtUKCbKAoXn55DW+q9yXStzNfBwf15cWsl3k+6+jtnedEyBEA++OGl1hi9Nk3vdCd
-         nJvQ==
-X-Gm-Message-State: AOAM530vhGIVJC4gWQVvipWviG7OXG6qnhY3fiSl2mEHrWv2nqHKv/YF
-        vq//6KDU+6EJ/aAfPntoruOPo1pO3iEC7wP7GXuZgy7GqXvdTs4eUF9zHLxCn1PEQc8O2uAV7/2
-        sk/ZN49z/GW/I
-X-Received: by 2002:a05:600c:206:: with SMTP id 6mr9915966wmi.137.1627482938622;
-        Wed, 28 Jul 2021 07:35:38 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxhTb5ddWwmkLn/CH3sMlITeGS1cEIPUQGu9uQ0XfoNZUun5nGZqs9ljS4qYZVOiACLgBqPBg==
-X-Received: by 2002:a05:600c:206:: with SMTP id 6mr9915951wmi.137.1627482938459;
-        Wed, 28 Jul 2021 07:35:38 -0700 (PDT)
-Received: from thuth.remote.csb (p5791d475.dip0.t-ipconnect.de. [87.145.212.117])
-        by smtp.gmail.com with ESMTPSA id y19sm6033618wma.21.2021.07.28.07.35.37
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 28 Jul 2021 07:35:37 -0700 (PDT)
-Subject: Re: [kvm-unit-tests PATCH v2] s390x: Add SPDX and header comments for
- s390x/* and lib/s390x/*
-To:     Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org
-Cc:     linux-s390@vger.kernel.org, imbrenda@linux.ibm.com,
-        david@redhat.com, cohuck@redhat.com
-References: <20210728101328.51646-2-frankja@linux.ibm.com>
- <20210728125643.80840-1-frankja@linux.ibm.com>
-From:   Thomas Huth <thuth@redhat.com>
-Message-ID: <23050302-247b-11f6-249b-d9ead3a9bea3@redhat.com>
-Date:   Wed, 28 Jul 2021 16:35:37 +0200
+        id S236663AbhG1OvG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 28 Jul 2021 10:51:06 -0400
+Received: from foss.arm.com ([217.140.110.172]:58082 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S235345AbhG1OvF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 28 Jul 2021 10:51:05 -0400
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 86FDB1042;
+        Wed, 28 Jul 2021 07:51:03 -0700 (PDT)
+Received: from [192.168.1.179] (unknown [172.31.20.19])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 8FDC63F70D;
+        Wed, 28 Jul 2021 07:51:01 -0700 (PDT)
+Subject: Re: [PATCH 01/16] KVM: arm64: Generalise VM features into a set of
+ flags
+To:     Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>
+Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        qperret@google.com, dbrazdil@google.com,
+        Srivatsa Vaddagiri <vatsa@codeaurora.org>,
+        Shanker R Donthineni <sdonthineni@nvidia.com>,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        kernel-team@android.com
+References: <20210715163159.1480168-1-maz@kernel.org>
+ <20210715163159.1480168-2-maz@kernel.org>
+ <20210727181026.GA19173@willie-the-truck> <875ywuepxv.wl-maz@kernel.org>
+From:   Steven Price <steven.price@arm.com>
+Message-ID: <716fffdb-580a-bc70-478a-a54912a77c82@arm.com>
+Date:   Wed, 28 Jul 2021 15:51:00 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.12.0
+ Thunderbird/78.11.0
 MIME-Version: 1.0
-In-Reply-To: <20210728125643.80840-1-frankja@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
+In-Reply-To: <875ywuepxv.wl-maz@kernel.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-GB
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 28/07/2021 14.56, Janosch Frank wrote:
-> Seems like I missed adding them.
+On 28/07/2021 10:41, Marc Zyngier wrote:
+> On Tue, 27 Jul 2021 19:10:27 +0100,
+> Will Deacon <will@kernel.org> wrote:
+>>
+>> On Thu, Jul 15, 2021 at 05:31:44PM +0100, Marc Zyngier wrote:
+>>> We currently deal with a set of booleans for VM features,
+>>> while they could be better represented as set of flags
+>>> contained in an unsigned long, similarily to what we are
+>>> doing on the CPU side.
+>>>
+>>> Signed-off-by: Marc Zyngier <maz@kernel.org>
+>>> ---
+>>>  arch/arm64/include/asm/kvm_host.h | 12 +++++++-----
+>>>  arch/arm64/kvm/arm.c              |  5 +++--
+>>>  arch/arm64/kvm/mmio.c             |  3 ++-
+>>>  3 files changed, 12 insertions(+), 8 deletions(-)
+>>>
+>>> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+>>> index 41911585ae0c..4add6c27251f 100644
+>>> --- a/arch/arm64/include/asm/kvm_host.h
+>>> +++ b/arch/arm64/include/asm/kvm_host.h
+>>> @@ -122,7 +122,10 @@ struct kvm_arch {
+>>>  	 * should) opt in to this feature if KVM_CAP_ARM_NISV_TO_USER is
+>>>  	 * supported.
+>>>  	 */
+>>> -	bool return_nisv_io_abort_to_user;
+>>> +#define KVM_ARCH_FLAG_RETURN_NISV_IO_ABORT_TO_USER	0
+>>> +	/* Memory Tagging Extension enabled for the guest */
+>>> +#define KVM_ARCH_FLAG_MTE_ENABLED			1
+>>> +	unsigned long flags;
+>>
+>> One downside of packing all these together is that updating 'flags' now
+>> requires an atomic rmw sequence (i.e. set_bit()). Then again, that's
+>> probably for the best anyway given that kvm_vm_ioctl_enable_cap() looks
+>> like it doesn't hold any locks.
 > 
-> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
-> ---
+> That, and these operations are supposed to be extremely rare anyway.
 > 
-> Dropped the sieve.c change.
+>>
+>>>  	/*
+>>>  	 * VM-wide PMU filter, implemented as a bitmap and big enough for
+>>> @@ -133,9 +136,6 @@ struct kvm_arch {
+>>>  
+>>>  	u8 pfr0_csv2;
+>>>  	u8 pfr0_csv3;
+>>> -
+>>> -	/* Memory Tagging Extension enabled for the guest */
+>>> -	bool mte_enabled;
+>>>  };
+>>>  
+>>>  struct kvm_vcpu_fault_info {
+>>> @@ -777,7 +777,9 @@ bool kvm_arm_vcpu_is_finalized(struct kvm_vcpu *vcpu);
+>>>  #define kvm_arm_vcpu_sve_finalized(vcpu) \
+>>>  	((vcpu)->arch.flags & KVM_ARM64_VCPU_SVE_FINALIZED)
+>>>  
+>>> -#define kvm_has_mte(kvm) (system_supports_mte() && (kvm)->arch.mte_enabled)
+>>> +#define kvm_has_mte(kvm)					\
+>>> +	(system_supports_mte() &&				\
+>>> +	 test_bit(KVM_ARCH_FLAG_MTE_ENABLED, &(kvm)->arch.flags))
+>>
+>> Not an issue with this patch, but I just noticed that the
+>> system_supports_mte() check is redundant here as we only allow the flag to
+>> be set if that's already the case.
 > 
-> ---
->   lib/s390x/uv.c   |  9 +++++++++
->   s390x/mvpg-sie.c |  9 +++++++++
->   s390x/sie.c      | 10 ++++++++++
->   3 files changed, 28 insertions(+)
+> It allows us to save a memory access if system_supports_mte() is false
+> (it is eventually implemented as a static key). On the other hand,
+> there is so much inlining due to it being a non-final cap that we
+> probably lose on that too...
 
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+My original logic was that system_supports_mte() checks
+IS_ENABLED(CONFIG_ARM64_MTE) - so this enables the code guarded with
+kvm_has_mte() to be compiled out if CONFIG_ARM64_MTE is disabled.
 
+Indeed it turns at we currently rely on this (with CONFIG_ARM64_MTE
+disabled):
+
+aarch64-linux-gnu-ld: arch/arm64/kvm/mmu.o: in function `sanitise_mte_tags':
+/home/stepri01/work/linux/arch/arm64/kvm/mmu.c:887: undefined reference to `mte_clear_page_tags'
+aarch64-linux-gnu-ld: arch/arm64/kvm/guest.o: in function `kvm_vm_ioctl_mte_copy_tags':
+/home/stepri01/work/linux/arch/arm64/kvm/guest.c:1066: undefined reference to `mte_copy_tags_to_user'
+aarch64-linux-gnu-ld: /home/stepri01/work/linux/arch/arm64/kvm/guest.c:1074: undefined reference to `mte_copy_tags_from_user'
+
+Obviously we could pull just the IS_ENABLED() into kvm_has_mte() instead.
+
+Steve
