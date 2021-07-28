@@ -2,206 +2,92 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2803A3D92C1
-	for <lists+kvm@lfdr.de>; Wed, 28 Jul 2021 18:08:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 92E883D9315
+	for <lists+kvm@lfdr.de>; Wed, 28 Jul 2021 18:22:22 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237381AbhG1QIF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 28 Jul 2021 12:08:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33650 "EHLO
+        id S229968AbhG1QWW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 28 Jul 2021 12:22:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37228 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237803AbhG1QH1 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 28 Jul 2021 12:07:27 -0400
-Received: from mail-pl1-x629.google.com (mail-pl1-x629.google.com [IPv6:2607:f8b0:4864:20::629])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2A526C061757
-        for <kvm@vger.kernel.org>; Wed, 28 Jul 2021 09:07:25 -0700 (PDT)
-Received: by mail-pl1-x629.google.com with SMTP id f13so3278658plj.2
-        for <kvm@vger.kernel.org>; Wed, 28 Jul 2021 09:07:25 -0700 (PDT)
+        with ESMTP id S229914AbhG1QWW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 28 Jul 2021 12:22:22 -0400
+Received: from mail-pl1-x631.google.com (mail-pl1-x631.google.com [IPv6:2607:f8b0:4864:20::631])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B0944C061757
+        for <kvm@vger.kernel.org>; Wed, 28 Jul 2021 09:22:20 -0700 (PDT)
+Received: by mail-pl1-x631.google.com with SMTP id d1so3333229pll.1
+        for <kvm@vger.kernel.org>; Wed, 28 Jul 2021 09:22:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=B9f6uyUz014fnggzO8Lz7MpHz0USkcYzM/T+4Ea78YM=;
-        b=UU5KdHZMP9IBGOyfkQN4ImyUxqovhAimR6tPwqXnZG0/QBAtlYgm5bNzO/2W3e3Mm4
-         o0ygSHzBIDMjtiuybMD47c94ckdLt4Dok/gkm32senPg5kCn0K9ZpDerrYWDfsHo4UPn
-         r/CkGC3O0SYBwaldA9baaB+4/0xzxd6cuB8kfc2kHexu53l5XLxuEM9Tm00EYYo8rfRg
-         4lsoaTnwx+e1oSMKMkOF3a5o45XXbDIJ0sgfDtR/zjYrkrwEqzGkdK4vk83uYig5GmLa
-         BwVF8M8KEfUf9nBZFdTP78JGEDhYKce4ojgcs/nGBODMepMkcO/UqD79xte6Glxl3Err
-         dWfQ==
+        bh=SX77jUngzbzpeyvU9f3wQNjCF2DwI9f6Oq2Toy5MXcw=;
+        b=KvCtjpjMprp7cO4bWkJe1GwIb9HVJ2dQsU1C+zOdylAGzcWlN3EhgUY05GiYpg8GS3
+         BmefgJlebXvJ5bk14+kQbwNBTq8N9gZr03qwY1IcgaEtLX8kdQZaLlzjeU/pmLw8Ew+I
+         DTxjfJYAbJY9HIGWtbcauxW7y9VMia9m2VvJ8LRdJc3+17hBm+tvRxtzrgXc8QnvYdRj
+         TiPyoB7KDSBPdgMeiXEeH96EXCyjCBoN3UuLVr08WF6yDYILoZkEVItsv/MpgdoBfAZw
+         WglAeZeWJPaeFTwduFE9cRL1lR5XyC93A+NiNQWZ6KGm7vf8PaKSawHvIt45W380Aee0
+         dqWA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=B9f6uyUz014fnggzO8Lz7MpHz0USkcYzM/T+4Ea78YM=;
-        b=jEzpmTkBP7RvzkDn+2Aay2f6ZjLJZO5hzj01QKZb/xsmftfnPk1g0TntjwdPY83xyJ
-         /ojb1OAX9b/vowwOtj+ClYoMuB5RaEeOEW8x2ViHymTpYnSynk5Lfxr+YboHuOEQN/TK
-         SJHOtFX9/lBR/S3KxnmgFJmQE/F3GLj0pzoKqzAP8Rr1CkyNprFGyHlK+lXgIZZAeg+g
-         9kqUaIbqLDK01K9fYwq3S5ngNPdVxvk75wMbYlHGY9aeMxoUjkUsEx7HzeIGg+lZXOmu
-         PiHQEtQAamw/Z8hF18PekGXv3aeDqiwC6XxFAVIsm2PMDDQZBBw6mrg1yiWQf2xo1pDW
-         tPCQ==
-X-Gm-Message-State: AOAM533+C92gSJRq4CecqDvpzgky2LXzkMiK9uSmd4Vq8Xm10t0vxNyH
-        Iztuglz7qUCLAiHssyQdFBKeJg==
-X-Google-Smtp-Source: ABdhPJyqhBT8FeAgjWJJ7ruwe46Q1IYbCWhTolNxYnN/jxsLiNOLefPNDqxF2KFRU35oEYxZ5FBXew==
-X-Received: by 2002:a63:593:: with SMTP id 141mr494827pgf.133.1627488444252;
-        Wed, 28 Jul 2021 09:07:24 -0700 (PDT)
+        bh=SX77jUngzbzpeyvU9f3wQNjCF2DwI9f6Oq2Toy5MXcw=;
+        b=ac4epqtMVHiaZFcmHXcrC1DgU/Zd8O/rHl512bE3qX+CrejA+Ic8rbsL6fOSTUMcoG
+         4naJny2yGYRgsfcdm923qddAQRahdQOifeyCrxI7/oouzDbU/FRJU7B69tKJa2yjaFHU
+         boSp0c3cXYaY7fA4OJGpouwYRUZaqyZJGtYFmkKOEMFid7drYQCrTpM/kaV5vnCEPrlw
+         CoYptiQhbEePVuJju0sOo0GLfNDo/7Melz6O8SCwiaF7i2JnvjCCNbjn9ZXUbw6Cz/cO
+         74E9ditWdbA713+V4TJ6pzvl1aH+cUidqUmIQeyS0fKDOSD5MQGOzkVUZgj2bOjEfm+T
+         gZHg==
+X-Gm-Message-State: AOAM533K5KKPhiaAiUHK75IbcnXmYfBYQXZI6116Jobt2HlpDARMlG/S
+        i7PLmAunOikQhKuLkLiammi3bbXLI4NY2TeT
+X-Google-Smtp-Source: ABdhPJzA3BBIVd+9l/f7oVcmDvOuujhZLkKM56p3RvSH0xXZBMYNJVzR1k+d0z7H+GLq/tOjM+IbYw==
+X-Received: by 2002:a17:90b:248e:: with SMTP id nt14mr606301pjb.144.1627489340043;
+        Wed, 28 Jul 2021 09:22:20 -0700 (PDT)
 Received: from google.com (254.80.82.34.bc.googleusercontent.com. [34.82.80.254])
-        by smtp.gmail.com with ESMTPSA id c2sm165230pgh.82.2021.07.28.09.07.23
+        by smtp.gmail.com with ESMTPSA id a4sm517203pfk.5.2021.07.28.09.22.19
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 28 Jul 2021 09:07:23 -0700 (PDT)
-Date:   Wed, 28 Jul 2021 16:07:19 +0000
+        Wed, 28 Jul 2021 09:22:19 -0700 (PDT)
+Date:   Wed, 28 Jul 2021 16:22:15 +0000
 From:   David Matlack <dmatlack@google.com>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Erdem Aktas <erdemaktas@google.com>,
-        linux-kselftest@vger.kernel.org, Peter Gonda <pgonda@google.com>,
-        Marc Orr <marcorr@google.com>, Sagi Shahar <sagis@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Shuah Khan <shuah@kernel.org>,
-        Andrew Jones <drjones@redhat.com>,
-        Ben Gardon <bgardon@google.com>, Peter Xu <peterx@redhat.com>,
-        Emanuele Giuseppe Esposito <eesposit@redhat.com>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Ricardo Koller <ricarkol@google.com>,
-        Eric Auger <eric.auger@redhat.com>,
-        Yanan Wang <wangyanan55@huawei.com>,
-        Aaron Lewis <aaronlewis@google.com>,
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     kvm@vger.kernel.org, Ben Gardon <bgardon@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
         Jim Mattson <jmattson@google.com>,
-        Oliver Upton <oupton@google.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Peter Shier <pshier@google.com>,
-        Axel Rasmussen <axelrasmussen@google.com>,
-        Zhenzhong Duan <zhenzhong.duan@intel.com>,
-        "Maciej S. Szmigiero" <maciej.szmigiero@oracle.com>,
-        Like Xu <like.xu@linux.intel.com>,
-        open list <linux-kernel@vger.kernel.org>,
-        "open list:KERNEL VIRTUAL MACHINE (KVM)" <kvm@vger.kernel.org>
-Subject: Re: [RFC PATCH 1/4] KVM: selftests: Add support for creating
- non-default type VMs
-Message-ID: <YQGAtxWqBhBUYWBN@google.com>
-References: <20210726183816.1343022-1-erdemaktas@google.com>
- <20210726183816.1343022-2-erdemaktas@google.com>
- <YP82iIe3vM/+fRAh@google.com>
- <YQBw8BIcCAq5ybHr@google.com>
+        Sean Christopherson <seanjc@google.com>,
+        Junaid Shahid <junaids@google.com>,
+        Andrew Jones <drjones@redhat.com>,
+        Matthew Wilcox <willy@infradead.org>,
+        Yu Zhao <yuzhao@google.com>,
+        David Hildenbrand <david@redhat.com>,
+        Andrew Morton <akpm@linux-foundation.org>
+Subject: Re: [PATCH v3 0/6] KVM: x86/mmu: Fast page fault support for the TDP
+ MMU
+Message-ID: <YQGEN9/IXi/BcLJ3@google.com>
+References: <20210713220957.3493520-1-dmatlack@google.com>
+ <d30ba4b6-2415-4386-6036-9ee2be8a97c0@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <YQBw8BIcCAq5ybHr@google.com>
+In-Reply-To: <d30ba4b6-2415-4386-6036-9ee2be8a97c0@redhat.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jul 27, 2021 at 08:47:44PM +0000, Sean Christopherson wrote:
-> On Mon, Jul 26, 2021, David Matlack wrote:
-> > On Mon, Jul 26, 2021 at 11:37:54AM -0700, Erdem Aktas wrote:
-> > > Currently vm_create function only creates KVM_X86_LEGACY_VM type VMs.
-> > > Changing the vm_create function to accept type parameter to create
-> > > new VM types.
-> > > 
-> > > Signed-off-by: Erdem Aktas <erdemaktas@google.com>
-> > > Reviewed-by: Sean Christopherson <seanjc@google.com>
+On Mon, Jul 26, 2021 at 03:50:58PM +0200, Paolo Bonzini wrote:
+> On 14/07/21 00:09, David Matlack wrote:
+> > This patch series adds support for the TDP MMU in the fast_page_fault
+> > path, which enables certain write-protection and access tracking faults
+> > to be handled without taking the KVM MMU lock. This series brings the
+> > performance of these faults up to par with the legacy MMU.
 > 
-> *-by tags should not be added unless explicitly provided.  IIRC, our internal
-> gerrit will convert +1 to Reviewed-by, but I don't think that's the case here.
-> This applies to all patches in this series.
-> 
-> See "Using Reported-by:, Tested-by:, Reviewed-by:, Suggested-by: and Fixes:" in
-> Documentation/process/submitting-patches.rst for more info.
-> 
-> > > Reviewed-by: Peter Gonda <pgonda@google.com>
-> > > Reviewed-by: Marc Orr <marcorr@google.com>
-> > > Reviewed-by: Sagi Shahar <sagis@google.com>
-> > 
-> > Reviewed-by: David Matlack <dmatlack@google.com>
-> > 
-> > (aside from the nit below)
-> > 
-> > > ---
-> > >  .../testing/selftests/kvm/include/kvm_util.h  |  1 +
-> > >  tools/testing/selftests/kvm/lib/kvm_util.c    | 29 +++++++++++++++++--
-> > >  2 files changed, 27 insertions(+), 3 deletions(-)
-> > > 
-> > > diff --git a/tools/testing/selftests/kvm/include/kvm_util.h b/tools/testing/selftests/kvm/include/kvm_util.h
-> > > index d53bfadd2..c63df42d6 100644
-> > > --- a/tools/testing/selftests/kvm/include/kvm_util.h
-> > > +++ b/tools/testing/selftests/kvm/include/kvm_util.h
-> > > @@ -88,6 +88,7 @@ int vcpu_enable_cap(struct kvm_vm *vm, uint32_t vcpu_id,
-> > >  void vm_enable_dirty_ring(struct kvm_vm *vm, uint32_t ring_size);
-> > >  
-> > >  struct kvm_vm *vm_create(enum vm_guest_mode mode, uint64_t phy_pages, int perm);
-> > > +struct kvm_vm *__vm_create(enum vm_guest_mode mode, uint64_t phy_pages, int perm, int type);
-> > 
-> > nit: Consider using a more readable function name such as
-> > vm_create_with_type().
-> 
-> Ha!  This is why I don't like doing internal reviews :-D
+> Queued, thanks.
 
-+1 :)
+Thanks Paolo. I noticed on PATCH 3 you changed the if-return to if-else.
+What was your rational? (I want to make sure I incorporate it in future
+patches.)
 
 > 
-> Erdem originally had vm_create_type(), I suggested __vm_create() as the double
-> underscore scheme is more common in the kernel for cases where there's a default
-> wrapper and an inner helper that implements the full API.
+> Paolo
 > 
-> Convention aside, the argument againsts ...with_type() are that it doesn't scale,
-> e.g. if someone adds another parameter parameter for which vm_create() provides a
-> default, and it doesn't self-document the relationship between vm_create() and
-> the inner helper, e.g. by convention, based on names alone I know that vm_create()
-> likely is a wrapper around __vm_create().
-
-True, although with __vm_create() is not solving the scalability
-problem, it's just preventing scaling altogether (you can only have 1
-wrapper function, vm_create). So if any caller wants to override one of
-the defaults they have to override all of them.
-
-I agree with you though in this case: __vm_create() is a better choice
-(especially given the existence of vm_create_with_vcpus).
-
-A better option than both (but would involve more work) would be to
-create an options struct with all optional arguments. Unfortunately C
-makes working with options structs a bit clumsy. But it's something to
-consider as the number of options passed to __vm_create increases.
-
-For example:
-
-struct vm_options {
-        enum vm_guest_mode mode;
-        uint64_t phy_pages;
-        int perm;
-        int type;
-};
-
-struct kvm_vm *vm_create(const struct vm_options *options)
-{
-        ...
-}
-
-static const struct vm_options default_vm_options = {
-  .mode = VM_MODE_DEFAULT,
-  .phy_pages = DEFAULT_GUEST_PHY_PAGES,
-  .perm = O_RDWR,
-  .type = DEFAULT_VM_TYPE,
-};
-
-/* Create a VM with default options. */
-vm = create_vm(&default_vm_options);
-
-/* Create a VM with TDX enabled. */
-struct vm_options options = default_vm_options;
-options.type = VM_TYPE_TDX;
-vm = create_vm(&options);
-
-(I'm sure I ham-fisted the const stuff but you get the idea.)
-
-I'm toying with introducing an options struct to perf_test_util as well
-so this is very top of mind.
-
-> 
-> Compare that with the existing
-> 
->   vm_create_default_with_vcpus()
->   vm_create_default()
->   vm_create_with_vcpus()
->   vm_create()
-> 
-> where the relationship between all the helpers is not immediately clear, and
-> vm_create_with_vcpus() is a misnomer because it does much more than call vm_create()
-> and instantiate vCPUs, e.g. it also instantiates the IRQ chip and loads the test
-> into guest memory.
