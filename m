@@ -2,100 +2,181 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2D9A13D9398
-	for <lists+kvm@lfdr.de>; Wed, 28 Jul 2021 18:51:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D2B293D942E
+	for <lists+kvm@lfdr.de>; Wed, 28 Jul 2021 19:23:16 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229716AbhG1Qv5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 28 Jul 2021 12:51:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44344 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229537AbhG1Qv5 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 28 Jul 2021 12:51:57 -0400
-Received: from mail-pl1-x62d.google.com (mail-pl1-x62d.google.com [IPv6:2607:f8b0:4864:20::62d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 88368C061764
-        for <kvm@vger.kernel.org>; Wed, 28 Jul 2021 09:51:55 -0700 (PDT)
-Received: by mail-pl1-x62d.google.com with SMTP id e5so3406156pld.6
-        for <kvm@vger.kernel.org>; Wed, 28 Jul 2021 09:51:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=qCPT4bVwwR8ai3a6eA6/fF0tOyNcgHz50ZuIx8a534o=;
-        b=dMzmTUSnosm/iHkWAoP9DVdTxjicL604f4Cb691mO0xLlWzl1lxDi0I5v80JbvapeL
-         xi7SV7RTFrxsT600ehMokUmTeLg69m4nWFIpMWkg5/2VylXavXWLdX5m12NRv7gkznCv
-         LC/keunwPko8qkM4Cmm42n8CIWUrHhCwdMeMeXWpqNnZIcwuJdV6LFztW+QUDQvG4HoM
-         j2CKMaWMy2LQzHH7CioAkmfb4cSiv23lZ8yFvage+0fcOi5z88WDNwpPrk5Swv8kQucn
-         wUSgw6uLYoqWEUM+7P/obhiyEnM4qy/4wUiSdayne+tI4zwFp/m09ycflePra7mYOZvu
-         8Nyw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=qCPT4bVwwR8ai3a6eA6/fF0tOyNcgHz50ZuIx8a534o=;
-        b=g4Lni1xtHbZlJ3FkKjS4iw1YN+IPSAjFPNoZC0OJxusH7uCf0oRBcs4qJnhCBXoxvQ
-         ebSVx2Wb6Wx9Ooz5ZBz8R1oFaUg9/C6VAtqidOcv17sokLPNKMJtZPORZS2u5od9RXEW
-         QS5p5rr8usswvnJA4D087fg4QuMToG2rx7LRccTSlwiUFqiju3J6QK73N2pnYgj93gLm
-         8v44NDO5eZeIfVvdKInZXhFxFbLhwBidQiey6Khp3SWK3WVl+o0C7+aF4IQigxy+L9Yl
-         mNPKieVluuRRTBrnCIhEvhUcK+3eeftCeQHe0POOqc9MDik0u+e6Pqku07HWt/Re9vf1
-         ucMg==
-X-Gm-Message-State: AOAM530g66zku9oxJ46NsXjVPR13Po5ZIPcwPV52YOq4GKMHFjyQ2qGJ
-        lXyRtzZ6Zg9L6lwnkgOo22apng==
-X-Google-Smtp-Source: ABdhPJyDcd4jgGC6QwVVtEOI+2Yz7a+SUlYoO1hC9Alm5zD0P5RC7YiblpIcYybXHIGTC3dFf27Kug==
-X-Received: by 2002:a63:cd4d:: with SMTP id a13mr707167pgj.364.1627491114753;
-        Wed, 28 Jul 2021 09:51:54 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id f16sm276873pgb.51.2021.07.28.09.51.53
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 28 Jul 2021 09:51:54 -0700 (PDT)
-Date:   Wed, 28 Jul 2021 16:51:50 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     isaku.yamahata@intel.com, Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        "H . Peter Anvin" <hpa@zytor.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, erdemaktas@google.com,
-        Connor Kuehl <ckuehl@redhat.com>, x86@kernel.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        isaku.yamahata@gmail.com
-Subject: Re: [RFC PATCH v2 00/69] KVM: X86: TDX support
-Message-ID: <YQGLJrvjTNZAqU61@google.com>
-References: <cover.1625186503.git.isaku.yamahata@intel.com>
- <0d453d76-11e7-aeb9-b890-f457afbb6614@redhat.com>
+        id S229904AbhG1RXQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 28 Jul 2021 13:23:16 -0400
+Received: from mga04.intel.com ([192.55.52.120]:2659 "EHLO mga04.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229515AbhG1RXP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 28 Jul 2021 13:23:15 -0400
+X-IronPort-AV: E=McAfee;i="6200,9189,10059"; a="210828495"
+X-IronPort-AV: E=Sophos;i="5.84,276,1620716400"; 
+   d="scan'208";a="210828495"
+Received: from fmsmga003.fm.intel.com ([10.253.24.29])
+  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Jul 2021 10:23:13 -0700
+X-IronPort-AV: E=Sophos;i="5.84,276,1620716400"; 
+   d="scan'208";a="506617562"
+Received: from xiaoluji-mobl1.ccr.corp.intel.com (HELO localhost) ([10.249.174.154])
+  by fmsmga003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Jul 2021 10:23:12 -0700
+Date:   Thu, 29 Jul 2021 01:23:11 +0800
+From:   Yu Zhang <yu.c.zhang@linux.intel.com>
+To:     Ben Gardon <bgardon@google.com>
+Cc:     Yan Zhao <yan.y.zhao@intel.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+Subject: Re: A question of TDP unloading.
+Message-ID: <20210728172241.aizlvj2alvxfvd43@linux.intel.com>
+References: <20210727161957.lxevvmy37azm2h7z@linux.intel.com>
+ <YQBLZ/RrBFxE4G4w@google.com>
+ <20210728065605.e4ql2hzrj5fkngux@linux.intel.com>
+ <20210728072514.GA375@yzhao56-desk.sh.intel.com>
+ <CANgfPd_Rt3udm8mUHzX=MaXPOafkXhUt++7ACNsG1PnPiLswnw@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <0d453d76-11e7-aeb9-b890-f457afbb6614@redhat.com>
+In-Reply-To: <CANgfPd_Rt3udm8mUHzX=MaXPOafkXhUt++7ACNsG1PnPiLswnw@mail.gmail.com>
+User-Agent: NeoMutt/20171215
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Jul 26, 2021, Paolo Bonzini wrote:
-> On 03/07/21 00:04, isaku.yamahata@intel.com wrote:
-> > * Patch organization
-> > The patch 66 is main change.  The preceding patches(1-65) The preceding
-> > patches(01-61) are refactoring the code and introducing additional hooks.
-> > 
-> > - 01-12: They are preparations. introduce architecture constants, code
-> >           refactoring, export symbols for following patches.
-> > - 13-40: start to introduce the new type of VM and allow the coexistence of
-> >           multiple type of VM. allow/disallow KVM ioctl where
-> >           appropriate. Especially make per-system ioctl to per-VM ioctl.
-> > - 41-65: refactoring KVM VMX/MMU and adding new hooks for Secure EPT.
-> > - 66:    main patch to add "basic" support for building/running TDX.
-> > - 67:    trace points for
-> > - 68-69:  Documentation
+On Wed, Jul 28, 2021 at 09:23:53AM -0700, Ben Gardon wrote:
+> On Wed, Jul 28, 2021 at 12:40 AM Yan Zhao <yan.y.zhao@intel.com> wrote:
+> >
+> > On Wed, Jul 28, 2021 at 02:56:05PM +0800, Yu Zhang wrote:
+> > > Thanks a lot for your reply, Sean.
+> > >
+> > > On Tue, Jul 27, 2021 at 06:07:35PM +0000, Sean Christopherson wrote:
+> > > > On Wed, Jul 28, 2021, Yu Zhang wrote:
+> > > > > Hi all,
+> > > > >
+> > > > >   I'd like to ask a question about kvm_reset_context(): is there any
+> > > > >   reason that we must alway unload TDP root in kvm_mmu_reset_context()?
 > 
-> Queued 2,3,17-20,23,44-45, thanks.
+> I just realized I sent my response to Yu yesterday without reply-all.
+> Sending it again here for posterity. I'll add comments on the
+> discussion inline below too.
 
-I strongly object to merging these two until we see the new SEAMLDR code:
+Thanks Ben, I copied my reply here. With some gramar fixes. :)
 
-  [RFC PATCH v2 02/69] KVM: X86: move kvm_cpu_vmxon() from vmx.c to virtext.h
-  [RFC PATCH v2 03/69] KVM: X86: move out the definition vmcs_hdr/vmcs from kvm to x86
+> 
+> Hi Yu,
+> 
+> I think the short answer here is no, there's no reason we can't keep
+> the root around for later.
+> 
+> When developing the TDP MMU, we were primarily concerned about
+> performance post-boot, especially during migration or when
+> re-populating memory for demand paging. In these scenarios the guest
+> role doesn't really change and so the TDP MMU's shadow page tables
+> aren't torn down. In my initial testing, I thought I only ever
+> observed two TDP MMU roots be allocated over the life of the VM, but I
+> could be wrong.
 
-If the SEAMLDR code ends up being fully contained in KVM, then this is unnecessary
-churn and exposes code outside of KVM that we may not want exposed (yet).  E.g.
-setting and clearing CR4.VMXE (in the fault path) in cpu_vmxon() may not be
-necessary/desirable for SEAMLDR, we simply can't tell without seeing the code.
+Well I observed more, may be because I am using OVMF? Note, the vCPU
+number is just one in my test.
+
+> 
+> For the TDP MMU root to be torn down, there also has to be no vCPU
+> using it. This probably happens in transitions to SMM and guest root
+> level changes, but I suspected that there would usually be at least
+> one vCPU in some "normal" mode, post boot. That may have been an
+> incorrect assumption.
+> 
+> I think the easiest solution to this would be to just have the TDP MMU
+> roots track the life of the VM by adding an extra increment to their
+> reference count on allocation and an extra decrement when the VM is
+> torn down. However this introduces a problem because it increases the
+> amount of memory the TDP MMU is likely to be using for its page
+> tables. (It could use the memory either way but it would require some
+> surprising guest behavior.)
+
+So your suggestion is, once allocated, do not free the root page until
+the VM is destroyed?
+
+> 
+> I have a few questions about these unnecessary tear-downs during boot:
+> 1. How many teardowns did you observe, and how many different roles
+> did they represent? Just thrashing between two roles, or 12 different
+> roles?
+
+I saw 106 reloadings of the root TDP. Among them, 14 are caused by memslot
+changes. Remaining ones are caused by the context reset from CR0/CR4/EFER
+changes(85 for CR0 changes). And I believe most are using the same roles,
+because in legacy TDP, only 4 different TDP roots are allocated due to the
+context reset(and several more are caused by memslot updating). But in TDP
+MMU, that means 106 times of TDP root being torn down and reallocated.
+
+> 2. When the TDP MMU's page tables got torn down, how much memory did
+> they map / how big were they?
+
+I did not collect this in TDP MMU, but I once tried with legacy TDP. IIRC,
+there are only several SPs allocated in one TDP table when the context resets.
+
+> 3. If you hacked in the extra refcount increment I suggested above,
+> how much of a difference in boot time does it make?
+
+I have not tried this, but I think that proposal is let TDP MMU try to
+reuse previous root page with same mmu role with current context, just
+like the legacy TDP does?
+
+Actually I am curious, why would the root needs to be unloaded at all(even
+in the legacy TDP code)? Sean's reply mentioned that change of the mmu role
+is the reason, but I do not understand yet.
+
+> 
+> For 2 and 3 I ask because if the guest hasn't accessed much of it's
+> memory early in boot, the paging structure won't be very large and
+> tearing it down / rebuilding it is pretty cheap.
+
+Agree. But I am a bit surprised to see so many CR0 changes in the boot time.
+
+> 
+> We may find that we need some kind of page quota for the TDP MMU after
+> all, if we want to have a bunch of roots at the same time. If that's
+> the case, perhaps we should spawn another email thread to discuss how
+> that should work.
+
+Could we find a way to obviate the requirement of unloading(if unnecessary)?
+
+> 
+> Thanks for raising this issue!
+> Ben
+> 
+> > > >
+> > > > The short answer is that mmu_role is changing, thus a new root shadow page is
+> > > > needed.
+> > >
+> > > I saw the mmu_role is recalculated, but I have not figured out how this
+> > > change would affect TDP. May I ask a favor to give an example? Thanks!
+> 
+> One really simple example is if the guest started using SMM. In that
+> case it's a totally different address space, so we need a new EPT.
+
+Yes. I admit unloading the MMU is necessary for SMM. But what about the other
+scenarios? :)
+
+> 
+> > >
+> > > I realized that if we only recalculate the mmu role, but do not unload
+> > > the TDP root(e.g., when guest efer.nx flips), base role of the SPs will
+> > > be inconsistent with the mmu context. But I do not understand why this
+> > > shall affect TDP.
+> 
+> It might not always cause problems since TDP is less sensitive to this
+> kind of thing than shadow paging, but getting all the details right is
+> hard so we just took the conservative approach of handling all role
+> changes with a new root.
+
+I have the same feeling, but I doubt if it will *never* cause any problem. :)
+
+Another impact I can think of is: without unloading, the root_hpa will not
+be set to INVALID_PAGE, hence the kvm_mmu_load() will not be called before
+vcpu entry(which may reload guest CR3/PDPTRs as well). But I have no idea
+if this could cause any trouble or not.
+
+B.R.
+Yu
