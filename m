@@ -2,143 +2,135 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id EBFF13D8901
-	for <lists+kvm@lfdr.de>; Wed, 28 Jul 2021 09:40:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C9D653D88DB
+	for <lists+kvm@lfdr.de>; Wed, 28 Jul 2021 09:30:58 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233937AbhG1HkL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 28 Jul 2021 03:40:11 -0400
-Received: from mga07.intel.com ([134.134.136.100]:62218 "EHLO mga07.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S233407AbhG1HkK (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 28 Jul 2021 03:40:10 -0400
-X-IronPort-AV: E=McAfee;i="6200,9189,10058"; a="276388920"
-X-IronPort-AV: E=Sophos;i="5.84,275,1620716400"; 
-   d="scan'208";a="276388920"
-Received: from fmsmga003.fm.intel.com ([10.253.24.29])
-  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Jul 2021 00:40:08 -0700
-X-IronPort-AV: E=Sophos;i="5.84,275,1620716400"; 
-   d="scan'208";a="506323868"
-Received: from yzhao56-desk.sh.intel.com ([10.239.13.16])
-  by fmsmga003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Jul 2021 00:40:06 -0700
-Date:   Wed, 28 Jul 2021 15:25:15 +0800
-From:   Yan Zhao <yan.y.zhao@intel.com>
-To:     Yu Zhang <yu.c.zhang@linux.intel.com>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Ben Gardon <bgardon@google.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
-Subject: Re: A question of TDP unloading.
-Message-ID: <20210728072514.GA375@yzhao56-desk.sh.intel.com>
-Reply-To: Yan Zhao <yan.y.zhao@intel.com>
-References: <20210727161957.lxevvmy37azm2h7z@linux.intel.com>
- <YQBLZ/RrBFxE4G4w@google.com>
- <20210728065605.e4ql2hzrj5fkngux@linux.intel.com>
+        id S234963AbhG1Hay (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 28 Jul 2021 03:30:54 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:48379 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S234950AbhG1Hax (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 28 Jul 2021 03:30:53 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1627457451;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=gBzmiE2KaP1Rkx4ybMUdQ6OFEaFkTJDJ5ZMf+LCZDks=;
+        b=HdCdZrmn4KKGal5Bha2pIAH33b8zgofbACG5cWw5zem/fibKJpFjjcFi0JaPal+aXkhPj+
+        rWXscPqkrD8TebSUsx/fdpGLB+EO93egDF63knJmOPV++HEwPQd45cxvfMWmiIuAkAXCgQ
+        sEA27JScT+nBvoSgYMJIFJxPGXBVmiY=
+Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
+ [209.85.218.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-325-YDMJHPmKM2yPDnFKY8kbtw-1; Wed, 28 Jul 2021 03:30:50 -0400
+X-MC-Unique: YDMJHPmKM2yPDnFKY8kbtw-1
+Received: by mail-ej1-f72.google.com with SMTP id g21-20020a1709061e15b029052292d7c3b4so497461ejj.9
+        for <kvm@vger.kernel.org>; Wed, 28 Jul 2021 00:30:50 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=gBzmiE2KaP1Rkx4ybMUdQ6OFEaFkTJDJ5ZMf+LCZDks=;
+        b=iJxfQqwROoAXoNRLXLA6ri20NnDjg8wHnD0yUxwisVYd20nuslep8p8QLrHJPwYcC9
+         N8WaloR8Py7y28DaYPkaeCaYumBVwwq0Lm5eJeHBj2zyQCiCdeUXixi4CX75VAwG/MlV
+         xnL3nBrcOXWdW56VwML82EU4diI2QiR3ZagXh3CcscbNnsMWP5TuOUDLj/QG8U2WRa03
+         8LovaUunCBcnhNVm+ei4NiaaoXMc8CED+NBraOoJs9L6Oz79cfdCvIVVV2lRvZ1u1tk6
+         cK3PkKc8VynBiP0il24BP36qpaknkYAtYDrJKwlTC/7IZ6EBOdCCz/UwyMCaN/b0YOfG
+         VVnw==
+X-Gm-Message-State: AOAM533Dcit5GiPPn9v12WccFzbO10K7wplTFnyAeUZQddvsiZbxnxPy
+        XKhkUfGubtU0nSxNwLw/2qBB3lYxwzLXz3bVcDpfFD34srNODKwPpUvLzUf2LOOJLia/vN2HHu6
+        z16QJ61jhu+pV
+X-Received: by 2002:a05:6402:170d:: with SMTP id y13mr4083406edu.228.1627457449047;
+        Wed, 28 Jul 2021 00:30:49 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxIPD61KneKnMpS6mbHSyOaSwiQcu3JMUJX83HwyFObdeqXpzvjKPm1SBdhQyu2ZD3VBppUXQ==
+X-Received: by 2002:a05:6402:170d:: with SMTP id y13mr4083394edu.228.1627457448889;
+        Wed, 28 Jul 2021 00:30:48 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e? ([2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e])
+        by smtp.gmail.com with ESMTPSA id n17sm2220109edr.84.2021.07.28.00.30.47
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 28 Jul 2021 00:30:48 -0700 (PDT)
+Subject: Re: [PATCH] target/arm: kvm: use RCU_READ_LOCK_GUARD() in
+ kvm_arch_fixup_msi_route()
+To:     Hamza Mahfooz <someguy@effective-light.com>, qemu-devel@nongnu.org
+Cc:     Peter Maydell <peter.maydell@linaro.org>, kvm@vger.kernel.org,
+        qemu-arm@nongnu.org
+References: <20210727235201.11491-1-someguy@effective-light.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <e84e3fe7-e644-7059-22cc-ddefd8bfc8c4@redhat.com>
+Date:   Wed, 28 Jul 2021 09:30:46 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.11.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210728065605.e4ql2hzrj5fkngux@linux.intel.com>
-User-Agent: Mutt/1.9.4 (2018-02-28)
+In-Reply-To: <20210727235201.11491-1-someguy@effective-light.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jul 28, 2021 at 02:56:05PM +0800, Yu Zhang wrote:
-> Thanks a lot for your reply, Sean.
+On 28/07/21 01:52, Hamza Mahfooz wrote:
+> As per commit 5626f8c6d468 ("rcu: Add automatically released rcu_read_lock
+> variants"), RCU_READ_LOCK_GUARD() should be used instead of
+> rcu_read_{un}lock().
 > 
-> On Tue, Jul 27, 2021 at 06:07:35PM +0000, Sean Christopherson wrote:
-> > On Wed, Jul 28, 2021, Yu Zhang wrote:
-> > > Hi all,
-> > > 
-> > >   I'd like to ask a question about kvm_reset_context(): is there any
-> > >   reason that we must alway unload TDP root in kvm_mmu_reset_context()?
-> > 
-> > The short answer is that mmu_role is changing, thus a new root shadow page is
-> > needed.
-> 
-> I saw the mmu_role is recalculated, but I have not figured out how this
-> change would affect TDP. May I ask a favor to give an example? Thanks!
-> 
-> I realized that if we only recalculate the mmu role, but do not unload
-> the TDP root(e.g., when guest efer.nx flips), base role of the SPs will
-> be inconsistent with the mmu context. But I do not understand why this
-> shall affect TDP. 
-> 
-> > 
-> > >   As you know, KVM MMU needs to track guest paging mode changes, to
-> > >   recalculate the mmu roles and reset callback routines(e.g., guest
-> > >   page table walker). These are done in kvm_mmu_reset_context(). Also,
-> > >   entering SMM, cpuid updates, and restoring L1 VMM's host state will
-> > >   trigger kvm_mmu_reset_context() too.
-> > >   
-> > >   Meanwhile, another job done by kvm_mmu_reset_context() is to unload
-> > >   the KVM MMU:
-> > >   
-> > >   - For shadow & legacy TDP, it means to unload the root shadow/TDP
-> > >     page and reconstruct another one in kvm_mmu_reload(), before
-> > >     entering guest. Old shadow/TDP pages will probably be reused later,
-> > >     after future guest paging mode switches.
-> > >   
-> > >   - For TDP MMU, it is even more aggressive, all TDP pages will be
-> > >     zapped, meaning a whole new TDP page table will be recontrustred,
-> > >     with each paging mode change in the guest. I witnessed dozens of
-> > >     rebuildings of TDP when booting a Linux guest(besides the ones
-> > >     caused by memslots rearrangement).
-> > >   
-> > >   However, I am wondering, why do we need the unloading, if GPA->HPA
-> > >   relationship is not changed? And if this is not a must, could we
-> > >   find a way to refactor kvm_mmu_reset_context(), so that unloading
-> > >   of TDP root is only performed when necessary(e.g, SMM switches and
-> > >   maybe after cpuid updates which may change the level of TDP)? 
-> > >   
-> > >   I tried to add a parameter in kvm_mmu_reset_context(), to make the
-> > >   unloading optional:  
-> > > 
-> > > +void kvm_mmu_reset_context(struct kvm_vcpu *vcpu, bool force_tdp_unload)
-> > >  {
-> > > -       kvm_mmu_unload(vcpu);
-> > > +       if (!tdp_enabled || force_tdp_unload)
-> > > +               kvm_mmu_unload(vcpu);
-> > > +
-> > >         kvm_init_mmu(vcpu);
-> > >  }
-> > > 
-> > >   But this change brings another problem - if we keep the TDP root, the
-> > >   role of existing SPs will be obsolete after guest paging mode changes.
-> > >   Altough I guess most role flags are irrelevant in TDP, I am not sure
-> > >   if this could cause any trouble.
-> > >   
-> > >   Is there anyone looking at this issue? Or do you have any suggestion?
-> > 
-> > What's the problem you're trying to solve?  kvm_mmu_reset_context() is most
-> > definitely a big hammer, e.g. kvm_post_set_cr0() and kvm_post_set_cr4() in
-> > particular could be reworked to do something like kvm_mmu_new_pgd() + kvm_init_mmu(),
-> > but modifying mmu_role bits in CR0/CR4 should be a rare event, i.e. there hasn't
-> > sufficient motivation to optimize CR0/CR4 changes.
-> 
-> Well, I noticed this when I was trying to find the reason why a single GFN
-> can have multiple rmaps in TDP(not the SMM case, which uses different memslot).
-> And the fact that guest paging mode change will cause the unloading of TDP
-> looks counter-intuitive. I know I must have missed something important, and
-> I have a strong desire to figure out why. :)
-> 
-> Then I tried with TDP MMU, yet to find the unloading is performed even more
-> aggressively... 
-> 
-> > 
-> > Note, most CR4 bits and CR0.PG are tracked in kvm_mmu_extended_role, not
-> > kvm_mmu_page_role, which adds a minor wrinkle to the logic.
-> > 
-> 
-> The extended role is another pain point for me when reading KVM MMU code.
-> I can understand it is useful in shadow, but does it also matters in TDP?
-> 
+> Signed-off-by: Hamza Mahfooz <someguy@effective-light.com>
+> ---
 
-hi
-I noticed that shadow page's role is of type union kvm_mmu_page_role.
-so, can I understand that we actually only need to do kvm_mmu_unload() when
-base roles of new mmu role and the old context mmu role are different?
+Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
 
-Thanks
-Yan
-
+>   target/arm/kvm.c | 17 ++++++++---------
+>   1 file changed, 8 insertions(+), 9 deletions(-)
+> 
+> diff --git a/target/arm/kvm.c b/target/arm/kvm.c
+> index d8381ba224..5d55de1a49 100644
+> --- a/target/arm/kvm.c
+> +++ b/target/arm/kvm.c
+> @@ -998,7 +998,6 @@ int kvm_arch_fixup_msi_route(struct kvm_irq_routing_entry *route,
+>       hwaddr xlat, len, doorbell_gpa;
+>       MemoryRegionSection mrs;
+>       MemoryRegion *mr;
+> -    int ret = 1;
+>   
+>       if (as == &address_space_memory) {
+>           return 0;
+> @@ -1006,15 +1005,19 @@ int kvm_arch_fixup_msi_route(struct kvm_irq_routing_entry *route,
+>   
+>       /* MSI doorbell address is translated by an IOMMU */
+>   
+> -    rcu_read_lock();
+> +    RCU_READ_LOCK_GUARD();
+> +
+>       mr = address_space_translate(as, address, &xlat, &len, true,
+>                                    MEMTXATTRS_UNSPECIFIED);
+> +
+>       if (!mr) {
+> -        goto unlock;
+> +        return 1;
+>       }
+> +
+>       mrs = memory_region_find(mr, xlat, 1);
+> +
+>       if (!mrs.mr) {
+> -        goto unlock;
+> +        return 1;
+>       }
+>   
+>       doorbell_gpa = mrs.offset_within_address_space;
+> @@ -1025,11 +1028,7 @@ int kvm_arch_fixup_msi_route(struct kvm_irq_routing_entry *route,
+>   
+>       trace_kvm_arm_fixup_msi_route(address, doorbell_gpa);
+>   
+> -    ret = 0;
+> -
+> -unlock:
+> -    rcu_read_unlock();
+> -    return ret;
+> +    return 0;
+>   }
+>   
+>   int kvm_arch_add_msi_route_post(struct kvm_irq_routing_entry *route,
+> 
 
