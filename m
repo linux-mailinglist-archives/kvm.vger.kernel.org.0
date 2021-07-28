@@ -2,115 +2,130 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 57E733D8826
-	for <lists+kvm@lfdr.de>; Wed, 28 Jul 2021 08:46:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5EBC43D8855
+	for <lists+kvm@lfdr.de>; Wed, 28 Jul 2021 08:56:12 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234691AbhG1Gq4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 28 Jul 2021 02:46:56 -0400
-Received: from mx21.baidu.com ([220.181.3.85]:41930 "EHLO baidu.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S232798AbhG1Gq4 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 28 Jul 2021 02:46:56 -0400
-Received: from BC-Mail-Ex14.internal.baidu.com (unknown [172.31.51.54])
-        by Forcepoint Email with ESMTPS id BADC532CDD7BE581D7CF;
-        Wed, 28 Jul 2021 14:46:45 +0800 (CST)
-Received: from BJHW-Mail-Ex15.internal.baidu.com (10.127.64.38) by
- BC-Mail-Ex14.internal.baidu.com (172.31.51.54) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
- 15.1.2242.12; Wed, 28 Jul 2021 14:46:45 +0800
-Received: from BJHW-Mail-Ex15.internal.baidu.com ([100.100.100.38]) by
- BJHW-Mail-Ex15.internal.baidu.com ([100.100.100.38]) with mapi id
- 15.01.2308.014; Wed, 28 Jul 2021 14:46:45 +0800
-From:   "Li,Rongqing" <lirongqing@baidu.com>
-To:     Pankaj Gupta <pankaj.gupta.linux@gmail.com>
-CC:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        "seanjc@google.com" <seanjc@google.com>
-Subject: =?utf-8?B?562U5aSNOiBbUEFUQ0hdW3YyXSBLVk06IHVzZSBjcHVfcmVsYXggd2hlbiBo?=
- =?utf-8?Q?alt_polling?=
-Thread-Topic: [PATCH][v2] KVM: use cpu_relax when halt polling
-Thread-Index: AQHXgxNrJHZDHQ3oBUOu+S+BDbpTIKtXpbcw//+9FYCAAIwC8A==
-Date:   Wed, 28 Jul 2021 06:46:45 +0000
-Message-ID: <46659966ffbb49c29240a6e8944179b7@baidu.com>
-References: <20210727111247.55510-1-lirongqing@baidu.com>
- <CAM9Jb+hWS5=Oib-NuKWTL=sfg=BQ-usdRV-H-mj6hLFVF6NYnQ@mail.gmail.com>
- <fe516f0a191d4c6e9fbd10b380c87f19@baidu.com>
- <CAM9Jb+iuhexGnwhp_zNCWBLO5dGainBUitObyTDRubjV_nq-HA@mail.gmail.com>
-In-Reply-To: <CAM9Jb+iuhexGnwhp_zNCWBLO5dGainBUitObyTDRubjV_nq-HA@mail.gmail.com>
-Accept-Language: zh-CN, en-US
-Content-Language: zh-CN
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [172.22.193.253]
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+        id S233971AbhG1G4M (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 28 Jul 2021 02:56:12 -0400
+Received: from mga06.intel.com ([134.134.136.31]:50676 "EHLO mga06.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229939AbhG1G4L (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 28 Jul 2021 02:56:11 -0400
+X-IronPort-AV: E=McAfee;i="6200,9189,10058"; a="273673026"
+X-IronPort-AV: E=Sophos;i="5.84,275,1620716400"; 
+   d="scan'208";a="273673026"
+Received: from fmsmga003.fm.intel.com ([10.253.24.29])
+  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Jul 2021 23:56:09 -0700
+X-IronPort-AV: E=Sophos;i="5.84,275,1620716400"; 
+   d="scan'208";a="506293869"
+Received: from baiyun1-mobl1.ccr.corp.intel.com (HELO localhost) ([10.249.175.110])
+  by fmsmga003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Jul 2021 23:56:07 -0700
+Date:   Wed, 28 Jul 2021 14:56:05 +0800
+From:   Yu Zhang <yu.c.zhang@linux.intel.com>
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Ben Gardon <bgardon@google.com>, kvm@vger.kernel.org
+Subject: Re: A question of TDP unloading.
+Message-ID: <20210728065605.e4ql2hzrj5fkngux@linux.intel.com>
+References: <20210727161957.lxevvmy37azm2h7z@linux.intel.com>
+ <YQBLZ/RrBFxE4G4w@google.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <YQBLZ/RrBFxE4G4w@google.com>
+User-Agent: NeoMutt/20171215
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-DQoNCj4gLS0tLS3pgq7ku7bljp/ku7YtLS0tLQ0KPiDlj5Hku7bkuro6IFBhbmthaiBHdXB0YSA8
-cGFua2FqLmd1cHRhLmxpbnV4QGdtYWlsLmNvbT4NCj4g5Y+R6YCB5pe26Ze0OiAyMDIx5bm0N+ac
-iDI45pelIDE0OjEyDQo+IOaUtuS7tuS6ujogTGksUm9uZ3FpbmcgPGxpcm9uZ3FpbmdAYmFpZHUu
-Y29tPg0KPiDmioTpgIE6IGt2bUB2Z2VyLmtlcm5lbC5vcmc7IFBhb2xvIEJvbnppbmkgPHBib256
-aW5pQHJlZGhhdC5jb20+Ow0KPiBzZWFuamNAZ29vZ2xlLmNvbQ0KPiDkuLvpopg6IFJlOiBbUEFU
-Q0hdW3YyXSBLVk06IHVzZSBjcHVfcmVsYXggd2hlbiBoYWx0IHBvbGxpbmcNCj4gDQo+ICcNCj4g
-PiA+ID4gIlJhdGhlciB0aGFuIGRpc2FsbG93aW5nIGhhbHQtcG9sbGluZyBlbnRpcmVseSwgb24g
-eDg2IGl0IHNob3VsZA0KPiA+ID4gPiBiZSBzdWZmaWNpZW50IHRvIHNpbXBseSBoYXZlIHRoZSBo
-YXJkd2FyZSB0aHJlYWQgeWllbGQgdG8gaXRzDQo+ID4gPiA+IHNpYmxpbmcocykgdmlhIFBBVVNF
-LiAgSXQgcHJvYmFibHkgd29uJ3QgZ2V0IGJhY2sgYWxsIHBlcmZvcm1hbmNlLA0KPiA+ID4gPiBi
-dXQgSSB3b3VsZCBleHBlY3QgaXQgdG8gYmUgY2xvc2UuDQo+ID4gPiA+IFRoaXMgY29tcGlsZXMg
-b24gYWxsIEtWTSBhcmNoaXRlY3R1cmVzLCBhbmQgQUZBSUNUIHRoZSBpbnRlbmRlZA0KPiA+ID4g
-PiB1c2FnZSBvZiBjcHVfcmVsYXgoKSBpcyBpZGVudGljYWwgZm9yIGFsbCBhcmNoaXRlY3R1cmVz
-LiINCj4gPiA+DQo+ID4gPiBGb3Igc3VyZSBjaGFuZ2UgdG8gY3B1X3JlbGF4KCkgaXMgYmV0dGVy
-Lg0KPiA+ID4gV2FzIGp1c3QgY3VyaW91cyB0byBrbm93IGlmIHlvdSBnb3QgZGVzY2VudCBwZXJm
-b3JtYW5jZSBpbXByb3ZlbWVudA0KPiA+ID4gY29tcGFyZWQgdG8gcHJldmlvdXNseSByZXBvcnRl
-ZCB3aXRoIFVuaXhiZW5jaC4NCj4gPiA+DQo+ID4gPiBUaGFua3MsDQo+ID4gPiBQYW5rYWoNCj4g
-Pg0KPiA+IFRoZSB0ZXN0IGFzIGJlbG93Og0KPiA+DQo+ID4gMS4gcnVuIHVuaXhiZW5jaCBkaHJ5
-MnJlZzogIC4vUnVuIC1jIDEgZGhyeTJyZWcgLWkgMSB3aXRob3V0IFNNVA0KPiA+IGRpc3R1cmJh
-bmNlLCB0aGUgc2NvcmUgaXMgMzE3MiB3aXRoIGEgIHt3aGlsZSgxKWkrK30gU01UIGRpc3R1cmJh
-bmNlLA0KPiA+IHRoZSBzY29yZSBpcyAxNTgzIHdpdGggYSAge3doaWxlKDEpKHJlcCBub3AvcGF1
-c2UpfSBTTVQgZGlzdHVyYmFuY2UsDQo+ID4gdGhlIHNjb3JlIGlzIDE3MjkuNA0KPiA+DQo+ID4g
-c2VlbXMgY3B1X3JlbGF4IGNhbiBub3QgZ2V0IGJhY2sgYWxsIHBlcmZvcm1hbmNlICwgd2hhdCB3
-cm9uZz8NCj4gDQo+IE1heWJlIGJlY2F1c2Ugb2YgcGF1c2UgaW50ZXJjZXB0IGZpbHRlcmluZywg
-Y29tcGFyYXRpdmVseSBNYXlsZXNzIFZNIEV4aXRzPw0KPiANCg0KSW4gdm07DQoNCkkgcmV0ZXN0
-IGl0IGluIGJhcmUgbWV0YWwsIHBhdXNlIGluc3RydWN0aW9uIHdvcmtzIGFzIGV4cGVjdCwgdGhl
-IHNjb3JlIHdpdGggInBhdXNlIGxvb3AiIGRpc3R1cmJhbmNlIGlzIDI4ODY7IGFib3V0IDkwJSBv
-ZiBubyBkaXN0dXJiYW5jZQ0KDQotTGkNCg0KPiA+DQo+ID4NCj4gPiAyLiBiYWNrIHRvIGhhbHRw
-b2xsDQo+ID4gcnVuIHVuaXhiZW5jaCBkaHJ5MnJlZyAuL1J1biAtYyAxIGRocnkycmVnIC1pIDEg
-d2l0aG91dCBTTVQNCj4gPiBkaXN0dXJiYW5jZSwgdGhlIHNjb3JlIGlzIDMxNzINCj4gPg0KPiA+
-IHdpdGggcmVkaXMtYmVuY2htYXJrIFNNVCBkaXN0dXJiYW5jZSwgcmVkaXMtYmVuY2htYXJrIHRh
-a2VzIDkwJWNwdToNCj4gPiB3aXRob3V0IHBhdGNoLCB0aGUgc2NvcmUgaXMgMTc3Ni45DQo+ID4g
-d2l0aCBteSBmaXJzdCBwYXRjaCwgdGhlIHNjb3JlIGlzIDE3ODIuMyB3aXRoIGNwdV9yZWxheCBw
-YXRjaCwgdGhlDQo+ID4gc2NvcmUgaXMgMTc3OA0KPiA+DQo+ID4gd2l0aCByZWRpcy1iZW5jaG1h
-cmsgU01UIGRpc3R1cmJhbmNlLCByZWRpcy1iZW5jaG1hcmsgdGFrZXMgMzMlY3B1Og0KPiA+IHdp
-dGhvdXQgcGF0Y2gsIHRoZSBzY29yZSBpcyAxOTI5LjkNCj4gPiB3aXRoIG15IGZpcnN0IHBhdGNo
-LCB0aGUgc2NvcmUgaXMgMjI5NC42IHdpdGggY3B1X3JlbGF4IHBhdGNoLCB0aGUNCj4gPiBzY29y
-ZSBpcyAyMDA1LjMNCj4gPg0KPiA+DQo+ID4gY3B1X3JlbGF4IGdpdmUgbGVzcyB0aGFuIHN0b3Ag
-aGFsdCBwb2xsaW5nLCBidXQgaXQgc2hvdWxkIGhhdmUgbGl0dGxlDQo+ID4gZWZmZWN0IGZvciBy
-ZWRpcy1iZW5jaG1hcmsgd2hpY2ggZ2V0IGJlbmVmaXQgZnJvbSBoYWx0IHBvbGxpbmcNCj4gDQo+
-IFdlIGFyZSBzZWVpbmcgaW1wcm92ZW1lbnQgd2l0aCBjcHVfcmVsYXgoKSB0aG91Z2ggbm90IHRv
-IHRoZSBsZXZlbCBvZiBzdG9wcGluZw0KPiB0aGUgaGFsdCBwb2xsaW5nIHdoZW4gc2libGluZyBD
-UFUgcnVubmluZyByZWRpcyB3b3JrbG9hZC4gRm9yIDkwJSBjYXNlIEkgdGhpbmsgaXRzDQo+IGV4
-cGVjdGVkIHRvIGhhdmUgc2ltaWxhciBwZXJmb3JtYW5jZS4NCj4gDQo+IEZvciAzMyUgc3RvcHBp
-bmcgaGFsdCBwb2xsIGdpdmVzIGJldHRlciByZXN1bHQgYmVjYXVzZSBvZiB0aGUgd29ya2xvYWQu
-IE92ZXJhbGwgSQ0KPiB0aGluayB0aGlzIHBhdGNoIGhlbHBzIGFuZCBub3QgaW1wYWN0IHBlcmZv
-cm1hbmNlIGluIG5vcm1hbCBjYXNlcy4NCj4gDQo+IFJldmlld2VkLWJ5OiBQYW5rYWogR3VwdGEg
-PHBhbmthai5ndXB0YUBpb25vcy5jb20+DQo+IA0KPiBCZXN0IHJlZ2FyZHMsDQo+IFBhbmthag0K
-PiANCj4gDQo+ID4NCj4gPg0KPiA+IC1MaQ0KPiA+DQo+ID4gPiA+DQo+ID4gPiA+IFN1Z2dlc3Rl
-ZC1ieTogU2VhbiBDaHJpc3RvcGhlcnNvbiA8c2VhbmpjQGdvb2dsZS5jb20+DQo+ID4gPiA+IFNp
-Z25lZC1vZmYtYnk6IExpIFJvbmdRaW5nIDxsaXJvbmdxaW5nQGJhaWR1LmNvbT4NCj4gPiA+ID4g
-LS0tDQo+ID4gPiA+IGRpZmYgdjE6IHVzaW5nIGNwdV9yZWxheCwgcmF0aGVyIHRoYXQgc3RvcCBo
-YWx0LXBvbGxpbmcNCj4gPiA+ID4NCj4gPiA+ID4gIHZpcnQva3ZtL2t2bV9tYWluLmMgfCAxICsN
-Cj4gPiA+ID4gIDEgZmlsZSBjaGFuZ2VkLCAxIGluc2VydGlvbigrKQ0KPiA+ID4gPg0KPiA+ID4g
-PiBkaWZmIC0tZ2l0IGEvdmlydC9rdm0va3ZtX21haW4uYyBiL3ZpcnQva3ZtL2t2bV9tYWluLmMg
-aW5kZXgNCj4gPiA+ID4gN2Q5NTEyNi4uMTY3OTcyOCAxMDA2NDQNCj4gPiA+ID4gLS0tIGEvdmly
-dC9rdm0va3ZtX21haW4uYw0KPiA+ID4gPiArKysgYi92aXJ0L2t2bS9rdm1fbWFpbi5jDQo+ID4g
-PiA+IEBAIC0zMTEwLDYgKzMxMTAsNyBAQCB2b2lkIGt2bV92Y3B1X2Jsb2NrKHN0cnVjdCBrdm1f
-dmNwdSAqdmNwdSkNCj4gPiA+ID4NCj4gPiA+ICsrdmNwdS0+c3RhdC5nZW5lcmljLmhhbHRfcG9s
-bF9pbnZhbGlkOw0KPiA+ID4gPiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIGdvdG8g
-b3V0Ow0KPiA+ID4gPiAgICAgICAgICAgICAgICAgICAgICAgICB9DQo+ID4gPiA+ICsgICAgICAg
-ICAgICAgICAgICAgICAgIGNwdV9yZWxheCgpOw0KPiA+ID4gPiAgICAgICAgICAgICAgICAgICAg
-ICAgICBwb2xsX2VuZCA9IGN1ciA9IGt0aW1lX2dldCgpOw0KPiA+ID4gPiAgICAgICAgICAgICAg
-ICAgfSB3aGlsZSAoa3ZtX3ZjcHVfY2FuX3BvbGwoY3VyLCBzdG9wKSk7DQo+ID4gPiA+ICAgICAg
-ICAgfQ0KPiA+ID4gPiAtLQ0KPiA+ID4gPiAyLjkuNA0KPiA+ID4gPg0K
+Thanks a lot for your reply, Sean.
+
+On Tue, Jul 27, 2021 at 06:07:35PM +0000, Sean Christopherson wrote:
+> On Wed, Jul 28, 2021, Yu Zhang wrote:
+> > Hi all,
+> > 
+> >   I'd like to ask a question about kvm_reset_context(): is there any
+> >   reason that we must alway unload TDP root in kvm_mmu_reset_context()?
+> 
+> The short answer is that mmu_role is changing, thus a new root shadow page is
+> needed.
+
+I saw the mmu_role is recalculated, but I have not figured out how this
+change would affect TDP. May I ask a favor to give an example? Thanks!
+
+I realized that if we only recalculate the mmu role, but do not unload
+the TDP root(e.g., when guest efer.nx flips), base role of the SPs will
+be inconsistent with the mmu context. But I do not understand why this
+shall affect TDP. 
+
+> 
+> >   As you know, KVM MMU needs to track guest paging mode changes, to
+> >   recalculate the mmu roles and reset callback routines(e.g., guest
+> >   page table walker). These are done in kvm_mmu_reset_context(). Also,
+> >   entering SMM, cpuid updates, and restoring L1 VMM's host state will
+> >   trigger kvm_mmu_reset_context() too.
+> >   
+> >   Meanwhile, another job done by kvm_mmu_reset_context() is to unload
+> >   the KVM MMU:
+> >   
+> >   - For shadow & legacy TDP, it means to unload the root shadow/TDP
+> >     page and reconstruct another one in kvm_mmu_reload(), before
+> >     entering guest. Old shadow/TDP pages will probably be reused later,
+> >     after future guest paging mode switches.
+> >   
+> >   - For TDP MMU, it is even more aggressive, all TDP pages will be
+> >     zapped, meaning a whole new TDP page table will be recontrustred,
+> >     with each paging mode change in the guest. I witnessed dozens of
+> >     rebuildings of TDP when booting a Linux guest(besides the ones
+> >     caused by memslots rearrangement).
+> >   
+> >   However, I am wondering, why do we need the unloading, if GPA->HPA
+> >   relationship is not changed? And if this is not a must, could we
+> >   find a way to refactor kvm_mmu_reset_context(), so that unloading
+> >   of TDP root is only performed when necessary(e.g, SMM switches and
+> >   maybe after cpuid updates which may change the level of TDP)? 
+> >   
+> >   I tried to add a parameter in kvm_mmu_reset_context(), to make the
+> >   unloading optional:  
+> > 
+> > +void kvm_mmu_reset_context(struct kvm_vcpu *vcpu, bool force_tdp_unload)
+> >  {
+> > -       kvm_mmu_unload(vcpu);
+> > +       if (!tdp_enabled || force_tdp_unload)
+> > +               kvm_mmu_unload(vcpu);
+> > +
+> >         kvm_init_mmu(vcpu);
+> >  }
+> > 
+> >   But this change brings another problem - if we keep the TDP root, the
+> >   role of existing SPs will be obsolete after guest paging mode changes.
+> >   Altough I guess most role flags are irrelevant in TDP, I am not sure
+> >   if this could cause any trouble.
+> >   
+> >   Is there anyone looking at this issue? Or do you have any suggestion?
+> 
+> What's the problem you're trying to solve?  kvm_mmu_reset_context() is most
+> definitely a big hammer, e.g. kvm_post_set_cr0() and kvm_post_set_cr4() in
+> particular could be reworked to do something like kvm_mmu_new_pgd() + kvm_init_mmu(),
+> but modifying mmu_role bits in CR0/CR4 should be a rare event, i.e. there hasn't
+> sufficient motivation to optimize CR0/CR4 changes.
+
+Well, I noticed this when I was trying to find the reason why a single GFN
+can have multiple rmaps in TDP(not the SMM case, which uses different memslot).
+And the fact that guest paging mode change will cause the unloading of TDP
+looks counter-intuitive. I know I must have missed something important, and
+I have a strong desire to figure out why. :)
+
+Then I tried with TDP MMU, yet to find the unloading is performed even more
+aggressively... 
+
+> 
+> Note, most CR4 bits and CR0.PG are tracked in kvm_mmu_extended_role, not
+> kvm_mmu_page_role, which adds a minor wrinkle to the logic.
+> 
+
+The extended role is another pain point for me when reading KVM MMU code.
+I can understand it is useful in shadow, but does it also matters in TDP?
+
+B.R.
+Yu
