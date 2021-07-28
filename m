@@ -2,102 +2,107 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C37DC3D8E97
-	for <lists+kvm@lfdr.de>; Wed, 28 Jul 2021 15:08:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 13C4C3D8E9E
+	for <lists+kvm@lfdr.de>; Wed, 28 Jul 2021 15:08:58 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236391AbhG1NIt (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 28 Jul 2021 09:08:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48234 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236371AbhG1NIZ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 28 Jul 2021 09:08:25 -0400
-Received: from mail-pj1-x102f.google.com (mail-pj1-x102f.google.com [IPv6:2607:f8b0:4864:20::102f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9462EC061764
-        for <kvm@vger.kernel.org>; Wed, 28 Jul 2021 06:08:23 -0700 (PDT)
-Received: by mail-pj1-x102f.google.com with SMTP id u9-20020a17090a1f09b029017554809f35so9862978pja.5
-        for <kvm@vger.kernel.org>; Wed, 28 Jul 2021 06:08:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance-com.20150623.gappssmtp.com; s=20150623;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=XX70o1X1Cgw4fNpu8tzLJbjLTB/dJBQIRbJuCgl7gAQ=;
-        b=qjJyVPD23XAfvIMFBK0k3lyIPRo9qGbjwyUTtkfxUEQQduxjqJNo1w3+PU5CfpsMmn
-         waiUcOznQY7k7MkpnHIzRDkQ8WCOyVySkwmoWt3E2YVUmR1Oc+Ia/TuihSWljmPrwNkP
-         YLdTeervyYOsboUmbGXkh8awIeQJeR4eKFDHzB/ItLEkL2FLeYEG7vG8zrffMZr4qoIR
-         38tzc3iwVD5lsmYgMSVpahKHc7Tdd4oJR+tuXwa/GODFxCy7bg3slQdCio5v5xl239k5
-         AZau68DzYxvhjXBVylam9VNmDAHsmH4DJ+vERsePgfh044NfG8Z+BJZrha2i12Sx6pCA
-         Abzg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=XX70o1X1Cgw4fNpu8tzLJbjLTB/dJBQIRbJuCgl7gAQ=;
-        b=DZRhv0m6EGcqBTDXfsb/4TYCqv/pENklz9z2C++nJgrN/uGpHiMqwlhlmhokH+oMOT
-         /Z4bBMD2qkBMU3DHd2XyDiQOqq9uCvh7Z3t9Eq9c8X30+D6F0NodpcqueaeTqtSDc3hr
-         CWuveWdgGFB754GKNpj68PGRLS0NydLX0AMjdlP5sg0RN7t+f/w1KK7hzoVpMaM1+9QP
-         +9iiJuN0MUkQp4KoIcqL0UaXhchTq6jNsqYSZyLVDQWrm4OE7aDs4hFmLLRtKFHHGUnh
-         lrRuTUNCSVsTdmfwwEU57uOuivcU77/3hnKwboxK2juUUKDiVNfMJU2102jySQgEp68t
-         3CEQ==
-X-Gm-Message-State: AOAM532PNL8bEdDVH9eD4ZRt6/13ZcPOyi1r+eR4QxaQOinowz2V36+g
-        PBySTlc8fmbBv2qVBFTqAN2r
-X-Google-Smtp-Source: ABdhPJz3HJJEY5ok/VLZC6bllUI2mC3K2btVzbWJ0mXyY5ky7iNv19XOgPjBOh4gziWaD4gfyYcEVw==
-X-Received: by 2002:a17:902:db0f:b029:12b:880b:ef38 with SMTP id m15-20020a170902db0fb029012b880bef38mr22513206plx.5.1627477703192;
-        Wed, 28 Jul 2021 06:08:23 -0700 (PDT)
-Received: from localhost ([139.177.225.253])
-        by smtp.gmail.com with ESMTPSA id j128sm7789048pfd.38.2021.07.28.06.08.22
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 28 Jul 2021 06:08:22 -0700 (PDT)
-From:   Xie Yongji <xieyongji@bytedance.com>
-To:     mst@redhat.com, jasowang@redhat.com, dan.carpenter@oracle.com
-Cc:     virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH v2 2/2] vhost: Fix the calculation in vhost_overflow()
-Date:   Wed, 28 Jul 2021 21:07:56 +0800
-Message-Id: <20210728130756.97-2-xieyongji@bytedance.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20210728130756.97-1-xieyongji@bytedance.com>
-References: <20210728130756.97-1-xieyongji@bytedance.com>
+        id S236486AbhG1NI4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 28 Jul 2021 09:08:56 -0400
+Received: from mout.kundenserver.de ([217.72.192.73]:59181 "EHLO
+        mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S236409AbhG1NIa (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 28 Jul 2021 09:08:30 -0400
+Received: from mail-wr1-f49.google.com ([209.85.221.49]) by
+ mrelayeu.kundenserver.de (mreue107 [213.165.67.113]) with ESMTPSA (Nemesis)
+ id 1N1xZX-1nAMXg0eU5-012GVn; Wed, 28 Jul 2021 15:08:25 +0200
+Received: by mail-wr1-f49.google.com with SMTP id r2so2494812wrl.1;
+        Wed, 28 Jul 2021 06:08:24 -0700 (PDT)
+X-Gm-Message-State: AOAM530LP6x5d7utXqUEbeeqt/XXl8lsKRXLE4rbHhR0V70QVPVUOnrU
+        IjrbdySFFgl9x1oZv/q4PIuea6rYr5kd+1eFohQ=
+X-Google-Smtp-Source: ABdhPJxxfv5Wc+SHhdsDE/NGqS8JZjtCDRKxpejCmw8fSUu1pUblkMW8vqXlfFC6WPm8N6ImE4zLbL7TYQIjJuw7+SI=
+X-Received: by 2002:a5d:44c7:: with SMTP id z7mr21469709wrr.286.1627477704695;
+ Wed, 28 Jul 2021 06:08:24 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+References: <20210721161609.68223-1-yishaih@nvidia.com> <20210721161609.68223-13-yishaih@nvidia.com>
+ <20210727155440.680ee22e.alex.williamson@redhat.com> <20210727230941.GL1721383@nvidia.com>
+ <20210728054306.GA3421@lst.de> <20210728120326.GQ1721383@nvidia.com>
+ <20210728122956.GA27111@lst.de> <20210728124755.GR1721383@nvidia.com>
+In-Reply-To: <20210728124755.GR1721383@nvidia.com>
+From:   Arnd Bergmann <arnd@arndb.de>
+Date:   Wed, 28 Jul 2021 15:08:08 +0200
+X-Gmail-Original-Message-ID: <CAK8P3a21ah=+x29jycWZBoTGA1RzfYz4qar9usvCa_hU85k=7g@mail.gmail.com>
+Message-ID: <CAK8P3a21ah=+x29jycWZBoTGA1RzfYz4qar9usvCa_hU85k=7g@mail.gmail.com>
+Subject: Re: [PATCH 12/12] vfio/pci: Introduce vfio_pci_core.ko
+To:     Jason Gunthorpe <jgg@nvidia.com>
+Cc:     Christoph Hellwig <hch@lst.de>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Yishai Hadas <yishaih@nvidia.com>,
+        Bjorn Helgaas <bhelgaas@google.com>,
+        Jonathan Corbet <corbet@lwn.net>, diana.craciun@oss.nxp.com,
+        kwankhede@nvidia.com, Eric Auger <eric.auger@redhat.com>,
+        Masahiro Yamada <masahiroy@kernel.org>,
+        Michal Marek <michal.lkml@markovi.net>,
+        linux-pci <linux-pci@vger.kernel.org>,
+        "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>,
+        kvm list <kvm@vger.kernel.org>,
+        linux-s390 <linux-s390@vger.kernel.org>,
+        Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>,
+        mgurtovoy@nvidia.com, maorg@nvidia.com, leonro@nvidia.com
+Content-Type: text/plain; charset="UTF-8"
+X-Provags-ID: V03:K1:VfrdqH+8hRfWWBCUeeCLzTKee5aiFfVqonRsF0cPxyHpJ27hjjW
+ napliTyiM232iU/b2h7piQKIzmMmiu7xfzuBeJZZmgCIv2l0dQdGsOGfnIQAKUWxDOfk6vG
+ fQRBZ/tLptHxvILO0wzGVrQ9kHzLmnxLZXR7+mMM3anAyTNikyoKsAmPBKcXeGjwZbRfSsG
+ f4G7ykKBzoesUsQVIeJ6w==
+X-Spam-Flag: NO
+X-UI-Out-Filterresults: notjunk:1;V03:K0:eWfNL6UrdeU=:ampkA+bFoDa2sBzpiNamAZ
+ zoWNZc90Y/wXqG+ZIuxUIDsFuNUlXxTk40/6eLdYbQ8W5xKOiWLFWtsfzXj0FvDgwhTCxEhVV
+ Qf6ozj4bizaXHvOese38gPx6lwZO2aU5zr+OGUZWJL6sSTPVoSpDX2SK4qeFYkHY+VXL4Mcdj
+ MUZaRhC32cvyr4/KdLgoILrgdZMgip4hcvO6y0k2ZqhptmfB7ZH3woAIG9zWg98piJHpcD+hA
+ cIGqG2SA/4XpReAEg1fyG+9rTFlPfepHd7eVJXLCuhIC/Cfyj6pw+ez1QyvCbBIgofOpuLndp
+ fZ49fGUeApxixHsC1i/gtt5FWxQJtIepsoyYDzsxGPJZJxgRWI4rhJbysCzMn1yU+65rx9k+p
+ m9f908CAg/7jRGFDrBeid01FC4PKWtjI5vxuNRKv8l/Ylc4lCc2sZLXFLpwoDcjDEMXL4eQ0r
+ K6nsL1iXJSCnb2ECESD8kHPZPtAowh55pUp7Qu7O4qLTiu74LXXZT8AyIfNbdcvd6PSLfPAwk
+ jMQoJdJ6O72eQAsRuJ+Wr6hmh81DXi/bsUdHvuTplgmOwN0Jb1CAXGXiiOKJ1/N1QhOVIXV5u
+ w8H9byVP/hvEbsGN0B+d3jp3p5Y+BmhMXIPukbnO/W3vqXr3iBz6YxNO2LvJ4fVh4Pqls1UJH
+ Qkj+1B3BtCZbGaChjPGEdjI0wz8PtSFJSJkpU8O9fz/HSnpDNI8xDGcyZt3ABzeCRUvzIxFZf
+ f3oUVXzgydQzG67vHycIWIBcM90VHvR5G2Pn4Z50u0/G3HNBCeu7OF4epJhF7+fniM6L277Wa
+ rxgXCXWE5BrrzS9wE0Zn6Om4YhOoV6pfRBfOLBWA03xwDqh2s4oBmz4cC+ujWRAVKWyLr5U4x
+ k7KRksKC7h03RoKVTW8pC6yeVJJbHGTrEA1bf0jccH+6oX6m6xMKo04lnodUcoe9L6srv6Xjy
+ S/uFWCmR8XK4IOBPeSYprX+lgh+TSRfBv5QBeSi7eUAxav5rwg7eo
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This fixes the incorrect calculation for integer overflow
-when the last address of iova range is 0xffffffff.
+On Wed, Jul 28, 2021 at 2:47 PM Jason Gunthorpe <jgg@nvidia.com> wrote:
+>
+> On Wed, Jul 28, 2021 at 02:29:56PM +0200, Christoph Hellwig wrote:
+>
+> > So not really an issue here.  VFIO_PCI_CORE really is underlying
+> > infrastructure a user should not care about.
+>
+> So then we can write it like below? Unfortunately it deletes the nice
+> menu structure that groups all the PCI drivers together like platform
+> (and mdev in future). Not sure this loss is worth the backwards compat
 
-Fixes: ec33d031a14b ("vhost: detect 32 bit integer wrap around“)
-Reported-by: Jason Wang <jasowang@redhat.com>
-Signed-off-by: Xie Yongji <xieyongji@bytedance.com>
-Acked-by: Jason Wang <jasowang@redhat.com>
----
- drivers/vhost/vhost.c | 10 ++++++++--
- 1 file changed, 8 insertions(+), 2 deletions(-)
+I think you can get back some structure by adding a 'menu "VFIO PCI drivers"'
+and 'endmenu' around it.
 
-diff --git a/drivers/vhost/vhost.c b/drivers/vhost/vhost.c
-index b9e853e6094d..59edb5a1ffe2 100644
---- a/drivers/vhost/vhost.c
-+++ b/drivers/vhost/vhost.c
-@@ -735,10 +735,16 @@ static bool log_access_ok(void __user *log_base, u64 addr, unsigned long sz)
- 			 (sz + VHOST_PAGE_SIZE * 8 - 1) / VHOST_PAGE_SIZE / 8);
- }
- 
-+/* Make sure 64 bit math will not overflow. */
- static bool vhost_overflow(u64 uaddr, u64 size)
- {
--	/* Make sure 64 bit math will not overflow. */
--	return uaddr > ULONG_MAX || size > ULONG_MAX || uaddr > ULONG_MAX - size;
-+	if (uaddr > ULONG_MAX || size > ULONG_MAX)
-+		return true;
-+
-+	if (!size)
-+		return false;
-+
-+	return uaddr > ULONG_MAX - size + 1;
- }
- 
- /* Caller should have vq mutex and device mutex. */
--- 
-2.11.0
+> @@ -17,6 +15,7 @@ config VFIO_PCI_INTX
+>
+>  config VFIO_PCI
+>         tristate "Generic VFIO support for any PCI device"
+> +       select VFIO_PCI_CORE
+>         help
+>           Support for the generic PCI VFIO bus driver which can connect any
+>           PCI device to the VFIO framework.
+> @@ -50,6 +49,7 @@ endif
+>  config MLX5_VFIO_PCI
+>         tristate "VFIO support for MLX5 PCI devices"
+>         depends on MLX5_CORE
+> +       select VFIO_PCI_CORE
+>         help
 
+These two now have to get a 'depends on MMU' if they don't already inherit
+that from elsewhere.
+
+       Arnd
