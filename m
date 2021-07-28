@@ -2,82 +2,132 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id AE5AF3D8C22
-	for <lists+kvm@lfdr.de>; Wed, 28 Jul 2021 12:46:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1728A3D8C26
+	for <lists+kvm@lfdr.de>; Wed, 28 Jul 2021 12:47:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235966AbhG1Kqr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 28 Jul 2021 06:46:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43990 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232514AbhG1Kqp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 28 Jul 2021 06:46:45 -0400
-Received: from desiato.infradead.org (desiato.infradead.org [IPv6:2001:8b0:10b:1:d65d:64ff:fe57:4e05])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8F2ACC061757;
-        Wed, 28 Jul 2021 03:46:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=desiato.20200630; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=YQ6n99gglRIs882rM3VAbrraBMVYq36xoGa1dJkdE1U=; b=jYFNUJ65XiqIDkOlUy2lMGnAg2
-        MJ+YjxSokjtG8XrRp1WQd2hfx98seC1/Bp1d0Vk7r4qoSxRjInphARNmUnpKBdfVXsLA5kEJbbpiM
-        /cNVPpASl/QBu1IhkUdCB8kmuRMBUMN+Re5KM5hd3a0O3ZIvCM9jumtMUQjW4o8weqy+9mrXsGqCQ
-        XEGDiEulhNWxMb2By0BUNfOcYxzFLgJ9svhj81JyeuqqGQlHsRcYfWida6ZXH7I6vQEVTcEU6jI2P
-        r5IlGgOsRshykl8cCY61PNkDGgZ0FH6Wp3yH45YDf9sbcd5Vl6SioBdeuQzBxZv3zMe+toHip1JrY
-        GCEsSA0w==;
-Received: from j217100.upc-j.chello.nl ([24.132.217.100] helo=noisy.programming.kicks-ass.net)
-        by desiato.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1m8h4b-003gLS-Td; Wed, 28 Jul 2021 10:46:02 +0000
-Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits))
-        (Client did not present a certificate)
-        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id 3287330005A;
-        Wed, 28 Jul 2021 12:46:00 +0200 (CEST)
-Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
-        id 186A721071BE8; Wed, 28 Jul 2021 12:46:00 +0200 (CEST)
-Date:   Wed, 28 Jul 2021 12:46:00 +0200
-From:   Peter Zijlstra <peterz@infradead.org>
-To:     Marcelo Tosatti <mtosatti@redhat.com>
-Cc:     Suleiman Souhlal <suleiman@google.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Juri Lelli <juri.lelli@redhat.com>,
-        Vincent Guittot <vincent.guittot@linaro.org>,
-        Dietmar Eggemann <dietmar.eggemann@arm.com>,
-        Steven Rostedt <rostedt@goodmis.org>,
-        Ben Segall <bsegall@google.com>, Mel Gorman <mgorman@suse.de>,
-        Daniel Bristot de Oliveira <bristot@redhat.com>,
-        ssouhlal@freebsd.org, joelaf@google.com, senozhatsky@chromium.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        Nitesh Narayan Lal <nitesh@redhat.com>,
-        Nicolas Saenz Julienne <nsaenzju@redhat.com>
-Subject: Re: [RFC PATCH 0/2] KVM: Support Heterogeneous RT VCPU
- Configurations.
-Message-ID: <YQE1aB0/6B1FReZg@hirez.programming.kicks-ass.net>
-References: <20210728073700.120449-1-suleiman@google.com>
- <YQEQ9zdlBrgpOukj@hirez.programming.kicks-ass.net>
- <20210728103253.GB7633@fuller.cnet>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210728103253.GB7633@fuller.cnet>
+        id S235992AbhG1KrY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 28 Jul 2021 06:47:24 -0400
+Received: from mail.kernel.org ([198.145.29.99]:52066 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S231340AbhG1KrY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 28 Jul 2021 06:47:24 -0400
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id C6B0760F9B;
+        Wed, 28 Jul 2021 10:47:22 +0000 (UTC)
+Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94.2)
+        (envelope-from <maz@kernel.org>)
+        id 1m8h5t-001Vli-5g; Wed, 28 Jul 2021 11:47:21 +0100
+Date:   Wed, 28 Jul 2021 11:47:20 +0100
+Message-ID: <87v94ud8av.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Will Deacon <will@kernel.org>
+Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        qperret@google.com, dbrazdil@google.com,
+        Srivatsa Vaddagiri <vatsa@codeaurora.org>,
+        Shanker R Donthineni <sdonthineni@nvidia.com>,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        kernel-team@android.com
+Subject: Re: [PATCH 07/16] KVM: arm64: Wire MMIO guard hypercalls
+In-Reply-To: <20210727181145.GF19173@willie-the-truck>
+References: <20210715163159.1480168-1-maz@kernel.org>
+        <20210715163159.1480168-8-maz@kernel.org>
+        <20210727181145.GF19173@willie-the-truck>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: will@kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, qperret@google.com, dbrazdil@google.com, vatsa@codeaurora.org, sdonthineni@nvidia.com, james.morse@arm.com, suzuki.poulose@arm.com, alexandru.elisei@arm.com, kernel-team@android.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jul 28, 2021 at 07:32:53AM -0300, Marcelo Tosatti wrote:
-> Peter, not sure what exactly are you thinking of? (to solve this
-> particular problem with pv deadline scheduling).
+On Tue, 27 Jul 2021 19:11:46 +0100,
+Will Deacon <will@kernel.org> wrote:
 > 
-> Shouldnt it be possible to, through paravirt locks, boost the priority
-> of the non-RT vCPU (when locking fails in the -RT vCPU) ?
+> On Thu, Jul 15, 2021 at 05:31:50PM +0100, Marc Zyngier wrote:
+> > Plumb in the hypercall interface to allow a guest to discover,
+> > enroll, map and unmap MMIO regions.
+> > 
+> > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> > ---
+> >  arch/arm64/kvm/hypercalls.c | 20 ++++++++++++++++++++
+> >  include/linux/arm-smccc.h   | 28 ++++++++++++++++++++++++++++
+> >  2 files changed, 48 insertions(+)
+> > 
+> > diff --git a/arch/arm64/kvm/hypercalls.c b/arch/arm64/kvm/hypercalls.c
+> > index 30da78f72b3b..a3deeb907fdd 100644
+> > --- a/arch/arm64/kvm/hypercalls.c
+> > +++ b/arch/arm64/kvm/hypercalls.c
+> > @@ -5,6 +5,7 @@
+> >  #include <linux/kvm_host.h>
+> >  
+> >  #include <asm/kvm_emulate.h>
+> > +#include <asm/kvm_mmu.h>
+> >  
+> >  #include <kvm/arm_hypercalls.h>
+> >  #include <kvm/arm_psci.h>
+> > @@ -129,10 +130,29 @@ int kvm_hvc_call_handler(struct kvm_vcpu *vcpu)
+> >  	case ARM_SMCCC_VENDOR_HYP_KVM_FEATURES_FUNC_ID:
+> >  		val[0] = BIT(ARM_SMCCC_KVM_FUNC_FEATURES);
+> >  		val[0] |= BIT(ARM_SMCCC_KVM_FUNC_PTP);
+> > +		val[0] |= BIT(ARM_SMCCC_KVM_FUNC_MMIO_GUARD_INFO);
+> > +		val[0] |= BIT(ARM_SMCCC_KVM_FUNC_MMIO_GUARD_ENROLL);
+> > +		val[0] |= BIT(ARM_SMCCC_KVM_FUNC_MMIO_GUARD_MAP);
+> > +		val[0] |= BIT(ARM_SMCCC_KVM_FUNC_MMIO_GUARD_UNMAP);
+> >  		break;
+> >  	case ARM_SMCCC_VENDOR_HYP_KVM_PTP_FUNC_ID:
+> >  		kvm_ptp_get_time(vcpu, val);
+> >  		break;
+> > +	case ARM_SMCCC_VENDOR_HYP_KVM_MMIO_GUARD_INFO_FUNC_ID:
+> > +		val[0] = PAGE_SIZE;
+> > +		break;
+> 
+> I get the nagging feeling that querying the stage-2 page-size outside of
+> MMIO guard is going to be useful once we start looking at memory sharing,
+> so perhaps rename this to something more generic?
 
-No. Static priority scheduling does not compose. Any scheme that relies
-on the guest behaving 'nice' is unacceptable.
+At this stage, why not follow the architecture and simply expose it as
+ID_AA64MMFR0_EL1.TGran{4,64,16}_2? That's exactly what it is for, and
+we already check for this in KVM itself.
+
+> 
+> > +	case ARM_SMCCC_VENDOR_HYP_KVM_MMIO_GUARD_ENROLL_FUNC_ID:
+> > +		set_bit(KVM_ARCH_FLAG_MMIO_GUARD, &vcpu->kvm->arch.flags);
+> > +		val[0] = SMCCC_RET_SUCCESS;
+> > +		break;
+> > +	case ARM_SMCCC_VENDOR_HYP_KVM_MMIO_GUARD_MAP_FUNC_ID:
+> > +		if (kvm_install_ioguard_page(vcpu, vcpu_get_reg(vcpu, 1)))
+> > +			val[0] = SMCCC_RET_SUCCESS;
+> > +		break;
+> > +	case ARM_SMCCC_VENDOR_HYP_KVM_MMIO_GUARD_UNMAP_FUNC_ID:
+> > +		if (kvm_remove_ioguard_page(vcpu, vcpu_get_reg(vcpu, 1)))
+> > +			val[0] = SMCCC_RET_SUCCESS;
+> > +		break;
+> 
+> I think there's a slight discrepancy between MAP and UNMAP here in that
+> calling UNMAP on something that hasn't been mapped will fail, whereas
+> calling MAP on something that's already been mapped will succeed. I think
+> that might mean you can't reason about the final state of the page if two
+> vCPUs race to call these functions in some cases (and both succeed).
+
+I'm not sure that's the expected behaviour for ioremap(), for example
+(you can ioremap two portions of the same page successfully).
+
+I guess MAP could return something indicating that the page is already
+mapped, but I wouldn't want to return a hard failure in this case.
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
