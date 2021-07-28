@@ -2,184 +2,100 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E3D9F3D935A
-	for <lists+kvm@lfdr.de>; Wed, 28 Jul 2021 18:41:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2D9A13D9398
+	for <lists+kvm@lfdr.de>; Wed, 28 Jul 2021 18:51:57 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229690AbhG1QlT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 28 Jul 2021 12:41:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41774 "EHLO
+        id S229716AbhG1Qv5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 28 Jul 2021 12:51:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44344 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229574AbhG1QlT (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 28 Jul 2021 12:41:19 -0400
-Received: from mail-lf1-x134.google.com (mail-lf1-x134.google.com [IPv6:2a00:1450:4864:20::134])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1CDB8C061757;
-        Wed, 28 Jul 2021 09:41:17 -0700 (PDT)
-Received: by mail-lf1-x134.google.com with SMTP id m13so5077940lfg.13;
-        Wed, 28 Jul 2021 09:41:17 -0700 (PDT)
+        with ESMTP id S229537AbhG1Qv5 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 28 Jul 2021 12:51:57 -0400
+Received: from mail-pl1-x62d.google.com (mail-pl1-x62d.google.com [IPv6:2607:f8b0:4864:20::62d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 88368C061764
+        for <kvm@vger.kernel.org>; Wed, 28 Jul 2021 09:51:55 -0700 (PDT)
+Received: by mail-pl1-x62d.google.com with SMTP id e5so3406156pld.6
+        for <kvm@vger.kernel.org>; Wed, 28 Jul 2021 09:51:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=VbHSe5ZmokTeRZOVR5/DxbeDukJUOZWqPm1zkRBz3bc=;
-        b=Y0tizcCEiBh+D7lqJGorKFC0uu9mzmJ+oKCwjELrNTc3QiKdHM7vxw8UwwvMU/PaUA
-         53tPEf3XHrNfByM7bl/komnTjiUYQA+Ci900eyGa0vW3bBGAY1ZQna2oOVTSJ+mScAef
-         ceR/M7AP4kLP/PjDCYKjb98hV7xYlzqqeXqyHmlAU4tsht+id5F2zzhw+/A6FuFU0OTy
-         MQQgpH6yZruzxncfSequRGMtWDbBTglcwesAGyxsGKCzX6zSVGhct0h3X2G1OrsnE6vC
-         IxN6ckpLC6Uy2wlZVeLY7xafATu4jXq0lZ53iiRMaGCnHgQFqk8NT3crT/Xu1X5UW0Em
-         S9pA==
+        d=google.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=qCPT4bVwwR8ai3a6eA6/fF0tOyNcgHz50ZuIx8a534o=;
+        b=dMzmTUSnosm/iHkWAoP9DVdTxjicL604f4Cb691mO0xLlWzl1lxDi0I5v80JbvapeL
+         xi7SV7RTFrxsT600ehMokUmTeLg69m4nWFIpMWkg5/2VylXavXWLdX5m12NRv7gkznCv
+         LC/keunwPko8qkM4Cmm42n8CIWUrHhCwdMeMeXWpqNnZIcwuJdV6LFztW+QUDQvG4HoM
+         j2CKMaWMy2LQzHH7CioAkmfb4cSiv23lZ8yFvage+0fcOi5z88WDNwpPrk5Swv8kQucn
+         wUSgw6uLYoqWEUM+7P/obhiyEnM4qy/4wUiSdayne+tI4zwFp/m09ycflePra7mYOZvu
+         8Nyw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=VbHSe5ZmokTeRZOVR5/DxbeDukJUOZWqPm1zkRBz3bc=;
-        b=sBGJ9/kBP1F/AreucvOoXqlQMUs33CPeWfp00CNi4j9kznNEMVvmcoXgOF2UtylZlj
-         RfrborwDXEFypNltOqqiwGC2vyTvDq7PcDw1bmPEAF7W5EaFl8dhP/BJK36H3tduHpV3
-         OAlI9e+ly2b9nk4O51jFObzAvedXklYzKSxParxhO6bYITZ1FFV7vEKN4wkn4fNXu57S
-         aoO+tbhArAP0rHD1sivKrQscdmJHuLETjszMBT1vIhd53C3uAW0aO0PznErGQJ0TquXJ
-         mw5TRAp9tCux2m98nZSxRYf9hmCEm+VcCs5SzJwkAO3kBEsHMU+3mxmMSuLOJUn04zPR
-         0KSA==
-X-Gm-Message-State: AOAM532RNt0GXrLYM1nW+m+Vi0sRs7lWzYIS8l4eGGWFCFQHfIlgbxm/
-        7TKlH45uEqvW9BnaR+cd7EabQPXCSW2H2KNNWp0=
-X-Google-Smtp-Source: ABdhPJw23T56CmiSS82fKQEiITmrFD7JG4x28Dd9mzB4sWJvcaayyqyqfcUURs8u+JK1LLu9eDiUAFteoWd98pTvZXc=
-X-Received: by 2002:a05:6512:3148:: with SMTP id s8mr341209lfi.513.1627490475453;
- Wed, 28 Jul 2021 09:41:15 -0700 (PDT)
-MIME-Version: 1.0
-References: <20210722054159.4459-1-lingshan.zhu@intel.com> <YQF7lwM6qzYso0Gg@hirez.programming.kicks-ass.net>
-In-Reply-To: <YQF7lwM6qzYso0Gg@hirez.programming.kicks-ass.net>
-From:   Like Xu <like.xu.linux@gmail.com>
-Date:   Thu, 29 Jul 2021 00:40:59 +0800
-Message-ID: <CAA3+yLe3xd5uP47kOTA843b5ZByTJR7h5Ud38y+yhP8i2vk_6Q@mail.gmail.com>
-Subject: Re: [PATCH V9 00/18] KVM: x86/pmu: Add *basic* support to enable
- guest PEBS via DS
-To:     Peter Zijlstra <peterz@infradead.org>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Zhu Lingshan <lingshan.zhu@intel.com>,
-        Borislav Petkov <bp@alien8.de>,
-        Sean Christopherson <seanjc@google.com>,
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=qCPT4bVwwR8ai3a6eA6/fF0tOyNcgHz50ZuIx8a534o=;
+        b=g4Lni1xtHbZlJ3FkKjS4iw1YN+IPSAjFPNoZC0OJxusH7uCf0oRBcs4qJnhCBXoxvQ
+         ebSVx2Wb6Wx9Ooz5ZBz8R1oFaUg9/C6VAtqidOcv17sokLPNKMJtZPORZS2u5od9RXEW
+         QS5p5rr8usswvnJA4D087fg4QuMToG2rx7LRccTSlwiUFqiju3J6QK73N2pnYgj93gLm
+         8v44NDO5eZeIfVvdKInZXhFxFbLhwBidQiey6Khp3SWK3WVl+o0C7+aF4IQigxy+L9Yl
+         mNPKieVluuRRTBrnCIhEvhUcK+3eeftCeQHe0POOqc9MDik0u+e6Pqku07HWt/Re9vf1
+         ucMg==
+X-Gm-Message-State: AOAM530g66zku9oxJ46NsXjVPR13Po5ZIPcwPV52YOq4GKMHFjyQ2qGJ
+        lXyRtzZ6Zg9L6lwnkgOo22apng==
+X-Google-Smtp-Source: ABdhPJyDcd4jgGC6QwVVtEOI+2Yz7a+SUlYoO1hC9Alm5zD0P5RC7YiblpIcYybXHIGTC3dFf27Kug==
+X-Received: by 2002:a63:cd4d:: with SMTP id a13mr707167pgj.364.1627491114753;
+        Wed, 28 Jul 2021 09:51:54 -0700 (PDT)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id f16sm276873pgb.51.2021.07.28.09.51.53
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 28 Jul 2021 09:51:54 -0700 (PDT)
+Date:   Wed, 28 Jul 2021 16:51:50 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     isaku.yamahata@intel.com, Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        "H . Peter Anvin" <hpa@zytor.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        "Liang, Kan" <kan.liang@linux.intel.com>, ak@linux.intel.com,
-        wei.w.wang@intel.com, Stephane Eranian <eranian@google.com>,
-        Liuxiangdong <liuxiangdong5@huawei.com>,
-        linux-kernel@vger.kernel.org, x86@kernel.org, kvm@vger.kernel.org,
-        boris.ostrvsky@oracle.com
-Content-Type: text/plain; charset="UTF-8"
+        Joerg Roedel <joro@8bytes.org>, erdemaktas@google.com,
+        Connor Kuehl <ckuehl@redhat.com>, x86@kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        isaku.yamahata@gmail.com
+Subject: Re: [RFC PATCH v2 00/69] KVM: X86: TDX support
+Message-ID: <YQGLJrvjTNZAqU61@google.com>
+References: <cover.1625186503.git.isaku.yamahata@intel.com>
+ <0d453d76-11e7-aeb9-b890-f457afbb6614@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <0d453d76-11e7-aeb9-b890-f457afbb6614@redhat.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jul 28, 2021 at 11:46 PM Peter Zijlstra <peterz@infradead.org> wrote:
->
-> On Thu, Jul 22, 2021 at 01:41:41PM +0800, Zhu Lingshan wrote:
-> > The guest Precise Event Based Sampling (PEBS) feature can provide an
-> > architectural state of the instruction executed after the guest instruction
-> > that exactly caused the event. It needs new hardware facility only available
-> > on Intel Ice Lake Server platforms. This patch set enables the basic PEBS
-> > feature for KVM guests on ICX.
-> >
-> > We can use PEBS feature on the Linux guest like native:
-> >
-> >    # echo 0 > /proc/sys/kernel/watchdog (on the host)
-> >    # perf record -e instructions:ppp ./br_instr a
-> >    # perf record -c 100000 -e instructions:pp ./br_instr a
->
-> Why does the host need to disable the watchdog? IIRC ICL has multiple
-> PEBS capable counters. Also, I think the watchdog ends up on a fixed
-> counter by default anyway.
+On Mon, Jul 26, 2021, Paolo Bonzini wrote:
+> On 03/07/21 00:04, isaku.yamahata@intel.com wrote:
+> > * Patch organization
+> > The patch 66 is main change.  The preceding patches(1-65) The preceding
+> > patches(01-61) are refactoring the code and introducing additional hooks.
+> > 
+> > - 01-12: They are preparations. introduce architecture constants, code
+> >           refactoring, export symbols for following patches.
+> > - 13-40: start to introduce the new type of VM and allow the coexistence of
+> >           multiple type of VM. allow/disallow KVM ioctl where
+> >           appropriate. Especially make per-system ioctl to per-VM ioctl.
+> > - 41-65: refactoring KVM VMX/MMU and adding new hooks for Secure EPT.
+> > - 66:    main patch to add "basic" support for building/running TDX.
+> > - 67:    trace points for
+> > - 68-69:  Documentation
+> 
+> Queued 2,3,17-20,23,44-45, thanks.
 
-The watchdog counter blocks the KVM PEBS request on the same (fixed) counter.
-This restriction will be lifted when we have cross-mapping support later in KVM.
+I strongly object to merging these two until we see the new SEAMLDR code:
 
->
-> > Like Xu (17):
-> >   perf/core: Use static_call to optimize perf_guest_info_callbacks
-> >   perf/x86/intel: Add EPT-Friendly PEBS for Ice Lake Server
-> >   perf/x86/intel: Handle guest PEBS overflow PMI for KVM guest
-> >   perf/x86/core: Pass "struct kvm_pmu *" to determine the guest values
-> >   KVM: x86/pmu: Set MSR_IA32_MISC_ENABLE_EMON bit when vPMU is enabled
-> >   KVM: x86/pmu: Introduce the ctrl_mask value for fixed counter
-> >   KVM: x86/pmu: Add IA32_PEBS_ENABLE MSR emulation for extended PEBS
-> >   KVM: x86/pmu: Reprogram PEBS event to emulate guest PEBS counter
-> >   KVM: x86/pmu: Adjust precise_ip to emulate Ice Lake guest PDIR counter
-> >   KVM: x86/pmu: Add IA32_DS_AREA MSR emulation to support guest DS
-> >   KVM: x86/pmu: Add PEBS_DATA_CFG MSR emulation to support adaptive PEBS
-> >   KVM: x86: Set PEBS_UNAVAIL in IA32_MISC_ENABLE when PEBS is enabled
-> >   KVM: x86/pmu: Move pmc_speculative_in_use() to arch/x86/kvm/pmu.h
-> >   KVM: x86/pmu: Disable guest PEBS temporarily in two rare situations
-> >   KVM: x86/pmu: Add kvm_pmu_cap to optimize perf_get_x86_pmu_capability
-> >   KVM: x86/cpuid: Refactor host/guest CPU model consistency check
-> >   KVM: x86/pmu: Expose CPUIDs feature bits PDCM, DS, DTES64
-> >
-> > Peter Zijlstra (Intel) (1):
-> >   x86/perf/core: Add pebs_capable to store valid PEBS_COUNTER_MASK value
->
-> Looks good:
->
-> Acked-by: Peter Zijlstra (Intel) <peterz@infradead.org>
+  [RFC PATCH v2 02/69] KVM: X86: move kvm_cpu_vmxon() from vmx.c to virtext.h
+  [RFC PATCH v2 03/69] KVM: X86: move out the definition vmcs_hdr/vmcs from kvm to x86
 
-Thanks for your time and support of the guest PMU features.
-
-> How do we want to route this, all through the KVM tree?
-
-As a prerequisite, the perf tree may apply the first three patches.
-Hi Paolo, do you have any preferences ?
-
->
-> One little nit I had; would something like the below (on top perhaps)
-> make the code easier to read?
-
-Fine to me and I may provide a follow-up patch.
-
->
-> ---
-> --- a/arch/x86/events/intel/core.c
-> +++ b/arch/x86/events/intel/core.c
-> @@ -3921,9 +3921,12 @@ static struct perf_guest_switch_msr *int
->         struct kvm_pmu *kvm_pmu = (struct kvm_pmu *)data;
->         u64 intel_ctrl = hybrid(cpuc->pmu, intel_ctrl);
->         u64 pebs_mask = cpuc->pebs_enabled & x86_pmu.pebs_capable;
-> +       int global_ctrl, pebs_enable;
->
->         *nr = 0;
-> -       arr[(*nr)++] = (struct perf_guest_switch_msr){
-> +
-> +       global_ctrl = (*nr)++;
-> +       arr[global_ctrl] = (struct perf_guest_switch_msr){
->                 .msr = MSR_CORE_PERF_GLOBAL_CTRL,
->                 .host = intel_ctrl & ~cpuc->intel_ctrl_guest_mask,
->                 .guest = intel_ctrl & (~cpuc->intel_ctrl_host_mask | ~pebs_mask),
-> @@ -3966,23 +3969,23 @@ static struct perf_guest_switch_msr *int
->                 };
->         }
->
-> -       arr[*nr] = (struct perf_guest_switch_msr){
-> +       pebs_enable = (*nr)++;
-> +       arr[pebs_enable] = (struct perf_guest_switch_msr){
->                 .msr = MSR_IA32_PEBS_ENABLE,
->                 .host = cpuc->pebs_enabled & ~cpuc->intel_ctrl_guest_mask,
->                 .guest = pebs_mask & ~cpuc->intel_ctrl_host_mask,
->         };
->
-> -       if (arr[*nr].host) {
-> +       if (arr[pebs_enable].host) {
->                 /* Disable guest PEBS if host PEBS is enabled. */
-> -               arr[*nr].guest = 0;
-> +               arr[pebs_enable].guest = 0;
->         } else {
->                 /* Disable guest PEBS for cross-mapped PEBS counters. */
-> -               arr[*nr].guest &= ~kvm_pmu->host_cross_mapped_mask;
-> +               arr[pebs_enable].guest &= ~kvm_pmu->host_cross_mapped_mask;
->                 /* Set hw GLOBAL_CTRL bits for PEBS counter when it runs for guest */
-> -               arr[0].guest |= arr[*nr].guest;
-> +               arr[global_ctrl].guest |= arr[pebs_enable].guest;
->         }
->
-> -       ++(*nr);
->         return arr;
->  }
->
->
->
->
+If the SEAMLDR code ends up being fully contained in KVM, then this is unnecessary
+churn and exposes code outside of KVM that we may not want exposed (yet).  E.g.
+setting and clearing CR4.VMXE (in the fault path) in cpu_vmxon() may not be
+necessary/desirable for SEAMLDR, we simply can't tell without seeing the code.
