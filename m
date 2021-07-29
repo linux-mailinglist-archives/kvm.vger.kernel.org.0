@@ -2,55 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6BB003DAEAB
-	for <lists+kvm@lfdr.de>; Fri, 30 Jul 2021 00:09:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6E9BA3DAEAE
+	for <lists+kvm@lfdr.de>; Fri, 30 Jul 2021 00:09:42 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234458AbhG2WJf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 29 Jul 2021 18:09:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60026 "EHLO
+        id S234568AbhG2WJi (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 29 Jul 2021 18:09:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60034 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234295AbhG2WJa (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 29 Jul 2021 18:09:30 -0400
-Received: from mail-oi1-x249.google.com (mail-oi1-x249.google.com [IPv6:2607:f8b0:4864:20::249])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 18AAFC061765
-        for <kvm@vger.kernel.org>; Thu, 29 Jul 2021 15:09:27 -0700 (PDT)
-Received: by mail-oi1-x249.google.com with SMTP id m20-20020a0568080f14b029025a3cb2429bso3631652oiw.20
-        for <kvm@vger.kernel.org>; Thu, 29 Jul 2021 15:09:27 -0700 (PDT)
+        with ESMTP id S234326AbhG2WJb (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 29 Jul 2021 18:09:31 -0400
+Received: from mail-il1-x149.google.com (mail-il1-x149.google.com [IPv6:2607:f8b0:4864:20::149])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 12A46C061765
+        for <kvm@vger.kernel.org>; Thu, 29 Jul 2021 15:09:28 -0700 (PDT)
+Received: by mail-il1-x149.google.com with SMTP id x16-20020a9206100000b02902166568c213so3963378ilg.22
+        for <kvm@vger.kernel.org>; Thu, 29 Jul 2021 15:09:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=date:in-reply-to:message-id:mime-version:references:subject:from:to
          :cc;
-        bh=quVRBmXT16c8/+OvPaemt4sih+vYkJfmbVpHJfXSYSE=;
-        b=ugW9I6GN7pWL34ADNzvmolXeBcl8BcWkp42bUMTI1HufksQY7hkq6QIre1ssegbcDK
-         1HingL2dULatPpmnK4uTzlDTe5eHq4aIvslbmDd+0FZDk9o/YhXmqlRUHTKClJqtjIRx
-         lO9lAb7lc0X/0//6WYsoJanHg5bq1N/NKju+D9SXdR0TnkG7bI2ZtwBRiaEWf6bOkRAb
-         98/5vkebBq7V5Nz4THlbYao4dA+pzlZ/gHl/QwtbvjtosU+04rXIX/8S9Log9/7k7tkG
-         h+Dzno/lXwqxLsTSydVwT48EpccvW4FnKhbvPPd1heziD9Z5v6dkZjVLzssvROFfgMNZ
-         1Y1Q==
+        bh=OUDEC1vqPr7sdUdf2B7zr2nu10+QX6s5o8FUl8jn128=;
+        b=afE61tmFlcKYV3syP0+ocrz06Dzk453aCfpsM5SdLvc9pXlbGValTdHId9+zvt7H+M
+         wYkB0MblDqvsjNJQs3xi0hlRFhf5T2vW5CS2ZIv7ezpfpvzRtWEk9hygtiKge9mN1F9U
+         WnKUVDYfMwPaMVDB778tT5OjBgssPZfqJsShDS+S+hY3M/4XbAe07rjzHqhnrsB3QOlh
+         oDO1n0Hr+y+GJtvHFGUarcecAb9fZi4NVCmTTOKOsxmhlfSrIW1+GQ/kW8St9S68/pH6
+         ZZ3P18M07QIcvNF07ClKQqYPgHfSkbBLFtoN8V027CGEypWH8yATHh6g3uqpDKBhxT3p
+         U58w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=quVRBmXT16c8/+OvPaemt4sih+vYkJfmbVpHJfXSYSE=;
-        b=EU56yBizb+8asvD/S3AAVFEouwG+J9t7RWHLsrt/41+ilsikIEhvy5OpaKz3tt9/6I
-         8P35tp7XRWpOA4/B56zKT5WkbODAaZsz8jod5TT1H3pU56RIn4hQy4wcpjCtfEF6Bjzm
-         DsuAx6RoaY6mavvF3y3XiziU1MEIRDJu7FSfzcknPD04CaeAcdRAQ+8nXtynl8mndlz/
-         +FyA43zrlMBr9N5J49U4FfAbVC3RWgGkgTCQmIvk3ShB/sLsFK9k5JExxSlutors9uFM
-         0VR7ypE1WKXRSbBx26BKtpbi6G4TBO+ejNF2CrjDGRKMWXNKKyzc/+fYGeMjIzJy0G7S
-         Enbg==
-X-Gm-Message-State: AOAM531v9CsXBlmOgTzDRYN/An8cMg9BDW51WUHln+a2xhxvC1dKyT/I
-        ohasx1V/vves7uNAfBMHpV7Bl53JzL8=
-X-Google-Smtp-Source: ABdhPJzcet3LHyvZdP4E+QC8YrDCMndlQCo3ftaMJDpvwe0sicb30CgU1kH3S2MUtZSb4XXEKENrpPs4SFs=
+        bh=OUDEC1vqPr7sdUdf2B7zr2nu10+QX6s5o8FUl8jn128=;
+        b=QJrslypHw7mOMzriX3eu17TyD+ynnvnHCeHdI1Oop7ztkLCxgYDqfy3JLixBGhLagk
+         AKjyuxNXIWIyiHS/9uMqG7P7vI1s+ZmLggsZOvkL9eH4z9JWE563nvGA11JQafLz63x3
+         Y2hv0A0DoQ1BE7YBKinGUFuTFgwE4hIVCJojeQfnMjZlEMTQF2mb7OT5yOPzgztllFz3
+         uB4QZk+YTARypzQp3EvgRVwQ7Z5j//g+HOnUj8nU2gdTT44tU0R66nkgoEhx8PtvvyfH
+         ab9HkFSWc/ItedDwnvEaa8VYUYFqu6R02f/tG5TnQxssjGFXPkQrG+QV3Prw5NcafYU+
+         OoiQ==
+X-Gm-Message-State: AOAM5324RXLwo1bR4CaoZ00u/OrquicETKtKEz7GqygwIYX4amNPfSXm
+        J+HjgQXtcbFIp1Em0psoWk/ybfQbX2E=
+X-Google-Smtp-Source: ABdhPJynKEKZCh3Kk0HnLCvNi7Sc5MHDpzqm8Ql84cT0T630dSbB3HhwdbM09/xE2CFjkssQ6KG4bWN3Y/U=
 X-Received: from oupton.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:404])
- (user=oupton job=sendgmr) by 2002:aca:bf84:: with SMTP id p126mr4508603oif.154.1627596566328;
- Thu, 29 Jul 2021 15:09:26 -0700 (PDT)
-Date:   Thu, 29 Jul 2021 22:09:14 +0000
+ (user=oupton job=sendgmr) by 2002:a02:b058:: with SMTP id q24mr117122jah.88.1627596567382;
+ Thu, 29 Jul 2021 15:09:27 -0700 (PDT)
+Date:   Thu, 29 Jul 2021 22:09:15 +0000
 In-Reply-To: <20210729220916.1672875-1-oupton@google.com>
-Message-Id: <20210729220916.1672875-2-oupton@google.com>
+Message-Id: <20210729220916.1672875-3-oupton@google.com>
 Mime-Version: 1.0
 References: <20210729220916.1672875-1-oupton@google.com>
 X-Mailer: git-send-email 2.32.0.554.ge1b32706d8-goog
-Subject: [PATCH v2 1/3] KVM: arm64: Record number of signal exits as a vCPU stat
+Subject: [PATCH v2 2/3] entry: KVM: Allow use of generic KVM entry w/o full
+ generic support
 From:   Oliver Upton <oupton@google.com>
 To:     kvmarm@lists.cs.columbia.edu
 Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
@@ -68,61 +69,42 @@ Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
         Peter Shier <pshier@google.com>,
         Shakeel Butt <shakeelb@google.com>,
         Guangyu Shi <guangyus@google.com>,
-        Oliver Upton <oupton@google.com>,
-        Jing Zhang <jingzhangos@google.com>
+        Oliver Upton <oupton@google.com>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Most other architectures that implement KVM record a statistic
-indicating the number of times a vCPU has exited due to a pending
-signal. Add support for that stat to arm64.
+Some architectures (e.g. arm64) have yet to adopt the generic entry
+infrastructure. Despite that, it would be nice to use some common
+plumbing for guest entry/exit handling. For example, KVM/arm64 currently
+does not handle TIF_NOTIFY_PENDING correctly.
 
-Reviewed-by: Jing Zhang <jingzhangos@google.com>
+Allow use of only the generic KVM entry code by tightening up the
+include list. No functional change intended.
+
 Signed-off-by: Oliver Upton <oupton@google.com>
 ---
- arch/arm64/include/asm/kvm_host.h | 1 +
- arch/arm64/kvm/arm.c              | 1 +
- arch/arm64/kvm/guest.c            | 1 +
- 3 files changed, 3 insertions(+)
+ include/linux/entry-kvm.h | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
 
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 41911585ae0c..70e129f2b574 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -576,6 +576,7 @@ struct kvm_vcpu_stat {
- 	u64 wfi_exit_stat;
- 	u64 mmio_exit_user;
- 	u64 mmio_exit_kernel;
-+	u64 signal_exits;
- 	u64 exits;
- };
+diff --git a/include/linux/entry-kvm.h b/include/linux/entry-kvm.h
+index 136b8d97d8c0..0d7865a0731c 100644
+--- a/include/linux/entry-kvm.h
++++ b/include/linux/entry-kvm.h
+@@ -2,7 +2,11 @@
+ #ifndef __LINUX_ENTRYKVM_H
+ #define __LINUX_ENTRYKVM_H
  
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index e9a2b8f27792..60d0a546d7fd 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -783,6 +783,7 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
- 		if (signal_pending(current)) {
- 			ret = -EINTR;
- 			run->exit_reason = KVM_EXIT_INTR;
-+			++vcpu->stat.signal_exits;
- 		}
+-#include <linux/entry-common.h>
++#include <linux/static_call_types.h>
++#include <linux/tracehook.h>
++#include <linux/syscalls.h>
++#include <linux/seccomp.h>
++#include <linux/sched.h>
+ #include <linux/tick.h>
  
- 		/*
-diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
-index 1dfb83578277..853d1e8d2e73 100644
---- a/arch/arm64/kvm/guest.c
-+++ b/arch/arm64/kvm/guest.c
-@@ -50,6 +50,7 @@ const struct _kvm_stats_desc kvm_vcpu_stats_desc[] = {
- 	STATS_DESC_COUNTER(VCPU, wfi_exit_stat),
- 	STATS_DESC_COUNTER(VCPU, mmio_exit_user),
- 	STATS_DESC_COUNTER(VCPU, mmio_exit_kernel),
-+	STATS_DESC_COUNTER(VCPU, signal_exits),
- 	STATS_DESC_COUNTER(VCPU, exits)
- };
- static_assert(ARRAY_SIZE(kvm_vcpu_stats_desc) ==
+ /* Transfer to guest mode work */
 -- 
 2.32.0.554.ge1b32706d8-goog
 
