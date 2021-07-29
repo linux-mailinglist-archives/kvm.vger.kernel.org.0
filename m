@@ -2,150 +2,87 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id DB4CB3DA2FD
-	for <lists+kvm@lfdr.de>; Thu, 29 Jul 2021 14:18:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 34BEF3DA345
+	for <lists+kvm@lfdr.de>; Thu, 29 Jul 2021 14:40:15 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236980AbhG2MSm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 29 Jul 2021 08:18:42 -0400
-Received: from mx21.baidu.com ([220.181.3.85]:55426 "EHLO baidu.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S236978AbhG2MSl (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 29 Jul 2021 08:18:41 -0400
-Received: from BC-Mail-EX08.internal.baidu.com (unknown [172.31.51.48])
-        by Forcepoint Email with ESMTPS id 258AA6B4DB088E50910F;
-        Thu, 29 Jul 2021 20:18:35 +0800 (CST)
-Received: from BJHW-MAIL-EX27.internal.baidu.com (10.127.64.42) by
- BC-Mail-EX08.internal.baidu.com (172.31.51.48) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
- 15.1.2242.12; Thu, 29 Jul 2021 20:18:34 +0800
-Received: from LAPTOP-UKSR4ENP.internal.baidu.com (172.31.63.8) by
- BJHW-MAIL-EX27.internal.baidu.com (10.127.64.42) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
- 15.1.2308.14; Thu, 29 Jul 2021 20:18:34 +0800
-From:   Cai Huoqing <caihuoqing@baidu.com>
-To:     <mst@redhat.com>, <jasowang@redhat.com>, <pbonzini@redhat.com>,
-        <stefanha@redhat.com>, <sgarzare@redhat.com>
-CC:     <kvm@vger.kernel.org>, <netdev@vger.kernel.org>,
-        Cai Huoqing <caihuoqing@baidu.com>
-Subject: [PATCH] vhost: Fix typo in comments
-Date:   Thu, 29 Jul 2021 20:18:28 +0800
-Message-ID: <20210729121828.2029-1-caihuoqing@baidu.com>
-X-Mailer: git-send-email 2.17.1
+        id S236597AbhG2MkQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 29 Jul 2021 08:40:16 -0400
+Received: from szxga08-in.huawei.com ([45.249.212.255]:13210 "EHLO
+        szxga08-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S234459AbhG2MkN (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 29 Jul 2021 08:40:13 -0400
+Received: from dggemv711-chm.china.huawei.com (unknown [172.30.72.54])
+        by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4Gb92931qTz1CNdJ;
+        Thu, 29 Jul 2021 20:34:09 +0800 (CST)
+Received: from dggpeml500013.china.huawei.com (7.185.36.41) by
+ dggemv711-chm.china.huawei.com (10.1.198.66) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2176.2; Thu, 29 Jul 2021 20:40:06 +0800
+Received: from [10.174.187.161] (10.174.187.161) by
+ dggpeml500013.china.huawei.com (7.185.36.41) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256) id
+ 15.1.2176.2; Thu, 29 Jul 2021 20:40:05 +0800
+To:     <like.xu@linux.intel.com>
+References: <20210201051039.255478-1-like.xu@linux.intel.com>
+Subject: Re: [PATCH v14 00/11] KVM: x86/pmu: Guest Last Branch Recording
+ Enabling
+CC:     <ak@linux.intel.com>, <alex.shi@linux.alibaba.com>,
+        <jmattson@google.com>, <joro@8bytes.org>, <kan.liang@intel.com>,
+        <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <pbonzini@redhat.com>, <seanjc@google.com>, <vkuznets@redhat.com>,
+        <wanpengli@tencent.com>, <wei.w.wang@intel.com>, <x86@kernel.org>,
+        "Fangyi (Eric)" <eric.fangyi@huawei.com>,
+        Xiexiangyou <xiexiangyou@huawei.com>
+From:   Liuxiangdong <liuxiangdong5@huawei.com>
+Message-ID: <6102A1A5.90901@huawei.com>
+Date:   Thu, 29 Jul 2021 20:40:05 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:38.0) Gecko/20100101
+ Thunderbird/38.1.0
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [172.31.63.8]
-X-ClientProxiedBy: BC-Mail-EX06.internal.baidu.com (172.31.51.46) To
- BJHW-MAIL-EX27.internal.baidu.com (10.127.64.42)
+In-Reply-To: <20210201051039.255478-1-like.xu@linux.intel.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.174.187.161]
+X-ClientProxiedBy: dggeme710-chm.china.huawei.com (10.1.199.106) To
+ dggpeml500013.china.huawei.com (7.185.36.41)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-fix typo for vhost
+Hi, like.
 
-Signed-off-by: Cai Huoqing <caihuoqing@baidu.com>
----
- drivers/vhost/scsi.c   |  4 ++--
- drivers/vhost/vhost.c  |  2 +-
- drivers/vhost/vringh.c | 18 +++++++++---------
- drivers/vhost/vsock.c  |  6 +++---
- 4 files changed, 15 insertions(+), 15 deletions(-)
+This patch set has been merged in 5.12 kernel tree so we can use LBR in 
+Guest.
+Does it have requirement on CPU?
+I can use lbr in guest on skylake and icelake, but cannot on IvyBridge.
 
-diff --git a/drivers/vhost/scsi.c b/drivers/vhost/scsi.c
-index 46f897e41217..18612219e994 100644
---- a/drivers/vhost/scsi.c
-+++ b/drivers/vhost/scsi.c
-@@ -119,7 +119,7 @@ struct vhost_scsi_nexus {
- struct vhost_scsi_tpg {
- 	/* Vhost port target portal group tag for TCM */
- 	u16 tport_tpgt;
--	/* Used to track number of TPG Port/Lun Links wrt to explict I_T Nexus shutdown */
-+	/* Used to track number of TPG Port/Lun Links wrt to explicit I_T Nexus shutdown */
- 	int tv_tpg_port_count;
- 	/* Used for vhost_scsi device reference to tpg_nexus, protected by tv_tpg_mutex */
- 	int tv_tpg_vhost_count;
-@@ -1057,7 +1057,7 @@ vhost_scsi_handle_vq(struct vhost_scsi *vs, struct vhost_virtqueue *vq)
- 			/*
- 			 * Set prot_iter to data_iter and truncate it to
- 			 * prot_bytes, and advance data_iter past any
--			 * preceeding prot_bytes that may be present.
-+			 * preceding prot_bytes that may be present.
- 			 *
- 			 * Also fix up the exp_data_len to reflect only the
- 			 * actual data payload length.
-diff --git a/drivers/vhost/vhost.c b/drivers/vhost/vhost.c
-index b9e853e6094d..9a0f8b93f64d 100644
---- a/drivers/vhost/vhost.c
-+++ b/drivers/vhost/vhost.c
-@@ -2486,7 +2486,7 @@ void vhost_add_used_and_signal_n(struct vhost_dev *dev,
- }
- EXPORT_SYMBOL_GPL(vhost_add_used_and_signal_n);
- 
--/* return true if we're sure that avaiable ring is empty */
-+/* return true if we're sure that available ring is empty */
- bool vhost_vq_avail_empty(struct vhost_dev *dev, struct vhost_virtqueue *vq)
- {
- 	__virtio16 avail_idx;
-diff --git a/drivers/vhost/vringh.c b/drivers/vhost/vringh.c
-index 4af8fa259d65..83e8c677ac11 100644
---- a/drivers/vhost/vringh.c
-+++ b/drivers/vhost/vringh.c
-@@ -630,9 +630,9 @@ static inline int xfer_to_user(const struct vringh *vrh,
-  * @features: the feature bits for this ring.
-  * @num: the number of elements.
-  * @weak_barriers: true if we only need memory barriers, not I/O.
-- * @desc: the userpace descriptor pointer.
-- * @avail: the userpace avail pointer.
-- * @used: the userpace used pointer.
-+ * @desc: the userspace descriptor pointer.
-+ * @avail: the userspace avail pointer.
-+ * @used: the userspace used pointer.
-  *
-  * Returns an error if num is invalid: you should check pointers
-  * yourself!
-@@ -905,9 +905,9 @@ static inline int kern_xfer(const struct vringh *vrh, void *dst,
-  * @features: the feature bits for this ring.
-  * @num: the number of elements.
-  * @weak_barriers: true if we only need memory barriers, not I/O.
-- * @desc: the userpace descriptor pointer.
-- * @avail: the userpace avail pointer.
-- * @used: the userpace used pointer.
-+ * @desc: the userspace descriptor pointer.
-+ * @avail: the userspace avail pointer.
-+ * @used: the userspace used pointer.
-  *
-  * Returns an error if num is invalid.
-  */
-@@ -1268,9 +1268,9 @@ static inline int putused_iotlb(const struct vringh *vrh,
-  * @features: the feature bits for this ring.
-  * @num: the number of elements.
-  * @weak_barriers: true if we only need memory barriers, not I/O.
-- * @desc: the userpace descriptor pointer.
-- * @avail: the userpace avail pointer.
-- * @used: the userpace used pointer.
-+ * @desc: the userspace descriptor pointer.
-+ * @avail: the userspace avail pointer.
-+ * @used: the userspace used pointer.
-  *
-  * Returns an error if num is invalid.
-  */
-diff --git a/drivers/vhost/vsock.c b/drivers/vhost/vsock.c
-index f249622ef11b..78f0efdc5713 100644
---- a/drivers/vhost/vsock.c
-+++ b/drivers/vhost/vsock.c
-@@ -178,10 +178,10 @@ vhost_transport_do_send_pkt(struct vhost_vsock *vsock,
- 			 * small rx buffers, headers of packets in rx queue are
- 			 * created dynamically and are initialized with header
- 			 * of current packet(except length). But in case of
--			 * SOCK_SEQPACKET, we also must clear record delimeter
-+			 * SOCK_SEQPACKET, we also must clear record delimiter
- 			 * bit(VIRTIO_VSOCK_SEQ_EOR). Otherwise, instead of one
--			 * packet with delimeter(which marks end of record),
--			 * there will be sequence of packets with delimeter
-+			 * packet with delimiter(which marks end of record),
-+			 * there will be sequence of packets with delimiter
- 			 * bit set. After initialized header will be copied to
- 			 * rx buffer, this bit will be restored.
- 			 */
--- 
-2.25.1
+I can see lbr formats(000011b) in perf_capabilities msr(0x345), but 
+there is still
+error when I try.
 
+$ perf record -b
+Error:
+cycles: PMU Hardware doesn't support sampling/overflow-interrupts. Try 
+'perf stat'
+
+Host CPU:
+Architecture:                    x86_64
+CPU op-mode(s):                  32-bit, 64-bit
+Byte Order:                      Little Endian
+Address sizes:                   46 bits physical, 48 bits virtual
+CPU(s):                          24
+On-line CPU(s) list:             0-23
+Thread(s) per core:              2
+Core(s) per socket:              6
+Socket(s):                       2
+NUMA node(s):                    2
+Vendor ID:                       GenuineIntel
+CPU family:                      6
+Model:                           62
+Model name:                      Intel(R) Xeon(R) CPU E5-2620 v2 @ 2.10GHz
+Stepping:                        4
+
+
+Thanks!
+Xiangdong Liu
