@@ -2,110 +2,127 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 336823DA811
-	for <lists+kvm@lfdr.de>; Thu, 29 Jul 2021 17:57:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 74B4C3DA8E3
+	for <lists+kvm@lfdr.de>; Thu, 29 Jul 2021 18:23:59 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238255AbhG2P5L (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 29 Jul 2021 11:57:11 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:30103 "EHLO
+        id S230036AbhG2QYB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 29 Jul 2021 12:24:01 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:34346 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S238189AbhG2P5E (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 29 Jul 2021 11:57:04 -0400
+        by vger.kernel.org with ESMTP id S229963AbhG2QYA (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 29 Jul 2021 12:24:00 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1627574220;
+        s=mimecast20190719; t=1627575836;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=OdUOSn5PsAyIvz/45Ktqnl2uzGhZFKajWTR316l3Z74=;
-        b=bbYtjcoVmU0+FlbJLtmEyn6TMFNDohk9VltIOKevd97vynQdS8iTSoDh7C+OjM1O4fmYoo
-        3IkpSoFOAj7aeFPfs+zr4GuiGrVC9sb1h/7SeuMXWPaWvWUqOrByW+sazYDC/56yDNMCFG
-        PjijuN8OOA6lUHNc6WweUmJC0kUsuzo=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-577-f2s-bEpxPrWERNCQ25pnSQ-1; Thu, 29 Jul 2021 11:56:59 -0400
-X-MC-Unique: f2s-bEpxPrWERNCQ25pnSQ-1
-Received: by mail-wm1-f70.google.com with SMTP id l12-20020a05600c1d0cb029024e389bb7f1so1940500wms.0
-        for <kvm@vger.kernel.org>; Thu, 29 Jul 2021 08:56:58 -0700 (PDT)
+        bh=8XlvRujXH8fG7I60x6Lze35EmuQmao4vXlcoc/uU2No=;
+        b=fYIAmzqj4bXwTj/VEEIGtYhI/HUVIKam1YgBWmch9CXa25I0r3koOWTKi977uBQuVztHxp
+        Vy71Qn3rMLfywr1h0ufTyf2p84j5tJoI5mMPRXjK8qlRCFo/VjniTN1WR/90zaIIK1Diz9
+        E4Q4orpAqTNU4oERQUtpxk0IZNph+ek=
+Received: from mail-il1-f197.google.com (mail-il1-f197.google.com
+ [209.85.166.197]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-35-5aMU5CGFO6-mvWqgfGC9Vw-1; Thu, 29 Jul 2021 12:22:30 -0400
+X-MC-Unique: 5aMU5CGFO6-mvWqgfGC9Vw-1
+Received: by mail-il1-f197.google.com with SMTP id g9-20020a92cda90000b029020cc3319a86so3515528ild.18
+        for <kvm@vger.kernel.org>; Thu, 29 Jul 2021 09:22:30 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=OdUOSn5PsAyIvz/45Ktqnl2uzGhZFKajWTR316l3Z74=;
-        b=afzSqMVjtBxykbgaQnsyRfk2hs9lvVOk/uq1DREPg7UWpDDXXh0zDmGWbx7mwR80t0
-         VXBQOveoF9tJaNoRkKGfATOCobmRbDr/UjzrPzEqxPhw4QxseAGQdE7urTr64TaQTV5V
-         Xd8kD2fuPtsw/KB4jdxJk3DBleREXv1qyknrn/1ysleWjczhXTd+fmVugl+Uo2V1pl2d
-         5zxGTYbU5t2hJtITDWmKpcdxJCwQ8a7k4RUhi68o9jza5AjqJXUlxVS0aSDDO6OgENXC
-         zH3OJQMCL/sVfoS485iyIYCQ41arltmWUgFN5xWIFGlwlkV9kgQ9oP86/0ywtyqk8+qh
-         BmhA==
-X-Gm-Message-State: AOAM531jfo+BOIGCBYPO7DbzzZ7bSxNrWriiDJTZ69FV8P23AdIytVbO
-        9qkpIC1YoURZhz1AnXL+bVAOlM9Xzrmq6NAZe/Qa7ur3yjFzhCVpRJEYAt1XN2Q/coQHIK0LNFf
-        Nb+G+IsMi4C3j
-X-Received: by 2002:adf:ed4a:: with SMTP id u10mr5502879wro.86.1627574217993;
-        Thu, 29 Jul 2021 08:56:57 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwLgrogS1Ps6UnQ/0VQrtQt2MjSbOfI++E0VYu6WLH7GmA/dcP3gaa//uIkUtCBDdxTYVpodw==
-X-Received: by 2002:adf:ed4a:: with SMTP id u10mr5502864wro.86.1627574217775;
-        Thu, 29 Jul 2021 08:56:57 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id k17sm4088354wrw.53.2021.07.29.08.56.56
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 29 Jul 2021 08:56:57 -0700 (PDT)
-Subject: Re: [PATCH 1/6] x86/feat_ctl: Add new VMX feature, Tertiary
- VM-Execution control
-To:     Sean Christopherson <seanjc@google.com>,
-        Zeng Guang <guang.zeng@intel.com>
-Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=8XlvRujXH8fG7I60x6Lze35EmuQmao4vXlcoc/uU2No=;
+        b=Dyw4A1QUPOXhLW0fafpp2YWPgDZrpKf2MhWYLwULtMB5mtIK3nYLyvdjL3vK8JE5/S
+         574UOP4S8Fs4cAPKXkE17tq4ORGqGnTfd5TeUDK4msW5igxHYQDhaUjaVMHbtKI7AQE5
+         SbXDO3VDbrOkvArkwcGzYnVRh1hxK3DphDes8tF+p/vjLYqVSRuMgtd0FcYT1WkyhLjO
+         CihMiG1vG8yaf1UobETewIEsRB9yEjMHnK2Smbe/h++GLTPvqgmL9SJf7bvOuCNLFmlw
+         T47qdFFXE/BpQMOPuG2MucwylcReGPxtL8RwTZeJScvAONeMmYvQ1efj2+LsygY0a/WT
+         otEw==
+X-Gm-Message-State: AOAM531Ewcu0pey/+WS+UWrf6tVVlJ4YOX0Wip8Wf5OyqIh4T3rA91lW
+        3ECE7FZLUM2BroyKyeiWcz7YL3NkZGL+/W7jE0HeCMNusn6OFFhhJlbFK6GgY5QLJY4M+R62q3/
+        OzmDSIjLIxUFS
+X-Received: by 2002:a92:d4c4:: with SMTP id o4mr4032649ilm.39.1627575749932;
+        Thu, 29 Jul 2021 09:22:29 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJx4Fgu9rQ1o/mvPKtWpoTLqejJyf90dyQNVh+Lg+zjo1jBFHEmgfOa/z3eVTuadhwo9KRb6mQ==
+X-Received: by 2002:a92:d4c4:: with SMTP id o4mr4032632ilm.39.1627575749732;
+        Thu, 29 Jul 2021 09:22:29 -0700 (PDT)
+Received: from gator ([140.82.166.162])
+        by smtp.gmail.com with ESMTPSA id p1sm1929221ilh.47.2021.07.29.09.22.28
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 29 Jul 2021 09:22:29 -0700 (PDT)
+Date:   Thu, 29 Jul 2021 18:22:26 +0200
+From:   Andrew Jones <drjones@redhat.com>
+To:     Oliver Upton <oupton@google.com>
+Cc:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Marc Zyngier <maz@kernel.org>, Peter Shier <pshier@google.com>,
         Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Tony Luck <tony.luck@intel.com>,
-        Kan Liang <kan.liang@linux.intel.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Kim Phillips <kim.phillips@amd.com>,
-        Jarkko Sakkinen <jarkko@kernel.org>,
-        Jethro Beekman <jethro@fortanix.com>,
-        Kai Huang <kai.huang@intel.com>, x86@kernel.org,
-        linux-kernel@vger.kernel.org, Robert Hu <robert.hu@intel.com>,
-        Gao Chao <chao.gao@intel.com>,
-        Robert Hoo <robert.hu@linux.intel.com>
-References: <20210716064808.14757-1-guang.zeng@intel.com>
- <20210716064808.14757-2-guang.zeng@intel.com> <YQHr6VvNOQclolfc@google.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <20d46894-a42f-88fc-124b-9d6662c57bef@redhat.com>
-Date:   Thu, 29 Jul 2021 17:56:55 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.11.0
+        David Matlack <dmatlack@google.com>,
+        Ricardo Koller <ricarkol@google.com>,
+        Jing Zhang <jingzhangos@google.com>,
+        Raghavendra Rao Anata <rananta@google.com>,
+        James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        linux-arm-kernel@lists.infradead.org
+Subject: Re: [PATCH v4 06/13] selftests: KVM: Fix kvm device helper ioctl
+ assertions
+Message-ID: <20210729162226.a6csfjpzhhpdgv7o@gator>
+References: <20210729001012.70394-1-oupton@google.com>
+ <20210729001012.70394-7-oupton@google.com>
 MIME-Version: 1.0
-In-Reply-To: <YQHr6VvNOQclolfc@google.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210729001012.70394-7-oupton@google.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 29/07/21 01:44, Sean Christopherson wrote:
->> +	rdmsr_safe(MSR_IA32_VMX_PROCBASED_CTLS3, &ign, &supported);
->> +	c->vmx_capability[TERTIARY_CTLS_LOW] = ign;
->> +	c->vmx_capability[TERTIARY_CTLS_HIGH] = supported;
-> Assuming only the lower 32 bits are going to be used for the near future (next
-> few years), what about defining just TERTIARY_CTLS_LOW and then doing:
+On Thu, Jul 29, 2021 at 12:10:05AM +0000, Oliver Upton wrote:
+> The KVM_CREATE_DEVICE and KVM_{GET,SET}_DEVICE_ATTR ioctls are defined
+> to return a value of zero on success. As such, tighten the assertions in
+> the helper functions to only pass if the return code is zero.
 > 
-> 	/*
-> 	 * Tertiary controls are 64-bit allowed-1, so unlikely other MSRs, the
-> 	 * upper bits are ignored (because they're not used, yet...).
-> 	 */
-> 	rdmsr_safe(MSR_IA32_VMX_PROCBASED_CTLS3, &supported, &ign);
-> 	c->vmx_capability[TERTIARY_CTLS_LOW] = supported;
+> Suggested-by: Andrew Jones <drjones@redhat.com>
+> Signed-off-by: Oliver Upton <oupton@google.com>
+> ---
+>  tools/testing/selftests/kvm/lib/kvm_util.c | 6 +++---
+>  1 file changed, 3 insertions(+), 3 deletions(-)
 > 
-> I.e. punt the ugliness issue down the road a few years.
-> 
-
-Or use two new variables low/high instead of supported/ign.
-
-Paolo
+> diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
+> index 10a8ed691c66..0ffc2d39c80d 100644
+> --- a/tools/testing/selftests/kvm/lib/kvm_util.c
+> +++ b/tools/testing/selftests/kvm/lib/kvm_util.c
+> @@ -1984,7 +1984,7 @@ int kvm_device_check_attr(int dev_fd, uint32_t group, uint64_t attr)
+>  {
+>  	int ret = _kvm_device_check_attr(dev_fd, group, attr);
+>  
+> -	TEST_ASSERT(ret >= 0, "KVM_HAS_DEVICE_ATTR failed, rc: %i errno: %i", ret, errno);
+> +	TEST_ASSERT(!ret, "KVM_HAS_DEVICE_ATTR failed, rc: %i errno: %i", ret, errno);
+>  	return ret;
+>  }
+>  
+> @@ -2008,7 +2008,7 @@ int kvm_create_device(struct kvm_vm *vm, uint64_t type, bool test)
+>  	ret = _kvm_create_device(vm, type, test, &fd);
+>  
+>  	if (!test) {
+> -		TEST_ASSERT(ret >= 0,
+> +		TEST_ASSERT(!ret,
+>  			    "KVM_CREATE_DEVICE IOCTL failed, rc: %i errno: %i", ret, errno);
+>  		return fd;
+>  	}
+> @@ -2036,7 +2036,7 @@ int kvm_device_access(int dev_fd, uint32_t group, uint64_t attr,
+>  {
+>  	int ret = _kvm_device_access(dev_fd, group, attr, val, write);
+>  
+> -	TEST_ASSERT(ret >= 0, "KVM_SET|GET_DEVICE_ATTR IOCTL failed, rc: %i errno: %i", ret, errno);
+> +	TEST_ASSERT(!ret, "KVM_SET|GET_DEVICE_ATTR IOCTL failed, rc: %i errno: %i", ret, errno);
+>  	return ret;
+>  }
+>  
+> -- 
+> 2.32.0.432.gabb21c7263-goog
+>
+ 
+Reviewed-by: Andrew Jones <drjones@redhat.com>
 
