@@ -2,122 +2,114 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 193783DA453
-	for <lists+kvm@lfdr.de>; Thu, 29 Jul 2021 15:30:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 03C783DA496
+	for <lists+kvm@lfdr.de>; Thu, 29 Jul 2021 15:46:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237895AbhG2NaP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 29 Jul 2021 09:30:15 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:38268 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S237836AbhG2N3N (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 29 Jul 2021 09:29:13 -0400
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 16TD4Lhl118285;
-        Thu, 29 Jul 2021 09:29:09 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
- subject : message-id : in-reply-to : references : mime-version :
- content-type : content-transfer-encoding; s=pp1;
- bh=n/FI01LIc1Yi03z/F59rRDY4CLBKGvjDsox2Mu6xUBI=;
- b=pCi7DDVncmuEieR0EOmwJpLGQmrNUYMSRDNrUzJqqNMmhZPnoxth5cfk6lydCdG0d8i1
- DCKx5uYQMC+j3luGVl3ZlFXaoCTT+FNoRwA1e8si+ELsYotuLbRRDRV3NtE/yK5kIbi0
- WZL0/Uei7rOl1Pp7+kH5Eau8aLspoFOycTL2AwEWXSpvscztllywZCHXV054MiOaJADD
- YZiRk/igf1xfZYeepNeDHdMaZhk1bJKELikDxJ5qtyIUhd8Dx3MQK3AqMcaeB1LHX6xb
- bMKM4MWJfcIuxS/6E4Zy1LOz0mAZwQGAresp8WaJgFDVye08QRuAvf2NqXRPwvt8YB0N Eg== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 3a3v5s2sxr-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 29 Jul 2021 09:29:09 -0400
-Received: from m0098419.ppops.net (m0098419.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 16TDI7o0190642;
-        Thu, 29 Jul 2021 09:29:08 -0400
-Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 3a3v5s2swv-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 29 Jul 2021 09:29:08 -0400
-Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
-        by ppma03ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 16TDIbhD023522;
-        Thu, 29 Jul 2021 13:29:07 GMT
-Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
-        by ppma03ams.nl.ibm.com with ESMTP id 3a235yhr2y-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 29 Jul 2021 13:29:06 +0000
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
-        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 16TDQIjC29163836
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 29 Jul 2021 13:26:18 GMT
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 43923A4062;
-        Thu, 29 Jul 2021 13:29:03 +0000 (GMT)
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id D3B59A4054;
-        Thu, 29 Jul 2021 13:29:02 +0000 (GMT)
-Received: from p-imbrenda (unknown [9.145.1.151])
-        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Thu, 29 Jul 2021 13:29:02 +0000 (GMT)
-Date:   Thu, 29 Jul 2021 15:28:55 +0200
-From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
-To:     Janosch Frank <frankja@linux.ibm.com>
-Cc:     kvm@vger.kernel.org, cohuck@redhat.com, borntraeger@de.ibm.com,
-        thuth@redhat.com, pasic@linux.ibm.com, david@redhat.com,
-        linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 13/13] KVM: s390: pv: add support for UV feature bits
-Message-ID: <20210729152855.5e25aa73@p-imbrenda>
-In-Reply-To: <4d26ba27-e235-8f2b-c59c-01d3e0691453@linux.ibm.com>
-References: <20210728142631.41860-1-imbrenda@linux.ibm.com>
-        <20210728142631.41860-14-imbrenda@linux.ibm.com>
-        <4d26ba27-e235-8f2b-c59c-01d3e0691453@linux.ibm.com>
-Organization: IBM
-X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
+        id S237738AbhG2NqO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 29 Jul 2021 09:46:14 -0400
+Received: from wforward5-smtp.messagingengine.com ([64.147.123.35]:47365 "EHLO
+        wforward5-smtp.messagingengine.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S237665AbhG2NqK (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 29 Jul 2021 09:46:10 -0400
+Received: from compute6.internal (compute6.nyi.internal [10.202.2.46])
+        by mailforward.west.internal (Postfix) with ESMTP id A42641AC0859;
+        Thu, 29 Jul 2021 09:39:42 -0400 (EDT)
+Received: from mailfrontend2 ([10.202.2.163])
+  by compute6.internal (MEProxy); Thu, 29 Jul 2021 09:39:43 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+        messagingengine.com; h=cc:content-transfer-encoding:date:from
+        :message-id:mime-version:subject:to:x-me-proxy:x-me-proxy
+        :x-me-sender:x-me-sender:x-sasl-enc; s=fm3; bh=JjfAbX1pq79BhH/GJ
+        ozIKahQKClhEXVcaFzB6MBJv38=; b=NNSX6bKm3/DuXkmc+nN6bQYRz3OBLW0ld
+        PknxVOFEev5n/ToLoUjxnZoa3VX7vbrlVFNb9/0u1HCnnK6tJdhDoIq+oa/C5VzG
+        N4dkyxFC/BAIlVrzHarBtkraDzE4z5D8c+Dq1lYOljpO6ilB1zmIJAuZjIFnnlPA
+        iB4u4g6toaOeTQPmu75ZTlNCK3/XopvNkma/kBF0utRT54GF/iuFLvidnG4Pw+30
+        /seeOCFITbE4iHBTMqyVMX5xe5gfiRRUqm7EMwUkoxAsEW7hFPV7V66dqdZyvhBD
+        i+nJg097f/HhqaPE3+Ah4euBlJnN+jc8k1so5gh3MGIfXFxIjlILg==
+X-ME-Sender: <xms:lq8CYWm4d2AFu6eQHqqCQRmi4Qom0z9Bsl_3Hi2UyztjKOeiyCi6PQ>
+    <xme:lq8CYd32afmelA8Qgv9gBH3_zhLmhLOeZlb210sJGWhtHL6ZGnGNRlDJiAfcIy2ZV
+    IuJNlrjgK_SitRXfkg>
+X-ME-Received: <xmr:lq8CYUoCBZdL5X6-4ceeApjXYt1ofprZ7qYHzxm-JqWWfRSB2IzZTeaIddb90ibYsL9uFdl51Z995ZlBIaIzijVzzPUheUENqTqJs8fWkBc>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvtddrheefgddviecutefuodetggdotefrodftvf
+    curfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfghnecu
+    uegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenuc
+    fjughrpefhvffufffkofgggfestdekredtredttdenucfhrhhomhepffgrvhhiugcugfgu
+    mhhonhgushhonhcuoegurghvihgurdgvughmohhnughsohhnsehorhgrtghlvgdrtghomh
+    eqnecuggftrfgrthhtvghrnhepudfhtedvhffgledttdegleehteevueefgeetvedtudei
+    vdegjefhudekgeetheehnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrg
+    hilhhfrhhomhepuggrvhhiugdrvggumhhonhgushhonhesohhrrggtlhgvrdgtohhm
+X-ME-Proxy: <xmx:lq8CYanhS1rK7UYHGvCLCpf0BAwp6as0iWFk0EQFlXACOY3B5qD3fA>
+    <xmx:lq8CYU2vHHHiJ66ezGoGFuggcpE2oymJ6o-Z36eu7TmKLpgiB0QLMQ>
+    <xmx:lq8CYRtumNCr7G6bvpaPV5RmDO5-3F-W4kJpLibhZrPW9hH6-F5T_Q>
+    <xmx:nq8CYf9G9v1Gl54NZKGPmKPa7mszxk4PG66PSXQdu2ZL0y44g_l5GMhxhjhalmQU>
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Thu,
+ 29 Jul 2021 09:39:33 -0400 (EDT)
+Received: from localhost (disaster-area.hh.sledj.net [local])
+        by disaster-area.hh.sledj.net (OpenSMTPD) with ESMTPA id c4c7ebe7;
+        Thu, 29 Jul 2021 13:39:32 +0000 (UTC)
+From:   David Edmondson <david.edmondson@oracle.com>
+To:     linux-kernel@vger.kernel.org
+Cc:     Thomas Gleixner <tglx@linutronix.de>,
+        Joerg Roedel <joro@8bytes.org>, Ingo Molnar <mingo@redhat.com>,
+        Jim Mattson <jmattson@google.com>, kvm@vger.kernel.org,
+        Borislav Petkov <bp@alien8.de>,
+        David Matlack <dmatlack@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, x86@kernel.org,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        David Edmondson <david.edmondson@oracle.com>
+Subject: [PATCH v3 0/3] kvm: x86: Convey the exit reason, etc. to user-space on emulation failure
+Date:   Thu, 29 Jul 2021 14:39:28 +0100
+Message-Id: <20210729133931.1129696-1-david.edmondson@oracle.com>
+X-Mailer: git-send-email 2.30.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: UUz94RYti661aEkcEtVaLzvX_T7KexiS
-X-Proofpoint-GUID: 7Mvun8R3E7JFZfJ0V1yWgAB5x0L0PkIO
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.790
- definitions=2021-07-29_10:2021-07-29,2021-07-29 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0 mlxscore=0
- adultscore=0 mlxlogscore=999 lowpriorityscore=0 clxscore=1015 bulkscore=0
- priorityscore=1501 impostorscore=0 phishscore=0 suspectscore=0
- malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2107140000 definitions=main-2107290084
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 29 Jul 2021 11:52:58 +0200
-Janosch Frank <frankja@linux.ibm.com> wrote:
+To help when debugging failures in the field, if instruction emulation
+fails, report the VM exit reason to userspace in order that it can be
+recorded.
 
-> On 7/28/21 4:26 PM, Claudio Imbrenda wrote:
-> > Add support for Ultravisor feature bits, and take advantage of the
-> > functionality advertised to speed up the lazy destroy mechanism.  
-> 
-> UV feature bit support is already merged please fix the description
-> and subject.
+Sean: hopefully this is something like what you intended. If not,
+please clarify and I will have another go. The lack of an ABI for the
+debug data does feel messy.
 
-oops, will be fixed
+The SGX changes here are compiled but untested.
 
-> > 
-> > Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
-> > ---
-> >  arch/s390/kernel/uv.c | 3 ++-
-> >  1 file changed, 2 insertions(+), 1 deletion(-)
-> > 
-> > diff --git a/arch/s390/kernel/uv.c b/arch/s390/kernel/uv.c
-> > index f0af49b09a91..6ec3d7338ec8 100644
-> > --- a/arch/s390/kernel/uv.c
-> > +++ b/arch/s390/kernel/uv.c
-> > @@ -290,7 +290,8 @@ static int make_secure_pte(pte_t *ptep,
-> > unsigned long addr, 
-> >  static bool should_export_before_import(struct uv_cb_header *uvcb,
-> > struct mm_struct *mm) {
-> > -	return uvcb->cmd != UVC_CMD_UNPIN_PAGE_SHARED &&
-> > +	return !test_bit_inv(BIT_UV_FEAT_MISC,
-> > &uv_info.uv_feature_indications) &&
-> > +		uvcb->cmd != UVC_CMD_UNPIN_PAGE_SHARED &&
-> >  		atomic_read(&mm->context.is_protected) > 1;
-> >  }
-> >  
-> >   
-> 
+v3:
+- Convey any debug data un-flagged after the ABI specified data in
+  struct emulation_failure (Sean)
+- Obey the ABI protocol in sgx_handle_emulation_failure() (Sean)
+
+v2:
+- Improve patch comments (dmatlock)
+- Intel should provide the full exit reason (dmatlock)
+- Pass a boolean rather than flags (dmatlock)
+- Use the helper in kvm_task_switch() and kvm_handle_memory_failure()
+  (dmatlock)
+- Describe the exit_reason field of the emulation_failure structure
+  (dmatlock)
+
+David Edmondson (3):
+  KVM: x86: kvm_x86_ops.get_exit_info should include the exit reason
+  KVM: x86: On emulation failure, convey the exit reason, etc. to
+    userspace
+  KVM: x86: SGX must obey the KVM_INTERNAL_ERROR_EMULATION protocol
+
+ arch/x86/include/asm/kvm_host.h | 12 ++++++--
+ arch/x86/kvm/svm/svm.c          |  8 +++--
+ arch/x86/kvm/trace.h            | 11 +++----
+ arch/x86/kvm/vmx/nested.c       |  2 +-
+ arch/x86/kvm/vmx/sgx.c          |  8 ++---
+ arch/x86/kvm/vmx/vmx.c          | 11 ++++---
+ arch/x86/kvm/x86.c              | 53 ++++++++++++++++++++++++++-------
+ include/uapi/linux/kvm.h        |  7 +++++
+ 8 files changed, 79 insertions(+), 33 deletions(-)
+
+-- 
+2.30.2
 
