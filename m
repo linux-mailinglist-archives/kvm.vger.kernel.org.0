@@ -2,71 +2,85 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 75B313D9B5A
-	for <lists+kvm@lfdr.de>; Thu, 29 Jul 2021 03:57:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 86FFA3D9C05
+	for <lists+kvm@lfdr.de>; Thu, 29 Jul 2021 05:13:11 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233234AbhG2B5e (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 28 Jul 2021 21:57:34 -0400
-Received: from mail.kernel.org ([198.145.29.99]:50628 "EHLO mail.kernel.org"
+        id S233513AbhG2DNM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 28 Jul 2021 23:13:12 -0400
+Received: from mga04.intel.com ([192.55.52.120]:24335 "EHLO mga04.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S233197AbhG2B5e (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 28 Jul 2021 21:57:34 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPS id F39CB6103B
-        for <kvm@vger.kernel.org>; Thu, 29 Jul 2021 01:57:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1627523852;
-        bh=gUZAThDOjCYPLhIJmnyogHl5F0+zIHrZ0V4rLI0+tQ0=;
-        h=From:To:Subject:Date:In-Reply-To:References:From;
-        b=vCueQg+Y0vA7+h3sPEQX90JdHF+BhRHQwH8qw67kvWexVoa5IAp+I4m0UMQOGPvNi
-         gBHkenAh5nR7RQzN+XT9AKq1pxpB+Hx+k4xf0tUzX2En8DI08rPcefo+ePt7ATBBQ9
-         IKJ52kXsRt0FT5000vn1fTuFPv7tYmYjDusey39B9qCt1BnG+hSrbvlUR81SrCa6Us
-         l5rvCnvEglzsxnzuUOQfTjv7JNFQid7Qg5124+4hnaTRw39t+DwT38U7XVYUJkDJM8
-         /lFy2/2byftOqIUKXL8C1cP45KiCF5tCKYRxRFSpju1aFh/O/W/lkkDLMbozaNl2AN
-         UR6U77iVrTv9Q==
-Received: by pdx-korg-bugzilla-2.web.codeaurora.org (Postfix, from userid 48)
-        id EBC9760EE0; Thu, 29 Jul 2021 01:57:31 +0000 (UTC)
-From:   bugzilla-daemon@bugzilla.kernel.org
-To:     kvm@vger.kernel.org
-Subject: [Bug 213781] KVM: x86/svm: The guest (#vcpu>1) can't boot up with
- QEMU "-overcommit cpu-pm=on"
-Date:   Thu, 29 Jul 2021 01:57:31 +0000
-X-Bugzilla-Reason: None
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Product: Virtualization
-X-Bugzilla-Component: kvm
-X-Bugzilla-Version: unspecified
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: blocking
-X-Bugzilla-Who: like.xu.linux@gmail.com
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P1
-X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: 
-Message-ID: <bug-213781-28872-BriNkrB4vZ@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-213781-28872@https.bugzilla.kernel.org/>
-References: <bug-213781-28872@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+        id S233297AbhG2DNK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 28 Jul 2021 23:13:10 -0400
+X-IronPort-AV: E=McAfee;i="6200,9189,10059"; a="210908867"
+X-IronPort-AV: E=Sophos;i="5.84,276,1620716400"; 
+   d="scan'208";a="210908867"
+Received: from fmsmga003.fm.intel.com ([10.253.24.29])
+  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Jul 2021 20:13:07 -0700
+X-IronPort-AV: E=Sophos;i="5.84,276,1620716400"; 
+   d="scan'208";a="506877323"
+Received: from yzhao56-desk.sh.intel.com ([10.239.13.16])
+  by fmsmga003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Jul 2021 20:13:06 -0700
+Date:   Thu, 29 Jul 2021 10:58:15 +0800
+From:   Yan Zhao <yan.y.zhao@intel.com>
+To:     Yu Zhang <yu.c.zhang@linux.intel.com>
+Cc:     Ben Gardon <bgardon@google.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+Subject: Re: A question of TDP unloading.
+Message-ID: <20210729025809.GA9585@yzhao56-desk.sh.intel.com>
+Reply-To: Yan Zhao <yan.y.zhao@intel.com>
+References: <20210727161957.lxevvmy37azm2h7z@linux.intel.com>
+ <YQBLZ/RrBFxE4G4w@google.com>
+ <20210728065605.e4ql2hzrj5fkngux@linux.intel.com>
+ <20210728072514.GA375@yzhao56-desk.sh.intel.com>
+ <CANgfPd_Rt3udm8mUHzX=MaXPOafkXhUt++7ACNsG1PnPiLswnw@mail.gmail.com>
+ <20210728172241.aizlvj2alvxfvd43@linux.intel.com>
+ <CANgfPd_o+HC80aqTQn7CA3o4rN2AFPDUp_Jxj9CQ6Rie9+yAug@mail.gmail.com>
+ <20210729030056.uk644q3eeoux2qfa@linux.intel.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210729030056.uk644q3eeoux2qfa@linux.intel.com>
+User-Agent: Mutt/1.9.4 (2018-02-28)
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D213781
+On Thu, Jul 29, 2021 at 11:00:56AM +0800, Yu Zhang wrote:
+> > 
+> > Ooof that's a lot of resets, though if there are only a handful of
+> > pages mapped, it might not be a noticeable performance impact. I think
+> > it'd be worth collecting some performance data to quantify the impact.
+> 
+> Yes. Too many reset will definitely hurt the performance, though I did not see
+> obvious delay.
+>
 
---- Comment #2 from Like Xu (like.xu.linux@gmail.com) ---
-Hi Maxim,
+if I add below limits before unloading mmu, and with
+enable_unrestricted_guest=0, the boot time can be reduced to 31 secs
+from more than 5 minutes. 
 
-Do we have any updates on this issue? Can you help provide more details
-about "non-atomic memslot update made by qemu" so I can try to fix it?
+ void kvm_mmu_reset_context(struct kvm_vcpu *vcpu)
+ {
+-       kvm_mmu_unload(vcpu);
+-       kvm_init_mmu(vcpu, true);
++       union kvm_mmu_role new_role =
++               kvm_calc_tdp_mmu_root_page_role(vcpu, false);
++       struct kvm_mmu *context = &vcpu->arch.root_mmu;
++       bool reset = false;
++
++       if (new_role.as_u64 != context->mmu_role.as_u64) {
++               kvm_mmu_unload(vcpu);
++               reset = true;
++       }
++       kvm_init_mmu(vcpu, reset);
 
---=20
-You may reply to this email to add a comment.
+But with enable_unrestricted_guest=0, if I further modify the limits to
+"if (new_role.base.word != context->mmu_role.base.word)", the VM would
+fail to boot.
+so, with mmu extended role changes, unload the mmu is necessary in some
+situation, or at least we need to zap related sptes.
 
-You are receiving this mail because:
-You are watching the assignee of the bug.=
+Thanks
+Yan
