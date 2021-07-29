@@ -2,101 +2,128 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 67E743DA91E
-	for <lists+kvm@lfdr.de>; Thu, 29 Jul 2021 18:30:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EC9C63DA926
+	for <lists+kvm@lfdr.de>; Thu, 29 Jul 2021 18:33:51 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232116AbhG2QbA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 29 Jul 2021 12:31:00 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:23037 "EHLO
+        id S230223AbhG2Qdx (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 29 Jul 2021 12:33:53 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:56324 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232013AbhG2Qa7 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 29 Jul 2021 12:30:59 -0400
+        by vger.kernel.org with ESMTP id S229565AbhG2Qdx (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 29 Jul 2021 12:33:53 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1627576255;
+        s=mimecast20190719; t=1627576429;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=orFog0sxfUadBkEgJaJjuoSWySLaowDikIZVY8CyGTw=;
-        b=dspfyz4NrIhmn4vwZf13U/req2N7klc2w6NjrjlDFvhgPo4Xcrt1Ual6Hitn6G5VrUvpNI
-        Yx1ZgpH6kxn8J8UMlg6SeOjVjfbuT50yKUrk/QnjNnR1uDmxL6qZjPCpVoqcKoA/U353UG
-        ew3vBd4Z5kWA1JZRi7u4cnfPRrhSEwg=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-230-x_vU8EerNf6HnXLN9j6hdQ-1; Thu, 29 Jul 2021 12:30:53 -0400
-X-MC-Unique: x_vU8EerNf6HnXLN9j6hdQ-1
-Received: by mail-wm1-f71.google.com with SMTP id k13-20020a05600c1c8db029025018ac4f7dso2179968wms.2
-        for <kvm@vger.kernel.org>; Thu, 29 Jul 2021 09:30:53 -0700 (PDT)
+        bh=FjcH7sCGB66RKzqPeaDWjgM8tAnh9bdebcMjCL2pj+c=;
+        b=AZMgn07nZDnWk6ZmC6UevS+2QDxOnllRT7nBFZ+Vy0zxVauxY0qwb2CoQM+QD/p0kGYU1t
+        YYEGPi9+AQT3dvmsMreQmUkKOPv9tmyM4r9F3vI5+GVLvUSb0RWDLp4Z2ftx62SmB96f0r
+        gmeAiRZdY5RlLL0PLHg5nkUrjL4cisM=
+Received: from mail-io1-f72.google.com (mail-io1-f72.google.com
+ [209.85.166.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-161-K5nHX24RM_-xyGjx10ADkg-1; Thu, 29 Jul 2021 12:33:48 -0400
+X-MC-Unique: K5nHX24RM_-xyGjx10ADkg-1
+Received: by mail-io1-f72.google.com with SMTP id c18-20020a0566023352b0290523c137a6a4so4168836ioz.8
+        for <kvm@vger.kernel.org>; Thu, 29 Jul 2021 09:33:48 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:to:cc:references:from:subject:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=orFog0sxfUadBkEgJaJjuoSWySLaowDikIZVY8CyGTw=;
-        b=raPviO7RyiAcvjcPHInfUW11tDiiLxGS35Fn6HLTlnQqwyhE9ih+k7mQsHX1KlyiXO
-         mJy5slhKZQ0WEkEO2YRk5LIuH57eSAMFbe9QAfi/DN/nz9dhZXAiGfMSpM+hC2j+KZSh
-         b+T8cvzyw/VOaRcfc5O2lVosPs/s38RBYEtIbeq6IhtgxrnbUtuf7F8wsixjwV++da8G
-         QA4ykmlCNR6/Etdeb/MmVkerHH1LFyW7wzo/XSIRR4Nc6OT6fbpe9mTvabjt5vnGvekA
-         xFh1CHhE1dQjtRHTck1z1EqRSTrPnCkZwS5SC8S43ZkKTjNQg9even68Mb3YFW2V26oz
-         /DwQ==
-X-Gm-Message-State: AOAM530Lr8rr61v5+xCSXIsw3NfQ00ZLLpXmgZ5wgukyMdFau2nDXyrk
-        kbxyGWVpI+gH0AXFe+3OH5YEkwQGlasi94YLRxsNgEYkceXoCiEOOdt6ywZgGQjuZa81M3VGKUk
-        +rbFf7A35GuQL
-X-Received: by 2002:a1c:ed03:: with SMTP id l3mr5512873wmh.56.1627576252722;
-        Thu, 29 Jul 2021 09:30:52 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJz8op0aYdpNBUVNZ07xifizo4nlPJ/0UHrFszSxe4dMu5xaM7/9rONhD05PbI9DYilr5YLi6g==
-X-Received: by 2002:a1c:ed03:: with SMTP id l3mr5512856wmh.56.1627576252496;
-        Thu, 29 Jul 2021 09:30:52 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id g138sm4927501wmg.32.2021.07.29.09.30.50
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 29 Jul 2021 09:30:51 -0700 (PDT)
-To:     Vineeth Pillai <viremana@linux.microsoft.com>
-Cc:     Dan Carpenter <dan.carpenter@oracle.com>,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        Vitaly Kuznetsov <vkuznets@redhat.com>
-References: <20210726165843.1441132-1-pbonzini@redhat.com>
- <87zgu76ary.fsf@vitty.brq.redhat.com>
- <1d82501c-05fd-deff-9652-790cde052644@linux.microsoft.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH] KVM: SVM: delay svm_vcpu_init_msrpm after svm->vmcb is
- initialized
-Message-ID: <38eb919c-2da1-648e-10a4-a76205fd5e96@redhat.com>
-Date:   Thu, 29 Jul 2021 18:30:49 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.11.0
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=FjcH7sCGB66RKzqPeaDWjgM8tAnh9bdebcMjCL2pj+c=;
+        b=VD5wzvc92lazXc21RDsIgNaOLjaUfWqZ2HFzvAkujd0xBbbCZvaPc2r2+sJuk2DjHP
+         ru8ZlVKcwBxvireb754gDTlsMd/REpwIftr5GCiIysfqznrCWoVSsoxxPVktV8zXY1FB
+         KOW4hGC/mgvGAH6B6gskFC3KCS4V+EgqEDtkiQxiA8hPP2zT4uORX4XfuQhaz3gluduS
+         /kg0vv7WQq02IsmwGmu1OyptMhwAnKVHbEOhqOVhFPCGyl3Qarpw90ar87vG04qwTXOx
+         h+YPwMx7FEV+YjEiYroRYCV+HqtnQzQYHf7Mig5Avyp928iMfwq26uFVuZ1uVAgxlRBi
+         JISw==
+X-Gm-Message-State: AOAM5309ZGUUZzouB7xzzDpiTNPxiXxJbvqhqP9qnYOjAEYtX9YCdy84
+        A5U3dW6/6NzJPXtb47rnH4pC3OAGP3KT1/T2vstLui54UARSIaEcc3hGHer2f1M1Nubh7mzsmsH
+        4ppFWlIvZz4X4
+X-Received: by 2002:a02:8241:: with SMTP id q1mr5172581jag.134.1627576427833;
+        Thu, 29 Jul 2021 09:33:47 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJw4d115XMfSVHnaViBRH7zqO/+JS3UA9k8rGTp/h+c0mtFXHxXJNO0ZZi3gMSV04nJNqZsx0Q==
+X-Received: by 2002:a02:8241:: with SMTP id q1mr5172569jag.134.1627576427690;
+        Thu, 29 Jul 2021 09:33:47 -0700 (PDT)
+Received: from gator ([140.82.166.162])
+        by smtp.gmail.com with ESMTPSA id f16sm2147192ilc.53.2021.07.29.09.33.46
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 29 Jul 2021 09:33:47 -0700 (PDT)
+Date:   Thu, 29 Jul 2021 18:33:44 +0200
+From:   Andrew Jones <drjones@redhat.com>
+To:     Oliver Upton <oupton@google.com>
+Cc:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Marc Zyngier <maz@kernel.org>, Peter Shier <pshier@google.com>,
+        Jim Mattson <jmattson@google.com>,
+        David Matlack <dmatlack@google.com>,
+        Ricardo Koller <ricarkol@google.com>,
+        Jing Zhang <jingzhangos@google.com>,
+        Raghavendra Rao Anata <rananta@google.com>,
+        James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        linux-arm-kernel@lists.infradead.org
+Subject: Re: [PATCH v4 11/13] KVM: arm64: Provide userspace access to the
+ physical counter offset
+Message-ID: <20210729163344.bojsdqw4z6pjdg3g@gator>
+References: <20210729001012.70394-1-oupton@google.com>
+ <20210729001012.70394-12-oupton@google.com>
 MIME-Version: 1.0
-In-Reply-To: <1d82501c-05fd-deff-9652-790cde052644@linux.microsoft.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210729001012.70394-12-oupton@google.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 28/07/21 22:18, Vineeth Pillai wrote:
+On Thu, Jul 29, 2021 at 12:10:10AM +0000, Oliver Upton wrote:
+> Presently, KVM provides no facilities for correctly migrating a guest
+> that depends on the physical counter-timer. While most guests (barring
+> NV, of course) should not depend on the physical counter-timer, an
+> operator may still wish to provide a consistent view of the physical
+> counter-timer across migrations.
 > 
-> On 7/27/2021 11:23 AM, Vitaly Kuznetsov wrote:
->> Paolo Bonzini <pbonzini@redhat.com> writes:
->>
->>> Right now, svm_hv_vmcb_dirty_nested_enlightenments has an incorrect
->>> dereference of vmcb->control.reserved_sw before the vmcb is checked
->>> for being non-NULL.  The compiler is usually sinking the dereference
->>> after the check; instead of doing this ourselves in the source,
->>> ensure that svm_hv_vmcb_dirty_nested_enlightenments is only called
->>> with a non-NULL VMCB.
->>>
->>> Reported-by: Dan Carpenter <dan.carpenter@oracle.com>
->>> Cc: Vineeth Pillai <viremana@linux.microsoft.com>
->>> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
->>> [Untested for now due to issues with my AMD machine. - Paolo]
-> Finally got hold of an AMD machine and tested nested virt: windows on 
-> linux on
-> windows with the patches applied. Did basic boot and minimal verification.
+> Provide userspace with a new vCPU attribute to modify the guest physical
+> counter-timer offset. Since the base architecture doesn't provide a
+> physical counter-timer offset register, emulate the correct behavior by
+> trapping accesses to the physical counter-timer whenever the offset
+> value is non-zero.
 > 
-> Tested-by: Vineeth Pillai <viremana@linux.microsoft.com>
+> Uphold the same behavior as CNTVOFF_EL2 and broadcast the physical
+> offset to all vCPUs whenever written. This guarantees that the
+> counter-timer we provide the guest remains architectural, wherein all
+> views of the counter-timer are consistent across vCPUs. Reconfigure
+> timer traps for VHE on every guest entry, as different VMs will now have
+> different traps enabled. Enable physical counter traps for nVHE whenever
+> the offset is nonzero (we already trap physical timer registers in
+> nVHE).
+> 
+> FEAT_ECV provides a guest physical counter-timer offset register
+> (CNTPOFF_EL2), but ECV-enabled hardware is nonexistent at the time of
+> writing so support for it was elided for the sake of the author :)
+> 
+> Cc: Andrew Jones <drjones@redhat.com>
+> Signed-off-by: Oliver Upton <oupton@google.com>
+> ---
+>  Documentation/virt/kvm/devices/vcpu.rst   | 22 +++++++
+>  arch/arm64/include/asm/kvm_host.h         |  1 +
+>  arch/arm64/include/asm/kvm_hyp.h          |  2 -
+>  arch/arm64/include/asm/sysreg.h           |  1 +
+>  arch/arm64/include/uapi/asm/kvm.h         |  1 +
+>  arch/arm64/kvm/arch_timer.c               | 72 ++++++++++++++---------
+>  arch/arm64/kvm/arm.c                      |  4 +-
+>  arch/arm64/kvm/hyp/include/hyp/switch.h   | 23 ++++++++
+>  arch/arm64/kvm/hyp/include/hyp/timer-sr.h | 26 ++++++++
+>  arch/arm64/kvm/hyp/nvhe/switch.c          |  2 -
+>  arch/arm64/kvm/hyp/nvhe/timer-sr.c        | 21 +++----
+>  arch/arm64/kvm/hyp/vhe/timer-sr.c         | 27 +++++++++
+>  include/kvm/arm_arch_timer.h              |  2 -
+>  13 files changed, 158 insertions(+), 46 deletions(-)
+>  create mode 100644 arch/arm64/kvm/hyp/include/hyp/timer-sr.h
+>
 
-Thanks!  In the meanwhile I had fixed my machine too. :)
-
-Paolo
+ 
+Reviewed-by: Andrew Jones <drjones@redhat.com>
 
