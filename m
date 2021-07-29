@@ -2,51 +2,51 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A1E8B3D9EAE
-	for <lists+kvm@lfdr.de>; Thu, 29 Jul 2021 09:37:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 012D33D9EB3
+	for <lists+kvm@lfdr.de>; Thu, 29 Jul 2021 09:37:15 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235428AbhG2HhC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 29 Jul 2021 03:37:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46772 "EHLO
+        id S235325AbhG2HhN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 29 Jul 2021 03:37:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46800 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235224AbhG2Hgr (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 29 Jul 2021 03:36:47 -0400
-Received: from mail-pj1-x102e.google.com (mail-pj1-x102e.google.com [IPv6:2607:f8b0:4864:20::102e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DB8EDC0613C1
-        for <kvm@vger.kernel.org>; Thu, 29 Jul 2021 00:36:44 -0700 (PDT)
-Received: by mail-pj1-x102e.google.com with SMTP id o44-20020a17090a0a2fb0290176ca3e5a2fso8018564pjo.1
-        for <kvm@vger.kernel.org>; Thu, 29 Jul 2021 00:36:44 -0700 (PDT)
+        with ESMTP id S235354AbhG2Hg7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 29 Jul 2021 03:36:59 -0400
+Received: from mail-pl1-x62a.google.com (mail-pl1-x62a.google.com [IPv6:2607:f8b0:4864:20::62a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 40ED5C0617A3
+        for <kvm@vger.kernel.org>; Thu, 29 Jul 2021 00:36:51 -0700 (PDT)
+Received: by mail-pl1-x62a.google.com with SMTP id c16so5944659plh.7
+        for <kvm@vger.kernel.org>; Thu, 29 Jul 2021 00:36:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=bytedance-com.20150623.gappssmtp.com; s=20150623;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=79+lwfgqPqTMCDJYOtelsxZhwWsCxwv7dGGvPGe+0Sw=;
-        b=pht7EHvBPEmalFMQJxnA5uITGsCuOlxP9Y280Ur4c4Xr3lJdEeqiDYxP7TC7vQPgGd
-         I/ZPYxIAF7wX+D7ibW2+QAbkf4ckwDUGvyyRhT83wHCsspVChvqBgO1K/tQZaoBTt9Yp
-         Lir6sHtO0AUKIhh8vlXiMiD+sbirh9E/DVJcXMoijXcC4aQJapQYNS+qNggApM9o0DIi
-         ZzEoPv6irKFSlf6epkzfwm9d0JWIMWZMQhLEIbRJUy/HXVHCsfR9gQAfB/8EirRwTMsF
-         uRKiOnqoMqV2cLI/WjkPsIhOBs4mwx41zQl+qu/lOvaz0BIStwAPZwrefnhImIRH+0MY
-         YaFg==
+        bh=LsGekY4BvYvIO5Z8AgcJapYB7A/KQEKxuOgJFJnV+F0=;
+        b=X98+TJ5q20fVVP7OZ9n9veXNRWtBaNyF7u49KUNkAM08u5ecR/X2DKDwo1Z3kXSnog
+         AkIvxsuc6X/gsU10vyjL8G4S48EXGasvxyUvBWTz/n2nYXpvsiABp2BBpcAxzMKlc9JC
+         tZHpDQJRdciKCGBbNBWxs2uv+1TVCUY4XPFmsIqsbkO+YVLO26aR4jONl8t2P20X7aov
+         2MxYGwbbV4OrGtS6am9b0pJn4afscft59CPUq0kj0zGDJRQnHkTNskX287DpmE2RFfUV
+         TaJlG/0ITl45C5ABu2t/JY8+gPqs+Fpn2oPnqG672GSOWOJqgTtAC/jfy64aWdz90uPG
+         HNQQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=79+lwfgqPqTMCDJYOtelsxZhwWsCxwv7dGGvPGe+0Sw=;
-        b=K+vSszOsgpnvIH8kI0tGruQzlvR9ToMCIx+Xkpg5Vr4rJnxvjiggimpEw5qBdl34Re
-         UfYA+cm1pxGH4mbhQJfbYutaVb6iZshzAf3IHcER7UgS/71+gpnRsYYNjKyIip5NPfSm
-         iCwZF6kKQVQvVtAoSpjsOeihr7rLg9SgX9kGcZMRM4Q9hS3234wi8xfobSE1ZT4ha4H/
-         lGfm3LeUoc0xZ5Kq1mDl1E7jlkIi0K4JAm+ycHcRSCkmyZ22xxqJ2HRGgI/yJhtfCR9w
-         jwz+T4Qi9D9eqXvlFqtgaTTWGrKHnjgogEvOLO+cSFxLAglGy9kUuBziRpqgop1tSSFS
-         R+dQ==
-X-Gm-Message-State: AOAM530k16gFPNfIdYfiwnmBMU2LoLjEfToIHLXRIQ04iMIqsbk1+2wj
-        pB5DbGXjL7h5jhzFGSoORQw/
-X-Google-Smtp-Source: ABdhPJwd6fqL59b6zB2Y1X6Xa6fhnvr9Evz97aQU4N4q/6V8MSENkC+yj5nWiVm8Rzev8LmszMzr1w==
-X-Received: by 2002:a05:6a00:2:b029:32e:3ef0:770a with SMTP id h2-20020a056a000002b029032e3ef0770amr3859510pfk.8.1627544204478;
-        Thu, 29 Jul 2021 00:36:44 -0700 (PDT)
+        bh=LsGekY4BvYvIO5Z8AgcJapYB7A/KQEKxuOgJFJnV+F0=;
+        b=tmtGdWuctrcItcDTfyMMD+5hGruW4ZVk7D3YvQE396Qa0dsHishXNDzVeQTKLKDeA6
+         L+Xnq0YrUCO5j/1JEtrhKumTwMEESuk9Skw1R8EXfm6IeNrhUxoaOZmVqHPq9zKgChMk
+         4bZFX200jILBoRgAScchyxq2Ig/pqKmey08jdl+cLeOX2EXCs8WBrKXUkuZoVXKfM6/J
+         b0CQmFN6ZqMykMzUdOoKwPRoJ9s5VF0jns/mo3EnJPr60LsIgnAmqLFpCk+aT35/ZkR7
+         QrtNAij0IwS+KhA1+K5rrsMC6jkdmMLXFzn0Lqe0eLf3tUS2hMClrmWUJ/CLe2V/+dUs
+         i3HQ==
+X-Gm-Message-State: AOAM531dM6vCS4ZHYsfYv6/yxBMJeBmn6Hb7p1j+r7cTGrjNBvTAKpth
+        UYGUrG1Jenq3E3Cv3QXmHauT
+X-Google-Smtp-Source: ABdhPJwjSVfLNS2GDfIx/eWaUI7/WEDOXCiXXfI318zMm7E6oJfs9FrWN4b/fDb28gHcKZEreTjMkA==
+X-Received: by 2002:a17:90a:5101:: with SMTP id t1mr13696042pjh.107.1627544210785;
+        Thu, 29 Jul 2021 00:36:50 -0700 (PDT)
 Received: from localhost ([139.177.225.253])
-        by smtp.gmail.com with ESMTPSA id ge21sm2237949pjb.55.2021.07.29.00.36.42
+        by smtp.gmail.com with ESMTPSA id s3sm2487674pfk.61.2021.07.29.00.36.49
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 29 Jul 2021 00:36:43 -0700 (PDT)
+        Thu, 29 Jul 2021 00:36:50 -0700 (PDT)
 From:   Xie Yongji <xieyongji@bytedance.com>
 To:     mst@redhat.com, jasowang@redhat.com, stefanha@redhat.com,
         sgarzare@redhat.com, parav@nvidia.com, hch@infradead.org,
@@ -60,9 +60,9 @@ Cc:     songmuchun@bytedance.com,
         virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
         kvm@vger.kernel.org, linux-fsdevel@vger.kernel.org,
         iommu@lists.linux-foundation.org, linux-kernel@vger.kernel.org
-Subject: [PATCH v10 09/17] virtio-vdpa: Handle the failure of vdpa_reset()
-Date:   Thu, 29 Jul 2021 15:34:55 +0800
-Message-Id: <20210729073503.187-10-xieyongji@bytedance.com>
+Subject: [PATCH v10 10/17] virtio: Handle device reset failure in register_virtio_device()
+Date:   Thu, 29 Jul 2021 15:34:56 +0800
+Message-Id: <20210729073503.187-11-xieyongji@bytedance.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20210729073503.187-1-xieyongji@bytedance.com>
 References: <20210729073503.187-1-xieyongji@bytedance.com>
@@ -72,29 +72,47 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The vpda_reset() may fail now. This adds check to its return
-value and fail the virtio_vdpa_reset().
+The device reset may fail in virtio-vdpa case now, so add checks to
+its return value and fail the register_virtio_device().
 
 Signed-off-by: Xie Yongji <xieyongji@bytedance.com>
 ---
- drivers/virtio/virtio_vdpa.c | 4 +---
- 1 file changed, 1 insertion(+), 3 deletions(-)
+ drivers/virtio/virtio.c | 15 ++++++++++-----
+ 1 file changed, 10 insertions(+), 5 deletions(-)
 
-diff --git a/drivers/virtio/virtio_vdpa.c b/drivers/virtio/virtio_vdpa.c
-index 3e666f70e829..ebbd8471bbee 100644
---- a/drivers/virtio/virtio_vdpa.c
-+++ b/drivers/virtio/virtio_vdpa.c
-@@ -101,9 +101,7 @@ static int virtio_vdpa_reset(struct virtio_device *vdev)
- {
- 	struct vdpa_device *vdpa = vd_get_vdpa(vdev);
+diff --git a/drivers/virtio/virtio.c b/drivers/virtio/virtio.c
+index a15beb6b593b..8df75425fb43 100644
+--- a/drivers/virtio/virtio.c
++++ b/drivers/virtio/virtio.c
+@@ -349,7 +349,9 @@ int register_virtio_device(struct virtio_device *dev)
  
--	vdpa_reset(vdpa);
--
--	return 0;
-+	return vdpa_reset(vdpa);
+ 	/* We always start by resetting the device, in case a previous
+ 	 * driver messed it up.  This also tests that code path a little. */
+-	dev->config->reset(dev);
++	err = dev->config->reset(dev);
++	if (err)
++		goto err_reset;
+ 
+ 	/* Acknowledge that we've seen the device. */
+ 	virtio_add_status(dev, VIRTIO_CONFIG_S_ACKNOWLEDGE);
+@@ -362,10 +364,13 @@ int register_virtio_device(struct virtio_device *dev)
+ 	 */
+ 	err = device_add(&dev->dev);
+ 	if (err)
+-		ida_simple_remove(&virtio_index_ida, dev->index);
+-out:
+-	if (err)
+-		virtio_add_status(dev, VIRTIO_CONFIG_S_FAILED);
++		goto err_add;
++
++	return 0;
++err_add:
++	virtio_add_status(dev, VIRTIO_CONFIG_S_FAILED);
++err_reset:
++	ida_simple_remove(&virtio_index_ida, dev->index);
+ 	return err;
  }
- 
- static bool virtio_vdpa_notify(struct virtqueue *vq)
+ EXPORT_SYMBOL_GPL(register_virtio_device);
 -- 
 2.11.0
 
