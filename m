@@ -2,130 +2,120 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2524F3DADDA
-	for <lists+kvm@lfdr.de>; Thu, 29 Jul 2021 22:40:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A14273DAE00
+	for <lists+kvm@lfdr.de>; Thu, 29 Jul 2021 23:05:04 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233335AbhG2Uk7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 29 Jul 2021 16:40:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39660 "EHLO
+        id S233252AbhG2VFG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 29 Jul 2021 17:05:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45186 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233146AbhG2Uk6 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 29 Jul 2021 16:40:58 -0400
-Received: from mail-pj1-x1029.google.com (mail-pj1-x1029.google.com [IPv6:2607:f8b0:4864:20::1029])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 618AFC061765
-        for <kvm@vger.kernel.org>; Thu, 29 Jul 2021 13:40:54 -0700 (PDT)
-Received: by mail-pj1-x1029.google.com with SMTP id j1so11982208pjv.3
-        for <kvm@vger.kernel.org>; Thu, 29 Jul 2021 13:40:54 -0700 (PDT)
+        with ESMTP id S229738AbhG2VFF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 29 Jul 2021 17:05:05 -0400
+Received: from mail-pl1-x633.google.com (mail-pl1-x633.google.com [IPv6:2607:f8b0:4864:20::633])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5E4E0C061765
+        for <kvm@vger.kernel.org>; Thu, 29 Jul 2021 14:05:01 -0700 (PDT)
+Received: by mail-pl1-x633.google.com with SMTP id e21so8459466pla.5
+        for <kvm@vger.kernel.org>; Thu, 29 Jul 2021 14:05:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=jWa/gItRDp22hlKSvMJuEd/U3UQ52bV7L3SE7KcUcbo=;
-        b=ebNEzb91974Wu9o3Wf9bISdIliikatv0/hBdlDVfuw6/MzcUHtNAKUFPZnNjhDbkLZ
-         5wo3s/oYc5vD1p8Cqn0mPJsBOqNzRZ4issiPLWQGKEKLzuB1mzxQTPLI3JQLavyUxE73
-         TvkZlwIfu06DvNIVLFwVNHt7r1xLsoawasw/bumcpx9g3sTZSSBvOfiOM4xvcQA7o+2R
-         6ydPZfsZ/jTavLDJp5uo3CSv80L4Cu55I+HO02T2WXk+3kjQCKd7UaIJb26ajjQ8pupp
-         Kxv2K1Bwuj47aevo4mADqfHXT71UjjU/uXqlIq+WeEte5lQOGmd5mjm1qszdr/6LuF5V
-         TsfA==
+        bh=EP+r5M4uIgFrLN0QnuC7exccoFAbiw7t8szAQCZZaGQ=;
+        b=h3JM1kXRoW/gjzhelVo2I6e/iUmHeSC4qExI7VE7vgAzNvkZvW0HAoH8Voq+JsaYjh
+         8YdbjaME/e11D+Y62dAyOTs1RL8dZFEgwCe6ALp0f/8RzI+OV0gomvjRnuXdh9GYcAEJ
+         hQuWwaYzxvJQdvzgcntZ5bUirAZ+YnM1lM2B0ixdZzwZovwCJV1VEphcda3tDUfTIehT
+         rb17AOxCs3e0ltFXwVRVyh8Oo30mZfqoHn95XhhKz16i5y13oCRWyT79RV8q3Z57YvWP
+         aAM16XeCTv4VRmJlmQBXJyZ3x26W++Z+p4B1cxHoLD8eE/G91yVSzkj3kqmXi6rkMtEf
+         G2Qw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=jWa/gItRDp22hlKSvMJuEd/U3UQ52bV7L3SE7KcUcbo=;
-        b=pPWSdGWHtAxBTq9KqVF8y3X50pRHqirKJEjIvn2Y7hEixh1JuTC7bg2RZ6ihi4uS+I
-         nUvyOPP7iojeNzbJ+C5mEmvLP8KMAoF/Jd+R08DfXwxO+LnRItn52c/PrW/6kyPa0gM1
-         rzP1mSH6ocoKMUrl5oqHAa8OOJ1wT0bo0BnHb9HFHKgl+z3VZxtL2o+jszQDgGFWEonx
-         YF0jqy0dmdEUpKX7s8j/LNzxLjx//qU90wSgrD4a5xUX23ckpssgzItNPYWcBw6HFxEL
-         HeOYTC37xJEO3huYFCTopZ98CzLQGbIJDCHR4hC5iFUDiVBrIuMnGq+eZOJv4e7GfibP
-         nORw==
-X-Gm-Message-State: AOAM531XoaxGVsZqOr4ekd8Wjin11rRtjgswab9z3AVVCJDLvjueD9zy
-        kvvVusMeiZOPSaBSmjpmTJ2ZHA==
-X-Google-Smtp-Source: ABdhPJzFSi4QMnRCl/6lB8rAqjQh3+Uc4cmtRn7cHk02ObMc76RhMDdvj330te8UP4yXze9wb+IkZA==
-X-Received: by 2002:a17:903:230b:b029:12a:d8db:cd27 with SMTP id d11-20020a170903230bb029012ad8dbcd27mr6427408plh.42.1627591253662;
-        Thu, 29 Jul 2021 13:40:53 -0700 (PDT)
+        bh=EP+r5M4uIgFrLN0QnuC7exccoFAbiw7t8szAQCZZaGQ=;
+        b=cI3/tKlGdyQw00O2Px3CrzG5Codtcdq2tUyXme3UZSo58gk6Yorbqj43PtFac819o/
+         c4fqzf4jVZAYU5uVk9QKY0rKro5Y4sSQe5dnFsbVzmgIO2ljVT22GEZRubZs2V574cal
+         11/atMpampy8Zer5YAw0YtzyHAiR4ZO6CHF/DVKv/ZtwKg+6ZqdXUArLBVmo8livZB6l
+         8D5hufZYVSz6gZ2ELOt2A73DKbyOH0fFfwWL+vLrH/W+CDwUwPZjOIm7XhjKjfmPMRj9
+         lIT8jzyH7D+y42bFm3tdYPr5sCehIm7vJnRoE4sH+UpQab8oy+/a+SkfPWCRmlOMsJJZ
+         7kLg==
+X-Gm-Message-State: AOAM531A+SsYZ+vYSq3wCDuGd0SHeRJTwthns58YLi35z7KpLKkiqjs5
+        msxFdrflxnCBskvEOM+67Im0Fw==
+X-Google-Smtp-Source: ABdhPJz3RzAgV9k+AtcJXBCANsAyZSnhKfxFWzA1ZCPYLjrvjhCsRLZQHYCkyF9W6ffnXU4L92TSJQ==
+X-Received: by 2002:a65:5bc6:: with SMTP id o6mr5507306pgr.2.1627592700695;
+        Thu, 29 Jul 2021 14:05:00 -0700 (PDT)
 Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id n12sm5176470pgr.2.2021.07.29.13.40.52
+        by smtp.gmail.com with ESMTPSA id v206sm4702868pfc.67.2021.07.29.14.04.59
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 29 Jul 2021 13:40:53 -0700 (PDT)
-Date:   Thu, 29 Jul 2021 20:40:49 +0000
+        Thu, 29 Jul 2021 14:05:00 -0700 (PDT)
+Date:   Thu, 29 Jul 2021 21:04:56 +0000
 From:   Sean Christopherson <seanjc@google.com>
-To:     Yan Zhao <yan.y.zhao@intel.com>
-Cc:     Yu Zhang <yu.c.zhang@linux.intel.com>,
-        Ben Gardon <bgardon@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+To:     Yu Zhang <yu.c.zhang@linux.intel.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Ben Gardon <bgardon@google.com>, kvm@vger.kernel.org
 Subject: Re: A question of TDP unloading.
-Message-ID: <YQMSUalIaMe9/78r@google.com>
+Message-ID: <YQMX+Cvo8GKCo3Zt@google.com>
 References: <20210727161957.lxevvmy37azm2h7z@linux.intel.com>
  <YQBLZ/RrBFxE4G4w@google.com>
  <20210728065605.e4ql2hzrj5fkngux@linux.intel.com>
- <20210728072514.GA375@yzhao56-desk.sh.intel.com>
- <CANgfPd_Rt3udm8mUHzX=MaXPOafkXhUt++7ACNsG1PnPiLswnw@mail.gmail.com>
- <20210728172241.aizlvj2alvxfvd43@linux.intel.com>
- <CANgfPd_o+HC80aqTQn7CA3o4rN2AFPDUp_Jxj9CQ6Rie9+yAug@mail.gmail.com>
- <20210729030056.uk644q3eeoux2qfa@linux.intel.com>
- <20210729025809.GA9585@yzhao56-desk.sh.intel.com>
+ <YQGj8gj7fpWDdLg5@google.com>
+ <20210729032200.qqb4mlctgplzq6bb@linux.intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20210729025809.GA9585@yzhao56-desk.sh.intel.com>
+In-Reply-To: <20210729032200.qqb4mlctgplzq6bb@linux.intel.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jul 29, 2021, Yan Zhao wrote:
-> On Thu, Jul 29, 2021 at 11:00:56AM +0800, Yu Zhang wrote:
-> > > 
-> > > Ooof that's a lot of resets, though if there are only a handful of
-> > > pages mapped, it might not be a noticeable performance impact. I think
-> > > it'd be worth collecting some performance data to quantify the impact.
+On Thu, Jul 29, 2021, Yu Zhang wrote:
+> On Wed, Jul 28, 2021 at 06:37:38PM +0000, Sean Christopherson wrote:
+> > On Wed, Jul 28, 2021, Yu Zhang wrote:
+> In the caller, force_tdp_unload was set to false for CR0/CR4/EFER changes. For SMM and
+> cpuid updates, it is set to true.
+> 
+> With this change, I can successfully boot a VM(and of course, number of unloadings is
+> greatly reduced). But access test case in kvm-unit-test hangs, after CR4.SMEP is flipped.
+> I'm trying to figure out why...
+
+Hrm, I'll look into when I get around to making this into a proper patch.
+
+Note, there's at least once bug, as is_root_usable() will compare the full role
+against a root shadow page's modified role.  A common helper to derive the page
+role for a direct/TDP page from an existing mmu_role is likely the way to go, as
+kvm_tdp_mmu_get_vcpu_root_hpa() would want the same functionality.
+
+> > I'll put this on my todo list, I've been looking for an excuse to update the
+> > cr0/cr4/efer flows anyways :-).  If it works, the changes should be relatively
+> > minor, if it works...
 > > 
-> > Yes. Too many reset will definitely hurt the performance, though I did not see
-> > obvious delay.
-> >
+> > diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> > index a8cdfd8d45c4..700664fe163e 100644
+> > --- a/arch/x86/kvm/mmu/mmu.c
+> > +++ b/arch/x86/kvm/mmu/mmu.c
+> > @@ -2077,8 +2077,20 @@ static struct kvm_mmu_page *kvm_mmu_get_page(struct kvm_vcpu *vcpu,
+> >         role = vcpu->arch.mmu->mmu_role.base;
+> >         role.level = level;
+> >         role.direct = direct;
+> > -       if (role.direct)
+> > +       if (role.direct) {
+> >                 role.gpte_is_8_bytes = true;
+> > +
+> > +               /*
+> > +                * Guest PTE permissions do not impact SPTE permissions for
+> > +                * direct MMUs.  Either there are no guest PTEs (CR0.PG=0) or
+> > +                * guest PTE permissions are enforced by the CPU (TDP enabled).
+> > +                */
+> > +               WARN_ON_ONCE(access != ACC_ALL);
+> > +               role.efer_nx = 0;
+> > +               role.cr0_wp = 0;
+> > +               role.smep_andnot_wp = 0;
+> > +               role.smap_andnot_wp = 0;
+> > +       }
 > 
-> if I add below limits before unloading mmu, and with
-> enable_unrestricted_guest=0, the boot time can be reduced to 31 secs
-> from more than 5 minutes. 
-> 
->  void kvm_mmu_reset_context(struct kvm_vcpu *vcpu)
->  {
-> -       kvm_mmu_unload(vcpu);
-> -       kvm_init_mmu(vcpu, true);
-> +       union kvm_mmu_role new_role =
-> +               kvm_calc_tdp_mmu_root_page_role(vcpu, false);
-> +       struct kvm_mmu *context = &vcpu->arch.root_mmu;
-> +       bool reset = false;
-> +
-> +       if (new_role.as_u64 != context->mmu_role.as_u64) {
+> How about we do this in kvm_calc_mmu_role_common()? :-)
 
-Aha!  A clue!
-
-This hack indicates that the call to kvm_mmu_reset_context() is spurious, i.e.
-none of the MMU role bits in CR0/CR4/EFER are changing.  Dollars to donuts says
-this is due to the long-standing hack-a-fix in enter_rmode() that unconditionally
-reset the MMU when the guest entered real mode.
-
-Prior to commit 5babbb43a58a ("KVM: VMX: Remove explicit MMU reset in enter_rmode()").
-(sitting in kvm/queue), enter_rmode() to deal with unrestricted_guest=0 would
-unconditionally do kvm_mmu_reset_context().  Based on the above, it sounds like
-your guest is going in and out of RM/PM, i.e. toggling CR0.PE.  CR0.PE isn't a
-MMU role bit, so the kvm_mmu_reset_context() is spurious unless CR0.PG is also
-being changed.
-
-TL;DR: Try the current kvm/queue, or at least after commit 5babbb43a58a
-       ("KVM: VMX: Remove explicit MMU reset in enter_rmode()").
-
-> +               kvm_mmu_unload(vcpu);
-> +               reset = true;
-> +       }
-> +       kvm_init_mmu(vcpu, reset);
-> 
-> But with enable_unrestricted_guest=0, if I further modify the limits to
-> "if (new_role.base.word != context->mmu_role.base.word)", the VM would
-> fail to boot.
-> so, with mmu extended role changes, unload the mmu is necessary in some
-> situation, or at least we need to zap related sptes.
-> 
-> Thanks
-> Yan
+No, because the role in struct kvm_mmu does need the correct bits, even for TDP,
+as the role is used to detect whether or not the context needs to be re-initialized,
+e.g. it would get a false negative on a cr0_wp change, not go through
+update_permission_bitmask(), and use the wrong page permissions when walking the
+guest page tables.
