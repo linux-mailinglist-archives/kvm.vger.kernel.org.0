@@ -2,106 +2,160 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 872A73DA39D
-	for <lists+kvm@lfdr.de>; Thu, 29 Jul 2021 15:00:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D05173DA444
+	for <lists+kvm@lfdr.de>; Thu, 29 Jul 2021 15:29:38 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237142AbhG2NAz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 29 Jul 2021 09:00:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39392 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237222AbhG2NAy (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 29 Jul 2021 09:00:54 -0400
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8A7C2C061765;
-        Thu, 29 Jul 2021 06:00:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=h5N7LaoEx0xFRONzbq8/zc8krUwJF4ItQdsTl0gzVm8=; b=DWV6yTn9RHEIKeoT1XxGwkxI89
-        TrAXhPIP0ojWhAXolTHhyQ7RVMHiFvg+CoSUfryoxINO2ZrsmzYk/5cTlnkjT6A6voEzvLsb/j51s
-        poLcddukpUev/1hOzINAIjWJ4JB3+f81r+6vw+xsMYR10yvkWbs2d8FI+T7CYK6rNKN9uMgUGylT7
-        fx6RnbRIwQA819xJp38fq6xTulv7akx/H+d68Mk2B7yVP83j6rQ8fwJIjuIr72Nlql7oMP7XiyW5i
-        cwzRw/bDbIxqpLGRpcAH27dMOEl0RifsDpjWgTWUSPRXX7FWmI7L4MdNtOlGat45N3/yeGxVuN/nm
-        HBn/dSkQ==;
-Received: from j217100.upc-j.chello.nl ([24.132.217.100] helo=noisy.programming.kicks-ass.net)
-        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1m95cI-00H4Xv-QC; Thu, 29 Jul 2021 12:58:46 +0000
-Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-        (Client did not present a certificate)
-        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id 4B47C300215;
-        Thu, 29 Jul 2021 14:58:23 +0200 (CEST)
-Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
-        id 13DA7200DB821; Thu, 29 Jul 2021 14:58:23 +0200 (CEST)
-Date:   Thu, 29 Jul 2021 14:58:23 +0200
-From:   Peter Zijlstra <peterz@infradead.org>
-To:     Like Xu <like.xu.linux@gmail.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>, kvm@vger.kernel.org,
-        x86@kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] KVM: x86/pmu: Introduce pmc->is_paused to reduce the
- call time of perf interfaces
-Message-ID: <YQKl7/0I4p0o0TCY@hirez.programming.kicks-ass.net>
-References: <20210728120705.6855-1-likexu@tencent.com>
+        id S237761AbhG2N3c (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 29 Jul 2021 09:29:32 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:15098 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S237752AbhG2N3L (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 29 Jul 2021 09:29:11 -0400
+Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 16TDSLcK064929;
+        Thu, 29 Jul 2021 09:29:07 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : message-id : in-reply-to : references : mime-version :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=UlOZAV3njL9WgqZBD8YgjqqBRmlVJi6DL813I4lx2rE=;
+ b=Z5b5nnjjaXk8iHz+dsjeJlcmsHWgHWcnUCZucaOA0C/jfGMOXZcthS0F5fpzKnaQWnne
+ w79U0ITFzJpubb8axxMHj8KkpCUt8LDTwOoJoOJm6TcZ+9WcNJn3XAOOOSPIpZMtvUwo
+ HpDDMskuUgK5LvBi+Lc3ndlbHWBOQRrohk+c0G5OPyb9xgyujSpSaMbMSJe4SyaQcFYl
+ 9Uyfa8JLsX9siovWKwqN3Llr81Ya5SKA7gRzQKN4Cj1wjzgfNCiMVuOPuB8Zwr2h7eUP
+ IMgFzzUOgpKqppqvyIAAZ15QaqkRmzO0wjEKAv7Ib+vE1a6vuVE5p21kgHTI377IzVtz uA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3a3w8cr0nu-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 29 Jul 2021 09:29:07 -0400
+Received: from m0098404.ppops.net (m0098404.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 16TDSwQE072095;
+        Thu, 29 Jul 2021 09:29:07 -0400
+Received: from ppma03fra.de.ibm.com (6b.4a.5195.ip4.static.sl-reverse.com [149.81.74.107])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3a3w8cr0n3-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 29 Jul 2021 09:29:06 -0400
+Received: from pps.filterd (ppma03fra.de.ibm.com [127.0.0.1])
+        by ppma03fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 16TDIh3H017669;
+        Thu, 29 Jul 2021 13:29:04 GMT
+Received: from b06cxnps4074.portsmouth.uk.ibm.com (d06relay11.portsmouth.uk.ibm.com [9.149.109.196])
+        by ppma03fra.de.ibm.com with ESMTP id 3a235ks4ht-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 29 Jul 2021 13:29:04 +0000
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
+        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 16TDT0pO27001110
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 29 Jul 2021 13:29:01 GMT
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id C923DA4060;
+        Thu, 29 Jul 2021 13:29:00 +0000 (GMT)
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 5AE63A405C;
+        Thu, 29 Jul 2021 13:29:00 +0000 (GMT)
+Received: from p-imbrenda (unknown [9.145.1.151])
+        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Thu, 29 Jul 2021 13:29:00 +0000 (GMT)
+Date:   Thu, 29 Jul 2021 15:22:05 +0200
+From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
+To:     Cornelia Huck <cohuck@redhat.com>
+Cc:     kvm@vger.kernel.org, borntraeger@de.ibm.com, frankja@linux.ibm.com,
+        thuth@redhat.com, pasic@linux.ibm.com, david@redhat.com,
+        linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 01/13] KVM: s390: pv: avoid stall notifications for
+ some UVCs
+Message-ID: <20210729152205.73d39a65@p-imbrenda>
+In-Reply-To: <87h7gd2y5c.fsf@redhat.com>
+References: <20210728142631.41860-1-imbrenda@linux.ibm.com>
+        <20210728142631.41860-2-imbrenda@linux.ibm.com>
+        <87h7gd2y5c.fsf@redhat.com>
+Organization: IBM
+X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210728120705.6855-1-likexu@tencent.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: SxWz63jsLsS7B6Gg-v2kr-IWBqk9ZxJu
+X-Proofpoint-ORIG-GUID: OPLqKlrIQPiVMfVwBdLbob15-vblMzzr
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.790
+ definitions=2021-07-29_10:2021-07-29,2021-07-29 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 spamscore=0
+ priorityscore=1501 mlxscore=0 impostorscore=0 adultscore=0 phishscore=0
+ mlxlogscore=999 suspectscore=0 lowpriorityscore=0 malwarescore=0
+ clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2107140000 definitions=main-2107290084
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jul 28, 2021 at 08:07:05PM +0800, Like Xu wrote:
-> From: Like Xu <likexu@tencent.com>
-> 
-> Based on our observations, after any vm-exit associated with vPMU, there
-> are at least two or more perf interfaces to be called for guest counter
-> emulation, such as perf_event_{pause, read_value, period}(), and each one
-> will {lock, unlock} the same perf_event_ctx. The frequency of calls becomes
-> more severe when guest use counters in a multiplexed manner.
-> 
-> Holding a lock once and completing the KVM request operations in the perf
-> context would introduce a set of impractical new interfaces. So we can
-> further optimize the vPMU implementation by avoiding repeated calls to
-> these interfaces in the KVM context for at least one pattern:
-> 
-> After we call perf_event_pause() once, the event will be disabled and its
-> internal count will be reset to 0. So there is no need to pause it again
-> or read its value. Once the event is paused, event period will not be
-> updated until the next time it's resumed or reprogrammed. And there is
-> also no need to call perf_event_period twice for a non-running counter,
-> considering the perf_event for a running counter is never paused.
-> 
-> Based on this implementation, for the following common usage of
-> sampling 4 events using perf on a 4u8g guest:
-> 
->   echo 0 > /proc/sys/kernel/watchdog
->   echo 25 > /proc/sys/kernel/perf_cpu_time_max_percent
->   echo 10000 > /proc/sys/kernel/perf_event_max_sample_rate
->   echo 0 > /proc/sys/kernel/perf_cpu_time_max_percent
->   for i in `seq 1 1 10`
->   do
->   taskset -c 0 perf record \
->   -e cpu-cycles -e instructions -e branch-instructions -e cache-misses \
->   /root/br_instr a
->   done
-> 
-> the average latency of the guest NMI handler is reduced from
-> 37646.7 ns to 32929.3 ns (~1.14x speed up) on the Intel ICX server.
-> Also, in addition to collecting more samples, no loss of sampling
-> accuracy was observed compared to before the optimization.
-> 
-> Signed-off-by: Like Xu <likexu@tencent.com>
+On Thu, 29 Jul 2021 12:49:03 +0200
+Cornelia Huck <cohuck@redhat.com> wrote:
 
-Looks sane I suppose.
+> On Wed, Jul 28 2021, Claudio Imbrenda <imbrenda@linux.ibm.com> wrote:
+> 
+> > Improve make_secure_pte to avoid stalls when the system is heavily
+> > overcommitted. This was especially problematic in
+> > kvm_s390_pv_unpack, because of the loop over all pages that needed
+> > unpacking.
+> >
+> > Also fix kvm_s390_pv_init_vm to avoid stalls when the system is
+> > heavily overcommitted.
+> >
+> > Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+> > ---
+> >  arch/s390/kernel/uv.c | 11 ++++++++---
+> >  arch/s390/kvm/pv.c    |  2 +-
+> >  2 files changed, 9 insertions(+), 4 deletions(-)
+> >
+> > diff --git a/arch/s390/kernel/uv.c b/arch/s390/kernel/uv.c
+> > index aeb0a15bcbb7..fd0faa51c1bb 100644
+> > --- a/arch/s390/kernel/uv.c
+> > +++ b/arch/s390/kernel/uv.c
+> > @@ -196,11 +196,16 @@ static int make_secure_pte(pte_t *ptep,
+> > unsigned long addr, if (!page_ref_freeze(page, expected))
+> >  		return -EBUSY;
+> >  	set_bit(PG_arch_1, &page->flags);
+> > -	rc = uv_call(0, (u64)uvcb);
+> > +	rc = __uv_call(0, (u64)uvcb);
+> >  	page_ref_unfreeze(page, expected);
+> > -	/* Return -ENXIO if the page was not mapped, -EINVAL
+> > otherwise */
+> > -	if (rc)
+> > +	/*
+> > +	 * Return -ENXIO if the page was not mapped, -EINVAL for
+> > other errors.
+> > +	 * If busy or partially completed, return -EAGAIN.
+> > +	 */
+> > +	if (rc == 1)
+> >  		rc = uvcb->rc == 0x10a ? -ENXIO : -EINVAL;
+> > +	else if (rc > 1)
+> > +		rc = -EAGAIN;
+> >  	return rc;
+> >  }  
+> 
+> Possibly dumb question: when does the call return > 1?
 
-Acked-by: Peter Zijlstra (Intel) <peterz@infradead.org>
+this is exactly what Janosch meant :)
 
-What kinds of VM-exits are the most common?
+the next version will have #defines for the 4 possible CC values.
+
+in short:
+0 OK
+1 error
+2 busy (nothing done, try again)
+3 partial (something done but not all, try again)
+
+> gmap_make_secure() will do a wait_on_page_writeback() for -EAGAIN, is
+> that always the right thing to do?
+
+it's the easiest way to get to a place where we will be able to
+reschedule if needed.
+
+wait_on_page_writeback will probably do nothing in that case because
+the page is not in writeback.
+
+(a few minutes later)
+
+actually I have checked, it seems that the -EAGAIN gets eventually
+propagated to places where it's not checked properly!
+
+this will need some more fixing
+
