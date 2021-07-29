@@ -2,193 +2,122 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6D7283DAEC0
-	for <lists+kvm@lfdr.de>; Fri, 30 Jul 2021 00:17:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 71AB83DAED5
+	for <lists+kvm@lfdr.de>; Fri, 30 Jul 2021 00:27:46 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234305AbhG2WR4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 29 Jul 2021 18:17:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33764 "EHLO
+        id S233043AbhG2W1n (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 29 Jul 2021 18:27:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35972 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230117AbhG2WRz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 29 Jul 2021 18:17:55 -0400
-Received: from mail-pl1-x636.google.com (mail-pl1-x636.google.com [IPv6:2607:f8b0:4864:20::636])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 00EE8C0613C1
-        for <kvm@vger.kernel.org>; Thu, 29 Jul 2021 15:17:52 -0700 (PDT)
-Received: by mail-pl1-x636.google.com with SMTP id i10so8678474pla.3
-        for <kvm@vger.kernel.org>; Thu, 29 Jul 2021 15:17:51 -0700 (PDT)
+        with ESMTP id S232169AbhG2W1i (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 29 Jul 2021 18:27:38 -0400
+Received: from mail-pl1-x635.google.com (mail-pl1-x635.google.com [IPv6:2607:f8b0:4864:20::635])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 124EEC061765
+        for <kvm@vger.kernel.org>; Thu, 29 Jul 2021 15:27:34 -0700 (PDT)
+Received: by mail-pl1-x635.google.com with SMTP id q2so8656391plr.11
+        for <kvm@vger.kernel.org>; Thu, 29 Jul 2021 15:27:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=u/ilw5NBsJP2nmfyHHjlurYIq9TKi0gAKv2Zlvey2RQ=;
-        b=iXGP91wf4OD7DIgLvU0aEpgvSVV8t+Qo7h/khRV7r9XjB3YXodcxAisfJqkUiFfZVo
-         uhYuF2xP/aaD5jMqrPBHziMaTTzcHOYIXrUj0ymvflER627ZyMRfYXIJ+2ecEgOdQYFq
-         OPokrPnYKzrpY28qLjfS/2kDH2yby5xHdcv1eG6/Jwu04A5jsXKcfCTGytafS6F1HfDL
-         lnCmIA5UGS8alBwdl+Y21xoWu0M+SgVGhGCr4GoNOC+5vxE2v9T99ZeJ/V9ArLL6l/PB
-         HBkKvZvgxgDmAXiZrokSdtopoAhlUkEWixyfWEooNVbrFq54cty6TzQOZQUoSVuAENZr
-         NVzw==
+        bh=U7V9Ap3CLbBdQCnG02pu0xdSqMhicUYByn9SxkAU8rw=;
+        b=Ffk8XpysnuqjpLBT6TZqn4W5/OEbtQF8oVqJwVgwx/tfDyKtg04s3+tvbENJTzrV5J
+         4NJrhbizq83pOW9DriO0IT1D4PRHNil84BWsETrNpx1o81V0zVMAYWrhvFiYbCRUk2MD
+         zG5yXj3ZhDiLFDAKQK4BizaWGfbivzK8Ia7+s06Ffs9L6mTHg6b2P3eFLnVlrfwT7WPO
+         zByAMI0AQb70/64I2++woOOagf26a1zTqhRimG2LA8iijcdW37HJhjl3r+9q2qJIk7SM
+         e9i3dvi3rB1sEJuHMPEhTCJ5YGvU3pkRsprjZZm28ZHEaP82OdR6kEcxqbW5GzfTj/Ng
+         aG5g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=u/ilw5NBsJP2nmfyHHjlurYIq9TKi0gAKv2Zlvey2RQ=;
-        b=kxIA4onLhEifQ6DSdgm/NUXtFRNqZXA7RY1T4WNVHzxeG9AscN3I3LIO1m+HiMoVsJ
-         IIEpR+lwBl6vEgBxbXLC3pSeuXU4fnnsvPr7nE9sjfKpbpr0gEWCVNi2fJvqNETEU4P2
-         xZX7kfKXU7pRa07BqpTjYTPUNTKWTyivfFE7pj6JcGLaRLJF5cIEmrFxEadsF4nZBrYm
-         LUqQ3bQBGElWhajEHV3bZ/wS8mrJ39FnTeVDIx6Qw8OUTPVpR3lLiNT4qliWJb6t5mP4
-         cXoPh8KdxWEowBNImf5ErWlwu00Di6KSxkzWrJKA1fLsvjT/6XuuFKYse8F41Ht+Knu3
-         z1+w==
-X-Gm-Message-State: AOAM532pOeL1bMSTSOJ5DST/LdWOODGJ2YzbY0mOBVJEsLCVr+iLNYcY
-        SKtpo0BMAaZxO9Fg8d+XGRLFqg==
-X-Google-Smtp-Source: ABdhPJxNdMwRYF6ewrVP/p926bsrmvoQLpd3Z3rK+e9SQlATNhMyMA66r9XA0q3U1bfPe2CULBPeeA==
-X-Received: by 2002:a62:e809:0:b029:32c:2dcf:60ed with SMTP id c9-20020a62e8090000b029032c2dcf60edmr7283033pfi.5.1627597071180;
-        Thu, 29 Jul 2021 15:17:51 -0700 (PDT)
+        bh=U7V9Ap3CLbBdQCnG02pu0xdSqMhicUYByn9SxkAU8rw=;
+        b=jpmA6wCT54NQkPqs2k9i4uLseHXoo8tTgzQL/tQ1uuB73pL8Wf47z1WPZKSni9m2AB
+         JS/HZ9XEUYAWhqy1ytuhPqoTzSEUVmU8d2mBxslpaqz6Bk/x2pl7Y9vaHv49tQNrQxvR
+         czWbsXTqspd+Gbf4NawJk0oLJdx+A9UZeK2e1w/fwRK5sD8t5sIdgipoHxS1Q8nPTHWR
+         wG5rIoQX7vtoxNZ6X+jnCNoMR9x4pQ5fJZlzNZS9/je3xmn6CdOp22mz0V8sk9ZEzhhP
+         zyzuU36sFWX4djwVaJOAiKuRXlzrAENtgeOvv0jDS3Xe7rMLCCxwq3hYGDd5HCnAw+H9
+         W+bw==
+X-Gm-Message-State: AOAM533b+pI3buKge4pGVcrvhDSupPA2qH+6GWxprDi7QZzg/E2Lm3HA
+        K8V5Ci24j+OOOQNrJJUI3H1D2Q==
+X-Google-Smtp-Source: ABdhPJwUIJmnIsqgtiT+cHGl4vPiaiiOn9b6WyOeTGaDzqUNureByRM1AZxpT7XVVs9zcWtSUdzInA==
+X-Received: by 2002:a17:902:d492:b029:12b:dd74:5c79 with SMTP id c18-20020a170902d492b029012bdd745c79mr6407841plg.45.1627597653314;
+        Thu, 29 Jul 2021 15:27:33 -0700 (PDT)
 Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id k6sm5063456pgb.43.2021.07.29.15.17.50
+        by smtp.gmail.com with ESMTPSA id z124sm5138144pgb.6.2021.07.29.15.27.32
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 29 Jul 2021 15:17:50 -0700 (PDT)
-Date:   Thu, 29 Jul 2021 22:17:46 +0000
+        Thu, 29 Jul 2021 15:27:32 -0700 (PDT)
+Date:   Thu, 29 Jul 2021 22:27:28 +0000
 From:   Sean Christopherson <seanjc@google.com>
-To:     Peter Gonda <pgonda@google.com>
-Cc:     kvm@vger.kernel.org, Lars Bull <larsbull@google.com>,
-        Brijesh Singh <brijesh.singh@amd.com>,
-        Marc Orr <marcorr@google.com>,
+To:     David Edmondson <david.edmondson@oracle.com>
+Cc:     linux-kernel@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
+        Joerg Roedel <joro@8bytes.org>, Ingo Molnar <mingo@redhat.com>,
+        Jim Mattson <jmattson@google.com>, kvm@vger.kernel.org,
+        Borislav Petkov <bp@alien8.de>,
+        David Matlack <dmatlack@google.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        David Rientjes <rientjes@google.com>,
-        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, x86@kernel.org,
         Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        "H. Peter Anvin" <hpa@zytor.com>, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 2/3 V3] KVM, SEV: Add support for SEV intra host migration
-Message-ID: <YQMpChJVo13/Njnc@google.com>
-References: <20210726195015.2106033-1-pgonda@google.com>
- <20210726195015.2106033-3-pgonda@google.com>
+        Vitaly Kuznetsov <vkuznets@redhat.com>
+Subject: Re: [PATCH v3 1/3] KVM: x86: kvm_x86_ops.get_exit_info should
+ include the exit reason
+Message-ID: <YQMrUOjZMD1eiIeE@google.com>
+References: <20210729133931.1129696-1-david.edmondson@oracle.com>
+ <20210729133931.1129696-2-david.edmondson@oracle.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20210726195015.2106033-3-pgonda@google.com>
+In-Reply-To: <20210729133931.1129696-2-david.edmondson@oracle.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Jul 26, 2021, Peter Gonda wrote:
-> To avoid exposing this internal state to userspace and prevent other
-> processes from importing state they shouldn't have access to, the send
-> returns a token to userspace that is handed off to the target VM. The
-> target passes in this token to receive the sent state. The token is only
-> valid for one-time use. Functionality on the source becomes limited
-> after send has been performed. If the source is destroyed before the
-> target has received, the token becomes invalid.
+Shortlog is a bit odd, "should" is subjective and makes this sound like a bug fix.
+
+  KVM: x86: Get exit_reason as part of kvm_x86_ops.get_exit_info
+
+On Thu, Jul 29, 2021, David Edmondson wrote:
+> Extend the get_exit_info static call to provide the reason for the VM
+> exit. Modify relevant trace points to use this rather than extracting
+> the reason in the caller.
+> 
+> Signed-off-by: David Edmondson <david.edmondson@oracle.com>
+> ---
+> -static void svm_get_exit_info(struct kvm_vcpu *vcpu, u64 *info1, u64 *info2,
+> +static void svm_get_exit_info(struct kvm_vcpu *vcpu, u64 *reason,
+> +			      u64 *info1, u64 *info2,
+>  			      u32 *intr_info, u32 *error_code)
+>  {
+>  	struct vmcb_control_area *control = &to_svm(vcpu)->vmcb->control;
+>  
+> +	*reason = control->exit_code;
+>  	*info1 = control->exit_info_1;
+>  	*info2 = control->exit_info_2;
+>  	*intr_info = control->exit_int_info;
 
 ...
 
-> +11. KVM_SEV_INTRA_HOST_RECEIVE
-> +-------------------------------------
-> +
-> +The KVM_SEV_INTRA_HOST_RECEIVE command is used to transfer staged SEV
-> +info to a target VM from some source VM. SEV on the target VM should be active
-> +when receive is performed, but not yet launched and without any pinned memory.
-> +The launch commands should be skipped after receive because they should have
-> +already been performed on the source.
-> +
-> +Parameters (in/out): struct kvm_sev_intra_host_receive
-> +
-> +Returns: 0 on success, -negative on error
-> +
-> +::
-> +
-> +    struct kvm_sev_intra_host_receive {
-> +        __u64 info_token;    /* token referencing the staged info */
+> diff --git a/arch/x86/kvm/trace.h b/arch/x86/kvm/trace.h
+> index b484141ea15b..2228565beda2 100644
+> --- a/arch/x86/kvm/trace.h
+> +++ b/arch/x86/kvm/trace.h
+> @@ -273,11 +273,11 @@ TRACE_EVENT(kvm_apic,
+>  
+>  #define TRACE_EVENT_KVM_EXIT(name)					     \
+>  TRACE_EVENT(name,							     \
+> -	TP_PROTO(unsigned int exit_reason, struct kvm_vcpu *vcpu, u32 isa),  \
+> -	TP_ARGS(exit_reason, vcpu, isa),				     \
+> +	TP_PROTO(struct kvm_vcpu *vcpu, u32 isa),			     \
+> +	TP_ARGS(vcpu, isa),						     \
+>  									     \
+>  	TP_STRUCT__entry(						     \
+> -		__field(	unsigned int,	exit_reason	)	     \
+> +		__field(	u64,		exit_reason	)	     \
 
-Sorry to belatedly throw a wrench in things, but why use a token approach?  This
-is only intended for migrating between two userspace VMMs using the same KVM 
-module, which can access both the source and target KVM instances (VMs/guests).
-Rather than indirectly communicate through a token, why not communidate directly?
-Same idea as svm_vm_copy_asid_from().
+Converting to a u64 is unnecessary and misleading.  vmcs.EXIT_REASON and
+vmcb.EXIT_CODE are both u32s, a.k.a. unsigned ints.  There is vmcb.EXIT_CODE_HI,
+but that's not being included, and AFAICT isn't even sanity checked by KVM.
 
-The locking needs special consideration, e.g. attempting to take kvm->lock on
-both the source and dest could deadlock if userspace is malicious and
-double-migrates, but I think a flag and global spinlock to state that migration
-is in-progress would suffice.                                                                                 
-
-Locking aside, this would reduce the ABI to a single ioctl(), should avoid most 
-if not all temporary memory allocations, and would obviate the need for patch 1 
-since there's no limbo state, i.e. the encrypted regions are either owned by the
-source or the dest.
-
-I think the following would work?  Another thought would be to make the helpers
-and "lock for multi-lock" flag arch-agnostic, e.g. the logic below works iff
-this is the only path that takes two kvm->locks simultaneous.
-
-static int svm_sev_lock_for_migration(struct kvm *kvm)
-{
-	struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
-	int ret = 0;
-
-	/*
-	 * Bail if this VM is already involved in a migration to avoid deadlock
-	 * between two VMs trying to migrate to/from each other.
-	 */
-	spin_lock(&sev_migration_lock);
-	if (sev->migration_in_progress)
-		ret = -EINVAL;
-	else
-		sev->migration_in_progress = true;
-	spin_unlock(&sev_migration_lock);
-
-	if (!ret)
-		mutex_lock(&kvm->lock);
-
-	return ret;
-}
-
-static void svm_unlock_after_migration(struct kvm *kvm)
-{
-	mutex_unlock(&kvm->lock);
-	WRITE_ONCE(sev->migration_in_progress, false);
-}
-
-int svm_sev_migrate_from(struct kvm *kvm, unsigned int source_fd)
-{
-	struct file *source_kvm_file;
-	struct kvm *source_kvm;
-	int ret = -EINVAL;
-
-	ret = svm_sev_lock_for_migration(kvm);
-	if (ret)
-		return ret;
-
-	if (!sev_guest(kvm))
-		goto out_unlock;
-
-	source_kvm_file = fget(source_fd);
-	if (!file_is_kvm(source_kvm_file)) {
-		ret = -EBADF;
-		goto out_fput;
-	}
-
-	source_kvm = source_kvm_file->private_data;
-	ret = svm_sev_lock_for_migration(source_kvm);
-	if (ret)
-		goto out_fput;
-
-	if (!sev_guest(source_kvm)) {
-		ret = -EINVAL;
-		goto out_source;
-	}
-
-	<migration magic>
-
-out_source:
-	svm_unlock_after_migration(&source_kvm->lock);
-out_fpu:
-	if (source_kvm_file)
-		fput(source_kvm_file);
-out_unlock:
-	svm_unlock_after_migration(kvm);
-	return ret;
-}
+>  		__field(	unsigned long,	guest_rip	)	     \
+>  		__field(	u32,	        isa             )	     \
+>  		__field(	u64,	        info1           )	     \
