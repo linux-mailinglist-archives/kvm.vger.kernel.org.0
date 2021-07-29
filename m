@@ -2,18 +2,18 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 896BB3D9E63
-	for <lists+kvm@lfdr.de>; Thu, 29 Jul 2021 09:26:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 303663D9E76
+	for <lists+kvm@lfdr.de>; Thu, 29 Jul 2021 09:31:05 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234564AbhG2H0R (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 29 Jul 2021 03:26:17 -0400
-Received: from verein.lst.de ([213.95.11.211]:56193 "EHLO verein.lst.de"
+        id S234683AbhG2HbG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 29 Jul 2021 03:31:06 -0400
+Received: from verein.lst.de ([213.95.11.211]:56214 "EHLO verein.lst.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S234470AbhG2H0R (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 29 Jul 2021 03:26:17 -0400
+        id S234524AbhG2HbG (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 29 Jul 2021 03:31:06 -0400
 Received: by verein.lst.de (Postfix, from userid 2407)
-        id 10BA568AFE; Thu, 29 Jul 2021 09:26:10 +0200 (CEST)
-Date:   Thu, 29 Jul 2021 09:26:09 +0200
+        id 1AC8567373; Thu, 29 Jul 2021 09:31:00 +0200 (CEST)
+Date:   Thu, 29 Jul 2021 09:30:59 +0200
 From:   Christoph Hellwig <hch@lst.de>
 To:     Jason Gunthorpe <jgg@nvidia.com>
 Cc:     David Airlie <airlied@linux.ie>,
@@ -48,27 +48,39 @@ Cc:     David Airlie <airlied@linux.ie>,
         Max Gurtovoy <mgurtovoy@nvidia.com>,
         Yishai Hadas <yishaih@nvidia.com>,
         Zhenyu Wang <zhenyuw@linux.intel.com>
-Subject: Re: [PATCH v3 04/14] vfio: Provide better generic support for
- open/release vfio_device_ops
-Message-ID: <20210729072609.GD31896@lst.de>
-References: <0-v3-6c9e19cc7d44+15613-vfio_reflck_jgg@nvidia.com> <4-v3-6c9e19cc7d44+15613-vfio_reflck_jgg@nvidia.com>
+Subject: Re: [PATCH v3 09/14] vfio/pci: Change vfio_pci_try_bus_reset() to
+ use the dev_set
+Message-ID: <20210729073059.GE31896@lst.de>
+References: <0-v3-6c9e19cc7d44+15613-vfio_reflck_jgg@nvidia.com> <9-v3-6c9e19cc7d44+15613-vfio_reflck_jgg@nvidia.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <4-v3-6c9e19cc7d44+15613-vfio_reflck_jgg@nvidia.com>
+In-Reply-To: <9-v3-6c9e19cc7d44+15613-vfio_reflck_jgg@nvidia.com>
 User-Agent: Mutt/1.5.17 (2007-11-01)
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-> +	device->open_count++;
-> +	if (device->open_count == 1 && device->ops->open_device) {
+> +/*
+> + * vfio-core considers a group to be viable and will create a vfio_device even
+> + * if some devices are bound to drivers like pci-stub or pcieport.  Here we
+> + * require all PCI devices to be inside our dev_set since that ensures they stay
+> + * put and that every driver controlling the device can co-ordinate with the
+> + * device reset.
+> + */
+> +static struct pci_dev *vfio_pci_find_reset_target(struct vfio_pci_device *vdev)
+> +{
+> +	struct vfio_device_set *dev_set = vdev->vdev.dev_set;
+> +	struct vfio_pci_device *cur;
+> +	bool needs_reset = false;
+> +
+> +	/* No VFIO device has an open device FD */
 
-I would have written this as
+s/has an/can have/ ?
 
-	if (++device->open_count == 1 && device->ops->open_device) {
+Or maybe:
 
-to make the pattern more clear, but that is just a minor nitpick.
+	/* No device in the set can have an open device FD */
 
 Otherwise looks good:
 
