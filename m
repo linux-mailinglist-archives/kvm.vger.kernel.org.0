@@ -2,99 +2,94 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E96D03DAA7A
-	for <lists+kvm@lfdr.de>; Thu, 29 Jul 2021 19:45:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 108A63DAA7B
+	for <lists+kvm@lfdr.de>; Thu, 29 Jul 2021 19:45:36 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229731AbhG2Rpf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 29 Jul 2021 13:45:35 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:27207 "EHLO
+        id S229786AbhG2Rpi (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 29 Jul 2021 13:45:38 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:52137 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229556AbhG2Rpe (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 29 Jul 2021 13:45:34 -0400
+        by vger.kernel.org with ESMTP id S229577AbhG2Rpf (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 29 Jul 2021 13:45:35 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
         s=mimecast20190719; t=1627580731;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=rT316eGUa2+7b7jjZkTlKN4mfhqRrOL4B5+LcpVHIKo=;
-        b=aW6A940p92WMQyoWCwqZksEJL3ubYIpEpzMjDJaSUcBxVLL/cPYTPs+qkL271P5j6ymnwG
-        jVU5K13p5dlMUy+sZSX5vQq78Hx7SiiSxf0b2yCoPTok09TyzGJUebD0PdEG470vkoYvrU
-        70DVApQVFbTHHo93//AyF+fJepwku1c=
-Received: from mail-il1-f198.google.com (mail-il1-f198.google.com
- [209.85.166.198]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-408-wsQdb_W5OSCfvxr1C_vHuQ-1; Thu, 29 Jul 2021 13:45:29 -0400
-X-MC-Unique: wsQdb_W5OSCfvxr1C_vHuQ-1
-Received: by mail-il1-f198.google.com with SMTP id h27-20020a056e021d9bb02902021736bb95so3636335ila.5
-        for <kvm@vger.kernel.org>; Thu, 29 Jul 2021 10:45:29 -0700 (PDT)
+        bh=3/uKqwlZEaxXqiQ3vzJCP51ioL56l4Vk/s9bff9c0N0=;
+        b=Ae9H4lMZRmjbL87Tq/Bv/ttgDLFNDsfXre5MM+3GyBT4AwAojnX9km1tk/3mbi0kz0j3j0
+        VDAxTiSfcktvxtZr+J5eNaIJGklGICgq7C8UF2CXflAQqezjbGM8fSNMKWGHvk9fiMq0an
+        qU+W8vB2c8K/VuSwmQSR1pU/qzZPRyk=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-408-epGQ3xr1MQiYaYVqIFs1iA-1; Thu, 29 Jul 2021 13:45:30 -0400
+X-MC-Unique: epGQ3xr1MQiYaYVqIFs1iA-1
+Received: by mail-wr1-f71.google.com with SMTP id p2-20020a5d48c20000b0290150e4a5e7e0so2460857wrs.13
+        for <kvm@vger.kernel.org>; Thu, 29 Jul 2021 10:45:30 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=rT316eGUa2+7b7jjZkTlKN4mfhqRrOL4B5+LcpVHIKo=;
-        b=MFo25R8tj+jRaV1jFMZm/vZVK6dztbRwAOsud2mHzs3THgW1YoL2FdhJirHAySv6C3
-         xaQhw0yctK5XXCb5aFuAfoseWODoiyUDJH+t4MYaNzmtxd+DbGEXrKoasPRdDZFNHDOy
-         klVTuTnYA7JCoJdLKb90mvLyyPTLtHQqgNyZqYFHrBcsemY7u+WnI7kccO9+Cfp1I6ir
-         FaBtWViiYuRsmbSHSr3yAWIycMXyJeidCOT5tu248FlnFvQ97vy6p+gRvwTpzIFf/ySf
-         4Da+bEK4ujnBC2rjwzRsP09x0f4IPSsIYHrUHALbGWJ5zPfvECdfOScU1p4lwDoB+YNX
-         MeOg==
-X-Gm-Message-State: AOAM532l1LTqr1cLIGgYp/B23vQqxjY88xtRhB0MsPyBxJXDS48gN/i8
-        z4Oa/TTwlymThcWqkpC2ao2isAvUBsmKM7I9PPu79UOq2Kes5g3PdLbUcBb4/qCPEbXlK9Rp1Nv
-        Sve+t2wOW6q+B
-X-Received: by 2002:a05:6638:3a12:: with SMTP id j18mr5555705jaj.75.1627580729307;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=3/uKqwlZEaxXqiQ3vzJCP51ioL56l4Vk/s9bff9c0N0=;
+        b=ny9WBnp7h6ntAa1DejQPA3Xx8UhjMUXYINByP6HroahBfnP8vZle/8cTC3DRF6V57a
+         RKh/73ci1OScFo8YU46ZGe98UAEeS9cilHCfIN6YMFJEI0UiQ5rrpWfB9sCsk5poLRws
+         SSN0EMwoTT5gsSZFrUdM2BqigKcvTq5+E7Jv0C/UNmI4WH4DJWTlZ/MFGDPuFztys3tt
+         WKpTNk1299yOOqZZzez4nZiFpIHGc3rQ+dj0CtEfNX4mqPuYmbKW40ljikK0HhBPTkJc
+         NPZTsyphRBNSC0LCJu6sEejV1h6gRDcBUkyLsJieH6WOcvfcXp3JJL0TGMUOKj0PmjY+
+         Nucg==
+X-Gm-Message-State: AOAM532LMH7bmjApJ5s/HPo/PEHSkTqa/WT9uGb5nIhzQWASP+apVq+W
+        5AVO1OipSIdD4zUvLwG++Tkqx49BxNUWC/UTC8OAJv5RmbplWiVZQKwEWp/ocZmK53jCbWKLQpy
+        0qLMhYx8ajQ0d
+X-Received: by 2002:a1c:7314:: with SMTP id d20mr5830486wmb.167.1627580729290;
         Thu, 29 Jul 2021 10:45:29 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyf77LhlT9YvfAjMD/rhjDi5lGqSzYugzzvfmOLDdrWVhTSAaNJZlRA4FN/MoqzmCofE6vzAQ==
-X-Received: by 2002:a05:6638:3a12:: with SMTP id j18mr5555679jaj.75.1627580729171;
+X-Google-Smtp-Source: ABdhPJxHGElmv5LPxm24VprwxC3qUzw6eNh/ws6LgsB+BsrVb0dmnSMDmImODHonZa5HTliLopvo9w==
+X-Received: by 2002:a1c:7314:: with SMTP id d20mr5830472wmb.167.1627580729127;
         Thu, 29 Jul 2021 10:45:29 -0700 (PDT)
-Received: from gator ([140.82.166.162])
-        by smtp.gmail.com with ESMTPSA id j18sm2589446ioa.53.2021.07.29.10.45.27
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+        by smtp.gmail.com with ESMTPSA id l41sm4328868wmp.23.2021.07.29.10.45.27
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
         Thu, 29 Jul 2021 10:45:28 -0700 (PDT)
-Date:   Thu, 29 Jul 2021 19:45:16 +0200
-From:   Andrew Jones <drjones@redhat.com>
-To:     Oliver Upton <oupton@google.com>
-Cc:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Marc Zyngier <maz@kernel.org>, Peter Shier <pshier@google.com>,
+Subject: Re: [PATCH v4 4/5] KVM: MMU: Add support for PKS emulation
+To:     Sean Christopherson <seanjc@google.com>,
+        Chenyi Qiang <chenyi.qiang@intel.com>
+Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        David Matlack <dmatlack@google.com>,
-        Ricardo Koller <ricarkol@google.com>,
-        Jing Zhang <jingzhangos@google.com>,
-        Raghavendra Rao Anata <rananta@google.com>,
-        James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        linux-arm-kernel@lists.infradead.org
-Subject: Re: [PATCH v5 13/13] selftests: KVM: Add counter emulation benchmark
-Message-ID: <20210729174516.nje54y7c5iy5qyn4@gator>
-References: <20210729173300.181775-1-oupton@google.com>
- <20210729173300.181775-14-oupton@google.com>
+        Joerg Roedel <joro@8bytes.org>,
+        Xiaoyao Li <xiaoyao.li@intel.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+References: <20210205083706.14146-1-chenyi.qiang@intel.com>
+ <20210205083706.14146-5-chenyi.qiang@intel.com> <YQLkczVfCsFp4IxW@google.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <fd1b39b1-ce99-3626-b502-eb1324001163@redhat.com>
+Date:   Thu, 29 Jul 2021 19:45:27 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.11.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210729173300.181775-14-oupton@google.com>
+In-Reply-To: <YQLkczVfCsFp4IxW@google.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jul 29, 2021 at 05:33:00PM +0000, Oliver Upton wrote:
-> Add a test case for counter emulation on arm64. A side effect of how KVM
-> handles physical counter offsetting on non-ECV systems is that the
-> virtual counter will always hit hardware and the physical could be
-> emulated. Force emulation by writing a nonzero offset to the physical
-> counter and compare the elapsed cycles to a direct read of the hardware
-> register.
+On 29/07/21 19:25, Sean Christopherson wrote:
+>> -		unsigned int cr4_pke:1;
+>> +		unsigned int cr4_pkr:1;
+> Smushing these together will not work, as this code (from below)
 > 
-> Cc: Andrew Jones <drjones@redhat.com>
-> Reviewed-by: Ricardo Koller <ricarkol@google.com>
-> Signed-off-by: Oliver Upton <oupton@google.com>
-> ---
->  tools/testing/selftests/kvm/.gitignore        |   1 +
->  tools/testing/selftests/kvm/Makefile          |   1 +
->  .../kvm/aarch64/counter_emulation_benchmark.c | 207 ++++++++++++++++++
->  3 files changed, 209 insertions(+)
->  create mode 100644 tools/testing/selftests/kvm/aarch64/counter_emulation_benchmark.c
->
+>> -     ext.cr4_pke = !!kvm_read_cr4_bits(vcpu, X86_CR4_PKE);
+>> +     ext.cr4_pkr = !!kvm_read_cr4_bits(vcpu, X86_CR4_PKE) ||
+>> +                   !!kvm_read_cr4_bits(vcpu, X86_CR4_PKS);
+> will generate the same mmu_role for CR4.PKE=0,PKS=1 and CR4.PKE=1,PKS=1 (and
+> other combinations).  I.e. KVM will fail to reconfigure the MMU and thus skip
+> update_pkr_bitmask() if the guest toggles PKE or PKS while the other PK* bit is set.
+> 
 
-Reviewed-by: Andrew Jones <drjones@redhat.com>
+I'm also not sure why there would be issues in just using cr4_pks.
+
+Paolo
 
