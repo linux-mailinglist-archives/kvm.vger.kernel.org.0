@@ -2,114 +2,122 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id CC0F43DA4BE
-	for <lists+kvm@lfdr.de>; Thu, 29 Jul 2021 15:52:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9C8E93DA5EE
+	for <lists+kvm@lfdr.de>; Thu, 29 Jul 2021 16:10:57 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237719AbhG2Nwv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 29 Jul 2021 09:52:51 -0400
-Received: from smtp-fw-6002.amazon.com ([52.95.49.90]:17130 "EHLO
-        smtp-fw-6002.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237463AbhG2Nwn (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 29 Jul 2021 09:52:43 -0400
+        id S239108AbhG2OKJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 29 Jul 2021 10:10:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55614 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S238581AbhG2OHZ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 29 Jul 2021 10:07:25 -0400
+Received: from mail-wr1-x42a.google.com (mail-wr1-x42a.google.com [IPv6:2a00:1450:4864:20::42a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E36B1C061367
+        for <kvm@vger.kernel.org>; Thu, 29 Jul 2021 07:00:10 -0700 (PDT)
+Received: by mail-wr1-x42a.google.com with SMTP id z4so7075740wrv.11
+        for <kvm@vger.kernel.org>; Thu, 29 Jul 2021 07:00:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.de; i=@amazon.de; q=dns/txt; s=amazon201209;
-  t=1627566761; x=1659102761;
-  h=from:to:cc:subject:date:message-id:mime-version;
-  bh=vOwTZ5orfIykxaqp7JrAwtEKMxnNxzc6TJ11+WdRNEs=;
-  b=JYul84FQr7jqxyoU/D6x80zezfwLgU1Xc979dgZFAugJcOd565CUBKwr
-   vjqbs2HdGOnsnvXRD/CdaOTRK5B2OM8CTEHbrYsHjF4FhSjqrmg58vihC
-   jTxvoORIh+sJ0kWjKcXIlSpphOMQZk4MhCuiJfv9dnDYgksS7UzMo6mP3
-   o=;
-X-IronPort-AV: E=Sophos;i="5.84,278,1620691200"; 
-   d="scan'208";a="128792960"
-Received: from iad12-co-svc-p1-lb1-vlan2.amazon.com (HELO email-inbound-relay-1e-c7c08562.us-east-1.amazon.com) ([10.43.8.2])
-  by smtp-border-fw-6002.iad6.amazon.com with ESMTP; 29 Jul 2021 13:52:31 +0000
-Received: from EX13D28EUC003.ant.amazon.com (iad55-ws-svc-p15-lb9-vlan3.iad.amazon.com [10.40.159.166])
-        by email-inbound-relay-1e-c7c08562.us-east-1.amazon.com (Postfix) with ESMTPS id C7CD4240413;
-        Thu, 29 Jul 2021 13:52:29 +0000 (UTC)
-Received: from uc8bbc9586ea454.ant.amazon.com (10.43.160.66) by
- EX13D28EUC003.ant.amazon.com (10.43.164.43) with Microsoft SMTP Server (TLS)
- id 15.0.1497.23; Thu, 29 Jul 2021 13:52:26 +0000
-From:   Siddharth Chandrasekaran <sidcha@amazon.de>
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        Marcelo Tosatti <mtosatti@redhat.com>
-CC:     Siddharth Chandrasekaran <sidcha.dev@gmail.com>,
-        Liran Alon <liran@amazon.com>,
-        Ioannis Aslanidis <iaslan@amazon.de>, <kvm@vger.kernel.org>,
-        <qemu-devel@nongnu.org>,
-        Siddharth Chandrasekaran <sidcha@amazon.de>
-Subject: [PATCH] hyperv: Fix struct hv_message_header ordering
-Date:   Thu, 29 Jul 2021 15:52:10 +0200
-Message-ID: <20210729135210.16970-1-sidcha@amazon.de>
-X-Mailer: git-send-email 2.17.1
+        d=google.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=liO5wucVGjUgl66CCyk5eCr9ee7CWFbOuaagBW74+qs=;
+        b=EJ2F3ITFwEJ9rcPEvHQ6lQ2DOZnQ5vBtGtiPUiaEaUYZAeiKbLrc61I8wPZVT0mmce
+         oMnATeCgB3nMSCmOY6JYICgTkdxdCA6cizvZWmE5FXgzbr/++FZUo4NbEvGTfoaVyNo1
+         0azpBzwCzgho7Xydbwqhu4X7ssL0HYuQtBhcVrHshYeuX/tgsNM/hwhRAfj6VPIYKcNn
+         SRdE5PgOBshCvRabzbztBxFP+svsg33eT/iYXEhNAvgVqbLfjYJ27YSZ+f2oEjLm1yDO
+         AhQLpqmc/tmy1CFjkjoE2k7ynXOGtOgA9wC8FJHeG8CjoVUhMUY8rhuJgR4gWWk4TaFx
+         BLGw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=liO5wucVGjUgl66CCyk5eCr9ee7CWFbOuaagBW74+qs=;
+        b=QzMPnW0j5p/xCuYKwC8tKdueckDsJCDlajy3vZiQeC3n3qpg7PGUuZ4pBI/wxvkFR4
+         ZNNf2qTRKsWNou+LIEIvnJjiO7n1qEgJgVlhjRDbfpHH6eh622mivpkNuwhmDTI5BEPw
+         0xNCzIQpRLNnprNIA35a/kt5+grPo72JthVSoAonYetdB1m+j7zYN8lTOo1zpNjC8g6j
+         h1r8k4vuECGBwO5ZbJdKAV76wTt2qhCWKStVA5FcmP4vuixPf5MotCI9TwcEzU8rY9Ng
+         cbRSwz+TfZZVj/1Ti4Adkd/5HYUXpIg0Nhrm3aWYvecKbci67+GKkimCSWdPRqE5owI1
+         HFNg==
+X-Gm-Message-State: AOAM531z3B4fLGWzUeZ4n0hcCi9UEQ9W/0VMaSxd2BlYy93SPyKElHFy
+        qcfFGW5z7i02j4cg9QaUs+54Wg==
+X-Google-Smtp-Source: ABdhPJzb3jcmoJ3eeO2z7wKiK0sm764dKThMtyfcXT/S/xhsz1jMXke7rkEjfqjma4uFzTs051Dz9A==
+X-Received: by 2002:a5d:64ac:: with SMTP id m12mr4942109wrp.89.1627567209287;
+        Thu, 29 Jul 2021 07:00:09 -0700 (PDT)
+Received: from google.com ([2a00:79e0:d:210:293a:bc89:7514:5218])
+        by smtp.gmail.com with ESMTPSA id l18sm9913097wmq.0.2021.07.29.07.00.08
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 29 Jul 2021 07:00:09 -0700 (PDT)
+Date:   Thu, 29 Jul 2021 15:00:05 +0100
+From:   Quentin Perret <qperret@google.com>
+To:     Marc Zyngier <maz@kernel.org>
+Cc:     kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org,
+        Will Deacon <will@kernel.org>,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        kernel-team@android.com, Catalin Marinas <catalin.marinas@arm.com>,
+        stable@vger.kernel.org
+Subject: Re: [PATCH] KVM: arm64: Unregister HYP sections from kmemleak in
+ protected mode
+Message-ID: <YQK0ZeRZY/53tWEZ@google.com>
+References: <20210729135016.3037277-1-maz@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.43.160.66]
-X-ClientProxiedBy: EX13D20UWA003.ant.amazon.com (10.43.160.97) To
- EX13D28EUC003.ant.amazon.com (10.43.164.43)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210729135016.3037277-1-maz@kernel.org>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-According to Hyper-V TLFS Version 6.0b, struct hv_message_header members
-should be defined in the order:
+On Thursday 29 Jul 2021 at 14:50:16 (+0100), Marc Zyngier wrote:
+> Booting a KVM host in protected mode with kmemleak quickly results
+> in a pretty bad crash, as kmemleak doesn't know that the HYP sections
+> have been taken away.
+> 
+> Make the unregistration from kmemleak part of marking the sections
+> as HYP-private. The rest of the HYP-specific data is obtained via
+> the page allocator, which is not subjected to kmemleak.
+> 
+> Fixes: 90134ac9cabb ("KVM: arm64: Protect the .hyp sections from the host")
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> Cc: Quentin Perret <qperret@google.com>
+> Cc: Catalin Marinas <catalin.marinas@arm.com>
+> Cc: stable@vger.kernel.org # 5.13
+> ---
+>  arch/arm64/kvm/arm.c | 7 ++++++-
+>  1 file changed, 6 insertions(+), 1 deletion(-)
+> 
+> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> index e9a2b8f27792..23f12e602878 100644
+> --- a/arch/arm64/kvm/arm.c
+> +++ b/arch/arm64/kvm/arm.c
+> @@ -15,6 +15,7 @@
+>  #include <linux/fs.h>
+>  #include <linux/mman.h>
+>  #include <linux/sched.h>
+> +#include <linux/kmemleak.h>
+>  #include <linux/kvm.h>
+>  #include <linux/kvm_irqfd.h>
+>  #include <linux/irqbypass.h>
+> @@ -1960,8 +1961,12 @@ static inline int pkvm_mark_hyp(phys_addr_t start, phys_addr_t end)
+>  }
+>  
+>  #define pkvm_mark_hyp_section(__section)		\
+> +({							\
+> +	u64 sz = __section##_end - __section##_start;	\
+> +	kmemleak_free_part(__section##_start, sz);	\
+>  	pkvm_mark_hyp(__pa_symbol(__section##_start),	\
+> -			__pa_symbol(__section##_end))
+> +		      __pa_symbol(__section##_end));	\
+> +})
 
-	message_type, _reserved, message_flags, payload_size
+At some point we should also look into unmapping these sections from
+EL1 stage-1 as well, as that should lead to better error messages in
+case the host accesses hyp-private memory some other way. But this
+patch makes sense on its own, so:
 
-but we have it defined in the order:
+Reviewed-by: Quentin Perret <qperret@google.com>
 
-	message_type, payload_size, message_flags, _reserved
-
-that is, the payload_size and _reserved members swapped. Due to this mix
-up, we were inadvertently causing two issues:
-
-    - The payload_size field has invalid data; it didn't cause an issue
-      so far because we are delivering only timer messages which has fixed
-      size payloads the guest probably did a sizeof(payload) instead
-      relying on the value of payload_size member.
-
-    - The message_flags was always delivered as 0 to the guest;
-      fortunately, according to section 13.3.1 message_flags is also
-      treated as a reserved field.
-
-Although this is not causing an issue now, it might in future (we are
-adding more message types in our VSM implementation) so fix it to
-reflect the specification.
-
-Signed-off-by: Siddharth Chandrasekaran <sidcha@amazon.de>
----
- include/hw/hyperv/hyperv-proto.h | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/include/hw/hyperv/hyperv-proto.h b/include/hw/hyperv/hyperv-proto.h
-index 21dc28aee9..f578a60e78 100644
---- a/include/hw/hyperv/hyperv-proto.h
-+++ b/include/hw/hyperv/hyperv-proto.h
-@@ -101,9 +101,9 @@ struct hyperv_signal_event_input {
-  */
- struct hyperv_message_header {
-     uint32_t message_type;
--    uint8_t  payload_size;
--    uint8_t  message_flags; /* HV_MESSAGE_FLAG_XX */
-     uint8_t  _reserved[2];
-+    uint8_t  message_flags; /* HV_MESSAGE_FLAG_XX */
-+    uint8_t  payload_size;
-     uint64_t sender;
- };
- 
--- 
-2.17.1
-
-
-
-
-Amazon Development Center Germany GmbH
-Krausenstr. 38
-10117 Berlin
-Geschaeftsfuehrung: Christian Schlaeger, Jonathan Weiss
-Eingetragen am Amtsgericht Charlottenburg unter HRB 149173 B
-Sitz: Berlin
-Ust-ID: DE 289 237 879
-
-
-
+Thanks,
+Quentin
