@@ -2,95 +2,115 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 70D653DAA0A
-	for <lists+kvm@lfdr.de>; Thu, 29 Jul 2021 19:24:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EF6923DAA0D
+	for <lists+kvm@lfdr.de>; Thu, 29 Jul 2021 19:25:14 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231475AbhG2RYq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 29 Jul 2021 13:24:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48752 "EHLO
+        id S231571AbhG2RZQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 29 Jul 2021 13:25:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48896 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231158AbhG2RYq (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 29 Jul 2021 13:24:46 -0400
-Received: from mail-lf1-x132.google.com (mail-lf1-x132.google.com [IPv6:2a00:1450:4864:20::132])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 86E13C0613C1
-        for <kvm@vger.kernel.org>; Thu, 29 Jul 2021 10:24:41 -0700 (PDT)
-Received: by mail-lf1-x132.google.com with SMTP id f18so12388253lfu.10
-        for <kvm@vger.kernel.org>; Thu, 29 Jul 2021 10:24:41 -0700 (PDT)
+        with ESMTP id S229598AbhG2RZP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 29 Jul 2021 13:25:15 -0400
+Received: from mail-pj1-x1036.google.com (mail-pj1-x1036.google.com [IPv6:2607:f8b0:4864:20::1036])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6C79DC0613C1
+        for <kvm@vger.kernel.org>; Thu, 29 Jul 2021 10:25:12 -0700 (PDT)
+Received: by mail-pj1-x1036.google.com with SMTP id ds11-20020a17090b08cbb0290172f971883bso16790665pjb.1
+        for <kvm@vger.kernel.org>; Thu, 29 Jul 2021 10:25:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=NWUclsCNuoKzRHN0VVtJJdT/B8wW6gEtVuB7tyt8rLQ=;
-        b=h49SkWwhYpGGEq0HAv2YJOkyCtnIxNxZboW8ndPd9G+k3fjW0fMRjdxDOJDRU757L8
-         N6Q4ZWXMh03f4TyH8G43QlVHUE0jqig5r2iK6Kfs6EycfoqfOThKQWFsmIWjLMi2d7ML
-         5EFjn6xctGpsWXUKsYGIk3KQr6+yw9IyK0hNxMEk8tpt6uH3kdg+zazOSHYrw8jovmq1
-         rtN/6IDFLcxuDYYDJ/OnoVFt932gnYWZt7jGVHp0QxcDUD22/tAU6+yE7ggOf74SZc/0
-         V7G6Yx5byQkoqN6EoI917XaWmvnti26/3YpCqjiX9Ky3EEd6ptVDHumyH1aXPXu8IiVL
-         hUBg==
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=bPybBS+SEyM4KcZDsnHXnLjGpy/o0QeG21zLg9FBHkA=;
+        b=bkKstZ2uPLU2FL52gETZq/yKnJxe+xxPRu0o3T8TY4cQ9wEDz7m3KHPqu1ygp45yst
+         WDtTKwuOB6ArJNsrdoTU936IAF86JDoVgS7OFhxNtb8TxvQqitVPi9SkG3VpgGCz1f0Q
+         kghHTiKTimFM4qgL5bs/dm3ahOaDVpDF52x7NEQeRTOe+Z7VDaQK2tp0hEWA50uShK9b
+         WGYWMlgy4jgBFkzu0s9Cq/Y+D9njHK95QqyXLY0Q6xLwyMV8P1WSj0jeLccy1lVv4uUV
+         vcE3qqFXweyOYj5VspsPrFcBmcwtPuDTRQoEU2HKgkXxxm5ir6pVybTDnkjQb8xPHQzl
+         Wwnw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=NWUclsCNuoKzRHN0VVtJJdT/B8wW6gEtVuB7tyt8rLQ=;
-        b=ttqIVURMD5yi2237JUAlPmuoK7u7ME1tssoENC+EM0gNz72MP0n6EgFwxXGU16PG8D
-         3v3I+dWR0Tg42j4uIJBq+2jdZesskPBJaTfSLI6ytt5O1cg14eIAT75Iw+bVGPQhRRyn
-         6BSUyRPBPX5zE9nyX6p5OLM88keh42hFBEQundWWM1NXl7aDFHkhR97MsICGiBdEDkG/
-         THI/ezvCzhFEc8GXmLoY1lwqGxdcLJBvoLD5sDzJlaP8wP3KBE4TWvibxx10x8pKKq04
-         zjhIyLO+6w7SJNo6cn/1YheYlO0x1nwO1NNNiABgVAgd691stXBM5YwCvLdGE1SkImQZ
-         j6tg==
-X-Gm-Message-State: AOAM531fTClREYMamIOaMaK02RxKrvXgjWd349Cij+ZqwTSlPQo5SQqs
-        bKUsummQEavjbyv1ZaFT6Hx1f4DJJGMH/Vi3fvrlPUnGiCY=
-X-Google-Smtp-Source: ABdhPJwJL70ofECEVuWUT9zJxNjPniu49uTz5Ht01kB1ctgoxTVytaCkkJvJwj+hTICZp8j2nVdJyfNONqGO97OzU4w=
-X-Received: by 2002:a05:6512:3ca5:: with SMTP id h37mr4714416lfv.46.1627579479513;
- Thu, 29 Jul 2021 10:24:39 -0700 (PDT)
-MIME-Version: 1.0
-References: <cover.1618914692.git.isaku.yamahata@intel.com>
- <YK65V++S2Kt1OLTu@google.com> <936b00e2-1bcc-d5cc-5ae1-59f43ab5325f@redhat.com>
- <20210610220056.GA642297@private.email.ne.jp> <CALzav=d2m+HffSLu5e3gz0cYk=MZ2uc1a3K+vP8VRVvLRiwd9g@mail.gmail.com>
- <92ffcffb-74c1-1876-fe86-a47553a2aa5b@redhat.com>
-In-Reply-To: <92ffcffb-74c1-1876-fe86-a47553a2aa5b@redhat.com>
-From:   David Matlack <dmatlack@google.com>
-Date:   Thu, 29 Jul 2021 10:24:13 -0700
-Message-ID: <CALzav=eSrEGt9Xn99YtmHnWE1hm7ExZ4o_wjn_Rc0ZokLpizeQ@mail.gmail.com>
-Subject: Re: [RFC PATCH 00/10] KVM: x86/mmu: simplify argument to kvm page
- fault handler
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Isaku Yamahata <isaku.yamahata@gmail.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Isaku Yamahata <isaku.yamahata@intel.com>,
-        kvm list <kvm@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=bPybBS+SEyM4KcZDsnHXnLjGpy/o0QeG21zLg9FBHkA=;
+        b=e1YGMCWTXJMdI6nG31JAAlQvYzz8cksTVeWbY4AQwgUvSIa9wlY7evrUXPOVN9SkpT
+         UFc1UpheLiJ8aRd2Lpk6kTLWs1fZKhhKnAhRWH/aJ1OY4DfyQE2lhQNM51Z87jS9n30P
+         Xeg2QUd7KI2lSDYpSD99Wpdpk5SZGe7KHv3Wb9TspwzMu9Cy4wggmranbFsW0CbYFLRO
+         ZD2fP2E8KvTPXOzd/mSYEriITI7GFn3EhWTg98Lu/zyByOXdGYFZqvGWtvdJXN9tyBL0
+         M3iRrXYbU/iGE8GBU5wKQ3X+6AQY9me+bSntQCZG6ElwIktHTribe5qHggcLI9w+skLi
+         u7Ug==
+X-Gm-Message-State: AOAM531CrE9q2f3CnXVacP29RX/X32U6zJ5sbippVLfSVakFcCOCEDdg
+        J6wQp61XjD8j/PYSA9qrzTB28w==
+X-Google-Smtp-Source: ABdhPJwB0muZ7UuLrpHcDc4ObRBn4wGsqT7t1aILaPUXMNV9uPzGnZIur2w4xC4sTh8ET8UYqRis1Q==
+X-Received: by 2002:a17:902:9688:b029:129:183a:2a61 with SMTP id n8-20020a1709029688b0290129183a2a61mr5590736plp.27.1627579511794;
+        Thu, 29 Jul 2021 10:25:11 -0700 (PDT)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id 16sm4408693pfu.109.2021.07.29.10.25.10
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 29 Jul 2021 10:25:11 -0700 (PDT)
+Date:   Thu, 29 Jul 2021 17:25:07 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Chenyi Qiang <chenyi.qiang@intel.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>
-Content-Type: text/plain; charset="UTF-8"
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Xiaoyao Li <xiaoyao.li@intel.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v4 4/5] KVM: MMU: Add support for PKS emulation
+Message-ID: <YQLkczVfCsFp4IxW@google.com>
+References: <20210205083706.14146-1-chenyi.qiang@intel.com>
+ <20210205083706.14146-5-chenyi.qiang@intel.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210205083706.14146-5-chenyi.qiang@intel.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jul 29, 2021 at 10:17 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
->
-> On 29/07/21 18:48, David Matlack wrote:
-> > On Thu, Jun 10, 2021 at 3:05 PM Isaku Yamahata <isaku.yamahata@gmail.com> wrote:
-> >>
-> >> Thanks for feedback. Let me respin it.
-> >
-> > Hi Isaku,
-> >
-> > I'm working on a series to plumb the memslot backing the faulting gfn
-> > through the page fault handling stack to avoid redundant lookups. This
-> > would be much cleaner to implement on top of your struct
-> > kvm_page_fault series than the existing code.
-> >
-> > Are you still planning to send another version of this series? Or if
-> > you have decided to drop it or go in a different direction?
->
-> I can work on this and post updated patches next week.
+On Fri, Feb 05, 2021, Chenyi Qiang wrote:
+> In addition to the pkey check for user pages, advertise pkr_mask also to
+> cache the conditions where protection key checks for supervisor pages
+> are needed. Add CR4_PKS in mmu_role_bits to track the pkr_mask update on
+> a per-mmu basis.
+> 
+> In original cache conditions of pkr_mask, U/S bit in page tables is a
+> judgement condition and replace the PFEC.RSVD in page fault error code
+> to form the index of 16 domains. PKS support would extend the U/S bits
+> (if U/S=0, PKS check required). It adds an additional check for
+> cr4_pke/cr4_pks to ensure the necessity and distinguish PKU and PKS from
+> each other.
+> 
+> Signed-off-by: Chenyi Qiang <chenyi.qiang@intel.com>
+> ---
+>  arch/x86/include/asm/kvm_host.h | 11 +++---
+>  arch/x86/kvm/mmu.h              | 13 ++++---
+>  arch/x86/kvm/mmu/mmu.c          | 63 +++++++++++++++++++--------------
+>  arch/x86/kvm/x86.c              |  3 +-
+>  4 files changed, 53 insertions(+), 37 deletions(-)
+> 
+> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+> index 1909d34cbac8..e515f1cecb88 100644
+> --- a/arch/x86/include/asm/kvm_host.h
+> +++ b/arch/x86/include/asm/kvm_host.h
+> @@ -294,7 +294,7 @@ union kvm_mmu_extended_role {
+>  		unsigned int cr0_pg:1;
+>  		unsigned int cr4_pae:1;
+>  		unsigned int cr4_pse:1;
+> -		unsigned int cr4_pke:1;
+> +		unsigned int cr4_pkr:1;
 
-Sounds good. For the record I'm also looking at adding an per-vCPU LRU
-slot, which *may* obviate the need to pass around the slot. (Isaku's
-series is still a nice cleanup regardless.)
+Smushing these together will not work, as this code (from below)
 
->
-> Paolo
->
+> -     ext.cr4_pke = !!kvm_read_cr4_bits(vcpu, X86_CR4_PKE);
+> +     ext.cr4_pkr = !!kvm_read_cr4_bits(vcpu, X86_CR4_PKE) ||
+> +                   !!kvm_read_cr4_bits(vcpu, X86_CR4_PKS);
+
+will generate the same mmu_role for CR4.PKE=0,PKS=1 and CR4.PKE=1,PKS=1 (and
+other combinations).  I.e. KVM will fail to reconfigure the MMU and thus skip
+update_pkr_bitmask() if the guest toggles PKE or PKS while the other PK* bit is set.
+
+>  		unsigned int cr4_smap:1;
+>  		unsigned int cr4_smep:1;
+>  		unsigned int maxphyaddr:6;
