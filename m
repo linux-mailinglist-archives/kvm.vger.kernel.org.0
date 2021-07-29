@@ -2,120 +2,164 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A14273DAE00
-	for <lists+kvm@lfdr.de>; Thu, 29 Jul 2021 23:05:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4D9603DAE0E
+	for <lists+kvm@lfdr.de>; Thu, 29 Jul 2021 23:17:40 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233252AbhG2VFG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 29 Jul 2021 17:05:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45186 "EHLO
+        id S233587AbhG2VR2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 29 Jul 2021 17:17:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47970 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229738AbhG2VFF (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 29 Jul 2021 17:05:05 -0400
-Received: from mail-pl1-x633.google.com (mail-pl1-x633.google.com [IPv6:2607:f8b0:4864:20::633])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5E4E0C061765
-        for <kvm@vger.kernel.org>; Thu, 29 Jul 2021 14:05:01 -0700 (PDT)
-Received: by mail-pl1-x633.google.com with SMTP id e21so8459466pla.5
-        for <kvm@vger.kernel.org>; Thu, 29 Jul 2021 14:05:01 -0700 (PDT)
+        with ESMTP id S233597AbhG2VRZ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 29 Jul 2021 17:17:25 -0400
+Received: from mail-pl1-x629.google.com (mail-pl1-x629.google.com [IPv6:2607:f8b0:4864:20::629])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C0715C061798
+        for <kvm@vger.kernel.org>; Thu, 29 Jul 2021 14:17:21 -0700 (PDT)
+Received: by mail-pl1-x629.google.com with SMTP id d1so8531977pll.1
+        for <kvm@vger.kernel.org>; Thu, 29 Jul 2021 14:17:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=EP+r5M4uIgFrLN0QnuC7exccoFAbiw7t8szAQCZZaGQ=;
-        b=h3JM1kXRoW/gjzhelVo2I6e/iUmHeSC4qExI7VE7vgAzNvkZvW0HAoH8Voq+JsaYjh
-         8YdbjaME/e11D+Y62dAyOTs1RL8dZFEgwCe6ALp0f/8RzI+OV0gomvjRnuXdh9GYcAEJ
-         hQuWwaYzxvJQdvzgcntZ5bUirAZ+YnM1lM2B0ixdZzwZovwCJV1VEphcda3tDUfTIehT
-         rb17AOxCs3e0ltFXwVRVyh8Oo30mZfqoHn95XhhKz16i5y13oCRWyT79RV8q3Z57YvWP
-         aAM16XeCTv4VRmJlmQBXJyZ3x26W++Z+p4B1cxHoLD8eE/G91yVSzkj3kqmXi6rkMtEf
-         G2Qw==
+        bh=KIFjrjBCZBNta1aQPIC9IIdRRedMm/calMcivWflCR8=;
+        b=IXbpigOGv034+BPFdHTh5nWBpOSuoy+RJOgOOHXXBCs3NudbgzAKsQWHlFKOLDU1zm
+         X3CIScRE6+lWU9jgRp2OhY+mwoJN3QHNwhkU57w2jAShQFUvi3yxhPy3hVvC4fnRGHWL
+         ze050lryO68WPb0CCLy3Mm1XvF60JTOT+dgMSey7555btM4cl+f3R4rjJ7FplQuFgKWc
+         F139FIoilaUAJwj5zF8BZE/e1teHbBn7S6vnv2O0VSf8jY1tfB1XLbBYelv1yaBk/U/R
+         GL31TAf8DzIPSteeN6fa7Nli2hABDXDebGEz2vIVf0r8QCWuch+e0wFEcGhVTTwam2ID
+         jgqw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=EP+r5M4uIgFrLN0QnuC7exccoFAbiw7t8szAQCZZaGQ=;
-        b=cI3/tKlGdyQw00O2Px3CrzG5Codtcdq2tUyXme3UZSo58gk6Yorbqj43PtFac819o/
-         c4fqzf4jVZAYU5uVk9QKY0rKro5Y4sSQe5dnFsbVzmgIO2ljVT22GEZRubZs2V574cal
-         11/atMpampy8Zer5YAw0YtzyHAiR4ZO6CHF/DVKv/ZtwKg+6ZqdXUArLBVmo8livZB6l
-         8D5hufZYVSz6gZ2ELOt2A73DKbyOH0fFfwWL+vLrH/W+CDwUwPZjOIm7XhjKjfmPMRj9
-         lIT8jzyH7D+y42bFm3tdYPr5sCehIm7vJnRoE4sH+UpQab8oy+/a+SkfPWCRmlOMsJJZ
-         7kLg==
-X-Gm-Message-State: AOAM531A+SsYZ+vYSq3wCDuGd0SHeRJTwthns58YLi35z7KpLKkiqjs5
-        msxFdrflxnCBskvEOM+67Im0Fw==
-X-Google-Smtp-Source: ABdhPJz3RzAgV9k+AtcJXBCANsAyZSnhKfxFWzA1ZCPYLjrvjhCsRLZQHYCkyF9W6ffnXU4L92TSJQ==
-X-Received: by 2002:a65:5bc6:: with SMTP id o6mr5507306pgr.2.1627592700695;
-        Thu, 29 Jul 2021 14:05:00 -0700 (PDT)
+        bh=KIFjrjBCZBNta1aQPIC9IIdRRedMm/calMcivWflCR8=;
+        b=tNoi2ADhrBQAxWW8d4PvQPKZZnZeyYwftVucTAjx3uxIaj6ZvYey0b9QMi96Jwt/+o
+         XlqvnhChjTXzNT4CcDgIutN8E42NmXQNOxpQHAW9w7ktPUXqnNLdpswT36n9UK4vPQ7+
+         iEUYP0IZvo99C8yzVzuxQCFVi6ej5JzmwLgfzi7HVpd4fUlrJIYmUwHqm8FvMJ3SmALi
+         RPqXam+bVtxQzu38oe+5Ir5LTpY8PJxYFyI6RnlHB813fugRm3yLkhDB3C9yLpz58xcI
+         PHJZ6vLvaGANmEbHt3C7XQqe4KXgtJbrKzap/zGX496cS7TeC1KfIINqZYF2S3nN2t0W
+         2MCQ==
+X-Gm-Message-State: AOAM530lF8iXYPmYUmkg4YPEPmeGcTwKToV6dCQG6VpmhvJSW8kd4AFE
+        ynHTgu5x0HUuLBYKjBJkSovGmQ==
+X-Google-Smtp-Source: ABdhPJwiMHGtwAApoWJJub1wHV/rXIFjlReZXf08aJmnLVL/GQq0q33W99afFvy9vCUJtjQUu9zjHQ==
+X-Received: by 2002:a17:902:6b4b:b029:12b:f96f:dc03 with SMTP id g11-20020a1709026b4bb029012bf96fdc03mr6512439plt.14.1627593441149;
+        Thu, 29 Jul 2021 14:17:21 -0700 (PDT)
 Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id v206sm4702868pfc.67.2021.07.29.14.04.59
+        by smtp.gmail.com with ESMTPSA id f15sm4876552pgv.92.2021.07.29.14.17.20
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 29 Jul 2021 14:05:00 -0700 (PDT)
-Date:   Thu, 29 Jul 2021 21:04:56 +0000
+        Thu, 29 Jul 2021 14:17:20 -0700 (PDT)
+Date:   Thu, 29 Jul 2021 21:17:16 +0000
 From:   Sean Christopherson <seanjc@google.com>
-To:     Yu Zhang <yu.c.zhang@linux.intel.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Ben Gardon <bgardon@google.com>, kvm@vger.kernel.org
-Subject: Re: A question of TDP unloading.
-Message-ID: <YQMX+Cvo8GKCo3Zt@google.com>
-References: <20210727161957.lxevvmy37azm2h7z@linux.intel.com>
- <YQBLZ/RrBFxE4G4w@google.com>
- <20210728065605.e4ql2hzrj5fkngux@linux.intel.com>
- <YQGj8gj7fpWDdLg5@google.com>
- <20210729032200.qqb4mlctgplzq6bb@linux.intel.com>
+To:     Peter Gonda <pgonda@google.com>
+Cc:     kvm@vger.kernel.org, Brijesh Singh <brijesh.singh@amd.com>,
+        Marc Orr <marcorr@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        David Rientjes <rientjes@google.com>,
+        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        "H. Peter Anvin" <hpa@zytor.com>, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 1/3 V3] KVM, SEV: Refactor out function for unregistering
+ encrypted regions
+Message-ID: <YQMa3IDQK+DIJiOY@google.com>
+References: <20210726195015.2106033-1-pgonda@google.com>
+ <20210726195015.2106033-2-pgonda@google.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20210729032200.qqb4mlctgplzq6bb@linux.intel.com>
+In-Reply-To: <20210726195015.2106033-2-pgonda@google.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jul 29, 2021, Yu Zhang wrote:
-> On Wed, Jul 28, 2021 at 06:37:38PM +0000, Sean Christopherson wrote:
-> > On Wed, Jul 28, 2021, Yu Zhang wrote:
-> In the caller, force_tdp_unload was set to false for CR0/CR4/EFER changes. For SMM and
-> cpuid updates, it is set to true.
+Prefer "KVM: SVM:" or "KVM: SEV:" in the shortlog, i.e. colon instead of comma
+after KVM.
+
+On Mon, Jul 26, 2021, Peter Gonda wrote:
+> Factor out helper function for freeing the encrypted region list.
 > 
-> With this change, I can successfully boot a VM(and of course, number of unloadings is
-> greatly reduced). But access test case in kvm-unit-test hangs, after CR4.SMEP is flipped.
-> I'm trying to figure out why...
-
-Hrm, I'll look into when I get around to making this into a proper patch.
-
-Note, there's at least once bug, as is_root_usable() will compare the full role
-against a root shadow page's modified role.  A common helper to derive the page
-role for a direct/TDP page from an existing mmu_role is likely the way to go, as
-kvm_tdp_mmu_get_vcpu_root_hpa() would want the same functionality.
-
-> > I'll put this on my todo list, I've been looking for an excuse to update the
-> > cr0/cr4/efer flows anyways :-).  If it works, the changes should be relatively
-> > minor, if it works...
-> > 
-> > diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> > index a8cdfd8d45c4..700664fe163e 100644
-> > --- a/arch/x86/kvm/mmu/mmu.c
-> > +++ b/arch/x86/kvm/mmu/mmu.c
-> > @@ -2077,8 +2077,20 @@ static struct kvm_mmu_page *kvm_mmu_get_page(struct kvm_vcpu *vcpu,
-> >         role = vcpu->arch.mmu->mmu_role.base;
-> >         role.level = level;
-> >         role.direct = direct;
-> > -       if (role.direct)
-> > +       if (role.direct) {
-> >                 role.gpte_is_8_bytes = true;
-> > +
-> > +               /*
-> > +                * Guest PTE permissions do not impact SPTE permissions for
-> > +                * direct MMUs.  Either there are no guest PTEs (CR0.PG=0) or
-> > +                * guest PTE permissions are enforced by the CPU (TDP enabled).
-> > +                */
-> > +               WARN_ON_ONCE(access != ACC_ALL);
-> > +               role.efer_nx = 0;
-> > +               role.cr0_wp = 0;
-> > +               role.smep_andnot_wp = 0;
-> > +               role.smap_andnot_wp = 0;
-> > +       }
+> Signed-off-by: Peter Gonda <pgonda@google.com>
+> Reviewed-by: Brijesh Singh <brijesh.singh@amd.com>
+> Reviewed-by: Marc Orr <marcorr@google.com>
+> Cc: Paolo Bonzini <pbonzini@redhat.com>
+> Cc: Sean Christopherson <seanjc@google.com>
+> Cc: David Rientjes <rientjes@google.com>
+> Cc: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> Cc: Brijesh Singh <brijesh.singh@amd.com>
+> Cc: Vitaly Kuznetsov <vkuznets@redhat.com>
+> Cc: Wanpeng Li <wanpengli@tencent.com>
+> Cc: Jim Mattson <jmattson@google.com>
+> Cc: Joerg Roedel <joro@8bytes.org>
+> Cc: Thomas Gleixner <tglx@linutronix.de>
+> Cc: Ingo Molnar <mingo@redhat.com>
+> Cc: Borislav Petkov <bp@alien8.de>
+> Cc: "H. Peter Anvin" <hpa@zytor.com>
+> Cc: kvm@vger.kernel.org
+> Cc: linux-kernel@vger.kernel.org
+> ---
+>  arch/x86/kvm/svm/sev.c | 26 +++++++++++++++++---------
+>  1 file changed, 17 insertions(+), 9 deletions(-)
 > 
-> How about we do this in kvm_calc_mmu_role_common()? :-)
+> diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+> index b59c464bcdfa..6cb61d36fd5e 100644
+> --- a/arch/x86/kvm/svm/sev.c
+> +++ b/arch/x86/kvm/svm/sev.c
+> @@ -1775,11 +1775,25 @@ int svm_vm_copy_asid_from(struct kvm *kvm, unsigned int source_fd)
+>  	return ret;
+>  }
+>  
+> +static void unregister_enc_regions(struct kvm *kvm,
+> +					    struct list_head *mem_regions)
 
-No, because the role in struct kvm_mmu does need the correct bits, even for TDP,
-as the role is used to detect whether or not the context needs to be re-initialized,
-e.g. it would get a false negative on a cr0_wp change, not go through
-update_permission_bitmask(), and use the wrong page permissions when walking the
-guest page tables.
+Indentation is wonky.  There's an extra tab and an extra space.
+
+> +{
+> +	struct enc_region *pos, *q;
+> +
+> +	lockdep_assert_held(&kvm->lock);
+> +
+> +	if (list_empty(mem_regions))
+> +		return;
+> +
+> +	list_for_each_entry_safe(pos, q, mem_regions, list) {
+> +		__unregister_enc_region_locked(kvm, pos);
+> +		cond_resched();
+> +	}
+> +}
+> +
+>  void sev_vm_destroy(struct kvm *kvm)
+>  {
+>  	struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
+> -	struct list_head *head = &sev->regions_list;
+> -	struct list_head *pos, *q;
+>  
+>  	if (!sev_guest(kvm))
+>  		return;
+> @@ -1803,13 +1817,7 @@ void sev_vm_destroy(struct kvm *kvm)
+>  	 * if userspace was terminated before unregistering the memory regions
+>  	 * then lets unpin all the registered memory.
+>  	 */
+> -	if (!list_empty(head)) {
+> -		list_for_each_safe(pos, q, head) {
+> -			__unregister_enc_region_locked(kvm,
+> -				list_entry(pos, struct enc_region, list));
+> -			cond_resched();
+> -		}
+> -	}
+> +	unregister_enc_regions(kvm, &sev->regions_list);
+>  
+>  	mutex_unlock(&kvm->lock);
+
+Is there any reason for taking kvm->lock in this path?  The VM is being destroyed,
+there should be no other references, i.e. this is the only task that can be doing
+anything with @kvm.
+
+The lock is harmless, it just always gives me pause to see the cond_resched()
+while holding kvm->lock.
+
+> -- 
+> 2.32.0.432.gabb21c7263-goog
+> 
