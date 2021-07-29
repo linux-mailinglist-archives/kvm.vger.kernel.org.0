@@ -2,162 +2,150 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id BDC643DA2EE
-	for <lists+kvm@lfdr.de>; Thu, 29 Jul 2021 14:17:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DB4CB3DA2FD
+	for <lists+kvm@lfdr.de>; Thu, 29 Jul 2021 14:18:42 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235358AbhG2MRY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 29 Jul 2021 08:17:24 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:20500 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231674AbhG2MRW (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 29 Jul 2021 08:17:22 -0400
-Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 16TCBxnb106765;
-        Thu, 29 Jul 2021 08:17:18 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=to : cc : references :
- from : subject : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=ncr9tdEnR/LWzJPZc04Ak5AtCvgjzA0ROVnP4OHIjhU=;
- b=PehW69u02IxSO+6kRFF7GppvWK32INRHEgVkGCakzcgGml+z74Aell+ARg+6Brw+HbaC
- OkDszTF9wfV8Ws4SN9+dP0TH/iC0XbxDRvH8NQeMwDaOdpJul8veq3l+5BrS9jipZGkj
- sjEVKVAAHonGtQFfA98D0KhjsQmP95WLvjVr+vb3owS0CM3epwxjxWlfh1250wtIP0A5
- sRu9fIWo2PJM6cXOGKdVS617AwBnqAWHvYWzQajuYJeafVkPJtElUHkzeIWtsLFZ6AkA
- 2sVIYBrWruc/ov/M5gZDt/oa0hUvFS/EbbkNrkXnUTVNOfBnbFRMzJey1/2K6SyTKLtE YA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3a3mm46aha-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 29 Jul 2021 08:17:18 -0400
-Received: from m0098394.ppops.net (m0098394.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 16TCD6l7116314;
-        Thu, 29 Jul 2021 08:17:18 -0400
-Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3a3mm46agc-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 29 Jul 2021 08:17:18 -0400
-Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
-        by ppma06ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 16TCDeEx025131;
-        Thu, 29 Jul 2021 12:17:15 GMT
-Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
-        by ppma06ams.nl.ibm.com with ESMTP id 3a235khppf-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 29 Jul 2021 12:17:15 +0000
-Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
-        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 16TCHCom12976530
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 29 Jul 2021 12:17:12 GMT
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 6AED611C050;
-        Thu, 29 Jul 2021 12:17:12 +0000 (GMT)
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id EA39311C05B;
-        Thu, 29 Jul 2021 12:17:11 +0000 (GMT)
-Received: from localhost.localdomain (unknown [9.145.155.135])
-        by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Thu, 29 Jul 2021 12:17:11 +0000 (GMT)
-To:     Claudio Imbrenda <imbrenda@linux.ibm.com>, kvm@vger.kernel.org
-Cc:     cohuck@redhat.com, borntraeger@de.ibm.com, thuth@redhat.com,
-        pasic@linux.ibm.com, david@redhat.com, linux-s390@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-References: <20210728142631.41860-1-imbrenda@linux.ibm.com>
- <20210728142631.41860-6-imbrenda@linux.ibm.com>
-From:   Janosch Frank <frankja@linux.ibm.com>
-Subject: Re: [PATCH v2 05/13] KVM: s390: pv: handle secure storage exceptions
- for normal guests
-Message-ID: <103c158c-dba6-7421-af8d-4d771c1cf087@linux.ibm.com>
-Date:   Thu, 29 Jul 2021 14:17:11 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.11.0
+        id S236980AbhG2MSm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 29 Jul 2021 08:18:42 -0400
+Received: from mx21.baidu.com ([220.181.3.85]:55426 "EHLO baidu.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S236978AbhG2MSl (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 29 Jul 2021 08:18:41 -0400
+Received: from BC-Mail-EX08.internal.baidu.com (unknown [172.31.51.48])
+        by Forcepoint Email with ESMTPS id 258AA6B4DB088E50910F;
+        Thu, 29 Jul 2021 20:18:35 +0800 (CST)
+Received: from BJHW-MAIL-EX27.internal.baidu.com (10.127.64.42) by
+ BC-Mail-EX08.internal.baidu.com (172.31.51.48) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
+ 15.1.2242.12; Thu, 29 Jul 2021 20:18:34 +0800
+Received: from LAPTOP-UKSR4ENP.internal.baidu.com (172.31.63.8) by
+ BJHW-MAIL-EX27.internal.baidu.com (10.127.64.42) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
+ 15.1.2308.14; Thu, 29 Jul 2021 20:18:34 +0800
+From:   Cai Huoqing <caihuoqing@baidu.com>
+To:     <mst@redhat.com>, <jasowang@redhat.com>, <pbonzini@redhat.com>,
+        <stefanha@redhat.com>, <sgarzare@redhat.com>
+CC:     <kvm@vger.kernel.org>, <netdev@vger.kernel.org>,
+        Cai Huoqing <caihuoqing@baidu.com>
+Subject: [PATCH] vhost: Fix typo in comments
+Date:   Thu, 29 Jul 2021 20:18:28 +0800
+Message-ID: <20210729121828.2029-1-caihuoqing@baidu.com>
+X-Mailer: git-send-email 2.17.1
 MIME-Version: 1.0
-In-Reply-To: <20210728142631.41860-6-imbrenda@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: sOsykrLJKdgJwp_DX4lCWhCs788WbNuo
-X-Proofpoint-ORIG-GUID: PrLcVzi7kY3xJxX7wAKXNY5anxzap1TY
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.790
- definitions=2021-07-29_10:2021-07-29,2021-07-29 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 adultscore=0
- priorityscore=1501 impostorscore=0 malwarescore=0 spamscore=0 bulkscore=0
- mlxlogscore=999 phishscore=0 lowpriorityscore=0 mlxscore=0 suspectscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2107140000
- definitions=main-2107290078
+Content-Type: text/plain
+X-Originating-IP: [172.31.63.8]
+X-ClientProxiedBy: BC-Mail-EX06.internal.baidu.com (172.31.51.46) To
+ BJHW-MAIL-EX27.internal.baidu.com (10.127.64.42)
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 7/28/21 4:26 PM, Claudio Imbrenda wrote:
-> With upcoming patches, normal guests might touch secure pages.
-> 
-> This patch extends the existing exception handler to convert the pages
-> to non secure also when the exception is triggered by a normal guest.
-> 
-> This can happen for example when a secure guest reboots; the first
-> stage of a secure guest is non secure, and in general a secure guest
-> can reboot into non-secure mode.
-> 
-> If the secure memory of the previous boot has not been cleared up
-> completely yet, a non-secure guest might touch secure memory, which
-> will need to be handled properly.
-> 
-> Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
-> ---
->  arch/s390/mm/fault.c | 12 +++++++++++-
->  1 file changed, 11 insertions(+), 1 deletion(-)
-> 
-> diff --git a/arch/s390/mm/fault.c b/arch/s390/mm/fault.c
-> index eb68b4f36927..b89d625ea2ec 100644
-> --- a/arch/s390/mm/fault.c
-> +++ b/arch/s390/mm/fault.c
-> @@ -767,6 +767,7 @@ void do_secure_storage_access(struct pt_regs *regs)
->  	struct vm_area_struct *vma;
->  	struct mm_struct *mm;
->  	struct page *page;
-> +	struct gmap *gmap;
->  	int rc;
->  
->  	/*
-> @@ -796,6 +797,16 @@ void do_secure_storage_access(struct pt_regs *regs)
->  	}
->  
->  	switch (get_fault_type(regs)) {
-> +	case GMAP_FAULT:
-> +		gmap = (struct gmap *)S390_lowcore.gmap;
-> +		/*
-> +		 * Very unlikely, but if it happens, simply try again.
-> +		 * The next attempt will trigger a different exception.
-> +		 */
+fix typo for vhost
 
-If we keep this the way it currently is then the comment needs to go to
-the EFAULT check since it makes no sense above the gmap_translate().
+Signed-off-by: Cai Huoqing <caihuoqing@baidu.com>
+---
+ drivers/vhost/scsi.c   |  4 ++--
+ drivers/vhost/vhost.c  |  2 +-
+ drivers/vhost/vringh.c | 18 +++++++++---------
+ drivers/vhost/vsock.c  |  6 +++---
+ 4 files changed, 15 insertions(+), 15 deletions(-)
 
-> +		addr = __gmap_translate(gmap, addr);
-
-So we had a valid gmap PTE to end up here where the guest touched a
-secure page and triggered the exception. But we suddenly can't translate
-the gaddr to a vmaddr because the gmap tracking doesn't have an entry
-for the address.
-
-My first instinct is to SIGSEGV the process since I can't come up with a
-way out of this situation except for the process to map this back in.
-The only reason I can think of that it was removed from the mapping is
-malicious intent or a bug.
-
-I think this is needs a VM_FAULT_BADMAP and a do_fault_error() call.
-
-> +		if (addr == -EFAULT)
-> +			break;
-> +		fallthrough;
->  	case USER_FAULT:
->  		mm = current->mm;
->  		mmap_read_lock(mm);
-> @@ -824,7 +835,6 @@ void do_secure_storage_access(struct pt_regs *regs)
->  		if (rc)
->  			BUG();
->  		break;
-> -	case GMAP_FAULT:
->  	default:
->  		do_fault_error(regs, VM_READ | VM_WRITE, VM_FAULT_BADMAP);
->  		WARN_ON_ONCE(1);
-> 
+diff --git a/drivers/vhost/scsi.c b/drivers/vhost/scsi.c
+index 46f897e41217..18612219e994 100644
+--- a/drivers/vhost/scsi.c
++++ b/drivers/vhost/scsi.c
+@@ -119,7 +119,7 @@ struct vhost_scsi_nexus {
+ struct vhost_scsi_tpg {
+ 	/* Vhost port target portal group tag for TCM */
+ 	u16 tport_tpgt;
+-	/* Used to track number of TPG Port/Lun Links wrt to explict I_T Nexus shutdown */
++	/* Used to track number of TPG Port/Lun Links wrt to explicit I_T Nexus shutdown */
+ 	int tv_tpg_port_count;
+ 	/* Used for vhost_scsi device reference to tpg_nexus, protected by tv_tpg_mutex */
+ 	int tv_tpg_vhost_count;
+@@ -1057,7 +1057,7 @@ vhost_scsi_handle_vq(struct vhost_scsi *vs, struct vhost_virtqueue *vq)
+ 			/*
+ 			 * Set prot_iter to data_iter and truncate it to
+ 			 * prot_bytes, and advance data_iter past any
+-			 * preceeding prot_bytes that may be present.
++			 * preceding prot_bytes that may be present.
+ 			 *
+ 			 * Also fix up the exp_data_len to reflect only the
+ 			 * actual data payload length.
+diff --git a/drivers/vhost/vhost.c b/drivers/vhost/vhost.c
+index b9e853e6094d..9a0f8b93f64d 100644
+--- a/drivers/vhost/vhost.c
++++ b/drivers/vhost/vhost.c
+@@ -2486,7 +2486,7 @@ void vhost_add_used_and_signal_n(struct vhost_dev *dev,
+ }
+ EXPORT_SYMBOL_GPL(vhost_add_used_and_signal_n);
+ 
+-/* return true if we're sure that avaiable ring is empty */
++/* return true if we're sure that available ring is empty */
+ bool vhost_vq_avail_empty(struct vhost_dev *dev, struct vhost_virtqueue *vq)
+ {
+ 	__virtio16 avail_idx;
+diff --git a/drivers/vhost/vringh.c b/drivers/vhost/vringh.c
+index 4af8fa259d65..83e8c677ac11 100644
+--- a/drivers/vhost/vringh.c
++++ b/drivers/vhost/vringh.c
+@@ -630,9 +630,9 @@ static inline int xfer_to_user(const struct vringh *vrh,
+  * @features: the feature bits for this ring.
+  * @num: the number of elements.
+  * @weak_barriers: true if we only need memory barriers, not I/O.
+- * @desc: the userpace descriptor pointer.
+- * @avail: the userpace avail pointer.
+- * @used: the userpace used pointer.
++ * @desc: the userspace descriptor pointer.
++ * @avail: the userspace avail pointer.
++ * @used: the userspace used pointer.
+  *
+  * Returns an error if num is invalid: you should check pointers
+  * yourself!
+@@ -905,9 +905,9 @@ static inline int kern_xfer(const struct vringh *vrh, void *dst,
+  * @features: the feature bits for this ring.
+  * @num: the number of elements.
+  * @weak_barriers: true if we only need memory barriers, not I/O.
+- * @desc: the userpace descriptor pointer.
+- * @avail: the userpace avail pointer.
+- * @used: the userpace used pointer.
++ * @desc: the userspace descriptor pointer.
++ * @avail: the userspace avail pointer.
++ * @used: the userspace used pointer.
+  *
+  * Returns an error if num is invalid.
+  */
+@@ -1268,9 +1268,9 @@ static inline int putused_iotlb(const struct vringh *vrh,
+  * @features: the feature bits for this ring.
+  * @num: the number of elements.
+  * @weak_barriers: true if we only need memory barriers, not I/O.
+- * @desc: the userpace descriptor pointer.
+- * @avail: the userpace avail pointer.
+- * @used: the userpace used pointer.
++ * @desc: the userspace descriptor pointer.
++ * @avail: the userspace avail pointer.
++ * @used: the userspace used pointer.
+  *
+  * Returns an error if num is invalid.
+  */
+diff --git a/drivers/vhost/vsock.c b/drivers/vhost/vsock.c
+index f249622ef11b..78f0efdc5713 100644
+--- a/drivers/vhost/vsock.c
++++ b/drivers/vhost/vsock.c
+@@ -178,10 +178,10 @@ vhost_transport_do_send_pkt(struct vhost_vsock *vsock,
+ 			 * small rx buffers, headers of packets in rx queue are
+ 			 * created dynamically and are initialized with header
+ 			 * of current packet(except length). But in case of
+-			 * SOCK_SEQPACKET, we also must clear record delimeter
++			 * SOCK_SEQPACKET, we also must clear record delimiter
+ 			 * bit(VIRTIO_VSOCK_SEQ_EOR). Otherwise, instead of one
+-			 * packet with delimeter(which marks end of record),
+-			 * there will be sequence of packets with delimeter
++			 * packet with delimiter(which marks end of record),
++			 * there will be sequence of packets with delimiter
+ 			 * bit set. After initialized header will be copied to
+ 			 * rx buffer, this bit will be restored.
+ 			 */
+-- 
+2.25.1
 
