@@ -2,164 +2,113 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4D9603DAE0E
-	for <lists+kvm@lfdr.de>; Thu, 29 Jul 2021 23:17:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 058CE3DAEA8
+	for <lists+kvm@lfdr.de>; Fri, 30 Jul 2021 00:09:32 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233587AbhG2VR2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 29 Jul 2021 17:17:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47970 "EHLO
+        id S234312AbhG2WJb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 29 Jul 2021 18:09:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60018 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233597AbhG2VRZ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 29 Jul 2021 17:17:25 -0400
-Received: from mail-pl1-x629.google.com (mail-pl1-x629.google.com [IPv6:2607:f8b0:4864:20::629])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C0715C061798
-        for <kvm@vger.kernel.org>; Thu, 29 Jul 2021 14:17:21 -0700 (PDT)
-Received: by mail-pl1-x629.google.com with SMTP id d1so8531977pll.1
-        for <kvm@vger.kernel.org>; Thu, 29 Jul 2021 14:17:21 -0700 (PDT)
+        with ESMTP id S234107AbhG2WJ3 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 29 Jul 2021 18:09:29 -0400
+Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0E770C061765
+        for <kvm@vger.kernel.org>; Thu, 29 Jul 2021 15:09:26 -0700 (PDT)
+Received: by mail-yb1-xb49.google.com with SMTP id f22-20020a25b0960000b029055ed6ffbea6so8103470ybj.14
+        for <kvm@vger.kernel.org>; Thu, 29 Jul 2021 15:09:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=KIFjrjBCZBNta1aQPIC9IIdRRedMm/calMcivWflCR8=;
-        b=IXbpigOGv034+BPFdHTh5nWBpOSuoy+RJOgOOHXXBCs3NudbgzAKsQWHlFKOLDU1zm
-         X3CIScRE6+lWU9jgRp2OhY+mwoJN3QHNwhkU57w2jAShQFUvi3yxhPy3hVvC4fnRGHWL
-         ze050lryO68WPb0CCLy3Mm1XvF60JTOT+dgMSey7555btM4cl+f3R4rjJ7FplQuFgKWc
-         F139FIoilaUAJwj5zF8BZE/e1teHbBn7S6vnv2O0VSf8jY1tfB1XLbBYelv1yaBk/U/R
-         GL31TAf8DzIPSteeN6fa7Nli2hABDXDebGEz2vIVf0r8QCWuch+e0wFEcGhVTTwam2ID
-         jgqw==
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=Y1FozKgR1OGtch4GBgu/T53ekVcZG3++UIur3cT4k1g=;
+        b=KCVCCjvfgPmT2bb35uWb5YZDXm5qgf3gJxeSBmXlrVF1vncKlfaP8Wzzg1bfZi5Nkr
+         T8v+aNTulTf6jbCZMm835Z7w86SM4E2eEqKDSBtbNqNvwJqd1ScPCOp0Ppmlru9mdffm
+         2PjMw4XxdccM8Am6I5NOcHkW9SIi6d5kd/NOAMDmNU4AT0AtBagT7M03wnlA7CmKb395
+         D5Bhao5isUgygnfi8Jw5PgpS4XM74rDfLMjm2dFm0CYi7EcZcLhU7AzADCylciD28fEy
+         aVUkLMiMdzIfZcktnJjBcPjav6cUYulnE9PWO19nsbfIJ9H+tszoSYfrdd5VQDoykvdb
+         fBBg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=KIFjrjBCZBNta1aQPIC9IIdRRedMm/calMcivWflCR8=;
-        b=tNoi2ADhrBQAxWW8d4PvQPKZZnZeyYwftVucTAjx3uxIaj6ZvYey0b9QMi96Jwt/+o
-         XlqvnhChjTXzNT4CcDgIutN8E42NmXQNOxpQHAW9w7ktPUXqnNLdpswT36n9UK4vPQ7+
-         iEUYP0IZvo99C8yzVzuxQCFVi6ej5JzmwLgfzi7HVpd4fUlrJIYmUwHqm8FvMJ3SmALi
-         RPqXam+bVtxQzu38oe+5Ir5LTpY8PJxYFyI6RnlHB813fugRm3yLkhDB3C9yLpz58xcI
-         PHJZ6vLvaGANmEbHt3C7XQqe4KXgtJbrKzap/zGX496cS7TeC1KfIINqZYF2S3nN2t0W
-         2MCQ==
-X-Gm-Message-State: AOAM530lF8iXYPmYUmkg4YPEPmeGcTwKToV6dCQG6VpmhvJSW8kd4AFE
-        ynHTgu5x0HUuLBYKjBJkSovGmQ==
-X-Google-Smtp-Source: ABdhPJwiMHGtwAApoWJJub1wHV/rXIFjlReZXf08aJmnLVL/GQq0q33W99afFvy9vCUJtjQUu9zjHQ==
-X-Received: by 2002:a17:902:6b4b:b029:12b:f96f:dc03 with SMTP id g11-20020a1709026b4bb029012bf96fdc03mr6512439plt.14.1627593441149;
-        Thu, 29 Jul 2021 14:17:21 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id f15sm4876552pgv.92.2021.07.29.14.17.20
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 29 Jul 2021 14:17:20 -0700 (PDT)
-Date:   Thu, 29 Jul 2021 21:17:16 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Peter Gonda <pgonda@google.com>
-Cc:     kvm@vger.kernel.org, Brijesh Singh <brijesh.singh@amd.com>,
-        Marc Orr <marcorr@google.com>,
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=Y1FozKgR1OGtch4GBgu/T53ekVcZG3++UIur3cT4k1g=;
+        b=abHYNtqE+/hoJaUCPrEny8qfAf0U6FvQZAGqGzZTwToPbdj6RrnJaAAkXNWxR1zo+X
+         +mKKtvFcD3xA4m1uQVTPrI/jCFX27H+ZykhPrLtTHxYRxs4aBtncLFOBFjDSFN5KUefe
+         M+qkL9si6zWknhci6CQYNm+if4pTJ8a5sbFFyaBdfqkZmvn8FjzXGQTvoSFjMY2qekZH
+         Ckb7uyLCRaE/lM4kC1kyYkc7Ck5EWcyOQIzu6rjQVTyH9mc3JcLT4Y9z6rDE8UPOJhp6
+         473i0RlVK6nlHj9DpFTAU9V0p3NceH9pF9e4HQ6dNAokINrc/DNj62lYwrEj2VSwdMR1
+         0mdw==
+X-Gm-Message-State: AOAM532RMMmy2PdMghDQ/4L2j4uSeBvVt16DO921F+kD3BhCRs7yAF7C
+        PtvUO8sgLJGXyC5phB59MSDt6F8Dx9k=
+X-Google-Smtp-Source: ABdhPJweYbkW6ntZKyVJeSlR2LDQ77+i9PG1QNakarKHqxX2ZyAz6vYGDXkzuixuoiNM0eHVpr8gTAurhys=
+X-Received: from oupton.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:404])
+ (user=oupton job=sendgmr) by 2002:a25:3503:: with SMTP id c3mr7258148yba.316.1627596565260;
+ Thu, 29 Jul 2021 15:09:25 -0700 (PDT)
+Date:   Thu, 29 Jul 2021 22:09:13 +0000
+Message-Id: <20210729220916.1672875-1-oupton@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.32.0.554.ge1b32706d8-goog
+Subject: [PATCH v2 0/3] KVM: arm64: Use generic guest entry infrastructure
+From:   Oliver Upton <oupton@google.com>
+To:     kvmarm@lists.cs.columbia.edu
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
         Paolo Bonzini <pbonzini@redhat.com>,
-        David Rientjes <rientjes@google.com>,
-        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
+        Marc Zyngier <maz@kernel.org>,
+        James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Will Deacon <will@kernel.org>,
         Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        "H. Peter Anvin" <hpa@zytor.com>, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 1/3 V3] KVM, SEV: Refactor out function for unregistering
- encrypted regions
-Message-ID: <YQMa3IDQK+DIJiOY@google.com>
-References: <20210726195015.2106033-1-pgonda@google.com>
- <20210726195015.2106033-2-pgonda@google.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210726195015.2106033-2-pgonda@google.com>
+        Peter Zijlstra <peterz@infradead.org>,
+        Andy Lutomirski <luto@kernel.org>,
+        linux-arm-kernel@lists.infradead.org,
+        Peter Shier <pshier@google.com>,
+        Shakeel Butt <shakeelb@google.com>,
+        Guangyu Shi <guangyus@google.com>,
+        Oliver Upton <oupton@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Prefer "KVM: SVM:" or "KVM: SEV:" in the shortlog, i.e. colon instead of comma
-after KVM.
+The arm64 kernel doesn't yet support the full generic entry
+infrastructure. That being said, KVM/arm64 doesn't properly handle
+TIF_NOTIFY_RESUME and could pick this up by switching to the generic
+guest entry infrasturture.
 
-On Mon, Jul 26, 2021, Peter Gonda wrote:
-> Factor out helper function for freeing the encrypted region list.
-> 
-> Signed-off-by: Peter Gonda <pgonda@google.com>
-> Reviewed-by: Brijesh Singh <brijesh.singh@amd.com>
-> Reviewed-by: Marc Orr <marcorr@google.com>
-> Cc: Paolo Bonzini <pbonzini@redhat.com>
-> Cc: Sean Christopherson <seanjc@google.com>
-> Cc: David Rientjes <rientjes@google.com>
-> Cc: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> Cc: Brijesh Singh <brijesh.singh@amd.com>
-> Cc: Vitaly Kuznetsov <vkuznets@redhat.com>
-> Cc: Wanpeng Li <wanpengli@tencent.com>
-> Cc: Jim Mattson <jmattson@google.com>
-> Cc: Joerg Roedel <joro@8bytes.org>
-> Cc: Thomas Gleixner <tglx@linutronix.de>
-> Cc: Ingo Molnar <mingo@redhat.com>
-> Cc: Borislav Petkov <bp@alien8.de>
-> Cc: "H. Peter Anvin" <hpa@zytor.com>
-> Cc: kvm@vger.kernel.org
-> Cc: linux-kernel@vger.kernel.org
-> ---
->  arch/x86/kvm/svm/sev.c | 26 +++++++++++++++++---------
->  1 file changed, 17 insertions(+), 9 deletions(-)
-> 
-> diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-> index b59c464bcdfa..6cb61d36fd5e 100644
-> --- a/arch/x86/kvm/svm/sev.c
-> +++ b/arch/x86/kvm/svm/sev.c
-> @@ -1775,11 +1775,25 @@ int svm_vm_copy_asid_from(struct kvm *kvm, unsigned int source_fd)
->  	return ret;
->  }
->  
-> +static void unregister_enc_regions(struct kvm *kvm,
-> +					    struct list_head *mem_regions)
+Patch 1 adds a missing vCPU stat to ARM64 to record the number of signal
+exits to userspace.
 
-Indentation is wonky.  There's an extra tab and an extra space.
+Patch 2 unhitches entry-kvm from entry-generic, as ARM64 doesn't
+currently support the generic infrastructure.
 
-> +{
-> +	struct enc_region *pos, *q;
-> +
-> +	lockdep_assert_held(&kvm->lock);
-> +
-> +	if (list_empty(mem_regions))
-> +		return;
-> +
-> +	list_for_each_entry_safe(pos, q, mem_regions, list) {
-> +		__unregister_enc_region_locked(kvm, pos);
-> +		cond_resched();
-> +	}
-> +}
-> +
->  void sev_vm_destroy(struct kvm *kvm)
->  {
->  	struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
-> -	struct list_head *head = &sev->regions_list;
-> -	struct list_head *pos, *q;
->  
->  	if (!sev_guest(kvm))
->  		return;
-> @@ -1803,13 +1817,7 @@ void sev_vm_destroy(struct kvm *kvm)
->  	 * if userspace was terminated before unregistering the memory regions
->  	 * then lets unpin all the registered memory.
->  	 */
-> -	if (!list_empty(head)) {
-> -		list_for_each_safe(pos, q, head) {
-> -			__unregister_enc_region_locked(kvm,
-> -				list_entry(pos, struct enc_region, list));
-> -			cond_resched();
-> -		}
-> -	}
-> +	unregister_enc_regions(kvm, &sev->regions_list);
->  
->  	mutex_unlock(&kvm->lock);
+Patch 3 replaces the open-coded entry handling with the generic xfer
+function.
 
-Is there any reason for taking kvm->lock in this path?  The VM is being destroyed,
-there should be no other references, i.e. this is the only task that can be doing
-anything with @kvm.
+This series was tested on an Ampere Mt. Jade reference system. The
+series cleanly applies to kvm/queue (note that this is deliberate as the
+generic kvm stats patches have not yet propagated to kvm-arm/queue) at
+the following commit:
 
-The lock is harmless, it just always gives me pause to see the cond_resched()
-while holding kvm->lock.
+8ad5e63649ff ("KVM: Don't take mmu_lock for range invalidation unless necessary")
 
-> -- 
-> 2.32.0.432.gabb21c7263-goog
-> 
+v1 -> v2:
+ - Address Jing's comment
+ - Carry Jing's r-b tag
+
+v1: http://lore.kernel.org/r/20210729195632.489978-1-oupton@google.com
+
+Oliver Upton (3):
+  KVM: arm64: Record number of signal exits as a vCPU stat
+  entry: KVM: Allow use of generic KVM entry w/o full generic support
+  KVM: arm64: Use generic KVM xfer to guest work function
+
+ arch/arm64/include/asm/kvm_host.h |  1 +
+ arch/arm64/kvm/Kconfig            |  1 +
+ arch/arm64/kvm/arm.c              | 26 ++++++++++++++------------
+ arch/arm64/kvm/guest.c            |  1 +
+ include/linux/entry-kvm.h         |  6 +++++-
+ 5 files changed, 22 insertions(+), 13 deletions(-)
+
+-- 
+2.32.0.554.ge1b32706d8-goog
+
