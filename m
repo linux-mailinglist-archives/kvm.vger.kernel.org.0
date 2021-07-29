@@ -2,189 +2,119 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 673393DA4A5
-	for <lists+kvm@lfdr.de>; Thu, 29 Jul 2021 15:48:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 41CD33DA4B3
+	for <lists+kvm@lfdr.de>; Thu, 29 Jul 2021 15:48:54 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237585AbhG2Ns3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 29 Jul 2021 09:48:29 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:5792 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S237825AbhG2Ns1 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 29 Jul 2021 09:48:27 -0400
-Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 16TDiI27078928;
-        Thu, 29 Jul 2021 09:48:17 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding; s=pp1;
- bh=vyJKt0bZhoq6ffyST58lUouDpSCAs2tHH4tmV7Qw7TU=;
- b=Ti4mKsbAMkW1//RkGfqT4znKMsJvbonU199wHuFqLo+PjGoOsSdkHlayl2MW1S2um3ux
- xymxIgrHxXk4PX4Of5r/OEIYnew4iNT3pdBjGtS8lZqqRLQoVSF1+QhNvuVeUI7qBMue
- knvriImhvLM09G/kzH68S39yYtp9biaeySbUwrtxZcD8LrlKUIjxx0SYC2ja5zaSMwlC
- dpJq7R/hu5UFKoVsukmcfeh9OzPj56gO6+heqF6m1Y95bcY3tNrR3xAXob8n7XFzMPTx
- PbmCuJLJQfUVqPax+fGKufDRV7THZqhBDUAclXxrarMe7zjwdRfih91EHOKmQxBcHx1q 3w== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3a3wftr3p9-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 29 Jul 2021 09:48:17 -0400
-Received: from m0098409.ppops.net (m0098409.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 16TDjOhS082679;
-        Thu, 29 Jul 2021 09:48:17 -0400
-Received: from ppma06fra.de.ibm.com (48.49.7a9f.ip4.static.sl-reverse.com [159.122.73.72])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3a3wftr3mv-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 29 Jul 2021 09:48:17 -0400
-Received: from pps.filterd (ppma06fra.de.ibm.com [127.0.0.1])
-        by ppma06fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 16TDZaEN007575;
-        Thu, 29 Jul 2021 13:48:14 GMT
-Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
-        by ppma06fra.de.ibm.com with ESMTP id 3a235kh545-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 29 Jul 2021 13:48:14 +0000
-Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
-        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 16TDjRhp21955056
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 29 Jul 2021 13:45:27 GMT
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id D55904C0BB;
-        Thu, 29 Jul 2021 13:48:11 +0000 (GMT)
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 8B90C4C0B6;
-        Thu, 29 Jul 2021 13:48:11 +0000 (GMT)
-Received: from t46lp67.lnxne.boe (unknown [9.152.108.100])
-        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Thu, 29 Jul 2021 13:48:11 +0000 (GMT)
-From:   Janosch Frank <frankja@linux.ibm.com>
-To:     kvm@vger.kernel.org
-Cc:     linux-s390@vger.kernel.org, imbrenda@linux.ibm.com,
-        david@redhat.com, thuth@redhat.com, cohuck@redhat.com
-Subject: [kvm-unit-tests PATCH 4/4] lib: s390x: sie: Move sie function into library
-Date:   Thu, 29 Jul 2021 13:48:03 +0000
-Message-Id: <20210729134803.183358-5-frankja@linux.ibm.com>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20210729134803.183358-1-frankja@linux.ibm.com>
-References: <20210729134803.183358-1-frankja@linux.ibm.com>
+        id S237837AbhG2Nsy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 29 Jul 2021 09:48:54 -0400
+Received: from wforward5-smtp.messagingengine.com ([64.147.123.35]:33165 "EHLO
+        wforward5-smtp.messagingengine.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S237831AbhG2Nsx (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 29 Jul 2021 09:48:53 -0400
+Received: from compute5.internal (compute5.nyi.internal [10.202.2.45])
+        by mailforward.west.internal (Postfix) with ESMTP id A60611AC0113;
+        Thu, 29 Jul 2021 09:48:48 -0400 (EDT)
+Received: from mailfrontend2 ([10.202.2.163])
+  by compute5.internal (MEProxy); Thu, 29 Jul 2021 09:48:49 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+        messagingengine.com; h=cc:content-type:date:from:in-reply-to
+        :message-id:mime-version:references:subject:to:x-me-proxy
+        :x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; bh=9QPW2T
+        aD5TkdBoSC7awJVUB3Oz/9pHuBCU2Rqw2XRmM=; b=UX5PL0C7EKdRQuy+w/FfN1
+        Bgu9VREKmyd4QqYE2mhCz63k7Z7Nld6DHJpjKy1I0Z94U3NlpQts+L4MhXK/oskt
+        jcOyiHibEl2xKYk2Kkzp1keMK0qQiWq8skd4R6r2uwp6trW+wQg2Mduso3jLFWlR
+        Nz7HqI4TqKDkSRa3xj4k/i3BG9RO57RttgUveqArp3QmP7pRna23+aEviFJqB1Dq
+        NDnPKGs7YygNQ41QOxZ1X8KcQngsJXtJEjIMbnxCuAbaqlXe9kYmNcao3l9aZhAZ
+        ygJ/TyiLHPeJPmzmY5Zdz2MDCagp1Yb4il5oGO6WDeL5JfKfgCTwE4d1+APUwq8g
+        ==
+X-ME-Sender: <xms:uLECYQKaAAPIOcNBK7DO0W4TMK1h7hiIoG_hdXwKSl_rAJIQo_A7mg>
+    <xme:uLECYQJ7bc_skfmUr8G0NnQ8jnuNTliOMdGZNVxOA4wUZrspQCj4o2gmainu193P9
+    lPW9OhfzdGNrj93PLE>
+X-ME-Received: <xmr:uLECYQuEWcfJbTIrmKDjsalZaHiGIU6el4Pm5AXi_jrVNNPHzadhtJ5CUYD7ET6SgSl6WbmPav3Fh-E3IgusIOqSigoU1ap08qX35VT6Qgo>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvtddrheefgddvkecutefuodetggdotefrodftvf
+    curfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfghnecu
+    uegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenuc
+    fjughrpefvufgjfhfhfffkgggtsehttdertddttddtnecuhfhrohhmpeffrghvihguucfg
+    ughmohhnughsohhnuceouggrvhhiugdrvggumhhonhgushhonhesohhrrggtlhgvrdgtoh
+    hmqeenucggtffrrghtthgvrhhnpeegtdegheevhfegieekfffhledtjedugeehffegvdev
+    feffheeliefhkeevfeejfeenucffohhmrghinhepkhgvrhhnvghlrdhorhhgnecuvehluh
+    hsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomhepuggrvhhiugdrvggu
+    mhhonhgushhonhesohhrrggtlhgvrdgtohhm
+X-ME-Proxy: <xmx:uLECYdaGxtYm92wj4W1DtEK31OUdCPpnhVDymZIMm6hZZuqGbcIwcA>
+    <xmx:uLECYXZxN-0DfUqhYKGBSe33Mcx__DUUoLfCADD-bpwyjnrkmmScrw>
+    <xmx:uLECYZDvOT7HNn0mYPXm_jT8z4lw_Y6F_6QCjHZjJaReJawnYh4PcQ>
+    <xmx:wLECYdwVh-qLAgSXrGx4FCGSkfiSwL3lJRMClSuEh3b8TAkhN8mGChuzs47hFOaZ>
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Thu,
+ 29 Jul 2021 09:48:39 -0400 (EDT)
+Received: from localhost (disaster-area.hh.sledj.net [local])
+        by disaster-area.hh.sledj.net (OpenSMTPD) with ESMTPA id bb8cfb13;
+        Thu, 29 Jul 2021 13:48:38 +0000 (UTC)
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     David Matlack <dmatlack@google.com>, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
+        Borislav Petkov <bp@alien8.de>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Joerg Roedel <joro@8bytes.org>, Ingo Molnar <mingo@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Paolo Bonzini <pbonzini@redhat.com>, x86@kernel.org,
+        Joao Martins <joao.m.martins@oracle.com>
+Subject: Re: [PATCH 2/2] KVM: x86: On emulation failure, convey the exit
+ reason to userspace
+In-Reply-To: <YOjGdFXXCqDeVlh4@google.com>
+References: <20210628173152.2062988-1-david.edmondson@oracle.com>
+ <20210628173152.2062988-3-david.edmondson@oracle.com>
+ <YNygagjfTIuptxL8@google.com> <m2pmw114w5.fsf@oracle.com>
+ <YOjGdFXXCqDeVlh4@google.com>
+From:   David Edmondson <david.edmondson@oracle.com>
+Date:   Thu, 29 Jul 2021 14:48:38 +0100
+Message-ID: <cunmtq5temh.fsf@oracle.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: AnrGKglxMdlTEmwuZV8tqQ9SN-oQ8UdF
-X-Proofpoint-GUID: lV_-kcy4UMNGefFORXUOmB__JaEGZ3Iy
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.790
- definitions=2021-07-29_10:2021-07-29,2021-07-29 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0
- priorityscore=1501 bulkscore=0 spamscore=0 impostorscore=0 clxscore=1015
- suspectscore=0 malwarescore=0 mlxscore=0 adultscore=0 lowpriorityscore=0
- mlxlogscore=999 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2107140000 definitions=main-2107290087
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Time to deduplicate more code.
+On Friday, 2021-07-09 at 21:58:12 GMT, Sean Christopherson wrote:
 
-Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
----
- lib/s390x/sie.c  | 13 +++++++++++++
- lib/s390x/sie.h  |  1 +
- s390x/mvpg-sie.c | 13 -------------
- s390x/sie.c      | 17 -----------------
- 4 files changed, 14 insertions(+), 30 deletions(-)
+> On Fri, Jul 02, 2021, David Edmondson wrote:
+>> On Wednesday, 2021-06-30 at 16:48:42 UTC, David Matlack wrote:
+>> 
+>> > On Mon, Jun 28, 2021 at 06:31:52PM +0100, David Edmondson wrote:
+>> >>  	if (!is_guest_mode(vcpu) && static_call(kvm_x86_get_cpl)(vcpu) == 0) {
+>> >> -		vcpu->run->exit_reason = KVM_EXIT_INTERNAL_ERROR;
+>> >> -		vcpu->run->internal.suberror = KVM_INTERNAL_ERROR_EMULATION;
+>> >> -		vcpu->run->internal.ndata = 0;
+>> >> +		prepare_emulation_failure_exit(
+>> >> +			vcpu, KVM_INTERNAL_ERROR_EMULATION_FLAG_EXIT_REASON);
+>> >
+>> > Should kvm_task_switch and kvm_handle_memory_failure also be updated
+>> > like this?
+>> 
+>> Will do in v2.
+>> 
+>> sgx_handle_emulation_failure() seems like an existing user of
+>> KVM_INTERNAL_ERROR_EMULATION that doesn't follow the new protocol (use
+>> the emulation_failure part of the union).
+>> 
+>> Sean: If I add another flag for this case, what is the existing
+>> user-level consumer?
+>
+> Doh, the SGX case should have been updated as part of commit c88339d88b0a ("kvm:
+> x86: Allow userspace to handle emulation errors").  The easiest fix for SGX would
+> be to zero out 'flags', bump ndata, and shift the existing field usage.  That
+> would resolve the existing problem of the address being misinterpreted as flags,
+> and would play nice _if_ additional flags are added.  I'll send a patch for that.
+>
+> [...]
+>
+> Which brings me back to adding another flag when dumping the exit reason.  Unless
+> there is a concrete use case for programmatically taking action in reponse to
+> failed emulation, e.g. attemping emulation in userspace using insn_bytes+insn_size,
+> I think we should not add a flag and instead dump info for debug/triage purposes
+> without committing to an ABI.  I.e. define the ABI such that KVM can dump
+> arbitrary info in the unused portions of data[].
 
-diff --git a/lib/s390x/sie.c b/lib/s390x/sie.c
-index ec0c4867..d971e825 100644
---- a/lib/s390x/sie.c
-+++ b/lib/s390x/sie.c
-@@ -43,6 +43,19 @@ void sie_handle_validity(struct vm *vm)
- 	validity_expected = false;
- }
- 
-+void sie(struct vm *vm)
-+{
-+	/* Reset icptcode so we don't trip over it below */
-+	vm->sblk->icptcode = 0;
-+
-+	while (vm->sblk->icptcode == 0) {
-+		sie64a(vm->sblk, &vm->save_area);
-+		sie_handle_validity(vm);
-+	}
-+	vm->save_area.guest.grs[14] = vm->sblk->gg14;
-+	vm->save_area.guest.grs[15] = vm->sblk->gg15;
-+}
-+
- /* Initializes the struct vm members like the SIE control block. */
- void sie_guest_create(struct vm *vm, uint64_t guest_mem, uint64_t guest_mem_len)
- {
-diff --git a/lib/s390x/sie.h b/lib/s390x/sie.h
-index 946bd164..ca514ef3 100644
---- a/lib/s390x/sie.h
-+++ b/lib/s390x/sie.h
-@@ -198,6 +198,7 @@ struct vm {
- extern void sie_entry(void);
- extern void sie_exit(void);
- extern void sie64a(struct kvm_s390_sie_block *sblk, struct vm_save_area *save_area);
-+void sie(struct vm *vm);
- void sie_expect_validity(void);
- void sie_check_validity(uint16_t vir_exp);
- void sie_handle_validity(struct vm *vm);
-diff --git a/s390x/mvpg-sie.c b/s390x/mvpg-sie.c
-index 71ae4f88..70d2fcfa 100644
---- a/s390x/mvpg-sie.c
-+++ b/s390x/mvpg-sie.c
-@@ -32,19 +32,6 @@ extern const char _binary_s390x_snippets_c_mvpg_snippet_gbin_start[];
- extern const char _binary_s390x_snippets_c_mvpg_snippet_gbin_end[];
- int binary_size;
- 
--static void sie(struct vm *vm)
--{
--	/* Reset icptcode so we don't trip over it below */
--	vm->sblk->icptcode = 0;
--
--	while (vm->sblk->icptcode == 0) {
--		sie64a(vm->sblk, &vm->save_area);
--		sie_handle_validity(vm);
--	}
--	vm->save_area.guest.grs[14] = vm->sblk->gg14;
--	vm->save_area.guest.grs[15] = vm->sblk->gg15;
--}
--
- static void test_mvpg_pei(void)
- {
- 	uint64_t **pei_dst = (uint64_t **)((uintptr_t) vm.sblk + 0xc0);
-diff --git a/s390x/sie.c b/s390x/sie.c
-index 9cb9b055..ed2c3263 100644
---- a/s390x/sie.c
-+++ b/s390x/sie.c
-@@ -24,22 +24,6 @@ static u8 *guest;
- static u8 *guest_instr;
- static struct vm vm;
- 
--
--static void sie(struct vm *vm)
--{
--	while (vm->sblk->icptcode == 0) {
--		sie64a(vm->sblk, &vm->save_area);
--		sie_handle_validity(vm);
--	}
--	vm->save_area.guest.grs[14] = vm->sblk->gg14;
--	vm->save_area.guest.grs[15] = vm->sblk->gg15;
--}
--
--static void sblk_cleanup(struct vm *vm)
--{
--	vm->sblk->icptcode = 0;
--}
--
- static void test_diag(u32 instr)
- {
- 	vm.sblk->gpsw.addr = PAGE_SIZE * 2;
-@@ -51,7 +35,6 @@ static void test_diag(u32 instr)
- 	report(vm.sblk->icptcode == ICPT_INST &&
- 	       vm.sblk->ipa == instr >> 16 && vm.sblk->ipb == instr << 16,
- 	       "Intercept data");
--	sblk_cleanup(&vm);
- }
- 
- static struct {
--- 
-2.30.2
-
+https://lore.kernel.org/r/20210729133931.1129696-1-david.edmondson@oracle.com
+includes both of these suggestions.
