@@ -2,89 +2,110 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E6F373DA7E8
-	for <lists+kvm@lfdr.de>; Thu, 29 Jul 2021 17:53:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 336823DA811
+	for <lists+kvm@lfdr.de>; Thu, 29 Jul 2021 17:57:11 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238050AbhG2Pxh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 29 Jul 2021 11:53:37 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:38344 "EHLO
+        id S238255AbhG2P5L (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 29 Jul 2021 11:57:11 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:30103 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S237817AbhG2Pxg (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 29 Jul 2021 11:53:36 -0400
+        by vger.kernel.org with ESMTP id S238189AbhG2P5E (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 29 Jul 2021 11:57:04 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1627574013;
+        s=mimecast20190719; t=1627574220;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=WIqDiJp6VaSn9dpR1kfsnItFG7gaXoSJekhGozotnW4=;
-        b=KzdrR9cbOAEOJeou885JD8F3L9guYcg26WZLANqI8cIobcbIlN8vh/5INKqJqUnwrnp61H
-        53ecLxuUbrscCbsgzYhsoPyxqciYwtOHi/cPDqVJH2HF3kvKqV8qhGWI0GP6awGhqvRPtI
-        AdNQpyw4v32Tbf5prERzAkDMzPyKRPc=
-Received: from mail-qt1-f198.google.com (mail-qt1-f198.google.com
- [209.85.160.198]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-404-18WL2xw7Ouqia2BdGS1O0Q-1; Thu, 29 Jul 2021 11:53:29 -0400
-X-MC-Unique: 18WL2xw7Ouqia2BdGS1O0Q-1
-Received: by mail-qt1-f198.google.com with SMTP id w19-20020ac87e930000b029025a2609eb04so2899528qtj.17
-        for <kvm@vger.kernel.org>; Thu, 29 Jul 2021 08:53:28 -0700 (PDT)
+        bh=OdUOSn5PsAyIvz/45Ktqnl2uzGhZFKajWTR316l3Z74=;
+        b=bbYtjcoVmU0+FlbJLtmEyn6TMFNDohk9VltIOKevd97vynQdS8iTSoDh7C+OjM1O4fmYoo
+        3IkpSoFOAj7aeFPfs+zr4GuiGrVC9sb1h/7SeuMXWPaWvWUqOrByW+sazYDC/56yDNMCFG
+        PjijuN8OOA6lUHNc6WweUmJC0kUsuzo=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-577-f2s-bEpxPrWERNCQ25pnSQ-1; Thu, 29 Jul 2021 11:56:59 -0400
+X-MC-Unique: f2s-bEpxPrWERNCQ25pnSQ-1
+Received: by mail-wm1-f70.google.com with SMTP id l12-20020a05600c1d0cb029024e389bb7f1so1940500wms.0
+        for <kvm@vger.kernel.org>; Thu, 29 Jul 2021 08:56:58 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=WIqDiJp6VaSn9dpR1kfsnItFG7gaXoSJekhGozotnW4=;
-        b=CGUeVt9qUa2kEijFqkLkQY6f5pgHGUMEY9pTG1Y29U0FBI8Hh6Gb/9UkEhwZi3Cool
-         983ajYEkgdpFtoOu3Pg/mqB7mMT9On8QgN056i/JROSuE0XdDSWXMWbepMClpqMcc/yE
-         4FlodSSpNQwa6KeZaLIMUWBmpd/i0jqe0B8vjgD2ZZpyAAWCIbjVSoq5MCIeUCgPaBXI
-         I1vapZ0lzNkKAO3lzz1A5cRNvmquRxXpXWCNzX6ihi+GPdkQVD0m9BKvZAJcg3b40uKp
-         Dt6YA38SUF9XP7bbFYgCObcuWuhzYBPlP2vHv72lu5i+afVYbe+ZBwGZjGx7m19F3z6L
-         JC8w==
-X-Gm-Message-State: AOAM533akgawIZ4j5qU3YKeWhGFEQ5uAQ5b0z6vP+GDeEGbza5cGN02J
-        HDt9R+HUYxded7chNgx9kWXi5cUysLCVJkcVtYU1XHraTFc15y4gdMIjXDm2oi/zIipP3d5/GTg
-        0NKmYrJkx1LkY
-X-Received: by 2002:a37:46d1:: with SMTP id t200mr6017851qka.491.1627574008556;
-        Thu, 29 Jul 2021 08:53:28 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJx20AvvmwA3zsdeUzhxGgr6AKaj+/c2//3SiKDGKEF0n2dtIKt7qPdZIpPiTl4sSwosnRnUXg==
-X-Received: by 2002:a37:46d1:: with SMTP id t200mr6017833qka.491.1627574008362;
-        Thu, 29 Jul 2021 08:53:28 -0700 (PDT)
-Received: from t490s (bras-base-toroon474qw-grc-65-184-144-111-238.dsl.bell.ca. [184.144.111.238])
-        by smtp.gmail.com with ESMTPSA id u186sm1990880qkb.11.2021.07.29.08.53.26
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 29 Jul 2021 08:53:27 -0700 (PDT)
-Date:   Thu, 29 Jul 2021 11:53:26 -0400
-From:   Peter Xu <peterx@redhat.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        Maxim Levitsky <mlevitsk@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>
-Subject: Re: [PATCH v2 8/9] KVM: X86: Optimize pte_list_desc with per-array
- counter
-Message-ID: <YQLO9upwcrBTIiqx@t490s>
-References: <20210625153214.43106-1-peterx@redhat.com>
- <20210625153415.43620-1-peterx@redhat.com>
- <YQHGXhOc5gO9aYsL@google.com>
- <YQHRV/uEZ4LqPVNI@t490s>
- <dc9eb6da-59ce-2dd3-c39c-8348088cadcb@redhat.com>
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=OdUOSn5PsAyIvz/45Ktqnl2uzGhZFKajWTR316l3Z74=;
+        b=afzSqMVjtBxykbgaQnsyRfk2hs9lvVOk/uq1DREPg7UWpDDXXh0zDmGWbx7mwR80t0
+         VXBQOveoF9tJaNoRkKGfATOCobmRbDr/UjzrPzEqxPhw4QxseAGQdE7urTr64TaQTV5V
+         Xd8kD2fuPtsw/KB4jdxJk3DBleREXv1qyknrn/1ysleWjczhXTd+fmVugl+Uo2V1pl2d
+         5zxGTYbU5t2hJtITDWmKpcdxJCwQ8a7k4RUhi68o9jza5AjqJXUlxVS0aSDDO6OgENXC
+         zH3OJQMCL/sVfoS485iyIYCQ41arltmWUgFN5xWIFGlwlkV9kgQ9oP86/0ywtyqk8+qh
+         BmhA==
+X-Gm-Message-State: AOAM531jfo+BOIGCBYPO7DbzzZ7bSxNrWriiDJTZ69FV8P23AdIytVbO
+        9qkpIC1YoURZhz1AnXL+bVAOlM9Xzrmq6NAZe/Qa7ur3yjFzhCVpRJEYAt1XN2Q/coQHIK0LNFf
+        Nb+G+IsMi4C3j
+X-Received: by 2002:adf:ed4a:: with SMTP id u10mr5502879wro.86.1627574217993;
+        Thu, 29 Jul 2021 08:56:57 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwLgrogS1Ps6UnQ/0VQrtQt2MjSbOfI++E0VYu6WLH7GmA/dcP3gaa//uIkUtCBDdxTYVpodw==
+X-Received: by 2002:adf:ed4a:: with SMTP id u10mr5502864wro.86.1627574217775;
+        Thu, 29 Jul 2021 08:56:57 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+        by smtp.gmail.com with ESMTPSA id k17sm4088354wrw.53.2021.07.29.08.56.56
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 29 Jul 2021 08:56:57 -0700 (PDT)
+Subject: Re: [PATCH 1/6] x86/feat_ctl: Add new VMX feature, Tertiary
+ VM-Execution control
+To:     Sean Christopherson <seanjc@google.com>,
+        Zeng Guang <guang.zeng@intel.com>
+Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Tony Luck <tony.luck@intel.com>,
+        Kan Liang <kan.liang@linux.intel.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Kim Phillips <kim.phillips@amd.com>,
+        Jarkko Sakkinen <jarkko@kernel.org>,
+        Jethro Beekman <jethro@fortanix.com>,
+        Kai Huang <kai.huang@intel.com>, x86@kernel.org,
+        linux-kernel@vger.kernel.org, Robert Hu <robert.hu@intel.com>,
+        Gao Chao <chao.gao@intel.com>,
+        Robert Hoo <robert.hu@linux.intel.com>
+References: <20210716064808.14757-1-guang.zeng@intel.com>
+ <20210716064808.14757-2-guang.zeng@intel.com> <YQHr6VvNOQclolfc@google.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <20d46894-a42f-88fc-124b-9d6662c57bef@redhat.com>
+Date:   Thu, 29 Jul 2021 17:56:55 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.11.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <dc9eb6da-59ce-2dd3-c39c-8348088cadcb@redhat.com>
+In-Reply-To: <YQHr6VvNOQclolfc@google.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jul 29, 2021 at 11:33:32AM +0200, Paolo Bonzini wrote:
-> On 28/07/21 23:51, Peter Xu wrote:
-> > Reasonable.  Not sure whether this would change the numbers a bit in the commit
-> > message; it can be slightly better but also possible to be non-observable.
-> > Paolo, let me know if you want me to repost/retest with the change (along with
-> > keeping the comment in the other patch).
+On 29/07/21 01:44, Sean Christopherson wrote:
+>> +	rdmsr_safe(MSR_IA32_VMX_PROCBASED_CTLS3, &ign, &supported);
+>> +	c->vmx_capability[TERTIARY_CTLS_LOW] = ign;
+>> +	c->vmx_capability[TERTIARY_CTLS_HIGH] = supported;
+> Assuming only the lower 32 bits are going to be used for the near future (next
+> few years), what about defining just TERTIARY_CTLS_LOW and then doing:
 > 
-> Yes, feel free please start from the patches in kvm/queue (there were some
-> conflicts, so it will save you the rebasing work) and send v3 according to
-> Sean's callbacks.
+> 	/*
+> 	 * Tertiary controls are 64-bit allowed-1, so unlikely other MSRs, the
+> 	 * upper bits are ignored (because they're not used, yet...).
+> 	 */
+> 	rdmsr_safe(MSR_IA32_VMX_PROCBASED_CTLS3, &supported, &ign);
+> 	c->vmx_capability[TERTIARY_CTLS_LOW] = supported;
+> 
+> I.e. punt the ugliness issue down the road a few years.
+> 
 
-Will do.  Thanks,
+Or use two new variables low/high instead of supported/ign.
 
--- 
-Peter Xu
+Paolo
 
