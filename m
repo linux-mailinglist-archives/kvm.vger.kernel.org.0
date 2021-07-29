@@ -2,161 +2,246 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9AA993D99DA
-	for <lists+kvm@lfdr.de>; Thu, 29 Jul 2021 02:04:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E7CFE3D99E4
+	for <lists+kvm@lfdr.de>; Thu, 29 Jul 2021 02:10:24 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232729AbhG2AEF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 28 Jul 2021 20:04:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57704 "EHLO
+        id S232875AbhG2AK0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 28 Jul 2021 20:10:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59114 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232471AbhG2AEE (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 28 Jul 2021 20:04:04 -0400
-Received: from mail-pj1-x102b.google.com (mail-pj1-x102b.google.com [IPv6:2607:f8b0:4864:20::102b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 27DE2C061765
-        for <kvm@vger.kernel.org>; Wed, 28 Jul 2021 17:04:01 -0700 (PDT)
-Received: by mail-pj1-x102b.google.com with SMTP id l19so7730235pjz.0
-        for <kvm@vger.kernel.org>; Wed, 28 Jul 2021 17:04:01 -0700 (PDT)
+        with ESMTP id S232471AbhG2AKZ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 28 Jul 2021 20:10:25 -0400
+Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5BDD8C061757
+        for <kvm@vger.kernel.org>; Wed, 28 Jul 2021 17:10:22 -0700 (PDT)
+Received: by mail-yb1-xb4a.google.com with SMTP id e145-20020a2550970000b029056eb288352cso4910253ybb.2
+        for <kvm@vger.kernel.org>; Wed, 28 Jul 2021 17:10:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=CW8QUk9P9o2UEGEcBhQxw6hUF2SB0nBvDvcAFREKWG0=;
-        b=p1HVDJ84ai7K3pcXHqczT0rOendqQSnKDQIkJGEQG94mnqrTbD0jqM3+xkRmHP3wi6
-         DhxPuvPyJjrnCSKldBYopwhFtYIMXRt6Lv7S78/8cFIhPn+WDc9vK6g3oFIb+hSoGElQ
-         KsQ+C6PRajcED+FgMfkZbBD0ZDi5whtifzZKg+rzwtiEO4o71BBsabs9TaHD0S6/2Ims
-         2wWv0D6Z/rG4Pvq67KOxGEJ0UNTgpYWxl8hPWriw1A2EoUY0sR+SMVnuZU+NMxxc6Wmk
-         tGs4VPywB7ceEtZKcEpQpilJKwdrBTCWhQ5xvKLijSnv/FelikOMx13QCBYu/ysF/7w9
-         ATJA==
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=99c49L3+Zl3kTX1nRDP8/rKylEgF5wqgIgkpMRASmII=;
+        b=JmEO2+LXxq988dTps+aeUhSs0bf98qApbIvIkf7ClPa4CjiDW1P8gP1rtqLACjbrjP
+         NjceCXXENlgjVsIoMcJQCEqt6mkyFP3/+Y1FMaUVpc87LvbUxcsLDRMEVPSK8C+M9DTm
+         pkoqtURFI4JmgLgrdjl5FzsF8Hs385rkndtLujMFF74ZAXFOLlTgg4Ag/MHvpGS0nN82
+         rMdkmmUF32HiiVJ5+TpcomXEaLwFkLZIv2TFRdBkrDPSHJxuEObuHGZr3+fdWETj4XSl
+         u+MwyMF5sdheDC5pgAhCQNNOIsgZKT0z9ujZedqS4XgwIFY3OWaWfA1ZFUojYMuDhJIZ
+         yBLw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=CW8QUk9P9o2UEGEcBhQxw6hUF2SB0nBvDvcAFREKWG0=;
-        b=tX+gmkwZg93SVOrf9lENwWhHbKNwhblx8i5V8jA25CCrsddScS3AJ8KfTu1vvCQTB8
-         9qDth7b8ZNNPeOq8sSfcNb1XJOHOXENlo+tidiDCwDa01t8Bu57tscgZ+ZrQgabwkth2
-         f0nuykWLVbSuO+K9WPp5fXckl9snVii6JZYNiYXnt/nCl85cBOTzl8FZl9rcfuwU2Xzd
-         Y8B4c4ZjtvMNJ2EPPLfHUdcAVhHk6JZE6s3PRE9ePEbDhwIac9KdsFo1f4xzbllmkAxs
-         ke4wBeCLkjIhBsxYKcVOqedeA9LbsybczlaXFx9B9XMOoy9F/rslR6oYP84EG4Lu0Bb6
-         ra2Q==
-X-Gm-Message-State: AOAM530kPXqH7AKYL5PHZ+6KcR9IgBjOZ5epFW/jHsTh2F2rnBlf+5da
-        ooPVTwzNAE9iOFaCZ2DgzCD6wA==
-X-Google-Smtp-Source: ABdhPJwDDRusLfZvjJMLfqtso2qpQV/CB8c/tUNekSFj6j2EXCUX/AkxCcm3tJJLABPyZtQ1trwVcw==
-X-Received: by 2002:aa7:8d56:0:b029:327:6dc:d254 with SMTP id s22-20020aa78d560000b029032706dcd254mr2268607pfe.69.1627517040296;
-        Wed, 28 Jul 2021 17:04:00 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id u19sm1183457pfi.4.2021.07.28.17.03.59
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 28 Jul 2021 17:03:59 -0700 (PDT)
-Date:   Thu, 29 Jul 2021 00:03:55 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Zeng Guang <guang.zeng@intel.com>
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=99c49L3+Zl3kTX1nRDP8/rKylEgF5wqgIgkpMRASmII=;
+        b=KJicFf8nhbuiXOxzT5GituIAzAPsrf4epnQVg424Z9iNqiiyHLrBgEmHivmy9AlQ1+
+         4Ya6o/he9NpK7WWZrOAqmFAIEjqeBS+UFmXWPG6COZ43y3uRIwtkQBdnOoQJezBTA1U9
+         Me8r/lj2ODqcRu4/0Jcw/BVu3HyHNCg9Ihc1s4doFwvg0ghZ14PxTESCe207EKmDN9xH
+         pedG56h6dwe/mVjMwzf59qZxgNMdxGBjHmLElyuLG9hIqo+QeOCGWIAKktvINpGu3Um6
+         X6OXpy6KqkaW1fRItFCoHICQxw60F97bPuOTL9f1+UlwpiV1GjtyrMO3bZou8lt4h+O5
+         LiMA==
+X-Gm-Message-State: AOAM5319f0KILsumsJP4dccC4bUasa/Dudrza4TrQyi8ebgwHWNOOL9L
+        /zj2LTDZkeKhDihVBc5HGu8QpK+rgqJWwF2/rpn4OMAZInPwEHsnps/OGok1wb0fTSU0wX4nZfU
+        BJJ+3K02ji6ueDhgY3HmOPk+coeqoqQmjubUeHUnUxBQkYZ3mqG5tdWd3+A==
+X-Google-Smtp-Source: ABdhPJyZ/XhRiHsl9K9UxY9ljR0tWMoMUszGG7V7+fEQHJUTUHMgWx388Q0SI6yFWBEjHdAGcb/X/ywvpiY=
+X-Received: from oupton.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:404])
+ (user=oupton job=sendgmr) by 2002:a25:dc50:: with SMTP id y77mr3336332ybe.484.1627517421452;
+ Wed, 28 Jul 2021 17:10:21 -0700 (PDT)
+Date:   Thu, 29 Jul 2021 00:09:59 +0000
+Message-Id: <20210729001012.70394-1-oupton@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.32.0.432.gabb21c7263-goog
+Subject: [PATCH v4 00/13] KVM: Add idempotent controls for migrating system
+ counter state
+From:   Oliver Upton <oupton@google.com>
+To:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
 Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Marc Zyngier <maz@kernel.org>, Peter Shier <pshier@google.com>,
         Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Tony Luck <tony.luck@intel.com>,
-        Kan Liang <kan.liang@linux.intel.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Kim Phillips <kim.phillips@amd.com>,
-        Jarkko Sakkinen <jarkko@kernel.org>,
-        Jethro Beekman <jethro@fortanix.com>,
-        Kai Huang <kai.huang@intel.com>, x86@kernel.org,
-        linux-kernel@vger.kernel.org, Robert Hu <robert.hu@intel.com>,
-        Gao Chao <chao.gao@intel.com>,
-        Robert Hoo <robert.hu@linux.intel.com>
-Subject: Re: [PATCH 3/6] KVM: VMX: Detect Tertiary VM-Execution control when
- setup VMCS config
-Message-ID: <YQHwa42jixqPPvVm@google.com>
-References: <20210716064808.14757-1-guang.zeng@intel.com>
- <20210716064808.14757-4-guang.zeng@intel.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210716064808.14757-4-guang.zeng@intel.com>
+        David Matlack <dmatlack@google.com>,
+        Ricardo Koller <ricarkol@google.com>,
+        Jing Zhang <jingzhangos@google.com>,
+        Raghavendra Rao Anata <rananta@google.com>,
+        James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        linux-arm-kernel@lists.infradead.org,
+        Andrew Jones <drjones@redhat.com>,
+        Oliver Upton <oupton@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Jul 16, 2021, Zeng Guang wrote:
-> @@ -4204,6 +4234,13 @@ vmx_adjust_secondary_exec_control(struct vcpu_vmx *vmx, u32 *exec_control,
->  #define vmx_adjust_sec_exec_exiting(vmx, exec_control, lname, uname) \
->  	vmx_adjust_sec_exec_control(vmx, exec_control, lname, uname, uname##_EXITING, true)
->  
-> +static void vmx_compute_tertiary_exec_control(struct vcpu_vmx *vmx)
-> +{
-> +	u32 exec_control = vmcs_config.cpu_based_3rd_exec_ctrl;
+KVM's current means of saving/restoring system counters is plagued with
+temporal issues. At least on ARM64 and x86, we migrate the guest's
+system counter by-value through the respective guest system register
+values (cntvct_el0, ia32_tsc). Restoring system counters by-value is
+brittle as the state is not idempotent: the host system counter is still
+oscillating between the attempted save and restore. Furthermore, VMMs
+may wish to transparently live migrate guest VMs, meaning that they
+include the elapsed time due to live migration blackout in the guest
+system counter view. The VMM thread could be preempted for any number of
+reasons (scheduler, L0 hypervisor under nested) between the time that
+it calculates the desired guest counter value and when KVM actually sets
+this counter state.
 
-This is incorrectly truncating the value.
+Despite the value-based interface that we present to userspace, KVM
+actually has idempotent guest controls by way of system counter offsets.
+We can avoid all of the issues associated with a value-based interface
+by abstracting these offset controls in new ioctls. This series
+introduces new vCPU device attributes to provide userspace access to the
+vCPU's system counter offset.
 
-> +
-> +	vmx->tertiary_exec_control = exec_control;
-> +}
-> +
->  static void vmx_compute_secondary_exec_control(struct vcpu_vmx *vmx)
->  {
->  	struct kvm_vcpu *vcpu = &vmx->vcpu;
-> @@ -4319,6 +4356,11 @@ static void init_vmcs(struct vcpu_vmx *vmx)
->  		secondary_exec_controls_set(vmx, vmx->secondary_exec_control);
->  	}
->  
-> +	if (cpu_has_tertiary_exec_ctrls()) {
-> +		vmx_compute_tertiary_exec_control(vmx);
-> +		tertiary_exec_controls_set(vmx, vmx->tertiary_exec_control);
+Patch 1 adopts Paolo's suggestion, augmenting the KVM_{GET,SET}_CLOCK
+ioctls to provide userspace with a (host_tsc, realtime) instant. This is
+essential for a VMM to perform precise migration of the guest's system
+counters.
 
-IMO, the existing vmx->secondary_exec_control is an abomination that should not
-exist.  Looking at the code, it's actually not hard to get rid, there's just one
-annoying use in prepare_vmcs02_early() that requires a bit of extra work to get
-rid of.
+Patches 2-3 add support for x86 by shoehorning the new controls into the
+pre-existing synchronization heuristics.
 
-Anyways, for tertiary controls, I'd prefer to avoid the same mess and instead
-follow vmx_exec_control(), both in functionality and in name:
+Patches 4-5 implement a test for the new additions to
+KVM_{GET,SET}_CLOCK.
 
-  static u64 vmx_tertiary_exec_control(struct vcpu_vmx *vmx)
-  {
-	return vmcs_config.cpu_based_3rd_exec_ctrl;
-  }
+Patch 6 fixes some assertions in the kvm device attribute helpers.
 
-and:
+Patches 7-8 implement at test for the tsc offset attribute introduced in
+patch 3.
 
-	if (cpu_has_tertiary_exec_ctrls())
-		tertiary_exec_controls_set(vmx, vmx_tertiary_exec_control(vmx));
+Patch 9 adds a device attribute for the arm64 virtual counter-timer
+offset.
 
-and then the next patch becomes:
+Patch 10 extends the test from patch 8 to cover the arm64 virtual
+counter-timer offset.
 
-  static u64 vmx_tertiary_exec_control(struct vcpu_vmx *vmx)
-  {
-	u64 exec_control = vmcs_config.cpu_based_3rd_exec_ctrl;
+Patch 11 adds a device attribute for the arm64 physical counter-timer
+offset. Currently, this is implemented as a synthetic register, forcing
+the guest to trap to the host and emulating the offset in the fast exit
+path. Later down the line we will have hardware with FEAT_ECV, which
+allows the hypervisor to perform physical counter-timer offsetting in
+hardware (CNTPOFF_EL2).
 
-	if (!kvm_vcpu_apicv_active(vcpu))
-		exec_control &= ~TERTIARY_EXEC_IPI_VIRT;
+Patch 12 extends the test from patch 8 to cover the arm64 physical
+counter-timer offset.
 
-	return exec_control;
-  }
+Patch 13 introduces a benchmark to measure the overhead of emulation in
+patch 11.
 
+This series was tested on both an Ampere Mt. Jade and Haswell systems.
 
-And I'll work on a patch to purge vmx->secondary_exec_control.
+Physical counter benchmark
+--------------------------
 
-> +	}
-> +
->  	if (kvm_vcpu_apicv_active(&vmx->vcpu)) {
->  		vmcs_write64(EOI_EXIT_BITMAP0, 0);
->  		vmcs_write64(EOI_EXIT_BITMAP1, 0);
-> diff --git a/arch/x86/kvm/vmx/vmx.h b/arch/x86/kvm/vmx/vmx.h
-> index 945c6639ce24..c356ceebe84c 100644
-> --- a/arch/x86/kvm/vmx/vmx.h
-> +++ b/arch/x86/kvm/vmx/vmx.h
-> @@ -266,6 +266,7 @@ struct vcpu_vmx {
->  	u32		      msr_ia32_umwait_control;
->  
->  	u32 secondary_exec_control;
-> +	u64 tertiary_exec_control;
->  
->  	/*
->  	 * loaded_vmcs points to the VMCS currently used in this vcpu. For a
-> -- 
-> 2.25.1
-> 
+The following data was collected by running 10000 iterations of the
+benchmark test from Patch 6 on an Ampere Mt. Jade reference server, A 2S
+machine with 2 80-core Ampere Altra SoCs. Measurements were collected
+for both VHE and nVHE operation using the `kvm-arm.mode=` command-line
+parameter.
+
+nVHE
+----
+
++--------------------+--------+---------+
+|       Metric       | Native | Trapped |
++--------------------+--------+---------+
+| Average            | 54ns   | 148ns   |
+| Standard Deviation | 124ns  | 122ns   |
+| 95th Percentile    | 258ns  | 348ns   |
++--------------------+--------+---------+
+
+VHE
+---
+
++--------------------+--------+---------+
+|       Metric       | Native | Trapped |
++--------------------+--------+---------+
+| Average            | 53ns   | 152ns   |
+| Standard Deviation | 92ns   | 94ns    |
+| 95th Percentile    | 204ns  | 307ns   |
++--------------------+--------+---------+
+
+This series applies cleanly to kvm/queue at the following commit:
+
+8ad5e63649ff ("KVM: Don't take mmu_lock for range invalidation unless necessary")
+
+v1 -> v2:
+  - Reimplemented as vCPU device attributes instead of a distinct ioctl.
+  - Added the (realtime, host_tsc) instant support to KVM_{GET,SET}_CLOCK
+  - Changed the arm64 implementation to broadcast counter
+    offset values to all vCPUs in a guest. This upholds the
+    architectural expectations of a consistent counter-timer across CPUs.
+  - Fixed a bug with traps in VHE mode. We now configure traps on every
+    transition into a guest to handle differing VMs (trapped, emulated).
+
+v2 -> v3:
+  - Added documentation for additions to KVM_{GET,SET}_CLOCK
+  - Added documentation for all new vCPU attributes
+  - Added documentation for suggested algorithm to migrate a guest's
+    TSC(s)
+  - Bug fixes throughout series
+  - Rename KVM_CLOCK_REAL_TIME -> KVM_CLOCK_REALTIME
+
+v3 -> v4:
+  - Added patch to address incorrect device helper assertions (Drew)
+  - Carried Drew's r-b tags where appropriate
+  - x86 selftest cleanup
+  - Removed stale kvm_timer_init_vhe() function
+  - Removed unnecessary GUEST_DONE() from selftests
+
+v1: https://lore.kernel.org/kvm/20210608214742.1897483-1-oupton@google.com/
+v2: https://lore.kernel.org/r/20210716212629.2232756-1-oupton@google.com
+v3: https://lore/kernel.org/r/20210719184949.1385910-1-oupton@google.com
+
+Oliver Upton (13):
+  KVM: x86: Report host tsc and realtime values in KVM_GET_CLOCK
+  KVM: x86: Refactor tsc synchronization code
+  KVM: x86: Expose TSC offset controls to userspace
+  tools: arch: x86: pull in pvclock headers
+  selftests: KVM: Add test for KVM_{GET,SET}_CLOCK
+  selftests: KVM: Fix kvm device helper ioctl assertions
+  selftests: KVM: Add helpers for vCPU device attributes
+  selftests: KVM: Introduce system counter offset test
+  KVM: arm64: Allow userspace to configure a vCPU's virtual offset
+  selftests: KVM: Add support for aarch64 to system_counter_offset_test
+  KVM: arm64: Provide userspace access to the physical counter offset
+  selftests: KVM: Test physical counter offsetting
+  selftests: KVM: Add counter emulation benchmark
+
+ Documentation/virt/kvm/api.rst                |  42 +-
+ Documentation/virt/kvm/devices/vcpu.rst       | 101 +++++
+ Documentation/virt/kvm/locking.rst            |  11 +
+ arch/arm64/include/asm/kvm_host.h             |   1 +
+ arch/arm64/include/asm/kvm_hyp.h              |   2 -
+ arch/arm64/include/asm/sysreg.h               |   1 +
+ arch/arm64/include/uapi/asm/kvm.h             |   2 +
+ arch/arm64/kvm/arch_timer.c                   | 140 ++++--
+ arch/arm64/kvm/arm.c                          |   4 +-
+ arch/arm64/kvm/hyp/include/hyp/switch.h       |  23 +
+ arch/arm64/kvm/hyp/include/hyp/timer-sr.h     |  26 ++
+ arch/arm64/kvm/hyp/nvhe/switch.c              |   2 -
+ arch/arm64/kvm/hyp/nvhe/timer-sr.c            |  21 +-
+ arch/arm64/kvm/hyp/vhe/timer-sr.c             |  27 ++
+ arch/x86/include/asm/kvm_host.h               |   4 +
+ arch/x86/include/uapi/asm/kvm.h               |   4 +
+ arch/x86/kvm/x86.c                            | 422 ++++++++++++++----
+ include/kvm/arm_arch_timer.h                  |   2 -
+ include/uapi/linux/kvm.h                      |   7 +-
+ tools/arch/x86/include/asm/pvclock-abi.h      |  48 ++
+ tools/arch/x86/include/asm/pvclock.h          | 103 +++++
+ tools/testing/selftests/kvm/.gitignore        |   3 +
+ tools/testing/selftests/kvm/Makefile          |   4 +
+ .../kvm/aarch64/counter_emulation_benchmark.c | 215 +++++++++
+ .../selftests/kvm/include/aarch64/processor.h |  24 +
+ .../testing/selftests/kvm/include/kvm_util.h  |  11 +
+ tools/testing/selftests/kvm/lib/kvm_util.c    |  44 +-
+ .../kvm/system_counter_offset_test.c          | 206 +++++++++
+ .../selftests/kvm/x86_64/kvm_clock_test.c     | 206 +++++++++
+ 29 files changed, 1548 insertions(+), 158 deletions(-)
+ create mode 100644 arch/arm64/kvm/hyp/include/hyp/timer-sr.h
+ create mode 100644 tools/arch/x86/include/asm/pvclock-abi.h
+ create mode 100644 tools/arch/x86/include/asm/pvclock.h
+ create mode 100644 tools/testing/selftests/kvm/aarch64/counter_emulation_benchmark.c
+ create mode 100644 tools/testing/selftests/kvm/system_counter_offset_test.c
+ create mode 100644 tools/testing/selftests/kvm/x86_64/kvm_clock_test.c
+
+-- 
+2.32.0.432.gabb21c7263-goog
+
