@@ -2,100 +2,99 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1AA353DAB86
-	for <lists+kvm@lfdr.de>; Thu, 29 Jul 2021 21:01:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A8BF23DAB91
+	for <lists+kvm@lfdr.de>; Thu, 29 Jul 2021 21:02:53 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229961AbhG2TBQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 29 Jul 2021 15:01:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44050 "EHLO
+        id S232099AbhG2TCz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 29 Jul 2021 15:02:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44462 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229713AbhG2TBP (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 29 Jul 2021 15:01:15 -0400
-Received: from mail-yb1-xb2f.google.com (mail-yb1-xb2f.google.com [IPv6:2607:f8b0:4864:20::b2f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 77757C0613C1
-        for <kvm@vger.kernel.org>; Thu, 29 Jul 2021 12:01:12 -0700 (PDT)
-Received: by mail-yb1-xb2f.google.com with SMTP id g76so11906758ybf.4
-        for <kvm@vger.kernel.org>; Thu, 29 Jul 2021 12:01:12 -0700 (PDT)
+        with ESMTP id S231245AbhG2TCy (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 29 Jul 2021 15:02:54 -0400
+Received: from mail-yb1-xb32.google.com (mail-yb1-xb32.google.com [IPv6:2607:f8b0:4864:20::b32])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0FA2EC0613C1
+        for <kvm@vger.kernel.org>; Thu, 29 Jul 2021 12:02:50 -0700 (PDT)
+Received: by mail-yb1-xb32.google.com with SMTP id g76so11914034ybf.4
+        for <kvm@vger.kernel.org>; Thu, 29 Jul 2021 12:02:50 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=tMRycNlt7ES7kF6ezVUYuskwJ/T4IKJjcQobjR4RSD4=;
-        b=cFpi1M7qYM3XfdgHPKkC+vm6dZjwvdn3EfcqmOIMjLRz4TQ3UIZKJjUYKMD3Fokfje
-         CpDCFZnH22rDjKqdDFAnPE7Gv+TC8SgFU7u5Kbtpkl6AO1H7ZzasMqae45NlY+mD7DlR
-         unyPSHCscYq40R6qTALdXsIeSQ8vhRHr6aAJJuEsVkqKjT6WSkBTey38Tc3dRUFZgdJK
-         i5GMfbKdEeEz7U8FjuylRaqKXdxsrSeIakRGyYZs81CWJrmr2K7cvUspdDvg7TDn/D8x
-         jKlvuhH5+OCt4K47XyjlkrQx7o5ut8imc67k+/jnhp8N5qDYMfFgtxByJ56kpcQQb7d/
-         8PhA==
+        bh=YqZsxUCzv1nae23QeEhOZX1NZ5hWxTmCpAqwWTcBvgs=;
+        b=g/a5YHYCKtRO0EJwzsoCB8TFISeJeQcBFKHob0LIZOeKkVIFXHcR7jJ0xYtaq14RYT
+         CRU+twyymtgjt2xdKhkI8AySQBUkukb5oMzrVNnfgPMXqbDm2ZXJVFZFqm52wn3762Qe
+         3XfD2as2/lEU3ruovPckflst5UmcV/DZxHmjaRcJnhkOxQH6Xg0JlRYX/pHz0c1S2E67
+         8oj1DOIUIVjFI1O03MX9qXBUPM1GtyV+sXced/UOf1Pdu5pTT1eTAsRRCrP+8iIhoEmo
+         W0YExJMNzqRZ0eh3GPSTi6g3VlyV831ucFL37jWfhpQkiTywgtGDRb7w7Lg8Sn5vM2Z7
+         4znw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=tMRycNlt7ES7kF6ezVUYuskwJ/T4IKJjcQobjR4RSD4=;
-        b=BNA85+KOmvrWS9TvbcH0ExGgFd8HVMLzdnOpPt3FUuM+g+3WuR8ep8We73Liq4gWBW
-         1oxh83xNLlGaqiC3c9+FVI0QFzmEWe1wNohOgvUx3fTTxU2JmITjqb+cQcenW0gXgXAt
-         A2yJ5kQbA4lY81jUcU0ASO/lKIc6SIdGSWQvMdv8kGeU+IiHT+7yZJZDnCMFVhxECW4V
-         goQZpkO4kAgh2zEhQCz8+eVxMkG5zv7aOxhXg+DqSaIatz5HdnvGd9twkcHDjQ+e81BX
-         /kPevmA5uhi3osLXUJA0A/yPTrGjlITOgvsYEB3Swz6tFHMeBrRNMEdax+5UHzIQeYNN
-         UZhg==
-X-Gm-Message-State: AOAM533V+RMpS9/MifUpWuZ9u53RK8faNLCeDJy5bt4yKgAfj90DOoRt
-        Jx4IkDPg++5HvDgR8MUB/l4O+bJv9y/b9/a1yaPM4w==
-X-Google-Smtp-Source: ABdhPJyg/YetziUGJSaXot2KuqGgbTVvVtMmN3N1dHm1mUYPErYLJSr1M1/cI9c92eqYrHnoUX63ULDib3cCo6sf7Fo=
-X-Received: by 2002:a25:b708:: with SMTP id t8mr8963591ybj.139.1627585271495;
- Thu, 29 Jul 2021 12:01:11 -0700 (PDT)
+        bh=YqZsxUCzv1nae23QeEhOZX1NZ5hWxTmCpAqwWTcBvgs=;
+        b=qXwmwhCCZOcaV7Nl0mrgkts2YnSfOK7EisyKCPcMGXoGGkE8XkGFsn4QkJZCiL1sWD
+         fwapNYibwohsLPypnvFRCYjOJvKibOUmzzCPJ0ji91kbfx0lbuwZ9wFqF3mF3QG6F5NB
+         Uh3uXKdpqdUZmY/xBfh1p6wazXs4j3PpX4g4vbBAj/AObUwbcVgCsNshKnp7m6eheuVC
+         tZZDuRil4/1Bd1Kr+rpwC3gW1mmiN2LXs6DIaHacjbb+pIjQx8HjqSuuzVJ+peO3h78j
+         qMA+qAXQKLv0lNIydN8tab6xmfIA0jrPu/MYkVFEVaVFifE040Efs2zCUkMjmGisOSQp
+         hFQQ==
+X-Gm-Message-State: AOAM5316b0pGtNka7tf/qw0fyTxX/tjKP3bM2l8weDV2qbPj55TsVqVC
+        nJbE3oG+uHNt3+zYM2purWVqgSZMeRluYnILCdAs4A==
+X-Google-Smtp-Source: ABdhPJwjjVyNU+LfXMuVPt0kIZo+lRNNrJ1hsEXIpHqMj7h9FlWDDwDsr4qd7Jzn1InFYTm54LpS8hXbQFesmt8FM8M=
+X-Received: by 2002:a25:f503:: with SMTP id a3mr7922680ybe.501.1627585369133;
+ Thu, 29 Jul 2021 12:02:49 -0700 (PDT)
 MIME-Version: 1.0
-References: <20210726175357.1572951-1-mizhang@google.com> <20210726175357.1572951-3-mizhang@google.com>
- <YQL0yjwYzJKJ0pTe@google.com>
-In-Reply-To: <YQL0yjwYzJKJ0pTe@google.com>
+References: <20210726175357.1572951-1-mizhang@google.com> <20210726175357.1572951-4-mizhang@google.com>
+ <CANgfPd8iohgpauQEEAFAQjLPXqHQw1Swguc7C0exHcz985igcw@mail.gmail.com> <YQL3SlI5XGVxqlvB@google.com>
+In-Reply-To: <YQL3SlI5XGVxqlvB@google.com>
 From:   Mingwei Zhang <mizhang@google.com>
-Date:   Thu, 29 Jul 2021 12:01:00 -0700
-Message-ID: <CAL715WKwFAPAFfZr=tEoW1QFLFosCtmstLskqxTKjiNZGUK-jA@mail.gmail.com>
-Subject: Re: [PATCH v2 2/3] KVM: x86/mmu: Avoid collision with !PRESENT SPTEs
- in TDP MMU lpage stats
+Date:   Thu, 29 Jul 2021 12:02:38 -0700
+Message-ID: <CAL715WJMnMaFZ8XmsXWNEEHft0JsKi+MUqLARTf+C7D5s3kEKw@mail.gmail.com>
+Subject: Re: [PATCH v2 3/3] KVM: x86/mmu: Add detailed page size stats
 To:     Sean Christopherson <seanjc@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+Cc:     Ben Gardon <bgardon@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Ben Gardon <bgardon@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm <kvm@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
         Jing Zhang <jingzhangos@google.com>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-oh, definitely. Sorry for the confusion.
+On Thu, Jul 29, 2021 at 11:45 AM Sean Christopherson <seanjc@google.com> wrote:
+>
+> On Mon, Jul 26, 2021, Ben Gardon wrote:
+> > On Mon, Jul 26, 2021 at 10:54 AM Mingwei Zhang <mizhang@google.com> wrote:
+> > > diff --git a/arch/x86/kvm/mmu.h b/arch/x86/kvm/mmu.h
+> > > index 83e6c6965f1e..ad5638815311 100644
+> > > --- a/arch/x86/kvm/mmu.h
+> > > +++ b/arch/x86/kvm/mmu.h
+> > > @@ -240,4 +240,6 @@ static inline bool kvm_memslots_have_rmaps(struct kvm *kvm)
+> > >         return smp_load_acquire(&kvm->arch.memslots_have_rmaps);
+> > >  }
+> > >
+> > > +void kvm_update_page_stats(struct kvm *kvm, int level, int count);
+> > > +
+> > >  #endif
+> > > diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> > > index 442cc554ebd6..7e0fc760739b 100644
+> > > --- a/arch/x86/kvm/mmu/mmu.c
+> > > +++ b/arch/x86/kvm/mmu/mmu.c
+> > > @@ -588,16 +588,22 @@ static bool mmu_spte_update(u64 *sptep, u64 new_spte)
+> > >         return flush;
+> > >  }
+> > >
+> > > +void kvm_update_page_stats(struct kvm *kvm, int level, int count)
+> > > +{
+> > > +       atomic64_add(count, &kvm->stat.page_stats.pages[level - 1]);
+> > > +}
+>
+> This can be static inline in the header.  Ignoring prolog+RET, it's four instructions,
+> and two of those are sign extending input params.
 
-On Thu, Jul 29, 2021 at 11:34 AM Sean Christopherson <seanjc@google.com> wrote:
->
-> On Mon, Jul 26, 2021, Mingwei Zhang wrote:
-> > Factor in whether or not the old/new SPTEs are shadow-present when
-> > adjusting the large page stats in the TDP MMU. A modified MMIO SPTE can
-> > toggle the page size bit, as bit 7 is used to store the MMIO generation,
-> > i.e. is_large_pte() can get a false positive when called on a MMIO SPTE.
-> > Ditto for nuking SPTEs with REMOVED_SPTE, which sets bit 7 in its magic
-> > value.
-> >
-> > Opportunistically move the logic below the check to verify at least one
-> > of the old/new SPTEs is shadow present.
-> >
-> > Use is/was_leaf even though is/was_present would suffice.  The code
-> > generation is roughly equivalent since all flags need to be computed
-> > prior to the code in question, and using the *_leaf flags will minimize
-> > the diff in a future enhancement to account all pages, i.e. will change
-> > the check to "is_leaf != was_leaf".
-> >
-> > Suggested-by: Sean Christopherson <seanjc@google.com>
->
-> There's no hard rule for when to use Suggested-by vs. giving Author credit, but
-> in this case, since you took the patch and changelog verbatim[*] (sans the missing
-> tags below), it's more polite to take the full patch (with me as Author in
-> this case) and add your SOB since you're posting the patch.
->
->   Fixes: 1699f65c8b65 ("kvm/x86: Fix 'lpages' kvm stat for TDM MMU")
->   Cc: stable@vger.kernel.org
->
-> [*] https://lkml.kernel.org/r/YPho0ME5pSjqRSoc@google.com
->
-> > Signed-off-by: Mingwei Zhang <mizhang@google.com>
+will do.It is really nice to see that this big function has been
+finally shrinked to a single-line routine.
