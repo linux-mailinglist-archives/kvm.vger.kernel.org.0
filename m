@@ -2,115 +2,339 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7D8AB3DA09B
-	for <lists+kvm@lfdr.de>; Thu, 29 Jul 2021 11:53:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1D5133DA0B3
+	for <lists+kvm@lfdr.de>; Thu, 29 Jul 2021 11:57:39 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235518AbhG2JxM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 29 Jul 2021 05:53:12 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:3108 "EHLO
-        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S235058AbhG2JxI (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 29 Jul 2021 05:53:08 -0400
-Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 16T9YOfF159856;
-        Thu, 29 Jul 2021 05:53:04 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=EErjgagjsOJ6351tBtBEsNPRFPR8zetcAG7oNhArlUg=;
- b=XxR4iBRm9xjhGhqBPYKpFH9sLBiTM7j1kUqklpLT+bNBTA07U2UIUdXjCpncAOQQsMPX
- rivHngBr7jTzTwomKVIdhTD1IHCITvGFS32svqA84djUtlbQ0c61BzdyTxfCFzdXHlkR
- yCx7hQ3n6JHKJp8BCbbe1IQBwOdy/ZZtR5omUttJZYp7MtQK8C7bybgHfI7VRXL6C6nf
- Flerjz5qMuvd6mjjkhmyyyDTGql48GaxlGBsg5EDbZ6cMVjhtv/GhAbizKMNau7YFiS7
- E1qJrpYj/uJ1fjcZsjd0hZsuGTL1XMVoPH1SjQBieOPgmd2ocjY/GKTHP9R2X8UDW14t UA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3a3fajubck-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 29 Jul 2021 05:53:04 -0400
-Received: from m0098417.ppops.net (m0098417.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 16T9p5SZ075549;
-        Thu, 29 Jul 2021 05:53:04 -0400
-Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3a3fajubbg-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 29 Jul 2021 05:53:03 -0400
-Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
-        by ppma06ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 16T9r2KO023078;
-        Thu, 29 Jul 2021 09:53:02 GMT
-Received: from b06cxnps4074.portsmouth.uk.ibm.com (d06relay11.portsmouth.uk.ibm.com [9.149.109.196])
-        by ppma06ams.nl.ibm.com with ESMTP id 3a235khm4g-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 29 Jul 2021 09:53:02 +0000
-Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
-        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 16T9qws524576418
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 29 Jul 2021 09:52:59 GMT
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id E09BD11C04A;
-        Thu, 29 Jul 2021 09:52:58 +0000 (GMT)
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 6455911C05B;
-        Thu, 29 Jul 2021 09:52:58 +0000 (GMT)
-Received: from localhost.localdomain (unknown [9.145.155.135])
-        by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Thu, 29 Jul 2021 09:52:58 +0000 (GMT)
-Subject: Re: [PATCH v2 13/13] KVM: s390: pv: add support for UV feature bits
-To:     Claudio Imbrenda <imbrenda@linux.ibm.com>, kvm@vger.kernel.org
-Cc:     cohuck@redhat.com, borntraeger@de.ibm.com, thuth@redhat.com,
-        pasic@linux.ibm.com, david@redhat.com, linux-s390@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-References: <20210728142631.41860-1-imbrenda@linux.ibm.com>
- <20210728142631.41860-14-imbrenda@linux.ibm.com>
-From:   Janosch Frank <frankja@linux.ibm.com>
-Message-ID: <4d26ba27-e235-8f2b-c59c-01d3e0691453@linux.ibm.com>
-Date:   Thu, 29 Jul 2021 11:52:58 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.11.0
+        id S235710AbhG2J5i (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 29 Jul 2021 05:57:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51894 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231488AbhG2J5h (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 29 Jul 2021 05:57:37 -0400
+Received: from mail-ej1-x631.google.com (mail-ej1-x631.google.com [IPv6:2a00:1450:4864:20::631])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 54C0BC0613CF
+        for <kvm@vger.kernel.org>; Thu, 29 Jul 2021 02:57:34 -0700 (PDT)
+Received: by mail-ej1-x631.google.com with SMTP id go31so9690474ejc.6
+        for <kvm@vger.kernel.org>; Thu, 29 Jul 2021 02:57:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=bytedance-com.20150623.gappssmtp.com; s=20150623;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=2/JQLrAj508aGv2jmDnAbPG9EWZtKhvl82UAOMEHPBs=;
+        b=A+Z9/U60T5YbUAEe4jTChA/mBPivVWZ7mluEerjhc+uNDyQEPDnLZTyScfp0foFFQ2
+         U18VzAwhGvf+YG3A92CMDlth4RheryJe/9mb84mBBsVyusD9fil8raZK9KYSHBEVIQ7r
+         vcgONXa7A1dVrBAoc6Wjc9ROTzUfoufjFxzY1y84GJWXb0xjAx7QOsKfGUWr4PyBIG94
+         013D3fFsLSYeHbqD25Riw7VBjfU+GZRszU7cNcvYRrFg6NmAdqf1dJqiwqQNtWz3re9C
+         R4RmFAoNIVed/GbVrR8D4MVMYsnqS2tzHmemUI5oVH0YIsVRQx81J4BB227Z4lSCF5H9
+         UMpA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=2/JQLrAj508aGv2jmDnAbPG9EWZtKhvl82UAOMEHPBs=;
+        b=nchi+4FB5jFJuUyrPYQfYPL2Vzt3VkGEcuaXb3207H+aMGOVP4VG4raqYUDDHXgIem
+         pmtE9h8IO3PGBpvXzOxMfZk16my54/301MAguSewFcqKJZfimXj2j41pIpN8BrT6eblj
+         +QCf9jHYULjWZVcqdEG9JVnkWMLfSDuhPGCHraRDVghzSqadrELIIfG7H7QLo7GXb1ky
+         99peo5e86Kj8RPMz7LuCqXvBh6dJ4j6HeHuP7JM+s9C/WtmJYPy5Yruo6M0EjUAzxunH
+         JEkMhqVWiq2wqUuA21p36x0hfDicWVuw5peVuPSAxIHdkvLuclU6Xv4YwZ+CHZCt4L86
+         SyjQ==
+X-Gm-Message-State: AOAM533JqQhsPduT0LWazFZ8SeOKfkgMcjfuVFzAYZ/qiSMyVKrEgUz/
+        8vBCnBkwlvr+9OUHPJKOvWFnNZXh/q9X3VycYrVL
+X-Google-Smtp-Source: ABdhPJyPJoh2rrpt21pOJjnB92m0UbkMLG/89N9L25ZMGcj+dxRx+R6yfC6pnUW65INSVyrfW/U8u02y7MhgGoOHpMc=
+X-Received: by 2002:a17:906:58c7:: with SMTP id e7mr3708944ejs.197.1627552652557;
+ Thu, 29 Jul 2021 02:57:32 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20210728142631.41860-14-imbrenda@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: 6YtK1rKxqZZS73Q75O_o-FDQQSAYiX0I
-X-Proofpoint-ORIG-GUID: zqcN2IzNl4fE_BQ9HO6WIS3_a1mglA3N
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.790
- definitions=2021-07-29_09:2021-07-27,2021-07-29 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
- spamscore=0 malwarescore=0 adultscore=0 impostorscore=0 mlxlogscore=999
- priorityscore=1501 mlxscore=0 clxscore=1011 bulkscore=0 phishscore=0
- suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2107140000 definitions=main-2107290061
+References: <20210729073503.187-1-xieyongji@bytedance.com> <20210729073503.187-17-xieyongji@bytedance.com>
+ <YQJuG7zrzdWm+ieZ@kroah.com>
+In-Reply-To: <YQJuG7zrzdWm+ieZ@kroah.com>
+From:   Yongji Xie <xieyongji@bytedance.com>
+Date:   Thu, 29 Jul 2021 17:57:21 +0800
+Message-ID: <CACycT3vDspiXSh=UoK9JXaMpv1+9C61DLy_-bWJV5XRxKs2xRw@mail.gmail.com>
+Subject: Re: [PATCH v10 16/17] vduse: Introduce VDUSE - vDPA Device in Userspace
+To:     Greg KH <gregkh@linuxfoundation.org>
+Cc:     "Michael S. Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Stefano Garzarella <sgarzare@redhat.com>,
+        Parav Pandit <parav@nvidia.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Christian Brauner <christian.brauner@canonical.com>,
+        Randy Dunlap <rdunlap@infradead.org>,
+        Matthew Wilcox <willy@infradead.org>,
+        Al Viro <viro@zeniv.linux.org.uk>,
+        Jens Axboe <axboe@kernel.dk>, bcrl@kvack.org,
+        Jonathan Corbet <corbet@lwn.net>,
+        =?UTF-8?Q?Mika_Penttil=C3=A4?= <mika.penttila@nextfour.com>,
+        Dan Carpenter <dan.carpenter@oracle.com>, joro@8bytes.org,
+        He Zhe <zhe.he@windriver.com>,
+        Liu Xiaodong <xiaodong.liu@intel.com>,
+        Joe Perches <joe@perches.com>, songmuchun@bytedance.com,
+        virtualization <virtualization@lists.linux-foundation.org>,
+        netdev@vger.kernel.org, kvm <kvm@vger.kernel.org>,
+        linux-fsdevel@vger.kernel.org, iommu@lists.linux-foundation.org,
+        linux-kernel <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 7/28/21 4:26 PM, Claudio Imbrenda wrote:
-> Add support for Ultravisor feature bits, and take advantage of the
-> functionality advertised to speed up the lazy destroy mechanism.
+On Thu, Jul 29, 2021 at 5:00 PM Greg KH <gregkh@linuxfoundation.org> wrote:
+>
+> On Thu, Jul 29, 2021 at 03:35:02PM +0800, Xie Yongji wrote:
+> > +/*
+> > + * The basic configuration of a VDUSE device, which is used by
+> > + * VDUSE_CREATE_DEV ioctl to create a VDUSE device.
+> > + */
+> > +struct vduse_dev_config {
+>
+> Please document this structure using kernel doc so we know what all the
+> fields are.
+>
 
-UV feature bit support is already merged please fix the description and
-subject.
+Sure.
 
-> 
-> Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
-> ---
->  arch/s390/kernel/uv.c | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
-> 
-> diff --git a/arch/s390/kernel/uv.c b/arch/s390/kernel/uv.c
-> index f0af49b09a91..6ec3d7338ec8 100644
-> --- a/arch/s390/kernel/uv.c
-> +++ b/arch/s390/kernel/uv.c
-> @@ -290,7 +290,8 @@ static int make_secure_pte(pte_t *ptep, unsigned long addr,
->  
->  static bool should_export_before_import(struct uv_cb_header *uvcb, struct mm_struct *mm)
->  {
-> -	return uvcb->cmd != UVC_CMD_UNPIN_PAGE_SHARED &&
-> +	return !test_bit_inv(BIT_UV_FEAT_MISC, &uv_info.uv_feature_indications) &&
-> +		uvcb->cmd != UVC_CMD_UNPIN_PAGE_SHARED &&
->  		atomic_read(&mm->context.is_protected) > 1;
->  }
->  
-> 
+> > +#define VDUSE_NAME_MAX       256
+> > +     char name[VDUSE_NAME_MAX]; /* vduse device name, needs to be NUL terminated */
+> > +     __u32 vendor_id; /* virtio vendor id */
+> > +     __u32 device_id; /* virtio device id */
+> > +     __u64 features; /* virtio features */
+> > +     __u32 vq_num; /* the number of virtqueues */
+> > +     __u32 vq_align; /* the allocation alignment of virtqueue's metadata */
+> > +     __u32 reserved[13]; /* for future use */
+>
+> This HAS to be tested to be all 0, otherwise you can never use it in the
+> future.  I did not see the code doing that at all.
+>
 
+Make sense. Will do it in the next version.
+
+> > +     __u32 config_size; /* the size of the configuration space */
+> > +     __u8 config[0]; /* the buffer of the configuration space */
+>
+> config[]; please instead?  I thought we were getting rid of all of the
+> 0-length arrays in the kernel tree.
+>
+
+OK.
+
+> > +};
+> > +
+> > +/* Create a VDUSE device which is represented by a char device (/dev/vduse/$NAME) */
+> > +#define VDUSE_CREATE_DEV     _IOW(VDUSE_BASE, 0x02, struct vduse_dev_config)
+> > +
+> > +/*
+> > + * Destroy a VDUSE device. Make sure there are no more references
+> > + * to the char device (/dev/vduse/$NAME).
+> > + */
+> > +#define VDUSE_DESTROY_DEV    _IOW(VDUSE_BASE, 0x03, char[VDUSE_NAME_MAX])
+> > +
+> > +/* The ioctls for VDUSE device (/dev/vduse/$NAME) */
+> > +
+> > +/*
+> > + * The information of one IOVA region, which is retrieved from
+> > + * VDUSE_IOTLB_GET_FD ioctl.
+> > + */
+> > +struct vduse_iotlb_entry {
+> > +     __u64 offset; /* the mmap offset on returned file descriptor */
+> > +     __u64 start; /* start of the IOVA range: [start, last] */
+> > +     __u64 last; /* last of the IOVA range: [start, last] */
+> > +#define VDUSE_ACCESS_RO 0x1
+> > +#define VDUSE_ACCESS_WO 0x2
+> > +#define VDUSE_ACCESS_RW 0x3
+> > +     __u8 perm; /* access permission of this region */
+> > +};
+> > +
+> > +/*
+> > + * Find the first IOVA region that overlaps with the range [start, last]
+> > + * and return the corresponding file descriptor. Return -EINVAL means the
+> > + * IOVA region doesn't exist. Caller should set start and last fields.
+> > + */
+> > +#define VDUSE_IOTLB_GET_FD   _IOWR(VDUSE_BASE, 0x10, struct vduse_iotlb_entry)
+> > +
+> > +/*
+> > + * Get the negotiated virtio features. It's a subset of the features in
+> > + * struct vduse_dev_config which can be accepted by virtio driver. It's
+> > + * only valid after FEATURES_OK status bit is set.
+> > + */
+> > +#define VDUSE_DEV_GET_FEATURES       _IOR(VDUSE_BASE, 0x11, __u64)
+> > +
+> > +/*
+> > + * The information that is used by VDUSE_DEV_SET_CONFIG ioctl to update
+> > + * device configuration space.
+> > + */
+> > +struct vduse_config_data {
+> > +     __u32 offset; /* offset from the beginning of configuration space */
+> > +     __u32 length; /* the length to write to configuration space */
+> > +     __u8 buffer[0]; /* buffer used to write from */
+>
+> again, buffer[];?
+>
+
+OK.
+
+> > +};
+> > +
+> > +/* Set device configuration space */
+> > +#define VDUSE_DEV_SET_CONFIG _IOW(VDUSE_BASE, 0x12, struct vduse_config_data)
+> > +
+> > +/*
+> > + * Inject a config interrupt. It's usually used to notify virtio driver
+> > + * that device configuration space has changed.
+> > + */
+> > +#define VDUSE_DEV_INJECT_CONFIG_IRQ  _IO(VDUSE_BASE, 0x13)
+> > +
+> > +/*
+> > + * The basic configuration of a virtqueue, which is used by
+> > + * VDUSE_VQ_SETUP ioctl to setup a virtqueue.
+> > + */
+> > +struct vduse_vq_config {
+> > +     __u32 index; /* virtqueue index */
+> > +     __u16 max_size; /* the max size of virtqueue */
+> > +};
+> > +
+> > +/*
+> > + * Setup the specified virtqueue. Make sure all virtqueues have been
+> > + * configured before the device is attached to vDPA bus.
+> > + */
+> > +#define VDUSE_VQ_SETUP               _IOW(VDUSE_BASE, 0x14, struct vduse_vq_config)
+> > +
+> > +struct vduse_vq_state_split {
+> > +     __u16 avail_index; /* available index */
+> > +};
+> > +
+> > +struct vduse_vq_state_packed {
+> > +     __u16 last_avail_counter:1; /* last driver ring wrap counter observed by device */
+> > +     __u16 last_avail_idx:15; /* device available index */
+>
+> Bit fields in a user structure?  Are you sure this is going to work
+> well?  Why not just make this a __u16 and then mask off what you want so
+> that you do not run into endian issues?
+>
+
+Good point! I will use __u16 for each field instead.
+
+> > +     __u16 last_used_counter:1; /* device ring wrap counter */
+> > +     __u16 last_used_idx:15; /* used index */
+> > +};
+> > +
+> > +/*
+> > + * The information of a virtqueue, which is retrieved from
+> > + * VDUSE_VQ_GET_INFO ioctl.
+> > + */
+> > +struct vduse_vq_info {
+> > +     __u32 index; /* virtqueue index */
+> > +     __u32 num; /* the size of virtqueue */
+> > +     __u64 desc_addr; /* address of desc area */
+> > +     __u64 driver_addr; /* address of driver area */
+> > +     __u64 device_addr; /* address of device area */
+> > +     union {
+> > +             struct vduse_vq_state_split split; /* split virtqueue state */
+> > +             struct vduse_vq_state_packed packed; /* packed virtqueue state */
+> > +     };
+> > +     __u8 ready; /* ready status of virtqueue */
+> > +};
+> > +
+> > +/* Get the specified virtqueue's information. Caller should set index field. */
+> > +#define VDUSE_VQ_GET_INFO    _IOWR(VDUSE_BASE, 0x15, struct vduse_vq_info)
+> > +
+> > +/*
+> > + * The eventfd configuration for the specified virtqueue. It's used by
+> > + * VDUSE_VQ_SETUP_KICKFD ioctl to setup kick eventfd.
+> > + */
+> > +struct vduse_vq_eventfd {
+> > +     __u32 index; /* virtqueue index */
+> > +#define VDUSE_EVENTFD_DEASSIGN -1
+> > +     int fd; /* eventfd, -1 means de-assigning the eventfd */
+>
+> Don't we have a file descriptor type?  I could be wrong.
+>
+
+It looks like I did not find it...
+
+> > +};
+> > +
+> > +/*
+> > + * Setup kick eventfd for specified virtqueue. The kick eventfd is used
+> > + * by VDUSE kernel module to notify userspace to consume the avail vring.
+> > + */
+> > +#define VDUSE_VQ_SETUP_KICKFD        _IOW(VDUSE_BASE, 0x16, struct vduse_vq_eventfd)
+> > +
+> > +/*
+> > + * Inject an interrupt for specific virtqueue. It's used to notify virtio driver
+> > + * to consume the used vring.
+> > + */
+> > +#define VDUSE_VQ_INJECT_IRQ  _IOW(VDUSE_BASE, 0x17, __u32)
+> > +
+> > +/* The control messages definition for read/write on /dev/vduse/$NAME */
+> > +
+> > +enum vduse_req_type {
+> > +     /* Get the state for specified virtqueue from userspace */
+> > +     VDUSE_GET_VQ_STATE,
+> > +     /* Set the device status */
+> > +     VDUSE_SET_STATUS,
+> > +     /*
+> > +      * Notify userspace to update the memory mapping for specified
+> > +      * IOVA range via VDUSE_IOTLB_GET_FD ioctl
+> > +      */
+> > +     VDUSE_UPDATE_IOTLB,
+> > +};
+> > +
+> > +struct vduse_vq_state {
+> > +     __u32 index; /* virtqueue index */
+> > +     union {
+> > +             struct vduse_vq_state_split split; /* split virtqueue state */
+> > +             struct vduse_vq_state_packed packed; /* packed virtqueue state */
+> > +     };
+> > +};
+> > +
+> > +struct vduse_dev_status {
+> > +     __u8 status; /* device status */
+> > +};
+> > +
+> > +struct vduse_iova_range {
+> > +     __u64 start; /* start of the IOVA range: [start, end] */
+> > +     __u64 last; /* last of the IOVA range: [start, end] */
+> > +};
+> > +
+> > +struct vduse_dev_request {
+> > +     __u32 type; /* request type */
+> > +     __u32 request_id; /* request id */
+> > +     __u32 reserved[2]; /* for future use */
+>
+> Again, this HAS to be checked to be 0 and aborted if not, otherwise you
+> can never use it in the future.
+>
+
+I see. This has already been done in the current version.
+
+> > +     union {
+> > +             struct vduse_vq_state vq_state; /* virtqueue state, only use index */
+> > +             struct vduse_dev_status s; /* device status */
+> > +             struct vduse_iova_range iova; /* IOVA range for updating */
+> > +             __u32 padding[16]; /* padding */
+> > +     };
+> > +};
+> > +
+> > +struct vduse_dev_response {
+> > +     __u32 request_id; /* corresponding request id */
+> > +#define VDUSE_REQ_RESULT_OK  0x00
+> > +#define VDUSE_REQ_RESULT_FAILED      0x01
+> > +     __u32 result; /* the result of request */
+> > +     __u32 reserved[2]; /* for future use */
+>
+> Same here, you have to check this.
+>
+
+Sure.
+
+> > +     union {
+> > +             struct vduse_vq_state vq_state; /* virtqueue state */
+> > +             __u32 padding[16]; /* padding */
+>
+> Check this padding too.
+>
+
+OK.
+
+Thanks,
+Yongji
