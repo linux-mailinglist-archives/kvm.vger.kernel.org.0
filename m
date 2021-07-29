@@ -2,143 +2,107 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id BC7023D9C25
-	for <lists+kvm@lfdr.de>; Thu, 29 Jul 2021 05:22:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B07813D9CBE
+	for <lists+kvm@lfdr.de>; Thu, 29 Jul 2021 06:26:48 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233507AbhG2DWI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 28 Jul 2021 23:22:08 -0400
-Received: from mga11.intel.com ([192.55.52.93]:50173 "EHLO mga11.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S233297AbhG2DWI (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 28 Jul 2021 23:22:08 -0400
-X-IronPort-AV: E=McAfee;i="6200,9189,10059"; a="209682890"
-X-IronPort-AV: E=Sophos;i="5.84,276,1620716400"; 
-   d="scan'208";a="209682890"
-Received: from fmsmga003.fm.intel.com ([10.253.24.29])
-  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Jul 2021 20:22:04 -0700
-X-IronPort-AV: E=Sophos;i="5.84,276,1620716400"; 
-   d="scan'208";a="506879422"
-Received: from wye1-mobl1.ccr.corp.intel.com (HELO localhost) ([10.249.174.73])
-  by fmsmga003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Jul 2021 20:22:03 -0700
-Date:   Thu, 29 Jul 2021 11:22:00 +0800
-From:   Yu Zhang <yu.c.zhang@linux.intel.com>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Ben Gardon <bgardon@google.com>, kvm@vger.kernel.org
-Subject: Re: A question of TDP unloading.
-Message-ID: <20210729032200.qqb4mlctgplzq6bb@linux.intel.com>
-References: <20210727161957.lxevvmy37azm2h7z@linux.intel.com>
- <YQBLZ/RrBFxE4G4w@google.com>
- <20210728065605.e4ql2hzrj5fkngux@linux.intel.com>
- <YQGj8gj7fpWDdLg5@google.com>
+        id S233599AbhG2E0t (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 29 Jul 2021 00:26:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59726 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232023AbhG2E0s (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 29 Jul 2021 00:26:48 -0400
+Received: from mail-il1-x129.google.com (mail-il1-x129.google.com [IPv6:2607:f8b0:4864:20::129])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9FD99C061757;
+        Wed, 28 Jul 2021 21:26:45 -0700 (PDT)
+Received: by mail-il1-x129.google.com with SMTP id x7so1102525ilh.10;
+        Wed, 28 Jul 2021 21:26:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=6qZSdBV70oLjzXY9J+kcpHCTOof0JnPkRHvC46/0enE=;
+        b=NLXb0OLnoHRE2t16wv2trQILVqh7yOu+pBFyho/tFMH3mB8KTdKPP+H6KcBlI0kgUJ
+         sO59ROgNvyvOSUyqhO24IwPJl5zEBMVGy8Ralbh5R7QIKgKvuflsVkG++8/RYh9DYh0V
+         JixA3XSUtQKND+hXCXZWljh1ktgpjJTrYR1mcRdVLcx4pRlPXZHUMzubyawn+8fCz0GX
+         qZNdcUJMM9qbE5vCxk7iTtr3xJuxdeN/qeRgAtQLeTJhZqFdYXY+1UEE+FNqnfhWp3R0
+         OJwlANBseQhp0rKw1p2Oef7mMEWNW1Gvt8aFtvXkYOi4OhJ7mpgU6fK7TbPaYDDZZYpE
+         p5zg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=6qZSdBV70oLjzXY9J+kcpHCTOof0JnPkRHvC46/0enE=;
+        b=Y9r+8dkhGvWO9LcQJjQ90RTNL9zMkVF7L0KKUw3v5ldJBQGqUrhJOhadgIcvE3JpxA
+         DZGwq/QpzQ3T97Vxt1TdnGG43tLVsqAfsQC+AvgIsec5t6oCkhi4j4lZ+gwkdBpbLpdy
+         KrOJLXQEvu7AVlFwulV8QmFnhPyHTGlVc1SHouYKyRS531dJOtsGLC9Rig6dLEbi7+Ap
+         Lfu7RV/xiIWYijHwic1oMmRd3gPzq67usbIMgA/82BVQ0771G3j1X0vflu8vWTuAuE1H
+         7f4S9l4sEK+Q1+xeo6ixmETgUnN3C1BosIVwhEbt9NGDyKxB5a5HwA8iPebwy9qq6TdY
+         v9JQ==
+X-Gm-Message-State: AOAM5309C30OZVjcNZqjYZ1vq8CQAhvKy3gGfDXeaMR0Zdy3x2bsPUA+
+        iUhflKcxrMzc5CFIUjzF57VF3kHfBf+JQrWunYk=
+X-Google-Smtp-Source: ABdhPJzpXQeDsRaaXvVfSvElKNAYZqDm1v7RAdis7kDfYXUnO38CrA7TED+wbGjakqPi3hd+HBlLZAW6DwHPkz8noQQ=
+X-Received: by 2002:a92:a005:: with SMTP id e5mr2242648ili.22.1627532805050;
+ Wed, 28 Jul 2021 21:26:45 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <YQGj8gj7fpWDdLg5@google.com>
-User-Agent: NeoMutt/20171215
+References: <20210722063946.28951-1-mika.penttila@gmail.com> <YQE0P9PLd3Uib7eu@hirez.programming.kicks-ass.net>
+In-Reply-To: <YQE0P9PLd3Uib7eu@hirez.programming.kicks-ass.net>
+From:   Pankaj Gupta <pankaj.gupta.linux@gmail.com>
+Date:   Thu, 29 Jul 2021 06:26:34 +0200
+Message-ID: <CAM9Jb+j5KbuuMD9mRNbBD9wn5ga8+GBcjPTVgiesfVQKctP0pQ@mail.gmail.com>
+Subject: Re: [PATCH] is_core_idle() is using a wrong variable
+To:     Peter Zijlstra <peterz@infradead.org>
+Cc:     mika.penttila@gmail.com, LKML <linux-kernel@vger.kernel.org>,
+        Li RongQing <lirongqing@baidu.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Ingo Molnar <mingo@redhat.com>, kvm@vger.kernel.org,
+        Mel Gorman <mgorman@suse.de>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jul 28, 2021 at 06:37:38PM +0000, Sean Christopherson wrote:
-> On Wed, Jul 28, 2021, Yu Zhang wrote:
-> > Thanks a lot for your reply, Sean.
-> > 
-> > On Tue, Jul 27, 2021 at 06:07:35PM +0000, Sean Christopherson wrote:
-> > > On Wed, Jul 28, 2021, Yu Zhang wrote:
-> > > > Hi all,
-> > > > 
-> > > >   I'd like to ask a question about kvm_reset_context(): is there any
-> > > >   reason that we must alway unload TDP root in kvm_mmu_reset_context()?
-> > > 
-> > > The short answer is that mmu_role is changing, thus a new root shadow page is
-> > > needed.
-> > 
-> > I saw the mmu_role is recalculated, but I have not figured out how this
-> > change would affect TDP. May I ask a favor to give an example? Thanks!
-> > 
-> > I realized that if we only recalculate the mmu role, but do not unload
-> > the TDP root(e.g., when guest efer.nx flips), base role of the SPs will
-> > be inconsistent with the mmu context. But I do not understand why this
-> > shall affect TDP. 
-> 
-> The SPTEs themselves are not affected if the base mmu_role doesn't change; note,
-> this holds true for shadow paging, too.  What changes is all of the kvm_mmu
-> knowledge about how to walk the guest PTEs, e.g. if a guest toggles CR4.SMAP,
-> then KVM needs to recalculate the #PF permissions for guest accesses so that
-> emulating instructions at CPL=0 does the right thing.
-> 
-> As for EFER.NX and CR0.WP, they are in the base page role because they need to
-> be there for shadow paging, e.g. if the guest toggles EFER.NX, then the reserved
-> bit and executable permissions change, and reusing shadow paging for the old
-> EFER.NX could result in missed reserved #PF and/or incorrect executable #PF
-> behavior.
-> 
-> For simplicitly, it's far, far eaiser to reuse the same page role struct for
-> TDP paging (both legacy and TDP MMUs) and shadow paging.
-> 
-> However, I think we can safely ignore NX, WP, SMEP, and SMAP in direct shadow
-> pages, which would allow reusing a TDP root across changes.  This is only a baby
-> step (assuming it even works), as further changes to set_cr0/cr4/efer would be
-> needed to fully realize the optimizations, e.g. to avoid complete teardown if
-> the root_count hits zero.
+On Wed, 28 Jul 2021 at 12:46, Peter Zijlstra <peterz@infradead.org> wrote:
+>
+> On Thu, Jul 22, 2021 at 09:39:46AM +0300, mika.penttila@gmail.com wrote:
+> > From: Mika Penttil=C3=A4 <mika.penttila@gmail.com>
+> >
+> > is_core_idle() was using a wrong variable in the loop test. Fix it.
+> >
+> > Signed-off-by: Mika Penttil=C3=A4 <mika.penttila@gmail.com>
+>
+> Thanks!
+>
+> ---
+> Subject: sched/numa: Fix is_core_idle()
+> From: Mika Penttil=C3=A4 <mika.penttila@gmail.com>
+> Date: Thu, 22 Jul 2021 09:39:46 +0300
+>
+> From: Mika Penttil=C3=A4 <mika.penttila@gmail.com>
+>
+> Use the loop variable instead of the function argument to test the
+> other SMT siblings for idle.
+>
+> Fixes: ff7db0bf24db ("sched/numa: Prefer using an idle CPU as a migration=
+ target instead of comparing tasks")
+> Signed-off-by: Mika Penttil=C3=A4 <mika.penttila@gmail.com>
+> Signed-off-by: Peter Zijlstra (Intel) <peterz@infradead.org>
+> Link: https://lkml.kernel.org/r/20210722063946.28951-1-mika.penttila@gmai=
+l.com
+> ---
+>  kernel/sched/fair.c |    2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> --- a/kernel/sched/fair.c
+> +++ b/kernel/sched/fair.c
+> @@ -1486,7 +1486,7 @@ static inline bool is_core_idle(int cpu)
+>                 if (cpu =3D=3D sibling)
+>                         continue;
+>
+> -               if (!idle_cpu(cpu))
+> +               if (!idle_cpu(sibling))
+>                         return false;
+>         }
+>  #endif
 
-Thanks for your explaination, Sean. And I fully agree!
-
-As you can see in my first mail, I kept reinitiate the mmu role in kvm_reset_context(),
-so that guest paging mode change will be handled correctly, for guest page table walker.
-As to shadow, the unload is always needed, because NX and WP of existing SPs matters.
-
-+void kvm_mmu_reset_context(struct kvm_vcpu *vcpu, bool force_tdp_unload)
-{
--       kvm_mmu_unload(vcpu);
-+       if (!tdp_enabled || force_tdp_unload)
-+               kvm_mmu_unload(vcpu);
-+
-        kvm_init_mmu(vcpu);
-}
-
-In the caller, force_tdp_unload was set to false for CR0/CR4/EFER changes. For SMM and
-cpuid updates, it is set to true.
-
-With this change, I can successfully boot a VM(and of course, number of unloadings is
-greatly reduced). But access test case in kvm-unit-test hangs, after CR4.SMEP is flipped.
-I'm trying to figure out why...
-
-> 
-> I'll put this on my todo list, I've been looking for an excuse to update the
-> cr0/cr4/efer flows anyways :-).  If it works, the changes should be relatively
-> minor, if it works...
-> 
-> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> index a8cdfd8d45c4..700664fe163e 100644
-> --- a/arch/x86/kvm/mmu/mmu.c
-> +++ b/arch/x86/kvm/mmu/mmu.c
-> @@ -2077,8 +2077,20 @@ static struct kvm_mmu_page *kvm_mmu_get_page(struct kvm_vcpu *vcpu,
->         role = vcpu->arch.mmu->mmu_role.base;
->         role.level = level;
->         role.direct = direct;
-> -       if (role.direct)
-> +       if (role.direct) {
->                 role.gpte_is_8_bytes = true;
-> +
-> +               /*
-> +                * Guest PTE permissions do not impact SPTE permissions for
-> +                * direct MMUs.  Either there are no guest PTEs (CR0.PG=0) or
-> +                * guest PTE permissions are enforced by the CPU (TDP enabled).
-> +                */
-> +               WARN_ON_ONCE(access != ACC_ALL);
-> +               role.efer_nx = 0;
-> +               role.cr0_wp = 0;
-> +               role.smep_andnot_wp = 0;
-> +               role.smap_andnot_wp = 0;
-> +       }
-
-How about we do this in kvm_calc_mmu_role_common()? :-)
-
-Thanks
-Yu
-
->         role.access = access;
->         if (!direct_mmu && vcpu->arch.mmu->root_level <= PT32_ROOT_LEVEL) {
->                 quadrant = gaddr >> (PAGE_SHIFT + (PT64_PT_BITS * level));
+Acked-by: Pankaj Gupta <pankaj.gupta@ionos.com>
