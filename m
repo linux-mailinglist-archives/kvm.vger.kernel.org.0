@@ -2,79 +2,98 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 781933DA939
-	for <lists+kvm@lfdr.de>; Thu, 29 Jul 2021 18:38:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A59693DA944
+	for <lists+kvm@lfdr.de>; Thu, 29 Jul 2021 18:42:22 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229761AbhG2Qie (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 29 Jul 2021 12:38:34 -0400
-Received: from mga11.intel.com ([192.55.52.93]:25602 "EHLO mga11.intel.com"
+        id S229963AbhG2QmY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 29 Jul 2021 12:42:24 -0400
+Received: from mail.kernel.org ([198.145.29.99]:45334 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229620AbhG2Qic (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 29 Jul 2021 12:38:32 -0400
-X-IronPort-AV: E=McAfee;i="6200,9189,10060"; a="209812830"
-X-IronPort-AV: E=Sophos;i="5.84,278,1620716400"; 
-   d="scan'208";a="209812830"
-Received: from fmsmga003.fm.intel.com ([10.253.24.29])
-  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Jul 2021 09:38:28 -0700
-X-IronPort-AV: E=Sophos;i="5.84,278,1620716400"; 
-   d="scan'208";a="507347688"
-Received: from wye1-mobl1.ccr.corp.intel.com (HELO localhost) ([10.249.174.73])
-  by fmsmga003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Jul 2021 09:38:25 -0700
-Date:   Fri, 30 Jul 2021 00:38:22 +0800
-From:   Yu Zhang <yu.c.zhang@linux.intel.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Ben Gardon <bgardon@google.com>, Yan Zhao <yan.y.zhao@intel.com>,
-        Sean Christopherson <seanjc@google.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
-Subject: Re: A question of TDP unloading.
-Message-ID: <20210729163822.ubzszrvnnmol4zlr@linux.intel.com>
-References: <20210727161957.lxevvmy37azm2h7z@linux.intel.com>
- <YQBLZ/RrBFxE4G4w@google.com>
- <20210728065605.e4ql2hzrj5fkngux@linux.intel.com>
- <20210728072514.GA375@yzhao56-desk.sh.intel.com>
- <CANgfPd_Rt3udm8mUHzX=MaXPOafkXhUt++7ACNsG1PnPiLswnw@mail.gmail.com>
- <20210728172241.aizlvj2alvxfvd43@linux.intel.com>
- <CANgfPd_o+HC80aqTQn7CA3o4rN2AFPDUp_Jxj9CQ6Rie9+yAug@mail.gmail.com>
- <20210729030056.uk644q3eeoux2qfa@linux.intel.com>
- <dd09360e-436e-4e66-faad-656c8aa9cee2@redhat.com>
+        id S229556AbhG2QmX (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 29 Jul 2021 12:42:23 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 4CADD60EBD;
+        Thu, 29 Jul 2021 16:42:18 +0000 (UTC)
+Date:   Thu, 29 Jul 2021 17:42:15 +0100
+From:   Catalin Marinas <catalin.marinas@arm.com>
+To:     Marc Zyngier <maz@kernel.org>
+Cc:     kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org,
+        Will Deacon <will@kernel.org>,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        kernel-team@android.com, Quentin Perret <qperret@google.com>,
+        stable@vger.kernel.org
+Subject: Re: [PATCH] KVM: arm64: Unregister HYP sections from kmemleak in
+ protected mode
+Message-ID: <20210729164214.GB31848@arm.com>
+References: <20210729135016.3037277-1-maz@kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <dd09360e-436e-4e66-faad-656c8aa9cee2@redhat.com>
-User-Agent: NeoMutt/20171215
+In-Reply-To: <20210729135016.3037277-1-maz@kernel.org>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jul 29, 2021 at 11:19:08AM +0200, Paolo Bonzini wrote:
-> On 29/07/21 05:00, Yu Zhang wrote:
-> > > I have a few questions about these unnecessary tear-downs during boot:
-> > > 1. How many teardowns did you observe, and how many different roles
-> > > did they represent? Just thrashing between two roles, or 12 different
-> > > roles?
-> > I saw 106 reloadings of the root TDP. Among them, 14 are caused by memslot
-> > changes. Remaining ones are caused by the context reset from CR0/CR4/EFER
-> > changes(85 for CR0 changes).
+On Thu, Jul 29, 2021 at 02:50:16PM +0100, Marc Zyngier wrote:
+> Booting a KVM host in protected mode with kmemleak quickly results
+> in a pretty bad crash, as kmemleak doesn't know that the HYP sections
+> have been taken away.
 > 
-> Possibly because CR0/CR4/EFER are changed multiple times on SMM entry (to go
-> from real mode to protected mode to 32-bit to 64-bit)?  But most of those
-> page tables should be very very small; they probably have only one page per
-> level.  The SMM page tables are very small too, the only one that is really
-> expensive to rebuild is the main non-SMM EPT.
-
-Thanks Paolo. 
-
-Well, I did not see any SMM entry in the whole test. And most resetings
-are due to CR0 changes in OVMF(74 out of 85), the rest are from guest
-kernel initialization stage.
-
-As expected, the number of SPs used are fairly small - about 5 - 10 for
-each TDP tree. For legcy TDP, since only 4 different TDP trees are built(
-the ones caused by memslot zapping are not counted). The total number of
-SPs are only 30+.
-
-B.R.
-Yu
+> Make the unregistration from kmemleak part of marking the sections
+> as HYP-private. The rest of the HYP-specific data is obtained via
+> the page allocator, which is not subjected to kmemleak.
 > 
-> Paolo
+> Fixes: 90134ac9cabb ("KVM: arm64: Protect the .hyp sections from the host")
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> Cc: Quentin Perret <qperret@google.com>
+> Cc: Catalin Marinas <catalin.marinas@arm.com>
+> Cc: stable@vger.kernel.org # 5.13
+> ---
+>  arch/arm64/kvm/arm.c | 7 ++++++-
+>  1 file changed, 6 insertions(+), 1 deletion(-)
 > 
+> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> index e9a2b8f27792..23f12e602878 100644
+> --- a/arch/arm64/kvm/arm.c
+> +++ b/arch/arm64/kvm/arm.c
+> @@ -15,6 +15,7 @@
+>  #include <linux/fs.h>
+>  #include <linux/mman.h>
+>  #include <linux/sched.h>
+> +#include <linux/kmemleak.h>
+>  #include <linux/kvm.h>
+>  #include <linux/kvm_irqfd.h>
+>  #include <linux/irqbypass.h>
+> @@ -1960,8 +1961,12 @@ static inline int pkvm_mark_hyp(phys_addr_t start, phys_addr_t end)
+>  }
+>  
+>  #define pkvm_mark_hyp_section(__section)		\
+> +({							\
+> +	u64 sz = __section##_end - __section##_start;	\
+> +	kmemleak_free_part(__section##_start, sz);	\
+>  	pkvm_mark_hyp(__pa_symbol(__section##_start),	\
+> -			__pa_symbol(__section##_end))
+> +		      __pa_symbol(__section##_end));	\
+> +})
+
+Using kmemleak_free_part() is fine in principle as this is not a slab
+object. However, the above would call the function even for ranges that
+are not tracked at all by kmemleak (text, idmap). Luckily Kmemleak won't
+complain, unless you #define DEBUG in the file (initially I tried to
+warn all the time but I couldn't fix all the callbacks).
+
+If it was just the BSS, I would move the kmemleak_free_part() call to
+finalize_hyp_mode() but there's the __hyp_rodata section as well.
+
+I think we have some inconsistency with .hyp.rodata which falls under
+_sdata.._edata while the kernel's own .rodata goes immediately after
+_etext. Should we move __hyp_rodata outside _sdata.._edata as well? It
+would benefit from the RO NX marking (probably more useful without the
+protected mode). If this works, we'd only need to call kmemleak once for
+the BSS.
+
+-- 
+Catalin
