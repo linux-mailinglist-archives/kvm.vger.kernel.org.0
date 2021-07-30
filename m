@@ -2,208 +2,141 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id F26EF3DC0B9
-	for <lists+kvm@lfdr.de>; Sat, 31 Jul 2021 00:05:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B90B23DC0BA
+	for <lists+kvm@lfdr.de>; Sat, 31 Jul 2021 00:05:07 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232384AbhG3WFF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 30 Jul 2021 18:05:05 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:45231 "EHLO
+        id S233028AbhG3WFI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 30 Jul 2021 18:05:08 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:32585 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230515AbhG3WFF (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 30 Jul 2021 18:05:05 -0400
+        by vger.kernel.org with ESMTP id S229709AbhG3WFH (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 30 Jul 2021 18:05:07 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1627682699;
+        s=mimecast20190719; t=1627682701;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=MBGBDXfJrYcoK/QqjYITo2GK0WNlQOndEHlJrBe9l38=;
-        b=CPsYZ1Q45CwenMWgxSsUYKBr0c8IhHsOzlwny0EtbLkc6GQLcoM4LBiwfPVAB7DejMEKi/
-        pApxYJ7BlpE7rqnScwtU+3NaRj6FKIonET8Ffa39WspBEap4Pt00Qp6tEc+VCktqLCuLN3
-        7YOzCIKwF3JTjB5W+fwGpikKY+TolB0=
-Received: from mail-qt1-f200.google.com (mail-qt1-f200.google.com
- [209.85.160.200]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-236-OizM_C_hPnaIibSHmC9y-Q-1; Fri, 30 Jul 2021 18:04:58 -0400
-X-MC-Unique: OizM_C_hPnaIibSHmC9y-Q-1
-Received: by mail-qt1-f200.google.com with SMTP id m22-20020a05622a1196b029026549e62339so5156376qtk.1
-        for <kvm@vger.kernel.org>; Fri, 30 Jul 2021 15:04:58 -0700 (PDT)
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=j/8ZgOgV9FABxcwPWKwd6pFZTEbb8PsS8jPvc0Wk6tg=;
+        b=fbHcs5jva1KPzejhf47LlSW+Za7QPEydHHRqQeVcrQt301tqS6UHYDjDDctQ5yCyNIYM9k
+        2r6ZG8zcX1j+YqiyFn60XdeOqtvV0E8+UihbXNfMg4SAkw+ksnvAUO5YmU1kGHXgUqFr90
+        dKGq5E2bQOE9R0uDxL4Ka845tFdG7ZU=
+Received: from mail-qt1-f198.google.com (mail-qt1-f198.google.com
+ [209.85.160.198]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-543-u1iXp_e4NwCWI_5JL64ATg-1; Fri, 30 Jul 2021 18:05:00 -0400
+X-MC-Unique: u1iXp_e4NwCWI_5JL64ATg-1
+Received: by mail-qt1-f198.google.com with SMTP id z16-20020ac87cb00000b029025bf786be09so974388qtv.20
+        for <kvm@vger.kernel.org>; Fri, 30 Jul 2021 15:04:59 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=MBGBDXfJrYcoK/QqjYITo2GK0WNlQOndEHlJrBe9l38=;
-        b=LDqo2ATuMeC5p0iuSwO2QdsFSDao3tcUFOvnF8WCKZhblS2gOTGJfJzs9CWoSOF62N
-         s8zwZLnKh/sXonYRbuS04HPLADMxZnDbqBl0bbrrU5SrNoZl3F30QVH4DARgRVG/WByn
-         oHliZAzZl7Y0e5EczP7l8yDeNNc9ZXWDJTp4h2FYAxx6Ze08wVTFbjaSaiA5G+P3iL+n
-         dYoet8i+7Vne0UzQjEnNwfR2KPkg8mSO1AgcAoBjLBo1VCkxGRyEzYTInG4HXlK12fz0
-         3+2WTk3GHo+WI3i1ebc4q2ma2q4oreZqJ+9kOyV7aiI6KSSKJJkUfew26mdlQCcdhliE
-         Pulw==
-X-Gm-Message-State: AOAM533mF+EP3jbWqHhpN1Yq8RXpb1uueV2e1/g8msYg/9vhj/C0RoBM
-        eVTBNEqq2+51wzkrnBRg9us1V7rWP4se5E7l33LFg0K/bOBiv9QA45n/JNPnwyNXAiFoOb/s+fV
-        aTdqBpzxdGsx9AGxuNkq3egFztE+oViDNpaRa8sbAP4TJUUGxvDnJaq/VqN52FQ==
-X-Received: by 2002:a37:a907:: with SMTP id s7mr4426112qke.247.1627682697695;
-        Fri, 30 Jul 2021 15:04:57 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJy2VCrDGvftm5L4TvkacltSQIYM1l6sE/2yJgSmuDyiEDf3IhZDUxwILuRPsvD5f5MfbbEaXg==
-X-Received: by 2002:a37:a907:: with SMTP id s7mr4426079qke.247.1627682697338;
-        Fri, 30 Jul 2021 15:04:57 -0700 (PDT)
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=j/8ZgOgV9FABxcwPWKwd6pFZTEbb8PsS8jPvc0Wk6tg=;
+        b=XcBvDpMuKjNTOKGgzbVMN07Q5nn9JW0NQm5YOk9TQ7NQaDybsBQizBFnvXX5vTXkCi
+         XU7toaQQqYIAXGex/0wj3De96RB3aElNgzqHGF74xkB7/C0055ZtoyXtoCg+WOKNgopb
+         I7G175kszViIssQGxq5SN/tmz0rGyy6TMD+M3fY/Eai4dIEJad3qpjslVZ3BO2g5jEv+
+         2Rb8FL2XSVRE3aUnIkp4+pJRCglAI1Va6GF6hKbhCPlRMHpIUWLYwcRDM73uMC3W1XUV
+         Zrhpp01LPEGNTUtJMIpZnqXYWMFMeNYRo2S7wq8Sj/emUU0EE8diR4tyNy4eCLTbbVDz
+         FH5g==
+X-Gm-Message-State: AOAM530XHdkHNJFJI2XrIG2hanpj78dAeLKMY73QOZYJ6fNMy1IOyOyL
+        YQMeA9M8OeiGPKYjtmN/OkTnjeiBYMLuFJrSoi048lYIpR4onA9VdnTgoSCVXlLkbWiaFZXmEL2
+        kSoSQXcGf+GKYbEAVZtYbgKy3zePMEDbqpUZb/Tt8rSRv5JfF85d1SWAuguYRxg==
+X-Received: by 2002:a05:6214:d6e:: with SMTP id 14mr5095106qvs.53.1627682698999;
+        Fri, 30 Jul 2021 15:04:58 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxMTQNHX7PoV1dhRPzDF85NElhalv3f5AD26oUEYimWzW4mHcCPuq4K8RhKwVszC874lpIkBw==
+X-Received: by 2002:a05:6214:d6e:: with SMTP id 14mr5095079qvs.53.1627682698761;
+        Fri, 30 Jul 2021 15:04:58 -0700 (PDT)
 Received: from t490s.. (bras-base-toroon474qw-grc-65-184-144-111-238.dsl.bell.ca. [184.144.111.238])
-        by smtp.gmail.com with ESMTPSA id l12sm1199651qtx.45.2021.07.30.15.04.56
+        by smtp.gmail.com with ESMTPSA id l12sm1199651qtx.45.2021.07.30.15.04.57
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 30 Jul 2021 15:04:56 -0700 (PDT)
+        Fri, 30 Jul 2021 15:04:58 -0700 (PDT)
 From:   Peter Xu <peterx@redhat.com>
 To:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
 Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
         Sean Christopherson <seanjc@google.com>, peterx@redhat.com,
         Maxim Levitsky <mlevitsk@redhat.com>,
         Paolo Bonzini <pbonzini@redhat.com>
-Subject: [PATCH v3 0/7] KVM: X86: Some light optimizations on rmap logic
-Date:   Fri, 30 Jul 2021 18:04:48 -0400
-Message-Id: <20210730220455.26054-1-peterx@redhat.com>
+Subject: [PATCH v3 1/7] KVM: Allow to have arch-specific per-vm debugfs files
+Date:   Fri, 30 Jul 2021 18:04:49 -0400
+Message-Id: <20210730220455.26054-2-peterx@redhat.com>
 X-Mailer: git-send-email 2.31.1
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <20210730220455.26054-1-peterx@redhat.com>
+References: <20210730220455.26054-1-peterx@redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Major change to v3 is to address comments from Sean.=0D
-=0D
-Since I retested the two relevant patches and the numbers changed slightly,=
- I=0D
-updated the numbers in the two optimization patches to reflect that.  In th=
-e=0D
-latest measurement the 3->15 slots change showed more effect on the speedup=
-.=0D
-Summary:=0D
-=0D
-        Vanilla:      473.90 (+-5.93%)=0D
-        3->15 slots:  366.10 (+-4.94%)=0D
-        Add counter:  351.00 (+-3.70%)=0D
-=0D
-All the numbers are also updated in the commit messages.=0D
-=0D
-To apply the series upon kvm/queue, below patches should be replaced by the=
-=0D
-corresponding patches in this v3:=0D
-=0D
-        KVM: X86: MMU: Tune PTE_LIST_EXT to be bigger=0D
-        KVM: X86: Optimize pte_list_desc with per-array counter=0D
-        KVM: X86: Optimize zapping rmap=0D
-=0D
-The 1st oneliner patch needs to be replaced because the commit message is=0D
-updated with the new numbers so to align all the numbers, the 2nd-3rd patch=
-es=0D
-are for addressing Sean's comments and also with the new numbers.=0D
-=0D
-I didn't repost the initial two patches because they're already in kvm/queu=
-e=0D
-and they'll be identical in content.  Please have a look, thanks.=0D
-=0D
-v2: https://lore.kernel.org/kvm/20210625153214.43106-1-peterx@redhat.com/=0D
-v1: https://lore.kernel.org/kvm/20210624181356.10235-1-peterx@redhat.com/=0D
-=0D
--- original cover letter --=0D
-=0D
-All things started from patch 1, which introduced a new statistic to keep "=
-max=0D
-rmap entry count per vm".  At that time I was just curious about how many r=
-map=0D
-is there normally for a guest, and it surprised me a bit.=0D
-=0D
-For TDP mappings it's all fine as mostly rmap of a page is either 0 or 1=0D
-depending on faulted or not.  It turns out with EPT=3DN there seems to be a=
- huge=0D
-number of pages that can have tens or hundreds of rmap entries even for an =
-idle=0D
-guest.  Then I continued with the rest.=0D
-=0D
-To understand better on "how much of those pages", I did patch 2-6 which=0D
-introduced the idea of per-arch per-vm debugfs nodes, and added a debug fil=
-e to=0D
-do statistics for rmap, which is similar to kvm_arch_create_vcpu_debugfs() =
-but=0D
-for vm not vcpu.=0D
-=0D
-I did notice this should be the clean approach as I also see other archs=0D
-randomly create some per-vm debugfs nodes there:=0D
-=0D
----8<---=0D
-*** arch/arm64/kvm/vgic/vgic-debug.c:=0D
-vgic_debug_init[274]           debugfs_create_file("vgic-state", 0444, kvm-=
->debugfs_dentry, kvm,=0D
-=0D
-*** arch/powerpc/kvm/book3s_64_mmu_hv.c:=0D
-kvmppc_mmu_debugfs_init[2115]  debugfs_create_file("htab", 0400, kvm->arch.=
-debugfs_dir, kvm,=0D
-=0D
-*** arch/powerpc/kvm/book3s_64_mmu_radix.c:=0D
-kvmhv_radix_debugfs_init[1434] debugfs_create_file("radix", 0400, kvm->arch=
-.debugfs_dir, kvm,=0D
-=0D
-*** arch/powerpc/kvm/book3s_hv.c:=0D
-debugfs_vcpu_init[2395]        debugfs_create_file("timings", 0444, vcpu->a=
-rch.debugfs_dir, vcpu,=0D
-=0D
-*** arch/powerpc/kvm/book3s_xics.c:=0D
-xics_debugfs_init[1027]        xics->dentry =3D debugfs_create_file(name, 0=
-444, powerpc_debugfs_root,=0D
-=0D
-*** arch/powerpc/kvm/book3s_xive.c:=0D
-xive_debugfs_init[2236]        xive->dentry =3D debugfs_create_file(name, S=
-_IRUGO, powerpc_debugfs_root,=0D
-=0D
-*** arch/powerpc/kvm/timing.c:=0D
-kvmppc_create_vcpu_debugfs[214] debugfs_file =3D debugfs_create_file(dbg_fn=
-ame, 0666, kvm_debugfs_dir,=0D
----8<---=0D
-=0D
-PPC even has its own per-vm dir for that.  I think if patch 2-6 can be=0D
-considered to be accepted then the next thing to consider is to merge all t=
-hese=0D
-usages to be under the same existing per-vm dentry with their per-arch hook=
-s=0D
-introduced.=0D
-=0D
-The last 3 patches (patch 7-9) are a few optimizations of existing rmap log=
-ic.=0D
-The major test case I used is rmap_fork [1], however it's not really the id=
-eal=0D
-one to show their effect for sure as that test I wrote covers both=0D
-rmap_add/remove, while I don't have good idea on optimizing rmap_remove wit=
-hout=0D
-changing the array structure or adding much overhead (e.g. sort the array, =
-or=0D
-making a tree-like structure somehow to replace the array list).  However i=
-t=0D
-already shows some benefit with those changes, so I post them out.=0D
-=0D
-Applying patch 7-8 will bring a summary of 38% perf boost when I fork 500=0D
-childs with the test I used.  Didn't run perf test on patch 9.  More in the=
-=0D
-commit log.=0D
-=0D
-Please review, thanks.=0D
-=0D
-[1] https://github.com/xzpeter/clibs/commit/825436f825453de2ea5aaee4bdb1c92=
-281efe5b3=0D
-=0D
-Peter Xu (7):=0D
-  KVM: Allow to have arch-specific per-vm debugfs files=0D
-  KVM: X86: Introduce pte_list_count() helper=0D
-  KVM: X86: Introduce kvm_mmu_slot_lpages() helpers=0D
-  KVM: X86: Introduce mmu_rmaps_stat per-vm debugfs file=0D
-  KVM: X86: MMU: Tune PTE_LIST_EXT to be bigger=0D
-  KVM: X86: Optimize pte_list_desc with per-array counter=0D
-  KVM: X86: Optimize zapping rmap=0D
-=0D
- arch/x86/kvm/mmu/mmu.c          |  98 +++++++++++++++++-------=0D
- arch/x86/kvm/mmu/mmu_internal.h |   1 +=0D
- arch/x86/kvm/x86.c              | 130 +++++++++++++++++++++++++++++++-=0D
- include/linux/kvm_host.h        |   1 +=0D
- virt/kvm/kvm_main.c             |  20 ++++-=0D
- 5 files changed, 221 insertions(+), 29 deletions(-)=0D
-=0D
--- =0D
-2.31.1=0D
-=0D
+Allow archs to create arch-specific nodes under kvm->debugfs_dentry directory
+besides the stats fields.  The new interface kvm_arch_create_vm_debugfs() is
+defined but not yet used.  It's called after kvm->debugfs_dentry is created, so
+it can be referenced directly in kvm_arch_create_vm_debugfs().  Arch should
+define their own versions when they want to create extra debugfs nodes.
+
+Signed-off-by: Peter Xu <peterx@redhat.com>
+---
+ include/linux/kvm_host.h |  1 +
+ virt/kvm/kvm_main.c      | 20 +++++++++++++++++++-
+ 2 files changed, 20 insertions(+), 1 deletion(-)
+
+diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+index 9d6b4ad407b8..a3ec3271c4c8 100644
+--- a/include/linux/kvm_host.h
++++ b/include/linux/kvm_host.h
+@@ -1067,6 +1067,7 @@ bool kvm_arch_dy_runnable(struct kvm_vcpu *vcpu);
+ bool kvm_arch_dy_has_pending_interrupt(struct kvm_vcpu *vcpu);
+ int kvm_arch_post_init_vm(struct kvm *kvm);
+ void kvm_arch_pre_destroy_vm(struct kvm *kvm);
++int kvm_arch_create_vm_debugfs(struct kvm *kvm);
+ 
+ #ifndef __KVM_HAVE_ARCH_VM_ALLOC
+ /*
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index a96cbe24c688..327f8fae80a5 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -915,7 +915,7 @@ static int kvm_create_vm_debugfs(struct kvm *kvm, int fd)
+ 	char dir_name[ITOA_MAX_LEN * 2];
+ 	struct kvm_stat_data *stat_data;
+ 	const struct _kvm_stats_desc *pdesc;
+-	int i;
++	int i, ret;
+ 	int kvm_debugfs_num_entries = kvm_vm_stats_header.num_desc +
+ 				      kvm_vcpu_stats_header.num_desc;
+ 
+@@ -960,6 +960,13 @@ static int kvm_create_vm_debugfs(struct kvm *kvm, int fd)
+ 				    kvm->debugfs_dentry, stat_data,
+ 				    &stat_fops_per_vm);
+ 	}
++
++	ret = kvm_arch_create_vm_debugfs(kvm);
++	if (ret) {
++		kvm_destroy_vm_debugfs(kvm);
++		return i;
++	}
++
+ 	return 0;
+ }
+ 
+@@ -980,6 +987,17 @@ void __weak kvm_arch_pre_destroy_vm(struct kvm *kvm)
+ {
+ }
+ 
++/*
++ * Called after per-vm debugfs created.  When called kvm->debugfs_dentry should
++ * be setup already, so we can create arch-specific debugfs entries under it.
++ * Cleanup should be automatic done in kvm_destroy_vm_debugfs() recursively, so
++ * a per-arch destroy interface is not needed.
++ */
++int __weak kvm_arch_create_vm_debugfs(struct kvm *kvm)
++{
++	return 0;
++}
++
+ static struct kvm *kvm_create_vm(unsigned long type)
+ {
+ 	struct kvm *kvm = kvm_arch_alloc_vm();
+-- 
+2.31.1
 
