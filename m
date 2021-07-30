@@ -2,115 +2,116 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9C9133DBD66
-	for <lists+kvm@lfdr.de>; Fri, 30 Jul 2021 18:56:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 66B9F3DBDBB
+	for <lists+kvm@lfdr.de>; Fri, 30 Jul 2021 19:31:58 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229834AbhG3Q46 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 30 Jul 2021 12:56:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52210 "EHLO
+        id S230200AbhG3RcC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 30 Jul 2021 13:32:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33152 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229707AbhG3Q45 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 30 Jul 2021 12:56:57 -0400
-Received: from mail-pj1-x1029.google.com (mail-pj1-x1029.google.com [IPv6:2607:f8b0:4864:20::1029])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AE5BFC061765
-        for <kvm@vger.kernel.org>; Fri, 30 Jul 2021 09:56:52 -0700 (PDT)
-Received: by mail-pj1-x1029.google.com with SMTP id ca5so16053695pjb.5
-        for <kvm@vger.kernel.org>; Fri, 30 Jul 2021 09:56:52 -0700 (PDT)
+        with ESMTP id S229958AbhG3RcB (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 30 Jul 2021 13:32:01 -0400
+Received: from mail-lf1-x12c.google.com (mail-lf1-x12c.google.com [IPv6:2a00:1450:4864:20::12c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2FBB6C06175F
+        for <kvm@vger.kernel.org>; Fri, 30 Jul 2021 10:31:56 -0700 (PDT)
+Received: by mail-lf1-x12c.google.com with SMTP id a26so19275201lfr.11
+        for <kvm@vger.kernel.org>; Fri, 30 Jul 2021 10:31:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=NHmczmIzJufSB3Li/LucyxkDOJfl+luasFO2GMfh3i8=;
-        b=EwcggOYo/KbZsqbv7CnLQji1AaGLnOh5sUY2NEpMi13aXZro2JK54VQT6EA0LGqEhp
-         1dUrc+sHK5QUBLJMqWCOkVhRORDMasbGc+TOD24B7tNkfpzuGSMo8PWaKmEy1U7xtHUx
-         q2Tra7+g6UGs9nC/2zTwsRW3ZjjJMQUqLUuu86eJdfpsqEdwAhNF1wbUviE7h7v3e4No
-         ZhEeZbFW48Wecy/exed5zVehY2v7yXNhQFiz7UAWuLehu8RXOsgutb5gJvvx4xh51f0m
-         ch4nma24ljAdFeNIidkVIV4YCjh9zTv7Sz9NEIs3gib/XxkJ9DakVPEgZNpUgkRMS3f3
-         pmpQ==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=rEJcSA2IPmkKQsknzGUJ8uAmtRXAnobazZDES9OmPiA=;
+        b=OE80SPuMPEE4aXxV1WMPQTqeE5Rm3NfvJCTCtili64uWEiQTjXetpimt52x2lbWZF9
+         2/BhKaoWhyNbsYamg0BVOQeI6zSVza/2Vv3n3IMFvAH7VG2AqnkloWhQKoWUkpxyqmak
+         1s3k4eHzssGFvVe9cDSkkibagLs5Y/M4Z4ila9FcfZMv93lwR6zX7YGJzA6XQ4wCvmQC
+         qpx/ppC9Kw37hIQsWENokFxypK83NY84ZCriz2+zV673drp0CAZCqAN6zzqntJ64V0k+
+         99wQiepzXVnPyl1YoNf1cZNCtd5dm2BkxbWffMhCqnfdtsphUb2RX5ayxsiPPo3N4qbn
+         vO2g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=NHmczmIzJufSB3Li/LucyxkDOJfl+luasFO2GMfh3i8=;
-        b=CFc3j6ezUrpjSyseJtr7ele92S+zoHndWRbpw698a1g+7G9aUB7Re6e/Gx8cVi18K1
-         mxjEaIxiFUl/j4tS3+ssLPzJ/z+p5qz5fKOd/u4G/urUkVY+xkTvtXDP84a/3w9kuBZA
-         PzJWe2EanHED4bNoeKyVwHVLkU4KEhRjzxQWVf5xt0NXnmNedJFgrnI123QzKTGuYQjJ
-         dJJnkUWRNa+sdVxxIsYQbSCXFEtRSBRqeMb6YzA2P56ez3nM21X5eyWbrjmCMohvSla4
-         5kL7Jcx1zKCBCVVSFqm+oXN2asJ236cO843wqSMqAKb4uzyL3drrGzcs6hajKLInyWve
-         cXRA==
-X-Gm-Message-State: AOAM530WKIr5Qi63QAhYfiojGXlJtG3ZXl0tdTj3lzYBIjUHVqI7qwOJ
-        z6/Snnd17wtTr6sGgkzRi7BYkw==
-X-Google-Smtp-Source: ABdhPJzWI6FoTcaZNj62M9u9nn73qB7KjElQlQVRB3Sn9a2CCf11QZlLRjOgsi/YapsBA2ELYgUCvw==
-X-Received: by 2002:a63:4e11:: with SMTP id c17mr3123982pgb.54.1627664212050;
-        Fri, 30 Jul 2021 09:56:52 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id f3sm2904882pfe.123.2021.07.30.09.56.51
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 30 Jul 2021 09:56:51 -0700 (PDT)
-Date:   Fri, 30 Jul 2021 16:56:47 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Oliver Upton <oupton@google.com>
-Cc:     Marc Zyngier <maz@kernel.org>, kvmarm@lists.cs.columbia.edu,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        James Morse <james.morse@arm.com>,
-        Alexandru Elisei <Alexandru.Elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Will Deacon <will@kernel.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Andy Lutomirski <luto@kernel.org>,
-        linux-arm-kernel@lists.infradead.org,
-        Peter Shier <pshier@google.com>,
-        Shakeel Butt <shakeelb@google.com>,
-        Guangyu Shi <guangyus@google.com>
-Subject: Re: [PATCH v2 3/3] KVM: arm64: Use generic KVM xfer to guest work
- function
-Message-ID: <YQQvT7vAnRrcAcx/@google.com>
-References: <20210729220916.1672875-1-oupton@google.com>
- <20210729220916.1672875-4-oupton@google.com>
- <878s1o2l6j.wl-maz@kernel.org>
- <CAOQ_QsjFzdjYgYSxNLH=8O84FJB+O8KtH0VnzdQ9HnLZwxwpNQ@mail.gmail.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=rEJcSA2IPmkKQsknzGUJ8uAmtRXAnobazZDES9OmPiA=;
+        b=EVycEBAyAUxOEy/TERa6+5icd6lyuPXSLjoYI6E4lDaswHVUAzO42b7ahphHRU6EQ3
+         CjwMEULLdcW6Kb5zddun1MUILwbuMk6nYF6epLmd5pjTYiTlhGHr7sDR1f0wWe2ZHWDL
+         H+b4ja3DRhjqg6JQjpk8U+/7cX25AMIa+eSB+k8gGVr0r+QGtnoASff/U8MJ+aCq8VYO
+         xgc2qrDI3Hs1Y29zjdcfspz7swgLXyPYQ94VnXA3+naeGtGcfY8t0aXuboIaoVH0+JNZ
+         uZYwtarokaBM9VidX5tUQhy5CJVNB0N0QdLPvWl1Eob/FEpP5/rRkO8BIbF21DTEHLfb
+         eQPQ==
+X-Gm-Message-State: AOAM533DTa6XQKn/JzSkWXHTpspDiVErCkJLC0UCQfaDquP1KhFozdpP
+        cgSAKDgNAjpXlKuiPNM5WHVJTbqpQftKv8PyCUo6xg==
+X-Google-Smtp-Source: ABdhPJwRt+6HcpUERxYL8Y78SiRl5pkHNGZ1Dy1A0OCkaOZixlY5EVKSv/L45tBArORrhkErfgibLipSkZhfvjfM0J8=
+X-Received: by 2002:a05:6512:218e:: with SMTP id b14mr2603583lft.178.1627666314257;
+ Fri, 30 Jul 2021 10:31:54 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAOQ_QsjFzdjYgYSxNLH=8O84FJB+O8KtH0VnzdQ9HnLZwxwpNQ@mail.gmail.com>
+References: <20210706180350.2838127-1-jingzhangos@google.com>
+ <20210706180350.2838127-2-jingzhangos@google.com> <8b6f442e-c8bd-d175-471e-6e28b4548c3e@redhat.com>
+In-Reply-To: <8b6f442e-c8bd-d175-471e-6e28b4548c3e@redhat.com>
+From:   Jing Zhang <jingzhangos@google.com>
+Date:   Fri, 30 Jul 2021 10:31:43 -0700
+Message-ID: <CAAdAUtiC9D=LkZTFDNMUfPXFGAbVvdEvXWAJSznZYA_T7KB8_A@mail.gmail.com>
+Subject: Re: [PATCH v1 1/4] KVM: stats: Support linear and logarithmic
+ histogram statistics
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     KVM <kvm@vger.kernel.org>, KVMPPC <kvm-ppc@vger.kernel.org>,
+        Sean Christopherson <seanjc@google.com>,
+        Jim Mattson <jmattson@google.com>,
+        Peter Shier <pshier@google.com>,
+        Oliver Upton <oupton@google.com>,
+        David Rientjes <rientjes@google.com>,
+        David Matlack <dmatlack@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Jul 30, 2021, Oliver Upton wrote:
-> 
-> On Fri, Jul 30, 2021 at 2:41 AM Marc Zyngier <maz@kernel.org> wrote:
+On Wed, Jul 28, 2021 at 5:39 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
+>
+> On 06/07/21 20:03, Jing Zhang wrote:
+> > +#define LINHIST_SIZE_SMALL           10
+> > +#define LINHIST_SIZE_MEDIUM          20
+> > +#define LINHIST_SIZE_LARGE           50
+> > +#define LINHIST_SIZE_XLARGE          100
+> > +#define LINHIST_BUCKET_SIZE_SMALL    10
+> > +#define LINHIST_BUCKET_SIZE_MEDIUM   100
+> > +#define LINHIST_BUCKET_SIZE_LARGE    1000
+> > +#define LINHIST_BUCKET_SIZE_XLARGE   10000
+> > +
+> > +#define LOGHIST_SIZE_SMALL           8
+> > +#define LOGHIST_SIZE_MEDIUM          16
+> > +#define LOGHIST_SIZE_LARGE           32
+> > +#define LOGHIST_SIZE_XLARGE          64
+> > +#define LOGHIST_BASE_2                       2
+>
+> I'd prefer inlining all of these.  For log histograms use 2 directly in
+> STATS_DESC_LOG_HIST, since the update function below uses fls64.
+>
+Sure, will inline these values.
+Will remove the loghist base, since base 2 log is enough for any
+number. No other base is needed.
 > >
-> > On Thu, 29 Jul 2021 23:09:16 +0100, Oliver Upton <oupton@google.com> wrote:
-> > > @@ -714,6 +715,13 @@ static bool vcpu_mode_is_bad_32bit(struct kvm_vcpu *vcpu)
-> > >               static_branch_unlikely(&arm64_mismatched_32bit_el0);
-> > >  }
-> > >
-> > > +static bool kvm_vcpu_exit_request(struct kvm_vcpu *vcpu)
-> > > +{
-> > > +     return kvm_request_pending(vcpu) ||
-> > > +                     need_new_vmid_gen(&vcpu->arch.hw_mmu->vmid) ||
-> > > +                     xfer_to_guest_mode_work_pending();
-> >
-> > Here's what xfer_to_guest_mode_work_pending() says:
-> >
-> > <quote>
-> >  * Has to be invoked with interrupts disabled before the transition to
-> >  * guest mode.
-> > </quote>
-> >
-> > At the point where you call this, we already are in guest mode, at
-> > least in the KVM sense.
-> 
-> I believe the comment is suggestive of guest mode in the hardware
-> sense, not KVM's vcpu->mode designation. I got this from
-> arch/x86/kvm/x86.c:vcpu_enter_guest() to infer the author's
-> intentions.
+> > + */
+> > +void kvm_stats_linear_hist_update(u64 *data, size_t size,
+> > +                               u64 value, size_t bucket_size)
+> > +{
+> > +     size_t index = value / bucket_size;
+> > +
+> > +     if (index >= size)
+> > +             index = size - 1;
+> > +     ++data[index];
+> > +}
+> > +
+>
+> Please make this function always inline, so that the compiler optimizes
+> the division.
+Sure.
+>
+> Also please use array_index_nospec to clamp the index to the size, in
+> case value comes from a memory access as well.  Likewise for
+> kvm_stats_log_hist_update.
+Thanks. Will do.
+>
+> Paolo
+>
 
-Yeah, the comment is referring to hardware guest mode.  The intent is to verify
-there is no work to be done before making the expensive world switch.  There's
-no meaningful interaction with vcpu->mode, on x86 it's simply more convenient
-from a code perspective to throw it into kvm_vcpu_exit_request().
+Jing
