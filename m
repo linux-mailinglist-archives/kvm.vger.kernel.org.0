@@ -2,178 +2,92 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id BF3963DB88F
-	for <lists+kvm@lfdr.de>; Fri, 30 Jul 2021 14:26:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C0FCC3DB892
+	for <lists+kvm@lfdr.de>; Fri, 30 Jul 2021 14:27:06 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238822AbhG3M0y (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 30 Jul 2021 08:26:54 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:50143 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S238838AbhG3M0w (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 30 Jul 2021 08:26:52 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1627648007;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=FMYzHnNd772jovT/0UPowsD8iExQ4yvLWYcwXjSPrGo=;
-        b=H4yHErLgahtOJLUyi4vnxXGvBgtfpu5b8r/seHOzdAnRqQ26iPEBdLIDyPS7iYw70x3o2p
-        yl8EsRqLP4rqF7XSk6RCoaKOwV/rSn60bwrcOXfDF7rvbvlALjM0YFTdKDHipJf2lLetYV
-        J3jmSO/IWd01NrosVTcSxdsfLh/HzqY=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-471-tG266UC4NRmq0h1QijsrGg-1; Fri, 30 Jul 2021 08:26:46 -0400
-X-MC-Unique: tG266UC4NRmq0h1QijsrGg-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A8B2810066E6;
-        Fri, 30 Jul 2021 12:26:44 +0000 (UTC)
-Received: from vitty.brq.redhat.com (unknown [10.40.194.154])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 9787718C7A;
-        Fri, 30 Jul 2021 12:26:42 +0000 (UTC)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Siddharth Chandrasekaran <sidcha@amazon.de>,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH 4/4] KVM: selftests: Test access to XMM fast hypercalls
-Date:   Fri, 30 Jul 2021 14:26:25 +0200
-Message-Id: <20210730122625.112848-5-vkuznets@redhat.com>
-In-Reply-To: <20210730122625.112848-1-vkuznets@redhat.com>
-References: <20210730122625.112848-1-vkuznets@redhat.com>
+        id S238824AbhG3M1J (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 30 Jul 2021 08:27:09 -0400
+Received: from mail.kernel.org ([198.145.29.99]:52778 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S238736AbhG3M1J (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 30 Jul 2021 08:27:09 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 4B1F66103B;
+        Fri, 30 Jul 2021 12:27:02 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1627648024;
+        bh=wT4Jmfp7K7e7610QIG6UJIKHHYTDycOajWViNs/FQzc=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=qOvuP+PZHGEQ6QFN9P+8FzxInej00GZmWtK4vwy+MZHMp1WOGMrViCMD0C4E/22gb
+         MLo9g0h9j0QBO24ETL9yVk+AyNhZxKNKXxTWahTA5VCPHB65mgTEuHclGoqvxNecn5
+         35Rpc2I2tuELdVK3Zmf8w431pR7IeEuLHZVO1yZ2sGEVlACBETPeYaXCT47Gy4u1ca
+         do/tEe5NT7emIko7C5viwa0FRQ9Lo27DJljdYaZCHS8xYb0RglMeBNuIdFY302g55t
+         llilOsUMxh7gMxsM5V2437OQA72tkzPS28rHXsx8u+qJ0OcWkMXN/UpQzpy19blt9G
+         Wl4B6Bo4b/VRw==
+Date:   Fri, 30 Jul 2021 13:26:59 +0100
+From:   Will Deacon <will@kernel.org>
+To:     Marc Zyngier <maz@kernel.org>
+Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        qperret@google.com, dbrazdil@google.com,
+        Srivatsa Vaddagiri <vatsa@codeaurora.org>,
+        Shanker R Donthineni <sdonthineni@nvidia.com>,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        kernel-team@android.com
+Subject: Re: [PATCH 04/16] KVM: arm64: Add MMIO checking infrastructure
+Message-ID: <20210730122658.GG23589@willie-the-truck>
+References: <20210715163159.1480168-1-maz@kernel.org>
+ <20210715163159.1480168-5-maz@kernel.org>
+ <20210727181107.GC19173@willie-the-truck>
+ <8735ryep6d.wl-maz@kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <8735ryep6d.wl-maz@kernel.org>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-HYPERV_CPUID_FEATURES.EDX and an 'XMM fast' hypercall is issued.
+On Wed, Jul 28, 2021 at 10:57:30AM +0100, Marc Zyngier wrote:
+> On Tue, 27 Jul 2021 19:11:08 +0100,
+> Will Deacon <will@kernel.org> wrote:
+> > On Thu, Jul 15, 2021 at 05:31:47PM +0100, Marc Zyngier wrote:
+> > > +bool kvm_install_ioguard_page(struct kvm_vcpu *vcpu, gpa_t ipa)
+> > > +{
+> > > +	struct kvm_mmu_memory_cache *memcache;
+> > > +	struct kvm_memory_slot *memslot;
+> > > +	int ret, idx;
+> > > +
+> > > +	if (!test_bit(KVM_ARCH_FLAG_MMIO_GUARD, &vcpu->kvm->arch.flags))
+> > > +		return false;
+> > > +
+> > > +	/* Must be page-aligned */
+> > > +	if (ipa & ~PAGE_MASK)
+> > > +		return false;
+> > > +
+> > > +	/*
+> > > +	 * The page cannot be in a memslot. At some point, this will
+> > > +	 * have to deal with device mappings though.
+> > > +	 */
+> > > +	idx = srcu_read_lock(&vcpu->kvm->srcu);
+> > > +	memslot = gfn_to_memslot(vcpu->kvm, ipa >> PAGE_SHIFT);
+> > > +	srcu_read_unlock(&vcpu->kvm->srcu, idx);
+> > 
+> > What does this memslot check achieve? A new memslot could be added after
+> > you've checked, no?
+> 
+> If you start allowing S2 annotations to coexist with potential memory
+> mappings, you're in for trouble. The faulting logic will happily
+> overwrite the annotation, and that's probably not what you want.
 
-Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
----
- .../selftests/kvm/include/x86_64/hyperv.h     |  5 ++-
- .../selftests/kvm/x86_64/hyperv_features.c    | 41 +++++++++++++++++--
- 2 files changed, 42 insertions(+), 4 deletions(-)
+I don't disagree, but the check above appears to be racy.
 
-diff --git a/tools/testing/selftests/kvm/include/x86_64/hyperv.h b/tools/testing/selftests/kvm/include/x86_64/hyperv.h
-index 412eaee7884a..b66910702c0a 100644
---- a/tools/testing/selftests/kvm/include/x86_64/hyperv.h
-+++ b/tools/testing/selftests/kvm/include/x86_64/hyperv.h
-@@ -117,7 +117,7 @@
- #define HV_X64_GUEST_DEBUGGING_AVAILABLE		BIT(1)
- #define HV_X64_PERF_MONITOR_AVAILABLE			BIT(2)
- #define HV_X64_CPU_DYNAMIC_PARTITIONING_AVAILABLE	BIT(3)
--#define HV_X64_HYPERCALL_PARAMS_XMM_AVAILABLE		BIT(4)
-+#define HV_X64_HYPERCALL_XMM_INPUT_AVAILABLE		BIT(4)
- #define HV_X64_GUEST_IDLE_STATE_AVAILABLE		BIT(5)
- #define HV_FEATURE_FREQUENCY_MSRS_AVAILABLE		BIT(8)
- #define HV_FEATURE_GUEST_CRASH_MSR_AVAILABLE		BIT(10)
-@@ -182,4 +182,7 @@
- #define HV_STATUS_INVALID_CONNECTION_ID		18
- #define HV_STATUS_INSUFFICIENT_BUFFERS		19
- 
-+/* hypercall options */
-+#define HV_HYPERCALL_FAST_BIT		BIT(16)
-+
- #endif /* !SELFTEST_KVM_HYPERV_H */
-diff --git a/tools/testing/selftests/kvm/x86_64/hyperv_features.c b/tools/testing/selftests/kvm/x86_64/hyperv_features.c
-index af27c7e829c1..91d88aaa9899 100644
---- a/tools/testing/selftests/kvm/x86_64/hyperv_features.c
-+++ b/tools/testing/selftests/kvm/x86_64/hyperv_features.c
-@@ -47,6 +47,7 @@ static void do_wrmsr(u32 idx, u64 val)
- }
- 
- static int nr_gp;
-+static int nr_ud;
- 
- static inline u64 hypercall(u64 control, vm_vaddr_t input_address,
- 			    vm_vaddr_t output_address)
-@@ -80,6 +81,12 @@ static void guest_gp_handler(struct ex_regs *regs)
- 		regs->rip = (uint64_t)&wrmsr_end;
- }
- 
-+static void guest_ud_handler(struct ex_regs *regs)
-+{
-+	nr_ud++;
-+	regs->rip += 3;
-+}
-+
- struct msr_data {
- 	uint32_t idx;
- 	bool available;
-@@ -90,6 +97,7 @@ struct msr_data {
- struct hcall_data {
- 	uint64_t control;
- 	uint64_t expect;
-+	bool ud_expected;
- };
- 
- static void guest_msr(struct msr_data *msr)
-@@ -117,13 +125,26 @@ static void guest_msr(struct msr_data *msr)
- static void guest_hcall(vm_vaddr_t pgs_gpa, struct hcall_data *hcall)
- {
- 	int i = 0;
-+	u64 res, input, output;
- 
- 	wrmsr(HV_X64_MSR_GUEST_OS_ID, LINUX_OS_ID);
- 	wrmsr(HV_X64_MSR_HYPERCALL, pgs_gpa);
- 
- 	while (hcall->control) {
--		GUEST_ASSERT(hypercall(hcall->control, pgs_gpa,
--				       pgs_gpa + 4096) == hcall->expect);
-+		nr_ud = 0;
-+		if (!(hcall->control & HV_HYPERCALL_FAST_BIT)) {
-+			input = pgs_gpa;
-+			output = pgs_gpa + 4096;
-+		} else {
-+			input = output = 0;
-+		}
-+
-+		res = hypercall(hcall->control, input, output);
-+		if (hcall->ud_expected)
-+			GUEST_ASSERT(nr_ud == 1);
-+		else
-+			GUEST_ASSERT(res == hcall->expect);
-+
- 		GUEST_SYNC(i++);
- 	}
- 
-@@ -552,8 +573,18 @@ static void guest_test_hcalls_access(struct kvm_vm *vm, struct hcall_data *hcall
- 			recomm.ebx = 0xfff;
- 			hcall->expect = HV_STATUS_SUCCESS;
- 			break;
--
- 		case 17:
-+			/* XMM fast hypercall */
-+			hcall->control = HVCALL_FLUSH_VIRTUAL_ADDRESS_SPACE | HV_HYPERCALL_FAST_BIT;
-+			hcall->ud_expected = true;
-+			break;
-+		case 18:
-+			feat.edx |= HV_X64_HYPERCALL_XMM_INPUT_AVAILABLE;
-+			hcall->ud_expected = false;
-+			hcall->expect = HV_STATUS_SUCCESS;
-+			break;
-+
-+		case 19:
- 			/* END */
- 			hcall->control = 0;
- 			break;
-@@ -625,6 +656,10 @@ int main(void)
- 	/* Test hypercalls */
- 	vm = vm_create_default(VCPU_ID, 0, guest_hcall);
- 
-+	vm_init_descriptor_tables(vm);
-+	vcpu_init_descriptor_tables(vm, VCPU_ID);
-+	vm_install_exception_handler(vm, UD_VECTOR, guest_ud_handler);
-+
- 	/* Hypercall input/output */
- 	hcall_page = vm_vaddr_alloc_pages(vm, 2);
- 	memset(addr_gva2hva(vm, hcall_page), 0x0, 2 * getpagesize());
--- 
-2.31.1
+> As for new (or moving) memslots, I guess they should be checked
+> against existing annotations.
 
+Something like that, but the devil is in the details as it will need to
+synchronize with this check somehow.
+
+Will
