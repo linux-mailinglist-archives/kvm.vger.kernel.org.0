@@ -2,108 +2,102 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 50D283DB147
-	for <lists+kvm@lfdr.de>; Fri, 30 Jul 2021 04:42:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9B50F3DB1DB
+	for <lists+kvm@lfdr.de>; Fri, 30 Jul 2021 05:16:15 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235940AbhG3CnA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 29 Jul 2021 22:43:00 -0400
-Received: from mga03.intel.com ([134.134.136.65]:6380 "EHLO mga03.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S230200AbhG3Cm6 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 29 Jul 2021 22:42:58 -0400
-X-IronPort-AV: E=McAfee;i="6200,9189,10060"; a="213049330"
-X-IronPort-AV: E=Sophos;i="5.84,280,1620716400"; 
-   d="scan'208";a="213049330"
-Received: from fmsmga003.fm.intel.com ([10.253.24.29])
-  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Jul 2021 19:42:54 -0700
-X-IronPort-AV: E=Sophos;i="5.84,280,1620716400"; 
-   d="scan'208";a="507676005"
-Received: from bingdeng-mobl.ccr.corp.intel.com (HELO localhost) ([10.249.174.25])
-  by fmsmga003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Jul 2021 19:42:52 -0700
-Date:   Fri, 30 Jul 2021 10:42:51 +0800
-From:   Yu Zhang <yu.c.zhang@linux.intel.com>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Ben Gardon <bgardon@google.com>, kvm@vger.kernel.org
-Subject: Re: A question of TDP unloading.
-Message-ID: <20210730024251.fpd2vtbkmdnooq6s@linux.intel.com>
-References: <20210727161957.lxevvmy37azm2h7z@linux.intel.com>
- <YQBLZ/RrBFxE4G4w@google.com>
- <20210728065605.e4ql2hzrj5fkngux@linux.intel.com>
- <YQGj8gj7fpWDdLg5@google.com>
- <20210729032200.qqb4mlctgplzq6bb@linux.intel.com>
- <YQMX+Cvo8GKCo3Zt@google.com>
+        id S234737AbhG3DQS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 29 Jul 2021 23:16:18 -0400
+Received: from szxga03-in.huawei.com ([45.249.212.189]:12333 "EHLO
+        szxga03-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229971AbhG3DQO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 29 Jul 2021 23:16:14 -0400
+Received: from dggemv703-chm.china.huawei.com (unknown [172.30.72.54])
+        by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4GbXVN0SRnz7ylK;
+        Fri, 30 Jul 2021 11:11:24 +0800 (CST)
+Received: from dggpeml500013.china.huawei.com (7.185.36.41) by
+ dggemv703-chm.china.huawei.com (10.3.19.46) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2176.2; Fri, 30 Jul 2021 11:16:09 +0800
+Received: from [10.174.187.161] (10.174.187.161) by
+ dggpeml500013.china.huawei.com (7.185.36.41) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256) id
+ 15.1.2176.2; Fri, 30 Jul 2021 11:16:08 +0800
+Subject: Re: [PATCH v14 00/11] KVM: x86/pmu: Guest Last Branch Recording
+ Enabling
+To:     <like.xu.linux@gmail.com>, <alex.shi@linux.alibaba.com>,
+        <like.xu.linux@gmail.com>
+References: <20210201051039.255478-1-like.xu@linux.intel.com>
+ <6102A1A5.90901@huawei.com>
+CC:     <ak@linux.intel.com>, <jmattson@google.com>, <joro@8bytes.org>,
+        <kan.liang@intel.com>, <kvm@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <pbonzini@redhat.com>,
+        <seanjc@google.com>, <vkuznets@redhat.com>,
+        <wanpengli@tencent.com>, <wei.w.wang@intel.com>, <x86@kernel.org>,
+        "Fangyi (Eric)" <eric.fangyi@huawei.com>,
+        Xiexiangyou <xiexiangyou@huawei.com>
+From:   Liuxiangdong <liuxiangdong5@huawei.com>
+Message-ID: <61036EEC.4020006@huawei.com>
+Date:   Fri, 30 Jul 2021 11:15:56 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:38.0) Gecko/20100101
+ Thunderbird/38.1.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <YQMX+Cvo8GKCo3Zt@google.com>
-User-Agent: NeoMutt/20171215
+In-Reply-To: <6102A1A5.90901@huawei.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.174.187.161]
+X-ClientProxiedBy: dggeme720-chm.china.huawei.com (10.1.199.116) To
+ dggpeml500013.china.huawei.com (7.185.36.41)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jul 29, 2021 at 09:04:56PM +0000, Sean Christopherson wrote:
-> On Thu, Jul 29, 2021, Yu Zhang wrote:
-> > On Wed, Jul 28, 2021 at 06:37:38PM +0000, Sean Christopherson wrote:
-> > > On Wed, Jul 28, 2021, Yu Zhang wrote:
-> > In the caller, force_tdp_unload was set to false for CR0/CR4/EFER changes. For SMM and
-> > cpuid updates, it is set to true.
-> > 
-> > With this change, I can successfully boot a VM(and of course, number of unloadings is
-> > greatly reduced). But access test case in kvm-unit-test hangs, after CR4.SMEP is flipped.
-> > I'm trying to figure out why...
-> 
-> Hrm, I'll look into when I get around to making this into a proper patch.
-> 
-> Note, there's at least once bug, as is_root_usable() will compare the full role
-> against a root shadow page's modified role.  A common helper to derive the page
-> role for a direct/TDP page from an existing mmu_role is likely the way to go, as
-> kvm_tdp_mmu_get_vcpu_root_hpa() would want the same functionality.
+Hi, like.
 
-So, if we know there are some bits meaningless in SP, could we use a 
-ignored_mask, each time we try to compare the full role.word? This may
-be also needed in kvm_mmu_get_page().
+Does it have requirement on CPU if we want to use LBR in Guest?
 
-> 
-> > > I'll put this on my todo list, I've been looking for an excuse to update the
-> > > cr0/cr4/efer flows anyways :-).  If it works, the changes should be relatively
-> > > minor, if it works...
-> > > 
-> > > diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> > > index a8cdfd8d45c4..700664fe163e 100644
-> > > --- a/arch/x86/kvm/mmu/mmu.c
-> > > +++ b/arch/x86/kvm/mmu/mmu.c
-> > > @@ -2077,8 +2077,20 @@ static struct kvm_mmu_page *kvm_mmu_get_page(struct kvm_vcpu *vcpu,
-> > >         role = vcpu->arch.mmu->mmu_role.base;
-> > >         role.level = level;
-> > >         role.direct = direct;
-> > > -       if (role.direct)
-> > > +       if (role.direct) {
-> > >                 role.gpte_is_8_bytes = true;
-> > > +
-> > > +               /*
-> > > +                * Guest PTE permissions do not impact SPTE permissions for
-> > > +                * direct MMUs.  Either there are no guest PTEs (CR0.PG=0) or
-> > > +                * guest PTE permissions are enforced by the CPU (TDP enabled).
-> > > +                */
-> > > +               WARN_ON_ONCE(access != ACC_ALL);
-> > > +               role.efer_nx = 0;
-> > > +               role.cr0_wp = 0;
-> > > +               role.smep_andnot_wp = 0;
-> > > +               role.smap_andnot_wp = 0;
-> > > +       }
-> > 
-> > How about we do this in kvm_calc_mmu_role_common()? :-)
-> 
-> No, because the role in struct kvm_mmu does need the correct bits, even for TDP,
-> as the role is used to detect whether or not the context needs to be re-initialized,
-> e.g. it would get a false negative on a cr0_wp change, not go through
-> update_permission_bitmask(), and use the wrong page permissions when walking the
-> guest page tables.
+I have tried linux-5.14-rc3 on different CPUs. And I can use lbr on 
+Haswell, Broadwell, skylake and icelake, but I cannot use lbr on IvyBridge.
 
-Oh yes. Regardless of what flags really matter in a SP, all of them are useful for mmu
-context. Thanks for correcting me.
+Thanks!
 
-B.R.
-Yu
+
+On 2021/7/29 20:40, Liuxiangdong wrote:
+> Hi, like.
+>
+> This patch set has been merged in 5.12 kernel tree so we can use LBR 
+> in Guest.
+> Does it have requirement on CPU?
+> I can use lbr in guest on skylake and icelake, but cannot on IvyBridge.
+>
+> I can see lbr formats(000011b) in perf_capabilities msr(0x345), but 
+> there is still
+> error when I try.
+>
+> $ perf record -b
+> Error:
+> cycles: PMU Hardware doesn't support sampling/overflow-interrupts. Try 
+> 'perf stat'
+>
+> Host CPU:
+> Architecture:                    x86_64
+> CPU op-mode(s):                  32-bit, 64-bit
+> Byte Order:                      Little Endian
+> Address sizes:                   46 bits physical, 48 bits virtual
+> CPU(s):                          24
+> On-line CPU(s) list:             0-23
+> Thread(s) per core:              2
+> Core(s) per socket:              6
+> Socket(s):                       2
+> NUMA node(s):                    2
+> Vendor ID:                       GenuineIntel
+> CPU family:                      6
+> Model:                           62
+> Model name:                      Intel(R) Xeon(R) CPU E5-2620 v2 @ 
+> 2.10GHz
+> Stepping:                        4
+>
+>
+> Thanks!
+> Xiangdong Liu
 
