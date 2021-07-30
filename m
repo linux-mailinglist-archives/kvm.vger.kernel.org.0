@@ -2,86 +2,82 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A5E403DBDC3
-	for <lists+kvm@lfdr.de>; Fri, 30 Jul 2021 19:32:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2FF8B3DBDCD
+	for <lists+kvm@lfdr.de>; Fri, 30 Jul 2021 19:34:16 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230236AbhG3RdD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 30 Jul 2021 13:33:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33460 "EHLO
+        id S229921AbhG3ReT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 30 Jul 2021 13:34:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33830 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230229AbhG3RdC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 30 Jul 2021 13:33:02 -0400
+        with ESMTP id S230200AbhG3ReS (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 30 Jul 2021 13:34:18 -0400
 Received: from mail-lj1-x22e.google.com (mail-lj1-x22e.google.com [IPv6:2a00:1450:4864:20::22e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6A33FC06175F
-        for <kvm@vger.kernel.org>; Fri, 30 Jul 2021 10:32:56 -0700 (PDT)
-Received: by mail-lj1-x22e.google.com with SMTP id m9so13392326ljp.7
-        for <kvm@vger.kernel.org>; Fri, 30 Jul 2021 10:32:56 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1EC07C06175F
+        for <kvm@vger.kernel.org>; Fri, 30 Jul 2021 10:34:13 -0700 (PDT)
+Received: by mail-lj1-x22e.google.com with SMTP id h9so13408598ljq.8
+        for <kvm@vger.kernel.org>; Fri, 30 Jul 2021 10:34:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=yIDDxq5moGpDeArfNpM/54jwiqwmK/kaH7+R0E9/Sq8=;
-        b=tor66oVSSmzcDYdetg6yiI3T1AqvGNbsE+Wj5B/xDAkbohTIFqA1yvdtNAudOF+3sV
-         uFS6VTpD5R14DJ3MpT+PXwd0n+BK3+C7xr5rc+FEMMQJ9qClpp/p1Pt3ows2mVdPTApj
-         Y0sCBbng4bc3Gc9zRR0CU+JCDLzeZZCZEXjwamJRiWyKt2rzvwHJUo4GzPn1xB1Esuju
-         SXp60XRLChJxlEmi/7vgPha3GnwSGiXHmrKNza4zPB/fPl4r1Rs7ULQ+MSl99ID1saCL
-         Ys1I165II2mEa/N9JG+xiM6CDAOJQ5Evr1RhfFD/fDRmrVX7wUrAbJxEaNOr2NZiMnlM
-         65Ng==
+        bh=mlX1nCiNDRiVrVxlVDHszrB0v/ewjTsjg4ostQyNPUg=;
+        b=bynegcZxgDCEpUi8d2HuAzcpZ1tEmeaASJMHmkOYZc3mvMjCLUDIbTm+O1VuoWz91H
+         9R28kLzaqtrtHbh9yTEfJSESk7sV+cF8+oLbjR9RXqSJqaX0bVci5a3SnRsowoV+yED6
+         qZ1TK7yxLK6D7Dwz70IPalyohCTfsZ0VxZdPgPixwDQdgqQw/m4dO7i2KIOJ2e+w+ygF
+         e9QCCHbYO5VNcNwQ9EfUkoqJQg+ZrK8WL7ZrKiM7muXUNXPn/a3WuhkqK+lk8Fc+TMQZ
+         ia21dWwC18DDnXBaP3W4XQnWopcwzowFvE3wYZ8lhNd61SbFTMvyTL7EpbyJclo+l3xb
+         +6yA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=yIDDxq5moGpDeArfNpM/54jwiqwmK/kaH7+R0E9/Sq8=;
-        b=JvitGcD+QPZ19RriDcef4fX/VPGdUUu40DgdVyOD1n2KbaDjwgOgHu59ZhJZQskjgw
-         gFjHNZZSW8tqSv/XyezEXv7JqTTAde59B2+g0qEGkV7ghTH59lRZ75O6ID52tyZgF1i4
-         1a+nkhg2RTQMr95Ggzra7sx2bmOkEJKxcUSI+jUE66ju7guuknYl8gt2a0tLKl2IhVao
-         NxdEMQGw76SMwLlDMME6ymSZPfNCZX5cVJCWJPn8X7tfbn0K76gXrZ5RDbiE52m6PY4h
-         vQ6PEB5krM5dE1i+mVpaSk/UJwfcWwIi236XSAkaw+MqstAFsy7C50BDOoqbn2m4ldXE
-         lB+A==
-X-Gm-Message-State: AOAM530s2Eqg5T783NVkXitHFrRALsmn8CE5kgjD76NPuMwh9V2qlFwb
-        Eac1D9flTjhNyg3IHZJIXqU9Ac9QAG5SrkCBvQPbHQ==
-X-Google-Smtp-Source: ABdhPJxDtKG/yZ2AqOdhmuZxb1CtNEbOu/hCPhr++f0lKHDJC8VuTLbMWq4VZrFqOI3MjENPk9AICPrrxEgKH4W2vJo=
-X-Received: by 2002:a2e:3307:: with SMTP id d7mr2367208ljc.256.1627666374636;
- Fri, 30 Jul 2021 10:32:54 -0700 (PDT)
+        bh=mlX1nCiNDRiVrVxlVDHszrB0v/ewjTsjg4ostQyNPUg=;
+        b=GDq18iaNpysbGseck+EiPBfQjnKDF785DxQ7ZTmNyaSN2ox1Q0zOfQfvTRLKHBEevE
+         4Jy7c17V2PF82p802NYqLm12I1anaEbe2VDJETKPvvVgb9KMFgm6in+YbtFI77xhfJXP
+         LQke76t2yLjTqcd4v2/J5yaXy1EQiK+grAzB+VBc3vOFF/eXyoPZlDFE/4gDbRdQhN+k
+         zXJcMeaviLM6GHPtZhPxbhtWRuisZCGksXwg9gue6oj3uGd1aQP54ObvhfLIPwMLQM8C
+         QP9A70pzrjRmgG7oaPmqyAHI8XDI/Uk71FHdgX3tyqKZqztabpUt6/PmNldJ1TQBD1nH
+         FAog==
+X-Gm-Message-State: AOAM531XCYbZA+n+pxVUL7CHUZk4j1p0OCamHn5iMXdYb7EtHqCRDlEH
+        xNIo3WoOVu/gfv3kSL9nbCDuMWKu+pJjhRgORNz4Ow==
+X-Google-Smtp-Source: ABdhPJwQm7osgysjal7b4gFKQif1+BNO+0WNNDORDMRHHkvDuxmU8Mm408VnxrPPcR+CR90UPsnKxeheV7HfFlQNNJA=
+X-Received: by 2002:a2e:90c4:: with SMTP id o4mr2361162ljg.28.1627666451240;
+ Fri, 30 Jul 2021 10:34:11 -0700 (PDT)
 MIME-Version: 1.0
 References: <20210706180350.2838127-1-jingzhangos@google.com>
- <20210706180350.2838127-3-jingzhangos@google.com> <YOY5QndV0O3giRJ2@google.com>
- <40bb3dd8-346e-81ee-8ec1-b41a46a8cbdf@redhat.com>
-In-Reply-To: <40bb3dd8-346e-81ee-8ec1-b41a46a8cbdf@redhat.com>
+ <20210706180350.2838127-5-jingzhangos@google.com> <8a6f9314-7329-54d1-63b4-dc7ba6b4ea1d@redhat.com>
+In-Reply-To: <8a6f9314-7329-54d1-63b4-dc7ba6b4ea1d@redhat.com>
 From:   Jing Zhang <jingzhangos@google.com>
-Date:   Fri, 30 Jul 2021 10:32:43 -0700
-Message-ID: <CAAdAUtj-e=bvZ07iH7r7eqg4Fy-KaPPgQiMHHVOh8EL4GfUJqA@mail.gmail.com>
-Subject: Re: [PATCH v1 2/4] KVM: stats: Update doc for histogram statistics
+Date:   Fri, 30 Jul 2021 10:34:00 -0700
+Message-ID: <CAAdAUtg6TNQ=_UrMe_mZ8Hv_u98i7gMybMUPKsnCXZkjivDRiQ@mail.gmail.com>
+Subject: Re: [PATCH v1 4/4] KVM: stats: Add halt polling related histogram stats
 To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     David Matlack <dmatlack@google.com>, KVM <kvm@vger.kernel.org>,
-        KVMPPC <kvm-ppc@vger.kernel.org>,
+Cc:     KVM <kvm@vger.kernel.org>, KVMPPC <kvm-ppc@vger.kernel.org>,
         Sean Christopherson <seanjc@google.com>,
         Jim Mattson <jmattson@google.com>,
         Peter Shier <pshier@google.com>,
         Oliver Upton <oupton@google.com>,
-        David Rientjes <rientjes@google.com>
+        David Rientjes <rientjes@google.com>,
+        David Matlack <dmatlack@google.com>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jul 28, 2021 at 5:42 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
+On Wed, Jul 28, 2021 at 5:45 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
 >
-> On 08/07/21 01:31, David Matlack wrote:
-> >> +
-> >> +8.35 KVM_CAP_STATS_BINARY_FD
-> >> +----------------------------
-> >> +
-> >> +:Architectures: all
-> >> +
-> >> +This capability indicates the feature that userspace can get a file descriptor
-> >> +for every VM and VCPU to read statistics data in binary format.
-> > This should probably be in a separate patch with a Fixes tag.
+> On 06/07/21 20:03, Jing Zhang wrote:
+> > +             kvm_stats_log_hist_update(
+> > +                             vc->runner->stat.generic.halt_wait_hist,
+> > +                             LOGHIST_SIZE_LARGE,
+> > +                             ktime_to_ns(cur) - ktime_to_ns(start_wait));
 >
-> Generally this chapter (which is probably incomplete, though) only
-> includes capabilities for which KVM_CHECK_EXTENSION can return a value
-> other than 0 or 1.  So there is no need to include KVM_CAP_STATS_BINARY_FD.
-Got it. Will drop this change.
+> Instead of passing the size to the function, perhaps you can wrap it
+> with a macro
+>
+> #define KVM_STATS_LOG_HIST_UPDATE(array, value) \
+>      kvm_stats_log_hist_update(array, ARRAY_SIZE(array), value)
+That's nice! Will do that.
 >
 > Paolo
 >
