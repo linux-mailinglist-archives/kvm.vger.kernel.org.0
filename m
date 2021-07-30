@@ -2,105 +2,133 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3F4333DC121
-	for <lists+kvm@lfdr.de>; Sat, 31 Jul 2021 00:34:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 815213DC123
+	for <lists+kvm@lfdr.de>; Sat, 31 Jul 2021 00:37:16 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233158AbhG3Wez (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 30 Jul 2021 18:34:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51562 "EHLO
+        id S233158AbhG3WhU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 30 Jul 2021 18:37:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52430 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233153AbhG3Wes (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 30 Jul 2021 18:34:48 -0400
-Received: from mail-pj1-x1034.google.com (mail-pj1-x1034.google.com [IPv6:2607:f8b0:4864:20::1034])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7C588C06175F
-        for <kvm@vger.kernel.org>; Fri, 30 Jul 2021 15:34:42 -0700 (PDT)
-Received: by mail-pj1-x1034.google.com with SMTP id j1so17248188pjv.3
-        for <kvm@vger.kernel.org>; Fri, 30 Jul 2021 15:34:42 -0700 (PDT)
+        with ESMTP id S232817AbhG3WhT (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 30 Jul 2021 18:37:19 -0400
+Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A56B6C06175F
+        for <kvm@vger.kernel.org>; Fri, 30 Jul 2021 15:37:14 -0700 (PDT)
+Received: by mail-yb1-xb49.google.com with SMTP id p71-20020a25424a0000b029056092741626so12028996yba.19
+        for <kvm@vger.kernel.org>; Fri, 30 Jul 2021 15:37:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=2B8bmMK1MWV0IKBzZFhJ4QQnRCCDWLQwwtmcrrRzShw=;
-        b=UfW+Uyhy937lSOvlfCbvzUSHfPBdVvhcTOaILHqlmzjEQeZkE7CJS1pDjY85yLeTrk
-         ZUbJvCXGnG9V4YR8YvLqiCoHxoAuC0RJHo8xznM5u3dhr6dkJI9BNq9mI/HgcDxL19UV
-         T0+Bsg6O2a3etVDRUOMu6je3JU33B5pFqiYpolqwzc84ASrmmPyryuwH24+FPODl2NK0
-         /jswqbw3cLYGC3s8tw+3+64iNj05CofMOCHjsjPmhNsSGF6fZGX5s2X6UpkAmOT82yEf
-         KD+vMh5N6wzurqnoLV7GP3bDuQRiamzrkbH5J6wxueQVfjy9YKlsV1lqKUCTBLbTMy1G
-         tbIg==
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=La1sDp9z728EUdArr8dAJV9rSsj40AWPAQ4RtlkYcwI=;
+        b=XAy+zPjNUa+2DhPvYtIrpzlUnjnEicZzUYnBUboPHDm5LSBnJv9yDGitPLtSnkr0eN
+         rmTs5VzGGpOrcL5XUB4IlNs0jpyUjuQhqsazyjbMJFhuOyeYczekeQtQcRf7Ilp1ieCi
+         7HxLJ1MedDo9+eYTiKf2WDQHZxO0pElHAFQAwa6FD67o7R6UGw0p3uTAV1lBtKwi17Lq
+         J0tCbtPhW7gRQir+vzV7cpTkdRdX0jdGfZ9edtkgKPtNU6s1v3tbcvHKtuFOukcmfz95
+         PSEr0AFmsfOfclFMfhUrDCBZ7H/YOlZlks/mtrgOc+5zbkFzl3E4Mcwh2QF/2SAvIXOt
+         f1IQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=2B8bmMK1MWV0IKBzZFhJ4QQnRCCDWLQwwtmcrrRzShw=;
-        b=o5B2LeNG+0I/jW+0el3uqs0kxvFIMjXlq1QY1MydI/XMwmU7juwrMdGpS6Ki/1FZpB
-         a07VBcdNIizuf+S9EHlchEdT4Gg7bTF0r/BkvtwKFdZKUb8ItHEso2RUbLN4EwrVnfUh
-         8rdbepumoJ0HmXGAbQf3lqwQ8LZMY0Q4N2LAMmazzArGkd/bWr4oXfL4aCfB4HNaG9Fi
-         410r5/e+Xdx1tlqNzWlElt75+VVIaF/wey3/S5UwIRRozfrztBrZ2hE4b0t3EAjdYdcf
-         xrC3BdYnCzycqwxUJ0Wnxlv927HlsNGZnH099+3zpRNwKIdcGOQREmLblRZ1hjpHxCoT
-         yW0w==
-X-Gm-Message-State: AOAM530SePDvOg3VLAHlN9MmQM9X6ZFh34QNW1k+GhqM/+/7nj7qU0jD
-        rOYcG5duQ2LvFDbtg6MwPPjtQA==
-X-Google-Smtp-Source: ABdhPJzSqN3B7Go3MtNjE9VY5h0clk+hYXj3ladZ5/S+PnXE8W92M9c05HKB4nGF1ekuX4eoULgjrQ==
-X-Received: by 2002:a17:90b:1bcc:: with SMTP id oa12mr5239612pjb.113.1627684481796;
-        Fri, 30 Jul 2021 15:34:41 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id b184sm3525033pfg.72.2021.07.30.15.34.41
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 30 Jul 2021 15:34:41 -0700 (PDT)
-Date:   Fri, 30 Jul 2021 22:34:37 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Tom Lendacky <thomas.lendacky@amd.com>
-Cc:     linux-kernel@vger.kernel.org, x86@kernel.org,
-        linuxppc-dev@lists.ozlabs.org, linux-s390@vger.kernel.org,
-        iommu@lists.linux-foundation.org, kvm@vger.kernel.org,
-        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
-        linux-graphics-maintainer@vmware.com,
-        amd-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
-        kexec@lists.infradead.org, linux-fsdevel@vger.kernel.org,
-        Borislav Petkov <bp@alien8.de>,
-        Brijesh Singh <brijesh.singh@amd.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Andi Kleen <ak@linux.intel.com>,
-        Sathyanarayanan Kuppuswamy 
-        <sathyanarayanan.kuppuswamy@linux.intel.com>,
-        Tianyu Lan <Tianyu.Lan@microsoft.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Peter Zijlstra <peterz@infradead.org>,
-        David Airlie <airlied@linux.ie>,
-        Daniel Vetter <daniel@ffwll.ch>,
-        Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
-        Maxime Ripard <mripard@kernel.org>,
-        Thomas Zimmermann <tzimmermann@suse.de>,
-        Will Deacon <will@kernel.org>, Dave Young <dyoung@redhat.com>,
-        Baoquan He <bhe@redhat.com>
-Subject: Re: [PATCH 07/11] treewide: Replace the use of mem_encrypt_active()
- with prot_guest_has()
-Message-ID: <YQR+ffO92gMfGDbs@google.com>
-References: <cover.1627424773.git.thomas.lendacky@amd.com>
- <029791b24c6412f9427cfe6ec598156c64395964.1627424774.git.thomas.lendacky@amd.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <029791b24c6412f9427cfe6ec598156c64395964.1627424774.git.thomas.lendacky@amd.com>
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=La1sDp9z728EUdArr8dAJV9rSsj40AWPAQ4RtlkYcwI=;
+        b=BcS4DgiyVhIeK0uTi8r9B8CTWWyuucKOw/NOLxWLXpwtu+NcufqremGhuH2LCuU3L5
+         dlGGhPuL9R53DvVZ3koyP0cjORi1FTWWXmUuhU8H185QuoS7F9MPBXg12rY7SHanQ3v1
+         sJvDJVmbo1TWIsvQ+MdXC7WzdGhebA5hdZQP+bwmkjwVJDGfaGRSyZXWfertRGSBs43n
+         GNkl30stuM3PUtzQjBlenacxi5STtQkuvgB9+CxuPPRiyNz0ihOEs2iScq5qaOTsmrN0
+         o2v3SaDra167fuqcT0UYazVd7FdgOyf7YcraSe372yvtQ9IfVCRDv7Qg8/N79iVh1sqM
+         1NZA==
+X-Gm-Message-State: AOAM530Hg4XwJHrRxQh4txN6ePVzENnInDIW0oaNK78oFDtr2lJKKccZ
+        txrmnYvu8M/YT+5wTArhxneRyjTYwgS1J27xNNxEbZra4QWIS2ah9Vp6FTFlrjGRj19woC5ZZ6B
+        UENU71OQ35LcCeekvho7e0U5gxid9jOfTo+41uBBQWGlXrSQUJpuwxrHvkdw4MdI=
+X-Google-Smtp-Source: ABdhPJzcuwwgkqV2TqY+j9OVN3wdzpyH6oHcSXdlPmkkkPQvsTKg05TEJyGGVzlEoWzNBSOQFWTck3OYXsw4mg==
+X-Received: from dmatlack-heavy.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:19cd])
+ (user=dmatlack job=sendgmr) by 2002:a05:6902:54e:: with SMTP id
+ z14mr2758285ybs.334.1627684633762; Fri, 30 Jul 2021 15:37:13 -0700 (PDT)
+Date:   Fri, 30 Jul 2021 22:37:01 +0000
+Message-Id: <20210730223707.4083785-1-dmatlack@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.32.0.554.ge1b32706d8-goog
+Subject: [PATCH 0/6] Improve gfn-to-memslot performance during page faults
+From:   David Matlack <dmatlack@google.com>
+To:     kvm@vger.kernel.org
+Cc:     Ben Gardon <bgardon@google.com>, Joerg Roedel <joro@8bytes.org>,
+        Jim Mattson <jmattson@google.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Junaid Shahid <junaids@google.com>,
+        Andrew Jones <drjones@redhat.com>,
+        David Matlack <dmatlack@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jul 27, 2021, Tom Lendacky wrote:
-> @@ -451,7 +450,7 @@ void __init mem_encrypt_free_decrypted_mem(void)
->  	 * The unused memory range was mapped decrypted, change the encryption
->  	 * attribute from decrypted to encrypted before freeing it.
->  	 */
-> -	if (mem_encrypt_active()) {
-> +	if (sme_me_mask) {
+This series improves the performance of gfn-to-memslot lookups during
+page faults. Ben Gardon originally identified this performance gap and
+sufficiently addressed it in Google's kernel by reading the memslot once
+at the beginning of the page fault and passing around the pointer.
 
-Any reason this uses sme_me_mask?  The helper it calls, __set_memory_enc_dec(),
-uses prot_guest_has(PATTR_MEM_ENCRYPT) so I assume it's available?
+This series takes an alternative approach by introducing a per-vCPU
+cache of the least recently used memslot index. This avoids needing to
+binary search the existing memslots multiple times during a page fault.
+Unlike passing around the pointer, the LRU cache has an additional
+benefit in that it speeds up gfn-to-memslot lookups *across* faults and
+during spte prefetching where the gfn changes.
 
->  		r = set_memory_encrypted(vaddr, npages);
->  		if (r) {
->  			pr_warn("failed to free unused decrypted pages\n");
+This difference can be seen clearly when looking at the performance of
+fast_page_fault when multiple slots are in play:
+
+Metric                        | Baseline     | Pass*    | LRU**
+----------------------------- | ------------ | -------- | ----------
+Iteration 2 dirty memory time | 2.8s         | 1.6s     | 0.30s
+
+* Pass: Lookup the memslot once per fault and pass it around.
+** LRU: Cache the LRU slot per vCPU (i.e. this series).
+
+(Collected via ./dirty_log_perf_test -v64 -x64)
+
+I plan to also send a follow-up series with a version of Ben's patches
+to pass the pointer to the memslot through the page fault handling code
+rather than looking it up multiple times. Even when applied on top of
+the LRU series it has some performance improvements by avoiding a few
+extra memory accesses (mainly kvm->memslots[as_id] and
+slots->used_slots). But it will be a judgement call whether or not it's
+worth the code churn and complexity.
+
+Here is a break down of this series:
+
+Patches 1-2 introduce a per-vCPU cache of the least recently memslot
+index.
+
+Patches 3-5 convert existing gfn-to-memslot lookups to use
+kvm_vcpu_gfn_to_memslot so that they can leverage the new LRU cache.
+
+Patch 6 adds support for multiple slots to dirty_log_perf_test which is
+used to generate the performance data in this series.
+
+David Matlack (6):
+  KVM: Cache the least recently used slot index per vCPU
+  KVM: Avoid VM-wide lru_slot lookup in kvm_vcpu_gfn_to_memslot
+  KVM: x86/mmu: Speed up dirty logging in
+    tdp_mmu_map_handle_target_level
+  KVM: x86/mmu: Leverage vcpu->lru_slot_index for rmap_add and
+    rmap_recycle
+  KVM: x86/mmu: Rename __gfn_to_rmap to gfn_to_rmap
+  KVM: selftests: Support multiple slots in dirty_log_perf_test
+
+ arch/x86/kvm/mmu/mmu.c                        | 54 +++++++------
+ arch/x86/kvm/mmu/tdp_mmu.c                    | 15 +++-
+ include/linux/kvm_host.h                      | 73 +++++++++++++-----
+ .../selftests/kvm/access_tracking_perf_test.c |  2 +-
+ .../selftests/kvm/demand_paging_test.c        |  2 +-
+ .../selftests/kvm/dirty_log_perf_test.c       | 76 ++++++++++++++++---
+ .../selftests/kvm/include/perf_test_util.h    |  2 +-
+ .../selftests/kvm/lib/perf_test_util.c        | 20 +++--
+ .../kvm/memslot_modification_stress_test.c    |  2 +-
+ virt/kvm/kvm_main.c                           | 21 ++++-
+ 10 files changed, 198 insertions(+), 69 deletions(-)
+
+-- 
+2.32.0.554.ge1b32706d8-goog
 
