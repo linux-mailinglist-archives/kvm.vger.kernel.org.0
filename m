@@ -2,71 +2,129 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 05B8A3DB26B
-	for <lists+kvm@lfdr.de>; Fri, 30 Jul 2021 06:39:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5AA0B3DB482
+	for <lists+kvm@lfdr.de>; Fri, 30 Jul 2021 09:30:03 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230184AbhG3Ejl (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 30 Jul 2021 00:39:41 -0400
-Received: from ozlabs.ru ([107.174.27.60]:39584 "EHLO ozlabs.ru"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229609AbhG3Ejl (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 30 Jul 2021 00:39:41 -0400
-X-Greylist: delayed 401 seconds by postgrey-1.27 at vger.kernel.org; Fri, 30 Jul 2021 00:39:41 EDT
-Received: from fstn1-p1.ozlabs.ibm.com. (localhost [IPv6:::1])
-        by ozlabs.ru (Postfix) with ESMTP id 37EE5AE80062;
-        Fri, 30 Jul 2021 00:32:21 -0400 (EDT)
-From:   Alexey Kardashevskiy <aik@ozlabs.ru>
-To:     linux-kernel@vger.kernel.org
-Cc:     Alexey Kardashevskiy <aik@ozlabs.ru>, kvm@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>
-Subject: [RFC PATCH kernel] KVM: Stop leaking memory in debugfs
-Date:   Fri, 30 Jul 2021 14:32:17 +1000
-Message-Id: <20210730043217.953384-1-aik@ozlabs.ru>
-X-Mailer: git-send-email 2.30.2
+        id S237616AbhG3HaF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 30 Jul 2021 03:30:05 -0400
+Received: from wforward1-smtp.messagingengine.com ([64.147.123.30]:33407 "EHLO
+        wforward1-smtp.messagingengine.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S230337AbhG3HaF (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 30 Jul 2021 03:30:05 -0400
+Received: from compute5.internal (compute5.nyi.internal [10.202.2.45])
+        by mailforward.west.internal (Postfix) with ESMTP id CB48D1AC0033;
+        Fri, 30 Jul 2021 03:29:58 -0400 (EDT)
+Received: from mailfrontend2 ([10.202.2.163])
+  by compute5.internal (MEProxy); Fri, 30 Jul 2021 03:29:59 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+        messagingengine.com; h=cc:content-type:date:from:in-reply-to
+        :message-id:mime-version:references:subject:to:x-me-proxy
+        :x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; bh=dEzoO3
+        e5Gf3/WxsXdgCVKNFItf3m4OWNnkjH5aZyCb8=; b=TGFFDRvqsUHtG8TmZTiDri
+        TRx628qViMWRHtLWzvUBrH6qQu7HAOVWfCv8bMiXj/U2KIPmBfclXIuBc3DvvGbs
+        wY7zLPy0f34Q7IZ0DjLTVv4FTwSrl+KStZoKOzJZHjVwD1BHZc8AcaBs85jSXThc
+        v5f0oniZOrFxBMcFYD9nbJdXoM14CPwo1CGKDbK0Fen63pPg5dpXnvhZJ++ezgcQ
+        /NPgxegdbEUwD+XKL1U6AmPPaJcOo2esL5Tuyq/sPhvgk4t0R675fYcZvYyoFDWS
+        IqMhVUSuqECyH48mDeOtlUgHdIHpk/oGTr4dFdwCe+Y8aPgz4JFkn9fmd6f65deg
+        ==
+X-ME-Sender: <xms:dKoDYY_hsbCZBSV7lomj82SZhW9uk3sQDDRNYAj6SU_lhoh-5oWOBQ>
+    <xme:dKoDYQugLUZV-Sd5xPn6YYL9y2-iVUBjgP8o6DRgYzXMK2BypbON5eB-81ldZBxD-
+    kmEUwp702lj-EAioKA>
+X-ME-Received: <xmr:dKoDYeBeu-r_IA2oKPCyxwwOMN0kxZeCrn_N0Z8o7gWznraeYnyr6Io2kyA28Mdm-U_04wfVQdb5GFvpLvy9PwEy1lRJI2OpeThk9s3-FN8>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvtddrheeggddutddtucetufdoteggodetrfdotf
+    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
+    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
+    cujfgurhepvffujghfhfffkfggtgesthdtredttddttdenucfhrhhomhepffgrvhhiugcu
+    gfgumhhonhgushhonhcuoegumhgvsegumhgvrdhorhhgqeenucggtffrrghtthgvrhhnpe
+    fhkeeguedtvdegffffteehjedvjeeitefgfefgffdugeffffegudehgeetgeelkeenucev
+    lhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpegumhgvsegumh
+    gvrdhorhhg
+X-ME-Proxy: <xmx:dKoDYYcRaEQh_lnu_ii9Q1dNQ5UVBQfUaQ6qZvRbOsEjpyBt9hIvQw>
+    <xmx:dKoDYdOExhZ2PaEzpsQQbM1mj4rwXfa2L3x9c-wFrp_86sg9pb3ljA>
+    <xmx:dKoDYSm8RvtdQe2cUePJKqN61xGu_XkeBDjPO0_R77DyIN_zLW0odw>
+    <xmx:dqoDYUkyVJdx73gLiAHEA4JYCnxsU09V6LdHrgz5cPFerDNqYTXaa3yalhzi9pQY>
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Fri,
+ 30 Jul 2021 03:29:54 -0400 (EDT)
+Received: from localhost (disaster-area.hh.sledj.net [local])
+        by disaster-area.hh.sledj.net (OpenSMTPD) with ESMTPA id 26d30f0b;
+        Fri, 30 Jul 2021 07:29:53 +0000 (UTC)
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     linux-kernel@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
+        Joerg Roedel <joro@8bytes.org>, Ingo Molnar <mingo@redhat.com>,
+        Jim Mattson <jmattson@google.com>, kvm@vger.kernel.org,
+        Borislav Petkov <bp@alien8.de>,
+        David Matlack <dmatlack@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, x86@kernel.org,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>
+Subject: Re: [PATCH v3 1/3] KVM: x86: kvm_x86_ops.get_exit_info should
+ include the exit reason
+In-Reply-To: <YQMrUOjZMD1eiIeE@google.com>
+References: <20210729133931.1129696-1-david.edmondson@oracle.com>
+ <20210729133931.1129696-2-david.edmondson@oracle.com>
+ <YQMrUOjZMD1eiIeE@google.com>
+From:   David Edmondson <dme@dme.org>
+Date:   Fri, 30 Jul 2021 08:29:53 +0100
+Message-ID: <cunsfzwmf7y.fsf@dme.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The debugfs folder name is made of a supposedly unique pair of
-the process pid and a VM fd. However it is possible to get a race here
-which manifests in these messages:
+On Thursday, 2021-07-29 at 22:27:28 GMT, Sean Christopherson wrote:
 
-[  471.846235] debugfs: Directory '20245-4' with parent 'kvm' already present!
+> Shortlog is a bit odd, "should" is subjective and makes this sound like a bug fix.
+>
+>   KVM: x86: Get exit_reason as part of kvm_x86_ops.get_exit_info
 
-debugfs_create_dir() returns an error which is handled correctly
-everywhere except kvm_create_vm_debugfs() where the code allocates
-stat data structs and overwrites the older values regardless.
+Okay.
 
-Spotted by syzkaller. This slow memory leak produces way too many
-OOM reports.
+> On Thu, Jul 29, 2021, David Edmondson wrote:
+>> Extend the get_exit_info static call to provide the reason for the VM
+>> exit. Modify relevant trace points to use this rather than extracting
+>> the reason in the caller.
+>> 
+>> Signed-off-by: David Edmondson <david.edmondson@oracle.com>
+>> ---
+>> -static void svm_get_exit_info(struct kvm_vcpu *vcpu, u64 *info1, u64 *info2,
+>> +static void svm_get_exit_info(struct kvm_vcpu *vcpu, u64 *reason,
+>> +			      u64 *info1, u64 *info2,
+>>  			      u32 *intr_info, u32 *error_code)
+>>  {
+>>  	struct vmcb_control_area *control = &to_svm(vcpu)->vmcb->control;
+>>  
+>> +	*reason = control->exit_code;
+>>  	*info1 = control->exit_info_1;
+>>  	*info2 = control->exit_info_2;
+>>  	*intr_info = control->exit_int_info;
+>
+> ...
+>
+>> diff --git a/arch/x86/kvm/trace.h b/arch/x86/kvm/trace.h
+>> index b484141ea15b..2228565beda2 100644
+>> --- a/arch/x86/kvm/trace.h
+>> +++ b/arch/x86/kvm/trace.h
+>> @@ -273,11 +273,11 @@ TRACE_EVENT(kvm_apic,
+>>  
+>>  #define TRACE_EVENT_KVM_EXIT(name)					     \
+>>  TRACE_EVENT(name,							     \
+>> -	TP_PROTO(unsigned int exit_reason, struct kvm_vcpu *vcpu, u32 isa),  \
+>> -	TP_ARGS(exit_reason, vcpu, isa),				     \
+>> +	TP_PROTO(struct kvm_vcpu *vcpu, u32 isa),			     \
+>> +	TP_ARGS(vcpu, isa),						     \
+>>  									     \
+>>  	TP_STRUCT__entry(						     \
+>> -		__field(	unsigned int,	exit_reason	)	     \
+>> +		__field(	u64,		exit_reason	)	     \
+>
+> Converting to a u64 is unnecessary and misleading.  vmcs.EXIT_REASON and
+> vmcb.EXIT_CODE are both u32s, a.k.a. unsigned ints.  There is vmcb.EXIT_CODE_HI,
+> but that's not being included, and AFAICT isn't even sanity checked by KVM.
 
-Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
----
+Thanks for pointing this out, I can only blame brain fade.
 
-I am pretty sure we better fix the race but I am not quite sure what
-lock is appropriate here, ideas?
-
----
- virt/kvm/kvm_main.c | 4 ++++
- 1 file changed, 4 insertions(+)
-
-diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index 986959833d70..89496fd8127a 100644
---- a/virt/kvm/kvm_main.c
-+++ b/virt/kvm/kvm_main.c
-@@ -904,6 +904,10 @@ static int kvm_create_vm_debugfs(struct kvm *kvm, int fd)
- 
- 	snprintf(dir_name, sizeof(dir_name), "%d-%d", task_pid_nr(current), fd);
- 	kvm->debugfs_dentry = debugfs_create_dir(dir_name, kvm_debugfs_dir);
-+	if (IS_ERR_OR_NULL(kvm->debugfs_dentry)) {
-+		pr_err("Failed to create %s\n", dir_name);
-+		return 0;
-+	}
- 
- 	kvm->debugfs_stat_data = kcalloc(kvm_debugfs_num_entries,
- 					 sizeof(*kvm->debugfs_stat_data),
--- 
-2.30.2
-
+>>  		__field(	unsigned long,	guest_rip	)	     \
+>>  		__field(	u32,	        isa             )	     \
+>>  		__field(	u64,	        info1           )	     \
