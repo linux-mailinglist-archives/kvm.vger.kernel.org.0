@@ -2,129 +2,189 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5AA0B3DB482
-	for <lists+kvm@lfdr.de>; Fri, 30 Jul 2021 09:30:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 50B073DB4B7
+	for <lists+kvm@lfdr.de>; Fri, 30 Jul 2021 09:53:08 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237616AbhG3HaF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 30 Jul 2021 03:30:05 -0400
-Received: from wforward1-smtp.messagingengine.com ([64.147.123.30]:33407 "EHLO
-        wforward1-smtp.messagingengine.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230337AbhG3HaF (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 30 Jul 2021 03:30:05 -0400
-Received: from compute5.internal (compute5.nyi.internal [10.202.2.45])
-        by mailforward.west.internal (Postfix) with ESMTP id CB48D1AC0033;
-        Fri, 30 Jul 2021 03:29:58 -0400 (EDT)
-Received: from mailfrontend2 ([10.202.2.163])
-  by compute5.internal (MEProxy); Fri, 30 Jul 2021 03:29:59 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-        messagingengine.com; h=cc:content-type:date:from:in-reply-to
-        :message-id:mime-version:references:subject:to:x-me-proxy
-        :x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; bh=dEzoO3
-        e5Gf3/WxsXdgCVKNFItf3m4OWNnkjH5aZyCb8=; b=TGFFDRvqsUHtG8TmZTiDri
-        TRx628qViMWRHtLWzvUBrH6qQu7HAOVWfCv8bMiXj/U2KIPmBfclXIuBc3DvvGbs
-        wY7zLPy0f34Q7IZ0DjLTVv4FTwSrl+KStZoKOzJZHjVwD1BHZc8AcaBs85jSXThc
-        v5f0oniZOrFxBMcFYD9nbJdXoM14CPwo1CGKDbK0Fen63pPg5dpXnvhZJ++ezgcQ
-        /NPgxegdbEUwD+XKL1U6AmPPaJcOo2esL5Tuyq/sPhvgk4t0R675fYcZvYyoFDWS
-        IqMhVUSuqECyH48mDeOtlUgHdIHpk/oGTr4dFdwCe+Y8aPgz4JFkn9fmd6f65deg
-        ==
-X-ME-Sender: <xms:dKoDYY_hsbCZBSV7lomj82SZhW9uk3sQDDRNYAj6SU_lhoh-5oWOBQ>
-    <xme:dKoDYQugLUZV-Sd5xPn6YYL9y2-iVUBjgP8o6DRgYzXMK2BypbON5eB-81ldZBxD-
-    kmEUwp702lj-EAioKA>
-X-ME-Received: <xmr:dKoDYeBeu-r_IA2oKPCyxwwOMN0kxZeCrn_N0Z8o7gWznraeYnyr6Io2kyA28Mdm-U_04wfVQdb5GFvpLvy9PwEy1lRJI2OpeThk9s3-FN8>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvtddrheeggddutddtucetufdoteggodetrfdotf
-    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
-    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
-    cujfgurhepvffujghfhfffkfggtgesthdtredttddttdenucfhrhhomhepffgrvhhiugcu
-    gfgumhhonhgushhonhcuoegumhgvsegumhgvrdhorhhgqeenucggtffrrghtthgvrhhnpe
-    fhkeeguedtvdegffffteehjedvjeeitefgfefgffdugeffffegudehgeetgeelkeenucev
-    lhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpegumhgvsegumh
-    gvrdhorhhg
-X-ME-Proxy: <xmx:dKoDYYcRaEQh_lnu_ii9Q1dNQ5UVBQfUaQ6qZvRbOsEjpyBt9hIvQw>
-    <xmx:dKoDYdOExhZ2PaEzpsQQbM1mj4rwXfa2L3x9c-wFrp_86sg9pb3ljA>
-    <xmx:dKoDYSm8RvtdQe2cUePJKqN61xGu_XkeBDjPO0_R77DyIN_zLW0odw>
-    <xmx:dqoDYUkyVJdx73gLiAHEA4JYCnxsU09V6LdHrgz5cPFerDNqYTXaa3yalhzi9pQY>
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Fri,
- 30 Jul 2021 03:29:54 -0400 (EDT)
-Received: from localhost (disaster-area.hh.sledj.net [local])
-        by disaster-area.hh.sledj.net (OpenSMTPD) with ESMTPA id 26d30f0b;
-        Fri, 30 Jul 2021 07:29:53 +0000 (UTC)
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     linux-kernel@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
-        Joerg Roedel <joro@8bytes.org>, Ingo Molnar <mingo@redhat.com>,
-        Jim Mattson <jmattson@google.com>, kvm@vger.kernel.org,
-        Borislav Petkov <bp@alien8.de>,
-        David Matlack <dmatlack@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, x86@kernel.org,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>
-Subject: Re: [PATCH v3 1/3] KVM: x86: kvm_x86_ops.get_exit_info should
- include the exit reason
-In-Reply-To: <YQMrUOjZMD1eiIeE@google.com>
-References: <20210729133931.1129696-1-david.edmondson@oracle.com>
- <20210729133931.1129696-2-david.edmondson@oracle.com>
- <YQMrUOjZMD1eiIeE@google.com>
-From:   David Edmondson <dme@dme.org>
-Date:   Fri, 30 Jul 2021 08:29:53 +0100
-Message-ID: <cunsfzwmf7y.fsf@dme.org>
+        id S237961AbhG3HxL convert rfc822-to-8bit (ORCPT
+        <rfc822;lists+kvm@lfdr.de>); Fri, 30 Jul 2021 03:53:11 -0400
+Received: from szxga02-in.huawei.com ([45.249.212.188]:12426 "EHLO
+        szxga02-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230240AbhG3HxK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 30 Jul 2021 03:53:10 -0400
+Received: from dggemv704-chm.china.huawei.com (unknown [172.30.72.55])
+        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4GbfgK4T8pzcfbV;
+        Fri, 30 Jul 2021 15:49:33 +0800 (CST)
+Received: from dggemi759-chm.china.huawei.com (10.1.198.145) by
+ dggemv704-chm.china.huawei.com (10.3.19.47) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256) id
+ 15.1.2176.2; Fri, 30 Jul 2021 15:53:03 +0800
+Received: from lhreml710-chm.china.huawei.com (10.201.108.61) by
+ dggemi759-chm.china.huawei.com (10.1.198.145) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
+ 15.1.2176.2; Fri, 30 Jul 2021 15:53:02 +0800
+Received: from lhreml710-chm.china.huawei.com ([169.254.81.184]) by
+ lhreml710-chm.china.huawei.com ([169.254.81.184]) with mapi id
+ 15.01.2176.012; Fri, 30 Jul 2021 08:53:00 +0100
+From:   Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
+To:     Max Gurtovoy <mgurtovoy@nvidia.com>,
+        "yishaih@nvidia.com" <yishaih@nvidia.com>
+CC:     "aviadye@nvidia.com" <aviadye@nvidia.com>,
+        "oren@nvidia.com" <oren@nvidia.com>,
+        "shahafs@nvidia.com" <shahafs@nvidia.com>,
+        "parav@nvidia.com" <parav@nvidia.com>,
+        "artemp@nvidia.com" <artemp@nvidia.com>,
+        "kwankhede@nvidia.com" <kwankhede@nvidia.com>,
+        "ACurrid@nvidia.com" <ACurrid@nvidia.com>,
+        "cjia@nvidia.com" <cjia@nvidia.com>,
+        "kevin.tian@intel.com" <kevin.tian@intel.com>,
+        "hch@infradead.org" <hch@infradead.org>,
+        "targupta@nvidia.com" <targupta@nvidia.com>,
+        liulongfang <liulongfang@huawei.com>,
+        "yan.y.zhao@intel.com" <yan.y.zhao@intel.com>,
+        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+        "cohuck@redhat.com" <cohuck@redhat.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "jgg@nvidia.com" <jgg@nvidia.com>
+Subject: RE: [RFC PATCH v4 00/11] Introduce vfio-pci-core subsystem
+Thread-Topic: [RFC PATCH v4 00/11] Introduce vfio-pci-core subsystem
+Thread-Index: AQHXWJLMh7u8kEfBQ0qOr84q2/p5ratbfFiw
+Date:   Fri, 30 Jul 2021 07:53:00 +0000
+Message-ID: <01765c3bb55f48cf866dc3732a483eff@huawei.com>
+References: <20210603160809.15845-1-mgurtovoy@nvidia.com>
+In-Reply-To: <20210603160809.15845-1-mgurtovoy@nvidia.com>
+Accept-Language: en-GB, en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [10.47.81.115]
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 8BIT
 MIME-Version: 1.0
-Content-Type: text/plain
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thursday, 2021-07-29 at 22:27:28 GMT, Sean Christopherson wrote:
+Hi Max/ Yishai,
 
-> Shortlog is a bit odd, "should" is subjective and makes this sound like a bug fix.
->
->   KVM: x86: Get exit_reason as part of kvm_x86_ops.get_exit_info
+(Sorry I picked this thread instead of the [1] here as I don't have that
+in my mailbox)
 
-Okay.
+I see that an update to this series has been posted by Yishai [1] and it mentions
+about a branch with all relevant patches,
 
-> On Thu, Jul 29, 2021, David Edmondson wrote:
->> Extend the get_exit_info static call to provide the reason for the VM
->> exit. Modify relevant trace points to use this rather than extracting
->> the reason in the caller.
->> 
->> Signed-off-by: David Edmondson <david.edmondson@oracle.com>
->> ---
->> -static void svm_get_exit_info(struct kvm_vcpu *vcpu, u64 *info1, u64 *info2,
->> +static void svm_get_exit_info(struct kvm_vcpu *vcpu, u64 *reason,
->> +			      u64 *info1, u64 *info2,
->>  			      u32 *intr_info, u32 *error_code)
->>  {
->>  	struct vmcb_control_area *control = &to_svm(vcpu)->vmcb->control;
->>  
->> +	*reason = control->exit_code;
->>  	*info1 = control->exit_info_1;
->>  	*info2 = control->exit_info_2;
->>  	*intr_info = control->exit_int_info;
->
-> ...
->
->> diff --git a/arch/x86/kvm/trace.h b/arch/x86/kvm/trace.h
->> index b484141ea15b..2228565beda2 100644
->> --- a/arch/x86/kvm/trace.h
->> +++ b/arch/x86/kvm/trace.h
->> @@ -273,11 +273,11 @@ TRACE_EVENT(kvm_apic,
->>  
->>  #define TRACE_EVENT_KVM_EXIT(name)					     \
->>  TRACE_EVENT(name,							     \
->> -	TP_PROTO(unsigned int exit_reason, struct kvm_vcpu *vcpu, u32 isa),  \
->> -	TP_ARGS(exit_reason, vcpu, isa),				     \
->> +	TP_PROTO(struct kvm_vcpu *vcpu, u32 isa),			     \
->> +	TP_ARGS(vcpu, isa),						     \
->>  									     \
->>  	TP_STRUCT__entry(						     \
->> -		__field(	unsigned int,	exit_reason	)	     \
->> +		__field(	u64,		exit_reason	)	     \
->
-> Converting to a u64 is unnecessary and misleading.  vmcs.EXIT_REASON and
-> vmcb.EXIT_CODE are both u32s, a.k.a. unsigned ints.  There is vmcb.EXIT_CODE_HI,
-> but that's not being included, and AFAICT isn't even sanity checked by KVM.
+" A preview of all the patches can be seen here:
+https://github.com/jgunthorpe/linux/commits/mlx5_vfio_pci"
 
-Thanks for pointing this out, I can only blame brain fade.
+But sorry I couldn't find the patches in the branch above. Could you
+please check and let me know.
 
->>  		__field(	unsigned long,	guest_rip	)	     \
->>  		__field(	u32,	        isa             )	     \
->>  		__field(	u64,	        info1           )	     \
+Thanks,
+Shameer
+
+[1] https://lore.kernel.org/kvm/20210721161609.68223-1-yishaih@nvidia.com/#R
+
+
+> -----Original Message-----
+> From: Max Gurtovoy [mailto:mgurtovoy@nvidia.com]
+> Sent: 03 June 2021 17:08
+> To: alex.williamson@redhat.com; cohuck@redhat.com; kvm@vger.kernel.org;
+> linux-kernel@vger.kernel.org; jgg@nvidia.com
+> Cc: aviadye@nvidia.com; oren@nvidia.com; shahafs@nvidia.com;
+> parav@nvidia.com; artemp@nvidia.com; kwankhede@nvidia.com;
+> ACurrid@nvidia.com; cjia@nvidia.com; yishaih@nvidia.com;
+> kevin.tian@intel.com; hch@infradead.org; targupta@nvidia.com; Shameerali
+> Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>; liulongfang
+> <liulongfang@huawei.com>; yan.y.zhao@intel.com; Max Gurtovoy
+> <mgurtovoy@nvidia.com>
+> Subject: [RFC PATCH v4 00/11] Introduce vfio-pci-core subsystem
+> 
+> Hi Alex, Cornelia, Jason and Co,
+> 
+> This series split the vfio_pci driver into 2 parts: pci drivers and a
+> subsystem driver that will also be library of code. The main pci driver,
+> vfio_pci.ko will be used as before and it will bind to the subsystem
+> driver vfio_pci_core.ko to register to the VFIO subsystem.
+> 
+> This series is coming to solve some of the issues that were raised in
+> the previous attempts for extending vfio-pci for vendor specific
+> functionality:
+> 1. https://lkml.org/lkml/2020/5/17/376 by Yan Zhao.
+> 2. https://www.spinics.net/lists/kernel/msg3903996.html by Longfang Liu
+> 
+> This subsystem framework will also ease on adding new vendor specific
+> functionality to VFIO devices in the future by allowing another module
+> to provide the pci_driver that can setup number of details before
+> registering to VFIO subsystem (such as inject its own operations).
+> 
+> This series also extends the "driver_override" mechanism. We added a flag
+> for pci drivers that will declare themselves as "driver_override" capable
+> and only declared drivers can use this mechanism in the PCI subsystem.
+> Other drivers will not be able to bind to devices that use "driver_override".
+> Also, the PCI driver matching will always look for ID table and will never
+> generate dummy "match_all" ID table in the PCI subsystem layer. In this
+> way, we ensure deterministic behaviour with no races with the original
+> pci drivers. In order to get the best match for "driver_override" drivers,
+> one can create a userspace program (example can be found at
+> https://github.com/maxgurtovoy/linux_tools/blob/main/vfio/bind_vfio_pci_dr
+> iver.py)
+> that find the 'best match' according to simple algorithm: "the driver
+> with the fewest '*' matches wins."
+> For example, the vfio-pci driver will match to any pci device. So it
+> will have the maximal '*' matches (for all matching IDs: vendor, device,
+> subvendor, ...).
+> In case we are looking for a match to mlx5 based device, we'll have a
+> match to vfio-pci.ko and mlx5-vfio-pci.ko. We'll prefer mlx5-vfio-pci.ko
+> since it will have less '*' matches (probably vendor and device IDs will
+> match). This will work in the future for NVMe/Virtio devices that can
+> match according to a class code or other criteria.
+> 
+> The main goal of this series is to agree on the vfio_pci module split and the
+> "driver_override" extensions. The follow-up version will include an extended
+> mlx5_vfio_pci driver that will support VF suspend/resume as well.
+> 
+> This series applied cleanly on top of vfio reflck re-design (still haven't sent
+> for review) and can be found at:
+> https://github.com/Mellanox/NVMEoF-P2P/tree/vfio-v4-external.
+> 
+> Max Gurtovoy (11):
+>   vfio-pci: rename vfio_pci.c to vfio_pci_core.c
+>   vfio-pci: rename vfio_pci_private.h to vfio_pci_core.h
+>   vfio-pci: rename vfio_pci_device to vfio_pci_core_device
+>   vfio-pci: rename ops functions to fit core namings
+>   vfio-pci: include vfio header in vfio_pci_core.h
+>   vfio-pci: introduce vfio_pci.c
+>   vfio-pci: move igd initialization to vfio_pci.c
+>   PCI: add flags field to pci_device_id structure
+>   PCI: add matching checks for driver_override binding
+>   vfio-pci: introduce vfio_pci_core subsystem driver
+>   mlx5-vfio-pci: add new vfio_pci driver for mlx5 devices
+> 
+>  Documentation/ABI/testing/sysfs-bus-pci       |    6 +-
+>  Documentation/PCI/pci.rst                     |    1 +
+>  drivers/pci/pci-driver.c                      |   22 +-
+>  drivers/vfio/pci/Kconfig                      |   27 +-
+>  drivers/vfio/pci/Makefile                     |   12 +-
+>  drivers/vfio/pci/mlx5_vfio_pci.c              |  130 +
+>  drivers/vfio/pci/vfio_pci.c                   | 2329 +----------------
+>  drivers/vfio/pci/vfio_pci_config.c            |   70 +-
+>  drivers/vfio/pci/vfio_pci_core.c              | 2239 ++++++++++++++++
+>  drivers/vfio/pci/vfio_pci_igd.c               |   16 +-
+>  drivers/vfio/pci/vfio_pci_intrs.c             |   42 +-
+>  drivers/vfio/pci/vfio_pci_rdwr.c              |   18 +-
+>  drivers/vfio/pci/vfio_pci_zdev.c              |    4 +-
+>  include/linux/mod_devicetable.h               |    9 +
+>  include/linux/pci.h                           |   27 +
+>  .../linux/vfio_pci_core.h                     |   93 +-
+>  scripts/mod/devicetable-offsets.c             |    1 +
+>  scripts/mod/file2alias.c                      |    8 +-
+>  18 files changed, 2695 insertions(+), 2359 deletions(-)
+>  create mode 100644 drivers/vfio/pci/mlx5_vfio_pci.c
+>  create mode 100644 drivers/vfio/pci/vfio_pci_core.c
+>  rename drivers/vfio/pci/vfio_pci_private.h => include/linux/vfio_pci_core.h
+> (56%)
+> 
+> --
+> 2.21.0
+
