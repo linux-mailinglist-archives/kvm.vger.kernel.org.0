@@ -2,86 +2,204 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 886FA3DBB6C
-	for <lists+kvm@lfdr.de>; Fri, 30 Jul 2021 16:54:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 336C23DBB8A
+	for <lists+kvm@lfdr.de>; Fri, 30 Jul 2021 17:06:12 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239412AbhG3OyU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 30 Jul 2021 10:54:20 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:30898 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S239369AbhG3OyT (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 30 Jul 2021 10:54:19 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1627656854;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=vP9UshPvbz8YoLOzWnPB+DZvElzHipfy18IZoTE1sak=;
-        b=RvAKA3pG65uQRioUXTUJhPgVgjQuJyzVBV5PlJxV3qBgopcGiQK1RBr3G0lANDu+8cBHRF
-        myZRnWSt16MuFUKf7U4QLVPOT17Ipim4zotYm9be9qygh2AUuuqcaxO1U2VDpcYdS5zoBc
-        HkgUF5vOej+yHacRlLqZcDR37yhBF6A=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-457-8G2Jno_TOcSYIKXN1WPdNA-1; Fri, 30 Jul 2021 10:54:13 -0400
-X-MC-Unique: 8G2Jno_TOcSYIKXN1WPdNA-1
-Received: by mail-wm1-f72.google.com with SMTP id a18-20020a05600c2252b02902531dcdc68fso3272436wmm.6
-        for <kvm@vger.kernel.org>; Fri, 30 Jul 2021 07:54:13 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=vP9UshPvbz8YoLOzWnPB+DZvElzHipfy18IZoTE1sak=;
-        b=CLAsJzwwyCPBr4LA0gWdyY0mpHRQgeTi1C5qYM4sB9Gm5foFjFRoni1BjQReSfj09a
-         A47GHLp3v3glOL7ElC+jqE9cl0WlIlPENGyd/j2sxqt6uEAVKU9h5Ghbq4dmP1zdw0ZM
-         Y7R6hokfzSo3KyOCqgCvE1GMHfZhPhGxkw9uHRy6Ot6GCuk75LfZ8s5b/2gE60YsDAgh
-         B5vNYF8EdbPFESXcJclfoE+qVO4AQvjuqiNRTj65kRFBCu1HXljPnvNcHO8gRjyWPejt
-         foeEz9R8mb8DUhsG+KfaS2ZdTs4bUoiuPaF5gYO+H8IPXbiwwVuREqkTFj2oLpvSJ7WH
-         PlWg==
-X-Gm-Message-State: AOAM530XLkjrHfATlyIbFslSPYq778BdolMlHnf7DCS0Vqlb1LhCo1hE
-        9u1If1O9ZJTZGYu1pwwpTs7o4SMI1JG+40NJofzDFQTgPCb5vcOSgqeCNnSCTSquStJZ0vHDtJ9
-        aRy8HZb/X7cKO
-X-Received: by 2002:a05:600c:2319:: with SMTP id 25mr3365328wmo.27.1627656852148;
-        Fri, 30 Jul 2021 07:54:12 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxnhYLRVeborZsaIV3naK2XsDF7jWBJ/fPAzAWtBaZX12E6P4p3lC1/JDHRJsKDlmjzoAiQKg==
-X-Received: by 2002:a05:600c:2319:: with SMTP id 25mr3365312wmo.27.1627656852014;
-        Fri, 30 Jul 2021 07:54:12 -0700 (PDT)
-Received: from thuth.remote.csb (p5791d280.dip0.t-ipconnect.de. [87.145.210.128])
-        by smtp.gmail.com with ESMTPSA id d15sm2105209wri.39.2021.07.30.07.54.11
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 30 Jul 2021 07:54:11 -0700 (PDT)
-Subject: Re: [kvm-unit-tests PATCH 4/4] lib: s390x: sie: Move sie function
- into library
-To:     Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org
-Cc:     linux-s390@vger.kernel.org, imbrenda@linux.ibm.com,
-        david@redhat.com, cohuck@redhat.com
-References: <20210729134803.183358-1-frankja@linux.ibm.com>
- <20210729134803.183358-5-frankja@linux.ibm.com>
-From:   Thomas Huth <thuth@redhat.com>
-Message-ID: <d6f15c93-3b9a-6a95-4d6b-db8d9c513bd2@redhat.com>
-Date:   Fri, 30 Jul 2021 16:54:10 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.12.0
-MIME-Version: 1.0
-In-Reply-To: <20210729134803.183358-5-frankja@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+        id S239351AbhG3PGK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 30 Jul 2021 11:06:10 -0400
+Received: from mga05.intel.com ([192.55.52.43]:52620 "EHLO mga05.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S238909AbhG3PGJ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 30 Jul 2021 11:06:09 -0400
+X-IronPort-AV: E=McAfee;i="6200,9189,10061"; a="298699104"
+X-IronPort-AV: E=Sophos;i="5.84,282,1620716400"; 
+   d="scan'208";a="298699104"
+Received: from fmsmga003.fm.intel.com ([10.253.24.29])
+  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Jul 2021 08:06:04 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.84,282,1620716400"; 
+   d="scan'208";a="508154895"
+Received: from chang-linux-3.sc.intel.com ([172.25.66.175])
+  by FMSMGA003.fm.intel.com with ESMTP; 30 Jul 2021 08:06:03 -0700
+From:   "Chang S. Bae" <chang.seok.bae@intel.com>
+To:     bp@suse.de, luto@kernel.org, tglx@linutronix.de, mingo@kernel.org,
+        x86@kernel.org
+Cc:     len.brown@intel.com, dave.hansen@intel.com,
+        thiago.macieira@intel.com, jing2.liu@intel.com,
+        ravi.v.shankar@intel.com, linux-kernel@vger.kernel.org,
+        chang.seok.bae@intel.com, kvm@vger.kernel.org
+Subject: [PATCH v9 01/26] x86/fpu/xstate: Modify the initialization helper to handle both static and dynamic buffers
+Date:   Fri, 30 Jul 2021 07:59:32 -0700
+Message-Id: <20210730145957.7927-2-chang.seok.bae@intel.com>
+X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20210730145957.7927-1-chang.seok.bae@intel.com>
+References: <20210730145957.7927-1-chang.seok.bae@intel.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 29/07/2021 15.48, Janosch Frank wrote:
-> Time to deduplicate more code.
-> 
-> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
-> ---
->   lib/s390x/sie.c  | 13 +++++++++++++
->   lib/s390x/sie.h  |  1 +
->   s390x/mvpg-sie.c | 13 -------------
->   s390x/sie.c      | 17 -----------------
->   4 files changed, 14 insertions(+), 30 deletions(-)
+Have the function initializing the XSTATE buffer take a struct fpu *
+pointer in preparation for dynamic state buffer support.
 
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+init_fpstate is a special case, which is indicated by a null pointer
+parameter to fpstate_init().
+
+Also, fpstate_init_xstate() now accepts the state component bitmap to
+customize the compacted format.
+
+No functional change.
+
+Signed-off-by: Chang S. Bae <chang.seok.bae@intel.com>
+Reviewed-by: Len Brown <len.brown@intel.com>
+Cc: x86@kernel.org
+Cc: linux-kernel@vger.kernel.org
+Cc: kvm@vger.kernel.org
+---
+Changes from v5:
+* Moved fpstate_init_xstate() back to the header (again).
+* Massaged the changelog.
+
+Changes from v4:
+* Added a proper function description. (Borislav Petkov)
+* Added the likely() statement as a null pointer is a special case.
+
+Changes from v3:
+* Updated the changelog. (Borislav Petkov)
+* Updated the function comment to use kernel-doc style. (Borislav Petkov)
+
+Changes from v2:
+* Updated the changelog with task->fpu removed. (Borislav Petkov)
+---
+ arch/x86/include/asm/fpu/internal.h | 11 ++++++++++-
+ arch/x86/kernel/fpu/core.c          | 28 +++++++++++++++++-----------
+ arch/x86/kernel/fpu/init.c          |  2 +-
+ arch/x86/kernel/fpu/xstate.c        |  3 +--
+ arch/x86/kvm/x86.c                  |  2 +-
+ 5 files changed, 30 insertions(+), 16 deletions(-)
+
+diff --git a/arch/x86/include/asm/fpu/internal.h b/arch/x86/include/asm/fpu/internal.h
+index 5a18694a89b2..c7a64e2806a9 100644
+--- a/arch/x86/include/asm/fpu/internal.h
++++ b/arch/x86/include/asm/fpu/internal.h
+@@ -80,7 +80,7 @@ static __always_inline __pure bool use_fxsr(void)
+ 
+ extern union fpregs_state init_fpstate;
+ 
+-extern void fpstate_init(union fpregs_state *state);
++extern void fpstate_init(struct fpu *fpu);
+ #ifdef CONFIG_MATH_EMULATION
+ extern void fpstate_init_soft(struct swregs_state *soft);
+ #else
+@@ -88,6 +88,15 @@ static inline void fpstate_init_soft(struct swregs_state *soft) {}
+ #endif
+ extern void save_fpregs_to_fpstate(struct fpu *fpu);
+ 
++static inline void fpstate_init_xstate(struct xregs_state *xsave, u64 mask)
++{
++	/*
++	 * XRSTORS requires these bits set in xcomp_bv, or it will
++	 * trigger #GP:
++	 */
++	xsave->header.xcomp_bv = XCOMP_BV_COMPACTED_FORMAT | mask;
++}
++
+ /* Returns 0 or the negated trap number, which results in -EFAULT for #PF */
+ #define user_insn(insn, output, input...)				\
+ ({									\
+diff --git a/arch/x86/kernel/fpu/core.c b/arch/x86/kernel/fpu/core.c
+index 7ada7bd03a32..c0098f8422de 100644
+--- a/arch/x86/kernel/fpu/core.c
++++ b/arch/x86/kernel/fpu/core.c
+@@ -203,15 +203,6 @@ void fpu_sync_fpstate(struct fpu *fpu)
+ 	fpregs_unlock();
+ }
+ 
+-static inline void fpstate_init_xstate(struct xregs_state *xsave)
+-{
+-	/*
+-	 * XRSTORS requires these bits set in xcomp_bv, or it will
+-	 * trigger #GP:
+-	 */
+-	xsave->header.xcomp_bv = XCOMP_BV_COMPACTED_FORMAT | xfeatures_mask_all;
+-}
+-
+ static inline void fpstate_init_fxstate(struct fxregs_state *fx)
+ {
+ 	fx->cwd = 0x37f;
+@@ -229,8 +220,23 @@ static inline void fpstate_init_fstate(struct fregs_state *fp)
+ 	fp->fos = 0xffff0000u;
+ }
+ 
+-void fpstate_init(union fpregs_state *state)
++/**
++ *
++ * fpstate_init - initialize the xstate buffer
++ *
++ * If @fpu is NULL, initialize init_fpstate.
++ *
++ * @fpu:	A struct fpu * pointer
++ */
++void fpstate_init(struct fpu *fpu)
+ {
++	union fpregs_state *state;
++
++	if (likely(fpu))
++		state = &fpu->state;
++	else
++		state = &init_fpstate;
++
+ 	if (!static_cpu_has(X86_FEATURE_FPU)) {
+ 		fpstate_init_soft(&state->soft);
+ 		return;
+@@ -239,7 +245,7 @@ void fpstate_init(union fpregs_state *state)
+ 	memset(state, 0, fpu_kernel_xstate_size);
+ 
+ 	if (static_cpu_has(X86_FEATURE_XSAVES))
+-		fpstate_init_xstate(&state->xsave);
++		fpstate_init_xstate(&state->xsave, xfeatures_mask_all);
+ 	if (static_cpu_has(X86_FEATURE_FXSR))
+ 		fpstate_init_fxstate(&state->fxsave);
+ 	else
+diff --git a/arch/x86/kernel/fpu/init.c b/arch/x86/kernel/fpu/init.c
+index 64e29927cc32..e14c72bc8706 100644
+--- a/arch/x86/kernel/fpu/init.c
++++ b/arch/x86/kernel/fpu/init.c
+@@ -124,7 +124,7 @@ static void __init fpu__init_system_generic(void)
+ 	 * Set up the legacy init FPU context. (xstate init might overwrite this
+ 	 * with a more modern format, if the CPU supports it.)
+ 	 */
+-	fpstate_init(&init_fpstate);
++	fpstate_init(NULL);
+ 
+ 	fpu__init_system_mxcsr();
+ }
+diff --git a/arch/x86/kernel/fpu/xstate.c b/arch/x86/kernel/fpu/xstate.c
+index c8def1b7f8fb..d4fdceb9a309 100644
+--- a/arch/x86/kernel/fpu/xstate.c
++++ b/arch/x86/kernel/fpu/xstate.c
+@@ -395,8 +395,7 @@ static void __init setup_init_fpu_buf(void)
+ 	print_xstate_features();
+ 
+ 	if (boot_cpu_has(X86_FEATURE_XSAVES))
+-		init_fpstate.xsave.header.xcomp_bv = XCOMP_BV_COMPACTED_FORMAT |
+-						     xfeatures_mask_all;
++		fpstate_init_xstate(&init_fpstate.xsave, xfeatures_mask_all);
+ 
+ 	/*
+ 	 * Init all the features state with header.xfeatures being 0x0
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index a4fd10604f72..76a4e5e274d8 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -10599,7 +10599,7 @@ static void fx_init(struct kvm_vcpu *vcpu)
+ 	if (!vcpu->arch.guest_fpu)
+ 		return;
+ 
+-	fpstate_init(&vcpu->arch.guest_fpu->state);
++	fpstate_init(vcpu->arch.guest_fpu);
+ 	if (boot_cpu_has(X86_FEATURE_XSAVES))
+ 		vcpu->arch.guest_fpu->state.xsave.header.xcomp_bv =
+ 			host_xcr0 | XSTATE_COMPACTION_ENABLED;
+-- 
+2.17.1
 
