@@ -2,122 +2,123 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 71AB83DAED5
-	for <lists+kvm@lfdr.de>; Fri, 30 Jul 2021 00:27:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id ABAC63DB083
+	for <lists+kvm@lfdr.de>; Fri, 30 Jul 2021 03:11:01 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233043AbhG2W1n (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 29 Jul 2021 18:27:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35972 "EHLO
+        id S232810AbhG3BLD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 29 Jul 2021 21:11:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45618 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232169AbhG2W1i (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 29 Jul 2021 18:27:38 -0400
-Received: from mail-pl1-x635.google.com (mail-pl1-x635.google.com [IPv6:2607:f8b0:4864:20::635])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 124EEC061765
-        for <kvm@vger.kernel.org>; Thu, 29 Jul 2021 15:27:34 -0700 (PDT)
-Received: by mail-pl1-x635.google.com with SMTP id q2so8656391plr.11
-        for <kvm@vger.kernel.org>; Thu, 29 Jul 2021 15:27:34 -0700 (PDT)
+        with ESMTP id S229667AbhG3BLC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 29 Jul 2021 21:11:02 -0400
+Received: from mail-pl1-x632.google.com (mail-pl1-x632.google.com [IPv6:2607:f8b0:4864:20::632])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B51BFC061765
+        for <kvm@vger.kernel.org>; Thu, 29 Jul 2021 18:10:57 -0700 (PDT)
+Received: by mail-pl1-x632.google.com with SMTP id i10so9090088pla.3
+        for <kvm@vger.kernel.org>; Thu, 29 Jul 2021 18:10:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=U7V9Ap3CLbBdQCnG02pu0xdSqMhicUYByn9SxkAU8rw=;
-        b=Ffk8XpysnuqjpLBT6TZqn4W5/OEbtQF8oVqJwVgwx/tfDyKtg04s3+tvbENJTzrV5J
-         4NJrhbizq83pOW9DriO0IT1D4PRHNil84BWsETrNpx1o81V0zVMAYWrhvFiYbCRUk2MD
-         zG5yXj3ZhDiLFDAKQK4BizaWGfbivzK8Ia7+s06Ffs9L6mTHg6b2P3eFLnVlrfwT7WPO
-         zByAMI0AQb70/64I2++woOOagf26a1zTqhRimG2LA8iijcdW37HJhjl3r+9q2qJIk7SM
-         e9i3dvi3rB1sEJuHMPEhTCJ5YGvU3pkRsprjZZm28ZHEaP82OdR6kEcxqbW5GzfTj/Ng
-         aG5g==
+        bh=DsDa8w/t7/VXcjTtjhlMutUZ69+V3sKaHAYWUrxvP2w=;
+        b=s5WKvm12hxduXD4KaBZVdGFu1auOXhmp85lyVaoRSW/i40OfXQUyx5b0TBXC+zeqll
+         Nqfev9udZ9s3S7qMBcWcr4MMCRGeZh7r31GXm49jNsKlnzuv8dtSyh4y4mskTCDsA9S3
+         QU3STRyPmpSeRi0qUf64zUJkaUCQxX49L97ZND7xLa0yvKCfzJcEn0y+z0uRBCjegntd
+         3ruUl7q66HZI3OLUvqEVPYCCdO4btGXwjs9Rmh2qCQ/vw2CedidiUv8BpS9RHY0MGdMN
+         tWRDfn/+oTzIOLFWjJRyiAhPh5NxaQXFiY8x/1ykirixoItlLiu0KTqzifk1So2yfQmX
+         kymg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=U7V9Ap3CLbBdQCnG02pu0xdSqMhicUYByn9SxkAU8rw=;
-        b=jpmA6wCT54NQkPqs2k9i4uLseHXoo8tTgzQL/tQ1uuB73pL8Wf47z1WPZKSni9m2AB
-         JS/HZ9XEUYAWhqy1ytuhPqoTzSEUVmU8d2mBxslpaqz6Bk/x2pl7Y9vaHv49tQNrQxvR
-         czWbsXTqspd+Gbf4NawJk0oLJdx+A9UZeK2e1w/fwRK5sD8t5sIdgipoHxS1Q8nPTHWR
-         wG5rIoQX7vtoxNZ6X+jnCNoMR9x4pQ5fJZlzNZS9/je3xmn6CdOp22mz0V8sk9ZEzhhP
-         zyzuU36sFWX4djwVaJOAiKuRXlzrAENtgeOvv0jDS3Xe7rMLCCxwq3hYGDd5HCnAw+H9
-         W+bw==
-X-Gm-Message-State: AOAM533b+pI3buKge4pGVcrvhDSupPA2qH+6GWxprDi7QZzg/E2Lm3HA
-        K8V5Ci24j+OOOQNrJJUI3H1D2Q==
-X-Google-Smtp-Source: ABdhPJwUIJmnIsqgtiT+cHGl4vPiaiiOn9b6WyOeTGaDzqUNureByRM1AZxpT7XVVs9zcWtSUdzInA==
-X-Received: by 2002:a17:902:d492:b029:12b:dd74:5c79 with SMTP id c18-20020a170902d492b029012bdd745c79mr6407841plg.45.1627597653314;
-        Thu, 29 Jul 2021 15:27:33 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id z124sm5138144pgb.6.2021.07.29.15.27.32
+        bh=DsDa8w/t7/VXcjTtjhlMutUZ69+V3sKaHAYWUrxvP2w=;
+        b=KM5clqqKShjo6Yfy/9aAmZE1TdvHQNLkf/dicAMaGdrWGVjrTIXJFXQ5tytY+FD22a
+         bEc/RCWqHyvuYAN8qJADtvkh8Bz0HucSM8ooey7+u3o6IdvXILBTRi5o69gqg/KTuJrX
+         5mvfZMspqshLYe4D6KhsvFOu9XbvYfbFhivZ2F8MHNg9Xl4bSuHCY1xJXWoVkhyCyrID
+         qDGtKzRvI6zM6Vwq00phLaWOIOcoAjTyoPDQJgwuiem9mh28UwRu/Ch8C+knY1VVR9FN
+         DDI9ewFqrrSL4imJL3lXc0WCWxyfbVE8dkhGqrMr1Zm8w4129y/v6+DAno/ryEOB/MfP
+         TnYA==
+X-Gm-Message-State: AOAM533HU7CAZeYfVvKdHs/yLLxBykkYS7SMm/DBiMyYOLhYFQRz7V3I
+        di6SHl4wDhv2p4O55IpIqjK3SZIRZbTHuQ==
+X-Google-Smtp-Source: ABdhPJykHjxFNng8e9pwGpUCl99/cU52oDpwBq5WiOXs/vFkGzZfPrkKkwfN3K7VYIuO2swkU374ZQ==
+X-Received: by 2002:aa7:88d4:0:b029:329:be20:a5c with SMTP id k20-20020aa788d40000b0290329be200a5cmr7927892pff.61.1627607456971;
+        Thu, 29 Jul 2021 18:10:56 -0700 (PDT)
+Received: from google.com (150.12.83.34.bc.googleusercontent.com. [34.83.12.150])
+        by smtp.gmail.com with ESMTPSA id h192sm59949pfe.1.2021.07.29.18.10.56
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 29 Jul 2021 15:27:32 -0700 (PDT)
-Date:   Thu, 29 Jul 2021 22:27:28 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     David Edmondson <david.edmondson@oracle.com>
-Cc:     linux-kernel@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
-        Joerg Roedel <joro@8bytes.org>, Ingo Molnar <mingo@redhat.com>,
-        Jim Mattson <jmattson@google.com>, kvm@vger.kernel.org,
-        Borislav Petkov <bp@alien8.de>,
-        David Matlack <dmatlack@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, x86@kernel.org,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>
-Subject: Re: [PATCH v3 1/3] KVM: x86: kvm_x86_ops.get_exit_info should
- include the exit reason
-Message-ID: <YQMrUOjZMD1eiIeE@google.com>
-References: <20210729133931.1129696-1-david.edmondson@oracle.com>
- <20210729133931.1129696-2-david.edmondson@oracle.com>
+        Thu, 29 Jul 2021 18:10:56 -0700 (PDT)
+Date:   Thu, 29 Jul 2021 18:10:53 -0700
+From:   Ricardo Koller <ricarkol@google.com>
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
+        pbonzini@redhat.com, maz@kernel.org, drjones@redhat.com,
+        alexandru.elisei@arm.com, eric.auger@redhat.com,
+        yuzenghui@huawei.com, vkuznets@redhat.com
+Subject: Re: [PATCH v4 3/6] KVM: selftests: Introduce UCALL_UNHANDLED for
+ unhandled vector reporting
+Message-ID: <YQNRnbuucxcYJT2F@google.com>
+References: <20210611011020.3420067-1-ricarkol@google.com>
+ <20210611011020.3420067-4-ricarkol@google.com>
+ <YQLwP9T4hevAqa7w@google.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20210729133931.1129696-2-david.edmondson@oracle.com>
+In-Reply-To: <YQLwP9T4hevAqa7w@google.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Shortlog is a bit odd, "should" is subjective and makes this sound like a bug fix.
-
-  KVM: x86: Get exit_reason as part of kvm_x86_ops.get_exit_info
-
-On Thu, Jul 29, 2021, David Edmondson wrote:
-> Extend the get_exit_info static call to provide the reason for the VM
-> exit. Modify relevant trace points to use this rather than extracting
-> the reason in the caller.
+On Thu, Jul 29, 2021 at 06:15:27PM +0000, Sean Christopherson wrote:
+> On Thu, Jun 10, 2021, Ricardo Koller wrote:
+> > diff --git a/tools/testing/selftests/kvm/include/kvm_util.h b/tools/testing/selftests/kvm/include/kvm_util.h
+> > index fcd8e3855111..beb76d6deaa9 100644
+> > --- a/tools/testing/selftests/kvm/include/kvm_util.h
+> > +++ b/tools/testing/selftests/kvm/include/kvm_util.h
+> > @@ -349,6 +349,7 @@ enum {
+> >  	UCALL_SYNC,
+> >  	UCALL_ABORT,
+> >  	UCALL_DONE,
+> > +	UCALL_UNHANDLED,
+> >  };
 > 
-> Signed-off-by: David Edmondson <david.edmondson@oracle.com>
-> ---
-> -static void svm_get_exit_info(struct kvm_vcpu *vcpu, u64 *info1, u64 *info2,
-> +static void svm_get_exit_info(struct kvm_vcpu *vcpu, u64 *reason,
-> +			      u64 *info1, u64 *info2,
->  			      u32 *intr_info, u32 *error_code)
->  {
->  	struct vmcb_control_area *control = &to_svm(vcpu)->vmcb->control;
->  
-> +	*reason = control->exit_code;
->  	*info1 = control->exit_info_1;
->  	*info2 = control->exit_info_2;
->  	*intr_info = control->exit_int_info;
+> ...
+> 
+> > @@ -1254,16 +1254,13 @@ void vm_install_exception_handler(struct kvm_vm *vm, int vector,
+> >  
+> >  void assert_on_unhandled_exception(struct kvm_vm *vm, uint32_t vcpuid)
+> >  {
+> > -	if (vcpu_state(vm, vcpuid)->exit_reason == KVM_EXIT_IO
+> > -		&& vcpu_state(vm, vcpuid)->io.port == UNEXPECTED_VECTOR_PORT
+> > -		&& vcpu_state(vm, vcpuid)->io.size == 4) {
+> > -		/* Grab pointer to io data */
+> > -		uint32_t *data = (void *)vcpu_state(vm, vcpuid)
+> > -			+ vcpu_state(vm, vcpuid)->io.data_offset;
+> > -
+> > -		TEST_ASSERT(false,
+> > -			    "Unexpected vectored event in guest (vector:0x%x)",
+> > -			    *data);
+> > +	struct ucall uc;
+> > +
+> > +	if (get_ucall(vm, vcpuid, &uc) == UCALL_UNHANDLED) {
+> 
+> UCALL_UNHANDLED is a bit of an odd name.  Without the surrounding context, I would
+> have no idea that it's referring to an unhandled event, e.g. my gut reaction would
+> be that it means the ucall itself was unhandled. Maybe UCALL_UNHANDLED_EVENT?
 
-...
+I see. I can send a new patch (this was commited as 75275d7fbe) with a
+new name. The only name I can think of that's more descriptive would be
+UCALL_UNHANDLED_EXCEPTION, but that's even longer.
 
-> diff --git a/arch/x86/kvm/trace.h b/arch/x86/kvm/trace.h
-> index b484141ea15b..2228565beda2 100644
-> --- a/arch/x86/kvm/trace.h
-> +++ b/arch/x86/kvm/trace.h
-> @@ -273,11 +273,11 @@ TRACE_EVENT(kvm_apic,
->  
->  #define TRACE_EVENT_KVM_EXIT(name)					     \
->  TRACE_EVENT(name,							     \
-> -	TP_PROTO(unsigned int exit_reason, struct kvm_vcpu *vcpu, u32 isa),  \
-> -	TP_ARGS(exit_reason, vcpu, isa),				     \
-> +	TP_PROTO(struct kvm_vcpu *vcpu, u32 isa),			     \
-> +	TP_ARGS(vcpu, isa),						     \
->  									     \
->  	TP_STRUCT__entry(						     \
-> -		__field(	unsigned int,	exit_reason	)	     \
-> +		__field(	u64,		exit_reason	)	     \
-
-Converting to a u64 is unnecessary and misleading.  vmcs.EXIT_REASON and
-vmcb.EXIT_CODE are both u32s, a.k.a. unsigned ints.  There is vmcb.EXIT_CODE_HI,
-but that's not being included, and AFAICT isn't even sanity checked by KVM.
-
->  		__field(	unsigned long,	guest_rip	)	     \
->  		__field(	u32,	        isa             )	     \
->  		__field(	u64,	        info1           )	     \
+> It's rather long, but I don't think that will be problematic for any of the code.
+> 
+> 
+> > +		uint64_t vector = uc.args[0];
+> > +
+> > +		TEST_FAIL("Unexpected vectored event in guest (vector:0x%lx)",
+> > +			  vector);
+> >  	}
+> >  }
+> >  
+> > -- 
+> > 2.32.0.272.g935e593368-goog
+> > 
