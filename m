@@ -2,248 +2,169 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 14B793DBB7F
-	for <lists+kvm@lfdr.de>; Fri, 30 Jul 2021 17:01:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8CCC23DBC1A
+	for <lists+kvm@lfdr.de>; Fri, 30 Jul 2021 17:22:20 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239405AbhG3PBy (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 30 Jul 2021 11:01:54 -0400
-Received: from smtp-fw-6002.amazon.com ([52.95.49.90]:52309 "EHLO
-        smtp-fw-6002.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239030AbhG3PBx (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 30 Jul 2021 11:01:53 -0400
+        id S239581AbhG3PWW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 30 Jul 2021 11:22:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55186 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S239558AbhG3PWU (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 30 Jul 2021 11:22:20 -0400
+Received: from mail-lf1-x12c.google.com (mail-lf1-x12c.google.com [IPv6:2a00:1450:4864:20::12c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AE94EC06175F
+        for <kvm@vger.kernel.org>; Fri, 30 Jul 2021 08:22:14 -0700 (PDT)
+Received: by mail-lf1-x12c.google.com with SMTP id h2so18622204lfu.4
+        for <kvm@vger.kernel.org>; Fri, 30 Jul 2021 08:22:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.de; i=@amazon.de; q=dns/txt; s=amazon201209;
-  t=1627657310; x=1659193310;
-  h=date:from:to:cc:message-id:references:mime-version:
-   in-reply-to:subject;
-  bh=kmZvjwXOQUAejKr+gnf0Zxf4PHoVVd4Xm45+XI/Os8g=;
-  b=ivuOCU/zqKiSYOpxPOmrf7rR2xTnHX1QGbMyEF7HiQpWx81U3XEv/9kJ
-   8ggkjTfbv2X+pObBJfDk1zcLlHLd8yJLmwR+bPRZFC7QiT+3uui5odJJC
-   j4OpDfF8C9DG7NGTAebk0sGU2uR9Odu9KA2dt+2Ur+kIR6f7bnvYw/grD
-   8=;
-X-IronPort-AV: E=Sophos;i="5.84,282,1620691200"; 
-   d="scan'208";a="129091375"
-Subject: Re: [PATCH 4/4] KVM: selftests: Test access to XMM fast hypercalls
-Received: from iad12-co-svc-p1-lb1-vlan2.amazon.com (HELO email-inbound-relay-1e-27fb8269.us-east-1.amazon.com) ([10.43.8.2])
-  by smtp-border-fw-6002.iad6.amazon.com with ESMTP; 30 Jul 2021 15:01:43 +0000
-Received: from EX13D28EUC003.ant.amazon.com (iad55-ws-svc-p15-lb9-vlan2.iad.amazon.com [10.40.159.162])
-        by email-inbound-relay-1e-27fb8269.us-east-1.amazon.com (Postfix) with ESMTPS id 18728A1C90;
-        Fri, 30 Jul 2021 15:01:39 +0000 (UTC)
-Received: from u366d62d47e3651.ant.amazon.com (10.43.161.175) by
- EX13D28EUC003.ant.amazon.com (10.43.164.43) with Microsoft SMTP Server (TLS)
- id 15.0.1497.23; Fri, 30 Jul 2021 15:01:36 +0000
-Date:   Fri, 30 Jul 2021 17:01:32 +0200
-From:   Siddharth Chandrasekaran <sidcha@amazon.de>
-To:     Vitaly Kuznetsov <vkuznets@redhat.com>
-CC:     <kvm@vger.kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        <linux-kernel@vger.kernel.org>
-Message-ID: <20210730150131.GA31075@u366d62d47e3651.ant.amazon.com>
-References: <20210730122625.112848-1-vkuznets@redhat.com>
- <20210730122625.112848-5-vkuznets@redhat.com>
- <20210730143530.GD20232@u366d62d47e3651.ant.amazon.com>
- <878s1namap.fsf@vitty.brq.redhat.com>
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=/1o7+QKd97cIwS/kb/Ro1mV06vaGWcTs0D3fJHtTeso=;
+        b=nVqXEBrlXTGcTUwaUH5Wm8FEDfko7xv0Xdqrq5ntdbi6gth09eo2rp2GDwyHrYvBtt
+         qcCaJ8HQgf4tyQdQ6aro6IyWLEpR5ja2MABBOxIHdNHEOIYAAx4P6J0nwbLx1/VjwT3z
+         MnxgpQjuj/UbcnSfMYqagxbISEsp7GkQYhqGVNHjVMqv0GR0qtz9XXiVfUvngr69Llko
+         Zlutqz6DBFg76VF5mD1QAh2yDxoxr7I/kjDc3v6eRfwv/YBPGLIJ1G6ckwEqO9WL8UT4
+         LTjGh2P4o7HCw6SZOwcuTIAbcdkvvScewj+4RG5cfRjkKrck+bbowZ88vu01qTxghj3R
+         HVcQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=/1o7+QKd97cIwS/kb/Ro1mV06vaGWcTs0D3fJHtTeso=;
+        b=skE5X0Pt/L7yJnGB5NFVJPseL/hh+yTsHST59ud03vYRb8K7mhxKMD4KvcnRYQHq7+
+         pDzuh7RD12rTpz6Fkaf0QVsXIVU0Xa6dGrVleoVNUUbfbtoKlQNIabYSH2y6rG2e9Min
+         4mjV/IIQPZe0J2Y4jzCLz61TyCX2701rRvEdDNaF0aXz5GRosV6Pd8TwxNZzvPnEKd7l
+         4/hdyzpf0tNUudSuWrihkcsC+KnBGJGv8R9ITZA5ySNbNDifegLat3dlo4l8TcJCR6ws
+         1XvijAgf0kcDFb5oK36YxvRmEwyTX/ZUUZYx0Soh+TrXP3TiNMCbeNAoomVJWjdF9w1V
+         owDA==
+X-Gm-Message-State: AOAM532XTIR0bBY6t0D72IynqdaXXuW6469sO6BMvd/Wf0D3JRfGBw7a
+        VhuJvfueFvi6SLKHaCj5mVfPDrAR0E6I1jfEZMwdEA==
+X-Google-Smtp-Source: ABdhPJy3MzOJEL7JUXn3pv247OvpOyrn4DFM65cNNeDejFTsyvt+MsdJW5ifOeeaLmsG2MxQDXZ+nQuM/comVP/br64=
+X-Received: by 2002:a05:6512:3d26:: with SMTP id d38mr2131778lfv.411.1627658532665;
+ Fri, 30 Jul 2021 08:22:12 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <878s1namap.fsf@vitty.brq.redhat.com>
-User-Agent: Mutt/1.9.4 (2018-02-28)
-X-Originating-IP: [10.43.161.175]
-X-ClientProxiedBy: EX13D45UWB003.ant.amazon.com (10.43.161.67) To
- EX13D28EUC003.ant.amazon.com (10.43.164.43)
+References: <20210729173300.181775-1-oupton@google.com> <20210729173300.181775-12-oupton@google.com>
+ <875yws2h5w.wl-maz@kernel.org>
+In-Reply-To: <875yws2h5w.wl-maz@kernel.org>
+From:   Oliver Upton <oupton@google.com>
+Date:   Fri, 30 Jul 2021 08:22:01 -0700
+Message-ID: <CAOQ_QsgCrEWQqakicR3Peu_c8oCMeq8Cok+CK8vJVURUwAdG0A@mail.gmail.com>
+Subject: Re: [PATCH v5 11/13] KVM: arm64: Provide userspace access to the
+ physical counter offset
+To:     Marc Zyngier <maz@kernel.org>
+Cc:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Peter Shier <pshier@google.com>,
+        Jim Mattson <jmattson@google.com>,
+        David Matlack <dmatlack@google.com>,
+        Ricardo Koller <ricarkol@google.com>,
+        Jing Zhang <jingzhangos@google.com>,
+        Raghavendra Rao Anata <rananta@google.com>,
+        James Morse <james.morse@arm.com>,
+        Alexandru Elisei <Alexandru.Elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        linux-arm-kernel@lists.infradead.org,
+        Andrew Jones <drjones@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Jul 30, 2021 at 04:50:06PM +0200, Vitaly Kuznetsov wrote:
-> CAUTION: This email originated from outside of the organization. Do not click links or open attachments unless you can confirm the sender and know the content is safe.
-> 
-> 
-> 
-> Siddharth Chandrasekaran <sidcha@amazon.de> writes:
-> 
-> > On Fri, Jul 30, 2021 at 02:26:25PM +0200, Vitaly Kuznetsov wrote:
-> >> HYPERV_CPUID_FEATURES.EDX and an 'XMM fast' hypercall is issued.
-> >>
-> >> Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
-> >> ---
-> >>  .../selftests/kvm/include/x86_64/hyperv.h     |  5 ++-
-> >>  .../selftests/kvm/x86_64/hyperv_features.c    | 41 +++++++++++++++++--
-> >>  2 files changed, 42 insertions(+), 4 deletions(-)
-> >>
-> >> diff --git a/tools/testing/selftests/kvm/include/x86_64/hyperv.h b/tools/testing/selftests/kvm/include/x86_64/hyperv.h
-> >> index 412eaee7884a..b66910702c0a 100644
-> >> --- a/tools/testing/selftests/kvm/include/x86_64/hyperv.h
-> >> +++ b/tools/testing/selftests/kvm/include/x86_64/hyperv.h
-> >> @@ -117,7 +117,7 @@
-> >>  #define HV_X64_GUEST_DEBUGGING_AVAILABLE               BIT(1)
-> >>  #define HV_X64_PERF_MONITOR_AVAILABLE                  BIT(2)
-> >>  #define HV_X64_CPU_DYNAMIC_PARTITIONING_AVAILABLE      BIT(3)
-> >> -#define HV_X64_HYPERCALL_PARAMS_XMM_AVAILABLE          BIT(4)
-> >> +#define HV_X64_HYPERCALL_XMM_INPUT_AVAILABLE           BIT(4)
-> >>  #define HV_X64_GUEST_IDLE_STATE_AVAILABLE              BIT(5)
-> >>  #define HV_FEATURE_FREQUENCY_MSRS_AVAILABLE            BIT(8)
-> >>  #define HV_FEATURE_GUEST_CRASH_MSR_AVAILABLE           BIT(10)
-> >> @@ -182,4 +182,7 @@
-> >>  #define HV_STATUS_INVALID_CONNECTION_ID                18
-> >>  #define HV_STATUS_INSUFFICIENT_BUFFERS         19
-> >>
-> >> +/* hypercall options */
-> >> +#define HV_HYPERCALL_FAST_BIT          BIT(16)
-> >> +
-> >>  #endif /* !SELFTEST_KVM_HYPERV_H */
-> >> diff --git a/tools/testing/selftests/kvm/x86_64/hyperv_features.c b/tools/testing/selftests/kvm/x86_64/hyperv_features.c
-> >> index af27c7e829c1..91d88aaa9899 100644
-> >> --- a/tools/testing/selftests/kvm/x86_64/hyperv_features.c
-> >> +++ b/tools/testing/selftests/kvm/x86_64/hyperv_features.c
-> >> @@ -47,6 +47,7 @@ static void do_wrmsr(u32 idx, u64 val)
-> >>  }
-> >>
-> >>  static int nr_gp;
-> >> +static int nr_ud;
-> >>
-> >>  static inline u64 hypercall(u64 control, vm_vaddr_t input_address,
-> >>                             vm_vaddr_t output_address)
-> >> @@ -80,6 +81,12 @@ static void guest_gp_handler(struct ex_regs *regs)
-> >>                 regs->rip = (uint64_t)&wrmsr_end;
-> >>  }
-> >>
-> >> +static void guest_ud_handler(struct ex_regs *regs)
-> >> +{
-> >> +       nr_ud++;
-> >> +       regs->rip += 3;
-> >> +}
-> >> +
-> >>  struct msr_data {
-> >>         uint32_t idx;
-> >>         bool available;
-> >> @@ -90,6 +97,7 @@ struct msr_data {
-> >>  struct hcall_data {
-> >>         uint64_t control;
-> >>         uint64_t expect;
-> >> +       bool ud_expected;
-> >>  };
-> >>
-> >>  static void guest_msr(struct msr_data *msr)
-> >> @@ -117,13 +125,26 @@ static void guest_msr(struct msr_data *msr)
-> >>  static void guest_hcall(vm_vaddr_t pgs_gpa, struct hcall_data *hcall)
-> >>  {
-> >>         int i = 0;
-> >> +       u64 res, input, output;
-> >>
-> >>         wrmsr(HV_X64_MSR_GUEST_OS_ID, LINUX_OS_ID);
-> >>         wrmsr(HV_X64_MSR_HYPERCALL, pgs_gpa);
-> >>
-> >>         while (hcall->control) {
-> >> -               GUEST_ASSERT(hypercall(hcall->control, pgs_gpa,
-> >> -                                      pgs_gpa + 4096) == hcall->expect);
-> >> +               nr_ud = 0;
-> >> +               if (!(hcall->control & HV_HYPERCALL_FAST_BIT)) {
-> >> +                       input = pgs_gpa;
-> >> +                       output = pgs_gpa + 4096;
-> >> +               } else {
-> >> +                       input = output = 0;
-> >> +               }
-> >> +
-> >> +               res = hypercall(hcall->control, input, output);
-> >> +               if (hcall->ud_expected)
-> >> +                       GUEST_ASSERT(nr_ud == 1);
-> >
-> > Should we also do WRITE_ONCE(nr_ur, 0) here?
-> 
-> It could probably make sense to replace 'nr_ud = 0' above with this so
-> compiler doesn't screw us up one day..
-> 
-> > or perhaps pass the the
-> > expected value of nr_ud + 1 in hcall->ud_expected from caller and do,
-> >
-> >     if (hcall->ud_expected)
-> >         GUEST_ASSERT(nr_ud == hcall->ud_expected);
-> >
-> > This way there can be other test that can also expect a UD.
-> 
-> My idea was that we don't really need to count #UDs for now, just
-> checking the fact that it happened is OK so I reset nr_ud before doing
-> the hypercall and check it after. It is possible to add more tests with
-> 'ud_expected' this way.
+On Fri, Jul 30, 2021 at 4:08 AM Marc Zyngier <maz@kernel.org> wrote:
+> > FEAT_ECV provides a guest physical counter-timer offset register
+> > (CNTPOFF_EL2), but ECV-enabled hardware is nonexistent at the time of
+> > writing so support for it was elided for the sake of the author :)
+>
+> You seem to have done most the work for that, and there are SW models
+> out there that implement ECV. If anything, the ECV support should come
+> first, and its emulation only as a poor man's workaround.
+>
+> It is also good to show silicon vendors that they suck at providing
+> useful features, and pointing them to the code that would use these
+> features *is* an incentive.
 
-Oops, my bad, didn't notice that you were resetting nr_ud before
-hypercall(). Thanks for clarifying.
+Lol, then so be it. I'll add ECV support to this series. What can I
+test with, though? I don't recall QEMU supporting ECV last I checked..
 
-Reviewed-by: Siddharth Chandrasekaran <sidcha@amazon.de>
+> I really dislike the fallback to !vhe here. I'd rather you
+> special-case the emulated ptimer in the VHE case:
+>
+>         if (has_vhe()) {
+>                 map->direct_vtimer = vcpu_vtimer(vcpu);
+>                 if (!timer_get_offset(vcpu_ptimer(vcpu)))
+>                         map->direct_ptimer = vcpu_ptimer(vcpu);
+>                         map->emul_ptimer = NULL;
+>                 } else {
+>                         map->direct_ptimer = NULL;
+>                         map->emul_ptimer = vcpu_ptimer(vcpu);
+>                 }
+>         } else {
 
-~ Sid.
+Ack.
+
+> and you can drop the timer_emulation_required() helper which doesn't
+> serve any purpose.
+
+Especially if I add ECV to this series, I'd prefer to carry it than
+open-code the check for CNTPOFF && !ECV in get_timer_map(). Do you
+concur? I can tighten it to ptimer_emulation_required() and avoid
+taking an arch_timer context if you prefer.
+
+> > +static inline bool __hyp_handle_counter(struct kvm_vcpu *vcpu)
+> > +{
+> > +     u32 sysreg = esr_sys64_to_sysreg(kvm_vcpu_get_esr(vcpu));
+> > +     int rt = kvm_vcpu_sys_get_rt(vcpu);
+> > +     u64 rv;
+> > +
+> > +     if (sysreg != SYS_CNTPCT_EL0)
+>
+> That's feels really optimistic. You don't check for the exception
+> class, and pray that the bits will align? ;-)
+
+Doh! Missed the EC check.
+
+> Please don't add more small includes like this. It makes things hard
+> to read and hides bugs
+
+Ack.
+
+> the counter read can (and will) be speculated,
+> so you definitely need an ISB before the access. Please also look at
+> __arch_counter_get_cntpct() and arch_counter_enforce_ordering().
+
+Wouldn't it be up to the guest to decide if it wants the counter to be
+speculated or not? I debated this a bit myself in the implementation,
+as we would trap both ordered and un-ordered reads. Well, no way to
+detect it :)
 
 > >
-> >> +               else
-> >> +                       GUEST_ASSERT(res == hcall->expect);
-> >> +
-> >>                 GUEST_SYNC(i++);
-> >>         }
-> >>
-> >> @@ -552,8 +573,18 @@ static void guest_test_hcalls_access(struct kvm_vm *vm, struct hcall_data *hcall
-> >>                         recomm.ebx = 0xfff;
-> >>                         hcall->expect = HV_STATUS_SUCCESS;
-> >>                         break;
-> >> -
-> >>                 case 17:
-> >> +                       /* XMM fast hypercall */
-> >> +                       hcall->control = HVCALL_FLUSH_VIRTUAL_ADDRESS_SPACE | HV_HYPERCALL_FAST_BIT;
-> >> +                       hcall->ud_expected = true;
-> >> +                       break;
-> >> +               case 18:
-> >> +                       feat.edx |= HV_X64_HYPERCALL_XMM_INPUT_AVAILABLE;
-> >> +                       hcall->ud_expected = false;
-> >> +                       hcall->expect = HV_STATUS_SUCCESS;
-> >> +                       break;
-> >> +
-> >> +               case 19:
-> >>                         /* END */
-> >>                         hcall->control = 0;
-> >>                         break;
-> >> @@ -625,6 +656,10 @@ int main(void)
-> >>         /* Test hypercalls */
-> >>         vm = vm_create_default(VCPU_ID, 0, guest_hcall);
-> >>
-> >> +       vm_init_descriptor_tables(vm);
-> >> +       vcpu_init_descriptor_tables(vm, VCPU_ID);
-> >> +       vm_install_exception_handler(vm, UD_VECTOR, guest_ud_handler);
-> >> +
-> >>         /* Hypercall input/output */
-> >>         hcall_page = vm_vaddr_alloc_pages(vm, 2);
-> >>         memset(addr_gva2hva(vm, hcall_page), 0x0, 2 * getpagesize());
-> >> --
-> >> 2.31.1
-> >>
-> >
-> >
-> >
-> > Amazon Development Center Germany GmbH
-> > Krausenstr. 38
-> > 10117 Berlin
-> > Geschaeftsfuehrung: Christian Schlaeger, Jonathan Weiss
-> > Eingetragen am Amtsgericht Charlottenburg unter HRB 149173 B
-> > Sitz: Berlin
-> > Ust-ID: DE 289 237 879
-> >
-> >
-> >
-> 
-> --
-> Vitaly
-> 
+> > -/*
+> > - * Should only be called on non-VHE systems.
+> > - * VHE systems use EL2 timers and configure EL1 timers in kvm_timer_init_vhe().
+> > - */
+>
+> This comment still applies. this function *is* nVHE specific.
+>
 
+Ack.
 
+>
+> You now pay the price of reprogramming CNTHCTL_EL2 on every entry for
+> VHE, and that's not right. On VHE, it should be enough to perform the
+> programming on vcpu_load() only.
+>
 
-Amazon Development Center Germany GmbH
-Krausenstr. 38
-10117 Berlin
-Geschaeftsfuehrung: Christian Schlaeger, Jonathan Weiss
-Eingetragen am Amtsgericht Charlottenburg unter HRB 149173 B
-Sitz: Berlin
-Ust-ID: DE 289 237 879
+True. I'll rework the programming in the next series.
 
+> Overall, this patch needs a bit of splitting up (userspace interface,
+> HV rework), re-optimise VHE, and it *definitely* wants the ECV support
+> for the physical timer.
+>
 
+Sure thing, thanks for the review Marc!
 
+--
+Best,
+Oliver
