@@ -2,204 +2,117 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 72BB53DBAAF
-	for <lists+kvm@lfdr.de>; Fri, 30 Jul 2021 16:35:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id AF9FA3DBAF7
+	for <lists+kvm@lfdr.de>; Fri, 30 Jul 2021 16:45:56 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239184AbhG3Ofw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 30 Jul 2021 10:35:52 -0400
-Received: from smtp-fw-80007.amazon.com ([99.78.197.218]:4849 "EHLO
-        smtp-fw-80007.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231255AbhG3Ofv (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 30 Jul 2021 10:35:51 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.de; i=@amazon.de; q=dns/txt; s=amazon201209;
-  t=1627655747; x=1659191747;
-  h=date:from:to:cc:message-id:references:mime-version:
-   in-reply-to:subject;
-  bh=0FsLXimCNBTR48j3aYbh34ic1ti4XjTilcok0yp9pGE=;
-  b=qIQ/aVNrpLMvOA2Gtj4/wIPiV/8eYYFdbHboMSGE8i9xct5UHQDZSfbj
-   On9mohGq+58n9BUySSOyAYcccM+pgFBjWiEJSvJuWp/6TXjIMBFWOwtqe
-   WfIaEJtyfKo2i+QpbHaJ/pOBK8CntDNT+LJTc3rBXqSrPbEFHQfX4L+lX
-   I=;
-X-IronPort-AV: E=Sophos;i="5.84,282,1620691200"; 
-   d="scan'208";a="15987416"
-Subject: Re: [PATCH 4/4] KVM: selftests: Test access to XMM fast hypercalls
-Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO email-inbound-relay-2b-baacba05.us-west-2.amazon.com) ([10.25.36.210])
-  by smtp-border-fw-80007.pdx80.corp.amazon.com with ESMTP; 30 Jul 2021 14:35:40 +0000
-Received: from EX13D28EUC003.ant.amazon.com (pdx1-ws-svc-p6-lb9-vlan2.pdx.amazon.com [10.236.137.194])
-        by email-inbound-relay-2b-baacba05.us-west-2.amazon.com (Postfix) with ESMTPS id 7B42AA1778;
-        Fri, 30 Jul 2021 14:35:39 +0000 (UTC)
-Received: from u366d62d47e3651.ant.amazon.com (10.43.160.66) by
- EX13D28EUC003.ant.amazon.com (10.43.164.43) with Microsoft SMTP Server (TLS)
- id 15.0.1497.23; Fri, 30 Jul 2021 14:35:35 +0000
-Date:   Fri, 30 Jul 2021 16:35:31 +0200
-From:   Siddharth Chandrasekaran <sidcha@amazon.de>
-To:     Vitaly Kuznetsov <vkuznets@redhat.com>
-CC:     <kvm@vger.kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        <linux-kernel@vger.kernel.org>
-Message-ID: <20210730143530.GD20232@u366d62d47e3651.ant.amazon.com>
-References: <20210730122625.112848-1-vkuznets@redhat.com>
- <20210730122625.112848-5-vkuznets@redhat.com>
+        id S239177AbhG3Op7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 30 Jul 2021 10:45:59 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:20674 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S239032AbhG3Op6 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 30 Jul 2021 10:45:58 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1627656353;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=eAvHmd59q5tqasusWWApD5RRDo6ed+dgXJVRWVN+feo=;
+        b=G3RcM1c0PYbLiWug3N2cSwi/UW4030kwj/l1GMS8KWhWE/apxfZ9XLBZGeBsFFjXgqoeuX
+        2kBFjmIHH9uj9hu69sM1syfzRCb+ryN5TlNqbf2WwKlETt5UQX3oq5lPgF7pvmONoWITqm
+        DS+7NSyAgYfwNULrHHQyodCPkbjp7Xs=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-252-gzIwcarbN8KuTo7zfPBMPQ-1; Fri, 30 Jul 2021 10:45:51 -0400
+X-MC-Unique: gzIwcarbN8KuTo7zfPBMPQ-1
+Received: by mail-wr1-f69.google.com with SMTP id d14-20020adfe2ce0000b029013a357d7bdcso3291034wrj.18
+        for <kvm@vger.kernel.org>; Fri, 30 Jul 2021 07:45:51 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=eAvHmd59q5tqasusWWApD5RRDo6ed+dgXJVRWVN+feo=;
+        b=SGo4p3Jna1BBAD1rWpW/pMQxTnJn9cnAzUgiYTKDL7/1qlnAfLJOSek2ZMZP0dQTQl
+         gzsA/xUpfJz/SSpKum7egbrVoqnEwrdOQ62pvuZOdRmZ6wpm8Pjb9czFMfMN1fW8wThN
+         8tIYuAPiAVgQ2LQfPG48YoVAH/klxpjWixf3irVeEdu/sYKceUPVaXYXcqojcBduXf0q
+         6khkTNorYIDye1mPunzuqe/QwJMTng0Vq38OvcWOgxntH69fFiwAQkmdppxxeZDabNNX
+         Aq1sUyG6VzJ7MiNERVS+R0LARn8UxABUGOkR1ohzp+5Ce2JdgCSeBy8NpV3/7xtE0liU
+         n4/A==
+X-Gm-Message-State: AOAM530wDEUOExVtrveQVfWNB3kKQDWcVWj8nTR8y4BJ21Z6wsWotxbx
+        K8d6XrBqlqp/5O0D5a63j+eS9r0iHo6eCRubWHDmFPN1lg7sq6bsl1hw7MLLX47XwKQfi95kT9W
+        AtIMMaTOPLqYX
+X-Received: by 2002:a05:600c:3509:: with SMTP id h9mr3229384wmq.81.1627656350465;
+        Fri, 30 Jul 2021 07:45:50 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzNNWT46urepAmYb0lxUGFcJKp2dR5HbCtV1vHjqW5ctbAXI8G+9pLFqZNIyWuAG6bbngQKsg==
+X-Received: by 2002:a05:600c:3509:: with SMTP id h9mr3229371wmq.81.1627656350291;
+        Fri, 30 Jul 2021 07:45:50 -0700 (PDT)
+Received: from thuth.remote.csb (p5791d280.dip0.t-ipconnect.de. [87.145.210.128])
+        by smtp.gmail.com with ESMTPSA id w13sm2330294wru.72.2021.07.30.07.45.49
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 30 Jul 2021 07:45:49 -0700 (PDT)
+Subject: Re: [kvm-unit-tests PATCH 1/4] s390x: sie: Add sie lib validity
+ handling
+To:     Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org
+Cc:     linux-s390@vger.kernel.org, imbrenda@linux.ibm.com,
+        david@redhat.com, cohuck@redhat.com
+References: <20210729134803.183358-1-frankja@linux.ibm.com>
+ <20210729134803.183358-2-frankja@linux.ibm.com>
+From:   Thomas Huth <thuth@redhat.com>
+Message-ID: <e4b7d844-a602-78be-2cdb-3f87bb22a04e@redhat.com>
+Date:   Fri, 30 Jul 2021 16:45:48 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.12.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20210730122625.112848-5-vkuznets@redhat.com>
-User-Agent: Mutt/1.9.4 (2018-02-28)
-X-Originating-IP: [10.43.160.66]
-X-ClientProxiedBy: EX13D36UWB004.ant.amazon.com (10.43.161.49) To
- EX13D28EUC003.ant.amazon.com (10.43.164.43)
+In-Reply-To: <20210729134803.183358-2-frankja@linux.ibm.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Jul 30, 2021 at 02:26:25PM +0200, Vitaly Kuznetsov wrote:
-> HYPERV_CPUID_FEATURES.EDX and an 'XMM fast' hypercall is issued.
+On 29/07/2021 15.48, Janosch Frank wrote:
+> Let's start off the SIE lib with validity handling code since that has
+> the least amount of dependencies to other files.
 > 
-> Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
 > ---
->  .../selftests/kvm/include/x86_64/hyperv.h     |  5 ++-
->  .../selftests/kvm/x86_64/hyperv_features.c    | 41 +++++++++++++++++--
->  2 files changed, 42 insertions(+), 4 deletions(-)
+>   lib/s390x/sie.c  | 41 +++++++++++++++++++++++++++++++++++++++++
+>   lib/s390x/sie.h  |  3 +++
+>   s390x/Makefile   |  1 +
+>   s390x/mvpg-sie.c |  2 +-
+>   s390x/sie.c      |  7 +------
+>   5 files changed, 47 insertions(+), 7 deletions(-)
+>   create mode 100644 lib/s390x/sie.c
 > 
-> diff --git a/tools/testing/selftests/kvm/include/x86_64/hyperv.h b/tools/testing/selftests/kvm/include/x86_64/hyperv.h
-> index 412eaee7884a..b66910702c0a 100644
-> --- a/tools/testing/selftests/kvm/include/x86_64/hyperv.h
-> +++ b/tools/testing/selftests/kvm/include/x86_64/hyperv.h
-> @@ -117,7 +117,7 @@
->  #define HV_X64_GUEST_DEBUGGING_AVAILABLE               BIT(1)
->  #define HV_X64_PERF_MONITOR_AVAILABLE                  BIT(2)
->  #define HV_X64_CPU_DYNAMIC_PARTITIONING_AVAILABLE      BIT(3)
-> -#define HV_X64_HYPERCALL_PARAMS_XMM_AVAILABLE          BIT(4)
-> +#define HV_X64_HYPERCALL_XMM_INPUT_AVAILABLE           BIT(4)
->  #define HV_X64_GUEST_IDLE_STATE_AVAILABLE              BIT(5)
->  #define HV_FEATURE_FREQUENCY_MSRS_AVAILABLE            BIT(8)
->  #define HV_FEATURE_GUEST_CRASH_MSR_AVAILABLE           BIT(10)
-> @@ -182,4 +182,7 @@
->  #define HV_STATUS_INVALID_CONNECTION_ID                18
->  #define HV_STATUS_INSUFFICIENT_BUFFERS         19
-> 
-> +/* hypercall options */
-> +#define HV_HYPERCALL_FAST_BIT          BIT(16)
+> diff --git a/lib/s390x/sie.c b/lib/s390x/sie.c
+> new file mode 100644
+> index 00000000..9107519f
+> --- /dev/null
+> +++ b/lib/s390x/sie.c
+> @@ -0,0 +1,41 @@
+> +/* SPDX-License-Identifier: GPL-2.0-only */
+> +/*
+> + * Virtualization library that speeds up managing guests.
+
+"speeds up managing guests" ... so this means that guests can be scheduled 
+faster? ;-)
+
+> + * Copyright (c) 2021 IBM Corp
+> + *
+> + * Authors:
+> + *  Janosch Frank <frankja@linux.ibm.com>
+> + */
 > +
->  #endif /* !SELFTEST_KVM_HYPERV_H */
-> diff --git a/tools/testing/selftests/kvm/x86_64/hyperv_features.c b/tools/testing/selftests/kvm/x86_64/hyperv_features.c
-> index af27c7e829c1..91d88aaa9899 100644
-> --- a/tools/testing/selftests/kvm/x86_64/hyperv_features.c
-> +++ b/tools/testing/selftests/kvm/x86_64/hyperv_features.c
-> @@ -47,6 +47,7 @@ static void do_wrmsr(u32 idx, u64 val)
->  }
-> 
->  static int nr_gp;
-> +static int nr_ud;
-> 
->  static inline u64 hypercall(u64 control, vm_vaddr_t input_address,
->                             vm_vaddr_t output_address)
-> @@ -80,6 +81,12 @@ static void guest_gp_handler(struct ex_regs *regs)
->                 regs->rip = (uint64_t)&wrmsr_end;
->  }
-> 
-> +static void guest_ud_handler(struct ex_regs *regs)
-> +{
-> +       nr_ud++;
-> +       regs->rip += 3;
-> +}
+> +#include <asm/barrier.h>
+> +#include <libcflat.h>
+> +#include <sie.h>
 > +
->  struct msr_data {
->         uint32_t idx;
->         bool available;
-> @@ -90,6 +97,7 @@ struct msr_data {
->  struct hcall_data {
->         uint64_t control;
->         uint64_t expect;
-> +       bool ud_expected;
->  };
-> 
->  static void guest_msr(struct msr_data *msr)
-> @@ -117,13 +125,26 @@ static void guest_msr(struct msr_data *msr)
->  static void guest_hcall(vm_vaddr_t pgs_gpa, struct hcall_data *hcall)
->  {
->         int i = 0;
-> +       u64 res, input, output;
-> 
->         wrmsr(HV_X64_MSR_GUEST_OS_ID, LINUX_OS_ID);
->         wrmsr(HV_X64_MSR_HYPERCALL, pgs_gpa);
-> 
->         while (hcall->control) {
-> -               GUEST_ASSERT(hypercall(hcall->control, pgs_gpa,
-> -                                      pgs_gpa + 4096) == hcall->expect);
-> +               nr_ud = 0;
-> +               if (!(hcall->control & HV_HYPERCALL_FAST_BIT)) {
-> +                       input = pgs_gpa;
-> +                       output = pgs_gpa + 4096;
-> +               } else {
-> +                       input = output = 0;
-> +               }
-> +
-> +               res = hypercall(hcall->control, input, output);
-> +               if (hcall->ud_expected)
-> +                       GUEST_ASSERT(nr_ud == 1);
+> +static bool validity_expected;
+> +static uint16_t vir;
 
-Should we also do WRITE_ONCE(nr_ur, 0) here? or perhaps pass the the
-expected value of nr_ud + 1 in hcall->ud_expected from caller and do,
+What does "vir" stand for? A short comment would be nice.
 
-    if (hcall->ud_expected)
-        GUEST_ASSERT(nr_ud == hcall->ud_expected);
-
-This way there can be other test that can also expect a UD.
-
-> +               else
-> +                       GUEST_ASSERT(res == hcall->expect);
-> +
->                 GUEST_SYNC(i++);
->         }
-> 
-> @@ -552,8 +573,18 @@ static void guest_test_hcalls_access(struct kvm_vm *vm, struct hcall_data *hcall
->                         recomm.ebx = 0xfff;
->                         hcall->expect = HV_STATUS_SUCCESS;
->                         break;
-> -
->                 case 17:
-> +                       /* XMM fast hypercall */
-> +                       hcall->control = HVCALL_FLUSH_VIRTUAL_ADDRESS_SPACE | HV_HYPERCALL_FAST_BIT;
-> +                       hcall->ud_expected = true;
-> +                       break;
-> +               case 18:
-> +                       feat.edx |= HV_X64_HYPERCALL_XMM_INPUT_AVAILABLE;
-> +                       hcall->ud_expected = false;
-> +                       hcall->expect = HV_STATUS_SUCCESS;
-> +                       break;
-> +
-> +               case 19:
->                         /* END */
->                         hcall->control = 0;
->                         break;
-> @@ -625,6 +656,10 @@ int main(void)
->         /* Test hypercalls */
->         vm = vm_create_default(VCPU_ID, 0, guest_hcall);
-> 
-> +       vm_init_descriptor_tables(vm);
-> +       vcpu_init_descriptor_tables(vm, VCPU_ID);
-> +       vm_install_exception_handler(vm, UD_VECTOR, guest_ud_handler);
-> +
->         /* Hypercall input/output */
->         hcall_page = vm_vaddr_alloc_pages(vm, 2);
->         memset(addr_gva2hva(vm, hcall_page), 0x0, 2 * getpagesize());
-> --
-> 2.31.1
-> 
-
-
-
-Amazon Development Center Germany GmbH
-Krausenstr. 38
-10117 Berlin
-Geschaeftsfuehrung: Christian Schlaeger, Jonathan Weiss
-Eingetragen am Amtsgericht Charlottenburg unter HRB 149173 B
-Sitz: Berlin
-Ust-ID: DE 289 237 879
-
-
+  Thomas
 
