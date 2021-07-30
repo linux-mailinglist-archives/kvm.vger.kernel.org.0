@@ -2,28 +2,28 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 52C013DB90D
-	for <lists+kvm@lfdr.de>; Fri, 30 Jul 2021 15:11:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DD6763DBA0B
+	for <lists+kvm@lfdr.de>; Fri, 30 Jul 2021 16:07:16 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238904AbhG3NLO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 30 Jul 2021 09:11:14 -0400
-Received: from mail.kernel.org ([198.145.29.99]:60944 "EHLO mail.kernel.org"
+        id S239122AbhG3OHT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 30 Jul 2021 10:07:19 -0400
+Received: from mail.kernel.org ([198.145.29.99]:52436 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S238893AbhG3NLN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 30 Jul 2021 09:11:13 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id AFDF760462;
-        Fri, 30 Jul 2021 13:11:06 +0000 (UTC)
+        id S239052AbhG3OHT (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 30 Jul 2021 10:07:19 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id A18AA60F94;
+        Fri, 30 Jul 2021 14:07:12 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1627650668;
-        bh=dCPVqim+3QLsfYnttxB0ASgmRObsONjZkZ9VkM4UMZA=;
+        s=k20201202; t=1627654034;
+        bh=k4XJ9zveStKiRpAKx9X6DNnQlXVfFjJr2h2Z96smXy0=;
         h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=YRmmKBxntTjK6srQwnni3UZ1ku7RqG9OCZSgjIgPkKxdxzbKcEHnjt5qO++TlplUW
-         bHNVzY6wzSMTntl5eF+8RU7L32sdKysWQfa+UCGrzlf0PKDKmsfHrdn26DiQVyJmfP
-         +GyoQSuIuIgCuG+zUi5lJb97/6wYrh94i/+Vy2SR8ZMsnzvXGWZJOh14jQYNgMzGnR
-         X0+oF97+vle8eTXlYuW4uw7VFzE21pHS8AcU+FtEqoD/ivoz5m4T1riIgHaUr+v5eF
-         FbxXGurZZJEGmNg3ZXivybbt+XAoKlM1hKHXIhfCqbYoQSmrPqPtN4n+/L0rKzCKE8
-         fFT+yqgfRfiyQ==
-Date:   Fri, 30 Jul 2021 14:11:03 +0100
+        b=YeHtVKPNwCWijDOU6aea/M2v3YF8KZIQOXmAKvam2VZEpbf1Pwi32kNcfd1h2Atn1
+         LDptbBukrpbQ2AZ1gKOnMmMgKyR2l8rrdqxLBaKh8pKICexW1+9on67ZuzrPdFu2o5
+         ii7zlMRyKeWjDD9ZELv0L1SC+cNVvfRgMWhRPo3lH7xVKNG3pqaJLShu9M0yLpmO4I
+         WjbiwdVLBL1b7aM72plnjgyB/lcQex4SDwHHi6f6aXrfQHnSVxGiG4g4+R2zXPWrxq
+         qGjMQBStMzISZ4OBdZzIiYpfSv6c1fCiAJ1j6TgJ5hSfkZsCoG0gpBa73i+TCXwPsY
+         duxAv61sqtRMA==
+Date:   Fri, 30 Jul 2021 15:07:09 +0100
 From:   Will Deacon <will@kernel.org>
 To:     Marc Zyngier <maz@kernel.org>
 Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
@@ -35,109 +35,93 @@ Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
         Suzuki K Poulose <suzuki.poulose@arm.com>,
         Alexandru Elisei <alexandru.elisei@arm.com>,
         kernel-team@android.com
-Subject: Re: [PATCH 07/16] KVM: arm64: Wire MMIO guard hypercalls
-Message-ID: <20210730131103.GD23756@willie-the-truck>
+Subject: Re: [PATCH 12/16] mm/ioremap: Add arch-specific callbacks on
+ ioremap/iounmap calls
+Message-ID: <20210730140709.GE23756@willie-the-truck>
 References: <20210715163159.1480168-1-maz@kernel.org>
- <20210715163159.1480168-8-maz@kernel.org>
- <20210727181145.GF19173@willie-the-truck>
- <87v94ud8av.wl-maz@kernel.org>
+ <20210715163159.1480168-13-maz@kernel.org>
+ <20210727181203.GG19173@willie-the-truck>
+ <87tuked7mm.wl-maz@kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <87v94ud8av.wl-maz@kernel.org>
+In-Reply-To: <87tuked7mm.wl-maz@kernel.org>
 User-Agent: Mutt/1.10.1 (2018-07-13)
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jul 28, 2021 at 11:47:20AM +0100, Marc Zyngier wrote:
-> On Tue, 27 Jul 2021 19:11:46 +0100,
+On Wed, Jul 28, 2021 at 12:01:53PM +0100, Marc Zyngier wrote:
+> On Tue, 27 Jul 2021 19:12:04 +0100,
 > Will Deacon <will@kernel.org> wrote:
 > > 
-> > On Thu, Jul 15, 2021 at 05:31:50PM +0100, Marc Zyngier wrote:
-> > > Plumb in the hypercall interface to allow a guest to discover,
-> > > enroll, map and unmap MMIO regions.
+> > On Thu, Jul 15, 2021 at 05:31:55PM +0100, Marc Zyngier wrote:
+> > > Add a pair of hooks (ioremap_page_range_hook/iounmap_page_range_hook)
+> > > that can be implemented by an architecture.
 > > > 
 > > > Signed-off-by: Marc Zyngier <maz@kernel.org>
 > > > ---
-> > >  arch/arm64/kvm/hypercalls.c | 20 ++++++++++++++++++++
-> > >  include/linux/arm-smccc.h   | 28 ++++++++++++++++++++++++++++
-> > >  2 files changed, 48 insertions(+)
+> > >  include/linux/io.h |  3 +++
+> > >  mm/ioremap.c       | 13 ++++++++++++-
+> > >  mm/vmalloc.c       |  8 ++++++++
+> > >  3 files changed, 23 insertions(+), 1 deletion(-)
 > > > 
-> > > diff --git a/arch/arm64/kvm/hypercalls.c b/arch/arm64/kvm/hypercalls.c
-> > > index 30da78f72b3b..a3deeb907fdd 100644
-> > > --- a/arch/arm64/kvm/hypercalls.c
-> > > +++ b/arch/arm64/kvm/hypercalls.c
-> > > @@ -5,6 +5,7 @@
-> > >  #include <linux/kvm_host.h>
+> > > diff --git a/include/linux/io.h b/include/linux/io.h
+> > > index 9595151d800d..0ffc265f114c 100644
+> > > --- a/include/linux/io.h
+> > > +++ b/include/linux/io.h
+> > > @@ -21,6 +21,9 @@ void __ioread32_copy(void *to, const void __iomem *from, size_t count);
+> > >  void __iowrite64_copy(void __iomem *to, const void *from, size_t count);
 > > >  
-> > >  #include <asm/kvm_emulate.h>
-> > > +#include <asm/kvm_mmu.h>
-> > >  
-> > >  #include <kvm/arm_hypercalls.h>
-> > >  #include <kvm/arm_psci.h>
-> > > @@ -129,10 +130,29 @@ int kvm_hvc_call_handler(struct kvm_vcpu *vcpu)
-> > >  	case ARM_SMCCC_VENDOR_HYP_KVM_FEATURES_FUNC_ID:
-> > >  		val[0] = BIT(ARM_SMCCC_KVM_FUNC_FEATURES);
-> > >  		val[0] |= BIT(ARM_SMCCC_KVM_FUNC_PTP);
-> > > +		val[0] |= BIT(ARM_SMCCC_KVM_FUNC_MMIO_GUARD_INFO);
-> > > +		val[0] |= BIT(ARM_SMCCC_KVM_FUNC_MMIO_GUARD_ENROLL);
-> > > +		val[0] |= BIT(ARM_SMCCC_KVM_FUNC_MMIO_GUARD_MAP);
-> > > +		val[0] |= BIT(ARM_SMCCC_KVM_FUNC_MMIO_GUARD_UNMAP);
-> > >  		break;
-> > >  	case ARM_SMCCC_VENDOR_HYP_KVM_PTP_FUNC_ID:
-> > >  		kvm_ptp_get_time(vcpu, val);
-> > >  		break;
-> > > +	case ARM_SMCCC_VENDOR_HYP_KVM_MMIO_GUARD_INFO_FUNC_ID:
-> > > +		val[0] = PAGE_SIZE;
-> > > +		break;
+> > >  #ifdef CONFIG_MMU
+> > > +void ioremap_page_range_hook(unsigned long addr, unsigned long end,
+> > > +			     phys_addr_t phys_addr, pgprot_t prot);
+> > > +void iounmap_page_range_hook(phys_addr_t phys_addr, size_t size);
+> > >  int ioremap_page_range(unsigned long addr, unsigned long end,
+> > >  		       phys_addr_t phys_addr, pgprot_t prot);
+> > >  #else
 > > 
-> > I get the nagging feeling that querying the stage-2 page-size outside of
-> > MMIO guard is going to be useful once we start looking at memory sharing,
-> > so perhaps rename this to something more generic?
-> 
-> At this stage, why not follow the architecture and simply expose it as
-> ID_AA64MMFR0_EL1.TGran{4,64,16}_2? That's exactly what it is for, and
-> we already check for this in KVM itself.
-
-Nice, I hadn't thought of that. On reflection, though, I don't agree that
-it's "exactly what it is for" -- the ID register talks about the supported
-stage-2 page-sizes, whereas we want to advertise the one page size that
-we're currently using. In other words, it's important that we only ever
-populate one of the fields and I wonder if that could bite us in future
-somehow?
-
-Up to you, you've definitely got a better feel for this than me.
-
-> > > +	case ARM_SMCCC_VENDOR_HYP_KVM_MMIO_GUARD_ENROLL_FUNC_ID:
-> > > +		set_bit(KVM_ARCH_FLAG_MMIO_GUARD, &vcpu->kvm->arch.flags);
-> > > +		val[0] = SMCCC_RET_SUCCESS;
-> > > +		break;
-> > > +	case ARM_SMCCC_VENDOR_HYP_KVM_MMIO_GUARD_MAP_FUNC_ID:
-> > > +		if (kvm_install_ioguard_page(vcpu, vcpu_get_reg(vcpu, 1)))
-> > > +			val[0] = SMCCC_RET_SUCCESS;
-> > > +		break;
-> > > +	case ARM_SMCCC_VENDOR_HYP_KVM_MMIO_GUARD_UNMAP_FUNC_ID:
-> > > +		if (kvm_remove_ioguard_page(vcpu, vcpu_get_reg(vcpu, 1)))
-> > > +			val[0] = SMCCC_RET_SUCCESS;
-> > > +		break;
+> > Can we avoid these hooks by instead not registering the regions proactively
+> > in the guest and moving that logic to a fault handler which runs off the
+> > back of the injected data abort? From there, we could check if the faulting
+> > IPA is a memory address and register it as MMIO if not.
 > > 
-> > I think there's a slight discrepancy between MAP and UNMAP here in that
-> > calling UNMAP on something that hasn't been mapped will fail, whereas
-> > calling MAP on something that's already been mapped will succeed. I think
-> > that might mean you can't reason about the final state of the page if two
-> > vCPUs race to call these functions in some cases (and both succeed).
+> > Dunno, you've spent more time than me thinking about this, but just
+> > wondering if you'd had a crack at doing it that way, as it _seems_ simpler
+> > to my naive brain.
 > 
-> I'm not sure that's the expected behaviour for ioremap(), for example
-> (you can ioremap two portions of the same page successfully).
+> I thought about it, but couldn't work out whether it was always
+> possible for the guest to handle these faults (first access in an
+> interrupt context, for example?).
 
-Hmm, good point. Does that mean we should be refcounting the stage-2?
-Otherwise if we do something like:
+If the check is a simple pfn_valid() I think it should be ok, but yes, we'd
+definitely not want to do anything more involved given that this could run
+in all sorts of horrible contexts.
 
-	foo = ioremap(page, 0x100);
-	bar = ioremap(page+0x100, 0x100);
-	iounmap(foo);
+> Also, this changes the semantics of the protection this is supposed to
+> offer: any access out of the RAM space will generate an abort, and the
+> fault handler will grant MMIO forwarding for this page. Stray accesses
+> that would normally be properly handled as fatal would now succeed and
+> be forwarded to userspace, even if there was no emulated devices
+> there.
 
-then bar will break. Or did I miss something in the series?
+That's true, it would offer much weaker guarantees to the guest. It's more
+like a guarantee that memory never traps to the VMM. It also then wouldn't
+help with the write-combine fun. It would be simpler though, but with less
+functionality.
+
+> For this to work, we'd need to work out whether there is any existing
+> device mapping that actually points to this page. And whether it
+> actually is supposed to be forwarded to userspace. Do we have a rmap
+> for device mappings?
+
+I don't think this would be possible given your comments above.
+
+So let's stick with the approach you've taken. It just feels like there
+should be a way to do this without introducing new hooks into the core
+code. If it wasn't for pci_remap_iospace(), we could simply hook our
+definition of __ioremap_caller(). Another avenue to explore would be
+looking at the IO resource instead; I see x86 already uses
+IORES_MAP_ENCRYPTED and IORES_MAP_SYSTEM_RAM to drive pgprot...
 
 Will
