@@ -2,57 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 34FB83DC127
+	by mail.lfdr.de (Postfix) with ESMTP id A2FA03DC128
 	for <lists+kvm@lfdr.de>; Sat, 31 Jul 2021 00:37:26 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233516AbhG3Wh1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 30 Jul 2021 18:37:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52462 "EHLO
+        id S232746AbhG3Wh3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 30 Jul 2021 18:37:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52474 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233460AbhG3Wh0 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 30 Jul 2021 18:37:26 -0400
-Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C6EC0C06175F
-        for <kvm@vger.kernel.org>; Fri, 30 Jul 2021 15:37:20 -0700 (PDT)
-Received: by mail-yb1-xb4a.google.com with SMTP id s123-20020a2577810000b02904f84a5c5297so12132027ybc.16
-        for <kvm@vger.kernel.org>; Fri, 30 Jul 2021 15:37:20 -0700 (PDT)
+        with ESMTP id S233322AbhG3Wh1 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 30 Jul 2021 18:37:27 -0400
+Received: from mail-pj1-x1049.google.com (mail-pj1-x1049.google.com [IPv6:2607:f8b0:4864:20::1049])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 58514C06175F
+        for <kvm@vger.kernel.org>; Fri, 30 Jul 2021 15:37:22 -0700 (PDT)
+Received: by mail-pj1-x1049.google.com with SMTP id f62-20020a17090a28c4b02901733dbfa29cso15101167pjd.0
+        for <kvm@vger.kernel.org>; Fri, 30 Jul 2021 15:37:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=date:in-reply-to:message-id:mime-version:references:subject:from:to
          :cc;
-        bh=dT/LFuHRBf+C472YuFJCuy5RtgpdJJjWKkeLjLnxKxA=;
-        b=RNNXXejJfclzGPg5C/Iq75evsn6AF6dYeRc40IEs9g3Obv6ocIozNA8m4JXs/D+x/B
-         kkDFMyvCIM4s6KCHC6j6hTRSrHn5OpxGnJgQz2HqgEgXXUEYbdaBwVrRSXlB9TfcKY2W
-         E6kBBrdQHJWIpyNzz+FVh0GCSR7DrJNy+SMpg4zDpd4/kdpGjncESgbtbisg/x7RqWwv
-         s+1bwp5OLztv3aZaxMDlQc6w3qV03grDqo9M6ZP+MjCdx2QwOZSLle9gQBAvz065FSiM
-         RVqArbSsPunOnq/PBomgGRhqNqJtsmXABmWMymEq1Dhpv1RwKs9VWB+WD2NfLXsJGHG7
-         FpEQ==
+        bh=C8wsi/YpXV8rtnPArvQuTmmEPgRsr+T0f2WmE+1tIKc=;
+        b=W2tOXIonhbyUDII+EidcljCQOcSIe5iUE2ZrdgCTlFu7041m4I02VARVFkyT/GkvnF
+         UqEBFvKWdKcId+x9qxqUd4x+lXSIpNLmDUHHgVDo01GNi3Je+dBRP01Nmi4lAkiCjzAo
+         b/GhgAZeFernKZ2OBbYJMztIkq+/YiVttFivbm9auFs9aZOpWPzeUOQgaiHwo5w71Hys
+         WlV/RIbbzWCxSA6IFQssu9ODOtzoHe/Wzfhx/254j00JfaU+VkLJ8JlrY1GF2tl0CE5l
+         xwPRsqrwBkGkcgP2FeCh40ebCt/RG4Vog7J+gtrDuLQ6DaVmDucGctbYp6F02l5yWzGx
+         dzJg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=dT/LFuHRBf+C472YuFJCuy5RtgpdJJjWKkeLjLnxKxA=;
-        b=MtLzw3BftWXSbBzda0iN9QY8M9SSpp1MhqOVCAt1bz6zG6Zk4W7Hcfq8G/S63RQAxw
-         jv12R0NwpjMCFv/HmEaAHS4O6Es8ONd91Y+zIMVIQlJiRAXwF/q3sN77NJizkCH9is7S
-         IFM/BDwWjEF8aXB4oeCJBkq2fy4bZe59943LcSMoWdQOXGM9Df12V7VnO5jIW5knc/uw
-         mMjQ4geysOpKtbQmEaL7lnEm5LLKR7uFYwKwhWH8hlHc8Qi4drTYV4eGmQaepr5hSWqf
-         xBTgtVEJyBaHphuWBgPqm7+rU/Mt13RS1uDc+eqsoakwUYf0IASLhiwP/YU0Wq+736PG
-         /z1Q==
-X-Gm-Message-State: AOAM530v6geBgAYtjgyZ3mRz+BZX9EnVJ0AfSfxjVao+/+Pir+Rj7t9Y
-        gVNxxZWfWzb0VPwm3XlsDw2PDjXkaacJJi8TSxiFHu/VSHVQo+Invxb9zcogg+0EVFhkdSyoqoM
-        RoKtVZ6gfXKWDqtcvLquITexDpBm8o+TQVI7COGP/QPnZP9gq61Idk2UcOp5YBSw=
-X-Google-Smtp-Source: ABdhPJxAMkvHC5nm2B+doIn5QGVay8C3OhySnZMSfi4ETddhbuY33oRb3sbBOAUpF8FnTHCw8B/9jJTycdG9Jw==
+        bh=C8wsi/YpXV8rtnPArvQuTmmEPgRsr+T0f2WmE+1tIKc=;
+        b=mQ5KS9vumYKnAZCaQzRZy9QPemvIdYEPmxjC7Hq9hfMI6jkIhx9IgKSheTjhZnSq8m
+         M6/Dt7KmsDCnbhtduqcRov0CeCKJ9B6EbEyZGHXldxbqk467LbBM6P9uGbjLpCgzPrPN
+         rSaZFldU+5xCQRKHWcJkm4Rt8wcXoeXJxvxDI9hZWLhIRA+n1jBoSkG+JhaN0uXfW9xY
+         YOD5QCU4bgP8pNcBU6sSZO6e2NdKEdbB2OzesLvCWakuRti5lOxvRLUs6rSYyS37XPPU
+         jBvYrNM7CPUI9FcZM4XMydUQ16++se+4eJdU0DpNyKDaTcxkNC5EnzE4XPA2OQ7Z/Gnp
+         Dvxg==
+X-Gm-Message-State: AOAM5310jOpIE8ix0DU3scxxA7J6Xe6CHJEbVi0EQCnXY7v57kTZ0XVa
+        F+SC8xyoGLuyNu2J/AY6Jx5us6Vjcqhe0u//oHXV0hUU0q55ACzEg8tBNSbUq7XPxzjKZp1M1Tp
+        A8ESjq314PfK9AsSh/71t0rbNGYzuI6FS6NGj7XvMu4kUQsSITSUUt+KTi3YkyDI=
+X-Google-Smtp-Source: ABdhPJyykJ4sAN4ft9cJ3uqJICBj9Be2CtGVlA9sX1e+0ejfcLAS7IcyqJ1Xqz3tbezEKqlhYWlNYLWDqNGlpw==
 X-Received: from dmatlack-heavy.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:19cd])
- (user=dmatlack job=sendgmr) by 2002:a25:e6d1:: with SMTP id
- d200mr5962463ybh.451.1627684639957; Fri, 30 Jul 2021 15:37:19 -0700 (PDT)
-Date:   Fri, 30 Jul 2021 22:37:05 +0000
+ (user=dmatlack job=sendgmr) by 2002:a17:903:300d:b029:12c:916f:fedd with SMTP
+ id o13-20020a170903300db029012c916ffeddmr4259981pla.19.1627684641735; Fri, 30
+ Jul 2021 15:37:21 -0700 (PDT)
+Date:   Fri, 30 Jul 2021 22:37:06 +0000
 In-Reply-To: <20210730223707.4083785-1-dmatlack@google.com>
-Message-Id: <20210730223707.4083785-5-dmatlack@google.com>
+Message-Id: <20210730223707.4083785-6-dmatlack@google.com>
 Mime-Version: 1.0
 References: <20210730223707.4083785-1-dmatlack@google.com>
 X-Mailer: git-send-email 2.32.0.554.ge1b32706d8-goog
-Subject: [PATCH 4/6] KVM: x86/mmu: Leverage vcpu->lru_slot_index for rmap_add
- and rmap_recycle
+Subject: [PATCH 5/6] KVM: x86/mmu: Rename __gfn_to_rmap to gfn_to_rmap
 From:   David Matlack <dmatlack@google.com>
 To:     kvm@vger.kernel.org
 Cc:     Ben Gardon <bgardon@google.com>, Joerg Roedel <joro@8bytes.org>,
@@ -69,103 +69,96 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-rmap_add() and rmap_recycle() both run in the context of the vCPU and
-thus we can use kvm_vcpu_gfn_to_memslot() to look up the memslot. This
-enables rmap_add() and rmap_recycle() to take advantage of
-vcpu->lru_slot_index and avoid expensive memslot searching.
-
-This change improves the performance of "Populate memory time" in
-dirty_log_perf_test with tdp_mmu=N. In addition to improving the
-performance, "Populate memory time" no longer scales with the number
-of memslots in the VM.
-
-Command                         | Before           | After
-------------------------------- | ---------------- | -------------
-./dirty_log_perf_test -v64 -x1  | 15.18001570s     | 14.99469366s
-./dirty_log_perf_test -v64 -x64 | 18.71336392s     | 14.98675076s
+gfn_to_rmap was removed in the previous patch so there is no need to
+retain the double underscore on __gfn_to_rmap.
 
 Signed-off-by: David Matlack <dmatlack@google.com>
 ---
- arch/x86/kvm/mmu/mmu.c | 35 ++++++++++++++++++++---------------
- 1 file changed, 20 insertions(+), 15 deletions(-)
+ arch/x86/kvm/mmu/mmu.c | 25 ++++++++++++-------------
+ 1 file changed, 12 insertions(+), 13 deletions(-)
 
 diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index a8cdfd8d45c4..370a6ebc2ede 100644
+index 370a6ebc2ede..df493729d86c 100644
 --- a/arch/x86/kvm/mmu/mmu.c
 +++ b/arch/x86/kvm/mmu/mmu.c
-@@ -1043,17 +1043,6 @@ static struct kvm_rmap_head *__gfn_to_rmap(gfn_t gfn, int level,
- 	return &slot->arch.rmap[level - PG_LEVEL_4K][idx];
+@@ -1034,8 +1034,8 @@ static bool pte_list_destroy(struct kvm_rmap_head *rmap_head,
+ 	return true;
  }
  
--static struct kvm_rmap_head *gfn_to_rmap(struct kvm *kvm, gfn_t gfn,
--					 struct kvm_mmu_page *sp)
--{
--	struct kvm_memslots *slots;
--	struct kvm_memory_slot *slot;
--
--	slots = kvm_memslots_for_spte_role(kvm, sp->role);
--	slot = __gfn_to_memslot(slots, gfn);
--	return __gfn_to_rmap(gfn, sp->role.level, slot);
--}
--
- static bool rmap_can_add(struct kvm_vcpu *vcpu)
+-static struct kvm_rmap_head *__gfn_to_rmap(gfn_t gfn, int level,
+-					   const struct kvm_memory_slot *slot)
++static struct kvm_rmap_head *gfn_to_rmap(gfn_t gfn, int level,
++					 const struct kvm_memory_slot *slot)
  {
- 	struct kvm_mmu_memory_cache *mc;
-@@ -1064,24 +1053,39 @@ static bool rmap_can_add(struct kvm_vcpu *vcpu)
+ 	unsigned long idx;
  
- static int rmap_add(struct kvm_vcpu *vcpu, u64 *spte, gfn_t gfn)
- {
-+	struct kvm_memory_slot *slot;
- 	struct kvm_mmu_page *sp;
- 	struct kvm_rmap_head *rmap_head;
- 
+@@ -1060,7 +1060,7 @@ static int rmap_add(struct kvm_vcpu *vcpu, u64 *spte, gfn_t gfn)
  	sp = sptep_to_sp(spte);
  	kvm_mmu_page_set_gfn(sp, spte - sp->spt, gfn);
--	rmap_head = gfn_to_rmap(vcpu->kvm, gfn, sp);
-+	slot = kvm_vcpu_gfn_to_memslot(vcpu, gfn);
-+	rmap_head = __gfn_to_rmap(gfn, sp->role.level, slot);
+ 	slot = kvm_vcpu_gfn_to_memslot(vcpu, gfn);
+-	rmap_head = __gfn_to_rmap(gfn, sp->role.level, slot);
++	rmap_head = gfn_to_rmap(gfn, sp->role.level, slot);
  	return pte_list_add(vcpu, spte, rmap_head);
  }
  
-+
- static void rmap_remove(struct kvm *kvm, u64 *spte)
- {
-+	struct kvm_memslots *slots;
-+	struct kvm_memory_slot *slot;
- 	struct kvm_mmu_page *sp;
- 	gfn_t gfn;
- 	struct kvm_rmap_head *rmap_head;
+@@ -1084,7 +1084,7 @@ static void rmap_remove(struct kvm *kvm, u64 *spte)
+ 	slots = kvm_memslots_for_spte_role(kvm, sp->role);
  
- 	sp = sptep_to_sp(spte);
- 	gfn = kvm_mmu_page_get_gfn(sp, spte - sp->spt);
--	rmap_head = gfn_to_rmap(kvm, gfn, sp);
-+
-+	/*
-+	 * Unlike rmap_add and rmap_recycle, rmap_remove does not run in the
-+	 * context of a vCPU so have to determine which memslots to use based
-+	 * on context information in sp->role.
-+	 */
-+	slots = kvm_memslots_for_spte_role(kvm, sp->role);
-+
-+	slot = __gfn_to_memslot(slots, gfn);
-+	rmap_head = __gfn_to_rmap(gfn, sp->role.level, slot);
-+
+ 	slot = __gfn_to_memslot(slots, gfn);
+-	rmap_head = __gfn_to_rmap(gfn, sp->role.level, slot);
++	rmap_head = gfn_to_rmap(gfn, sp->role.level, slot);
+ 
  	__pte_list_remove(spte, rmap_head);
  }
+@@ -1306,8 +1306,8 @@ static void kvm_mmu_write_protect_pt_masked(struct kvm *kvm,
+ 		return;
  
-@@ -1628,12 +1632,13 @@ static bool kvm_test_age_rmapp(struct kvm *kvm, struct kvm_rmap_head *rmap_head,
+ 	while (mask) {
+-		rmap_head = __gfn_to_rmap(slot->base_gfn + gfn_offset + __ffs(mask),
+-					  PG_LEVEL_4K, slot);
++		rmap_head = gfn_to_rmap(slot->base_gfn + gfn_offset + __ffs(mask),
++					PG_LEVEL_4K, slot);
+ 		__rmap_write_protect(kvm, rmap_head, false);
  
- static void rmap_recycle(struct kvm_vcpu *vcpu, u64 *spte, gfn_t gfn)
+ 		/* clear the first set bit */
+@@ -1339,8 +1339,8 @@ static void kvm_mmu_clear_dirty_pt_masked(struct kvm *kvm,
+ 		return;
+ 
+ 	while (mask) {
+-		rmap_head = __gfn_to_rmap(slot->base_gfn + gfn_offset + __ffs(mask),
+-					  PG_LEVEL_4K, slot);
++		rmap_head = gfn_to_rmap(slot->base_gfn + gfn_offset + __ffs(mask),
++					PG_LEVEL_4K, slot);
+ 		__rmap_clear_dirty(kvm, rmap_head, slot);
+ 
+ 		/* clear the first set bit */
+@@ -1406,7 +1406,7 @@ bool kvm_mmu_slot_gfn_write_protect(struct kvm *kvm,
+ 
+ 	if (kvm_memslots_have_rmaps(kvm)) {
+ 		for (i = min_level; i <= KVM_MAX_HUGEPAGE_LEVEL; ++i) {
+-			rmap_head = __gfn_to_rmap(gfn, i, slot);
++			rmap_head = gfn_to_rmap(gfn, i, slot);
+ 			write_protected |= __rmap_write_protect(kvm, rmap_head, true);
+ 		}
+ 	}
+@@ -1506,9 +1506,8 @@ rmap_walk_init_level(struct slot_rmap_walk_iterator *iterator, int level)
  {
-+	struct kvm_memory_slot *slot;
- 	struct kvm_rmap_head *rmap_head;
- 	struct kvm_mmu_page *sp;
+ 	iterator->level = level;
+ 	iterator->gfn = iterator->start_gfn;
+-	iterator->rmap = __gfn_to_rmap(iterator->gfn, level, iterator->slot);
+-	iterator->end_rmap = __gfn_to_rmap(iterator->end_gfn, level,
+-					   iterator->slot);
++	iterator->rmap = gfn_to_rmap(iterator->gfn, level, iterator->slot);
++	iterator->end_rmap = gfn_to_rmap(iterator->end_gfn, level, iterator->slot);
+ }
+ 
+ static void
+@@ -1638,7 +1637,7 @@ static void rmap_recycle(struct kvm_vcpu *vcpu, u64 *spte, gfn_t gfn)
  
  	sp = sptep_to_sp(spte);
--
--	rmap_head = gfn_to_rmap(vcpu->kvm, gfn, sp);
-+	slot = kvm_vcpu_gfn_to_memslot(vcpu, gfn);
-+	rmap_head = __gfn_to_rmap(gfn, sp->role.level, slot);
+ 	slot = kvm_vcpu_gfn_to_memslot(vcpu, gfn);
+-	rmap_head = __gfn_to_rmap(gfn, sp->role.level, slot);
++	rmap_head = gfn_to_rmap(gfn, sp->role.level, slot);
  
  	kvm_unmap_rmapp(vcpu->kvm, rmap_head, NULL, gfn, sp->role.level, __pte(0));
  	kvm_flush_remote_tlbs_with_address(vcpu->kvm, sp->gfn,
