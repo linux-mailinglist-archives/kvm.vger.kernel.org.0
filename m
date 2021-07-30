@@ -2,63 +2,63 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B90B23DC0BA
-	for <lists+kvm@lfdr.de>; Sat, 31 Jul 2021 00:05:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5FA5C3DC0BC
+	for <lists+kvm@lfdr.de>; Sat, 31 Jul 2021 00:05:08 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233028AbhG3WFI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 30 Jul 2021 18:05:08 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:32585 "EHLO
+        id S233112AbhG3WFL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 30 Jul 2021 18:05:11 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:46348 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229709AbhG3WFH (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 30 Jul 2021 18:05:07 -0400
+        by vger.kernel.org with ESMTP id S232672AbhG3WFI (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 30 Jul 2021 18:05:08 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1627682701;
+        s=mimecast20190719; t=1627682702;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=j/8ZgOgV9FABxcwPWKwd6pFZTEbb8PsS8jPvc0Wk6tg=;
-        b=fbHcs5jva1KPzejhf47LlSW+Za7QPEydHHRqQeVcrQt301tqS6UHYDjDDctQ5yCyNIYM9k
-        2r6ZG8zcX1j+YqiyFn60XdeOqtvV0E8+UihbXNfMg4SAkw+ksnvAUO5YmU1kGHXgUqFr90
-        dKGq5E2bQOE9R0uDxL4Ka845tFdG7ZU=
-Received: from mail-qt1-f198.google.com (mail-qt1-f198.google.com
- [209.85.160.198]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-543-u1iXp_e4NwCWI_5JL64ATg-1; Fri, 30 Jul 2021 18:05:00 -0400
-X-MC-Unique: u1iXp_e4NwCWI_5JL64ATg-1
-Received: by mail-qt1-f198.google.com with SMTP id z16-20020ac87cb00000b029025bf786be09so974388qtv.20
-        for <kvm@vger.kernel.org>; Fri, 30 Jul 2021 15:04:59 -0700 (PDT)
+        bh=NSBJ7FBNCe1tAX/jT7A68XhwxPR3lX/uR04jjJ3Q1pU=;
+        b=OwyGDBTT/M7qGmLVGiI6Kkxf8SXrE+XwX21M/fklZHrOXj8UnJCRxkkNJzNF2mXTQnjTju
+        YnD9eizbujfomM4gRGRUIceC1/QR4nEq8Uyr3iqpGP+R1JyVntUTgg35Zb9wO+EnryriDB
+        n07is+roabaZ6xXkX0v3kQqpIRLEnCQ=
+Received: from mail-qt1-f197.google.com (mail-qt1-f197.google.com
+ [209.85.160.197]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-574-iDbodSd0MpervcqRp5oMWw-1; Fri, 30 Jul 2021 18:05:01 -0400
+X-MC-Unique: iDbodSd0MpervcqRp5oMWw-1
+Received: by mail-qt1-f197.google.com with SMTP id l7-20020ac848c70000b0290252173fe79cso5158500qtr.2
+        for <kvm@vger.kernel.org>; Fri, 30 Jul 2021 15:05:01 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=j/8ZgOgV9FABxcwPWKwd6pFZTEbb8PsS8jPvc0Wk6tg=;
-        b=XcBvDpMuKjNTOKGgzbVMN07Q5nn9JW0NQm5YOk9TQ7NQaDybsBQizBFnvXX5vTXkCi
-         XU7toaQQqYIAXGex/0wj3De96RB3aElNgzqHGF74xkB7/C0055ZtoyXtoCg+WOKNgopb
-         I7G175kszViIssQGxq5SN/tmz0rGyy6TMD+M3fY/Eai4dIEJad3qpjslVZ3BO2g5jEv+
-         2Rb8FL2XSVRE3aUnIkp4+pJRCglAI1Va6GF6hKbhCPlRMHpIUWLYwcRDM73uMC3W1XUV
-         Zrhpp01LPEGNTUtJMIpZnqXYWMFMeNYRo2S7wq8Sj/emUU0EE8diR4tyNy4eCLTbbVDz
-         FH5g==
-X-Gm-Message-State: AOAM530XHdkHNJFJI2XrIG2hanpj78dAeLKMY73QOZYJ6fNMy1IOyOyL
-        YQMeA9M8OeiGPKYjtmN/OkTnjeiBYMLuFJrSoi048lYIpR4onA9VdnTgoSCVXlLkbWiaFZXmEL2
-        kSoSQXcGf+GKYbEAVZtYbgKy3zePMEDbqpUZb/Tt8rSRv5JfF85d1SWAuguYRxg==
-X-Received: by 2002:a05:6214:d6e:: with SMTP id 14mr5095106qvs.53.1627682698999;
-        Fri, 30 Jul 2021 15:04:58 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxMTQNHX7PoV1dhRPzDF85NElhalv3f5AD26oUEYimWzW4mHcCPuq4K8RhKwVszC874lpIkBw==
-X-Received: by 2002:a05:6214:d6e:: with SMTP id 14mr5095079qvs.53.1627682698761;
-        Fri, 30 Jul 2021 15:04:58 -0700 (PDT)
+        bh=NSBJ7FBNCe1tAX/jT7A68XhwxPR3lX/uR04jjJ3Q1pU=;
+        b=PU+wazW4wUumtSR7s5eDRcIEqdfDubIs+Ds5gwYUUBJFmRB7jwNDrIH4rVYJkR6M0p
+         WxkYMSBeikxkrfx6oOs1R9Wub02b+cuSBvP9liGCwT6pDY1Ndozb/XhYzCB/F6zIIFnl
+         c6M9RvWkhFPQ2s6TxlKOGBzdjfXplGJTB/BH072j3jt4NhmOT0MEwewZbZxfwc9WSKNq
+         TyNhnKr0EJFh3AqKUEsi9YMjN0D8HKUpnr+nPyc2ukhLhsptvcEyJ0TaSmjTmmsPKIQA
+         e2CEDuSzkxwfjvuwX4Jdj63kCZk95EhhmNZaptHZIdFavftHXVmFGsgMFLPKG1+J6oTz
+         uzwg==
+X-Gm-Message-State: AOAM5335P0weYM792wdCF0/KE4nRA0J8moCxLxn4LwlKOjSJcsSEZTKt
+        UXknwBjHJY3l0IvG7EnvDgzHVkVEmT2oRs9pefk7EUsPyXZ74SHVcMBgFEw5ZIYCRR0Sg1FCCks
+        0OLLgdGu5qAsRVVGZTY7UiDS4F/4g1emj+cA/nssugROpau/LKGv0huxMB4l3oA==
+X-Received: by 2002:a05:620a:1423:: with SMTP id k3mr4382996qkj.311.1627682700541;
+        Fri, 30 Jul 2021 15:05:00 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwsE0R7naZuNPnJJC2QXc2HOhX6dmnUYtwJ3AeyZw/7H252RCpv0ekq01gRagRLcYrLB58hlA==
+X-Received: by 2002:a05:620a:1423:: with SMTP id k3mr4382968qkj.311.1627682700254;
+        Fri, 30 Jul 2021 15:05:00 -0700 (PDT)
 Received: from t490s.. (bras-base-toroon474qw-grc-65-184-144-111-238.dsl.bell.ca. [184.144.111.238])
-        by smtp.gmail.com with ESMTPSA id l12sm1199651qtx.45.2021.07.30.15.04.57
+        by smtp.gmail.com with ESMTPSA id l12sm1199651qtx.45.2021.07.30.15.04.58
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 30 Jul 2021 15:04:58 -0700 (PDT)
+        Fri, 30 Jul 2021 15:04:59 -0700 (PDT)
 From:   Peter Xu <peterx@redhat.com>
 To:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
 Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
         Sean Christopherson <seanjc@google.com>, peterx@redhat.com,
         Maxim Levitsky <mlevitsk@redhat.com>,
         Paolo Bonzini <pbonzini@redhat.com>
-Subject: [PATCH v3 1/7] KVM: Allow to have arch-specific per-vm debugfs files
-Date:   Fri, 30 Jul 2021 18:04:49 -0400
-Message-Id: <20210730220455.26054-2-peterx@redhat.com>
+Subject: [PATCH v3 2/7] KVM: X86: Introduce pte_list_count() helper
+Date:   Fri, 30 Jul 2021 18:04:50 -0400
+Message-Id: <20210730220455.26054-3-peterx@redhat.com>
 X-Mailer: git-send-email 2.31.1
 In-Reply-To: <20210730220455.26054-1-peterx@redhat.com>
 References: <20210730220455.26054-1-peterx@redhat.com>
@@ -68,75 +68,59 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Allow archs to create arch-specific nodes under kvm->debugfs_dentry directory
-besides the stats fields.  The new interface kvm_arch_create_vm_debugfs() is
-defined but not yet used.  It's called after kvm->debugfs_dentry is created, so
-it can be referenced directly in kvm_arch_create_vm_debugfs().  Arch should
-define their own versions when they want to create extra debugfs nodes.
+This helper is used to count the number of rmap entries in the rmap list
+pointed by the kvm_rmap_head.
 
 Signed-off-by: Peter Xu <peterx@redhat.com>
 ---
- include/linux/kvm_host.h |  1 +
- virt/kvm/kvm_main.c      | 20 +++++++++++++++++++-
- 2 files changed, 20 insertions(+), 1 deletion(-)
+ arch/x86/kvm/mmu/mmu.c          | 21 +++++++++++++++++++++
+ arch/x86/kvm/mmu/mmu_internal.h |  1 +
+ 2 files changed, 22 insertions(+)
 
-diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-index 9d6b4ad407b8..a3ec3271c4c8 100644
---- a/include/linux/kvm_host.h
-+++ b/include/linux/kvm_host.h
-@@ -1067,6 +1067,7 @@ bool kvm_arch_dy_runnable(struct kvm_vcpu *vcpu);
- bool kvm_arch_dy_has_pending_interrupt(struct kvm_vcpu *vcpu);
- int kvm_arch_post_init_vm(struct kvm *kvm);
- void kvm_arch_pre_destroy_vm(struct kvm *kvm);
-+int kvm_arch_create_vm_debugfs(struct kvm *kvm);
+diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+index 5429c20cf2cf..16c99f771c9e 100644
+--- a/arch/x86/kvm/mmu/mmu.c
++++ b/arch/x86/kvm/mmu/mmu.c
+@@ -998,6 +998,27 @@ static void pte_list_remove(struct kvm_rmap_head *rmap_head, u64 *sptep)
+ 	__pte_list_remove(sptep, rmap_head);
+ }
  
- #ifndef __KVM_HAVE_ARCH_VM_ALLOC
- /*
-diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index a96cbe24c688..327f8fae80a5 100644
---- a/virt/kvm/kvm_main.c
-+++ b/virt/kvm/kvm_main.c
-@@ -915,7 +915,7 @@ static int kvm_create_vm_debugfs(struct kvm *kvm, int fd)
- 	char dir_name[ITOA_MAX_LEN * 2];
- 	struct kvm_stat_data *stat_data;
- 	const struct _kvm_stats_desc *pdesc;
--	int i;
-+	int i, ret;
- 	int kvm_debugfs_num_entries = kvm_vm_stats_header.num_desc +
- 				      kvm_vcpu_stats_header.num_desc;
- 
-@@ -960,6 +960,13 @@ static int kvm_create_vm_debugfs(struct kvm *kvm, int fd)
- 				    kvm->debugfs_dentry, stat_data,
- 				    &stat_fops_per_vm);
- 	}
++unsigned int pte_list_count(struct kvm_rmap_head *rmap_head)
++{
++	struct pte_list_desc *desc;
++	unsigned int i, count = 0;
 +
-+	ret = kvm_arch_create_vm_debugfs(kvm);
-+	if (ret) {
-+		kvm_destroy_vm_debugfs(kvm);
-+		return i;
++	if (!rmap_head->val)
++		return 0;
++	else if (!(rmap_head->val & 1))
++		return 1;
++
++	desc = (struct pte_list_desc *)(rmap_head->val & ~1ul);
++
++	while (desc) {
++		for (i = 0; (i < PTE_LIST_EXT) && desc->sptes[i]; i++)
++			count++;
++		desc = desc->more;
 +	}
 +
- 	return 0;
- }
- 
-@@ -980,6 +987,17 @@ void __weak kvm_arch_pre_destroy_vm(struct kvm *kvm)
- {
- }
- 
-+/*
-+ * Called after per-vm debugfs created.  When called kvm->debugfs_dentry should
-+ * be setup already, so we can create arch-specific debugfs entries under it.
-+ * Cleanup should be automatic done in kvm_destroy_vm_debugfs() recursively, so
-+ * a per-arch destroy interface is not needed.
-+ */
-+int __weak kvm_arch_create_vm_debugfs(struct kvm *kvm)
-+{
-+	return 0;
++	return count;
 +}
 +
- static struct kvm *kvm_create_vm(unsigned long type)
+ static struct kvm_rmap_head *__gfn_to_rmap(gfn_t gfn, int level,
+ 					   const struct kvm_memory_slot *slot)
  {
- 	struct kvm *kvm = kvm_arch_alloc_vm();
+diff --git a/arch/x86/kvm/mmu/mmu_internal.h b/arch/x86/kvm/mmu/mmu_internal.h
+index ca7b7595bbfc..62bb8f758b3f 100644
+--- a/arch/x86/kvm/mmu/mmu_internal.h
++++ b/arch/x86/kvm/mmu/mmu_internal.h
+@@ -131,6 +131,7 @@ bool kvm_mmu_slot_gfn_write_protect(struct kvm *kvm,
+ 				    int min_level);
+ void kvm_flush_remote_tlbs_with_address(struct kvm *kvm,
+ 					u64 start_gfn, u64 pages);
++unsigned int pte_list_count(struct kvm_rmap_head *rmap_head);
+ 
+ /*
+  * Return values of handle_mmio_page_fault, mmu.page_fault, and fast_page_fault().
 -- 
 2.31.1
 
