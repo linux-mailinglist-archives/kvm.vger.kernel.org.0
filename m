@@ -2,204 +2,204 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id AEC873DBAA6
-	for <lists+kvm@lfdr.de>; Fri, 30 Jul 2021 16:33:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 72BB53DBAAF
+	for <lists+kvm@lfdr.de>; Fri, 30 Jul 2021 16:35:48 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239274AbhG3Odl (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 30 Jul 2021 10:33:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41930 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239042AbhG3Odk (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 30 Jul 2021 10:33:40 -0400
-Received: from mail-lj1-x229.google.com (mail-lj1-x229.google.com [IPv6:2a00:1450:4864:20::229])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0B3F2C06175F
-        for <kvm@vger.kernel.org>; Fri, 30 Jul 2021 07:33:35 -0700 (PDT)
-Received: by mail-lj1-x229.google.com with SMTP id q2so12666497ljq.5
-        for <kvm@vger.kernel.org>; Fri, 30 Jul 2021 07:33:34 -0700 (PDT)
+        id S239184AbhG3Ofw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 30 Jul 2021 10:35:52 -0400
+Received: from smtp-fw-80007.amazon.com ([99.78.197.218]:4849 "EHLO
+        smtp-fw-80007.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231255AbhG3Ofv (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 30 Jul 2021 10:35:51 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=dQGtz4NxA/KCcb2UkEKczuSorFz82jXK+AMOuFhIpSY=;
-        b=RDXh6xhSHzVcHoLlZtkJY8rwf+9yeKe0yYYIuU3JvH6YO4ghrz6ojczlapHQhwLmCd
-         Fe+TAjzwdXYjAv06/eyWHH3Q10DkSfI9d/AfMDP7wA867e2ePSETc1r6V984B2jOSxuf
-         amMOK/ZmyhihhEhZ8f/Sa3NU/ODRr5XPRXRIR9lvPBR3s9csTgQ1WHhVYHwGmlpeK9IT
-         dDVZYTaWI9Vc59rDlXVpmgnW6t6/qB7KFS8XKcZdocIlK2yLURmYOJJfjNhhBnZ5DHFd
-         FjPTbYr5RJa7XU4gvoi6v4QJy5l1V9kf7uESMvX+FkIFC6dNkaxHkyQDRuwJkGyuXETd
-         ziGA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=dQGtz4NxA/KCcb2UkEKczuSorFz82jXK+AMOuFhIpSY=;
-        b=CwYcWwGEZGcNPWhlk6+B8k9SaAO7XJssNje3FdyDNEKGkvy+qgx16FwpeKtNrSO/NZ
-         Inq7kB1MRt/WoOdcscLkOrxJTnkwP5+9NKFKxcUfj0289qjBii5u10TqRt3UhFuwVt0e
-         yYPEtw5dYfgac23gaey7R4KzJV9KLAN7CvaNLio60RwsRDd4erPEcZIMi+Rpbfdta7OG
-         kG4C76GTJPQuWtfJzUE+7AOWEsVfPBnhKwmtYhc73Br/mIEDNcqieFVE5Tkt+rdXbVrl
-         esTCXfKWRr4Vo4EXKgNc0Rl4i+2/X8AofMo1KHvu2F2/cJFIy9W6vFnHwWP9JJ4bzrWR
-         7tcQ==
-X-Gm-Message-State: AOAM533hzpQE9BgmM9NiRaI+JKheRAKj3L3rNUzWaS9c8Z9tiETN5Bjc
-        6vb0Jn2V2Pv7HyCcJ0Bu/15wMfMYqxsTJ9TO3OR9kA==
-X-Google-Smtp-Source: ABdhPJzgGnVq10vXKLaHBZpfgLUJ0afJNvNbZo+mH2b7grVgG96TtjH9fn8FrBCfPY3RGRFW6+8Q94qxjfL1Nl+Zq/g=
-X-Received: by 2002:a2e:a68f:: with SMTP id q15mr1890524lje.314.1627655612988;
- Fri, 30 Jul 2021 07:33:32 -0700 (PDT)
+  d=amazon.de; i=@amazon.de; q=dns/txt; s=amazon201209;
+  t=1627655747; x=1659191747;
+  h=date:from:to:cc:message-id:references:mime-version:
+   in-reply-to:subject;
+  bh=0FsLXimCNBTR48j3aYbh34ic1ti4XjTilcok0yp9pGE=;
+  b=qIQ/aVNrpLMvOA2Gtj4/wIPiV/8eYYFdbHboMSGE8i9xct5UHQDZSfbj
+   On9mohGq+58n9BUySSOyAYcccM+pgFBjWiEJSvJuWp/6TXjIMBFWOwtqe
+   WfIaEJtyfKo2i+QpbHaJ/pOBK8CntDNT+LJTc3rBXqSrPbEFHQfX4L+lX
+   I=;
+X-IronPort-AV: E=Sophos;i="5.84,282,1620691200"; 
+   d="scan'208";a="15987416"
+Subject: Re: [PATCH 4/4] KVM: selftests: Test access to XMM fast hypercalls
+Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO email-inbound-relay-2b-baacba05.us-west-2.amazon.com) ([10.25.36.210])
+  by smtp-border-fw-80007.pdx80.corp.amazon.com with ESMTP; 30 Jul 2021 14:35:40 +0000
+Received: from EX13D28EUC003.ant.amazon.com (pdx1-ws-svc-p6-lb9-vlan2.pdx.amazon.com [10.236.137.194])
+        by email-inbound-relay-2b-baacba05.us-west-2.amazon.com (Postfix) with ESMTPS id 7B42AA1778;
+        Fri, 30 Jul 2021 14:35:39 +0000 (UTC)
+Received: from u366d62d47e3651.ant.amazon.com (10.43.160.66) by
+ EX13D28EUC003.ant.amazon.com (10.43.164.43) with Microsoft SMTP Server (TLS)
+ id 15.0.1497.23; Fri, 30 Jul 2021 14:35:35 +0000
+Date:   Fri, 30 Jul 2021 16:35:31 +0200
+From:   Siddharth Chandrasekaran <sidcha@amazon.de>
+To:     Vitaly Kuznetsov <vkuznets@redhat.com>
+CC:     <kvm@vger.kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        <linux-kernel@vger.kernel.org>
+Message-ID: <20210730143530.GD20232@u366d62d47e3651.ant.amazon.com>
+References: <20210730122625.112848-1-vkuznets@redhat.com>
+ <20210730122625.112848-5-vkuznets@redhat.com>
 MIME-Version: 1.0
-References: <20210729220916.1672875-1-oupton@google.com> <20210729220916.1672875-4-oupton@google.com>
- <878s1o2l6j.wl-maz@kernel.org>
-In-Reply-To: <878s1o2l6j.wl-maz@kernel.org>
-From:   Oliver Upton <oupton@google.com>
-Date:   Fri, 30 Jul 2021 07:33:21 -0700
-Message-ID: <CAOQ_QsjFzdjYgYSxNLH=8O84FJB+O8KtH0VnzdQ9HnLZwxwpNQ@mail.gmail.com>
-Subject: Re: [PATCH v2 3/3] KVM: arm64: Use generic KVM xfer to guest work function
-To:     Marc Zyngier <maz@kernel.org>
-Cc:     kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-        James Morse <james.morse@arm.com>,
-        Alexandru Elisei <Alexandru.Elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Will Deacon <will@kernel.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Andy Lutomirski <luto@kernel.org>,
-        linux-arm-kernel@lists.infradead.org,
-        Peter Shier <pshier@google.com>,
-        Shakeel Butt <shakeelb@google.com>,
-        Guangyu Shi <guangyus@google.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20210730122625.112848-5-vkuznets@redhat.com>
+User-Agent: Mutt/1.9.4 (2018-02-28)
+X-Originating-IP: [10.43.160.66]
+X-ClientProxiedBy: EX13D36UWB004.ant.amazon.com (10.43.161.49) To
+ EX13D28EUC003.ant.amazon.com (10.43.164.43)
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Marc,
+On Fri, Jul 30, 2021 at 02:26:25PM +0200, Vitaly Kuznetsov wrote:
+> HYPERV_CPUID_FEATURES.EDX and an 'XMM fast' hypercall is issued.
+> 
+> Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+> ---
+>  .../selftests/kvm/include/x86_64/hyperv.h     |  5 ++-
+>  .../selftests/kvm/x86_64/hyperv_features.c    | 41 +++++++++++++++++--
+>  2 files changed, 42 insertions(+), 4 deletions(-)
+> 
+> diff --git a/tools/testing/selftests/kvm/include/x86_64/hyperv.h b/tools/testing/selftests/kvm/include/x86_64/hyperv.h
+> index 412eaee7884a..b66910702c0a 100644
+> --- a/tools/testing/selftests/kvm/include/x86_64/hyperv.h
+> +++ b/tools/testing/selftests/kvm/include/x86_64/hyperv.h
+> @@ -117,7 +117,7 @@
+>  #define HV_X64_GUEST_DEBUGGING_AVAILABLE               BIT(1)
+>  #define HV_X64_PERF_MONITOR_AVAILABLE                  BIT(2)
+>  #define HV_X64_CPU_DYNAMIC_PARTITIONING_AVAILABLE      BIT(3)
+> -#define HV_X64_HYPERCALL_PARAMS_XMM_AVAILABLE          BIT(4)
+> +#define HV_X64_HYPERCALL_XMM_INPUT_AVAILABLE           BIT(4)
+>  #define HV_X64_GUEST_IDLE_STATE_AVAILABLE              BIT(5)
+>  #define HV_FEATURE_FREQUENCY_MSRS_AVAILABLE            BIT(8)
+>  #define HV_FEATURE_GUEST_CRASH_MSR_AVAILABLE           BIT(10)
+> @@ -182,4 +182,7 @@
+>  #define HV_STATUS_INVALID_CONNECTION_ID                18
+>  #define HV_STATUS_INSUFFICIENT_BUFFERS         19
+> 
+> +/* hypercall options */
+> +#define HV_HYPERCALL_FAST_BIT          BIT(16)
+> +
+>  #endif /* !SELFTEST_KVM_HYPERV_H */
+> diff --git a/tools/testing/selftests/kvm/x86_64/hyperv_features.c b/tools/testing/selftests/kvm/x86_64/hyperv_features.c
+> index af27c7e829c1..91d88aaa9899 100644
+> --- a/tools/testing/selftests/kvm/x86_64/hyperv_features.c
+> +++ b/tools/testing/selftests/kvm/x86_64/hyperv_features.c
+> @@ -47,6 +47,7 @@ static void do_wrmsr(u32 idx, u64 val)
+>  }
+> 
+>  static int nr_gp;
+> +static int nr_ud;
+> 
+>  static inline u64 hypercall(u64 control, vm_vaddr_t input_address,
+>                             vm_vaddr_t output_address)
+> @@ -80,6 +81,12 @@ static void guest_gp_handler(struct ex_regs *regs)
+>                 regs->rip = (uint64_t)&wrmsr_end;
+>  }
+> 
+> +static void guest_ud_handler(struct ex_regs *regs)
+> +{
+> +       nr_ud++;
+> +       regs->rip += 3;
+> +}
+> +
+>  struct msr_data {
+>         uint32_t idx;
+>         bool available;
+> @@ -90,6 +97,7 @@ struct msr_data {
+>  struct hcall_data {
+>         uint64_t control;
+>         uint64_t expect;
+> +       bool ud_expected;
+>  };
+> 
+>  static void guest_msr(struct msr_data *msr)
+> @@ -117,13 +125,26 @@ static void guest_msr(struct msr_data *msr)
+>  static void guest_hcall(vm_vaddr_t pgs_gpa, struct hcall_data *hcall)
+>  {
+>         int i = 0;
+> +       u64 res, input, output;
+> 
+>         wrmsr(HV_X64_MSR_GUEST_OS_ID, LINUX_OS_ID);
+>         wrmsr(HV_X64_MSR_HYPERCALL, pgs_gpa);
+> 
+>         while (hcall->control) {
+> -               GUEST_ASSERT(hypercall(hcall->control, pgs_gpa,
+> -                                      pgs_gpa + 4096) == hcall->expect);
+> +               nr_ud = 0;
+> +               if (!(hcall->control & HV_HYPERCALL_FAST_BIT)) {
+> +                       input = pgs_gpa;
+> +                       output = pgs_gpa + 4096;
+> +               } else {
+> +                       input = output = 0;
+> +               }
+> +
+> +               res = hypercall(hcall->control, input, output);
+> +               if (hcall->ud_expected)
+> +                       GUEST_ASSERT(nr_ud == 1);
 
-On Fri, Jul 30, 2021 at 2:41 AM Marc Zyngier <maz@kernel.org> wrote:
->
-> Hi Oliver,
->
-> On Thu, 29 Jul 2021 23:09:16 +0100,
-> Oliver Upton <oupton@google.com> wrote:
-> >
-> > Clean up handling of checks for pending work by switching to the generic
-> > infrastructure to do so.
-> >
-> > We pick up handling for TIF_NOTIFY_RESUME from this switch, meaning that
-> > task work will be correctly handled.
-> >
-> > Signed-off-by: Oliver Upton <oupton@google.com>
-> > ---
-> >  arch/arm64/kvm/Kconfig |  1 +
-> >  arch/arm64/kvm/arm.c   | 27 ++++++++++++++-------------
-> >  2 files changed, 15 insertions(+), 13 deletions(-)
-> >
-> > diff --git a/arch/arm64/kvm/Kconfig b/arch/arm64/kvm/Kconfig
-> > index a4eba0908bfa..8bc1fac5fa26 100644
-> > --- a/arch/arm64/kvm/Kconfig
-> > +++ b/arch/arm64/kvm/Kconfig
-> > @@ -26,6 +26,7 @@ menuconfig KVM
-> >       select HAVE_KVM_ARCH_TLB_FLUSH_ALL
-> >       select KVM_MMIO
-> >       select KVM_GENERIC_DIRTYLOG_READ_PROTECT
-> > +     select KVM_XFER_TO_GUEST_WORK
-> >       select SRCU
-> >       select KVM_VFIO
-> >       select HAVE_KVM_EVENTFD
-> > diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> > index 60d0a546d7fd..9762e2129813 100644
-> > --- a/arch/arm64/kvm/arm.c
-> > +++ b/arch/arm64/kvm/arm.c
-> > @@ -6,6 +6,7 @@
-> >
-> >  #include <linux/bug.h>
-> >  #include <linux/cpu_pm.h>
-> > +#include <linux/entry-kvm.h>
-> >  #include <linux/errno.h>
-> >  #include <linux/err.h>
-> >  #include <linux/kvm_host.h>
-> > @@ -714,6 +715,13 @@ static bool vcpu_mode_is_bad_32bit(struct kvm_vcpu *vcpu)
-> >               static_branch_unlikely(&arm64_mismatched_32bit_el0);
-> >  }
-> >
-> > +static bool kvm_vcpu_exit_request(struct kvm_vcpu *vcpu)
-> > +{
-> > +     return kvm_request_pending(vcpu) ||
-> > +                     need_new_vmid_gen(&vcpu->arch.hw_mmu->vmid) ||
-> > +                     xfer_to_guest_mode_work_pending();
->
-> Here's what xfer_to_guest_mode_work_pending() says:
->
-> <quote>
->  * Has to be invoked with interrupts disabled before the transition to
->  * guest mode.
-> </quote>
->
-> At the point where you call this, we already are in guest mode, at
-> least in the KVM sense.
+Should we also do WRITE_ONCE(nr_ur, 0) here? or perhaps pass the the
+expected value of nr_ud + 1 in hcall->ud_expected from caller and do,
 
-I believe the comment is suggestive of guest mode in the hardware
-sense, not KVM's vcpu->mode designation. I got this from
-arch/x86/kvm/x86.c:vcpu_enter_guest() to infer the author's
-intentions.
+    if (hcall->ud_expected)
+        GUEST_ASSERT(nr_ud == hcall->ud_expected);
 
->
-> > +}
-> > +
-> >  /**
-> >   * kvm_arch_vcpu_ioctl_run - the main VCPU run function to execute guest code
-> >   * @vcpu:    The VCPU pointer
-> > @@ -757,7 +765,11 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
-> >               /*
-> >                * Check conditions before entering the guest
-> >                */
-> > -             cond_resched();
-> > +             if (__xfer_to_guest_mode_work_pending()) {
-> > +                     ret = xfer_to_guest_mode_handle_work(vcpu);
->
-> xfer_to_guest_mode_handle_work() already does the exact equivalent of
-> __xfer_to_guest_mode_work_pending(). Why do we need to do it twice?
+This way there can be other test that can also expect a UD.
 
-Right, there's no need to do the check twice.
+> +               else
+> +                       GUEST_ASSERT(res == hcall->expect);
+> +
+>                 GUEST_SYNC(i++);
+>         }
+> 
+> @@ -552,8 +573,18 @@ static void guest_test_hcalls_access(struct kvm_vm *vm, struct hcall_data *hcall
+>                         recomm.ebx = 0xfff;
+>                         hcall->expect = HV_STATUS_SUCCESS;
+>                         break;
+> -
+>                 case 17:
+> +                       /* XMM fast hypercall */
+> +                       hcall->control = HVCALL_FLUSH_VIRTUAL_ADDRESS_SPACE | HV_HYPERCALL_FAST_BIT;
+> +                       hcall->ud_expected = true;
+> +                       break;
+> +               case 18:
+> +                       feat.edx |= HV_X64_HYPERCALL_XMM_INPUT_AVAILABLE;
+> +                       hcall->ud_expected = false;
+> +                       hcall->expect = HV_STATUS_SUCCESS;
+> +                       break;
+> +
+> +               case 19:
+>                         /* END */
+>                         hcall->control = 0;
+>                         break;
+> @@ -625,6 +656,10 @@ int main(void)
+>         /* Test hypercalls */
+>         vm = vm_create_default(VCPU_ID, 0, guest_hcall);
+> 
+> +       vm_init_descriptor_tables(vm);
+> +       vcpu_init_descriptor_tables(vm, VCPU_ID);
+> +       vm_install_exception_handler(vm, UD_VECTOR, guest_ud_handler);
+> +
+>         /* Hypercall input/output */
+>         hcall_page = vm_vaddr_alloc_pages(vm, 2);
+>         memset(addr_gva2hva(vm, hcall_page), 0x0, 2 * getpagesize());
+> --
+> 2.31.1
+> 
 
->
-> > +                     if (!ret)
-> > +                             ret = 1;
-> > +             }
-> >
-> >               update_vmid(&vcpu->arch.hw_mmu->vmid);
-> >
-> > @@ -776,16 +788,6 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
-> >
-> >               kvm_vgic_flush_hwstate(vcpu);
-> >
-> > -             /*
-> > -              * Exit if we have a signal pending so that we can deliver the
-> > -              * signal to user space.
-> > -              */
-> > -             if (signal_pending(current)) {
-> > -                     ret = -EINTR;
-> > -                     run->exit_reason = KVM_EXIT_INTR;
-> > -                     ++vcpu->stat.signal_exits;
-> > -             }
-> > -
-> >               /*
-> >                * If we're using a userspace irqchip, then check if we need
-> >                * to tell a userspace irqchip about timer or PMU level
-> > @@ -809,8 +811,7 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
-> >                */
-> >               smp_store_mb(vcpu->mode, IN_GUEST_MODE);
-> >
-> > -             if (ret <= 0 || need_new_vmid_gen(&vcpu->arch.hw_mmu->vmid) ||
-> > -                 kvm_request_pending(vcpu)) {
-> > +             if (ret <= 0 || kvm_vcpu_exit_request(vcpu)) {
->
-> If you are doing this, please move the userspace irqchip handling into
-> the helper as well, so that we have a single function dealing with
-> collecting exit reasons.
 
-Sure thing.
 
-Thanks for the quick review, Marc!
+Amazon Development Center Germany GmbH
+Krausenstr. 38
+10117 Berlin
+Geschaeftsfuehrung: Christian Schlaeger, Jonathan Weiss
+Eingetragen am Amtsgericht Charlottenburg unter HRB 149173 B
+Sitz: Berlin
+Ust-ID: DE 289 237 879
 
---
-Best,
-Oliver
+
+
