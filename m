@@ -2,52 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 815213DC123
-	for <lists+kvm@lfdr.de>; Sat, 31 Jul 2021 00:37:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A0BF43DC124
+	for <lists+kvm@lfdr.de>; Sat, 31 Jul 2021 00:37:18 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233158AbhG3WhU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 30 Jul 2021 18:37:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52430 "EHLO
+        id S233273AbhG3WhW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 30 Jul 2021 18:37:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52438 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232817AbhG3WhT (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 30 Jul 2021 18:37:19 -0400
-Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A56B6C06175F
-        for <kvm@vger.kernel.org>; Fri, 30 Jul 2021 15:37:14 -0700 (PDT)
-Received: by mail-yb1-xb49.google.com with SMTP id p71-20020a25424a0000b029056092741626so12028996yba.19
-        for <kvm@vger.kernel.org>; Fri, 30 Jul 2021 15:37:14 -0700 (PDT)
+        with ESMTP id S232817AbhG3WhV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 30 Jul 2021 18:37:21 -0400
+Received: from mail-pl1-x649.google.com (mail-pl1-x649.google.com [IPv6:2607:f8b0:4864:20::649])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B799EC06175F
+        for <kvm@vger.kernel.org>; Fri, 30 Jul 2021 15:37:15 -0700 (PDT)
+Received: by mail-pl1-x649.google.com with SMTP id f9-20020a1709028609b0290128bcba6be7so8699917plo.18
+        for <kvm@vger.kernel.org>; Fri, 30 Jul 2021 15:37:15 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
-        h=date:message-id:mime-version:subject:from:to:cc;
-        bh=La1sDp9z728EUdArr8dAJV9rSsj40AWPAQ4RtlkYcwI=;
-        b=XAy+zPjNUa+2DhPvYtIrpzlUnjnEicZzUYnBUboPHDm5LSBnJv9yDGitPLtSnkr0eN
-         rmTs5VzGGpOrcL5XUB4IlNs0jpyUjuQhqsazyjbMJFhuOyeYczekeQtQcRf7Ilp1ieCi
-         7HxLJ1MedDo9+eYTiKf2WDQHZxO0pElHAFQAwa6FD67o7R6UGw0p3uTAV1lBtKwi17Lq
-         J0tCbtPhW7gRQir+vzV7cpTkdRdX0jdGfZ9edtkgKPtNU6s1v3tbcvHKtuFOukcmfz95
-         PSEr0AFmsfOfclFMfhUrDCBZ7H/YOlZlks/mtrgOc+5zbkFzl3E4Mcwh2QF/2SAvIXOt
-         f1IQ==
+        h=date:in-reply-to:message-id:mime-version:references:subject:from:to
+         :cc;
+        bh=dMwap4hObUgoDwGKFMQjZvRZTCSpSBJpDZ6SHzoUej4=;
+        b=px4bUOZfcOhRJsEm/Sr8g4k95JNeIzM6JiOzIBpBY6IM6kuDZGh92zuj7W+WNPQuyL
+         7VNqO3x8d2aBGs+rWxrd4v8KgYIEM9pxJeEM//MAaQgrV3jGrwYhYKeevY5tiIavyOYu
+         cS3RgbFZG/ZMyct9IdRjJEVUE1U7rlFxzy3TFqAmuUZP5aXmxh0S0nycIamkztVy+dz/
+         6XSBD2Z7hpr5rb/mvZEY12vh9SJApojYBRNEM6F6Tp1JId/lWyOHPzy1XXQneGqcP3SB
+         nvVxFBkRp2IFOZ9v+078asAjbU3oMK7qtoN3lOpYXy2aUVQHStTZyABRll1ywSySLPUG
+         pdxg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
-        bh=La1sDp9z728EUdArr8dAJV9rSsj40AWPAQ4RtlkYcwI=;
-        b=BcS4DgiyVhIeK0uTi8r9B8CTWWyuucKOw/NOLxWLXpwtu+NcufqremGhuH2LCuU3L5
-         dlGGhPuL9R53DvVZ3koyP0cjORi1FTWWXmUuhU8H185QuoS7F9MPBXg12rY7SHanQ3v1
-         sJvDJVmbo1TWIsvQ+MdXC7WzdGhebA5hdZQP+bwmkjwVJDGfaGRSyZXWfertRGSBs43n
-         GNkl30stuM3PUtzQjBlenacxi5STtQkuvgB9+CxuPPRiyNz0ihOEs2iScq5qaOTsmrN0
-         o2v3SaDra167fuqcT0UYazVd7FdgOyf7YcraSe372yvtQ9IfVCRDv7Qg8/N79iVh1sqM
-         1NZA==
-X-Gm-Message-State: AOAM530Hg4XwJHrRxQh4txN6ePVzENnInDIW0oaNK78oFDtr2lJKKccZ
-        txrmnYvu8M/YT+5wTArhxneRyjTYwgS1J27xNNxEbZra4QWIS2ah9Vp6FTFlrjGRj19woC5ZZ6B
-        UENU71OQ35LcCeekvho7e0U5gxid9jOfTo+41uBBQWGlXrSQUJpuwxrHvkdw4MdI=
-X-Google-Smtp-Source: ABdhPJzcuwwgkqV2TqY+j9OVN3wdzpyH6oHcSXdlPmkkkPQvsTKg05TEJyGGVzlEoWzNBSOQFWTck3OYXsw4mg==
+        h=x-gm-message-state:date:in-reply-to:message-id:mime-version
+         :references:subject:from:to:cc;
+        bh=dMwap4hObUgoDwGKFMQjZvRZTCSpSBJpDZ6SHzoUej4=;
+        b=LiiwUKeeZRC+nDt/hTc64pWD+NPR17INW6FwfkEui9jgR8WNdBNzbyMhc6v1332G1P
+         vDKm89A5BRrBsKEMqWBZfr37Qw27aMaBhvVb+n+iDCtd5Ns6P7qIGf5GFd8p7tN4ZjxJ
+         wkjjJEfQAsg+qIPe7HMeUofa7Lmvg5ljOdmrjZ0AQBoowOAbdYNs1B9pLx421D+I0Nk+
+         TQqDbZLh/k1J/XyiEwBmpcxdJKaoyLFc2Zvx/WlxRUQjxwbxZs3Gd7Cgeoc98xVyTLUN
+         K9i06Ui+vqCnnJh+O1ZP9JNgboWyw7GBEWYzQASdnDtQyFhtmy5oHa3v0IEfH2mOwaFZ
+         m5JA==
+X-Gm-Message-State: AOAM5305Q/cvwtpCxy6L57XfF4cxGbr4OHbyJQTLCFNnzkCzKCLdHSrh
+        RfXZWOgYCSga5fKYCKBjXsb1gtEU6YQ+DUaFjcAco04VVbUIeA3CW9pezJYt2yXo6djYR3/TK7J
+        GWvlF6i+fkQb93O6W4lw3AzLaTC4oKRLKe0tj117+WEJJusUaRNPaIegcW/S44gE=
+X-Google-Smtp-Source: ABdhPJxBfbsygN5WdnwHHjaO9B0TAkPrvBKH8QFlHhGFSBhwXNnLD7yI53Ixn1v9pk+s3wtGmjh2mhXJRQXdhA==
 X-Received: from dmatlack-heavy.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:19cd])
- (user=dmatlack job=sendgmr) by 2002:a05:6902:54e:: with SMTP id
- z14mr2758285ybs.334.1627684633762; Fri, 30 Jul 2021 15:37:13 -0700 (PDT)
-Date:   Fri, 30 Jul 2021 22:37:01 +0000
-Message-Id: <20210730223707.4083785-1-dmatlack@google.com>
+ (user=dmatlack job=sendgmr) by 2002:a05:6a00:1394:b029:3ac:c1a3:f988 with
+ SMTP id t20-20020a056a001394b02903acc1a3f988mr5137051pfg.37.1627684635120;
+ Fri, 30 Jul 2021 15:37:15 -0700 (PDT)
+Date:   Fri, 30 Jul 2021 22:37:02 +0000
+In-Reply-To: <20210730223707.4083785-1-dmatlack@google.com>
+Message-Id: <20210730223707.4083785-2-dmatlack@google.com>
 Mime-Version: 1.0
+References: <20210730223707.4083785-1-dmatlack@google.com>
 X-Mailer: git-send-email 2.32.0.554.ge1b32706d8-goog
-Subject: [PATCH 0/6] Improve gfn-to-memslot performance during page faults
+Subject: [PATCH 1/6] KVM: Cache the least recently used slot index per vCPU
 From:   David Matlack <dmatlack@google.com>
 To:     kvm@vger.kernel.org
 Cc:     Ben Gardon <bgardon@google.com>, Joerg Roedel <joro@8bytes.org>,
@@ -64,71 +69,178 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This series improves the performance of gfn-to-memslot lookups during
-page faults. Ben Gardon originally identified this performance gap and
-sufficiently addressed it in Google's kernel by reading the memslot once
-at the beginning of the page fault and passing around the pointer.
+The memslot for a given gfn is looked up multiple times during page
+fault handling. Avoid binary searching for it multiple times by caching
+the least recently used slot. There is an existing VM-wide LRU slot but
+that does not work well for cases where vCPUs are accessing memory in
+different slots (see performance data below).
 
-This series takes an alternative approach by introducing a per-vCPU
-cache of the least recently used memslot index. This avoids needing to
-binary search the existing memslots multiple times during a page fault.
-Unlike passing around the pointer, the LRU cache has an additional
-benefit in that it speeds up gfn-to-memslot lookups *across* faults and
-during spte prefetching where the gfn changes.
+Another benefit of caching the least recently use slot (versus looking
+up the slot once and passing around a pointer) is speeding up memslot
+lookups *across* faults and during spte prefetching.
 
-This difference can be seen clearly when looking at the performance of
-fast_page_fault when multiple slots are in play:
+To measure the performance of this change I ran dirty_log_perf_test with
+64 vCPUs and 64 memslots and measured "Populate memory time" and
+"Iteration 2 dirty memory time".  Tests were ran with eptad=N to force
+dirty logging to use fast_page_fault so its performance could be
+measured.
 
-Metric                        | Baseline     | Pass*    | LRU**
------------------------------ | ------------ | -------- | ----------
-Iteration 2 dirty memory time | 2.8s         | 1.6s     | 0.30s
+Config     | Metric                        | Before | After
+---------- | ----------------------------- | ------ | ------
+tdp_mmu=Y  | Populate memory time          | 6.76s  | 5.47s
+tdp_mmu=Y  | Iteration 2 dirty memory time | 2.83s  | 0.31s
+tdp_mmu=N  | Populate memory time          | 20.4s  | 18.7s
+tdp_mmu=N  | Iteration 2 dirty memory time | 2.65s  | 0.30s
 
-* Pass: Lookup the memslot once per fault and pass it around.
-** LRU: Cache the LRU slot per vCPU (i.e. this series).
+The "Iteration 2 dirty memory time" results are especially compelling
+because they are equivalent to running the same test with a single
+memslot. In other words, fast_page_fault performance no longer scales
+with the number of memslots.
 
-(Collected via ./dirty_log_perf_test -v64 -x64)
+Signed-off-by: David Matlack <dmatlack@google.com>
+---
+ include/linux/kvm_host.h | 61 ++++++++++++++++++++++++++++++----------
+ virt/kvm/kvm_main.c      | 21 +++++++++++++-
+ 2 files changed, 66 insertions(+), 16 deletions(-)
 
-I plan to also send a follow-up series with a version of Ben's patches
-to pass the pointer to the memslot through the page fault handling code
-rather than looking it up multiple times. Even when applied on top of
-the LRU series it has some performance improvements by avoiding a few
-extra memory accesses (mainly kvm->memslots[as_id] and
-slots->used_slots). But it will be a judgement call whether or not it's
-worth the code churn and complexity.
-
-Here is a break down of this series:
-
-Patches 1-2 introduce a per-vCPU cache of the least recently memslot
-index.
-
-Patches 3-5 convert existing gfn-to-memslot lookups to use
-kvm_vcpu_gfn_to_memslot so that they can leverage the new LRU cache.
-
-Patch 6 adds support for multiple slots to dirty_log_perf_test which is
-used to generate the performance data in this series.
-
-David Matlack (6):
-  KVM: Cache the least recently used slot index per vCPU
-  KVM: Avoid VM-wide lru_slot lookup in kvm_vcpu_gfn_to_memslot
-  KVM: x86/mmu: Speed up dirty logging in
-    tdp_mmu_map_handle_target_level
-  KVM: x86/mmu: Leverage vcpu->lru_slot_index for rmap_add and
-    rmap_recycle
-  KVM: x86/mmu: Rename __gfn_to_rmap to gfn_to_rmap
-  KVM: selftests: Support multiple slots in dirty_log_perf_test
-
- arch/x86/kvm/mmu/mmu.c                        | 54 +++++++------
- arch/x86/kvm/mmu/tdp_mmu.c                    | 15 +++-
- include/linux/kvm_host.h                      | 73 +++++++++++++-----
- .../selftests/kvm/access_tracking_perf_test.c |  2 +-
- .../selftests/kvm/demand_paging_test.c        |  2 +-
- .../selftests/kvm/dirty_log_perf_test.c       | 76 ++++++++++++++++---
- .../selftests/kvm/include/perf_test_util.h    |  2 +-
- .../selftests/kvm/lib/perf_test_util.c        | 20 +++--
- .../kvm/memslot_modification_stress_test.c    |  2 +-
- virt/kvm/kvm_main.c                           | 21 ++++-
- 10 files changed, 198 insertions(+), 69 deletions(-)
-
+diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+index 9d6b4ad407b8..320090d5a124 100644
+--- a/include/linux/kvm_host.h
++++ b/include/linux/kvm_host.h
+@@ -354,6 +354,13 @@ struct kvm_vcpu {
+ 	struct kvm_vcpu_stat stat;
+ 	char stats_id[KVM_STATS_NAME_SIZE];
+ 	struct kvm_dirty_ring dirty_ring;
++
++	/*
++	 * The index of the least recently used memslot by this vCPU. It's ok
++	 * if this becomes stale due to memslot changes since we always check
++	 * it is a valid slot.
++	 */
++	int lru_slot_index;
+ };
+ 
+ /* must be called with irqs disabled */
+@@ -1189,27 +1196,38 @@ int kvm_request_irq_source_id(struct kvm *kvm);
+ void kvm_free_irq_source_id(struct kvm *kvm, int irq_source_id);
+ bool kvm_arch_irqfd_allowed(struct kvm *kvm, struct kvm_irqfd *args);
+ 
++static inline struct kvm_memory_slot *get_slot(struct kvm_memslots *slots, int slot_index)
++{
++	if (slot_index < 0 || slot_index >= slots->used_slots)
++		return NULL;
++
++	return &slots->memslots[slot_index];
++}
++
++static inline bool slot_contains_gfn(struct kvm_memslots *slots, int slot_index, gfn_t gfn)
++{
++	struct kvm_memory_slot *memslot = get_slot(slots, slot_index);
++
++	if (!memslot)
++		return false;
++
++	return gfn >= memslot->base_gfn && gfn < memslot->base_gfn + memslot->npages;
++}
++
+ /*
+- * search_memslots() and __gfn_to_memslot() are here because they are
+- * used in non-modular code in arch/powerpc/kvm/book3s_hv_rm_mmu.c.
+- * gfn_to_memslot() itself isn't here as an inline because that would
+- * bloat other code too much.
+- *
+  * IMPORTANT: Slots are sorted from highest GFN to lowest GFN!
+  */
+-static inline struct kvm_memory_slot *
+-search_memslots(struct kvm_memslots *slots, gfn_t gfn)
++static inline int __search_memslots(struct kvm_memslots *slots, gfn_t gfn)
+ {
+ 	int start = 0, end = slots->used_slots;
+ 	int slot = atomic_read(&slots->lru_slot);
+ 	struct kvm_memory_slot *memslots = slots->memslots;
+ 
+ 	if (unlikely(!slots->used_slots))
+-		return NULL;
++		return -1;
+ 
+-	if (gfn >= memslots[slot].base_gfn &&
+-	    gfn < memslots[slot].base_gfn + memslots[slot].npages)
+-		return &memslots[slot];
++	if (slot_contains_gfn(slots, slot, gfn))
++		return slot;
+ 
+ 	while (start < end) {
+ 		slot = start + (end - start) / 2;
+@@ -1220,13 +1238,26 @@ search_memslots(struct kvm_memslots *slots, gfn_t gfn)
+ 			start = slot + 1;
+ 	}
+ 
+-	if (start < slots->used_slots && gfn >= memslots[start].base_gfn &&
+-	    gfn < memslots[start].base_gfn + memslots[start].npages) {
++	if (slot_contains_gfn(slots, start, gfn)) {
+ 		atomic_set(&slots->lru_slot, start);
+-		return &memslots[start];
++		return start;
+ 	}
+ 
+-	return NULL;
++	return -1;
++}
++
++/*
++ * search_memslots() and __gfn_to_memslot() are here because they are
++ * used in non-modular code in arch/powerpc/kvm/book3s_hv_rm_mmu.c.
++ * gfn_to_memslot() itself isn't here as an inline because that would
++ * bloat other code too much.
++ */
++static inline struct kvm_memory_slot *
++search_memslots(struct kvm_memslots *slots, gfn_t gfn)
++{
++	int slot_index = __search_memslots(slots, gfn);
++
++	return get_slot(slots, slot_index);
+ }
+ 
+ static inline struct kvm_memory_slot *
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index a96cbe24c688..9307594bda0c 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -415,6 +415,7 @@ static void kvm_vcpu_init(struct kvm_vcpu *vcpu, struct kvm *kvm, unsigned id)
+ 	vcpu->preempted = false;
+ 	vcpu->ready = false;
+ 	preempt_notifier_init(&vcpu->preempt_notifier, &kvm_preempt_ops);
++	vcpu->lru_slot_index = 0;
+ }
+ 
+ void kvm_vcpu_destroy(struct kvm_vcpu *vcpu)
+@@ -2024,7 +2025,25 @@ EXPORT_SYMBOL_GPL(gfn_to_memslot);
+ 
+ struct kvm_memory_slot *kvm_vcpu_gfn_to_memslot(struct kvm_vcpu *vcpu, gfn_t gfn)
+ {
+-	return __gfn_to_memslot(kvm_vcpu_memslots(vcpu), gfn);
++	struct kvm_memslots *slots = kvm_vcpu_memslots(vcpu);
++	int slot_index = vcpu->lru_slot_index;
++	struct kvm_memory_slot *slot;
++
++	if (!slot_contains_gfn(slots, slot_index, gfn))
++		slot_index = __search_memslots(slots, gfn);
++
++	slot = get_slot(slots, slot_index);
++
++	/*
++	 * Purposely avoid updating vcpu->lru_slot_index if the gfn is not
++	 * backed by memslot as that will guarantee a cache miss on the next
++	 * try. By leaving vcpu->lru_slot_index untouched we have a chance of
++	 * a hit on the next lookup.
++	 */
++	if (slot)
++		vcpu->lru_slot_index = slot_index;
++
++	return slot;
+ }
+ EXPORT_SYMBOL_GPL(kvm_vcpu_gfn_to_memslot);
+ 
 -- 
 2.32.0.554.ge1b32706d8-goog
 
