@@ -2,200 +2,183 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id EEAA03DDE1D
-	for <lists+kvm@lfdr.de>; Mon,  2 Aug 2021 18:56:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9C6113DDE24
+	for <lists+kvm@lfdr.de>; Mon,  2 Aug 2021 18:58:11 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232390AbhHBQ4z (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 2 Aug 2021 12:56:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58194 "EHLO
+        id S232190AbhHBQ6T (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 2 Aug 2021 12:58:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58588 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232029AbhHBQ4y (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 2 Aug 2021 12:56:54 -0400
-Received: from mail-qt1-x849.google.com (mail-qt1-x849.google.com [IPv6:2607:f8b0:4864:20::849])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1AD60C061760
-        for <kvm@vger.kernel.org>; Mon,  2 Aug 2021 09:56:45 -0700 (PDT)
-Received: by mail-qt1-x849.google.com with SMTP id l7-20020ac848c70000b0290252173fe79cso10237874qtr.2
-        for <kvm@vger.kernel.org>; Mon, 02 Aug 2021 09:56:45 -0700 (PDT)
+        with ESMTP id S229797AbhHBQ6S (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 2 Aug 2021 12:58:18 -0400
+Received: from mail-pl1-x62b.google.com (mail-pl1-x62b.google.com [IPv6:2607:f8b0:4864:20::62b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 07AF1C0613D5
+        for <kvm@vger.kernel.org>; Mon,  2 Aug 2021 09:58:08 -0700 (PDT)
+Received: by mail-pl1-x62b.google.com with SMTP id c16so20331595plh.7
+        for <kvm@vger.kernel.org>; Mon, 02 Aug 2021 09:58:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
-        h=date:in-reply-to:message-id:mime-version:references:subject:from:to
-         :cc;
-        bh=VXgwAAaOZDdhQJAmcCsgajsK7P41PLb/M4QBrHtckB4=;
-        b=uu/yX7pHqaAAnRRi8Htyf6pBMrBCqXOibwZDpnbIu0BeYMF59NqPMgSBMpU4+v9cmo
-         pzfccr0SY9o8sv+uWxPFw5U3G2F2rnUNUipaPp2r9c9lZMtfY14HP523uBYyLzZX+074
-         7tZuGo35ZQ3xKrRBjrFpOTrYXWHH/nNKIbtBtpz3UZHRCXpZjvX5qifXY+0w9wBXPvvV
-         A6rqQ+qiHWwY2mTuvIFXdWuCB5WlJ1mX344tPjuvkC2z6cgzjvsZyPwDz36qI5ZzwZhy
-         GcasoGIZffjX8DnjayYwCwOh85VrVBKxIzY5m1MhZKi1ka4lOhKhU0T2nOEKtB5mmD9s
-         vS3Q==
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=67UCcXw6Bwoz9yHjZZDcAJ+wIZA32YKluf+gMvwDLEg=;
+        b=AYyNS5HBgapBPr9RswDyouJAQcviXGYaBRing3fUZOGZ/CaN+DEPCDiRLPDi1oGf3g
+         AH0o3pLecIc8tzPHY/9A256deoWzNr+LNKvRr6DdM3fIDisWniBMC/CLUUf8Ntcf1pT5
+         Zd6U0zQ/DupQV8dYaahn6Nbj1zQWOWxLsXzE8Poz4x6gf+361OXm+2B5td35xkbHJV73
+         7jMDKuLSQK45yC+nug7PEC4bhebnRmh7Dy1jt1/BNYpwOAEALOsj3kCWlz4hfTTfBFe/
+         Y/bbQnOmjHAUgevRxnY9LbWH295Opk9Rq4DTHqA97KnMCdZRdxJXZywSyawku2LVSSiY
+         XD0A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:in-reply-to:message-id:mime-version
-         :references:subject:from:to:cc;
-        bh=VXgwAAaOZDdhQJAmcCsgajsK7P41PLb/M4QBrHtckB4=;
-        b=ctdNEzhSmAxN/3Fl81RPSG6Wfc2Nn6njTBhZo+Sl7lHT5liUfDOfiM5fprlDTTnZUL
-         3/jWoQNZT0L+hBnaF3CZATuspgqwViqjipsq4pe0qqGbSw84xzdvQtkNHZgOn82WNYPb
-         0Lcb9qmr3eQSmL31ltP4Px6k8L4aOag8wopRPPuP4ns9A0um2X6c+Su3Rfy9cDFX67sA
-         vksdqijiC1A4NfUKx4W8MQSCRFpN7epJ5YKF7LMsIU6EX+8LVEkZ5Hy5Y9ZPgJnTqv/I
-         sxc90tyVdMZWNuxecyjpvv3oIbtPSVtqnJtxkmMzOrmWsmM65L4XO8TCZnwwxi8eVMCY
-         n/YA==
-X-Gm-Message-State: AOAM531r4cNqKRDWVn615jGyjOs4HvvJREfOpzEqUFQP9ZrWPOzwBz/W
-        ZHq1z64eOCpLJyyLvdzDKBG3rbcNT18aI0dluLYzXko/Tdc/O0MHm3uyC464Ujd7xz6tGtVbQ96
-        HlF4s5Hlp1R0s1p2qTEt8k84oWwF+Geo/t+jC1908kKLpYTnt7MRo4jrK9wDMOZ0KFCkPu3o=
-X-Google-Smtp-Source: ABdhPJzSVgOt+I8hE7F+dMFTwoIwceAnL+TZyLr2Lod8tHBnGw0g7rMKXyKpoSWaKDECLgbhxIltoepmGIpkqP7osA==
-X-Received: from jgzg.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:1acf])
- (user=jingzhangos job=sendgmr) by 2002:ad4:4972:: with SMTP id
- p18mr5954084qvy.26.1627923404246; Mon, 02 Aug 2021 09:56:44 -0700 (PDT)
-Date:   Mon,  2 Aug 2021 16:56:33 +0000
-In-Reply-To: <20210802165633.1866976-1-jingzhangos@google.com>
-Message-Id: <20210802165633.1866976-6-jingzhangos@google.com>
-Mime-Version: 1.0
-References: <20210802165633.1866976-1-jingzhangos@google.com>
-X-Mailer: git-send-email 2.32.0.554.ge1b32706d8-goog
-Subject: [PATCH v3 5/5] KVM: stats: Add halt polling related histogram stats
-From:   Jing Zhang <jingzhangos@google.com>
-To:     KVM <kvm@vger.kernel.org>, KVMPPC <kvm-ppc@vger.kernel.org>,
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=67UCcXw6Bwoz9yHjZZDcAJ+wIZA32YKluf+gMvwDLEg=;
+        b=nU00bOxwsY4D0VR/aBphdzFTPh89PwROJ9jmKlLJ2IaDc4v6E78wY2zBOwsMhEqigQ
+         gD/6Q9c3iIhyW92nEPhXDV/eQEi1a15mbLBL9MyIEYSqnyhfQxMH/vFr7mhw9ytyptbw
+         4BfR2xikOdijBHJwtgskpzHBE3WKvZz3GVMR/vjKqeUaPoB0B2GkHmGOv4uIcFQOVoKG
+         FbFienUhiQhaHa8+4cqyp+1tlg1/mXW4NOkQJYWgz4eKM0Qhp4r66+rZnUgjuMXDq0+N
+         xsrhk01MNT5mytEYpNgt/ukYGSe/xy14sT1gioH+MlMFGecicNJfz1doJaluMMJGzKLs
+         4NeA==
+X-Gm-Message-State: AOAM531wDsZsI49eSyryIC4dMTkc3pOXs2Lmu8NgGcOWK5m9Pcrf8Hdc
+        BKRssQCaQoHrsb4DyJPFwGmBCg==
+X-Google-Smtp-Source: ABdhPJzd04ClYJnQ645mP57EXMTmUJraBrjjimwiy45nqkuGWAfqZEHd+NGWKFwE19xucv5mGbSWbg==
+X-Received: by 2002:a05:6a00:1951:b029:333:64d3:e1f1 with SMTP id s17-20020a056a001951b029033364d3e1f1mr17948484pfk.43.1627923487274;
+        Mon, 02 Aug 2021 09:58:07 -0700 (PDT)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id o9sm13248081pfh.217.2021.08.02.09.58.06
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 02 Aug 2021 09:58:06 -0700 (PDT)
+Date:   Mon, 2 Aug 2021 16:58:03 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     David Edmondson <david.edmondson@oracle.com>
+Cc:     linux-kernel@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
+        Joerg Roedel <joro@8bytes.org>, Ingo Molnar <mingo@redhat.com>,
+        Jim Mattson <jmattson@google.com>, kvm@vger.kernel.org,
+        Borislav Petkov <bp@alien8.de>,
+        David Matlack <dmatlack@google.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Jim Mattson <jmattson@google.com>,
-        Peter Shier <pshier@google.com>,
-        Oliver Upton <oupton@google.com>,
-        David Rientjes <rientjes@google.com>,
-        David Matlack <dmatlack@google.com>
-Cc:     Jing Zhang <jingzhangos@google.com>
-Content-Type: text/plain; charset="UTF-8"
+        "H. Peter Anvin" <hpa@zytor.com>, x86@kernel.org,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Joao Martins <joao.m.martins@oracle.com>
+Subject: Re: [PATCH v3 2/3] KVM: x86: On emulation failure, convey the exit
+ reason, etc. to userspace
+Message-ID: <YQgkGwGkrleO7I2A@google.com>
+References: <20210729133931.1129696-1-david.edmondson@oracle.com>
+ <20210729133931.1129696-3-david.edmondson@oracle.com>
+ <YQR52JRv8jgj+Dv8@google.com>
+ <cunk0l4mhjc.fsf@oracle.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <cunk0l4mhjc.fsf@oracle.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Add three log histogram stats to record the distribution of time spent
-on successful polling, failed polling and VCPU wait.
-halt_poll_success_hist: Distribution of spent time for a successful poll.
-halt_poll_fail_hist: Distribution of spent time for a failed poll.
-halt_wait_hist: Distribution of time a VCPU has spent on waiting.
+On Mon, Aug 02, 2021, David Edmondson wrote:
+> On Friday, 2021-07-30 at 22:14:48 GMT, Sean Christopherson wrote:
+> 
+> > On Thu, Jul 29, 2021, David Edmondson wrote:
+> >> +		__u64 exit_info1;
+> >> +		__u64 exit_info2;
+> >> +		__u32 intr_info;
+> >> +		__u32 error_code;
+> >> +	} exit_reason;
+> >
+> > Oooh, you're dumping all the fields in kvm_run.  That took me forever to realize
+> > because the struct is named "exit_reason".  Unless there's a naming conflict,
+> > 'data' would be the simplest, and if that's already taken, maybe 'info'?
+> >
+> > I'm also not sure an anonymous struct is going to be the easiest to maintain.
+> > I do like that the fields all have names, but on the other hand the data should
+> > be padded so that each field is in its own data[] entry when dumped to userspace.
+> > IMO, the padding complexity isn't worth the naming niceness since this code
+> > doesn't actually care about what each field contains.
+> 
+> Given that this is avowedly not an ABI and that we are expecting any
+> (human) consumer to be intimate with the implementation to make sense of
+> it, is there really any requirement or need for padding?
 
-Signed-off-by: Jing Zhang <jingzhangos@google.com>
----
- arch/powerpc/kvm/book3s_hv.c | 16 ++++++++++++++--
- include/linux/kvm_host.h     |  8 +++++++-
- include/linux/kvm_types.h    |  5 +++++
- virt/kvm/kvm_main.c          | 12 ++++++++++++
- 4 files changed, 38 insertions(+), 3 deletions(-)
+My thought with the padding was to force each field into its own data[] entry.
+E.g. if userspace does something like
 
-diff --git a/arch/powerpc/kvm/book3s_hv.c b/arch/powerpc/kvm/book3s_hv.c
-index 813ca155561b..6d63c8e6d4f0 100644
---- a/arch/powerpc/kvm/book3s_hv.c
-+++ b/arch/powerpc/kvm/book3s_hv.c
-@@ -4146,17 +4146,29 @@ static void kvmppc_vcore_blocked(struct kvmppc_vcore *vc)
- 	if (do_sleep) {
- 		vc->runner->stat.generic.halt_wait_ns +=
- 			ktime_to_ns(cur) - ktime_to_ns(start_wait);
-+		KVM_STATS_LOG_HIST_UPDATE(
-+				vc->runner->stat.generic.halt_wait_hist,
-+				ktime_to_ns(cur) - ktime_to_ns(start_wait));
- 		/* Attribute failed poll time */
--		if (vc->halt_poll_ns)
-+		if (vc->halt_poll_ns) {
- 			vc->runner->stat.generic.halt_poll_fail_ns +=
- 				ktime_to_ns(start_wait) -
- 				ktime_to_ns(start_poll);
-+			KVM_STATS_LOG_HIST_UPDATE(
-+				vc->runner->stat.generic.halt_poll_fail_hist,
-+				ktime_to_ns(start_wait) -
-+				ktime_to_ns(start_poll));
-+		}
- 	} else {
- 		/* Attribute successful poll time */
--		if (vc->halt_poll_ns)
-+		if (vc->halt_poll_ns) {
- 			vc->runner->stat.generic.halt_poll_success_ns +=
- 				ktime_to_ns(cur) -
- 				ktime_to_ns(start_poll);
-+			KVM_STATS_LOG_HIST_UPDATE(
-+				vc->runner->stat.generic.halt_poll_success_hist,
-+				ktime_to_ns(cur) - ktime_to_ns(start_poll));
-+		}
- 	}
- 
- 	/* Adjust poll time */
-diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-index 9b773fef7bba..b67f01f61840 100644
---- a/include/linux/kvm_host.h
-+++ b/include/linux/kvm_host.h
-@@ -1403,7 +1403,13 @@ struct _kvm_stats_desc {
- 	STATS_DESC_COUNTER(VCPU_GENERIC, halt_wakeup),			       \
- 	STATS_DESC_TIME_NSEC(VCPU_GENERIC, halt_poll_success_ns),	       \
- 	STATS_DESC_TIME_NSEC(VCPU_GENERIC, halt_poll_fail_ns),		       \
--	STATS_DESC_TIME_NSEC(VCPU_GENERIC, halt_wait_ns)
-+	STATS_DESC_TIME_NSEC(VCPU_GENERIC, halt_wait_ns),		       \
-+	STATS_DESC_LOGHIST_TIME_NSEC(VCPU_GENERIC, halt_poll_success_hist,     \
-+			HALT_POLL_HIST_COUNT),				       \
-+	STATS_DESC_LOGHIST_TIME_NSEC(VCPU_GENERIC, halt_poll_fail_hist,	       \
-+			HALT_POLL_HIST_COUNT),				       \
-+	STATS_DESC_LOGHIST_TIME_NSEC(VCPU_GENERIC, halt_wait_hist,	       \
-+			HALT_POLL_HIST_COUNT)
- 
- extern struct dentry *kvm_debugfs_dir;
- 
-diff --git a/include/linux/kvm_types.h b/include/linux/kvm_types.h
-index 291ef55125b2..de7fb5f364d8 100644
---- a/include/linux/kvm_types.h
-+++ b/include/linux/kvm_types.h
-@@ -76,6 +76,8 @@ struct kvm_mmu_memory_cache {
- };
- #endif
- 
-+#define HALT_POLL_HIST_COUNT			32
-+
- struct kvm_vm_stat_generic {
- 	u64 remote_tlb_flush;
- };
-@@ -88,6 +90,9 @@ struct kvm_vcpu_stat_generic {
- 	u64 halt_poll_success_ns;
- 	u64 halt_poll_fail_ns;
- 	u64 halt_wait_ns;
-+	u64 halt_poll_success_hist[HALT_POLL_HIST_COUNT];
-+	u64 halt_poll_fail_hist[HALT_POLL_HIST_COUNT];
-+	u64 halt_wait_hist[HALT_POLL_HIST_COUNT];
- };
- 
- #define KVM_STATS_NAME_SIZE	48
-diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index af9bcb50fdd4..717006de17e7 100644
---- a/virt/kvm/kvm_main.c
-+++ b/virt/kvm/kvm_main.c
-@@ -3166,13 +3166,23 @@ void kvm_vcpu_block(struct kvm_vcpu *vcpu)
- 				++vcpu->stat.generic.halt_successful_poll;
- 				if (!vcpu_valid_wakeup(vcpu))
- 					++vcpu->stat.generic.halt_poll_invalid;
-+
-+				KVM_STATS_LOG_HIST_UPDATE(
-+				      vcpu->stat.generic.halt_poll_success_hist,
-+				      ktime_to_ns(ktime_get()) -
-+				      ktime_to_ns(start));
- 				goto out;
- 			}
- 			cpu_relax();
- 			poll_end = cur = ktime_get();
- 		} while (kvm_vcpu_can_poll(cur, stop));
-+
-+		KVM_STATS_LOG_HIST_UPDATE(
-+				vcpu->stat.generic.halt_poll_fail_hist,
-+				ktime_to_ns(ktime_get()) - ktime_to_ns(start));
- 	}
- 
-+
- 	prepare_to_rcuwait(&vcpu->wait);
- 	for (;;) {
- 		set_current_state(TASK_INTERRUPTIBLE);
-@@ -3188,6 +3198,8 @@ void kvm_vcpu_block(struct kvm_vcpu *vcpu)
- 	if (waited) {
- 		vcpu->stat.generic.halt_wait_ns +=
- 			ktime_to_ns(cur) - ktime_to_ns(poll_end);
-+		KVM_STATS_LOG_HIST_UPDATE(vcpu->stat.generic.halt_wait_hist,
-+				ktime_to_ns(cur) - ktime_to_ns(poll_end));
- 	}
- out:
- 	kvm_arch_vcpu_unblocking(vcpu);
--- 
-2.32.0.554.ge1b32706d8-goog
+	for (i = 0; i < ndata; i++)
+		printf("\tdata[%d] = 0x%llx\n", i, data[i]);
 
+then padding will yield
+
+	data[0] = flags
+	data[1] = exit_reason
+	data[2] = exit_info1
+	data[3] = exit_info2
+	data[4] = intr_info
+	data[5] = error_code
+
+versus
+
+	data[0] = <flags>
+	data[1] = (exit_info1 << 32) | exit_reason
+	data[2] = (exit_info2 << 32) | (exit_info1 >> 32)
+	data[3] = (intr_info << 32) | (exit_info2 >> 32)
+	data[4] = error_code
+
+Changing exit_reason to a u64 would clean up the worst of the mangling, but until
+there's actually a 64-bit exit reason to dump, that's just a more subtle way to
+pad the data.
+
+> In your example below (most of which I'm fine with), the padding has the
+> effect of wasting space that could be used for another u64 of debug
+> data.
+
+Yes, but because it's not ABI, we can change it in the future if we get to the
+point where we want to dump more info and don't have space.  Until that time, I
+think it makes sense to prioritize readability with an ignorant (of the format)
+userspace over memory footprint.
+
+> > 	/*
+> > 	 * There's currently space for 13 entries, but 5 are used for the exit
+> > 	 * reason and info.  Restrict to 4 to reduce the maintenance burden
+> > 	 * when expanding kvm_run.emulation_failure in the future.
+> > 	 */
+> > 	if (WARN_ON_ONCE(ndata > 4))
+> > 		ndata = 4;
+> >
+> > 	if (insn_size) {
+> > 		ndata_start = 3;
+> > 		run->emulation_failure.flags =
+> > 			KVM_INTERNAL_ERROR_EMULATION_FLAG_INSTRUCTION_BYTES;
+> > 		run->emulation_failure.insn_size = insn_size;
+> > 		memset(run->emulation_failure.insn_bytes, 0x90,
+> > 		       sizeof(run->emulation_failure.insn_bytes));
+> > 		memcpy(run->emulation_failure.insn_bytes, insn_bytes, insn_size);
+> > 	} else {
+> > 		/* Always include the flags as a 'data' entry. */
+> > 		ndata_start = 1;
+> > 		run->emulation_failure.flags = 0;
+> > 	}
+> 
+> When we add another flag (presuming that we do, because if not there was
+> not much point in the flags) this will have to be restructured again. Is
+> there an objection to the original style? (prime ndata=1, flags=0, OR in
+> flags and adjust ndata as we go.)
+
+No objection, though if you OR in flags then you should truly _adjust_ ndata, not
+set it, e.g.
+
+        /* Always include the flags as a 'data' entry. */
+        ndata_start = 1;
+        run->emulation_failure.flags = 0;
+
+        if (insn_size) {
+                ndata_start += 2;  <----------------------- Adjust, not override
+                run->emulation_failure.flags |=
+                        KVM_INTERNAL_ERROR_EMULATION_FLAG_INSTRUCTION_BYTES;
+                run->emulation_failure.insn_size = insn_size;
+                memset(run->emulation_failure.insn_bytes, 0x90,
+                       sizeof(run->emulation_failure.insn_bytes));
+                memcpy(run->emulation_failure.insn_bytes, insn_bytes, insn_size);
+        }
+
+> > 	memcpy(&run->internal.data[ndata_start], info, ARRAY_SIZE(info));
+> > 	memcpy(&run->internal.data[ndata_start + ARRAY_SIZE(info)], data, ndata);
+> > }
