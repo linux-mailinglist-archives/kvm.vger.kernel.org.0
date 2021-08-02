@@ -2,292 +2,124 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id BF4D03DD542
-	for <lists+kvm@lfdr.de>; Mon,  2 Aug 2021 14:08:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2DE023DD5BF
+	for <lists+kvm@lfdr.de>; Mon,  2 Aug 2021 14:36:16 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233676AbhHBMIo (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 2 Aug 2021 08:08:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41774 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233678AbhHBMIf (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 2 Aug 2021 08:08:35 -0400
-Received: from mail-pj1-x1033.google.com (mail-pj1-x1033.google.com [IPv6:2607:f8b0:4864:20::1033])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6B135C06175F
-        for <kvm@vger.kernel.org>; Mon,  2 Aug 2021 05:08:26 -0700 (PDT)
-Received: by mail-pj1-x1033.google.com with SMTP id m10-20020a17090a34cab0290176b52c60ddso24313456pjf.4
-        for <kvm@vger.kernel.org>; Mon, 02 Aug 2021 05:08:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance-com.20150623.gappssmtp.com; s=20150623;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references;
-        bh=j42q5rdRZ8gBlePD6vWg8hPTNcHOSjWSlt+Ho+ufcE8=;
-        b=UwJwUPjlDNb71qW4v0Y+K8kmjyAwvH04VEeNmg7tGkkOuSswF/yNEXYddpFCC0XJ9c
-         6fIn3JuZqAQXBkzx/b60j5tel3/imCLlvLyB7tC2jqffS2+Bcalqt6rw5xaVVKpLkZ9z
-         LjZlRiL9LCaSjslKkC1oZPCMorGfIHC3uo78b2se7pFoCgGTxjaExiGm9IvecQO+zdpz
-         YuQLqROwGIUxMALDUAhEgZ0EnJMw0nSnljq9o//n4uuT9Vo/0N5+kBmJb0C33qgGgYvh
-         fZl6w/8FwwnWwHWI3TeKkLzdM5rLazrOPrBYSiKtEW+AarU1aQx8UL35gQr2rqp1zHBs
-         EnFA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references;
-        bh=j42q5rdRZ8gBlePD6vWg8hPTNcHOSjWSlt+Ho+ufcE8=;
-        b=NiXzJpmYp5Ryb97YxmC046QLDf3z+jc27K33c2ge6trhH7C41JGRHfzdicngOmEs+4
-         z8Rw5WhrY5mAhqBPBYiFW1tFrVp4VQ+t3gTkI8dyKl3aNcfSk5pUcG3G5JK4fI/eWA3Z
-         K78zfZrln88u8gm1CbrobpU2mmwiOp+hN3w9STP8s2qOEHGm26dMMPYljJI3ZaPKeSRf
-         RZKRiufIZ2sMf4RzZXzKROYW1KNoBQJ2cu4Q75Z+UwJCEoOiT8sm7PCshrqXluSsa8AO
-         cXT4p5nTpcv8YsfCRxcs40gP9RByrPm7JwBsK3/Ajv110nKUaGyksJu7IRkEtzJ5yHct
-         n2og==
-X-Gm-Message-State: AOAM531ppEcdTRlaGNa9mu2Z6HMjVM+6Uuac2pzNtBTwTrajsi4VCDAd
-        H7cJOQOYfU28antXFwFIQhThZw==
-X-Google-Smtp-Source: ABdhPJyWEyx8aChLggqRUs8fOfQ650EJoTGy+jTjblU9JsWLXnlVzZKnHrFbberN8DpROD+/drzUxQ==
-X-Received: by 2002:a17:902:c20c:b029:12c:afb8:fad2 with SMTP id 12-20020a170902c20cb029012cafb8fad2mr6139991pll.19.1627906105954;
-        Mon, 02 Aug 2021 05:08:25 -0700 (PDT)
-Received: from n248-175-059.byted.org. ([121.30.179.62])
-        by smtp.googlemail.com with ESMTPSA id f30sm12874867pgl.48.2021.08.02.05.08.22
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 02 Aug 2021 05:08:25 -0700 (PDT)
-From:   fuguancheng <fuguancheng@bytedance.com>
-To:     mst@redhat.com, jasowang@redhat.com, stefanha@redhat.com,
-        sgarzare@redhat.com, davem@davemloft.net, kuba@kernel.org,
-        arseny.krasnov@kaspersky.com, andraprs@amazon.com,
-        colin.king@canonical.com
-Cc:     kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
-        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-        fuguancheng <fuguancheng@bytedance.com>
-Subject: [PATCH 4/4] VSOCK DRIVER: support communication using host additional cids
-Date:   Mon,  2 Aug 2021 20:07:20 +0800
-Message-Id: <20210802120720.547894-5-fuguancheng@bytedance.com>
-X-Mailer: git-send-email 2.11.0
-In-Reply-To: <20210802120720.547894-1-fuguancheng@bytedance.com>
-References: <20210802120720.547894-1-fuguancheng@bytedance.com>
+        id S233608AbhHBMgY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 2 Aug 2021 08:36:24 -0400
+Received: from mail.kernel.org ([198.145.29.99]:43334 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S232629AbhHBMgX (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 2 Aug 2021 08:36:23 -0400
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 1FD7460551;
+        Mon,  2 Aug 2021 12:36:14 +0000 (UTC)
+Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94.2)
+        (envelope-from <maz@kernel.org>)
+        id 1mAXAy-002RiU-6o; Mon, 02 Aug 2021 13:36:12 +0100
+Date:   Mon, 02 Aug 2021 13:36:11 +0100
+Message-ID: <87o8ag10sk.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Catalin Marinas <catalin.marinas@arm.com>
+Cc:     kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org,
+        Will Deacon <will@kernel.org>,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        kernel-team@android.com, Quentin Perret <qperret@google.com>,
+        stable@vger.kernel.org
+Subject: Re: [PATCH] KVM: arm64: Unregister HYP sections from kmemleak in protected mode
+In-Reply-To: <20210729164214.GB31848@arm.com>
+References: <20210729135016.3037277-1-maz@kernel.org>
+        <20210729164214.GB31848@arm.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: catalin.marinas@arm.com, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, will@kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, alexandru.elisei@arm.com, kernel-team@android.com, qperret@google.com, stable@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This patch allows the user to use the additional host CIDS to communicate
-with the guest.  As server, the host can bind to any CIDS as long as
-the cid can be mapped to one guest.
+On Thu, 29 Jul 2021 17:42:15 +0100,
+Catalin Marinas <catalin.marinas@arm.com> wrote:
+> 
+> On Thu, Jul 29, 2021 at 02:50:16PM +0100, Marc Zyngier wrote:
+> > Booting a KVM host in protected mode with kmemleak quickly results
+> > in a pretty bad crash, as kmemleak doesn't know that the HYP sections
+> > have been taken away.
+> > 
+> > Make the unregistration from kmemleak part of marking the sections
+> > as HYP-private. The rest of the HYP-specific data is obtained via
+> > the page allocator, which is not subjected to kmemleak.
+> > 
+> > Fixes: 90134ac9cabb ("KVM: arm64: Protect the .hyp sections from the host")
+> > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> > Cc: Quentin Perret <qperret@google.com>
+> > Cc: Catalin Marinas <catalin.marinas@arm.com>
+> > Cc: stable@vger.kernel.org # 5.13
+> > ---
+> >  arch/arm64/kvm/arm.c | 7 ++++++-
+> >  1 file changed, 6 insertions(+), 1 deletion(-)
+> > 
+> > diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> > index e9a2b8f27792..23f12e602878 100644
+> > --- a/arch/arm64/kvm/arm.c
+> > +++ b/arch/arm64/kvm/arm.c
+> > @@ -15,6 +15,7 @@
+> >  #include <linux/fs.h>
+> >  #include <linux/mman.h>
+> >  #include <linux/sched.h>
+> > +#include <linux/kmemleak.h>
+> >  #include <linux/kvm.h>
+> >  #include <linux/kvm_irqfd.h>
+> >  #include <linux/irqbypass.h>
+> > @@ -1960,8 +1961,12 @@ static inline int pkvm_mark_hyp(phys_addr_t start, phys_addr_t end)
+> >  }
+> >  
+> >  #define pkvm_mark_hyp_section(__section)		\
+> > +({							\
+> > +	u64 sz = __section##_end - __section##_start;	\
+> > +	kmemleak_free_part(__section##_start, sz);	\
+> >  	pkvm_mark_hyp(__pa_symbol(__section##_start),	\
+> > -			__pa_symbol(__section##_end))
+> > +		      __pa_symbol(__section##_end));	\
+> > +})
+> 
+> Using kmemleak_free_part() is fine in principle as this is not a slab
+> object. However, the above would call the function even for ranges that
+> are not tracked at all by kmemleak (text, idmap). Luckily Kmemleak won't
+> complain, unless you #define DEBUG in the file (initially I tried to
+> warn all the time but I couldn't fix all the callbacks).
 
-The VHOST_DEFAULT_CID can be used as normal.
+Yeah, I had a look last week, and this fires everywhere (KVM only adds
+a drop in an ocean of warnings).
 
-As client, when connect to a remote server, if no address is specified to
-be used, then it will use the first cid in the array. If the user wants
-to use a specific cid, then the user can perfrom bind before the connect
-operation, so that vsock_auto_bind will not be performed.
+> If it was just the BSS, I would move the kmemleak_free_part() call to
+> finalize_hyp_mode() but there's the __hyp_rodata section as well.
+> 
+> I think we have some inconsistency with .hyp.rodata which falls under
+> _sdata.._edata while the kernel's own .rodata goes immediately after
+> _etext. Should we move __hyp_rodata outside _sdata.._edata as well? It
+> would benefit from the RO NX marking (probably more useful without the
+> protected mode). If this works, we'd only need to call kmemleak once for
+> the BSS.
 
-The patch depends on the previous patch which enables hypervisors such as
-qemu to specify multiple cids for host and guest.
+That's a good idea, and pretty easy to implement. I'll post a respin
+shortly.
 
-Signed-off-by: fuguancheng <fuguancheng@bytedance.com>
----
- drivers/vhost/vsock.c            | 39 ++++++++++++++++++++++++++++++++++++++-
- include/net/af_vsock.h           |  4 ++++
- net/vmw_vsock/af_vsock.c         | 20 ++++++++++++++------
- net/vmw_vsock/virtio_transport.c | 30 ++++++++++++++++++++++++++++++
- 4 files changed, 86 insertions(+), 7 deletions(-)
+Thanks,
 
-diff --git a/drivers/vhost/vsock.c b/drivers/vhost/vsock.c
-index f5d9b9f06ba5..104fcdea2dd7 100644
---- a/drivers/vhost/vsock.c
-+++ b/drivers/vhost/vsock.c
-@@ -57,8 +57,22 @@ struct vhost_vsock_ref {
- 
- static bool vhost_transport_contain_cid(u32 cid)
- {
-+	unsigned int index;
-+	struct vhost_vsock_ref *ref;
-+
- 	if (cid == VHOST_VSOCK_DEFAULT_HOST_CID)
- 		return true;
-+
-+	mutex_lock(&valid_host_mutex);
-+	hash_for_each(valid_host_hash, index, ref, ref_hash) {
-+		u32 other_cid = ref->cid;
-+
-+		if (other_cid == cid) {
-+			mutex_unlock(&valid_host_mutex);
-+			return true;
-+		}
-+	}
-+	mutex_unlock(&valid_host_mutex);
- 	return false;
- }
- 
-@@ -101,6 +115,21 @@ vhost_vsock_contain_cid(struct vhost_vsock *vsock, u32 cid)
- 	return false;
- }
- 
-+/* Check if a cid is valid for the pkt to be received. */
-+static bool
-+vhost_vsock_contain_host_cid(struct vhost_vsock *vsock, u32 dst_cid)
-+{
-+	uint32_t index;
-+
-+	if (dst_cid == VHOST_VSOCK_DEFAULT_HOST_CID)
-+		return true;
-+	for (index = 0; index < vsock->num_host_cid; index++) {
-+		if (vsock->hostcids[index] == dst_cid)
-+			return true;
-+	}
-+	return false;
-+}
-+
- static u32 vhost_transport_get_local_cid(void)
- {
- 	return VHOST_VSOCK_DEFAULT_HOST_CID;
-@@ -128,6 +157,13 @@ static struct vhost_vsock *vhost_vsock_get(u32 guest_cid)
- 	return NULL;
- }
- 
-+/* This function checks if the cid is used by one of the guests. */
-+static bool
-+vhost_transport_contain_opposite_cid(u32 cid)
-+{
-+	return vhost_vsock_get(cid) != NULL;
-+}
-+
- /* Callers that dereference the return value must hold vhost_vsock_mutex or the
-  * RCU read lock.
-  */
-@@ -512,6 +548,7 @@ static struct virtio_transport vhost_transport = {
- 
- 		.get_local_cid            = vhost_transport_get_local_cid,
- 		.contain_cid              = vhost_transport_contain_cid,
-+		.contain_opposite_cid     = vhost_transport_contain_opposite_cid,
- 
- 		.init                     = virtio_transport_do_socket_init,
- 		.destruct                 = virtio_transport_destruct,
-@@ -629,7 +666,7 @@ static void vhost_vsock_handle_tx_kick(struct vhost_work *work)
- 		/* Only accept correctly addressed packets */
- 		if (vsock->num_cid > 0 &&
- 			vhost_vsock_contain_cid(vsock, pkt->hdr.src_cid) &&
--		    le64_to_cpu(pkt->hdr.dst_cid) == vhost_transport_get_local_cid())
-+		    vhost_vsock_contain_host_cid(vsock, le64_to_cpu(pkt->hdr.dst_cid)))
- 			virtio_transport_recv_pkt(&vhost_transport, pkt);
- 		else
- 			virtio_transport_free_pkt(pkt);
-diff --git a/include/net/af_vsock.h b/include/net/af_vsock.h
-index d0fc08fb9cac..739ac9aaff8f 100644
---- a/include/net/af_vsock.h
-+++ b/include/net/af_vsock.h
-@@ -171,6 +171,10 @@ struct vsock_transport {
- 	/* Addressing. */
- 	u32 (*get_local_cid)(void);
- 	bool (*contain_cid)(u32 cid);
-+	/* For transport_g2h, this checks if the cid is used by its host. */
-+	/* For transport_h2g, this checks if the cid is used by one of its guests. */
-+	/* This function is set to NULL for loopback_transport. */
-+	bool (*contain_opposite_cid)(u32 cid);
- };
- 
- /**** CORE ****/
-diff --git a/net/vmw_vsock/af_vsock.c b/net/vmw_vsock/af_vsock.c
-index c22ae7101e55..d3037ee885be 100644
---- a/net/vmw_vsock/af_vsock.c
-+++ b/net/vmw_vsock/af_vsock.c
-@@ -397,9 +397,9 @@ static bool vsock_use_local_transport(unsigned int remote_cid)
- 		return true;
- 
- 	if (transport_g2h) {
--		return remote_cid == transport_g2h->get_local_cid();
-+		return transport_g2h->contain_cid(remote_cid);
- 	} else {
--		return remote_cid == VMADDR_CID_HOST;
-+		return transport_h2g->contain_cid(remote_cid);
- 	}
- }
- 
-@@ -423,7 +423,9 @@ static void vsock_deassign_transport(struct vsock_sock *vsk)
-  *    g2h is not loaded, will use local transport;
-  *  - remote CID <= VMADDR_CID_HOST or h2g is not loaded or remote flags field
-  *    includes VMADDR_FLAG_TO_HOST flag value, will use guest->host transport;
-- *  - remote CID > VMADDR_CID_HOST will use host->guest transport;
-+ *  - remote CID > VMADDR_CID_HOST will use host->guest transport if
-+ *    guest->host transport is not loaded.  Otherwise, if guest->host transport
-+ *    contains the remote_cid, then use the guest->host transport.
-  */
- int vsock_assign_transport(struct vsock_sock *vsk, struct vsock_sock *psk)
- {
-@@ -434,15 +436,18 @@ int vsock_assign_transport(struct vsock_sock *vsk, struct vsock_sock *psk)
- 	int ret;
- 
- 	/* If the packet is coming with the source and destination CIDs higher
--	 * than VMADDR_CID_HOST, then a vsock channel where all the packets are
-+	 * than VMADDR_CID_HOST, and the source and destination CIDs are not
-+	 * used by the host, then a vsock channel where all the packets are
- 	 * forwarded to the host should be established. Then the host will
- 	 * need to forward the packets to the guest.
- 	 *
- 	 * The flag is set on the (listen) receive path (psk is not NULL). On
- 	 * the connect path the flag can be set by the user space application.
- 	 */
--	if (psk && vsk->local_addr.svm_cid > VMADDR_CID_HOST &&
--	    vsk->remote_addr.svm_cid > VMADDR_CID_HOST)
-+	if (psk && transport_h2g && vsk->local_addr.svm_cid > VMADDR_CID_HOST &&
-+	    !transport_h2g->contain_cid(vsk->local_addr.svm_cid) &&
-+	    vsk->remote_addr.svm_cid > VMADDR_CID_HOST &&
-+	    !transport_h2g->contain_cid(vsk->remote_addr.svm_cid))
- 		vsk->remote_addr.svm_flags |= VMADDR_FLAG_TO_HOST;
- 
- 	remote_flags = vsk->remote_addr.svm_flags;
-@@ -458,6 +463,9 @@ int vsock_assign_transport(struct vsock_sock *vsk, struct vsock_sock *psk)
- 		else if (remote_cid <= VMADDR_CID_HOST || !transport_h2g ||
- 			 (remote_flags & VMADDR_FLAG_TO_HOST))
- 			new_transport = transport_g2h;
-+		else if (remote_cid > VMADDR_CID_HOST && transport_g2h &&
-+			 transport_g2h->contain_opposite_cid(remote_cid))
-+			new_transport = transport_g2h;
- 		else
- 			new_transport = transport_h2g;
- 		break;
-diff --git a/net/vmw_vsock/virtio_transport.c b/net/vmw_vsock/virtio_transport.c
-index c552bc60e539..0c4a2f03318c 100644
---- a/net/vmw_vsock/virtio_transport.c
-+++ b/net/vmw_vsock/virtio_transport.c
-@@ -99,6 +99,35 @@ static bool virtio_transport_contain_cid(u32 cid)
- 	return ret;
- }
- 
-+/* This function checks if the transport_g2h is using the cid. */
-+static bool virtio_transport_contain_opposite_cid(u32 cid)
-+{
-+	struct virtio_vsock *vsock;
-+	bool ret;
-+	u32 num_host_cid;
-+
-+	if (cid == VMADDR_CID_HOST)
-+		return true;
-+	num_host_cid = 0;
-+	rcu_read_lock();
-+	vsock = rcu_dereference(the_virtio_vsock);
-+	if (!vsock || vsock->number_host_cid == 0) {
-+		ret = false;
-+		goto out_rcu;
-+	}
-+
-+	for (num_host_cid = 0; num_host_cid < vsock->number_host_cid; num_host_cid++) {
-+		if (vsock->host_cids[num_host_cid] == cid) {
-+			ret = true;
-+			goto out_rcu;
-+		}
-+	}
-+	ret = false;
-+out_rcu:
-+	rcu_read_unlock();
-+	return ret;
-+}
-+
- static u32 virtio_transport_get_local_cid(void)
- {
- 	struct virtio_vsock *vsock;
-@@ -532,6 +561,7 @@ static struct virtio_transport virtio_transport = {
- 
- 		.get_local_cid            = virtio_transport_get_local_cid,
- 		.contain_cid              = virtio_transport_contain_cid,
-+		.contain_opposite_cid     = virtio_transport_contain_opposite_cid,
- 
- 		.init                     = virtio_transport_do_socket_init,
- 		.destruct                 = virtio_transport_destruct,
+	M.
+
 -- 
-2.11.0
-
+Without deviation from the norm, progress is not possible.
