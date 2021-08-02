@@ -2,426 +2,232 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id BB1E13DD5FC
-	for <lists+kvm@lfdr.de>; Mon,  2 Aug 2021 14:50:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D960D3DD607
+	for <lists+kvm@lfdr.de>; Mon,  2 Aug 2021 14:53:10 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233711AbhHBMua (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 2 Aug 2021 08:50:30 -0400
-Received: from pegase2.c-s.fr ([93.17.235.10]:46189 "EHLO pegase2.c-s.fr"
+        id S233665AbhHBMxS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 2 Aug 2021 08:53:18 -0400
+Received: from mga06.intel.com ([134.134.136.31]:31381 "EHLO mga06.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S232629AbhHBMu2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 2 Aug 2021 08:50:28 -0400
-X-Greylist: delayed 456 seconds by postgrey-1.27 at vger.kernel.org; Mon, 02 Aug 2021 08:50:27 EDT
-Received: from localhost (mailhub3.si.c-s.fr [172.26.127.67])
-        by localhost (Postfix) with ESMTP id 4Gdd265BJvz9sTV;
-        Mon,  2 Aug 2021 14:42:38 +0200 (CEST)
-X-Virus-Scanned: amavisd-new at c-s.fr
-Received: from pegase2.c-s.fr ([172.26.127.65])
-        by localhost (pegase2.c-s.fr [127.0.0.1]) (amavisd-new, port 10024)
-        with ESMTP id hMLcQ9rc4PUn; Mon,  2 Aug 2021 14:42:38 +0200 (CEST)
-Received: from messagerie.si.c-s.fr (messagerie.si.c-s.fr [192.168.25.192])
-        by pegase2.c-s.fr (Postfix) with ESMTP id 4Gdd253Z2xz9sRx;
-        Mon,  2 Aug 2021 14:42:37 +0200 (CEST)
-Received: from localhost (localhost [127.0.0.1])
-        by messagerie.si.c-s.fr (Postfix) with ESMTP id 4F4668B770;
-        Mon,  2 Aug 2021 14:42:37 +0200 (CEST)
-X-Virus-Scanned: amavisd-new at c-s.fr
-Received: from messagerie.si.c-s.fr ([127.0.0.1])
-        by localhost (messagerie.si.c-s.fr [127.0.0.1]) (amavisd-new, port 10023)
-        with ESMTP id bydFCkI05YiT; Mon,  2 Aug 2021 14:42:37 +0200 (CEST)
-Received: from [10.25.200.145] (po15451.idsi0.si.c-s.fr [10.25.200.145])
-        by messagerie.si.c-s.fr (Postfix) with ESMTP id D4A988B763;
-        Mon,  2 Aug 2021 14:42:36 +0200 (CEST)
-Subject: Re: [PATCH 07/11] treewide: Replace the use of mem_encrypt_active()
- with prot_guest_has()
-To:     Tom Lendacky <thomas.lendacky@amd.com>,
-        linux-kernel@vger.kernel.org, x86@kernel.org,
-        linuxppc-dev@lists.ozlabs.org, linux-s390@vger.kernel.org,
-        iommu@lists.linux-foundation.org, kvm@vger.kernel.org,
-        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
-        linux-graphics-maintainer@vmware.com,
-        amd-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
-        kexec@lists.infradead.org, linux-fsdevel@vger.kernel.org
-Cc:     Sathyanarayanan Kuppuswamy 
-        <sathyanarayanan.kuppuswamy@linux.intel.com>,
-        Andi Kleen <ak@linux.intel.com>,
-        Tianyu Lan <Tianyu.Lan@microsoft.com>,
-        Daniel Vetter <daniel@ffwll.ch>, Baoquan He <bhe@redhat.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Thomas Zimmermann <tzimmermann@suse.de>,
-        Joerg Roedel <joro@8bytes.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
-        Maxime Ripard <mripard@kernel.org>,
-        David Airlie <airlied@linux.ie>,
-        Dave Young <dyoung@redhat.com>, Ingo Molnar <mingo@redhat.com>,
-        Borislav Petkov <bp@alien8.de>,
-        Andy Lutomirski <luto@kernel.org>,
-        Brijesh Singh <brijesh.singh@amd.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Will Deacon <will@kernel.org>
-References: <cover.1627424773.git.thomas.lendacky@amd.com>
- <029791b24c6412f9427cfe6ec598156c64395964.1627424774.git.thomas.lendacky@amd.com>
-From:   Christophe Leroy <christophe.leroy@csgroup.eu>
-Message-ID: <ab2b910b-cd2a-d63b-f080-987d0bb4b5a5@csgroup.eu>
-Date:   Mon, 2 Aug 2021 14:42:36 +0200
-User-Agent: Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.12.0
+        id S232629AbhHBMxS (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 2 Aug 2021 08:53:18 -0400
+X-IronPort-AV: E=McAfee;i="6200,9189,10063"; a="274511422"
+X-IronPort-AV: E=Sophos;i="5.84,288,1620716400"; 
+   d="scan'208";a="274511422"
+Received: from fmsmga002.fm.intel.com ([10.253.24.26])
+  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Aug 2021 05:53:07 -0700
+X-IronPort-AV: E=Sophos;i="5.84,288,1620716400"; 
+   d="scan'208";a="520498828"
+Received: from xiaoyaol-mobl.ccr.corp.intel.com (HELO [10.249.168.136]) ([10.249.168.136])
+  by fmsmga002-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Aug 2021 05:53:03 -0700
+Subject: Re: [PATCH v2] KVM: VMX: Enable Notify VM exit
+To:     Sean Christopherson <seanjc@google.com>, Tao Xu <tao3.xu@intel.com>
+Cc:     pbonzini@redhat.com, vkuznets@redhat.com, wanpengli@tencent.com,
+        jmattson@google.com, joro@8bytes.org, tglx@linutronix.de,
+        mingo@redhat.com, bp@alien8.de, hpa@zytor.com, x86@kernel.org,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20210525051204.1480610-1-tao3.xu@intel.com>
+ <YQRkBI9RFf6lbifZ@google.com>
+From:   Xiaoyao Li <xiaoyao.li@intel.com>
+Message-ID: <b0c90258-3f68-57a2-664a-e20a6d251e45@intel.com>
+Date:   Mon, 2 Aug 2021 20:53:01 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Firefox/78.0 Thunderbird/78.12.0
 MIME-Version: 1.0
-In-Reply-To: <029791b24c6412f9427cfe6ec598156c64395964.1627424774.git.thomas.lendacky@amd.com>
+In-Reply-To: <YQRkBI9RFf6lbifZ@google.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: fr
-Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-
-Le 28/07/2021 à 00:26, Tom Lendacky a écrit :
-> Replace occurrences of mem_encrypt_active() with calls to prot_guest_has()
-> with the PATTR_MEM_ENCRYPT attribute.
-
-
-What about 
-https://patchwork.ozlabs.org/project/linuxppc-dev/patch/20210730114231.23445-1-will@kernel.org/ ?
-
-Christophe
-
-
+On 7/31/2021 4:41 AM, Sean Christopherson wrote:
+> On Tue, May 25, 2021, Tao Xu wrote:
+>>   #endif /* __KVM_X86_VMX_CAPS_H */
+>> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+>> index 4bceb5ca3a89..c0ad01c88dac 100644
+>> --- a/arch/x86/kvm/vmx/vmx.c
+>> +++ b/arch/x86/kvm/vmx/vmx.c
+>> @@ -205,6 +205,10 @@ module_param(ple_window_max, uint, 0444);
+>>   int __read_mostly pt_mode = PT_MODE_SYSTEM;
+>>   module_param(pt_mode, int, S_IRUGO);
+>>   
+>> +/* Default is 0, less than 0 (for example, -1) disables notify window. */
+>> +static int __read_mostly notify_window;
 > 
-> Cc: Thomas Gleixner <tglx@linutronix.de>
-> Cc: Ingo Molnar <mingo@redhat.com>
-> Cc: Borislav Petkov <bp@alien8.de>
-> Cc: Dave Hansen <dave.hansen@linux.intel.com>
-> Cc: Andy Lutomirski <luto@kernel.org>
-> Cc: Peter Zijlstra <peterz@infradead.org>
-> Cc: David Airlie <airlied@linux.ie>
-> Cc: Daniel Vetter <daniel@ffwll.ch>
-> Cc: Maarten Lankhorst <maarten.lankhorst@linux.intel.com>
-> Cc: Maxime Ripard <mripard@kernel.org>
-> Cc: Thomas Zimmermann <tzimmermann@suse.de>
-> Cc: VMware Graphics <linux-graphics-maintainer@vmware.com>
-> Cc: Joerg Roedel <joro@8bytes.org>
-> Cc: Will Deacon <will@kernel.org>
-> Cc: Dave Young <dyoung@redhat.com>
-> Cc: Baoquan He <bhe@redhat.com>
-> Signed-off-by: Tom Lendacky <thomas.lendacky@amd.com>
-> ---
->   arch/x86/kernel/head64.c                | 4 ++--
->   arch/x86/mm/ioremap.c                   | 4 ++--
->   arch/x86/mm/mem_encrypt.c               | 5 ++---
->   arch/x86/mm/pat/set_memory.c            | 3 ++-
->   drivers/gpu/drm/amd/amdgpu/amdgpu_drv.c | 4 +++-
->   drivers/gpu/drm/drm_cache.c             | 4 ++--
->   drivers/gpu/drm/vmwgfx/vmwgfx_drv.c     | 4 ++--
->   drivers/gpu/drm/vmwgfx/vmwgfx_msg.c     | 6 +++---
->   drivers/iommu/amd/iommu.c               | 3 ++-
->   drivers/iommu/amd/iommu_v2.c            | 3 ++-
->   drivers/iommu/iommu.c                   | 3 ++-
->   fs/proc/vmcore.c                        | 6 +++---
->   kernel/dma/swiotlb.c                    | 4 ++--
->   13 files changed, 29 insertions(+), 24 deletions(-)
+> I'm not sure I like the idea of trusting ucode to select an appropriate internal
+> threshold.  Unless the internal threshold is architecturally defined to be at
+> least N nanoseconds or whatever, I think KVM should provide its own sane default.
+> E.g. it's not hard to imagine a scenario where a ucode patch gets rolled out that
+> adjusts the threshold and starts silently degrading guest performance.
+
+You mean when internal threshold gets smaller somehow, and cases 
+false-positive that leads unexpected VM exit on normal instruction? In 
+this case, we set increase the vmcs.notify_window in KVM.
+
+I think there is no better to avoid this case if ucode changes internal 
+threshold. Unless KVM's default notify_window is bigger enough.
+
+> Even if the internal threshold isn't architecturally constrained, it would be very,
+> very helpful if Intel could publish the per-uarch/stepping thresholds, e.g. to give
+> us a ballpark idea of how agressive KVM can be before it risks false positives.
+
+Even Intel publishes the internal threshold, we still need to provide a 
+final best_value (internal + vmcs.notify_window). Then what's that value?
+
+If we have an option for final best_value, then I think it's OK to just 
+let vmcs.notify_window = best_value. Then the true final value is 
+best_value + internal.
+  - if it's a normal instruction, it should finish within best_value or 
+best_value + internal. So it makes no difference.
+  - if it's an instruction in malicious case, it won't go to next 
+instruction whether wait for best_value or best_value + internal.
+
+>> +module_param(notify_window, int, 0644);
 > 
-> diff --git a/arch/x86/kernel/head64.c b/arch/x86/kernel/head64.c
-> index de01903c3735..cafed6456d45 100644
-> --- a/arch/x86/kernel/head64.c
-> +++ b/arch/x86/kernel/head64.c
-> @@ -19,7 +19,7 @@
->   #include <linux/start_kernel.h>
->   #include <linux/io.h>
->   #include <linux/memblock.h>
-> -#include <linux/mem_encrypt.h>
-> +#include <linux/protected_guest.h>
->   #include <linux/pgtable.h>
->   
->   #include <asm/processor.h>
-> @@ -285,7 +285,7 @@ unsigned long __head __startup_64(unsigned long physaddr,
->   	 * there is no need to zero it after changing the memory encryption
->   	 * attribute.
->   	 */
-> -	if (mem_encrypt_active()) {
-> +	if (prot_guest_has(PATTR_MEM_ENCRYPT)) {
->   		vaddr = (unsigned long)__start_bss_decrypted;
->   		vaddr_end = (unsigned long)__end_bss_decrypted;
->   		for (; vaddr < vaddr_end; vaddr += PMD_SIZE) {
-> diff --git a/arch/x86/mm/ioremap.c b/arch/x86/mm/ioremap.c
-> index 0f2d5ace5986..5e1c1f5cbbe8 100644
-> --- a/arch/x86/mm/ioremap.c
-> +++ b/arch/x86/mm/ioremap.c
-> @@ -693,7 +693,7 @@ static bool __init early_memremap_is_setup_data(resource_size_t phys_addr,
->   bool arch_memremap_can_ram_remap(resource_size_t phys_addr, unsigned long size,
->   				 unsigned long flags)
->   {
-> -	if (!mem_encrypt_active())
-> +	if (!prot_guest_has(PATTR_MEM_ENCRYPT))
->   		return true;
->   
->   	if (flags & MEMREMAP_ENC)
-> @@ -723,7 +723,7 @@ pgprot_t __init early_memremap_pgprot_adjust(resource_size_t phys_addr,
->   {
->   	bool encrypted_prot;
->   
-> -	if (!mem_encrypt_active())
-> +	if (!prot_guest_has(PATTR_MEM_ENCRYPT))
->   		return prot;
->   
->   	encrypted_prot = true;
-> diff --git a/arch/x86/mm/mem_encrypt.c b/arch/x86/mm/mem_encrypt.c
-> index 451de8e84fce..0f1533dbe81c 100644
-> --- a/arch/x86/mm/mem_encrypt.c
-> +++ b/arch/x86/mm/mem_encrypt.c
-> @@ -364,8 +364,7 @@ int __init early_set_memory_encrypted(unsigned long vaddr, unsigned long size)
->   /*
->    * SME and SEV are very similar but they are not the same, so there are
->    * times that the kernel will need to distinguish between SME and SEV. The
-> - * sme_active() and sev_active() functions are used for this.  When a
-> - * distinction isn't needed, the mem_encrypt_active() function can be used.
-> + * sme_active() and sev_active() functions are used for this.
->    *
->    * The trampoline code is a good example for this requirement.  Before
->    * paging is activated, SME will access all memory as decrypted, but SEV
-> @@ -451,7 +450,7 @@ void __init mem_encrypt_free_decrypted_mem(void)
->   	 * The unused memory range was mapped decrypted, change the encryption
->   	 * attribute from decrypted to encrypted before freeing it.
->   	 */
-> -	if (mem_encrypt_active()) {
-> +	if (sme_me_mask) {
->   		r = set_memory_encrypted(vaddr, npages);
->   		if (r) {
->   			pr_warn("failed to free unused decrypted pages\n");
-> diff --git a/arch/x86/mm/pat/set_memory.c b/arch/x86/mm/pat/set_memory.c
-> index ad8a5c586a35..6925f2bb4be1 100644
-> --- a/arch/x86/mm/pat/set_memory.c
-> +++ b/arch/x86/mm/pat/set_memory.c
-> @@ -18,6 +18,7 @@
->   #include <linux/libnvdimm.h>
->   #include <linux/vmstat.h>
->   #include <linux/kernel.h>
-> +#include <linux/protected_guest.h>
->   
->   #include <asm/e820/api.h>
->   #include <asm/processor.h>
-> @@ -1986,7 +1987,7 @@ static int __set_memory_enc_dec(unsigned long addr, int numpages, bool enc)
->   	int ret;
->   
->   	/* Nothing to do if memory encryption is not active */
-> -	if (!mem_encrypt_active())
-> +	if (!prot_guest_has(PATTR_MEM_ENCRYPT))
->   		return 0;
->   
->   	/* Should not be working on unaligned addresses */
-> diff --git a/drivers/gpu/drm/amd/amdgpu/amdgpu_drv.c b/drivers/gpu/drm/amd/amdgpu/amdgpu_drv.c
-> index abb928894eac..8407224717df 100644
-> --- a/drivers/gpu/drm/amd/amdgpu/amdgpu_drv.c
-> +++ b/drivers/gpu/drm/amd/amdgpu/amdgpu_drv.c
-> @@ -38,6 +38,7 @@
->   #include <drm/drm_probe_helper.h>
->   #include <linux/mmu_notifier.h>
->   #include <linux/suspend.h>
-> +#include <linux/protected_guest.h>
->   
->   #include "amdgpu.h"
->   #include "amdgpu_irq.h"
-> @@ -1239,7 +1240,8 @@ static int amdgpu_pci_probe(struct pci_dev *pdev,
->   	 * however, SME requires an indirect IOMMU mapping because the encryption
->   	 * bit is beyond the DMA mask of the chip.
->   	 */
-> -	if (mem_encrypt_active() && ((flags & AMD_ASIC_MASK) == CHIP_RAVEN)) {
-> +	if (prot_guest_has(PATTR_MEM_ENCRYPT) &&
-> +	    ((flags & AMD_ASIC_MASK) == CHIP_RAVEN)) {
->   		dev_info(&pdev->dev,
->   			 "SME is not compatible with RAVEN\n");
->   		return -ENOTSUPP;
-> diff --git a/drivers/gpu/drm/drm_cache.c b/drivers/gpu/drm/drm_cache.c
-> index 546599f19a93..4d01d44012fd 100644
-> --- a/drivers/gpu/drm/drm_cache.c
-> +++ b/drivers/gpu/drm/drm_cache.c
-> @@ -31,7 +31,7 @@
->   #include <linux/dma-buf-map.h>
->   #include <linux/export.h>
->   #include <linux/highmem.h>
-> -#include <linux/mem_encrypt.h>
-> +#include <linux/protected_guest.h>
->   #include <xen/xen.h>
->   
->   #include <drm/drm_cache.h>
-> @@ -204,7 +204,7 @@ bool drm_need_swiotlb(int dma_bits)
->   	 * Enforce dma_alloc_coherent when memory encryption is active as well
->   	 * for the same reasons as for Xen paravirtual hosts.
->   	 */
-> -	if (mem_encrypt_active())
-> +	if (prot_guest_has(PATTR_MEM_ENCRYPT))
->   		return true;
->   
->   	for (tmp = iomem_resource.child; tmp; tmp = tmp->sibling)
-> diff --git a/drivers/gpu/drm/vmwgfx/vmwgfx_drv.c b/drivers/gpu/drm/vmwgfx/vmwgfx_drv.c
-> index dde8b35bb950..06ec95a650ba 100644
-> --- a/drivers/gpu/drm/vmwgfx/vmwgfx_drv.c
-> +++ b/drivers/gpu/drm/vmwgfx/vmwgfx_drv.c
-> @@ -29,7 +29,7 @@
->   #include <linux/dma-mapping.h>
->   #include <linux/module.h>
->   #include <linux/pci.h>
-> -#include <linux/mem_encrypt.h>
-> +#include <linux/protected_guest.h>
->   
->   #include <drm/ttm/ttm_range_manager.h>
->   #include <drm/drm_aperture.h>
-> @@ -634,7 +634,7 @@ static int vmw_dma_select_mode(struct vmw_private *dev_priv)
->   		[vmw_dma_map_bind] = "Giving up DMA mappings early."};
->   
->   	/* TTM currently doesn't fully support SEV encryption. */
-> -	if (mem_encrypt_active())
-> +	if (prot_guest_has(PATTR_MEM_ENCRYPT))
->   		return -EINVAL;
->   
->   	if (vmw_force_coherent)
-> diff --git a/drivers/gpu/drm/vmwgfx/vmwgfx_msg.c b/drivers/gpu/drm/vmwgfx/vmwgfx_msg.c
-> index 3d08f5700bdb..0c70573d3dce 100644
-> --- a/drivers/gpu/drm/vmwgfx/vmwgfx_msg.c
-> +++ b/drivers/gpu/drm/vmwgfx/vmwgfx_msg.c
-> @@ -28,7 +28,7 @@
->   #include <linux/kernel.h>
->   #include <linux/module.h>
->   #include <linux/slab.h>
-> -#include <linux/mem_encrypt.h>
-> +#include <linux/protected_guest.h>
->   
->   #include <asm/hypervisor.h>
->   
-> @@ -153,7 +153,7 @@ static unsigned long vmw_port_hb_out(struct rpc_channel *channel,
->   	unsigned long msg_len = strlen(msg);
->   
->   	/* HB port can't access encrypted memory. */
-> -	if (hb && !mem_encrypt_active()) {
-> +	if (hb && !prot_guest_has(PATTR_MEM_ENCRYPT)) {
->   		unsigned long bp = channel->cookie_high;
->   
->   		si = (uintptr_t) msg;
-> @@ -208,7 +208,7 @@ static unsigned long vmw_port_hb_in(struct rpc_channel *channel, char *reply,
->   	unsigned long si, di, eax, ebx, ecx, edx;
->   
->   	/* HB port can't access encrypted memory */
-> -	if (hb && !mem_encrypt_active()) {
-> +	if (hb && !prot_guest_has(PATTR_MEM_ENCRYPT)) {
->   		unsigned long bp = channel->cookie_low;
->   
->   		si = channel->cookie_high;
-> diff --git a/drivers/iommu/amd/iommu.c b/drivers/iommu/amd/iommu.c
-> index 811a49a95d04..def63a8deab4 100644
-> --- a/drivers/iommu/amd/iommu.c
-> +++ b/drivers/iommu/amd/iommu.c
-> @@ -31,6 +31,7 @@
->   #include <linux/irqdomain.h>
->   #include <linux/percpu.h>
->   #include <linux/io-pgtable.h>
-> +#include <linux/protected_guest.h>
->   #include <asm/irq_remapping.h>
->   #include <asm/io_apic.h>
->   #include <asm/apic.h>
-> @@ -2178,7 +2179,7 @@ static int amd_iommu_def_domain_type(struct device *dev)
->   	 * active, because some of those devices (AMD GPUs) don't have the
->   	 * encryption bit in their DMA-mask and require remapping.
->   	 */
-> -	if (!mem_encrypt_active() && dev_data->iommu_v2)
-> +	if (!prot_guest_has(PATTR_MEM_ENCRYPT) && dev_data->iommu_v2)
->   		return IOMMU_DOMAIN_IDENTITY;
->   
->   	return 0;
-> diff --git a/drivers/iommu/amd/iommu_v2.c b/drivers/iommu/amd/iommu_v2.c
-> index f8d4ad421e07..ac359bc98523 100644
-> --- a/drivers/iommu/amd/iommu_v2.c
-> +++ b/drivers/iommu/amd/iommu_v2.c
-> @@ -16,6 +16,7 @@
->   #include <linux/wait.h>
->   #include <linux/pci.h>
->   #include <linux/gfp.h>
-> +#include <linux/protected_guest.h>
->   
->   #include "amd_iommu.h"
->   
-> @@ -741,7 +742,7 @@ int amd_iommu_init_device(struct pci_dev *pdev, int pasids)
->   	 * When memory encryption is active the device is likely not in a
->   	 * direct-mapped domain. Forbid using IOMMUv2 functionality for now.
->   	 */
-> -	if (mem_encrypt_active())
-> +	if (prot_guest_has(PATTR_MEM_ENCRYPT))
->   		return -ENODEV;
->   
->   	if (!amd_iommu_v2_supported())
-> diff --git a/drivers/iommu/iommu.c b/drivers/iommu/iommu.c
-> index 5419c4b9f27a..ddbedb1b5b6b 100644
-> --- a/drivers/iommu/iommu.c
-> +++ b/drivers/iommu/iommu.c
-> @@ -23,6 +23,7 @@
->   #include <linux/property.h>
->   #include <linux/fsl/mc.h>
->   #include <linux/module.h>
-> +#include <linux/protected_guest.h>
->   #include <trace/events/iommu.h>
->   
->   static struct kset *iommu_group_kset;
-> @@ -127,7 +128,7 @@ static int __init iommu_subsys_init(void)
->   		else
->   			iommu_set_default_translated(false);
->   
-> -		if (iommu_default_passthrough() && mem_encrypt_active()) {
-> +		if (iommu_default_passthrough() && prot_guest_has(PATTR_MEM_ENCRYPT)) {
->   			pr_info("Memory encryption detected - Disabling default IOMMU Passthrough\n");
->   			iommu_set_default_translated(false);
->   		}
-> diff --git a/fs/proc/vmcore.c b/fs/proc/vmcore.c
-> index 9a15334da208..b466f543dc00 100644
-> --- a/fs/proc/vmcore.c
-> +++ b/fs/proc/vmcore.c
-> @@ -26,7 +26,7 @@
->   #include <linux/vmalloc.h>
->   #include <linux/pagemap.h>
->   #include <linux/uaccess.h>
-> -#include <linux/mem_encrypt.h>
-> +#include <linux/protected_guest.h>
->   #include <asm/io.h>
->   #include "internal.h"
->   
-> @@ -177,7 +177,7 @@ ssize_t __weak elfcorehdr_read(char *buf, size_t count, u64 *ppos)
->    */
->   ssize_t __weak elfcorehdr_read_notes(char *buf, size_t count, u64 *ppos)
->   {
-> -	return read_from_oldmem(buf, count, ppos, 0, mem_encrypt_active());
-> +	return read_from_oldmem(buf, count, ppos, 0, prot_guest_has(PATTR_MEM_ENCRYPT));
->   }
->   
->   /*
-> @@ -378,7 +378,7 @@ static ssize_t __read_vmcore(char *buffer, size_t buflen, loff_t *fpos,
->   					    buflen);
->   			start = m->paddr + *fpos - m->offset;
->   			tmp = read_from_oldmem(buffer, tsz, &start,
-> -					       userbuf, mem_encrypt_active());
-> +					       userbuf, prot_guest_has(PATTR_MEM_ENCRYPT));
->   			if (tmp < 0)
->   				return tmp;
->   			buflen -= tsz;
-> diff --git a/kernel/dma/swiotlb.c b/kernel/dma/swiotlb.c
-> index e50df8d8f87e..2e8dee23a624 100644
-> --- a/kernel/dma/swiotlb.c
-> +++ b/kernel/dma/swiotlb.c
-> @@ -34,7 +34,7 @@
->   #include <linux/highmem.h>
->   #include <linux/gfp.h>
->   #include <linux/scatterlist.h>
-> -#include <linux/mem_encrypt.h>
-> +#include <linux/protected_guest.h>
->   #include <linux/set_memory.h>
->   #ifdef CONFIG_DEBUG_FS
->   #include <linux/debugfs.h>
-> @@ -515,7 +515,7 @@ phys_addr_t swiotlb_tbl_map_single(struct device *dev, phys_addr_t orig_addr,
->   	if (!mem)
->   		panic("Can not allocate SWIOTLB buffer earlier and can't now provide you with the DMA bounce buffer");
->   
-> -	if (mem_encrypt_active())
-> +	if (prot_guest_has(PATTR_MEM_ENCRYPT))
->   		pr_warn_once("Memory encryption is active and system is using DMA bounce buffers\n");
->   
->   	if (mapping_size > alloc_size) {
+> I really like the idea of making the module param writable, but doing so will
+> require far more effort.  At an absolute minimum, the module param would need to
+> be snapshotted at VM creation time, a la lapic_timer_advance_ns, otherwise the
+> behavior is non-deterministic.
 > 
+> But I don't think snapshotting is a worthwhile approach because the main reason
+> for adjusting the window while guests are running is probably going to be to relax
+> the window because guest's are observing degraded performance.  
+
+Let's make it non-writable.
+
+> Hopefully that
+> never happens, but the "CPU adds a magic internal buffer" behavior makes me more
+> than a bit nervous.
+
+If we don't trust internal value, we can just treat it as 0.
+
+> And on the other hand, adding a ton of logic to forcefully update every VMCS is
+> likely overkill.
+> 
+> So, that takes us back to providing a sane, somewhat conservative default.  I've
+> said in the past that ideally the notify_window would be as small as possible,
+> but pushing it down to single digit cycles swings the pendulum too far in the
+> other direction.
+> 
+>> +
+>>   static DEFINE_STATIC_KEY_FALSE(vmx_l1d_should_flush);
+>>   static DEFINE_STATIC_KEY_FALSE(vmx_l1d_flush_cond);
+>>   static DEFINE_MUTEX(vmx_l1d_flush_mutex);
+>> @@ -2539,7 +2543,8 @@ static __init int setup_vmcs_config(struct vmcs_config *vmcs_conf,
+>>   			SECONDARY_EXEC_PT_USE_GPA |
+>>   			SECONDARY_EXEC_PT_CONCEAL_VMX |
+>>   			SECONDARY_EXEC_ENABLE_VMFUNC |
+>> -			SECONDARY_EXEC_BUS_LOCK_DETECTION;
+>> +			SECONDARY_EXEC_BUS_LOCK_DETECTION |
+>> +			SECONDARY_EXEC_NOTIFY_VM_EXITING;
+>>   		if (cpu_has_sgx())
+>>   			opt2 |= SECONDARY_EXEC_ENCLS_EXITING;
+>>   		if (adjust_vmx_controls(min2, opt2,
+>> @@ -4376,6 +4381,9 @@ static void vmx_compute_secondary_exec_control(struct vcpu_vmx *vmx)
+>>   	if (!vcpu->kvm->arch.bus_lock_detection_enabled)
+>>   		exec_control &= ~SECONDARY_EXEC_BUS_LOCK_DETECTION;
+>>   
+>> +	if (cpu_has_notify_vm_exiting() && notify_window < 0)
+>> +		exec_control &= ~SECONDARY_EXEC_NOTIFY_VM_EXITING;
+>> +
+>>   	vmx->secondary_exec_control = exec_control;
+>>   }
+>>   
+>> @@ -4423,6 +4431,9 @@ static void init_vmcs(struct vcpu_vmx *vmx)
+>>   		vmx->ple_window_dirty = true;
+>>   	}
+>>   
+>> +	if (cpu_has_notify_vm_exiting() && notify_window >= 0)
+>> +		vmcs_write32(NOTIFY_WINDOW, notify_window);
+> 
+> I'm all for punting full nested support to a future patch, but _this_ patch
+> absolutely needs to apply KVM's notify_window to vmcs02, otherwise L1 can simply
+> run in L2 to avoid the restriction.  init_vmcs() is used only for vmcs01, i.e.
+> prepare_vmcs02_constant_state() needs to set the correct vmcs.NOTIFY_WINDOW,
+> and prepare_vmcs02_early() needs to set/clear SECONDARY_EXEC_NOTIFY_VM_EXITING
+> appropriately.
+
+Thanks for pointing it out. We will fix it in next version.
+
+>> +
+>>   	vmcs_write32(PAGE_FAULT_ERROR_CODE_MASK, 0);
+>>   	vmcs_write32(PAGE_FAULT_ERROR_CODE_MATCH, 0);
+>>   	vmcs_write32(CR3_TARGET_COUNT, 0);           /* 22.2.1 */
+>> @@ -5642,6 +5653,31 @@ static int handle_bus_lock_vmexit(struct kvm_vcpu *vcpu)
+>>   	return 0;
+>>   }
+>>   
+>> +static int handle_notify(struct kvm_vcpu *vcpu)
+>> +{
+>> +	unsigned long exit_qual = vmx_get_exit_qual(vcpu);
+>> +
+>> +	if (!(exit_qual & NOTIFY_VM_CONTEXT_INVALID)) {
+> 
+> What does CONTEXT_INVALID mean?  The ISE doesn't provide any information whatsoever.
+
+It means whether the VM context is corrupted and not valid in the VMCS.
+
+>> +		/*
+>> +		 * Notify VM exit happened while executing iret from NMI,
+>> +		 * "blocked by NMI" bit has to be set before next VM entry.
+>> +		 */
+>> +		if (enable_vnmi &&
+>> +		    (exit_qual & INTR_INFO_UNBLOCK_NMI))
+>> +			vmcs_set_bits(GUEST_INTERRUPTIBILITY_INFO,
+>> +				      GUEST_INTR_STATE_NMI);
+> 
+> Hmm, logging of some kind is probably a good idea if this exit occurs, e.g. so
+> that the host can (a) get an indication that a guest is potentially malicious and
+> (b) rule out (or confirm) notify_window exits as the source of degraded guest
+> performance.
+> 
+> Maybe add a per-vCPU stat, "u64 notify_window_exits"?
+
+Good idea.
+
+> Another thought would be to also do pr_info/warn_ratelimited if a vCPU gets
+> multiple notify_window exits and doesn't appear to be making forward progress,
+> e.g. same RIP observed two notify_window exits in a row.  Even if the guest is
+> making forward progress, displaying the guest RIP and instruction (if possible)
+> could be useful in triaging why the guest appears to be getting false positives.
+
+I suppose kvm_exit trace can be used if we find there are too many 
+notify_exit.
+
+>> +		return 1;
+>> +	}
+>> +
+>> +	vcpu->run->exit_reason = KVM_EXIT_INTERNAL_ERROR;
+>> +	vcpu->run->internal.suberror = KVM_INTERNAL_ERROR_NO_EVENT_WINDOW;
+>> +	vcpu->run->internal.ndata = 1;
+>> +	vcpu->run->internal.data[0] = exit_qual;
+> 
+> Unless an invalid context can _never_ happen, or is already fatal to the guest,
+
+As I explained, invalid means VM context is corrupted and not valid in 
+VMCS. We have no choice.
+
+> I don't think effectively killing the guest is a good idea.  KVM doesn't know
+> for certain that the guest was being malicious, all it knows is that the CPU
+> didn't open an event window for some arbitrary amount of time (arbitrary because
+> the internal threshold is likely to be uarch specific).  KVM is getting exits,
+> which means it's getting a chance to check for signals, etc..., so resuming the
+> guest is ok.
+> 
+>> +
+>> +	return 0;
+>> +}
+>> +
+>>   /*
+>>    * The exit handlers return 1 if the exit was handled fully and guest execution
+>>    * may resume.  Otherwise they set the kvm_run parameter to indicate what needs
+>> @@ -5699,6 +5735,7 @@ static int (*kvm_vmx_exit_handlers[])(struct kvm_vcpu *vcpu) = {
+>>   	[EXIT_REASON_PREEMPTION_TIMER]	      = handle_preemption_timer,
+>>   	[EXIT_REASON_ENCLS]		      = handle_encls,
+>>   	[EXIT_REASON_BUS_LOCK]                = handle_bus_lock_vmexit,
+>> +	[EXIT_REASON_NOTIFY]		      = handle_notify,
+>>   };
+>>   
+
