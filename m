@@ -2,237 +2,149 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5B29E3DDC5C
-	for <lists+kvm@lfdr.de>; Mon,  2 Aug 2021 17:25:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9C59B3DDCA6
+	for <lists+kvm@lfdr.de>; Mon,  2 Aug 2021 17:46:12 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234885AbhHBPZ2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 2 Aug 2021 11:25:28 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:24543 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S234754AbhHBPZ1 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 2 Aug 2021 11:25:27 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1627917917;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=xftexRmGJH8/1M/pkzb30LS03dbVSEsqIX9DeZUf7y0=;
-        b=BaMUHdL5E7bCeWbd0tmr+3SqJE9z1MC7765xgLdDTbfsQ9pqipeqOXK7MovbEFZFhpA0Ke
-        W5A8dtmErwvUPEy+SrGjBPEAsghrIz8fnii194GCXEWi28/U0ojdklAMu+wNWms3nzvkS1
-        xlKRGxbiV/jllNWgbgt18VUrRePlciY=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-460-_66L0CsvOsa4U0IOwVG1Bg-1; Mon, 02 Aug 2021 11:25:16 -0400
-X-MC-Unique: _66L0CsvOsa4U0IOwVG1Bg-1
-Received: by mail-wm1-f69.google.com with SMTP id e21-20020a05600c4b95b029025b007a168dso906224wmp.4
-        for <kvm@vger.kernel.org>; Mon, 02 Aug 2021 08:25:16 -0700 (PDT)
+        id S235266AbhHBPqU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 2 Aug 2021 11:46:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39864 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S234551AbhHBPqT (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 2 Aug 2021 11:46:19 -0400
+Received: from mail-pj1-x102f.google.com (mail-pj1-x102f.google.com [IPv6:2607:f8b0:4864:20::102f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3C69CC06175F
+        for <kvm@vger.kernel.org>; Mon,  2 Aug 2021 08:46:10 -0700 (PDT)
+Received: by mail-pj1-x102f.google.com with SMTP id nh14so14005665pjb.2
+        for <kvm@vger.kernel.org>; Mon, 02 Aug 2021 08:46:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=8Q8GPtUEDsZnvVcYI9DEHGIcb7f0tGzkxrNpYDg2qaU=;
+        b=uow+0XtDub2IqIcws3lM4NZ7uaUdL+cd84LTX4KtuCE3l37WKA2N+zxg5/iVd8BXRq
+         fX1WFK1I+yFnvLf4UWLznAAWEPerkoHJShkJ28aOvH2VE6TE1vJoeCYklWFB4N39ajUz
+         h+hfQex/9Ng6SEilyRyJXJ67tdLF7zbsHtQ1G3sFPnONGHZMXdCLYOd+81GbwBsSNn9b
+         giIDjtOcFzOwECu6+D5R6Pkkjq/ZLiN5ZdLbDKeGW2WyenxRSyUfN3o/1s7SyEygNRcN
+         LNysSnrbcnPA0eFtCIgxq0vL89LGrGe1GzjhZuGXb4Ry/t+e0QRN5DuEzkFQkJuRGucW
+         zxmw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=xftexRmGJH8/1M/pkzb30LS03dbVSEsqIX9DeZUf7y0=;
-        b=sYVTmINHsLO/9Gw2sD5Idaoo0Mk/i9rRI7goybIRpTfKQIAEhhMkWCXZMgMhdwyT/s
-         K8BybHvPVWBbHqop43UOcirwDto+OykSM0nX3o39Eqs+Ss69Y2vWjeiYtxZpeO9Yf8Ew
-         Y1C4Ml0JhbAMxd4czDN5M+JMkLWNyE4DsgA9qYpacOIElRqhvlO1tLJulYqgcQO+tVRW
-         xNRA9vvgDtn//1xPz+L0EvLmW5kK/Sz/uqtbQaDuzOTO7o3EBwE9Xa/BL0j5lvjZBu3s
-         zUwzGTTiXiEUveVnjJdaJyt/E1WI0HsLK1eyhpTg/MbXlCiVDq3G76shfhEEXWRH/bV/
-         6hwQ==
-X-Gm-Message-State: AOAM531KHh2/E8RNr+mPvAXTktPYUNSt1zxF1kpDo4uWSdknETavaKOv
-        fuchc66rlW8kGAPR+U/CqUocH6ehxS1LLEFnAOfK8EqVR3OLjqu30eF6TcRqcte2YqwZmBnjBsK
-        lvvrW+MmPysR2
-X-Received: by 2002:adf:f550:: with SMTP id j16mr17963068wrp.91.1627917914731;
-        Mon, 02 Aug 2021 08:25:14 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJy9Fi4IxIqrXQ8Q59sUryuPklM/kVQ/ol76fUwEbKaqHpLrnllMncmn29lBNyvRUD+Yy3rDYw==
-X-Received: by 2002:adf:f550:: with SMTP id j16mr17963049wrp.91.1627917914542;
-        Mon, 02 Aug 2021 08:25:14 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id 19sm4293972wmj.48.2021.08.02.08.25.13
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 02 Aug 2021 08:25:13 -0700 (PDT)
-Subject: Re: [PATCH v3 4/7] KVM: X86: Introduce mmu_rmaps_stat per-vm debugfs
- file
-To:     Peter Xu <peterx@redhat.com>, kvm@vger.kernel.org,
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=8Q8GPtUEDsZnvVcYI9DEHGIcb7f0tGzkxrNpYDg2qaU=;
+        b=VLffV/l5mx5RLf1hVVTPdz8CBfRGhPqQ3EdqJf1TTVpxTDfEFH7LLvfJpaH/+DlLZm
+         3PndQRaEN+Z0TUK8y6KsLdDISH5jjooLaAocCyZ5ySjZFe+zhnsnCF8oUB8Wu6rmoiW9
+         77/A4Lca3BYcUJEKuu5iRphT1Hsi4e0s0ZYqwdhtsThV8nlvEkYq0acWdM4OfScRwqWI
+         KAAOVUvM4bMAQfn5G2fpa9gjgQ6NXuO84U5z7hAODZQ1hUg9fYlT62lV63EEF58KsVsH
+         y4GPyjnmpygJVrqTeVQo2P0I/Dp0aNIdPyjzK3SHcjXw3vrXfgVpCVy1jujJoOggEj5p
+         DO6w==
+X-Gm-Message-State: AOAM533qp72OefqaHBIDXq/spCrag0nh8PkV8505i1Bk5zqYoIPcqihe
+        UisqTZTbNe9HKV7rxvKHhf6Ckw==
+X-Google-Smtp-Source: ABdhPJyD2vWo9Vn05mBGwtYf+avY1EFSSDpDQQAstgMR7/9Wwz/17fZavGw+io3OGZXkoX9XNrwNMw==
+X-Received: by 2002:a65:6441:: with SMTP id s1mr3109877pgv.214.1627919169557;
+        Mon, 02 Aug 2021 08:46:09 -0700 (PDT)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id b7sm12046336pfl.195.2021.08.02.08.46.08
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 02 Aug 2021 08:46:09 -0700 (PDT)
+Date:   Mon, 2 Aug 2021 15:46:05 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Xiaoyao Li <xiaoyao.li@intel.com>
+Cc:     Tao Xu <tao3.xu@intel.com>, pbonzini@redhat.com,
+        vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com,
+        joro@8bytes.org, tglx@linutronix.de, mingo@redhat.com,
+        bp@alien8.de, hpa@zytor.com, x86@kernel.org, kvm@vger.kernel.org,
         linux-kernel@vger.kernel.org
-Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Maxim Levitsky <mlevitsk@redhat.com>
-References: <20210730220455.26054-1-peterx@redhat.com>
- <20210730220455.26054-5-peterx@redhat.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <8964c91d-761f-8fd4-e8c6-f85d6e318a45@redhat.com>
-Date:   Mon, 2 Aug 2021 17:25:12 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.11.0
+Subject: Re: [PATCH v2] KVM: VMX: Enable Notify VM exit
+Message-ID: <YQgTPakbT+kCwMLP@google.com>
+References: <20210525051204.1480610-1-tao3.xu@intel.com>
+ <YQRkBI9RFf6lbifZ@google.com>
+ <b0c90258-3f68-57a2-664a-e20a6d251e45@intel.com>
 MIME-Version: 1.0
-In-Reply-To: <20210730220455.26054-5-peterx@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <b0c90258-3f68-57a2-664a-e20a6d251e45@intel.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 31/07/21 00:04, Peter Xu wrote:
-> Use this file to dump rmap statistic information.  The statistic is done by
-> calculating the rmap count and the result is log-2-based.
+On Mon, Aug 02, 2021, Xiaoyao Li wrote:
+> On 7/31/2021 4:41 AM, Sean Christopherson wrote:
+> > On Tue, May 25, 2021, Tao Xu wrote:
+> > >   #endif /* __KVM_X86_VMX_CAPS_H */
+> > > diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+> > > index 4bceb5ca3a89..c0ad01c88dac 100644
+> > > --- a/arch/x86/kvm/vmx/vmx.c
+> > > +++ b/arch/x86/kvm/vmx/vmx.c
+> > > @@ -205,6 +205,10 @@ module_param(ple_window_max, uint, 0444);
+> > >   int __read_mostly pt_mode = PT_MODE_SYSTEM;
+> > >   module_param(pt_mode, int, S_IRUGO);
+> > > +/* Default is 0, less than 0 (for example, -1) disables notify window. */
+> > > +static int __read_mostly notify_window;
+> > 
+> > I'm not sure I like the idea of trusting ucode to select an appropriate internal
+> > threshold.  Unless the internal threshold is architecturally defined to be at
+> > least N nanoseconds or whatever, I think KVM should provide its own sane default.
+> > E.g. it's not hard to imagine a scenario where a ucode patch gets rolled out that
+> > adjusts the threshold and starts silently degrading guest performance.
 > 
-> An example output of this looks like (idle 6GB guest, right after boot linux):
+> You mean when internal threshold gets smaller somehow, and cases
+> false-positive that leads unexpected VM exit on normal instruction? In this
+> case, we set increase the vmcs.notify_window in KVM.
+
+Not while VMs are running though.
+
+> I think there is no better to avoid this case if ucode changes internal
+> threshold. Unless KVM's default notify_window is bigger enough.
 > 
-> Rmap_Count:     0       1       2-3     4-7     8-15    16-31   32-63   64-127  128-255 256-511 512-1023
-> Level=4K:       3086676 53045   12330   1272    502     121     76      2       0       0       0
-> Level=2M:       5947    231     0       0       0       0       0       0       0       0       0
-> Level=1G:       32      0       0       0       0       0       0       0       0       0       0
+> > Even if the internal threshold isn't architecturally constrained, it would be very,
+> > very helpful if Intel could publish the per-uarch/stepping thresholds, e.g. to give
+> > us a ballpark idea of how agressive KVM can be before it risks false positives.
 > 
-> Signed-off-by: Peter Xu <peterx@redhat.com>
-> ---
->   arch/x86/kvm/x86.c | 113 +++++++++++++++++++++++++++++++++++++++++++++
->   1 file changed, 113 insertions(+)
+> Even Intel publishes the internal threshold, we still need to provide a
+> final best_value (internal + vmcs.notify_window). Then what's that value?
 
-This should be in debugfs.c, meaning that the kvm_mmu_slot_lpages() must 
-be in a header.  I think mmu.h should do, let me take a look and I can 
-post myself a v4 of these debugfs parts.
+The ideal value would be high enough to guarantee there are zero false positives,
+yet low enough to prevent a malicious guest from causing instability in the host
+by blocking events for an extended duration.  The problem is that there's no
+magic answer for the threshold at which a blocked event would lead to system
+instability, and without at least a general idea of the internal value there's no
+answer at all.
 
-Paolo
+IIRC, SGX instructions have a hard upper bound of 25k cycles before they have to
+check for pending interrupts, e.g. it's why EINIT is interruptible.  The 25k cycle
+limit is likely a good starting point for the combined minimum.  That's why I want
+to know the internal minimum; if the internal minimum is _guaranteed_ to be >25k,
+then KVM can be more aggressive with its default value.
 
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index e44d8f7781b6..0877340dc6ff 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -30,6 +30,7 @@
->   #include "hyperv.h"
->   #include "lapic.h"
->   #include "xen.h"
-> +#include "mmu/mmu_internal.h"
->   
->   #include <linux/clocksource.h>
->   #include <linux/interrupt.h>
-> @@ -59,6 +60,7 @@
->   #include <linux/mem_encrypt.h>
->   #include <linux/entry-kvm.h>
->   #include <linux/suspend.h>
-> +#include <linux/debugfs.h>
->   
->   #include <trace/events/kvm.h>
->   
-> @@ -11193,6 +11195,117 @@ int kvm_arch_post_init_vm(struct kvm *kvm)
->   	return kvm_mmu_post_init_vm(kvm);
->   }
->   
-> +/*
-> + * This covers statistics <1024 (11=log(1024)+1), which should be enough to
-> + * cover RMAP_RECYCLE_THRESHOLD.
-> + */
-> +#define  RMAP_LOG_SIZE  11
-> +
-> +static const char *kvm_lpage_str[KVM_NR_PAGE_SIZES] = { "4K", "2M", "1G" };
-> +
-> +static int kvm_mmu_rmaps_stat_show(struct seq_file *m, void *v)
-> +{
-> +	struct kvm_rmap_head *rmap;
-> +	struct kvm *kvm = m->private;
-> +	struct kvm_memory_slot *slot;
-> +	struct kvm_memslots *slots;
-> +	unsigned int lpage_size, index;
-> +	/* Still small enough to be on the stack */
-> +	unsigned int *log[KVM_NR_PAGE_SIZES], *cur;
-> +	int i, j, k, l, ret;
-> +
-> +	memset(log, 0, sizeof(log));
-> +
-> +	ret = -ENOMEM;
-> +	for (i = 0; i < KVM_NR_PAGE_SIZES; i++) {
-> +		log[i] = kzalloc(RMAP_LOG_SIZE * sizeof(unsigned int), GFP_KERNEL);
-> +		if (!log[i])
-> +			goto out;
-> +	}
-> +
-> +	mutex_lock(&kvm->slots_lock);
-> +	write_lock(&kvm->mmu_lock);
-> +
-> +	for (i = 0; i < KVM_ADDRESS_SPACE_NUM; i++) {
-> +		slots = __kvm_memslots(kvm, i);
-> +		for (j = 0; j < slots->used_slots; j++) {
-> +			slot = &slots->memslots[j];
-> +			for (k = 0; k < KVM_NR_PAGE_SIZES; k++) {
-> +				rmap = slot->arch.rmap[k];
-> +				lpage_size = kvm_mmu_slot_lpages(slot, k + 1);
-> +				cur = log[k];
-> +				for (l = 0; l < lpage_size; l++) {
-> +					index = ffs(pte_list_count(&rmap[l]));
-> +					if (WARN_ON_ONCE(index >= RMAP_LOG_SIZE))
-> +						index = RMAP_LOG_SIZE - 1;
-> +					cur[index]++;
-> +				}
-> +			}
-> +		}
-> +	}
-> +
-> +	write_unlock(&kvm->mmu_lock);
-> +	mutex_unlock(&kvm->slots_lock);
-> +
-> +	/* index=0 counts no rmap; index=1 counts 1 rmap */
-> +	seq_printf(m, "Rmap_Count:\t0\t1\t");
-> +	for (i = 2; i < RMAP_LOG_SIZE; i++) {
-> +		j = 1 << (i - 1);
-> +		k = (1 << i) - 1;
-> +		seq_printf(m, "%d-%d\t", j, k);
-> +	}
-> +	seq_printf(m, "\n");
-> +
-> +	for (i = 0; i < KVM_NR_PAGE_SIZES; i++) {
-> +		seq_printf(m, "Level=%s:\t", kvm_lpage_str[i]);
-> +		cur = log[i];
-> +		for (j = 0; j < RMAP_LOG_SIZE; j++)
-> +			seq_printf(m, "%d\t", cur[j]);
-> +		seq_printf(m, "\n");
-> +	}
-> +
-> +	ret = 0;
-> +out:
-> +	for (i = 0; i < KVM_NR_PAGE_SIZES; i++)
-> +		if (log[i])
-> +			kfree(log[i]);
-> +
-> +	return ret;
-> +}
-> +
-> +static int kvm_mmu_rmaps_stat_open(struct inode *inode, struct file *file)
-> +{
-> +	struct kvm *kvm = inode->i_private;
-> +
-> +	if (!kvm_get_kvm_safe(kvm))
-> +		return -ENOENT;
-> +
-> +	return single_open(file, kvm_mmu_rmaps_stat_show, kvm);
-> +}
-> +
-> +static int kvm_mmu_rmaps_stat_release(struct inode *inode, struct file *file)
-> +{
-> +	struct kvm *kvm = inode->i_private;
-> +
-> +	kvm_put_kvm(kvm);
-> +
-> +	return single_release(inode, file);
-> +}
-> +
-> +static const struct file_operations mmu_rmaps_stat_fops = {
-> +	.open		= kvm_mmu_rmaps_stat_open,
-> +	.read		= seq_read,
-> +	.llseek		= seq_lseek,
-> +	.release	= kvm_mmu_rmaps_stat_release,
-> +};
-> +
-> +int kvm_arch_create_vm_debugfs(struct kvm *kvm)
-> +{
-> +	debugfs_create_file("mmu_rmaps_stat", 0644, kvm->debugfs_dentry, kvm,
-> +			    &mmu_rmaps_stat_fops);
-> +	return 0;
-> +}
-> +
->   static void kvm_unload_vcpu_mmu(struct kvm_vcpu *vcpu)
->   {
->   	vcpu_load(vcpu);
+> If we have an option for final best_value, then I think it's OK to just let
+> vmcs.notify_window = best_value. Then the true final value is best_value +
+> internal.
+>  - if it's a normal instruction, it should finish within best_value or
+> best_value + internal. So it makes no difference.
+>  - if it's an instruction in malicious case, it won't go to next instruction
+> whether wait for best_value or best_value + internal.
+
+...
+
+> > > +
+> > >   	vmcs_write32(PAGE_FAULT_ERROR_CODE_MASK, 0);
+> > >   	vmcs_write32(PAGE_FAULT_ERROR_CODE_MATCH, 0);
+> > >   	vmcs_write32(CR3_TARGET_COUNT, 0);           /* 22.2.1 */
+> > > @@ -5642,6 +5653,31 @@ static int handle_bus_lock_vmexit(struct kvm_vcpu *vcpu)
+> > >   	return 0;
+> > >   }
+> > > +static int handle_notify(struct kvm_vcpu *vcpu)
+> > > +{
+> > > +	unsigned long exit_qual = vmx_get_exit_qual(vcpu);
+> > > +
+> > > +	if (!(exit_qual & NOTIFY_VM_CONTEXT_INVALID)) {
+> > 
+> > What does CONTEXT_INVALID mean?  The ISE doesn't provide any information whatsoever.
 > 
+> It means whether the VM context is corrupted and not valid in the VMCS.
 
+Well that's a bit terrifying.  Under what conditions can the VM context become
+corrupted?  E.g. if the context can be corrupted by an inopportune NOTIFY exit,
+then KVM needs to be ultra conservative as a false positive could be fatal to a
+guest.
