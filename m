@@ -2,128 +2,200 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id F21393DD1D9
-	for <lists+kvm@lfdr.de>; Mon,  2 Aug 2021 10:22:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7A2163DD2D0
+	for <lists+kvm@lfdr.de>; Mon,  2 Aug 2021 11:20:13 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232664AbhHBIW7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 2 Aug 2021 04:22:59 -0400
-Received: from mga18.intel.com ([134.134.136.126]:50020 "EHLO mga18.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S232562AbhHBIW7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 2 Aug 2021 04:22:59 -0400
-X-IronPort-AV: E=McAfee;i="6200,9189,10063"; a="200614779"
-X-IronPort-AV: E=Sophos;i="5.84,288,1620716400"; 
-   d="scan'208";a="200614779"
-Received: from fmsmga003.fm.intel.com ([10.253.24.29])
-  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Aug 2021 01:22:49 -0700
-X-IronPort-AV: E=Sophos;i="5.84,288,1620716400"; 
-   d="scan'208";a="509975082"
-Received: from zengguan-mobl.ccr.corp.intel.com (HELO [10.238.0.133]) ([10.238.0.133])
-  by fmsmga003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Aug 2021 01:22:44 -0700
-Subject: Re: [PATCH 1/6] x86/feat_ctl: Add new VMX feature, Tertiary
- VM-Execution control
+        id S233049AbhHBJUV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 2 Aug 2021 05:20:21 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:20908 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S233022AbhHBJUU (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 2 Aug 2021 05:20:20 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1627896011;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=V5kcFdNRWOiht+T1lIPq+oWf7FIdnNa43xgv94hglac=;
+        b=fKoweC3rX06W7nHTb0hoOiBKggfAjeWthS633dqRhuuryT9R6pAbAkVpMEDEMg78kIPsbJ
+        JEjS056bthAgjz4At8FLl3w8b29r/M6ca4BLMKhg+VknXfdaZOXMZ6OOP0MMu9qKsjZWbo
+        g9Ym/C29SK1g+uWj4llEDsjU+ykdq3Y=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-188-AGFRgZCwNr2HdytgCBED_Q-1; Mon, 02 Aug 2021 05:20:10 -0400
+X-MC-Unique: AGFRgZCwNr2HdytgCBED_Q-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DD6A987D541;
+        Mon,  2 Aug 2021 09:20:07 +0000 (UTC)
+Received: from starship (unknown [10.35.206.50])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id E058D5D6CF;
+        Mon,  2 Aug 2021 09:20:03 +0000 (UTC)
+Message-ID: <599d7449ca94a7ef31b406330bd2bb0ad1870f2b.camel@redhat.com>
+Subject: Re: KVM's support for non default APIC base
+From:   Maxim Levitsky <mlevitsk@redhat.com>
 To:     Sean Christopherson <seanjc@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+Cc:     kvm@vger.kernel.org,
+        "open list:X86 ARCHITECTURE (32-BIT AND 64-BIT)" 
+        <linux-kernel@vger.kernel.org>, Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, Borislav Petkov <bp@alien8.de>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        "Luck, Tony" <tony.luck@intel.com>,
-        Kan Liang <kan.liang@linux.intel.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
         Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Kim Phillips <kim.phillips@amd.com>,
-        Jarkko Sakkinen <jarkko@kernel.org>,
-        Jethro Beekman <jethro@fortanix.com>,
-        "Huang, Kai" <kai.huang@intel.com>,
-        "x86@kernel.org" <x86@kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "Hu, Robert" <robert.hu@intel.com>,
-        "Gao, Chao" <chao.gao@intel.com>,
-        Robert Hoo <robert.hu@linux.intel.com>
-References: <20210716064808.14757-1-guang.zeng@intel.com>
- <20210716064808.14757-2-guang.zeng@intel.com> <YQHr6VvNOQclolfc@google.com>
-From:   Zeng Guang <guang.zeng@intel.com>
-Message-ID: <ad88a2ed-536e-deae-2428-278346a43d30@intel.com>
-Date:   Mon, 2 Aug 2021 16:22:32 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
- Firefox/78.0 Thunderbird/78.12.0
+        "H. Peter Anvin" <hpa@zytor.com>, Ingo Molnar <mingo@redhat.com>,
+        "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>
+Date:   Mon, 02 Aug 2021 12:20:02 +0300
+In-Reply-To: <564fd4461c73a4ec08d68e2364401db981ecba3a.camel@redhat.com>
+References: <20210713142023.106183-1-mlevitsk@redhat.com>
+         <20210713142023.106183-9-mlevitsk@redhat.com>
+         <c51d3f0b46bb3f73d82d66fae92425be76b84a68.camel@redhat.com>
+         <YPXJQxLaJuoF6aXl@google.com>
+         <564fd4461c73a4ec08d68e2364401db981ecba3a.camel@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
 MIME-Version: 1.0
-In-Reply-To: <YQHr6VvNOQclolfc@google.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 7bit
-Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 7/29/2021 7:44 AM, Sean Christopherson wrote:
-> On Fri, Jul 16, 2021, Zeng Guang wrote:
->> From: Robert Hoo <robert.hu@linux.intel.com>
->>
->> New VMX capability MSR IA32_VMX_PROCBASED_CTLS3 conresponse to this new
->> VM-Execution control field. And it is 64bit allow-1 semantics, not like
->> previous capability MSRs 32bit allow-0 and 32bit allow-1. So with Tertiary
->> VM-Execution control field introduced, 2 vmx_feature leaves are introduced,
->> TERTIARY_CTLS_LOW and TERTIARY_CTLS_HIGH.
-> ...
->
->>   /*
->>    * Note: If the comment begins with a quoted string, that string is used
->> @@ -43,6 +43,7 @@
->>   #define VMX_FEATURE_RDTSC_EXITING	( 1*32+ 12) /* "" VM-Exit on RDTSC */
->>   #define VMX_FEATURE_CR3_LOAD_EXITING	( 1*32+ 15) /* "" VM-Exit on writes to CR3 */
->>   #define VMX_FEATURE_CR3_STORE_EXITING	( 1*32+ 16) /* "" VM-Exit on reads from CR3 */
->> +#define VMX_FEATURE_TER_CONTROLS	(1*32 + 17) /* "" Enable Tertiary VM-Execution Controls */
-> Maybe spell out TERTIARY?   SEC_CONTROLS is at least somewhat guessable, I doubt
-> TERTIARY is the first thing that comes to mind for most people when seeing "TER" :-)
-Agree. TERTIARY could be readable without any confusion.
->>   #define VMX_FEATURE_CR8_LOAD_EXITING	( 1*32+ 19) /* "" VM-Exit on writes to CR8 */
->>   #define VMX_FEATURE_CR8_STORE_EXITING	( 1*32+ 20) /* "" VM-Exit on reads from CR8 */
->>   #define VMX_FEATURE_VIRTUAL_TPR		( 1*32+ 21) /* "vtpr" TPR virtualization, a.k.a. TPR shadow */
->> diff --git a/arch/x86/kernel/cpu/feat_ctl.c b/arch/x86/kernel/cpu/feat_ctl.c
->> index da696eb4821a..2e0272d127e4 100644
->> --- a/arch/x86/kernel/cpu/feat_ctl.c
->> +++ b/arch/x86/kernel/cpu/feat_ctl.c
->> @@ -15,6 +15,8 @@ enum vmx_feature_leafs {
->>   	MISC_FEATURES = 0,
->>   	PRIMARY_CTLS,
->>   	SECONDARY_CTLS,
->> +	TERTIARY_CTLS_LOW,
->> +	TERTIARY_CTLS_HIGH,
->>   	NR_VMX_FEATURE_WORDS,
->>   };
->>   
->> @@ -42,6 +44,13 @@ static void init_vmx_capabilities(struct cpuinfo_x86 *c)
->>   	rdmsr_safe(MSR_IA32_VMX_PROCBASED_CTLS2, &ign, &supported);
->>   	c->vmx_capability[SECONDARY_CTLS] = supported;
->>   
->> +	/*
->> +	 * For tertiary execution controls MSR, it's actually a 64bit allowed-1.
->> +	 */
->> +	rdmsr_safe(MSR_IA32_VMX_PROCBASED_CTLS3, &ign, &supported);
->> +	c->vmx_capability[TERTIARY_CTLS_LOW] = ign;
->> +	c->vmx_capability[TERTIARY_CTLS_HIGH] = supported;
-> Assuming only the lower 32 bits are going to be used for the near future (next
-> few years), what about defining just TERTIARY_CTLS_LOW and then doing:
->
-> 	/*
-> 	 * Tertiary controls are 64-bit allowed-1, so unlikely other MSRs, the
-> 	 * upper bits are ignored (because they're not used, yet...).
-> 	 */
-> 	rdmsr_safe(MSR_IA32_VMX_PROCBASED_CTLS3, &supported, &ign);
-> 	c->vmx_capability[TERTIARY_CTLS_LOW] = supported;
->
-> I.e. punt the ugliness issue down the road a few years.
-Prefer to keep it complete, and use new variables like low/high 
-consistent with its function meaning. Ok for that ?
->> +
->>   	rdmsr(MSR_IA32_VMX_PINBASED_CTLS, ign, supported);
->>   	rdmsr_safe(MSR_IA32_VMX_VMFUNC, &ign, &funcs);
->>   
->> -- 
->> 2.25.1
->>
+On Thu, 2021-07-22 at 12:12 +0300, Maxim Levitsky wrote:
+> On Mon, 2021-07-19 at 18:49 +0000, Sean Christopherson wrote:
+> > On Sun, Jul 18, 2021, Maxim Levitsky wrote:
+> > > I am more inclined to fix this by just tracking if we hold the srcu
+> > > lock on each VCPU manually, just as we track the srcu index anyway,
+> > > and then kvm_request_apicv_update can use this to drop the srcu
+> > > lock when needed.
+> > 
+> > The entire approach of dynamically adding/removing the memslot seems doomed to
+> > failure, and is likely responsible for the performance issues with AVIC, e.g. a
+> > single vCPU temporarily inhibiting AVIC will zap all SPTEs _twice_; on disable
+> > and again on re-enable.
+> > 
+> > Rather than pile on more gunk, what about special casing the APIC access page
+> > memslot in try_async_pf()?  E.g. zap the GFN in avic_update_access_page() when
+> > disabling (and bounce through kvm_{inc,dec}_notifier_count()), and have the page
+> > fault path skip directly to MMIO emulation without caching the MMIO info.  It'd
+> > also give us a good excuse to rename try_async_pf() :-)
+> > 
+> > If lack of MMIO caching is a performance problem, an alternative solution would
+> > be to allow caching but add a helper to zap the MMIO SPTE and request all vCPUs to
+> > clear their cache.
+> > 
+> > It's all a bit gross, especially hijacking the mmu_notifier path, but IMO it'd be
+> > less awful than the current memslot+SRCU mess
+> 
+> Hi Sean, Paolo and everyone else:
+> 
+> I am exploring the approach that you proposed and I noticed that we have very inconsistient
+> code that handles the APIC base relocation for in-kernel local apic.
+> I do know that APIC base relocation is not supported, and I don't have anything against
+> this as long as VMs don't use that feature, but I do want this to be consistent.
+> 
+> I did a study of the code that is involved in this mess and I would like to hear your opinion:
+> 
+> There are basically 3 modes of operation of in kernel local apic:
+> 
+> Regular unaccelerated local apic:
+> 
+> -> APIC MMIO base address is stored at 'apic->base_address', and updated in 
+>    kvm_lapic_set_base which is called from  msr write of 'MSR_IA32_APICBASE'
+>    (both by SVM and VMX).
+>    The value is even migrated.
+> 
+> -> APIC mmio read/write is done from MMU, when we access MMIO page:
+> 	vcpu_mmio_write always calls apic_mmio_write which checks if the write is in 
+> 	apic->base_address page and if so forwards the write local apic with offset
+> 	in this page.
+> 
+> -> APIC MMIO area has to be MMIO for 'apic_mmio_write' to be called,
+>    thus must contain no guest memslots.
+>    If the guest relocates the APIC base somewhere where we have a memslot, 
+>    memslot will take priority, while on real hardware, LAPIC is likely to
+>    take priority.
+> 
+> APICv:
+> 
+> -> The default apic MMIO base (0xfee00000) is covered by a dummy page which is
+>    allocated from qemu's process  using __x86_set_memory_region.
+>    
+>    This is done once in alloc_apic_access_page which is called on vcpu creation,
+>    (but only once when the memslot is not yet enabled)
+> 
+> -> to avoid pinning this page into qemu's memory, reference to it
+>    is dropped in alloc_apic_access_page.
+>    (see commit c24ae0dcd3e8695efa43e71704d1fc4bc7e29e9b)
+> 
+> -> kvm_arch_mmu_notifier_invalidate_range -> checks if we invalidate GPA 0xfee00000 
+>    and if so, raises KVM_REQ_APIC_PAGE_RELOAD request.
+> 
+> -> kvm_vcpu_reload_apic_access_page handles the KVM_REQ_APIC_PAGE_RELOAD request by calling
+>    kvm_x86_ops.set_apic_access_page_addr which is only implemented on VMX
+>    (vmx_set_apic_access_page_addr)
+> 
+> -> vmx_set_apic_access_page_addr does gfn_to_page on 0xfee00000 GPA,
+>    and if the result is valid, writes the physical address of this page to APIC_ACCESS_ADDR vmcs field.
+> 
+>    (This is a major difference from the AVIC - AVIC's avic_vapic_bar is *GPA*, while APIC_ACCESS_ADDR
+>    is host physical address which the hypervisor is supposed to map at APIC MMIO GPA using EPT)
+> 
+>    Note that if we have an error here, we might end with invalid APIC_ACCESS_ADDR field.
+> 
+> -> writes to the  HPA of that special page (which has GPA of 0xfee00000, and mapped via EPT) go to
+>    APICv or cause special VM exits: (EXIT_REASON_APIC_ACCESS, EXIT_REASON_APIC_WRITE)
+> 
+>    * EXIT_REASON_APIC_ACCESS (which is used for older limited 'flexpriotiy' mode which only emulates TPR practically) 
+>      actually emulates the instruction to know the written value,
+>      but we have a special case in vcpu_is_mmio_gpa which makes the emulation treat the access to the default
+>      apic base as MMIO.
+>    
+>    * EXIT_REASON_APIC_WRITE is a trap VMexit which comes with full APICv, and since it also has offset
+>      qualification and the value is already in the apic page, this info is just passed to kvm_lapic_reg_write
+> 
+> 
+> -> If APIC base is relocated, the APICv isn't aware of it, and the writes to new APIC base,
+>    (assuming that we have no memslots covering it) will go through standard APIC MMIO emulation,
+>    and *might* create a mess.
+> 
+> AVIC:
+> 
+> -> The default apic MMIO base (0xfee00000) 
+>    is also covered by a dummy page which is allocated from qemu's process using __x86_set_memory_region 
+>    in avic_update_access_page which is called also on vcpu creation (also only once),
+>    and from SVM's dynamic AVIC inhibition.
+> 
+> -> The reference to this page is not dropped thus there is no KVM_REQ_APIC_PAGE_RELOAD handler.
+>    I think we should do the same we do for APICv here?
+> 
+> -> avic_vapic_bar is GPA and thus contains 0xfee00000 but writes to MSR_IA32_APICBASE do update it
+>    (avic_update_vapic_bar which is called from MSR_IA32_APICBASE write in SVM code)
+> 
+>    thus if the guest relocates the APIC base to a writable memory page, actually AVIC would happen to work.
+>    (opposite from the stock xAPIC handlilng, which only works when apic base is in MMIO area.)
+> 
+> -> writes to the GPA in avic_vapic_bar are first checked in NPT (but HPA written there ignored),
+>    and then either go to AVIC or cause SVM_EXIT_AVIC_UNACCELERATED_ACCESS which has offset of the write
+>    in the exit_info_1
+>    (there is also SVM_EXIT_AVIC_INCOMPLETE_IPI which is called on some ICR writes)
+> 
+> 
+> As far as I know the only good reason to relocate APIC base is to access it from the real mode
+> which is not something that is done these days by modern BIOSes.
+> 
+> I vote to make it read only (#GP on MSR_IA32_APICBASE write when non default base is set and apic enabled) 
+> and remove all remains of the support for variable APIC base.
+> (we already have a warning when APIC base is set to non default value)
+> 
+> 
+> Best regards,
+> 	Maxim Levitsky
+> 
+Ping.
+
+Best regards,
+	Maxim Levitsky
+
