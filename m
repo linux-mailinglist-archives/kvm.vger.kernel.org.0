@@ -2,79 +2,80 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4E2CC3DDDC4
-	for <lists+kvm@lfdr.de>; Mon,  2 Aug 2021 18:34:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 989AF3DDDD5
+	for <lists+kvm@lfdr.de>; Mon,  2 Aug 2021 18:38:58 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232390AbhHBQez (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 2 Aug 2021 12:34:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52608 "EHLO
+        id S230224AbhHBQjG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 2 Aug 2021 12:39:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53664 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229622AbhHBQey (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 2 Aug 2021 12:34:54 -0400
-Received: from mail-pl1-x633.google.com (mail-pl1-x633.google.com [IPv6:2607:f8b0:4864:20::633])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2854FC06175F
-        for <kvm@vger.kernel.org>; Mon,  2 Aug 2021 09:34:45 -0700 (PDT)
-Received: by mail-pl1-x633.google.com with SMTP id u2so11989915plg.10
-        for <kvm@vger.kernel.org>; Mon, 02 Aug 2021 09:34:45 -0700 (PDT)
+        with ESMTP id S229612AbhHBQjG (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 2 Aug 2021 12:39:06 -0400
+Received: from mail-pj1-x1030.google.com (mail-pj1-x1030.google.com [IPv6:2607:f8b0:4864:20::1030])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CDA15C06175F
+        for <kvm@vger.kernel.org>; Mon,  2 Aug 2021 09:38:56 -0700 (PDT)
+Received: by mail-pj1-x1030.google.com with SMTP id k4-20020a17090a5144b02901731c776526so32494818pjm.4
+        for <kvm@vger.kernel.org>; Mon, 02 Aug 2021 09:38:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=Bi/McSu5rgZjmipTgVgtwGrGIXFV7d2s60lhYfXtq4A=;
-        b=PzbR0unERo1CF0c0AfA9crVsGVDdY3Wo/wAR64t4ZgUg+sOWeA2pgEw02YuXGvquD9
-         1bHZS+HAf4fKXaUtlyWup+ZoP2BHo3ZRGjjZfKmcZqkn37ZuRjh2VarLUNTSHdlseUWU
-         phDkzz2Wx1/tBKAQptRd2gOrR+yGCgSf/vg+ShtMKU8kSDIDS4+jUa3kw5R5UH81q1gT
-         CfgoCGug+Ru9HkRUw76YjqQ+D/Pp27KK6TNELnH6rN/m0e6PUA0ns7gtykL+1ffJAH3Y
-         +ZECiy3IUrlsxVFXypQfbHQiaYIsgTFKDEVtkpXFvxA976kztsZUSBt8wmnTEvwmDai6
-         hIBA==
+        bh=lQAu3LqRARD7V8wp5wecoxa4nteJQMRA6MuSVLanmJ8=;
+        b=g+QN9XxtcL7712bfnob7k9h5VQElwSt9LlezSJ34ETCCmRVRzif+mY8hdSGNEcBell
+         tPLeAsg/py78/PECQOIM+OUqBDYosOnU5IwtdsPuIEIHB59TN1WxTyAlb0tQIpOezkru
+         2iPw2wrbIRRcPGT+DIC4fDTRQtG0IJy+d95X6FlNwGdH/oPQQOlIsP341IgJS8dxUyXS
+         tXk77RuZkoPLgtMMy+wfn8zZXcPvOGzTsC8w7H6y5JLysngdgaVAfXyk/7Zrj5A4ntQy
+         fCgv5PWzTpCumUGUqHJHeyjcD2/sGLipqjOxsaygpKGGcU52MM1KSKb1T3U/4xrTYPvs
+         HyJQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=Bi/McSu5rgZjmipTgVgtwGrGIXFV7d2s60lhYfXtq4A=;
-        b=TCA/uRkM+UAvulGPF0V6uUzie/CSVx5drzU+WoWkmNTgB/AGodtgtNSsV+1w0k/dtn
-         36SPLqoK7CMyirqjdqvBfx6KP0th6U04lPjfXHVYTh7bu8OQec6MkHMxuwa6T3VuuEW+
-         vZc6TFQWAPsur6V030xL9jevaIDPn74Ip0D8leydSzYbg9d99uwh6rKzc5G072+VRIr/
-         9/TE4A7kSTNNI7vYfMAHiFxEEC48Sr/se5hQzpUkZUw2zpHanEZJKZdU0Gy1RxJlIIbw
-         LI3oiiuKa16PEZvPYRgWR5z6Vr5bStFS7XJSQE1I7PGKHnGjbDZ29g5/u1JkKDnjB5VL
-         MzXQ==
-X-Gm-Message-State: AOAM531xi9qp+6HyfBGSg4TRoga9mYfFuuMVlMOvEpegw4gmKH4Fm7Lt
-        LX4NbYj7nRUCfcrP9hMVJBEwBw==
-X-Google-Smtp-Source: ABdhPJwkfRTKlBoRj36phE//kPga1bZX9wIU7av/sKd7AR0P7bD8iviOqI60Ppq2BrFYETKIbdO8WQ==
-X-Received: by 2002:aa7:90c8:0:b029:32c:935f:de5f with SMTP id k8-20020aa790c80000b029032c935fde5fmr17660349pfk.79.1627922084544;
-        Mon, 02 Aug 2021 09:34:44 -0700 (PDT)
+        bh=lQAu3LqRARD7V8wp5wecoxa4nteJQMRA6MuSVLanmJ8=;
+        b=E3mDMmFI4gvSY37Trj6DeLPxww8i+RrKHCK5hZVDWF1SRchJO1GG+CjKpRWm1hqy9o
+         KgShKLYd9WaRYsBFJD4BQEBZXxiWeiXm21t6tLEF/1aW+y/2dZ0vK2Ogxxku9+q1p/ZR
+         OkBeyftyQzy2fDXWV9BNDpsKya2uxtH1sy/AYguymYLZEf9QaS34uy9FZH93v2kBlnYh
+         slrIjTOzUagNMqCYFVJIXSc5rRxDYcRy/04zPIBAFXQ1EFBnvSb0yGiACJcbTf+zXRoy
+         aHDh+yWNcLQ1EpIS6F4Q70+6MoZ3yKxx9bFRvHEh43Z4tGm3DSGbWvG2GswFEoum8SOk
+         wiJA==
+X-Gm-Message-State: AOAM532swW8mrsxwcTUUO5ewa62IPF4RKsw4ng00TIh40iT8QPouX379
+        +7SOoY2gYGo+nP8fsAeJxOLRWIekry+0lQ==
+X-Google-Smtp-Source: ABdhPJxBhZyl0GpAKdf+wrSeD2Qv5y4p3Gh1wke8fQlzxRZ/T6xEEiMac3VFTpYwsnOrihcA97wN7Q==
+X-Received: by 2002:a63:6f8c:: with SMTP id k134mr203335pgc.35.1627922336232;
+        Mon, 02 Aug 2021 09:38:56 -0700 (PDT)
 Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id l11sm13097806pfd.187.2021.08.02.09.34.43
+        by smtp.gmail.com with ESMTPSA id j13sm375248pjl.1.2021.08.02.09.38.55
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 02 Aug 2021 09:34:44 -0700 (PDT)
-Date:   Mon, 2 Aug 2021 16:34:40 +0000
+        Mon, 02 Aug 2021 09:38:55 -0700 (PDT)
+Date:   Mon, 2 Aug 2021 16:38:52 +0000
 From:   Sean Christopherson <seanjc@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Krish Sadhukhan <krish.sadhukhan@oracle.com>, kvm@vger.kernel.org,
-        jmattson@google.com, vkuznets@redhat.com, wanpengli@tencent.com,
-        joro@8bytes.org
-Subject: Re: [PATCH] KVM: nVMX: nSVM: Show guest mode in kvm_{entry,exit}
- tracepoints
-Message-ID: <YQgeoOpaHGBDW49Z@google.com>
-References: <20210621204345.124480-1-krish.sadhukhan@oracle.com>
- <20210621204345.124480-2-krish.sadhukhan@oracle.com>
- <ac5d0cb7-9955-0482-33ee-cf06bb55db7a@redhat.com>
+To:     David Matlack <dmatlack@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+        Ben Gardon <bgardon@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Jim Mattson <jmattson@google.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Junaid Shahid <junaids@google.com>,
+        Andrew Jones <drjones@redhat.com>
+Subject: Re: [PATCH 1/6] KVM: Cache the least recently used slot index per
+ vCPU
+Message-ID: <YQgfnE7fM7VW2+N7@google.com>
+References: <20210730223707.4083785-1-dmatlack@google.com>
+ <20210730223707.4083785-2-dmatlack@google.com>
+ <b87b9f52-b763-856f-16f0-ecb668ba22c1@redhat.com>
+ <YQgdA6Blu4vYToLM@google.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <ac5d0cb7-9955-0482-33ee-cf06bb55db7a@redhat.com>
+In-Reply-To: <YQgdA6Blu4vYToLM@google.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Aug 02, 2021, Paolo Bonzini wrote:
-> On 21/06/21 22:43, Krish Sadhukhan wrote:
-> > With this patch KVM entry and exit tracepoints will
-> > show "guest_mode = 0" if it is a guest and "guest_mode = 1" if it is a
-> > nested guest.
-> 
-> What about adding a "(nested)" suffix for L2, and nothing for L1?
+On Mon, Aug 02, 2021, David Matlack wrote:
+> I'll include a patch in v2 to fix the name of the existing lru_slot to
+> something like mru_slot or last_used_slot.
 
-That'd work too, though it would be nice to get vmcx12 printed as well so that
-it would be possible to determine which L2 is running without having to cross-
-reference other tracepoints.
+I vote for last_used_slot, "mru" isn't exactly a common acronym, and the "mr" part
+could easily be misinterpreted as Memory Region.
