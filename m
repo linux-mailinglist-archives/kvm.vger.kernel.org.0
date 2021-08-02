@@ -2,56 +2,55 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 490E13DE012
-	for <lists+kvm@lfdr.de>; Mon,  2 Aug 2021 21:28:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BFBE23DE00E
+	for <lists+kvm@lfdr.de>; Mon,  2 Aug 2021 21:28:19 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231430AbhHBT22 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 2 Aug 2021 15:28:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39518 "EHLO
+        id S231186AbhHBT21 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 2 Aug 2021 15:28:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39516 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231231AbhHBT20 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S231199AbhHBT20 (ORCPT <rfc822;kvm@vger.kernel.org>);
         Mon, 2 Aug 2021 15:28:26 -0400
-Received: from mail-il1-x149.google.com (mail-il1-x149.google.com [IPv6:2607:f8b0:4864:20::149])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 283D4C061760
-        for <kvm@vger.kernel.org>; Mon,  2 Aug 2021 12:28:16 -0700 (PDT)
-Received: by mail-il1-x149.google.com with SMTP id h17-20020a92d0910000b029020269661e11so8883921ilh.13
-        for <kvm@vger.kernel.org>; Mon, 02 Aug 2021 12:28:16 -0700 (PDT)
+Received: from mail-io1-xd49.google.com (mail-io1-xd49.google.com [IPv6:2607:f8b0:4864:20::d49])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2AB70C06175F
+        for <kvm@vger.kernel.org>; Mon,  2 Aug 2021 12:28:17 -0700 (PDT)
+Received: by mail-io1-xd49.google.com with SMTP id h70-20020a6bb7490000b02904f7957d92b5so12318056iof.21
+        for <kvm@vger.kernel.org>; Mon, 02 Aug 2021 12:28:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=date:in-reply-to:message-id:mime-version:references:subject:from:to
          :cc;
-        bh=OUDEC1vqPr7sdUdf2B7zr2nu10+QX6s5o8FUl8jn128=;
-        b=UGdnaf0Z5zkw/NSqrI8i5gZcNR0jvyngA3yzdo3qsADSiJEY6hBCd+mpE/zuWfHHRK
-         1uu3eDJRyuFQ2ZFJORG7LWmLah5k/+OgglzudgvK4iTfUlNbWqThqIgSaY5vTYXHBOHe
-         VSNGHmflOtl8HILOX35h8lv6KZ27Eg6gCVfW1TSSp6TuuN0kIBefed3k0k+pTHI93Ppj
-         /YVEfDB/dDnXAWmDJXHRiBWcrGjzys2+pKWHoje00bxlY+OaXkMAzjZqwCsOcjlMqaYu
-         sSnh4SFsoRSWsaWU93DH+gz+BGSC54rKvFG6GeqZJVeELDYvCIyKollPVH04QqV4NaTI
-         88sQ==
+        bh=jx0kExs6wdQ4eyF+O8UZpjg55SHP0x/R47RYe4pO1Jg=;
+        b=cnlnmm5jEcaX+8zW+WSejkVKj0nduwLltebT/qMtowaGCR+RHiHpBF/VdhhDT/Dtlq
+         hdCvXd1HKtznA+2bWaWmZjX9fDY+VZnLTDnoWRpoJLt+CLD5HBQ1qeq9a24998lbwwGG
+         XINPu6/m86yqEfenasB0uNWBtKwmdk1StlA8Kh6fvPSFY436m1Dx9ZvhB1cVoHPdY4QA
+         J0BZyEP4DVP3GHIZK2GEyzOBo596dfU7U7PvH1hqzc9g+fyPi4oH9XJcWDNi7aKWtzpJ
+         0fYZ1L5RsprfPc9XNpWjZC1cFy1+d01JC6jNyWRLyOLTJHhqX59EM1tKbveG66fhI5yY
+         Bn4A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=OUDEC1vqPr7sdUdf2B7zr2nu10+QX6s5o8FUl8jn128=;
-        b=jwjoUdSOyrNHsGnvPjwpblWBffX5eXVXoD05cmqfnLpWATMtVOFEFBKmvc2p1OxIfZ
-         3wTHuhizqOC3px+B5iwnd3kWh+HgIApVhmjigBTXy6jIQyZv5mZYepkxXM40yiJHvKwD
-         c32XD5VV2VaiJA3EPPjdvbCRnGoFZ9V0JEethgDpkA1yMazzQVYZX+K8sJKS/IecYFQI
-         l5zNvVu5XbuBIplH4niE2LVXrquhv5+pss3xZgcBANVcyjDah+ueJbq4Xxy/bgvUICuq
-         TAS4Dq+9gpWo9Q79o6yZhdDepD3BQQ49QSeRphmv5ypRYrCaS3DMyR9AYkKqMg8iVf0F
-         hsFQ==
-X-Gm-Message-State: AOAM533UX6vDuSLxd5IYwWmi1/AdR3IMRZdDC/084WpdSdumFrCYLxKn
-        E5GMX7rdBJzsvv1PP/Acl8Yn8+kTojY=
-X-Google-Smtp-Source: ABdhPJw9BuQeA1J7hyFa/wKhd4oWSoC8qIUMN6Ku6i73EKILJHTfLU4lRZ39Qjqel47OyIbrpzh0uk5O0G4=
+        bh=jx0kExs6wdQ4eyF+O8UZpjg55SHP0x/R47RYe4pO1Jg=;
+        b=Q56iMDB1+HQtaLBiM6ANYA9eVcecbVcp6PMwiw+JjpOn08vCLjhxHt8Y8oxYo/MzHg
+         dPH8kO0UZ1tVJuOPYhNguUDFkl2TyG27QotJFlysDf15CDuqDngIK6Fo8REG/HgmENLh
+         UKAkKU0/ArVxF2yCL5oe6nOc6CYPTjbrlMMma4Tu7Ie+mqe6hXlEzm828lAyZ1w3Ym1U
+         ZNoENg8vTlURVwEjt7VF+XqBznZy4c/Vt7DpmUUBURB94mzNFjQcxQ/VMs4OFLVdQZiI
+         s905lUXuVqbIaO1JC0ZhKkf37iPM3PZXsr459HE7u0M4vGGrW8LFOZfNZNAiDCPMM1B8
+         yN9Q==
+X-Gm-Message-State: AOAM53397Fh3U3NUssoyPXZT7GobLyBWeIFU3TL4mbIw0Wf0Ky8IEshc
+        YSGueE+7SuHYBD22rlqCB/tbzHesL4E=
+X-Google-Smtp-Source: ABdhPJzTnJVyWDVmpRbXbEdCYT1hqJ9Qs+9K/AwtglpDZFmw11pNZLaqhv7TtM62mzN8+d7RPIBMwsUg3V8=
 X-Received: from oupton.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:404])
- (user=oupton job=sendgmr) by 2002:a05:6602:3404:: with SMTP id
- n4mr724981ioz.31.1627932495517; Mon, 02 Aug 2021 12:28:15 -0700 (PDT)
-Date:   Mon,  2 Aug 2021 19:28:08 +0000
+ (user=oupton job=sendgmr) by 2002:a02:8206:: with SMTP id o6mr16038436jag.92.1627932496528;
+ Mon, 02 Aug 2021 12:28:16 -0700 (PDT)
+Date:   Mon,  2 Aug 2021 19:28:09 +0000
 In-Reply-To: <20210802192809.1851010-1-oupton@google.com>
-Message-Id: <20210802192809.1851010-3-oupton@google.com>
+Message-Id: <20210802192809.1851010-4-oupton@google.com>
 Mime-Version: 1.0
 References: <20210802192809.1851010-1-oupton@google.com>
 X-Mailer: git-send-email 2.32.0.554.ge1b32706d8-goog
-Subject: [PATCH v3 2/3] entry: KVM: Allow use of generic KVM entry w/o full
- generic support
+Subject: [PATCH v3 3/3] KVM: arm64: Use generic KVM xfer to guest work function
 From:   Oliver Upton <oupton@google.com>
 To:     kvmarm@lists.cs.columbia.edu
 Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
@@ -75,36 +74,141 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Some architectures (e.g. arm64) have yet to adopt the generic entry
-infrastructure. Despite that, it would be nice to use some common
-plumbing for guest entry/exit handling. For example, KVM/arm64 currently
-does not handle TIF_NOTIFY_PENDING correctly.
+Clean up handling of checks for pending work by switching to the generic
+infrastructure to do so.
 
-Allow use of only the generic KVM entry code by tightening up the
-include list. No functional change intended.
+We pick up handling for TIF_NOTIFY_RESUME from this switch, meaning that
+task work will be correctly handled.
 
 Signed-off-by: Oliver Upton <oupton@google.com>
 ---
- include/linux/entry-kvm.h | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
+ arch/arm64/kvm/Kconfig |  1 +
+ arch/arm64/kvm/arm.c   | 72 ++++++++++++++++++++++++++----------------
+ 2 files changed, 45 insertions(+), 28 deletions(-)
 
-diff --git a/include/linux/entry-kvm.h b/include/linux/entry-kvm.h
-index 136b8d97d8c0..0d7865a0731c 100644
---- a/include/linux/entry-kvm.h
-+++ b/include/linux/entry-kvm.h
-@@ -2,7 +2,11 @@
- #ifndef __LINUX_ENTRYKVM_H
- #define __LINUX_ENTRYKVM_H
+diff --git a/arch/arm64/kvm/Kconfig b/arch/arm64/kvm/Kconfig
+index a4eba0908bfa..8bc1fac5fa26 100644
+--- a/arch/arm64/kvm/Kconfig
++++ b/arch/arm64/kvm/Kconfig
+@@ -26,6 +26,7 @@ menuconfig KVM
+ 	select HAVE_KVM_ARCH_TLB_FLUSH_ALL
+ 	select KVM_MMIO
+ 	select KVM_GENERIC_DIRTYLOG_READ_PROTECT
++	select KVM_XFER_TO_GUEST_WORK
+ 	select SRCU
+ 	select KVM_VFIO
+ 	select HAVE_KVM_EVENTFD
+diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+index 60d0a546d7fd..8245efc6e88f 100644
+--- a/arch/arm64/kvm/arm.c
++++ b/arch/arm64/kvm/arm.c
+@@ -6,6 +6,7 @@
  
--#include <linux/entry-common.h>
-+#include <linux/static_call_types.h>
-+#include <linux/tracehook.h>
-+#include <linux/syscalls.h>
-+#include <linux/seccomp.h>
-+#include <linux/sched.h>
- #include <linux/tick.h>
+ #include <linux/bug.h>
+ #include <linux/cpu_pm.h>
++#include <linux/entry-kvm.h>
+ #include <linux/errno.h>
+ #include <linux/err.h>
+ #include <linux/kvm_host.h>
+@@ -714,6 +715,45 @@ static bool vcpu_mode_is_bad_32bit(struct kvm_vcpu *vcpu)
+ 		static_branch_unlikely(&arm64_mismatched_32bit_el0);
+ }
  
- /* Transfer to guest mode work */
++/**
++ * kvm_vcpu_exit_request - returns true if the VCPU should *not* enter the guest
++ * @vcpu:	The VCPU pointer
++ * @ret:	Pointer to write optional return code
++ *
++ * Returns: true if the VCPU needs to return to a preemptible + interruptible
++ *	    and skip guest entry.
++ *
++ * This function disambiguates between two different types of exits: exits to a
++ * preemptible + interruptible kernel context and exits to userspace. For an
++ * exit to userspace, this function will write the return code to ret and return
++ * true. For an exit to preemptible + interruptible kernel context (i.e. check
++ * for pending work and re-enter), return true without writing to ret.
++ */
++static bool kvm_vcpu_exit_request(struct kvm_vcpu *vcpu, int *ret)
++{
++	struct kvm_run *run = vcpu->run;
++
++	/*
++	 * If we're using a userspace irqchip, then check if we need
++	 * to tell a userspace irqchip about timer or PMU level
++	 * changes and if so, exit to userspace (the actual level
++	 * state gets updated in kvm_timer_update_run and
++	 * kvm_pmu_update_run below).
++	 */
++	if (static_branch_unlikely(&userspace_irqchip_in_use)) {
++		if (kvm_timer_should_notify_user(vcpu) ||
++		    kvm_pmu_should_notify_user(vcpu)) {
++			*ret = -EINTR;
++			run->exit_reason = KVM_EXIT_INTR;
++			return true;
++		}
++	}
++
++	return kvm_request_pending(vcpu) ||
++			need_new_vmid_gen(&vcpu->arch.hw_mmu->vmid) ||
++			xfer_to_guest_mode_work_pending();
++}
++
+ /**
+  * kvm_arch_vcpu_ioctl_run - the main VCPU run function to execute guest code
+  * @vcpu:	The VCPU pointer
+@@ -757,7 +797,9 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
+ 		/*
+ 		 * Check conditions before entering the guest
+ 		 */
+-		cond_resched();
++		ret = xfer_to_guest_mode_handle_work(vcpu);
++		if (!ret)
++			ret = 1;
+ 
+ 		update_vmid(&vcpu->arch.hw_mmu->vmid);
+ 
+@@ -776,31 +818,6 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
+ 
+ 		kvm_vgic_flush_hwstate(vcpu);
+ 
+-		/*
+-		 * Exit if we have a signal pending so that we can deliver the
+-		 * signal to user space.
+-		 */
+-		if (signal_pending(current)) {
+-			ret = -EINTR;
+-			run->exit_reason = KVM_EXIT_INTR;
+-			++vcpu->stat.signal_exits;
+-		}
+-
+-		/*
+-		 * If we're using a userspace irqchip, then check if we need
+-		 * to tell a userspace irqchip about timer or PMU level
+-		 * changes and if so, exit to userspace (the actual level
+-		 * state gets updated in kvm_timer_update_run and
+-		 * kvm_pmu_update_run below).
+-		 */
+-		if (static_branch_unlikely(&userspace_irqchip_in_use)) {
+-			if (kvm_timer_should_notify_user(vcpu) ||
+-			    kvm_pmu_should_notify_user(vcpu)) {
+-				ret = -EINTR;
+-				run->exit_reason = KVM_EXIT_INTR;
+-			}
+-		}
+-
+ 		/*
+ 		 * Ensure we set mode to IN_GUEST_MODE after we disable
+ 		 * interrupts and before the final VCPU requests check.
+@@ -809,8 +826,7 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
+ 		 */
+ 		smp_store_mb(vcpu->mode, IN_GUEST_MODE);
+ 
+-		if (ret <= 0 || need_new_vmid_gen(&vcpu->arch.hw_mmu->vmid) ||
+-		    kvm_request_pending(vcpu)) {
++		if (ret <= 0 || kvm_vcpu_exit_request(vcpu, &ret)) {
+ 			vcpu->mode = OUTSIDE_GUEST_MODE;
+ 			isb(); /* Ensure work in x_flush_hwstate is committed */
+ 			kvm_pmu_sync_hwstate(vcpu);
 -- 
 2.32.0.554.ge1b32706d8-goog
 
