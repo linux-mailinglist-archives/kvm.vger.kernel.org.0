@@ -2,54 +2,29 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0CDA03DD6A8
-	for <lists+kvm@lfdr.de>; Mon,  2 Aug 2021 15:11:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 636C23DD6DC
+	for <lists+kvm@lfdr.de>; Mon,  2 Aug 2021 15:20:47 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233983AbhHBNLd (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 2 Aug 2021 09:11:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57426 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234111AbhHBNL1 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 2 Aug 2021 09:11:27 -0400
-Received: from mail-wm1-x336.google.com (mail-wm1-x336.google.com [IPv6:2a00:1450:4864:20::336])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5C102C061381
-        for <kvm@vger.kernel.org>; Mon,  2 Aug 2021 06:11:13 -0700 (PDT)
-Received: by mail-wm1-x336.google.com with SMTP id u15so10390072wmj.1
-        for <kvm@vger.kernel.org>; Mon, 02 Aug 2021 06:11:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=Y+0uaIcI0mf0ejSXXUrubCKbBMCdNsNKojVgct2vGJc=;
-        b=byi63PIOkTLrQ3+UVW6t6Nu8bIplNFnTeI8Al2gNkJj/Ntg9CXWWhVqe2Y6WGtrj74
-         Zjt2WO0HgkRiXwOm2DP9hu5N+igm0XJwOM52BYAcf2rTDeYhwNOpAT80bBzwkuNlw0dm
-         VwiIz+l+w/zRklTygHBpoulOMIPVMDfUD2wl7HDy0F8hEmdzlUAabcdkOEehUB45MTrP
-         iEAc+DG+MTBDD483So934wmNTSUVZGKVPgVT/s6va8wV/Zs5HrZZgKxu9QiqSis3XAft
-         IqltpSp2l22oHBbjTLkroYFTLhjkAbn+h2gWjiHlqsk28mNjMjLuKEC+rcuSrSrOKtn/
-         UPbg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=Y+0uaIcI0mf0ejSXXUrubCKbBMCdNsNKojVgct2vGJc=;
-        b=TlMh5SDlNHOFBjzKqJPBO6At0Dw93f4AKn0ImaMjiHW6tU1EUkmj5wCIt4Q5OWLkSi
-         t9PbXOdzuCtKlbAfb20QSm30+d3I6cdy6XAG2XfpZ4k7xWbh5YVBhDmPawb+G1o23yt3
-         NGLEf0gS0wY4HTjqbfzJKm8GRwlkNKm6eIE85NPKa94VpS+dK2OIvX+grTZ3J9bo1pkA
-         kFeq1WfZMJ6pbfs8JFxunE7fTIYhrzbo+rtHSOht/zLQds1eJz2FNI+KqWXQd9laAzmy
-         csGWgJuozg/Go67k8bkXO4OeSnAg/frHdg0Fxlmm8pOFYSTWhGRXNnP+CWFLu1b14X5n
-         tcKg==
-X-Gm-Message-State: AOAM532zjvH7CNxbaTLfw8GTscVTR9zlBnOGi3pJqVT3sPLgQxBG/ffY
-        LQzPuNdkONRAkSO5WO/n4HiU/Q==
-X-Google-Smtp-Source: ABdhPJy6LhSB+zaOl8biQZCLEmpra28+MUW1EPrRJ99jo7BMsfeo2ldRPESQWWEITnMPTAsaU2dASA==
-X-Received: by 2002:a1c:4409:: with SMTP id r9mr16799679wma.150.1627909870168;
-        Mon, 02 Aug 2021 06:11:10 -0700 (PDT)
-Received: from google.com ([2a00:79e0:d:210:44fe:c9a8:c2b2:3798])
-        by smtp.gmail.com with ESMTPSA id d5sm11047663wre.77.2021.08.02.06.11.09
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 02 Aug 2021 06:11:09 -0700 (PDT)
-Date:   Mon, 2 Aug 2021 14:11:07 +0100
-From:   Quentin Perret <qperret@google.com>
-To:     Marc Zyngier <maz@kernel.org>
+        id S233874AbhHBNUz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 2 Aug 2021 09:20:55 -0400
+Received: from mail.kernel.org ([198.145.29.99]:40710 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S233691AbhHBNUy (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 2 Aug 2021 09:20:54 -0400
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id F08DE61108;
+        Mon,  2 Aug 2021 13:20:44 +0000 (UTC)
+Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94.2)
+        (envelope-from <maz@kernel.org>)
+        id 1mAXs2-002SNp-Tz; Mon, 02 Aug 2021 14:20:43 +0100
+Date:   Mon, 02 Aug 2021 14:20:42 +0100
+Message-ID: <87mtq00yqd.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Quentin Perret <qperret@google.com>
 Cc:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
         linux-arm-kernel@lists.infradead.org,
         James Morse <james.morse@arm.com>,
@@ -58,70 +33,64 @@ Cc:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
         Will Deacon <will@kernel.org>,
         Catalin Marinas <catalin.marinas@arm.com>,
         kernel-team@android.com, stable@vger.kernel.org
-Subject: Re: [PATCH v2 1/2] arm64: Move .hyp.rodata outside of the
- _sdata.._edata range
-Message-ID: <YQfu6+3uo6qlxrpv@google.com>
+Subject: Re: [PATCH v2 1/2] arm64: Move .hyp.rodata outside of the _sdata.._edata range
+In-Reply-To: <YQfu6+3uo6qlxrpv@google.com>
 References: <20210802123830.2195174-1-maz@kernel.org>
- <20210802123830.2195174-2-maz@kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210802123830.2195174-2-maz@kernel.org>
+        <20210802123830.2195174-2-maz@kernel.org>
+        <YQfu6+3uo6qlxrpv@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: qperret@google.com, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, james.morse@arm.com, suzuki.poulose@arm.com, alexandru.elisei@arm.com, will@kernel.org, catalin.marinas@arm.com, kernel-team@android.com, stable@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Marc,
+Hi Quentin,
 
-On Monday 02 Aug 2021 at 13:38:29 (+0100), Marc Zyngier wrote:
-> The HYP rodata section is currently lumped together with the BSS,
-> which isn't exactly what is expected (it gets registered with
-> kmemleak, for example).
+On Mon, 02 Aug 2021 14:11:07 +0100,
+Quentin Perret <qperret@google.com> wrote:
 > 
-> Move it away so that it is actually marked RO. As an added
-> benefit, it isn't registered with kmemleak anymore.
-
-2d7bf218ca73 ("KVM: arm64: Add .hyp.data..ro_after_init ELF section")
-states explicitly that the hyp ro_after_init section should remain RW in
-the host as it is expected to modify it before initializing EL2. But I
-can't seem to trigger anything with this patch applied, so I'll look
-into this a bit more.
-
-> Fixes: 380e18ade4a5 ("KVM: arm64: Introduce a BSS section for use at Hyp")
-
-Not sure this is the patch to blame?
-
-> Suggested-by: Catalin Marinas <catalin.marinas@arm.com>
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> Cc: stable@vger.kernel.org #5.13
-> ---
->  arch/arm64/kernel/vmlinux.lds.S | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
+> Hi Marc,
 > 
-> diff --git a/arch/arm64/kernel/vmlinux.lds.S b/arch/arm64/kernel/vmlinux.lds.S
-> index 709d2c433c5e..f6b1a88245db 100644
-> --- a/arch/arm64/kernel/vmlinux.lds.S
-> +++ b/arch/arm64/kernel/vmlinux.lds.S
-> @@ -181,6 +181,8 @@ SECTIONS
->  	/* everything from this point to __init_begin will be marked RO NX */
->  	RO_DATA(PAGE_SIZE)
->  
-> +	HYPERVISOR_DATA_SECTIONS
-> +
->  	idmap_pg_dir = .;
->  	. += IDMAP_DIR_SIZE;
->  	idmap_pg_end = .;
-> @@ -260,8 +262,6 @@ SECTIONS
->  	_sdata = .;
->  	RW_DATA(L1_CACHE_BYTES, PAGE_SIZE, THREAD_ALIGN)
->  
-> -	HYPERVISOR_DATA_SECTIONS
-> -
->  	/*
->  	 * Data written with the MMU off but read with the MMU on requires
->  	 * cache lines to be invalidated, discarding up to a Cache Writeback
-> -- 
-> 2.30.2
+> On Monday 02 Aug 2021 at 13:38:29 (+0100), Marc Zyngier wrote:
+> > The HYP rodata section is currently lumped together with the BSS,
+> > which isn't exactly what is expected (it gets registered with
+> > kmemleak, for example).
+> > 
+> > Move it away so that it is actually marked RO. As an added
+> > benefit, it isn't registered with kmemleak anymore.
+> 
+> 2d7bf218ca73 ("KVM: arm64: Add .hyp.data..ro_after_init ELF section")
+> states explicitly that the hyp ro_after_init section should remain RW in
+> the host as it is expected to modify it before initializing EL2. But I
+> can't seem to trigger anything with this patch applied, so I'll look
+> into this a bit more.
+
+The switch to RO happens quite late. And if the host was to actually
+try and change things there, it would be screwed anyway (we will have
+already removed the pages from its S2).
+
+I wouldn't be surprised if this was a consequence of the way we now
+build the HYP object, and the comment in the original commit may not
+be valid anymore.
+
+> 
+> > Fixes: 380e18ade4a5 ("KVM: arm64: Introduce a BSS section for use at Hyp")
+> 
+> Not sure this is the patch to blame?
+
+My bad, this is plain wrong. I'm not sure it can be applied earlier
+though if my rambling above is correct.
 
 Thanks,
-Quentin
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
