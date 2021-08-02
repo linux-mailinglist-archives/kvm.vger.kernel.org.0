@@ -2,94 +2,118 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0B8283DDFD1
-	for <lists+kvm@lfdr.de>; Mon,  2 Aug 2021 21:05:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 653E43DE00A
+	for <lists+kvm@lfdr.de>; Mon,  2 Aug 2021 21:28:16 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231259AbhHBTFc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 2 Aug 2021 15:05:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33956 "EHLO
+        id S231165AbhHBT2Y (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 2 Aug 2021 15:28:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39510 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229755AbhHBTFb (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 2 Aug 2021 15:05:31 -0400
-Received: from mail-pj1-x102a.google.com (mail-pj1-x102a.google.com [IPv6:2607:f8b0:4864:20::102a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C4982C06175F
-        for <kvm@vger.kernel.org>; Mon,  2 Aug 2021 12:05:20 -0700 (PDT)
-Received: by mail-pj1-x102a.google.com with SMTP id pj14-20020a17090b4f4eb029017786cf98f9so1384700pjb.2
-        for <kvm@vger.kernel.org>; Mon, 02 Aug 2021 12:05:20 -0700 (PDT)
+        with ESMTP id S229729AbhHBT2X (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 2 Aug 2021 15:28:23 -0400
+Received: from mail-qv1-xf49.google.com (mail-qv1-xf49.google.com [IPv6:2607:f8b0:4864:20::f49])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 29237C06175F
+        for <kvm@vger.kernel.org>; Mon,  2 Aug 2021 12:28:14 -0700 (PDT)
+Received: by mail-qv1-xf49.google.com with SMTP id cb3-20020ad456230000b02903319321d1e3so13760267qvb.14
+        for <kvm@vger.kernel.org>; Mon, 02 Aug 2021 12:28:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=wgfgMVxCPBQ0GIYZVwRvz6smg5/pTXTIka/+zBBpuZk=;
-        b=RG3wQlQziA+GjMEr81FaBBAaGIIW8dPtnvEJ9EWW+U3G3ykNoUxbSQfGCTghxJ7qx5
-         QYm8bwpA/Hr2tZ7Noc+uAMCeCktweksMH1VyqPEMrrskx66UCoNCX/LJDzyN1uXixhX8
-         c65KywHQsOQFSgrSOA/fIBLcSLdPpPgGc1ZFsOqdBfcKSoSj3+BuL9KiE1r5KEF/+eSa
-         bjVzu8Bu8F66mmRAJaVEj9OpIvLtSAQgpYyvZBjJj46HxsokfUSEUYyxn6H6ALCyeisN
-         ccfxLzNePC8I9IgQsjx35VDbDogXXHEPlkZ3uF6DZquLH24KjTflmTI91hbQ/WmY0URI
-         aK2g==
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=7p7mJlnVfl7T+hlkAFYQVL3Is2jTnSQaIAIQgTOcTTk=;
+        b=OY292XYyvnBQO68s2vxsf3lDot6Bl03ugOYkZXMJ9nkuBk+VuvbVvn/odIPpSKl276
+         xD0eqPI8jPoX/TF86opk9ZaMJQWa2HRJOq94tzbxlPWK8vES8KnmkizzX+2ms4SdkJJ6
+         OAEGDsS4vYub5LQa1QcPWHWhWX9ACr/85Dk+uBeK3Sgz0w17r8COtDiuMi5Eq4Hpqqcy
+         FgTth+PT7AlHU0Y4O1Ql51fYFcVknWX7ukp6pFJ/ozpKLOPNo0Mma784d+wGq25wDBsO
+         8sl1aV66fmgfyNYGSCjjzQaZZDi76dVnOSRnA0hS9eEjO/QAPnioTibV1YLced4eE/us
+         9tLg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=wgfgMVxCPBQ0GIYZVwRvz6smg5/pTXTIka/+zBBpuZk=;
-        b=Vh5Yb4NuVOZMIzSiTGGhZtlb+w1Zv3aZteJgC+QItuvphJrvzdDMLISRv7pmPPVm6D
-         gQkQYPb/w1DVWRY94gsL85RDxG2jTfhA9DOS95FSsQhwTtdzbjZWLuFW2yArsK9VNCi+
-         JHnszoPmvJV+VgJ/lxvt5fh9HQ1UlWa1Rw5BOgaDyD2jvG9qAvLgrAksyTBqzRBZZgvG
-         F9ylGvcCxUu03bYzUfU2P/1jgE+ksibV2uBZtWvHgTWkkmOnc+EMS8ukgg3/DHQ2NybX
-         rgBQwbO6gK/7BbubDF34VLNOb8Vpv1eSGmUWHNS95GUsVnEbO76jazgZG4U8M+FPUn5T
-         15cw==
-X-Gm-Message-State: AOAM530XRblooe7OWA6JDlfLE+LE06HUKZL0i0swE4TCGbPuU7BeC9dx
-        10REfJ8tm0GtBsrNRYjWPGiK4g==
-X-Google-Smtp-Source: ABdhPJy4lW5VvswSn/50aGr5nBPbX5BezfjcGcMRQmajbM/t5mzCcanvKADCE20jv86zq7xao538fA==
-X-Received: by 2002:a17:902:dad0:b029:12c:83ca:fdd4 with SMTP id q16-20020a170902dad0b029012c83cafdd4mr15265788plx.77.1627931120160;
-        Mon, 02 Aug 2021 12:05:20 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id x19sm9439006pgk.37.2021.08.02.12.05.19
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 02 Aug 2021 12:05:19 -0700 (PDT)
-Date:   Mon, 2 Aug 2021 19:05:15 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Subject: Re: [PATCH 2/2] KVM: Don't take mmu_lock for range invalidation
- unless necessary
-Message-ID: <YQhB690YQ04nAS32@google.com>
-References: <20210727171808.1645060-1-pbonzini@redhat.com>
- <20210727171808.1645060-3-pbonzini@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210727171808.1645060-3-pbonzini@redhat.com>
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=7p7mJlnVfl7T+hlkAFYQVL3Is2jTnSQaIAIQgTOcTTk=;
+        b=pqz+8XrAgk0C/KJrfaA0o0b/ojyv7y+5LzsXzqHAOJ0zoknfyzuMNSjzdTP6JBR836
+         4jD9vQ+Eba0Sig+i4f4fFL5u7ufg0kVV0euu6zA1ilqCf0LWedOLugy4P50GmXVq9V5d
+         dorJ5mR2957Sp/wTzQpUnQgOaSBnba8UisrleMUyG5i5FUc0RdCulKuRgKVGqrCkSvg/
+         qgH0Z4l6k8csPr5Gi8DAgOdmXib4UaHgrKr1qB2UprE105rkAJ/ov+TuY2BKEkCiu6wc
+         JDBHRqrXBtOdZt+W5EUNvOmTgvQbY+/pUA9h6fBfJvEBP/sFKaF0VjOTGUHeFUfeVOmV
+         BtUA==
+X-Gm-Message-State: AOAM531toi0THBR0Arpw2B0/4+gmnIRF8Ku8buD+THilTmpfDZMWdw0H
+        ronAn711FSgQEFXKI8hSr8O6WiVMZok=
+X-Google-Smtp-Source: ABdhPJwgN1HZ3KJQEcy/2zN9k/TS5BpBTtk4TBxtE7nS2taL/Exse1zhnY7xm/INDrcGXMRjZGi0yvlXbY0=
+X-Received: from oupton.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:404])
+ (user=oupton job=sendgmr) by 2002:a05:6214:18c7:: with SMTP id
+ cy7mr17647152qvb.59.1627932493300; Mon, 02 Aug 2021 12:28:13 -0700 (PDT)
+Date:   Mon,  2 Aug 2021 19:28:06 +0000
+Message-Id: <20210802192809.1851010-1-oupton@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.32.0.554.ge1b32706d8-goog
+Subject: [PATCH v3 0/3] KVM: arm64: Use generic guest entry infrastructure
+From:   Oliver Upton <oupton@google.com>
+To:     kvmarm@lists.cs.columbia.edu
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Marc Zyngier <maz@kernel.org>,
+        James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Will Deacon <will@kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Andy Lutomirski <luto@kernel.org>,
+        linux-arm-kernel@lists.infradead.org,
+        Peter Shier <pshier@google.com>,
+        Shakeel Butt <shakeelb@google.com>,
+        Guangyu Shi <guangyus@google.com>,
+        Oliver Upton <oupton@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jul 27, 2021, Paolo Bonzini wrote:
-> @@ -605,8 +597,13 @@ static void kvm_mmu_notifier_change_pte(struct mmu_notifier *mn,
->  
->  	/*
->  	 * .change_pte() must be surrounded by .invalidate_range_{start,end}(),
-> +	 * If mmu_notifier_count is zero, then start() didn't find a relevant
-> +	 * memslot and wasn't forced down the slow path; rechecking here is
-> +	 * unnecessary.
+The arm64 kernel doesn't yet support the full generic entry
+infrastructure. That being said, KVM/arm64 doesn't properly handle
+TIF_NOTIFY_RESUME and could pick this up by switching to the generic
+guest entry infrasturture.
 
-Critiquing my own comment...
+Patch 1 adds a missing vCPU stat to ARM64 to record the number of signal
+exits to userspace.
 
-Maybe elaborate on what's (not) being rechecked?  And also clarify that rechecking
-the memslots on a false positive (due to a second invalidation) is not problematic?
+Patch 2 unhitches entry-kvm from entry-generic, as ARM64 doesn't
+currently support the generic infrastructure.
 
-	 * If mmu_notifier_count is zero, then no in-progress invalidations,
-	 * including this one, found a relevant memslot at start(); rechecking
-	 * memslots here is unnecessary.  Note, a false positive (count elevated
-	 * by a different invalidation) is sub-optimal but functionally ok.
-	 */
+Patch 3 replaces the open-coded entry handling with the generic xfer
+function.
 
-Thanks for doing the heavy lifting!
+This series was tested on an Ampere Mt. Jade reference system. The
+series cleanly applies to kvm/queue (note that this is deliberate as the
+generic kvm stats patches have not yet propagated to kvm-arm/queue) at
+the following commit:
 
->  	 */
->  	WARN_ON_ONCE(!READ_ONCE(kvm->mn_active_invalidate_count));
-> +	if (!kvm->mmu_notifier_count)
-> +		return;
->  
->  	kvm_handle_hva_range(mn, address, address + 1, pte, kvm_set_spte_gfn);
->  }
+8ad5e63649ff ("KVM: Don't take mmu_lock for range invalidation unless necessary")
+
+v1 -> v2:
+ - Address Jing's comment
+ - Carry Jing's r-b tag
+
+v2 -> v3:
+ - Roll all exit conditions into kvm_vcpu_exit_request() (Marc)
+ - Avoid needlessly checking for work twice (Marc)
+
+v1: http://lore.kernel.org/r/20210729195632.489978-1-oupton@google.com
+v2: http://lore.kernel.org/r/20210729220916.1672875-1-oupton@google.com
+
+Oliver Upton (3):
+  KVM: arm64: Record number of signal exits as a vCPU stat
+  entry: KVM: Allow use of generic KVM entry w/o full generic support
+  KVM: arm64: Use generic KVM xfer to guest work function
+
+ arch/arm64/include/asm/kvm_host.h |  1 +
+ arch/arm64/kvm/Kconfig            |  1 +
+ arch/arm64/kvm/arm.c              | 71 +++++++++++++++++++------------
+ arch/arm64/kvm/guest.c            |  1 +
+ include/linux/entry-kvm.h         |  6 ++-
+ 5 files changed, 52 insertions(+), 28 deletions(-)
+
+-- 
+2.32.0.554.ge1b32706d8-goog
+
