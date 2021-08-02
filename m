@@ -2,95 +2,96 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5BF4E3DDE7B
-	for <lists+kvm@lfdr.de>; Mon,  2 Aug 2021 19:25:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C41233DDE97
+	for <lists+kvm@lfdr.de>; Mon,  2 Aug 2021 19:35:23 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230387AbhHBR0D (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 2 Aug 2021 13:26:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37316 "EHLO
+        id S229977AbhHBRf3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 2 Aug 2021 13:35:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39702 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229551AbhHBR0A (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 2 Aug 2021 13:26:00 -0400
-Received: from mail-yb1-xb2b.google.com (mail-yb1-xb2b.google.com [IPv6:2607:f8b0:4864:20::b2b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 59C65C06175F
-        for <kvm@vger.kernel.org>; Mon,  2 Aug 2021 10:25:50 -0700 (PDT)
-Received: by mail-yb1-xb2b.google.com with SMTP id g76so29688304ybf.4
-        for <kvm@vger.kernel.org>; Mon, 02 Aug 2021 10:25:50 -0700 (PDT)
+        with ESMTP id S229551AbhHBRf2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 2 Aug 2021 13:35:28 -0400
+Received: from mail-wr1-x435.google.com (mail-wr1-x435.google.com [IPv6:2a00:1450:4864:20::435])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CBE60C06175F;
+        Mon,  2 Aug 2021 10:35:18 -0700 (PDT)
+Received: by mail-wr1-x435.google.com with SMTP id h13so8897902wrp.1;
+        Mon, 02 Aug 2021 10:35:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=q/q31t5T+36bS3/wvpT+OMFWaL1ftp/gRKotikKNdQw=;
-        b=LhIAyiQ4DGJkN4/4LQ5fm3YGNPZdmEJzhy4txTg+V+8Zw+iHAkHNaGHWYKeM38WhGn
-         7QaBiepaSP1JBqwB6VoBuL5StJZ8FPCt+zqDICi8hH1hGP9QkQxWHCgbfdN8niuBLPGz
-         izjhivh6jzxNtq8gsLezGYQW8Vh9K9iFzkhXwcw/TtB9heltkVYRGc8qXQT1fQIBTra7
-         bMzWWdLbxxn5SA55g6pb9ZsHloCXQ4QVaEe+uGIOmBrzwfflbfzSoOkd67ptugrOV0Oj
-         uHA5LGlO3WHZyZ183S63juyO3D0VcmSwzWOy9snmvYxVgiND41QnhPuS1c9R5/sZigC5
-         SpEQ==
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id;
+        bh=r6bg/D0h+hHSSt2k/0GZqDs26DAnYPWQv+c56O1rXQU=;
+        b=ZoxugyjH6qgO8Kba98UUpQzsZ9N43kL4yEKf1+fQud+NY6AFPeIxgDgbyN7fcAmDMS
+         SA9va3fbiBXU9YuqD/+A32zwTr7+RHXhaK5dOpe6UxixF/w6iwC0VljThqc0IrMp+PWz
+         iOZPr6XLe4drRxPLsWL7NR60sL+y9qNNQhS3dn5IBeH3BS3dgrap+CD/qt3GDipDTRYR
+         xDyQjk6hrlTIaalzUoeRHYdvB0LPWUmLQMAlfVi22n4+FwujniF0mTgs63/AqJT8mljP
+         XgS1cBakqXYZJNgXWgNgcn2ZDS2qvkzqv8MhrXXWaX+cuNmohDCWkPX6Wm86g8gaQzpa
+         ZT7A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=q/q31t5T+36bS3/wvpT+OMFWaL1ftp/gRKotikKNdQw=;
-        b=lpbyRqIpFcdVnIToExB9vnytCZfm0YLX2G1e5n3dO7HIaIBXPplSAVRsOGMDv/hupb
-         Jg1c6PgjSir9oJIfAQYfglCPTx2QxypW7C/Hd/EVO+WpT6zBx6iBn7hXDuYewPCe+fBW
-         t+2n5AUvolj2yJENBd4+nFTYlamBATcuOiOCrc07IU454VzydBW1JtEWBWZlWdkCabss
-         G1/SnGg5rNinWW/1G2uayoBWdc47wYkYyREg/Co1ZLL2gqYhmvr2cwYWCO9hDFilbSpm
-         FJTgmzSM1Z3SyVaalFNmhVR7tsrUqxBU8iby6r8A3G+Nq7DwfztFS5JbAYdd8Ow5QMC5
-         ranw==
-X-Gm-Message-State: AOAM530yN33yyZ4J78J8Ya/PwaXbA61YW7fJI5x2pOvtsEUD+jFf1oqZ
-        eVmqFQif+W893h+QF0dhzbc7D5HTmaop3Mm2fXEDUQ==
-X-Google-Smtp-Source: ABdhPJw+a5aBgfV8UBGn5AEsMNJKdy9IHEJXHYJYV3cTfaKSyFzVTE1Rud/ZY6q5S1wRi0imigf/Yv+MY28MQqrZwRs=
-X-Received: by 2002:a25:ab54:: with SMTP id u78mr8592843ybi.139.1627925149434;
- Mon, 02 Aug 2021 10:25:49 -0700 (PDT)
-MIME-Version: 1.0
-References: <20210731011304.3868795-1-mizhang@google.com> <YQgamDDn6TVY/BoV@google.com>
- <71a905a1-0a6f-0d7a-f8fe-237b9e5af05c@redhat.com>
-In-Reply-To: <71a905a1-0a6f-0d7a-f8fe-237b9e5af05c@redhat.com>
-From:   Mingwei Zhang <mizhang@google.com>
-Date:   Mon, 2 Aug 2021 10:25:38 -0700
-Message-ID: <CAL715WKVZqHG0sJhTn-ebJKjdj5pUQedL9kJjVRWMWoZGbzHFg@mail.gmail.com>
-Subject: Re: [PATCH] KVM: SEV: improve the code readability for ASID management
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm <kvm@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Marc Orr <marcorr@google.com>,
-        David Rientjes <rientjes@google.com>,
-        Alper Gun <alpergun@google.com>,
-        Dionna Glaze <dionnaglaze@google.com>,
-        Vipin Sharma <vipinsh@google.com>
-Content-Type: text/plain; charset="UTF-8"
+        h=x-gm-message-state:from:to:cc:subject:date:message-id;
+        bh=r6bg/D0h+hHSSt2k/0GZqDs26DAnYPWQv+c56O1rXQU=;
+        b=ZxtE1Ylzsd5E5e9WpILIjBbH/k9dja9jXcaovMDf2GKJM82K/U614PCxb20lNDpXbv
+         Vt3qfSqPowxIo9Aeg/krX7PdgPH2XqrsE54O6Qb8G+IiggiDq7BNQGdYqYhniuscjjX7
+         uHzOmh5dFcRteOwbhvOYf88SRdHAxH0AZK+Vwml36IKJv+YkKZ0RkL66bB4tMkNM2yYn
+         8IU11Ayk0he9A0viqzF4vhl8deUAlFRU7ERSeIwCkqHmofgYKtc0Qrj8svVJeHbqr5sm
+         MUvdpr0eGlRvJTLbwoYVfP7tl9JuTZ1sRmn92rCRhHWk7lxdAkqAxHBaAI7xKVSZWiCN
+         D1xw==
+X-Gm-Message-State: AOAM533n7f5nkp+oR0yv+rKU/cOLfCt/pPWoXtbNy90h7CVwFe1p3cyO
+        ITf0y8WCZ8rwEV4Ua8/qIyw=
+X-Google-Smtp-Source: ABdhPJzC+4l7ytCLAIQxQkriQ1JBuZu+PO3Qay8vSNbgdj3ZUV7INvXpfVRnKdQweqiqMlP9y7cpiw==
+X-Received: by 2002:a5d:4386:: with SMTP id i6mr18852593wrq.249.1627925717477;
+        Mon, 02 Aug 2021 10:35:17 -0700 (PDT)
+Received: from hack-haven.speedport.ip (p200300ca17195e20d9703d2c4e611570.dip0.t-ipconnect.de. [2003:ca:1719:5e20:d970:3d2c:4e61:1570])
+        by smtp.googlemail.com with ESMTPSA id g5sm22101wmh.31.2021.08.02.10.35.16
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 02 Aug 2021 10:35:17 -0700 (PDT)
+From:   Harshavardhan Unnibhavi <harshanavkis@gmail.com>
+To:     stefanha@redhat.com, sgarzare@redhat.com, davem@davemloft.net,
+        kuba@kernel.org, asias@redhat.com, mst@redhat.com,
+        imbrenda@linux.vnet.ibm.com, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Cc:     Harshavardhan Unnibhavi <harshanavkis@gmail.com>
+Subject: [PATCH net] VSOCK: handle VIRTIO_VSOCK_OP_CREDIT_REQUEST
+Date:   Mon,  2 Aug 2021 19:35:06 +0200
+Message-Id: <20210802173506.2383-1-harshanavkis@gmail.com>
+X-Mailer: git-send-email 2.17.1
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Paolo,
+The original implementation of the virtio-vsock driver does not
+handle a VIRTIO_VSOCK_OP_CREDIT_REQUEST as required by the
+virtio-vsock specification. The vsock device emulated by
+vhost-vsock and the virtio-vsock driver never uses this request,
+which was probably why nobody noticed it. However, another
+implementation of the device may use this request type.
 
-Thanks. I think Sean's suggestion makes sense. I will update it with
-that one and remove the 'fixes' line.
+Hence, this commit introduces a way to handle an explicit credit
+request by responding with a corresponding credit update as
+required by the virtio-vsock specification.
 
-Regards
--Mingwei
+Fixes: 06a8fc78367d ("VSOCK: Introduce virtio_vsock_common.ko")
 
-On Mon, Aug 2, 2021 at 9:53 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
->
-> On 02/08/21 18:17, Sean Christopherson wrote:
-> >
-> > Rather than adjusting the bitmap index, what about simply umping the bitmap size?
-> > IIRC, current CPUs have 512 ASIDs, counting ASID 0, i.e. bumping the size won't
-> > consume any additional memory.  And if it does, the cost is 8 bytes...
-> >
-> > It'd be a bigger refactoring, but it should completely eliminate the mod-by-1
-> > shenanigans, e.g. a partial patch could look like
->
-> This is also okay by me if Mingwei agrees, of course.  I have already
-> queued his patch, but I can replace it with one using a nr_asids-sized
-> bitmap too.
->
-> Paolo
->
+Signed-off-by: Harshavardhan Unnibhavi <harshanavkis@gmail.com>
+---
+ net/vmw_vsock/virtio_transport_common.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
+index 169ba8b72a63..081e7ae93cb1 100644
+--- a/net/vmw_vsock/virtio_transport_common.c
++++ b/net/vmw_vsock/virtio_transport_common.c
+@@ -1079,6 +1079,9 @@ virtio_transport_recv_connected(struct sock *sk,
+ 		virtio_transport_recv_enqueue(vsk, pkt);
+ 		sk->sk_data_ready(sk);
+ 		return err;
++	case VIRTIO_VSOCK_OP_CREDIT_REQUEST:
++		virtio_transport_send_credit_update(vsk);
++		break;
+ 	case VIRTIO_VSOCK_OP_CREDIT_UPDATE:
+ 		sk->sk_write_space(sk);
+ 		break;
+-- 
+2.17.1
+
