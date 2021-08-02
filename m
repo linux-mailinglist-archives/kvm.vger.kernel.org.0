@@ -2,37 +2,37 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6B2DB3DDF43
+	by mail.lfdr.de (Postfix) with ESMTP id B76AB3DDF44
 	for <lists+kvm@lfdr.de>; Mon,  2 Aug 2021 20:33:59 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231465AbhHBSeF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 2 Aug 2021 14:34:05 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:28034 "EHLO
+        id S231523AbhHBSeH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 2 Aug 2021 14:34:07 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:48173 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231408AbhHBSeC (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 2 Aug 2021 14:34:02 -0400
+        by vger.kernel.org with ESMTP id S230369AbhHBSeH (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 2 Aug 2021 14:34:07 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1627929232;
+        s=mimecast20190719; t=1627929237;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=rVODFKjpHHsWrcOVmStXMEVlb3jc8Z1zSx5UbCY7ylg=;
-        b=h3DWc/7z4MMEBSiRP26zuITdUPHoBPrpsR+YBKpHef6cHoQ4rsMDkPMJ7StPvZxC3ByWUY
-        dB20+WLhVJMWYTLvV8qHG7DvarS1bHkm9FvQ+mEJmx/itgAYPvfITX28XVoWxTJw400bwO
-        6sFTq/BG6WVIp53blTM8z3jHsFMxQ84=
+        bh=Ve94S67hgMBvO85m8e37Yshn8SH9uzguaWXbkg9LtFo=;
+        b=ItssCNVH14zb3yFWZuPErZJ+TUR7oM4dwQuGOvCFDrcMr8eyUYF6o1slF0YL62Leu6Wfr0
+        XYQgfOWNrgZB5bJBuJ1XXWQZ8+E0UQXS4hWZMsAsNQZF++tcjLVFw6LXprNz+jX3zTOfel
+        G6bTfy5hzqF1lh2oYpdMQEbIp3goo0g=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-266-EzleAlbFOcO-I8Nh3aJHSg-1; Mon, 02 Aug 2021 14:33:51 -0400
-X-MC-Unique: EzleAlbFOcO-I8Nh3aJHSg-1
+ us-mta-2-b7hc_s_nOiylcJKkXSqBVA-1; Mon, 02 Aug 2021 14:33:55 -0400
+X-MC-Unique: b7hc_s_nOiylcJKkXSqBVA-1
 Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 036C710066E6;
-        Mon,  2 Aug 2021 18:33:50 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E1774801AE7;
+        Mon,  2 Aug 2021 18:33:53 +0000 (UTC)
 Received: from localhost.localdomain (unknown [10.35.206.50])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 7B29C3AE1;
-        Mon,  2 Aug 2021 18:33:46 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 6342C3AE1;
+        Mon,  2 Aug 2021 18:33:50 +0000 (UTC)
 From:   Maxim Levitsky <mlevitsk@redhat.com>
 To:     kvm@vger.kernel.org
 Cc:     Wanpeng Li <wanpengli@tencent.com>,
@@ -48,9 +48,9 @@ Cc:     Wanpeng Li <wanpengli@tencent.com>,
         "H. Peter Anvin" <hpa@zytor.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
         Maxim Levitsky <mlevitsk@redhat.com>
-Subject: [PATCH v3 04/12] KVM: x86/mmu: allow kvm_faultin_pfn to return page fault handling code
-Date:   Mon,  2 Aug 2021 21:33:21 +0300
-Message-Id: <20210802183329.2309921-5-mlevitsk@redhat.com>
+Subject: [PATCH v3 05/12] KVM: x86/mmu: allow APICv memslot to be partially enabled
+Date:   Mon,  2 Aug 2021 21:33:22 +0300
+Message-Id: <20210802183329.2309921-6-mlevitsk@redhat.com>
 In-Reply-To: <20210802183329.2309921-1-mlevitsk@redhat.com>
 References: <20210802183329.2309921-1-mlevitsk@redhat.com>
 MIME-Version: 1.0
@@ -60,88 +60,60 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This will allow it to return RET_PF_EMULATE for APIC mmio
-emulation.
+on AMD, APIC virtualization needs to dynamicaly inhibit the AVIC in a
+response to some events, and this is problematic and not efficient to do by
+enabling/disabling the memslot that covers APIC's mmio range.
+Plus due to SRCU locking, it makes it more complex to request AVIC inhibition.
 
-This code is based on a patch from Sean Christopherson:
+Instead, the APIC memslot will be always enabled, but the MMU code
+will not install a SPTE for it, when arch.apic_access_memslot_enabled == false
+and instead jump straight to emulating the access.
+
+When inhibiting the AVIC, this SPTE will be zapped.
+
+This code is based on a suggestion from Sean Christopherson:
 https://lkml.org/lkml/2021/7/19/2970
 
 Suggested-by: Sean Christopherson <seanjc@google.com>
 Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
 ---
- arch/x86/kvm/mmu/mmu.c         | 17 ++++++++++-------
- arch/x86/kvm/mmu/paging_tmpl.h |  4 ++--
- 2 files changed, 12 insertions(+), 9 deletions(-)
+ arch/x86/kvm/mmu/mmu.c | 23 ++++++++++++++++++-----
+ 1 file changed, 18 insertions(+), 5 deletions(-)
 
 diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index c5e0ecf5f758..6f77f6efd43c 100644
+index 6f77f6efd43c..965b562da893 100644
 --- a/arch/x86/kvm/mmu/mmu.c
 +++ b/arch/x86/kvm/mmu/mmu.c
-@@ -3844,7 +3844,7 @@ static bool kvm_arch_setup_async_pf(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa,
- 
- static bool kvm_faultin_pfn(struct kvm_vcpu *vcpu, bool prefault, gfn_t gfn,
- 			 gpa_t cr2_or_gpa, kvm_pfn_t *pfn, hva_t *hva,
--			 bool write, bool *writable)
-+			 bool write, bool *writable, int *r)
- {
- 	struct kvm_memory_slot *slot = kvm_vcpu_gfn_to_memslot(vcpu, gfn);
- 	bool async;
-@@ -3855,7 +3855,7 @@ static bool kvm_faultin_pfn(struct kvm_vcpu *vcpu, bool prefault, gfn_t gfn,
- 	 * be zapped before KVM inserts a new MMIO SPTE for the gfn.
- 	 */
+@@ -3857,11 +3857,24 @@ static bool kvm_faultin_pfn(struct kvm_vcpu *vcpu, bool prefault, gfn_t gfn,
  	if (slot && (slot->flags & KVM_MEMSLOT_INVALID))
--		return true;
-+		goto out_retry;
+ 		goto out_retry;
  
- 	/* Don't expose private memslots to L2. */
- 	if (is_guest_mode(vcpu) && !kvm_is_visible_memslot(slot)) {
-@@ -3875,14 +3875,17 @@ static bool kvm_faultin_pfn(struct kvm_vcpu *vcpu, bool prefault, gfn_t gfn,
- 		if (kvm_find_async_pf_gfn(vcpu, gfn)) {
- 			trace_kvm_async_pf_doublefault(cr2_or_gpa, gfn);
- 			kvm_make_request(KVM_REQ_APF_HALT, vcpu);
--			return true;
-+			goto out_retry;
- 		} else if (kvm_arch_setup_async_pf(vcpu, cr2_or_gpa, gfn))
--			return true;
-+			goto out_retry;
+-	/* Don't expose private memslots to L2. */
+-	if (is_guest_mode(vcpu) && !kvm_is_visible_memslot(slot)) {
+-		*pfn = KVM_PFN_NOSLOT;
+-		*writable = false;
+-		return false;
++	if (!kvm_is_visible_memslot(slot)) {
++		/* Don't expose private memslots to L2. */
++		if (is_guest_mode(vcpu)) {
++			*pfn = KVM_PFN_NOSLOT;
++			*writable = false;
++			return false;
++		}
++		/*
++		 * If the APIC access page exists but is disabled, go directly
++		 * to emulation without caching the MMIO access or creating a
++		 * MMIO SPTE.  That way the cache doesn't need to be purged
++		 * when the AVIC is re-enabled.
++		 */
++		if (slot && slot->id == APIC_ACCESS_PAGE_PRIVATE_MEMSLOT &&
++		    !vcpu->kvm->arch.apic_access_memslot_enabled) {
++			*r = RET_PF_EMULATE;
++			return true;
++		}
  	}
  
- 	*pfn = __gfn_to_pfn_memslot(slot, gfn, false, NULL,
- 				    write, writable, hva);
--	return false;
-+
-+out_retry:
-+	*r = RET_PF_RETRY;
-+	return true;
- }
- 
- static int direct_page_fault(struct kvm_vcpu *vcpu, gpa_t gpa, u32 error_code,
-@@ -3913,8 +3916,8 @@ static int direct_page_fault(struct kvm_vcpu *vcpu, gpa_t gpa, u32 error_code,
- 	smp_rmb();
- 
- 	if (kvm_faultin_pfn(vcpu, prefault, gfn, gpa, &pfn, &hva,
--			 write, &map_writable))
--		return RET_PF_RETRY;
-+			 write, &map_writable, &r))
-+		return r;
- 
- 	if (handle_abnormal_pfn(vcpu, is_tdp ? 0 : gpa, gfn, pfn, ACC_ALL, &r))
- 		return r;
-diff --git a/arch/x86/kvm/mmu/paging_tmpl.h b/arch/x86/kvm/mmu/paging_tmpl.h
-index f349eae69bf3..7d03e9b7ccfa 100644
---- a/arch/x86/kvm/mmu/paging_tmpl.h
-+++ b/arch/x86/kvm/mmu/paging_tmpl.h
-@@ -882,8 +882,8 @@ static int FNAME(page_fault)(struct kvm_vcpu *vcpu, gpa_t addr, u32 error_code,
- 	smp_rmb();
- 
- 	if (kvm_faultin_pfn(vcpu, prefault, walker.gfn, addr, &pfn, &hva,
--			 write_fault, &map_writable))
--		return RET_PF_RETRY;
-+			 write_fault, &map_writable, &r))
-+		return r;
- 
- 	if (handle_abnormal_pfn(vcpu, addr, walker.gfn, pfn, walker.pte_access, &r))
- 		return r;
+ 	async = false;
 -- 
 2.26.3
 
