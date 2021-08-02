@@ -2,54 +2,54 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 570E93DE074
-	for <lists+kvm@lfdr.de>; Mon,  2 Aug 2021 22:10:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 113693DE07A
+	for <lists+kvm@lfdr.de>; Mon,  2 Aug 2021 22:12:08 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231339AbhHBULG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 2 Aug 2021 16:11:06 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:39659 "EHLO
+        id S231408AbhHBUMP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 2 Aug 2021 16:12:15 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:60828 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230095AbhHBULG (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 2 Aug 2021 16:11:06 -0400
+        by vger.kernel.org with ESMTP id S230420AbhHBUMP (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 2 Aug 2021 16:12:15 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1627935055;
+        s=mimecast20190719; t=1627935125;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=LA8evM7BHjBr4jABvi1M9utaaAjmimAJTMztodEqWno=;
-        b=Sdbwc2nyDANJY1mFTAktqUhIeYe1Hs7Q9uW6bdmTOawW+OsHzwxayFV7TqtNuUqjreizyr
-        j5JSnYuDyIG8hmLLiH6bWL9w4EvJjicSw4UpSNJxrIfxK+EzjzDXCRTBlca2ypY62nWf5h
-        CsDI2jPkmvvVZ2z/by52UsefAJR7tZU=
-Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
- [209.85.218.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-250-B6rrxzh7N62iXZKafz-BMw-1; Mon, 02 Aug 2021 16:10:54 -0400
-X-MC-Unique: B6rrxzh7N62iXZKafz-BMw-1
-Received: by mail-ej1-f72.google.com with SMTP id k21-20020a1709062a55b0290590e181cc34so4021958eje.3
-        for <kvm@vger.kernel.org>; Mon, 02 Aug 2021 13:10:54 -0700 (PDT)
+        bh=q52w6Q4YtuhtQOV0oJmgEUraWN88/oaIpPIXQ4cq1HY=;
+        b=LE0/8pkSOZcet6YCYBENzHDVMIQNfhM6lL7mYED5VZpbWc/H8slVirXD3rhjcKyI92EgD6
+        yN/RyDTZS5WQdGMT6ZG6V3DpEte1/YuyCgdLXHeNgJzuS0Fi4feQ5VqvbCKsr/oaqZBzgZ
+        sCwnvaNRb5VuCIlJWDoGqikhrSuGTOc=
+Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
+ [209.85.208.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-504-3BmtIjX7OGytG-B05u2MfA-1; Mon, 02 Aug 2021 16:12:03 -0400
+X-MC-Unique: 3BmtIjX7OGytG-B05u2MfA-1
+Received: by mail-ed1-f70.google.com with SMTP id x1-20020a05640218c1b02903bc7f97f858so7746282edy.2
+        for <kvm@vger.kernel.org>; Mon, 02 Aug 2021 13:12:03 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=LA8evM7BHjBr4jABvi1M9utaaAjmimAJTMztodEqWno=;
-        b=WYtCMZi3xtNQAXMkYxSMljNTKqBdE1W9xmUYMg6xJrk2T4Z6iQr9XQKWCNRShqR+lF
-         Q5khSsqmf64pOjte+RgyCsJqCqD0dziJRjLKPzhq1LKltxqQuf78+QgS9QZVWoHUlI35
-         jsIQ96EQCG5/d9W2Z2razwOgqqWb89K3AO3fugnDMVm/nyOQ8vY+oL5ucSDF/4IxLHOo
-         0tvpnvENf66auR1J/LM6Kf5S2UXRG59AEa9/umxzKE4Inr39g4yV0MTNji8jdyel8KXv
-         85Pq1b3FwaNzlHkthCNhlzd7S1FV7M2+c0Et0EenHLCgPvHm5hspoLnhF0GVtRh/TdCh
-         0blA==
-X-Gm-Message-State: AOAM532w+iJplJewxUOgKp9AfnURfwCrLK+/4YZWAXUVcs1GtcQXgaRa
-        CGhm2wNgrXhO8OpuedCyGwdjDaranD7Kj7Oo8ltpkAVZVre51Clq/uhW2lgukIhUJfPWOU9Fr4F
-        tgrW2BfFH42vw
-X-Received: by 2002:a17:906:4b18:: with SMTP id y24mr16671486eju.42.1627935053630;
-        Mon, 02 Aug 2021 13:10:53 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzQDGepqRHg1s0zF2qekNjn1VPDNh8LoMDbONxjezTZrGQTTG2YxoZ166f6S0JBTqWT6JZH/A==
-X-Received: by 2002:a17:906:4b18:: with SMTP id y24mr16671470eju.42.1627935053501;
-        Mon, 02 Aug 2021 13:10:53 -0700 (PDT)
+        bh=q52w6Q4YtuhtQOV0oJmgEUraWN88/oaIpPIXQ4cq1HY=;
+        b=A2DkfNq5JeLj5dJYHHtdLe/NRrgH6QK786ysX5lu4vUlmZO9yVJC5mK+GVIM2rqqTe
+         lZqNzCv3RD62bkkzExtcFAUyOs/vDNXYVgvNg6iYa2PonVcz5QUluikvcOnvSVexDn3N
+         kfA0WCTg/1qa1T41qSpKNQ9VxErKk8iIpn4RMoDAw19aJUL9QPAQgqvWiSWBSVPJckrP
+         sg3wL4z1UASwrdVp0oLjKufxkQUf+Yaht56rzwFY9U2rhENJwa1GMpB2camCiOaUeu4Q
+         YtCTDW7oa24BJ03B6fP7c1S3AdIfegKxwQuTuPt+6p5NxzPUYIoKBGOn6A0J2GS95zmj
+         BD2Q==
+X-Gm-Message-State: AOAM533DXfIAEWNDPKRdSzqJmSeFgEGXrIt1u5OYZ76rPJrRn5LTiCFd
+        yiE529lE0CrGAbFzSGtUIFMigIm3eKKTjemzWeqBuzwTQWuXVhj4y4Gggy/rpypMrL88+IkqtFD
+        Zfs/cfJvk3KNN
+X-Received: by 2002:aa7:c0d1:: with SMTP id j17mr21235854edp.217.1627935122739;
+        Mon, 02 Aug 2021 13:12:02 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyfr39sns4u7IHD+697IXe7EyNtPI7YycI0ox/3uN10j7vd/YANYQrljcKZhj+LRbcxif46Ug==
+X-Received: by 2002:aa7:c0d1:: with SMTP id j17mr21235843edp.217.1627935122638;
+        Mon, 02 Aug 2021 13:12:02 -0700 (PDT)
 Received: from redhat.com ([2.55.140.205])
-        by smtp.gmail.com with ESMTPSA id g8sm6748637edw.89.2021.08.02.13.10.50
+        by smtp.gmail.com with ESMTPSA id o7sm4957679ejy.48.2021.08.02.13.11.59
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 02 Aug 2021 13:10:52 -0700 (PDT)
-Date:   Mon, 2 Aug 2021 16:10:48 -0400
+        Mon, 02 Aug 2021 13:12:02 -0700 (PDT)
+Date:   Mon, 2 Aug 2021 16:11:57 -0400
 From:   "Michael S. Tsirkin" <mst@redhat.com>
 To:     fuguancheng <fuguancheng@bytedance.com>
 Cc:     jasowang@redhat.com, stefanha@redhat.com, sgarzare@redhat.com,
@@ -58,7 +58,7 @@ Cc:     jasowang@redhat.com, stefanha@redhat.com, sgarzare@redhat.com,
         virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
         linux-kernel@vger.kernel.org
 Subject: Re: [PATCH 1/4] VSOCK DRIVER: Add multi-cid support for guest
-Message-ID: <20210802160815-mutt-send-email-mst@kernel.org>
+Message-ID: <20210802161055-mutt-send-email-mst@kernel.org>
 References: <20210802120720.547894-1-fuguancheng@bytedance.com>
  <20210802120720.547894-2-fuguancheng@bytedance.com>
 MIME-Version: 1.0
@@ -70,28 +70,21 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 On Mon, Aug 02, 2021 at 08:07:17PM +0800, fuguancheng wrote:
-> diff --git a/include/uapi/linux/vhost.h b/include/uapi/linux/vhost.h
-> index c998860d7bbc..a3ea99f6fc7f 100644
-> --- a/include/uapi/linux/vhost.h
-> +++ b/include/uapi/linux/vhost.h
-> @@ -17,6 +17,13 @@
+> diff --git a/include/uapi/linux/virtio_vsock.h b/include/uapi/linux/virtio_vsock.h
+> index 3dd3555b2740..0afc14446b01 100644
+> --- a/include/uapi/linux/virtio_vsock.h
+> +++ b/include/uapi/linux/virtio_vsock.h
+> @@ -42,7 +42,8 @@
+>  #define VIRTIO_VSOCK_F_SEQPACKET	1	/* SOCK_SEQPACKET supported */
 >  
->  #define VHOST_FILE_UNBIND -1
->  
-> +/* structs used for hypervisors to send cid info. */
-> +
-> +struct multi_cid_message {
-> +	u32 number_cid;
-> +	u64 *cid;
-> +};
-> +
->  /* ioctls */
->  
->  #define VHOST_VIRTIO 0xAF
+>  struct virtio_vsock_config {
+> -	__le64 guest_cid;
+> +	__le32 number_cid;
+> +	__le64 cids[];
+>  } __attribute__((packed));
 
-
-In this case, a kernel pointer in a UAPI struct is suspicious.
-So is padding after number_cid.
+any host/guest interface change needs to copy the virtio TC.
+packing here is a bad idea imho, just add explicit padding.
 
 -- 
 MST
