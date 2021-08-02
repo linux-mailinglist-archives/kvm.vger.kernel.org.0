@@ -2,139 +2,108 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C46753DD0E3
-	for <lists+kvm@lfdr.de>; Mon,  2 Aug 2021 09:00:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 926333DD10F
+	for <lists+kvm@lfdr.de>; Mon,  2 Aug 2021 09:18:26 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232448AbhHBHA2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 2 Aug 2021 03:00:28 -0400
-Received: from mga17.intel.com ([192.55.52.151]:27827 "EHLO mga17.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S232297AbhHBHA1 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 2 Aug 2021 03:00:27 -0400
-X-IronPort-AV: E=McAfee;i="6200,9189,10063"; a="193681317"
-X-IronPort-AV: E=Sophos;i="5.84,288,1620716400"; 
-   d="scan'208";a="193681317"
-Received: from fmsmga003.fm.intel.com ([10.253.24.29])
-  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Aug 2021 00:00:10 -0700
-X-IronPort-AV: E=Sophos;i="5.84,288,1620716400"; 
-   d="scan'208";a="509949522"
-Received: from zengguan-mobl.ccr.corp.intel.com (HELO [10.238.0.133]) ([10.238.0.133])
-  by fmsmga003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Aug 2021 00:00:03 -0700
-Subject: Re: [PATCH 3/6] KVM: VMX: Detect Tertiary VM-Execution control when
- setup VMCS config
+        id S232173AbhHBHSe (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 2 Aug 2021 03:18:34 -0400
+Received: from wforward3-smtp.messagingengine.com ([64.147.123.22]:46001 "EHLO
+        wforward3-smtp.messagingengine.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S231649AbhHBHSd (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 2 Aug 2021 03:18:33 -0400
+Received: from compute5.internal (compute5.nyi.internal [10.202.2.45])
+        by mailforward.west.internal (Postfix) with ESMTP id 211651AC00CC;
+        Mon,  2 Aug 2021 03:18:20 -0400 (EDT)
+Received: from mailfrontend2 ([10.202.2.163])
+  by compute5.internal (MEProxy); Mon, 02 Aug 2021 03:18:21 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+        messagingengine.com; h=cc:content-type:date:from:in-reply-to
+        :message-id:mime-version:references:subject:to:x-me-proxy
+        :x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; bh=WBgQhr
+        7+uwTed/8uhlgXLoHO+0NWliI4QXXIGZ4PZXU=; b=mR12apI/NAdLtGleYVSnlK
+        m3YmcjnAWdIvUTs11/BuFxCQALMND+8duWD6j1W4nIhUPkfSQJ6xRVZpenOzZH1s
+        y6rYi50/P9xI0uIVKxnp7T+WHZw75jNW6QWwkyX5/gtWTDQbC4wI7RBwOFdutp5a
+        HA7R6h55ZlUxeeEPwImvd4HIy3d93G722BxZzurA7gjv06eHRI9QtRCIFxo74qJ1
+        5tKuaoHZhzL+4C9phvIaBJmagOuuDYQF1x6pK/0MYxwWCOJ6jNgUo8bQMtnrB9C7
+        J5K21h3/v8YSU6IlT6uOCEEUOkJCiplkyIISYkzk3TqIMiZAAR954DG2VjXTum/w
+        ==
+X-ME-Sender: <xms:OpwHYfN4A86KRf3lxe2wq6PNUIuuuDUpIWxLA0WhSmgpGPL1VKW8sA>
+    <xme:OpwHYZ_tHlgBAMFnP_4siH1lC71VRPnCYhEUGnl0qSU5_Zcumh2xmiSOmJ4XdBNFH
+    j1zBspoHRKMSQyoMM0>
+X-ME-Received: <xmr:OpwHYeRenDbqDtMrQ16zFY5ou0Z2PW3su6wr155xnE1hSOdDarQTkMzQ3SVJvPYWUXJxP-Ibs0OQ2R2jiAmxnIO-H2Xvez1fUXDCk7dNUSg>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvtddriedugdellecutefuodetggdotefrodftvf
+    curfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfghnecu
+    uegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenuc
+    fjughrpefvufgjfhfhfffkgggtsehttdertddttddtnecuhfhrohhmpeffrghvihguucfg
+    ughmohhnughsohhnuceoughmvgesughmvgdrohhrgheqnecuggftrfgrthhtvghrnhephf
+    ekgeeutddvgeffffetheejvdejieetgfefgfffudegffffgeduheegteegleeknecuvehl
+    uhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomhepughmvgesughmvg
+    drohhrgh
+X-ME-Proxy: <xmx:OpwHYTur6DSQsHj5VXa9ko0qBswkNKy8NcRIIBQr8U9pka2sDkbBEA>
+    <xmx:OpwHYXeuj9F13p4Vaxtos9eqPJuSjJnRpT5kHgqHjVflh9Tbw8kOtQ>
+    <xmx:OpwHYf3Ohtk1NYdwLzTW5FCT4pcE8qHBJhSPzuQx3GiwbYXQ9Wumsg>
+    <xmx:O5wHYS2Ty3tixOqXVkMEO8LdP0CS6-UPlcZKjhkikz-sKDgtOg21S5asc-bwGes1>
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Mon,
+ 2 Aug 2021 03:18:16 -0400 (EDT)
+Received: from localhost (disaster-area.hh.sledj.net [local])
+        by disaster-area.hh.sledj.net (OpenSMTPD) with ESMTPA id 5a5976c4;
+        Mon, 2 Aug 2021 07:18:15 +0000 (UTC)
 To:     Sean Christopherson <seanjc@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
+Cc:     linux-kernel@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
+        Joerg Roedel <joro@8bytes.org>, Ingo Molnar <mingo@redhat.com>,
+        Jim Mattson <jmattson@google.com>, kvm@vger.kernel.org,
+        Borislav Petkov <bp@alien8.de>,
+        David Matlack <dmatlack@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, x86@kernel.org,
         Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        "Luck, Tony" <tony.luck@intel.com>,
-        Kan Liang <kan.liang@linux.intel.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Kim Phillips <kim.phillips@amd.com>,
-        Jarkko Sakkinen <jarkko@kernel.org>,
-        Jethro Beekman <jethro@fortanix.com>,
-        "Huang, Kai" <kai.huang@intel.com>,
-        "x86@kernel.org" <x86@kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "Hu, Robert" <robert.hu@intel.com>,
-        "Gao, Chao" <chao.gao@intel.com>,
-        Robert Hoo <robert.hu@linux.intel.com>
-References: <20210716064808.14757-1-guang.zeng@intel.com>
- <20210716064808.14757-4-guang.zeng@intel.com> <YQHwa42jixqPPvVm@google.com>
-From:   Zeng Guang <guang.zeng@intel.com>
-Message-ID: <05faffb4-c22d-1cd5-7582-823de9dd109a@intel.com>
-Date:   Mon, 2 Aug 2021 14:59:47 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
- Firefox/78.0 Thunderbird/78.12.0
+        Vitaly Kuznetsov <vkuznets@redhat.com>
+Subject: Re: [PATCH v3 3/3] KVM: x86: SGX must obey the
+ KVM_INTERNAL_ERROR_EMULATION protocol
+In-Reply-To: <YQR6XgkjaGfGhesl@google.com>
+References: <20210729133931.1129696-1-david.edmondson@oracle.com>
+ <20210729133931.1129696-4-david.edmondson@oracle.com>
+ <YQR6XgkjaGfGhesl@google.com>
+From:   David Edmondson <dme@dme.org>
+Date:   Mon, 02 Aug 2021 08:18:15 +0100
+Message-ID: <cunmtq0mi14.fsf@dme.org>
 MIME-Version: 1.0
-In-Reply-To: <YQHwa42jixqPPvVm@google.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 7/29/2021 8:03 AM, Sean Christopherson wrote:
-> On Fri, Jul 16, 2021, Zeng Guang wrote:
->> @@ -4204,6 +4234,13 @@ vmx_adjust_secondary_exec_control(struct vcpu_vmx *vmx, u32 *exec_control,
->>   #define vmx_adjust_sec_exec_exiting(vmx, exec_control, lname, uname) \
->>   	vmx_adjust_sec_exec_control(vmx, exec_control, lname, uname, uname##_EXITING, true)
->>   
->> +static void vmx_compute_tertiary_exec_control(struct vcpu_vmx *vmx)
->> +{
->> +	u32 exec_control = vmcs_config.cpu_based_3rd_exec_ctrl;
-> This is incorrectly truncating the value.
->
+On Friday, 2021-07-30 at 22:17:02 GMT, Sean Christopherson wrote:
+
+> On Thu, Jul 29, 2021, David Edmondson wrote:
+>> When passing the failing address and size out to user space, SGX must
+>> ensure not to trample on the earlier fields of the emulation_failure
+>> sub-union of struct kvm_run.
+>> 
+>> Signed-off-by: David Edmondson <david.edmondson@oracle.com>
+>> ---
+>>  arch/x86/kvm/vmx/sgx.c | 8 +++-----
+>>  1 file changed, 3 insertions(+), 5 deletions(-)
+>> 
+>> diff --git a/arch/x86/kvm/vmx/sgx.c b/arch/x86/kvm/vmx/sgx.c
+>> index 6693ebdc0770..63fb93163383 100644
+>> --- a/arch/x86/kvm/vmx/sgx.c
+>> +++ b/arch/x86/kvm/vmx/sgx.c
+>> @@ -53,11 +53,9 @@ static int sgx_get_encls_gva(struct kvm_vcpu *vcpu, unsigned long offset,
+>>  static void sgx_handle_emulation_failure(struct kvm_vcpu *vcpu, u64 addr,
+>>  					 unsigned int size)
+>>  {
+>> -	vcpu->run->exit_reason = KVM_EXIT_INTERNAL_ERROR;
+>> -	vcpu->run->internal.suberror = KVM_INTERNAL_ERROR_EMULATION;
+>> -	vcpu->run->internal.ndata = 2;
+>> -	vcpu->run->internal.data[0] = addr;
+>> -	vcpu->run->internal.data[1] = size;
+>> +	uint64_t data[2] = { addr, size };
 >> +
->> +	vmx->tertiary_exec_control = exec_control;
->> +}
->> +
->>   static void vmx_compute_secondary_exec_control(struct vcpu_vmx *vmx)
->>   {
->>   	struct kvm_vcpu *vcpu = &vmx->vcpu;
->> @@ -4319,6 +4356,11 @@ static void init_vmcs(struct vcpu_vmx *vmx)
->>   		secondary_exec_controls_set(vmx, vmx->secondary_exec_control);
->>   	}
->>   
->> +	if (cpu_has_tertiary_exec_ctrls()) {
->> +		vmx_compute_tertiary_exec_control(vmx);
->> +		tertiary_exec_controls_set(vmx, vmx->tertiary_exec_control);
-> IMO, the existing vmx->secondary_exec_control is an abomination that should not
-> exist.  Looking at the code, it's actually not hard to get rid, there's just one
-> annoying use in prepare_vmcs02_early() that requires a bit of extra work to get
-> rid of.
+>> +	kvm_prepare_emulation_failure_exit(vcpu, false, data, sizeof(data));
 >
-> Anyways, for tertiary controls, I'd prefer to avoid the same mess and instead
-> follow vmx_exec_control(), both in functionality and in name:
->
->    static u64 vmx_tertiary_exec_control(struct vcpu_vmx *vmx)
->    {
-> 	return vmcs_config.cpu_based_3rd_exec_ctrl;
->    }
->
-> and:
->
-> 	if (cpu_has_tertiary_exec_ctrls())
-> 		tertiary_exec_controls_set(vmx, vmx_tertiary_exec_control(vmx));
->
-> and then the next patch becomes:
->
->    static u64 vmx_tertiary_exec_control(struct vcpu_vmx *vmx)
->    {
-> 	u64 exec_control = vmcs_config.cpu_based_3rd_exec_ctrl;
->
-> 	if (!kvm_vcpu_apicv_active(vcpu))
-> 		exec_control &= ~TERTIARY_EXEC_IPI_VIRT;
->
-> 	return exec_control;
->    }
->
->
-> And I'll work on a patch to purge vmx->secondary_exec_control.
-Ok, it looks much concise. I will change as you suggest. Thanks.
->> +	}
->> +
->>   	if (kvm_vcpu_apicv_active(&vmx->vcpu)) {
->>   		vmcs_write64(EOI_EXIT_BITMAP0, 0);
->>   		vmcs_write64(EOI_EXIT_BITMAP1, 0);
->> diff --git a/arch/x86/kvm/vmx/vmx.h b/arch/x86/kvm/vmx/vmx.h
->> index 945c6639ce24..c356ceebe84c 100644
->> --- a/arch/x86/kvm/vmx/vmx.h
->> +++ b/arch/x86/kvm/vmx/vmx.h
->> @@ -266,6 +266,7 @@ struct vcpu_vmx {
->>   	u32		      msr_ia32_umwait_control;
->>   
->>   	u32 secondary_exec_control;
->> +	u64 tertiary_exec_control;
->>   
->>   	/*
->>   	 * loaded_vmcs points to the VMCS currently used in this vcpu. For a
->> -- 
->> 2.25.1
->>
+> Assuming we go with my suggestion to have kvm_prepare_emulation_failure_exit()
+> capture the exit reason/info, it's probably worth converting all the
+> KVM_EXIT_INTERNAL_ERROR paths in sgx.c, even though the others don't clobber flags.
+
+Okay.
