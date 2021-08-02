@@ -2,179 +2,191 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9E6C33DDBB6
-	for <lists+kvm@lfdr.de>; Mon,  2 Aug 2021 16:59:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8BE033DDBF7
+	for <lists+kvm@lfdr.de>; Mon,  2 Aug 2021 17:10:02 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234570AbhHBPAI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 2 Aug 2021 11:00:08 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:33733 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S234518AbhHBPAH (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 2 Aug 2021 11:00:07 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1627916397;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=ZGliIfJBEHexOCPQGqPO8C8AjQrhwCqXvf0JbC+DPHo=;
-        b=hVXa74XHlv52iqL2kBpfkNdzg+FybkvURsxVPIVr6gQetubg/tTfVM2DuyozHDZL8Djolj
-        KoDtu9Spw63gIDombY8tyZEaio2KgTW7IBJjFjh2VeYWcWTlzPRq6uwbV/6s/2OKljSL6d
-        GCCk2dPilzSn87IDnkQ0bS41rjMaZPQ=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-335-91hF76AEPTawjEEl__Vfaw-1; Mon, 02 Aug 2021 10:59:56 -0400
-X-MC-Unique: 91hF76AEPTawjEEl__Vfaw-1
-Received: by mail-wr1-f72.google.com with SMTP id d7-20020adffd870000b02901544ea2018fso3465709wrr.10
-        for <kvm@vger.kernel.org>; Mon, 02 Aug 2021 07:59:56 -0700 (PDT)
+        id S234492AbhHBPKL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 2 Aug 2021 11:10:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58596 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S234281AbhHBPKK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 2 Aug 2021 11:10:10 -0400
+Received: from mail-pl1-x62d.google.com (mail-pl1-x62d.google.com [IPv6:2607:f8b0:4864:20::62d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 306CCC06175F
+        for <kvm@vger.kernel.org>; Mon,  2 Aug 2021 08:10:01 -0700 (PDT)
+Received: by mail-pl1-x62d.google.com with SMTP id u2so11681890plg.10
+        for <kvm@vger.kernel.org>; Mon, 02 Aug 2021 08:10:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=C5WNlWr2BA+JxhQ5uP7aMJ5RBERtPiuLGKSHEYe5+sI=;
+        b=CcMM1SCSMb7rRzN3Do0VlF2oMkiwZQ+XGFeO4P34eULW8joQ+7e01PFxPtcyS9L8Ka
+         2s4Fvhea128luYbThbX/49lSq5Xf32R2jOf0t9etj2o1Pf6gbcUybkF9+ggPld0a7ssP
+         QBiFm1EW+tRcz8K3jnOAN6hh8Bsq2RkCV5ddK159ThaeLiUzgx/F/YX5zPxerTUaB8Po
+         ABlh1q7KMLdQbWffosOx8GNj0HylPDb8RViJwwM32rjM63YzV/gBuIYWOEd/cRXzX846
+         nB2yP4Cm35CeTMcu7y3aroRRtA+nqZfEFoLsIBfUVkOQbYK8/PXBwL/ZQdy5dkcelZTR
+         NoVA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=ZGliIfJBEHexOCPQGqPO8C8AjQrhwCqXvf0JbC+DPHo=;
-        b=IYWp4I+qLmZ3d/sTgLFMwbeyFxMYVG3oe8kI2Nb6bjO49ve5VOIPXAYai/+t2XRiEP
-         Qq7gD0rMhrj5/xTgg++wdPgGZUU36KLZjnbOTzhCmSau/2yuALZCWwF2dUIvvxgRXn5W
-         3Km+adj2Nukt/+0x2fWrZQ5u2pWtGTY+BrwkNCXchqyNER9/BNHRUEBZcvBDTZNHKr0+
-         HjfJsbR/YHDXBO7MFdDxBnF4zD9mfZTaY/jhalcamSoDmxG24r5j8LidcwqCJKO8Un2v
-         w3l4HtSbKGKAXXPLSmLBzYmx1HW9g/Z4VSyvdjGpHKRolzXyXWiL+WtIUQ6sMlIeaYh8
-         SK8g==
-X-Gm-Message-State: AOAM532Xs/stIcaWJzbHJVu4VkvPnkNIkanOhoQP5LVTPmHuXwtz43AZ
-        Mz7lXA/Exg88wSv7zPRineaqTnKBZpJraJZ6Pm9qHZqe3a8LrKXcLoEd1zNiYboIgqU4V5hAaHt
-        IToqSMyL9eYBI
-X-Received: by 2002:adf:80e8:: with SMTP id 95mr18150741wrl.388.1627916395556;
-        Mon, 02 Aug 2021 07:59:55 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJx7+cjWAWN+T4atLoy+bwc7s+8haOi45vgtyaUXf4iYn94Yld31ccLtL9/CnIj87WUkeVI92g==
-X-Received: by 2002:adf:80e8:: with SMTP id 95mr18150719wrl.388.1627916395363;
-        Mon, 02 Aug 2021 07:59:55 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id l9sm11422889wro.92.2021.08.02.07.59.54
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 02 Aug 2021 07:59:54 -0700 (PDT)
-Subject: Re: [PATCH 5/6] KVM: x86/mmu: Rename __gfn_to_rmap to gfn_to_rmap
-To:     David Matlack <dmatlack@google.com>, kvm@vger.kernel.org
-Cc:     Ben Gardon <bgardon@google.com>, Joerg Roedel <joro@8bytes.org>,
-        Jim Mattson <jmattson@google.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Junaid Shahid <junaids@google.com>,
-        Andrew Jones <drjones@redhat.com>
-References: <20210730223707.4083785-1-dmatlack@google.com>
- <20210730223707.4083785-6-dmatlack@google.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <c513647b-5b3b-f65b-b69d-77714fa128e2@redhat.com>
-Date:   Mon, 2 Aug 2021 16:59:53 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.11.0
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=C5WNlWr2BA+JxhQ5uP7aMJ5RBERtPiuLGKSHEYe5+sI=;
+        b=FgTJNZNC8BEjB2FeS/Sbh9vnLOK03R3OHmPvAR1KFIWFK1YpiEVS6cm/TWRbHILMuI
+         Dv9eiuwwR2mVIgYmmdy3pQpSW+CL2NK9TD+DsFMa5k8NZTOJDCw3B5R062bw6Du6izwC
+         //gS56us0BjBwUGdT03hdd3vPNwwk09M35i6vLWxxu0KYsplj1jeptbynK4WMPdZduBh
+         8QISMUA7R7yf3tgiB+ueJROyIjzlJMe1iZeo7ZmvLIkY18ndd+RwcaNi2DjZrMz23W00
+         hdznGXBAN9kruOTcWMJdlYlzSDeaOmndW9bPAsp7F66922euG52CR9CQJBGvrKp1cR2l
+         Mfmg==
+X-Gm-Message-State: AOAM532bgn5pHZY7iwDbUbOn8wwPwdEoqI7RmS+KRoekoAjE98dw8ChP
+        CDD6K3Tg+hL0js1D43r6JPfLjg==
+X-Google-Smtp-Source: ABdhPJyPbUCHsd51UrtQEu3P1CiMjdTb4lnu9kanE57p+qXB+gQSXAkuHXee7Qy9flZBvtaRtNROjg==
+X-Received: by 2002:a17:90a:29a4:: with SMTP id h33mr17177475pjd.98.1627917000497;
+        Mon, 02 Aug 2021 08:10:00 -0700 (PDT)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id u129sm5971733pfc.59.2021.08.02.08.09.59
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 02 Aug 2021 08:09:59 -0700 (PDT)
+Date:   Mon, 2 Aug 2021 15:09:56 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Lara Lazier <laramglazier@gmail.com>
+Cc:     kvm@vger.kernel.org
+Subject: Re: [kvm-unit-tests PATCH] nSVM: Added test for VGIF feature
+Message-ID: <YQgKxFwd8TpdWaOc@google.com>
+References: <20210722131718.11667-1-laramglazier@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20210730223707.4083785-6-dmatlack@google.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210722131718.11667-1-laramglazier@gmail.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 31/07/21 00:37, David Matlack wrote:
-> gfn_to_rmap was removed in the previous patch so there is no need to
-> retain the double underscore on __gfn_to_rmap.
+Nit, s/Added/Add in the shortlog
+
+On Thu, Jul 22, 2021, Lara Lazier wrote:
+> When VGIF is enabled STGI executed in guest mode
+> sets bit 9, while CLGI clears bit 9 in the int_ctl (offset 60h)
+> of the VMCB.
 > 
-> Signed-off-by: David Matlack <dmatlack@google.com>
+> Signed-off-by: Lara Lazier <laramglazier@gmail.com>
 > ---
->   arch/x86/kvm/mmu/mmu.c | 25 ++++++++++++-------------
->   1 file changed, 12 insertions(+), 13 deletions(-)
 
-Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
+...
 
-apart from the extra mmu_audit.c changes.
+> --- a/x86/svm_tests.c
+> +++ b/x86/svm_tests.c
+> @@ -2772,6 +2772,73 @@ static void svm_vmload_vmsave(void)
+>  	vmcb->control.intercept = intercept_saved;
+>  }
+>  
+> +static void prepare_vgif_enabled(struct svm_test *test)
+> +{
+> +    default_prepare(test);
+> +}
+> +
+> +static void test_vgif(struct svm_test *test)
+> +{
+> +    asm volatile ("vmmcall\n\tstgi\n\tvmmcall\n\tclgi\n\tvmmcall\n\t");
 
-Paolo
+While amusing, this isn't very readable :-)  The SVM tests that use this for
+back-to-back VMMCALL are setting a bad example.  The space between "volatile" and
+the opening "(" can go too.
 
-> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> index 370a6ebc2ede..df493729d86c 100644
-> --- a/arch/x86/kvm/mmu/mmu.c
-> +++ b/arch/x86/kvm/mmu/mmu.c
-> @@ -1034,8 +1034,8 @@ static bool pte_list_destroy(struct kvm_rmap_head *rmap_head,
->   	return true;
->   }
->   
-> -static struct kvm_rmap_head *__gfn_to_rmap(gfn_t gfn, int level,
-> -					   const struct kvm_memory_slot *slot)
-> +static struct kvm_rmap_head *gfn_to_rmap(gfn_t gfn, int level,
-> +					 const struct kvm_memory_slot *slot)
->   {
->   	unsigned long idx;
->   
-> @@ -1060,7 +1060,7 @@ static int rmap_add(struct kvm_vcpu *vcpu, u64 *spte, gfn_t gfn)
->   	sp = sptep_to_sp(spte);
->   	kvm_mmu_page_set_gfn(sp, spte - sp->spt, gfn);
->   	slot = kvm_vcpu_gfn_to_memslot(vcpu, gfn);
-> -	rmap_head = __gfn_to_rmap(gfn, sp->role.level, slot);
-> +	rmap_head = gfn_to_rmap(gfn, sp->role.level, slot);
->   	return pte_list_add(vcpu, spte, rmap_head);
->   }
->   
-> @@ -1084,7 +1084,7 @@ static void rmap_remove(struct kvm *kvm, u64 *spte)
->   	slots = kvm_memslots_for_spte_role(kvm, sp->role);
->   
->   	slot = __gfn_to_memslot(slots, gfn);
-> -	rmap_head = __gfn_to_rmap(gfn, sp->role.level, slot);
-> +	rmap_head = gfn_to_rmap(gfn, sp->role.level, slot);
->   
->   	__pte_list_remove(spte, rmap_head);
->   }
-> @@ -1306,8 +1306,8 @@ static void kvm_mmu_write_protect_pt_masked(struct kvm *kvm,
->   		return;
->   
->   	while (mask) {
-> -		rmap_head = __gfn_to_rmap(slot->base_gfn + gfn_offset + __ffs(mask),
-> -					  PG_LEVEL_4K, slot);
-> +		rmap_head = gfn_to_rmap(slot->base_gfn + gfn_offset + __ffs(mask),
-> +					PG_LEVEL_4K, slot);
->   		__rmap_write_protect(kvm, rmap_head, false);
->   
->   		/* clear the first set bit */
-> @@ -1339,8 +1339,8 @@ static void kvm_mmu_clear_dirty_pt_masked(struct kvm *kvm,
->   		return;
->   
->   	while (mask) {
-> -		rmap_head = __gfn_to_rmap(slot->base_gfn + gfn_offset + __ffs(mask),
-> -					  PG_LEVEL_4K, slot);
-> +		rmap_head = gfn_to_rmap(slot->base_gfn + gfn_offset + __ffs(mask),
-> +					PG_LEVEL_4K, slot);
->   		__rmap_clear_dirty(kvm, rmap_head, slot);
->   
->   		/* clear the first set bit */
-> @@ -1406,7 +1406,7 @@ bool kvm_mmu_slot_gfn_write_protect(struct kvm *kvm,
->   
->   	if (kvm_memslots_have_rmaps(kvm)) {
->   		for (i = min_level; i <= KVM_MAX_HUGEPAGE_LEVEL; ++i) {
-> -			rmap_head = __gfn_to_rmap(gfn, i, slot);
-> +			rmap_head = gfn_to_rmap(gfn, i, slot);
->   			write_protected |= __rmap_write_protect(kvm, rmap_head, true);
->   		}
->   	}
-> @@ -1506,9 +1506,8 @@ rmap_walk_init_level(struct slot_rmap_walk_iterator *iterator, int level)
->   {
->   	iterator->level = level;
->   	iterator->gfn = iterator->start_gfn;
-> -	iterator->rmap = __gfn_to_rmap(iterator->gfn, level, iterator->slot);
-> -	iterator->end_rmap = __gfn_to_rmap(iterator->end_gfn, level,
-> -					   iterator->slot);
-> +	iterator->rmap = gfn_to_rmap(iterator->gfn, level, iterator->slot);
-> +	iterator->end_rmap = gfn_to_rmap(iterator->end_gfn, level, iterator->slot);
->   }
->   
->   static void
-> @@ -1638,7 +1637,7 @@ static void rmap_recycle(struct kvm_vcpu *vcpu, u64 *spte, gfn_t gfn)
->   
->   	sp = sptep_to_sp(spte);
->   	slot = kvm_vcpu_gfn_to_memslot(vcpu, gfn);
-> -	rmap_head = __gfn_to_rmap(gfn, sp->role.level, slot);
-> +	rmap_head = gfn_to_rmap(gfn, sp->role.level, slot);
->   
->   	kvm_unmap_rmapp(vcpu->kvm, rmap_head, NULL, gfn, sp->role.level, __pte(0));
->   	kvm_flush_remote_tlbs_with_address(vcpu->kvm, sp->gfn,
-> 
+	asm volatile("vmmcall\n\t"
+		     "stgi\n\t"
+		     "vmmcall\n\t"
+		     "clgi\n\t"
+		     "vmmcall\n\t");
 
+> +
+
+Unnecessary newline.
+
+> +}
+> +
+> +static bool vgif_finished(struct svm_test *test)
+> +{
+> +    switch (get_test_stage(test))
+> +    {
+> +    case 0:
+> +        if (vmcb->control.exit_code != SVM_EXIT_VMMCALL) {
+> +            report(false, "VMEXIT not due to vmmcall.");
+> +            return true;
+> +        }
+> +        vmcb->control.int_ctl |= V_GIF_ENABLED_MASK;
+
+Setting and restoring a control flag should be done in setup/teardown, e.g. this
+approach will leave V_GIF_ENABLED_MASK set if a VMMCALL check fails.
+
+> +        vmcb->save.rip += 3;
+> +        inc_test_stage(test);
+> +        break;
+> +    case 1:
+> +        if (vmcb->control.exit_code != SVM_EXIT_VMMCALL) {
+> +            report(false, "VMEXIT not due to vmmcall.");
+> +            return true;
+> +        }
+> +        if (!(vmcb->control.int_ctl & V_GIF_MASK)) {
+> +            report(false, "Failed to set VGIF when executing STGI.");
+> +            vmcb->control.int_ctl &= ~V_GIF_ENABLED_MASK;
+> +            return true;
+
+Are the VGIF checks really fatal?   I.e. can we keep running of a STGI/CLGI test
+fails?  That would allow for slightly cleaner code.
+
+> +        }
+> +        report(true, "STGI set VGIF bit.");
+> +        vmcb->save.rip += 3;
+> +        inc_test_stage(test);
+> +        break;
+> +    case 2:
+> +        if (vmcb->control.exit_code != SVM_EXIT_VMMCALL) {
+> +            report(false, "VMEXIT not due to vmmcall.");
+> +            return true;
+> +        }
+> +        if (vmcb->control.int_ctl & V_GIF_MASK) {
+> +            report(false, "Failed to clear VGIF when executing CLGI.");
+> +            vmcb->control.int_ctl &= ~V_GIF_ENABLED_MASK;
+> +            return true;
+> +        }
+> +        report(true, "CLGI cleared VGIF bit.");
+> +        vmcb->save.rip += 3;
+> +        inc_test_stage(test);
+> +        vmcb->control.int_ctl &= ~V_GIF_ENABLED_MASK;
+> +        break;
+
+
+Something like this is more reader friendly as the boilerplate is consoliated,
+abd the interesting test code is isolated in the switch statement.
+
+	bool is_vmmcall_exit = (vmcb->control.exit_code == SVM_EXIT_VMMCALL);
+
+	report(is_vmmcall_exit, ...);
+	if (!is_vmmcall_exit)
+		return true;
+
+	switch (get_test_stage())
+	{
+	case 0:
+		vmcb->control.int_ctl |= V_GIF_ENABLED_MASK;
+		break;
+	case 1:
+		report(vmcb->control.int_ctl & V_GIF_MASK, ...);
+		break;
+	case 2:
+		report(!(vmcb->control.int_ctl & V_GIF_MASK), ...);
+		break;
+	default:
+		break;
+	}
+
+	vmcb->save.rip += 3;
+	inc_test_stage(test);
+
+	return get_test_stage() >= 3;
+
+> +    default:
+> +        return true;
+> +        break;
+> +    }
