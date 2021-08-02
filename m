@@ -2,208 +2,95 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id F2E783DDE6B
-	for <lists+kvm@lfdr.de>; Mon,  2 Aug 2021 19:23:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5BF4E3DDE7B
+	for <lists+kvm@lfdr.de>; Mon,  2 Aug 2021 19:25:54 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231186AbhHBRXn (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 2 Aug 2021 13:23:43 -0400
-Received: from wforward2-smtp.messagingengine.com ([64.147.123.31]:53105 "EHLO
-        wforward2-smtp.messagingengine.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231410AbhHBRXl (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 2 Aug 2021 13:23:41 -0400
-Received: from compute4.internal (compute4.nyi.internal [10.202.2.44])
-        by mailforward.west.internal (Postfix) with ESMTP id DAA211AC0477;
-        Mon,  2 Aug 2021 13:23:28 -0400 (EDT)
-Received: from mailfrontend1 ([10.202.2.162])
-  by compute4.internal (MEProxy); Mon, 02 Aug 2021 13:23:29 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-        messagingengine.com; h=cc:content-type:date:from:in-reply-to
-        :message-id:mime-version:references:subject:to:x-me-proxy
-        :x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; bh=paabWa
-        2xNdONg8O+31P0jix5EoZeeaUaNV4cT5H6DrY=; b=i3TYK1HvKYcBRaXbIouOl4
-        jMxIGABlgkRMpecFi2JNSCHZRywYXGtK3ACOwxV0MIgZTZnhfNsb0t7x9XCdUcas
-        U+IlbDOT6y7yeuV5emHyXejgcYjY0e7057toPQVcWg22YWQ+o0+qyb+YPMnE4sQk
-        EM5TaJDnLhXcrsXYmLvvUSWSdxoj2IQ0d6e10AVoaOigwzQ3gCKOqNfNEHnr0cjm
-        iLGXxx0gv5f6g7oUkSvaVos1XIgBCXo4k/E1UQqqv+X9iqm5y9NoWJnM5VsmEc9b
-        1TfsaA94dI9GTpJoNEn1AbNSiaVaJMqUQGCewyh+hWrSDBR+omgq4YXm5mLWnlZQ
-        ==
-X-ME-Sender: <xms:CCoIYd3i8ycbqRBwXW6_B9z-lZiDVZElgx5nKvCSWzIAU_eQ_nWj0g>
-    <xme:CCoIYUFCXDKAhQJfiz01ps2qiJyONbeJFc0Plwx8Hz9Qi3Tv7LBiqb0j0ZSO4xyMx
-    H53PhQ-_3m87k_LwBQ>
-X-ME-Received: <xmr:CCoIYd7zGr6AOOj3AJjKMnMKzCII1dCrFNjaRj3ds13gD99j8iLM3BUvdZuC3V3SHjKex-ZcmBfh6rCXtFmfUCNBWQ7juMteEzQE8FL481c>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvtddriedvgddutddvucetufdoteggodetrfdotf
-    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
-    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
-    cujfgurhepvffujghfhfffkfggtgesthdtredttddttdenucfhrhhomhepffgrvhhiugcu
-    gfgumhhonhgushhonhcuoegurghvihgurdgvughmohhnughsohhnsehorhgrtghlvgdrtg
-    homheqnecuggftrfgrthhtvghrnhepheelfeefudeiudegudelgfetgeetkeelveeuieet
-    udelheejkeeileekveeukedtnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpe
-    hmrghilhhfrhhomhepuggrvhhiugdrvggumhhonhgushhonhesohhrrggtlhgvrdgtohhm
-X-ME-Proxy: <xmx:CCoIYa21HsJurVoPc-6powVv5CwwBXi2FEOrjFcjx-vbN62fanmIOQ>
-    <xmx:CCoIYQGNDPy-yqvQMD81Ig9yUi7AAyobCE0u9gbUeyRBJTer2M9wIw>
-    <xmx:CCoIYb-L2fOSzQ1mxBbh_XzGw97Www_w2Vm9HSD4U3KcqUn82zAmow>
-    <xmx:ECoIYcPUYm4UulqXdBhipUuxnnwAwj2cQb1ZfJlfzr2V8sXAUiEZq_CESGOuSzR3>
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Mon,
- 2 Aug 2021 13:23:19 -0400 (EDT)
-Received: from localhost (disaster-area.hh.sledj.net [local])
-        by disaster-area.hh.sledj.net (OpenSMTPD) with ESMTPA id 6ae5efb3;
-        Mon, 2 Aug 2021 17:23:18 +0000 (UTC)
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     linux-kernel@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
-        Joerg Roedel <joro@8bytes.org>, Ingo Molnar <mingo@redhat.com>,
-        Jim Mattson <jmattson@google.com>, kvm@vger.kernel.org,
-        Borislav Petkov <bp@alien8.de>,
-        David Matlack <dmatlack@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, x86@kernel.org,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Joao Martins <joao.m.martins@oracle.com>
-Subject: Re: [PATCH v3 2/3] KVM: x86: On emulation failure, convey the exit
- reason, etc. to userspace
-In-Reply-To: <YQgkGwGkrleO7I2A@google.com>
-References: <20210729133931.1129696-1-david.edmondson@oracle.com>
- <20210729133931.1129696-3-david.edmondson@oracle.com>
- <YQR52JRv8jgj+Dv8@google.com> <cunk0l4mhjc.fsf@oracle.com>
- <YQgkGwGkrleO7I2A@google.com>
-From:   David Edmondson <david.edmondson@oracle.com>
-Date:   Mon, 02 Aug 2021 18:23:17 +0100
-Message-ID: <cunbl6fn4l6.fsf@oracle.com>
+        id S230387AbhHBR0D (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 2 Aug 2021 13:26:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37316 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229551AbhHBR0A (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 2 Aug 2021 13:26:00 -0400
+Received: from mail-yb1-xb2b.google.com (mail-yb1-xb2b.google.com [IPv6:2607:f8b0:4864:20::b2b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 59C65C06175F
+        for <kvm@vger.kernel.org>; Mon,  2 Aug 2021 10:25:50 -0700 (PDT)
+Received: by mail-yb1-xb2b.google.com with SMTP id g76so29688304ybf.4
+        for <kvm@vger.kernel.org>; Mon, 02 Aug 2021 10:25:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=q/q31t5T+36bS3/wvpT+OMFWaL1ftp/gRKotikKNdQw=;
+        b=LhIAyiQ4DGJkN4/4LQ5fm3YGNPZdmEJzhy4txTg+V+8Zw+iHAkHNaGHWYKeM38WhGn
+         7QaBiepaSP1JBqwB6VoBuL5StJZ8FPCt+zqDICi8hH1hGP9QkQxWHCgbfdN8niuBLPGz
+         izjhivh6jzxNtq8gsLezGYQW8Vh9K9iFzkhXwcw/TtB9heltkVYRGc8qXQT1fQIBTra7
+         bMzWWdLbxxn5SA55g6pb9ZsHloCXQ4QVaEe+uGIOmBrzwfflbfzSoOkd67ptugrOV0Oj
+         uHA5LGlO3WHZyZ183S63juyO3D0VcmSwzWOy9snmvYxVgiND41QnhPuS1c9R5/sZigC5
+         SpEQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=q/q31t5T+36bS3/wvpT+OMFWaL1ftp/gRKotikKNdQw=;
+        b=lpbyRqIpFcdVnIToExB9vnytCZfm0YLX2G1e5n3dO7HIaIBXPplSAVRsOGMDv/hupb
+         Jg1c6PgjSir9oJIfAQYfglCPTx2QxypW7C/Hd/EVO+WpT6zBx6iBn7hXDuYewPCe+fBW
+         t+2n5AUvolj2yJENBd4+nFTYlamBATcuOiOCrc07IU454VzydBW1JtEWBWZlWdkCabss
+         G1/SnGg5rNinWW/1G2uayoBWdc47wYkYyREg/Co1ZLL2gqYhmvr2cwYWCO9hDFilbSpm
+         FJTgmzSM1Z3SyVaalFNmhVR7tsrUqxBU8iby6r8A3G+Nq7DwfztFS5JbAYdd8Ow5QMC5
+         ranw==
+X-Gm-Message-State: AOAM530yN33yyZ4J78J8Ya/PwaXbA61YW7fJI5x2pOvtsEUD+jFf1oqZ
+        eVmqFQif+W893h+QF0dhzbc7D5HTmaop3Mm2fXEDUQ==
+X-Google-Smtp-Source: ABdhPJw+a5aBgfV8UBGn5AEsMNJKdy9IHEJXHYJYV3cTfaKSyFzVTE1Rud/ZY6q5S1wRi0imigf/Yv+MY28MQqrZwRs=
+X-Received: by 2002:a25:ab54:: with SMTP id u78mr8592843ybi.139.1627925149434;
+ Mon, 02 Aug 2021 10:25:49 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain
+References: <20210731011304.3868795-1-mizhang@google.com> <YQgamDDn6TVY/BoV@google.com>
+ <71a905a1-0a6f-0d7a-f8fe-237b9e5af05c@redhat.com>
+In-Reply-To: <71a905a1-0a6f-0d7a-f8fe-237b9e5af05c@redhat.com>
+From:   Mingwei Zhang <mizhang@google.com>
+Date:   Mon, 2 Aug 2021 10:25:38 -0700
+Message-ID: <CAL715WKVZqHG0sJhTn-ebJKjdj5pUQedL9kJjVRWMWoZGbzHFg@mail.gmail.com>
+Subject: Re: [PATCH] KVM: SEV: improve the code readability for ASID management
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm <kvm@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Marc Orr <marcorr@google.com>,
+        David Rientjes <rientjes@google.com>,
+        Alper Gun <alpergun@google.com>,
+        Dionna Glaze <dionnaglaze@google.com>,
+        Vipin Sharma <vipinsh@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Monday, 2021-08-02 at 16:58:03 GMT, Sean Christopherson wrote:
+Hi Paolo,
 
-> On Mon, Aug 02, 2021, David Edmondson wrote:
->> On Friday, 2021-07-30 at 22:14:48 GMT, Sean Christopherson wrote:
->> 
->> > On Thu, Jul 29, 2021, David Edmondson wrote:
->> >> +		__u64 exit_info1;
->> >> +		__u64 exit_info2;
->> >> +		__u32 intr_info;
->> >> +		__u32 error_code;
->> >> +	} exit_reason;
->> >
->> > Oooh, you're dumping all the fields in kvm_run.  That took me forever to realize
->> > because the struct is named "exit_reason".  Unless there's a naming conflict,
->> > 'data' would be the simplest, and if that's already taken, maybe 'info'?
->> >
->> > I'm also not sure an anonymous struct is going to be the easiest to maintain.
->> > I do like that the fields all have names, but on the other hand the data should
->> > be padded so that each field is in its own data[] entry when dumped to userspace.
->> > IMO, the padding complexity isn't worth the naming niceness since this code
->> > doesn't actually care about what each field contains.
->> 
->> Given that this is avowedly not an ABI and that we are expecting any
->> (human) consumer to be intimate with the implementation to make sense of
->> it, is there really any requirement or need for padding?
->
-> My thought with the padding was to force each field into its own data[] entry.
-> E.g. if userspace does something like
->
-> 	for (i = 0; i < ndata; i++)
-> 		printf("\tdata[%d] = 0x%llx\n", i, data[i]);
->
-> then padding will yield
->
-> 	data[0] = flags
-> 	data[1] = exit_reason
-> 	data[2] = exit_info1
-> 	data[3] = exit_info2
-> 	data[4] = intr_info
-> 	data[5] = error_code
->
-> versus
->
-> 	data[0] = <flags>
-> 	data[1] = (exit_info1 << 32) | exit_reason
-> 	data[2] = (exit_info2 << 32) | (exit_info1 >> 32)
-> 	data[3] = (intr_info << 32) | (exit_info2 >> 32)
-> 	data[4] = error_code
->
-> Changing exit_reason to a u64 would clean up the worst of the mangling, but until
-> there's actually a 64-bit exit reason to dump, that's just a more subtle way to
-> pad the data.
+Thanks. I think Sean's suggestion makes sense. I will update it with
+that one and remove the 'fixes' line.
 
-Unnecessarily extending exit_reason to u64 would be bad, I agree.
+Regards
+-Mingwei
 
->> In your example below (most of which I'm fine with), the padding has the
->> effect of wasting space that could be used for another u64 of debug
->> data.
+On Mon, Aug 2, 2021 at 9:53 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
 >
-> Yes, but because it's not ABI, we can change it in the future if we get to the
-> point where we want to dump more info and don't have space.  Until that time, I
-> think it makes sense to prioritize readability with an ignorant (of the format)
-> userspace over memory footprint.
-
-This seems reasonable.
-
->> > 	/*
->> > 	 * There's currently space for 13 entries, but 5 are used for the exit
->> > 	 * reason and info.  Restrict to 4 to reduce the maintenance burden
->> > 	 * when expanding kvm_run.emulation_failure in the future.
->> > 	 */
->> > 	if (WARN_ON_ONCE(ndata > 4))
->> > 		ndata = 4;
->> >
->> > 	if (insn_size) {
->> > 		ndata_start = 3;
->> > 		run->emulation_failure.flags =
->> > 			KVM_INTERNAL_ERROR_EMULATION_FLAG_INSTRUCTION_BYTES;
->> > 		run->emulation_failure.insn_size = insn_size;
->> > 		memset(run->emulation_failure.insn_bytes, 0x90,
->> > 		       sizeof(run->emulation_failure.insn_bytes));
->> > 		memcpy(run->emulation_failure.insn_bytes, insn_bytes, insn_size);
->> > 	} else {
->> > 		/* Always include the flags as a 'data' entry. */
->> > 		ndata_start = 1;
->> > 		run->emulation_failure.flags = 0;
->> > 	}
->> 
->> When we add another flag (presuming that we do, because if not there was
->> not much point in the flags) this will have to be restructured again. Is
->> there an objection to the original style? (prime ndata=1, flags=0, OR in
->> flags and adjust ndata as we go.)
+> On 02/08/21 18:17, Sean Christopherson wrote:
+> >
+> > Rather than adjusting the bitmap index, what about simply umping the bitmap size?
+> > IIRC, current CPUs have 512 ASIDs, counting ASID 0, i.e. bumping the size won't
+> > consume any additional memory.  And if it does, the cost is 8 bytes...
+> >
+> > It'd be a bigger refactoring, but it should completely eliminate the mod-by-1
+> > shenanigans, e.g. a partial patch could look like
 >
-> No objection, though if you OR in flags then you should truly _adjust_ ndata, not
-> set it, e.g.
-
-My understanding of Aaron's intent is that this would not be the
-case.
-
-That is, if we add another flag with payload and set that flag, we would
-still have space for the instruction stream in data[] even if
-KVM_INTERNAL_ERROR_EMULATION_FLAG_INSTRUCTION_BYTES is not set.
-
-Given that, we must *set* ndata each time we add in a flag, with the
-value being the extent of data[] used by the payload corresponding to
-that flag, and the flags must be considered in ascending order (or we
-remember a "max" along the way).
-
-Dumping the arbitray debug data after the defined fields would require
-adjusting ndata, of course.
-
-If this is not the case, and the flag indicated payloads are packed at
-the head of data[], then the current structure definition is misleading
-and we should perhaps revise it.
-
->         /* Always include the flags as a 'data' entry. */
->         ndata_start = 1;
->         run->emulation_failure.flags = 0;
+> This is also okay by me if Mingwei agrees, of course.  I have already
+> queued his patch, but I can replace it with one using a nr_asids-sized
+> bitmap too.
 >
->         if (insn_size) {
->                 ndata_start += 2;  <----------------------- Adjust, not override
->                 run->emulation_failure.flags |=
->                         KVM_INTERNAL_ERROR_EMULATION_FLAG_INSTRUCTION_BYTES;
->                 run->emulation_failure.insn_size = insn_size;
->                 memset(run->emulation_failure.insn_bytes, 0x90,
->                        sizeof(run->emulation_failure.insn_bytes));
->                 memcpy(run->emulation_failure.insn_bytes, insn_bytes, insn_size);
->         }
+> Paolo
 >
->> > 	memcpy(&run->internal.data[ndata_start], info, ARRAY_SIZE(info));
->> > 	memcpy(&run->internal.data[ndata_start + ARRAY_SIZE(info)], data, ndata);
->> > }
