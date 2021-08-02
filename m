@@ -2,115 +2,163 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id F24E73DDF28
-	for <lists+kvm@lfdr.de>; Mon,  2 Aug 2021 20:30:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 81C213DDF38
+	for <lists+kvm@lfdr.de>; Mon,  2 Aug 2021 20:33:42 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230095AbhHBSac (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 2 Aug 2021 14:30:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53240 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229551AbhHBSa3 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 2 Aug 2021 14:30:29 -0400
-Received: from mail-pl1-x62c.google.com (mail-pl1-x62c.google.com [IPv6:2607:f8b0:4864:20::62c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DA09AC06175F
-        for <kvm@vger.kernel.org>; Mon,  2 Aug 2021 11:30:18 -0700 (PDT)
-Received: by mail-pl1-x62c.google.com with SMTP id d1so20682384pll.1
-        for <kvm@vger.kernel.org>; Mon, 02 Aug 2021 11:30:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=L3jHyeWhOPlnmHEQqXQZtFquEdYtQ8PlFuxX/iA0B/s=;
-        b=kkjr9Q/jcBdtyVY5j9GqKJURedDDefAXP9V4LLH7jtLeQqkTsQo/ZuqK1HHxKKvaLY
-         ckm/XCuKGJyChRIRNCuBPMHQY90EAtuNL6ptK857EoNl7NBUH+omXWvJKVbIv0+ljlnU
-         IiHomGcvuGugBEKgR5O0j5SlsR5VOunsN5drCoPuO916v4Kz6Zilh157r0R12lMvZirw
-         1AeNotywzHUneXGQGeV3QB0utob2Be5+J7zESX0D/ZOO2ozyaNV+lh2IiZ8++WadhUl2
-         A1yKt7ur0DcQrw+3deesKHw2I2qg1XlE2o/MWjsqOTIfeVUGZ86Fg/F+8ToYMRQbeDQl
-         LA1A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=L3jHyeWhOPlnmHEQqXQZtFquEdYtQ8PlFuxX/iA0B/s=;
-        b=DACpfrXR+9xiIicP7tR1OrQS7Quvk0ZhUrRKtKJwuVhDAysGu27n0Jd360j8Cbu2S5
-         kD2KRdqQz5eCyAyUhyguDlf2xJAaArjv91WDESQgPMRZkBrNx1Zh+IDodaLmoVrHMt/g
-         g1UboxQRFTB3R3VKULJUec+Nfwt+SisuPINtPmBHmRExbMTDEW383YJM/t0YineZgBAk
-         /MoO+r238q8ken322kd5Qh3kvFVHWYN0YBRW4hG3QOwKQs3HBavCYiMrCxR3eIQ8d7f4
-         b3IvA+WU15Xdm5fKNAENeHDREBxxEigxkeJr5LcKjgq+uEsqCTIBJ5v0wH5w+QxTaZlf
-         RhNQ==
-X-Gm-Message-State: AOAM531e3O0KyFbb6CGrzZx40/+0iGDoXtSesuV0tUmi5pbdo8WEx+N9
-        9/6JRmhUey7lAzkskdlGhQibVg==
-X-Google-Smtp-Source: ABdhPJxRFU6SpKvF4ZIie4VYq4AmJSV23DiH9m8nZORtUbgYg8beriVgY9zbA/I1wRaSH3jlkqsqcA==
-X-Received: by 2002:a17:902:ab05:b029:12c:3d3:cc93 with SMTP id ik5-20020a170902ab05b029012c03d3cc93mr15525090plb.74.1627929018268;
-        Mon, 02 Aug 2021 11:30:18 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id j10sm13563971pfd.200.2021.08.02.11.30.17
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 02 Aug 2021 11:30:17 -0700 (PDT)
-Date:   Mon, 2 Aug 2021 18:30:13 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Subject: Re: [PATCH 1/2] KVM: Block memslot updates across range_start() and
- range_end()
-Message-ID: <YQg5tQslPv83TTQW@google.com>
-References: <20210727171808.1645060-1-pbonzini@redhat.com>
- <20210727171808.1645060-2-pbonzini@redhat.com>
+        id S230309AbhHBSdu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 2 Aug 2021 14:33:50 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:60606 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229537AbhHBSdu (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 2 Aug 2021 14:33:50 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1627929219;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=u8cNuKavrSy3Q2eP4G8hJso7GgWtVrDgG0yqiTGqFog=;
+        b=Dr/T1VPBCDc37hE3AGjVT1ioNtZQHoUCczTmBuW0vEm5a8ISugRh7A3paq2TwIYXFgSXFU
+        SZYKsn19MloxVuItn/pWFUPq/LL3uRzYiFSQwtFrWQ2eBLO3SoenjKZRHhIwIjKXpwqV50
+        ss1PAir6SWcjIi3sZGmsT5Mf8DkNBKk=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-556-B_RjfL8SOJWT2_Jy58FmNg-1; Mon, 02 Aug 2021 14:33:36 -0400
+X-MC-Unique: B_RjfL8SOJWT2_Jy58FmNg-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 142D0802923;
+        Mon,  2 Aug 2021 18:33:34 +0000 (UTC)
+Received: from localhost.localdomain (unknown [10.35.206.50])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 3AB4D27CAB;
+        Mon,  2 Aug 2021 18:33:30 +0000 (UTC)
+From:   Maxim Levitsky <mlevitsk@redhat.com>
+To:     kvm@vger.kernel.org
+Cc:     Wanpeng Li <wanpengli@tencent.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Joerg Roedel <joro@8bytes.org>, Borislav Petkov <bp@alien8.de>,
+        Sean Christopherson <seanjc@google.com>,
+        Jim Mattson <jmattson@google.com>,
+        x86@kernel.org (maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)),
+        linux-kernel@vger.kernel.org (open list:X86 ARCHITECTURE (32-BIT AND
+        64-BIT)), Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Ingo Molnar <mingo@redhat.com>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Maxim Levitsky <mlevitsk@redhat.com>
+Subject: [PATCH v3 00/12] My AVIC patch queue
+Date:   Mon,  2 Aug 2021 21:33:17 +0300
+Message-Id: <20210802183329.2309921-1-mlevitsk@redhat.com>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210727171808.1645060-2-pbonzini@redhat.com>
+Content-Transfer-Encoding: quoted-printable
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jul 27, 2021, Paolo Bonzini wrote:
-> @@ -764,8 +769,9 @@ static inline struct kvm_memslots *__kvm_memslots(struct kvm *kvm, int as_id)
->  {
->  	as_id = array_index_nospec(as_id, KVM_ADDRESS_SPACE_NUM);
->  	return srcu_dereference_check(kvm->memslots[as_id], &kvm->srcu,
-> -			lockdep_is_held(&kvm->slots_lock) ||
-> -			!refcount_read(&kvm->users_count));
-> +				      lockdep_is_held(&kvm->slots_lock) ||
-> +				      READ_ONCE(kvm->mn_active_invalidate_count) ||
+Hi!=0D
+=0D
+This is a series of bugfixes to the AVIC dynamic inhibition, which was=0D
+made while trying to fix bugs as much as possible in this area and trying=0D
+to make the AVIC+SYNIC conditional enablement work.=0D
+=0D
+* Patches 1-6 are code from Sean Christopherson which=0D
+  implement an alternative approach of inhibiting AVIC without=0D
+  disabling its memslot.=0D
+  Those patches are new in this version of the patchset.=0D
+=0D
+* Patches 7-8 in this series fix a race condition which can cause=0D
+  a lost write from a guest to APIC when the APIC write races=0D
+  the AVIC un-inhibition, and add a warning to catch this problem=0D
+  if it re-emerges again.=0D
+=0D
+  V3: moved the mutex to kvm.arch and added comment=0D
+=0D
+* Patch 9 is the patch from Vitaly about allowing AVIC with SYNC=0D
+  as long as the guest doesn=E2=80=99t use the AutoEOI feature. I only slig=
+htly=0D
+  changed it to expose the AutoEOI cpuid bit regardless of AVIC enablement.=
+=0D
+=0D
+* Patch 10 is a new patch in this version, which is a refactoring that is n=
+ow=0D
+  possible in SVM AVIC inhibition code, because the RCU lock is not dropped=
+ anymore.=0D
+=0D
+* Patch 11 fixes another issue I found in AVIC inhibit code:=0D
+=0D
+  Currently avic_vcpu_load/avic_vcpu_put are called on userspace entry/exit=
+=0D
+  from KVM (aka kvm_vcpu_get/kvm_vcpu_put), and these functions update the=
+=0D
+  "is running" bit in the AVIC physical ID remap table and update the=0D
+  target vCPU in iommu code.=0D
+=0D
+  However both of these functions don't do anything when AVIC is inhibited=
+=0D
+  thus the "is running" bit will be kept enabled during the exit to userspa=
+ce.=0D
+  This shouldn't be a big issue as the caller=0D
+  doesn't use the AVIC when inhibited but still inconsistent and can trigge=
+r=0D
+  a warning about this in avic_vcpu_load.=0D
+=0D
+  To be on the safe side I think it makes sense to call=0D
+  avic_vcpu_put/avic_vcpu_load when inhibiting/uninhibiting the AVIC.=0D
+  This will ensure that the work these functions do is matched.=0D
+=0D
+* Patch 12 (also new in this series) removes the pointless APIC base=0D
+  relocation from AVIC to make it consistent with the rest of KVM.=0D
+=0D
+  (both AVIC and APICv only support default base, while regular KVM,=0D
+  sort of support any APIC base as long as it is not RAM.=0D
+  If guest attempts to relocate APIC base to non RAM area,=0D
+  while APICv/AVIC are active, the new base will be non accelerated,=0D
+  while the default base will continue to be AVIC/APICv backed).=0D
+=0D
+Best regards,=0D
+	Maxim Levitsky=0D
+=0D
+Maxim Levitsky (10):=0D
+  KVM: x86/mmu: bump mmu notifier count in kvm_zap_gfn_range=0D
+  KVM: x86/mmu: rename try_async_pf to kvm_faultin_pfn=0D
+  KVM: x86/mmu: allow kvm_faultin_pfn to return page fault handling code=0D
+  KVM: x86/mmu: allow APICv memslot to be partially enabled=0D
+  KVM: x86: don't disable APICv memslot when inhibited=0D
+  KVM: x86: APICv: fix race in kvm_request_apicv_update on SVM=0D
+  KVM: SVM: add warning for mistmatch between AVIC state and AVIC access=0D
+    page state=0D
+  KVM: SVM: remove svm_toggle_avic_for_irq_window=0D
+  KVM: SVM: call avic_vcpu_load/avic_vcpu_put when enabling/disabling=0D
+    AVIC=0D
+  KVM: SVM: AVIC: drop unsupported AVIC base relocation code=0D
+=0D
+Sean Christopherson (1):=0D
+  Revert "KVM: x86/mmu: Allow zap gfn range to operate under the mmu=0D
+    read lock"=0D
+=0D
+Vitaly Kuznetsov (1):=0D
+  KVM: x86: hyper-v: Deactivate APICv only when AutoEOI feature is in=0D
+    use=0D
+=0D
+ arch/x86/include/asm/kvm-x86-ops.h |  1 -=0D
+ arch/x86/include/asm/kvm_host.h    |  7 ++-=0D
+ arch/x86/kvm/hyperv.c              | 27 ++++++++---=0D
+ arch/x86/kvm/mmu/mmu.c             | 69 ++++++++++++++++----------=0D
+ arch/x86/kvm/mmu/paging_tmpl.h     |  6 +--=0D
+ arch/x86/kvm/mmu/tdp_mmu.c         | 15 ++----=0D
+ arch/x86/kvm/mmu/tdp_mmu.h         | 11 ++---=0D
+ arch/x86/kvm/svm/avic.c            | 77 ++++++++++++------------------=0D
+ arch/x86/kvm/svm/svm.c             | 23 +++++----=0D
+ arch/x86/kvm/svm/svm.h             |  8 ----=0D
+ arch/x86/kvm/x86.c                 | 56 +++++++++++++---------=0D
+ include/linux/kvm_host.h           |  5 ++=0D
+ virt/kvm/kvm_main.c                |  7 ++-=0D
+ 13 files changed, 166 insertions(+), 146 deletions(-)=0D
+=0D
+-- =0D
+2.26.3=0D
+=0D
 
-Hmm, I'm not sure we should add mn_active_invalidate_count as an exception to
-holding kvm->srcu.  It made sense in original (flawed) approach because the
-exception was a locked_is_held() check, i.e. it was verifying the the current
-task holds the lock.  With mn_active_invalidate_count, this only verifies that
-there's an invalidation in-progress, it doesn't verify that this task/CPU is the
-one doing the invalidation.
-
-Since __kvm_handle_hva_range() takes SRCU for read, maybe it's best omit this?
-
-> +				      !refcount_read(&kvm->users_count));
->  }
->  
->  static inline struct kvm_memslots *kvm_memslots(struct kvm *kvm)
-
-...
-
-> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> index 5cc79373827f..c64a7de60846 100644
-> --- a/virt/kvm/kvm_main.c
-> +++ b/virt/kvm/kvm_main.c
-> @@ -605,10 +605,8 @@ static void kvm_mmu_notifier_change_pte(struct mmu_notifier *mn,
->  
->  	/*
->  	 * .change_pte() must be surrounded by .invalidate_range_{start,end}(),
-
-Nit, the comma can be switch to a period.  The next patch starts a new sentence,
-so it would be correct even in the long term.
-
-> -	 * and so always runs with an elevated notifier count.  This obviates
-> -	 * the need to bump the sequence count.
->  	 */
-> -	WARN_ON_ONCE(!kvm->mmu_notifier_count);
-> +	WARN_ON_ONCE(!READ_ONCE(kvm->mn_active_invalidate_count));
->  
->  	kvm_handle_hva_range(mn, address, address + 1, pte, kvm_set_spte_gfn);
->  }
-
-Nits aside,
-
-Reviewed-by: Sean Christopherson <seanjc@google.com>
