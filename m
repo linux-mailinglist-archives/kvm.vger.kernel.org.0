@@ -2,149 +2,210 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9C59B3DDCA6
-	for <lists+kvm@lfdr.de>; Mon,  2 Aug 2021 17:46:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6DCF83DDCA8
+	for <lists+kvm@lfdr.de>; Mon,  2 Aug 2021 17:46:28 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235266AbhHBPqU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 2 Aug 2021 11:46:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39864 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234551AbhHBPqT (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 2 Aug 2021 11:46:19 -0400
-Received: from mail-pj1-x102f.google.com (mail-pj1-x102f.google.com [IPv6:2607:f8b0:4864:20::102f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3C69CC06175F
-        for <kvm@vger.kernel.org>; Mon,  2 Aug 2021 08:46:10 -0700 (PDT)
-Received: by mail-pj1-x102f.google.com with SMTP id nh14so14005665pjb.2
-        for <kvm@vger.kernel.org>; Mon, 02 Aug 2021 08:46:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=8Q8GPtUEDsZnvVcYI9DEHGIcb7f0tGzkxrNpYDg2qaU=;
-        b=uow+0XtDub2IqIcws3lM4NZ7uaUdL+cd84LTX4KtuCE3l37WKA2N+zxg5/iVd8BXRq
-         fX1WFK1I+yFnvLf4UWLznAAWEPerkoHJShkJ28aOvH2VE6TE1vJoeCYklWFB4N39ajUz
-         h+hfQex/9Ng6SEilyRyJXJ67tdLF7zbsHtQ1G3sFPnONGHZMXdCLYOd+81GbwBsSNn9b
-         giIDjtOcFzOwECu6+D5R6Pkkjq/ZLiN5ZdLbDKeGW2WyenxRSyUfN3o/1s7SyEygNRcN
-         LNysSnrbcnPA0eFtCIgxq0vL89LGrGe1GzjhZuGXb4Ry/t+e0QRN5DuEzkFQkJuRGucW
-         zxmw==
+        id S235279AbhHBPqg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 2 Aug 2021 11:46:36 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:48982 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S230131AbhHBPqe (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 2 Aug 2021 11:46:34 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1627919184;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=ajvnHluA867RdGZlexeIhFwJ8QUYCttbeHBIj4eOw+8=;
+        b=VNjyaIbAxgdAj7f3RScpZ7XcPoDqwrECRrjhIYc/m8RcWkIk+aRS2SGdFKyqPtNITxoScg
+        arexFMgc6enzezAWBWwA577oO0CiasSeS29JQKy5vB+4WSqajfzyKyUsx2+onUVclfwFEt
+        Zgg4nU9t0haIf48bmsWXtFqZOO0NJkE=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-527-6h1wW90hMLm3q90FWW37lw-1; Mon, 02 Aug 2021 11:46:23 -0400
+X-MC-Unique: 6h1wW90hMLm3q90FWW37lw-1
+Received: by mail-wr1-f71.google.com with SMTP id c1-20020a5d4cc10000b02901547bb2ef31so1901547wrt.7
+        for <kvm@vger.kernel.org>; Mon, 02 Aug 2021 08:46:23 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=8Q8GPtUEDsZnvVcYI9DEHGIcb7f0tGzkxrNpYDg2qaU=;
-        b=VLffV/l5mx5RLf1hVVTPdz8CBfRGhPqQ3EdqJf1TTVpxTDfEFH7LLvfJpaH/+DlLZm
-         3PndQRaEN+Z0TUK8y6KsLdDISH5jjooLaAocCyZ5ySjZFe+zhnsnCF8oUB8Wu6rmoiW9
-         77/A4Lca3BYcUJEKuu5iRphT1Hsi4e0s0ZYqwdhtsThV8nlvEkYq0acWdM4OfScRwqWI
-         KAAOVUvM4bMAQfn5G2fpa9gjgQ6NXuO84U5z7hAODZQ1hUg9fYlT62lV63EEF58KsVsH
-         y4GPyjnmpygJVrqTeVQo2P0I/Dp0aNIdPyjzK3SHcjXw3vrXfgVpCVy1jujJoOggEj5p
-         DO6w==
-X-Gm-Message-State: AOAM533qp72OefqaHBIDXq/spCrag0nh8PkV8505i1Bk5zqYoIPcqihe
-        UisqTZTbNe9HKV7rxvKHhf6Ckw==
-X-Google-Smtp-Source: ABdhPJyD2vWo9Vn05mBGwtYf+avY1EFSSDpDQQAstgMR7/9Wwz/17fZavGw+io3OGZXkoX9XNrwNMw==
-X-Received: by 2002:a65:6441:: with SMTP id s1mr3109877pgv.214.1627919169557;
-        Mon, 02 Aug 2021 08:46:09 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id b7sm12046336pfl.195.2021.08.02.08.46.08
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 02 Aug 2021 08:46:09 -0700 (PDT)
-Date:   Mon, 2 Aug 2021 15:46:05 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Xiaoyao Li <xiaoyao.li@intel.com>
-Cc:     Tao Xu <tao3.xu@intel.com>, pbonzini@redhat.com,
-        vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com,
-        joro@8bytes.org, tglx@linutronix.de, mingo@redhat.com,
-        bp@alien8.de, hpa@zytor.com, x86@kernel.org, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2] KVM: VMX: Enable Notify VM exit
-Message-ID: <YQgTPakbT+kCwMLP@google.com>
-References: <20210525051204.1480610-1-tao3.xu@intel.com>
- <YQRkBI9RFf6lbifZ@google.com>
- <b0c90258-3f68-57a2-664a-e20a6d251e45@intel.com>
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=ajvnHluA867RdGZlexeIhFwJ8QUYCttbeHBIj4eOw+8=;
+        b=U5Z9onf7CI4xnqXLHpUbyBkp4illOACbnHK+FdvTijiU4vh8pY+CwjcnLMDK3RxvVp
+         zkyMLWeCMrUdC0EUh1kP+jNAVYd23wbKFrjgnwmdqzJhhPCOPE8WSMEYg9v7jDKwq9lB
+         huEyNj6DRAhEs9YoyRMVLybmTNLhUc2HmQErP68xsgyN5pfr1jyRGnlonkYarVuSpJtv
+         HFqcY8lix8ySt4Uh38B7nf3O9VLiXlgTXJuQ4gEhGqD/mvvvLpg+tlhh/U13wqvp4fFp
+         OcAtwFbQ4tb1Xb7ju5Q9eAlJ1tCJ66zeqV3C0NVVRWYjscZxCC5NYB0p+qyVe0cy2JE0
+         c7IA==
+X-Gm-Message-State: AOAM5327WR3KAUskACO0ge6OclPCCz5FZ9iLRvkWM1YYGO2/iX4QO272
+        gWFz6T0BJpRdRRNvSjghg57wXFmQ5Z/VxPyFNCTk7UsYcxZPdDFZqJFFcCns7dVTOt/i9Kc4xbh
+        ir4N+J420P7Zn
+X-Received: by 2002:adf:ef0d:: with SMTP id e13mr18847287wro.390.1627919182388;
+        Mon, 02 Aug 2021 08:46:22 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyY1BCQzPsZFV2SjOkvGPU+pQM37pPcAbyInqUAOs1oZfToNhXPHVMmxMcu3td2vrkDkR3Lkw==
+X-Received: by 2002:adf:ef0d:: with SMTP id e13mr18847276wro.390.1627919182214;
+        Mon, 02 Aug 2021 08:46:22 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+        by smtp.gmail.com with ESMTPSA id j6sm10367926wmq.29.2021.08.02.08.46.21
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 02 Aug 2021 08:46:21 -0700 (PDT)
+Subject: Re: [PATCH] KVM: x86/pmu: Introduce pmc->is_paused to reduce the call
+ time of perf interfaces
+To:     Like Xu <like.xu.linux@gmail.com>
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>, kvm@vger.kernel.org,
+        x86@kernel.org, linux-kernel@vger.kernel.org
+References: <20210728120705.6855-1-likexu@tencent.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <0e1526dd-12e6-ad35-e69c-4eb58ed032e0@redhat.com>
+Date:   Mon, 2 Aug 2021 17:46:20 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.11.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <b0c90258-3f68-57a2-664a-e20a6d251e45@intel.com>
+In-Reply-To: <20210728120705.6855-1-likexu@tencent.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Aug 02, 2021, Xiaoyao Li wrote:
-> On 7/31/2021 4:41 AM, Sean Christopherson wrote:
-> > On Tue, May 25, 2021, Tao Xu wrote:
-> > >   #endif /* __KVM_X86_VMX_CAPS_H */
-> > > diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> > > index 4bceb5ca3a89..c0ad01c88dac 100644
-> > > --- a/arch/x86/kvm/vmx/vmx.c
-> > > +++ b/arch/x86/kvm/vmx/vmx.c
-> > > @@ -205,6 +205,10 @@ module_param(ple_window_max, uint, 0444);
-> > >   int __read_mostly pt_mode = PT_MODE_SYSTEM;
-> > >   module_param(pt_mode, int, S_IRUGO);
-> > > +/* Default is 0, less than 0 (for example, -1) disables notify window. */
-> > > +static int __read_mostly notify_window;
-> > 
-> > I'm not sure I like the idea of trusting ucode to select an appropriate internal
-> > threshold.  Unless the internal threshold is architecturally defined to be at
-> > least N nanoseconds or whatever, I think KVM should provide its own sane default.
-> > E.g. it's not hard to imagine a scenario where a ucode patch gets rolled out that
-> > adjusts the threshold and starts silently degrading guest performance.
+On 28/07/21 14:07, Like Xu wrote:
+> From: Like Xu <likexu@tencent.com>
 > 
-> You mean when internal threshold gets smaller somehow, and cases
-> false-positive that leads unexpected VM exit on normal instruction? In this
-> case, we set increase the vmcs.notify_window in KVM.
-
-Not while VMs are running though.
-
-> I think there is no better to avoid this case if ucode changes internal
-> threshold. Unless KVM's default notify_window is bigger enough.
+> Based on our observations, after any vm-exit associated with vPMU, there
+> are at least two or more perf interfaces to be called for guest counter
+> emulation, such as perf_event_{pause, read_value, period}(), and each one
+> will {lock, unlock} the same perf_event_ctx. The frequency of calls becomes
+> more severe when guest use counters in a multiplexed manner.
 > 
-> > Even if the internal threshold isn't architecturally constrained, it would be very,
-> > very helpful if Intel could publish the per-uarch/stepping thresholds, e.g. to give
-> > us a ballpark idea of how agressive KVM can be before it risks false positives.
+> Holding a lock once and completing the KVM request operations in the perf
+> context would introduce a set of impractical new interfaces. So we can
+> further optimize the vPMU implementation by avoiding repeated calls to
+> these interfaces in the KVM context for at least one pattern:
 > 
-> Even Intel publishes the internal threshold, we still need to provide a
-> final best_value (internal + vmcs.notify_window). Then what's that value?
-
-The ideal value would be high enough to guarantee there are zero false positives,
-yet low enough to prevent a malicious guest from causing instability in the host
-by blocking events for an extended duration.  The problem is that there's no
-magic answer for the threshold at which a blocked event would lead to system
-instability, and without at least a general idea of the internal value there's no
-answer at all.
-
-IIRC, SGX instructions have a hard upper bound of 25k cycles before they have to
-check for pending interrupts, e.g. it's why EINIT is interruptible.  The 25k cycle
-limit is likely a good starting point for the combined minimum.  That's why I want
-to know the internal minimum; if the internal minimum is _guaranteed_ to be >25k,
-then KVM can be more aggressive with its default value.
-
-> If we have an option for final best_value, then I think it's OK to just let
-> vmcs.notify_window = best_value. Then the true final value is best_value +
-> internal.
->  - if it's a normal instruction, it should finish within best_value or
-> best_value + internal. So it makes no difference.
->  - if it's an instruction in malicious case, it won't go to next instruction
-> whether wait for best_value or best_value + internal.
-
-...
-
-> > > +
-> > >   	vmcs_write32(PAGE_FAULT_ERROR_CODE_MASK, 0);
-> > >   	vmcs_write32(PAGE_FAULT_ERROR_CODE_MATCH, 0);
-> > >   	vmcs_write32(CR3_TARGET_COUNT, 0);           /* 22.2.1 */
-> > > @@ -5642,6 +5653,31 @@ static int handle_bus_lock_vmexit(struct kvm_vcpu *vcpu)
-> > >   	return 0;
-> > >   }
-> > > +static int handle_notify(struct kvm_vcpu *vcpu)
-> > > +{
-> > > +	unsigned long exit_qual = vmx_get_exit_qual(vcpu);
-> > > +
-> > > +	if (!(exit_qual & NOTIFY_VM_CONTEXT_INVALID)) {
-> > 
-> > What does CONTEXT_INVALID mean?  The ISE doesn't provide any information whatsoever.
+> After we call perf_event_pause() once, the event will be disabled and its
+> internal count will be reset to 0. So there is no need to pause it again
+> or read its value. Once the event is paused, event period will not be
+> updated until the next time it's resumed or reprogrammed. And there is
+> also no need to call perf_event_period twice for a non-running counter,
+> considering the perf_event for a running counter is never paused.
 > 
-> It means whether the VM context is corrupted and not valid in the VMCS.
+> Based on this implementation, for the following common usage of
+> sampling 4 events using perf on a 4u8g guest:
+> 
+>    echo 0 > /proc/sys/kernel/watchdog
+>    echo 25 > /proc/sys/kernel/perf_cpu_time_max_percent
+>    echo 10000 > /proc/sys/kernel/perf_event_max_sample_rate
+>    echo 0 > /proc/sys/kernel/perf_cpu_time_max_percent
+>    for i in `seq 1 1 10`
+>    do
+>    taskset -c 0 perf record \
+>    -e cpu-cycles -e instructions -e branch-instructions -e cache-misses \
+>    /root/br_instr a
+>    done
+> 
+> the average latency of the guest NMI handler is reduced from
+> 37646.7 ns to 32929.3 ns (~1.14x speed up) on the Intel ICX server.
+> Also, in addition to collecting more samples, no loss of sampling
+> accuracy was observed compared to before the optimization.
+> 
+> Signed-off-by: Like Xu <likexu@tencent.com>
+> ---
+>   arch/x86/include/asm/kvm_host.h | 1 +
+>   arch/x86/kvm/pmu.c              | 5 ++++-
+>   arch/x86/kvm/pmu.h              | 2 +-
+>   arch/x86/kvm/vmx/pmu_intel.c    | 4 ++--
+>   4 files changed, 8 insertions(+), 4 deletions(-)
+> 
+> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+> index 99f37781a6fc..a079880d4cd5 100644
+> --- a/arch/x86/include/asm/kvm_host.h
+> +++ b/arch/x86/include/asm/kvm_host.h
+> @@ -482,6 +482,7 @@ struct kvm_pmc {
+>   	 * ctrl value for fixed counters.
+>   	 */
+>   	u64 current_config;
+> +	bool is_paused;
+>   };
+>   
+>   struct kvm_pmu {
+> diff --git a/arch/x86/kvm/pmu.c b/arch/x86/kvm/pmu.c
+> index 827886c12c16..0772bad9165c 100644
+> --- a/arch/x86/kvm/pmu.c
+> +++ b/arch/x86/kvm/pmu.c
+> @@ -137,18 +137,20 @@ static void pmc_reprogram_counter(struct kvm_pmc *pmc, u32 type,
+>   	pmc->perf_event = event;
+>   	pmc_to_pmu(pmc)->event_count++;
+>   	clear_bit(pmc->idx, pmc_to_pmu(pmc)->reprogram_pmi);
+> +	pmc->is_paused = false;
+>   }
+>   
+>   static void pmc_pause_counter(struct kvm_pmc *pmc)
+>   {
+>   	u64 counter = pmc->counter;
+>   
+> -	if (!pmc->perf_event)
+> +	if (!pmc->perf_event || pmc->is_paused)
+>   		return;
+>   
+>   	/* update counter, reset event value to avoid redundant accumulation */
+>   	counter += perf_event_pause(pmc->perf_event, true);
+>   	pmc->counter = counter & pmc_bitmask(pmc);
+> +	pmc->is_paused = true;
+>   }
+>   
+>   static bool pmc_resume_counter(struct kvm_pmc *pmc)
+> @@ -163,6 +165,7 @@ static bool pmc_resume_counter(struct kvm_pmc *pmc)
+>   
+>   	/* reuse perf_event to serve as pmc_reprogram_counter() does*/
+>   	perf_event_enable(pmc->perf_event);
+> +	pmc->is_paused = false;
+>   
+>   	clear_bit(pmc->idx, (unsigned long *)&pmc_to_pmu(pmc)->reprogram_pmi);
+>   	return true;
+> diff --git a/arch/x86/kvm/pmu.h b/arch/x86/kvm/pmu.h
+> index 67e753edfa22..0e4f2b1fa9fb 100644
+> --- a/arch/x86/kvm/pmu.h
+> +++ b/arch/x86/kvm/pmu.h
+> @@ -55,7 +55,7 @@ static inline u64 pmc_read_counter(struct kvm_pmc *pmc)
+>   	u64 counter, enabled, running;
+>   
+>   	counter = pmc->counter;
+> -	if (pmc->perf_event)
+> +	if (pmc->perf_event && !pmc->is_paused)
+>   		counter += perf_event_read_value(pmc->perf_event,
+>   						 &enabled, &running);
+>   	/* FIXME: Scaling needed? */
+> diff --git a/arch/x86/kvm/vmx/pmu_intel.c b/arch/x86/kvm/vmx/pmu_intel.c
+> index 9efc1a6b8693..10cc4f65c4ef 100644
+> --- a/arch/x86/kvm/vmx/pmu_intel.c
+> +++ b/arch/x86/kvm/vmx/pmu_intel.c
+> @@ -437,13 +437,13 @@ static int intel_pmu_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+>   			    !(msr & MSR_PMC_FULL_WIDTH_BIT))
+>   				data = (s64)(s32)data;
+>   			pmc->counter += data - pmc_read_counter(pmc);
+> -			if (pmc->perf_event)
+> +			if (pmc->perf_event && !pmc->is_paused)
+>   				perf_event_period(pmc->perf_event,
+>   						  get_sample_period(pmc, data));
+>   			return 0;
+>   		} else if ((pmc = get_fixed_pmc(pmu, msr))) {
+>   			pmc->counter += data - pmc_read_counter(pmc);
+> -			if (pmc->perf_event)
+> +			if (pmc->perf_event && !pmc->is_paused)
+>   				perf_event_period(pmc->perf_event,
+>   						  get_sample_period(pmc, data));
+>   			return 0;
+> 
 
-Well that's a bit terrifying.  Under what conditions can the VM context become
-corrupted?  E.g. if the context can be corrupted by an inopportune NOTIFY exit,
-then KVM needs to be ultra conservative as a false positive could be fatal to a
-guest.
+Queued, thanks.
+
+Paolo
+
