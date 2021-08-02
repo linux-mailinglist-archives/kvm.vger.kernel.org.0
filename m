@@ -2,174 +2,139 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2B93B3DD028
-	for <lists+kvm@lfdr.de>; Mon,  2 Aug 2021 07:55:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C46753DD0E3
+	for <lists+kvm@lfdr.de>; Mon,  2 Aug 2021 09:00:21 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229805AbhHBFzv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 2 Aug 2021 01:55:51 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:33753 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229495AbhHBFzv (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 2 Aug 2021 01:55:51 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1627883742;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=ivPqFlYITqRUkuoXkFTKBay5LBYZ801aDo0Fz7/YC94=;
-        b=IGT89iJTZ3oTzkvaGRjUqyqSPQD0oZLGChHHiIAkPNtdaUqRrKc6M12FU6K0BrUxHq6Wmt
-        kDqcsl1tR3wg6oVcuOPvpxbwdCcWfUutzlxGQAR/1hNIY23nuxoQPx9ckx6IeGUnQRb9Qm
-        uHogsQ/teNJZ0vK1ILWF9H0KozeTk3s=
-Received: from mail-pj1-f71.google.com (mail-pj1-f71.google.com
- [209.85.216.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-554-emqJwS2FMVauKu9RVNnpOQ-1; Mon, 02 Aug 2021 01:55:40 -0400
-X-MC-Unique: emqJwS2FMVauKu9RVNnpOQ-1
-Received: by mail-pj1-f71.google.com with SMTP id ep15-20020a17090ae64fb02901772983d308so16080375pjb.4
-        for <kvm@vger.kernel.org>; Sun, 01 Aug 2021 22:55:40 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-transfer-encoding
-         :content-language;
-        bh=ivPqFlYITqRUkuoXkFTKBay5LBYZ801aDo0Fz7/YC94=;
-        b=b8kQ0yqQ9bOXXYYXzghlDPMLaQfDfVR9JsJY9a+VSE4zqE6NAwwKV8dODOcAyW8Yiq
-         iJ83MIU0a4rh7R+LkTbgMMv1jV8JOxX1thK20E1IldkQ6po8AAlQpRtyHzEMFI1lr8am
-         AygUbsWu8wWHWkLptutr4/BxW3lcDDD35WLyhoKsN1xnqpFFmGNfwFovRX0/N6zB30bP
-         yKi/TWI2mcvhhMyT7VD+6aKz4rS04HwLt96FrXxL8IoNRbjKXng50G+hoymb+BgHSzut
-         vqmyOmX0Lftp38m1zkOjQZ5R91rrAv9E5lta0WEtFfmPYB/rOGekk4n/jnEeK218sJTP
-         L2Lg==
-X-Gm-Message-State: AOAM533il1wVclRtuVY/rAZc4KuqhRvSNDOPXA2LbMQz48ktWAbytltR
-        tbwTUc8xA6ojcxQOJjk5x087CvWkQZ30i7OX9meZvOxXSMX8Zi/Ned27tjhVseOSpDgl9zh/o1S
-        X4vowhkxNzxvw
-X-Received: by 2002:a17:902:7889:b029:12b:cf54:4bf1 with SMTP id q9-20020a1709027889b029012bcf544bf1mr13203523pll.85.1627883739447;
-        Sun, 01 Aug 2021 22:55:39 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwCymVYU/4mTuqAsIpJXfqohEsOKqh1rlQQr8yeuVnx7kilOyGUBZP3wg1qufTUzqmR/4n/Hw==
-X-Received: by 2002:a17:902:7889:b029:12b:cf54:4bf1 with SMTP id q9-20020a1709027889b029012bcf544bf1mr13203506pll.85.1627883739140;
-        Sun, 01 Aug 2021 22:55:39 -0700 (PDT)
-Received: from wangxiaodeMacBook-Air.local ([209.132.188.80])
-        by smtp.gmail.com with ESMTPSA id 136sm9275832pge.77.2021.08.01.22.55.37
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 01 Aug 2021 22:55:38 -0700 (PDT)
-Subject: Re: [PATCH] vdpa: Make use of PFN_PHYS/PFN_UP/PFN_DOWN helper macro
-To:     Cai Huoqing <caihuoqing@baidu.com>, mst@redhat.com
-Cc:     kvm@vger.kernel.org, virtualization@lists.linux-foundation.org
-References: <20210802013717.851-1-caihuoqing@baidu.com>
-From:   Jason Wang <jasowang@redhat.com>
-Message-ID: <8ae935c5-27fd-ef96-94f1-6d935381ee18@redhat.com>
-Date:   Mon, 2 Aug 2021 13:55:35 +0800
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0)
- Gecko/20100101 Thunderbird/78.12.0
+        id S232448AbhHBHA2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 2 Aug 2021 03:00:28 -0400
+Received: from mga17.intel.com ([192.55.52.151]:27827 "EHLO mga17.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S232297AbhHBHA1 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 2 Aug 2021 03:00:27 -0400
+X-IronPort-AV: E=McAfee;i="6200,9189,10063"; a="193681317"
+X-IronPort-AV: E=Sophos;i="5.84,288,1620716400"; 
+   d="scan'208";a="193681317"
+Received: from fmsmga003.fm.intel.com ([10.253.24.29])
+  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Aug 2021 00:00:10 -0700
+X-IronPort-AV: E=Sophos;i="5.84,288,1620716400"; 
+   d="scan'208";a="509949522"
+Received: from zengguan-mobl.ccr.corp.intel.com (HELO [10.238.0.133]) ([10.238.0.133])
+  by fmsmga003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Aug 2021 00:00:03 -0700
+Subject: Re: [PATCH 3/6] KVM: VMX: Detect Tertiary VM-Execution control when
+ setup VMCS config
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        "Luck, Tony" <tony.luck@intel.com>,
+        Kan Liang <kan.liang@linux.intel.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Kim Phillips <kim.phillips@amd.com>,
+        Jarkko Sakkinen <jarkko@kernel.org>,
+        Jethro Beekman <jethro@fortanix.com>,
+        "Huang, Kai" <kai.huang@intel.com>,
+        "x86@kernel.org" <x86@kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "Hu, Robert" <robert.hu@intel.com>,
+        "Gao, Chao" <chao.gao@intel.com>,
+        Robert Hoo <robert.hu@linux.intel.com>
+References: <20210716064808.14757-1-guang.zeng@intel.com>
+ <20210716064808.14757-4-guang.zeng@intel.com> <YQHwa42jixqPPvVm@google.com>
+From:   Zeng Guang <guang.zeng@intel.com>
+Message-ID: <05faffb4-c22d-1cd5-7582-823de9dd109a@intel.com>
+Date:   Mon, 2 Aug 2021 14:59:47 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Firefox/78.0 Thunderbird/78.12.0
 MIME-Version: 1.0
-In-Reply-To: <20210802013717.851-1-caihuoqing@baidu.com>
-Content-Type: text/plain; charset=gbk; format=flowed
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <YQHwa42jixqPPvVm@google.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Content-Language: en-US
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-ÔÚ 2021/8/2 ÉÏÎç9:37, Cai Huoqing Ð´µÀ:
-> it's a nice refactor to make use of
-> PFN_PHYS/PFN_UP/PFN_DOWN helper macro
+On 7/29/2021 8:03 AM, Sean Christopherson wrote:
+> On Fri, Jul 16, 2021, Zeng Guang wrote:
+>> @@ -4204,6 +4234,13 @@ vmx_adjust_secondary_exec_control(struct vcpu_vmx *vmx, u32 *exec_control,
+>>   #define vmx_adjust_sec_exec_exiting(vmx, exec_control, lname, uname) \
+>>   	vmx_adjust_sec_exec_control(vmx, exec_control, lname, uname, uname##_EXITING, true)
+>>   
+>> +static void vmx_compute_tertiary_exec_control(struct vcpu_vmx *vmx)
+>> +{
+>> +	u32 exec_control = vmcs_config.cpu_based_3rd_exec_ctrl;
+> This is incorrectly truncating the value.
 >
-> Signed-off-by: Cai Huoqing <caihuoqing@baidu.com>
-
-
-Acked-by: Jason Wang <jasowang@redhat.com>
-
-
-> ---
->   drivers/vhost/vdpa.c | 24 ++++++++++++------------
->   1 file changed, 12 insertions(+), 12 deletions(-)
+>> +
+>> +	vmx->tertiary_exec_control = exec_control;
+>> +}
+>> +
+>>   static void vmx_compute_secondary_exec_control(struct vcpu_vmx *vmx)
+>>   {
+>>   	struct kvm_vcpu *vcpu = &vmx->vcpu;
+>> @@ -4319,6 +4356,11 @@ static void init_vmcs(struct vcpu_vmx *vmx)
+>>   		secondary_exec_controls_set(vmx, vmx->secondary_exec_control);
+>>   	}
+>>   
+>> +	if (cpu_has_tertiary_exec_ctrls()) {
+>> +		vmx_compute_tertiary_exec_control(vmx);
+>> +		tertiary_exec_controls_set(vmx, vmx->tertiary_exec_control);
+> IMO, the existing vmx->secondary_exec_control is an abomination that should not
+> exist.  Looking at the code, it's actually not hard to get rid, there's just one
+> annoying use in prepare_vmcs02_early() that requires a bit of extra work to get
+> rid of.
 >
-> diff --git a/drivers/vhost/vdpa.c b/drivers/vhost/vdpa.c
-> index 210ab35a7ebf..1f6dd6ad0f8b 100644
-> --- a/drivers/vhost/vdpa.c
-> +++ b/drivers/vhost/vdpa.c
-> @@ -507,15 +507,15 @@ static void vhost_vdpa_iotlb_unmap(struct vhost_vdpa *v, u64 start, u64 last)
->   	unsigned long pfn, pinned;
->   
->   	while ((map = vhost_iotlb_itree_first(iotlb, start, last)) != NULL) {
-> -		pinned = map->size >> PAGE_SHIFT;
-> -		for (pfn = map->addr >> PAGE_SHIFT;
-> +		pinned = PFN_DOWN(map->size);
-> +		for (pfn = PFN_DOWN(map->addr);
->   		     pinned > 0; pfn++, pinned--) {
->   			page = pfn_to_page(pfn);
->   			if (map->perm & VHOST_ACCESS_WO)
->   				set_page_dirty_lock(page);
->   			unpin_user_page(page);
->   		}
-> -		atomic64_sub(map->size >> PAGE_SHIFT, &dev->mm->pinned_vm);
-> +		atomic64_sub(PFN_DOWN(map->size), &dev->mm->pinned_vm);
->   		vhost_iotlb_map_free(iotlb, map);
->   	}
->   }
-> @@ -577,7 +577,7 @@ static int vhost_vdpa_map(struct vhost_vdpa *v,
->   	if (r)
->   		vhost_iotlb_del_range(dev->iotlb, iova, iova + size - 1);
->   	else
-> -		atomic64_add(size >> PAGE_SHIFT, &dev->mm->pinned_vm);
-> +		atomic64_add(PFN_DOWN(size), &dev->mm->pinned_vm);
->   
->   	return r;
->   }
-> @@ -630,7 +630,7 @@ static int vhost_vdpa_process_iotlb_update(struct vhost_vdpa *v,
->   	if (msg->perm & VHOST_ACCESS_WO)
->   		gup_flags |= FOLL_WRITE;
->   
-> -	npages = PAGE_ALIGN(msg->size + (iova & ~PAGE_MASK)) >> PAGE_SHIFT;
-> +	npages = PFN_UP(msg->size + (iova & ~PAGE_MASK));
->   	if (!npages) {
->   		ret = -EINVAL;
->   		goto free;
-> @@ -638,7 +638,7 @@ static int vhost_vdpa_process_iotlb_update(struct vhost_vdpa *v,
->   
->   	mmap_read_lock(dev->mm);
->   
-> -	lock_limit = rlimit(RLIMIT_MEMLOCK) >> PAGE_SHIFT;
-> +	lock_limit = PFN_DOWN(rlimit(RLIMIT_MEMLOCK));
->   	if (npages + atomic64_read(&dev->mm->pinned_vm) > lock_limit) {
->   		ret = -ENOMEM;
->   		goto unlock;
-> @@ -672,9 +672,9 @@ static int vhost_vdpa_process_iotlb_update(struct vhost_vdpa *v,
->   
->   			if (last_pfn && (this_pfn != last_pfn + 1)) {
->   				/* Pin a contiguous chunk of memory */
-> -				csize = (last_pfn - map_pfn + 1) << PAGE_SHIFT;
-> +				csize = PFN_PHYS(last_pfn - map_pfn + 1);
->   				ret = vhost_vdpa_map(v, iova, csize,
-> -						     map_pfn << PAGE_SHIFT,
-> +						     PFN_PHYS(map_pfn),
->   						     msg->perm);
->   				if (ret) {
->   					/*
-> @@ -698,13 +698,13 @@ static int vhost_vdpa_process_iotlb_update(struct vhost_vdpa *v,
->   			last_pfn = this_pfn;
->   		}
->   
-> -		cur_base += pinned << PAGE_SHIFT;
-> +		cur_base += PFN_PHYS(pinned);
->   		npages -= pinned;
->   	}
->   
->   	/* Pin the rest chunk */
-> -	ret = vhost_vdpa_map(v, iova, (last_pfn - map_pfn + 1) << PAGE_SHIFT,
-> -			     map_pfn << PAGE_SHIFT, msg->perm);
-> +	ret = vhost_vdpa_map(v, iova, PFN_PHYS(last_pfn - map_pfn + 1),
-> +			     PFN_PHYS(map_pfn), msg->perm);
->   out:
->   	if (ret) {
->   		if (nchunks) {
-> @@ -944,7 +944,7 @@ static vm_fault_t vhost_vdpa_fault(struct vm_fault *vmf)
->   
->   	vma->vm_page_prot = pgprot_noncached(vma->vm_page_prot);
->   	if (remap_pfn_range(vma, vmf->address & PAGE_MASK,
-> -			    notify.addr >> PAGE_SHIFT, PAGE_SIZE,
-> +			    PFN_DOWN(notify.addr), PAGE_SIZE,
->   			    vma->vm_page_prot))
->   		return VM_FAULT_SIGBUS;
->   
-
+> Anyways, for tertiary controls, I'd prefer to avoid the same mess and instead
+> follow vmx_exec_control(), both in functionality and in name:
+>
+>    static u64 vmx_tertiary_exec_control(struct vcpu_vmx *vmx)
+>    {
+> 	return vmcs_config.cpu_based_3rd_exec_ctrl;
+>    }
+>
+> and:
+>
+> 	if (cpu_has_tertiary_exec_ctrls())
+> 		tertiary_exec_controls_set(vmx, vmx_tertiary_exec_control(vmx));
+>
+> and then the next patch becomes:
+>
+>    static u64 vmx_tertiary_exec_control(struct vcpu_vmx *vmx)
+>    {
+> 	u64 exec_control = vmcs_config.cpu_based_3rd_exec_ctrl;
+>
+> 	if (!kvm_vcpu_apicv_active(vcpu))
+> 		exec_control &= ~TERTIARY_EXEC_IPI_VIRT;
+>
+> 	return exec_control;
+>    }
+>
+>
+> And I'll work on a patch to purge vmx->secondary_exec_control.
+Ok, it looks much concise. I will change as you suggest. Thanks.
+>> +	}
+>> +
+>>   	if (kvm_vcpu_apicv_active(&vmx->vcpu)) {
+>>   		vmcs_write64(EOI_EXIT_BITMAP0, 0);
+>>   		vmcs_write64(EOI_EXIT_BITMAP1, 0);
+>> diff --git a/arch/x86/kvm/vmx/vmx.h b/arch/x86/kvm/vmx/vmx.h
+>> index 945c6639ce24..c356ceebe84c 100644
+>> --- a/arch/x86/kvm/vmx/vmx.h
+>> +++ b/arch/x86/kvm/vmx/vmx.h
+>> @@ -266,6 +266,7 @@ struct vcpu_vmx {
+>>   	u32		      msr_ia32_umwait_control;
+>>   
+>>   	u32 secondary_exec_control;
+>> +	u64 tertiary_exec_control;
+>>   
+>>   	/*
+>>   	 * loaded_vmcs points to the VMCS currently used in this vcpu. For a
+>> -- 
+>> 2.25.1
+>>
