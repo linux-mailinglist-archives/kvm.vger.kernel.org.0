@@ -2,96 +2,106 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 31ACC3DF535
-	for <lists+kvm@lfdr.de>; Tue,  3 Aug 2021 21:15:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 76A303DF593
+	for <lists+kvm@lfdr.de>; Tue,  3 Aug 2021 21:26:08 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239525AbhHCTPN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 3 Aug 2021 15:15:13 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:41753 "EHLO
+        id S230376AbhHCT0Q (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 3 Aug 2021 15:26:16 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:38082 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S239079AbhHCTPM (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 3 Aug 2021 15:15:12 -0400
+        by vger.kernel.org with ESMTP id S238920AbhHCT0Q (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 3 Aug 2021 15:26:16 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1628018101;
+        s=mimecast20190719; t=1628018764;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=+rSWKM/T14hSNJ7CCzHqgndf9sQoQa3vUJu76cRGCd4=;
-        b=VJwvzzvHIrjPvzGs/SV6VENfbCCSvdt3tPaDL8IkN9MlN7rahXuWzeExUzZSMiCB7Sv3se
-        /VEMjxzRlTrWZffBmg0YmjSU8+bKHXIm0yUJylKJVsOdBrPSuIruPHi9jO4Y8nGra4w6Je
-        8aiJ34Av2ot83zQj4f0wNEqrbgzSm1c=
-Received: from mail-qk1-f197.google.com (mail-qk1-f197.google.com
- [209.85.222.197]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-570-AQhjPkj6MgSPZLjx8bNDYw-1; Tue, 03 Aug 2021 15:15:00 -0400
-X-MC-Unique: AQhjPkj6MgSPZLjx8bNDYw-1
-Received: by mail-qk1-f197.google.com with SMTP id b4-20020a3799040000b02903b899a4309cso206018qke.14
-        for <kvm@vger.kernel.org>; Tue, 03 Aug 2021 12:14:59 -0700 (PDT)
+        bh=AuezItg9seEgfMKYB1g/Rctit7PAPDnaoS+2H0jfLOQ=;
+        b=JyQbWiWA/ShnqQS9193SwxTv8XnGyg0v85aSUjbImuoSD663ZStghkRreCNY3sHo9ZR4oj
+        jY3XMS83Sckg1g8asCpqJlU76X0qmENsQZhdLKr16rNUerKGLlAJfh7FZqVnHrSpiacSQq
+        qm1BaLxL0nQdAS5iOVvS+Pqj8ClEZ6c=
+Received: from mail-qv1-f71.google.com (mail-qv1-f71.google.com
+ [209.85.219.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-51-G11JtJpfNb2E5JaGu-ahSw-1; Tue, 03 Aug 2021 15:26:01 -0400
+X-MC-Unique: G11JtJpfNb2E5JaGu-ahSw-1
+Received: by mail-qv1-f71.google.com with SMTP id y10-20020a0cd98a0000b029032ca50bbea1so18532113qvj.12
+        for <kvm@vger.kernel.org>; Tue, 03 Aug 2021 12:26:01 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=+rSWKM/T14hSNJ7CCzHqgndf9sQoQa3vUJu76cRGCd4=;
-        b=TIK8JBI4EMlbhu8TELO3iUr0n/eZ6wdGpxevV8E82+wdVqHFaz0iTrVvR9ypAdBaN9
-         U8S9YvGafWUXlUA5QDG1Lv2tO1E3tUxrZcG+oGTJfKB7pVJQX3OvltmiwS7tItAU1SRT
-         ZS0y5KoooPyDY/Zm+k34gkbMyJOW69a1HQpxD+ZLN1SGPbW0/lQqHnTi7nmZeYWtGY0J
-         kJHWv9oCwtqj76tl5pF5BfZN0Aqs1dk2OPqtjDjWBPucJ/wKgYV0PU5/4+OZb1hVtVYf
-         s/h/nSC9b0TQf/JVTi7+vCBn4k4DF3N+GTOecGdVyHLqiAwHpN4SguAyphPGPwoWzr3i
-         HJ+Q==
-X-Gm-Message-State: AOAM532JOcCB4x6KLZ/BW1LozMNbTCJv9Hya8ihi/iaHtWe78MQaflGS
-        4sdTTPaPoZhXAUQzq9jSmQgma7CoM3g6nKIvB3ZxmwNqmLUk/rbkmjhhfgzc0kTD7wHFGHvcdfu
-        piQfvQeSpDkhK
-X-Received: by 2002:a37:d8c:: with SMTP id 134mr22409453qkn.433.1628018099292;
-        Tue, 03 Aug 2021 12:14:59 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJz/g25mwjJPBW3GRsT658xAjK7WfPFxd5+EX8D2glJQaP3nTHkoEEbGh1NCY2uO0kxMEiXzLw==
-X-Received: by 2002:a37:d8c:: with SMTP id 134mr22409441qkn.433.1628018099094;
-        Tue, 03 Aug 2021 12:14:59 -0700 (PDT)
+        bh=AuezItg9seEgfMKYB1g/Rctit7PAPDnaoS+2H0jfLOQ=;
+        b=HjBZfu3jgEUGkBI3V/Bqt7r9N6ICY0WWxEIsrzcKQciChbZivsNBbuMPZOCQQh7vZv
+         XxU3OiKpJs+bWktp1T2hC+a/1OPtQ7YOjjDheoNSMDzIppIzmXDa0vrWJJwi5CnLn2PB
+         rJWR5GnO4GCcIWx7mo+Q2zxVaul6iixTjZwTSHMKeO2WKOh5dnE6sGMCWhYSTtdZeDgC
+         hGl4UNQ7zcTCK3eh22ajCCdNzG4Sa/9IS7gdy6fPNFqLKT67E2Apv4NZK8KHb1AhwVhP
+         30zroe9trvyYvMVYXvGxtUaTgtsVbDm61Q0kiOgD+WPRdfAI0BEYaczWolF4F6HRRfqB
+         shdw==
+X-Gm-Message-State: AOAM533oVsalSUTMuSSejo2g7ki6ci75Fd4HzIdMB72ROBs5kXua8HNN
+        wi3noUM+LtSfxOEjDOSD2ash/Su5ggHtTQOUH2Tw+B7cNirIqIP53ztuon2HTGjkscl4KoeI5A8
+        4tC+v5lJtmxQJ
+X-Received: by 2002:ae9:ebd5:: with SMTP id b204mr21648674qkg.183.1628018760671;
+        Tue, 03 Aug 2021 12:26:00 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzYeoQDv54NHjaIqbGDtNPTql9N7o1wDb61oHzcCt7l9lNHoPyLztEafRgQaLSDv9++2pNkrw==
+X-Received: by 2002:ae9:ebd5:: with SMTP id b204mr21648661qkg.183.1628018760445;
+        Tue, 03 Aug 2021 12:26:00 -0700 (PDT)
 Received: from t490s (bras-base-toroon474qw-grc-92-76-70-75-133.dsl.bell.ca. [76.70.75.133])
-        by smtp.gmail.com with ESMTPSA id v6sm8503245qkp.117.2021.08.03.12.14.58
+        by smtp.gmail.com with ESMTPSA id i62sm8509567qke.110.2021.08.03.12.25.59
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 03 Aug 2021 12:14:58 -0700 (PDT)
-Date:   Tue, 3 Aug 2021 15:14:57 -0400
+        Tue, 03 Aug 2021 12:25:59 -0700 (PDT)
+Date:   Tue, 3 Aug 2021 15:25:58 -0400
 From:   Peter Xu <peterx@redhat.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
+To:     Greg KH <greg@kroah.com>
 Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Sean Christopherson <seanjc@google.com>,
-        Maxim Levitsky <mlevitsk@redhat.com>
-Subject: Re: [PATCH v3 4/7] KVM: X86: Introduce mmu_rmaps_stat per-vm debugfs
- file
-Message-ID: <YQmVsSKIPooRQakQ@t490s>
+        Maxim Levitsky <mlevitsk@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [PATCH v3 1/7] KVM: Allow to have arch-specific per-vm debugfs
+ files
+Message-ID: <YQmYRmidtS1XAydf@t490s>
 References: <20210730220455.26054-1-peterx@redhat.com>
- <20210730220455.26054-5-peterx@redhat.com>
- <8964c91d-761f-8fd4-e8c6-f85d6e318a45@redhat.com>
+ <20210730220455.26054-2-peterx@redhat.com>
+ <YQklR580FbVSiVz6@kroah.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <8964c91d-761f-8fd4-e8c6-f85d6e318a45@redhat.com>
+In-Reply-To: <YQklR580FbVSiVz6@kroah.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Aug 02, 2021 at 05:25:12PM +0200, Paolo Bonzini wrote:
-> On 31/07/21 00:04, Peter Xu wrote:
-> > Use this file to dump rmap statistic information.  The statistic is done by
-> > calculating the rmap count and the result is log-2-based.
-> > 
-> > An example output of this looks like (idle 6GB guest, right after boot linux):
-> > 
-> > Rmap_Count:     0       1       2-3     4-7     8-15    16-31   32-63   64-127  128-255 256-511 512-1023
-> > Level=4K:       3086676 53045   12330   1272    502     121     76      2       0       0       0
-> > Level=2M:       5947    231     0       0       0       0       0       0       0       0       0
-> > Level=1G:       32      0       0       0       0       0       0       0       0       0       0
-> > 
-> > Signed-off-by: Peter Xu <peterx@redhat.com>
-> > ---
-> >   arch/x86/kvm/x86.c | 113 +++++++++++++++++++++++++++++++++++++++++++++
-> >   1 file changed, 113 insertions(+)
+On Tue, Aug 03, 2021 at 01:15:19PM +0200, Greg KH wrote:
+> > +/*
+> > + * Called after per-vm debugfs created.  When called kvm->debugfs_dentry should
+> > + * be setup already, so we can create arch-specific debugfs entries under it.
+> > + * Cleanup should be automatic done in kvm_destroy_vm_debugfs() recursively, so
+> > + * a per-arch destroy interface is not needed.
+> > + */
+> > +int __weak kvm_arch_create_vm_debugfs(struct kvm *kvm)
 > 
-> This should be in debugfs.c, meaning that the kvm_mmu_slot_lpages() must be
-> in a header.  I think mmu.h should do, let me take a look and I can post
-> myself a v4 of these debugfs parts.
+> This should be a void function, nothing should matter if creating
+> debugfs files succeeds or not.
+> 
+> As proof, your one implementation always returned 0 :)
 
-Thanks, Paolo!
+Right. :)
+
+But we do have code that prepares for a failure on debugfs creations, please
+have a look at kvm_create_vm_debugfs().  So I kept that for per-arch hook.
+
+The existing x86 one should not fail, but it's a hope that we can convert some
+other arch's existing debugfs code into per-arch hook like what we did with x86
+here.  I didn't check again (please refer to the cover letter; we do have some
+of those), but it's still easier to still allow per-arch hook to fail the vm
+creation just like what we have for kvm_create_vm_debugfs().
+
+PS: It makes sense to me to fail vm creation if 99% of those debugfs creation
+failures are about -ENOMEM; e.g. early failure sounds better than failing right
+after VM booted.
+
+Meanwhile, I never expected to receive comments from you; thanks for having a
+look!
 
 -- 
 Peter Xu
