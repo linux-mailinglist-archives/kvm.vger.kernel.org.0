@@ -2,188 +2,116 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E579A3DE91D
-	for <lists+kvm@lfdr.de>; Tue,  3 Aug 2021 11:01:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7E6E03DE922
+	for <lists+kvm@lfdr.de>; Tue,  3 Aug 2021 11:02:15 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234923AbhHCJBa (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 3 Aug 2021 05:01:30 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:52812 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S234831AbhHCJB3 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 3 Aug 2021 05:01:29 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1627981278;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=pKHXn9wnTp9qRrDvUqHWpePjL7Y3hrbra/6xW/dla90=;
-        b=i2GmHkTtKvwab5yr2VLy8d3OzP5Yu5366PdB8wBfuniNBbF4CcJWFwIpRHdD6Pi7HLI3Lw
-        9QX5OAndZVmBFvEF3JeYfzatWiy57KkI7odUZ0yv+TEH+mmOmxjWYh2W2rz41rTPwXvdVx
-        /cA5ikfkzWGKKLwbz1JAukXGJTixZME=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-445-3dIh2y_ONwqW3_Pe_WhmBQ-1; Tue, 03 Aug 2021 05:01:14 -0400
-X-MC-Unique: 3dIh2y_ONwqW3_Pe_WhmBQ-1
-Received: by mail-wr1-f69.google.com with SMTP id d7-20020adffd870000b02901544ea2018fso4229395wrr.10
-        for <kvm@vger.kernel.org>; Tue, 03 Aug 2021 02:01:14 -0700 (PDT)
+        id S234967AbhHCJCY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 3 Aug 2021 05:02:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33786 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S234631AbhHCJCU (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 3 Aug 2021 05:02:20 -0400
+Received: from mail-ed1-x52a.google.com (mail-ed1-x52a.google.com [IPv6:2a00:1450:4864:20::52a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9B4ECC061764
+        for <kvm@vger.kernel.org>; Tue,  3 Aug 2021 02:02:09 -0700 (PDT)
+Received: by mail-ed1-x52a.google.com with SMTP id ec13so27557523edb.0
+        for <kvm@vger.kernel.org>; Tue, 03 Aug 2021 02:02:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=bytedance-com.20150623.gappssmtp.com; s=20150623;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=3wZFhZTC8zZY+D9UvhMcL30+qrKHqoBqQtpm1vOADzM=;
+        b=JKe8MBo/Q/9jJiWfNFv7/6FozVELAtit9lfH9d5TxXXMYzq/K+Pmkq5MZfy0MK2cFu
+         cx6FhhWxNDc+0E1xzGVvot63Tu4Ur8FkAtBApXV5HGWA7B6YAue4z52aDqp2cPeuObcM
+         NbvLlt0iETqmIH/loBFX6RmK5lnhTeVCMIO5KKZH9Z5CWgGXEldHbQTMQQrf9uJEnfFB
+         86l/PEM0xk2vAai/1RJXq5azCxa1fJfFP2bTdkelMNkruzkW1VP4XZZrR/YihWu8I9cm
+         wPq3kJhM7XQVmw7qPL2HCPQ0a2PjgZxJc4l7AroO/DlUf8xZiD0v/CMDlg12kwVoA4f6
+         XDfQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=pKHXn9wnTp9qRrDvUqHWpePjL7Y3hrbra/6xW/dla90=;
-        b=ENVYlfW0kggbSnP03Ea3uXmjl7zaCLGlZLvewmm2HwrbI+QJqkqaiTvq8v9xnIcJgr
-         5xtsbOEHtvynE6x3pMxUP9e6RtncxgpDzOjFte7QJA5cph63w21txBNpL072dgIeG2ra
-         3xXX/YWSgEM26DF246PWrBuo6I0tlbLs4O2m5wfyDqQ/g8D3RMxFox+24gNE5fcEVnA9
-         xKkhlKTXCNi55uT4J+eRmDn1H92Gegrf99j9smOGdhEnEsFpAZybZpxfCTGkchFQSZ3L
-         T8cqhXQIeUSRQLC/yaM/iGq0y1IRB5qeFWg7t8u8umUxIGSV0loP6Ck0Nm29/QNOveTJ
-         +9ng==
-X-Gm-Message-State: AOAM530LPVocrsHsKsJgTaHOC9sGiK0kUpZLA2tSuCch+ArG9cDmJ4jJ
-        y8XuHz7ftq0NdrIxPzwqij8QwPFTNMG0mBrddcok7fary/ToUG3gDgMWBP+85cVkk636NySzjUF
-        RxgD+nx6hw8EP
-X-Received: by 2002:a1c:46c4:: with SMTP id t187mr3244030wma.64.1627981273321;
-        Tue, 03 Aug 2021 02:01:13 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxSMW8XDmM6IKA3v4gzcbw7RQQimpJW2BqmCZ8OTl1PXZEjUdI1YetIiIV7wNFHI9aSeYjXEg==
-X-Received: by 2002:a1c:46c4:: with SMTP id t187mr3244005wma.64.1627981273140;
-        Tue, 03 Aug 2021 02:01:13 -0700 (PDT)
-Received: from [192.168.10.118] ([93.56.169.140])
-        by smtp.gmail.com with ESMTPSA id a16sm14072483wrx.7.2021.08.03.02.01.11
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 03 Aug 2021 02:01:12 -0700 (PDT)
-Subject: Re: [PATCH v3 09/12] KVM: x86: hyper-v: Deactivate APICv only when
- AutoEOI feature is in use
-To:     Maxim Levitsky <mlevitsk@redhat.com>, kvm@vger.kernel.org
-Cc:     Wanpeng Li <wanpengli@tencent.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Joerg Roedel <joro@8bytes.org>, Borislav Petkov <bp@alien8.de>,
-        Sean Christopherson <seanjc@google.com>,
-        Jim Mattson <jmattson@google.com>,
-        "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
-        "open list:X86 ARCHITECTURE (32-BIT AND 64-BIT)" 
-        <linux-kernel@vger.kernel.org>,
-        Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Ingo Molnar <mingo@redhat.com>,
-        "H. Peter Anvin" <hpa@zytor.com>
-References: <20210802183329.2309921-1-mlevitsk@redhat.com>
- <20210802183329.2309921-10-mlevitsk@redhat.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <4209384b-68f3-a0d2-24da-3b047422f114@redhat.com>
-Date:   Tue, 3 Aug 2021 11:01:10 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.11.0
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=3wZFhZTC8zZY+D9UvhMcL30+qrKHqoBqQtpm1vOADzM=;
+        b=qQGYJUb096LFP+WChfC/EzfA8cUWlFcB8jdFN5pVyqIvvTeWboQrLoGXodAJ8/orFK
+         XilUJuUj5BYvUTjWGTnoag+Qz3yXnG2lY/RdwBQ+d8WvlH8Q5LBPLj+qjt9ySXtdMzxX
+         UQup0Tx+vEQl+nDurb+CEst9vkfPz7PkP1/BOcAnvNAqi/kLPVNoqwTqtRmHCf3+wnb6
+         bno53UdGyRuHoHq/BAneL6nnSZ4/z6Sx17V122Rx+737vlr4CUMBBc/Mc/Mnk16bgaKV
+         dCBGnU/Rw46ibHYIogVsQvbTNxkhprbfRD9K7HvT8F1mpbThq3xxS+/f8VyM7KPr8DQW
+         mbgg==
+X-Gm-Message-State: AOAM5326g4q0soLj1jGlvFU358Or+fjHIdGSavQn3KeaDYAinp8J+isg
+        1tUL115T2Pvah9Hi01nWdILGYs0qA6wyxmGmoeBH
+X-Google-Smtp-Source: ABdhPJyS6bOrWfuvjmdwVRGONpMTv6Y0zVE0kh7I9sjtSTBg5XbDmv85P6yS8Pkoi3kNsB54rx4AF9ZFKn4Qu8vMSM8=
+X-Received: by 2002:aa7:c50a:: with SMTP id o10mr23739559edq.118.1627981328237;
+ Tue, 03 Aug 2021 02:02:08 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20210802183329.2309921-10-mlevitsk@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+References: <20210729073503.187-1-xieyongji@bytedance.com> <20210729073503.187-3-xieyongji@bytedance.com>
+ <a0ab081a-db06-6b7a-b22e-4ace96a5c7db@redhat.com>
+In-Reply-To: <a0ab081a-db06-6b7a-b22e-4ace96a5c7db@redhat.com>
+From:   Yongji Xie <xieyongji@bytedance.com>
+Date:   Tue, 3 Aug 2021 17:01:57 +0800
+Message-ID: <CACycT3sdx8nA8fh3pjO_=pbiM+Bs5y+h4fuGkFQEsRSaBnph7Q@mail.gmail.com>
+Subject: Re: [PATCH v10 02/17] file: Export receive_fd() to modules
+To:     Jason Wang <jasowang@redhat.com>
+Cc:     "Michael S. Tsirkin" <mst@redhat.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Stefano Garzarella <sgarzare@redhat.com>,
+        Parav Pandit <parav@nvidia.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Christian Brauner <christian.brauner@canonical.com>,
+        Randy Dunlap <rdunlap@infradead.org>,
+        Matthew Wilcox <willy@infradead.org>,
+        Al Viro <viro@zeniv.linux.org.uk>,
+        Jens Axboe <axboe@kernel.dk>, bcrl@kvack.org,
+        Jonathan Corbet <corbet@lwn.net>,
+        =?UTF-8?Q?Mika_Penttil=C3=A4?= <mika.penttila@nextfour.com>,
+        Dan Carpenter <dan.carpenter@oracle.com>, joro@8bytes.org,
+        Greg KH <gregkh@linuxfoundation.org>,
+        He Zhe <zhe.he@windriver.com>,
+        Liu Xiaodong <xiaodong.liu@intel.com>,
+        Joe Perches <joe@perches.com>, songmuchun@bytedance.com,
+        virtualization <virtualization@lists.linux-foundation.org>,
+        netdev@vger.kernel.org, kvm <kvm@vger.kernel.org>,
+        linux-fsdevel@vger.kernel.org, iommu@lists.linux-foundation.org,
+        linux-kernel <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 02/08/21 20:33, Maxim Levitsky wrote:
-> From: Vitaly Kuznetsov <vkuznets@redhat.com>
-> 
-> APICV_INHIBIT_REASON_HYPERV is currently unconditionally forced upon
-> SynIC activation as SynIC's AutoEOI is incompatible with APICv/AVIC. It is,
-> however, possible to track whether the feature was actually used by the
-> guest and only inhibit APICv/AVIC when needed.
-> 
-> TLFS suggests a dedicated 'HV_DEPRECATING_AEOI_RECOMMENDED' flag to let
-> Windows know that AutoEOI feature should be avoided. While it's up to
-> KVM userspace to set the flag, KVM can help a bit by exposing global
-> APICv/AVIC enablement.
-> 
-> Maxim:
->     - always set HV_DEPRECATING_AEOI_RECOMMENDED in kvm_get_hv_cpuid,
->       since this feature can be used regardless of AVIC
-> 
-> Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
-> Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
-> ---
->   arch/x86/include/asm/kvm_host.h |  3 +++
->   arch/x86/kvm/hyperv.c           | 27 +++++++++++++++++++++------
->   2 files changed, 24 insertions(+), 6 deletions(-)
-> 
-> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-> index 80323b5fb20a..55b1f79d9c43 100644
-> --- a/arch/x86/include/asm/kvm_host.h
-> +++ b/arch/x86/include/asm/kvm_host.h
-> @@ -988,6 +988,9 @@ struct kvm_hv {
->   	/* How many vCPUs have VP index != vCPU index */
->   	atomic_t num_mismatched_vp_indexes;
->   
-> +	/* How many SynICs use 'AutoEOI' feature */
-> +	atomic_t synic_auto_eoi_used;
-> +
->   	struct hv_partition_assist_pg *hv_pa_pg;
->   	struct kvm_hv_syndbg hv_syndbg;
->   };
-> diff --git a/arch/x86/kvm/hyperv.c b/arch/x86/kvm/hyperv.c
-> index b07592ca92f0..638f3c559623 100644
-> --- a/arch/x86/kvm/hyperv.c
-> +++ b/arch/x86/kvm/hyperv.c
-> @@ -88,6 +88,10 @@ static bool synic_has_vector_auto_eoi(struct kvm_vcpu_hv_synic *synic,
->   static void synic_update_vector(struct kvm_vcpu_hv_synic *synic,
->   				int vector)
->   {
-> +	struct kvm_vcpu *vcpu = hv_synic_to_vcpu(synic);
-> +	struct kvm_hv *hv = to_kvm_hv(vcpu->kvm);
-> +	int auto_eoi_old, auto_eoi_new;
-> +
->   	if (vector < HV_SYNIC_FIRST_VALID_VECTOR)
->   		return;
->   
-> @@ -96,10 +100,25 @@ static void synic_update_vector(struct kvm_vcpu_hv_synic *synic,
->   	else
->   		__clear_bit(vector, synic->vec_bitmap);
->   
-> +	auto_eoi_old = bitmap_weight(synic->auto_eoi_bitmap, 256);
-> +
->   	if (synic_has_vector_auto_eoi(synic, vector))
->   		__set_bit(vector, synic->auto_eoi_bitmap);
->   	else
->   		__clear_bit(vector, synic->auto_eoi_bitmap);
-> +
-> +	auto_eoi_new = bitmap_weight(synic->auto_eoi_bitmap, 256);
-> +
-> +	/* Hyper-V SynIC auto EOI SINTs are not compatible with APICV */
-> +	if (!auto_eoi_old && auto_eoi_new) {
-> +		if (atomic_inc_return(&hv->synic_auto_eoi_used) == 1)
-> +			kvm_request_apicv_update(vcpu->kvm, false,
-> +						APICV_INHIBIT_REASON_HYPERV);
-> +	} else if (!auto_eoi_new && auto_eoi_old) {
-> +		if (atomic_dec_return(&hv->synic_auto_eoi_used) == 0)
-> +			kvm_request_apicv_update(vcpu->kvm, true,
-> +						APICV_INHIBIT_REASON_HYPERV);
-> +	}
->   }
->   
->   static int synic_set_sint(struct kvm_vcpu_hv_synic *synic, int sint,
-> @@ -933,12 +952,6 @@ int kvm_hv_activate_synic(struct kvm_vcpu *vcpu, bool dont_zero_synic_pages)
->   
->   	synic = to_hv_synic(vcpu);
->   
-> -	/*
-> -	 * Hyper-V SynIC auto EOI SINT's are
-> -	 * not compatible with APICV, so request
-> -	 * to deactivate APICV permanently.
-> -	 */
-> -	kvm_request_apicv_update(vcpu->kvm, false, APICV_INHIBIT_REASON_HYPERV);
->   	synic->active = true;
->   	synic->dont_zero_synic_pages = dont_zero_synic_pages;
->   	synic->control = HV_SYNIC_CONTROL_ENABLE;
-> @@ -2466,6 +2479,8 @@ int kvm_get_hv_cpuid(struct kvm_vcpu *vcpu, struct kvm_cpuid2 *cpuid,
->   				ent->eax |= HV_X64_ENLIGHTENED_VMCS_RECOMMENDED;
->   			if (!cpu_smt_possible())
->   				ent->eax |= HV_X64_NO_NONARCH_CORESHARING;
-> +
-> +			ent->eax |= HV_DEPRECATING_AEOI_RECOMMENDED;
->   			/*
->   			 * Default number of spinlock retry attempts, matches
->   			 * HyperV 2016.
-> 
+On Tue, Aug 3, 2021 at 3:46 PM Jason Wang <jasowang@redhat.com> wrote:
+>
+>
+> =E5=9C=A8 2021/7/29 =E4=B8=8B=E5=8D=883:34, Xie Yongji =E5=86=99=E9=81=93=
+:
+> > Export receive_fd() so that some modules can use
+> > it to pass file descriptor between processes without
+> > missing any security stuffs.
+> >
+> > Signed-off-by: Xie Yongji <xieyongji@bytedance.com>
+> > ---
+> >   fs/file.c            | 6 ++++++
+> >   include/linux/file.h | 7 +++----
+> >   2 files changed, 9 insertions(+), 4 deletions(-)
+> >
+> > diff --git a/fs/file.c b/fs/file.c
+> > index 86dc9956af32..210e540672aa 100644
+> > --- a/fs/file.c
+> > +++ b/fs/file.c
+> > @@ -1134,6 +1134,12 @@ int receive_fd_replace(int new_fd, struct file *=
+file, unsigned int o_flags)
+> >       return new_fd;
+> >   }
+> >
+> > +int receive_fd(struct file *file, unsigned int o_flags)
+> > +{
+> > +     return __receive_fd(file, NULL, o_flags);
+>
+>
+> Any reason that receive_fd_user() can live in the file.h?
+>
 
-Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
+Since no modules use it.
 
+Thanks,
+Yongji
