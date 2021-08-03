@@ -2,134 +2,344 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 97C3C3DF1E7
-	for <lists+kvm@lfdr.de>; Tue,  3 Aug 2021 17:57:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5DACF3DF29A
+	for <lists+kvm@lfdr.de>; Tue,  3 Aug 2021 18:34:16 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237200AbhHCP5g (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 3 Aug 2021 11:57:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52888 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237133AbhHCP5e (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 3 Aug 2021 11:57:34 -0400
-Received: from mail-pj1-x1029.google.com (mail-pj1-x1029.google.com [IPv6:2607:f8b0:4864:20::1029])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F1E75C06175F
-        for <kvm@vger.kernel.org>; Tue,  3 Aug 2021 08:57:22 -0700 (PDT)
-Received: by mail-pj1-x1029.google.com with SMTP id pj14-20020a17090b4f4eb029017786cf98f9so5324318pjb.2
-        for <kvm@vger.kernel.org>; Tue, 03 Aug 2021 08:57:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=PUbLeF6P+RfV2ZMxgILEyWJ1iWI9JJBoF3+HQdIEp0o=;
-        b=uEOqguzLfN7sxpk0hpNOYoi9naF81pEJsvlwL2+Hzf9X4jF3wJu7wk9ZTlzyX6qWI+
-         qfV6C+nj8EL/HvTpF0FgN6WzgJiduGzthDy5w5YBvhVLdmtdzgfDWteklLMP5gukp2TV
-         gWwhSTtlL1ZjU8HvVso6A+ozmA+KQ74GVJQg3y7FjwhjMzdkoiVcBQhcCas1PTRL/Cs1
-         u8gUEdYB4L+Eg86K6hrdHnu8w8rY/sFkr3CyghJVfGH35hAMG85XbJk0lSlIB+AVFR4A
-         bJIREME8V/XhMCh/mWv9IMenXWihHo2scEnXQGND/ztC/fzn+R9IWsCQSALCrBnf0x5v
-         7wVw==
+        id S234092AbhHCQeY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 3 Aug 2021 12:34:24 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:53924 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S234065AbhHCQeX (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 3 Aug 2021 12:34:23 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1628008451;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=ZC6fz0wH6LOZCoKtHBlL+gFtJ2XidB4lNAk1d1Zfen0=;
+        b=a9ZYgOtjKrdFbjzBEbY7/aTlsTofEj3MnIYL1+KlUM36VqIMYZy5jQcaJsU5Uo3QbuRZH5
+        FdU/4vq72qaDwQlcp61VqsELO08bPrkJAKTNxM7y3qgJ3Pup55ILqwSqc8EWDM92S+NFaP
+        L4RJ0QnY8H6aXS0RcnH+y//3/r2MIh8=
+Received: from mail-oi1-f200.google.com (mail-oi1-f200.google.com
+ [209.85.167.200]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-59-JVuOZ60eMIiSKdHaviEWVw-1; Tue, 03 Aug 2021 12:34:10 -0400
+X-MC-Unique: JVuOZ60eMIiSKdHaviEWVw-1
+Received: by mail-oi1-f200.google.com with SMTP id s17-20020a0568080b11b02901f424a672b7so8846009oij.18
+        for <kvm@vger.kernel.org>; Tue, 03 Aug 2021 09:34:10 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=PUbLeF6P+RfV2ZMxgILEyWJ1iWI9JJBoF3+HQdIEp0o=;
-        b=sfT8M3IzufOqe0OX6gUDkZnKS+SheAaaiNWcmeab8dv8rFO8zzSnLYrjjBsWPuxDfA
-         OKDh4AjFtZxZKvea4M9E2FNAL2BIIzryjQRxB0N6xX3hQM5YfBriWDhxZoWsGE0NyQdX
-         815J/uGrx4PLWZf93LtT+BHmhCZil88H9ak+IVKav0sPsTPaVKimm/Hok0No5gyHnZjM
-         KqwgAglZlrHZMkx2vgqzjU7yfvCi0XPxNAR9bmbBca+tbFXMH9/pJFDFHFdR7Squ+1EA
-         du8GqmzZ+AarUTkvvsXQlaIhpIKu/9/8exoK3KS+/GgpTEmFo5TUzgB8xfxgFBTRukQC
-         guCA==
-X-Gm-Message-State: AOAM532ly0306Ynl3JBT4stCUUfrdLsnyXUmUYgcZW/w4+eQ55SmsXwC
-        gFngMe3EFjPRTAhXhuYfgaKF+f4kOcl1aA==
-X-Google-Smtp-Source: ABdhPJyCNNlnYJSNBk0rXf5Z1I+OpS/E5ZuAiTayefhIQ6JoKww4ArLbVfGJBQvXyAavllg6CDngrg==
-X-Received: by 2002:aa7:9470:0:b029:3c4:d63d:38bf with SMTP id t16-20020aa794700000b02903c4d63d38bfmr371218pfq.24.1628006242332;
-        Tue, 03 Aug 2021 08:57:22 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id b7sm15773399pfl.195.2021.08.03.08.57.21
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=ZC6fz0wH6LOZCoKtHBlL+gFtJ2XidB4lNAk1d1Zfen0=;
+        b=IUChB4IHGbZDoBR7U/3cRNvoba9Yff5CxprRj6Rc6D0/quCdcsT98WpBxqDusrFnz3
+         RrzC7xL7kPR2qgJGQyJNPQs+MQwx1UhAEsXV/Dlzc3DWOu/suMSbAs/WDvZ83jNxEfcy
+         Y4fjNu2JPhgWfrKWysYt1vX2654CzPZvYMwuHBlJu7sDUExBKJslkitcDLujnOO08d7o
+         GDvKarFc9wmcj7lskDc+PeNvA4VTXqn96NmE505FxwUKxlzLdKZiyE4BfXdeMLOlXCjv
+         PGupV7I9uYeRsrMlA6d6gX47J+gue/V1dnoUNl12pV+A3wDGb1kcn3lQvbtvmXVZ7X1b
+         Wwyw==
+X-Gm-Message-State: AOAM530wEXVY+TYIVs51WoDYjcA+3U3EbId0y0i8MbUOF63X2pcQCfIP
+        3lFiRoTHdAAUhiI7tysbyXrV/M5x+8vr/pIFZ9KDHd7BDDVGwH7gm4/gCEzMIOJrOemgAZ+E/S1
+        vhALR1uGjgh6A
+X-Received: by 2002:a54:478e:: with SMTP id o14mr3753038oic.173.1628008449663;
+        Tue, 03 Aug 2021 09:34:09 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzFwuESI0HnE76c1/AUZG8mHAVE7uoxUNQvCdQAFpY43ILy5oWRZNuayH573kYg7XpB5z/ECQ==
+X-Received: by 2002:a54:478e:: with SMTP id o14mr3752987oic.173.1628008449364;
+        Tue, 03 Aug 2021 09:34:09 -0700 (PDT)
+Received: from redhat.com ([198.99.80.109])
+        by smtp.gmail.com with ESMTPSA id h1sm2607585otj.48.2021.08.03.09.34.07
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 03 Aug 2021 08:57:21 -0700 (PDT)
-Date:   Tue, 3 Aug 2021 15:57:18 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Lai Jiangshan <jiangshanlai@gmail.com>
-Cc:     LKML <linux-kernel@vger.kernel.org>, kvm@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Lai Jiangshan <laijs@linux.alibaba.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>
-Subject: Re: [RFC PATCH] kvm/x86: Keep root hpa in prev_roots as much as
- possible
-Message-ID: <YQlnXlmt9JvzRn+f@google.com>
-References: <20210525213920.3340-1-jiangshanlai@gmail.com>
- <YQLuBDZ2MlNlIoH4@google.com>
- <CAJhGHyCU-Om3NWLVg-kbUE7FZD1nNZft8+KeCDH3cr_FDaitXQ@mail.gmail.com>
+        Tue, 03 Aug 2021 09:34:09 -0700 (PDT)
+Date:   Tue, 3 Aug 2021 10:34:06 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Jason Gunthorpe <jgg@nvidia.com>
+Cc:     David Airlie <airlied@linux.ie>,
+        Tony Krowiak <akrowiak@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        Diana Craciun <diana.craciun@oss.nxp.com>,
+        dri-devel@lists.freedesktop.org,
+        Eric Auger <eric.auger@redhat.com>,
+        Eric Farman <farman@linux.ibm.com>,
+        Harald Freudenberger <freude@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        intel-gfx@lists.freedesktop.org,
+        intel-gvt-dev@lists.freedesktop.org,
+        Jani Nikula <jani.nikula@linux.intel.com>,
+        Jason Herne <jjherne@linux.ibm.com>,
+        Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
+        kvm@vger.kernel.org, Kirti Wankhede <kwankhede@nvidia.com>,
+        linux-doc@vger.kernel.org, linux-s390@vger.kernel.org,
+        Matthew Rosato <mjrosato@linux.ibm.com>,
+        Peter Oberparleiter <oberpar@linux.ibm.com>,
+        Halil Pasic <pasic@linux.ibm.com>,
+        Rodrigo Vivi <rodrigo.vivi@intel.com>,
+        Vineeth Vijayan <vneethv@linux.ibm.com>,
+        Zhi Wang <zhi.a.wang@intel.com>,
+        "Raj, Ashok" <ashok.raj@intel.com>, Christoph Hellwig <hch@lst.de>,
+        Leon Romanovsky <leonro@nvidia.com>,
+        Max Gurtovoy <mgurtovoy@nvidia.com>,
+        Yishai Hadas <yishaih@nvidia.com>,
+        Zhenyu Wang <zhenyuw@linux.intel.com>
+Subject: Re: [PATCH v3 09/14] vfio/pci: Change vfio_pci_try_bus_reset() to
+ use the dev_set
+Message-ID: <20210803103406.5e1be269.alex.williamson@redhat.com>
+In-Reply-To: <9-v3-6c9e19cc7d44+15613-vfio_reflck_jgg@nvidia.com>
+References: <0-v3-6c9e19cc7d44+15613-vfio_reflck_jgg@nvidia.com>
+        <9-v3-6c9e19cc7d44+15613-vfio_reflck_jgg@nvidia.com>
+X-Mailer: Claws Mail 3.18.0 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAJhGHyCU-Om3NWLVg-kbUE7FZD1nNZft8+KeCDH3cr_FDaitXQ@mail.gmail.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Aug 03, 2021, Lai Jiangshan wrote:
-> On Fri, Jul 30, 2021 at 2:06 AM Sean Christopherson <seanjc@google.com> wrote:
-> > Ha, we can do this without increasing the memory footprint and without co-opting
-> > a bit from pgd or hpa.  Because of compiler alignment/padding, the u8s and bools
-> > between mmu_role and prev_roots already occupy 8 bytes, even though the actual
-> > size is 4 bytes.  In total, we need room for 4 roots (3 previous + current), i.e.
-> > 4 bytes.  If a separate array is used, no additional memory is consumed and no
-> > masking is needed when reading/writing e.g. pgd.
-> >
-> > The cost is an extra swap() when updating the prev_roots LRU, but that's peanuts
-> > and would likely be offset by masking anyways.
-> >
-> > diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-> > index 99f37781a6fc..13bb3c3a60b4 100644
-> > --- a/arch/x86/include/asm/kvm_host.h
-> > +++ b/arch/x86/include/asm/kvm_host.h
-> > @@ -424,10 +424,12 @@ struct kvm_mmu {
-> >         hpa_t root_hpa;
-> >         gpa_t root_pgd;
-> >         union kvm_mmu_role mmu_role;
-> > +       bool root_unsync;
-> >         u8 root_level;
-> >         u8 shadow_root_level;
-> >         u8 ept_ad;
-> >         bool direct_map;
-> > +       bool unsync_roots[KVM_MMU_NUM_PREV_ROOTS];
-> >         struct kvm_mmu_root_info prev_roots[KVM_MMU_NUM_PREV_ROOTS];
-> >
+On Wed, 28 Jul 2021 21:49:18 -0300
+Jason Gunthorpe <jgg@nvidia.com> wrote:
+
+> Keep track of all the vfio_devices that have been added to the device set
+> and use this list in vfio_pci_try_bus_reset() instead of trying to work
+> backwards from the pci_device.
 > 
-> Hello
+> The dev_set->lock directly prevents devices from joining/leaving the set,
+> which further implies the pci_device cannot change drivers or that the
+> vfio_device be freed, eliminating the need for get/put's.
 > 
-> I think it is too complicated.  And it is hard to accept to put "unsync"
-> out of struct kvm_mmu_root_info when they should be bound to each other.
-
-I agree it's a bit ugly to have the separate unsync_roots array, but I don't see
-how it's any more complex.  It's literally a single swap() call.
-
-> How about this:
-> - KVM_MMU_NUM_PREV_ROOTS
-> + KVM_MMU_NUM_CACHED_ROOTS
-> - mmu->prev_roots[KVM_MMU_NUM_PREV_ROOTS]
-> + mmu->cached_roots[KVM_MMU_NUM_CACHED_ROOTS]
-
-I don't have a strong preference on PREV vs CACHED.  CACHED is probably more
-intuitive, but KVM isn't truly caching the root, it's just tracking the HPA (and
-PGD for indirect MMUs), e.g. the root may no longer exist if the backing shadow
-page was zapped.  On the other hand, the main helper is cached_root_available()...
-
-> - mmu->root_hpa
-> + mmu->cached_roots[0].hpa
-> - mmu->root_pgd
-> + mmu->cached_roots[0].pgd
+> Completeness of the device set can be directly measured by checking if
+> every PCI device in the reset group is also in the device set - which
+> proves that VFIO drivers are attached to everything.
 > 
-> And using the bit63 in @pgd as the information that it is not requested
+> This restructuring corrects a call to pci_dev_driver() without holding the
+> device_lock() and removes a hard wiring to &vfio_pci_driver.
+> 
+> Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
+> ---
+>  drivers/vfio/pci/vfio_pci.c | 148 +++++++++++++++---------------------
+>  1 file changed, 62 insertions(+), 86 deletions(-)
+> 
+> diff --git a/drivers/vfio/pci/vfio_pci.c b/drivers/vfio/pci/vfio_pci.c
+> index 5d6db93d6c680f..a1ae9a83a38621 100644
+> --- a/drivers/vfio/pci/vfio_pci.c
+> +++ b/drivers/vfio/pci/vfio_pci.c
+> @@ -404,6 +404,9 @@ static void vfio_pci_disable(struct vfio_pci_device *vdev)
+>  	struct vfio_pci_ioeventfd *ioeventfd, *ioeventfd_tmp;
+>  	int i, bar;
+>  
+> +	/* For needs_reset */
+> +	lockdep_assert_held(&vdev->vdev.dev_set->lock);
+> +
+>  	/* Stop the device from further DMA */
+>  	pci_clear_master(pdev);
+>  
+> @@ -2145,7 +2148,7 @@ static struct pci_driver vfio_pci_driver = {
+>  	.err_handler		= &vfio_err_handlers,
+>  };
+>  
+> -static int vfio_pci_get_unused_devs(struct pci_dev *pdev, void *data)
+> +static int vfio_pci_try_zap_and_vma_lock_cb(struct pci_dev *pdev, void *data)
+>  {
+>  	struct vfio_devices *devs = data;
+>  	struct vfio_device *device;
+> @@ -2165,8 +2168,11 @@ static int vfio_pci_get_unused_devs(struct pci_dev *pdev, void *data)
+>  
+>  	vdev = container_of(device, struct vfio_pci_device, vdev);
+>  
+> -	/* Fault if the device is not unused */
+> -	if (device->open_count) {
+> +	/*
+> +	 * Locking multiple devices is prone to deadlock, runaway and
+> +	 * unwind if we hit contention.
+> +	 */
+> +	if (!vfio_pci_zap_and_vma_lock(vdev, true)) {
+>  		vfio_device_put(device);
+>  		return -EBUSY;
+>  	}
+> @@ -2175,112 +2181,82 @@ static int vfio_pci_get_unused_devs(struct pci_dev *pdev, void *data)
+>  	return 0;
+>  }
+>  
+> -static int vfio_pci_try_zap_and_vma_lock_cb(struct pci_dev *pdev, void *data)
+> +static int vfio_pci_is_device_in_set(struct pci_dev *pdev, void *data)
+>  {
+> -	struct vfio_devices *devs = data;
+> -	struct vfio_device *device;
+> -	struct vfio_pci_device *vdev;
+> +	struct vfio_device_set *dev_set = data;
+> +	struct vfio_device *cur;
+>  
+> -	if (devs->cur_index == devs->max_index)
+> -		return -ENOSPC;
+> +	lockdep_assert_held(&dev_set->lock);
+>  
+> -	device = vfio_device_get_from_dev(&pdev->dev);
+> -	if (!device)
+> -		return -EINVAL;
+> -
+> -	if (pci_dev_driver(pdev) != &vfio_pci_driver) {
+> -		vfio_device_put(device);
+> -		return -EBUSY;
+> -	}
+> -
+> -	vdev = container_of(device, struct vfio_pci_device, vdev);
+> +	list_for_each_entry(cur, &dev_set->device_list, dev_set_list)
+> +		if (cur->dev == &pdev->dev)
+> +			return 0;
+> +	return -EBUSY;
+> +}
+>  
+> -	/*
+> -	 * Locking multiple devices is prone to deadlock, runaway and
+> -	 * unwind if we hit contention.
+> -	 */
+> -	if (!vfio_pci_zap_and_vma_lock(vdev, true)) {
+> -		vfio_device_put(device);
+> -		return -EBUSY;
+> +/*
+> + * vfio-core considers a group to be viable and will create a vfio_device even
+> + * if some devices are bound to drivers like pci-stub or pcieport.  Here we
+> + * require all PCI devices to be inside our dev_set since that ensures they stay
+> + * put and that every driver controlling the device can co-ordinate with the
+> + * device reset.
+> + */
+> +static struct pci_dev *vfio_pci_find_reset_target(struct vfio_pci_device *vdev)
+> +{
+> +	struct vfio_device_set *dev_set = vdev->vdev.dev_set;
+> +	struct vfio_pci_device *cur;
+> +	bool needs_reset = false;
+> +
+> +	/* No VFIO device has an open device FD */
+> +	list_for_each_entry(cur, &dev_set->device_list, vdev.dev_set_list) {
+> +		if (cur->vdev.open_count)
+> +			return NULL;
+> +		needs_reset |= cur->needs_reset;
+>  	}
+> +	if (!needs_reset)
+> +		return NULL;
+>  
+> -	devs->devices[devs->cur_index++] = vdev;
+> -	return 0;
+> +	/* All PCI devices in the group to be reset need to be in our dev_set */
+> +	if (vfio_pci_for_each_slot_or_bus(
+> +		    vdev->pdev, vfio_pci_is_device_in_set, dev_set,
+> +		    !pci_probe_reset_slot(vdev->pdev->slot)))
+> +		return NULL;
+> +	return cur->pdev;
 
-FWIW, using bit 0 will likely generate more efficient code.
 
-> to sync since the last sync.
+I don't understand the "reset target" aspect of this, cur->pdev is
+simply the last entry in the dev_set->devices_list...
 
-Again, I don't have a super strong preference.  I don't hate or love either one :-)
+>  }
+>  
+>  /*
+>   * If a bus or slot reset is available for the provided device and:
+>   *  - All of the devices affected by that bus or slot reset are unused
+> - *    (!refcnt)
+>   *  - At least one of the affected devices is marked dirty via
+>   *    needs_reset (such as by lack of FLR support)
+> - * Then attempt to perform that bus or slot reset.  Callers are required
+> - * to hold vdev->dev_set->lock, protecting the bus/slot reset group from
+> - * concurrent opens.  A vfio_device reference is acquired for each device
+> - * to prevent unbinds during the reset operation.
+> - *
+> - * NB: vfio-core considers a group to be viable even if some devices are
+> - * bound to drivers like pci-stub or pcieport.  Here we require all devices
+> - * to be bound to vfio_pci since that's the only way we can be sure they
+> - * stay put.
+> + * Then attempt to perform that bus or slot reset.
+>   */
+>  static void vfio_pci_try_bus_reset(struct vfio_pci_device *vdev)
+>  {
+> -	struct vfio_devices devs = { .cur_index = 0 };
+> -	int i = 0, ret = -EINVAL;
+> -	bool slot = false;
+> -	struct vfio_pci_device *tmp;
+> -
+> -	if (!pci_probe_reset_slot(vdev->pdev->slot))
+> -		slot = true;
+> -	else if (pci_probe_reset_bus(vdev->pdev->bus))
+> -		return;
+> +	struct vfio_device_set *dev_set = vdev->vdev.dev_set;
+> +	struct pci_dev *to_reset;
+> +	struct vfio_pci_device *cur;
+> +	int ret;
+>  
+> -	if (vfio_pci_for_each_slot_or_bus(vdev->pdev, vfio_pci_count_devs,
+> -					  &i, slot) || !i)
+> -		return;
+> +	lockdep_assert_held(&vdev->vdev.dev_set->lock);
+>  
+> -	devs.max_index = i;
+> -	devs.devices = kcalloc(i, sizeof(struct vfio_device *), GFP_KERNEL);
+> -	if (!devs.devices)
+> +	if (pci_probe_reset_slot(vdev->pdev->slot) &&
+> +	    pci_probe_reset_bus(vdev->pdev->bus))
+>  		return;
+>  
+> -	if (vfio_pci_for_each_slot_or_bus(vdev->pdev,
+> -					  vfio_pci_get_unused_devs,
+> -					  &devs, slot))
+> -		goto put_devs;
+> -
+> -	/* Does at least one need a reset? */
+> -	for (i = 0; i < devs.cur_index; i++) {
+> -		tmp = devs.devices[i];
+> -		if (tmp->needs_reset) {
+> -			ret = pci_reset_bus(vdev->pdev);
+> -			break;
+> -		}
+> -	}
+> -
+> -put_devs:
+> -	for (i = 0; i < devs.cur_index; i++) {
+> -		tmp = devs.devices[i];
+> -
+> -		/*
+> -		 * If reset was successful, affected devices no longer need
+> -		 * a reset and we should return all the collateral devices
+> -		 * to low power.  If not successful, we either didn't reset
+> -		 * the bus or timed out waiting for it, so let's not touch
+> -		 * the power state.
+> -		 */
+> -		if (!ret) {
+> -			tmp->needs_reset = false;
+> +	to_reset = vfio_pci_find_reset_target(vdev);
+> +	if (!to_reset)
+> +		return;
+>  
+> -			if (tmp != vdev && !disable_idle_d3)
+> -				vfio_pci_set_power_state(tmp, PCI_D3hot);
+> -		}
+> +	ret = pci_reset_bus(to_reset);
+> +	if (ret)
+> +		return;
+>  
+> -		vfio_device_put(&tmp->vdev);
+> +	list_for_each_entry(cur, &dev_set->device_list, vdev.dev_set_list) {
+> +		cur->needs_reset = false;
+> +		if (cur->pdev != to_reset && !disable_idle_d3)
+> +			vfio_pci_set_power_state(cur, PCI_D3hot);
+>  	}
 
-Vitaly, Paolo, any preferences on names and approaches for tracking if a "cached"
-root is unsync?
+...which means that here, I think we're putting all but whichever
+random device was last in the list into D3.  The intention was that all
+the devices except for the one we're operating on should already be in
+D3, the bus reset will put them back in D0, so we want to force them
+back to D3.
+
+I think the vfio_pci_find_reset_target() function needs to be re-worked
+to just tell us true/false that it's ok to reset the provided device,
+not to anoint an arbitrary target device.  Thanks,
+
+Alex
+
+> -
+> -	kfree(devs.devices);
+>  }
+>  
+>  static void __exit vfio_pci_cleanup(void)
+
