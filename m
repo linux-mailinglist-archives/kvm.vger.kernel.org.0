@@ -2,56 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id AE3D83DE985
-	for <lists+kvm@lfdr.de>; Tue,  3 Aug 2021 11:11:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3BA5D3DE989
+	for <lists+kvm@lfdr.de>; Tue,  3 Aug 2021 11:12:42 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234840AbhHCJLn (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 3 Aug 2021 05:11:43 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:31031 "EHLO
+        id S234922AbhHCJMu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 3 Aug 2021 05:12:50 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:23923 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S234962AbhHCJLk (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 3 Aug 2021 05:11:40 -0400
+        by vger.kernel.org with ESMTP id S234699AbhHCJMu (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 3 Aug 2021 05:12:50 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1627981889;
+        s=mimecast20190719; t=1627981959;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=ww50rpTfPMrsM3ZfYnQ4Y42+A1dc/QCaNs+ZKmOYvIA=;
-        b=ORJEnGNIBddzTO6jkKyIqmHQxr5VvS1qbMSMemi5RgYEhPVQDnz5mvRU4KWZ7mH9mRF8a/
-        rPCFiqFhflgTF32wcHIQ2wMhVq/dvJKnom6DnSWXdPdhi2GktlPgMDLM8q//tqcrntrIXc
-        vK9Chau3KiGyLU8KlhdZvg3V27DEmAY=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-60-ESljDVWTOoqx9Af2ST1DEw-1; Tue, 03 Aug 2021 05:11:27 -0400
-X-MC-Unique: ESljDVWTOoqx9Af2ST1DEw-1
-Received: by mail-wm1-f71.google.com with SMTP id 132-20020a1c018a0000b029025005348905so586033wmb.7
-        for <kvm@vger.kernel.org>; Tue, 03 Aug 2021 02:11:27 -0700 (PDT)
+        bh=eCKm6da5+hhoG0rSAczFzIx0ZDsjnfG3RjfWntwjIfE=;
+        b=UDPLBxXWRnVeHbRVVrYi3G7Uv5vLFvSaupRCjTElIdxSBfCX2hkwFb7QcwQAXkaLvWeGzm
+        eTaIoyvH4ud9nyl1kcgEPSXmL7AQ5dtyXkNlTq7PWZN60gJsoCkDpR6fRlYz6Z1jT14/kA
+        IHNbdUxWgxWG1Vq9L5MXEy04ZAFrETk=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-58-fcYk0rmcOZ-vYCDTFS718w-1; Tue, 03 Aug 2021 05:12:37 -0400
+X-MC-Unique: fcYk0rmcOZ-vYCDTFS718w-1
+Received: by mail-wr1-f70.google.com with SMTP id z10-20020adfdf8a0000b02901536d17cd63so7347296wrl.21
+        for <kvm@vger.kernel.org>; Tue, 03 Aug 2021 02:12:37 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=ww50rpTfPMrsM3ZfYnQ4Y42+A1dc/QCaNs+ZKmOYvIA=;
-        b=oXezD7QEr4ecVr0hm+WXO8/f/ZUg12x6ViaNELvXOYeTgKywMsxrRczSKp/JyQuqTf
-         MViUZYwK4ZUPOy7pQ4tvoU5YU4N48mmKGUm4nqeDCkDrGtZubCG4TwCyRBzsql+B2H8i
-         tgKLMLCvvGmfEm6kVeZPZNchgpxA3DFO+cebHBqxlBn+3FJxQ7bKH3ncTw9vGHpheVFG
-         QSOoYair16Vq9lHr+xPku3FxtuFSNV8BLoK4FEhLjDByk2SYqaGfgUBqboGrAp9zQ9nu
-         cDDVI+835iN+qTuUHx6Hj2HlYcoeza9fQayyfzxSNpTAEkLyhob9HdWzXUd6YotaHuy0
-         lI6w==
-X-Gm-Message-State: AOAM532epGPEiYrKkKMoug3+WQFadGcQN+KmJKTX0HvYsYUh+ryk2Vhv
-        sPbfJHb6d3Jv3R1naACsBbDf9DbeSIxIibUclbWNrRFgx/o1Tle2pNp6gSTz83gg7wQ22sMMY0E
-        aBqg0KYPIuPty
-X-Received: by 2002:a05:600c:2197:: with SMTP id e23mr10913000wme.22.1627981886076;
-        Tue, 03 Aug 2021 02:11:26 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJztPFH5Lkm0hhgNrUOpi1iGz0Drv3yTGk+xokv0DuvP1XpPvbr8Tj1zpQt/S0dBsjL31q24MA==
-X-Received: by 2002:a05:600c:2197:: with SMTP id e23mr10912977wme.22.1627981885891;
-        Tue, 03 Aug 2021 02:11:25 -0700 (PDT)
+        bh=eCKm6da5+hhoG0rSAczFzIx0ZDsjnfG3RjfWntwjIfE=;
+        b=P6r4f3c3xZRX7Dbe/aPZ4pFzzHH8E/YZV+JMRcvKT4woH4FxScWoQxOpoEEqkXNUAl
+         rvj8gWkprj6+9u5HA5owAbuJkoN123IPhZgD3He9ZtL/8NxpCalhG5ICoqNN6+kHvDBp
+         Gav/2sjoChgqH8DK3owBnRm6031vzdFrl7DeRxd9LV1UglK+qqyte313JUfnDcEzX/QO
+         n+Hm7HKVBaIVhPwsdxwECYftasw6IyUz04eH7X6eq9oY8Gd7oH4mDJJyF23Dkv/01gbe
+         7nBiqBVZOyfGZ2Se4C39tIoyDOVVU6Hw9rAdPMk5yxo8G53YFpKoN/IWAUiryZM7DVoz
+         bRWA==
+X-Gm-Message-State: AOAM533FZoA4O6fw1jEafhoYY1SPNyZdZy7didQHmuBntrxO0Y3/4MD5
+        VRhuk4T0P7jGvKvH1mukwr8DeD3W/3BoP7A2fkTLCzIbx5trPS4b9bhfWLyrpuitviXnme0j2oj
+        woaAbkajXv88R
+X-Received: by 2002:a5d:500a:: with SMTP id e10mr8231502wrt.408.1627981956706;
+        Tue, 03 Aug 2021 02:12:36 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJy4sV9KN3ghccHUUcC1Z25a/b+c2HxmSI9BHJqh17kYzma2BQ7RCPYSwyOWG6ol50Cr1aLdyw==
+X-Received: by 2002:a5d:500a:: with SMTP id e10mr8231489wrt.408.1627981956546;
+        Tue, 03 Aug 2021 02:12:36 -0700 (PDT)
 Received: from ?IPv6:2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e? ([2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e])
-        by smtp.gmail.com with ESMTPSA id t16sm4409501wmi.13.2021.08.03.02.11.24
+        by smtp.gmail.com with ESMTPSA id x12sm14136910wrt.35.2021.08.03.02.12.33
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 03 Aug 2021 02:11:25 -0700 (PDT)
-Subject: Re: [PATCH v3 10/12] KVM: SVM: remove svm_toggle_avic_for_irq_window
+        Tue, 03 Aug 2021 02:12:35 -0700 (PDT)
+Subject: Re: [PATCH v3 05/12] KVM: x86/mmu: allow APICv memslot to be
+ partially enabled
 To:     Maxim Levitsky <mlevitsk@redhat.com>, kvm@vger.kernel.org
 Cc:     Wanpeng Li <wanpengli@tencent.com>,
         Thomas Gleixner <tglx@linutronix.de>,
@@ -66,14 +67,14 @@ Cc:     Wanpeng Li <wanpengli@tencent.com>,
         Ingo Molnar <mingo@redhat.com>,
         "H. Peter Anvin" <hpa@zytor.com>
 References: <20210802183329.2309921-1-mlevitsk@redhat.com>
- <20210802183329.2309921-11-mlevitsk@redhat.com>
+ <20210802183329.2309921-6-mlevitsk@redhat.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <7b4442b6-644d-6fcb-1147-2aa220b2c8c8@redhat.com>
-Date:   Tue, 3 Aug 2021 11:11:23 +0200
+Message-ID: <596639a1-4df3-54e7-3f72-1bd292e592a2@redhat.com>
+Date:   Tue, 3 Aug 2021 11:12:33 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.11.0
 MIME-Version: 1.0
-In-Reply-To: <20210802183329.2309921-11-mlevitsk@redhat.com>
+In-Reply-To: <20210802183329.2309921-6-mlevitsk@redhat.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -82,73 +83,65 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 On 02/08/21 20:33, Maxim Levitsky wrote:
-> Now that kvm_request_apicv_update doesn't need to drop the kvm->srcu lock,
-> we can call kvm_request_apicv_update directly.
+> on AMD, APIC virtualization needs to dynamicaly inhibit the AVIC in a
+> response to some events, and this is problematic and not efficient to do by
+> enabling/disabling the memslot that covers APIC's mmio range.
+> Plus due to SRCU locking, it makes it more complex to request AVIC inhibition.
 > 
+> Instead, the APIC memslot will be always enabled, but the MMU code
+> will not install a SPTE for it, when arch.apic_access_memslot_enabled == false
+> and instead jump straight to emulating the access.
+> 
+> When inhibiting the AVIC, this SPTE will be zapped.
+> 
+> This code is based on a suggestion from Sean Christopherson:
+> https://lkml.org/lkml/2021/7/19/2970
+> 
+> Suggested-by: Sean Christopherson <seanjc@google.com>
 > Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
 > ---
->   arch/x86/kvm/svm/avic.c | 11 -----------
->   arch/x86/kvm/svm/svm.c  |  4 ++--
->   arch/x86/kvm/svm/svm.h  |  1 -
->   3 files changed, 2 insertions(+), 14 deletions(-)
+>   arch/x86/kvm/mmu/mmu.c | 23 ++++++++++++++++++-----
+>   1 file changed, 18 insertions(+), 5 deletions(-)
 > 
-> diff --git a/arch/x86/kvm/svm/avic.c b/arch/x86/kvm/svm/avic.c
-> index d0acbeeab3d6..1def54c26259 100644
-> --- a/arch/x86/kvm/svm/avic.c
-> +++ b/arch/x86/kvm/svm/avic.c
-> @@ -582,17 +582,6 @@ void avic_post_state_restore(struct kvm_vcpu *vcpu)
->   	avic_handle_ldr_update(vcpu);
->   }
+> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> index 6f77f6efd43c..965b562da893 100644
+> --- a/arch/x86/kvm/mmu/mmu.c
+> +++ b/arch/x86/kvm/mmu/mmu.c
+> @@ -3857,11 +3857,24 @@ static bool kvm_faultin_pfn(struct kvm_vcpu *vcpu, bool prefault, gfn_t gfn,
+>   	if (slot && (slot->flags & KVM_MEMSLOT_INVALID))
+>   		goto out_retry;
 >   
-> -void svm_toggle_avic_for_irq_window(struct kvm_vcpu *vcpu, bool activate)
-> -{
-> -	if (!enable_apicv || !lapic_in_kernel(vcpu))
-> -		return;
-> -
-> -	srcu_read_unlock(&vcpu->kvm->srcu, vcpu->srcu_idx);
-> -	kvm_request_apicv_update(vcpu->kvm, activate,
-> -				 APICV_INHIBIT_REASON_IRQWIN);
-> -	vcpu->srcu_idx = srcu_read_lock(&vcpu->kvm->srcu);
-> -}
-> -
->   void svm_set_virtual_apic_mode(struct kvm_vcpu *vcpu)
->   {
->   	return;
-> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-> index 3923d383face..c8827de49c75 100644
-> --- a/arch/x86/kvm/svm/svm.c
-> +++ b/arch/x86/kvm/svm/svm.c
-> @@ -2994,7 +2994,7 @@ static int interrupt_window_interception(struct kvm_vcpu *vcpu)
->   	 * In this case AVIC was temporarily disabled for
->   	 * requesting the IRQ window and we have to re-enable it.
->   	 */
-> -	svm_toggle_avic_for_irq_window(vcpu, true);
-> +	kvm_request_apicv_update(vcpu->kvm, true, APICV_INHIBIT_REASON_IRQWIN);
->   
->   	++vcpu->stat.irq_window_exits;
->   	return 1;
-> @@ -3546,7 +3546,7 @@ static void svm_enable_irq_window(struct kvm_vcpu *vcpu)
->   		 * via AVIC. In such case, we need to temporarily disable AVIC,
->   		 * and fallback to injecting IRQ via V_IRQ.
->   		 */
-> -		svm_toggle_avic_for_irq_window(vcpu, false);
-> +		kvm_request_apicv_update(vcpu->kvm, false, APICV_INHIBIT_REASON_IRQWIN);
->   		svm_set_vintr(svm);
->   	}
->   }
-> diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
-> index bd41f2a32838..aae851762b59 100644
-> --- a/arch/x86/kvm/svm/svm.h
-> +++ b/arch/x86/kvm/svm/svm.h
-> @@ -524,7 +524,6 @@ int avic_ga_log_notifier(u32 ga_tag);
->   void avic_vm_destroy(struct kvm *kvm);
->   int avic_vm_init(struct kvm *kvm);
->   void avic_init_vmcb(struct vcpu_svm *svm);
-> -void svm_toggle_avic_for_irq_window(struct kvm_vcpu *vcpu, bool activate);
->   int avic_incomplete_ipi_interception(struct kvm_vcpu *vcpu);
->   int avic_unaccelerated_access_interception(struct kvm_vcpu *vcpu);
->   int avic_init_vcpu(struct vcpu_svm *svm);
-> 
+> -	/* Don't expose private memslots to L2. */
+> -	if (is_guest_mode(vcpu) && !kvm_is_visible_memslot(slot)) {
+> -		*pfn = KVM_PFN_NOSLOT;
+> -		*writable = false;
+> -		return false;
+> +	if (!kvm_is_visible_memslot(slot)) {
+> +		/* Don't expose private memslots to L2. */
+> +		if (is_guest_mode(vcpu)) {
+> +			*pfn = KVM_PFN_NOSLOT;
+> +			*writable = false;
+> +			return false;
+> +		}
+> +		/*
+> +		 * If the APIC access page exists but is disabled, go directly
+> +		 * to emulation without caching the MMIO access or creating a
+> +		 * MMIO SPTE.  That way the cache doesn't need to be purged
+> +		 * when the AVIC is re-enabled.
+> +		 */
+> +		if (slot && slot->id == APIC_ACCESS_PAGE_PRIVATE_MEMSLOT &&
+> +		    !vcpu->kvm->arch.apic_access_memslot_enabled) {
 
-Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
+In addition to using apicv_inhibit_reasons, I would change the subject 
+to "allow APICv memslot to be enabled but invisible".  Otherwise looks good.
+
+Paolo
+
+> +			*r = RET_PF_EMULATE;
+> +			return true;
+> +		}
+>   	}
+>   
+>   	async = false;
+> 
 
