@@ -2,53 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 65AA43DE5A8
+	by mail.lfdr.de (Postfix) with ESMTP id 19DF93DE5A7
 	for <lists+kvm@lfdr.de>; Tue,  3 Aug 2021 06:46:41 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233822AbhHCEqo (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 3 Aug 2021 00:46:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57712 "EHLO
+        id S233734AbhHCEqm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 3 Aug 2021 00:46:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57726 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233157AbhHCEqj (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S229611AbhHCEqj (ORCPT <rfc822;kvm@vger.kernel.org>);
         Tue, 3 Aug 2021 00:46:39 -0400
-Received: from mail-pl1-x649.google.com (mail-pl1-x649.google.com [IPv6:2607:f8b0:4864:20::649])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C5ECAC06175F
-        for <kvm@vger.kernel.org>; Mon,  2 Aug 2021 21:46:26 -0700 (PDT)
-Received: by mail-pl1-x649.google.com with SMTP id c1-20020a170902aa41b02901298fdd4067so12698179plr.0
-        for <kvm@vger.kernel.org>; Mon, 02 Aug 2021 21:46:26 -0700 (PDT)
+Received: from mail-pj1-x1049.google.com (mail-pj1-x1049.google.com [IPv6:2607:f8b0:4864:20::1049])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 83F33C061796
+        for <kvm@vger.kernel.org>; Mon,  2 Aug 2021 21:46:28 -0700 (PDT)
+Received: by mail-pj1-x1049.google.com with SMTP id n4-20020a17090ac684b0290177656cfbc7so2272437pjt.7
+        for <kvm@vger.kernel.org>; Mon, 02 Aug 2021 21:46:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
-        h=reply-to:date:message-id:mime-version:subject:from:to:cc;
-        bh=xUAn1SFGSbX/PJThgRvGPBeZbin4ckymuiwWI24odS0=;
-        b=KXs30yTrLMEs8DkxavYlwKUkhA5CDXu64qEWjOwtd6o4pU+YkrmTj7ND9fGObVR/kj
-         EyxCauAxgXdmXNp/24JOMoqDzR+NycY5h8p/EAc4VmT7fw3b4L5fmtZwPadGEj+qlKBv
-         Xb0Fieh9GkbPEssAKEIwFKSfFfIQf6Fd/g4ypU2qk/PYZeYpRU4eSLqGcs55WBCoY5uE
-         20cvGSbZzYEvJ2fjwKIHSkDMEEkf7HVECDyOm0BRCHrzXDAoLKLhaUUN9ClEIIahR8XY
-         QAyo0J9/aI41Z7NEis3m6u5w2zHC0M18ZvFRMRTuoV8noykj826MRJ1/ffSHsAjX7P4M
-         5KPA==
+        h=reply-to:date:in-reply-to:message-id:mime-version:references
+         :subject:from:to:cc;
+        bh=uvGN8o0svNEgNpDAlc6hd0uZYNG8aDJpGIKyIlckztA=;
+        b=EstkdbR37/abuK+nZocc83eoDyxbAueC4xW7VBFBL+11H/s8A7Nj3uKtpONLq5G/80
+         3A7l15GjFqzxPajJGMmk70pYdv1YC1UE8P0m9zC/39TbfL61vU0RPUIOK5R5SwNsNabe
+         IzkvkvPu9WCs2VagDvbLQNJpDjTpgnUs2FfQCESqF+GoSNgq/+wM/IYW7yNtaYy8lPBN
+         ggEN1Q6XqsdfJPdBJGzFtVTl1EKWycwQ7oJI+LlHeeiJcCG6f5XS3KkRiTyk99EbYbWI
+         MAP7GBEINtiboJmngr63BAc2Hj7CRxN2bqDyDY9RZRKzUvpYTR80oNAHdOu2Nb17IFWR
+         e30w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:reply-to:date:message-id:mime-version:subject
-         :from:to:cc;
-        bh=xUAn1SFGSbX/PJThgRvGPBeZbin4ckymuiwWI24odS0=;
-        b=UCrExczBJQXjHMXbNp1cqhZuPb9WuHVQzLtZMwC1eAllFkXxNbYbs4odA4L4CfXVQK
-         j/fDOPMxHYSVn86oTQdNXiyI63yBMzQsseORwHt/a0syHI82yatG+eoE9uyg4ajhmErT
-         uxdchjC7m0UgkV5HqOZYEziWKWiNeYMoqp2hCQ+5FcSxWqWb/+KeM7WGZXzIOnMdG/NJ
-         8hT3h8UOsiNyDLZ60w92CrfOZSEZpIl9c7X92vaY4YHhqDRr5OWua5WVgsZOAKxYhfYd
-         W+k1FeSVxroyBk73N9JOFcqkL93qOVMePeXirUPsKEuHy2sd3YvNfDY3c8Wdo6Zl5tEL
-         UZSg==
-X-Gm-Message-State: AOAM531Tlk2VJc9TWkI/WUBr/33+Jhqu3aRE5AAMqk9pz5iVyD8ghRsa
-        VingCaz7PGsJnR1lZ+1Pb67ZrYip6hhf
-X-Google-Smtp-Source: ABdhPJzLOemLPvttklhl7Nf0PGlbyIbiTejqsfedLe8XBlBvpa565iLT+bJIB/hirHjUug1G/1tTDwzfUUL/
+        h=x-gm-message-state:reply-to:date:in-reply-to:message-id
+         :mime-version:references:subject:from:to:cc;
+        bh=uvGN8o0svNEgNpDAlc6hd0uZYNG8aDJpGIKyIlckztA=;
+        b=TSgVOGrTIKflXDskea82vfE6PEfAya8wepR5LycDrX2PAAmqJ+6ZZ5wgTxvitmmvQj
+         2YOw5rUxZknwjBF7pvyMUAZoYQPFKBzQeSEovr033AtuJ5Lk1/X72ZjCdL1a8GE1W+Ka
+         cJxULAYyEIPsXHNP9rSia4VIAFxiCdvgaKWiUArBvIIFVLTZ3LpfBQite1uLIhLRXV/V
+         4PXMYIS2Vr8/BIUe0N4mFJC5PBunr6Q7W4YD8xaRUxLR0rCvdE0qc99E1m3U+KXlrMDq
+         ol3UjpWhRAZ/GetEzct7N7/ULKVwxvf9HuTnCw5F3mqatZmNKDwDxSRQeZNFUTyr40U7
+         1OFQ==
+X-Gm-Message-State: AOAM533jTPlVblmJ87smZl6OCQFiD2zD2a1vNM+ESzQYnBrxyZKJtpLS
+        nHqi/hURDRATXwV46hQhOxPI4aMLeaa/
+X-Google-Smtp-Source: ABdhPJyaw9WJ7iFBQaTLk0jwa6AM5CsSnxVzPD4B9jsp6ckJsVDFg8I3HQCXj6lroq4+P5FfD6XYc6lJFXoZ
 X-Received: from mihenry-linux-desktop.kir.corp.google.com ([2620:15c:29:204:4304:2e3e:d2f5:48c8])
- (user=mizhang job=sendgmr) by 2002:a17:90a:5205:: with SMTP id
- v5mr2457851pjh.206.1627965986347; Mon, 02 Aug 2021 21:46:26 -0700 (PDT)
+ (user=mizhang job=sendgmr) by 2002:a17:902:e88f:b029:12c:c949:36dd with SMTP
+ id w15-20020a170902e88fb029012cc94936ddmr1292433plg.84.1627965987962; Mon, 02
+ Aug 2021 21:46:27 -0700 (PDT)
 Reply-To: Mingwei Zhang <mizhang@google.com>
-Date:   Mon,  2 Aug 2021 21:46:04 -0700
-Message-Id: <20210803044607.599629-1-mizhang@google.com>
+Date:   Mon,  2 Aug 2021 21:46:05 -0700
+In-Reply-To: <20210803044607.599629-1-mizhang@google.com>
+Message-Id: <20210803044607.599629-2-mizhang@google.com>
 Mime-Version: 1.0
+References: <20210803044607.599629-1-mizhang@google.com>
 X-Mailer: git-send-email 2.32.0.554.ge1b32706d8-goog
-Subject: [PATCH v4 0/3] Add detailed page size stats in KVM stats
+Subject: [PATCH v4 1/3] KVM: x86/mmu: Remove redundant spte present check in mmu_set_spte
 From:   Mingwei Zhang <mizhang@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     Sean Christopherson <seanjc@google.com>,
@@ -65,48 +69,54 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This commit basically adds detailed (large and regular) page size info to
-KVM stats and deprecate the old one: lpages.
+Drop an unnecessary is_shadow_present_pte() check when updating the rmaps
+after installing a non-MMIO SPTE.  set_spte() is used only to create
+shadow-present SPTEs, e.g. MMIO SPTEs are handled early on, mmu_set_spte()
+runs with mmu_lock held for write, i.e. the SPTE can't be zapped between
+writing the SPTE and updating the rmaps.
 
-To support legacy MMU and TDP mmu, we use atomic type for all page stats.
+Opportunistically combine the "new SPTE" logic for large pages and rmaps.
 
-v3 -> v4:
- - rebase to origin/queue. [sean]
- - replace the lpages with page stats in place to avoid conflicts. [sean]
+No functional change intended.
 
-v2 -> v3:
- - move kvm_update_page_stats to mmu.h as a static inline function. [sean]
- - remove is_last_spte check in mmu_spte_clear_track_bits. [bgardon]
- - change page_stats union by making it anonymous. [dmatlack]
+Suggested-by: Ben Gardon <bgardon@google.com>
 
-v1 -> v2:
- - refactor kvm_update_page_stats and remove 'spte' argument. [sean]
- - remove 'lpages' as it can be aggregated by user level [sean]
- - fix lpages stats update issue in __handle_change_pte [sean]
- - fix style issues and typos. [ben/sean]
+Reviewed-by: David Matlack <dmatlack@google.com>
+Reviewed-by: Ben Gardon <bgardon@google.com>
+Reviewed-by: Sean Christopherson <seanjc@google.com>
+Signed-off-by: Mingwei Zhang <mizhang@google.com>
+---
+ arch/x86/kvm/mmu/mmu.c | 16 ++++++----------
+ 1 file changed, 6 insertions(+), 10 deletions(-)
 
-pre-v1 (internal reviewers):
- - use atomic in all page stats and use 'level' as index. [sean]
- - use an extra argument in kvm_update_page_stats for atomic/non-atomic.
-   [bgardon]
- - should be careful on the difference between legacy mmu and tdp mmu.
-   [jingzhangos]
-
-Mingwei Zhang (2):
-  KVM: x86/mmu: Remove redundant spte present check in mmu_set_spte
-  KVM: x86/mmu: Add detailed page size stats
-
-Sean Christopherson (1):
-  KVM: x86/mmu: Avoid collision with !PRESENT SPTEs in TDP MMU lpage
-    stats
-
- arch/x86/include/asm/kvm_host.h | 10 ++++++-
- arch/x86/kvm/mmu.h              |  4 +++
- arch/x86/kvm/mmu/mmu.c          | 50 +++++++++++++++------------------
- arch/x86/kvm/mmu/tdp_mmu.c      |  9 ++----
- arch/x86/kvm/x86.c              |  5 +++-
- 5 files changed, 42 insertions(+), 36 deletions(-)
-
---
+diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+index a8cdfd8d45c4..f614e9df3c3b 100644
+--- a/arch/x86/kvm/mmu/mmu.c
++++ b/arch/x86/kvm/mmu/mmu.c
+@@ -2734,17 +2734,13 @@ static int mmu_set_spte(struct kvm_vcpu *vcpu, u64 *sptep,
+ 
+ 	pgprintk("%s: setting spte %llx\n", __func__, *sptep);
+ 	trace_kvm_mmu_set_spte(level, gfn, sptep);
+-	if (!was_rmapped && is_large_pte(*sptep))
+-		++vcpu->kvm->stat.lpages;
+ 
+-	if (is_shadow_present_pte(*sptep)) {
+-		if (!was_rmapped) {
+-			rmap_count = rmap_add(vcpu, sptep, gfn);
+-			if (rmap_count > vcpu->kvm->stat.max_mmu_rmap_size)
+-				vcpu->kvm->stat.max_mmu_rmap_size = rmap_count;
+-			if (rmap_count > RMAP_RECYCLE_THRESHOLD)
+-				rmap_recycle(vcpu, sptep, gfn);
+-		}
++	if (!was_rmapped) {
++		if (is_large_pte(*sptep))
++			++vcpu->kvm->stat.lpages;
++		rmap_count = rmap_add(vcpu, sptep, gfn);
++		if (rmap_count > RMAP_RECYCLE_THRESHOLD)
++			rmap_recycle(vcpu, sptep, gfn);
+ 	}
+ 
+ 	return ret;
+-- 
 2.32.0.554.ge1b32706d8-goog
 
