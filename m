@@ -2,106 +2,99 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1051F3DE865
-	for <lists+kvm@lfdr.de>; Tue,  3 Aug 2021 10:27:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2DCB73DE885
+	for <lists+kvm@lfdr.de>; Tue,  3 Aug 2021 10:34:27 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234649AbhHCI1J (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 3 Aug 2021 04:27:09 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:27062 "EHLO
+        id S234585AbhHCIeg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 3 Aug 2021 04:34:36 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:57410 "EHLO
         mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S234517AbhHCI1G (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 3 Aug 2021 04:27:06 -0400
-Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 1738FJln049769;
-        Tue, 3 Aug 2021 04:26:55 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : in-reply-to : references; s=pp1;
- bh=SykDvfuDhGiKWrRYA/vYadWCInVTWC5oFhkc3mo436A=;
- b=eFcb5DiIxjS12n3LJvOoAEU3Pag8buz1DiiQbS/CkEJtVGYT3kTOy/7TW1MI46fZm9KG
- aveqUTdLuNzqEbtjv5BQpdmdGjHKrH+5IR3h1Vy+GYfsVinRL3YljeGO22yO2rsGE84V
- y7z575hNsK3XBJK+ySgO0ISZZMD3OrdmeTgmbuV7ZV9CFXo5gOHpLFIsEjX4/ZPZ3xZ5
- J9mm9k+IC7ha+Iu9Cu2kpkRpc32AQoiZclpmhPwHrzatqM86GFV5QZ76NxAGr05eikST
- 3hXFNRJQp5giC39+4akbxpK94OpmJijxsEZO4lmLbWER6RU3rO6utNpF2TSFAodBH24M 7w== 
+        by vger.kernel.org with ESMTP id S234526AbhHCIeg (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 3 Aug 2021 04:34:36 -0400
+Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 1738Xm0K001498;
+        Tue, 3 Aug 2021 04:34:23 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : message-id : references : mime-version : content-type :
+ in-reply-to; s=pp1; bh=gztNBNWGYIeoA7EMxLtqr7x1FH5dKTBCDjZWF4fFaw8=;
+ b=Fk07zDHzpbnB6AB1BGSjqTdkQmNkJ1LtlKeXuj0i+02sGZEoXCCFGRMAszf2VawT1JjE
+ j6gHcORNvcruOj6fCH51jq0U5D2GztIFKsdlmd80Bs5BLHeZeumrpeLN6KQWbVqX/MU2
+ 0ZHP9UesG7OlgZhwecDcQ/rYa0HIH3ESrLruH41xTizc7iivZbiNk5Jr0lihYYr1rQzM
+ a2N6Gd1e70SnMOPa+1n5GBVL4/hnVf42Vdiq1wCRaO0iOlr1XO4xAW22umUeZnVPZ2Ib
+ tduAY9j/oVuiBrtH1Psq3uAUATugiCtBEy6srCXp4cuT4TYa2lFTU7iNRn3wunTCnMkE QQ== 
 Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 3a72320bgw-1
+        by mx0b-001b2d01.pphosted.com with ESMTP id 3a6keaqmhm-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 03 Aug 2021 04:26:55 -0400
-Received: from m0098414.ppops.net (m0098414.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 1738FUEY050503;
-        Tue, 3 Aug 2021 04:26:54 -0400
-Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 3a72320bg5-1
+        Tue, 03 Aug 2021 04:34:23 -0400
+Received: from m0098416.ppops.net (m0098416.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 1738Xukv002517;
+        Tue, 3 Aug 2021 04:34:22 -0400
+Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 3a6keaqmgw-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 03 Aug 2021 04:26:54 -0400
-Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
-        by ppma06ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 1738HGB3008814;
-        Tue, 3 Aug 2021 08:26:53 GMT
+        Tue, 03 Aug 2021 04:34:22 -0400
+Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
+        by ppma03ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 1738WGl2026340;
+        Tue, 3 Aug 2021 08:34:21 GMT
 Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
-        by ppma06ams.nl.ibm.com with ESMTP id 3a4wshpp42-1
+        by ppma03ams.nl.ibm.com with ESMTP id 3a4x58xp0q-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 03 Aug 2021 08:26:52 +0000
-Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
-        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 1738NsMc56492526
+        Tue, 03 Aug 2021 08:34:20 +0000
+Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
+        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 1738VLOb56951082
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 3 Aug 2021 08:23:54 GMT
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id D40FEA405F;
-        Tue,  3 Aug 2021 08:26:49 +0000 (GMT)
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 4FF8FA406F;
-        Tue,  3 Aug 2021 08:26:49 +0000 (GMT)
-Received: from oc3016276355.ibm.com (unknown [9.145.75.95])
-        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Tue,  3 Aug 2021 08:26:49 +0000 (GMT)
-From:   Pierre Morel <pmorel@linux.ibm.com>
-To:     kvm@vger.kernel.org
-Cc:     linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
-        borntraeger@de.ibm.com, frankja@linux.ibm.com, cohuck@redhat.com,
-        david@redhat.com, thuth@redhat.com, imbrenda@linux.ibm.com,
-        hca@linux.ibm.com, gor@linux.ibm.com, pmorel@linux.ibm.com
-Subject: [PATCH v3 3/3] s390x: optimization of the check for CPU topology change
-Date:   Tue,  3 Aug 2021 10:26:46 +0200
-Message-Id: <1627979206-32663-4-git-send-email-pmorel@linux.ibm.com>
-X-Mailer: git-send-email 1.8.3.1
-In-Reply-To: <1627979206-32663-1-git-send-email-pmorel@linux.ibm.com>
-References: <1627979206-32663-1-git-send-email-pmorel@linux.ibm.com>
+        Tue, 3 Aug 2021 08:31:21 GMT
+Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 3A07A52057;
+        Tue,  3 Aug 2021 08:34:17 +0000 (GMT)
+Received: from osiris (unknown [9.145.48.2])
+        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTPS id AD4AC5204F;
+        Tue,  3 Aug 2021 08:34:16 +0000 (GMT)
+Date:   Tue, 3 Aug 2021 10:34:15 +0200
+From:   Heiko Carstens <hca@linux.ibm.com>
+To:     Cai Huoqing <caihuoqing@baidu.com>
+Cc:     gor@linux.ibm.com, borntraeger@de.ibm.com, vneethv@linux.ibm.com,
+        oberpar@linux.ibm.com, cohuck@redhat.com, farman@linux.ibm.com,
+        mjrosato@linux.ibm.com, pasic@linux.ibm.com,
+        chaitanya.kulkarni@wdc.com, axboe@kernel.dk,
+        linux-s390@vger.kernel.org, kvm@vger.kernel.org
+Subject: Re: [PATCH 0/4] s390: Make use of PAGE_ALIGN/PAGE_MASK/PFN_UP helper
+ macro
+Message-ID: <YQj/h5oi9y4Zs8FR@osiris>
+References: <20210803034904.1579-1-caihuoqing@baidu.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210803034904.1579-1-caihuoqing@baidu.com>
 X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: 1PYLi39yGSt-JEAcbOEjMNil9JiYrdcm
-X-Proofpoint-ORIG-GUID: JAk0DWKu_RPKFoLoRExq4pCpq571bs7C
+X-Proofpoint-ORIG-GUID: G1Hi1ySNKAMlvfjTJ72Esf_C_dhyaM4I
+X-Proofpoint-GUID: JvqMmm9psheAG2tkwsbY_aME3d7kkWIT
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.790
- definitions=2021-08-03_02:2021-08-02,2021-08-03 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
- phishscore=0 mlxscore=0 clxscore=1015 impostorscore=0 spamscore=0
- mlxlogscore=999 malwarescore=0 bulkscore=0 priorityscore=1501 adultscore=0
- suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2107140000 definitions=main-2108030055
+ definitions=2021-08-03_02:2021-08-03,2021-08-03 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 clxscore=1011
+ lowpriorityscore=0 phishscore=0 impostorscore=0 suspectscore=0 bulkscore=0
+ spamscore=0 mlxscore=0 mlxlogscore=946 priorityscore=1501 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2107140000
+ definitions=main-2108030059
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Now that the PTF instruction is interpreted by the SIE we can optimize
-the arch_update_cpu_topology callback to check if there is a real need
-to update the topology by using the PTF instruction.
+On Tue, Aug 03, 2021 at 11:49:00AM +0800, Cai Huoqing wrote:
+> it's a refactor to make use of PAGE_ALIGN/PAGE_MASK/PFN_UP helper macro
+> 
+> Cai Huoqing (4):
+>   s390/scm_blk: Make use of PAGE_ALIGN helper macro
+>   s390/vmcp: Make use of PFN_UP helper macro
+>   vfio-ccw: Make use of PAGE_MASK/PFN_UP helper macro
+>   s390/cio: Make use of PAGE_ALIGN helper macro
+> 
+>  drivers/s390/block/scm_blk.c   |  2 +-
+>  drivers/s390/char/vmcp.c       | 10 ++++------
+>  drivers/s390/cio/itcw.c        |  2 +-
+>  drivers/s390/cio/vfio_ccw_cp.c |  8 ++++----
+>  4 files changed, 10 insertions(+), 12 deletions(-)
 
-Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
----
- arch/s390/kernel/topology.c | 3 +++
- 1 file changed, 3 insertions(+)
-
-diff --git a/arch/s390/kernel/topology.c b/arch/s390/kernel/topology.c
-index 26aa2614ee35..741cb447e78e 100644
---- a/arch/s390/kernel/topology.c
-+++ b/arch/s390/kernel/topology.c
-@@ -322,6 +322,9 @@ int arch_update_cpu_topology(void)
- 	struct device *dev;
- 	int cpu, rc;
- 
-+	if (!ptf(PTF_CHECK))
-+		return 0;
-+
- 	rc = __arch_update_cpu_topology();
- 	on_each_cpu(__arch_update_dedicated_flag, NULL, 0);
- 	for_each_online_cpu(cpu) {
--- 
-2.25.1
-
+I'm not willing to review or apply these patches. There is no added
+value and I doubt that anything of this has been tested, so you are
+putting the burden on other people.
