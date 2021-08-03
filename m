@@ -2,350 +2,408 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 23FFC3DE8E5
-	for <lists+kvm@lfdr.de>; Tue,  3 Aug 2021 10:50:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 641003DE8ED
+	for <lists+kvm@lfdr.de>; Tue,  3 Aug 2021 10:52:16 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234844AbhHCIuV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 3 Aug 2021 04:50:21 -0400
-Received: from mga04.intel.com ([192.55.52.120]:18401 "EHLO mga04.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S234689AbhHCIuT (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 3 Aug 2021 04:50:19 -0400
-X-IronPort-AV: E=McAfee;i="6200,9189,10064"; a="211762837"
-X-IronPort-AV: E=Sophos;i="5.84,291,1620716400"; 
-   d="scan'208";a="211762837"
-Received: from fmsmga003.fm.intel.com ([10.253.24.29])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Aug 2021 01:50:08 -0700
-X-IronPort-AV: E=Sophos;i="5.84,291,1620716400"; 
-   d="scan'208";a="510951292"
-Received: from cqiang-mobl.ccr.corp.intel.com (HELO [10.238.0.162]) ([10.238.0.162])
-  by fmsmga003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Aug 2021 01:50:06 -0700
-From:   Chenyi Qiang <chenyi.qiang@intel.com>
-Subject: Re: [PATCH v4 2/5] KVM: X86: Expose PKS to guest
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Xiaoyao Li <xiaoyao.li@intel.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-References: <20210205083706.14146-1-chenyi.qiang@intel.com>
- <20210205083706.14146-3-chenyi.qiang@intel.com> <YQLa4UErfNbdjv3l@google.com>
-Message-ID: <4c335e72-5866-9b7a-ee99-712adc9a9228@intel.com>
-Date:   Tue, 3 Aug 2021 16:50:04 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
- Firefox/78.0 Thunderbird/78.12.0
+        id S234697AbhHCIwY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 3 Aug 2021 04:52:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59356 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S234566AbhHCIwX (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 3 Aug 2021 04:52:23 -0400
+Received: from mail-ed1-x52a.google.com (mail-ed1-x52a.google.com [IPv6:2a00:1450:4864:20::52a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D4458C061796
+        for <kvm@vger.kernel.org>; Tue,  3 Aug 2021 01:52:12 -0700 (PDT)
+Received: by mail-ed1-x52a.google.com with SMTP id b7so28070727edu.3
+        for <kvm@vger.kernel.org>; Tue, 03 Aug 2021 01:52:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=bytedance-com.20150623.gappssmtp.com; s=20150623;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=yNVHfomn1+7EeD9B5QlHFpydoWXL8UTDlRD2Gz6lLm4=;
+        b=W0MTWrHDNl+PRjXzBtO9//AT8bfTt0UGPAHtUfBNteJlLivBgLI3a3M0Cm6JfHl6EU
+         OzC+TGexcu64OQ0IP3USZrqt2WiDlFnE3x853FdQ3WR9WB4jRQw/jYSdkoofkjW2qDU3
+         j58nWRiHEPc+e52N0nWvgyhMZhyAMe7deX8EcVEhLUoh4nAqTBSQO688xMWgma06sg/a
+         33OeapUYYq8j1XteBpboom94lgmjToIStbqrTzJdFXzT3azY/Zuaq+3TI8dS3w7cS6uf
+         7W5dKidG7EeuuBKAOhfmGL49foVg2UwnrUwNzB+zkgtIL7M7E83x3xOceSwH5iUf4oNA
+         WW4g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=yNVHfomn1+7EeD9B5QlHFpydoWXL8UTDlRD2Gz6lLm4=;
+        b=QPklM+4M5+52cUACvsLkK7GGrJdBgBq+vxPjIItGgHgkFYFAihiCofTfWuCKqhzqxa
+         22yvovrmOG2Hr4mxENmwjd3vGWve7QQDy0FiJo6gQ7Og7EMonF5EgtbnHY82IVQeEW5a
+         iC2BaB+pxh5f2rcW9RR+bNHr2lNP13wdxefFFDTp7m3hxkg4T7Pw1xgpEg5nw99nwOZg
+         RztHUITJbL0u6r0xeYYGQvkT4NCQoVIxoJSvmPepEqPfFFfR5uPB+ctMs2CMZfp8LUim
+         kPzMaWQzACrPNWZo/tMSi8AohFCwwG9FxrWhVwcKMwpM3Sh0OJTRVv5qd5aIqimqWrs+
+         p0Mg==
+X-Gm-Message-State: AOAM530Mw9nBq0NE5yFmZaZOPi5Y3iNuofFy4BNdudG2yZBBOUnmGmMK
+        kpzEK4yCMRuABzZCUqH+fpJRhA9tqNItF5tjvSNL
+X-Google-Smtp-Source: ABdhPJzP3mqKMcinlyFQCqeLKP6E0gKZq9ZubV8wxKczwvyn7WhW7EmyF4LbdLIGRxNOj8q+vmW+CnwGpcs0ZzKpngc=
+X-Received: by 2002:a05:6402:74f:: with SMTP id p15mr23885429edy.195.1627980731381;
+ Tue, 03 Aug 2021 01:52:11 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <YQLa4UErfNbdjv3l@google.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+References: <20210729073503.187-1-xieyongji@bytedance.com> <20210729073503.187-18-xieyongji@bytedance.com>
+ <05365f36-bc3a-40f4-764d-37a7249b94b1@redhat.com>
+In-Reply-To: <05365f36-bc3a-40f4-764d-37a7249b94b1@redhat.com>
+From:   Yongji Xie <xieyongji@bytedance.com>
+Date:   Tue, 3 Aug 2021 16:52:00 +0800
+Message-ID: <CACycT3uwBy3HY4at-d8Hg2v4ciSWLkhFU5Sk4AxzjbvNEY9mCg@mail.gmail.com>
+Subject: Re: [PATCH v10 17/17] Documentation: Add documentation for VDUSE
+To:     Jason Wang <jasowang@redhat.com>
+Cc:     "Michael S. Tsirkin" <mst@redhat.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Stefano Garzarella <sgarzare@redhat.com>,
+        Parav Pandit <parav@nvidia.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Christian Brauner <christian.brauner@canonical.com>,
+        Randy Dunlap <rdunlap@infradead.org>,
+        Matthew Wilcox <willy@infradead.org>,
+        Al Viro <viro@zeniv.linux.org.uk>,
+        Jens Axboe <axboe@kernel.dk>, bcrl@kvack.org,
+        Jonathan Corbet <corbet@lwn.net>,
+        =?UTF-8?Q?Mika_Penttil=C3=A4?= <mika.penttila@nextfour.com>,
+        Dan Carpenter <dan.carpenter@oracle.com>, joro@8bytes.org,
+        Greg KH <gregkh@linuxfoundation.org>,
+        He Zhe <zhe.he@windriver.com>,
+        Liu Xiaodong <xiaodong.liu@intel.com>,
+        Joe Perches <joe@perches.com>, songmuchun@bytedance.com,
+        virtualization <virtualization@lists.linux-foundation.org>,
+        netdev@vger.kernel.org, kvm <kvm@vger.kernel.org>,
+        linux-fsdevel@vger.kernel.org, iommu@lists.linux-foundation.org,
+        linux-kernel <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Thanks Sean for your review.
+On Tue, Aug 3, 2021 at 3:35 PM Jason Wang <jasowang@redhat.com> wrote:
+>
+>
+> =E5=9C=A8 2021/7/29 =E4=B8=8B=E5=8D=883:35, Xie Yongji =E5=86=99=E9=81=93=
+:
+> > VDUSE (vDPA Device in Userspace) is a framework to support
+> > implementing software-emulated vDPA devices in userspace. This
+> > document is intended to clarify the VDUSE design and usage.
+> >
+> > Signed-off-by: Xie Yongji <xieyongji@bytedance.com>
+> > ---
+> >   Documentation/userspace-api/index.rst |   1 +
+> >   Documentation/userspace-api/vduse.rst | 232 +++++++++++++++++++++++++=
++++++++++
+> >   2 files changed, 233 insertions(+)
+> >   create mode 100644 Documentation/userspace-api/vduse.rst
+> >
+> > diff --git a/Documentation/userspace-api/index.rst b/Documentation/user=
+space-api/index.rst
+> > index 0b5eefed027e..c432be070f67 100644
+> > --- a/Documentation/userspace-api/index.rst
+> > +++ b/Documentation/userspace-api/index.rst
+> > @@ -27,6 +27,7 @@ place where this information is gathered.
+> >      iommu
+> >      media/index
+> >      sysfs-platform_profile
+> > +   vduse
+> >
+> >   .. only::  subproject and html
+> >
+> > diff --git a/Documentation/userspace-api/vduse.rst b/Documentation/user=
+space-api/vduse.rst
+> > new file mode 100644
+> > index 000000000000..30c9d1482126
+> > --- /dev/null
+> > +++ b/Documentation/userspace-api/vduse.rst
+> > @@ -0,0 +1,232 @@
+> > +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> > +VDUSE - "vDPA Device in Userspace"
+> > +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> > +
+> > +vDPA (virtio data path acceleration) device is a device that uses a
+> > +datapath which complies with the virtio specifications with vendor
+> > +specific control path. vDPA devices can be both physically located on
+> > +the hardware or emulated by software. VDUSE is a framework that makes =
+it
+> > +possible to implement software-emulated vDPA devices in userspace. And
+> > +to make the device emulation more secure, the emulated vDPA device's
+> > +control path is handled in the kernel and only the data path is
+> > +implemented in the userspace.
+> > +
+> > +Note that only virtio block device is supported by VDUSE framework now=
+,
+> > +which can reduce security risks when the userspace process that implem=
+ents
+> > +the data path is run by an unprivileged user. The support for other de=
+vice
+> > +types can be added after the security issue of corresponding device dr=
+iver
+> > +is clarified or fixed in the future.
+> > +
+> > +Create/Destroy VDUSE devices
+> > +------------------------
+> > +
+> > +VDUSE devices are created as follows:
+> > +
+> > +1. Create a new VDUSE instance with ioctl(VDUSE_CREATE_DEV) on
+> > +   /dev/vduse/control.
+> > +
+> > +2. Setup each virtqueue with ioctl(VDUSE_VQ_SETUP) on /dev/vduse/$NAME=
+.
+> > +
+> > +3. Begin processing VDUSE messages from /dev/vduse/$NAME. The first
+> > +   messages will arrive while attaching the VDUSE instance to vDPA bus=
+.
+> > +
+> > +4. Send the VDPA_CMD_DEV_NEW netlink message to attach the VDUSE
+> > +   instance to vDPA bus.
+> > +
+> > +VDUSE devices are destroyed as follows:
+> > +
+> > +1. Send the VDPA_CMD_DEV_DEL netlink message to detach the VDUSE
+> > +   instance from vDPA bus.
+> > +
+> > +2. Close the file descriptor referring to /dev/vduse/$NAME.
+> > +
+> > +3. Destroy the VDUSE instance with ioctl(VDUSE_DESTROY_DEV) on
+> > +   /dev/vduse/control.
+> > +
+> > +The netlink messages can be sent via vdpa tool in iproute2 or use the
+> > +below sample codes:
+> > +
+> > +.. code-block:: c
+> > +
+> > +     static int netlink_add_vduse(const char *name, enum vdpa_command =
+cmd)
+> > +     {
+> > +             struct nl_sock *nlsock;
+> > +             struct nl_msg *msg;
+> > +             int famid;
+> > +
+> > +             nlsock =3D nl_socket_alloc();
+> > +             if (!nlsock)
+> > +                     return -ENOMEM;
+> > +
+> > +             if (genl_connect(nlsock))
+> > +                     goto free_sock;
+> > +
+> > +             famid =3D genl_ctrl_resolve(nlsock, VDPA_GENL_NAME);
+> > +             if (famid < 0)
+> > +                     goto close_sock;
+> > +
+> > +             msg =3D nlmsg_alloc();
+> > +             if (!msg)
+> > +                     goto close_sock;
+> > +
+> > +             if (!genlmsg_put(msg, NL_AUTO_PORT, NL_AUTO_SEQ, famid, 0=
+, 0, cmd, 0))
+> > +                     goto nla_put_failure;
+> > +
+> > +             NLA_PUT_STRING(msg, VDPA_ATTR_DEV_NAME, name);
+> > +             if (cmd =3D=3D VDPA_CMD_DEV_NEW)
+> > +                     NLA_PUT_STRING(msg, VDPA_ATTR_MGMTDEV_DEV_NAME, "=
+vduse");
+> > +
+> > +             if (nl_send_sync(nlsock, msg))
+> > +                     goto close_sock;
+> > +
+> > +             nl_close(nlsock);
+> > +             nl_socket_free(nlsock);
+> > +
+> > +             return 0;
+> > +     nla_put_failure:
+> > +             nlmsg_free(msg);
+> > +     close_sock:
+> > +             nl_close(nlsock);
+> > +     free_sock:
+> > +             nl_socket_free(nlsock);
+> > +             return -1;
+> > +     }
+> > +
+> > +How VDUSE works
+> > +---------------
+> > +
+> > +As mentioned above, a VDUSE device is created by ioctl(VDUSE_CREATE_DE=
+V) on
+> > +/dev/vduse/control. With this ioctl, userspace can specify some basic =
+configuration
+> > +such as device name (uniquely identify a VDUSE device), virtio feature=
+s, virtio
+> > +configuration space, the number of virtqueues and so on for this emula=
+ted device.
+> > +Then a char device interface (/dev/vduse/$NAME) is exported to userspa=
+ce for device
+> > +emulation. Userspace can use the VDUSE_VQ_SETUP ioctl on /dev/vduse/$N=
+AME to
+> > +add per-virtqueue configuration such as the max size of virtqueue to t=
+he device.
+> > +
+> > +After the initialization, the VDUSE device can be attached to vDPA bus=
+ via
+> > +the VDPA_CMD_DEV_NEW netlink message. Userspace needs to read()/write(=
+) on
+> > +/dev/vduse/$NAME to receive/reply some control messages from/to VDUSE =
+kernel
+> > +module as follows:
+> > +
+> > +.. code-block:: c
+> > +
+> > +     static int vduse_message_handler(int dev_fd)
+> > +     {
+> > +             int len;
+> > +             struct vduse_dev_request req;
+> > +             struct vduse_dev_response resp;
+> > +
+> > +             len =3D read(dev_fd, &req, sizeof(req));
+> > +             if (len !=3D sizeof(req))
+> > +                     return -1;
+> > +
+> > +             resp.request_id =3D req.request_id;
+> > +
+> > +             switch (req.type) {
+> > +
+> > +             /* handle different types of messages */
+> > +
+> > +             }
+> > +
+> > +             len =3D write(dev_fd, &resp, sizeof(resp));
+> > +             if (len !=3D sizeof(resp))
+> > +                     return -1;
+> > +
+> > +             return 0;
+> > +     }
+> > +
+> > +There are now three types of messages introduced by VDUSE framework:
+> > +
+> > +- VDUSE_GET_VQ_STATE: Get the state for virtqueue, userspace should re=
+turn
+> > +  avail index for split virtqueue or the device/driver ring wrap count=
+ers and
+> > +  the avail and used index for packed virtqueue.
+> > +
+> > +- VDUSE_SET_STATUS: Set the device status, userspace should follow
+> > +  the virtio spec: https://docs.oasis-open.org/virtio/virtio/v1.1/virt=
+io-v1.1.html
+> > +  to process this message. For example, fail to set the FEATURES_OK de=
+vice
+> > +  status bit if the device can not accept the negotiated virtio featur=
+es
+> > +  get from the VDUSE_DEV_GET_FEATURES ioctl.
+>
+>
+> I wonder if it's better to add a section about the future work?
+>
+> E.g the support for the userspace device to modify status (like
+> NEEDS_RESET).
+>
 
-On 7/30/2021 12:44 AM, Sean Christopherson wrote:
-> On Fri, Feb 05, 2021, Chenyi Qiang wrote:
->> @@ -539,6 +540,7 @@ struct kvm_vcpu_arch {
->>   	unsigned long cr8;
->>   	u32 host_pkru;
->>   	u32 pkru;
->> +	u32 pkrs;
->>   	u32 hflags;
->>   	u64 efer;
->>   	u64 apic_base;
-> 
-> ...
-> 
->> diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
->> index 89af692deb7e..2266d98ace6f 100644
->> --- a/arch/x86/kvm/vmx/nested.c
->> +++ b/arch/x86/kvm/vmx/nested.c
->> @@ -250,6 +250,7 @@ static void vmx_sync_vmcs_host_state(struct vcpu_vmx *vmx,
->>   	dest->ds_sel = src->ds_sel;
->>   	dest->es_sel = src->es_sel;
->>   #endif
->> +	dest->pkrs = src->pkrs;
-> 
-> This is wrong.  It also arguably belongs in patch 04.
-> 
-> The part that's missing is actually updating vmcs.HOST_IA32_PKRS.  FS/GS are
-> handled by vmx_set_host_fs_gs(), while LDT/DS/ES are oddballs where the selector
-> is also the state that's restored.
-> 
+I prefer to document it after we add this new feature.
 
-Will fix it. I guess it should belong in patch 05.
+>
+> > +
+> > +- VDUSE_UPDATE_IOTLB: Notify userspace to update the memory mapping fo=
+r specified
+> > +  IOVA range, userspace should firstly remove the old mapping, then se=
+tup the new
+> > +  mapping via the VDUSE_IOTLB_GET_FD ioctl.
+> > +
+> > +After DRIVER_OK status bit is set via the VDUSE_SET_STATUS message, us=
+erspace is
+> > +able to start the dataplane processing as follows:
+> > +
+> > +1. Get the specified virtqueue's information with the VDUSE_VQ_GET_INF=
+O ioctl,
+> > +   including the size, the IOVAs of descriptor table, available ring a=
+nd used ring,
+> > +   the state and the ready status.
+> > +
+> > +2. Pass the above IOVAs to the VDUSE_IOTLB_GET_FD ioctl so that those =
+IOVA regions
+> > +   can be mapped into userspace. Some sample codes is shown below:
+> > +
+> > +.. code-block:: c
+> > +
+> > +     static int perm_to_prot(uint8_t perm)
+> > +     {
+> > +             int prot =3D 0;
+> > +
+> > +             switch (perm) {
+> > +             case VDUSE_ACCESS_WO:
+> > +                     prot |=3D PROT_WRITE;
+> > +                     break;
+> > +             case VDUSE_ACCESS_RO:
+> > +                     prot |=3D PROT_READ;
+> > +                     break;
+> > +             case VDUSE_ACCESS_RW:
+> > +                     prot |=3D PROT_READ | PROT_WRITE;
+> > +                     break;
+> > +             }
+> > +
+> > +             return prot;
+> > +     }
+> > +
+> > +     static void *iova_to_va(int dev_fd, uint64_t iova, uint64_t *len)
+> > +     {
+> > +             int fd;
+> > +             void *addr;
+> > +             size_t size;
+> > +             struct vduse_iotlb_entry entry;
+> > +
+> > +             entry.start =3D iova;
+> > +             entry.last =3D iova;
+> > +
+> > +             /*
+> > +              * Find the first IOVA region that overlaps with the spec=
+ified
+> > +              * range [start, last] and return the corresponding file =
+descriptor.
+> > +              */
+> > +             fd =3D ioctl(dev_fd, VDUSE_IOTLB_GET_FD, &entry);
+> > +             if (fd < 0)
+> > +                     return NULL;
+> > +
+> > +             size =3D entry.last - entry.start + 1;
+> > +             *len =3D entry.last - iova + 1;
+> > +             addr =3D mmap(0, size, perm_to_prot(entry.perm), MAP_SHAR=
+ED,
+> > +                         fd, entry.offset);
+> > +             close(fd);
+> > +             if (addr =3D=3D MAP_FAILED)
+> > +                     return NULL;
+> > +
+> > +             /*
+> > +              * Using some data structures such as linked list to stor=
+e
+> > +              * the iotlb mapping. The munmap(2) should be called for =
+the
+> > +              * cached mapping when the corresponding VDUSE_UPDATE_IOT=
+LB
+> > +              * message is received or the device is reset.
+> > +              */
+> > +
+> > +             return addr + iova - entry.start;
+> > +     }
+> > +
+> > +3. Setup the kick eventfd for the specified virtqueues with the VDUSE_=
+VQ_SETUP_KICKFD
+> > +   ioctl. The kick eventfd is used by VDUSE kernel module to notify us=
+erspace to
+> > +   consume the available ring.
+> > +
+> > +4. Listen to the kick eventfd and consume the available ring. The buff=
+er described
+> > +   by the descriptors in the descriptor table should be also mapped in=
+to userspace
+> > +   via the VDUSE_IOTLB_GET_FD ioctl before accessing.
+>
+>
+> (Or userspace may poll the indices instead, the kick eventfd is not a mus=
+t).
+>
 
-> In other words, this will cause nested VM-Exit to load the wrong PKRS.
-> 
->>   }
->>   
->>   static void vmx_switch_vmcs(struct kvm_vcpu *vcpu, struct loaded_vmcs *vmcs)
->> diff --git a/arch/x86/kvm/vmx/vmcs.h b/arch/x86/kvm/vmx/vmcs.h
->> index 1472c6c376f7..b5ba6407c5e1 100644
->> --- a/arch/x86/kvm/vmx/vmcs.h
->> +++ b/arch/x86/kvm/vmx/vmcs.h
->> @@ -40,6 +40,7 @@ struct vmcs_host_state {
->>   #ifdef CONFIG_X86_64
->>   	u16           ds_sel, es_sel;
->>   #endif
->> +	u32           pkrs;
->>   };
->>   
->>   struct vmcs_controls_shadow {
->> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
->> index 47b8357b9751..a3d95492e2b7 100644
->> --- a/arch/x86/kvm/vmx/vmx.c
->> +++ b/arch/x86/kvm/vmx/vmx.c
->> @@ -363,6 +363,8 @@ module_param_cb(vmentry_l1d_flush, &vmentry_l1d_flush_ops, NULL, 0644);
->>   static u32 vmx_segment_access_rights(struct kvm_segment *var);
->>   static __always_inline void vmx_disable_intercept_for_msr(struct kvm_vcpu *vcpu,
->>   							  u32 msr, int type);
->> +static __always_inline void vmx_enable_intercept_for_msr(struct kvm_vcpu *vcpu,
->> +							 u32 msr, int type);
->>   
->>   void vmx_vmexit(void);
->>   
->> @@ -660,6 +662,8 @@ static bool is_valid_passthrough_msr(u32 msr)
->>   	case MSR_IA32_RTIT_ADDR0_A ... MSR_IA32_RTIT_ADDR3_B:
->>   		/* PT MSRs. These are handled in pt_update_intercept_for_msr() */
->>   		return true;
->> +	case MSR_IA32_PKRS:
->> +		return true;
-> 
-> This is wrong with respect to MSR filtering, as KVM will fail to intercept the
-> MSR in response to a filter change.  See vmx_msr_filter_changed()..  I also think
-> that special casing PKRS is a bad idea in general.  More later.
-> 
+OK, will add it.
 
-Yes, msr filter support for PKRS was missing. Will add the support in 
-vmx_msr_filter_changed().
-
->>   	}
->>   
->>   	r = possible_passthrough_msr_slot(msr) != -ENOENT;
-> 
-> ...
-> 
->> +	case MSR_IA32_PKRS:
->> +		if (!kvm_pkrs_valid(data))
->> +			return 1;
->> +		if (!kvm_cpu_cap_has(X86_FEATURE_PKS) ||
->> +		    (!msr_info->host_initiated &&
->> +		    !guest_cpuid_has(vcpu, X86_FEATURE_PKS)))
->> +			return 1;
->> +		if (vcpu->arch.pkrs != data) {
-> 
-> This will need to be modified if we go with my below proposal.
-> 
->> +			vcpu->arch.pkrs = data;
->> +			vmcs_write64(GUEST_IA32_PKRS, data);
->> +		}
->> +		break;
->>   	case MSR_TSC_AUX:
->>   		if (!msr_info->host_initiated &&
->>   		    !guest_cpuid_has(vcpu, X86_FEATURE_RDTSCP))
->> @@ -2479,7 +2518,8 @@ static __init int setup_vmcs_config(struct vmcs_config *vmcs_conf,
->>   	      VM_EXIT_LOAD_IA32_EFER |
->>   	      VM_EXIT_CLEAR_BNDCFGS |
->>   	      VM_EXIT_PT_CONCEAL_PIP |
->> -	      VM_EXIT_CLEAR_IA32_RTIT_CTL;
->> +	      VM_EXIT_CLEAR_IA32_RTIT_CTL |
->> +	      VM_EXIT_LOAD_IA32_PKRS;
->>   	if (adjust_vmx_controls(min, opt, MSR_IA32_VMX_EXIT_CTLS,
->>   				&_vmexit_control) < 0)
->>   		return -EIO;
->> @@ -2503,7 +2543,8 @@ static __init int setup_vmcs_config(struct vmcs_config *vmcs_conf,
->>   	      VM_ENTRY_LOAD_IA32_EFER |
->>   	      VM_ENTRY_LOAD_BNDCFGS |
->>   	      VM_ENTRY_PT_CONCEAL_PIP |
->> -	      VM_ENTRY_LOAD_IA32_RTIT_CTL;
->> +	      VM_ENTRY_LOAD_IA32_RTIT_CTL |
->> +	      VM_ENTRY_LOAD_IA32_PKRS;
->>   	if (adjust_vmx_controls(min, opt, MSR_IA32_VMX_ENTRY_CTLS,
->>   				&_vmentry_control) < 0)
->>   		return -EIO;
->> @@ -3103,8 +3144,9 @@ int vmx_set_cr4(struct kvm_vcpu *vcpu, unsigned long cr4)
->>   	 * is in force while we are in guest mode.  Do not let guests control
->>   	 * this bit, even if host CR4.MCE == 0.
->>   	 */
->> -	unsigned long hw_cr4;
->> +	unsigned long hw_cr4, old_cr4;
->>   
->> +	old_cr4 = kvm_read_cr4(vcpu);
->>   	hw_cr4 = (cr4_read_shadow() & X86_CR4_MCE) | (cr4 & ~X86_CR4_MCE);
->>   	if (is_unrestricted_guest(vcpu))
->>   		hw_cr4 |= KVM_VM_CR4_ALWAYS_ON_UNRESTRICTED_GUEST;
->> @@ -3152,7 +3194,7 @@ int vmx_set_cr4(struct kvm_vcpu *vcpu, unsigned long cr4)
->>   		}
->>   
->>   		/*
->> -		 * SMEP/SMAP/PKU is disabled if CPU is in non-paging mode in
->> +		 * SMEP/SMAP/PKU/PKS is disabled if CPU is in non-paging mode in
->>   		 * hardware.  To emulate this behavior, SMEP/SMAP/PKU needs
->>   		 * to be manually disabled when guest switches to non-paging
->>   		 * mode.
->> @@ -3160,10 +3202,29 @@ int vmx_set_cr4(struct kvm_vcpu *vcpu, unsigned long cr4)
->>   		 * If !enable_unrestricted_guest, the CPU is always running
->>   		 * with CR0.PG=1 and CR4 needs to be modified.
->>   		 * If enable_unrestricted_guest, the CPU automatically
->> -		 * disables SMEP/SMAP/PKU when the guest sets CR0.PG=0.
->> +		 * disables SMEP/SMAP/PKU/PKS when the guest sets CR0.PG=0.
->>   		 */
->>   		if (!is_paging(vcpu))
->> -			hw_cr4 &= ~(X86_CR4_SMEP | X86_CR4_SMAP | X86_CR4_PKE);
->> +			hw_cr4 &= ~(X86_CR4_SMEP | X86_CR4_SMAP | X86_CR4_PKE |
->> +				    X86_CR4_PKS);
->> +	}
->> +
->> +	if ((hw_cr4 ^ old_cr4) & X86_CR4_PKS) {
-> 
-> Comparing hw_cr4 and old_cr4 is wrong, they are representative of two different
-> contexts.  old_cr4 is the guest's previous CR4 irrespective of KVM maniuplations,
-> whereas hw_cr4 does include KVM's modification, e.g. the is_paging() logic above
-> may clear CR4.PKS and may lead to incorrect behavior.
-> 
-> E.g.:
-> 
-> 	guest.CR4.PKS = 1
-> 	guest.CR0.PG  = 0
-> 	guest_hw.CR4.PKS = 0  // KVM
-> 	vmcs.LOAD_PKRS = 0    // KVM
-> 	guest.CR0.PG  = 1
-> 	guest_hw.CR4.PKS = 1  // KVM
-> 	vmcs.LOAD_PKRS not modified because guest.CR4.PKS == guest_hw.CR4.PKS == 1
-> 
-> This logic also fails to handle the case where L1 doesn't intercept CR4.PKS
-> modifications for L2.
-> 
-> The VM-Exit path that does:
-> 
->> +     if (static_cpu_has(X86_FEATURE_PKS) &&
->> +         kvm_read_cr4_bits(vcpu, X86_CR4_PKS))
->> +             vcpu->arch.pkrs = vmcs_read64(GUEST_IA32_PKRS)
-> 
-> is also flawed in that, per this scheme, it may unnecessarily read vmcs.GUEST_PKRS,
-> though I don't think it can get the wrong value, unless of course it's running L2...
-> 
-> In short, IMO toggling PKRS interception/load on CR4 changes is a really, really
-> bad idea.  UMIP emulation attempted do fancy toggling and got it wrong multiple
-> times, and this is more complicated than what UMIP was trying to do.
-> 
-> The only motiviation for toggling PKRS interception/load is to avoid the VMREAD in
-> the VM-Exit path.  Given that vcpu->arch.pkrs is rarely accessed by KVM, e.g. only
-> on host userspace MSR reads and and GVA->GPA translation via permission_fault(),
-> keeping vcpu->arch.pkrs up-to-date at all times is unnecessary, i.e. it can be
-> synchronized on-demand.  And regarding permission_fault(), that's indirectly gated
-> by CR4.PKS=1, thus deferring the VMREAD to permission_fault() is guaranteed to be
-> more performant than reading on every VM-Exit (with CR4.PKS=1).
-> 
-> So:
-> 
->    - Disable PKRS MSR interception if it's exposed to the guest.
->    - Load PKRS on entry/exit if it's exposed to the guest.
->    - Add VCPU_EXREG_PKRS and clear its bits in vmx_register_cache_reset().
->    - Add helpers to read/write/cache PKRS and use accordingly.
-> 
-
-Make sense. Will refactor all these mentioned in next version.
-
->> +		/* pass through PKRS to guest when CR4.PKS=1 */
->> +		if (guest_cpuid_has(vcpu, X86_FEATURE_PKS) && hw_cr4 & X86_CR4_PKS) {
->> +			vmx_disable_intercept_for_msr(vcpu, MSR_IA32_PKRS, MSR_TYPE_RW);
->> +			vm_entry_controls_setbit(vmx, VM_ENTRY_LOAD_IA32_PKRS);
->> +			vm_exit_controls_setbit(vmx, VM_EXIT_LOAD_IA32_PKRS);
->> +			/*
->> +			 * Every vm exit saves guest pkrs automatically, sync vcpu->arch.pkrs
->> +			 * to VMCS.GUEST_PKRS to avoid the pollution by host pkrs.
->> +			 */
->> +			vmcs_write64(GUEST_IA32_PKRS, vcpu->arch.pkrs);
->> +		} else {
->> +			vmx_enable_intercept_for_msr(vcpu, MSR_IA32_PKRS, MSR_TYPE_RW);
->> +			vm_entry_controls_clearbit(vmx, VM_ENTRY_LOAD_IA32_PKRS);
->> +			vm_exit_controls_clearbit(vmx, VM_EXIT_LOAD_IA32_PKRS);
->> +		}
->>   	}
->>   
->>   	vmcs_writel(CR4_READ_SHADOW, cr4);
-> 
-> ...
-> 
->> @@ -6776,6 +6841,10 @@ static fastpath_t vmx_vcpu_run(struct kvm_vcpu *vcpu)
->>   
->>   	pt_guest_exit(vmx);
->>   
->> +	if (static_cpu_has(X86_FEATURE_PKS) &&
->> +	    kvm_read_cr4_bits(vcpu, X86_CR4_PKS))
->> +		vcpu->arch.pkrs = vmcs_read64(GUEST_IA32_PKRS);
->> +
->>   	kvm_load_host_xsave_state(vcpu);
->>   
->>   	vmx->nested.nested_run_pending = 0;
->> @@ -7280,6 +7349,14 @@ static __init void vmx_set_cpu_caps(void)
->>   	if (vmx_pt_mode_is_host_guest())
->>   		kvm_cpu_cap_check_and_set(X86_FEATURE_INTEL_PT);
->>   
->> +	/*
->> +	 * PKS is not yet implemented for shadow paging.
->> +	 * If not support VM_{ENTRY, EXIT}_LOAD_IA32_PKRS,
->> +	 * don't expose the PKS as well.
->> +	 */
->> +	if (enable_ept && cpu_has_load_ia32_pkrs())
->> +		kvm_cpu_cap_check_and_set(X86_FEATURE_PKS);
->> +
->>   	if (vmx_umip_emulated())
->>   		kvm_cpu_cap_set(X86_FEATURE_UMIP);
->>   
->> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
->> index f5ede41bf9e6..684ef760481c 100644
->> --- a/arch/x86/kvm/x86.c
->> +++ b/arch/x86/kvm/x86.c
->> @@ -1213,7 +1213,7 @@ static const u32 msrs_to_save_all[] = {
->>   	MSR_IA32_RTIT_ADDR1_A, MSR_IA32_RTIT_ADDR1_B,
->>   	MSR_IA32_RTIT_ADDR2_A, MSR_IA32_RTIT_ADDR2_B,
->>   	MSR_IA32_RTIT_ADDR3_A, MSR_IA32_RTIT_ADDR3_B,
->> -	MSR_IA32_UMWAIT_CONTROL,
->> +	MSR_IA32_UMWAIT_CONTROL, MSR_IA32_PKRS,
->>   
->>   	MSR_ARCH_PERFMON_FIXED_CTR0, MSR_ARCH_PERFMON_FIXED_CTR1,
->>   	MSR_ARCH_PERFMON_FIXED_CTR0 + 2, MSR_ARCH_PERFMON_FIXED_CTR0 + 3,
->> @@ -5718,6 +5718,10 @@ static void kvm_init_msr_list(void)
->>   				intel_pt_validate_hw_cap(PT_CAP_num_address_ranges) * 2)
->>   				continue;
->>   			break;
->> +		case MSR_IA32_PKRS:
->> +			if (!kvm_cpu_cap_has(X86_FEATURE_PKS))
->> +				continue;
->> +			break;
->>   		case MSR_ARCH_PERFMON_PERFCTR0 ... MSR_ARCH_PERFMON_PERFCTR0 + 17:
->>   			if (msrs_to_save_all[i] - MSR_ARCH_PERFMON_PERFCTR0 >=
->>   			    min(INTEL_PMC_MAX_GENERIC, x86_pmu.num_counters_gp))
->> @@ -10026,6 +10030,8 @@ void kvm_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event)
->>   
->>   	vcpu->arch.ia32_xss = 0;
->>   
->> +	vcpu->arch.pkrs = 0;
-> 
-> This is wrong and also unreviewable.  It's wrong because the write isn't propagted
-> to vmcs.GUEST_PKRS, e.g. if the guest enables CR0.PG and CR4.PKS without writing
-> PKRS, KVM will run the guest with a stale value.
-> 
-
-Yes, should write to vmcs to do reset.
-  > It's unreviewable because the SDM doesn't specify whether PKRS is 
-cleared or
-> preserved on INIT.  The SDM needs an entry for PRKS in Table 9-1. "IA-32 and Intel
-> 64 Processor States Following Power-up, Reset, or INIT" before this can be merged.
-> 
-
-PKRS is missing in Table 9-1. It will be updated in next version of SDM, 
-just let you know to help current review:
-
-"PKRS is cleared on INIT. It should be 0 in all cases."
-
->> +
->>   	kvm_x86_ops.vcpu_reset(vcpu, init_event);
->>   }
+Thanks,
+Yongji
