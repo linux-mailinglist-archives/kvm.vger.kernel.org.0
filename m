@@ -2,57 +2,58 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 19DF93DE5A7
-	for <lists+kvm@lfdr.de>; Tue,  3 Aug 2021 06:46:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 290773DE5AA
+	for <lists+kvm@lfdr.de>; Tue,  3 Aug 2021 06:46:42 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233734AbhHCEqm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 3 Aug 2021 00:46:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57726 "EHLO
+        id S233853AbhHCEqq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 3 Aug 2021 00:46:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57736 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229611AbhHCEqj (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 3 Aug 2021 00:46:39 -0400
-Received: from mail-pj1-x1049.google.com (mail-pj1-x1049.google.com [IPv6:2607:f8b0:4864:20::1049])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 83F33C061796
-        for <kvm@vger.kernel.org>; Mon,  2 Aug 2021 21:46:28 -0700 (PDT)
-Received: by mail-pj1-x1049.google.com with SMTP id n4-20020a17090ac684b0290177656cfbc7so2272437pjt.7
-        for <kvm@vger.kernel.org>; Mon, 02 Aug 2021 21:46:28 -0700 (PDT)
+        with ESMTP id S233725AbhHCEql (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 3 Aug 2021 00:46:41 -0400
+Received: from mail-pl1-x64a.google.com (mail-pl1-x64a.google.com [IPv6:2607:f8b0:4864:20::64a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E1A92C061799
+        for <kvm@vger.kernel.org>; Mon,  2 Aug 2021 21:46:29 -0700 (PDT)
+Received: by mail-pl1-x64a.google.com with SMTP id l16-20020a170902f690b029012cb82f15afso4476891plg.10
+        for <kvm@vger.kernel.org>; Mon, 02 Aug 2021 21:46:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=reply-to:date:in-reply-to:message-id:mime-version:references
          :subject:from:to:cc;
-        bh=uvGN8o0svNEgNpDAlc6hd0uZYNG8aDJpGIKyIlckztA=;
-        b=EstkdbR37/abuK+nZocc83eoDyxbAueC4xW7VBFBL+11H/s8A7Nj3uKtpONLq5G/80
-         3A7l15GjFqzxPajJGMmk70pYdv1YC1UE8P0m9zC/39TbfL61vU0RPUIOK5R5SwNsNabe
-         IzkvkvPu9WCs2VagDvbLQNJpDjTpgnUs2FfQCESqF+GoSNgq/+wM/IYW7yNtaYy8lPBN
-         ggEN1Q6XqsdfJPdBJGzFtVTl1EKWycwQ7oJI+LlHeeiJcCG6f5XS3KkRiTyk99EbYbWI
-         MAP7GBEINtiboJmngr63BAc2Hj7CRxN2bqDyDY9RZRKzUvpYTR80oNAHdOu2Nb17IFWR
-         e30w==
+        bh=/kt3GsReI0qxlgk6gWKn2NJ23HEdkW7Aud8Gxnwk7qw=;
+        b=Xh81q1RmonSbkzq73aaMKLEqC/x2Cco72xRZ8gNWiIBwOPcwOaB5/GGrvb9rz47gBS
+         XXg2t0f2JCAihWnYPpJvZoalPTYvi4DJ6RopV8A0fsfodMASneaUYJ4FU83DeTRGCEEI
+         +ePoGauvyPKOeP+/kewT9XOp+C4TiJ/sx3qD202pbHcE0BkpoWjwjHlPkhEirp09x6EV
+         ySIzlpWuN239XjN2P7ke1ftWkVWAiqPeiTPZGGgEg/fUMjjl5S+hVikebIXw2ZchHdGO
+         vCJ3/k8Z7iTWrT6YGaSsGH6pJkJWNhgsORa+N1ljG3poKuIoGshhO0P/TLwzMZsapNVO
+         aBow==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:reply-to:date:in-reply-to:message-id
          :mime-version:references:subject:from:to:cc;
-        bh=uvGN8o0svNEgNpDAlc6hd0uZYNG8aDJpGIKyIlckztA=;
-        b=TSgVOGrTIKflXDskea82vfE6PEfAya8wepR5LycDrX2PAAmqJ+6ZZ5wgTxvitmmvQj
-         2YOw5rUxZknwjBF7pvyMUAZoYQPFKBzQeSEovr033AtuJ5Lk1/X72ZjCdL1a8GE1W+Ka
-         cJxULAYyEIPsXHNP9rSia4VIAFxiCdvgaKWiUArBvIIFVLTZ3LpfBQite1uLIhLRXV/V
-         4PXMYIS2Vr8/BIUe0N4mFJC5PBunr6Q7W4YD8xaRUxLR0rCvdE0qc99E1m3U+KXlrMDq
-         ol3UjpWhRAZ/GetEzct7N7/ULKVwxvf9HuTnCw5F3mqatZmNKDwDxSRQeZNFUTyr40U7
-         1OFQ==
-X-Gm-Message-State: AOAM533jTPlVblmJ87smZl6OCQFiD2zD2a1vNM+ESzQYnBrxyZKJtpLS
-        nHqi/hURDRATXwV46hQhOxPI4aMLeaa/
-X-Google-Smtp-Source: ABdhPJyaw9WJ7iFBQaTLk0jwa6AM5CsSnxVzPD4B9jsp6ckJsVDFg8I3HQCXj6lroq4+P5FfD6XYc6lJFXoZ
+        bh=/kt3GsReI0qxlgk6gWKn2NJ23HEdkW7Aud8Gxnwk7qw=;
+        b=sqoQqmaHsgiwyM6TAlaUvtTVALMU4na+FIUNhhjf7Ue8qpAD/4keCPCZYDHqzFkArU
+         F7uMtSnAkTWBh3Q727nCP0SDgmcDvre9+guwgQrJT9n+SN0F3gQ5LcsXwrVgDwyr9cRZ
+         gtlyJdJ6wcdBY8Yaxohs3dW5EmSxaE4EzNYM/K5vIkfVAsVuCkJF5xhiZThVkhoNMDaP
+         lfRB6yhDW+qIozdRdwCQc+jQCmH6vSnUXD3FR+OHRtAEajK/fcrz9VY3WBuodxkhBKw5
+         cll/d3C35rFjcLN3/pVyXPP0ewV8hjCpIMIpDbaoic2zzGtVnHDQWXohgilddPjo6wDt
+         jwfA==
+X-Gm-Message-State: AOAM531E2towg+6kbBfMXspJwjfQ7mtL+Fce71XEMLjXSqtWW1dPq6US
+        idGWV1i5F/ZGwo9naaIb0I7iRmvT+Het
+X-Google-Smtp-Source: ABdhPJxps/Vl+UCc7rA/SBKbGz0jwmpKAc00VAX8dRqRa4N0RWHQf3ZnxU+ioFSRa6KEOCh6it2TAaN1BkTM
 X-Received: from mihenry-linux-desktop.kir.corp.google.com ([2620:15c:29:204:4304:2e3e:d2f5:48c8])
- (user=mizhang job=sendgmr) by 2002:a17:902:e88f:b029:12c:c949:36dd with SMTP
- id w15-20020a170902e88fb029012cc94936ddmr1292433plg.84.1627965987962; Mon, 02
- Aug 2021 21:46:27 -0700 (PDT)
+ (user=mizhang job=sendgmr) by 2002:a17:902:a5c5:b029:12c:9108:d83 with SMTP
+ id t5-20020a170902a5c5b029012c91080d83mr17010060plq.33.1627965989421; Mon, 02
+ Aug 2021 21:46:29 -0700 (PDT)
 Reply-To: Mingwei Zhang <mizhang@google.com>
-Date:   Mon,  2 Aug 2021 21:46:05 -0700
+Date:   Mon,  2 Aug 2021 21:46:06 -0700
 In-Reply-To: <20210803044607.599629-1-mizhang@google.com>
-Message-Id: <20210803044607.599629-2-mizhang@google.com>
+Message-Id: <20210803044607.599629-3-mizhang@google.com>
 Mime-Version: 1.0
 References: <20210803044607.599629-1-mizhang@google.com>
 X-Mailer: git-send-email 2.32.0.554.ge1b32706d8-goog
-Subject: [PATCH v4 1/3] KVM: x86/mmu: Remove redundant spte present check in mmu_set_spte
+Subject: [PATCH v4 2/3] KVM: x86/mmu: Avoid collision with !PRESENT SPTEs in
+ TDP MMU lpage stats
 From:   Mingwei Zhang <mizhang@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     Sean Christopherson <seanjc@google.com>,
@@ -69,54 +70,80 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Drop an unnecessary is_shadow_present_pte() check when updating the rmaps
-after installing a non-MMIO SPTE.  set_spte() is used only to create
-shadow-present SPTEs, e.g. MMIO SPTEs are handled early on, mmu_set_spte()
-runs with mmu_lock held for write, i.e. the SPTE can't be zapped between
-writing the SPTE and updating the rmaps.
+From: Sean Christopherson <seanjc@google.com>
 
-Opportunistically combine the "new SPTE" logic for large pages and rmaps.
+Factor in whether or not the old/new SPTEs are shadow-present when
+adjusting the large page stats in the TDP MMU.  A modified MMIO SPTE can
+toggle the page size bit, as bit 7 is used to store the MMIO generation,
+i.e. is_large_pte() can get a false positive when called on a MMIO SPTE.
+Ditto for nuking SPTEs with REMOVED_SPTE, which sets bit 7 in its magic
+value.
 
-No functional change intended.
+Opportunistically move the logic below the check to verify at least one
+of the old/new SPTEs is shadow present.
 
-Suggested-by: Ben Gardon <bgardon@google.com>
+Use is/was_leaf even though is/was_present would suffice.  The code
+generation is roughly equivalent since all flags need to be computed
+prior to the code in question, and using the *_leaf flags will minimize
+the diff in a future enhancement to account all pages, i.e. will change
+the check to "is_leaf != was_leaf".
 
 Reviewed-by: David Matlack <dmatlack@google.com>
 Reviewed-by: Ben Gardon <bgardon@google.com>
-Reviewed-by: Sean Christopherson <seanjc@google.com>
+
+Fixes: 1699f65c8b65 ("kvm/x86: Fix 'lpages' kvm stat for TDM MMU")
+Cc: stable@vger.kernel.org
+Signed-off-by: Sean Christopherson <seanjc@google.com>
 Signed-off-by: Mingwei Zhang <mizhang@google.com>
 ---
- arch/x86/kvm/mmu/mmu.c | 16 ++++++----------
- 1 file changed, 6 insertions(+), 10 deletions(-)
+ arch/x86/kvm/mmu/tdp_mmu.c | 20 +++++++++++++-------
+ 1 file changed, 13 insertions(+), 7 deletions(-)
 
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index a8cdfd8d45c4..f614e9df3c3b 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -2734,17 +2734,13 @@ static int mmu_set_spte(struct kvm_vcpu *vcpu, u64 *sptep,
+diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
+index 43f12f5d12c0..4b0953fed12e 100644
+--- a/arch/x86/kvm/mmu/tdp_mmu.c
++++ b/arch/x86/kvm/mmu/tdp_mmu.c
+@@ -413,6 +413,7 @@ static void __handle_changed_spte(struct kvm *kvm, int as_id, gfn_t gfn,
+ 	bool was_leaf = was_present && is_last_spte(old_spte, level);
+ 	bool is_leaf = is_present && is_last_spte(new_spte, level);
+ 	bool pfn_changed = spte_to_pfn(old_spte) != spte_to_pfn(new_spte);
++	bool was_large, is_large;
  
- 	pgprintk("%s: setting spte %llx\n", __func__, *sptep);
- 	trace_kvm_mmu_set_spte(level, gfn, sptep);
--	if (!was_rmapped && is_large_pte(*sptep))
--		++vcpu->kvm->stat.lpages;
+ 	WARN_ON(level > PT64_ROOT_MAX_LEVEL);
+ 	WARN_ON(level < PG_LEVEL_4K);
+@@ -446,13 +447,6 @@ static void __handle_changed_spte(struct kvm *kvm, int as_id, gfn_t gfn,
  
--	if (is_shadow_present_pte(*sptep)) {
--		if (!was_rmapped) {
--			rmap_count = rmap_add(vcpu, sptep, gfn);
--			if (rmap_count > vcpu->kvm->stat.max_mmu_rmap_size)
--				vcpu->kvm->stat.max_mmu_rmap_size = rmap_count;
--			if (rmap_count > RMAP_RECYCLE_THRESHOLD)
--				rmap_recycle(vcpu, sptep, gfn);
--		}
-+	if (!was_rmapped) {
-+		if (is_large_pte(*sptep))
-+			++vcpu->kvm->stat.lpages;
-+		rmap_count = rmap_add(vcpu, sptep, gfn);
-+		if (rmap_count > RMAP_RECYCLE_THRESHOLD)
-+			rmap_recycle(vcpu, sptep, gfn);
+ 	trace_kvm_tdp_mmu_spte_changed(as_id, gfn, level, old_spte, new_spte);
+ 
+-	if (is_large_pte(old_spte) != is_large_pte(new_spte)) {
+-		if (is_large_pte(old_spte))
+-			atomic64_sub(1, (atomic64_t*)&kvm->stat.lpages);
+-		else
+-			atomic64_add(1, (atomic64_t*)&kvm->stat.lpages);
+-	}
+-
+ 	/*
+ 	 * The only times a SPTE should be changed from a non-present to
+ 	 * non-present state is when an MMIO entry is installed/modified/
+@@ -478,6 +472,18 @@ static void __handle_changed_spte(struct kvm *kvm, int as_id, gfn_t gfn,
+ 		return;
  	}
  
- 	return ret;
++	/*
++	 * Update large page stats if a large page is being zapped, created, or
++	 * is replacing an existing shadow page.
++	 */
++	was_large = was_leaf && is_large_pte(old_spte);
++	is_large = is_leaf && is_large_pte(new_spte);
++	if (was_large != is_large) {
++		if (was_large)
++			atomic64_sub(1, (atomic64_t *)&kvm->stat.lpages);
++		else
++			atomic64_add(1, (atomic64_t *)&kvm->stat.lpages);
++	}
+ 
+ 	if (was_leaf && is_dirty_spte(old_spte) &&
+ 	    (!is_present || !is_dirty_spte(new_spte) || pfn_changed))
 -- 
 2.32.0.554.ge1b32706d8-goog
 
