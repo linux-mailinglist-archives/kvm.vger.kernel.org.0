@@ -2,57 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A029C3DE917
-	for <lists+kvm@lfdr.de>; Tue,  3 Aug 2021 11:00:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C55A73DE919
+	for <lists+kvm@lfdr.de>; Tue,  3 Aug 2021 11:00:38 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234814AbhHCJAk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 3 Aug 2021 05:00:40 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:35281 "EHLO
+        id S234906AbhHCJAq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 3 Aug 2021 05:00:46 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:52048 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S234740AbhHCJAj (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 3 Aug 2021 05:00:39 -0400
+        by vger.kernel.org with ESMTP id S234554AbhHCJAp (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 3 Aug 2021 05:00:45 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1627981229;
+        s=mimecast20190719; t=1627981234;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=9Q7/xPZm8jUnnjCMCdU0R6LgFCbSeWcpFM+7y2Jr/KQ=;
-        b=Gy9jfYn2yB5Sezmh0Aug/hb+3+rkKUKkYWHt1wcYY/NbEk42Sou0CwVmNibuenSqI7YbSK
-        2hj9rh77Jl2x5alPV7Jwo2imUoIMgdVWVqsYMNAmUE5GUzTPGpvTKDwslmg/L6mEeP3hIQ
-        eyfXRGMpTgoYKwINp5oIT0sGuS3O7KE=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-486-D0Effw4IMv-0UpNHHkuosw-1; Tue, 03 Aug 2021 05:00:27 -0400
-X-MC-Unique: D0Effw4IMv-0UpNHHkuosw-1
-Received: by mail-wm1-f69.google.com with SMTP id k5-20020a7bc3050000b02901e081f69d80so3707651wmj.8
-        for <kvm@vger.kernel.org>; Tue, 03 Aug 2021 02:00:27 -0700 (PDT)
+        bh=9UH0gpcsz/cdHoJVPf064lHW6QX70PQL8rmdmVm5V1c=;
+        b=OZ+YEf+Ic4A0+je0njOwaLHYjr8VKuRZtztUAlhAwj7ArU3MiqtCi7f+Pt7xdORzVJQNrK
+        WenNikWR6qW2vMEINZwe4UnX4ng0+eRQi0BHr4kz1kHvW/+je7MJpYAC/aIEGYfmcN/ATb
+        XEP4NHDLhiof8Cbp7Wa/OiLj+xXlAZA=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-589-wTh-Co-TNh-yZuacbrQqaQ-1; Tue, 03 Aug 2021 05:00:33 -0400
+X-MC-Unique: wTh-Co-TNh-yZuacbrQqaQ-1
+Received: by mail-wr1-f72.google.com with SMTP id p12-20020a5d68cc0000b02901426384855aso7312609wrw.11
+        for <kvm@vger.kernel.org>; Tue, 03 Aug 2021 02:00:32 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=9Q7/xPZm8jUnnjCMCdU0R6LgFCbSeWcpFM+7y2Jr/KQ=;
-        b=Tco/Y3JV05FdS1BOB6GRxRBHNvEjRpzJila6uHVeLdBRwSn25OpCQlPoqD6PAbFBrJ
-         Is0YaeV49l2i+XzFgT/PUk9tej9kunFRA1H+KVBhUXM+Gf9N+/++B0Mr19kEH9JH1qK2
-         UQoTl5avVMK7Mn7fg/kvIrSEeRQ4xxMxCw3V3ghjCK6S3/n8+Y+gekh6B1FtU61vgICu
-         a6lh4PrhulSugoyRmr/oIr12kdWurl907kpLjKUgxODynsJDvuEmGisCXpF8B759N9Tx
-         1h+DMuYS9RfjR71Z3liGLX106o7EBW4f21DNrhhOX9hmYwDPceXgifw7J/LRvn4Tiwq6
-         bUPA==
-X-Gm-Message-State: AOAM532jdM2LPQx9rezEegqcGHJp91pp818lTuIpfG8USUgi9wVD14ev
-        cECGLkUwa7HF1PQc/d6DbBATzH7WZA8ccYLrd8oILfgnOdxSV2EcMfUCw5uuaMQT2r8ew9FXpQc
-        Ei8FsplGJPxUL
-X-Received: by 2002:a7b:cc98:: with SMTP id p24mr3165687wma.118.1627981226477;
-        Tue, 03 Aug 2021 02:00:26 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJykQE+5VkJxZIVMbxOmNBn0QTX3WJWN0Jt8B5Z7DzZM/I/IFQQ7DsCaWyGb+4kCxVZ7I5vUxg==
-X-Received: by 2002:a7b:cc98:: with SMTP id p24mr3165653wma.118.1627981226235;
-        Tue, 03 Aug 2021 02:00:26 -0700 (PDT)
+        bh=9UH0gpcsz/cdHoJVPf064lHW6QX70PQL8rmdmVm5V1c=;
+        b=I4xQBZbU98QyuHyuPL+8/jeMK0j7mmhG7XunJUAwfMyzykKRb8JIzfC8aR4JFVI0SG
+         DycRpNjCysL5xLs++jyvrDzKxoWV3lXJxw97fQRyRVYvOxUgQ2CMpEuwuIdN2MkSqxVU
+         pAtm2Is38yGy2zYvk5EKdx7b+scPJXrbQ3xWakMp/ygUP59f8EMSIJnFEfSBportBfVn
+         2KRf4UBA4UVWD6v4IuHILsgvTeWVaZYUcXn9iyiuWPMkUPan5Sq2/Lrj1FZcOeoRtlMh
+         mt9+936riL0UUGJEkKmUnvcXxdI2TEAfGyq6ZpnAY+HpOBD19bJkjXxWU/gQ0R86aIju
+         MIWg==
+X-Gm-Message-State: AOAM530r7J75fgKAOIaXzxSqsUMdy8ezHgeQbADbPdHLBIsU4J53GI/E
+        sK8d0l+5mtnUCXMv7sixopRrr0z6Q8VY2mRjgToiSmi/a9Jidyq3dnSdTCbkM3TPhai4nqbN+sG
+        Xi/efW7SsWvJw
+X-Received: by 2002:a1c:188:: with SMTP id 130mr3208933wmb.122.1627981231921;
+        Tue, 03 Aug 2021 02:00:31 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzlx9U65dG5iOGg+nn1zcieWJgrvlrWZan5a+mAwh+5cAXSF//R8+mFLP2xQqFq1bv7rXUQIw==
+X-Received: by 2002:a1c:188:: with SMTP id 130mr3208916wmb.122.1627981231688;
+        Tue, 03 Aug 2021 02:00:31 -0700 (PDT)
 Received: from [192.168.10.118] ([93.56.169.140])
-        by smtp.gmail.com with ESMTPSA id n11sm16313687wrs.81.2021.08.03.02.00.24
+        by smtp.gmail.com with ESMTPSA id s1sm1873569wmj.8.2021.08.03.02.00.30
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 03 Aug 2021 02:00:25 -0700 (PDT)
-Subject: Re: [PATCH v3 02/12] KVM: x86/mmu: bump mmu notifier count in
- kvm_zap_gfn_range
+        Tue, 03 Aug 2021 02:00:31 -0700 (PDT)
+Subject: Re: [PATCH v3 03/12] KVM: x86/mmu: rename try_async_pf to
+ kvm_faultin_pfn
 To:     Maxim Levitsky <mlevitsk@redhat.com>, kvm@vger.kernel.org
 Cc:     Wanpeng Li <wanpengli@tencent.com>,
         Thomas Gleixner <tglx@linutronix.de>,
@@ -67,14 +67,14 @@ Cc:     Wanpeng Li <wanpengli@tencent.com>,
         Ingo Molnar <mingo@redhat.com>,
         "H. Peter Anvin" <hpa@zytor.com>
 References: <20210802183329.2309921-1-mlevitsk@redhat.com>
- <20210802183329.2309921-3-mlevitsk@redhat.com>
+ <20210802183329.2309921-4-mlevitsk@redhat.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <8cae345b-767d-69fe-b7dc-7be559c18e2a@redhat.com>
-Date:   Tue, 3 Aug 2021 11:00:23 +0200
+Message-ID: <7dbd1416-5cf7-4950-e391-d45190f8313d@redhat.com>
+Date:   Tue, 3 Aug 2021 11:00:29 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.11.0
 MIME-Version: 1.0
-In-Reply-To: <20210802183329.2309921-3-mlevitsk@redhat.com>
+In-Reply-To: <20210802183329.2309921-4-mlevitsk@redhat.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -83,99 +83,54 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 On 02/08/21 20:33, Maxim Levitsky wrote:
-> This together with previous patch, ensures that
-> kvm_zap_gfn_range doesn't race with page fault
-> running on another vcpu, and will make this page fault code
-> retry instead.
+> try_async_pf is a wrong name for this function, since this code
+> is used when asynchronous page fault is not enabled as well.
 > 
-> This is based on a patch suggested by Sean Christopherson:
-> https://lkml.org/lkml/2021/7/22/1025
+> This code is based on a patch from Sean Christopherson:
+> https://lkml.org/lkml/2021/7/19/2970
 > 
 > Suggested-by: Sean Christopherson <seanjc@google.com>
 > Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
 > ---
->   arch/x86/kvm/mmu/mmu.c   | 4 ++++
->   include/linux/kvm_host.h | 5 +++++
->   virt/kvm/kvm_main.c      | 7 +++++--
->   3 files changed, 14 insertions(+), 2 deletions(-)
+>   arch/x86/kvm/mmu/mmu.c         | 4 ++--
+>   arch/x86/kvm/mmu/paging_tmpl.h | 2 +-
+>   2 files changed, 3 insertions(+), 3 deletions(-)
 > 
 > diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> index 9d78cb1c0f35..9da635e383c2 100644
+> index 9da635e383c2..c5e0ecf5f758 100644
 > --- a/arch/x86/kvm/mmu/mmu.c
 > +++ b/arch/x86/kvm/mmu/mmu.c
-> @@ -5640,6 +5640,8 @@ void kvm_zap_gfn_range(struct kvm *kvm, gfn_t gfn_start, gfn_t gfn_end)
->   
->   	write_lock(&kvm->mmu_lock);
->   
-> +	kvm_inc_notifier_count(kvm, gfn_start, gfn_end);
-> +
->   	if (kvm_memslots_have_rmaps(kvm)) {
->   		for (i = 0; i < KVM_ADDRESS_SPACE_NUM; i++) {
->   			slots = __kvm_memslots(kvm, i);
-> @@ -5671,6 +5673,8 @@ void kvm_zap_gfn_range(struct kvm *kvm, gfn_t gfn_start, gfn_t gfn_end)
->   	if (flush)
->   		kvm_flush_remote_tlbs_with_address(kvm, gfn_start, gfn_end);
->   
-> +	kvm_dec_notifier_count(kvm, gfn_start, gfn_end);
-> +
->   	write_unlock(&kvm->mmu_lock);
+> @@ -3842,7 +3842,7 @@ static bool kvm_arch_setup_async_pf(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa,
+>   				  kvm_vcpu_gfn_to_hva(vcpu, gfn), &arch);
 >   }
 >   
-> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-> index 9d6b4ad407b8..962e11a73e8e 100644
-> --- a/include/linux/kvm_host.h
-> +++ b/include/linux/kvm_host.h
-> @@ -985,6 +985,11 @@ void kvm_mmu_free_memory_cache(struct kvm_mmu_memory_cache *mc);
->   void *kvm_mmu_memory_cache_alloc(struct kvm_mmu_memory_cache *mc);
->   #endif
->   
-> +void kvm_inc_notifier_count(struct kvm *kvm, unsigned long start,
-> +				   unsigned long end);
-> +void kvm_dec_notifier_count(struct kvm *kvm, unsigned long start,
-> +				   unsigned long end);
-> +
->   long kvm_arch_dev_ioctl(struct file *filp,
->   			unsigned int ioctl, unsigned long arg);
->   long kvm_arch_vcpu_ioctl(struct file *filp,
-> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> index a96cbe24c688..71042cd807b3 100644
-> --- a/virt/kvm/kvm_main.c
-> +++ b/virt/kvm/kvm_main.c
-> @@ -608,7 +608,7 @@ static void kvm_mmu_notifier_change_pte(struct mmu_notifier *mn,
->   	kvm_handle_hva_range(mn, address, address + 1, pte, kvm_set_spte_gfn);
->   }
->   
-> -static void kvm_inc_notifier_count(struct kvm *kvm, unsigned long start,
-> +void kvm_inc_notifier_count(struct kvm *kvm, unsigned long start,
->   				   unsigned long end)
+> -static bool try_async_pf(struct kvm_vcpu *vcpu, bool prefault, gfn_t gfn,
+> +static bool kvm_faultin_pfn(struct kvm_vcpu *vcpu, bool prefault, gfn_t gfn,
+>   			 gpa_t cr2_or_gpa, kvm_pfn_t *pfn, hva_t *hva,
+>   			 bool write, bool *writable)
 >   {
->   	/*
-> @@ -636,6 +636,7 @@ static void kvm_inc_notifier_count(struct kvm *kvm, unsigned long start,
->   			max(kvm->mmu_notifier_range_end, end);
->   	}
->   }
-> +EXPORT_SYMBOL_GPL(kvm_inc_notifier_count);
+> @@ -3912,7 +3912,7 @@ static int direct_page_fault(struct kvm_vcpu *vcpu, gpa_t gpa, u32 error_code,
+>   	mmu_seq = vcpu->kvm->mmu_notifier_seq;
+>   	smp_rmb();
 >   
->   static int kvm_mmu_notifier_invalidate_range_start(struct mmu_notifier *mn,
->   					const struct mmu_notifier_range *range)
-> @@ -670,7 +671,7 @@ static int kvm_mmu_notifier_invalidate_range_start(struct mmu_notifier *mn,
->   	return 0;
->   }
+> -	if (try_async_pf(vcpu, prefault, gfn, gpa, &pfn, &hva,
+> +	if (kvm_faultin_pfn(vcpu, prefault, gfn, gpa, &pfn, &hva,
+>   			 write, &map_writable))
+>   		return RET_PF_RETRY;
 >   
-> -static void kvm_dec_notifier_count(struct kvm *kvm, unsigned long start,
-> +void kvm_dec_notifier_count(struct kvm *kvm, unsigned long start,
->   				   unsigned long end)
->   {
->   	/*
-> @@ -687,6 +688,8 @@ static void kvm_dec_notifier_count(struct kvm *kvm, unsigned long start,
->   	 */
->   	kvm->mmu_notifier_count--;
->   }
-> +EXPORT_SYMBOL_GPL(kvm_dec_notifier_count);
-> +
+> diff --git a/arch/x86/kvm/mmu/paging_tmpl.h b/arch/x86/kvm/mmu/paging_tmpl.h
+> index ee044d357b5f..f349eae69bf3 100644
+> --- a/arch/x86/kvm/mmu/paging_tmpl.h
+> +++ b/arch/x86/kvm/mmu/paging_tmpl.h
+> @@ -881,7 +881,7 @@ static int FNAME(page_fault)(struct kvm_vcpu *vcpu, gpa_t addr, u32 error_code,
+>   	mmu_seq = vcpu->kvm->mmu_notifier_seq;
+>   	smp_rmb();
 >   
->   static void kvm_mmu_notifier_invalidate_range_end(struct mmu_notifier *mn,
->   					const struct mmu_notifier_range *range)
+> -	if (try_async_pf(vcpu, prefault, walker.gfn, addr, &pfn, &hva,
+> +	if (kvm_faultin_pfn(vcpu, prefault, walker.gfn, addr, &pfn, &hva,
+>   			 write_fault, &map_writable))
+>   		return RET_PF_RETRY;
+>   
 > 
 
 Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
