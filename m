@@ -2,115 +2,115 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6908D3DE7AE
-	for <lists+kvm@lfdr.de>; Tue,  3 Aug 2021 09:59:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4B8E13DE7D2
+	for <lists+kvm@lfdr.de>; Tue,  3 Aug 2021 10:03:14 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234375AbhHCH7g (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 3 Aug 2021 03:59:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46050 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234321AbhHCH7f (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 3 Aug 2021 03:59:35 -0400
-Received: from mail-qt1-x84a.google.com (mail-qt1-x84a.google.com [IPv6:2607:f8b0:4864:20::84a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F2617C061764
-        for <kvm@vger.kernel.org>; Tue,  3 Aug 2021 00:59:24 -0700 (PDT)
-Received: by mail-qt1-x84a.google.com with SMTP id s14-20020ac8528e0000b029025f76cabdfcso12512957qtn.15
-        for <kvm@vger.kernel.org>; Tue, 03 Aug 2021 00:59:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:message-id:mime-version:subject:from:to:cc;
-        bh=Fxd607RMBzP4aoVO0IekhXmHo+nn/xa9qFfPGrfYJnk=;
-        b=YymPx+mWp1zUbGTLO5o8137nsca5qm9tyeMBp6mwVCeFmc2hPAVp6FRtc/ojTVbd0e
-         bTJkElcc0C6ssNMxn8f1pPJx08ZJTZNOWD/QHci2jOnYQ4C9P5J7xnODtAwpF77xNzB0
-         TIdSAXiFgg300g+h+io9WAoNmjFXP4l1QYqCB/m42HWP5vCrPXgQNK44A+jsjNegQwFn
-         4CWG/kdVsURaNsXjonrIEsrPpzfl2ad18OFY+e7omyKmYqhWJ5HeVPhW68yaZszdfgDo
-         Hjd9A6DbB51Z4zL+7X+KAJITtV5AeBVr74YqKV56/qV1Tr/RpFvnsxvLGKEV5ZUQ6aTL
-         8PEA==
+        id S234354AbhHCIDW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 3 Aug 2021 04:03:22 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:41725 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S234357AbhHCIDU (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 3 Aug 2021 04:03:20 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1627977789;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=oX9W5hbn1aUW9052DFy7xT6UwniQgZiOlZ+YGM5fx0A=;
+        b=drQ3y0yYcOqB4qinQnLDe/UhmYQyIbaZmxCvAItHRe1ROT8eyKIznfLS2bbr6GT6sO8IRx
+        2Wzv+A+gbvBSJTQVpFhVKZp5ndX2K6o07Mh05jZua0EZiWVHXZcnbVS43DBr4zJqYXTevp
+        lZYtrn7a+VFkAQ4WUZVdm8hmPx5r8To=
+Received: from mail-pj1-f69.google.com (mail-pj1-f69.google.com
+ [209.85.216.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-439-wCm0HsfROAaDaxZCtQpdeA-1; Tue, 03 Aug 2021 04:03:08 -0400
+X-MC-Unique: wCm0HsfROAaDaxZCtQpdeA-1
+Received: by mail-pj1-f69.google.com with SMTP id lx12-20020a17090b4b0cb0290176d6de7ddbso18997148pjb.9
+        for <kvm@vger.kernel.org>; Tue, 03 Aug 2021 01:03:08 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
-        bh=Fxd607RMBzP4aoVO0IekhXmHo+nn/xa9qFfPGrfYJnk=;
-        b=JtNNf6sOHKRwppvE6ahILlt/RpjT/8S/wLbVe25hZR+2oNbuQC/9wUng9PzRaIK2+l
-         xCGY8apKoeEsKWNdp6xXrpFWcB2p+qJzvNeB8IhsQ++ZBAr4uPZilMmEOxGH7aO+dIfE
-         yoHcRHzaSYX0WSmHGD3z3P/JKoe2P2dlrIm0m2adkB98VtzCcviziVjLYylkCtTy07Wd
-         vBb3YTSqVNCT3TTfhXZ8/HGe5ylTBouBuCpth9U+G9fkokkCVwJUu+Ma3rZFMnuMB7DU
-         M67ux/Twjje0ifrJwy5zjL8H68Qs5W2EJ/b3UzvnaHfqg3YJGq6ilUaZq+JJ9h+SFa5w
-         E6Bg==
-X-Gm-Message-State: AOAM530kp2YdJQPlia51+V9BJHJKRPCnr8F0DckpLcsqrsTFKbDCvYw4
-        0bqzBaheBKkfce+aixrD7peNEJd+/5xR4w==
-X-Google-Smtp-Source: ABdhPJysqvn+LjS2ao5Iec7fgO+cxbswRHEKmAV0xZsBvKypSr1bKig1Z1zbBeJ2hUtpYyWnPao0H7Tj6P3tAQ==
-X-Received: from suleiman1.tok.corp.google.com ([2401:fa00:8f:203:7e55:6c56:df0d:f664])
- (user=suleiman job=sendgmr) by 2002:a05:6214:332:: with SMTP id
- j18mr20391348qvu.21.1627977564134; Tue, 03 Aug 2021 00:59:24 -0700 (PDT)
-Date:   Tue,  3 Aug 2021 16:59:14 +0900
-Message-Id: <20210803075914.3070477-1-suleiman@google.com>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.32.0.554.ge1b32706d8-goog
-Subject: [PATCH] kvm,x86: Use the refined tsc rate for the guest tsc.
-From:   Suleiman Souhlal <suleiman@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     ssouhlal@freebsd.org, hikalium@chromium.org,
-        senozhatsky@chromium.org, Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Suleiman Souhlal <suleiman@google.com>
-Content-Type: text/plain; charset="UTF-8"
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-transfer-encoding
+         :content-language;
+        bh=oX9W5hbn1aUW9052DFy7xT6UwniQgZiOlZ+YGM5fx0A=;
+        b=bJQuooqV3Lr+afuKdmxixZgJQFK7rffKEyyg4ySDT/iC2PmjZB2N66Jsd2eYAe3moy
+         XpMKpku8GDitma+V7yx8nozzX0lIzT9M5fMe4uZiIfKGcCeKgtb3QNZm8t3foZ8sBJjC
+         XJDK0eGWJawY9hRvbSVZfFmItsOtiCAj5GWheNKjMQSM5Z7VfkplNBr3hRSExYSyV8ea
+         YCf9tZx9LBMfqBMxIRDDy4In4sSfRuzXid/NspsOyHaU4F4URctXgWRvhzavZvEMp3Ye
+         EqFsd9BqDgh+NdNv4l0ev3Labfh+YHyGsfSWVv0J77rkR7WaQIr/v3Y3PD+2mXcRnN/S
+         Zs5Q==
+X-Gm-Message-State: AOAM5322JY1QcWl/xasjYm+g/AaxILjVCJ1IgI5aLbG5/TjVs6eKJBx2
+        //yg6gGSVCvcb4XAlmRGtWghMpkCTeVrLjeerxlGt/3P/mwloLn2VxtYLjP7Xg95Pz2ZmuFqytj
+        SSuPrAOKM5AeE
+X-Received: by 2002:a17:90a:784e:: with SMTP id y14mr5429379pjl.185.1627977787238;
+        Tue, 03 Aug 2021 01:03:07 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzQ/4OMNA4Jyj5oD4cflZM/wOKB+qV8HVYA0Mg+fxcM5s95sTutq8PhHECERUYS65XO/92FRw==
+X-Received: by 2002:a17:90a:784e:: with SMTP id y14mr5429356pjl.185.1627977786975;
+        Tue, 03 Aug 2021 01:03:06 -0700 (PDT)
+Received: from wangxiaodeMacBook-Air.local ([209.132.188.80])
+        by smtp.gmail.com with ESMTPSA id n20sm7442877pfv.212.2021.08.03.01.02.59
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 03 Aug 2021 01:03:06 -0700 (PDT)
+Subject: Re: [PATCH v10 07/17] virtio: Don't set FAILED status bit on device
+ index allocation failure
+To:     Xie Yongji <xieyongji@bytedance.com>, mst@redhat.com,
+        stefanha@redhat.com, sgarzare@redhat.com, parav@nvidia.com,
+        hch@infradead.org, christian.brauner@canonical.com,
+        rdunlap@infradead.org, willy@infradead.org,
+        viro@zeniv.linux.org.uk, axboe@kernel.dk, bcrl@kvack.org,
+        corbet@lwn.net, mika.penttila@nextfour.com,
+        dan.carpenter@oracle.com, joro@8bytes.org,
+        gregkh@linuxfoundation.org, zhe.he@windriver.com,
+        xiaodong.liu@intel.com, joe@perches.com
+Cc:     songmuchun@bytedance.com,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        kvm@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        iommu@lists.linux-foundation.org, linux-kernel@vger.kernel.org
+References: <20210729073503.187-1-xieyongji@bytedance.com>
+ <20210729073503.187-8-xieyongji@bytedance.com>
+From:   Jason Wang <jasowang@redhat.com>
+Message-ID: <487ed840-f417-e1b6-edb3-15f19969de51@redhat.com>
+Date:   Tue, 3 Aug 2021 16:02:57 +0800
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0)
+ Gecko/20100101 Thunderbird/78.12.0
+MIME-Version: 1.0
+In-Reply-To: <20210729073503.187-8-xieyongji@bytedance.com>
+Content-Type: text/plain; charset=gbk; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Prior to this change, the initial tsc rate used by kvm would be
-the unrefined rate, instead of the refined rate that is derived
-later at boot and used for timekeeping. This can cause time to
-advance at different rates between the host and the guest.
 
-Signed-off-by: Suleiman Souhlal <suleiman@google.com>
----
- arch/x86/kvm/x86.c | 11 +++++++++++
- 1 file changed, 11 insertions(+)
+ÔÚ 2021/7/29 ÏÂÎç3:34, Xie Yongji Ð´µÀ:
+> We don't need to set FAILED status bit on device index allocation
+> failure since the device initialization hasn't been started yet.
+> This doesn't affect runtime, found in code review.
+>
+> Signed-off-by: Xie Yongji <xieyongji@bytedance.com>
 
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 4116567f3d44..1e59bb326c10 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -2199,6 +2199,7 @@ static atomic_t kvm_guest_has_master_clock = ATOMIC_INIT(0);
- #endif
- 
- static DEFINE_PER_CPU(unsigned long, cpu_tsc_khz);
-+static DEFINE_PER_CPU(bool, cpu_tsc_khz_changed);
- static unsigned long max_tsc_khz;
- 
- static u32 adjust_tsc_khz(u32 khz, s32 ppm)
-@@ -2906,6 +2907,14 @@ static int kvm_guest_time_update(struct kvm_vcpu *v)
- 		kvm_make_request(KVM_REQ_CLOCK_UPDATE, v);
- 		return 1;
- 	}
-+	/*
-+	 * Use the refined tsc_khz instead of the tsc_khz at boot (which was
-+	 * not refined yet when we got it), if the tsc frequency hasn't changed.
-+	 * If the frequency does change, it does not get refined any further,
-+	 * so it is safe to use the one gotten from the notifiers.
-+	 */
-+	if (!__this_cpu_read(cpu_tsc_khz_changed))
-+		tgt_tsc_khz = tsc_khz;
- 	if (!use_master_clock) {
- 		host_tsc = rdtsc();
- 		kernel_ns = get_kvmclock_base_ns();
-@@ -8086,6 +8095,8 @@ static void tsc_khz_changed(void *data)
- 		khz = freq->new;
- 	else if (!boot_cpu_has(X86_FEATURE_CONSTANT_TSC))
- 		khz = cpufreq_quick_get(raw_smp_processor_id());
-+	if (khz)
-+		__this_cpu_write(cpu_tsc_khz_changed, true);
- 	if (!khz)
- 		khz = tsc_khz;
- 	__this_cpu_write(cpu_tsc_khz, khz);
--- 
-2.32.0.554.ge1b32706d8-goog
+
+Does it really harm?
+
+Thanks
+
+
+> ---
+>   drivers/virtio/virtio.c | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/drivers/virtio/virtio.c b/drivers/virtio/virtio.c
+> index 4b15c00c0a0a..a15beb6b593b 100644
+> --- a/drivers/virtio/virtio.c
+> +++ b/drivers/virtio/virtio.c
+> @@ -338,7 +338,7 @@ int register_virtio_device(struct virtio_device *dev)
+>   	/* Assign a unique device index and hence name. */
+>   	err = ida_simple_get(&virtio_index_ida, 0, 0, GFP_KERNEL);
+>   	if (err < 0)
+> -		goto out;
+> +		return err;
+>   
+>   	dev->index = err;
+>   	dev_set_name(&dev->dev, "virtio%u", dev->index);
 
