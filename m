@@ -2,93 +2,97 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 91C8E3DF4ED
-	for <lists+kvm@lfdr.de>; Tue,  3 Aug 2021 20:45:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 31ACC3DF535
+	for <lists+kvm@lfdr.de>; Tue,  3 Aug 2021 21:15:04 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239257AbhHCSpd (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 3 Aug 2021 14:45:33 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:47063 "EHLO
+        id S239525AbhHCTPN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 3 Aug 2021 15:15:13 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:41753 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S239231AbhHCSpb (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 3 Aug 2021 14:45:31 -0400
+        by vger.kernel.org with ESMTP id S239079AbhHCTPM (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 3 Aug 2021 15:15:12 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1628016319;
+        s=mimecast20190719; t=1628018101;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=vD4GHHiAQujvrl1/opzUUx/uFZKgR5lwlMLUYlItd0Q=;
-        b=NL2Prij89lxH5pgMDhJSS97vgeR22yKoiBY0+LzZlZ6td9wdzc28mEVSsIrPe8/G0kxc4S
-        3rNYPEAHYic8AvxppjcOBAsR7MQ/QcVI5+XYL1CtJGHR8kDExr9WTdXk9MPNKakaCB4eXC
-        o8hObIkSUT2HogrO2DqDfkKQIqmK/Ak=
-Received: from mail-ot1-f70.google.com (mail-ot1-f70.google.com
- [209.85.210.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-583-J66qQS43OROYpTqexdnn-A-1; Tue, 03 Aug 2021 14:45:18 -0400
-X-MC-Unique: J66qQS43OROYpTqexdnn-A-1
-Received: by mail-ot1-f70.google.com with SMTP id j12-20020a9d190c0000b02904d23318616aso10185981ota.17
-        for <kvm@vger.kernel.org>; Tue, 03 Aug 2021 11:45:17 -0700 (PDT)
+        bh=+rSWKM/T14hSNJ7CCzHqgndf9sQoQa3vUJu76cRGCd4=;
+        b=VJwvzzvHIrjPvzGs/SV6VENfbCCSvdt3tPaDL8IkN9MlN7rahXuWzeExUzZSMiCB7Sv3se
+        /VEMjxzRlTrWZffBmg0YmjSU8+bKHXIm0yUJylKJVsOdBrPSuIruPHi9jO4Y8nGra4w6Je
+        8aiJ34Av2ot83zQj4f0wNEqrbgzSm1c=
+Received: from mail-qk1-f197.google.com (mail-qk1-f197.google.com
+ [209.85.222.197]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-570-AQhjPkj6MgSPZLjx8bNDYw-1; Tue, 03 Aug 2021 15:15:00 -0400
+X-MC-Unique: AQhjPkj6MgSPZLjx8bNDYw-1
+Received: by mail-qk1-f197.google.com with SMTP id b4-20020a3799040000b02903b899a4309cso206018qke.14
+        for <kvm@vger.kernel.org>; Tue, 03 Aug 2021 12:14:59 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=vD4GHHiAQujvrl1/opzUUx/uFZKgR5lwlMLUYlItd0Q=;
-        b=Mj5HzFqFTpYDmMnYso4Q6oDJUiprKR34r0EMXpGij7A4ftdxG1Ua77Crn3eIiWJ2HW
-         VQixoPWF2JClZdGeL11Ll4w00mI5ni7SZC66qG579SN+loWrFJDGOPL6h6t+IUuAm1r+
-         CYA99/jfu+B+piR89ozoVfMXjfdyEhGONpytFFZdSS7g4FiGvUmSTgbW1zBhX+D0Njmp
-         YFnhfF6JHmURgq2Ae9H/Xdi2GkSt3OenhHBkNuoLaeBG9ApiOvL9gPR4fOeb1NUy8MuK
-         Mzh5QGQvVhQNnbmTMsZzD3Dl+rDXvCkvloSrxGS4Y4xzubI5EhNOTm8zJSATzkQYSmqX
-         s/iA==
-X-Gm-Message-State: AOAM5335f7FZesVqO2PiaDUfRo63fGH9FcI9wi2LDO0YMgq9HI5CO6XV
-        ebUoe9vYgL1D7GPZg31vCem4Lg4jASNcTOgRGEfb6866ajP5MRd69sPkahjHI5c4WbmKs8p+UH6
-        L0doOhT4TsvAD
-X-Received: by 2002:a4a:de08:: with SMTP id y8mr15449640oot.82.1628016317415;
-        Tue, 03 Aug 2021 11:45:17 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyCfhff+efEfTZP7FOJU9riq82NNdenr4cPJ+RBArqw/DOV4JlQPqPyE+EnKVMCeq6hipJkUQ==
-X-Received: by 2002:a4a:de08:: with SMTP id y8mr15449633oot.82.1628016317267;
-        Tue, 03 Aug 2021 11:45:17 -0700 (PDT)
-Received: from redhat.com ([198.99.80.109])
-        by smtp.gmail.com with ESMTPSA id bg9sm2584126oib.26.2021.08.03.11.45.16
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=+rSWKM/T14hSNJ7CCzHqgndf9sQoQa3vUJu76cRGCd4=;
+        b=TIK8JBI4EMlbhu8TELO3iUr0n/eZ6wdGpxevV8E82+wdVqHFaz0iTrVvR9ypAdBaN9
+         U8S9YvGafWUXlUA5QDG1Lv2tO1E3tUxrZcG+oGTJfKB7pVJQX3OvltmiwS7tItAU1SRT
+         ZS0y5KoooPyDY/Zm+k34gkbMyJOW69a1HQpxD+ZLN1SGPbW0/lQqHnTi7nmZeYWtGY0J
+         kJHWv9oCwtqj76tl5pF5BfZN0Aqs1dk2OPqtjDjWBPucJ/wKgYV0PU5/4+OZb1hVtVYf
+         s/h/nSC9b0TQf/JVTi7+vCBn4k4DF3N+GTOecGdVyHLqiAwHpN4SguAyphPGPwoWzr3i
+         HJ+Q==
+X-Gm-Message-State: AOAM532JOcCB4x6KLZ/BW1LozMNbTCJv9Hya8ihi/iaHtWe78MQaflGS
+        4sdTTPaPoZhXAUQzq9jSmQgma7CoM3g6nKIvB3ZxmwNqmLUk/rbkmjhhfgzc0kTD7wHFGHvcdfu
+        piQfvQeSpDkhK
+X-Received: by 2002:a37:d8c:: with SMTP id 134mr22409453qkn.433.1628018099292;
+        Tue, 03 Aug 2021 12:14:59 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJz/g25mwjJPBW3GRsT658xAjK7WfPFxd5+EX8D2glJQaP3nTHkoEEbGh1NCY2uO0kxMEiXzLw==
+X-Received: by 2002:a37:d8c:: with SMTP id 134mr22409441qkn.433.1628018099094;
+        Tue, 03 Aug 2021 12:14:59 -0700 (PDT)
+Received: from t490s (bras-base-toroon474qw-grc-92-76-70-75-133.dsl.bell.ca. [76.70.75.133])
+        by smtp.gmail.com with ESMTPSA id v6sm8503245qkp.117.2021.08.03.12.14.58
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 03 Aug 2021 11:45:17 -0700 (PDT)
-Date:   Tue, 3 Aug 2021 12:45:16 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Jason Gunthorpe <jgg@nvidia.com>
-Cc:     Cornelia Huck <cohuck@redhat.com>, kvm@vger.kernel.org,
-        Yishai Hadas <yishaih@nvidia.com>
-Subject: Re: [PATCH v3] vfio/pci: Make vfio_pci_regops->rw() return ssize_t
-Message-ID: <20210803124516.7531a1b6.alex.williamson@redhat.com>
-In-Reply-To: <0-v3-5db12d1bf576+c910-vfio_rw_jgg@nvidia.com>
-References: <0-v3-5db12d1bf576+c910-vfio_rw_jgg@nvidia.com>
-X-Mailer: Claws Mail 3.18.0 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
+        Tue, 03 Aug 2021 12:14:58 -0700 (PDT)
+Date:   Tue, 3 Aug 2021 15:14:57 -0400
+From:   Peter Xu <peterx@redhat.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Maxim Levitsky <mlevitsk@redhat.com>
+Subject: Re: [PATCH v3 4/7] KVM: X86: Introduce mmu_rmaps_stat per-vm debugfs
+ file
+Message-ID: <YQmVsSKIPooRQakQ@t490s>
+References: <20210730220455.26054-1-peterx@redhat.com>
+ <20210730220455.26054-5-peterx@redhat.com>
+ <8964c91d-761f-8fd4-e8c6-f85d6e318a45@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <8964c91d-761f-8fd4-e8c6-f85d6e318a45@redhat.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 21 Jul 2021 10:05:48 -0300
-Jason Gunthorpe <jgg@nvidia.com> wrote:
-
-> From: Yishai Hadas <yishaih@nvidia.com>
+On Mon, Aug 02, 2021 at 05:25:12PM +0200, Paolo Bonzini wrote:
+> On 31/07/21 00:04, Peter Xu wrote:
+> > Use this file to dump rmap statistic information.  The statistic is done by
+> > calculating the rmap count and the result is log-2-based.
+> > 
+> > An example output of this looks like (idle 6GB guest, right after boot linux):
+> > 
+> > Rmap_Count:     0       1       2-3     4-7     8-15    16-31   32-63   64-127  128-255 256-511 512-1023
+> > Level=4K:       3086676 53045   12330   1272    502     121     76      2       0       0       0
+> > Level=2M:       5947    231     0       0       0       0       0       0       0       0       0
+> > Level=1G:       32      0       0       0       0       0       0       0       0       0       0
+> > 
+> > Signed-off-by: Peter Xu <peterx@redhat.com>
+> > ---
+> >   arch/x86/kvm/x86.c | 113 +++++++++++++++++++++++++++++++++++++++++++++
+> >   1 file changed, 113 insertions(+)
 > 
-> The only implementation of this in IGD returns a -ERRNO which is
-> implicitly cast through a size_t and then casted again and returned as a
-> ssize_t in vfio_pci_rw().
-> 
-> Fix the vfio_pci_regops->rw() return type to be ssize_t so all is
-> consistent.
-> 
-> Fixes: 28541d41c9e0 ("vfio/pci: Add infrastructure for additional device specific regions")
-> Signed-off-by: Yishai Hadas <yishaih@nvidia.com>
-> Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
-> ---
->  drivers/vfio/pci/vfio_pci_igd.c     | 10 +++++-----
->  drivers/vfio/pci/vfio_pci_private.h |  2 +-
->  2 files changed, 6 insertions(+), 6 deletions(-)
+> This should be in debugfs.c, meaning that the kvm_mmu_slot_lpages() must be
+> in a header.  I think mmu.h should do, let me take a look and I can post
+> myself a v4 of these debugfs parts.
 
-Applied to vfio next branch for v5.15 with Max and Connie's R-b.
-Thanks,
+Thanks, Paolo!
 
-Alex
+-- 
+Peter Xu
 
