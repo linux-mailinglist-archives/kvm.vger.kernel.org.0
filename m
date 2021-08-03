@@ -2,57 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1743B3DE75D
-	for <lists+kvm@lfdr.de>; Tue,  3 Aug 2021 09:41:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B5A1E3DE76D
+	for <lists+kvm@lfdr.de>; Tue,  3 Aug 2021 09:46:23 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234313AbhHCHl6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 3 Aug 2021 03:41:58 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:39525 "EHLO
+        id S234262AbhHCHq1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 3 Aug 2021 03:46:27 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:29681 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S234248AbhHCHl4 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 3 Aug 2021 03:41:56 -0400
+        by vger.kernel.org with ESMTP id S234183AbhHCHq0 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 3 Aug 2021 03:46:26 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1627976505;
+        s=mimecast20190719; t=1627976775;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=sEW12L7lEJwVitr0islGtcOwaqb3auoW/6llqcQs9Bo=;
-        b=CqTbzxYbFeG33LhPH8dYRIjrt76BjkZXb1MHHxs07j59O+nF4TZSaVrtneunZG9oqrXcmb
-        tY+zfqSSsTxSFGoV2myD1rSHwMklnOmb6iMIACfiGa1OQ5k8DYK3NGEgDpIeZ5VizHZ7HB
-        F0s3RZ5661vbON9Z2yk4nQAZmufxohM=
-Received: from mail-pj1-f71.google.com (mail-pj1-f71.google.com
- [209.85.216.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-270-YBlaQsxhOZO7XZ7toqEBKQ-1; Tue, 03 Aug 2021 03:41:44 -0400
-X-MC-Unique: YBlaQsxhOZO7XZ7toqEBKQ-1
-Received: by mail-pj1-f71.google.com with SMTP id o23-20020a17090a4217b02901774c248202so2141531pjg.9
-        for <kvm@vger.kernel.org>; Tue, 03 Aug 2021 00:41:44 -0700 (PDT)
+        bh=GnfVPSk/HizDyO3JxuKbaXMtEKJY0iQR8Nsy47TDxzw=;
+        b=TV+X/2+EPNlJqtuALnqcjwblykoEHAhXsqzjYi5xoN1+ANdvxV50Kv5c8CIEG4H5yVRv8+
+        p7spVU9ZtYn/WSBTvQtZ+1mvFeX/FqOB3OKuiN0dUIwnaeO/Z7QGXFQyCcVZj8guGXP93s
+        qXowOOvNpDJjJkXEe2Ciz9TSsFpwWQs=
+Received: from mail-pl1-f199.google.com (mail-pl1-f199.google.com
+ [209.85.214.199]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-336-hoP-_NlOPSWAlIKVq7Mh0w-1; Tue, 03 Aug 2021 03:46:14 -0400
+X-MC-Unique: hoP-_NlOPSWAlIKVq7Mh0w-1
+Received: by mail-pl1-f199.google.com with SMTP id p21-20020a1709028a95b029012c31764588so1769808plo.12
+        for <kvm@vger.kernel.org>; Tue, 03 Aug 2021 00:46:14 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-transfer-encoding
          :content-language;
-        bh=sEW12L7lEJwVitr0islGtcOwaqb3auoW/6llqcQs9Bo=;
-        b=S/xb7ON0rGLvL7e9Dzhr9x7qrwcVCXXDU/muw0Yg71W6Pe1hokQLczcGIV5QG0p49z
-         gUklz+0j2JKLH8GMhCJnESv58+k/jED/pa7dlv2ddWBHTuzffH2sC+l+oHCgwy6YyYVC
-         aNmnr9AqW8TCSaJ5qOCsizFfZhsO3lsGqHe7EyH42f6DbIqJbouQzfi+qj0AZE93RaT2
-         nmzDKn5WP6J2oBHcb8AkMbC2PZjd8SziweGTOK1AA6oC6bvGiOBtf0z8gwhDH0ura5mi
-         i4bSyYoAdB27kCyIMgzc2hFyPF9sR7tgapnz3Ui4BEWAG71z68QpIvewTKZFEci5NBva
-         Mk0w==
-X-Gm-Message-State: AOAM531rOANdWQEleeC7XJaBBZFMrEIll4C5fgCfHAa9q7TT/NOmpbsF
-        qAiTMuBG+1xgJmjl5kT3OhqcIDbjLdxo73+TVMg7yqdqD47i7njEvIHMrO/4kKnvcGN4DhQC55s
-        p1AH1EMQYgUuR
-X-Received: by 2002:a65:6658:: with SMTP id z24mr924181pgv.266.1627976503787;
-        Tue, 03 Aug 2021 00:41:43 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyTQ9FIMwD850kYRySFMOvwSa2Mh3zZSaM4w5MdRtHBvqDzhjK3JTqHR+x1mQoJbyhltJ0O8Q==
-X-Received: by 2002:a65:6658:: with SMTP id z24mr924161pgv.266.1627976503586;
-        Tue, 03 Aug 2021 00:41:43 -0700 (PDT)
+        bh=GnfVPSk/HizDyO3JxuKbaXMtEKJY0iQR8Nsy47TDxzw=;
+        b=YG48cXhLeTK83ympAUYXkdR0CAoUBh6A0FlMKYrKUGfmB7+pRtShnmybOtXphfTla7
+         1hNw/7lyyMhUv70KUJd1ZBLcyzoxWqAM3nSmlNqqvPdtDmJL453113AupBhIygJS7VJk
+         MPMj06h2D5Je6BlPmnugwIbKUYIwVSo0n3P5q2IYA05WP7BLh0FxlQ3JMjKU+HZKKIkB
+         BGiKTOVnreO5YEIzwvwL7loQ2FBNscQJtXRHzH6opFKOmDLxy2Pn2+YnFTsq0D1CWtVC
+         0xxQSL+ultLsh6mRKn1rEO2iLHBLzsHK46d6X/Cv72aILIKWFX63r1h8f6gqLyojo3OJ
+         wKDQ==
+X-Gm-Message-State: AOAM530W7dCbe1J/TnX4t261czMprCjF0HuMHUvvdHVnA1EL7P/zbGZb
+        XW3S/pKBfd52StbILFCUIhs6PQvXWREDJBNKNL9EOl7zoj8rua6jKVk6PxBYtcxERVhfrSdJDlp
+        3yU4tib2xDqlP
+X-Received: by 2002:a17:90a:7065:: with SMTP id f92mr3190620pjk.16.1627976773309;
+        Tue, 03 Aug 2021 00:46:13 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyEvOW/oPitztnM44QtOEHatfCeA16JROutkQDb3a25VjV+JgBNuHrwDZ3buALcITz8Iapu0g==
+X-Received: by 2002:a17:90a:7065:: with SMTP id f92mr3190595pjk.16.1627976773095;
+        Tue, 03 Aug 2021 00:46:13 -0700 (PDT)
 Received: from wangxiaodeMacBook-Air.local ([209.132.188.80])
-        by smtp.gmail.com with ESMTPSA id r15sm13016701pjl.29.2021.08.03.00.41.35
+        by smtp.gmail.com with ESMTPSA id f1sm7278948pfk.115.2021.08.03.00.46.05
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 03 Aug 2021 00:41:42 -0700 (PDT)
-Subject: Re: [PATCH v10 01/17] iova: Export alloc_iova_fast() and
- free_iova_fast()
+        Tue, 03 Aug 2021 00:46:12 -0700 (PDT)
+Subject: Re: [PATCH v10 02/17] file: Export receive_fd() to modules
 To:     Xie Yongji <xieyongji@bytedance.com>, mst@redhat.com,
         stefanha@redhat.com, sgarzare@redhat.com, parav@nvidia.com,
         hch@infradead.org, christian.brauner@canonical.com,
@@ -67,14 +66,14 @@ Cc:     songmuchun@bytedance.com,
         kvm@vger.kernel.org, linux-fsdevel@vger.kernel.org,
         iommu@lists.linux-foundation.org, linux-kernel@vger.kernel.org
 References: <20210729073503.187-1-xieyongji@bytedance.com>
- <20210729073503.187-2-xieyongji@bytedance.com>
+ <20210729073503.187-3-xieyongji@bytedance.com>
 From:   Jason Wang <jasowang@redhat.com>
-Message-ID: <43d88942-1cd3-c840-6fec-4155fd544d80@redhat.com>
-Date:   Tue, 3 Aug 2021 15:41:33 +0800
+Message-ID: <a0ab081a-db06-6b7a-b22e-4ace96a5c7db@redhat.com>
+Date:   Tue, 3 Aug 2021 15:45:59 +0800
 User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0)
  Gecko/20100101 Thunderbird/78.12.0
 MIME-Version: 1.0
-In-Reply-To: <20210729073503.187-2-xieyongji@bytedance.com>
+In-Reply-To: <20210729073503.187-3-xieyongji@bytedance.com>
 Content-Type: text/plain; charset=gbk; format=flowed
 Content-Transfer-Encoding: 8bit
 Content-Language: en-US
@@ -84,39 +83,63 @@ X-Mailing-List: kvm@vger.kernel.org
 
 
 ÔÚ 2021/7/29 ÏÂÎç3:34, Xie Yongji Ð´µÀ:
-> Export alloc_iova_fast() and free_iova_fast() so that
-> some modules can use it to improve iova allocation efficiency.
+> Export receive_fd() so that some modules can use
+> it to pass file descriptor between processes without
+> missing any security stuffs.
+>
+> Signed-off-by: Xie Yongji <xieyongji@bytedance.com>
+> ---
+>   fs/file.c            | 6 ++++++
+>   include/linux/file.h | 7 +++----
+>   2 files changed, 9 insertions(+), 4 deletions(-)
+>
+> diff --git a/fs/file.c b/fs/file.c
+> index 86dc9956af32..210e540672aa 100644
+> --- a/fs/file.c
+> +++ b/fs/file.c
+> @@ -1134,6 +1134,12 @@ int receive_fd_replace(int new_fd, struct file *file, unsigned int o_flags)
+>   	return new_fd;
+>   }
+>   
+> +int receive_fd(struct file *file, unsigned int o_flags)
+> +{
+> +	return __receive_fd(file, NULL, o_flags);
 
 
-It's better to explain why alloc_iova() is not sufficient here.
+Any reason that receive_fd_user() can live in the file.h?
 
 Thanks
 
 
->
-> Signed-off-by: Xie Yongji <xieyongji@bytedance.com>
-> ---
->   drivers/iommu/iova.c | 2 ++
->   1 file changed, 2 insertions(+)
->
-> diff --git a/drivers/iommu/iova.c b/drivers/iommu/iova.c
-> index b6cf5f16123b..3941ed6bb99b 100644
-> --- a/drivers/iommu/iova.c
-> +++ b/drivers/iommu/iova.c
-> @@ -521,6 +521,7 @@ alloc_iova_fast(struct iova_domain *iovad, unsigned long size,
+> +}
+> +EXPORT_SYMBOL_GPL(receive_fd);
+> +
+>   static int ksys_dup3(unsigned int oldfd, unsigned int newfd, int flags)
+>   {
+>   	int err = -EBADF;
+> diff --git a/include/linux/file.h b/include/linux/file.h
+> index 2de2e4613d7b..51e830b4fe3a 100644
+> --- a/include/linux/file.h
+> +++ b/include/linux/file.h
+> @@ -94,6 +94,9 @@ extern void fd_install(unsigned int fd, struct file *file);
 >   
->   	return new_iova->pfn_lo;
+>   extern int __receive_fd(struct file *file, int __user *ufd,
+>   			unsigned int o_flags);
+> +
+> +extern int receive_fd(struct file *file, unsigned int o_flags);
+> +
+>   static inline int receive_fd_user(struct file *file, int __user *ufd,
+>   				  unsigned int o_flags)
+>   {
+> @@ -101,10 +104,6 @@ static inline int receive_fd_user(struct file *file, int __user *ufd,
+>   		return -EFAULT;
+>   	return __receive_fd(file, ufd, o_flags);
 >   }
-> +EXPORT_SYMBOL_GPL(alloc_iova_fast);
+> -static inline int receive_fd(struct file *file, unsigned int o_flags)
+> -{
+> -	return __receive_fd(file, NULL, o_flags);
+> -}
+>   int receive_fd_replace(int new_fd, struct file *file, unsigned int o_flags);
 >   
->   /**
->    * free_iova_fast - free iova pfn range into rcache
-> @@ -538,6 +539,7 @@ free_iova_fast(struct iova_domain *iovad, unsigned long pfn, unsigned long size)
->   
->   	free_iova(iovad, pfn);
->   }
-> +EXPORT_SYMBOL_GPL(free_iova_fast);
->   
->   #define fq_ring_for_each(i, fq) \
->   	for ((i) = (fq)->head; (i) != (fq)->tail; (i) = ((i) + 1) % IOVA_FQ_SIZE)
+>   extern void flush_delayed_fput(void);
 
