@@ -2,285 +2,191 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B258A3DE3EB
-	for <lists+kvm@lfdr.de>; Tue,  3 Aug 2021 03:19:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E5FA53DE41F
+	for <lists+kvm@lfdr.de>; Tue,  3 Aug 2021 03:45:48 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233212AbhHCBTj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 2 Aug 2021 21:19:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38752 "EHLO
+        id S233516AbhHCBp5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 2 Aug 2021 21:45:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44770 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233148AbhHCBTj (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 2 Aug 2021 21:19:39 -0400
-Received: from mail-il1-x132.google.com (mail-il1-x132.google.com [IPv6:2607:f8b0:4864:20::132])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 021B7C06175F;
-        Mon,  2 Aug 2021 18:19:29 -0700 (PDT)
-Received: by mail-il1-x132.google.com with SMTP id c3so18187265ilh.3;
-        Mon, 02 Aug 2021 18:19:28 -0700 (PDT)
+        with ESMTP id S232904AbhHCBp4 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 2 Aug 2021 21:45:56 -0400
+Received: from mail-io1-xd2f.google.com (mail-io1-xd2f.google.com [IPv6:2607:f8b0:4864:20::d2f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5C156C06175F;
+        Mon,  2 Aug 2021 18:45:46 -0700 (PDT)
+Received: by mail-io1-xd2f.google.com with SMTP id 185so22560083iou.10;
+        Mon, 02 Aug 2021 18:45:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=u9hZlNEVQtl9H4h5fUtoarYkmhlyAeJcak16DpUZk5w=;
-        b=XP074fISHdgNdmqlBDocoFPPOyy3Ag4vr397lUiFsl78eXaEeoy056KI89cuLstmPT
-         af+v8NtkcdxGgVDmFDb0jSl9ndPRl/XPasHsyX9PnFCkpKm/5L5Dk03TNtT6I41cgv/2
-         gUFk/22SzlBl+HbudPWXGDLLHmS4E3O9HuXNFBw8UWbLTTwRY9WDIBYpS4A3H+nToLd8
-         5oqi/H3AtAesgGjq4cb6o389lE0OW3kwKB5ZUnbZKKPjEjCri8Oe9eeU7CYgdxiw0Mfx
-         b+MeqNbxuMpRQqtO2il/c5zlpX3tCYN+R3HfXnNIFB0pTi75itEaP6x8bwjOcK/sEw5x
-         pTVg==
+        bh=uv1+NuI+jQm46T5UIH7fZM+sGGArCQuLnRoIYxPk0sY=;
+        b=MW3uECBVUejj6dl/243hzvdWUjNkj2HO8ic5AQ7SIj5F9+5eEFABHSv20akkmzow94
+         TiJT4EeKpFUxE17eeJsLyYcm6Xv7fjHD0wOMkjisEVv0rDAJls7ARdooL+HIMF5ay0SM
+         Helb4RyQZVZ4RBKT6zVCjNQuEwzWmmIfCViPtZeyV/v9mYMS9Xfwzvo3C0lY+Ld903eg
+         eo4MvYHlTQWV9PP0Th8j4piMx19+IctgO2gpPBuWE5ZadXKGjZCMQTzBDCnkf3m4kZUL
+         J2/CO6tQtRmrudOOD3d/n4/MEfeVO6E7XKnqwesUFPWJTigmMzNqGVr2exJm+vFhUrz6
+         jcFg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=u9hZlNEVQtl9H4h5fUtoarYkmhlyAeJcak16DpUZk5w=;
-        b=B9heoFLM32kv+U1cPR3JYMqVT9YjMYSOwHOzqLJtaMzfQ6Tj4hUvmAAClyunl9/fop
-         //1A1HczbNkQJrJWBGQ8QGUO/XrjyKSG8dVbLgIRKJmp2DGUdzD2+SGhgczocAAW0IKa
-         Y0iuLa9P1E4q6xcuK45goGhrr9ROIQl4nRdqr/8cE2k16HK5ZUnXuf9RPPFznr3Ookj2
-         1beMfH8dYFKAMBzEv60Hdp8s+7KRlGXshcrX/M7uGJI/ehD/VIr8Wim8rOWEMkNtaBHv
-         JqZXL1f1IQ9g9YJPG1b+nUJF/pOmuwKXCpkEoW9KaHtM3idSZG4LOUAtW1uMe7QIZBmI
-         Eu7Q==
-X-Gm-Message-State: AOAM530/eboP1I5tyS2dmUZ8dbUHbeqlhU07RGvwhASu0sBIcnF/LiQJ
-        wILROqm8w5JBYM3UBZ7qojwsZSqhJBs5FMqIHPA=
-X-Google-Smtp-Source: ABdhPJwO2whEKVXD9FpKYTgzaF0VMeJTZBR6Hxntfmj81J5yV0DJZTUjbOkVVNzO+vANYCpIVcApLDWdrer3qTE3STA=
-X-Received: by 2002:a05:6e02:b43:: with SMTP id f3mr613726ilu.94.1627953568399;
- Mon, 02 Aug 2021 18:19:28 -0700 (PDT)
+        bh=uv1+NuI+jQm46T5UIH7fZM+sGGArCQuLnRoIYxPk0sY=;
+        b=QGYXkdWMj4xlEIA7qrnaFVgUXiQxwhPfGxCnOECesUDWOX92CwYnzryT2FaK7ptuGY
+         ciQeCnZ/2FrOnihcEOK/QdgjmsMm75npHmkoD0UfInLqWanFMp5k3xCHNKodFFFGbVTg
+         cvCStfUks9j2UITOtWBKIgeszNpkVb2+O6DbH5i7Z7eZ7qaVl7r1hjx6A9S0pXLPt3UV
+         BjdxdlG6MAgQ+OOHqUstLk1SUulFdJIzBRSNgbt13+1tijX9sHMEMS2lNgJY/+EPMMY9
+         vewNv22EBmCREq+2gkYLxQv2DhPATxw3ahLMMmamMef2SAkiIn1N96cEKd5eNDX6lMt7
+         Zm8A==
+X-Gm-Message-State: AOAM531xuvzNjUu/l+tT7Oc5mk4EK9n/FQ4EZwX1CG5G9tdsCiIZUUU7
+        EIeE/CF0X9mD9BDLCKzr2dMa4e9a3a4laur9AEU=
+X-Google-Smtp-Source: ABdhPJyUMDyHdvpVuqg+tL6JdAWjwy+ffyggZHU4slBKyVtqy3W1yWBlNCDo/n42AgBDLk2S+LCLh7/+4+Fx/nLbQ+Q=
+X-Received: by 2002:a05:6638:cba:: with SMTP id x26mr13354789jad.98.1627955145847;
+ Mon, 02 Aug 2021 18:45:45 -0700 (PDT)
 MIME-Version: 1.0
-References: <20210525213920.3340-1-jiangshanlai@gmail.com> <YQLuBDZ2MlNlIoH4@google.com>
-In-Reply-To: <YQLuBDZ2MlNlIoH4@google.com>
-From:   Lai Jiangshan <jiangshanlai@gmail.com>
-Date:   Tue, 3 Aug 2021 09:19:17 +0800
-Message-ID: <CAJhGHyCU-Om3NWLVg-kbUE7FZD1nNZft8+KeCDH3cr_FDaitXQ@mail.gmail.com>
-Subject: Re: [RFC PATCH] kvm/x86: Keep root hpa in prev_roots as much as possible
+References: <20200320212833.3507-1-sean.j.christopherson@intel.com> <20200320212833.3507-2-sean.j.christopherson@intel.com>
+In-Reply-To: <20200320212833.3507-2-sean.j.christopherson@intel.com>
+From:   Lai Jiangshan <jiangshanlai+lkml@gmail.com>
+Date:   Tue, 3 Aug 2021 09:45:34 +0800
+Message-ID: <CAJhGHyCPyu6BVZwqvySeT2LSr81Xospdv2O=ssvTQv0Rvky0UA@mail.gmail.com>
+Subject: Re: [PATCH v3 01/37] KVM: VMX: Flush all EPTP/VPID contexts on remote
+ TLB flush
 To:     Sean Christopherson <seanjc@google.com>
-Cc:     LKML <linux-kernel@vger.kernel.org>, kvm@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Lai Jiangshan <laijs@linux.alibaba.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+        LKML <linux-kernel@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Jul 30, 2021 at 2:06 AM Sean Christopherson <seanjc@google.com> wrote:
->
-> On Wed, May 26, 2021, Lai Jiangshan wrote:
-> > From: Lai Jiangshan <laijs@linux.alibaba.com>
-> >
-> > Pagetable roots in prev_roots[] are likely to be reused soon and
-> > there is no much overhead to keep it with a new need_sync field
-> > introduced.
-> >
-> > With the help of the new need_sync field, pagetable roots are
-> > kept as much as possible, and they will be re-synced before reused
-> > instead of being dropped.
-> >
-> > Signed-off-by: Lai Jiangshan <laijs@linux.alibaba.com>
-> > ---
-> >
-> > This patch is just for RFC.
-> >   Is the idea Ok?
->
-> Yes, the idea is definitely a good one.
->
-> >   If the idea is Ok, we need to reused one bit from pgd or hpa
-> >     as need_sync to save memory.  Which one is better?
->
-> Ha, we can do this without increasing the memory footprint and without co-opting
-> a bit from pgd or hpa.  Because of compiler alignment/padding, the u8s and bools
-> between mmu_role and prev_roots already occupy 8 bytes, even though the actual
-> size is 4 bytes.  In total, we need room for 4 roots (3 previous + current), i.e.
-> 4 bytes.  If a separate array is used, no additional memory is consumed and no
-> masking is needed when reading/writing e.g. pgd.
->
-> The cost is an extra swap() when updating the prev_roots LRU, but that's peanuts
-> and would likely be offset by masking anyways.
->
-> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-> index 99f37781a6fc..13bb3c3a60b4 100644
-> --- a/arch/x86/include/asm/kvm_host.h
-> +++ b/arch/x86/include/asm/kvm_host.h
-> @@ -424,10 +424,12 @@ struct kvm_mmu {
->         hpa_t root_hpa;
->         gpa_t root_pgd;
->         union kvm_mmu_role mmu_role;
-> +       bool root_unsync;
->         u8 root_level;
->         u8 shadow_root_level;
->         u8 ept_ad;
->         bool direct_map;
-> +       bool unsync_roots[KVM_MMU_NUM_PREV_ROOTS];
->         struct kvm_mmu_root_info prev_roots[KVM_MMU_NUM_PREV_ROOTS];
->
+(I'm replying to a very old email, so many CCs are dropped.)
 
-Hello
+On Sat, Mar 21, 2020 at 5:33 AM Sean Christopherson
+<sean.j.christopherson@intel.com> wrote:
+>
+> Flush all EPTP/VPID contexts if a TLB flush _may_ have been triggered by
+> a remote or deferred TLB flush, i.e. by KVM_REQ_TLB_FLUSH.  Remote TLB
+> flushes require all contexts to be invalidated, not just the active
+> contexts, e.g. all mappings in all contexts for a given HVA need to be
+> invalidated on a mmu_notifier invalidation.  Similarly, the instigator
+> of the deferred TLB flush may be expecting all contexts to be flushed,
+> e.g. vmx_vcpu_load_vmcs().
+>
+> Without nested VMX, flushing only the current EPTP/VPID context isn't
+> problematic because KVM uses a constant VPID for each vCPU, and
 
-I think it is too complicated.  And it is hard to accept to put "unsync"
-out of struct kvm_mmu_root_info when they should be bound to each other.
+Hello, Sean
 
-How about this:
-- KVM_MMU_NUM_PREV_ROOTS
-+ KVM_MMU_NUM_CACHED_ROOTS
-- mmu->prev_roots[KVM_MMU_NUM_PREV_ROOTS]
-+ mmu->cached_roots[KVM_MMU_NUM_CACHED_ROOTS]
-- mmu->root_hpa
-+ mmu->cached_roots[0].hpa
-- mmu->root_pgd
-+ mmu->cached_roots[0].pgd
+Is the patch optimized for cases where nested VMX is active?
+I think the non-nested cases are normal cases.
 
-And using the bit63 in @pgd as the information that it is not requested
-to sync since the last sync.
+Although the related code has been changed, the logic of the patch
+is still working now, would it be better if we restore the optimization
+for the normal cases (non-nested)?
 
 Thanks
-Lai.
+Lai
 
->         /*
+> mmu_alloc_direct_roots() all but guarantees KVM will use a single EPTP
+> for L1.  In the rare case where a different EPTP is created or reused,
+> KVM (currently) unconditionally flushes the new EPTP context prior to
+> entering the guest.
 >
+> With nested VMX, KVM conditionally uses a different VPID for L2, and
+> unconditionally uses a different EPTP for L2.  Because KVM doesn't
+> _intentionally_ guarantee L2's EPTP/VPID context is flushed on nested
+> VM-Enter, it'd be possible for a malicious L1 to attack the host and/or
+> different VMs by exploiting the lack of flushing for L2.
 >
-> >  arch/x86/include/asm/kvm_host.h |  3 ++-
-> >  arch/x86/kvm/mmu/mmu.c          |  6 ++++++
-> >  arch/x86/kvm/vmx/nested.c       | 12 ++++--------
-> >  arch/x86/kvm/x86.c              |  9 +++++----
-> >  4 files changed, 17 insertions(+), 13 deletions(-)
-> >
-> > diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-> > index 55efbacfc244..19a337cf7aa6 100644
-> > --- a/arch/x86/include/asm/kvm_host.h
-> > +++ b/arch/x86/include/asm/kvm_host.h
-> > @@ -354,10 +354,11 @@ struct rsvd_bits_validate {
-> >  struct kvm_mmu_root_info {
-> >       gpa_t pgd;
-> >       hpa_t hpa;
-> > +     bool need_sync;
+>   1) Launch nested guest from malicious L1.
 >
-> Hmm, use "unsync" instead of "need_sync", purely to match the existing terminology
-> in KVM's MMU for this sort of behavior.
+>   2) Nested VM-Enter to L2.
 >
-> >  };
-> >
-> >  #define KVM_MMU_ROOT_INFO_INVALID \
-> > -     ((struct kvm_mmu_root_info) { .pgd = INVALID_PAGE, .hpa = INVALID_PAGE })
-> > +     ((struct kvm_mmu_root_info) { .pgd = INVALID_PAGE, .hpa = INVALID_PAGE, .need_sync = true})
-> >
-> >  #define KVM_MMU_NUM_PREV_ROOTS 3
-> >
-> > diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> > index 5e60b00e8e50..147827135549 100644
-> > --- a/arch/x86/kvm/mmu/mmu.c
-> > +++ b/arch/x86/kvm/mmu/mmu.c
-> > @@ -3878,6 +3878,7 @@ static bool cached_root_available(struct kvm_vcpu *vcpu, gpa_t new_pgd,
-> >
-> >       root.pgd = mmu->root_pgd;
-> >       root.hpa = mmu->root_hpa;
-> > +     root.need_sync = false;
-> >
-> >       if (is_root_usable(&root, new_pgd, new_role))
-> >               return true;
-> > @@ -3892,6 +3893,11 @@ static bool cached_root_available(struct kvm_vcpu *vcpu, gpa_t new_pgd,
-> >       mmu->root_hpa = root.hpa;
-> >       mmu->root_pgd = root.pgd;
-> >
-> > +     if (i < KVM_MMU_NUM_PREV_ROOTS && root.need_sync) {
+>   3) Access target GPA 'g'.  CPU inserts TLB entry tagged with L2's ASID
+>      mapping 'g' to host PFN 'x'.
 >
-> Probably makes sense to write this as:
+>   2) Nested VM-Exit to L1.
 >
->         if (i >= KVM_MMU_NUM_PREV_ROOTS)
->                 return false;
+>   3) L1 triggers kernel same-page merging (ksm) by duplicating/zeroing
+>      the page for PFN 'x'.
 >
->         if (root.need_sync) {
->                 kvm_make_request(KVM_REQ_MMU_SYNC, vcpu);
->                 kvm_make_request(KVM_REQ_TLB_FLUSH_CURRENT, vcpu);
->         }
->         return true;
+>   4) Host kernel merges PFN 'x' with PFN 'y', i.e. unmaps PFN 'x' and
+>      remaps the page to PFN 'y'.  mmu_notifier sends invalidate command,
+>      KVM flushes TLB only for L1's ASID.
 >
-> The "i < KVM_MMU_NUM_PREV_ROOTS == success" logic is just confusing enough that
-> it'd be nice to write it only once.
+>   4) Host kernel reallocates PFN 'x' to some other task/guest.
 >
-> And that would also play nicely with deferring a sync for the "current" root
-> (see below), e.g.
+>   5) Nested VM-Enter to L2.  KVM does not invalidate L2's EPTP or VPID.
 >
->         ...
->         unsync = mmu->root_unsync;
+>   6) L2 accesses GPA 'g' and gains read/write access to PFN 'x' via its
+>      stale TLB entry.
 >
->         if (is_root_usable(&root, new_pgd, new_role))
->                 goto found_root;
+> However, current KVM unconditionally flushes L1's EPTP/VPID context on
+> nested VM-Exit.  But, that behavior is mostly unintentional, KVM doesn't
+> go out of its way to flush EPTP/VPID on nested VM-Enter/VM-Exit, rather
+> a TLB flush is guaranteed to occur prior to re-entering L1 due to
+> __kvm_mmu_new_cr3() always being called with skip_tlb_flush=false.  On
+> nested VM-Enter, this happens via kvm_init_shadow_ept_mmu() (nested EPT
+> enabled) or in nested_vmx_load_cr3() (nested EPT disabled).  On nested
+> VM-Exit it occurs via nested_vmx_load_cr3().
 >
->         for (i = 0; i < KVM_MMU_NUM_PREV_ROOTS; i++) {
->                 swap(root, mmu->prev_roots[i]);
->                 swap(unsync, mmu->unsync_roots[i]);
+> This also fixes a bug where a deferred TLB flush in the context of L2,
+> with EPT disabled, would flush L1's VPID instead of L2's VPID, as
+> vmx_flush_tlb() flushes L1's VPID regardless of is_guest_mode().
 >
->                 if (is_root_usable(&root, new_pgd, new_role))
->                         break;
->         }
+> Cc: Vitaly Kuznetsov <vkuznets@redhat.com>
+> Cc: Ben Gardon <bgardon@google.com>
+> Cc: Jim Mattson <jmattson@google.com>
+> Cc: Junaid Shahid <junaids@google.com>
+> Cc: Liran Alon <liran.alon@oracle.com>
+> Cc: Boris Ostrovsky <boris.ostrovsky@oracle.com>
+> Cc: John Haxby <john.haxby@oracle.com>
+> Reviewed-by: Liran Alon <liran.alon@oracle.com>
+> Fixes: efebf0aaec3d ("KVM: nVMX: Do not flush TLB on L1<->L2 transitions if L1 uses VPID and EPT")
+> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+> ---
+>  arch/x86/kvm/vmx/vmx.h | 28 +++++++++++++++++++++++++++-
+>  1 file changed, 27 insertions(+), 1 deletion(-)
 >
->         if (i >= KVM_MMU_NUM_PREV_ROOTS)
->                 return false;
+> diff --git a/arch/x86/kvm/vmx/vmx.h b/arch/x86/kvm/vmx/vmx.h
+> index be93d597306c..d6d67b816ebe 100644
+> --- a/arch/x86/kvm/vmx/vmx.h
+> +++ b/arch/x86/kvm/vmx/vmx.h
+> @@ -518,7 +518,33 @@ static inline void __vmx_flush_tlb(struct kvm_vcpu *vcpu, int vpid,
 >
-> found_root:
->         if (unsync) {
->                 kvm_make_request(KVM_REQ_MMU_SYNC, vcpu);
->                 kvm_make_request(KVM_REQ_TLB_FLUSH_CURRENT, vcpu);
->         }
->         return true;
+>  static inline void vmx_flush_tlb(struct kvm_vcpu *vcpu, bool invalidate_gpa)
+>  {
+> -       __vmx_flush_tlb(vcpu, to_vmx(vcpu)->vpid, invalidate_gpa);
+> +       struct vcpu_vmx *vmx = to_vmx(vcpu);
+> +
+> +       /*
+> +        * Flush all EPTP/VPID contexts if the TLB flush _may_ have been
+> +        * invoked via kvm_flush_remote_tlbs(), which always passes %true for
+> +        * @invalidate_gpa.  Flushing remote TLBs requires all contexts to be
+> +        * flushed, not just the active context.
+> +        *
+> +        * Note, this also ensures a deferred TLB flush with VPID enabled and
+> +        * EPT disabled invalidates the "correct" VPID, by nuking both L1 and
+> +        * L2's VPIDs.
+> +        */
+> +       if (invalidate_gpa) {
+> +               if (enable_ept) {
+> +                       ept_sync_global();
+> +               } else if (enable_vpid) {
+> +                       if (cpu_has_vmx_invvpid_global()) {
+> +                               vpid_sync_vcpu_global();
+> +                       } else {
+> +                               WARN_ON_ONCE(!cpu_has_vmx_invvpid_single());
+> +                               vpid_sync_vcpu_single(vmx->vpid);
+> +                               vpid_sync_vcpu_single(vmx->nested.vpid02);
+> +                       }
+> +               }
+> +       } else {
+> +               __vmx_flush_tlb(vcpu, vmx->vpid, false);
+> +       }
+>  }
 >
-> > +             kvm_make_request(KVM_REQ_MMU_SYNC, vcpu);
-> > +             kvm_make_request(KVM_REQ_TLB_FLUSH_CURRENT, vcpu);
-> > +     }
-> > +
-> >       return i < KVM_MMU_NUM_PREV_ROOTS;
-> >  }
-> >
-> > diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-> > index 6058a65a6ede..ab7069ac6dc5 100644
-> > --- a/arch/x86/kvm/vmx/nested.c
-> > +++ b/arch/x86/kvm/vmx/nested.c
-> > @@ -5312,7 +5312,7 @@ static int handle_invept(struct kvm_vcpu *vcpu)
-> >  {
-> >       struct vcpu_vmx *vmx = to_vmx(vcpu);
-> >       u32 vmx_instruction_info, types;
-> > -     unsigned long type, roots_to_free;
-> > +     unsigned long type;
-> >       struct kvm_mmu *mmu;
-> >       gva_t gva;
-> >       struct x86_exception e;
-> > @@ -5361,29 +5361,25 @@ static int handle_invept(struct kvm_vcpu *vcpu)
-> >                       return nested_vmx_fail(vcpu,
-> >                               VMXERR_INVALID_OPERAND_TO_INVEPT_INVVPID);
-> >
-> > -             roots_to_free = 0;
-> >               if (nested_ept_root_matches(mmu->root_hpa, mmu->root_pgd,
-> >                                           operand.eptp))
-> > -                     roots_to_free |= KVM_MMU_ROOT_CURRENT;
-> > +                     kvm_mmu_free_roots(vcpu, mmu, KVM_MMU_ROOT_CURRENT);
+>  static inline void decache_tsc_multiplier(struct vcpu_vmx *vmx)
+> --
+> 2.24.1
 >
-> For a non-RFC series, I think this should do two things:
->
->   1. Separate INVEPT from INVPCID, i.e. do only INVPCID first.
->   2. Enhance INVEPT to SYNC+FLUSH the current root instead of freeing it
->
-> As alluded to above, this can be done by deferring the sync+flush (which can't
-> be done right away because INVEPT runs in L1 context, whereas KVM needs to sync+flush
-> L2 EPT context).
->
-> >               for (i = 0; i < KVM_MMU_NUM_PREV_ROOTS; i++) {
-> >                       if (nested_ept_root_matches(mmu->prev_roots[i].hpa,
-> >                                                   mmu->prev_roots[i].pgd,
-> >                                                   operand.eptp))
-> > -                             roots_to_free |= KVM_MMU_ROOT_PREVIOUS(i);
-> > +                             mmu->prev_roots[i].need_sync = true;
-> >               }
-> >               break;
-> >       case VMX_EPT_EXTENT_GLOBAL:
-> > -             roots_to_free = KVM_MMU_ROOTS_ALL;
-> > +             kvm_mmu_free_roots(vcpu, mmu, KVM_MMU_ROOTS_ALL);
-> >               break;
-> >       default:
-> >               BUG();
-> >               break;
-> >       }
-> >
-> > -     if (roots_to_free)
-> > -             kvm_mmu_free_roots(vcpu, mmu, roots_to_free);
-> > -
-> >       return nested_vmx_succeed(vcpu);
-> >  }
