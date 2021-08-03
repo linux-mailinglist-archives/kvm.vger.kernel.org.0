@@ -2,136 +2,86 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 868343DEA04
-	for <lists+kvm@lfdr.de>; Tue,  3 Aug 2021 11:51:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id ACB1A3DEA86
+	for <lists+kvm@lfdr.de>; Tue,  3 Aug 2021 12:10:49 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235113AbhHCJvK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 3 Aug 2021 05:51:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45670 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235004AbhHCJvH (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 3 Aug 2021 05:51:07 -0400
-Received: from mail-ed1-x52b.google.com (mail-ed1-x52b.google.com [IPv6:2a00:1450:4864:20::52b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D9962C061798
-        for <kvm@vger.kernel.org>; Tue,  3 Aug 2021 02:50:56 -0700 (PDT)
-Received: by mail-ed1-x52b.google.com with SMTP id cf5so16679731edb.2
-        for <kvm@vger.kernel.org>; Tue, 03 Aug 2021 02:50:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance-com.20150623.gappssmtp.com; s=20150623;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=jILE4iG7Hf5kzSZ86WpBt9OleoKnKxcD0AIYcg4CDWg=;
-        b=UYLK3kL70/wbKlpjOzW8UaU540qw0H/BDGz2GAidxIH+0Tbdq0r3XuevQhcMlSwF58
-         U+YHGLL8f22QDEunPk9DqMq1eT1/Yz2ExXO9GDS/ufNbqgnesYijDgUYNyUBGpqkPBK0
-         jc6z0LopU31KIzZFUVhnBr86QNVcAec5ZQBL5MTDd8HrrSV4ZRwjz36IsOtuGmnH5X6A
-         jYcjFh70UmazEs1b8oePF1wJDVsQ8glRQ/glBwJR4GBZ9yTuI1WAaizqZ05szzG1Ixmq
-         2ctXvL00wRUev+FoavAHzmKe4yzO/7Bj+vNrO7PmMnz9qL1uqQVTrFk5IPvZ//M0qMCj
-         v22g==
+        id S235283AbhHCKK6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 3 Aug 2021 06:10:58 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:45513 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S235199AbhHCKKg (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 3 Aug 2021 06:10:36 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1627985424;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=OfOI5BQLkvmy3gTPFxCm3AerU5X6fkkIIhM9umQ8DpQ=;
+        b=DvT7R9lwMBCqvAk3A2/RiL6UsVkzMILvAmHtlapLjM2APqxQKY/yeBpS/zIWqeQD3tvFnv
+        0o0TzcYacWTUBwHc9aITrvtRQtIsoHnAXDg+tzGqcB0Vb6NBuLgENI4FKUNN5tu8QfvS9n
+        6/aeHgeuOX+2pwrZjFpBisQdo31VQtk=
+Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
+ [209.85.218.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-375-jlWGcMYbOIaTfdA1MbagMQ-1; Tue, 03 Aug 2021 06:10:23 -0400
+X-MC-Unique: jlWGcMYbOIaTfdA1MbagMQ-1
+Received: by mail-ej1-f72.google.com with SMTP id nb40-20020a1709071ca8b02905992266c319so2368075ejc.21
+        for <kvm@vger.kernel.org>; Tue, 03 Aug 2021 03:10:23 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=jILE4iG7Hf5kzSZ86WpBt9OleoKnKxcD0AIYcg4CDWg=;
-        b=k7xyCEnZxlKiKgNq2HcY/Mrn2HmLeqA9CR4+OG28OW+hGmZodXlihfyra0oGn2HK/b
-         jYhzjt1iEtig86+I2H/DKhXJy+4vyhjciP95x25CRsc/xVfl5hEZlkx0bJYyQwwGjbrG
-         LEZo00IQIB0Eyy5wh7Ip9/gI+qixmXmSjyqBcYSOWp5BtVAHEoAyagk/aiGmNnsmt6et
-         0lkwf0sAtXfZfhnksLvdJAQt4NDnC5fWwsYGt0jEi080K1Cmv+PUF+BWNCKVubD/cOCz
-         5RIvZ2Hjmakh/EttZby4I/cOIZNyszw0uDLhbHhENjH0b1YFRlYQs73NZVMpbgbaSY83
-         Czxg==
-X-Gm-Message-State: AOAM530Wsl4fT2/yKqrBWORq6+ho6HkFKpXBASJndlRzQRGT+vrSahWq
-        VxDrj4G2G0IbfVPqPHzT9aRGfnTyhKjz2PV+qfIf
-X-Google-Smtp-Source: ABdhPJy97k/uCbx6CjOrhsXKJtmjljacfy1qGYT4R+qrgPXqN+DQqG/xN8Jl5mhRS2KKa0ZWZzj3JvoQucqDWlc+mNo=
-X-Received: by 2002:a05:6402:18c1:: with SMTP id x1mr24603324edy.145.1627984255528;
- Tue, 03 Aug 2021 02:50:55 -0700 (PDT)
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=OfOI5BQLkvmy3gTPFxCm3AerU5X6fkkIIhM9umQ8DpQ=;
+        b=WrLChdgr2Oo47GpCbittEkPxEeqG0WAIEu5YM2l5GlDh1HYOulhn3yhmIm32YB3If7
+         PDaUM839WBch/u1r/kePtKEOveUyMVI///VbDM8rUJ+xIWquOJsuxhYMpw6epSAPzuj5
+         qATYndmbhz0yWvLzbw29neWcBJQQLgke0IiAbfr15fZWu2aG1u1e9pX3MmZP6dhA6fTz
+         8V3Y+rttZRn1TavNC1G43IgNboSBOpojyjllQm/CvkHIj3xaA2+0fDjTQatmsqACjILC
+         OqUJzn8iVCQhB/UUHsjoXUXbnn6nzkXeOkkGGZwn9uzSxnB4fFM15usia8vMhIPqtn0A
+         zJ5w==
+X-Gm-Message-State: AOAM532mCcIj1foU/ASj3G5PRoE65rdR9FD8BJyzIzGot3IGW1eJGQ5N
+        f+DPHLYWL5YBibw2bq01NRPF0yvIVruFQaqjfcpEylAZMK/e72Bi9pdjbVMcvetB1VDHb6Nrmo/
+        Vn/7L2L6+kZs/
+X-Received: by 2002:aa7:c792:: with SMTP id n18mr25043035eds.269.1627985422208;
+        Tue, 03 Aug 2021 03:10:22 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJz3kVrw5MTcDI9OybfehAfSQ7erslosbBvvpZwwtNS45igYKMuMk4BoT1R5P8G1dajNAUraxQ==
+X-Received: by 2002:aa7:c792:: with SMTP id n18mr25043014eds.269.1627985422004;
+        Tue, 03 Aug 2021 03:10:22 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e? ([2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e])
+        by smtp.gmail.com with ESMTPSA id cf16sm7767366edb.92.2021.08.03.03.10.20
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 03 Aug 2021 03:10:21 -0700 (PDT)
+Subject: Re: [PATCH 4/4] KVM: selftests: Test access to XMM fast hypercalls
+To:     Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Siddharth Chandrasekaran <sidcha@amazon.de>
+Cc:     kvm@vger.kernel.org, Sean Christopherson <seanjc@google.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>, linux-kernel@vger.kernel.org
+References: <20210730122625.112848-1-vkuznets@redhat.com>
+ <20210730122625.112848-5-vkuznets@redhat.com>
+ <20210730143530.GD20232@u366d62d47e3651.ant.amazon.com>
+ <878s1namap.fsf@vitty.brq.redhat.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <1939b03b-cec3-2c2e-2f67-b0dfc2c83735@redhat.com>
+Date:   Tue, 3 Aug 2021 12:10:20 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.11.0
 MIME-Version: 1.0
-References: <20210729073503.187-1-xieyongji@bytedance.com> <20210729073503.187-6-xieyongji@bytedance.com>
- <55191de0-1a03-ff0d-1a49-afc419014bab@redhat.com>
-In-Reply-To: <55191de0-1a03-ff0d-1a49-afc419014bab@redhat.com>
-From:   Yongji Xie <xieyongji@bytedance.com>
-Date:   Tue, 3 Aug 2021 17:50:44 +0800
-Message-ID: <CACycT3sfiFizYQckHi5k4MpVpOOQCEwJhC-cToAnXaBVHTDPQQ@mail.gmail.com>
-Subject: Re: [PATCH v10 05/17] vhost-vdpa: Fail the vhost_vdpa_set_status() on
- reset failure
-To:     Jason Wang <jasowang@redhat.com>
-Cc:     "Michael S. Tsirkin" <mst@redhat.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Stefano Garzarella <sgarzare@redhat.com>,
-        Parav Pandit <parav@nvidia.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Christian Brauner <christian.brauner@canonical.com>,
-        Randy Dunlap <rdunlap@infradead.org>,
-        Matthew Wilcox <willy@infradead.org>,
-        Al Viro <viro@zeniv.linux.org.uk>,
-        Jens Axboe <axboe@kernel.dk>, bcrl@kvack.org,
-        Jonathan Corbet <corbet@lwn.net>,
-        =?UTF-8?Q?Mika_Penttil=C3=A4?= <mika.penttila@nextfour.com>,
-        Dan Carpenter <dan.carpenter@oracle.com>, joro@8bytes.org,
-        Greg KH <gregkh@linuxfoundation.org>,
-        He Zhe <zhe.he@windriver.com>,
-        Liu Xiaodong <xiaodong.liu@intel.com>,
-        Joe Perches <joe@perches.com>, songmuchun@bytedance.com,
-        virtualization <virtualization@lists.linux-foundation.org>,
-        netdev@vger.kernel.org, kvm <kvm@vger.kernel.org>,
-        linux-fsdevel@vger.kernel.org, iommu@lists.linux-foundation.org,
-        linux-kernel <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <878s1namap.fsf@vitty.brq.redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Aug 3, 2021 at 4:10 PM Jason Wang <jasowang@redhat.com> wrote:
->
->
-> =E5=9C=A8 2021/7/29 =E4=B8=8B=E5=8D=883:34, Xie Yongji =E5=86=99=E9=81=93=
-:
-> > Re-read the device status to ensure it's set to zero during
-> > resetting. Otherwise, fail the vhost_vdpa_set_status() after timeout.
-> >
-> > Signed-off-by: Xie Yongji <xieyongji@bytedance.com>
-> > ---
-> >   drivers/vhost/vdpa.c | 11 ++++++++++-
-> >   1 file changed, 10 insertions(+), 1 deletion(-)
-> >
-> > diff --git a/drivers/vhost/vdpa.c b/drivers/vhost/vdpa.c
-> > index b07aa161f7ad..dd05c1e1133c 100644
-> > --- a/drivers/vhost/vdpa.c
-> > +++ b/drivers/vhost/vdpa.c
-> > @@ -157,7 +157,7 @@ static long vhost_vdpa_set_status(struct vhost_vdpa=
- *v, u8 __user *statusp)
-> >       struct vdpa_device *vdpa =3D v->vdpa;
-> >       const struct vdpa_config_ops *ops =3D vdpa->config;
-> >       u8 status, status_old;
-> > -     int nvqs =3D v->nvqs;
-> > +     int timeout =3D 0, nvqs =3D v->nvqs;
-> >       u16 i;
-> >
-> >       if (copy_from_user(&status, statusp, sizeof(status)))
-> > @@ -173,6 +173,15 @@ static long vhost_vdpa_set_status(struct vhost_vdp=
-a *v, u8 __user *statusp)
-> >               return -EINVAL;
-> >
-> >       ops->set_status(vdpa, status);
-> > +     if (status =3D=3D 0) {
-> > +             while (ops->get_status(vdpa)) {
-> > +                     timeout +=3D 20;
-> > +                     if (timeout > VDPA_RESET_TIMEOUT_MS)
-> > +                             return -EIO;
-> > +
-> > +                     msleep(20);
-> > +             }
->
->
-> Spec has introduced the reset a one of the basic facility. And consider
-> we differ reset here.
->
-> This makes me think if it's better to introduce a dedicated vdpa ops for
-> reset?
->
+On 30/07/21 16:50, Vitaly Kuznetsov wrote:
+>> Should we also do WRITE_ONCE(nr_ur, 0) here?
+> It could probably make sense to replace 'nr_ud = 0' above with this so
+> compiler doesn't screw us up one day..
+> 
 
-Do you mean replace the ops.set_status(vdev, 0) with the ops.reset()?
-Then we can remove the timeout processing which is device specific
-stuff.
+It should be okay with the "memory" clobber.
 
-Thanks,
-Yongji
+Paolo
+
