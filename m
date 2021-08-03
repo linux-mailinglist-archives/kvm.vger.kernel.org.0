@@ -2,103 +2,112 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8C2EF3DF198
-	for <lists+kvm@lfdr.de>; Tue,  3 Aug 2021 17:32:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 695423DF1A2
+	for <lists+kvm@lfdr.de>; Tue,  3 Aug 2021 17:39:39 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236856AbhHCPck (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 3 Aug 2021 11:32:40 -0400
-Received: from mail.kernel.org ([198.145.29.99]:44038 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S236801AbhHCPcj (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 3 Aug 2021 11:32:39 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 5D53C60EC0;
-        Tue,  3 Aug 2021 15:32:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1628004748;
-        bh=NFlhqOplTZXAI0Dyb+KjHTbgLHGA5lnFEt+p2z6v+iM=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=oMjfeRMxIT3SvO+bti5OjoKO6PpmEsNLCtlzo44iZnfZsZofDvb7xoPDD4mkX4OJ+
-         Vn1gECcUm5dFIKbOty+raoD0bQ2mGIpg0mn2LhKlxihBKhFQHpf/Wa+04Lhcun2RV9
-         +jLyYBAEyDfgAZcWaCKrrOB5xsYz/SLLNIhSI2PZqCefhYdhJIPa43GLPh6pd9Fpcl
-         lvrLTNw2bXyyb4O3A4EgZi+Ca9VP56F2sajgBUbOlye7o/a7IwSNtvu4yxNafAnO81
-         32FjyCa5SeOQJFqM1E8kSYM4HddZQ6G4LUIiTEVCwLS4gYLq3hh8bKATjTG26qsYPO
-         IvChdLdqlxrtw==
-Date:   Tue, 3 Aug 2021 16:32:22 +0100
-From:   Will Deacon <will@kernel.org>
-To:     Fuad Tabba <tabba@google.com>
-Cc:     kvmarm@lists.cs.columbia.edu, maz@kernel.org, james.morse@arm.com,
-        alexandru.elisei@arm.com, suzuki.poulose@arm.com,
-        mark.rutland@arm.com, christoffer.dall@arm.com,
-        pbonzini@redhat.com, drjones@redhat.com, qperret@google.com,
-        kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        kernel-team@android.com
-Subject: Re: [PATCH v3 10/15] KVM: arm64: Guest exit handlers for nVHE hyp
-Message-ID: <20210803153222.GB31125@willie-the-truck>
-References: <20210719160346.609914-1-tabba@google.com>
- <20210719160346.609914-11-tabba@google.com>
+        id S236941AbhHCPjt (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 3 Aug 2021 11:39:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48192 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S236935AbhHCPjs (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 3 Aug 2021 11:39:48 -0400
+Received: from mail-pl1-x634.google.com (mail-pl1-x634.google.com [IPv6:2607:f8b0:4864:20::634])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A7C68C061757
+        for <kvm@vger.kernel.org>; Tue,  3 Aug 2021 08:39:37 -0700 (PDT)
+Received: by mail-pl1-x634.google.com with SMTP id j3so9102865plx.4
+        for <kvm@vger.kernel.org>; Tue, 03 Aug 2021 08:39:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=2sX1mKKrCL8lc1p+n/MM0GDdJIkBlYihGahD2K+Ccl8=;
+        b=TFvnWLm9PZnPoUxcmPjeksWlW6a45bHVn2xs4koKJM+KQ9oM+9PefWknC1HiwT6SNC
+         /1l95mD17frIgwbeuX0o7Igx53gRV3Vu9A8NiLr+j33935xAE5e2sLDe08RdKr03cA11
+         In+ZxccgmFeTY2SUj4n3D/CQnXlqvEGLGEiDRUfIb6CwZUiL6/AbNbY4yz2a9H1ZihT6
+         RtPctBf+OJukscPGs48ThDjJGAHIKY+oebLmkudSeCHvhq6/R0LlRXPr2LB4HJUAxrhU
+         aGTbdGUGOY/p6ztM0HG72969IkPFiyOMPZLt8uJgq1CdwFb3gNv2W5CLXBYceH/a3yoZ
+         r7+w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=2sX1mKKrCL8lc1p+n/MM0GDdJIkBlYihGahD2K+Ccl8=;
+        b=bX8URQLF5qkQXEZED1gk8AxJ+pucjC0DZQhMm/G01cBp3zprOWJN/UEtQUvVmANZAw
+         GvfRJyoFU8/jQoFCgvdF3QGYR5ZTWBw7+RSy2BWmJ+4eUEx0W/aK4RHuA2BjeUXYlFy1
+         HBebav1I91OyXRgrpQSzeymgBD10KIcnR6U3jcMFfaptS9ap4oVqfT6yLfMNTDEfokg9
+         I+//XPjT0SpwijvvZUsvg5MmxVZqbj995RBX9A0wq7kjyEFK91EnCyTT60fpGxEM/A7O
+         1a1hvoMyywlgnXD9hzoeryvkUnyti5Jxa8aXgJBiB6SnJgNtDjOeSYYkp5mV8L9MWDUP
+         5TIQ==
+X-Gm-Message-State: AOAM5337AZpGrrr9C5WxvvhVB9V7B1TJyt0EqsV7zikvt8AMbfG2Yfnm
+        M7C8RxGEN804JvOR2MV5O+cUaA==
+X-Google-Smtp-Source: ABdhPJzbTpsIiHV6WTUKwsj1FL6VXvZnxrSQwhBUuATXzgUkC4HF26wKX0eARxW+JJ2tFbPYVdg/Ww==
+X-Received: by 2002:a63:8c04:: with SMTP id m4mr2351035pgd.89.1628005177069;
+        Tue, 03 Aug 2021 08:39:37 -0700 (PDT)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id v7sm14367366pjk.37.2021.08.03.08.39.36
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 03 Aug 2021 08:39:36 -0700 (PDT)
+Date:   Tue, 3 Aug 2021 15:39:32 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Lai Jiangshan <jiangshanlai+lkml@gmail.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+        LKML <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH v3 01/37] KVM: VMX: Flush all EPTP/VPID contexts on
+ remote TLB flush
+Message-ID: <YQljNBBp/EousNBk@google.com>
+References: <20200320212833.3507-1-sean.j.christopherson@intel.com>
+ <20200320212833.3507-2-sean.j.christopherson@intel.com>
+ <CAJhGHyCPyu6BVZwqvySeT2LSr81Xospdv2O=ssvTQv0Rvky0UA@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20210719160346.609914-11-tabba@google.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+In-Reply-To: <CAJhGHyCPyu6BVZwqvySeT2LSr81Xospdv2O=ssvTQv0Rvky0UA@mail.gmail.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Jul 19, 2021 at 05:03:41PM +0100, Fuad Tabba wrote:
-> Add an array of pointers to handlers for various trap reasons in
-> nVHE code.
+On Tue, Aug 03, 2021, Lai Jiangshan wrote:
+> (I'm replying to a very old email, so many CCs are dropped.)
 > 
-> The current code selects how to fixup a guest on exit based on a
-> series of if/else statements. Future patches will also require
-> different handling for guest exists. Create an array of handlers
-> to consolidate them.
+> On Sat, Mar 21, 2020 at 5:33 AM Sean Christopherson
+> <sean.j.christopherson@intel.com> wrote:
+> >
+> > Flush all EPTP/VPID contexts if a TLB flush _may_ have been triggered by
+> > a remote or deferred TLB flush, i.e. by KVM_REQ_TLB_FLUSH.  Remote TLB
+> > flushes require all contexts to be invalidated, not just the active
+> > contexts, e.g. all mappings in all contexts for a given HVA need to be
+> > invalidated on a mmu_notifier invalidation.  Similarly, the instigator
+> > of the deferred TLB flush may be expecting all contexts to be flushed,
+> > e.g. vmx_vcpu_load_vmcs().
+> >
+> > Without nested VMX, flushing only the current EPTP/VPID context isn't
+> > problematic because KVM uses a constant VPID for each vCPU, and
 > 
-> No functional change intended as the array isn't populated yet.
+> Hello, Sean
 > 
-> Acked-by: Will Deacon <will@kernel.org>
-> Signed-off-by: Fuad Tabba <tabba@google.com>
-> ---
->  arch/arm64/kvm/hyp/include/hyp/switch.h | 43 +++++++++++++++++++++++++
->  arch/arm64/kvm/hyp/nvhe/switch.c        | 35 ++++++++++++++++++++
->  2 files changed, 78 insertions(+)
+> Is the patch optimized for cases where nested VMX is active?
 
-Definitely keep my Ack on this, but Clang just chucked out a warning due to:
+Well, this patch isn't, but KVM has since been optimized to do full EPT/VPID
+flushes only when "necessary".  Necessary in quotes because the two uses can
+technically be further optimized, but doing so would incur significant complexity.
 
-> diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
-> index a0e78a6027be..5a2b89b96c67 100644
-> --- a/arch/arm64/kvm/hyp/include/hyp/switch.h
-> +++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
-> @@ -409,6 +409,46 @@ static inline bool __hyp_handle_ptrauth(struct kvm_vcpu *vcpu)
->  	return true;
->  }
->  
-> +typedef int (*exit_handle_fn)(struct kvm_vcpu *);
-> +
-> +exit_handle_fn kvm_get_nvhe_exit_handler(struct kvm_vcpu *vcpu);
+Use #1 is remote flushes from the MMU, which don't strictly require a global flush,
+but KVM would need to propagate more information (mmu_role?) in order for responding
+vCPUs to determine what contexts needs to be flushed.  And practically speaking,
+for MMU flushes there's no meaningful difference when using TDP without nested
+guests as the common case will be that each vCPU has a single active EPTP and
+that EPTP will be affected by the MMU changes, i.e. needs to be flushed.
 
-and:
+Use #2 is in VMX's pCPU migration path.  Again, not strictly necessary as KVM could
+theoretically track which pCPUs have run a particular vCPU and when that pCPU last
+flushed EPT contexts, but fully solving the problem would be quite complex.  Since
+pCPU migration is always going to be a slow path, the extra complexity would be
+very difficult to justify.
 
-> diff --git a/arch/arm64/kvm/hyp/nvhe/switch.c b/arch/arm64/kvm/hyp/nvhe/switch.c
-> index 86f3d6482935..36da423006bd 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/switch.c
-> +++ b/arch/arm64/kvm/hyp/nvhe/switch.c
-> @@ -158,6 +158,41 @@ static void __pmu_switch_to_host(struct kvm_cpu_context *host_ctxt)
->  		write_sysreg(pmu->events_host, pmcntenset_el0);
->  }
->  
-> +typedef int (*exit_handle_fn)(struct kvm_vcpu *);
+> I think the non-nested cases are normal cases.
+> 
+> Although the related code has been changed, the logic of the patch
+> is still working now, would it be better if we restore the optimization
+> for the normal cases (non-nested)?
 
-Which leads to:
-
-arch/arm64/kvm/hyp/nvhe/switch.c:189:15: warning: redefinition of typedef 'exit_handle_fn' is a C11 feature [-Wtypedef-redefinition]
-typedef int (*exit_handle_fn)(struct kvm_vcpu *);
-              ^
-./arch/arm64/kvm/hyp/include/hyp/switch.h:416:15: note: previous definition is here
-typedef int (*exit_handle_fn)(struct kvm_vcpu *);
-              ^
-1 warning generated.
-
-So I guess just pick your favourite?
-
-Will
+As above, vmx_flush_tlb_all() hasn't changed, but the callers have.
