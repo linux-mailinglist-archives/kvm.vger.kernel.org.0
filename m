@@ -2,82 +2,107 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B85003DEB9A
-	for <lists+kvm@lfdr.de>; Tue,  3 Aug 2021 13:16:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E15E13DEE3D
+	for <lists+kvm@lfdr.de>; Tue,  3 Aug 2021 14:52:34 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235495AbhHCLQg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 3 Aug 2021 07:16:36 -0400
-Received: from mail.kernel.org ([198.145.29.99]:51250 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S235329AbhHCLQf (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 3 Aug 2021 07:16:35 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 7B14A61040;
-        Tue,  3 Aug 2021 11:16:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-        s=korg; t=1627989383;
-        bh=irsKls81jNM6jGZibRYCKH0dVnnI1L1OshG9DEuboV8=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=PpUOvRNBM7tUwfU7zMqz8mkVQmcP5+8ie0RX2MW/3LqeWRaeSHmQli4vav9yCLrPV
-         R2bHrVQXWLXmG8Bak60QArsN42gjH3mX2CzGj6wt8YScfe0baiM7UH75qbXpkbQYx/
-         P/CxNxc4YxA1tU0BaDb68GGY0m6GwHjnLxmd4hEU=
-Date:   Tue, 3 Aug 2021 13:16:18 +0200
-From:   Greg KH <gregkh@linuxfoundation.org>
-To:     Alexey Kardashevskiy <aik@ozlabs.ru>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [RFC PATCH kernel] KVM: Stop leaking memory in debugfs
-Message-ID: <YQklgq4NkL4UToVY@kroah.com>
-References: <20210730043217.953384-1-aik@ozlabs.ru>
+        id S236027AbhHCMwo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 3 Aug 2021 08:52:44 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:44861 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S235805AbhHCMwn (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 3 Aug 2021 08:52:43 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1627995152;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=1e0CmMEL83WqdLcdVYEsCcbtntf5BnVnii0Ea1ZAFFA=;
+        b=MMrV3Syp7S0q3yJReMfoDGNra9Q+2MAEW2r/CWFgFOoMVHlhllPaSGTwqVtEW8/Cgruix7
+        blHv+XRTb0aaOf0mHfCO60dFzprZYcs6JU8eWefm1p5I8Lvx6QUdq2aOkuM2RT4pCTfrbV
+        CqCYkAB0hTO+MbXRMg42trMbUNjOsIQ=
+Received: from mail-pj1-f71.google.com (mail-pj1-f71.google.com
+ [209.85.216.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-394-aTZkXJGHMLKpKmNNzH59Nw-1; Tue, 03 Aug 2021 08:52:30 -0400
+X-MC-Unique: aTZkXJGHMLKpKmNNzH59Nw-1
+Received: by mail-pj1-f71.google.com with SMTP id 16-20020a17090a1990b0290178031dca45so577054pji.9
+        for <kvm@vger.kernel.org>; Tue, 03 Aug 2021 05:52:30 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=1e0CmMEL83WqdLcdVYEsCcbtntf5BnVnii0Ea1ZAFFA=;
+        b=DRo3o7SfFcyYUi+oEt2c+/n2pMYfj3ajeUi7m/3IwvITP1uEDmtDCbVZ38QiIxbc8e
+         gyWEWcSD+JOxM824R5AITqNiwTQP3kz72+TTMeGGaYlRfs3DLEk6d8/tbAcC0+kEcoTf
+         EyzG0/MBzza8FiO51W6pA1/hQ2JxvgpkMxFyALpZKdcZ+jwG/KuOTt/P0BMS2E5w41DV
+         lprwUA35QKMw6P62uxykLm9q0lpWpBtiPfj+p//5W+m0h/j+nebNSiHxTTRMYQDldEdi
+         GXeJONo4h8AnD9/xJlgCdzXb8mIeIKezhJKnW0KsQ0o+ein9/cCKuoU3bvJjOYnJNI/9
+         Os4Q==
+X-Gm-Message-State: AOAM531CnVqBhghb2KLP4f1i3anPQk9G0+xAWffH/UMY7O0r5GdukcYg
+        XbqCEQvDIbStj03fAo3sIfsXLjXaSHcSpr7cKDv8mLtJwJBp5Sxk2mc15BAid1itSKFTYqS29Ud
+        PjMASNWoZzOn1Zvensyov5PPQxsAd
+X-Received: by 2002:a62:b615:0:b029:34a:3920:a7ea with SMTP id j21-20020a62b6150000b029034a3920a7eamr22355466pff.21.1627995149488;
+        Tue, 03 Aug 2021 05:52:29 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJx4ikkr08NYYktnHUlEdmpFVB7A+oX79XPR1VnPIsMyaCkS1EbwHZ+ZyqfBBTwjkVz3XU8wsDGoYgkiCgoB/Tg=
+X-Received: by 2002:a62:b615:0:b029:34a:3920:a7ea with SMTP id
+ j21-20020a62b6150000b029034a3920a7eamr22355435pff.21.1627995149184; Tue, 03
+ Aug 2021 05:52:29 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210730043217.953384-1-aik@ozlabs.ru>
+References: <20210730043217.953384-1-aik@ozlabs.ru> <YQklgq4NkL4UToVY@kroah.com>
+In-Reply-To: <YQklgq4NkL4UToVY@kroah.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Date:   Tue, 3 Aug 2021 14:52:17 +0200
+Message-ID: <CABgObfb+M9Qeow1EZy+eQwM1jwoZY3zdPJfZW+Q+MoWmkaqcFw@mail.gmail.com>
+Subject: Re: [RFC PATCH kernel] KVM: Stop leaking memory in debugfs
+To:     Greg KH <gregkh@linuxfoundation.org>
+Cc:     Alexey Kardashevskiy <aik@ozlabs.ru>,
+        "Kernel Mailing List, Linux" <linux-kernel@vger.kernel.org>,
+        kvm <kvm@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Jul 30, 2021 at 02:32:17PM +1000, Alexey Kardashevskiy wrote:
-> The debugfs folder name is made of a supposedly unique pair of
-> the process pid and a VM fd. However it is possible to get a race here
-> which manifests in these messages:
-> 
-> [  471.846235] debugfs: Directory '20245-4' with parent 'kvm' already present!
-> 
-> debugfs_create_dir() returns an error which is handled correctly
-> everywhere except kvm_create_vm_debugfs() where the code allocates
-> stat data structs and overwrites the older values regardless.
-> 
-> Spotted by syzkaller. This slow memory leak produces way too many
-> OOM reports.
-> 
-> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
-> ---
-> 
-> I am pretty sure we better fix the race but I am not quite sure what
-> lock is appropriate here, ideas?
-> 
-> ---
->  virt/kvm/kvm_main.c | 4 ++++
->  1 file changed, 4 insertions(+)
-> 
-> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> index 986959833d70..89496fd8127a 100644
-> --- a/virt/kvm/kvm_main.c
-> +++ b/virt/kvm/kvm_main.c
-> @@ -904,6 +904,10 @@ static int kvm_create_vm_debugfs(struct kvm *kvm, int fd)
->  
->  	snprintf(dir_name, sizeof(dir_name), "%d-%d", task_pid_nr(current), fd);
->  	kvm->debugfs_dentry = debugfs_create_dir(dir_name, kvm_debugfs_dir);
-> +	if (IS_ERR_OR_NULL(kvm->debugfs_dentry)) {
-> +		pr_err("Failed to create %s\n", dir_name);
-> +		return 0;
-> +	}
+On Tue, Aug 3, 2021 at 1:16 PM Greg KH <gregkh@linuxfoundation.org> wrote:
+> On Fri, Jul 30, 2021 at 02:32:17PM +1000, Alexey Kardashevskiy wrote:
+> >       snprintf(dir_name, sizeof(dir_name), "%d-%d", task_pid_nr(current), fd);
+> >       kvm->debugfs_dentry = debugfs_create_dir(dir_name, kvm_debugfs_dir);
+> > +     if (IS_ERR_OR_NULL(kvm->debugfs_dentry)) {
+> > +             pr_err("Failed to create %s\n", dir_name);
+> > +             return 0;
+> > +     }
+>
+> It should not matter if you fail a debugfs call at all.
+>
+> If there is a larger race at work here, please fix that root cause, do
+> not paper over it by attempting to have debugfs catch the issue for you.
 
-It should not matter if you fail a debugfs call at all.
+I don't think it's a race, it's really just a bug that is intrinsic in how
+the debugfs files are named.  You can just do something like this:
 
-If there is a larger race at work here, please fix that root cause, do
-not paper over it by attempting to have debugfs catch the issue for you.
+#include <unistd.h>
+#include <stdio.h>
+#include <fcntl.h>
+#include <sys/wait.h>
+#include <sys/ioctl.h>
+#include <linux/kvm.h>
+#include <stdlib.h>
+int main() {
+        int kvmfd = open("/dev/kvm", O_RDONLY);
+        int fd = ioctl(kvmfd, KVM_CREATE_VM, 0);
+        if (fork() == 0) {
+                printf("before: %d\n", fd);
+                sleep(2);
+        } else {
+                close(fd);
+                sleep(1);
+                int fd = ioctl(kvmfd, KVM_CREATE_VM, 0);
+                printf("after: %d\n", fd);
+                wait(NULL);
+        }
+}
 
-thanks,
+So Alexey's patch is okay and I've queued it, though with pr_warn_ratelimited
+instead of pr_err.
 
-greg k-h
+Paolo
+
