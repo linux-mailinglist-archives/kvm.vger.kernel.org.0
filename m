@@ -2,82 +2,139 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7751A3DEF10
-	for <lists+kvm@lfdr.de>; Tue,  3 Aug 2021 15:29:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6D54D3DEF3F
+	for <lists+kvm@lfdr.de>; Tue,  3 Aug 2021 15:48:02 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236417AbhHCN3n (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 3 Aug 2021 09:29:43 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:44591 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S236260AbhHCN3m (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 3 Aug 2021 09:29:42 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1627997371;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=KcuyzBZVCsQzdOpIzaT9GhZQ70W+KOCymEeOniqVHmM=;
-        b=E0a6+saCo8bQujt9Uh/bgJai7jcYSPmIP9U/fGsDUq7BOOx6eq+qiLSNzCfM8LT+JvZOrd
-        To1YU1V65tgKBeyCTZRrMWfKBupii0ayLCN9nHH8CXStdUzyuWVz2d5PtbSyJoqgPDTYO/
-        O/i/fY1qr5ezc2WBjX0BFmrqnDmvbCA=
-Received: from mail-pl1-f199.google.com (mail-pl1-f199.google.com
- [209.85.214.199]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-410-gOG_8LJwPuyQIAoW-Ql7Vg-1; Tue, 03 Aug 2021 09:29:29 -0400
-X-MC-Unique: gOG_8LJwPuyQIAoW-Ql7Vg-1
-Received: by mail-pl1-f199.google.com with SMTP id u4-20020a170902e804b029012c4b467095so16618129plg.9
-        for <kvm@vger.kernel.org>; Tue, 03 Aug 2021 06:29:29 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=KcuyzBZVCsQzdOpIzaT9GhZQ70W+KOCymEeOniqVHmM=;
-        b=RRXNX+GhehOl9vmYYmABUghb7CuW0oS4rfdmsaB9Ayu5/thMJ82OrQMDUjFGds8WPd
-         d7D/xXnzhAUnEpbD97mhmQftrwDpwNzob4+BNpapNN4rjVpy3D1H/e4LKtQ36wgyZ95l
-         kTJP18BpWun8GQk0KWT4TKu1gbKUSA0oKrLcJa5ZiTdwAzMCPLbbhtlHS6KOde1Nt5Hx
-         SzfKAvGJOXf0DSsgfdqCxNXqhABeE65fMhf1r1f6y0NA10f55l1hHq+/If3lCppMU3Qj
-         3cZJvZLwt2xClG/O1vSA56CpzcK1kUTS95dlzmNr13J58t7PdkV2cmSEBfXIWTilLu4F
-         T2EQ==
-X-Gm-Message-State: AOAM531eUhbQLn6yPcjqA3wC1WWphgVpmWfLKIIpTnwmyaxYCjB1zUs1
-        O+AJTU26gl9ia8HtFswinpPC2hcqL2iLcUneWZ2m4V8+soxYi7xbZoNiiPXkv1SGPfVK+6iWLlM
-        ueRyTViQRUyL75pNU/cWgc2iD82Xa
-X-Received: by 2002:a17:90b:e10:: with SMTP id ge16mr19921910pjb.150.1627997368681;
-        Tue, 03 Aug 2021 06:29:28 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxzxa98h40WXZjb7MbKGaow2kMLBjuSDMzy/SK9GtPRKrme9h8m7Mim/oH4cNzNd2U3c+ZjB2RXr7Hl4V6qgAU=
-X-Received: by 2002:a17:90b:e10:: with SMTP id ge16mr19921886pjb.150.1627997368395;
- Tue, 03 Aug 2021 06:29:28 -0700 (PDT)
+        id S236138AbhHCNsL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 3 Aug 2021 09:48:11 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:5152 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S234388AbhHCNsL (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 3 Aug 2021 09:48:11 -0400
+Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 173DbcTa137613;
+        Tue, 3 Aug 2021 09:47:59 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=to : cc : references :
+ from : subject : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=L18TyFKizwRJHWpW8VSMeK81EQm3rFiGSjHYCZqO0sk=;
+ b=I5dGHeeypijC9Zicu+cru/DmOgLhkQfEWTpCqVBib8auwcUjAOQXMu6OK81soZJmBc6R
+ 00PEvzGW0Fb54z4//Vzkn+UAaNhpV6aEPZLoMueA5dzY9Ii9jCd3HRsszOSVALl5GrhW
+ 7j0EcK3RTtTMCUwk/DbJW0OpUOEDLB31MzbQ+/EIhklJSEZYsG6cJdDnT/gwRvbaEZrB
+ ZzSuqMkxEXgxmQtPzhHnJnfLyWvtj5WL7buY3gMQWhwqSw85Bj4z3SZDlz+ZH8r9rQrX
+ KNsoxa7KiBS9RhilWcvBJI8g6Eqw1qWx96eYkfei1OeYUY+r/R6Fq3M81+fKYE3eDfmF jQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 3a5nh8qpxn-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 03 Aug 2021 09:47:59 -0400
+Received: from m0098413.ppops.net (m0098413.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 173DcWgF139671;
+        Tue, 3 Aug 2021 09:47:59 -0400
+Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 3a5nh8qpv3-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 03 Aug 2021 09:47:58 -0400
+Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
+        by ppma04ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 173DhSFU018867;
+        Tue, 3 Aug 2021 13:47:56 GMT
+Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
+        by ppma04ams.nl.ibm.com with ESMTP id 3a4x58y57h-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 03 Aug 2021 13:47:55 +0000
+Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
+        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 173Divir28901876
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 3 Aug 2021 13:44:57 GMT
+Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 8FD3F52051;
+        Tue,  3 Aug 2021 13:47:53 +0000 (GMT)
+Received: from localhost.localdomain (unknown [9.145.171.18])
+        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id 42F7652052;
+        Tue,  3 Aug 2021 13:47:53 +0000 (GMT)
+To:     Thomas Huth <thuth@redhat.com>, kvm@vger.kernel.org
+Cc:     linux-s390@vger.kernel.org, imbrenda@linux.ibm.com,
+        david@redhat.com, cohuck@redhat.com
+References: <20210729134803.183358-1-frankja@linux.ibm.com>
+ <20210729134803.183358-2-frankja@linux.ibm.com>
+ <e4b7d844-a602-78be-2cdb-3f87bb22a04e@redhat.com>
+From:   Janosch Frank <frankja@linux.ibm.com>
+Subject: Re: [kvm-unit-tests PATCH 1/4] s390x: sie: Add sie lib validity
+ handling
+Message-ID: <ca027e7f-9baf-f48e-459b-0d365db09023@linux.ibm.com>
+Date:   Tue, 3 Aug 2021 15:47:52 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.11.0
 MIME-Version: 1.0
-References: <20210730043217.953384-1-aik@ozlabs.ru> <YQklgq4NkL4UToVY@kroah.com>
- <CABgObfb+M9Qeow1EZy+eQwM1jwoZY3zdPJfZW+Q+MoWmkaqcFw@mail.gmail.com> <YQlAl7/GSHWwkzEj@kroah.com>
-In-Reply-To: <YQlAl7/GSHWwkzEj@kroah.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Date:   Tue, 3 Aug 2021 15:29:16 +0200
-Message-ID: <CABgObfamvoMai1b9hrPkt1uwgw0kozhU5V_Vvk1__k_sGnx4LA@mail.gmail.com>
-Subject: Re: [RFC PATCH kernel] KVM: Stop leaking memory in debugfs
-To:     Greg KH <gregkh@linuxfoundation.org>
-Cc:     Alexey Kardashevskiy <aik@ozlabs.ru>,
-        "Kernel Mailing List, Linux" <linux-kernel@vger.kernel.org>,
-        kvm <kvm@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <e4b7d844-a602-78be-2cdb-3f87bb22a04e@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: R5yGEPvq3F6Hujl_fNMKPYJhwc8R2qX1
+X-Proofpoint-ORIG-GUID: Vy7YvAuYe3yYDbZZW44dpFc-7s5HTPpt
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.790
+ definitions=2021-08-03_03:2021-08-03,2021-08-03 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
+ phishscore=0 adultscore=0 spamscore=0 mlxscore=0 suspectscore=0
+ bulkscore=0 clxscore=1015 priorityscore=1501 mlxlogscore=999
+ impostorscore=0 malwarescore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2107140000 definitions=main-2108030090
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-> So userspace can create kvm resources with duplicate names?  That feels
-> wrong to me.
+On 7/30/21 4:45 PM, Thomas Huth wrote:
+> On 29/07/2021 15.48, Janosch Frank wrote:
+>> Let's start off the SIE lib with validity handling code since that has
+>> the least amount of dependencies to other files.
+>>
+>> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+>> ---
+>>   lib/s390x/sie.c  | 41 +++++++++++++++++++++++++++++++++++++++++
+>>   lib/s390x/sie.h  |  3 +++
+>>   s390x/Makefile   |  1 +
+>>   s390x/mvpg-sie.c |  2 +-
+>>   s390x/sie.c      |  7 +------
+>>   5 files changed, 47 insertions(+), 7 deletions(-)
+>>   create mode 100644 lib/s390x/sie.c
+>>
+>> diff --git a/lib/s390x/sie.c b/lib/s390x/sie.c
+>> new file mode 100644
+>> index 00000000..9107519f
+>> --- /dev/null
+>> +++ b/lib/s390x/sie.c
+>> @@ -0,0 +1,41 @@
+>> +/* SPDX-License-Identifier: GPL-2.0-only */
+>> +/*
+>> + * Virtualization library that speeds up managing guests.
+> 
+> "speeds up managing guests" ... so this means that guests can be scheduled 
+> faster? ;-)
 
-Yes, the name is just the (pid, file descriptor). It's used only for
-debugfs, and it's not really likely going to happen unless a program
-does it on purpose, but the ugliness/wrongness is one of the reasons
-why we now have a non-debugfs mechanism to retrieve the stats.
+Maybe once I implement scheduling which is not on my current plan.
 
-> But if all that is "duplicate" is the debugfs kvm directory, why not ask
-> debugfs if it is already present before trying to create it again?  That
-> way you will not have debugfs complain about duplicate
-> files/directories.
+> 
+>> + * Copyright (c) 2021 IBM Corp
+>> + *
+>> + * Authors:
+>> + *  Janosch Frank <frankja@linux.ibm.com>
+>> + */
+>> +
+>> +#include <asm/barrier.h>
+>> +#include <libcflat.h>
+>> +#include <sie.h>
+>> +
+>> +static bool validity_expected;
+>> +static uint16_t vir;
+> 
+> What does "vir" stand for? A short comment would be nice.
 
-That would also be racy; it would need a simple mutex around
-debugfs_lookup and debugfs_create_dir. But it would indeed avoid the
-complaints altogether, so I'll prepare a patch.  Thanks,
+So apparently it's called "Validity-Interception Reason" in the
+specification which makes sense in the context it's used :)
 
-Paolo
+I'll add a few words.
+
+> 
+>   Thomas
+> 
 
