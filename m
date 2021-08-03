@@ -2,115 +2,135 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 104903DE35A
-	for <lists+kvm@lfdr.de>; Tue,  3 Aug 2021 02:03:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4C7043DE3A0
+	for <lists+kvm@lfdr.de>; Tue,  3 Aug 2021 02:38:23 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233074AbhHCAD3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 2 Aug 2021 20:03:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49506 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232975AbhHCAD3 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 2 Aug 2021 20:03:29 -0400
-Received: from mail-pl1-x62f.google.com (mail-pl1-x62f.google.com [IPv6:2607:f8b0:4864:20::62f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 16603C06175F
-        for <kvm@vger.kernel.org>; Mon,  2 Aug 2021 17:03:19 -0700 (PDT)
-Received: by mail-pl1-x62f.google.com with SMTP id u16so13059693ple.2
-        for <kvm@vger.kernel.org>; Mon, 02 Aug 2021 17:03:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=gNQxWs6ae3YcVZWqxF22UaX2JDNNXbpKD5ncaIixamI=;
-        b=ICVkHfMst9Z81UIrA8uJEfXOrWBUSYEUJWxBHe9CJmt5AVnECYMdrq1Hd1SDXzhshf
-         wpt/B4YueOBryw8Va3zhA/k9U5jACf1FqeOus5vu7i0w8ahZLyUL0dQdEVHtBcZHmVu2
-         rCu9kwUiUqFYn+Ubbu7fz9p7RPemw+F6wgOkgzi4RGTB1FVo5Slb5WXRXxi4BEzsEgBN
-         +l5mu7EIXoNkyiNr65Aat+mrjKxqzYotQa1euoT7gjAJcf2yS0nMVAWtdPF2MVgxKKoq
-         +GNuopkA3tc+48C5P0T8/EVyxawIqs/Af7HPmiBdnR4b7Ay7ZC1gyY/DLKCXx0z3pMbH
-         cWxg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=gNQxWs6ae3YcVZWqxF22UaX2JDNNXbpKD5ncaIixamI=;
-        b=XJbgwauD+4N7Q3PJEn63n39YKf+CM9AcNrudOf/+6hsLDXuqk9wQsxg+RFD6xHH8ZR
-         +iQN8dZjYVzRBiR0cmZofepwzYG4zkC7ZlLn8z9tw4QaFC913CkqaA+G3OuDCM69k2+R
-         pHjYEu3KL+O6qkrz4vp9omaNVIbwVni/H27ND1ylFAFbPtgs5jZF/fdGJUvgLzQ4eRhf
-         qWwB9lkiLMXoTW34lpB/FzkH/8mG56LgFMP4q9Fg1B+rn9F0zt6zKioz4sukQ3vgizzh
-         F/Jcjs/IoAzjXUgU7SrGkK9mAhOrbA8mHa6Pd7Mmv7xvEVANryQ82xWve+7K/n8TP/PG
-         sjwA==
-X-Gm-Message-State: AOAM530Ro5szdl1oMtFyHej9UMQJpyJvxWd7WAQpE6U70tDA27YWEBNg
-        hA52OBP4TE+J5kW9GujVYvTqzQ==
-X-Google-Smtp-Source: ABdhPJzM8mlDpJKWNVW20oZP2wcKsO88pRU6iGfhWQZEO6kTcNfh2YAGdk/LolW7auoHUpJnmjo9NQ==
-X-Received: by 2002:a62:ce44:0:b029:3aa:37f6:6fd6 with SMTP id y65-20020a62ce440000b02903aa37f66fd6mr18988828pfg.59.1627948998390;
-        Mon, 02 Aug 2021 17:03:18 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id f19sm11572193pjj.22.2021.08.02.17.03.17
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 02 Aug 2021 17:03:17 -0700 (PDT)
-Date:   Tue, 3 Aug 2021 00:03:14 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Jim Mattson <jmattson@google.com>
-Cc:     Krish Sadhukhan <krish.sadhukhan@oracle.com>,
-        Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-        vkuznets@redhat.com, wanpengli@tencent.com, joro@8bytes.org
-Subject: Re: [PATCH] KVM: nVMX: nSVM: Show guest mode in kvm_{entry,exit}
- tracepoints
-Message-ID: <YQiHwtkEhx2AoQtT@google.com>
-References: <20210621204345.124480-1-krish.sadhukhan@oracle.com>
- <20210621204345.124480-2-krish.sadhukhan@oracle.com>
- <ac5d0cb7-9955-0482-33ee-cf06bb55db7a@redhat.com>
- <YQgeoOpaHGBDW49Z@google.com>
- <68082174-4137-db39-362c-975931688453@redhat.com>
- <c0f5ae5d-da93-8877-ce00-ee87b0b3650c@oracle.com>
- <CALMp9eQvEA8DDq03ny-EZpr0zjSMBmdiXCEdeaYe8qbvUknbGA@mail.gmail.com>
+        id S232910AbhHCAib (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 2 Aug 2021 20:38:31 -0400
+Received: from mga14.intel.com ([192.55.52.115]:59360 "EHLO mga14.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S232540AbhHCAia (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 2 Aug 2021 20:38:30 -0400
+X-IronPort-AV: E=McAfee;i="6200,9189,10064"; a="213287155"
+X-IronPort-AV: E=Sophos;i="5.84,290,1620716400"; 
+   d="scan'208";a="213287155"
+Received: from fmsmga003.fm.intel.com ([10.253.24.29])
+  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Aug 2021 17:38:19 -0700
+X-IronPort-AV: E=Sophos;i="5.84,290,1620716400"; 
+   d="scan'208";a="510573535"
+Received: from xiaoyaol-mobl.ccr.corp.intel.com (HELO [10.249.175.54]) ([10.249.175.54])
+  by fmsmga003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Aug 2021 17:38:15 -0700
+Subject: Re: [PATCH v2] KVM: VMX: Enable Notify VM exit
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Tao Xu <tao3.xu@intel.com>, pbonzini@redhat.com,
+        vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com,
+        joro@8bytes.org, tglx@linutronix.de, mingo@redhat.com,
+        bp@alien8.de, hpa@zytor.com, x86@kernel.org, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+References: <20210525051204.1480610-1-tao3.xu@intel.com>
+ <YQRkBI9RFf6lbifZ@google.com>
+ <b0c90258-3f68-57a2-664a-e20a6d251e45@intel.com>
+ <YQgTPakbT+kCwMLP@google.com>
+From:   Xiaoyao Li <xiaoyao.li@intel.com>
+Message-ID: <080602dc-f998-ec13-ddf9-42902aa477de@intel.com>
+Date:   Tue, 3 Aug 2021 08:38:13 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Firefox/78.0 Thunderbird/78.12.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CALMp9eQvEA8DDq03ny-EZpr0zjSMBmdiXCEdeaYe8qbvUknbGA@mail.gmail.com>
+In-Reply-To: <YQgTPakbT+kCwMLP@google.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Aug 02, 2021, Jim Mattson wrote:
-> On Mon, Aug 2, 2021 at 3:21 PM Krish Sadhukhan <krish.sadhukhan@oracle.com> wrote:
-> >
-> >
-> > On 8/2/21 9:39 AM, Paolo Bonzini wrote:
-> > > On 02/08/21 18:34, Sean Christopherson wrote:
-> > >> On Mon, Aug 02, 2021, Paolo Bonzini wrote:
-> > >>> On 21/06/21 22:43, Krish Sadhukhan wrote:
-> > >>>> With this patch KVM entry and exit tracepoints will
-> > >>>> show "guest_mode = 0" if it is a guest and "guest_mode = 1" if it is a
-> > >>>> nested guest.
-> > >>>
-> > >>> What about adding a "(nested)" suffix for L2, and nothing for L1?
-> > >>
-> > >> That'd work too, though it would be nice to get vmcx12 printed as well
-> > >> so that it would be possible to determine which L2 is running without
-> > >> having to cross-reference other tracepoints.
-> > >
-> > > Yes, it would be nice but it would also clutter the output a bit.
-
-But with my gross hack, it'd only clutter nested entries/exits.
-
-> > > It's like what we have already in kvm_inj_exception:
-> > >
-> > >         TP_printk("%s (0x%x)",
-> > >                   __print_symbolic(__entry->exception, kvm_trace_sym_exc),
-> > >                   /* FIXME: don't print error_code if not present */
-> > >                   __entry->has_error ? __entry->error_code : 0)
-> > >
-> > > It could be done with a trace-cmd plugin, but that creates other issues
-> > > since it essentially forces the tracepoints to have a stable API.
-> >
-> > Also, the vmcs/vmcb address is vCPU-specific, so if L2 runs on 10 vCPUs,
-> > traces will show 10 different addresses for the same L2 and it's not
-> > convenient on a cloud host where hundreds of L1s and L2s run.
+On 8/2/2021 11:46 PM, Sean Christopherson wrote:
+> On Mon, Aug 02, 2021, Xiaoyao Li wrote:
+>> On 7/31/2021 4:41 AM, Sean Christopherson wrote:
+>>> On Tue, May 25, 2021, Tao Xu wrote:
+>>>>    #endif /* __KVM_X86_VMX_CAPS_H */
+>>>> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+>>>> index 4bceb5ca3a89..c0ad01c88dac 100644
+>>>> --- a/arch/x86/kvm/vmx/vmx.c
+>>>> +++ b/arch/x86/kvm/vmx/vmx.c
+>>>> @@ -205,6 +205,10 @@ module_param(ple_window_max, uint, 0444);
+>>>>    int __read_mostly pt_mode = PT_MODE_SYSTEM;
+>>>>    module_param(pt_mode, int, S_IRUGO);
+>>>> +/* Default is 0, less than 0 (for example, -1) disables notify window. */
+>>>> +static int __read_mostly notify_window;
+>>>
+>>> I'm not sure I like the idea of trusting ucode to select an appropriate internal
+>>> threshold.  Unless the internal threshold is architecturally defined to be at
+>>> least N nanoseconds or whatever, I think KVM should provide its own sane default.
+>>> E.g. it's not hard to imagine a scenario where a ucode patch gets rolled out that
+>>> adjusts the threshold and starts silently degrading guest performance.
+>>
+>> You mean when internal threshold gets smaller somehow, and cases
+>> false-positive that leads unexpected VM exit on normal instruction? In this
+>> case, we set increase the vmcs.notify_window in KVM.
 > 
-> The vmcx02 address is vCPU-specific. However, Sean asked for the
-> vmcx12 address, which is a GPA that is common across all vCPUs.
+> Not while VMs are running though.
+> 
+>> I think there is no better to avoid this case if ucode changes internal
+>> threshold. Unless KVM's default notify_window is bigger enough.
+>>
+>>> Even if the internal threshold isn't architecturally constrained, it would be very,
+>>> very helpful if Intel could publish the per-uarch/stepping thresholds, e.g. to give
+>>> us a ballpark idea of how agressive KVM can be before it risks false positives.
+>>
+>> Even Intel publishes the internal threshold, we still need to provide a
+>> final best_value (internal + vmcs.notify_window). Then what's that value?
+> 
+> The ideal value would be high enough to guarantee there are zero false positives,
+> yet low enough to prevent a malicious guest from causing instability in the host
+> by blocking events for an extended duration.  The problem is that there's no
+> magic answer for the threshold at which a blocked event would lead to system
+> instability, and without at least a general idea of the internal value there's no
+> answer at all.
+> 
+> IIRC, SGX instructions have a hard upper bound of 25k cycles before they have to
+> check for pending interrupts, e.g. it's why EINIT is interruptible.  The 25k cycle
+> limit is likely a good starting point for the combined minimum.  That's why I want
+> to know the internal minimum; if the internal minimum is _guaranteed_ to be >25k,
+> then KVM can be more aggressive with its default value.
 
-Ya.  Obviously it doesn't help identifying L2 vCPU relationships, e.g. if an L2 VM
-runs 10 vCPUs of its own, but in most cases the sequence of what was run for a
-given L1 vCPU is what's interesting and relevant, whereas knowing which L2 vCPUs
-belong to which L2 VM isn't often critical information for debug/triage.
+OK. I will go internally to see if we can publish the internal threshold.
+
+>> If we have an option for final best_value, then I think it's OK to just let
+>> vmcs.notify_window = best_value. Then the true final value is best_value +
+>> internal.
+>>   - if it's a normal instruction, it should finish within best_value or
+>> best_value + internal. So it makes no difference.
+>>   - if it's an instruction in malicious case, it won't go to next instruction
+>> whether wait for best_value or best_value + internal.
+> 
+> ...
+> 
+>>>> +
+>>>>    	vmcs_write32(PAGE_FAULT_ERROR_CODE_MASK, 0);
+>>>>    	vmcs_write32(PAGE_FAULT_ERROR_CODE_MATCH, 0);
+>>>>    	vmcs_write32(CR3_TARGET_COUNT, 0);           /* 22.2.1 */
+>>>> @@ -5642,6 +5653,31 @@ static int handle_bus_lock_vmexit(struct kvm_vcpu *vcpu)
+>>>>    	return 0;
+>>>>    }
+>>>> +static int handle_notify(struct kvm_vcpu *vcpu)
+>>>> +{
+>>>> +	unsigned long exit_qual = vmx_get_exit_qual(vcpu);
+>>>> +
+>>>> +	if (!(exit_qual & NOTIFY_VM_CONTEXT_INVALID)) {
+>>>
+>>> What does CONTEXT_INVALID mean?  The ISE doesn't provide any information whatsoever.
+>>
+>> It means whether the VM context is corrupted and not valid in the VMCS.
+> 
+> Well that's a bit terrifying.  Under what conditions can the VM context become
+> corrupted?  E.g. if the context can be corrupted by an inopportune NOTIFY exit,
+> then KVM needs to be ultra conservative as a false positive could be fatal to a
+> guest.
+> 
+
+Short answer is no case will set the VM_CONTEXT_INVALID bit.
+
+VM_CONTEXT_INVALID is so fatal and IMHO it won't be set for any 
+inopportune NOTIFY exit.
