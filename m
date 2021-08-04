@@ -2,73 +2,83 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 974393E0124
-	for <lists+kvm@lfdr.de>; Wed,  4 Aug 2021 14:26:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DAE6A3E0148
+	for <lists+kvm@lfdr.de>; Wed,  4 Aug 2021 14:38:42 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237177AbhHDM04 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 4 Aug 2021 08:26:56 -0400
-Received: from mail.kernel.org ([198.145.29.99]:44990 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S235639AbhHDM0z (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 4 Aug 2021 08:26:55 -0400
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        id S238140AbhHDMiv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 4 Aug 2021 08:38:51 -0400
+Received: from smtp-out2.suse.de ([195.135.220.29]:35072 "EHLO
+        smtp-out2.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S236625AbhHDMiu (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 4 Aug 2021 08:38:50 -0400
+Received: from imap1.suse-dmz.suse.de (imap1.suse-dmz.suse.de [192.168.254.73])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 5FED760E8D;
-        Wed,  4 Aug 2021 12:26:43 +0000 (UTC)
-Received: from sofa.misterjones.org ([185.219.108.64] helo=hot-poop.lan)
-        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-        (Exim 4.94.2)
-        (envelope-from <maz@kernel.org>)
-        id 1mBFyr-002urw-Ht; Wed, 04 Aug 2021 13:26:41 +0100
-From:   Marc Zyngier <maz@kernel.org>
-To:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        Marc Zyngier <maz@kernel.org>, kvm@vger.kernel.org
-Cc:     Quentin Perret <qperret@google.com>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Will Deacon <will@kernel.org>, kernel-team@android.com,
-        James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>
-Subject: Re: [PATCH v2 0/2] KVM: arm64: Prevent kmemleak from accessing HYP data
-Date:   Wed,  4 Aug 2021 13:26:37 +0100
-Message-Id: <162807998838.4077325.1915601762078271589.b4-ty@kernel.org>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20210802123830.2195174-1-maz@kernel.org>
-References: <20210802123830.2195174-1-maz@kernel.org>
+        by smtp-out2.suse.de (Postfix) with ESMTPS id 9DBD91FDE1;
+        Wed,  4 Aug 2021 12:38:37 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1628080717; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=2f91k6SgHUkmkVOGvL33AmKyXMuC7A2FSqIjj4I2NVk=;
+        b=1A8WFnuOFzhWbZIyx4BDTQUrN2cu6PhZbtMp/QThM+7uujODcjMhmKfSuloyDHt2BkCFGI
+        Km4+sMgFUtDAycRSAyTuf5vHka24OKn0+YtPjH2RLvir1T1sMc797Xvx8WETYLFUNMf2Zl
+        I4guBTLbMS9g7EV15SZaxAkbl9+KEUE=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1628080717;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=2f91k6SgHUkmkVOGvL33AmKyXMuC7A2FSqIjj4I2NVk=;
+        b=I2AINXixJWDiDqNI6pb+XuVbrlEEbRW8ruYNojo+PLCc3gRod+DTbvQfGHN1/vnGQM2E2E
+        6hsSo9QLBU+IB8Ag==
+Received: from imap1.suse-dmz.suse.de (imap1.suse-dmz.suse.de [192.168.254.73])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap1.suse-dmz.suse.de (Postfix) with ESMTPS id 7C8FE13672;
+        Wed,  4 Aug 2021 12:38:37 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap1.suse-dmz.suse.de with ESMTPSA
+        id D2KiHE2KCmGsLQAAGKfGzw
+        (envelope-from <jroedel@suse.de>); Wed, 04 Aug 2021 12:38:37 +0000
+Date:   Wed, 4 Aug 2021 14:38:35 +0200
+From:   Joerg Roedel <jroedel@suse.de>
+To:     Dan Carpenter <dan.carpenter@oracle.com>
+Cc:     kvm@vger.kernel.org
+Subject: Re: [bug report] x86/sev: Split up runtime #VC handler for correct
+ state tracking
+Message-ID: <YQqKS7ayK1qkmNzv@suse.de>
+References: <20210804095725.GA8011@kili>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, maz@kernel.org, kvm@vger.kernel.org, qperret@google.com, catalin.marinas@arm.com, suzuki.poulose@arm.com, will@kernel.org, kernel-team@android.com, james.morse@arm.com, alexandru.elisei@arm.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210804095725.GA8011@kili>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 2 Aug 2021 13:38:28 +0100, Marc Zyngier wrote:
-> This is a rework of the patch previously posted at [1].
+Hi Dan,
+
+On Wed, Aug 04, 2021 at 12:57:25PM +0300, Dan Carpenter wrote:
+> These sleeping in atomic static checker warnings come with a lot of
+> caveats because the call tree is very long and it's easy to have false
+> positives.
 > 
-> The gist of the problem is that kmemleak can legitimately access data
-> that has been removed from the kernel view, for two reasons:
+> --> vc_raw_handle_exception()
+>     --> vc_forward_exception()
+>         --> exc_page_fault()
 > 
-> (1) .hyp.rodata is lumped together with the BSS
-> (2) there is no separation of the HYP BSS from the kernel BSS
-> 
-> [...]
+> Page faults always sleep right?
 
-Applied to next, thanks!
+No, page faults do no always sleep, only when IO needs to be done to
+fulfill the page fault request. In this case, the page-fault handler
+will never sleep, because it is called with preemption disabled. The
+page-fault handler can detect this and just do nothing. The #VC handler
+will return for re-fault in this case.
 
-[1/2] arm64: Move .hyp.rodata outside of the _sdata.._edata range
-      commit: eb48d154cd0dade56a0e244f0cfa198ea2925ed3
-[2/2] KVM: arm64: Unregister HYP sections from kmemleak in protected mode
-      commit: 47e6223c841e029bfc23c3ce594dac5525cebaf8
+Hope that helps,
 
-Cheers,
-
-	M.
--- 
-Without deviation from the norm, progress is not possible.
-
+     Joerg
 
