@@ -2,101 +2,188 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 940183E048F
-	for <lists+kvm@lfdr.de>; Wed,  4 Aug 2021 17:42:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 907243E0494
+	for <lists+kvm@lfdr.de>; Wed,  4 Aug 2021 17:43:57 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239114AbhHDPm5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 4 Aug 2021 11:42:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43424 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231349AbhHDPmf (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 4 Aug 2021 11:42:35 -0400
-Received: from mail-pl1-x62c.google.com (mail-pl1-x62c.google.com [IPv6:2607:f8b0:4864:20::62c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2C7F7C061387
-        for <kvm@vger.kernel.org>; Wed,  4 Aug 2021 08:42:06 -0700 (PDT)
-Received: by mail-pl1-x62c.google.com with SMTP id z3so3411147plg.8
-        for <kvm@vger.kernel.org>; Wed, 04 Aug 2021 08:42:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=1ofFQyJiIJOQkTXzSM3r7/yq4jCe28tqrRs6j4ym+54=;
-        b=QfH5iPJBNnOGYdUDxq8UFfARpio6lLVmOCCYAU4Yr+ex59GVda9SZczTDqhOf7dWxE
-         iRfj2KBVpBm+C/5aIrFsbDFhLRDKW6GUxLZI1qNDnug86lvUHjFkwwGvq3zU+czFxV+H
-         TxjVlSigDrrhg5hHlI0yxjbLJ6qhVZpdV52/KAG5KJcLwRUs7ateqLn2c0W9rTd/qrNO
-         9x9IEU5PNchcKK5kX3GkxfoRBgw0AuK2mKGcXfGBt3CJx5uU78pyXtodqFpBzOxJ2XSv
-         2TmZOHPOeL/s3PS0TW3yDKccM03JksLpcGq4PhJjYNY7Qw3mZDYL7QXiDeYIa9OvBEua
-         hf2A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=1ofFQyJiIJOQkTXzSM3r7/yq4jCe28tqrRs6j4ym+54=;
-        b=O109m1r+3Md+aBxXFmZqrSE7UPBfXqAfclDRvTRWIuzloZz2r6IU858pJ+RMDOb8W1
-         U0BZ3TMqUKJ7lq/w7zB0DazQSbYkHYmghh09r3dbUoecpDaA7mVhBCOW3FubmimHOsMf
-         /afxNufAZZVvCbZQPKrG0btCDdneri08clK2CXNbfwg2VI2W1ELYSAS68I28s5+XbTfN
-         CszbWJgAXjTRNYzNa6s+iqBgi84tl63Ud/u7PVQl4zxMGv4Dmc8rnlWACUvD12HioCnm
-         SyduGQjnsIz3pIQbPczMDSG/AyR3vGpy5YObRDgEaL0EL6m965vnqF3AtKm9c6MQZ80P
-         X7ag==
-X-Gm-Message-State: AOAM530pSjY47CHXLyMUqEalUT+31vqLh3Jv0AKQlUqAZJX15RN0NPZ+
-        eRnYopE1nX1xjO+RK7frk/ubUA==
-X-Google-Smtp-Source: ABdhPJxt++Uy8Sk5a8ClyTVphkj+DxmlDPiyKR8+Am8xhe3mYgVQr06+AXxlhj3uEwwG/GOBe1WiyQ==
-X-Received: by 2002:a17:90a:bd98:: with SMTP id z24mr10364623pjr.99.1628091725523;
-        Wed, 04 Aug 2021 08:42:05 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id v15sm3354938pff.105.2021.08.04.08.42.04
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 04 Aug 2021 08:42:04 -0700 (PDT)
-Date:   Wed, 4 Aug 2021 15:42:01 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Maxim Levitsky <mlevitsk@redhat.com>
-Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Brijesh Singh <brijesh.singh@amd.com>,
-        David Gilbert <dgilbert@redhat.com>,
-        David Matlack <dmatlack@google.com>
-Subject: Re: Possible minor CPU bug on Zen2 in regard to using very high GPA
- in a VM
-Message-ID: <YQq1SVV9DKaZDhLp@google.com>
-References: <f8071f73869de34961ea1a35177fc778bb99d4b7.camel@redhat.com>
+        id S239178AbhHDPoI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 4 Aug 2021 11:44:08 -0400
+Received: from foss.arm.com ([217.140.110.172]:33872 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S239214AbhHDPoG (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 4 Aug 2021 11:44:06 -0400
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 191B531B;
+        Wed,  4 Aug 2021 08:43:53 -0700 (PDT)
+Received: from [10.57.36.146] (unknown [10.57.36.146])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id D22B33F66F;
+        Wed,  4 Aug 2021 08:43:48 -0700 (PDT)
+Subject: Re: [PATCH v10 01/17] iova: Export alloc_iova_fast() and
+ free_iova_fast()
+To:     Yongji Xie <xieyongji@bytedance.com>
+Cc:     kvm <kvm@vger.kernel.org>, "Michael S. Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        virtualization <virtualization@lists.linux-foundation.org>,
+        Christian Brauner <christian.brauner@canonical.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Matthew Wilcox <willy@infradead.org>,
+        Christoph Hellwig <hch@infradead.org>,
+        Dan Carpenter <dan.carpenter@oracle.com>,
+        Stefano Garzarella <sgarzare@redhat.com>,
+        Liu Xiaodong <xiaodong.liu@intel.com>,
+        Joe Perches <joe@perches.com>,
+        Al Viro <viro@zeniv.linux.org.uk>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        songmuchun@bytedance.com, Jens Axboe <axboe@kernel.dk>,
+        He Zhe <zhe.he@windriver.com>,
+        Greg KH <gregkh@linuxfoundation.org>,
+        Randy Dunlap <rdunlap@infradead.org>,
+        linux-kernel <linux-kernel@vger.kernel.org>,
+        iommu@lists.linux-foundation.org, bcrl@kvack.org,
+        netdev@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        =?UTF-8?Q?Mika_Penttil=c3=a4?= <mika.penttila@nextfour.com>
+References: <20210729073503.187-1-xieyongji@bytedance.com>
+ <20210729073503.187-2-xieyongji@bytedance.com>
+ <43d88942-1cd3-c840-6fec-4155fd544d80@redhat.com>
+ <CACycT3vcpwyA3xjD29f1hGnYALyAd=-XcWp8+wJiwSqpqUu00w@mail.gmail.com>
+ <6e05e25e-e569-402e-d81b-8ac2cff1c0e8@arm.com>
+ <CACycT3sm2r8NMMUPy1k1PuSZZ3nM9aic-O4AhdmRRCwgmwGj4Q@mail.gmail.com>
+From:   Robin Murphy <robin.murphy@arm.com>
+Message-ID: <417ce5af-4deb-5319-78ce-b74fb4dd0582@arm.com>
+Date:   Wed, 4 Aug 2021 16:43:43 +0100
+User-Agent: Mozilla/5.0 (Windows NT 10.0; rv:78.0) Gecko/20100101
+ Thunderbird/78.12.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <f8071f73869de34961ea1a35177fc778bb99d4b7.camel@redhat.com>
+In-Reply-To: <CACycT3sm2r8NMMUPy1k1PuSZZ3nM9aic-O4AhdmRRCwgmwGj4Q@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-GB
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Aug 04, 2021, Maxim Levitsky wrote:
-> Hi!
->  
-> I recently triaged a series of failures that I am seeing on both of my AMD machines in the kvm selftests.
+On 2021-08-04 06:02, Yongji Xie wrote:
+> On Tue, Aug 3, 2021 at 6:54 PM Robin Murphy <robin.murphy@arm.com> wrote:
+>>
+>> On 2021-08-03 09:54, Yongji Xie wrote:
+>>> On Tue, Aug 3, 2021 at 3:41 PM Jason Wang <jasowang@redhat.com> wrote:
+>>>>
+>>>>
+>>>> 在 2021/7/29 下午3:34, Xie Yongji 写道:
+>>>>> Export alloc_iova_fast() and free_iova_fast() so that
+>>>>> some modules can use it to improve iova allocation efficiency.
+>>>>
+>>>>
+>>>> It's better to explain why alloc_iova() is not sufficient here.
+>>>>
+>>>
+>>> Fine.
+>>
+>> What I fail to understand from the later patches is what the IOVA domain
+>> actually represents. If the "device" is a userspace process then
+>> logically the "IOVA" would be the userspace address, so presumably
+>> somewhere you're having to translate between this arbitrary address
+>> space and actual usable addresses - if you're worried about efficiency
+>> surely it would be even better to not do that?
+>>
 > 
-> One test failed due to a trivial typo, to which I had sent a fix, but most of the other tests failed
-> due to what I now suspect to be a very minor but still a CPU bug.
->  
-> All of the failing tests except two tests that timeout (and I haven't yet triaged them),
-> use the perf_test_util.c library.
-> All of these fail with SHUTDOWN exit reason.
+> Yes, userspace daemon needs to translate the "IOVA" in a DMA
+> descriptor to the VA (from mmap(2)). But this actually doesn't affect
+> performance since it's an identical mapping in most cases.
+
+I'm not familiar with the vhost_iotlb stuff, but it looks suspiciously 
+like you're walking yet another tree to make those translations. Even if 
+the buffer can be mapped all at once with a fixed offset such that each 
+DMA mapping call doesn't need a lookup for each individual "IOVA" - that 
+might be what's happening already, but it's a bit hard to follow just 
+reading the patches in my mail client - vhost_iotlb_add_range() doesn't 
+look like it's super-cheap to call, and you're serialising on a lock for 
+that.
+
+My main point, though, is that if you've already got something else 
+keeping track of the actual addresses, then the way you're using an 
+iova_domain appears to be something you could do with a trivial bitmap 
+allocator. That's why I don't buy the efficiency argument. The main 
+design points of the IOVA allocator are to manage large address spaces 
+while trying to maximise spatial locality to minimise the underlying 
+pagetable usage, and allocating with a flexible limit to support 
+multiple devices with different addressing capabilities in the same 
+address space. If none of those aspects are relevant to the use-case - 
+which AFAICS appears to be true here - then as a general-purpose 
+resource allocator it's rubbish and has an unreasonably massive memory 
+overhead and there are many, many better choices.
+
+FWIW I've recently started thinking about moving all the caching stuff 
+out of iova_domain and into the iommu-dma layer since it's now a giant 
+waste of space for all the other current IOVA users.
+
+>> Presumably userspace doesn't have any concern about alignment and the
+>> things we have to worry about for the DMA API in general, so it's pretty
+>> much just allocating slots in a buffer, and there are far more effective
+>> ways to do that than a full-blown address space manager.
 > 
-> After a relatively recent commit ef4c9f4f6546 ("KVM: selftests: Fix 32-bit truncation of vm_get_max_gfn()"),
-> vm_get_max_gfn() was fixed to return the maximum GFN that the guest can use.
-> For default VM type this value is obtained from 'vm->pa_bit's which is in turn obtained
-> from guest's cpuid in kvm_get_cpu_address_width function.
->  
-> It is 48 on both my AMD machines (3970X and 4650U) and also on remote EPYC 7302P machine.
-> (all of them are Zen2 machines)
->  
-> My 3970X has SME enabled by BIOS, while my 4650U doesn't have it enabled.
-> The 7302P also has SME enabled.
-> SEV was obviously not enabled for the test.
-> NPT was enabled.
->  
-> It appears that if the guest uses any GPA above 0xFFFCFFFFF000 in its guest paging tables, 
-> then it gets #PF with reserved bits error code.
+> Considering iova allocation efficiency, I think the iova allocator is
+> better here. In most cases, we don't even need to hold a spin lock
+> during iova allocation.
+> 
+>> If you're going
+>> to reuse any infrastructure I'd have expected it to be SWIOTLB rather
+>> than the IOVA allocator. Because, y'know, you're *literally implementing
+>> a software I/O TLB* ;)
+>>
+> 
+> But actually what we can reuse in SWIOTLB is the IOVA allocator.
 
-LOL, I encountered this joy a few weeks back.  There's a magic Hyper-Transport
-region at the top of memory that is reserved, even for GPAs.  You and I say
-"CPU BUG!!!", AMD says "working as intended" ;-)
+Huh? Those are completely unrelated and orthogonal things - SWIOTLB does 
+not use an external allocator (see find_slots()). By SWIOTLB I mean 
+specifically the library itself, not dma-direct or any of the other 
+users built around it. The functionality for managing slots in a buffer 
+and bouncing data in and out can absolutely be reused - that's why users 
+like the Xen and iommu-dma code *are* reusing it instead of open-coding 
+their own versions.
 
-https://lkml.kernel.org/r/20210625020354.431829-2-seanjc@google.com
+> And
+> the IOVA management in SWIOTLB is not what we want. For example,
+> SWIOTLB allocates and uses contiguous memory for bouncing, which is
+> not necessary in VDUSE case.
+
+alloc_iova() allocates a contiguous (in IOVA address) region of space. 
+In vduse_domain_map_page() you use it to allocate a contiguous region of 
+space from your bounce buffer. Can you clarify how that is fundamentally 
+different from allocating a contiguous region of space from a bounce 
+buffer? Nobody's saying the underlying implementation details of where 
+the buffer itself comes from can't be tweaked.
+
+> And VDUSE needs coherent mapping which is
+> not supported by the SWIOTLB. Besides, the SWIOTLB works in singleton
+> mode (designed for platform IOMMU) , but VDUSE is based on on-chip
+> IOMMU (supports multiple instances).
+That's not entirely true - the IOMMU bounce buffering scheme introduced 
+in intel-iommu and now moved into the iommu-dma layer was already a step 
+towards something conceptually similar. It does still rely on stealing 
+the underlying pages from the global SWIOTLB pool at the moment, but the 
+bouncing is effectively done in a per-IOMMU-domain context.
+
+The next step is currently queued in linux-next, wherein we can now have 
+individual per-device SWIOTLB pools. In fact at that point I think you 
+might actually be able to do your thing without implementing any special 
+DMA ops at all - you'd need to set up a pool for your "device" with 
+force_bounce set, then when you mmap() that to userspace, set up 
+dev->dma_range_map to describe an offset from the physical address of 
+the buffer to the userspace address, and I think dma-direct would be 
+tricked into doing the right thing. It's a bit wacky, but it could stand 
+to save a hell of a lot of bother.
+
+Finally, enhancing SWIOTLB to cope with virtually-mapped buffers that 
+don't have to be physically contiguous is a future improvement which I 
+think could benefit various use-cases - indeed it's possibly already on 
+the table for IOMMU bounce pages - so would probably be welcome in general.
+
+ > So I still prefer to reuse the
+ > IOVA allocator to implement a MMU-based software IOTLB.
+
+If you're dead set on open-coding all the bounce-buffering machinery, 
+then I'd honestly recommend open-coding a more suitable buffer allocator 
+as well ;)
+
+Thanks,
+Robin.
