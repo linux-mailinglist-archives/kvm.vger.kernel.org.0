@@ -2,56 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D73C93DFD67
-	for <lists+kvm@lfdr.de>; Wed,  4 Aug 2021 10:58:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2C9D43DFD68
+	for <lists+kvm@lfdr.de>; Wed,  4 Aug 2021 10:58:46 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236839AbhHDI6z (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 4 Aug 2021 04:58:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35066 "EHLO
+        id S235421AbhHDI64 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 4 Aug 2021 04:58:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35072 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235421AbhHDI6y (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 4 Aug 2021 04:58:54 -0400
-Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 217E9C0613D5
+        with ESMTP id S236833AbhHDI6z (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 4 Aug 2021 04:58:55 -0400
+Received: from mail-il1-x149.google.com (mail-il1-x149.google.com [IPv6:2607:f8b0:4864:20::149])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EB8ADC0613D5
         for <kvm@vger.kernel.org>; Wed,  4 Aug 2021 01:58:42 -0700 (PDT)
-Received: by mail-yb1-xb4a.google.com with SMTP id j9-20020a2581490000b02905897d81c63fso2250482ybm.8
+Received: by mail-il1-x149.google.com with SMTP id i4-20020a056e0212c4b029022291c9f509so620153ilm.6
         for <kvm@vger.kernel.org>; Wed, 04 Aug 2021 01:58:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=date:in-reply-to:message-id:mime-version:references:subject:from:to
          :cc;
-        bh=QZYUzbcXutG2B1XPKYDDaowrOTkrdRCYpxjQmfgRBqw=;
-        b=fg8ZdJyTO1IzZwQnyFmtQzBLyvzLg3oWs5Mwrvzrq7RU1rdysfWLN2A/CA6201R02a
-         9x/yYSHRuUETBU088OpH41tdmTezHXghlym7jalL4hNQj9khOjSNah3nmR20olJYlpGM
-         NL9UDv3ftB1FzNYvmaswYPXp0iJ0GOb9T8RcGftr9OzVhNA3piITvnnmbrvRoEKYaUs3
-         TAbiN9VHBzEih5yBmaD0TSgq4w33jIlobvj6FE10tdMiUbNXovPf3cPu5j0dQjIYAP24
-         xcRWGMUyhFLsg7YJPN15v+gKZLMR1hpOHVLDuC1OOWN4vglBYkL+5BSD3FbMNsMZGkwn
-         KpMw==
+        bh=fWcniuNXCUCuPv57yCdSEdrKkifvC8A89oeC6WgOzN8=;
+        b=a9oOAkp4mvbQXissCbYue355AXwUJT0HyqVBhuZt9Uq2Oyi8tVlNMo/c/bZSF5LyrW
+         mHB4/6yIVqensNawvm9tyvWFjoT+YkB0Tvb7Mic09FxwsneEGvLKtmQWfbfkfGC0NN00
+         +WBONgVMZ7jhm2uwJuAkeDE9h/2mo/bjkfi9kt5ci3bceCDwhMnxiujgpDx34DfOPk8z
+         +H6PUQQa+YSiUjG18yfhsQw3IWbzPPu4m4POcWBtJFo9mgA6yxSEgZpi3jhcqfRxVb9y
+         B6z69N+o/U5y7TGF/p0TcAP9yTuhdp69m0eQKJbQ91Ap69SkvekfHzoR6FVEoxXf0+LF
+         Ov8w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=QZYUzbcXutG2B1XPKYDDaowrOTkrdRCYpxjQmfgRBqw=;
-        b=JwbuF/CHYBdfggpa75qHYDiE4Wum814xn6q80r8GD8ouva9qoR4/K+Fc8qsD43QJZ/
-         cxPGzOF61Bl0MBZYr55I1fVufq9EiYW99o8kHXRQtNbyQiibjAIZ7A/iZOuPHdaGPrdp
-         dyWE/vBCJUqiKFdVpzgUI60yn+hvsLmkJUNSJLcUz9aG3uRLXNwbW5rWjFabXsqvn2kk
-         JCji/U+c3HUVbOQz9Zsc0/WZ6ddojJYutQFgS08Kvh5JiVRZEVVGH993bfgs1qcQL/dJ
-         xpeTxI0X99HQ7MrNh4z6/PvtDlA3IYC9Ta3rxp4R2p1267JJ95Hyqpc3DcWpwdEFy1R7
-         emQA==
-X-Gm-Message-State: AOAM532l4DTnmkEpjl93NttrhTYiEDYnQSEqdEHHYiz9THO0c0wktNUI
-        8qf75CaPqpqJ0o3WW/M9pGZUcNdd7p7O1YfZ3PjzsDtponduaaIThRnIbKnLPgOiDOI+BGrvUDR
-        gLP65JxKMGcQsmiNKnSDRLxD1QcIVmqF5ETaa0u5N0BRjkf3ASvlGXP0UVA==
-X-Google-Smtp-Source: ABdhPJxV6+3gLGbTheDt4LD8pHoTTfHfR6GcLwPPsqBvh7B9FGBWOPkR9xVf9DHE0p02LBy+6d+tyicSFeI=
+        bh=fWcniuNXCUCuPv57yCdSEdrKkifvC8A89oeC6WgOzN8=;
+        b=X2PpAL4gvE9VNOKGDS72ZW8YpYqDwyK8LuPIaD/A/zlI/WPfPm/kJRNTrrrl3SpzQY
+         NB8njwHO7yn6GWNi0TkRA+VuMP3+dX50ukiipZalufPAzVX8A0tGge+zA2m93OEiHI5Z
+         QLWcUaBIX7vAfzdtkimb8EgS+1qUdEyxyX2hmUG7LIs6ZpylfnWG7GQtZvYsb0WNF21U
+         Nqxj0YlwTGvHFuMDGt3lWaAF+fBaxtdBxjX7hMoftX0+x7YDC6ubC6L55zslrwbO8P89
+         nktwsL0e1DQyrksGHIJKBjlVYJXY/R5Z58gNEzMrJ7kVrgTnnRVsUf4oDnlMZCq0pBEs
+         eOOg==
+X-Gm-Message-State: AOAM530RQHMOeo6BxavNN9BpeYXP8b8pGNTfxaEGIXi7Eu4RFIavbaXT
+        IPnItBj+C6ntv1EwvE1JuSMp58Sak+Tx/trsEmD5JEwDQaGoctRVywyQZ7wltvYckekzgk633Pj
+        wBSRLBuhUm/8Sa2Boh2z6XJJyeJTqhcsdnJqEye6noytSegZXoYC5mv6bxg==
+X-Google-Smtp-Source: ABdhPJyAyc/dU3nSEvjNvxPG8j4g40KIoOuCzRMMt1RHb+qZXYIlBxONKqT8lMuEOfBkT/Z+tisIzU18bGY=
 X-Received: from oupton.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:404])
- (user=oupton job=sendgmr) by 2002:a25:4283:: with SMTP id p125mr35878914yba.184.1628067521137;
- Wed, 04 Aug 2021 01:58:41 -0700 (PDT)
-Date:   Wed,  4 Aug 2021 08:58:04 +0000
+ (user=oupton job=sendgmr) by 2002:a5d:9808:: with SMTP id a8mr135685iol.1.1628067522287;
+ Wed, 04 Aug 2021 01:58:42 -0700 (PDT)
+Date:   Wed,  4 Aug 2021 08:58:05 +0000
 In-Reply-To: <20210804085819.846610-1-oupton@google.com>
-Message-Id: <20210804085819.846610-7-oupton@google.com>
+Message-Id: <20210804085819.846610-8-oupton@google.com>
 Mime-Version: 1.0
 References: <20210804085819.846610-1-oupton@google.com>
 X-Mailer: git-send-email 2.32.0.605.g8dce9f2422-goog
-Subject: [PATCH v6 06/21] tools: arch: x86: pull in pvclock headers
+Subject: [PATCH v6 07/21] selftests: KVM: Add test for KVM_{GET,SET}_CLOCK
 From:   Oliver Upton <oupton@google.com>
 To:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
 Cc:     Paolo Bonzini <pbonzini@redhat.com>,
@@ -75,180 +75,268 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Copy over approximately clean versions of the pvclock headers into
-tools. Reconcile headers/symbols missing in tools that are unneeded.
+Add a selftest for the new KVM clock UAPI that was introduced. Ensure
+that the KVM clock is consistent between userspace and the guest, and
+that the difference in realtime will only ever cause the KVM clock to
+advance forward.
 
+Cc: Andrew Jones <drjones@redhat.com>
 Signed-off-by: Oliver Upton <oupton@google.com>
 ---
- tools/arch/x86/include/asm/pvclock-abi.h |  48 +++++++++++
- tools/arch/x86/include/asm/pvclock.h     | 103 +++++++++++++++++++++++
- 2 files changed, 151 insertions(+)
- create mode 100644 tools/arch/x86/include/asm/pvclock-abi.h
- create mode 100644 tools/arch/x86/include/asm/pvclock.h
+ tools/testing/selftests/kvm/.gitignore        |   1 +
+ tools/testing/selftests/kvm/Makefile          |   1 +
+ .../testing/selftests/kvm/include/kvm_util.h  |   2 +
+ .../selftests/kvm/x86_64/kvm_clock_test.c     | 204 ++++++++++++++++++
+ 4 files changed, 208 insertions(+)
+ create mode 100644 tools/testing/selftests/kvm/x86_64/kvm_clock_test.c
 
-diff --git a/tools/arch/x86/include/asm/pvclock-abi.h b/tools/arch/x86/include/asm/pvclock-abi.h
-new file mode 100644
-index 000000000000..1436226efe3e
---- /dev/null
-+++ b/tools/arch/x86/include/asm/pvclock-abi.h
-@@ -0,0 +1,48 @@
-+/* SPDX-License-Identifier: GPL-2.0 */
-+#ifndef _ASM_X86_PVCLOCK_ABI_H
-+#define _ASM_X86_PVCLOCK_ABI_H
-+#ifndef __ASSEMBLY__
+diff --git a/tools/testing/selftests/kvm/.gitignore b/tools/testing/selftests/kvm/.gitignore
+index 36896d251977..958a809c8de4 100644
+--- a/tools/testing/selftests/kvm/.gitignore
++++ b/tools/testing/selftests/kvm/.gitignore
+@@ -11,6 +11,7 @@
+ /x86_64/emulator_error_test
+ /x86_64/get_cpuid_test
+ /x86_64/get_msr_index_features
++/x86_64/kvm_clock_test
+ /x86_64/kvm_pv_test
+ /x86_64/hyperv_clock
+ /x86_64/hyperv_cpuid
+diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
+index c103873531e0..0f94b18b33ce 100644
+--- a/tools/testing/selftests/kvm/Makefile
++++ b/tools/testing/selftests/kvm/Makefile
+@@ -46,6 +46,7 @@ TEST_GEN_PROGS_x86_64 += x86_64/get_cpuid_test
+ TEST_GEN_PROGS_x86_64 += x86_64/hyperv_clock
+ TEST_GEN_PROGS_x86_64 += x86_64/hyperv_cpuid
+ TEST_GEN_PROGS_x86_64 += x86_64/hyperv_features
++TEST_GEN_PROGS_x86_64 += x86_64/kvm_clock_test
+ TEST_GEN_PROGS_x86_64 += x86_64/kvm_pv_test
+ TEST_GEN_PROGS_x86_64 += x86_64/mmio_warning_test
+ TEST_GEN_PROGS_x86_64 += x86_64/mmu_role_test
+diff --git a/tools/testing/selftests/kvm/include/kvm_util.h b/tools/testing/selftests/kvm/include/kvm_util.h
+index 010b59b13917..a8ac5d52e17b 100644
+--- a/tools/testing/selftests/kvm/include/kvm_util.h
++++ b/tools/testing/selftests/kvm/include/kvm_util.h
+@@ -19,6 +19,8 @@
+ #define KVM_DEV_PATH "/dev/kvm"
+ #define KVM_MAX_VCPUS 512
+ 
++#define NSEC_PER_SEC 1000000000L
 +
+ /*
+  * Callers of kvm_util only have an incomplete/opaque description of the
+  * structure kvm_util is using to maintain the state of a VM.
+diff --git a/tools/testing/selftests/kvm/x86_64/kvm_clock_test.c b/tools/testing/selftests/kvm/x86_64/kvm_clock_test.c
+new file mode 100644
+index 000000000000..e0dcc27ae9f1
+--- /dev/null
++++ b/tools/testing/selftests/kvm/x86_64/kvm_clock_test.c
+@@ -0,0 +1,204 @@
++// SPDX-License-Identifier: GPL-2.0-only
 +/*
-+ * These structs MUST NOT be changed.
-+ * They are the ABI between hypervisor and guest OS.
-+ * Both Xen and KVM are using this.
++ * Copyright (C) 2021, Google LLC.
 + *
-+ * pvclock_vcpu_time_info holds the system time and the tsc timestamp
-+ * of the last update. So the guest can use the tsc delta to get a
-+ * more precise system time.  There is one per virtual cpu.
-+ *
-+ * pvclock_wall_clock references the point in time when the system
-+ * time was zero (usually boot time), thus the guest calculates the
-+ * current wall clock by adding the system time.
-+ *
-+ * Protocol for the "version" fields is: hypervisor raises it (making
-+ * it uneven) before it starts updating the fields and raises it again
-+ * (making it even) when it is done.  Thus the guest can make sure the
-+ * time values it got are consistent by checking the version before
-+ * and after reading them.
++ * Tests for adjusting the KVM clock from userspace
 + */
-+
-+struct pvclock_vcpu_time_info {
-+	u32   version;
-+	u32   pad0;
-+	u64   tsc_timestamp;
-+	u64   system_time;
-+	u32   tsc_to_system_mul;
-+	s8    tsc_shift;
-+	u8    flags;
-+	u8    pad[2];
-+} __attribute__((__packed__)); /* 32 bytes */
-+
-+struct pvclock_wall_clock {
-+	u32   version;
-+	u32   sec;
-+	u32   nsec;
-+} __attribute__((__packed__));
-+
-+#define PVCLOCK_TSC_STABLE_BIT	(1 << 0)
-+#define PVCLOCK_GUEST_STOPPED	(1 << 1)
-+/* PVCLOCK_COUNTS_FROM_ZERO broke ABI and can't be used anymore. */
-+#define PVCLOCK_COUNTS_FROM_ZERO (1 << 2)
-+#endif /* __ASSEMBLY__ */
-+#endif /* _ASM_X86_PVCLOCK_ABI_H */
-diff --git a/tools/arch/x86/include/asm/pvclock.h b/tools/arch/x86/include/asm/pvclock.h
-new file mode 100644
-index 000000000000..2628f9a6330b
---- /dev/null
-+++ b/tools/arch/x86/include/asm/pvclock.h
-@@ -0,0 +1,103 @@
-+/* SPDX-License-Identifier: GPL-2.0 */
-+#ifndef _ASM_X86_PVCLOCK_H
-+#define _ASM_X86_PVCLOCK_H
-+
-+#include <asm/barrier.h>
++#include <asm/kvm_para.h>
++#include <asm/pvclock.h>
 +#include <asm/pvclock-abi.h>
++#include <stdint.h>
++#include <string.h>
++#include <sys/stat.h>
++#include <time.h>
 +
-+/* some helper functions for xen and kvm pv clock sources */
-+u64 pvclock_clocksource_read(struct pvclock_vcpu_time_info *src);
-+u8 pvclock_read_flags(struct pvclock_vcpu_time_info *src);
-+void pvclock_set_flags(u8 flags);
-+unsigned long pvclock_tsc_khz(struct pvclock_vcpu_time_info *src);
-+void pvclock_resume(void);
++#include "test_util.h"
++#include "kvm_util.h"
++#include "processor.h"
 +
-+void pvclock_touch_watchdogs(void);
++#define VCPU_ID 0
 +
-+static __always_inline
-+unsigned pvclock_read_begin(const struct pvclock_vcpu_time_info *src)
++struct test_case {
++	uint64_t kvmclock_base;
++	int64_t realtime_offset;
++};
++
++static struct test_case test_cases[] = {
++	{ .kvmclock_base = 0 },
++	{ .kvmclock_base = 180 * NSEC_PER_SEC },
++	{ .kvmclock_base = 0, .realtime_offset = -180 * NSEC_PER_SEC },
++	{ .kvmclock_base = 0, .realtime_offset = 180 * NSEC_PER_SEC },
++};
++
++#define GUEST_SYNC_CLOCK(__stage, __val)			\
++		GUEST_SYNC_ARGS(__stage, __val, 0, 0, 0)
++
++static void guest_main(vm_paddr_t pvti_pa, struct pvclock_vcpu_time_info *pvti)
 +{
-+	unsigned version = src->version & ~1;
-+	/* Make sure that the version is read before the data. */
-+	rmb();
-+	return version;
++	int i;
++
++	wrmsr(MSR_KVM_SYSTEM_TIME_NEW, pvti_pa | KVM_MSR_ENABLED);
++	for (i = 0; i < ARRAY_SIZE(test_cases); i++)
++		GUEST_SYNC_CLOCK(i, __pvclock_read_cycles(pvti, rdtsc()));
 +}
 +
-+static __always_inline
-+bool pvclock_read_retry(const struct pvclock_vcpu_time_info *src,
-+			unsigned version)
++#define EXPECTED_FLAGS (KVM_CLOCK_REALTIME | KVM_CLOCK_HOST_TSC)
++
++static inline void assert_flags(struct kvm_clock_data *data)
 +{
-+	/* Make sure that the version is re-read after the data. */
-+	rmb();
-+	return version != src->version;
++	TEST_ASSERT((data->flags & EXPECTED_FLAGS) == EXPECTED_FLAGS,
++		    "unexpected clock data flags: %x (want set: %x)",
++		    data->flags, EXPECTED_FLAGS);
 +}
 +
-+/*
-+ * Scale a 64-bit delta by scaling and multiplying by a 32-bit fraction,
-+ * yielding a 64-bit result.
-+ */
-+static inline u64 pvclock_scale_delta(u64 delta, u32 mul_frac, int shift)
++static void handle_sync(struct ucall *uc, struct kvm_clock_data *start,
++			struct kvm_clock_data *end)
 +{
-+	u64 product;
-+#ifdef __i386__
-+	u32 tmp1, tmp2;
-+#else
-+	unsigned long tmp;
-+#endif
++	uint64_t obs, exp_lo, exp_hi;
 +
-+	if (shift < 0)
-+		delta >>= -shift;
-+	else
-+		delta <<= shift;
++	obs = uc->args[2];
++	exp_lo = start->clock;
++	exp_hi = end->clock;
 +
-+#ifdef __i386__
-+	__asm__ (
-+		"mul  %5       ; "
-+		"mov  %4,%%eax ; "
-+		"mov  %%edx,%4 ; "
-+		"mul  %5       ; "
-+		"xor  %5,%5    ; "
-+		"add  %4,%%eax ; "
-+		"adc  %5,%%edx ; "
-+		: "=A" (product), "=r" (tmp1), "=r" (tmp2)
-+		: "a" ((u32)delta), "1" ((u32)(delta >> 32)), "2" (mul_frac) );
-+#elif defined(__x86_64__)
-+	__asm__ (
-+		"mulq %[mul_frac] ; shrd $32, %[hi], %[lo]"
-+		: [lo]"=a"(product),
-+		  [hi]"=d"(tmp)
-+		: "0"(delta),
-+		  [mul_frac]"rm"((u64)mul_frac));
-+#else
-+#error implement me!
-+#endif
++	assert_flags(start);
++	assert_flags(end);
 +
-+	return product;
++	TEST_ASSERT(exp_lo <= obs && obs <= exp_hi,
++		    "unexpected kvm-clock value: %"PRIu64" expected range: [%"PRIu64", %"PRIu64"]",
++		    obs, exp_lo, exp_hi);
++
++	pr_info("kvm-clock value: %"PRIu64" expected range [%"PRIu64", %"PRIu64"]\n",
++		obs, exp_lo, exp_hi);
 +}
 +
-+static __always_inline
-+u64 __pvclock_read_cycles(const struct pvclock_vcpu_time_info *src, u64 tsc)
++static void handle_abort(struct ucall *uc)
 +{
-+	u64 delta = tsc - src->tsc_timestamp;
-+	u64 offset = pvclock_scale_delta(delta, src->tsc_to_system_mul,
-+					     src->tsc_shift);
-+	return src->system_time + offset;
++	TEST_FAIL("%s at %s:%ld", (const char *)uc->args[0],
++		  __FILE__, uc->args[1]);
 +}
 +
-+struct pvclock_vsyscall_time_info {
-+	struct pvclock_vcpu_time_info pvti;
-+} __attribute__((__aligned__(64)));
-+
-+#define PVTI_SIZE sizeof(struct pvclock_vsyscall_time_info)
-+
-+#ifdef CONFIG_PARAVIRT_CLOCK
-+void pvclock_set_pvti_cpu0_va(struct pvclock_vsyscall_time_info *pvti);
-+struct pvclock_vsyscall_time_info *pvclock_get_pvti_cpu0_va(void);
-+#else
-+static inline struct pvclock_vsyscall_time_info *pvclock_get_pvti_cpu0_va(void)
++static void setup_clock(struct kvm_vm *vm, struct test_case *test_case)
 +{
-+	return NULL;
-+}
-+#endif
++	struct kvm_clock_data data;
 +
-+#endif /* _ASM_X86_PVCLOCK_H */
++	memset(&data, 0, sizeof(data));
++
++	data.clock = test_case->kvmclock_base;
++	if (test_case->realtime_offset) {
++		struct timespec ts;
++		int r;
++
++		data.flags |= KVM_CLOCK_REALTIME;
++		do {
++			r = clock_gettime(CLOCK_REALTIME, &ts);
++			if (!r)
++				break;
++		} while (errno == EINTR);
++
++		TEST_ASSERT(!r, "clock_gettime() failed: %d\n", r);
++
++		data.realtime = ts.tv_sec * NSEC_PER_SEC;
++		data.realtime += ts.tv_nsec;
++		data.realtime += test_case->realtime_offset;
++	}
++
++	vm_ioctl(vm, KVM_SET_CLOCK, &data);
++}
++
++static void enter_guest(struct kvm_vm *vm)
++{
++	struct kvm_clock_data start, end;
++	struct kvm_run *run;
++	struct ucall uc;
++	int i, r;
++
++	run = vcpu_state(vm, VCPU_ID);
++
++	for (i = 0; i < ARRAY_SIZE(test_cases); i++) {
++		setup_clock(vm, &test_cases[i]);
++
++		vm_ioctl(vm, KVM_GET_CLOCK, &start);
++
++		r = _vcpu_run(vm, VCPU_ID);
++		vm_ioctl(vm, KVM_GET_CLOCK, &end);
++
++		TEST_ASSERT(!r, "vcpu_run failed: %d\n", r);
++		TEST_ASSERT(run->exit_reason == KVM_EXIT_IO,
++			    "unexpected exit reason: %u (%s)",
++			    run->exit_reason, exit_reason_str(run->exit_reason));
++
++		switch (get_ucall(vm, VCPU_ID, &uc)) {
++		case UCALL_SYNC:
++			handle_sync(&uc, &start, &end);
++			break;
++		case UCALL_ABORT:
++			handle_abort(&uc);
++			return;
++		default:
++			TEST_ASSERT(0, "unhandled ucall: %ld\n",
++				    get_ucall(vm, VCPU_ID, &uc));
++		}
++	}
++}
++
++#define CLOCKSOURCE_PATH "/sys/devices/system/clocksource/clocksource0/current_clocksource"
++
++static void check_clocksource(void)
++{
++	char *clk_name;
++	struct stat st;
++	FILE *fp;
++
++	fp = fopen(CLOCKSOURCE_PATH, "r");
++	if (!fp) {
++		pr_info("failed to open clocksource file: %d; assuming TSC.\n",
++			errno);
++		return;
++	}
++
++	if (fstat(fileno(fp), &st)) {
++		pr_info("failed to stat clocksource file: %d; assuming TSC.\n",
++			errno);
++		goto out;
++	}
++
++	clk_name = malloc(st.st_size);
++	TEST_ASSERT(clk_name, "failed to allocate buffer to read file\n");
++
++	if (!fgets(clk_name, st.st_size, fp)) {
++		pr_info("failed to read clocksource file: %d; assuming TSC.\n",
++			ferror(fp));
++		goto out;
++	}
++
++	TEST_ASSERT(!strncmp(clk_name, "tsc\n", st.st_size),
++		    "clocksource not supported: %s", clk_name);
++out:
++	fclose(fp);
++}
++
++int main(void)
++{
++	vm_vaddr_t pvti_gva;
++	vm_paddr_t pvti_gpa;
++	struct kvm_vm *vm;
++	int flags;
++
++	flags = kvm_check_cap(KVM_CAP_ADJUST_CLOCK);
++	if (!(flags & KVM_CLOCK_REALTIME)) {
++		print_skip("KVM_CLOCK_REALTIME not supported; flags: %x",
++			   flags);
++		exit(KSFT_SKIP);
++	}
++
++	check_clocksource();
++
++	vm = vm_create_default(VCPU_ID, 0, guest_main);
++
++	pvti_gva = vm_vaddr_alloc(vm, getpagesize(), 0x10000);
++	pvti_gpa = addr_gva2gpa(vm, pvti_gva);
++	vcpu_args_set(vm, VCPU_ID, 2, pvti_gpa, pvti_gva);
++
++	enter_guest(vm);
++	kvm_vm_free(vm);
++}
 -- 
 2.32.0.605.g8dce9f2422-goog
 
