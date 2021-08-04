@@ -2,57 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 172283DFD85
+	by mail.lfdr.de (Postfix) with ESMTP id 723753DFD86
 	for <lists+kvm@lfdr.de>; Wed,  4 Aug 2021 10:59:08 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236871AbhHDI7R (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 4 Aug 2021 04:59:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35176 "EHLO
+        id S236899AbhHDI7S (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 4 Aug 2021 04:59:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35192 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236862AbhHDI7I (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 4 Aug 2021 04:59:08 -0400
-Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 76D9CC06179B
-        for <kvm@vger.kernel.org>; Wed,  4 Aug 2021 01:58:56 -0700 (PDT)
-Received: by mail-yb1-xb49.google.com with SMTP id b9-20020a5b07890000b0290558245b7eabso2258865ybq.10
-        for <kvm@vger.kernel.org>; Wed, 04 Aug 2021 01:58:56 -0700 (PDT)
+        with ESMTP id S236894AbhHDI7K (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 4 Aug 2021 04:59:10 -0400
+Received: from mail-qv1-xf4a.google.com (mail-qv1-xf4a.google.com [IPv6:2607:f8b0:4864:20::f4a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7847EC06179C
+        for <kvm@vger.kernel.org>; Wed,  4 Aug 2021 01:58:57 -0700 (PDT)
+Received: by mail-qv1-xf4a.google.com with SMTP id b8-20020a0562141148b02902f1474ce8b7so1265458qvt.20
+        for <kvm@vger.kernel.org>; Wed, 04 Aug 2021 01:58:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=date:in-reply-to:message-id:mime-version:references:subject:from:to
          :cc;
-        bh=5F2XBId6Ml8d60ozFayhTnFPlnF21xMQYH0bLBzTlnY=;
-        b=P/k5j1VS70sB8KLubXHq8/9bo8zjwK2ApmesXmWhSfReRNFGLt7FgvYu9pxbL6CMou
-         jqHRyYf9SLnUjdLKJDC/uGZe+5hsYe27lfpfmoaEpKXJ0DV/3X4nK9CLFDBUyABhnYLK
-         0Z44gI8AjTXpmoIvCKRNQDfMcuTKGA36vz7aezWaRVzygXDtNs0MdO82Vja0e+m9cry0
-         BVMfsfEVyxRXREMb1Kyb9F5T0WGSTugrH4X2p9veldb6WExGhuBbstJKbJKsQrdZ1+C2
-         CXxBgk3nuMutZaqFqkrD2cNUjfrbWvLYbbUJX+u9gb95Zb/lCrlxb2YcX179DIalG6bX
-         kYow==
+        bh=P+wj7LgLjEuWRbpjKCXjEpBSkxsEIWcdrd+/OVNGjgQ=;
+        b=U2RWOObCpS8DFZJ10Fp2o+XLbL0l1Du9Q2Q9GE9WrsZOYR4vwBJQlSHULYkGmuvObp
+         qkHivooxec/DqyZKsQVcgoEPCJi+6nxBSJa++GLLq4UkYPeTO/PnhQU8BxXCanAd/n3b
+         1VAAXmzHLRgzm8XB6suWss1/HgHWX8AsDQjtvEEKe6uBRGu5tM62spN1T/IizoXmP1ZL
+         /bcqtSUX18eaq6JGBkF1Jl6CZbI9tnVwffM2msHBTiN69mXBBWf9eO+ZEhofwM/eDIVc
+         AgUFDx/s8u2xV/CUIjyX8OpmxWHZj6alRmINi+u/RPuPYEpQrLqUs/YiaPtSGXJY1Ysc
+         UVRg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=5F2XBId6Ml8d60ozFayhTnFPlnF21xMQYH0bLBzTlnY=;
-        b=NHZLWl3igLdGFTmQIFBdyLLAz96gKL8SflfAhuRj3bEFgqgClOMvgLXcNE9VHjj4za
-         0vIs4CunqSGxMNcYSmF5WXnHQ57z4an0Q74ZvSiP02bmSoqR/8oT3BBkjR3SoPxONrNT
-         lVB/ujjOs0lejEFvIPIwM3RTNvs05Q44KSWGT3MMhtcW5xN+4K2mfr4g/z/YRC41xgSu
-         b85WH5yvJt6d0WrwGAVb8Zf+SGfsf/xrNT1IuPbr+DDHkzBIifQ2crdgg4rDOUEii4nr
-         2xJRa7IyQ6hoQ1ium26b4VR8s3r6yKZ4Z9fN/iGkMNNS8maVCqqdMdnNbfz8UeLHtH89
-         9VWA==
-X-Gm-Message-State: AOAM530IiHEDY0XQxbFsD4+cggHBWtWMV1iZRZLn7zQOFvRwaXUfTMn8
-        N6W9KYC0STAU8ZDB0f4nD/i6pr0XPrpINE5B33CuXLDdQ9m3xK1krth2yIegJs3YTIkPNcmwOfR
-        HmOIWDtJXzk05PDLajBNe/G9JKCbzvX1MH8EHJ1YUh/uzYox5UbLi0esuXA==
-X-Google-Smtp-Source: ABdhPJyliD4AsBjXCLBTaK2m63jx3rCYhGHEqJklXaxkWK0zm/UKQW1pH50RYWgtA27P4BN9OFdyiRL9jr0=
+        bh=P+wj7LgLjEuWRbpjKCXjEpBSkxsEIWcdrd+/OVNGjgQ=;
+        b=nrYK8sTztx5gnKMXXUExpgsvRCtwk08o+UW5218E/aofJNH4hgfnC1O/2wUIOVHOid
+         3Ws6jGrCWU68VSS5nLkFt+z1Q9hoOgmpSa8shXxYohdBvZWn10won1XtJR/kbxOS7Spc
+         k9G1YsFaYK+ncqk+Msw/hymje9x+Shvp4BRgcX4gVtbM1wVOelcvowUR+gbnI3gyUyTx
+         430Y1PX1Nc/vf00SKBpCbzeW2BsFsyGaX/CX5DmHwMkIU3Gxb5e8qtIW66zmjM0b/KKM
+         lo3skHq4hpRXr2f6AA1Xn/Q3HQ7Dxawn5yXEA9pNNwcQDsaocAm5VAMTVcuQ5vZN5/Jj
+         3mLQ==
+X-Gm-Message-State: AOAM532uOVAz2n7S2Bv7/xdiZdasnCnpP+U+9wYknB9FGh8kzANxkSho
+        i+P3/h6UhMJYmM9PDBOGzVN6oBR1J4xxViHY6j5heQ6Ab1Wi7njvlufBRiyIglct2uhkkSF8BFK
+        G50W28PxSIO/WEgfVbwFTczatykb0Z5KyyUvvkVGT1lqi0+3pY/mp6jCWbA==
+X-Google-Smtp-Source: ABdhPJxwuRb6Dx8CoyJvkFTha9TsHjRjV9Svfskn24Ka80JcxAcKjGHT4By5V5+EQXZYVffGDUwuCZ/2cFY=
 X-Received: from oupton.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:404])
- (user=oupton job=sendgmr) by 2002:a25:5844:: with SMTP id m65mr33677475ybb.199.1628067535625;
- Wed, 04 Aug 2021 01:58:55 -0700 (PDT)
-Date:   Wed,  4 Aug 2021 08:58:17 +0000
+ (user=oupton job=sendgmr) by 2002:a05:6214:e67:: with SMTP id
+ jz7mr23858033qvb.0.1628067536659; Wed, 04 Aug 2021 01:58:56 -0700 (PDT)
+Date:   Wed,  4 Aug 2021 08:58:18 +0000
 In-Reply-To: <20210804085819.846610-1-oupton@google.com>
-Message-Id: <20210804085819.846610-20-oupton@google.com>
+Message-Id: <20210804085819.846610-21-oupton@google.com>
 Mime-Version: 1.0
 References: <20210804085819.846610-1-oupton@google.com>
 X-Mailer: git-send-email 2.32.0.605.g8dce9f2422-goog
-Subject: [PATCH v6 19/21] KVM: arm64: Emulate physical counter offsetting on
- non-ECV systems
+Subject: [PATCH v6 20/21] selftests: KVM: Test physical counter offsetting
 From:   Oliver Upton <oupton@google.com>
 To:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
 Cc:     Paolo Bonzini <pbonzini@redhat.com>,
@@ -76,232 +75,109 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Unfortunately, ECV hasn't yet arrived in any tangible hardware. At the
-same time, controlling the guest view of the physical counter-timer is
-useful. Support guest counter-timer offsetting on non-ECV systems by
-trapping guest accesses to the physical counter-timer. Emulate reads of
-the physical counter in the fast exit path.
+Test that userspace adjustment of the guest physical counter-timer
+results in the correct view within the guest.
 
+Cc: Andrew Jones <drjones@redhat.com>
 Signed-off-by: Oliver Upton <oupton@google.com>
 ---
- arch/arm64/include/asm/sysreg.h         |  1 +
- arch/arm64/kvm/arch_timer.c             | 53 +++++++++++++++----------
- arch/arm64/kvm/hyp/include/hyp/switch.h | 29 ++++++++++++++
- arch/arm64/kvm/hyp/nvhe/timer-sr.c      | 11 ++++-
- 4 files changed, 70 insertions(+), 24 deletions(-)
+ .../selftests/kvm/include/aarch64/processor.h | 12 +++++++
+ .../kvm/system_counter_offset_test.c          | 31 +++++++++++++++++--
+ 2 files changed, 40 insertions(+), 3 deletions(-)
 
-diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
-index c34672aa65b9..e49790ae5da4 100644
---- a/arch/arm64/include/asm/sysreg.h
-+++ b/arch/arm64/include/asm/sysreg.h
-@@ -505,6 +505,7 @@
- #define SYS_AMEVCNTR0_MEM_STALL		SYS_AMEVCNTR0_EL0(3)
+diff --git a/tools/testing/selftests/kvm/include/aarch64/processor.h b/tools/testing/selftests/kvm/include/aarch64/processor.h
+index 3168cdbae6ee..7f53d90e9512 100644
+--- a/tools/testing/selftests/kvm/include/aarch64/processor.h
++++ b/tools/testing/selftests/kvm/include/aarch64/processor.h
+@@ -141,4 +141,16 @@ static inline uint64_t read_cntvct_ordered(void)
+ 	return r;
+ }
  
- #define SYS_CNTFRQ_EL0			sys_reg(3, 3, 14, 0, 0)
-+#define SYS_CNTPCT_EL0			sys_reg(3, 3, 14, 0, 1)
++static inline uint64_t read_cntpct_ordered(void)
++{
++	uint64_t r;
++
++	__asm__ __volatile__("isb\n\t"
++			     "mrs %0, cntpct_el0\n\t"
++			     "isb\n\t"
++			     : "=r"(r));
++
++	return r;
++}
++
+ #endif /* SELFTEST_KVM_PROCESSOR_H */
+diff --git a/tools/testing/selftests/kvm/system_counter_offset_test.c b/tools/testing/selftests/kvm/system_counter_offset_test.c
+index ac933db83d03..82d26a45cc48 100644
+--- a/tools/testing/selftests/kvm/system_counter_offset_test.c
++++ b/tools/testing/selftests/kvm/system_counter_offset_test.c
+@@ -57,6 +57,9 @@ static uint64_t host_read_guest_system_counter(struct test_case *test)
  
- #define SYS_CNTP_TVAL_EL0		sys_reg(3, 3, 14, 2, 0)
- #define SYS_CNTP_CTL_EL0		sys_reg(3, 3, 14, 2, 1)
-diff --git a/arch/arm64/kvm/arch_timer.c b/arch/arm64/kvm/arch_timer.c
-index 9ead94aa867d..b7cb63acf2a0 100644
---- a/arch/arm64/kvm/arch_timer.c
-+++ b/arch/arm64/kvm/arch_timer.c
-@@ -51,7 +51,7 @@ static void kvm_arm_timer_write(struct kvm_vcpu *vcpu,
- static u64 kvm_arm_timer_read(struct kvm_vcpu *vcpu,
- 			      struct arch_timer_context *timer,
- 			      enum kvm_arch_timer_regs treg);
--static void kvm_timer_enable_traps_vhe(void);
-+static void kvm_timer_enable_traps_vhe(struct kvm_vcpu *vcpu);
+ enum arch_counter {
+ 	VIRTUAL,
++	PHYSICAL,
++	/* offset physical, read virtual */
++	PHYSICAL_READ_VIRTUAL,
+ };
  
- u32 timer_get_ctl(struct arch_timer_context *ctxt)
+ struct test_case {
+@@ -68,32 +71,54 @@ static struct test_case test_cases[] = {
+ 	{ .counter = VIRTUAL, .offset = 0 },
+ 	{ .counter = VIRTUAL, .offset = 180 * NSEC_PER_SEC },
+ 	{ .counter = VIRTUAL, .offset = -180 * NSEC_PER_SEC },
++	{ .counter = PHYSICAL, .offset = 0 },
++	{ .counter = PHYSICAL, .offset = 180 * NSEC_PER_SEC },
++	{ .counter = PHYSICAL, .offset = -180 * NSEC_PER_SEC },
++	{ .counter = PHYSICAL_READ_VIRTUAL, .offset = 0 },
++	{ .counter = PHYSICAL_READ_VIRTUAL, .offset = 180 * NSEC_PER_SEC },
++	{ .counter = PHYSICAL_READ_VIRTUAL, .offset = -180 * NSEC_PER_SEC },
+ };
+ 
+ static void check_preconditions(struct kvm_vm *vm)
  {
-@@ -175,6 +175,12 @@ static void timer_set_guest_offset(struct arch_timer_context *ctxt, u64 offset)
+-	if (vcpu_has_reg(vm, VCPU_ID, KVM_REG_ARM_TIMER_OFFSET))
++	if (vcpu_has_reg(vm, VCPU_ID, KVM_REG_ARM_TIMER_OFFSET) &&
++	    !_vcpu_has_device_attr(vm, VCPU_ID, KVM_ARM_VCPU_TIMER_CTRL,
++				   KVM_ARM_VCPU_TIMER_OFFSET))
+ 		return;
+ 
+-	print_skip("KVM_REG_ARM_TIMER_OFFSET not supported; skipping test");
++	print_skip("KVM_REG_ARM_TIMER_OFFSET|KVM_ARM_VCPU_TIMER_OFFSET not supported; skipping test");
+ 	exit(KSFT_SKIP);
+ }
+ 
+ static void setup_system_counter(struct kvm_vm *vm, struct test_case *test)
+ {
++	uint64_t cntvoff, cntpoff;
+ 	struct kvm_one_reg reg = {
+ 		.id = KVM_REG_ARM_TIMER_OFFSET,
+-		.addr = (__u64)&test->offset,
++		.addr = (__u64)&cntvoff,
+ 	};
+ 
++	if (test->counter == VIRTUAL) {
++		cntvoff = test->offset;
++		cntpoff = 0;
++	} else {
++		cntvoff = 0;
++		cntpoff = test->offset;
++	}
++
+ 	vcpu_set_reg(vm, VCPU_ID, &reg);
++	vcpu_access_device_attr(vm, VCPU_ID, KVM_ARM_VCPU_TIMER_CTRL,
++				KVM_ARM_VCPU_TIMER_OFFSET, &cntpoff, true);
+ }
+ 
+ static uint64_t guest_read_system_counter(struct test_case *test)
+ {
+ 	switch (test->counter) {
+ 	case VIRTUAL:
++	case PHYSICAL_READ_VIRTUAL:
+ 		return read_cntvct_ordered();
++	case PHYSICAL:
++		return read_cntpct_ordered();
+ 	default:
+ 		GUEST_ASSERT(0);
  	}
- }
- 
-+static bool ptimer_emulation_required(struct kvm_vcpu *vcpu)
-+{
-+	return timer_get_offset(vcpu_ptimer(vcpu)) &&
-+			!cpus_have_const_cap(ARM64_ECV);
-+}
-+
- u64 kvm_phys_timer_read(void)
- {
- 	return timecounter->cc->read(timecounter->cc);
-@@ -184,8 +190,13 @@ static void get_timer_map(struct kvm_vcpu *vcpu, struct timer_map *map)
- {
- 	if (has_vhe()) {
- 		map->direct_vtimer = vcpu_vtimer(vcpu);
--		map->direct_ptimer = vcpu_ptimer(vcpu);
--		map->emul_ptimer = NULL;
-+		if (!ptimer_emulation_required(vcpu)) {
-+			map->direct_ptimer = vcpu_ptimer(vcpu);
-+			map->emul_ptimer = NULL;
-+		} else {
-+			map->direct_ptimer = NULL;
-+			map->emul_ptimer = vcpu_ptimer(vcpu);
-+		}
- 	} else {
- 		map->direct_vtimer = vcpu_vtimer(vcpu);
- 		map->direct_ptimer = NULL;
-@@ -671,7 +682,7 @@ void kvm_timer_vcpu_load(struct kvm_vcpu *vcpu)
- 		timer_emulate(map.emul_ptimer);
- 
- 	if (has_vhe())
--		kvm_timer_enable_traps_vhe();
-+		kvm_timer_enable_traps_vhe(vcpu);
- }
- 
- bool kvm_timer_should_notify_user(struct kvm_vcpu *vcpu)
-@@ -1392,22 +1403,29 @@ int kvm_timer_enable(struct kvm_vcpu *vcpu)
-  * The host kernel runs at EL2 with HCR_EL2.TGE == 1,
-  * and this makes those bits have no effect for the host kernel execution.
-  */
--static void kvm_timer_enable_traps_vhe(void)
-+static void kvm_timer_enable_traps_vhe(struct kvm_vcpu *vcpu)
- {
- 	/* When HCR_EL2.E2H ==1, EL1PCEN and EL1PCTEN are shifted by 10 */
- 	u32 cnthctl_shift = 10;
--	u64 val;
-+	u64 val, mask;
-+
-+	mask = CNTHCTL_EL1PCEN << cnthctl_shift;
-+	mask |= CNTHCTL_EL1PCTEN << cnthctl_shift;
- 
--	/*
--	 * VHE systems allow the guest direct access to the EL1 physical
--	 * timer/counter.
--	 */
- 	val = read_sysreg(cnthctl_el2);
--	val |= (CNTHCTL_EL1PCEN << cnthctl_shift);
--	val |= (CNTHCTL_EL1PCTEN << cnthctl_shift);
- 
- 	if (cpus_have_const_cap(ARM64_ECV))
- 		val |= CNTHCTL_ECV;
-+
-+	/*
-+	 * VHE systems allow the guest direct access to the EL1 physical
-+	 * timer/counter if offsetting isn't requested on a non-ECV system.
-+	 */
-+	if (ptimer_emulation_required(vcpu))
-+		val &= ~mask;
-+	else
-+		val |= mask;
-+
- 	write_sysreg(val, cnthctl_el2);
- }
- 
-@@ -1462,9 +1480,6 @@ static int kvm_arm_timer_set_attr_offset(struct kvm_vcpu *vcpu,
- 	u64 __user *uaddr = (u64 __user *)(long)attr->addr;
- 	u64 offset;
- 
--	if (!cpus_have_const_cap(ARM64_ECV))
--		return -ENXIO;
--
- 	if (get_user(offset, uaddr))
- 		return -EFAULT;
- 
-@@ -1513,9 +1528,6 @@ static int kvm_arm_timer_get_attr_offset(struct kvm_vcpu *vcpu,
- 	u64 __user *uaddr = (u64 __user *)(long)attr->addr;
- 	u64 offset;
- 
--	if (!cpus_have_const_cap(ARM64_ECV))
--		return -ENXIO;
--
- 	offset = timer_get_offset(vcpu_ptimer(vcpu));
- 	return put_user(offset, uaddr);
- }
-@@ -1539,11 +1551,8 @@ int kvm_arm_timer_has_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr)
- 	switch (attr->attr) {
- 	case KVM_ARM_VCPU_TIMER_IRQ_VTIMER:
- 	case KVM_ARM_VCPU_TIMER_IRQ_PTIMER:
--		return 0;
- 	case KVM_ARM_VCPU_TIMER_OFFSET:
--		if (cpus_have_const_cap(ARM64_ECV))
--			return 0;
--		break;
-+		return 0;
- 	}
- 
- 	return -ENXIO;
-diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
-index e4a2f295a394..abd3813a709e 100644
---- a/arch/arm64/kvm/hyp/include/hyp/switch.h
-+++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
-@@ -15,6 +15,7 @@
- #include <linux/jump_label.h>
- #include <uapi/linux/psci.h>
- 
-+#include <kvm/arm_arch_timer.h>
- #include <kvm/arm_psci.h>
- 
- #include <asm/barrier.h>
-@@ -405,6 +406,31 @@ static inline bool __hyp_handle_ptrauth(struct kvm_vcpu *vcpu)
- 	return true;
- }
- 
-+static inline u64 __timer_read_cntpct(struct kvm_vcpu *vcpu)
-+{
-+	return __arch_counter_get_cntpct() - vcpu_ptimer(vcpu)->host_offset;
-+}
-+
-+static inline bool __hyp_handle_counter(struct kvm_vcpu *vcpu)
-+{
-+	u32 sysreg;
-+	int rt;
-+	u64 rv;
-+
-+	if (kvm_vcpu_trap_get_class(vcpu) != ESR_ELx_EC_SYS64)
-+		return false;
-+
-+	sysreg = esr_sys64_to_sysreg(kvm_vcpu_get_esr(vcpu));
-+	if (sysreg != SYS_CNTPCT_EL0)
-+		return false;
-+
-+	rt = kvm_vcpu_sys_get_rt(vcpu);
-+	rv = __timer_read_cntpct(vcpu);
-+	vcpu_set_reg(vcpu, rt, rv);
-+	__kvm_skip_instr(vcpu);
-+	return true;
-+}
-+
- /*
-  * Return true when we were able to fixup the guest exit and should return to
-  * the guest, false when we should restore the host state and return to the
-@@ -439,6 +465,9 @@ static inline bool fixup_guest_exit(struct kvm_vcpu *vcpu, u64 *exit_code)
- 	if (*exit_code != ARM_EXCEPTION_TRAP)
- 		goto exit;
- 
-+	if (__hyp_handle_counter(vcpu))
-+		goto guest;
-+
- 	if (cpus_have_final_cap(ARM64_WORKAROUND_CAVIUM_TX2_219_TVM) &&
- 	    kvm_vcpu_trap_get_class(vcpu) == ESR_ELx_EC_SYS64 &&
- 	    handle_tx2_tvm(vcpu))
-diff --git a/arch/arm64/kvm/hyp/nvhe/timer-sr.c b/arch/arm64/kvm/hyp/nvhe/timer-sr.c
-index 5b8b4cd02506..67236c2e0ba7 100644
---- a/arch/arm64/kvm/hyp/nvhe/timer-sr.c
-+++ b/arch/arm64/kvm/hyp/nvhe/timer-sr.c
-@@ -44,10 +44,17 @@ void __timer_enable_traps(struct kvm_vcpu *vcpu)
- 
- 	/*
- 	 * Disallow physical timer access for the guest
--	 * Physical counter access is allowed
- 	 */
- 	val = read_sysreg(cnthctl_el2);
- 	val &= ~CNTHCTL_EL1PCEN;
--	val |= CNTHCTL_EL1PCTEN;
-+
-+	/*
-+	 * Disallow physical counter access for the guest if offsetting is
-+	 * requested on a non-ECV system.
-+	 */
-+	if (vcpu_ptimer(vcpu)->host_offset && !cpus_have_const_cap(ARM64_ECV))
-+		val &= ~CNTHCTL_EL1PCTEN;
-+	else
-+		val |= CNTHCTL_EL1PCTEN;
- 	write_sysreg(val, cnthctl_el2);
- }
 -- 
 2.32.0.605.g8dce9f2422-goog
 
