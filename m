@@ -2,56 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1EC6F3DFD64
-	for <lists+kvm@lfdr.de>; Wed,  4 Aug 2021 10:58:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D73C93DFD67
+	for <lists+kvm@lfdr.de>; Wed,  4 Aug 2021 10:58:45 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236822AbhHDI6y (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 4 Aug 2021 04:58:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35060 "EHLO
+        id S236839AbhHDI6z (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 4 Aug 2021 04:58:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35066 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235421AbhHDI6x (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 4 Aug 2021 04:58:53 -0400
-Received: from mail-io1-xd4a.google.com (mail-io1-xd4a.google.com [IPv6:2607:f8b0:4864:20::d4a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F3895C0613D5
-        for <kvm@vger.kernel.org>; Wed,  4 Aug 2021 01:58:40 -0700 (PDT)
-Received: by mail-io1-xd4a.google.com with SMTP id d7-20020a6b6e070000b02904c0978ed194so1062536ioh.10
-        for <kvm@vger.kernel.org>; Wed, 04 Aug 2021 01:58:40 -0700 (PDT)
+        with ESMTP id S235421AbhHDI6y (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 4 Aug 2021 04:58:54 -0400
+Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 217E9C0613D5
+        for <kvm@vger.kernel.org>; Wed,  4 Aug 2021 01:58:42 -0700 (PDT)
+Received: by mail-yb1-xb4a.google.com with SMTP id j9-20020a2581490000b02905897d81c63fso2250482ybm.8
+        for <kvm@vger.kernel.org>; Wed, 04 Aug 2021 01:58:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=date:in-reply-to:message-id:mime-version:references:subject:from:to
          :cc;
-        bh=x8LPWtdOqJCGz9ZSpM5JrXHjuEyQMoplDMq1Km+kgH0=;
-        b=Au6D/Rvztr8x+Su+/oHB1zmQdKPKKOPs60i1D7hXkjYp9l6h0j9DWswHbfoi6cMVx/
-         cjoothQhTFpqD3jSDCQ24VbgRhP1N00BTGfvSVXqc4pdGyfiOUF8th/2oUMCVzTjs/E8
-         WPDPC+v5GLCMg0rbTM5na3j7fyRd/GR0XorrJHmYMLeYrhtyAlVC+ghXc+An64/+5N5Z
-         fVLCeWG7KQ9TzW6MjKrc2hASzDgjGZcA9GK0/shvksegM3ZLWPdVozZazOshAoEZ9GbX
-         WDlgqr8qPRDdjK/ffvbsn+J+q78H7XPdFth0NkJZaioxy4IovF4YAdBGOXh+JbNq/Bz+
-         PnLw==
+        bh=QZYUzbcXutG2B1XPKYDDaowrOTkrdRCYpxjQmfgRBqw=;
+        b=fg8ZdJyTO1IzZwQnyFmtQzBLyvzLg3oWs5Mwrvzrq7RU1rdysfWLN2A/CA6201R02a
+         9x/yYSHRuUETBU088OpH41tdmTezHXghlym7jalL4hNQj9khOjSNah3nmR20olJYlpGM
+         NL9UDv3ftB1FzNYvmaswYPXp0iJ0GOb9T8RcGftr9OzVhNA3piITvnnmbrvRoEKYaUs3
+         TAbiN9VHBzEih5yBmaD0TSgq4w33jIlobvj6FE10tdMiUbNXovPf3cPu5j0dQjIYAP24
+         xcRWGMUyhFLsg7YJPN15v+gKZLMR1hpOHVLDuC1OOWN4vglBYkL+5BSD3FbMNsMZGkwn
+         KpMw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=x8LPWtdOqJCGz9ZSpM5JrXHjuEyQMoplDMq1Km+kgH0=;
-        b=rRJLoYmhRqPtE5pB2v+11EZ2KeBFJT5vhOg2ooU+VyeqZN1cOXROSP1rfiNL9TFFw0
-         zlw+HdUu5Zm4RoVfXxl7SZEy0i0tu1kBvRTy75dflbLpBG651Gzcm8FXlAdrf8sllofd
-         vOO1SNvg6LPlFFWSoioM1XCwDHcBhB8OvCdMibouhZqNOdCVHRLhRGA6V289MytzejJn
-         LeaxoNxiiZryvHJyKotDoaBnJ+cB7cbKcGe4hnaq7S8GciT5jVfDxUgYppBt31C1KpcX
-         yjXeaTf+DoOKKHfA1jwCz3rFgqh49uqNDhfMA4ASyNNgwjGY1xfY2DKYpj6++KzTr6WV
-         VZ3Q==
-X-Gm-Message-State: AOAM530tdaD9qUJneu3yhAeyim1Rt26pCRRU2Nk6b2VNdO2zssu0V3KZ
-        01g8dk3NpU0+iLin4Vh6tMTZYz8lZfOy8Opk9RM7suuwgBIWkK7G0hdTdsDk/skUZP6vzDD8/iq
-        2Gio6gQ22vsH6c1yb0j+Ov4gI9wm5ZaqYn+BBM+EzE+wv9257w3g0LkMd9Q==
-X-Google-Smtp-Source: ABdhPJwJZUENE+FwWb/7dNEy0PuIQl8TXpDew9XDjDz/fQ4geLk3Q3U6VoPSJg0+mNpCuFaUZohuvLgh4W8=
+        bh=QZYUzbcXutG2B1XPKYDDaowrOTkrdRCYpxjQmfgRBqw=;
+        b=JwbuF/CHYBdfggpa75qHYDiE4Wum814xn6q80r8GD8ouva9qoR4/K+Fc8qsD43QJZ/
+         cxPGzOF61Bl0MBZYr55I1fVufq9EiYW99o8kHXRQtNbyQiibjAIZ7A/iZOuPHdaGPrdp
+         dyWE/vBCJUqiKFdVpzgUI60yn+hvsLmkJUNSJLcUz9aG3uRLXNwbW5rWjFabXsqvn2kk
+         JCji/U+c3HUVbOQz9Zsc0/WZ6ddojJYutQFgS08Kvh5JiVRZEVVGH993bfgs1qcQL/dJ
+         xpeTxI0X99HQ7MrNh4z6/PvtDlA3IYC9Ta3rxp4R2p1267JJ95Hyqpc3DcWpwdEFy1R7
+         emQA==
+X-Gm-Message-State: AOAM532l4DTnmkEpjl93NttrhTYiEDYnQSEqdEHHYiz9THO0c0wktNUI
+        8qf75CaPqpqJ0o3WW/M9pGZUcNdd7p7O1YfZ3PjzsDtponduaaIThRnIbKnLPgOiDOI+BGrvUDR
+        gLP65JxKMGcQsmiNKnSDRLxD1QcIVmqF5ETaa0u5N0BRjkf3ASvlGXP0UVA==
+X-Google-Smtp-Source: ABdhPJxV6+3gLGbTheDt4LD8pHoTTfHfR6GcLwPPsqBvh7B9FGBWOPkR9xVf9DHE0p02LBy+6d+tyicSFeI=
 X-Received: from oupton.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:404])
- (user=oupton job=sendgmr) by 2002:a5e:c803:: with SMTP id y3mr762616iol.107.1628067520327;
- Wed, 04 Aug 2021 01:58:40 -0700 (PDT)
-Date:   Wed,  4 Aug 2021 08:58:03 +0000
+ (user=oupton job=sendgmr) by 2002:a25:4283:: with SMTP id p125mr35878914yba.184.1628067521137;
+ Wed, 04 Aug 2021 01:58:41 -0700 (PDT)
+Date:   Wed,  4 Aug 2021 08:58:04 +0000
 In-Reply-To: <20210804085819.846610-1-oupton@google.com>
-Message-Id: <20210804085819.846610-6-oupton@google.com>
+Message-Id: <20210804085819.846610-7-oupton@google.com>
 Mime-Version: 1.0
 References: <20210804085819.846610-1-oupton@google.com>
 X-Mailer: git-send-email 2.32.0.605.g8dce9f2422-goog
-Subject: [PATCH v6 05/21] KVM: x86: Expose TSC offset controls to userspace
+Subject: [PATCH v6 06/21] tools: arch: x86: pull in pvclock headers
 From:   Oliver Upton <oupton@google.com>
 To:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
 Cc:     Paolo Bonzini <pbonzini@redhat.com>,
@@ -75,253 +75,180 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-To date, VMM-directed TSC synchronization and migration has been a bit
-messy. KVM has some baked-in heuristics around TSC writes to infer if
-the VMM is attempting to synchronize. This is problematic, as it depends
-on host userspace writing to the guest's TSC within 1 second of the last
-write.
+Copy over approximately clean versions of the pvclock headers into
+tools. Reconcile headers/symbols missing in tools that are unneeded.
 
-A much cleaner approach to configuring the guest's views of the TSC is to
-simply migrate the TSC offset for every vCPU. Offsets are idempotent,
-and thus not subject to change depending on when the VMM actually
-reads/writes values from/to KVM. The VMM can then read the TSC once with
-KVM_GET_CLOCK to capture a (realtime, host_tsc) pair at the instant when
-the guest is paused.
-
-Cc: David Matlack <dmatlack@google.com>
-Cc: Sean Christopherson <seanjc@google.com>
 Signed-off-by: Oliver Upton <oupton@google.com>
 ---
- Documentation/virt/kvm/devices/vcpu.rst |  57 +++++++++++++
- arch/x86/include/asm/kvm_host.h         |   1 +
- arch/x86/include/uapi/asm/kvm.h         |   4 +
- arch/x86/kvm/x86.c                      | 109 ++++++++++++++++++++++++
- 4 files changed, 171 insertions(+)
+ tools/arch/x86/include/asm/pvclock-abi.h |  48 +++++++++++
+ tools/arch/x86/include/asm/pvclock.h     | 103 +++++++++++++++++++++++
+ 2 files changed, 151 insertions(+)
+ create mode 100644 tools/arch/x86/include/asm/pvclock-abi.h
+ create mode 100644 tools/arch/x86/include/asm/pvclock.h
 
-diff --git a/Documentation/virt/kvm/devices/vcpu.rst b/Documentation/virt/kvm/devices/vcpu.rst
-index 2acec3b9ef65..3b399d727c11 100644
---- a/Documentation/virt/kvm/devices/vcpu.rst
-+++ b/Documentation/virt/kvm/devices/vcpu.rst
-@@ -161,3 +161,60 @@ Specifies the base address of the stolen time structure for this VCPU. The
- base address must be 64 byte aligned and exist within a valid guest memory
- region. See Documentation/virt/kvm/arm/pvtime.rst for more information
- including the layout of the stolen time structure.
+diff --git a/tools/arch/x86/include/asm/pvclock-abi.h b/tools/arch/x86/include/asm/pvclock-abi.h
+new file mode 100644
+index 000000000000..1436226efe3e
+--- /dev/null
++++ b/tools/arch/x86/include/asm/pvclock-abi.h
+@@ -0,0 +1,48 @@
++/* SPDX-License-Identifier: GPL-2.0 */
++#ifndef _ASM_X86_PVCLOCK_ABI_H
++#define _ASM_X86_PVCLOCK_ABI_H
++#ifndef __ASSEMBLY__
 +
-+4. GROUP: KVM_VCPU_TSC_CTRL
-+===========================
++/*
++ * These structs MUST NOT be changed.
++ * They are the ABI between hypervisor and guest OS.
++ * Both Xen and KVM are using this.
++ *
++ * pvclock_vcpu_time_info holds the system time and the tsc timestamp
++ * of the last update. So the guest can use the tsc delta to get a
++ * more precise system time.  There is one per virtual cpu.
++ *
++ * pvclock_wall_clock references the point in time when the system
++ * time was zero (usually boot time), thus the guest calculates the
++ * current wall clock by adding the system time.
++ *
++ * Protocol for the "version" fields is: hypervisor raises it (making
++ * it uneven) before it starts updating the fields and raises it again
++ * (making it even) when it is done.  Thus the guest can make sure the
++ * time values it got are consistent by checking the version before
++ * and after reading them.
++ */
 +
-+:Architectures: x86
++struct pvclock_vcpu_time_info {
++	u32   version;
++	u32   pad0;
++	u64   tsc_timestamp;
++	u64   system_time;
++	u32   tsc_to_system_mul;
++	s8    tsc_shift;
++	u8    flags;
++	u8    pad[2];
++} __attribute__((__packed__)); /* 32 bytes */
 +
-+4.1 ATTRIBUTE: KVM_VCPU_TSC_OFFSET
++struct pvclock_wall_clock {
++	u32   version;
++	u32   sec;
++	u32   nsec;
++} __attribute__((__packed__));
 +
-+:Parameters: 64-bit unsigned TSC offset
++#define PVCLOCK_TSC_STABLE_BIT	(1 << 0)
++#define PVCLOCK_GUEST_STOPPED	(1 << 1)
++/* PVCLOCK_COUNTS_FROM_ZERO broke ABI and can't be used anymore. */
++#define PVCLOCK_COUNTS_FROM_ZERO (1 << 2)
++#endif /* __ASSEMBLY__ */
++#endif /* _ASM_X86_PVCLOCK_ABI_H */
+diff --git a/tools/arch/x86/include/asm/pvclock.h b/tools/arch/x86/include/asm/pvclock.h
+new file mode 100644
+index 000000000000..2628f9a6330b
+--- /dev/null
++++ b/tools/arch/x86/include/asm/pvclock.h
+@@ -0,0 +1,103 @@
++/* SPDX-License-Identifier: GPL-2.0 */
++#ifndef _ASM_X86_PVCLOCK_H
++#define _ASM_X86_PVCLOCK_H
 +
-+Returns:
++#include <asm/barrier.h>
++#include <asm/pvclock-abi.h>
 +
-+	 ======= ======================================
-+	 -EFAULT Error reading/writing the provided
-+		 parameter address.
-+	 -ENXIO  Attribute not supported
-+	 ======= ======================================
++/* some helper functions for xen and kvm pv clock sources */
++u64 pvclock_clocksource_read(struct pvclock_vcpu_time_info *src);
++u8 pvclock_read_flags(struct pvclock_vcpu_time_info *src);
++void pvclock_set_flags(u8 flags);
++unsigned long pvclock_tsc_khz(struct pvclock_vcpu_time_info *src);
++void pvclock_resume(void);
 +
-+Specifies the guest's TSC offset relative to the host's TSC. The guest's
-+TSC is then derived by the following equation:
++void pvclock_touch_watchdogs(void);
 +
-+  guest_tsc = host_tsc + KVM_VCPU_TSC_OFFSET
-+
-+This attribute is useful for the precise migration of a guest's TSC. The
-+following describes a possible algorithm to use for the migration of a
-+guest's TSC:
-+
-+From the source VMM process:
-+
-+1. Invoke the KVM_GET_CLOCK ioctl to record the host TSC (t_0),
-+   kvmclock nanoseconds (k_0), and realtime nanoseconds (r_0).
-+
-+2. Read the KVM_VCPU_TSC_OFFSET attribute for every vCPU to record the
-+   guest TSC offset (off_n).
-+
-+3. Invoke the KVM_GET_TSC_KHZ ioctl to record the frequency of the
-+   guest's TSC (freq).
-+
-+From the destination VMM process:
-+
-+4. Invoke the KVM_SET_CLOCK ioctl, providing the kvmclock nanoseconds
-+   (k_0) and realtime nanoseconds (r_0) in their respective fields.
-+   Ensure that the KVM_CLOCK_REALTIME flag is set in the provided
-+   structure. KVM will advance the VM's kvmclock to account for elapsed
-+   time since recording the clock values.
-+
-+5. Invoke the KVM_GET_CLOCK ioctl to record the host TSC (t_1) and
-+   kvmclock nanoseconds (k_1).
-+
-+6. Adjust the guest TSC offsets for every vCPU to account for (1) time
-+   elapsed since recording state and (2) difference in TSCs between the
-+   source and destination machine:
-+
-+   new_off_n = t_0 + off_n + (k_1 - k_0) * freq - t_1
-+
-+7. Write the KVM_VCPU_TSC_OFFSET attribute for every vCPU with the
-+   respective value derived in the previous step.
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index d6376ca8efce..e9bfc00692fb 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -1064,6 +1064,7 @@ struct kvm_arch {
- 	u64 last_tsc_nsec;
- 	u64 last_tsc_write;
- 	u32 last_tsc_khz;
-+	u64 last_tsc_offset;
- 	u64 cur_tsc_nsec;
- 	u64 cur_tsc_write;
- 	u64 cur_tsc_offset;
-diff --git a/arch/x86/include/uapi/asm/kvm.h b/arch/x86/include/uapi/asm/kvm.h
-index a6c327f8ad9e..0b22e1e84e78 100644
---- a/arch/x86/include/uapi/asm/kvm.h
-+++ b/arch/x86/include/uapi/asm/kvm.h
-@@ -503,4 +503,8 @@ struct kvm_pmu_event_filter {
- #define KVM_PMU_EVENT_ALLOW 0
- #define KVM_PMU_EVENT_DENY 1
- 
-+/* for KVM_{GET,SET,HAS}_DEVICE_ATTR */
-+#define KVM_VCPU_TSC_CTRL 0 /* control group for the timestamp counter (TSC) */
-+#define   KVM_VCPU_TSC_OFFSET 0 /* attribute for the TSC offset */
-+
- #endif /* _ASM_X86_KVM_H */
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 91aea751d621..3fdad71e5a36 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -2466,6 +2466,7 @@ static void __kvm_synchronize_tsc(struct kvm_vcpu *vcpu, u64 offset, u64 tsc,
- 	kvm->arch.last_tsc_nsec = ns;
- 	kvm->arch.last_tsc_write = tsc;
- 	kvm->arch.last_tsc_khz = vcpu->arch.virtual_tsc_khz;
-+	kvm->arch.last_tsc_offset = offset;
- 
- 	vcpu->arch.last_guest_tsc = tsc;
- 
-@@ -4924,6 +4925,109 @@ static int kvm_set_guest_paused(struct kvm_vcpu *vcpu)
- 	return 0;
- }
- 
-+static int kvm_arch_tsc_has_attr(struct kvm_vcpu *vcpu,
-+				 struct kvm_device_attr *attr)
++static __always_inline
++unsigned pvclock_read_begin(const struct pvclock_vcpu_time_info *src)
 +{
-+	int r;
-+
-+	switch (attr->attr) {
-+	case KVM_VCPU_TSC_OFFSET:
-+		r = 0;
-+		break;
-+	default:
-+		r = -ENXIO;
-+	}
-+
-+	return r;
++	unsigned version = src->version & ~1;
++	/* Make sure that the version is read before the data. */
++	rmb();
++	return version;
 +}
 +
-+static int kvm_arch_tsc_get_attr(struct kvm_vcpu *vcpu,
-+				 struct kvm_device_attr *attr)
++static __always_inline
++bool pvclock_read_retry(const struct pvclock_vcpu_time_info *src,
++			unsigned version)
 +{
-+	u64 __user *uaddr = (u64 __user *)attr->addr;
-+	int r;
-+
-+	switch (attr->attr) {
-+	case KVM_VCPU_TSC_OFFSET:
-+		r = -EFAULT;
-+		if (put_user(vcpu->arch.l1_tsc_offset, uaddr))
-+			break;
-+		r = 0;
-+		break;
-+	default:
-+		r = -ENXIO;
-+	}
-+
-+	return r;
++	/* Make sure that the version is re-read after the data. */
++	rmb();
++	return version != src->version;
 +}
 +
-+static int kvm_arch_tsc_set_attr(struct kvm_vcpu *vcpu,
-+				 struct kvm_device_attr *attr)
++/*
++ * Scale a 64-bit delta by scaling and multiplying by a 32-bit fraction,
++ * yielding a 64-bit result.
++ */
++static inline u64 pvclock_scale_delta(u64 delta, u32 mul_frac, int shift)
 +{
-+	u64 __user *uaddr = (u64 __user *)attr->addr;
-+	struct kvm *kvm = vcpu->kvm;
-+	int r;
++	u64 product;
++#ifdef __i386__
++	u32 tmp1, tmp2;
++#else
++	unsigned long tmp;
++#endif
 +
-+	switch (attr->attr) {
-+	case KVM_VCPU_TSC_OFFSET: {
-+		u64 offset, tsc, ns;
-+		unsigned long flags;
-+		bool matched;
++	if (shift < 0)
++		delta >>= -shift;
++	else
++		delta <<= shift;
 +
-+		r = -EFAULT;
-+		if (get_user(offset, uaddr))
-+			break;
++#ifdef __i386__
++	__asm__ (
++		"mul  %5       ; "
++		"mov  %4,%%eax ; "
++		"mov  %%edx,%4 ; "
++		"mul  %5       ; "
++		"xor  %5,%5    ; "
++		"add  %4,%%eax ; "
++		"adc  %5,%%edx ; "
++		: "=A" (product), "=r" (tmp1), "=r" (tmp2)
++		: "a" ((u32)delta), "1" ((u32)(delta >> 32)), "2" (mul_frac) );
++#elif defined(__x86_64__)
++	__asm__ (
++		"mulq %[mul_frac] ; shrd $32, %[hi], %[lo]"
++		: [lo]"=a"(product),
++		  [hi]"=d"(tmp)
++		: "0"(delta),
++		  [mul_frac]"rm"((u64)mul_frac));
++#else
++#error implement me!
++#endif
 +
-+		raw_spin_lock_irqsave(&kvm->arch.tsc_write_lock, flags);
-+
-+		matched = (vcpu->arch.virtual_tsc_khz &&
-+			   kvm->arch.last_tsc_khz == vcpu->arch.virtual_tsc_khz &&
-+			   kvm->arch.last_tsc_offset == offset);
-+
-+		tsc = kvm_scale_tsc(vcpu, rdtsc(), vcpu->arch.l1_tsc_scaling_ratio) + offset;
-+		ns = get_kvmclock_base_ns();
-+
-+		__kvm_synchronize_tsc(vcpu, offset, tsc, ns, matched);
-+		raw_spin_unlock_irqrestore(&kvm->arch.tsc_write_lock, flags);
-+
-+		r = 0;
-+		break;
-+	}
-+	default:
-+		r = -ENXIO;
-+	}
-+
-+	return r;
++	return product;
 +}
 +
-+static int kvm_vcpu_ioctl_device_attr(struct kvm_vcpu *vcpu,
-+				      unsigned int ioctl,
-+				      void __user *argp)
++static __always_inline
++u64 __pvclock_read_cycles(const struct pvclock_vcpu_time_info *src, u64 tsc)
 +{
-+	struct kvm_device_attr attr;
-+	int r;
-+
-+	if (copy_from_user(&attr, argp, sizeof(attr)))
-+		return -EFAULT;
-+
-+	if (attr.group != KVM_VCPU_TSC_CTRL)
-+		return -ENXIO;
-+
-+	switch (ioctl) {
-+	case KVM_HAS_DEVICE_ATTR:
-+		r = kvm_arch_tsc_has_attr(vcpu, &attr);
-+		break;
-+	case KVM_GET_DEVICE_ATTR:
-+		r = kvm_arch_tsc_get_attr(vcpu, &attr);
-+		break;
-+	case KVM_SET_DEVICE_ATTR:
-+		r = kvm_arch_tsc_set_attr(vcpu, &attr);
-+		break;
-+	}
-+
-+	return r;
++	u64 delta = tsc - src->tsc_timestamp;
++	u64 offset = pvclock_scale_delta(delta, src->tsc_to_system_mul,
++					     src->tsc_shift);
++	return src->system_time + offset;
 +}
 +
- static int kvm_vcpu_ioctl_enable_cap(struct kvm_vcpu *vcpu,
- 				     struct kvm_enable_cap *cap)
- {
-@@ -5378,6 +5482,11 @@ long kvm_arch_vcpu_ioctl(struct file *filp,
- 		r = __set_sregs2(vcpu, u.sregs2);
- 		break;
- 	}
-+	case KVM_HAS_DEVICE_ATTR:
-+	case KVM_GET_DEVICE_ATTR:
-+	case KVM_SET_DEVICE_ATTR:
-+		r = kvm_vcpu_ioctl_device_attr(vcpu, ioctl, argp);
-+		break;
- 	default:
- 		r = -EINVAL;
- 	}
++struct pvclock_vsyscall_time_info {
++	struct pvclock_vcpu_time_info pvti;
++} __attribute__((__aligned__(64)));
++
++#define PVTI_SIZE sizeof(struct pvclock_vsyscall_time_info)
++
++#ifdef CONFIG_PARAVIRT_CLOCK
++void pvclock_set_pvti_cpu0_va(struct pvclock_vsyscall_time_info *pvti);
++struct pvclock_vsyscall_time_info *pvclock_get_pvti_cpu0_va(void);
++#else
++static inline struct pvclock_vsyscall_time_info *pvclock_get_pvti_cpu0_va(void)
++{
++	return NULL;
++}
++#endif
++
++#endif /* _ASM_X86_PVCLOCK_H */
 -- 
 2.32.0.605.g8dce9f2422-goog
 
