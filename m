@@ -2,158 +2,157 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 35EC63E03A4
-	for <lists+kvm@lfdr.de>; Wed,  4 Aug 2021 16:46:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B0C8A3E0415
+	for <lists+kvm@lfdr.de>; Wed,  4 Aug 2021 17:24:00 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238713AbhHDOqO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 4 Aug 2021 10:46:14 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:52613 "EHLO
+        id S238973AbhHDPYL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 4 Aug 2021 11:24:11 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:46303 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S238705AbhHDOqM (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 4 Aug 2021 10:46:12 -0400
+        by vger.kernel.org with ESMTP id S238914AbhHDPYJ (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 4 Aug 2021 11:24:09 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1628088360;
+        s=mimecast20190719; t=1628090636;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=AtaANfQj7G/12fLVNP8ZEKFYhS90aaah+dzycPwvl7A=;
-        b=Usu6I00m+mSEcxWiwh3g4zK7cRSdWg8hljF/vK2YHxHSKrJyyvf4VL4FIUNdj7z4H/2HUu
-        K//1pNnNpJfj7SuGRSuHVl3i08+7Eu0fKmIQzZyOw37kEwEc5VsMwknI9axeIzQtWJJw2w
-        bkS/junpB8xjJQ68JHAZmg67MCpROV8=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-358-RluIBlZvO3Ovj2uUiEH8Iw-1; Wed, 04 Aug 2021 10:45:58 -0400
-X-MC-Unique: RluIBlZvO3Ovj2uUiEH8Iw-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1A30AC7400;
-        Wed,  4 Aug 2021 14:45:56 +0000 (UTC)
-Received: from starship (unknown [10.35.206.50])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 8255410016F2;
-        Wed,  4 Aug 2021 14:45:44 +0000 (UTC)
-Message-ID: <c82a3abe00d387985ac806c8ff062cc29e192bbd.camel@redhat.com>
-Subject: Re: [RFC PATCH 1/4] KVM: selftests: Add support for creating
- non-default type VMs
-From:   Maxim Levitsky <mlevitsk@redhat.com>
-To:     Xiaoyao Li <xiaoyao.li@intel.com>,
-        Erdem Aktas <erdemaktas@google.com>,
-        linux-kselftest@vger.kernel.org
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Peter Gonda <pgonda@google.com>, Marc Orr <marcorr@google.com>,
-        Sagi Shahar <sagis@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Shuah Khan <shuah@kernel.org>,
-        Andrew Jones <drjones@redhat.com>,
-        Ben Gardon <bgardon@google.com>, Peter Xu <peterx@redhat.com>,
-        David Matlack <dmatlack@google.com>,
-        Emanuele Giuseppe Esposito <eesposit@redhat.com>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Ricardo Koller <ricarkol@google.com>,
-        Eric Auger <eric.auger@redhat.com>,
-        Yanan Wang <wangyanan55@huawei.com>,
-        Aaron Lewis <aaronlewis@google.com>,
-        Jim Mattson <jmattson@google.com>,
-        Oliver Upton <oupton@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Peter Shier <pshier@google.com>,
-        Axel Rasmussen <axelrasmussen@google.com>,
-        Zhenzhong Duan <zhenzhong.duan@intel.com>,
-        "Maciej S. Szmigiero" <maciej.szmigiero@oracle.com>,
-        Like Xu <like.xu@linux.intel.com>,
-        open list <linux-kernel@vger.kernel.org>,
-        "open list:KERNEL VIRTUAL MACHINE (KVM)" <kvm@vger.kernel.org>
-Date:   Wed, 04 Aug 2021 17:45:43 +0300
-In-Reply-To: <42a812a9-7f17-2a26-d289-1f921408a469@intel.com>
-References: <20210726183816.1343022-1-erdemaktas@google.com>
-         <20210726183816.1343022-2-erdemaktas@google.com>
-         <e1651746-aa46-31e7-e1c0-99f3faaf1586@intel.com>
-         <ede70f11e713ee0140c0e684c3d46b3aa1176e5e.camel@redhat.com>
-         <42a812a9-7f17-2a26-d289-1f921408a469@intel.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
+        bh=FOnK+veu0wWChnkChEJGDHGZFXwH5RbR5XEsiBmdrMU=;
+        b=EWL5wYRH9wKRzHE0hKRJ9dENezx0OIft/STNvk/T6479Vl/4EShaW5eDSL1KGU16tg7PRE
+        VQ7ziWdly8kTel1YRGUFoKfwu8xQe2nhQ6BUmUeV4Fak4QQLKSjGeVx/poaXYNFlYOCl/G
+        MFQBrPd4k3ERIDH9j5ohW1wT6PVAOYs=
+Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
+ [209.85.218.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-428-SdYk-7BGMUmFu4hZHhcgaA-1; Wed, 04 Aug 2021 11:23:53 -0400
+X-MC-Unique: SdYk-7BGMUmFu4hZHhcgaA-1
+Received: by mail-ej1-f69.google.com with SMTP id q19-20020a170906b293b029058a1e75c819so935458ejz.16
+        for <kvm@vger.kernel.org>; Wed, 04 Aug 2021 08:23:52 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to;
+        bh=FOnK+veu0wWChnkChEJGDHGZFXwH5RbR5XEsiBmdrMU=;
+        b=npASV1jGcSNMBipyKZQfwmnvTDm4YDgeFgRj43onV53/ccmsd0/WCr5QWZpiXPhsuv
+         irpmEYsj6qY38MKWhfZWE5RJudexmGcMpTedVmipGXo24okkpgHbd+oKgb3s9bGO7ttS
+         AeR2hYQBrgh1uQ6D6ibGcYtj0i0YdTc6gQ9bMMgs+kC8X9ggBLsn+4gLeCfuI8LKuwyW
+         8wbKOiiOHZGUo2bqLH3jRGBEWduyLZW5zco/jJJ7Yl7kuKpn5wVQZgpc9aWqYNCjmrXo
+         oBHJbXfOI6yK6ZoTw8Jmf8B+Uas5bBZxbqIfGdVvizhyuW4GnBZvZA97AKgAIQ2It8Ba
+         MuFw==
+X-Gm-Message-State: AOAM531lNquG/Fs32yqLQ0vdB+Qe5ALmVgmO6vu8MceEh2Jrqg2f47aZ
+        niroL1GEczdcxzIOs7x9pcYMLLEH1abLZ9U057PiE2hQKfY7nCI3OhpAudmO3aquGkmP7vw8Taw
+        eFcVe6re22WlA
+X-Received: by 2002:a05:6402:184b:: with SMTP id v11mr279748edy.267.1628090631912;
+        Wed, 04 Aug 2021 08:23:51 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJz/39HeEjVjl3cpnIoTdSCpE59bH+X7ttEEVWnEzeo9TkvSQoRZJeV8fS+jTMea1+k26xJCDw==
+X-Received: by 2002:a05:6402:184b:: with SMTP id v11mr279724edy.267.1628090631769;
+        Wed, 04 Aug 2021 08:23:51 -0700 (PDT)
+Received: from steredhat (host-79-18-148-79.retail.telecomitalia.it. [79.18.148.79])
+        by smtp.gmail.com with ESMTPSA id nd14sm736547ejc.113.2021.08.04.08.23.50
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 04 Aug 2021 08:23:51 -0700 (PDT)
+Date:   Wed, 4 Aug 2021 17:23:49 +0200
+From:   Stefano Garzarella <sgarzare@redhat.com>
+To:     =?utf-8?B?5YKF5YWz5Lie?= <fuguancheng@bytedance.com>
+Cc:     "Michael S. Tsirkin" <mst@redhat.com>, jasowang@redhat.com,
+        stefanha@redhat.com, davem@davemloft.net, kuba@kernel.org,
+        arseny.krasnov@kaspersky.com, andraprs@amazon.com,
+        Colin King <colin.king@canonical.com>, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [External] Re: [PATCH 0/4] Add multi-cid support for vsock driver
+Message-ID: <20210804152349.o4vh233xjdruh4pv@steredhat>
+References: <20210802120720.547894-1-fuguancheng@bytedance.com>
+ <20210802134251.hgg2wnepia4cjwnv@steredhat>
+ <CAKv9dH5KbN25m8_Wmej9WXgJWheRV5S-tyPCdjUHHEFoWk-V1w@mail.gmail.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAKv9dH5KbN25m8_Wmej9WXgJWheRV5S-tyPCdjUHHEFoWk-V1w@mail.gmail.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 2021-08-04 at 22:42 +0800, Xiaoyao Li wrote:
-> On 8/4/2021 10:24 PM, Maxim Levitsky wrote:
-> > On Wed, 2021-08-04 at 14:09 +0800, Xiaoyao Li wrote:
-> > > On 7/27/2021 2:37 AM, Erdem Aktas wrote:
-> > > > Currently vm_create function only creates KVM_X86_LEGACY_VM type VMs.
-> > > > Changing the vm_create function to accept type parameter to create
-> > > > new VM types.
-> > > > 
-> > > > Signed-off-by: Erdem Aktas <erdemaktas@google.com>
-> > > > Reviewed-by: Sean Christopherson <seanjc@google.com>
-> > > > Reviewed-by: Peter Gonda <pgonda@google.com>
-> > > > Reviewed-by: Marc Orr <marcorr@google.com>
-> > > > Reviewed-by: Sagi Shahar <sagis@google.com>
-> > > > ---
-> > > >    .../testing/selftests/kvm/include/kvm_util.h  |  1 +
-> > > >    tools/testing/selftests/kvm/lib/kvm_util.c    | 29 +++++++++++++++++--
-> > > >    2 files changed, 27 insertions(+), 3 deletions(-)
-> > > > 
-> > > > diff --git a/tools/testing/selftests/kvm/include/kvm_util.h b/tools/testing/selftests/kvm/include/kvm_util.h
-> > > > index d53bfadd2..c63df42d6 100644
-> > > > --- a/tools/testing/selftests/kvm/include/kvm_util.h
-> > > > +++ b/tools/testing/selftests/kvm/include/kvm_util.h
-> > > > @@ -88,6 +88,7 @@ int vcpu_enable_cap(struct kvm_vm *vm, uint32_t vcpu_id,
-> > > >    void vm_enable_dirty_ring(struct kvm_vm *vm, uint32_t ring_size);
-> > > >    
-> > > >    struct kvm_vm *vm_create(enum vm_guest_mode mode, uint64_t phy_pages, int perm);
-> > > > +struct kvm_vm *__vm_create(enum vm_guest_mode mode, uint64_t phy_pages, int perm, int type);
-> > > >    void kvm_vm_free(struct kvm_vm *vmp);
-> > > >    void kvm_vm_restart(struct kvm_vm *vmp, int perm);
-> > > >    void kvm_vm_release(struct kvm_vm *vmp);
-> > > > diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
-> > > > index e5fbf16f7..70caa3882 100644
-> > > > --- a/tools/testing/selftests/kvm/lib/kvm_util.c
-> > > > +++ b/tools/testing/selftests/kvm/lib/kvm_util.c
-> > > > @@ -180,13 +180,36 @@ _Static_assert(sizeof(vm_guest_mode_params)/sizeof(struct vm_guest_mode_params)
-> > > >     * Return:
-> > > >     *   Pointer to opaque structure that describes the created VM.
-> > > >     *
-> > > > - * Creates a VM with the mode specified by mode (e.g. VM_MODE_P52V48_4K).
-> > > > + * Wrapper VM Create function to create a VM with default type (0).
-> > > 
-> > > Can we pass KVM_X86_LEGACY_VM (whatever name when it's upstreamed)
-> > > instead of 0?
-> > 
-> > To be honest I would prefer this to be called something like KVM_X86_STANDARD_VM,
-> > or something.
-> > 
-> > I don't think that normal unencrypted virtualization is already legacy, even if TDX
-> > docs claim that.
-> 
-> I'm not proposing to use this specific name introduced in TDX RFC 
-> series, but proposing to use the name defined in KVM in the future 
-> instead of hard-coded 0.
-> 
-> Yes, KVM_X86_STANDARD_VM or KVM_X86_NORMAL_VM (proposed by Paolo) is 
-> better than KVM_X86_LEGACY_VM.
+On Wed, Aug 04, 2021 at 03:09:41PM +0800, 傅关丞 wrote:
+>Sorry I cannot figure out a good use case.
+>
+>It is normal for a host to have multiple ip addresses used for
+>communication.
+>So I thought it might be nice to have both  host and guest use multiple
+>CIDs for communication.
+>I know this is not a very strong argument.
 
-KVM_X86_NORMAL_VM is a very good name IMHO as well.
-Thanks!
+Maybe there could be a use case for guests (which I don't see now), but 
+for the host it seems pointless. The strength of vsock is that the guest 
+knows that using CID=2 always reaches the host.
 
-Best regards,
-	Maxim Levitsky
+Moreover we have recently merged VMADDR_FLAG_TO_HOST that when set 
+allows you to forward any packet to the host, regardless of the CID (not 
+yet supported by vhost-vsock).
 
-> 
-> > Just my personal opinion.
-> > 
-> > Best regards,
-> > 	Maxim Levitsky
-> > 
-> > > > + */
-> > > > +struct kvm_vm *vm_create(enum vm_guest_mode mode, uint64_t phy_pages, int perm)
-> > > > +{
-> > > > +	return __vm_create(mode, phy_pages, perm, 0);
-> > > > +}
-> > > > +
+>
+>The vsock driver does not work if one of the two peers doesn't support
+>multiple CIDs.
 
+This is absolutely to be avoided.
+
+I think the virtio device feature negotiation can help here.
+
+>
+>I have a possible solution here, but there may be some problems with it
+>that I haven't noticed.
+>
+>Hypervisors will use different ways to send CIDs setup to the kernel based
+>on their vsock setup.
+>
+>------For host-------
+>If host vsock driver supports multi-cid, the hypervisor will use the
+>modified VHOST_VSOCK_SET_GUEST_CID call to set its CIDs.
+>Otherwise, the original call is used.
+>
+>------For guest-------
+>Now the virtio_vsock_config looks like this:
+>u64 guest_cid
+>u32 num_guest_cid;
+>u32 num_host_cid;
+>u32 index;
+>u64 cid;
+>
+>If the guest vsock driver supports multi-cid, it will read num_guest_cid
+>and num_host_cid from the device config space.
+>Then it writes an index register, which is the cid it wants to read.  After
+>hypervisors handle this issue, it can read the cid
+>from the cid register.
+>
+>If it does not support multi-cid, it will just read the guest_cid from the
+>config space, which should work just fine.
+>
+
+Why not add a new device feature to enable or disable multi-cid?
+
+
+>
+>-------Communication--------
+>For communication issues, we might need to use a new feature bit.  Let's
+>call it VHOST_VSOCK_SUPPORT_MULTI_CID.
+>The basic idea is that this feature bit is set when both host and guest
+>support using multiple CIDs.  After negotiation, if the feature bit
+>is set, the host can use all the CIDs specified to communicate with the
+>guest.  Otherwise, the first cid passed in will
+>be used as the guest_cid to communicate with guests.
+
+I think the same feature bit can be used for the virtio_vsock_config, 
+no?
+
+>
+>Also, if the bit is set for guests, all the CIDs can be used to communicate
+>with the host.  Otherwise, the first cid with index 0 will be
+>used as the guest_cid while the VMADDR_HOST_CID will be used for host cid.
+
+We already have VMADDR_FLAG_TO_HOST to forward all packets to the host, 
+we only need to support in some way in vhost-vsock.
+
+Thanks,
+Stefano
 
