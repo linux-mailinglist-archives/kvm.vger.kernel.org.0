@@ -2,112 +2,151 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id CA1593DF8FA
-	for <lists+kvm@lfdr.de>; Wed,  4 Aug 2021 02:39:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5C5B63DF9DF
+	for <lists+kvm@lfdr.de>; Wed,  4 Aug 2021 05:03:11 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229922AbhHDAjO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 3 Aug 2021 20:39:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36666 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229892AbhHDAjN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 3 Aug 2021 20:39:13 -0400
-Received: from mail-ot1-x32d.google.com (mail-ot1-x32d.google.com [IPv6:2607:f8b0:4864:20::32d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C6CB4C06175F
-        for <kvm@vger.kernel.org>; Tue,  3 Aug 2021 17:39:01 -0700 (PDT)
-Received: by mail-ot1-x32d.google.com with SMTP id 61-20020a9d0d430000b02903eabfc221a9so219073oti.0
-        for <kvm@vger.kernel.org>; Tue, 03 Aug 2021 17:39:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=TIxIODv/KXQQdTNzvHXnF6RyCq8epmlZKshZBKKOkhc=;
-        b=ChPqxi8jpGXh5LtSA6CH4tJUdKiFVjYDth3nMzPuFdikFvo9fQnDgcw/99seKBphrW
-         MEin4bfjYloij8SocRKMPh5OYH+l2RalJJVsjP+3+1uLUd3rBRJ+aixMRuQhzYmws/gC
-         5lS/EQvbG+Tm28J1NpCeH+SiJKSzJa6vQwIPmmQ/iudr7SM021njikH0+Ny4loQtRxGg
-         pfQu+U/2VU9gBnSaYSvzHAp+sR6caWGSVNdsA2XH7FPawitFv/lMxV0NrgEvQ8HAOR8z
-         Owg6Z0iQglcgIxmomKcKkcVR6y+zdHMfzy/oJkBi5Yc62lFa2Q5VZtsTyrz0+4MBi2wn
-         oBOg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=TIxIODv/KXQQdTNzvHXnF6RyCq8epmlZKshZBKKOkhc=;
-        b=Dt85BsxwSt48XoTnfiTR8efvvSlPgnZ+mcKabtn0rhyQptiKBrqgdn/DUT8v1K5zW4
-         3M3RszJdER1PA49r8E9vcVB8WlBE29Z6MKl+Q7O9NcAVoVY4NX9PxbmqOxxaS1a8BIkl
-         0kIir4LPdM+oqaOZ/CKnyWrIQSfdhQEzXXwCrWkWHeDIFuh2onDtgiyPQN5vXTiCLne/
-         FtsvOGVq6UESJuyHSGvuVbKjCmsGl5rDYEnkjI/c+nic5f7oxYxVhaL1VfVqi8O2iMKC
-         06ib1zA5zlHPj84rnVdN1i4SBH9rWB2EpjQjdw22eJbu0LaeJDRUs+b/fIqegL/XzCDm
-         Kr8A==
-X-Gm-Message-State: AOAM532JT97wrFRskZhHyipmN13zi5c8i29srs7cKg3DbpwtqjWL34gI
-        G7L8CW9ymVaE6Ihho8bUyCUm9V4Ky5nVrUE/mos=
-X-Google-Smtp-Source: ABdhPJzhOS9SWifCdLUqG0NVqLZED7uAHz1MZ6X0Vuq4TIxyVqc0izh3EH+FSYZIh0T9jDKCmC3QeQwwB8RFPvdgY+8=
-X-Received: by 2002:a05:6830:1c69:: with SMTP id s9mr17485492otg.185.1628037541255;
- Tue, 03 Aug 2021 17:39:01 -0700 (PDT)
+        id S232671AbhHDDDV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 3 Aug 2021 23:03:21 -0400
+Received: from mga04.intel.com ([192.55.52.120]:26646 "EHLO mga04.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S230088AbhHDDDU (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 3 Aug 2021 23:03:20 -0400
+X-IronPort-AV: E=McAfee;i="6200,9189,10065"; a="211971562"
+X-IronPort-AV: E=Sophos;i="5.84,293,1620716400"; 
+   d="scan'208";a="211971562"
+Received: from fmsmga002.fm.intel.com ([10.253.24.26])
+  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Aug 2021 20:03:08 -0700
+X-IronPort-AV: E=Sophos;i="5.84,293,1620716400"; 
+   d="scan'208";a="521655496"
+Received: from lingshan-mobl5.ccr.corp.intel.com (HELO [10.249.168.129]) ([10.249.168.129])
+  by fmsmga002-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Aug 2021 20:03:02 -0700
+Subject: Re: [PATCH V9 00/18] KVM: x86/pmu: Add *basic* support to enable
+ guest PEBS via DS
+To:     Peter Zijlstra <peterz@infradead.org>
+Cc:     pbonzini@redhat.com, bp@alien8.de, seanjc@google.com,
+        vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com,
+        joro@8bytes.org, kan.liang@linux.intel.com, ak@linux.intel.com,
+        wei.w.wang@intel.com, eranian@google.com, liuxiangdong5@huawei.com,
+        linux-kernel@vger.kernel.org, x86@kernel.org, kvm@vger.kernel.org,
+        like.xu.linux@gmail.com, boris.ostrvsky@oracle.com
+References: <20210722054159.4459-1-lingshan.zhu@intel.com>
+ <YQF7lwM6qzYso0Gg@hirez.programming.kicks-ass.net>
+From:   "Zhu, Lingshan" <lingshan.zhu@intel.com>
+Message-ID: <9ee8c1a8-6de5-06eb-dc55-b0b2a444387b@intel.com>
+Date:   Wed, 4 Aug 2021 11:03:00 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Firefox/78.0 Thunderbird/78.12.0
 MIME-Version: 1.0
-References: <YQlOeGxhor3wJM6i@stefanha-x1.localdomain>
-In-Reply-To: <YQlOeGxhor3wJM6i@stefanha-x1.localdomain>
-From:   Wanpeng Li <kernellwp@gmail.com>
-Date:   Wed, 4 Aug 2021 08:38:50 +0800
-Message-ID: <CANRm+Cy6CN2hF=BxZagkm0amUoQ8UcuD0JGvCV_Sj7bJFit0ow@mail.gmail.com>
-Subject: Re: What does KVM_HINTS_REALTIME do?
-To:     Stefan Hajnoczi <stefanha@redhat.com>
-Cc:     kvm <kvm@vger.kernel.org>, Jenifer Abrams <jhopper@redhat.com>,
-        atheurer@redhat.com, jmario@redhat.com,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Eduardo Habkost <ehabkost@redhat.com>,
-        Maxim Levitsky <mlevitsk@redhat.com>,
-        Marcelo Tosatti <mtosatti@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <YQF7lwM6qzYso0Gg@hirez.programming.kicks-ass.net>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 3 Aug 2021 at 22:14, Stefan Hajnoczi <stefanha@redhat.com> wrote:
->
-> Hi,
-> I was just in a discussion where we realized KVM_HINTS_REALTIME is a
-> little underdocumented. Here is attempt to address that. Please correct
-> me if there are inaccuracies or reply if you have additional questions:
->
-> KVM_HINTS_REALTIME (aka QEMU kvm-hint-dedicated) is defined as follows
-> in Documentation/virt/kvm/cpuid.rst:
->
->   guest checks this feature bit to determine that vCPUs are never
->   preempted for an unlimited time allowing optimizations
->
-> Users or management tools set this flag themselves (it is not set
-> automatically). This raises the question of what effects this flag has
-> and when it should be set.
->
-> When should I set KVM_HINTS_REALTIME?
-> -------------------------------------
-> When vCPUs are pinned to dedicated pCPUs. Even better if the isolcpus=
-> kernel parameter is used on the host so there are no disturbances.
->
-> Is the flag guest-wide or per-vCPU?
-> -----------------------------------
-> This flag is guest-wide so all vCPUs should be dedicated, not just some
-> of them.
->
-> Which Linux guest features are affected?
-> ----------------------------------------
-> PV spinlocks, PV TLB flush, and PV sched yield are disabled by
-> KVM_HINTS_REALTIME. This is because no other vCPUs or host tasks will be
-> running on the pCPUs, so there is no benefit in involving the host.
->
-> The cpuidle-haltpoll driver is enabled by KVM_HINTS_REALTIME. This
-> driver performs busy waiting inside the guest before halting the CPU in
-> order to avoid the vCPU's wakeup latency. This driver also has a boolean
-> "force" module parameter if you wish to enable it without setting
-> KVM_HINTS_REALTIME.
->
-> When KVM_HINTS_REALTIME is set, the KVM_CAP_X86_DISABLE_EXITS capability
-> can also be used to disable MWAIT/HLT/PAUSE/CSTATE exits. This improves
-> the latency of these operations. The user or management tools need to
-> disable these exits themselves, e.g. with QEMU's -overcommit cpu-pm=on.
 
-Looks good to me, too. :)
 
-    Wanpeng
+On 7/28/2021 11:45 PM, Peter Zijlstra wrote:
+> On Thu, Jul 22, 2021 at 01:41:41PM +0800, Zhu Lingshan wrote:
+>> The guest Precise Event Based Sampling (PEBS) feature can provide an
+>> architectural state of the instruction executed after the guest instruction
+>> that exactly caused the event. It needs new hardware facility only available
+>> on Intel Ice Lake Server platforms. This patch set enables the basic PEBS
+>> feature for KVM guests on ICX.
+>>
+>> We can use PEBS feature on the Linux guest like native:
+>>
+>>     # echo 0 > /proc/sys/kernel/watchdog (on the host)
+>>     # perf record -e instructions:ppp ./br_instr a
+>>     # perf record -c 100000 -e instructions:pp ./br_instr a
+> Why does the host need to disable the watchdog? IIRC ICL has multiple
+> PEBS capable counters. Also, I think the watchdog ends up on a fixed
+> counter by default anyway.
+>
+>> Like Xu (17):
+>>    perf/core: Use static_call to optimize perf_guest_info_callbacks
+>>    perf/x86/intel: Add EPT-Friendly PEBS for Ice Lake Server
+>>    perf/x86/intel: Handle guest PEBS overflow PMI for KVM guest
+>>    perf/x86/core: Pass "struct kvm_pmu *" to determine the guest values
+>>    KVM: x86/pmu: Set MSR_IA32_MISC_ENABLE_EMON bit when vPMU is enabled
+>>    KVM: x86/pmu: Introduce the ctrl_mask value for fixed counter
+>>    KVM: x86/pmu: Add IA32_PEBS_ENABLE MSR emulation for extended PEBS
+>>    KVM: x86/pmu: Reprogram PEBS event to emulate guest PEBS counter
+>>    KVM: x86/pmu: Adjust precise_ip to emulate Ice Lake guest PDIR counter
+>>    KVM: x86/pmu: Add IA32_DS_AREA MSR emulation to support guest DS
+>>    KVM: x86/pmu: Add PEBS_DATA_CFG MSR emulation to support adaptive PEBS
+>>    KVM: x86: Set PEBS_UNAVAIL in IA32_MISC_ENABLE when PEBS is enabled
+>>    KVM: x86/pmu: Move pmc_speculative_in_use() to arch/x86/kvm/pmu.h
+>>    KVM: x86/pmu: Disable guest PEBS temporarily in two rare situations
+>>    KVM: x86/pmu: Add kvm_pmu_cap to optimize perf_get_x86_pmu_capability
+>>    KVM: x86/cpuid: Refactor host/guest CPU model consistency check
+>>    KVM: x86/pmu: Expose CPUIDs feature bits PDCM, DS, DTES64
+>>
+>> Peter Zijlstra (Intel) (1):
+>>    x86/perf/core: Add pebs_capable to store valid PEBS_COUNTER_MASK value
+> Looks good:
+>
+> Acked-by: Peter Zijlstra (Intel) <peterz@infradead.org>
+>
+> How do we want to route this, all through the KVM tree?
+I will send a V10 patchset then ping Paolo.
+>
+> One little nit I had; would something like the below (on top perhaps)
+> make the code easier to read?
+V10 will include this change.
+
+Thanks,
+Zhu Lingshan
+>
+> ---
+> --- a/arch/x86/events/intel/core.c
+> +++ b/arch/x86/events/intel/core.c
+> @@ -3921,9 +3921,12 @@ static struct perf_guest_switch_msr *int
+>   	struct kvm_pmu *kvm_pmu = (struct kvm_pmu *)data;
+>   	u64 intel_ctrl = hybrid(cpuc->pmu, intel_ctrl);
+>   	u64 pebs_mask = cpuc->pebs_enabled & x86_pmu.pebs_capable;
+> +	int global_ctrl, pebs_enable;
+>   
+>   	*nr = 0;
+> -	arr[(*nr)++] = (struct perf_guest_switch_msr){
+> +
+> +	global_ctrl = (*nr)++;
+> +	arr[global_ctrl] = (struct perf_guest_switch_msr){
+>   		.msr = MSR_CORE_PERF_GLOBAL_CTRL,
+>   		.host = intel_ctrl & ~cpuc->intel_ctrl_guest_mask,
+>   		.guest = intel_ctrl & (~cpuc->intel_ctrl_host_mask | ~pebs_mask),
+> @@ -3966,23 +3969,23 @@ static struct perf_guest_switch_msr *int
+>   		};
+>   	}
+>   
+> -	arr[*nr] = (struct perf_guest_switch_msr){
+> +	pebs_enable = (*nr)++;
+> +	arr[pebs_enable] = (struct perf_guest_switch_msr){
+>   		.msr = MSR_IA32_PEBS_ENABLE,
+>   		.host = cpuc->pebs_enabled & ~cpuc->intel_ctrl_guest_mask,
+>   		.guest = pebs_mask & ~cpuc->intel_ctrl_host_mask,
+>   	};
+>   
+> -	if (arr[*nr].host) {
+> +	if (arr[pebs_enable].host) {
+>   		/* Disable guest PEBS if host PEBS is enabled. */
+> -		arr[*nr].guest = 0;
+> +		arr[pebs_enable].guest = 0;
+>   	} else {
+>   		/* Disable guest PEBS for cross-mapped PEBS counters. */
+> -		arr[*nr].guest &= ~kvm_pmu->host_cross_mapped_mask;
+> +		arr[pebs_enable].guest &= ~kvm_pmu->host_cross_mapped_mask;
+>   		/* Set hw GLOBAL_CTRL bits for PEBS counter when it runs for guest */
+> -		arr[0].guest |= arr[*nr].guest;
+> +		arr[global_ctrl].guest |= arr[pebs_enable].guest;
+>   	}
+>   
+> -	++(*nr);
+>   	return arr;
+>   }
+>   
+>
+>
+>
+
