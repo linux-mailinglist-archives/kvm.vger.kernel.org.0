@@ -2,117 +2,131 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7D6B63DFD9B
-	for <lists+kvm@lfdr.de>; Wed,  4 Aug 2021 11:06:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D89AF3DFD9C
+	for <lists+kvm@lfdr.de>; Wed,  4 Aug 2021 11:08:03 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236854AbhHDJHB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 4 Aug 2021 05:07:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37172 "EHLO
+        id S236906AbhHDJIO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 4 Aug 2021 05:08:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37446 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235350AbhHDJHB (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 4 Aug 2021 05:07:01 -0400
-Received: from mail-io1-xd32.google.com (mail-io1-xd32.google.com [IPv6:2607:f8b0:4864:20::d32])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CDC14C0613D5
-        for <kvm@vger.kernel.org>; Wed,  4 Aug 2021 02:06:48 -0700 (PDT)
-Received: by mail-io1-xd32.google.com with SMTP id s184so1637524ios.2
-        for <kvm@vger.kernel.org>; Wed, 04 Aug 2021 02:06:48 -0700 (PDT)
+        with ESMTP id S235350AbhHDJIO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 4 Aug 2021 05:08:14 -0400
+Received: from mail-ej1-x62c.google.com (mail-ej1-x62c.google.com [IPv6:2a00:1450:4864:20::62c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0D145C06179A
+        for <kvm@vger.kernel.org>; Wed,  4 Aug 2021 02:08:02 -0700 (PDT)
+Received: by mail-ej1-x62c.google.com with SMTP id gs8so2628187ejc.13
+        for <kvm@vger.kernel.org>; Wed, 04 Aug 2021 02:08:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
+        d=bytedance-com.20150623.gappssmtp.com; s=20150623;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=KpWU8S2rnRJUrosxQi6qwyfx5W1dTAzpFDbdGBIRVh4=;
-        b=MifTh5R4ZMmURl28E4XLwG9O81A4kneMeOhdNThYWIa3ylNmsUIWMeSHnpAbFnbH+m
-         msA8NtoXKU3zPa6vzDHAvKB9QLmM7L+mdLppajOFbH1ksCbfH5BLsPz0OWNPruVUl671
-         gl35Ei0R8+6FMPCdiGGFsxaQi3WYrB/jIlnkHU8jgbec5QpA5xs0FTyaJRoUEVrqtoD5
-         dwxU97itNfedFAYFwsyfr4DwElmkM00m2/gOclmM9034kYuNyW+SvyiTubV6DXp4KoX5
-         JFBkh2svyW6pJXvLQWLKMWRZY74hqNnfK+bg64TYd0fBH+TD1BhYDSjKo/O69fCN38HC
-         JaXg==
+         :cc:content-transfer-encoding;
+        bh=vHxgnDbRze3cfbummo1oFdspd0VXUkioTGyKAxbmjBY=;
+        b=rrLb5avlbWWVVZAoiqSf4GuH1Tep3672/ZPFrJ1q2sFsUjVxFnNVB7tKQ6xXG4rhnv
+         1PpAczmI/qacC7vsiZ2BEcntWSoQhW130Qwg+GEKxWvTPhhjdU0zMqHukOrvN7jIhUoV
+         Nsn2eb0p8F8I1ZJcwL62tBSr6vb1HYCK7y/HkosE9AxRt7VX5in8838+OKYoj/JdigCO
+         22pQ6zrUz1MLqHboxSN2WElTA63GZmG1OcBMMKNc/LoDbjlq6Lf4z01rVYSWbqkkn5bl
+         mqGmd/oNyGjYpPMnG5vHW8RpUjXvzzZbHlRoL8cVzBdZSTws01CqFaXWZkQX3ftOVtMV
+         f9GA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=KpWU8S2rnRJUrosxQi6qwyfx5W1dTAzpFDbdGBIRVh4=;
-        b=nyq1XuHbonXUhcjq2wPwe0gvNWYPratZj7K4RHlrt4bE9b40lxwDVyKAyhqQzVx6cJ
-         3X7cVnWT34a6jC2buB++IAcvT6ypkXXZSlNBRpYfXthL4h/BEHdMmSnOOzgrgHNczKnS
-         +ZwduJPZMIhFuD5yGfOZG8SKXKfmESBou4OtEVSv6LXcAj874rh50gvuLv8EgCcZ1eDW
-         J8TZPQjY7dFui1353wHmYfAcu6b0ipK8rbjutjmaD2IjcNEzzuFKuJThd6NEHqNAGXar
-         pH+/PLyFVa5yfUao0PLz/K5rlVj/wg3v6Th5DsQ9eGpYUEY2ZaWFCwM/ALj6jbMSlF0j
-         TmKg==
-X-Gm-Message-State: AOAM5334OjkYMpdReXbRFMvoZwVcDDsw32bAdza0lH1OKoFGY/JLPQ1t
-        TlSop/Wp/jzFcAn56dCW6EmdxUgqWbs4Ny8Hqdo=
-X-Google-Smtp-Source: ABdhPJwCZX5c1nCNybr01QMYC0HxKNSAYZ5FoMn5reti11HNcRWnTG7kOxvYk/c64w2yHu6SWp9+tenVOricwsSirZA=
-X-Received: by 2002:a05:6602:228d:: with SMTP id d13mr1062869iod.36.1628068008300;
- Wed, 04 Aug 2021 02:06:48 -0700 (PDT)
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=vHxgnDbRze3cfbummo1oFdspd0VXUkioTGyKAxbmjBY=;
+        b=Ca+i6jyls5++/mikAcgfMU42eLGkOs0EOJdQtZD8Zv5IsG371X9X7Cl68xdkjMJefc
+         7jILmLEKACO51rZxXJmP6OLmh3G42Hcs6d4qBpGLTSW8JV5KL8/hXusH2pCz5AXPNjyp
+         IgcdR2zTWyDnHJmM4pxhf1dOf/fEupX3fdfO5nw1mOC39RBoofQqg0pXbwMXe6fphQZH
+         C6hsBKskqtXn/WkGajTmnUCPW1YgOMXWbAqb+D/BAF+bVE1fJp2Qq0zI4kt58NJuatvZ
+         uRTQQoR99aSqCNHzXQk7LFyaB4qxfvns+uiK4d5+wjbGBi8JtkhHS2+vLGexZSzw4tWD
+         R5aQ==
+X-Gm-Message-State: AOAM533OSbNZ1UggrKh2R6RztK3JX0iJsE02T68HNfDmUN4jHsGkk85x
+        JUuWolLU0ZEJd6bRVlfSWBUib+q0OXnGdpJtbX6q
+X-Google-Smtp-Source: ABdhPJz7ndtSUpcqEgNkoVHcDwP0fq03BR0Lre7qDAvevyBxeyuNZM0taxEDcIn1Kzh847IXKZfSmIisXg0eBWVCt2c=
+X-Received: by 2002:a17:906:58c7:: with SMTP id e7mr24219405ejs.197.1628068080494;
+ Wed, 04 Aug 2021 02:08:00 -0700 (PDT)
 MIME-Version: 1.0
-References: <YQlOeGxhor3wJM6i@stefanha-x1.localdomain> <CAM9Jb+jAx8uy0PerK6gN2GOykQpPXQbd9uoPkeyxZSbya==o5w@mail.gmail.com>
-In-Reply-To: <CAM9Jb+jAx8uy0PerK6gN2GOykQpPXQbd9uoPkeyxZSbya==o5w@mail.gmail.com>
-From:   Pankaj Gupta <pankaj.gupta.linux@gmail.com>
-Date:   Wed, 4 Aug 2021 11:06:37 +0200
-Message-ID: <CAM9Jb+jNUrympkjUMnX3D0AMTfZOuHYbF+-VDb10AiXybW-e_A@mail.gmail.com>
-Subject: Re: What does KVM_HINTS_REALTIME do?
-To:     Stefan Hajnoczi <stefanha@redhat.com>
-Cc:     kvm@vger.kernel.org, Jenifer Abrams <jhopper@redhat.com>,
-        atheurer@redhat.com, jmario@redhat.com,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Eduardo Habkost <ehabkost@redhat.com>,
-        Maxim Levitsky <mlevitsk@redhat.com>,
-        Marcelo Tosatti <mtosatti@redhat.com>
+References: <20210729073503.187-1-xieyongji@bytedance.com> <20210729073503.187-11-xieyongji@bytedance.com>
+ <6bb6c689-e6dd-cfa2-094b-a0ca4258aded@redhat.com> <CACycT3v7BHxYY0OFYJRFU41Bz1=_v8iMRwzYKgX6cJM-SiNH+A@mail.gmail.com>
+ <fdcb0224-11f9-caf2-a44e-e6406087fd50@redhat.com> <CACycT3v0EQVrv_A1K1bKmiYu0q5aFE=t+0yRaWKC7T3_H3oB-Q@mail.gmail.com>
+ <bd48ec76-0d5c-2efb-8406-894286b28f6b@redhat.com>
+In-Reply-To: <bd48ec76-0d5c-2efb-8406-894286b28f6b@redhat.com>
+From:   Yongji Xie <xieyongji@bytedance.com>
+Date:   Wed, 4 Aug 2021 17:07:49 +0800
+Message-ID: <CACycT3tUwJXUV24PK7OvzPrHYYeQ5Q3qUW_vbuFMjwig0dBw2g@mail.gmail.com>
+Subject: Re: [PATCH v10 10/17] virtio: Handle device reset failure in register_virtio_device()
+To:     Jason Wang <jasowang@redhat.com>
+Cc:     "Michael S. Tsirkin" <mst@redhat.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Stefano Garzarella <sgarzare@redhat.com>,
+        Parav Pandit <parav@nvidia.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Christian Brauner <christian.brauner@canonical.com>,
+        Randy Dunlap <rdunlap@infradead.org>,
+        Matthew Wilcox <willy@infradead.org>,
+        Al Viro <viro@zeniv.linux.org.uk>,
+        Jens Axboe <axboe@kernel.dk>, bcrl@kvack.org,
+        Jonathan Corbet <corbet@lwn.net>,
+        =?UTF-8?Q?Mika_Penttil=C3=A4?= <mika.penttila@nextfour.com>,
+        Dan Carpenter <dan.carpenter@oracle.com>, joro@8bytes.org,
+        Greg KH <gregkh@linuxfoundation.org>,
+        He Zhe <zhe.he@windriver.com>,
+        Liu Xiaodong <xiaodong.liu@intel.com>,
+        Joe Perches <joe@perches.com>, songmuchun@bytedance.com,
+        virtualization <virtualization@lists.linux-foundation.org>,
+        netdev@vger.kernel.org, kvm <kvm@vger.kernel.org>,
+        linux-fsdevel@vger.kernel.org, iommu@lists.linux-foundation.org,
+        linux-kernel <linux-kernel@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-> > Hi,
-> > I was just in a discussion where we realized KVM_HINTS_REALTIME is a
-> > little underdocumented. Here is attempt to address that. Please correct
-> > me if there are inaccuracies or reply if you have additional questions:
-> >
-> > KVM_HINTS_REALTIME (akaalso  QEMU kvm-hint-dedicated) is defined as follows
-> > in Documentation/virt/kvm/cpuid.rst:
-> >
-> >   guest checks this feature bit to determine that vCPUs are never
-> >   preempted for an unlimited time allowing optimizations
-> >
-> > Users or management tools set this flag themselves (it is not set
-> > automatically). This raises the question of what effects this flag has
-> > and when it should be set.
-> >
-> > When should I set KVM_HINTS_REALTIME?
-> > -------------------------------------
-> > When vCPUs are pinned to dedicated pCPUs. Even better if the isolcpus=
-> > kernel parameter is used on the host so there are no disturbances.
-> >
-> > Is the flag guest-wide or per-vCPU?
-> > -----------------------------------
-> > This flag is guest-wide so all vCPUs should be dedicated, not just some
-> > of them.
-> >
-> > Which Linux guest features are affected?
-> > ----------------------------------------
-> > PV spinlocks, PV TLB flush, and PV sched yield are disabled by
-> > KVM_HINTS_REALTIME. This is because no other vCPUs or host tasks will be
-> > running on the pCPUs, so there is no benefit in involving the host.
+On Wed, Aug 4, 2021 at 4:54 PM Jason Wang <jasowang@redhat.com> wrote:
 >
-> Do we need to mention "halt_poll_ns" at host side also will also be disabled?
-with KVM_FEATURE_POLL_CONTROL
+>
+> =E5=9C=A8 2021/8/4 =E4=B8=8B=E5=8D=884:50, Yongji Xie =E5=86=99=E9=81=93:
+> > On Wed, Aug 4, 2021 at 4:32 PM Jason Wang <jasowang@redhat.com> wrote:
+> >>
+> >> =E5=9C=A8 2021/8/3 =E4=B8=8B=E5=8D=885:38, Yongji Xie =E5=86=99=E9=81=
+=93:
+> >>> On Tue, Aug 3, 2021 at 4:09 PM Jason Wang <jasowang@redhat.com> wrote=
+:
+> >>>> =E5=9C=A8 2021/7/29 =E4=B8=8B=E5=8D=883:34, Xie Yongji =E5=86=99=E9=
+=81=93:
+> >>>>> The device reset may fail in virtio-vdpa case now, so add checks to
+> >>>>> its return value and fail the register_virtio_device().
+> >>>> So the reset() would be called by the driver during remove as well, =
+or
+> >>>> is it sufficient to deal only with the reset during probe?
+> >>>>
+> >>> Actually there is no way to handle failure during removal. And it
+> >>> should be safe with the protection of software IOTLB even if the
+> >>> reset() fails.
+> >>>
+> >>> Thanks,
+> >>> Yongji
+> >>
+> >> If this is true, does it mean we don't even need to care about reset
+> >> failure?
+> >>
+> > But we need to handle the failure in the vhost-vdpa case, isn't it?
+>
+>
+> Yes, but:
+>
+> - This patch is for virtio not for vhost, if we don't care virtio, we
+> can avoid the changes
+> - For vhost, there could be two ways probably:
+>
+> 1) let the set_status to report error
+> 2) require userspace to re-read for status
+>
+> It looks to me you want to go with 1) and I'm not sure whether or not
+> it's too late to go with 2).
+>
 
-Sorry, pressed enter quickly in previous email.
->
-> >
-> > The cpuidle-haltpoll driver is enabled by KVM_HINTS_REALTIME. This
-> > driver performs busy waiting inside the guest before halting the CPU in
-> > order to avoid the vCPU's wakeup latency. This driver also has a boolean
-> > "force" module parameter if you wish to enable it without setting
-> > KVM_HINTS_REALTIME.
-> >
-> > When KVM_HINTS_REALTIME is set, the KVM_CAP_X86_DISABLE_EXITS capability
-> > can also be used to disable MWAIT/HLT/PAUSE/CSTATE exits. This improves
-> > the latency of these operations. The user or management tools need to
-> > disable these exits themselves, e.g. with QEMU's -overcommit cpu-pm=on.
->
-> This looks good. Thank you.
->
-> Thanks,
-> Pankaj
+Looks like 2) can't work if reset failure happens in
+vhost_vdpa_release() and vhost_vdpa_open().
+
+Thanks,
+Yongji
