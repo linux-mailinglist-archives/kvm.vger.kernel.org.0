@@ -2,56 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 434AF3E0A5C
-	for <lists+kvm@lfdr.de>; Thu,  5 Aug 2021 00:29:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 671CC3E0A5E
+	for <lists+kvm@lfdr.de>; Thu,  5 Aug 2021 00:29:08 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232932AbhHDW3S (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 4 Aug 2021 18:29:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51628 "EHLO
+        id S233420AbhHDW3T (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 4 Aug 2021 18:29:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51634 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233026AbhHDW3R (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 4 Aug 2021 18:29:17 -0400
-Received: from mail-pl1-x64a.google.com (mail-pl1-x64a.google.com [IPv6:2607:f8b0:4864:20::64a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0A5EAC06179B
-        for <kvm@vger.kernel.org>; Wed,  4 Aug 2021 15:29:03 -0700 (PDT)
-Received: by mail-pl1-x64a.google.com with SMTP id s6-20020a170902b186b029012cbebe7236so664526plr.11
-        for <kvm@vger.kernel.org>; Wed, 04 Aug 2021 15:29:03 -0700 (PDT)
+        with ESMTP id S233357AbhHDW3S (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 4 Aug 2021 18:29:18 -0400
+Received: from mail-pj1-x104a.google.com (mail-pj1-x104a.google.com [IPv6:2607:f8b0:4864:20::104a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9154FC0613D5
+        for <kvm@vger.kernel.org>; Wed,  4 Aug 2021 15:29:04 -0700 (PDT)
+Received: by mail-pj1-x104a.google.com with SMTP id q6-20020a17090aa006b02901779796d79eso5723570pjp.1
+        for <kvm@vger.kernel.org>; Wed, 04 Aug 2021 15:29:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=date:in-reply-to:message-id:mime-version:references:subject:from:to
          :cc;
-        bh=Bk8U0jio7mRFkeeUxntTqJSeYflds2FmZc2qdnrxh4k=;
-        b=YXlps6w72QwFtNeJLBv93P4DfNsv9Q9pnaWra6vSLL/drHhBIkkLAAWjcencTwuvlG
-         Poz1uip/vMzZOiQTtaDss+T8BnCB5V3fhs2IghnuUp/C1tglhFAudoUdw0F3HB4Pa7Re
-         in5uHLn1vWkYDztu+Tx7vzahBy566ckgJscXx9J5qiVhj01rPAXH4vyUVj01Cpk8U83W
-         +Jja4n3sQOqEG03tTsaklETM5+7AwwPFwJJy2doIWfQrrbzYDyyEGQv9lfpp4AmzjL2I
-         /bu21jtXOeVe/7NHRMb33wvCOQgXR++2cYcdZLK2GMauemh7XrzbKNAfKcMI21xXJqjp
-         EKog==
+        bh=9wiCmoE9RCNpFzjVibQ+jhZe1y0mw87FfiQJ+4m3Tkw=;
+        b=M0cSDOPRaTlSHBDnZ+prpDA5SuJB1wnLHaUVYMN9WOtJYmGTmLEAR7cymQuX1odCH2
+         41CCLpJIBAL6bczlxmWxqm0XPvUqZbQbMA2CVmp/+Yppll930YQuV+ZoZBzBBMRMGJTl
+         EjBbsROiHYowBd8wmSeKxaSMUGLxvaymAHh+dduK/Cs9/49PHbYVZQhTyA5c7BRgM+Uw
+         ne6L63irMH9rgTcJWn7ghu/e9WfxI9/yy723er5eXMS7PEyp56GkRpXOJr3LsfWSutXm
+         ElDF13t2EKizIzeWbsjd48V+kd1jzQJWdpAQ1NSl14Y9y8txg9U9qqdJ4qIXadkRNDiu
+         UkRg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=Bk8U0jio7mRFkeeUxntTqJSeYflds2FmZc2qdnrxh4k=;
-        b=dKuItzYBXCBB9UqqOnFQYpj7gmdAt0I6gWvXkZwGcFjkk/v8808u9P318SLB1N34eX
-         zhktywa3gCsOwm6DUe2eMEeOUImiswZpjKw7yiqyi4RuWPofnwKh5rtSxwAXKVYg+k1M
-         RSErPq0Qgmuw7wlYRWiUXUChq4K0wv3S7J80C9DS66l0fK1r6WDo9xckeMm7JYGdp3mg
-         ED/P+oHRU9KE/rq0XZU/f4u2inkqnZONZjq1uQhjRp7OzRRjRr9xTCV2/H1lTKVCdwh2
-         xwEqxnfupL2fYSWeBJXsQ0W5gnVkY1U8JGEMq3LkUOnjD/uHz1JCSQ+7TH6HTnElDa4y
-         l4zA==
-X-Gm-Message-State: AOAM531075iusmDc/Czeyrl1waN1hPT8s3AyjuwPDWAv2XhSv/KOFfh0
-        4jPLJ3Qxpxz7HgF6HmCdG5GdSziZZiVjUw==
-X-Google-Smtp-Source: ABdhPJwgX+p1R8mxhSnM/ta2kGDRLl8Cv0dDa3hjAiS6zXXIOTPMUayiB8hoXUZi58fvlU/HKBx9r17Df2XHjQ==
+        bh=9wiCmoE9RCNpFzjVibQ+jhZe1y0mw87FfiQJ+4m3Tkw=;
+        b=VM9f30JDl4lAN7e3FqfwfLyEe3exLQ2VtqyQxrRL9dzCFNZ3rgneohQa1bFRkh9RJb
+         Hr7arUxjEUMlWqePBl6j2jhCkyD/R6XH1y0KW4b82kziEcYjPh5DGoZbNgn4xszOOfVB
+         PlJlv8N20a/0i2IgBvHB1H5sgaPr2PiYKr2kx4jh0NYJYucOdJZ5q1rnvBgc5zE/6SJZ
+         UN7eSXysu4nlWpr8SnFN2tNDXFF4h1aYoq8U/lzXITun4eAiBugSiy5SKB1qNP/i2vtE
+         P7ahdRVypd03JLsbnDYk9sBwATFXVjlqgA11wmOuMSQwuaPuyNJ0XolX0wG41cVDOePW
+         YHGA==
+X-Gm-Message-State: AOAM530pToG12+xHJZ72iGJmMeslseTxlL/M+mIxA7nJt29BPyHRYwgm
+        Kl1IxWsW/xne/sEc3ESNAjzU1NmPEaeGWw==
+X-Google-Smtp-Source: ABdhPJyjJCZTrQ+lFVwH/WVeYCivhHyRRDakaivxPuSK/KDbXrZY8UvJM0zcZP7nDtssWPm3nsyEJJVt3ijECA==
 X-Received: from dmatlack-heavy.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:19cd])
- (user=dmatlack job=sendgmr) by 2002:a62:794e:0:b029:3c5:a678:efff with SMTP
- id u75-20020a62794e0000b02903c5a678efffmr1894496pfc.11.1628116142566; Wed, 04
- Aug 2021 15:29:02 -0700 (PDT)
-Date:   Wed,  4 Aug 2021 22:28:39 +0000
+ (user=dmatlack job=sendgmr) by 2002:a62:e40d:0:b029:3ab:42cd:d156 with SMTP
+ id r13-20020a62e40d0000b02903ab42cdd156mr1498338pfh.81.1628116144093; Wed, 04
+ Aug 2021 15:29:04 -0700 (PDT)
+Date:   Wed,  4 Aug 2021 22:28:40 +0000
 In-Reply-To: <20210804222844.1419481-1-dmatlack@google.com>
-Message-Id: <20210804222844.1419481-3-dmatlack@google.com>
+Message-Id: <20210804222844.1419481-4-dmatlack@google.com>
 Mime-Version: 1.0
 References: <20210804222844.1419481-1-dmatlack@google.com>
 X-Mailer: git-send-email 2.32.0.554.ge1b32706d8-goog
-Subject: [PATCH v2 2/7] KVM: Move last_used_slot logic out of search_memslots
+Subject: [PATCH v2 3/7] KVM: Cache the last used slot index per vCPU
 From:   David Matlack <dmatlack@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     kvm@vger.kernel.org, kvm-ppc@vger.kernel.org,
@@ -72,148 +72,111 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Make search_memslots unconditionally search all memslots and move the
-last_used_slot logic up one level to __gfn_to_memslot. This is in
-preparation for introducing a per-vCPU last_used_slot.
+The memslot for a given gfn is looked up multiple times during page
+fault handling. Avoid binary searching for it multiple times by caching
+the most recently used slot. There is an existing VM-wide last_used_slot
+but that does not work well for cases where vCPUs are accessing memory
+in different slots (see performance data below).
 
-As part of this change convert existing callers of search_memslots to
-__gfn_to_memslot to avoid making any functional changes.
+Another benefit of caching the most recently use slot (versus looking
+up the slot once and passing around a pointer) is speeding up memslot
+lookups *across* faults and during spte prefetching.
+
+To measure the performance of this change I ran dirty_log_perf_test with
+64 vCPUs and 64 memslots and measured "Populate memory time" and
+"Iteration 2 dirty memory time".  Tests were ran with eptad=N to force
+dirty logging to use fast_page_fault so its performance could be
+measured.
+
+Config     | Metric                        | Before | After
+---------- | ----------------------------- | ------ | ------
+tdp_mmu=Y  | Populate memory time          | 6.76s  | 5.47s
+tdp_mmu=Y  | Iteration 2 dirty memory time | 2.83s  | 0.31s
+tdp_mmu=N  | Populate memory time          | 20.4s  | 18.7s
+tdp_mmu=N  | Iteration 2 dirty memory time | 2.65s  | 0.30s
+
+The "Iteration 2 dirty memory time" results are especially compelling
+because they are equivalent to running the same test with a single
+memslot. In other words, fast_page_fault performance no longer scales
+with the number of memslots.
 
 Signed-off-by: David Matlack <dmatlack@google.com>
 ---
- arch/powerpc/kvm/book3s_64_vio.c    |  2 +-
- arch/powerpc/kvm/book3s_64_vio_hv.c |  2 +-
- include/linux/kvm_host.h            | 64 +++++++++++++++++++++--------
- 3 files changed, 50 insertions(+), 18 deletions(-)
+ include/linux/kvm_host.h | 13 +++++++++++++
+ virt/kvm/kvm_main.c      | 22 +++++++++++++++++++++-
+ 2 files changed, 34 insertions(+), 1 deletion(-)
 
-diff --git a/arch/powerpc/kvm/book3s_64_vio.c b/arch/powerpc/kvm/book3s_64_vio.c
-index 8da93fdfa59e..6365087f3160 100644
---- a/arch/powerpc/kvm/book3s_64_vio.c
-+++ b/arch/powerpc/kvm/book3s_64_vio.c
-@@ -346,7 +346,7 @@ static long kvmppc_tce_to_ua(struct kvm *kvm, unsigned long tce,
- 	unsigned long gfn = tce >> PAGE_SHIFT;
- 	struct kvm_memory_slot *memslot;
- 
--	memslot = search_memslots(kvm_memslots(kvm), gfn);
-+	memslot = __gfn_to_memslot(kvm_memslots(kvm), gfn);
- 	if (!memslot)
- 		return -EINVAL;
- 
-diff --git a/arch/powerpc/kvm/book3s_64_vio_hv.c b/arch/powerpc/kvm/book3s_64_vio_hv.c
-index dc6591548f0c..f38dfe195ef2 100644
---- a/arch/powerpc/kvm/book3s_64_vio_hv.c
-+++ b/arch/powerpc/kvm/book3s_64_vio_hv.c
-@@ -80,7 +80,7 @@ static long kvmppc_rm_tce_to_ua(struct kvm *kvm,
- 	unsigned long gfn = tce >> PAGE_SHIFT;
- 	struct kvm_memory_slot *memslot;
- 
--	memslot = search_memslots(kvm_memslots_raw(kvm), gfn);
-+	memslot = __gfn_to_memslot(kvm_memslots_raw(kvm), gfn);
- 	if (!memslot)
- 		return -EINVAL;
- 
 diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-index 61ff8130a75d..7f28731346f8 100644
+index 7f28731346f8..5eb2da09cf7f 100644
 --- a/include/linux/kvm_host.h
 +++ b/include/linux/kvm_host.h
-@@ -1190,29 +1190,43 @@ void kvm_free_irq_source_id(struct kvm *kvm, int irq_source_id);
- bool kvm_arch_irqfd_allowed(struct kvm *kvm, struct kvm_irqfd *args);
+@@ -354,6 +354,13 @@ struct kvm_vcpu {
+ 	struct kvm_vcpu_stat stat;
+ 	char stats_id[KVM_STATS_NAME_SIZE];
+ 	struct kvm_dirty_ring dirty_ring;
++
++	/*
++	 * The index of the most recently used memslot by this vCPU. It's ok
++	 * if this becomes stale due to memslot changes since we always check
++	 * it is a valid slot.
++	 */
++	int last_used_slot;
+ };
  
- /*
-- * search_memslots() and __gfn_to_memslot() are here because they are
-- * used in non-modular code in arch/powerpc/kvm/book3s_hv_rm_mmu.c.
-- * gfn_to_memslot() itself isn't here as an inline because that would
-- * bloat other code too much.
-+ * Returns a pointer to the memslot at slot_index if it contains gfn.
-+ * Otherwise returns NULL.
-+ */
-+static inline struct kvm_memory_slot *
-+try_get_memslot(struct kvm_memslots *slots, int slot_index, gfn_t gfn)
-+{
-+	struct kvm_memory_slot *slot;
-+
-+	if (slot_index < 0 || slot_index >= slots->used_slots)
-+		return NULL;
-+
-+	slot = &slots->memslots[slot_index];
-+
-+	if (gfn >= slot->base_gfn && gfn < slot->base_gfn + slot->npages)
-+		return slot;
-+	else
-+		return NULL;
-+}
-+
-+/*
-+ * Returns a pointer to the memslot that contains gfn and records the index of
-+ * the slot in index. Otherwise returns NULL.
-  *
-  * IMPORTANT: Slots are sorted from highest GFN to lowest GFN!
-  */
- static inline struct kvm_memory_slot *
--search_memslots(struct kvm_memslots *slots, gfn_t gfn)
-+search_memslots(struct kvm_memslots *slots, gfn_t gfn, int *index)
- {
- 	int start = 0, end = slots->used_slots;
--	int slot = atomic_read(&slots->last_used_slot);
- 	struct kvm_memory_slot *memslots = slots->memslots;
-+	struct kvm_memory_slot *slot;
- 
- 	if (unlikely(!slots->used_slots))
+ /* must be called with irqs disabled */
+@@ -1201,6 +1208,12 @@ try_get_memslot(struct kvm_memslots *slots, int slot_index, gfn_t gfn)
+ 	if (slot_index < 0 || slot_index >= slots->used_slots)
  		return NULL;
  
--	if (gfn >= memslots[slot].base_gfn &&
--	    gfn < memslots[slot].base_gfn + memslots[slot].npages)
--		return &memslots[slot];
--
- 	while (start < end) {
--		slot = start + (end - start) / 2;
-+		int slot = start + (end - start) / 2;
++	/*
++	 * slot_index can come from vcpu->last_used_slot which is not kept
++	 * in sync with userspace-controllable memslot deletion. So use nospec
++	 * to prevent the CPU from speculating past the end of memslots[].
++	 */
++	slot_index = array_index_nospec(slot_index, slots->used_slots);
+ 	slot = &slots->memslots[slot_index];
  
- 		if (gfn >= memslots[slot].base_gfn)
- 			end = slot;
-@@ -1220,19 +1234,37 @@ search_memslots(struct kvm_memslots *slots, gfn_t gfn)
- 			start = slot + 1;
- 	}
- 
--	if (start < slots->used_slots && gfn >= memslots[start].base_gfn &&
--	    gfn < memslots[start].base_gfn + memslots[start].npages) {
--		atomic_set(&slots->last_used_slot, start);
--		return &memslots[start];
-+	slot = try_get_memslot(slots, start, gfn);
-+	if (slot) {
-+		*index = start;
-+		return slot;
- 	}
- 
- 	return NULL;
+ 	if (gfn >= slot->base_gfn && gfn < slot->base_gfn + slot->npages)
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index 9d3c9f71b4e1..9ae8b96905c7 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -415,6 +415,7 @@ static void kvm_vcpu_init(struct kvm_vcpu *vcpu, struct kvm *kvm, unsigned id)
+ 	vcpu->preempted = false;
+ 	vcpu->ready = false;
+ 	preempt_notifier_init(&vcpu->preempt_notifier, &kvm_preempt_ops);
++	vcpu->last_used_slot = 0;
  }
  
-+/*
-+ * __gfn_to_memslot() and its descendants are here because it is called from
-+ * non-modular code in arch/powerpc/kvm/book3s_64_vio{,_hv}.c. gfn_to_memslot()
-+ * itself isn't here as an inline because that would bloat other code too much.
-+ */
- static inline struct kvm_memory_slot *
- __gfn_to_memslot(struct kvm_memslots *slots, gfn_t gfn)
+ void kvm_vcpu_destroy(struct kvm_vcpu *vcpu)
+@@ -2024,7 +2025,26 @@ EXPORT_SYMBOL_GPL(gfn_to_memslot);
+ 
+ struct kvm_memory_slot *kvm_vcpu_gfn_to_memslot(struct kvm_vcpu *vcpu, gfn_t gfn)
  {
--	return search_memslots(slots, gfn);
+-	return __gfn_to_memslot(kvm_vcpu_memslots(vcpu), gfn);
++	struct kvm_memslots *slots = kvm_vcpu_memslots(vcpu);
 +	struct kvm_memory_slot *slot;
-+	int slot_index = atomic_read(&slots->last_used_slot);
++	int slot_index;
 +
-+	slot = try_get_memslot(slots, slot_index, gfn);
++	slot = try_get_memslot(slots, vcpu->last_used_slot, gfn);
 +	if (slot)
 +		return slot;
 +
++	/*
++	 * Fall back to searching all memslots. We purposely use
++	 * search_memslots() instead of __gfn_to_memslot() to avoid
++	 * thrashing the VM-wide last_used_index in kvm_memslots.
++	 */
 +	slot = search_memslots(slots, gfn, &slot_index);
 +	if (slot) {
-+		atomic_set(&slots->last_used_slot, slot_index);
++		vcpu->last_used_slot = slot_index;
 +		return slot;
 +	}
 +
 +	return NULL;
  }
+ EXPORT_SYMBOL_GPL(kvm_vcpu_gfn_to_memslot);
  
- static inline unsigned long
 -- 
 2.32.0.554.ge1b32706d8-goog
 
