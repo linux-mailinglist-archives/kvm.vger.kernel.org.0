@@ -2,114 +2,101 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id BEFA43DFB53
-	for <lists+kvm@lfdr.de>; Wed,  4 Aug 2021 08:09:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EECCA3DFBA5
+	for <lists+kvm@lfdr.de>; Wed,  4 Aug 2021 08:59:53 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235519AbhHDGJr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 4 Aug 2021 02:09:47 -0400
-Received: from mga11.intel.com ([192.55.52.93]:42718 "EHLO mga11.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S235499AbhHDGJq (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 4 Aug 2021 02:09:46 -0400
-X-IronPort-AV: E=McAfee;i="6200,9189,10065"; a="210744639"
-X-IronPort-AV: E=Sophos;i="5.84,293,1620716400"; 
-   d="scan'208";a="210744639"
-Received: from fmsmga003.fm.intel.com ([10.253.24.29])
-  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Aug 2021 23:09:34 -0700
-X-IronPort-AV: E=Sophos;i="5.84,293,1620716400"; 
-   d="scan'208";a="511750613"
-Received: from xiaoyaol-mobl.ccr.corp.intel.com (HELO [10.239.13.122]) ([10.239.13.122])
-  by fmsmga003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Aug 2021 23:09:28 -0700
-Subject: Re: [RFC PATCH 1/4] KVM: selftests: Add support for creating
- non-default type VMs
-To:     Erdem Aktas <erdemaktas@google.com>,
-        linux-kselftest@vger.kernel.org
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Peter Gonda <pgonda@google.com>, Marc Orr <marcorr@google.com>,
-        Sagi Shahar <sagis@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Shuah Khan <shuah@kernel.org>,
-        Andrew Jones <drjones@redhat.com>,
-        Ben Gardon <bgardon@google.com>, Peter Xu <peterx@redhat.com>,
-        David Matlack <dmatlack@google.com>,
-        Emanuele Giuseppe Esposito <eesposit@redhat.com>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Ricardo Koller <ricarkol@google.com>,
-        Eric Auger <eric.auger@redhat.com>,
-        Yanan Wang <wangyanan55@huawei.com>,
-        Aaron Lewis <aaronlewis@google.com>,
-        Jim Mattson <jmattson@google.com>,
-        Oliver Upton <oupton@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Peter Shier <pshier@google.com>,
-        Axel Rasmussen <axelrasmussen@google.com>,
-        Zhenzhong Duan <zhenzhong.duan@intel.com>,
-        "Maciej S. Szmigiero" <maciej.szmigiero@oracle.com>,
-        Like Xu <like.xu@linux.intel.com>,
-        open list <linux-kernel@vger.kernel.org>,
-        "open list:KERNEL VIRTUAL MACHINE (KVM)" <kvm@vger.kernel.org>
-References: <20210726183816.1343022-1-erdemaktas@google.com>
- <20210726183816.1343022-2-erdemaktas@google.com>
-From:   Xiaoyao Li <xiaoyao.li@intel.com>
-Message-ID: <e1651746-aa46-31e7-e1c0-99f3faaf1586@intel.com>
-Date:   Wed, 4 Aug 2021 14:09:26 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
- Firefox/78.0 Thunderbird/78.12.0
+        id S235714AbhHDHAE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 4 Aug 2021 03:00:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36396 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S235227AbhHDHAE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 4 Aug 2021 03:00:04 -0400
+Received: from mail-lf1-x12e.google.com (mail-lf1-x12e.google.com [IPv6:2a00:1450:4864:20::12e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A1AD7C0613D5
+        for <kvm@vger.kernel.org>; Tue,  3 Aug 2021 23:59:50 -0700 (PDT)
+Received: by mail-lf1-x12e.google.com with SMTP id u3so2722053lff.9
+        for <kvm@vger.kernel.org>; Tue, 03 Aug 2021 23:59:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=FyMnszXXyHK4JDa0x/iclyGuG1G0X7e/HsoyPTG9034=;
+        b=O4ScIbiiu9dQgWr9MYBsJ7D7L5y53rgIr6rBY0Al0x6bLaD/QC54vpgVaAnYS29zlG
+         wkTjmNUfxliTIQ0aQU0OZEKx3pSAgIwaYbrBd1b1EdRvMIRH/oScbeKx6KYqu9swRn2z
+         AZxgEa8Lx7vQXXGr8x6tIAiHo+Z7DH/t638EfZLab02YuiXMkqPWdCqWjfTQi3GF7qc2
+         2aPloOXQpeBfUEMuah/ScHkmRqOGL7yVTNpRmH80JSlRIDGcHGk3W53rikKcZOO4W5AF
+         BrdYfrxYYa6MBdMuPOubwecXugERvoLpUwVVLNrk/9pAsbsWG8GIQ1HzzXBMUjA62zoJ
+         RdMA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=FyMnszXXyHK4JDa0x/iclyGuG1G0X7e/HsoyPTG9034=;
+        b=mfgfZb7XTo8tZUSMjkw1xXYa9B1mwjm0w2fZJe4JpSFMCzRCA1pNi/WFfd23ln+E+p
+         i/1X40fwXxyAr3ZMaAd3P9Zf13R1ntkNj9xzyOk1Y00vUvr9jpJUg/fI6Yhafmt/6kFD
+         md3BPc+IkoFNZQrstUpSwaDgjnt1DgLV3pArTq9tiTrFzNj3qaBPzst7VTuNmMvSIZop
+         eD7jjTYIOkcaLtGYSaCWrxEcpLZlxeT+Ie0I1w3iFaJVZdbqbPEeVG1B8buwaFWtdom5
+         fQ7IoWW1y7xcEU34/F0mnCrZOyP3wQQJhcOsmVhhBJAeLAaJIBuVt6JnlLUvys0E3tM1
+         YCkw==
+X-Gm-Message-State: AOAM53296VUK1kES+yur1LRJn+EwuCsUn2rAZPuiNx4mwEAZ+6SjpDAz
+        Be2kyzMPHzAlVTr+jliBfScSAH89ak0opS0Iv+tSZA==
+X-Google-Smtp-Source: ABdhPJw2rUXELmIWFkaMKtzqgTKfHrd105kgYzO8xlzBjLxsLAtt/jBBP3NH6qpDRWX+ZhCBAP9JdOZwYa8M2d7kCpc=
+X-Received: by 2002:a05:6512:314a:: with SMTP id s10mr1127161lfi.57.1628060388794;
+ Tue, 03 Aug 2021 23:59:48 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20210726183816.1343022-2-erdemaktas@google.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+References: <20210729173300.181775-1-oupton@google.com> <20210729173300.181775-12-oupton@google.com>
+ <875yws2h5w.wl-maz@kernel.org> <CAOQ_QsgCrEWQqakicR3Peu_c8oCMeq8Cok+CK8vJVURUwAdG0A@mail.gmail.com>
+ <87wnp722tm.wl-maz@kernel.org> <CAOQ_QsiwuancUsFEVr3TBeP6yLZMfAqNRv3ww2H+hcUGfxs9LA@mail.gmail.com>
+In-Reply-To: <CAOQ_QsiwuancUsFEVr3TBeP6yLZMfAqNRv3ww2H+hcUGfxs9LA@mail.gmail.com>
+From:   Oliver Upton <oupton@google.com>
+Date:   Tue, 3 Aug 2021 23:59:37 -0700
+Message-ID: <CAOQ_QsiChO1mGGOFL96d35bbLaUBXyYf9cZw1h-Cf3G4P=1YXg@mail.gmail.com>
+Subject: Re: [PATCH v5 11/13] KVM: arm64: Provide userspace access to the
+ physical counter offset
+To:     Marc Zyngier <maz@kernel.org>
+Cc:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Peter Shier <pshier@google.com>,
+        Jim Mattson <jmattson@google.com>,
+        David Matlack <dmatlack@google.com>,
+        Ricardo Koller <ricarkol@google.com>,
+        Jing Zhang <jingzhangos@google.com>,
+        Raghavendra Rao Anata <rananta@google.com>,
+        James Morse <james.morse@arm.com>,
+        Alexandru Elisei <Alexandru.Elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        linux-arm-kernel@lists.infradead.org,
+        Andrew Jones <drjones@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 7/27/2021 2:37 AM, Erdem Aktas wrote:
-> Currently vm_create function only creates KVM_X86_LEGACY_VM type VMs.
-> Changing the vm_create function to accept type parameter to create
-> new VM types.
-> 
-> Signed-off-by: Erdem Aktas <erdemaktas@google.com>
-> Reviewed-by: Sean Christopherson <seanjc@google.com>
-> Reviewed-by: Peter Gonda <pgonda@google.com>
-> Reviewed-by: Marc Orr <marcorr@google.com>
-> Reviewed-by: Sagi Shahar <sagis@google.com>
-> ---
->   .../testing/selftests/kvm/include/kvm_util.h  |  1 +
->   tools/testing/selftests/kvm/lib/kvm_util.c    | 29 +++++++++++++++++--
->   2 files changed, 27 insertions(+), 3 deletions(-)
-> 
-> diff --git a/tools/testing/selftests/kvm/include/kvm_util.h b/tools/testing/selftests/kvm/include/kvm_util.h
-> index d53bfadd2..c63df42d6 100644
-> --- a/tools/testing/selftests/kvm/include/kvm_util.h
-> +++ b/tools/testing/selftests/kvm/include/kvm_util.h
-> @@ -88,6 +88,7 @@ int vcpu_enable_cap(struct kvm_vm *vm, uint32_t vcpu_id,
->   void vm_enable_dirty_ring(struct kvm_vm *vm, uint32_t ring_size);
->   
->   struct kvm_vm *vm_create(enum vm_guest_mode mode, uint64_t phy_pages, int perm);
-> +struct kvm_vm *__vm_create(enum vm_guest_mode mode, uint64_t phy_pages, int perm, int type);
->   void kvm_vm_free(struct kvm_vm *vmp);
->   void kvm_vm_restart(struct kvm_vm *vmp, int perm);
->   void kvm_vm_release(struct kvm_vm *vmp);
-> diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
-> index e5fbf16f7..70caa3882 100644
-> --- a/tools/testing/selftests/kvm/lib/kvm_util.c
-> +++ b/tools/testing/selftests/kvm/lib/kvm_util.c
-> @@ -180,13 +180,36 @@ _Static_assert(sizeof(vm_guest_mode_params)/sizeof(struct vm_guest_mode_params)
->    * Return:
->    *   Pointer to opaque structure that describes the created VM.
->    *
-> - * Creates a VM with the mode specified by mode (e.g. VM_MODE_P52V48_4K).
-> + * Wrapper VM Create function to create a VM with default type (0).
+Hi Marc,
 
-Can we pass KVM_X86_LEGACY_VM (whatever name when it's upstreamed) 
-instead of 0?
+On Fri, Jul 30, 2021 at 9:48 AM Oliver Upton <oupton@google.com> wrote:
+>
+> On Fri, Jul 30, 2021 at 9:18 AM Marc Zyngier <maz@kernel.org> wrote:
+> > You want the ARM FVP model, or maybe even the Foundation model. It has
+> > support all the way to ARMv8.7 apparently. I personally use the FVP,
+> > get in touch offline and I'll help you with the setup.
+> >
+> > In general, I tend to trust the ARM models a lot more than QEMU for
+> > the quality of the emulation. You can tune it in some bizarre way
+> > (the cache modelling is terrifying), and it will definitely do all
+> > kind of crazy reordering and speculation.
+>
+> Awesome, thanks. I'll give this a try.
+>
 
-> + */
-> +struct kvm_vm *vm_create(enum vm_guest_mode mode, uint64_t phy_pages, int perm)
-> +{
-> +	return __vm_create(mode, phy_pages, perm, 0);
-> +}
-> +
+I have another spin of this series ready to kick out the door that
+implements ECV support but ran into some issues testing it... Seems
+that the ARM Foundation model only implements ECV=0x01, when we need
+ECV=0x02 for CNTPOFF_EL2 to be valid. Any thoughts, or shall I just
+send out the series and stare at it long enough to make sure the ECV
+parts look right ;-)
 
-
+--
+Thanks,
+Oliver
