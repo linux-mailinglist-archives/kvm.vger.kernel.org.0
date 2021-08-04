@@ -2,56 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id AD0A53E0A60
-	for <lists+kvm@lfdr.de>; Thu,  5 Aug 2021 00:29:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9BD1C3E0A61
+	for <lists+kvm@lfdr.de>; Thu,  5 Aug 2021 00:29:11 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234022AbhHDW3U (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 4 Aug 2021 18:29:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51646 "EHLO
+        id S233949AbhHDW3W (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 4 Aug 2021 18:29:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51664 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233357AbhHDW3T (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 4 Aug 2021 18:29:19 -0400
-Received: from mail-pl1-x64a.google.com (mail-pl1-x64a.google.com [IPv6:2607:f8b0:4864:20::64a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 75931C061798
-        for <kvm@vger.kernel.org>; Wed,  4 Aug 2021 15:29:06 -0700 (PDT)
-Received: by mail-pl1-x64a.google.com with SMTP id u4-20020a170902e804b029012c4b467095so3098609plg.9
-        for <kvm@vger.kernel.org>; Wed, 04 Aug 2021 15:29:06 -0700 (PDT)
+        with ESMTP id S233831AbhHDW3V (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 4 Aug 2021 18:29:21 -0400
+Received: from mail-qt1-x84a.google.com (mail-qt1-x84a.google.com [IPv6:2607:f8b0:4864:20::84a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 51556C061798
+        for <kvm@vger.kernel.org>; Wed,  4 Aug 2021 15:29:08 -0700 (PDT)
+Received: by mail-qt1-x84a.google.com with SMTP id o7-20020ac87c470000b029025f8084df09so1746600qtv.6
+        for <kvm@vger.kernel.org>; Wed, 04 Aug 2021 15:29:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=date:in-reply-to:message-id:mime-version:references:subject:from:to
          :cc;
-        bh=r4KSt42d4XavFyyskSaAj5jovU4vP6wMC/qg76U9MT4=;
-        b=saxQfM/DE5sak0n0k+Ca6yVZgSHFIEiarauRjxb8Bi2TNY3WwY2jmG67uGoM9c1suk
-         r5aU0FY2iJblaiCJtmntiICjJW/duvb69W2EnZqjsSIHouQYRCBVfi/h6k5ejfKZVPrc
-         T/3LOilp5kT8fKEc4FY6UoPHHewFa4+4IBgUfAPTR+qb1rjzFD0Kl3+ulRk9XW1a+gjY
-         T/hzfbh1YaM/pX2/O81b8XgSZxglG4VbXshYomH85qmvtNx4PomMbTCYYAW6NuN4CJEe
-         oVcAqj9ThcvPiSvdGJs17TPOQa6cihAIjQPuO4rHsQ0DhfO+b2s83T0SPHzhxECGNx73
-         fCcg==
+        bh=5Eu+aw1lRqoNOShs52yKOmU8oimqSDtgVqbv4t5aTj4=;
+        b=WwJsObmem6DyHnnFm7cNADHNS/GI0KmHlvBFGH37H0MzRvjcMYZ7ZVcF8+qlnU+S5y
+         4HugHwFBwOTZ2qnbq2bAm8y+OOTeuZX4xlnaLAy43lqKgx17SOhBrWoONjXtda7anmgC
+         AtsSqqdkxP1Y8ClhzGZXQGbOXkUJwHa2JwJaAx+IE96IXEyCB+jtjqGZ/NjS8/FT0MDK
+         OhYm0EXV5ESpvbYoHjEM3Q6q/9gThDX4IT/DI6ftGrSTnqWkvB+NX/EOCY6BnUMwIXvW
+         8obp9X2N11POEW0VvhxOUiDb72y+ng+t/N1ULPT7DnQjOem+spe2KGE7L4/SEUj47grG
+         JghQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=r4KSt42d4XavFyyskSaAj5jovU4vP6wMC/qg76U9MT4=;
-        b=Sk1Iy2bI5jKTSMHfEb00VpslmO5Wi78NyXocOPR6Z3E+RryLQp+19jffM45EoawJKf
-         SY/MyJbjumWjNmpAgOC934/+po/JD7JXKegnmd2zkRbb4kA1VNdD6clP0RMOMBsK7Cbf
-         qND6EdTqK5QVMkGVXoq4puePH5Tx/l+2TkHmxomgY9hbLf/nCDn3Wvcc334bSIaFdofh
-         7ysE1E85K3jJOVBukNNGxVNyYKGtggLO8N/CMVYpVB9mPG/VPEcm3v6rjq0COi1MyW6B
-         308DqLDkM4JHngufwpevvEQz4ZzN/CbGmBrCtXzqj4YN0dLVq0pob5kDdX3eXSJ/HRa4
-         5y0w==
-X-Gm-Message-State: AOAM530tLPf38wmM4rGOtuT8BHzo1yhpLT1K3KxlbNIXO7XGgFJt2R+1
-        dlTV45aUXbqSTjMYAGgBDUYHqLj3ZHrx4Q==
-X-Google-Smtp-Source: ABdhPJwztsKEFalvD8y8OYu//RhJK+QYKZxTVE4i+C3flJ6riHbA13iz9bp8e/azIxsDBdK85rJet2G2FpIUag==
+        bh=5Eu+aw1lRqoNOShs52yKOmU8oimqSDtgVqbv4t5aTj4=;
+        b=B9N9ty1VLuguHp+C9/ixU73dCfJq+DmzgBwltoK/CEx5j9IwHOQtxpyNcvbuaZGXJ/
+         K2Tt5hpkbEhEuWspPAAV5qLOR9dAGY9e9usSsnWmWC0qdSIO8GnYzZQ4rQOvfhm1lBHB
+         GlCc7KFjCRYLmelS0j0b9z53xTzS7ey2oBsOjpMt0H8JyEf/+pGryB2J6CwDCVKdkBS9
+         u7UX4M9EueZhh98Mqoz6xtfdZq4BzqTfQxlIbzcrR4Gc/Y9S5TpMk30b+zDB1RusDDjZ
+         SMW3rPcZHcf5Yli5sU4/KE+i/AvCMx8HE1Zwa7CeiAvaledNcw7TlksHKzOFXTxiBAal
+         FqYQ==
+X-Gm-Message-State: AOAM532KG7srwX3r7fvArydGbLYqOxdF0F9dxK/kKi/d6nJE8SgLsaTq
+        K7XNDjBqfx7DEMgBZPPARYFerAdCYpnyHA==
+X-Google-Smtp-Source: ABdhPJx5lVjgRawVW2hr2ptJDN68IEgkF3aMXKLbo7D7swoDh5EM1HRZ30u7K6X4M583pTQEhdE6HP/dV5OV6w==
 X-Received: from dmatlack-heavy.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:19cd])
- (user=dmatlack job=sendgmr) by 2002:a05:6a00:15d3:b029:3a5:f4dd:4627 with
- SMTP id o19-20020a056a0015d3b02903a5f4dd4627mr1814572pfu.4.1628116145880;
- Wed, 04 Aug 2021 15:29:05 -0700 (PDT)
-Date:   Wed,  4 Aug 2021 22:28:41 +0000
+ (user=dmatlack job=sendgmr) by 2002:a05:6214:20ea:: with SMTP id
+ 10mr1892816qvk.13.1628116147552; Wed, 04 Aug 2021 15:29:07 -0700 (PDT)
+Date:   Wed,  4 Aug 2021 22:28:42 +0000
 In-Reply-To: <20210804222844.1419481-1-dmatlack@google.com>
-Message-Id: <20210804222844.1419481-5-dmatlack@google.com>
+Message-Id: <20210804222844.1419481-6-dmatlack@google.com>
 Mime-Version: 1.0
 References: <20210804222844.1419481-1-dmatlack@google.com>
 X-Mailer: git-send-email 2.32.0.554.ge1b32706d8-goog
-Subject: [PATCH v2 4/7] KVM: x86/mmu: Leverage vcpu->last_used_slot in tdp_mmu_map_handle_target_level
+Subject: [PATCH v2 5/7] KVM: x86/mmu: Leverage vcpu->last_used_slot for
+ rmap_add and rmap_recycle
 From:   David Matlack <dmatlack@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     kvm@vger.kernel.org, kvm-ppc@vger.kernel.org,
@@ -72,102 +72,107 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The existing TDP MMU methods to handle dirty logging are vcpu-agnostic
-since they can be driven by MMU notifiers and other non-vcpu-specific
-events in addition to page faults. However this means that the TDP MMU
-is not benefiting from the new vcpu->last_used_slot. Fix that by
-introducing a tdp_mmu_map_set_spte_atomic() which is only called during
-a TDP page fault and has access to the kvm_vcpu for fast slot lookups.
+rmap_add() and rmap_recycle() both run in the context of the vCPU and
+thus we can use kvm_vcpu_gfn_to_memslot() to look up the memslot. This
+enables rmap_add() and rmap_recycle() to take advantage of
+vcpu->last_used_slot and avoid expensive memslot searching.
 
-This improves "Populate memory time" in dirty_log_perf_test by 5%:
+This change improves the performance of "Populate memory time" in
+dirty_log_perf_test with tdp_mmu=N. In addition to improving the
+performance, "Populate memory time" no longer scales with the number
+of memslots in the VM.
 
 Command                         | Before           | After
 ------------------------------- | ---------------- | -------------
-./dirty_log_perf_test -v64 -x64 | 5.472321072s     | 5.169832886s
+./dirty_log_perf_test -v64 -x1  | 15.18001570s     | 14.99469366s
+./dirty_log_perf_test -v64 -x64 | 18.71336392s     | 14.98675076s
 
+Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
 Signed-off-by: David Matlack <dmatlack@google.com>
 ---
- arch/x86/kvm/mmu/tdp_mmu.c | 42 ++++++++++++++++++++++++++++++--------
- 1 file changed, 33 insertions(+), 9 deletions(-)
+ arch/x86/kvm/mmu/mmu.c | 35 ++++++++++++++++++++---------------
+ 1 file changed, 20 insertions(+), 15 deletions(-)
 
-diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
-index 43f12f5d12c0..dab6cb46cdb2 100644
---- a/arch/x86/kvm/mmu/tdp_mmu.c
-+++ b/arch/x86/kvm/mmu/tdp_mmu.c
-@@ -542,15 +542,40 @@ static inline bool tdp_mmu_set_spte_atomic_no_dirty_log(struct kvm *kvm,
- 	return true;
+diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+index a8cdfd8d45c4..370a6ebc2ede 100644
+--- a/arch/x86/kvm/mmu/mmu.c
++++ b/arch/x86/kvm/mmu/mmu.c
+@@ -1043,17 +1043,6 @@ static struct kvm_rmap_head *__gfn_to_rmap(gfn_t gfn, int level,
+ 	return &slot->arch.rmap[level - PG_LEVEL_4K][idx];
  }
  
--static inline bool tdp_mmu_set_spte_atomic(struct kvm *kvm,
--					   struct tdp_iter *iter,
--					   u64 new_spte)
-+/*
-+ * tdp_mmu_map_set_spte_atomic - Set a leaf TDP MMU SPTE atomically to resolve a
-+ * TDP page fault.
-+ *
-+ * @vcpu: The vcpu instance that took the TDP page fault.
-+ * @iter: a tdp_iter instance currently on the SPTE that should be set
-+ * @new_spte: The value the SPTE should be set to
-+ *
-+ * Returns: true if the SPTE was set, false if it was not. If false is returned,
-+ *	    this function will have no side-effects.
-+ */
-+static inline bool tdp_mmu_map_set_spte_atomic(struct kvm_vcpu *vcpu,
-+					       struct tdp_iter *iter,
-+					       u64 new_spte)
+-static struct kvm_rmap_head *gfn_to_rmap(struct kvm *kvm, gfn_t gfn,
+-					 struct kvm_mmu_page *sp)
+-{
+-	struct kvm_memslots *slots;
+-	struct kvm_memory_slot *slot;
+-
+-	slots = kvm_memslots_for_spte_role(kvm, sp->role);
+-	slot = __gfn_to_memslot(slots, gfn);
+-	return __gfn_to_rmap(gfn, sp->role.level, slot);
+-}
+-
+ static bool rmap_can_add(struct kvm_vcpu *vcpu)
  {
-+	struct kvm *kvm = vcpu->kvm;
-+
- 	if (!tdp_mmu_set_spte_atomic_no_dirty_log(kvm, iter, new_spte))
- 		return false;
+ 	struct kvm_mmu_memory_cache *mc;
+@@ -1064,24 +1053,39 @@ static bool rmap_can_add(struct kvm_vcpu *vcpu)
  
--	handle_changed_spte_dirty_log(kvm, iter->as_id, iter->gfn,
--				      iter->old_spte, new_spte, iter->level);
-+	/*
-+	 * Use kvm_vcpu_gfn_to_memslot() instead of going through
-+	 * handle_changed_spte_dirty_log() to leverage vcpu->last_used_slot.
-+	 */
-+	if (is_writable_pte(new_spte)) {
-+		struct kvm_memory_slot *slot = kvm_vcpu_gfn_to_memslot(vcpu, iter->gfn);
-+
-+		if (slot && kvm_slot_dirty_track_enabled(slot)) {
-+			/* Enforced by kvm_mmu_hugepage_adjust. */
-+			WARN_ON_ONCE(iter->level > PG_LEVEL_4K);
-+			mark_page_dirty_in_slot(kvm, slot, iter->gfn);
-+		}
-+	}
-+
- 	return true;
+ static int rmap_add(struct kvm_vcpu *vcpu, u64 *spte, gfn_t gfn)
+ {
++	struct kvm_memory_slot *slot;
+ 	struct kvm_mmu_page *sp;
+ 	struct kvm_rmap_head *rmap_head;
+ 
+ 	sp = sptep_to_sp(spte);
+ 	kvm_mmu_page_set_gfn(sp, spte - sp->spt, gfn);
+-	rmap_head = gfn_to_rmap(vcpu->kvm, gfn, sp);
++	slot = kvm_vcpu_gfn_to_memslot(vcpu, gfn);
++	rmap_head = __gfn_to_rmap(gfn, sp->role.level, slot);
+ 	return pte_list_add(vcpu, spte, rmap_head);
  }
  
-@@ -563,7 +588,7 @@ static inline bool tdp_mmu_zap_spte_atomic(struct kvm *kvm,
- 	 * immediately installing a present entry in its place
- 	 * before the TLBs are flushed.
- 	 */
--	if (!tdp_mmu_set_spte_atomic(kvm, iter, REMOVED_SPTE))
-+	if (!tdp_mmu_set_spte_atomic_no_dirty_log(kvm, iter, REMOVED_SPTE))
- 		return false;
++
+ static void rmap_remove(struct kvm *kvm, u64 *spte)
+ {
++	struct kvm_memslots *slots;
++	struct kvm_memory_slot *slot;
+ 	struct kvm_mmu_page *sp;
+ 	gfn_t gfn;
+ 	struct kvm_rmap_head *rmap_head;
  
- 	kvm_flush_remote_tlbs_with_address(kvm, iter->gfn,
-@@ -931,7 +956,7 @@ static int tdp_mmu_map_handle_target_level(struct kvm_vcpu *vcpu, int write,
+ 	sp = sptep_to_sp(spte);
+ 	gfn = kvm_mmu_page_get_gfn(sp, spte - sp->spt);
+-	rmap_head = gfn_to_rmap(kvm, gfn, sp);
++
++	/*
++	 * Unlike rmap_add and rmap_recycle, rmap_remove does not run in the
++	 * context of a vCPU so have to determine which memslots to use based
++	 * on context information in sp->role.
++	 */
++	slots = kvm_memslots_for_spte_role(kvm, sp->role);
++
++	slot = __gfn_to_memslot(slots, gfn);
++	rmap_head = __gfn_to_rmap(gfn, sp->role.level, slot);
++
+ 	__pte_list_remove(spte, rmap_head);
+ }
  
- 	if (new_spte == iter->old_spte)
- 		ret = RET_PF_SPURIOUS;
--	else if (!tdp_mmu_set_spte_atomic(vcpu->kvm, iter, new_spte))
-+	else if (!tdp_mmu_map_set_spte_atomic(vcpu, iter, new_spte))
- 		return RET_PF_RETRY;
+@@ -1628,12 +1632,13 @@ static bool kvm_test_age_rmapp(struct kvm *kvm, struct kvm_rmap_head *rmap_head,
  
- 	/*
-@@ -1035,8 +1060,7 @@ int kvm_tdp_mmu_map(struct kvm_vcpu *vcpu, gpa_t gpa, u32 error_code,
- 			new_spte = make_nonleaf_spte(child_pt,
- 						     !shadow_accessed_mask);
+ static void rmap_recycle(struct kvm_vcpu *vcpu, u64 *spte, gfn_t gfn)
+ {
++	struct kvm_memory_slot *slot;
+ 	struct kvm_rmap_head *rmap_head;
+ 	struct kvm_mmu_page *sp;
  
--			if (tdp_mmu_set_spte_atomic(vcpu->kvm, &iter,
--						    new_spte)) {
-+			if (tdp_mmu_set_spte_atomic_no_dirty_log(vcpu->kvm, &iter, new_spte)) {
- 				tdp_mmu_link_page(vcpu->kvm, sp, true,
- 						  huge_page_disallowed &&
- 						  req_level >= iter.level);
+ 	sp = sptep_to_sp(spte);
+-
+-	rmap_head = gfn_to_rmap(vcpu->kvm, gfn, sp);
++	slot = kvm_vcpu_gfn_to_memslot(vcpu, gfn);
++	rmap_head = __gfn_to_rmap(gfn, sp->role.level, slot);
+ 
+ 	kvm_unmap_rmapp(vcpu->kvm, rmap_head, NULL, gfn, sp->role.level, __pte(0));
+ 	kvm_flush_remote_tlbs_with_address(vcpu->kvm, sp->gfn,
 -- 
 2.32.0.554.ge1b32706d8-goog
 
