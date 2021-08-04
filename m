@@ -2,133 +2,109 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 88A693E0992
-	for <lists+kvm@lfdr.de>; Wed,  4 Aug 2021 22:43:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 32CCD3E0A1C
+	for <lists+kvm@lfdr.de>; Wed,  4 Aug 2021 23:46:16 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240984AbhHDUne (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 4 Aug 2021 16:43:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56244 "EHLO
+        id S233344AbhHDVq1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 4 Aug 2021 17:46:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42152 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240999AbhHDUnb (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 4 Aug 2021 16:43:31 -0400
-Received: from mail-pj1-x102e.google.com (mail-pj1-x102e.google.com [IPv6:2607:f8b0:4864:20::102e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2EA3EC0617A1
-        for <kvm@vger.kernel.org>; Wed,  4 Aug 2021 13:43:16 -0700 (PDT)
-Received: by mail-pj1-x102e.google.com with SMTP id e2-20020a17090a4a02b029016f3020d867so5310663pjh.3
-        for <kvm@vger.kernel.org>; Wed, 04 Aug 2021 13:43:16 -0700 (PDT)
+        with ESMTP id S229725AbhHDVq0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 4 Aug 2021 17:46:26 -0400
+Received: from mail-qv1-xf49.google.com (mail-qv1-xf49.google.com [IPv6:2607:f8b0:4864:20::f49])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CE6E1C0613D5
+        for <kvm@vger.kernel.org>; Wed,  4 Aug 2021 14:46:13 -0700 (PDT)
+Received: by mail-qv1-xf49.google.com with SMTP id dl20-20020ad44e140000b0290347c39b05c0so877426qvb.3
+        for <kvm@vger.kernel.org>; Wed, 04 Aug 2021 14:46:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=1DGmVLNofyKFJ2WDfVjd9ULXSsiDt/CCk+eOwHGjfu4=;
-        b=WArsvRSLlFr50dBfZn6SZ2FmQx3aDGM8BDjvlw+WToDfW5/7sFaoacLCSjg/XSPZfp
-         +iPwZJGtDdfNI7X1Oft9kNYtVRTPy53ejKYzUjSKkDRN86QL4wUD5ZoA1z06BQrNcI/w
-         UhqBoKZ3h5ajEcud4tt6yhTPTi1h8PsP/2XybeEqHBpidFLGokATt8Vp8FzWI1uslJo7
-         B2N3K4GxezuAKoP7Msdv0lUlSuCbN754OQ8BnmzR95Lzr400lIh6gE7ngI2iXcwiLk1c
-         aatIrA/teQHEe7osYVDpn4wwTe4d/V24KvA9PUbUSsxuKcZ1eS7Y9vV46jTloH1fjBrM
-         C4Zw==
+        h=reply-to:date:message-id:mime-version:subject:from:to:cc;
+        bh=C4TQOA8B8J/q4Zfe5kHKEB3lmPCutdPC4QZ7gqnArH8=;
+        b=YNPOfuewQrcWJCQ/5Iz1uNhVfCb1JkA4TKkX/0eh8jFXMExJPlyT8oXMGZuw00qiCd
+         C1/GMBA6RZBqyhevuhfebMNc+N2QsjkyLxFe07Cc+rN13zJCqwy7DrMvbPFF7OQaZO5K
+         bhXLFz6y7Of7H+rEatnX55xtleoN0xU/Aud13OEC0HEB35o5FXSwWY+qLM6V8dOi80aB
+         yLbZWKMiIA2jqt8de0baS96IM6KRrc0+2tfoXthF8vlgqfgtK5Hnfm5/a54wXuChfA35
+         sTHKSjHy5zp4Sr8X9yl8pPez1sljtm+vUKXWatUrSr4GvZk7U/8pozMdAIwomPipG4CQ
+         OnqA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=1DGmVLNofyKFJ2WDfVjd9ULXSsiDt/CCk+eOwHGjfu4=;
-        b=nkkT9lp3n4slEURP1xr241g9JUkN8dMGDNDShKvP7FTp0x6qGt3c6+Hkhhaf76edML
-         MRqV1io7H+PjD/7pFd/fJQxwysj2824RP1isKTeblTWktwE8ceXDv6sbcNTODt+gXfY/
-         mxI8NIH9VVFieWMXhZRqIROl9wkwHJjUL7g5ZqkOIefd+rkYPu+m4RKt+C5woOecM83j
-         RbdK8GMBlepr4VTm/5YhAuLM7pncGwL74Up7AvOhIvnM4eRj+l/zqENi05UkX8s8lxNE
-         nCpDQ657Tqs31wepOtK/Jnywlers40b6T2vzx00Ng3vkOtS/Oot5fsye77y9DHv4e4Tl
-         hiFQ==
-X-Gm-Message-State: AOAM533lHJQVnBYGOQ1gNbA72+rD8YaY4NQTJXHtXWpS/HF9vgcldgNR
-        +isONUU7IGGn5+Z1p3SDhoxNyalNVY6QtYK4PciHRA==
-X-Google-Smtp-Source: ABdhPJyeQRI34XtispxUm9kcYFkw2mybSTv8DV1XRknJ0Xuiis25Z9MXXJVDoi+23/Ho5lOIL/15fsb49Kq/Sqq0iyA=
-X-Received: by 2002:a63:4446:: with SMTP id t6mr967654pgk.76.1628109795439;
- Wed, 04 Aug 2021 13:43:15 -0700 (PDT)
-MIME-Version: 1.0
-References: <cover.1625186503.git.isaku.yamahata@intel.com>
- <d29b2ac2090f20e8de96888742feb413f597f1dc.1625186503.git.isaku.yamahata@intel.com>
- <CAAYXXYy=fn9dUMjY6b6wgCHSTLewnTZLKb00NMupDXSWbNC9OQ@mail.gmail.com> <1057bbfe-c73e-a182-7696-afc59a4786d8@intel.com>
-In-Reply-To: <1057bbfe-c73e-a182-7696-afc59a4786d8@intel.com>
-From:   Erdem Aktas <erdemaktas@google.com>
-Date:   Wed, 4 Aug 2021 13:43:04 -0700
-Message-ID: <CAAYXXYwDuRMQ16X3mshkGcBQXhvgoxPTCu8UGggYgfCzHOWwtQ@mail.gmail.com>
-Subject: Re: [RFC PATCH v2 05/69] KVM: TDX: Add architectural definitions for
- structures and values
-To:     Xiaoyao Li <xiaoyao.li@intel.com>
-Cc:     "Yamahata, Isaku" <isaku.yamahata@intel.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        "H . Peter Anvin" <hpa@zytor.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
+        h=x-gm-message-state:reply-to:date:message-id:mime-version:subject
+         :from:to:cc;
+        bh=C4TQOA8B8J/q4Zfe5kHKEB3lmPCutdPC4QZ7gqnArH8=;
+        b=mqlauntmXdhzf1MSdvWQmk6IppxYC4KBw3zahquaGaTVO+fDVwz1erM0+eeHnPjGYA
+         p10fNYX0rBle+UWeqNEfOb6tJVVSiBFqUJ+EzRXuYrp/Lx04L9+rZHiqvxisTTTj5OCO
+         ZvOnnQ6b/+0mk0Pk/MjN8v4CJUhD/EvFflBFCrIS8KlEC4dwH1/MV4RTdfUrgrh8My04
+         CJ5sX1kruoaWqksc7kZe0AcP/6sKFneYHxGkR4BpzGMve7J2EZkZOQbGiUIeQzXE5smC
+         QkbglA2Q2l7gOqOKHU5xGMloY39NxXhyZCSH6I2hDKRp3MC1O6FyhuJJFkae6YKH1yel
+         z8eA==
+X-Gm-Message-State: AOAM530jcDnLVX+qZuXUa1v5jQPNGlQyquh+8kC6Ulq5MnnQ8Qwod6MI
+        r1jY67WY9uIA6XSCEO76vpVOlVPaLh0=
+X-Google-Smtp-Source: ABdhPJzre0zuQgcoCCv3rfHIjO6dR7eyTRXfK2AxxKiu1wox9S+sbtAdIzb3L38QimrvyQF7xC/AQRzu05o=
+X-Received: from seanjc798194.pdx.corp.google.com ([2620:15c:90:200:e041:28e5:75db:9055])
+ (user=seanjc job=sendgmr) by 2002:a0c:a321:: with SMTP id u30mr1545572qvu.57.1628113573026;
+ Wed, 04 Aug 2021 14:46:13 -0700 (PDT)
+Reply-To: Sean Christopherson <seanjc@google.com>
+Date:   Wed,  4 Aug 2021 14:46:09 -0700
+Message-Id: <20210804214609.1096003-1-seanjc@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.32.0.554.ge1b32706d8-goog
+Subject: [PATCH] KVM: x86/mmu: Fix per-cpu counter corruption on 32-bit builds
+From:   Sean Christopherson <seanjc@google.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Sean Christopherson <seanjc@google.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Connor Kuehl <ckuehl@redhat.com>,
-        Sean Christopherson <seanjc@google.com>, x86 <x86@kernel.org>,
-        open list <linux-kernel@vger.kernel.org>,
-        "open list:KERNEL VIRTUAL MACHINE (KVM)" <kvm@vger.kernel.org>,
-        isaku.yamahata@gmail.com,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Kai Huang <kai.huang@linux.intel.com>,
-        Chao Gao <chao.gao@intel.com>
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Ben Gardon <bgardon@google.com>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Aug 2, 2021 at 6:25 AM Xiaoyao Li <xiaoyao.li@intel.com> wrote:
->
-> No. bit 63 is not for readonly fields, but for non_arch fields.
->
-> Please see 18.7.1 General definition
-Thank you so much! make sense.
+Take a signed 'long' instead of an 'unsigned long' for the number of
+pages to add/subtract to the total number of pages used by the MMU.  This
+fixes a zero-extension bug on 32-bit kernels that effectively corrupts
+the per-cpu counter used by the shrinker.
 
-> > Is this information correct and is this included in the spec? I tried
-> > to find it but somehow I do not see it clearly defined.
-> >
-> >> +#define TDX1_NR_TDCX_PAGES             4
-> >> +#define TDX1_NR_TDVPX_PAGES            5
-> >> +
-> >> +#define TDX1_MAX_NR_CPUID_CONFIGS      6
-> > Why is this just 6? I am looking at the CPUID table in the spec and
-> > there are already more than 6 CPUID leaves there.
->
-> This is the number of CPUID config reported by TDH.SYS.INFO. Current KVM
-> only reports 6 leaves.
+Per-cpu counters take a signed 64-bit value on both 32-bit and 64-bit
+kernels, whereas kvm_mod_used_mmu_pages() takes an unsigned long and thus
+an unsigned 32-bit value on 32-bit kernels.  As a result, the value used
+to adjust the per-cpu counter is zero-extended (unsigned -> signed), not
+sign-extended (signed -> signed), and so KVM's intended -1 gets morphed to
+4294967295 and effectively corrupts the counter.
 
-I, personally, still think that it should be enumerated, rather than
-hardcoded. It is not clear to me why it is 6 and nothing in the spec
-says it will not change.
+This was found by a staggering amount of sheer dumb luck when running
+kvm-unit-tests on a 32-bit KVM build.  The shrinker just happened to kick
+in while running tests and do_shrink_slab() logged an error about trying
+to free a negative number of objects.  The truly lucky part is that the
+kernel just happened to be a slightly stale build, as the shrinker no
+longer yells about negative objects as of commit 18bb473e5031 ("mm:
+vmscan: shrink deferred objects proportional to priority").
 
-> >> +#define TDX1_MAX_NR_CMRS               32
-> >> +#define TDX1_MAX_NR_TDMRS              64
-> >> +#define TDX1_MAX_NR_RSVD_AREAS         16
-> >> +#define TDX1_PAMT_ENTRY_SIZE           16
-> >> +#define TDX1_EXTENDMR_CHUNKSIZE                256
-> >
-> > I believe all of the defined variables above need to be enumerated
-> > with TDH.SYS.INFO.
->
-> No. Only TDX1_MAX_NR_TDMRS, TDX1_MAX_NR_RSVD_AREAS and
-> TDX1_PAMT_ENTRY_SIZE can be enumerated from TDH.SYS.INFO.
->
-> - TDX1_MAX_NR_CMRS is described in 18.6.3 CMR_INFO, which tells
->
->    TDH.SYS.INFO leaf function returns a MAX_CMRS(32) entry array
->    of CMR_INFO entries.
->
-> - TDX1_EXTENDMR_CHUNKSIZE is describe in 20.2.23 TDH.MR.EXTEND
+ vmscan: shrink_slab: mmu_shrink_scan+0x0/0x210 [kvm] negative objects to delete nr=-858993460
 
-Thanks for the pointers for MAX_CMRS and TDX1_EXTENDMR_CHUNKSIZE.
-Will the rest of it be enumerated or hardcoded?
+Fixes: bc8a3d8925a8 ("kvm: mmu: Fix overflow on kvm mmu page limit calculation")
+Cc: stable@vger.kernel.org
+Cc: Ben Gardon <bgardon@google.com>
+Signed-off-by: Sean Christopherson <seanjc@google.com>
+---
+ arch/x86/kvm/mmu/mmu.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-> >> +#define TDX_TDMR_ADDR_ALIGNMENT        512
-> > Is TDX_TDMR_ADDR_ALIGNMENT used anywhere or is it just for completeness?
->
-> It's the leftover during rebase. We will clean it up.
-Thanks!
+diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+index b4b65c21b2ca..082a0ba79edd 100644
+--- a/arch/x86/kvm/mmu/mmu.c
++++ b/arch/x86/kvm/mmu/mmu.c
+@@ -1700,7 +1700,7 @@ static int is_empty_shadow_page(u64 *spt)
+  * aggregate version in order to make the slab shrinker
+  * faster
+  */
+-static inline void kvm_mod_used_mmu_pages(struct kvm *kvm, unsigned long nr)
++static inline void kvm_mod_used_mmu_pages(struct kvm *kvm, long nr)
+ {
+ 	kvm->arch.n_used_mmu_pages += nr;
+ 	percpu_counter_add(&kvm_total_used_mmu_pages, nr);
+-- 
+2.32.0.554.ge1b32706d8-goog
 
-> SEAMCALL TDH.SYS.INFO requires each cmr info in CMR_INFO_ARRAY to be
-> 512B aligned
-
-Make sense, Thanks for the explanation.
