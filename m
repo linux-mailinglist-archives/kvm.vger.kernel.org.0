@@ -2,90 +2,71 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 71DBA3DFE6F
-	for <lists+kvm@lfdr.de>; Wed,  4 Aug 2021 11:54:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E70F53DFE75
+	for <lists+kvm@lfdr.de>; Wed,  4 Aug 2021 11:56:23 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237217AbhHDJzJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 4 Aug 2021 05:55:09 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:44012 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S236483AbhHDJzI (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 4 Aug 2021 05:55:08 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1628070896;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=IVyRjDmeX+wbvqFuUsJ5xLBNN+y9TnRnqtbgDhoq1nM=;
-        b=GX9CB2qYjrMAqdyo5lgqZTTquYuf6xvep7NeL72DOvQ82qjJOfb/epdRHkU13yk89+MTfZ
-        N7tAQQWzuNpRuULKyEpvht3u/YlVpOBgsElw+Go9dIxFU4hnP1Le4k+Z802plGl8z8K85d
-        FMzxPR3YBBG6Wo7Syzx2jJm3Hp7cfsU=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-371-wUqhYAr7PZK6FP7TUhV76w-1; Wed, 04 Aug 2021 05:54:54 -0400
-X-MC-Unique: wUqhYAr7PZK6FP7TUhV76w-1
-Received: by mail-wm1-f71.google.com with SMTP id y186-20020a1c32c30000b02902b5ac887cfcso286521wmy.2
-        for <kvm@vger.kernel.org>; Wed, 04 Aug 2021 02:54:54 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=IVyRjDmeX+wbvqFuUsJ5xLBNN+y9TnRnqtbgDhoq1nM=;
-        b=J4p6m/yLL8UW0kOpvUwfeiLhmXtv9e1wY3TcqsxDeVVcrm+yVG4vJqk5pJWkNb2LXM
-         n7TTG8o35jm/c5OeNAK+Xl5MsvrOpP4TLvKk+9guQdTnz4tbs3kgquMhKdZePAYNh8GL
-         jQPF6dnJIOD2BZx2jXH2GwnZIHrqtR6OU8cuIYAJtUdpXKjhyvKFWKyJuosP5mp3hAJD
-         p5P14Omkiyv04XJtBONGJVnhiXQzRu10Y7Yi87ILkvcWNiQTlEL0Ji1+XtMJY013SmZx
-         vZzA4VoDP8p06nDVgTGkgxww3OLWt4hT4SaRIEPqxnojTPt8AwLydCmrmIWxZWSWmjtO
-         2n3w==
-X-Gm-Message-State: AOAM533WOVQB3eDq7xI3yUqUnJbKZ2mc7ZFtlyDmJOFrVdCjB0vnWrA4
-        9RBrEL2agqjY/KVH8SkloHLnfxwT959kosQ0GWXNQ4+en9Xg1G2V7Fjl9+hM0JymfWJWSNKnEGH
-        NPfNqqg4nEhGw
-X-Received: by 2002:adf:e652:: with SMTP id b18mr28298499wrn.349.1628070893681;
-        Wed, 04 Aug 2021 02:54:53 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyEzjSkw2SNBjsVvvj0XG8DdnV1HOS2cohTznkyoER8S0vQ+eZzwQZxWq98BnI25UUDHEHBBA==
-X-Received: by 2002:adf:e652:: with SMTP id b18mr28298474wrn.349.1628070893524;
-        Wed, 04 Aug 2021 02:54:53 -0700 (PDT)
-Received: from ?IPv6:2001:b07:add:ec09:c399:bc87:7b6c:fb2a? ([2001:b07:add:ec09:c399:bc87:7b6c:fb2a])
-        by smtp.gmail.com with ESMTPSA id o17sm1815503wrw.17.2021.08.04.02.54.51
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 04 Aug 2021 02:54:53 -0700 (PDT)
-Subject: Re: What does KVM_HINTS_REALTIME do?
-To:     Pankaj Gupta <pankaj.gupta.linux@gmail.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>
-Cc:     kvm@vger.kernel.org, Jenifer Abrams <jhopper@redhat.com>,
-        atheurer@redhat.com, jmario@redhat.com,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Eduardo Habkost <ehabkost@redhat.com>,
-        Maxim Levitsky <mlevitsk@redhat.com>,
-        Marcelo Tosatti <mtosatti@redhat.com>
-References: <YQlOeGxhor3wJM6i@stefanha-x1.localdomain>
- <CAM9Jb+jAx8uy0PerK6gN2GOykQpPXQbd9uoPkeyxZSbya==o5w@mail.gmail.com>
- <CAM9Jb+jNUrympkjUMnX3D0AMTfZOuHYbF+-VDb10AiXybW-e_A@mail.gmail.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <bef63d3a-d8e5-03c9-521e-7b287247c626@redhat.com>
-Date:   Wed, 4 Aug 2021 11:54:51 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.11.0
+        id S237234AbhHDJ4f (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 4 Aug 2021 05:56:35 -0400
+Received: from mail.kernel.org ([198.145.29.99]:44738 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S236659AbhHDJ4e (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 4 Aug 2021 05:56:34 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 518AB601FC;
+        Wed,  4 Aug 2021 09:56:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+        s=korg; t=1628070980;
+        bh=1d9tA3AdDvnlhXjD3Ugn/xlnN8cCmIyfjgOcCevxnqU=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=MfHM1furbp94KogJg6m6eOi3zQf1ifgX/PumR+ZqpRGi/Y4RFj60T3BPVDQKbtMvJ
+         8hR/XIPY3YPghFMQRS1b24TylHj7vzTPcevrSL0wcF3l40cQersTEldlxQL3MDjlXK
+         QABexY0Ud58QXdaaojrB/YBjw8BdhPkGZ7Bl1NYA=
+Date:   Wed, 4 Aug 2021 11:56:15 +0200
+From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        stable@vger.kernel.org, Alexey Kardashevskiy <aik@ozlabs.ru>
+Subject: Re: [PATCH] KVM: Do not leak memory for duplicate debugfs directories
+Message-ID: <YQpkPzWhC0+44cXb@kroah.com>
+References: <20210804093737.2536206-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <CAM9Jb+jNUrympkjUMnX3D0AMTfZOuHYbF+-VDb10AiXybW-e_A@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210804093737.2536206-1-pbonzini@redhat.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 04/08/21 11:06, Pankaj Gupta wrote:
->> Do we need to mention "halt_poll_ns" at host side also will also be disabled?
-> with KVM_FEATURE_POLL_CONTROL
+On Wed, Aug 04, 2021 at 05:37:37AM -0400, Paolo Bonzini wrote:
+> KVM creates a debugfs directory for each VM in order to store statistics
+> about the virtual machine.  The directory name is built from the process
+> pid and a VM fd.  While generally unique, it is possible to keep a
+> file descriptor alive in a way that causes duplicate directories, which
+> manifests as these messages:
 > 
-> Sorry, pressed enter quickly in previous email.
+>   [  471.846235] debugfs: Directory '20245-4' with parent 'kvm' already present!
+> 
+> Even though this should not happen in practice, it is more or less
+> expected in the case of KVM for testcases that call KVM_CREATE_VM and
+> close the resulting file descriptor repeatedly and in parallel.
+> 
+> When this happens, debugfs_create_dir() returns an error but
+> kvm_create_vm_debugfs() goes on to allocate stat data structs which are
+> later leaked.  The slow memory leak was spotted by syzkaller, where it
+> caused OOM reports.
+> 
+> Since the issue only affects debugfs, do a lookup before calling
+> debugfs_create_dir, so that the message is downgraded and rate-limited.
+> While at it, ensure kvm->debugfs_dentry is NULL rather than an error
+> if it is not created.  This fixes kvm_destroy_vm_debugfs, which was not
+> checking IS_ERR_OR_NULL correctly.
+> 
+> Cc: stable@vger.kernel.org
+> Fixes: 536a6f88c49d ("KVM: Create debugfs dir and stat files for each VM")
+> Reported-by: Alexey Kardashevskiy <aik@ozlabs.ru>
+> Suggested-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> ---
+>  virt/kvm/kvm_main.c | 18 ++++++++++++++++--
+>  1 file changed, 16 insertions(+), 2 deletions(-)
 
-That is done by the cpuidle-haltpoll driver, not just by the presence of 
-the feature.
-
-Paolo
-
+Acked-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
