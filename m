@@ -2,131 +2,141 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D89AF3DFD9C
-	for <lists+kvm@lfdr.de>; Wed,  4 Aug 2021 11:08:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 453043DFDBF
+	for <lists+kvm@lfdr.de>; Wed,  4 Aug 2021 11:15:01 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236906AbhHDJIO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 4 Aug 2021 05:08:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37446 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235350AbhHDJIO (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 4 Aug 2021 05:08:14 -0400
-Received: from mail-ej1-x62c.google.com (mail-ej1-x62c.google.com [IPv6:2a00:1450:4864:20::62c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0D145C06179A
-        for <kvm@vger.kernel.org>; Wed,  4 Aug 2021 02:08:02 -0700 (PDT)
-Received: by mail-ej1-x62c.google.com with SMTP id gs8so2628187ejc.13
-        for <kvm@vger.kernel.org>; Wed, 04 Aug 2021 02:08:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance-com.20150623.gappssmtp.com; s=20150623;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=vHxgnDbRze3cfbummo1oFdspd0VXUkioTGyKAxbmjBY=;
-        b=rrLb5avlbWWVVZAoiqSf4GuH1Tep3672/ZPFrJ1q2sFsUjVxFnNVB7tKQ6xXG4rhnv
-         1PpAczmI/qacC7vsiZ2BEcntWSoQhW130Qwg+GEKxWvTPhhjdU0zMqHukOrvN7jIhUoV
-         Nsn2eb0p8F8I1ZJcwL62tBSr6vb1HYCK7y/HkosE9AxRt7VX5in8838+OKYoj/JdigCO
-         22pQ6zrUz1MLqHboxSN2WElTA63GZmG1OcBMMKNc/LoDbjlq6Lf4z01rVYSWbqkkn5bl
-         mqGmd/oNyGjYpPMnG5vHW8RpUjXvzzZbHlRoL8cVzBdZSTws01CqFaXWZkQX3ftOVtMV
-         f9GA==
+        id S236109AbhHDJPM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 4 Aug 2021 05:15:12 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:26676 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S235495AbhHDJPL (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 4 Aug 2021 05:15:11 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1628068498;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=tTIjprUhEDbhjonUuP4pIFp+Z7bPyJe6jb/7RK3byQs=;
+        b=NxjQ0Oq/AqSgMNL9cPDZeeZrvKeEK0d0dhWIqlBrsEnbS2JI0N4hNWEisGhHYURWm9PuuQ
+        sYNnDJMqov4WvVTVwIjWMxbvJCPV3BlyAD2a8JN8U7tvW9M0AW7peEd5DT3QffWYGu7tPD
+        9phetDmgdmDs8+v07q4veAp7yD7L7Qs=
+Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
+ [209.85.218.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-318-6upWPqkVMVqfk8Liav5BgA-1; Wed, 04 Aug 2021 05:14:57 -0400
+X-MC-Unique: 6upWPqkVMVqfk8Liav5BgA-1
+Received: by mail-ej1-f71.google.com with SMTP id qh25-20020a170906ecb9b02905a655de6553so502022ejb.19
+        for <kvm@vger.kernel.org>; Wed, 04 Aug 2021 02:14:57 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=vHxgnDbRze3cfbummo1oFdspd0VXUkioTGyKAxbmjBY=;
-        b=Ca+i6jyls5++/mikAcgfMU42eLGkOs0EOJdQtZD8Zv5IsG371X9X7Cl68xdkjMJefc
-         7jILmLEKACO51rZxXJmP6OLmh3G42Hcs6d4qBpGLTSW8JV5KL8/hXusH2pCz5AXPNjyp
-         IgcdR2zTWyDnHJmM4pxhf1dOf/fEupX3fdfO5nw1mOC39RBoofQqg0pXbwMXe6fphQZH
-         C6hsBKskqtXn/WkGajTmnUCPW1YgOMXWbAqb+D/BAF+bVE1fJp2Qq0zI4kt58NJuatvZ
-         uRTQQoR99aSqCNHzXQk7LFyaB4qxfvns+uiK4d5+wjbGBi8JtkhHS2+vLGexZSzw4tWD
-         R5aQ==
-X-Gm-Message-State: AOAM533OSbNZ1UggrKh2R6RztK3JX0iJsE02T68HNfDmUN4jHsGkk85x
-        JUuWolLU0ZEJd6bRVlfSWBUib+q0OXnGdpJtbX6q
-X-Google-Smtp-Source: ABdhPJz7ndtSUpcqEgNkoVHcDwP0fq03BR0Lre7qDAvevyBxeyuNZM0taxEDcIn1Kzh847IXKZfSmIisXg0eBWVCt2c=
-X-Received: by 2002:a17:906:58c7:: with SMTP id e7mr24219405ejs.197.1628068080494;
- Wed, 04 Aug 2021 02:08:00 -0700 (PDT)
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=tTIjprUhEDbhjonUuP4pIFp+Z7bPyJe6jb/7RK3byQs=;
+        b=kMe2iPjOQCZR81Ev5OXBnBvf49KpJPWPza7Q/MmKz0gkZTyNIrL2I2HrOYjCjZMC/g
+         o/nu1MBP8DoOvrL6RLackZD5hkZL6SqDeKTAY7d53oCKjSjCrrmsdORXD7vcSsUtfJEg
+         Y1qsJ6MH5xCAJfL2C+GimcGRJnKL2mWdW7nfJcNDvhkrM5yTIByRow0hLP19vn0OxW8l
+         GpLWnaMdYWlGOxk/a/7JOt/YcoF53czOIl9aR4ODw37qQDN5LTinzL/JnPwsAPr1/r+l
+         ixXmqlbyLu+mHbwBiOez/7Ruv7ZTsuLKK7oPHD05+jpLanvEogYXpf2sX8BTZfQ9Bwtq
+         Pk9g==
+X-Gm-Message-State: AOAM530eJw9Y4QrgS/0Q7UMIbSVelp6Wx2+imbfe3xvHdGm+7VJRnfvN
+        N+LBzC0XWuhdjI7PJoHUnKmR8d2Dpy1nAtsL+2egNllDKd46YBoqmBdIA4uQbUKTjxLRIA0YzMI
+        Uljl+1pawuC6s
+X-Received: by 2002:a05:6402:40c7:: with SMTP id z7mr2271212edb.193.1628068496555;
+        Wed, 04 Aug 2021 02:14:56 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzzq8BjCcunO2gxZ/evsJ4buvf+QSwB0JER9NnDit3gYvyU1ktgpjUANRe5hzZ0BF++uILOjA==
+X-Received: by 2002:a05:6402:40c7:: with SMTP id z7mr2271190edb.193.1628068496402;
+        Wed, 04 Aug 2021 02:14:56 -0700 (PDT)
+Received: from gator.home (cst2-174-132.cust.vodafone.cz. [31.30.174.132])
+        by smtp.gmail.com with ESMTPSA id i14sm690894edx.30.2021.08.04.02.14.55
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 04 Aug 2021 02:14:55 -0700 (PDT)
+Date:   Wed, 4 Aug 2021 11:14:53 +0200
+From:   Andrew Jones <drjones@redhat.com>
+To:     Oliver Upton <oupton@google.com>
+Cc:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Marc Zyngier <maz@kernel.org>, Peter Shier <pshier@google.com>,
+        Jim Mattson <jmattson@google.com>,
+        David Matlack <dmatlack@google.com>,
+        Ricardo Koller <ricarkol@google.com>,
+        Jing Zhang <jingzhangos@google.com>,
+        Raghavendra Rao Anata <rananta@google.com>,
+        James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        linux-arm-kernel@lists.infradead.org,
+        Will Deacon <will@kernel.org>,
+        Catalin Marinas <catalin.marinas@arm.com>
+Subject: Re: [PATCH v6 14/21] selftests: KVM: Add helper to check for
+ register presence
+Message-ID: <20210804091453.u4bf75pfeyldowt5@gator.home>
+References: <20210804085819.846610-1-oupton@google.com>
+ <20210804085819.846610-15-oupton@google.com>
 MIME-Version: 1.0
-References: <20210729073503.187-1-xieyongji@bytedance.com> <20210729073503.187-11-xieyongji@bytedance.com>
- <6bb6c689-e6dd-cfa2-094b-a0ca4258aded@redhat.com> <CACycT3v7BHxYY0OFYJRFU41Bz1=_v8iMRwzYKgX6cJM-SiNH+A@mail.gmail.com>
- <fdcb0224-11f9-caf2-a44e-e6406087fd50@redhat.com> <CACycT3v0EQVrv_A1K1bKmiYu0q5aFE=t+0yRaWKC7T3_H3oB-Q@mail.gmail.com>
- <bd48ec76-0d5c-2efb-8406-894286b28f6b@redhat.com>
-In-Reply-To: <bd48ec76-0d5c-2efb-8406-894286b28f6b@redhat.com>
-From:   Yongji Xie <xieyongji@bytedance.com>
-Date:   Wed, 4 Aug 2021 17:07:49 +0800
-Message-ID: <CACycT3tUwJXUV24PK7OvzPrHYYeQ5Q3qUW_vbuFMjwig0dBw2g@mail.gmail.com>
-Subject: Re: [PATCH v10 10/17] virtio: Handle device reset failure in register_virtio_device()
-To:     Jason Wang <jasowang@redhat.com>
-Cc:     "Michael S. Tsirkin" <mst@redhat.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Stefano Garzarella <sgarzare@redhat.com>,
-        Parav Pandit <parav@nvidia.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Christian Brauner <christian.brauner@canonical.com>,
-        Randy Dunlap <rdunlap@infradead.org>,
-        Matthew Wilcox <willy@infradead.org>,
-        Al Viro <viro@zeniv.linux.org.uk>,
-        Jens Axboe <axboe@kernel.dk>, bcrl@kvack.org,
-        Jonathan Corbet <corbet@lwn.net>,
-        =?UTF-8?Q?Mika_Penttil=C3=A4?= <mika.penttila@nextfour.com>,
-        Dan Carpenter <dan.carpenter@oracle.com>, joro@8bytes.org,
-        Greg KH <gregkh@linuxfoundation.org>,
-        He Zhe <zhe.he@windriver.com>,
-        Liu Xiaodong <xiaodong.liu@intel.com>,
-        Joe Perches <joe@perches.com>, songmuchun@bytedance.com,
-        virtualization <virtualization@lists.linux-foundation.org>,
-        netdev@vger.kernel.org, kvm <kvm@vger.kernel.org>,
-        linux-fsdevel@vger.kernel.org, iommu@lists.linux-foundation.org,
-        linux-kernel <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210804085819.846610-15-oupton@google.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Aug 4, 2021 at 4:54 PM Jason Wang <jasowang@redhat.com> wrote:
->
->
-> =E5=9C=A8 2021/8/4 =E4=B8=8B=E5=8D=884:50, Yongji Xie =E5=86=99=E9=81=93:
-> > On Wed, Aug 4, 2021 at 4:32 PM Jason Wang <jasowang@redhat.com> wrote:
-> >>
-> >> =E5=9C=A8 2021/8/3 =E4=B8=8B=E5=8D=885:38, Yongji Xie =E5=86=99=E9=81=
-=93:
-> >>> On Tue, Aug 3, 2021 at 4:09 PM Jason Wang <jasowang@redhat.com> wrote=
-:
-> >>>> =E5=9C=A8 2021/7/29 =E4=B8=8B=E5=8D=883:34, Xie Yongji =E5=86=99=E9=
-=81=93:
-> >>>>> The device reset may fail in virtio-vdpa case now, so add checks to
-> >>>>> its return value and fail the register_virtio_device().
-> >>>> So the reset() would be called by the driver during remove as well, =
-or
-> >>>> is it sufficient to deal only with the reset during probe?
-> >>>>
-> >>> Actually there is no way to handle failure during removal. And it
-> >>> should be safe with the protection of software IOTLB even if the
-> >>> reset() fails.
-> >>>
-> >>> Thanks,
-> >>> Yongji
-> >>
-> >> If this is true, does it mean we don't even need to care about reset
-> >> failure?
-> >>
-> > But we need to handle the failure in the vhost-vdpa case, isn't it?
->
->
-> Yes, but:
->
-> - This patch is for virtio not for vhost, if we don't care virtio, we
-> can avoid the changes
-> - For vhost, there could be two ways probably:
->
-> 1) let the set_status to report error
-> 2) require userspace to re-read for status
->
-> It looks to me you want to go with 1) and I'm not sure whether or not
-> it's too late to go with 2).
+On Wed, Aug 04, 2021 at 08:58:12AM +0000, Oliver Upton wrote:
+> The KVM_GET_REG_LIST vCPU ioctl returns a list of supported registers
+> for a given vCPU. Add a helper to check if a register exists in the list
+> of supported registers.
+> 
+> Signed-off-by: Oliver Upton <oupton@google.com>
+> ---
+>  .../testing/selftests/kvm/include/kvm_util.h  |  2 ++
+>  tools/testing/selftests/kvm/lib/kvm_util.c    | 19 +++++++++++++++++++
+>  2 files changed, 21 insertions(+)
+> 
+> diff --git a/tools/testing/selftests/kvm/include/kvm_util.h b/tools/testing/selftests/kvm/include/kvm_util.h
+> index 1b3ef5757819..077082dd2ca7 100644
+> --- a/tools/testing/selftests/kvm/include/kvm_util.h
+> +++ b/tools/testing/selftests/kvm/include/kvm_util.h
+> @@ -215,6 +215,8 @@ void vcpu_fpu_get(struct kvm_vm *vm, uint32_t vcpuid,
+>  		  struct kvm_fpu *fpu);
+>  void vcpu_fpu_set(struct kvm_vm *vm, uint32_t vcpuid,
+>  		  struct kvm_fpu *fpu);
+> +
+> +bool vcpu_has_reg(struct kvm_vm *vm, uint32_t vcpuid, uint64_t reg_id);
+>  void vcpu_get_reg(struct kvm_vm *vm, uint32_t vcpuid, struct kvm_one_reg *reg);
+>  void vcpu_set_reg(struct kvm_vm *vm, uint32_t vcpuid, struct kvm_one_reg *reg);
+>  #ifdef __KVM_HAVE_VCPU_EVENTS
+> diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
+> index 0fe66ca6139a..a5801d4ed37d 100644
+> --- a/tools/testing/selftests/kvm/lib/kvm_util.c
+> +++ b/tools/testing/selftests/kvm/lib/kvm_util.c
+> @@ -1823,6 +1823,25 @@ void vcpu_fpu_set(struct kvm_vm *vm, uint32_t vcpuid, struct kvm_fpu *fpu)
+>  		    ret, errno, strerror(errno));
+>  }
+>  
+> +bool vcpu_has_reg(struct kvm_vm *vm, uint32_t vcpuid, uint64_t reg_id)
+> +{
+> +	struct kvm_reg_list *list;
+> +	bool ret = false;
+> +	uint64_t i;
+> +
+> +	list = vcpu_get_reg_list(vm, vcpuid);
+> +
+> +	for (i = 0; i < list->n; i++) {
+> +		if (list->reg[i] == reg_id) {
+> +			ret = true;
+> +			break;
+> +		}
+> +	}
+> +
+> +	free(list);
+> +	return ret;
+> +}
+> +
+>  void vcpu_get_reg(struct kvm_vm *vm, uint32_t vcpuid, struct kvm_one_reg *reg)
+>  {
+>  	int ret;
+> -- 
+> 2.32.0.605.g8dce9f2422-goog
 >
 
-Looks like 2) can't work if reset failure happens in
-vhost_vdpa_release() and vhost_vdpa_open().
+Reviewed-by: Andrew Jones <drjones@redhat.com>
 
-Thanks,
-Yongji
