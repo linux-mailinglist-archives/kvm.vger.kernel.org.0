@@ -2,125 +2,94 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 412833E0F44
-	for <lists+kvm@lfdr.de>; Thu,  5 Aug 2021 09:33:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6157F3E0F53
+	for <lists+kvm@lfdr.de>; Thu,  5 Aug 2021 09:35:24 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238692AbhHEHeK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 5 Aug 2021 03:34:10 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:21614 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S238685AbhHEHeJ (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 5 Aug 2021 03:34:09 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1628148835;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=1X4atkIAaKHKvFaPgSQTrOWjpkdnsM1vBayaGygXCVA=;
-        b=eU2iQoRAVQr9qpkoTBrFwvE80Bktz2EypQGmcT6zXHQTEJCR7Za5TOnp9/Ww4VCE88SumB
-        Bthq6bkhAl2mchLGrLRXdicSGkucChplxjNlBxfU5w3sGHx6XZkGMOWekQfJuL6iFOt3b0
-        ZXbkRtpDeACwxO1cdCFSjzKXMGVVVvo=
-Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
- [209.85.218.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-493-691ReTLQP66PeQp5Z3JrNA-1; Thu, 05 Aug 2021 03:33:53 -0400
-X-MC-Unique: 691ReTLQP66PeQp5Z3JrNA-1
-Received: by mail-ej1-f70.google.com with SMTP id lu19-20020a170906fad3b029058768348f55so1737437ejb.12
-        for <kvm@vger.kernel.org>; Thu, 05 Aug 2021 00:33:53 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=1X4atkIAaKHKvFaPgSQTrOWjpkdnsM1vBayaGygXCVA=;
-        b=oTPzru/uqoEgqJoOW1C0lLDANbPP/qyG8gZii/ymqpuU77EoPhN97ioH8BOVm+RSlI
-         9+ySKXodM7Bu6qC1RH+h4L2SZ8+SYFiO6DuA4wqy7J7zHJZ4RHGDv5hUr5/fTR80gt1c
-         67riOPrAPKjNJNLIuIMDO82SE+3MyirFirIwZTyrFrT16DjSH1IjAJIxQU2ArMfYuNuT
-         +gcsvbwDpELbKayhyrrtdCNnSgmkA9Bqbeka/rb0PQoKU8O+6PkbfO7t/frzCs+eenRJ
-         S0IKoWsy243VEjnPIUOemR1RIxrE3JKmCcYnlf9cGu6SSpKT74U1iIkjllaxV2+Uzp99
-         gsxg==
-X-Gm-Message-State: AOAM531nZ/cmNwQqewcUUSF0rB6YOUfNXxnVlgyDT7CiiLO+c3+dGqvN
-        WssiKGu4ZOMl9RCNK2S8vEsqPlgrG6bkOwizntAPmMOuOaFz/lNoUEAHcfsyq178KQwz/8pO2EA
-        ljdTqWkMpQMoE
-X-Received: by 2002:a17:906:acf:: with SMTP id z15mr3478779ejf.512.1628148832682;
-        Thu, 05 Aug 2021 00:33:52 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJznKB1r0CMePbBY5Fa8xL01mLW4gcnEfvw2D+pstCkRlMae0hElKTucF/c2Ck/KkB9T2KxNBA==
-X-Received: by 2002:a17:906:acf:: with SMTP id z15mr3478763ejf.512.1628148832502;
-        Thu, 05 Aug 2021 00:33:52 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e? ([2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e])
-        by smtp.gmail.com with ESMTPSA id nb39sm1385122ejc.95.2021.08.05.00.33.51
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 05 Aug 2021 00:33:52 -0700 (PDT)
-Subject: Re: [PATCH] KVM: x86/mmu: Fix per-cpu counter corruption on 32-bit
- builds
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Ben Gardon <bgardon@google.com>
-References: <20210804214609.1096003-1-seanjc@google.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <9527197a-2a81-832b-7391-80d646a5e212@redhat.com>
-Date:   Thu, 5 Aug 2021 09:33:50 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.11.0
+        id S232323AbhHEHfh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 5 Aug 2021 03:35:37 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:15862 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S230471AbhHEHfg (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 5 Aug 2021 03:35:36 -0400
+Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 1757Wv1E089820;
+        Thu, 5 Aug 2021 03:35:19 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : message-id : reply-to : references : content-type : in-reply-to
+ : mime-version; s=pp1; bh=wJq0ybxY7L2Dl7sNEaUtoMo0Eyb6m2cp1YW6q5Z54gU=;
+ b=H0nVLr8LQZypL1kZPu6OSW+wIgOPQGzkEMaVET0BPtRs36rHSVlbDFKDWbMFBRlSKtcs
+ BLD3sedJEoTkDaZ79PjX7HngtDImbarPGUHj7KAOe8/kQ2pPrMUz1nri/S/J/sj/P/oH
+ Yse/HGmUY93o2A37PjbSvNBR9qWrO5IsfIsbePXz+xw40Z4BF5re15XL1fGNbJ93dHCE
+ z8HiRc0ZXu5cE9R/zBKfL0RyCUhRP6BhGrW8YaqIZQno0bqlYtug3IyTV+N+AWG+VaMJ
+ 0+Pge5rCOKk2lsEbIqmNer1VPjWLlbz9yzQbp07HWCzCAqdfFID7mFB24Eg2846sJIlS wQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3a88k2mphv-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 05 Aug 2021 03:35:19 -0400
+Received: from m0098410.ppops.net (m0098410.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 1757Ww2T089927;
+        Thu, 5 Aug 2021 03:35:19 -0400
+Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3a88k2mph2-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 05 Aug 2021 03:35:19 -0400
+Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
+        by ppma06ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 1757Rhri027416;
+        Thu, 5 Aug 2021 07:35:16 GMT
+Received: from b06cxnps3074.portsmouth.uk.ibm.com (d06relay09.portsmouth.uk.ibm.com [9.149.109.194])
+        by ppma06ams.nl.ibm.com with ESMTP id 3a4wshtscu-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 05 Aug 2021 07:35:16 +0000
+Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
+        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 1757ZDHR51118428
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 5 Aug 2021 07:35:14 GMT
+Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 48CA452078;
+        Thu,  5 Aug 2021 07:35:13 +0000 (GMT)
+Received: from in.ibm.com (unknown [9.102.2.73])
+        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTPS id E411E52071;
+        Thu,  5 Aug 2021 07:35:11 +0000 (GMT)
+Date:   Thu, 5 Aug 2021 13:05:05 +0530
+From:   Bharata B Rao <bharata@linux.ibm.com>
+To:     kvm-ppc@vger.kernel.org, linuxppc-dev@lists.ozlabs.org
+Cc:     kvm@vger.kernel.org, aneesh.kumar@linux.ibm.com,
+        bharata.rao@gmail.com
+Subject: Re: [RFC PATCH v0 0/5] PPC: KVM: pseries: Asynchronous page fault
+Message-ID: <YQuUqfn3OV/qDI8U@in.ibm.com>
+Reply-To: bharata@linux.ibm.com
+References: <20210805072439.501481-1-bharata@linux.ibm.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210805072439.501481-1-bharata@linux.ibm.com>
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: dQ4IEPT42jF3YzuN81mh3vm9kpjOAXjI
+X-Proofpoint-GUID: 8i40YJ0Hs5Hj8XuZpk9WumIFaqEKVr7D
+X-Proofpoint-UnRewURL: 0 URL was un-rewritten
 MIME-Version: 1.0
-In-Reply-To: <20210804214609.1096003-1-seanjc@google.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.790
+ definitions=2021-08-05_02:2021-08-04,2021-08-05 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0 mlxlogscore=911
+ clxscore=1015 adultscore=0 bulkscore=0 lowpriorityscore=0 suspectscore=0
+ impostorscore=0 mlxscore=0 malwarescore=0 phishscore=0 priorityscore=1501
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2107140000
+ definitions=main-2108050044
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 04/08/21 23:46, Sean Christopherson wrote:
-> Take a signed 'long' instead of an 'unsigned long' for the number of
-> pages to add/subtract to the total number of pages used by the MMU.  This
-> fixes a zero-extension bug on 32-bit kernels that effectively corrupts
-> the per-cpu counter used by the shrinker.
+On Thu, Aug 05, 2021 at 12:54:34PM +0530, Bharata B Rao wrote:
+> Hi,
 > 
-> Per-cpu counters take a signed 64-bit value on both 32-bit and 64-bit
-> kernels, whereas kvm_mod_used_mmu_pages() takes an unsigned long and thus
-> an unsigned 32-bit value on 32-bit kernels.  As a result, the value used
-> to adjust the per-cpu counter is zero-extended (unsigned -> signed), not
-> sign-extended (signed -> signed), and so KVM's intended -1 gets morphed to
-> 4294967295 and effectively corrupts the counter.
+> This series adds asynchronous page fault support for pseries guests
+> and enables the support for the same in powerpc KVM. This is an
+> early RFC with details and multiple TODOs listed in patch descriptions.
 > 
-> This was found by a staggering amount of sheer dumb luck when running
-> kvm-unit-tests on a 32-bit KVM build.  The shrinker just happened to kick
-> in while running tests and do_shrink_slab() logged an error about trying
-> to free a negative number of objects.  The truly lucky part is that the
-> kernel just happened to be a slightly stale build, as the shrinker no
-> longer yells about negative objects as of commit 18bb473e5031 ("mm:
-> vmscan: shrink deferred objects proportional to priority").
-> 
->   vmscan: shrink_slab: mmu_shrink_scan+0x0/0x210 [kvm] negative objects to delete nr=-858993460
-> 
-> Fixes: bc8a3d8925a8 ("kvm: mmu: Fix overflow on kvm mmu page limit calculation")
-> Cc: stable@vger.kernel.org
-> Cc: Ben Gardon <bgardon@google.com>
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
-> ---
->   arch/x86/kvm/mmu/mmu.c | 2 +-
->   1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> index b4b65c21b2ca..082a0ba79edd 100644
-> --- a/arch/x86/kvm/mmu/mmu.c
-> +++ b/arch/x86/kvm/mmu/mmu.c
-> @@ -1700,7 +1700,7 @@ static int is_empty_shadow_page(u64 *spt)
->    * aggregate version in order to make the slab shrinker
->    * faster
->    */
-> -static inline void kvm_mod_used_mmu_pages(struct kvm *kvm, unsigned long nr)
-> +static inline void kvm_mod_used_mmu_pages(struct kvm *kvm, long nr)
->   {
->   	kvm->arch.n_used_mmu_pages += nr;
->   	percpu_counter_add(&kvm_total_used_mmu_pages, nr);
-> 
+> This patch needs supporting enablement in QEMU too which will be
+> posted separately.
 
-Queued, thanks.
+QEMU part is posted here:
+https://lore.kernel.org/qemu-devel/20210805073228.502292-2-bharata@linux.ibm.com/T/#u
 
-Paolo
-
+Regards,
+Bharata.
