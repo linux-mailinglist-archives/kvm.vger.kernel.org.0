@@ -2,396 +2,174 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C69323E0F1F
-	for <lists+kvm@lfdr.de>; Thu,  5 Aug 2021 09:25:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3E6563E0F3D
+	for <lists+kvm@lfdr.de>; Thu,  5 Aug 2021 09:33:10 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238641AbhHEHZ3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 5 Aug 2021 03:25:29 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:22886 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S238611AbhHEHZ0 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 5 Aug 2021 03:25:26 -0400
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 1757ArRc140705;
-        Thu, 5 Aug 2021 03:25:11 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding; s=pp1;
- bh=zWG0pHLszMGhSn12UZYrNCEJ4kEU5e+/nJEH1VtnCbY=;
- b=rjBxqSUNl1298zvP70DGBEcSvtZNiMRqLq7oxDmMzKjeLoenf2M0VfW5GCGjdMHtjoSw
- /Ee2QTnAb/6Rma1yfuGZJHwRNpi7z9oL8ETAdBogcqcQFXPqwhdyRCbH78BpmkDJXfiu
- hNBwcjLYBQddR+tpE7O+CHYZykhi07Iz+AucYCHeprDgVTDFcSPDJ+m76PrSL1PCk5g4
- +SFNvGLVuhut3zSZQ2O+75LB0pt68x1558BnfMdOKNgTqPKEtmmtCEGXv78DVO0vRqNQ
- KKvQvN/FzL7AiPydcJtVCbkEGrJNDe2LKOsxBAiy35IcWfok2V0VpfELChlXSlm/+Lv1 qg== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3a89p12m8y-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 05 Aug 2021 03:25:11 -0400
-Received: from m0098404.ppops.net (m0098404.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 1757BB8i142349;
-        Thu, 5 Aug 2021 03:25:10 -0400
-Received: from ppma02fra.de.ibm.com (47.49.7a9f.ip4.static.sl-reverse.com [159.122.73.71])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3a89p12m8a-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 05 Aug 2021 03:25:10 -0400
-Received: from pps.filterd (ppma02fra.de.ibm.com [127.0.0.1])
-        by ppma02fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 17576Z6O004876;
-        Thu, 5 Aug 2021 07:25:08 GMT
-Received: from b06cxnps4074.portsmouth.uk.ibm.com (d06relay11.portsmouth.uk.ibm.com [9.149.109.196])
-        by ppma02fra.de.ibm.com with ESMTP id 3a4x58sncp-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 05 Aug 2021 07:25:08 +0000
-Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
-        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 1757P3WA44761538
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 5 Aug 2021 07:25:03 GMT
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 9623EA4072;
-        Thu,  5 Aug 2021 07:25:03 +0000 (GMT)
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 9054CA4078;
-        Thu,  5 Aug 2021 07:25:01 +0000 (GMT)
-Received: from bharata.ibmuc.com (unknown [9.102.2.73])
-        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Thu,  5 Aug 2021 07:25:01 +0000 (GMT)
-From:   Bharata B Rao <bharata@linux.ibm.com>
-To:     kvm-ppc@vger.kernel.org, linuxppc-dev@lists.ozlabs.org
-Cc:     kvm@vger.kernel.org, aneesh.kumar@linux.ibm.com,
-        bharata.rao@gmail.com, Bharata B Rao <bharata@linux.ibm.com>
-Subject: [RFC PATCH v0 5/5] pseries: Asynchronous page fault support
-Date:   Thu,  5 Aug 2021 12:54:39 +0530
-Message-Id: <20210805072439.501481-6-bharata@linux.ibm.com>
-X-Mailer: git-send-email 2.31.1
-In-Reply-To: <20210805072439.501481-1-bharata@linux.ibm.com>
-References: <20210805072439.501481-1-bharata@linux.ibm.com>
+        id S237114AbhHEHdW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 5 Aug 2021 03:33:22 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:47159 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S231499AbhHEHdW (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 5 Aug 2021 03:33:22 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1628148788;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=VMJr84Y9bUNKt9cAHm1Vupejhp2NHPyfaDvSsHp2BrQ=;
+        b=GCf3qBI8HicT70/BWeQRQLABdqVMXfGeLIUWu7ShmxHE+0JGSbMo+U2nxiUVMK+AcrYxpl
+        SpiXVCZfL305ZNoOlOcxTz/s/rviOKI1BXfpZyCquFMfNLQ3+ye86Z0pgl9ebgN1QRKl5G
+        YtGn+ygxO2pN6AZfp+tYhnaiQT8qZZw=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-324-cPH-JUHKMRGuyXsE6Wr6iw-1; Thu, 05 Aug 2021 03:33:07 -0400
+X-MC-Unique: cPH-JUHKMRGuyXsE6Wr6iw-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id F06CD10066E5;
+        Thu,  5 Aug 2021 07:33:05 +0000 (UTC)
+Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 98A8460BF4;
+        Thu,  5 Aug 2021 07:33:05 +0000 (UTC)
+From:   Paolo Bonzini <pbonzini@redhat.com>
+To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Cc:     David Woodhouse <dwmw@amazon.co.uk>
+Subject: [PATCH] KVM: xen: do not use struct gfn_to_hva_cache
+Date:   Thu,  5 Aug 2021 03:33:05 -0400
+Message-Id: <20210805073305.2682042-1-pbonzini@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: 7wOzeE0FsfaShdDy-z2XiZChE7Y6VxLl
-X-Proofpoint-ORIG-GUID: -Kqv53yqYFxZ7tMee0W8_aVyrDNjzYCw
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.790
- definitions=2021-08-05_02:2021-08-04,2021-08-05 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
- priorityscore=1501 mlxlogscore=999 adultscore=0 mlxscore=0 suspectscore=0
- impostorscore=0 spamscore=0 clxscore=1015 phishscore=0 malwarescore=0
- bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2107140000 definitions=main-2108050041
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Add asynchronous page fault support for pseries guests.
+gfn_to_hva_cache is not thread-safe, so it is usually used only within
+a vCPU (whose code is protected by vcpu->mutex).  The Xen interface
+implementation has such a cache in kvm->arch, but it is not really
+used except to store the location of the shared info page.  Replace
+shinfo_set and shinfo_cache with just the value that is passed via
+KVM_XEN_ATTR_TYPE_SHARED_INFO; the only complication is that the
+initialization value is not zero anymore and therefore kvm_xen_init_vm
+needs to be introduced.
 
-1. Setup the guest to handle async-pf
-   - Issue H_REG_SNS hcall to register the SNS region.
-   - Setup the subvention interrupt irq.
-   - Enable async-pf by updating the byte_b9 of VPA for each
-     CPU.
-2. Check if the page fault is an expropriation notification
-   (SRR1_PROGTRAP set in SRR1) and if so put the task on
-   wait queue based on the expropriation correlation number
-   read from the VPA.
-3. Handle subvention interrupt to wake any waiting tasks.
-   The wait and wakeup mechanism from x86 async-pf implementation
-   is being reused here.
-
-TODO:
-- Check how to keep this feature together with other CMO features.
-- The async-pf check in the page fault handler path is limited to
-  guest with an #ifdef. This isn't sufficient and hence needs to
-  be replaced by an appropriate check.
-
-Signed-off-by: Bharata B Rao <bharata@linux.ibm.com>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- arch/powerpc/include/asm/async-pf.h       |  12 ++
- arch/powerpc/mm/fault.c                   |   7 +-
- arch/powerpc/platforms/pseries/Makefile   |   2 +-
- arch/powerpc/platforms/pseries/async-pf.c | 219 ++++++++++++++++++++++
- 4 files changed, 238 insertions(+), 2 deletions(-)
- create mode 100644 arch/powerpc/include/asm/async-pf.h
- create mode 100644 arch/powerpc/platforms/pseries/async-pf.c
+ arch/x86/include/asm/kvm_host.h |  3 +--
+ arch/x86/kvm/x86.c              |  1 +
+ arch/x86/kvm/xen.c              | 23 ++++++++++++-----------
+ arch/x86/kvm/xen.h              |  5 +++++
+ 4 files changed, 19 insertions(+), 13 deletions(-)
 
-diff --git a/arch/powerpc/include/asm/async-pf.h b/arch/powerpc/include/asm/async-pf.h
-new file mode 100644
-index 000000000000..95d6c3da9f50
---- /dev/null
-+++ b/arch/powerpc/include/asm/async-pf.h
-@@ -0,0 +1,12 @@
-+/* SPDX-License-Identifier: GPL-2.0 */
-+/*
-+ * Async page fault support via PAPR Expropriation/Subvention Notification
-+ * option(ESN)
-+ *
-+ * Copyright 2020 Bharata B Rao, IBM Corp. <bharata@linux.ibm.com>
-+ */
-+
-+#ifndef _ASM_POWERPC_ASYNC_PF_H
-+int handle_async_page_fault(struct pt_regs *regs, unsigned long addr);
-+#define _ASM_POWERPC_ASYNC_PF_H
-+#endif
-diff --git a/arch/powerpc/mm/fault.c b/arch/powerpc/mm/fault.c
-index a8d0ce85d39a..bbdc61605885 100644
---- a/arch/powerpc/mm/fault.c
-+++ b/arch/powerpc/mm/fault.c
-@@ -44,7 +44,7 @@
- #include <asm/debug.h>
- #include <asm/kup.h>
- #include <asm/inst.h>
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index a079880d4cd5..6a73ff7db5f9 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -1003,9 +1003,8 @@ struct msr_bitmap_range {
+ /* Xen emulation context */
+ struct kvm_xen {
+ 	bool long_mode;
+-	bool shinfo_set;
+ 	u8 upcall_vector;
+-	struct gfn_to_hva_cache shinfo_cache;
++	gfn_t shinfo_gfn;
+ };
+ 
+ enum kvm_irqchip_mode {
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 348452bb16bc..3cedc7cc132a 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -11162,6 +11162,7 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
+ 	kvm_hv_init_vm(kvm);
+ 	kvm_page_track_init(kvm);
+ 	kvm_mmu_init_vm(kvm);
++	kvm_xen_init_vm(kvm);
+ 
+ 	return static_call(kvm_x86_vm_init)(kvm);
+ }
+diff --git a/arch/x86/kvm/xen.c b/arch/x86/kvm/xen.c
+index ae17250e1efe..9ea9c3dabe37 100644
+--- a/arch/x86/kvm/xen.c
++++ b/arch/x86/kvm/xen.c
+@@ -25,15 +25,14 @@ static int kvm_xen_shared_info_init(struct kvm *kvm, gfn_t gfn)
+ {
+ 	gpa_t gpa = gfn_to_gpa(gfn);
+ 	int wc_ofs, sec_hi_ofs;
+-	int ret;
++	int ret = 0;
+ 	int idx = srcu_read_lock(&kvm->srcu);
+ 
+-	ret = kvm_gfn_to_hva_cache_init(kvm, &kvm->arch.xen.shinfo_cache,
+-					gpa, PAGE_SIZE);
+-	if (ret)
++	if (kvm_is_error_hva(gfn_to_hva(kvm, gfn))) {
++		ret = -EFAULT;
+ 		goto out;
 -
-+#include <asm/async-pf.h>
+-	kvm->arch.xen.shinfo_set = true;
++	}
++	kvm->arch.xen.shinfo_gfn = gfn;
  
- /*
-  * do_page_fault error handling helpers
-@@ -395,6 +395,11 @@ static int ___do_page_fault(struct pt_regs *regs, unsigned long address,
- 	vm_fault_t fault, major = 0;
- 	bool kprobe_fault = kprobe_page_fault(regs, 11);
+ 	/* Paranoia checks on the 32-bit struct layout */
+ 	BUILD_BUG_ON(offsetof(struct compat_shared_info, wc) != 0x900);
+@@ -245,7 +244,7 @@ int kvm_xen_hvm_set_attr(struct kvm *kvm, struct kvm_xen_hvm_attr *data)
  
-+#ifdef CONFIG_PPC_PSERIES
-+	if (handle_async_page_fault(regs, address))
-+		return 0;
-+#endif
-+
- 	if (unlikely(debugger_fault_handler(regs) || kprobe_fault))
- 		return 0;
+ 	case KVM_XEN_ATTR_TYPE_SHARED_INFO:
+ 		if (data->u.shared_info.gfn == GPA_INVALID) {
+-			kvm->arch.xen.shinfo_set = false;
++			kvm->arch.xen.shinfo_gfn = GPA_INVALID;
+ 			r = 0;
+ 			break;
+ 		}
+@@ -283,10 +282,7 @@ int kvm_xen_hvm_get_attr(struct kvm *kvm, struct kvm_xen_hvm_attr *data)
+ 		break;
  
-diff --git a/arch/powerpc/platforms/pseries/Makefile b/arch/powerpc/platforms/pseries/Makefile
-index 4cda0ef87be0..e0ada605ef20 100644
---- a/arch/powerpc/platforms/pseries/Makefile
-+++ b/arch/powerpc/platforms/pseries/Makefile
-@@ -6,7 +6,7 @@ obj-y			:= lpar.o hvCall.o nvram.o reconfig.o \
- 			   of_helpers.o \
- 			   setup.o iommu.o event_sources.o ras.o \
- 			   firmware.o power.o dlpar.o mobility.o rng.o \
--			   pci.o pci_dlpar.o eeh_pseries.o msi.o
-+			   pci.o pci_dlpar.o eeh_pseries.o msi.o async-pf.o
- obj-$(CONFIG_SMP)	+= smp.o
- obj-$(CONFIG_SCANLOG)	+= scanlog.o
- obj-$(CONFIG_KEXEC_CORE)	+= kexec.o
-diff --git a/arch/powerpc/platforms/pseries/async-pf.c b/arch/powerpc/platforms/pseries/async-pf.c
-new file mode 100644
-index 000000000000..c2f3bbc0d674
---- /dev/null
-+++ b/arch/powerpc/platforms/pseries/async-pf.c
-@@ -0,0 +1,219 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/*
-+ * Async page fault support via PAPR Expropriation/Subvention Notification
-+ * option(ESN)
-+ *
-+ * Copyright 2020 Bharata B Rao, IBM Corp. <bharata@linux.ibm.com>
-+ */
-+
-+#include <linux/interrupt.h>
-+#include <linux/swait.h>
-+#include <linux/irqdomain.h>
-+#include <asm/machdep.h>
-+#include <asm/hvcall.h>
-+#include <asm/paca.h>
-+
-+static char sns_buffer[PAGE_SIZE] __aligned(4096);
-+static uint16_t *esn_q = (uint16_t *)sns_buffer + 1;
-+static unsigned long next_eq_entry, nr_eq_entries;
-+
-+#define ASYNC_PF_SLEEP_HASHBITS 8
-+#define ASYNC_PF_SLEEP_HASHSIZE (1<<ASYNC_PF_SLEEP_HASHBITS)
-+
-+/* Controls access to SNS buffer */
-+static DEFINE_RAW_SPINLOCK(async_sns_guest_lock);
-+
-+/* Wait queue handling is from x86 asyn-pf implementation */
-+struct async_pf_sleep_node {
-+	struct hlist_node link;
-+	struct swait_queue_head wq;
-+	u64 token;
-+	int cpu;
-+};
-+
-+static struct async_pf_sleep_head {
-+	raw_spinlock_t lock;
-+	struct hlist_head list;
-+} async_pf_sleepers[ASYNC_PF_SLEEP_HASHSIZE];
-+
-+static struct async_pf_sleep_node *_find_apf_task(struct async_pf_sleep_head *b,
-+						  u64 token)
+ 	case KVM_XEN_ATTR_TYPE_SHARED_INFO:
+-		if (kvm->arch.xen.shinfo_set)
+-			data->u.shared_info.gfn = gpa_to_gfn(kvm->arch.xen.shinfo_cache.gpa);
+-		else
+-			data->u.shared_info.gfn = GPA_INVALID;
++		data->u.shared_info.gfn = gpa_to_gfn(kvm->arch.xen.shinfo_gfn);
+ 		r = 0;
+ 		break;
+ 
+@@ -646,6 +642,11 @@ int kvm_xen_hvm_config(struct kvm *kvm, struct kvm_xen_hvm_config *xhc)
+ 	return 0;
+ }
+ 
++void kvm_xen_init_vm(struct kvm *kvm)
 +{
-+	struct hlist_node *p;
-+
-+	hlist_for_each(p, &b->list) {
-+		struct async_pf_sleep_node *n =
-+			hlist_entry(p, typeof(*n), link);
-+		if (n->token == token)
-+			return n;
-+	}
-+
-+	return NULL;
-+}
-+static int async_pf_queue_task(u64 token, struct async_pf_sleep_node *n)
-+{
-+	u64 key = hash_64(token, ASYNC_PF_SLEEP_HASHBITS);
-+	struct async_pf_sleep_head *b = &async_pf_sleepers[key];
-+	struct async_pf_sleep_node *e;
-+
-+	raw_spin_lock(&b->lock);
-+	e = _find_apf_task(b, token);
-+	if (e) {
-+		/* dummy entry exist -> wake up was delivered ahead of PF */
-+		hlist_del(&e->link);
-+		raw_spin_unlock(&b->lock);
-+		kfree(e);
-+		return false;
-+	}
-+
-+	n->token = token;
-+	n->cpu = smp_processor_id();
-+	init_swait_queue_head(&n->wq);
-+	hlist_add_head(&n->link, &b->list);
-+	raw_spin_unlock(&b->lock);
-+	return true;
++	kvm->arch.xen.shinfo_gfn = GPA_INVALID;
 +}
 +
-+/*
-+ * Handle Expropriation notification.
-+ */
-+int handle_async_page_fault(struct pt_regs *regs, unsigned long addr)
+ void kvm_xen_destroy_vm(struct kvm *kvm)
+ {
+ 	if (kvm->arch.xen_hvm_config.msr)
+diff --git a/arch/x86/kvm/xen.h b/arch/x86/kvm/xen.h
+index 463a7844a8ca..cc0cf5f37450 100644
+--- a/arch/x86/kvm/xen.h
++++ b/arch/x86/kvm/xen.h
+@@ -21,6 +21,7 @@ int kvm_xen_hvm_set_attr(struct kvm *kvm, struct kvm_xen_hvm_attr *data);
+ int kvm_xen_hvm_get_attr(struct kvm *kvm, struct kvm_xen_hvm_attr *data);
+ int kvm_xen_write_hypercall_page(struct kvm_vcpu *vcpu, u64 data);
+ int kvm_xen_hvm_config(struct kvm *kvm, struct kvm_xen_hvm_config *xhc);
++void kvm_xen_init_vm(struct kvm *kvm);
+ void kvm_xen_destroy_vm(struct kvm *kvm);
+ 
+ static inline bool kvm_xen_msr_enabled(struct kvm *kvm)
+@@ -50,6 +51,10 @@ static inline int kvm_xen_write_hypercall_page(struct kvm_vcpu *vcpu, u64 data)
+ 	return 1;
+ }
+ 
++static inline void kvm_xen_init_vm(struct kvm *kvm)
 +{
-+	struct async_pf_sleep_node n;
-+	DECLARE_SWAITQUEUE(wait);
-+	unsigned long exp_corr_nr;
-+
-+	/* Is this Expropriation notification? */
-+	if (!(mfspr(SPRN_SRR1) & SRR1_PROGTRAP))
-+		return 0;
-+
-+	if (unlikely(!user_mode(regs)))
-+		panic("Host injected async PF in kernel mode\n");
-+
-+	exp_corr_nr = be16_to_cpu(get_lppaca()->exp_corr_nr);
-+	if (!async_pf_queue_task(exp_corr_nr, &n))
-+		return 0;
-+
-+	for (;;) {
-+		prepare_to_swait_exclusive(&n.wq, &wait, TASK_UNINTERRUPTIBLE);
-+		if (hlist_unhashed(&n.link))
-+			break;
-+
-+		local_irq_enable();
-+		schedule();
-+		local_irq_disable();
-+	}
-+
-+	finish_swait(&n.wq, &wait);
-+	return 1;
 +}
 +
-+static void apf_task_wake_one(struct async_pf_sleep_node *n)
-+{
-+	hlist_del_init(&n->link);
-+	if (swq_has_sleeper(&n->wq))
-+		swake_up_one(&n->wq);
-+}
-+
-+static void async_pf_wake_task(u64 token)
-+{
-+	u64 key = hash_64(token, ASYNC_PF_SLEEP_HASHBITS);
-+	struct async_pf_sleep_head *b = &async_pf_sleepers[key];
-+	struct async_pf_sleep_node *n;
-+
-+again:
-+	raw_spin_lock(&b->lock);
-+	n = _find_apf_task(b, token);
-+	if (!n) {
-+		/*
-+		 * async PF was not yet handled.
-+		 * Add dummy entry for the token.
-+		 */
-+		n = kzalloc(sizeof(*n), GFP_ATOMIC);
-+		if (!n) {
-+			/*
-+			 * Allocation failed! Busy wait while other cpu
-+			 * handles async PF.
-+			 */
-+			raw_spin_unlock(&b->lock);
-+			cpu_relax();
-+			goto again;
-+		}
-+		n->token = token;
-+		n->cpu = smp_processor_id();
-+		init_swait_queue_head(&n->wq);
-+		hlist_add_head(&n->link, &b->list);
-+	} else {
-+		apf_task_wake_one(n);
-+	}
-+	raw_spin_unlock(&b->lock);
-+}
-+
-+/*
-+ * Handle Subvention notification.
-+ */
-+static irqreturn_t async_pf_handler(int irq, void *dev_id)
-+{
-+	uint16_t exp_token, old;
-+
-+	raw_spin_lock(&async_sns_guest_lock);
-+	do {
-+		exp_token = *(esn_q + next_eq_entry);
-+		if (!exp_token)
-+			break;
-+
-+		old = arch_cmpxchg(esn_q + next_eq_entry, exp_token, 0);
-+		BUG_ON(old != exp_token);
-+
-+		async_pf_wake_task(exp_token);
-+		next_eq_entry = (next_eq_entry + 1) % nr_eq_entries;
-+	} while (1);
-+	raw_spin_unlock(&async_sns_guest_lock);
-+	return IRQ_HANDLED;
-+}
-+
-+static int __init pseries_async_pf_init(void)
-+{
-+	long rc;
-+	unsigned long ret[PLPAR_HCALL_BUFSIZE];
-+	unsigned int irq, cpu;
-+	int i;
-+
-+	/* Register buffer via H_REG_SNS */
-+	rc = plpar_hcall(H_REG_SNS, ret, __pa(sns_buffer), PAGE_SIZE);
-+	if (rc != H_SUCCESS)
-+		return -1;
-+
-+	nr_eq_entries = (PAGE_SIZE - 2) / sizeof(uint16_t);
-+
-+	/* Register irq handler */
-+	irq = irq_create_mapping(NULL, ret[1]);
-+	if (!irq) {
-+		plpar_hcall(H_REG_SNS, ret, -1, PAGE_SIZE);
-+		return -1;
-+	}
-+
-+	rc = request_irq(irq, async_pf_handler, 0, "sns-interrupt", NULL);
-+	if (rc < 0) {
-+		plpar_hcall(H_REG_SNS, ret, -1, PAGE_SIZE);
-+		return -1;
-+	}
-+
-+	for (i = 0; i < ASYNC_PF_SLEEP_HASHSIZE; i++)
-+		raw_spin_lock_init(&async_pf_sleepers[i].lock);
-+
-+	/*
-+	 * Enable subvention notifications from the hypervisor
-+	 * by setting bit 0, byte 0 of SNS buffer
-+	 */
-+	*sns_buffer |= 0x1;
-+
-+	/* Enable LPPACA_EXP_INT_ENABLED in VPA */
-+	for_each_possible_cpu(cpu)
-+		lppaca_of(cpu).byte_b9 |= LPPACA_EXP_INT_ENABLED;
-+
-+	pr_err("%s: Enabled Async PF\n", __func__);
-+	return 0;
-+}
-+
-+machine_arch_initcall(pseries, pseries_async_pf_init);
+ static inline void kvm_xen_destroy_vm(struct kvm *kvm)
+ {
+ }
 -- 
-2.31.1
+2.27.0
 
