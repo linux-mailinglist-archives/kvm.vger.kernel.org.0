@@ -2,160 +2,100 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 772223E1A8F
-	for <lists+kvm@lfdr.de>; Thu,  5 Aug 2021 19:39:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3E3E23E1B1E
+	for <lists+kvm@lfdr.de>; Thu,  5 Aug 2021 20:19:50 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240378AbhHERjb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 5 Aug 2021 13:39:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58236 "EHLO
+        id S241135AbhHESUC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 5 Aug 2021 14:20:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39286 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240038AbhHERj3 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 5 Aug 2021 13:39:29 -0400
-Received: from mail-pj1-x102a.google.com (mail-pj1-x102a.google.com [IPv6:2607:f8b0:4864:20::102a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6C2BEC0613D5
-        for <kvm@vger.kernel.org>; Thu,  5 Aug 2021 10:39:14 -0700 (PDT)
-Received: by mail-pj1-x102a.google.com with SMTP id ca5so10616982pjb.5
-        for <kvm@vger.kernel.org>; Thu, 05 Aug 2021 10:39:14 -0700 (PDT)
+        with ESMTP id S241126AbhHESUB (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 5 Aug 2021 14:20:01 -0400
+Received: from mail-pj1-x1036.google.com (mail-pj1-x1036.google.com [IPv6:2607:f8b0:4864:20::1036])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E6F11C061765
+        for <kvm@vger.kernel.org>; Thu,  5 Aug 2021 11:19:45 -0700 (PDT)
+Received: by mail-pj1-x1036.google.com with SMTP id nh14so10919475pjb.2
+        for <kvm@vger.kernel.org>; Thu, 05 Aug 2021 11:19:45 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=25dI2qwAi7TSMZKSjGmJYglQgYbrwOJcxN6GHCDQJtY=;
-        b=uFTSZPbFCNjb65mQPn0Er3edoI5Tmo52V5M7wb5ifPkYDUeTgC/9MnNHvvfC5T4c6D
-         fg9Hf9rnez9xcFsdyFWGWwMsaYVxXUtpI3M0YlwSoG00LC07NRKudSF7L7svQjkGaWlm
-         SnDiKDpT/ncc0KXEeCLwfBU4UOqtHjsqxieGTHZe1/TRJQvEF3XilbYTdFQ6iTWGwGVO
-         bf63iXpy7D3DFsaAmEVEOEROXRQ+dA8w5RfaWGPayfYPszXElngWAshhZgXFVYSGvIYI
-         vAewl8g3XCgeJLYC7KC756Imz2qE8gu7BOzxLBF0o4EioAMBrMAR7grb9J+qR6SyWhXS
-         ReZA==
+         :content-disposition:content-transfer-encoding:in-reply-to;
+        bh=InNueHw56vHBV+1tT6xD7MnAUIreY9NYLVLxpAGdi8E=;
+        b=CuuxnsN0QgIUDgNI0+zzS+ltEtAuQsligmM89FxcRGwaSyAFpJWi1g1UU6g8+QVwjJ
+         7TheF0ELN5GPWRXdSWQWVDyRIVyh3AYbhQbqK2+ja4LzBUsSA2dLfrOeWMMytxW2w7/N
+         +1D5KcQyCXFdRm/8IT96c44RWWQr5BRFk9JxbNRArHHkCZ5AK9u1FVrHE8WGCihgTyZQ
+         CfmU1Y4VYsUMIoMJrhcvIjayL6yqACQhIcoYjli0ULYRjH7NTLlvj6dOGwZsNtAEQYrd
+         rEc26P3Mrpv0sUL6P9aJ4A9UF45Hh7z9EtmjRVxyaWGXtb7vjnwkqmRxXiGoIypZNRVL
+         +bvg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=25dI2qwAi7TSMZKSjGmJYglQgYbrwOJcxN6GHCDQJtY=;
-        b=Eu6KfPZhLOTyHWeEqD/facs4mcrnvpIMp41RGSFcQ6yEIW/1STkdReOlvYUToABiW9
-         1/Lkkk7KCPB57YA4x+ccAjvbzLg9Jk2r6dIpR7weEIiGnN5vyiet1+/ZlPIXHdGrgk1b
-         5gp/YKctClY6/QNJHfo91t1V86J6IMIGcgTbZdGG/99muFyRSpBYXtvGeaRViCFjwoPJ
-         q9bkjAO+0P0wtRHuk+DLWYufsPLBJxQwxv7m1AaK0r5y1ttjzbPf34SuptUJDb8JYtQc
-         ldBOdG45cxOubV5X9Lcr1TbXF+DbVXAvNl0Qee6Mfk35hijDJfZT23vxrtwjryR3LtCV
-         rboA==
-X-Gm-Message-State: AOAM532FkA2wf49ZezhkH3yFPmSztWySWsSQBzO1KuPHvjuU7vXtrwJH
-        qLu3YStrxPULQHYuRjytpauc/g==
-X-Google-Smtp-Source: ABdhPJwQ/vFVl7z3DmEv/wlvSs11OrMFHcZMvxz1lW0lUCxyJlJX0BFvN1tmkExqXFlN2th6Y5N+dA==
-X-Received: by 2002:a17:90a:8049:: with SMTP id e9mr16826271pjw.160.1628185153210;
-        Thu, 05 Aug 2021 10:39:13 -0700 (PDT)
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to;
+        bh=InNueHw56vHBV+1tT6xD7MnAUIreY9NYLVLxpAGdi8E=;
+        b=HjckJ9OL2xCyWHoGtHgKPl6Q3RRD0WZG6iHAff5cn8o27vdSDVD/QhnILGtzX4VOCJ
+         cjZPb5ETZjbin8bfwAItmzU6gfbQemp1HtVZ9E/ZH2hcFVz+K7S/I68isj0M3tiun7da
+         SWivBUkPws111HTsakWf3boSh8pPCpVXbpFzPph81XRptmqv2UbjwfMuPepTsqH9YZ77
+         kcCNpQuaRRCg4XB5GtU8agRiV2AN1a/igSDXR5S4h0M8UJMIpuAS/aO9QD3DNLFjCXeS
+         r7aTNtQqHMA8v7zHESoSc3PwFp3J3Yz1xpgjXhivVwsGo4qeTeu+etqLbHB4K+Xp5XET
+         JUIA==
+X-Gm-Message-State: AOAM5316+kVWQkJ/ZuyBNxHfQ7aB7JKSTAJ0O74Qv81lJRGJOL/77Hyq
+        eJEvr+//wJfWnBsgDDe4BZ4dzA==
+X-Google-Smtp-Source: ABdhPJyD44lfRbmtbRyYlKYo78opElfarkxLTHe3/Hy0Me7lLaLMaId5sNULWNI48OEexuH9ivy+0Q==
+X-Received: by 2002:a17:90a:3801:: with SMTP id w1mr16476553pjb.57.1628187584967;
+        Thu, 05 Aug 2021 11:19:44 -0700 (PDT)
 Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id j3sm7677397pfe.98.2021.08.05.10.39.12
+        by smtp.gmail.com with ESMTPSA id 16sm7571735pfu.109.2021.08.05.11.19.44
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 05 Aug 2021 10:39:12 -0700 (PDT)
-Date:   Thu, 5 Aug 2021 17:39:08 +0000
+        Thu, 05 Aug 2021 11:19:44 -0700 (PDT)
+Date:   Thu, 5 Aug 2021 18:19:41 +0000
 From:   Sean Christopherson <seanjc@google.com>
-To:     "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>
-Cc:     "Huang, Kai" <kai.huang@intel.com>,
-        "erdemaktas@google.com" <erdemaktas@google.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "jmattson@google.com" <jmattson@google.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "vkuznets@redhat.com" <vkuznets@redhat.com>,
-        "tglx@linutronix.de" <tglx@linutronix.de>,
-        "ckuehl@redhat.com" <ckuehl@redhat.com>,
-        "joro@8bytes.org" <joro@8bytes.org>,
-        "x86@kernel.org" <x86@kernel.org>, "hpa@zytor.com" <hpa@zytor.com>,
-        "mingo@redhat.com" <mingo@redhat.com>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "bp@alien8.de" <bp@alien8.de>,
-        "Yamahata, Isaku" <isaku.yamahata@intel.com>,
-        "isaku.yamahata@gmail.com" <isaku.yamahata@gmail.com>,
-        "wanpengli@tencent.com" <wanpengli@tencent.com>
-Subject: Re: [RFC PATCH v2 41/69] KVM: x86: Add infrastructure for stolen GPA
- bits
-Message-ID: <YQwiPNRYHtnMA5AL@google.com>
-References: <cover.1625186503.git.isaku.yamahata@intel.com>
- <c958a131ded780808a687b0f25c02127ca14418a.1625186503.git.isaku.yamahata@intel.com>
- <20210805234424.d14386b79413845b990a18ac@intel.com>
- <YQwMkbBFUuNGnGFw@google.com>
- <78b802bbcf72a087bcf118340eae89f97024d09c.camel@intel.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Peter Xu <peterx@redhat.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Maxim Levitsky <mlevitsk@redhat.com>
+Subject: Re: [PATCH v3 4/7] KVM: X86: Introduce mmu_rmaps_stat per-vm debugfs
+ file
+Message-ID: <YQwrvX2MHplDlxrx@google.com>
+References: <20210730220455.26054-1-peterx@redhat.com>
+ <20210730220455.26054-5-peterx@redhat.com>
+ <8964c91d-761f-8fd4-e8c6-f85d6e318a45@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <78b802bbcf72a087bcf118340eae89f97024d09c.camel@intel.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <8964c91d-761f-8fd4-e8c6-f85d6e318a45@redhat.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Aug 05, 2021, Edgecombe, Rick P wrote:
-> On Thu, 2021-08-05 at 16:06 +0000, Sean Christopherson wrote:
-> > On Thu, Aug 05, 2021, Kai Huang wrote:
-> > > And removing 'gfn_stolen_bits' in 'struct kvm_mmu_page' could also save
-> > > some memory.
+On Mon, Aug 02, 2021, Paolo Bonzini wrote:
+> On 31/07/21 00:04, Peter Xu wrote:
+> > Use this file to dump rmap statistic information.  The statistic is done by
+> > calculating the rmap count and the result is log-2-based.
 > > 
-> > But I do like saving memory...  One potentially bad idea would be to
-> > unionize gfn and stolen bits by shifting the stolen bits after they're
-> > extracted from the gpa, e.g.
+> > An example output of this looks like (idle 6GB guest, right after boot linux):
 > > 
-> > 	union {
-> > 		gfn_t gfn_and_stolen;
-> > 		struct {
-> > 			gfn_t gfn:52;
-> > 			gfn_t stolen:12;
-> > 		}
-> > 	};
+> > Rmap_Count:     0       1       2-3     4-7     8-15    16-31   32-63   64-127  128-255 256-511 512-1023
+> > Level=4K:       3086676 53045   12330   1272    502     121     76      2       0       0       0
+> > Level=2M:       5947    231     0       0       0       0       0       0       0       0       0
+> > Level=1G:       32      0       0       0       0       0       0       0       0       0       0
 > > 
-> > the downsides being that accessing just the gfn would require an additional
-> > masking operation, and the stolen bits wouldn't align with reality.
+> > Signed-off-by: Peter Xu <peterx@redhat.com>
+> > ---
+> >   arch/x86/kvm/x86.c | 113 +++++++++++++++++++++++++++++++++++++++++++++
+> >   1 file changed, 113 insertions(+)
 > 
-> It definitely seems like the sp could be packed more efficiently.
+> This should be in debugfs.c, meaning that the kvm_mmu_slot_lpages() must be
+> in a header.  I think mmu.h should do, let me take a look and I can post
+> myself a v4 of these debugfs parts.
 
-Yeah, in general it could be optimized.  But for TDP/direct MMUs, we don't care
-thaaat much because there are relatively few shadow pages, versus indirect MMUs
-with thousands or tens of thousands of shadow pages.  Of course, indirect MMUs
-are also the most gluttonous due to the unsync_child_bitmap, gfns, write flooding
-count, etc...
+When you do post v4, don't forget to include both mmu.h and mmu/mmu_internal.h. :-)
+kvm/queue is still broken...
 
-If we really want to reduce the memory footprint for the common case (TDP MMU),
-the crud that's used only by indirect shadow pages could be shoved into a
-different struct by abusing the struct layout and and wrapping accesses to the
-indirect-only fields with casts/container_of and helpers, e.g.
-
-struct kvm_mmu_indirect_page {
-	struct kvm_mmu_page this;
-
-	gfn_t *gfns;
-	unsigned int unsync_children;
-	DECLARE_BITMAP(unsync_child_bitmap, 512);
-
-#ifdef CONFIG_X86_32
-	/*
-	 * Used out of the mmu-lock to avoid reading spte values while an
-	 * update is in progress; see the comments in __get_spte_lockless().
-	 */
-	int clear_spte_count;
-#endif
-
-	/* Number of writes since the last time traversal visited this page.  */
-	atomic_t write_flooding_count;
-}
-
-
-> One other idea is the stolen bits could just be recovered from the role
-> bits with a helper, like how the page fault error code stolen bits
-> encoding version of this works.
-
-As in, a generic "stolen_gfn_bits" in the role instead of a per-feature role bit?
-That would avoid the problem of per-feature role bits leading to a pile of
-marshalling code, and wouldn't suffer the masking cost when accessing ->gfn,
-though I'm not sure that matters much.
-
-> If the stolen bits are not fed into the hash calculation though it
-> would change the behavior a bit. Not sure if for better or worse. Also
-> the calculation of hash collisions would need to be aware.
-
-The role is already factored into the collision logic.
-
-> FWIW, I kind of like something like Sean's proposal. It's a bit
-> convoluted, but there are more unused bits in the gfn than the role.
-
-And tightly bound, i.e. there can't be more than gfn_t gfn+gfn_stolen bits.
-
-> Also they are a little more related.
-
-
+arch/x86/kvm/debugfs.c: In function ‘kvm_mmu_rmaps_stat_show’:
+arch/x86/kvm/debugfs.c:115:18: error: implicit declaration of function ‘kvm_mmu_slot_lpages’;
+  115 |     lpage_size = kvm_mmu_slot_lpages(slot, k + 1);
+      |                  ^~~~~~~~~~~~~~~~~~~
+      |                  kvm_mmu_gfn_allow_lpage
