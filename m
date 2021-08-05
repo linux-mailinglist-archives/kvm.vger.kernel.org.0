@@ -2,157 +2,175 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9252D3E0FF4
-	for <lists+kvm@lfdr.de>; Thu,  5 Aug 2021 10:11:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 939433E105E
+	for <lists+kvm@lfdr.de>; Thu,  5 Aug 2021 10:33:22 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239048AbhHEILW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 5 Aug 2021 04:11:22 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:39565 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S235877AbhHEILU (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 5 Aug 2021 04:11:20 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1628151066;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=mYqedqKfIiUibnkEHrQKTy4lpTPXpfEo+LIanl10hPg=;
-        b=Ldu2RLwAFeC0P0UXfBEGsPpluHgeILpXMiYmUe5K69AeX/d0zVSJ3jZisp4QUNOFNipF0Z
-        GwCrKJni29AEZ4dmthh9j94KLbGtbhXFWtgXVU6tKi5bk4sudb2zKVTecs5H+NmqIwjsY+
-        C3rQKg6rkENv6Pif39KuSyhifRMDgsg=
-Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
- [209.85.218.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-296-1TLMKbQEN7GyLR03Xbl_JA-1; Thu, 05 Aug 2021 04:11:03 -0400
-X-MC-Unique: 1TLMKbQEN7GyLR03Xbl_JA-1
-Received: by mail-ej1-f69.google.com with SMTP id ne21-20020a1709077b95b029057eb61c6fdfso1745526ejc.22
-        for <kvm@vger.kernel.org>; Thu, 05 Aug 2021 01:11:03 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=mYqedqKfIiUibnkEHrQKTy4lpTPXpfEo+LIanl10hPg=;
-        b=dJE8eTy/o0+u3FgHSnnNKi4Xdvpq39/Wt+aWybqzHGdLlkG4Ujy+I/F1Dpw9fwM+ya
-         /VGGRVoDUZf4CX7OIdQcf39hEs5+59rLaMIQfMO9VBtDXvMcQ7evuX77PUu7WoG9iLPG
-         6JCb61I0CEV/8zjKNpyQWec+QZqD+32sIAFjKX/vfRht7MHFGBBc1HIzsO2/pJj3t1uw
-         J/1Few6kvqMEpVAThCTPNjPZQOJUK96FqV/QEkL0NZGm8/jCDzJAF1HXMzt8S2C3iZT6
-         h6YHWyi/lBu5E3hjwZm5f0WiWAVGgrTJ+v6r3g5L9OsNABzqfMNGR/ObEqmL7BnCRvGH
-         Be3w==
-X-Gm-Message-State: AOAM531DqSoc9on3wBA139HjYGgTVQis9f0DtLlrFhdrgvwYq5cgZ4u+
-        7PG8MblJTZsH7IEml7Wr9zWqIe0tOl3bRFRRgexov/2NvxwOLMTP5GNQbGwtSeyAhirhgsmFpUb
-        biRDt0ZcBdqoa
-X-Received: by 2002:aa7:da19:: with SMTP id r25mr4954619eds.247.1628151062629;
-        Thu, 05 Aug 2021 01:11:02 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyaJA0TvoXpvAWSL/yCRIoTeNJGM0lZhY9jS7JaxFj3Fehbl2uGqQzkR9pTj5Tk7izwMPgUeg==
-X-Received: by 2002:aa7:da19:: with SMTP id r25mr4954606eds.247.1628151062496;
-        Thu, 05 Aug 2021 01:11:02 -0700 (PDT)
-Received: from [192.168.10.118] ([93.56.169.140])
-        by smtp.gmail.com with ESMTPSA id cz3sm1924356edb.11.2021.08.05.01.11.01
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 05 Aug 2021 01:11:01 -0700 (PDT)
-Subject: Re: [PATCH v2 0/7] Improve gfn-to-memslot performance during page
- faults
-To:     David Matlack <dmatlack@google.com>
-Cc:     kvm@vger.kernel.org, kvm-ppc@vger.kernel.org,
-        Ben Gardon <bgardon@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Jim Mattson <jmattson@google.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Junaid Shahid <junaids@google.com>,
-        Andrew Jones <drjones@redhat.com>,
-        Paul Mackerras <paulus@ozlabs.org>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>
-References: <20210804222844.1419481-1-dmatlack@google.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <8a795ab3-d504-b0fd-447c-12117fb598c1@redhat.com>
-Date:   Thu, 5 Aug 2021 10:11:00 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.11.0
+        id S236825AbhHEIda (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 5 Aug 2021 04:33:30 -0400
+Received: from mx13.kaspersky-labs.com ([91.103.66.164]:12214 "EHLO
+        mx13.kaspersky-labs.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S233624AbhHEIda (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 5 Aug 2021 04:33:30 -0400
+Received: from relay13.kaspersky-labs.com (unknown [127.0.0.10])
+        by relay13.kaspersky-labs.com (Postfix) with ESMTP id 62812520D38;
+        Thu,  5 Aug 2021 11:33:14 +0300 (MSK)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kaspersky.com;
+        s=mail202102; t=1628152394;
+        bh=k0pgS1kHGbla5ruFilbtneTZqlGPAFUQro8mBMppHLE=;
+        h=Subject:To:From:Message-ID:Date:MIME-Version:Content-Type;
+        b=5Jl3ZrfuwildCQlS79Y/Bsx4GwA0unWegjmiYNWjJfy9cAlWIrr9DVHnSfBw1Kmll
+         eoNTRZx32yLUaWTVt+deAI49RrEwgmARzr9LoZk5kCMIbcDHVHhTaxWI/UvMyge/OF
+         5FJPv/NQiJu6reifjT01DD41avbz5BVC2PyYjWqNc3rFHVGgfTswYKku/lw708c8HI
+         u2wzWbwX/hCVUJgyxncXOhTIVkX9QktJDwbJeEFSL0Md2Zrk/1ruFp2JQ1kXzTUFF9
+         9hd0VaisTaFRrOaecPbOZKczRe/Resn6n/8f6IvNuDaPR2dSodcCy7iUuHgxtrco4C
+         IlmDdKiBcNWaQ==
+Received: from mail-hq2.kaspersky.com (unknown [91.103.66.206])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-SHA256 (128/128 bits))
+        (Client CN "mail-hq2.kaspersky.com", Issuer "Kaspersky MailRelays CA G3" (verified OK))
+        by mailhub13.kaspersky-labs.com (Postfix) with ESMTPS id 9DC01520D3A;
+        Thu,  5 Aug 2021 11:33:13 +0300 (MSK)
+Received: from [10.16.171.77] (10.64.64.121) by hqmailmbx3.avp.ru
+ (10.64.67.243) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2308.14; Thu, 5
+ Aug 2021 11:33:13 +0300
+Subject: Re: [RFC PATCH v1 0/7] virtio/vsock: introduce MSG_EOR flag for
+ SEQPACKET
+To:     Stefano Garzarella <sgarzare@redhat.com>
+CC:     Stefan Hajnoczi <stefanha@redhat.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Colin Ian King <colin.king@canonical.com>,
+        Andra Paraschiv <andraprs@amazon.com>,
+        Norbert Slusarek <nslusarek@gmx.net>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "virtualization@lists.linux-foundation.org" 
+        <virtualization@lists.linux-foundation.org>,
+        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "oxffffaa@gmail.com" <oxffffaa@gmail.com>
+References: <20210726163137.2589102-1-arseny.krasnov@kaspersky.com>
+ <20210804125737.kbgc6mg2v5lw25wu@steredhat>
+From:   Arseny Krasnov <arseny.krasnov@kaspersky.com>
+Message-ID: <8e44442c-4cac-dcbc-a88d-17d9878e7d32@kaspersky.com>
+Date:   Thu, 5 Aug 2021 11:33:12 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <20210804222844.1419481-1-dmatlack@google.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
+In-Reply-To: <20210804125737.kbgc6mg2v5lw25wu@steredhat>
+Content-Type: text/plain; charset="windows-1252"
 Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+X-Originating-IP: [10.64.64.121]
+X-ClientProxiedBy: hqmailmbx1.avp.ru (10.64.67.241) To hqmailmbx3.avp.ru
+ (10.64.67.243)
+X-KSE-ServerInfo: hqmailmbx3.avp.ru, 9
+X-KSE-AntiSpam-Interceptor-Info: scan successful
+X-KSE-AntiSpam-Version: 5.9.20, Database issued on: 08/05/2021 08:19:01
+X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
+X-KSE-AntiSpam-Method: none
+X-KSE-AntiSpam-Rate: 0
+X-KSE-AntiSpam-Info: Lua profiles 165422 [Aug 04 2021]
+X-KSE-AntiSpam-Info: Version: 5.9.20.0
+X-KSE-AntiSpam-Info: Envelope from: arseny.krasnov@kaspersky.com
+X-KSE-AntiSpam-Info: LuaCore: 449 449 5db59deca4a4f5e6ea34a93b13bc730e229092f4
+X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
+X-KSE-AntiSpam-Info: d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;kaspersky.com:7.1.1;127.0.0.199:7.1.2
+X-KSE-AntiSpam-Info: Rate: 0
+X-KSE-AntiSpam-Info: Status: not_detected
+X-KSE-AntiSpam-Info: Method: none
+X-KSE-Antiphishing-Info: Clean
+X-KSE-Antiphishing-ScanningType: Deterministic
+X-KSE-Antiphishing-Method: None
+X-KSE-Antiphishing-Bases: 08/05/2021 08:22:00
+X-KSE-AttachmentFiltering-Interceptor-Info: no applicable attachment filtering
+ rules found
+X-KSE-Antivirus-Interceptor-Info: scan successful
+X-KSE-Antivirus-Info: Clean, bases: 04.08.2021 22:55:00
+X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
+X-KSE-AttachmentFiltering-Interceptor-Info: no applicable attachment filtering
+ rules found
+X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
+X-KLMS-Rule-ID: 52
+X-KLMS-Message-Action: clean
+X-KLMS-AntiSpam-Status: not scanned, disabled by settings
+X-KLMS-AntiSpam-Interceptor-Info: not scanned
+X-KLMS-AntiPhishing: Clean, bases: 2021/08/04 17:04:00
+X-KLMS-AntiVirus: Kaspersky Security for Linux Mail Server, version 8.0.3.30, bases: 2021/08/04 22:55:00 #16982736
+X-KLMS-AntiVirus-Status: Clean, skipped
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 05/08/21 00:28, David Matlack wrote:
-> This series improves the performance of gfn-to-memslot lookups during
-> page faults. Ben Gardon originally identified this performance gap and
-> sufficiently addressed it in Google's kernel by reading the memslot once
-> at the beginning of the page fault and passing around the pointer.
-> 
-> This series takes an alternative approach by introducing a per-vCPU
-> cache of the least recently used memslot index. This avoids needing to
-> binary search the existing memslots multiple times during a page fault.
-> Unlike passing around the pointer, the cache has an additional benefit
-> in that it speeds up gfn-to-memslot lookups *across* faults and during
-> spte prefetching where the gfn changes.
-> 
-> This difference can be seen clearly when looking at the performance of
-> fast_page_fault when multiple slots are in play:
-> 
-> Metric                        | Baseline     | Pass*    | Cache**
-> ----------------------------- | ------------ | -------- | ----------
-> Iteration 2 dirty memory time | 2.8s         | 1.6s     | 0.30s
-> 
-> * Pass: Lookup the memslot once per fault and pass it around.
-> ** Cache: Cache the last used slot per vCPU (i.e. this series).
-> 
-> (Collected via ./dirty_log_perf_test -v64 -x64)
-> 
-> I plan to also send a follow-up series with a version of Ben's patches
-> to pass the pointer to the memslot through the page fault handling code
-> rather than looking it up multiple times. Even when applied on top of
-> the cache series it has some performance improvements by avoiding a few
-> extra memory accesses (mainly kvm->memslots[as_id] and
-> slots->used_slots). But it will be a judgement call whether or not it's
-> worth the code churn and complexity.
 
-Queued, thanks.
+On 04.08.2021 15:57, Stefano Garzarella wrote:
+> Caution: This is an external email. Be cautious while opening links or attachments.
+>
+>
+>
+> Hi Arseny,
+>
+> On Mon, Jul 26, 2021 at 07:31:33PM +0300, Arseny Krasnov wrote:
+>>       This patchset implements support of MSG_EOR bit for SEQPACKET
+>> AF_VSOCK sockets over virtio transport.
+>>       Idea is to distinguish concepts of 'messages' and 'records'.
+>> Message is result of sending calls: 'write()', 'send()', 'sendmsg()'
+>> etc. It has fixed maximum length, and it bounds are visible using
+>> return from receive calls: 'read()', 'recv()', 'recvmsg()' etc.
+>> Current implementation based on message definition above.
+> Okay, so the implementation we merged is wrong right?
+> Should we disable the feature bit in stable kernels that contain it? Or
+> maybe we can backport the fixes...
 
-Paolo
+Hi,
 
-> v2:
->   * Rename lru to last_used [Paolo]
->   * Tree-wide replace search_memslots with __gfn_to_memslot [Paolo]
->   * Avoid speculation when accessesing slots->memslots [Paolo]
->   * Refactor tdp_set_spte_atomic to leverage vcpu->last_used_slot [Paolo]
->   * Add Paolo's Reviewed-by tags
->   * Fix build failures in mmu_audit.c [kernel test robot]
-> 
-> v1: https://lore.kernel.org/kvm/20210730223707.4083785-1-dmatlack@google.com/
-> 
-> David Matlack (7):
->    KVM: Rename lru_slot to last_used_slot
->    KVM: Move last_used_slot logic out of search_memslots
->    KVM: Cache the last used slot index per vCPU
->    KVM: x86/mmu: Leverage vcpu->last_used_slot in
->      tdp_mmu_map_handle_target_level
->    KVM: x86/mmu: Leverage vcpu->last_used_slot for rmap_add and
->      rmap_recycle
->    KVM: x86/mmu: Rename __gfn_to_rmap to gfn_to_rmap
->    KVM: selftests: Support multiple slots in dirty_log_perf_test
-> 
->   arch/powerpc/kvm/book3s_64_vio.c              |  2 +-
->   arch/powerpc/kvm/book3s_64_vio_hv.c           |  2 +-
->   arch/s390/kvm/kvm-s390.c                      |  4 +-
->   arch/x86/kvm/mmu/mmu.c                        | 54 +++++++------
->   arch/x86/kvm/mmu/mmu_audit.c                  |  4 +-
->   arch/x86/kvm/mmu/tdp_mmu.c                    | 42 +++++++---
->   include/linux/kvm_host.h                      | 80 +++++++++++++++----
->   .../selftests/kvm/access_tracking_perf_test.c |  2 +-
->   .../selftests/kvm/demand_paging_test.c        |  2 +-
->   .../selftests/kvm/dirty_log_perf_test.c       | 76 +++++++++++++++---
->   .../selftests/kvm/include/perf_test_util.h    |  2 +-
->   .../selftests/kvm/lib/perf_test_util.c        | 20 +++--
->   .../kvm/memslot_modification_stress_test.c    |  2 +-
->   virt/kvm/kvm_main.c                           | 26 +++++-
->   14 files changed, 238 insertions(+), 80 deletions(-)
-> 
+No, this is correct and it is message boundary based. Idea of this
 
+patchset is to add extra boundaries marker which i think could be
+
+useful when we want to send data in seqpacket mode which length
+
+is bigger than maximum message length(this is limited by transport).
+
+Of course we can fragment big piece of data too small messages, but this
+
+requires to carry fragmentation info in data protocol. So In this case
+
+when we want to maintain boundaries receiver calls recvmsg() until MSG_EOR found.
+
+But when receiver knows, that data is fit in maximum datagram length,
+
+it doesn't care about checking MSG_EOR just calling recv() or read()(e.g.
+
+message based mode).
+
+
+Thank You
+
+>
+>>       Record has unlimited length, it consists of multiple message,
+>> and bounds of record are visible via MSG_EOR flag returned from
+>> 'recvmsg()' call. Sender passes MSG_EOR to sending system call and
+>> receiver will see MSG_EOR when corresponding message will be processed.
+>>       To support MSG_EOR new bit was added along with existing
+>> 'VIRTIO_VSOCK_SEQ_EOR': 'VIRTIO_VSOCK_SEQ_EOM'(end-of-message) - now it
+>> works in the same way as 'VIRTIO_VSOCK_SEQ_EOR'. But 'VIRTIO_VSOCK_SEQ_EOR'
+>> is used to mark 'MSG_EOR' bit passed from userspace.
+> I understand that it makes sense to remap VIRTIO_VSOCK_SEQ_EOR to
+> MSG_EOR to make the user understand the boundaries, but why do we need
+> EOM as well?
+>
+> Why do we care about the boundaries of a message within a record?
+> I mean, if the sender makes 3 calls:
+>      send(A1,0)
+>      send(A2,0)
+>      send(A3, MSG_EOR);
+>
+> IIUC it should be fine if the receiver for example receives all in one
+> single recv() calll with MSG_EOR set, so why do we need EOM?
+>
+> Thanks,
+> Stefano
+>
+>
