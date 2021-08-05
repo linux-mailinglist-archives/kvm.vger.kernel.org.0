@@ -2,174 +2,125 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3E6563E0F3D
-	for <lists+kvm@lfdr.de>; Thu,  5 Aug 2021 09:33:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 412833E0F44
+	for <lists+kvm@lfdr.de>; Thu,  5 Aug 2021 09:33:58 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237114AbhHEHdW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 5 Aug 2021 03:33:22 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:47159 "EHLO
+        id S238692AbhHEHeK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 5 Aug 2021 03:34:10 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:21614 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231499AbhHEHdW (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 5 Aug 2021 03:33:22 -0400
+        by vger.kernel.org with ESMTP id S238685AbhHEHeJ (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 5 Aug 2021 03:34:09 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1628148788;
+        s=mimecast20190719; t=1628148835;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=VMJr84Y9bUNKt9cAHm1Vupejhp2NHPyfaDvSsHp2BrQ=;
-        b=GCf3qBI8HicT70/BWeQRQLABdqVMXfGeLIUWu7ShmxHE+0JGSbMo+U2nxiUVMK+AcrYxpl
-        SpiXVCZfL305ZNoOlOcxTz/s/rviOKI1BXfpZyCquFMfNLQ3+ye86Z0pgl9ebgN1QRKl5G
-        YtGn+ygxO2pN6AZfp+tYhnaiQT8qZZw=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-324-cPH-JUHKMRGuyXsE6Wr6iw-1; Thu, 05 Aug 2021 03:33:07 -0400
-X-MC-Unique: cPH-JUHKMRGuyXsE6Wr6iw-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id F06CD10066E5;
-        Thu,  5 Aug 2021 07:33:05 +0000 (UTC)
-Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 98A8460BF4;
-        Thu,  5 Aug 2021 07:33:05 +0000 (UTC)
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=1X4atkIAaKHKvFaPgSQTrOWjpkdnsM1vBayaGygXCVA=;
+        b=eU2iQoRAVQr9qpkoTBrFwvE80Bktz2EypQGmcT6zXHQTEJCR7Za5TOnp9/Ww4VCE88SumB
+        Bthq6bkhAl2mchLGrLRXdicSGkucChplxjNlBxfU5w3sGHx6XZkGMOWekQfJuL6iFOt3b0
+        ZXbkRtpDeACwxO1cdCFSjzKXMGVVVvo=
+Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
+ [209.85.218.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-493-691ReTLQP66PeQp5Z3JrNA-1; Thu, 05 Aug 2021 03:33:53 -0400
+X-MC-Unique: 691ReTLQP66PeQp5Z3JrNA-1
+Received: by mail-ej1-f70.google.com with SMTP id lu19-20020a170906fad3b029058768348f55so1737437ejb.12
+        for <kvm@vger.kernel.org>; Thu, 05 Aug 2021 00:33:53 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=1X4atkIAaKHKvFaPgSQTrOWjpkdnsM1vBayaGygXCVA=;
+        b=oTPzru/uqoEgqJoOW1C0lLDANbPP/qyG8gZii/ymqpuU77EoPhN97ioH8BOVm+RSlI
+         9+ySKXodM7Bu6qC1RH+h4L2SZ8+SYFiO6DuA4wqy7J7zHJZ4RHGDv5hUr5/fTR80gt1c
+         67riOPrAPKjNJNLIuIMDO82SE+3MyirFirIwZTyrFrT16DjSH1IjAJIxQU2ArMfYuNuT
+         +gcsvbwDpELbKayhyrrtdCNnSgmkA9Bqbeka/rb0PQoKU8O+6PkbfO7t/frzCs+eenRJ
+         S0IKoWsy243VEjnPIUOemR1RIxrE3JKmCcYnlf9cGu6SSpKT74U1iIkjllaxV2+Uzp99
+         gsxg==
+X-Gm-Message-State: AOAM531nZ/cmNwQqewcUUSF0rB6YOUfNXxnVlgyDT7CiiLO+c3+dGqvN
+        WssiKGu4ZOMl9RCNK2S8vEsqPlgrG6bkOwizntAPmMOuOaFz/lNoUEAHcfsyq178KQwz/8pO2EA
+        ljdTqWkMpQMoE
+X-Received: by 2002:a17:906:acf:: with SMTP id z15mr3478779ejf.512.1628148832682;
+        Thu, 05 Aug 2021 00:33:52 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJznKB1r0CMePbBY5Fa8xL01mLW4gcnEfvw2D+pstCkRlMae0hElKTucF/c2Ck/KkB9T2KxNBA==
+X-Received: by 2002:a17:906:acf:: with SMTP id z15mr3478763ejf.512.1628148832502;
+        Thu, 05 Aug 2021 00:33:52 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e? ([2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e])
+        by smtp.gmail.com with ESMTPSA id nb39sm1385122ejc.95.2021.08.05.00.33.51
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 05 Aug 2021 00:33:52 -0700 (PDT)
+Subject: Re: [PATCH] KVM: x86/mmu: Fix per-cpu counter corruption on 32-bit
+ builds
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Ben Gardon <bgardon@google.com>
+References: <20210804214609.1096003-1-seanjc@google.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc:     David Woodhouse <dwmw@amazon.co.uk>
-Subject: [PATCH] KVM: xen: do not use struct gfn_to_hva_cache
-Date:   Thu,  5 Aug 2021 03:33:05 -0400
-Message-Id: <20210805073305.2682042-1-pbonzini@redhat.com>
+Message-ID: <9527197a-2a81-832b-7391-80d646a5e212@redhat.com>
+Date:   Thu, 5 Aug 2021 09:33:50 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.11.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+In-Reply-To: <20210804214609.1096003-1-seanjc@google.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-gfn_to_hva_cache is not thread-safe, so it is usually used only within
-a vCPU (whose code is protected by vcpu->mutex).  The Xen interface
-implementation has such a cache in kvm->arch, but it is not really
-used except to store the location of the shared info page.  Replace
-shinfo_set and shinfo_cache with just the value that is passed via
-KVM_XEN_ATTR_TYPE_SHARED_INFO; the only complication is that the
-initialization value is not zero anymore and therefore kvm_xen_init_vm
-needs to be introduced.
+On 04/08/21 23:46, Sean Christopherson wrote:
+> Take a signed 'long' instead of an 'unsigned long' for the number of
+> pages to add/subtract to the total number of pages used by the MMU.  This
+> fixes a zero-extension bug on 32-bit kernels that effectively corrupts
+> the per-cpu counter used by the shrinker.
+> 
+> Per-cpu counters take a signed 64-bit value on both 32-bit and 64-bit
+> kernels, whereas kvm_mod_used_mmu_pages() takes an unsigned long and thus
+> an unsigned 32-bit value on 32-bit kernels.  As a result, the value used
+> to adjust the per-cpu counter is zero-extended (unsigned -> signed), not
+> sign-extended (signed -> signed), and so KVM's intended -1 gets morphed to
+> 4294967295 and effectively corrupts the counter.
+> 
+> This was found by a staggering amount of sheer dumb luck when running
+> kvm-unit-tests on a 32-bit KVM build.  The shrinker just happened to kick
+> in while running tests and do_shrink_slab() logged an error about trying
+> to free a negative number of objects.  The truly lucky part is that the
+> kernel just happened to be a slightly stale build, as the shrinker no
+> longer yells about negative objects as of commit 18bb473e5031 ("mm:
+> vmscan: shrink deferred objects proportional to priority").
+> 
+>   vmscan: shrink_slab: mmu_shrink_scan+0x0/0x210 [kvm] negative objects to delete nr=-858993460
+> 
+> Fixes: bc8a3d8925a8 ("kvm: mmu: Fix overflow on kvm mmu page limit calculation")
+> Cc: stable@vger.kernel.org
+> Cc: Ben Gardon <bgardon@google.com>
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
+> ---
+>   arch/x86/kvm/mmu/mmu.c | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> index b4b65c21b2ca..082a0ba79edd 100644
+> --- a/arch/x86/kvm/mmu/mmu.c
+> +++ b/arch/x86/kvm/mmu/mmu.c
+> @@ -1700,7 +1700,7 @@ static int is_empty_shadow_page(u64 *spt)
+>    * aggregate version in order to make the slab shrinker
+>    * faster
+>    */
+> -static inline void kvm_mod_used_mmu_pages(struct kvm *kvm, unsigned long nr)
+> +static inline void kvm_mod_used_mmu_pages(struct kvm *kvm, long nr)
+>   {
+>   	kvm->arch.n_used_mmu_pages += nr;
+>   	percpu_counter_add(&kvm_total_used_mmu_pages, nr);
+> 
 
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- arch/x86/include/asm/kvm_host.h |  3 +--
- arch/x86/kvm/x86.c              |  1 +
- arch/x86/kvm/xen.c              | 23 ++++++++++++-----------
- arch/x86/kvm/xen.h              |  5 +++++
- 4 files changed, 19 insertions(+), 13 deletions(-)
+Queued, thanks.
 
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index a079880d4cd5..6a73ff7db5f9 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -1003,9 +1003,8 @@ struct msr_bitmap_range {
- /* Xen emulation context */
- struct kvm_xen {
- 	bool long_mode;
--	bool shinfo_set;
- 	u8 upcall_vector;
--	struct gfn_to_hva_cache shinfo_cache;
-+	gfn_t shinfo_gfn;
- };
- 
- enum kvm_irqchip_mode {
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 348452bb16bc..3cedc7cc132a 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -11162,6 +11162,7 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
- 	kvm_hv_init_vm(kvm);
- 	kvm_page_track_init(kvm);
- 	kvm_mmu_init_vm(kvm);
-+	kvm_xen_init_vm(kvm);
- 
- 	return static_call(kvm_x86_vm_init)(kvm);
- }
-diff --git a/arch/x86/kvm/xen.c b/arch/x86/kvm/xen.c
-index ae17250e1efe..9ea9c3dabe37 100644
---- a/arch/x86/kvm/xen.c
-+++ b/arch/x86/kvm/xen.c
-@@ -25,15 +25,14 @@ static int kvm_xen_shared_info_init(struct kvm *kvm, gfn_t gfn)
- {
- 	gpa_t gpa = gfn_to_gpa(gfn);
- 	int wc_ofs, sec_hi_ofs;
--	int ret;
-+	int ret = 0;
- 	int idx = srcu_read_lock(&kvm->srcu);
- 
--	ret = kvm_gfn_to_hva_cache_init(kvm, &kvm->arch.xen.shinfo_cache,
--					gpa, PAGE_SIZE);
--	if (ret)
-+	if (kvm_is_error_hva(gfn_to_hva(kvm, gfn))) {
-+		ret = -EFAULT;
- 		goto out;
--
--	kvm->arch.xen.shinfo_set = true;
-+	}
-+	kvm->arch.xen.shinfo_gfn = gfn;
- 
- 	/* Paranoia checks on the 32-bit struct layout */
- 	BUILD_BUG_ON(offsetof(struct compat_shared_info, wc) != 0x900);
-@@ -245,7 +244,7 @@ int kvm_xen_hvm_set_attr(struct kvm *kvm, struct kvm_xen_hvm_attr *data)
- 
- 	case KVM_XEN_ATTR_TYPE_SHARED_INFO:
- 		if (data->u.shared_info.gfn == GPA_INVALID) {
--			kvm->arch.xen.shinfo_set = false;
-+			kvm->arch.xen.shinfo_gfn = GPA_INVALID;
- 			r = 0;
- 			break;
- 		}
-@@ -283,10 +282,7 @@ int kvm_xen_hvm_get_attr(struct kvm *kvm, struct kvm_xen_hvm_attr *data)
- 		break;
- 
- 	case KVM_XEN_ATTR_TYPE_SHARED_INFO:
--		if (kvm->arch.xen.shinfo_set)
--			data->u.shared_info.gfn = gpa_to_gfn(kvm->arch.xen.shinfo_cache.gpa);
--		else
--			data->u.shared_info.gfn = GPA_INVALID;
-+		data->u.shared_info.gfn = gpa_to_gfn(kvm->arch.xen.shinfo_gfn);
- 		r = 0;
- 		break;
- 
-@@ -646,6 +642,11 @@ int kvm_xen_hvm_config(struct kvm *kvm, struct kvm_xen_hvm_config *xhc)
- 	return 0;
- }
- 
-+void kvm_xen_init_vm(struct kvm *kvm)
-+{
-+	kvm->arch.xen.shinfo_gfn = GPA_INVALID;
-+}
-+
- void kvm_xen_destroy_vm(struct kvm *kvm)
- {
- 	if (kvm->arch.xen_hvm_config.msr)
-diff --git a/arch/x86/kvm/xen.h b/arch/x86/kvm/xen.h
-index 463a7844a8ca..cc0cf5f37450 100644
---- a/arch/x86/kvm/xen.h
-+++ b/arch/x86/kvm/xen.h
-@@ -21,6 +21,7 @@ int kvm_xen_hvm_set_attr(struct kvm *kvm, struct kvm_xen_hvm_attr *data);
- int kvm_xen_hvm_get_attr(struct kvm *kvm, struct kvm_xen_hvm_attr *data);
- int kvm_xen_write_hypercall_page(struct kvm_vcpu *vcpu, u64 data);
- int kvm_xen_hvm_config(struct kvm *kvm, struct kvm_xen_hvm_config *xhc);
-+void kvm_xen_init_vm(struct kvm *kvm);
- void kvm_xen_destroy_vm(struct kvm *kvm);
- 
- static inline bool kvm_xen_msr_enabled(struct kvm *kvm)
-@@ -50,6 +51,10 @@ static inline int kvm_xen_write_hypercall_page(struct kvm_vcpu *vcpu, u64 data)
- 	return 1;
- }
- 
-+static inline void kvm_xen_init_vm(struct kvm *kvm)
-+{
-+}
-+
- static inline void kvm_xen_destroy_vm(struct kvm *kvm)
- {
- }
--- 
-2.27.0
+Paolo
 
