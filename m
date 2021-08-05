@@ -2,162 +2,143 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 493543E0DDF
-	for <lists+kvm@lfdr.de>; Thu,  5 Aug 2021 07:49:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 598203E0E4D
+	for <lists+kvm@lfdr.de>; Thu,  5 Aug 2021 08:28:07 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232144AbhHEFt1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 5 Aug 2021 01:49:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35786 "EHLO
+        id S236276AbhHEG2T (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 5 Aug 2021 02:28:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44360 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229578AbhHEFt0 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 5 Aug 2021 01:49:26 -0400
-Received: from mail-pj1-x1033.google.com (mail-pj1-x1033.google.com [IPv6:2607:f8b0:4864:20::1033])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 21EC8C0613D5
-        for <kvm@vger.kernel.org>; Wed,  4 Aug 2021 22:49:12 -0700 (PDT)
-Received: by mail-pj1-x1033.google.com with SMTP id o44-20020a17090a0a2fb0290176ca3e5a2fso7040021pjo.1
-        for <kvm@vger.kernel.org>; Wed, 04 Aug 2021 22:49:12 -0700 (PDT)
+        with ESMTP id S235592AbhHEG2Q (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 5 Aug 2021 02:28:16 -0400
+Received: from mail-lj1-x235.google.com (mail-lj1-x235.google.com [IPv6:2a00:1450:4864:20::235])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6C97FC061765
+        for <kvm@vger.kernel.org>; Wed,  4 Aug 2021 23:28:01 -0700 (PDT)
+Received: by mail-lj1-x235.google.com with SMTP id l4so5647856ljq.4
+        for <kvm@vger.kernel.org>; Wed, 04 Aug 2021 23:28:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ozlabs-ru.20150623.gappssmtp.com; s=20150623;
-        h=message-id:date:mime-version:user-agent:subject:content-language:to
-         :cc:references:from:in-reply-to:content-transfer-encoding;
-        bh=dNsQY+F/nTZDlRa7s8E02CpCEHGRnjF0leqZ8/MnW8A=;
-        b=XlRrQdL9k7bXH9baTOiW0UScO0BXEPiwuTl8Ed5xr1VY4LwTSCHjHNHUdxdHo1xgun
-         HOyIPLyZ0sXVDlyztY+TJGlCWpHwQX+cEMOj1Ezq1Act+q9Lq1CjbUzbPm/a+tTkHkkT
-         1QAKMZlgAqTXh/ShUtsRC8Jot8Elr5U958dhkuqDFna618ZYUT6TearZNMmCwyvRtDzF
-         gK6VnVJBUnlvi8mCCXeL/GYrcSCHGqZz5SiTWGh0cL56p8CdE4rztSX6IvO2Zxl/u7fk
-         LWfTs+x8UBBqY3OnBJaMP7fSODsRhvCCWw57l/qhkoz0Mj6HpbVR5pPD08XRcC3maJgc
-         AdGA==
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=qZujMoRT1ZKK0WrlZq2+xupgWWhgF2cPYjSHNhOFfkU=;
+        b=A8TcVfSSUWhwH5Gwiljw1kOaURLOTjY3Hxlw0BvexgCrBmDI1AmbOksHtYpHNO437X
+         qp4U2afG8SepZqohJ7E240SqnKG4GNQHuoWvyXSw2H1dzAvMsncgsrBfw3zjGrAXZ+e7
+         ajsp/PW3uLnjA29mTqPLW5EHlBUXd90yI+BNEeE2qnEK763ozktvU3lIcjFV3s3ne4T9
+         zxUIr5Umhmq6LDpa2oZzfgWtiMt5cdUhDpT/UVszVdo4XnLpU9yGsa21inrQgX3XQ7ab
+         DnD51btLSrRk72pk4bh0tDrVV41dNOYd3T5yhe58dzQD+fkuEWM0uenNb5JytQKfUKOu
+         AmbA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=dNsQY+F/nTZDlRa7s8E02CpCEHGRnjF0leqZ8/MnW8A=;
-        b=Iba2RrEH5NJNbMWRqqe0yInoZYpsR34BhTkNkNIIOvUPNTqhvlyp1qYQCdev+LufgH
-         sbAxlg19FCbz5VvJ/nB9tWpTaXj13Bk5UgFAYQkiG8lcYSqksy5lKwb0+fAooAo88kxK
-         tg/TSgREHF7vbF8sjHgvW6vfbuRgWGUPPFoXqZRMaj13ImGUp/l25PtdKQOScrpWc5Qm
-         oHE7chUNO9flcLwdi2K22VnxFw4n013SmzNvU0q4naMRfuCeg16MTLpN+m0xUNeznZLj
-         qynTHuPTnLzSZK34TYj6cl4HLniUtpOpEXMkv19lhGyv7Gdlpp8h5jMbs/e9ScZCUtGy
-         OiVA==
-X-Gm-Message-State: AOAM5321hycK2p40Zi0YFaa/dl+uOtAjQM3W9tE9mMl/yImrf8MQDN5U
-        JDI2qOZ6cz/q+JS7F4dzyFY6vw==
-X-Google-Smtp-Source: ABdhPJyq36kr7e5TFNOzJSVQEXm6NeJWJM6IIWNfcQVUeMByEtQjPVrmwruLaFRK0kiCDYVpeqsClQ==
-X-Received: by 2002:a17:902:6bc8:b029:117:6a8a:f7af with SMTP id m8-20020a1709026bc8b02901176a8af7afmr2530078plt.51.1628142551592;
-        Wed, 04 Aug 2021 22:49:11 -0700 (PDT)
-Received: from localhost (110-175-254-242.static.tpgi.com.au. [110.175.254.242])
-        by smtp.gmail.com with UTF8SMTPSA id g19sm8114748pjl.25.2021.08.04.22.49.08
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 04 Aug 2021 22:49:11 -0700 (PDT)
-Message-ID: <b2d4af96-ea66-982f-54c0-919546d39aa3@ozlabs.ru>
-Date:   Thu, 5 Aug 2021 15:49:05 +1000
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=qZujMoRT1ZKK0WrlZq2+xupgWWhgF2cPYjSHNhOFfkU=;
+        b=FqL9VcJW9aszfEEn1ujxyqInCn8uALs2pnzX+URiNTYUklOBLyebfq6MPDZ0ADeM6L
+         2TmM8bxebayV7zPuB4fHPIdjq290Nyaa9BMR+VORs+T8PF25bU33dpQny1PCdelWE2kI
+         TarKrAvCXDGLLBSvf3bQDb3WxEBEsgRjsq36x3DHk9+Jsuyz/60MIdneW5T6HP04fgWO
+         A3mv6Fk/p3ItzLl/hkkVl5bYSJc56vYjpL5su9ouWxQ/KV1Aj4Udj55LLSxt4hESDVo9
+         JafGEWGl1vouH3Qn7C2DsmWuSLKDgyT54rMFT2cb9rE71wfpRboDtqs5LX+lDx46YXuz
+         LkRQ==
+X-Gm-Message-State: AOAM532VSDyLmmiYt5LcGivdizSEItxhqWJfH6p5iPSow7SEiHw1+OaW
+        P9Iwb4dCU4BNrWu/w/17dXg99/7ARFWrku1wMvk1kA==
+X-Google-Smtp-Source: ABdhPJx71BAqveU+GESvhEqPQ6+JEFcqk5SdIMktg0RjCYmjLebuoo+kva+QCUatWyOaLmvBQuiQznsARu5ehNolva4=
+X-Received: by 2002:a2e:9b4f:: with SMTP id o15mr2061197ljj.22.1628144879477;
+ Wed, 04 Aug 2021 23:27:59 -0700 (PDT)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:88.0) Gecko/20100101
- Thunderbird/88.0
-Subject: Re: [PATCH] KVM: Do not leak memory for duplicate debugfs directories
-Content-Language: en-US
-To:     Paolo Bonzini <pbonzini@redhat.com>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org
-Cc:     stable@vger.kernel.org,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-References: <20210804093737.2536206-1-pbonzini@redhat.com>
-From:   Alexey Kardashevskiy <aik@ozlabs.ru>
-In-Reply-To: <20210804093737.2536206-1-pbonzini@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <20210804085819.846610-1-oupton@google.com> <20210804085819.846610-20-oupton@google.com>
+ <20210804110531.x6gm2bpygg7laiau@gator.home>
+In-Reply-To: <20210804110531.x6gm2bpygg7laiau@gator.home>
+From:   Oliver Upton <oupton@google.com>
+Date:   Wed, 4 Aug 2021 23:27:48 -0700
+Message-ID: <CAOQ_QsgzsS1iMPQ8t+-ivjiTWJbbOQ2k_AmBHar3NqKJ=YydsA@mail.gmail.com>
+Subject: Re: [PATCH v6 19/21] KVM: arm64: Emulate physical counter offsetting
+ on non-ECV systems
+To:     Andrew Jones <drjones@redhat.com>
+Cc:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Marc Zyngier <maz@kernel.org>, Peter Shier <pshier@google.com>,
+        Jim Mattson <jmattson@google.com>,
+        David Matlack <dmatlack@google.com>,
+        Ricardo Koller <ricarkol@google.com>,
+        Jing Zhang <jingzhangos@google.com>,
+        Raghavendra Rao Anata <rananta@google.com>,
+        James Morse <james.morse@arm.com>,
+        Alexandru Elisei <Alexandru.Elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        linux-arm-kernel@lists.infradead.org,
+        Will Deacon <will@kernel.org>,
+        Catalin Marinas <catalin.marinas@arm.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Hi Drew,
 
+On Wed, Aug 4, 2021 at 4:05 AM Andrew Jones <drjones@redhat.com> wrote:
+> > +static bool ptimer_emulation_required(struct kvm_vcpu *vcpu)
+> > +{
+> > +     return timer_get_offset(vcpu_ptimer(vcpu)) &&
+> > +                     !cpus_have_const_cap(ARM64_ECV);
+>
+> Whenever I see a static branch check and something else in the same
+> condition, I always wonder if we could trim a few instructions for
+> the static branch is false case by testing it first.
 
-On 8/4/21 19:37, Paolo Bonzini wrote:
-> KVM creates a debugfs directory for each VM in order to store statistics
-> about the virtual machine.  The directory name is built from the process
-> pid and a VM fd.  While generally unique, it is possible to keep a
-> file descriptor alive in a way that causes duplicate directories, which
-> manifests as these messages:
-> 
->    [  471.846235] debugfs: Directory '20245-4' with parent 'kvm' already present!
-> 
-> Even though this should not happen in practice, it is more or less
-> expected in the case of KVM for testcases that call KVM_CREATE_VM and
-> close the resulting file descriptor repeatedly and in parallel.
-> 
-> When this happens, debugfs_create_dir() returns an error but
-> kvm_create_vm_debugfs() goes on to allocate stat data structs which are
-> later leaked.  The slow memory leak was spotted by syzkaller, where it
-> caused OOM reports.
-> 
-> Since the issue only affects debugfs, do a lookup before calling
-> debugfs_create_dir, so that the message is downgraded and rate-limited.
-> While at it, ensure kvm->debugfs_dentry is NULL rather than an error
-> if it is not created.  This fixes kvm_destroy_vm_debugfs, which was not
-> checking IS_ERR_OR_NULL correctly.
-> 
-> Cc: stable@vger.kernel.org
-> Fixes: 536a6f88c49d ("KVM: Create debugfs dir and stat files for each VM")
-> Reported-by: Alexey Kardashevskiy <aik@ozlabs.ru>
-> Suggested-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+Good point, I'll reclaim those few cycles in the next spin ;-)
 
+> > @@ -1539,11 +1551,8 @@ int kvm_arm_timer_has_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr)
+> >       switch (attr->attr) {
+> >       case KVM_ARM_VCPU_TIMER_IRQ_VTIMER:
+> >       case KVM_ARM_VCPU_TIMER_IRQ_PTIMER:
+> > -             return 0;
+> >       case KVM_ARM_VCPU_TIMER_OFFSET:
+> > -             if (cpus_have_const_cap(ARM64_ECV))
+> > -                     return 0;
+> > -             break;
+> > +             return 0;
+>
+> So now, if userspace wants to know when they're using an emulated
+> TIMER_OFFSET vs. ECV, then they'll need to check the HWCAP. I guess
+> that's fair. We should update the selftest to report what it's testing
+> when the HWCAP is available.
+>
 
-after another try, works brilliant.
+Hmm...
 
-Reviewed-by: Alexey Kardashevskiy <aik@ozlabs.ru>
-Tested-by: Alexey Kardashevskiy <aik@ozlabs.ru>
+I hadn't yet wired up the ECV cpufeature bits to an ELF HWCAP, but
+this point is a bit interesting. I can see the argument being made
+that we shouldn't have two ELF HWCAP bits for ECV (depending on
+partial or full ECV support). ECV=0x1 is most certainly of interest to
+userspace, since self-synchronized views of the counter are then
+available. However, ECV=0x2 is purely of interest to EL2.
 
-Thanks,
+What if we only had only one ELF HWCAP bit for ECV >= 0x1? We could
+let userspace read ID_AA64MMFR0_EL1.ECV if it really needs to know
+about ECV = 0x2.
 
+> > +     if (vcpu_ptimer(vcpu)->host_offset && !cpus_have_const_cap(ARM64_ECV))
+>
+> Shouldn't we expose and reuse ptimer_emulation_required() here?
+>
 
-> ---
->   virt/kvm/kvm_main.c | 18 ++++++++++++++++--
->   1 file changed, 16 insertions(+), 2 deletions(-)
-> 
-> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> index d20fba0fc290..b50dbe269f4b 100644
-> --- a/virt/kvm/kvm_main.c
-> +++ b/virt/kvm/kvm_main.c
-> @@ -892,6 +892,8 @@ static void kvm_destroy_vm_debugfs(struct kvm *kvm)
->   
->   static int kvm_create_vm_debugfs(struct kvm *kvm, int fd)
->   {
-> +	static DEFINE_MUTEX(kvm_debugfs_lock);
-> +	struct dentry *dent;
->   	char dir_name[ITOA_MAX_LEN * 2];
->   	struct kvm_stat_data *stat_data;
->   	const struct _kvm_stats_desc *pdesc;
-> @@ -903,8 +905,20 @@ static int kvm_create_vm_debugfs(struct kvm *kvm, int fd)
->   		return 0;
->   
->   	snprintf(dir_name, sizeof(dir_name), "%d-%d", task_pid_nr(current), fd);
-> -	kvm->debugfs_dentry = debugfs_create_dir(dir_name, kvm_debugfs_dir);
-> +	mutex_lock(&kvm_debugfs_lock);
-> +	dent = debugfs_lookup(dir_name, kvm_debugfs_dir);
-> +	if (dent) {
-> +		pr_warn_ratelimited("KVM: debugfs: duplicate directory %s\n", dir_name);
-> +		dput(dent);
-> +		mutex_unlock(&kvm_debugfs_lock);
-> +		return 0;
-> +	}
-> +	dent = debugfs_create_dir(dir_name, kvm_debugfs_dir);
-> +	mutex_unlock(&kvm_debugfs_lock);
-> +	if (IS_ERR(dent))
-> +		return 0;
->   
-> +	kvm->debugfs_dentry = dent;
->   	kvm->debugfs_stat_data = kcalloc(kvm_debugfs_num_entries,
->   					 sizeof(*kvm->debugfs_stat_data),
->   					 GFP_KERNEL_ACCOUNT);
-> @@ -5201,7 +5215,7 @@ static void kvm_uevent_notify_change(unsigned int type, struct kvm *kvm)
->   	}
->   	add_uevent_var(env, "PID=%d", kvm->userspace_pid);
->   
-> -	if (!IS_ERR_OR_NULL(kvm->debugfs_dentry)) {
-> +	if (kvm->debugfs_dentry) {
->   		char *tmp, *p = kmalloc(PATH_MAX, GFP_KERNEL_ACCOUNT);
->   
->   		if (p) {
-> 
+Agreed, makes it much cleaner.
 
--- 
-Alexey
+> > +             val &= ~CNTHCTL_EL1PCTEN;
+> > +     else
+> > +             val |= CNTHCTL_EL1PCTEN;
+> >       write_sysreg(val, cnthctl_el2);
+> >  }
+> > --
+> > 2.32.0.605.g8dce9f2422-goog
+> >
+>
+> Otherwise,
+>
+> Reviewed-by: Andrew Jones <drjones@redhat.com>
+>
+
+Thanks!
+
+--
+Oliver
