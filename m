@@ -2,175 +2,156 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 939433E105E
-	for <lists+kvm@lfdr.de>; Thu,  5 Aug 2021 10:33:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9BADA3E10AB
+	for <lists+kvm@lfdr.de>; Thu,  5 Aug 2021 10:58:11 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236825AbhHEIda (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 5 Aug 2021 04:33:30 -0400
-Received: from mx13.kaspersky-labs.com ([91.103.66.164]:12214 "EHLO
-        mx13.kaspersky-labs.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233624AbhHEIda (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 5 Aug 2021 04:33:30 -0400
-Received: from relay13.kaspersky-labs.com (unknown [127.0.0.10])
-        by relay13.kaspersky-labs.com (Postfix) with ESMTP id 62812520D38;
-        Thu,  5 Aug 2021 11:33:14 +0300 (MSK)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kaspersky.com;
-        s=mail202102; t=1628152394;
-        bh=k0pgS1kHGbla5ruFilbtneTZqlGPAFUQro8mBMppHLE=;
-        h=Subject:To:From:Message-ID:Date:MIME-Version:Content-Type;
-        b=5Jl3ZrfuwildCQlS79Y/Bsx4GwA0unWegjmiYNWjJfy9cAlWIrr9DVHnSfBw1Kmll
-         eoNTRZx32yLUaWTVt+deAI49RrEwgmARzr9LoZk5kCMIbcDHVHhTaxWI/UvMyge/OF
-         5FJPv/NQiJu6reifjT01DD41avbz5BVC2PyYjWqNc3rFHVGgfTswYKku/lw708c8HI
-         u2wzWbwX/hCVUJgyxncXOhTIVkX9QktJDwbJeEFSL0Md2Zrk/1ruFp2JQ1kXzTUFF9
-         9hd0VaisTaFRrOaecPbOZKczRe/Resn6n/8f6IvNuDaPR2dSodcCy7iUuHgxtrco4C
-         IlmDdKiBcNWaQ==
-Received: from mail-hq2.kaspersky.com (unknown [91.103.66.206])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-SHA256 (128/128 bits))
-        (Client CN "mail-hq2.kaspersky.com", Issuer "Kaspersky MailRelays CA G3" (verified OK))
-        by mailhub13.kaspersky-labs.com (Postfix) with ESMTPS id 9DC01520D3A;
-        Thu,  5 Aug 2021 11:33:13 +0300 (MSK)
-Received: from [10.16.171.77] (10.64.64.121) by hqmailmbx3.avp.ru
- (10.64.67.243) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2308.14; Thu, 5
- Aug 2021 11:33:13 +0300
-Subject: Re: [RFC PATCH v1 0/7] virtio/vsock: introduce MSG_EOR flag for
- SEQPACKET
-To:     Stefano Garzarella <sgarzare@redhat.com>
-CC:     Stefan Hajnoczi <stefanha@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Colin Ian King <colin.king@canonical.com>,
-        Andra Paraschiv <andraprs@amazon.com>,
-        Norbert Slusarek <nslusarek@gmx.net>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "virtualization@lists.linux-foundation.org" 
-        <virtualization@lists.linux-foundation.org>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "oxffffaa@gmail.com" <oxffffaa@gmail.com>
-References: <20210726163137.2589102-1-arseny.krasnov@kaspersky.com>
- <20210804125737.kbgc6mg2v5lw25wu@steredhat>
-From:   Arseny Krasnov <arseny.krasnov@kaspersky.com>
-Message-ID: <8e44442c-4cac-dcbc-a88d-17d9878e7d32@kaspersky.com>
-Date:   Thu, 5 Aug 2021 11:33:12 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        id S232535AbhHEI6Y (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 5 Aug 2021 04:58:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50418 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S234449AbhHEI6X (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 5 Aug 2021 04:58:23 -0400
+Received: from mail-wr1-x435.google.com (mail-wr1-x435.google.com [IPv6:2a00:1450:4864:20::435])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 94EE9C061765
+        for <kvm@vger.kernel.org>; Thu,  5 Aug 2021 01:58:08 -0700 (PDT)
+Received: by mail-wr1-x435.google.com with SMTP id h13so5516369wrp.1
+        for <kvm@vger.kernel.org>; Thu, 05 Aug 2021 01:58:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=WZJ8sApnM5wYW8QOW5ulsd7QikaFSQCDvJUPnNEkOo0=;
+        b=IScr4heJatmtd7c0ux7+8fqRTCy0QLEnxyMUK3E8v3WOraAyiH85TYPywPRxhyadn3
+         CCof3GkHeRiSmiDikLt2wWElthlFtUXVUsMUjPvTGbaPfGSOqjrS23KQ8EQxHhsjSn2a
+         9n9gC0n9yYPEgvTiweqbkRarXGEfKIL1TSmHiX68ukPPkMbXDmpQSQkFek66Qs82P+K0
+         beul0jB2WChU8B97v77teeeVZslGGcCQGO0g+Bc1bEFkvQRujH5fKirxoO69SA2XnCXM
+         4KdhOHn54Dg/HedUJXCjKbef5hEqE0kybUk/5LT1K6qK7XDKvStOJCmzxP5EQ8l5Z4+W
+         35vA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=WZJ8sApnM5wYW8QOW5ulsd7QikaFSQCDvJUPnNEkOo0=;
+        b=MOpeQJGkF3y1OPWV5Aw4vuCI0sP1vIOlG7zMEmaGJEK3SXuI7jBydcWM8oXyUHUHrP
+         o9bgu6d6zhp8vh1I+XJCfsVvoc5iPeMx2VNXd5JH+rwqq/qdMuqx5Ql0sL4++r78WxPz
+         yAYOJX8DiYBu1t7qcOIRjPdKefNk2+WqFHtNqjfkw5vrl0zBFvKMAhXq0zdELOXw5jwG
+         dblc0dd9lles3HyVNgEk21Nx86ZJGZ1dn/m5t241QkneqBFZaUU+D5cWdZMLEyDj6+WH
+         Q94AFeDqh98TeHwwCeITTPhsOmCtTsDWJdQPaqdR5x6wgEfdXu33+4L64JoIM6hqw76v
+         N1Ew==
+X-Gm-Message-State: AOAM531t1vunYEiUgY8qe6skAQu+vbWwdLeyaOEiwngnoQMCfYxMI+tg
+        703rOJp/WRmmsBnTTD7VnFLerHa1wnrNoA==
+X-Google-Smtp-Source: ABdhPJzGdiWYrRF+VOtm90o3lq5LJvyHIsoxFmzIapUualQ8+U6yByDAfeRNGjbFzxNgrGrx2/N5lg==
+X-Received: by 2002:a5d:6b8f:: with SMTP id n15mr3838814wrx.103.1628153887167;
+        Thu, 05 Aug 2021 01:58:07 -0700 (PDT)
+Received: from laral.fritz.box (200116b82b640800b3a4b41f77fc5e0e.dip.versatel-1u1.de. [2001:16b8:2b64:800:b3a4:b41f:77fc:5e0e])
+        by smtp.gmail.com with ESMTPSA id l9sm5341322wro.92.2021.08.05.01.58.06
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 05 Aug 2021 01:58:06 -0700 (PDT)
+From:   Lara Lazier <laramglazier@gmail.com>
+To:     kvm@vger.kernel.org
+Cc:     pbonzini@redhat.com, Lara Lazier <laramglazier@gmail.com>
+Subject: [PATCH kvm-unit-tests] nSVM: test canonicalization of segment bases in VMLOAD
+Date:   Thu,  5 Aug 2021 10:57:46 +0200
+Message-Id: <20210805085746.95096-1-laramglazier@gmail.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-In-Reply-To: <20210804125737.kbgc6mg2v5lw25wu@steredhat>
-Content-Type: text/plain; charset="windows-1252"
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-X-Originating-IP: [10.64.64.121]
-X-ClientProxiedBy: hqmailmbx1.avp.ru (10.64.67.241) To hqmailmbx3.avp.ru
- (10.64.67.243)
-X-KSE-ServerInfo: hqmailmbx3.avp.ru, 9
-X-KSE-AntiSpam-Interceptor-Info: scan successful
-X-KSE-AntiSpam-Version: 5.9.20, Database issued on: 08/05/2021 08:19:01
-X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
-X-KSE-AntiSpam-Method: none
-X-KSE-AntiSpam-Rate: 0
-X-KSE-AntiSpam-Info: Lua profiles 165422 [Aug 04 2021]
-X-KSE-AntiSpam-Info: Version: 5.9.20.0
-X-KSE-AntiSpam-Info: Envelope from: arseny.krasnov@kaspersky.com
-X-KSE-AntiSpam-Info: LuaCore: 449 449 5db59deca4a4f5e6ea34a93b13bc730e229092f4
-X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
-X-KSE-AntiSpam-Info: d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;kaspersky.com:7.1.1;127.0.0.199:7.1.2
-X-KSE-AntiSpam-Info: Rate: 0
-X-KSE-AntiSpam-Info: Status: not_detected
-X-KSE-AntiSpam-Info: Method: none
-X-KSE-Antiphishing-Info: Clean
-X-KSE-Antiphishing-ScanningType: Deterministic
-X-KSE-Antiphishing-Method: None
-X-KSE-Antiphishing-Bases: 08/05/2021 08:22:00
-X-KSE-AttachmentFiltering-Interceptor-Info: no applicable attachment filtering
- rules found
-X-KSE-Antivirus-Interceptor-Info: scan successful
-X-KSE-Antivirus-Info: Clean, bases: 04.08.2021 22:55:00
-X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
-X-KSE-AttachmentFiltering-Interceptor-Info: no applicable attachment filtering
- rules found
-X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
-X-KLMS-Rule-ID: 52
-X-KLMS-Message-Action: clean
-X-KLMS-AntiSpam-Status: not scanned, disabled by settings
-X-KLMS-AntiSpam-Interceptor-Info: not scanned
-X-KLMS-AntiPhishing: Clean, bases: 2021/08/04 17:04:00
-X-KLMS-AntiVirus: Kaspersky Security for Linux Mail Server, version 8.0.3.30, bases: 2021/08/04 22:55:00 #16982736
-X-KLMS-AntiVirus-Status: Clean, skipped
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+APM2 states that VMRUN and VMLOAD should canonicalize all base
+addresses in the segment registers that have been loaded respectively.
 
-On 04.08.2021 15:57, Stefano Garzarella wrote:
-> Caution: This is an external email. Be cautious while opening links or attachments.
->
->
->
-> Hi Arseny,
->
-> On Mon, Jul 26, 2021 at 07:31:33PM +0300, Arseny Krasnov wrote:
->>       This patchset implements support of MSG_EOR bit for SEQPACKET
->> AF_VSOCK sockets over virtio transport.
->>       Idea is to distinguish concepts of 'messages' and 'records'.
->> Message is result of sending calls: 'write()', 'send()', 'sendmsg()'
->> etc. It has fixed maximum length, and it bounds are visible using
->> return from receive calls: 'read()', 'recv()', 'recvmsg()' etc.
->> Current implementation based on message definition above.
-> Okay, so the implementation we merged is wrong right?
-> Should we disable the feature bit in stable kernels that contain it? Or
-> maybe we can backport the fixes...
+Split up in test_canonicalization the TEST_CANONICAL for VMLOAD and
+VMRUN. Added the respective test for KERNEL_GS.
 
-Hi,
+Signed-off-by: Lara Lazier <laramglazier@gmail.com>
+---
+ x86/svm_tests.c | 51 +++++++++++++++++++++++++++++++++----------------
+ 1 file changed, 35 insertions(+), 16 deletions(-)
 
-No, this is correct and it is message boundary based. Idea of this
+diff --git a/x86/svm_tests.c b/x86/svm_tests.c
+index 7c7b19d..f6bccb7 100644
+--- a/x86/svm_tests.c
++++ b/x86/svm_tests.c
+@@ -2460,32 +2460,51 @@ static void test_msrpm_iopm_bitmap_addrs(void)
+ 	vmcb->control.intercept = saved_intercept;
+ }
+ 
+-#define TEST_CANONICAL(seg_base, msg)					\
+-	saved_addr = seg_base;						\
++#define TEST_CANONICAL_VMRUN(seg_base, msg)					\
++	saved_addr = seg_base;					\
+ 	seg_base = (seg_base & ((1ul << addr_limit) - 1)) | noncanonical_mask; \
+-	report(svm_vmrun() == SVM_EXIT_VMMCALL, "Test %s.base for canonical form: %lx", msg, seg_base);							\
++	return_value = svm_vmrun(); \
++	report(return_value == SVM_EXIT_VMMCALL, \
++			"Successful VMRUN with noncanonical %s.base", msg); \
++	report(is_canonical(seg_base), \
++			"Test %s.base for canonical form: %lx", msg, seg_base); \
++	seg_base = saved_addr;
++
++
++#define TEST_CANONICAL_VMLOAD(seg_base, msg)					\
++	saved_addr = seg_base;					\
++	seg_base = (seg_base & ((1ul << addr_limit) - 1)) | noncanonical_mask; \
++	asm volatile ("vmload %0" : : "a"(vmcb_phys) : "memory"); \
++	asm volatile ("vmsave %0" : : "a"(vmcb_phys) : "memory"); \
++	report(is_canonical(seg_base), \
++			"Test %s.base for canonical form: %lx", msg, seg_base); \
+ 	seg_base = saved_addr;
+ 
+ /*
+  * VMRUN canonicalizes (i.e., sign-extend to bit 63) all base addresses
+  • in the segment registers that have been loaded.
+  */
+-static void test_vmrun_canonicalization(void)
++static void test_canonicalization(void)
+ {
+ 	u64 saved_addr;
+-	u8 addr_limit = cpuid_maxphyaddr();
++	u64 return_value;
++	u64 addr_limit;
++	u64 vmcb_phys = virt_to_phys(vmcb);
++
++	addr_limit = (this_cpu_has(X86_FEATURE_LA57)) ? 57 : 48;
+ 	u64 noncanonical_mask = NONCANONICAL & ~((1ul << addr_limit) - 1);
+ 
+-	TEST_CANONICAL(vmcb->save.es.base, "ES");
+-	TEST_CANONICAL(vmcb->save.cs.base, "CS");
+-	TEST_CANONICAL(vmcb->save.ss.base, "SS");
+-	TEST_CANONICAL(vmcb->save.ds.base, "DS");
+-	TEST_CANONICAL(vmcb->save.fs.base, "FS");
+-	TEST_CANONICAL(vmcb->save.gs.base, "GS");
+-	TEST_CANONICAL(vmcb->save.gdtr.base, "GDTR");
+-	TEST_CANONICAL(vmcb->save.ldtr.base, "LDTR");
+-	TEST_CANONICAL(vmcb->save.idtr.base, "IDTR");
+-	TEST_CANONICAL(vmcb->save.tr.base, "TR");
++	TEST_CANONICAL_VMLOAD(vmcb->save.fs.base, "FS");
++	TEST_CANONICAL_VMLOAD(vmcb->save.gs.base, "GS");
++	TEST_CANONICAL_VMLOAD(vmcb->save.ldtr.base, "LDTR");
++	TEST_CANONICAL_VMLOAD(vmcb->save.tr.base, "TR");
++	TEST_CANONICAL_VMLOAD(vmcb->save.kernel_gs_base, "KERNEL GS");
++	TEST_CANONICAL_VMRUN(vmcb->save.es.base, "ES");
++	TEST_CANONICAL_VMRUN(vmcb->save.cs.base, "CS");
++	TEST_CANONICAL_VMRUN(vmcb->save.ss.base, "SS");
++	TEST_CANONICAL_VMRUN(vmcb->save.ds.base, "DS");
++	TEST_CANONICAL_VMRUN(vmcb->save.gdtr.base, "GDTR");
++	TEST_CANONICAL_VMRUN(vmcb->save.idtr.base, "IDTR");
+ }
+ 
+ static void svm_guest_state_test(void)
+@@ -2497,7 +2516,7 @@ static void svm_guest_state_test(void)
+ 	test_cr4();
+ 	test_dr();
+ 	test_msrpm_iopm_bitmap_addrs();
+-	test_vmrun_canonicalization();
++	test_canonicalization();
+ }
+ 
+ static void __svm_npt_rsvd_bits_test(u64 *pxe, u64 rsvd_bits, u64 efer,
+-- 
+2.25.1
 
-patchset is to add extra boundaries marker which i think could be
-
-useful when we want to send data in seqpacket mode which length
-
-is bigger than maximum message length(this is limited by transport).
-
-Of course we can fragment big piece of data too small messages, but this
-
-requires to carry fragmentation info in data protocol. So In this case
-
-when we want to maintain boundaries receiver calls recvmsg() until MSG_EOR found.
-
-But when receiver knows, that data is fit in maximum datagram length,
-
-it doesn't care about checking MSG_EOR just calling recv() or read()(e.g.
-
-message based mode).
-
-
-Thank You
-
->
->>       Record has unlimited length, it consists of multiple message,
->> and bounds of record are visible via MSG_EOR flag returned from
->> 'recvmsg()' call. Sender passes MSG_EOR to sending system call and
->> receiver will see MSG_EOR when corresponding message will be processed.
->>       To support MSG_EOR new bit was added along with existing
->> 'VIRTIO_VSOCK_SEQ_EOR': 'VIRTIO_VSOCK_SEQ_EOM'(end-of-message) - now it
->> works in the same way as 'VIRTIO_VSOCK_SEQ_EOR'. But 'VIRTIO_VSOCK_SEQ_EOR'
->> is used to mark 'MSG_EOR' bit passed from userspace.
-> I understand that it makes sense to remap VIRTIO_VSOCK_SEQ_EOR to
-> MSG_EOR to make the user understand the boundaries, but why do we need
-> EOM as well?
->
-> Why do we care about the boundaries of a message within a record?
-> I mean, if the sender makes 3 calls:
->      send(A1,0)
->      send(A2,0)
->      send(A3, MSG_EOR);
->
-> IIUC it should be fine if the receiver for example receives all in one
-> single recv() calll with MSG_EOR set, so why do we need EOM?
->
-> Thanks,
-> Stefano
->
->
