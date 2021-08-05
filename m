@@ -2,465 +2,385 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 46E553E140C
-	for <lists+kvm@lfdr.de>; Thu,  5 Aug 2021 13:44:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 99A893E1411
+	for <lists+kvm@lfdr.de>; Thu,  5 Aug 2021 13:47:06 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239037AbhHELop (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 5 Aug 2021 07:44:45 -0400
-Received: from mga12.intel.com ([192.55.52.136]:10563 "EHLO mga12.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S235877AbhHELoo (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 5 Aug 2021 07:44:44 -0400
-X-IronPort-AV: E=McAfee;i="6200,9189,10066"; a="193726889"
-X-IronPort-AV: E=Sophos;i="5.84,296,1620716400"; 
-   d="scan'208";a="193726889"
-Received: from fmsmga004.fm.intel.com ([10.253.24.48])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Aug 2021 04:44:30 -0700
-X-IronPort-AV: E=Sophos;i="5.84,296,1620716400"; 
-   d="scan'208";a="503385375"
-Received: from dawntan-mobl1.gar.corp.intel.com (HELO khuang2-desk.gar.corp.intel.com) ([10.254.52.64])
-  by fmsmga004-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Aug 2021 04:44:26 -0700
-Date:   Thu, 5 Aug 2021 23:44:24 +1200
-From:   Kai Huang <kai.huang@intel.com>
-To:     <isaku.yamahata@intel.com>
-Cc:     Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        "H . Peter Anvin" <hpa@zytor.com>,
-        "Paolo Bonzini" <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        "Joerg Roedel" <joro@8bytes.org>, <erdemaktas@google.com>,
-        Connor Kuehl <ckuehl@redhat.com>,
-        Sean Christopherson <seanjc@google.com>, <x86@kernel.org>,
-        <linux-kernel@vger.kernel.org>, <kvm@vger.kernel.org>,
-        <isaku.yamahata@gmail.com>,
-        Rick Edgecombe <rick.p.edgecombe@intel.com>
-Subject: Re: [RFC PATCH v2 41/69] KVM: x86: Add infrastructure for stolen
- GPA bits
-Message-Id: <20210805234424.d14386b79413845b990a18ac@intel.com>
-In-Reply-To: <c958a131ded780808a687b0f25c02127ca14418a.1625186503.git.isaku.yamahata@intel.com>
-References: <cover.1625186503.git.isaku.yamahata@intel.com>
-        <c958a131ded780808a687b0f25c02127ca14418a.1625186503.git.isaku.yamahata@intel.com>
-X-Mailer: Sylpheed 3.7.0 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+        id S241080AbhHELrT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 5 Aug 2021 07:47:19 -0400
+Received: from mail-co1nam11on2068.outbound.protection.outlook.com ([40.107.220.68]:30816
+        "EHLO NAM11-CO1-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S235877AbhHELrS (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 5 Aug 2021 07:47:18 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=DJXfCZUzaK3XQeOg91MIXUSuz10Dems7uRrUP3MNAdXaArhAGfiv1aWVVNGvE5RGTbrW9i/Tc3sys+3ZH9q5ZtQ9PnqiDoCMltn8pCrPNXAl9sg0uhX0mj4miOkO4RaIAJlg95Yd0IDXki0+Z8vgEOSgatRmbhw1rk3O4psnCbkvEZRDym6fzrlwl5JrEfOZ/6GbjYJL4dvzdZ11/0u9irf+1B3xCiWE3r5282Phg/kDsnRba8uMBkJFWkxj2TwNPCNzu8fWKHmvOLcoxGevrn4IUiUU4s0ib8o6icdQI5Y2YDMIypfJLNGL8Wi8OPuFFK7zr3fc0+RsqvOmv9k27g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=eZUNqPZLRV11X0bz3MgrQpE1I7VjISWzljAOTtg7+xY=;
+ b=iOfad2sD0b/pA/Bv5Y3jlxeAHz131FEQv53HN1rQEdearZsQHe9jeUCxSxC0VBqUCP2zbwgVEJGOcLGM15OqRZ0e1RjSLBpELckORZrLSlDyqi2AjxKDiie59K221Z1UPQtwXtWXrXt2d/1wI28XtvL36kMu04Yp4uSNfpPKhBYiK7pTDeOpEDAz+cboDDO0qhNjI2aqa/ka/vb7ZkT6GR9LqnqSDweMh2pvyY+NNuVeCpl4WUQDMtL5DYB4VPGT74KWtQrVqXNoG9dtlff7YPKBrenT1zLKsaotUzMU05TBiA8Ei2XOv5pXz5FUdVPYKZLDFdNG56H327H3bsNvsw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=eZUNqPZLRV11X0bz3MgrQpE1I7VjISWzljAOTtg7+xY=;
+ b=pN+h4V8UQvyDYtVbDSlfNFsoFbjLQg46WaBmwPJjqJsYh0x1EzzyEqx983VTnVHABqBJMUsTWr/tAUq64Nt8ooyfkp9v2nC66lopdN3Ll/wVmQWmqQxz4/+OCwFUhrY8Et3Lu5e4GAWOvlle0MhvAPp36duFPJVZ8oj0Mwj12PSdbpJbahKWMzNuFX6sKJPZIBy6m+lrEqixnYYoX3P9iJmYGMqYQn8HA1tbNkIbKlAbjGEYjZ7xuxPF5x3HTIhWz3SAAEdua3qW/wuSNEM3KtJCgaFEOvfXojY5w23nS3AmaoHzBzrabi2KUNUKUZz8MPXqtmrn6wH1eCvWQvENkQ==
+Authentication-Results: redhat.com; dkim=none (message not signed)
+ header.d=none;redhat.com; dmarc=none action=none header.from=nvidia.com;
+Received: from BL0PR12MB5506.namprd12.prod.outlook.com (2603:10b6:208:1cb::22)
+ by BL1PR12MB5141.namprd12.prod.outlook.com (2603:10b6:208:309::7) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4394.17; Thu, 5 Aug
+ 2021 11:47:02 +0000
+Received: from BL0PR12MB5506.namprd12.prod.outlook.com
+ ([fe80::1de1:52a9:cf66:f336]) by BL0PR12MB5506.namprd12.prod.outlook.com
+ ([fe80::1de1:52a9:cf66:f336%7]) with mapi id 15.20.4394.018; Thu, 5 Aug 2021
+ 11:47:02 +0000
+Date:   Thu, 5 Aug 2021 08:47:01 -0300
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     Alex Williamson <alex.williamson@redhat.com>
+Cc:     David Airlie <airlied@linux.ie>,
+        Tony Krowiak <akrowiak@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        Diana Craciun <diana.craciun@oss.nxp.com>,
+        dri-devel@lists.freedesktop.org,
+        Eric Auger <eric.auger@redhat.com>,
+        Eric Farman <farman@linux.ibm.com>,
+        Harald Freudenberger <freude@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        intel-gfx@lists.freedesktop.org,
+        intel-gvt-dev@lists.freedesktop.org,
+        Jani Nikula <jani.nikula@linux.intel.com>,
+        Jason Herne <jjherne@linux.ibm.com>,
+        Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
+        kvm@vger.kernel.org, Kirti Wankhede <kwankhede@nvidia.com>,
+        linux-doc@vger.kernel.org, linux-s390@vger.kernel.org,
+        Matthew Rosato <mjrosato@linux.ibm.com>,
+        Peter Oberparleiter <oberpar@linux.ibm.com>,
+        Halil Pasic <pasic@linux.ibm.com>,
+        Rodrigo Vivi <rodrigo.vivi@intel.com>,
+        Vineeth Vijayan <vneethv@linux.ibm.com>,
+        Zhi Wang <zhi.a.wang@intel.com>,
+        "Raj, Ashok" <ashok.raj@intel.com>, Christoph Hellwig <hch@lst.de>,
+        Leon Romanovsky <leonro@nvidia.com>,
+        Max Gurtovoy <mgurtovoy@nvidia.com>,
+        Yishai Hadas <yishaih@nvidia.com>,
+        Zhenyu Wang <zhenyuw@linux.intel.com>
+Subject: Re: [PATCH v3 09/14] vfio/pci: Change vfio_pci_try_bus_reset() to
+ use the dev_set
+Message-ID: <20210805114701.GC1672295@nvidia.com>
+References: <0-v3-6c9e19cc7d44+15613-vfio_reflck_jgg@nvidia.com>
+ <9-v3-6c9e19cc7d44+15613-vfio_reflck_jgg@nvidia.com>
+ <20210803103406.5e1be269.alex.williamson@redhat.com>
+ <20210803164152.GC1721383@nvidia.com>
+ <20210803105225.2ee7dac2.alex.williamson@redhat.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210803105225.2ee7dac2.alex.williamson@redhat.com>
+X-ClientProxiedBy: CH0PR03CA0290.namprd03.prod.outlook.com
+ (2603:10b6:610:e6::25) To BL0PR12MB5506.namprd12.prod.outlook.com
+ (2603:10b6:208:1cb::22)
+MIME-Version: 1.0
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from mlx.ziepe.ca (206.223.160.26) by CH0PR03CA0290.namprd03.prod.outlook.com (2603:10b6:610:e6::25) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4394.15 via Frontend Transport; Thu, 5 Aug 2021 11:47:02 +0000
+Received: from jgg by mlx with local (Exim 4.94)        (envelope-from <jgg@nvidia.com>)        id 1mBbq1-00DFYB-2f; Thu, 05 Aug 2021 08:47:01 -0300
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: c7b4c886-ecac-44d7-a632-08d95806bd87
+X-MS-TrafficTypeDiagnostic: BL1PR12MB5141:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <BL1PR12MB51414849F60F3F95C01FF497C2F29@BL1PR12MB5141.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:8882;
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: apF8TpEiGAYaNig6vVvEAOvUPtl4ou8aOb9YMW9YfyjRD0wwKHOrIc2g7tuyypChuD2z8JEMKNRoKxL+lT1+UsHT2Jaqys/Hz09b8sI4K9rj1N4tWAr3agcfr+fncjP9Vx+WXla/wPCfBeHb7hr1gmUF49ZeySwFATzFhWLKV6ICxG4LMClfrBQIcn1N/m08yd1NCa6sgKaOPqoiAe5gNi7bEQrJkodTN6qIyWzh2SQMJzpAqg3T0WVnW/J7wuusMSoBL0Dxa3DTg7J3RatKIISrx61XJSlO1WKCSUJJQ4RwDJ36V8rC2cDhGCA4Q1t6CcRiGq7/9X5DKYiyoRV5AJ/wH2Cfk4WcA09G8XnZg4q0ITmDcowUB8sAc3deiFZZ3AUNPCdtmrXV2X/EVEQbS1EIrz/GMO80dTTTUIETJOq2epuKLXbsuNkJG+ye2b1fSba7xliGnphFROeIamuvcMQqQahi24eJMBux52hOb2EYLZX0Rsufkxr7Qa16sdyR1NHL5DIsSe4NUgld7bHWTBgzD2e0WKIPKRKslh2ORb+SanjsAHTgRwxQuq3BckvJP3Uyr9UIQ8BK0L1CFxK8z8bUnTcfy/zm2PX53LLTg6qL6X+8kDXs68fVUjhXBU8+X6RvIn/AOUE31H9M6OeB3Q==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL0PR12MB5506.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(2906002)(38100700002)(1076003)(316002)(426003)(7416002)(7406005)(36756003)(83380400001)(54906003)(6916009)(8936002)(508600001)(5660300002)(8676002)(2616005)(33656002)(9786002)(66476007)(4326008)(66556008)(9746002)(26005)(86362001)(186003)(66946007);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?2o3G1pmJE+Y3wikC1sjqqRROIecgAfMPpmQhFaylFYw2rIoRIca23ZntBIHU?=
+ =?us-ascii?Q?ho56Aiq37IOdE3TNwqrexSmxJzu8rxWz0Lul89S0m0w+8Z5EVdajGo5sAXxC?=
+ =?us-ascii?Q?E2LQZ4a3nXG+BMJEh7KGblHSKn4d5lQTSyVvF22+muW94FD1MOuMV8I85CAH?=
+ =?us-ascii?Q?4adLvgPdDvAEBvSnvVEev/4zuEI1nxmxgv6kZ3y3go03yjs431w0yEk1YDdY?=
+ =?us-ascii?Q?K5zd2KIMCD/inBiucWLA4HzHAqJ+OlIOdVQRoVy1l5fE3VDKYgAfxlgYbSqP?=
+ =?us-ascii?Q?8hida6sbucH//SRRVtg9Z7qomHVc0gLyvRe7Ez19oSY9pWx297hhaM+3wQch?=
+ =?us-ascii?Q?Vnd5h1fduQHifR+w+jHTQWUW05uO/nVOkue89kMkuI6N9C3TC8UtH0joXZGO?=
+ =?us-ascii?Q?uCp81tTEtUVAiktkWHgQFJ0jKRT4Fdw5zYsU5ZZwYL4vLsucifuwhh2TT55q?=
+ =?us-ascii?Q?teFDDP6pUL9wIdBetITfmAzFIZa7kktmJjdk0JYn5tF4EtZW8Haf0ao3dq+w?=
+ =?us-ascii?Q?6EAA81VhdVP+RGpEFphogxj9tPCKgIN0mT2+cMVlXsslL3HwgwBLdIKm5Nr1?=
+ =?us-ascii?Q?B978jTIEURVGsnmoLaInxR6alYY7WcS5m0tmEhMqnY/06qfoNNAYFDu4yxT0?=
+ =?us-ascii?Q?v5qFeNRT5eNzY8RDZ8Qk51fL3R1bhY0jlQ1hbEmw3a4zi9eT9zFsiI5ksHWX?=
+ =?us-ascii?Q?bp8OeWPPK5Vx0Am8Zs/gIPOpKpqRg6re9ocQ6gSxmPJ6RAidh+Ofs6E3wykY?=
+ =?us-ascii?Q?VcQQ6B/y73L/+sVVxex7kTmupOcUMYjP+nLOQi+Sqsbt21DwvaRz1iazxYmi?=
+ =?us-ascii?Q?JV6RRVeq04UZFu0GIUF9GC9QNxOQ6h2PG3CkIw/NKctxZMePiEpVTN9xfry7?=
+ =?us-ascii?Q?ozxI2BZdYSuDF3LnLsiEY7SXbdIS3XbABWlFYM+n7NDYIiR906HD5RQGUjdR?=
+ =?us-ascii?Q?Ae9wgoB7N9DzXFfPYqCB02BRlJ7pwxD/8kAzXVx6gbTEVncebs6H16k/vJLK?=
+ =?us-ascii?Q?POd3XjkWHB7J56Eed1IkOSZCgHkNFDlQ1Srpx65Flge6V1DBXpP7WbRrzjQd?=
+ =?us-ascii?Q?V2oOPLWDFHgEOnS+XWmiuwmj4bwYM6LtBPMNVM/zPAhYq4D4TM33sqG1QHTG?=
+ =?us-ascii?Q?U5NCxqt6yuVi5Gv2YSwUhExFSG1ToBN3Pk8x1x3nI4Zk+Q66cmWr9mowAHs6?=
+ =?us-ascii?Q?ulLa2IgCobtqqchhOln5oCROOoc9wnhkff5W6FOPdmsF82FMXLxWX6iDPVE8?=
+ =?us-ascii?Q?yvZMJaD6bcG3lHmYLbU85+G4YK4PM5ZoXlZoGDzwm7r3mEJdxU4BqxgSJEC+?=
+ =?us-ascii?Q?XUbM8ovQv3t3z5JKnUua+H4v?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: c7b4c886-ecac-44d7-a632-08d95806bd87
+X-MS-Exchange-CrossTenant-AuthSource: BL0PR12MB5506.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Aug 2021 11:47:02.6310
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: hrljNrt+xHpvJD3qcLGfiLeBWpw+MI5O/P+mjXsc+Y6nOIMUjhDHwQXmLmgWxMGX
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL1PR12MB5141
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 2 Jul 2021 15:04:47 -0700 isaku.yamahata@intel.com wrote:
-> From: Rick Edgecombe <rick.p.edgecombe@intel.com>
+On Tue, Aug 03, 2021 at 10:52:25AM -0600, Alex Williamson wrote:
+> On Tue, 3 Aug 2021 13:41:52 -0300
+> Jason Gunthorpe <jgg@nvidia.com> wrote:
+> > On Tue, Aug 03, 2021 at 10:34:06AM -0600, Alex Williamson wrote:
+> > > I think the vfio_pci_find_reset_target() function needs to be re-worked
+> > > to just tell us true/false that it's ok to reset the provided device,
+> > > not to anoint an arbitrary target device.  Thanks,  
+> > 
+> > Yes, though this logic is confusing, why do we need to check if any
+> > device needs a reset at this point? If we are being asked to reset
+> > vdev shouldn't vdev needs_reset?
+> > 
+> > Or is the function more of a 'synchronize pending reset' kind of
+> > thing?
 > 
-> Add support in KVM's MMU for aliasing multiple GPAs (from a hardware
-> perspective) to a single GPA (from a memslot perspective). GPA alising
-> will be used to repurpose GPA bits as attribute bits, e.g. to expose an
-> execute-only permission bit to the guest. To keep the implementation
-> simple (relatively speaking), GPA aliasing is only supported via TDP.
-> 
-> Today KVM assumes two things that are broken by GPA aliasing.
->   1. GPAs coming from hardware can be simply shifted to get the GFNs.
->   2. GPA bits 51:MAXPHYADDR are reserved to zero.
-> 
-> With GPA aliasing, translating a GPA to GFN requires masking off the
-> repurposed bit, and a repurposed bit may reside in 51:MAXPHYADDR.
-> 
-> To support GPA aliasing, introduce the concept of per-VM GPA stolen bits,
-> that is, bits stolen from the GPA to act as new virtualized attribute
-> bits. A bit in the mask will cause the MMU code to create aliases of the
-> GPA. It can also be used to find the GFN out of a GPA coming from a tdp
-> fault.
-> 
-> To handle case (1) from above, retain any stolen bits when passing a GPA
-> in KVM's MMU code, but strip them when converting to a GFN so that the
-> GFN contains only the "real" GFN, i.e. never has repurposed bits set.
-> 
-> GFNs (without stolen bits) continue to be used to:
-> 	-Specify physical memory by userspace via memslots
-> 	-Map GPAs to TDP PTEs via RMAP
-> 	-Specify dirty tracking and write protection
-> 	-Look up MTRR types
-> 	-Inject async page faults
-> 
-> Since there are now multiple aliases for the same aliased GPA, when
-> userspace memory backing the memslots is paged out, both aliases need to be
-> modified. Fortunately this happens automatically. Since rmap supports
-> multiple mappings for the same GFN for PTE shadowing based paging, by
-> adding/removing each alias PTE with its GFN, kvm_handle_hva() based
-> operations will be applied to both aliases.
-> 
-> In the case of the rmap being removed in the future, the needed
-> information could be recovered by iterating over the stolen bits and
-> walking the TDP page tables.
-> 
-> For TLB flushes that are address based, make sure to flush both aliases
-> in the stolen bits case.
-> 
-> Only support stolen bits in 64 bit guest paging modes (long, PAE).
-> Features that use this infrastructure should restrict the stolen bits to
-> exclude the other paging modes. Don't support stolen bits for shadow EPT.
-> 
-> Signed-off-by: Rick Edgecombe <rick.p.edgecombe@intel.com>
-> Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
-> ---
->  arch/x86/kvm/mmu.h              | 26 ++++++++++
->  arch/x86/kvm/mmu/mmu.c          | 86 ++++++++++++++++++++++-----------
->  arch/x86/kvm/mmu/mmu_internal.h |  1 +
->  arch/x86/kvm/mmu/paging_tmpl.h  | 25 ++++++----
->  4 files changed, 101 insertions(+), 37 deletions(-)
-> 
-> diff --git a/arch/x86/kvm/mmu.h b/arch/x86/kvm/mmu.h
-> index 88d0ed5225a4..69b82857acdb 100644
-> --- a/arch/x86/kvm/mmu.h
-> +++ b/arch/x86/kvm/mmu.h
-> @@ -232,4 +232,30 @@ int kvm_arch_write_log_dirty(struct kvm_vcpu *vcpu);
->  int kvm_mmu_post_init_vm(struct kvm *kvm);
->  void kvm_mmu_pre_destroy_vm(struct kvm *kvm);
->  
-> +static inline gfn_t kvm_gfn_stolen_mask(struct kvm *kvm)
-> +{
-> +	/* Currently there are no stolen bits in KVM */
-> +	return 0;
-> +}
-> +
-> +static inline gfn_t vcpu_gfn_stolen_mask(struct kvm_vcpu *vcpu)
-> +{
-> +	return kvm_gfn_stolen_mask(vcpu->kvm);
-> +}
-> +
-> +static inline gpa_t kvm_gpa_stolen_mask(struct kvm *kvm)
-> +{
-> +	return kvm_gfn_stolen_mask(kvm) << PAGE_SHIFT;
-> +}
-> +
-> +static inline gpa_t vcpu_gpa_stolen_mask(struct kvm_vcpu *vcpu)
-> +{
-> +	return kvm_gpa_stolen_mask(vcpu->kvm);
-> +}
-> +
-> +static inline gfn_t vcpu_gpa_to_gfn_unalias(struct kvm_vcpu *vcpu, gpa_t gpa)
-> +{
-> +	return (gpa >> PAGE_SHIFT) & ~vcpu_gfn_stolen_mask(vcpu);
-> +}
-> +
->  #endif
-> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> index 0dc4bf34ce9c..990ee645b8a2 100644
-> --- a/arch/x86/kvm/mmu/mmu.c
-> +++ b/arch/x86/kvm/mmu/mmu.c
-> @@ -188,27 +188,37 @@ static inline bool kvm_available_flush_tlb_with_range(void)
->  	return kvm_x86_ops.tlb_remote_flush_with_range;
->  }
->  
-> -static void kvm_flush_remote_tlbs_with_range(struct kvm *kvm,
-> -		struct kvm_tlb_range *range)
-> -{
-> -	int ret = -ENOTSUPP;
-> -
-> -	if (range && kvm_x86_ops.tlb_remote_flush_with_range)
-> -		ret = static_call(kvm_x86_tlb_remote_flush_with_range)(kvm, range);
-> -
-> -	if (ret)
-> -		kvm_flush_remote_tlbs(kvm);
-> -}
-> -
->  void kvm_flush_remote_tlbs_with_address(struct kvm *kvm,
->  		u64 start_gfn, u64 pages)
->  {
->  	struct kvm_tlb_range range;
-> +	u64 gfn_stolen_mask;
-> +
-> +	if (!kvm_available_flush_tlb_with_range())
-> +		goto generic_flush;
-> +
-> +	/*
-> +	 * Fall back to the big hammer flush if there is more than one
-> +	 * GPA alias that needs to be flushed.
-> +	 */
-> +	gfn_stolen_mask = kvm_gfn_stolen_mask(kvm);
-> +	if (hweight64(gfn_stolen_mask) > 1)
-> +		goto generic_flush;
->  
->  	range.start_gfn = start_gfn;
->  	range.pages = pages;
-> +	if (static_call(kvm_x86_tlb_remote_flush_with_range)(kvm, &range))
-> +		goto generic_flush;
-> +
-> +	if (!gfn_stolen_mask)
-> +		return;
->  
-> -	kvm_flush_remote_tlbs_with_range(kvm, &range);
-> +	range.start_gfn |= gfn_stolen_mask;
-> +	static_call(kvm_x86_tlb_remote_flush_with_range)(kvm, &range);
-> +	return;
-> +
-> +generic_flush:
-> +	kvm_flush_remote_tlbs(kvm);
->  }
->  
->  bool is_nx_huge_page_enabled(void)
-> @@ -1949,14 +1959,16 @@ static void clear_sp_write_flooding_count(u64 *spte)
->  	__clear_sp_write_flooding_count(sptep_to_sp(spte));
->  }
->  
-> -static struct kvm_mmu_page *kvm_mmu_get_page(struct kvm_vcpu *vcpu,
-> -					     gfn_t gfn,
-> -					     gva_t gaddr,
-> -					     unsigned level,
-> -					     int direct,
-> -					     unsigned int access)
-> +static struct kvm_mmu_page *__kvm_mmu_get_page(struct kvm_vcpu *vcpu,
-> +					       gfn_t gfn,
-> +					       gfn_t gfn_stolen_bits,
-> +					       gva_t gaddr,
-> +					       unsigned int level,
-> +					       int direct,
-> +					       unsigned int access)
->  {
->  	bool direct_mmu = vcpu->arch.mmu->direct_map;
-> +	gpa_t gfn_and_stolen = gfn | gfn_stolen_bits;
->  	union kvm_mmu_page_role role;
->  	struct hlist_head *sp_list;
->  	unsigned quadrant;
-> @@ -1978,9 +1990,9 @@ static struct kvm_mmu_page *kvm_mmu_get_page(struct kvm_vcpu *vcpu,
->  		role.quadrant = quadrant;
->  	}
->  
-> -	sp_list = &vcpu->kvm->arch.mmu_page_hash[kvm_page_table_hashfn(gfn)];
-> +	sp_list = &vcpu->kvm->arch.mmu_page_hash[kvm_page_table_hashfn(gfn_and_stolen)];
->  	for_each_valid_sp(vcpu->kvm, sp, sp_list) {
-> -		if (sp->gfn != gfn) {
-> +		if ((sp->gfn | sp->gfn_stolen_bits) != gfn_and_stolen) {
->  			collisions++;
->  			continue;
->  		}
-> @@ -2020,6 +2032,7 @@ static struct kvm_mmu_page *kvm_mmu_get_page(struct kvm_vcpu *vcpu,
->  	sp = kvm_mmu_alloc_page(vcpu, direct);
->  
->  	sp->gfn = gfn;
-> +	sp->gfn_stolen_bits = gfn_stolen_bits;
->  	sp->role = role;
->  	hlist_add_head(&sp->hash_link, sp_list);
->  	if (!direct) {
-> @@ -2044,6 +2057,13 @@ static struct kvm_mmu_page *kvm_mmu_get_page(struct kvm_vcpu *vcpu,
->  	return sp;
->  }
+> Yes, the latter.  For instance think about a multi-function PCI device
+> such as a GPU.  The functions have dramatically different capabilities,
+> some might have function level reset abilities and others not.  We want
+> to be able to trigger a bus reset as the last device of the set is
+> released, no matter the order they're released and no matter the
+> capabilities of the device we're currently processing.  Thanks,
 
+I worked on this for awhile, I think this is much clearer about what
+this algorithm is trying to do:
 
-Sorry for replying old thread, but to me it looks weird to have gfn_stolen_bits
-in 'struct kvm_mmu_page'.  If I understand correctly, above code basically
-means that GFN with different stolen bit will have different 'struct
-kvm_mmu_page', but in the context of this patch, mappings with different
-stolen bits still use the same root, which means gfn_stolen_bits doesn't make a
-lot of sense at least for root page table. 
-
-Instead, having gfn_stolen_bits in 'struct kvm_mmu_page' only makes sense in
-the context of TDX, since TDX requires two separate roots for private and
-shared mappings.
-
-So given we cannot tell whether the same root, or different roots should be
-used for different stolen bits, I think we should not add 'gfn_stolen_bits' to
-'struct kvm_mmu_page' and use it to determine whether to allocate a new table
-for the same GFN, but should use a new role (i.e role.private) to determine.
-
-And removing 'gfn_stolen_bits' in 'struct kvm_mmu_page' could also save some
-memory.
-
->  
-> +static struct kvm_mmu_page *kvm_mmu_get_page(struct kvm_vcpu *vcpu, gfn_t gfn,
-> +					     gva_t gaddr, unsigned int level,
-> +					     int direct, unsigned int access)
-> +{
-> +	return __kvm_mmu_get_page(vcpu, gfn, 0, gaddr, level, direct, access);
-> +}
-> +
->  static void shadow_walk_init_using_root(struct kvm_shadow_walk_iterator *iterator,
->  					struct kvm_vcpu *vcpu, hpa_t root,
->  					u64 addr)
-> @@ -2637,7 +2657,9 @@ static int direct_pte_prefetch_many(struct kvm_vcpu *vcpu,
->  
->  	gfn = kvm_mmu_page_get_gfn(sp, start - sp->spt);
->  	slot = gfn_to_memslot_dirty_bitmap(vcpu, gfn, access & ACC_WRITE_MASK);
-> -	if (!slot)
-> +
-> +	/* Don't map private memslots for stolen bits */
-> +	if (!slot || (sp->gfn_stolen_bits && slot->id >= KVM_USER_MEM_SLOTS))
->  		return -1;
->  
->  	ret = gfn_to_page_many_atomic(slot, gfn, pages, end - start);
-> @@ -2827,7 +2849,9 @@ static int __direct_map(struct kvm_vcpu *vcpu, gpa_t gpa, u32 error_code,
->  	struct kvm_shadow_walk_iterator it;
->  	struct kvm_mmu_page *sp;
->  	int level, req_level, ret;
-> -	gfn_t gfn = gpa >> PAGE_SHIFT;
-> +	gpa_t gpa_stolen_mask = vcpu_gpa_stolen_mask(vcpu);
-> +	gfn_t gfn = (gpa & ~gpa_stolen_mask) >> PAGE_SHIFT;
-> +	gfn_t gfn_stolen_bits = (gpa & gpa_stolen_mask) >> PAGE_SHIFT;
->  	gfn_t base_gfn = gfn;
->  
->  	if (WARN_ON(!VALID_PAGE(vcpu->arch.mmu->root_hpa)))
-> @@ -2852,8 +2876,9 @@ static int __direct_map(struct kvm_vcpu *vcpu, gpa_t gpa, u32 error_code,
->  
->  		drop_large_spte(vcpu, it.sptep);
->  		if (!is_shadow_present_pte(*it.sptep)) {
-> -			sp = kvm_mmu_get_page(vcpu, base_gfn, it.addr,
-> -					      it.level - 1, true, ACC_ALL);
-> +			sp = __kvm_mmu_get_page(vcpu, base_gfn,
-> +						gfn_stolen_bits, it.addr,
-> +						it.level - 1, true, ACC_ALL);
->  
->  			link_shadow_page(vcpu, it.sptep, sp);
->  			if (is_tdp && huge_page_disallowed &&
-> @@ -3689,6 +3714,13 @@ static bool try_async_pf(struct kvm_vcpu *vcpu, bool prefault, gfn_t gfn,
->  	if (slot && (slot->flags & KVM_MEMSLOT_INVALID))
->  		return true;
->  
-> +	/* Don't expose aliases for no slot GFNs or private memslots */
-> +	if ((cr2_or_gpa & vcpu_gpa_stolen_mask(vcpu)) &&
-> +	    !kvm_is_visible_memslot(slot)) {
-> +		*pfn = KVM_PFN_NOSLOT;
-> +		return false;
-> +	}
-> +
->  	/* Don't expose private memslots to L2. */
->  	if (is_guest_mode(vcpu) && !kvm_is_visible_memslot(slot)) {
->  		*pfn = KVM_PFN_NOSLOT;
-> @@ -3723,7 +3755,7 @@ static int direct_page_fault(struct kvm_vcpu *vcpu, gpa_t gpa, u32 error_code,
->  	bool write = error_code & PFERR_WRITE_MASK;
->  	bool map_writable;
->  
-> -	gfn_t gfn = gpa >> PAGE_SHIFT;
-> +	gfn_t gfn = vcpu_gpa_to_gfn_unalias(vcpu, gpa);
->  	unsigned long mmu_seq;
->  	kvm_pfn_t pfn;
->  	hva_t hva;
-> @@ -3833,7 +3865,7 @@ int kvm_tdp_page_fault(struct kvm_vcpu *vcpu, gpa_t gpa, u32 error_code,
->  	     max_level > PG_LEVEL_4K;
->  	     max_level--) {
->  		int page_num = KVM_PAGES_PER_HPAGE(max_level);
-> -		gfn_t base = (gpa >> PAGE_SHIFT) & ~(page_num - 1);
-> +		gfn_t base = vcpu_gpa_to_gfn_unalias(vcpu, gpa) & ~(page_num - 1);
->  
->  		if (kvm_mtrr_check_gfn_range_consistency(vcpu, base, page_num))
->  			break;
-> diff --git a/arch/x86/kvm/mmu/mmu_internal.h b/arch/x86/kvm/mmu/mmu_internal.h
-> index d64ccb417c60..c896ec9f3159 100644
-> --- a/arch/x86/kvm/mmu/mmu_internal.h
-> +++ b/arch/x86/kvm/mmu/mmu_internal.h
-> @@ -46,6 +46,7 @@ struct kvm_mmu_page {
->  	 */
->  	union kvm_mmu_page_role role;
->  	gfn_t gfn;
-> +	gfn_t gfn_stolen_bits;
->  
->  	u64 *spt;
->  	/* hold the gfn of each spte inside spt */
-> diff --git a/arch/x86/kvm/mmu/paging_tmpl.h b/arch/x86/kvm/mmu/paging_tmpl.h
-> index 823a5919f9fa..439dc141391b 100644
-> --- a/arch/x86/kvm/mmu/paging_tmpl.h
-> +++ b/arch/x86/kvm/mmu/paging_tmpl.h
-> @@ -25,7 +25,8 @@
->  	#define guest_walker guest_walker64
->  	#define FNAME(name) paging##64_##name
->  	#define PT_BASE_ADDR_MASK PT64_BASE_ADDR_MASK
-> -	#define PT_LVL_ADDR_MASK(lvl) PT64_LVL_ADDR_MASK(lvl)
-> +	#define PT_LVL_ADDR_MASK(vcpu, lvl) (~vcpu_gpa_stolen_mask(vcpu) & \
-> +					     PT64_LVL_ADDR_MASK(lvl))
->  	#define PT_LVL_OFFSET_MASK(lvl) PT64_LVL_OFFSET_MASK(lvl)
->  	#define PT_INDEX(addr, level) PT64_INDEX(addr, level)
->  	#define PT_LEVEL_BITS PT64_LEVEL_BITS
-> @@ -44,7 +45,7 @@
->  	#define guest_walker guest_walker32
->  	#define FNAME(name) paging##32_##name
->  	#define PT_BASE_ADDR_MASK PT32_BASE_ADDR_MASK
-> -	#define PT_LVL_ADDR_MASK(lvl) PT32_LVL_ADDR_MASK(lvl)
-> +	#define PT_LVL_ADDR_MASK(vcpu, lvl) PT32_LVL_ADDR_MASK(lvl)
->  	#define PT_LVL_OFFSET_MASK(lvl) PT32_LVL_OFFSET_MASK(lvl)
->  	#define PT_INDEX(addr, level) PT32_INDEX(addr, level)
->  	#define PT_LEVEL_BITS PT32_LEVEL_BITS
-> @@ -58,7 +59,7 @@
->  	#define guest_walker guest_walkerEPT
->  	#define FNAME(name) ept_##name
->  	#define PT_BASE_ADDR_MASK PT64_BASE_ADDR_MASK
-> -	#define PT_LVL_ADDR_MASK(lvl) PT64_LVL_ADDR_MASK(lvl)
-> +	#define PT_LVL_ADDR_MASK(vcpu, lvl) PT64_LVL_ADDR_MASK(lvl)
->  	#define PT_LVL_OFFSET_MASK(lvl) PT64_LVL_OFFSET_MASK(lvl)
->  	#define PT_INDEX(addr, level) PT64_INDEX(addr, level)
->  	#define PT_LEVEL_BITS PT64_LEVEL_BITS
-> @@ -75,7 +76,7 @@
->  #define PT_GUEST_ACCESSED_MASK (1 << PT_GUEST_ACCESSED_SHIFT)
->  
->  #define gpte_to_gfn_lvl FNAME(gpte_to_gfn_lvl)
-> -#define gpte_to_gfn(pte) gpte_to_gfn_lvl((pte), PG_LEVEL_4K)
-> +#define gpte_to_gfn(vcpu, pte) gpte_to_gfn_lvl(vcpu, pte, PG_LEVEL_4K)
->  
->  /*
->   * The guest_walker structure emulates the behavior of the hardware page
-> @@ -96,9 +97,9 @@ struct guest_walker {
->  	struct x86_exception fault;
->  };
->  
-> -static gfn_t gpte_to_gfn_lvl(pt_element_t gpte, int lvl)
-> +static gfn_t gpte_to_gfn_lvl(struct kvm_vcpu *vcpu, pt_element_t gpte, int lvl)
->  {
-> -	return (gpte & PT_LVL_ADDR_MASK(lvl)) >> PAGE_SHIFT;
-> +	return (gpte & PT_LVL_ADDR_MASK(vcpu, lvl)) >> PAGE_SHIFT;
->  }
->  
->  static inline void FNAME(protect_clean_gpte)(struct kvm_mmu *mmu, unsigned *access,
-> @@ -366,7 +367,7 @@ static int FNAME(walk_addr_generic)(struct guest_walker *walker,
->  		--walker->level;
->  
->  		index = PT_INDEX(addr, walker->level);
-> -		table_gfn = gpte_to_gfn(pte);
-> +		table_gfn = gpte_to_gfn(vcpu, pte);
->  		offset    = index * sizeof(pt_element_t);
->  		pte_gpa   = gfn_to_gpa(table_gfn) + offset;
->  
-> @@ -432,7 +433,7 @@ static int FNAME(walk_addr_generic)(struct guest_walker *walker,
->  	if (unlikely(errcode))
->  		goto error;
->  
-> -	gfn = gpte_to_gfn_lvl(pte, walker->level);
-> +	gfn = gpte_to_gfn_lvl(vcpu, pte, walker->level);
->  	gfn += (addr & PT_LVL_OFFSET_MASK(walker->level)) >> PAGE_SHIFT;
->  
->  	if (PTTYPE == 32 && walker->level > PG_LEVEL_4K && is_cpuid_PSE36())
-> @@ -537,12 +538,14 @@ FNAME(prefetch_gpte)(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp,
->  	gfn_t gfn;
->  	kvm_pfn_t pfn;
->  
-> +	WARN_ON(gpte & vcpu_gpa_stolen_mask(vcpu));
-> +
->  	if (FNAME(prefetch_invalid_gpte)(vcpu, sp, spte, gpte))
->  		return false;
->  
->  	pgprintk("%s: gpte %llx spte %p\n", __func__, (u64)gpte, spte);
->  
-> -	gfn = gpte_to_gfn(gpte);
-> +	gfn = gpte_to_gfn(vcpu, gpte);
->  	pte_access = sp->role.access & FNAME(gpte_access)(gpte);
->  	FNAME(protect_clean_gpte)(vcpu->arch.mmu, &pte_access, gpte);
->  	pfn = pte_prefetch_gfn_to_pfn(vcpu, gfn,
-> @@ -652,6 +655,8 @@ static int FNAME(fetch)(struct kvm_vcpu *vcpu, gpa_t addr,
->  
->  	direct_access = gw->pte_access;
->  
-> +	WARN_ON(addr & vcpu_gpa_stolen_mask(vcpu));
-> +
->  	top_level = vcpu->arch.mmu->root_level;
->  	if (top_level == PT32E_ROOT_LEVEL)
->  		top_level = PT32_ROOT_LEVEL;
-> @@ -1067,7 +1072,7 @@ static int FNAME(sync_page)(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp)
->  			continue;
->  		}
->  
-> -		gfn = gpte_to_gfn(gpte);
-> +		gfn = gpte_to_gfn(vcpu, gpte);
->  		pte_access = sp->role.access;
->  		pte_access &= FNAME(gpte_access)(gpte);
->  		FNAME(protect_clean_gpte)(vcpu->arch.mmu, &pte_access, gpte);
-> -- 
-> 2.25.1
-> 
+diff --git a/drivers/vfio/pci/vfio_pci.c b/drivers/vfio/pci/vfio_pci.c
+index 5d6db93d6c680f..e418bcbb68facc 100644
+--- a/drivers/vfio/pci/vfio_pci.c
++++ b/drivers/vfio/pci/vfio_pci.c
+@@ -223,7 +223,7 @@ static void vfio_pci_probe_mmaps(struct vfio_pci_device *vdev)
+ 	}
+ }
+ 
+-static void vfio_pci_try_bus_reset(struct vfio_pci_device *vdev);
++static bool vfio_pci_dev_set_try_reset(struct vfio_device_set *dev_set);
+ static void vfio_pci_disable(struct vfio_pci_device *vdev);
+ static int vfio_pci_try_zap_and_vma_lock_cb(struct pci_dev *pdev, void *data);
+ 
+@@ -404,6 +404,9 @@ static void vfio_pci_disable(struct vfio_pci_device *vdev)
+ 	struct vfio_pci_ioeventfd *ioeventfd, *ioeventfd_tmp;
+ 	int i, bar;
+ 
++	/* For needs_reset */
++	lockdep_assert_held(&vdev->vdev.dev_set->lock);
++
+ 	/* Stop the device from further DMA */
+ 	pci_clear_master(pdev);
+ 
+@@ -487,9 +490,7 @@ static void vfio_pci_disable(struct vfio_pci_device *vdev)
+ out:
+ 	pci_disable_device(pdev);
+ 
+-	vfio_pci_try_bus_reset(vdev);
+-
+-	if (!disable_idle_d3)
++	if (!vfio_pci_dev_set_try_reset(vdev->vdev.dev_set) && !disable_idle_d3)
+ 		vfio_pci_set_power_state(vdev, PCI_D3hot);
+ }
+ 
+@@ -2145,36 +2146,6 @@ static struct pci_driver vfio_pci_driver = {
+ 	.err_handler		= &vfio_err_handlers,
+ };
+ 
+-static int vfio_pci_get_unused_devs(struct pci_dev *pdev, void *data)
+-{
+-	struct vfio_devices *devs = data;
+-	struct vfio_device *device;
+-	struct vfio_pci_device *vdev;
+-
+-	if (devs->cur_index == devs->max_index)
+-		return -ENOSPC;
+-
+-	device = vfio_device_get_from_dev(&pdev->dev);
+-	if (!device)
+-		return -EINVAL;
+-
+-	if (pci_dev_driver(pdev) != &vfio_pci_driver) {
+-		vfio_device_put(device);
+-		return -EBUSY;
+-	}
+-
+-	vdev = container_of(device, struct vfio_pci_device, vdev);
+-
+-	/* Fault if the device is not unused */
+-	if (device->open_count) {
+-		vfio_device_put(device);
+-		return -EBUSY;
+-	}
+-
+-	devs->devices[devs->cur_index++] = vdev;
+-	return 0;
+-}
+-
+ static int vfio_pci_try_zap_and_vma_lock_cb(struct pci_dev *pdev, void *data)
+ {
+ 	struct vfio_devices *devs = data;
+@@ -2208,79 +2179,86 @@ static int vfio_pci_try_zap_and_vma_lock_cb(struct pci_dev *pdev, void *data)
+ 	return 0;
+ }
+ 
++static int vfio_pci_is_device_in_set(struct pci_dev *pdev, void *data)
++{
++	struct vfio_device_set *dev_set = data;
++	struct vfio_device *cur;
++
++	lockdep_assert_held(&dev_set->lock);
++
++	list_for_each_entry(cur, &dev_set->device_list, dev_set_list)
++		if (cur->dev == &pdev->dev)
++			return 0;
++	return -EBUSY;
++}
++
++static bool vfio_pci_dev_set_needs_reset(struct vfio_device_set *dev_set)
++{
++	struct vfio_pci_device *cur;
++	bool needs_reset = false;
++
++	list_for_each_entry(cur, &dev_set->device_list, vdev.dev_set_list) {
++		/* No VFIO device in the set can have an open device FD */
++		if (cur->vdev.open_count)
++			return false;
++		needs_reset |= cur->needs_reset;
++	}
++	return needs_reset;
++}
++
+ /*
+- * If a bus or slot reset is available for the provided device and:
++ * If a bus or slot reset is available for the provided dev_set and:
+  *  - All of the devices affected by that bus or slot reset are unused
+- *    (!refcnt)
+  *  - At least one of the affected devices is marked dirty via
+  *    needs_reset (such as by lack of FLR support)
+- * Then attempt to perform that bus or slot reset.  Callers are required
+- * to hold vdev->dev_set->lock, protecting the bus/slot reset group from
+- * concurrent opens.  A vfio_device reference is acquired for each device
+- * to prevent unbinds during the reset operation.
+- *
+- * NB: vfio-core considers a group to be viable even if some devices are
+- * bound to drivers like pci-stub or pcieport.  Here we require all devices
+- * to be bound to vfio_pci since that's the only way we can be sure they
+- * stay put.
++ * Then attempt to perform that bus or slot reset.
++ * Returns true if the dev_set was reset.
+  */
+-static void vfio_pci_try_bus_reset(struct vfio_pci_device *vdev)
++static bool vfio_pci_dev_set_try_reset(struct vfio_device_set *dev_set)
+ {
+-	struct vfio_devices devs = { .cur_index = 0 };
+-	int i = 0, ret = -EINVAL;
+-	bool slot = false;
+-	struct vfio_pci_device *tmp;
++	struct vfio_pci_device *cur;
++	struct pci_dev *pdev;
++	int ret;
+ 
+-	if (!pci_probe_reset_slot(vdev->pdev->slot))
+-		slot = true;
+-	else if (pci_probe_reset_bus(vdev->pdev->bus))
+-		return;
++	lockdep_assert_held(&dev_set->lock);
+ 
+-	if (vfio_pci_for_each_slot_or_bus(vdev->pdev, vfio_pci_count_devs,
+-					  &i, slot) || !i)
+-		return;
++	/*
++	 * By definition all PCI devices in the dev_set share the same PCI
++	 * reset, so any pci_dev will have the same outcomes for
++	 * pci_probe_reset_*() and pci_reset_bus().
++	 */
++	pdev = list_first_entry(&dev_set->device_list, struct vfio_pci_device,
++				vdev.dev_set_list)->pdev;
+ 
+-	devs.max_index = i;
+-	devs.devices = kcalloc(i, sizeof(struct vfio_device *), GFP_KERNEL);
+-	if (!devs.devices)
+-		return;
++	/* Reset of the dev_set is possible */
++	if (pci_probe_reset_slot(pdev->slot) && pci_probe_reset_bus(pdev->bus))
++		return false;
+ 
+-	if (vfio_pci_for_each_slot_or_bus(vdev->pdev,
+-					  vfio_pci_get_unused_devs,
+-					  &devs, slot))
+-		goto put_devs;
++	if (!vfio_pci_dev_set_needs_reset(dev_set))
++		return false;
+ 
+-	/* Does at least one need a reset? */
+-	for (i = 0; i < devs.cur_index; i++) {
+-		tmp = devs.devices[i];
+-		if (tmp->needs_reset) {
+-			ret = pci_reset_bus(vdev->pdev);
+-			break;
+-		}
++	/*
++	 * vfio-core considers a group to be viable and will create a
++	 * vfio_device even if some devices are bound to drivers like pci-stub
++	 * or pcieport. Here we require all PCI devices to be inside our dev_set
++	 * since that ensures they stay put and that every driver controlling
++	 * the device can co-ordinate with the device reset.
++	 */
++	if (vfio_pci_for_each_slot_or_bus(pdev, vfio_pci_is_device_in_set,
++					  dev_set,
++					  !pci_probe_reset_slot(pdev->slot)))
++		return false;
++
++	ret = pci_reset_bus(pdev);
++	if (ret)
++		return false;
++
++	list_for_each_entry(cur, &dev_set->device_list, vdev.dev_set_list) {
++		cur->needs_reset = false;
++		if (!disable_idle_d3)
++			vfio_pci_set_power_state(cur, PCI_D3hot);
+ 	}
+-
+-put_devs:
+-	for (i = 0; i < devs.cur_index; i++) {
+-		tmp = devs.devices[i];
+-
+-		/*
+-		 * If reset was successful, affected devices no longer need
+-		 * a reset and we should return all the collateral devices
+-		 * to low power.  If not successful, we either didn't reset
+-		 * the bus or timed out waiting for it, so let's not touch
+-		 * the power state.
+-		 */
+-		if (!ret) {
+-			tmp->needs_reset = false;
+-
+-			if (tmp != vdev && !disable_idle_d3)
+-				vfio_pci_set_power_state(tmp, PCI_D3hot);
+-		}
+-
+-		vfio_device_put(&tmp->vdev);
+-	}
+-
+-	kfree(devs.devices);
++	return true;
+ }
+ 
+ static void __exit vfio_pci_cleanup(void)
