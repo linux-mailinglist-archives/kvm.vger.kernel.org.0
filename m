@@ -2,373 +2,168 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E139D3E1838
-	for <lists+kvm@lfdr.de>; Thu,  5 Aug 2021 17:39:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4122C3E1910
+	for <lists+kvm@lfdr.de>; Thu,  5 Aug 2021 18:06:48 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242291AbhHEPjF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 5 Aug 2021 11:39:05 -0400
-Received: from mga03.intel.com ([134.134.136.65]:63642 "EHLO mga03.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S242260AbhHEPiy (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 5 Aug 2021 11:38:54 -0400
-X-IronPort-AV: E=McAfee;i="6200,9189,10067"; a="214209814"
-X-IronPort-AV: E=Sophos;i="5.84,296,1620716400"; 
-   d="scan'208";a="214209814"
-Received: from fmsmga003.fm.intel.com ([10.253.24.29])
-  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Aug 2021 08:38:39 -0700
-X-IronPort-AV: E=Sophos;i="5.84,296,1620716400"; 
-   d="scan'208";a="512734476"
-Received: from arthur-vostro-3668.sh.intel.com ([10.239.13.1])
-  by fmsmga003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Aug 2021 08:38:34 -0700
-From:   Zeng Guang <guang.zeng@intel.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
+        id S242877AbhHEQHA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 5 Aug 2021 12:07:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36712 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S242655AbhHEQHA (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 5 Aug 2021 12:07:00 -0400
+Received: from mail-pj1-x102c.google.com (mail-pj1-x102c.google.com [IPv6:2607:f8b0:4864:20::102c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CD9F1C061765
+        for <kvm@vger.kernel.org>; Thu,  5 Aug 2021 09:06:45 -0700 (PDT)
+Received: by mail-pj1-x102c.google.com with SMTP id dw2-20020a17090b0942b0290177cb475142so15956373pjb.2
+        for <kvm@vger.kernel.org>; Thu, 05 Aug 2021 09:06:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=gS8FXqlIEEYizkg3i3gXTEp2lHp5Ys6haxL7lS48eI8=;
+        b=miRBqZUA8BbUIlZohBuu/kNx4j1tzah82MIu4dyhQGdEA0VMlmks9FBmM8o1OfLbDE
+         LGg4+1FIyJnQojI0aE/D+9o3NVgjua82cVV6t/gUhboPyFCqN1Ga74AYWV9Jbb2ojx+G
+         uLC4Pgxq4AkM+pZeaTQLCNQU/tyWOi6ibMtFPKZz+vvNd09+DzLB69uQbWRTkmc8Ikfq
+         yXXsy0CRAsx1PBm96IIT769fOoDdkgQRaP/gRlJsFrRJ/tLJTCkzqB8ZYW0zLfb48Ts2
+         Rdm/QpnNp4zkbO2BE0eQBajw936AYGGnR1Oh5MUJEzCS3tgshADKN0dnaEhaBa0UlrpL
+         oszA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=gS8FXqlIEEYizkg3i3gXTEp2lHp5Ys6haxL7lS48eI8=;
+        b=kYpuB51VzLKeP2UOZLzZDdFQnD3AjlMa1P7ZVPMeo/u3Yc9HouY7y2p1TtUhTP8Mu+
+         BdWtE39z8RjfPieokbPcrj9LLlsPlNg8+E+zyvrzioNapHnHp2XSWDlXb0B0Pc1UwfGr
+         +KcFPmXtz+2Z7Mv2xc0LhlWATvjDIRd5ILynQkoE2aZ/ia3Q8JXcuHvZaHjQp3HXowv9
+         g7TRBZbG3odkxlAzTCq6fg43xd8pARdh2s9mskFbZTgA09AdjUq35z84I8qzrUeMRHDp
+         ACJ/tDQ6KlxO1qF4V4MgKRXclypWrfD+voZhOAz+rUJOHh1WycCSfEwPbvyS2OIy4W5W
+         q1Vw==
+X-Gm-Message-State: AOAM5316yaoRbmfNhgrxhe8b4xlqNtGc2B2ONzTy9oAxMwnNIVjKJKfR
+        iLdF/E/A1N9MbAqMB9Pas6p6hQ==
+X-Google-Smtp-Source: ABdhPJxelZ+Nxxc4JwbVy64K4qs/9MVt5N26BOgWzQ/3UeKKo3CG9tIj7GO/UOHPjDVmDR4y9iuAoQ==
+X-Received: by 2002:a17:90a:150d:: with SMTP id l13mr5379126pja.93.1628179605081;
+        Thu, 05 Aug 2021 09:06:45 -0700 (PDT)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id a21sm10421833pjo.15.2021.08.05.09.06.44
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 05 Aug 2021 09:06:44 -0700 (PDT)
+Date:   Thu, 5 Aug 2021 16:06:41 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Kai Huang <kai.huang@intel.com>
+Cc:     isaku.yamahata@intel.com, Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        "H . Peter Anvin" <hpa@zytor.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Tony Luck <tony.luck@intel.com>,
-        Kan Liang <kan.liang@linux.intel.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Kim Phillips <kim.phillips@amd.com>,
-        Jarkko Sakkinen <jarkko@kernel.org>,
-        Jethro Beekman <jethro@fortanix.com>,
-        Kai Huang <kai.huang@intel.com>
-Cc:     x86@kernel.org, linux-kernel@vger.kernel.org,
-        Robert Hu <robert.hu@intel.com>, Gao Chao <chao.gao@intel.com>,
-        Zeng Guang <guang.zeng@intel.com>
-Subject: [PATCH v3 6/6] KVM: VMX: enable IPI virtualization
-Date:   Thu,  5 Aug 2021 23:13:17 +0800
-Message-Id: <20210805151317.19054-7-guang.zeng@intel.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20210805151317.19054-1-guang.zeng@intel.com>
-References: <20210805151317.19054-1-guang.zeng@intel.com>
+        Joerg Roedel <joro@8bytes.org>, erdemaktas@google.com,
+        Connor Kuehl <ckuehl@redhat.com>, x86@kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        isaku.yamahata@gmail.com,
+        Rick Edgecombe <rick.p.edgecombe@intel.com>
+Subject: Re: [RFC PATCH v2 41/69] KVM: x86: Add infrastructure for stolen GPA
+ bits
+Message-ID: <YQwMkbBFUuNGnGFw@google.com>
+References: <cover.1625186503.git.isaku.yamahata@intel.com>
+ <c958a131ded780808a687b0f25c02127ca14418a.1625186503.git.isaku.yamahata@intel.com>
+ <20210805234424.d14386b79413845b990a18ac@intel.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210805234424.d14386b79413845b990a18ac@intel.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Gao Chao <chao.gao@intel.com>
+On Thu, Aug 05, 2021, Kai Huang wrote:
+> On Fri, 2 Jul 2021 15:04:47 -0700 isaku.yamahata@intel.com wrote:
+> > From: Rick Edgecombe <rick.p.edgecombe@intel.com>
+> > @@ -2020,6 +2032,7 @@ static struct kvm_mmu_page *kvm_mmu_get_page(struct kvm_vcpu *vcpu,
+> >  	sp = kvm_mmu_alloc_page(vcpu, direct);
+> >  
+> >  	sp->gfn = gfn;
+> > +	sp->gfn_stolen_bits = gfn_stolen_bits;
+> >  	sp->role = role;
+> >  	hlist_add_head(&sp->hash_link, sp_list);
+> >  	if (!direct) {
+> > @@ -2044,6 +2057,13 @@ static struct kvm_mmu_page *kvm_mmu_get_page(struct kvm_vcpu *vcpu,
+> >  	return sp;
+> >  }
+> 
+> 
+> Sorry for replying old thread,
 
-With IPI virtualization enabled, the processor emulates writes
-to APIC registers that would send IPIs. The processor sets the
-bit corresponding to the vector in target vCPU's PIR and may send
-a notification (IPI) specified by NDST and NV fields in target vCPU's
-PID. It is similar to what IOMMU engine does when dealing with posted
-interrupt from devices.
+Ha, one month isn't old, it's barely even mature.
 
-A PID-pointer table is used by the processor to locate the PID of a
-vCPU with the vCPU's APIC ID.
+> but to me it looks weird to have gfn_stolen_bits
+> in 'struct kvm_mmu_page'.  If I understand correctly, above code basically
+> means that GFN with different stolen bit will have different 'struct
+> kvm_mmu_page', but in the context of this patch, mappings with different
+> stolen bits still use the same root,
 
-Like VT-d PI, if a vCPU goes to blocked state, VMM needs to switch its
-notification vector to wakeup vector. This can ensure that when an IPI
-for blocked vCPUs arrives, VMM can get control and wake up blocked
-vCPUs. And if a VCPU is preempted, its posted interrupt notification
-is suppressed.
+You're conflating "mapping" with "PTE".  The GFN is a per-PTE value.  Yes, there
+is a final GFN that is representative of the mapping, but more directly the final
+GFN is associated with the leaf PTE.
 
-Note that IPI virtualization can only virualize physical-addressing,
-flat mode, unicast IPIs. Sending other IPIs would still cause a
-VM exit and need to be handled by VMM.
+TDX effectively adds the restriction that all PTEs used for a mapping must have
+the same shared/private status, so mapping and PTE are somewhat interchangeable
+when talking about stolen bits (the shared bit), but in the context of this patch,
+the stolen bits are a property of the PTE.
 
-Signed-off-by: Gao Chao <chao.gao@intel.com>
-Signed-off-by: Zeng Guang <guang.zeng@intel.com>
----
- arch/x86/include/asm/vmx.h         |  8 ++++
- arch/x86/include/asm/vmxfeatures.h |  2 +
- arch/x86/kvm/vmx/capabilities.h    |  7 +++
- arch/x86/kvm/vmx/posted_intr.c     | 22 +++++++---
- arch/x86/kvm/vmx/vmx.c             | 69 ++++++++++++++++++++++++++++--
- arch/x86/kvm/vmx/vmx.h             |  3 ++
- 6 files changed, 101 insertions(+), 10 deletions(-)
+Back to your statement, it's incorrect.  PTEs (effectively mappings in TDX) with
+different stolen bits will _not_ use the same root.  kvm_mmu_get_page() includes
+the stolen bits in both the hash lookup and in the comparison, i.e. restores the
+stolen bits when looking for an existing shadow page at the target GFN.
 
-diff --git a/arch/x86/include/asm/vmx.h b/arch/x86/include/asm/vmx.h
-index 8c929596a299..b79b6438acaa 100644
---- a/arch/x86/include/asm/vmx.h
-+++ b/arch/x86/include/asm/vmx.h
-@@ -76,6 +76,11 @@
- #define SECONDARY_EXEC_ENABLE_USR_WAIT_PAUSE	VMCS_CONTROL_BIT(USR_WAIT_PAUSE)
- #define SECONDARY_EXEC_BUS_LOCK_DETECTION	VMCS_CONTROL_BIT(BUS_LOCK_DETECTION)
- 
-+/*
-+ * Definitions of Tertiary Processor-Based VM-Execution Controls.
-+ */
-+#define TERTIARY_EXEC_IPI_VIRT			VMCS_CONTROL_BIT(IPI_VIRT)
-+
- #define PIN_BASED_EXT_INTR_MASK                 VMCS_CONTROL_BIT(INTR_EXITING)
- #define PIN_BASED_NMI_EXITING                   VMCS_CONTROL_BIT(NMI_EXITING)
- #define PIN_BASED_VIRTUAL_NMIS                  VMCS_CONTROL_BIT(VIRTUAL_NMIS)
-@@ -159,6 +164,7 @@ static inline int vmx_misc_mseg_revid(u64 vmx_misc)
- enum vmcs_field {
- 	VIRTUAL_PROCESSOR_ID            = 0x00000000,
- 	POSTED_INTR_NV                  = 0x00000002,
-+	LAST_PID_POINTER_INDEX		= 0x00000008,
- 	GUEST_ES_SELECTOR               = 0x00000800,
- 	GUEST_CS_SELECTOR               = 0x00000802,
- 	GUEST_SS_SELECTOR               = 0x00000804,
-@@ -224,6 +230,8 @@ enum vmcs_field {
- 	TSC_MULTIPLIER_HIGH             = 0x00002033,
- 	TERTIARY_VM_EXEC_CONTROL	= 0x00002034,
- 	TERTIARY_VM_EXEC_CONTROL_HIGH	= 0x00002035,
-+	PID_POINTER_TABLE		= 0x00002042,
-+	PID_POINTER_TABLE_HIGH		= 0x00002043,
- 	GUEST_PHYSICAL_ADDRESS          = 0x00002400,
- 	GUEST_PHYSICAL_ADDRESS_HIGH     = 0x00002401,
- 	VMCS_LINK_POINTER               = 0x00002800,
-diff --git a/arch/x86/include/asm/vmxfeatures.h b/arch/x86/include/asm/vmxfeatures.h
-index b264f5c43b5f..e7b368a68c7c 100644
---- a/arch/x86/include/asm/vmxfeatures.h
-+++ b/arch/x86/include/asm/vmxfeatures.h
-@@ -86,4 +86,6 @@
- #define VMX_FEATURE_ENCLV_EXITING	( 2*32+ 28) /* "" VM-Exit on ENCLV (leaf dependent) */
- #define VMX_FEATURE_BUS_LOCK_DETECTION	( 2*32+ 30) /* "" VM-Exit when bus lock caused */
- 
-+/* Tertiary Processor-Based VM-Execution Controls, word 3 */
-+#define VMX_FEATURE_IPI_VIRT		( 3*32 + 4) /* "" Enable IPI virtualization */
- #endif /* _ASM_X86_VMXFEATURES_H */
-diff --git a/arch/x86/kvm/vmx/capabilities.h b/arch/x86/kvm/vmx/capabilities.h
-index 38d414f64e61..78b0525dd991 100644
---- a/arch/x86/kvm/vmx/capabilities.h
-+++ b/arch/x86/kvm/vmx/capabilities.h
-@@ -12,6 +12,7 @@ extern bool __read_mostly enable_ept;
- extern bool __read_mostly enable_unrestricted_guest;
- extern bool __read_mostly enable_ept_ad_bits;
- extern bool __read_mostly enable_pml;
-+extern bool __read_mostly enable_ipiv;
- extern int __read_mostly pt_mode;
- 
- #define PT_MODE_SYSTEM		0
-@@ -283,6 +284,12 @@ static inline bool cpu_has_vmx_apicv(void)
- 		cpu_has_vmx_posted_intr();
- }
- 
-+static inline bool cpu_has_vmx_ipiv(void)
-+{
-+	return vmcs_config.cpu_based_3rd_exec_ctrl &
-+		TERTIARY_EXEC_IPI_VIRT;
-+}
-+
- static inline bool cpu_has_vmx_flexpriority(void)
- {
- 	return cpu_has_vmx_tpr_shadow() &&
-diff --git a/arch/x86/kvm/vmx/posted_intr.c b/arch/x86/kvm/vmx/posted_intr.c
-index 5f81ef092bd4..8c1400aaa1e7 100644
---- a/arch/x86/kvm/vmx/posted_intr.c
-+++ b/arch/x86/kvm/vmx/posted_intr.c
-@@ -81,9 +81,12 @@ void vmx_vcpu_pi_put(struct kvm_vcpu *vcpu)
- {
- 	struct pi_desc *pi_desc = vcpu_to_pi_desc(vcpu);
- 
--	if (!kvm_arch_has_assigned_device(vcpu->kvm) ||
--		!irq_remapping_cap(IRQ_POSTING_CAP)  ||
--		!kvm_vcpu_apicv_active(vcpu))
-+	if (!kvm_vcpu_apicv_active(vcpu))
-+		return;
-+
-+	if ((!kvm_arch_has_assigned_device(vcpu->kvm) ||
-+		!irq_remapping_cap(IRQ_POSTING_CAP)) &&
-+		!enable_ipiv)
- 		return;
- 
- 	/* Set SN when the vCPU is preempted */
-@@ -141,9 +144,16 @@ int pi_pre_block(struct kvm_vcpu *vcpu)
- 	struct pi_desc old, new;
- 	struct pi_desc *pi_desc = vcpu_to_pi_desc(vcpu);
- 
--	if (!kvm_arch_has_assigned_device(vcpu->kvm) ||
--		!irq_remapping_cap(IRQ_POSTING_CAP)  ||
--		!kvm_vcpu_apicv_active(vcpu))
-+	if (!kvm_vcpu_apicv_active(vcpu))
-+		return 0;
-+
-+	/* Put vCPU into a list and set NV to wakeup vector if it is
-+	 * one of the following cases:
-+	 * 1. any assigned device is in use.
-+	 * 2. IPI virtualization is enabled.
-+	 */
-+	if ((!kvm_arch_has_assigned_device(vcpu->kvm) ||
-+		!irq_remapping_cap(IRQ_POSTING_CAP)) && !enable_ipiv)
- 		return 0;
- 
- 	WARN_ON(irqs_disabled());
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index 0f7aecd1e2d1..2f24ac65c48f 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -104,6 +104,9 @@ module_param(fasteoi, bool, S_IRUGO);
- 
- module_param(enable_apicv, bool, S_IRUGO);
- 
-+bool __read_mostly enable_ipiv = 1;
-+module_param(enable_ipiv, bool, S_IRUGO);
-+
- /*
-  * If nested=1, nested virtualization is supported, i.e., guests may use
-  * VMX and be a hypervisor for its own guests. If nested=0, guests may not
-@@ -225,6 +228,7 @@ static const struct {
- };
- 
- #define L1D_CACHE_ORDER 4
-+#define PID_TABLE_ORDER get_order(KVM_MAX_VCPU_ID << 3)
- static void *vmx_l1d_flush_pages;
- 
- static int vmx_setup_l1d_flush(enum vmx_l1d_flush_state l1tf)
-@@ -2514,7 +2518,7 @@ static __init int setup_vmcs_config(struct vmcs_config *vmcs_conf,
- 	}
- 
- 	if (_cpu_based_exec_control & CPU_BASED_ACTIVATE_TERTIARY_CONTROLS) {
--		u64 opt3 = 0;
-+		u64 opt3 = enable_ipiv ? TERTIARY_EXEC_IPI_VIRT : 0;
- 		u64 min3 = 0;
- 
- 		if (adjust_vmx_controls_64(min3, opt3,
-@@ -3870,6 +3874,8 @@ static void vmx_update_msr_bitmap_x2apic(struct kvm_vcpu *vcpu, u8 mode)
- 		vmx_enable_intercept_for_msr(vcpu, X2APIC_MSR(APIC_TMCCT), MSR_TYPE_RW);
- 		vmx_disable_intercept_for_msr(vcpu, X2APIC_MSR(APIC_EOI), MSR_TYPE_W);
- 		vmx_disable_intercept_for_msr(vcpu, X2APIC_MSR(APIC_SELF_IPI), MSR_TYPE_W);
-+		vmx_set_intercept_for_msr(vcpu, X2APIC_MSR(APIC_ICR),
-+				MSR_TYPE_RW, !enable_ipiv);
- 	}
- }
- 
-@@ -4138,14 +4144,21 @@ static void vmx_refresh_apicv_exec_ctrl(struct kvm_vcpu *vcpu)
- 
- 	pin_controls_set(vmx, vmx_pin_based_exec_ctrl(vmx));
- 	if (cpu_has_secondary_exec_ctrls()) {
--		if (kvm_vcpu_apicv_active(vcpu))
-+		if (kvm_vcpu_apicv_active(vcpu)) {
- 			secondary_exec_controls_setbit(vmx,
- 				      SECONDARY_EXEC_APIC_REGISTER_VIRT |
- 				      SECONDARY_EXEC_VIRTUAL_INTR_DELIVERY);
--		else
-+			if (cpu_has_tertiary_exec_ctrls() && enable_ipiv)
-+				tertiary_exec_controls_setbit(vmx,
-+					TERTIARY_EXEC_IPI_VIRT);
-+		} else {
- 			secondary_exec_controls_clearbit(vmx,
- 					SECONDARY_EXEC_APIC_REGISTER_VIRT |
- 					SECONDARY_EXEC_VIRTUAL_INTR_DELIVERY);
-+			if (cpu_has_tertiary_exec_ctrls())
-+				tertiary_exec_controls_clearbit(vmx,
-+					TERTIARY_EXEC_IPI_VIRT);
-+		}
- 	}
- 
- 	if (cpu_has_vmx_msr_bitmap())
-@@ -4180,7 +4193,13 @@ u32 vmx_exec_control(struct vcpu_vmx *vmx)
- 
- u64 vmx_tertiary_exec_control(struct vcpu_vmx *vmx)
- {
--	return vmcs_config.cpu_based_3rd_exec_ctrl;
-+	struct kvm_vcpu *vcpu = &vmx->vcpu;
-+	u64 exec_control = vmcs_config.cpu_based_3rd_exec_ctrl;
-+
-+	if (!kvm_vcpu_apicv_active(vcpu))
-+		exec_control &= ~TERTIARY_EXEC_IPI_VIRT;
-+
-+	return exec_control;
- }
- 
- /*
-@@ -4330,6 +4349,17 @@ static void vmx_compute_secondary_exec_control(struct vcpu_vmx *vmx)
- 
- #define VMX_XSS_EXIT_BITMAP 0
- 
-+static void install_pid(struct vcpu_vmx *vmx)
-+{
-+	struct kvm_vmx *kvm_vmx = to_kvm_vmx(vmx->vcpu.kvm);
-+
-+	BUG_ON(vmx->vcpu.vcpu_id > kvm_vmx->pid_last_index);
-+	/* Bit 0 is the valid bit */
-+	kvm_vmx->pid_table[vmx->vcpu.vcpu_id] = __pa(&vmx->pi_desc) | 1;
-+	vmcs_write64(PID_POINTER_TABLE, __pa(kvm_vmx->pid_table));
-+	vmcs_write16(LAST_PID_POINTER_INDEX, kvm_vmx->pid_last_index);
-+}
-+
- /*
-  * Noting that the initialization of Guest-state Area of VMCS is in
-  * vmx_vcpu_reset().
-@@ -4367,6 +4397,9 @@ static void init_vmcs(struct vcpu_vmx *vmx)
- 
- 		vmcs_write16(POSTED_INTR_NV, POSTED_INTR_VECTOR);
- 		vmcs_write64(POSTED_INTR_DESC_ADDR, __pa((&vmx->pi_desc)));
-+
-+		if (enable_ipiv)
-+			install_pid(vmx);
- 	}
- 
- 	if (!kvm_pause_in_guest(vmx->vcpu.kvm)) {
-@@ -6965,6 +6998,22 @@ static int vmx_vm_init(struct kvm *kvm)
- 			break;
- 		}
- 	}
-+
-+	if (enable_ipiv) {
-+		struct page *pages;
-+
-+		/* Allocate pages for PID table in order of PID_TABLE_ORDER
-+		 * depending on KVM_MAX_VCPU_ID. Each PID entry is 8 bytes.
-+		 */
-+		pages = alloc_pages(GFP_KERNEL | __GFP_ZERO, PID_TABLE_ORDER);
-+
-+		if (!pages)
-+			return -ENOMEM;
-+
-+		to_kvm_vmx(kvm)->pid_table = (void *)page_address(pages);
-+		to_kvm_vmx(kvm)->pid_last_index = KVM_MAX_VCPU_ID;
-+	}
-+
- 	return 0;
- }
- 
-@@ -7575,6 +7624,14 @@ static bool vmx_check_apicv_inhibit_reasons(ulong bit)
- 	return supported & BIT(bit);
- }
- 
-+static void vmx_vm_destroy(struct kvm *kvm)
-+{
-+	struct kvm_vmx *kvm_vmx = to_kvm_vmx(kvm);
-+
-+	if (kvm_vmx->pid_table)
-+		free_pages((unsigned long)kvm_vmx->pid_table, PID_TABLE_ORDER);
-+}
-+
- static struct kvm_x86_ops vmx_x86_ops __initdata = {
- 	.hardware_unsetup = hardware_unsetup,
- 
-@@ -7585,6 +7642,7 @@ static struct kvm_x86_ops vmx_x86_ops __initdata = {
- 
- 	.vm_size = sizeof(struct kvm_vmx),
- 	.vm_init = vmx_vm_init,
-+	.vm_destroy = vmx_vm_destroy,
- 
- 	.vcpu_create = vmx_create_vcpu,
- 	.vcpu_free = vmx_free_vcpu,
-@@ -7824,6 +7882,9 @@ static __init int hardware_setup(void)
- 		vmx_x86_ops.sync_pir_to_irr = NULL;
- 	}
- 
-+	if (!enable_apicv || !cpu_has_vmx_ipiv())
-+		enable_ipiv = 0;
-+
- 	if (cpu_has_vmx_tsc_scaling()) {
- 		kvm_has_tsc_control = true;
- 		kvm_max_tsc_scaling_ratio = KVM_VMX_TSC_MULTIPLIER_MAX;
-diff --git a/arch/x86/kvm/vmx/vmx.h b/arch/x86/kvm/vmx/vmx.h
-index 448006bd8fa7..80e854707725 100644
---- a/arch/x86/kvm/vmx/vmx.h
-+++ b/arch/x86/kvm/vmx/vmx.h
-@@ -351,6 +351,9 @@ struct kvm_vmx {
- 	unsigned int tss_addr;
- 	bool ept_identity_pagetable_done;
- 	gpa_t ept_identity_map_addr;
-+	/* PID table for IPI virtualization */
-+	u64 *pid_table;
-+	u16 pid_last_index;
- };
- 
- bool nested_vmx_allowed(struct kvm_vcpu *vcpu);
--- 
-2.25.1
+@@ -1978,9 +1990,9 @@ static struct kvm_mmu_page *kvm_mmu_get_page(struct kvm_vcpu *vcpu,
+                role.quadrant = quadrant;
+        }
 
+-       sp_list = &vcpu->kvm->arch.mmu_page_hash[kvm_page_table_hashfn(gfn)];
++       sp_list = &vcpu->kvm->arch.mmu_page_hash[kvm_page_table_hashfn(gfn_and_stolen)];
+        for_each_valid_sp(vcpu->kvm, sp, sp_list) {
+-               if (sp->gfn != gfn) {
++               if ((sp->gfn | sp->gfn_stolen_bits) != gfn_and_stolen) {
+                        collisions++;
+                        continue;
+                }
+
+> which means gfn_stolen_bits doesn't make a lot of sense at least for root
+> page table. 
+
+It does make sense, even without a follow-up patch.  In Rick's original series,
+stealing a bit for execute-only guest memory, there was only a single root.  And
+except for TDX, there can only ever be a single root because the shared EPTP isn't
+usable, i.e. there's only the regular/private EPTP.
+
+> Instead, having gfn_stolen_bits in 'struct kvm_mmu_page' only makes sense in
+> the context of TDX, since TDX requires two separate roots for private and
+> shared mappings.
+
+> So given we cannot tell whether the same root, or different roots should be
+> used for different stolen bits, I think we should not add 'gfn_stolen_bits' to
+> 'struct kvm_mmu_page' and use it to determine whether to allocate a new table
+> for the same GFN, but should use a new role (i.e role.private) to determine.
+
+A new role would work, too, but it has the disadvantage of not automagically
+working for all uses of stolen bits, e.g. XO support would have to add another
+role bit.
+
+> And removing 'gfn_stolen_bits' in 'struct kvm_mmu_page' could also save some
+> memory.
+
+But I do like saving memory...  One potentially bad idea would be to unionize
+gfn and stolen bits by shifting the stolen bits after they're extracted from the
+gpa, e.g.
+
+	union {
+		gfn_t gfn_and_stolen;
+		struct {
+			gfn_t gfn:52;
+			gfn_t stolen:12;
+		}
+	};
+
+the downsides being that accessing just the gfn would require an additional masking
+operation, and the stolen bits wouldn't align with reality.
