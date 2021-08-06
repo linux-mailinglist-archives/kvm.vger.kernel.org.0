@@ -2,175 +2,291 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 723223E1F1F
-	for <lists+kvm@lfdr.de>; Fri,  6 Aug 2021 01:05:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B94543E1FF7
+	for <lists+kvm@lfdr.de>; Fri,  6 Aug 2021 02:24:02 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233425AbhHEXFj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 5 Aug 2021 19:05:39 -0400
-Received: from mail-dm6nam11on2055.outbound.protection.outlook.com ([40.107.223.55]:50113
-        "EHLO NAM11-DM6-obe.outbound.protection.outlook.com"
+        id S241273AbhHFAYP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 5 Aug 2021 20:24:15 -0400
+Received: from mail-bn8nam11on2076.outbound.protection.outlook.com ([40.107.236.76]:45330
+        "EHLO NAM11-BN8-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S231757AbhHEXFi (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 5 Aug 2021 19:05:38 -0400
+        id S238757AbhHFAYO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 5 Aug 2021 20:24:14 -0400
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=NeYMii/gH4402lhacoExGY9GMpwUalR5/6hTJzapx6NYW5TReSQq0sDVZ2JyHQyDl2X18bUbQgt1JqKtTTIwrwifwlNXadMLMYj+OrQV76ldMoXAKgegvt+qPrYp3hyyYm/2BqWt04y+W1WaXOPidhbJ+YoIEE83nMKwnHtC5I2lO4mHariRudXqFBR8gskaqEATpW3AoOcAOYl3zs9K+v1K60KTz00JpK0j31qqb/8Qyvy1pIMcrSGP0G1T5Zc88hhglYPuzF4YfsKuToLqkspOBpcXl1wkDuH+o8NT47T7+WTfQgG5cRL26AQG/67O3Oca4uiZTVNN474ZFC507Q==
+ b=C+OxaedSECgah2q7EceiDmitsaCBghWVUdi6iyXjkFTvwrpiLmjye+4gBZlbl+sUJAJq8BIJvVfifkt0ymzY5Ht0BggH0Sjhw92IHLuPSv0JdJuTo+pXqokqYs6rK85ukEe7E0PRMdCaVg42IXjQHJfpi8CFRNM907QDV+VcXwlQkdH/qgbawNyMqfL+Y4EQniYAlTJYind5zYj5I1hixWjqL0NNFixNfuqboHAb9oGQqIGZg812EeWLW6rBf0Mf3pFNm9+QKRQUMu8pR/80P0hAzxOyXrDOCGdtpGEV+HLUVLOIhzvvEm+EhZy9dnu8f/UPHdw1JNIlWwD6XF2OUA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=n1OmkNhs/ImC/8miMp7DzXmn9tn6S3OBgY+WZDgUgko=;
- b=mNUDtWYtR9igoz/w0F2tcgbXFIXK8MI2kkviVqBN9vDN7e0TnUjaROG/4ol1G43ZXrDJv9siAAgBLmDPuSFdw6sA5sv1f1QWJAC4rzddqLsgdMDNk/OX1P4hZp6THks8ieMyuZ9vpoHpLb1+jVO+skVjLl9zU8Ff91XWLdOCd+PMKg6U04pUUViM5mj9ZPXWjAjMpom/0SqPvSROBLiu4b7z/Lh/2YJU2E9D6wfqVm0Qrhd4+ygnRn3tvpnNZGcegLfZk/NGmrszI+msLKoh62B2sIOD7+fGg2CG0DxlcMa1gbO3swu1Li0fUXDL8YmWFPAkefv3HYwYzSc1TUkRJw==
+ bh=r4VWPshiCn8S4pFe6Sz8RiKzdQdXieO2aMLSmrOVkwA=;
+ b=VJyoR5aHvvbXXi2qcYx/NX5iTctmKZqggF+9In3FUu/zL7JbAC+ZUye/7AT9xPvFPyCd2VXDUGeXRNpoauBZIfgur7DtR5acSKgrHEdSytDkQqW75vbpPEJYNcx/W59txFNd3nDtP7bnXDs3b3If0UAhFVQrVxceCdkwH3PuiDeL6V9R7jQVvCv2BBuhEZGyJw/UgdUqYSeTmHPjgO3g2sqC83k60jMJnCwRVE07+W8C9OxlfH1BguaEqhrJuKRU/NanQW03dRvGKOnGZXsiIcigDLg1f4mxptcBRrpELT+KQ0RF2wRJ8Zm86/8SuYB9Vd6yojCKCl9VJP1Oy5Emuw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
  dkim=pass header.d=nvidia.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=n1OmkNhs/ImC/8miMp7DzXmn9tn6S3OBgY+WZDgUgko=;
- b=IhUC5eSz3m2uo2s84t38vMyIsBa3pxS1KKQtZBwamMf5gUDv8gkKniNNc/r7CVFXjdiMvmX5Pm7v3xzNvoDMgJg0j0Z7EjkICccKpg6W6vb6uUc6taBnJqRWpQb21eoZconyMpc8RCpdbYHegquKmmBSIvv2/4DzJMdYGNSzBND31QMpnzkN/fUdZHaGEHtVwI0bKp5gvDJjPNaBqVbD1XscROjU547D6odh/zTy/o6djAdgD2/+h4ibec/2iDjK2XvmExPeg6O/JeirAUMYG2jE539iDNJTEastzUk8x4phM2RBxbPNPmYoNcKufrYEef5NlhGQ85VtuSAGjrU2Iw==
-Authentication-Results: redhat.com; dkim=none (message not signed)
- header.d=none;redhat.com; dmarc=none action=none header.from=nvidia.com;
+ bh=r4VWPshiCn8S4pFe6Sz8RiKzdQdXieO2aMLSmrOVkwA=;
+ b=BRf/liJ3fnnxD5Y+ZqShev31eeTclfIO+hZiKVT7sbPtYhO0dsuv2SeS4Xm9pOkKs4794tuRD73d9NAQ28kkOxErxO21SNHnOwWPJwMDDCH+bRWhNu0EcNkDu1qQNpNC9aJMKamXdXMATrILOy8pQk0BkCAjYA2oiC8VvjCEjZElilDZGQcDgxHsHzi9mFePxVzfwKo04TUmN1GZAeKsnsxw4eFefCRZVwVPRNf8PHIUCxVY04d1Ugb9KHs6h3ZCxEH8lLGIIZBzhVN9OzCMBawx4EdtTKFtl2HjuYbPHOzVuvsM3yjPJeNhNriSLmDaFPXlIQSt7ZyCewVNLupokA==
+Authentication-Results: kernel.org; dkim=none (message not signed)
+ header.d=none;kernel.org; dmarc=none action=none header.from=nvidia.com;
 Received: from BL0PR12MB5506.namprd12.prod.outlook.com (2603:10b6:208:1cb::22)
- by BL1PR12MB5112.namprd12.prod.outlook.com (2603:10b6:208:316::16) with
+ by BL1PR12MB5110.namprd12.prod.outlook.com (2603:10b6:208:312::12) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4394.17; Thu, 5 Aug
- 2021 23:05:22 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4394.17; Fri, 6 Aug
+ 2021 00:23:58 +0000
 Received: from BL0PR12MB5506.namprd12.prod.outlook.com
  ([fe80::1de1:52a9:cf66:f336]) by BL0PR12MB5506.namprd12.prod.outlook.com
- ([fe80::1de1:52a9:cf66:f336%7]) with mapi id 15.20.4394.018; Thu, 5 Aug 2021
- 23:05:22 +0000
-Date:   Thu, 5 Aug 2021 20:05:20 -0300
+ ([fe80::1de1:52a9:cf66:f336%7]) with mapi id 15.20.4394.018; Fri, 6 Aug 2021
+ 00:23:58 +0000
+Date:   Thu, 5 Aug 2021 21:23:57 -0300
 From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     Alex Williamson <alex.williamson@redhat.com>
-Cc:     David Airlie <airlied@linux.ie>,
-        Tony Krowiak <akrowiak@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Daniel Vetter <daniel@ffwll.ch>,
-        Diana Craciun <diana.craciun@oss.nxp.com>,
-        dri-devel@lists.freedesktop.org,
-        Eric Auger <eric.auger@redhat.com>,
-        Eric Farman <farman@linux.ibm.com>,
-        Harald Freudenberger <freude@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        intel-gfx@lists.freedesktop.org,
-        intel-gvt-dev@lists.freedesktop.org,
-        Jani Nikula <jani.nikula@linux.intel.com>,
-        Jason Herne <jjherne@linux.ibm.com>,
-        Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
-        kvm@vger.kernel.org, Kirti Wankhede <kwankhede@nvidia.com>,
-        linux-doc@vger.kernel.org, linux-s390@vger.kernel.org,
-        Matthew Rosato <mjrosato@linux.ibm.com>,
-        Peter Oberparleiter <oberpar@linux.ibm.com>,
-        Halil Pasic <pasic@linux.ibm.com>,
-        Rodrigo Vivi <rodrigo.vivi@intel.com>,
-        Vineeth Vijayan <vneethv@linux.ibm.com>,
-        Zhi Wang <zhi.a.wang@intel.com>,
-        "Raj, Ashok" <ashok.raj@intel.com>, Christoph Hellwig <hch@lst.de>,
-        Leon Romanovsky <leonro@nvidia.com>,
-        Max Gurtovoy <mgurtovoy@nvidia.com>,
-        Yishai Hadas <yishaih@nvidia.com>,
-        Zhenyu Wang <zhenyuw@linux.intel.com>
-Subject: Re: [PATCH v3 09/14] vfio/pci: Change vfio_pci_try_bus_reset() to
- use the dev_set
-Message-ID: <20210805230520.GO1721383@nvidia.com>
-References: <0-v3-6c9e19cc7d44+15613-vfio_reflck_jgg@nvidia.com>
- <9-v3-6c9e19cc7d44+15613-vfio_reflck_jgg@nvidia.com>
- <20210803103406.5e1be269.alex.williamson@redhat.com>
- <20210803164152.GC1721383@nvidia.com>
- <20210803105225.2ee7dac2.alex.williamson@redhat.com>
- <20210805114701.GC1672295@nvidia.com>
- <20210805113311.65a16bba.alex.williamson@redhat.com>
+To:     Bjorn Helgaas <helgaas@kernel.org>
+Cc:     Yishai Hadas <yishaih@nvidia.com>, bhelgaas@google.com,
+        corbet@lwn.net, alex.williamson@redhat.com,
+        diana.craciun@oss.nxp.com, kwankhede@nvidia.com,
+        eric.auger@redhat.com, masahiroy@kernel.org,
+        michal.lkml@markovi.net, linux-pci@vger.kernel.org,
+        linux-doc@vger.kernel.org, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org, linux-kbuild@vger.kernel.org,
+        mgurtovoy@nvidia.com, maorg@nvidia.com, leonro@nvidia.com
+Subject: Re: [PATCH 09/12] PCI: Add a PCI_ID_F_VFIO_DRIVER_OVERRIDE flag to
+ struct pci_device_id
+Message-ID: <20210806002357.GD1672295@nvidia.com>
+References: <20210721161609.68223-10-yishaih@nvidia.com>
+ <20210804203412.GA1663387@bjorn-Precision-5520>
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20210805113311.65a16bba.alex.williamson@redhat.com>
-X-ClientProxiedBy: CH2PR16CA0021.namprd16.prod.outlook.com
- (2603:10b6:610:50::31) To BL0PR12MB5506.namprd12.prod.outlook.com
+In-Reply-To: <20210804203412.GA1663387@bjorn-Precision-5520>
+X-ClientProxiedBy: MN2PR05CA0045.namprd05.prod.outlook.com
+ (2603:10b6:208:236::14) To BL0PR12MB5506.namprd12.prod.outlook.com
  (2603:10b6:208:1cb::22)
 MIME-Version: 1.0
 X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from mlx.ziepe.ca (206.223.160.26) by CH2PR16CA0021.namprd16.prod.outlook.com (2603:10b6:610:50::31) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4394.15 via Frontend Transport; Thu, 5 Aug 2021 23:05:21 +0000
-Received: from jgg by mlx with local (Exim 4.94)        (envelope-from <jgg@nvidia.com>)        id 1mBmQS-00Dg9p-7a; Thu, 05 Aug 2021 20:05:20 -0300
+Received: from mlx.ziepe.ca (142.162.113.129) by MN2PR05CA0045.namprd05.prod.outlook.com (2603:10b6:208:236::14) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4415.6 via Frontend Transport; Fri, 6 Aug 2021 00:23:58 +0000
+Received: from jgg by mlx with local (Exim 4.94)        (envelope-from <jgg@nvidia.com>)        id 1mBneX-00DnEX-8e; Thu, 05 Aug 2021 21:23:57 -0300
 X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 621a8ed3-15f0-4953-aa8d-08d958658018
-X-MS-TrafficTypeDiagnostic: BL1PR12MB5112:
+X-MS-Office365-Filtering-Correlation-Id: 130fec76-f7ee-49a2-36b1-08d958707b7b
+X-MS-TrafficTypeDiagnostic: BL1PR12MB5110:
 X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <BL1PR12MB5112C1B83152428538762C78C2F29@BL1PR12MB5112.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:7691;
+X-Microsoft-Antispam-PRVS: <BL1PR12MB5110D74C73C1813C1190A2D3C2F39@BL1PR12MB5110.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:2657;
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 4oovYC4zbwRXsfCN8lh+OxVsvMm++lP/o2waFWf4ojo6tcFgdO5Q7AtXwClLdz14BS5x/v8CS3s2eDhnpu8B6sgCWADRdtvi3EKsACO3sgK3Ar3w6pva8cE0VPYRDJIgEnhdm+AXPZ6PMYiz6M+R41ZfuuHESFZwqcNkmxVc8xRlRc2LwxFusr2NkITYKUAZYpSU9zKe/yC8CQG8dWak1JpfY5ZcdTBBOKVZAoZk3DRDYMHLTvxK/cEc0UUw/45ndCXgfAwSceEYOOxLzHwrsor7Fs9lvtfCXbPb4Cl2EJWLm3PAVH+xGIdeJ9SYpKHkMR7/www8P5Lp/wvwimfpgeeNWfcEb8np4MFKsbDLjUBCaDBAauJCBPaGz3kci/3n+QHvbMG619Aj8x8VxyDT91We38wML56s01jfRRsDJaHSFQWdap+U2sD2hBr3ZVxW1jdD6V+10nXGAXYainR9rdS8PINecym9Vtw/8mMRGUivLsfD+AG1ctPmHZoad0hXzJ8jfU7uWi6+/pcPOcHjvtP8YFWN+vtgcrMoEIW2LRo4uh0TULXvuQtgB7Foa54CxsokRViQZjgH+k4YkFKEC6ALX1DZXGTqTQnu9EDlzhenJ+FLw8siI8+v+3DvZC5ilbOJc2EU8pgKREvcNLXA9A==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL0PR12MB5506.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(38100700002)(316002)(6916009)(426003)(66476007)(66556008)(186003)(2616005)(8676002)(9746002)(86362001)(8936002)(26005)(9786002)(66946007)(36756003)(83380400001)(1076003)(5660300002)(33656002)(7406005)(54906003)(7416002)(4326008)(2906002)(508600001);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam-Message-Info: ztC41JSQggx1eGXCo69wlagE7FC9yhrycrzMgryedV1EXoLpOKbZyvhLxpzcfNwzNtO2MMX2u9AVB1yZuzbvSTFmAfSRVKbP9Q1TeXlOC4Gy71KePrZ9kpdvo8lwhWHJtkrKx9A+yrGmQph4Un6lG+0GdYRnRhy1cQhgod7K+WW+/04xBstCmV4hwAYQ/tNbbnoAKrEgERiObTGTe3jehzyCEbSfLGa+/mj2KVjo6PJ8uwa93WMRXJ/3NUzKoCynUOw25PJagpGGqtSMvPeoIszAMpBfh03H0deUZ6dbqSGh0jiHVmmHgkXioj0sFKKnuOQ4EeIH0SQeSV2pu6lwiEEFdKwG90QSfb0FSC9DAs0AFHXBR7mggDzfHTkPdc3I4VdB7a1nPeSPfMDg+QglxDBZNH2YEkwMCjpCsWter1JC/8d6+wml2LKRO2nFAnBB7CKdES+r+ga3I7d1fnd3m50bf7nYjQZ6nnF71pZ7+CojzXol0qor3ltYH3ggn2M4iBySr6l8TnM+LFkA3fs2NU9p/i35bhqndqtAal+JpHBeB2FRs2ZmuWbPgHEvQXP7KcUceDZB5MLmvUIqVB4OB350ht0oE+1N30/DzBNTIslSQHE0bc/Qt4dT42SYRjwBvt/EANsmobOmHM1IqQ3UOA==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL0PR12MB5506.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(376002)(39860400002)(346002)(396003)(136003)(366004)(86362001)(83380400001)(26005)(2906002)(2616005)(33656002)(38100700002)(107886003)(6916009)(7416002)(4326008)(5660300002)(186003)(316002)(36756003)(66946007)(9786002)(9746002)(66556008)(66476007)(8936002)(1076003)(478600001)(8676002)(426003);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?KsKh/sxcQiGYjJ26QPMhU7nR7SsWYDyXI9oL59/Y80mV21+VaLQPB1r27yPb?=
- =?us-ascii?Q?4GpRhnW8P/qkyP8+liQarLVvE8VUIaQFj+WHXEJ1JTFtc2s1zVelevAhZmKk?=
- =?us-ascii?Q?o+xezKg6xmr9yXP02WrEdqLPYoYF9joBdn0SPAnWRcSMJM/hYGokIjQD0PB9?=
- =?us-ascii?Q?+uuGPavfJW7BewyBS0sEOjgFnFErk/MfWitxcVzxi8nKw5Dn1lxo7Ep5/ggJ?=
- =?us-ascii?Q?hAx2Fxxp7cEXSFK+1bM3vSQz2cggYL7F17gsD6+qhxGB/YCNHSAGEib88Og/?=
- =?us-ascii?Q?C73WVcEeuesLes0XcpjhIjO64Npp/PDO0UVgQlqQ8MSfdh1BTjyWB4xnuplV?=
- =?us-ascii?Q?ekq7ey6c0H54cvt7/jkrn8/sXGV3lofvlRzvaoxYI0Ib3nVJnByv2y6HNq3g?=
- =?us-ascii?Q?VqIiMXizzDdfvFa5FkYrjLijNsldaAF+bO7PY75uOkZh21NopxDJTE4goLq5?=
- =?us-ascii?Q?Gv54hOroI4B53PRRKLnNnTlQ3hGNRfXb+VK/aMVfiEiymQGkm9je04gliYGZ?=
- =?us-ascii?Q?rlZWWFgcZi24BPPaEejPYKyuhDLxQO5+DDTDXI0Bx7/eLV9SC0mWLj/OKURF?=
- =?us-ascii?Q?yIXEI6xy8NvMFeCcCbEufnGdLXZeOkZ/oMk0aegNo38/dJQsPJEQBFVWPSb6?=
- =?us-ascii?Q?rN3ESdNkb/7d0zW7w7PXRvTtD8zEVETa6qbJzkRqf2JMjvG6A314JftZNA/1?=
- =?us-ascii?Q?h30XZcyawwX9IB9yjiKgP/vC6eNuqqxTzSFjO0iuqVdUWIdVTT80CVp2RzVo?=
- =?us-ascii?Q?saRuBbk7W7YuWnYkrDiXLWtQNBzP3bKeL9yIN90JTMwN4nzkTaIjhYUXj/j5?=
- =?us-ascii?Q?ellSzFlOoMWBy8NSm/QflAb5MeX5G/8e4uVU2MfFw8sWmul7VMp3zd2LmdZU?=
- =?us-ascii?Q?ssonZftoVdbWC+UPZ9zs8X8T0jKXyw+RKXfXrb44Op68hrVSQLQNNYBPdwPX?=
- =?us-ascii?Q?5xNKVTIoGvc8mhQFjrcrBFI1AejX2hxo9Yj04iEMbvx2kLzexBR+6l+gsjcX?=
- =?us-ascii?Q?5F7pjjw1945OPE/yh4x64qgVULIFQkM/Xiz3ptJj+gGSuVBZF6ofviLLXH+4?=
- =?us-ascii?Q?YWp2lnDLGZORuF7NAnbrBGndOlKGOGgOGR/zAOcR+IfbHwZbfKtllfqfIiB5?=
- =?us-ascii?Q?sZwaDlURzLPhmgxLctAUzKbtR72lVIe04VmRVFwmLvkzbjsm3RZzC9aTpbvl?=
- =?us-ascii?Q?k0NZ3SYtKNPe5ZR4Eo/JcRrpld2PlDA1V70FkMVF7pwhihsmNRUn6To4/vPD?=
- =?us-ascii?Q?B51kcfBTXMKPAsROdBFW2RWSk+zWp2xzgqqygFPIxvd/mY9B+67bOQQOZDEN?=
- =?us-ascii?Q?rNdNRxqc39ycg/8lNByZndJ4?=
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?FVbRaOoESygPfoFS9/fraQL//aKYi187cMcdB7WCrshb/pzkdrp44apSJkip?=
+ =?us-ascii?Q?xZ4MAzSP2RkoEroV55bg5TJHRKfumHT0PagcbKPtnqc7kp5aMFHjQnHO3zFL?=
+ =?us-ascii?Q?ZLFD7dgdYIPaVIcsRV/S8qRh/txDHFTJO6PL590tAojCRXJ57TMqizdv677+?=
+ =?us-ascii?Q?dttcXc77Yau++mJBBMeipA/GWoep634bHgl7fn5a6jYJh/My8mbvzzlRmwoD?=
+ =?us-ascii?Q?7iY+T5VFxTFm9TJr9iXyLdZe4TJM86d2rrZFCQJn9Jt3/TnydzxwlNRhn+py?=
+ =?us-ascii?Q?6pJl7+wEpfjTvl6yqBWTn7aaApCTJc5V+RDW7mlsF1p/hP/oOZ2C8FQ4P7bL?=
+ =?us-ascii?Q?GvpDbQzvnq0y1xK/6zGpGsLHxk8yCRcoDIEtjGpKa/IMJZ2eJk7MKi10mTiy?=
+ =?us-ascii?Q?QdUnLJJMaoAEVBJc0AGT2/2MLnT6LCS5jN194/SRkKgiqFjMMnvJ17ulM+Ij?=
+ =?us-ascii?Q?gcnUcILUBShTR+McPmiuy72RquLDI2fDg3ssFC6xGYGgQakZujBaU/wyO5Vz?=
+ =?us-ascii?Q?rxWotDWV9gdfH0WRhdxYGuqEJzP92X1oZSSfmH4utxsA3cJWIQQ0DC9QVODL?=
+ =?us-ascii?Q?s2h2XiIBivY4RLGgqPG0moLpTmjE3Lo9qn+6UpvJbTdOw+khwJWY/RBiFeRj?=
+ =?us-ascii?Q?BK2MhPta6uWnKXh5e102/ViUskSdcB7TTWewJrbPibAwrqyL6LxJg7JJATPp?=
+ =?us-ascii?Q?1CVLTnCP1kx1RWIbTpxMncITLeERvmJnk2eSS/I90WKiwWuiOldZZpV8mHIr?=
+ =?us-ascii?Q?X9KLhof+HAJxiy9H4Ab7AYuiyXcF3NCDlggxS6w7w1q5+1yNPmhAfRPJ2It+?=
+ =?us-ascii?Q?iIw4nwV8FdMoplGo//+XtSGVfiMGM/L0oPU5h4f4dklgsJn1VDteeiVWfuLP?=
+ =?us-ascii?Q?MzOihn9YAm5f5NzVil0caoCOizkI7TANxTDsT/Lt6NQ4YfteOkCkOE3ULq1g?=
+ =?us-ascii?Q?fr588Az0zEXgUCPoS8mlYY1t8qLBHwenU+ywXxUOodMG7RT5xYamnJcBn++m?=
+ =?us-ascii?Q?VMtVuVVlr2xAIrL0qPtyxMKs9SpTYDt+oBtBL38LHg3mlKSSaInJ1PuQlbm0?=
+ =?us-ascii?Q?I6rXp4uEJQ+T1Nz81rGt+Jf/rI/l+nPvuPMdUuip+uLRmsTeFZ6bH7S+8Zno?=
+ =?us-ascii?Q?T8eRO/j9uzCMhysxNo7XLTy86ojy2hiICupXFdOYF51Cxw9XjSNo1NuvQHum?=
+ =?us-ascii?Q?C3Dq6o3g+BduXdM64DaM7MRModXotfuY7YxDJVUezQwwyyQwmDS3NKcHq7dh?=
+ =?us-ascii?Q?PdQiH2udePorTOuCKsWGF2OITf5JxWg38FleSxhmKOJpxw3sDrnHCpnq1jtO?=
+ =?us-ascii?Q?JB6BqnCF/1eEeUMmEH3hDSg1?=
 X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 621a8ed3-15f0-4953-aa8d-08d958658018
+X-MS-Exchange-CrossTenant-Network-Message-Id: 130fec76-f7ee-49a2-36b1-08d958707b7b
 X-MS-Exchange-CrossTenant-AuthSource: BL0PR12MB5506.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Aug 2021 23:05:21.9202
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Aug 2021 00:23:58.2960
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: dngc9M2/G5chTb3TaA8DxGlbJoRB8y7qXcE+pxhtaJiBkUjXZ9WuUhgM1RwacfDe
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL1PR12MB5112
+X-MS-Exchange-CrossTenant-UserPrincipalName: e+9k0M/xdrOcgg1ASygUMwl1W3icwzB1MnOfymnWJhuZ50IqlI5Q5TluOimrlwyi
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL1PR12MB5110
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Aug 05, 2021 at 11:33:11AM -0600, Alex Williamson wrote:
-> > +static int vfio_pci_is_device_in_set(struct pci_dev *pdev, void *data)
-> > +{
-> > +	struct vfio_device_set *dev_set = data;
-> > +	struct vfio_device *cur;
-> > +
-> > +	lockdep_assert_held(&dev_set->lock);
-> > +
-> > +	list_for_each_entry(cur, &dev_set->device_list, dev_set_list)
-> > +		if (cur->dev == &pdev->dev)
-> > +			return 0;
-> > +	return -EBUSY;
-> > +}
-> > +
-> > +static bool vfio_pci_dev_set_needs_reset(struct vfio_device_set *dev_set)
+On Wed, Aug 04, 2021 at 03:34:12PM -0500, Bjorn Helgaas wrote:
+
+> > The first use will be to define a VFIO flag that indicates the PCI driver
+> > is a VFIO driver.
+>
+> Is there such a thing as a "VFIO driver" today?  
+
+Yes.
+
+VFIO has long existed as a driver subsystem that binds drivers to
+devices in various bus types. In the case of PCI the admin moves a PCI
+device from normal operation to VFIO operation via something like:
+
+echo vfio_pci > /sys/bus/pci/devices/0000:01:00.0/driver_override
+
+Other bus types (platform, acpi, etc) have a similar command to move
+them to VFIO.
+
+> > VFIO drivers have a few special properties compared to normal PCI drivers:
+> >  - They do not automatically bind. VFIO drivers are used to swap out the
+> >    normal driver for a device and convert the PCI device to the VFIO
+> >    subsystem.
 > 
-> Slight nit on the name here since we're essentially combining
-> needs_reset along with the notion of the device being unused.  I'm not
-> sure, maybe "should_reset"?  Otherwise it looks ok.  Thanks,
+> The comment below says "... any matching PCI_ID_F_DRIVER_OVERRIDE
+> [sic] entry is returned," which sounds like the opposite of "do not
+> automatically bind."  Might be exposing my VFIO ignorance here.
 
-What I did is add a new function vfio_pci_dev_set_resettable() which
-pulls in three parts of logic that can be be shared with the
-VFIO_DEVICE_PCI_HOT_RESET change in the next patch. That leaves this
-function as purely needs_reset.
+The comment is in error
+ 
+> >    The admin must make this choice and following the current uAPI this is
+> >    usually done by using the driver_override sysfs.
+> 
+> I'm not sure "converting PCI device to the VFIO subsystem" is the
+> right way to phrase this, but whatever it is, make this idea specific,
+> e.g., by "echo pci-stub > /sys/.../driver_override" or whatever.
 
-In turn the VFIO_DEVICE_PCI_HOT_RESET patch gets the same treatment
-where it becomes a dev_set centric API just like this.
+The next version will include the sequence we worked out with Alex in
+the other branch of this thread. See below
 
-I'll send it as a v4.
+> >  - The modules.alias includes the IDs of the VFIO PCI drivers, prefixing
+> >    them with 'vfio_pci:' instead of the normal 'pci:'.
+> > 
+> >    This allows the userspace machinery that switches devices to VFIO to
+> >    know what kernel drivers support what devices and allows it to trigger
+> >    the proper device_override.
+> 
+> What does "switch device to VFIO" mean?  I could be reading this too
+> literally (in my defense, I'm not a VFIO expert), but AFAICT this is
+> not something you do to the *device*.  
+
+It means change the struct device_driver bound to the struct device -
+which is an operation that the admin does on the device object.
+
+> I guess maybe this is something like "prevent the normal driver from
+> claiming the device so we can use VFIO instead"?
+
+no..
+
+> Does "using VFIO" mean getting vfio-pci to claim the device?
+
+If by claim you mean bind a pci_driver to the pci_dev, then yes.
+
+> > As existing tools do not recognize the "vfio_pci:" mod-alias prefix this
+> > keeps todays behavior the same. VFIO remains on the side, is never
+> > autoloaded and can only be activated by direct admin action.
+> 
+> s/todays/today's/
+> 
+> > This patch is the infrastructure to provide the information in the
+> > modules.alias to userspace and enable the only PCI VFIO driver. Later
+> > series introduce additional HW specific VFIO PCI drivers.
+> 
+> s/the only/only the/ ?  (Not sure what you intend, but "the only"
+> doesn't seem right)
+
+"the only" is correct, at this point in the sequence there is only one
+pci_driver that uses this, vfio_pci.ko
+
+> Sorry, I know I'm totally missing the point here.
+
+Lets try again..
+
+PCI: Add a PCI_ID_F_VFIO_DRIVER_OVERRIDE flag to struct pci_device_id
+
+Allow device drivers to include match entries in the modules.alias file
+produced by kbuild that are not used for normal driver autoprobing and
+module autoloading. Drivers using these match entries can be connected to
+the PCI device manually, by userspace, using the existing driver_override
+sysfs.
+
+Add the flag PCI_ID_F_VFIO_DRIVER_OVERRIDE to indicate that the match
+entry is for the VFIO subsystem. These match entries are prefixed with
+"vfio_" in the modules.alias.
+
+For example the resulting modules.alias may have:
+
+  alias pci:v000015B3d00001021sv*sd*bc*sc*i* mlx5_core
+  alias vfio_pci:v000015B3d00001021sv*sd*bc*sc*i* mlx5_vfio_pci
+  alias vfio_pci:v*d*sv*sd*bc*sc*i* vfio_pci
+
+In this example mlx5_core and mlx5_vfio_pci match to the same PCI
+device. The kernel will autoload and autobind to mlx5_core but the kernel
+and udev mechanisms will ignore mlx5_vfio_pci.
+
+When userspace wants to change a device to the VFIO subsystem userspace
+can implement a generic algorithm:
+
+   1) Identify the sysfs path to the device:
+    /sys/devices/pci0000:00/0000:00:01.0/0000:01:00.0
+
+   2) Get the modalias string from the kernel:
+    $ cat /sys/bus/pci/devices/0000:01:00.0/modalias
+    pci:v000015B3d00001021sv000015B3sd00000001bc02sc00i00
+
+   3) Prefix it with vfio_:
+    vfio_pci:v000015B3d00001021sv000015B3sd00000001bc02sc00i00
+
+   4) Search modules.alias for the above string and select the entry that
+      has the fewest *'s:
+    alias vfio_pci:v000015B3d00001021sv*sd*bc*sc*i* mlx5_vfio_pci
+
+   5) modprobe the matched module name:
+    $ modprobe mlx5_vfio_pci
+
+   6) cat the matched module name to driver_override:
+    echo mlx5_vfio_pci > /sys/bus/pci/devices/0000:01:00.0/driver_override
+
+The algorithm is independent of bus type. In future the other buses's with
+VFIO device drivers, like platform and ACPI, can use this algorithm as
+well.
+
+This patch is the infrastructure to provide the information in the
+modules.alias to userspace. Convert the only VFIO pci_driver which
+results in one new line in the modules.alias:
+
+  alias vfio_pci:v*d*sv*sd*bc*sc*i* vfio_pci
+
+Later series introduce additional HW specific VFIO PCI drivers, such as
+mlx5_vfio_pci.
+
+> > diff --git a/scripts/mod/file2alias.c b/scripts/mod/file2alias.c
+> > index 7c97fa8e36bc..f53b38e8f696 100644
+> > +++ b/scripts/mod/file2alias.c
+> > @@ -426,7 +426,7 @@ static int do_ieee1394_entry(const char *filename,
+> >  	return 1;
+> >  }
+> >  
+> > -/* Looks like: pci:vNdNsvNsdNbcNscNiN. */
+> > +/* Looks like: pci:vNdNsvNsdNbcNscNiN or <prefix>_pci:vNdNsvNsdNbcNscNiN. */
+> >  static int do_pci_entry(const char *filename,
+> >  			void *symval, char *alias)
+> >  {
+> > @@ -440,8 +440,12 @@ static int do_pci_entry(const char *filename,
+> >  	DEF_FIELD(symval, pci_device_id, subdevice);
+> >  	DEF_FIELD(symval, pci_device_id, class);
+> >  	DEF_FIELD(symval, pci_device_id, class_mask);
+> > +	DEF_FIELD(symval, pci_device_id, flags);
+> 
+> I'm a little bit wary of adding a new field to this kernel/user
+> interface just for this single bit.  Maybe it's justified but feels
+> like it's worth being careful.
+
+A couple of us looked at this in one of the RFC threads..
+
+As far as we could tell this is not a kernel/user interface. It is an
+interface within kbuild between gcc and file2alias and is not used or
+really exported beyond the kernel build sequence.
+
+Debian code search didn't find anything, for instance.
+
+modules.alias, as output by file2alias during kbuild, is the canonical
+"kernel/user" interface here. Everything that needs this data should
+be using that.
 
 Thanks,
 Jason
