@@ -2,24 +2,24 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E623A3E2B92
-	for <lists+kvm@lfdr.de>; Fri,  6 Aug 2021 15:39:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5D86D3E2B93
+	for <lists+kvm@lfdr.de>; Fri,  6 Aug 2021 15:39:10 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344186AbhHFNjN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 6 Aug 2021 09:39:13 -0400
-Received: from mga18.intel.com ([134.134.136.126]:16714 "EHLO mga18.intel.com"
+        id S1344211AbhHFNjO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 6 Aug 2021 09:39:14 -0400
+Received: from mga18.intel.com ([134.134.136.126]:16722 "EHLO mga18.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1344218AbhHFNjD (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 6 Aug 2021 09:39:03 -0400
-X-IronPort-AV: E=McAfee;i="6200,9189,10068"; a="201553549"
+        id S1344237AbhHFNjG (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 6 Aug 2021 09:39:06 -0400
+X-IronPort-AV: E=McAfee;i="6200,9189,10068"; a="201553558"
 X-IronPort-AV: E=Sophos;i="5.84,300,1620716400"; 
-   d="scan'208";a="201553549"
+   d="scan'208";a="201553558"
 Received: from fmsmga002.fm.intel.com ([10.253.24.26])
-  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Aug 2021 06:38:45 -0700
+  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Aug 2021 06:38:49 -0700
 X-IronPort-AV: E=Sophos;i="5.84,300,1620716400"; 
-   d="scan'208";a="523463432"
+   d="scan'208";a="523463447"
 Received: from vmm_a4_icx.sh.intel.com (HELO localhost.localdomain) ([10.239.53.245])
-  by fmsmga002-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Aug 2021 06:38:39 -0700
+  by fmsmga002-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Aug 2021 06:38:44 -0700
 From:   Zhu Lingshan <lingshan.zhu@intel.com>
 To:     peterz@infradead.org, pbonzini@redhat.com
 Cc:     bp@alien8.de, seanjc@google.com, vkuznets@redhat.com,
@@ -29,12 +29,11 @@ Cc:     bp@alien8.de, seanjc@google.com, vkuznets@redhat.com,
         linux-kernel@vger.kernel.org, x86@kernel.org, kvm@vger.kernel.org,
         like.xu.linux@gmail.com, boris.ostrvsky@oracle.com,
         Like Xu <like.xu@linux.intel.com>,
-        Yao Yuan <yuan.yao@intel.com>,
-        Venkatesh Srinivas <venkateshs@chromium.org>,
+        Luwei Kang <luwei.kang@intel.com>,
         Zhu Lingshan <lingshan.zhu@intel.com>
-Subject: [PATCH V10 05/18] KVM: x86/pmu: Set MSR_IA32_MISC_ENABLE_EMON bit when vPMU is enabled
-Date:   Fri,  6 Aug 2021 21:37:49 +0800
-Message-Id: <20210806133802.3528-6-lingshan.zhu@intel.com>
+Subject: [PATCH V10 06/18] KVM: x86/pmu: Introduce the ctrl_mask value for fixed counter
+Date:   Fri,  6 Aug 2021 21:37:50 +0800
+Message-Id: <20210806133802.3528-7-lingshan.zhu@intel.com>
 X-Mailer: git-send-email 2.27.0
 In-Reply-To: <20210806133802.3528-1-lingshan.zhu@intel.com>
 References: <20210806133802.3528-1-lingshan.zhu@intel.com>
@@ -46,47 +45,71 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Like Xu <like.xu@linux.intel.com>
 
-On Intel platforms, the software can use the IA32_MISC_ENABLE[7] bit to
-detect whether the processor supports performance monitoring facility.
+The mask value of fixed counter control register should be dynamic
+adjusted with the number of fixed counters. This patch introduces a
+variable that includes the reserved bits of fixed counter control
+registers. This is a generic code refactoring.
 
-It depends on the PMU is enabled for the guest, and a software write
-operation to this available bit will be ignored. The proposal to ignore
-the toggle in KVM is the way to go and that behavior matches bare metal.
-
-Cc: Yao Yuan <yuan.yao@intel.com>
+Co-developed-by: Luwei Kang <luwei.kang@intel.com>
+Signed-off-by: Luwei Kang <luwei.kang@intel.com>
 Signed-off-by: Like Xu <like.xu@linux.intel.com>
-Reviewed-by: Venkatesh Srinivas <venkateshs@chromium.org>
 Signed-off-by: Zhu Lingshan <lingshan.zhu@intel.com>
 Acked-by: Peter Zijlstra (Intel) <peterz@infradead.org>
 ---
- arch/x86/kvm/vmx/pmu_intel.c | 1 +
- arch/x86/kvm/x86.c           | 1 +
- 2 files changed, 2 insertions(+)
+ arch/x86/include/asm/kvm_host.h | 1 +
+ arch/x86/kvm/vmx/pmu_intel.c    | 6 +++++-
+ 2 files changed, 6 insertions(+), 1 deletion(-)
 
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index 128e2dd9c944..172fabbcc11a 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -489,6 +489,7 @@ struct kvm_pmu {
+ 	unsigned nr_arch_fixed_counters;
+ 	unsigned available_event_types;
+ 	u64 fixed_ctr_ctrl;
++	u64 fixed_ctr_ctrl_mask;
+ 	u64 global_ctrl;
+ 	u64 global_status;
+ 	u64 global_ovf_ctrl;
 diff --git a/arch/x86/kvm/vmx/pmu_intel.c b/arch/x86/kvm/vmx/pmu_intel.c
-index 9efc1a6b8693..d9dbebe03cae 100644
+index d9dbebe03cae..ac7fe714e6c1 100644
 --- a/arch/x86/kvm/vmx/pmu_intel.c
 +++ b/arch/x86/kvm/vmx/pmu_intel.c
-@@ -488,6 +488,7 @@ static void intel_pmu_refresh(struct kvm_vcpu *vcpu)
- 	if (!pmu->version)
- 		return;
- 
-+	vcpu->arch.ia32_misc_enable_msr |= MSR_IA32_MISC_ENABLE_EMON;
- 	perf_get_x86_pmu_capability(&x86_pmu);
- 
- 	pmu->nr_arch_gp_counters = min_t(int, eax.split.num_counters,
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index efd11702465c..f6b6984e26ef 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -3321,6 +3321,7 @@ int kvm_set_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+@@ -400,7 +400,7 @@ static int intel_pmu_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+ 	case MSR_CORE_PERF_FIXED_CTR_CTRL:
+ 		if (pmu->fixed_ctr_ctrl == data)
+ 			return 0;
+-		if (!(data & 0xfffffffffffff444ull)) {
++		if (!(data & pmu->fixed_ctr_ctrl_mask)) {
+ 			reprogram_fixed_counters(pmu, data);
+ 			return 0;
  		}
- 		break;
- 	case MSR_IA32_MISC_ENABLE:
-+		data &= ~MSR_IA32_MISC_ENABLE_EMON;
- 		if (!kvm_check_has_quirk(vcpu->kvm, KVM_X86_QUIRK_MISC_ENABLE_NO_MWAIT) &&
- 		    ((vcpu->arch.ia32_misc_enable_msr ^ data) & MSR_IA32_MISC_ENABLE_MWAIT)) {
- 			if (!guest_cpuid_has(vcpu, X86_FEATURE_XMM3))
+@@ -470,6 +470,7 @@ static void intel_pmu_refresh(struct kvm_vcpu *vcpu)
+ 	struct kvm_cpuid_entry2 *entry;
+ 	union cpuid10_eax eax;
+ 	union cpuid10_edx edx;
++	int i;
+ 
+ 	pmu->nr_arch_gp_counters = 0;
+ 	pmu->nr_arch_fixed_counters = 0;
+@@ -477,6 +478,7 @@ static void intel_pmu_refresh(struct kvm_vcpu *vcpu)
+ 	pmu->counter_bitmask[KVM_PMC_FIXED] = 0;
+ 	pmu->version = 0;
+ 	pmu->reserved_bits = 0xffffffff00200000ull;
++	pmu->fixed_ctr_ctrl_mask = ~0ull;
+ 
+ 	entry = kvm_find_cpuid_entry(vcpu, 0xa, 0);
+ 	if (!entry)
+@@ -511,6 +513,8 @@ static void intel_pmu_refresh(struct kvm_vcpu *vcpu)
+ 			((u64)1 << edx.split.bit_width_fixed) - 1;
+ 	}
+ 
++	for (i = 0; i < pmu->nr_arch_fixed_counters; i++)
++		pmu->fixed_ctr_ctrl_mask &= ~(0xbull << (i * 4));
+ 	pmu->global_ctrl = ((1ull << pmu->nr_arch_gp_counters) - 1) |
+ 		(((1ull << pmu->nr_arch_fixed_counters) - 1) << INTEL_PMC_IDX_FIXED);
+ 	pmu->global_ctrl_mask = ~pmu->global_ctrl;
 -- 
 2.27.0
 
