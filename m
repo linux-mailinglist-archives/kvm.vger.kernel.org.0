@@ -2,70 +2,109 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 29B323E2CBB
-	for <lists+kvm@lfdr.de>; Fri,  6 Aug 2021 16:34:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4CA633E2CF5
+	for <lists+kvm@lfdr.de>; Fri,  6 Aug 2021 16:53:22 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240380AbhHFOfB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 6 Aug 2021 10:35:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60400 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240496AbhHFOfA (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 6 Aug 2021 10:35:00 -0400
-Received: from mail-il1-x12f.google.com (mail-il1-x12f.google.com [IPv6:2607:f8b0:4864:20::12f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A7849C0617A2
-        for <kvm@vger.kernel.org>; Fri,  6 Aug 2021 07:34:43 -0700 (PDT)
-Received: by mail-il1-x12f.google.com with SMTP id h18so9137645ilc.5
-        for <kvm@vger.kernel.org>; Fri, 06 Aug 2021 07:34:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:reply-to:from:date:message-id:subject:to;
-        bh=/oMubRmlLM5EZ/UdY6Fj3wsfS2kyoMzN9ASXgZ3xneY=;
-        b=WwtirH+AN5QEGc+PsYDg7GPmicCeAO3NPEqhZC74A3+cGIN9TIFUSUQWVdp/dEeJ0X
-         ++0akNbjsW/3xJMMbrUcWsaDb/Yt8FhArvnBGhYYupKONjpXh07T85TTJ6z/R14UeK25
-         VfrKT4PbBRG9FpAA5mPltqAa33Oy6oNBbUHIMXxZ8Pb8DDymDVISOJ0z/+FU283l+PC4
-         CL/S0Mt/1jGAvk934eTBfkPJMYFqxNe9DmuvxRe6nTQgDgkYbQOxTC8k7gZ9Je0QkKHX
-         pj04+ieraICgLCEIDsM+PSxXHeP7MukFzwmFuXJEWjT/gtCn4i9C831/d3PQ2UrLasbD
-         Q6dQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:reply-to:from:date:message-id
-         :subject:to;
-        bh=/oMubRmlLM5EZ/UdY6Fj3wsfS2kyoMzN9ASXgZ3xneY=;
-        b=B4AAvrdmVkSEmuV5yTcmgiWmLXBDV+Otq7AH8NCUZupHYugP78ekaTZyav2QaF1c/z
-         JiThCTqu7gFVR54Nr0mQZCiJY+xv4xtrPSj5+XU5P1J1PnzQaHk9r/mSpEiSHk2MXN8R
-         p/y9iupU7SiTE/NIiEW8HoO0bXdryJM2KWhx0YFn4zGuwYiI0bf2KrINKA5rXEviDXb6
-         /+ZlPI+gtdCcz8Gm5prR8hMuEOhGMFd3YD8Ajx591/B+SQuydWReLaWbplnvQGL4EUG9
-         S1kRCQ9qY3ZJpe2lSIXtIBQOg+nOmr/HxulPWyS+LwNAf1bMlrpxTrdF9C+EMgSUnmCE
-         b2lQ==
-X-Gm-Message-State: AOAM531ADzCDlXs726/4MbwmY7JRYlM4Gy7glTGM1wTXRQaDXdTNNAU6
-        uRues7O2PNaSLHgPGf831L8BMO6z0nv49VUCvVU=
-X-Google-Smtp-Source: ABdhPJxp5ET5L2YTA3wanMtEqCHLczOyx36yHFnFg6UZI0mLKFWZaADmnk+VVmvj6+SDnpgqRgA+ZQp8fhbmG7dX2Io=
-X-Received: by 2002:a92:d088:: with SMTP id h8mr67865ilh.165.1628260482824;
- Fri, 06 Aug 2021 07:34:42 -0700 (PDT)
+        id S232302AbhHFOxg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 6 Aug 2021 10:53:36 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:47824 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S230302AbhHFOxf (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 6 Aug 2021 10:53:35 -0400
+Received: from pps.filterd (m0187473.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 176EYBVd109100;
+        Fri, 6 Aug 2021 10:53:12 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : in-reply-to : references : date : message-id : mime-version :
+ content-type; s=pp1; bh=K81u1sXeXTng2fnrgtRrGKD4KNmSjMIC8eOMEgTvc5M=;
+ b=tJTIiD5Tg5SDMpDuor9c56wVMTI7eoe+QjAZ3WZCYcx7Ryxu5F25RHZBZ0jsII0xguoz
+ TfgnBoD15xNzVQyTHfpuDrjwlAFeNvRTStUMzmKH6AulsJQw9DU7nxF2cr8UsLr+zLw8
+ aO0+zkg/fYj4nyYu0RZ9u01WOki9tQw0NNju73ahY/seslJN7hnPRFm4SrLGbdPmPwt5
+ FGdXPWYct3oOgzUEBllX10fyHV8FGMbO4wLjTD8sorp0qyLdZvDFPUPhEqNuqGwirO7G
+ ZZ8kvGEKIg+xxsAqI9YaUh0ad7B8fWqYPIQXFPc1Kvf/ffdUjn75gqhlHZzNt6e4z+0P GA== 
+Received: from ppma01wdc.us.ibm.com (fd.55.37a9.ip4.static.sl-reverse.com [169.55.85.253])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3a89fnspds-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 06 Aug 2021 10:53:11 -0400
+Received: from pps.filterd (ppma01wdc.us.ibm.com [127.0.0.1])
+        by ppma01wdc.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 176EhIrq006768;
+        Fri, 6 Aug 2021 14:53:10 GMT
+Received: from b03cxnp07027.gho.boulder.ibm.com (b03cxnp07027.gho.boulder.ibm.com [9.17.130.14])
+        by ppma01wdc.us.ibm.com with ESMTP id 3a8gwuc9e8-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 06 Aug 2021 14:53:10 +0000
+Received: from b03ledav004.gho.boulder.ibm.com (b03ledav004.gho.boulder.ibm.com [9.17.130.235])
+        by b03cxnp07027.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 176Er9pD34472258
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 6 Aug 2021 14:53:09 GMT
+Received: from b03ledav004.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 888E678060;
+        Fri,  6 Aug 2021 14:53:09 +0000 (GMT)
+Received: from b03ledav004.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id B3A7778067;
+        Fri,  6 Aug 2021 14:53:08 +0000 (GMT)
+Received: from localhost (unknown [9.211.46.8])
+        by b03ledav004.gho.boulder.ibm.com (Postfix) with ESMTPS;
+        Fri,  6 Aug 2021 14:53:08 +0000 (GMT)
+From:   Fabiano Rosas <farosas@linux.ibm.com>
+To:     Alexey Kardashevskiy <aik@ozlabs.ru>, linuxppc-dev@lists.ozlabs.org
+Cc:     Alexey Kardashevskiy <aik@ozlabs.ru>, kvm-ppc@vger.kernel.org,
+        Michael Ellerman <mpe@ellerman.id.au>, kvm@vger.kernel.org
+Subject: Re: [PATCH kernel v2] KVM: PPC: Use arch_get_random_seed_long
+ instead of powernv variant
+In-Reply-To: <20210805075649.2086567-1-aik@ozlabs.ru>
+References: <20210805075649.2086567-1-aik@ozlabs.ru>
+Date:   Fri, 06 Aug 2021 11:53:06 -0300
+Message-ID: <87bl6atyjx.fsf@linux.ibm.com>
 MIME-Version: 1.0
-Received: by 2002:a02:6384:0:0:0:0:0 with HTTP; Fri, 6 Aug 2021 07:34:42 -0700 (PDT)
-Reply-To: mrmaxwellwatford@gmail.com
-From:   "Mr.Maxwell Watford" <matinmiller89@gmail.com>
-Date:   Fri, 6 Aug 2021 14:34:42 +0000
-Message-ID: <CABQ=EucNt8T50SyY_xMhf4eA-+FY+vTpH5-ztzQHBLq2ww-40w@mail.gmail.com>
-Subject: i need your reply
-To:     matinmiller89@gmail.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: _RGfA1NBZULcggjYMmEN8jXIAQ_1UMzZ
+X-Proofpoint-GUID: _RGfA1NBZULcggjYMmEN8jXIAQ_1UMzZ
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.790
+ definitions=2021-08-06_05:2021-08-05,2021-08-06 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1011 suspectscore=0
+ priorityscore=1501 bulkscore=0 phishscore=0 adultscore=0 malwarescore=0
+ impostorscore=0 mlxscore=0 mlxlogscore=843 lowpriorityscore=0 spamscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2107140000
+ definitions=main-2108060101
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Greetings,
+Alexey Kardashevskiy <aik@ozlabs.ru> writes:
 
-We are writing to you from Ecowas Finance Controller Office Lome Togo,
-because we have received a file from the Ministry of Finance Lome-
-Togo, concerning an Inherited Fund bearing your name on it, And after
-our verifications, we found out that the funds belong to you.
+> The powernv_get_random_long() does not work in nested KVM (which is
+> pseries) and produces a crash when accessing in_be64(rng->regs) in
+> powernv_get_random_long().
+>
+> This replaces powernv_get_random_long with the ppc_md machine hook
+> wrapper.
+>
+> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
 
-It has been awarded and I will like to guide you to claim the funds.
-Please contact me at my private email address
-(mrmaxwellwatford@gmail.com) for more information and directive
+Reviewed-by: Fabiano Rosas <farosas@linux.ibm.com>
 
-I am looking forward to your urgent reply,
-Best regards
-Mr Maxwell Watford
+> ---
+>
+> Changes:
+> v2:
+> * replaces [PATCH kernel] powerpc/powernv: Check if powernv_rng is initialized
+>
+> ---
+>  arch/powerpc/kvm/book3s_hv.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/arch/powerpc/kvm/book3s_hv.c b/arch/powerpc/kvm/book3s_hv.c
+> index be0cde26f156..ecfd133e0ca8 100644
+> --- a/arch/powerpc/kvm/book3s_hv.c
+> +++ b/arch/powerpc/kvm/book3s_hv.c
+> @@ -1165,7 +1165,7 @@ int kvmppc_pseries_do_hcall(struct kvm_vcpu *vcpu)
+>  		break;
+>  #endif
+>  	case H_RANDOM:
+> -		if (!powernv_get_random_long(&vcpu->arch.regs.gpr[4]))
+> +		if (!arch_get_random_seed_long(&vcpu->arch.regs.gpr[4]))
+>  			ret = H_HARDWARE;
+>  		break;
+>  	case H_RPT_INVALIDATE:
