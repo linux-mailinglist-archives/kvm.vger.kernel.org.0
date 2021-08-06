@@ -2,160 +2,115 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E791C3E2D68
-	for <lists+kvm@lfdr.de>; Fri,  6 Aug 2021 17:15:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C6AD33E2DEE
+	for <lists+kvm@lfdr.de>; Fri,  6 Aug 2021 17:51:08 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244031AbhHFPQL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 6 Aug 2021 11:16:11 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:39424 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232091AbhHFPQK (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 6 Aug 2021 11:16:10 -0400
-Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 176F4I3v020863;
-        Fri, 6 Aug 2021 11:15:55 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=syQV8uN5W9JS7Yp81CMW1qDS06SO7yI9K3N8agnRKEs=;
- b=g2N0wrbAdEKRxRwW6pAZUyhKjtqt2aKWly1IxcC4Z+S+MpZr1UxYzMfPfR4ofbsJpzrx
- ZACTTHp9EewrLaxFNBCwEq7tOnZIWU/tauEBvRKauOwOIhJlA3Ve5zliD/WugzwR7Hr/
- Oyu0dHc3Qvnm3w8+hRCC5YJq6xeHqc7/XIftGq/Hk1aPU3gidngpuuRbrUo8jYT+RDjo
- Gbxg267oNAaY1Oi05vLCXi1LQioi/QlTXUM57D8Pv2VGokIF1nDX3HUXlTe0dIWSBLns
- VPr6xVrRtFs1C75BO5D2ZWM3i88GL2ICmJCVNrpxRrgxN15vFD3ZI1QPTwQwnDNiHvZq ZQ== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3a885ac215-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 06 Aug 2021 11:15:54 -0400
-Received: from m0098409.ppops.net (m0098409.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 176F4ebX028590;
-        Fri, 6 Aug 2021 11:15:54 -0400
-Received: from ppma01fra.de.ibm.com (46.49.7a9f.ip4.static.sl-reverse.com [159.122.73.70])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3a885ac204-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 06 Aug 2021 11:15:54 -0400
-Received: from pps.filterd (ppma01fra.de.ibm.com [127.0.0.1])
-        by ppma01fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 176F8nOW010873;
-        Fri, 6 Aug 2021 15:15:52 GMT
-Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
-        by ppma01fra.de.ibm.com with ESMTP id 3a4x58ux7w-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 06 Aug 2021 15:15:52 +0000
-Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
-        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 176FCitS51970558
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 6 Aug 2021 15:12:44 GMT
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 6545611C050;
-        Fri,  6 Aug 2021 15:15:47 +0000 (GMT)
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id BBC0311C052;
-        Fri,  6 Aug 2021 15:15:46 +0000 (GMT)
-Received: from localhost.localdomain (unknown [9.145.27.67])
-        by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Fri,  6 Aug 2021 15:15:46 +0000 (GMT)
-Subject: Re: [PATCH v3 01/14] KVM: s390: pv: add macros for UVC CC values
-To:     David Hildenbrand <david@redhat.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>, kvm@vger.kernel.org
-Cc:     cohuck@redhat.com, borntraeger@de.ibm.com, thuth@redhat.com,
-        pasic@linux.ibm.com, linux-s390@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Ulrich.Weigand@de.ibm.com
-References: <20210804154046.88552-1-imbrenda@linux.ibm.com>
- <20210804154046.88552-2-imbrenda@linux.ibm.com>
- <f3fc81a7-ea71-56f6-16e0-e43fc36d646e@redhat.com>
-From:   Janosch Frank <frankja@linux.ibm.com>
-Message-ID: <54a3b55e-bf05-e661-0618-7839f3d2c8dd@linux.ibm.com>
-Date:   Fri, 6 Aug 2021 17:15:46 +0200
+        id S243362AbhHFPvW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 6 Aug 2021 11:51:22 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:20588 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S238640AbhHFPvW (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 6 Aug 2021 11:51:22 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1628265065;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=+MvzS92Uk60oNAzw+Z3d407dSFOjXozPlgK3Ui3EuhY=;
+        b=SRaw/YZvlGzVq9AnNY5qKTj+UvohuR2BOGecVwrRBt+Cl6f20+zsuVEU1S/BzgitCFWR8r
+        I+1/a4V7OGvzQeCpke1vlcFVM4kdZx0+mSXosNCwiuqVUIJlr9tVfOPHVPmst7RBM43WGg
+        V8zkyONvuHnOkEYvpuurqi1zNUZNTrc=
+Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
+ [209.85.208.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-277-pctNZIfnPua-l14sBhc8hw-1; Fri, 06 Aug 2021 11:51:04 -0400
+X-MC-Unique: pctNZIfnPua-l14sBhc8hw-1
+Received: by mail-ed1-f70.google.com with SMTP id de5-20020a0564023085b02903bb92fd182eso5181267edb.8
+        for <kvm@vger.kernel.org>; Fri, 06 Aug 2021 08:51:04 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=+MvzS92Uk60oNAzw+Z3d407dSFOjXozPlgK3Ui3EuhY=;
+        b=c0WI6EKq+8tJDcVDLlbANt0okVJHHdLTGaIsFYUjgmW+djWioCIEbCR//VcNTRBvKO
+         XYE0RljJVSKaOWZljhUNmAmf10TIw86X+WQiR7jIBfjY/HYQRU592RyRz/fWpvIvpsNs
+         4kZSKoAeibX5ikRfiqZV4X10WjTteTmdHiV7GRFjeLnMCHPHbjMC1f9/334vYOntRivz
+         IuoUX9r4ppBm9Nv3+JzwXeEtU49UdwJxIS6tDuOnK13PDgthosr9QgjeIfDFJQWINAUI
+         ShzwWjVQ8Y8WRjcs2e7+ORoa8WoE5/W3X9RTqyuG6UUNopI2HcgyDMQyYctjDzpZfWTI
+         gcjQ==
+X-Gm-Message-State: AOAM533CsyjWNpTuQm9GW9l8UgRXHGBw1/AoNX3DJmrkZXe6z973fybo
+        Oz/FWMS2Sb2Fb/3YI8pf7C6UnB1NRFTObZ4D0jsgqnpUWSPQAmFWYuMxUaRcg9YFPV6XDF41hzq
+        2qf8od6xloFPV
+X-Received: by 2002:a17:906:3b87:: with SMTP id u7mr10704611ejf.66.1628265063274;
+        Fri, 06 Aug 2021 08:51:03 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwAe7/Ac/Nrk5QJgOh1300wanbnDOg/CO6BneIJR56E9sgbBIU8cyOWTJf37lCWXFCHY+PAtw==
+X-Received: by 2002:a17:906:3b87:: with SMTP id u7mr10704593ejf.66.1628265063117;
+        Fri, 06 Aug 2021 08:51:03 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e? ([2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e])
+        by smtp.gmail.com with ESMTPSA id hc19sm2735104ejc.0.2021.08.06.08.51.01
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 06 Aug 2021 08:51:01 -0700 (PDT)
+Subject: Re: [PATCH v3 2/6] KVM: VMX: Extend BUILD_CONTROLS_SHADOW macro to
+ support 64-bit variation
+To:     Sean Christopherson <seanjc@google.com>,
+        Zeng Guang <guang.zeng@intel.com>
+Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Tony Luck <tony.luck@intel.com>,
+        Kan Liang <kan.liang@linux.intel.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Kim Phillips <kim.phillips@amd.com>,
+        Jarkko Sakkinen <jarkko@kernel.org>,
+        Jethro Beekman <jethro@fortanix.com>,
+        Kai Huang <kai.huang@intel.com>, x86@kernel.org,
+        linux-kernel@vger.kernel.org, Robert Hu <robert.hu@intel.com>,
+        Gao Chao <chao.gao@intel.com>,
+        Robert Hoo <robert.hu@linux.intel.com>
+References: <20210805151317.19054-1-guang.zeng@intel.com>
+ <20210805151317.19054-3-guang.zeng@intel.com> <YQxnGIT7XLQvPkrz@google.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <a984cf7e-fe3e-98bd-744f-9d0ff3759e01@redhat.com>
+Date:   Fri, 6 Aug 2021 17:51:00 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.11.0
 MIME-Version: 1.0
-In-Reply-To: <f3fc81a7-ea71-56f6-16e0-e43fc36d646e@redhat.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <YQxnGIT7XLQvPkrz@google.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: TGGl0JWygJMUpFiGCuFprQKPdR0NOyNt
-X-Proofpoint-ORIG-GUID: 3XcH6j7RSQDgLeSGg9v6VwyviDswaCVm
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.790
- definitions=2021-08-06_05:2021-08-05,2021-08-06 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
- spamscore=0 malwarescore=0 mlxlogscore=999 mlxscore=0 bulkscore=0
- adultscore=0 impostorscore=0 clxscore=1015 suspectscore=0
- priorityscore=1501 phishscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2107140000 definitions=main-2108060104
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 8/6/21 9:26 AM, David Hildenbrand wrote:
-> On 04.08.21 17:40, Claudio Imbrenda wrote:
->> Add macros to describe the 4 possible CC values returned by the UVC
->> instruction.
->>
->> Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
->> ---
->>   arch/s390/include/asm/uv.h | 5 +++++
->>   1 file changed, 5 insertions(+)
->>
->> diff --git a/arch/s390/include/asm/uv.h b/arch/s390/include/asm/uv.h
->> index 12c5f006c136..b35add51b967 100644
->> --- a/arch/s390/include/asm/uv.h
->> +++ b/arch/s390/include/asm/uv.h
->> @@ -18,6 +18,11 @@
->>   #include <asm/page.h>
->>   #include <asm/gmap.h>
->>   
->> +#define UVC_CC_OK	0
->> +#define UVC_CC_ERROR	1
->> +#define UVC_CC_BUSY 	2
->> +#define UVC_CC_PARTIAL	3
->> +
->>   #define UVC_RC_EXECUTED		0x0001
->>   #define UVC_RC_INV_CMD		0x0002
->>   #define UVC_RC_INV_STATE	0x0003
->>
+On 06/08/21 00:32, Sean Christopherson wrote:
+>> -BUILD_CONTROLS_SHADOW(vm_entry, VM_ENTRY_CONTROLS)
+>> -BUILD_CONTROLS_SHADOW(vm_exit, VM_EXIT_CONTROLS)
+>> -BUILD_CONTROLS_SHADOW(pin, PIN_BASED_VM_EXEC_CONTROL)
+>> -BUILD_CONTROLS_SHADOW(exec, CPU_BASED_VM_EXEC_CONTROL)
+>> -BUILD_CONTROLS_SHADOW(secondary_exec, SECONDARY_VM_EXEC_CONTROL)
+>> +BUILD_CONTROLS_SHADOW(vm_entry, VM_ENTRY_CONTROLS, 32)
+>> +BUILD_CONTROLS_SHADOW(vm_exit, VM_EXIT_CONTROLS, 32)
+>> +BUILD_CONTROLS_SHADOW(pin, PIN_BASED_VM_EXEC_CONTROL, 32)
+>> +BUILD_CONTROLS_SHADOW(exec, CPU_BASED_VM_EXEC_CONTROL, 32)
+>> +BUILD_CONTROLS_SHADOW(secondary_exec, SECONDARY_VM_EXEC_CONTROL, 32)
+>> +BUILD_CONTROLS_SHADOW(tertiary_exec, TERTIARY_VM_EXEC_CONTROL, 64)
 > 
-> Do we have any users we could directly fix up? AFAIKs, most users don't 
-> really care about the cc value, only about cc vs !cc.
+> This fails to compile because all the TERTIARY collateral is in a later patch.
 > 
-> The only instances I was able to spot quickly:
+> I think I'd also prefer hiding the 32/64 param via more macros, e.g.
+> 
+> #define __BUILD_CONTROLS_SHADOW(lname, uname, bits)				\
 
-The only fix for the functions below that I would accept would be to
-check for cc 2 and 3. A cc >= UVC_CC_BUSY confuses me way too much when
-reading.
+No, please don't. :)  Also because the 64 bit version is used only once.
 
-But honestly for those two I'd just keep the code as is. I only asked
-Claudio to fix the code in the next patch and add this patch as it was
-not clearly visible he was dealing with a CC.
+Agreed on keeping everything here except for TERTIARY_VM_EXEC_CONTROL, 
+and moving that line to patch 3.
 
-> 
-> 
-> diff --git a/arch/s390/include/asm/uv.h b/arch/s390/include/asm/uv.h
-> index 12c5f006c136..dd72d325f9e8 100644
-> --- a/arch/s390/include/asm/uv.h
-> +++ b/arch/s390/include/asm/uv.h
-> @@ -233,7 +233,7 @@ static inline int uv_call(unsigned long r1, unsigned 
-> long r2)
-> 
->          do {
->                  cc = __uv_call(r1, r2);
-> -       } while (cc > 1);
-> +       } while (cc >= UVC_CC_BUSY);
->          return cc;
->   }
-> 
-> @@ -245,7 +245,7 @@ static inline int uv_call_sched(unsigned long r1, 
-> unsigned long r2)
->          do {
->                  cc = __uv_call(r1, r2);
->                  cond_resched();
-> -       } while (cc > 1);
-> +       } while (cc >= UVC_CC_BUSY);
->          return cc;
->   }
-> 
-> 
-> Of course, we could replace all checks for cc vs !cc with "cc != 
-> UVC_CC_OK" vs "cc == UVC_CC_OK".
-> 
+Paolo
 
