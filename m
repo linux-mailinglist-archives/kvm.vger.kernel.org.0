@@ -2,159 +2,184 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 333D43E2659
-	for <lists+kvm@lfdr.de>; Fri,  6 Aug 2021 10:48:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 622103E2759
+	for <lists+kvm@lfdr.de>; Fri,  6 Aug 2021 11:35:01 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243643AbhHFIsN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 6 Aug 2021 04:48:13 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:46244 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231572AbhHFIsN (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 6 Aug 2021 04:48:13 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1628239677;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=uIBiZswclAmZAKEwOl2WxxnVqDtJu5o7jYDul8dvWmY=;
-        b=MYbKyuMBYOp1zrhYcod/BvIYXXLLnXEdP/YZISXm07ci1tMy2ycl3k00OUZcw8BGciAuV1
-        LZKSoBtNC/4YZgnQBj5v1NWxoNM1+vgIvravNrRZY0F05m1R4IF9FkS4jn2+VC72QPiN2W
-        3P3I2eqWpnzqWIU8Xsxg/nkKhamYRIY=
-Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
- [209.85.218.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-494-SgpamJy5OH2OeUXXBZqhMQ-1; Fri, 06 Aug 2021 04:47:56 -0400
-X-MC-Unique: SgpamJy5OH2OeUXXBZqhMQ-1
-Received: by mail-ej1-f70.google.com with SMTP id ne21-20020a1709077b95b029057eb61c6fdfso2918638ejc.22
-        for <kvm@vger.kernel.org>; Fri, 06 Aug 2021 01:47:55 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=uIBiZswclAmZAKEwOl2WxxnVqDtJu5o7jYDul8dvWmY=;
-        b=VE9byvTLJU5RaUB/FZq7SJckLwjBokTeLu/gZEiruX22RUb9yfzm74BNpPLApOslW6
-         ikt0Wo44YDRMvaySgvt76PxGnhB7Gl8bHkWq/FSwi8xxoto/Lnn1VHA6t3Q2EYEr8sWK
-         HRsWfYR05M3ZiZPhjm7InkxT8N7sB3zvRP4oXLFn8DOhQkfHiwxn2DEgEUcMaajLlK/t
-         vzQT/CUcSFmSG753suiyCgH2XmtSUKzoXcvBUDvHu0dvJKg3XlAqkZRELRo0POEGYR/t
-         b3zArLu6xxZczGyz28dKze4Mb9Ei5OaIg1WCI0mFnPO7GAaKJUVebhGNxkse70RT5aWH
-         qH3Q==
-X-Gm-Message-State: AOAM532j6GqDKfPw4Y9vdUfGwG+ZcuugHKxnz1ca2MpGzSFISxhlfkLi
-        tfMaHLaHPPz1MNVQ9jggThpWMj7KfJcjl4tPRHfM0THKzIcPGkQ8BlXAXKPSCZb/27Z3Eh7L4Px
-        0CbgodjrKlDrd
-X-Received: by 2002:a05:6402:18c1:: with SMTP id x1mr11474526edy.145.1628239675036;
-        Fri, 06 Aug 2021 01:47:55 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxTd0o4WvYl5mo4LnOpxaZnn897ViX2mbmfnK91Gcgr5jxHNl8+wZOELsM+8EHXJ3B1tc7yGA==
-X-Received: by 2002:a05:6402:18c1:: with SMTP id x1mr11474504edy.145.1628239674906;
-        Fri, 06 Aug 2021 01:47:54 -0700 (PDT)
-Received: from steredhat (host-79-18-148-79.retail.telecomitalia.it. [79.18.148.79])
-        by smtp.gmail.com with ESMTPSA id w13sm3610023ede.24.2021.08.06.01.47.54
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 06 Aug 2021 01:47:54 -0700 (PDT)
-Date:   Fri, 6 Aug 2021 10:47:52 +0200
-From:   Stefano Garzarella <sgarzare@redhat.com>
-To:     Arseny Krasnov <arseny.krasnov@kaspersky.com>
-Cc:     Stefan Hajnoczi <stefanha@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Norbert Slusarek <nslusarek@gmx.net>,
-        Andra Paraschiv <andraprs@amazon.com>,
-        Colin Ian King <colin.king@canonical.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "virtualization@lists.linux-foundation.org" 
-        <virtualization@lists.linux-foundation.org>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "oxffffaa@gmail.com" <oxffffaa@gmail.com>
-Subject: Re: [RFC PATCH v1 3/7] vhost/vsock: support MSG_EOR bit processing
-Message-ID: <20210806084752.vzzucocjg3wvpukr@steredhat>
-References: <20210726163137.2589102-1-arseny.krasnov@kaspersky.com>
- <20210726163341.2589759-1-arseny.krasnov@kaspersky.com>
- <20210806072849.4by3wbdkg2bsierm@steredhat>
- <40a1d508-c841-23b7-58d5-f539b2d98ae1@kaspersky.com>
+        id S231553AbhHFJfN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 6 Aug 2021 05:35:13 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:44624 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S244411AbhHFJfL (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 6 Aug 2021 05:35:11 -0400
+Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 1769XFES180400;
+        Fri, 6 Aug 2021 05:34:54 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : message-id : in-reply-to : references : content-type :
+ content-transfer-encoding : mime-version; s=pp1;
+ bh=DFzWBu8nrmvkkvErcxeG1Ba6c1l04INbUxHBOut8jRA=;
+ b=Lg63E8CM+kRxMjUDBy8QjSWsWK8f1+1/eYMzwhtZp2GRSH8YLj3haYOcgQwsaz3QPufC
+ gtKLoUvO8NnT4lBAW4GF7NVBJClr9ev/6BnhCRNQ6MITh4MNGHiGRaVOqi+XaEk5qibK
+ GdaxYhPcOUk2M52IhZt3LufGBDuYfwOJtqIrSzCTeZPYs5gbnxgrvuVi/0INsl1U9mXw
+ 9i4LElwje3KU+04LHcE7Nt2nmVkXNKGfCo5Ir1OLxPuBl3uzvyH0zp7yzLs2dFwQP/rg
+ khHRSndJrLowTVpUDHUBkY97+u8EgnvYWmR/EhFIp+3TcHhmBiMEGrE16180sh0URIDj pQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3a8ye9nnq1-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 06 Aug 2021 05:34:53 -0400
+Received: from m0098394.ppops.net (m0098394.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 1769XoHX182952;
+        Fri, 6 Aug 2021 05:34:53 -0400
+Received: from ppma01fra.de.ibm.com (46.49.7a9f.ip4.static.sl-reverse.com [159.122.73.70])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3a8ye9nnnx-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 06 Aug 2021 05:34:53 -0400
+Received: from pps.filterd (ppma01fra.de.ibm.com [127.0.0.1])
+        by ppma01fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 1769WTH5023947;
+        Fri, 6 Aug 2021 09:34:51 GMT
+Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
+        by ppma01fra.de.ibm.com with ESMTP id 3a4x58ujpu-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 06 Aug 2021 09:34:50 +0000
+Received: from d06av24.portsmouth.uk.ibm.com (mk.ibm.com [9.149.105.60])
+        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 1769YkT826018054
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 6 Aug 2021 09:34:46 GMT
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 7B4504205C;
+        Fri,  6 Aug 2021 09:34:46 +0000 (GMT)
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 0985142042;
+        Fri,  6 Aug 2021 09:34:46 +0000 (GMT)
+Received: from p-imbrenda (unknown [9.145.6.208])
+        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Fri,  6 Aug 2021 09:34:45 +0000 (GMT)
+Date:   Fri, 6 Aug 2021 11:30:05 +0200
+From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
+To:     David Hildenbrand <david@redhat.com>
+Cc:     kvm@vger.kernel.org, cohuck@redhat.com, borntraeger@de.ibm.com,
+        frankja@linux.ibm.com, thuth@redhat.com, pasic@linux.ibm.com,
+        linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Ulrich.Weigand@de.ibm.com,
+        "linux-mm@kvack.org" <linux-mm@kvack.org>,
+        Michal Hocko <mhocko@kernel.org>
+Subject: Re: [PATCH v3 00/14] KVM: s390: pv: implement lazy destroy
+Message-ID: <20210806113005.0259d53c@p-imbrenda>
+In-Reply-To: <86b114ef-41ea-04b6-327c-4a036f784fad@redhat.com>
+References: <20210804154046.88552-1-imbrenda@linux.ibm.com>
+        <86b114ef-41ea-04b6-327c-4a036f784fad@redhat.com>
+Organization: IBM
+X-Mailer: Claws Mail 3.18.0 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
+Content-Type: text/plain; charset=US-ASCII
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: NXMxdx-DilzzegqkArzYiI6ijm9cugdq
+X-Proofpoint-GUID: S0FS-CtOORbJt6m_Nd7GtUjNccCG0Bcp
+Content-Transfer-Encoding: 7bit
+X-Proofpoint-UnRewURL: 0 URL was un-rewritten
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <40a1d508-c841-23b7-58d5-f539b2d98ae1@kaspersky.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.790
+ definitions=2021-08-06_02:2021-08-05,2021-08-06 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
+ suspectscore=0 malwarescore=0 mlxscore=0 adultscore=0 mlxlogscore=999
+ spamscore=0 bulkscore=0 impostorscore=0 phishscore=0 clxscore=1011
+ priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2107140000 definitions=main-2108060067
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Aug 06, 2021 at 11:40:38AM +0300, Arseny Krasnov wrote:
->
->On 06.08.2021 10:28, Stefano Garzarella wrote:
->> Caution: This is an external email. Be cautious while opening links or attachments.
->>
->>
->>
->> On Mon, Jul 26, 2021 at 07:33:38PM +0300, Arseny Krasnov wrote:
->>> It works in the same way as 'end-of-message' bit: if packet has
->>> 'EOM' bit, also check for 'EOR' bit.
->>>
->>> Signed-off-by: Arseny Krasnov <arseny.krasnov@kaspersky.com>
->>> ---
->>> drivers/vhost/vsock.c | 12 +++++++++++-
->>> 1 file changed, 11 insertions(+), 1 deletion(-)
->>>
->>> diff --git a/drivers/vhost/vsock.c b/drivers/vhost/vsock.c
->>> index 3b55de70ac77..3e2b150f9c6f 100644
->>> --- a/drivers/vhost/vsock.c
->>> +++ b/drivers/vhost/vsock.c
->>> @@ -115,6 +115,7 @@ vhost_transport_do_send_pkt(struct vhost_vsock *vsock,
->>>               size_t iov_len, payload_len;
->>>               int head;
->>>               bool restore_msg_eom_flag = false;
->>> +              bool restore_msg_eor_flag = false;
->> Since we now have 2 flags to potentially restore, we could use a single
->> variable (e.g. uint32_t flags_to_restore), initialized to 0.
->>
->> We can set all the flags we need to restore and then simply put it
->> in or with the `pkt->hdr.flags` field.
->>
->>>               spin_lock_bh(&vsock->send_pkt_list_lock);
->>>               if (list_empty(&vsock->send_pkt_list)) {
->>> @@ -188,6 +189,11 @@ vhost_transport_do_send_pkt(struct vhost_vsock *vsock,
->>>                       if (le32_to_cpu(pkt->hdr.flags) & VIRTIO_VSOCK_SEQ_EOM) {
->>>                               pkt->hdr.flags &= ~cpu_to_le32(VIRTIO_VSOCK_SEQ_EOM);
->>>                               restore_msg_eom_flag = true;
->>> +
->>> +                              if (le32_to_cpu(pkt->hdr.flags & VIRTIO_VSOCK_SEQ_EOR)) {
->>                                                                 ^
->> Here it should be `le32_to_cpu(pkt->hdr.flags) & VIRTIO_VSOCK_SEQ_EOR`
->>
->>> +                                      pkt->hdr.flags &= ~cpu_to_le32(VIRTIO_VSOCK_SEQ_EOR);
->>> +                                      restore_msg_eor_flag = true;
->>> +                              }
->>>                       }
->>>               }
->>>
->>> @@ -224,9 +230,13 @@ vhost_transport_do_send_pkt(struct vhost_vsock *vsock,
->>>                * to send it with the next available buffer.
->>>                */
->>>               if (pkt->off < pkt->len) {
->>> -                      if (restore_msg_eom_flag)
->>> +                      if (restore_msg_eom_flag) {
->>>                               pkt->hdr.flags |= cpu_to_le32(VIRTIO_VSOCK_SEQ_EOM);
->>>
->>> +                              if (restore_msg_eor_flag)
->>> +                                      pkt->hdr.flags |= cpu_to_le32(VIRTIO_VSOCK_SEQ_EOR);
->>> +                      }
->>> +
->> If we use a single variable, here we can simply do:
->>
->>                         pkt->hdr.flags |= cpu_to_le32(flags_to_restore);
->>
->> Stefano
->
->Thanks, i'll prepare v2 both with spec patch. About spec: i've already sent
->
->patch for SEQPACKET, can i prepare spec patch updating current reviewed
->
->SEQPACKET? E.g. i'll include both EOM and EOR in one patch.
+On Fri, 6 Aug 2021 09:10:28 +0200
+David Hildenbrand <david@redhat.com> wrote:
 
-Yep, since spec is not yet merged, I think make sense to have all 
-seqpacket stuff in a single patch.
+> On 04.08.21 17:40, Claudio Imbrenda wrote:
+> > Previously, when a protected VM was rebooted or when it was shut
+> > down, its memory was made unprotected, and then the protected VM
+> > itself was destroyed. Looping over the whole address space can take
+> > some time, considering the overhead of the various Ultravisor Calls
+> > (UVCs). This means that a reboot or a shutdown would take a
+> > potentially long amount of time, depending on the amount of used
+> > memory.
+> > 
+> > This patchseries implements a deferred destroy mechanism for
+> > protected guests. When a protected guest is destroyed, its memory
+> > is cleared in background, allowing the guest to restart or
+> > terminate significantly faster than before.
+> > 
+> > There are 2 possibilities when a protected VM is torn down:
+> > * it still has an address space associated (reboot case)
+> > * it does not have an address space anymore (shutdown case)
+> > 
+> > For the reboot case, the reference count of the mm is increased, and
+> > then a background thread is started to clean up. Once the thread
+> > went through the whole address space, the protected VM is actually
+> > destroyed.  
+> 
+> That doesn't sound too hacky to me, and actually sounds like a good 
+> idea, doing what the guest would do either way but speeding it up 
+> asynchronously, but ...
+> 
+> > 
+> > For the shutdown case, a list of pages to be destroyed is formed
+> > when the mm is torn down. Instead of just unmapping the pages when
+> > the address space is being torn down, they are also set aside.
+> > Later when KVM cleans up the VM, a thread is started to clean up
+> > the pages from the list.  
+> 
+> ... this ...
+> 
+> > 
+> > This means that the same address space can have memory belonging to
+> > more than one protected guest, although only one will be running,
+> > the others will in fact not even have any CPUs.  
+> 
+> ... this ...
 
-Thanks,
-Stefano
+this ^ is exactly the reboot case.
+
+> > When a guest is destroyed, its memory still counts towards its
+> > memory control group until it's actually freed (I tested this
+> > experimentally)
+> > 
+> > When the system runs out of memory, if a guest has terminated and
+> > its memory is being cleaned asynchronously, the OOM killer will
+> > wait a little and then see if memory has been freed. This has the
+> > practical effect of slowing down memory allocations when the system
+> > is out of memory to give the cleanup thread time to cleanup and
+> > free memory, and avoid an actual OOM situation.  
+> 
+> ... and this sound like the kind of arch MM hacks that will bite us
+> in the long run. Of course, I might be wrong, but already doing
+> excessive GFP_ATOMIC allocations or messing with the OOM killer that
+
+they are GFP_ATOMIC but they should not put too much weight on the
+memory and can also fail without consequences, I used:
+
+GFP_ATOMIC | __GFP_NOMEMALLOC | __GFP_NOWARN
+
+also notice that after every page allocation a page gets freed, so this
+is only temporary.
+
+I would not call it "messing with the OOM killer", I'm using the same
+interface used by virtio-baloon
+
+> way for a pure (shutdown) optimization is an alarm signal. Of course,
+> I might be wrong.
+> 
+> You should at least CC linux-mm. I'll do that right now and also CC 
+> Michal. He might have time to have a quick glimpse at patch #11 and
+> #13.
+> 
+> https://lkml.kernel.org/r/20210804154046.88552-12-imbrenda@linux.ibm.com
+> https://lkml.kernel.org/r/20210804154046.88552-14-imbrenda@linux.ibm.com
+> 
+> IMHO, we should proceed with patch 1-10, as they solve a really 
+> important problem ("slow reboots") in a nice way, whereby patch 11 
+> handles a case that can be worked around comparatively easily by 
+> management tools -- my 2 cents.
+
+how would management tools work around the issue that a shutdown can
+take very long?
+
+also, without my patches, the shutdown case would use export instead of
+destroy, making it even slower.
 
