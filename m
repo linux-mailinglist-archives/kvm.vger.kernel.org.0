@@ -2,89 +2,154 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D502D3E2A32
-	for <lists+kvm@lfdr.de>; Fri,  6 Aug 2021 13:58:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CE0B43E2A7D
+	for <lists+kvm@lfdr.de>; Fri,  6 Aug 2021 14:23:39 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243199AbhHFL6V (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 6 Aug 2021 07:58:21 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:48492 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229578AbhHFL6U (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 6 Aug 2021 07:58:20 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1628251084;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=WsFUm2Fex09UP/JQJ5oBYUs9L6S3a0XW+Bgd7Je/qd4=;
-        b=jACuhYfxkKpvtW1oBoy4GeWbeXBO++3To//qIz6KlPgn2sw9qnd2qolnAo2KmvpV5gm+h+
-        iP6tHmGBRKbM5Rg2lyoKustnGQqrqiis4IQnBh92DpYHN03fkiqCQtxZkjkY8teN7ZhV8q
-        lj+AonJYEkF4b/yWwDSd5lZ+CEl+bf8=
-Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
- [209.85.208.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-143-krR3T_WxMe2JC2TgX436_g-1; Fri, 06 Aug 2021 07:58:03 -0400
-X-MC-Unique: krR3T_WxMe2JC2TgX436_g-1
-Received: by mail-ed1-f69.google.com with SMTP id y39-20020a50bb2a0000b02903bc05daccbaso4801209ede.5
-        for <kvm@vger.kernel.org>; Fri, 06 Aug 2021 04:58:03 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=WsFUm2Fex09UP/JQJ5oBYUs9L6S3a0XW+Bgd7Je/qd4=;
-        b=CNIKvdPEAVXV9TVfUL+SmCNYOh+b4FUQ4mx36eXVCEU5J5+cmASJQmqnNaDUZvF44f
-         5sre00axH5PavZxsKahFkR8+9NQrMWHOCEzOVyDp/5Ia8UysZFAJYY87HjxaZ8P4Aq+l
-         NTVJPkodnguEbJyyJ+AqVqr4XdYK3fWTuKd5/eYTZRlIG5Fy92KVYRORshJv4TitCeQl
-         WxTsw/zDOjInSn0KZ0Ea2gekHxrUiCyqYDRAmjK8bXissm+0JPJ2YzMWCIwZuEcMbazF
-         NsHWJMAVVpbLEmnGIs++7rqDTVBgUaw2DroC/Ktqq6UE9IOgwiWjDKt3PJ1D6BBN42Qv
-         jKGg==
-X-Gm-Message-State: AOAM530ykMlXSFCZWgTLEvRTewLqsYu3JFpEgvI1FCtt2c0hiVMUzipF
-        z+/G8qx0PW5R+E3N4sHhFycskCHL9g0y0kGuEKCnbWTWkZ5ki2pZ1q4aQZGXiXA6bOa+Lm+vb9i
-        dR0Dbt963V0DI
-X-Received: by 2002:a17:907:2595:: with SMTP id ad21mr9166364ejc.430.1628251082316;
-        Fri, 06 Aug 2021 04:58:02 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJylY//hOXD/73qc587D65K41qOTA088fVA2wMV+LUzQVJR46b1Vn56ScUwZQ9Yhu1huHNyzmA==
-X-Received: by 2002:a17:907:2595:: with SMTP id ad21mr9166352ejc.430.1628251082174;
-        Fri, 06 Aug 2021 04:58:02 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e? ([2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e])
-        by smtp.gmail.com with ESMTPSA id w23sm3708888edx.34.2021.08.06.04.58.01
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 06 Aug 2021 04:58:01 -0700 (PDT)
-Subject: Re: [PATCH] KVM: x86: Allow guest to set EFER.NX=1 on non-PAE 32-bit
- kernels
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-References: <20210805183804.1221554-1-seanjc@google.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <ec7165f9-a008-e11d-a7d4-c12503b08434@redhat.com>
-Date:   Fri, 6 Aug 2021 13:58:00 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.11.0
+        id S1343626AbhHFMXx (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 6 Aug 2021 08:23:53 -0400
+Received: from mga02.intel.com ([134.134.136.20]:61545 "EHLO mga02.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S243697AbhHFMXx (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 6 Aug 2021 08:23:53 -0400
+X-IronPort-AV: E=McAfee;i="6200,9189,10067"; a="201532833"
+X-IronPort-AV: E=Sophos;i="5.84,300,1620716400"; 
+   d="scan'208";a="201532833"
+Received: from fmsmga008.fm.intel.com ([10.253.24.58])
+  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Aug 2021 05:23:29 -0700
+X-IronPort-AV: E=Sophos;i="5.84,300,1620716400"; 
+   d="scan'208";a="481458026"
+Received: from lingshan-mobl5.ccr.corp.intel.com (HELO [10.249.174.155]) ([10.249.174.155])
+  by fmsmga008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Aug 2021 05:23:24 -0700
+Subject: Re: [PATCH V9 03/18] perf/x86/intel: Handle guest PEBS overflow PMI
+ for KVM guest
+To:     Liuxiangdong <liuxiangdong5@huawei.com>, peterz@infradead.org,
+        pbonzini@redhat.com
+Cc:     bp@alien8.de, seanjc@google.com, vkuznets@redhat.com,
+        wanpengli@tencent.com, jmattson@google.com, joro@8bytes.org,
+        kan.liang@linux.intel.com, ak@linux.intel.com,
+        wei.w.wang@intel.com, eranian@google.com,
+        linux-kernel@vger.kernel.org, x86@kernel.org, kvm@vger.kernel.org,
+        like.xu.linux@gmail.com, boris.ostrvsky@oracle.com,
+        Like Xu <like.xu@linux.intel.com>
+References: <20210722054159.4459-1-lingshan.zhu@intel.com>
+ <20210722054159.4459-4-lingshan.zhu@intel.com> <610B3BBE.8080204@huawei.com>
+From:   "Zhu, Lingshan" <lingshan.zhu@intel.com>
+Message-ID: <02c324f0-37e0-f58f-4572-a5967c2e54f1@intel.com>
+Date:   Fri, 6 Aug 2021 20:23:23 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Firefox/78.0 Thunderbird/78.12.0
 MIME-Version: 1.0
-In-Reply-To: <20210805183804.1221554-1-seanjc@google.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <610B3BBE.8080204@huawei.com>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 8bit
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 05/08/21 20:38, Sean Christopherson wrote:
-> Fast forward to today, and KVM has long since stopped running the guest
-> with the host's EFER.NX.  Not only does KVM context switch EFER if
-> host.EFER.NX=1 && guest.EFER.NX=0, KVM also forces host.EFER.NX=0 &&
-> guest.EFER.NX=1 when using shadow paging (to emulate SMEP).  Furthermore,
-> the entire motivation for the restriction was made obsolete over a decade
-> ago when Intel added dedicated host and guest EFER fields in the VMCS
-> (Nehalem timeframe), which reduced the overhead of context switching EFER
-> from 400+ cycles (2 * WRMSR + 1 * RDMSR) to a mere ~2 cycles.
 
-Both pretty good points. :)  Queued, thanks.
 
-Paolo
+On 8/5/2021 9:15 AM, Liuxiangdong wrote:
+>
+>
+> On 2021/7/22 13:41, Zhu Lingshan wrote:
+>> From: Like Xu <like.xu@linux.intel.com>
+>>
+>> With PEBS virtualization, the guest PEBS records get delivered to the
+>> guest DS, and the host pmi handler uses perf_guest_cbs->is_in_guest()
+>> to distinguish whether the PMI comes from the guest code like Intel PT.
+>>
+>> No matter how many guest PEBS counters are overflowed, only triggering
+>> one fake event is enough. The fake event causes the KVM PMI callback to
+>> be called, thereby injecting the PEBS overflow PMI into the guest.
+>>
+>> KVM may inject the PMI with BUFFER_OVF set, even if the guest DS is
+>> empty. That should really be harmless. Thus guest PEBS handler would
+>> retrieve the correct information from its own PEBS records buffer.
+>>
+>> Originally-by: Andi Kleen <ak@linux.intel.com>
+>> Co-developed-by: Kan Liang <kan.liang@linux.intel.com>
+>> Signed-off-by: Kan Liang <kan.liang@linux.intel.com>
+>> Signed-off-by: Like Xu <like.xu@linux.intel.com>
+>> Signed-off-by: Zhu Lingshan <lingshan.zhu@intel.com>
+>> ---
+>>   arch/x86/events/intel/core.c | 45 ++++++++++++++++++++++++++++++++++++
+>>   1 file changed, 45 insertions(+)
+>>
+>> diff --git a/arch/x86/events/intel/core.c b/arch/x86/events/intel/core.c
+>> index da835f5a37e2..2eceb73cd303 100644
+>> --- a/arch/x86/events/intel/core.c
+>> +++ b/arch/x86/events/intel/core.c
+>> @@ -2783,6 +2783,50 @@ static void intel_pmu_reset(void)
+>>   }
+>>     DECLARE_STATIC_CALL(x86_guest_handle_intel_pt_intr, 
+>> *(perf_guest_cbs->handle_intel_pt_intr));
+>> +DECLARE_STATIC_CALL(x86_guest_state, *(perf_guest_cbs->state));
+>> +
+>> +/*
+>> + * We may be running with guest PEBS events created by KVM, and the
+>> + * PEBS records are logged into the guest's DS and invisible to host.
+>> + *
+>> + * In the case of guest PEBS overflow, we only trigger a fake event
+>> + * to emulate the PEBS overflow PMI for guest PBES counters in KVM.
+>> + * The guest will then vm-entry and check the guest DS area to read
+>> + * the guest PEBS records.
+>> + *
+>> + * The contents and other behavior of the guest event do not matter.
+>> + */
+>> +static void x86_pmu_handle_guest_pebs(struct pt_regs *regs,
+>> +                      struct perf_sample_data *data)
+>> +{
+>> +    struct cpu_hw_events *cpuc = this_cpu_ptr(&cpu_hw_events);
+>> +    u64 guest_pebs_idxs = cpuc->pebs_enabled & 
+>> ~cpuc->intel_ctrl_host_mask;
+>
+> guest_pebs_idxs has been defined here.
+>
+>> +    struct perf_event *event = NULL;
+>> +    unsigned int guest = 0;
+>> +    int bit;
+>> +
+>> +    guest = static_call(x86_guest_state)();
+>> +    if (!(guest & PERF_GUEST_ACTIVE))
+>> +        return;
+>> +
+>> +    if (!x86_pmu.pebs_vmx || !x86_pmu.pebs_active ||
+>> +        !(cpuc->pebs_enabled & ~cpuc->intel_ctrl_host_mask))
+>> +        return;
+>> +
+> Why not use guest_pebs_idxs?
+>
+> +    if (!x86_pmu.pebs_vmx || !x86_pmu.pebs_active ||
+> +        !guest_pebs_idxs)
+> +        return;
+Thanks, I have apply this change in V10
+
+Thanks
+>
+>
+>> + for_each_set_bit(bit, (unsigned long *)&guest_pebs_idxs,
+>> +             INTEL_PMC_IDX_FIXED + x86_pmu.num_counters_fixed) {
+>> +        event = cpuc->events[bit];
+>> +        if (!event->attr.precise_ip)
+>> +            continue;
+>> +
+>> +        perf_sample_data_init(data, 0, event->hw.last_period);
+>> +        if (perf_event_overflow(event, data, regs))
+>> +            x86_pmu_stop(event, 0);
+>> +
+>> +        /* Inject one fake event is enough. */
+>> +        break;
+>> +    }
+>> +}
+>>     static int handle_pmi_common(struct pt_regs *regs, u64 status)
+>>   {
+>> @@ -2835,6 +2879,7 @@ static int handle_pmi_common(struct pt_regs 
+>> *regs, u64 status)
+>>           u64 pebs_enabled = cpuc->pebs_enabled;
+>>             handled++;
+>> +        x86_pmu_handle_guest_pebs(regs, &data);
+>>           x86_pmu.drain_pebs(regs, &data);
+>>           status &= intel_ctrl | GLOBAL_STATUS_TRACE_TOPAPMI;
+>
 
