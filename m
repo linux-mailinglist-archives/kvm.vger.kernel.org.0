@@ -2,149 +2,212 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 97B943E23BF
-	for <lists+kvm@lfdr.de>; Fri,  6 Aug 2021 09:10:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A4DBC3E23D0
+	for <lists+kvm@lfdr.de>; Fri,  6 Aug 2021 09:16:57 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243502AbhHFHKs (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 6 Aug 2021 03:10:48 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:26506 "EHLO
+        id S243567AbhHFHRG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 6 Aug 2021 03:17:06 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:43247 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S241622AbhHFHKs (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 6 Aug 2021 03:10:48 -0400
+        by vger.kernel.org with ESMTP id S241864AbhHFHRF (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 6 Aug 2021 03:17:05 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1628233832;
+        s=mimecast20190719; t=1628234209;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=OdiX91xZyqhCMWTD+e1a7203Hh2iiQFW1H/jHSgMREc=;
-        b=ZEJwu9F+5NmCWWBljAV343h9V/i7WvsbM1jOZG7QNw3xB4KplhPvdd6tjz/gJHmcA0ixmS
-        Jj4Bqr7J2WmVTcYFMdiAHPoQDEZnP67eGIQgnEqSIi/Ds1m7d4ZIJ26/anyD9zbN1H+pST
-        wHM/GI8p278Ld3bAvjzAZhlVS6XdppE=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-486-Tpf2VkPvPW6JcPoNA4l0YA-1; Fri, 06 Aug 2021 03:10:30 -0400
-X-MC-Unique: Tpf2VkPvPW6JcPoNA4l0YA-1
-Received: by mail-wm1-f72.google.com with SMTP id m37-20020a05600c3b25b02902b5a02478adso1751498wms.0
-        for <kvm@vger.kernel.org>; Fri, 06 Aug 2021 00:10:30 -0700 (PDT)
+        bh=4h9NXCahpaPwahhaO5hMLHu+0Sj92iJsupdJcdmnrx4=;
+        b=QyZvqAEae9RwU2R0wLA6NaPiHcc/a+2+C0owzLknw8Q1Qj1llWV8wkmcsG3Q6SxYK+PszG
+        3jPOe19/VP3p5+VzlPJpuFx7MSqGb83bb9gRRf/l05XxtifBphT1M48vnOwc8vmxYGGsk0
+        Q7y2O5vUIbBCDMFxyF/Ig1DjUtFf9Q4=
+Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
+ [209.85.208.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-248-GR3YaRpxMNq10xmNUFR-Bw-1; Fri, 06 Aug 2021 03:16:48 -0400
+X-MC-Unique: GR3YaRpxMNq10xmNUFR-Bw-1
+Received: by mail-ed1-f69.google.com with SMTP id c1-20020aa7df010000b02903bb5c6f746eso4413370edy.10
+        for <kvm@vger.kernel.org>; Fri, 06 Aug 2021 00:16:48 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:to:cc:references:from:organization:subject
-         :message-id:date:user-agent:mime-version:in-reply-to
-         :content-language:content-transfer-encoding;
-        bh=OdiX91xZyqhCMWTD+e1a7203Hh2iiQFW1H/jHSgMREc=;
-        b=fh387R/iEcBRXVJCOxjaySBg9QZmKqS/f4sMZYOhtdkCnMOHcj4B5GwLpBf1Dr2/De
-         q59u5epSafwpOmVGhdmcI7b8kvaOuUHpUu52P/kmWhVJqFInLLnGMkZtt2no4EGZQ243
-         bgwcp4nYmtg3sKkZ+oIEAuSUNhT0W5mZFDZa295xIjt2g+U2Te1WziJagv4yts/+O8A7
-         wH799Bnv1RuLcRBv1tN/naPTA5GiD7eoCb92t8M5GTliMR0sxU+azdI56VD3T8qh/oR/
-         PRNc0rQRIzsoOsCFUmYjPvutsrpwNcmCaLzTUGp1VlgTKXpwS1JhNEOXHLwixOF1VCBY
-         8vCA==
-X-Gm-Message-State: AOAM531Ts19UrAw8WO8YQoZqVnovbPRTFdz4ZC/f0uh/JQ0B+dADzPwu
-        1/ahUXTTQyPbnuTw1eA9UBGYVLCiine5sNPpcdida/oz5BE2TV3z5g2Ev/hI7tvQJsg1970kKw9
-        CjKXgiSc4lSgD
-X-Received: by 2002:a1c:7402:: with SMTP id p2mr18778763wmc.111.1628233829596;
-        Fri, 06 Aug 2021 00:10:29 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJy3kCeiOWbbw8vg7aEBTtCpQMHk0XWodUURxQdsSZuiFQC4PLQm2T8HYcAlaq/7xcBafZ8pIw==
-X-Received: by 2002:a1c:7402:: with SMTP id p2mr18778739wmc.111.1628233829376;
-        Fri, 06 Aug 2021 00:10:29 -0700 (PDT)
-Received: from [192.168.3.132] (p5b0c6104.dip0.t-ipconnect.de. [91.12.97.4])
-        by smtp.gmail.com with ESMTPSA id a2sm8564992wrn.95.2021.08.06.00.10.28
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 06 Aug 2021 00:10:29 -0700 (PDT)
-To:     Claudio Imbrenda <imbrenda@linux.ibm.com>, kvm@vger.kernel.org
-Cc:     cohuck@redhat.com, borntraeger@de.ibm.com, frankja@linux.ibm.com,
-        thuth@redhat.com, pasic@linux.ibm.com, linux-s390@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Ulrich.Weigand@de.ibm.com,
-        "linux-mm@kvack.org" <linux-mm@kvack.org>,
-        Michal Hocko <mhocko@kernel.org>
-References: <20210804154046.88552-1-imbrenda@linux.ibm.com>
-From:   David Hildenbrand <david@redhat.com>
-Organization: Red Hat
-Subject: Re: [PATCH v3 00/14] KVM: s390: pv: implement lazy destroy
-Message-ID: <86b114ef-41ea-04b6-327c-4a036f784fad@redhat.com>
-Date:   Fri, 6 Aug 2021 09:10:28 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.11.0
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=4h9NXCahpaPwahhaO5hMLHu+0Sj92iJsupdJcdmnrx4=;
+        b=VrpOI+dnFZvBVnq3wR6MdsVjexe2TdvEZ+IW56R/Qm09trHMpXq57GL9YTKkuZm5WU
+         C4WQhSSQ0dxbK89G4PabkgaLk/jAoHUQ3EzwUfLoq7j7Ib+1caOVtMidZ1QUAvtNjU2A
+         HsBssZze0d+tm5P7br8woXyW7xJXUY+4QIFS76/kctNxAXCXAEEF5FqCZOJP66qXpP6d
+         WefJUj0UHgVBrA0oVTGWAzRh7OI+4oGecbib0RX3+RkCWVQPkvGeqFceggvirKLFfkMD
+         jz807eq4qnU8xAV0Dsl9dF6AygLSKgdsq5etq1W8+EuURrUefYucrF/A6IkAiFBCpeOW
+         f1Ug==
+X-Gm-Message-State: AOAM532lYh9dHIXnI+r62XP+fMnMC0EC3itn99yD3DVWLEEZSVmRZRQv
+        XW8QFMDOwjBLTSaFyBS8CjaIr+io99S5CuKd2q4ThVlqO8OfcLLUOWv7KXRjf3JixgqmsNPPQ92
+        hV+vhCQYuJvlp
+X-Received: by 2002:a05:6402:3552:: with SMTP id f18mr11179144edd.82.1628234206525;
+        Fri, 06 Aug 2021 00:16:46 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwYURfrjKTFZrJHZ9Mcw5cT6VZwzIqZ9tPmHg4AX/+74PdKLsXxtkvp1Vnsgy4/vQl/I70njg==
+X-Received: by 2002:a05:6402:3552:: with SMTP id f18mr11179120edd.82.1628234206380;
+        Fri, 06 Aug 2021 00:16:46 -0700 (PDT)
+Received: from steredhat (host-79-18-148-79.retail.telecomitalia.it. [79.18.148.79])
+        by smtp.gmail.com with ESMTPSA id gv7sm2535932ejc.5.2021.08.06.00.16.45
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 06 Aug 2021 00:16:46 -0700 (PDT)
+Date:   Fri, 6 Aug 2021 09:16:43 +0200
+From:   Stefano Garzarella <sgarzare@redhat.com>
+To:     Arseny Krasnov <arseny.krasnov@kaspersky.com>
+Cc:     Stefan Hajnoczi <stefanha@redhat.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Colin Ian King <colin.king@canonical.com>,
+        Andra Paraschiv <andraprs@amazon.com>,
+        Norbert Slusarek <nslusarek@gmx.net>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "virtualization@lists.linux-foundation.org" 
+        <virtualization@lists.linux-foundation.org>,
+        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "oxffffaa@gmail.com" <oxffffaa@gmail.com>
+Subject: Re: [!!Mass Mail KSE][MASSMAIL KLMS] Re: [RFC PATCH v1 0/7]
+ virtio/vsock: introduce MSG_EOR flag for SEQPACKET
+Message-ID: <20210806071643.byebg4hmm3dtnb2x@steredhat>
+References: <20210726163137.2589102-1-arseny.krasnov@kaspersky.com>
+ <20210804125737.kbgc6mg2v5lw25wu@steredhat>
+ <8e44442c-4cac-dcbc-a88d-17d9878e7d32@kaspersky.com>
+ <20210805090657.y2sz3pzhruuolncq@steredhat>
+ <8bd80d3f-3e00-5e31-42a1-300ff29100ae@kaspersky.com>
 MIME-Version: 1.0
-In-Reply-To: <20210804154046.88552-1-imbrenda@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <8bd80d3f-3e00-5e31-42a1-300ff29100ae@kaspersky.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 04.08.21 17:40, Claudio Imbrenda wrote:
-> Previously, when a protected VM was rebooted or when it was shut down,
-> its memory was made unprotected, and then the protected VM itself was
-> destroyed. Looping over the whole address space can take some time,
-> considering the overhead of the various Ultravisor Calls (UVCs). This
-> means that a reboot or a shutdown would take a potentially long amount
-> of time, depending on the amount of used memory.
-> 
-> This patchseries implements a deferred destroy mechanism for protected
-> guests. When a protected guest is destroyed, its memory is cleared in
-> background, allowing the guest to restart or terminate significantly
-> faster than before.
-> 
-> There are 2 possibilities when a protected VM is torn down:
-> * it still has an address space associated (reboot case)
-> * it does not have an address space anymore (shutdown case)
-> 
-> For the reboot case, the reference count of the mm is increased, and
-> then a background thread is started to clean up. Once the thread went
-> through the whole address space, the protected VM is actually
-> destroyed.
+On Thu, Aug 05, 2021 at 12:21:57PM +0300, Arseny Krasnov wrote:
+>
+>On 05.08.2021 12:06, Stefano Garzarella wrote:
+>> Caution: This is an external email. Be cautious while opening links or attachments.
+>>
+>>
+>>
+>> On Thu, Aug 05, 2021 at 11:33:12AM +0300, Arseny Krasnov wrote:
+>>> On 04.08.2021 15:57, Stefano Garzarella wrote:
+>>>> Caution: This is an external email. Be cautious while opening links or attachments.
+>>>>
+>>>>
+>>>>
+>>>> Hi Arseny,
+>>>>
+>>>> On Mon, Jul 26, 2021 at 07:31:33PM +0300, Arseny Krasnov wrote:
+>>>>>       This patchset implements support of MSG_EOR bit for SEQPACKET
+>>>>> AF_VSOCK sockets over virtio transport.
+>>>>>       Idea is to distinguish concepts of 'messages' and 'records'.
+>>>>> Message is result of sending calls: 'write()', 'send()', 'sendmsg()'
+>>>>> etc. It has fixed maximum length, and it bounds are visible using
+>>>>> return from receive calls: 'read()', 'recv()', 'recvmsg()' etc.
+>>>>> Current implementation based on message definition above.
+>>>> Okay, so the implementation we merged is wrong right?
+>>>> Should we disable the feature bit in stable kernels that contain it? Or
+>>>> maybe we can backport the fixes...
+>>> Hi,
+>>>
+>>> No, this is correct and it is message boundary based. Idea of this
+>>> patchset is to add extra boundaries marker which i think could be
+>>> useful when we want to send data in seqpacket mode which length
+>>> is bigger than maximum message length(this is limited by transport).
+>>> Of course we can fragment big piece of data too small messages, but
+>>> this
+>>> requires to carry fragmentation info in data protocol. So In this case
+>>> when we want to maintain boundaries receiver calls recvmsg() until
+>>> MSG_EOR found.
+>>> But when receiver knows, that data is fit in maximum datagram length,
+>>> it doesn't care about checking MSG_EOR just calling recv() or
+>>> read()(e.g.
+>>> message based mode).
+>> I'm not sure we should maintain boundaries of multiple send(), from
+>> POSIX standard [1]:
+>
+>Yes, but also from POSIX: such calls like send() and sendmsg()
+>
+>operates with "message" and if we check recvmsg() we will
+>
+>find the following thing:
+>
+>
+>For message-based sockets, such as SOCK_DGRAM and SOCK_SEQPACKET, the entire
+>
+>message shall be read in a single operation. If a message is too long to fit in the supplied
+>
+>buffers, and MSG_PEEK is not set in the flags argument, the excess bytes shall be discarded.
+>
+>
+>I understand this, that send() boundaries also must be maintained.
+>
+>I've checked SEQPACKET in AF_UNIX and AX_25 - both doesn't support
+>
+>MSG_EOR, so send() boundaries must be supported.
+>
+>>
+>>    SOCK_SEQPACKET
+>>      Provides sequenced, reliable, bidirectional, connection-mode
+>>      transmission paths for records. A record can be sent using one or
+>>      more output operations and received using one or more input
+>>      operations, but a single operation never transfers part of more than
+>>      one record. Record boundaries are visible to the receiver via the
+>>      MSG_EOR flag.
+>>
+>>  From my understanding a record could be sent with multiple send() 
+>>  and
+>> received, for example, with a single recvmsg().
+>> The only boundary should be the MSG_EOR flag set by the user on the 
+>> last
+>> send() of a record.
+>You are right, if we talking about "record".
+>>
+>>  From send() description [2]:
+>>
+>>    MSG_EOR
+>>      Terminates a record (if supported by the protocol).
+>>
+>>  From recvmsg() description [3]:
+>>
+>>    MSG_EOR
+>>      End-of-record was received (if supported by the protocol).
+>>
+>> Thanks,
+>> Stefano
+>>
+>> [1]
+>> https://pubs.opengroup.org/onlinepubs/9699919799/functions/socket.html
+>> [2] 
+>> https://pubs.opengroup.org/onlinepubs/9699919799/functions/send.html
+>> [3]
+>> https://pubs.opengroup.org/onlinepubs/9699919799/functions/recvmsg.html
+>
+>P.S.: seems SEQPACKET is too exotic thing that everyone implements it 
+>in
+>
+>own manner, because i've tested SCTP seqpacket implementation, and 
+>found
+>
+>that:
+>
+>1) It doesn't support MSG_EOR bit at send side, but uses MSG_EOR at 
+>receiver
+>
+>side to mark MESSAGE boundary.
+>
+>2) According POSIX any extra bytes that didn't fit in user's buffer 
+>must be dropped,
+>
+>but SCTP doesn't drop it - you can read rest of datagram in next calls.
+>
 
-That doesn't sound too hacky to me, and actually sounds like a good 
-idea, doing what the guest would do either way but speeding it up 
-asynchronously, but ...
+Thanks for this useful information, now I see the differences and why we 
+should support both.
 
-> 
-> For the shutdown case, a list of pages to be destroyed is formed when
-> the mm is torn down. Instead of just unmapping the pages when the
-> address space is being torn down, they are also set aside. Later when
-> KVM cleans up the VM, a thread is started to clean up the pages from
-> the list.
+I think is better to include them in the cover letter.
 
-... this ...
+I'm going to review the paches right now :-)
 
-> 
-> This means that the same address space can have memory belonging to
-> more than one protected guest, although only one will be running, the
-> others will in fact not even have any CPUs.
-
-... this ...
-> 
-> When a guest is destroyed, its memory still counts towards its memory
-> control group until it's actually freed (I tested this experimentally)
-> 
-> When the system runs out of memory, if a guest has terminated and its
-> memory is being cleaned asynchronously, the OOM killer will wait a
-> little and then see if memory has been freed. This has the practical
-> effect of slowing down memory allocations when the system is out of
-> memory to give the cleanup thread time to cleanup and free memory, and
-> avoid an actual OOM situation.
-
-... and this sound like the kind of arch MM hacks that will bite us in 
-the long run. Of course, I might be wrong, but already doing excessive 
-GFP_ATOMIC allocations or messing with the OOM killer that way for a 
-pure (shutdown) optimization is an alarm signal. Of course, I might be 
-wrong.
-
-You should at least CC linux-mm. I'll do that right now and also CC 
-Michal. He might have time to have a quick glimpse at patch #11 and #13.
-
-https://lkml.kernel.org/r/20210804154046.88552-12-imbrenda@linux.ibm.com
-https://lkml.kernel.org/r/20210804154046.88552-14-imbrenda@linux.ibm.com
-
-IMHO, we should proceed with patch 1-10, as they solve a really 
-important problem ("slow reboots") in a nice way, whereby patch 11 
-handles a case that can be worked around comparatively easily by 
-management tools -- my 2 cents.
-
--- 
-Thanks,
-
-David / dhildenb
+Stefano
 
