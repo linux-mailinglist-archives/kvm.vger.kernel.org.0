@@ -2,99 +2,114 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B528B3E2428
-	for <lists+kvm@lfdr.de>; Fri,  6 Aug 2021 09:32:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id AD0A33E23FF
+	for <lists+kvm@lfdr.de>; Fri,  6 Aug 2021 09:29:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236069AbhHFHcO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 6 Aug 2021 03:32:14 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:29496 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232808AbhHFHcN (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 6 Aug 2021 03:32:13 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1628235117;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=pVWC3UDptA7H+V1Kg/+VGDadWKlNerXuJRs5msdmzWc=;
-        b=RZhsMLBqXDzNvYL/aZr4aClU+Jr1nmFS71BZnyBac0kixbV1q+vqn76qfcbZV7QJd73MqJ
-        MH4Hn4/5eS/wP6Pgaf31OLjf+BDE2uOiFA4YD5dokOGv2aEGzjg63/ucLFkJjZS7oKKP5e
-        AWH2ehg2p4gnQ2BFp+Ep2kDbxbZem+A=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-356-Y9bgYxNjPvCP0OCrkiZohQ-1; Fri, 06 Aug 2021 03:31:56 -0400
-X-MC-Unique: Y9bgYxNjPvCP0OCrkiZohQ-1
-Received: by mail-wm1-f69.google.com with SMTP id k13-20020a05600c1c8db029025018ac4f7dso2160087wms.2
-        for <kvm@vger.kernel.org>; Fri, 06 Aug 2021 00:31:56 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:organization
-         :message-id:date:user-agent:mime-version:in-reply-to
-         :content-language:content-transfer-encoding;
-        bh=pVWC3UDptA7H+V1Kg/+VGDadWKlNerXuJRs5msdmzWc=;
-        b=g+zTz8gF1fP0Hy7U5Lul+qLQMZDZF0Pm0vUPMDNFotKJS9Uu848FHToitLJyS97nJh
-         iekiCCj2RkJ7b+++cgVvmAKHuXrUXdnnUyqWqY7jWhN+f7PSw8R/EBDdd2+hzqVjHJzu
-         w98O2fJH6GRQW6vne6oGZkaim5y2I8cC/1L6JTOdOEHG3N2bg5Ih0IMIuAwM79SyHBrD
-         1r4IWWQrrKBRazUCVja+e7EGgmzE2PXL4UBQRI2XQs/FfPXquEXCKEl/lMYuXLy15uGM
-         guHud8E4p/UiRys4tiCJ+/AgmBWc7wQafwUsq0WQtzRMDPOh+FLT8kXWu7kZveZGXJEx
-         9Hcw==
-X-Gm-Message-State: AOAM532uRGjhVhitwGOheRNerHdLumpPxBYhE6SAkepBP7AF3I32cf0Y
-        lLOtXhtgWBUFaXEfXrWODYJRk2Hx4RzmRAJrUXGJNK1cHTJNR/hz8oGzE38Pj//kNdWd0rk1b9Z
-        MZ5hNwhgfYAXz
-X-Received: by 2002:adf:d84b:: with SMTP id k11mr9111339wrl.135.1628235115559;
-        Fri, 06 Aug 2021 00:31:55 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxdlvx8qxBMUwmS1NtvHCTtU89EIX8U1VYvVts48XyoDGlCmxjLvN0ZVnYLEfLtdPlwCuIpmw==
-X-Received: by 2002:adf:d84b:: with SMTP id k11mr9111324wrl.135.1628235115424;
-        Fri, 06 Aug 2021 00:31:55 -0700 (PDT)
-Received: from [192.168.3.132] (p5b0c6104.dip0.t-ipconnect.de. [91.12.97.4])
-        by smtp.gmail.com with ESMTPSA id o24sm9843900wmm.37.2021.08.06.00.31.54
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 06 Aug 2021 00:31:55 -0700 (PDT)
-Subject: Re: [PATCH v3 03/14] KVM: s390: pv: leak the ASCE page when destroy
- fails
-To:     Claudio Imbrenda <imbrenda@linux.ibm.com>, kvm@vger.kernel.org
-Cc:     cohuck@redhat.com, borntraeger@de.ibm.com, frankja@linux.ibm.com,
-        thuth@redhat.com, pasic@linux.ibm.com, linux-s390@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Ulrich.Weigand@de.ibm.com
-References: <20210804154046.88552-1-imbrenda@linux.ibm.com>
- <20210804154046.88552-4-imbrenda@linux.ibm.com>
-From:   David Hildenbrand <david@redhat.com>
-Organization: Red Hat
-Message-ID: <6b75cc71-b996-cf3d-ce57-dbcd475ebc3a@redhat.com>
-Date:   Fri, 6 Aug 2021 09:31:54 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.11.0
-MIME-Version: 1.0
-In-Reply-To: <20210804154046.88552-4-imbrenda@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+        id S243644AbhHFH3a (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 6 Aug 2021 03:29:30 -0400
+Received: from mga05.intel.com ([192.55.52.43]:16349 "EHLO mga05.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S243626AbhHFH31 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 6 Aug 2021 03:29:27 -0400
+X-IronPort-AV: E=McAfee;i="6200,9189,10067"; a="299913729"
+X-IronPort-AV: E=Sophos;i="5.84,299,1620716400"; 
+   d="scan'208";a="299913729"
+Received: from fmsmga003.fm.intel.com ([10.253.24.29])
+  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Aug 2021 00:29:11 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.84,299,1620716400"; 
+   d="scan'208";a="513102278"
+Received: from michael-optiplex-9020.sh.intel.com ([10.239.159.182])
+  by FMSMGA003.fm.intel.com with ESMTP; 06 Aug 2021 00:29:08 -0700
+From:   Yang Weijiang <weijiang.yang@intel.com>
+To:     pbonzini@redhat.com, jmattson@google.com, seanjc@google.com,
+        vkuznets@redhat.com, wei.w.wang@intel.com, like.xu.linux@gmail.com,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc:     root <root@984fee009f2b.jf.intel.com>
+Subject: [PATCH v7 00/15] Introduce Architectural LBR for vPMU
+Date:   Fri,  6 Aug 2021 15:42:10 +0800
+Message-Id: <1628235745-26566-1-git-send-email-weijiang.yang@intel.com>
+X-Mailer: git-send-email 2.7.4
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 04.08.21 17:40, Claudio Imbrenda wrote:
-> When a protected VM is created, the topmost level of page tables of its
-> ASCE is marked by the Ultravisor; any attempt to use that memory for
-> protected virtualization will result in failure.
-> 
-> Only a successful Destroy Configuration UVC will remove the marking.
-> 
-> When the Destroy Configuration UVC fails, the topmost level of page
-> tables of the VM does not get its marking cleared; to avoid issues it
-> must not be used again.
-> 
-> Since the page becomes in practice unusable, we set it aside and leak it.
+From: root <root@984fee009f2b.jf.intel.com>
 
-Instead of leaking, can't we add it to some list and try again later? Or 
-do we only expect permanent errors?
+The Architectural Last Branch Records (LBRs) is published in the 319433-040
+release of Intel Architecture Instruction Set Extensions and Future Features
+Programming Reference[0].
 
-Also, we really should bail out loud (pr_warn) to tell the admin that 
-something really nasty is going on.
+The main advantages of Arch LBR are [1]:
+- Faster context switching due to XSAVES support and faster reset of
+  LBR MSRs via the new DEPTH MSR
+- Faster LBR read for a non-PEBS event due to XSAVES support, which
+  lowers the overhead of the NMI handler.
+- Linux kernel can support the LBR features without knowing the model
+  number of the current CPU.
+
+From end user's point of view, the usage of Arch LBR is the same as
+the Legacy LBR that has been merged in the mainline.
+
+Note, there's one limitations for current guest Arch LBR implementation:
+Guest can only use the same LBR record depth as host, this is due to
+the special behavior of MSR_ARCH_LBR_DEPTH: a) On write to the MSR,
+it'll reset all Arch LBR recording MSRs to 0s. b) XRSTORS will reset all
+recording MSRs to 0s if the saved depth mismatches MSR_ARCH_LBR_DEPTH.
+
+But this limitation won't impact guest perf tool usage.
+
+[0] https://software.intel.com/content/www/us/en/develop/download/intel-architecture-instruction-set-extensions-and-future-features-programming-reference.html
+[1] https://lore.kernel.org/lkml/1593780569-62993-1-git-send-email-kan.liang@linux.intel.com/
+
+
+Previous version:
+v6: https://lkml.kernel.org/kvm/1626425406-18582-1-git-send-email-weijiang.yang@intel.com/
+
+Changes in v7:
+1. Added fix patch for nested VM entry failure issue, also fix warnings from reported from L1.
+2. Added patches to flip LBREn bit upon guest state changes, e.g., on #SMI, #DB, warm reset.
+3. Added kvm unit-test application for Arch LBR.
+4. Rebased v6 patches to kernel v5.14-rc4.
+
+
+Like Xu (6):
+  perf/x86/intel: Fix the comment about guest LBR support on KVM
+  perf/x86/lbr: Simplify the exposure check for the LBR_INFO registers
+  KVM: vmx/pmu: Emulate MSR_ARCH_LBR_DEPTH for guest Arch LBR
+  KVM: vmx/pmu: Emulate MSR_ARCH_LBR_CTL for guest Arch LBR
+  KVM: x86: Refine the matching and clearing logic for supported_xss
+  KVM: x86: Add XSAVE Support for Architectural LBR
+
+Sean Christopherson (1):
+  KVM: x86: Report XSS as an MSR to be saved if there are supported
+    features
+
+Yang Weijiang (8):
+  KVM: x86: Add Arch LBR MSRs to msrs_to_save_all list
+  KVM: x86/pmu: Refactor code to support guest Arch LBR
+  KVM: x86: Refresh CPUID on writes to MSR_IA32_XSS
+  KVM: x86/vmx: Check Arch LBR config when return perf capabilities
+  KVM: nVMX: Add necessary Arch LBR settings for nested VM
+  KVM: x86/vmx: Clear Arch LBREn bit before inject #DB to guest
+  KVM: x86/vmx: Flip Arch LBREn bit on guest state change
+  KVM: x86/cpuid: Advise Arch LBR feature in CPUID
+
+ arch/x86/events/intel/core.c     |   3 +-
+ arch/x86/events/intel/lbr.c      |   6 +-
+ arch/x86/include/asm/kvm_host.h  |   1 +
+ arch/x86/include/asm/msr-index.h |   1 +
+ arch/x86/include/asm/vmx.h       |   4 +
+ arch/x86/kvm/cpuid.c             |  54 +++++++++++++-
+ arch/x86/kvm/vmx/capabilities.h  |  25 +++++--
+ arch/x86/kvm/vmx/nested.c        |   6 +-
+ arch/x86/kvm/vmx/pmu_intel.c     | 122 +++++++++++++++++++++++++++----
+ arch/x86/kvm/vmx/vmcs12.c        |   1 +
+ arch/x86/kvm/vmx/vmcs12.h        |   3 +-
+ arch/x86/kvm/vmx/vmx.c           |  54 ++++++++++++--
+ arch/x86/kvm/x86.c               |  24 +++++-
+ 13 files changed, 261 insertions(+), 43 deletions(-)
 
 -- 
-Thanks,
-
-David / dhildenb
+2.25.1
 
