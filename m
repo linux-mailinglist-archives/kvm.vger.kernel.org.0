@@ -2,44 +2,44 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4BB583E35A5
-	for <lists+kvm@lfdr.de>; Sat,  7 Aug 2021 15:50:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 360213E35A8
+	for <lists+kvm@lfdr.de>; Sat,  7 Aug 2021 15:50:18 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232477AbhHGNuM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 7 Aug 2021 09:50:12 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:27507 "EHLO
+        id S232540AbhHGNuQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 7 Aug 2021 09:50:16 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:21157 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232382AbhHGNuF (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Sat, 7 Aug 2021 09:50:05 -0400
+        by vger.kernel.org with ESMTP id S232408AbhHGNuI (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Sat, 7 Aug 2021 09:50:08 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1628344187;
+        s=mimecast20190719; t=1628344190;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=iuqVLpvS2t/MK2CdiO4Y+MO6qExINTrTjzjoNQbAE38=;
-        b=Jff6SNcWFLW9nYwLd7lE+NVaguirdd4ionyDc5Evan+j3SOwg0etD5FS7dctApmuL6ilUb
-        ZBwKlL9OR/0hsCbbITulncUtOVd5sz2AIuFaMK186mkqAUetPdvaGrP/eHT1XPZezihBCO
-        YW/DaAybViFlqaOoLqfkV326LtBcc+8=
+        bh=jVGcFAzulOYWC1/vN+ITFpFYZSvJDdcnfWhluCdbHT4=;
+        b=Om+UY2fNF7hS5bSdxMK+BCybqV/W0JN4uBZOtukI0Ynia3N+EXdZtvSoWfr7PaLY8Gt1zD
+        K6IdjILRrhOP4ffYJwWDVuK13v3Ia1O8WJaclUd6G0V8EvZTBM6+G7FV/A1KKuqC2OWHsP
+        1BtchDpRKpUW417a1xruymYQIP9+6Ps=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-80-MSroy0OUPES1PBHdwbxVzg-1; Sat, 07 Aug 2021 09:49:46 -0400
-X-MC-Unique: MSroy0OUPES1PBHdwbxVzg-1
+ us-mta-497-YfQrxdK_Mpazd9DjZSaEew-1; Sat, 07 Aug 2021 09:49:47 -0400
+X-MC-Unique: YfQrxdK_Mpazd9DjZSaEew-1
 Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3C0B9801AC0;
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D5AEA760C1;
         Sat,  7 Aug 2021 13:49:45 +0000 (UTC)
 Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 78F3E1700F;
-        Sat,  7 Aug 2021 13:49:44 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 55A511700F;
+        Sat,  7 Aug 2021 13:49:45 +0000 (UTC)
 From:   Paolo Bonzini <pbonzini@redhat.com>
 To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
 Cc:     isaku.yamahata@intel.com, David Matlack <dmatlack@google.com>,
         seanjc@google.com, peterx@redhat.com
-Subject: [PATCH 05/16] KVM: MMU: change direct_page_fault() arguments to kvm_page_fault
-Date:   Sat,  7 Aug 2021 09:49:25 -0400
-Message-Id: <20210807134936.3083984-6-pbonzini@redhat.com>
+Subject: [PATCH 06/16] KVM: MMU: change page_fault_handle_page_track() arguments to kvm_page_fault
+Date:   Sat,  7 Aug 2021 09:49:26 -0400
+Message-Id: <20210807134936.3083984-7-pbonzini@redhat.com>
 In-Reply-To: <20210807134936.3083984-1-pbonzini@redhat.com>
 References: <20210807134936.3083984-1-pbonzini@redhat.com>
 MIME-Version: 1.0
@@ -49,174 +49,121 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Add fields to struct kvm_page_fault corresponding to
-the arguments of direct_page_fault().  The fields are
-initialized in the callers, and direct_page_fault()
-receives a struct kvm_page_fault instead of having to
-extract the arguments out of it.
-
-Also adjust FNAME(page_fault) to store the max_level in
-struct kvm_page_fault, to keep it similar to the direct
-map path.
+Add fields to struct kvm_page_fault corresponding to the arguments
+of page_fault_handle_page_track().  The fields are initialized in the
+callers, and page_fault_handle_page_track() receives a struct
+kvm_page_fault instead of having to extract the arguments out of it.
 
 Suggested-by: Isaku Yamahata <isaku.yamahata@intel.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- arch/x86/kvm/mmu.h             |  5 ++++
- arch/x86/kvm/mmu/mmu.c         | 43 +++++++++++++++-------------------
- arch/x86/kvm/mmu/paging_tmpl.h |  7 +++---
- 3 files changed, 27 insertions(+), 28 deletions(-)
+ arch/x86/kvm/mmu.h             |  3 +++
+ arch/x86/kvm/mmu/mmu.c         | 18 +++++++++---------
+ arch/x86/kvm/mmu/paging_tmpl.h |  7 ++++---
+ 3 files changed, 16 insertions(+), 12 deletions(-)
 
 diff --git a/arch/x86/kvm/mmu.h b/arch/x86/kvm/mmu.h
-index bbe5fe57c2af..158263847bef 100644
+index 158263847bef..c3d404155ceb 100644
 --- a/arch/x86/kvm/mmu.h
 +++ b/arch/x86/kvm/mmu.h
-@@ -129,6 +129,9 @@ struct kvm_page_fault {
+@@ -132,6 +132,9 @@ struct kvm_page_fault {
  
- 	/* Derived from mmu.  */
- 	const bool is_tdp;
+ 	/* Input to FNAME(fetch), __direct_map and kvm_tdp_mmu_map.  */
+ 	u8 max_level;
 +
-+	/* Input to FNAME(fetch), __direct_map and kvm_tdp_mmu_map.  */
-+	u8 max_level;
++	/* Shifted addr, or result of guest page table walk if addr is a gva.  */
++	gfn_t gfn;
  };
  
  int kvm_tdp_page_fault(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault);
-@@ -146,6 +149,8 @@ static inline int kvm_mmu_do_page_fault(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa,
- 		.user = err & PFERR_USER_MASK,
- 		.prefault = prefault,
- 		.is_tdp = likely(vcpu->arch.mmu->page_fault == kvm_tdp_page_fault),
-+
-+		.max_level = KVM_MAX_HUGEPAGE_LEVEL,
- 	};
- #ifdef CONFIG_RETPOLINE
- 	if (fault.is_tdp)
 diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index bb3a2c2aa62e..e93ee0ebe5ff 100644
+index e93ee0ebe5ff..3af49678d4f8 100644
 --- a/arch/x86/kvm/mmu/mmu.c
 +++ b/arch/x86/kvm/mmu/mmu.c
-@@ -3878,11 +3878,11 @@ static bool try_async_pf(struct kvm_vcpu *vcpu, bool prefault, gfn_t gfn,
- 	return false;
+@@ -3788,20 +3788,19 @@ static int handle_mmio_page_fault(struct kvm_vcpu *vcpu, u64 addr, bool direct)
  }
  
--static int direct_page_fault(struct kvm_vcpu *vcpu, gpa_t gpa, u32 error_code,
--			     bool prefault, int max_level, bool is_tdp)
-+static int direct_page_fault(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
+ static bool page_fault_handle_page_track(struct kvm_vcpu *vcpu,
+-					 u32 error_code, gfn_t gfn)
++					 struct kvm_page_fault *fault)
  {
-+	gpa_t gpa = fault->addr;
-+	u32 error_code = fault->error_code;
+-	if (unlikely(error_code & PFERR_RSVD_MASK))
++	if (unlikely(fault->rsvd))
+ 		return false;
+ 
+-	if (!(error_code & PFERR_PRESENT_MASK) ||
+-	      !(error_code & PFERR_WRITE_MASK))
++	if (!fault->present || !fault->write)
+ 		return false;
+ 
+ 	/*
+ 	 * guest is writing the page which is write tracked which can
+ 	 * not be fixed by page fault handler.
+ 	 */
+-	if (kvm_page_track_is_active(vcpu, gfn, KVM_PAGE_TRACK_WRITE))
++	if (kvm_page_track_is_active(vcpu, fault->gfn, KVM_PAGE_TRACK_WRITE))
+ 		return true;
+ 
+ 	return false;
+@@ -3885,13 +3884,13 @@ static int direct_page_fault(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault
  	bool is_tdp_mmu_fault = is_tdp_mmu(vcpu->arch.mmu);
--	bool write = error_code & PFERR_WRITE_MASK;
  	bool map_writable;
  
- 	gfn_t gfn = gpa >> PAGE_SHIFT;
-@@ -3905,11 +3905,11 @@ static int direct_page_fault(struct kvm_vcpu *vcpu, gpa_t gpa, u32 error_code,
+-	gfn_t gfn = gpa >> PAGE_SHIFT;
+ 	unsigned long mmu_seq;
+ 	kvm_pfn_t pfn;
+ 	hva_t hva;
+ 	int r;
+ 
+-	if (page_fault_handle_page_track(vcpu, error_code, gfn))
++	fault->gfn = gpa >> PAGE_SHIFT;
++	if (page_fault_handle_page_track(vcpu, fault))
+ 		return RET_PF_EMULATE;
+ 
+ 	r = fast_page_fault(vcpu, gpa, error_code);
+@@ -3905,11 +3904,12 @@ static int direct_page_fault(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault
  	mmu_seq = vcpu->kvm->mmu_notifier_seq;
  	smp_rmb();
  
--	if (try_async_pf(vcpu, prefault, gfn, gpa, &pfn, &hva,
--			 write, &map_writable))
-+	if (try_async_pf(vcpu, fault->prefault, gfn, gpa, &pfn, &hva,
-+			 fault->write, &map_writable))
+-	if (try_async_pf(vcpu, fault->prefault, gfn, gpa, &pfn, &hva,
++	if (try_async_pf(vcpu, fault->prefault, fault->gfn, gpa, &pfn, &hva,
+ 			 fault->write, &map_writable))
  		return RET_PF_RETRY;
  
--	if (handle_abnormal_pfn(vcpu, is_tdp ? 0 : gpa, gfn, pfn, ACC_ALL, &r))
-+	if (handle_abnormal_pfn(vcpu, fault->is_tdp ? 0 : gpa, gfn, pfn, ACC_ALL, &r))
+-	if (handle_abnormal_pfn(vcpu, fault->is_tdp ? 0 : gpa, gfn, pfn, ACC_ALL, &r))
++	if (handle_abnormal_pfn(vcpu, fault->is_tdp ? 0 : gpa,
++	                        fault->gfn, pfn, ACC_ALL, &r))
  		return r;
  
  	r = RET_PF_RETRY;
-@@ -3926,11 +3926,11 @@ static int direct_page_fault(struct kvm_vcpu *vcpu, gpa_t gpa, u32 error_code,
- 		goto out_unlock;
- 
- 	if (is_tdp_mmu_fault)
--		r = kvm_tdp_mmu_map(vcpu, gpa, error_code, map_writable, max_level,
--				    pfn, prefault);
-+		r = kvm_tdp_mmu_map(vcpu, gpa, error_code, map_writable, fault->max_level,
-+				    pfn, fault->prefault);
- 	else
--		r = __direct_map(vcpu, gpa, error_code, map_writable, max_level, pfn,
--				 prefault, is_tdp);
-+		r = __direct_map(vcpu, gpa, error_code, map_writable, fault->max_level, pfn,
-+				 fault->prefault, fault->is_tdp);
- 
- out_unlock:
- 	if (is_tdp_mmu_fault)
-@@ -3944,12 +3944,11 @@ static int direct_page_fault(struct kvm_vcpu *vcpu, gpa_t gpa, u32 error_code,
- static int nonpaging_page_fault(struct kvm_vcpu *vcpu,
- 				struct kvm_page_fault *fault)
- {
--	pgprintk("%s: gva %lx error %x\n", __func__, gpa, error_code);
-+	pgprintk("%s: gva %lx error %x\n", __func__, fault->addr, fault->error_code);
- 
- 	/* This path builds a PAE pagetable, we can map 2mb pages at maximum. */
--	return direct_page_fault(vcpu, fault->addr,
--				 fault->error_code, fault->prefault,
--				 PG_LEVEL_2M, false);
-+	fault->max_level = PG_LEVEL_2M;
-+	return direct_page_fault(vcpu, fault);
- }
- 
- int kvm_handle_page_fault(struct kvm_vcpu *vcpu, u64 error_code,
-@@ -3987,21 +3986,17 @@ EXPORT_SYMBOL_GPL(kvm_handle_page_fault);
- 
- int kvm_tdp_page_fault(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
- {
--	int max_level;
--	gpa_t gpa = fault->addr;
--
--	for (max_level = KVM_MAX_HUGEPAGE_LEVEL;
--	     max_level > PG_LEVEL_4K;
--	     max_level--) {
--		int page_num = KVM_PAGES_PER_HPAGE(max_level);
--		gfn_t base = (gpa >> PAGE_SHIFT) & ~(page_num - 1);
-+	while (fault->max_level > PG_LEVEL_4K) {
-+		int page_num = KVM_PAGES_PER_HPAGE(fault->max_level);
-+		gfn_t base = (fault->addr >> PAGE_SHIFT) & ~(page_num - 1);
- 
- 		if (kvm_mtrr_check_gfn_range_consistency(vcpu, base, page_num))
- 			break;
-+
-+		--fault->max_level;
- 	}
- 
--	return direct_page_fault(vcpu, gpa, fault->error_code,
--				 fault->prefault, max_level, true);
-+	return direct_page_fault(vcpu, fault);
- }
- 
- static void nonpaging_init_context(struct kvm_mmu *context)
 diff --git a/arch/x86/kvm/mmu/paging_tmpl.h b/arch/x86/kvm/mmu/paging_tmpl.h
-index 916a8106d0f4..5352323646b0 100644
+index 5352323646b0..2ef219bf1745 100644
 --- a/arch/x86/kvm/mmu/paging_tmpl.h
 +++ b/arch/x86/kvm/mmu/paging_tmpl.h
-@@ -832,7 +832,6 @@ static int FNAME(page_fault)(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault
- 	hva_t hva;
- 	unsigned long mmu_seq;
- 	bool map_writable, is_self_change_mapping;
--	int max_level;
+@@ -858,7 +858,8 @@ static int FNAME(page_fault)(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault
+ 		return RET_PF_RETRY;
+ 	}
  
- 	pgprintk("%s: addr %lx err %x\n", __func__, addr, error_code);
- 	WARN_ON_ONCE(fault->is_tdp);
-@@ -874,9 +873,9 @@ static int FNAME(page_fault)(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault
- 	      &walker, fault->user, &vcpu->arch.write_fault_to_shadow_pgtable);
- 
- 	if (is_self_change_mapping)
--		max_level = PG_LEVEL_4K;
-+		fault->max_level = PG_LEVEL_4K;
- 	else
--		max_level = walker.level;
-+		fault->max_level = walker.level;
- 
+-	if (page_fault_handle_page_track(vcpu, error_code, walker.gfn)) {
++	fault->gfn = walker.gfn;
++	if (page_fault_handle_page_track(vcpu, fault)) {
+ 		shadow_page_table_clear_flood(vcpu, addr);
+ 		return RET_PF_EMULATE;
+ 	}
+@@ -880,11 +881,11 @@ static int FNAME(page_fault)(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault
  	mmu_seq = vcpu->kvm->mmu_notifier_seq;
  	smp_rmb();
-@@ -916,7 +915,7 @@ static int FNAME(page_fault)(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault
- 	r = make_mmu_pages_available(vcpu);
- 	if (r)
- 		goto out_unlock;
--	r = FNAME(fetch)(vcpu, addr, &walker, error_code, max_level, pfn,
-+	r = FNAME(fetch)(vcpu, addr, &walker, error_code, fault->max_level, pfn,
- 			 map_writable, fault->prefault);
- 	kvm_mmu_audit(vcpu, AUDIT_POST_PAGE_FAULT);
  
+-	if (try_async_pf(vcpu, fault->prefault, walker.gfn, addr, &pfn, &hva,
++	if (try_async_pf(vcpu, fault->prefault, fault->gfn, addr, &pfn, &hva,
+ 			 fault->write, &map_writable))
+ 		return RET_PF_RETRY;
+ 
+-	if (handle_abnormal_pfn(vcpu, addr, walker.gfn, pfn, walker.pte_access, &r))
++	if (handle_abnormal_pfn(vcpu, addr, fault->gfn, pfn, walker.pte_access, &r))
+ 		return r;
+ 
+ 	/*
 -- 
 2.27.0
 
