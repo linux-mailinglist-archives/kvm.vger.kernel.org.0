@@ -2,338 +2,135 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2BA5B3E3C13
-	for <lists+kvm@lfdr.de>; Sun,  8 Aug 2021 19:50:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 260313E3C80
+	for <lists+kvm@lfdr.de>; Sun,  8 Aug 2021 21:27:15 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232209AbhHHRty (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 8 Aug 2021 13:49:54 -0400
-Received: from mail-bn7nam10on2047.outbound.protection.outlook.com ([40.107.92.47]:61472
-        "EHLO NAM10-BN7-obe.outbound.protection.outlook.com"
+        id S232411AbhHHT11 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 8 Aug 2021 15:27:27 -0400
+Received: from mail-mw2nam12on2086.outbound.protection.outlook.com ([40.107.244.86]:12128
+        "EHLO NAM12-MW2-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S230201AbhHHRtx (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 8 Aug 2021 13:49:53 -0400
+        id S230169AbhHHT11 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 8 Aug 2021 15:27:27 -0400
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=MGXsqCCALNGuB2TRXOVOI8NKPZgC727rE/ADkaulXBBLpmDgzP9MBttTJKW/cz4kh1D/3itMwMl/tsVLAp8z7eZAH68YBKoYGbwZph5uCADeFxWRZK0jJlvRwOLQqERhvIbijv77G1QDzh2jOfSMqV8ObrU7v9T4pAnm8bUj3+i3euhyxx7OtgT7S0GA3nmqjFjAaML8lRCvxhtuIHzgAGaAuXTfbWbHo1EyVD+6ePy2CfvMFEIRpifxxZS5DeFcVgZ/lMnP8CYAFpp/5wHJ9APbWWadu7NGfuVCJ0UcpXF2MlY4TwvLmc0uPaILiZ428GWpWF/Nade2gJIV4u5m/A==
+ b=J4XTeGtAd/Y66RNcg2i3n7QDtPGUmculIJ/OJq1qwObgDRgqu+b64apYXj+5LWEwcHz0tXWW3YNNdOK8AhIDljM0eZc9mkT2i++gzWc4hDIiHot4fpPXMw4p86p2OqGEZ+KR1XEPhUKeqgWnZzdaRaEJctpagl9ZQ8hJatSUM92PrSNNf6fM97UxQk0jVuVmC3yQ79je8+o4900/wsW3GgmRdR5CRSQtY7bPpWZf8ykMNThbRbVMASb0AIwU9p7YfFCTB4WD/v0JB6avsARoc207B/BFhWz6fzotEn07PAGA1zhDaaVsNcJhcN8d0+TLcfcNaaFAFwVxlQYwkHrHxw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=3cTMtJaBhX7icUOCqoBdUJ0qQVM7rpqRYJgEaIC05Yk=;
- b=XzKoWcdCqIT0E+S8BZGuBaJMcIK6RS5XQzzUjlMUwXVktbRkjY6VuG5/eV7egEfQnY+A4r7Mq8vv+8qoTEydJOdclkx02bRcHqRquv0SHMGGQIUASTSYJ3fDstgYxOSVBxzSb+AtaYnSrQ3yfCS+B3O4Yi3Bq6Teh07G1ppftrZEw12/z0dCdnsIF6lfwaUzWG5802pFmvEeAvA46OMrt4SBNi5Zw7AskrhU98zkp1Yl9O5OReZ/nNoglIfFJN/rmwR6n4T5ykOdlTwkOVeHgsitIhfYIM8POqF9x9KOjg5xV0r8ufxc88Xq7EgW/6/YRbE+peZ0K6i0l5IoLAfuVw==
+ bh=ocLw+JiqhsoE5x7GEONPt+/XccfOuFDl5HXQenJ9Q+M=;
+ b=UqUYBK9WH8sLtqNcL2KEwGnbaIwkzhcgROIpx2zVyLtw8qQwqVbjMdL+bHYcecEdilUzu1zxxhIsYBiff+CpMKj9EEtHjD032YRt1/GVhPRSt2omlhO37dPj4i00i2IMsMdTghHFzYgGvuYfkcCHgVQn6E8lV3CQ1q6Kyvhy3PA3gKMaLC7fM4GvT/cgH4YQYXStIMikFndOl/3yBE/+UTl++qL+HN7c0rsCZXoTw9A9bXlqOtgpQQmMqryCbmj/Kk0E6dF56FpC+SJeDbPxUcDtkjCkmgS4458aHQCFd3DOZAYnqrQ+VS8AsdNebwBvAR5mUK3oFjR6mCceBM6AfQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
  header.d=amd.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=3cTMtJaBhX7icUOCqoBdUJ0qQVM7rpqRYJgEaIC05Yk=;
- b=rldereBx8hhFbXI9iPHc1C6O+UyhWVd+BVqtakuNemMywafm8cPN2hTXayGn9Kqy36hG6XWH1J7Y+uvldK2uG3ITFQf5Af4I7tYIfFLakq08RAOJ3ZR3gfPelyT3Co/7fUCFHe2gBTBBoq/iG6OntExKWJEh/HgxI+0GeOc0qDY=
-Authentication-Results: zytor.com; dkim=none (message not signed)
- header.d=none;zytor.com; dmarc=none action=none header.from=amd.com;
+ bh=ocLw+JiqhsoE5x7GEONPt+/XccfOuFDl5HXQenJ9Q+M=;
+ b=AVi9W0MH2Dp2qyWTQp5MHVa6zrHv1AQFOxCDsYtrZWZjEx8KzrRYHRhvddaMOLTIBoFJcSMD6qQeXY3RfIvDFX4MP79b88QhRQIuILK7WoLZRfGg2DZDiiWR5jbQvg511poYdEoMpA7E9eLei4PwlL+B6WtQTe4GnHgHl+aiMkg=
+Authentication-Results: vger.kernel.org; dkim=none (message not signed)
+ header.d=none;vger.kernel.org; dmarc=none action=none header.from=amd.com;
 Received: from DM5PR1201MB0201.namprd12.prod.outlook.com (2603:10b6:4:5b::21)
- by DM6PR12MB3306.namprd12.prod.outlook.com (2603:10b6:5:186::20) with
+ by DM5PR12MB1434.namprd12.prod.outlook.com (2603:10b6:3:77::21) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4394.21; Sun, 8 Aug
- 2021 17:49:30 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4394.17; Sun, 8 Aug
+ 2021 19:27:05 +0000
 Received: from DM5PR1201MB0201.namprd12.prod.outlook.com
  ([fe80::7410:8a22:1bdb:d24d]) by DM5PR1201MB0201.namprd12.prod.outlook.com
  ([fe80::7410:8a22:1bdb:d24d%6]) with mapi id 15.20.4394.022; Sun, 8 Aug 2021
- 17:49:30 +0000
-Subject: Re: [PATCH v1 2/3] KVM: x86: Handle the case of 5-level shadow page
- table
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        pbonzini@redhat.com, vkuznets@redhat.com, wanpengli@tencent.com,
+ 19:27:05 +0000
+From:   Wei Huang <wei.huang2@amd.com>
+To:     kvm@vger.kernel.org
+Cc:     linux-kernel@vger.kernel.org, pbonzini@redhat.com,
+        seanjc@google.com, vkuznets@redhat.com, wanpengli@tencent.com,
         jmattson@google.com, joro@8bytes.org, tglx@linutronix.de,
         mingo@redhat.com, bp@alien8.de, x86@kernel.org, hpa@zytor.com
-References: <20210805205504.2647362-1-wei.huang2@amd.com>
- <20210805205504.2647362-3-wei.huang2@amd.com> <YQ14RmuYxlAydmOu@google.com>
-From:   Wei Huang <wei.huang2@amd.com>
-Message-ID: <60fe6735-9e0b-cd35-0660-a2bcafef2191@amd.com>
-Date:   Sun, 8 Aug 2021 12:49:27 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.11.0
-In-Reply-To: <YQ14RmuYxlAydmOu@google.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
+Subject: [PATCH v2 0/3] SVM 5-level page table support
+Date:   Sun,  8 Aug 2021 14:26:55 -0500
+Message-Id: <20210808192658.2923641-1-wei.huang2@amd.com>
+X-Mailer: git-send-email 2.31.1
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: SA9P223CA0024.NAMP223.PROD.OUTLOOK.COM
- (2603:10b6:806:26::29) To DM5PR1201MB0201.namprd12.prod.outlook.com
- (2603:10b6:4:5b::21)
+Content-Type: text/plain
+X-ClientProxiedBy: SN2PR01CA0082.prod.exchangelabs.com (2603:10b6:800::50) To
+ DM5PR1201MB0201.namprd12.prod.outlook.com (2603:10b6:4:5b::21)
 MIME-Version: 1.0
 X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from [172.31.10.87] (165.204.77.11) by SA9P223CA0024.NAMP223.PROD.OUTLOOK.COM (2603:10b6:806:26::29) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4394.15 via Frontend Transport; Sun, 8 Aug 2021 17:49:29 +0000
+Received: from weiserver.amd.com (165.204.77.1) by SN2PR01CA0082.prod.exchangelabs.com (2603:10b6:800::50) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4394.15 via Frontend Transport; Sun, 8 Aug 2021 19:27:04 +0000
 X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 49cadd92-c101-4030-c7e8-08d95a94df94
-X-MS-TrafficTypeDiagnostic: DM6PR12MB3306:
-X-Microsoft-Antispam-PRVS: <DM6PR12MB330662D600616C979CCDD1A2CFF59@DM6PR12MB3306.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:10000;
+X-MS-Office365-Filtering-Correlation-Id: 9f7bff76-0722-4e21-46f6-08d95aa28189
+X-MS-TrafficTypeDiagnostic: DM5PR12MB1434:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <DM5PR12MB1434BE7411A7E235FF0067C9CFF59@DM5PR12MB1434.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:1332;
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: bKc6DfJKBBzE/IPjf01tE2/z/lWcyj2clgQaejmLnbMrYj7yinZQVl3uy/XqoyRsvL7piDFPRW5ER+F9SEDd1TIKYMB86lv1rqjoLkYWioeWhTID2VJifUn7n2dbJj4/AzUTJFZr6FRWstC/9JMvzhb2tdhXpWf2P4UJFZ/tb0KBfootdDUwokb+e46+8fpnkbi3UneGmuIw86l6tr1us5HyTLzyPRJu3Y/LsZbNSR6wLDdvhz8obWuE1e9MJjl/46h/F8GK2ahMzVQN/M1rWzpvYldCbNbljP1uVyTJQcCfWr1YGzK+2NKhTXGQ976cerLawLMvNN8tk55cTTd1LfewijxQNHSg9KqTEEeqnJakuny4I4LlCm7mpzrqng4q0p3slH6xnDC7ViIEJV4YTA9yONOtGMH7Qv4nFFl99bGukLwKPduuGZt19oE4rBGgg9ptj9WdeBL0UmxcY//cpiNKCwbys4XWxeiO0ClAr971h4l9tbQszsYqaNU+S5a6nFz/mU1ba2JJOBBGfdqphe3nallM5Tqo+GhxPuWzm8nyLqrbuXwIdSD1XgVzWxNfx+7bCvuYKv+KDXzyf8u2Ku6KPykQEO1Q+YkX1G+WUHcFtbVse9YnRjy2EzPaT7POMgX9WXV4mJDaEIbLUshHvISvQeuDLWHGcF0Y6mcAsgs1tL/QfOhzI3VP7j7jAgZ+9x+ewlLV+E/J8m5e3udIb2fCfjbGrXKecJPr2FoEkwL3rUr+ojzpV+C3iP/sZ0CC+B82sm2MB/ZTbKVO63eh6Q==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM5PR1201MB0201.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(376002)(39860400002)(136003)(396003)(346002)(53546011)(31686004)(186003)(5660300002)(316002)(8676002)(52116002)(8936002)(478600001)(26005)(6916009)(16576012)(83380400001)(2616005)(956004)(31696002)(86362001)(38100700002)(6486002)(38350700002)(36756003)(7416002)(66556008)(2906002)(66476007)(66946007)(4326008)(43740500002)(45980500001);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam-Message-Info: gK/Lr6Yo7327I4YTwNfd4d0UoClvuCCRSU1KfjAmJV9P1HTbqcT4z1luvgJnNyf9qbm2j5Qv/rhXQrPpfl9VRIYStsvnYFqsNEO/6UH7Iwuw6cibcHKiugjcW0wDPKJK3/YdGRdZzdqI5ie49srjkuHvUR6n9vtLpOsgJqlPmIn64jxJCw1K9zeXUop/KMmY3OJqusrbhIKlkTKc9gYVjs8rXAvbI6tGu4nzOJzW8Wzf3Omj0J/RFKDhpUyygXwD8eMvNwyyWTna8DJfJMa/63Rigq1g/0QY6qV/HPTLpc/l0adnrNZdKHtoymqJNhz4OPo+s/Ziid4FmSfPK+KMlTF/H586q9uzmXt5PVJ0KLsvIZNXbycDYXHdnkSZk2a4jT30L0uUlr57SNjWsVTmYwu29+WSzbN5exx6yh4zqnB3N/8PaeVXKG1FUReHTFz4AoP08W+a91343ZKiwGIMGVyUoa5WkYxrddMaH1pY1HFJx1/FbjvJaO0RmysM2GsNaWVdtRktPGbZtPTxqC9j7VOnFuVuGvNzdn0u3ZTbLt8sYO6lnk+CnI9uU/iMJqQPcXhvJ7ofPvEIpaPTIBPsz/QHsg/eDRMRMxTqX0JE2LY+GnsB4Ktr7lh0mzfvA+S8meg9c9x9ygevPO5wgRquq+mo5lYiYJ8c0+bDRVI+tqGBxqYiehKYHJ/i5zFlZZfydx3T7RjEfga5o64OWMfF4g==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM5PR1201MB0201.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(376002)(136003)(396003)(346002)(39860400002)(6666004)(186003)(86362001)(83380400001)(4326008)(7416002)(6916009)(5660300002)(1076003)(8676002)(38350700002)(38100700002)(8936002)(66946007)(2616005)(66556008)(66476007)(52116002)(7696005)(956004)(2906002)(316002)(478600001)(6486002)(36756003)(26005);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?YjFQbG12OE41ditWdWsyZm5aeHlTL05zbkJ5VGxiT2kxeFU3NzEycE03Nmlx?=
- =?utf-8?B?WkVpZVZHeGs3NnloaThzQzBqSTk3TWE3YkxRYUM3b2lzTVpjVjFVTDJOaUZT?=
- =?utf-8?B?c1hEbDl6RTZtNysrb00rRy8yTVc4WTgyS1RTNFRsZ2UzeC92MXhZVWF3bnJ2?=
- =?utf-8?B?dUtpdVh3Zkpxa3JUZG5vQWQrd3kzdXlXaHFWWi91eG40Y1ZtT2FnQStkSmpJ?=
- =?utf-8?B?bXk1Y1ZndDdxaDI5MVQ0Rm5HbGY2QURRRG9INmY5V2srYlk3NEpLWnljYTZl?=
- =?utf-8?B?RmtQTkc2bFpmSklYMzZzaXNPOW05dzcvOHpvUDhaZW40S0o4dHFuby9VWkp2?=
- =?utf-8?B?emhYN0lIOHNvcE9aOER6QmgwOFpId2dRWlV0S3V0dUxraVdkV2xGT0VQYmhk?=
- =?utf-8?B?aUZzd2tVaXhTbGhkSEV2RFMyUlY2QVR2TDQ0a1hjNFZSbmNuTGNjdUg4WHRN?=
- =?utf-8?B?dmkrS3NZdWNpc1dqU2FFQks4YjFBWHcvZGhIWDZNSlJLQXVxWEZBMHlFSGFS?=
- =?utf-8?B?RFpTRklkRUU2RzNwWmdaVFd2MFZIUkY1c0RoU0RPSlVYcGJNWVl3VGpxQ2xB?=
- =?utf-8?B?TlZjbVlzdXh0emUzMjhBUVNHTWQ4SlVaelpxeDB2dGt1VXBMV3J2WG9HY2JZ?=
- =?utf-8?B?UTU5UUNldWlTc25kbG03Z3A2WEltNGRvQlYxdUJXT05HYjNRSlF1djNmSFZl?=
- =?utf-8?B?NDBrZFpqbUZyU25OVHo0TFE2b1BrQmEwd3hjYmw0cmRhM1B1K1JtTDZSOGhQ?=
- =?utf-8?B?NTgyQWdwTG1jMTEvNjl2TmZ5TE5XUFhIQ2dQZW1tWjdPYmdZNldIdkFNSVZl?=
- =?utf-8?B?R3NYd3ZoTDc1MXp0dFNCUkpSZ2pxTEo4WFI0TWVkMlZRb1FYRnNWSEUxb0VN?=
- =?utf-8?B?UW1taFRVLzNaQnc1L05UMjhpNmE0ek1hb0h2NG0xcTZ1ZDgyb1pJQmszL3hB?=
- =?utf-8?B?eWpHY0VHeHlrZG93eXprVm9nS3B6UjI5RGZKWXVXdFB4Q0V2V0s1OUZ6cjI4?=
- =?utf-8?B?YVo4MnI5emVMWjFobitERkR6U1JzczAyRm5qMVlrQXQwOThJMCtzd2htWG5x?=
- =?utf-8?B?eW9tbFBmdUNhS2l2Z1VTY1NsNVNPeE41NVY4UnhjSW0yYlBZakVIRlRIcmNU?=
- =?utf-8?B?S2JUcDFWOUpnUW9TN21tNC9rZ1RLakExM2tTTzRtZlhBSk5HUjN3eVdDWVV0?=
- =?utf-8?B?aDNxdythT29jaGo1cldsb2ZscTZxekhYZ2R1VUhPYUcxSGRHR3dGNU1sdDE5?=
- =?utf-8?B?SjVtcU9uZ1E1VHBxT2dqOXNzenlXMUdBcG9kaEY4TGdOMWkwcFdRZnZZU0Ft?=
- =?utf-8?B?RGhHakN4ZmNMZUttODlkSzFPVTZreWhlVUhKZU5SSUV6T3ZPeVhGUE04VExx?=
- =?utf-8?B?dVovMVJ2M0lJRitKaUZzb256SVN0LzNnNG1vWW94QXJncmhXQjNxZlR2ckpF?=
- =?utf-8?B?V3BhM1FiQzdrL0lYTG0xRS8yMzMwYjd1bGU1NG9hY1k0OWNJa3o0K3ZxZWFP?=
- =?utf-8?B?V0Q1VUIxVm10ZlRwVDlZTFczVXdobDFFYVNDYkNlcDYrazRMa0NTY1BjajUw?=
- =?utf-8?B?ZGRzZXVHV3NiTEJ0NmtkSnJNMitUOVBIL2RSMGZlejFRTW9QYlgxT3l6Y0RP?=
- =?utf-8?B?L1VhazhaczRlN1FaNjlXMmlyNlVXd1Z5bGZRWHhFTTRJK1VqNk5VekRuVW5p?=
- =?utf-8?B?cUdWYVpaU3NJMU9oYWQ2MkVVQnJBNU1CdjZ5YVVLemdqTDAxYXViYndOM3M0?=
- =?utf-8?Q?5czbS29p48y31LWlYt3KucmkG0QvXLx+Mgq96J+?=
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?fvWRq3LwO0vS4yFsYWszXjVQZHrgecDmjiXY8HRimkjX+Zz68BkoND373CRS?=
+ =?us-ascii?Q?aaZtnq5kJdzzpxs6h22063sx9CU+FKNBEWtWOwtRQeGcfFo3gWzZjjHI4zJQ?=
+ =?us-ascii?Q?hOcRrKDtm/pztEmWGVcuqZsWwdV5CcqFKTmHXOGliCJyUuKQIsxaOmMElx6j?=
+ =?us-ascii?Q?xuAjyy5yPNQNWv2KUt2dqbHsS61Q6lFAFpVW+UDaleP/RNFL1VS/kME3qwUu?=
+ =?us-ascii?Q?S/gApgrVm+X25JarYCtX0PDicHP/5gdfdmoZ+fgQ8/odVuyGxWJnNLvf/zRQ?=
+ =?us-ascii?Q?cQq/5KTRNfuuhJt+KZh1O4oa4MGfQOycBTUq07CvU+VFIBj9sTRf7ii6rVcj?=
+ =?us-ascii?Q?gXYpzvMIqXNnxSlwmgbqoIKCYZlcC1OKKHlQPKZvWk1LFZoULB0fg7+FsvAD?=
+ =?us-ascii?Q?b3F2FxfDNcv0kLUT+7Jsxzy6INWcV9nF+BziyXnSuOMNcxjWUB6WJqQUh2lM?=
+ =?us-ascii?Q?9+sOEOhOM+f243yn9udrbaeHF4cMt2ItSHvetzrxi7RRCakb5PlZf+d1SStb?=
+ =?us-ascii?Q?OOyFdXLYeH3iYF5/3wbhFaLA/XXEg4M1lI9wRHmYOw9OPKJnHDpQifRbGy9I?=
+ =?us-ascii?Q?vfU9vFAerNmaHyYJP/HgNH/prERgwpR+UobXth8XiTTSh5BwyOv5MF83HsvI?=
+ =?us-ascii?Q?7tFteB/8b48NNMzM88UrwuO575qthsYs0W5quXkucB2eYup/sujxmZV2pJ0t?=
+ =?us-ascii?Q?Gm//+2nX2Ht/KLrZJIxpfp0zIVW5Dz1YggMATEf5n96bZm3RWRbnqmU+NkKl?=
+ =?us-ascii?Q?LXeLkagvbixYrttLqYhgpc+f42AhTqZZ6wEWBHaAglZDRcDwOaqmojOs+Hao?=
+ =?us-ascii?Q?cij0Z/HbG174kkytAQzzvz3mLctI7JzSu+ozb12mNI7LhhLWv8D9mVvimMI1?=
+ =?us-ascii?Q?W/9Qm1PyTTuMmecxRRYCWxhBSyjlAb5Kyn/hFkv+jjju7emqERC//59HiYDC?=
+ =?us-ascii?Q?UhgA8GjhdH6vyAWVi0B8aJlgvReWEmFOStswO0v8V/F+oNqEMyHsjKzMu1K5?=
+ =?us-ascii?Q?5hcgMpP2OTnZQVzGNGRm+VrhjcVAsq2X2blyp+7sbG5sc6lBeC41mnLN6uGE?=
+ =?us-ascii?Q?mk6IYXmebzO5KRCUYMc3C9EACGV/7WLSVKKKwqSaQqdO9A0U7SW+/AFXTSY5?=
+ =?us-ascii?Q?5b7bkFpbAlqXqWAIa3YIyd2q/b9qrAjdW3RNRia4DsligspNrhsL28KSvAzX?=
+ =?us-ascii?Q?fSzerYreGT4OCcYKOT/hxafi1RfLyJoU8cTQIeq7zZbVgibA1ZGG746HsS12?=
+ =?us-ascii?Q?eK9gc7MKAq+N7AfEu3KCxtMVaUIIOpUhGUsQrQVm6mCflGMbabdXpBsxWiEG?=
+ =?us-ascii?Q?cERs9aiZgLSqvMk3t6nCCIhu?=
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 49cadd92-c101-4030-c7e8-08d95a94df94
+X-MS-Exchange-CrossTenant-Network-Message-Id: 9f7bff76-0722-4e21-46f6-08d95aa28189
 X-MS-Exchange-CrossTenant-AuthSource: DM5PR1201MB0201.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Aug 2021 17:49:30.5103
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Aug 2021 19:27:05.5884
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: ntnCMbQLQMYfAlC1Er3WgDse4j7i8JD9sctjjSQKRIpOW2eA4N8qVbTcgJCrZHuj
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB3306
+X-MS-Exchange-CrossTenant-UserPrincipalName: X7GSW0SIvo+Qywzc6KrRsOnITxH+r8EWJTu+zB0NVxgiZSCtI6j/fVBHqMwcvVZg
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM5PR12MB1434
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+This patch set adds 5-level page table support for AMD SVM. When the
+5-level page table is enabled on host OS, the nested page table for guest
+VMs will use the same format as host OS (i.e. 5-level NPT). These patches
+were tested with various combination of different settings and test cases
+(nested/regular VMs, AMD64/i686 kernels, kvm-unit-tests, etc.)
 
+v1->v2:
+ * Remove v1's arch-specific get_tdp_level() and add a new parameter,
+   tdp_forced_root_level, to allow forced TDP level (Sean)
+ * Add additional comment on tdp_root table chaining trick and change the
+   PML root table allocation code (Sean)
+ * Revise Patch 1's commit msg (Sean and Jim)
 
-On 8/6/21 12:58 PM, Sean Christopherson wrote:
-> On Thu, Aug 05, 2021, Wei Huang wrote:
->> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
->> index 44e4561e41f5..b162c3e530aa 100644
->> --- a/arch/x86/kvm/mmu/mmu.c
->> +++ b/arch/x86/kvm/mmu/mmu.c
->> @@ -3428,7 +3428,7 @@ static int mmu_alloc_shadow_roots(struct kvm_vcpu *vcpu)
->>   	 * the shadow page table may be a PAE or a long mode page table.
->>   	 */
->>   	pm_mask = PT_PRESENT_MASK | shadow_me_mask;
->> -	if (mmu->shadow_root_level == PT64_ROOT_4LEVEL) {
->> +	if (mmu->shadow_root_level >= PT64_ROOT_4LEVEL) {
->>   		pm_mask |= PT_ACCESSED_MASK | PT_WRITABLE_MASK | PT_USER_MASK;
->>   
->>   		if (WARN_ON_ONCE(!mmu->pml4_root)) {
->> @@ -3454,11 +3454,17 @@ static int mmu_alloc_shadow_roots(struct kvm_vcpu *vcpu)
->>   				      PT32_ROOT_LEVEL, false);
->>   		mmu->pae_root[i] = root | pm_mask;
->>   	}
->> +	mmu->root_hpa = __pa(mmu->pae_root);
->>   
->> -	if (mmu->shadow_root_level == PT64_ROOT_4LEVEL)
->> +	if (mmu->shadow_root_level >= PT64_ROOT_4LEVEL) {
->> +		mmu->pml4_root[0] = mmu->root_hpa | pm_mask;
->>   		mmu->root_hpa = __pa(mmu->pml4_root);
->> -	else
->> -		mmu->root_hpa = __pa(mmu->pae_root);
->> +	}
->> +
->> +	if (mmu->shadow_root_level == PT64_ROOT_5LEVEL) {
->> +		mmu->pml5_root[0] = mmu->root_hpa | pm_mask;
->> +		mmu->root_hpa = __pa(mmu->pml5_root);
->> +	}
-> 
-> Ouch, the root_hpa chaining is subtle.  That's my fault :-)  I think it would be
-> better to explicitly chain pae->pml4->pml5?  E.g.
-> 
-> 	if (mmu->shadow_root_level >= PT64_ROOT_4LEVEL) {
-> 		mmu->pml4_root[0] = __pa(mmu->pae_root) | pm_mask;
-> 
-> 		if (mmu->shadow_root_level == PT64_ROOT_5LEVEL) {
-> 			mmu->pml5_root[0] = __pa(mmu->pml4_root) | pm_mask;
-> 			mmu->root_hpa = __pa(mmu->pml5_root);
-> 		} else {
-> 			mmu->root_hpa = __pa(mmu->pml4_root);
-> 		}
-> 	} else {
-> 		mmu->root_hpa = __pa(mmu->pae_root);
-> 	}
-> 
-> It'd require more churn if we get to 6-level paging, but that's a risk I'm willing
-> to take ;-)
-> 
+Thanks,
+-Wei
 
-Thanks for the review. This part of code is indeed subtle. The chaining 
-trick will be easier to understand with a proper explanation. My 
-proposal is to keep the original approach, but add more comments to this 
-group of code.
+Wei Huang (3):
+  KVM: x86: Allow CPU to force vendor-specific TDP level
+  KVM: x86: Handle the case of 5-level shadow page table
+  KVM: SVM: Add 5-level page table support for SVM
 
-       /* 
- 
+ arch/x86/include/asm/kvm_host.h |  6 ++--
+ arch/x86/kvm/mmu/mmu.c          | 58 ++++++++++++++++++++++-----------
+ arch/x86/kvm/svm/svm.c          | 13 ++++----
+ arch/x86/kvm/vmx/vmx.c          |  3 +-
+ 4 files changed, 50 insertions(+), 30 deletions(-)
 
-        * Depending on the shadow_root_level, build the root_hpa table 
-by 
+-- 
+2.31.1
 
-        * chaining either pml5->pml4->pae or pml4->pae. 
- 
-
-        */
-       mmu->root_hpa = __pa(mmu->pae_root);
-       if (mmu->shadow_root_level >= PT64_ROOT_4LEVEL) {
-               mmu->pml4_root[0] = mmu->root_hpa | pm_mask;
-               mmu->root_hpa = __pa(mmu->pml4_root);
-       }
-       if (mmu->shadow_root_level == PT64_ROOT_5LEVEL) {
-               mmu->pml5_root[0] = mmu->root_hpa | pm_mask;
-               mmu->root_hpa = __pa(mmu->pml5_root);
-       }
-
-This code will be easy to extend for 6-level page table (if needed) in 
-the future.
-
->>   
->>   set_root_pgd:
->>   	mmu->root_pgd = root_pgd;
->> @@ -3471,7 +3477,7 @@ static int mmu_alloc_shadow_roots(struct kvm_vcpu *vcpu)
->>   static int mmu_alloc_special_roots(struct kvm_vcpu *vcpu)
->>   {
->>   	struct kvm_mmu *mmu = vcpu->arch.mmu;
->> -	u64 *pml4_root, *pae_root;
->> +	u64 *pml5_root, *pml4_root, *pae_root;
->>   
->>   	/*
->>   	 * When shadowing 32-bit or PAE NPT with 64-bit NPT, the PML4 and PDP
->> @@ -3487,17 +3493,18 @@ static int mmu_alloc_special_roots(struct kvm_vcpu *vcpu)
->>   	 * This mess only works with 4-level paging and needs to be updated to
->>   	 * work with 5-level paging.
->>   	 */
->> -	if (WARN_ON_ONCE(mmu->shadow_root_level != PT64_ROOT_4LEVEL))
->> +	if (WARN_ON_ONCE(mmu->shadow_root_level < PT64_ROOT_4LEVEL)) {
-> 
-> This is amusingly wrong.  The check above this is:
-> 
-> 	if (mmu->direct_map || mmu->root_level >= PT64_ROOT_4LEVEL ||
-> 	    mmu->shadow_root_level < PT64_ROOT_4LEVEL)  <--------
-> 		return 0;
-> 
-> meaning this is dead code.  It should simply deleted.  If we reaaaaaly wanted to
-> future proof the code, we could do:
-> 
-> 	if (WARN_ON_ONCE(mmu->shadow_root_level > PT64_ROOT_5LEVEL)
-> 		return -EIO;
-> 
-> but at that point we're looking at a completely different architecture, so I don't
-> think we need to be that paranoid :-)
-
-You are right that this can be removed.
-
-> 
->>   		return -EIO;
->> +	}
->>   
->> -	if (mmu->pae_root && mmu->pml4_root)
->> +	if (mmu->pae_root && mmu->pml4_root && mmu->pml5_root)
->>   		return 0;
->>   
->>   	/*
->>   	 * The special roots should always be allocated in concert.  Yell and
->>   	 * bail if KVM ends up in a state where only one of the roots is valid.
->>   	 */
->> -	if (WARN_ON_ONCE(!tdp_enabled || mmu->pae_root || mmu->pml4_root))
->> +	if (WARN_ON_ONCE(!tdp_enabled || mmu->pae_root || mmu->pml4_root || mmu->pml5_root))
->>   		return -EIO;
->>   
->>   	/*
->> @@ -3506,18 +3513,30 @@ static int mmu_alloc_special_roots(struct kvm_vcpu *vcpu)
->>   	 */
->>   	pae_root = (void *)get_zeroed_page(GFP_KERNEL_ACCOUNT);
->>   	if (!pae_root)
->> -		return -ENOMEM;
->> +		goto err_out;
-> 
-> Branching to the error handling here is silly, it's the first allocation.
-> 
->>   
->>   	pml4_root = (void *)get_zeroed_page(GFP_KERNEL_ACCOUNT);
->> -	if (!pml4_root) {
->> -		free_page((unsigned long)pae_root);
->> -		return -ENOMEM;
->> -	}
->> +	if (!pml4_root)
->> +		goto err_out;
->> +
->> +	pml5_root = (void *)get_zeroed_page(GFP_KERNEL_ACCOUNT);
-> 
-> This should be guarded by "mmu->shadow_root_level > PT64_ROOT_4LEVEL", there's no
-> need to waste a page on PML5 if it can't exist.
-
-Will do
-
-> 
->> +	if (!pml5_root)
->> +		goto err_out;
->>   
->>   	mmu->pae_root = pae_root;
->>   	mmu->pml4_root = pml4_root;
->> +	mmu->pml5_root = pml5_root;
->>   
->>   	return 0;
->> +err_out:
->> +	if (pae_root)
->> +		free_page((unsigned long)pae_root);
->> +	if (pml4_root)
->> +		free_page((unsigned long)pml4_root);
->> +	if (pml5_root)
->> +		free_page((unsigned long)pml5_root);
-> 
-> This is flawed as failure to allocate pml4_root will consume an uninitialized
-> pml5_root.  There's also no need to check for non-NULL values as free_page plays
-> nice with NULL pointers.
-> 
-> If you drop the unnecessary goto for pae_root allocation failure, than this can
-> become:
-> 
-> err_out:
-> 	free_page((unsigned long)pml4_root);
-> 	free_page((unsigned long)pae_root);
-> 
-> since pml4_root will be NULL if pml4_root allocation failures.  IMO that's
-> unnecessarily clever though, and a more standard:
-> 
-> err_pml5:
-> 	free_page((unsigned long)pml4_root);
-> err_pml4:
-> 	free_page((unsigned long)pae_root);
-> 	return -ENOMEM;
-> 
-> would be far easier to read/maintain.
-> 
-
-I will take the advice for this part of code.
-
->> +
->> +	return -ENOMEM;
->>   }
->>   
->>   void kvm_mmu_sync_roots(struct kvm_vcpu *vcpu)
->> @@ -5320,6 +5339,7 @@ static void free_mmu_pages(struct kvm_mmu *mmu)
->>   		set_memory_encrypted((unsigned long)mmu->pae_root, 1);
->>   	free_page((unsigned long)mmu->pae_root);
->>   	free_page((unsigned long)mmu->pml4_root);
->> +	free_page((unsigned long)mmu->pml5_root);
->>   }
->>   
->>   static int __kvm_mmu_create(struct kvm_vcpu *vcpu, struct kvm_mmu *mmu)
->> -- 
->> 2.31.1
->>
