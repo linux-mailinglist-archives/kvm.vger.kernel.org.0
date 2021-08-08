@@ -2,212 +2,143 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6373C3E35D9
-	for <lists+kvm@lfdr.de>; Sat,  7 Aug 2021 16:22:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CA1623E39B1
+	for <lists+kvm@lfdr.de>; Sun,  8 Aug 2021 10:54:53 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232397AbhHGOXG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 7 Aug 2021 10:23:06 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:48289 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232313AbhHGOXF (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Sat, 7 Aug 2021 10:23:05 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1628346167;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=Mn88nB2Mn33WML8Ivc2xsRfSzqG9DRPUmQ//XqF85LY=;
-        b=Yj1vx2uoaBm3g1ex3Xcwu9jj1DYp63yHhAP1aIWCZHrqvl1WYQLXdp2NMrL7BY1JQrK1E2
-        +5WvQn5VJ3VQ22L/+vflaHugrtQZ4CrJsQs5oTgQqbB8mYK95vHYtJr8kjDM8wPMQVh2gg
-        N5UV/bs7PZGX4PkkNMiAxvxv01cZ0Ic=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-153-UIfdWls6O5-ASsNY-O66YQ-1; Sat, 07 Aug 2021 10:22:46 -0400
-X-MC-Unique: UIfdWls6O5-ASsNY-O66YQ-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B36B9180FCBC;
-        Sat,  7 Aug 2021 14:22:44 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-112-12.ams2.redhat.com [10.36.112.12])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 8C51C5D6AD;
-        Sat,  7 Aug 2021 14:22:43 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
-        id 23B8711380A0; Sat,  7 Aug 2021 16:22:42 +0200 (CEST)
-From:   Markus Armbruster <armbru@redhat.com>
-To:     Valeriy Vdovin <valeriy.vdovin@virtuozzo.com>
-Cc:     qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>,
-        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-        Eric Blake <eblake@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Marcelo Tosatti <mtosatti@redhat.com>,
-        Richard Henderson <richard.henderson@linaro.org>,
-        Thomas Huth <thuth@redhat.com>,
-        Laurent Vivier <lvivier@redhat.com>, kvm@vger.kernel.org,
-        Denis Lunev <den@openvz.org>,
-        Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Subject: Re: [PATCH v12] qapi: introduce 'query-x86-cpuid' QMP command.
-References: <20210728125402.2496-1-valeriy.vdovin@virtuozzo.com>
-Date:   Sat, 07 Aug 2021 16:22:42 +0200
-In-Reply-To: <20210728125402.2496-1-valeriy.vdovin@virtuozzo.com> (Valeriy
-        Vdovin's message of "Wed, 28 Jul 2021 15:54:02 +0300")
-Message-ID: <87eeb59vwt.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/27.2 (gnu/linux)
+        id S231202AbhHHIzK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 8 Aug 2021 04:55:10 -0400
+Received: from mail-bn1nam07on2089.outbound.protection.outlook.com ([40.107.212.89]:4416
+        "EHLO NAM02-BN1-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S230301AbhHHIzJ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 8 Aug 2021 04:55:09 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=ltAfO6wUtANh+zL/ZQnDO5y8UitwD8XouNNvG9YwJ4bTBcqDgJrHGWeePRK5vFsIJtCiXvtWw3MxdV7H/gSyk7JQ9aSUIdJulckFAFTTfoOGyJub7L2pJO2GweyzMCe1DwD6K5YP4gP1oCJEYJULwflEu+sidxINvMHwYLmSnQuNPusgJ2KkZdoxbuA8Lq+nqx/Ncfydlq+/6C9xsAyfSnmvP+HKj5ufXn3VCKUOogRdOC0LWybnK3876XfDAMhxNuYRfIcsj77vS/oq52uKrBmK+rCv1Iu46K9da23gT9m9FhwlGTM5nsRNJU9xNurW+GTojzCQeEPbP4f+HNyzsQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=L/RGAJknooE9Djhl97guu1XK/xCdaQ/XCwgF7v9kTkA=;
+ b=AIQUAoyBC+oUGEftsdtvwQEa6CV1ffIi2uhI0N/u7n3vKppZf9W1m8zH7ZEUHaf0Ds6Jqdt7y2PZUUMYSFMXixMM82J8gLXbu8HsRmG6gv2vo0taf4fNeSlFkX29BaM4+6owYiTPGKLWwzTEcRS1sKZ9gFvbcEWJQfFxOfl4jo0a6K11dzDfJjntmbZ1wCZ3IHf1bJj6f/WvpgnkjLk/XUsym1CNaB+ewDVict1kt5/2HrvAMQTyBNBSizWu6OWEDDMw6Hu57Xt+a7VXjUKexHUB/s7hmQzPZvc/BVTvEF4Il58lxYix1QUbiNXeConVlb1xzC5GvmmVuJVm65Ms+g==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.112.34) smtp.rcpttodomain=linux.ibm.com smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=quarantine sp=none pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=L/RGAJknooE9Djhl97guu1XK/xCdaQ/XCwgF7v9kTkA=;
+ b=jtelv8o7qEr51w+a8U9gdOYQ/UQrZJ7nMjCymzk68G7Z05z3l4OOJW2P8EIbTeGC7t9brKONoT7fS+9CfjbWtig+PgJwxYOwUA44sLITwnccYdjcenb4kXsbMnQZB9nAh4OoG5ggYhZUSfQU8Ii0q7hg0F3kp3sX98odaC2iQS5Vg/jqH06G9U6PhX3As6mYm4Ee2T4O8wSxad0TChJaSq3Z/rk7r2hjiHejTisHLH0293efaoBlUj/Qb5/2LIekDKTrJwGDGTQYSp7XV2xKn/80OFoBrM3xSbngjEXEhmIHJ9I6vzPD60udrs7IS4tZfxwmvgIGXfROY8TmgyrASQ==
+Received: from DM6PR07CA0058.namprd07.prod.outlook.com (2603:10b6:5:74::35) by
+ DM5PR12MB2519.namprd12.prod.outlook.com (2603:10b6:4:b5::22) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.4394.21; Sun, 8 Aug 2021 08:54:48 +0000
+Received: from DM6NAM11FT064.eop-nam11.prod.protection.outlook.com
+ (2603:10b6:5:74:cafe::70) by DM6PR07CA0058.outlook.office365.com
+ (2603:10b6:5:74::35) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4394.16 via Frontend
+ Transport; Sun, 8 Aug 2021 08:54:48 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.112.34)
+ smtp.mailfrom=nvidia.com; linux.ibm.com; dkim=none (message not signed)
+ header.d=none;linux.ibm.com; dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.112.34 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.112.34; helo=mail.nvidia.com;
+Received: from mail.nvidia.com (216.228.112.34) by
+ DM6NAM11FT064.mail.protection.outlook.com (10.13.172.234) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
+ 15.20.4394.16 via Frontend Transport; Sun, 8 Aug 2021 08:54:47 +0000
+Received: from [172.27.14.153] (172.20.187.6) by HQMAIL107.nvidia.com
+ (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1497.2; Sun, 8 Aug
+ 2021 08:54:36 +0000
+Subject: Re: [PATCH v4 01/14] vfio/samples: Remove module get/put
+To:     Jason Gunthorpe <jgg@nvidia.com>, David Airlie <airlied@linux.ie>,
+        "Tony Krowiak" <akrowiak@linux.ibm.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        "Daniel Vetter" <daniel@ffwll.ch>,
+        Diana Craciun <diana.craciun@oss.nxp.com>,
+        <dri-devel@lists.freedesktop.org>,
+        Eric Auger <eric.auger@redhat.com>,
+        "Eric Farman" <farman@linux.ibm.com>,
+        Harald Freudenberger <freude@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        <intel-gfx@lists.freedesktop.org>,
+        <intel-gvt-dev@lists.freedesktop.org>,
+        Jani Nikula <jani.nikula@linux.intel.com>,
+        Jason Herne <jjherne@linux.ibm.com>,
+        Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
+        <kvm@vger.kernel.org>, Kirti Wankhede <kwankhede@nvidia.com>,
+        <linux-doc@vger.kernel.org>, <linux-s390@vger.kernel.org>,
+        Matthew Rosato <mjrosato@linux.ibm.com>,
+        Peter Oberparleiter <oberpar@linux.ibm.com>,
+        "Halil Pasic" <pasic@linux.ibm.com>,
+        Rodrigo Vivi <rodrigo.vivi@intel.com>,
+        "Vineeth Vijayan" <vneethv@linux.ibm.com>,
+        Zhi Wang <zhi.a.wang@intel.com>
+CC:     "Raj, Ashok" <ashok.raj@intel.com>, Christoph Hellwig <hch@lst.de>,
+        "Leon Romanovsky" <leonro@nvidia.com>,
+        Yishai Hadas <yishaih@nvidia.com>,
+        "Zhenyu Wang" <zhenyuw@linux.intel.com>
+References: <1-v4-9ea22c5e6afb+1adf-vfio_reflck_jgg@nvidia.com>
+From:   Max Gurtovoy <mgurtovoy@nvidia.com>
+Message-ID: <a5fc93a0-4634-d0aa-8b4c-0dc28b1459d5@nvidia.com>
+Date:   Sun, 8 Aug 2021 11:54:29 +0300
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.12.0
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+In-Reply-To: <1-v4-9ea22c5e6afb+1adf-vfio_reflck_jgg@nvidia.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+X-Originating-IP: [172.20.187.6]
+X-ClientProxiedBy: HQMAIL101.nvidia.com (172.20.187.10) To
+ HQMAIL107.nvidia.com (172.20.187.13)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: cd05e1ac-103b-44ad-f4b0-08d95a4a2d08
+X-MS-TrafficTypeDiagnostic: DM5PR12MB2519:
+X-Microsoft-Antispam-PRVS: <DM5PR12MB251973393625C9941809DC86DEF59@DM5PR12MB2519.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:2887;
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: HMlVj7ZIwwFIMUcH2+f0d0OXjAUrrhiU3h94vgUvO2v7qAA/YfrcsQqC+1zln3SrU/ouSVNwC7V2i9y70Uo4Gcek1w1enXHzjk0LP6FFcJ75tPvKFIuzEXS0KSMuxkGQC2AKWEFOsPfdsYmfVQoGdXBIhEjtPwRppfIs97EPZFpk1DXI/0JeijB3Z9i04zRo4M6yhjaIqQgrkXmzTAV3pwge/ffLEYEQB2A4oJcysiInetbWj3o3Mez029RuNINaMflxQtA+vdczf878zVNwuLhkjwrdIP0p0Ke0+ODMIiYje6zOkK0nV1K+R0tdp/X6rCymuUE5lmfR+6XA9PaiiRpzE6X4vf29jJL0IvIdK2VntnQ441PqopO3/X453MwInKNqssLqDINGXoXlFFLe0MEdQ+1JAxuSfl2SpL8nWUyz6QwMlEkv4fG7Mh7T4uLBEErAvgkYAMRzdFcYVyN3eU/bXvsU4ffTJ0l3N8ZwpCouKoCfeAR9bEI4sGllKi7N2hnWVcILrJYaCuAU8LFRQPCGVN4nuaFTaj+xaHP4wn1y2uIW7ProRfouxSRx/q6E3RirEQn9LqUtd8x72A+fB6G4u+4N0Qp+IYKps5GlkzfQR6ARLgchuzi0JX3IhFyN/ICSwltNAODYOcjEiv6VpCUYsuGYuKRBIF+H4rT+MVjVNSa4yxzdEsAe13NMERdBSlW5iwLMwgWQ19ZToTNcQW7Jt8VZyUUDZhaG2tbf3n3YQXZyqsX/szMmxmaiTXzGVrq+23B60aJoBb26wkWoLwjM+ewgf3edzrObFMA1NhA=
+X-Forefront-Antispam-Report: CIP:216.228.112.34;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:schybrid03.nvidia.com;CAT:NONE;SFS:(4636009)(346002)(376002)(396003)(39860400002)(136003)(46966006)(36840700001)(31696002)(478600001)(7636003)(316002)(4326008)(356005)(16576012)(86362001)(2616005)(31686004)(47076005)(7406005)(110136005)(7416002)(82740400003)(54906003)(36860700001)(70586007)(5660300002)(426003)(70206006)(921005)(8676002)(8936002)(82310400003)(336012)(4744005)(186003)(6666004)(26005)(2906002)(53546011)(36756003)(83380400001)(36906005)(16526019)(43740500002)(2101003)(83996005);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Aug 2021 08:54:47.8057
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: cd05e1ac-103b-44ad-f4b0-08d95a4a2d08
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.112.34];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource: DM6NAM11FT064.eop-nam11.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM5PR12MB2519
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-I'm afraid this needs a rebase now.  Reviewing anyway.
 
-Valeriy Vdovin <valeriy.vdovin@virtuozzo.com> writes:
-
-> Introducing new QMP command 'query-x86-cpuid'. This command can be used to
-> get virtualized cpu model info generated by QEMU during VM initialization in
-> the form of cpuid representation.
+On 8/6/2021 4:18 AM, Jason Gunthorpe wrote:
+> The patch to move the get/put to core and the patch to convert the samples
+> to use vfio_device crossed in a way that this was missed. When both
+> patches are together the samples do not need their own get/put.
 >
-> Diving into more details about virtual CPU generation: QEMU first parses '-cpu'
-> command line option. From there it takes the name of the model as the basis for
-> feature set of the new virtual CPU. After that it uses trailing '-cpu' options,
-> that state if additional cpu features should be present on the virtual CPU or
-> excluded from it (tokens '+'/'-' or '=on'/'=off').
-> After that QEMU checks if the host's cpu can actually support the derived
-> feature set and applies host limitations to it.
-> After this initialization procedure, virtual CPU has it's model and
-> vendor names, and a working feature set and is ready for identification
-> instructions such as CPUID.
->
-> To learn exactly how virtual CPU is presented to the guest machine via CPUID
-> instruction, new QMP command can be used. By calling 'query-x86-cpuid'
-> command, one can get a full listing of all CPUID leaves with subleaves which are
-> supported by the initialized virtual CPU.
->
-> Other than debug, the command is useful in cases when we would like to
-> utilize QEMU's virtual CPU initialization routines and put the retrieved
-> values into kernel CPUID overriding mechanics for more precise control
-> over how various processes perceive its underlying hardware with
-> container processes as a good example.
->
-> The command is specific to x86. It is currenly only implemented for KVM acceleator.
->
-> Output format:
-> The output is a plain list of leaf/subleaf argument combinations, that
-> return 4 words in registers EAX, EBX, ECX, EDX.
->
-> Use example:
-> qmp_request: {
->   "execute": "query-x86-cpuid"
-> }
->
-> qmp_response: {
->   "return": [
->     {
->       "eax": 1073741825,
->       "edx": 77,
->       "in-eax": 1073741824,
->       "ecx": 1447775574,
->       "ebx": 1263359563
->     },
->     {
->       "eax": 16777339,
->       "edx": 0,
->       "in-eax": 1073741825,
->       "ecx": 0,
->       "ebx": 0
->     },
->     {
->       "eax": 13,
->       "edx": 1231384169,
->       "in-eax": 0,
->       "ecx": 1818588270,
->       "ebx": 1970169159
->     },
->     {
->       "eax": 198354,
->       "edx": 126614527,
->       "in-eax": 1,
->       "ecx": 2176328193,
->       "ebx": 2048
->     },
->     ....
->     {
->       "eax": 12328,
->       "edx": 0,
->       "in-eax": 2147483656,
->       "ecx": 0,
->       "ebx": 0
->     }
->   ]
-> }
->
-> Signed-off-by: Valeriy Vdovin <valeriy.vdovin@virtuozzo.com>
+> Fixes: 437e41368c01 ("vfio/mdpy: Convert to use vfio_register_group_dev()")
+> Fixes: 681c1615f891 ("vfio/mbochs: Convert to use vfio_register_group_dev()")
+> Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+> Reviewed-by: Christoph Hellwig <hch@lst.de>
+> Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
 > ---
+>   samples/vfio-mdev/mbochs.c | 4 ----
+>   samples/vfio-mdev/mdpy.c   | 4 ----
+>   2 files changed, 8 deletions(-)
 
-[...]
+Looks good,
 
-> diff --git a/qapi/machine-target.json b/qapi/machine-target.json
-> index e7811654b7..db906c9240 100644
-> --- a/qapi/machine-target.json
-> +++ b/qapi/machine-target.json
-> @@ -329,3 +329,47 @@
->  ##
->  { 'command': 'query-cpu-definitions', 'returns': ['CpuDefinitionInfo'],
->    'if': 'defined(TARGET_PPC) || defined(TARGET_ARM) || defined(TARGET_I386) || defined(TARGET_S390X) || defined(TARGET_MIPS)' }
-> +
-> +##
-> +# @CpuidEntry:
-> +#
-> +# A single entry of a CPUID response.
-> +#
-> +# One entry holds full set of information (leaf) returned to the guest
-> +# in response to it calling a CPUID instruction with eax, ecx used as
-> +# the agruments to that instruction. ecx is an optional argument as
+Reviewed-by: Max Gurtovoy <mgurtovoy@nvidia.com>
 
-Typo: arguments
-
-> +# not all of the leaves support it.
-> +#
-> +# @in-eax: CPUID argument in eax
-> +# @in-ecx: CPUID argument in ecx
-> +# @eax: CPUID result in eax
-> +# @ebx: CPUID result in ebx
-> +# @ecx: CPUID result in ecx
-> +# @edx: CPUID result in edx
-> +#
-> +# Since: 6.1
-> +##
-> +{ 'struct': 'CpuidEntry',
-> +  'data': { 'in-eax' : 'uint32',
-> +            '*in-ecx' : 'uint32',
-> +            'eax' : 'uint32',
-> +            'ebx' : 'uint32',
-> +            'ecx' : 'uint32',
-> +            'edx' : 'uint32'
-> +          },
-> +  'if': 'defined(TARGET_I386)' }
-> +
-> +##
-> +# @query-x86-cpuid:
-> +#
-> +# Returns raw data from the emulated CPUID table for the first VCPU.
-> +# The emulated CPUID table defines the response to the CPUID
-> +# instruction when executed by the guest operating system.
-> +#
-> +# Returns: a list of CpuidEntry
-> +#
-> +# Since: 6.1
-> +##
-> +{ 'command': 'query-x86-cpuid',
-> +  'returns': ['CpuidEntry'],
-> +  'if': 'defined(TARGET_I386)' }
-
-I understand this fails when the acceleator isn't KVM.  I think that's
-worth documenting.
-
-Is this intended to be a stable interface?  Interfaces intended just for
-debugging usually aren't.
-
-Eduardo, what's your take on this version?
 
