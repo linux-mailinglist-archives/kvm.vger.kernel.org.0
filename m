@@ -2,150 +2,165 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9B6053E3C86
-	for <lists+kvm@lfdr.de>; Sun,  8 Aug 2021 21:27:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 06CD13E3C8A
+	for <lists+kvm@lfdr.de>; Sun,  8 Aug 2021 21:31:07 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232525AbhHHT2G (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 8 Aug 2021 15:28:06 -0400
-Received: from mail-mw2nam12on2086.outbound.protection.outlook.com ([40.107.244.86]:7744
+        id S231967AbhHHTbY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 8 Aug 2021 15:31:24 -0400
+Received: from mail-mw2nam12on2078.outbound.protection.outlook.com ([40.107.244.78]:16524
         "EHLO NAM12-MW2-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S232512AbhHHT2B (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 8 Aug 2021 15:28:01 -0400
+        id S230201AbhHHTbX (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 8 Aug 2021 15:31:23 -0400
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=oODMt1TUDUWjX6qCzxlSaQBzOWl1HFKSIJ60LvVqC+DBSBNl08ugLRhNEgNyr9ucPsOD9M0Xd37caelptdwiRGT8zF8M81wftSUiym8cpxp6CuW5/YVgs1pG3rOO7r1/ithLxA+1fa3akHIfmW8EFbrJbxp+gqaJoV0iX0Lc1TUQaqO+DtkPMBt/mSCKdO4MoAPxwCH2Gt/YDrLKEcPz9hwSLkL1juDWZHqSZbiK20JCDnRyGmWX8e24rQlwPgNSA7b8g4J+DROGwTZ/ws00edx1DF4CuIxUp1PILyw6DvkTG5VuctkfwpM1liyI4yWZwpkodU09iIn3gAmL4utLvw==
+ b=f69Fz+qLH0xvEEjITD1dqbaF/F91sWwRfCnNk0tF63NUPe2EIb6y84CVigkETq6aSI2nyf0lTJEn34QNoAsOexusFdqlLtif7wtQm6VsPwLlIRPop/e76aymQEqFFkcjiH4nQwYGqxDaUpHmJ4MUO4r97ZOJIF3Q0vF7AuxM8FtOU9IeRi2PZV5ACWL7KsiEP6xMQ39w4cTjxqyufp8r0HdbfoRJIjGUWzbmqDXBLXB3csEOwDlWC+ml5Ia7/N5ARm5fb1SKmw/+DfkPEZPdii46jpK6x7wHS+trxnZpkg46WMg9C4KgrBbxN08A8RM+I1Iga0AcYaF33YzyPcRtsQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=suaeuw0WhDhX59QF9PkszMqhn1lSiqzEurIUweovBHE=;
- b=aoul8fcG66+ia4a/zCJ64KxJndhbdunrFJTsS+YhUjowahttUyhv67wPxUymWG9oJtUTZwuDqEYSWl/+yvNRcO2fRl5l8c3phrDaAOmbejxIcQ6EnKTrHszWUWo8t/KoqtD580d3WZo2P5T0P2H71PPMSr0kxS0kIsVtKmfd4D9HChAt2ZFhf77EZYh7GRkbvB0lRuQmAj0iWNxfkdz4rbzDwnauZD8Z9ehbnuj9pl7JpPB6nwwdzjqo5DnIheUfG20eqOw+IK57Lu6QYSwHYy49Rcqs9n0Pky0VZjFD1umlqw+6bY3NgKzP88vqtDmR1vfLhaABE+LFzU3Uj4GVag==
+ bh=pEqrGdk0/Qpa2pbTnNpJzY+ZnSSEOl8VJ8OhRCW+oAw=;
+ b=hUAytjJqoKB0Ir6jptX4VwjsBzMzIWeCOc3dcBbpEQQrBetBG70Uu3VyP0fMDYjuDagI97+saKwxblYvqAXyYk8zT+/sLagkw706S4GVMZ3KOcP7UjMeJoctB7d8mmqIiB0KwDaon8xf8JglCk6b80PS4bsmSMaDE9HPAz47Ydvyw4h9lu67ubMfWovN2jgavYODHHq7pYRrFoah8RuDm6dUbkuxRa1tZbV93WFtHbLKxwxFADY3X3WeioxYoQEFhRhyQhxz0qGXI031tEmva9yPiTjKTm1HPCbSRul4yNws+IujnYShEMSwghWf3m+IOHnhjTXyeKGQ9aKfYbj3rw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
  header.d=amd.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=suaeuw0WhDhX59QF9PkszMqhn1lSiqzEurIUweovBHE=;
- b=YpS3JhVADB+TrRbry4Rw8F7sh07hk9zU/mQyoMU9bNbnKQsqqUL/T1eDSQEbreC06lcYtJ4HMRIs9oMuTQcHAias3qwKLLzdRADc0mnFXI+pdZlWNujg1+6WXU9Qzm8TqEm60zlf+99bSx506Gmga9OGSQVpYKT6LoWi6ef5uTo=
-Authentication-Results: vger.kernel.org; dkim=none (message not signed)
- header.d=none;vger.kernel.org; dmarc=none action=none header.from=amd.com;
+ bh=pEqrGdk0/Qpa2pbTnNpJzY+ZnSSEOl8VJ8OhRCW+oAw=;
+ b=eVhgB6nVBAVtg4KQfWis5zrPDBsP0JNq1V5Lf68r7JmGPJV3QFP4+IaYVgGCY9wLRb//IsbkPdapmcoKU5jAkQtuuzXrwHkxA0RgvNczsKMsEvBWTXjVwEwHBVPDHWsvO31607ypeS4pLx+fT0joXDSzOPr/isn5udqs0H/799o=
+Authentication-Results: zytor.com; dkim=none (message not signed)
+ header.d=none;zytor.com; dmarc=none action=none header.from=amd.com;
 Received: from DM5PR1201MB0201.namprd12.prod.outlook.com (2603:10b6:4:5b::21)
  by DM5PR12MB1434.namprd12.prod.outlook.com (2603:10b6:3:77::21) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4394.17; Sun, 8 Aug
- 2021 19:27:41 +0000
+ 2021 19:31:03 +0000
 Received: from DM5PR1201MB0201.namprd12.prod.outlook.com
  ([fe80::7410:8a22:1bdb:d24d]) by DM5PR1201MB0201.namprd12.prod.outlook.com
  ([fe80::7410:8a22:1bdb:d24d%6]) with mapi id 15.20.4394.022; Sun, 8 Aug 2021
- 19:27:41 +0000
-From:   Wei Huang <wei.huang2@amd.com>
-To:     kvm@vger.kernel.org
-Cc:     linux-kernel@vger.kernel.org, pbonzini@redhat.com,
-        seanjc@google.com, vkuznets@redhat.com, wanpengli@tencent.com,
+ 19:31:03 +0000
+Subject: Re: [PATCH v1 1/3] KVM: x86: Convert TDP level calculation to
+ vendor's specific code
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        pbonzini@redhat.com, vkuznets@redhat.com, wanpengli@tencent.com,
         jmattson@google.com, joro@8bytes.org, tglx@linutronix.de,
         mingo@redhat.com, bp@alien8.de, x86@kernel.org, hpa@zytor.com
-Subject: [PATCH v2 3/3] KVM: SVM: Add 5-level page table support for SVM
-Date:   Sun,  8 Aug 2021 14:26:58 -0500
-Message-Id: <20210808192658.2923641-4-wei.huang2@amd.com>
-X-Mailer: git-send-email 2.31.1
-In-Reply-To: <20210808192658.2923641-1-wei.huang2@amd.com>
-References: <20210808192658.2923641-1-wei.huang2@amd.com>
+References: <20210805205504.2647362-1-wei.huang2@amd.com>
+ <20210805205504.2647362-2-wei.huang2@amd.com> <YQxdbq+yoTIJmpL+@google.com>
+From:   Wei Huang <wei.huang2@amd.com>
+Message-ID: <08d21961-db3c-ae91-909c-df068b7be2e7@amd.com>
+Date:   Sun, 8 Aug 2021 14:30:59 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.11.0
+In-Reply-To: <YQxdbq+yoTIJmpL+@google.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Content-Type: text/plain
-X-ClientProxiedBy: SN6PR05CA0007.namprd05.prod.outlook.com
- (2603:10b6:805:de::20) To DM5PR1201MB0201.namprd12.prod.outlook.com
+X-ClientProxiedBy: SN4PR0401CA0026.namprd04.prod.outlook.com
+ (2603:10b6:803:2a::12) To DM5PR1201MB0201.namprd12.prod.outlook.com
  (2603:10b6:4:5b::21)
 MIME-Version: 1.0
 X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from weiserver.amd.com (165.204.77.1) by SN6PR05CA0007.namprd05.prod.outlook.com (2603:10b6:805:de::20) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4415.4 via Frontend Transport; Sun, 8 Aug 2021 19:27:40 +0000
+Received: from [172.31.10.87] (165.204.77.11) by SN4PR0401CA0026.namprd04.prod.outlook.com (2603:10b6:803:2a::12) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4394.15 via Frontend Transport; Sun, 8 Aug 2021 19:31:01 +0000
 X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 6ba058ba-d4fe-48cb-6969-08d95aa296e3
+X-MS-Office365-Filtering-Correlation-Id: 72179e55-8ad7-4d42-f7ab-08d95aa30f19
 X-MS-TrafficTypeDiagnostic: DM5PR12MB1434:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <DM5PR12MB14340CB991AFE5CA5887796ACFF59@DM5PR12MB1434.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:6790;
+X-Microsoft-Antispam-PRVS: <DM5PR12MB1434808A2F96753AC222903ACFF59@DM5PR12MB1434.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:7691;
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: v/r/M+X4tqrRRcWbJ0N+zRai6KfOsglfCN1xstJ3iLSurXoP3p1gSC2CBXT4WDKK08TIyXZ4OAOJY7Ekxsh3oqHlM6JGewvYVIIK85tev67bFvJsVqzr1VoPmxNMvVw7bVG9lILI7X/qSatApB4pKP4ucR9dJvbJZG8gppZMXKtZPBhiZBC34YD8JMN8t/lT4Q6mj5S4F/8Ntlu8N0RjjXEdcLHeBcxaMwzxfyajcqnRNmPj/lMx2WTwsn65nRVAXo2cE9m33tDWtZzIe3ALojs7Q8v8yKGFdpGt3h1lkzeM0wtJ615t58dsRIc9amYjFOLaHj5lbrm1H4YcWtCJe7c3/MkVU+/eBoLvvoHv3txTZoaDLbrtplZn+R074NwXgqKACKRSfrTB1xtQOKCbVhixn1ah0BTEhuooME1Tfwo+DwsAEOhIs/dQKspZJV5RdLBzxA6E9eixrOvJqtYaboCrCUEcKsC8q0uQwCuMwxCCe+tLDe/cyLFgbwBWYPMTK567cKiTWWStv7ESJraJafYAYZen6LesGursARDYjaVKyrCjMN3Fj0h/abevl5zb7QfxUPaZLIu9RSx/O+AdyMIshjNuGhehQ0rwxAG9tfRQ5cF/GOYzQE9z89dstuAK/kARY4Z3iCEne6m7Do8e4sEJUme476v/AGVXk+JCbF3NlCZX2aeTrUcQNzRgK4W8Y0iBZzdRroqwtI//vjbsYQ==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM5PR1201MB0201.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(376002)(136003)(396003)(346002)(39860400002)(6666004)(186003)(86362001)(83380400001)(4326008)(7416002)(6916009)(5660300002)(1076003)(8676002)(38350700002)(38100700002)(8936002)(66946007)(2616005)(66556008)(66476007)(52116002)(7696005)(956004)(2906002)(316002)(478600001)(6486002)(36756003)(26005);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam-Message-Info: KpY2cCKoOpRbvlJterPlJhQCx8hJHutvt1XctTUqQp8WfWyEyIYK83iTmzwwTY/25DZ+H+dILvXqtA9wpntzRJXu0zlpKQT+EHAtMLYp+rndUEBVWQZ23gJEu4JdN2dpKz8K22kst/qKFRezOmFvCP+ssUzqk1UIVSlUgTgnYFXo551YH0ApATHTDztJ/GiFwFNhGHTjc9Rri5MxApQQ63czZ4Z5rtlIb1Vw6ER1SoMRgo2/td8GeiN+2kyR3PuTNNGbfM7nGP+RfS3ANJey6i4Nx7oYDKL+dvPxQayk26DrI/B6Z82lGDaM/kpmc43sxhON7wwd9GwD6D4DqxnKn5UdsAhhPQJjKTglRb8K2advj85Y1kDgbIgJMVclZ+HAKoSukHgSGXqRt0cE43h2G/tKTY2ExMI2ANRAqKHVoJ9iQdKYTq6VQ1sl5QdEcfzRLSTUOqG/Pap6W4QRaoLPROrDCEqO3qprCNTHXeccVPqESjYUeikk5ndmaYvRTaGrKHqSfEKe394ldsVumaJRSIZcR4ylNSvOofES2BLvHZkDun0m7sNPHuSmlZ4m7JhxHV4pskBv/00Kfmvvk7CASXcfFAGEvKXlZkx+mmbB+iJdRjaP8d8uiSAdODMSPXofbX7j6asYgPwp16bi18XDi0JbiOQo155QUJlMLcexVQiMUNM6ZrUC0yXxzHeCstFs7YGXRYi7Xih8jwCvpvSOBZ/xjchdJ4Zbob9G7xX1QmSlz4tuMUrDioKShosHgM7U
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM5PR1201MB0201.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(376002)(136003)(396003)(346002)(39860400002)(186003)(31686004)(86362001)(4326008)(7416002)(6916009)(5660300002)(8676002)(38350700002)(38100700002)(8936002)(53546011)(66946007)(2616005)(66556008)(66476007)(52116002)(31696002)(956004)(2906002)(316002)(16576012)(478600001)(6486002)(36756003)(26005)(45980500001)(43740500002);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?fUvwuOUJIP2Px2itG6usAecDsyGGIgvGWxEhg3f1M2gau8KE7FQtPQVTZPfG?=
- =?us-ascii?Q?LndKQjET55uR6kV/4+mf8QEQ84juLFdJVUfP8sGn7aSXn3Wa6ylecHLKq79v?=
- =?us-ascii?Q?AcUsdJ+oPb/mkujgbUVaSlQDeqTzB3Z1UoPI3dNw3eC8UeUAR/3xBiPw0rYO?=
- =?us-ascii?Q?s1WdomFL+M5wgVyqpYtZ3Nss/TQ7TRKfF1oGsN3gD2yHSyikzUoPAK9onMFG?=
- =?us-ascii?Q?zeybZuo0nqxMExzZHPGk6q2eY9KLfAshAOem2EIBz01ogKBtD1teZ1+75wlV?=
- =?us-ascii?Q?23sjUKYU8Q9vUXACaanJ0KAaR9QpTrqB1IdfHfNWvSZiHJF8Y9L1K7a13f5a?=
- =?us-ascii?Q?+unoaqF1lkzRtC7a/q5bprcfWKztJmZIsRqz5DU9JzeIwcwvkUb4DI6V8q8W?=
- =?us-ascii?Q?Kd+/JmkGxI5J6xbOzdyHWeNv1az64DbP6ryFvE86nX19phibYiBNTH/8Bzc3?=
- =?us-ascii?Q?oxbYgC3j1qXyrWvL9Ab3AtbFXVJU0jTZpO40wyHQO7er0ixxvsAmOyLFb+RI?=
- =?us-ascii?Q?ODhoXdI+urja/VF7g9MpVa4KcXPll9Qd2D2hAmbMqXwoUzqvr015SFnXEN4d?=
- =?us-ascii?Q?tpGKEmIL+KbUj7+hBStrg0i/iL3DNpS02yNBqsuxntjU310LmKbXun59b2zU?=
- =?us-ascii?Q?rfghhIXX88oqwVFu9yegLoSIC5flU53FmmeRP6Bxq4IbDcJ2ezHPmeemSsgr?=
- =?us-ascii?Q?nwHjVxEzA4qMWSfsWe3qnPAoWn/zKD94V8FjY3GFHnEra6wZn/eEx5DIX94V?=
- =?us-ascii?Q?ujokevialYh04TIMFjGUnazNDkOecjguVaL9VqogHiGQmcjtWm/WeFXO0irh?=
- =?us-ascii?Q?v8NgHtdseqqf06umjvdcprS2Ue7F50MIkVHzmOVjYIcDaFpLEBOpNn79lBdP?=
- =?us-ascii?Q?G2XiThVBGvV1dYINMKiH3Ic5FWp0HzBoBvIFdWpawQY879PVPGvagBAjPy3v?=
- =?us-ascii?Q?+XeTMDvbjHbUK37JaAwSovPyNRQWBagvs3VGPtjEkMFBmCjGbIPfnBvIGLEj?=
- =?us-ascii?Q?X5Wa3sI4WIVb+8fe7KHVa7xZXKJd5jPC6ISvvFPyRrIGBU87gYKK+y4vsrmE?=
- =?us-ascii?Q?0pgmhfNRpS4oXfNsV6VwNTv2l/Gj9qwMzTeynzKLLoTAKNeawksm29o+GZwP?=
- =?us-ascii?Q?c4T0VvcOGAqjZMea211lHryvz+UwJIhic4AqDnVPqwkeJIqQhhR89iP0cHH6?=
- =?us-ascii?Q?SoMufz69rES7M7SOfg+Hh7M7JoRqhW488yegt8+eGtw/f2f+XW54Wd4GueO8?=
- =?us-ascii?Q?vlLKUOrW0OWcYTW90J33rwEBfaJQZHYuBf6+ut/GQVnzZAkkdUnuGbkbPChn?=
- =?us-ascii?Q?pR9+QHWMmH+91JVC2QQPL44R?=
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?Vmx5bkJrMDQ3NmtUODY4U2ErUHVJdFRPcmttcGVHRDRCRjBLUS9UWGFOU2Z3?=
+ =?utf-8?B?LzhEdTdZTktsZ1hyUkEySDRXM2VwWVBqdWt1bmhrVFVZTnJlWk00L29PZFdJ?=
+ =?utf-8?B?SXZCcE9qWlZYVyt4TW9XMjdUU0ozZXM5TXR2Q01sb3E1b052NHphNEYra3Rq?=
+ =?utf-8?B?SFVzTXdNdXFqRWNIdzBSU01CRnBQVEZKa01UdVY4VHFPZTlFc2N5b0EzS2N5?=
+ =?utf-8?B?SlZmMXIvZFBEZUVleGxqNEZCaWVQWDRtd3FaSFpMY2ZNRlF1R2N6N0FWSEp4?=
+ =?utf-8?B?b25oVDAwR2RWY2k4dFQvWHFKODl5UXdtbTNkUlRlUFRRd3lBSUlsR1p5Qkwz?=
+ =?utf-8?B?TWNrQ05xSDByUGU4d3JOZHFDZkZMRzVTQzRDOHJrV210dTdtbmNMU3pLU2Ex?=
+ =?utf-8?B?eCtMY1pkSHZPUHc4U0RYQ0Rkc1hwMFhWeXhkRk9MODkwTUxvaG94WXVuQnRR?=
+ =?utf-8?B?ckJXNlorcXBCa3lwS3VlQXpjelpYQ3g3L3JuWUNhdmRKWFV5SDhLd0RoMXZU?=
+ =?utf-8?B?U25KQ21kQk5tbkhWa3NSS0FNdDdOMjRFMGJXVWwwbjltR2VlMHNjZUNPbTNQ?=
+ =?utf-8?B?NnB0Ym14cG1YZnRlYVc5bmhLQ1RBVGZZOU5vVlJTdHQ4ZU5jZ2NtWmV2TEdv?=
+ =?utf-8?B?UVo5WmduVWQxQWM2T3VEc3pyWVBtZ0NuY3JQVXF5bGlHUkN3OENZNmJPR2dy?=
+ =?utf-8?B?WXcwaGxhZFVwVllWYVc0TVVNV213dTRjYVNNempnVGt1STNwT1JsNmRvTkdD?=
+ =?utf-8?B?SE80MjRpOVFEY0RGUERMUW1NMy9mY25oSWlybU9UdjBMYWZmcnJmMUQ3cmVt?=
+ =?utf-8?B?cGltTDlSZC9EeEhyZ2NlYTFYb0xkeE9BWWcxdzRFNmNHNW1JZjFtSUFEOWh2?=
+ =?utf-8?B?cmZHa2dpb0ZqYWN1ejd6WVpIT05ZdWxJbTdJTlZZUzUzRm12RWFGOWlyMHlJ?=
+ =?utf-8?B?SHg5OG11NUtZbWFkN0djemF6cEhJTWFVcEZaSUd0cE9sSEVEUWtFQVY2bFlu?=
+ =?utf-8?B?Ky83WVVmblVac3l4Sk10VEVtVlZ3WXdHc0prVGF3VnkzU09LZ0YvNVdDL0Ux?=
+ =?utf-8?B?UUZqeFlNYjdiUzdTSHBrYmlyZkV1eGZKWkVCR25TaWlRZFJBL0hIalB1UXBm?=
+ =?utf-8?B?cHAvb3ZaOUdOaHNDdkwvNkhmRkxaVlJoU3pKdUZSMTExVEpPN0VHOGRyemJo?=
+ =?utf-8?B?YlFqWHVkeVlnRGllSDRmQXE1RkxYMEhIbWl0SW5hRXdCSks3bXNNc1pYcjZE?=
+ =?utf-8?B?WDNRdWZrWGN2TkI5WXo1b2RmWG4xZ2M4LzRvNHhaVkp6dHFqRDcvcVV6Uy9F?=
+ =?utf-8?B?SGpTbEFGclF3YmF3cDN5YWtwa29OTGwyVGE1cHM0ZW5jYXdwRVpCZmtjbUhH?=
+ =?utf-8?B?WnE2SFJ2dTRjK29tdTdXTTJTbVJlM2tkdFRCU0VSRkNPMDhub0ZheUs0bTVp?=
+ =?utf-8?B?YVhkY1h0N3VvSS9MNWdCeHlZaDhDRnQ2UUhLdU5mb2hXc2NoMDRrcU9qVDBF?=
+ =?utf-8?B?aCtSZmtVL0ZNdWlMSFhZemRUL0ZhVlllQTBIVWx6eURPSGNsQVN1elVQWWpM?=
+ =?utf-8?B?OTV5VUpyYVM3Q29xZEZoM3MwN0hIU2lab3R6VTdMZEtTWGVscERYdWZ5NGNs?=
+ =?utf-8?B?YWFKUk5kOWpVUUhkUFhaNGxFc1RLU0wweUFtWFMxeU1pWVlSc3VaNnBqZVg4?=
+ =?utf-8?B?QXNLeGU0NzlDT3RvUTl2eFZuZ2VrTm5yS2NKQUxndm4wSGdWVkYvQ2c0a2Y5?=
+ =?utf-8?Q?EEOyxfUwTXxHgBuiu64Xtmy7VZNbTALKoXUWWew?=
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 6ba058ba-d4fe-48cb-6969-08d95aa296e3
+X-MS-Exchange-CrossTenant-Network-Message-Id: 72179e55-8ad7-4d42-f7ab-08d95aa30f19
 X-MS-Exchange-CrossTenant-AuthSource: DM5PR1201MB0201.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Aug 2021 19:27:41.3922
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Aug 2021 19:31:03.0624
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: wkaTCujOfzZq454JrFI8U+YNsBTz9JKF8yzQyAk1IxBCHnkRGoToHJ1cjLcAAA9P
+X-MS-Exchange-CrossTenant-UserPrincipalName: i6zxmPq80rso0Nwvh48OHqASy+uJ1VoubZrGdF7i+6jxWY0AgWYAwiJyjqBEJ5zG
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM5PR12MB1434
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-When the 5-level page table is enabled on host OS, the nested page table
-for guest VMs must use 5-level as well. Update get_npt_level() function
-to reflect this requirement. In the meanwhile, remove the code that
-prevents kvm-amd driver from being loaded when 5-level page table is
-detected.
 
-Signed-off-by: Wei Huang <wei.huang2@amd.com>
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- arch/x86/kvm/svm/svm.c | 9 +++------
- 1 file changed, 3 insertions(+), 6 deletions(-)
 
-diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index f361d466e18e..dfb864f2674b 100644
---- a/arch/x86/kvm/svm/svm.c
-+++ b/arch/x86/kvm/svm/svm.c
-@@ -261,7 +261,9 @@ u32 svm_msrpm_offset(u32 msr)
- static int get_max_npt_level(void)
- {
- #ifdef CONFIG_X86_64
--	return PT64_ROOT_4LEVEL;
-+	bool la57 = (cr4_read_shadow() & X86_CR4_LA57) != 0;
-+
-+	return la57 ? PT64_ROOT_5LEVEL : PT64_ROOT_4LEVEL;
- #else
- 	return PT32E_ROOT_LEVEL;
- #endif
-@@ -462,11 +464,6 @@ static int has_svm(void)
- 		return 0;
- 	}
- 
--	if (pgtable_l5_enabled()) {
--		pr_info("KVM doesn't yet support 5-level paging on AMD SVM\n");
--		return 0;
--	}
--
- 	return 1;
- }
- 
--- 
-2.31.1
+On 8/5/21 4:51 PM, Sean Christopherson wrote:
+> 
+> If we want to keep the MAXPHYADDR behavior, I'd vote for something like:
+> 
+> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> index b4b65c21b2ca..7e35f2bf89b4 100644
+> --- a/arch/x86/kvm/mmu/mmu.c
+> +++ b/arch/x86/kvm/mmu/mmu.c
+> @@ -97,6 +97,7 @@ module_param_named(flush_on_reuse, force_flush_and_sync_on_reuse, bool, 0644);
+>   bool tdp_enabled = false;
+> 
+>   static int max_huge_page_level __read_mostly;
+> +static int tdp_root_level __read_mostly;
+>   static int max_tdp_level __read_mostly;
+> 
+>   enum {
+> @@ -4645,6 +4646,9 @@ static union kvm_mmu_role kvm_calc_mmu_role_common(struct kvm_vcpu *vcpu,
+> 
+>   static inline int kvm_mmu_get_tdp_level(struct kvm_vcpu *vcpu)
+>   {
+> +       if (tdp_root_level)
+> +               return tdp_root_level;
+> +
+>          /* Use 5-level TDP if and only if it's useful/necessary. */
+>          if (max_tdp_level == 5 && cpuid_maxphyaddr(vcpu) <= 48)
+>                  return 4;
+> @@ -5336,10 +5340,11 @@ void kvm_mmu_invpcid_gva(struct kvm_vcpu *vcpu, gva_t gva, unsigned long pcid)
+>           */
+>   }
+> 
+> -void kvm_configure_mmu(bool enable_tdp, int tdp_max_root_level,
+> -                      int tdp_huge_page_level)
+> +void kvm_configure_mmu(bool enable_tdp, int tdp_forced_root_level,
+> +                      int tdp_max_root_level, int tdp_huge_page_level)
+>   {
+>          tdp_enabled = enable_tdp;
+> +       tdp_root_level = tdp_forced_root_level;
+>          max_tdp_level = tdp_max_root_level;
+> 
+>          /*
+> 
 
+I decided to take this suggestion in v2: it avoids using 5-level table 
+(memory cost and potential table-walk overhead) if the host has the 
+flexibility of using 4-level NPT under LA57.
