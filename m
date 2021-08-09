@@ -2,76 +2,155 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 111973E4056
-	for <lists+kvm@lfdr.de>; Mon,  9 Aug 2021 08:42:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9628D3E40FF
+	for <lists+kvm@lfdr.de>; Mon,  9 Aug 2021 09:45:48 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233354AbhHIGm4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 9 Aug 2021 02:42:56 -0400
-Received: from mga01.intel.com ([192.55.52.88]:40471 "EHLO mga01.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S233234AbhHIGmx (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 9 Aug 2021 02:42:53 -0400
-X-IronPort-AV: E=McAfee;i="6200,9189,10070"; a="236624899"
-X-IronPort-AV: E=Sophos;i="5.84,305,1620716400"; 
-   d="scan'208";a="236624899"
-Received: from fmsmga004.fm.intel.com ([10.253.24.48])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Aug 2021 23:42:32 -0700
-X-IronPort-AV: E=Sophos;i="5.84,305,1620716400"; 
-   d="scan'208";a="505068716"
-Received: from raochun1-mobl.ccr.corp.intel.com (HELO localhost) ([10.255.28.63])
-  by fmsmga004-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Aug 2021 23:42:27 -0700
-Date:   Mon, 9 Aug 2021 14:42:24 +0800
-From:   Yu Zhang <yu.c.zhang@linux.intel.com>
-To:     Wei Huang <wei.huang2@amd.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        pbonzini@redhat.com, seanjc@google.com, vkuznets@redhat.com,
-        wanpengli@tencent.com, jmattson@google.com, joro@8bytes.org,
-        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, x86@kernel.org,
-        hpa@zytor.com
-Subject: Re: [PATCH v2 1/3] KVM: x86: Allow CPU to force vendor-specific TDP
- level
-Message-ID: <20210809064224.ctu3zxknn7s56gk3@linux.intel.com>
-References: <20210808192658.2923641-1-wei.huang2@amd.com>
- <20210808192658.2923641-2-wei.huang2@amd.com>
- <20210809035806.5cqdqm5vkexvngda@linux.intel.com>
- <c6324362-1439-ef94-789b-5934c0e1cdb8@amd.com>
- <20210809042703.25gfuuvujicc3vj7@linux.intel.com>
- <73bbaac0-701c-42dd-36da-aae1fed7f1a0@amd.com>
+        id S233585AbhHIHp4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 9 Aug 2021 03:45:56 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:20242 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S233552AbhHIHpx (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 9 Aug 2021 03:45:53 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1628495133;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=sNLQyoKHz3doB3VgHoSYiw/2Wi9gt/WD6yUBM0vzV9U=;
+        b=X4vnk2y8K43ftq/lKkUZvNw3xKCIWdX7HqG1dNbpg/AQcM6E0G/kI20zD9a0ZzAraooujs
+        Ub989RRmzccW/lsGpvbknTkhvRv6UfpDBzNf13a+UvtogM5rtzuJ5XnOu8v5TyVkVA+Xbz
+        FejsHiGWbP2S8uUKyAsd8ltGLKPGIy0=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-591-z6TTFUY7OwO2e0ffebZ4jA-1; Mon, 09 Aug 2021 03:45:32 -0400
+X-MC-Unique: z6TTFUY7OwO2e0ffebZ4jA-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 887631853028;
+        Mon,  9 Aug 2021 07:45:30 +0000 (UTC)
+Received: from starship (unknown [10.35.206.50])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id AC1BD60CC9;
+        Mon,  9 Aug 2021 07:45:28 +0000 (UTC)
+Message-ID: <33d01b8bb31541be7911f95581cdf608c6c79bf6.camel@redhat.com>
+Subject: Re: [PATCH] selftests: KVM: avoid failures due to reserved
+ HyperTransport region
+From:   Maxim Levitsky <mlevitsk@redhat.com>
+To:     Joao Martins <joao.m.martins@oracle.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Cc:     stable@vger.kernel.org, David Matlack <dmatlack@google.com>,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Date:   Mon, 09 Aug 2021 10:45:27 +0300
+In-Reply-To: <4b530fb6-81cc-be36-aa68-92ec01c65775@oracle.com>
+References: <20210805105423.412878-1-pbonzini@redhat.com>
+         <4b530fb6-81cc-be36-aa68-92ec01c65775@oracle.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <73bbaac0-701c-42dd-36da-aae1fed7f1a0@amd.com>
-User-Agent: NeoMutt/20171215
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sun, Aug 08, 2021 at 11:33:44PM -0500, Wei Huang wrote:
+On Fri, 2021-08-06 at 11:57 +0100, Joao Martins wrote:
 > 
+> On 8/5/21 11:54 AM, Paolo Bonzini wrote:
+> > Accessing guest physical addresses at 0xFFFD_0000_0000 and above causes
+> > a failure on AMD processors because those addresses are reserved by
+> > HyperTransport (this is not documented).  
 > 
-> On 8/8/21 11:27 PM, Yu Zhang wrote:
-> > On Sun, Aug 08, 2021 at 11:11:40PM -0500, Wei Huang wrote:
-> > > 
-> > > 
-> > > On 8/8/21 10:58 PM, Yu Zhang wrote:
-> > > > On Sun, Aug 08, 2021 at 02:26:56PM -0500, Wei Huang wrote:
-> > > > > AMD future CPUs will require a 5-level NPT if host CR4.LA57 is set.
-> > > > 
-> > > > Sorry, but why? NPT is not indexed by HVA.
-> > > 
-> > > NPT is not indexed by HVA - it is always indexed by GPA. What I meant is NPT
-> > > page table level has to be the same as the host OS page table: if 5-level
-> > > page table is enabled in host OS (CR4.LA57=1), guest NPT has to 5-level too.
+> Oh, but it's actually documented in the AMD IOMMU manual [0] (and AMD IOMMU in linux do
+> mark it as a reserved IOVA region i.e. HT_RANGE_START..HT_RANGE_END). And it's usually
+> marked as a reserved type in E820. At least on the machines I've seen.
+> 
+> See manual section '2.1.2 IOMMU Logical Topology':
+> 
+> "Special address controls in Table 3 are interpreted against untranslated guest physical
+> addressess (GPA) that lack a PASID TLP prefix."
+> 
+>  Base Address   Top Address   Use
+> 
+>   FD_0000_0000h FD_F7FF_FFFFh Reserved interrupt address space
+>   FD_F800_0000h FD_F8FF_FFFFh Interrupt/EOI IntCtl
+>   FD_F900_0000h FD_F90F_FFFFh Legacy PIC IACK
+>   FD_F910_0000h FD_F91F_FFFFh System Management
+>   FD_F920_0000h FD_FAFF_FFFFh Reserved Page Tables
+>   FD_FB00_0000h FD_FBFF_FFFFh Address Translation
+>   FD_FC00_0000h FD_FDFF_FFFFh I/O Space
+>   FD_FE00_0000h FD_FFFF_FFFFh Configuration
+>   FE_0000_0000h FE_1FFF_FFFFh Extended Configuration/Device Messages
+>   FE_2000_0000h FF_FFFF_FFFFh Reserved
+> 
+> It covers the range starting that address you fixed up ... up to 1Tb, fwiw.
+> 
+> You mark it ~1010G as max gfn so shouldn't be a problem.
+> 
+> [0] https://www.amd.com/system/files/TechDocs/48882_IOMMU.pdf
+> 
+> > Avoid selftests failures
+> > by reserving those guest physical addresses.
 > > 
-> > I know what you meant. But may I ask why?
+> > Fixes: ef4c9f4f6546 ("KVM: selftests: Fix 32-bit truncation of vm_get_max_gfn()")
+> > Cc: stable@vger.kernel.org
+> > Cc: David Matlack <dmatlack@google.com>
+> > Reported-by: Maxim Levitsky <mlevitsk@redhat.com>
+> > Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> > ---
+> >  tools/testing/selftests/kvm/lib/kvm_util.c | 6 ++++++
+> >  1 file changed, 6 insertions(+)
+> > 
+> > diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
+> > index 10a8ed691c66..d995cc9836ee 100644
+> > --- a/tools/testing/selftests/kvm/lib/kvm_util.c
+> > +++ b/tools/testing/selftests/kvm/lib/kvm_util.c
+> > @@ -309,6 +309,12 @@ struct kvm_vm *vm_create(enum vm_guest_mode mode, uint64_t phy_pages, int perm)
+> >  	/* Limit physical addresses to PA-bits. */
+> >  	vm->max_gfn = ((1ULL << vm->pa_bits) >> vm->page_shift) - 1;
+> >  
+> > +#ifdef __x86_64__
+> > +	/* Avoid reserved HyperTransport region on AMD processors.  */
+> > +	if (vm->pa_bits == 48)
+> > +		vm->max_gfn = 0xfffcfffff;
+> > +#endif
+> > +
 > 
-> I don't have a good answer for it. From what I know, VMCB doesn't have a
-> field to indicate guest page table level. As a result, hardware relies on
-> host CR4 to infer NPT level.
+> Not sure if it's worth the trouble having a macro with the same name as AMD iommu like:
+> 
+> #define HT_RANGE_START                (0xfd00000000ULL)
+> #define MAX_GFN			      (HT_RANGE_START - 1ULL)
+> 
+> #ifdef __x86_64__
+> 	/* Avoid reserved HyperTransport region on AMD processors.  */
+> 	if (vm->pa_bits == 48)
+> 		vm->max_gfn = MAX_GFN;
+> #endif
 
-I guess you mean not even in the N_CR3 field of VMCB? 
+I guess now that we know that it is documented, it is worth it,
+to remove '== 48' check and add check for an AMD cpu, and add reference
+to this manual.
 
-Then it's not a broken design - it's a limitation of SVM. :)
+I am mentioning the 48 bit check because I have seen that AMD just recently
+posted 5 level NPT support, so I guess CPUs which > 48 bit max physical address
+are also probably on horison.
 
-B.R.
-Yu
+And long term solution for this I guess is to add these areas to a blacklist
+and avoid them.
+
+Best regards,
+	Maxim Levitsky
+
+> 
+> It's a detail, but *perhaps* would help people grepping around it.
+> 
+> Also, not sure if checking against AMD cpuid vendor is worth, considering this is
+> a limitation only on AMD.
+> 
+> 
+> >  	/* Allocate and setup memory for guest. */
+> >  	vm->vpages_mapped = sparsebit_alloc();
+> >  	if (phy_pages != 0)
+> > 
+
+
