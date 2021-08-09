@@ -2,217 +2,166 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4EFF03E481C
-	for <lists+kvm@lfdr.de>; Mon,  9 Aug 2021 16:55:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7F0763E4856
+	for <lists+kvm@lfdr.de>; Mon,  9 Aug 2021 17:08:33 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233412AbhHIOz3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 9 Aug 2021 10:55:29 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:50752 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S235201AbhHIOzS (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 9 Aug 2021 10:55:18 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1628520897;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=R5n29Ns9jbHIa7w/GQmGAMNTzRkJjoUQ8KKA6Ga94Xg=;
-        b=XAWXypEennYBtKob/AJCVJQvdMqodjTjsCgyfK/F3tjmD4EuChXi1GVKrDnm7hSnolQn83
-        VZDF1xL8Tbpc9SpqmUf7sn/ZFTssL8u1JXEpoULcXgMA4rN/Sbx4l88kv9HnO+wanxcyH/
-        EKuQjlo93f7S8WVPJS736/NN/VpWsfg=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-262-o35Qq__SN_WSsti7M_-SzA-1; Mon, 09 Aug 2021 10:54:56 -0400
-X-MC-Unique: o35Qq__SN_WSsti7M_-SzA-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id AF44E100A96A;
-        Mon,  9 Aug 2021 14:54:32 +0000 (UTC)
-Received: from localhost.localdomain (unknown [10.39.193.220])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 911F07A51F;
-        Mon,  9 Aug 2021 14:54:29 +0000 (UTC)
-From:   Emanuele Giuseppe Esposito <eesposit@redhat.com>
-To:     kvm@vger.kernel.org
+        id S235358AbhHIPIw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 9 Aug 2021 11:08:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53836 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S235326AbhHIPIu (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 9 Aug 2021 11:08:50 -0400
+Received: from mail-lf1-x135.google.com (mail-lf1-x135.google.com [IPv6:2a00:1450:4864:20::135])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F1984C0613D3;
+        Mon,  9 Aug 2021 08:08:29 -0700 (PDT)
+Received: by mail-lf1-x135.google.com with SMTP id p38so7116969lfa.0;
+        Mon, 09 Aug 2021 08:08:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=vDJzN0F1WF5mOprRxjX5kY7x+uv7q/PkzLNKpudNlaQ=;
+        b=M2mSWAmzbSQ/dESj//1mXpehasYfI6exx45MLHkYhhxNOoJvnPO48q7JNHgn9z6HTz
+         DoxXwkHEFfnI9EWfC/IJLMdRO0JJ/DABGs0mB7IBtEpXVRYFnlhffHIw1I8kn5frFvdW
+         MqtUzhf/HkxvNukw7sfWVUJN2v0o6oWkf3eW0A9UWwHrKXwSMPboonsRNLqdb8X4Q1Yw
+         m5hkWY40Ry3YJJZRcK1Qr7uXcJLZXjpSXAcMuX86VXqIFwjNxedYryUjAjOb1yvTAwev
+         PTkedY/eWM0dR0kCdCNZoWg/xnNCCrwWREiAKY97AQXx9Tax1DtStuuIir9IG+yAkmSl
+         XewQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=vDJzN0F1WF5mOprRxjX5kY7x+uv7q/PkzLNKpudNlaQ=;
+        b=mFL3Ry5Sy3sT+UnqJ0KaNiNbuGgwPR/fnmTWYSzXYjonhufmSdZwowyoQ5No7nnvD0
+         gEnE0hMKRwqmNnxReSkTYO0lkEV3aF3BEuMS/rq7D9UbpGurDf8XYE4TE7I80UU0Pr0z
+         5kK0B//7EqSfqRaxXeZIfk7unfXOU1capDcc9RYmp/oi9rmYfciINbb653O+pqZ932Dr
+         jCcDEjE2TdqrnzOZertnsCbK0DQOzYc//FVyUjQCuPMLut7CYTTLTE297mb1xuUHHbQN
+         cGPkk3nyGSnm1j8CCneow1CNdcPmj3g1MwX4v3NFXRa6ngGxcv/EdtgL7+rLm48pvCv4
+         WbLw==
+X-Gm-Message-State: AOAM531KiLsCr01azfPeFT+tZGqP3b7LWI9wtC54+Xo5nv2DJUZ2Ecxh
+        J3Rxzb3sEWKVbFWNoHuYBQG/ffJMvd9pEaW9/zw=
+X-Google-Smtp-Source: ABdhPJx4sHr8dvW+wwXzfa5zhIeJZFDTaQe7IDZi1FybWo1LhVpYXgzJFGP/L3E/ebv0KH+Y2DoTuF2qc4LX8LXDv1s=
+X-Received: by 2002:a05:6512:132a:: with SMTP id x42mr17346429lfu.291.1628521708328;
+ Mon, 09 Aug 2021 08:08:28 -0700 (PDT)
+MIME-Version: 1.0
+References: <20210809074803.43154-1-likexu@tencent.com> <7599a987-c931-20f1-9441-d86222a4519d@linux.intel.com>
+In-Reply-To: <7599a987-c931-20f1-9441-d86222a4519d@linux.intel.com>
+From:   Like Xu <like.xu.linux@gmail.com>
+Date:   Mon, 9 Aug 2021 23:08:11 +0800
+Message-ID: <CAA3+yLfF8a5Jwz6s3ZG6zMgRn7GEF5Q8ENucuu3Ne977MmVUug@mail.gmail.com>
+Subject: Re: [PATCH] KVM: x86/pmu: Don't expose guest LBR if the LBR_SELECT is
+ shared per physical core
+To:     "Liang, Kan" <kan.liang@linux.intel.com>
 Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Maxim Levitsky <mlevitsk@redhat.com>,
+        Andi Kleen <ak@linux.intel.com>,
+        Tony Luck <tony.luck@intel.com>,
         Sean Christopherson <seanjc@google.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, Ingo Molnar <mingo@redhat.com>,
-        Borislav Petkov <bp@alien8.de>, x86@kernel.org,
-        "H. Peter Anvin" <hpa@zytor.com>, linux-kernel@vger.kernel.org,
-        Emanuele Giuseppe Esposito <eesposit@redhat.com>
-Subject: [PATCH 2/2] KVM: nSVM: temporarly save vmcb12's efer, cr0 and cr4 to avoid TOC/TOU races
-Date:   Mon,  9 Aug 2021 16:53:43 +0200
-Message-Id: <20210809145343.97685-3-eesposit@redhat.com>
-In-Reply-To: <20210809145343.97685-1-eesposit@redhat.com>
-References: <20210809145343.97685-1-eesposit@redhat.com>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        x86@kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Move the checks done by nested_vmcb_valid_sregs and nested_vmcb_check_controls
-directly in enter_svm_guest_mode, and save the values of vmcb12's
-efer, cr0 and cr4 in local variable that are then passed to
-nested_vmcb02_prepare_save. This prevents from creating TOC/TOU races.
+On Mon, Aug 9, 2021 at 10:12 PM Liang, Kan <kan.liang@linux.intel.com> wrote:
+>
+>
+>
+> On 8/9/2021 3:48 AM, Like Xu wrote:
+> > From: Like Xu <likexu@tencent.com>
+> >
+> > According to Intel SDM, the Last Branch Record Filtering Select Register
+> > (R/W) is defined as shared per physical core rather than per logical core
+> > on some older Intel platforms: Silvermont, Airmont, Goldmont and Nehalem.
+> >
+> > To avoid LBR attacks or accidental data leakage, on these specific
+> > platforms, KVM should not expose guest LBR capability even if HT is
+> > disabled on the host, considering that the HT state can be dynamically
+> > changed, yet the KVM capabilities are initialized at module initialisation.
+> >
+> > Fixes: be635e34c284 ("KVM: vmx/pmu: Expose LBR_FMT in the MSR_IA32_PERF_CAPABILITIES")
+> > Signed-off-by: Like Xu <likexu@tencent.com>
+> > ---
+> >   arch/x86/include/asm/intel-family.h |  1 +
+> >   arch/x86/kvm/vmx/capabilities.h     | 19 ++++++++++++++++++-
+> >   2 files changed, 19 insertions(+), 1 deletion(-)
+> >
+> > diff --git a/arch/x86/include/asm/intel-family.h b/arch/x86/include/asm/intel-family.h
+> > index 27158436f322..f35c915566e3 100644
+> > --- a/arch/x86/include/asm/intel-family.h
+> > +++ b/arch/x86/include/asm/intel-family.h
+> > @@ -119,6 +119,7 @@
+> >
+> >   #define INTEL_FAM6_ATOM_SILVERMONT  0x37 /* Bay Trail, Valleyview */
+> >   #define INTEL_FAM6_ATOM_SILVERMONT_D        0x4D /* Avaton, Rangely */
+> > +#define INTEL_FAM6_ATOM_SILVERMONT_X3        0x5D /* X3-C3000 based on Silvermont */
+>
+>
+> Please submit a separate patch if you want to add a new CPU ID. Also,
+> the comments should be platform code name, not the model.
+>
+> AFAIK, Atom X3 should be SoFIA which is for mobile phone. It's an old
+> product. I don't think I enabled it in perf. I have no idea why you want
+> to add it here for KVM. If you have a product and want to enable it, I
+> guess you may want to enable it for perf first.
 
-This also avoids the need of force-setting EFER_SVME in
-nested_vmcb02_prepare_save.
+Thanks for your clarification about SoFIA. I'll drop 0x5D check
+for V2 since we doesn't have host support as you said.
 
-Signed-off-by: Emanuele Giuseppe Esposito <eesposit@redhat.com>
----
- arch/x86/kvm/svm/nested.c | 72 +++++++++++++++++++--------------------
- 1 file changed, 36 insertions(+), 36 deletions(-)
+Do the other models here and the idea of banning guest LBR make sense to you ?
 
-diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
-index 0ac2d14add15..04e9e947deb9 100644
---- a/arch/x86/kvm/svm/nested.c
-+++ b/arch/x86/kvm/svm/nested.c
-@@ -259,20 +259,14 @@ static bool nested_vmcb_check_controls(struct kvm_vcpu *vcpu,
- 
- /* Common checks that apply to both L1 and L2 state.  */
- static bool nested_vmcb_valid_sregs(struct kvm_vcpu *vcpu,
--				    struct vmcb_save_area *save)
-+				    struct vmcb_save_area *save,
-+				    u64 efer, u64 cr0, u64 cr4)
- {
--	/*
--	 * FIXME: these should be done after copying the fields,
--	 * to avoid TOC/TOU races.  For these save area checks
--	 * the possible damage is limited since kvm_set_cr0 and
--	 * kvm_set_cr4 handle failure; EFER_SVME is an exception
--	 * so it is force-set later in nested_prepare_vmcb_save.
--	 */
--	if (CC(!(save->efer & EFER_SVME)))
-+	if (CC(!(efer & EFER_SVME)))
- 		return false;
- 
--	if (CC((save->cr0 & X86_CR0_CD) == 0 && (save->cr0 & X86_CR0_NW)) ||
--	    CC(save->cr0 & ~0xffffffffULL))
-+	if (CC((cr0 & X86_CR0_CD) == 0 && (cr0 & X86_CR0_NW)) ||
-+	    CC(cr0 & ~0xffffffffULL))
- 		return false;
- 
- 	if (CC(!kvm_dr6_valid(save->dr6)) || CC(!kvm_dr7_valid(save->dr7)))
-@@ -283,17 +277,16 @@ static bool nested_vmcb_valid_sregs(struct kvm_vcpu *vcpu,
- 	 * except that EFER.LMA is not checked by SVM against
- 	 * CR0.PG && EFER.LME.
- 	 */
--	if ((save->efer & EFER_LME) && (save->cr0 & X86_CR0_PG)) {
--		if (CC(!(save->cr4 & X86_CR4_PAE)) ||
--		    CC(!(save->cr0 & X86_CR0_PE)) ||
-+	if ((efer & EFER_LME) && (cr0 & X86_CR0_PG)) {
-+		if (CC(!(cr4 & X86_CR4_PAE)) || CC(!(cr0 & X86_CR0_PE)) ||
- 		    CC(kvm_vcpu_is_illegal_gpa(vcpu, save->cr3)))
- 			return false;
- 	}
- 
--	if (CC(!kvm_is_valid_cr4(vcpu, save->cr4)))
-+	if (CC(!kvm_is_valid_cr4(vcpu, cr4)))
- 		return false;
- 
--	if (CC(!kvm_valid_efer(vcpu, save->efer)))
-+	if (CC(!kvm_valid_efer(vcpu, efer)))
- 		return false;
- 
- 	return true;
-@@ -434,7 +427,9 @@ void nested_vmcb02_compute_g_pat(struct vcpu_svm *svm)
- 	svm->nested.vmcb02.ptr->save.g_pat = svm->vmcb01.ptr->save.g_pat;
- }
- 
--static void nested_vmcb02_prepare_save(struct vcpu_svm *svm, struct vmcb *vmcb12)
-+static void nested_vmcb02_prepare_save(struct vcpu_svm *svm,
-+				       struct vmcb *vmcb12,
-+				       u64 efer, u64 cr0, u64 cr4)
- {
- 	bool new_vmcb12 = false;
- 
-@@ -463,15 +458,10 @@ static void nested_vmcb02_prepare_save(struct vcpu_svm *svm, struct vmcb *vmcb12
- 
- 	kvm_set_rflags(&svm->vcpu, vmcb12->save.rflags | X86_EFLAGS_FIXED);
- 
--	/*
--	 * Force-set EFER_SVME even though it is checked earlier on the
--	 * VMCB12, because the guest can flip the bit between the check
--	 * and now.  Clearing EFER_SVME would call svm_free_nested.
--	 */
--	svm_set_efer(&svm->vcpu, vmcb12->save.efer | EFER_SVME);
-+	svm_set_efer(&svm->vcpu, efer);
- 
--	svm_set_cr0(&svm->vcpu, vmcb12->save.cr0);
--	svm_set_cr4(&svm->vcpu, vmcb12->save.cr4);
-+	svm_set_cr0(&svm->vcpu, cr0);
-+	svm_set_cr4(&svm->vcpu, cr4);
- 
- 	svm->vcpu.arch.cr2 = vmcb12->save.cr2;
- 
-@@ -567,6 +557,7 @@ int enter_svm_guest_mode(struct kvm_vcpu *vcpu, u64 vmcb12_gpa,
- {
- 	struct vcpu_svm *svm = to_svm(vcpu);
- 	int ret;
-+	u64 vmcb12_efer, vmcb12_cr0, vmcb12_cr4;
- 
- 	trace_kvm_nested_vmrun(svm->vmcb->save.rip, vmcb12_gpa,
- 			       vmcb12->save.rip,
-@@ -589,8 +580,25 @@ int enter_svm_guest_mode(struct kvm_vcpu *vcpu, u64 vmcb12_gpa,
- 	nested_svm_copy_common_state(svm->vmcb01.ptr, svm->nested.vmcb02.ptr);
- 
- 	svm_switch_vmcb(svm, &svm->nested.vmcb02);
-+
-+	/* Save vmcb12's EFER, CR0 and CR4 to avoid TOC/TOU races. */
-+	vmcb12_efer = vmcb12->save.efer;
-+	vmcb12_cr0 = vmcb12->save.cr0;
-+	vmcb12_cr4 = vmcb12->save.cr4;
-+
-+	if (!nested_vmcb_valid_sregs(vcpu, &vmcb12->save, vmcb12_efer,
-+				     vmcb12_cr0, vmcb12_cr4) ||
-+	    !nested_vmcb_check_controls(vcpu, &svm->nested.ctl)) {
-+		vmcb12->control.exit_code    = SVM_EXIT_ERR;
-+		vmcb12->control.exit_code_hi = 0;
-+		vmcb12->control.exit_info_1  = 0;
-+		vmcb12->control.exit_info_2  = 0;
-+		return 1;
-+	}
-+
- 	nested_vmcb02_prepare_control(svm);
--	nested_vmcb02_prepare_save(svm, vmcb12);
-+	nested_vmcb02_prepare_save(svm, vmcb12, vmcb12_efer, vmcb12_cr0,
-+				   vmcb12_cr4);
- 
- 	ret = nested_svm_load_cr3(&svm->vcpu, vmcb12->save.cr3,
- 				  nested_npt_enabled(svm), true);
-@@ -641,15 +649,6 @@ int nested_svm_vmrun(struct kvm_vcpu *vcpu)
- 
- 	nested_load_control_from_vmcb12(svm, &vmcb12->control);
- 
--	if (!nested_vmcb_valid_sregs(vcpu, &vmcb12->save) ||
--	    !nested_vmcb_check_controls(vcpu, &svm->nested.ctl)) {
--		vmcb12->control.exit_code    = SVM_EXIT_ERR;
--		vmcb12->control.exit_code_hi = 0;
--		vmcb12->control.exit_info_1  = 0;
--		vmcb12->control.exit_info_2  = 0;
--		goto out;
--	}
--
- 	/*
- 	 * Since vmcb01 is not in use, we can use it to store some of the L1
- 	 * state.
-@@ -1336,7 +1335,8 @@ static int svm_set_nested_state(struct kvm_vcpu *vcpu,
- 	if (!(save->cr0 & X86_CR0_PG) ||
- 	    !(save->cr0 & X86_CR0_PE) ||
- 	    (save->rflags & X86_EFLAGS_VM) ||
--	    !nested_vmcb_valid_sregs(vcpu, save))
-+	    !nested_vmcb_valid_sregs(vcpu, save, save->efer, save->cr0,
-+				     save->cr4))
- 		goto out_free;
- 
- 	/*
--- 
-2.31.1
-
+>
+> Thanks,
+> Kan
+>
+> >   #define INTEL_FAM6_ATOM_SILVERMONT_MID      0x4A /* Merriefield */
+> >
+> >   #define INTEL_FAM6_ATOM_AIRMONT             0x4C /* Cherry Trail, Braswell */
+> > diff --git a/arch/x86/kvm/vmx/capabilities.h b/arch/x86/kvm/vmx/capabilities.h
+> > index 4705ad55abb5..ff9596d7112d 100644
+> > --- a/arch/x86/kvm/vmx/capabilities.h
+> > +++ b/arch/x86/kvm/vmx/capabilities.h
+> > @@ -3,6 +3,7 @@
+> >   #define __KVM_X86_VMX_CAPS_H
+> >
+> >   #include <asm/vmx.h>
+> > +#include <asm/cpu_device_id.h>
+> >
+> >   #include "lapic.h"
+> >
+> > @@ -376,6 +377,21 @@ static inline bool vmx_pt_mode_is_host_guest(void)
+> >       return pt_mode == PT_MODE_HOST_GUEST;
+> >   }
+> >
+> > +static const struct x86_cpu_id lbr_select_shared_cpu[] = {
+> > +     X86_MATCH_INTEL_FAM6_MODEL(ATOM_SILVERMONT, NULL),
+> > +     X86_MATCH_INTEL_FAM6_MODEL(ATOM_SILVERMONT_MID, NULL),
+> > +     X86_MATCH_INTEL_FAM6_MODEL(ATOM_SILVERMONT_D, NULL),
+> > +     X86_MATCH_INTEL_FAM6_MODEL(ATOM_SILVERMONT_X3, NULL),
+> > +     X86_MATCH_INTEL_FAM6_MODEL(ATOM_AIRMONT_MID, NULL),
+> > +     X86_MATCH_INTEL_FAM6_MODEL(ATOM_GOLDMONT, NULL),
+> > +     X86_MATCH_INTEL_FAM6_MODEL(ATOM_GOLDMONT_PLUS, NULL),
+> > +     X86_MATCH_INTEL_FAM6_MODEL(NEHALEM_EP, NULL),
+> > +     X86_MATCH_INTEL_FAM6_MODEL(NEHALEM, NULL),
+> > +     X86_MATCH_INTEL_FAM6_MODEL(NEHALEM_G, NULL),
+> > +     X86_MATCH_INTEL_FAM6_MODEL(NEHALEM_EX, NULL),
+> > +     {}
+> > +};
+> > +
+> >   static inline u64 vmx_get_perf_capabilities(void)
+> >   {
+> >       u64 perf_cap = 0;
+> > @@ -383,7 +399,8 @@ static inline u64 vmx_get_perf_capabilities(void)
+> >       if (boot_cpu_has(X86_FEATURE_PDCM))
+> >               rdmsrl(MSR_IA32_PERF_CAPABILITIES, perf_cap);
+> >
+> > -     perf_cap &= PMU_CAP_LBR_FMT;
+> > +     if (!x86_match_cpu(lbr_select_shared_cpu))
+> > +             perf_cap &= PMU_CAP_LBR_FMT;
+> >
+> >       /*
+> >        * Since counters are virtualized, KVM would support full
+> >
