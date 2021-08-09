@@ -2,143 +2,135 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id DF8163E4B01
-	for <lists+kvm@lfdr.de>; Mon,  9 Aug 2021 19:40:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B54D93E517D
+	for <lists+kvm@lfdr.de>; Tue, 10 Aug 2021 05:28:10 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234521AbhHIRkc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 9 Aug 2021 13:40:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60940 "EHLO
+        id S236692AbhHJD2a (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 9 Aug 2021 23:28:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52206 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234545AbhHIRkb (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 9 Aug 2021 13:40:31 -0400
-Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A1196C061796
-        for <kvm@vger.kernel.org>; Mon,  9 Aug 2021 10:40:10 -0700 (PDT)
-Received: by mail-yb1-xb4a.google.com with SMTP id f8-20020a2585480000b02905937897e3daso4865480ybn.2
-        for <kvm@vger.kernel.org>; Mon, 09 Aug 2021 10:40:10 -0700 (PDT)
+        with ESMTP id S236656AbhHJD23 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 9 Aug 2021 23:28:29 -0400
+Received: from mail-pl1-x630.google.com (mail-pl1-x630.google.com [IPv6:2607:f8b0:4864:20::630])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 39A6AC0613D3;
+        Mon,  9 Aug 2021 20:28:08 -0700 (PDT)
+Received: by mail-pl1-x630.google.com with SMTP id d1so19114680pll.1;
+        Mon, 09 Aug 2021 20:28:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=reply-to:date:in-reply-to:message-id:mime-version:references
-         :subject:from:to:cc;
-        bh=J36Wx/RkTb0D4oTQeLsHsT1q0l8StXG1g3yJDRFzPZE=;
-        b=VdTTxR661OL3+D5jswoMHXZIoH3185bNJA+vHUPtyk+nv1RVhw48mrJAUzZm07Bt6r
-         DyAdUL2h1TLN5GaCLOsG3sInSLCU/uemQ9DGHfm6ph9xXASmnUc2hKyar26TxDz9SpdL
-         5XzXbtKpihv9i/vvyu8wkVBh4+a8qcg2NShVlbJ9o1c8Z444LaKAGWi8LIo6PeZqEwWf
-         CkK09U8+KicN0lDfvdsZ64/P3fyh4fb/TTxpFRxE+BYMuEqO2OI4ph/qMuxmdRHlh9ym
-         g2r3yfBEsybF6onKjyQYnMmqFSTJ3HrEeTG1VHAldc/ZwcA7BvP9GqmSYET6/h601hnG
-         Wb7w==
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id:in-reply-to:references
+         :mime-version:content-transfer-encoding;
+        bh=M/ed0gDaKV+4auNbc7EJdhjHTQcL9A5qPBDfLfsEH1s=;
+        b=BjdVyzF3VGwrkJN4df7DhbgvySjlcyUylGVAZWO7PqsKNCneDbmpU0vhMhWyMbPOBZ
+         MdgWVtV+PQPQEx07Yw4flE3hKSro1Ap7wzsKKjHeliXKH9n32VTvJeyZBTt3tvi7k9hs
+         sdKHMJGQ255ldC+fUSSoigXuVY1FNGM0EWgv4MGMHMzfX/kXf2nZtjX+Kjpp191wwshp
+         5m8+tA4u35SuXwBqlWaG5c9d38N+OXUr+6bj5DTLqO24f6mwaajSAV+gzF/cC8WxUKHi
+         evsyNVpZFxKB1/Xx6P7ALfDVHbNQC+AY4PvHS8uy2H9+xNEBZc/UQjUbD6seHvcwhzg4
+         XsHw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:reply-to:date:in-reply-to:message-id
-         :mime-version:references:subject:from:to:cc;
-        bh=J36Wx/RkTb0D4oTQeLsHsT1q0l8StXG1g3yJDRFzPZE=;
-        b=erhjGxtCN5S2KV07mMtH1qlDxC/DyowJMbWktwDAjPWokwp/nwoxQ6P3JueCbI/Drn
-         QJ2dY+K6ai8BSvttUGZPkincCVGzFIirgvhDAvVgasBDvnSbSjjhOX8VqMTYYQtOdawB
-         a1IM3s43VBW6kTwkCLPdJq8YodoQFgnZH5BzErZV+//vcBTpeAX1nBCsv6wp/xickWAH
-         p23iZF9r99spYo/5cBnYjW7p/VQBLYCn/qAbWdxnIS9C7eDbd/5/qZkafTFHcJSolNDP
-         gZOQtPhA/30EZ3KBYZsv1QflhioiLXuhnvhsNJfUG56A+vxYQULP39SuNj8V3Z9b7d2c
-         Ezcg==
-X-Gm-Message-State: AOAM530tawBh0Bdzzpm8+aT61BvJjOMuMl6aln1y5p2O03l2ezddp3BR
-        1fD5YTNKWLhbQZJAx4vluANUToP8rZA=
-X-Google-Smtp-Source: ABdhPJxfsVYalWjf7EAWF143gPK9KWWTt1llY4AdJOvSpHxmE3x5I+M8k/C6dMXHmNMbqBjXGNz74hdfTiY=
-X-Received: from seanjc798194.pdx.corp.google.com ([2620:15c:90:200:b967:644e:62eb:1752])
- (user=seanjc job=sendgmr) by 2002:a25:c4:: with SMTP id 187mr33657699yba.373.1628530809907;
- Mon, 09 Aug 2021 10:40:09 -0700 (PDT)
-Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Mon,  9 Aug 2021 10:39:55 -0700
-In-Reply-To: <20210809173955.1710866-1-seanjc@google.com>
-Message-Id: <20210809173955.1710866-3-seanjc@google.com>
-Mime-Version: 1.0
-References: <20210809173955.1710866-1-seanjc@google.com>
-X-Mailer: git-send-email 2.32.0.605.g8dce9f2422-goog
-Subject: [PATCH v2 2/2] KVM: x86: Move declaration of kvm_spurious_fault() to x86.h
-From:   Sean Christopherson <seanjc@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Sean Christopherson <seanjc@google.com>,
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=M/ed0gDaKV+4auNbc7EJdhjHTQcL9A5qPBDfLfsEH1s=;
+        b=nCop1JxwB0gp/WV6JRNSdXH2s3MNFHeY0u0+dUTmxV6MfpL6KD+DO/6l63LLMZWgE3
+         lor4SnYcGHIeu4h4F9+b/dJDjBt29/W+UZ3+vrl7eZOy3xAabIxBghh/vgxV9GoSlyX8
+         QnFZPxvHdiJhCf/wKGwAKRrDcpbYIGIzFhV5F1P3tr6/Mw+9Xb2XklohiC+YaKLg4P3r
+         rJMGtIq5MUEK/arjj0MKtBR/d/oGT32Cx/CS4LaeGBn+zkHwYplV71rPI1aFGQtOEBo2
+         0V6GhW5lyVWRROdOD6YdVsF96J2HabheJeVBLNhuswUtHM89jWGRCzAF04YgCKZbx7NH
+         2Nnw==
+X-Gm-Message-State: AOAM531dt27JRWe5eApycLWofeITPgLaHjXlzb7h6cGscFgTGqGJzisA
+        pIavyhHd4imeICKkyPruKeiPHKDlpjU=
+X-Google-Smtp-Source: ABdhPJzv6VJrv87qOl6QBbPi+/OtpoeMh8LN/1Mh6Vu107huljtA0JToLg2ZJWOzax2i5DM9J4DfXQ==
+X-Received: by 2002:a62:cdc8:0:b029:3c4:e67e:2c0b with SMTP id o191-20020a62cdc80000b02903c4e67e2c0bmr21214340pfg.65.1628566087521;
+        Mon, 09 Aug 2021 20:28:07 -0700 (PDT)
+Received: from localhost ([47.251.4.198])
+        by smtp.gmail.com with ESMTPSA id j6sm24587192pgq.0.2021.08.09.20.28.06
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Mon, 09 Aug 2021 20:28:07 -0700 (PDT)
+From:   Lai Jiangshan <jiangshanlai@gmail.com>
+To:     linux-kernel@vger.kernel.org
+Cc:     Lai Jiangshan <laijs@linux.alibaba.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Uros Bizjak <ubizjak@gmail.com>,
-        Like Xu <like.xu.linux@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
+        kvm@vger.kernel.org
+Subject: [PATCH V2 1/3] KVM: X86: Remove unneeded KVM_DEBUGREG_RELOAD
+Date:   Tue, 10 Aug 2021 01:43:05 +0800
+Message-Id: <20210809174307.145263-1-jiangshanlai@gmail.com>
+X-Mailer: git-send-email 2.19.1.6.gb485710b
+In-Reply-To: <YRFdq8sNuXYpgemU@google.com>
+References: <YRFdq8sNuXYpgemU@google.com>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Uros Bizjak <ubizjak@gmail.com>
+From: Lai Jiangshan <laijs@linux.alibaba.com>
 
-Move the declaration of kvm_spurious_fault() to KVM's "private" x86.h,
-it should never be called by anything other than low level KVM code.
+Commit ae561edeb421 ("KVM: x86: DR0-DR3 are not clear on reset") added code to
+ensure eff_db are updated when they're modified through non-standard paths.
 
-Cc: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Sean Christopherson <seanjc@google.com>
-Signed-off-by: Uros Bizjak <ubizjak@gmail.com>
-[sean: rebased to a series without __ex()/__kvm_handle_fault_on_reboot()]
-Signed-off-by: Sean Christopherson <seanjc@google.com>
+But there is no reason to also update hardware DRs unless hardware breakpoints
+are active or DR exiting is disabled, and in those cases updating hardware is
+handled by KVM_DEBUGREG_WONT_EXIT and KVM_DEBUGREG_BP_ENABLED.
+
+KVM_DEBUGREG_RELOAD just causes unnecesarry load of hardware DRs and is better
+to be removed.
+
+Suggested-by: Sean Christopherson <seanjc@google.com>
+Signed-off-by: Lai Jiangshan <laijs@linux.alibaba.com>
 ---
- arch/x86/include/asm/kvm_host.h | 2 --
- arch/x86/kvm/svm/svm_ops.h      | 2 +-
- arch/x86/kvm/vmx/vmx_ops.h      | 2 +-
- arch/x86/kvm/x86.h              | 2 ++
- 4 files changed, 4 insertions(+), 4 deletions(-)
+ arch/x86/include/asm/kvm_host.h | 1 -
+ arch/x86/kvm/x86.c              | 3 ---
+ 2 files changed, 4 deletions(-)
 
 diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index 56540b5befd0..45e618902623 100644
+index 974cbfb1eefe..9623855a5838 100644
 --- a/arch/x86/include/asm/kvm_host.h
 +++ b/arch/x86/include/asm/kvm_host.h
-@@ -1798,8 +1798,6 @@ enum {
- #define kvm_arch_vcpu_memslots_id(vcpu) ((vcpu)->arch.hflags & HF_SMM_MASK ? 1 : 0)
- #define kvm_memslots_for_spte_role(kvm, role) __kvm_memslots(kvm, (role).smm)
+@@ -522,7 +522,6 @@ struct kvm_pmu_ops;
+ enum {
+ 	KVM_DEBUGREG_BP_ENABLED = 1,
+ 	KVM_DEBUGREG_WONT_EXIT = 2,
+-	KVM_DEBUGREG_RELOAD = 4,
+ };
  
--void kvm_spurious_fault(void);
--
- #define KVM_ARCH_WANT_MMU_NOTIFIER
+ struct kvm_mtrr_range {
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 4116567f3d44..ad47a09ce307 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -1180,7 +1180,6 @@ static void kvm_update_dr0123(struct kvm_vcpu *vcpu)
+ 	if (!(vcpu->guest_debug & KVM_GUESTDBG_USE_HW_BP)) {
+ 		for (i = 0; i < KVM_NR_DB_REGS; i++)
+ 			vcpu->arch.eff_db[i] = vcpu->arch.db[i];
+-		vcpu->arch.switch_db_regs |= KVM_DEBUGREG_RELOAD;
+ 	}
+ }
  
- int kvm_cpu_has_injectable_intr(struct kvm_vcpu *v);
-diff --git a/arch/x86/kvm/svm/svm_ops.h b/arch/x86/kvm/svm/svm_ops.h
-index 8170f2a5a16f..22e2b019de37 100644
---- a/arch/x86/kvm/svm/svm_ops.h
-+++ b/arch/x86/kvm/svm/svm_ops.h
-@@ -4,7 +4,7 @@
+@@ -9600,7 +9599,6 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
+ 		set_debugreg(vcpu->arch.eff_db[2], 2);
+ 		set_debugreg(vcpu->arch.eff_db[3], 3);
+ 		set_debugreg(vcpu->arch.dr6, 6);
+-		vcpu->arch.switch_db_regs &= ~KVM_DEBUGREG_RELOAD;
+ 	} else if (unlikely(hw_breakpoint_active())) {
+ 		set_debugreg(0, 7);
+ 	}
+@@ -9630,7 +9628,6 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
+ 		static_call(kvm_x86_sync_dirty_debug_regs)(vcpu);
+ 		kvm_update_dr0123(vcpu);
+ 		kvm_update_dr7(vcpu);
+-		vcpu->arch.switch_db_regs &= ~KVM_DEBUGREG_RELOAD;
+ 	}
  
- #include <linux/compiler_types.h>
- 
--#include <asm/kvm_host.h>
-+#include "x86.h"
- 
- #define svm_asm(insn, clobber...)				\
- do {								\
-diff --git a/arch/x86/kvm/vmx/vmx_ops.h b/arch/x86/kvm/vmx/vmx_ops.h
-index c0d74b994b56..9e9ef47e988c 100644
---- a/arch/x86/kvm/vmx/vmx_ops.h
-+++ b/arch/x86/kvm/vmx/vmx_ops.h
-@@ -4,11 +4,11 @@
- 
- #include <linux/nospec.h>
- 
--#include <asm/kvm_host.h>
- #include <asm/vmx.h>
- 
- #include "evmcs.h"
- #include "vmcs.h"
-+#include "x86.h"
- 
- asmlinkage void vmread_error(unsigned long field, bool fault);
- __attribute__((regparm(0))) void vmread_error_trampoline(unsigned long field,
-diff --git a/arch/x86/kvm/x86.h b/arch/x86/kvm/x86.h
-index 44ae10312740..7d66d63dc55a 100644
---- a/arch/x86/kvm/x86.h
-+++ b/arch/x86/kvm/x86.h
-@@ -8,6 +8,8 @@
- #include "kvm_cache_regs.h"
- #include "kvm_emulate.h"
- 
-+void kvm_spurious_fault(void);
-+
- static __always_inline void kvm_guest_enter_irqoff(void)
- {
  	/*
 -- 
-2.32.0.605.g8dce9f2422-goog
+2.19.1.6.gb485710b
 
