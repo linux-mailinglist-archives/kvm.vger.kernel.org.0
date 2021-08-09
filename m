@@ -2,51 +2,51 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 52E623E42CA
+	by mail.lfdr.de (Postfix) with ESMTP id E5CCE3E42CC
 	for <lists+kvm@lfdr.de>; Mon,  9 Aug 2021 11:34:29 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234545AbhHIJen (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 9 Aug 2021 05:34:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33754 "EHLO
+        id S234589AbhHIJer (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 9 Aug 2021 05:34:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33770 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234521AbhHIJem (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 9 Aug 2021 05:34:42 -0400
-Received: from mail-pl1-x631.google.com (mail-pl1-x631.google.com [IPv6:2607:f8b0:4864:20::631])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C55C9C0613CF;
-        Mon,  9 Aug 2021 02:34:22 -0700 (PDT)
-Received: by mail-pl1-x631.google.com with SMTP id e19so2193114pla.10;
-        Mon, 09 Aug 2021 02:34:22 -0700 (PDT)
+        with ESMTP id S234564AbhHIJeq (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 9 Aug 2021 05:34:46 -0400
+Received: from mail-pj1-x1034.google.com (mail-pj1-x1034.google.com [IPv6:2607:f8b0:4864:20::1034])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 840EDC0613CF;
+        Mon,  9 Aug 2021 02:34:25 -0700 (PDT)
+Received: by mail-pj1-x1034.google.com with SMTP id gz13-20020a17090b0ecdb0290178c0e0ce8bso662982pjb.1;
+        Mon, 09 Aug 2021 02:34:25 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=LMGJDyl7UhcfZwG/lrk8OVLrJYjfTuTv0zD0UPmM7+o=;
-        b=SQqQMjjNJtk6SKMeeSexM65VwayfQgmINsOAHqkKJo7kzA1/yVXgQDnT8/H/wInPhb
-         dwYT7HJKzbmzjFLykHB3wicVvn63a89l8CHHtM26NGaShcDuvTJFPZxluspYhjmGdNWE
-         O76Wjlfp3KrKA6pA6CK4V+Zko6mbZPp1b8u3ZJZ/psSENk1VHfttgCj77mZeEL27iToZ
-         b/+3oK5gl4a0XMjKO3NkVLFsLGyAx0PqTl1LKehnDbioClJgmJ2nkhBBWGSKPrrFDcoz
-         FB/4IuAXqHTp5madlb8ZI2Ymi9J4/U4KARlKpFFdn4K6GVd9QXAZ/JoqYljC+d9vKBgr
-         RojQ==
+        bh=5jB8CoTWK2C4ziZeKzeYIfYXklUI9UOSANjF0ttEBWc=;
+        b=cMfv9a7/zeSchOm6rgA2iBCzcCgPawm058zZmliElUjw5rfCx1RPivisNphQdRG+Uc
+         Q91I1bbBdEBbaTUSdPLC66kCYFSt152lag39+XBxEOFYuVSD5TbTMpYHUJfwLSzHm2q5
+         PaBFuAmsKFGMOOCtemxvd45P4s8pCl5wmyb/PkbQ/hiYWYkSLbWifhzVtKDE5+CfpM19
+         ynvXXmkgayhsyHHq//bdNN6uMrYjUX9CdNyhYcDMDgrP1HpH5YElkCsMvmS0amPoX4ok
+         pvB/qymyx0koxABC1I57r04A1+bMsh4SLZ53z6DHtDCxc7/5uBYepYddvFlEkiWKrhC1
+         K8SQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=LMGJDyl7UhcfZwG/lrk8OVLrJYjfTuTv0zD0UPmM7+o=;
-        b=cjHRyuIw+3Tn9YNl+A6HregJhceWtWZXMgdBQzbG/WXC8gnsXfXIe14WeFMTUJ8ZHg
-         t3FBtOF3jNNDhcmQgxASMGBnfsh+mqdmMQLHAHjdaymeLUzuN73P14BhyKbAeig5X+uj
-         nkPl4RzOYr9cou9K5trHHpjZ3HoIJzlk0VXegOSLK5PljoZ1Gy4c4YqY/C9duhAn7boy
-         pW8+TPtW4sTNNzU/aA4eTNc1N1LkVGmARKrBYKRKLE5jizFSC9v1+JVtda64ICb56oOQ
-         isjZXNXZEIgNIJaQUw6t2RrqzzKC6ELRWIliy2Db8Dy+s24tv1qwNmJt3QC0JlBgb1H/
-         XYiQ==
-X-Gm-Message-State: AOAM533QWYbTf7OaHgHZwJ/6QhdldCp62iyHDveNB/cA+n1If3BAPlXc
-        fqJVxHaYORFlugvwr2Kubms=
-X-Google-Smtp-Source: ABdhPJyZU6UtCWnNmc+vik8Zko8d4QMuc0ueQP8e8SRyNKnXWN87CtOVEYzgehdkvo5psjMlLMXh+g==
-X-Received: by 2002:a63:7343:: with SMTP id d3mr87542pgn.169.1628501662437;
-        Mon, 09 Aug 2021 02:34:22 -0700 (PDT)
+        bh=5jB8CoTWK2C4ziZeKzeYIfYXklUI9UOSANjF0ttEBWc=;
+        b=qOF9WdeUzg9F9G6J2Ueq8pfrHdvmwI/ZB0BeGFPsl7IPcI8xhNS/HFEWrdpNI9+yjN
+         cKhf0IKdjtuRSJWbtf9InVN22XWqAKM4kswGKpH56vE8ZFO3FGqavtOLjmR0X9We/p/4
+         uf3VtE656aULc7dHsPoLhhVFvZTM15ianYQIzep1rsBhx6xflF8gQ/XotkLejUDGvYYN
+         ak8+EKQl9BSLozoDxYTvi0WDOSNNvBcquK9uLd6tGFeelytkz5oeRHGNyfvXPst37FaB
+         VN/vnBw7DHUdD+gcM2cwCvGovpPPesgTc5VrUsAT6DG/0pe3ANaTBjUe1XUZVmIhL3YV
+         AH5Q==
+X-Gm-Message-State: AOAM532COthiJLqqYKAMUv+Zs9DT+zfBIXoxAVZQdcqf/wFXRUhBp+Rn
+        owIn599YammmLYmCkvMMuf4=
+X-Google-Smtp-Source: ABdhPJxOHWdPCzmG+3XrWMpK6NGltR81LX3pHqFBvsFSGhlXxJ43yuht5ggjYdMn2UIRFpW757ijjg==
+X-Received: by 2002:a17:90a:d702:: with SMTP id y2mr3014220pju.127.1628501665087;
+        Mon, 09 Aug 2021 02:34:25 -0700 (PDT)
 Received: from localhost.localdomain ([103.7.29.32])
-        by smtp.gmail.com with ESMTPSA id h188sm10839982pfg.45.2021.08.09.02.34.20
+        by smtp.gmail.com with ESMTPSA id h188sm10839982pfg.45.2021.08.09.02.34.22
         (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 09 Aug 2021 02:34:22 -0700 (PDT)
+        Mon, 09 Aug 2021 02:34:24 -0700 (PDT)
 From:   Like Xu <like.xu.linux@gmail.com>
 X-Google-Original-From: Like Xu <likexu@tencent.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
@@ -56,9 +56,9 @@ Cc:     Sean Christopherson <seanjc@google.com>,
         Jim Mattson <jmattson@google.com>,
         Joerg Roedel <joro@8bytes.org>, Ingo Molnar <mingo@redhat.com>,
         kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH 1/5] KVM: x86: Clean up redundant mod_64(x, y) macro definition
-Date:   Mon,  9 Aug 2021 17:34:06 +0800
-Message-Id: <20210809093410.59304-2-likexu@tencent.com>
+Subject: [PATCH 2/5] KVM: x86: Clean up redundant CC macro definition
+Date:   Mon,  9 Aug 2021 17:34:07 +0800
+Message-Id: <20210809093410.59304-3-likexu@tencent.com>
 X-Mailer: git-send-email 2.32.0
 In-Reply-To: <20210809093410.59304-1-likexu@tencent.com>
 References: <20210809093410.59304-1-likexu@tencent.com>
@@ -70,68 +70,57 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Like Xu <likexu@tencent.com>
 
-The mod_64(x, y) macro is only defined and used in the kvm/x86 context.
-It's safe to move the definition of mod_64(x, y) from x86/{i8254lapic}.c
-to the generic x86.h without any intended functional change.
+With the exception of drivers/dma/pl330.c, the CC macro is defined and used
+in {svm, vmx}/nested.c, and the KVM_NESTED_VMENTER_CONSISTENCY_CHECK
+macro it refers to is defined in x86.h, so it's safe to move it into x86.h
+without intended functional changes.
 
 Signed-off-by: Like Xu <likexu@tencent.com>
 ---
- arch/x86/kvm/i8254.c | 6 ------
- arch/x86/kvm/lapic.c | 6 ------
- arch/x86/kvm/x86.h   | 6 ++++++
- 3 files changed, 6 insertions(+), 12 deletions(-)
+ arch/x86/kvm/svm/nested.c | 2 --
+ arch/x86/kvm/vmx/nested.c | 2 --
+ arch/x86/kvm/x86.h        | 2 ++
+ 3 files changed, 2 insertions(+), 4 deletions(-)
 
-diff --git a/arch/x86/kvm/i8254.c b/arch/x86/kvm/i8254.c
-index 5a69cce4d72d..81d2ba064dc3 100644
---- a/arch/x86/kvm/i8254.c
-+++ b/arch/x86/kvm/i8254.c
-@@ -40,12 +40,6 @@
- #include "i8254.h"
- #include "x86.h"
+diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
+index 5e13357da21e..57c288ba6ef0 100644
+--- a/arch/x86/kvm/svm/nested.c
++++ b/arch/x86/kvm/svm/nested.c
+@@ -29,8 +29,6 @@
+ #include "lapic.h"
+ #include "svm.h"
  
--#ifndef CONFIG_X86_64
--#define mod_64(x, y) ((x) - (y) * div64_u64(x, y))
--#else
--#define mod_64(x, y) ((x) % (y))
--#endif
+-#define CC KVM_NESTED_VMENTER_CONSISTENCY_CHECK
 -
- #define RW_STATE_LSB 1
- #define RW_STATE_MSB 2
- #define RW_STATE_WORD0 3
-diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
-index 76fb00921203..6b3d8feac1d0 100644
---- a/arch/x86/kvm/lapic.c
-+++ b/arch/x86/kvm/lapic.c
-@@ -42,12 +42,6 @@
- #include "cpuid.h"
- #include "hyperv.h"
+ static void nested_svm_inject_npf_exit(struct kvm_vcpu *vcpu,
+ 				       struct x86_exception *fault)
+ {
+diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+index 0d0dd6580cfd..404db7c854d2 100644
+--- a/arch/x86/kvm/vmx/nested.c
++++ b/arch/x86/kvm/vmx/nested.c
+@@ -22,8 +22,6 @@ module_param_named(enable_shadow_vmcs, enable_shadow_vmcs, bool, S_IRUGO);
+ static bool __read_mostly nested_early_check = 0;
+ module_param(nested_early_check, bool, S_IRUGO);
  
--#ifndef CONFIG_X86_64
--#define mod_64(x, y) ((x) - (y) * div64_u64(x, y))
--#else
--#define mod_64(x, y) ((x) % (y))
--#endif
+-#define CC KVM_NESTED_VMENTER_CONSISTENCY_CHECK
 -
- #define PRId64 "d"
- #define PRIx64 "llx"
- #define PRIu64 "u"
+ /*
+  * Hyper-V requires all of these, so mark them as supported even though
+  * they are just treated the same as all-context.
 diff --git a/arch/x86/kvm/x86.h b/arch/x86/kvm/x86.h
-index 44ae10312740..6aac4a901b65 100644
+index 6aac4a901b65..b8a024b0f91c 100644
 --- a/arch/x86/kvm/x86.h
 +++ b/arch/x86/kvm/x86.h
-@@ -8,6 +8,12 @@
- #include "kvm_cache_regs.h"
- #include "kvm_emulate.h"
+@@ -67,6 +67,8 @@ static __always_inline void kvm_guest_exit_irqoff(void)
+ 	failed;								\
+ })
  
-+#ifndef CONFIG_X86_64
-+#define mod_64(x, y) ((x) - (y) * div64_u64(x, y))
-+#else
-+#define mod_64(x, y) ((x) % (y))
-+#endif
++#define CC KVM_NESTED_VMENTER_CONSISTENCY_CHECK
 +
- static __always_inline void kvm_guest_enter_irqoff(void)
- {
- 	/*
+ #define KVM_DEFAULT_PLE_GAP		128
+ #define KVM_VMX_DEFAULT_PLE_WINDOW	4096
+ #define KVM_DEFAULT_PLE_WINDOW_GROW	2
 -- 
 2.32.0
 
