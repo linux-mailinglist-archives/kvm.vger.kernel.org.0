@@ -2,51 +2,51 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C4AD83E42CE
-	for <lists+kvm@lfdr.de>; Mon,  9 Aug 2021 11:34:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 26DE63E42D2
+	for <lists+kvm@lfdr.de>; Mon,  9 Aug 2021 11:34:41 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234630AbhHIJev (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 9 Aug 2021 05:34:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33794 "EHLO
+        id S234674AbhHIJe6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 9 Aug 2021 05:34:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33808 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234564AbhHIJeu (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 9 Aug 2021 05:34:50 -0400
-Received: from mail-pj1-x1031.google.com (mail-pj1-x1031.google.com [IPv6:2607:f8b0:4864:20::1031])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BCF97C061796;
-        Mon,  9 Aug 2021 02:34:30 -0700 (PDT)
-Received: by mail-pj1-x1031.google.com with SMTP id u13-20020a17090abb0db0290177e1d9b3f7so33546164pjr.1;
-        Mon, 09 Aug 2021 02:34:30 -0700 (PDT)
+        with ESMTP id S234650AbhHIJex (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 9 Aug 2021 05:34:53 -0400
+Received: from mail-pl1-x62a.google.com (mail-pl1-x62a.google.com [IPv6:2607:f8b0:4864:20::62a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 80B91C0613D3;
+        Mon,  9 Aug 2021 02:34:33 -0700 (PDT)
+Received: by mail-pl1-x62a.google.com with SMTP id k2so15672547plk.13;
+        Mon, 09 Aug 2021 02:34:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=paMMYKKDNMpKtXFsce6OcCMqHzENmTbIMXLEYEGC9LM=;
-        b=YfmvDMH8vOx5dSG8Iguhx/ExPkvGJl8W2PJzWwEQW/MIoVsUOMmL4izX0nfphOurzh
-         na2Qo3OOnJ3MjgfVaaBkqYZGkvv98IgzooTQfDOR6+hdvzIyjegHOs1y4G6l8DSl5I3n
-         bmXZ+x2zT32FtOtyp3eliwY35QHyzy+Ag3lUrh1nGVU6VzBcyG5GfgdO88hfm4zfJF09
-         JPi+pS8fokwdf9IQa5HWikZgCf6YjolZ7oswnKOOS98439Mbms6N5yODv+Xo1v0KiG5x
-         IlVoghL9vGtld7yrCXXHouj2M9RF9urgQd6dnnoAKURgU1onxLYmMOAGYyxEh8pG3nxP
-         2/zA==
+        bh=biNAy5h7oVY1q9CMKi2TrD2G8iCaEg6EwP+zpkG0x9I=;
+        b=KOFlhkZ8VT9Gg9IfumWNsU68mB6qyhv3ke4WeNu4vQGPDja7D1rSsGobfSJIEz+trR
+         tO10tcI5Hsvj8CxNRUpQLmai/t3R9HPXZ5Hmed/L/L7VveGjC9KkQOocGuCJ2kT9PodI
+         wJdX5yFTlyHJ/2XcQS23jBgqwZPNeHKskN59LNx5u5k+qRP8DlSvjgPrPR6MPqSQhK+b
+         jeUio+sEk/0O7teaVuE4PNUumxMPAsUNNedzbRoTF/xU0ZDvauzppZXLw4npMgEMbNlQ
+         ZxhZeWFhU+fCA4cbtTIW8adOo9zshLEb0xohK0qyccRqe729ErkEWDbBBat+wdIF74sV
+         2eBg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=paMMYKKDNMpKtXFsce6OcCMqHzENmTbIMXLEYEGC9LM=;
-        b=iC5ycX0OiHNE0SnatQHYpB/K7nRsZWIykxJGZGEcE32mMftboggvhLxPtsuF4lwvoI
-         +1gvAahNBY+c7KUbtYJ2bMmNt/9TP8xgvxlBGnxRGjiuZYEdwC9WlD5A/qip/0bYjV9g
-         UC94tl8TtboQ+rFfqd9zCVTluve/B1wl6AQkGFOOaGn3BzCzRWOLdptmMZ0k+bFlvcNM
-         iXOPgMx8hnb6Ks/epoGEPeom7kostNrKZaq8vjnvBUarNSTTIjYk1VyBC/h/+BAew42l
-         DM5QlC60w/fT/qVSqotFiiTuOgenkWfpeujmNswI2cqetA4EobuWssByN+iLoO6nb9nI
-         31lA==
-X-Gm-Message-State: AOAM533G5MLjgTnICemiUcrjzhqgzQksxEak5jhBHdbKXwzJbmD1aSJ/
-        PEECtFFl4RoxfN/EOq14ryI=
-X-Google-Smtp-Source: ABdhPJymEN9P+1KmLocw1I3tK+cZ/V7imfxvFX/+U6VG93/lGJn536uhRiVpRcCOaE36oGuGcVSvXg==
-X-Received: by 2002:a17:902:6ac8:b029:12d:632:ffcf with SMTP id i8-20020a1709026ac8b029012d0632ffcfmr8948632plt.28.1628501670386;
-        Mon, 09 Aug 2021 02:34:30 -0700 (PDT)
+        bh=biNAy5h7oVY1q9CMKi2TrD2G8iCaEg6EwP+zpkG0x9I=;
+        b=Y2Zjz5eF0dec/wfwAww9DYRJozS+ezuT92sFM88W8ijJHKK7yDRUGlTrs15IVuavKH
+         zZeL0o/3DtgJkoHLXQmZwdRJgu8dtrkoDjAKArGy3XqaArJz5lvXK0HDMBNJ8lVsYOcU
+         +YPLDEKiKXuAgOtC+CWUFVkutPk3E8mU326fMZQjc+RLdYQ7ro/VcrCNMVYKzJoDyayU
+         izPkk58vRLBozsxGhWdM4LKqSs9OmOz0QdyHAExzflanYqaXAhFBRqLh4R0DWlCm30CY
+         lrSooBGE6Zdo/5VXXBKu8d3jzGD4Luznqn0MiXV0Xn0ITl20phP+XDETAGEauhi0srOg
+         1sbA==
+X-Gm-Message-State: AOAM531iZ8wQwzN7TM3EzI89yLIIPJYgpAY4YOvmpvcgcbZiFpglH0qb
+        3FJHI+f7jAOQKUWP7bbBwJU=
+X-Google-Smtp-Source: ABdhPJxKQ+0mIcms3UnGJli7b+FS7AElw6vbE0y7uJR2PIKScPY3i57ziCBYSkdhDkTL5xfz7FhBKA==
+X-Received: by 2002:a17:903:31c3:b029:ed:6f74:49c7 with SMTP id v3-20020a17090331c3b02900ed6f7449c7mr19366644ple.12.1628501673150;
+        Mon, 09 Aug 2021 02:34:33 -0700 (PDT)
 Received: from localhost.localdomain ([103.7.29.32])
-        by smtp.gmail.com with ESMTPSA id h188sm10839982pfg.45.2021.08.09.02.34.28
+        by smtp.gmail.com with ESMTPSA id h188sm10839982pfg.45.2021.08.09.02.34.30
         (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 09 Aug 2021 02:34:30 -0700 (PDT)
+        Mon, 09 Aug 2021 02:34:32 -0700 (PDT)
 From:   Like Xu <like.xu.linux@gmail.com>
 X-Google-Original-From: Like Xu <likexu@tencent.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
@@ -56,9 +56,9 @@ Cc:     Sean Christopherson <seanjc@google.com>,
         Jim Mattson <jmattson@google.com>,
         Joerg Roedel <joro@8bytes.org>, Ingo Molnar <mingo@redhat.com>,
         kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH 4/5] KVM: x86: Clean up redundant __ex(x) macro definition
-Date:   Mon,  9 Aug 2021 17:34:09 +0800
-Message-Id: <20210809093410.59304-5-likexu@tencent.com>
+Subject: [PATCH 5/5] KVM: x86: Clean up redundant pr_fmt(fmt) macro definition for svm
+Date:   Mon,  9 Aug 2021 17:34:10 +0800
+Message-Id: <20210809093410.59304-6-likexu@tencent.com>
 X-Mailer: git-send-email 2.32.0
 In-Reply-To: <20210809093410.59304-1-likexu@tencent.com>
 References: <20210809093410.59304-1-likexu@tencent.com>
@@ -70,71 +70,69 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Like Xu <likexu@tencent.com>
 
-The __ex(x) macro is repeatedly defined in sev.c, svm.c and vmx_ops.h,
-and it has never been used outside the KVM/x86 context.
+The svm specific pr_fmt(fmt) macro is repeatedly defined in svm code
+and the new one has never been used outside the svm context.
 
-Let's move it to kvm_host.h without any intended functional changes.
+Let's move it to svm.h without any intended functional changes.
 
 Signed-off-by: Like Xu <likexu@tencent.com>
 ---
- arch/x86/include/asm/kvm_host.h | 2 ++
- arch/x86/kvm/svm/sev.c          | 2 --
- arch/x86/kvm/svm/svm.c          | 2 --
- arch/x86/kvm/vmx/vmx_ops.h      | 2 --
- 4 files changed, 2 insertions(+), 6 deletions(-)
+ arch/x86/kvm/svm/avic.c   | 2 --
+ arch/x86/kvm/svm/nested.c | 2 --
+ arch/x86/kvm/svm/svm.c    | 2 --
+ arch/x86/kvm/svm/svm.h    | 3 +++
+ 4 files changed, 3 insertions(+), 6 deletions(-)
 
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index 4c567b05edad..7480d31463bc 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -1823,6 +1823,8 @@ asmlinkage void kvm_spurious_fault(void);
- 	"668: \n\t"							\
- 	_ASM_EXTABLE(666b, 667b)
+diff --git a/arch/x86/kvm/svm/avic.c b/arch/x86/kvm/svm/avic.c
+index a8ad78a2faa1..8b055f9ad9fe 100644
+--- a/arch/x86/kvm/svm/avic.c
++++ b/arch/x86/kvm/svm/avic.c
+@@ -12,8 +12,6 @@
+  *   Avi Kivity   <avi@qumranet.com>
+  */
  
-+#define __ex(x) __kvm_handle_fault_on_reboot(x)
-+
- #define KVM_ARCH_WANT_MMU_NOTIFIER
- 
- int kvm_cpu_has_injectable_intr(struct kvm_vcpu *v);
-diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-index 9f1585f40c85..19cdb73aa623 100644
---- a/arch/x86/kvm/svm/sev.c
-+++ b/arch/x86/kvm/svm/sev.c
-@@ -28,8 +28,6 @@
- #include "cpuid.h"
- #include "trace.h"
- 
--#define __ex(x) __kvm_handle_fault_on_reboot(x)
+-#define pr_fmt(fmt) "SVM: " fmt
 -
- #ifndef CONFIG_KVM_AMD_SEV
- /*
-  * When this config is not defined, SEV feature is not supported and APIs in
+ #include <linux/kvm_types.h>
+ #include <linux/hashtable.h>
+ #include <linux/amd-iommu.h>
+diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
+index 57c288ba6ef0..3080776a55a5 100644
+--- a/arch/x86/kvm/svm/nested.c
++++ b/arch/x86/kvm/svm/nested.c
+@@ -12,8 +12,6 @@
+  *   Avi Kivity   <avi@qumranet.com>
+  */
+ 
+-#define pr_fmt(fmt) "SVM: " fmt
+-
+ #include <linux/kvm_types.h>
+ #include <linux/kvm_host.h>
+ #include <linux/kernel.h>
 diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index 9d72b1df426e..2b6632d4c76f 100644
+index 2b6632d4c76f..4a3f8ef56daa 100644
 --- a/arch/x86/kvm/svm/svm.c
 +++ b/arch/x86/kvm/svm/svm.c
-@@ -46,8 +46,6 @@
- #include "kvm_onhyperv.h"
- #include "svm_onhyperv.h"
- 
--#define __ex(x) __kvm_handle_fault_on_reboot(x)
+@@ -1,5 +1,3 @@
+-#define pr_fmt(fmt) "SVM: " fmt
 -
- MODULE_AUTHOR("Qumranet");
- MODULE_LICENSE("GPL");
+ #include <linux/kvm_host.h>
  
-diff --git a/arch/x86/kvm/vmx/vmx_ops.h b/arch/x86/kvm/vmx/vmx_ops.h
-index 164b64f65a8f..c0d74b994b56 100644
---- a/arch/x86/kvm/vmx/vmx_ops.h
-+++ b/arch/x86/kvm/vmx/vmx_ops.h
-@@ -10,8 +10,6 @@
- #include "evmcs.h"
- #include "vmcs.h"
+ #include "irq.h"
+diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
+index bd0fe94c2920..76d5fe3f00dc 100644
+--- a/arch/x86/kvm/svm/svm.h
++++ b/arch/x86/kvm/svm/svm.h
+@@ -15,6 +15,9 @@
+ #ifndef __SVM_SVM_H
+ #define __SVM_SVM_H
  
--#define __ex(x) __kvm_handle_fault_on_reboot(x)
--
- asmlinkage void vmread_error(unsigned long field, bool fault);
- __attribute__((regparm(0))) void vmread_error_trampoline(unsigned long field,
- 							 bool fault);
++#undef pr_fmt
++#define pr_fmt(fmt) "SVM: " fmt
++
+ #include <linux/kvm_types.h>
+ #include <linux/kvm_host.h>
+ #include <linux/bits.h>
 -- 
 2.32.0
 
