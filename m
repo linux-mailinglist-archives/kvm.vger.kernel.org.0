@@ -2,93 +2,104 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B63983E41FF
-	for <lists+kvm@lfdr.de>; Mon,  9 Aug 2021 11:03:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 71FB03E42C8
+	for <lists+kvm@lfdr.de>; Mon,  9 Aug 2021 11:34:23 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234136AbhHIJDr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 9 Aug 2021 05:03:47 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:27206 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S234085AbhHIJDr (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 9 Aug 2021 05:03:47 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1628499806;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=YD6YtXFfV0ZdxzY2okiuEvUgqKdEvMrxSjlrPcu8jO8=;
-        b=TGE45nIfVc1g+um7sq5N50r/cK2TNC7qwop/SEytKaV0vV7dWqlnJ1BYczWE92V0tW40WA
-        3vDjhQxFr1QpikhE2VLcachu9BTsh0/uneRIX0l4ptgsyF00hIY3j3s6pACErozSmRtQnH
-        ZZY+7DVw8v5c6PVbjMBiJPJ50gw9L/U=
-Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
- [209.85.218.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-74-ijjq_CesOhav8ufQAXPTeA-1; Mon, 09 Aug 2021 05:03:25 -0400
-X-MC-Unique: ijjq_CesOhav8ufQAXPTeA-1
-Received: by mail-ej1-f69.google.com with SMTP id nb40-20020a1709071ca8b02905992266c319so4270975ejc.21
-        for <kvm@vger.kernel.org>; Mon, 09 Aug 2021 02:03:25 -0700 (PDT)
+        id S234468AbhHIJem (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 9 Aug 2021 05:34:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33742 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S234375AbhHIJel (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 9 Aug 2021 05:34:41 -0400
+Received: from mail-pl1-x631.google.com (mail-pl1-x631.google.com [IPv6:2607:f8b0:4864:20::631])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2D249C0613CF;
+        Mon,  9 Aug 2021 02:34:20 -0700 (PDT)
+Received: by mail-pl1-x631.google.com with SMTP id j3so15726179plx.4;
+        Mon, 09 Aug 2021 02:34:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=uCGpUr2j9D66mSgiwXstiBVBXY4god79WtpOChDFv8g=;
+        b=MyyZfcT+a7lJSGQmSG+ij13zxJebAJBwFWfy01VL9LEY79KcZNDZm/Wq9KaDhahy+K
+         bdQc/1FkC9S6fuKFBN/YnnL1zqJuXpW+sNMFzEIxoBzvZptfj5L6fv1KFQK3OF7Pcj6q
+         eFp1Bj08ZbUPbidkpnU8mMN1Lk53zdkgU7ogs33bwemXZCoqyOJ7YPxRSiI1k49EV0aQ
+         ONMaEr8jUSfGsJyU59SzFn+ilJUcshewMPyPu9hVLD8nphqwFaQWc9uBDNMetg7YrN18
+         zqnaXCjDTfRjObbzhvokfq044MmcCoPo87AIBsdTSzLE7pE2At7jh50++aFOVvJZHX+u
+         ChuA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
          :content-transfer-encoding;
-        bh=YD6YtXFfV0ZdxzY2okiuEvUgqKdEvMrxSjlrPcu8jO8=;
-        b=EtfygDm/UWu1yt+XhDtupV+a8K88xJwAcWMnNQjQy/3KknBU8T6nlUACuaSKBit8vh
-         xa7pgYqWsPVDOWEf3BrLoHM7+uEoPhuOyqzZJzNDQZGQBVEF2UBX8aTAr8hNfBtIAVpj
-         tMcM75664Ya5FQQG1qPieUVPFiqGgxZYZddoRxRAAhumb1t6FZQXcqCns7LMzQqSR+Vi
-         PuZ6Tt4I2qHBwT3U1b2SfplGMhtvKgBqUhS7pn/8I4gNeUXBoPu+MmbLn309nqNnS/kv
-         0fmLSUakfEtwQioxNCpsF7yVd+TFPUm5t6DOP38ejfG58YaHZZ9CcVELdn7I9ex78iKz
-         hIhw==
-X-Gm-Message-State: AOAM532ayaE9oloaq+1YNkijZRfObTvNYOQBTz5/JS2/kJ5DxHmmuvHR
-        A2f45QM3RStRCmwbOX3uixp5mhfhfT2uM42DLFn96784u5BgEmWuPh7/zi8tUYv/h4o1ApngbUF
-        70DOqx5gIzXdp494sd+cLOMTiRvB4vW1fqW2mHs/7Mvjtae94H3DCpZVBP6iy/3s1
-X-Received: by 2002:a50:eb95:: with SMTP id y21mr1598525edr.5.1628499804253;
-        Mon, 09 Aug 2021 02:03:24 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwzhaL+Jl3EZwRBsYOO8E4+FcpPlNxyP5w/mtjGoLfLcpqqoyNTzhHHD6cjGczoFBtkRapYOw==
-X-Received: by 2002:a50:eb95:: with SMTP id y21mr1598496edr.5.1628499804014;
-        Mon, 09 Aug 2021 02:03:24 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e? ([2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e])
-        by smtp.gmail.com with ESMTPSA id b1sm5732062ejz.24.2021.08.09.02.03.22
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 09 Aug 2021 02:03:23 -0700 (PDT)
-Subject: Re: [PATCH] selftests: KVM: avoid failures due to reserved
- HyperTransport region
-To:     Joao Martins <joao.m.martins@oracle.com>
-Cc:     stable@vger.kernel.org, David Matlack <dmatlack@google.com>,
-        Maxim Levitsky <mlevitsk@redhat.com>,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-References: <20210805105423.412878-1-pbonzini@redhat.com>
- <4b530fb6-81cc-be36-aa68-92ec01c65775@oracle.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <5f3c13be-f65d-1793-bd91-7491d3e149b0@redhat.com>
-Date:   Mon, 9 Aug 2021 11:03:22 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.11.0
+        bh=uCGpUr2j9D66mSgiwXstiBVBXY4god79WtpOChDFv8g=;
+        b=BRBYX65T7M3wnlCyQVnZneLR64TX3uq4cjALwXu+B66DXAPcpCz1B2APBq8hbpzt/d
+         CbUBZVCkrRSRyhn+9MBavZujQwSJENv0F4wzVEvYqrhy9AliTKwhD0Zesk/1kCyIhI2C
+         ym4C+fcBEsOsxpu0B0gdTUC67qoaUK65rPMP9jvPkRQ5nYp9vV4hY6UbTd+oZuydTikT
+         3oXx0462yNqnpEwMKjnE71VGucbudmknGOK7waVVcA+PfB55R8pRc8N4YUJJAmxOSUg/
+         nVQkk9MAmCHYnagl3q/8gAjhjSI7FRXaP+xAfntlBBzs9S1u7NF8Z2KREcL1iWDu8jM3
+         DR0w==
+X-Gm-Message-State: AOAM531AtIr58r4uco0CMnq5O4FhxlVlNwoBPa/6pkfKspVxRfEz8b1S
+        5IQHNBor1rnsT+aeAo2Fyw8=
+X-Google-Smtp-Source: ABdhPJwBg42DZycaIhZuLLnIypdZvj48GYhu+t8A6d8TpgO3cQ+OhYWXxvpY6o8p7c5TpsRMytPg8Q==
+X-Received: by 2002:a63:dd51:: with SMTP id g17mr716156pgj.47.1628501659697;
+        Mon, 09 Aug 2021 02:34:19 -0700 (PDT)
+Received: from localhost.localdomain ([103.7.29.32])
+        by smtp.gmail.com with ESMTPSA id h188sm10839982pfg.45.2021.08.09.02.34.16
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Mon, 09 Aug 2021 02:34:19 -0700 (PDT)
+From:   Like Xu <like.xu.linux@gmail.com>
+X-Google-Original-From: Like Xu <likexu@tencent.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, Ingo Molnar <mingo@redhat.com>,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [PATCH 0/5] KVM: x86: Clean up redundant macro definitions
+Date:   Mon,  9 Aug 2021 17:34:05 +0800
+Message-Id: <20210809093410.59304-1-likexu@tencent.com>
+X-Mailer: git-send-email 2.32.0
 MIME-Version: 1.0
-In-Reply-To: <4b530fb6-81cc-be36-aa68-92ec01c65775@oracle.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 06/08/21 12:57, Joao Martins wrote:
->   Base Address   Top Address   Use
-> 
->    FD_0000_0000h FD_F7FF_FFFFh Reserved interrupt address space
->    FD_F800_0000h FD_F8FF_FFFFh Interrupt/EOI IntCtl
->    FD_F900_0000h FD_F90F_FFFFh Legacy PIC IACK
->    FD_F910_0000h FD_F91F_FFFFh System Management
->    FD_F920_0000h FD_FAFF_FFFFh Reserved Page Tables
->    FD_FB00_0000h FD_FBFF_FFFFh Address Translation
->    FD_FC00_0000h FD_FDFF_FFFFh I/O Space
->    FD_FE00_0000h FD_FFFF_FFFFh Configuration
->    FE_0000_0000h FE_1FFF_FFFFh Extended Configuration/Device Messages
->    FE_2000_0000h FF_FFFF_FFFFh Reserved
+In KVM/x86 code, there are macros with the same name that are
+defined and used separately in the evolving code, and if the scope
+of the code review is only on iterations of the patch set, it can be
+difficult to spot these fragmented macros being defined repeatedly.
 
-The problems we're seeing are with FFFD_0000_0000h.  How does the IOMMU 
-interpret bits 40-47 of the address?
+IMO, it's necessary to clean this up to improve the consistency and
+readability of the code, and it also helps to avoid software defects
+caused by inconsistencies in the scope of influence of macros.
 
-Paolo
+Like Xu (5):
+  KVM: x86: Clean up redundant mod_64(x, y) macro definition
+  KVM: x86: Clean up redundant CC macro definition
+  KVM: x86: Clean up redundant ROL16(val, n) macro definition
+  KVM: x86: Clean up redundant __ex(x) macro definition
+  KVM: x86: Clean up redundant pr_fmt(fmt) macro definition for svm
+
+ arch/x86/include/asm/kvm_host.h | 2 ++
+ arch/x86/kvm/i8254.c            | 6 ------
+ arch/x86/kvm/lapic.c            | 6 ------
+ arch/x86/kvm/svm/avic.c         | 2 --
+ arch/x86/kvm/svm/nested.c       | 4 ----
+ arch/x86/kvm/svm/sev.c          | 2 --
+ arch/x86/kvm/svm/svm.c          | 4 ----
+ arch/x86/kvm/svm/svm.h          | 3 +++
+ arch/x86/kvm/vmx/evmcs.c        | 1 -
+ arch/x86/kvm/vmx/evmcs.h        | 4 ----
+ arch/x86/kvm/vmx/nested.c       | 2 --
+ arch/x86/kvm/vmx/vmcs.h         | 2 ++
+ arch/x86/kvm/vmx/vmcs12.c       | 1 -
+ arch/x86/kvm/vmx/vmcs12.h       | 4 ----
+ arch/x86/kvm/vmx/vmx_ops.h      | 2 --
+ arch/x86/kvm/x86.h              | 8 ++++++++
+ 16 files changed, 15 insertions(+), 38 deletions(-)
+
+-- 
+2.32.0
 
