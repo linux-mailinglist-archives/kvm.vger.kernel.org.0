@@ -2,155 +2,146 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9628D3E40FF
-	for <lists+kvm@lfdr.de>; Mon,  9 Aug 2021 09:45:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9324F3E410F
+	for <lists+kvm@lfdr.de>; Mon,  9 Aug 2021 09:48:23 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233585AbhHIHp4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 9 Aug 2021 03:45:56 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:20242 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S233552AbhHIHpx (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 9 Aug 2021 03:45:53 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1628495133;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=sNLQyoKHz3doB3VgHoSYiw/2Wi9gt/WD6yUBM0vzV9U=;
-        b=X4vnk2y8K43ftq/lKkUZvNw3xKCIWdX7HqG1dNbpg/AQcM6E0G/kI20zD9a0ZzAraooujs
-        Ub989RRmzccW/lsGpvbknTkhvRv6UfpDBzNf13a+UvtogM5rtzuJ5XnOu8v5TyVkVA+Xbz
-        FejsHiGWbP2S8uUKyAsd8ltGLKPGIy0=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-591-z6TTFUY7OwO2e0ffebZ4jA-1; Mon, 09 Aug 2021 03:45:32 -0400
-X-MC-Unique: z6TTFUY7OwO2e0ffebZ4jA-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 887631853028;
-        Mon,  9 Aug 2021 07:45:30 +0000 (UTC)
-Received: from starship (unknown [10.35.206.50])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id AC1BD60CC9;
-        Mon,  9 Aug 2021 07:45:28 +0000 (UTC)
-Message-ID: <33d01b8bb31541be7911f95581cdf608c6c79bf6.camel@redhat.com>
-Subject: Re: [PATCH] selftests: KVM: avoid failures due to reserved
- HyperTransport region
-From:   Maxim Levitsky <mlevitsk@redhat.com>
-To:     Joao Martins <joao.m.martins@oracle.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Cc:     stable@vger.kernel.org, David Matlack <dmatlack@google.com>,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Date:   Mon, 09 Aug 2021 10:45:27 +0300
-In-Reply-To: <4b530fb6-81cc-be36-aa68-92ec01c65775@oracle.com>
-References: <20210805105423.412878-1-pbonzini@redhat.com>
-         <4b530fb6-81cc-be36-aa68-92ec01c65775@oracle.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
+        id S233558AbhHIHsm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 9 Aug 2021 03:48:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37196 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S233533AbhHIHsf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 9 Aug 2021 03:48:35 -0400
+Received: from mail-pj1-x102e.google.com (mail-pj1-x102e.google.com [IPv6:2607:f8b0:4864:20::102e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9A1FFC0613CF;
+        Mon,  9 Aug 2021 00:48:14 -0700 (PDT)
+Received: by mail-pj1-x102e.google.com with SMTP id ca5so26557208pjb.5;
+        Mon, 09 Aug 2021 00:48:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=C85qCSugEcqkhP9sJqsX8NhHPkwOW8SIOj7a90Xvxf0=;
+        b=FoSOf3fe97dAktFJrsyO2Jm8eZW3V2hbTtl4YqOpsH3q6LFrMlcsdEspXGHh/HT6tg
+         qsUFdUMAe9Wo/Tp5jw+IYsw+1uMGLhUsw1O7i7DPFqjzjR0mOwgyUyXjtjpPc21nkAIj
+         vPY4Klo0WX73N0wprV+3jw8rn0FBQ7qzbrWNcek1B9oDnRrLGRCxz23sxgDg7RJqbR83
+         F68ZsfhXTzj2SQBe/O720stwmBjxNlzzEtaOt1bKYA49Rg6XILnyqpjz7XZqj7uIUEEE
+         v4TNn/Ekve1v39xAItQxyzHEquDCoWJqaNa8ibXKHvpTXGzCcZUA/1fme6ZvgRZmMg5c
+         oDHg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=C85qCSugEcqkhP9sJqsX8NhHPkwOW8SIOj7a90Xvxf0=;
+        b=IhLsKQLILWkZF7xhofIB5FluZhBX/yg1cAI8JgTXfS88gEaS04aA2d7bClR+p8DXiY
+         EvPMSlntldJShxNAlvidVweSDFcVbFFn4FkpxND1mT1zT5P1KXXKEOpA98CMHIv/dxV9
+         f7ySnQfoLlNjrbbU920HW2GmlY3nWu/d6LtzwjROhnqRWJDNjkDwUpiGcPPNFYDoqIxY
+         ygxU9Ft1Ellvi7m20RCaSJG8jLXiFsIC+B4S14i8iAO9P5500z98nocWY8SYMWI7giln
+         n0Rhx5CnE5h1sMMYz4JaXHISty5st695IcS+3cn7/WTvA60jDCjPLEAC+yw/Qn8KkmfZ
+         A07w==
+X-Gm-Message-State: AOAM531KisTz4oGvdHtRp9t/JFfGrngf2hl6BHgT/eCG0WXvRWWDwy5H
+        ybJsrUyK2r6dDvZrCzvIR/vYYqlQNjlGlA==
+X-Google-Smtp-Source: ABdhPJzDkvBu4hnlJ2QQXDeMmude9oYDgLJbFwDOrBwImh0r+qPVap7hNSuMhrAdn3p+B9RRObhBjQ==
+X-Received: by 2002:a17:90a:17cc:: with SMTP id q70mr2347701pja.1.1628495294159;
+        Mon, 09 Aug 2021 00:48:14 -0700 (PDT)
+Received: from localhost.localdomain ([103.7.29.32])
+        by smtp.gmail.com with ESMTPSA id n35sm18609297pfv.152.2021.08.09.00.48.10
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Mon, 09 Aug 2021 00:48:13 -0700 (PDT)
+From:   Like Xu <like.xu.linux@gmail.com>
+X-Google-Original-From: Like Xu <likexu@tencent.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        Kan Liang <kan.liang@linux.intel.com>
+Cc:     Andi Kleen <ak@linux.intel.com>, Tony Luck <tony.luck@intel.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        x86@kernel.org, linux-kernel@vger.kernel.org
+Subject: [PATCH] KVM: x86/pmu: Don't expose guest LBR if the LBR_SELECT is shared per physical core
+Date:   Mon,  9 Aug 2021 15:48:03 +0800
+Message-Id: <20210809074803.43154-1-likexu@tencent.com>
+X-Mailer: git-send-email 2.32.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 2021-08-06 at 11:57 +0100, Joao Martins wrote:
-> 
-> On 8/5/21 11:54 AM, Paolo Bonzini wrote:
-> > Accessing guest physical addresses at 0xFFFD_0000_0000 and above causes
-> > a failure on AMD processors because those addresses are reserved by
-> > HyperTransport (this is not documented).  
-> 
-> Oh, but it's actually documented in the AMD IOMMU manual [0] (and AMD IOMMU in linux do
-> mark it as a reserved IOVA region i.e. HT_RANGE_START..HT_RANGE_END). And it's usually
-> marked as a reserved type in E820. At least on the machines I've seen.
-> 
-> See manual section '2.1.2 IOMMU Logical Topology':
-> 
-> "Special address controls in Table 3 are interpreted against untranslated guest physical
-> addressess (GPA) that lack a PASID TLP prefix."
-> 
->  Base Address   Top Address   Use
-> 
->   FD_0000_0000h FD_F7FF_FFFFh Reserved interrupt address space
->   FD_F800_0000h FD_F8FF_FFFFh Interrupt/EOI IntCtl
->   FD_F900_0000h FD_F90F_FFFFh Legacy PIC IACK
->   FD_F910_0000h FD_F91F_FFFFh System Management
->   FD_F920_0000h FD_FAFF_FFFFh Reserved Page Tables
->   FD_FB00_0000h FD_FBFF_FFFFh Address Translation
->   FD_FC00_0000h FD_FDFF_FFFFh I/O Space
->   FD_FE00_0000h FD_FFFF_FFFFh Configuration
->   FE_0000_0000h FE_1FFF_FFFFh Extended Configuration/Device Messages
->   FE_2000_0000h FF_FFFF_FFFFh Reserved
-> 
-> It covers the range starting that address you fixed up ... up to 1Tb, fwiw.
-> 
-> You mark it ~1010G as max gfn so shouldn't be a problem.
-> 
-> [0] https://www.amd.com/system/files/TechDocs/48882_IOMMU.pdf
-> 
-> > Avoid selftests failures
-> > by reserving those guest physical addresses.
-> > 
-> > Fixes: ef4c9f4f6546 ("KVM: selftests: Fix 32-bit truncation of vm_get_max_gfn()")
-> > Cc: stable@vger.kernel.org
-> > Cc: David Matlack <dmatlack@google.com>
-> > Reported-by: Maxim Levitsky <mlevitsk@redhat.com>
-> > Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> > ---
-> >  tools/testing/selftests/kvm/lib/kvm_util.c | 6 ++++++
-> >  1 file changed, 6 insertions(+)
-> > 
-> > diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
-> > index 10a8ed691c66..d995cc9836ee 100644
-> > --- a/tools/testing/selftests/kvm/lib/kvm_util.c
-> > +++ b/tools/testing/selftests/kvm/lib/kvm_util.c
-> > @@ -309,6 +309,12 @@ struct kvm_vm *vm_create(enum vm_guest_mode mode, uint64_t phy_pages, int perm)
-> >  	/* Limit physical addresses to PA-bits. */
-> >  	vm->max_gfn = ((1ULL << vm->pa_bits) >> vm->page_shift) - 1;
-> >  
-> > +#ifdef __x86_64__
-> > +	/* Avoid reserved HyperTransport region on AMD processors.  */
-> > +	if (vm->pa_bits == 48)
-> > +		vm->max_gfn = 0xfffcfffff;
-> > +#endif
-> > +
-> 
-> Not sure if it's worth the trouble having a macro with the same name as AMD iommu like:
-> 
-> #define HT_RANGE_START                (0xfd00000000ULL)
-> #define MAX_GFN			      (HT_RANGE_START - 1ULL)
-> 
-> #ifdef __x86_64__
-> 	/* Avoid reserved HyperTransport region on AMD processors.  */
-> 	if (vm->pa_bits == 48)
-> 		vm->max_gfn = MAX_GFN;
-> #endif
+From: Like Xu <likexu@tencent.com>
 
-I guess now that we know that it is documented, it is worth it,
-to remove '== 48' check and add check for an AMD cpu, and add reference
-to this manual.
+According to Intel SDM, the Last Branch Record Filtering Select Register
+(R/W) is defined as shared per physical core rather than per logical core
+on some older Intel platforms: Silvermont, Airmont, Goldmont and Nehalem.
 
-I am mentioning the 48 bit check because I have seen that AMD just recently
-posted 5 level NPT support, so I guess CPUs which > 48 bit max physical address
-are also probably on horison.
+To avoid LBR attacks or accidental data leakage, on these specific
+platforms, KVM should not expose guest LBR capability even if HT is
+disabled on the host, considering that the HT state can be dynamically
+changed, yet the KVM capabilities are initialized at module initialisation.
 
-And long term solution for this I guess is to add these areas to a blacklist
-and avoid them.
+Fixes: be635e34c284 ("KVM: vmx/pmu: Expose LBR_FMT in the MSR_IA32_PERF_CAPABILITIES")
+Signed-off-by: Like Xu <likexu@tencent.com>
+---
+ arch/x86/include/asm/intel-family.h |  1 +
+ arch/x86/kvm/vmx/capabilities.h     | 19 ++++++++++++++++++-
+ 2 files changed, 19 insertions(+), 1 deletion(-)
 
-Best regards,
-	Maxim Levitsky
-
-> 
-> It's a detail, but *perhaps* would help people grepping around it.
-> 
-> Also, not sure if checking against AMD cpuid vendor is worth, considering this is
-> a limitation only on AMD.
-> 
-> 
-> >  	/* Allocate and setup memory for guest. */
-> >  	vm->vpages_mapped = sparsebit_alloc();
-> >  	if (phy_pages != 0)
-> > 
-
+diff --git a/arch/x86/include/asm/intel-family.h b/arch/x86/include/asm/intel-family.h
+index 27158436f322..f35c915566e3 100644
+--- a/arch/x86/include/asm/intel-family.h
++++ b/arch/x86/include/asm/intel-family.h
+@@ -119,6 +119,7 @@
+ 
+ #define INTEL_FAM6_ATOM_SILVERMONT	0x37 /* Bay Trail, Valleyview */
+ #define INTEL_FAM6_ATOM_SILVERMONT_D	0x4D /* Avaton, Rangely */
++#define INTEL_FAM6_ATOM_SILVERMONT_X3	0x5D /* X3-C3000 based on Silvermont */
+ #define INTEL_FAM6_ATOM_SILVERMONT_MID	0x4A /* Merriefield */
+ 
+ #define INTEL_FAM6_ATOM_AIRMONT		0x4C /* Cherry Trail, Braswell */
+diff --git a/arch/x86/kvm/vmx/capabilities.h b/arch/x86/kvm/vmx/capabilities.h
+index 4705ad55abb5..ff9596d7112d 100644
+--- a/arch/x86/kvm/vmx/capabilities.h
++++ b/arch/x86/kvm/vmx/capabilities.h
+@@ -3,6 +3,7 @@
+ #define __KVM_X86_VMX_CAPS_H
+ 
+ #include <asm/vmx.h>
++#include <asm/cpu_device_id.h>
+ 
+ #include "lapic.h"
+ 
+@@ -376,6 +377,21 @@ static inline bool vmx_pt_mode_is_host_guest(void)
+ 	return pt_mode == PT_MODE_HOST_GUEST;
+ }
+ 
++static const struct x86_cpu_id lbr_select_shared_cpu[] = {
++	X86_MATCH_INTEL_FAM6_MODEL(ATOM_SILVERMONT, NULL),
++	X86_MATCH_INTEL_FAM6_MODEL(ATOM_SILVERMONT_MID, NULL),
++	X86_MATCH_INTEL_FAM6_MODEL(ATOM_SILVERMONT_D, NULL),
++	X86_MATCH_INTEL_FAM6_MODEL(ATOM_SILVERMONT_X3, NULL),
++	X86_MATCH_INTEL_FAM6_MODEL(ATOM_AIRMONT_MID, NULL),
++	X86_MATCH_INTEL_FAM6_MODEL(ATOM_GOLDMONT, NULL),
++	X86_MATCH_INTEL_FAM6_MODEL(ATOM_GOLDMONT_PLUS, NULL),
++	X86_MATCH_INTEL_FAM6_MODEL(NEHALEM_EP, NULL),
++	X86_MATCH_INTEL_FAM6_MODEL(NEHALEM, NULL),
++	X86_MATCH_INTEL_FAM6_MODEL(NEHALEM_G, NULL),
++	X86_MATCH_INTEL_FAM6_MODEL(NEHALEM_EX, NULL),
++	{}
++};
++
+ static inline u64 vmx_get_perf_capabilities(void)
+ {
+ 	u64 perf_cap = 0;
+@@ -383,7 +399,8 @@ static inline u64 vmx_get_perf_capabilities(void)
+ 	if (boot_cpu_has(X86_FEATURE_PDCM))
+ 		rdmsrl(MSR_IA32_PERF_CAPABILITIES, perf_cap);
+ 
+-	perf_cap &= PMU_CAP_LBR_FMT;
++	if (!x86_match_cpu(lbr_select_shared_cpu))
++		perf_cap &= PMU_CAP_LBR_FMT;
+ 
+ 	/*
+ 	 * Since counters are virtualized, KVM would support full
+-- 
+2.32.0
 
