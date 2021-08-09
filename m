@@ -2,98 +2,91 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9016A3E4F8E
-	for <lists+kvm@lfdr.de>; Tue, 10 Aug 2021 00:54:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3DC9B3E5002
+	for <lists+kvm@lfdr.de>; Tue, 10 Aug 2021 01:33:47 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236910AbhHIWzC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 9 Aug 2021 18:55:02 -0400
-Received: from mail-io1-f71.google.com ([209.85.166.71]:54997 "EHLO
-        mail-io1-f71.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233950AbhHIWzB (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 9 Aug 2021 18:55:01 -0400
-Received: by mail-io1-f71.google.com with SMTP id 81-20020a6b02540000b02905824a68848bso12629835ioc.21
-        for <kvm@vger.kernel.org>; Mon, 09 Aug 2021 15:54:41 -0700 (PDT)
+        id S235336AbhHIXeG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 9 Aug 2021 19:34:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56896 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S233018AbhHIXeF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 9 Aug 2021 19:34:05 -0400
+Received: from mail-pj1-x102d.google.com (mail-pj1-x102d.google.com [IPv6:2607:f8b0:4864:20::102d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 51C2AC0613D3
+        for <kvm@vger.kernel.org>; Mon,  9 Aug 2021 16:33:44 -0700 (PDT)
+Received: by mail-pj1-x102d.google.com with SMTP id bo18so8393451pjb.0
+        for <kvm@vger.kernel.org>; Mon, 09 Aug 2021 16:33:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=V2c/S/LrwZpcBpKTpdOItZ7Sz1gaTCXfKY8kRI2j8ZQ=;
+        b=dssDc9DnwTywEoUHtTg0h4HNe9/5swQv2xI9ksPxKKtX16AuPKlw6njsDkk+om8Vz5
+         zjs1wHfVISScdCHvPyLahkek50XfcuwYCRYsOxcNlTUd0zcOLQNQEEwyuqisxY/ieiU9
+         86p1GzQrqb1yfXySTvWkFl0jnX0hABIkSR9LN0yOUh/JXoKBU4TqyixlEhk8NUTQAJr3
+         LMEJ/nt8nqtNNyuKnxmh+/R7RlSCu7n8Ba3LwNY5R7TzxKtIddcvoqY8h56DOheYO7Zx
+         Z4t6o6Nr3Uu0d8o7Ww1l94/GCDqAjgWvuURKf9kiCHZChT5Ow0YQoGupwWNWGtbBlEgp
+         zQGQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:date:in-reply-to:message-id:subject
-         :from:to:cc;
-        bh=0GEr0YUZkyRAP1wDiFKJUOaJlg7EZ2L8Am1PwhFfBiI=;
-        b=gE04oqGnavzOaBSQtUADtyZ6mVNxppzKehtHkY08DhC7A5scbJEuVE1XaiBT/u68Bj
-         JGxWR4Lu7j7iaVkGO84RkNPMFFPD2JbaWtTgMxKLNZjFYAgFHP5RuwSPnDlW5oSbmGMy
-         J2y11GDuGsrnma24d+J+zbfKT50+LWuc4pHmbD5y9GOh883B9tqgmXcy5pt1ITSDNW39
-         cJyS9eRMKD4FelatrkpuEAWokYxQd+VF6sMTLMboAmRK/HTiomVUzGkjWeDgQFq3TLFj
-         xT42/xCYJi4ySC9obkyzqs/3I0RifyfKIc5hNVCKZ+oza8zrYjF/iieMm31kaapDJjMM
-         Sbpg==
-X-Gm-Message-State: AOAM531CClozTRtjPnXoyh3PMF5KPbSMfaG5nXzcjSmkGdJdSdWRUZET
-        n7lSVWZCNeDGbV2Jmc32O7J9kykEVmH8F1MFo/v6Ge6RSDo8
-X-Google-Smtp-Source: ABdhPJwk0q1pYnZGZs4kh572MkPxHqbPaEAtwhr92LekdjMLybPHJTxNw3B6UeE7+39DTbR9YWviD15VoC2pUv0OCqZf7aJiMbhY
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=V2c/S/LrwZpcBpKTpdOItZ7Sz1gaTCXfKY8kRI2j8ZQ=;
+        b=My/Owv1YFEvK1wQ0mJHh5M9Z7aMTKiZwg7NwVlYRKeO4u5rzqahSdvbFPY72xfiBnE
+         MqtF0wHzqatsMstBCu4QYuBmRWe5I1Tya2Wk46qxapsL9CfiO+lyKOa0QEhtBUrN8qe/
+         AC7CwjcGxbE9iGMtaLrMPijJ9rvgnyALqlDFtn9yvebZpvvS+M4Amsps+AGxRdJg4uKU
+         npSzTAl2iThH8/U4/sKtTYB9laueg+6iDl/6+bjGOvirPjNAyD3ze9u1lJMg+U6gXmTZ
+         dGweqow8sINcICsuQup9LT1AE/acr3KqhEVyvDpl3TqcScF1wxGKrrfbRjwvNl9T/gsv
+         NMEQ==
+X-Gm-Message-State: AOAM530eOG+N2RQZmb4RJZvriBGmOfdxDSlGtwRpz5koVwAOQAE29GwD
+        nj4Bt9BCKTv94CCtctLs0XH0dA==
+X-Google-Smtp-Source: ABdhPJzRKhUsypoMkmp1CxLWq2G8VZ6jQyI6SBYExAFY0sino5cn9WnvgPn47coA7DhP5f0B8Vvchg==
+X-Received: by 2002:a63:f242:: with SMTP id d2mr193701pgk.384.1628552023542;
+        Mon, 09 Aug 2021 16:33:43 -0700 (PDT)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id ci23sm19346865pjb.47.2021.08.09.16.33.42
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 09 Aug 2021 16:33:42 -0700 (PDT)
+Date:   Mon, 9 Aug 2021 23:33:39 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Junaid Shahid <junaids@google.com>
+Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, jmattson@google.com,
+        bgardon@google.com, pshier@google.com
+Subject: Re: [PATCH] kvm: vmx: Sync all matching EPTPs when injecting nested
+ EPT fault
+Message-ID: <YRG7U3b3ZM17ggp4@google.com>
+References: <20210806222229.1645356-1-junaids@google.com>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6638:618:: with SMTP id g24mr24712725jar.94.1628549680460;
- Mon, 09 Aug 2021 15:54:40 -0700 (PDT)
-Date:   Mon, 09 Aug 2021 15:54:40 -0700
-In-Reply-To: <YRGxNaVc1cGsyd0Y@casper.infradead.org>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <00000000000033f7f705c9284592@google.com>
-Subject: Re: [syzbot] kernel BUG in find_lock_entries
-From:   syzbot <syzbot+c87be4f669d920c76330@syzkaller.appspotmail.com>
-To:     Matthew Wilcox <willy@infradead.org>
-Cc:     akpm@linux-foundation.org, bp@alien8.de, frederic@kernel.org,
-        hpa@zytor.com, jmattson@google.com, joro@8bytes.org,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-mm@kvack.org, mark.rutland@arm.com, masahiroy@kernel.org,
-        mingo@redhat.com, npiggin@gmail.com, pbonzini@redhat.com,
-        peterz@infradead.org, rafael.j.wysocki@intel.com,
-        rostedt@goodmis.org, seanjc@google.com, sedat.dilek@gmail.com,
-        syzkaller-bugs@googlegroups.com, tglx@linutronix.de,
-        vitor@massaru.org, vkuznets@redhat.com, wanpengli@tencent.com,
-        will@kernel.org, willy@infradead.org, x86@kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210806222229.1645356-1-junaids@google.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-> On Mon, Aug 09, 2021 at 02:02:22PM -0700, syzbot wrote:
->> The issue was bisected to:
->> 
->> commit 997acaf6b4b59c6a9c259740312a69ea549cc684
->> Author: Mark Rutland <mark.rutland@arm.com>
->> Date:   Mon Jan 11 15:37:07 2021 +0000
->> 
->>     lockdep: report broken irq restoration
->
-> That's just a bogus bisection.  The correct bad commit is 5c211ba29deb.
->
->> kernel BUG at mm/filemap.c:2041!
->> invalid opcode: 0000 [#1] PREEMPT SMP KASAN
->> CPU: 1 PID: 24786 Comm: syz-executor626 Not tainted 5.14.0-rc4-syzkaller #0
->> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
->> RIP: 0010:find_lock_entries+0x10d5/0x1110 mm/filemap.c:2041
->
-> This patch should fix it.  It's not just removing the warning; this
-> warning duplicates the warning a few lines down (after taking the
-> lock).  It's not safe to make this assertion without holding the page
-> lock as the page can move between the page cache and the swap cache.
->
-> #syz test
+On Fri, Aug 06, 2021, Junaid Shahid wrote:
+> When a nested EPT violation/misconfig is injected into the guest,
+> the shadow EPT PTEs associated with that address need to be synced.
+> This is done by kvm_inject_emulated_page_fault() before it calls
+> nested_ept_inject_page_fault(). However, that will only sync the
+> shadow EPT PTE associated with the current L1 EPTP. Since the ASID
 
-want 2 args (repo, branch), got 4
+For the changelog and the comment, IMO using "vmcs12 EPTP" instead of "L1 EPTP"
+would add clarity.  I usually think of "L1 EPTP" as vmcs01->eptp and "L2 EPTP"
+as vmcs02->EPTP.  There are enough EPTPs in play with nested that it'd help to
+be very explicit.
 
->
-> diff --git a/mm/filemap.c b/mm/filemap.c
-> index d1458ecf2f51..34de0b14aaa9 100644
-> --- a/mm/filemap.c
-> +++ b/mm/filemap.c
-> @@ -2038,7 +2038,6 @@ unsigned find_lock_entries(struct address_space *mapping, pgoff_t start,
->  		if (!xa_is_value(page)) {
->  			if (page->index < start)
->  				goto put;
-> -			VM_BUG_ON_PAGE(page->index != xas.xa_index, page);
->  			if (page->index + thp_nr_pages(page) - 1 > end)
->  				goto put;
->  			if (!trylock_page(page))
->
-> -- 
-> You received this message because you are subscribed to the Google Groups "syzkaller-bugs" group.
-> To unsubscribe from this group and stop receiving emails from it, send an email to syzkaller-bugs+unsubscribe@googlegroups.com.
-> To view this discussion on the web visit https://groups.google.com/d/msgid/syzkaller-bugs/YRGxNaVc1cGsyd0Y%40casper.infradead.org.
+> is based on EP4TA rather than the full EPTP, so syncing the current
+> EPTP is not enough. The SPTEs associated with any other L1 EPTPs
+> in the prev_roots cache with the same EP4TA also need to be synced.
+
+No small part of me wonders if we should disallow duplicate vmcs12 EP4TAs in a
+single vCPU's root cache, e.g. purge existing roots with the same pgd but
+different role.  INVEPT does the right thing, but that seems more coincidental
+than intentional.
+
+Practically speaking, this only affects A/D bits.  Wouldn't a VMM need to flush
+the EP4TA if it toggled A/D enabling in order to have deterministic behavior?
+In other words, is there a real world use case for switching between EPTPs with
+same EP4TAs but different properties that would see a performance hit if KVM
+purged unusable cached roots with the same EP4TA?
