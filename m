@@ -2,112 +2,155 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id F25793E3F34
-	for <lists+kvm@lfdr.de>; Mon,  9 Aug 2021 07:08:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E35513E3F78
+	for <lists+kvm@lfdr.de>; Mon,  9 Aug 2021 07:56:49 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233090AbhHIFJE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 9 Aug 2021 01:09:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58348 "EHLO
+        id S233168AbhHIF5E (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 9 Aug 2021 01:57:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40610 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229516AbhHIFJC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 9 Aug 2021 01:09:02 -0400
-Received: from mail-pj1-x102d.google.com (mail-pj1-x102d.google.com [IPv6:2607:f8b0:4864:20::102d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9E0D1C061764;
-        Sun,  8 Aug 2021 22:08:41 -0700 (PDT)
-Received: by mail-pj1-x102d.google.com with SMTP id e2-20020a17090a4a02b029016f3020d867so28340476pjh.3;
-        Sun, 08 Aug 2021 22:08:41 -0700 (PDT)
+        with ESMTP id S233127AbhHIF5D (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 9 Aug 2021 01:57:03 -0400
+Received: from mail-ej1-x62a.google.com (mail-ej1-x62a.google.com [IPv6:2a00:1450:4864:20::62a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B58A6C061796
+        for <kvm@vger.kernel.org>; Sun,  8 Aug 2021 22:56:43 -0700 (PDT)
+Received: by mail-ej1-x62a.google.com with SMTP id yk17so26908094ejb.11
+        for <kvm@vger.kernel.org>; Sun, 08 Aug 2021 22:56:43 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=to:references:cc:from:organization:subject:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=nVRGhQ52gBWFp8QzDfKqSErmQkgn6uw1EtmTvvUH/SY=;
-        b=e/yZ/TMUZPTcvotOAgjOYPIM/hwMDno3wL9N3tdWkVzKO0aHZgbRyJfcTZ35UMoP3w
-         +UR9WOhqUIL0pYSZRQseUJ/noVCsuKe4t8pxgeGUmFFbkutLlFe79UMD61ajjm1vhj/1
-         Nr42kS9dld/jSa43z+R+or2PFHDjNaYJbCSslpKem4Y/c4vY3gV/jPv+zvlSMOpjqI3I
-         Et7DFEtdwvBLDlf+8uki8Jo9womWI+oaLnwDTxCYh+I0WpnictBPWE6i4DWW6cG7vAid
-         nFUDwKmI0bu/bmvkWXh9aXVaLJTvp5sqNslbrdkBKpK06JdyU2RYHaOw7O54QaSqNO8Y
-         O61w==
+        d=bytedance-com.20150623.gappssmtp.com; s=20150623;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=1QKCwJXH7b2bV95pG+j9QIMKAhZHvf1ykyTmniZz1n8=;
+        b=Tz23BY9lPnQ3vIL8d7cY3bYV2IhYyaRUOu6xQBORJN4cz8W0au9Gfbaf8lAUsNVPjB
+         tAe8PYHGpUriBFSopttHCQqPoMMqR1rexL5EnAAhvV7l1kBuiWYPDjMEaayMcy4xi6aA
+         5uuCDZ/qs9RJhz3WH8weHBsQyMPk7q4EdO+FETqAWaWTUAwpTlufojrgm+S4Uy1A1zXZ
+         ZIxfVRVGOJA3AjSm25fOEwYePUK2HcOeOIwdB6uMCtposnKf/XtfViVOX2BxRLFe5OIJ
+         L4Gu9IBkOOJTcyhBSto5DUifQ4gSNns3GbgdZ0iDqXV+q6HNfQZu9lYsJfT7RE/U4CCP
+         sTvQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:to:references:cc:from:organization:subject
-         :message-id:date:user-agent:mime-version:in-reply-to
-         :content-language:content-transfer-encoding;
-        bh=nVRGhQ52gBWFp8QzDfKqSErmQkgn6uw1EtmTvvUH/SY=;
-        b=gJk1WN28nht/txO++OD+B2T/qmkq9WYUHG1hj3MyE7geVgKBZhVt2is4gEc2F0lkIo
-         lIu/tx8f5jm+wsSLi+GX0gxrMvBun7U4QcxKAA/DKM8WR5YGZ8OoWf13rxudtM2fI1oU
-         QI+2xf/SmLjumRxRTb58cYeMGsn3JH12d/AED7m5AWof2fzfeBXtddGiiB+TUrQkoHX5
-         eI/56FjcQrJvM8Z2jHyda8y/8Keek+PcK9yrSp6hbuDonywbUerdeZLPsCxtAtk5V00L
-         eSyCd+f3ckSSJla7w4kIiRqeHM0jU1RxAsfv7W6HfW05IfHrpgAVExdevg6Xj1AD/mHM
-         +v5A==
-X-Gm-Message-State: AOAM531a+8hhoC3BC8ZgQyHnhEWUs7ZBa3PkJEK2lV7Nsu4UzH9+4cOa
-        UB01t3wdOPBYAq03z/pO3DCeqaHrO3WdlA==
-X-Google-Smtp-Source: ABdhPJxzbPTQkCEN+KHiTTz0ubUlJNCzsj6VQp9gW/z3RN3y6ao8d6VMyPtILOc+ar8YyoZWf8EAtQ==
-X-Received: by 2002:a17:902:b193:b029:11a:a179:453a with SMTP id s19-20020a170902b193b029011aa179453amr18858372plr.69.1628485721186;
-        Sun, 08 Aug 2021 22:08:41 -0700 (PDT)
-Received: from Likes-MacBook-Pro.local ([103.7.29.32])
-        by smtp.gmail.com with ESMTPSA id u129sm18989065pfc.59.2021.08.08.22.08.38
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 08 Aug 2021 22:08:40 -0700 (PDT)
-To:     Yang Weijiang <weijiang.yang@intel.com>
-References: <1628235745-26566-1-git-send-email-weijiang.yang@intel.com>
- <1628235745-26566-14-git-send-email-weijiang.yang@intel.com>
-Cc:     pbonzini@redhat.com, jmattson@google.com, seanjc@google.com,
-        vkuznets@redhat.com, wei.w.wang@intel.com, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-From:   Like Xu <like.xu.linux@gmail.com>
-Organization: Tencent
-Subject: Re: [PATCH v7 13/15] KVM: x86/vmx: Clear Arch LBREn bit before inject
- #DB to guest
-Message-ID: <fde88a8a-fd9b-b192-caae-105224d78b47@gmail.com>
-Date:   Mon, 9 Aug 2021 13:08:32 +0800
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0)
- Gecko/20100101 Thunderbird/78.12.0
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=1QKCwJXH7b2bV95pG+j9QIMKAhZHvf1ykyTmniZz1n8=;
+        b=QHGfcFl3oxxNQeAMR7YLy7lQxhVFR6atQbTyqOb9IpjNgaEQHXAPx9yoJOjEYkCvCT
+         7IGPZIma85TtSJEAQhcW+I/w3GR+UZC/5+mIL4zKyBPgFd5jPY2IyQw3HcnWNSTrsnQ9
+         IWs+UZEwgUP06vN0X9f2Ai7Uyi4ylzRJOrIoD6CMdfJe/9cc//ICU1r/dpYcwQE8ETdi
+         1PTcePq35Q07gzfC3Ez6Ge6ztxaVg1rUpU0B6a7EUbYf2m3s2EeFe/VZy9EToiZHoUh8
+         wo3xV3ndickS8FEVcn0iFwTdS4XZ4NS7DcoBpLq9De65KbtwQlMl4tuzPQN6KrrpzH7m
+         gzYw==
+X-Gm-Message-State: AOAM533YbGGM4ecdfys1lUr7huUXuKMCmZwh1E4C3aKZzL0UwevFcqV2
+        kolzH1jFs5jdV2pTe8nCWgi5V0GXkjXod+QZtb3M
+X-Google-Smtp-Source: ABdhPJytSHJOcxF9+rpBixPa7fMmae2NjP3sPUJopLOrs0pFpyMSkYVK2NfzI4kxhNLm4dqCFsDdPFoJRqjc++Vk9j4=
+X-Received: by 2002:a17:907:3e0d:: with SMTP id hp13mr20504923ejc.372.1628488602064;
+ Sun, 08 Aug 2021 22:56:42 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <1628235745-26566-14-git-send-email-weijiang.yang@intel.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+References: <20210729073503.187-1-xieyongji@bytedance.com> <20210729073503.187-2-xieyongji@bytedance.com>
+ <43d88942-1cd3-c840-6fec-4155fd544d80@redhat.com> <CACycT3vcpwyA3xjD29f1hGnYALyAd=-XcWp8+wJiwSqpqUu00w@mail.gmail.com>
+ <6e05e25e-e569-402e-d81b-8ac2cff1c0e8@arm.com> <CACycT3sm2r8NMMUPy1k1PuSZZ3nM9aic-O4AhdmRRCwgmwGj4Q@mail.gmail.com>
+ <417ce5af-4deb-5319-78ce-b74fb4dd0582@arm.com> <CACycT3vARzvd4-dkZhDHqUkeYoSxTa2ty0z0ivE1znGti+n1-g@mail.gmail.com>
+ <8c381d3d-9bbd-73d6-9733-0f0b15c40820@redhat.com>
+In-Reply-To: <8c381d3d-9bbd-73d6-9733-0f0b15c40820@redhat.com>
+From:   Yongji Xie <xieyongji@bytedance.com>
+Date:   Mon, 9 Aug 2021 13:56:31 +0800
+Message-ID: <CACycT3steXFeg7NRbWpo2J59dpYcumzcvM2zcPJAVe40-EvvEg@mail.gmail.com>
+Subject: Re: [PATCH v10 01/17] iova: Export alloc_iova_fast() and free_iova_fast()
+To:     Jason Wang <jasowang@redhat.com>,
+        Robin Murphy <robin.murphy@arm.com>
+Cc:     kvm <kvm@vger.kernel.org>, "Michael S. Tsirkin" <mst@redhat.com>,
+        virtualization <virtualization@lists.linux-foundation.org>,
+        Christian Brauner <christian.brauner@canonical.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Matthew Wilcox <willy@infradead.org>,
+        Christoph Hellwig <hch@infradead.org>,
+        Dan Carpenter <dan.carpenter@oracle.com>,
+        Stefano Garzarella <sgarzare@redhat.com>,
+        Liu Xiaodong <xiaodong.liu@intel.com>,
+        Joe Perches <joe@perches.com>,
+        Al Viro <viro@zeniv.linux.org.uk>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        songmuchun@bytedance.com, Jens Axboe <axboe@kernel.dk>,
+        He Zhe <zhe.he@windriver.com>,
+        Greg KH <gregkh@linuxfoundation.org>,
+        Randy Dunlap <rdunlap@infradead.org>,
+        linux-kernel <linux-kernel@vger.kernel.org>,
+        iommu@lists.linux-foundation.org, bcrl@kvack.org,
+        netdev@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        =?UTF-8?Q?Mika_Penttil=C3=A4?= <mika.penttila@nextfour.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 6/8/2021 3:42 pm, Yang Weijiang wrote:
-> Per ISA spec, need to clear the bit before inject #DB.
+On Thu, Aug 5, 2021 at 9:31 PM Jason Wang <jasowang@redhat.com> wrote:
+>
+>
+> =E5=9C=A8 2021/8/5 =E4=B8=8B=E5=8D=888:34, Yongji Xie =E5=86=99=E9=81=93:
+> >> My main point, though, is that if you've already got something else
+> >> keeping track of the actual addresses, then the way you're using an
+> >> iova_domain appears to be something you could do with a trivial bitmap
+> >> allocator. That's why I don't buy the efficiency argument. The main
+> >> design points of the IOVA allocator are to manage large address spaces
+> >> while trying to maximise spatial locality to minimise the underlying
+> >> pagetable usage, and allocating with a flexible limit to support
+> >> multiple devices with different addressing capabilities in the same
+> >> address space. If none of those aspects are relevant to the use-case -
+> >> which AFAICS appears to be true here - then as a general-purpose
+> >> resource allocator it's rubbish and has an unreasonably massive memory
+> >> overhead and there are many, many better choices.
+> >>
+> > OK, I get your point. Actually we used the genpool allocator in the
+> > early version. Maybe we can fall back to using it.
+>
+>
+> I think maybe you can share some perf numbers to see how much
+> alloc_iova_fast() can help.
+>
 
-Please paste the SDM statement accurately so that the reviewers
-can verify that the code is consistent with the documentation.
+I did some fio tests[1] with a ram-backend vduse block device[2].
 
-> 
-> Signed-off-by: Yang Weijiang <weijiang.yang@intel.com>
-> ---
->   arch/x86/kvm/vmx/vmx.c | 21 +++++++++++++++++++++
->   1 file changed, 21 insertions(+)
-> 
-> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> index 70314cd93340..31b9c06c9b3b 100644
-> --- a/arch/x86/kvm/vmx/vmx.c
-> +++ b/arch/x86/kvm/vmx/vmx.c
-> @@ -1601,6 +1601,21 @@ static void vmx_clear_hlt(struct kvm_vcpu *vcpu)
->   		vmcs_write32(GUEST_ACTIVITY_STATE, GUEST_ACTIVITY_ACTIVE);
->   }
->   
-> +static void flip_arch_lbr_ctl(struct kvm_vcpu *vcpu, bool on)
-> +{
-> +	if (vcpu_to_pmu(vcpu)->event_count > 0 &&
+Following are some performance data:
 
-Ugh, this check seems ridiculous/funny to me.
+                            numjobs=3D1   numjobs=3D2    numjobs=3D4   numj=
+obs=3D8
+iova_alloc_fast    145k iops      265k iops      514k iops      758k iops
 
-> +	    kvm_cpu_cap_has(X86_FEATURE_ARCH_LBR)) {
-> +		u64 lbr_ctl = vmcs_read64(GUEST_IA32_LBR_CTL);
-> +
-> +		if (on)
-> +			lbr_ctl |= 1ULL;
-> +		else
-> +			lbr_ctl &= ~1ULL;
-> +
-> +		vmcs_write64(GUEST_IA32_LBR_CTL, lbr_ctl);
-> +	}
-> +}
+iova_alloc            137k iops     170k iops      128k iops      113k iops
 
-...
+gen_pool_alloc   143k iops      270k iops      458k iops      521k iops
+
+The iova_alloc_fast() has the best performance since we always hit the
+per-cpu cache. Regardless of the per-cpu cache, the genpool allocator
+should be better than the iova allocator.
+
+[1] fio jobfile:
+
+[global]
+rw=3Drandread
+direct=3D1
+ioengine=3Dlibaio
+iodepth=3D16
+time_based=3D1
+runtime=3D60s
+group_reporting
+bs=3D4k
+filename=3D/dev/vda
+[job]
+numjobs=3D..
+
+[2]  $ qemu-storage-daemon \
+      --chardev socket,id=3Dcharmonitor,path=3D/tmp/qmp.sock,server,nowait =
+\
+      --monitor chardev=3Dcharmonitor \
+      --blockdev
+driver=3Dhost_device,cache.direct=3Don,aio=3Dnative,filename=3D/dev/nullb0,=
+node-name=3Ddisk0
+\
+      --export type=3Dvduse-blk,id=3Dtest,node-name=3Ddisk0,writable=3Don,n=
+ame=3Dvduse-null,num-queues=3D16,queue-size=3D128
+
+The qemu-storage-daemon can be builded based on the repo:
+https://github.com/bytedance/qemu/tree/vduse-test.
+
+Thanks,
+Yongji
