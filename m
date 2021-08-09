@@ -2,144 +2,121 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 24EA23E4741
-	for <lists+kvm@lfdr.de>; Mon,  9 Aug 2021 16:12:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D28373E4775
+	for <lists+kvm@lfdr.de>; Mon,  9 Aug 2021 16:23:11 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234650AbhHIOMr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 9 Aug 2021 10:12:47 -0400
-Received: from mga06.intel.com ([134.134.136.31]:40934 "EHLO mga06.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S233274AbhHIOMr (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 9 Aug 2021 10:12:47 -0400
-X-IronPort-AV: E=McAfee;i="6200,9189,10070"; a="275737180"
-X-IronPort-AV: E=Sophos;i="5.84,307,1620716400"; 
-   d="scan'208";a="275737180"
-Received: from fmsmga003.fm.intel.com ([10.253.24.29])
-  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Aug 2021 07:12:26 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.84,307,1620716400"; 
-   d="scan'208";a="514968970"
-Received: from linux.intel.com ([10.54.29.200])
-  by FMSMGA003.fm.intel.com with ESMTP; 09 Aug 2021 07:12:24 -0700
-Received: from [10.209.33.137] (kliang2-MOBL.ccr.corp.intel.com [10.209.33.137])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by linux.intel.com (Postfix) with ESMTPS id 202EE580910;
-        Mon,  9 Aug 2021 07:12:23 -0700 (PDT)
-Subject: Re: [PATCH] KVM: x86/pmu: Don't expose guest LBR if the LBR_SELECT is
- shared per physical core
-To:     Like Xu <like.xu.linux@gmail.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Andi Kleen <ak@linux.intel.com>, Tony Luck <tony.luck@intel.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        x86@kernel.org, linux-kernel@vger.kernel.org
-References: <20210809074803.43154-1-likexu@tencent.com>
-From:   "Liang, Kan" <kan.liang@linux.intel.com>
-Message-ID: <7599a987-c931-20f1-9441-d86222a4519d@linux.intel.com>
-Date:   Mon, 9 Aug 2021 10:12:22 -0400
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+        id S235035AbhHIOXb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 9 Aug 2021 10:23:31 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:21380 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S234995AbhHIOXa (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 9 Aug 2021 10:23:30 -0400
+Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 179ELmVr106418;
+        Mon, 9 Aug 2021 10:23:09 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=4f/Mzii8bLQiR3ZK8eC0Tg/FO5FSlYOqDJga+TxX1Pw=;
+ b=Ikrzf5UIrEO+XhAl19n1pm+zXCdbILAyGZku++ly8IqjVo58X06L220+czj4hs47igzx
+ 8+jq/dTK3KOfHtQozZhuibpAKm9UTibVFT3PXjS8mU+4JVfqleR3usipdYd+L045fBnp
+ js0orlzDm4fd3hWY8xdg+oBgNwiasdH8VNivZY+VFZY6qAb1HxVFPvGTbSE/LxeVNFHw
+ d/i+2m/2NPsTy/rzekl4cfQOC1hGiCZbq4bOI57/Fu5D7D/srTZ1VvZMj/SkprR4DYgw
+ 0va7Ka4fe8+ClDwJpxBWHUFf/4cnJiBeYtRI0dn+eMHCIMDePtB5SLPGyUG8PRnFB4Ou xg== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3ab3rtmvpq-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 09 Aug 2021 10:23:09 -0400
+Received: from m0098410.ppops.net (m0098410.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 179EMJch108048;
+        Mon, 9 Aug 2021 10:23:09 -0400
+Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3ab3rtmvn2-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 09 Aug 2021 10:23:09 -0400
+Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
+        by ppma06ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 179EI8ZZ022208;
+        Mon, 9 Aug 2021 14:23:06 GMT
+Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
+        by ppma06ams.nl.ibm.com with ESMTP id 3a9hehc4xf-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 09 Aug 2021 14:23:06 +0000
+Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
+        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 179EJrrK53477732
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 9 Aug 2021 14:19:53 GMT
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 49CB3AE057;
+        Mon,  9 Aug 2021 14:23:03 +0000 (GMT)
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id E79EFAE061;
+        Mon,  9 Aug 2021 14:23:02 +0000 (GMT)
+Received: from oc3016276355.ibm.com (unknown [9.145.151.189])
+        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Mon,  9 Aug 2021 14:23:02 +0000 (GMT)
+Subject: Re: [kvm-unit-tests PATCH v1 2/4] s390x: lib: Move stsi_get_fc to
+ library
+To:     Janosch Frank <frankja@linux.ibm.com>, linux-s390@vger.kernel.org
+Cc:     thuth@redhat.com, kvm@vger.kernel.org, cohuck@redhat.com,
+        imbrenda@linux.ibm.com, david@redhat.com
+References: <1628498934-20735-1-git-send-email-pmorel@linux.ibm.com>
+ <1628498934-20735-3-git-send-email-pmorel@linux.ibm.com>
+ <d8740bcd-19e0-c5d0-9f31-ba63e4471e4b@linux.ibm.com>
+From:   Pierre Morel <pmorel@linux.ibm.com>
+Message-ID: <44413246-aa14-0e03-1094-17a14394ee76@linux.ibm.com>
+Date:   Mon, 9 Aug 2021 16:23:02 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.12.0
 MIME-Version: 1.0
-In-Reply-To: <20210809074803.43154-1-likexu@tencent.com>
+In-Reply-To: <d8740bcd-19e0-c5d0-9f31-ba63e4471e4b@linux.ibm.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: i4CRFupX-hOI5D90Ki3xLwAVnoiJmDCx
+X-Proofpoint-ORIG-GUID: hcrRtz-ljw_cNmNz6RAIvU49cnta8lOY
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.790
+ definitions=2021-08-09_05:2021-08-06,2021-08-09 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0 mlxlogscore=999
+ adultscore=0 bulkscore=0 lowpriorityscore=0 priorityscore=1501
+ malwarescore=0 mlxscore=0 clxscore=1015 phishscore=0 impostorscore=0
+ suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2107140000 definitions=main-2108090105
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
 
-On 8/9/2021 3:48 AM, Like Xu wrote:
-> From: Like Xu <likexu@tencent.com>
+On 8/9/21 12:16 PM, Janosch Frank wrote:
+> On 8/9/21 10:48 AM, Pierre Morel wrote:
+>> It's needed in multiple tests now.
+>>
+>> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
+>> ---
+>>   lib/s390x/asm/arch_def.h | 16 ++++++++++++++++
+>>   s390x/stsi.c             | 16 ----------------
+>>   2 files changed, 16 insertions(+), 16 deletions(-)
+>>
+>> diff --git a/lib/s390x/asm/arch_def.h b/lib/s390x/asm/arch_def.h
+>> index 15cf7d48..57d7ddac 100644
+>> --- a/lib/s390x/asm/arch_def.h
+>> +++ b/lib/s390x/asm/arch_def.h
+>> @@ -328,6 +328,22 @@ static inline int stsi(void *addr, int fc, int sel1, int sel2)
+>>   	return cc;
+>>   }
+>>   
+>> +static inline unsigned long stsi_get_fc(void *addr)
 > 
-> According to Intel SDM, the Last Branch Record Filtering Select Register
-> (R/W) is defined as shared per physical core rather than per logical core
-> on some older Intel platforms: Silvermont, Airmont, Goldmont and Nehalem.
-> 
-> To avoid LBR attacks or accidental data leakage, on these specific
-> platforms, KVM should not expose guest LBR capability even if HT is
-> disabled on the host, considering that the HT state can be dynamically
-> changed, yet the KVM capabilities are initialized at module initialisation.
-> 
-> Fixes: be635e34c284 ("KVM: vmx/pmu: Expose LBR_FMT in the MSR_IA32_PERF_CAPABILITIES")
-> Signed-off-by: Like Xu <likexu@tencent.com>
-> ---
->   arch/x86/include/asm/intel-family.h |  1 +
->   arch/x86/kvm/vmx/capabilities.h     | 19 ++++++++++++++++++-
->   2 files changed, 19 insertions(+), 1 deletion(-)
-> 
-> diff --git a/arch/x86/include/asm/intel-family.h b/arch/x86/include/asm/intel-family.h
-> index 27158436f322..f35c915566e3 100644
-> --- a/arch/x86/include/asm/intel-family.h
-> +++ b/arch/x86/include/asm/intel-family.h
-> @@ -119,6 +119,7 @@
->   
->   #define INTEL_FAM6_ATOM_SILVERMONT	0x37 /* Bay Trail, Valleyview */
->   #define INTEL_FAM6_ATOM_SILVERMONT_D	0x4D /* Avaton, Rangely */
-> +#define INTEL_FAM6_ATOM_SILVERMONT_X3	0x5D /* X3-C3000 based on Silvermont */
+> We don't need an address for fc == 0. You can remove that and fix the
+> s390x/stsi.c call.
 
-
-Please submit a separate patch if you want to add a new CPU ID. Also, 
-the comments should be platform code name, not the model.
-
-AFAIK, Atom X3 should be SoFIA which is for mobile phone. It's an old 
-product. I don't think I enabled it in perf. I have no idea why you want 
-to add it here for KVM. If you have a product and want to enable it, I 
-guess you may want to enable it for perf first.
-
+OK, I do that.
 Thanks,
-Kan
 
->   #define INTEL_FAM6_ATOM_SILVERMONT_MID	0x4A /* Merriefield */
->   
->   #define INTEL_FAM6_ATOM_AIRMONT		0x4C /* Cherry Trail, Braswell */
-> diff --git a/arch/x86/kvm/vmx/capabilities.h b/arch/x86/kvm/vmx/capabilities.h
-> index 4705ad55abb5..ff9596d7112d 100644
-> --- a/arch/x86/kvm/vmx/capabilities.h
-> +++ b/arch/x86/kvm/vmx/capabilities.h
-> @@ -3,6 +3,7 @@
->   #define __KVM_X86_VMX_CAPS_H
->   
->   #include <asm/vmx.h>
-> +#include <asm/cpu_device_id.h>
->   
->   #include "lapic.h"
->   
-> @@ -376,6 +377,21 @@ static inline bool vmx_pt_mode_is_host_guest(void)
->   	return pt_mode == PT_MODE_HOST_GUEST;
->   }
->   
-> +static const struct x86_cpu_id lbr_select_shared_cpu[] = {
-> +	X86_MATCH_INTEL_FAM6_MODEL(ATOM_SILVERMONT, NULL),
-> +	X86_MATCH_INTEL_FAM6_MODEL(ATOM_SILVERMONT_MID, NULL),
-> +	X86_MATCH_INTEL_FAM6_MODEL(ATOM_SILVERMONT_D, NULL),
-> +	X86_MATCH_INTEL_FAM6_MODEL(ATOM_SILVERMONT_X3, NULL),
-> +	X86_MATCH_INTEL_FAM6_MODEL(ATOM_AIRMONT_MID, NULL),
-> +	X86_MATCH_INTEL_FAM6_MODEL(ATOM_GOLDMONT, NULL),
-> +	X86_MATCH_INTEL_FAM6_MODEL(ATOM_GOLDMONT_PLUS, NULL),
-> +	X86_MATCH_INTEL_FAM6_MODEL(NEHALEM_EP, NULL),
-> +	X86_MATCH_INTEL_FAM6_MODEL(NEHALEM, NULL),
-> +	X86_MATCH_INTEL_FAM6_MODEL(NEHALEM_G, NULL),
-> +	X86_MATCH_INTEL_FAM6_MODEL(NEHALEM_EX, NULL),
-> +	{}
-> +};
-> +
->   static inline u64 vmx_get_perf_capabilities(void)
->   {
->   	u64 perf_cap = 0;
-> @@ -383,7 +399,8 @@ static inline u64 vmx_get_perf_capabilities(void)
->   	if (boot_cpu_has(X86_FEATURE_PDCM))
->   		rdmsrl(MSR_IA32_PERF_CAPABILITIES, perf_cap);
->   
-> -	perf_cap &= PMU_CAP_LBR_FMT;
-> +	if (!x86_match_cpu(lbr_select_shared_cpu))
-> +		perf_cap &= PMU_CAP_LBR_FMT;
->   
->   	/*
->   	 * Since counters are virtualized, KVM would support full
-> 
+Pierre
+
+
+-- 
+Pierre Morel
+IBM Lab Boeblingen
