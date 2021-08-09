@@ -2,231 +2,111 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 36A133E48AB
-	for <lists+kvm@lfdr.de>; Mon,  9 Aug 2021 17:25:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0D7EE3E48E6
+	for <lists+kvm@lfdr.de>; Mon,  9 Aug 2021 17:33:39 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235525AbhHIPZb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 9 Aug 2021 11:25:31 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:45404 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S235588AbhHIPZ0 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 9 Aug 2021 11:25:26 -0400
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 179F4QlS184481;
-        Mon, 9 Aug 2021 11:25:05 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=92CSMFWIHVvbAZhW6mbS9BPDXlq2dgOMjfcK6Kplj80=;
- b=iQmO+PiwE34MfB6dEHltxjD0i/5OUr4jPOkayDM8HKCxyBGMRT33tZf4VSsvUvN3FE0k
- +gt8S4ywzapPad8dCEEn66mD8JSrLb5VJNYJ0l4u6aZRSHILqqZsqFSNflLej6+nnyGD
- mW6Py7+CK6YeoqXl3ramN89UXETz91WHGYKX4kaihyW4WQvxCMLeZOAi5n773+xiV/na
- /ZtMUfRrB8gbruc26hyphnKh6qYIYA5EvUdPu9LYwZeRHh3PX9lc1NFp813kWlbZWJyf
- ZfyP0yZ4Qp9DSnyaHxuFagnL7vVbx4EgCyvqCEy1evJFlJgxWAV7zE+jOllwj9+x+0sJ fg== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 3aa7n0burx-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 09 Aug 2021 11:25:05 -0400
-Received: from m0098419.ppops.net (m0098419.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 179F4dWs185808;
-        Mon, 9 Aug 2021 11:25:04 -0400
-Received: from ppma05fra.de.ibm.com (6c.4a.5195.ip4.static.sl-reverse.com [149.81.74.108])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 3aa7n0buqv-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 09 Aug 2021 11:25:04 -0400
-Received: from pps.filterd (ppma05fra.de.ibm.com [127.0.0.1])
-        by ppma05fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 179FCE3r030665;
-        Mon, 9 Aug 2021 15:25:03 GMT
-Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
-        by ppma05fra.de.ibm.com with ESMTP id 3a9ht8uqws-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 09 Aug 2021 15:25:02 +0000
-Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
-        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 179FOxRU47448464
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 9 Aug 2021 15:24:59 GMT
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 5C18EAE0F6;
-        Mon,  9 Aug 2021 15:24:59 +0000 (GMT)
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 0DEE2AE0ED;
-        Mon,  9 Aug 2021 15:24:59 +0000 (GMT)
-Received: from oc3016276355.ibm.com (unknown [9.145.151.189])
-        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Mon,  9 Aug 2021 15:24:58 +0000 (GMT)
-Subject: Re: [kvm-unit-tests PATCH v1 3/4] s390x: topology: check the Perform
- Topology Function
-To:     Claudio Imbrenda <imbrenda@linux.ibm.com>
-Cc:     linux-s390@vger.kernel.org, frankja@linux.ibm.com,
-        thuth@redhat.com, kvm@vger.kernel.org, cohuck@redhat.com,
-        david@redhat.com
-References: <1628498934-20735-1-git-send-email-pmorel@linux.ibm.com>
- <1628498934-20735-4-git-send-email-pmorel@linux.ibm.com>
- <20210809120306.6bd78354@p-imbrenda>
-From:   Pierre Morel <pmorel@linux.ibm.com>
-Message-ID: <0af6723f-f8b6-18cf-73ef-535cc818468b@linux.ibm.com>
-Date:   Mon, 9 Aug 2021 17:24:58 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.12.0
+        id S235063AbhHIPdr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 9 Aug 2021 11:33:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59056 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S235482AbhHIPbW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 9 Aug 2021 11:31:22 -0400
+Received: from mail-pj1-x1036.google.com (mail-pj1-x1036.google.com [IPv6:2607:f8b0:4864:20::1036])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1A9F9C061796
+        for <kvm@vger.kernel.org>; Mon,  9 Aug 2021 08:30:13 -0700 (PDT)
+Received: by mail-pj1-x1036.google.com with SMTP id s22-20020a17090a1c16b0290177caeba067so35299041pjs.0
+        for <kvm@vger.kernel.org>; Mon, 09 Aug 2021 08:30:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=0AECcEi2rpt5gm0PQCPyfbI2DBqYy38YFfxxfkJxtfU=;
+        b=nvgDcF9oG4oweN91pNjyW0PwF3Wwq1kdB8edecupp/0AAlGgeVxfi6VaUQYhaBKIEQ
+         KfxX7PsGRvTGaymoz7UKsMn7m6U3/pvHIAtH9dSiNosjr6WZeZAhce0vGW8uDjdRtKax
+         a6u7Ig4lBKVRJw5VhquaWiKNLQ3TVn7Q6byy7hy4H8juTQJEau+Z6YqtOXl1dN4R4Mij
+         bqpUPJNiavaIwG/MtPnpZ81XQ1+n8tDBylpVsX3eAbu8sPwPVk7UfHhNHRcSvnMto/9O
+         q9iNpgDuNR3OjvkApqeNWTi1MltBiczdHnuiMlcCoaP/YwLWHkMDcMXHnNt53lnK9vCY
+         cFaw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=0AECcEi2rpt5gm0PQCPyfbI2DBqYy38YFfxxfkJxtfU=;
+        b=sYCYfC/PkvC5F6W416HKo2trO0WHGsPWm98QxNjPru7hrCh8vX2mCGEDeemLKWHhMX
+         UxQUfo5dk/lZYOuD/XodFH4LD1BZiF469YFJSIbuZ/Sl2ZW9C4evO0GxUq3q0zhmTq5n
+         JrVXarvXi1hqc31z7rxJZO4/sNvsbrvwsuExUWaSwoi1rYqWjeoXPylBeppcAtP0CDdI
+         qBOU+j7xym7srHC1q3dreGMy9zozRLRZwkACLdboReI9oaG7k6BA9Tat2k3/zk/6dFGF
+         RD/tFn5ESOm3UIyewmMuJBvsEMH1QPpmCZ4wCnXfyLSLfW3f/nvmh1DcpbNhLTVISgtQ
+         eEBQ==
+X-Gm-Message-State: AOAM5321kzwHG8bGibdtvaH8AOWGM0ks9qtwQ7PQSFanFuLqfrgVKiHc
+        HK7jdwxvLcdzFjGb3QTmg/uMC5nxDTirlg==
+X-Google-Smtp-Source: ABdhPJz3gQIyTN45i1aPVFveM3Bul2uCaHAGbhBoyHJdaWipsW4dCYaNLy3z+6I5IMCotxAlOsp8pQ==
+X-Received: by 2002:a17:90a:bb0b:: with SMTP id u11mr36773910pjr.18.1628523012466;
+        Mon, 09 Aug 2021 08:30:12 -0700 (PDT)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id y2sm19717321pjl.6.2021.08.09.08.30.11
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 09 Aug 2021 08:30:11 -0700 (PDT)
+Date:   Mon, 9 Aug 2021 15:30:08 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Yu Zhang <yu.c.zhang@linux.intel.com>
+Cc:     Wei Huang <wei.huang2@amd.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, pbonzini@redhat.com,
+        vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com,
+        joro@8bytes.org, tglx@linutronix.de, mingo@redhat.com,
+        bp@alien8.de, x86@kernel.org, hpa@zytor.com
+Subject: Re: [PATCH v2 1/3] KVM: x86: Allow CPU to force vendor-specific TDP
+ level
+Message-ID: <YRFKABg2MOJxcq+y@google.com>
+References: <20210808192658.2923641-1-wei.huang2@amd.com>
+ <20210808192658.2923641-2-wei.huang2@amd.com>
+ <20210809035806.5cqdqm5vkexvngda@linux.intel.com>
+ <c6324362-1439-ef94-789b-5934c0e1cdb8@amd.com>
+ <20210809042703.25gfuuvujicc3vj7@linux.intel.com>
+ <73bbaac0-701c-42dd-36da-aae1fed7f1a0@amd.com>
+ <20210809064224.ctu3zxknn7s56gk3@linux.intel.com>
 MIME-Version: 1.0
-In-Reply-To: <20210809120306.6bd78354@p-imbrenda>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: eQGFMXCB-6nk3Y-3A4TVHNqQmXEIfNdq
-X-Proofpoint-ORIG-GUID: 6wYcjCt-0eU0VpOFcZGSTsTIoU7Ui0c9
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.790
- definitions=2021-08-09_05:2021-08-06,2021-08-09 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0 mlxscore=0
- phishscore=0 clxscore=1015 lowpriorityscore=0 bulkscore=0 malwarescore=0
- spamscore=0 mlxlogscore=999 suspectscore=0 priorityscore=1501 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2107140000
- definitions=main-2108090111
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210809064224.ctu3zxknn7s56gk3@linux.intel.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-
-On 8/9/21 12:03 PM, Claudio Imbrenda wrote:
-> On Mon,  9 Aug 2021 10:48:53 +0200
-> Pierre Morel <pmorel@linux.ibm.com> wrote:
+On Mon, Aug 09, 2021, Yu Zhang wrote:
+> On Sun, Aug 08, 2021 at 11:33:44PM -0500, Wei Huang wrote:
+> > 
+> > On 8/8/21 11:27 PM, Yu Zhang wrote:
+> > > On Sun, Aug 08, 2021 at 11:11:40PM -0500, Wei Huang wrote:
+> > > > 
+> > > > 
+> > > > On 8/8/21 10:58 PM, Yu Zhang wrote:
+> > > > > On Sun, Aug 08, 2021 at 02:26:56PM -0500, Wei Huang wrote:
+> > > > > > AMD future CPUs will require a 5-level NPT if host CR4.LA57 is set.
+> > > > > 
+> > > > > Sorry, but why? NPT is not indexed by HVA.
+> > > > 
+> > > > NPT is not indexed by HVA - it is always indexed by GPA. What I meant is NPT
+> > > > page table level has to be the same as the host OS page table: if 5-level
+> > > > page table is enabled in host OS (CR4.LA57=1), guest NPT has to 5-level too.
+> > > 
+> > > I know what you meant. But may I ask why?
+> > 
+> > I don't have a good answer for it. From what I know, VMCB doesn't have a
+> > field to indicate guest page table level. As a result, hardware relies on
+> > host CR4 to infer NPT level.
 > 
->> We check the PTF instruction.
->>
->> - We do not expect to support vertical polarization.
->>
->> - We do not expect the Modified Topology Change Report to be
->> pending or not at the moment the first PTF instruction with
->> PTF_CHECK function code is done as some code already did run
->> a polarization change may have occur.
->>
->> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
->> ---
->>   s390x/Makefile      |  1 +
->>   s390x/topology.c    | 87
->> +++++++++++++++++++++++++++++++++++++++++++++ s390x/unittests.cfg |
->> 3 ++ 3 files changed, 91 insertions(+)
->>   create mode 100644 s390x/topology.c
->>
->> diff --git a/s390x/Makefile b/s390x/Makefile
->> index 6565561b..c82b7dbf 100644
->> --- a/s390x/Makefile
->> +++ b/s390x/Makefile
->> @@ -24,6 +24,7 @@ tests += $(TEST_DIR)/mvpg.elf
->>   tests += $(TEST_DIR)/uv-host.elf
->>   tests += $(TEST_DIR)/edat.elf
->>   tests += $(TEST_DIR)/mvpg-sie.elf
->> +tests += $(TEST_DIR)/topology.elf
->>   
->>   tests_binary = $(patsubst %.elf,%.bin,$(tests))
->>   ifneq ($(HOST_KEY_DOCUMENT),)
->> diff --git a/s390x/topology.c b/s390x/topology.c
->> new file mode 100644
->> index 00000000..4146189a
->> --- /dev/null
->> +++ b/s390x/topology.c
->> @@ -0,0 +1,87 @@
->> +/* SPDX-License-Identifier: GPL-2.0-only */
->> +/*
->> + * CPU Topology
->> + *
->> + * Copyright (c) 2021 IBM Corp
->> + *
->> + * Authors:
->> + *  Pierre Morel <pmorel@linux.ibm.com>
->> + */
->> +
->> +#include <libcflat.h>
->> +#include <asm/page.h>
->> +#include <asm/asm-offsets.h>
->> +#include <asm/interrupt.h>
->> +#include <asm/facility.h>
->> +#include <smp.h>
->> +#include <sclp.h>
->> +
->> +static uint8_t pagebuf[PAGE_SIZE * 2]
->> __attribute__((aligned(PAGE_SIZE * 2))); +int machine_level;
->> +int mnest;
->> +
->> +#define PTF_HORIZONTAL	0
->> +#define PTF_VERTICAL	1
->> +#define PTF_CHECK	2
->> +
->> +#define PTF_ERR_NO_REASON	0
->> +#define PTF_ERR_ALRDY_POLARIZED	1
->> +#define PTF_ERR_IN_PROGRESS	2
->> +
->> +static int ptf(unsigned long fc, unsigned long *rc)
->> +{
->> +	int cc;
->> +
->> +	asm volatile(
->> +		"       .insn   rre,0xb9a20000,%1,%1\n"
-> 
-> I know you copied this from the kernel, but the second argument is not
-> really there according to the PoP, so maybe it's better to have this
-> instead?
-> 
-> 	.insn   rre,0xb9a20000,%1,0\n
+> I guess you mean not even in the N_CR3 field of VMCB? 
 
-OK, thanks.
+Correct, nCR3 is a basically a pure representation of a regular CR3.
 
-> 
->> +		"       ipm     %0\n"
->> +		"       srl     %0,28\n"
->> +		: "=d" (cc), "+d" (fc)
->> +		: "d" (fc)
->> +		: "cc");
->> +
->> +	*rc = fc >> 8;
->> +	return cc;
->> +}
->> +
->> +static void test_ptf(void)
->> +{
->> +	unsigned long rc;
->> +	int cc;
->> +
->> +	report_prefix_push("Topology Report pending");
->> +	/*
->> +	 * At this moment the topology may already have changed
->> +	 * since the VM has been started.
->> +	 * However, we can test if a second PTF instruction
->> +	 * reports that the topology did not change since the
->> +	 * preceding PFT instruction.
->> +	 */
->> +	ptf(PTF_CHECK, &rc);
->> +	cc = ptf(PTF_CHECK, &rc);
->> +	report(cc == 0, "PTF check clear");
->> +	cc = ptf(PTF_HORIZONTAL, &rc);
->> +	report(cc == 2 && rc == PTF_ERR_ALRDY_POLARIZED,
->> +	       "PTF horizontal already configured");
->> +	cc = ptf(PTF_VERTICAL, &rc);
->> +	report(cc == 2 && rc == PTF_ERR_NO_REASON,
->> +	       "PTF vertical non possible");
-> 
-> *not possible
+> Then it's not a broken design - it's a limitation of SVM. :)
 
-Oh yes :)
+That's just a polite way of saying it's a broken design ;-)
 
-> 
->> +
->> +	report_prefix_pop();
->> +}
->> +
->> +int main(int argc, char *argv[])
->> +{
->> +	report_prefix_push("stsi");
-> 
-> should this really be "stsi" ?
-
-No, I think CPU-Topology should be better.
-
-
-
-
--- 
-Pierre Morel
-IBM Lab Boeblingen
+Joking aside, NPT opted for a semblance of backwards compatibility at the cost of
+having to carry all the baggage that comes with a legacy design.  Keeping the core
+functionality from IA32 paging presumably miminizes design and hardware costs, and
+required minimal enabling in hypervisors.  The downside is that it's less flexible
+than EPT and has a few warts, e.g. shadowing NPT is gross because the host can't
+easily mirror L1's desired paging mode.
