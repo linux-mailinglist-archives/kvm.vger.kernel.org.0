@@ -2,71 +2,52 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 610263E4458
-	for <lists+kvm@lfdr.de>; Mon,  9 Aug 2021 13:01:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D406C3E460D
+	for <lists+kvm@lfdr.de>; Mon,  9 Aug 2021 15:05:37 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234930AbhHILBw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 9 Aug 2021 07:01:52 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:36580 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S234354AbhHILBv (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 9 Aug 2021 07:01:51 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1628506890;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=I4iw7fn0YB8IrJWVg7SMxyrXhBb76FvYytxPyMw8j2Y=;
-        b=Np+7H6ULMwIv+eIZCI9bQVX4t5PkCyConeyQuQwvNUvFg5qgmCzLxzoBU5FFsDrvkch4fe
-        ha2GA6ygKqlK0edfrhTlwnZ6/gDC0YMywJR64Qhsh+ZUbtTBJUHxzry7swkE3SSEhfqN8a
-        uUF2PRVPAK7SyAYH76SZIEaUqEGs8pw=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-323-0Oz19N7BN1-sp-Y4tGaTpg-1; Mon, 09 Aug 2021 07:01:29 -0400
-X-MC-Unique: 0Oz19N7BN1-sp-Y4tGaTpg-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6FBD71940940;
-        Mon,  9 Aug 2021 11:01:21 +0000 (UTC)
-Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 954C777302;
-        Mon,  9 Aug 2021 11:01:20 +0000 (UTC)
-From:   Paolo Bonzini <pbonzini@redhat.com>
-To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc:     kernel test robot <lkp@intel.com>
-Subject: [PATCH] KVM: x86: remove dead initialization
-Date:   Mon,  9 Aug 2021 07:01:20 -0400
-Message-Id: <20210809110120.3237065-1-pbonzini@redhat.com>
+        id S233999AbhHINF4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 9 Aug 2021 09:05:56 -0400
+Received: from out30-54.freemail.mail.aliyun.com ([115.124.30.54]:45835 "EHLO
+        out30-54.freemail.mail.aliyun.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S235001AbhHINFv (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 9 Aug 2021 09:05:51 -0400
+X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R821e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e01424;MF=chaowu@linux.alibaba.com;NM=1;PH=DS;RN=8;SR=0;TI=SMTPD_---0UiVb3bx_1628514328;
+Received: from B-Q154MD6P-0029.local(mailfrom:ChaoWu@linux.alibaba.com fp:SMTPD_---0UiVb3bx_1628514328)
+          by smtp.aliyun-inc.com(127.0.0.1);
+          Mon, 09 Aug 2021 21:05:28 +0800
+Subject: Re: [PATCH 0/2] Fix ptp_kvm_get_time_fn infinite loop and remove
+ redundant EXPORT_SYMBOL_GPL
+To:     Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Richard Cochran <richardcochran@gmail.com>
+Cc:     x86@kernel.org, kvm@vger.kernel.org, gerry@linux.alibaba.com,
+        zhabin@linux.alibaba.com
+References: <cover.1621505277.git.chaowu@linux.alibaba.com>
+From:   Chao Wu <ChaoWu@linux.alibaba.com>
+Message-ID: <125d01f6-cefa-8515-5a04-333747b9b7ef@linux.alibaba.com>
+Date:   Mon, 9 Aug 2021 21:05:27 +0800
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0)
+ Gecko/20100101 Thunderbird/78.12.0
 MIME-Version: 1.0
+In-Reply-To: <cover.1621505277.git.chaowu@linux.alibaba.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-hv_vcpu is initialized again a dozen lines below, so remove the
-initializer.
+Ping
 
-Reported-by: kernel test robot <lkp@intel.com>
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- arch/x86/kvm/hyperv.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/arch/x86/kvm/hyperv.c b/arch/x86/kvm/hyperv.c
-index e9582db29a99..2da21e45da99 100644
---- a/arch/x86/kvm/hyperv.c
-+++ b/arch/x86/kvm/hyperv.c
-@@ -1968,7 +1968,7 @@ static u64 kvm_hv_send_ipi(struct kvm_vcpu *vcpu, struct kvm_hv_hcall *hc, bool
- void kvm_hv_set_cpuid(struct kvm_vcpu *vcpu)
- {
- 	struct kvm_cpuid_entry2 *entry;
--	struct kvm_vcpu_hv *hv_vcpu = to_hv_vcpu(vcpu);
-+	struct kvm_vcpu_hv *hv_vcpu;
- 
- 	entry = kvm_find_cpuid_entry(vcpu, HYPERV_CPUID_INTERFACE, 0);
- 	if (entry && entry->eax == HYPERV_CPUID_SIGNATURE_EAX) {
--- 
-2.27.0
-
+在 2021/5/25 下午4:44, Chao Wu 写道:
+> We fix the infinite loop bug in ptp_kvm_get_time_fn function and removes the redundant EXPORT_SYMBOL_GPL for pvclock_get_pvti_cpu0_va.
+>
+> Chao Wu (2):
+>    ptp_kvm: fix an infinite loop in ptp_kvm_get_time_fn when vm has more than 64 vcpus
+>    pvclock: remove EXPORT_SYMBOL_GPL for pvclock_get_pvti_cpu0_va
+>
+>   arch/x86/include/asm/kvmclock.h | 16 ++++++++++++++++
+>   arch/x86/kernel/kvmclock.c      | 12 ++----------
+>   arch/x86/kernel/pvclock.c       |  1 -
+>   drivers/ptp/ptp_kvm.c           |  6 ++----
+>   4 files changed, 20 insertions(+), 15 deletions(-)
+>
