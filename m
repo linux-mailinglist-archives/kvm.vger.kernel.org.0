@@ -2,199 +2,162 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 531063E4D3C
-	for <lists+kvm@lfdr.de>; Mon,  9 Aug 2021 21:43:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2BA5A3E4E36
+	for <lists+kvm@lfdr.de>; Mon,  9 Aug 2021 23:02:27 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235450AbhHIToE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 9 Aug 2021 15:44:04 -0400
-Received: from mail-co1nam11on2079.outbound.protection.outlook.com ([40.107.220.79]:17184
-        "EHLO NAM11-CO1-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S235001AbhHIToD (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 9 Aug 2021 15:44:03 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=XSiVxQnS9Ias0WogVd9dcK0hL4UqDwgE9EULgzRwg5B8ACxaW+Uwiebv/Bd+57U+iVbqhVdE0MTjuqbhvizZN4RfhqbvGPR1GFuHyyGH0T12QzwW5/AZjhZaZRVJsxMqjE2xbLAwhJTX0c3MVbEf5mRkaDuilvB56e/4ev77uyTDkdiXLvCkXd/cYTHSm16Y82qLy311LHfts9tYwwQvYPD7aLs4LGA2zaQWtSU/pgiLNiI+PA3tCfqEp8OM2n3ovAML9Kl/AbGVFaW1ZBnrY/6Z59cqUm3QT48ZQDrpatpFA5SgViyoQiJAdzjrtPMsoljCs9MV6r0f18srPMHcNA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=98F/i4TT8gQkH10sU4cMWCNIH39I/qQQvB5ur3kX+b8=;
- b=A6mxPDZ7yHYHwHU47x1B+awY7RWVn/LCNlCMA9DhqBjQbVhRkEe24W2FUg6gN4R5BlJoIefBHdcLeS5dOZIVLKlVJJVS15gkQz8fyl+GfrDbnaYgFHZvQTXbg3nKaf2rCGNySdrjk0nhdsJV0kqnrKQ3USw+/w/n2StE7hxr5Km/ZAMzqHwrNVaDBMGf09ylM7gBQJuDKh2IJtPI/WvhbWMDIMD2o9wmokSUlJdLPc1Q+VzzHTTerCYATshF4jfpigSJbW/t+yk5srUyhSFmxs9JsIfgUAkAseqa0tDzI9lxpSeWVrqq0wnYTn5i7gBzw+xy3kcp0Ra9//4ZWBqWzg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=98F/i4TT8gQkH10sU4cMWCNIH39I/qQQvB5ur3kX+b8=;
- b=NhjsUI0cT4Iu5z58cQ/vk+2XXOukfkdjfK2Iyq5mgAu+TeFJ7wWb7WF3aZGGq0+FWktD4AGedQW1pNGATttY18+7VLJzHSMsNzwMXt/vx/UcEbXYLAzRQ+eZm5C3XMlLivRdi/D716WwZ4n2q+CaHVjNuzJ+uL8De8SEO1AILAk=
-Authentication-Results: vger.kernel.org; dkim=none (message not signed)
- header.d=none;vger.kernel.org; dmarc=none action=none header.from=amd.com;
-Received: from MW3PR12MB4553.namprd12.prod.outlook.com (2603:10b6:303:2c::19)
- by MWHPR12MB1551.namprd12.prod.outlook.com (2603:10b6:301:9::23) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4394.15; Mon, 9 Aug
- 2021 19:43:35 +0000
-Received: from MW3PR12MB4553.namprd12.prod.outlook.com
- ([fe80::3987:37e5:4db7:944e]) by MW3PR12MB4553.namprd12.prod.outlook.com
- ([fe80::3987:37e5:4db7:944e%6]) with mapi id 15.20.4394.023; Mon, 9 Aug 2021
- 19:43:35 +0000
-Subject: Re: [kvm-unit-tests PATCH 1/2] x86: access: Fix timeout failure by
- limiting number of flag combinations
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     pbonzini@redhat.com, thuth@redhat.com, drjones@redhat.com,
-        kvm@vger.kernel.org
-References: <162826604263.32391.7580736822527851972.stgit@bmoger-ubuntu>
- <162826611747.32391.16149996928851353357.stgit@bmoger-ubuntu>
- <YQ1pA9nN6DP0veQ1@google.com>
-From:   Babu Moger <babu.moger@amd.com>
-Message-ID: <1f30bd0f-da1b-2aa0-e0c8-76d3b5410bcd@amd.com>
-Date:   Mon, 9 Aug 2021 14:43:33 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.11.0
-In-Reply-To: <YQ1pA9nN6DP0veQ1@google.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: SA0PR11CA0082.namprd11.prod.outlook.com
- (2603:10b6:806:d2::27) To MW3PR12MB4553.namprd12.prod.outlook.com
- (2603:10b6:303:2c::19)
+        id S236244AbhHIVCq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 9 Aug 2021 17:02:46 -0400
+Received: from mail-io1-f70.google.com ([209.85.166.70]:39551 "EHLO
+        mail-io1-f70.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229812AbhHIVCo (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 9 Aug 2021 17:02:44 -0400
+Received: by mail-io1-f70.google.com with SMTP id u22-20020a5d9f560000b02905058dc6c376so13180394iot.6
+        for <kvm@vger.kernel.org>; Mon, 09 Aug 2021 14:02:23 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:date:message-id:subject:from:to;
+        bh=VGe3Z5M4JpJQGp07PVsxWzU3in6lwjZc9g6V+3kwV5s=;
+        b=nyB2YjwGM1YpWgfRbrLC9WuLmygQgdh8v7UbFRYyTAkPFGGoIHgBFmqmQ+u6h+pRc7
+         YcBYnTtis5qDCYkvgPqrCRNj38HlUfp9db1cfHmwRhA6Z3CZZ6WeaynzQGFfVq0Iphl6
+         VhuBl+GEDbWKdV5AHaZzFqi7CzZaDamHiR9Y2ADL7mKfLuoV/8hO5Q6Jt9FhaTW4S+2i
+         pl3x/uFaP7E/mNHLwGtlc7OFVv5YMrGgtz7usdzBLZvbdfh0sz83fSKLZYjINaGoRoVD
+         X/dgBBE4jNE3JLGPjYAgIVhxTNq5ZAS5s/7OL6xW0mJfhfwlDvaN5ekLCGvIs7JyJwDF
+         8PLQ==
+X-Gm-Message-State: AOAM533hCXuydBy7pexgbAk78w2YHdEU/IrocijtBFOqRfwLYYz1HlPn
+        VjwLnShFond+6wCzUwe0EMS5A2s1+o5EWX+1jW/AeuHHQ4Kv
+X-Google-Smtp-Source: ABdhPJy2mpVy0vGDnE8XXuXP8CkA/Nh9fDV41Lbp9RhnbI9FunWT9fAkZM+tztzsVgB88xupeuMvpUr2T99kJLajF8mM70p0G3cm
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from [10.236.31.0] (165.204.77.1) by SA0PR11CA0082.namprd11.prod.outlook.com (2603:10b6:806:d2::27) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4394.15 via Frontend Transport; Mon, 9 Aug 2021 19:43:34 +0000
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 258aac2a-b0b8-4680-5725-08d95b6df9f8
-X-MS-TrafficTypeDiagnostic: MWHPR12MB1551:
-X-Microsoft-Antispam-PRVS: <MWHPR12MB1551C94101FD03B2954FC26395F69@MWHPR12MB1551.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:10000;
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: QqhnzlIL49yooyaA28OgRL6b39rnPKqgzh8mQ65/dKeuCYBWPmTVMoh8KdZZj60OrIhQ5Mo1Cyr9etOf6Le2iyg20EUu+XvwNC6pBcZL4fAgV6uua3n8aJG3IkO1tM5wnliQ2sIAD+UGb/YI82pIDYnVIfG/gy07mjgVcQy9+A3Z1mAVQGCqacfgU3DAvLxNXNZlsM7WfzgnIh1PXZR+aC0jIJaPX5rhrqulITVInZjELs0RZxqzPNcCOfeAp7X2AB2C3RlDvZx0FtxWqMYIvXW+pVcIqTljCiW5P8Oi+OtDHY+eifM2LHleEeiynu72PyNuD4lsbkBjwlhciYV+4EAstdkMEZ5kh2JfoZfGfDZs/iW9S0Akd9KABd2qdpjmmhFC1YOb0vvt77bH11/zmtR+VRNsLnXgZMCIUyHer/QBKnLBKjloifvwMbJX/Mo286xLrGekOjCag+/wystWUox6kSrm7Xqw/Hyhuf6V0nqzVXFFLDXlxYeLG4PW89NUdQklRX5P2SmMBXQX0qxH8yLlbP4vtFF3iSbf6JJy7LR2l7jdnlejOcXK/KXILahHpYfDR17Hpo6D9LnHfKhPlDkEJAn9Zf5AF45bikTNgofqMdeeCVh2aRvcRiOWM2ArZ/X7whM79gtGwZhonkm+wMpWIlO9gEfTW6AwOX/V1Qr0KxcepFK/3xjIA6ExrseW1sU/PT8Tf1+YGxyA9d93clzZdyCXMKq8MyygN+s1I8t5YcB21d1M0b9S9Vb9uN+QgTJLyE7ydMeeLoPYNMA3tg==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MW3PR12MB4553.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(31686004)(8936002)(2906002)(44832011)(36756003)(66556008)(956004)(66476007)(66946007)(2616005)(8676002)(6486002)(186003)(83380400001)(53546011)(26005)(6916009)(5660300002)(16576012)(86362001)(31696002)(316002)(38100700002)(38350700002)(4326008)(52116002)(508600001)(43740500002)(45980500001);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?QkZpeXFNd0VxZ3hTejJqaTcrbWtqUWhPVVk5TUFPeWVvS3dsM2xJR1dpL0lm?=
- =?utf-8?B?ZGFMci9iSDk3MGZ3SGhsdlBCckZFcXQ1WldaVDEvUXYyQmlPNHJLWG1CTnhn?=
- =?utf-8?B?UkVacDdxREJvQjF4WUdTTGJ5cy9VMFRTUVdGRUZZVEl1ZU9RQ1RtM3E3SjV5?=
- =?utf-8?B?QTlKRkpWRlhzajZjQmdKcWg1aUZkRndnZW4vdDBISU1zT0lFeGVJNEIxRXRY?=
- =?utf-8?B?aG9rU3ZGNE5jcURGSWQ3M1pxZjY0N0FxNXpEamI0RTdCaURZOGp6Y1ZwY0NL?=
- =?utf-8?B?MUFqWXFPa0w3YUFvaE9DK1FOZnBqS09FQkpMNjYzOTc3VWswbGh5cnJyVHFB?=
- =?utf-8?B?Y1IrYjlHcnltOUhGU29KUStubGoyNzVHZC8wTzRUZ0Yrblg1VlRTTUhqYVVZ?=
- =?utf-8?B?dmk2eVAyTTRabUNJUDdyVlBBSFMxQWtPSTRNdk9qNnIyREh6L2U2eSt5VTNC?=
- =?utf-8?B?NG11N0gzQjF2SlhQN1lXVllqVld0Y1dYQnRLdHFQY2diZm52MjJGdHVuck44?=
- =?utf-8?B?QTBqRzdYLzBHdHF2cVhaeHlHSWJBZisrVkhydzdUNUlWTGRZanJnMzZCa1Q2?=
- =?utf-8?B?TmR2Y2FqcEpLbjJzcjNSbW90Q09QZDdoTzFwK0gyNjJvbmlRQnZXb3pGNXFK?=
- =?utf-8?B?amNQMDZTdGduZ3lQVjFCN2tTd3QvQnFxVGhZWXc3SUNUZTlxM1plTVBiUWtW?=
- =?utf-8?B?N3pjTUIxcWZnam5wQ1dLT09JUWd3cXRxYWs5WXNlZHVRRVdCbE1ocHF0MkR5?=
- =?utf-8?B?VUJpN0MxRlU1L3N0MFNDWVpObEJJMkZxSElLRkJBM2UwUnhxTkh2QS92TGRr?=
- =?utf-8?B?S0owKzA4YmFFbUVETEhub2YrZSsvRnl4dmhjWEVDbWUvbDZtS0tFWWRBUldj?=
- =?utf-8?B?Vjk3cTlVTGg4SExpY2NZZG1CUmhRUU1hQkdDcXMvMEtSTHpvYnpnNW9rdjR4?=
- =?utf-8?B?b3FpTzQ2QjVRRHVQRFQ0aEVjOXhXa1BZb1pmYmt5TjZLUlhYMDNEMzJUeFRL?=
- =?utf-8?B?cDc5eXpDejlyV3BnUGIzd0RNaU9PSndiTU5qdHhXUjRjQ2thMTF2Y2ZuVUlh?=
- =?utf-8?B?YWZDMmJrdElBQjFuUGtwazZMaEg1VCtyOFkvMVNjbGlPdFIzcWY5WGhDSGk4?=
- =?utf-8?B?eHRxS1NpeHorNzUzTTNLSDloYU4rVEVLUS9tR1IvNXZtaVpCa3hOL1pnTGRu?=
- =?utf-8?B?NjR6MC9SYS9YNzlmTS9WcFBaNWZ2d2JLOGROVjFDTlM4c1FtUVR6RHAvNit4?=
- =?utf-8?B?REJOUGJOYmN6UUZwcUdPc1dvSytaVTgwRjJDQSthY3RMY2tYZkUxc0hHWUkr?=
- =?utf-8?B?UDZKSVJxdlgxRThLVmhBa3g5SkYxVnlHWFRockxPdm80SkZKYVkvbklGTGRI?=
- =?utf-8?B?UFFZL2d2RkJLQWNxMlY2b1JCa1NLNnhqL0czTnV4ZEFQZ0dHUGpjWGFtSVdH?=
- =?utf-8?B?emlBUm9vbnFhdURrb3RDSGszWVc4a0F3dVprQmJkVjhraE9jYkJQWDRrRjhQ?=
- =?utf-8?B?d2lpRGVoRndhclFZd0ZUdUdNTHhvNXVURWtZdGpoUWZvS1BneEdIZWRNNFp3?=
- =?utf-8?B?dHNob3E1VzNhRVN2QU9xc2J2QVNuNTVNUTU0Z2crUllNdi9UbHd3RlRYYklD?=
- =?utf-8?B?ZFROQzBKK3VCYk9OT3gzeDhNMW9uZDNiRkwwVExkeXYwREtHcW5OcjVaYVFv?=
- =?utf-8?B?Tm5SYzdEMVFUV1NRL1grWkJVbVJ3V05wazVPbEJZOTlmaXl1MCtxZFBzc09Z?=
- =?utf-8?Q?neiUhL8JB/iz7f+4JMmbGccNPf8GhvAwQSN/n6r?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 258aac2a-b0b8-4680-5725-08d95b6df9f8
-X-MS-Exchange-CrossTenant-AuthSource: MW3PR12MB4553.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Aug 2021 19:43:35.4245
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 5s3EGXC2cAwLl/LdPlrAOVMi6B5z31EwivbLOInxGl3Y8Ti7pIzg7L9UyUV2ug+i
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MWHPR12MB1551
+X-Received: by 2002:a92:d3c7:: with SMTP id c7mr614438ilh.59.1628542942901;
+ Mon, 09 Aug 2021 14:02:22 -0700 (PDT)
+Date:   Mon, 09 Aug 2021 14:02:22 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <0000000000009cfcda05c926b34b@google.com>
+Subject: [syzbot] kernel BUG in find_lock_entries
+From:   syzbot <syzbot+c87be4f669d920c76330@syzkaller.appspotmail.com>
+To:     akpm@linux-foundation.org, bp@alien8.de, frederic@kernel.org,
+        hpa@zytor.com, jmattson@google.com, joro@8bytes.org,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-mm@kvack.org, mark.rutland@arm.com, masahiroy@kernel.org,
+        mingo@redhat.com, npiggin@gmail.com, pbonzini@redhat.com,
+        peterz@infradead.org, rafael.j.wysocki@intel.com,
+        rostedt@goodmis.org, seanjc@google.com, sedat.dilek@gmail.com,
+        syzkaller-bugs@googlegroups.com, tglx@linutronix.de,
+        vitor@massaru.org, vkuznets@redhat.com, wanpengli@tencent.com,
+        will@kernel.org, x86@kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Hello,
+
+syzbot found the following issue on:
+
+HEAD commit:    902e7f373fff Merge tag 'net-5.14-rc5' of git://git.kernel...
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=15337cd6300000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=702bfdfbf389c324
+dashboard link: https://syzkaller.appspot.com/bug?extid=c87be4f669d920c76330
+compiler:       Debian clang version 11.0.1-2, GNU ld (GNU Binutils for Debian) 2.35.1
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=157afce9300000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=152fc43a300000
+
+The issue was bisected to:
+
+commit 997acaf6b4b59c6a9c259740312a69ea549cc684
+Author: Mark Rutland <mark.rutland@arm.com>
+Date:   Mon Jan 11 15:37:07 2021 +0000
+
+    lockdep: report broken irq restoration
+
+bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=137296e6300000
+final oops:     https://syzkaller.appspot.com/x/report.txt?x=10f296e6300000
+console output: https://syzkaller.appspot.com/x/log.txt?x=177296e6300000
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+c87be4f669d920c76330@syzkaller.appspotmail.com
+Fixes: 997acaf6b4b5 ("lockdep: report broken irq restoration")
+
+ __pagevec_release+0x7d/0xf0 mm/swap.c:992
+ pagevec_release include/linux/pagevec.h:81 [inline]
+ shmem_undo_range+0x5da/0x1a60 mm/shmem.c:931
+ shmem_truncate_range mm/shmem.c:1030 [inline]
+ shmem_setattr+0x4f0/0x890 mm/shmem.c:1091
+ notify_change+0xbb8/0x1060 fs/attr.c:398
+ do_truncate fs/open.c:64 [inline]
+ vfs_truncate+0x6be/0x880 fs/open.c:112
+ do_sys_truncate fs/open.c:135 [inline]
+ __do_sys_truncate fs/open.c:147 [inline]
+ __se_sys_truncate fs/open.c:145 [inline]
+ __x64_sys_truncate+0x110/0x1b0 fs/open.c:145
+ do_syscall_x64 arch/x86/entry/common.c:50 [inline]
+ do_syscall_64+0x3d/0xb0 arch/x86/entry/common.c:80
+ entry_SYSCALL_64_after_hwframe+0x44/0xae
+------------[ cut here ]------------
+kernel BUG at mm/filemap.c:2041!
+invalid opcode: 0000 [#1] PREEMPT SMP KASAN
+CPU: 1 PID: 24786 Comm: syz-executor626 Not tainted 5.14.0-rc4-syzkaller #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
+RIP: 0010:find_lock_entries+0x10d5/0x1110 mm/filemap.c:2041
+Code: e8 00 3d d8 ff 4c 89 e7 48 c7 c6 20 70 39 8a e8 71 bf 0d 00 0f 0b e8 ea 3c d8 ff 4c 89 e7 48 c7 c6 40 62 39 8a e8 5b bf 0d 00 <0f> 0b e8 d4 3c d8 ff 4c 89 e7 48 c7 c6 80 6a 39 8a e8 45 bf 0d 00
+RSP: 0018:ffffc9000a52f7e0 EFLAGS: 00010246
+RAX: c75c992acedb0700 RBX: 0000000000000001 RCX: ffff8880161ab880
+RDX: 0000000000000000 RSI: 000000000000ffff RDI: 000000000000ffff
+RBP: ffffc9000a52f930 R08: ffffffff81d080d4 R09: ffffed1017383f24
+R10: ffffed1017383f24 R11: 0000000000000000 R12: ffffea0000f40000
+R13: 0000000000001000 R14: fffffffffffffffe R15: 0000000000001140
+FS:  00007f1334d1f700(0000) GS:ffff8880b9d00000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007faaa593a000 CR3: 00000000165b1000 CR4: 00000000001506e0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+Call Trace:
+ shmem_undo_range+0x1ea/0x1a60 mm/shmem.c:910
+ shmem_truncate_range mm/shmem.c:1030 [inline]
+ shmem_setattr+0x4f0/0x890 mm/shmem.c:1091
+ notify_change+0xbb8/0x1060 fs/attr.c:398
+ do_truncate fs/open.c:64 [inline]
+ vfs_truncate+0x6be/0x880 fs/open.c:112
+ do_sys_truncate fs/open.c:135 [inline]
+ __do_sys_truncate fs/open.c:147 [inline]
+ __se_sys_truncate fs/open.c:145 [inline]
+ __x64_sys_truncate+0x110/0x1b0 fs/open.c:145
+ do_syscall_x64 arch/x86/entry/common.c:50 [inline]
+ do_syscall_64+0x3d/0xb0 arch/x86/entry/common.c:80
+ entry_SYSCALL_64_after_hwframe+0x44/0xae
+RIP: 0033:0x44a9a9
+Code: 28 00 00 00 75 05 48 83 c4 28 c3 e8 71 15 00 00 90 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 bc ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007f1334d1f208 EFLAGS: 00000246 ORIG_RAX: 000000000000004c
+RAX: ffffffffffffffda RBX: 00000000004cb4f8 RCX: 000000000044a9a9
+RDX: 00007f1334d1f700 RSI: 0000000000000001 RDI: 0000000020000340
+RBP: 00000000004cb4f0 R08: 00007f1334d1f700 R09: 0000000000000000
+R10: 00007f1334d1f700 R11: 0000000000000246 R12: 00000000004cb4fc
+R13: 00007ffdec06b36f R14: 00007f1334d1f300 R15: 0000000000022000
+Modules linked in:
+---[ end trace 4dcd0c81778c7d51 ]---
+RIP: 0010:find_lock_entries+0x10d5/0x1110 mm/filemap.c:2041
+Code: e8 00 3d d8 ff 4c 89 e7 48 c7 c6 20 70 39 8a e8 71 bf 0d 00 0f 0b e8 ea 3c d8 ff 4c 89 e7 48 c7 c6 40 62 39 8a e8 5b bf 0d 00 <0f> 0b e8 d4 3c d8 ff 4c 89 e7 48 c7 c6 80 6a 39 8a e8 45 bf 0d 00
+RSP: 0018:ffffc9000a52f7e0 EFLAGS: 00010246
+RAX: c75c992acedb0700 RBX: 0000000000000001 RCX: ffff8880161ab880
+RDX: 0000000000000000 RSI: 000000000000ffff RDI: 000000000000ffff
+RBP: ffffc9000a52f930 R08: ffffffff81d080d4 R09: ffffed1017383f24
+R10: ffffed1017383f24 R11: 0000000000000000 R12: ffffea0000f40000
+R13: 0000000000001000 R14: fffffffffffffffe R15: 0000000000001140
+FS:  00007f1334d1f700(0000) GS:ffff8880b9c00000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 0000557a29364160 CR3: 00000000165b1000 CR4: 00000000001506f0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
 
 
-On 8/6/21 11:53 AM, Sean Christopherson wrote:
-> On Fri, Aug 06, 2021, Babu Moger wrote:
->> From: Babu Moger <Babu.Moger@amd.com>
->>
->> The test ./x86/access fails with a timeout. This is due to the number test
->> combination. The test cases increase exponentially as the features get
->> enabled. The new machine adds the feature AC_CPU_CR4_PKE. The default
->> timeout is 180 seconds. Seen this problem both on AMD and Intel machines.
->>
->> #./tests/access
->> qemu-system-x86_64: terminating on signal 15 from pid 20050 (timeout)
->> FAIL access (timeout; duration=180)
->>
->> This test can take about 7 minutes without timeout.
->> time ./tests/access
->> 58982405 tests, 0 failures
->> PASS access
->>
->> real	7m10.063s
->> user	7m9.063s
->> sys	0m0.309s
->>
->> Fix the problem by adding few more limit checks.
-> 
-> Please state somewhere in the changelog what is actually being changed, and the
-> actual effect of the change.  E.g.
-> 
->   Disallow protection keys testcase in combination with reserved bit
->   testcasess to further limit the number of tests run to avoid timeouts on
->   systems with support for protection keys.
-> 
->   Disallowing this combination reduces the total number of tests from
->   58982405 to <???>, and the runtime from ~7 minutes to <???>
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-Sure. Will do.
-> 
->> Signed-off-by: Babu Moger <Babu.Moger@amd.com>
->> ---
->>  x86/access.c |    4 ++--
->>  1 file changed, 2 insertions(+), 2 deletions(-)
->>
->> diff --git a/x86/access.c b/x86/access.c
->> index 47807cc..e371dd5 100644
->> --- a/x86/access.c
->> +++ b/x86/access.c
->> @@ -317,9 +317,9 @@ static _Bool ac_test_legal(ac_test_t *at)
->>      /*
->>       * Shorten the test by avoiding testing too many reserved bit combinations
->>       */
->> -    if ((F(AC_PDE_BIT51) + F(AC_PDE_BIT36) + F(AC_PDE_BIT13)) > 1)
->> +    if ((F(AC_PDE_BIT51) + F(AC_PDE_BIT36) + F(AC_PDE_BIT13) + F(AC_CPU_CR4_PKE)) > 1)
->>          return false;
->> -    if ((F(AC_PTE_BIT51) + F(AC_PTE_BIT36)) > 1)
->> +    if ((F(AC_PTE_BIT51) + F(AC_PTE_BIT36) + F(AC_CPU_CR4_PKE)) > 1)
-> 
-> Why are protection keys the sacrifical lamb?  Simply because they're the newest?
-
-Yes. I added it because it was new ):.
-> 
-> And before we start killing off arbitrary combinations, what about sharding the
-> test so that testcases that depend on a specific CR0/CR4/EFER bit, i.e. trigger
-> a VM-Exit when the configuration changes, are separate runs?  Being able to run
-> a specific combination would also hopefully make it easier to debug issues as
-> the user could specify which combo to run without having to modify the code and
-> recompile.
-> 
-> That probably won't actually reduce the total run time, but it would make each
-> run a separate test and give developers a warm fuzzy feeling that they're indeed
-> making progress :-)
-> 
-> Not sure how this could be automagically expressed this in unittest.cfg though...
-
-Let me investigate if we can do that fairly easy. Will let you know.
-Thanks
-Babu
-> 
->>          return false;
->>  
->>      return true;
->>
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+For information about bisection process see: https://goo.gl/tpsmEJ#bisection
+syzbot can test patches for this issue, for details see:
+https://goo.gl/tpsmEJ#testing-patches
