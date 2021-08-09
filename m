@@ -2,111 +2,145 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0D7EE3E48E6
-	for <lists+kvm@lfdr.de>; Mon,  9 Aug 2021 17:33:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 952623E4956
+	for <lists+kvm@lfdr.de>; Mon,  9 Aug 2021 17:57:18 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235063AbhHIPdr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 9 Aug 2021 11:33:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59056 "EHLO
+        id S235868AbhHIP5g (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 9 Aug 2021 11:57:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37206 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235482AbhHIPbW (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 9 Aug 2021 11:31:22 -0400
-Received: from mail-pj1-x1036.google.com (mail-pj1-x1036.google.com [IPv6:2607:f8b0:4864:20::1036])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1A9F9C061796
-        for <kvm@vger.kernel.org>; Mon,  9 Aug 2021 08:30:13 -0700 (PDT)
-Received: by mail-pj1-x1036.google.com with SMTP id s22-20020a17090a1c16b0290177caeba067so35299041pjs.0
-        for <kvm@vger.kernel.org>; Mon, 09 Aug 2021 08:30:13 -0700 (PDT)
+        with ESMTP id S235788AbhHIP5f (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 9 Aug 2021 11:57:35 -0400
+Received: from mail-pj1-x102a.google.com (mail-pj1-x102a.google.com [IPv6:2607:f8b0:4864:20::102a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0E8CAC0613D3
+        for <kvm@vger.kernel.org>; Mon,  9 Aug 2021 08:57:15 -0700 (PDT)
+Received: by mail-pj1-x102a.google.com with SMTP id j18-20020a17090aeb12b029017737e6c349so355416pjz.0
+        for <kvm@vger.kernel.org>; Mon, 09 Aug 2021 08:57:15 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=0AECcEi2rpt5gm0PQCPyfbI2DBqYy38YFfxxfkJxtfU=;
-        b=nvgDcF9oG4oweN91pNjyW0PwF3Wwq1kdB8edecupp/0AAlGgeVxfi6VaUQYhaBKIEQ
-         KfxX7PsGRvTGaymoz7UKsMn7m6U3/pvHIAtH9dSiNosjr6WZeZAhce0vGW8uDjdRtKax
-         a6u7Ig4lBKVRJw5VhquaWiKNLQ3TVn7Q6byy7hy4H8juTQJEau+Z6YqtOXl1dN4R4Mij
-         bqpUPJNiavaIwG/MtPnpZ81XQ1+n8tDBylpVsX3eAbu8sPwPVk7UfHhNHRcSvnMto/9O
-         q9iNpgDuNR3OjvkApqeNWTi1MltBiczdHnuiMlcCoaP/YwLWHkMDcMXHnNt53lnK9vCY
-         cFaw==
+        bh=qmKZUENIq51fhuRL35kMmVWqclk5GRvGXJyAk2DQ4tY=;
+        b=GPjvTN7fd8PCJickd2j8qbEcp1kxpLCDGv5E8h8xgKzOlYUsKf1aSElz4JUvbAH8by
+         Nm7Nlv5+l/LI+9A/R5wiyYOghMhFopxEJg3ltbJr0udNGlhTFaFjCfvbsRHux+0pVsYm
+         SMnqTfZnWHL+TMEW6x7N/xJ/K1eTioeLvfKQ21LjHlVHHzSmvNx7YNmoiLd/WtxSxXaH
+         6swsvEcd7v1UHaYT0KwYyKE/i5Pl+Y/wDkKjuY0ykYhbpTSR8tqir57W92QxOxEapV3q
+         b77/tAtaKX3eIs+XX/1jimBw7POQts4+G3K3gaxgt4dxGlVztyRqmBl0e3M2emPcsVB3
+         RWHA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=0AECcEi2rpt5gm0PQCPyfbI2DBqYy38YFfxxfkJxtfU=;
-        b=sYCYfC/PkvC5F6W416HKo2trO0WHGsPWm98QxNjPru7hrCh8vX2mCGEDeemLKWHhMX
-         UxQUfo5dk/lZYOuD/XodFH4LD1BZiF469YFJSIbuZ/Sl2ZW9C4evO0GxUq3q0zhmTq5n
-         JrVXarvXi1hqc31z7rxJZO4/sNvsbrvwsuExUWaSwoi1rYqWjeoXPylBeppcAtP0CDdI
-         qBOU+j7xym7srHC1q3dreGMy9zozRLRZwkACLdboReI9oaG7k6BA9Tat2k3/zk/6dFGF
-         RD/tFn5ESOm3UIyewmMuJBvsEMH1QPpmCZ4wCnXfyLSLfW3f/nvmh1DcpbNhLTVISgtQ
-         eEBQ==
-X-Gm-Message-State: AOAM5321kzwHG8bGibdtvaH8AOWGM0ks9qtwQ7PQSFanFuLqfrgVKiHc
-        HK7jdwxvLcdzFjGb3QTmg/uMC5nxDTirlg==
-X-Google-Smtp-Source: ABdhPJz3gQIyTN45i1aPVFveM3Bul2uCaHAGbhBoyHJdaWipsW4dCYaNLy3z+6I5IMCotxAlOsp8pQ==
-X-Received: by 2002:a17:90a:bb0b:: with SMTP id u11mr36773910pjr.18.1628523012466;
-        Mon, 09 Aug 2021 08:30:12 -0700 (PDT)
+        bh=qmKZUENIq51fhuRL35kMmVWqclk5GRvGXJyAk2DQ4tY=;
+        b=Tk0v5IzYFrSuH19ESj501naVHa7UPFk6uyFFp8bF7T1dj1rVpiOihG4sKrKS+HKWja
+         /wH/rTkIrTiAltJ/n8iWOatu6XI6wDCAFfFoMZpQ0v2k+lqWlRdE98FFcYd9X1biVg0e
+         f9apgqgR37IDXyA7wpW1T+fkuj3kxCjwTTEc5EpAzmCQyLb+sELgEVdp0GVHxGw1/Dtf
+         lWo/7gb9cXQeRFOU2S2WOKTv0xUpv3j2huu1ROxJAc31gP9W8IkE/LqyiwuI9YpxcMJQ
+         pk0wlVTWBkmYPp9aJfvsnNVuQqNrRre2uVsNbO2KSAi0F51MlZh/rTc9jWvOvEtOCAi2
+         oUbw==
+X-Gm-Message-State: AOAM533/drSkwzDnT4f+3r87GLctivs+QKDiJ0dvMfqMwlrzX4p8atOh
+        FCDNpjcO/RwXeZb433ua6FAAWA==
+X-Google-Smtp-Source: ABdhPJzQzmImICh0VNjzcZPOjEsb5viw224s+Sdfd8OJFV/zcpKtUjtxqj/PBW3z4taalyPDiHyEpQ==
+X-Received: by 2002:a17:90a:5515:: with SMTP id b21mr14939488pji.142.1628524634304;
+        Mon, 09 Aug 2021 08:57:14 -0700 (PDT)
 Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id y2sm19717321pjl.6.2021.08.09.08.30.11
+        by smtp.gmail.com with ESMTPSA id nv11sm454062pjb.48.2021.08.09.08.57.13
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 09 Aug 2021 08:30:11 -0700 (PDT)
-Date:   Mon, 9 Aug 2021 15:30:08 +0000
+        Mon, 09 Aug 2021 08:57:13 -0700 (PDT)
+Date:   Mon, 9 Aug 2021 15:57:09 +0000
 From:   Sean Christopherson <seanjc@google.com>
-To:     Yu Zhang <yu.c.zhang@linux.intel.com>
-Cc:     Wei Huang <wei.huang2@amd.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, pbonzini@redhat.com,
-        vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com,
-        joro@8bytes.org, tglx@linutronix.de, mingo@redhat.com,
-        bp@alien8.de, x86@kernel.org, hpa@zytor.com
-Subject: Re: [PATCH v2 1/3] KVM: x86: Allow CPU to force vendor-specific TDP
- level
-Message-ID: <YRFKABg2MOJxcq+y@google.com>
-References: <20210808192658.2923641-1-wei.huang2@amd.com>
- <20210808192658.2923641-2-wei.huang2@amd.com>
- <20210809035806.5cqdqm5vkexvngda@linux.intel.com>
- <c6324362-1439-ef94-789b-5934c0e1cdb8@amd.com>
- <20210809042703.25gfuuvujicc3vj7@linux.intel.com>
- <73bbaac0-701c-42dd-36da-aae1fed7f1a0@amd.com>
- <20210809064224.ctu3zxknn7s56gk3@linux.intel.com>
+To:     Maxim Levitsky <mlevitsk@redhat.com>
+Cc:     kvm@vger.kernel.org,
+        "open list:X86 ARCHITECTURE (32-BIT AND 64-BIT)" 
+        <linux-kernel@vger.kernel.org>, Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, Borislav Petkov <bp@alien8.de>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ingo Molnar <mingo@redhat.com>,
+        "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>
+Subject: Re: KVM's support for non default APIC base
+Message-ID: <YRFQVbo90g3sPby3@google.com>
+References: <20210713142023.106183-1-mlevitsk@redhat.com>
+ <20210713142023.106183-9-mlevitsk@redhat.com>
+ <c51d3f0b46bb3f73d82d66fae92425be76b84a68.camel@redhat.com>
+ <YPXJQxLaJuoF6aXl@google.com>
+ <564fd4461c73a4ec08d68e2364401db981ecba3a.camel@redhat.com>
+ <YQ2vv7EXGN2jgQBb@google.com>
+ <5f991ac11006ae890961a76d35a63b7c9c56b47c.camel@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20210809064224.ctu3zxknn7s56gk3@linux.intel.com>
+In-Reply-To: <5f991ac11006ae890961a76d35a63b7c9c56b47c.camel@redhat.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Aug 09, 2021, Yu Zhang wrote:
-> On Sun, Aug 08, 2021 at 11:33:44PM -0500, Wei Huang wrote:
-> > 
-> > On 8/8/21 11:27 PM, Yu Zhang wrote:
-> > > On Sun, Aug 08, 2021 at 11:11:40PM -0500, Wei Huang wrote:
-> > > > 
-> > > > 
-> > > > On 8/8/21 10:58 PM, Yu Zhang wrote:
-> > > > > On Sun, Aug 08, 2021 at 02:26:56PM -0500, Wei Huang wrote:
-> > > > > > AMD future CPUs will require a 5-level NPT if host CR4.LA57 is set.
-> > > > > 
-> > > > > Sorry, but why? NPT is not indexed by HVA.
-> > > > 
-> > > > NPT is not indexed by HVA - it is always indexed by GPA. What I meant is NPT
-> > > > page table level has to be the same as the host OS page table: if 5-level
-> > > > page table is enabled in host OS (CR4.LA57=1), guest NPT has to 5-level too.
-> > > 
-> > > I know what you meant. But may I ask why?
-> > 
-> > I don't have a good answer for it. From what I know, VMCB doesn't have a
-> > field to indicate guest page table level. As a result, hardware relies on
-> > host CR4 to infer NPT level.
+On Mon, Aug 09, 2021, Maxim Levitsky wrote:
+> On Fri, 2021-08-06 at 21:55 +0000, Sean Christopherson wrote:
+> > Making up our own behavior is almost never the right approach.  E.g. _best_ case
+> > scenario for an unexpected #GP is the guest immediately terminates.  Worst case
+> > scenario is the guest eats the #GP and continues on, which is basically the status
+> > quo, except it's guaranteed to now work, whereas todays behavior can at least let
+> > the guest function, for some definitions of "function".
 > 
-> I guess you mean not even in the N_CR3 field of VMCB? 
+> Well, at least the Intel's PRM does state that APIC base relocation is not guaranteed
+> to work on all CPUs, so giving the guest a #GP is like telling it that current CPU doesn't
+> support it. In theory, a very well behaving guest can catch the exception and
+> fail back to the default base.
+> 
+> I don't understand what do you mean by 'guaranteed to now work'. If the guest
 
-Correct, nCR3 is a basically a pure representation of a regular CR3.
+Doh, typo, it should be "not", i.e. "guaranteed to not work".  As in, allowing the
+unsupported WRMSR could work depending on what features KVM is using and what the
+guest is doing, whereas injecting #GP is guaranteed to break the guest.
 
-> Then it's not a broken design - it's a limitation of SVM. :)
+> ignores this #GP and still thinks that APIC base relocation worked, it is its fault.
+> A well behaving guest should never assume that a msr write that failed with #GP
+> worked.
+> 
+> > 
+> > I think the only viable "solution" is to exit to userspace on the guilty WRMSR.
+> > Whether or not we can do that without breaking userspace is probably the big
+> > question.  Fully emulating APIC base relocation would be a tremendous amount of
+> > effort and complexity for practically zero benefit.
+> 
+> I have nothing against this as well although I kind of like the #GP approach
+> a bit more, and knowing that there are barely any reasons to relocate the
+> APIC base, and that it doesn't work well, there is a good chance that no one
+> does it anyway (except our kvm unit tests, but that isn't an issue).
 
-That's just a polite way of saying it's a broken design ;-)
+Injecting an exception that architecturally should not happen is simply not
+acceptable.  Silently (and partially) ignoring the WRMSR isn't acceptable either,
+but we can't travel back in time to fix that so we're stuck with it unless we can
+change the behavior without anyone complaining.
 
-Joking aside, NPT opted for a semblance of backwards compatibility at the cost of
-having to carry all the baggage that comes with a legacy design.  Keeping the core
-functionality from IA32 paging presumably miminizes design and hardware costs, and
-required minimal enabling in hypervisors.  The downside is that it's less flexible
-than EPT and has a few warts, e.g. shadowing NPT is gross because the host can't
-easily mirror L1's desired paging mode.
+> > > (we already have a warning when APIC base is set to non default value)
+> > 
+> > FWIW, that warning is worthless because it's _once(), i.e. won't help detect a
+> > misbehaving guest unless it's the first guest to misbehave on a particular
+> > instantiation of KVM.   _ratelimited() would improve the situation, but not
+> > completely eliminate the possibility of a misbehaving guest going unnoticed.
+> > Anything else isn't an option becuase it's obviously guest triggerable.
+> 
+> 100% agree.
+> 
+> I'll say I would first make it _ratelimited() for few KVM versions, and then
+> if nobody complains, make it a KVM internal error / #GP, and remove all the
+> leftovers from the code that pretend that it can work.
+
+I don't see any point in temporarily making it _ratelimited(), (1) the odds of someone
+running a guest that relies on APIC base relocation are very low, (2) the odds of
+that someone noticing a _ratelimited() and not a _once() are even lower, and (3) the
+odds of that prompting a bug report are even lower still.
+
+> And add a comment explaining *why* as you explained, supporting APIC base relocation
+> isn't worth it.
+> 
+> Best regards,
+> 	Maxim Levitsky
+> 
+> > 
+> 
+> 
