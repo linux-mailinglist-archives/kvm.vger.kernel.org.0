@@ -2,137 +2,142 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 26DE63E42D2
-	for <lists+kvm@lfdr.de>; Mon,  9 Aug 2021 11:34:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8960F3E4305
+	for <lists+kvm@lfdr.de>; Mon,  9 Aug 2021 11:40:44 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234674AbhHIJe6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 9 Aug 2021 05:34:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33808 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234650AbhHIJex (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 9 Aug 2021 05:34:53 -0400
-Received: from mail-pl1-x62a.google.com (mail-pl1-x62a.google.com [IPv6:2607:f8b0:4864:20::62a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 80B91C0613D3;
-        Mon,  9 Aug 2021 02:34:33 -0700 (PDT)
-Received: by mail-pl1-x62a.google.com with SMTP id k2so15672547plk.13;
-        Mon, 09 Aug 2021 02:34:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=biNAy5h7oVY1q9CMKi2TrD2G8iCaEg6EwP+zpkG0x9I=;
-        b=KOFlhkZ8VT9Gg9IfumWNsU68mB6qyhv3ke4WeNu4vQGPDja7D1rSsGobfSJIEz+trR
-         tO10tcI5Hsvj8CxNRUpQLmai/t3R9HPXZ5Hmed/L/L7VveGjC9KkQOocGuCJ2kT9PodI
-         wJdX5yFTlyHJ/2XcQS23jBgqwZPNeHKskN59LNx5u5k+qRP8DlSvjgPrPR6MPqSQhK+b
-         jeUio+sEk/0O7teaVuE4PNUumxMPAsUNNedzbRoTF/xU0ZDvauzppZXLw4npMgEMbNlQ
-         ZxhZeWFhU+fCA4cbtTIW8adOo9zshLEb0xohK0qyccRqe729ErkEWDbBBat+wdIF74sV
-         2eBg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=biNAy5h7oVY1q9CMKi2TrD2G8iCaEg6EwP+zpkG0x9I=;
-        b=Y2Zjz5eF0dec/wfwAww9DYRJozS+ezuT92sFM88W8ijJHKK7yDRUGlTrs15IVuavKH
-         zZeL0o/3DtgJkoHLXQmZwdRJgu8dtrkoDjAKArGy3XqaArJz5lvXK0HDMBNJ8lVsYOcU
-         +YPLDEKiKXuAgOtC+CWUFVkutPk3E8mU326fMZQjc+RLdYQ7ro/VcrCNMVYKzJoDyayU
-         izPkk58vRLBozsxGhWdM4LKqSs9OmOz0QdyHAExzflanYqaXAhFBRqLh4R0DWlCm30CY
-         lrSooBGE6Zdo/5VXXBKu8d3jzGD4Luznqn0MiXV0Xn0ITl20phP+XDETAGEauhi0srOg
-         1sbA==
-X-Gm-Message-State: AOAM531iZ8wQwzN7TM3EzI89yLIIPJYgpAY4YOvmpvcgcbZiFpglH0qb
-        3FJHI+f7jAOQKUWP7bbBwJU=
-X-Google-Smtp-Source: ABdhPJxKQ+0mIcms3UnGJli7b+FS7AElw6vbE0y7uJR2PIKScPY3i57ziCBYSkdhDkTL5xfz7FhBKA==
-X-Received: by 2002:a17:903:31c3:b029:ed:6f74:49c7 with SMTP id v3-20020a17090331c3b02900ed6f7449c7mr19366644ple.12.1628501673150;
-        Mon, 09 Aug 2021 02:34:33 -0700 (PDT)
-Received: from localhost.localdomain ([103.7.29.32])
-        by smtp.gmail.com with ESMTPSA id h188sm10839982pfg.45.2021.08.09.02.34.30
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 09 Aug 2021 02:34:32 -0700 (PDT)
-From:   Like Xu <like.xu.linux@gmail.com>
-X-Google-Original-From: Like Xu <likexu@tencent.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Sean Christopherson <seanjc@google.com>,
+        id S234690AbhHIJlC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 9 Aug 2021 05:41:02 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:54465 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S234632AbhHIJlB (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 9 Aug 2021 05:41:01 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1628502040;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=CtWshAOO+UWfSciG+cfJh+KGwRIb+TkaEybWSY8y0ZY=;
+        b=dFSokIn47ztLDMIr3/d1TL3U3Q7bctH78mEvMnRKDBGrqzOoxyFHgTF9gRIWN0ABy33tqR
+        JbOvzVcKGxmY01VpEge1Oj2/z/T4vaNdOEViGkdkmf56CaVnBNnlJeJmpJ4qQdeKy5suPr
+        ixQKEr8BMTFNNa+Nvxy2RWk1oZ4niTU=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-517-ZRl7GWxIPMaQPSrG5KvEEw-1; Mon, 09 Aug 2021 05:40:37 -0400
+X-MC-Unique: ZRl7GWxIPMaQPSrG5KvEEw-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8860ADF8A5;
+        Mon,  9 Aug 2021 09:40:35 +0000 (UTC)
+Received: from starship (unknown [10.35.206.50])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 2135781F75;
+        Mon,  9 Aug 2021 09:40:29 +0000 (UTC)
+Message-ID: <5f991ac11006ae890961a76d35a63b7c9c56b47c.camel@redhat.com>
+Subject: Re: KVM's support for non default APIC base
+From:   Maxim Levitsky <mlevitsk@redhat.com>
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     kvm@vger.kernel.org,
+        "open list:X86 ARCHITECTURE (32-BIT AND 64-BIT)" 
+        <linux-kernel@vger.kernel.org>, Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, Borislav Petkov <bp@alien8.de>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, Ingo Molnar <mingo@redhat.com>,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH 5/5] KVM: x86: Clean up redundant pr_fmt(fmt) macro definition for svm
-Date:   Mon,  9 Aug 2021 17:34:10 +0800
-Message-Id: <20210809093410.59304-6-likexu@tencent.com>
-X-Mailer: git-send-email 2.32.0
-In-Reply-To: <20210809093410.59304-1-likexu@tencent.com>
-References: <20210809093410.59304-1-likexu@tencent.com>
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ingo Molnar <mingo@redhat.com>,
+        "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>
+Date:   Mon, 09 Aug 2021 12:40:29 +0300
+In-Reply-To: <YQ2vv7EXGN2jgQBb@google.com>
+References: <20210713142023.106183-1-mlevitsk@redhat.com>
+         <20210713142023.106183-9-mlevitsk@redhat.com>
+         <c51d3f0b46bb3f73d82d66fae92425be76b84a68.camel@redhat.com>
+         <YPXJQxLaJuoF6aXl@google.com>
+         <564fd4461c73a4ec08d68e2364401db981ecba3a.camel@redhat.com>
+         <YQ2vv7EXGN2jgQBb@google.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Like Xu <likexu@tencent.com>
+On Fri, 2021-08-06 at 21:55 +0000, Sean Christopherson wrote:
+> On Thu, Jul 22, 2021, Maxim Levitsky wrote:
+> > On Mon, 2021-07-19 at 18:49 +0000, Sean Christopherson wrote:
+> > > On Sun, Jul 18, 2021, Maxim Levitsky wrote:
+> > -> APIC MMIO area has to be MMIO for 'apic_mmio_write' to be called,
+> >    thus must contain no guest memslots.
+> >    If the guest relocates the APIC base somewhere where we have a memslot, 
+> >    memslot will take priority, while on real hardware, LAPIC is likely to
+> >    take priority.
+> 
+> Yep.  The thing that really bites us is that other vCPUs should still be able to
+> access the memory defined by the memslot, e.g. to make it work we'd have to run
+> the vCPU with a completely different MMU root.
+That is something I haven't took in the account. 
+Complexity of supporting this indeed isn't worth it.
 
-The svm specific pr_fmt(fmt) macro is repeatedly defined in svm code
-and the new one has never been used outside the svm context.
+> 
+> > As far as I know the only good reason to relocate APIC base is to access it
+> > from the real mode which is not something that is done these days by modern
+> > BIOSes.
+> > 
+> > I vote to make it read only (#GP on MSR_IA32_APICBASE write when non default
+> > base is set and apic enabled) and remove all remains of the support for
+> > variable APIC base.
+> 
+> Making up our own behavior is almost never the right approach.  E.g. _best_ case
+> scenario for an unexpected #GP is the guest immediately terminates.  Worst case
+> scenario is the guest eats the #GP and continues on, which is basically the status
+> quo, except it's guaranteed to now work, whereas todays behavior can at least let
+> the guest function, for some definitions of "function".
 
-Let's move it to svm.h without any intended functional changes.
+Well, at least the Intel's PRM does state that APIC base relocation is not guaranteed
+to work on all CPUs, so giving the guest a #GP is like telling it that current CPU doesn't
+support it. In theory, a very well behaving guest can catch the exception and
+fail back to the default base.
 
-Signed-off-by: Like Xu <likexu@tencent.com>
----
- arch/x86/kvm/svm/avic.c   | 2 --
- arch/x86/kvm/svm/nested.c | 2 --
- arch/x86/kvm/svm/svm.c    | 2 --
- arch/x86/kvm/svm/svm.h    | 3 +++
- 4 files changed, 3 insertions(+), 6 deletions(-)
+I don't understand what do you mean by 'guaranteed to now work'. If the guest
+ignores this #GP and still thinks that APIC base relocation worked, it is its fault.
+A well behaving guest should never assume that a msr write that failed with #GP
+worked.
 
-diff --git a/arch/x86/kvm/svm/avic.c b/arch/x86/kvm/svm/avic.c
-index a8ad78a2faa1..8b055f9ad9fe 100644
---- a/arch/x86/kvm/svm/avic.c
-+++ b/arch/x86/kvm/svm/avic.c
-@@ -12,8 +12,6 @@
-  *   Avi Kivity   <avi@qumranet.com>
-  */
- 
--#define pr_fmt(fmt) "SVM: " fmt
--
- #include <linux/kvm_types.h>
- #include <linux/hashtable.h>
- #include <linux/amd-iommu.h>
-diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
-index 57c288ba6ef0..3080776a55a5 100644
---- a/arch/x86/kvm/svm/nested.c
-+++ b/arch/x86/kvm/svm/nested.c
-@@ -12,8 +12,6 @@
-  *   Avi Kivity   <avi@qumranet.com>
-  */
- 
--#define pr_fmt(fmt) "SVM: " fmt
--
- #include <linux/kvm_types.h>
- #include <linux/kvm_host.h>
- #include <linux/kernel.h>
-diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index 2b6632d4c76f..4a3f8ef56daa 100644
---- a/arch/x86/kvm/svm/svm.c
-+++ b/arch/x86/kvm/svm/svm.c
-@@ -1,5 +1,3 @@
--#define pr_fmt(fmt) "SVM: " fmt
--
- #include <linux/kvm_host.h>
- 
- #include "irq.h"
-diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
-index bd0fe94c2920..76d5fe3f00dc 100644
---- a/arch/x86/kvm/svm/svm.h
-+++ b/arch/x86/kvm/svm/svm.h
-@@ -15,6 +15,9 @@
- #ifndef __SVM_SVM_H
- #define __SVM_SVM_H
- 
-+#undef pr_fmt
-+#define pr_fmt(fmt) "SVM: " fmt
-+
- #include <linux/kvm_types.h>
- #include <linux/kvm_host.h>
- #include <linux/bits.h>
--- 
-2.32.0
+
+> 
+> I think the only viable "solution" is to exit to userspace on the guilty WRMSR.
+> Whether or not we can do that without breaking userspace is probably the big
+> question.  Fully emulating APIC base relocation would be a tremendous amount of
+> effort and complexity for practically zero benefit.
+
+I have nothing against this as well although I kind of like the #GP approach a bit more, 
+and knowing that there are barely any reasons
+to relocate the APIC base, and that it doesn't work well, there is a good chance
+that no one does it anyway (except our kvm unit tests, but that isn't an issue).
+
+> 
+> > (we already have a warning when APIC base is set to non default value)
+> 
+> FWIW, that warning is worthless because it's _once(), i.e. won't help detect a
+> misbehaving guest unless it's the first guest to misbehave on a particular
+> instantiation of KVM.   _ratelimited() would improve the situation, but not
+> completely eliminate the possibility of a misbehaving guest going unnoticed.
+> Anything else isn't an option becuase it's obviously guest triggerable.
+
+100% agree.
+
+I'll say I would first make it _ratelimited() for few KVM versions, and then
+if nobody complains, make it a KVM internal error / #GP, and remove all the leftovers
+from the code that pretend that it can work.
+
+And add a comment explaining *why* as you explained, supporting APIC base relocation
+isn't worth it.
+
+Best regards,
+	Maxim Levitsky
+
+> 
+
 
