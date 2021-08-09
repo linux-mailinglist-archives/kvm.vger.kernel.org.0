@@ -2,101 +2,88 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 505273E4A80
-	for <lists+kvm@lfdr.de>; Mon,  9 Aug 2021 19:06:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 354193E4AFD
+	for <lists+kvm@lfdr.de>; Mon,  9 Aug 2021 19:40:09 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233842AbhHIRGT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 9 Aug 2021 13:06:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53038 "EHLO
+        id S234416AbhHIRk2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 9 Aug 2021 13:40:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60914 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232979AbhHIRGS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 9 Aug 2021 13:06:18 -0400
-Received: from mail-pl1-x62f.google.com (mail-pl1-x62f.google.com [IPv6:2607:f8b0:4864:20::62f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 297A5C061796
-        for <kvm@vger.kernel.org>; Mon,  9 Aug 2021 10:05:57 -0700 (PDT)
-Received: by mail-pl1-x62f.google.com with SMTP id a5so1426932plh.5
-        for <kvm@vger.kernel.org>; Mon, 09 Aug 2021 10:05:57 -0700 (PDT)
+        with ESMTP id S233847AbhHIRk1 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 9 Aug 2021 13:40:27 -0400
+Received: from mail-qk1-x74a.google.com (mail-qk1-x74a.google.com [IPv6:2607:f8b0:4864:20::74a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D47F5C061796
+        for <kvm@vger.kernel.org>; Mon,  9 Aug 2021 10:40:06 -0700 (PDT)
+Received: by mail-qk1-x74a.google.com with SMTP id c3-20020a05620a0ce3b02903b8eff05707so6070904qkj.5
+        for <kvm@vger.kernel.org>; Mon, 09 Aug 2021 10:40:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=N7MkMqODLMj3T1NXlpOTDzU2vHrNeFZAgg8Mo4BnxXs=;
-        b=iy704fzF1WuCsB5tcbjR5QKsPL5hnZbfbqDjSUv26AmmK3U/Cj6l40QO2XS5/nmLn/
-         9UGYJ/rkqg5vfjA98pwFWK00HWvBsrVlTBQiR65UYgqvQVFvsqdFKZQZLjkTuExlTABE
-         KJbsozSvF1dSjr425fOHT4GqpgkKXm/Eidpsm38eYaJZe5L4HOpXfPzS604gMQXKPk6H
-         qW/P69tl1K4QM6HQGQi4vlKjyfQnC+nAVXNxPyi7YSHyRKbvhDiH77tW1CMpyHXbNde2
-         zKA6rrSsdVpgkN3CHqYttXeXxfzirGKs1yMR0LOg9QF1lEn8+GjvtEeQA2XSm75Nmfgq
-         peWw==
+        h=reply-to:date:message-id:mime-version:subject:from:to:cc;
+        bh=gVO6XyapJi5pX7+bij/mNcbdaPF5qfutW9ftVZjcinQ=;
+        b=hxr1KUlt6JndExAgFseog0rdSnmMTQt0HlJRzm++AIsgXQ+IPtzHHk2qqmqBIJMxpE
+         6t1oKBc5o9JxmCeW3Mi0ebeAsQVFVehwd3lhDajrtMAtYQWxws1scS3niVXthDfyd6F9
+         7c50WOZBh2GfdoLM27xHKawIFOVMruOPcnWZ4beRqsKIUY1RA0IQqCZHwAu8YbanCcqD
+         sfki9DSmFkKlkEgmf3Wdc3oBIsF1qExMAk5GwZnXt9h9T9N5nNLKKhbs0D8ZLnTfocfe
+         vWbjK79GqdZSeT9SNFNAzDCVk68q9hiCv+MW2aD9TO/cUmnCVEKFqracZs3VYPkqKuHM
+         KGSQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=N7MkMqODLMj3T1NXlpOTDzU2vHrNeFZAgg8Mo4BnxXs=;
-        b=RE9l2GYV9bGnqwPr6AsZVv6YWEGgJzF1uMGuFUSXPeYZa6Zlgnn9tUI7LYxniWqq0y
-         rG1Tg2DsjkMt0c+PRKReupM2Rqx3NPCFqgdnBtFuuSWUnbObrrcgpsji4l1eOTOmBPW0
-         mikYOX/0WP8HAVSF2dd6zVj9Wjna3YuzEbYdr2n+RXAy0cIkl4Zk0LmXTXT6uHj5TAJp
-         orbElDKw5TxjwvmP60Z1O+8kb14wmKdZ1i4K/Mlr5berEsazx/bNhjIwQjLG/rbBeXCB
-         3RK39tVoqqaNBjmTF/resJ0vyyOGA49MerRUzL1mMgaIukwSpyDZq8v3zytLcxob8CQG
-         u7hQ==
-X-Gm-Message-State: AOAM532Q24nBt1Hi5iUSDkr51X75EuydBZxnDhUmzSm6MW+dR/wRltP1
-        OEZ6YRcoKFK5ysKMVTuRbGgR7Y7tyvufQw==
-X-Google-Smtp-Source: ABdhPJyKqEllVhCXTU2xATl7Pge82E/AWpZaqZpmLpH5NGgCRl654KTZF6HN2xqA5KEsvfIcQkSe/w==
-X-Received: by 2002:a63:4c0e:: with SMTP id z14mr251057pga.427.1628528756567;
-        Mon, 09 Aug 2021 10:05:56 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id a8sm24541915pgd.50.2021.08.09.10.05.55
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 09 Aug 2021 10:05:55 -0700 (PDT)
-Date:   Mon, 9 Aug 2021 17:05:51 +0000
+        h=x-gm-message-state:reply-to:date:message-id:mime-version:subject
+         :from:to:cc;
+        bh=gVO6XyapJi5pX7+bij/mNcbdaPF5qfutW9ftVZjcinQ=;
+        b=TaxDzA5GwWYnqIPPTXfq42Xj7CRJDlfUW2yeXS1LHzUIGCtgCbAsALNMc53cqid2qG
+         YY2MbrqN9sFEB12Gp+8rDxw2XMjiyMXElRH6uAtsMUF7abmXhLSwqiR1hn/mFNmlF82+
+         0w7LSpHXzqEicQ0LKNOiZWpgrj61t3/C0zwt20LQbEMsnmLAERkkQYdaNFzRRB08gO8+
+         9XwPZTzz/JMuU3m6URqirD4JnuFAvPO0QpUnF8Zdh4JrI/0KJh5YaCZg2FAe7hBdZjWR
+         IuRdYv5jKH6cwIquy5S9JXgtad4C7iLuqfNvaJptyGKLGQx7vJnCav3TC2tJE3NVT92x
+         UlRw==
+X-Gm-Message-State: AOAM533OkmP53kcBTK6ojRNsFakoodXIati8nzkPFprVnrFzYmXgaL93
+        vK4oHOdGcTlrlN/q6M/cwDDfA/dQHKI=
+X-Google-Smtp-Source: ABdhPJwzkDy6R3OkPg4FEjD90MQ4pkhiSgikL3UlI9potyHED+1GvoHhRCLT0mfhlrjMo0W+xFwGepeiq6A=
+X-Received: from seanjc798194.pdx.corp.google.com ([2620:15c:90:200:b967:644e:62eb:1752])
+ (user=seanjc job=sendgmr) by 2002:a05:6214:13af:: with SMTP id
+ h15mr13548050qvz.7.1628530806014; Mon, 09 Aug 2021 10:40:06 -0700 (PDT)
+Reply-To: Sean Christopherson <seanjc@google.com>
+Date:   Mon,  9 Aug 2021 10:39:53 -0700
+Message-Id: <20210809173955.1710866-1-seanjc@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.32.0.605.g8dce9f2422-goog
+Subject: [PATCH v2 0/2] KVM: x86: Purge __ex() and __kvm_spurious_fault()
 From:   Sean Christopherson <seanjc@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        kernel test robot <lkp@intel.com>
-Subject: Re: [PATCH] KVM: x86: remove dead initialization
-Message-ID: <YRFgb5AbeL8fprgc@google.com>
-References: <20210809110120.3237065-1-pbonzini@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210809110120.3237065-1-pbonzini@redhat.com>
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Uros Bizjak <ubizjak@gmail.com>,
+        Like Xu <like.xu.linux@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Aug 09, 2021, Paolo Bonzini wrote:
-> hv_vcpu is initialized again a dozen lines below, so remove the
-> initializer.
+Two patches to remove __ex() and __kvm_spurious_fault(), and hide
+kvm_spurious_fault() in x86.h.  These were part of a larger series that
+received the magic "Queued, thanks", but got lost at some point.
 
-Eewwww.  It's not just dead code, it's code that could potentially lead to
-dereferncing a NULL pointer and/or a stale pointer.  The second initialization
-of the local hv_vcpu happens after a conditional call to kvm_hv_vcpu_init().
+v1: https://lore.kernel.org/kvm/20201231002702.2223707-1-seanjc@google.com/
 
-Maybe update the changelog to clarify why the second initialization absolutely
-must be kept?
+Sean Christopherson (1):
+  KVM: x86: Kill off __ex() and __kvm_handle_fault_on_reboot()
 
-For the code:
+Uros Bizjak (1):
+  KVM: x86: Move declaration of kvm_spurious_fault() to x86.h
 
-Reviewed-by: Sean Christopherson <seanjc@google.com>
+ arch/x86/include/asm/kvm_host.h | 25 -------------------------
+ arch/x86/kvm/svm/sev.c          |  2 --
+ arch/x86/kvm/svm/svm.c          |  2 --
+ arch/x86/kvm/svm/svm_ops.h      |  2 +-
+ arch/x86/kvm/vmx/vmx_ops.h      |  4 +---
+ arch/x86/kvm/x86.c              |  9 ++++++++-
+ arch/x86/kvm/x86.h              |  2 ++
+ 7 files changed, 12 insertions(+), 34 deletions(-)
 
-> Reported-by: kernel test robot <lkp@intel.com>
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> ---
->  arch/x86/kvm/hyperv.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/arch/x86/kvm/hyperv.c b/arch/x86/kvm/hyperv.c
-> index e9582db29a99..2da21e45da99 100644
-> --- a/arch/x86/kvm/hyperv.c
-> +++ b/arch/x86/kvm/hyperv.c
-> @@ -1968,7 +1968,7 @@ static u64 kvm_hv_send_ipi(struct kvm_vcpu *vcpu, struct kvm_hv_hcall *hc, bool
->  void kvm_hv_set_cpuid(struct kvm_vcpu *vcpu)
->  {
->  	struct kvm_cpuid_entry2 *entry;
-> -	struct kvm_vcpu_hv *hv_vcpu = to_hv_vcpu(vcpu);
-> +	struct kvm_vcpu_hv *hv_vcpu;
->  
->  	entry = kvm_find_cpuid_entry(vcpu, HYPERV_CPUID_INTERFACE, 0);
->  	if (entry && entry->eax == HYPERV_CPUID_SIGNATURE_EAX) {
-> -- 
-> 2.27.0
-> 
+-- 
+2.32.0.605.g8dce9f2422-goog
+
