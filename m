@@ -2,174 +2,199 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 414B13E4CC2
-	for <lists+kvm@lfdr.de>; Mon,  9 Aug 2021 21:14:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 531063E4D3C
+	for <lists+kvm@lfdr.de>; Mon,  9 Aug 2021 21:43:45 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235971AbhHITPR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 9 Aug 2021 15:15:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54570 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235963AbhHITPR (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 9 Aug 2021 15:15:17 -0400
-Received: from mail-pl1-x630.google.com (mail-pl1-x630.google.com [IPv6:2607:f8b0:4864:20::630])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 94944C0613D3
-        for <kvm@vger.kernel.org>; Mon,  9 Aug 2021 12:14:56 -0700 (PDT)
-Received: by mail-pl1-x630.google.com with SMTP id e19so4079201pla.10
-        for <kvm@vger.kernel.org>; Mon, 09 Aug 2021 12:14:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=Z71lr7ALr8yhgNFk9t0UHNkHlIbL+MrfSpKuMWA0Gdg=;
-        b=YVNswqj3RzqtdUCaokR8knCfXB0jvPDRV5LdgxJ6C8HQbi2VR5aa7OVGrPfzlCUVn2
-         upyUDfslHyeyU5wW48o32z19ZYAvobB1AXj+vg4N/R8BXmmHSUoaAepVcNPnw4VFhVPk
-         O2vxbA6kJ+Qn0uWW/yWtpY4S4CIIlEdLxOYQYe+GA1pjGKrLqbU/cQueVVfzXF2nZk2r
-         yx/mk13TMcvULK+C5YG5kusmdC+1Euhzad+2Cl2ie75YR7EtYhiYzotmhtQHUtse9ZbQ
-         Il6PUpDC0eYsDUTTLgbYgGJXyGlZXLqU2SbDq+C2vPeOeObO/GBVlbFNHqfyfjtrs7Un
-         GtVg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=Z71lr7ALr8yhgNFk9t0UHNkHlIbL+MrfSpKuMWA0Gdg=;
-        b=akQlZ7oYUYECRJV2SA0w7+l1QYUb3dAdu/j89k796olpSclBWk1bCJ6/RGDNIkTvXI
-         DDHhJSfEcOe8jjwXlgLG0Y9yAMI7xdMpIF2sNmD4PcFPQBwYWpHdNjScTBfgOgGlJHBd
-         CLt9LCuD9HdOwtDEMpvvYQgSdJi6ZDmJXhT5TFhW6LL+uRUvxPG4P5b7wvqxckoNNMK4
-         f+zZln6mf5OmhBR9FEsmd1s1fLsMvs3qAjZjXxLXdhE6xnRgm3BDd0FOUbAfZRxjnXMx
-         yj0hs3N9E4z7PynenxVtkCx9OrRtYMXxfZyQZ6go7E9O9/bjh34qgDw78qNm8cKq36jg
-         SvCg==
-X-Gm-Message-State: AOAM5332wodkjYm0bdZgrWPOcIk8P2f4d15YOzNuY8KO6UVk+1uSdy1M
-        OwpWagwMAWpdMtvtwQQNe1m1r3uVd8jDFg==
-X-Google-Smtp-Source: ABdhPJzuIWt8O8bmIq2TkVYVreUsqsCwzquCtkX2KomoumtcUA3Jc+kI6kQmWcweJczhoUNgdUzzJQ==
-X-Received: by 2002:a17:902:6b4b:b029:12b:f96f:dc03 with SMTP id g11-20020a1709026b4bb029012bf96fdc03mr22019481plt.14.1628536495773;
-        Mon, 09 Aug 2021 12:14:55 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id e27sm21418503pfj.23.2021.08.09.12.14.54
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 09 Aug 2021 12:14:55 -0700 (PDT)
-Date:   Mon, 9 Aug 2021 19:14:51 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Maxim Levitsky <mlevitsk@redhat.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Joerg Roedel <joro@8bytes.org>, Borislav Petkov <bp@alien8.de>,
-        Jim Mattson <jmattson@google.com>,
-        "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
-        "open list:X86 ARCHITECTURE (32-BIT AND 64-BIT)" 
-        <linux-kernel@vger.kernel.org>,
-        Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Ingo Molnar <mingo@redhat.com>,
-        "H. Peter Anvin" <hpa@zytor.com>
-Subject: Re: [PATCH v3 06/12] KVM: x86: don't disable APICv memslot when
- inhibited
-Message-ID: <YRF+qzvH8jbLCuNE@google.com>
-References: <20210802183329.2309921-1-mlevitsk@redhat.com>
- <20210802183329.2309921-7-mlevitsk@redhat.com>
- <f221e94c-fb64-a859-de3c-30f883eac657@redhat.com>
- <d3e0ba8085a8b6054e757dac696823f1181a712b.camel@redhat.com>
+        id S235450AbhHIToE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 9 Aug 2021 15:44:04 -0400
+Received: from mail-co1nam11on2079.outbound.protection.outlook.com ([40.107.220.79]:17184
+        "EHLO NAM11-CO1-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S235001AbhHIToD (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 9 Aug 2021 15:44:03 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=XSiVxQnS9Ias0WogVd9dcK0hL4UqDwgE9EULgzRwg5B8ACxaW+Uwiebv/Bd+57U+iVbqhVdE0MTjuqbhvizZN4RfhqbvGPR1GFuHyyGH0T12QzwW5/AZjhZaZRVJsxMqjE2xbLAwhJTX0c3MVbEf5mRkaDuilvB56e/4ev77uyTDkdiXLvCkXd/cYTHSm16Y82qLy311LHfts9tYwwQvYPD7aLs4LGA2zaQWtSU/pgiLNiI+PA3tCfqEp8OM2n3ovAML9Kl/AbGVFaW1ZBnrY/6Z59cqUm3QT48ZQDrpatpFA5SgViyoQiJAdzjrtPMsoljCs9MV6r0f18srPMHcNA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=98F/i4TT8gQkH10sU4cMWCNIH39I/qQQvB5ur3kX+b8=;
+ b=A6mxPDZ7yHYHwHU47x1B+awY7RWVn/LCNlCMA9DhqBjQbVhRkEe24W2FUg6gN4R5BlJoIefBHdcLeS5dOZIVLKlVJJVS15gkQz8fyl+GfrDbnaYgFHZvQTXbg3nKaf2rCGNySdrjk0nhdsJV0kqnrKQ3USw+/w/n2StE7hxr5Km/ZAMzqHwrNVaDBMGf09ylM7gBQJuDKh2IJtPI/WvhbWMDIMD2o9wmokSUlJdLPc1Q+VzzHTTerCYATshF4jfpigSJbW/t+yk5srUyhSFmxs9JsIfgUAkAseqa0tDzI9lxpSeWVrqq0wnYTn5i7gBzw+xy3kcp0Ra9//4ZWBqWzg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=98F/i4TT8gQkH10sU4cMWCNIH39I/qQQvB5ur3kX+b8=;
+ b=NhjsUI0cT4Iu5z58cQ/vk+2XXOukfkdjfK2Iyq5mgAu+TeFJ7wWb7WF3aZGGq0+FWktD4AGedQW1pNGATttY18+7VLJzHSMsNzwMXt/vx/UcEbXYLAzRQ+eZm5C3XMlLivRdi/D716WwZ4n2q+CaHVjNuzJ+uL8De8SEO1AILAk=
+Authentication-Results: vger.kernel.org; dkim=none (message not signed)
+ header.d=none;vger.kernel.org; dmarc=none action=none header.from=amd.com;
+Received: from MW3PR12MB4553.namprd12.prod.outlook.com (2603:10b6:303:2c::19)
+ by MWHPR12MB1551.namprd12.prod.outlook.com (2603:10b6:301:9::23) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4394.15; Mon, 9 Aug
+ 2021 19:43:35 +0000
+Received: from MW3PR12MB4553.namprd12.prod.outlook.com
+ ([fe80::3987:37e5:4db7:944e]) by MW3PR12MB4553.namprd12.prod.outlook.com
+ ([fe80::3987:37e5:4db7:944e%6]) with mapi id 15.20.4394.023; Mon, 9 Aug 2021
+ 19:43:35 +0000
+Subject: Re: [kvm-unit-tests PATCH 1/2] x86: access: Fix timeout failure by
+ limiting number of flag combinations
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     pbonzini@redhat.com, thuth@redhat.com, drjones@redhat.com,
+        kvm@vger.kernel.org
+References: <162826604263.32391.7580736822527851972.stgit@bmoger-ubuntu>
+ <162826611747.32391.16149996928851353357.stgit@bmoger-ubuntu>
+ <YQ1pA9nN6DP0veQ1@google.com>
+From:   Babu Moger <babu.moger@amd.com>
+Message-ID: <1f30bd0f-da1b-2aa0-e0c8-76d3b5410bcd@amd.com>
+Date:   Mon, 9 Aug 2021 14:43:33 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.11.0
+In-Reply-To: <YQ1pA9nN6DP0veQ1@google.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: SA0PR11CA0082.namprd11.prod.outlook.com
+ (2603:10b6:806:d2::27) To MW3PR12MB4553.namprd12.prod.outlook.com
+ (2603:10b6:303:2c::19)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <d3e0ba8085a8b6054e757dac696823f1181a712b.camel@redhat.com>
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from [10.236.31.0] (165.204.77.1) by SA0PR11CA0082.namprd11.prod.outlook.com (2603:10b6:806:d2::27) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4394.15 via Frontend Transport; Mon, 9 Aug 2021 19:43:34 +0000
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 258aac2a-b0b8-4680-5725-08d95b6df9f8
+X-MS-TrafficTypeDiagnostic: MWHPR12MB1551:
+X-Microsoft-Antispam-PRVS: <MWHPR12MB1551C94101FD03B2954FC26395F69@MWHPR12MB1551.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:10000;
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: QqhnzlIL49yooyaA28OgRL6b39rnPKqgzh8mQ65/dKeuCYBWPmTVMoh8KdZZj60OrIhQ5Mo1Cyr9etOf6Le2iyg20EUu+XvwNC6pBcZL4fAgV6uua3n8aJG3IkO1tM5wnliQ2sIAD+UGb/YI82pIDYnVIfG/gy07mjgVcQy9+A3Z1mAVQGCqacfgU3DAvLxNXNZlsM7WfzgnIh1PXZR+aC0jIJaPX5rhrqulITVInZjELs0RZxqzPNcCOfeAp7X2AB2C3RlDvZx0FtxWqMYIvXW+pVcIqTljCiW5P8Oi+OtDHY+eifM2LHleEeiynu72PyNuD4lsbkBjwlhciYV+4EAstdkMEZ5kh2JfoZfGfDZs/iW9S0Akd9KABd2qdpjmmhFC1YOb0vvt77bH11/zmtR+VRNsLnXgZMCIUyHer/QBKnLBKjloifvwMbJX/Mo286xLrGekOjCag+/wystWUox6kSrm7Xqw/Hyhuf6V0nqzVXFFLDXlxYeLG4PW89NUdQklRX5P2SmMBXQX0qxH8yLlbP4vtFF3iSbf6JJy7LR2l7jdnlejOcXK/KXILahHpYfDR17Hpo6D9LnHfKhPlDkEJAn9Zf5AF45bikTNgofqMdeeCVh2aRvcRiOWM2ArZ/X7whM79gtGwZhonkm+wMpWIlO9gEfTW6AwOX/V1Qr0KxcepFK/3xjIA6ExrseW1sU/PT8Tf1+YGxyA9d93clzZdyCXMKq8MyygN+s1I8t5YcB21d1M0b9S9Vb9uN+QgTJLyE7ydMeeLoPYNMA3tg==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MW3PR12MB4553.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(31686004)(8936002)(2906002)(44832011)(36756003)(66556008)(956004)(66476007)(66946007)(2616005)(8676002)(6486002)(186003)(83380400001)(53546011)(26005)(6916009)(5660300002)(16576012)(86362001)(31696002)(316002)(38100700002)(38350700002)(4326008)(52116002)(508600001)(43740500002)(45980500001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?QkZpeXFNd0VxZ3hTejJqaTcrbWtqUWhPVVk5TUFPeWVvS3dsM2xJR1dpL0lm?=
+ =?utf-8?B?ZGFMci9iSDk3MGZ3SGhsdlBCckZFcXQ1WldaVDEvUXYyQmlPNHJLWG1CTnhn?=
+ =?utf-8?B?UkVacDdxREJvQjF4WUdTTGJ5cy9VMFRTUVdGRUZZVEl1ZU9RQ1RtM3E3SjV5?=
+ =?utf-8?B?QTlKRkpWRlhzajZjQmdKcWg1aUZkRndnZW4vdDBISU1zT0lFeGVJNEIxRXRY?=
+ =?utf-8?B?aG9rU3ZGNE5jcURGSWQ3M1pxZjY0N0FxNXpEamI0RTdCaURZOGp6Y1ZwY0NL?=
+ =?utf-8?B?MUFqWXFPa0w3YUFvaE9DK1FOZnBqS09FQkpMNjYzOTc3VWswbGh5cnJyVHFB?=
+ =?utf-8?B?Y1IrYjlHcnltOUhGU29KUStubGoyNzVHZC8wTzRUZ0Yrblg1VlRTTUhqYVVZ?=
+ =?utf-8?B?dmk2eVAyTTRabUNJUDdyVlBBSFMxQWtPSTRNdk9qNnIyREh6L2U2eSt5VTNC?=
+ =?utf-8?B?NG11N0gzQjF2SlhQN1lXVllqVld0Y1dYQnRLdHFQY2diZm52MjJGdHVuck44?=
+ =?utf-8?B?QTBqRzdYLzBHdHF2cVhaeHlHSWJBZisrVkhydzdUNUlWTGRZanJnMzZCa1Q2?=
+ =?utf-8?B?TmR2Y2FqcEpLbjJzcjNSbW90Q09QZDdoTzFwK0gyNjJvbmlRQnZXb3pGNXFK?=
+ =?utf-8?B?amNQMDZTdGduZ3lQVjFCN2tTd3QvQnFxVGhZWXc3SUNUZTlxM1plTVBiUWtW?=
+ =?utf-8?B?N3pjTUIxcWZnam5wQ1dLT09JUWd3cXRxYWs5WXNlZHVRRVdCbE1ocHF0MkR5?=
+ =?utf-8?B?VUJpN0MxRlU1L3N0MFNDWVpObEJJMkZxSElLRkJBM2UwUnhxTkh2QS92TGRr?=
+ =?utf-8?B?S0owKzA4YmFFbUVETEhub2YrZSsvRnl4dmhjWEVDbWUvbDZtS0tFWWRBUldj?=
+ =?utf-8?B?Vjk3cTlVTGg4SExpY2NZZG1CUmhRUU1hQkdDcXMvMEtSTHpvYnpnNW9rdjR4?=
+ =?utf-8?B?b3FpTzQ2QjVRRHVQRFQ0aEVjOXhXa1BZb1pmYmt5TjZLUlhYMDNEMzJUeFRL?=
+ =?utf-8?B?cDc5eXpDejlyV3BnUGIzd0RNaU9PSndiTU5qdHhXUjRjQ2thMTF2Y2ZuVUlh?=
+ =?utf-8?B?YWZDMmJrdElBQjFuUGtwazZMaEg1VCtyOFkvMVNjbGlPdFIzcWY5WGhDSGk4?=
+ =?utf-8?B?eHRxS1NpeHorNzUzTTNLSDloYU4rVEVLUS9tR1IvNXZtaVpCa3hOL1pnTGRu?=
+ =?utf-8?B?NjR6MC9SYS9YNzlmTS9WcFBaNWZ2d2JLOGROVjFDTlM4c1FtUVR6RHAvNit4?=
+ =?utf-8?B?REJOUGJOYmN6UUZwcUdPc1dvSytaVTgwRjJDQSthY3RMY2tYZkUxc0hHWUkr?=
+ =?utf-8?B?UDZKSVJxdlgxRThLVmhBa3g5SkYxVnlHWFRockxPdm80SkZKYVkvbklGTGRI?=
+ =?utf-8?B?UFFZL2d2RkJLQWNxMlY2b1JCa1NLNnhqL0czTnV4ZEFQZ0dHUGpjWGFtSVdH?=
+ =?utf-8?B?emlBUm9vbnFhdURrb3RDSGszWVc4a0F3dVprQmJkVjhraE9jYkJQWDRrRjhQ?=
+ =?utf-8?B?d2lpRGVoRndhclFZd0ZUdUdNTHhvNXVURWtZdGpoUWZvS1BneEdIZWRNNFp3?=
+ =?utf-8?B?dHNob3E1VzNhRVN2QU9xc2J2QVNuNTVNUTU0Z2crUllNdi9UbHd3RlRYYklD?=
+ =?utf-8?B?ZFROQzBKK3VCYk9OT3gzeDhNMW9uZDNiRkwwVExkeXYwREtHcW5OcjVaYVFv?=
+ =?utf-8?B?Tm5SYzdEMVFUV1NRL1grWkJVbVJ3V05wazVPbEJZOTlmaXl1MCtxZFBzc09Z?=
+ =?utf-8?Q?neiUhL8JB/iz7f+4JMmbGccNPf8GhvAwQSN/n6r?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 258aac2a-b0b8-4680-5725-08d95b6df9f8
+X-MS-Exchange-CrossTenant-AuthSource: MW3PR12MB4553.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Aug 2021 19:43:35.4245
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 5s3EGXC2cAwLl/LdPlrAOVMi6B5z31EwivbLOInxGl3Y8Ti7pIzg7L9UyUV2ug+i
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MWHPR12MB1551
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Aug 09, 2021, Maxim Levitsky wrote:
-> On Tue, 2021-08-03 at 10:44 +0200, Paolo Bonzini wrote:
-> > Reviewing this patch and the next one together.
-> > 
-> > On 02/08/21 20:33, Maxim Levitsky wrote:
-> > > +static int avic_alloc_access_page(struct kvm *kvm)
-> > >  {
-> > >  	void __user *ret;
-> > >  	int r = 0;
-> > >  
-> > >  	mutex_lock(&kvm->slots_lock);
-> > > +
-> > > +	if (kvm->arch.apic_access_memslot_enabled)
-> > >  		goto out;
-> > 
-> > This variable is overloaded between "is access enabled" and "is the 
-> > memslot allocated".  I think you should check 
-> > kvm->arch.apicv_inhibit_reasons instead in kvm_faultin_pfn.
-> > 
-> > 
-> > > +	if (!activate)
-> > > +		kvm_zap_gfn_range(kvm, gpa_to_gfn(APIC_DEFAULT_PHYS_BASE),
-> > > +				  gpa_to_gfn(APIC_DEFAULT_PHYS_BASE + PAGE_SIZE));
-> > > +
-> > 
-> > Off by one, the last argument of kvm_zap_gfn_range is inclusive:
-> 
-> Actually is it? 
 
-Nope.  The actual implementation is exclusive for both legacy and TDP MMU.  And
-as you covered below, the fixed and variable MTRR helpers provide exclusive
-start+end, so there's no functional bug.  The "0 - ~0" use case is irrevelant
-because there can't be physical memory at -4096.
 
-The ~0ull case can be fixed by adding a helper to get the max GFN possible, e.g.
-steal this code from kvm_tdp_mmu_put_root()
+On 8/6/21 11:53 AM, Sean Christopherson wrote:
+> On Fri, Aug 06, 2021, Babu Moger wrote:
+>> From: Babu Moger <Babu.Moger@amd.com>
+>>
+>> The test ./x86/access fails with a timeout. This is due to the number test
+>> combination. The test cases increase exponentially as the features get
+>> enabled. The new machine adds the feature AC_CPU_CR4_PKE. The default
+>> timeout is 180 seconds. Seen this problem both on AMD and Intel machines.
+>>
+>> #./tests/access
+>> qemu-system-x86_64: terminating on signal 15 from pid 20050 (timeout)
+>> FAIL access (timeout; duration=180)
+>>
+>> This test can take about 7 minutes without timeout.
+>> time ./tests/access
+>> 58982405 tests, 0 failures
+>> PASS access
+>>
+>> real	7m10.063s
+>> user	7m9.063s
+>> sys	0m0.309s
+>>
+>> Fix the problem by adding few more limit checks.
+> 
+> Please state somewhere in the changelog what is actually being changed, and the
+> actual effect of the change.  E.g.
+> 
+>   Disallow protection keys testcase in combination with reserved bit
+>   testcasess to further limit the number of tests run to avoid timeouts on
+>   systems with support for protection keys.
+> 
+>   Disallowing this combination reduces the total number of tests from
+>   58982405 to <???>, and the runtime from ~7 minutes to <???>
 
-	gfn_t max_gfn = 1ULL << (shadow_phys_bits - PAGE_SHIFT);
+Sure. Will do.
+> 
+>> Signed-off-by: Babu Moger <Babu.Moger@amd.com>
+>> ---
+>>  x86/access.c |    4 ++--
+>>  1 file changed, 2 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/x86/access.c b/x86/access.c
+>> index 47807cc..e371dd5 100644
+>> --- a/x86/access.c
+>> +++ b/x86/access.c
+>> @@ -317,9 +317,9 @@ static _Bool ac_test_legal(ac_test_t *at)
+>>      /*
+>>       * Shorten the test by avoiding testing too many reserved bit combinations
+>>       */
+>> -    if ((F(AC_PDE_BIT51) + F(AC_PDE_BIT36) + F(AC_PDE_BIT13)) > 1)
+>> +    if ((F(AC_PDE_BIT51) + F(AC_PDE_BIT36) + F(AC_PDE_BIT13) + F(AC_CPU_CR4_PKE)) > 1)
+>>          return false;
+>> -    if ((F(AC_PTE_BIT51) + F(AC_PTE_BIT36)) > 1)
+>> +    if ((F(AC_PTE_BIT51) + F(AC_PTE_BIT36) + F(AC_CPU_CR4_PKE)) > 1)
+> 
+> Why are protection keys the sacrifical lamb?  Simply because they're the newest?
 
-and maybe add a comment saying it intentionally ignores guest.MAXPHYADDR (from
-CPUID) so that the helper can be used even when CPUID is being modified.
+Yes. I added it because it was new ):.
+> 
+> And before we start killing off arbitrary combinations, what about sharding the
+> test so that testcases that depend on a specific CR0/CR4/EFER bit, i.e. trigger
+> a VM-Exit when the configuration changes, are separate runs?  Being able to run
+> a specific combination would also hopefully make it easier to debug issues as
+> the user could specify which combo to run without having to modify the code and
+> recompile.
+> 
+> That probably won't actually reduce the total run time, but it would make each
+> run a separate test and give developers a warm fuzzy feeling that they're indeed
+> making progress :-)
+> 
+> Not sure how this could be automagically expressed this in unittest.cfg though...
 
-> There are 3 uses of this function.
-> Two of them (kvm_post_set_cr0 and one case in update_mtrr) use 0,~0ULL which is indeed inclusive,
-> but for variable mtrrs I see that in var_mtrr_range this code:
+Let me investigate if we can do that fairly easy. Will let you know.
+Thanks
+Babu
 > 
-> *end = (*start | ~mask) + 1;
-> 
-> and the *end is passed to kvm_zap_gfn_range.
-> 
-> 
-> Another thing I noticed that I added calls to kvm_inc_notifier_count/kvm_dec_notifier_count
-> in the kvm_zap_gfn_range but these do seem to have non inclusive ends, thus 
-> I need to fix them sadly if this is the case.
-> This depends on mmu_notifier_ops and it is not documented well.
-> 
-> However at least mmu_notifier_retry_hva, does assume a non inclusive range since it checks
-> 
-> 
-> hva >= kvm->mmu_notifier_range_start &&
-> 	    hva < kvm->mmu_notifier_range_end
-> 
-> 
-> Also looking at the algorithm of the kvm_zap_gfn_range.
-> Suppose that gfn_start == gfn_end and we have a memslot with one page at gfn_start
-> 
-> Then:
-> 
-> 
-> start = max(gfn_start, memslot->base_gfn); // start = memslot->base_gfn
-> end = min(gfn_end, memslot->base_gfn + memslot->npages); // end = memslot->base_gfn
-> 
-> if (start >= end)
-> 	continue;
-> 
-> In this case it seems that it will do nothing. So I suspect that kvm_zap_gfn_range
-> actually needs non inclusive range but due to the facts that it was used much
-> it didn't cause trouble.
->
-> Another thing I found in kvm_zap_gfn_range:
-> 
-> kvm_flush_remote_tlbs_with_address(kvm, gfn_start, gfn_end);
-> 
-> But kvm_flush_remote_tlbs_with_address expects (struct kvm *kvm, u64 start_gfn, u64 pages)
-
-Heh, surpise, surprise, a rare path with no architecturally visible effects is
-busted :-)
-
-> kvm_flush_remote_tlbs_with_address is also for some reason called twice with
-> the same parameters.
-
-It's called twice in the current code because mmu_lock is dropped between handling
-the current MMU and the legacy mmu.
-
-> Could you help with that? Am I missing something?
-
+>>          return false;
+>>  
+>>      return true;
+>>
