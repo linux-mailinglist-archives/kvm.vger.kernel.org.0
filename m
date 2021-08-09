@@ -2,112 +2,84 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 700233E4777
-	for <lists+kvm@lfdr.de>; Mon,  9 Aug 2021 16:23:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 95EE63E480F
+	for <lists+kvm@lfdr.de>; Mon,  9 Aug 2021 16:54:55 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235058AbhHIOX6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 9 Aug 2021 10:23:58 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:20712 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S234995AbhHIOX4 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 9 Aug 2021 10:23:56 -0400
-Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 179ELlZU125900;
-        Mon, 9 Aug 2021 10:23:36 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=ETvsuerive3vOMJVANgx3kPKEw8PHVLbEpE5ztWC/Bg=;
- b=ViQKK6Q+Df9vQohYn6WWcKqQHuIc+UC8O8mgy2LhVtG8h34XmOenvGAH18AwX4VP/dHq
- GAaFBaedLFe3ZQj5F+h4z1i7PrFyqgRQvpNi4R9NW3ojDEM0APBzspikUWRblKeyZydj
- YVEj9s22ZQ0zE28qn0OP9mgSq0brWQRCsmDtcyWF4yxVRfA4liz+U7bOxfHyJqQrAKJi
- Ao2hJkK4/i3XXUd4anPRoAFsJSADwnnI8D3sKl/K9JsxhoU56SwmeSSFa5E90LkO+p+6
- EaQ8riJm4cjgAbUGjpPuPU7mR7IxAbe/pWoA2OIpMkpLfoz7v09FlZ5/rK5J3NYelhbZ kQ== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3aax6c4spp-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 09 Aug 2021 10:23:36 -0400
-Received: from m0098396.ppops.net (m0098396.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 179ELqRs126409;
-        Mon, 9 Aug 2021 10:23:35 -0400
-Received: from ppma04fra.de.ibm.com (6a.4a.5195.ip4.static.sl-reverse.com [149.81.74.106])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3aax6c4snr-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 09 Aug 2021 10:23:35 -0400
-Received: from pps.filterd (ppma04fra.de.ibm.com [127.0.0.1])
-        by ppma04fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 179EIWkP021438;
-        Mon, 9 Aug 2021 14:23:33 GMT
-Received: from b06cxnps4075.portsmouth.uk.ibm.com (d06relay12.portsmouth.uk.ibm.com [9.149.109.197])
-        by ppma04fra.de.ibm.com with ESMTP id 3a9ht8knuh-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 09 Aug 2021 14:23:33 +0000
-Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
-        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 179ENTwN52625874
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 9 Aug 2021 14:23:29 GMT
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 70A83AE053;
-        Mon,  9 Aug 2021 14:23:29 +0000 (GMT)
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 27044AE057;
-        Mon,  9 Aug 2021 14:23:29 +0000 (GMT)
-Received: from oc3016276355.ibm.com (unknown [9.145.151.189])
-        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Mon,  9 Aug 2021 14:23:29 +0000 (GMT)
-Subject: Re: [kvm-unit-tests PATCH v1 1/4] s390x: lib: Add SCLP toplogy nested
- level
-To:     Claudio Imbrenda <imbrenda@linux.ibm.com>
-Cc:     linux-s390@vger.kernel.org, frankja@linux.ibm.com,
-        thuth@redhat.com, kvm@vger.kernel.org, cohuck@redhat.com,
-        david@redhat.com
-References: <1628498934-20735-1-git-send-email-pmorel@linux.ibm.com>
- <1628498934-20735-2-git-send-email-pmorel@linux.ibm.com>
- <20210809115345.3f0eb1c4@p-imbrenda>
-From:   Pierre Morel <pmorel@linux.ibm.com>
-Message-ID: <31fe25db-6df8-90dc-81f4-d37ad17add5e@linux.ibm.com>
-Date:   Mon, 9 Aug 2021 16:23:28 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.12.0
+        id S235045AbhHIOzO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 9 Aug 2021 10:55:14 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:54193 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S235126AbhHIOzA (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 9 Aug 2021 10:55:00 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1628520879;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=Of72I49nauR2VhDblZZ+5IyF6nFKX4mvsTZhOlXnK2k=;
+        b=b+ypKdAog2JbkTFovp2QJoPbyz0uQDOQrcnuEaSDZFAqBuIKcYLNGyg5iHKtlYmkpl/COA
+        GLphoJkTw8QSTKD6f8Dl/3L0F0camr78U7q1B8JYVJeETTw4bTYvwgHEbaCLcNH0EfoM8w
+        rJdrC93AJE1LUwa81Y1ljrVk42gw2qU=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-456-4GVZdNtbNf2kvaxqGV2MhQ-1; Mon, 09 Aug 2021 10:54:37 -0400
+X-MC-Unique: 4GVZdNtbNf2kvaxqGV2MhQ-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7A9D910AFE50;
+        Mon,  9 Aug 2021 14:54:24 +0000 (UTC)
+Received: from localhost.localdomain (unknown [10.39.193.220])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 62D9B749BB;
+        Mon,  9 Aug 2021 14:53:44 +0000 (UTC)
+From:   Emanuele Giuseppe Esposito <eesposit@redhat.com>
+To:     kvm@vger.kernel.org
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Maxim Levitsky <mlevitsk@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, Ingo Molnar <mingo@redhat.com>,
+        Borislav Petkov <bp@alien8.de>, x86@kernel.org,
+        "H. Peter Anvin" <hpa@zytor.com>, linux-kernel@vger.kernel.org,
+        Emanuele Giuseppe Esposito <eesposit@redhat.com>
+Subject: [PATCH 0/2] KVM: nSVM: avoid TOC/TOU race when checking vmcb12
+Date:   Mon,  9 Aug 2021 16:53:41 +0200
+Message-Id: <20210809145343.97685-1-eesposit@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20210809115345.3f0eb1c4@p-imbrenda>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: PvNf45CegAiV9edjiBzBdMwBkr5Gmwpu
-X-Proofpoint-ORIG-GUID: dYLbuyPcDCe5-LoskeW3_c2PhKP6VvWb
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.790
- definitions=2021-08-09_04:2021-08-06,2021-08-09 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0
- priorityscore=1501 clxscore=1015 impostorscore=0 malwarescore=0
- spamscore=0 mlxscore=0 lowpriorityscore=0 mlxlogscore=999 phishscore=0
- bulkscore=0 suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2107140000 definitions=main-2108090105
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Currently there is a TOC/TOU race between the first check of vmcb12's
+efer, cr0 and cr4 registers and the later save of their values in
+svm_set_*, because the guest could modify the values in the meanwhile.
 
+To solve this issue, this serie 1) moves the actual check nearer to the
+usage (from nested_svm_vmrun to enter_svm_guest_mode), possible thanks
+to the patch "KVM: nSVM: remove useless kvm_clear_*_queue"
+and 2) adds local variables in enter_svm_guest_mode to save the
+current value of efer, cr0 and cr4 and later use these to set the
+vcpu->arch.* state.
 
-On 8/9/21 11:53 AM, Claudio Imbrenda wrote:
-> On Mon,  9 Aug 2021 10:48:51 +0200
-> Pierre Morel <pmorel@linux.ibm.com> wrote:
-> 
->> The maximum CPU Topology nested level is available with the SCLP
->> READ_INFO command inside the byte at offset 15 of the ReadInfo
->> structure.
->>
->> Let's return this information to check the number of topology nested
->> information available with the STSI 15.1.x instruction.
->>
->> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
-> 
-> Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+Patch 1 just refactors the code to simplify the second patch, where
+we move the TOC nearer to the TOU and use local variables.
 
-Thanks,
-Pierre
+Based-on: <20210802125634.309874-1-pbonzini@redhat.com>
+Signed-off-by: Emanuele Giuseppe Esposito <eesposit@redhat.com>
 
+Emanuele Giuseppe Esposito (2):
+  KVM: nSVM: move nested_vmcb_check_cr3_cr4 logic in
+    nested_vmcb_valid_sregs
+  KVM: nSVM: temporarly save vmcb12's efer, cr0 and cr4 to avoid TOC/TOU
+    races
+
+ arch/x86/kvm/svm/nested.c | 99 ++++++++++++++++++---------------------
+ 1 file changed, 45 insertions(+), 54 deletions(-)
 
 -- 
-Pierre Morel
-IBM Lab Boeblingen
+2.31.1
+
