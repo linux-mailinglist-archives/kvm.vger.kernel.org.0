@@ -2,88 +2,93 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2DCD03E41CB
-	for <lists+kvm@lfdr.de>; Mon,  9 Aug 2021 10:49:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B63983E41FF
+	for <lists+kvm@lfdr.de>; Mon,  9 Aug 2021 11:03:30 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234074AbhHIIta (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 9 Aug 2021 04:49:30 -0400
-Received: from mga03.intel.com ([134.134.136.65]:30257 "EHLO mga03.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S234068AbhHIIt1 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 9 Aug 2021 04:49:27 -0400
-X-IronPort-AV: E=McAfee;i="6200,9189,10070"; a="214675998"
-X-IronPort-AV: E=Sophos;i="5.84,307,1620716400"; 
-   d="scan'208";a="214675998"
-Received: from fmsmga003.fm.intel.com ([10.253.24.29])
-  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Aug 2021 01:49:05 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.84,307,1620716400"; 
-   d="scan'208";a="514842352"
-Received: from michael-optiplex-9020.sh.intel.com (HELO localhost) ([10.239.159.182])
-  by FMSMGA003.fm.intel.com with ESMTP; 09 Aug 2021 01:49:03 -0700
-Date:   Mon, 9 Aug 2021 17:02:15 +0800
-From:   Yang Weijiang <weijiang.yang@intel.com>
-To:     Like Xu <like.xu.linux@gmail.com>
-Cc:     Yang Weijiang <weijiang.yang@intel.com>, pbonzini@redhat.com,
-        jmattson@google.com, seanjc@google.com, vkuznets@redhat.com,
-        wei.w.wang@intel.com, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v7 13/15] KVM: x86/vmx: Clear Arch LBREn bit before
- inject #DB to guest
-Message-ID: <20210809090215.GA31980@intel.com>
-References: <1628235745-26566-1-git-send-email-weijiang.yang@intel.com>
- <1628235745-26566-14-git-send-email-weijiang.yang@intel.com>
- <fde88a8a-fd9b-b192-caae-105224d78b47@gmail.com>
+        id S234136AbhHIJDr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 9 Aug 2021 05:03:47 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:27206 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S234085AbhHIJDr (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 9 Aug 2021 05:03:47 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1628499806;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=YD6YtXFfV0ZdxzY2okiuEvUgqKdEvMrxSjlrPcu8jO8=;
+        b=TGE45nIfVc1g+um7sq5N50r/cK2TNC7qwop/SEytKaV0vV7dWqlnJ1BYczWE92V0tW40WA
+        3vDjhQxFr1QpikhE2VLcachu9BTsh0/uneRIX0l4ptgsyF00hIY3j3s6pACErozSmRtQnH
+        ZZY+7DVw8v5c6PVbjMBiJPJ50gw9L/U=
+Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
+ [209.85.218.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-74-ijjq_CesOhav8ufQAXPTeA-1; Mon, 09 Aug 2021 05:03:25 -0400
+X-MC-Unique: ijjq_CesOhav8ufQAXPTeA-1
+Received: by mail-ej1-f69.google.com with SMTP id nb40-20020a1709071ca8b02905992266c319so4270975ejc.21
+        for <kvm@vger.kernel.org>; Mon, 09 Aug 2021 02:03:25 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=YD6YtXFfV0ZdxzY2okiuEvUgqKdEvMrxSjlrPcu8jO8=;
+        b=EtfygDm/UWu1yt+XhDtupV+a8K88xJwAcWMnNQjQy/3KknBU8T6nlUACuaSKBit8vh
+         xa7pgYqWsPVDOWEf3BrLoHM7+uEoPhuOyqzZJzNDQZGQBVEF2UBX8aTAr8hNfBtIAVpj
+         tMcM75664Ya5FQQG1qPieUVPFiqGgxZYZddoRxRAAhumb1t6FZQXcqCns7LMzQqSR+Vi
+         PuZ6Tt4I2qHBwT3U1b2SfplGMhtvKgBqUhS7pn/8I4gNeUXBoPu+MmbLn309nqNnS/kv
+         0fmLSUakfEtwQioxNCpsF7yVd+TFPUm5t6DOP38ejfG58YaHZZ9CcVELdn7I9ex78iKz
+         hIhw==
+X-Gm-Message-State: AOAM532ayaE9oloaq+1YNkijZRfObTvNYOQBTz5/JS2/kJ5DxHmmuvHR
+        A2f45QM3RStRCmwbOX3uixp5mhfhfT2uM42DLFn96784u5BgEmWuPh7/zi8tUYv/h4o1ApngbUF
+        70DOqx5gIzXdp494sd+cLOMTiRvB4vW1fqW2mHs/7Mvjtae94H3DCpZVBP6iy/3s1
+X-Received: by 2002:a50:eb95:: with SMTP id y21mr1598525edr.5.1628499804253;
+        Mon, 09 Aug 2021 02:03:24 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwzhaL+Jl3EZwRBsYOO8E4+FcpPlNxyP5w/mtjGoLfLcpqqoyNTzhHHD6cjGczoFBtkRapYOw==
+X-Received: by 2002:a50:eb95:: with SMTP id y21mr1598496edr.5.1628499804014;
+        Mon, 09 Aug 2021 02:03:24 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e? ([2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e])
+        by smtp.gmail.com with ESMTPSA id b1sm5732062ejz.24.2021.08.09.02.03.22
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 09 Aug 2021 02:03:23 -0700 (PDT)
+Subject: Re: [PATCH] selftests: KVM: avoid failures due to reserved
+ HyperTransport region
+To:     Joao Martins <joao.m.martins@oracle.com>
+Cc:     stable@vger.kernel.org, David Matlack <dmatlack@google.com>,
+        Maxim Levitsky <mlevitsk@redhat.com>,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+References: <20210805105423.412878-1-pbonzini@redhat.com>
+ <4b530fb6-81cc-be36-aa68-92ec01c65775@oracle.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <5f3c13be-f65d-1793-bd91-7491d3e149b0@redhat.com>
+Date:   Mon, 9 Aug 2021 11:03:22 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.11.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <fde88a8a-fd9b-b192-caae-105224d78b47@gmail.com>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+In-Reply-To: <4b530fb6-81cc-be36-aa68-92ec01c65775@oracle.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Aug 09, 2021 at 01:08:32PM +0800, Like Xu wrote:
-> On 6/8/2021 3:42 pm, Yang Weijiang wrote:
-> >Per ISA spec, need to clear the bit before inject #DB.
+On 06/08/21 12:57, Joao Martins wrote:
+>   Base Address   Top Address   Use
 > 
-> Please paste the SDM statement accurately so that the reviewers
-> can verify that the code is consistent with the documentation.
->
-Thanks Like! Sure, will add the description in commit message.
+>    FD_0000_0000h FD_F7FF_FFFFh Reserved interrupt address space
+>    FD_F800_0000h FD_F8FF_FFFFh Interrupt/EOI IntCtl
+>    FD_F900_0000h FD_F90F_FFFFh Legacy PIC IACK
+>    FD_F910_0000h FD_F91F_FFFFh System Management
+>    FD_F920_0000h FD_FAFF_FFFFh Reserved Page Tables
+>    FD_FB00_0000h FD_FBFF_FFFFh Address Translation
+>    FD_FC00_0000h FD_FDFF_FFFFh I/O Space
+>    FD_FE00_0000h FD_FFFF_FFFFh Configuration
+>    FE_0000_0000h FE_1FFF_FFFFh Extended Configuration/Device Messages
+>    FE_2000_0000h FF_FFFF_FFFFh Reserved
 
-> >
-> >Signed-off-by: Yang Weijiang <weijiang.yang@intel.com>
-> >---
-> >  arch/x86/kvm/vmx/vmx.c | 21 +++++++++++++++++++++
-> >  1 file changed, 21 insertions(+)
-> >
-> >diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> >index 70314cd93340..31b9c06c9b3b 100644
-> >--- a/arch/x86/kvm/vmx/vmx.c
-> >+++ b/arch/x86/kvm/vmx/vmx.c
-> >@@ -1601,6 +1601,21 @@ static void vmx_clear_hlt(struct kvm_vcpu *vcpu)
-> >  		vmcs_write32(GUEST_ACTIVITY_STATE, GUEST_ACTIVITY_ACTIVE);
-> >  }
-> >+static void flip_arch_lbr_ctl(struct kvm_vcpu *vcpu, bool on)
-> >+{
-> >+	if (vcpu_to_pmu(vcpu)->event_count > 0 &&
-> 
-> Ugh, this check seems ridiculous/funny to me.
-Do you expect aditional bit-check for INTEL_PMC_IDX_FIXED_VLBR in 
-pmu->pmc_in_use?
+The problems we're seeing are with FFFD_0000_0000h.  How does the IOMMU 
+interpret bits 40-47 of the address?
 
-> 
-> >+	    kvm_cpu_cap_has(X86_FEATURE_ARCH_LBR)) {
-> >+		u64 lbr_ctl = vmcs_read64(GUEST_IA32_LBR_CTL);
-> >+
-> >+		if (on)
-> >+			lbr_ctl |= 1ULL;
-> >+		else
-> >+			lbr_ctl &= ~1ULL;
-> >+
-> >+		vmcs_write64(GUEST_IA32_LBR_CTL, lbr_ctl);
-> >+	}
-> >+}
-> 
-> ...
+Paolo
+
