@@ -2,339 +2,252 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2D2FB3E41D3
-	for <lists+kvm@lfdr.de>; Mon,  9 Aug 2021 10:49:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 32B4F3E41D8
+	for <lists+kvm@lfdr.de>; Mon,  9 Aug 2021 10:51:06 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234092AbhHIItp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 9 Aug 2021 04:49:45 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:7672 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S234059AbhHIIt1 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 9 Aug 2021 04:49:27 -0400
-Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 1798XfYc125814;
-        Mon, 9 Aug 2021 04:49:04 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : in-reply-to : references; s=pp1;
- bh=VR/Nrxf0VCY2lgTzvl5UWhJQodkU0Z/7KGYUvleT39c=;
- b=U/Et+s56crdDxndsGq/LT4GiMSLH3/M1uzVx4kd4E+RBvrfE4IExdRMOMJaoHNduT/PB
- LSvpg6YhllTkiuBSRhnasq2Cohrse1VjgLjzznTzBeaD0kUz4iy/4an7obpXFa2CwIlH
- r8GoLsPdD6FxvW+wzKyRfqHYLrRXk+On8ubMLxZkZS7Gzwf8haRTp+NQ/Y8HIPmbTcSy
- canRBJ9hMFmVTT5eskScvQtSjqTKnn/iN8RDh4vTFqIxK6oYyhGLGDDOuq5JTt8J/Q8Y
- BkLUe825u/ElUzezR9p4t/zq9dvIdg5c3IygQzhz+AqN5RR8FxCGpf9Dz18A1YJk86N/ Dw== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3aa74j2fe6-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 09 Aug 2021 04:49:04 -0400
-Received: from m0098394.ppops.net (m0098394.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 1798YiaC130418;
-        Mon, 9 Aug 2021 04:49:04 -0400
-Received: from ppma01fra.de.ibm.com (46.49.7a9f.ip4.static.sl-reverse.com [159.122.73.70])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3aa74j2fdf-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 09 Aug 2021 04:49:04 -0400
-Received: from pps.filterd (ppma01fra.de.ibm.com [127.0.0.1])
-        by ppma01fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 1798ks6x014969;
-        Mon, 9 Aug 2021 08:49:01 GMT
-Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
-        by ppma01fra.de.ibm.com with ESMTP id 3a9ht8k9jw-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 09 Aug 2021 08:49:01 +0000
-Received: from d06av24.portsmouth.uk.ibm.com (mk.ibm.com [9.149.105.60])
-        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 1798mw1C55312794
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 9 Aug 2021 08:48:58 GMT
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 1EDEA4204B;
-        Mon,  9 Aug 2021 08:48:58 +0000 (GMT)
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id B3C6142045;
-        Mon,  9 Aug 2021 08:48:57 +0000 (GMT)
-Received: from oc3016276355.ibm.com (unknown [9.145.151.189])
-        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Mon,  9 Aug 2021 08:48:57 +0000 (GMT)
-From:   Pierre Morel <pmorel@linux.ibm.com>
-To:     linux-s390@vger.kernel.org
-Cc:     frankja@linux.ibm.com, thuth@redhat.com, kvm@vger.kernel.org,
-        cohuck@redhat.com, imbrenda@linux.ibm.com, david@redhat.com
-Subject: [kvm-unit-tests PATCH v1 4/4] s390x: Topology: checking Configuration Topology Information
-Date:   Mon,  9 Aug 2021 10:48:54 +0200
-Message-Id: <1628498934-20735-5-git-send-email-pmorel@linux.ibm.com>
-X-Mailer: git-send-email 1.8.3.1
-In-Reply-To: <1628498934-20735-1-git-send-email-pmorel@linux.ibm.com>
-References: <1628498934-20735-1-git-send-email-pmorel@linux.ibm.com>
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: hiuOa-pQWKTgjvnfYq2aJm1y7rgOL3Uu
-X-Proofpoint-GUID: dcnfWGNfpYVrqlUA-gDHcAt92GFyhYBZ
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.790
- definitions=2021-08-09_01:2021-08-06,2021-08-09 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0 adultscore=0
- spamscore=0 lowpriorityscore=0 malwarescore=0 bulkscore=0 suspectscore=0
- mlxscore=0 clxscore=1015 mlxlogscore=999 priorityscore=1501 phishscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2107140000
- definitions=main-2108090069
+        id S234094AbhHIIvX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 9 Aug 2021 04:51:23 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:45152 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S234008AbhHIIvW (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 9 Aug 2021 04:51:22 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1628499061;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=eXR+JIzWEYNeD1UnXjRtYb+ykUgRxVjnQJbgR8HpkXE=;
+        b=Uq5jtkqbNeTZUqLwcYVXbwK22o3IM5QSl616zVZ6BL0NnVsP4icrkNTx1QQXzDzs8UmMTu
+        OYxdgTYM7GRWUNBo+/dfglc7Wbrmn2Ol7NVFTy6NberfBo3VQZG3QMcnxP5ppD5qW9bjQ+
+        A2lKoxbXNWkvRCGuDZJfgFNAuLWknhw=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-295-5Ql1yix9NyOlWpXtj3B5Hw-1; Mon, 09 Aug 2021 04:50:59 -0400
+X-MC-Unique: 5Ql1yix9NyOlWpXtj3B5Hw-1
+Received: by mail-wm1-f70.google.com with SMTP id 17-20020a1c04110000b02902e687e6276dso1317569wme.3
+        for <kvm@vger.kernel.org>; Mon, 09 Aug 2021 01:50:59 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:to:cc:references:from:organization:subject
+         :message-id:date:user-agent:mime-version:in-reply-to
+         :content-language:content-transfer-encoding;
+        bh=eXR+JIzWEYNeD1UnXjRtYb+ykUgRxVjnQJbgR8HpkXE=;
+        b=hjjbQgIsjYsx63CopMa/GO5pBCUjYkfNzI+q3H6SXmyx4WAJr7b0Saud96nCbw/LcS
+         o4A1A8JCM+YRYYxqB7HvgbTSkrf+x7h8YARXX2bajsSwcRu9M779fbFSDY4d5h0c7nb9
+         KvLSJ2R1kf9PVRUWLRynWqqRi0LkHqwI/QjQDxfKtRYhsszgWvYCpvxG18K0hcwUt7mV
+         vwPC5LivDSLW169swsQpzupH8eiHJ0Xp0jhjLJODcU+hCibFhDo0kWxJ3jUZCxzKLcl8
+         Cu3G9k9RO4ES7o3X3MTwgTmIR55GYGQb7dQUd3/8TpyRQ0d2iS17agxC9yZEQeM9l51a
+         cUUw==
+X-Gm-Message-State: AOAM530caaxkE1Z24a/9oulEyHHUXF/N41Mw07XsF3c4lcoy4wHalfQV
+        svf08inWUXHxItFXzgy5II3BOvc9YzgtWAHwN+VJD/HBrgzSFpo/fNHOfz44ZzlsTx5WJkxNjog
+        oyrx4XVUr5ery
+X-Received: by 2002:a05:600c:1d12:: with SMTP id l18mr15423198wms.88.1628499058627;
+        Mon, 09 Aug 2021 01:50:58 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyn8BfKomzEPX0PtqpbGSxmBgVo/T64uydRSEX/+7aDK1leW+8vEKtx+wRwoAiMKr32K3b/YA==
+X-Received: by 2002:a05:600c:1d12:: with SMTP id l18mr15423168wms.88.1628499058304;
+        Mon, 09 Aug 2021 01:50:58 -0700 (PDT)
+Received: from ?IPv6:2003:d8:2f0a:7f00:fad7:3bc9:69d:31f? (p200300d82f0a7f00fad73bc9069d031f.dip0.t-ipconnect.de. [2003:d8:2f0a:7f00:fad7:3bc9:69d:31f])
+        by smtp.gmail.com with ESMTPSA id j4sm16841393wmi.4.2021.08.09.01.50.57
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 09 Aug 2021 01:50:57 -0700 (PDT)
+To:     Claudio Imbrenda <imbrenda@linux.ibm.com>
+Cc:     kvm@vger.kernel.org, cohuck@redhat.com, borntraeger@de.ibm.com,
+        frankja@linux.ibm.com, thuth@redhat.com, pasic@linux.ibm.com,
+        linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Ulrich.Weigand@de.ibm.com,
+        "linux-mm@kvack.org" <linux-mm@kvack.org>,
+        Michal Hocko <mhocko@kernel.org>
+References: <20210804154046.88552-1-imbrenda@linux.ibm.com>
+ <86b114ef-41ea-04b6-327c-4a036f784fad@redhat.com>
+ <20210806113005.0259d53c@p-imbrenda>
+ <ada27c6d-4dc9-04c3-d5b9-566e65359701@redhat.com>
+ <20210806154400.2ca55563@p-imbrenda>
+From:   David Hildenbrand <david@redhat.com>
+Organization: Red Hat
+Subject: Re: [PATCH v3 00/14] KVM: s390: pv: implement lazy destroy
+Message-ID: <8f1502a4-8ee3-f70f-ca04-4a13d44368fb@redhat.com>
+Date:   Mon, 9 Aug 2021 10:50:57 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.11.0
+MIME-Version: 1.0
+In-Reply-To: <20210806154400.2ca55563@p-imbrenda>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-STSI with function code 15 is used to store the CPU configuration
-topology.
+On 06.08.21 15:44, Claudio Imbrenda wrote:
+> On Fri, 6 Aug 2021 13:30:21 +0200
+> David Hildenbrand <david@redhat.com> wrote:
+> 
+> [...]
+> 
+>>>>> When the system runs out of memory, if a guest has terminated and
+>>>>> its memory is being cleaned asynchronously, the OOM killer will
+>>>>> wait a little and then see if memory has been freed. This has the
+>>>>> practical effect of slowing down memory allocations when the
+>>>>> system is out of memory to give the cleanup thread time to
+>>>>> cleanup and free memory, and avoid an actual OOM situation.
+>>>>
+>>>> ... and this sound like the kind of arch MM hacks that will bite us
+>>>> in the long run. Of course, I might be wrong, but already doing
+>>>> excessive GFP_ATOMIC allocations or messing with the OOM killer
+>>>> that
+>>>
+>>> they are GFP_ATOMIC but they should not put too much weight on the
+>>> memory and can also fail without consequences, I used:
+>>>
+>>> GFP_ATOMIC | __GFP_NOMEMALLOC | __GFP_NOWARN
+>>>
+>>> also notice that after every page allocation a page gets freed, so
+>>> this is only temporary.
+>>
+>> Correct me if I'm wrong: you're allocating unmovable pages for
+>> tracking (e.g., ZONE_DMA, ZONE_NORMAL) from atomic reserves and will
+>> free a movable process page, correct? Or which page will you be
+>> freeing?
+> 
+> we are transforming ALL moveable pages belonging to userspace into
+> unmoveable pages. every ~500 pages one page gets actually
+> allocated (unmoveable), and another (moveable) one gets freed.
+> 
+>>>
+>>> I would not call it "messing with the OOM killer", I'm using the
+>>> same interface used by virtio-baloon
+>>
+>> Right, and for virtio-balloon it's actually a workaround to restore
+>> the original behavior of a rarely used feature: deflate-on-oom.
+>> Commit da10329cb057 ("virtio-balloon: switch back to OOM handler for
+>> VIRTIO_BALLOON_F_DEFLATE_ON_OOM") tried to document why we switched
+>> back from a shrinker to VIRTIO_BALLOON_F_DEFLATE_ON_OOM:
+>>
+>> "The name "deflate on OOM" makes it pretty clear when deflation should
+>>    happen - after other approaches to reclaim memory failed, not while
+>>    reclaiming. This allows to minimize the footprint of a guest -
+>> memory will only be taken out of the balloon when really needed."
+>>
+>> Note some subtle differences:
+>>
+>> a) IIRC, before running into the OOM killer, will try reclaiming
+>>      anything  else. This is what we want for deflate-on-oom, it might
+>> not be what you want for your feature (e.g., flushing other
+>> processes/VMs to disk/swap instead of waiting for a single process to
+>> stop).
+> 
+> we are already reclaiming the memory of the dead secure guest.
+> 
+>> b) Migration of movable balloon inflated pages continues working
+>> because we are dealing with non-lru page migration.
+>>
+>> Will page reclaim, page migration, compaction, ... of these movable
+>> LRU pages still continue working while they are sitting around
+>> waiting to be cleaned up? I can see that we're grabbing an extra
+>> reference when we put them onto the list, that might be a problem:
+>> for example, we can most certainly not swap out these pages or write
+>> them back to disk on memory pressure.
+> 
+> this is true. on the other hand, swapping a moveable page would be even
+> slower, because those pages would need to be exported and not destroyed.
+> 
+>>>    
+>>>> way for a pure (shutdown) optimization is an alarm signal. Of
+>>>> course, I might be wrong.
+>>>>
+>>>> You should at least CC linux-mm. I'll do that right now and also CC
+>>>> Michal. He might have time to have a quick glimpse at patch #11 and
+>>>> #13.
+>>>>
+>>>> https://lkml.kernel.org/r/20210804154046.88552-12-imbrenda@linux.ibm.com
+>>>> https://lkml.kernel.org/r/20210804154046.88552-14-imbrenda@linux.ibm.com
+>>>>
+>>>> IMHO, we should proceed with patch 1-10, as they solve a really
+>>>> important problem ("slow reboots") in a nice way, whereby patch 11
+>>>> handles a case that can be worked around comparatively easily by
+>>>> management tools -- my 2 cents.
+>>>
+>>> how would management tools work around the issue that a shutdown can
+>>> take very long?
+>>
+>> The traditional approach is to wait starting a new VM on another
+>> hypervisor instead until memory has been freed up, or start it on
+>> another hypervisor. That raises the question about the target use
+>> case.
+>>
+>> What I don't get is that we have to pay the price for freeing up that
+>> memory. Why isn't it sufficient to keep the process running and let
+>> ordinary MM do it's thing?
+> 
+> what price?
+> 
+> you mean let mm do the slowest possible thing when tearing down a dead
+> guest?
+> 
+> without this, the dying guest would still take up all the memory. and
+> swapping it would not be any faster (it would be slower, in fact). the
+> system would OOM anyway.
+> 
+>> Maybe you should clearly spell out what the target use case for the
+>> fast shutdown (fast quitting of the process?) is?. I assume it is,
+>> starting a new VM / process / whatsoever on the same host
+>> immediately, and then
+>>
+>> a) Eventually slowing down other processes due heavy reclaim.
+> 
+> for each dying guest, only one CPU is used by the reclaim; depending on
+> the total load of the system, this might not even be noticeable
+> 
+>> b) Slowing down the new process because you have to pay the price of
+>> cleaning up memory.
+> 
+> do you prefer to OOM because the dying guest will need ages to clean up
+> its memory?
+> 
+>> I think I am missing why we need the lazy destroy at all when killing
+>> a process. Couldn't you instead teach the OOM killer "hey, we're
+>> currently quitting a heavy process that is just *very* slow to free
+>> up memory, please wait for that before starting shooting around" ?
+> 
+> isn't this ^ exactly what the OOM notifier does?
+> 
+> 
+> another note here:
+> 
+> when the process quits, the mm starts the tear down. at this point, the
+> mm has no idea that this is a dying KVM guest, so the best it can do is
+> exporting (which is significantly slower than destroy page)
+> 
+> kvm comes into play long after the mm is gone, and at this point it
+> can't do anything anymore. the memory is already gone (very slowly).
+> 
+> if I kill -9 qemu (or if qemu segfaults), KVM will never notice until
+> the mm is gone.
+> 
 
-We check if the topology stored is coherent with the QEMU -smp
-parameters.
-The current check is done on the number of CPUs, the maximum number
-of CPUs, the number of sockets and the number of cores per sockets.
+Summarizing what we discussed offline:
 
-Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
----
- s390x/topology.c    | 207 ++++++++++++++++++++++++++++++++++++++++++++
- s390x/unittests.cfg |   1 +
- 2 files changed, 208 insertions(+)
+1. We should optimize for proper shutdowns first, this is the most 
+important use case. We should look into letting QEMU tear down the KVM 
+secure context such that we can just let MM teardown do its thing -> 
+destroy instead of export secure pages. If no kernel changes are 
+required to get that implemented, even better.
 
-diff --git a/s390x/topology.c b/s390x/topology.c
-index 4146189a..1eb463fd 100644
---- a/s390x/topology.c
-+++ b/s390x/topology.c
-@@ -19,6 +19,51 @@
- static uint8_t pagebuf[PAGE_SIZE * 2] __attribute__((aligned(PAGE_SIZE * 2)));
- int machine_level;
- int mnest;
-+static long max_cpus;
-+static long cores;
-+static long sockets;
-+static long books;
-+static long drawers;
-+static long nodes;
-+static long ncpus;
-+
-+struct topology_core {
-+	unsigned char nl;
-+	unsigned char reserved0[3];
-+	unsigned char :5;
-+	unsigned char d:1;
-+	unsigned char pp:2;
-+	unsigned char type;
-+	unsigned short origin;
-+	unsigned long mask;
-+};
-+
-+struct topology_container {
-+	unsigned char nl;
-+	unsigned char reserved[6];
-+	unsigned char id;
-+};
-+
-+union topology_entry {
-+	unsigned char nl;
-+	struct topology_core cpu;
-+	struct topology_container container;
-+};
-+
-+struct sysinfo_15_1_x {
-+	unsigned char reserved0[2];
-+	unsigned short length;
-+	unsigned char mag6;
-+	unsigned char mag5;
-+	unsigned char mag4;
-+	unsigned char mag3;
-+	unsigned char mag2;
-+	unsigned char mag1;
-+	unsigned char reserved1;
-+	unsigned char mnest;
-+	unsigned char reserved2[4];
-+	union topology_entry tle[0];
-+};
- 
- #define PTF_HORIZONTAL	0
- #define PTF_VERTICAL	1
-@@ -70,9 +115,170 @@ static void test_ptf(void)
- 	report_prefix_pop();
- }
- 
-+static void check_sysinfo_15_1_x(struct sysinfo_15_1_x *info)
-+{
-+	struct topology_container *tc, *end;
-+	struct topology_core *cpus;
-+	int nb_nl0 = 0, nb_nl1 = 0, nb_nl2 = 0, nb_nl3 = 0;
-+
-+	if (mnest > 5)
-+		report(info->mag6 == 0, "topology level 6");
-+	if (mnest > 4)
-+		report(info->mag5 == nodes, "Maximum number of nodes");
-+	if (mnest > 3)
-+		report(info->mag4 == drawers, "Maximum number of drawers");
-+	if (mnest > 2)
-+		report(info->mag3 == books, "Maximum number of book");
-+
-+	/* Both levels 2 and 1 are always valid */
-+	report(info->mag2 == sockets, "Maximum number of sockets");
-+	report(info->mag1 == cores, "Maximum number of cores");
-+
-+	tc = (void *)&info->tle[0];
-+	end = (struct topology_container *)((unsigned long)info + info->length);
-+
-+	while (tc < end) {
-+		switch (tc->nl) {
-+		case 3:
-+			report_info("drawer: %d %d", tc->nl, tc->id);
-+			nb_nl3++;
-+			break;
-+		case 2:
-+			report_info("book  : %d %d", tc->nl, tc->id);
-+			nb_nl2++;
-+			break;
-+		case 1:
-+			report_info("socket: %d %d", tc->nl, tc->id);
-+			nb_nl1++;
-+			break;
-+		case 0:
-+			cpus = (struct topology_core *) tc;
-+			report_info("cpu type %02x  d: %d pp: %d", cpus->type, cpus->d, cpus->pp);
-+			report_info("origin : %04x mask %016lx", cpus->origin, cpus->mask);
-+			tc++;
-+			nb_nl0++;
-+			break;
-+		default:
-+			report_abort("Unexpected TL Entry: tle->nl: %d", tc->nl);
-+			return;
-+		}
-+		tc++;
-+	}
-+	/*
-+	 * As we accept only 1 type of CPU, and only horizontal and dedicated CPUs
-+	 * We expect max_cpus / cores CPU entries
-+	 */
-+	report(nb_nl0 ==  (1 + (ncpus - 1) / cores),
-+			  "Check count of cores: %d %ld", nb_nl0, ncpus / cores);
-+	/* We expect the same count of sockets and CPU entries */
-+	report(nb_nl1 ==  nb_nl0, "Check count of sockets");
-+	if (mnest > 2)
-+		report(nb_nl2 == nb_nl1 / sockets, "Checks count of books");
-+	if (mnest > 3)
-+		report(nb_nl3 == nb_nl2 / books, "Checks count of drawers");
-+}
-+
-+static void test_stsi(void)
-+{
-+	int ret;
-+
-+	report_info("VM Level: %ld", stsi_get_fc(pagebuf));
-+
-+	mnest = sclp_get_stsi_parm();
-+	/* If the STSI parm is 0, the maximum MNEST for STSI is 2 */
-+	if (!mnest)
-+		mnest = 2;
-+	report_info("SCLP MNEST: %d", mnest);
-+
-+	ret = sclp_get_cpu_num();
-+	report_info("SCLP CPU  : %d", ret);
-+
-+	ret = stsi(pagebuf, 15, 1, 2);
-+	report(!ret, "valid stsi 15.1.2");
-+	if (!ret)
-+		check_sysinfo_15_1_x((struct sysinfo_15_1_x *)pagebuf);
-+	else
-+		report_info(" ret: %d", ret);
-+
-+	if (mnest < 3) {
-+		report(stsi(pagebuf, 15, 1, 3) == 3, "invalid stsi 15.1.3");
-+	} else {
-+		report(stsi(pagebuf, 15, 1, 3) == 0, "valid stsi 15.1.3");
-+		check_sysinfo_15_1_x((struct sysinfo_15_1_x *)pagebuf);
-+	}
-+
-+	if (mnest < 4) {
-+		report(stsi(pagebuf, 15, 1, 4) == 3, "invalid stsi 15.1.4");
-+	} else {
-+		report(stsi(pagebuf, 15, 1, 4) == 0, "valid stsi 15.1.4");
-+		check_sysinfo_15_1_x((struct sysinfo_15_1_x *)pagebuf);
-+	}
-+
-+	if (mnest < 5) {
-+		report(stsi(pagebuf, 15, 1, 5) == 3, "invalid stsi 15.1.5");
-+	} else {
-+		report(stsi(pagebuf, 15, 1, 5) == 0, "valid stsi 15.1.5");
-+		check_sysinfo_15_1_x((struct sysinfo_15_1_x *)pagebuf);
-+	}
-+
-+	if (mnest < 6) {
-+		report(stsi(pagebuf, 15, 1, 6) == 3, "invalid stsi 15.1.6");
-+	} else {
-+		report(stsi(pagebuf, 15, 1, 6) == 0, "valid stsi 15.1.6");
-+		check_sysinfo_15_1_x((struct sysinfo_15_1_x *)pagebuf);
-+	}
-+}
-+
-+static void parse_topology_args(int argc, char **argv)
-+{
-+	int i;
-+
-+	for (i = 1; i < argc; i++) {
-+		if (!strcmp("-c", argv[i])) {
-+			i++;
-+			if (i >= argc)
-+				report_abort("-c (cores) needs a parameter");
-+			cores = atol(argv[i]);
-+		} else if (!strcmp("-s", argv[i])) {
-+			i++;
-+			if (i >= argc)
-+				report_abort("-s (sockets) needs a parameter");
-+			sockets = atol(argv[i]);
-+		} else if (!strcmp("-b", argv[i])) {
-+			i++;
-+			if (i >= argc)
-+				report_abort("-b (books) needs a parameter");
-+			books = atol(argv[i]);
-+		} else if (!strcmp("-d", argv[i])) {
-+			i++;
-+			if (i >= argc)
-+				report_abort("-d (drawers) needs a parameter");
-+			drawers = atol(argv[i]);
-+		} else if (!strcmp("-n", argv[i])) {
-+			i++;
-+			if (i >= argc)
-+				report_abort("-n (nodes) needs a parameter");
-+			nodes = atol(argv[i]);
-+		}
-+	}
-+	if (!cores)
-+		cores = 1;
-+	if (!sockets)
-+		sockets = 1;
-+	if (!books)
-+		books = 1;
-+	if (!drawers)
-+		drawers = 1;
-+	if (!nodes)
-+		nodes = 1;
-+	max_cpus = cores * sockets * books * drawers * nodes;
-+	ncpus = smp_query_num_cpus();
-+}
-+
- int main(int argc, char *argv[])
- {
- 	report_prefix_push("stsi");
-+	parse_topology_args(argc, argv);
- 
- 	if (!test_facility(11)) {
- 		report_skip("Topology facility not present");
-@@ -82,6 +288,7 @@ int main(int argc, char *argv[])
- 	report_info("Machine level %ld", stsi_get_fc(pagebuf));
- 
- 	test_ptf();
-+	test_stsi();
- end:
- 	return report_summary();
- }
-diff --git a/s390x/unittests.cfg b/s390x/unittests.cfg
-index 0f84d279..390e8398 100644
---- a/s390x/unittests.cfg
-+++ b/s390x/unittests.cfg
-@@ -112,3 +112,4 @@ file = mvpg-sie.elf
- 
- [topology]
- file = topology.elf
-+extra_params=-smp 5,sockets=4,cores=4,maxcpus=16 -append "-n 5 -s 4 -c 4 -m 16"
+2. If we want to optimize "there is a big process dying horribly slow, 
+please OOM killer please wait a bit instead of starting killing other 
+processes", we might want to do that in a more generic way (if not 
+already in place, no expert).
+
+3. If we really want to go down the path of optimizing "kill -9" and 
+friends to e.g., take 40min instead of 20min on a huge VM (who cares? 
+especially, the OOM handler will struggle already if memory is getting 
+freed that slowly, no matter if 40 or 20 minutes), we should look into 
+being able to release the relevant KVM secure context before tearing 
+down MM. We should avoid any arch specific hacks.
+
 -- 
-2.25.1
+Thanks,
+
+David / dhildenb
 
