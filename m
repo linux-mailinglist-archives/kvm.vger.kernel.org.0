@@ -2,143 +2,199 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E7D703E4A32
-	for <lists+kvm@lfdr.de>; Mon,  9 Aug 2021 18:47:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BCA883E4A5D
+	for <lists+kvm@lfdr.de>; Mon,  9 Aug 2021 18:54:11 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233411AbhHIQrh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 9 Aug 2021 12:47:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48630 "EHLO
+        id S233694AbhHIQya (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 9 Aug 2021 12:54:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50326 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233083AbhHIQrg (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 9 Aug 2021 12:47:36 -0400
-Received: from mail-oi1-x235.google.com (mail-oi1-x235.google.com [IPv6:2607:f8b0:4864:20::235])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 58ABAC0613D3
-        for <kvm@vger.kernel.org>; Mon,  9 Aug 2021 09:47:16 -0700 (PDT)
-Received: by mail-oi1-x235.google.com with SMTP id o20so24378358oiw.12
-        for <kvm@vger.kernel.org>; Mon, 09 Aug 2021 09:47:16 -0700 (PDT)
+        with ESMTP id S233075AbhHIQy3 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 9 Aug 2021 12:54:29 -0400
+Received: from mail-pl1-x629.google.com (mail-pl1-x629.google.com [IPv6:2607:f8b0:4864:20::629])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 74792C061796
+        for <kvm@vger.kernel.org>; Mon,  9 Aug 2021 09:54:09 -0700 (PDT)
+Received: by mail-pl1-x629.google.com with SMTP id f3so6438489plg.3
+        for <kvm@vger.kernel.org>; Mon, 09 Aug 2021 09:54:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=4Q4zxO7vdS8HSQuned3Ij+Zp035NjsUriOcL/f8N/vE=;
-        b=j2NpvGoKzxZPRA+ABQcxnU1qZrlIAbco1aqaPepiA06jVBmXNDE1AMHKWODflPyxkt
-         /2Sz1Zy4PGSj4dpl8ohZRQSyzJ1mhEAaNeogwo9pI6Y9jnSMis3QEczWoadtCDGR6l0H
-         DEj7QhwSxVR/qaNumhl1Nb82dI7xD0YkQgMKxpTkmsytsoifq0Ig/wQmrIcLjUha8Wv9
-         LyZFbV1lmp7stjsluzC8e5g8wGtdcHCfZ8r4hDVCpZwTue5GNG5PjqqD+GyU3q3zScOO
-         SDti6XDZWG983fcO7y3LnKW2YsLjqVio4FX+bqFrKnCIH4Kq09N1Wps2Etv4XpOEH0c5
-         joWw==
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=vKoYQRDH+Wjsz6hbWc1vGfeTf051Y0mGdYB8Ul+Z0Ls=;
+        b=kqcMZwS917tKDqBTTwkutmGTpL9mLaRCuS1p3XZ0LpZ14LbgPe0zHQnSwCwja26grr
+         3xDMruZmDkriQT3wsNlOJL291BmmG4HIH1iDZ6+47eS6nZuBVUjwb+1T86gjlgytzred
+         sY66il0+Q2Ao2Oui/KMQ6z2OX3cDQRFSJ9Vx7q43Qdiud15Bk2Kb2F0UdNGVJBrwlTxd
+         0Nu6zOiG69QoPR3GEY8UHQKyom8Ez1qRje7BiIJ7HFlZg0n/BphVhMZiv38XkqsrdQpT
+         38+a/GOgdfaoJ4eT8xBCaSWF++wHrUZqXnCgPCuzIFsrrSKTRiHG/GQfVxZ/6Y1L9Ugf
+         RwHw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=4Q4zxO7vdS8HSQuned3Ij+Zp035NjsUriOcL/f8N/vE=;
-        b=IM8mKwuuF214kkbLO++l4QV4Ez80esbRL8WBaYHGivvdG/NHL9s9hR4soir3+LC88C
-         /DLk8po9ds3YVk+FDdu6bbGwPevzprRgKhYbQgh7KfDLQwJzTvlQWPQ873Wj47AGxyW2
-         Ib21P7fEt5hl54jpIyUJp5XUBMqqn7qIQ+lAQrd68nn4Y/l5qMi0dAWIwbLGpEa6YLsA
-         heRBDxK7CbRWWGGPI8ZCg3VSvCdrCph366LirXKXh6flJJKwaPaj0jE3dDbKF0wi2OR/
-         +/JMUGNEK+XT2mpf4Frf7eKj7IHriTaPk/CJG6OCVBP0OddIRaDFEiSrHhVkjQD3UoRk
-         e24A==
-X-Gm-Message-State: AOAM532sWgvHq5Mt/qSQEUAoHnlpfwGShR45laEVgctnTWgsuGa2s3gn
-        vL4WpuGX37xqBwmoGglfDTPZM9Aa1unEJzGAiaX2EA==
-X-Google-Smtp-Source: ABdhPJwgSuZYBnqb3tIFQyk4qh0XbxDhU7djxzN8HiAnNxkgxx5IIQ14tSytznaExbjZGBhrwxClrKDH/W7N/TOsSC8=
-X-Received: by 2002:aca:6704:: with SMTP id z4mr38751oix.13.1628527635519;
- Mon, 09 Aug 2021 09:47:15 -0700 (PDT)
-MIME-Version: 1.0
-References: <20210713142023.106183-1-mlevitsk@redhat.com> <20210713142023.106183-9-mlevitsk@redhat.com>
- <c51d3f0b46bb3f73d82d66fae92425be76b84a68.camel@redhat.com>
- <YPXJQxLaJuoF6aXl@google.com> <564fd4461c73a4ec08d68e2364401db981ecba3a.camel@redhat.com>
- <YQ2vv7EXGN2jgQBb@google.com> <5f991ac11006ae890961a76d35a63b7c9c56b47c.camel@redhat.com>
-In-Reply-To: <5f991ac11006ae890961a76d35a63b7c9c56b47c.camel@redhat.com>
-From:   Jim Mattson <jmattson@google.com>
-Date:   Mon, 9 Aug 2021 09:47:04 -0700
-Message-ID: <CALMp9eRxthu+5NMRTL4+NtcsAcMyYmLiQs4Get5=UAAH_yqH=w@mail.gmail.com>
-Subject: Re: KVM's support for non default APIC base
-To:     Maxim Levitsky <mlevitsk@redhat.com>
-Cc:     Sean Christopherson <seanjc@google.com>, kvm@vger.kernel.org,
-        "open list:X86 ARCHITECTURE (32-BIT AND 64-BIT)" 
-        <linux-kernel@vger.kernel.org>, Joerg Roedel <joro@8bytes.org>,
-        Borislav Petkov <bp@alien8.de>,
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=vKoYQRDH+Wjsz6hbWc1vGfeTf051Y0mGdYB8Ul+Z0Ls=;
+        b=P/re9DrFzNa/lVD6bR7h8G09uW/hNa3Fqi6/fX8mILVpPOCOmbTIh33IFeWCKMAgzR
+         En50pOCihIls+WzI3E00wx2TuZBWMtRrI+1Lik7uJxF8e4xjr+ycE1XI/e29WyI/SnlF
+         oWEt6O1Rt/Jwdx3DYj8+zSxJgxph9IC15O3q9w9vXo44wnq3tYgUu3Ky5XztscOV/6ol
+         ePKmWhGstzsmIMoXAWTHC7+ZYt8xYUdwN/TMk+pQRaqi6sHbfU/f9k2Qudd6XZzxRup3
+         XoKzWx5/ta0hAkegL6dUzYXpr3CoZuJ5bUoFeulqJWd9IosxfVya9VdOKgYHe9UAQKYM
+         iAgw==
+X-Gm-Message-State: AOAM533xU8e9f91E7n4JllAyPjlfgUSDeuD+fyA4p4XO1ydQ+2GNY866
+        CaqHyx2RmcA0b1QxBjXKl4mGDg==
+X-Google-Smtp-Source: ABdhPJwXA7iilxoGJ2kF9DwWX3NmGW5lCdsCR3FRGZ5QpxqDBdhU07dKj6xtNENdSeRRBCd1JQWNzQ==
+X-Received: by 2002:a65:438c:: with SMTP id m12mr455399pgp.163.1628528048716;
+        Mon, 09 Aug 2021 09:54:08 -0700 (PDT)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id d20sm1034423pfu.36.2021.08.09.09.54.07
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 09 Aug 2021 09:54:08 -0700 (PDT)
+Date:   Mon, 9 Aug 2021 16:54:03 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Lai Jiangshan <jiangshanlai@gmail.com>
+Cc:     linux-kernel@vger.kernel.org,
+        Lai Jiangshan <laijs@linux.alibaba.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
         Thomas Gleixner <tglx@linutronix.de>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ingo Molnar <mingo@redhat.com>,
-        "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
+        kvm@vger.kernel.org
+Subject: Re: [PATCH] KVM: X86: Don't reset dr6 unconditionally when the vcpu
+ being scheduled out
+Message-ID: <YRFdq8sNuXYpgemU@google.com>
+References: <20210808232919.862835-1-jiangshanlai@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210808232919.862835-1-jiangshanlai@gmail.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Aug 9, 2021 at 2:40 AM Maxim Levitsky <mlevitsk@redhat.com> wrote:
->
-> On Fri, 2021-08-06 at 21:55 +0000, Sean Christopherson wrote:
-> > On Thu, Jul 22, 2021, Maxim Levitsky wrote:
-> > > On Mon, 2021-07-19 at 18:49 +0000, Sean Christopherson wrote:
-> > > > On Sun, Jul 18, 2021, Maxim Levitsky wrote:
-> > > -> APIC MMIO area has to be MMIO for 'apic_mmio_write' to be called,
-> > >    thus must contain no guest memslots.
-> > >    If the guest relocates the APIC base somewhere where we have a memslot,
-> > >    memslot will take priority, while on real hardware, LAPIC is likely to
-> > >    take priority.
-> >
-> > Yep.  The thing that really bites us is that other vCPUs should still be able to
-> > access the memory defined by the memslot, e.g. to make it work we'd have to run
-> > the vCPU with a completely different MMU root.
-> That is something I haven't took in the account.
-> Complexity of supporting this indeed isn't worth it.
->
-> >
-> > > As far as I know the only good reason to relocate APIC base is to access it
-> > > from the real mode which is not something that is done these days by modern
-> > > BIOSes.
-> > >
-> > > I vote to make it read only (#GP on MSR_IA32_APICBASE write when non default
-> > > base is set and apic enabled) and remove all remains of the support for
-> > > variable APIC base.
-> >
-> > Making up our own behavior is almost never the right approach.  E.g. _best_ case
-> > scenario for an unexpected #GP is the guest immediately terminates.  Worst case
-> > scenario is the guest eats the #GP and continues on, which is basically the status
-> > quo, except it's guaranteed to now work, whereas todays behavior can at least let
-> > the guest function, for some definitions of "function".
->
-> Well, at least the Intel's PRM does state that APIC base relocation is not guaranteed
-> to work on all CPUs, so giving the guest a #GP is like telling it that current CPU doesn't
-> support it. In theory, a very well behaving guest can catch the exception and
-> fail back to the default base.
->
-> I don't understand what do you mean by 'guaranteed to now work'. If the guest
-> ignores this #GP and still thinks that APIC base relocation worked, it is its fault.
-> A well behaving guest should never assume that a msr write that failed with #GP
-> worked.
->
->
-> >
-> > I think the only viable "solution" is to exit to userspace on the guilty WRMSR.
-> > Whether or not we can do that without breaking userspace is probably the big
-> > question.  Fully emulating APIC base relocation would be a tremendous amount of
-> > effort and complexity for practically zero benefit.
->
-> I have nothing against this as well although I kind of like the #GP approach a bit more,
-> and knowing that there are barely any reasons
-> to relocate the APIC base, and that it doesn't work well, there is a good chance
-> that no one does it anyway (except our kvm unit tests, but that isn't an issue).
->
-> >
-> > > (we already have a warning when APIC base is set to non default value)
-> >
-> > FWIW, that warning is worthless because it's _once(), i.e. won't help detect a
-> > misbehaving guest unless it's the first guest to misbehave on a particular
-> > instantiation of KVM.   _ratelimited() would improve the situation, but not
-> > completely eliminate the possibility of a misbehaving guest going unnoticed.
-> > Anything else isn't an option becuase it's obviously guest triggerable.
->
-> 100% agree.
->
-> I'll say I would first make it _ratelimited() for few KVM versions, and then
-> if nobody complains, make it a KVM internal error / #GP, and remove all the leftovers
-> from the code that pretend that it can work.
+On Mon, Aug 09, 2021, Lai Jiangshan wrote:
+> From: Lai Jiangshan <laijs@linux.alibaba.com>
+> 
+> The commit efdab992813fb ("KVM: x86: fix escape of guest dr6 to the host")
+> fixed a bug.  It did a great job and reset dr6 unconditionally when the
+> vcpu being scheduled out since the linux kernel only activates breakpoints
+> in rescheduling (perf events).
+> 
+> But writing to debug registers is slow, and it can be shown in perf results
+> sometimes even neither the host nor the guest activate breakpoints.
+> 
+> It'd be better to reset it conditionally and this patch moves the code of
+> reseting dr6 to the path of VM-exit where we can check the related
+> conditions.  And the comment is also updated.
+> 
+> Signed-off-by: Lai Jiangshan <laijs@linux.alibaba.com>
+> ---
+> And even in the future, the linux kernel might activate breakpoint
+> in interrupts (rather than in rescheduling only),  the host would
+> not be confused by the stale dr6 after this patch.  The possible future
+> author who would implement it wouldn't need to care about how the kvm
+> mananges debug registers since it sticks to the host's expectations.
 
-Printing things to syslog is not very helpful. Any time that kvm
-violates the architectural specification, it should provide
-information about the emulation error to userspace.
+Eh, I don't think this is a valid argument.  KGBD already manipulates breakpoints
+in NMI context, activating breakpoints from interrupt context would absolutely
+require a full audit of the kernel.
+
+> Another solution is changing breakpoint.c and make the linux kernel
+> always reset dr6 in activating breakpoints.  So that dr6 is allowed
+> to be stale when host breakpoints is not enabled and we don't need
+> to reset dr6 in this case. But it would be no harm to reset it even in
+> both places and killing stale states is good in programing.
+
+Hmm, other than further penalizing guests that enable debug breakpoints.
+
+What about adding a arch.switch_db_regs flag to note that DR6 is loaded with a
+guest value and keeping the reset code in kvm_arch_vcpu_put()?
+
+>  arch/x86/kvm/x86.c | 29 +++++++++++++++++++++--------
+>  1 file changed, 21 insertions(+), 8 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index 4116567f3d44..39b5dad2dd19 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -4310,12 +4310,6 @@ void kvm_arch_vcpu_put(struct kvm_vcpu *vcpu)
+>  
+>  	static_call(kvm_x86_vcpu_put)(vcpu);
+>  	vcpu->arch.last_host_tsc = rdtsc();
+> -	/*
+> -	 * If userspace has set any breakpoints or watchpoints, dr6 is restored
+> -	 * on every vmexit, but if not, we might have a stale dr6 from the
+> -	 * guest. do_debug expects dr6 to be cleared after it runs, do the same.
+> -	 */
+> -	set_debugreg(0, 6);
+>  }
+>  
+>  static int kvm_vcpu_ioctl_get_lapic(struct kvm_vcpu *vcpu,
+> @@ -9375,6 +9369,7 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
+>  	fastpath_t exit_fastpath;
+>  
+>  	bool req_immediate_exit = false;
+> +	bool reset_dr6 = false;
+>  
+>  	/* Forbid vmenter if vcpu dirty ring is soft-full */
+>  	if (unlikely(vcpu->kvm->dirty_ring_size &&
+> @@ -9601,6 +9596,7 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
+>  		set_debugreg(vcpu->arch.eff_db[3], 3);
+>  		set_debugreg(vcpu->arch.dr6, 6);
+
+Not directly related to this patch, but why does KVM_DEBUGREG_RELOAD exist?
+Commit ae561edeb421 ("KVM: x86: DR0-DR3 are not clear on reset") added it to
+ensure DR0-3 are fresh when they're modified through non-standard paths, but I
+don't see any reason why the new values _must_ be loaded into hardware.  eff_db
+needs to be updated, but I don't see why hardware DRs need to be updated unless
+hardware breakpoints are active or DR exiting is disabled, and in those cases
+updating hardware is handled by KVM_DEBUGREG_WONT_EXIT and KVM_DEBUGREG_BP_ENABLED.
+
+Am I missing something?
+
+>  		vcpu->arch.switch_db_regs &= ~KVM_DEBUGREG_RELOAD;
+> +		reset_dr6 = true;
+>  	} else if (unlikely(hw_breakpoint_active())) {
+>  		set_debugreg(0, 7);
+>  	}
+> @@ -9631,17 +9627,34 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
+>  		kvm_update_dr0123(vcpu);
+>  		kvm_update_dr7(vcpu);
+>  		vcpu->arch.switch_db_regs &= ~KVM_DEBUGREG_RELOAD;
+> +		reset_dr6 = true;
+>  	}
+>  
+>  	/*
+>  	 * If the guest has used debug registers, at least dr7
+>  	 * will be disabled while returning to the host.
+> +	 *
+> +	 * If we have active breakpoints in the host, restore the old state.
+> +	 *
+>  	 * If we don't have active breakpoints in the host, we don't
+> -	 * care about the messed up debug address registers. But if
+> -	 * we have some of them active, restore the old state.
+> +	 * care about the messed up debug address registers but dr6
+> +	 * which is expected to be cleared normally.  Otherwise we might
+> +	 * leak a stale dr6 from the guest and confuse the host since
+> +	 * neither the host reset dr6 on activating next breakpoints nor
+> +	 * the hardware clear it on dilivering #DB.  The Intel SDM says:
+> +	 *
+> +	 *   Certain debug exceptions may clear bits 0-3. The remaining
+> +	 *   contents of the DR6 register are never cleared by the
+> +	 *   processor. To avoid confusion in identifying debug
+> +	 *   exceptions, debug handlers should clear the register before
+> +	 *   returning to the interrupted task.
+> +	 *
+> +	 * Keep it simple and live up to expectations: clear DR6 immediately.
+>  	 */
+>  	if (hw_breakpoint_active())
+>  		hw_breakpoint_restore();
+> +	else if (unlikely(reset_dr6))
+> +		set_debugreg(DR6_RESERVED, 6);
+>  
+>  	vcpu->arch.last_vmentry_cpu = vcpu->cpu;
+>  	vcpu->arch.last_guest_tsc = kvm_read_l1_tsc(vcpu, rdtsc());
+> -- 
+> 2.19.1.6.gb485710b
+> 
