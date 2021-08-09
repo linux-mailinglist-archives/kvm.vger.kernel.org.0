@@ -2,51 +2,51 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B54D93E517D
-	for <lists+kvm@lfdr.de>; Tue, 10 Aug 2021 05:28:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6AFD53E517F
+	for <lists+kvm@lfdr.de>; Tue, 10 Aug 2021 05:28:18 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236692AbhHJD2a (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 9 Aug 2021 23:28:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52206 "EHLO
+        id S236715AbhHJD2i (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 9 Aug 2021 23:28:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52246 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236656AbhHJD23 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 9 Aug 2021 23:28:29 -0400
-Received: from mail-pl1-x630.google.com (mail-pl1-x630.google.com [IPv6:2607:f8b0:4864:20::630])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 39A6AC0613D3;
-        Mon,  9 Aug 2021 20:28:08 -0700 (PDT)
-Received: by mail-pl1-x630.google.com with SMTP id d1so19114680pll.1;
-        Mon, 09 Aug 2021 20:28:08 -0700 (PDT)
+        with ESMTP id S236700AbhHJD2h (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 9 Aug 2021 23:28:37 -0400
+Received: from mail-pl1-x62f.google.com (mail-pl1-x62f.google.com [IPv6:2607:f8b0:4864:20::62f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A48CCC0613D3;
+        Mon,  9 Aug 2021 20:28:15 -0700 (PDT)
+Received: by mail-pl1-x62f.google.com with SMTP id u16so19112137ple.2;
+        Mon, 09 Aug 2021 20:28:15 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=M/ed0gDaKV+4auNbc7EJdhjHTQcL9A5qPBDfLfsEH1s=;
-        b=BjdVyzF3VGwrkJN4df7DhbgvySjlcyUylGVAZWO7PqsKNCneDbmpU0vhMhWyMbPOBZ
-         MdgWVtV+PQPQEx07Yw4flE3hKSro1Ap7wzsKKjHeliXKH9n32VTvJeyZBTt3tvi7k9hs
-         sdKHMJGQ255ldC+fUSSoigXuVY1FNGM0EWgv4MGMHMzfX/kXf2nZtjX+Kjpp191wwshp
-         5m8+tA4u35SuXwBqlWaG5c9d38N+OXUr+6bj5DTLqO24f6mwaajSAV+gzF/cC8WxUKHi
-         evsyNVpZFxKB1/Xx6P7ALfDVHbNQC+AY4PvHS8uy2H9+xNEBZc/UQjUbD6seHvcwhzg4
-         XsHw==
+        bh=GhyeRU1OXy7cKuXtjm07ggDkCx++YUixjK+wm1BYxtg=;
+        b=YTeT2/nRmOJIcqGAZPjivRu5d9O6Abp+R6snyYaRaUn6iQajVd7LBFcDqNZeX+Uot3
+         ZwjnCaLmsBjicwIH9GQcAux1hRxrBtnZiOTmDUeoCnF2UaRCsbLkTIok0qv5hocPq696
+         JJxqqr32iObH3JZgT/xm403lupemcyR3V3njZbSAb2zcggf/UQK5ET/MmBpbbtaqmO5Y
+         ESenvqLzr7rcV1wQX+tdkFIfKaZgHnPOkQ9LBCY/v7aSLoLXkcOHSrRHtnFeLNzz+dBK
+         1RF6sfQ1n9jKzps/VyzSCKWssgkj1MYimKQN9WhU5oXu6Mlckkrrgw6sOCuuu0meU5vk
+         L/CA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=M/ed0gDaKV+4auNbc7EJdhjHTQcL9A5qPBDfLfsEH1s=;
-        b=nCop1JxwB0gp/WV6JRNSdXH2s3MNFHeY0u0+dUTmxV6MfpL6KD+DO/6l63LLMZWgE3
-         lor4SnYcGHIeu4h4F9+b/dJDjBt29/W+UZ3+vrl7eZOy3xAabIxBghh/vgxV9GoSlyX8
-         QnFZPxvHdiJhCf/wKGwAKRrDcpbYIGIzFhV5F1P3tr6/Mw+9Xb2XklohiC+YaKLg4P3r
-         rJMGtIq5MUEK/arjj0MKtBR/d/oGT32Cx/CS4LaeGBn+zkHwYplV71rPI1aFGQtOEBo2
-         0V6GhW5lyVWRROdOD6YdVsF96J2HabheJeVBLNhuswUtHM89jWGRCzAF04YgCKZbx7NH
-         2Nnw==
-X-Gm-Message-State: AOAM531dt27JRWe5eApycLWofeITPgLaHjXlzb7h6cGscFgTGqGJzisA
-        pIavyhHd4imeICKkyPruKeiPHKDlpjU=
-X-Google-Smtp-Source: ABdhPJzv6VJrv87qOl6QBbPi+/OtpoeMh8LN/1Mh6Vu107huljtA0JToLg2ZJWOzax2i5DM9J4DfXQ==
-X-Received: by 2002:a62:cdc8:0:b029:3c4:e67e:2c0b with SMTP id o191-20020a62cdc80000b02903c4e67e2c0bmr21214340pfg.65.1628566087521;
-        Mon, 09 Aug 2021 20:28:07 -0700 (PDT)
+        bh=GhyeRU1OXy7cKuXtjm07ggDkCx++YUixjK+wm1BYxtg=;
+        b=tphkx26EqpP26si4NUJXcs/9AgkctglWwo6zXeHjpBznYRI4nuhHmIJIp3cir5kamf
+         NfeKkrGkgufNm3crJA+mcU1+pLpEgtHihg8CKA3t9rrsgPKTLC2RZIfnmvsuUwYwNIFW
+         f+1C0bJD7O8b8/w17XMi5RiznT/WRJ225lURzCZasRGrKB8OHz5mqJNKCdCDUUmMCmkQ
+         11QO0073/v8uf2+jmZE/OHHmAx0AOfYVVNzz9Wi4HN6veKUzwpazL2B1JeEcegVfe/x1
+         +achLN//kJ0IlmBFOksXdsbaE33qOAI/ZE1AQaCyNU0UPRtSaqCKiykTY7rWEFJJkYGb
+         e7cg==
+X-Gm-Message-State: AOAM533Rfm+g9p4F+cebvZE5srp6IWgUNITQj8a77t6zRCyL2B1EQS8Q
+        PV9btQ4uVkNZsqVWJXodjV6zku4ZGjA=
+X-Google-Smtp-Source: ABdhPJyYuFcZoig3Du/aWKDunvDG7owKBuynuhdo/LwCuE/2olGjouDQtvcjtFSdOlkfmFvuncT3+w==
+X-Received: by 2002:a63:5b24:: with SMTP id p36mr375641pgb.91.1628566095155;
+        Mon, 09 Aug 2021 20:28:15 -0700 (PDT)
 Received: from localhost ([47.251.4.198])
-        by smtp.gmail.com with ESMTPSA id j6sm24587192pgq.0.2021.08.09.20.28.06
+        by smtp.gmail.com with ESMTPSA id i1sm971964pjs.31.2021.08.09.20.28.14
         (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 09 Aug 2021 20:28:07 -0700 (PDT)
+        Mon, 09 Aug 2021 20:28:14 -0700 (PDT)
 From:   Lai Jiangshan <jiangshanlai@gmail.com>
 To:     linux-kernel@vger.kernel.org
 Cc:     Lai Jiangshan <laijs@linux.alibaba.com>,
@@ -60,12 +60,13 @@ Cc:     Lai Jiangshan <laijs@linux.alibaba.com>,
         Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
         x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
         kvm@vger.kernel.org
-Subject: [PATCH V2 1/3] KVM: X86: Remove unneeded KVM_DEBUGREG_RELOAD
-Date:   Tue, 10 Aug 2021 01:43:05 +0800
-Message-Id: <20210809174307.145263-1-jiangshanlai@gmail.com>
+Subject: [PATCH V2 2/3] KVM: X86: Set the hardware DR6 only when KVM_DEBUGREG_WONT_EXIT
+Date:   Tue, 10 Aug 2021 01:43:06 +0800
+Message-Id: <20210809174307.145263-2-jiangshanlai@gmail.com>
 X-Mailer: git-send-email 2.19.1.6.gb485710b
-In-Reply-To: <YRFdq8sNuXYpgemU@google.com>
+In-Reply-To: <20210809174307.145263-1-jiangshanlai@gmail.com>
 References: <YRFdq8sNuXYpgemU@google.com>
+ <20210809174307.145263-1-jiangshanlai@gmail.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
@@ -74,63 +75,40 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Lai Jiangshan <laijs@linux.alibaba.com>
 
-Commit ae561edeb421 ("KVM: x86: DR0-DR3 are not clear on reset") added code to
-ensure eff_db are updated when they're modified through non-standard paths.
+Commit c77fb5fe6f03 ("KVM: x86: Allow the guest to run with dirty debug
+registers") allows the guest accessing to DRs without exiting when
+KVM_DEBUGREG_WONT_EXIT and we need to ensure that they are synchronized
+on entry to the guest---including DR6 that was not synced before the commit.
 
-But there is no reason to also update hardware DRs unless hardware breakpoints
-are active or DR exiting is disabled, and in those cases updating hardware is
-handled by KVM_DEBUGREG_WONT_EXIT and KVM_DEBUGREG_BP_ENABLED.
+But the commit sets the hardware DR6 not only when KVM_DEBUGREG_WONT_EXIT,
+but also when KVM_DEBUGREG_BP_ENABLED.  The second case is unnecessary
+and just leads to a more case which leaks stale DR6 to the host which has
+to be resolved by unconditionally reseting DR6 in kvm_arch_vcpu_put().
 
-KVM_DEBUGREG_RELOAD just causes unnecesarry load of hardware DRs and is better
-to be removed.
+We'd better to set the hardware DR6 only when KVM_DEBUGREG_WONT_EXIT,
+so that we can fine-grain control the cases when we need to reset it
+which is done in later patch.
 
-Suggested-by: Sean Christopherson <seanjc@google.com>
 Signed-off-by: Lai Jiangshan <laijs@linux.alibaba.com>
 ---
- arch/x86/include/asm/kvm_host.h | 1 -
- arch/x86/kvm/x86.c              | 3 ---
- 2 files changed, 4 deletions(-)
+ arch/x86/kvm/x86.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index 974cbfb1eefe..9623855a5838 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -522,7 +522,6 @@ struct kvm_pmu_ops;
- enum {
- 	KVM_DEBUGREG_BP_ENABLED = 1,
- 	KVM_DEBUGREG_WONT_EXIT = 2,
--	KVM_DEBUGREG_RELOAD = 4,
- };
- 
- struct kvm_mtrr_range {
 diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 4116567f3d44..ad47a09ce307 100644
+index ad47a09ce307..d2aa49722064 100644
 --- a/arch/x86/kvm/x86.c
 +++ b/arch/x86/kvm/x86.c
-@@ -1180,7 +1180,6 @@ static void kvm_update_dr0123(struct kvm_vcpu *vcpu)
- 	if (!(vcpu->guest_debug & KVM_GUESTDBG_USE_HW_BP)) {
- 		for (i = 0; i < KVM_NR_DB_REGS; i++)
- 			vcpu->arch.eff_db[i] = vcpu->arch.db[i];
--		vcpu->arch.switch_db_regs |= KVM_DEBUGREG_RELOAD;
- 	}
- }
- 
-@@ -9600,7 +9599,6 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
+@@ -9598,7 +9598,9 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
+ 		set_debugreg(vcpu->arch.eff_db[1], 1);
  		set_debugreg(vcpu->arch.eff_db[2], 2);
  		set_debugreg(vcpu->arch.eff_db[3], 3);
- 		set_debugreg(vcpu->arch.dr6, 6);
--		vcpu->arch.switch_db_regs &= ~KVM_DEBUGREG_RELOAD;
+-		set_debugreg(vcpu->arch.dr6, 6);
++		/* When KVM_DEBUGREG_WONT_EXIT, dr6 is accessible in guest. */
++		if (vcpu->arch.switch_db_regs & KVM_DEBUGREG_WONT_EXIT)
++			set_debugreg(vcpu->arch.dr6, 6);
  	} else if (unlikely(hw_breakpoint_active())) {
  		set_debugreg(0, 7);
  	}
-@@ -9630,7 +9628,6 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
- 		static_call(kvm_x86_sync_dirty_debug_regs)(vcpu);
- 		kvm_update_dr0123(vcpu);
- 		kvm_update_dr7(vcpu);
--		vcpu->arch.switch_db_regs &= ~KVM_DEBUGREG_RELOAD;
- 	}
- 
- 	/*
 -- 
 2.19.1.6.gb485710b
 
