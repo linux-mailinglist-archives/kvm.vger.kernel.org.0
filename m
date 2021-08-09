@@ -2,131 +2,71 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E19B13E43DE
-	for <lists+kvm@lfdr.de>; Mon,  9 Aug 2021 12:23:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 610263E4458
+	for <lists+kvm@lfdr.de>; Mon,  9 Aug 2021 13:01:34 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234737AbhHIKXu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 9 Aug 2021 06:23:50 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:24579 "EHLO
+        id S234930AbhHILBw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 9 Aug 2021 07:01:52 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:36580 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S234718AbhHIKXq (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 9 Aug 2021 06:23:46 -0400
+        by vger.kernel.org with ESMTP id S234354AbhHILBv (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 9 Aug 2021 07:01:51 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1628504606;
+        s=mimecast20190719; t=1628506890;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=lBMgmsHqw0YdLKVpdWLFV60bEE3X7POBff7kY81z7+0=;
-        b=HEhDKxW+uzM66vTqgVs2HRKwBi/9mc8NuxfefMQHS7QdDWhHFC1X9ZJXUiOyelx+coKUiT
-        8eArWu3fZ2KUI2JmjF3f5C8iYz8hkpqb9yvebSSPjArWgpD545E6PS1F0TQZvzRm12V+up
-        K1l4YOOLv0vVGO4p5MBYmWWUsR8KTCk=
-Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
- [209.85.208.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-407-DDP-F86JOFypUT-s2QDOmQ-1; Mon, 09 Aug 2021 06:23:25 -0400
-X-MC-Unique: DDP-F86JOFypUT-s2QDOmQ-1
-Received: by mail-ed1-f72.google.com with SMTP id j15-20020aa7c40f0000b02903be5fbe68a9so2023395edq.2
-        for <kvm@vger.kernel.org>; Mon, 09 Aug 2021 03:23:24 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:to:cc:references:from:subject:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=lBMgmsHqw0YdLKVpdWLFV60bEE3X7POBff7kY81z7+0=;
-        b=G0Buez3Ms5GGo5tROhPHrO8S3OogJfjA4DEcj19jKJ4g/+KCDNnHTQERO1+350ubGe
-         3J45S7yymTVYEGBcmKO8VWeVJSS6enJa5gfwn31dVTE1E6PjbUgxzBCFTa6XI62N8x+1
-         VIrD1AZ5VgPtdQBdI4l7efqjpiRDT4YKZn7ulImfCv7k3vXCnLxVhuA4GOr/TbFijf4h
-         vnh8ZrkfAyFdNOffNIvfkzfaMor+a5MhgY9ywPARCrDQBROGEQMzE6MYiPuMtzaAOyhC
-         +ztT73/XBBxNHtXKpAUMeBzQuO01gSyr8v1UI0Y4eOGR/NBKMpRpuH7z8FIK8yO8ilHc
-         oZIQ==
-X-Gm-Message-State: AOAM5327TJVyr33kEqrkyP/n9p/xjzbOMEojh6nBi3lALq6FQPFQtFMb
-        YN8lffCNHIyF9w5xbp212/VaN/9SH/7JWOWtTDf0qYHeCHHrtkeqjFpiSjAm+Hgd5GvnFO3xAO+
-        YHEoBJWUtPKyMvXbEJrEk9X9iucW1eJSpKm8w/kFHdU00KY/nIqA2aigrWH3qoG3k
-X-Received: by 2002:aa7:c647:: with SMTP id z7mr28762259edr.52.1628504603622;
-        Mon, 09 Aug 2021 03:23:23 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxu4/FLaxiABAh3xlH1zEltzZAqe/JpBP91yZt7peMzpTB2Jakv6WmDhskp7f5QhwHz26t4Ug==
-X-Received: by 2002:aa7:c647:: with SMTP id z7mr28762236edr.52.1628504603409;
-        Mon, 09 Aug 2021 03:23:23 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e? ([2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e])
-        by smtp.gmail.com with ESMTPSA id l9sm7953930edt.55.2021.08.09.03.23.22
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 09 Aug 2021 03:23:22 -0700 (PDT)
-To:     Joao Martins <joao.m.martins@oracle.com>,
-        Maxim Levitsky <mlevitsk@redhat.com>
-Cc:     stable@vger.kernel.org, David Matlack <dmatlack@google.com>,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-References: <20210805105423.412878-1-pbonzini@redhat.com>
- <4b530fb6-81cc-be36-aa68-92ec01c65775@oracle.com>
- <5f3c13be-f65d-1793-bd91-7491d3e149b0@redhat.com>
- <bab67d1c-f9b7-0a91-2d4f-9881e3f47218@oracle.com>
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=I4iw7fn0YB8IrJWVg7SMxyrXhBb76FvYytxPyMw8j2Y=;
+        b=Np+7H6ULMwIv+eIZCI9bQVX4t5PkCyConeyQuQwvNUvFg5qgmCzLxzoBU5FFsDrvkch4fe
+        ha2GA6ygKqlK0edfrhTlwnZ6/gDC0YMywJR64Qhsh+ZUbtTBJUHxzry7swkE3SSEhfqN8a
+        uUF2PRVPAK7SyAYH76SZIEaUqEGs8pw=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-323-0Oz19N7BN1-sp-Y4tGaTpg-1; Mon, 09 Aug 2021 07:01:29 -0400
+X-MC-Unique: 0Oz19N7BN1-sp-Y4tGaTpg-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6FBD71940940;
+        Mon,  9 Aug 2021 11:01:21 +0000 (UTC)
+Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 954C777302;
+        Mon,  9 Aug 2021 11:01:20 +0000 (UTC)
 From:   Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH] selftests: KVM: avoid failures due to reserved
- HyperTransport region
-Message-ID: <ac72b77c-f633-923b-8019-69347db706be@redhat.com>
-Date:   Mon, 9 Aug 2021 12:23:21 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.11.0
+To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Cc:     kernel test robot <lkp@intel.com>
+Subject: [PATCH] KVM: x86: remove dead initialization
+Date:   Mon,  9 Aug 2021 07:01:20 -0400
+Message-Id: <20210809110120.3237065-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <bab67d1c-f9b7-0a91-2d4f-9881e3f47218@oracle.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
 Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 09/08/21 12:00, Joao Martins wrote:
-> [0]https://developer.amd.com/wp-content/resources/56323-PUB_0.78.pdf
-> 
-> 1286 Spurious #GP May Occur When Hypervisor Running on
-> Another Hypervisor
-> 
-> Description
-> 
-> The processor may incorrectly generate a #GP fault if a hypervisor running on a hypervisor
-> attempts to access the following secure memory areas:
-> 
-> • The reserved memory address region starting at FFFD_0000_0000h and extending up to
-> FFFF_FFFF_FFFFh.
-> • ASEG and TSEG memory regions for SMM (System Management Mode)
-> • MMIO APIC Space
+hv_vcpu is initialized again a dozen lines below, so remove the
+initializer.
 
-This errata took a few months to debug so we're quite familiar with it 
-:) but I only knew about the ASEG/TSEG/APIC cases.
+Reported-by: kernel test robot <lkp@intel.com>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ arch/x86/kvm/hyperv.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-So this HyperTransport region is not related to this issue, but the 
-errata does point out that FFFD_0000_0000h and upwards is special in guests.
-
-The Xen folks also had to deal with it only a couple months ago 
-(https://yhbt.net/lore/all/1eb16baa-6b1b-3b18-c712-4459bd83e1aa@citrix.com/):
-
-   From "Open-Source Register Reference for AMD Family 17h Processors 
-(PUB)":
-   https://developer.amd.com/wp-content/resources/56255_3_03.PDF
-
-   "The processor defines a reserved memory address region starting at
-   FFFD_0000_0000h and extending up to FFFF_FFFF_FFFFh."
-
-   It's still doesn't say that it's at the top of physical address space
-   although I understand that's how it's now implemented. The official
-   document doesn't confirm it will move along with physical address space
-   extension.
-
-   [...]
-
-   1) On parts with <40 bits, its fully hidden from software
-   2) Before Fam17h, it was always 12G just below 1T, even if there was
-   more RAM above this location
-   3) On Fam17h and later, it is variable based on SME, and is either
-   just below 2^48 (no encryption) or 2^43 (encryption)
-
-> It's
-> interesting that fn8000_000A EDX[28] is part of the reserved bits from that CPUID leaf.
-
-It's only been defined after AMD deemed that the errata was not fixable 
-in current generation processors); it's X86_FEATURE_SVME_ADDR_CHK now.
-
-I'll update the patch based on the findings from the Xen team.
-
-Paolo
+diff --git a/arch/x86/kvm/hyperv.c b/arch/x86/kvm/hyperv.c
+index e9582db29a99..2da21e45da99 100644
+--- a/arch/x86/kvm/hyperv.c
++++ b/arch/x86/kvm/hyperv.c
+@@ -1968,7 +1968,7 @@ static u64 kvm_hv_send_ipi(struct kvm_vcpu *vcpu, struct kvm_hv_hcall *hc, bool
+ void kvm_hv_set_cpuid(struct kvm_vcpu *vcpu)
+ {
+ 	struct kvm_cpuid_entry2 *entry;
+-	struct kvm_vcpu_hv *hv_vcpu = to_hv_vcpu(vcpu);
++	struct kvm_vcpu_hv *hv_vcpu;
+ 
+ 	entry = kvm_find_cpuid_entry(vcpu, HYPERV_CPUID_INTERFACE, 0);
+ 	if (entry && entry->eax == HYPERV_CPUID_SIGNATURE_EAX) {
+-- 
+2.27.0
 
