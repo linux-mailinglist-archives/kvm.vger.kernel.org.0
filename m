@@ -2,175 +2,188 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9FDC03E423D
-	for <lists+kvm@lfdr.de>; Mon,  9 Aug 2021 11:14:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 367673E3DC0
+	for <lists+kvm@lfdr.de>; Mon,  9 Aug 2021 03:42:03 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234226AbhHIJOe (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 9 Aug 2021 05:14:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56970 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234085AbhHIJOb (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 9 Aug 2021 05:14:31 -0400
-Received: from mail-pl1-x62c.google.com (mail-pl1-x62c.google.com [IPv6:2607:f8b0:4864:20::62c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 83F22C0613CF;
-        Mon,  9 Aug 2021 02:14:11 -0700 (PDT)
-Received: by mail-pl1-x62c.google.com with SMTP id f3so5040926plg.3;
-        Mon, 09 Aug 2021 02:14:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=U9+lePBuSqGbHWb7b9q5oyrUY4RW0y6COAp8Vm5hWWA=;
-        b=o8UBzIGNDTZsevHxmWwA3WBb89p0jwDO1lHlqeiwBcM1ugNsdBGxf1RJWyLXCpFqjB
-         W5ln2eG/mRL+yPvSDn/tyw7U0KP6bevUxRsx4XFrXCzUnCYjN0IYdw151LVZ3VN5/XLK
-         6TiV9pcsVDUsWcSgfbWy2sqXaxKKEA4J4laKWS4mHIXXTNGOxAdazyoYGRAAL8N/sJW7
-         PG1gpCN41Tw+LwB+W2O0lUmBidnQHy1Ttu6gl6KpOR4Sj9rqvD/Far3kjXAxc6xY3mHr
-         Am+0+hG4CATnZro2xDA6EzOEj7ivV3sCSqVMG+ocm57I+6NBVrFbhdM/xK81p26Q257x
-         i6eA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=U9+lePBuSqGbHWb7b9q5oyrUY4RW0y6COAp8Vm5hWWA=;
-        b=RANLm9knY2h/ohzGKp8t9Y74GPHy7pgZYrchIC9ire7iuXEdrDZdxDJatp4F3katg/
-         9sQ/4nyPk147RKKSx+QjTD3Bdf9wqOpR7xbMSutZ/qRSH+/pVTf19LPFngejpP8vWv+p
-         hXjNpbXJ7O4ZRwvx6dJVOkPyLpOazB0Pv+zSoJb0+yAcSFZ98fZa0d27a1tRlARjrb4i
-         s9Mx702rBEGDZo+L2x/idNiMwNvS6FZLsc2h7XzeBN03priNTmvYp5iMe6Xr5J1JJp5A
-         B2WcqnjD/rszrIVaeQ736Bnr8bkyfeHAZQ7LiJKD1LbFuoWYEb8OKY2mPbgu4yL5/VPr
-         a8vA==
-X-Gm-Message-State: AOAM533DSvHu8CnhX0DddRFnNp8eaBNWatii1aFxWOWY7fvBRl9etVw1
-        0+u8dbgw45jkFT075nIFvlQDRFx1x/A=
-X-Google-Smtp-Source: ABdhPJwcZy4LkWv84hU5BIzfGMBWQfnbLuErD9eHQ/sOHXJ06SLTnvMKnw0MmM3oa8VJOCDTqTA7bQ==
-X-Received: by 2002:a05:6a00:188e:b029:3c3:1142:15f2 with SMTP id x14-20020a056a00188eb02903c3114215f2mr23050720pfh.36.1628500450924;
-        Mon, 09 Aug 2021 02:14:10 -0700 (PDT)
-Received: from localhost ([47.251.4.198])
-        by smtp.gmail.com with ESMTPSA id fa21sm1179426pjb.20.2021.08.09.02.14.09
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 09 Aug 2021 02:14:10 -0700 (PDT)
-From:   Lai Jiangshan <jiangshanlai@gmail.com>
-To:     linux-kernel@vger.kernel.org
-Cc:     Lai Jiangshan <laijs@linux.alibaba.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
+        id S232696AbhHIBmV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 8 Aug 2021 21:42:21 -0400
+Received: from mga12.intel.com ([192.55.52.136]:16048 "EHLO mga12.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S232678AbhHIBmU (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 8 Aug 2021 21:42:20 -0400
+X-IronPort-AV: E=McAfee;i="6200,9189,10070"; a="194200409"
+X-IronPort-AV: E=Sophos;i="5.84,305,1620716400"; 
+   d="scan'208";a="194200409"
+Received: from fmsmga006.fm.intel.com ([10.253.24.20])
+  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Aug 2021 18:41:59 -0700
+X-IronPort-AV: E=Sophos;i="5.84,305,1620716400"; 
+   d="scan'208";a="670624711"
+Received: from ctrondse-mobl.amr.corp.intel.com (HELO skuppusw-mobl5.amr.corp.intel.com) ([10.212.77.4])
+  by fmsmga006-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Aug 2021 18:41:57 -0700
+Subject: Re: [PATCH 00/11] Implement generic prot_guest_has() helper function
+To:     Tom Lendacky <thomas.lendacky@amd.com>,
+        linux-kernel@vger.kernel.org, x86@kernel.org,
+        linuxppc-dev@lists.ozlabs.org, linux-s390@vger.kernel.org,
+        iommu@lists.linux-foundation.org, kvm@vger.kernel.org,
+        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
+        linux-graphics-maintainer@vmware.com,
+        amd-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
+        kexec@lists.infradead.org, linux-fsdevel@vger.kernel.org
+Cc:     Borislav Petkov <bp@alien8.de>,
+        Brijesh Singh <brijesh.singh@amd.com>,
         Joerg Roedel <joro@8bytes.org>,
+        Andi Kleen <ak@linux.intel.com>,
+        Tianyu Lan <Tianyu.Lan@microsoft.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Ard Biesheuvel <ardb@kernel.org>, Baoquan He <bhe@redhat.com>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Dave Young <dyoung@redhat.com>,
+        David Airlie <airlied@linux.ie>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Ingo Molnar <mingo@redhat.com>,
+        Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
+        Maxime Ripard <mripard@kernel.org>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Paul Mackerras <paulus@samba.org>,
+        Peter Zijlstra <peterz@infradead.org>,
         Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
-        kvm@vger.kernel.org
-Subject: [PATCH] KVM: X86: Don't reset dr6 unconditionally when the vcpu being scheduled out
-Date:   Mon,  9 Aug 2021 07:29:19 +0800
-Message-Id: <20210808232919.862835-1-jiangshanlai@gmail.com>
-X-Mailer: git-send-email 2.19.1.6.gb485710b
+        Thomas Zimmermann <tzimmermann@suse.de>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Will Deacon <will@kernel.org>
+References: <cover.1627424773.git.thomas.lendacky@amd.com>
+From:   "Kuppuswamy, Sathyanarayanan" 
+        <sathyanarayanan.kuppuswamy@linux.intel.com>
+Message-ID: <0d75f283-50b7-460d-3165-185cb955bd70@linux.intel.com>
+Date:   Sun, 8 Aug 2021 18:41:54 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Firefox/78.0 Thunderbird/78.11.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <cover.1627424773.git.thomas.lendacky@amd.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Lai Jiangshan <laijs@linux.alibaba.com>
+Hi Tom,
 
-The commit efdab992813fb ("KVM: x86: fix escape of guest dr6 to the host")
-fixed a bug.  It did a great job and reset dr6 unconditionally when the
-vcpu being scheduled out since the linux kernel only activates breakpoints
-in rescheduling (perf events).
+On 7/27/21 3:26 PM, Tom Lendacky wrote:
+> This patch series provides a generic helper function, prot_guest_has(),
+> to replace the sme_active(), sev_active(), sev_es_active() and
+> mem_encrypt_active() functions.
+> 
+> It is expected that as new protected virtualization technologies are
+> added to the kernel, they can all be covered by a single function call
+> instead of a collection of specific function calls all called from the
+> same locations.
+> 
+> The powerpc and s390 patches have been compile tested only. Can the
+> folks copied on this series verify that nothing breaks for them.
 
-But writing to debug registers is slow, and it can be shown in perf results
-sometimes even neither the host nor the guest activate breakpoints.
+With this patch set, select ARCH_HAS_PROTECTED_GUEST and set
+CONFIG_AMD_MEM_ENCRYPT=n, creates following error.
 
-It'd be better to reset it conditionally and this patch moves the code of
-reseting dr6 to the path of VM-exit where we can check the related
-conditions.  And the comment is also updated.
+ld: arch/x86/mm/ioremap.o: in function `early_memremap_is_setup_data':
+arch/x86/mm/ioremap.c:672: undefined reference to `early_memremap_decrypted'
 
-Signed-off-by: Lai Jiangshan <laijs@linux.alibaba.com>
----
-And even in the future, the linux kernel might activate breakpoint
-in interrupts (rather than in rescheduling only),  the host would
-not be confused by the stale dr6 after this patch.  The possible future
-author who would implement it wouldn't need to care about how the kvm
-mananges debug registers since it sticks to the host's expectations.
+It looks like early_memremap_is_setup_data() is not protected with
+appropriate config.
 
-Another solution is changing breakpoint.c and make the linux kernel
-always reset dr6 in activating breakpoints.  So that dr6 is allowed
-to be stale when host breakpoints is not enabled and we don't need
-to reset dr6 in this case. But it would be no harm to reset it even in
-both places and killing stale states is good in programing.
 
- arch/x86/kvm/x86.c | 29 +++++++++++++++++++++--------
- 1 file changed, 21 insertions(+), 8 deletions(-)
+> 
+> Cc: Andi Kleen <ak@linux.intel.com>
+> Cc: Andy Lutomirski <luto@kernel.org>
+> Cc: Ard Biesheuvel <ardb@kernel.org>
+> Cc: Baoquan He <bhe@redhat.com>
+> Cc: Benjamin Herrenschmidt <benh@kernel.crashing.org>
+> Cc: Borislav Petkov <bp@alien8.de>
+> Cc: Christian Borntraeger <borntraeger@de.ibm.com>
+> Cc: Daniel Vetter <daniel@ffwll.ch>
+> Cc: Dave Hansen <dave.hansen@linux.intel.com>
+> Cc: Dave Young <dyoung@redhat.com>
+> Cc: David Airlie <airlied@linux.ie>
+> Cc: Heiko Carstens <hca@linux.ibm.com>
+> Cc: Ingo Molnar <mingo@redhat.com>
+> Cc: Joerg Roedel <joro@8bytes.org>
+> Cc: Maarten Lankhorst <maarten.lankhorst@linux.intel.com>
+> Cc: Maxime Ripard <mripard@kernel.org>
+> Cc: Michael Ellerman <mpe@ellerman.id.au>
+> Cc: Paul Mackerras <paulus@samba.org>
+> Cc: Peter Zijlstra <peterz@infradead.org>
+> Cc: Thomas Gleixner <tglx@linutronix.de>
+> Cc: Thomas Zimmermann <tzimmermann@suse.de>
+> Cc: Vasily Gorbik <gor@linux.ibm.com>
+> Cc: VMware Graphics <linux-graphics-maintainer@vmware.com>
+> Cc: Will Deacon <will@kernel.org>
+> 
+> ---
+> 
+> Patches based on:
+>    https://git.kernel.org/pub/scm/linux/kernel/git/tip/tip.git master
+>    commit 79e920060fa7 ("Merge branch 'WIP/fixes'")
+> 
+> Tom Lendacky (11):
+>    mm: Introduce a function to check for virtualization protection
+>      features
+>    x86/sev: Add an x86 version of prot_guest_has()
+>    powerpc/pseries/svm: Add a powerpc version of prot_guest_has()
+>    x86/sme: Replace occurrences of sme_active() with prot_guest_has()
+>    x86/sev: Replace occurrences of sev_active() with prot_guest_has()
+>    x86/sev: Replace occurrences of sev_es_active() with prot_guest_has()
+>    treewide: Replace the use of mem_encrypt_active() with
+>      prot_guest_has()
+>    mm: Remove the now unused mem_encrypt_active() function
+>    x86/sev: Remove the now unused mem_encrypt_active() function
+>    powerpc/pseries/svm: Remove the now unused mem_encrypt_active()
+>      function
+>    s390/mm: Remove the now unused mem_encrypt_active() function
+> 
+>   arch/Kconfig                               |  3 ++
+>   arch/powerpc/include/asm/mem_encrypt.h     |  5 --
+>   arch/powerpc/include/asm/protected_guest.h | 30 +++++++++++
+>   arch/powerpc/platforms/pseries/Kconfig     |  1 +
+>   arch/s390/include/asm/mem_encrypt.h        |  2 -
+>   arch/x86/Kconfig                           |  1 +
+>   arch/x86/include/asm/kexec.h               |  2 +-
+>   arch/x86/include/asm/mem_encrypt.h         | 13 +----
+>   arch/x86/include/asm/protected_guest.h     | 27 ++++++++++
+>   arch/x86/kernel/crash_dump_64.c            |  4 +-
+>   arch/x86/kernel/head64.c                   |  4 +-
+>   arch/x86/kernel/kvm.c                      |  3 +-
+>   arch/x86/kernel/kvmclock.c                 |  4 +-
+>   arch/x86/kernel/machine_kexec_64.c         | 19 +++----
+>   arch/x86/kernel/pci-swiotlb.c              |  9 ++--
+>   arch/x86/kernel/relocate_kernel_64.S       |  2 +-
+>   arch/x86/kernel/sev.c                      |  6 +--
+>   arch/x86/kvm/svm/svm.c                     |  3 +-
+>   arch/x86/mm/ioremap.c                      | 16 +++---
+>   arch/x86/mm/mem_encrypt.c                  | 60 +++++++++++++++-------
+>   arch/x86/mm/mem_encrypt_identity.c         |  3 +-
+>   arch/x86/mm/pat/set_memory.c               |  3 +-
+>   arch/x86/platform/efi/efi_64.c             |  9 ++--
+>   arch/x86/realmode/init.c                   |  8 +--
+>   drivers/gpu/drm/amd/amdgpu/amdgpu_drv.c    |  4 +-
+>   drivers/gpu/drm/drm_cache.c                |  4 +-
+>   drivers/gpu/drm/vmwgfx/vmwgfx_drv.c        |  4 +-
+>   drivers/gpu/drm/vmwgfx/vmwgfx_msg.c        |  6 +--
+>   drivers/iommu/amd/init.c                   |  7 +--
+>   drivers/iommu/amd/iommu.c                  |  3 +-
+>   drivers/iommu/amd/iommu_v2.c               |  3 +-
+>   drivers/iommu/iommu.c                      |  3 +-
+>   fs/proc/vmcore.c                           |  6 +--
+>   include/linux/mem_encrypt.h                |  4 --
+>   include/linux/protected_guest.h            | 37 +++++++++++++
+>   kernel/dma/swiotlb.c                       |  4 +-
+>   36 files changed, 218 insertions(+), 104 deletions(-)
+>   create mode 100644 arch/powerpc/include/asm/protected_guest.h
+>   create mode 100644 arch/x86/include/asm/protected_guest.h
+>   create mode 100644 include/linux/protected_guest.h
+> 
 
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 4116567f3d44..39b5dad2dd19 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -4310,12 +4310,6 @@ void kvm_arch_vcpu_put(struct kvm_vcpu *vcpu)
- 
- 	static_call(kvm_x86_vcpu_put)(vcpu);
- 	vcpu->arch.last_host_tsc = rdtsc();
--	/*
--	 * If userspace has set any breakpoints or watchpoints, dr6 is restored
--	 * on every vmexit, but if not, we might have a stale dr6 from the
--	 * guest. do_debug expects dr6 to be cleared after it runs, do the same.
--	 */
--	set_debugreg(0, 6);
- }
- 
- static int kvm_vcpu_ioctl_get_lapic(struct kvm_vcpu *vcpu,
-@@ -9375,6 +9369,7 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
- 	fastpath_t exit_fastpath;
- 
- 	bool req_immediate_exit = false;
-+	bool reset_dr6 = false;
- 
- 	/* Forbid vmenter if vcpu dirty ring is soft-full */
- 	if (unlikely(vcpu->kvm->dirty_ring_size &&
-@@ -9601,6 +9596,7 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
- 		set_debugreg(vcpu->arch.eff_db[3], 3);
- 		set_debugreg(vcpu->arch.dr6, 6);
- 		vcpu->arch.switch_db_regs &= ~KVM_DEBUGREG_RELOAD;
-+		reset_dr6 = true;
- 	} else if (unlikely(hw_breakpoint_active())) {
- 		set_debugreg(0, 7);
- 	}
-@@ -9631,17 +9627,34 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
- 		kvm_update_dr0123(vcpu);
- 		kvm_update_dr7(vcpu);
- 		vcpu->arch.switch_db_regs &= ~KVM_DEBUGREG_RELOAD;
-+		reset_dr6 = true;
- 	}
- 
- 	/*
- 	 * If the guest has used debug registers, at least dr7
- 	 * will be disabled while returning to the host.
-+	 *
-+	 * If we have active breakpoints in the host, restore the old state.
-+	 *
- 	 * If we don't have active breakpoints in the host, we don't
--	 * care about the messed up debug address registers. But if
--	 * we have some of them active, restore the old state.
-+	 * care about the messed up debug address registers but dr6
-+	 * which is expected to be cleared normally.  Otherwise we might
-+	 * leak a stale dr6 from the guest and confuse the host since
-+	 * neither the host reset dr6 on activating next breakpoints nor
-+	 * the hardware clear it on dilivering #DB.  The Intel SDM says:
-+	 *
-+	 *   Certain debug exceptions may clear bits 0-3. The remaining
-+	 *   contents of the DR6 register are never cleared by the
-+	 *   processor. To avoid confusion in identifying debug
-+	 *   exceptions, debug handlers should clear the register before
-+	 *   returning to the interrupted task.
-+	 *
-+	 * Keep it simple and live up to expectations: clear DR6 immediately.
- 	 */
- 	if (hw_breakpoint_active())
- 		hw_breakpoint_restore();
-+	else if (unlikely(reset_dr6))
-+		set_debugreg(DR6_RESERVED, 6);
- 
- 	vcpu->arch.last_vmentry_cpu = vcpu->cpu;
- 	vcpu->arch.last_guest_tsc = kvm_read_l1_tsc(vcpu, rdtsc());
 -- 
-2.19.1.6.gb485710b
-
+Sathyanarayanan Kuppuswamy
+Linux Kernel Developer
