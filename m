@@ -2,129 +2,84 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B5D3F3E84D3
-	for <lists+kvm@lfdr.de>; Tue, 10 Aug 2021 22:54:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9D9BF3E84D0
+	for <lists+kvm@lfdr.de>; Tue, 10 Aug 2021 22:54:43 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234621AbhHJUzA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 10 Aug 2021 16:55:00 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:22719 "EHLO
+        id S234845AbhHJUy6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 10 Aug 2021 16:54:58 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:25207 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S234415AbhHJUyj (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 10 Aug 2021 16:54:39 -0400
+        by vger.kernel.org with ESMTP id S234787AbhHJUyq (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 10 Aug 2021 16:54:46 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1628628856;
+        s=mimecast20190719; t=1628628863;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=ijwNNEcllK+t5cc2Umz3Vv9vhvGF8MBG5A38UzmKycw=;
-        b=dJJ6QlNkWSgA+qIj9eiCpMj2JrzkljRgnHCE0DuSXdOUTBH444CUQeVx0Kka+Cl3uSfhBA
-        6kRP+yor/RdQBy0UGmf7KwkcXF9j+hxkKrhfPyTzZHOrOYecOPLZ5ZaB31CwsfzHpToB+b
-        W1sDgrs+vr6Q1LItR7t+fLJ643ahowk=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-469-Ck3ZU83qMl6GbxPIv768Nw-1; Tue, 10 Aug 2021 16:54:15 -0400
-X-MC-Unique: Ck3ZU83qMl6GbxPIv768Nw-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id F078B3E745;
-        Tue, 10 Aug 2021 20:54:13 +0000 (UTC)
-Received: from localhost.localdomain (unknown [10.35.206.50])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 1E4C9421F;
-        Tue, 10 Aug 2021 20:54:06 +0000 (UTC)
-From:   Maxim Levitsky <mlevitsk@redhat.com>
-To:     kvm@vger.kernel.org
-Cc:     Jim Mattson <jmattson@google.com>, linux-kernel@vger.kernel.org,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Borislav Petkov <bp@alien8.de>, Joerg Roedel <joro@8bytes.org>,
-        Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        x86@kernel.org (maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)),
-        Maxim Levitsky <mlevitsk@redhat.com>
-Subject: [PATCH v4 16/16] KVM: SVM: AVIC: drop unsupported AVIC base relocation code
-Date:   Tue, 10 Aug 2021 23:52:51 +0300
-Message-Id: <20210810205251.424103-17-mlevitsk@redhat.com>
-In-Reply-To: <20210810205251.424103-1-mlevitsk@redhat.com>
-References: <20210810205251.424103-1-mlevitsk@redhat.com>
+        bh=PquKaDcRR+YnvRs9ZlK0t/qXSTbz8AOV/mTyg3IQF/A=;
+        b=Qmzhs+g9Hy8Hg0iEUVDqquZC3SLG9Mz3+6z/XzUTpp0NOOjDAEgFm2NWhtiXmHj+X/5TMq
+        jNPQCPWQVke6NUGhj5NXp/Tye5VldjXKh50bavXoMtOmICA55g4iQVNgtnUyXYLw93PwEZ
+        uSE5TPPG58BYtVLB9WifFRq//PB0/GI=
+Received: from mail-qt1-f200.google.com (mail-qt1-f200.google.com
+ [209.85.160.200]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-153-lgDENOgcMzO5iB9mJhxpkA-1; Tue, 10 Aug 2021 16:54:21 -0400
+X-MC-Unique: lgDENOgcMzO5iB9mJhxpkA-1
+Received: by mail-qt1-f200.google.com with SMTP id m8-20020a05622a0548b029028e6910f18aso155348qtx.4
+        for <kvm@vger.kernel.org>; Tue, 10 Aug 2021 13:54:21 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=PquKaDcRR+YnvRs9ZlK0t/qXSTbz8AOV/mTyg3IQF/A=;
+        b=oGKzOSuTb08exr4wTm4VawzEC8YsDqWG7BvbpGBk0Tm1Rgbu4QRSTjGeuAyKHblQ5V
+         x16PAX/Bz0pc1qd0+JPECCa5rFeYpk+p+Y+w2a8P2W7nQeW16G33GK3rQ6N2Rk8vu2eB
+         5B+pFFrcXHic32lEhstXlNwrFmEUbo4M5erjXqC8rWTJpPdqI54iC6qEuZAi3Dypuywo
+         QkiQjV/rHv34QB3gyFj+jCADrM+H9TbA/RqBAhvzp1EtEF0tishjR2nECxd31GIu0lT6
+         rX//KYqMQTqKyraB1W/b+3K66sF20zTY5fPHSwOOhcRuiptsr1WDBTrT430nu5kwFKIv
+         JbTA==
+X-Gm-Message-State: AOAM532AEHx5c5TQV7HmGK96b1EVjJfd/UXGq8DW3TMMGQ6WsM7QSk1r
+        wALavydChOvEhu2oV8sywePdhh/N6z6dcW21BJwyg/4fRPoxRbsx7e1KEWDbzDrhADpJjuG1Y+9
+        OqraNQLKAvnu+
+X-Received: by 2002:ad4:4087:: with SMTP id l7mr19752203qvp.37.1628628861321;
+        Tue, 10 Aug 2021 13:54:21 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzlooYZ0bGnYWz+gubLVP7tQocXuPUGfuPLGffaVUsAiveZD1nvQNJY3yVfdejJ0U+6prnPBg==
+X-Received: by 2002:ad4:4087:: with SMTP id l7mr19752183qvp.37.1628628861100;
+        Tue, 10 Aug 2021 13:54:21 -0700 (PDT)
+Received: from t490s (bras-base-toroon474qw-grc-92-76-70-75-133.dsl.bell.ca. [76.70.75.133])
+        by smtp.gmail.com with ESMTPSA id m197sm11541159qke.54.2021.08.10.13.54.19
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 10 Aug 2021 13:54:20 -0700 (PDT)
+Date:   Tue, 10 Aug 2021 16:54:19 -0400
+From:   Peter Xu <peterx@redhat.com>
+To:     Alex Williamson <alex.williamson@redhat.com>
+Cc:     Jason Gunthorpe <jgg@nvidia.com>, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org
+Subject: Re: [PATCH 7/7] vfio/pci: Remove map-on-fault behavior
+Message-ID: <YRLne7/S1euppJQr@t490s>
+References: <162818167535.1511194.6614962507750594786.stgit@omen>
+ <162818330190.1511194.10498114924408843888.stgit@omen>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <162818330190.1511194.10498114924408843888.stgit@omen>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-APIC base relocation is not supported anyway and won't work
-correctly so just drop the code that handles it and keep AVIC
-MMIO bar at the default APIC base.
+On Thu, Aug 05, 2021 at 11:08:21AM -0600, Alex Williamson wrote:
+> diff --git a/drivers/vfio/pci/vfio_pci_private.h b/drivers/vfio/pci/vfio_pci_private.h
+> index 0aa542fa1e26..9aedb78a4ae3 100644
+> --- a/drivers/vfio/pci/vfio_pci_private.h
+> +++ b/drivers/vfio/pci/vfio_pci_private.h
+> @@ -128,6 +128,7 @@ struct vfio_pci_device {
+>  	bool			needs_reset;
+>  	bool			nointx;
+>  	bool			needs_pm_restore;
+> +	bool			zapped_bars;
 
-Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
----
- arch/x86/kvm/svm/avic.c | 2 ++
- arch/x86/kvm/svm/svm.c  | 7 -------
- arch/x86/kvm/svm/svm.h  | 6 ------
- 3 files changed, 2 insertions(+), 13 deletions(-)
+Would it be nicer to invert the meaning of "zapped_bars" and rename it to
+"memory_enabled"?  Thanks,
 
-diff --git a/arch/x86/kvm/svm/avic.c b/arch/x86/kvm/svm/avic.c
-index 01c0e83e1b71..8052d92069e0 100644
---- a/arch/x86/kvm/svm/avic.c
-+++ b/arch/x86/kvm/svm/avic.c
-@@ -197,6 +197,8 @@ void avic_init_vmcb(struct vcpu_svm *svm)
- 	vmcb->control.avic_logical_id = lpa & AVIC_HPA_MASK;
- 	vmcb->control.avic_physical_id = ppa & AVIC_HPA_MASK;
- 	vmcb->control.avic_physical_id |= AVIC_MAX_PHYSICAL_ID_COUNT;
-+	vmcb->control.avic_vapic_bar = APIC_DEFAULT_PHYS_BASE & VMCB_AVIC_APIC_BAR_MASK;
-+
- 	if (kvm_apicv_activated(svm->vcpu.kvm))
- 		vmcb->control.int_ctl |= AVIC_ENABLE_MASK;
- 	else
-diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index 700bc188a650..160b10ca4f62 100644
---- a/arch/x86/kvm/svm/svm.c
-+++ b/arch/x86/kvm/svm/svm.c
-@@ -1316,9 +1316,6 @@ static void svm_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event)
- 	svm->virt_spec_ctrl = 0;
- 
- 	init_vmcb(vcpu);
--
--	if (kvm_vcpu_apicv_active(vcpu) && !init_event)
--		avic_update_vapic_bar(svm, APIC_DEFAULT_PHYS_BASE);
- }
- 
- void svm_switch_vmcb(struct vcpu_svm *svm, struct kvm_vmcb_info *target_vmcb)
-@@ -2969,10 +2966,6 @@ static int svm_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr)
- 		svm->msr_decfg = data;
- 		break;
- 	}
--	case MSR_IA32_APICBASE:
--		if (kvm_vcpu_apicv_active(vcpu))
--			avic_update_vapic_bar(to_svm(vcpu), data);
--		fallthrough;
- 	default:
- 		return kvm_set_msr_common(vcpu, msr);
- 	}
-diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
-index aae851762b59..524d943f3efc 100644
---- a/arch/x86/kvm/svm/svm.h
-+++ b/arch/x86/kvm/svm/svm.h
-@@ -503,12 +503,6 @@ extern struct kvm_x86_nested_ops svm_nested_ops;
- 
- #define VMCB_AVIC_APIC_BAR_MASK		0xFFFFFFFFFF000ULL
- 
--static inline void avic_update_vapic_bar(struct vcpu_svm *svm, u64 data)
--{
--	svm->vmcb->control.avic_vapic_bar = data & VMCB_AVIC_APIC_BAR_MASK;
--	vmcb_mark_dirty(svm->vmcb, VMCB_AVIC);
--}
--
- static inline bool avic_vcpu_is_running(struct kvm_vcpu *vcpu)
- {
- 	struct vcpu_svm *svm = to_svm(vcpu);
 -- 
-2.26.3
+Peter Xu
 
