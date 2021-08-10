@@ -2,27 +2,27 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3C31A3E571E
-	for <lists+kvm@lfdr.de>; Tue, 10 Aug 2021 11:36:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C7FE53E5729
+	for <lists+kvm@lfdr.de>; Tue, 10 Aug 2021 11:38:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239194AbhHJJgQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 10 Aug 2021 05:36:16 -0400
-Received: from mail.kernel.org ([198.145.29.99]:35320 "EHLO mail.kernel.org"
+        id S239218AbhHJJif (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 10 Aug 2021 05:38:35 -0400
+Received: from mail.kernel.org ([198.145.29.99]:36752 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S239183AbhHJJgO (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 10 Aug 2021 05:36:14 -0400
+        id S237707AbhHJJie (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 10 Aug 2021 05:38:34 -0400
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 2D5EA6101E;
-        Tue, 10 Aug 2021 09:35:53 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 9818561078;
+        Tue, 10 Aug 2021 09:38:12 +0000 (UTC)
 Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
         by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
         (Exim 4.94.2)
         (envelope-from <maz@kernel.org>)
-        id 1mDOAp-0041Qv-6G; Tue, 10 Aug 2021 10:35:51 +0100
-Date:   Tue, 10 Aug 2021 10:35:50 +0100
-Message-ID: <87czqlbq15.wl-maz@kernel.org>
+        id 1mDOD4-0041Tz-KE; Tue, 10 Aug 2021 10:38:10 +0100
+Date:   Tue, 10 Aug 2021 10:38:10 +0100
+Message-ID: <87bl65bpx9.wl-maz@kernel.org>
 From:   Marc Zyngier <maz@kernel.org>
 To:     Oliver Upton <oupton@google.com>
 Cc:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
@@ -41,10 +41,10 @@ Cc:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
         Andrew Jones <drjones@redhat.com>,
         Will Deacon <will@kernel.org>,
         Catalin Marinas <catalin.marinas@arm.com>
-Subject: Re: [PATCH v6 13/21] KVM: arm64: Allow userspace to configure a vCPU's virtual offset
-In-Reply-To: <20210804085819.846610-14-oupton@google.com>
+Subject: Re: [PATCH v6 16/21] arm64: cpufeature: Enumerate support for Enhanced Counter Virtualization
+In-Reply-To: <20210804085819.846610-17-oupton@google.com>
 References: <20210804085819.846610-1-oupton@google.com>
-        <20210804085819.846610-14-oupton@google.com>
+        <20210804085819.846610-17-oupton@google.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
  (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -58,67 +58,68 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 04 Aug 2021 09:58:11 +0100,
+On Wed, 04 Aug 2021 09:58:14 +0100,
 Oliver Upton <oupton@google.com> wrote:
 > 
-> Allow userspace to access the guest's virtual counter-timer offset
-> through the ONE_REG interface. The value read or written is defined to
-> be an offset from the guest's physical counter-timer. Add some
-> documentation to clarify how a VMM should use this and the existing
-> CNTVCT_EL0.
+> Introduce a new cpucap to indicate if the system supports full enhanced
+> counter virtualization (i.e. ID_AA64MMFR0_EL1.ECV==0x2).
 > 
 > Signed-off-by: Oliver Upton <oupton@google.com>
 > ---
->  Documentation/virt/kvm/api.rst    | 10 ++++++++++
->  arch/arm64/include/uapi/asm/kvm.h |  1 +
->  arch/arm64/kvm/arch_timer.c       | 11 +++++++++++
->  arch/arm64/kvm/guest.c            |  6 +++++-
->  include/kvm/arm_arch_timer.h      |  1 +
->  5 files changed, 28 insertions(+), 1 deletion(-)
+>  arch/arm64/include/asm/sysreg.h |  2 ++
+>  arch/arm64/kernel/cpufeature.c  | 10 ++++++++++
+>  arch/arm64/tools/cpucaps        |  1 +
+>  3 files changed, 13 insertions(+)
 > 
-> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-> index 8d4a3471ad9e..28a65dc89985 100644
-> --- a/Documentation/virt/kvm/api.rst
-> +++ b/Documentation/virt/kvm/api.rst
-> @@ -2487,6 +2487,16 @@ arm64 system registers have the following id bit patterns::
->       derived from the register encoding for CNTV_CVAL_EL0.  As this is
->       API, it must remain this way.
+> diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
+> index 7b9c3acba684..4dfc44066dfb 100644
+> --- a/arch/arm64/include/asm/sysreg.h
+> +++ b/arch/arm64/include/asm/sysreg.h
+> @@ -847,6 +847,8 @@
+>  #define ID_AA64MMFR0_ASID_SHIFT		4
+>  #define ID_AA64MMFR0_PARANGE_SHIFT	0
 >  
-> +.. warning::
-> +
-> +     The value of KVM_REG_ARM_TIMER_OFFSET is defined as an offset from
-> +     the guest's view of the physical counter-timer.
-> +
-> +     Userspace should use either KVM_REG_ARM_TIMER_OFFSET or
-> +     KVM_REG_ARM_TIMER_CVAL to pause and resume a guest's virtual
-
-You probably mean KVM_REG_ARM_TIMER_CNT here, despite the broken
-encoding.
-
-> +     counter-timer. Mixed use of these registers could result in an
-> +     unpredictable guest counter value.
-> +
->  arm64 firmware pseudo-registers have the following bit pattern::
+> +#define ID_AA64MMFR0_ECV_VIRT		0x1
+> +#define ID_AA64MMFR0_ECV_PHYS		0x2
+>  #define ID_AA64MMFR0_TGRAN4_NI		0xf
+>  #define ID_AA64MMFR0_TGRAN4_SUPPORTED	0x0
+>  #define ID_AA64MMFR0_TGRAN64_NI		0xf
+> diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
+> index 0ead8bfedf20..94c349e179d3 100644
+> --- a/arch/arm64/kernel/cpufeature.c
+> +++ b/arch/arm64/kernel/cpufeature.c
+> @@ -2301,6 +2301,16 @@ static const struct arm64_cpu_capabilities arm64_features[] = {
+>  		.matches = has_cpuid_feature,
+>  		.min_field_value = 1,
+>  	},
+> +	{
+> +		.desc = "Enhanced Counter Virtualization (Physical)",
+> +		.capability = ARM64_ECV,
+> +		.type = ARM64_CPUCAP_SYSTEM_FEATURE,
+> +		.sys_reg = SYS_ID_AA64MMFR0_EL1,
+> +		.sign = FTR_UNSIGNED,
+> +		.field_pos = ID_AA64MMFR0_ECV_SHIFT,
+> +		.matches = has_cpuid_feature,
+> +		.min_field_value = ID_AA64MMFR0_ECV_PHYS,
+> +	},
+>  	{},
+>  };
 >  
->    0x6030 0000 0014 <regno:16>
-> diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
-> index b3edde68bc3e..949a31bc10f0 100644
-> --- a/arch/arm64/include/uapi/asm/kvm.h
-> +++ b/arch/arm64/include/uapi/asm/kvm.h
-> @@ -255,6 +255,7 @@ struct kvm_arm_copy_mte_tags {
->  #define KVM_REG_ARM_TIMER_CTL		ARM64_SYS_REG(3, 3, 14, 3, 1)
->  #define KVM_REG_ARM_TIMER_CVAL		ARM64_SYS_REG(3, 3, 14, 0, 2)
->  #define KVM_REG_ARM_TIMER_CNT		ARM64_SYS_REG(3, 3, 14, 3, 2)
-> +#define KVM_REG_ARM_TIMER_OFFSET	ARM64_SYS_REG(3, 4, 14, 0, 3)
+> diff --git a/arch/arm64/tools/cpucaps b/arch/arm64/tools/cpucaps
+> index 49305c2e6dfd..d819ea614da5 100644
+> --- a/arch/arm64/tools/cpucaps
+> +++ b/arch/arm64/tools/cpucaps
+> @@ -3,6 +3,7 @@
+>  # Internal CPU capabilities constants, keep this list sorted
+>  
+>  BTI
+> +ECV
+>  # Unreliable: use system_supports_32bit_el0() instead.
+>  HAS_32BIT_EL0_DO_NOT_USE
+>  HAS_32BIT_EL1
 
-I don't think we can use the encoding for CNTPOFF_EL2 here, as it will
-eventually clash with a NV guest using the same feature for its own
-purpose. We don't want this offset to overlap with any of the existing
-features.
-
-I actually liked your previous proposal of controlling the physical
-offset via a device property, as it clearly indicated that you were
-dealing with non-architectural state.
+As discussed in another context, we probably want both ECV and ECV2 to
+distinguish the two feature sets that ECV has so far.
 
 Thanks,
 
