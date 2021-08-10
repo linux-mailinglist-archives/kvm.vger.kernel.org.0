@@ -2,90 +2,100 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E7CE43E568D
-	for <lists+kvm@lfdr.de>; Tue, 10 Aug 2021 11:16:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EF73C3E56BC
+	for <lists+kvm@lfdr.de>; Tue, 10 Aug 2021 11:24:03 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238788AbhHJJRF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 10 Aug 2021 05:17:05 -0400
-Received: from mail.skyhub.de ([5.9.137.197]:51294 "EHLO mail.skyhub.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S238777AbhHJJQ7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 10 Aug 2021 05:16:59 -0400
-Received: from zn.tnic (p200300ec2f0d65002f77173b43e63b63.dip0.t-ipconnect.de [IPv6:2003:ec:2f0d:6500:2f77:173b:43e6:3b63])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 32D221EC01B7;
-        Tue, 10 Aug 2021 11:16:28 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
-        t=1628586988;
+        id S238977AbhHJJYW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 10 Aug 2021 05:24:22 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:42844 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S238936AbhHJJYQ (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 10 Aug 2021 05:24:16 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1628587433;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
-        bh=7e+HGcOHJ96LFGWVJDME/h9ZcJWYWo7cdlDC8qUJl3Y=;
-        b=Hyiz6S9AveiAXpd7wTU8ZQM3+2JzRq/DaHuPlGM6Ou7O3jgv8sL12UwwrJ4VIDwUeR4O4e
-        8rTFGfeQxlxvrrg48r/pEYoZKC6y5SNfI3wKzdZhG+F/3Q644VAtkWyXNFnTR31GmiYIKZ
-        EGsiOkk1vDviIZy1rZDkLdz0L+2ypxY=
-Date:   Tue, 10 Aug 2021 11:17:07 +0200
-From:   Borislav Petkov <bp@alien8.de>
-To:     Brijesh Singh <brijesh.singh@amd.com>
-Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
-        linux-coco@lists.linux.dev, linux-mm@kvack.org,
-        linux-crypto@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
-        David Rientjes <rientjes@google.com>,
-        Dov Murik <dovmurik@linux.ibm.com>,
-        Tobin Feldman-Fitzthum <tobin@ibm.com>,
-        Michael Roth <michael.roth@amd.com>,
-        Vlastimil Babka <vbabka@suse.cz>, tony.luck@intel.com,
-        npmccallum@redhat.com, brijesh.ksingh@gmail.com
-Subject: Re: [PATCH Part1 RFC v4 02/36] x86/sev: Save the negotiated GHCB
- version
-Message-ID: <YRJEE6C/NC3Epa8G@zn.tnic>
-References: <20210707181506.30489-1-brijesh.singh@amd.com>
- <20210707181506.30489-3-brijesh.singh@amd.com>
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=A/TaMuDq9rc/wgUkDC5taSVgSHRGlTMP2mW3Lj4nlK0=;
+        b=TdBxhdKYuxVzJ2lFemXsp7u3EwUNVkBn8w/4PUGtxwr3gI3CM3OPP9kMIHVV0+VOW+2AJT
+        1wmSZR6pdj48mOUD65I5hoKbBL3piCoDjAUTqcfC589TeGyPy4Oh5dxTB9YcQzhCBc+x3U
+        YdPeOnItKMIU0D/qmm2SRALjJuKKnYs=
+Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
+ [209.85.208.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-515-XjBuFKoCOmiA_DAj-2XlpQ-1; Tue, 10 Aug 2021 05:23:52 -0400
+X-MC-Unique: XjBuFKoCOmiA_DAj-2XlpQ-1
+Received: by mail-ed1-f72.google.com with SMTP id y22-20020a0564023596b02903bd9452ad5cso10436379edc.20
+        for <kvm@vger.kernel.org>; Tue, 10 Aug 2021 02:23:51 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:to:cc:references:from:subject:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=A/TaMuDq9rc/wgUkDC5taSVgSHRGlTMP2mW3Lj4nlK0=;
+        b=c7ylSQF5fdBMsYEa5f/7qe9GuBFhcCGAXfOZeBtoLZqfU8apvg0bTynvqSVY4AcZo9
+         faoOBJ5WyawxR0qOIp2bPa//bQlPG6RlDMV1ifbvER05bSU523VwFdWcCXOhY8+D6Ma1
+         VlCF4bjqSw8tTrkIH8q0QBwlTqxGvv1BSxeaGvI9DzWwzyu1ayJ10N7dS1+WlAnV1sbM
+         kV5vGexaYMUrxyzBmpoq4FmNcHc+aitMMqZbmAvAoYaga6i8iiXtCF8ZIdUTs3kVLLlJ
+         oz3xkJI26h1rMAa7TkTqe37a8DIPnmx35D73jBLA9A/GSstd7aDravevFdv1ZZkThUzf
+         nvjg==
+X-Gm-Message-State: AOAM531P3JLF9W9+2WfiLrl+inv7zB5MTcTzNxD0Fw7aKPMUt3YRtKFo
+        CuU+JyOrQFDyoiM//Y1mK1Guw6Yc7Y3Xq9d7kFj+KgV6NKa97OMgmvq4hZ5gS3Y9v/vApn2fPJt
+        ogCeTFEJ1MivM
+X-Received: by 2002:a05:6402:452:: with SMTP id p18mr3795476edw.34.1628587430913;
+        Tue, 10 Aug 2021 02:23:50 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJy8PXtMO2e19p2OPoYOrnLEV4qDAC/gOcR888De9nrRlKF6wNXdDkTjBvD0jcpOd8sYsOWqHA==
+X-Received: by 2002:a05:6402:452:: with SMTP id p18mr3795455edw.34.1628587430750;
+        Tue, 10 Aug 2021 02:23:50 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:63a7:c72e:ea0e:6045? ([2001:b07:6468:f312:63a7:c72e:ea0e:6045])
+        by smtp.gmail.com with ESMTPSA id u23sm4545368edr.42.2021.08.10.02.23.49
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 10 Aug 2021 02:23:50 -0700 (PDT)
+To:     Jim Mattson <jmattson@google.com>,
+        Sean Christopherson <seanjc@google.com>
+Cc:     Yu Zhang <yu.c.zhang@linux.intel.com>,
+        Wei Huang <wei.huang2@amd.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, vkuznets@redhat.com,
+        wanpengli@tencent.com, joro@8bytes.org, tglx@linutronix.de,
+        mingo@redhat.com, bp@alien8.de, x86@kernel.org, hpa@zytor.com
+References: <20210808192658.2923641-1-wei.huang2@amd.com>
+ <20210808192658.2923641-2-wei.huang2@amd.com>
+ <20210809035806.5cqdqm5vkexvngda@linux.intel.com>
+ <c6324362-1439-ef94-789b-5934c0e1cdb8@amd.com>
+ <20210809042703.25gfuuvujicc3vj7@linux.intel.com>
+ <73bbaac0-701c-42dd-36da-aae1fed7f1a0@amd.com>
+ <20210809064224.ctu3zxknn7s56gk3@linux.intel.com>
+ <YRFKABg2MOJxcq+y@google.com>
+ <CALMp9eRfuntBFz=gnsvEuTXAXZorWJFAPq0ZdwZePxxQYGzdQA@mail.gmail.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [PATCH v2 1/3] KVM: x86: Allow CPU to force vendor-specific TDP
+ level
+Message-ID: <400f8ca7-8f82-308b-3427-b644144cfa5c@redhat.com>
+Date:   Tue, 10 Aug 2021 11:23:48 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.11.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20210707181506.30489-3-brijesh.singh@amd.com>
+In-Reply-To: <CALMp9eRfuntBFz=gnsvEuTXAXZorWJFAPq0ZdwZePxxQYGzdQA@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jul 07, 2021 at 01:14:32PM -0500, Brijesh Singh wrote:
-> diff --git a/arch/x86/kernel/sev-shared.c b/arch/x86/kernel/sev-shared.c
-> index 114f62fe2529..19c2306ac02d 100644
-> --- a/arch/x86/kernel/sev-shared.c
-> +++ b/arch/x86/kernel/sev-shared.c
-> @@ -14,6 +14,15 @@
->  #define has_cpuflag(f)	boot_cpu_has(f)
->  #endif
->  
-> +/*
-> + * Since feature negotiation related variables are set early in the boot
-> + * process they must reside in the .data section so as not to be zeroed
-> + * out when the .bss section is later cleared.
-> + *
-> + * GHCB protocol version negotiated with the hypervisor.
-> + */
-> +static u16 ghcb_version __section(".data..ro_after_init");
+On 09/08/21 23:49, Jim Mattson wrote:
+> Doesn't this break legacy type 2 hypervisors that don't know anything
+> about 5-level NPT and don't have any control over whether or not the
+> host uses 5-level paging?
 
-There's a define for that section specifier: __ro_after_init
+Yes, where "legacy" probably means "all released versions of all of 
+them", including KVM.  Host support for LA57 was merged in 4.13, while 
+KVM started supporting 5-level page tables in EPT in 4.14 and even then 
+just returned PT64_ROOT_LEVEL (i.e. 4) for the maximum NPT level.
 
--- 
-Regards/Gruss,
-    Boris.
+So all Linux versions up to 5.13, which has "KVM: x86: Prevent KVM SVM 
+from loading on kernels with 5-level paging", will break horribly. 
+Better backport that patch to stable...
 
-https://people.kernel.org/tglx/notes-about-netiquette
+Paolo
+
