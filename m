@@ -2,152 +2,105 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id ECD933E8480
-	for <lists+kvm@lfdr.de>; Tue, 10 Aug 2021 22:42:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A63EA3E84A2
+	for <lists+kvm@lfdr.de>; Tue, 10 Aug 2021 22:51:28 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233317AbhHJUnA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 10 Aug 2021 16:43:00 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:42995 "EHLO
+        id S233710AbhHJUvs (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 10 Aug 2021 16:51:48 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:23558 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232453AbhHJUm7 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 10 Aug 2021 16:42:59 -0400
+        by vger.kernel.org with ESMTP id S233549AbhHJUvr (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 10 Aug 2021 16:51:47 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1628628156;
+        s=mimecast20190719; t=1628628684;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=hHnrIWkzZ7LkFQAJEORQbPUdKrZ3WDQnEsS9T+9/pd4=;
-        b=I7HLrjMs2JV8RGOGzMuymLZDnghxUE2/X+v0BomNuuzyqDqnRLzelH7XaBIdDtJHs/cu6c
-        O0hYjaDzSEHPFyQH80bks+76v2YLQCaZKKyHoiS8bHVnXIB7EtWQN13SfJUiwOWzQkB+Zo
-        4PSi+srEp/+76PrUcAeEbfZQ8TG6Lt0=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-33-UQBarrSZPcm-SrZF67zyFw-1; Tue, 10 Aug 2021 16:42:35 -0400
-X-MC-Unique: UQBarrSZPcm-SrZF67zyFw-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8BC76801AE7;
-        Tue, 10 Aug 2021 20:42:33 +0000 (UTC)
-Received: from starship (unknown [10.35.206.50])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id C11773AFD;
-        Tue, 10 Aug 2021 20:42:29 +0000 (UTC)
-Message-ID: <bb889453a1082c132846296744706a4e1456f127.camel@redhat.com>
-Subject: Re: KVM's support for non default APIC base
-From:   Maxim Levitsky <mlevitsk@redhat.com>
-To:     Jim Mattson <jmattson@google.com>
-Cc:     Sean Christopherson <seanjc@google.com>, kvm@vger.kernel.org,
-        "open list:X86 ARCHITECTURE (32-BIT AND 64-BIT)" 
-        <linux-kernel@vger.kernel.org>, Joerg Roedel <joro@8bytes.org>,
-        Borislav Petkov <bp@alien8.de>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ingo Molnar <mingo@redhat.com>,
-        "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>
-Date:   Tue, 10 Aug 2021 23:42:28 +0300
-In-Reply-To: <CALMp9eRxthu+5NMRTL4+NtcsAcMyYmLiQs4Get5=UAAH_yqH=w@mail.gmail.com>
-References: <20210713142023.106183-1-mlevitsk@redhat.com>
-         <20210713142023.106183-9-mlevitsk@redhat.com>
-         <c51d3f0b46bb3f73d82d66fae92425be76b84a68.camel@redhat.com>
-         <YPXJQxLaJuoF6aXl@google.com>
-         <564fd4461c73a4ec08d68e2364401db981ecba3a.camel@redhat.com>
-         <YQ2vv7EXGN2jgQBb@google.com>
-         <5f991ac11006ae890961a76d35a63b7c9c56b47c.camel@redhat.com>
-         <CALMp9eRxthu+5NMRTL4+NtcsAcMyYmLiQs4Get5=UAAH_yqH=w@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
+        bh=BRAP3UcLgpqf8XsYQHiUMWSMjCOCoU43rTaFEkutFE4=;
+        b=VQ5V6RZT+eXQvel8/CD/v9/r/nUWZxKSSF6+mhzVRCAKQu5rocml+KXkqml22mvnVUSImg
+        obWtLVqQQMxZ7NcWIXpnuJbB9bs8wZ56zcFgfqkBMSkY75/XOZwI2+tjZotKGrCAByR2i8
+        3VMMlpfMQwZNBBqLrPNNO5MWPP0UysE=
+Received: from mail-oi1-f197.google.com (mail-oi1-f197.google.com
+ [209.85.167.197]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-159-kF-XguTDNwevxAdUPTx9cg-1; Tue, 10 Aug 2021 16:51:23 -0400
+X-MC-Unique: kF-XguTDNwevxAdUPTx9cg-1
+Received: by mail-oi1-f197.google.com with SMTP id c6-20020aca35060000b029025c5504f461so263262oia.22
+        for <kvm@vger.kernel.org>; Tue, 10 Aug 2021 13:51:22 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=BRAP3UcLgpqf8XsYQHiUMWSMjCOCoU43rTaFEkutFE4=;
+        b=eSjiqpodi4lZREN5L1F2zUDCzcQ10Q33dJ/f/peDcNeFY0mg1jEz4K+gA0cw1K9I1X
+         C7SNCu3NUd4lGu0HztR55XPE/llACTzsXAZ75ae+mxS1QjI0+4aaG0X0K816Tc4ktpWl
+         4acTzrPnPvFUNbiOAm8YhOLlvp7N8EygtJDDnbReiKjOhZB9U9ryIBM/8mO+pdgL0LN7
+         /ukDDN5STmk0bmzjN+HZAU7aiwPCx5YGekbbMNFeYkeWaBCtHE9L0+663XJiu7maecrT
+         iBT3rlPP9yzhPigmpumMa6up/INUABZAGHHjRkZUiy9u0dl51Tp2SkFHf4c2WqJIYviQ
+         XsAw==
+X-Gm-Message-State: AOAM530mUXmq12+9cu+ncg9ktBuZBnoZ0qrEPteOXFym/WdeewfxC6de
+        R2Isz3F3zlOMTe71ZNtaY0Mj0HEQUDzjzxc5PvvinewOHG/fanGvakVEsXdDaL3M8oZc7zAP2FM
+        GoOkx8If9r9nf
+X-Received: by 2002:aca:4554:: with SMTP id s81mr5073409oia.41.1628628682453;
+        Tue, 10 Aug 2021 13:51:22 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJy78YX4WsIPZVstJJSezqWHWGPHEZO0W2taQXaEHV3PPUALBc3Bl+022KgyUSRnEeR2u7YVTQ==
+X-Received: by 2002:aca:4554:: with SMTP id s81mr5073400oia.41.1628628682265;
+        Tue, 10 Aug 2021 13:51:22 -0700 (PDT)
+Received: from redhat.com ([198.99.80.109])
+        by smtp.gmail.com with ESMTPSA id e20sm621635otj.4.2021.08.10.13.51.21
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 10 Aug 2021 13:51:22 -0700 (PDT)
+Date:   Tue, 10 Aug 2021 14:51:20 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Peter Xu <peterx@redhat.com>
+Cc:     Christoph Hellwig <hch@infradead.org>,
+        Jason Gunthorpe <jgg@nvidia.com>, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org
+Subject: Re: [PATCH 3/7] vfio/pci: Use vfio_device_unmap_mapping_range()
+Message-ID: <20210810145120.28759d65.alex.williamson@redhat.com>
+In-Reply-To: <YRLNMv3UhwVa8Pd4@t490s>
+References: <162818167535.1511194.6614962507750594786.stgit@omen>
+        <162818325518.1511194.1243290800645603609.stgit@omen>
+        <YRI+nsVAr3grftB4@infradead.org>
+        <YRLNMv3UhwVa8Pd4@t490s>
+X-Mailer: Claws Mail 3.18.0 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 2021-08-09 at 09:47 -0700, Jim Mattson wrote:
-> On Mon, Aug 9, 2021 at 2:40 AM Maxim Levitsky <mlevitsk@redhat.com> wrote:
-> > On Fri, 2021-08-06 at 21:55 +0000, Sean Christopherson wrote:
-> > > On Thu, Jul 22, 2021, Maxim Levitsky wrote:
-> > > > On Mon, 2021-07-19 at 18:49 +0000, Sean Christopherson wrote:
-> > > > > On Sun, Jul 18, 2021, Maxim Levitsky wrote:
-> > > > -> APIC MMIO area has to be MMIO for 'apic_mmio_write' to be called,
-> > > >    thus must contain no guest memslots.
-> > > >    If the guest relocates the APIC base somewhere where we have a memslot,
-> > > >    memslot will take priority, while on real hardware, LAPIC is likely to
-> > > >    take priority.
-> > > 
-> > > Yep.  The thing that really bites us is that other vCPUs should still be able to
-> > > access the memory defined by the memslot, e.g. to make it work we'd have to run
-> > > the vCPU with a completely different MMU root.
-> > That is something I haven't took in the account.
-> > Complexity of supporting this indeed isn't worth it.
+On Tue, 10 Aug 2021 15:02:10 -0400
+Peter Xu <peterx@redhat.com> wrote:
+
+> On Tue, Aug 10, 2021 at 10:53:50AM +0200, Christoph Hellwig wrote:
+> > On Thu, Aug 05, 2021 at 11:07:35AM -0600, Alex Williamson wrote:  
+> > > +static void vfio_pci_zap_bars(struct vfio_pci_device *vdev)
+> > >  {
+> > > +	vfio_device_unmap_mapping_range(&vdev->vdev,
+> > > +			VFIO_PCI_INDEX_TO_OFFSET(VFIO_PCI_BAR0_REGION_INDEX),
+> > > +			VFIO_PCI_INDEX_TO_OFFSET(VFIO_PCI_ROM_REGION_INDEX) -
+> > > +			VFIO_PCI_INDEX_TO_OFFSET(VFIO_PCI_BAR0_REGION_INDEX));  
 > > 
-> > > > As far as I know the only good reason to relocate APIC base is to access it
-> > > > from the real mode which is not something that is done these days by modern
-> > > > BIOSes.
-> > > > 
-> > > > I vote to make it read only (#GP on MSR_IA32_APICBASE write when non default
-> > > > base is set and apic enabled) and remove all remains of the support for
-> > > > variable APIC base.
-> > > 
-> > > Making up our own behavior is almost never the right approach.  E.g. _best_ case
-> > > scenario for an unexpected #GP is the guest immediately terminates.  Worst case
-> > > scenario is the guest eats the #GP and continues on, which is basically the status
-> > > quo, except it's guaranteed to now work, whereas todays behavior can at least let
-> > > the guest function, for some definitions of "function".
-> > 
-> > Well, at least the Intel's PRM does state that APIC base relocation is not guaranteed
-> > to work on all CPUs, so giving the guest a #GP is like telling it that current CPU doesn't
-> > support it. In theory, a very well behaving guest can catch the exception and
-> > fail back to the default base.
-> > 
-> > I don't understand what do you mean by 'guaranteed to now work'. If the guest
-> > ignores this #GP and still thinks that APIC base relocation worked, it is its fault.
-> > A well behaving guest should never assume that a msr write that failed with #GP
-> > worked.
-> > 
-> > 
-> > > I think the only viable "solution" is to exit to userspace on the guilty WRMSR.
-> > > Whether or not we can do that without breaking userspace is probably the big
-> > > question.  Fully emulating APIC base relocation would be a tremendous amount of
-> > > effort and complexity for practically zero benefit.
-> > 
-> > I have nothing against this as well although I kind of like the #GP approach a bit more,
-> > and knowing that there are barely any reasons
-> > to relocate the APIC base, and that it doesn't work well, there is a good chance
-> > that no one does it anyway (except our kvm unit tests, but that isn't an issue).
-> > 
-> > > > (we already have a warning when APIC base is set to non default value)
-> > > 
-> > > FWIW, that warning is worthless because it's _once(), i.e. won't help detect a
-> > > misbehaving guest unless it's the first guest to misbehave on a particular
-> > > instantiation of KVM.   _ratelimited() would improve the situation, but not
-> > > completely eliminate the possibility of a misbehaving guest going unnoticed.
-> > > Anything else isn't an option becuase it's obviously guest triggerable.
-> > 
-> > 100% agree.
-> > 
-> > I'll say I would first make it _ratelimited() for few KVM versions, and then
-> > if nobody complains, make it a KVM internal error / #GP, and remove all the leftovers
-> > from the code that pretend that it can work.
+> > Maybe make this a little more readable by having local variables:  
 > 
-> Printing things to syslog is not very helpful. Any time that kvm
-> violates the architectural specification, it should provide
-> information about the emulation error to userspace.
-> 
-Paolo, what do you think?
+> Or just pass in unmap_mapping_range(start=0, len=0)?  As unmap_mapping_range()
+> understands len==0 as "to the end of file".  Thanks,
 
-My personal opinion is that we should indeed cause KVM internal error
-on all attempts to change the APIC base.
+But we're not actually trying to unmap the entire device fd, we're only
+targeting the ranges of it that correspond to standard MMIO resources
+of the device.  Our vma-to-pfn function for vfio-pci also only knows
+how to lookup vmas in this range.  If there were mmap'able regions
+outside of this, for example provided by vendor specific extensions, we
+a) don't generically know if they're related to the device itself or
+some supporting information managed in software (ex. IGD OpRegion) and
+b) don't know how to lookup the pfn to remap them when MMIO is
+re-enabled.
 
-If someone complains, then we can look at their use-case.
+I don't think we have any such extensions today, but we might with
+vfio-pci-core and we'd need to figure out how to include those regions
+in some future work.  Thanks,
 
-My view is that any half-working feature is bound to bitrot
-and cause harm and confusion.
-
-Best regards,
-	Maxim Levitsky
-
+Alex
 
