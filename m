@@ -2,173 +2,139 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 412863E7CB8
-	for <lists+kvm@lfdr.de>; Tue, 10 Aug 2021 17:48:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 07EB43E7D63
+	for <lists+kvm@lfdr.de>; Tue, 10 Aug 2021 18:22:34 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242144AbhHJPsc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 10 Aug 2021 11:48:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54722 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242096AbhHJPs0 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 10 Aug 2021 11:48:26 -0400
-Received: from galois.linutronix.de (Galois.linutronix.de [IPv6:2a0a:51c0:0:12e:550::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 771E6C0613C1;
-        Tue, 10 Aug 2021 08:48:04 -0700 (PDT)
-From:   Thomas Gleixner <tglx@linutronix.de>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020; t=1628610483;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=T74u7wivCD+70aSSFcjrY7qzEdPjRIB3i17jgj6Jj7M=;
-        b=GQsP4ydZdaizjI7aDD8jal0K4ynFGpb8UgdDtWJ8QCjeKElBVTmFd+w7RcJqsRpZLUGOBM
-        uoBElAi/ZAxWJlUNd6UZyFTSLfVn/jNIRVfCwrvbfr+18wYSaGGfWRBhd1FmG8ZrKNq4Bh
-        QdNu3/mpxlwba21pm69poQeA1LdON2lLFv6ZYEhwVBDkAlLWEqcuvGWONXHfFROHuryjos
-        x6iExbEuT1YUYzbuBgGPm+3bV351Ktg/aFn4CwngkqyCiI6NlghyqmWyRcKHKyAZTPd8ve
-        zKLCDIMzlamwgyH77NaHEAVOoGPMoh6PclcFPWAgGch1kn5FBMg1xTlzu08eng==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020e; t=1628610483;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=T74u7wivCD+70aSSFcjrY7qzEdPjRIB3i17jgj6Jj7M=;
-        b=XJbcS3rj56HrvStKFW2KEnB/xuskVXpnKbjLsNZtj7rhOXWN6zirJbWraym7MHLHJNCHuK
-        hUNnaw9IPLWcutCA==
-To:     Hikaru Nishida <hikalium@chromium.org>,
-        linux-kernel@vger.kernel.org, dme@dme.org, mlevitsk@redhat.com
-Cc:     suleiman@google.com, Hikaru Nishida <hikalium@chromium.org>,
-        Borislav Petkov <bp@alien8.de>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ingo Molnar <mingo@redhat.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        John Stultz <john.stultz@linaro.org>,
-        Juergen Gross <jgross@suse.com>,
-        Lai Jiangshan <laijs@linux.alibaba.com>,
-        Mike Travis <mike.travis@hpe.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        "Peter Zijlstra (Intel)" <peterz@infradead.org>,
-        Sean Christopherson <seanjc@google.com>,
-        Stephen Boyd <sboyd@kernel.org>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>, kvm@vger.kernel.org,
-        x86@kernel.org
-Subject: Re: [v2 PATCH 4/4] x86/kvm: Add guest side support for virtual
- suspend time injection
-In-Reply-To: <20210806190607.v2.4.I2cbcd43256eacc3c92274adff6d0458b6a9c15ee@changeid>
-References: <20210806100710.2425336-1-hikalium@chromium.org>
- <20210806190607.v2.4.I2cbcd43256eacc3c92274adff6d0458b6a9c15ee@changeid>
-Date:   Tue, 10 Aug 2021 17:48:02 +0200
-Message-ID: <87lf59qp1p.ffs@tglx>
+        id S234323AbhHJQWy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 10 Aug 2021 12:22:54 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:22384 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S229977AbhHJQWy (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 10 Aug 2021 12:22:54 -0400
+Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 17AG42k6006735;
+        Tue, 10 Aug 2021 12:22:31 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : mime-version; s=pp1;
+ bh=rhIiwDe/9t2V3PCCnUgpcGEvl7zLch4ChZvqc1epa5M=;
+ b=ogHGJhTcKVUK90X+8GwjxdsqR8TIlK77aiNbJPEQq1ol/2i7akJTMagt32rb/HCQAkVH
+ y970NfXSDS4i/sa3FehSz6I2c9v1pI6Ev0qlLJMQT2uS8fJyNehP4+WbkxbNk3iSL0Y6
+ UQu0QW7nBULY0dUtX1Jvof2fKiXxDWPNkPOp/yfWosXDTn0GfMF8b3iOBIB9LIb+W6hH
+ uB+HdCO2ObLkNw4RlNIDRx4ZRQ2S5uhAwb0oHpQKOW4GeYOUf3T3/9f/KwzfWm3Ry8Ov
+ plMPpmhAMCsvqhC+Kb0e4ceNiWMIJTYKEUaycyzl7/qZjiLzrO29s+cOheMq8ioZQVyz 1g== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 3abb7pamtj-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 10 Aug 2021 12:22:31 -0400
+Received: from m0098420.ppops.net (m0098420.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 17AG45o0007133;
+        Tue, 10 Aug 2021 12:22:31 -0400
+Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 3abb7pamt5-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 10 Aug 2021 12:22:31 -0400
+Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
+        by ppma04ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 17AGGZBJ001248;
+        Tue, 10 Aug 2021 16:22:29 GMT
+Received: from b06cxnps4075.portsmouth.uk.ibm.com (d06relay12.portsmouth.uk.ibm.com [9.149.109.197])
+        by ppma04ams.nl.ibm.com with ESMTP id 3a9ht8xe29-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 10 Aug 2021 16:22:29 +0000
+Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
+        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 17AGMPpj56295688
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 10 Aug 2021 16:22:25 GMT
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id A7999AE055;
+        Tue, 10 Aug 2021 16:22:25 +0000 (GMT)
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 4A5F3AE059;
+        Tue, 10 Aug 2021 16:22:25 +0000 (GMT)
+Received: from oc3016276355.ibm.com (unknown [9.145.176.19])
+        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Tue, 10 Aug 2021 16:22:25 +0000 (GMT)
+From:   Pierre Morel <pmorel@linux.ibm.com>
+To:     linux-s390@vger.kernel.org
+Cc:     frankja@linux.ibm.com, thuth@redhat.com, kvm@vger.kernel.org,
+        cohuck@redhat.com, imbrenda@linux.ibm.com, david@redhat.com
+Subject: [kvm-unit-tests PATCH v2 0/4] S390x: CPU Topology Information
+Date:   Tue, 10 Aug 2021 18:22:20 +0200
+Message-Id: <1628612544-25130-1-git-send-email-pmorel@linux.ibm.com>
+X-Mailer: git-send-email 1.8.3.1
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: yR0o7jPPeJtlZROtXvn2KexX_syRc_63
+X-Proofpoint-GUID: uQc8RsqtsSvbentZm_lses_cpE8vNlI-
+X-Proofpoint-UnRewURL: 0 URL was un-rewritten
 MIME-Version: 1.0
-Content-Type: text/plain
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.790
+ definitions=2021-08-10_07:2021-08-10,2021-08-10 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 mlxlogscore=999
+ mlxscore=0 malwarescore=0 priorityscore=1501 lowpriorityscore=0
+ spamscore=0 suspectscore=0 clxscore=1015 bulkscore=0 impostorscore=0
+ phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2107140000 definitions=main-2108100103
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Aug 06 2021 at 19:07, Hikaru Nishida wrote:
->  arch/x86/Kconfig                    | 13 ++++++++++
->  arch/x86/include/asm/idtentry.h     |  4 +++
->  arch/x86/include/asm/kvm_para.h     |  9 +++++++
->  arch/x86/kernel/kvmclock.c          | 40 +++++++++++++++++++++++++++++
->  include/linux/timekeeper_internal.h |  4 +++
->  kernel/time/timekeeping.c           | 33 ++++++++++++++++++++++++
+Hi,
 
-Again, this wants to be split into infrastructure and usage.
+second version of the series with corrections.
 
-> --- a/include/linux/timekeeper_internal.h
-> +++ b/include/linux/timekeeper_internal.h
-> @@ -124,6 +124,10 @@ struct timekeeper {
-> 	u32			ntp_err_mult;
-> 	/* Flag used to avoid updating NTP twice with same second */
-> 	u32			skip_second_overflow;
-> +#ifdef CONFIG_KVM_VIRT_SUSPEND_TIMING_GUEST
-> +	/* suspend_time_injected keeps the duration injected through kvm */
-> +	u64			suspend_time_injected;
+When facility 11 is available inside the S390x architecture, 2 new
+instructions are available: PTF and STSI with function code 15.
 
-This is KVM only, so please can we have a name for that struct member
-which reflects this?
+Let's check their availability in QEMU/KVM and their coherence
+with the CPU topology provided by the QEMU -smp parameter.
 
-> +#endif
->  #ifdef CONFIG_DEBUG_TIMEKEEPING
-> 	long			last_warning;
-> 	/*
+To run these tests successfully you will need the Linux and the QEMU
+patches:
+    https://lkml.org/lkml/2021/8/3/201
 
-> diff --git a/kernel/time/timekeeping.c b/kernel/time/timekeeping.c
-> index 3ac3fb479981..424c61d38646 100644
-> --- a/kernel/time/timekeeping.c
-> +++ b/kernel/time/timekeeping.c
-> @@ -2125,6 +2125,39 @@ static u64 logarithmic_accumulation(struct timekeeper *tk, u64 offset,
->  	return offset;
->  }
->  
-> +#ifdef CONFIG_KVM_VIRT_SUSPEND_TIMING_GUEST
-> +/*
-> + * timekeeping_inject_virtual_suspend_time - Inject virtual suspend time
-> + * when requested by the kvm host.
+    https://lists.nongnu.org/archive/html/qemu-s390x/2021-07/msg00165.html
 
-If this is an attempt to provide a kernel-doc comment for this function,
-then it's clearly a failed attempt and aside of that malformatted.
+Regards,
+Pierre
 
-> + * This function should be called under irq context.
+Pierre Morel (4):
+  s390x: lib: Add SCLP toplogy nested level
+  s390x: lib: Simplify stsi_get_fc and move it to library
+  s390x: topology: Check the Perform Topology Function
+  s390x: topology: Checking Configuration Topology Information
 
-Why? There is no reason for being called from interrupt context and
-nothing inforces it.
+ lib/s390x/asm/arch_def.h |  16 ++
+ lib/s390x/sclp.c         |   6 +
+ lib/s390x/sclp.h         |   4 +-
+ s390x/Makefile           |   1 +
+ s390x/stsi.c             |  20 +--
+ s390x/topology.c         | 307 +++++++++++++++++++++++++++++++++++++++
+ s390x/unittests.cfg      |   4 +
+ 7 files changed, 339 insertions(+), 19 deletions(-)
+ create mode 100644 s390x/topology.c
 
-> + */
-> +void timekeeping_inject_virtual_suspend_time(void)
-> +{
-> +	/*
-> +	 * Only updates shadow_timekeeper so the change will be reflected
-> +	 * on the next call of timekeeping_advance().
+-- 
+2.25.1
 
-No. That's broken.
+Changelog:
 
-    timekeeping_inject_virtual_suspend_time();
+From V1:
 
-    do_settimeofday() or do_adjtimex()
+- Simplify the stsi_get_fc function when pushing it into lib
+  (Janosch)
 
-       timekeeping_update(tk, TK_MIRROR...);
+- Simplify PTF inline assembly as PTF instruction does not use RRE
+  second argument
+  (Claudio)
 
-and your change to the shadow timekeeper is gone.
+- Rename Test global name
+  (Claudio, Janosch)
 
-Of course there is also no justification for this approach. What's wrong
-with updating it right away?
+- readibility, naming for PTF_REQ_* and removed unused globals
+  (Janosch)
 
-> +	 */
-> +	struct timekeeper *tk = &shadow_timekeeper;
-> +	unsigned long flags;
-> +	struct timespec64 delta;
-> +	u64 suspend_time;
+- skipping tests which could fail when run on LPAR
+  (Janosh)
 
-Please sort variables in reverse fir tree order and not randomly as you
-see fit.
-
-> +
-> +	raw_spin_lock_irqsave(&timekeeper_lock, flags);
-> +	suspend_time = kvm_get_suspend_time();
-> +	if (suspend_time > tk->suspend_time_injected) {
-> +		/*
-> +		 * Do injection only if the time is not injected yet.
-> +		 * suspend_time and tk->suspend_time_injected values are
-> +		 * cummrative, so take a diff and inject the duration.
-
-cummrative?
-
-> +		 */
-> +		delta = ns_to_timespec64(suspend_time - tk->suspend_time_injected);
-> +		__timekeeping_inject_sleeptime(tk, &delta);
-> +		tk->suspend_time_injected = suspend_time;
-
-It's absolutely unclear how this storage and diff magic works and the
-comment is not helping someone not familiar with the implementation of
-kvm_get_suspend_time() and the related code at all. Please explain
-non-obvious logic properly.
-
-Thanks,
-
-        tglx
-
-
-
+- Missing prefix_pop
+  (Janosch)
 
