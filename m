@@ -2,105 +2,178 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A63EA3E84A2
-	for <lists+kvm@lfdr.de>; Tue, 10 Aug 2021 22:51:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0D6543E84AC
+	for <lists+kvm@lfdr.de>; Tue, 10 Aug 2021 22:53:03 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233710AbhHJUvs (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 10 Aug 2021 16:51:48 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:23558 "EHLO
+        id S233782AbhHJUxX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 10 Aug 2021 16:53:23 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:50247 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S233549AbhHJUvr (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 10 Aug 2021 16:51:47 -0400
+        by vger.kernel.org with ESMTP id S233412AbhHJUxW (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 10 Aug 2021 16:53:22 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1628628684;
+        s=mimecast20190719; t=1628628780;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=BRAP3UcLgpqf8XsYQHiUMWSMjCOCoU43rTaFEkutFE4=;
-        b=VQ5V6RZT+eXQvel8/CD/v9/r/nUWZxKSSF6+mhzVRCAKQu5rocml+KXkqml22mvnVUSImg
-        obWtLVqQQMxZ7NcWIXpnuJbB9bs8wZ56zcFgfqkBMSkY75/XOZwI2+tjZotKGrCAByR2i8
-        3VMMlpfMQwZNBBqLrPNNO5MWPP0UysE=
-Received: from mail-oi1-f197.google.com (mail-oi1-f197.google.com
- [209.85.167.197]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-159-kF-XguTDNwevxAdUPTx9cg-1; Tue, 10 Aug 2021 16:51:23 -0400
-X-MC-Unique: kF-XguTDNwevxAdUPTx9cg-1
-Received: by mail-oi1-f197.google.com with SMTP id c6-20020aca35060000b029025c5504f461so263262oia.22
-        for <kvm@vger.kernel.org>; Tue, 10 Aug 2021 13:51:22 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=BRAP3UcLgpqf8XsYQHiUMWSMjCOCoU43rTaFEkutFE4=;
-        b=eSjiqpodi4lZREN5L1F2zUDCzcQ10Q33dJ/f/peDcNeFY0mg1jEz4K+gA0cw1K9I1X
-         C7SNCu3NUd4lGu0HztR55XPE/llACTzsXAZ75ae+mxS1QjI0+4aaG0X0K816Tc4ktpWl
-         4acTzrPnPvFUNbiOAm8YhOLlvp7N8EygtJDDnbReiKjOhZB9U9ryIBM/8mO+pdgL0LN7
-         /ukDDN5STmk0bmzjN+HZAU7aiwPCx5YGekbbMNFeYkeWaBCtHE9L0+663XJiu7maecrT
-         iBT3rlPP9yzhPigmpumMa6up/INUABZAGHHjRkZUiy9u0dl51Tp2SkFHf4c2WqJIYviQ
-         XsAw==
-X-Gm-Message-State: AOAM530mUXmq12+9cu+ncg9ktBuZBnoZ0qrEPteOXFym/WdeewfxC6de
-        R2Isz3F3zlOMTe71ZNtaY0Mj0HEQUDzjzxc5PvvinewOHG/fanGvakVEsXdDaL3M8oZc7zAP2FM
-        GoOkx8If9r9nf
-X-Received: by 2002:aca:4554:: with SMTP id s81mr5073409oia.41.1628628682453;
-        Tue, 10 Aug 2021 13:51:22 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJy78YX4WsIPZVstJJSezqWHWGPHEZO0W2taQXaEHV3PPUALBc3Bl+022KgyUSRnEeR2u7YVTQ==
-X-Received: by 2002:aca:4554:: with SMTP id s81mr5073400oia.41.1628628682265;
-        Tue, 10 Aug 2021 13:51:22 -0700 (PDT)
-Received: from redhat.com ([198.99.80.109])
-        by smtp.gmail.com with ESMTPSA id e20sm621635otj.4.2021.08.10.13.51.21
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 10 Aug 2021 13:51:22 -0700 (PDT)
-Date:   Tue, 10 Aug 2021 14:51:20 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Peter Xu <peterx@redhat.com>
-Cc:     Christoph Hellwig <hch@infradead.org>,
-        Jason Gunthorpe <jgg@nvidia.com>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org
-Subject: Re: [PATCH 3/7] vfio/pci: Use vfio_device_unmap_mapping_range()
-Message-ID: <20210810145120.28759d65.alex.williamson@redhat.com>
-In-Reply-To: <YRLNMv3UhwVa8Pd4@t490s>
-References: <162818167535.1511194.6614962507750594786.stgit@omen>
-        <162818325518.1511194.1243290800645603609.stgit@omen>
-        <YRI+nsVAr3grftB4@infradead.org>
-        <YRLNMv3UhwVa8Pd4@t490s>
-X-Mailer: Claws Mail 3.18.0 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
+         content-transfer-encoding:content-transfer-encoding;
+        bh=NhVj87YtWSgAJFzfob9ZxJQ6iKp15+xteDE4MWJJLZ0=;
+        b=ClrR3wjHSVHPBfEiW3mFMmw1jwicfspa7sKmL9esYTUUKgagziM4JErUUEPI0c9PjI6HuD
+        +L3iku9bTIbhmWVB2mTJoi+9oDC0vUvroBEjMu6DxfgibtUHt3SsLdPsgRVdVtc5QGFLTO
+        hR35T9raQI8MnZn485C9L+Qc5qAHb5w=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-402-nVe_l5eYPPSM03G3LugNCw-1; Tue, 10 Aug 2021 16:52:58 -0400
+X-MC-Unique: nVe_l5eYPPSM03G3LugNCw-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 10F19801B3D;
+        Tue, 10 Aug 2021 20:52:57 +0000 (UTC)
+Received: from localhost.localdomain (unknown [10.35.206.50])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 086D06E0B7;
+        Tue, 10 Aug 2021 20:52:52 +0000 (UTC)
+From:   Maxim Levitsky <mlevitsk@redhat.com>
+To:     kvm@vger.kernel.org
+Cc:     Jim Mattson <jmattson@google.com>, linux-kernel@vger.kernel.org,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Borislav Petkov <bp@alien8.de>, Joerg Roedel <joro@8bytes.org>,
+        Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        x86@kernel.org (maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)),
+        Maxim Levitsky <mlevitsk@redhat.com>
+Subject: [PATCH v4 00/16] My AVIC patch queue
+Date:   Tue, 10 Aug 2021 23:52:35 +0300
+Message-Id: <20210810205251.424103-1-mlevitsk@redhat.com>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: quoted-printable
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 10 Aug 2021 15:02:10 -0400
-Peter Xu <peterx@redhat.com> wrote:
-
-> On Tue, Aug 10, 2021 at 10:53:50AM +0200, Christoph Hellwig wrote:
-> > On Thu, Aug 05, 2021 at 11:07:35AM -0600, Alex Williamson wrote:  
-> > > +static void vfio_pci_zap_bars(struct vfio_pci_device *vdev)
-> > >  {
-> > > +	vfio_device_unmap_mapping_range(&vdev->vdev,
-> > > +			VFIO_PCI_INDEX_TO_OFFSET(VFIO_PCI_BAR0_REGION_INDEX),
-> > > +			VFIO_PCI_INDEX_TO_OFFSET(VFIO_PCI_ROM_REGION_INDEX) -
-> > > +			VFIO_PCI_INDEX_TO_OFFSET(VFIO_PCI_BAR0_REGION_INDEX));  
-> > 
-> > Maybe make this a little more readable by having local variables:  
-> 
-> Or just pass in unmap_mapping_range(start=0, len=0)?  As unmap_mapping_range()
-> understands len==0 as "to the end of file".  Thanks,
-
-But we're not actually trying to unmap the entire device fd, we're only
-targeting the ranges of it that correspond to standard MMIO resources
-of the device.  Our vma-to-pfn function for vfio-pci also only knows
-how to lookup vmas in this range.  If there were mmap'able regions
-outside of this, for example provided by vendor specific extensions, we
-a) don't generically know if they're related to the device itself or
-some supporting information managed in software (ex. IGD OpRegion) and
-b) don't know how to lookup the pfn to remap them when MMIO is
-re-enabled.
-
-I don't think we have any such extensions today, but we might with
-vfio-pci-core and we'd need to figure out how to include those regions
-in some future work.  Thanks,
-
-Alex
+Hi!=0D
+=0D
+This is a series of bugfixes to the AVIC dynamic inhibition, which was=0D
+made while trying to fix bugs as much as possible in this area and trying=0D
+to make the AVIC+SYNIC conditional enablement work.=0D
+=0D
+* Patches 1,3-8 are code from Sean Christopherson which=0D
+  implement an alternative approach of inhibiting AVIC without=0D
+  disabling its memslot.=0D
+=0D
+  V4: addressed review feedback.=0D
+=0D
+* Patch 2 is new and it fixes a bug in kvm_flush_remote_tlbs_with_address=0D
+=0D
+* Patches 9-10 in this series fix a race condition which can cause=0D
+  a lost write from a guest to APIC when the APIC write races=0D
+  the AVIC un-inhibition, and add a warning to catch this problem=0D
+  if it re-emerges again.=0D
+=0D
+  V4: applied review feedback from Paolo=0D
+=0D
+* Patch 11 is the patch from Vitaly about allowing AVIC with SYNC=0D
+  as long as the guest doesn=E2=80=99t use the AutoEOI feature. I only slig=
+htly=0D
+  changed it to expose the AutoEOI cpuid bit regardless of AVIC enablement.=
+=0D
+=0D
+  V4: fixed a race that Paolo pointed out.=0D
+=0D
+* Patch 12 is a refactoring that is now possible in SVM AVIC inhibition cod=
+e,=0D
+  because the RCU lock is not dropped anymore.=0D
+=0D
+* Patch 13-15 fixes another issue I found in AVIC inhibit code:=0D
+=0D
+  Currently avic_vcpu_load/avic_vcpu_put are called on userspace entry/exit=
+=0D
+  from KVM (aka kvm_vcpu_get/kvm_vcpu_put), and these functions update the=
+=0D
+  "is running" bit in the AVIC physical ID remap table and update the=0D
+  target vCPU in iommu code.=0D
+=0D
+  However both of these functions don't do anything when AVIC is inhibited=
+=0D
+  thus the "is running" bit will be kept enabled during the exit to userspa=
+ce.=0D
+  This shouldn't be a big issue as the caller=0D
+  doesn't use the AVIC when inhibited but still inconsistent and can trigge=
+r=0D
+  a warning about this in avic_vcpu_load.=0D
+=0D
+  To be on the safe side I think it makes sense to call=0D
+  avic_vcpu_put/avic_vcpu_load when inhibiting/uninhibiting the AVIC.=0D
+  This will ensure that the work these functions do is matched.=0D
+=0D
+  V4: I splitted a single patch to 3 patches to make it easier=0D
+      to review, and applied Paolo's review feedback.=0D
+=0D
+* Patch 16 removes the pointless APIC base=0D
+  relocation from AVIC to make it consistent with the rest of KVM.=0D
+=0D
+  (both AVIC and APICv only support default base, while regular KVM,=0D
+  sort of support any APIC base as long as it is not RAM.=0D
+  If guest attempts to relocate APIC base to non RAM area,=0D
+  while APICv/AVIC are active, the new base will be non accelerated,=0D
+  while the default base will continue to be AVIC/APICv backed).=0D
+=0D
+  On top of that if guest uses different APIC bases on different vCPUs,=0D
+  KVM doesn't honour the fact that the MMIO range should only be active=0D
+  on that vCPU.=0D
+=0D
+Best regards,=0D
+	Maxim Levitsky=0D
+=0D
+Maxim Levitsky (14):=0D
+  KVM: x86/mmu: fix parameters to kvm_flush_remote_tlbs_with_address=0D
+  KVM: x86/mmu: add comment explaining arguments to kvm_zap_gfn_range=0D
+  KVM: x86/mmu: bump mmu notifier count in kvm_zap_gfn_range=0D
+  KVM: x86/mmu: rename try_async_pf to kvm_faultin_pfn=0D
+  KVM: x86/mmu: allow kvm_faultin_pfn to return page fault handling code=0D
+  KVM: x86/mmu: allow APICv memslot to be enabled but invisible=0D
+  KVM: x86: don't disable APICv memslot when inhibited=0D
+  KVM: x86: APICv: fix race in kvm_request_apicv_update on SVM=0D
+  KVM: SVM: add warning for mistmatch between AVIC vcpu state and AVIC=0D
+    inhibition=0D
+  KVM: SVM: remove svm_toggle_avic_for_irq_window=0D
+  KVM: SVM: avoid refreshing avic if its state didn't change=0D
+  KVM: SVM: move check for kvm_vcpu_apicv_active outside of=0D
+    avic_vcpu_{put|load}=0D
+  KVM: SVM: call avic_vcpu_load/avic_vcpu_put when enabling/disabling=0D
+    AVIC=0D
+  KVM: SVM: AVIC: drop unsupported AVIC base relocation code=0D
+=0D
+Sean Christopherson (1):=0D
+  Revert "KVM: x86/mmu: Allow zap gfn range to operate under the mmu=0D
+    read lock"=0D
+=0D
+Vitaly Kuznetsov (1):=0D
+  KVM: x86: hyper-v: Deactivate APICv only when AutoEOI feature is in=0D
+    use=0D
+=0D
+ arch/x86/include/asm/kvm-x86-ops.h |  1 -=0D
+ arch/x86/include/asm/kvm_host.h    | 13 +++++-=0D
+ arch/x86/kvm/hyperv.c              | 32 ++++++++++---=0D
+ arch/x86/kvm/mmu/mmu.c             | 75 ++++++++++++++++++++----------=0D
+ arch/x86/kvm/mmu/paging_tmpl.h     |  6 +--=0D
+ arch/x86/kvm/mmu/tdp_mmu.c         | 15 ++----=0D
+ arch/x86/kvm/mmu/tdp_mmu.h         | 11 ++---=0D
+ arch/x86/kvm/svm/avic.c            | 49 +++++++------------=0D
+ arch/x86/kvm/svm/svm.c             | 21 ++++-----=0D
+ arch/x86/kvm/svm/svm.h             |  8 ----=0D
+ arch/x86/kvm/x86.c                 | 67 +++++++++++++++-----------=0D
+ include/linux/kvm_host.h           |  5 ++=0D
+ virt/kvm/kvm_main.c                |  7 ++-=0D
+ 13 files changed, 174 insertions(+), 136 deletions(-)=0D
+=0D
+-- =0D
+2.26.3=0D
+=0D
 
