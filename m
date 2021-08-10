@@ -2,120 +2,89 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 19E983E8667
-	for <lists+kvm@lfdr.de>; Wed, 11 Aug 2021 01:22:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EF3A23E8674
+	for <lists+kvm@lfdr.de>; Wed, 11 Aug 2021 01:26:53 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235314AbhHJXXF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 10 Aug 2021 19:23:05 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:60820 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S235242AbhHJXXE (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 10 Aug 2021 19:23:04 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1628637761;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=zebpogOe1quBLKE4Uo3idNxbcVJ3dkkOF+OjhdeOFhQ=;
-        b=FMrVYRLtPn/LMWUPRMnvWG5Vfsv5VTX2KRKmpoNAHk9OMZ2t5l6lpEgGfsn2kXq6r8ARic
-        fVv03R+vTFACinhXKG+CJzCTCV+rJKO6WGnbmrD76l76OnXrODqSSvOl3j7tkIe0GrfTuT
-        20/CaSJ7yIaXQMKcLpFTp0XYuxkHqnI=
-Received: from mail-qt1-f200.google.com (mail-qt1-f200.google.com
- [209.85.160.200]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-222-07jvgxabMKe8s9RVNocoFQ-1; Tue, 10 Aug 2021 19:22:40 -0400
-X-MC-Unique: 07jvgxabMKe8s9RVNocoFQ-1
-Received: by mail-qt1-f200.google.com with SMTP id e3-20020ac80b030000b029028ac1c46c2aso355699qti.2
-        for <kvm@vger.kernel.org>; Tue, 10 Aug 2021 16:22:40 -0700 (PDT)
+        id S235242AbhHJX1O (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 10 Aug 2021 19:27:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47512 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S235372AbhHJX1O (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 10 Aug 2021 19:27:14 -0400
+Received: from mail-lf1-x130.google.com (mail-lf1-x130.google.com [IPv6:2a00:1450:4864:20::130])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 65E33C0613D3
+        for <kvm@vger.kernel.org>; Tue, 10 Aug 2021 16:26:51 -0700 (PDT)
+Received: by mail-lf1-x130.google.com with SMTP id w20so1409496lfu.7
+        for <kvm@vger.kernel.org>; Tue, 10 Aug 2021 16:26:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=IpS+g8UvsiLyUgpdgVvZlXwMvzb3ABnt39ksJ0ei0ms=;
+        b=QxvhkwExnPz/tWcFlp6413i0rHFKRAWk6FwIR79Xm+KaIfqQvOft7zcgKjZp+EvXTJ
+         ZX3wakPItvvD1wNI9SwnCChiF5OTB/0QU2rj7CKnWFX3oPEyHA8XBR1oMqge5Tp7F/Gk
+         hLn3mviBbttPU0/dOkmUcLw0PKIX6gD9EJ0tl8h0eP184uUA3aUDhwxae1jj5shA42/g
+         VoZkmgkl7AdhN4kpRGjuUJ5xv63BZoFbbX6dBvX+vyo3BwNMhNqerDKaCzP3ad2kkH8X
+         SU+uLWtH3y/idPTg2060QaUoIbvIce5RgTZOWVi/M36qQgPR+qkFN4cqj0j2hFhh15SH
+         PFBw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=zebpogOe1quBLKE4Uo3idNxbcVJ3dkkOF+OjhdeOFhQ=;
-        b=AomwRKhIYBoA1tDSCnD604CMUg2dhzQX3VnDbAksbIICSGen8ASmK51iaNLZnB1mpq
-         Ym9SbwKNc52J3OJTT03Os4YBnmSnTD34A/ZMPJ69cpthPeKnwVSmaFHwKmIBpYd9JZmH
-         IhIwxu2YiU/YSVRiLLgl9jnhVQidL3uzhlqvzqTLnmr9tVvC9U0m3Sysl+1cVuWJQlMh
-         TgWJSOr4mQzut9hYmjlKPplg74jjvPxVRR5zuigo3m/VDQvakesn0YOF5k00E2RX0841
-         hLJPSRaY7UbcFq4ofC6/mjnoygJKPh/dzhrt83k46gNR1fEfn/WiPX9eeC3sUIQexI5g
-         t+lQ==
-X-Gm-Message-State: AOAM530Sr3kxXyaRa9yREf3oy7PzQ2FIgKw9UHbZHe3qvNwB5pXqOmsW
-        Eut7XwC+ipbX9itxzZAK7DyM5mgTqxvxOzRxfrhesmSDGiFK/IrDWJyAJAOAbo3b0//NpPSgD4Q
-        IrptvsevzQ2Mr
-X-Received: by 2002:a05:620a:318b:: with SMTP id bi11mr17242547qkb.302.1628637759723;
-        Tue, 10 Aug 2021 16:22:39 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxRqxrHLUeXL8415G82p0kwf+OoH+p90MLbtMF/Y3gvXjd4Z1rzFmseE9OfMSwFwyYvyHyAVA==
-X-Received: by 2002:a05:620a:318b:: with SMTP id bi11mr17242527qkb.302.1628637759517;
-        Tue, 10 Aug 2021 16:22:39 -0700 (PDT)
-Received: from t490s (bras-base-toroon474qw-grc-92-76-70-75-133.dsl.bell.ca. [76.70.75.133])
-        by smtp.gmail.com with ESMTPSA id b11sm5934711qtt.42.2021.08.10.16.22.38
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 10 Aug 2021 16:22:38 -0700 (PDT)
-Date:   Tue, 10 Aug 2021 19:22:37 -0400
-From:   Peter Xu <peterx@redhat.com>
-To:     Mingwei Zhang <mizhang@google.com>
-Cc:     Jim Mattson <jmattson@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm <kvm@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Ben Gardon <bgardon@google.com>,
-        David Matlack <dmatlack@google.com>,
-        Jing Zhang <jingzhangos@google.com>
-Subject: Re: [PATCH v4 3/3] KVM: x86/mmu: Add detailed page size stats
-Message-ID: <YRMKPd2ZarXCX6vm@t490s>
-References: <20210803044607.599629-1-mizhang@google.com>
- <20210803044607.599629-4-mizhang@google.com>
- <CALMp9eR4AB0O7__VwGNbnm-99Pp7fNssr8XGHpq+6Pwkpo_oAw@mail.gmail.com>
- <CAL715WJLfJc3dnLUcMRY=wNPX0XDuL9WzF-4VWMdS_OudShXHg@mail.gmail.com>
- <CAL715WLO9+CpNa4ZQX4J2OdyqOBsX0+g0M4bNe+A+6FVxB2OxA@mail.gmail.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=IpS+g8UvsiLyUgpdgVvZlXwMvzb3ABnt39ksJ0ei0ms=;
+        b=gsfzM3fkcN+Tq762Z5k6MTyTAT2G8IzmAk4qyCaEdwsz0NL4JZcKyuCTTwo1qFsOg4
+         EAwMbnzmh5vDEXfdiNkeYsjrDIogKt8BGTdEtAqbJshpn++dKJrqAhkLEeVaelY2mmcY
+         5R2KE48qfexgzAYQP3PSkX/918/W1xgG2+6HlBFhn7UpxVZRNKEbVrG0KgRP7mQZmzod
+         M+ZtcpM2Wwb8tOIg3fIvNN27hrtEYkUvReoLn6DrgK5YBAh4f+jSFZDR6gyU+P4hjAr5
+         wFSBlkJ1o0sG4swGHQTRl12ShXAblDyz7haWiHHO1qZjLpXyUp5WXpFFIqNAxfbKpiqN
+         Do9Q==
+X-Gm-Message-State: AOAM530K/W8Q4yOScrSFcV5r2i3i9nHNUSyezWBF0ZfPh8mVscSkKn0R
+        Ms0H51yjV1y5fdHhaO3tN2nqEG1N/giChKkC5KtLrA==
+X-Google-Smtp-Source: ABdhPJx1KBXlnWNnAiYPtByvCPAUGB6rQIpnAmgTrV7HDzSBU8i66K5pas2kI5wSd18D2DuqiSzloOUi0mUKH/riftM=
+X-Received: by 2002:a05:6512:4025:: with SMTP id br37mr2238361lfb.23.1628638009569;
+ Tue, 10 Aug 2021 16:26:49 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <CAL715WLO9+CpNa4ZQX4J2OdyqOBsX0+g0M4bNe+A+6FVxB2OxA@mail.gmail.com>
+References: <20210810223238.979194-1-jingzhangos@google.com>
+ <CAOQ_QshcSQWhEUt9d7OV58V=3WrL34xfpFYS-wp6H4rzy_r_4w@mail.gmail.com> <CAM3pwhE=JCVrGoh3qJtxUYfjSB8Kfax+NKkqK_fVn6_1nU7OZQ@mail.gmail.com>
+In-Reply-To: <CAM3pwhE=JCVrGoh3qJtxUYfjSB8Kfax+NKkqK_fVn6_1nU7OZQ@mail.gmail.com>
+From:   Oliver Upton <oupton@google.com>
+Date:   Tue, 10 Aug 2021 16:26:38 -0700
+Message-ID: <CAOQ_QsjS8tgx76Q3GDZO2UcA8XtFoUyZUjUhSk92Ei6baGn+kQ@mail.gmail.com>
+Subject: Re: [PATCH] KVM: stats: Add VM dirty_pages stats for the number of
+ dirty pages
+To:     Peter Feiner <pfeiner@google.com>
+Cc:     Jing Zhang <jingzhangos@google.com>, KVM <kvm@vger.kernel.org>,
+        KVMPPC <kvm-ppc@vger.kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Peter Shier <pshier@google.com>,
+        David Matlack <dmatlack@google.com>,
+        Ben Gardon <bgardon@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Aug 09, 2021 at 05:01:39PM -0700, Mingwei Zhang wrote:
-> Hi Paolo,
+On Tue, Aug 10, 2021 at 4:15 PM Peter Feiner <pfeiner@google.com> wrote:
+> > Races to increment by a few pages might be OK, so long as imprecision
+> > is acceptable, but decrementing by an entire bitmap could cause the
+> > stat to get waaay off from the state of the VM.
+>
+> My original use case was to know the rate at which memory was being
+> dirtied to predict how expensive a live migration would be. I didn't
+> need full precision, but I would have needed a bound on the slop. A
+> "few pages" isn't a bound :-)
 
-Hi, Mingwei,
+I think the agreement with VM-scoped statistics is that slop is OK,
+better than paying the cost of locking/atomics. If we want to be
+exact, it'd have to be a vCPU stat.
 
-> 
-> I recently looked at the patches queued and I find this patch from
-> Peter Xu (Cced), which is also adding 'page stats' information into
-> KVM:
-> 
-> https://patchwork.kernel.org/project/kvm/patch/20210625153214.43106-7-peterx@redhat.com/
-> 
-> From a functionality point of view, the above patch seems duplicate
-> with mine.
+> IMO, this patch isn't worth figuring out without a use case. It's
+> complex and has perf overhead. Maybe just drop it?
 
-The rmap statistics are majorly for rmap, not huge pages.
+Knowing the approximate rate at which pages are being dirtied would be
+a nice-to-have for debugging, IMO. Just treating this stat as
+monotonic would greatly simplify it and avoid the overhead.
 
-> But in detail, Peter's approach is using debugfs with
-> proper locking to traverse the whole rmap to get the detailed page
-> sizes in different granularity.
-> 
-> In comparison, mine is to add extra code in low level SPTE update
-> routines and store aggregated data in kvm->kvm_stats. This data could
-> be retrieved from Jing's fd based API without any lock required, but
-> it does not provide the fine granular information such as the number
-> of contiguous 4KG/2MB/1GB pages.
-> 
-> So would you mind giving me some feedback on this patch? I would
-> really appreciate it.
-
-I have a question: why change to using atomic ops?  As most kvm statistics
-seems to be not with atomics before.
-
-AFAIK atomics are expensive, and they get even more expensive when the host is
-bigger (it should easily go into ten-nanosecond level).  So I have no idea
-whether it's worth it for persuing that accuracy.
-
+--
 Thanks,
-
--- 
-Peter Xu
-
+Oliver
