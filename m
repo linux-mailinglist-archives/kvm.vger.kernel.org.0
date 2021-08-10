@@ -2,79 +2,91 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C3E443E833A
-	for <lists+kvm@lfdr.de>; Tue, 10 Aug 2021 20:48:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CBD8B3E833E
+	for <lists+kvm@lfdr.de>; Tue, 10 Aug 2021 20:49:51 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231406AbhHJSs7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 10 Aug 2021 14:48:59 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:34463 "EHLO
+        id S231386AbhHJSuM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 10 Aug 2021 14:50:12 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:46481 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230181AbhHJSs6 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 10 Aug 2021 14:48:58 -0400
+        by vger.kernel.org with ESMTP id S229774AbhHJSuL (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 10 Aug 2021 14:50:11 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1628621315;
+        s=mimecast20190719; t=1628621389;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=uGh9fA/6SL05Y4+mEAteYPx6YCipxcI5JZ/cNQGYfos=;
-        b=XDu8pTQ1m5Tqf16wPV6QbBZh7d2epsSgc1tEOFcOoh/pCHna6qYZWFPzrxavIMJeh3tc/s
-        XUY7p7YXdoL6crGrsrBUkGWAu45W2klDohYPf4Ouak7FrD2EUIGqgW1pot7TJJA9eYWeid
-        BeN8lNOFRCr0iv2f6jkFJuqMreXewtw=
-Received: from mail-qv1-f70.google.com (mail-qv1-f70.google.com
- [209.85.219.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-271-hLVSX5Z_N-2E1fodvtg6rQ-1; Tue, 10 Aug 2021 14:48:34 -0400
-X-MC-Unique: hLVSX5Z_N-2E1fodvtg6rQ-1
-Received: by mail-qv1-f70.google.com with SMTP id b2-20020a0cc9820000b0290352b2c7d7e1so7963967qvk.9
-        for <kvm@vger.kernel.org>; Tue, 10 Aug 2021 11:48:34 -0700 (PDT)
+        bh=sIY2+IC7WL45hNaXWA0mNkNCzPB+K2jEa8Wry58PE/U=;
+        b=CP0AG/TDukuYVBQI6nIBz4MAxe5Z7vGZDaLqpKuYdW+sD5J1wt47tk2poev3avU8KwNWpI
+        p5i8IPbS0ZGsZbdrd5JNQSNNE3WKqK/uDamHwLiXYcAm6KbbR6A3y0aUb515d9QKMkhDqm
+        nrgTLOH+FEU/N/dc03K3k3bBxkSzuCQ=
+Received: from mail-qv1-f69.google.com (mail-qv1-f69.google.com
+ [209.85.219.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-247-NQAMlOC2NIm6IbliN_kqKQ-1; Tue, 10 Aug 2021 14:49:48 -0400
+X-MC-Unique: NQAMlOC2NIm6IbliN_kqKQ-1
+Received: by mail-qv1-f69.google.com with SMTP id t9-20020a0562140c69b029033e8884d712so17486392qvj.18
+        for <kvm@vger.kernel.org>; Tue, 10 Aug 2021 11:49:47 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=uGh9fA/6SL05Y4+mEAteYPx6YCipxcI5JZ/cNQGYfos=;
-        b=SwZDZpW32qQMRg6Sf1wpRHe1Vt2gk3wzngWnTS7Ggmm6OfDeIgXXTgAr6tiTSlM/mO
-         vqfeOvmspS4c9wEsVr1CdbDSssmIfu1JXZOKi8Ckmqoldwrp5dEnZV5ORgaq/rrZV35I
-         DIFvcUigUOK1oOGAiuYFxH39w1rpaTkQEM+k7+PiM7bPxBvLYq2CgnaXTGBElIq4VQQa
-         x409fCi9rDOoSJ6XObgyZlB2JNS9hMyk4h154w9NljLGnm9+YMUT6c+5t0CLP/jne+XR
-         BhNUVVo7Y1WHBZCa6H7bljUENMaG6cd2EkaqvEVIWqWsOrYdgAtMMZbQop/AmBI03VrM
-         +JMQ==
-X-Gm-Message-State: AOAM5319fE97yXHPGqRPYbucZzPqqdgsWYT77BUmq0qs7LlEDzjY3Fn8
-        Ti3U2qa2XP/fzwpatTc/R6U+RB7hk3gOA2x/AtGXP512+Dh9770l4Jgkjxlf8IsOEr08TZ0gp69
-        hiNNuJQQFFVZI
-X-Received: by 2002:a05:620a:2101:: with SMTP id l1mr14790460qkl.104.1628621313806;
-        Tue, 10 Aug 2021 11:48:33 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxIyq0bJKC/A97FVUFNlJ4uivR7xL4lKUeKBCJnJ5l4dPxGWD2CLEAIiMGQtQn39x+UaF2hrA==
-X-Received: by 2002:a05:620a:2101:: with SMTP id l1mr14790443qkl.104.1628621313591;
-        Tue, 10 Aug 2021 11:48:33 -0700 (PDT)
+        bh=sIY2+IC7WL45hNaXWA0mNkNCzPB+K2jEa8Wry58PE/U=;
+        b=ORhm2hbyBxqCD7CMR8mcZT/SwORbkisa7r0LOssmpb7Fbwz7Y5PXoN9JPEY2XRylQX
+         gU/o4XUSWFSyKl3BGqjYqqCXkyPQq+dOurz+ShN2cIxkfXmyiqmoAKXhhfrtltIrMWTX
+         VkbsJNtdJD1u8GhJ8T7gXEoe9aH44aROXUppRVWk8poyc6Yo1ARdJzgfW9LWYkDUKfvw
+         zOuyV+J8aJpjsokztxrXVq5PYVqHOjMIvXGsoljBo4ROFSZ22LeHctZ8n1Y9s6RCTH8o
+         R7Vl3fDMsJT2euO6Rf3hLKtUght8vWW6oe9PaeONn4jY1zD4EeDtTiNMJ1o1s3V9WBEu
+         UdLA==
+X-Gm-Message-State: AOAM5303hF6pan8Opv6b32CzM7YS/c4mCWuCC5KiIZjb/2Qti4anPAb+
+        GaPNhmCDR7AnlQNmFUYs7Dw5iHTxqRN+vFzT5LpNZaOnjCvs6e/AHDnaZwX54HZRYcDc2agabpv
+        cy6Q7uCRcSJ3O
+X-Received: by 2002:a05:620a:4495:: with SMTP id x21mr29960407qkp.468.1628621387550;
+        Tue, 10 Aug 2021 11:49:47 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxQvFRashIBFVzGhqhv5sdxbxzhHektVx1wjA60NW0CdiaAdHl2bwdx2KS9QwBp6XM60FSi5Q==
+X-Received: by 2002:a05:620a:4495:: with SMTP id x21mr29960386qkp.468.1628621387352;
+        Tue, 10 Aug 2021 11:49:47 -0700 (PDT)
 Received: from t490s (bras-base-toroon474qw-grc-92-76-70-75-133.dsl.bell.ca. [76.70.75.133])
-        by smtp.gmail.com with ESMTPSA id a24sm8898750qtj.43.2021.08.10.11.48.32
+        by smtp.gmail.com with ESMTPSA id c68sm11756909qkf.48.2021.08.10.11.49.46
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 10 Aug 2021 11:48:32 -0700 (PDT)
-Date:   Tue, 10 Aug 2021 14:48:31 -0400
+        Tue, 10 Aug 2021 11:49:46 -0700 (PDT)
+Date:   Tue, 10 Aug 2021 14:49:45 -0400
 From:   Peter Xu <peterx@redhat.com>
-To:     Alex Williamson <alex.williamson@redhat.com>
-Cc:     Jason Gunthorpe <jgg@nvidia.com>, linux-kernel@vger.kernel.org,
+To:     Christoph Hellwig <hch@infradead.org>
+Cc:     Alex Williamson <alex.williamson@redhat.com>,
+        Jason Gunthorpe <jgg@nvidia.com>, linux-kernel@vger.kernel.org,
         kvm@vger.kernel.org
-Subject: Re: [PATCH 3/7] vfio/pci: Use vfio_device_unmap_mapping_range()
-Message-ID: <YRLJ/wdiY/fnGj2d@t490s>
+Subject: Re: [PATCH 1/7] vfio: Create vfio_fs_type with inode per device
+Message-ID: <YRLKSYQL8VvTr3gc@t490s>
 References: <162818167535.1511194.6614962507750594786.stgit@omen>
- <162818325518.1511194.1243290800645603609.stgit@omen>
+ <162818322947.1511194.6035266132085405252.stgit@omen>
+ <YRI8Mev5yfeAXsrj@infradead.org>
+ <20210810085254.51da01d6.alex.williamson@redhat.com>
+ <YRKT2UhgjfWBmwuJ@infradead.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <162818325518.1511194.1243290800645603609.stgit@omen>
+In-Reply-To: <YRKT2UhgjfWBmwuJ@infradead.org>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Aug 05, 2021 at 11:07:35AM -0600, Alex Williamson wrote:
-> @@ -1690,7 +1554,7 @@ static int vfio_pci_mmap(struct vfio_device *core_vdev, struct vm_area_struct *v
->  
->  	vma->vm_private_data = vdev;
->  	vma->vm_page_prot = pgprot_noncached(vma->vm_page_prot);
-> -	vma->vm_pgoff = (pci_resource_start(pdev, index) >> PAGE_SHIFT) + pgoff;
-> +	vma->vm_page_prot = pgprot_decrypted(vma->vm_page_prot);
+On Tue, Aug 10, 2021 at 03:57:29PM +0100, Christoph Hellwig wrote:
+> On Tue, Aug 10, 2021 at 08:52:54AM -0600, Alex Williamson wrote:
+> > On Tue, 10 Aug 2021 10:43:29 +0200
+> > Christoph Hellwig <hch@infradead.org> wrote:
+> > 
+> > > > + * XXX Adopt the following when available:
+> > > > + * https://lore.kernel.org/lkml/20210309155348.974875-1-hch@lst.de/  
+> > > 
+> > > No need for this link.
+> > 
+> > Is that effort dead?  I've used the link several times myself to search
+> > for progress, so it's been useful to me.  Thanks,
+> 
+> No, but it seems odd to have reference to an old patchset in the kernel
+> tree.
 
-This addition seems to be an accident. :) Thanks,
+I learn from the reference too.  Maybe move into commit message?  Thanks,
 
 -- 
 Peter Xu
