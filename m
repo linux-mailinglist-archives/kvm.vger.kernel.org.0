@@ -2,62 +2,64 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id EF73C3E56BC
-	for <lists+kvm@lfdr.de>; Tue, 10 Aug 2021 11:24:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 41EC03E56C8
+	for <lists+kvm@lfdr.de>; Tue, 10 Aug 2021 11:25:39 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238977AbhHJJYW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 10 Aug 2021 05:24:22 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:42844 "EHLO
+        id S238989AbhHJJZ6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 10 Aug 2021 05:25:58 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:28095 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S238936AbhHJJYQ (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 10 Aug 2021 05:24:16 -0400
+        by vger.kernel.org with ESMTP id S238988AbhHJJZ4 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 10 Aug 2021 05:25:56 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1628587433;
+        s=mimecast20190719; t=1628587534;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=A/TaMuDq9rc/wgUkDC5taSVgSHRGlTMP2mW3Lj4nlK0=;
-        b=TdBxhdKYuxVzJ2lFemXsp7u3EwUNVkBn8w/4PUGtxwr3gI3CM3OPP9kMIHVV0+VOW+2AJT
-        1wmSZR6pdj48mOUD65I5hoKbBL3piCoDjAUTqcfC589TeGyPy4Oh5dxTB9YcQzhCBc+x3U
-        YdPeOnItKMIU0D/qmm2SRALjJuKKnYs=
-Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
- [209.85.208.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-515-XjBuFKoCOmiA_DAj-2XlpQ-1; Tue, 10 Aug 2021 05:23:52 -0400
-X-MC-Unique: XjBuFKoCOmiA_DAj-2XlpQ-1
-Received: by mail-ed1-f72.google.com with SMTP id y22-20020a0564023596b02903bd9452ad5cso10436379edc.20
-        for <kvm@vger.kernel.org>; Tue, 10 Aug 2021 02:23:51 -0700 (PDT)
+        bh=9RB6Pczk4vDPwq2uSGWS6COud14iPXuDOTUgBGUDVOs=;
+        b=CUQi/Vwnyk3GKIC0Jl47AwPd/Oin74rdJ1iYgJm3AACg50M5gCsoxb759WlN0vwp6liUdJ
+        LIedfvX5czi2HOjm0+8lKSJ8sFunx/PGbC32FkNxmtypccrjrzRRLHSY78G9odFMnbbN2c
+        krpBuv/gxj7FpNJsFAt3ZYMc1uRQc18=
+Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
+ [209.85.218.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-279-EDpvg2_1PBKKyxJRMuqzhw-1; Tue, 10 Aug 2021 05:25:30 -0400
+X-MC-Unique: EDpvg2_1PBKKyxJRMuqzhw-1
+Received: by mail-ej1-f72.google.com with SMTP id h17-20020a1709070b11b02905b5ced62193so320986ejl.1
+        for <kvm@vger.kernel.org>; Tue, 10 Aug 2021 02:25:30 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:to:cc:references:from:subject:message-id:date
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=A/TaMuDq9rc/wgUkDC5taSVgSHRGlTMP2mW3Lj4nlK0=;
-        b=c7ylSQF5fdBMsYEa5f/7qe9GuBFhcCGAXfOZeBtoLZqfU8apvg0bTynvqSVY4AcZo9
-         faoOBJ5WyawxR0qOIp2bPa//bQlPG6RlDMV1ifbvER05bSU523VwFdWcCXOhY8+D6Ma1
-         VlCF4bjqSw8tTrkIH8q0QBwlTqxGvv1BSxeaGvI9DzWwzyu1ayJ10N7dS1+WlAnV1sbM
-         kV5vGexaYMUrxyzBmpoq4FmNcHc+aitMMqZbmAvAoYaga6i8iiXtCF8ZIdUTs3kVLLlJ
-         oz3xkJI26h1rMAa7TkTqe37a8DIPnmx35D73jBLA9A/GSstd7aDravevFdv1ZZkThUzf
-         nvjg==
-X-Gm-Message-State: AOAM531P3JLF9W9+2WfiLrl+inv7zB5MTcTzNxD0Fw7aKPMUt3YRtKFo
-        CuU+JyOrQFDyoiM//Y1mK1Guw6Yc7Y3Xq9d7kFj+KgV6NKa97OMgmvq4hZ5gS3Y9v/vApn2fPJt
-        ogCeTFEJ1MivM
-X-Received: by 2002:a05:6402:452:: with SMTP id p18mr3795476edw.34.1628587430913;
-        Tue, 10 Aug 2021 02:23:50 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJy8PXtMO2e19p2OPoYOrnLEV4qDAC/gOcR888De9nrRlKF6wNXdDkTjBvD0jcpOd8sYsOWqHA==
-X-Received: by 2002:a05:6402:452:: with SMTP id p18mr3795455edw.34.1628587430750;
-        Tue, 10 Aug 2021 02:23:50 -0700 (PDT)
+        bh=9RB6Pczk4vDPwq2uSGWS6COud14iPXuDOTUgBGUDVOs=;
+        b=WODNueZkVpbTfIO/SPX9rzJulWMWCzd7JwNnqVvAvO40Y+i71UN1lTGxs0lO2ZQ/BL
+         qNe0OWRCjtCyQNyZZHv+5EgyH8j7u4xhUzrjIfW9rBhOYCK7lpeB89RMyv68hol1He3U
+         NegtTMXRLq4NrYXOUfZbSDIT3iEz1miaH9XoXDATq81WPu6aciNrqaG8QuV1w90rQ69x
+         NjIZwCETb7JjmEoX7puZigwnIXkLTHicd2sHDT13754Fv5VFNbWwVg42J40WfiOhkzuR
+         Kzmh7rsqW3FfUjkT+sbQNL581BLTsGBzs/EdoPXEh7YSQOxH7PWci1dGhWUUxg7EHe8j
+         iw4g==
+X-Gm-Message-State: AOAM5315n73ttwYGnWG/qirvJ4MjyqUZplJNT5j8iSBMZhllID4Bz1Rk
+        mBZBzrF8JsxrGGDgEA55barSqvnQGmC4xpP7UNBMm51BC+EKDnuq+GnHoP3jSLDgHfoXKzq/0ep
+        nSII7qUUQt7FE
+X-Received: by 2002:a17:906:1412:: with SMTP id p18mr403413ejc.545.1628587529793;
+        Tue, 10 Aug 2021 02:25:29 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzdtVhsz6duqdq2TK6WgLYxnxtIAyk8aZC40PfN4pZYSJW6GS3DgxOlNPPOp8fH24wM2t3hCA==
+X-Received: by 2002:a17:906:1412:: with SMTP id p18mr403396ejc.545.1628587529632;
+        Tue, 10 Aug 2021 02:25:29 -0700 (PDT)
 Received: from ?IPv6:2001:b07:6468:f312:63a7:c72e:ea0e:6045? ([2001:b07:6468:f312:63a7:c72e:ea0e:6045])
-        by smtp.gmail.com with ESMTPSA id u23sm4545368edr.42.2021.08.10.02.23.49
+        by smtp.gmail.com with ESMTPSA id c17sm844174edu.11.2021.08.10.02.25.28
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 10 Aug 2021 02:23:50 -0700 (PDT)
-To:     Jim Mattson <jmattson@google.com>,
+        Tue, 10 Aug 2021 02:25:28 -0700 (PDT)
+Subject: Re: [PATCH v2 1/3] KVM: x86: Allow CPU to force vendor-specific TDP
+ level
+To:     Yu Zhang <yu.c.zhang@linux.intel.com>,
         Sean Christopherson <seanjc@google.com>
-Cc:     Yu Zhang <yu.c.zhang@linux.intel.com>,
-        Wei Huang <wei.huang2@amd.com>, kvm@vger.kernel.org,
+Cc:     Wei Huang <wei.huang2@amd.com>, kvm@vger.kernel.org,
         linux-kernel@vger.kernel.org, vkuznets@redhat.com,
-        wanpengli@tencent.com, joro@8bytes.org, tglx@linutronix.de,
-        mingo@redhat.com, bp@alien8.de, x86@kernel.org, hpa@zytor.com
+        wanpengli@tencent.com, jmattson@google.com, joro@8bytes.org,
+        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, x86@kernel.org,
+        hpa@zytor.com
 References: <20210808192658.2923641-1-wei.huang2@amd.com>
  <20210808192658.2923641-2-wei.huang2@amd.com>
  <20210809035806.5cqdqm5vkexvngda@linux.intel.com>
@@ -66,36 +68,32 @@ References: <20210808192658.2923641-1-wei.huang2@amd.com>
  <73bbaac0-701c-42dd-36da-aae1fed7f1a0@amd.com>
  <20210809064224.ctu3zxknn7s56gk3@linux.intel.com>
  <YRFKABg2MOJxcq+y@google.com>
- <CALMp9eRfuntBFz=gnsvEuTXAXZorWJFAPq0ZdwZePxxQYGzdQA@mail.gmail.com>
+ <20210810074037.mizpggevgyhed6rm@linux.intel.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH v2 1/3] KVM: x86: Allow CPU to force vendor-specific TDP
- level
-Message-ID: <400f8ca7-8f82-308b-3427-b644144cfa5c@redhat.com>
-Date:   Tue, 10 Aug 2021 11:23:48 +0200
+Message-ID: <0ac41a07-beeb-161e-9e5d-e45477106c01@redhat.com>
+Date:   Tue, 10 Aug 2021 11:25:27 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.11.0
 MIME-Version: 1.0
-In-Reply-To: <CALMp9eRfuntBFz=gnsvEuTXAXZorWJFAPq0ZdwZePxxQYGzdQA@mail.gmail.com>
+In-Reply-To: <20210810074037.mizpggevgyhed6rm@linux.intel.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 09/08/21 23:49, Jim Mattson wrote:
-> Doesn't this break legacy type 2 hypervisors that don't know anything
-> about 5-level NPT and don't have any control over whether or not the
-> host uses 5-level paging?
+On 10/08/21 09:40, Yu Zhang wrote:
+> About "host can't easily mirror L1's desired paging mode", could you please elaborate?
+> Thanks!
 
-Yes, where "legacy" probably means "all released versions of all of 
-them", including KVM.  Host support for LA57 was merged in 4.13, while 
-KVM started supporting 5-level page tables in EPT in 4.14 and even then 
-just returned PT64_ROOT_LEVEL (i.e. 4) for the maximum NPT level.
+Shadow pgae tables in KVM will always have 3 levels on 32-bit machines 
+and 4/5 levels on 64-bit machines.  L1 instead might have any number of 
+levels from 2 to 5 (though of course not more than the host has).
 
-So all Linux versions up to 5.13, which has "KVM: x86: Prevent KVM SVM 
-from loading on kernels with 5-level paging", will break horribly. 
-Better backport that patch to stable...
+Therefore, when shadowing 32-bit NPT page tables, KVM has to add extra 
+fixed levels on top of those that it's shadowing.  See 
+mmu_alloc_direct_roots for the code.
 
 Paolo
 
