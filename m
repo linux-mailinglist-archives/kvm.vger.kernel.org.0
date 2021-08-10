@@ -2,126 +2,98 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D50A63E841C
-	for <lists+kvm@lfdr.de>; Tue, 10 Aug 2021 22:09:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 68E9F3E8439
+	for <lists+kvm@lfdr.de>; Tue, 10 Aug 2021 22:20:18 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232836AbhHJUJa (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 10 Aug 2021 16:09:30 -0400
-Received: from mga18.intel.com ([134.134.136.126]:55710 "EHLO mga18.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229788AbhHJUJa (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 10 Aug 2021 16:09:30 -0400
-X-IronPort-AV: E=McAfee;i="6200,9189,10072"; a="202152493"
-X-IronPort-AV: E=Sophos;i="5.84,310,1620716400"; 
-   d="scan'208";a="202152493"
-Received: from fmsmga003.fm.intel.com ([10.253.24.29])
-  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Aug 2021 13:09:06 -0700
-X-IronPort-AV: E=Sophos;i="5.84,310,1620716400"; 
-   d="scan'208";a="515971399"
-Received: from pdmuelle-desk2.amr.corp.intel.com (HELO skuppusw-mobl5.amr.corp.intel.com) ([10.213.166.202])
-  by fmsmga003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Aug 2021 13:09:05 -0700
-Subject: Re: [PATCH 07/11] treewide: Replace the use of mem_encrypt_active()
- with prot_guest_has()
-To:     Tom Lendacky <thomas.lendacky@amd.com>,
-        linux-kernel@vger.kernel.org, x86@kernel.org,
-        linuxppc-dev@lists.ozlabs.org, linux-s390@vger.kernel.org,
-        iommu@lists.linux-foundation.org, kvm@vger.kernel.org,
-        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
-        linux-graphics-maintainer@vmware.com,
-        amd-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
-        kexec@lists.infradead.org, linux-fsdevel@vger.kernel.org
-Cc:     Borislav Petkov <bp@alien8.de>,
-        Brijesh Singh <brijesh.singh@amd.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Andi Kleen <ak@linux.intel.com>,
-        Tianyu Lan <Tianyu.Lan@microsoft.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Peter Zijlstra <peterz@infradead.org>,
-        David Airlie <airlied@linux.ie>,
-        Daniel Vetter <daniel@ffwll.ch>,
-        Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
-        Maxime Ripard <mripard@kernel.org>,
-        Thomas Zimmermann <tzimmermann@suse.de>,
-        Will Deacon <will@kernel.org>, Dave Young <dyoung@redhat.com>,
-        Baoquan He <bhe@redhat.com>,
-        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-References: <cover.1627424773.git.thomas.lendacky@amd.com>
- <029791b24c6412f9427cfe6ec598156c64395964.1627424774.git.thomas.lendacky@amd.com>
- <166f30d8-9abb-02de-70d8-6e97f44f85df@linux.intel.com>
- <4b885c52-f70a-147e-86bd-c71a8f4ef564@amd.com>
-From:   "Kuppuswamy, Sathyanarayanan" 
-        <sathyanarayanan.kuppuswamy@linux.intel.com>
-Message-ID: <4f9effcb-055b-51ee-6722-c9f0cc1d8acf@linux.intel.com>
-Date:   Tue, 10 Aug 2021 13:09:02 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Firefox/78.0 Thunderbird/78.11.0
+        id S233043AbhHJUUj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 10 Aug 2021 16:20:39 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:32298 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S231398AbhHJUUi (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 10 Aug 2021 16:20:38 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1628626815;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=gr9ydGicGYYIpIdPqhG9R+Yfix/AQszzOwnKSS/8chs=;
+        b=QqbzQWmfoJWI/tFHZsoJArzdb1nN3ZAMyoctqwaLC1vUJEHlzcvon4RgGSBhw0YTv5tlL/
+        P9+lBUSQAc8R6FQsSjIsj568rDAjYUUM8bLTfUTR4BnceXDbubeRgsPuaDyIWN70m3LV1d
+        PScyrFhTZSYjO4LrHsKnlO5DpkMbOUw=
+Received: from mail-qv1-f72.google.com (mail-qv1-f72.google.com
+ [209.85.219.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-473-fVS7KglANDOfOR84IS0kTQ-1; Tue, 10 Aug 2021 16:20:14 -0400
+X-MC-Unique: fVS7KglANDOfOR84IS0kTQ-1
+Received: by mail-qv1-f72.google.com with SMTP id z25-20020a0ca9590000b029033ba243ffa1so17744290qva.0
+        for <kvm@vger.kernel.org>; Tue, 10 Aug 2021 13:20:14 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=gr9ydGicGYYIpIdPqhG9R+Yfix/AQszzOwnKSS/8chs=;
+        b=JXquaKLWDE7QzbAtq6rApgfLMpLbTgYVdSd7vsWz8/NpVt1AP1yJAesIKyKGnLrVBB
+         XRwZUgFT5JTxzW0Uw55GQGHRrlnpLgz2tfzoYCOCsh8WHTYqpDogur4z92hMYCmoRAau
+         TW7/HMNsC4hM0dokzZ51XtYcMITVz5SQbCtPEFsb/REBtGYbWnyUqJI90Ebzo4TRMZ7d
+         W6aTKoMBPErb72SAmbEFD5KNWZvebsR3PMLDiFZwQyS37kq5LxOUH32VoT3Pvb85A+q9
+         Tm/2+W+YP8v1xCTajFnf3KXdR/vRTkhCzjsnwyiqlpbOh1W+lSIbxeUTbfO5nIKCbgYZ
+         RWkg==
+X-Gm-Message-State: AOAM533PlY2XwXUTMpEdsP6n7XYat8CeZ3gcaiyJFJClruhX37INS8H6
+        A8vQ0YDGDVU8AGm2Ee79ynb5KAs16HIt+rnfJZiqGMRlAEs0fxgMZ+mIubfZSW0cqDxjy+iGEMq
+        fdH3uqTvHuyIG
+X-Received: by 2002:a37:a7d2:: with SMTP id q201mr30795010qke.158.1628626814048;
+        Tue, 10 Aug 2021 13:20:14 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxD/SBX1bvWaqNT+p/rP4m0OLiPIsi3i5KBCXy2l6Fk5Kcju97nlz7lIXDz3fxmxzfZ8fQHSA==
+X-Received: by 2002:a37:a7d2:: with SMTP id q201mr30794980qke.158.1628626813765;
+        Tue, 10 Aug 2021 13:20:13 -0700 (PDT)
+Received: from t490s (bras-base-toroon474qw-grc-92-76-70-75-133.dsl.bell.ca. [76.70.75.133])
+        by smtp.gmail.com with ESMTPSA id a18sm11026048qkg.62.2021.08.10.13.20.12
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 10 Aug 2021 13:20:13 -0700 (PDT)
+Date:   Tue, 10 Aug 2021 16:20:12 -0400
+From:   Peter Xu <peterx@redhat.com>
+To:     Alex Williamson <alex.williamson@redhat.com>
+Cc:     Jason Gunthorpe <jgg@nvidia.com>, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org
+Subject: Re: [PATCH 3/7] vfio/pci: Use vfio_device_unmap_mapping_range()
+Message-ID: <YRLffH221xvfABvf@t490s>
+References: <162818167535.1511194.6614962507750594786.stgit@omen>
+ <162818325518.1511194.1243290800645603609.stgit@omen>
+ <YRLJ/wdiY/fnGj2d@t490s>
+ <20210810135932.6825833b.alex.williamson@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <4b885c52-f70a-147e-86bd-c71a8f4ef564@amd.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20210810135932.6825833b.alex.williamson@redhat.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-
-On 8/10/21 12:48 PM, Tom Lendacky wrote:
-> On 8/10/21 1:45 PM, Kuppuswamy, Sathyanarayanan wrote:
->>
->>
->> On 7/27/21 3:26 PM, Tom Lendacky wrote:
->>> diff --git a/arch/x86/kernel/head64.c b/arch/x86/kernel/head64.c
->>> index de01903c3735..cafed6456d45 100644
->>> --- a/arch/x86/kernel/head64.c
->>> +++ b/arch/x86/kernel/head64.c
->>> @@ -19,7 +19,7 @@
->>>    #include <linux/start_kernel.h>
->>>    #include <linux/io.h>
->>>    #include <linux/memblock.h>
->>> -#include <linux/mem_encrypt.h>
->>> +#include <linux/protected_guest.h>
->>>    #include <linux/pgtable.h>
->>>      #include <asm/processor.h>
->>> @@ -285,7 +285,7 @@ unsigned long __head __startup_64(unsigned long
->>> physaddr,
->>>         * there is no need to zero it after changing the memory encryption
->>>         * attribute.
->>>         */
->>> -    if (mem_encrypt_active()) {
->>> +    if (prot_guest_has(PATTR_MEM_ENCRYPT)) {
->>>            vaddr = (unsigned long)__start_bss_decrypted;
->>>            vaddr_end = (unsigned long)__end_bss_decrypted;
->>
->>
->> Since this change is specific to AMD, can you replace PATTR_MEM_ENCRYPT with
->> prot_guest_has(PATTR_SME) || prot_guest_has(PATTR_SEV). It is not used in
->> TDX.
+On Tue, Aug 10, 2021 at 01:59:32PM -0600, Alex Williamson wrote:
+> On Tue, 10 Aug 2021 14:48:31 -0400
+> Peter Xu <peterx@redhat.com> wrote:
 > 
-> This is a direct replacement for now. I think the change you're requesting
-> should be done as part of the TDX support patches so it's clear why it is
-> being changed.
-
-Ok. I will include it part of TDX changes.
-
+> > On Thu, Aug 05, 2021 at 11:07:35AM -0600, Alex Williamson wrote:
+> > > @@ -1690,7 +1554,7 @@ static int vfio_pci_mmap(struct vfio_device *core_vdev, struct vm_area_struct *v
+> > >  
+> > >  	vma->vm_private_data = vdev;
+> > >  	vma->vm_page_prot = pgprot_noncached(vma->vm_page_prot);
+> > > -	vma->vm_pgoff = (pci_resource_start(pdev, index) >> PAGE_SHIFT) + pgoff;
+> > > +	vma->vm_page_prot = pgprot_decrypted(vma->vm_page_prot);  
+> > 
+> > This addition seems to be an accident. :) Thanks,
 > 
-> But, wouldn't TDX still need to do something with this shared/unencrypted
-> area, though? Or since it is shared, there's actually nothing you need to
-> do (the bss decrpyted section exists even if CONFIG_AMD_MEM_ENCRYPT is not
-> configured)?
-
-Kirill had a requirement to turn on CONFIG_AMD_MEM_ENCRYPT for adding lazy
-accept support in TDX guest kernel. Kirill, can you add details here?
-
+> Nope, Jason noted on a previous version that io_remap_pfn_range() is
+> essentially:
 > 
-> Thanks,
-> Tom
+>   remap_pfn_range(vma, addr, pfn, size, pgprot_decrypted(prot));
 > 
->>
+> So since we switched to vmf_insert_pfn() I added this page protection
+> flag to the vma instead, then it gets removed later when we switch back
+> to io_remap_pfn_range().  Thanks,
+
+I see, I read it wrongly as pgprot_noncached() previously.  Yes, it makes sense
+to do so.  Thanks,
 
 -- 
-Sathyanarayanan Kuppuswamy
-Linux Kernel Developer
+Peter Xu
+
