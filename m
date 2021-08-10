@@ -2,98 +2,80 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 652203E831F
-	for <lists+kvm@lfdr.de>; Tue, 10 Aug 2021 20:45:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C3E443E833A
+	for <lists+kvm@lfdr.de>; Tue, 10 Aug 2021 20:48:38 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231274AbhHJSpc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 10 Aug 2021 14:45:32 -0400
-Received: from mga04.intel.com ([192.55.52.120]:6970 "EHLO mga04.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229480AbhHJSpb (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 10 Aug 2021 14:45:31 -0400
-X-IronPort-AV: E=McAfee;i="6200,9189,10072"; a="213112915"
-X-IronPort-AV: E=Sophos;i="5.84,310,1620716400"; 
-   d="scan'208";a="213112915"
-Received: from fmsmga003.fm.intel.com ([10.253.24.29])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Aug 2021 11:45:07 -0700
-X-IronPort-AV: E=Sophos;i="5.84,310,1620716400"; 
-   d="scan'208";a="515946770"
-Received: from pdmuelle-desk2.amr.corp.intel.com (HELO skuppusw-mobl5.amr.corp.intel.com) ([10.213.166.202])
-  by fmsmga003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Aug 2021 11:45:06 -0700
-Subject: Re: [PATCH 07/11] treewide: Replace the use of mem_encrypt_active()
- with prot_guest_has()
-To:     Tom Lendacky <thomas.lendacky@amd.com>,
-        linux-kernel@vger.kernel.org, x86@kernel.org,
-        linuxppc-dev@lists.ozlabs.org, linux-s390@vger.kernel.org,
-        iommu@lists.linux-foundation.org, kvm@vger.kernel.org,
-        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
-        linux-graphics-maintainer@vmware.com,
-        amd-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
-        kexec@lists.infradead.org, linux-fsdevel@vger.kernel.org
-Cc:     Borislav Petkov <bp@alien8.de>,
-        Brijesh Singh <brijesh.singh@amd.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Andi Kleen <ak@linux.intel.com>,
-        Tianyu Lan <Tianyu.Lan@microsoft.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Peter Zijlstra <peterz@infradead.org>,
-        David Airlie <airlied@linux.ie>,
-        Daniel Vetter <daniel@ffwll.ch>,
-        Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
-        Maxime Ripard <mripard@kernel.org>,
-        Thomas Zimmermann <tzimmermann@suse.de>,
-        Will Deacon <will@kernel.org>, Dave Young <dyoung@redhat.com>,
-        Baoquan He <bhe@redhat.com>
-References: <cover.1627424773.git.thomas.lendacky@amd.com>
- <029791b24c6412f9427cfe6ec598156c64395964.1627424774.git.thomas.lendacky@amd.com>
-From:   "Kuppuswamy, Sathyanarayanan" 
-        <sathyanarayanan.kuppuswamy@linux.intel.com>
-Message-ID: <166f30d8-9abb-02de-70d8-6e97f44f85df@linux.intel.com>
-Date:   Tue, 10 Aug 2021 11:45:04 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Firefox/78.0 Thunderbird/78.11.0
+        id S231406AbhHJSs7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 10 Aug 2021 14:48:59 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:34463 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S230181AbhHJSs6 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 10 Aug 2021 14:48:58 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1628621315;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=uGh9fA/6SL05Y4+mEAteYPx6YCipxcI5JZ/cNQGYfos=;
+        b=XDu8pTQ1m5Tqf16wPV6QbBZh7d2epsSgc1tEOFcOoh/pCHna6qYZWFPzrxavIMJeh3tc/s
+        XUY7p7YXdoL6crGrsrBUkGWAu45W2klDohYPf4Ouak7FrD2EUIGqgW1pot7TJJA9eYWeid
+        BeN8lNOFRCr0iv2f6jkFJuqMreXewtw=
+Received: from mail-qv1-f70.google.com (mail-qv1-f70.google.com
+ [209.85.219.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-271-hLVSX5Z_N-2E1fodvtg6rQ-1; Tue, 10 Aug 2021 14:48:34 -0400
+X-MC-Unique: hLVSX5Z_N-2E1fodvtg6rQ-1
+Received: by mail-qv1-f70.google.com with SMTP id b2-20020a0cc9820000b0290352b2c7d7e1so7963967qvk.9
+        for <kvm@vger.kernel.org>; Tue, 10 Aug 2021 11:48:34 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=uGh9fA/6SL05Y4+mEAteYPx6YCipxcI5JZ/cNQGYfos=;
+        b=SwZDZpW32qQMRg6Sf1wpRHe1Vt2gk3wzngWnTS7Ggmm6OfDeIgXXTgAr6tiTSlM/mO
+         vqfeOvmspS4c9wEsVr1CdbDSssmIfu1JXZOKi8Ckmqoldwrp5dEnZV5ORgaq/rrZV35I
+         DIFvcUigUOK1oOGAiuYFxH39w1rpaTkQEM+k7+PiM7bPxBvLYq2CgnaXTGBElIq4VQQa
+         x409fCi9rDOoSJ6XObgyZlB2JNS9hMyk4h154w9NljLGnm9+YMUT6c+5t0CLP/jne+XR
+         BhNUVVo7Y1WHBZCa6H7bljUENMaG6cd2EkaqvEVIWqWsOrYdgAtMMZbQop/AmBI03VrM
+         +JMQ==
+X-Gm-Message-State: AOAM5319fE97yXHPGqRPYbucZzPqqdgsWYT77BUmq0qs7LlEDzjY3Fn8
+        Ti3U2qa2XP/fzwpatTc/R6U+RB7hk3gOA2x/AtGXP512+Dh9770l4Jgkjxlf8IsOEr08TZ0gp69
+        hiNNuJQQFFVZI
+X-Received: by 2002:a05:620a:2101:: with SMTP id l1mr14790460qkl.104.1628621313806;
+        Tue, 10 Aug 2021 11:48:33 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxIyq0bJKC/A97FVUFNlJ4uivR7xL4lKUeKBCJnJ5l4dPxGWD2CLEAIiMGQtQn39x+UaF2hrA==
+X-Received: by 2002:a05:620a:2101:: with SMTP id l1mr14790443qkl.104.1628621313591;
+        Tue, 10 Aug 2021 11:48:33 -0700 (PDT)
+Received: from t490s (bras-base-toroon474qw-grc-92-76-70-75-133.dsl.bell.ca. [76.70.75.133])
+        by smtp.gmail.com with ESMTPSA id a24sm8898750qtj.43.2021.08.10.11.48.32
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 10 Aug 2021 11:48:32 -0700 (PDT)
+Date:   Tue, 10 Aug 2021 14:48:31 -0400
+From:   Peter Xu <peterx@redhat.com>
+To:     Alex Williamson <alex.williamson@redhat.com>
+Cc:     Jason Gunthorpe <jgg@nvidia.com>, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org
+Subject: Re: [PATCH 3/7] vfio/pci: Use vfio_device_unmap_mapping_range()
+Message-ID: <YRLJ/wdiY/fnGj2d@t490s>
+References: <162818167535.1511194.6614962507750594786.stgit@omen>
+ <162818325518.1511194.1243290800645603609.stgit@omen>
 MIME-Version: 1.0
-In-Reply-To: <029791b24c6412f9427cfe6ec598156c64395964.1627424774.git.thomas.lendacky@amd.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <162818325518.1511194.1243290800645603609.stgit@omen>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Thu, Aug 05, 2021 at 11:07:35AM -0600, Alex Williamson wrote:
+> @@ -1690,7 +1554,7 @@ static int vfio_pci_mmap(struct vfio_device *core_vdev, struct vm_area_struct *v
+>  
+>  	vma->vm_private_data = vdev;
+>  	vma->vm_page_prot = pgprot_noncached(vma->vm_page_prot);
+> -	vma->vm_pgoff = (pci_resource_start(pdev, index) >> PAGE_SHIFT) + pgoff;
+> +	vma->vm_page_prot = pgprot_decrypted(vma->vm_page_prot);
 
-
-On 7/27/21 3:26 PM, Tom Lendacky wrote:
-> diff --git a/arch/x86/kernel/head64.c b/arch/x86/kernel/head64.c
-> index de01903c3735..cafed6456d45 100644
-> --- a/arch/x86/kernel/head64.c
-> +++ b/arch/x86/kernel/head64.c
-> @@ -19,7 +19,7 @@
->   #include <linux/start_kernel.h>
->   #include <linux/io.h>
->   #include <linux/memblock.h>
-> -#include <linux/mem_encrypt.h>
-> +#include <linux/protected_guest.h>
->   #include <linux/pgtable.h>
->   
->   #include <asm/processor.h>
-> @@ -285,7 +285,7 @@ unsigned long __head __startup_64(unsigned long physaddr,
->   	 * there is no need to zero it after changing the memory encryption
->   	 * attribute.
->   	 */
-> -	if (mem_encrypt_active()) {
-> +	if (prot_guest_has(PATTR_MEM_ENCRYPT)) {
->   		vaddr = (unsigned long)__start_bss_decrypted;
->   		vaddr_end = (unsigned long)__end_bss_decrypted;
-
-
-Since this change is specific to AMD, can you replace PATTR_MEM_ENCRYPT with
-prot_guest_has(PATTR_SME) || prot_guest_has(PATTR_SEV). It is not used in
-TDX.
+This addition seems to be an accident. :) Thanks,
 
 -- 
-Sathyanarayanan Kuppuswamy
-Linux Kernel Developer
+Peter Xu
+
