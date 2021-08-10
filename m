@@ -2,37 +2,37 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D1F4B3E84CA
-	for <lists+kvm@lfdr.de>; Tue, 10 Aug 2021 22:54:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 81E083E84CD
+	for <lists+kvm@lfdr.de>; Tue, 10 Aug 2021 22:54:32 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234670AbhHJUyg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 10 Aug 2021 16:54:36 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:29999 "EHLO
+        id S234550AbhHJUyu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 10 Aug 2021 16:54:50 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:49483 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S234585AbhHJUy0 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 10 Aug 2021 16:54:26 -0400
+        by vger.kernel.org with ESMTP id S234382AbhHJUyc (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 10 Aug 2021 16:54:32 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1628628843;
+        s=mimecast20190719; t=1628628849;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=knMixSXR1OcGQkWSrlCsIpGHjIT1cMve0h4vaB7v5cc=;
-        b=Qd21FIp5gZXA7GHcuLQEKIAIN1ps9Fw88722IjfsaFv60hwiKuiBIffktKn9F8wb0/fDZV
-        xH0mfbBXWCgTjTPxNxbhmsNd9gHlaS+x066t21ldZkX4NQY/3SOujI/saIp4J5febknpvv
-        cAAFYm47i2JajiiulHKl/MCu4c6jhYc=
+        bh=l5GwAOytc+alDuVkjvMgicVVPcMLI/NAgXu8uD1zrA4=;
+        b=bCWeSPU7dArND6nJWsWHXx/rU3PGkUVFElWDYdKxV2FsVLza47Rmlo/ASFc1Kb8DUAXS3E
+        gL4cq47eQtwzwhEPoKMk5tU5xJY5yYQZ3O3pS1HtXMcmJt04Lmg3Og6aBm6CHVppBoSepF
+        k6eoF7WP8v1C2+6bAACBsMGbxwl9jIA=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-9-ZtjbB_jEPJCI7fEoqhdJ2w-1; Tue, 10 Aug 2021 16:54:01 -0400
-X-MC-Unique: ZtjbB_jEPJCI7fEoqhdJ2w-1
+ us-mta-441-pN1pLpUkO8OwbVdo5CHfOg-1; Tue, 10 Aug 2021 16:54:08 -0400
+X-MC-Unique: pN1pLpUkO8OwbVdo5CHfOg-1
 Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3D0391853028;
-        Tue, 10 Aug 2021 20:53:59 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id AFD831853026;
+        Tue, 10 Aug 2021 20:54:06 +0000 (UTC)
 Received: from localhost.localdomain (unknown [10.35.206.50])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 9ECC569CBA;
-        Tue, 10 Aug 2021 20:53:55 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id A0B98620DE;
+        Tue, 10 Aug 2021 20:53:59 +0000 (UTC)
 From:   Maxim Levitsky <mlevitsk@redhat.com>
 To:     kvm@vger.kernel.org
 Cc:     Jim Mattson <jmattson@google.com>, linux-kernel@vger.kernel.org,
@@ -47,9 +47,9 @@ Cc:     Jim Mattson <jmattson@google.com>, linux-kernel@vger.kernel.org,
         Sean Christopherson <seanjc@google.com>,
         x86@kernel.org (maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)),
         Maxim Levitsky <mlevitsk@redhat.com>
-Subject: [PATCH v4 14/16] KVM: SVM: move check for kvm_vcpu_apicv_active outside of avic_vcpu_{put|load}
-Date:   Tue, 10 Aug 2021 23:52:49 +0300
-Message-Id: <20210810205251.424103-15-mlevitsk@redhat.com>
+Subject: [PATCH v4 15/16] KVM: SVM: call avic_vcpu_load/avic_vcpu_put when enabling/disabling AVIC
+Date:   Tue, 10 Aug 2021 23:52:50 +0300
+Message-Id: <20210810205251.424103-16-mlevitsk@redhat.com>
 In-Reply-To: <20210810205251.424103-1-mlevitsk@redhat.com>
 References: <20210810205251.424103-1-mlevitsk@redhat.com>
 MIME-Version: 1.0
@@ -59,71 +59,40 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-No functional change intended.
+Currently it is possible to have the following scenario:
+
+1. AVIC is disabled by svm_refresh_apicv_exec_ctrl
+2. svm_vcpu_blocking calls avic_vcpu_put which does nothing
+3. svm_vcpu_unblocking enables the AVIC (due to KVM_REQ_APICV_UPDATE)
+   and then calls avic_vcpu_load
+4. warning is triggered in avic_vcpu_load since
+   AVIC_PHYSICAL_ID_ENTRY_IS_RUNNING_MASK was never cleared
+
+While it is possible to just remove the warning, it seems to be more robust
+to fully disable/enable AVIC in svm_refresh_apicv_exec_ctrl by calling the
+avic_vcpu_load/avic_vcpu_put
 
 Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
 ---
- arch/x86/kvm/svm/avic.c | 10 ++++------
- arch/x86/kvm/svm/svm.c  |  7 +++++--
- 2 files changed, 9 insertions(+), 8 deletions(-)
+ arch/x86/kvm/svm/avic.c | 5 +++++
+ 1 file changed, 5 insertions(+)
 
 diff --git a/arch/x86/kvm/svm/avic.c b/arch/x86/kvm/svm/avic.c
-index 1def54c26259..e7728b16a46f 100644
+index e7728b16a46f..01c0e83e1b71 100644
 --- a/arch/x86/kvm/svm/avic.c
 +++ b/arch/x86/kvm/svm/avic.c
-@@ -940,9 +940,6 @@ void avic_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
- 	int h_physical_id = kvm_cpu_get_apicid(cpu);
- 	struct vcpu_svm *svm = to_svm(vcpu);
- 
--	if (!kvm_vcpu_apicv_active(vcpu))
--		return;
--
- 	/*
- 	 * Since the host physical APIC id is 8 bits,
- 	 * we can support host APIC ID upto 255.
-@@ -970,9 +967,6 @@ void avic_vcpu_put(struct kvm_vcpu *vcpu)
- 	u64 entry;
- 	struct vcpu_svm *svm = to_svm(vcpu);
- 
--	if (!kvm_vcpu_apicv_active(vcpu))
--		return;
--
- 	entry = READ_ONCE(*(svm->avic_physical_id_cache));
- 	if (entry & AVIC_PHYSICAL_ID_ENTRY_IS_RUNNING_MASK)
- 		avic_update_iommu_vcpu_affinity(vcpu, -1, 0);
-@@ -989,6 +983,10 @@ static void avic_set_running(struct kvm_vcpu *vcpu, bool is_run)
- 	struct vcpu_svm *svm = to_svm(vcpu);
- 
- 	svm->avic_is_running = is_run;
-+
-+	if (!kvm_vcpu_apicv_active(vcpu))
-+		return;
-+
- 	if (is_run)
- 		avic_vcpu_load(vcpu, vcpu->cpu);
- 	else
-diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index 1da12d700436..700bc188a650 100644
---- a/arch/x86/kvm/svm/svm.c
-+++ b/arch/x86/kvm/svm/svm.c
-@@ -1483,12 +1483,15 @@ static void svm_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
- 		sd->current_vmcb = svm->vmcb;
- 		indirect_branch_prediction_barrier();
+@@ -651,6 +651,11 @@ void svm_refresh_apicv_exec_ctrl(struct kvm_vcpu *vcpu)
  	}
--	avic_vcpu_load(vcpu, cpu);
-+	if (kvm_vcpu_apicv_active(vcpu))
-+		avic_vcpu_load(vcpu, cpu);
- }
+ 	vmcb_mark_dirty(vmcb, VMCB_AVIC);
  
- static void svm_vcpu_put(struct kvm_vcpu *vcpu)
- {
--	avic_vcpu_put(vcpu);
-+	if (kvm_vcpu_apicv_active(vcpu))
++	if (activated)
++		avic_vcpu_load(vcpu, vcpu->cpu);
++	else
 +		avic_vcpu_put(vcpu);
 +
- 	svm_prepare_host_switch(vcpu);
+ 	svm_set_pi_irte_mode(vcpu, activated);
+ }
  
- 	++vcpu->stat.host_state_reload;
 -- 
 2.26.3
 
