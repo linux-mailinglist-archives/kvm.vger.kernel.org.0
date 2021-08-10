@@ -2,86 +2,98 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 535C33E82D3
-	for <lists+kvm@lfdr.de>; Tue, 10 Aug 2021 20:19:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 652203E831F
+	for <lists+kvm@lfdr.de>; Tue, 10 Aug 2021 20:45:12 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233436AbhHJSUD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 10 Aug 2021 14:20:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60436 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233767AbhHJSTF (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 10 Aug 2021 14:19:05 -0400
-Received: from mail-qt1-x849.google.com (mail-qt1-x849.google.com [IPv6:2607:f8b0:4864:20::849])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9A8ACC0619D4
-        for <kvm@vger.kernel.org>; Tue, 10 Aug 2021 11:00:46 -0700 (PDT)
-Received: by mail-qt1-x849.google.com with SMTP id c11-20020ac87dcb0000b0290293566e00b1so5739255qte.15
-        for <kvm@vger.kernel.org>; Tue, 10 Aug 2021 11:00:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:message-id:mime-version:subject:from:to:cc;
-        bh=ZDsAyuyusmciA2jiuLhkX1nPCmYyecrodVye11rLd9Q=;
-        b=W4lyCmEWtEn5ycLPtZ5uDc3331Cbl+GU78dXD1fIggb7r5XOIzNGFYWRQs/u4ouCxr
-         bChbsah2+heDHScZ+z8ZCwUR/DBMW0rNIiY6Yr5AzqX6g2A5tiKpJTo1InBQJKDRQLPk
-         xgdnRvjZAjEOzkYtFHu1MR0+Dsxh9im01Y3ujy1hUCTUVTRnzwxs3ykAD/rvSbYJTkSF
-         YvzJKYt7XXknwvMQUUYaI7fs7u+pCOrEJpzduqIoptGwjrmuDgjNpUwYo9O5KhmSPpIU
-         xF+CtkWMIKFrXtJdErkMNHI+inLWCKGYbYggu5I37fao0dBXvPUdAwyj3svkVoMsH2w1
-         zsJA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
-        bh=ZDsAyuyusmciA2jiuLhkX1nPCmYyecrodVye11rLd9Q=;
-        b=qnGl6wI7FwZLzJl7yq7piFG/5wCQbiugv7ZGc2bSFN5ww5ITRaW+4Fl+0Vl8NSRvXu
-         Lq9eUJ+Tq12zVplosMVZn844kXPxcvVxMD4y3Rli4q7qUdYhHtb/jvOvOyIPQw4BJqqX
-         U5BGd+rRjqslzloKygx2GoosdPkAQZ0DNY/JVO8TstL9LZvKiCmwnydcS3Ycrk+ou2U+
-         E69icUo98oXmnWxvXDydiuetnhFJ7dezTAPK7D3DPsi26jIDZbGXb8ob69ze2LLxlOF3
-         AoiMpvefoqIGitRc6LDltaFGBXtGiiDqMgozIFflEQvxCYyQsX5syBH+ypxrRYfJQGV8
-         K2YQ==
-X-Gm-Message-State: AOAM531ZMI6HOsf9D5O8zOmJAmlvICWgCeGjGC+1jE2Rxhs6kpsSTt7v
-        +mUkThgKaK9pjklKmknzlFh91jwUTABTXIFFmt04VwMcM+mtQQyae+BKJZRR+VCsUy3YHEbbyW3
-        +ieqdgJO7W/VQ/YIkRNlKxxkLTgKRl5L8/9aTTHww4awz1m4yifeHh6dWiWOBo5jYWnFA6BY=
-X-Google-Smtp-Source: ABdhPJyiek44iHjdvj08SYsBGaFQYUJXKpN8kPEeKzUx8QYEIxcpDdQzWI3zurb29W8usy1UnVj1TDmnJ8MDSx4PTg==
-X-Received: from jgzg.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:1acf])
- (user=jingzhangos job=sendgmr) by 2002:a05:6214:1c47:: with SMTP id
- if7mr19170630qvb.6.1628618445702; Tue, 10 Aug 2021 11:00:45 -0700 (PDT)
-Date:   Tue, 10 Aug 2021 18:00:42 +0000
-Message-Id: <20210810180042.453089-1-jingzhangos@google.com>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.32.0.605.g8dce9f2422-goog
-Subject: [PATCH] KVM: stats: Remove unnecessary value store
-From:   Jing Zhang <jingzhangos@google.com>
-To:     KVM <kvm@vger.kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
-        kernel test robot <rong.a.chen@intel.com>
-Cc:     Jing Zhang <jingzhangos@google.com>,
-        kernel test robot <lkp@intel.com>
-Content-Type: text/plain; charset="UTF-8"
+        id S231274AbhHJSpc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 10 Aug 2021 14:45:32 -0400
+Received: from mga04.intel.com ([192.55.52.120]:6970 "EHLO mga04.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229480AbhHJSpb (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 10 Aug 2021 14:45:31 -0400
+X-IronPort-AV: E=McAfee;i="6200,9189,10072"; a="213112915"
+X-IronPort-AV: E=Sophos;i="5.84,310,1620716400"; 
+   d="scan'208";a="213112915"
+Received: from fmsmga003.fm.intel.com ([10.253.24.29])
+  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Aug 2021 11:45:07 -0700
+X-IronPort-AV: E=Sophos;i="5.84,310,1620716400"; 
+   d="scan'208";a="515946770"
+Received: from pdmuelle-desk2.amr.corp.intel.com (HELO skuppusw-mobl5.amr.corp.intel.com) ([10.213.166.202])
+  by fmsmga003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Aug 2021 11:45:06 -0700
+Subject: Re: [PATCH 07/11] treewide: Replace the use of mem_encrypt_active()
+ with prot_guest_has()
+To:     Tom Lendacky <thomas.lendacky@amd.com>,
+        linux-kernel@vger.kernel.org, x86@kernel.org,
+        linuxppc-dev@lists.ozlabs.org, linux-s390@vger.kernel.org,
+        iommu@lists.linux-foundation.org, kvm@vger.kernel.org,
+        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
+        linux-graphics-maintainer@vmware.com,
+        amd-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
+        kexec@lists.infradead.org, linux-fsdevel@vger.kernel.org
+Cc:     Borislav Petkov <bp@alien8.de>,
+        Brijesh Singh <brijesh.singh@amd.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Andi Kleen <ak@linux.intel.com>,
+        Tianyu Lan <Tianyu.Lan@microsoft.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Peter Zijlstra <peterz@infradead.org>,
+        David Airlie <airlied@linux.ie>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
+        Maxime Ripard <mripard@kernel.org>,
+        Thomas Zimmermann <tzimmermann@suse.de>,
+        Will Deacon <will@kernel.org>, Dave Young <dyoung@redhat.com>,
+        Baoquan He <bhe@redhat.com>
+References: <cover.1627424773.git.thomas.lendacky@amd.com>
+ <029791b24c6412f9427cfe6ec598156c64395964.1627424774.git.thomas.lendacky@amd.com>
+From:   "Kuppuswamy, Sathyanarayanan" 
+        <sathyanarayanan.kuppuswamy@linux.intel.com>
+Message-ID: <166f30d8-9abb-02de-70d8-6e97f44f85df@linux.intel.com>
+Date:   Tue, 10 Aug 2021 11:45:04 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Firefox/78.0 Thunderbird/78.11.0
+MIME-Version: 1.0
+In-Reply-To: <029791b24c6412f9427cfe6ec598156c64395964.1627424774.git.thomas.lendacky@amd.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Variables 'remain' and 'dest' don't need to be updated in the end.
 
-Reported-by: kernel test robot <lkp@intel.com>
-Signed-off-by: Jing Zhang <jingzhangos@google.com>
----
- virt/kvm/binary_stats.c | 2 --
- 1 file changed, 2 deletions(-)
 
-diff --git a/virt/kvm/binary_stats.c b/virt/kvm/binary_stats.c
-index e609d428811a..eefca6c69f51 100644
---- a/virt/kvm/binary_stats.c
-+++ b/virt/kvm/binary_stats.c
-@@ -136,9 +136,7 @@ ssize_t kvm_stats_read(char *id, const struct kvm_stats_header *header,
- 		src = stats + pos - header->data_offset;
- 		if (copy_to_user(dest, src, copylen))
- 			return -EFAULT;
--		remain -= copylen;
- 		pos += copylen;
--		dest += copylen;
- 	}
- 
- 	*offset = pos;
+On 7/27/21 3:26 PM, Tom Lendacky wrote:
+> diff --git a/arch/x86/kernel/head64.c b/arch/x86/kernel/head64.c
+> index de01903c3735..cafed6456d45 100644
+> --- a/arch/x86/kernel/head64.c
+> +++ b/arch/x86/kernel/head64.c
+> @@ -19,7 +19,7 @@
+>   #include <linux/start_kernel.h>
+>   #include <linux/io.h>
+>   #include <linux/memblock.h>
+> -#include <linux/mem_encrypt.h>
+> +#include <linux/protected_guest.h>
+>   #include <linux/pgtable.h>
+>   
+>   #include <asm/processor.h>
+> @@ -285,7 +285,7 @@ unsigned long __head __startup_64(unsigned long physaddr,
+>   	 * there is no need to zero it after changing the memory encryption
+>   	 * attribute.
+>   	 */
+> -	if (mem_encrypt_active()) {
+> +	if (prot_guest_has(PATTR_MEM_ENCRYPT)) {
+>   		vaddr = (unsigned long)__start_bss_decrypted;
+>   		vaddr_end = (unsigned long)__end_bss_decrypted;
 
-base-commit: d0732b0f8884d9cc0eca0082bbaef043f3fef7fb
+
+Since this change is specific to AMD, can you replace PATTR_MEM_ENCRYPT with
+prot_guest_has(PATTR_SME) || prot_guest_has(PATTR_SEV). It is not used in
+TDX.
+
 -- 
-2.32.0.605.g8dce9f2422-goog
-
+Sathyanarayanan Kuppuswamy
+Linux Kernel Developer
