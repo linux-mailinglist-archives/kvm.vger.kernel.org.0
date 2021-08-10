@@ -2,183 +2,106 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6D7F33E852A
-	for <lists+kvm@lfdr.de>; Tue, 10 Aug 2021 23:21:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 968893E856A
+	for <lists+kvm@lfdr.de>; Tue, 10 Aug 2021 23:35:45 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234538AbhHJVWC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 10 Aug 2021 17:22:02 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:56692 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S233895AbhHJVWB (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 10 Aug 2021 17:22:01 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1628630498;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=WRig48A/Y5ELWIXGfc5pI8HkAOxX1i/Vg3HxN4KtJsk=;
-        b=LHMUJKAYa8SMDck+wmLridOrrA2/YBsLdwH1UTWe0LO+rLjZZIlzuCgUC3QPht9kWpXA89
-        p9teaoHeuZvjDKsmjOo6onnrnwSyJW5fkUSYS64/BFMdMaCMQXXxuwsKK3Z36tugyq7jPJ
-        kRymr62O5s8X9qmtwb0DJT5rmOv1XMk=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-534-PvZ7OvBQN5q3Bq30GCpdAw-1; Tue, 10 Aug 2021 17:21:37 -0400
-X-MC-Unique: PvZ7OvBQN5q3Bq30GCpdAw-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id F0EED8799E0;
-        Tue, 10 Aug 2021 21:21:35 +0000 (UTC)
-Received: from starship (unknown [10.35.206.50])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 7172E620DE;
-        Tue, 10 Aug 2021 21:21:32 +0000 (UTC)
-Message-ID: <42cb19be1f6598e878b5b122e2152bdec27f62db.camel@redhat.com>
-Subject: Re: [PATCH v4 00/16] My AVIC patch queue
-From:   Maxim Levitsky <mlevitsk@redhat.com>
-To:     kvm@vger.kernel.org
-Cc:     Jim Mattson <jmattson@google.com>, linux-kernel@vger.kernel.org,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Borislav Petkov <bp@alien8.de>, Joerg Roedel <joro@8bytes.org>,
-        Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>
-Date:   Wed, 11 Aug 2021 00:21:31 +0300
-In-Reply-To: <20210810205251.424103-1-mlevitsk@redhat.com>
-References: <20210810205251.424103-1-mlevitsk@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
+        id S234388AbhHJVf4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 10 Aug 2021 17:35:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50680 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S234477AbhHJVfy (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 10 Aug 2021 17:35:54 -0400
+Received: from mail-il1-x12d.google.com (mail-il1-x12d.google.com [IPv6:2607:f8b0:4864:20::12d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6B6FFC061765
+        for <kvm@vger.kernel.org>; Tue, 10 Aug 2021 14:35:32 -0700 (PDT)
+Received: by mail-il1-x12d.google.com with SMTP id i13so545670ilm.11
+        for <kvm@vger.kernel.org>; Tue, 10 Aug 2021 14:35:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=lUE6eUMNCnrpO1N7j3rQ1PNPlaJZ7qzSUy+sJRK4FEM=;
+        b=vymI9nKeiVsD/NRJcl8MVSTZRXr+NmurSByydqRiTU7iZ9DBAVJbroT+yxxd+bq7Oy
+         igWAREU+JhyqdIMg1EuePqGhizukMrpATtdgypIpsOqN7iWmU8IuCrsPyD4v5lL+Ohc6
+         JJrc3wSSgUlOkb7j5vX0uL0YG97i8RN2+/mUyAD2k1KeL1XKR+mG8LPKXaRlYB0rz1u+
+         GfedsaBcmPk/GeZ1k6qSr7ge9m7C3mgCmFE16JO41FfRjNXfaPVS6A5lVQSptQFtJ+r1
+         Km2JKiW92KxdXLH1zuqB/HqcBWT1rntDsmacBSDjXT1A+Fu1ehrpTZXbOuWTkpVA46QX
+         bZAQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=lUE6eUMNCnrpO1N7j3rQ1PNPlaJZ7qzSUy+sJRK4FEM=;
+        b=CIEdAFVhkTb2OeyOczJFMnGONATjfmpBjCK6Ho9rLciGHeqtaWKFWnvtNDQbEI8jIW
+         gn+IRp6zWhNyHUtSJMrAnyKI4lQnp8UcRPinaRTgGCv9O5d6xR7xZntDzQsJYJxHCLON
+         2xIvTJZAjlOl2Ijc4v2M3qs/6BKntpk5a3Nbznth0x+eXIxMDdmfzGgfVFznZbfB0EUG
+         03lEhtUKQ2sC5IVtQ82KLeWKI2TG8JiqxvRIQYFO7sUEah0pn1Qlm+jDseauVIkPevpH
+         q6/qP+oRLhfdV/r/JRJcRhfD/rCIFQ6NOjwU4Q5wyTM6l6zunpZtzO22MKjAuO7CHwqh
+         /viA==
+X-Gm-Message-State: AOAM532ZBYJJvse6CFRZTMDXdjs4CKDeFnnyVKTbFex40kFjrxe/gjwO
+        tBOpPVj8zPYl9M0O0txu01hyni1BkJjGrizG0RiT/A==
+X-Google-Smtp-Source: ABdhPJxGYkX9hKhbVd1kniokF5j5+lFbDRHKxwd9lLvSfT9jwnQ29gg7CGwDoEiMqoUq48pxY1ll9zxlhJsfYX8cR10=
+X-Received: by 2002:a92:d9ce:: with SMTP id n14mr422309ilq.29.1628631331702;
+ Tue, 10 Aug 2021 14:35:31 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+References: <20210806222229.1645356-1-junaids@google.com> <YRG7U3b3ZM17ggp4@google.com>
+ <89c2d9da-590b-fb03-405c-4b16f2aff090@redhat.com>
+In-Reply-To: <89c2d9da-590b-fb03-405c-4b16f2aff090@redhat.com>
+From:   Junaid Shahid <junaids@google.com>
+Date:   Tue, 10 Aug 2021 14:34:55 -0700
+Message-ID: <CAL-GctE6jm4cYG8VB_mZisiRT-p7=Jppyepd28idsSqBEG7vyg@mail.gmail.com>
+Subject: Re: [PATCH] kvm: vmx: Sync all matching EPTPs when injecting nested
+ EPT fault
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Sean Christopherson <seanjc@google.com>, kvm@vger.kernel.org,
+        jmattson@google.com, bgardon@google.com, pshier@google.com
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 2021-08-10 at 23:52 +0300, Maxim Levitsky wrote:
-> Hi!
-> 
-> This is a series of bugfixes to the AVIC dynamic inhibition, which was
-> made while trying to fix bugs as much as possible in this area and trying
-> to make the AVIC+SYNIC conditional enablement work.
-> 
-> * Patches 1,3-8 are code from Sean Christopherson which
+On Tue, Aug 10, 2021 at 10:52 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
+>
+> On 10/08/21 01:33, Sean Christopherson wrote:
+> > On Fri, Aug 06, 2021, Junaid Shahid wrote:
+> >> When a nested EPT violation/misconfig is injected into the guest,
+> >> the shadow EPT PTEs associated with that address need to be synced.
+> >> This is done by kvm_inject_emulated_page_fault() before it calls
+> >> nested_ept_inject_page_fault(). However, that will only sync the
+> >> shadow EPT PTE associated with the current L1 EPTP. Since the ASID
+> >
+> > For the changelog and the comment, IMO using "vmcs12 EPTP" instead of "L1 EPTP"
+> > would add clarity.  I usually think of "L1 EPTP" as vmcs01->eptp and "L2 EPTP"
+> > as vmcs02->EPTP.  There are enough EPTPs in play with nested that it'd help to
+> > be very explicit.
+>
+> Or more briefly "EPT12".
 
-I mean patches 1,4-8. I forgot about patch 3 which I also added,
-which just added a comment about parameters of the kvm_flush_remote_tlbs_with_address.
+Sounds good.
 
-Best regards,
-	Maxim Levitsky
+>
+> >> is based on EP4TA rather than the full EPTP, so syncing the current
+> >> EPTP is not enough. The SPTEs associated with any other L1 EPTPs
+> >> in the prev_roots cache with the same EP4TA also need to be synced.
+> >
+> > No small part of me wonders if we should disallow duplicate vmcs12 EP4TAs in a
+> > single vCPU's root cache, e.g. purge existing roots with the same pgd but
+> > different role.  INVEPT does the right thing, but that seems more coincidental
+> > than intentional.
+> >
+> > Practically speaking, this only affects A/D bits.  Wouldn't a VMM need to flush
+> > the EP4TA if it toggled A/D enabling in order to have deterministic behavior?
+> > In other words, is there a real world use case for switching between EPTPs with
+> > same EP4TAs but different properties that would see a performance hit if KVM
+> > purged unusable cached roots with the same EP4TA?
+>
+> Probably not, but the complexity wouldn't be much different.
+>
 
->   implement an alternative approach of inhibiting AVIC without
->   disabling its memslot.
-> 
->   V4: addressed review feedback.
-> 
-> * Patch 2 is new and it fixes a bug in kvm_flush_remote_tlbs_with_address
-> 
-> * Patches 9-10 in this series fix a race condition which can cause
->   a lost write from a guest to APIC when the APIC write races
->   the AVIC un-inhibition, and add a warning to catch this problem
->   if it re-emerges again.
-> 
->   V4: applied review feedback from Paolo
-> 
-> * Patch 11 is the patch from Vitaly about allowing AVIC with SYNC
->   as long as the guest doesn’t use the AutoEOI feature. I only slightly
->   changed it to expose the AutoEOI cpuid bit regardless of AVIC enablement.
-> 
->   V4: fixed a race that Paolo pointed out.
-> 
-> * Patch 12 is a refactoring that is now possible in SVM AVIC inhibition code,
->   because the RCU lock is not dropped anymore.
-> 
-> * Patch 13-15 fixes another issue I found in AVIC inhibit code:
-> 
->   Currently avic_vcpu_load/avic_vcpu_put are called on userspace entry/exit
->   from KVM (aka kvm_vcpu_get/kvm_vcpu_put), and these functions update the
->   "is running" bit in the AVIC physical ID remap table and update the
->   target vCPU in iommu code.
-> 
->   However both of these functions don't do anything when AVIC is inhibited
->   thus the "is running" bit will be kept enabled during the exit to userspace.
->   This shouldn't be a big issue as the caller
->   doesn't use the AVIC when inhibited but still inconsistent and can trigger
->   a warning about this in avic_vcpu_load.
-> 
->   To be on the safe side I think it makes sense to call
->   avic_vcpu_put/avic_vcpu_load when inhibiting/uninhibiting the AVIC.
->   This will ensure that the work these functions do is matched.
-> 
->   V4: I splitted a single patch to 3 patches to make it easier
->       to review, and applied Paolo's review feedback.
-> 
-> * Patch 16 removes the pointless APIC base
->   relocation from AVIC to make it consistent with the rest of KVM.
-> 
->   (both AVIC and APICv only support default base, while regular KVM,
->   sort of support any APIC base as long as it is not RAM.
->   If guest attempts to relocate APIC base to non RAM area,
->   while APICv/AVIC are active, the new base will be non accelerated,
->   while the default base will continue to be AVIC/APICv backed).
-> 
->   On top of that if guest uses different APIC bases on different vCPUs,
->   KVM doesn't honour the fact that the MMIO range should only be active
->   on that vCPU.
-> 
-> Best regards,
-> 	Maxim Levitsky
-> 
-> Maxim Levitsky (14):
->   KVM: x86/mmu: fix parameters to kvm_flush_remote_tlbs_with_address
->   KVM: x86/mmu: add comment explaining arguments to kvm_zap_gfn_range
->   KVM: x86/mmu: bump mmu notifier count in kvm_zap_gfn_range
->   KVM: x86/mmu: rename try_async_pf to kvm_faultin_pfn
->   KVM: x86/mmu: allow kvm_faultin_pfn to return page fault handling code
->   KVM: x86/mmu: allow APICv memslot to be enabled but invisible
->   KVM: x86: don't disable APICv memslot when inhibited
->   KVM: x86: APICv: fix race in kvm_request_apicv_update on SVM
->   KVM: SVM: add warning for mistmatch between AVIC vcpu state and AVIC
->     inhibition
->   KVM: SVM: remove svm_toggle_avic_for_irq_window
->   KVM: SVM: avoid refreshing avic if its state didn't change
->   KVM: SVM: move check for kvm_vcpu_apicv_active outside of
->     avic_vcpu_{put|load}
->   KVM: SVM: call avic_vcpu_load/avic_vcpu_put when enabling/disabling
->     AVIC
->   KVM: SVM: AVIC: drop unsupported AVIC base relocation code
-> 
-> Sean Christopherson (1):
->   Revert "KVM: x86/mmu: Allow zap gfn range to operate under the mmu
->     read lock"
-> 
-> Vitaly Kuznetsov (1):
->   KVM: x86: hyper-v: Deactivate APICv only when AutoEOI feature is in
->     use
-> 
->  arch/x86/include/asm/kvm-x86-ops.h |  1 -
->  arch/x86/include/asm/kvm_host.h    | 13 +++++-
->  arch/x86/kvm/hyperv.c              | 32 ++++++++++---
->  arch/x86/kvm/mmu/mmu.c             | 75 ++++++++++++++++++++----------
->  arch/x86/kvm/mmu/paging_tmpl.h     |  6 +--
->  arch/x86/kvm/mmu/tdp_mmu.c         | 15 ++----
->  arch/x86/kvm/mmu/tdp_mmu.h         | 11 ++---
->  arch/x86/kvm/svm/avic.c            | 49 +++++++------------
->  arch/x86/kvm/svm/svm.c             | 21 ++++-----
->  arch/x86/kvm/svm/svm.h             |  8 ----
->  arch/x86/kvm/x86.c                 | 67 +++++++++++++++-----------
->  include/linux/kvm_host.h           |  5 ++
->  virt/kvm/kvm_main.c                |  7 ++-
->  13 files changed, 174 insertions(+), 136 deletions(-)
-> 
-> -- 
-> 2.26.3
-> 
-> 
+I also don't know of a real world use case like that, so either way
+would work. But I agree that it likely wouldn't be that much simpler.
+So I guess I'll just send a v2 with the clearer terminology, unless
+anyone really prefers disallowing duplicate EP4TAs in the root cache.
 
-
+Thanks,
+Junaid
