@@ -2,94 +2,126 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B35753E8407
-	for <lists+kvm@lfdr.de>; Tue, 10 Aug 2021 21:59:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D50A63E841C
+	for <lists+kvm@lfdr.de>; Tue, 10 Aug 2021 22:09:10 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232453AbhHJUAB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 10 Aug 2021 16:00:01 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:42741 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230525AbhHJT76 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 10 Aug 2021 15:59:58 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1628625576;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=5SYx2j9EQ5pdzV1C9IH+mYuJFsFKmzgLPRyNEkIdI+s=;
-        b=Xkdkxe5T/awZUJ8HBBunAMgm3la0mgGP0TT666B0+ltbRAahtrDDb05ciuk7ktvmW4YFoU
-        5Aiy8mqpWuB0y1/GG86DN9b7BcinDSpBCuf52Cp4P6bnlN27FFxzFrafndPxhYAX+8fSa/
-        zWZCvaPYFBYwPZ90nelWilg/pJcHNmw=
-Received: from mail-ot1-f72.google.com (mail-ot1-f72.google.com
- [209.85.210.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-78-vOs6m1rWMDWaNFQvnMECOg-1; Tue, 10 Aug 2021 15:59:35 -0400
-X-MC-Unique: vOs6m1rWMDWaNFQvnMECOg-1
-Received: by mail-ot1-f72.google.com with SMTP id i9-20020a0568302109b02905090e0df297so171642otc.0
-        for <kvm@vger.kernel.org>; Tue, 10 Aug 2021 12:59:34 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=5SYx2j9EQ5pdzV1C9IH+mYuJFsFKmzgLPRyNEkIdI+s=;
-        b=Xxi7dSfl14F0Q0ygTCFxsojvNMwITuwkF/KUV9TbA38XTCfFWaqJG0g0PHaDjRIEIq
-         rwXzEiI+dlveSRAKN+XZouvnDpCUOLTJqdLpoO/sQdXVSGWatkE4MZ53o0BKbonyv0T7
-         5HVNh4kaxmqY1GhR9MA4MbrGnoJknpX/tOCREJLa+knMMOv+zfXQ0+AnYQ7E+kABxG0C
-         Q+blpx4flomdF35fZI9vzCpQ8xJ8nSjvaHQRH6C9sCzrEA5a0LH4TjeAkUPE4lbjQeLx
-         IHSH1wqAmDxqYL+MjRjPz1A32sXp1XA30Feb0v2dBnCaGHODeH+SbFZ0hGm/gwLI7JMy
-         /mSw==
-X-Gm-Message-State: AOAM532EjPCYsA71hXP6VuPhuVM33Lw45zMNVfipSMkYW+w+B4WZ9DUm
-        iucuY9zS0KFMOJY8WCbJfEjTn1JHeXh6VOaeicfu6jUUVYUZwhFyVVgrhD7uzAspPZ/4MVdyLgj
-        vavKifzCH8uHN
-X-Received: by 2002:aca:2b07:: with SMTP id i7mr4975587oik.97.1628625574203;
-        Tue, 10 Aug 2021 12:59:34 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwK3rE75lK3h+wUTcVv/Hzo5wpFsQe+Kjjbim3d5l0FAevt8Ld9ndoIzQ5mbMXYi918sGGsWQ==
-X-Received: by 2002:aca:2b07:: with SMTP id i7mr4975578oik.97.1628625574071;
-        Tue, 10 Aug 2021 12:59:34 -0700 (PDT)
-Received: from redhat.com ([198.99.80.109])
-        by smtp.gmail.com with ESMTPSA id b11sm674139ooi.0.2021.08.10.12.59.33
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 10 Aug 2021 12:59:33 -0700 (PDT)
-Date:   Tue, 10 Aug 2021 13:59:32 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Peter Xu <peterx@redhat.com>
-Cc:     Jason Gunthorpe <jgg@nvidia.com>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org
-Subject: Re: [PATCH 3/7] vfio/pci: Use vfio_device_unmap_mapping_range()
-Message-ID: <20210810135932.6825833b.alex.williamson@redhat.com>
-In-Reply-To: <YRLJ/wdiY/fnGj2d@t490s>
-References: <162818167535.1511194.6614962507750594786.stgit@omen>
-        <162818325518.1511194.1243290800645603609.stgit@omen>
-        <YRLJ/wdiY/fnGj2d@t490s>
-X-Mailer: Claws Mail 3.18.0 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
+        id S232836AbhHJUJa (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 10 Aug 2021 16:09:30 -0400
+Received: from mga18.intel.com ([134.134.136.126]:55710 "EHLO mga18.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229788AbhHJUJa (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 10 Aug 2021 16:09:30 -0400
+X-IronPort-AV: E=McAfee;i="6200,9189,10072"; a="202152493"
+X-IronPort-AV: E=Sophos;i="5.84,310,1620716400"; 
+   d="scan'208";a="202152493"
+Received: from fmsmga003.fm.intel.com ([10.253.24.29])
+  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Aug 2021 13:09:06 -0700
+X-IronPort-AV: E=Sophos;i="5.84,310,1620716400"; 
+   d="scan'208";a="515971399"
+Received: from pdmuelle-desk2.amr.corp.intel.com (HELO skuppusw-mobl5.amr.corp.intel.com) ([10.213.166.202])
+  by fmsmga003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Aug 2021 13:09:05 -0700
+Subject: Re: [PATCH 07/11] treewide: Replace the use of mem_encrypt_active()
+ with prot_guest_has()
+To:     Tom Lendacky <thomas.lendacky@amd.com>,
+        linux-kernel@vger.kernel.org, x86@kernel.org,
+        linuxppc-dev@lists.ozlabs.org, linux-s390@vger.kernel.org,
+        iommu@lists.linux-foundation.org, kvm@vger.kernel.org,
+        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
+        linux-graphics-maintainer@vmware.com,
+        amd-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
+        kexec@lists.infradead.org, linux-fsdevel@vger.kernel.org
+Cc:     Borislav Petkov <bp@alien8.de>,
+        Brijesh Singh <brijesh.singh@amd.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Andi Kleen <ak@linux.intel.com>,
+        Tianyu Lan <Tianyu.Lan@microsoft.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Peter Zijlstra <peterz@infradead.org>,
+        David Airlie <airlied@linux.ie>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
+        Maxime Ripard <mripard@kernel.org>,
+        Thomas Zimmermann <tzimmermann@suse.de>,
+        Will Deacon <will@kernel.org>, Dave Young <dyoung@redhat.com>,
+        Baoquan He <bhe@redhat.com>,
+        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+References: <cover.1627424773.git.thomas.lendacky@amd.com>
+ <029791b24c6412f9427cfe6ec598156c64395964.1627424774.git.thomas.lendacky@amd.com>
+ <166f30d8-9abb-02de-70d8-6e97f44f85df@linux.intel.com>
+ <4b885c52-f70a-147e-86bd-c71a8f4ef564@amd.com>
+From:   "Kuppuswamy, Sathyanarayanan" 
+        <sathyanarayanan.kuppuswamy@linux.intel.com>
+Message-ID: <4f9effcb-055b-51ee-6722-c9f0cc1d8acf@linux.intel.com>
+Date:   Tue, 10 Aug 2021 13:09:02 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Firefox/78.0 Thunderbird/78.11.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <4b885c52-f70a-147e-86bd-c71a8f4ef564@amd.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 10 Aug 2021 14:48:31 -0400
-Peter Xu <peterx@redhat.com> wrote:
 
-> On Thu, Aug 05, 2021 at 11:07:35AM -0600, Alex Williamson wrote:
-> > @@ -1690,7 +1554,7 @@ static int vfio_pci_mmap(struct vfio_device *core_vdev, struct vm_area_struct *v
-> >  
-> >  	vma->vm_private_data = vdev;
-> >  	vma->vm_page_prot = pgprot_noncached(vma->vm_page_prot);
-> > -	vma->vm_pgoff = (pci_resource_start(pdev, index) >> PAGE_SHIFT) + pgoff;
-> > +	vma->vm_page_prot = pgprot_decrypted(vma->vm_page_prot);  
+
+On 8/10/21 12:48 PM, Tom Lendacky wrote:
+> On 8/10/21 1:45 PM, Kuppuswamy, Sathyanarayanan wrote:
+>>
+>>
+>> On 7/27/21 3:26 PM, Tom Lendacky wrote:
+>>> diff --git a/arch/x86/kernel/head64.c b/arch/x86/kernel/head64.c
+>>> index de01903c3735..cafed6456d45 100644
+>>> --- a/arch/x86/kernel/head64.c
+>>> +++ b/arch/x86/kernel/head64.c
+>>> @@ -19,7 +19,7 @@
+>>>    #include <linux/start_kernel.h>
+>>>    #include <linux/io.h>
+>>>    #include <linux/memblock.h>
+>>> -#include <linux/mem_encrypt.h>
+>>> +#include <linux/protected_guest.h>
+>>>    #include <linux/pgtable.h>
+>>>      #include <asm/processor.h>
+>>> @@ -285,7 +285,7 @@ unsigned long __head __startup_64(unsigned long
+>>> physaddr,
+>>>         * there is no need to zero it after changing the memory encryption
+>>>         * attribute.
+>>>         */
+>>> -    if (mem_encrypt_active()) {
+>>> +    if (prot_guest_has(PATTR_MEM_ENCRYPT)) {
+>>>            vaddr = (unsigned long)__start_bss_decrypted;
+>>>            vaddr_end = (unsigned long)__end_bss_decrypted;
+>>
+>>
+>> Since this change is specific to AMD, can you replace PATTR_MEM_ENCRYPT with
+>> prot_guest_has(PATTR_SME) || prot_guest_has(PATTR_SEV). It is not used in
+>> TDX.
 > 
-> This addition seems to be an accident. :) Thanks,
+> This is a direct replacement for now. I think the change you're requesting
+> should be done as part of the TDX support patches so it's clear why it is
+> being changed.
 
-Nope, Jason noted on a previous version that io_remap_pfn_range() is
-essentially:
+Ok. I will include it part of TDX changes.
 
-  remap_pfn_range(vma, addr, pfn, size, pgprot_decrypted(prot));
+> 
+> But, wouldn't TDX still need to do something with this shared/unencrypted
+> area, though? Or since it is shared, there's actually nothing you need to
+> do (the bss decrpyted section exists even if CONFIG_AMD_MEM_ENCRYPT is not
+> configured)?
 
-So since we switched to vmf_insert_pfn() I added this page protection
-flag to the vma instead, then it gets removed later when we switch back
-to io_remap_pfn_range().  Thanks,
+Kirill had a requirement to turn on CONFIG_AMD_MEM_ENCRYPT for adding lazy
+accept support in TDX guest kernel. Kirill, can you add details here?
 
-Alex
+> 
+> Thanks,
+> Tom
+> 
+>>
 
+-- 
+Sathyanarayanan Kuppuswamy
+Linux Kernel Developer
