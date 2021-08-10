@@ -2,151 +2,100 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id AD1833E5751
-	for <lists+kvm@lfdr.de>; Tue, 10 Aug 2021 11:44:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CE3663E57BC
+	for <lists+kvm@lfdr.de>; Tue, 10 Aug 2021 11:59:43 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238224AbhHJJoj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 10 Aug 2021 05:44:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53636 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238220AbhHJJog (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 10 Aug 2021 05:44:36 -0400
-Received: from mail-lj1-x22e.google.com (mail-lj1-x22e.google.com [IPv6:2a00:1450:4864:20::22e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 942F2C0613D3
-        for <kvm@vger.kernel.org>; Tue, 10 Aug 2021 02:44:14 -0700 (PDT)
-Received: by mail-lj1-x22e.google.com with SMTP id l4so13450944ljq.4
-        for <kvm@vger.kernel.org>; Tue, 10 Aug 2021 02:44:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=yE5wXZDXK6p9cpZ2q0EZSEm3h7xR70bZBY+/kdRRL0c=;
-        b=CRO03wZGW9IhDXyoC7tHi98Ja0XupCcBdJAnNO0LJgz5Hr/4tX8bE7lC8sh5nXSMz4
-         r+qJDvdQOTJPMcSkKA/yt+ECcOjls9JMmmNgIfvfEbnxM4o2xQzyJUelT1TmznCjSYzs
-         gGwHdKzl9m+H/hhxsyxOSa4DDTSAnlGCJsGkgMFlMB2hC8pZZEjX6C4Yphf8RjExvNff
-         1rulAz0nxCsvsAdwaL/xE/pIPBdDLbeRyJC0Qubdu7z/oe4INRDK8fgSAu4JgknRPv96
-         xtaOetA4RrzmQ4YJ6NLsjhuKMtZjvZybtrccCQH9GJrw+fTpwpiAfP/232Tf44PidSLD
-         Lefg==
+        id S239502AbhHJKAD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 10 Aug 2021 06:00:03 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:37804 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S239501AbhHJJ76 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 10 Aug 2021 05:59:58 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1628589576;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=3ld0ov5ZFUXowL08LtrrPHuGTJpIQ0NXDqTK+zb0kPo=;
+        b=Ec43FRyt+UpKO6ROs4MQEkNN7AUp4JyL2/TNaSHHTE8k1P+SYaDG9m+Vo+fTYVfqbcOYca
+        rg5VT38Aa+2zE2eVcAAjZU/tRyfLlodU8FAzEKxWHox4qcJYJpJuyNKz6fZYzFUwPf/Lri
+        TsSPHk3kCfPu7pK4/HiTqlZIZxK1wJQ=
+Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
+ [209.85.218.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-197-AuQIT9FjMdefWc3oTiDYjw-1; Tue, 10 Aug 2021 05:59:35 -0400
+X-MC-Unique: AuQIT9FjMdefWc3oTiDYjw-1
+Received: by mail-ej1-f72.google.com with SMTP id kf21-20020a17090776d5b02905af6ad96f02so1662078ejc.12
+        for <kvm@vger.kernel.org>; Tue, 10 Aug 2021 02:59:34 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=yE5wXZDXK6p9cpZ2q0EZSEm3h7xR70bZBY+/kdRRL0c=;
-        b=WZQ++hUppehmbtxTM2ichC1ImPbPcR3/OE4MFTKjKglK7wpUpkgbXvDb4vojOrlD1n
-         bVeJkFVgX+XakkPYMef1ftlopn9kyqQuB6CyXo4+m7EdX0gema8zavaCgJWgRrJ3evP+
-         29A75/1abhnsOyeCVeZjlyHy9UrD/R7TArOYTrABAAnBRaWJJUdFGYs7gFhSefE4gL86
-         itjGALW6EJGaRque30aW4l+Nw8h2WugiizoChfTHYME1Ygt2QHK2UwqxlEgTJxPcw+Pj
-         9UNz6+LfFelwMLhbVQK0tXXxWGx9nrlSpRW8sDRMo+5A/bx+9tKwfrjBgNk/CmfdeA67
-         yTfg==
-X-Gm-Message-State: AOAM531K3L7F86IiaWBHLSURrz+Zv9PoZox8Z8dgHP2RDlkYrL+MLofX
-        bCi4SPfTdbtHZBy8wvMckYikhUgLGUz9Rn5knd8MVtlL+N2kqw==
-X-Google-Smtp-Source: ABdhPJxUnypR2IsyYSmdqkzIj2TFW6CoDKEXzQYFw/rzkhRclEucBFJqITY4bz5cpiueE/RXRyoyQxJgKvpb1EKKg+k=
-X-Received: by 2002:a2e:89c4:: with SMTP id c4mr18569718ljk.275.1628588652559;
- Tue, 10 Aug 2021 02:44:12 -0700 (PDT)
-MIME-Version: 1.0
-References: <20210804085819.846610-1-oupton@google.com> <20210804085819.846610-14-oupton@google.com>
- <87czqlbq15.wl-maz@kernel.org>
-In-Reply-To: <87czqlbq15.wl-maz@kernel.org>
-From:   Oliver Upton <oupton@google.com>
-Date:   Tue, 10 Aug 2021 02:44:01 -0700
-Message-ID: <CAOQ_Qsjiyp_HQLhgFfF-o7T=Qpe+djL9KCFjAU2xmj8OXhAf4w@mail.gmail.com>
-Subject: Re: [PATCH v6 13/21] KVM: arm64: Allow userspace to configure a
- vCPU's virtual offset
-To:     Marc Zyngier <maz@kernel.org>
-Cc:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Peter Shier <pshier@google.com>,
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=3ld0ov5ZFUXowL08LtrrPHuGTJpIQ0NXDqTK+zb0kPo=;
+        b=XumCTlB0KLitVcI+dfb5xIWFbBczGbUoHXxyH9uqaaCmqXDQf3qFnsD5Xh6xXqj1fE
+         Zl85cDHWkoxe/f/SAp6yzFqWuY0eJ63gD2TCXUY0yTIJC6iEaHedHmZIiKKqnxFKURWq
+         JP3JH5UR1NKMuNuZGVjr2H3ezkcNSYJ64qgKqVI6j5B04fpVfWqfpCPw5P/RGhBXxcJ1
+         PALymsFR6bcc5/ZYiyladO5m26TfrB3htunjExQVvFdmA7fV3H/xQ4IitJqNSBj0Qz3J
+         lfebbEg4y7yQ2SxTeey6YLFHA0Wj3kl1Exf7PQqCoksRx3z53K6xMv+6j/Xv2UDhE5I9
+         xknw==
+X-Gm-Message-State: AOAM532Tb3O4n1u0z8YiWErr1j/7MTzNyesOX5FBBu1Ls+O06k6E0Lw7
+        cW221EDZkSu2hLdA2Vw8t2ZZXSTgpLlTuhZHS/nrg88HhrzuvcW/3iT3VYPm3d13MDVnZilstCA
+        MDkfzOP4RFZRqvW6rO6DALQm9m0MLz1M56W4TCLv0Si3G6B4txxx9TUJbog1yBs8q
+X-Received: by 2002:a50:bb2e:: with SMTP id y43mr3967361ede.103.1628589573625;
+        Tue, 10 Aug 2021 02:59:33 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJw5saJYoklO3PlR4J0I3tkMX/trMfPhYNaGzws5Cn/JV+9a9cwjuu9i9GaWViUAQy7+HEBujw==
+X-Received: by 2002:a50:bb2e:: with SMTP id y43mr3967341ede.103.1628589573452;
+        Tue, 10 Aug 2021 02:59:33 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:63a7:c72e:ea0e:6045? ([2001:b07:6468:f312:63a7:c72e:ea0e:6045])
+        by smtp.gmail.com with ESMTPSA id b5sm6683059ejq.56.2021.08.10.02.59.32
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 10 Aug 2021 02:59:32 -0700 (PDT)
+Subject: Re: [PATCH] KVM: X86: Don't reset dr6 unconditionally when the vcpu
+ being scheduled out
+To:     Sean Christopherson <seanjc@google.com>,
+        Lai Jiangshan <jiangshanlai@gmail.com>
+Cc:     linux-kernel@vger.kernel.org,
+        Lai Jiangshan <laijs@linux.alibaba.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        David Matlack <dmatlack@google.com>,
-        Ricardo Koller <ricarkol@google.com>,
-        Jing Zhang <jingzhangos@google.com>,
-        Raghavendra Rao Anata <rananta@google.com>,
-        James Morse <james.morse@arm.com>,
-        Alexandru Elisei <Alexandru.Elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        linux-arm-kernel@lists.infradead.org,
-        Andrew Jones <drjones@redhat.com>,
-        Will Deacon <will@kernel.org>,
-        Catalin Marinas <catalin.marinas@arm.com>
-Content-Type: text/plain; charset="UTF-8"
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
+        kvm@vger.kernel.org
+References: <20210808232919.862835-1-jiangshanlai@gmail.com>
+ <YRFdq8sNuXYpgemU@google.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <8726aff8-f7d0-d4e0-ed59-aeffc2a4c2f5@redhat.com>
+Date:   Tue, 10 Aug 2021 11:59:31 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.11.0
+MIME-Version: 1.0
+In-Reply-To: <YRFdq8sNuXYpgemU@google.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Aug 10, 2021 at 2:35 AM Marc Zyngier <maz@kernel.org> wrote:
->
-> On Wed, 04 Aug 2021 09:58:11 +0100,
-> Oliver Upton <oupton@google.com> wrote:
-> >
-> > Allow userspace to access the guest's virtual counter-timer offset
-> > through the ONE_REG interface. The value read or written is defined to
-> > be an offset from the guest's physical counter-timer. Add some
-> > documentation to clarify how a VMM should use this and the existing
-> > CNTVCT_EL0.
-> >
-> > Signed-off-by: Oliver Upton <oupton@google.com>
-> > ---
-> >  Documentation/virt/kvm/api.rst    | 10 ++++++++++
-> >  arch/arm64/include/uapi/asm/kvm.h |  1 +
-> >  arch/arm64/kvm/arch_timer.c       | 11 +++++++++++
-> >  arch/arm64/kvm/guest.c            |  6 +++++-
-> >  include/kvm/arm_arch_timer.h      |  1 +
-> >  5 files changed, 28 insertions(+), 1 deletion(-)
-> >
-> > diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-> > index 8d4a3471ad9e..28a65dc89985 100644
-> > --- a/Documentation/virt/kvm/api.rst
-> > +++ b/Documentation/virt/kvm/api.rst
-> > @@ -2487,6 +2487,16 @@ arm64 system registers have the following id bit patterns::
-> >       derived from the register encoding for CNTV_CVAL_EL0.  As this is
-> >       API, it must remain this way.
-> >
-> > +.. warning::
-> > +
-> > +     The value of KVM_REG_ARM_TIMER_OFFSET is defined as an offset from
-> > +     the guest's view of the physical counter-timer.
-> > +
-> > +     Userspace should use either KVM_REG_ARM_TIMER_OFFSET or
-> > +     KVM_REG_ARM_TIMER_CVAL to pause and resume a guest's virtual
->
-> You probably mean KVM_REG_ARM_TIMER_CNT here, despite the broken
-> encoding.
+On 09/08/21 18:54, Sean Christopherson wrote:
+> Not directly related to this patch, but why does KVM_DEBUGREG_RELOAD exist?
+> Commit ae561edeb421 ("KVM: x86: DR0-DR3 are not clear on reset") added it to
+> ensure DR0-3 are fresh when they're modified through non-standard paths, but I
+> don't see any reason why the new values_must_  be loaded into hardware.  eff_db
+> needs to be updated, but I don't see why hardware DRs need to be updated unless
+> hardware breakpoints are active or DR exiting is disabled, and in those cases
+> updating hardware is handled by KVM_DEBUGREG_WONT_EXIT and KVM_DEBUGREG_BP_ENABLED.
 
-Indeed I do!
+The original implementation of KVM_DEBUGREG_WONT_EXIT (by yours truly) 
+had a bug where it did not call kvm_update_dr7 and thus 
+KVM_DEBUGREG_BP_ENABLED was not set correctly.  I agree that commit 
+70e4da7a8ff6 ("KVM: x86: fix root cause for missed hardware 
+breakpoints") should have gotten rid of KVM_DEBUGREG_RELOAD altogether.
 
->
-> > +     counter-timer. Mixed use of these registers could result in an
-> > +     unpredictable guest counter value.
-> > +
-> >  arm64 firmware pseudo-registers have the following bit pattern::
-> >
-> >    0x6030 0000 0014 <regno:16>
-> > diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
-> > index b3edde68bc3e..949a31bc10f0 100644
-> > --- a/arch/arm64/include/uapi/asm/kvm.h
-> > +++ b/arch/arm64/include/uapi/asm/kvm.h
-> > @@ -255,6 +255,7 @@ struct kvm_arm_copy_mte_tags {
-> >  #define KVM_REG_ARM_TIMER_CTL                ARM64_SYS_REG(3, 3, 14, 3, 1)
-> >  #define KVM_REG_ARM_TIMER_CVAL               ARM64_SYS_REG(3, 3, 14, 0, 2)
-> >  #define KVM_REG_ARM_TIMER_CNT                ARM64_SYS_REG(3, 3, 14, 3, 2)
-> > +#define KVM_REG_ARM_TIMER_OFFSET     ARM64_SYS_REG(3, 4, 14, 0, 3)
->
-> I don't think we can use the encoding for CNTPOFF_EL2 here, as it will
-> eventually clash with a NV guest using the same feature for its own
-> purpose. We don't want this offset to overlap with any of the existing
-> features.
->
-> I actually liked your previous proposal of controlling the physical
-> offset via a device property, as it clearly indicated that you were
-> dealing with non-architectural state.
 
-That's actually exactly what I did here :) That said, the macro name
-is horribly obfuscated from CNTVOFF_EL2. I did this for the sake of
-symmetry with other virtual counter-timer registers above, though this
-may warrant special casing given the fact that we have a similarly
-named device attribute to handle the physical offset.
+Paolo
 
---
-Thanks,
-Oliver
