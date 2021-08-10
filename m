@@ -2,102 +2,145 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B15373E5479
-	for <lists+kvm@lfdr.de>; Tue, 10 Aug 2021 09:40:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8C9A73E5483
+	for <lists+kvm@lfdr.de>; Tue, 10 Aug 2021 09:44:14 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234967AbhHJHlI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 10 Aug 2021 03:41:08 -0400
-Received: from mga01.intel.com ([192.55.52.88]:56797 "EHLO mga01.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229760AbhHJHlH (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 10 Aug 2021 03:41:07 -0400
-X-IronPort-AV: E=McAfee;i="6200,9189,10070"; a="236858554"
-X-IronPort-AV: E=Sophos;i="5.84,309,1620716400"; 
-   d="scan'208";a="236858554"
-Received: from fmsmga003.fm.intel.com ([10.253.24.29])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Aug 2021 00:40:45 -0700
-X-IronPort-AV: E=Sophos;i="5.84,309,1620716400"; 
-   d="scan'208";a="515665387"
-Received: from yilonggu-mobl.ccr.corp.intel.com (HELO localhost) ([10.249.175.101])
-  by fmsmga003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Aug 2021 00:40:41 -0700
-Date:   Tue, 10 Aug 2021 15:40:37 +0800
-From:   Yu Zhang <yu.c.zhang@linux.intel.com>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Wei Huang <wei.huang2@amd.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, pbonzini@redhat.com,
-        vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com,
-        joro@8bytes.org, tglx@linutronix.de, mingo@redhat.com,
-        bp@alien8.de, x86@kernel.org, hpa@zytor.com
-Subject: Re: [PATCH v2 1/3] KVM: x86: Allow CPU to force vendor-specific TDP
- level
-Message-ID: <20210810074037.mizpggevgyhed6rm@linux.intel.com>
-References: <20210808192658.2923641-1-wei.huang2@amd.com>
- <20210808192658.2923641-2-wei.huang2@amd.com>
- <20210809035806.5cqdqm5vkexvngda@linux.intel.com>
- <c6324362-1439-ef94-789b-5934c0e1cdb8@amd.com>
- <20210809042703.25gfuuvujicc3vj7@linux.intel.com>
- <73bbaac0-701c-42dd-36da-aae1fed7f1a0@amd.com>
- <20210809064224.ctu3zxknn7s56gk3@linux.intel.com>
- <YRFKABg2MOJxcq+y@google.com>
+        id S236851AbhHJHoc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 10 Aug 2021 03:44:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53128 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S235070AbhHJHoa (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 10 Aug 2021 03:44:30 -0400
+Received: from mail-ej1-x629.google.com (mail-ej1-x629.google.com [IPv6:2a00:1450:4864:20::629])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A5CB9C061796
+        for <kvm@vger.kernel.org>; Tue, 10 Aug 2021 00:44:08 -0700 (PDT)
+Received: by mail-ej1-x629.google.com with SMTP id o23so560662ejc.3
+        for <kvm@vger.kernel.org>; Tue, 10 Aug 2021 00:44:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=bytedance-com.20150623.gappssmtp.com; s=20150623;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=elqUT9stw2J3iR2l4RxHnGypplqsV8TkYIJkIMW8hsY=;
+        b=Dw2anpOlrs9rV2RbKN404Zn18rw9HV6mvfkE8M1kGMV2Ah+OI2rfEhpzsA9qdOawIF
+         k8THbB9AABfuNY1MbNdd0AcLrxpPD246ArW/bPUC+pr03hqytJJD7OFvzo3N0q/tpZGO
+         tH48kCvdWiYFfAcIV1f5yS5oQiNePxkq4fi3pXrnB2oNtBTWdXNxRQpFSbu0OmyXCusR
+         +W05Ly+4a2nE2bv8/HwAQbH8fmJcv8+1juWLj995sdhCvh4wbwIAVnm3NRBqnxRlLOyy
+         KEmSTLyK4NbrCSV7j939f/4v7zlRHpFqgOALTvOj2N1xjrfa63r8X64WZ/4zirZ1FwSG
+         ug5Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=elqUT9stw2J3iR2l4RxHnGypplqsV8TkYIJkIMW8hsY=;
+        b=WgThI5cnyi84+1vBO5ktgGbzwPerJHpTUTYkCzsUMMt8PmVwr0D+nFQTazoMcxXZgT
+         2TzpcPNcp3rIjQvql83j4KjNBOCPd33bB+V1nl35HzE7UuXaLRX5m+Ny4cnBwzWKTFEJ
+         WBkq5Wczx7bW0/VUlEZqNTIp0soCw+G4cJdE00fcAvnueVmlDE+WPGEhQBRHRqcCRIzE
+         bXFyjc4+Xq16Bz3rGHsacRUbUqR6GZG4nmk5ojE/UHh1kc9qqTEeRYk2wfcl0VX5FB8v
+         mJ5MT2DujsVBr+LjcR2tKg0hzWVvYosaTG+MHGoO00iqZ/ZgXM1b3c6AePfmrctvyLmy
+         TlWw==
+X-Gm-Message-State: AOAM532Ya9j4JfzxUKVEzQpNORLIuqT7FrmtHdxYUjVqRbflf/cgTQoo
+        +va98GSLpOl6wPFILfAi6I+A1x6v2507sXUdK4Dy
+X-Google-Smtp-Source: ABdhPJx/TbMGjhieQzq1YqRjJBN7a9WTaXbFyhJM7EzEX+MXvLMAXR31L8+X5gM3dqLz8GqZFLUy0w3uIoYuvmPOUqE=
+X-Received: by 2002:a17:906:8606:: with SMTP id o6mr26642389ejx.247.1628581447154;
+ Tue, 10 Aug 2021 00:44:07 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <YRFKABg2MOJxcq+y@google.com>
-User-Agent: NeoMutt/20171215
+References: <20210729073503.187-1-xieyongji@bytedance.com> <20210729073503.187-2-xieyongji@bytedance.com>
+ <43d88942-1cd3-c840-6fec-4155fd544d80@redhat.com> <CACycT3vcpwyA3xjD29f1hGnYALyAd=-XcWp8+wJiwSqpqUu00w@mail.gmail.com>
+ <6e05e25e-e569-402e-d81b-8ac2cff1c0e8@arm.com> <CACycT3sm2r8NMMUPy1k1PuSZZ3nM9aic-O4AhdmRRCwgmwGj4Q@mail.gmail.com>
+ <417ce5af-4deb-5319-78ce-b74fb4dd0582@arm.com> <CACycT3vARzvd4-dkZhDHqUkeYoSxTa2ty0z0ivE1znGti+n1-g@mail.gmail.com>
+ <8c381d3d-9bbd-73d6-9733-0f0b15c40820@redhat.com> <CACycT3steXFeg7NRbWpo2J59dpYcumzcvM2zcPJAVe40-EvvEg@mail.gmail.com>
+ <b427cf12-2ff6-e5cd-fe6a-3874d8622a29@redhat.com>
+In-Reply-To: <b427cf12-2ff6-e5cd-fe6a-3874d8622a29@redhat.com>
+From:   Yongji Xie <xieyongji@bytedance.com>
+Date:   Tue, 10 Aug 2021 15:43:56 +0800
+Message-ID: <CACycT3vuBdmWdu4X9wjCO0hm+O0xH2Uf0S2ZTk4O_pL2jX6Y5g@mail.gmail.com>
+Subject: Re: [PATCH v10 01/17] iova: Export alloc_iova_fast() and free_iova_fast()
+To:     Jason Wang <jasowang@redhat.com>,
+        Robin Murphy <robin.murphy@arm.com>
+Cc:     kvm <kvm@vger.kernel.org>, "Michael S. Tsirkin" <mst@redhat.com>,
+        virtualization <virtualization@lists.linux-foundation.org>,
+        Christian Brauner <christian.brauner@canonical.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Matthew Wilcox <willy@infradead.org>,
+        Christoph Hellwig <hch@infradead.org>,
+        Dan Carpenter <dan.carpenter@oracle.com>,
+        Stefano Garzarella <sgarzare@redhat.com>,
+        Liu Xiaodong <xiaodong.liu@intel.com>,
+        Joe Perches <joe@perches.com>,
+        Al Viro <viro@zeniv.linux.org.uk>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        songmuchun@bytedance.com, Jens Axboe <axboe@kernel.dk>,
+        He Zhe <zhe.he@windriver.com>,
+        Greg KH <gregkh@linuxfoundation.org>,
+        Randy Dunlap <rdunlap@infradead.org>,
+        linux-kernel <linux-kernel@vger.kernel.org>,
+        iommu@lists.linux-foundation.org, bcrl@kvack.org,
+        netdev@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        =?UTF-8?Q?Mika_Penttil=C3=A4?= <mika.penttila@nextfour.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Aug 09, 2021 at 03:30:08PM +0000, Sean Christopherson wrote:
-> On Mon, Aug 09, 2021, Yu Zhang wrote:
-> > On Sun, Aug 08, 2021 at 11:33:44PM -0500, Wei Huang wrote:
-> > > 
-> > > On 8/8/21 11:27 PM, Yu Zhang wrote:
-> > > > On Sun, Aug 08, 2021 at 11:11:40PM -0500, Wei Huang wrote:
-> > > > > 
-> > > > > 
-> > > > > On 8/8/21 10:58 PM, Yu Zhang wrote:
-> > > > > > On Sun, Aug 08, 2021 at 02:26:56PM -0500, Wei Huang wrote:
-> > > > > > > AMD future CPUs will require a 5-level NPT if host CR4.LA57 is set.
-> > > > > > 
-> > > > > > Sorry, but why? NPT is not indexed by HVA.
-> > > > > 
-> > > > > NPT is not indexed by HVA - it is always indexed by GPA. What I meant is NPT
-> > > > > page table level has to be the same as the host OS page table: if 5-level
-> > > > > page table is enabled in host OS (CR4.LA57=1), guest NPT has to 5-level too.
-> > > > 
-> > > > I know what you meant. But may I ask why?
-> > > 
-> > > I don't have a good answer for it. From what I know, VMCB doesn't have a
-> > > field to indicate guest page table level. As a result, hardware relies on
-> > > host CR4 to infer NPT level.
-> > 
-> > I guess you mean not even in the N_CR3 field of VMCB? 
-> 
-> Correct, nCR3 is a basically a pure representation of a regular CR3.
-> 
-> > Then it's not a broken design - it's a limitation of SVM. :)
-> 
-> That's just a polite way of saying it's a broken design ;-)
-> 
-> Joking aside, NPT opted for a semblance of backwards compatibility at the cost of
-> having to carry all the baggage that comes with a legacy design.  Keeping the core
-> functionality from IA32 paging presumably miminizes design and hardware costs, and
-> required minimal enabling in hypervisors.  The downside is that it's less flexible
-> than EPT and has a few warts, e.g. shadowing NPT is gross because the host can't
-> easily mirror L1's desired paging mode.
+On Tue, Aug 10, 2021 at 11:02 AM Jason Wang <jasowang@redhat.com> wrote:
+>
+>
+> =E5=9C=A8 2021/8/9 =E4=B8=8B=E5=8D=881:56, Yongji Xie =E5=86=99=E9=81=93:
+> > On Thu, Aug 5, 2021 at 9:31 PM Jason Wang <jasowang@redhat.com> wrote:
+> >>
+> >> =E5=9C=A8 2021/8/5 =E4=B8=8B=E5=8D=888:34, Yongji Xie =E5=86=99=E9=81=
+=93:
+> >>>> My main point, though, is that if you've already got something else
+> >>>> keeping track of the actual addresses, then the way you're using an
+> >>>> iova_domain appears to be something you could do with a trivial bitm=
+ap
+> >>>> allocator. That's why I don't buy the efficiency argument. The main
+> >>>> design points of the IOVA allocator are to manage large address spac=
+es
+> >>>> while trying to maximise spatial locality to minimise the underlying
+> >>>> pagetable usage, and allocating with a flexible limit to support
+> >>>> multiple devices with different addressing capabilities in the same
+> >>>> address space. If none of those aspects are relevant to the use-case=
+ -
+> >>>> which AFAICS appears to be true here - then as a general-purpose
+> >>>> resource allocator it's rubbish and has an unreasonably massive memo=
+ry
+> >>>> overhead and there are many, many better choices.
+> >>>>
+> >>> OK, I get your point. Actually we used the genpool allocator in the
+> >>> early version. Maybe we can fall back to using it.
+> >>
+> >> I think maybe you can share some perf numbers to see how much
+> >> alloc_iova_fast() can help.
+> >>
+> > I did some fio tests[1] with a ram-backend vduse block device[2].
+> >
+> > Following are some performance data:
+> >
+> >                              numjobs=3D1   numjobs=3D2    numjobs=3D4  =
+ numjobs=3D8
+> > iova_alloc_fast    145k iops      265k iops      514k iops      758k io=
+ps
+> >
+> > iova_alloc            137k iops     170k iops      128k iops      113k =
+iops
+> >
+> > gen_pool_alloc   143k iops      270k iops      458k iops      521k iops
+> >
+> > The iova_alloc_fast() has the best performance since we always hit the
+> > per-cpu cache. Regardless of the per-cpu cache, the genpool allocator
+> > should be better than the iova allocator.
+>
+>
+> I think we see convincing numbers for using iova_alloc_fast() than the
+> gen_poll_alloc() (45% improvement on job=3D8).
+>
 
-Thanks for your explaination, Sean. Everything has a cost, and now it's time to pay
-the price. :)
+Yes, so alloc_iova_fast() still seems to be the best choice based on
+performance considerations.
 
-As to the max level, it is calculated in kvm_init(). Though I do not see any chance
-that host paging mode will be changed after kvm_init(), or any case that Linux uses
-different paging levels in different pCPUs, I am wondering, should we do something,
-e.g., to document this as an open?
+Hi Robin, any comments?
 
-About "host can't easily mirror L1's desired paging mode", could you please elaborate?
-Thanks!
-
-B.R.
-Yu
-
+Thanks,
+Yongji
