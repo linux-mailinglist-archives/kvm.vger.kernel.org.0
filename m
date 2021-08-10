@@ -2,98 +2,127 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 41EC03E56C8
-	for <lists+kvm@lfdr.de>; Tue, 10 Aug 2021 11:25:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3C31A3E571E
+	for <lists+kvm@lfdr.de>; Tue, 10 Aug 2021 11:36:00 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238989AbhHJJZ6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 10 Aug 2021 05:25:58 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:28095 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S238988AbhHJJZ4 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 10 Aug 2021 05:25:56 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1628587534;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=9RB6Pczk4vDPwq2uSGWS6COud14iPXuDOTUgBGUDVOs=;
-        b=CUQi/Vwnyk3GKIC0Jl47AwPd/Oin74rdJ1iYgJm3AACg50M5gCsoxb759WlN0vwp6liUdJ
-        LIedfvX5czi2HOjm0+8lKSJ8sFunx/PGbC32FkNxmtypccrjrzRRLHSY78G9odFMnbbN2c
-        krpBuv/gxj7FpNJsFAt3ZYMc1uRQc18=
-Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
- [209.85.218.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-279-EDpvg2_1PBKKyxJRMuqzhw-1; Tue, 10 Aug 2021 05:25:30 -0400
-X-MC-Unique: EDpvg2_1PBKKyxJRMuqzhw-1
-Received: by mail-ej1-f72.google.com with SMTP id h17-20020a1709070b11b02905b5ced62193so320986ejl.1
-        for <kvm@vger.kernel.org>; Tue, 10 Aug 2021 02:25:30 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=9RB6Pczk4vDPwq2uSGWS6COud14iPXuDOTUgBGUDVOs=;
-        b=WODNueZkVpbTfIO/SPX9rzJulWMWCzd7JwNnqVvAvO40Y+i71UN1lTGxs0lO2ZQ/BL
-         qNe0OWRCjtCyQNyZZHv+5EgyH8j7u4xhUzrjIfW9rBhOYCK7lpeB89RMyv68hol1He3U
-         NegtTMXRLq4NrYXOUfZbSDIT3iEz1miaH9XoXDATq81WPu6aciNrqaG8QuV1w90rQ69x
-         NjIZwCETb7JjmEoX7puZigwnIXkLTHicd2sHDT13754Fv5VFNbWwVg42J40WfiOhkzuR
-         Kzmh7rsqW3FfUjkT+sbQNL581BLTsGBzs/EdoPXEh7YSQOxH7PWci1dGhWUUxg7EHe8j
-         iw4g==
-X-Gm-Message-State: AOAM5315n73ttwYGnWG/qirvJ4MjyqUZplJNT5j8iSBMZhllID4Bz1Rk
-        mBZBzrF8JsxrGGDgEA55barSqvnQGmC4xpP7UNBMm51BC+EKDnuq+GnHoP3jSLDgHfoXKzq/0ep
-        nSII7qUUQt7FE
-X-Received: by 2002:a17:906:1412:: with SMTP id p18mr403413ejc.545.1628587529793;
-        Tue, 10 Aug 2021 02:25:29 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzdtVhsz6duqdq2TK6WgLYxnxtIAyk8aZC40PfN4pZYSJW6GS3DgxOlNPPOp8fH24wM2t3hCA==
-X-Received: by 2002:a17:906:1412:: with SMTP id p18mr403396ejc.545.1628587529632;
-        Tue, 10 Aug 2021 02:25:29 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:63a7:c72e:ea0e:6045? ([2001:b07:6468:f312:63a7:c72e:ea0e:6045])
-        by smtp.gmail.com with ESMTPSA id c17sm844174edu.11.2021.08.10.02.25.28
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 10 Aug 2021 02:25:28 -0700 (PDT)
-Subject: Re: [PATCH v2 1/3] KVM: x86: Allow CPU to force vendor-specific TDP
- level
-To:     Yu Zhang <yu.c.zhang@linux.intel.com>,
-        Sean Christopherson <seanjc@google.com>
-Cc:     Wei Huang <wei.huang2@amd.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, vkuznets@redhat.com,
-        wanpengli@tencent.com, jmattson@google.com, joro@8bytes.org,
-        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, x86@kernel.org,
-        hpa@zytor.com
-References: <20210808192658.2923641-1-wei.huang2@amd.com>
- <20210808192658.2923641-2-wei.huang2@amd.com>
- <20210809035806.5cqdqm5vkexvngda@linux.intel.com>
- <c6324362-1439-ef94-789b-5934c0e1cdb8@amd.com>
- <20210809042703.25gfuuvujicc3vj7@linux.intel.com>
- <73bbaac0-701c-42dd-36da-aae1fed7f1a0@amd.com>
- <20210809064224.ctu3zxknn7s56gk3@linux.intel.com>
- <YRFKABg2MOJxcq+y@google.com>
- <20210810074037.mizpggevgyhed6rm@linux.intel.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <0ac41a07-beeb-161e-9e5d-e45477106c01@redhat.com>
-Date:   Tue, 10 Aug 2021 11:25:27 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.11.0
-MIME-Version: 1.0
-In-Reply-To: <20210810074037.mizpggevgyhed6rm@linux.intel.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+        id S239194AbhHJJgQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 10 Aug 2021 05:36:16 -0400
+Received: from mail.kernel.org ([198.145.29.99]:35320 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S239183AbhHJJgO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 10 Aug 2021 05:36:14 -0400
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 2D5EA6101E;
+        Tue, 10 Aug 2021 09:35:53 +0000 (UTC)
+Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94.2)
+        (envelope-from <maz@kernel.org>)
+        id 1mDOAp-0041Qv-6G; Tue, 10 Aug 2021 10:35:51 +0100
+Date:   Tue, 10 Aug 2021 10:35:50 +0100
+Message-ID: <87czqlbq15.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Oliver Upton <oupton@google.com>
+Cc:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Peter Shier <pshier@google.com>,
+        Jim Mattson <jmattson@google.com>,
+        David Matlack <dmatlack@google.com>,
+        Ricardo Koller <ricarkol@google.com>,
+        Jing Zhang <jingzhangos@google.com>,
+        Raghavendra Rao Anata <rananta@google.com>,
+        James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        linux-arm-kernel@lists.infradead.org,
+        Andrew Jones <drjones@redhat.com>,
+        Will Deacon <will@kernel.org>,
+        Catalin Marinas <catalin.marinas@arm.com>
+Subject: Re: [PATCH v6 13/21] KVM: arm64: Allow userspace to configure a vCPU's virtual offset
+In-Reply-To: <20210804085819.846610-14-oupton@google.com>
+References: <20210804085819.846610-1-oupton@google.com>
+        <20210804085819.846610-14-oupton@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: oupton@google.com, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, pbonzini@redhat.com, seanjc@google.com, pshier@google.com, jmattson@google.com, dmatlack@google.com, ricarkol@google.com, jingzhangos@google.com, rananta@google.com, james.morse@arm.com, alexandru.elisei@arm.com, suzuki.poulose@arm.com, linux-arm-kernel@lists.infradead.org, drjones@redhat.com, will@kernel.org, catalin.marinas@arm.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 10/08/21 09:40, Yu Zhang wrote:
-> About "host can't easily mirror L1's desired paging mode", could you please elaborate?
-> Thanks!
+On Wed, 04 Aug 2021 09:58:11 +0100,
+Oliver Upton <oupton@google.com> wrote:
+> 
+> Allow userspace to access the guest's virtual counter-timer offset
+> through the ONE_REG interface. The value read or written is defined to
+> be an offset from the guest's physical counter-timer. Add some
+> documentation to clarify how a VMM should use this and the existing
+> CNTVCT_EL0.
+> 
+> Signed-off-by: Oliver Upton <oupton@google.com>
+> ---
+>  Documentation/virt/kvm/api.rst    | 10 ++++++++++
+>  arch/arm64/include/uapi/asm/kvm.h |  1 +
+>  arch/arm64/kvm/arch_timer.c       | 11 +++++++++++
+>  arch/arm64/kvm/guest.c            |  6 +++++-
+>  include/kvm/arm_arch_timer.h      |  1 +
+>  5 files changed, 28 insertions(+), 1 deletion(-)
+> 
+> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+> index 8d4a3471ad9e..28a65dc89985 100644
+> --- a/Documentation/virt/kvm/api.rst
+> +++ b/Documentation/virt/kvm/api.rst
+> @@ -2487,6 +2487,16 @@ arm64 system registers have the following id bit patterns::
+>       derived from the register encoding for CNTV_CVAL_EL0.  As this is
+>       API, it must remain this way.
+>  
+> +.. warning::
+> +
+> +     The value of KVM_REG_ARM_TIMER_OFFSET is defined as an offset from
+> +     the guest's view of the physical counter-timer.
+> +
+> +     Userspace should use either KVM_REG_ARM_TIMER_OFFSET or
+> +     KVM_REG_ARM_TIMER_CVAL to pause and resume a guest's virtual
 
-Shadow pgae tables in KVM will always have 3 levels on 32-bit machines 
-and 4/5 levels on 64-bit machines.  L1 instead might have any number of 
-levels from 2 to 5 (though of course not more than the host has).
+You probably mean KVM_REG_ARM_TIMER_CNT here, despite the broken
+encoding.
 
-Therefore, when shadowing 32-bit NPT page tables, KVM has to add extra 
-fixed levels on top of those that it's shadowing.  See 
-mmu_alloc_direct_roots for the code.
+> +     counter-timer. Mixed use of these registers could result in an
+> +     unpredictable guest counter value.
+> +
+>  arm64 firmware pseudo-registers have the following bit pattern::
+>  
+>    0x6030 0000 0014 <regno:16>
+> diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
+> index b3edde68bc3e..949a31bc10f0 100644
+> --- a/arch/arm64/include/uapi/asm/kvm.h
+> +++ b/arch/arm64/include/uapi/asm/kvm.h
+> @@ -255,6 +255,7 @@ struct kvm_arm_copy_mte_tags {
+>  #define KVM_REG_ARM_TIMER_CTL		ARM64_SYS_REG(3, 3, 14, 3, 1)
+>  #define KVM_REG_ARM_TIMER_CVAL		ARM64_SYS_REG(3, 3, 14, 0, 2)
+>  #define KVM_REG_ARM_TIMER_CNT		ARM64_SYS_REG(3, 3, 14, 3, 2)
+> +#define KVM_REG_ARM_TIMER_OFFSET	ARM64_SYS_REG(3, 4, 14, 0, 3)
 
-Paolo
+I don't think we can use the encoding for CNTPOFF_EL2 here, as it will
+eventually clash with a NV guest using the same feature for its own
+purpose. We don't want this offset to overlap with any of the existing
+features.
 
+I actually liked your previous proposal of controlling the physical
+offset via a device property, as it clearly indicated that you were
+dealing with non-architectural state.
+
+Thanks,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
