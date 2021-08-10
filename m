@@ -2,79 +2,127 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 136FA3E58C3
-	for <lists+kvm@lfdr.de>; Tue, 10 Aug 2021 13:00:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 315B33E58FD
+	for <lists+kvm@lfdr.de>; Tue, 10 Aug 2021 13:22:18 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239985AbhHJLBD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 10 Aug 2021 07:01:03 -0400
-Received: from mga04.intel.com ([192.55.52.120]:30776 "EHLO mga04.intel.com"
+        id S240110AbhHJLWL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 10 Aug 2021 07:22:11 -0400
+Received: from mail.skyhub.de ([5.9.137.197]:42748 "EHLO mail.skyhub.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S237696AbhHJLBC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 10 Aug 2021 07:01:02 -0400
-X-IronPort-AV: E=McAfee;i="6200,9189,10070"; a="213021969"
-X-IronPort-AV: E=Sophos;i="5.84,310,1620716400"; 
-   d="scan'208";a="213021969"
-Received: from fmsmga003.fm.intel.com ([10.253.24.29])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Aug 2021 04:00:40 -0700
-X-IronPort-AV: E=Sophos;i="5.84,310,1620716400"; 
-   d="scan'208";a="515756235"
-Received: from yilonggu-mobl.ccr.corp.intel.com (HELO localhost) ([10.249.175.101])
-  by fmsmga003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Aug 2021 04:00:35 -0700
-Date:   Tue, 10 Aug 2021 19:00:31 +0800
-From:   Yu Zhang <yu.c.zhang@linux.intel.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Wei Huang <wei.huang2@amd.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, vkuznets@redhat.com,
-        wanpengli@tencent.com, jmattson@google.com, joro@8bytes.org,
-        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, x86@kernel.org,
-        hpa@zytor.com
-Subject: Re: [PATCH v2 1/3] KVM: x86: Allow CPU to force vendor-specific TDP
- level
-Message-ID: <20210810110031.h7vaqf3nljwm3wym@linux.intel.com>
-References: <20210808192658.2923641-1-wei.huang2@amd.com>
- <20210808192658.2923641-2-wei.huang2@amd.com>
- <20210809035806.5cqdqm5vkexvngda@linux.intel.com>
- <c6324362-1439-ef94-789b-5934c0e1cdb8@amd.com>
- <20210809042703.25gfuuvujicc3vj7@linux.intel.com>
- <73bbaac0-701c-42dd-36da-aae1fed7f1a0@amd.com>
- <20210809064224.ctu3zxknn7s56gk3@linux.intel.com>
- <YRFKABg2MOJxcq+y@google.com>
- <20210810074037.mizpggevgyhed6rm@linux.intel.com>
- <0ac41a07-beeb-161e-9e5d-e45477106c01@redhat.com>
+        id S237367AbhHJLWK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 10 Aug 2021 07:22:10 -0400
+Received: from zn.tnic (p200300ec2f0d6500ceb5d19a4916b1c0.dip0.t-ipconnect.de [IPv6:2003:ec:2f0d:6500:ceb5:d19a:4916:b1c0])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id B31AE1EC0345;
+        Tue, 10 Aug 2021 13:21:39 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
+        t=1628594499;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
+        bh=jxQ/uGaIC2hNdLaotz2he1qg+SDxseRUqTr7wLeakrc=;
+        b=APjc8gUXPsLUuxJkQzUYGN6q0+8dfojHKppTJMvFnFS9d3fo4B2i5wyWddjqROX221Jl+e
+        5TKpVYM9EDn0MgHtzGWZrO5R/ncJCLadbtuZBQxZj5wpKUp56MIwtHy53DKviQRfv7PPu+
+        MGS6Nbx2cqwmWJ0P4wD6xqEpAPSbUz4=
+Date:   Tue, 10 Aug 2021 13:22:19 +0200
+From:   Borislav Petkov <bp@alien8.de>
+To:     Brijesh Singh <brijesh.singh@amd.com>
+Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
+        linux-coco@lists.linux.dev, linux-mm@kvack.org,
+        linux-crypto@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        David Rientjes <rientjes@google.com>,
+        Dov Murik <dovmurik@linux.ibm.com>,
+        Tobin Feldman-Fitzthum <tobin@ibm.com>,
+        Michael Roth <michael.roth@amd.com>,
+        Vlastimil Babka <vbabka@suse.cz>, tony.luck@intel.com,
+        npmccallum@redhat.com, brijesh.ksingh@gmail.com
+Subject: Re: [PATCH Part1 RFC v4 03/36] x86/sev: Add support for hypervisor
+ feature VMGEXIT
+Message-ID: <YRJha2XSZo3u7KIr@zn.tnic>
+References: <20210707181506.30489-1-brijesh.singh@amd.com>
+ <20210707181506.30489-4-brijesh.singh@amd.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <0ac41a07-beeb-161e-9e5d-e45477106c01@redhat.com>
-User-Agent: NeoMutt/20171215
+In-Reply-To: <20210707181506.30489-4-brijesh.singh@amd.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Aug 10, 2021 at 11:25:27AM +0200, Paolo Bonzini wrote:
-> On 10/08/21 09:40, Yu Zhang wrote:
-> > About "host can't easily mirror L1's desired paging mode", could you please elaborate?
-> > Thanks!
-> 
-> Shadow pgae tables in KVM will always have 3 levels on 32-bit machines and
-> 4/5 levels on 64-bit machines.  L1 instead might have any number of levels
-> from 2 to 5 (though of course not more than the host has).
+On Wed, Jul 07, 2021 at 01:14:33PM -0500, Brijesh Singh wrote:
+> diff --git a/arch/x86/include/asm/sev-common.h b/arch/x86/include/asm/sev-common.h
+> index 11b7d9cea775..23929a3010df 100644
+> --- a/arch/x86/include/asm/sev-common.h
+> +++ b/arch/x86/include/asm/sev-common.h
+> @@ -45,6 +45,15 @@
+>  		(((unsigned long)reg & GHCB_MSR_CPUID_REG_MASK) << GHCB_MSR_CPUID_REG_POS) | \
+>  		(((unsigned long)fn) << GHCB_MSR_CPUID_FUNC_POS))
+>  
+> +/* GHCB Hypervisor Feature Request */
+> +#define GHCB_MSR_HV_FT_REQ	0x080
+> +#define GHCB_MSR_HV_FT_RESP	0x081
+> +#define GHCB_MSR_HV_FT_POS	12
+> +#define GHCB_MSR_HV_FT_MASK	GENMASK_ULL(51, 0)
+> +
+> +#define GHCB_MSR_HV_FT_RESP_VAL(v)	\
+> +	(((unsigned long)((v) >> GHCB_MSR_HV_FT_POS) & GHCB_MSR_HV_FT_MASK))
 
-Thanks Paolo.
+As I suggested...
 
-I guess it's because, unlike EPT which are with either 4 or 5 levels, NPT's
-level can range from 2 to 5, depending on the host paging mode...
+> @@ -215,6 +216,7 @@
+>  	{ SVM_VMGEXIT_NMI_COMPLETE,	"vmgexit_nmi_complete" }, \
+>  	{ SVM_VMGEXIT_AP_HLT_LOOP,	"vmgexit_ap_hlt_loop" }, \
+>  	{ SVM_VMGEXIT_AP_JUMP_TABLE,	"vmgexit_ap_jump_table" }, \
+> +	{ SVM_VMGEXIT_HYPERVISOR_FEATURES,	"vmgexit_hypervisor_feature" }, \
 
-> 
-> Therefore, when shadowing 32-bit NPT page tables, KVM has to add extra fixed
-> levels on top of those that it's shadowing.  See mmu_alloc_direct_roots for
-> the code.
+	SVM_VMGEXIT_HV_FEATURES
 
-So when shadowing NPTs(can be 2/3 levels, depending on the paging mode in L1),
-and if L0 Linux is running in 4/5 level mode, extra levels of paging structures
-is needed in the shadow NPT.
+>  	{ SVM_EXIT_ERR,         "invalid_guest_state" }
+>  
+>  
+> diff --git a/arch/x86/kernel/sev-shared.c b/arch/x86/kernel/sev-shared.c
+> index 19c2306ac02d..34821da5f05e 100644
+> --- a/arch/x86/kernel/sev-shared.c
+> +++ b/arch/x86/kernel/sev-shared.c
+> @@ -23,6 +23,9 @@
+>   */
+>  static u16 ghcb_version __section(".data..ro_after_init");
+>  
+> +/* Bitmap of SEV features supported by the hypervisor */
+> +u64 sev_hv_features __section(".data..ro_after_init") = 0;
 
-But shadow EPT does not have such annoyance. Is above understanding correct?
+__ro_after_init
 
-B.R.
-Yu
+> diff --git a/arch/x86/kernel/sev.c b/arch/x86/kernel/sev.c
+> index 66b7f63ad041..540b81ac54c9 100644
+> --- a/arch/x86/kernel/sev.c
+> +++ b/arch/x86/kernel/sev.c
+> @@ -96,6 +96,9 @@ struct ghcb_state {
+>  static DEFINE_PER_CPU(struct sev_es_runtime_data*, runtime_data);
+>  DEFINE_STATIC_KEY_FALSE(sev_es_enable_key);
+>  
+> +/* Bitmap of SEV features supported by the hypervisor */
+> +EXPORT_SYMBOL(sev_hv_features);
+
+Why is this exported and why not a _GPL export?
+
+-- 
+Regards/Gruss,
+    Boris.
+
+https://people.kernel.org/tglx/notes-about-netiquette
