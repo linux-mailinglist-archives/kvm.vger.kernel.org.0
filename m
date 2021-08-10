@@ -2,341 +2,218 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 701463E7D6B
-	for <lists+kvm@lfdr.de>; Tue, 10 Aug 2021 18:22:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B5EC93E7DE2
+	for <lists+kvm@lfdr.de>; Tue, 10 Aug 2021 18:59:44 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234851AbhHJQW6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 10 Aug 2021 12:22:58 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:37234 "EHLO
-        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S234331AbhHJQWz (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 10 Aug 2021 12:22:55 -0400
-Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 17AG34o6012182;
-        Tue, 10 Aug 2021 12:22:33 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : in-reply-to : references; s=pp1;
- bh=HXLjn3TiI1BG+ZuSoYjVNQNM/rtVtLplTEvSlcyJOqU=;
- b=leaiETAe7Pi3/WKdORZwuEPl7zglFH9SZNxbbi21YkeQuf9JZ36JtyKK0zp5w/lRru3i
- uTIH2wLnsTwZ3TFDsMWHLfX1z36AeWoD5ucWa8MhwmEC7nYco8vkGNitiGZDsrWIDKlU
- SAhHJrvJtnuXzUkTY4OY9jvZberDXWIkt1fR8dQC4CpxDLIiI6vPuYl1k1U7upMi3plD
- oy+PUem1u2RD+XBlO6qYyvPZce5upo/+UCLTUNOb1VM+jWKTo8PAcyVFFnieZtIcQPr2
- LXhb7rueWTZF91UKiIXZ4899iLTK5gsjke9yPcW26V6VQbaLNtF2MrZwSraH9WZjF0F6 NQ== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3abt96wcfp-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 10 Aug 2021 12:22:32 -0400
-Received: from m0098421.ppops.net (m0098421.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 17AG38Tq012723;
-        Tue, 10 Aug 2021 12:22:32 -0400
-Received: from ppma06fra.de.ibm.com (48.49.7a9f.ip4.static.sl-reverse.com [159.122.73.72])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3abt96wcfb-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 10 Aug 2021 12:22:32 -0400
-Received: from pps.filterd (ppma06fra.de.ibm.com [127.0.0.1])
-        by ppma06fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 17AGGT7j022122;
-        Tue, 10 Aug 2021 16:22:31 GMT
-Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
-        by ppma06fra.de.ibm.com with ESMTP id 3abaq49j7v-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 10 Aug 2021 16:22:30 +0000
-Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
-        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 17AGJFOs56754618
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 10 Aug 2021 16:19:15 GMT
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 95142AE04D;
-        Tue, 10 Aug 2021 16:22:27 +0000 (GMT)
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 3B9CCAE065;
-        Tue, 10 Aug 2021 16:22:27 +0000 (GMT)
-Received: from oc3016276355.ibm.com (unknown [9.145.176.19])
-        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Tue, 10 Aug 2021 16:22:27 +0000 (GMT)
-From:   Pierre Morel <pmorel@linux.ibm.com>
-To:     linux-s390@vger.kernel.org
-Cc:     frankja@linux.ibm.com, thuth@redhat.com, kvm@vger.kernel.org,
-        cohuck@redhat.com, imbrenda@linux.ibm.com, david@redhat.com
-Subject: [kvm-unit-tests PATCH v2 4/4] s390x: topology: Checking Configuration Topology Information
-Date:   Tue, 10 Aug 2021 18:22:24 +0200
-Message-Id: <1628612544-25130-5-git-send-email-pmorel@linux.ibm.com>
-X-Mailer: git-send-email 1.8.3.1
-In-Reply-To: <1628612544-25130-1-git-send-email-pmorel@linux.ibm.com>
-References: <1628612544-25130-1-git-send-email-pmorel@linux.ibm.com>
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: DUDgY_PPyPvrhb6UGuM726qdxz7zLv8C
-X-Proofpoint-GUID: mtzOukNHyOdMfYCXxbb8W4D6cXep2Abs
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.790
- definitions=2021-08-10_07:2021-08-10,2021-08-10 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 spamscore=0
- clxscore=1015 lowpriorityscore=0 suspectscore=0 adultscore=0
- priorityscore=1501 impostorscore=0 mlxlogscore=999 malwarescore=0
- mlxscore=0 bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2107140000 definitions=main-2108100103
+        id S229679AbhHJRAF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 10 Aug 2021 13:00:05 -0400
+Received: from mail-dm6nam10on2081.outbound.protection.outlook.com ([40.107.93.81]:39360
+        "EHLO NAM10-DM6-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S229474AbhHJRAE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 10 Aug 2021 13:00:04 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=XgvZ+W1gDdH3p3lDpbQNqlV+cx9v1PmFNjMkEjbWl4A6NcFLAKoxigcQsQ5ZNOm96onnxYpt87USYa3bmkwtpNSJLOUl+BJclI/KkavPA0oxCJGQ1dl+h0sOiztXx0NcyckOy6DX1+We9GY3zQXtMVnoIrplcIBe2MGJG7U03nNJCdMEAjyA7I0YHDHqZ8g2tMH0i6dvjp5q3O7LxEh1PG2i0eyrVqh+6H+0EyePS1NZqHgiUKg58LFxnw7++wVErXpEF+iAz9de45ggAzBJoif/BGXcK1VG7TWVi0yuGDXyL9Hmy6hY0K5f8scz/T36cq10Crbmg9DKxuLAbmnp+g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=fOCmh5IWwOhmGvv1ZS9RxdG5YCRqjdS+uS4Z/hoL088=;
+ b=Ibefb26SX/2BJqIKvlLSxU8SdB33Hv2hGDthi0fGk6P5m33itnwR0Itx8EPazAKOhzK/aesXcesJSOMeBvNCpFg/SuJ7POgF6C4FcL53AeeU2uq8ItSMUgsjFB+Mnnubzg6mhtzWzL3LNz5Rgtw1wHad074hMMqV4b+oc/UuyW/Ctm+Q8PPqpb1Xq8MWJlIPhpsuV4LqVbYJj8XKb1pPpOOzQq2E1+M1K9+SPHoo3izUI+msBGV0UaLrF4oVvdQZPrhs9BgReAP1pGZT14o1xvH8zdQCcxSms7aPYvgSVzejyC2hMNP9DGzkjvHQI4eyBRUczokzz3BY2z5XZmNSzQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=fOCmh5IWwOhmGvv1ZS9RxdG5YCRqjdS+uS4Z/hoL088=;
+ b=JnNwAFDEzgSBLW3TaaHuVaCAUSZ7Ojf3tAGJJ/H4SNVjF4UgVtil6gY1U94u6JCn0HQo6O5LrZ6Kwh/vtx6ygJDBeQ4vgPGZAEmKG9eEpPMMwZMx2Wm9GxkSG3OFQIGaSrf5ywYhZM8f765Gzhz80urFa2WkHVZL7F+AgNlh/NI=
+Authentication-Results: vger.kernel.org; dkim=none (message not signed)
+ header.d=none;vger.kernel.org; dmarc=none action=none header.from=amd.com;
+Received: from MW3PR12MB4553.namprd12.prod.outlook.com (2603:10b6:303:2c::19)
+ by MW2PR12MB2539.namprd12.prod.outlook.com (2603:10b6:907:9::30) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4394.20; Tue, 10 Aug
+ 2021 16:59:40 +0000
+Received: from MW3PR12MB4553.namprd12.prod.outlook.com
+ ([fe80::3987:37e5:4db7:944e]) by MW3PR12MB4553.namprd12.prod.outlook.com
+ ([fe80::3987:37e5:4db7:944e%6]) with mapi id 15.20.4394.023; Tue, 10 Aug 2021
+ 16:59:40 +0000
+Subject: Re: [kvm-unit-tests PATCH 1/2] x86: access: Fix timeout failure by
+ limiting number of flag combinations
+From:   Babu Moger <babu.moger@amd.com>
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     pbonzini@redhat.com, thuth@redhat.com, drjones@redhat.com,
+        kvm@vger.kernel.org
+References: <162826604263.32391.7580736822527851972.stgit@bmoger-ubuntu>
+ <162826611747.32391.16149996928851353357.stgit@bmoger-ubuntu>
+ <YQ1pA9nN6DP0veQ1@google.com> <1f30bd0f-da1b-2aa0-e0c8-76d3b5410bcd@amd.com>
+Message-ID: <7d0aa9b1-2eb7-8c89-9c2b-7712c5031aed@amd.com>
+Date:   Tue, 10 Aug 2021 11:59:38 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.11.0
+In-Reply-To: <1f30bd0f-da1b-2aa0-e0c8-76d3b5410bcd@amd.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: SA0PR11CA0130.namprd11.prod.outlook.com
+ (2603:10b6:806:131::15) To MW3PR12MB4553.namprd12.prod.outlook.com
+ (2603:10b6:303:2c::19)
+MIME-Version: 1.0
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from [10.236.31.0] (165.204.77.1) by SA0PR11CA0130.namprd11.prod.outlook.com (2603:10b6:806:131::15) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4415.13 via Frontend Transport; Tue, 10 Aug 2021 16:59:39 +0000
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: c144116d-dd1c-4009-ed37-08d95c203e52
+X-MS-TrafficTypeDiagnostic: MW2PR12MB2539:
+X-Microsoft-Antispam-PRVS: <MW2PR12MB2539D288BAF490012593A18195F79@MW2PR12MB2539.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:10000;
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: DW/HlepEFInEFvMytQtDScy3g8L7rBTeGGSVMQscOYgpCqyiu68jDl2lirIKdbolth7jzKzfBxOZh+lCPpHcvaPxIHVWQGUOIfAlRhLBC0ujqHrstMpk4l5JHvvtIbF/96C4g6EQCmrZBIgst62dSAaJwxrnNLY1ptlA+VQB8Lbw48HopK2yHDBl9pGuquuS6wVO5ezdd0yxIvn9rGXApf3c2lZ9NLH3vM3WgbDsPE1u34XUAV0XOs99/2QKGs7wriwLMNTOIjj5xHe0djKJQibCKGxv0Ukx4BEF1ZqH1+8AlkXzvHDVovZ2GL0IiyP8k4RK3RDeouc1J2VmcDSjvsuuv+NiiQuGJYp5ALT7xhJXwZTOtBTW8yXdQIDsp0YCgK+hSbAr3O9pTVWySxNGa2X0mvXs2TCGDnVpjSg4JfOpSM2zTBans372YmUIFfqSEkj7BV3XqVcSwaco/fZjjnW7+IUJdQ2eLgZa+GhSEiCT/Kupe46owalCQGB77yeLgvlSael3c7dBBAXIIfHyASFYeYT4vp0WyYDQ1H/al7cGBCv2tqOoB3sjH25UfLfYpWzhPobjYfFAJnG9/ZVyfvQQPQ2sj5nNI+sbGKlPp6elsD+XduzzfF19Ac+PteGgSDiQg4DVBvUr/3n6GAIHuVz8hADn76oKGx8sK11Ll1bHNV3j7uxJQer2hEhxfOH9YlaCTp7WTVnPzsTEEvyMntaGDABXR+RH4oYgjAU+KNlXPHohiQtNfRjbavd28lKIIjNkq8Q/PqFWTtZu6zvaWA==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MW3PR12MB4553.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(136003)(376002)(39860400002)(396003)(346002)(366004)(53546011)(52116002)(26005)(8676002)(2906002)(31686004)(38350700002)(38100700002)(31696002)(8936002)(316002)(16576012)(86362001)(36756003)(66556008)(66476007)(83380400001)(4326008)(2616005)(956004)(6486002)(66946007)(44832011)(5660300002)(186003)(478600001)(6916009)(43740500002)(45980500001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?VmhDVEsrTkluQThDa1NnWGFYYVdQL0czOUVBSjM0SWJQK0FyTk0wQ2cxRkhY?=
+ =?utf-8?B?Mm4vUWlNNTNua2tHOEd1Sk12KzJUN0JuTEp4dktwOGhDa21LaUtFeXQrNVN2?=
+ =?utf-8?B?c1pKMko5b1E2ajdZSFovaW42VzNCcDdnQXdwd0VuVVVXZDNLdjFBbzEzeEMy?=
+ =?utf-8?B?V1FpcVhTUVlQbitkUHRwcHdWYzRDbk5PQ2FnVUdIZ0xEbGp2dGx4S00zME0z?=
+ =?utf-8?B?Q29GVDVSRnk0VE9waXA2Y3FxWmtYME9KcnBKZUQ2bTA3dzA1a3VQYnIzME9j?=
+ =?utf-8?B?SElzSEd0RnNjSWdLVW5ZT3BJQzgrOGtKaGZ4R2pIb1JYd2JHaHB1KzdsSlVY?=
+ =?utf-8?B?K0FtRnR3c2phbVBVdnNyK1JNTlJMNlc3akQrVVJObkt6SkhJKy94cFY0MEx0?=
+ =?utf-8?B?M2dHSWNlS29EZWZYQk9uMHVEYmdqSUVvMHRCb3gzYWx3K3dCQitaYzRUcVMr?=
+ =?utf-8?B?VU5PZnJLZW9heWFSNXFYbnk3RmtBblEvRTlKTURNNnZDTjdMZklEMW9tZnhI?=
+ =?utf-8?B?RVVKU3Y2WjE3a2NkaFhWSFpIVm5rZTlueDU0bm1nTjA1em1YTGhPbklRYjdz?=
+ =?utf-8?B?c245R01BRUZ2TWlSc0R4NUNaVDMrUlpaRnpDOFpLN2pNSzRESkFpTWFFZHpj?=
+ =?utf-8?B?bHJ4K3g0dU5ja0lwdGFneGdXNkkvRjQ1bWJEa1V5aWVkTnFRelRWTUt1RitI?=
+ =?utf-8?B?bEJlTTRZMFZVcGFzZFVpQTJMNzluejY2SWVMR1VBcHVsM1QwM0wySDJaYkRa?=
+ =?utf-8?B?RHJHalZoN2ZoYmdoQkt4Mjh1UGsyMEwvenNESlI0ejlaanVUcWpxVEFTTFBu?=
+ =?utf-8?B?R1Q3ODF3bXN3NWR6bWZtS2FUbkpaOFBoT2lYaVJ1VUtqUnZ1OEEvQ1loK1lP?=
+ =?utf-8?B?aWhvYjJMZ3pOMHZRdmFTdTdONnE1SkNvRTFLK1MvdmdNOVhCMjZxSmRHWE82?=
+ =?utf-8?B?dGtFcEJNcFFWVWhmZndyMFRYUTYvTDhSVDNoRkZocGgxTjhSUStXcWNyVjdI?=
+ =?utf-8?B?aEh4K0Jham9FNEExYUdwVmlkMXNaR0dpZ2JyTkd3MGg1WlV4K2JFWjlDT3lH?=
+ =?utf-8?B?aThzYm8vbklaMmE0UjcvelpNNmJCQnRWWVcvWDNNZlB5KzZPWklYTDRodkdO?=
+ =?utf-8?B?NGpjbXJSVjdQbkZZdVZCdllvanpnU0ZFLzdrL0ZzZXVWT0pET3M2OG81RHdo?=
+ =?utf-8?B?SlAvQVRFTmpYelBCRzAySWZNNXFHU2pjeWdEaXJRMjVlN2dZaGxrSmg5a3po?=
+ =?utf-8?B?ZjgycFpNd2FaSG9IRGQ1a0VwZlpOM004SUpNQXMrVWI5dFB3ZW5QWWVrNU8w?=
+ =?utf-8?B?aWlMenhDOWxDK3lKZGV2SWROb3YzcFhlc0dvbnVtL2FBd1FrYjNIemNvMk1y?=
+ =?utf-8?B?bEo3M1ozMFRrQ2N0ZlpIUDBWL2lTZUppRnhIcEs1YUJlWlhwSGtmZE9QYTIr?=
+ =?utf-8?B?NW1OcXlaTExvYjNUaUdPU1pIY3pjODVtNjlYUUtOUDU2bFRjWXV4VjRvbGJ1?=
+ =?utf-8?B?NFkrTjJGU0hYcW5wWFRaUWwrMVZjeDJlaC8vRm45dGFnT3FsZ1VyUjI0eVZE?=
+ =?utf-8?B?bDRNUDc5K2JwOHFRaGJTL0lmbmVnWkdaazEwRWlUR2dqNnNETE1aNEpwci9U?=
+ =?utf-8?B?L25nR1BoTDBtUndFcnFjOGhUTWRRTzJ3YXR5Kyt3OGlQdFVKMGtvUjY2TEIw?=
+ =?utf-8?B?bzZJcmlBWk43QnMwYTFSNEdwNlliWFRoNExZUnExYlZKb1VOS3E3cHA2blVI?=
+ =?utf-8?Q?LaBcGpkOn3gAq6ILHitWv0cwStxVyWlBFocsCEb?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: c144116d-dd1c-4009-ed37-08d95c203e52
+X-MS-Exchange-CrossTenant-AuthSource: MW3PR12MB4553.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Aug 2021 16:59:40.6047
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: LNfO/3oDzza+Q6LBpUxyRLXS241yh/Ly3X161QxuzQQU9/0t/F6eGzAMnaGTR27k
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW2PR12MB2539
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-STSI with function code 15 is used to store the CPU configuration
-topology.
 
-We check if the topology stored is coherent with the QEMU -smp
-parameters.
-The current check is done on the number of CPUs, the maximum number
-of CPUs, the number of sockets and the number of cores per sockets.
 
-Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
----
- s390x/topology.c    | 208 ++++++++++++++++++++++++++++++++++++++++++++
- s390x/unittests.cfg |   1 +
- 2 files changed, 209 insertions(+)
+On 8/9/21 2:43 PM, Babu Moger wrote:
+> 
+> 
+> On 8/6/21 11:53 AM, Sean Christopherson wrote:
+>> On Fri, Aug 06, 2021, Babu Moger wrote:
+>>> From: Babu Moger <Babu.Moger@amd.com>
+>>>
+>>> The test ./x86/access fails with a timeout. This is due to the number test
+>>> combination. The test cases increase exponentially as the features get
+>>> enabled. The new machine adds the feature AC_CPU_CR4_PKE. The default
+>>> timeout is 180 seconds. Seen this problem both on AMD and Intel machines.
+>>>
+>>> #./tests/access
+>>> qemu-system-x86_64: terminating on signal 15 from pid 20050 (timeout)
+>>> FAIL access (timeout; duration=180)
+>>>
+>>> This test can take about 7 minutes without timeout.
+>>> time ./tests/access
+>>> 58982405 tests, 0 failures
+>>> PASS access
+>>>
+>>> real	7m10.063s
+>>> user	7m9.063s
+>>> sys	0m0.309s
+>>>
+>>> Fix the problem by adding few more limit checks.
+>>
+>> Please state somewhere in the changelog what is actually being changed, and the
+>> actual effect of the change.  E.g.
+>>
+>>   Disallow protection keys testcase in combination with reserved bit
+>>   testcasess to further limit the number of tests run to avoid timeouts on
+>>   systems with support for protection keys.
+>>
+>>   Disallowing this combination reduces the total number of tests from
+>>   58982405 to <???>, and the runtime from ~7 minutes to <???>
+> 
+> Sure. Will do.
+>>
+>>> Signed-off-by: Babu Moger <Babu.Moger@amd.com>
+>>> ---
+>>>  x86/access.c |    4 ++--
+>>>  1 file changed, 2 insertions(+), 2 deletions(-)
+>>>
+>>> diff --git a/x86/access.c b/x86/access.c
+>>> index 47807cc..e371dd5 100644
+>>> --- a/x86/access.c
+>>> +++ b/x86/access.c
+>>> @@ -317,9 +317,9 @@ static _Bool ac_test_legal(ac_test_t *at)
+>>>      /*
+>>>       * Shorten the test by avoiding testing too many reserved bit combinations
+>>>       */
+>>> -    if ((F(AC_PDE_BIT51) + F(AC_PDE_BIT36) + F(AC_PDE_BIT13)) > 1)
+>>> +    if ((F(AC_PDE_BIT51) + F(AC_PDE_BIT36) + F(AC_PDE_BIT13) + F(AC_CPU_CR4_PKE)) > 1)
+>>>          return false;
+>>> -    if ((F(AC_PTE_BIT51) + F(AC_PTE_BIT36)) > 1)
+>>> +    if ((F(AC_PTE_BIT51) + F(AC_PTE_BIT36) + F(AC_CPU_CR4_PKE)) > 1)
+>>
+>> Why are protection keys the sacrifical lamb?  Simply because they're the newest?
+> 
+> Yes. I added it because it was new ):.
+>>
+>> And before we start killing off arbitrary combinations, what about sharding the
+>> test so that testcases that depend on a specific CR0/CR4/EFER bit, i.e. trigger
+>> a VM-Exit when the configuration changes, are separate runs?  Being able to run
+>> a specific combination would also hopefully make it easier to debug issues as
+>> the user could specify which combo to run without having to modify the code and
+>> recompile.
+>>
+>> That probably won't actually reduce the total run time, but it would make each
+>> run a separate test and give developers a warm fuzzy feeling that they're indeed
+>> making progress :-)
+>>
+>> Not sure how this could be automagically expressed this in unittest.cfg though...
 
-diff --git a/s390x/topology.c b/s390x/topology.c
-index a0dc3b9e..be6f5abc 100644
---- a/s390x/topology.c
-+++ b/s390x/topology.c
-@@ -17,6 +17,53 @@
- #include <sclp.h>
- 
- static int machine_level;
-+static uint8_t pagebuf[PAGE_SIZE * 2] __attribute__((aligned(PAGE_SIZE * 2)));
-+static int mnest;
-+static long max_cpus;
-+static long cores;
-+static long sockets;
-+static long books;
-+static long drawers;
-+static long nodes;
-+static long ncpus;
-+
-+struct topology_core {
-+	unsigned char nl;
-+	unsigned char reserved0[3];
-+	unsigned char :5;
-+	unsigned char d:1;
-+	unsigned char pp:2;
-+	unsigned char type;
-+	unsigned short origin;
-+	unsigned long mask;
-+};
-+
-+struct topology_container {
-+	unsigned char nl;
-+	unsigned char reserved[6];
-+	unsigned char id;
-+};
-+
-+union topology_entry {
-+	unsigned char nl;
-+	struct topology_core cpu;
-+	struct topology_container container;
-+};
-+
-+struct sysinfo_15_1_x {
-+	unsigned char reserved0[2];
-+	unsigned short length;
-+	unsigned char mag6;
-+	unsigned char mag5;
-+	unsigned char mag4;
-+	unsigned char mag3;
-+	unsigned char mag2;
-+	unsigned char mag1;
-+	unsigned char reserved1;
-+	unsigned char mnest;
-+	unsigned char reserved2[4];
-+	union topology_entry tle[0];
-+};
- 
- #define PTF_REQ_HORIZONTAL	0
- #define PTF_REQ_VERTICAL	1
-@@ -79,10 +126,170 @@ end:
- 	report_prefix_pop();
- }
- 
-+static void check_sysinfo_15_1_x(struct sysinfo_15_1_x *info)
-+{
-+	struct topology_container *tc, *end;
-+	struct topology_core *cpus;
-+	int nb_nl0 = 0, nb_nl1 = 0, nb_nl2 = 0, nb_nl3 = 0;
-+
-+	if (mnest > 5)
-+		report(info->mag6 == 0, "topology level 6");
-+	if (mnest > 4)
-+		report(info->mag5 == nodes, "Maximum number of nodes");
-+	if (mnest > 3)
-+		report(info->mag4 == drawers, "Maximum number of drawers");
-+	if (mnest > 2)
-+		report(info->mag3 == books, "Maximum number of books");
-+
-+	/* Both levels 2 and 1 are always valid */
-+	report(info->mag2 == sockets, "Maximum number of sockets");
-+	report(info->mag1 == cores, "Maximum number of cores");
-+
-+	tc = (void *)&info->tle[0];
-+	end = (struct topology_container *)((unsigned long)info + info->length);
-+
-+	while (tc < end) {
-+		switch (tc->nl) {
-+		case 3:
-+			report_info("drawer: %d %d", tc->nl, tc->id);
-+			nb_nl3++;
-+			break;
-+		case 2:
-+			report_info("book  : %d %d", tc->nl, tc->id);
-+			nb_nl2++;
-+			break;
-+		case 1:
-+			report_info("socket: %d %d", tc->nl, tc->id);
-+			nb_nl1++;
-+			break;
-+		case 0:
-+			cpus = (struct topology_core *) tc;
-+			report_info("cpu type %02x  d: %d pp: %d", cpus->type, cpus->d, cpus->pp);
-+			report_info("origin : %04x mask %016lx", cpus->origin, cpus->mask);
-+			tc++;
-+			nb_nl0++;
-+			break;
-+		default:
-+			report_abort("Unexpected TL Entry: tle->nl: %d", tc->nl);
-+			return;
-+		}
-+		tc++;
-+	}
-+	/*
-+	 * As we accept only 1 type of CPU, and only horizontal and dedicated CPUs
-+	 * We expect max_cpus / cores CPU entries
-+	 */
-+	report(nb_nl0 ==  (1 + (ncpus - 1) / cores),
-+			  "Check count of cores: %d %ld", nb_nl0, ncpus / cores);
-+	/* We expect the same count of sockets and CPU entries */
-+	report(nb_nl1 ==  nb_nl0, "Check count of sockets");
-+	if (mnest > 2)
-+		report(nb_nl2 == nb_nl1 / sockets, "Checks count of books");
-+	if (mnest > 3)
-+		report(nb_nl3 == nb_nl2 / books, "Checks count of drawers");
-+}
-+
-+static void test_stsi(void)
-+{
-+	int ret;
-+
-+	mnest = sclp_get_stsi_parm();
-+	/* If the STSI parm is 0, the maximum MNEST for STSI is 2 */
-+	if (!mnest)
-+		mnest = 2;
-+	report_info("SCLP MNEST : %d", mnest);
-+
-+	ret = sclp_get_cpu_num();
-+	report_info("SCLP nb CPU: %d", ret);
-+
-+	ret = stsi(pagebuf, 15, 1, 2);
-+	report(!ret, "valid stsi 15.1.2");
-+	if (!ret)
-+		check_sysinfo_15_1_x((struct sysinfo_15_1_x *)pagebuf);
-+	else
-+		report_info(" ret: %d", ret);
-+
-+	if (mnest < 3) {
-+		report(stsi(pagebuf, 15, 1, 3) == 3, "invalid stsi 15.1.3");
-+	} else {
-+		report(stsi(pagebuf, 15, 1, 3) == 0, "valid stsi 15.1.3");
-+		check_sysinfo_15_1_x((struct sysinfo_15_1_x *)pagebuf);
-+	}
-+
-+	if (mnest < 4) {
-+		report(stsi(pagebuf, 15, 1, 4) == 3, "invalid stsi 15.1.4");
-+	} else {
-+		report(stsi(pagebuf, 15, 1, 4) == 0, "valid stsi 15.1.4");
-+		check_sysinfo_15_1_x((struct sysinfo_15_1_x *)pagebuf);
-+	}
-+
-+	if (mnest < 5) {
-+		report(stsi(pagebuf, 15, 1, 5) == 3, "invalid stsi 15.1.5");
-+	} else {
-+		report(stsi(pagebuf, 15, 1, 5) == 0, "valid stsi 15.1.5");
-+		check_sysinfo_15_1_x((struct sysinfo_15_1_x *)pagebuf);
-+	}
-+
-+	if (mnest < 6) {
-+		report(stsi(pagebuf, 15, 1, 6) == 3, "invalid stsi 15.1.6");
-+	} else {
-+		report(stsi(pagebuf, 15, 1, 6) == 0, "valid stsi 15.1.6");
-+		check_sysinfo_15_1_x((struct sysinfo_15_1_x *)pagebuf);
-+	}
-+}
-+
-+static void parse_topology_args(int argc, char **argv)
-+{
-+	int i;
-+
-+	for (i = 1; i < argc; i++) {
-+		if (!strcmp("-c", argv[i])) {
-+			i++;
-+			if (i >= argc)
-+				report_abort("-c (cores) needs a parameter");
-+			cores = atol(argv[i]);
-+		} else if (!strcmp("-s", argv[i])) {
-+			i++;
-+			if (i >= argc)
-+				report_abort("-s (sockets) needs a parameter");
-+			sockets = atol(argv[i]);
-+		} else if (!strcmp("-b", argv[i])) {
-+			i++;
-+			if (i >= argc)
-+				report_abort("-b (books) needs a parameter");
-+			books = atol(argv[i]);
-+		} else if (!strcmp("-d", argv[i])) {
-+			i++;
-+			if (i >= argc)
-+				report_abort("-d (drawers) needs a parameter");
-+			drawers = atol(argv[i]);
-+		} else if (!strcmp("-n", argv[i])) {
-+			i++;
-+			if (i >= argc)
-+				report_abort("-n (nodes) needs a parameter");
-+			nodes = atol(argv[i]);
-+		}
-+	}
-+	if (!cores)
-+		cores = 1;
-+	if (!sockets)
-+		sockets = 1;
-+	if (!books)
-+		books = 1;
-+	if (!drawers)
-+		drawers = 1;
-+	if (!nodes)
-+		nodes = 1;
-+	max_cpus = cores * sockets * books * drawers * nodes;
-+	ncpus = smp_query_num_cpus();
-+}
-+
- int main(int argc, char *argv[])
- {
- 	report_prefix_push("CPU Topology");
- 
-+	parse_topology_args(argc, argv);
-+
- 	if (!test_facility(11)) {
- 		report_skip("Topology facility not present");
- 		goto end;
-@@ -92,6 +299,7 @@ int main(int argc, char *argv[])
- 	report_info("Machine level %d", machine_level);
- 
- 	test_ptf();
-+	test_stsi();
- 
- end:
- 	report_prefix_pop();
-diff --git a/s390x/unittests.cfg b/s390x/unittests.cfg
-index 0f84d279..390e8398 100644
---- a/s390x/unittests.cfg
-+++ b/s390x/unittests.cfg
-@@ -112,3 +112,4 @@ file = mvpg-sie.elf
- 
- [topology]
- file = topology.elf
-+extra_params=-smp 5,sockets=4,cores=4,maxcpus=16 -append "-n 5 -s 4 -c 4 -m 16"
--- 
-2.25.1
+As we know now that we cannot run a huge number of tests without running
+into timeout, I was thinking of adding a extra parameter "max_runs" for
+these tests and add a check in ac_test_run to limit the number of runs.
+The max_runs will be set to default 10000000. But it can be changed in
+unittests.cfg. Something like this.
 
+[access]
+ file = access.flat
+ arch = x86_64
+-extra_params = -cpu max
++extra_params = -cpu max -append 10000000
+ timeout = 180
+
+Thoughts?
+
+> 
+> Let me investigate if we can do that fairly easy. Will let you know.
+> Thanks
+> Babu
+>>
+>>>          return false;
+>>>  
+>>>      return true;
+>>>
