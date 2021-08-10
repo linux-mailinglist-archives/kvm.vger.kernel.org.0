@@ -2,92 +2,409 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id CBD8B3E833E
-	for <lists+kvm@lfdr.de>; Tue, 10 Aug 2021 20:49:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B2C1B3E8343
+	for <lists+kvm@lfdr.de>; Tue, 10 Aug 2021 20:52:52 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231386AbhHJSuM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 10 Aug 2021 14:50:12 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:46481 "EHLO
+        id S231324AbhHJSxN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 10 Aug 2021 14:53:13 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:60191 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229774AbhHJSuL (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 10 Aug 2021 14:50:11 -0400
+        by vger.kernel.org with ESMTP id S229774AbhHJSxM (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 10 Aug 2021 14:53:12 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1628621389;
+        s=mimecast20190719; t=1628621569;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=sIY2+IC7WL45hNaXWA0mNkNCzPB+K2jEa8Wry58PE/U=;
-        b=CP0AG/TDukuYVBQI6nIBz4MAxe5Z7vGZDaLqpKuYdW+sD5J1wt47tk2poev3avU8KwNWpI
-        p5i8IPbS0ZGsZbdrd5JNQSNNE3WKqK/uDamHwLiXYcAm6KbbR6A3y0aUb515d9QKMkhDqm
-        nrgTLOH+FEU/N/dc03K3k3bBxkSzuCQ=
-Received: from mail-qv1-f69.google.com (mail-qv1-f69.google.com
- [209.85.219.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-247-NQAMlOC2NIm6IbliN_kqKQ-1; Tue, 10 Aug 2021 14:49:48 -0400
-X-MC-Unique: NQAMlOC2NIm6IbliN_kqKQ-1
-Received: by mail-qv1-f69.google.com with SMTP id t9-20020a0562140c69b029033e8884d712so17486392qvj.18
-        for <kvm@vger.kernel.org>; Tue, 10 Aug 2021 11:49:47 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=sIY2+IC7WL45hNaXWA0mNkNCzPB+K2jEa8Wry58PE/U=;
-        b=ORhm2hbyBxqCD7CMR8mcZT/SwORbkisa7r0LOssmpb7Fbwz7Y5PXoN9JPEY2XRylQX
-         gU/o4XUSWFSyKl3BGqjYqqCXkyPQq+dOurz+ShN2cIxkfXmyiqmoAKXhhfrtltIrMWTX
-         VkbsJNtdJD1u8GhJ8T7gXEoe9aH44aROXUppRVWk8poyc6Yo1ARdJzgfW9LWYkDUKfvw
-         zOuyV+J8aJpjsokztxrXVq5PYVqHOjMIvXGsoljBo4ROFSZ22LeHctZ8n1Y9s6RCTH8o
-         R7Vl3fDMsJT2euO6Rf3hLKtUght8vWW6oe9PaeONn4jY1zD4EeDtTiNMJ1o1s3V9WBEu
-         UdLA==
-X-Gm-Message-State: AOAM5303hF6pan8Opv6b32CzM7YS/c4mCWuCC5KiIZjb/2Qti4anPAb+
-        GaPNhmCDR7AnlQNmFUYs7Dw5iHTxqRN+vFzT5LpNZaOnjCvs6e/AHDnaZwX54HZRYcDc2agabpv
-        cy6Q7uCRcSJ3O
-X-Received: by 2002:a05:620a:4495:: with SMTP id x21mr29960407qkp.468.1628621387550;
-        Tue, 10 Aug 2021 11:49:47 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxQvFRashIBFVzGhqhv5sdxbxzhHektVx1wjA60NW0CdiaAdHl2bwdx2KS9QwBp6XM60FSi5Q==
-X-Received: by 2002:a05:620a:4495:: with SMTP id x21mr29960386qkp.468.1628621387352;
-        Tue, 10 Aug 2021 11:49:47 -0700 (PDT)
-Received: from t490s (bras-base-toroon474qw-grc-92-76-70-75-133.dsl.bell.ca. [76.70.75.133])
-        by smtp.gmail.com with ESMTPSA id c68sm11756909qkf.48.2021.08.10.11.49.46
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 10 Aug 2021 11:49:46 -0700 (PDT)
-Date:   Tue, 10 Aug 2021 14:49:45 -0400
-From:   Peter Xu <peterx@redhat.com>
-To:     Christoph Hellwig <hch@infradead.org>
-Cc:     Alex Williamson <alex.williamson@redhat.com>,
-        Jason Gunthorpe <jgg@nvidia.com>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org
-Subject: Re: [PATCH 1/7] vfio: Create vfio_fs_type with inode per device
-Message-ID: <YRLKSYQL8VvTr3gc@t490s>
-References: <162818167535.1511194.6614962507750594786.stgit@omen>
- <162818322947.1511194.6035266132085405252.stgit@omen>
- <YRI8Mev5yfeAXsrj@infradead.org>
- <20210810085254.51da01d6.alex.williamson@redhat.com>
- <YRKT2UhgjfWBmwuJ@infradead.org>
+        bh=IaZEvofZD0Yrso8Llr5b7ZleegW2NnD/54H1Y1DVYAk=;
+        b=UQvf3Cit1rtcyoQC5j2AD5XrmjIyTRuCIZM4AKClO1XPoM79fJFWi1n1RdUZ2bStp5Pvss
+        Ur3NISjPHsBAghjCbtQ+cZrxXbCaF9Fx9mHhSmww7mQ8DhDjT5d0PJvtUsUt7n5rw0jK+H
+        vZBGGz8eWSRPMbbX8o0q6ziyScrfaOY=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-275-IzBc6EIVMsShNWDFYJGuMA-1; Tue, 10 Aug 2021 14:52:48 -0400
+X-MC-Unique: IzBc6EIVMsShNWDFYJGuMA-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A06C31853029;
+        Tue, 10 Aug 2021 18:52:46 +0000 (UTC)
+Received: from localhost (unknown [10.22.32.20])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id F33BA5C1A1;
+        Tue, 10 Aug 2021 18:52:45 +0000 (UTC)
+Date:   Tue, 10 Aug 2021 14:52:45 -0400
+From:   Eduardo Habkost <ehabkost@redhat.com>
+To:     Valeriy Vdovin <valery.vdovin.s@gmail.com>
+Cc:     qemu-devel@nongnu.org,
+        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+        Eric Blake <eblake@redhat.com>,
+        Markus Armbruster <armbru@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Marcelo Tosatti <mtosatti@redhat.com>,
+        Richard Henderson <richard.henderson@linaro.org>,
+        Thomas Huth <thuth@redhat.com>,
+        Laurent Vivier <lvivier@redhat.com>, kvm@vger.kernel.org,
+        Denis Lunev <den@openvz.org>,
+        Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+        Valeriy Vdovin <valeriy.vdovin@virtuozzo.com>
+Subject: Re: [PATCH v14] qapi: introduce 'query-x86-cpuid' QMP command.
+Message-ID: <20210810185245.kivvmrmvew6e5xtr@habkost.net>
+References: <20210810065131.2849-1-valery.vdovin.s@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <YRKT2UhgjfWBmwuJ@infradead.org>
+In-Reply-To: <20210810065131.2849-1-valery.vdovin.s@gmail.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Aug 10, 2021 at 03:57:29PM +0100, Christoph Hellwig wrote:
-> On Tue, Aug 10, 2021 at 08:52:54AM -0600, Alex Williamson wrote:
-> > On Tue, 10 Aug 2021 10:43:29 +0200
-> > Christoph Hellwig <hch@infradead.org> wrote:
-> > 
-> > > > + * XXX Adopt the following when available:
-> > > > + * https://lore.kernel.org/lkml/20210309155348.974875-1-hch@lst.de/  
-> > > 
-> > > No need for this link.
-> > 
-> > Is that effort dead?  I've used the link several times myself to search
-> > for progress, so it's been useful to me.  Thanks,
+On Tue, Aug 10, 2021 at 09:51:31AM +0300, Valeriy Vdovin wrote:
+> From: Valeriy Vdovin <valeriy.vdovin@virtuozzo.com>
 > 
-> No, but it seems odd to have reference to an old patchset in the kernel
-> tree.
+> Introducing new QMP command 'query-x86-cpuid'. This command can be used to
+> get virtualized cpu model info generated by QEMU during VM initialization in
+> the form of cpuid representation.
+> 
+> Diving into more details about virtual CPU generation: QEMU first parses '-cpu'
+> command line option. From there it takes the name of the model as the basis for
+> feature set of the new virtual CPU. After that it uses trailing '-cpu' options,
+> that state if additional cpu features should be present on the virtual CPU or
+> excluded from it (tokens '+'/'-' or '=on'/'=off').
+> After that QEMU checks if the host's cpu can actually support the derived
+> feature set and applies host limitations to it.
+> After this initialization procedure, virtual CPU has it's model and
+> vendor names, and a working feature set and is ready for identification
+> instructions such as CPUID.
+> 
+> To learn exactly how virtual CPU is presented to the guest machine via CPUID
+> instruction, new QMP command can be used. By calling 'query-x86-cpuid'
+> command, one can get a full listing of all CPUID leaves with subleaves which are
+> supported by the initialized virtual CPU.
+> 
+> Other than debug, the command is useful in cases when we would like to
+> utilize QEMU's virtual CPU initialization routines and put the retrieved
+> values into kernel CPUID overriding mechanics for more precise control
+> over how various processes perceive its underlying hardware with
+> container processes as a good example.
+> 
+> The command is specific to x86. It is currenly only implemented for KVM acceleator.
+> 
+> Output format:
+> The output is a plain list of leaf/subleaf argument combinations, that
+> return 4 words in registers EAX, EBX, ECX, EDX.
+> 
+> Use example:
+> qmp_request: {
+>   "execute": "query-x86-cpuid"
+> }
+> 
+> qmp_response: {
+>   "return": [
+>     {
+>       "eax": 1073741825,
+>       "edx": 77,
+>       "in-eax": 1073741824,
+>       "ecx": 1447775574,
+>       "ebx": 1263359563
+>     },
+>     {
+>       "eax": 16777339,
+>       "edx": 0,
+>       "in-eax": 1073741825,
+>       "ecx": 0,
+>       "ebx": 0
+>     },
+>     {
+>       "eax": 13,
+>       "edx": 1231384169,
+>       "in-eax": 0,
+>       "ecx": 1818588270,
+>       "ebx": 1970169159
+>     },
+>     {
+>       "eax": 198354,
+>       "edx": 126614527,
+>       "in-eax": 1,
+>       "ecx": 2176328193,
+>       "ebx": 2048
+>     },
+>     ....
+>     {
+>       "eax": 12328,
+>       "edx": 0,
+>       "in-eax": 2147483656,
+>       "ecx": 0,
+>       "ebx": 0
+>     }
+>   ]
+> }
+> 
+> Signed-off-by: Valeriy Vdovin <valeriy.vdovin@virtuozzo.com>
+> ---
+> v2: - Removed leaf/subleaf iterators.
+>     - Modified cpu_x86_cpuid to return false in cases when count is
+>       greater than supported subleaves.
+> v3: - Fixed structure name coding style.
+>     - Added more comments
+>     - Ensured buildability for non-x86 targets.
+> v4: - Fixed cpu_x86_cpuid return value logic and handling of 0xA leaf.
+>     - Fixed comments.
+>     - Removed target check in qmp_query_cpu_model_cpuid.
+> v5: - Added error handling code in qmp_query_cpu_model_cpuid
+> v6: - Fixed error handling code. Added method to query_error_class
+> v7: - Changed implementation in favor of cached cpuid_data for
+>       KVM_SET_CPUID2
+> v8: - Renamed qmp method to query-kvm-cpuid and some fields in response.
+>     - Modified documentation to qmp method
+>     - Removed helper struct declaration
+> v9: - Renamed 'in_eax' / 'in_ecx' fields to 'in-eax' / 'in-ecx'
+>     - Pasted more complete response to commit message.
+> v10:
+>     - Subject changed
+>     - Fixes in commit message
+>     - Small fixes in QMP command docs
+> v11:
+>     - Added explanation about CONFIG_KVM to the commit message.
+> v12:
+>     - Changed title from query-kvm-cpuid to query-x86-cpuid
+>     - Removed CONFIG_KVM ifdefs
+>     - Added detailed error messages for some stub/unimplemented cases.
+> v13:
+>     - Tagged with since 6.2
+> v14:
+>     - Rebased to latest master 632eda54043d6f26ff87dac16233e14b4708b967
+>     - Added note about error return cases in api documentation.
+> 
+>  qapi/machine-target.json   | 46 ++++++++++++++++++++++++++++++++++
+>  softmmu/cpus.c             |  2 +-
+>  target/i386/kvm/kvm-stub.c | 10 ++++++++
+>  target/i386/kvm/kvm.c      | 51 ++++++++++++++++++++++++++++++++++++++
+>  tests/qtest/qmp-cmd-test.c |  1 +
+>  5 files changed, 109 insertions(+), 1 deletion(-)
+> 
+> diff --git a/qapi/machine-target.json b/qapi/machine-target.json
+> index e7811654b7..71648a4f56 100644
+> --- a/qapi/machine-target.json
+> +++ b/qapi/machine-target.json
+> @@ -329,3 +329,49 @@
+>  ##
+>  { 'command': 'query-cpu-definitions', 'returns': ['CpuDefinitionInfo'],
+>    'if': 'defined(TARGET_PPC) || defined(TARGET_ARM) || defined(TARGET_I386) || defined(TARGET_S390X) || defined(TARGET_MIPS)' }
+> +
+> +##
+> +# @CpuidEntry:
+> +#
+> +# A single entry of a CPUID response.
+> +#
+> +# One entry holds full set of information (leaf) returned to the guest
+> +# in response to it calling a CPUID instruction with eax, ecx used as
+> +# the arguments to that instruction. ecx is an optional argument as
+> +# not all of the leaves support it.
+> +#
+> +# @in-eax: CPUID argument in eax
+> +# @in-ecx: CPUID argument in ecx
+> +# @eax: CPUID result in eax
+> +# @ebx: CPUID result in ebx
+> +# @ecx: CPUID result in ecx
+> +# @edx: CPUID result in edx
+> +#
+> +# Since: 6.2
+> +##
+> +{ 'struct': 'CpuidEntry',
+> +  'data': { 'in-eax' : 'uint32',
+> +            '*in-ecx' : 'uint32',
+> +            'eax' : 'uint32',
+> +            'ebx' : 'uint32',
+> +            'ecx' : 'uint32',
+> +            'edx' : 'uint32'
+> +          },
+> +  'if': 'defined(TARGET_I386)' }
+> +
+> +##
+> +# @query-x86-cpuid:
+> +#
+> +# Returns raw data from the emulated CPUID table for the first VCPU.
+> +# The emulated CPUID table defines the response to the CPUID
+> +# instruction when executed by the guest operating system.
+> +# 
+> +#
+> +# Returns: a list of CpuidEntry. Returns error when qemu is configured with
+> +# --disable-kvm flag or if qemu is run with any other accelerator than KVM.
+> +#
+> +# Since: 6.2
+> +##
+> +{ 'command': 'query-x86-cpuid',
+> +  'returns': ['CpuidEntry'],
+> +  'if': 'defined(TARGET_I386)' }
+> diff --git a/softmmu/cpus.c b/softmmu/cpus.c
+> index 071085f840..8501081897 100644
+> --- a/softmmu/cpus.c
+> +++ b/softmmu/cpus.c
+> @@ -129,7 +129,7 @@ void hw_error(const char *fmt, ...)
+>  /*
+>   * The chosen accelerator is supposed to register this.
+>   */
+> -static const AccelOpsClass *cpus_accel;
+> +const AccelOpsClass *cpus_accel;
+>  
+>  void cpu_synchronize_all_states(void)
+>  {
+> diff --git a/target/i386/kvm/kvm-stub.c b/target/i386/kvm/kvm-stub.c
+> index f6e7e4466e..9eb04d908f 100644
+> --- a/target/i386/kvm/kvm-stub.c
+> +++ b/target/i386/kvm/kvm-stub.c
+> @@ -12,6 +12,7 @@
+>  #include "qemu/osdep.h"
+>  #include "cpu.h"
+>  #include "kvm_i386.h"
+> +#include "qapi/error.h"
+>  
+>  #ifndef __OPTIMIZE__
+>  bool kvm_has_smm(void)
+> @@ -44,3 +45,12 @@ bool kvm_hyperv_expand_features(X86CPU *cpu, Error **errp)
+>  {
+>      abort();
+>  }
+> +
+> +typedef struct CpuidEntryList CpuidEntryList;
+> +CpuidEntryList *qmp_query_x86_cpuid(Error **errp);
+> +
+> +CpuidEntryList *qmp_query_x86_cpuid(Error **errp)
+> +{
+> +    error_setg(errp, "Not implemented in --disable-kvm configuration");
+> +    return NULL;
+> +}
+> diff --git a/target/i386/kvm/kvm.c b/target/i386/kvm/kvm.c
+> index e69abe48e3..28e79cd0cf 100644
+> --- a/target/i386/kvm/kvm.c
+> +++ b/target/i386/kvm/kvm.c
+> @@ -20,11 +20,13 @@
+>  
+>  #include <linux/kvm.h>
+>  #include "standard-headers/asm-x86/kvm_para.h"
+> +#include "qapi/qapi-commands-machine-target.h"
+>  
+>  #include "cpu.h"
+>  #include "host-cpu.h"
+>  #include "sysemu/sysemu.h"
+>  #include "sysemu/hw_accel.h"
+> +#include "sysemu/accel-ops.h"
+>  #include "sysemu/kvm_int.h"
+>  #include "sysemu/runstate.h"
+>  #include "kvm_i386.h"
+> @@ -1540,6 +1542,51 @@ static Error *invtsc_mig_blocker;
+>  
+>  #define KVM_MAX_CPUID_ENTRIES  100
+>  
+> +struct kvm_cpuid2 *cpuid_data_cached;
+> +extern const AccelOpsClass *cpus_accel;
+> +
+> +static inline int is_kvm_accel(AccelOpsClass *class)
+> +{
+> +    ObjectClass *parent_class;
 
-I learn from the reference too.  Maybe move into commit message?  Thanks,
+We normally call ObjectClass variables 'oc'.
+
+> +
+> +    parent_class = &class->parent_class;
+
+The right way to cast a class/object to a different type is to
+use the type casting macros. e.g.:
+
+    oc = OBJECT_CLASS(class);
+
+> +    return strcmp(object_class_get_name(parent_class),
+> +        "kvm-accel-ops") == 0;
+
+You should never do a string comparison of the QOM type name to
+decide what to do.  If you want to know if a class implements a
+specific type, you can just call:
+
+   object_class_dynamic_cast(class, TYPE_KVM_ACCEL)
+
+In either case, this function can probably be deleted and
+replaced with a simple kvm_enabled() call (see below).
+
+> +}
+> +
+> +CpuidEntryList *qmp_query_x86_cpuid(Error **errp)
+> +{
+> +    int i;
+> +    struct kvm_cpuid_entry2 *kvm_entry;
+> +    CpuidEntryList *head = NULL, **tail = &head;
+> +    CpuidEntry *entry;
+> +
+> +    if (!cpuid_data_cached) {
+> +         if (cpus_accel && !is_kvm_accel((AccelOpsClass *)cpus_accel))
+
+This can be replaced by a kvm_enabled() check.
+
+Also, I suggest avoid nesting conditionals when possible.  e.g.:
+
+  if (!kvm_enabled()) {
+      error_setg(...);
+      return NULL;
+  }
+  if (!cpuid_data_cached) {
+      error_setg(...);
+      return NULL;
+  }
+
+> +             error_setg(errp, "Not implemented for non-kvm accel");
+> +         else
+> +             error_setg(errp, "VCPU was not initialized yet");
+> +         return NULL;
+> +    }
+> +
+> +    for (i = 0; i < cpuid_data_cached->nent; ++i) {
+> +        kvm_entry = &cpuid_data_cached->entries[i];
+> +        entry = g_malloc0(sizeof(*entry));
+> +        entry->in_eax = kvm_entry->function;
+> +        if (kvm_entry->flags & KVM_CPUID_FLAG_SIGNIFCANT_INDEX) {
+> +            entry->in_ecx = kvm_entry->index;
+> +            entry->has_in_ecx = true;
+> +        }
+> +        entry->eax = kvm_entry->eax;
+> +        entry->ebx = kvm_entry->ebx;
+> +        entry->ecx = kvm_entry->ecx;
+> +        entry->edx = kvm_entry->edx;
+> +        QAPI_LIST_APPEND(tail, entry);
+> +    }
+> +
+> +    return head;
+> +}
+> +
+>  int kvm_arch_init_vcpu(CPUState *cs)
+>  {
+>      struct {
+> @@ -1923,6 +1970,10 @@ int kvm_arch_init_vcpu(CPUState *cs)
+>      if (r) {
+>          goto fail;
+>      }
+> +    if (!cpuid_data_cached) {
+> +        cpuid_data_cached = g_malloc0(sizeof(cpuid_data));
+> +        memcpy(cpuid_data_cached, &cpuid_data, sizeof(cpuid_data));
+> +    }
+>  
+>      if (has_xsave) {
+>          env->xsave_buf_len = sizeof(struct kvm_xsave);
+> diff --git a/tests/qtest/qmp-cmd-test.c b/tests/qtest/qmp-cmd-test.c
+> index c98b78d033..bd883f7f52 100644
+> --- a/tests/qtest/qmp-cmd-test.c
+> +++ b/tests/qtest/qmp-cmd-test.c
+> @@ -46,6 +46,7 @@ static int query_error_class(const char *cmd)
+>          { "query-balloon", ERROR_CLASS_DEVICE_NOT_ACTIVE },
+>          { "query-hotpluggable-cpus", ERROR_CLASS_GENERIC_ERROR },
+>          { "query-vm-generation-id", ERROR_CLASS_GENERIC_ERROR },
+> +        { "query-x86-cpuid", ERROR_CLASS_GENERIC_ERROR },
+>          { NULL, -1 }
+>      };
+>      int i;
+> -- 
+> 2.17.1
+> 
 
 -- 
-Peter Xu
+Eduardo
 
