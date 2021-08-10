@@ -2,310 +2,113 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 05E173E5912
-	for <lists+kvm@lfdr.de>; Tue, 10 Aug 2021 13:28:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5BB383E5924
+	for <lists+kvm@lfdr.de>; Tue, 10 Aug 2021 13:33:03 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240044AbhHJL2N (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 10 Aug 2021 07:28:13 -0400
-Received: from mail.kernel.org ([198.145.29.99]:48650 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S238297AbhHJL2N (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 10 Aug 2021 07:28:13 -0400
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
+        id S236412AbhHJLdW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 10 Aug 2021 07:33:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50732 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229527AbhHJLdU (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 10 Aug 2021 07:33:20 -0400
+Received: from mail.skyhub.de (mail.skyhub.de [IPv6:2a01:4f8:190:11c2::b:1457])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 59FB0C0613D3;
+        Tue, 10 Aug 2021 04:32:58 -0700 (PDT)
+Received: from zn.tnic (p200300ec2f0d650032ff4b0dbb793dda.dip0.t-ipconnect.de [IPv6:2003:ec:2f0d:6500:32ff:4b0d:bb79:3dda])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 5330760EBB;
-        Tue, 10 Aug 2021 11:27:51 +0000 (UTC)
-Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
-        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-        (Exim 4.94.2)
-        (envelope-from <maz@kernel.org>)
-        id 1mDPvB-0042lI-6W; Tue, 10 Aug 2021 12:27:49 +0100
-Date:   Tue, 10 Aug 2021 12:27:48 +0100
-Message-ID: <878s19bkuj.wl-maz@kernel.org>
-From:   Marc Zyngier <maz@kernel.org>
-To:     Oliver Upton <oupton@google.com>
-Cc:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
+        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 124861EC0345;
+        Tue, 10 Aug 2021 13:32:50 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
+        t=1628595170;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
+        bh=R0Bn+dXKzaBou1+W8ZeOwhmfqcSDNHnGnKGMW8DU+1o=;
+        b=Flm+45n8y3Gtv+plIrS/FRcndJKdE24N1BwdLlt+khb4sM4nPfiJaI8pTzCJCrQgE26phx
+        D+cVO7QxwpUFbuhBxXejG6qZ3AkJlIiTSvMrYvQRzKtD5dDIiK8EbnSKyeoCVsbX6EW2c8
+        c81rM3/neP7P3s/3IznKD+Dekv/zL8o=
+Date:   Tue, 10 Aug 2021 13:33:34 +0200
+From:   Borislav Petkov <bp@alien8.de>
+To:     Brijesh Singh <brijesh.singh@amd.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>
+Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
+        linux-coco@lists.linux.dev, linux-mm@kvack.org,
+        linux-crypto@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
         Paolo Bonzini <pbonzini@redhat.com>,
         Sean Christopherson <seanjc@google.com>,
-        Peter Shier <pshier@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        David Matlack <dmatlack@google.com>,
-        Ricardo Koller <ricarkol@google.com>,
-        Jing Zhang <jingzhangos@google.com>,
-        Raghavendra Rao Anata <rananta@google.com>,
-        James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        linux-arm-kernel@lists.infradead.org,
-        Andrew Jones <drjones@redhat.com>,
-        Will Deacon <will@kernel.org>,
-        Catalin Marinas <catalin.marinas@arm.com>
-Subject: Re: [PATCH v6 19/21] KVM: arm64: Emulate physical counter offsetting on non-ECV systems
-In-Reply-To: <20210804085819.846610-20-oupton@google.com>
-References: <20210804085819.846610-1-oupton@google.com>
-        <20210804085819.846610-20-oupton@google.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
- (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: oupton@google.com, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, pbonzini@redhat.com, seanjc@google.com, pshier@google.com, jmattson@google.com, dmatlack@google.com, ricarkol@google.com, jingzhangos@google.com, rananta@google.com, james.morse@arm.com, alexandru.elisei@arm.com, suzuki.poulose@arm.com, linux-arm-kernel@lists.infradead.org, drjones@redhat.com, will@kernel.org, catalin.marinas@arm.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        David Rientjes <rientjes@google.com>,
+        Dov Murik <dovmurik@linux.ibm.com>,
+        Tobin Feldman-Fitzthum <tobin@ibm.com>,
+        Michael Roth <michael.roth@amd.com>,
+        Vlastimil Babka <vbabka@suse.cz>, tony.luck@intel.com,
+        npmccallum@redhat.com, brijesh.ksingh@gmail.com
+Subject: Re: [PATCH Part1 RFC v4 05/36] x86/sev: Define the Linux specific
+ guest termination reasons
+Message-ID: <YRJkDhcbUi9xQemM@zn.tnic>
+References: <20210707181506.30489-1-brijesh.singh@amd.com>
+ <20210707181506.30489-6-brijesh.singh@amd.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20210707181506.30489-6-brijesh.singh@amd.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 04 Aug 2021 09:58:17 +0100,
-Oliver Upton <oupton@google.com> wrote:
-> 
-> Unfortunately, ECV hasn't yet arrived in any tangible hardware. At the
-> same time, controlling the guest view of the physical counter-timer is
-> useful. Support guest counter-timer offsetting on non-ECV systems by
-> trapping guest accesses to the physical counter-timer. Emulate reads of
-> the physical counter in the fast exit path.
-> 
-> Signed-off-by: Oliver Upton <oupton@google.com>
-> ---
->  arch/arm64/include/asm/sysreg.h         |  1 +
->  arch/arm64/kvm/arch_timer.c             | 53 +++++++++++++++----------
->  arch/arm64/kvm/hyp/include/hyp/switch.h | 29 ++++++++++++++
->  arch/arm64/kvm/hyp/nvhe/timer-sr.c      | 11 ++++-
->  4 files changed, 70 insertions(+), 24 deletions(-)
-> 
-> diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
-> index c34672aa65b9..e49790ae5da4 100644
-> --- a/arch/arm64/include/asm/sysreg.h
-> +++ b/arch/arm64/include/asm/sysreg.h
-> @@ -505,6 +505,7 @@
->  #define SYS_AMEVCNTR0_MEM_STALL		SYS_AMEVCNTR0_EL0(3)
+On Wed, Jul 07, 2021 at 01:14:35PM -0500, Brijesh Singh wrote:
+> diff --git a/arch/x86/include/asm/sev-common.h b/arch/x86/include/asm/sev-common.h
+> index 23929a3010df..e75e29c05f59 100644
+> --- a/arch/x86/include/asm/sev-common.h
+> +++ b/arch/x86/include/asm/sev-common.h
+> @@ -63,9 +63,17 @@
+>  	(((((u64)reason_set) &  GHCB_MSR_TERM_REASON_SET_MASK) << GHCB_MSR_TERM_REASON_SET_POS) | \
+>  	((((u64)reason_val) & GHCB_MSR_TERM_REASON_MASK) << GHCB_MSR_TERM_REASON_POS))
 >  
->  #define SYS_CNTFRQ_EL0			sys_reg(3, 3, 14, 0, 0)
-> +#define SYS_CNTPCT_EL0			sys_reg(3, 3, 14, 0, 1)
->  
->  #define SYS_CNTP_TVAL_EL0		sys_reg(3, 3, 14, 2, 0)
->  #define SYS_CNTP_CTL_EL0		sys_reg(3, 3, 14, 2, 1)
-> diff --git a/arch/arm64/kvm/arch_timer.c b/arch/arm64/kvm/arch_timer.c
-> index 9ead94aa867d..b7cb63acf2a0 100644
-> --- a/arch/arm64/kvm/arch_timer.c
-> +++ b/arch/arm64/kvm/arch_timer.c
-> @@ -51,7 +51,7 @@ static void kvm_arm_timer_write(struct kvm_vcpu *vcpu,
->  static u64 kvm_arm_timer_read(struct kvm_vcpu *vcpu,
->  			      struct arch_timer_context *timer,
->  			      enum kvm_arch_timer_regs treg);
-> -static void kvm_timer_enable_traps_vhe(void);
-> +static void kvm_timer_enable_traps_vhe(struct kvm_vcpu *vcpu);
->  
->  u32 timer_get_ctl(struct arch_timer_context *ctxt)
->  {
-> @@ -175,6 +175,12 @@ static void timer_set_guest_offset(struct arch_timer_context *ctxt, u64 offset)
->  	}
->  }
->  
-> +static bool ptimer_emulation_required(struct kvm_vcpu *vcpu)
-> +{
-> +	return timer_get_offset(vcpu_ptimer(vcpu)) &&
-> +			!cpus_have_const_cap(ARM64_ECV);
+> +/* Error code from reason set 0 */
 
-What Andrew said! :-)
+... Error codes...
 
-> +}
-> +
->  u64 kvm_phys_timer_read(void)
->  {
->  	return timecounter->cc->read(timecounter->cc);
-> @@ -184,8 +190,13 @@ static void get_timer_map(struct kvm_vcpu *vcpu, struct timer_map *map)
->  {
->  	if (has_vhe()) {
->  		map->direct_vtimer = vcpu_vtimer(vcpu);
-> -		map->direct_ptimer = vcpu_ptimer(vcpu);
-> -		map->emul_ptimer = NULL;
-> +		if (!ptimer_emulation_required(vcpu)) {
-> +			map->direct_ptimer = vcpu_ptimer(vcpu);
-> +			map->emul_ptimer = NULL;
-> +		} else {
-> +			map->direct_ptimer = NULL;
-> +			map->emul_ptimer = vcpu_ptimer(vcpu);
-> +		}
->  	} else {
->  		map->direct_vtimer = vcpu_vtimer(vcpu);
->  		map->direct_ptimer = NULL;
-> @@ -671,7 +682,7 @@ void kvm_timer_vcpu_load(struct kvm_vcpu *vcpu)
->  		timer_emulate(map.emul_ptimer);
+> +#define SEV_TERM_SET_GEN		0
+>  #define GHCB_SEV_ES_GEN_REQ		0
+>  #define GHCB_SEV_ES_PROT_UNSUPPORTED	1
 >  
->  	if (has_vhe())
-> -		kvm_timer_enable_traps_vhe();
-> +		kvm_timer_enable_traps_vhe(vcpu);
->  }
+>  #define GHCB_RESP_CODE(v)		((v) & GHCB_MSR_INFO_MASK)
 >  
->  bool kvm_timer_should_notify_user(struct kvm_vcpu *vcpu)
-> @@ -1392,22 +1403,29 @@ int kvm_timer_enable(struct kvm_vcpu *vcpu)
->   * The host kernel runs at EL2 with HCR_EL2.TGE == 1,
->   * and this makes those bits have no effect for the host kernel execution.
->   */
-> -static void kvm_timer_enable_traps_vhe(void)
-> +static void kvm_timer_enable_traps_vhe(struct kvm_vcpu *vcpu)
->  {
->  	/* When HCR_EL2.E2H ==1, EL1PCEN and EL1PCTEN are shifted by 10 */
->  	u32 cnthctl_shift = 10;
-> -	u64 val;
-> +	u64 val, mask;
-> +
-> +	mask = CNTHCTL_EL1PCEN << cnthctl_shift;
-> +	mask |= CNTHCTL_EL1PCTEN << cnthctl_shift;
->  
-> -	/*
-> -	 * VHE systems allow the guest direct access to the EL1 physical
-> -	 * timer/counter.
-> -	 */
->  	val = read_sysreg(cnthctl_el2);
-> -	val |= (CNTHCTL_EL1PCEN << cnthctl_shift);
-> -	val |= (CNTHCTL_EL1PCTEN << cnthctl_shift);
->  
->  	if (cpus_have_const_cap(ARM64_ECV))
->  		val |= CNTHCTL_ECV;
-> +
-> +	/*
-> +	 * VHE systems allow the guest direct access to the EL1 physical
-> +	 * timer/counter if offsetting isn't requested on a non-ECV system.
-> +	 */
-> +	if (ptimer_emulation_required(vcpu))
-> +		val &= ~mask;
-> +	else
-> +		val |= mask;
-> +
->  	write_sysreg(val, cnthctl_el2);
->  }
->  
-> @@ -1462,9 +1480,6 @@ static int kvm_arm_timer_set_attr_offset(struct kvm_vcpu *vcpu,
->  	u64 __user *uaddr = (u64 __user *)(long)attr->addr;
->  	u64 offset;
->  
-> -	if (!cpus_have_const_cap(ARM64_ECV))
-> -		return -ENXIO;
-> -
->  	if (get_user(offset, uaddr))
->  		return -EFAULT;
->  
-> @@ -1513,9 +1528,6 @@ static int kvm_arm_timer_get_attr_offset(struct kvm_vcpu *vcpu,
->  	u64 __user *uaddr = (u64 __user *)(long)attr->addr;
->  	u64 offset;
->  
-> -	if (!cpus_have_const_cap(ARM64_ECV))
-> -		return -ENXIO;
-> -
->  	offset = timer_get_offset(vcpu_ptimer(vcpu));
->  	return put_user(offset, uaddr);
->  }
-> @@ -1539,11 +1551,8 @@ int kvm_arm_timer_has_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr)
->  	switch (attr->attr) {
->  	case KVM_ARM_VCPU_TIMER_IRQ_VTIMER:
->  	case KVM_ARM_VCPU_TIMER_IRQ_PTIMER:
-> -		return 0;
->  	case KVM_ARM_VCPU_TIMER_OFFSET:
-> -		if (cpus_have_const_cap(ARM64_ECV))
-> -			return 0;
-> -		break;
-> +		return 0;
->  	}
->  
->  	return -ENXIO;
-> diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
-> index e4a2f295a394..abd3813a709e 100644
-> --- a/arch/arm64/kvm/hyp/include/hyp/switch.h
-> +++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
-> @@ -15,6 +15,7 @@
->  #include <linux/jump_label.h>
->  #include <uapi/linux/psci.h>
->  
-> +#include <kvm/arm_arch_timer.h>
->  #include <kvm/arm_psci.h>
->  
->  #include <asm/barrier.h>
-> @@ -405,6 +406,31 @@ static inline bool __hyp_handle_ptrauth(struct kvm_vcpu *vcpu)
->  	return true;
->  }
->  
-> +static inline u64 __timer_read_cntpct(struct kvm_vcpu *vcpu)
-> +{
-> +	return __arch_counter_get_cntpct() - vcpu_ptimer(vcpu)->host_offset;
-> +}
-> +
-> +static inline bool __hyp_handle_counter(struct kvm_vcpu *vcpu)
-> +{
-> +	u32 sysreg;
-> +	int rt;
-> +	u64 rv;
+> +/* Linux specific reason codes (used with reason set 1) */
 
-You could start with a
+... Linux-specific ...
 
-	if (cpus_have_final_cap(ARM64_ECV))
-		return false;
+> +#define SEV_TERM_SET_LINUX		1
 
-which will speed-up the exit on ECV-capable systems.
+GHCB doc says:
 
+"This document defines and owns reason code set 0x0"
+
+Should it also say, reason code set 1 is allocated for Linux guest use?
+I don't see why not...
+
+Tom?
+
+> +#define GHCB_TERM_REGISTER		0	/* GHCB GPA registration failure */
+> +#define GHCB_TERM_PSC			1	/* Page State Change failure */
+> +#define GHCB_TERM_PVALIDATE		2	/* Pvalidate failure */
 > +
-> +	if (kvm_vcpu_trap_get_class(vcpu) != ESR_ELx_EC_SYS64)
-> +		return false;
-> +
-> +	sysreg = esr_sys64_to_sysreg(kvm_vcpu_get_esr(vcpu));
-> +	if (sysreg != SYS_CNTPCT_EL0)
-> +		return false;
-
-You also want to check for CNTPCTSS_EL0 which will also be caught by
-this trap.
-
-> +
-> +	rt = kvm_vcpu_sys_get_rt(vcpu);
-> +	rv = __timer_read_cntpct(vcpu);
-> +	vcpu_set_reg(vcpu, rt, rv);
-> +	__kvm_skip_instr(vcpu);
-> +	return true;
-> +}
-> +
->  /*
->   * Return true when we were able to fixup the guest exit and should return to
->   * the guest, false when we should restore the host state and return to the
-> @@ -439,6 +465,9 @@ static inline bool fixup_guest_exit(struct kvm_vcpu *vcpu, u64 *exit_code)
->  	if (*exit_code != ARM_EXCEPTION_TRAP)
->  		goto exit;
->  
-> +	if (__hyp_handle_counter(vcpu))
-> +		goto guest;
-> +
->  	if (cpus_have_final_cap(ARM64_WORKAROUND_CAVIUM_TX2_219_TVM) &&
->  	    kvm_vcpu_trap_get_class(vcpu) == ESR_ELx_EC_SYS64 &&
->  	    handle_tx2_tvm(vcpu))
-> diff --git a/arch/arm64/kvm/hyp/nvhe/timer-sr.c b/arch/arm64/kvm/hyp/nvhe/timer-sr.c
-> index 5b8b4cd02506..67236c2e0ba7 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/timer-sr.c
-> +++ b/arch/arm64/kvm/hyp/nvhe/timer-sr.c
-> @@ -44,10 +44,17 @@ void __timer_enable_traps(struct kvm_vcpu *vcpu)
->  
->  	/*
->  	 * Disallow physical timer access for the guest
-> -	 * Physical counter access is allowed
->  	 */
->  	val = read_sysreg(cnthctl_el2);
->  	val &= ~CNTHCTL_EL1PCEN;
-> -	val |= CNTHCTL_EL1PCTEN;
-> +
-> +	/*
-> +	 * Disallow physical counter access for the guest if offsetting is
-> +	 * requested on a non-ECV system.
-> +	 */
-> +	if (vcpu_ptimer(vcpu)->host_offset && !cpus_have_const_cap(ARM64_ECV))
-> +		val &= ~CNTHCTL_EL1PCTEN;
-> +	else
-> +		val |= CNTHCTL_EL1PCTEN;
->  	write_sysreg(val, cnthctl_el2);
->  }
-
-Thanks,
-
-	M.
+>  #endif
 
 -- 
-Without deviation from the norm, progress is not possible.
+Regards/Gruss,
+    Boris.
+
+https://people.kernel.org/tglx/notes-about-netiquette
