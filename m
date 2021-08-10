@@ -2,113 +2,94 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C9BBA3E83F0
-	for <lists+kvm@lfdr.de>; Tue, 10 Aug 2021 21:50:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B35753E8407
+	for <lists+kvm@lfdr.de>; Tue, 10 Aug 2021 21:59:41 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232685AbhHJTvU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 10 Aug 2021 15:51:20 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:26918 "EHLO
+        id S232453AbhHJUAB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 10 Aug 2021 16:00:01 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:42741 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232085AbhHJTvU (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 10 Aug 2021 15:51:20 -0400
+        by vger.kernel.org with ESMTP id S230525AbhHJT76 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 10 Aug 2021 15:59:58 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1628625057;
+        s=mimecast20190719; t=1628625576;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=INqpe3n3BlMDccYZl1wR1LT5eBk11RZA0ukzrlreDIY=;
-        b=V3aOaFvPkIVlsS2mWhrj4gnyR4z5OU+cro7GqJMyKQnAVx1qUHWrTv7fTuqeET/mO2qB4x
-        eQ4ceHLmygRy8L+CLkRypXC2DAKrzNaonwx5x3ZM+Qdj+Sqxje/GpKvIJdtPtVtULmqPMr
-        3yqq7IKTZF9LNKmCQFjaEoy6JxUMU6Y=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-124-KpOG7iPYNjuteauMc_hqyQ-1; Tue, 10 Aug 2021 15:50:55 -0400
-X-MC-Unique: KpOG7iPYNjuteauMc_hqyQ-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A0357801A92;
-        Tue, 10 Aug 2021 19:50:54 +0000 (UTC)
-Received: from localhost (unknown [10.22.32.20])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 678005D9CA;
-        Tue, 10 Aug 2021 19:50:54 +0000 (UTC)
-Date:   Tue, 10 Aug 2021 15:50:53 -0400
-From:   Eduardo Habkost <ehabkost@redhat.com>
-To:     Valeriy Vdovin <valery.vdovin.s@gmail.com>
-Cc:     qemu-devel@nongnu.org,
-        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-        Eric Blake <eblake@redhat.com>,
-        Markus Armbruster <armbru@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Marcelo Tosatti <mtosatti@redhat.com>,
-        Richard Henderson <richard.henderson@linaro.org>,
-        Thomas Huth <thuth@redhat.com>,
-        Laurent Vivier <lvivier@redhat.com>, kvm@vger.kernel.org,
-        Denis Lunev <den@openvz.org>,
-        Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
-        Valeriy Vdovin <valeriy.vdovin@virtuozzo.com>
-Subject: Re: [PATCH v14] qapi: introduce 'query-x86-cpuid' QMP command.
-Message-ID: <20210810195053.6vsjadglrexf6jwy@habkost.net>
-References: <20210810065131.2849-1-valery.vdovin.s@gmail.com>
+        bh=5SYx2j9EQ5pdzV1C9IH+mYuJFsFKmzgLPRyNEkIdI+s=;
+        b=Xkdkxe5T/awZUJ8HBBunAMgm3la0mgGP0TT666B0+ltbRAahtrDDb05ciuk7ktvmW4YFoU
+        5Aiy8mqpWuB0y1/GG86DN9b7BcinDSpBCuf52Cp4P6bnlN27FFxzFrafndPxhYAX+8fSa/
+        zWZCvaPYFBYwPZ90nelWilg/pJcHNmw=
+Received: from mail-ot1-f72.google.com (mail-ot1-f72.google.com
+ [209.85.210.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-78-vOs6m1rWMDWaNFQvnMECOg-1; Tue, 10 Aug 2021 15:59:35 -0400
+X-MC-Unique: vOs6m1rWMDWaNFQvnMECOg-1
+Received: by mail-ot1-f72.google.com with SMTP id i9-20020a0568302109b02905090e0df297so171642otc.0
+        for <kvm@vger.kernel.org>; Tue, 10 Aug 2021 12:59:34 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=5SYx2j9EQ5pdzV1C9IH+mYuJFsFKmzgLPRyNEkIdI+s=;
+        b=Xxi7dSfl14F0Q0ygTCFxsojvNMwITuwkF/KUV9TbA38XTCfFWaqJG0g0PHaDjRIEIq
+         rwXzEiI+dlveSRAKN+XZouvnDpCUOLTJqdLpoO/sQdXVSGWatkE4MZ53o0BKbonyv0T7
+         5HVNh4kaxmqY1GhR9MA4MbrGnoJknpX/tOCREJLa+knMMOv+zfXQ0+AnYQ7E+kABxG0C
+         Q+blpx4flomdF35fZI9vzCpQ8xJ8nSjvaHQRH6C9sCzrEA5a0LH4TjeAkUPE4lbjQeLx
+         IHSH1wqAmDxqYL+MjRjPz1A32sXp1XA30Feb0v2dBnCaGHODeH+SbFZ0hGm/gwLI7JMy
+         /mSw==
+X-Gm-Message-State: AOAM532EjPCYsA71hXP6VuPhuVM33Lw45zMNVfipSMkYW+w+B4WZ9DUm
+        iucuY9zS0KFMOJY8WCbJfEjTn1JHeXh6VOaeicfu6jUUVYUZwhFyVVgrhD7uzAspPZ/4MVdyLgj
+        vavKifzCH8uHN
+X-Received: by 2002:aca:2b07:: with SMTP id i7mr4975587oik.97.1628625574203;
+        Tue, 10 Aug 2021 12:59:34 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwK3rE75lK3h+wUTcVv/Hzo5wpFsQe+Kjjbim3d5l0FAevt8Ld9ndoIzQ5mbMXYi918sGGsWQ==
+X-Received: by 2002:aca:2b07:: with SMTP id i7mr4975578oik.97.1628625574071;
+        Tue, 10 Aug 2021 12:59:34 -0700 (PDT)
+Received: from redhat.com ([198.99.80.109])
+        by smtp.gmail.com with ESMTPSA id b11sm674139ooi.0.2021.08.10.12.59.33
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 10 Aug 2021 12:59:33 -0700 (PDT)
+Date:   Tue, 10 Aug 2021 13:59:32 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Peter Xu <peterx@redhat.com>
+Cc:     Jason Gunthorpe <jgg@nvidia.com>, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org
+Subject: Re: [PATCH 3/7] vfio/pci: Use vfio_device_unmap_mapping_range()
+Message-ID: <20210810135932.6825833b.alex.williamson@redhat.com>
+In-Reply-To: <YRLJ/wdiY/fnGj2d@t490s>
+References: <162818167535.1511194.6614962507750594786.stgit@omen>
+        <162818325518.1511194.1243290800645603609.stgit@omen>
+        <YRLJ/wdiY/fnGj2d@t490s>
+X-Mailer: Claws Mail 3.18.0 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20210810065131.2849-1-valery.vdovin.s@gmail.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Aug 10, 2021 at 09:51:31AM +0300, Valeriy Vdovin wrote:
-> From: Valeriy Vdovin <valeriy.vdovin@virtuozzo.com>
-> 
-> Introducing new QMP command 'query-x86-cpuid'. This command can be used to
-> get virtualized cpu model info generated by QEMU during VM initialization in
-> the form of cpuid representation.
-> 
-> Diving into more details about virtual CPU generation: QEMU first parses '-cpu'
-> command line option. From there it takes the name of the model as the basis for
-> feature set of the new virtual CPU. After that it uses trailing '-cpu' options,
-> that state if additional cpu features should be present on the virtual CPU or
-> excluded from it (tokens '+'/'-' or '=on'/'=off').
-> After that QEMU checks if the host's cpu can actually support the derived
-> feature set and applies host limitations to it.
-> After this initialization procedure, virtual CPU has it's model and
-> vendor names, and a working feature set and is ready for identification
-> instructions such as CPUID.
-> 
-> To learn exactly how virtual CPU is presented to the guest machine via CPUID
-> instruction, new QMP command can be used. By calling 'query-x86-cpuid'
-> command, one can get a full listing of all CPUID leaves with subleaves which are
-> supported by the initialized virtual CPU.
-> 
-> Other than debug, the command is useful in cases when we would like to
-> utilize QEMU's virtual CPU initialization routines and put the retrieved
-> values into kernel CPUID overriding mechanics for more precise control
-> over how various processes perceive its underlying hardware with
-> container processes as a good example.
-> 
-> The command is specific to x86. It is currenly only implemented for KVM acceleator.
-> 
-> Output format:
-> The output is a plain list of leaf/subleaf argument combinations, that
-> return 4 words in registers EAX, EBX, ECX, EDX.
->
-[...]
+On Tue, 10 Aug 2021 14:48:31 -0400
+Peter Xu <peterx@redhat.com> wrote:
 
-Based on the effort being required from you to make sure this
-patch is in good shape, maybe you could reconsider my suggestion
-from a while ago for a single-CPUID-leaf interface, as discussed
-at:
-https://lore.kernel.org/qemu-devel/20210421201759.utsmhuopdmlhghbx@habkost.net/
+> On Thu, Aug 05, 2021 at 11:07:35AM -0600, Alex Williamson wrote:
+> > @@ -1690,7 +1554,7 @@ static int vfio_pci_mmap(struct vfio_device *core_vdev, struct vm_area_struct *v
+> >  
+> >  	vma->vm_private_data = vdev;
+> >  	vma->vm_page_prot = pgprot_noncached(vma->vm_page_prot);
+> > -	vma->vm_pgoff = (pci_resource_start(pdev, index) >> PAGE_SHIFT) + pgoff;
+> > +	vma->vm_page_prot = pgprot_decrypted(vma->vm_page_prot);  
+> 
+> This addition seems to be an accident. :) Thanks,
 
-A single-CPUID-leaf qmp_query_x86_cpuid() function that is
-generic and not KVM-specific can probably be implemented in ~5
-lines of code.
+Nope, Jason noted on a previous version that io_remap_pfn_range() is
+essentially:
 
-I'm not against the interface proposed here, but you are surely
-going to get more friction and more complexity to deal with.
+  remap_pfn_range(vma, addr, pfn, size, pgprot_decrypted(prot));
 
--- 
-Eduardo
+So since we switched to vmf_insert_pfn() I added this page protection
+flag to the vma instead, then it gets removed later when we switch back
+to io_remap_pfn_range().  Thanks,
+
+Alex
 
