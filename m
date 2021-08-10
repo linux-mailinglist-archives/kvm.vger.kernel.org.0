@@ -2,65 +2,69 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C7E833E8597
-	for <lists+kvm@lfdr.de>; Tue, 10 Aug 2021 23:45:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E8BAC3E85AC
+	for <lists+kvm@lfdr.de>; Tue, 10 Aug 2021 23:51:04 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234715AbhHJVpk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 10 Aug 2021 17:45:40 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:30861 "EHLO
+        id S234156AbhHJVvZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 10 Aug 2021 17:51:25 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:31899 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S234434AbhHJVpj (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 10 Aug 2021 17:45:39 -0400
+        by vger.kernel.org with ESMTP id S234947AbhHJVvZ (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 10 Aug 2021 17:51:25 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1628631916;
+        s=mimecast20190719; t=1628632261;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=lx2uWYFZRkWia4mHYWRkdZx8DwSlvSdbBOWfMTQd9Bk=;
-        b=jQ36H/0RtXvnY/tkGhY2alSZW0kmGRygk3OG5Bqe8B0suyW8i78D0O+TMTnqxz2LuHxiBd
-        UAq/TJh2stu9bAZU98jiBji5MmHGC2MJtiPED2n3FiUffEKl1rtpz7tnNeIWU0TfHkw0y8
-        PsxpIwS2lRhDovjVr668Pw++Pdsft/Q=
-Received: from mail-oo1-f70.google.com (mail-oo1-f70.google.com
- [209.85.161.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-337-P0ndGvCaOM69za_-sud4LQ-1; Tue, 10 Aug 2021 17:45:14 -0400
-X-MC-Unique: P0ndGvCaOM69za_-sud4LQ-1
-Received: by mail-oo1-f70.google.com with SMTP id u5-20020a4a97050000b029026a71f65966so107137ooi.2
-        for <kvm@vger.kernel.org>; Tue, 10 Aug 2021 14:45:14 -0700 (PDT)
+        bh=oH36/9wH82mNkALKpSBwfhqJr/0cHRA60oHpFS8duTI=;
+        b=DAp0ugyrAOwGImwkGYC7NThWgRlljVL68YYInh+fZhUMU4CmSeM4ttc2Ap9Y5roMbJSd/f
+        6pxyVPXYKnUYuqEf05rYygTeVCaTOrfcC5Cn+UE4vKGnI4ucLofwTMV8EgI4tggPmIy53O
+        tZMCZYAA5GAiARH8pN1pxz5kFkCgcNU=
+Received: from mail-ot1-f72.google.com (mail-ot1-f72.google.com
+ [209.85.210.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-151-guLvZdFxN4qru5qy-WofHg-1; Tue, 10 Aug 2021 17:51:00 -0400
+X-MC-Unique: guLvZdFxN4qru5qy-WofHg-1
+Received: by mail-ot1-f72.google.com with SMTP id r24-20020a0568302378b02904f21fcab643so243477oth.17
+        for <kvm@vger.kernel.org>; Tue, 10 Aug 2021 14:51:00 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=lx2uWYFZRkWia4mHYWRkdZx8DwSlvSdbBOWfMTQd9Bk=;
-        b=O3J7Io6tYssRq25dqR3bEym3ZdQsLLUHSN1KEuwF6RDjVCm+vZblmNE/J7z4b69yCZ
-         TZNekcqqC23w6RvhtGyRa4g6dbN26ySoix3heCkjw6BAVuOj89jmRvVYDYkUSZUS8Qz1
-         9lNf9hqI8UWhXrD+iZW4Tf1ZEkovaNgZE37cUvNiHfjmvvscpMYuHbQdNvosBpLZiAlU
-         Fo3egAtqxMVhOqiHpZbsbpE9qRgZL1IP6puUZxCpO75BJqwRPIDKvimagg+LuShRJ4eK
-         qlYEuZoD/ADg/w02R6eAMknmhP/nW0hVnYBtHWtasNbgL6/KeJsxEXnKzRyWWiChNjCQ
-         y9uw==
-X-Gm-Message-State: AOAM533PZIvXfKYQ2pmm3I+QGhgltYXiitJ6ULvekxfEOaeIsXQ9Yl2z
-        f1pYK0ZTDmomx3JS9ALuvOAy8/bm9uDCzV92S6TgqprOjPkg4bjkrRIh2g9N7K+X65fbJidDglS
-        MvQb95T1yffEk
-X-Received: by 2002:a9d:84c:: with SMTP id 70mr12855826oty.344.1628631914187;
-        Tue, 10 Aug 2021 14:45:14 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJy6Ary8a1ESo9zoHrr/4X7svWaGu5Lqsi/I+gg1HHwrs8HuQtFwcEHHfgHpn5voCQdKzkbzAQ==
-X-Received: by 2002:a9d:84c:: with SMTP id 70mr12855815oty.344.1628631913982;
-        Tue, 10 Aug 2021 14:45:13 -0700 (PDT)
+        bh=oH36/9wH82mNkALKpSBwfhqJr/0cHRA60oHpFS8duTI=;
+        b=FzBrA7ClT9zZ01xS9GT8s4eg5c2Q2GfWbePzhH1vewzIOt7na4D/tFljIhmXJESnLl
+         k3w7XGt0gwAVhCbSFHVUv4ja95SfANc5TDdO66hGg8tCrN+LDbvIRfjBK78U4BqejMyX
+         JE9rJDxhXpR2ppBrxaKjy0XnSQqr+8nP6qlcKTygoIJB6lfZLrPO9t4+UIKvDDvgWv4n
+         hdICKAkReXSuqvfiyeWdaoxPogd8RL74eD03pLmAqCbwAdNt0zFg0T2cn6aOEYWsU7XI
+         oQ0acJIuYJIm1JctGMKQqXcpOLZcc0IeGTUK716jDzwCYLnGjCkuYL3vCXmfJ27IRFDg
+         Pl3A==
+X-Gm-Message-State: AOAM5339c69EwcXSsMuW2u7tSk6fvwLq9XrqYKuYD53TBj5KC9l+FXfN
+        rMdOGj0FAGeh/yo85OYwxL/NpRvcwi4UIGgIHD3SVLY3fZDONY9NFp4OIoLiHv8iZUHKEVBGr9f
+        o8JtNbdEud2Zb
+X-Received: by 2002:aca:1911:: with SMTP id l17mr7944504oii.160.1628632260032;
+        Tue, 10 Aug 2021 14:51:00 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJx0YdnMUdm+pqFd5LmIbRWI/f3AmnZFLtHNMH7iPqJDMGpCMBi118Y1XtZ+GSFLbmgWeFotoA==
+X-Received: by 2002:aca:1911:: with SMTP id l17mr7944498oii.160.1628632259915;
+        Tue, 10 Aug 2021 14:50:59 -0700 (PDT)
 Received: from redhat.com ([198.99.80.109])
-        by smtp.gmail.com with ESMTPSA id r137sm3455476oie.17.2021.08.10.14.45.13
+        by smtp.gmail.com with ESMTPSA id e20sm655457otj.4.2021.08.10.14.50.59
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 10 Aug 2021 14:45:13 -0700 (PDT)
-Date:   Tue, 10 Aug 2021 15:45:12 -0600
+        Tue, 10 Aug 2021 14:50:59 -0700 (PDT)
+Date:   Tue, 10 Aug 2021 15:50:58 -0600
 From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Peter Xu <peterx@redhat.com>
+To:     Christoph Hellwig <hch@infradead.org>
 Cc:     Jason Gunthorpe <jgg@nvidia.com>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org
-Subject: Re: [PATCH 7/7] vfio/pci: Remove map-on-fault behavior
-Message-ID: <20210810154512.5aa8eeb3.alex.williamson@redhat.com>
-In-Reply-To: <YRLne7/S1euppJQr@t490s>
+        kvm@vger.kernel.org, peterx@redhat.com
+Subject: Re: [PATCH 3/7] vfio/pci: Use vfio_device_unmap_mapping_range()
+Message-ID: <20210810155058.4199a86b.alex.williamson@redhat.com>
+In-Reply-To: <YRJ3JD7gyi11x5Hw@infradead.org>
 References: <162818167535.1511194.6614962507750594786.stgit@omen>
-        <162818330190.1511194.10498114924408843888.stgit@omen>
-        <YRLne7/S1euppJQr@t490s>
+        <162818325518.1511194.1243290800645603609.stgit@omen>
+        <20210806010418.GF1672295@nvidia.com>
+        <20210806141745.1d8c3e0a.alex.williamson@redhat.com>
+        <YRI9+7CCSq++pYfM@infradead.org>
+        <20210810115722.GA5158@nvidia.com>
+        <YRJ3JD7gyi11x5Hw@infradead.org>
 X-Mailer: Claws Mail 3.18.0 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
@@ -69,37 +73,22 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 10 Aug 2021 16:54:19 -0400
-Peter Xu <peterx@redhat.com> wrote:
+On Tue, 10 Aug 2021 13:55:00 +0100
+Christoph Hellwig <hch@infradead.org> wrote:
 
-> On Thu, Aug 05, 2021 at 11:08:21AM -0600, Alex Williamson wrote:
-> > diff --git a/drivers/vfio/pci/vfio_pci_private.h b/drivers/vfio/pci/vfio_pci_private.h
-> > index 0aa542fa1e26..9aedb78a4ae3 100644
-> > --- a/drivers/vfio/pci/vfio_pci_private.h
-> > +++ b/drivers/vfio/pci/vfio_pci_private.h
-> > @@ -128,6 +128,7 @@ struct vfio_pci_device {
-> >  	bool			needs_reset;
-> >  	bool			nointx;
-> >  	bool			needs_pm_restore;
-> > +	bool			zapped_bars;  
+> On Tue, Aug 10, 2021 at 08:57:22AM -0300, Jason Gunthorpe wrote:
+> > I'm not sure there is a real performance win to chase here? Doesn't
+> > this only protect mmap against reset? The mmap isn't performance
+> > sensitive, right?
+> > 
+> > If this really needs extra optimization adding a rwsem to the devset
+> > and using that across the whole set would surely be sufficient.  
 > 
-> Would it be nicer to invert the meaning of "zapped_bars" and rename it to
-> "memory_enabled"?  Thanks,
+> Every mmio read or write takes memory_lock.
 
-I think this has it's own down sides, for example is this really less
-confusing?:
-
-  if (!vdev->memory_enabled && __vfio_pci_memory_enabled(vdev))
-
-Are you specifically trying to invert the polarity or just get away
-from the name proposed here?  We could use something like
-"bars_unmapped", which would have the same polarity (OTOH,
-"bars_mapped" suggests something to me about whether the user has
-performed any mmaps of BARs).
-
-I do wish there was a more elegant solution than an @var tracking this
-state in general, but I haven't come up with such a solution yet.
-Thanks,
+Exactly.  Ideally we're not using that path often, but I don't think
+that's a good excuse to introduce memory access serialization, or even
+dependencies between devices.  Thanks,
 
 Alex
 
