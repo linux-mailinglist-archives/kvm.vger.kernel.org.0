@@ -2,227 +2,380 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4A9473E5372
-	for <lists+kvm@lfdr.de>; Tue, 10 Aug 2021 08:25:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A6C103E53EA
+	for <lists+kvm@lfdr.de>; Tue, 10 Aug 2021 08:51:40 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237797AbhHJG0C (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 10 Aug 2021 02:26:02 -0400
-Received: from foss.arm.com ([217.140.110.172]:48394 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S234937AbhHJG0B (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 10 Aug 2021 02:26:01 -0400
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id DD2676D;
-        Mon,  9 Aug 2021 23:25:39 -0700 (PDT)
-Received: from usa.arm.com (a074945.blr.arm.com [10.162.16.71])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 453303F718;
-        Mon,  9 Aug 2021 23:25:37 -0700 (PDT)
-From:   Vivek Gautam <vivek.gautam@arm.com>
-To:     will@kernel.org, julien.thierry.kdev@gmail.com, kvm@vger.kernel.org
-Cc:     andre.przywara@arm.com, alexandru.elisei@arm.com,
-        lorenzo.pieralisi@arm.com, jean-philippe@linaro.org,
-        eric.auger@redhat.com, Vivek Gautam <vivek.gautam@arm.com>
-Subject: [PATCH] vfio/pci: Add support for PCIe extended capabilities
-Date:   Tue, 10 Aug 2021 11:55:14 +0530
-Message-Id: <20210810062514.18980-1-vivek.gautam@arm.com>
+        id S237931AbhHJGwA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 10 Aug 2021 02:52:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41132 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231482AbhHJGwA (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 10 Aug 2021 02:52:00 -0400
+Received: from mail-lf1-x12a.google.com (mail-lf1-x12a.google.com [IPv6:2a00:1450:4864:20::12a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2ED4FC0613D3
+        for <kvm@vger.kernel.org>; Mon,  9 Aug 2021 23:51:38 -0700 (PDT)
+Received: by mail-lf1-x12a.google.com with SMTP id z2so22614207lft.1
+        for <kvm@vger.kernel.org>; Mon, 09 Aug 2021 23:51:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id;
+        bh=xGor3bt4+u7rgQNdKXo1UES+1CoHnwsMlNRtJKUbrwI=;
+        b=tHVD2kJZ2H7NaYF83pB8XwQYJ4cksPECI3EXmqao0bh5bF4Sc6X9XtIlwH/educGMT
+         MRGNo9U+bRPCSASS2DAeIBMj2BYC/9jibEr6S9nNxEgyY+E7BEQUrretFfb+UxJv1sP2
+         /Q/vtuyPD1EZt0F2EQR3Rlt2jpIsezLcW1WdQNZtW1hZu9+45P2EudFqmHgmk8zpi+Lz
+         yJTHTS2gK/GXoFQOHeExnxgHF46brpMU+AfmHXK1n/YU/hfXvfxSsRJIQcPseUHsBDXm
+         uxoX0QJzabZTi50aRUMr8/zMA+npjuLqdISw3CgftAtyT9tVWsdzC35vOS8H5b7apUXF
+         HZEg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id;
+        bh=xGor3bt4+u7rgQNdKXo1UES+1CoHnwsMlNRtJKUbrwI=;
+        b=KUsVwr3OqpElb8O+jT3FvSNa8xaZ0FUjbWvof9V9WFbOKVMaojzAkXay4AwZLEb6O2
+         CwBbbJEmWWwbKgncK7JUMKlkL9AJ9QOLdFjGqxoLhl4p6Jw0NsgJItihXRfa0MiqnU5k
+         oOHJMwNzLKYIyd+u5YQKxBfxsmr8LOReLLUJfnwYXNINpWC2O1H3WhathvfyL+7rvE9U
+         ZzFnTiX0JUThcjCkH4y/9pG7/Ot/ZeP4DBXqtYqnjPXzofXkD/BHO1CsHIh2qagAH7Pl
+         AFo/Sxeat8TCszOg2ULtCQuKMRUJdH1rC2dQm5oE1bYYc3rRa2ckitgoE6EZvp+rWeGA
+         H+bA==
+X-Gm-Message-State: AOAM530eaKGdwZeKtB/Oxv5rlF2xVx87xDTqcqCNKhKeJTi/hoT4PvCf
+        x+flStU7m3/ZoJg6CZ0nj9s=
+X-Google-Smtp-Source: ABdhPJys9eBTGkxdb/mbmufakC3JlPVuADCW8h4Ernjz+iACKmB88VhwFHpbIqJJ6+rMqL39GMN1pg==
+X-Received: by 2002:ac2:4357:: with SMTP id o23mr20207526lfl.188.1628578296458;
+        Mon, 09 Aug 2021 23:51:36 -0700 (PDT)
+Received: from localhost.localdomain ([176.106.247.78])
+        by smtp.gmail.com with ESMTPSA id c9sm1957061lfv.17.2021.08.09.23.51.35
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 09 Aug 2021 23:51:35 -0700 (PDT)
+From:   Valeriy Vdovin <valery.vdovin.s@gmail.com>
+To:     qemu-devel@nongnu.org
+Cc:     Eduardo Habkost <ehabkost@redhat.com>,
+        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+        Eric Blake <eblake@redhat.com>,
+        Markus Armbruster <armbru@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Marcelo Tosatti <mtosatti@redhat.com>,
+        Richard Henderson <richard.henderson@linaro.org>,
+        Thomas Huth <thuth@redhat.com>,
+        Laurent Vivier <lvivier@redhat.com>, kvm@vger.kernel.org,
+        Denis Lunev <den@openvz.org>,
+        Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+        Valeriy Vdovin <valery.vdovin.s@gmail.com>,
+        Valeriy Vdovin <valeriy.vdovin@virtuozzo.com>
+Subject: [PATCH v14] qapi: introduce 'query-x86-cpuid' QMP command.
+Date:   Tue, 10 Aug 2021 09:51:31 +0300
+Message-Id: <20210810065131.2849-1-valery.vdovin.s@gmail.com>
 X-Mailer: git-send-email 2.17.1
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Add support to parse extended configuration space for vfio based
-assigned PCIe devices and add extended capabilities for the device
-in the guest. This allows the guest to see and work on extended
-capabilities, for example to toggle PRI extended cap to enable and
-disable Shared virtual addressing (SVA) support.
-PCIe extended capability header that is the first DWORD of all
-extended caps is shown below -
+From: Valeriy Vdovin <valeriy.vdovin@virtuozzo.com>
 
-   31               20  19   16  15                 0
-   ____________________|_______|_____________________
-  |    Next cap off    |  1h   |     Cap ID          |
-  |____________________|_______|_____________________|
+Introducing new QMP command 'query-x86-cpuid'. This command can be used to
+get virtualized cpu model info generated by QEMU during VM initialization in
+the form of cpuid representation.
 
-Out of the two upper bytes of extended cap header, the
-lower nibble is actually cap version - 0x1.
-'next cap offset' if present at bits [31:20], should be
-right shifted by 4 bits to calculate the position of next
-capability.
-This change supports parsing and adding ATS, PRI and PASID caps.
+Diving into more details about virtual CPU generation: QEMU first parses '-cpu'
+command line option. From there it takes the name of the model as the basis for
+feature set of the new virtual CPU. After that it uses trailing '-cpu' options,
+that state if additional cpu features should be present on the virtual CPU or
+excluded from it (tokens '+'/'-' or '=on'/'=off').
+After that QEMU checks if the host's cpu can actually support the derived
+feature set and applies host limitations to it.
+After this initialization procedure, virtual CPU has it's model and
+vendor names, and a working feature set and is ready for identification
+instructions such as CPUID.
 
-Signed-off-by: Vivek Gautam <vivek.gautam@arm.com>
+To learn exactly how virtual CPU is presented to the guest machine via CPUID
+instruction, new QMP command can be used. By calling 'query-x86-cpuid'
+command, one can get a full listing of all CPUID leaves with subleaves which are
+supported by the initialized virtual CPU.
+
+Other than debug, the command is useful in cases when we would like to
+utilize QEMU's virtual CPU initialization routines and put the retrieved
+values into kernel CPUID overriding mechanics for more precise control
+over how various processes perceive its underlying hardware with
+container processes as a good example.
+
+The command is specific to x86. It is currenly only implemented for KVM acceleator.
+
+Output format:
+The output is a plain list of leaf/subleaf argument combinations, that
+return 4 words in registers EAX, EBX, ECX, EDX.
+
+Use example:
+qmp_request: {
+  "execute": "query-x86-cpuid"
+}
+
+qmp_response: {
+  "return": [
+    {
+      "eax": 1073741825,
+      "edx": 77,
+      "in-eax": 1073741824,
+      "ecx": 1447775574,
+      "ebx": 1263359563
+    },
+    {
+      "eax": 16777339,
+      "edx": 0,
+      "in-eax": 1073741825,
+      "ecx": 0,
+      "ebx": 0
+    },
+    {
+      "eax": 13,
+      "edx": 1231384169,
+      "in-eax": 0,
+      "ecx": 1818588270,
+      "ebx": 1970169159
+    },
+    {
+      "eax": 198354,
+      "edx": 126614527,
+      "in-eax": 1,
+      "ecx": 2176328193,
+      "ebx": 2048
+    },
+    ....
+    {
+      "eax": 12328,
+      "edx": 0,
+      "in-eax": 2147483656,
+      "ecx": 0,
+      "ebx": 0
+    }
+  ]
+}
+
+Signed-off-by: Valeriy Vdovin <valeriy.vdovin@virtuozzo.com>
 ---
- include/kvm/pci.h |   6 +++
- vfio/pci.c        | 104 ++++++++++++++++++++++++++++++++++++++++++----
- 2 files changed, 103 insertions(+), 7 deletions(-)
+v2: - Removed leaf/subleaf iterators.
+    - Modified cpu_x86_cpuid to return false in cases when count is
+      greater than supported subleaves.
+v3: - Fixed structure name coding style.
+    - Added more comments
+    - Ensured buildability for non-x86 targets.
+v4: - Fixed cpu_x86_cpuid return value logic and handling of 0xA leaf.
+    - Fixed comments.
+    - Removed target check in qmp_query_cpu_model_cpuid.
+v5: - Added error handling code in qmp_query_cpu_model_cpuid
+v6: - Fixed error handling code. Added method to query_error_class
+v7: - Changed implementation in favor of cached cpuid_data for
+      KVM_SET_CPUID2
+v8: - Renamed qmp method to query-kvm-cpuid and some fields in response.
+    - Modified documentation to qmp method
+    - Removed helper struct declaration
+v9: - Renamed 'in_eax' / 'in_ecx' fields to 'in-eax' / 'in-ecx'
+    - Pasted more complete response to commit message.
+v10:
+    - Subject changed
+    - Fixes in commit message
+    - Small fixes in QMP command docs
+v11:
+    - Added explanation about CONFIG_KVM to the commit message.
+v12:
+    - Changed title from query-kvm-cpuid to query-x86-cpuid
+    - Removed CONFIG_KVM ifdefs
+    - Added detailed error messages for some stub/unimplemented cases.
+v13:
+    - Tagged with since 6.2
+v14:
+    - Rebased to latest master 632eda54043d6f26ff87dac16233e14b4708b967
+    - Added note about error return cases in api documentation.
 
-diff --git a/include/kvm/pci.h b/include/kvm/pci.h
-index 0f2d5bb..a365337 100644
---- a/include/kvm/pci.h
-+++ b/include/kvm/pci.h
-@@ -165,6 +165,12 @@ struct pci_exp_cap {
- 	u32 root_status;
- };
- 
-+struct pci_ext_cap_hdr {
-+	u16	type;
-+	/* bit 19:16 = 0x1: Cap version */
-+	u16	next;
-+};
+ qapi/machine-target.json   | 46 ++++++++++++++++++++++++++++++++++
+ softmmu/cpus.c             |  2 +-
+ target/i386/kvm/kvm-stub.c | 10 ++++++++
+ target/i386/kvm/kvm.c      | 51 ++++++++++++++++++++++++++++++++++++++
+ tests/qtest/qmp-cmd-test.c |  1 +
+ 5 files changed, 109 insertions(+), 1 deletion(-)
+
+diff --git a/qapi/machine-target.json b/qapi/machine-target.json
+index e7811654b7..71648a4f56 100644
+--- a/qapi/machine-target.json
++++ b/qapi/machine-target.json
+@@ -329,3 +329,49 @@
+ ##
+ { 'command': 'query-cpu-definitions', 'returns': ['CpuDefinitionInfo'],
+   'if': 'defined(TARGET_PPC) || defined(TARGET_ARM) || defined(TARGET_I386) || defined(TARGET_S390X) || defined(TARGET_MIPS)' }
 +
- struct pci_device_header;
++##
++# @CpuidEntry:
++#
++# A single entry of a CPUID response.
++#
++# One entry holds full set of information (leaf) returned to the guest
++# in response to it calling a CPUID instruction with eax, ecx used as
++# the arguments to that instruction. ecx is an optional argument as
++# not all of the leaves support it.
++#
++# @in-eax: CPUID argument in eax
++# @in-ecx: CPUID argument in ecx
++# @eax: CPUID result in eax
++# @ebx: CPUID result in ebx
++# @ecx: CPUID result in ecx
++# @edx: CPUID result in edx
++#
++# Since: 6.2
++##
++{ 'struct': 'CpuidEntry',
++  'data': { 'in-eax' : 'uint32',
++            '*in-ecx' : 'uint32',
++            'eax' : 'uint32',
++            'ebx' : 'uint32',
++            'ecx' : 'uint32',
++            'edx' : 'uint32'
++          },
++  'if': 'defined(TARGET_I386)' }
++
++##
++# @query-x86-cpuid:
++#
++# Returns raw data from the emulated CPUID table for the first VCPU.
++# The emulated CPUID table defines the response to the CPUID
++# instruction when executed by the guest operating system.
++# 
++#
++# Returns: a list of CpuidEntry. Returns error when qemu is configured with
++# --disable-kvm flag or if qemu is run with any other accelerator than KVM.
++#
++# Since: 6.2
++##
++{ 'command': 'query-x86-cpuid',
++  'returns': ['CpuidEntry'],
++  'if': 'defined(TARGET_I386)' }
+diff --git a/softmmu/cpus.c b/softmmu/cpus.c
+index 071085f840..8501081897 100644
+--- a/softmmu/cpus.c
++++ b/softmmu/cpus.c
+@@ -129,7 +129,7 @@ void hw_error(const char *fmt, ...)
+ /*
+  * The chosen accelerator is supposed to register this.
+  */
+-static const AccelOpsClass *cpus_accel;
++const AccelOpsClass *cpus_accel;
  
- typedef int (*bar_activate_fn_t)(struct kvm *kvm,
-diff --git a/vfio/pci.c b/vfio/pci.c
-index ea33fd6..d045e0d 100644
---- a/vfio/pci.c
-+++ b/vfio/pci.c
-@@ -665,19 +665,105 @@ static int vfio_pci_add_cap(struct vfio_device *vdev, u8 *virt_hdr,
- 	return 0;
+ void cpu_synchronize_all_states(void)
+ {
+diff --git a/target/i386/kvm/kvm-stub.c b/target/i386/kvm/kvm-stub.c
+index f6e7e4466e..9eb04d908f 100644
+--- a/target/i386/kvm/kvm-stub.c
++++ b/target/i386/kvm/kvm-stub.c
+@@ -12,6 +12,7 @@
+ #include "qemu/osdep.h"
+ #include "cpu.h"
+ #include "kvm_i386.h"
++#include "qapi/error.h"
+ 
+ #ifndef __OPTIMIZE__
+ bool kvm_has_smm(void)
+@@ -44,3 +45,12 @@ bool kvm_hyperv_expand_features(X86CPU *cpu, Error **errp)
+ {
+     abort();
  }
++
++typedef struct CpuidEntryList CpuidEntryList;
++CpuidEntryList *qmp_query_x86_cpuid(Error **errp);
++
++CpuidEntryList *qmp_query_x86_cpuid(Error **errp)
++{
++    error_setg(errp, "Not implemented in --disable-kvm configuration");
++    return NULL;
++}
+diff --git a/target/i386/kvm/kvm.c b/target/i386/kvm/kvm.c
+index e69abe48e3..28e79cd0cf 100644
+--- a/target/i386/kvm/kvm.c
++++ b/target/i386/kvm/kvm.c
+@@ -20,11 +20,13 @@
  
-+static ssize_t vfio_pci_ext_cap_size(struct pci_ext_cap_hdr *cap_hdr)
+ #include <linux/kvm.h>
+ #include "standard-headers/asm-x86/kvm_para.h"
++#include "qapi/qapi-commands-machine-target.h"
+ 
+ #include "cpu.h"
+ #include "host-cpu.h"
+ #include "sysemu/sysemu.h"
+ #include "sysemu/hw_accel.h"
++#include "sysemu/accel-ops.h"
+ #include "sysemu/kvm_int.h"
+ #include "sysemu/runstate.h"
+ #include "kvm_i386.h"
+@@ -1540,6 +1542,51 @@ static Error *invtsc_mig_blocker;
+ 
+ #define KVM_MAX_CPUID_ENTRIES  100
+ 
++struct kvm_cpuid2 *cpuid_data_cached;
++extern const AccelOpsClass *cpus_accel;
++
++static inline int is_kvm_accel(AccelOpsClass *class)
 +{
-+	switch (cap_hdr->type) {
-+	case PCI_EXT_CAP_ID_ATS:
-+		return PCI_EXT_CAP_ATS_SIZEOF;
-+	case PCI_EXT_CAP_ID_PRI:
-+		return PCI_EXT_CAP_PRI_SIZEOF;
-+	case PCI_EXT_CAP_ID_PASID:
-+		return PCI_EXT_CAP_PASID_SIZEOF;
-+	default:
-+		pr_err("unknown extended PCI capability 0x%x", cap_hdr->type);
-+		return 0;
-+	}
++    ObjectClass *parent_class;
++
++    parent_class = &class->parent_class;
++    return strcmp(object_class_get_name(parent_class),
++        "kvm-accel-ops") == 0;
 +}
 +
-+static int vfio_pci_add_ext_cap(struct vfio_device *vdev, u8 *virt_hdr,
-+			    struct pci_ext_cap_hdr *cap, off_t pos)
++CpuidEntryList *qmp_query_x86_cpuid(Error **errp)
 +{
-+	struct pci_ext_cap_hdr *last;
++    int i;
++    struct kvm_cpuid_entry2 *kvm_entry;
++    CpuidEntryList *head = NULL, **tail = &head;
++    CpuidEntry *entry;
 +
-+	cap->next = 0;
-+	last = PCI_CAP(virt_hdr, 0x100);
++    if (!cpuid_data_cached) {
++         if (cpus_accel && !is_kvm_accel((AccelOpsClass *)cpus_accel))
++             error_setg(errp, "Not implemented for non-kvm accel");
++         else
++             error_setg(errp, "VCPU was not initialized yet");
++         return NULL;
++    }
 +
-+	while (last->next)
-+		last = PCI_CAP(virt_hdr, last->next);
++    for (i = 0; i < cpuid_data_cached->nent; ++i) {
++        kvm_entry = &cpuid_data_cached->entries[i];
++        entry = g_malloc0(sizeof(*entry));
++        entry->in_eax = kvm_entry->function;
++        if (kvm_entry->flags & KVM_CPUID_FLAG_SIGNIFCANT_INDEX) {
++            entry->in_ecx = kvm_entry->index;
++            entry->has_in_ecx = true;
++        }
++        entry->eax = kvm_entry->eax;
++        entry->ebx = kvm_entry->ebx;
++        entry->ecx = kvm_entry->ecx;
++        entry->edx = kvm_entry->edx;
++        QAPI_LIST_APPEND(tail, entry);
++    }
 +
-+	last->next = pos;
-+	/*
-+	 * Out of the two upper bytes of extended cap header, the
-+	 * nibble [19:16] is actually cap version that should be 0x1,
-+	 * so shift back the actual 'next' value by 4 bits.
-+	 */
-+	last->next = (last->next << 4) | 0x1;
-+	memcpy(virt_hdr + pos, cap, vfio_pci_ext_cap_size(cap));
-+
-+	return 0;
-+
++    return head;
 +}
 +
-+static int vfio_pci_parse_ext_caps(struct vfio_device *vdev, u8 *virt_hdr)
-+{
-+	int ret;
-+	u16 pos, next;
-+	struct pci_ext_cap_hdr *ext_cap;
-+	struct vfio_pci_device *pdev = &vdev->pci;
-+
-+	/* Extended cap only for PCIe devices */
-+	if (!arch_has_pci_exp())
-+		return 0;
-+
-+	/* Extended caps start from 0x100 offset. */
-+	pos = 0x100;
-+
-+	for (; pos; pos = next) {
-+		ext_cap = PCI_CAP(&pdev->hdr, pos);
-+		/*
-+		 * Out of the two upper bytes of extended cap header, the
-+		 * lowest nibble is actually cap version.
-+		 * 'next cap offset' if present at bits [31:20], while
-+		 * bits [19:16] are set to 1 to indicate cap version.
-+		 * So to get position of next cap right shift by 4 bits.
-+		 */
-+		next = (ext_cap->next >> 4);
-+
-+		switch (ext_cap->type) {
-+		case PCI_EXT_CAP_ID_ATS:
-+			ret = vfio_pci_add_ext_cap(vdev, virt_hdr, ext_cap, pos);
-+			if (ret)
-+				return ret;
-+			break;
-+		case PCI_EXT_CAP_ID_PRI:
-+			ret = vfio_pci_add_ext_cap(vdev, virt_hdr, ext_cap, pos);
-+			if (ret)
-+				return ret;
-+			break;
-+		case PCI_EXT_CAP_ID_PASID:
-+			ret = vfio_pci_add_ext_cap(vdev, virt_hdr, ext_cap, pos);
-+			if (ret)
-+				return ret;
-+			break;
-+		}
-+	}
-+
-+	return 0;
-+}
-+
- static int vfio_pci_parse_caps(struct vfio_device *vdev)
+ int kvm_arch_init_vcpu(CPUState *cs)
  {
- 	int ret;
- 	size_t size;
- 	u16 pos, next;
- 	struct pci_cap_hdr *cap;
--	u8 virt_hdr[PCI_DEV_CFG_SIZE_LEGACY];
-+	u8 virt_hdr[PCI_DEV_CFG_SIZE];
- 	struct vfio_pci_device *pdev = &vdev->pci;
+     struct {
+@@ -1923,6 +1970,10 @@ int kvm_arch_init_vcpu(CPUState *cs)
+     if (r) {
+         goto fail;
+     }
++    if (!cpuid_data_cached) {
++        cpuid_data_cached = g_malloc0(sizeof(cpuid_data));
++        memcpy(cpuid_data_cached, &cpuid_data, sizeof(cpuid_data));
++    }
  
- 	if (!(pdev->hdr.status & PCI_STATUS_CAP_LIST))
- 		return 0;
- 
--	memset(virt_hdr, 0, PCI_DEV_CFG_SIZE_LEGACY);
-+	memset(virt_hdr, 0, PCI_DEV_CFG_SIZE);
- 
- 	pos = pdev->hdr.capabilities & ~3;
- 
-@@ -715,9 +801,13 @@ static int vfio_pci_parse_caps(struct vfio_device *vdev)
- 		}
- 	}
- 
-+	ret = vfio_pci_parse_ext_caps(vdev, virt_hdr);
-+	if (ret)
-+		return ret;
-+
- 	/* Wipe remaining capabilities */
- 	pos = PCI_STD_HEADER_SIZEOF;
--	size = PCI_DEV_CFG_SIZE_LEGACY - PCI_STD_HEADER_SIZEOF;
-+	size = PCI_DEV_CFG_SIZE - PCI_STD_HEADER_SIZEOF;
- 	memcpy((void *)&pdev->hdr + pos, virt_hdr + pos, size);
- 
- 	return 0;
-@@ -725,7 +815,7 @@ static int vfio_pci_parse_caps(struct vfio_device *vdev)
- 
- static int vfio_pci_parse_cfg_space(struct vfio_device *vdev)
- {
--	ssize_t sz = PCI_DEV_CFG_SIZE_LEGACY;
-+	ssize_t sz = PCI_DEV_CFG_SIZE;
- 	struct vfio_region_info *info;
- 	struct vfio_pci_device *pdev = &vdev->pci;
- 
-@@ -831,10 +921,10 @@ static int vfio_pci_fixup_cfg_space(struct vfio_device *vdev)
- 	/* Install our fake Configuration Space */
- 	info = &vdev->regions[VFIO_PCI_CONFIG_REGION_INDEX].info;
- 	/*
--	 * We don't touch the extended configuration space, let's be cautious
--	 * and not overwrite it all with zeros, or bad things might happen.
-+	 * Update the extended configuration space as well since we
-+	 * are now populating the extended capabilities.
- 	 */
--	hdr_sz = PCI_DEV_CFG_SIZE_LEGACY;
-+	hdr_sz = PCI_DEV_CFG_SIZE;
- 	if (pwrite(vdev->fd, &pdev->hdr, hdr_sz, info->offset) != hdr_sz) {
- 		vfio_dev_err(vdev, "failed to write %zd bytes to Config Space",
- 			     hdr_sz);
+     if (has_xsave) {
+         env->xsave_buf_len = sizeof(struct kvm_xsave);
+diff --git a/tests/qtest/qmp-cmd-test.c b/tests/qtest/qmp-cmd-test.c
+index c98b78d033..bd883f7f52 100644
+--- a/tests/qtest/qmp-cmd-test.c
++++ b/tests/qtest/qmp-cmd-test.c
+@@ -46,6 +46,7 @@ static int query_error_class(const char *cmd)
+         { "query-balloon", ERROR_CLASS_DEVICE_NOT_ACTIVE },
+         { "query-hotpluggable-cpus", ERROR_CLASS_GENERIC_ERROR },
+         { "query-vm-generation-id", ERROR_CLASS_GENERIC_ERROR },
++        { "query-x86-cpuid", ERROR_CLASS_GENERIC_ERROR },
+         { NULL, -1 }
+     };
+     int i;
 -- 
 2.17.1
 
