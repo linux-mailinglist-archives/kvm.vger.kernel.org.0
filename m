@@ -2,110 +2,97 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5B7923E8602
-	for <lists+kvm@lfdr.de>; Wed, 11 Aug 2021 00:18:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2E78C3E860C
+	for <lists+kvm@lfdr.de>; Wed, 11 Aug 2021 00:27:34 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235093AbhHJWTA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 10 Aug 2021 18:19:00 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:29931 "EHLO
+        id S234919AbhHJW1y (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 10 Aug 2021 18:27:54 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:35457 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S234859AbhHJWS7 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 10 Aug 2021 18:18:59 -0400
+        by vger.kernel.org with ESMTP id S231387AbhHJW1x (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 10 Aug 2021 18:27:53 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1628633916;
+        s=mimecast20190719; t=1628634450;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=7YZY4Fy0S693Kga/zgn3elAZcDC5WxrNoe2T+rwZApE=;
-        b=gMQzqyGRz/puTvjpyiEvqfajWHHm/QDNScN7pjRNvbGcF5GD0iaqXrXYswv8+Dfh1wQswg
-        023zCLvi7TSDw+FB25PUyyAnO5lOax5DjHcja1nm754KNo0y+/xvIPukWotukmY9j2fgMv
-        EuV3uSZkuvVMUZkb5h/tXKPeiuNsk78=
-Received: from mail-qt1-f200.google.com (mail-qt1-f200.google.com
- [209.85.160.200]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-527-G2qIm_uQMTGOc9bUyMF41A-1; Tue, 10 Aug 2021 18:18:35 -0400
-X-MC-Unique: G2qIm_uQMTGOc9bUyMF41A-1
-Received: by mail-qt1-f200.google.com with SMTP id j1-20020ac866410000b029028bef7ed9e1so252685qtp.11
-        for <kvm@vger.kernel.org>; Tue, 10 Aug 2021 15:18:35 -0700 (PDT)
+        bh=rKtkcMoRO4/SmKHkWSTGcVIokr6+s/Nfptu/B3gHJZ4=;
+        b=VRq5dXPptuCXrk1Y4GUcDpjLK1Lp7wMbznfKIXTrMZdhSwWaGT29pw3c0qIRJ4kHC1b0wm
+        oK/zPFOAiZgBEpgjYGPqagEJ2Wuor1oG3cn5AH4lSngONLwSB/vx8LS5FtfwD/ipnJK8Hv
+        onn+QhFLvKgV5B5dNSNaB3TOv2Z5CTw=
+Received: from mail-qv1-f72.google.com (mail-qv1-f72.google.com
+ [209.85.219.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-392-2w8VQ2jwP_CsM8C68JVrgA-1; Tue, 10 Aug 2021 18:27:28 -0400
+X-MC-Unique: 2w8VQ2jwP_CsM8C68JVrgA-1
+Received: by mail-qv1-f72.google.com with SMTP id u8-20020a0cec880000b029035825559ec4so84033qvo.22
+        for <kvm@vger.kernel.org>; Tue, 10 Aug 2021 15:27:28 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=7YZY4Fy0S693Kga/zgn3elAZcDC5WxrNoe2T+rwZApE=;
-        b=Pe4TqnLJOHWH9lBjmFKhzcFqmzP0g9DecUwXKtX8Jj+1UI22bYZ7M7DufQzID13EMd
-         PuY19XeKtIVpEMUNnGy+fWbRmvMlaXp/iG8XFB61SxslPsweYVQQb0pjPLeF0H7w9jA6
-         ZMopnc003mb5qq0hkVJV4dl+JKXG8MsYBqJLtx7e8MFjefCiUAx4VUtrYMhTS2K2dkZh
-         gN2Cq8HoYfTETqBd2FqNTwrWEMkn2+zmmGPj5Oi5PBwYQQ2aDHlIEdfdTO2iApTkHX33
-         AkWCXLqtehbu8iD649md3IQr1b9W/4ruSF2CxwxE+mbEJ4k8hFm0uqgf5FS2pOBj9F6Y
-         1VyQ==
-X-Gm-Message-State: AOAM532MMHffj8VT7KrspeRCoyjfOaynQTeAExwgs2y6SMV/6vTG/lSP
-        KegdSUjEirOx+9F55fT6Nv474G0OuYUav/aeUw4Off0nHJZqDx8aLn6z/KvibGuaUkiZPE+lseL
-        zN+L/hbN0Hkb1
-X-Received: by 2002:a37:b544:: with SMTP id e65mr31249877qkf.84.1628633915140;
-        Tue, 10 Aug 2021 15:18:35 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwe+BlgB4A1XuAQgShSQ1NiAMJQshbqb1mytM+jP2Rk2LYjiR4/4P9XpXXA95IcNLHVb/a1fw==
-X-Received: by 2002:a37:b544:: with SMTP id e65mr31249859qkf.84.1628633914928;
-        Tue, 10 Aug 2021 15:18:34 -0700 (PDT)
+        bh=rKtkcMoRO4/SmKHkWSTGcVIokr6+s/Nfptu/B3gHJZ4=;
+        b=ce/uPCTJBqDsCNYprUp6VNg6Y6GVG5MDtxl7+jZNs1ZN7lPcxIn+yV8l5EaosL37UL
+         sB833Td+m0qWnzobuOpjY9c9rSdaOdmx8JunzO5CtxouMdMwCXlG6GuvRjXLbrEZHs2j
+         5jUOjIg98s9j5kCSsKXG3AlcsrGt1lP0qKz90HXgs+OpAEqKI3MF+9FMUg4kQDVyMw2l
+         cbFxZrM17t/Bj00a7AcNs1NQ1M0cNfsxWPm8noli7pcQm9bjafmqwvvZBi5pl0gkUR32
+         w45QvHizBdwuh4y1O1Q48lNm6gO20yOFsTxTb8uBjn50uwRUIOygfsMrQ+hyu529leTK
+         gIXg==
+X-Gm-Message-State: AOAM5325QuAImCrvp77H6cj+aeHotNwkPmmoyGf3WoTV6PqwMXVQj/oP
+        o4bLqoBNMnWRHV8gSGOuJHxgK52Iy2nqWrmQj1NIZZI8yc4yJ+i7rigzVNFMsUwu11p6dm8TFlT
+        EJP93VVnkAlX7
+X-Received: by 2002:a05:620a:13c8:: with SMTP id g8mr14086267qkl.258.1628634448377;
+        Tue, 10 Aug 2021 15:27:28 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJz6ol+Dk+1WWikh+M4yXdniloOOnQpQMxQ/tgcF5y35oJ1E0R3kXcExU8u5AzE9C/Qmja70zA==
+X-Received: by 2002:a05:620a:13c8:: with SMTP id g8mr14086248qkl.258.1628634448157;
+        Tue, 10 Aug 2021 15:27:28 -0700 (PDT)
 Received: from t490s (bras-base-toroon474qw-grc-92-76-70-75-133.dsl.bell.ca. [76.70.75.133])
-        by smtp.gmail.com with ESMTPSA id a8sm10798674qkn.63.2021.08.10.15.18.33
+        by smtp.gmail.com with ESMTPSA id o26sm4628328qkm.29.2021.08.10.15.27.27
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 10 Aug 2021 15:18:34 -0700 (PDT)
-Date:   Tue, 10 Aug 2021 18:18:33 -0400
+        Tue, 10 Aug 2021 15:27:27 -0700 (PDT)
+Date:   Tue, 10 Aug 2021 18:27:26 -0400
 From:   Peter Xu <peterx@redhat.com>
 To:     Alex Williamson <alex.williamson@redhat.com>
-Cc:     Christoph Hellwig <hch@infradead.org>,
-        Jason Gunthorpe <jgg@nvidia.com>, linux-kernel@vger.kernel.org,
+Cc:     Jason Gunthorpe <jgg@nvidia.com>, linux-kernel@vger.kernel.org,
         kvm@vger.kernel.org
-Subject: Re: [PATCH 1/7] vfio: Create vfio_fs_type with inode per device
-Message-ID: <YRL7OdHv/CG+oUI6@t490s>
+Subject: Re: [PATCH 7/7] vfio/pci: Remove map-on-fault behavior
+Message-ID: <YRL9TmcGcLMRHlgO@t490s>
 References: <162818167535.1511194.6614962507750594786.stgit@omen>
- <162818322947.1511194.6035266132085405252.stgit@omen>
- <YRI8Mev5yfeAXsrj@infradead.org>
- <20210810085254.51da01d6.alex.williamson@redhat.com>
- <YRKT2UhgjfWBmwuJ@infradead.org>
- <YRLKSYQL8VvTr3gc@t490s>
- <20210810151614.39a6714f.alex.williamson@redhat.com>
+ <162818330190.1511194.10498114924408843888.stgit@omen>
+ <YRLne7/S1euppJQr@t490s>
+ <20210810154512.5aa8eeb3.alex.williamson@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20210810151614.39a6714f.alex.williamson@redhat.com>
+In-Reply-To: <20210810154512.5aa8eeb3.alex.williamson@redhat.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Aug 10, 2021 at 03:16:14PM -0600, Alex Williamson wrote:
-> On Tue, 10 Aug 2021 14:49:45 -0400
+On Tue, Aug 10, 2021 at 03:45:12PM -0600, Alex Williamson wrote:
+> On Tue, 10 Aug 2021 16:54:19 -0400
 > Peter Xu <peterx@redhat.com> wrote:
 > 
-> > On Tue, Aug 10, 2021 at 03:57:29PM +0100, Christoph Hellwig wrote:
-> > > On Tue, Aug 10, 2021 at 08:52:54AM -0600, Alex Williamson wrote:  
-> > > > On Tue, 10 Aug 2021 10:43:29 +0200
-> > > > Christoph Hellwig <hch@infradead.org> wrote:
-> > > >   
-> > > > > > + * XXX Adopt the following when available:
-> > > > > > + * https://lore.kernel.org/lkml/20210309155348.974875-1-hch@lst.de/    
-> > > > > 
-> > > > > No need for this link.  
-> > > > 
-> > > > Is that effort dead?  I've used the link several times myself to search
-> > > > for progress, so it's been useful to me.  Thanks,  
-> > > 
-> > > No, but it seems odd to have reference to an old patchset in the kernel
-> > > tree.  
+> > On Thu, Aug 05, 2021 at 11:08:21AM -0600, Alex Williamson wrote:
+> > > diff --git a/drivers/vfio/pci/vfio_pci_private.h b/drivers/vfio/pci/vfio_pci_private.h
+> > > index 0aa542fa1e26..9aedb78a4ae3 100644
+> > > --- a/drivers/vfio/pci/vfio_pci_private.h
+> > > +++ b/drivers/vfio/pci/vfio_pci_private.h
+> > > @@ -128,6 +128,7 @@ struct vfio_pci_device {
+> > >  	bool			needs_reset;
+> > >  	bool			nointx;
+> > >  	bool			needs_pm_restore;
+> > > +	bool			zapped_bars;  
 > > 
-> > I learn from the reference too.  Maybe move into commit message?  Thanks,
+> > Would it be nicer to invert the meaning of "zapped_bars" and rename it to
+> > "memory_enabled"?  Thanks,
 > 
-> TBH, I'm ok if it's "odd" if it's useful.  Right here we have two
-> instances of it being useful.  I don't think that two lines of comment
-> is excessive and we can always remove it when we either make the
-> conversion or give up on it.  Moving it to the commit log would just
-> bury it to be pointless.
+> I think this has it's own down sides, for example is this really less
+> confusing?:
 > 
-> I don't have a more concise, current, or future-proof way to describe
-> the todo item than this link (ok, ok, I could s/lkml/r/ for 3 less
-> chars :-P).  Thanks,
+>   if (!vdev->memory_enabled && __vfio_pci_memory_enabled(vdev))
 
-Yep, fine by me - either by keeping it in the code, commit message, or in cover
-letter, as it's still an useful reference before that series got merged. Thanks,
+Maybe "memory_enabled_last"?  No strong opinion, especially for namings. :)
+zapped_bars still looks okay to me.  Thanks,
 
 -- 
 Peter Xu
