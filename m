@@ -2,134 +2,117 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id F3D093E7B8A
-	for <lists+kvm@lfdr.de>; Tue, 10 Aug 2021 17:01:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 86BC43E7BA7
+	for <lists+kvm@lfdr.de>; Tue, 10 Aug 2021 17:04:14 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239443AbhHJPBc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 10 Aug 2021 11:01:32 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:30036 "EHLO
+        id S242540AbhHJPE3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 10 Aug 2021 11:04:29 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:56371 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S242024AbhHJPBb (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 10 Aug 2021 11:01:31 -0400
+        by vger.kernel.org with ESMTP id S241428AbhHJPE2 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 10 Aug 2021 11:04:28 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1628607669;
+        s=mimecast20190719; t=1628607845;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=RTXz3ikSpV209MnT5rDr3f83EI1kiMwH0E1+MqiJoiI=;
-        b=JxS6L892YV+I9zdIgJ8U+vG/KIWoZAl9hHw7O9lavbvMMd5Q1rKTyuF308enXUC26k36/I
-        lABiktx3Ycuaynk3npcrX8lmJuijzfZeZR42xHYSztVJFYl6oSsUOIPIOuIGicchBdqD5w
-        xgoL0p+jRYQPs7MrVoeccafZb/YzZYo=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-96-gwEukTkBMOKq4Ilmjc8DwQ-1; Tue, 10 Aug 2021 11:01:04 -0400
-X-MC-Unique: gwEukTkBMOKq4Ilmjc8DwQ-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id F1424801B3C;
-        Tue, 10 Aug 2021 15:01:00 +0000 (UTC)
-Received: from localhost (unknown [10.39.192.120])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 5243219CBA;
-        Tue, 10 Aug 2021 15:01:00 +0000 (UTC)
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Vineeth Vijayan <vneethv@linux.ibm.com>,
-        Christoph Hellwig <hch@lst.de>
-Cc:     Jason Gunthorpe <jgg@nvidia.com>,
-        Eric Farman <farman@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Heiko Carstens <hca@linux.ibm.com>, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org,
-        Peter Oberparleiter <oberpar@linux.ibm.com>,
-        Halil Pasic <pasic@linux.ibm.com>,
-        "Raj, Ashok" <ashok.raj@intel.com>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Daniel Vetter <daniel@ffwll.ch>,
-        Leon Romanovsky <leonro@nvidia.com>,
-        Max Gurtovoy <mgurtovoy@nvidia.com>,
-        Tarun Gupta <targupta@nvidia.com>
-Subject: Re: s390 common I/O layer locking
-In-Reply-To: <7d751173-09b2-f49e-13ac-a72129f36f74@linux.ibm.com>
-Organization: Red Hat GmbH
-References: <0-v2-7667f42c9bad+935-vfio3_jgg@nvidia.com>
- <7-v2-7667f42c9bad+935-vfio3_jgg@nvidia.com>
- <20210428190949.4360afb7.cohuck@redhat.com>
- <20210428172008.GV1370958@nvidia.com>
- <20210429135855.443b7a1b.cohuck@redhat.com>
- <20210429181347.GA3414759@nvidia.com>
- <20210430143140.378904bf.cohuck@redhat.com>
- <20210430171908.GD1370958@nvidia.com>
- <20210503125440.0acd7c1f.cohuck@redhat.com>
- <292442e8-3b1a-56c4-b974-05e8b358ba64@linux.ibm.com>
- <20210724132400.GA19006@lst.de>
- <7d751173-09b2-f49e-13ac-a72129f36f74@linux.ibm.com>
-User-Agent: Notmuch/0.32.1 (https://notmuchmail.org)
-Date:   Tue, 10 Aug 2021 17:00:58 +0200
-Message-ID: <878s19wdhx.fsf@redhat.com>
+        bh=saDSmbq1KyQ846SiUJnNdk6f6G6MN7+bgqLynbPPajY=;
+        b=VeVhUEpb7wGosqcqiQNUtoO9xG9XNA2KSSiidTa/VxcJTzpzURGHYPNx1ay90quOXa2efC
+        7purs2HchEjS/fUahfzPa8UPgWqhFLmQ3vHisXLhVqd67Ma50j0pXTeGpW4r8j7PDOAFUP
+        +W70+vIwC8/HrC7KxNvD1LW9018/TAg=
+Received: from mail-oo1-f72.google.com (mail-oo1-f72.google.com
+ [209.85.161.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-9-_Kr9kQWyMLmsKlyliHTBaA-1; Tue, 10 Aug 2021 11:04:04 -0400
+X-MC-Unique: _Kr9kQWyMLmsKlyliHTBaA-1
+Received: by mail-oo1-f72.google.com with SMTP id y10-20020a4ab40a0000b0290285068c6fc0so7170121oon.1
+        for <kvm@vger.kernel.org>; Tue, 10 Aug 2021 08:04:04 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
+         :references:organization:mime-version:content-transfer-encoding;
+        bh=saDSmbq1KyQ846SiUJnNdk6f6G6MN7+bgqLynbPPajY=;
+        b=jpHC8BUi5yks8ajewouL3vPjvSG5jhUrnFMzTv1EbqOVXNeg9PjcYHYGHeYOaXVgVu
+         W2kPsPQ9qQBeUIXG0eWA3BsonGcYrtroDxxx+7O8R1boxtQFdGvka+oR6mf2z6qpuNPK
+         4+CjWTDENlvkDX3XrIL/Mhg8nUyFrqTbaqWbxrnq7c/eyLPo1q0Ih2qlg8MuO6eaTWAF
+         IcTwvHFV+sYeIEiZSLXZnD9/w+ZUtRoYbUii6mAx1v74YtRv2pRxyOFpPfunXBvenVHs
+         DzBXmJoG2X7J4ptH+jtQXQ4H7PDykgzFxmYyz528SNCrOtrOesxnOTyw3/VaW20Pwp19
+         0HHw==
+X-Gm-Message-State: AOAM5311SVSicwdv+LDtsimQATkTEybCBeOvAKR5OomE1nOoOjFiB5b7
+        QVwLajpRUqyoVcF4Jy/80X72qOGYD3HNZE5ikiV+v+JuqAHKHB8rj0B0YExDQvAlwrc1cUnrae8
+        pHY9+8cCYqQAR
+X-Received: by 2002:a9d:4e03:: with SMTP id p3mr20862109otf.214.1628607843793;
+        Tue, 10 Aug 2021 08:04:03 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwa8NsTflJyoCSB3QzQu/ldQGo0dEw8Tvkv48rIc4s6fH1Ji0z48X8Eqi491aAosuf+mgaKlg==
+X-Received: by 2002:a9d:4e03:: with SMTP id p3mr20862079otf.214.1628607843599;
+        Tue, 10 Aug 2021 08:04:03 -0700 (PDT)
+Received: from redhat.com ([198.99.80.109])
+        by smtp.gmail.com with ESMTPSA id w13sm2037036otl.41.2021.08.10.08.04.02
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 10 Aug 2021 08:04:03 -0700 (PDT)
+Date:   Tue, 10 Aug 2021 09:04:02 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Christoph Hellwig <hch@infradead.org>
+Cc:     Jason Gunthorpe <jgg@nvidia.com>, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, peterx@redhat.com
+Subject: Re: [PATCH 7/7] vfio/pci: Remove map-on-fault behavior
+Message-ID: <20210810090402.0a120276.alex.williamson@redhat.com>
+In-Reply-To: <YRJC1buKp67kGemh@infradead.org>
+References: <162818167535.1511194.6614962507750594786.stgit@omen>
+        <162818330190.1511194.10498114924408843888.stgit@omen>
+        <YRJC1buKp67kGemh@infradead.org>
+Organization: Red Hat
+X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Aug 03 2021, Vineeth Vijayan <vneethv@linux.ibm.com> wrote:
+On Tue, 10 Aug 2021 11:11:49 +0200
+Christoph Hellwig <hch@infradead.org> wrote:
 
-> On 7/24/21 3:24 PM, Christoph Hellwig wrote:
->> On Tue, May 04, 2021 at 05:10:42PM +0200, Vineeth Vijayan wrote:
-> ...snip...
->>> I just had a quick glance on the CIO layer drivers. And at first=20
->>> look, you
->>> are right.
->>> It looks likewe need modifications in the event callbacks (referring css
->>> here)
->>> Let me go thoughthis thoroughly and update.
->> Did this go anywhere?
-> Hello Christoph,
->
-> Thank you for this reminder. Also, my apologies for the slow reply; This=
-=20
-> was one of those item which really needed this reminder :-)
->
-> Coming to the point, The event-callbacks=C2=A0 are under sch->lock, which=
- i=20
-> think is the right thing to do. But i also agree on your feedback about=20
-> the sch->driver accesses in the css_evaluate_known_subchannel() call. My=
-=20
-> first impression was to add them under device_lock(). As Conny=20
-> mentioned, most of the drivers on the css-bus remained-stable during the=
-=20
-> lifetime of the devices, and we never got this racy scenario.=C2=A0 And t=
-hen=20
-> having this change with device_lock(), as you mentioned,this code-base=20
-> would need significant change in the sch_event callbacks. I am not sure=20
-> if there is a straight forward solution for this locking-issue
-> scenario.
+> On Thu, Aug 05, 2021 at 11:08:21AM -0600, Alex Williamson wrote:
+> > +void vfio_pci_test_and_up_write_memory_lock(struct vfio_pci_device *vdev)
+> > +{
+> > +	if (vdev->zapped_bars && __vfio_pci_memory_enabled(vdev)) {
+> > +		WARN_ON(vfio_device_io_remap_mapping_range(&vdev->vdev,
+> > +			VFIO_PCI_INDEX_TO_OFFSET(VFIO_PCI_BAR0_REGION_INDEX),
+> > +			VFIO_PCI_INDEX_TO_OFFSET(VFIO_PCI_ROM_REGION_INDEX) -
+> > +			VFIO_PCI_INDEX_TO_OFFSET(VFIO_PCI_BAR0_REGION_INDEX)));
+> > +		vdev->zapped_bars = false;  
+> 
+> Doing actual work inside a WARN_ON is pretty nasty.  Also the non-ONCE
+> version here will lead to massive log splatter if it actually hits.
+> 
+> I'd prefer something like:
+> 
+> 	loff_t start = VFIO_PCI_INDEX_TO_OFFSET(VFIO_PCI_BAR0_REGION_INDEX);
+> 	loff_t end = VFIO_PCI_INDEX_TO_OFFSET(VFIO_PCI_ROM_REGION_INDEX);
+> 
+> 	if (vdev->zapped_bars && __vfio_pci_memory_enabled(vdev)) {
+> 		if (!vfio_device_io_remap_mapping_range(&vdev->vdev, start,
+> 				end - start))
+> 			vdev->zapped_bars = false;
+> 		WARN_ON_ONCE(vdev->zapped_bars);
+> 
+> >  	vma->vm_page_prot = pgprot_noncached(vma->vm_page_prot);
+> > -	vma->vm_page_prot = pgprot_decrypted(vma->vm_page_prot);  
+> 
+> What is the story with this appearing earlier and disappearing here
+> again?
 
-Hm, I may have lost my way in the code, but I think ->sch_event is
-called _without_ the subchannel lock being held? It is only taken in
-e.g. io_subchannel_sch_event.
+We switched from io_remap_pfn_range() which includes this flag
+implicitly, to vmf_insert_pfn() which does not, and back to
+io_remap_pfn_range() when the fault handler is removed.
 
-->chp_event is called with the subchannel lock held, though.
+> > +extern void vfio_pci_test_and_up_write_memory_lock(struct vfio_pci_device
+> > +						   *vdev);  
+> 
+> No need for the extern.
 
->
-> Currently, i am trying to see the "minimal" change i can work on on the=20
-> event-callbacks and the css_evaluate_known_subchannel() call, to make=20
-> sure that, this racy condition can never occur.
->
-> Conny,
->
-> Please do let me know if you think i am missing something here. I would=20
-> like to concentrate more on the sch->driver() access scenario first and=20
-> would like to see how it can have minimal impact on the event-callbacks.=
-=20
-> especially io_subchannel_sch_event.
+Thanks much for the reviews!
 
-Given that the code changing sch->driver holds the device lock, but not
-the subchannel lock, you probably need to make sure that the device lock
-is held? It has been some time since I've done more complicated work in
-the common I/O layer, though, and I might be missing something.
+Alex
 
