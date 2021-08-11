@@ -2,208 +2,104 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C92ED3E8E84
-	for <lists+kvm@lfdr.de>; Wed, 11 Aug 2021 12:24:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EBD733E8EC6
+	for <lists+kvm@lfdr.de>; Wed, 11 Aug 2021 12:33:23 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237158AbhHKKY1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 11 Aug 2021 06:24:27 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:41811 "EHLO
+        id S237196AbhHKKdq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 11 Aug 2021 06:33:46 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:25413 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S237150AbhHKKYZ (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 11 Aug 2021 06:24:25 -0400
+        by vger.kernel.org with ESMTP id S237133AbhHKKdo (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 11 Aug 2021 06:33:44 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1628677441;
+        s=mimecast20190719; t=1628678001;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=Wjib2CaoBoKQ960V8nb3t6a1/GwcD38v7ydXMlMNTLw=;
-        b=gaKUGVkcRCO/BXK4rUgbzzcvPsWsAGQYNjHRjGfdPFnpDRai1WP0GOOzkta/+9EftNcFBx
-        0o1YD5goyFrxgiE1V9IKTh71PKZgFjGX8JJzeC/nVSHu1jfhIQ/NxNY28M2TK7aws9qWP8
-        milCzZMHKdDfUUenG+DcpqG15Wp5R1g=
+        bh=FClcYxsTNaJelqEsbQtnRJdqr/jkyNvyq3Av2pw8Tzg=;
+        b=MaYQUXaAZRD3/gUfAAnZNFVEwTdvSoE8L4Yfu8MlI79Q0fb2oihheet6wx9RusF1M5MmiH
+        sRHpbaF018bhHjfJgPhD6jDbfGubv7adpxrnx45kLkXOXuBQDtvtf/CgkTv/dD2eL8uGKF
+        XmX2YxL1mOtHF2TbJuqYO3oy7/BYNrc=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-556-A1WSQEExOHuemxTFuC2LLA-1; Wed, 11 Aug 2021 06:24:00 -0400
-X-MC-Unique: A1WSQEExOHuemxTFuC2LLA-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+ us-mta-564-n3jWRGIjODO2LnxMXrJU7g-1; Wed, 11 Aug 2021 06:33:20 -0400
+X-MC-Unique: n3jWRGIjODO2LnxMXrJU7g-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7478A101C8A0;
-        Wed, 11 Aug 2021 10:23:59 +0000 (UTC)
-Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id EE7625D9C6;
-        Wed, 11 Aug 2021 10:23:58 +0000 (UTC)
-From:   Paolo Bonzini <pbonzini@redhat.com>
-To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc:     vkuznets@redhat.com, mtosatti@redhat.com
-Subject: [PATCH 2/2] kvm: x86: abstract locking around pvclock_update_vm_gtod_copy
-Date:   Wed, 11 Aug 2021 06:23:56 -0400
-Message-Id: <20210811102356.3406687-3-pbonzini@redhat.com>
-In-Reply-To: <20210811102356.3406687-1-pbonzini@redhat.com>
-References: <20210811102356.3406687-1-pbonzini@redhat.com>
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8E6DC1008062;
+        Wed, 11 Aug 2021 10:33:16 +0000 (UTC)
+Received: from localhost (unknown [10.39.192.118])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id C56495C25A;
+        Wed, 11 Aug 2021 10:33:02 +0000 (UTC)
+From:   Cornelia Huck <cohuck@redhat.com>
+To:     Jason Gunthorpe <jgg@nvidia.com>, David Airlie <airlied@linux.ie>,
+        Tony Krowiak <akrowiak@linux.ibm.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        Diana Craciun <diana.craciun@oss.nxp.com>,
+        dri-devel@lists.freedesktop.org,
+        Eric Auger <eric.auger@redhat.com>,
+        Eric Farman <farman@linux.ibm.com>,
+        Harald Freudenberger <freude@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        intel-gfx@lists.freedesktop.org,
+        intel-gvt-dev@lists.freedesktop.org,
+        Jani Nikula <jani.nikula@linux.intel.com>,
+        Jason Herne <jjherne@linux.ibm.com>,
+        Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
+        kvm@vger.kernel.org, Kirti Wankhede <kwankhede@nvidia.com>,
+        linux-doc@vger.kernel.org, linux-s390@vger.kernel.org,
+        Matthew Rosato <mjrosato@linux.ibm.com>,
+        Peter Oberparleiter <oberpar@linux.ibm.com>,
+        Halil Pasic <pasic@linux.ibm.com>,
+        Rodrigo Vivi <rodrigo.vivi@intel.com>,
+        Vineeth Vijayan <vneethv@linux.ibm.com>,
+        Zhi Wang <zhi.a.wang@intel.com>
+Cc:     "Raj, Ashok" <ashok.raj@intel.com>, Christoph Hellwig <hch@lst.de>,
+        Leon Romanovsky <leonro@nvidia.com>,
+        Max Gurtovoy <mgurtovoy@nvidia.com>,
+        Yishai Hadas <yishaih@nvidia.com>,
+        Zhenyu Wang <zhenyuw@linux.intel.com>
+Subject: Re: [PATCH v4 10/14] vfio/pci: Reorganize VFIO_DEVICE_PCI_HOT_RESET
+ to use the device set
+In-Reply-To: <10-v4-9ea22c5e6afb+1adf-vfio_reflck_jgg@nvidia.com>
+Organization: Red Hat GmbH
+References: <10-v4-9ea22c5e6afb+1adf-vfio_reflck_jgg@nvidia.com>
+User-Agent: Notmuch/0.32.1 (https://notmuchmail.org)
+Date:   Wed, 11 Aug 2021 12:33:01 +0200
+Message-ID: <87tujwuv8i.fsf@redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+Content-Type: text/plain
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Updates to the kvmclock parameters needs to do a complicated dance of
-KVM_REQ_MCLOCK_INPROGRESS and KVM_REQ_CLOCK_UPDATE in addition to taking
-pvclock_gtod_sync_lock.  Place that in two functions that can be called
-on all of master clock update, KVM_SET_CLOCK, and Hyper-V reenlightenment.
+On Thu, Aug 05 2021, Jason Gunthorpe <jgg@nvidia.com> wrote:
 
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- arch/x86/include/asm/kvm_host.h |  1 -
- arch/x86/kvm/x86.c              | 66 +++++++++++++--------------------
- 2 files changed, 26 insertions(+), 41 deletions(-)
+> Like vfio_pci_dev_set_try_reset() this code wants to reset all of the
+> devices in the "reset group" which is the same membership as the device
+> set.
+>
+> Instead of trying to reconstruct the device set from the PCI list go
+> directly from the device set's device list to execute the reset.
+>
+> The same basic structure as vfio_pci_dev_set_try_reset() is used. The
+> 'vfio_devices' struct is replaced with the device set linked list and we
+> simply sweep it multiple times under the lock.
+>
+> This eliminates a memory allocation and get/put traffic and another
+> improperly locked test of pci_dev_driver().
+>
+> Reviewed-off-by: Christoph Hellwig <hch@lst.de>
+> Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
+> ---
+>  drivers/vfio/pci/vfio_pci.c | 213 +++++++++++++++---------------------
+>  1 file changed, 89 insertions(+), 124 deletions(-)
 
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index bc6157677753..c54f9da91f99 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -1839,7 +1839,6 @@ u64 kvm_calc_nested_tsc_multiplier(u64 l1_multiplier, u64 l2_multiplier);
- unsigned long kvm_get_linear_rip(struct kvm_vcpu *vcpu);
- bool kvm_is_linear_rip(struct kvm_vcpu *vcpu, unsigned long linear_rip);
- 
--void kvm_make_mclock_inprogress_request(struct kvm *kvm);
- void kvm_make_scan_ioapic_request(struct kvm *kvm);
- void kvm_make_scan_ioapic_request_mask(struct kvm *kvm,
- 				       unsigned long *vcpu_bitmap);
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 284afaa1db86..8f96cdfcf364 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -2757,35 +2757,36 @@ static void pvclock_update_vm_gtod_copy(struct kvm *kvm)
- #endif
- }
- 
--void kvm_make_mclock_inprogress_request(struct kvm *kvm)
-+static void kvm_start_pvclock_update(struct kvm *kvm)
- {
-+	struct kvm_arch *ka = &kvm->arch;
- 	kvm_make_all_cpus_request(kvm, KVM_REQ_MCLOCK_INPROGRESS);
-+
-+	/* no guest entries from this point */
-+	spin_lock_irq(&ka->pvclock_gtod_sync_lock);
- }
- 
--static void kvm_gen_update_masterclock(struct kvm *kvm)
-+static void kvm_end_pvclock_update(struct kvm *kvm)
- {
--#ifdef CONFIG_X86_64
--	int i;
--	struct kvm_vcpu *vcpu;
- 	struct kvm_arch *ka = &kvm->arch;
--	unsigned long flags;
--
--	kvm_hv_invalidate_tsc_page(kvm);
--
--	kvm_make_mclock_inprogress_request(kvm);
--
--	/* no guest entries from this point */
--	spin_lock_irqsave(&ka->pvclock_gtod_sync_lock, flags);
--	pvclock_update_vm_gtod_copy(kvm);
--	spin_unlock_irqrestore(&ka->pvclock_gtod_sync_lock, flags);
-+	struct kvm_vcpu *vcpu;
-+	int i;
- 
-+	spin_unlock_irq(&ka->pvclock_gtod_sync_lock);
- 	kvm_for_each_vcpu(i, vcpu, kvm)
- 		kvm_make_request(KVM_REQ_CLOCK_UPDATE, vcpu);
- 
- 	/* guest entries allowed */
- 	kvm_for_each_vcpu(i, vcpu, kvm)
- 		kvm_clear_request(KVM_REQ_MCLOCK_INPROGRESS, vcpu);
--#endif
-+}
-+
-+static void kvm_update_masterclock(struct kvm *kvm)
-+{
-+	kvm_hv_invalidate_tsc_page(kvm);
-+	kvm_start_pvclock_update(kvm);
-+	pvclock_update_vm_gtod_copy(kvm);
-+	kvm_end_pvclock_update(kvm);
- }
- 
- u64 get_kvmclock_ns(struct kvm *kvm)
-@@ -6077,12 +6078,10 @@ long kvm_arch_vm_ioctl(struct file *filp,
- 			goto out;
- 
- 		r = 0;
--		/*
--		 * TODO: userspace has to take care of races with VCPU_RUN, so
--		 * kvm_gen_update_masterclock() can be cut down to locked
--		 * pvclock_update_vm_gtod_copy().
--		 */
--		kvm_gen_update_masterclock(kvm);
-+
-+		kvm_hv_invalidate_tsc_page(kvm);
-+		kvm_start_pvclock_update(kvm);
-+		pvclock_update_vm_gtod_copy(kvm);
- 
- 		/*
- 		 * This pairs with kvm_guest_time_update(): when masterclock is
-@@ -6091,15 +6090,12 @@ long kvm_arch_vm_ioctl(struct file *filp,
- 		 * is slightly ahead) here we risk going negative on unsigned
- 		 * 'system_time' when 'user_ns.clock' is very small.
- 		 */
--		spin_lock_irq(&ka->pvclock_gtod_sync_lock);
- 		if (kvm->arch.use_master_clock)
- 			now_ns = ka->master_kernel_ns;
- 		else
- 			now_ns = get_kvmclock_base_ns();
- 		ka->kvmclock_offset = user_ns.clock - now_ns;
--		spin_unlock_irq(&ka->pvclock_gtod_sync_lock);
--
--		kvm_make_all_cpus_request(kvm, KVM_REQ_CLOCK_UPDATE);
-+		kvm_end_pvclock_update(kvm);
- 		break;
- 	}
- 	case KVM_GET_CLOCK: {
-@@ -8105,9 +8101,7 @@ static void tsc_khz_changed(void *data)
- static void kvm_hyperv_tsc_notifier(void)
- {
- 	struct kvm *kvm;
--	struct kvm_vcpu *vcpu;
- 	int cpu;
--	unsigned long flags;
- 
- 	mutex_lock(&kvm_lock);
- 	list_for_each_entry(kvm, &vm_list, vm_list)
-@@ -8121,19 +8115,11 @@ static void kvm_hyperv_tsc_notifier(void)
- 	kvm_max_guest_tsc_khz = tsc_khz;
- 
- 	list_for_each_entry(kvm, &vm_list, vm_list) {
--		struct kvm_arch *ka = &kvm->arch;
--
--		kvm_make_mclock_inprogress_request(kvm);
--		spin_lock_irqsave(&ka->pvclock_gtod_sync_lock, flags);
-+		kvm_start_pvclock_update(kvm);
- 		pvclock_update_vm_gtod_copy(kvm);
--		spin_unlock_irqrestore(&ka->pvclock_gtod_sync_lock, flags);
--
--		kvm_for_each_vcpu(cpu, vcpu, kvm)
--			kvm_make_request(KVM_REQ_CLOCK_UPDATE, vcpu);
--
--		kvm_for_each_vcpu(cpu, vcpu, kvm)
--			kvm_clear_request(KVM_REQ_MCLOCK_INPROGRESS, vcpu);
-+		kvm_end_pvclock_update(kvm);
- 	}
-+
- 	mutex_unlock(&kvm_lock);
- }
- #endif
-@@ -9413,7 +9399,7 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
- 		if (kvm_check_request(KVM_REQ_MIGRATE_TIMER, vcpu))
- 			__kvm_migrate_timers(vcpu);
- 		if (kvm_check_request(KVM_REQ_MASTERCLOCK_UPDATE, vcpu))
--			kvm_gen_update_masterclock(vcpu->kvm);
-+			kvm_update_masterclock(vcpu->kvm);
- 		if (kvm_check_request(KVM_REQ_GLOBAL_CLOCK_UPDATE, vcpu))
- 			kvm_gen_kvmclock_update(vcpu);
- 		if (kvm_check_request(KVM_REQ_CLOCK_UPDATE, vcpu)) {
--- 
-2.27.0
+Reviewed-by: Cornelia Huck <cohuck@redhat.com>
 
