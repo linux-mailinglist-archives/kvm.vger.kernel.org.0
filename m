@@ -2,119 +2,132 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id EE5863E95A4
-	for <lists+kvm@lfdr.de>; Wed, 11 Aug 2021 18:13:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id F3C343E960F
+	for <lists+kvm@lfdr.de>; Wed, 11 Aug 2021 18:34:14 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229625AbhHKQNu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 11 Aug 2021 12:13:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54372 "EHLO
+        id S230316AbhHKQeg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 11 Aug 2021 12:34:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59186 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229481AbhHKQNt (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 11 Aug 2021 12:13:49 -0400
-Received: from mail-pj1-x102a.google.com (mail-pj1-x102a.google.com [IPv6:2607:f8b0:4864:20::102a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F2E70C061765
-        for <kvm@vger.kernel.org>; Wed, 11 Aug 2021 09:13:25 -0700 (PDT)
-Received: by mail-pj1-x102a.google.com with SMTP id a8so4238321pjk.4
-        for <kvm@vger.kernel.org>; Wed, 11 Aug 2021 09:13:25 -0700 (PDT)
+        with ESMTP id S230040AbhHKQed (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 11 Aug 2021 12:34:33 -0400
+Received: from mail-il1-x132.google.com (mail-il1-x132.google.com [IPv6:2607:f8b0:4864:20::132])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1E2D8C0613D3
+        for <kvm@vger.kernel.org>; Wed, 11 Aug 2021 09:34:10 -0700 (PDT)
+Received: by mail-il1-x132.google.com with SMTP id r6so2458419ilt.13
+        for <kvm@vger.kernel.org>; Wed, 11 Aug 2021 09:34:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=zLG0IhppbEuJ5I37GZ3ktmpdVCYinF/Aoi/BpZiVyOY=;
-        b=UuG/nIza6FTbl6CUnlqf8n2GzjzaCWJRZkma3t2gozBz49i5DMRD7zqm8hTfUImQTK
-         ZconzCnYaL/QSVlLZ32omkhOCX/b0kv/9SVvhIzX8mmWwuY95melD24SJoN/62CDoLI4
-         TcLYNXdUNtmGqFQ470ULaTKpW0sisc4iX1N79c2Y/CrIMwXLAoM9sMWcpBky/1Von2Ip
-         qAJ/6V8/RWvy8BE6atotoMw/htjry5FccYaNivKkJ7n3Nerv5qauj1iQ9prg48Vt6eWT
-         fuwBjA2B8yGCvRhNI3d1lZ/jMz431jOR+UxsPOwne0rZ0Jdl/yMdVeTo+HMQM5gGxqt5
-         qdIg==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=MiyXaKuo5MKFz5xTuKgPxPuaaij2HCFYcE1MAYz0REg=;
+        b=qzk/GM33ZCdtZbJZtJAJP/kWtgtTjQwNcsmSSAYqiffShG7oeLVm7tOQVHINHXsoLq
+         9yWPnQuRcQvO4IAUfgcxAW7CMdJCXasEmfFWEzHNwNv20ottnoat8QezWCS/nXvvykGE
+         Lzb894TfheLpGH5YyB2IzuFezJgPbfyNde+6Zy9U1hbZ1tQppF3RrUnNP80Hfy9/OaDv
+         UklNV67dzGuO2Ybv20/Vwq1dXd028bYefpz/bf3O0/w8Cm6VR32Wdp55ZqeS2gpww3Ej
+         AuYUAJw/UMgfwC2SmzJho8Y8cEuY9cGqzpv95LK9F8UiBfKgd6ROYTng30Mm2EQ7g+EY
+         Xu0A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=zLG0IhppbEuJ5I37GZ3ktmpdVCYinF/Aoi/BpZiVyOY=;
-        b=OwnbpXNDXQSElP7zYMx2OEwU4Z3/Ip839CUEdow9fmiGFhk9DDlZNQkawRO2IeiGXr
-         8etiiIU3CNNH3xIw9wpoNm5cwkmHK9tRk/vgjvG8UqkZ9Pm/WwlW13YAd6Lf3dntxG2v
-         ZNtzrSqZWm+1ZtR3/PsMG8dwQmxbmBVhgDLU8uKiTwcOOWVcD6ajOkwIvfm775NB+UI2
-         ksD3gCvXgdk8PIl+x+EN7HhkVxK1PX1JLy86B8xrCQTeJUqUDbgSMMrv4mqT+GDtJmsP
-         cl6fD6i6A1RD+V1aMbtRXtXqQizzjfN323Fn5Zv6YO0c+TM+Rwx6fv7dTdg7V0yoGrmS
-         R8Bw==
-X-Gm-Message-State: AOAM532BJSuZeHeB9NUNIN5fVwbKqGB/FTB/B6t13+oTLpqeuLJc3Trt
-        b0xM9dE7Vf80aLs4CnXSteMQ84Sjpv4dig==
-X-Google-Smtp-Source: ABdhPJwQgyzOHA9X6j+BerQ3nsX8xhB0omJPH+oiEAdnYHUsBrYfm7DochSgLjPLecm0tpLkr27n+g==
-X-Received: by 2002:a63:5002:: with SMTP id e2mr534268pgb.256.1628698405248;
-        Wed, 11 Aug 2021 09:13:25 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id c15sm25647878pjr.22.2021.08.11.09.13.24
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 11 Aug 2021 09:13:24 -0700 (PDT)
-Date:   Wed, 11 Aug 2021 16:13:19 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Babu Moger <babu.moger@amd.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, thuth@redhat.com,
-        drjones@redhat.com, kvm@vger.kernel.org
-Subject: Re: [kvm-unit-tests PATCH 1/2] x86: access: Fix timeout failure by
- limiting number of flag combinations
-Message-ID: <YRP3HxfCRMQBt2Ty@google.com>
-References: <162826604263.32391.7580736822527851972.stgit@bmoger-ubuntu>
- <162826611747.32391.16149996928851353357.stgit@bmoger-ubuntu>
- <YQ1pA9nN6DP0veQ1@google.com>
- <1f30bd0f-da1b-2aa0-e0c8-76d3b5410bcd@amd.com>
- <7d0aa9b1-2eb7-8c89-9c2b-7712c5031aed@amd.com>
- <4af3323d-90e9-38a0-f11a-f4e89d0c0b50@amd.com>
- <b348c0f6-70fa-053f-86fa-8284b7bc33a4@redhat.com>
- <29220431-5b08-9419-636e-d4331648aed1@amd.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=MiyXaKuo5MKFz5xTuKgPxPuaaij2HCFYcE1MAYz0REg=;
+        b=ARI44heLziWaDxTLC3RAlDJb9NDj/Y0LSMSOgT1EeXMAk1OuT717f/rRjVCD97iUnH
+         /oE3xgpF5uy/KQCpJWRq+tz4R8Ay7rF+rSdwlpbdVT+wl57Vzd5BCeXGBMPoeSr8r/VZ
+         21zub3P9tlt0qdlyotM8HWK/AEoH7oe0aTzI2/XUHJo6/vGIs2on+yYWysLg7qopEJZs
+         JUAL12Lu2ETEtNH0zk5pD7+IRO5kyoMlhlWstLpVVaeLx/FD9ehjmbtRxOCOXoBMLXEk
+         gI2Rwq4BRfXHjfLsmq/lEWh2XMCBlwlnzeRnliTpdONZiNlPG55WyAm/iPgVEzAWViTP
+         X3+Q==
+X-Gm-Message-State: AOAM532V3eL9IUAX2qPADpUsxanP1am8ZJFmomYSb0ktVGIHtMaIATt1
+        IRjh7dZvbH5LD75jM5mZH3PWvkL2lKuztPSmUeGmBQ==
+X-Google-Smtp-Source: ABdhPJxkZl/Bld6p9S4wH0FuPMsDn/NAUqDQkIWLW5eMNnp6ZjwvJenOZrxV33H7v0n74tA+UpWY12fJfNxFzc8/+QY=
+X-Received: by 2002:a05:6e02:15c8:: with SMTP id q8mr612495ilu.285.1628699649398;
+ Wed, 11 Aug 2021 09:34:09 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <29220431-5b08-9419-636e-d4331648aed1@amd.com>
+References: <20210810224554.2978735-1-seanjc@google.com> <20210810224554.2978735-3-seanjc@google.com>
+In-Reply-To: <20210810224554.2978735-3-seanjc@google.com>
+From:   Ben Gardon <bgardon@google.com>
+Date:   Wed, 11 Aug 2021 09:33:58 -0700
+Message-ID: <CANgfPd9MQWjP47-DjOt-dPrTRuV46VdiR7wEWjX9pYefyBfZ1A@mail.gmail.com>
+Subject: Re: [PATCH 2/2] KVM: x86/mmu: Drop 'shared' param from tdp_mmu_link_page()
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm <kvm@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Aug 11, 2021, Babu Moger wrote:
-> 
-> On 8/11/21 2:09 AM, Paolo Bonzini wrote:
-> > On 11/08/21 01:38, Babu Moger wrote:
-> >> No. This will not work. The PKU feature flag is bit 30. That is 2^30
-> >> iterations to cover the tests for this feature. Looks like I need to split
-> >> the tests into PKU and non PKU tests. For PKU tests I may need to change
-> >> the bump frequency (in ac_test_bump_one) to much higher value. Right now,
-> >> it is 1. Let me try that,
-> > 
-> > The simplest way to cut on tests, which is actually similar to this patch,
-> > would be:
-> > 
-> > - do not try all combinations of PTE access bits when reserved bits are set
-> > 
-> > - do not try combinations with more than one reserved bit set
-> 
-> Did you mean this? Just doing this reduces the combination by huge number.
-> I don't need to add your first PTE access combinations.
-> 
-> diff --git a/x86/access.c b/x86/access.c
-> index 47807cc..a730b6b 100644
-> --- a/x86/access.c
-> +++ b/x86/access.c
-> @@ -317,9 +317,7 @@ static _Bool ac_test_legal(ac_test_t *at)
->      /*
->       * Shorten the test by avoiding testing too many reserved bit
-> combinations
->       */
-> -    if ((F(AC_PDE_BIT51) + F(AC_PDE_BIT36) + F(AC_PDE_BIT13)) > 1)
-> -        return false;
-> -    if ((F(AC_PTE_BIT51) + F(AC_PTE_BIT36)) > 1)
-> +    if ((F(AC_PDE_BIT51) + F(AC_PDE_BIT36) + F(AC_PDE_BIT13) +
-> F(AC_PTE_BIT51) + F(AC_PTE_BIT36)) > 1)
->          return false;
-> 
->      return true;
+On Tue, Aug 10, 2021 at 3:46 PM Sean Christopherson <seanjc@google.com> wrote:
+>
+> Drop @shared from tdp_mmu_link_page() and hardcode it to work for
+> mmu_lock being held for read.  The helper has exactly one caller and
+> in all likelihood will only ever have exactly one caller.  Even if KVM
+> adds a path to install translations without an initiating page fault,
+> odds are very, very good that the path will just be a wrapper to the
+> "page fault" handler (both SNP and TDX RFCs propose patches to do
+> exactly that).
+>
+> No functional change intended.
+>
+> Cc: Ben Gardon <bgardon@google.com>
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
 
-Looks good to me, is it sufficient to keep the overall runtime sane?.  And maybe
-update the comment too, e.g. something like
+Reviewed-by: Ben Gardon <bgardon@google.com>
 
-	/*
-	 * Skip testing multiple reserved bits to shorten the test.  Reserved
-	 * bit page faults are terminal and multiple reserved bits do not affect
-	 * the error code; the odds of a KVM bug are super low, and the odds of
-	 * actually being able to detect a bug are even lower.
-	 */
+Nice cleanup!
+
+> ---
+>  arch/x86/kvm/mmu/tdp_mmu.c | 17 ++++-------------
+>  1 file changed, 4 insertions(+), 13 deletions(-)
+>
+> diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
+> index d99e064d366f..c5b901744d15 100644
+> --- a/arch/x86/kvm/mmu/tdp_mmu.c
+> +++ b/arch/x86/kvm/mmu/tdp_mmu.c
+> @@ -257,26 +257,17 @@ static void handle_changed_spte_dirty_log(struct kvm *kvm, int as_id, gfn_t gfn,
+>   *
+>   * @kvm: kvm instance
+>   * @sp: the new page
+> - * @shared: This operation may not be running under the exclusive use of
+> - *         the MMU lock and the operation must synchronize with other
+> - *         threads that might be adding or removing pages.
+>   * @account_nx: This page replaces a NX large page and should be marked for
+>   *             eventual reclaim.
+>   */
+>  static void tdp_mmu_link_page(struct kvm *kvm, struct kvm_mmu_page *sp,
+> -                             bool shared, bool account_nx)
+> +                             bool account_nx)
+>  {
+> -       if (shared)
+> -               spin_lock(&kvm->arch.tdp_mmu_pages_lock);
+> -       else
+> -               lockdep_assert_held_write(&kvm->mmu_lock);
+> -
+> +       spin_lock(&kvm->arch.tdp_mmu_pages_lock);
+>         list_add(&sp->link, &kvm->arch.tdp_mmu_pages);
+>         if (account_nx)
+>                 account_huge_nx_page(kvm, sp);
+> -
+> -       if (shared)
+> -               spin_unlock(&kvm->arch.tdp_mmu_pages_lock);
+> +       spin_unlock(&kvm->arch.tdp_mmu_pages_lock);
+>  }
+>
+>  /**
+> @@ -1062,7 +1053,7 @@ int kvm_tdp_mmu_map(struct kvm_vcpu *vcpu, gpa_t gpa, u32 error_code,
+>                                                      !shadow_accessed_mask);
+>
+>                         if (tdp_mmu_set_spte_atomic_no_dirty_log(vcpu->kvm, &iter, new_spte)) {
+> -                               tdp_mmu_link_page(vcpu->kvm, sp, true,
+> +                               tdp_mmu_link_page(vcpu->kvm, sp,
+>                                                   huge_page_disallowed &&
+>                                                   req_level >= iter.level);
+>
+> --
+> 2.32.0.605.g8dce9f2422-goog
+>
