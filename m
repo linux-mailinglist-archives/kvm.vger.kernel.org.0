@@ -2,125 +2,97 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C6C213E8CF4
-	for <lists+kvm@lfdr.de>; Wed, 11 Aug 2021 11:12:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7DE9E3E8D07
+	for <lists+kvm@lfdr.de>; Wed, 11 Aug 2021 11:17:24 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236622AbhHKJNK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 11 Aug 2021 05:13:10 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:43256 "EHLO
+        id S234878AbhHKJRq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 11 Aug 2021 05:17:46 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:41840 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S236314AbhHKJNJ (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 11 Aug 2021 05:13:09 -0400
+        by vger.kernel.org with ESMTP id S236314AbhHKJRq (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 11 Aug 2021 05:17:46 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1628673165;
+        s=mimecast20190719; t=1628673442;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=xXwE7CHo/JY+uapmOrMsy/SWDFuCzkqxTC2MlTmyXRU=;
-        b=PNqRbR0LCPP26r8qJyRM55VysXR+ZyvAF8CTULKwFk15qy1NRgy2UoYSCC2s5YBYa9vs6C
-        9Phodca/oMtaaqWr4kqj1oOs/oRrI5MjMn52c9p8gLUcZ4fwVd+ateECb8aitmXugn9e7B
-        lW5rIlePq0M6sar42bmsQUDYctNx3go=
-Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
- [209.85.208.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-494-vFdS7mAYO6Wd1Shc5pZrZA-1; Wed, 11 Aug 2021 05:12:44 -0400
-X-MC-Unique: vFdS7mAYO6Wd1Shc5pZrZA-1
-Received: by mail-ed1-f69.google.com with SMTP id n4-20020aa7c6840000b02903be94ce771fso353135edq.11
-        for <kvm@vger.kernel.org>; Wed, 11 Aug 2021 02:12:44 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=xXwE7CHo/JY+uapmOrMsy/SWDFuCzkqxTC2MlTmyXRU=;
-        b=hv/Cm5QovZT9QodJ9X7FQKDKrs5REUzBed9weBSlggGbJ1ZsnYFHFTN0ydYcgyRC/t
-         MGthpAVXOdMasZinpaHf3vVbuCnTyIEeLJRNY+5Qq6yMmiMr7ScYYqYxuKIkEWXgJ9gI
-         XBFYBYlaTXsG+y5X9OQb3zVL8Tte/WRXtACwonR2+/5sUNZOetDLgbCgAthkMf9bE5hQ
-         G2XFBqqi5Ec6BfSGw5gLvvd33eq/Cbi4Sz2cxZzCwhWQeyIg7C6qSK7su2JMjdez04RK
-         aHIug3cshXG9f8v8VeE3leFkCtv6ORjvt2AulPKy0ssQTqI4lxqZuIzpZ7yBNAZu+bJe
-         V1dg==
-X-Gm-Message-State: AOAM531rrcKwsEvKdyKWiGgw/mJj+BfGOfQTVd6+P7Uayc9qVwpv2Ddy
-        uAASdZMA2j5s0y0WC9o+iQl4TzPlUQkGEjBUyQSC4p++lp3P1viHtJShckBT+mnqKpNOTuxlyPu
-        Ga/5gb3RnUOjr
-X-Received: by 2002:a17:906:b1d3:: with SMTP id bv19mr1140407ejb.361.1628673163552;
-        Wed, 11 Aug 2021 02:12:43 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzOBdpK/bCd9lXs8Es1fYDQDN9tg88WZ+etc/k124zb/U4oV6dt2a1qRBU8C9IEa088GmY3XQ==
-X-Received: by 2002:a17:906:b1d3:: with SMTP id bv19mr1140394ejb.361.1628673163432;
-        Wed, 11 Aug 2021 02:12:43 -0700 (PDT)
-Received: from steredhat (a-nu5-14.tin.it. [212.216.181.13])
-        by smtp.gmail.com with ESMTPSA id ee11sm8306374edb.26.2021.08.11.02.12.42
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 11 Aug 2021 02:12:43 -0700 (PDT)
-Date:   Wed, 11 Aug 2021 11:12:40 +0200
-From:   Stefano Garzarella <sgarzare@redhat.com>
-To:     Arseny Krasnov <arseny.krasnov@kaspersky.com>
-Cc:     Stefan Hajnoczi <stefanha@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Norbert Slusarek <nslusarek@gmx.net>,
-        Andra Paraschiv <andraprs@amazon.com>,
-        Colin Ian King <colin.king@canonical.com>,
-        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
-        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-        stsp2@yandex.ru, oxffffaa@gmail.com
-Subject: Re: [RFC PATCH v2 5/5] vsock_test: update message bounds test for
- MSG_EOR
-Message-ID: <20210811091240.jbum3572eelgbbpi@steredhat>
-References: <20210810113901.1214116-1-arseny.krasnov@kaspersky.com>
- <20210810114119.1215014-1-arseny.krasnov@kaspersky.com>
+        bh=+rZhRdoNsieIXYY/pA3jAteEJJ6dMMA1Zrb29vrmk38=;
+        b=F9ue79Caurm0msLvQMJDD6p3betL5KqRX80wo6KszM8CnBqU1+6g3pGd27GWvIWSQ5LPs1
+        4Oz7ZNi9rOD2qoIUUTDOSUcPgn8uM47k5iB9qAF2Jeg3bfGpnv50SSgFYoUDuUgmdXNSc8
+        YJpHzLMVszuG0V5HSAFfTlVj24vue4g=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-521-MtjubO-eMWOOB7mz4njilQ-1; Wed, 11 Aug 2021 05:17:18 -0400
+X-MC-Unique: MtjubO-eMWOOB7mz4njilQ-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 83515C7401;
+        Wed, 11 Aug 2021 09:17:13 +0000 (UTC)
+Received: from localhost (unknown [10.39.192.118])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 1A1C05D9CA;
+        Wed, 11 Aug 2021 09:17:03 +0000 (UTC)
+From:   Cornelia Huck <cohuck@redhat.com>
+To:     Jason Gunthorpe <jgg@nvidia.com>, David Airlie <airlied@linux.ie>,
+        Tony Krowiak <akrowiak@linux.ibm.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        Diana Craciun <diana.craciun@oss.nxp.com>,
+        dri-devel@lists.freedesktop.org,
+        Eric Auger <eric.auger@redhat.com>,
+        Eric Farman <farman@linux.ibm.com>,
+        Harald Freudenberger <freude@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        intel-gfx@lists.freedesktop.org,
+        intel-gvt-dev@lists.freedesktop.org,
+        Jani Nikula <jani.nikula@linux.intel.com>,
+        Jason Herne <jjherne@linux.ibm.com>,
+        Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
+        kvm@vger.kernel.org, Kirti Wankhede <kwankhede@nvidia.com>,
+        linux-doc@vger.kernel.org, linux-s390@vger.kernel.org,
+        Matthew Rosato <mjrosato@linux.ibm.com>,
+        Peter Oberparleiter <oberpar@linux.ibm.com>,
+        Halil Pasic <pasic@linux.ibm.com>,
+        Rodrigo Vivi <rodrigo.vivi@intel.com>,
+        Vineeth Vijayan <vneethv@linux.ibm.com>,
+        Zhi Wang <zhi.a.wang@intel.com>
+Cc:     "Raj, Ashok" <ashok.raj@intel.com>, Christoph Hellwig <hch@lst.de>,
+        Leon Romanovsky <leonro@nvidia.com>,
+        Max Gurtovoy <mgurtovoy@nvidia.com>,
+        Yishai Hadas <yishaih@nvidia.com>,
+        Zhenyu Wang <zhenyuw@linux.intel.com>
+Subject: Re: [PATCH v4 02/14] vfio/mbochs: Fix missing error unwind of
+ mbochs_used_mbytes
+In-Reply-To: <2-v4-9ea22c5e6afb+1adf-vfio_reflck_jgg@nvidia.com>
+Organization: Red Hat GmbH
+References: <2-v4-9ea22c5e6afb+1adf-vfio_reflck_jgg@nvidia.com>
+User-Agent: Notmuch/0.32.1 (https://notmuchmail.org)
+Date:   Wed, 11 Aug 2021 11:17:01 +0200
+Message-ID: <8735rgwdbm.fsf@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <20210810114119.1215014-1-arseny.krasnov@kaspersky.com>
+Content-Type: text/plain
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Aug 10, 2021 at 02:41:16PM +0300, Arseny Krasnov wrote:
->Set 'MSG_EOR' in one of message sent, check that 'MSG_EOR'
->is visible in corresponding message at receiver.
->
->Signed-off-by: Arseny Krasnov <arseny.krasnov@kaspersky.com>
->---
-> tools/testing/vsock/vsock_test.c | 8 +++++++-
-> 1 file changed, 7 insertions(+), 1 deletion(-)
->
->diff --git a/tools/testing/vsock/vsock_test.c b/tools/testing/vsock/vsock_test.c
->index 67766bfe176f..2a3638c0a008 100644
->--- a/tools/testing/vsock/vsock_test.c
->+++ b/tools/testing/vsock/vsock_test.c
->@@ -282,6 +282,7 @@ static void test_stream_msg_peek_server(const struct test_opts *opts)
-> }
->
-> #define MESSAGES_CNT 7
->+#define MSG_EOR_IDX (MESSAGES_CNT / 2)
-> static void test_seqpacket_msg_bounds_client(const struct test_opts *opts)
-> {
-> 	int fd;
->@@ -294,7 +295,7 @@ static void test_seqpacket_msg_bounds_client(const struct test_opts *opts)
->
-> 	/* Send several messages, one with MSG_EOR flag */
-> 	for (int i = 0; i < MESSAGES_CNT; i++)
->-		send_byte(fd, 1, 0);
->+		send_byte(fd, 1, (i == MSG_EOR_IDX) ? MSG_EOR : 0);
->
-> 	control_writeln("SENDDONE");
-> 	close(fd);
->@@ -324,6 +325,11 @@ static void test_seqpacket_msg_bounds_server(const struct test_opts *opts)
-> 			perror("message bound violated");
-> 			exit(EXIT_FAILURE);
-> 		}
->+
->+		if ((i == MSG_EOR_IDX) ^ !!(msg.msg_flags & MSG_EOR)) {
->+			perror("MSG_EOR");
->+			exit(EXIT_FAILURE);
->+		}
-> 	}
->
-> 	close(fd);
->-- 
->2.25.1
->
+On Thu, Aug 05 2021, Jason Gunthorpe <jgg@nvidia.com> wrote:
 
-Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
+> Convert mbochs to use an atomic scheme for this like mtty was changed
+> into. The atomic fixes various race conditions with probing. Add the
+> missing error unwind. Also add the missing kfree of mdev_state->pages.
+>
+> Fixes: 681c1615f891 ("vfio/mbochs: Convert to use vfio_register_group_dev()")
+> Reported-by: Cornelia Huck <cohuck@redhat.com>
+> Co-developed-by: Alex Williamson <alex.williamson@redhat.com>
+> Reviewed-by: Christoph Hellwig <hch@lst.de>
+> Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
+> ---
+>  samples/vfio-mdev/mbochs.c | 24 +++++++++++++++---------
+>  1 file changed, 15 insertions(+), 9 deletions(-)
+
+Reviewed-by: Cornelia Huck <cohuck@redhat.com>
 
