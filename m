@@ -2,118 +2,152 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id BB4743E948F
-	for <lists+kvm@lfdr.de>; Wed, 11 Aug 2021 17:29:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4DD873E9477
+	for <lists+kvm@lfdr.de>; Wed, 11 Aug 2021 17:22:47 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233079AbhHKP36 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 11 Aug 2021 11:29:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44278 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231388AbhHKP35 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 11 Aug 2021 11:29:57 -0400
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1DF45C061765
-        for <kvm@vger.kernel.org>; Wed, 11 Aug 2021 08:29:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
-        References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:
-        Content-Type:Content-ID:Content-Description;
-        bh=1VNBK0D56SUo2dHkmlJ33YIGrsDG4gY27rkWRbTafAE=; b=IxEyZnRshCOx40QprQiV3edpkG
-        o6PG2dK3sMWBb8yt+ey/ZLBps5QJPtJpXCTjrpOjEvgzkRBABNJwd8VP0gn5JHFkzxh+vt+EefLC1
-        DM3TbAeomynTQEd/pjHQGFpOi0AU/nvIl+ZP4WYmBb+4HgNywQQRPQ9ZyBB3Lhol/+Vg6eBmxFKQB
-        BxXln6E6IeIo6FJAtpvcfZ2Chh8mq8KuhOl6Miuvw3to5iqqf2QzY8CQ00q2uNXvlazDLR0lZtRc1
-        nA6NLkFizj3In7mQ4LZBQpWZSOb9dnBq+Gq5LBGsV23fK/QEoCUltnKeazJTdhAEi6xJpDA6UjoFm
-        hRaJsJFQ==;
-Received: from [2001:4bb8:184:6215:ac7b:970b:bd9c:c36c] (helo=localhost)
-        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1mDq9Z-00DYxH-3Q; Wed, 11 Aug 2021 15:28:34 +0000
-From:   Christoph Hellwig <hch@lst.de>
-To:     Alex Williamson <alex.williamson@redhat.com>
-Cc:     Diana Craciun <diana.craciun@oss.nxp.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Kirti Wankhede <kwankhede@nvidia.com>,
-        Eric Auger <eric.auger@redhat.com>,
-        Jason Gunthorpe <jgg@ziepe.ca>, kvm@vger.kernel.org
-Subject: [PATCH 14/14] vfio/iommu_type1: remove IS_IOMMU_CAP_DOMAIN_IN_CONTAINER
-Date:   Wed, 11 Aug 2021 17:15:00 +0200
-Message-Id: <20210811151500.2744-15-hch@lst.de>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20210811151500.2744-1-hch@lst.de>
-References: <20210811151500.2744-1-hch@lst.de>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
+        id S232923AbhHKPXJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 11 Aug 2021 11:23:09 -0400
+Received: from mail.kernel.org ([198.145.29.99]:58774 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S232821AbhHKPXJ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 11 Aug 2021 11:23:09 -0400
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id C145560F11;
+        Wed, 11 Aug 2021 15:22:45 +0000 (UTC)
+Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94.2)
+        (envelope-from <maz@kernel.org>)
+        id 1mDq43-004Mfn-Kz; Wed, 11 Aug 2021 16:22:43 +0100
+Date:   Wed, 11 Aug 2021 16:22:43 +0100
+Message-ID: <87h7fw9fb0.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Oliver Upton <oupton@google.com>
+Cc:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Peter Shier <pshier@google.com>,
+        Jim Mattson <jmattson@google.com>,
+        David Matlack <dmatlack@google.com>,
+        Ricardo Koller <ricarkol@google.com>,
+        Jing Zhang <jingzhangos@google.com>,
+        Raghavendra Rao Anata <rananta@google.com>,
+        James Morse <james.morse@arm.com>,
+        Alexandru Elisei <Alexandru.Elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        linux-arm-kernel@lists.infradead.org,
+        Andrew Jones <drjones@redhat.com>,
+        Will Deacon <will@kernel.org>,
+        Catalin Marinas <catalin.marinas@arm.com>
+Subject: Re: [PATCH v6 13/21] KVM: arm64: Allow userspace to configure a vCPU's virtual offset
+In-Reply-To: <CAOQ_Qsjiyp_HQLhgFfF-o7T=Qpe+djL9KCFjAU2xmj8OXhAf4w@mail.gmail.com>
+References: <20210804085819.846610-1-oupton@google.com>
+        <20210804085819.846610-14-oupton@google.com>
+        <87czqlbq15.wl-maz@kernel.org>
+        <CAOQ_Qsjiyp_HQLhgFfF-o7T=Qpe+djL9KCFjAU2xmj8OXhAf4w@mail.gmail.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: oupton@google.com, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, pbonzini@redhat.com, seanjc@google.com, pshier@google.com, jmattson@google.com, dmatlack@google.com, ricarkol@google.com, jingzhangos@google.com, rananta@google.com, james.morse@arm.com, Alexandru.Elisei@arm.com, suzuki.poulose@arm.com, linux-arm-kernel@lists.infradead.org, drjones@redhat.com, will@kernel.org, catalin.marinas@arm.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-IS_IOMMU_CAP_DOMAIN_IN_CONTAINER just obsfucated the checks being
-performed, so open code it in the callers.
+On Tue, 10 Aug 2021 10:44:01 +0100,
+Oliver Upton <oupton@google.com> wrote:
+> 
+> On Tue, Aug 10, 2021 at 2:35 AM Marc Zyngier <maz@kernel.org> wrote:
+> >
+> > On Wed, 04 Aug 2021 09:58:11 +0100,
+> > Oliver Upton <oupton@google.com> wrote:
+> > >
+> > > Allow userspace to access the guest's virtual counter-timer offset
+> > > through the ONE_REG interface. The value read or written is defined to
+> > > be an offset from the guest's physical counter-timer. Add some
+> > > documentation to clarify how a VMM should use this and the existing
+> > > CNTVCT_EL0.
+> > >
+> > > Signed-off-by: Oliver Upton <oupton@google.com>
+> > > ---
+> > >  Documentation/virt/kvm/api.rst    | 10 ++++++++++
+> > >  arch/arm64/include/uapi/asm/kvm.h |  1 +
+> > >  arch/arm64/kvm/arch_timer.c       | 11 +++++++++++
+> > >  arch/arm64/kvm/guest.c            |  6 +++++-
+> > >  include/kvm/arm_arch_timer.h      |  1 +
+> > >  5 files changed, 28 insertions(+), 1 deletion(-)
+> > >
+> > > diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+> > > index 8d4a3471ad9e..28a65dc89985 100644
+> > > --- a/Documentation/virt/kvm/api.rst
+> > > +++ b/Documentation/virt/kvm/api.rst
+> > > @@ -2487,6 +2487,16 @@ arm64 system registers have the following id bit patterns::
+> > >       derived from the register encoding for CNTV_CVAL_EL0.  As this is
+> > >       API, it must remain this way.
+> > >
+> > > +.. warning::
+> > > +
+> > > +     The value of KVM_REG_ARM_TIMER_OFFSET is defined as an offset from
+> > > +     the guest's view of the physical counter-timer.
+> > > +
+> > > +     Userspace should use either KVM_REG_ARM_TIMER_OFFSET or
+> > > +     KVM_REG_ARM_TIMER_CVAL to pause and resume a guest's virtual
+> >
+> > You probably mean KVM_REG_ARM_TIMER_CNT here, despite the broken
+> > encoding.
+> 
+> Indeed I do!
+> 
+> >
+> > > +     counter-timer. Mixed use of these registers could result in an
+> > > +     unpredictable guest counter value.
+> > > +
+> > >  arm64 firmware pseudo-registers have the following bit pattern::
+> > >
+> > >    0x6030 0000 0014 <regno:16>
+> > > diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
+> > > index b3edde68bc3e..949a31bc10f0 100644
+> > > --- a/arch/arm64/include/uapi/asm/kvm.h
+> > > +++ b/arch/arm64/include/uapi/asm/kvm.h
+> > > @@ -255,6 +255,7 @@ struct kvm_arm_copy_mte_tags {
+> > >  #define KVM_REG_ARM_TIMER_CTL                ARM64_SYS_REG(3, 3, 14, 3, 1)
+> > >  #define KVM_REG_ARM_TIMER_CVAL               ARM64_SYS_REG(3, 3, 14, 0, 2)
+> > >  #define KVM_REG_ARM_TIMER_CNT                ARM64_SYS_REG(3, 3, 14, 3, 2)
+> > > +#define KVM_REG_ARM_TIMER_OFFSET     ARM64_SYS_REG(3, 4, 14, 0, 3)
+> >
+> > I don't think we can use the encoding for CNTPOFF_EL2 here, as it will
+> > eventually clash with a NV guest using the same feature for its own
+> > purpose. We don't want this offset to overlap with any of the existing
+> > features.
+> >
+> > I actually liked your previous proposal of controlling the physical
+> > offset via a device property, as it clearly indicated that you were
+> > dealing with non-architectural state.
+> 
+> That's actually exactly what I did here :) That said, the macro name
+> is horribly obfuscated from CNTVOFF_EL2. I did this for the sake of
+> symmetry with other virtual counter-timer registers above, though this
+> may warrant special casing given the fact that we have a similarly
+> named device attribute to handle the physical offset.
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- drivers/vfio/vfio_iommu_type1.c | 13 +++++--------
- 1 file changed, 5 insertions(+), 8 deletions(-)
+Gah, you are of course right. Ignore my rambling. The name is fine (or
+at least in keeping with existing quality level of the making).
 
-diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
-index 205f13c05b236e..42bd902243eca5 100644
---- a/drivers/vfio/vfio_iommu_type1.c
-+++ b/drivers/vfio/vfio_iommu_type1.c
-@@ -144,9 +144,6 @@ struct vfio_regions {
- 	size_t len;
- };
- 
--#define IS_IOMMU_CAP_DOMAIN_IN_CONTAINER(iommu)	\
--					(!list_empty(&iommu->domain_list))
--
- #define DIRTY_BITMAP_BYTES(n)	(ALIGN(n, BITS_PER_TYPE(u64)) / BITS_PER_BYTE)
- 
- /*
-@@ -884,7 +881,7 @@ static int vfio_iommu_type1_pin_pages(void *iommu_data,
- 	 * already pinned and accounted. Accounting should be done if there is no
- 	 * iommu capable domain in the container.
- 	 */
--	do_accounting = !IS_IOMMU_CAP_DOMAIN_IN_CONTAINER(iommu);
-+	do_accounting = list_empty(&iommu->domain_list);
- 
- 	for (i = 0; i < npage; i++) {
- 		struct vfio_pfn *vpfn;
-@@ -973,7 +970,7 @@ static int vfio_iommu_type1_unpin_pages(void *iommu_data,
- 
- 	mutex_lock(&iommu->lock);
- 
--	do_accounting = !IS_IOMMU_CAP_DOMAIN_IN_CONTAINER(iommu);
-+	do_accounting = list_empty(&iommu->domain_list);
- 	for (i = 0; i < npage; i++) {
- 		struct vfio_dma *dma;
- 		dma_addr_t iova;
-@@ -1094,7 +1091,7 @@ static long vfio_unmap_unpin(struct vfio_iommu *iommu, struct vfio_dma *dma,
- 	if (!dma->size)
- 		return 0;
- 
--	if (!IS_IOMMU_CAP_DOMAIN_IN_CONTAINER(iommu))
-+	if (list_empty(&iommu->domain_list))
- 		return 0;
- 
- 	/*
-@@ -1671,7 +1668,7 @@ static int vfio_dma_do_map(struct vfio_iommu *iommu,
- 	vfio_link_dma(iommu, dma);
- 
- 	/* Don't pin and map if container doesn't contain IOMMU capable domain*/
--	if (!IS_IOMMU_CAP_DOMAIN_IN_CONTAINER(iommu))
-+	if (list_empty(&iommu->domain_list))
- 		dma->size = size;
- 	else
- 		ret = vfio_pin_map_dma(iommu, dma, size);
-@@ -2477,7 +2474,7 @@ static void vfio_iommu_type1_detach_group(void *iommu_data,
- 		kfree(group);
- 
- 		if (list_empty(&iommu->mediated_groups) &&
--		    !IS_IOMMU_CAP_DOMAIN_IN_CONTAINER(iommu)) {
-+		    list_empty(&iommu->domain_list)) {
- 			WARN_ON(iommu->notifier.head);
- 			vfio_iommu_unmap_unpin_all(iommu);
- 		}
+For the physical offset, something along the lines of
+KVM_ARM_VCPU_TIMER_PHYS_OFFSET is probably right (but feel free to be
+creative, I'm terrible at this stuff [1]).
+
+Thanks,
+
+	M.
+
+[1] https://twitter.com/codinghorror/status/506010907021828096?lang=en
+
 -- 
-2.30.2
-
+Without deviation from the norm, progress is not possible.
