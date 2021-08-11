@@ -2,156 +2,199 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7075F3E8B76
-	for <lists+kvm@lfdr.de>; Wed, 11 Aug 2021 10:09:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 082E53E8CBC
+	for <lists+kvm@lfdr.de>; Wed, 11 Aug 2021 11:00:49 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236270AbhHKIJP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 11 Aug 2021 04:09:15 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:59019 "EHLO
+        id S236554AbhHKJBG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 11 Aug 2021 05:01:06 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:26923 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S235974AbhHKIH4 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 11 Aug 2021 04:07:56 -0400
+        by vger.kernel.org with ESMTP id S236497AbhHKJBC (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 11 Aug 2021 05:01:02 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1628669210;
+        s=mimecast20190719; t=1628672438;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=l5r6D8jUkNx5Z0m6hgkp7yIVpIvqOnZTyj26nR1HJ7k=;
-        b=XYD67XgTfh44nmL3kg0gYBbkOEJywvbZtreCmPwe/EGaWwTdySZpxLpfd8zoO13LJVmoF5
-        Npd/doO+3iCz9sIn++ypB43huXHQ2WHPDoCoT9SqQQs8Tqgp4uBGFkMIsqdgwnYCHGJyvj
-        nuE3c7A47+M7ga4/QohAyaMLO7yTtD4=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-429-c-tNJYbJMtGuVzI4eMDNEQ-1; Wed, 11 Aug 2021 04:06:47 -0400
-X-MC-Unique: c-tNJYbJMtGuVzI4eMDNEQ-1
-Received: by mail-wr1-f71.google.com with SMTP id f6-20020adfe9060000b0290153abe88c2dso427148wrm.20
-        for <kvm@vger.kernel.org>; Wed, 11 Aug 2021 01:06:46 -0700 (PDT)
+        bh=xVYk6O6UbKVQlEk4hpiQ+ioYAfkIhHzccxHN1Fx+454=;
+        b=T/pogVQ6LOdA85cxys2r8Oov0oYWdqkwp4EIA6yINrMWIf8rUlOBOI2NJ6ecwD42S2IEDK
+        FJRSU5xXa/fJogpaDT8SxftcvDOQgnbxTKZoywOOOl7OofO8xdfTJxvxzk9Hr5v5TV6mML
+        cWjeq9kl6yCws6JbJxJYijPmrwRiG9U=
+Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
+ [209.85.218.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-539-7vFSFOBBNXqCd0u4i6b9Uw-1; Wed, 11 Aug 2021 05:00:35 -0400
+X-MC-Unique: 7vFSFOBBNXqCd0u4i6b9Uw-1
+Received: by mail-ej1-f70.google.com with SMTP id h17-20020a1709070b11b02905b5ced62193so425069ejl.1
+        for <kvm@vger.kernel.org>; Wed, 11 Aug 2021 02:00:34 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=l5r6D8jUkNx5Z0m6hgkp7yIVpIvqOnZTyj26nR1HJ7k=;
-        b=TMhqD3n5FuANNHM0fhtGkGIS0DhDUh4wCvJZpQVqFVs7c9gkKPshIPGwpTEatXGUYB
-         uX/nTFZTTtKrGIjeBgqCeAfBSeVQjAPdUs+K6V9iBc94Rhpnady2m7dw0HXjb4EmaFHD
-         zvhsLK+fKAu6fS8tJ//tvOSgxed6QxIB37AOdOMtojAYf9NqVd4YiAVyFm2GOVuCI7gx
-         2vYVMXyxIl6Yu1wR69rTTkixWERfvCZy1T+Gqt5YbYzNKdVUzr3dWTWI1QdaX+N/pxOZ
-         rw8vvPxggTZM6qWkOWQhHkcAZ9FsjnbwU4IvrhfS7451e83Cot38BLdgMuL2YbJ8HwVa
-         G+pg==
-X-Gm-Message-State: AOAM533soqCe/q6Psrj7X3fFgITywhdQBsQQP02QlaicWU28Hm1LdBw7
-        HyiCoyavWw3BIs3LTJGWwHNNixjGkJO9RwQ1ogvWgzUBYtkgCLQ76HT+YzwuFizp+jZAY7ab3Er
-        qpehR/lz/nSx5
-X-Received: by 2002:a5d:68cb:: with SMTP id p11mr35726052wrw.364.1628669206049;
-        Wed, 11 Aug 2021 01:06:46 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyxOTmqN+Uo0zudKogchLE49arHby/+3aOpLRhbOaodhXmC9tsnZNZ8BkMLNkhO4f20zgVqig==
-X-Received: by 2002:a5d:68cb:: with SMTP id p11mr35726033wrw.364.1628669205866;
-        Wed, 11 Aug 2021 01:06:45 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:63a7:c72e:ea0e:6045? ([2001:b07:6468:f312:63a7:c72e:ea0e:6045])
-        by smtp.gmail.com with ESMTPSA id r23sm8947379wrr.14.2021.08.11.01.06.44
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 11 Aug 2021 01:06:45 -0700 (PDT)
-Subject: Re: [PATCH v4 00/16] My AVIC patch queue
-To:     Maxim Levitsky <mlevitsk@redhat.com>, kvm@vger.kernel.org
-Cc:     Jim Mattson <jmattson@google.com>, linux-kernel@vger.kernel.org,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Borislav Petkov <bp@alien8.de>, Joerg Roedel <joro@8bytes.org>,
-        Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>
-References: <20210810205251.424103-1-mlevitsk@redhat.com>
- <42cb19be1f6598e878b5b122e2152bdec27f62db.camel@redhat.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <af1014c0-a690-7e10-4bb7-a751af9c5bbc@redhat.com>
-Date:   Wed, 11 Aug 2021 10:06:43 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.11.0
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=xVYk6O6UbKVQlEk4hpiQ+ioYAfkIhHzccxHN1Fx+454=;
+        b=Le6XWN98W42famUCmdL0UG61u8aP4ZUFCD0aDo+4WQybxN/Pu4ZnXNAqEZevZl3GnH
+         KVANOMMJXmtNyAIIM3dOldGEdTgmomWh+UtTb/nJiXTXl7oTPcNA3505/NdMUAivZB9B
+         2U34syhMGGdnma+BcTMQl8fZgz4+UnWbcd60deS0CtZpwGXgTlCtfyyGyB5d+B5bLnlX
+         Ik6Psx/eQpyaATYz7XdSeN1bM5foA7pFFZ2VfNkOvN6kZGn5Ur82VBRDxzs/LMPphY2A
+         MYGg4fKGERJ7A+/2IdODu9h8aiINGql92dSfiDIHjX1g+YUUH4KqewGRBsvSRxfEVZQc
+         zGMw==
+X-Gm-Message-State: AOAM530DBFqS+ZNqKK/T/ZIQTKYxi/+pZZ5K6xHJQx+Bmo/EpDM16/7t
+        ghBG/EMtJmO2KYeTm64YPe0YUacJ6BdVujh2CerKdtHWpLQhwKNs/91IvM3sEuZ1APsRR+TR9Sg
+        W70XCFd3MvBzc
+X-Received: by 2002:a17:906:a08a:: with SMTP id q10mr2593166ejy.100.1628672433740;
+        Wed, 11 Aug 2021 02:00:33 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJx+Wh3oVEmn3QZnNAXMGsVm3JaAoH4eSr1ZKRKUam8aqa4jKG8XOA/RBO+z8M1b/2H29w2Viw==
+X-Received: by 2002:a17:906:a08a:: with SMTP id q10mr2593146ejy.100.1628672433523;
+        Wed, 11 Aug 2021 02:00:33 -0700 (PDT)
+Received: from steredhat (a-nu5-14.tin.it. [212.216.181.13])
+        by smtp.gmail.com with ESMTPSA id l19sm4147213edb.86.2021.08.11.02.00.32
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 11 Aug 2021 02:00:33 -0700 (PDT)
+Date:   Wed, 11 Aug 2021 11:00:30 +0200
+From:   Stefano Garzarella <sgarzare@redhat.com>
+To:     Arseny Krasnov <arseny.krasnov@kaspersky.com>
+Cc:     Stefan Hajnoczi <stefanha@redhat.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Colin Ian King <colin.king@canonical.com>,
+        Norbert Slusarek <nslusarek@gmx.net>,
+        Andra Paraschiv <andraprs@amazon.com>, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org, stsp2@yandex.ru, oxffffaa@gmail.com
+Subject: Re: [RFC PATCH v2 1/5] virtio/vsock: add 'VIRTIO_VSOCK_SEQ_EOM' bit
+Message-ID: <20210811090030.snu5ckf6bdkzxdg7@steredhat>
+References: <20210810113901.1214116-1-arseny.krasnov@kaspersky.com>
+ <20210810113956.1214463-1-arseny.krasnov@kaspersky.com>
 MIME-Version: 1.0
-In-Reply-To: <42cb19be1f6598e878b5b122e2152bdec27f62db.camel@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <20210810113956.1214463-1-arseny.krasnov@kaspersky.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 10/08/21 23:21, Maxim Levitsky wrote:
-> On Tue, 2021-08-10 at 23:52 +0300, Maxim Levitsky wrote:
->> Hi!
->>
->> This is a series of bugfixes to the AVIC dynamic inhibition, which was
->> made while trying to fix bugs as much as possible in this area and trying
->> to make the AVIC+SYNIC conditional enablement work.
->>
->> * Patches 1,3-8 are code from Sean Christopherson which
-> 
-> I mean patches 1,4-8. I forgot about patch 3 which I also added,
-> which just added a comment about parameters of the kvm_flush_remote_tlbs_with_address.
-> 
-> Best regards,
-> 	Maxim Levitsky
-> 
->>    implement an alternative approach of inhibiting AVIC without
->>    disabling its memslot.
->>
->>    V4: addressed review feedback.
->>
->> * Patch 2 is new and it fixes a bug in kvm_flush_remote_tlbs_with_address
->>
->> * Patches 9-10 in this series fix a race condition which can cause
->>    a lost write from a guest to APIC when the APIC write races
->>    the AVIC un-inhibition, and add a warning to catch this problem
->>    if it re-emerges again.
->>
->>    V4: applied review feedback from Paolo
->>
->> * Patch 11 is the patch from Vitaly about allowing AVIC with SYNC
->>    as long as the guest doesn’t use the AutoEOI feature. I only slightly
->>    changed it to expose the AutoEOI cpuid bit regardless of AVIC enablement.
->>
->>    V4: fixed a race that Paolo pointed out.
->>
->> * Patch 12 is a refactoring that is now possible in SVM AVIC inhibition code,
->>    because the RCU lock is not dropped anymore.
->>
->> * Patch 13-15 fixes another issue I found in AVIC inhibit code:
->>
->>    Currently avic_vcpu_load/avic_vcpu_put are called on userspace entry/exit
->>    from KVM (aka kvm_vcpu_get/kvm_vcpu_put), and these functions update the
->>    "is running" bit in the AVIC physical ID remap table and update the
->>    target vCPU in iommu code.
->>
->>    However both of these functions don't do anything when AVIC is inhibited
->>    thus the "is running" bit will be kept enabled during the exit to userspace.
->>    This shouldn't be a big issue as the caller
->>    doesn't use the AVIC when inhibited but still inconsistent and can trigger
->>    a warning about this in avic_vcpu_load.
->>
->>    To be on the safe side I think it makes sense to call
->>    avic_vcpu_put/avic_vcpu_load when inhibiting/uninhibiting the AVIC.
->>    This will ensure that the work these functions do is matched.
->>
->>    V4: I splitted a single patch to 3 patches to make it easier
->>        to review, and applied Paolo's review feedback.
->>
->> * Patch 16 removes the pointless APIC base
->>    relocation from AVIC to make it consistent with the rest of KVM.
->>
->>    (both AVIC and APICv only support default base, while regular KVM,
->>    sort of support any APIC base as long as it is not RAM.
->>    If guest attempts to relocate APIC base to non RAM area,
->>    while APICv/AVIC are active, the new base will be non accelerated,
->>    while the default base will continue to be AVIC/APICv backed).
->>
->>    On top of that if guest uses different APIC bases on different vCPUs,
->>    KVM doesn't honour the fact that the MMIO range should only be active
->>    on that vCPU.
+On Tue, Aug 10, 2021 at 02:39:53PM +0300, Arseny Krasnov wrote:
 
-No problem, b4 diff is my friend. :)  Queued, thanks.
+The title is confusing, we are renaming EOR in EOM.
 
-Paolo
+>This bit is used to mark end of messages('EOM' - end of message), while
+>'VIRIO_VSOCK_SEQ_EOR' is used to pass MSG_EOR. Also rename 'record' to
+>'message' in implementation as it is different things.
+>
+>Signed-off-by: Arseny Krasnov <arseny.krasnov@kaspersky.com>
+>---
+> drivers/vhost/vsock.c                   | 12 ++++++------
+> include/uapi/linux/virtio_vsock.h       |  3 ++-
+> net/vmw_vsock/virtio_transport_common.c | 14 +++++++-------
+> 3 files changed, 15 insertions(+), 14 deletions(-)
+>
+>diff --git a/drivers/vhost/vsock.c b/drivers/vhost/vsock.c
+>index f249622ef11b..feaf650affbe 100644
+>--- a/drivers/vhost/vsock.c
+>+++ b/drivers/vhost/vsock.c
+>@@ -178,15 +178,15 @@ vhost_transport_do_send_pkt(struct vhost_vsock *vsock,
+> 			 * small rx buffers, headers of packets in rx queue are
+> 			 * created dynamically and are initialized with 
+> 			 header
+> 			 * of current packet(except length). But in case of
+>-			 * SOCK_SEQPACKET, we also must clear record delimeter
+>-			 * bit(VIRTIO_VSOCK_SEQ_EOR). Otherwise, instead of one
+>-			 * packet with delimeter(which marks end of record),
+>+			 * SOCK_SEQPACKET, we also must clear message delimeter
+>+			 * bit(VIRTIO_VSOCK_SEQ_EOM). Otherwise, instead of one
+>+			 * packet with delimeter(which marks end of message),
+> 			 * there will be sequence of packets with delimeter
+> 			 * bit set. After initialized header will be copied to
+> 			 * rx buffer, this bit will be restored.
+> 			 */
+>-			if (le32_to_cpu(pkt->hdr.flags) & VIRTIO_VSOCK_SEQ_EOR) {
+>-				pkt->hdr.flags &= ~cpu_to_le32(VIRTIO_VSOCK_SEQ_EOR);
+>+			if (le32_to_cpu(pkt->hdr.flags) & VIRTIO_VSOCK_SEQ_EOM) {
+>+				pkt->hdr.flags &= ~cpu_to_le32(VIRTIO_VSOCK_SEQ_EOM);
+> 				restore_flag = true;
+> 			}
+> 		}
+>@@ -225,7 +225,7 @@ vhost_transport_do_send_pkt(struct vhost_vsock *vsock,
+> 		 */
+> 		if (pkt->off < pkt->len) {
+> 			if (restore_flag)
+>-				pkt->hdr.flags |= cpu_to_le32(VIRTIO_VSOCK_SEQ_EOR);
+>+				pkt->hdr.flags |= cpu_to_le32(VIRTIO_VSOCK_SEQ_EOM);
+>
+> 			/* We are queueing the same virtio_vsock_pkt to handle
+> 			 * the remaining bytes, and we want to deliver it
+>diff --git a/include/uapi/linux/virtio_vsock.h b/include/uapi/linux/virtio_vsock.h
+>index 3dd3555b2740..64738838bee5 100644
+>--- a/include/uapi/linux/virtio_vsock.h
+>+++ b/include/uapi/linux/virtio_vsock.h
+>@@ -97,7 +97,8 @@ enum virtio_vsock_shutdown {
+>
+> /* VIRTIO_VSOCK_OP_RW flags values */
+> enum virtio_vsock_rw {
+>-	VIRTIO_VSOCK_SEQ_EOR = 1,
+>+	VIRTIO_VSOCK_SEQ_EOM = 1,
+>+	VIRTIO_VSOCK_SEQ_EOR = 2,
+         ^
+I think is better to add this new flag in a separate patch.
+
+> };
+>
+> #endif /* _UAPI_LINUX_VIRTIO_VSOCK_H */
+>diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
+>index 081e7ae93cb1..4d5a93beceb0 100644
+>--- a/net/vmw_vsock/virtio_transport_common.c
+>+++ b/net/vmw_vsock/virtio_transport_common.c
+>@@ -77,7 +77,7 @@ virtio_transport_alloc_pkt(struct virtio_vsock_pkt_info *info,
+>
+> 		if (msg_data_left(info->msg) == 0 &&
+> 		    info->type == VIRTIO_VSOCK_TYPE_SEQPACKET)
+>-			pkt->hdr.flags |= cpu_to_le32(VIRTIO_VSOCK_SEQ_EOR);
+>+			pkt->hdr.flags |= cpu_to_le32(VIRTIO_VSOCK_SEQ_EOM);
+> 	}
+>
+> 	trace_virtio_transport_alloc_pkt(src_cid, src_port,
+>@@ -457,7 +457,7 @@ static int virtio_transport_seqpacket_do_dequeue(struct vsock_sock *vsk,
+> 				dequeued_len += pkt_len;
+> 		}
+>
+>-		if (le32_to_cpu(pkt->hdr.flags) & VIRTIO_VSOCK_SEQ_EOR) {
+>+		if (le32_to_cpu(pkt->hdr.flags) & VIRTIO_VSOCK_SEQ_EOM) {
+> 			msg_ready = true;
+> 			vvs->msg_count--;
+> 		}
+>@@ -1029,7 +1029,7 @@ virtio_transport_recv_enqueue(struct vsock_sock *vsk,
+> 		goto out;
+> 	}
+>
+>-	if (le32_to_cpu(pkt->hdr.flags) & VIRTIO_VSOCK_SEQ_EOR)
+>+	if (le32_to_cpu(pkt->hdr.flags) & VIRTIO_VSOCK_SEQ_EOM)
+> 		vvs->msg_count++;
+>
+> 	/* Try to copy small packets into the buffer of last packet queued,
+>@@ -1044,12 +1044,12 @@ virtio_transport_recv_enqueue(struct vsock_sock *vsk,
+>
+> 		/* If there is space in the last packet queued, we copy the
+> 		 * new packet in its buffer. We avoid this if the last packet
+>-		 * queued has VIRTIO_VSOCK_SEQ_EOR set, because this is
+>-		 * delimiter of SEQPACKET record, so 'pkt' is the first packet
+>-		 * of a new record.
+>+		 * queued has VIRTIO_VSOCK_SEQ_EOM set, because this is
+>+		 * delimiter of SEQPACKET message, so 'pkt' is the first packet
+>+		 * of a new message.
+> 		 */
+> 		if ((pkt->len <= last_pkt->buf_len - last_pkt->len) &&
+>-		    !(le32_to_cpu(last_pkt->hdr.flags) & VIRTIO_VSOCK_SEQ_EOR)) {
+>+		    !(le32_to_cpu(last_pkt->hdr.flags) & VIRTIO_VSOCK_SEQ_EOM)) {
+> 			memcpy(last_pkt->buf + last_pkt->len, pkt->buf,
+> 			       pkt->len);
+> 			last_pkt->len += pkt->len;
+>-- 
+>2.25.1
+>
+
+The rest LGTM!
+
+Thanks,
+Stefano
 
