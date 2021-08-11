@@ -2,81 +2,86 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 26C263E9230
-	for <lists+kvm@lfdr.de>; Wed, 11 Aug 2021 15:05:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 425583E9246
+	for <lists+kvm@lfdr.de>; Wed, 11 Aug 2021 15:10:52 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231175AbhHKNF7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 11 Aug 2021 09:05:59 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:55749 "EHLO
+        id S230177AbhHKNLO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 11 Aug 2021 09:11:14 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:54501 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229766AbhHKNF6 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 11 Aug 2021 09:05:58 -0400
+        by vger.kernel.org with ESMTP id S230022AbhHKNLN (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 11 Aug 2021 09:11:13 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1628687134;
+        s=mimecast20190719; t=1628687449;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=ejky1L45fjpIqglpN+AycHkOBEyLVHC4mSrGMJh6Vhk=;
-        b=R6jKYdjEjs3FUXNbrLa7BVwvfC0aKyH5ntWKOYxgjEy2XtHfngeIrGXk00jEWOkQgoA2XM
-        sp53/RbdLPmcEWK2HHejBKDqZrPZGPjPbsxkrUIsCM0HLDZ/Zx1Lt23OUzHyosdO17VnyO
-        y1wGTslXwTcbU77i5oTQDEL26kFRgjY=
-Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
- [209.85.218.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-251-T3F45O6rPa-GSlGyFV3krA-1; Wed, 11 Aug 2021 09:05:33 -0400
-X-MC-Unique: T3F45O6rPa-GSlGyFV3krA-1
-Received: by mail-ej1-f70.google.com with SMTP id e1-20020a170906c001b02905b53c2f6542so663256ejz.7
-        for <kvm@vger.kernel.org>; Wed, 11 Aug 2021 06:05:32 -0700 (PDT)
+        bh=H8sWpMxpIZDBmpCGl8ZAafxxVgEbTAfN82/liA2rLIM=;
+        b=OJLSK2uA8RLZWckwNdu7wc+6Kp1CgzcTB0IYh7bqJOA+Qmm2jTeACwTwTaDPOqaMu/9b46
+        /tLS+a7v2Bo3HYhU6vU7Kr18W4lO8RUzufu/E9qO7eFZtIJaVh1xa9X4F/0MysOk3kA+bx
+        yvtb3x7knT7YGy5LU+90HZUq9VLdIWk=
+Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
+ [209.85.208.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-381-I5tb62GEOFKTQT16pK05mw-1; Wed, 11 Aug 2021 09:10:48 -0400
+X-MC-Unique: I5tb62GEOFKTQT16pK05mw-1
+Received: by mail-ed1-f72.google.com with SMTP id ec47-20020a0564020d6fb02903be5e0a8cd2so1199822edb.0
+        for <kvm@vger.kernel.org>; Wed, 11 Aug 2021 06:10:47 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=ejky1L45fjpIqglpN+AycHkOBEyLVHC4mSrGMJh6Vhk=;
-        b=fcbsc3OP5Q7fN/bnFtFQjTQNBhxwoKMzZbH78ZdJ7BCNJytWzU4z36bhElHN5orcJf
-         A/vcuMEUHIjXl8qp53G9dXyo9nkhPD4ExUxUdUwqhIE7FSamE0875uWHB5rpzDb7e0Us
-         7jQ2XerUrHCvDl40ECJ+IHI6TX2P7jGib83qmZw6MuTjXNdbjwyt9IRmrPVkP9M+O5kd
-         n1a3zRh62XoTSUBYapCZByUwf2f5HLSdKxho3aOEQPRFAl5hNG+GG2HIwCulkezX6P5W
-         14BOCVRGUf9qmIpNQrKAhp3bOYOs9+dT4XCxH7h5r+lgEgTXF61Kf4zY3bb60FPBwXJ6
-         amNA==
-X-Gm-Message-State: AOAM530L2TAI01jwSPnR2ZGUqkYbkPkAJQKlFGl+WzOAEf8z2mYfJFts
-        lVDvFHEb4zmj8qsPxYL5p87O7HFVxeET4pI76XG6yrI69SKRx1kdzSImvWZsSCZm1GvN7rNN9o6
-        yyFqmtqJoa+fr
-X-Received: by 2002:a17:907:3d93:: with SMTP id he19mr3569807ejc.179.1628687132019;
-        Wed, 11 Aug 2021 06:05:32 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwv0o2qcd2qyszkVd6eUDUWXqakuUjyDYC+wCYZeaGx1y3ijN1A/umGBfrGXBRNz7hWK5walg==
-X-Received: by 2002:a17:907:3d93:: with SMTP id he19mr3569774ejc.179.1628687131737;
-        Wed, 11 Aug 2021 06:05:31 -0700 (PDT)
+        bh=H8sWpMxpIZDBmpCGl8ZAafxxVgEbTAfN82/liA2rLIM=;
+        b=lsmUiPMu9b/dGJfMBQQ/eudRNLEKYn5jWsTi5zBmnK7/YrlWC+sSwicQXT8JtE368k
+         uwVf7PW+6KTDxJbEjkhRotQ1N8hnZft3PTDUbXWQJGa+9j91tpgyt1N6J7CJADsYBbiu
+         moDwwnyUstwMJgGkZZGWDITyZ8ZEn8m/F3c0wtXzJ3ZfVbezgQFd4ov/Tp/Pjoyg3+SV
+         VFaDvDS7FuU+hH16WYjHTXl3BrBi81Jy+d806gdzsvCbvbXmSIBHhD0990p6ZUUCLMkc
+         R8XhqlOViZI4mGqwqmLBRqJSlR4QcqkqeF3sU1NTm/ZuRP+2PiIM2/8HJlJCoUCWZ6fA
+         cA7A==
+X-Gm-Message-State: AOAM531mMwLBfw42vXWRzYV+7pks9JGYh4StjHxDr/CTiBtlYU6c4558
+        SCoZG4WoayDWbXpa42dT1kp/hdP2Xu/LbZMs9L2mT7ddS5e4bpYEgIC3Pf+HH7FxUGIrEykfJYe
+        FpWqz6Xc6AbG3
+X-Received: by 2002:a17:907:9602:: with SMTP id gb2mr3636058ejc.354.1628687446282;
+        Wed, 11 Aug 2021 06:10:46 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyFPjH6U5yQfTCMV1bM5Bqc+L0/4ww4/tZsl0Q75Sik3+sIXSUET2NDh+BgQ9F4aGHgJZzQcg==
+X-Received: by 2002:a17:907:9602:: with SMTP id gb2mr3636035ejc.354.1628687445979;
+        Wed, 11 Aug 2021 06:10:45 -0700 (PDT)
 Received: from ?IPv6:2001:b07:6468:f312:63a7:c72e:ea0e:6045? ([2001:b07:6468:f312:63a7:c72e:ea0e:6045])
-        by smtp.gmail.com with ESMTPSA id y1sm2657015ejf.2.2021.08.11.06.05.30
+        by smtp.gmail.com with ESMTPSA id f15sm8159390ejt.75.2021.08.11.06.10.43
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 11 Aug 2021 06:05:31 -0700 (PDT)
-Subject: Re: [PATCH v6 00/21] KVM: Add idempotent controls for migrating
- system counter state
-To:     Oliver Upton <oupton@google.com>, kvm@vger.kernel.org,
-        kvmarm@lists.cs.columbia.edu
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Marc Zyngier <maz@kernel.org>, Peter Shier <pshier@google.com>,
-        Jim Mattson <jmattson@google.com>,
-        David Matlack <dmatlack@google.com>,
-        Ricardo Koller <ricarkol@google.com>,
-        Jing Zhang <jingzhangos@google.com>,
-        Raghavendra Rao Anata <rananta@google.com>,
-        James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        linux-arm-kernel@lists.infradead.org,
+        Wed, 11 Aug 2021 06:10:45 -0700 (PDT)
+Subject: Re: [PATCH v3 0/6] KVM: my debug patch queue
+To:     Maxim Levitsky <mlevitsk@redhat.com>, kvm@vger.kernel.org
+Cc:     Kieran Bingham <kbingham@kernel.org>,
+        Jan Kiszka <jan.kiszka@siemens.com>,
         Andrew Jones <drjones@redhat.com>,
-        Will Deacon <will@kernel.org>,
-        Catalin Marinas <catalin.marinas@arm.com>
-References: <20210804085819.846610-1-oupton@google.com>
+        Jonathan Corbet <corbet@lwn.net>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Ingo Molnar <mingo@redhat.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
+        Johannes Berg <johannes.berg@intel.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Jessica Yu <jeyu@kernel.org>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Yang Weijiang <weijiang.yang@intel.com>,
+        linux-kernel@vger.kernel.org, Borislav Petkov <bp@alien8.de>,
+        "open list:KERNEL SELFTEST FRAMEWORK" 
+        <linux-kselftest@vger.kernel.org>,
+        "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>,
+        Shuah Khan <shuah@kernel.org>,
+        Andrew Morton <akpm@linux-foundation.org>
+References: <20210811122927.900604-1-mlevitsk@redhat.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <927240ff-a4f4-fcc6-ae1b-92cefeda9e59@redhat.com>
-Date:   Wed, 11 Aug 2021 15:05:29 +0200
+Message-ID: <1646763f-9f92-bb67-f358-9b17c8000b12@redhat.com>
+Date:   Wed, 11 Aug 2021 15:10:43 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.11.0
 MIME-Version: 1.0
-In-Reply-To: <20210804085819.846610-1-oupton@google.com>
+In-Reply-To: <20210811122927.900604-1-mlevitsk@redhat.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -84,57 +89,78 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 04/08/21 10:57, Oliver Upton wrote:
-> KVM's current means of saving/restoring system counters is plagued with
-> temporal issues. At least on ARM64 and x86, we migrate the guest's
-> system counter by-value through the respective guest system register
-> values (cntvct_el0, ia32_tsc). Restoring system counters by-value is
-> brittle as the state is not idempotent: the host system counter is still
-> oscillating between the attempted save and restore. Furthermore, VMMs
-> may wish to transparently live migrate guest VMs, meaning that they
-> include the elapsed time due to live migration blackout in the guest
-> system counter view. The VMM thread could be preempted for any number of
-> reasons (scheduler, L0 hypervisor under nested) between the time that
-> it calculates the desired guest counter value and when KVM actually sets
-> this counter state.
+On 11/08/21 14:29, Maxim Levitsky wrote:
+> Hi!
 > 
-> Despite the value-based interface that we present to userspace, KVM
-> actually has idempotent guest controls by way of system counter offsets.
-> We can avoid all of the issues associated with a value-based interface
-> by abstracting these offset controls in new ioctls. This series
-> introduces new vCPU device attributes to provide userspace access to the
-> vCPU's system counter offset.
+> I would like to publish two debug features which were needed for other stuff
+> I work on.
 > 
-> Patch 1 addresses a possible race in KVM_GET_CLOCK where
-> use_master_clock is read outside of the pvclock_gtod_sync_lock.
+> One is the reworked lx-symbols script which now actually works on at least
+> gdb 9.1 (gdb 9.2 was reported to fail to load the debug symbols from the kernel
+> for some reason, not related to this patch) and upstream qemu.
 > 
-> Patch 2 adopts Paolo's suggestion, augmenting the KVM_{GET,SET}_CLOCK
-> ioctls to provide userspace with a (host_tsc, realtime) instant. This is
-> essential for a VMM to perform precise migration of the guest's system
-> counters.
+> The other feature is the ability to trap all guest exceptions (on SVM for now)
+> and see them in kvmtrace prior to potential merge to double/triple fault.
 > 
-> Patches 3-4 are some preparatory changes for exposing the TSC offset to
-> userspace. Patch 5 provides a vCPU attribute to provide userspace access
-> to the TSC offset.
+> This can be very useful and I already had to manually patch KVM a few
+> times for this.
+> I will, once time permits, implement this feature on Intel as well.
 > 
-> Patches 6-7 implement a test for the new additions to
-> KVM_{GET,SET}_CLOCK.
+> V2:
 > 
-> Patch 8 fixes some assertions in the kvm device attribute helpers.
+>   * Some more refactoring and workarounds for lx-symbols script
 > 
-> Patches 9-10 implement at test for the tsc offset attribute introduced in
-> patch 5.
+>   * added KVM_GUESTDBG_BLOCKIRQ flag to enable 'block interrupts on
+>     single step' together with KVM_CAP_SET_GUEST_DEBUG2 capability
+>     to indicate which guest debug flags are supported.
+> 
+>     This is a replacement for unconditional block of interrupts on single
+>     step that was done in previous version of this patch set.
+>     Patches to qemu to use that feature will be sent soon.
+> 
+>   * Reworked the the 'intercept all exceptions for debug' feature according
+>     to the review feedback:
+> 
+>     - renamed the parameter that enables the feature and
+>       moved it to common kvm module.
+>       (only SVM part is currently implemented though)
+> 
+>     - disable the feature for SEV guests as was suggested during the review
+>     - made the vmexit table const again, as was suggested in the review as well.
+> 
+> V3:
+>   * Modified a selftest to cover the KVM_GUESTDBG_BLOCKIRQ
+>   * Rebased on kvm/queue
+> 
+> Best regards,
+>          Maxim Levitsky
+> 
+> Maxim Levitsky (6):
+>    KVM: SVM: split svm_handle_invalid_exit
+>    KVM: x86: add force_intercept_exceptions_mask
+>    KVM: SVM: implement force_intercept_exceptions_mask
+>    scripts/gdb: rework lx-symbols gdb script
+>    KVM: x86: implement KVM_GUESTDBG_BLOCKIRQ
+>    KVM: selftests: test KVM_GUESTDBG_BLOCKIRQ
+> 
+>   Documentation/virt/kvm/api.rst                |   1 +
+>   arch/x86/include/asm/kvm_host.h               |   5 +-
+>   arch/x86/include/uapi/asm/kvm.h               |   1 +
+>   arch/x86/kvm/svm/svm.c                        |  87 +++++++-
+>   arch/x86/kvm/svm/svm.h                        |   6 +-
+>   arch/x86/kvm/x86.c                            |  12 +-
+>   arch/x86/kvm/x86.h                            |   2 +
+>   kernel/module.c                               |   8 +-
+>   scripts/gdb/linux/symbols.py                  | 203 ++++++++++++------
+>   .../testing/selftests/kvm/x86_64/debug_regs.c |  24 ++-
+>   10 files changed, 266 insertions(+), 83 deletions(-)
+> 
 
-The x86 parts look good, except that patch 3 is a bit redundant with my 
-idea of altogether getting rid of the pvclock_gtod_sync_lock.  That said 
-I agree that patches 1 and 2 (and extracting kvm_vm_ioctl_get_clock and 
-kvm_vm_ioctl_set_clock) should be done before whatever locking changes 
-have to be done.
+Queued 1-5-6.
 
-Time is ticking for 5.15 due to my vacation, I'll see if I have some 
-time to look at it further next week.
+For patches 2 and 3, please add VMX support too.
 
-I agree that arm64 can be done separately from x86.
+For patch 4, it's not KVM :) so please submit it separately.
 
 Paolo
 
