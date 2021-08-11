@@ -2,96 +2,92 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3D5273E8A0B
-	for <lists+kvm@lfdr.de>; Wed, 11 Aug 2021 08:10:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 292813E8ACB
+	for <lists+kvm@lfdr.de>; Wed, 11 Aug 2021 09:09:52 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234609AbhHKGK2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 11 Aug 2021 02:10:28 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:47264 "EHLO
+        id S235109AbhHKHKO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 11 Aug 2021 03:10:14 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:22281 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S234501AbhHKGK1 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 11 Aug 2021 02:10:27 -0400
+        by vger.kernel.org with ESMTP id S234855AbhHKHKL (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 11 Aug 2021 03:10:11 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1628662204;
+        s=mimecast20190719; t=1628665787;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=Lt7s6a/ADOsLO3OlJslpQTleS5qgFcdo019Iim0BZnY=;
-        b=T/QBgTuowrlNGm8NI7gdLXxC+a8kLB2St0BxPKD3wm2uzEUbeRT7Fwj7DzY27P9F1FDhu+
-        M25G3jWnNkBrit3I8D6vKjChasfSGfSrJuOLa8WYU9s1MfP0pV1ks1Ip6SEZQ8R+Gg+58G
-        3cZXvbhhFuC3vXovccpFBREqg8fZH0Q=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-178-NiOgtYwMO7OLi3MuzXGRNg-1; Wed, 11 Aug 2021 02:09:58 -0400
-X-MC-Unique: NiOgtYwMO7OLi3MuzXGRNg-1
-Received: by mail-wr1-f71.google.com with SMTP id z10-20020a5d440a0000b0290154e0f00348so353933wrq.4
-        for <kvm@vger.kernel.org>; Tue, 10 Aug 2021 23:09:58 -0700 (PDT)
+        bh=hoS/qp7odMiW1j0/xTIU4hbReBtSD40PKHL686RTz8k=;
+        b=M5e/PEelLwpxkJyBAEOL0ZJ6yqVODd5iA9fmMSSLO1cZNhLnZ14WaNmjIcks0Wh65RHeOr
+        F3Js2PPdP4LEx/d+PGnTH2fayA4oXCovKaHjqdlmOb3vjaaSlTtSoieMJKZFnHy5G/WJMk
+        8gm6xAD7Dg595FXa0dEgHv2Uuwp/2pE=
+Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
+ [209.85.208.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-584-mcD3uf-YMJy6VzcExIkDcA-1; Wed, 11 Aug 2021 03:09:46 -0400
+X-MC-Unique: mcD3uf-YMJy6VzcExIkDcA-1
+Received: by mail-ed1-f69.google.com with SMTP id v11-20020a056402348bb02903be68e116adso748886edc.14
+        for <kvm@vger.kernel.org>; Wed, 11 Aug 2021 00:09:45 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=Lt7s6a/ADOsLO3OlJslpQTleS5qgFcdo019Iim0BZnY=;
-        b=IPZyaX8ev3yerWKL0YWod8jbxVJpWQ/libzwVEeGXDWTdORjez0cSL4ZQBVphEAQVk
-         WwiwbOz2OiPAIxFoBIPg2RgxL1oxOTHOT4pVR/K6DepclfJvxnamtxZlCZ5zCj6BIhw4
-         vkoB5SgaKk89LaTurhfDQPiPL76HUNk2/X6v1zqX24OreM9ERq4cE+bYzWiE193LkwCF
-         YxA5kusFBz/o/jOPfLkc/mBbXfVjFwA0e1zzOqRLoibmOcLLX+OeDiUxkmyE7mMXBlfA
-         AUYC8HalY082lD03ShmJBwzXrXyvfAv/y11mmEfecDbmRxDnlFwd5g2nJ8y5Fb2Kb7qS
-         oMWg==
-X-Gm-Message-State: AOAM530I+gv/3vigcNYDuM6/PhqgsR0QoyppMYnZnwfVtc4ByaMIEriY
-        RJzo5eAxoDU0VMP1jmf4VghBqcb69ne8AU7drLTsPefZXGRHe6haSvmk16R0+SIRiEHYfaZHBgS
-        HcgE5zNO+xtd5
-X-Received: by 2002:a7b:c041:: with SMTP id u1mr25265964wmc.95.1628662197576;
-        Tue, 10 Aug 2021 23:09:57 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxAjRPWrxT2VPV0q6Mq4630l0CqJLrcYde5bLE6JqFuzM5k1RpHnY4jVZWpcU2E+dDNhKzYiw==
-X-Received: by 2002:a7b:c041:: with SMTP id u1mr25265946wmc.95.1628662197428;
-        Tue, 10 Aug 2021 23:09:57 -0700 (PDT)
-Received: from thuth.remote.csb (nat-pool-str-t.redhat.com. [149.14.88.106])
-        by smtp.gmail.com with ESMTPSA id k31sm7171198wms.31.2021.08.10.23.09.56
+        bh=hoS/qp7odMiW1j0/xTIU4hbReBtSD40PKHL686RTz8k=;
+        b=BwbVTzy37uMbyPODJbWQr9f2gSbVlQWFDPeewhQwAyAFvIlo71im7j9M2uGjD2cfZm
+         c2lSbPhRpaTTN+3JRYjDqrX9QhNvXEcekGGxlwQf5UP9hoiJM4rwtfrCB8SswuyoXnjC
+         BLoLr0j9K9x8agUl/nCYwZWtJoGvCbbtxISE9gq2FpjriVQCqLF8VlIYQj+R21azHyqp
+         yo+5Uta9bq7vYGUh6S8zKozD9X/N+cX/4oPhvxhUjP99TQB4wLj2fV0yFHsTDAp5GCto
+         artirmaAJ3kZwR5JRPOog2cKY63zM+YxwJOf1Z+i2h69dP8wZ1wChTk+WAyUjeMDFFis
+         HQjw==
+X-Gm-Message-State: AOAM531YiJv63nQfR8QIzsB45KsXdx722E+Wkab/Kna+KjHGpw+441GB
+        eyae0TryutbH9IJA7ZY2PO9SsCYoJZBwQNKuTpxy8NpDiFfkaFHzL7SEu45udU77jI6tPIXMOeH
+        vUyZM+YzJlxNnJa6cFqDpoVvZMUVe8mZSQjr/O+ZWuRXCM1Sc1tZuhKcc3HVKpaYu
+X-Received: by 2002:aa7:dcc2:: with SMTP id w2mr3607580edu.192.1628665784349;
+        Wed, 11 Aug 2021 00:09:44 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzoI5/iQErvAAcBl2s9X9EI5NBkB9g2qn2e86IdzETHQDygFAyZP9ZbrnM9YYyPV3YqWlljvQ==
+X-Received: by 2002:aa7:dcc2:: with SMTP id w2mr3607565edu.192.1628665784180;
+        Wed, 11 Aug 2021 00:09:44 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:63a7:c72e:ea0e:6045? ([2001:b07:6468:f312:63a7:c72e:ea0e:6045])
+        by smtp.gmail.com with ESMTPSA id m21sm10569136edc.5.2021.08.11.00.09.42
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 10 Aug 2021 23:09:56 -0700 (PDT)
-Subject: Re: [PATCH v12] qapi: introduce 'query-x86-cpuid' QMP command.
-To:     Eduardo Habkost <ehabkost@redhat.com>,
-        Markus Armbruster <armbru@redhat.com>
-Cc:     Valeriy Vdovin <valeriy.vdovin@virtuozzo.com>,
-        qemu-devel@nongnu.org,
-        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-        Eric Blake <eblake@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Marcelo Tosatti <mtosatti@redhat.com>,
-        Richard Henderson <richard.henderson@linaro.org>,
-        Laurent Vivier <lvivier@redhat.com>, kvm@vger.kernel.org,
-        Denis Lunev <den@openvz.org>,
-        Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-References: <20210728125402.2496-1-valeriy.vdovin@virtuozzo.com>
- <87eeb59vwt.fsf@dusky.pond.sub.org>
- <20210810185644.iyqt3iao2qdqd5jk@habkost.net>
-From:   Thomas Huth <thuth@redhat.com>
-Message-ID: <2191952f-6989-771a-1f0a-ece58262d141@redhat.com>
-Date:   Wed, 11 Aug 2021 08:09:55 +0200
+        Wed, 11 Aug 2021 00:09:43 -0700 (PDT)
+Subject: Re: [kvm-unit-tests PATCH 1/2] x86: access: Fix timeout failure by
+ limiting number of flag combinations
+To:     Babu Moger <babu.moger@amd.com>,
+        Sean Christopherson <seanjc@google.com>
+Cc:     thuth@redhat.com, drjones@redhat.com, kvm@vger.kernel.org
+References: <162826604263.32391.7580736822527851972.stgit@bmoger-ubuntu>
+ <162826611747.32391.16149996928851353357.stgit@bmoger-ubuntu>
+ <YQ1pA9nN6DP0veQ1@google.com> <1f30bd0f-da1b-2aa0-e0c8-76d3b5410bcd@amd.com>
+ <7d0aa9b1-2eb7-8c89-9c2b-7712c5031aed@amd.com>
+ <4af3323d-90e9-38a0-f11a-f4e89d0c0b50@amd.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <b348c0f6-70fa-053f-86fa-8284b7bc33a4@redhat.com>
+Date:   Wed, 11 Aug 2021 09:09:41 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.12.0
+ Thunderbird/78.11.0
 MIME-Version: 1.0
-In-Reply-To: <20210810185644.iyqt3iao2qdqd5jk@habkost.net>
+In-Reply-To: <4af3323d-90e9-38a0-f11a-f4e89d0c0b50@amd.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 10/08/2021 20.56, Eduardo Habkost wrote:
-> On Sat, Aug 07, 2021 at 04:22:42PM +0200, Markus Armbruster wrote:
->> Is this intended to be a stable interface?  Interfaces intended just for
->> debugging usually aren't.
-> 
-> I don't think we need to make it a stable interface, but I won't
-> mind if we declare it stable.
+On 11/08/21 01:38, Babu Moger wrote:
+> No. This will not work. The PKU feature flag is bit 30. That is 2^30
+> iterations to cover the tests for this feature. Looks like I need to split
+> the tests into PKU and non PKU tests. For PKU tests I may need to change
+> the bump frequency (in ac_test_bump_one) to much higher value. Right now,
+> it is 1. Let me try that,
 
-If we don't feel 100% certain yet, it's maybe better to introduce this with 
-a "x-" prefix first, isn't it? I.e. "x-query-x86-cpuid" ... then it's clear 
-that this is only experimental/debugging/not-stable yet. Just my 0.02 €.
+The simplest way to cut on tests, which is actually similar to this 
+patch, would be:
 
-  Thomas
+- do not try all combinations of PTE access bits when reserved bits are set
+
+- do not try combinations with more than one reserved bit set
+
+Paolo
 
