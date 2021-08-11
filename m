@@ -2,174 +2,176 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 506363E94B9
-	for <lists+kvm@lfdr.de>; Wed, 11 Aug 2021 17:40:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 49E7E3E950E
+	for <lists+kvm@lfdr.de>; Wed, 11 Aug 2021 17:52:54 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233176AbhHKPkY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 11 Aug 2021 11:40:24 -0400
-Received: from mail-dm6nam08on2043.outbound.protection.outlook.com ([40.107.102.43]:22575
-        "EHLO NAM04-DM6-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S232120AbhHKPkX (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 11 Aug 2021 11:40:23 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=daLEHybPecI6ZRHIqH2cWATVIfPB+WooynNVSuvLkAtnRwsGnHNpn3k78Oh+gBP8L59PRPP2nBUqJt+Bfer9wZOhl4a1j4NqMFiiqXjL9O9YvADSKo8pjnU9IxV166s07Gm+zWT+JZzYXX59TlPnLlMCetnw/TKr/P48K9eCA1Z4I/sngLElIb9YUZavHVRKdrE1onEf7g6L3p9apkiSdy1wLbssK2NkXGgsoKSxZpaP30A0qur2zgFsflgJHxCzAKjjpKUxJjaUw4BHJ+FPQPTNen9QCCBJHgdLBNaaXxnuBm/cOdgnRp7JRZIJZq49/geQLv0nSy9tckgYqmRa8A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=2evfU3JKF12i+CHIj3gsXs8GalyqMJpNfF6tW4wUq2o=;
- b=YsjP+FkVvQzAPeqmTMzAOI9rlxik8Fapr8uLmUgc8SPWzBmIuQn4tnloY0ZMtzyUVOXS2/PbcQgFxngzEp4BXlMeUWqoPbHInwGzG3tYh1Q7+eLhvnADEh9s4vzMPr+/i2S5syNC1WlBuTBkWLs53OHFdiVoLTg5RRWcxJKravJuwSlGyypN9InJ4gaZAzqBV7w/z0otj1uWX3e8uJskf3kRTnekM1TvaOOWC+hDjAvL7TGl6unufyADcbZn245m1QW6ZBjtvvHxNTvy4vFLPa26tlRkn5qLge2279CsTzc0CrM35z71XdN4gtgrT7cfh5lRzgzQv7m7WPHnQg9aRg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=2evfU3JKF12i+CHIj3gsXs8GalyqMJpNfF6tW4wUq2o=;
- b=V8IePYDNxlfzfQdtdtha00szkrEQwwgv+NXNgJ4tlOcyTgsoMxTTfNqSPuxFP4bN/zQGAQRtNV5NNFtUzM/pIdq7Ht70s1yUh2GO/1wQ8K8jEz/p4SqROPRsskmIsCdPkGCCewt+g4kMSH5+QqCD96gcEdUOr7HW0n3eDqs26Qg=
-Authentication-Results: microsoft.com; dkim=none (message not signed)
- header.d=none;microsoft.com; dmarc=none action=none header.from=amd.com;
-Received: from DM4PR12MB5229.namprd12.prod.outlook.com (2603:10b6:5:398::12)
- by DM8PR12MB5447.namprd12.prod.outlook.com (2603:10b6:8:36::7) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.4415.13; Wed, 11 Aug 2021 15:39:58 +0000
-Received: from DM4PR12MB5229.namprd12.prod.outlook.com
- ([fe80::d560:d21:cd59:9418]) by DM4PR12MB5229.namprd12.prod.outlook.com
- ([fe80::d560:d21:cd59:9418%6]) with mapi id 15.20.4415.016; Wed, 11 Aug 2021
- 15:39:58 +0000
-Subject: Re: [PATCH 01/11] mm: Introduce a function to check for
- virtualization protection features
-To:     "Kuppuswamy, Sathyanarayanan" 
-        <sathyanarayanan.kuppuswamy@linux.intel.com>,
-        linux-kernel@vger.kernel.org, x86@kernel.org,
-        linuxppc-dev@lists.ozlabs.org, linux-s390@vger.kernel.org,
-        iommu@lists.linux-foundation.org, kvm@vger.kernel.org,
-        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
-        linux-graphics-maintainer@vmware.com,
-        amd-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
-        kexec@lists.infradead.org, linux-fsdevel@vger.kernel.org
-Cc:     Borislav Petkov <bp@alien8.de>,
-        Brijesh Singh <brijesh.singh@amd.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Andi Kleen <ak@linux.intel.com>,
-        Tianyu Lan <Tianyu.Lan@microsoft.com>
-References: <cover.1627424773.git.thomas.lendacky@amd.com>
- <cbc875b1d2113225c2b44a2384d5b303d0453cf7.1627424774.git.thomas.lendacky@amd.com>
- <805946e3-5138-3565-65eb-3cb8ac6f0b3e@linux.intel.com>
-From:   Tom Lendacky <thomas.lendacky@amd.com>
-Message-ID: <e7208040-9ccc-b2df-b2d3-a06ed793908b@amd.com>
-Date:   Wed, 11 Aug 2021 10:39:54 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.11.0
-In-Reply-To: <805946e3-5138-3565-65eb-3cb8ac6f0b3e@linux.intel.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: SA0PR11CA0050.namprd11.prod.outlook.com
- (2603:10b6:806:d0::25) To DM4PR12MB5229.namprd12.prod.outlook.com
- (2603:10b6:5:398::12)
+        id S233285AbhHKPxP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 11 Aug 2021 11:53:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49500 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232973AbhHKPwy (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 11 Aug 2021 11:52:54 -0400
+Received: from mail-pj1-x102f.google.com (mail-pj1-x102f.google.com [IPv6:2607:f8b0:4864:20::102f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7C388C061765
+        for <kvm@vger.kernel.org>; Wed, 11 Aug 2021 08:52:20 -0700 (PDT)
+Received: by mail-pj1-x102f.google.com with SMTP id a8so4130373pjk.4
+        for <kvm@vger.kernel.org>; Wed, 11 Aug 2021 08:52:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=5LIL7TooUdF4jsk1ShMs5Hj6yTpAYJOQMbpQgvOSIVs=;
+        b=TZ0ZBPoAkcrtXMYs67yvlc/TxTa93EDbVEhrkTkgjtjd9HqIb9zMkXF8uBGNGxlREo
+         sACE0/6tzrQCPH1P8KznR9K049lCmT4LVltVmhex2nSH6LL8Cu0xS6K9suZYeHt+dWzy
+         bMv3K/g1wEyJ8++ThT/UujdWetAiU+ZQEoQOWzBeR0+0wRk51yirvqjRQln4EVocUdHM
+         SPqAtOL5jLhymUv9WpKnhifW2Il6qdmRF3GBsJen9yzthPCnlg3HdGZHamCIpM15ApSN
+         FFa1sJclUnoHbS5C/GNXdKixfBCvcchBZvCtpbJFPzL5UiOo4qH8EAb3/AMg77tgFvVY
+         6dQQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=5LIL7TooUdF4jsk1ShMs5Hj6yTpAYJOQMbpQgvOSIVs=;
+        b=hTFrS4OWzEU5ftJ6OXdvVsiELmj5YPdMMHNztRPhjSJqHO/bj+t06KXBVwpuE1SqCe
+         NXhsXdQ9mgiYAbT470HnDSS8rVZh5VYmY/pIteLGeJba9VrIxpyXli7c52xGK29OtR20
+         D7ANZeFP3e1hSQa9YdEw3VBFOfK9E0oUUKcyq00BFukO+K07kMPau0FLtKbNSpkyCGYX
+         3HCJqtJakGp8E6dsnoOngLFaPm4MUspemJcsfsGmN1A1AXFJ52OmDlWiQ5S52EnBTZp3
+         DWuo+NMkEAT0yfMw557/BNQ6p3N2fHFNSOfoUTYOVOPalCPWOzY8dLDWyb4B9Y+jhSwB
+         tRrg==
+X-Gm-Message-State: AOAM533Px/WWannKdUZKDrUZRN5OQDC/0eQnfFAcEiEViEHO1b3WLYe4
+        ysYWJkrH7uFZFrPE3gw3kCaDNg==
+X-Google-Smtp-Source: ABdhPJzy7ItsvyY0Z/dD5yQa+gbL0TSGT69lYVYnkCI4eCcvMSWrsciOyAsWNdeHSB464MyvFOY3wQ==
+X-Received: by 2002:a63:4e51:: with SMTP id o17mr399343pgl.126.1628697139744;
+        Wed, 11 Aug 2021 08:52:19 -0700 (PDT)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id z131sm10806573pfc.159.2021.08.11.08.52.18
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 11 Aug 2021 08:52:19 -0700 (PDT)
+Date:   Wed, 11 Aug 2021 15:52:13 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Ben Gardon <bgardon@google.com>
+Subject: Re: [PATCH 1/2] KVM: x86/mmu: Protect marking SPs unsync when using
+ TDP MMU with spinlock
+Message-ID: <YRPyLagRbw5QKoNc@google.com>
+References: <20210810224554.2978735-1-seanjc@google.com>
+ <20210810224554.2978735-2-seanjc@google.com>
+ <74bb6910-4a0c-4d2f-e6b5-714a3181638e@redhat.com>
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from [10.236.30.241] (165.204.77.1) by SA0PR11CA0050.namprd11.prod.outlook.com (2603:10b6:806:d0::25) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4415.14 via Frontend Transport; Wed, 11 Aug 2021 15:39:56 +0000
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 0dc406e1-0586-4eca-cb83-08d95cde45f9
-X-MS-TrafficTypeDiagnostic: DM8PR12MB5447:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <DM8PR12MB5447EBEF2583098748EDDEC9ECF89@DM8PR12MB5447.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:1013;
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: GbpvZHrEktXDOQPMRWHMYiyUuTlNMQ6O97bArWsUpsez9UrKjNMsVtXUVMkdTpTToQA7kNzulOyAVG9RqiQKxhWV6tgQDqTBFPqpRZiAfHwsXEtAq1jVtjb1IC51fOHT2KR5+2gsHs+FvusJR9HkXxblK5nslI0w+2y9tHdH4kZatggMfQw+gskbQxLFMkYyCZ2Bmf4Zzoo7Y55zv8kx+f1XBXeqUj1G/KEkXimTbq/L0I4QxhDkeY/LT8D8Il2sFoELSVY4x7zNzPhqIWy2h2ADJfzSqguJAgpTSUQUfl0A2exnWt9qJmYqWFHfkkRCLStYlOWF9rsO397jYxDT4KdfEjpSaxI+CRle5jloFYCYQiQo+r+ZlVmiaDe6O1xFscV98V+BB455lX2cB1W1Zm2ku4WYNrNgY6WfeoguRM5i2yL2FAYiRgiBli6djLvYKGr9axkeZ5vxHMQZyBU0slxvA87yZIfln+Ot/yCrJh3bwS8Loc8+/60vUGJLhR53oPFxinWlZT4u2DchHPE87DWwM3oLo1zojFEbVfJmsATJERlD6EPdgGvDwauUpoV2Hte9wi5TgPNEvWqxm8yCyj7Pk4Wgjry5iXKfFgnDdhAcWCxAwvVtqirs1hurFf+8GhH4xNyqXulJWFHDyGsdNNCLWaZhWRjtBz9JjO/s6X1S7OyGsgcaem58mY/zbJTG6IWqjsaPgivu5mxJ3BlLfa+bJN8F+JL9/8IQ0eP4JC2IqVLn0+YAN+UFV4ClE5jL
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR12MB5229.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(346002)(396003)(136003)(39860400002)(376002)(31686004)(26005)(478600001)(53546011)(54906003)(186003)(36756003)(16576012)(2906002)(2616005)(7416002)(4326008)(956004)(316002)(86362001)(5660300002)(921005)(38100700002)(66476007)(66946007)(8936002)(6486002)(8676002)(31696002)(66556008)(43740500002)(45980500001);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?RTJFanZpMUZGa3pNZ2hERXpwQlNsQTBxUTZNWWJQUDBaeUs0QVhSRXMwVDlL?=
- =?utf-8?B?Qmt3Y1hHUmVpYVo5QzVyczZvTlZ4VTBYTTZpdy9WS2dWdTh6SFVEaUt2R05s?=
- =?utf-8?B?YXozRm5hUVBYaTYxVzRMUWg2ZFAxOW5UbjhPOVlGQXd4Z21pYlFEbGpKR0kx?=
- =?utf-8?B?YUpadXE1NWRURUdiM2JIRjNyVUpPR1RQTnpuTW9PN1dhVGZJK1VCU2hqTkdK?=
- =?utf-8?B?dlhFWnFqOUMxY3VBUVpRR2pKRyt1TVVraXNtNk1jc3FMSVl4dWtPNk5ibDhS?=
- =?utf-8?B?WnpEdmxQMldBM0ZlZk1Pb1hDRzNaakVNaDVhWE50djBldW9NbWZORzduNE9W?=
- =?utf-8?B?MTFDcml4SUt5QnE3SGdBRE9iZHcwemgra0pKS3RSakl1b3hJbHovMlR3RFNW?=
- =?utf-8?B?VnpTelplT2tNVkcwMkpZVEtjTks2Tk5ZTmlacExBUCtDT1o4QnJKclozSlJ5?=
- =?utf-8?B?ZndLeXd2VFptdTBDVTdSbUdhcHM3a2RSOGtBUk9nc1AwajdkNVJDUERyMDU4?=
- =?utf-8?B?T1pqK0QzTEluRGkxYzMxczFFdXpSSFBib25MaTlVSzlxdkliTHpJTERzSXFN?=
- =?utf-8?B?VUJBelNQVUJ6VDZKQlhzK2s0bjZOai9sRDJMV1pXcVc2dnEycmJiM1hyV1ZQ?=
- =?utf-8?B?Wmp4cnAzeURjS0FENUlJRVNJb29zb1BKVXRyc2hUMFY4Y24vQlVyUStQNDZV?=
- =?utf-8?B?cFJxMWZxR2dGQ3J5ZU9FYjRrTkRXRlN6b2pxTzB2di9ycEd6ZUd6ajgrOGxI?=
- =?utf-8?B?bVROTmJzbGRuY2NaNHkwcFlidDA3U2VrUWdoU2xpaUk3dG1yclg2NkY4NEhI?=
- =?utf-8?B?STQ4NmUvN2xVSk5lZDQ1SFc0RE94RkdUbXBleEFhWVp4dnphRjBPVXhLTHhy?=
- =?utf-8?B?K3lZYVNiNDZsaTFUeE9WK1djblF6Y3Bhd1dyeEpoSUJnUnhGMjBEbHhPamJ6?=
- =?utf-8?B?UWNvcEUrMEJMNi8ySXQvaHdoNW8wUGo1L0ZqNkZnSHdoaWV6MllOU0NrVi9w?=
- =?utf-8?B?RkJodDV2Sk85aTcyOFRjOFRvVE4ydW5EczZLcnpaaHdscUNNK3FJelJVZDNk?=
- =?utf-8?B?WnVZVFVwMk9UVGE3OEF0d1dVcmp1cmZydUFuQVREdE9UU1pRQzJCM3FGeTg2?=
- =?utf-8?B?Ti9XMXdoQTl4TU1HM2FwU3FrTzZmTkVyRkNQd3pYYkRpSGR3WHFYeUJEbUlH?=
- =?utf-8?B?a055SnlIMGNxNFJ2KzdEbXQray9mU0JsVEZqb2xicDlMd0Q4YWxCR0grcGtl?=
- =?utf-8?B?cmhZV0xWOTNGK20vV3lwb1lpeWFlaEhYekpWdEVUTlgwME12UkNVZHNRblpk?=
- =?utf-8?B?Z05NcFU0am5yRWcrK2JyT3JMQ2xIeEp5cGlCejBYL3UwVmVQOTVqVCs0Y0dU?=
- =?utf-8?B?SURCeEZJTXFUMk0yc0JaM1RZMmNjNDF3UUJUYkhoSmlRYkFnbjVzV3AvTkpn?=
- =?utf-8?B?bWp2R3IrSnh6VytMWmw2RGNUdzVOdFpDWTJ2Y2RJUDdZT1lFVjhRZm5qZjFx?=
- =?utf-8?B?VVhkUVQxVytJdmdsVlpnOWZmZ05PZmplckJlUEh3bXJMUVNkSkt1YTk1L2xn?=
- =?utf-8?B?NWc1UWZSSk9jdVRsV1l6UHdySzNaNCtHQkVBNFNKV2UreTFlVzFyS3djMlhE?=
- =?utf-8?B?WnBxZSs5b2R5dlRVS2lNZWlpUVg5ZU1XUlRjSlc5cGJyWEhRY01YV0ZzRE1u?=
- =?utf-8?B?T3pUck1uTVpDNU94eTg3OXBSS3V2eWtJTzdsc3d6QWdiZk9mdk9XVTJTdkJy?=
- =?utf-8?Q?QoSrilrwpTZt6Dqeo2Wtk6LZbxABIZJ1LolbsoS?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 0dc406e1-0586-4eca-cb83-08d95cde45f9
-X-MS-Exchange-CrossTenant-AuthSource: DM4PR12MB5229.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Aug 2021 15:39:57.9206
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: OELy2RTyEG0+9O72k8UtSUmgfgE4amU/1OUQMRVL6kZ0hhl35eyfyQBhQcHDk0XEIE1+XWScyv+bWtCGRlebiQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM8PR12MB5447
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <74bb6910-4a0c-4d2f-e6b5-714a3181638e@redhat.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 8/11/21 9:53 AM, Kuppuswamy, Sathyanarayanan wrote:
-> On 7/27/21 3:26 PM, Tom Lendacky wrote:
->> diff --git a/include/linux/protected_guest.h
->> b/include/linux/protected_guest.h
->> new file mode 100644
->> index 000000000000..f8ed7b72967b
->> --- /dev/null
->> +++ b/include/linux/protected_guest.h
->> @@ -0,0 +1,32 @@
->> +/* SPDX-License-Identifier: GPL-2.0-only */
->> +/*
->> + * Protected Guest (and Host) Capability checks
->> + *
->> + * Copyright (C) 2021 Advanced Micro Devices, Inc.
->> + *
->> + * Author: Tom Lendacky<thomas.lendacky@amd.com>
->> + */
->> +
->> +#ifndef _PROTECTED_GUEST_H
->> +#define _PROTECTED_GUEST_H
->> +
->> +#ifndef __ASSEMBLY__
+On Wed, Aug 11, 2021, Paolo Bonzini wrote:
+> On 11/08/21 00:45, Sean Christopherson wrote:
+> > Use an entirely new spinlock even though piggybacking tdp_mmu_pages_lock
+> > would functionally be ok.  Usurping the lock could degrade performance when
+> > building upper level page tables on different vCPUs, especially since the
+> > unsync flow could hold the lock for a comparatively long time depending on
+> > the number of indirect shadow pages and the depth of the paging tree.
 > 
-> Can you include headers for bool type and false definition?
+> If we are to introduce a new spinlock, do we need to make it conditional and
+> pass it around like this?  It would be simpler to just take it everywhere
+> (just like, in patch 2, passing "shared == true" to tdp_mmu_link_page is
+> always safe anyway).
 
-Can do.
+It's definitely not necessary to pass it around.  I liked this approach because
+the lock is directly referenced only by the TDP MMU.
 
-Thanks,
-Tom
+My runner up was to key off of is_tdp_mmu_enabled(), which is not strictly
+necessary, but I didn't like checking is_tdp_mmu() this far down the call chain.
+E.g. minus comments and lockdeps
 
-> 
-> --- a/include/linux/protected_guest.h
-> +++ b/include/linux/protected_guest.h
-> @@ -12,6 +12,9 @@
-> 
->  #ifndef __ASSEMBLY__
-> 
-> +#include <linux/types.h>
-> +#include <linux/stddef.h>
-> 
-> Otherwise, I see following errors in multi-config auto testing.
-> 
-> include/linux/protected_guest.h:40:15: error: unknown type name 'bool'
-> include/linux/protected_guest.h:40:63: error: 'false' undeclared (first
-> use in this functi
-> 
+diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+index d574c68cbc5c..651256a10cb9 100644
+--- a/arch/x86/kvm/mmu/mmu.c
++++ b/arch/x86/kvm/mmu/mmu.c
+@@ -2594,6 +2594,8 @@ static void kvm_unsync_page(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp)
+  */
+ int mmu_try_to_unsync_pages(struct kvm_vcpu *vcpu, gfn_t gfn, bool can_unsync)
+ {
++       bool tdp_mmu = is_tdp_mmu_enabled(vcpu->kvm);
++       bool write_locked = !tdp_mmu;
+        struct kvm_mmu_page *sp;
+
+        /*
+@@ -2617,9 +2619,19 @@ int mmu_try_to_unsync_pages(struct kvm_vcpu *vcpu, gfn_t gfn, bool can_unsync)
+                if (sp->unsync)
+                        continue;
+
++               if (!write_locked) {
++                       write_locked = true;
++                       spin_lock(&vcpu->kvm->arch.tdp_mmu_unsync_pages_lock);
++
++                       if (READ_ONCE(sp->unsync))
++                               continue;
++               }
++
+                WARN_ON(sp->role.level != PG_LEVEL_4K);
+                kvm_unsync_page(vcpu, sp);
+        }
++       if (tdp_mmu && write_locked)
++               spin_unlock(&vcpu->kvm->arch.tdp_mmu_unsync_pages_lock);
+
+        /*
+         * We need to ensure that the marking of unsync pages is visible
+
+
+
+All that said, I do not have a strong preference.  Were you thinking something
+like this?
+
+diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+index d574c68cbc5c..b622e8a13b8b 100644
+--- a/arch/x86/kvm/mmu/mmu.c
++++ b/arch/x86/kvm/mmu/mmu.c
+@@ -2595,6 +2595,7 @@ static void kvm_unsync_page(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp)
+ int mmu_try_to_unsync_pages(struct kvm_vcpu *vcpu, gfn_t gfn, bool can_unsync)
+ {
+        struct kvm_mmu_page *sp;
++       bool locked = false;
+
+        /*
+         * Force write-protection if the page is being tracked.  Note, the page
+@@ -2617,9 +2618,34 @@ int mmu_try_to_unsync_pages(struct kvm_vcpu *vcpu, gfn_t gfn, bool can_unsync)
+                if (sp->unsync)
+                        continue;
+
++               /*
++                * TDP MMU page faults require an additional spinlock as they
++                * run with mmu_lock held for read, not write, and the unsync
++                * logic is not thread safe.  Take the spinklock regardless of
++                * the MMU type to avoid extra conditionals/parameters, there's
++                * no meaningful penalty if mmu_lock is held for write.
++                */
++               if (!locked) {
++                       locked = true;
++                       spin_lock(&kvm->arch.mmu_unsync_pages_lock);
++
++                       /*
++                        * Recheck after taking the spinlock, a different vCPU
++                        * may have since marked the page unsync.  A false
++                        * positive on the unprotected check above is not
++                        * possible as clearing sp->unsync _must_ hold mmu_lock
++                        * for write, i.e. unsync cannot transition from 0->1
++                        * while this CPU holds mmu_lock for read.
++                        */
++                       if (READ_ONCE(sp->unsync))
++                               continue;
++               }
++
+                WARN_ON(sp->role.level != PG_LEVEL_4K);
+                kvm_unsync_page(vcpu, sp);
+        }
++       if (locked)
++               spin_unlock(&kvm->arch.mmu_unsync_pages_lock);
+
+        /*
+         * We need to ensure that the marking of unsync pages is visible
