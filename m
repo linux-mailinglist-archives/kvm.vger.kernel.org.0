@@ -2,159 +2,97 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id DE3F93E9275
-	for <lists+kvm@lfdr.de>; Wed, 11 Aug 2021 15:23:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 32D6F3E92DA
+	for <lists+kvm@lfdr.de>; Wed, 11 Aug 2021 15:41:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230426AbhHKNXn (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 11 Aug 2021 09:23:43 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:51675 "EHLO
+        id S231599AbhHKNlj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 11 Aug 2021 09:41:39 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:44223 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230294AbhHKNXV (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 11 Aug 2021 09:23:21 -0400
+        by vger.kernel.org with ESMTP id S231459AbhHKNlj (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 11 Aug 2021 09:41:39 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1628688153;
+        s=mimecast20190719; t=1628689275;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=E8j3Usu6TPeDlqdG02ig6iok7ibfK10nrJnXjIHPT7g=;
-        b=CG1wBbanNPYSldAQzs46DwLYLkJUAkAb2Bw2wzObjcZSi1cqL97K+eD/MgGnGgD8mbGcEP
-        sSZiWjVCrVwEu/6qzco1EjkrZO2tvkKeCG6FrmaG6T1ahVV3+fT2VLD6dSsuq/+VXuR1bL
-        utGnKPrVZvAmhjZ7IyRZnG6sPNKx//Y=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-169-c8uzCiM8MpWpL-j_94rFmw-1; Wed, 11 Aug 2021 09:22:32 -0400
-X-MC-Unique: c8uzCiM8MpWpL-j_94rFmw-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D97D9802922;
-        Wed, 11 Aug 2021 13:22:29 +0000 (UTC)
-Received: from starship (unknown [10.35.206.50])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 2A2AC226E0;
-        Wed, 11 Aug 2021 13:22:23 +0000 (UTC)
-Message-ID: <bb7568d08ea7d3598d71db7631d56b9f288d3f32.camel@redhat.com>
-Subject: Re: [PATCH v3 0/6] KVM: my debug patch queue
-From:   Maxim Levitsky <mlevitsk@redhat.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
-Cc:     Kieran Bingham <kbingham@kernel.org>,
-        Jan Kiszka <jan.kiszka@siemens.com>,
-        Andrew Jones <drjones@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Ingo Molnar <mingo@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
-        Johannes Berg <johannes.berg@intel.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Jessica Yu <jeyu@kernel.org>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Yang Weijiang <weijiang.yang@intel.com>,
-        linux-kernel@vger.kernel.org, Borislav Petkov <bp@alien8.de>,
-        "open list:KERNEL SELFTEST FRAMEWORK" 
-        <linux-kselftest@vger.kernel.org>,
-        "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>,
-        Shuah Khan <shuah@kernel.org>,
-        Andrew Morton <akpm@linux-foundation.org>
-Date:   Wed, 11 Aug 2021 16:22:23 +0300
-In-Reply-To: <1646763f-9f92-bb67-f358-9b17c8000b12@redhat.com>
-References: <20210811122927.900604-1-mlevitsk@redhat.com>
-         <1646763f-9f92-bb67-f358-9b17c8000b12@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
+        bh=Q20KrUkR7MsbG79i79vAF5MOF6BNiEXRrsZS5BYJL/s=;
+        b=Qj1wTagUbrR8KgQF2lWL6ZDSWIhSl+k5DEL+tp4zkMARQk76cZz0aAWKqvXlV9rRqDcEKS
+        Ax3bz5rRkHppB0zOO/fGV/YQOq+JqtXenPP/A2M/4aRqwo3NLixpM3QyupuWSLQG80ChC/
+        63nwUUYUfhgYYspzeA2p2hY9lkYzQTc=
+Received: from mail-lf1-f71.google.com (mail-lf1-f71.google.com
+ [209.85.167.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-456-BTNDM7i2NL2UfYTlCuqwLA-1; Wed, 11 Aug 2021 09:41:14 -0400
+X-MC-Unique: BTNDM7i2NL2UfYTlCuqwLA-1
+Received: by mail-lf1-f71.google.com with SMTP id c24-20020a0565123258b02903c025690adcso898208lfr.22
+        for <kvm@vger.kernel.org>; Wed, 11 Aug 2021 06:41:13 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=Q20KrUkR7MsbG79i79vAF5MOF6BNiEXRrsZS5BYJL/s=;
+        b=egnnAQrbTJqEKOVThM9L1SWJaDkMvvbirlVubfgB/SaKTTo/rTVUTgUYzOJ93tZc1B
+         H5yKLYnSV6RGuhl+LOxgGouCeXqmY8avYTT8/RnfNAtjSuHn0TU16SJgf0tAHnKVkP0G
+         uXApvmqhpwGvpl57ymlLK4nWFgShrMfuBrZHxjYiEjIV3/yMNLUyLiOEj07HVdfL5CLX
+         9iDK7rAalTxD8quH7KoxTN8v5J2A9xO1n1+HcnmLqZw8ISeeray7KYFt1zIUsnj/KcId
+         tQMSjL2QVsQq8GJUH/9VOl3GfL7o0nCY7S+ZOTulYrz5Wh7yB2zfxzXfpaGmiMmDq/sX
+         lxSw==
+X-Gm-Message-State: AOAM533keBWy25AjSmclA2DIZcM43ElWm3B6R1ZO4RR7Moy8m89GZPmc
+        OCo5eHBet0rimck+sEh+Va2y66badurt8It8V+kwdbPLn4ABXlAEEW9lPAaPCYFm71AVi2GMcBX
+        M7j9YTmGv3RGTNA1QUOn7sBRWnW8x
+X-Received: by 2002:a05:651c:1318:: with SMTP id u24mr23436031lja.200.1628689272166;
+        Wed, 11 Aug 2021 06:41:12 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJz+6BdoUaBCFxukN4ueUP4CyCqCQCjOrtjSlQ68bQIAme3PFXhQwnvtCXRS1PnGzqfNmqUY8Frv1CWTH7KUc1w=
+X-Received: by 2002:a05:651c:1318:: with SMTP id u24mr23436016lja.200.1628689271960;
+ Wed, 11 Aug 2021 06:41:11 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+References: <20210728125402.2496-1-valeriy.vdovin@virtuozzo.com>
+ <87eeb59vwt.fsf@dusky.pond.sub.org> <20210810185644.iyqt3iao2qdqd5jk@habkost.net>
+ <2191952f-6989-771a-1f0a-ece58262d141@redhat.com>
+In-Reply-To: <2191952f-6989-771a-1f0a-ece58262d141@redhat.com>
+From:   Eduardo Habkost <ehabkost@redhat.com>
+Date:   Wed, 11 Aug 2021 09:40:56 -0400
+Message-ID: <CAOpTY_qbsqh9Tf8LB3EOOi_gkREotdpUyuF3-d_sBFsof3-9KQ@mail.gmail.com>
+Subject: Re: [PATCH v12] qapi: introduce 'query-x86-cpuid' QMP command.
+To:     Thomas Huth <thuth@redhat.com>
+Cc:     Markus Armbruster <armbru@redhat.com>,
+        Valeriy Vdovin <valeriy.vdovin@virtuozzo.com>,
+        "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+        Eric Blake <eblake@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Marcelo Tosatti <mtosatti@redhat.com>,
+        Richard Henderson <richard.henderson@linaro.org>,
+        Laurent Vivier <lvivier@redhat.com>, kvm@vger.kernel.org,
+        Denis Lunev <den@openvz.org>,
+        Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 2021-08-11 at 15:10 +0200, Paolo Bonzini wrote:
-> On 11/08/21 14:29, Maxim Levitsky wrote:
-> > Hi!
-> > 
-> > I would like to publish two debug features which were needed for other stuff
-> > I work on.
-> > 
-> > One is the reworked lx-symbols script which now actually works on at least
-> > gdb 9.1 (gdb 9.2 was reported to fail to load the debug symbols from the kernel
-> > for some reason, not related to this patch) and upstream qemu.
-> > 
-> > The other feature is the ability to trap all guest exceptions (on SVM for now)
-> > and see them in kvmtrace prior to potential merge to double/triple fault.
-> > 
-> > This can be very useful and I already had to manually patch KVM a few
-> > times for this.
-> > I will, once time permits, implement this feature on Intel as well.
-> > 
-> > V2:
-> > 
-> >   * Some more refactoring and workarounds for lx-symbols script
-> > 
-> >   * added KVM_GUESTDBG_BLOCKIRQ flag to enable 'block interrupts on
-> >     single step' together with KVM_CAP_SET_GUEST_DEBUG2 capability
-> >     to indicate which guest debug flags are supported.
-> > 
-> >     This is a replacement for unconditional block of interrupts on single
-> >     step that was done in previous version of this patch set.
-> >     Patches to qemu to use that feature will be sent soon.
-> > 
-> >   * Reworked the the 'intercept all exceptions for debug' feature according
-> >     to the review feedback:
-> > 
-> >     - renamed the parameter that enables the feature and
-> >       moved it to common kvm module.
-> >       (only SVM part is currently implemented though)
-> > 
-> >     - disable the feature for SEV guests as was suggested during the review
-> >     - made the vmexit table const again, as was suggested in the review as well.
-> > 
-> > V3:
-> >   * Modified a selftest to cover the KVM_GUESTDBG_BLOCKIRQ
-> >   * Rebased on kvm/queue
-> > 
-> > Best regards,
-> >          Maxim Levitsky
-> > 
-> > Maxim Levitsky (6):
-> >    KVM: SVM: split svm_handle_invalid_exit
-> >    KVM: x86: add force_intercept_exceptions_mask
-> >    KVM: SVM: implement force_intercept_exceptions_mask
-> >    scripts/gdb: rework lx-symbols gdb script
-> >    KVM: x86: implement KVM_GUESTDBG_BLOCKIRQ
-> >    KVM: selftests: test KVM_GUESTDBG_BLOCKIRQ
-> > 
-> >   Documentation/virt/kvm/api.rst                |   1 +
-> >   arch/x86/include/asm/kvm_host.h               |   5 +-
-> >   arch/x86/include/uapi/asm/kvm.h               |   1 +
-> >   arch/x86/kvm/svm/svm.c                        |  87 +++++++-
-> >   arch/x86/kvm/svm/svm.h                        |   6 +-
-> >   arch/x86/kvm/x86.c                            |  12 +-
-> >   arch/x86/kvm/x86.h                            |   2 +
-> >   kernel/module.c                               |   8 +-
-> >   scripts/gdb/linux/symbols.py                  | 203 ++++++++++++------
-> >   .../testing/selftests/kvm/x86_64/debug_regs.c |  24 ++-
-> >   10 files changed, 266 insertions(+), 83 deletions(-)
-> > 
-> 
-> Queued 1-5-6.
-> 
-> For patches 2 and 3, please add VMX support too.
-> 
-> For patch 4, it's not KVM :) so please submit it separately.
+On Wed, Aug 11, 2021 at 2:10 AM Thomas Huth <thuth@redhat.com> wrote:
+>
+> On 10/08/2021 20.56, Eduardo Habkost wrote:
+> > On Sat, Aug 07, 2021 at 04:22:42PM +0200, Markus Armbruster wrote:
+> >> Is this intended to be a stable interface?  Interfaces intended just f=
+or
+> >> debugging usually aren't.
+> >
+> > I don't think we need to make it a stable interface, but I won't
+> > mind if we declare it stable.
+>
+> If we don't feel 100% certain yet, it's maybe better to introduce this wi=
+th
+> a "x-" prefix first, isn't it? I.e. "x-query-x86-cpuid" ... then it's cle=
+ar
+> that this is only experimental/debugging/not-stable yet. Just my 0.02 =E2=
+=82=AC.
 
-Thanks!
+That would be my expectation. Is this a documented policy?
 
-I will do this!
-
-
-Best regards,
-	Maxim Levitsky
-
-> 
-> Paolo
-> 
-
+--=20
+Eduardo
 
