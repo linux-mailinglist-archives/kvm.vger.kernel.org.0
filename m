@@ -2,199 +2,109 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 082E53E8CBC
-	for <lists+kvm@lfdr.de>; Wed, 11 Aug 2021 11:00:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5BC763E8CBF
+	for <lists+kvm@lfdr.de>; Wed, 11 Aug 2021 11:01:38 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236554AbhHKJBG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 11 Aug 2021 05:01:06 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:26923 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S236497AbhHKJBC (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 11 Aug 2021 05:01:02 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1628672438;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=xVYk6O6UbKVQlEk4hpiQ+ioYAfkIhHzccxHN1Fx+454=;
-        b=T/pogVQ6LOdA85cxys2r8Oov0oYWdqkwp4EIA6yINrMWIf8rUlOBOI2NJ6ecwD42S2IEDK
-        FJRSU5xXa/fJogpaDT8SxftcvDOQgnbxTKZoywOOOl7OofO8xdfTJxvxzk9Hr5v5TV6mML
-        cWjeq9kl6yCws6JbJxJYijPmrwRiG9U=
-Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
- [209.85.218.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-539-7vFSFOBBNXqCd0u4i6b9Uw-1; Wed, 11 Aug 2021 05:00:35 -0400
-X-MC-Unique: 7vFSFOBBNXqCd0u4i6b9Uw-1
-Received: by mail-ej1-f70.google.com with SMTP id h17-20020a1709070b11b02905b5ced62193so425069ejl.1
-        for <kvm@vger.kernel.org>; Wed, 11 Aug 2021 02:00:34 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=xVYk6O6UbKVQlEk4hpiQ+ioYAfkIhHzccxHN1Fx+454=;
-        b=Le6XWN98W42famUCmdL0UG61u8aP4ZUFCD0aDo+4WQybxN/Pu4ZnXNAqEZevZl3GnH
-         KVANOMMJXmtNyAIIM3dOldGEdTgmomWh+UtTb/nJiXTXl7oTPcNA3505/NdMUAivZB9B
-         2U34syhMGGdnma+BcTMQl8fZgz4+UnWbcd60deS0CtZpwGXgTlCtfyyGyB5d+B5bLnlX
-         Ik6Psx/eQpyaATYz7XdSeN1bM5foA7pFFZ2VfNkOvN6kZGn5Ur82VBRDxzs/LMPphY2A
-         MYGg4fKGERJ7A+/2IdODu9h8aiINGql92dSfiDIHjX1g+YUUH4KqewGRBsvSRxfEVZQc
-         zGMw==
-X-Gm-Message-State: AOAM530DBFqS+ZNqKK/T/ZIQTKYxi/+pZZ5K6xHJQx+Bmo/EpDM16/7t
-        ghBG/EMtJmO2KYeTm64YPe0YUacJ6BdVujh2CerKdtHWpLQhwKNs/91IvM3sEuZ1APsRR+TR9Sg
-        W70XCFd3MvBzc
-X-Received: by 2002:a17:906:a08a:: with SMTP id q10mr2593166ejy.100.1628672433740;
-        Wed, 11 Aug 2021 02:00:33 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJx+Wh3oVEmn3QZnNAXMGsVm3JaAoH4eSr1ZKRKUam8aqa4jKG8XOA/RBO+z8M1b/2H29w2Viw==
-X-Received: by 2002:a17:906:a08a:: with SMTP id q10mr2593146ejy.100.1628672433523;
-        Wed, 11 Aug 2021 02:00:33 -0700 (PDT)
-Received: from steredhat (a-nu5-14.tin.it. [212.216.181.13])
-        by smtp.gmail.com with ESMTPSA id l19sm4147213edb.86.2021.08.11.02.00.32
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 11 Aug 2021 02:00:33 -0700 (PDT)
-Date:   Wed, 11 Aug 2021 11:00:30 +0200
-From:   Stefano Garzarella <sgarzare@redhat.com>
-To:     Arseny Krasnov <arseny.krasnov@kaspersky.com>
-Cc:     Stefan Hajnoczi <stefanha@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Colin Ian King <colin.king@canonical.com>,
-        Norbert Slusarek <nslusarek@gmx.net>,
-        Andra Paraschiv <andraprs@amazon.com>, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org, stsp2@yandex.ru, oxffffaa@gmail.com
-Subject: Re: [RFC PATCH v2 1/5] virtio/vsock: add 'VIRTIO_VSOCK_SEQ_EOM' bit
-Message-ID: <20210811090030.snu5ckf6bdkzxdg7@steredhat>
-References: <20210810113901.1214116-1-arseny.krasnov@kaspersky.com>
- <20210810113956.1214463-1-arseny.krasnov@kaspersky.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <20210810113956.1214463-1-arseny.krasnov@kaspersky.com>
+        id S236255AbhHKJCA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 11 Aug 2021 05:02:00 -0400
+Received: from mail.kernel.org ([198.145.29.99]:58750 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S236270AbhHKJB7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 11 Aug 2021 05:01:59 -0400
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 9DE7060FE6;
+        Wed, 11 Aug 2021 09:01:34 +0000 (UTC)
+Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94.2)
+        (envelope-from <maz@kernel.org>)
+        id 1mDk7A-004H2h-Iv; Wed, 11 Aug 2021 10:01:32 +0100
+Date:   Wed, 11 Aug 2021 10:01:32 +0100
+Message-ID: <87wnos9wyb.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Oliver Upton <oupton@google.com>
+Cc:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Peter Shier <pshier@google.com>,
+        Jim Mattson <jmattson@google.com>,
+        David Matlack <dmatlack@google.com>,
+        Ricardo Koller <ricarkol@google.com>,
+        Jing Zhang <jingzhangos@google.com>,
+        Raghavendra Rao Anata <rananta@google.com>,
+        James Morse <james.morse@arm.com>,
+        Alexandru Elisei <Alexandru.Elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        linux-arm-kernel@lists.infradead.org,
+        Andrew Jones <drjones@redhat.com>,
+        Will Deacon <will@kernel.org>,
+        Catalin Marinas <catalin.marinas@arm.com>
+Subject: Re: [PATCH v6 17/21] KVM: arm64: Allow userspace to configure a guest's counter-timer offset
+In-Reply-To: <CAOQ_Qsjn4UK81qBj-uPzoejNc4GAnZXPi=mvcoVi15N0_kayAw@mail.gmail.com>
+References: <20210804085819.846610-1-oupton@google.com>
+        <20210804085819.846610-18-oupton@google.com>
+        <87a6lpbmbb.wl-maz@kernel.org>
+        <CAOQ_Qsjn4UK81qBj-uPzoejNc4GAnZXPi=mvcoVi15N0_kayAw@mail.gmail.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: oupton@google.com, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, pbonzini@redhat.com, seanjc@google.com, pshier@google.com, jmattson@google.com, dmatlack@google.com, ricarkol@google.com, jingzhangos@google.com, rananta@google.com, james.morse@arm.com, Alexandru.Elisei@arm.com, suzuki.poulose@arm.com, linux-arm-kernel@lists.infradead.org, drjones@redhat.com, will@kernel.org, catalin.marinas@arm.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Aug 10, 2021 at 02:39:53PM +0300, Arseny Krasnov wrote:
+On Tue, 10 Aug 2021 18:55:12 +0100,
+Oliver Upton <oupton@google.com> wrote:
+> 
+> On Tue, Aug 10, 2021 at 3:56 AM Marc Zyngier <maz@kernel.org> wrote:
+> >
+> > On Wed, 04 Aug 2021 09:58:15 +0100,
+> > Oliver Upton <oupton@google.com> wrote:
 
-The title is confusing, we are renaming EOR in EOM.
+[...]
 
->This bit is used to mark end of messages('EOM' - end of message), while
->'VIRIO_VSOCK_SEQ_EOR' is used to pass MSG_EOR. Also rename 'record' to
->'message' in implementation as it is different things.
->
->Signed-off-by: Arseny Krasnov <arseny.krasnov@kaspersky.com>
->---
-> drivers/vhost/vsock.c                   | 12 ++++++------
-> include/uapi/linux/virtio_vsock.h       |  3 ++-
-> net/vmw_vsock/virtio_transport_common.c | 14 +++++++-------
-> 3 files changed, 15 insertions(+), 14 deletions(-)
->
->diff --git a/drivers/vhost/vsock.c b/drivers/vhost/vsock.c
->index f249622ef11b..feaf650affbe 100644
->--- a/drivers/vhost/vsock.c
->+++ b/drivers/vhost/vsock.c
->@@ -178,15 +178,15 @@ vhost_transport_do_send_pkt(struct vhost_vsock *vsock,
-> 			 * small rx buffers, headers of packets in rx queue are
-> 			 * created dynamically and are initialized with 
-> 			 header
-> 			 * of current packet(except length). But in case of
->-			 * SOCK_SEQPACKET, we also must clear record delimeter
->-			 * bit(VIRTIO_VSOCK_SEQ_EOR). Otherwise, instead of one
->-			 * packet with delimeter(which marks end of record),
->+			 * SOCK_SEQPACKET, we also must clear message delimeter
->+			 * bit(VIRTIO_VSOCK_SEQ_EOM). Otherwise, instead of one
->+			 * packet with delimeter(which marks end of message),
-> 			 * there will be sequence of packets with delimeter
-> 			 * bit set. After initialized header will be copied to
-> 			 * rx buffer, this bit will be restored.
-> 			 */
->-			if (le32_to_cpu(pkt->hdr.flags) & VIRTIO_VSOCK_SEQ_EOR) {
->-				pkt->hdr.flags &= ~cpu_to_le32(VIRTIO_VSOCK_SEQ_EOR);
->+			if (le32_to_cpu(pkt->hdr.flags) & VIRTIO_VSOCK_SEQ_EOM) {
->+				pkt->hdr.flags &= ~cpu_to_le32(VIRTIO_VSOCK_SEQ_EOM);
-> 				restore_flag = true;
-> 			}
-> 		}
->@@ -225,7 +225,7 @@ vhost_transport_do_send_pkt(struct vhost_vsock *vsock,
-> 		 */
-> 		if (pkt->off < pkt->len) {
-> 			if (restore_flag)
->-				pkt->hdr.flags |= cpu_to_le32(VIRTIO_VSOCK_SEQ_EOR);
->+				pkt->hdr.flags |= cpu_to_le32(VIRTIO_VSOCK_SEQ_EOM);
->
-> 			/* We are queueing the same virtio_vsock_pkt to handle
-> 			 * the remaining bytes, and we want to deliver it
->diff --git a/include/uapi/linux/virtio_vsock.h b/include/uapi/linux/virtio_vsock.h
->index 3dd3555b2740..64738838bee5 100644
->--- a/include/uapi/linux/virtio_vsock.h
->+++ b/include/uapi/linux/virtio_vsock.h
->@@ -97,7 +97,8 @@ enum virtio_vsock_shutdown {
->
-> /* VIRTIO_VSOCK_OP_RW flags values */
-> enum virtio_vsock_rw {
->-	VIRTIO_VSOCK_SEQ_EOR = 1,
->+	VIRTIO_VSOCK_SEQ_EOM = 1,
->+	VIRTIO_VSOCK_SEQ_EOR = 2,
-         ^
-I think is better to add this new flag in a separate patch.
+> > > diff --git a/include/clocksource/arm_arch_timer.h b/include/clocksource/arm_arch_timer.h
+> > > index 73c7139c866f..7252ffa3d675 100644
+> > > --- a/include/clocksource/arm_arch_timer.h
+> > > +++ b/include/clocksource/arm_arch_timer.h
+> > > @@ -21,6 +21,7 @@
+> > >  #define CNTHCTL_EVNTEN                       (1 << 2)
+> > >  #define CNTHCTL_EVNTDIR                      (1 << 3)
+> > >  #define CNTHCTL_EVNTI                        (0xF << 4)
+> > > +#define CNTHCTL_ECV                  (1 << 12)
+> > >
+> > >  enum arch_timer_reg {
+> > >       ARCH_TIMER_REG_CTRL,
+> >
+> > You also want to document that SCR_EL3.ECVEn has to be set to 1 for
+> > this to work (see Documentation/arm64/booting.txt). And if it isn't,
+> > the firmware better handle the CNTPOFF_EL2 traps correctly...
+> 
+> I'll grab the popcorn now ;-) Adding docs for this, good idea.
+> 
+> > What firmware did you use for this? I think we need to update the boot
+> > wrapper, but that's something that can be done in parallel.
+> 
+> I had actually just done a direct boot from ARM-TF -> Linux, nothing
+> else in between.
 
-> };
->
-> #endif /* _UAPI_LINUX_VIRTIO_VSOCK_H */
->diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
->index 081e7ae93cb1..4d5a93beceb0 100644
->--- a/net/vmw_vsock/virtio_transport_common.c
->+++ b/net/vmw_vsock/virtio_transport_common.c
->@@ -77,7 +77,7 @@ virtio_transport_alloc_pkt(struct virtio_vsock_pkt_info *info,
->
-> 		if (msg_data_left(info->msg) == 0 &&
-> 		    info->type == VIRTIO_VSOCK_TYPE_SEQPACKET)
->-			pkt->hdr.flags |= cpu_to_le32(VIRTIO_VSOCK_SEQ_EOR);
->+			pkt->hdr.flags |= cpu_to_le32(VIRTIO_VSOCK_SEQ_EOM);
-> 	}
->
-> 	trace_virtio_transport_alloc_pkt(src_cid, src_port,
->@@ -457,7 +457,7 @@ static int virtio_transport_seqpacket_do_dequeue(struct vsock_sock *vsk,
-> 				dequeued_len += pkt_len;
-> 		}
->
->-		if (le32_to_cpu(pkt->hdr.flags) & VIRTIO_VSOCK_SEQ_EOR) {
->+		if (le32_to_cpu(pkt->hdr.flags) & VIRTIO_VSOCK_SEQ_EOM) {
-> 			msg_ready = true;
-> 			vvs->msg_count--;
-> 		}
->@@ -1029,7 +1029,7 @@ virtio_transport_recv_enqueue(struct vsock_sock *vsk,
-> 		goto out;
-> 	}
->
->-	if (le32_to_cpu(pkt->hdr.flags) & VIRTIO_VSOCK_SEQ_EOR)
->+	if (le32_to_cpu(pkt->hdr.flags) & VIRTIO_VSOCK_SEQ_EOM)
-> 		vvs->msg_count++;
->
-> 	/* Try to copy small packets into the buffer of last packet queued,
->@@ -1044,12 +1044,12 @@ virtio_transport_recv_enqueue(struct vsock_sock *vsk,
->
-> 		/* If there is space in the last packet queued, we copy the
-> 		 * new packet in its buffer. We avoid this if the last packet
->-		 * queued has VIRTIO_VSOCK_SEQ_EOR set, because this is
->-		 * delimiter of SEQPACKET record, so 'pkt' is the first packet
->-		 * of a new record.
->+		 * queued has VIRTIO_VSOCK_SEQ_EOM set, because this is
->+		 * delimiter of SEQPACKET message, so 'pkt' is the first packet
->+		 * of a new message.
-> 		 */
-> 		if ((pkt->len <= last_pkt->buf_len - last_pkt->len) &&
->-		    !(le32_to_cpu(last_pkt->hdr.flags) & VIRTIO_VSOCK_SEQ_EOR)) {
->+		    !(le32_to_cpu(last_pkt->hdr.flags) & VIRTIO_VSOCK_SEQ_EOM)) {
-> 			memcpy(last_pkt->buf + last_pkt->len, pkt->buf,
-> 			       pkt->len);
-> 			last_pkt->len += pkt->len;
->-- 
->2.25.1
->
-
-The rest LGTM!
+Ah, right. I tend to use the boot-wrapper[1] to build a single binary
+that contains the 'boot loader', DT and kernel. Using ATF is probably
+more representative of the final thing, but the boot-wrapper is dead
+easy to hack on...
 
 Thanks,
-Stefano
 
+	M.
+
+[1] git://git.kernel.org/pub/scm/linux/kernel/git/mark/boot-wrapper-aarch64.git
+
+-- 
+Without deviation from the norm, progress is not possible.
