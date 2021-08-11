@@ -2,119 +2,302 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7D25F3E931F
-	for <lists+kvm@lfdr.de>; Wed, 11 Aug 2021 15:58:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 19E833E93AC
+	for <lists+kvm@lfdr.de>; Wed, 11 Aug 2021 16:26:55 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231714AbhHKN7D (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 11 Aug 2021 09:59:03 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:45893 "EHLO
+        id S232441AbhHKO1Q (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 11 Aug 2021 10:27:16 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:52579 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231563AbhHKN7C (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 11 Aug 2021 09:59:02 -0400
+        by vger.kernel.org with ESMTP id S232417AbhHKO1P (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 11 Aug 2021 10:27:15 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1628690319;
+        s=mimecast20190719; t=1628692011;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=qLAu7Xt9giB1JEJeaXVcKTr3zxBkgolhQiE77Rr3piU=;
-        b=acEaex1KXVGphWfBIAAXAGtZr4o4P7cVcPE7YVssrgHaGwB2WWZ+e1rXVrX6mLKK33Cqwr
-        ry5nYEcDqysybYoedhdMM6WOi52ULSPGuwunBbQgTAsrKHwCATFRdGqrUK0S2xZwfzyfS+
-        pgZ9cKUxlzhJRXFk6q8PAoQn/hIdf1s=
-Received: from mail-lj1-f199.google.com (mail-lj1-f199.google.com
- [209.85.208.199]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-122-_dYqfDMMNGW1im_LZ4Vycg-1; Wed, 11 Aug 2021 09:58:37 -0400
-X-MC-Unique: _dYqfDMMNGW1im_LZ4Vycg-1
-Received: by mail-lj1-f199.google.com with SMTP id m4-20020a2ea8840000b029018ba0baeb6eso819684ljq.5
-        for <kvm@vger.kernel.org>; Wed, 11 Aug 2021 06:58:37 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=qLAu7Xt9giB1JEJeaXVcKTr3zxBkgolhQiE77Rr3piU=;
-        b=f4oUOpFO5VQl7v5g1ShphVf16IayQiUysCnV0XEfV00uTHGMvJF1R38J969Fm2SbVV
-         ZFEJEsh5vZNAvY9DgSHSeFycXKpdLam3b84zDgi70E4FJld8Zuvbu2czvWUOVm40ExnF
-         a6we9yrOSbqjRnFRl+fVgc6BdAFMcOFroJGx1KAt/f+hK3LmrSrp6oNKkqp4wBrga/3O
-         TtXsNeg5rZtIp2JG7LBn6MRCPyQYbNVXNzlAgBCVg3sQKgHLQ8FDCJC+TNPXOitDdWpE
-         LOn/+Rz+b+lcUNWIuqILyFTfibayyi9l0/yd8VMaF3WRLie2kyied5SMQEmFxLM+nyGx
-         fzbw==
-X-Gm-Message-State: AOAM533HBJrFgoJfTkmEpjNyaiHyAVNUbH9POnIjkZze6Jbqi2eiS2Zt
-        3ExJa3MixyHOWkEq1PjM9pYP9/2nG4FTE2Hq+1ULNmVge8o29gdyhGqcreFDxbpe2kbKCVXqO6g
-        G1QiRtLIbgo6ZFFJq47TWkmLXrDvb
-X-Received: by 2002:a2e:9355:: with SMTP id m21mr22807152ljh.445.1628690316033;
-        Wed, 11 Aug 2021 06:58:36 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxl12Co/rSK8sREdXG2ZIEVYWevhIt1h4k4YDs8TUY0b/cRFg4Pp78qZxQ4i6zJCMIbWVczSn9w+TKkmrFLlto=
-X-Received: by 2002:a2e:9355:: with SMTP id m21mr22807128ljh.445.1628690315807;
- Wed, 11 Aug 2021 06:58:35 -0700 (PDT)
-MIME-Version: 1.0
-References: <20210728125402.2496-1-valeriy.vdovin@virtuozzo.com>
- <87eeb59vwt.fsf@dusky.pond.sub.org> <20210810185644.iyqt3iao2qdqd5jk@habkost.net>
- <2191952f-6989-771a-1f0a-ece58262d141@redhat.com> <CAOpTY_qbsqh9Tf8LB3EOOi_gkREotdpUyuF3-d_sBFsof3-9KQ@mail.gmail.com>
- <97ce9800-ff69-46cd-b6ab-c7645ee10d2c@redhat.com>
-In-Reply-To: <97ce9800-ff69-46cd-b6ab-c7645ee10d2c@redhat.com>
-From:   Eduardo Habkost <ehabkost@redhat.com>
-Date:   Wed, 11 Aug 2021 09:58:19 -0400
-Message-ID: <CAOpTY_rv4nZib1Eymm9ZVcLf=v=-QjpUm24U7FtS-1pUqS_6VQ@mail.gmail.com>
-Subject: Re: [PATCH v12] qapi: introduce 'query-x86-cpuid' QMP command.
-To:     Thomas Huth <thuth@redhat.com>
-Cc:     Markus Armbruster <armbru@redhat.com>,
-        Valeriy Vdovin <valeriy.vdovin@virtuozzo.com>,
-        "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
-        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-        Eric Blake <eblake@redhat.com>,
+        bh=SiFfbJIzEQjG/ygjdfzM4enm4T9jUPJiEOjLRuFPC/w=;
+        b=AdPTEI17P85ft/DTL2LdORbf/7vw+HrRGwVe9M/5zbLXLXE8GvFDUxd3TdExTEFMc2o63U
+        2tRZxkyYWOsrifgntvI5HKsAVjh7I8os2ARq46yYGY+pzYEz1LJ4lCqZRZ7m7id3ScWRqC
+        YEMEfbW56KgasLaPTk15qXPzTtIs7Zg=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-239-8cD_HgouPWiFL5t7N2-KIA-1; Wed, 11 Aug 2021 10:26:50 -0400
+X-MC-Unique: 8cD_HgouPWiFL5t7N2-KIA-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 40A91107ACF5;
+        Wed, 11 Aug 2021 14:26:47 +0000 (UTC)
+Received: from starship (unknown [10.35.206.50])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 6F2B95D9CA;
+        Wed, 11 Aug 2021 14:26:41 +0000 (UTC)
+Message-ID: <73f3eff092ca9624ebd55bc02193b39f248c8877.camel@redhat.com>
+Subject: Re: [PATCH v3 3/6] KVM: SVM: implement
+ force_intercept_exceptions_mask
+From:   Maxim Levitsky <mlevitsk@redhat.com>
+To:     kvm@vger.kernel.org
+Cc:     Kieran Bingham <kbingham@kernel.org>,
+        Jan Kiszka <jan.kiszka@siemens.com>,
+        Andrew Jones <drjones@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Ingo Molnar <mingo@redhat.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
+        Johannes Berg <johannes.berg@intel.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Jessica Yu <jeyu@kernel.org>,
+        Jim Mattson <jmattson@google.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        Marcelo Tosatti <mtosatti@redhat.com>,
-        Richard Henderson <richard.henderson@linaro.org>,
-        Laurent Vivier <lvivier@redhat.com>, kvm@vger.kernel.org,
-        Denis Lunev <den@openvz.org>,
-        Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+        Joerg Roedel <joro@8bytes.org>,
+        Yang Weijiang <weijiang.yang@intel.com>,
+        linux-kernel@vger.kernel.org, Borislav Petkov <bp@alien8.de>,
+        "open list:KERNEL SELFTEST FRAMEWORK" 
+        <linux-kselftest@vger.kernel.org>,
+        "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>,
+        Shuah Khan <shuah@kernel.org>,
+        Andrew Morton <akpm@linux-foundation.org>
+Date:   Wed, 11 Aug 2021 17:26:40 +0300
+In-Reply-To: <20210811122927.900604-4-mlevitsk@redhat.com>
+References: <20210811122927.900604-1-mlevitsk@redhat.com>
+         <20210811122927.900604-4-mlevitsk@redhat.com>
+Content-Type: multipart/mixed; boundary="=-6BVcX+XV7rDFCEbVrCRD"
+User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
+MIME-Version: 1.0
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Aug 11, 2021 at 9:44 AM Thomas Huth <thuth@redhat.com> wrote:
->
-> On 11/08/2021 15.40, Eduardo Habkost wrote:
-> > On Wed, Aug 11, 2021 at 2:10 AM Thomas Huth <thuth@redhat.com> wrote:
-> >>
-> >> On 10/08/2021 20.56, Eduardo Habkost wrote:
-> >>> On Sat, Aug 07, 2021 at 04:22:42PM +0200, Markus Armbruster wrote:
-> >>>> Is this intended to be a stable interface?  Interfaces intended just=
- for
-> >>>> debugging usually aren't.
-> >>>
-> >>> I don't think we need to make it a stable interface, but I won't
-> >>> mind if we declare it stable.
-> >>
-> >> If we don't feel 100% certain yet, it's maybe better to introduce this=
- with
-> >> a "x-" prefix first, isn't it? I.e. "x-query-x86-cpuid" ... then it's =
-clear
-> >> that this is only experimental/debugging/not-stable yet. Just my 0.02 =
-=E2=82=AC.
-> >
-> > That would be my expectation. Is this a documented policy?
-> >
->
-> According to docs/interop/qmp-spec.txt :
->
->   Any command or member name beginning with "x-" is deemed
->   experimental, and may be withdrawn or changed in an incompatible
->   manner in a future release.
 
-Thanks! I had looked at other QMP docs, but not qmp-spec.txt.
+--=-6BVcX+XV7rDFCEbVrCRD
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
 
-In my reply above, please read "make it a stable interface" as
-"declare it as supported by not using the 'x-' prefix".
+On Wed, 2021-08-11 at 15:29 +0300, Maxim Levitsky wrote:
+> Currently #TS interception is only done once.
+> Also exception interception is not enabled for SEV guests.
+> 
+> Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
+> ---
+>  arch/x86/include/asm/kvm_host.h |  2 +
+>  arch/x86/kvm/svm/svm.c          | 70 +++++++++++++++++++++++++++++++++
+>  arch/x86/kvm/svm/svm.h          |  6 ++-
+>  arch/x86/kvm/x86.c              |  5 ++-
+>  4 files changed, 80 insertions(+), 3 deletions(-)
+> 
+> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+> index 20daaf67a5bf..72fe03506018 100644
+> --- a/arch/x86/include/asm/kvm_host.h
+> +++ b/arch/x86/include/asm/kvm_host.h
+> @@ -1690,6 +1690,8 @@ int kvm_emulate_rdpmc(struct kvm_vcpu *vcpu);
+>  void kvm_queue_exception(struct kvm_vcpu *vcpu, unsigned nr);
+>  void kvm_queue_exception_e(struct kvm_vcpu *vcpu, unsigned nr, u32 error_code);
+>  void kvm_queue_exception_p(struct kvm_vcpu *vcpu, unsigned nr, unsigned long payload);
+> +void kvm_queue_exception_e_p(struct kvm_vcpu *vcpu, unsigned nr,
+> +			     u32 error_code, unsigned long payload);
+>  void kvm_requeue_exception(struct kvm_vcpu *vcpu, unsigned nr);
+>  void kvm_requeue_exception_e(struct kvm_vcpu *vcpu, unsigned nr, u32 error_code);
+>  void kvm_inject_page_fault(struct kvm_vcpu *vcpu, struct x86_exception *fault);
+> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+> index e45259177009..19f54b07161a 100644
+> --- a/arch/x86/kvm/svm/svm.c
+> +++ b/arch/x86/kvm/svm/svm.c
+> @@ -233,6 +233,8 @@ static const u32 msrpm_ranges[] = {0, 0xc0000000, 0xc0010000};
+>  #define MSRS_RANGE_SIZE 2048
+>  #define MSRS_IN_RANGE (MSRS_RANGE_SIZE * 8 / 2)
+>  
+> +static int svm_handle_invalid_exit(struct kvm_vcpu *vcpu, u64 exit_code);
+> +
+>  u32 svm_msrpm_offset(u32 msr)
+>  {
+>  	u32 offset;
+> @@ -1153,6 +1155,22 @@ static void svm_recalc_instruction_intercepts(struct kvm_vcpu *vcpu,
+>  	}
+>  }
+>  
+> +static void svm_init_force_exceptions_intercepts(struct vcpu_svm *svm)
+> +{
+> +	int exc;
+> +
+> +	svm->force_intercept_exceptions_mask = force_intercept_exceptions_mask;
+> +	for (exc = 0 ; exc < 32 ; exc++) {
+> +		if (!(svm->force_intercept_exceptions_mask & (1 << exc)))
+> +			continue;
+> +
+> +		/* Those are defined to have undefined behavior in the SVM spec */
+> +		if (exc != 2 && exc != 9)
+> +			continue;
+> +		set_exception_intercept(svm, exc);
 
-I don't think we have to make it stable, but I won't argue against it
-if the current proposal is deemed acceptable by other maintainers.
+I made a mistake here, during one of the refactoring I think, after I finished
+testing this througfully, and I noticed it now while looking again
+at the code.
 
-Personally, I'm still frustrated by the complexity of the current
-proposal, but I don't want to block it just because of my frustration.
+I attached a fix for this, and I also tested more carefully that the
+feature works with selftests, kvm unit tests and by booting few VMs.
 
---=20
-Eduardo
+Best regards,
+	Maxim Levitsky
+
+> +	}
+> +}
+> +
+>  static void init_vmcb(struct kvm_vcpu *vcpu)
+>  {
+>  	struct vcpu_svm *svm = to_svm(vcpu);
+> @@ -1304,6 +1322,9 @@ static void init_vmcb(struct kvm_vcpu *vcpu)
+>  
+>  	enable_gif(svm);
+>  
+> +	if (!sev_es_guest(vcpu->kvm))
+> +		svm_init_force_exceptions_intercepts(svm);
+> +
+>  }
+>  
+>  static void svm_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event)
+> @@ -1892,6 +1913,17 @@ static int pf_interception(struct kvm_vcpu *vcpu)
+>  	u64 fault_address = svm->vmcb->control.exit_info_2;
+>  	u64 error_code = svm->vmcb->control.exit_info_1;
+>  
+> +	if ((svm->force_intercept_exceptions_mask & (1 << PF_VECTOR)))
+> +		if (npt_enabled && !vcpu->arch.apf.host_apf_flags) {
+> +			/* If the #PF was only intercepted for debug, inject
+> +			 * it directly to the guest, since the kvm's mmu code
+> +			 * is not ready to deal with such page faults.
+> +			 */
+> +			kvm_queue_exception_e_p(vcpu, PF_VECTOR,
+> +						error_code, fault_address);
+> +			return 1;
+> +		}
+> +
+>  	return kvm_handle_page_fault(vcpu, error_code, fault_address,
+>  			static_cpu_has(X86_FEATURE_DECODEASSISTS) ?
+>  			svm->vmcb->control.insn_bytes : NULL,
+> @@ -1967,6 +1999,40 @@ static int ac_interception(struct kvm_vcpu *vcpu)
+>  	return 1;
+>  }
+>  
+> +static int gen_exc_interception(struct kvm_vcpu *vcpu)
+> +{
+> +	/*
+> +	 * Generic exception intercept handler which forwards a guest exception
+> +	 * as-is to the guest.
+> +	 * For exceptions that don't have a special intercept handler.
+> +	 *
+> +	 * Used only for 'force_intercept_exceptions_mask' KVM debug feature.
+> +	 */
+> +	struct vcpu_svm *svm = to_svm(vcpu);
+> +	int exc = svm->vmcb->control.exit_code - SVM_EXIT_EXCP_BASE;
+> +
+> +	/* SVM doesn't provide us with an error code for the #DF */
+> +	u32 err_code = exc == DF_VECTOR ? 0 : svm->vmcb->control.exit_info_1;
+> +
+> +	if (!(svm->force_intercept_exceptions_mask & (1 << exc)))
+> +		return svm_handle_invalid_exit(vcpu, svm->vmcb->control.exit_code);
+> +
+> +	if (exc == TS_VECTOR) {
+> +		/*
+> +		 * SVM doesn't provide us with an error code to be able to
+> +		 * re-inject the #TS exception, so just disable its
+> +		 * intercept, and let the guest re-execute the instruction.
+> +		 */
+> +		vmcb_clr_intercept(&svm->vmcb01.ptr->control,
+> +				   INTERCEPT_EXCEPTION_OFFSET + TS_VECTOR);
+> +		recalc_intercepts(svm);
+> +	} else if (x86_exception_has_error_code(exc))
+> +		kvm_queue_exception_e(vcpu, exc, err_code);
+> +	else
+> +		kvm_queue_exception(vcpu, exc);
+> +	return 1;
+> +}
+> +
+>  static bool is_erratum_383(void)
+>  {
+>  	int err, i;
+> @@ -3065,6 +3131,10 @@ static int (*const svm_exit_handlers[])(struct kvm_vcpu *vcpu) = {
+>  	[SVM_EXIT_WRITE_DR5]			= dr_interception,
+>  	[SVM_EXIT_WRITE_DR6]			= dr_interception,
+>  	[SVM_EXIT_WRITE_DR7]			= dr_interception,
+> +
+> +	[SVM_EXIT_EXCP_BASE ...
+> +	SVM_EXIT_EXCP_BASE + 31]		= gen_exc_interception,
+> +
+>  	[SVM_EXIT_EXCP_BASE + DB_VECTOR]	= db_interception,
+>  	[SVM_EXIT_EXCP_BASE + BP_VECTOR]	= bp_interception,
+>  	[SVM_EXIT_EXCP_BASE + UD_VECTOR]	= ud_interception,
+> diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
+> index 524d943f3efc..187ada7c5b03 100644
+> --- a/arch/x86/kvm/svm/svm.h
+> +++ b/arch/x86/kvm/svm/svm.h
+> @@ -196,6 +196,7 @@ struct vcpu_svm {
+>  	bool ghcb_sa_free;
+>  
+>  	bool guest_state_loaded;
+> +	u32 force_intercept_exceptions_mask;
+>  };
+>  
+>  struct svm_cpu_data {
+> @@ -351,8 +352,11 @@ static inline void clr_exception_intercept(struct vcpu_svm *svm, u32 bit)
+>  	struct vmcb *vmcb = svm->vmcb01.ptr;
+>  
+>  	WARN_ON_ONCE(bit >= 32);
+> -	vmcb_clr_intercept(&vmcb->control, INTERCEPT_EXCEPTION_OFFSET + bit);
+>  
+> +	if ((1 << bit) & svm->force_intercept_exceptions_mask)
+> +		return;
+> +
+> +	vmcb_clr_intercept(&vmcb->control, INTERCEPT_EXCEPTION_OFFSET + bit);
+>  	recalc_intercepts(svm);
+>  }
+>  
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index 092e2fad3c0d..e5c7b8fa1f7f 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -695,12 +695,13 @@ void kvm_queue_exception_p(struct kvm_vcpu *vcpu, unsigned nr,
+>  }
+>  EXPORT_SYMBOL_GPL(kvm_queue_exception_p);
+>  
+> -static void kvm_queue_exception_e_p(struct kvm_vcpu *vcpu, unsigned nr,
+> -				    u32 error_code, unsigned long payload)
+> +void kvm_queue_exception_e_p(struct kvm_vcpu *vcpu, unsigned nr,
+> +			     u32 error_code, unsigned long payload)
+>  {
+>  	kvm_multiple_exception(vcpu, nr, true, error_code,
+>  			       true, payload, false);
+>  }
+> +EXPORT_SYMBOL_GPL(kvm_queue_exception_e_p);
+>  
+>  int kvm_complete_insn_gp(struct kvm_vcpu *vcpu, int err)
+>  {
+
+
+--=-6BVcX+XV7rDFCEbVrCRD
+Content-Disposition: attachment;
+	filename="0001-KVM-x86-fix-for-force_intercept_exceptions_mask.patch"
+Content-Type: text/x-patch;
+	name="0001-KVM-x86-fix-for-force_intercept_exceptions_mask.patch";
+	charset="UTF-8"
+Content-Transfer-Encoding: base64
+
+RnJvbSAyYmRmODQ3Zjk5OTFmNWJlMWJkYjNhNDdjMGU3OTZhZjkzNWJkYjNmIE1vbiBTZXAgMTcg
+MDA6MDA6MDAgMjAwMQpGcm9tOiBNYXhpbSBMZXZpdHNreSA8bWxldml0c2tAcmVkaGF0LmNvbT4K
+RGF0ZTogV2VkLCAxMSBBdWcgMjAyMSAxNzowMjoxNCArMDMwMApTdWJqZWN0OiBbUEFUQ0hdIEtW
+TTogeDg2OiBmaXggZm9yIGZvcmNlX2ludGVyY2VwdF9leGNlcHRpb25zX21hc2sKCi0tLQogYXJj
+aC94ODYva3ZtL3N2bS9zdm0uYyB8IDMgKy0tCiAxIGZpbGUgY2hhbmdlZCwgMSBpbnNlcnRpb24o
+KyksIDIgZGVsZXRpb25zKC0pCgpkaWZmIC0tZ2l0IGEvYXJjaC94ODYva3ZtL3N2bS9zdm0uYyBi
+L2FyY2gveDg2L2t2bS9zdm0vc3ZtLmMKaW5kZXggNmYxNzU2OWZkNWM4Li44NWU1YTkzZmE3OWEg
+MTAwNjQ0Ci0tLSBhL2FyY2gveDg2L2t2bS9zdm0vc3ZtLmMKKysrIGIvYXJjaC94ODYva3ZtL3N2
+bS9zdm0uYwpAQCAtMTE2Niw4ICsxMTY2LDcgQEAgc3RhdGljIHZvaWQgc3ZtX2luaXRfZm9yY2Vf
+ZXhjZXB0aW9uc19pbnRlcmNlcHRzKHN0cnVjdCB2Y3B1X3N2bSAqc3ZtKQogCiAJCS8qIFRob3Nl
+IGFyZSBkZWZpbmVkIHRvIGhhdmUgdW5kZWZpbmVkIGJlaGF2aW9yIGluIHRoZSBTVk0gc3BlYyAq
+LwogCQlpZiAoZXhjICE9IDIgJiYgZXhjICE9IDkpCi0JCQljb250aW51ZTsKLQkJc2V0X2V4Y2Vw
+dGlvbl9pbnRlcmNlcHQoc3ZtLCBleGMpOworCQkJc2V0X2V4Y2VwdGlvbl9pbnRlcmNlcHQoc3Zt
+LCBleGMpOwogCX0KIH0KIAotLSAKMi4yNi4zCgo=
+
+
+--=-6BVcX+XV7rDFCEbVrCRD--
 
