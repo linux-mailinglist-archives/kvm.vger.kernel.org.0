@@ -2,81 +2,104 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 29A583E9D1E
-	for <lists+kvm@lfdr.de>; Thu, 12 Aug 2021 06:02:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 093033E9DB6
+	for <lists+kvm@lfdr.de>; Thu, 12 Aug 2021 06:56:30 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229545AbhHLECu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 12 Aug 2021 00:02:50 -0400
-Received: from out30-45.freemail.mail.aliyun.com ([115.124.30.45]:34600 "EHLO
-        out30-45.freemail.mail.aliyun.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229460AbhHLECt (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 12 Aug 2021 00:02:49 -0400
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R231e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=alimailimapcm10staff010182156082;MF=houwenlong93@linux.alibaba.com;NM=1;PH=DS;RN=13;SR=0;TI=SMTPD_---0UikIOfv_1628740942;
-Received: from localhost(mailfrom:houwenlong93@linux.alibaba.com fp:SMTPD_---0UikIOfv_1628740942)
-          by smtp.aliyun-inc.com(127.0.0.1);
-          Thu, 12 Aug 2021 12:02:22 +0800
-From:   Hou Wenlong <houwenlong93@linux.alibaba.com>
-To:     kvm@vger.kernel.org
+        id S234093AbhHLE4u (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 12 Aug 2021 00:56:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57712 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S233944AbhHLE4r (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 12 Aug 2021 00:56:47 -0400
+Received: from mail-qk1-x74a.google.com (mail-qk1-x74a.google.com [IPv6:2607:f8b0:4864:20::74a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EC502C0613D3
+        for <kvm@vger.kernel.org>; Wed, 11 Aug 2021 21:56:22 -0700 (PDT)
+Received: by mail-qk1-x74a.google.com with SMTP id b190-20020a3767c70000b02903ca0967b842so2852464qkc.9
+        for <kvm@vger.kernel.org>; Wed, 11 Aug 2021 21:56:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=reply-to:date:message-id:mime-version:subject:from:to:cc;
+        bh=qanCpgG6K85LtNMV/pCVVA2s8D8zJvxN6mc+87zshdI=;
+        b=o5zN41efKx806Jn7dtKlx4vQuz7KW0nR6lpqWhcBhYLL8JH7DK2RSoIuDgxsMa45da
+         faKc9y9iEm0czZ4VgYcEAKFOO+QKCxGJRXtn2Iyo60ydQebd8xwXGs1z5JGQrFi0V/Jt
+         cpzoKYeB1hFJ4/CsG+V53GYNX9nJqZKaUIACW0myQ7vpPeDF30OBW0zs57rDq0G/wn0z
+         BPcNsjqj9wpKrz88IL4mBDUTSy1cADU1GpwFTVpzUo0qmo344JGtlhUm0pjJyCIT3tqd
+         1h9X2/A1NJueGpanbKdKEFLqPbJ4T1q1Qbmm764qSAz06/+jEKz+Q82iOhCI/jnYZjko
+         EPwA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:reply-to:date:message-id:mime-version:subject
+         :from:to:cc;
+        bh=qanCpgG6K85LtNMV/pCVVA2s8D8zJvxN6mc+87zshdI=;
+        b=DfrzlYeANyw4uJSQcE3J64Ijzbzrh3RYUpFhkiQptJSqGCqRsLDOYhIE0OGxJGhnEp
+         e1RF8/6Num1P6ERy0jo9k6S4gDAk2EzLwuPlRIg1IJBvN8nenvI1TqYU5pJSa9y+FVw3
+         e/0or8EKGoCoCLq/HjfKd1pZfXMcbPTYi7P/9xB6jCj6P2bFNM0Brn0lDTfFsq1bF2wI
+         jAoycJ8jf5G1mF5GalnwET4nIgwLFOfW9FXs3pWa51esFcyFOtZK1nMfcT9YfyHi1q0N
+         D1s2uK05ooCkqyXLYnfA/tMl8IKNJL53fQT5y1BYdyvc9WuL5deW0J8bcJjrv17b48Jg
+         ptAA==
+X-Gm-Message-State: AOAM533eBtT85Cc2jVR7iUFhMGUmNPzNB2/EtCNULpEo78ftMMeVmPR3
+        CKxRepuwgIRNJpwYZa/0VbDgZ73UB1A=
+X-Google-Smtp-Source: ABdhPJzkgLj6qwyYzeVoo/P1gKsjQtvMJImXKFL6Pf4wPg7ocSsPdlTAZezWiJFVjnfGiU/oEMFunsTOs+s=
+X-Received: from seanjc798194.pdx.corp.google.com ([2620:15c:90:200:f150:c3bd:5e7f:59bf])
+ (user=seanjc job=sendgmr) by 2002:a05:6214:285:: with SMTP id
+ l5mr2089662qvv.24.1628744182096; Wed, 11 Aug 2021 21:56:22 -0700 (PDT)
+Reply-To: Sean Christopherson <seanjc@google.com>
+Date:   Wed, 11 Aug 2021 21:56:15 -0700
+Message-Id: <20210812045615.3167686-1-seanjc@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.33.0.rc1.237.g0d66db33f3-goog
+Subject: [PATCH] KVM: nVMX: Use vmx_need_pf_intercept() when deciding if L0
+ wants a #PF
+From:   Sean Christopherson <seanjc@google.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH v2 2/2] kvm: x86: move architecture specific code into kvm_arch_vcpu_fault
-Date:   Thu, 12 Aug 2021 12:02:20 +0800
-Message-Id: <146fab9b48eb8554202f91785d0e009757439baf.1628739116.git.houwenlong93@linux.alibaba.com>
-X-Mailer: git-send-email 2.31.1
-In-Reply-To: <1c510b24fc1d7cbae8aa4b69c0799ebd32e65b82.1628739116.git.houwenlong93@linux.alibaba.com>
-References: <1c510b24fc1d7cbae8aa4b69c0799ebd32e65b82.1628739116.git.houwenlong93@linux.alibaba.com>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Peter Shier <pshier@google.com>,
+        Oliver Upton <oupton@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The function kvm_arch_vcpu_fault can handle architecture specific
-case, so move x86's pio_data hanlding into it.
+Use vmx_need_pf_intercept() when determining if L0 wants to handle a #PF
+in L2 or if the VM-Exit should be forwarded to L1.  The current logic fails
+to account for the case where #PF is intercepted to handle
+guest.MAXPHYADDR < host.MAXPHYADDR and ends up reflecting all #PFs into
+L1.  At best, L1 will complain and inject the #PF back into L2.  At
+worst, L1 will eat the unexpected fault and cause L2 to hang on infinite
+page faults.
 
-Suggested-by: Sean Christopherson <seanjc@google.com>
-Signed-off-by: Hou Wenlong <houwenlong93@linux.alibaba.com>
+Note, while the bug was technically introduced by the commit that added
+support for the MAXPHYADDR madness, the shame is all on commit
+a0c134347baf ("KVM: VMX: introduce vmx_need_pf_intercept").
+
+Fixes: 1dbf5d68af6f ("KVM: VMX: Add guest physical address check in EPT violation and misconfig")
+Cc: stable@vger.kernel.org
+Cc: Peter Shier <pshier@google.com>
+Cc: Oliver Upton <oupton@google.com>
+Cc: Jim Mattson <jmattson@google.com>
+Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/kvm/x86.c  | 2 ++
- virt/kvm/kvm_main.c | 4 ----
- 2 files changed, 2 insertions(+), 4 deletions(-)
+ arch/x86/kvm/vmx/nested.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 1e3bbe5cd33a..25c0752d6cd9 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -5349,6 +5349,8 @@ long kvm_arch_vcpu_ioctl(struct file *filp,
- 
- struct page *kvm_arch_vcpu_fault(struct kvm_vcpu *vcpu, struct vm_fault *vmf)
- {
-+	if (vmf->pgoff == KVM_PIO_PAGE_OFFSET)
-+		return virt_to_page(vcpu->arch.pio_data);
- 	return NULL;
- }
- 
-diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index f7d21418971b..43064df5ad87 100644
---- a/virt/kvm/kvm_main.c
-+++ b/virt/kvm/kvm_main.c
-@@ -3435,10 +3435,6 @@ static vm_fault_t kvm_vcpu_fault(struct vm_fault *vmf)
- 
- 	if (vmf->pgoff == 0)
- 		page = virt_to_page(vcpu->run);
--#ifdef CONFIG_X86
--	else if (vmf->pgoff == KVM_PIO_PAGE_OFFSET)
--		page = virt_to_page(vcpu->arch.pio_data);
--#endif
- #ifdef CONFIG_KVM_MMIO
- 	else if (vmf->pgoff == KVM_COALESCED_MMIO_PAGE_OFFSET)
- 		page = virt_to_page(vcpu->kvm->coalesced_mmio_ring);
+diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+index bc6327950657..8bcbe57b560f 100644
+--- a/arch/x86/kvm/vmx/nested.c
++++ b/arch/x86/kvm/vmx/nested.c
+@@ -5830,7 +5830,8 @@ static bool nested_vmx_l0_wants_exit(struct kvm_vcpu *vcpu,
+ 		if (is_nmi(intr_info))
+ 			return true;
+ 		else if (is_page_fault(intr_info))
+-			return vcpu->arch.apf.host_apf_flags || !enable_ept;
++			return vcpu->arch.apf.host_apf_flags ||
++			       vmx_need_pf_intercept(vcpu);
+ 		else if (is_debug(intr_info) &&
+ 			 vcpu->guest_debug &
+ 			 (KVM_GUESTDBG_SINGLESTEP | KVM_GUESTDBG_USE_HW_BP))
 -- 
-2.31.1
+2.33.0.rc1.237.g0d66db33f3-goog
 
