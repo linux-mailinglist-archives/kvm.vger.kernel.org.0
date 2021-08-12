@@ -2,157 +2,139 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5CDE53EA702
-	for <lists+kvm@lfdr.de>; Thu, 12 Aug 2021 17:00:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 93AA83EA70B
+	for <lists+kvm@lfdr.de>; Thu, 12 Aug 2021 17:03:31 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237455AbhHLPAd (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 12 Aug 2021 11:00:33 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:34506 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S237129AbhHLPAc (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 12 Aug 2021 11:00:32 -0400
-Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 17CEX2c1131538
-        for <kvm@vger.kernel.org>; Thu, 12 Aug 2021 11:00:07 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=F+DnVrixQHtphiIbwcP+pveyz6BrSx7Vwt80YqkNA2I=;
- b=EmCTQJEbY/Qg1cnM3GRPOMi+05MmYsh/9c7PUDEKMob/sfa/9M5OCh7I4bM+WjQFixqR
- R7mSGVqNrI+LB2IsAhOwe65Hj3g/WnOemmg8+7hg3HgDVYwR0/QY4lI9js5yxWWA8sLy
- eBeyPPP8Mfh98ec/k+dFGzTc+ZOAN04PcqD6/TdzBsKs7M8fY5P8avSjMz3EY7jUZlyG
- 60p56nKfAUu/rRupk6eZczEJTAyX7SwK9dlTrtCDGZg5uIucH8kg5tnQS57TpE0qGDdz
- elFBscZ/saYjMyn3NfO2eavQYS3FvfcJDh47ex34sMD00bksGjXWD81PlLj2TZLn9gVN ug== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3acy935exw-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Thu, 12 Aug 2021 11:00:06 -0400
-Received: from m0098410.ppops.net (m0098410.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 17CEXLC8133429
-        for <kvm@vger.kernel.org>; Thu, 12 Aug 2021 11:00:05 -0400
-Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3acy935eve-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 12 Aug 2021 11:00:05 -0400
-Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
-        by ppma04ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 17CEwF1d024956;
-        Thu, 12 Aug 2021 15:00:03 GMT
-Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
-        by ppma04ams.nl.ibm.com with ESMTP id 3acn76a4qt-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 12 Aug 2021 15:00:03 +0000
-Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
-        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 17CExxOx55705996
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 12 Aug 2021 14:59:59 GMT
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id C48FE4C063;
-        Thu, 12 Aug 2021 14:59:59 +0000 (GMT)
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 78AEB4C04A;
-        Thu, 12 Aug 2021 14:59:59 +0000 (GMT)
-Received: from oc3016276355.ibm.com (unknown [9.145.85.233])
-        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Thu, 12 Aug 2021 14:59:59 +0000 (GMT)
-Subject: Re: [kvm-unit-tests PATCH 1/1] s390x: css: check the CSS is working
- with any ISC
-To:     Cornelia Huck <cohuck@redhat.com>, kvm@vger.kernel.org
-Cc:     frankja@linux.ibm.com, david@redhat.com, thuth@redhat.com,
-        imbrenda@linux.ibm.com
-References: <1628769189-10699-1-git-send-email-pmorel@linux.ibm.com>
- <1628769189-10699-2-git-send-email-pmorel@linux.ibm.com>
- <87fsvevo7p.fsf@redhat.com>
-From:   Pierre Morel <pmorel@linux.ibm.com>
-Message-ID: <276c5be3-2e57-d29c-a179-3b59e8b69fe1@linux.ibm.com>
-Date:   Thu, 12 Aug 2021 16:59:59 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.12.0
+        id S238258AbhHLPDK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 12 Aug 2021 11:03:10 -0400
+Received: from mail.skyhub.de ([5.9.137.197]:50100 "EHLO mail.skyhub.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S238194AbhHLPDJ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 12 Aug 2021 11:03:09 -0400
+Received: from zn.tnic (p200300ec2f0f830099de965992d633fe.dip0.t-ipconnect.de [IPv6:2003:ec:2f0f:8300:99de:9659:92d6:33fe])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 294AA1EC01DF;
+        Thu, 12 Aug 2021 17:02:38 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
+        t=1628780558;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
+        bh=2YLlWCBM2h1buYRLjyfrjQPBk1fNhhkd7J5SB+sqLHw=;
+        b=gWT5tIHXbO5j+eyxCYEkIXJIRECIzEXs881TU9lM9OeZxaMuuIbZTby9xQPlv6dlqebt01
+        FzpsbL+TNjnr6a7NrLSTdIPQ0tC8NGB/Juj5Zl0aX89dthadzA7rLQtdcd1DdziIaFytZq
+        6NnMAmufxmIjSJP+EqsGLo4LHipXGFA=
+Date:   Thu, 12 Aug 2021 17:03:15 +0200
+From:   Borislav Petkov <bp@alien8.de>
+To:     "Chang S. Bae" <chang.seok.bae@intel.com>
+Cc:     luto@kernel.org, tglx@linutronix.de, mingo@kernel.org,
+        x86@kernel.org, len.brown@intel.com, dave.hansen@intel.com,
+        thiago.macieira@intel.com, jing2.liu@intel.com,
+        ravi.v.shankar@intel.com, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org
+Subject: Re: [PATCH v9 05/26] x86/fpu/xstate: Add new variables to indicate
+ dynamic XSTATE buffer size
+Message-ID: <YRU4M6FO0OHc67Wx@zn.tnic>
+References: <20210730145957.7927-1-chang.seok.bae@intel.com>
+ <20210730145957.7927-6-chang.seok.bae@intel.com>
 MIME-Version: 1.0
-In-Reply-To: <87fsvevo7p.fsf@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: aydZv4deCZrnUEz2Ral2wIFrDsy6xprm
-X-Proofpoint-ORIG-GUID: y7gvg6rFXqKgZu-EGAW_92dXW1QutONt
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.790
- definitions=2021-08-12_05:2021-08-12,2021-08-12 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 impostorscore=0
- lowpriorityscore=0 priorityscore=1501 suspectscore=0 spamscore=0
- mlxscore=0 mlxlogscore=999 bulkscore=0 phishscore=0 malwarescore=0
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2107140000 definitions=main-2108120094
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20210730145957.7927-6-chang.seok.bae@intel.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Fri, Jul 30, 2021 at 07:59:36AM -0700, Chang S. Bae wrote:
+> @@ -167,8 +158,10 @@ static void __init fpu__init_task_struct_size(void)
+>  	/*
+>  	 * Add back the dynamically-calculated register state
+>  	 * size.
+> +	 *
+> +	 * Use the minimum size as embedded to task_struct.
 
+embedded in...
 
-On 8/12/21 2:31 PM, Cornelia Huck wrote:
-> On Thu, Aug 12 2021, Pierre Morel <pmorel@linux.ibm.com> wrote:
-> 
->> In the previous version we did only check that one ISC dedicated by
->> Linux for I/O is working fine.
->>
->> However, there is no reason to prefer one ISC to another ISC, we are
->> free to take anyone.
->>
->> Let's check all possible ISC to verify that QEMU/KVM is really ISC
->> independent.
-> 
-> It's probably a good idea to test for a non-standard isc. Not sure
-> whether we need all of them, but it doesn't hurt.
-> 
-> Do you also have plans for a test to verify the priority handling for
-> the different iscs?
+> diff --git a/arch/x86/kernel/fpu/xstate.c b/arch/x86/kernel/fpu/xstate.c
+> index 74e608c6ad6c..12caf1a56ce0 100644
+> --- a/arch/x86/kernel/fpu/xstate.c
+> +++ b/arch/x86/kernel/fpu/xstate.c
+> @@ -77,12 +77,51 @@ static unsigned int xstate_comp_offsets[XFEATURE_MAX] __ro_after_init =
+>  static unsigned int xstate_supervisor_only_offsets[XFEATURE_MAX] __ro_after_init =
+>  	{ [ 0 ... XFEATURE_MAX - 1] = -1};
+>  
+> -/*
+> - * The XSAVE area of kernel can be in standard or compacted format;
+> - * it is always in standard format for user mode. This is the user
+> - * mode standard format size used for signal and ptrace frames.
+> +/**
+> + * struct fpu_xstate_buffer_config - xstate buffer configuration
+> + * @max_size:			The CPUID-enumerated all-feature "maximum" size
+> + *				for xstate per-task buffer.
+> + * @min_size:			The size to fit into the statically-allocated
+> + *				buffer. With dynamic states, this buffer no longer
+> + *				contains all the enabled state components.
+> + * @user_size:			The size of user-space buffer for signal and
+> + *				ptrace frames, in the non-compacted format.
+>   */
+> -unsigned int fpu_user_xstate_size __ro_after_init;
+> +struct fpu_xstate_buffer_config {
+> +	unsigned int min_size, max_size;
+> +	unsigned int user_size;
+> +};
+> +
+> +static struct fpu_xstate_buffer_config buffer_config __ro_after_init;
 
-No, I did not think about this yet.
+I know I had asked for the accessors below but if this is going to be
+read-only after init and is not going to change for duration of the
+system lifetime, then you don't really need those accessors.
 
+I.e., you can do
 
-> 
->>
->> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
->> ---
->>   s390x/css.c | 25 +++++++++++++++++--------
->>   1 file changed, 17 insertions(+), 8 deletions(-)
->>
-> 
-> (...)
-> 
->> @@ -142,7 +143,6 @@ static void sense_id(void)
->>   
->>   static void css_init(void)
->>   {
->> -	assert(register_io_int_func(css_irq_io) == 0);
->>   	lowcore_ptr->io_int_param = 0;
->>   
->>   	report(get_chsc_scsc(), "Store Channel Characteristics");
->> @@ -351,11 +351,20 @@ int main(int argc, char *argv[])
->>   	int i;
->>   
->>   	report_prefix_push("Channel Subsystem");
->> -	enable_io_isc(0x80 >> IO_SCH_ISC);
->> -	for (i = 0; tests[i].name; i++) {
->> -		report_prefix_push(tests[i].name);
->> -		tests[i].func();
->> -		report_prefix_pop();
->> +
->> +	for (io_isc = 0; io_isc < 8; io_isc++) {
->> +		report_info("ISC: %d\n", io_isc);
->> +
->> +		enable_io_isc(0x80 >> io_isc);
->> +		assert(register_io_int_func(css_irq_io) == 0);
-> 
-> Why are you registering/deregistering the irq handler multiple times? It
-> should be the same, regardless of the isc?
+struct fpu_xstate_buffer_config {
+	unsigned int min_size, max_size;
+	unsigned int user_size;
+};
 
-Yes, right, did not pay attention when pushing all in the loop,
-I will get it out of the loop.
+static struct fpu_xstate_buffer_config fpu_buf_cfg __ro_after_init;
 
-Thanks,
-Pierre
+and then access those values through fpu_buf_cfg.<value>
 
+Thx.
+
+> +
+> +unsigned int get_xstate_config(enum xstate_config cfg)
+> +{
+> +	switch (cfg) {
+> +	case XSTATE_MIN_SIZE:
+> +		return buffer_config.min_size;
+> +	case XSTATE_MAX_SIZE:
+> +		return buffer_config.max_size;
+> +	case XSTATE_USER_SIZE:
+> +		return buffer_config.user_size;
+> +	default:
+> +		return 0;
+> +	}
+> +}
+> +EXPORT_SYMBOL_GPL(get_xstate_config);
+> +
+> +void set_xstate_config(enum xstate_config cfg, unsigned int value)
+> +{
+> +	switch (cfg) {
+> +	case XSTATE_MIN_SIZE:
+> +		buffer_config.min_size = value;
+> +		break;
+> +	case XSTATE_MAX_SIZE:
+> +		buffer_config.max_size = value;
+> +		break;
+> +	case XSTATE_USER_SIZE:
+> +		buffer_config.user_size = value;
+> +	}
+> +}
 
 -- 
-Pierre Morel
-IBM Lab Boeblingen
+Regards/Gruss,
+    Boris.
+
+https://people.kernel.org/tglx/notes-about-netiquette
