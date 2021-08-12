@@ -2,98 +2,97 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 00B353EA804
-	for <lists+kvm@lfdr.de>; Thu, 12 Aug 2021 17:53:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 777F53EA819
+	for <lists+kvm@lfdr.de>; Thu, 12 Aug 2021 17:56:33 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238403AbhHLPxu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 12 Aug 2021 11:53:50 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:24582 "EHLO
+        id S238482AbhHLP4q (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 12 Aug 2021 11:56:46 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:38262 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S238319AbhHLPxs (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 12 Aug 2021 11:53:48 -0400
+        by vger.kernel.org with ESMTP id S238477AbhHLP4q (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 12 Aug 2021 11:56:46 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1628783602;
+        s=mimecast20190719; t=1628783780;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=dHPw1bhKl19tpaWZWxIqL1UIJ8eN+9Q1TmLAPmpMLXc=;
-        b=diI3w0Fg1ancmdWWLeAMr4G92L/XajtbciMHRdwvI3Hq0jIaI/NKmW5qGsDHT0TZ81VNSP
-        HlVmdvlGWza0+cVDtd8kL0OZedodaPr1EYUPHkd83kEO0t5RCV7Ot5KllLWKcA3vVKLCYv
-        bZltZr2CXyja8tfkbmYBTk3dlg1GpYE=
-Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
- [209.85.208.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-217-DiV-rUjAP6WvDyW6JMVG_Q-1; Thu, 12 Aug 2021 11:53:21 -0400
-X-MC-Unique: DiV-rUjAP6WvDyW6JMVG_Q-1
-Received: by mail-ed1-f69.google.com with SMTP id s8-20020a0564025208b02903bd8539e1caso3237067edd.22
-        for <kvm@vger.kernel.org>; Thu, 12 Aug 2021 08:53:20 -0700 (PDT)
+        bh=jP9rC4W5Rt3ibI4PmBrTL9EEbYfxjT7lG4AyqlHLOZw=;
+        b=OfzxomGvoR7lvFfc0daKdr36AOan73IIoheCgMe2r/mQPKapZGrKcXVcW8yEqjRw4Z8Bbv
+        LFpLusI0faVtHBC2JiPCLEhzNGTvurtVkEd7LzK6L2PDWg/KRhn3wPaRT4muzCsumCjRU5
+        fCDbZv904ZFlZmDsDyn/3AfWjoSV6yk=
+Received: from mail-oo1-f69.google.com (mail-oo1-f69.google.com
+ [209.85.161.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-553-rJPUPUJBOtqtXisi5qwhAA-1; Thu, 12 Aug 2021 11:56:17 -0400
+X-MC-Unique: rJPUPUJBOtqtXisi5qwhAA-1
+Received: by mail-oo1-f69.google.com with SMTP id b24-20020a4ac2980000b0290269ebe9b797so2277183ooq.18
+        for <kvm@vger.kernel.org>; Thu, 12 Aug 2021 08:56:16 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:to:cc:references:from:subject:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=dHPw1bhKl19tpaWZWxIqL1UIJ8eN+9Q1TmLAPmpMLXc=;
-        b=ULcQcPA5RZkVCWLx4WIjU4CC2Jjk+HEtmuQWk3Q7kVjfZX7Kr8zRSgoNQ6L6kU6v96
-         BSJyJ7z2Ykxtg6b/bhpwmup6VL0lsqGrdPZADlzZ8MsigpXgCiixKjVvHh8v3A1KY0dQ
-         q66AKVVqAQAp3v7A+wMqx/7nhTLOxQ73M5vI55fN/Zay3bkl+Yev9nqacjFAlogvlJ3w
-         //j4OqRcvaNz7awIAm6Jk8Tz4ofxbW+2dyICfgQeiotTigAuRZAQoot6KRmazekBVXSY
-         pYlIG+Ns/LjG4QLXuVFSi0JJJIZEscg6Yyx+KR/a0qyfIvTKFuz2VNaXJvilgAOtW8lT
-         2c6g==
-X-Gm-Message-State: AOAM532vCf0mkD3DJaccv94Cp0i1SwmEMAyLAueHvptWc2Mi1/vaV6Ji
-        pclW9FtAuJ3ge/StUgbSwGUw4pUfoYMOZhrBYpnYPZix+nf8Q26s+ZjgoiQ9j0/he1LlZcKtcGk
-        0xQr78sQJ9e95
-X-Received: by 2002:aa7:c345:: with SMTP id j5mr2694257edr.331.1628783599819;
-        Thu, 12 Aug 2021 08:53:19 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyA2o0pTKirLj0DNfQbHbvFJAFWpUMp09yyngCH8w5NoiU/HesRnlmz+BQfPLisSylJ4MIxPw==
-X-Received: by 2002:aa7:c345:: with SMTP id j5mr2694241edr.331.1628783599604;
-        Thu, 12 Aug 2021 08:53:19 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id m25sm1293859edv.81.2021.08.12.08.53.17
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 12 Aug 2021 08:53:18 -0700 (PDT)
-To:     Marcelo Tosatti <mtosatti@redhat.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        vkuznets@redhat.com
-References: <20210811102356.3406687-1-pbonzini@redhat.com>
- <20210811102356.3406687-2-pbonzini@redhat.com>
- <20210811180322.GA178399@fuller.cnet>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH 1/2] KVM: KVM-on-hyperv: shorten no-entry section on
- reenlightenment
-Message-ID: <5e3ddaea-c0f4-f207-de54-5702c970079b@redhat.com>
-Date:   Thu, 12 Aug 2021 17:53:17 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.11.0
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=jP9rC4W5Rt3ibI4PmBrTL9EEbYfxjT7lG4AyqlHLOZw=;
+        b=elWuKMAOa8vvBdpmDxq8m+vkp7AT0u8k6SwXi6kRvxFpWc1HrDw4MnyhfVeZwm1dOm
+         JajnRhYFN//VS7AB8WmKKHoSHhyCwhO0t9L2X74+nZFxRFkUBraDOC1pR9+DWV/3aIJB
+         p5jBgK8rr9b1WFJp/4NLSTjxdWU3deMjNIBkPAuhG3Qjdf98A0Yu9oNW4EfkPKNQ3IoS
+         orbUh2jLTvph01riQNCINvPS0b1EnR73zf+Aqr/Ynichnltmh+weukna5+cDo94TsarK
+         yRhSKA1IGH1i6IQLt+ncVhxI6Vp/OAfV5/J3Fqo+2F08lM1wwPXdLju9Z1f5/9I9PeGL
+         j4iw==
+X-Gm-Message-State: AOAM532iCjzsgmRucSY4ucmQG6Q06+a3AdXGuLiZ9V12sA0+AFWL2bDu
+        IVfmf8PchuGGEJdPZKQu1hR5nCJS2rZ73r4azf31xu8s6dRTvCAwr2xh7wEfJD/0iNg39GrRR/r
+        OUA3gA46ak2FB
+X-Received: by 2002:a05:6830:3145:: with SMTP id c5mr3935364ots.245.1628783776429;
+        Thu, 12 Aug 2021 08:56:16 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJznlclP0Zx5nBNeeFvXZ3mWhBBV2KVFXd0kDScEy4VoJCRJyLLF3KeFSh05bRPBExRmJinXkg==
+X-Received: by 2002:a05:6830:3145:: with SMTP id c5mr3935350ots.245.1628783776155;
+        Thu, 12 Aug 2021 08:56:16 -0700 (PDT)
+Received: from redhat.com ([198.99.80.109])
+        by smtp.gmail.com with ESMTPSA id u14sm611344oot.36.2021.08.12.08.56.15
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 12 Aug 2021 08:56:15 -0700 (PDT)
+Date:   Thu, 12 Aug 2021 09:56:14 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Diana Craciun <diana.craciun@oss.nxp.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Kirti Wankhede <kwankhede@nvidia.com>,
+        Eric Auger <eric.auger@redhat.com>,
+        Jason Gunthorpe <jgg@ziepe.ca>, kvm@vger.kernel.org
+Subject: Re: [PATCH 05/14] vfio: refactor noiommu group creation
+Message-ID: <20210812095614.3299d7ab.alex.williamson@redhat.com>
+In-Reply-To: <20210812072617.GA28507@lst.de>
+References: <20210811151500.2744-1-hch@lst.de>
+        <20210811151500.2744-6-hch@lst.de>
+        <20210811160341.573a5b82.alex.williamson@redhat.com>
+        <20210812072617.GA28507@lst.de>
+X-Mailer: Claws Mail 3.18.0 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-In-Reply-To: <20210811180322.GA178399@fuller.cnet>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 11/08/21 20:03, Marcelo Tosatti wrote:
->          hyperv_stop_tsc_emulation();
+On Thu, 12 Aug 2021 09:26:17 +0200
+Christoph Hellwig <hch@lst.de> wrote:
+
+> On Wed, Aug 11, 2021 at 04:03:41PM -0600, Alex Williamson wrote:
+> > > +			dev_warn(dev, "Adding kernel taint for vfio-noiommu group on device\n");
+> > > +			return vfio_noiommu_group_alloc(dev);  
+> > 
+> > Nit, we taint regardless of the success of this function, should we
+> > move the tainting back into the function (using the flags to skip for
+> > mdev in subsequent patches) or swap the order to check the return value
+> > before tainting?  Thanks,  
 > 
->          /* TSC frequency always matches when on Hyper-V */
->          for_each_present_cpu(cpu)
->                  per_cpu(cpu_tsc_khz, cpu) = tsc_khz;
->          kvm_max_guest_tsc_khz = tsc_khz;
+> Does it really matter to have the extra thread if a memory allocation
+> failed when going down this route?
 
-Yeah, it's more complicated than this.  The right sequence is:
+Extra thread?  In practice this is unlikely to ever fail, but if we've
+chosen the point at which we have a no-iommu group as where we taint,
+then let's at least be consistent and not move that back to the point
+where we tried to make a no-iommu group, regardless of whether it was
+successful.  Thanks,
 
-- update the master clock
-
-- update the TSC page parameters
-
-- stop TSC emulation
-
-There is no need to invalidate the TSC page.
-
-Related to this, after kvm_hv_invalidate_tsc_page the sequence value in 
-the Hyper-V TSC page will always be 1, which is wrong.  I'll take a look 
-at that too.
-
-Paolo
+Alex
 
