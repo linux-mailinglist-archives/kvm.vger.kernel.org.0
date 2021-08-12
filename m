@@ -2,291 +2,206 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 25D553E9CEB
-	for <lists+kvm@lfdr.de>; Thu, 12 Aug 2021 05:31:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9CE673E9D22
+	for <lists+kvm@lfdr.de>; Thu, 12 Aug 2021 06:02:30 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233780AbhHLDbf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 11 Aug 2021 23:31:35 -0400
-Received: from mga11.intel.com ([192.55.52.93]:65081 "EHLO mga11.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S233771AbhHLDbc (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 11 Aug 2021 23:31:32 -0400
-X-IronPort-AV: E=McAfee;i="6200,9189,10073"; a="212159227"
-X-IronPort-AV: E=Sophos;i="5.84,314,1620716400"; 
-   d="scan'208";a="212159227"
-Received: from fmsmga002.fm.intel.com ([10.253.24.26])
-  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Aug 2021 20:31:07 -0700
-X-IronPort-AV: E=Sophos;i="5.84,314,1620716400"; 
-   d="scan'208";a="527545901"
-Received: from unknown (HELO cra01infra01.deacluster.intel.com) ([10.240.192.107])
-  by fmsmga002-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Aug 2021 20:31:05 -0700
-From:   Zhu Lingshan <lingshan.zhu@intel.com>
-To:     jasowang@redhat.com, mst@redhat.com
-Cc:     virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        kvm@vger.kernel.org, Zhu Lingshan <lingshan.zhu@intel.com>
-Subject: [RESEND PATCH V3 2/2] vDPA/ifcvf: implement management netlink framework for ifcvf
-Date:   Thu, 12 Aug 2021 11:24:54 +0800
-Message-Id: <20210812032454.24486-3-lingshan.zhu@intel.com>
-X-Mailer: git-send-email 2.27.0
-In-Reply-To: <20210812032454.24486-1-lingshan.zhu@intel.com>
-References: <20210812032454.24486-1-lingshan.zhu@intel.com>
+        id S229983AbhHLECv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 12 Aug 2021 00:02:51 -0400
+Received: from out30-130.freemail.mail.aliyun.com ([115.124.30.130]:39336 "EHLO
+        out30-130.freemail.mail.aliyun.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229518AbhHLECu (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 12 Aug 2021 00:02:50 -0400
+X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R101e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e01424;MF=houwenlong93@linux.alibaba.com;NM=1;PH=DS;RN=38;SR=0;TI=SMTPD_---0UikIOfn_1628740941;
+Received: from localhost(mailfrom:houwenlong93@linux.alibaba.com fp:SMTPD_---0UikIOfn_1628740941)
+          by smtp.aliyun-inc.com(127.0.0.1);
+          Thu, 12 Aug 2021 12:02:21 +0800
+From:   Hou Wenlong <houwenlong93@linux.alibaba.com>
+To:     kvm@vger.kernel.org
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Marc Zyngier <maz@kernel.org>,
+        James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Will Deacon <will@kernel.org>,
+        Huacai Chen <chenhuacai@kernel.org>,
+        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+        Paul Mackerras <paulus@ozlabs.org>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        linux-kernel@vger.kernel.org, linux-mips@vger.kernel.org,
+        kvm-ppc@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+        linux-s390@vger.kernel.org
+Subject: [PATCH v2 1/2] KVM: Refactor kvm_arch_vcpu_fault() to return a struct page pointer
+Date:   Thu, 12 Aug 2021 12:02:19 +0800
+Message-Id: <1c510b24fc1d7cbae8aa4b69c0799ebd32e65b82.1628739116.git.houwenlong93@linux.alibaba.com>
+X-Mailer: git-send-email 2.31.1
+In-Reply-To: <YRQcZqCWwVH8bCGc@google.com>
+References: <YRQcZqCWwVH8bCGc@google.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This commit implements the management netlink framework for ifcvf,
-including register and add / remove a device
+From: Sean Christopherson <seanjc@google.com>
 
-It works with iproute2:
-[root@localhost lszhu]# vdpa mgmtdev show -jp
-{
-    "mgmtdev": {
-        "pci/0000:01:00.5": {
-            "supported_classes": [ "net" ]
-        },
-        "pci/0000:01:00.6": {
-            "supported_classes": [ "net" ]
-        }
-    }
-}
+Refactor kvm_arch_vcpu_fault() to return 'struct page *' instead of
+'vm_fault_t' to simplify architecture specific implementations that do
+more than return SIGBUS.  Currently this only applies to s390, but a
+future patch will move x86's pio_data handling into x86 where it belongs.
 
-[root@localhost lszhu]# vdpa dev add mgmtdev pci/0000:01:00.5 name vdpa0
-[root@localhost lszhu]# vdpa dev add mgmtdev pci/0000:01:00.6 name vdpa1
+No functional changed intended.
 
-Signed-off-by: Zhu Lingshan <lingshan.zhu@intel.com>
-Acked-by: Jason Wang <jasowang@redhat.com>
+Cc: Hou Wenlong <houwenlong93@linux.alibaba.com>
+Signed-off-by: Sean Christopherson <seanjc@google.com>
+Signed-off-by: Hou Wenlong <houwenlong93@linux.alibaba.com>
 ---
- drivers/vdpa/ifcvf/ifcvf_base.h |   6 ++
- drivers/vdpa/ifcvf/ifcvf_main.c | 154 ++++++++++++++++++++++++--------
- 2 files changed, 124 insertions(+), 36 deletions(-)
+ arch/arm64/kvm/arm.c       |  4 ++--
+ arch/mips/kvm/mips.c       |  4 ++--
+ arch/powerpc/kvm/powerpc.c |  4 ++--
+ arch/s390/kvm/kvm-s390.c   | 12 ++++--------
+ arch/x86/kvm/x86.c         |  4 ++--
+ include/linux/kvm_host.h   |  2 +-
+ virt/kvm/kvm_main.c        |  5 ++++-
+ 7 files changed, 17 insertions(+), 18 deletions(-)
 
-diff --git a/drivers/vdpa/ifcvf/ifcvf_base.h b/drivers/vdpa/ifcvf/ifcvf_base.h
-index 2996db0da490..1601e87870da 100644
---- a/drivers/vdpa/ifcvf/ifcvf_base.h
-+++ b/drivers/vdpa/ifcvf/ifcvf_base.h
-@@ -106,6 +106,12 @@ struct ifcvf_lm_cfg {
- 	struct ifcvf_vring_lm_cfg vring_lm_cfg[IFCVF_MAX_QUEUE_PAIRS];
- };
- 
-+struct ifcvf_vdpa_mgmt_dev {
-+	struct vdpa_mgmt_dev mdev;
-+	struct ifcvf_adapter *adapter;
-+	struct pci_dev *pdev;
-+};
-+
- int ifcvf_init_hw(struct ifcvf_hw *hw, struct pci_dev *dev);
- int ifcvf_start_hw(struct ifcvf_hw *hw);
- void ifcvf_stop_hw(struct ifcvf_hw *hw);
-diff --git a/drivers/vdpa/ifcvf/ifcvf_main.c b/drivers/vdpa/ifcvf/ifcvf_main.c
-index b5db114646c1..4b623253f460 100644
---- a/drivers/vdpa/ifcvf/ifcvf_main.c
-+++ b/drivers/vdpa/ifcvf/ifcvf_main.c
-@@ -218,7 +218,7 @@ static void ifcvf_vdpa_set_status(struct vdpa_device *vdpa_dev, u8 status)
- 	int ret;
- 
- 	vf  = vdpa_to_vf(vdpa_dev);
--	adapter = dev_get_drvdata(vdpa_dev->dev.parent);
-+	adapter = vdpa_to_adapter(vdpa_dev);
- 	status_old = ifcvf_get_status(vf);
- 
- 	if (status_old == status)
-@@ -458,6 +458,16 @@ static const struct vdpa_config_ops ifc_vdpa_ops = {
- 	.get_vq_notification = ifcvf_get_vq_notification,
- };
- 
-+static struct virtio_device_id id_table_net[] = {
-+	{VIRTIO_ID_NET, VIRTIO_DEV_ANY_ID},
-+	{0},
-+};
-+
-+static struct virtio_device_id id_table_blk[] = {
-+	{VIRTIO_ID_BLOCK, VIRTIO_DEV_ANY_ID},
-+	{0},
-+};
-+
- static u32 get_dev_type(struct pci_dev *pdev)
- {
- 	u32 dev_type;
-@@ -478,48 +488,30 @@ static u32 get_dev_type(struct pci_dev *pdev)
- 	return dev_type;
- }
- 
--static int ifcvf_probe(struct pci_dev *pdev, const struct pci_device_id *id)
-+static int ifcvf_vdpa_dev_add(struct vdpa_mgmt_dev *mdev, const char *name)
- {
--	struct device *dev = &pdev->dev;
-+	struct ifcvf_vdpa_mgmt_dev *ifcvf_mgmt_dev;
- 	struct ifcvf_adapter *adapter;
-+	struct pci_dev *pdev;
- 	struct ifcvf_hw *vf;
-+	struct device *dev;
- 	int ret, i;
- 
--	ret = pcim_enable_device(pdev);
--	if (ret) {
--		IFCVF_ERR(pdev, "Failed to enable device\n");
--		return ret;
--	}
--
--	ret = pcim_iomap_regions(pdev, BIT(0) | BIT(2) | BIT(4),
--				 IFCVF_DRIVER_NAME);
--	if (ret) {
--		IFCVF_ERR(pdev, "Failed to request MMIO region\n");
--		return ret;
--	}
--
--	ret = dma_set_mask_and_coherent(dev, DMA_BIT_MASK(64));
--	if (ret) {
--		IFCVF_ERR(pdev, "No usable DMA configuration\n");
--		return ret;
--	}
--
--	ret = devm_add_action_or_reset(dev, ifcvf_free_irq_vectors, pdev);
--	if (ret) {
--		IFCVF_ERR(pdev,
--			  "Failed for adding devres for freeing irq vectors\n");
--		return ret;
--	}
-+	ifcvf_mgmt_dev = container_of(mdev, struct ifcvf_vdpa_mgmt_dev, mdev);
-+	if (ifcvf_mgmt_dev->adapter)
-+		return -EOPNOTSUPP;
- 
-+	pdev = ifcvf_mgmt_dev->pdev;
-+	dev = &pdev->dev;
- 	adapter = vdpa_alloc_device(struct ifcvf_adapter, vdpa,
--				    dev, &ifc_vdpa_ops, NULL);
--	if (adapter == NULL) {
-+				    dev, &ifc_vdpa_ops, name);
-+	if (!adapter) {
- 		IFCVF_ERR(pdev, "Failed to allocate vDPA structure");
- 		return -ENOMEM;
- 	}
- 
--	pci_set_master(pdev);
--	pci_set_drvdata(pdev, adapter);
-+	ifcvf_mgmt_dev->adapter = adapter;
-+	pci_set_drvdata(pdev, ifcvf_mgmt_dev);
- 
- 	vf = &adapter->vf;
- 	vf->dev_type = get_dev_type(pdev);
-@@ -539,9 +531,10 @@ static int ifcvf_probe(struct pci_dev *pdev, const struct pci_device_id *id)
- 
- 	vf->hw_features = ifcvf_get_hw_features(vf);
- 
--	ret = vdpa_register_device(&adapter->vdpa, IFCVF_MAX_QUEUE_PAIRS * 2);
-+	adapter->vdpa.mdev = &ifcvf_mgmt_dev->mdev;
-+	ret = _vdpa_register_device(&adapter->vdpa, IFCVF_MAX_QUEUE_PAIRS * 2);
- 	if (ret) {
--		IFCVF_ERR(pdev, "Failed to register ifcvf to vdpa bus");
-+		IFCVF_ERR(pdev, "Failed to register to vDPA bus");
- 		goto err;
- 	}
- 
-@@ -552,11 +545,100 @@ static int ifcvf_probe(struct pci_dev *pdev, const struct pci_device_id *id)
+diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+index e9a2b8f27792..83f4ffe3e4f2 100644
+--- a/arch/arm64/kvm/arm.c
++++ b/arch/arm64/kvm/arm.c
+@@ -161,9 +161,9 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
  	return ret;
  }
  
-+static void ifcvf_vdpa_dev_del(struct vdpa_mgmt_dev *mdev, struct vdpa_device *dev)
-+{
-+	struct ifcvf_vdpa_mgmt_dev *ifcvf_mgmt_dev;
-+
-+	ifcvf_mgmt_dev = container_of(mdev, struct ifcvf_vdpa_mgmt_dev, mdev);
-+	_vdpa_unregister_device(dev);
-+	ifcvf_mgmt_dev->adapter = NULL;
-+}
-+
-+static const struct vdpa_mgmtdev_ops ifcvf_vdpa_mgmt_dev_ops = {
-+	.dev_add = ifcvf_vdpa_dev_add,
-+	.dev_del = ifcvf_vdpa_dev_del
-+};
-+
-+static int ifcvf_probe(struct pci_dev *pdev, const struct pci_device_id *id)
-+{
-+	struct ifcvf_vdpa_mgmt_dev *ifcvf_mgmt_dev;
-+	struct device *dev = &pdev->dev;
-+	u32 dev_type;
-+	int ret;
-+
-+	ifcvf_mgmt_dev = kzalloc(sizeof(struct ifcvf_vdpa_mgmt_dev), GFP_KERNEL);
-+	if (!ifcvf_mgmt_dev) {
-+		IFCVF_ERR(pdev, "Failed to alloc memory for the vDPA management device\n");
-+		return -ENOMEM;
-+	}
-+
-+	dev_type = get_dev_type(pdev);
-+	switch (dev_type) {
-+	case VIRTIO_ID_NET:
-+		ifcvf_mgmt_dev->mdev.id_table = id_table_net;
-+		break;
-+	case VIRTIO_ID_BLOCK:
-+		ifcvf_mgmt_dev->mdev.id_table = id_table_blk;
-+		break;
-+	default:
-+		IFCVF_ERR(pdev, "VIRTIO ID %u not supported\n", dev_type);
-+		ret = -EOPNOTSUPP;
-+		goto err;
-+	}
-+
-+	ifcvf_mgmt_dev->mdev.ops = &ifcvf_vdpa_mgmt_dev_ops;
-+	ifcvf_mgmt_dev->mdev.device = dev;
-+	ifcvf_mgmt_dev->pdev = pdev;
-+
-+	ret = pcim_enable_device(pdev);
-+	if (ret) {
-+		IFCVF_ERR(pdev, "Failed to enable device\n");
-+		goto err;
-+	}
-+
-+	ret = pcim_iomap_regions(pdev, BIT(0) | BIT(2) | BIT(4),
-+				 IFCVF_DRIVER_NAME);
-+	if (ret) {
-+		IFCVF_ERR(pdev, "Failed to request MMIO region\n");
-+		goto err;
-+	}
-+
-+	ret = dma_set_mask_and_coherent(dev, DMA_BIT_MASK(64));
-+	if (ret) {
-+		IFCVF_ERR(pdev, "No usable DMA configuration\n");
-+		goto err;
-+	}
-+
-+	ret = devm_add_action_or_reset(dev, ifcvf_free_irq_vectors, pdev);
-+	if (ret) {
-+		IFCVF_ERR(pdev,
-+			  "Failed for adding devres for freeing irq vectors\n");
-+		goto err;
-+	}
-+
-+	pci_set_master(pdev);
-+
-+	ret = vdpa_mgmtdev_register(&ifcvf_mgmt_dev->mdev);
-+	if (ret) {
-+		IFCVF_ERR(pdev,
-+			  "Failed to initialize the management interfaces\n");
-+		goto err;
-+	}
-+
-+	return 0;
-+
-+err:
-+	kfree(ifcvf_mgmt_dev);
-+	return ret;
-+}
-+
- static void ifcvf_remove(struct pci_dev *pdev)
+-vm_fault_t kvm_arch_vcpu_fault(struct kvm_vcpu *vcpu, struct vm_fault *vmf)
++struct page *kvm_arch_vcpu_fault(struct kvm_vcpu *vcpu, struct vm_fault *vmf)
  {
--	struct ifcvf_adapter *adapter = pci_get_drvdata(pdev);
-+	struct ifcvf_vdpa_mgmt_dev *ifcvf_mgmt_dev;
- 
--	vdpa_unregister_device(&adapter->vdpa);
-+	ifcvf_mgmt_dev = pci_get_drvdata(pdev);
-+	vdpa_mgmtdev_unregister(&ifcvf_mgmt_dev->mdev);
-+	kfree(ifcvf_mgmt_dev);
+-	return VM_FAULT_SIGBUS;
++	return NULL;
  }
  
- static struct pci_device_id ifcvf_pci_ids[] = {
+ 
+diff --git a/arch/mips/kvm/mips.c b/arch/mips/kvm/mips.c
+index af9dd029a4e1..ae79874e6fd2 100644
+--- a/arch/mips/kvm/mips.c
++++ b/arch/mips/kvm/mips.c
+@@ -1053,9 +1053,9 @@ int kvm_arch_vcpu_ioctl_set_fpu(struct kvm_vcpu *vcpu, struct kvm_fpu *fpu)
+ 	return -ENOIOCTLCMD;
+ }
+ 
+-vm_fault_t kvm_arch_vcpu_fault(struct kvm_vcpu *vcpu, struct vm_fault *vmf)
++struct page *kvm_arch_vcpu_fault(struct kvm_vcpu *vcpu, struct vm_fault *vmf)
+ {
+-	return VM_FAULT_SIGBUS;
++	return NULL;
+ }
+ 
+ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+diff --git a/arch/powerpc/kvm/powerpc.c b/arch/powerpc/kvm/powerpc.c
+index be33b5321a76..b9c21f9ab784 100644
+--- a/arch/powerpc/kvm/powerpc.c
++++ b/arch/powerpc/kvm/powerpc.c
+@@ -2090,9 +2090,9 @@ long kvm_arch_vcpu_ioctl(struct file *filp,
+ 	return r;
+ }
+ 
+-vm_fault_t kvm_arch_vcpu_fault(struct kvm_vcpu *vcpu, struct vm_fault *vmf)
++struct page *kvm_arch_vcpu_fault(struct kvm_vcpu *vcpu, struct vm_fault *vmf)
+ {
+-	return VM_FAULT_SIGBUS;
++	return NULL;
+ }
+ 
+ static int kvm_vm_ioctl_get_pvinfo(struct kvm_ppc_pvinfo *pvinfo)
+diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
+index 02574d7b3612..e1b69833e228 100644
+--- a/arch/s390/kvm/kvm-s390.c
++++ b/arch/s390/kvm/kvm-s390.c
+@@ -4979,17 +4979,13 @@ long kvm_arch_vcpu_ioctl(struct file *filp,
+ 	return r;
+ }
+ 
+-vm_fault_t kvm_arch_vcpu_fault(struct kvm_vcpu *vcpu, struct vm_fault *vmf)
++struct page *kvm_arch_vcpu_fault(struct kvm_vcpu *vcpu, struct vm_fault *vmf)
+ {
+ #ifdef CONFIG_KVM_S390_UCONTROL
+-	if ((vmf->pgoff == KVM_S390_SIE_PAGE_OFFSET)
+-		 && (kvm_is_ucontrol(vcpu->kvm))) {
+-		vmf->page = virt_to_page(vcpu->arch.sie_block);
+-		get_page(vmf->page);
+-		return 0;
+-	}
++	if (vmf->pgoff == KVM_S390_SIE_PAGE_OFFSET && kvm_is_ucontrol(vcpu->kvm))
++		return virt_to_page(vcpu->arch.sie_block);
+ #endif
+-	return VM_FAULT_SIGBUS;
++	return NULL;
+ }
+ 
+ /* Section: memory related */
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 3cedc7cc132a..1e3bbe5cd33a 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -5347,9 +5347,9 @@ long kvm_arch_vcpu_ioctl(struct file *filp,
+ 	return r;
+ }
+ 
+-vm_fault_t kvm_arch_vcpu_fault(struct kvm_vcpu *vcpu, struct vm_fault *vmf)
++struct page *kvm_arch_vcpu_fault(struct kvm_vcpu *vcpu, struct vm_fault *vmf)
+ {
+-	return VM_FAULT_SIGBUS;
++	return NULL;
+ }
+ 
+ static int kvm_vm_ioctl_set_tss_addr(struct kvm *kvm, unsigned long addr)
+diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+index 492d183dd7d0..a949de534722 100644
+--- a/include/linux/kvm_host.h
++++ b/include/linux/kvm_host.h
+@@ -995,7 +995,7 @@ long kvm_arch_dev_ioctl(struct file *filp,
+ 			unsigned int ioctl, unsigned long arg);
+ long kvm_arch_vcpu_ioctl(struct file *filp,
+ 			 unsigned int ioctl, unsigned long arg);
+-vm_fault_t kvm_arch_vcpu_fault(struct kvm_vcpu *vcpu, struct vm_fault *vmf);
++struct page *kvm_arch_vcpu_fault(struct kvm_vcpu *vcpu, struct vm_fault *vmf);
+ 
+ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext);
+ 
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index 30d322519253..f7d21418971b 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -3448,7 +3448,10 @@ static vm_fault_t kvm_vcpu_fault(struct vm_fault *vmf)
+ 		    &vcpu->dirty_ring,
+ 		    vmf->pgoff - KVM_DIRTY_LOG_PAGE_OFFSET);
+ 	else
+-		return kvm_arch_vcpu_fault(vcpu, vmf);
++		page = kvm_arch_vcpu_fault(vcpu, vmf);
++	if (!page)
++		return VM_FAULT_SIGBUS;
++
+ 	get_page(page);
+ 	vmf->page = page;
+ 	return 0;
 -- 
-2.27.0
+2.31.1
 
