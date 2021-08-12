@@ -2,227 +2,169 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4DDC13EAA3F
-	for <lists+kvm@lfdr.de>; Thu, 12 Aug 2021 20:29:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CBA6E3EAB60
+	for <lists+kvm@lfdr.de>; Thu, 12 Aug 2021 21:51:38 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233468AbhHLSaO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 12 Aug 2021 14:30:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48084 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233237AbhHLSaN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 12 Aug 2021 14:30:13 -0400
-Received: from mail-ot1-x336.google.com (mail-ot1-x336.google.com [IPv6:2607:f8b0:4864:20::336])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 18603C061756
-        for <kvm@vger.kernel.org>; Thu, 12 Aug 2021 11:29:48 -0700 (PDT)
-Received: by mail-ot1-x336.google.com with SMTP id a7-20020a9d5c870000b029050333abe08aso8820999oti.13
-        for <kvm@vger.kernel.org>; Thu, 12 Aug 2021 11:29:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=8p/OCx8wfKLI1Vwr3WoruCyYyLDk0HKlG9q3THas0Ro=;
-        b=pCkiiuBcAuyJQfE4lgHO2ZNaNUHxyIZv+gkKlkHTrJLj5xvMeJrz9bWScyqw/CpS24
-         YZ+1Q8phMUIM9RivFHJsILLnwPWCWsXFbUTNrUi9gUfYWVUuUI93UEj1Ol6uwBY3alyn
-         P/deOXHX0+ZtYJfTnYvzFAIdZ79Y3niK8GIX0bATy2Pkv1WicFhfc75p31bOoAmQtr2D
-         siqWqJ2SiIxlmKmr+hg5DahX0u3DwOT83FVQtueF/qQKjhk3fEgSsQXcwi4U6OYnJhSQ
-         qxj1aJfTWJ/BGdp5X6hAdhaK1VFAYJDW6YItkYu5eOXSaEX0JWr3HsODbMbraE8ogrPl
-         kBlw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=8p/OCx8wfKLI1Vwr3WoruCyYyLDk0HKlG9q3THas0Ro=;
-        b=mjSDzPlSUWX8159/22dUi29f4L6sOti62Ed85pWJyfnSeuA5lH8vELfcjhl4AiEYUy
-         6k5sA5iekdTCvIIn/j3egGzjYjsi+d6jAffU3pM6OKNiO5amkNRoyH7BM5T7z9YmNgka
-         b4Ipvo5RIWySvh5v6lxUDF3CBXJKud4ZrgbwzEktz89fA1Pg7sDyZmaqpoMdKisJp3W0
-         ECBwfda3V1S4t2JgFZwleWg7Zr8bNICdXs0FA6438uu2oaY3zd5YvHYesyO2mYnj/vOp
-         6BcjLeEooXwd1mBfWf04MJxtGha1teTSGwmwOaYvmTwtfwzu5pAFhvJ0uIuPEGoF1rQA
-         cpTw==
-X-Gm-Message-State: AOAM533YzN01Pu9EHhvkiZSX5bezujzMEg3yDnPrZTCT3aX04bvOOZoX
-        pDrVHW7ywDsBaKcaDn0Uy8No8AJGqSmx8HF/vFKs/Q==
-X-Google-Smtp-Source: ABdhPJwmK/AbZDsA28wYWSSvhqmGx87EEzk8m55h/Bl6sOe/aSIg0F5Q/OX5FkRbNMXJ6bvis0pEJwYbT6vvgpWqJyo=
-X-Received: by 2002:a05:6830:189:: with SMTP id q9mr4548874ota.313.1628792987226;
- Thu, 12 Aug 2021 11:29:47 -0700 (PDT)
+        id S236461AbhHLTv5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 12 Aug 2021 15:51:57 -0400
+Received: from mail-bn7nam10on2072.outbound.protection.outlook.com ([40.107.92.72]:48480
+        "EHLO NAM10-BN7-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S236114AbhHLTv4 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 12 Aug 2021 15:51:56 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=R3XZ/LHL3/R4amcfFiXRfQ8xmfxQRcbkZE0gA5cOeokXVWTkOxACtzrM8NjxhR71O/cMu9PjudG1yf7NuEFhflNHmfnfwnPkGro2ZLPhu9BPmQeFdSxo+qf4katYgfJb2zW9kO44NAfVnBYAal2BulUj8p2wDfiVMi/WTxl8Wq2tE780QfCdllgxoSRbHf6myCyd5FCbQSmcj28AG6IjBo1yAi7bEVbN4Q14ckm/09KlFSSrd8zFhJvSE4pbXobu9W2OsstuFY0zj0lJNEC8HOxT4sBBNO1pA5dm6FO2fNLAk4fhTxkdejPZqbzlG/h+FeLU/N4a5GZe87wO+3z/hQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=4V13jeISzZIVwJZJ63tOEkqMMW9GoFkucYac+tncRpA=;
+ b=h+RGQC538BSX8WJJn+K6nj5QmX6qhV01mKWxZQ8FeJymtIDR/FRUPSUEMiBwGRmtlOmCcGHc9mQTceZaV/lLhhRDZd8ncvPRcf0FX4CAYqzQPQ716k0vAhlpHNWFOdvIMHuXpNR5tKv2IPRKfa/f737zSbspLiPLYUN4g9snn08IZNQXTWAKrHBTmm99R02ZJewusYyyae9h+CyQPORKyHVU0/iQS2bqrKK6oyuwW9awV3xjka1dfBs0AtnxDTrNkoGB0DBflO/H+VQ/4XLxipGMMpw8FWECDxmZCI+kbOAy1HLKV/fnT/ALzoi/FO+M8wOwQ+eoqzWYbqpngAjcTg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=4V13jeISzZIVwJZJ63tOEkqMMW9GoFkucYac+tncRpA=;
+ b=OnIpnzq3vZhvqXQKdFZ9GiFq0XKwFgWuNjHCYuJOkLBuLJvi5UPUmX8aGTo3N5YWTvsABxt3Z1FiKmT8LdLOPijMAfD2kloMOCU8iZBTK1o6hxRRgVZR7UwZYfIJ0RTANZAvlABbm8Hup8yvU0EEYTqDenXXqO6pXpRR1W4Sq3E95hKcHeu9tB7YBss6WAMfxS58NKAR0jA7Ts+kd3tItiTe9k0NzXIgs6snbvwb2E66wSq9l8yLRMjCoxvYOwLlT5kV1xM0SJ90IWA3NgM9TX4NLlg5+u0PV1Jnn0MWJzseo9Cnrlen45EMasWBHkcvHrRs43ZJliVks1sQBv7jFw==
+Authentication-Results: kernel.org; dkim=none (message not signed)
+ header.d=none;kernel.org; dmarc=none action=none header.from=nvidia.com;
+Received: from DM6PR12MB5520.namprd12.prod.outlook.com (2603:10b6:5:208::9) by
+ DM6PR12MB5565.namprd12.prod.outlook.com (2603:10b6:5:1b6::13) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.4415.16; Thu, 12 Aug 2021 19:51:28 +0000
+Received: from DM6PR12MB5520.namprd12.prod.outlook.com
+ ([fe80::81bc:3e01:d9e0:6c52]) by DM6PR12MB5520.namprd12.prod.outlook.com
+ ([fe80::81bc:3e01:d9e0:6c52%9]) with mapi id 15.20.4415.018; Thu, 12 Aug 2021
+ 19:51:28 +0000
+Date:   Thu, 12 Aug 2021 16:51:26 -0300
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     Bjorn Helgaas <helgaas@kernel.org>
+Cc:     Yishai Hadas <yishaih@nvidia.com>, bhelgaas@google.com,
+        corbet@lwn.net, alex.williamson@redhat.com,
+        diana.craciun@oss.nxp.com, kwankhede@nvidia.com,
+        eric.auger@redhat.com, masahiroy@kernel.org,
+        michal.lkml@markovi.net, linux-pci@vger.kernel.org,
+        linux-doc@vger.kernel.org, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org, linux-kbuild@vger.kernel.org,
+        mgurtovoy@nvidia.com, maorg@nvidia.com, leonro@nvidia.com
+Subject: Re: [PATCH 09/12] PCI: Add a PCI_ID_F_VFIO_DRIVER_OVERRIDE flag to
+ struct pci_device_id
+Message-ID: <20210812195126.GA4026@nvidia.com>
+References: <20210812132728.GB8367@nvidia.com>
+ <20210812155707.GA2464922@bjorn-Precision-5520>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210812155707.GA2464922@bjorn-Precision-5520>
+X-ClientProxiedBy: BL0PR05CA0028.namprd05.prod.outlook.com
+ (2603:10b6:208:91::38) To DM6PR12MB5520.namprd12.prod.outlook.com
+ (2603:10b6:5:208::9)
 MIME-Version: 1.0
-References: <20210812181815.3378104-1-seanjc@google.com>
-In-Reply-To: <20210812181815.3378104-1-seanjc@google.com>
-From:   Ben Gardon <bgardon@google.com>
-Date:   Thu, 12 Aug 2021 11:29:35 -0700
-Message-ID: <CANgfPd-SsnkBeAuZ0eVRknjLo3DNP2ZnzF88KQTkACj+sU55OQ@mail.gmail.com>
-Subject: Re: [PATCH v2] KVM: x86/mmu: Protect marking SPs unsync when using
- TDP MMU with spinlock
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm <kvm@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from mlx.ziepe.ca (142.162.113.129) by BL0PR05CA0028.namprd05.prod.outlook.com (2603:10b6:208:91::38) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4415.9 via Frontend Transport; Thu, 12 Aug 2021 19:51:28 +0000
+Received: from jgg by jggl with local (Exim 4.94)       (envelope-from <jgg@nvidia.com>)        id 1mEGje-0001Gp-KA; Thu, 12 Aug 2021 16:51:26 -0300
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 1affb811-fd27-434f-b4c5-08d95dca9305
+X-MS-TrafficTypeDiagnostic: DM6PR12MB5565:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <DM6PR12MB5565D943F228A003E210C0D9C2F99@DM6PR12MB5565.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:10000;
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: WBgmOTaJ/SZU4kTMJ+YjVB/uQh044xXb3vg3SOoOtaeIPxLxSbNDqYkczY1o1fUo2Uz5J4crzS4+LHY36axm56kIHuKEJXiZqT86dOwh27ARjNvSPNIGxtESBOIInOWaYkdO0bY74MYaHdUcnedvjhgWutRyFN8mb+QZ7AFbRJcdxvBwaFaOxOVKzSTXDNw/d6psqfLoQDev9SHfHry+nSBE/x3NUw4h/xJPCkmg5DUhynnW9mfKVFD2W4yPfV4HdYSlZzS8IFSe0YwD6ExelliFveZbyBX0ICh1FUzLjvQxgPpmSgDbG5hECJtz+omQ26ffXM5uleZrYI6m/IqAAFhUe0ge5YKA/AkKgdTC9XIoGNXwbd58BS/xJaZ3XZ8hUyHyID6WUCrZscF8X/DvvCKFY65y+4yFyM1iRmxYktjaobUE3znurEgC3LgF4wzQ6CR5yuTSmVu01SOWDupN5YvSLh68WYNAyrnTRNVlhNrFdjijUSn1Il0TXPzJuqbuW0t85gNLUdypXKPoEIKZCGr66ToORZxjLfmt2kFeOms0NMTg/W6bFkwk39ojSHnVRPZtdytJofn9y8XBh0gKbe1FQMVOpTk9eLev48quzbM3m9iNwpFHny8oui5bIPxQpoUMwz3m92lnyeFidjCInQ==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR12MB5520.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(376002)(39860400002)(396003)(346002)(136003)(6916009)(2906002)(107886003)(478600001)(33656002)(7416002)(86362001)(186003)(316002)(26005)(66556008)(66476007)(8936002)(426003)(66946007)(8676002)(36756003)(83380400001)(4326008)(38100700002)(9786002)(9746002)(1076003)(2616005)(5660300002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?anVxCu1lS50HMlIxM/1dtgSUXvO0q1a/iMeavz7ADuwextrlHplWFHzWhebz?=
+ =?us-ascii?Q?d5DD/tTSAZBJ93hH+cktzwZsizhVOlfWjfINicUfvnHfuQT5diwUH8p2RBuH?=
+ =?us-ascii?Q?IVi0GOJ0O7R/EqWchEtAnlLA5QSstdkjKwRsQNsYc5ygapWjv4Mx/ILE4Mmr?=
+ =?us-ascii?Q?fc9SEAApOdPD7sO0KuyatkfUsH5deBquIXTQ580gRrUDzLVA+yKCsp2F/hQY?=
+ =?us-ascii?Q?KeVzqs/mrCqvfxu2XCqj+6kmNJ+F2wXjXp8ruMWBqD3aMRKxsV3EhqQvRjeb?=
+ =?us-ascii?Q?OoqaULy3kCyNhQel3KBZN0s3yVQIgUK+uunLU892WFV1iS5XKd76p2nxs2/v?=
+ =?us-ascii?Q?pfLfVPvTvzory5sGvvOeTBkjXw44NNM68dwP7O8rGIJJGRwzWp4zG88O09tq?=
+ =?us-ascii?Q?apG0soL8JFknPdlT0ntcGSs7bSVI5q1lio08Cepg2t72JALbxZ9GkIjziIbe?=
+ =?us-ascii?Q?jNx4brkOvZzbKRXSnMJXmmDL09pFv7a5DuW9+E+OKmby+1ag4Xs72thI/rh3?=
+ =?us-ascii?Q?VASnfbao3frkabfDFICTTQ1JQJFEA6T/iDr7isnnXCxAgX831zBsB9XdGBnZ?=
+ =?us-ascii?Q?YO/eNoEuMQLwNLT6k8fOkUu+4roJsR6/PeOZ5AgYEmOjIQ5zwJApgJwwto3O?=
+ =?us-ascii?Q?rh99CIi3Kr1isxJ4fsKG+B9MRTmawXsiAwEHlPVXFXXTOAjtqrQUZ8wzQsZL?=
+ =?us-ascii?Q?zgDL6Afogtcd+6ZzqiREUikw6a3eFHo1lxYP/2Yci5cq4eAw2vooTMu+RDbi?=
+ =?us-ascii?Q?jLFfZv6zzXPRmee4YZIHnA7Cin1TySSDzunmEJBiskCw/KVG8eqPyyoZBan1?=
+ =?us-ascii?Q?75/zajHIEhzFXdKNv3O336GRd4pgNKF4oi9Td407CpLrdKzzQ1s942dmjWcL?=
+ =?us-ascii?Q?eZD3MDTtDK/Df8840v/DwnCB/00VwEKTxJ5XLjc2GAGmW0eTT2tFxjBzEJUM?=
+ =?us-ascii?Q?WWcjYOFZ9x+RU4J35HioVXKhnGUgxUXtTzEd5dfZC0pwYIY4hEXljC2AVRvb?=
+ =?us-ascii?Q?gyI0vlqvGjZXdP1Zo6jW+gvPTR4gxw/UVgCoa3At02fZa46B35LpyA5XEGfW?=
+ =?us-ascii?Q?zNZXPmBC0PBr6QnLy1J/2+eSDIwI1BIBFLR9LiFcgHF5xra9UrFr62Y4diiP?=
+ =?us-ascii?Q?Oh4UEIyaNxpGTsnOTUz3zagkRcBNRBdBiHlpFUyjL7qHG2qwbNt6nEdyxz7H?=
+ =?us-ascii?Q?g/lnK5xEQmqzsAKHKzxQ7zK41Zyw4OXkWIoGH7L776yq5AxC53gQ6JXnQHZ7?=
+ =?us-ascii?Q?9TOa/kBIhsBiM6WyjIdcp+PmMFMZumA6abvrYNksUrOC/opqb8S9cpN+RHLm?=
+ =?us-ascii?Q?m05IvLfM/lQr9s4yVd1dASmN?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 1affb811-fd27-434f-b4c5-08d95dca9305
+X-MS-Exchange-CrossTenant-AuthSource: DM6PR12MB5520.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Aug 2021 19:51:28.3367
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: HAhiOoRv/oHrqatZtepUHKFMbb/bJKdqycxxq+Usce/ALQ3/TTBc7iLanEX5CEWF
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB5565
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Aug 12, 2021 at 11:18 AM Sean Christopherson <seanjc@google.com> wrote:
->
-> Add yet another spinlock for the TDP MMU and take it when marking indirect
-> shadow pages unsync.  When using the TDP MMU and L1 is running L2(s) with
-> nested TDP, KVM may encounter shadow pages for the TDP entries managed by
-> L1 (controlling L2) when handling a TDP MMU page fault.  The unsync logic
-> is not thread safe, e.g. the kvm_mmu_page fields are not atomic, and
-> misbehaves when a shadow page is marked unsync via a TDP MMU page fault,
-> which runs with mmu_lock held for read, not write.
->
-> Lack of a critical section manifests most visibly as an underflow of
-> unsync_children in clear_unsync_child_bit() due to unsync_children being
-> corrupted when multiple CPUs write it without a critical section and
-> without atomic operations.  But underflow is the best case scenario.  The
-> worst case scenario is that unsync_children prematurely hits '0' and
-> leads to guest memory corruption due to KVM neglecting to properly sync
-> shadow pages.
->
-> Use an entirely new spinlock even though piggybacking tdp_mmu_pages_lock
-> would functionally be ok.  Usurping the lock could degrade performance when
-> building upper level page tables on different vCPUs, especially since the
-> unsync flow could hold the lock for a comparatively long time depending on
-> the number of indirect shadow pages and the depth of the paging tree.
->
-> For simplicity, take the lock for all MMUs, even though KVM could fairly
-> easily know that mmu_lock is held for write.  If mmu_lock is held for
-> write, there cannot be contention for the inner spinlock, and marking
-> shadow pages unsync across multiple vCPUs will be slow enough that
-> bouncing the kvm_arch cacheline should be in the noise.
->
-> Note, even though L2 could theoretically be given access to its own EPT
-> entries, a nested MMU must hold mmu_lock for write and thus cannot race
-> against a TDP MMU page fault.  I.e. the additional spinlock only _needs_ to
-> be taken by the TDP MMU, as opposed to being taken by any MMU for a VM
-> that is running with the TDP MMU enabled.  Holding mmu_lock for read also
-> prevents the indirect shadow page from being freed.  But as above, keep
-> it simple and always take the lock.
->
-> Alternative #1, the TDP MMU could simply pass "false" for can_unsync and
-> effectively disable unsync behavior for nested TDP.  Write protecting leaf
-> shadow pages is unlikely to noticeably impact traditional L1 VMMs, as such
-> VMMs typically don't modify TDP entries, but the same may not hold true for
-> non-standard use cases and/or VMMs that are migrating physical pages (from
-> L1's perspective).
->
-> Alternative #2, the unsync logic could be made thread safe.  In theory,
-> simply converting all relevant kvm_mmu_page fields to atomics and using
-> atomic bitops for the bitmap would suffice.  However, (a) an in-depth audit
-> would be required, (b) the code churn would be substantial, and (c) legacy
-> shadow paging would incur additional atomic operations in performance
-> sensitive paths for no benefit (to legacy shadow paging).
->
-> Fixes: a2855afc7ee8 ("KVM: x86/mmu: Allow parallel page faults for the TDP MMU")
-> Cc: stable@vger.kernel.org
-> Cc: Ben Gardon <bgardon@google.com>
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
-> ---
->  Documentation/virt/kvm/locking.rst |  8 ++++----
->  arch/x86/include/asm/kvm_host.h    |  7 +++++++
->  arch/x86/kvm/mmu/mmu.c             | 28 ++++++++++++++++++++++++++++
->  3 files changed, 39 insertions(+), 4 deletions(-)
->
-> diff --git a/Documentation/virt/kvm/locking.rst b/Documentation/virt/kvm/locking.rst
-> index 8138201efb09..5d27da356836 100644
-> --- a/Documentation/virt/kvm/locking.rst
-> +++ b/Documentation/virt/kvm/locking.rst
-> @@ -31,10 +31,10 @@ On x86:
->
->  - vcpu->mutex is taken outside kvm->arch.hyperv.hv_lock
->
-> -- kvm->arch.mmu_lock is an rwlock.  kvm->arch.tdp_mmu_pages_lock is
-> -  taken inside kvm->arch.mmu_lock, and cannot be taken without already
-> -  holding kvm->arch.mmu_lock (typically with ``read_lock``, otherwise
-> -  there's no need to take kvm->arch.tdp_mmu_pages_lock at all).
-> +- kvm->arch.mmu_lock is an rwlock.  kvm->arch.tdp_mmu_pages_lock and
-> +  kvm->arch.mmu_unsync_pages_lock are taken inside kvm->arch.mmu_lock, and
-> +  cannot be taken without already holding kvm->arch.mmu_lock (typically with
-> +  ``read_lock`` for the TDP MMU, thus the need for additional spinlocks).
->
->  Everything else is a leaf: no other lock is taken inside the critical
->  sections.
-> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-> index 20daaf67a5bf..cf32b87b6bd3 100644
-> --- a/arch/x86/include/asm/kvm_host.h
-> +++ b/arch/x86/include/asm/kvm_host.h
-> @@ -1036,6 +1036,13 @@ struct kvm_arch {
->         struct list_head lpage_disallowed_mmu_pages;
->         struct kvm_page_track_notifier_node mmu_sp_tracker;
->         struct kvm_page_track_notifier_head track_notifier_head;
-> +       /*
-> +        * Protects marking pages unsync during page faults, as TDP MMU page
-> +        * faults only take mmu_lock for read.  For simplicity, the unsync
-> +        * pages lock is always taken when marking pages unsync regardless of
-> +        * whether mmu_lock is held for read or write.
-> +        */
-> +       spinlock_t mmu_unsync_pages_lock;
->
->         struct list_head assigned_dev_head;
->         struct iommu_domain *iommu_domain;
-> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> index a272ccbddfa1..cef526dac730 100644
-> --- a/arch/x86/kvm/mmu/mmu.c
-> +++ b/arch/x86/kvm/mmu/mmu.c
-> @@ -2596,6 +2596,7 @@ static void kvm_unsync_page(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp)
->  int mmu_try_to_unsync_pages(struct kvm_vcpu *vcpu, gfn_t gfn, bool can_unsync)
->  {
->         struct kvm_mmu_page *sp;
-> +       bool locked = false;
->
->         /*
->          * Force write-protection if the page is being tracked.  Note, the page
+On Thu, Aug 12, 2021 at 10:57:07AM -0500, Bjorn Helgaas wrote:
+> On Thu, Aug 12, 2021 at 10:27:28AM -0300, Jason Gunthorpe wrote:
+> > On Wed, Aug 11, 2021 at 02:07:37PM -0500, Bjorn Helgaas wrote:
+> > > On Thu, Aug 05, 2021 at 09:23:57PM -0300, Jason Gunthorpe wrote:
+> 
+> > > Do the other bus types have a flag analogous to
+> > > PCI_ID_F_VFIO_DRIVER_OVERRIDE?  If we're doing something similar to
+> > > other bus types, it'd be nice if the approach were similar.
+> > 
+> > They could, this series doesn't attempt it. I expect the approach to
+> > be similar as driver_override was copied from PCI to other
+> > busses. When this is completed I hope to take a look at it.
+> 
+> I think this would make more sense as two patches:
+> 
+>   - Add a "PCI_ID_DRIVER_OVERRIDE" flag.  This is not VFIO-specific,
+>     since nothing in PCI depends on the VFIO-ness of drivers that use
+>     the flag.  The only point here is that driver id_table entries
+>     with this flag only match when driver_override matches the driver.
 
-It might also be worth adding a note about how it's safe to use
-for_each_gfn_indirect_valid_sp under the MMU read lock because
-mmu_page_hash is only modified with the lock held for write.
+This would require using two flags, one to indicate the above to the
+PCI code and another to indicate the vfio_pci string to
+file2alias. This doesn't seem justified at this point, IMHO.
 
-> @@ -2618,9 +2619,34 @@ int mmu_try_to_unsync_pages(struct kvm_vcpu *vcpu, gfn_t gfn, bool can_unsync)
->                 if (sp->unsync)
->                         continue;
->
-> +               /*
-> +                * TDP MMU page faults require an additional spinlock as they
-> +                * run with mmu_lock held for read, not write, and the unsync
-> +                * logic is not thread safe.  Take the spinklock regardless of
-> +                * the MMU type to avoid extra conditionals/parameters, there's
-> +                * no meaningful penalty if mmu_lock is held for write.
-> +                */
-> +               if (!locked) {
-> +                       locked = true;
-> +                       spin_lock(&vcpu->kvm->arch.mmu_unsync_pages_lock);
-> +
-> +                       /*
-> +                        * Recheck after taking the spinlock, a different vCPU
-> +                        * may have since marked the page unsync.  A false
-> +                        * positive on the unprotected check above is not
-> +                        * possible as clearing sp->unsync _must_ hold mmu_lock
-> +                        * for write, i.e. unsync cannot transition from 0->1
-> +                        * while this CPU holds mmu_lock for read (or write).
-> +                        */
-> +                       if (READ_ONCE(sp->unsync))
-> +                               continue;
-> +               }
-> +
->                 WARN_ON(sp->role.level != PG_LEVEL_4K);
->                 kvm_unsync_page(vcpu, sp);
->         }
-> +       if (locked)
-> +               spin_unlock(&vcpu->kvm->arch.mmu_unsync_pages_lock);
->
->         /*
->          * We need to ensure that the marking of unsync pages is visible
-> @@ -5604,6 +5630,8 @@ void kvm_mmu_init_vm(struct kvm *kvm)
->  {
->         struct kvm_page_track_notifier_node *node = &kvm->arch.mmu_sp_tracker;
->
-> +       spin_lock_init(&kvm->arch.mmu_unsync_pages_lock);
-> +
->         if (!kvm_mmu_init_tdp_mmu(kvm))
->                 /*
->                  * No smp_load/store wrappers needed here as we are in
-> --
-> 2.33.0.rc1.237.g0d66db33f3-goog
->
+>   - Update file2alias.c to export the flags and the "vfio_pci:" alias.
+>     This seems to be the only place where VFIO comes into play, and
+>     putting it in a separate patch will make it much smaller and it
+>     will be clear how it could be extended for other buses.
+
+Well, I don't want to see a flag called PCI_ID_DRIVER_OVERRIDE mapped
+to the string "vfio_pci", that is just really confusing.
+
+Other busses need to copy pretty much the entire patch, there isn't
+really any sharing here. I don't see splitting as good here..
+
+What this logically wants is the match entry to have a
+
+  const char *file2alias_prefix
+
+Which would be set to "vfio_", but I'm not keen to bloat the match
+entry further to do that..
+
+> > The full sequence is more like:
+> > 
+> >      echo mlx5_vfio_pci > /sys/bus/pci/devices/0000:01:00.0/driver_override
+> >      echo 0000:01:00.0 > /sys/bus/pci/devices/0000:01:00.0/driver/unbind
+> >      echo 0000:01:00.0 > /sys/bus/pci/drivers_probe
+> 
+> Thanks a lot for this!  I didn't know about drivers_probe (see
+> drivers_probe_store()), and it doesn't seem to be documented anywhere
+> except sysfs-bus-usb, where it's only incidental to USB.
+
+Okay, lets make the changes in the commit message, it does help
+
+Jason
