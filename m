@@ -2,136 +2,118 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id F19C23EA52B
-	for <lists+kvm@lfdr.de>; Thu, 12 Aug 2021 15:09:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 129E23EA582
+	for <lists+kvm@lfdr.de>; Thu, 12 Aug 2021 15:22:31 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237352AbhHLNJj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 12 Aug 2021 09:09:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57952 "EHLO
+        id S237817AbhHLNWv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 12 Aug 2021 09:22:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60672 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235924AbhHLNJi (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 12 Aug 2021 09:09:38 -0400
-Received: from mail-ot1-x332.google.com (mail-ot1-x332.google.com [IPv6:2607:f8b0:4864:20::332])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9ECB4C0613D5
-        for <kvm@vger.kernel.org>; Thu, 12 Aug 2021 06:09:13 -0700 (PDT)
-Received: by mail-ot1-x332.google.com with SMTP id v10-20020a9d604a0000b02904fa9613b53dso7614925otj.6
-        for <kvm@vger.kernel.org>; Thu, 12 Aug 2021 06:09:13 -0700 (PDT)
+        with ESMTP id S237674AbhHLNVf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 12 Aug 2021 09:21:35 -0400
+Received: from mail-pl1-x62a.google.com (mail-pl1-x62a.google.com [IPv6:2607:f8b0:4864:20::62a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BFD38C00EA85;
+        Thu, 12 Aug 2021 06:21:05 -0700 (PDT)
+Received: by mail-pl1-x62a.google.com with SMTP id l11so7259755plk.6;
+        Thu, 12 Aug 2021 06:21:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=WRqzbWQ5nIKrt8ACxqIhdjGTjjV3XNEnx9RLXFnLp9U=;
-        b=af9F5gG94wT94ta0EmdCDZ8PMu/JYSODDydH43su3PYUH4Z+npHCVd+twnuabLyLNV
-         AIRifFs11BXjl7YazhGbXPfY4lNp4+/FEqPxhzIGR0b3jyb4NHjP7kUl0QOJ/VbDYSCB
-         zNvXzIbE8H6Z1AG4SI7PCxZR0ffFQ77Cz11R/oC77w/C3MuMlI+IVT+jryt6r3kbgt03
-         UeVzl+KGq4v/L8c0z7v3ETQ1rM0re5bwSmmKhOrdWFpgq+zjfmf0rwokthr5pRl130jX
-         oLOOYQm4tbe896knjGw2NJTQSh1bNrKbUMtFmPczK4ih0DP8ZsNDXMkHcnAvjd5BYv8M
-         713Q==
+        d=gmail.com; s=20161025;
+        h=subject:to:cc:references:from:organization:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=RrGE9qY6q5pKFuZWe8wC47/1qSM0FaVp53alD7sacQE=;
+        b=OGNXPwUdKji1eWBa5xXxJDq3MgBncwNQKXtkauakvygJ0dKVUn7plbxTp/KCakypZK
+         snQOX9YC0+5HSAf7yZ9a49Qg0kyOQpP3mUTR25ICYbi9PwleAf0OCASYBIIz6p2Vtym3
+         h2Qa5Rf63XLsbVkcXVperA+PUin2+kDeOweWqwr5A7oUx9b31K1sUv6LyfODCQ4s3W1k
+         Nf5hpAveP3kO+tbsqg6juaKysvroqZWJCnjWKQYFV/5/UXGjk0fwrGAgXV/hymUukkPV
+         sMXdeI3E9D85PvCAz3yIn7ohHufCsyIxGAgRLdJRsdjKM9uE/jINnctlpzTUXqTY9iLo
+         CBow==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=WRqzbWQ5nIKrt8ACxqIhdjGTjjV3XNEnx9RLXFnLp9U=;
-        b=sEYQc5l+Gyy7aOVG6bwRuV/+LVYLJoaDxhqzjpwIPO8i84am8Ek3ypKERgHyv2CigE
-         XwQWF5md4Lap/OjY4shbGkJbJwlrbfwujiCQCntzwkUkaf86t8DSIm0+q1TyXNvcN4jy
-         Vb4M5iTcEDkh83HNEhUIYyqKvJu28+pebabNcHTAHwT5DhlM3aao8YCac91vthnnkT6u
-         sTMxIlLRc5wtckUY5N6PxUvmkpac3r7oc3TIl5b8JOrLSkynNAX3pbLO2sGgivbDje1e
-         9dW5M8FPNqtaPqLoOmrx88bSeCOBX364FkUc1siqg1Kw8g04cPKNnL7DPbK2KF3mBJxc
-         NW1Q==
-X-Gm-Message-State: AOAM530yVMJbYvULWe0RN9lgVilLx000NFZmOe4U3MB+C0uFWoT3rcuY
-        NYN3DYkYpnJcmbGz8jvdYQfkMYHlMIYxSo3JRAPOVA==
-X-Google-Smtp-Source: ABdhPJzOnqtXcXrXssuHj4ykZZNRW7+lUJI1VruW/y3wcegljhCDGPhQVqab0qVckurvGz4++zn4Vc5YQG/X0aDIIwE=
-X-Received: by 2002:a05:6830:1095:: with SMTP id y21mr3282853oto.144.1628773752727;
- Thu, 12 Aug 2021 06:09:12 -0700 (PDT)
+        h=x-gm-message-state:subject:to:cc:references:from:organization
+         :message-id:date:user-agent:mime-version:in-reply-to
+         :content-language:content-transfer-encoding;
+        bh=RrGE9qY6q5pKFuZWe8wC47/1qSM0FaVp53alD7sacQE=;
+        b=IbNPxNcwt6hQReCjCOfinfi+3l1AAo7xx9NEX10bxAN1LxtyaK0mDjuNPDEKV3EC5b
+         H/CiiJZxmIeYexcOPPefARxLKB/oC2RPmaEh5AlhB/s5rJEZPLxVA2IbdFFyLOXbM1UA
+         KAIWUkFaOuGj4AMzc0/P7sdaU4JRtO/jNbrlUR2PJTN4GH1O9u9tDhSFMmvmovtSSdRT
+         D2sJ7PT5PgNAuJjYvh8cW8xk5Eh/2L/zsBsQkMlWxGdCzW248nkArEZaDA+KGo8ErsZh
+         uwVblwUVCELHbBBolZvGAl7hV6EQUEagnAgkLG8WWN7k6I2a8XpptLG5gUlMAm9o5+FY
+         /wIw==
+X-Gm-Message-State: AOAM533lw3P2z56dk/HPHp7Fr17xaNcOt95ClU7oVTUYIqLUInaz/oft
+        B1kO/dbzxYhVenLUhufDWwY=
+X-Google-Smtp-Source: ABdhPJxI5Tt5vtX0zDMijSjVIafzeaLyGnUw+kmctuBeTvjTDKCowjwc84IH7yc1FevEY92nWvuqIw==
+X-Received: by 2002:a17:902:ea03:b029:12d:13d8:63d1 with SMTP id s3-20020a170902ea03b029012d13d863d1mr3420739plg.49.1628774465161;
+        Thu, 12 Aug 2021 06:21:05 -0700 (PDT)
+Received: from Likes-MacBook-Pro.local ([103.7.29.32])
+        by smtp.gmail.com with ESMTPSA id j185sm3674708pfb.86.2021.08.12.06.21.00
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 12 Aug 2021 06:21:04 -0700 (PDT)
+Subject: Re: [PING][PATCH V9 00/18] KVM: x86/pmu: Add *basic* support to
+ enable guest PEBS via DS
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     bp@alien8.de, seanjc@google.com, vkuznets@redhat.com,
+        wanpengli@tencent.com, jmattson@google.com, joro@8bytes.org,
+        kan.liang@linux.intel.com, ak@linux.intel.com,
+        wei.w.wang@intel.com, eranian@google.com, liuxiangdong5@huawei.com,
+        linux-kernel@vger.kernel.org, x86@kernel.org, kvm@vger.kernel.org,
+        boris.ostrvsky@oracle.com, Zhu Lingshan <lingshan.zhu@intel.com>,
+        Peter Zijlstra <peterz@infradead.org>
+References: <20210722054159.4459-1-lingshan.zhu@intel.com>
+ <YQF7lwM6qzYso0Gg@hirez.programming.kicks-ass.net>
+From:   Like Xu <like.xu.linux@gmail.com>
+Organization: Tencent
+Message-ID: <d4899d1b-b04d-6d96-7a29-dfb10355d601@gmail.com>
+Date:   Thu, 12 Aug 2021 21:20:54 +0800
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0)
+ Gecko/20100101 Thunderbird/78.13.0
 MIME-Version: 1.0
-References: <20210719160346.609914-1-tabba@google.com> <20210719160346.609914-15-tabba@google.com>
- <20210812095743.GL5912@willie-the-truck>
-In-Reply-To: <20210812095743.GL5912@willie-the-truck>
-From:   Fuad Tabba <tabba@google.com>
-Date:   Thu, 12 Aug 2021 15:08:36 +0200
-Message-ID: <CA+EHjTzE1w-ePBw+JZw-+ScSKWYExKw9HNTo8rNJAJnAUNf6tw@mail.gmail.com>
-Subject: Re: [PATCH v3 14/15] KVM: arm64: Handle protected guests at 32 bits
-To:     Will Deacon <will@kernel.org>
-Cc:     kvmarm@lists.cs.columbia.edu, maz@kernel.org, james.morse@arm.com,
-        alexandru.elisei@arm.com, suzuki.poulose@arm.com,
-        mark.rutland@arm.com, christoffer.dall@arm.com,
-        pbonzini@redhat.com, drjones@redhat.com, qperret@google.com,
-        kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        kernel-team@android.com
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <YQF7lwM6qzYso0Gg@hirez.programming.kicks-ass.net>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Will,
+Hi Paolo,
 
+On 28/7/2021 11:45 pm, Peter Zijlstra wrote:
+>> Like Xu (17):
+>>    perf/core: Use static_call to optimize perf_guest_info_callbacks
+>>    perf/x86/intel: Add EPT-Friendly PEBS for Ice Lake Server
+>>    perf/x86/intel: Handle guest PEBS overflow PMI for KVM guest
+>>    perf/x86/core: Pass "struct kvm_pmu *" to determine the guest values
+>>    KVM: x86/pmu: Set MSR_IA32_MISC_ENABLE_EMON bit when vPMU is enabled
+>>    KVM: x86/pmu: Introduce the ctrl_mask value for fixed counter
+>>    KVM: x86/pmu: Add IA32_PEBS_ENABLE MSR emulation for extended PEBS
+>>    KVM: x86/pmu: Reprogram PEBS event to emulate guest PEBS counter
+>>    KVM: x86/pmu: Adjust precise_ip to emulate Ice Lake guest PDIR counter
+>>    KVM: x86/pmu: Add IA32_DS_AREA MSR emulation to support guest DS
+>>    KVM: x86/pmu: Add PEBS_DATA_CFG MSR emulation to support adaptive PEBS
+>>    KVM: x86: Set PEBS_UNAVAIL in IA32_MISC_ENABLE when PEBS is enabled
+>>    KVM: x86/pmu: Move pmc_speculative_in_use() to arch/x86/kvm/pmu.h
+>>    KVM: x86/pmu: Disable guest PEBS temporarily in two rare situations
+>>    KVM: x86/pmu: Add kvm_pmu_cap to optimize perf_get_x86_pmu_capability
+>>    KVM: x86/cpuid: Refactor host/guest CPU model consistency check
+>>    KVM: x86/pmu: Expose CPUIDs feature bits PDCM, DS, DTES64
+>>
+>> Peter Zijlstra (Intel) (1):
+>>    x86/perf/core: Add pebs_capable to store valid PEBS_COUNTER_MASK value
+> Looks good:
+> 
+> Acked-by: Peter Zijlstra (Intel)<peterz@infradead.org>
+> 
+> How do we want to route this, all through the KVM tree?
 
-On Thu, Aug 12, 2021 at 11:57 AM Will Deacon <will@kernel.org> wrote:
->
-> On Mon, Jul 19, 2021 at 05:03:45PM +0100, Fuad Tabba wrote:
-> > Protected KVM does not support protected AArch32 guests. However,
-> > it is possible for the guest to force run AArch32, potentially
-> > causing problems. Add an extra check so that if the hypervisor
-> > catches the guest doing that, it can prevent the guest from
-> > running again by resetting vcpu->arch.target and returning
-> > ARM_EXCEPTION_IL.
-> >
-> > Adapted from commit 22f553842b14 ("KVM: arm64: Handle Asymmetric
-> > AArch32 systems")
-> >
-> > Signed-off-by: Fuad Tabba <tabba@google.com>
-> > ---
-> >  arch/arm64/kvm/hyp/include/hyp/switch.h | 24 ++++++++++++++++++++++++
-> >  1 file changed, 24 insertions(+)
-> >
-> > diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
-> > index 8431f1514280..f09343e15a80 100644
-> > --- a/arch/arm64/kvm/hyp/include/hyp/switch.h
-> > +++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
-> > @@ -23,6 +23,7 @@
-> >  #include <asm/kprobes.h>
-> >  #include <asm/kvm_asm.h>
-> >  #include <asm/kvm_emulate.h>
-> > +#include <asm/kvm_fixed_config.h>
-> >  #include <asm/kvm_hyp.h>
-> >  #include <asm/kvm_mmu.h>
-> >  #include <asm/fpsimd.h>
-> > @@ -477,6 +478,29 @@ static inline bool fixup_guest_exit(struct kvm_vcpu *vcpu, u64 *exit_code)
-> >                       write_sysreg_el2(read_sysreg_el2(SYS_ELR) - 4, SYS_ELR);
-> >       }
-> >
-> > +     /*
-> > +      * Protected VMs might not be allowed to run in AArch32. The check below
-> > +      * is based on the one in kvm_arch_vcpu_ioctl_run().
-> > +      * The ARMv8 architecture doesn't give the hypervisor a mechanism to
-> > +      * prevent a guest from dropping to AArch32 EL0 if implemented by the
-> > +      * CPU. If the hypervisor spots a guest in such a state ensure it is
-> > +      * handled, and don't trust the host to spot or fix it.
-> > +      */
-> > +     if (unlikely(is_nvhe_hyp_code() &&
-> > +                  kvm_vm_is_protected(kern_hyp_va(vcpu->kvm)) &&
-> > +                  FIELD_GET(FEATURE(ID_AA64PFR0_EL0),
-> > +                            PVM_ID_AA64PFR0_ALLOW) <
-> > +                          ID_AA64PFR0_ELx_32BIT_64BIT &&
-> > +                  vcpu_mode_is_32bit(vcpu))) {
-> > +             /*
-> > +              * As we have caught the guest red-handed, decide that it isn't
-> > +              * fit for purpose anymore by making the vcpu invalid.
-> > +              */
-> > +             vcpu->arch.target = -1;
-> > +             *exit_code = ARM_EXCEPTION_IL;
-> > +             goto exit;
-> > +     }
->
-> Would this be better off inside the nvhe-specific run loop? Seems like we
-> could elide fixup_guest_exit() altogether if we've detect that we're in
-> AArch32 state when we shouldn't be and it would keep the code off the shared
-> path.
+Do you have any comments for the latest version[1]
+or do we have a chance to get it queued for mainline ?
 
-Yes, it makes more sense and would result in cleaner code to have it
-there, especially in the future where there's likely to be a separate
-run loop for protected VMs. I'll move it.
+I would really like to ease the burden of Lingshan on
+maintaining this feature and on the basis of this work,
+the guest BTS (Branch Tracking Store) is also ready to go.
 
 Thanks,
-/fuad
-> Will
+Like Xu
+
+[1] https://lore.kernel.org/kvm/20210806133802.3528-1-lingshan.zhu@intel.com/
