@@ -2,114 +2,261 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A574E3EA208
-	for <lists+kvm@lfdr.de>; Thu, 12 Aug 2021 11:31:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 07DB73EA22E
+	for <lists+kvm@lfdr.de>; Thu, 12 Aug 2021 11:38:47 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234593AbhHLJaI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 12 Aug 2021 05:30:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35808 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234824AbhHLJ3w (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 12 Aug 2021 05:29:52 -0400
-Received: from mail-oi1-x22d.google.com (mail-oi1-x22d.google.com [IPv6:2607:f8b0:4864:20::22d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 77F3AC0613D3
-        for <kvm@vger.kernel.org>; Thu, 12 Aug 2021 02:29:27 -0700 (PDT)
-Received: by mail-oi1-x22d.google.com with SMTP id be20so9322353oib.8
-        for <kvm@vger.kernel.org>; Thu, 12 Aug 2021 02:29:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=U79XFkLmbTn8yZV9qpDrY5ksUSwcFQWwCLlxy1S3ZCM=;
-        b=XrAlKvRO3IhvRdo1OfWHbg5fICmE2y0uYSwhfVvs4rYQN5CsIicsYYx6Bs4fvQnjgZ
-         1/hpL5TdfGpaLaNtdcGvPBeWvKk9rEqJGgPOYiuE8PeSQq/Bp+L6vzIUH7vP8RS5UiCD
-         S446ike5fw0AnQivnWAK1804te/Ob8vIu1CzthWvfbYZVJMEOzyP8sKTFKNHq5j0HqpT
-         a8El6dzjZNsuBOljCrPy+L/RGS8k7Uk+j+BCtfS+Nr5DfOg9ETkSRCRT42zKL+wSYKs+
-         QZgYYQ+Q7DRIRJjmSg3t5RF45otrrW1S3LT5N++xJgdcQ9882GV8NuvDQdqM26arapJ9
-         OXZA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=U79XFkLmbTn8yZV9qpDrY5ksUSwcFQWwCLlxy1S3ZCM=;
-        b=EOFUYeeuxW9I+E/LX2tTVAvCpsjtA3QZAOfb3i6LjDgo04dN++GquMkP4jVqJ5z+3l
-         IufVvBzdSPzEYwmZ2ypKJqIZDEjyVoHs5YtNEWG0BRMleB8TgIPbIuVKwPc0b4gcvtxM
-         CZoAYrVyAo7l54yv6Is6J14ugXAt7qtRk9o8y9x7l5XdstxLc/Xi74kFI5Cc2vTKQGvx
-         mjxTGHpLvMv4hh8XudvzPG85dLAiBF0KQseA1YSSnWFTznC66UGhsmx6pcQqKHyECTHc
-         GyjKwFB/bD3yOBAq7Wg5dqOtWPVd9vylrwl++lGyH2rjEPt/E+1RwaUwFR4WrfZcQKwu
-         jnnA==
-X-Gm-Message-State: AOAM53053CrcOWSGHoAqCF3Q3E3FKX9uiFflB4OZqUD9u+gQTsx+mzN3
-        mX2An6u0W/OCFDmgnS6m20/0SuakO+Po4VWfvzUPtw==
-X-Google-Smtp-Source: ABdhPJy/aFf9zz0FkODqeQLUSWtM0BsR7RoSxRgsEV4qM8uv4EK7odLD7bTl7wQy0/py2mv9baEX0r2aaorTwAPxZfU=
-X-Received: by 2002:aca:220a:: with SMTP id b10mr10630360oic.8.1628760566696;
- Thu, 12 Aug 2021 02:29:26 -0700 (PDT)
+        id S235233AbhHLJjK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 12 Aug 2021 05:39:10 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:62902 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S235166AbhHLJjK (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 12 Aug 2021 05:39:10 -0400
+Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 17C9Y9uc059214;
+        Thu, 12 Aug 2021 05:38:45 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=to : cc : references :
+ from : subject : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=B4ESlgt/+Lrp/jkfBwwhu0O4mVP/rZklSNvJOeUHJ00=;
+ b=JEvjBxQiKB3go/b8ZLo8hKWMxZrgmoK4/4ZKw6tbT9pftDQjSck8tXHnWniV8wPk9BjD
+ C275GCcKXAmqOaHFSk0Ieofo0vAj9jZR9LjsLM1WuSohIcjp7rAYQEXaNpLXu3r6ZLLM
+ J7ucEFheJy3v0ogEB3g4vOo4p6wtjoDOJoYTEhO8T6kOGKHnRDhU19csOyTkfsGdXrBq
+ mv/jWP0oDU/X6fkTIGJC6wLJRAPbeODkS6K8u6+J03ToCqGvbb038VbwAbUhBWHX9JZf
+ /yhi7/JQw36rS0yQ9LVKjuyjjtfchOdRgBbssXE24khyhk2Tl69yPCZ0PmH/qQipfkMx kQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3abrr6n7q9-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 12 Aug 2021 05:38:44 -0400
+Received: from m0098399.ppops.net (m0098399.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 17C9YCTx059457;
+        Thu, 12 Aug 2021 05:38:44 -0400
+Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3abrr6n7jm-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 12 Aug 2021 05:38:44 -0400
+Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
+        by ppma04ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 17C9btgT017359;
+        Thu, 12 Aug 2021 09:38:40 GMT
+Received: from b06cxnps3074.portsmouth.uk.ibm.com (d06relay09.portsmouth.uk.ibm.com [9.149.109.194])
+        by ppma04ams.nl.ibm.com with ESMTP id 3acn768vk2-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 12 Aug 2021 09:38:40 +0000
+Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
+        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 17C9ca1E54526306
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 12 Aug 2021 09:38:36 GMT
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 684DEA404D;
+        Thu, 12 Aug 2021 09:38:36 +0000 (GMT)
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 0B1C8A405F;
+        Thu, 12 Aug 2021 09:38:36 +0000 (GMT)
+Received: from localhost.localdomain (unknown [9.145.58.112])
+        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Thu, 12 Aug 2021 09:38:35 +0000 (GMT)
+To:     Pierre Morel <pmorel@linux.ibm.com>, linux-s390@vger.kernel.org
+Cc:     thuth@redhat.com, kvm@vger.kernel.org, cohuck@redhat.com,
+        imbrenda@linux.ibm.com, david@redhat.com
+References: <1628612544-25130-1-git-send-email-pmorel@linux.ibm.com>
+ <1628612544-25130-4-git-send-email-pmorel@linux.ibm.com>
+From:   Janosch Frank <frankja@linux.ibm.com>
+Subject: Re: [kvm-unit-tests PATCH v2 3/4] s390x: topology: Check the Perform
+ Topology Function
+Message-ID: <ae1eb2bc-8570-d114-9f45-4aaf40d23d3f@linux.ibm.com>
+Date:   Thu, 12 Aug 2021 11:38:35 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.11.0
 MIME-Version: 1.0
-References: <20210719160346.609914-1-tabba@google.com> <20210719160346.609914-7-tabba@google.com>
- <20210720145258.axhqog3abdvtpqhw@gator> <CA+EHjTweLPu+DQ8hR9kEW0LrawtaoAoXR_+HmSEZpP-XOEm2qg@mail.gmail.com>
- <20210812084600.GA5912@willie-the-truck>
-In-Reply-To: <20210812084600.GA5912@willie-the-truck>
-From:   Fuad Tabba <tabba@google.com>
-Date:   Thu, 12 Aug 2021 11:28:50 +0200
-Message-ID: <CA+EHjTx7q+DeR2dNL9X6jLcqtr=ZZ5YN4WsnnbOUPvtQZP1dSQ@mail.gmail.com>
-Subject: Re: [PATCH v3 06/15] KVM: arm64: Restore mdcr_el2 from vcpu
-To:     Will Deacon <will@kernel.org>
-Cc:     Andrew Jones <drjones@redhat.com>, kvmarm@lists.cs.columbia.edu,
-        maz@kernel.org, james.morse@arm.com, alexandru.elisei@arm.com,
-        suzuki.poulose@arm.com, mark.rutland@arm.com,
-        christoffer.dall@arm.com, pbonzini@redhat.com, qperret@google.com,
-        kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        kernel-team@android.com
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <1628612544-25130-4-git-send-email-pmorel@linux.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: 213GjdATOgSCM_V-7B0mtVshbOHL_Uxx
+X-Proofpoint-GUID: e3IqL7tTT1UHeKW3kEkSKmgeo4ooCJlh
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.790
+ definitions=2021-08-12_03:2021-08-11,2021-08-12 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015
+ priorityscore=1501 bulkscore=0 spamscore=0 impostorscore=0 adultscore=0
+ lowpriorityscore=0 malwarescore=0 mlxscore=0 suspectscore=0 phishscore=0
+ mlxlogscore=999 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2107140000 definitions=main-2108120061
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Will,
+On 8/10/21 6:22 PM, Pierre Morel wrote:
+> We check the PTF instruction.
+> 
+> - We do not expect to support vertical polarization.
 
-On Thu, Aug 12, 2021 at 10:46 AM Will Deacon <will@kernel.org> wrote:
->
-> On Wed, Jul 21, 2021 at 08:37:21AM +0100, Fuad Tabba wrote:
-> > On Tue, Jul 20, 2021 at 3:53 PM Andrew Jones <drjones@redhat.com> wrote:
-> > >
-> > > On Mon, Jul 19, 2021 at 05:03:37PM +0100, Fuad Tabba wrote:
-> > > > On deactivating traps, restore the value of mdcr_el2 from the
-> > > > newly created and preserved host value vcpu context, rather than
-> > > > directly reading the hardware register.
-> > > >
-> > > > Up until and including this patch the two values are the same,
-> > > > i.e., the hardware register and the vcpu one. A future patch will
-> > > > be changing the value of mdcr_el2 on activating traps, and this
-> > > > ensures that its value will be restored.
-> > > >
-> > > > No functional change intended.
-> > >
-> > > I'm probably missing something, but I can't convince myself that the host
-> > > will end up with the same mdcr_el2 value after deactivating traps after
-> > > this patch as before. We clearly now restore whatever we had when
-> > > activating traps (presumably whatever we configured at init_el2_state
-> > > time), but is that equivalent to what we had before with the masking and
-> > > ORing that this patch drops?
-> >
-> > You're right. I thought that these were actually being initialized to
-> > the same values, but having a closer look at the code the mdcr values
-> > are not the same as pre-patch. I will fix this.
->
-> Can you elaborate on the issue here, please? I was just looking at this
-> but aren't you now relying on __init_el2_debug to configure this, which
-> should be fine?
+KVM does not support vertical polarization and we don't expect it to be
+added in the future?
 
-I *think* that it should be fine, but as Drew pointed out, the host
-does not end up with the same mdcr_el2 value after the deactivation in
-this patch as it did after deactivation before this patch. In my v4
-(not sent out yet), I have fixed it to ensure that the host does end
-up with the same value as the one before this patch. That should make
-it easier to check that there's no functional change.
+> 
+> - We do not expect the Modified Topology Change Report to be
+> pending or not at the moment the first PTF instruction with
+> PTF_CHECK function code is done as some code already did run
+> a polarization change may have occur.
 
-I'll look into it further, and if I can convince myself that there
-aren't any issues and that this patch makes the code cleaner, I will
-add it as a separate patch instead to make reviewing easier.
+ENOPARSE
 
-Thanks,
-/fuad
+> 
+> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
+> ---
+>  s390x/Makefile      |  1 +
+>  s390x/topology.c    | 99 +++++++++++++++++++++++++++++++++++++++++++++
+>  s390x/unittests.cfg |  3 ++
+>  3 files changed, 103 insertions(+)
+>  create mode 100644 s390x/topology.c
+> 
+> diff --git a/s390x/Makefile b/s390x/Makefile
+> index 6565561b..c82b7dbf 100644
+> --- a/s390x/Makefile
+> +++ b/s390x/Makefile
+> @@ -24,6 +24,7 @@ tests += $(TEST_DIR)/mvpg.elf
+>  tests += $(TEST_DIR)/uv-host.elf
+>  tests += $(TEST_DIR)/edat.elf
+>  tests += $(TEST_DIR)/mvpg-sie.elf
+> +tests += $(TEST_DIR)/topology.elf
+>  
+>  tests_binary = $(patsubst %.elf,%.bin,$(tests))
+>  ifneq ($(HOST_KEY_DOCUMENT),)
+> diff --git a/s390x/topology.c b/s390x/topology.c
+> new file mode 100644
+> index 00000000..a0dc3b9e
+> --- /dev/null
+> +++ b/s390x/topology.c
+> @@ -0,0 +1,99 @@
+> +/* SPDX-License-Identifier: GPL-2.0-only */
+> +/*
+> + * CPU Topology
+> + *
+> + * Copyright (c) 2021 IBM Corp
+> + *
+> + * Authors:
+> + *  Pierre Morel <pmorel@linux.ibm.com>
+> + */
+> +
+> +#include <libcflat.h>
+> +#include <asm/page.h>
+> +#include <asm/asm-offsets.h>
+> +#include <asm/interrupt.h>
+> +#include <asm/facility.h>
+> +#include <smp.h>
+> +#include <sclp.h>
+> +
+> +static int machine_level;
+> +
+> +#define PTF_REQ_HORIZONTAL	0
+> +#define PTF_REQ_VERTICAL	1
+> +#define PTF_REQ_CHECK		2
+> +
+> +#define PTF_ERR_NO_REASON	0
+> +#define PTF_ERR_ALRDY_POLARIZED	1
+> +#define PTF_ERR_IN_PROGRESS	2
+> +
+> +static int ptf(unsigned long fc, unsigned long *rc)
+> +{
+> +	int cc;
+> +
+> +	asm volatile(
+> +		"       .insn   rre,0xb9a20000,%1,0\n"
+> +		"       ipm     %0\n"
+> +		"       srl     %0,28\n"
+> +		: "=d" (cc), "+d" (fc)
+> +		: "d" (fc)
+> +		: "cc");
+> +
+> +	*rc = fc >> 8;
+> +	return cc;
+> +}
+> +
+> +static void test_ptf(void)
+> +{
+> +	unsigned long rc;
+> +	int cc;
+> +
+> +	report_prefix_push("Topology Report pending");
+> +	/*
+> +	 * At this moment the topology may already have changed
+> +	 * since the VM has been started.
+> +	 * However, we can test if a second PTF instruction
+> +	 * reports that the topology did not change since the
+> +	 * preceding PFT instruction.
+> +	 */
+> +	ptf(PTF_REQ_CHECK, &rc);
+> +	cc = ptf(PTF_REQ_CHECK, &rc);
+> +	report(cc == 0, "PTF check clear");
+> +
+> +	/*
+> +	 * In the LPAR we can not assume the state of the polarizatiom
 
-> Will
+polarization
+
+> +	 * at this moment.
+> +	 * Let's skip the tests for LPAR.
+> +	 */
+
+Any idea what happens on z/VM?
+We don't necessarily need to support z/VM but we at least need to skip
+like we do on lpar :-)
+
+Maybe also add a TODO, so we know we could improve the test?
+
+> +	if (machine_level < 3)
+> +		goto end;
+> +
+
+Add comments:
+We're always horizontally polarized in KVM.
+
+> +	cc = ptf(PTF_REQ_HORIZONTAL, &rc);
+> +	report(cc == 2 && rc == PTF_ERR_ALRDY_POLARIZED,
+> +	       "PTF horizontal already configured");
+> +
+
+KVM doesn't support vertical polarization.
+
+> +	cc = ptf(PTF_REQ_VERTICAL, &rc);
+> +	report(cc == 2 && rc == PTF_ERR_NO_REASON,
+> +	       "PTF vertical non possible");
+
+s/non/not/
+
+> +
+> +end:
+> +	report_prefix_pop();
+> +}
+> +
+> +int main(int argc, char *argv[])
+> +{
+> +	report_prefix_push("CPU Topology");
+> +
+> +	if (!test_facility(11)) {
+> +		report_skip("Topology facility not present");
+> +		goto end;
+> +	}
+> +
+> +	machine_level = stsi_get_fc();
+> +	report_info("Machine level %d", machine_level);
+> +
+> +	test_ptf();
+> +
+> +end:
+> +	report_prefix_pop();
+> +	return report_summary();
+> +}
+> diff --git a/s390x/unittests.cfg b/s390x/unittests.cfg
+> index 9e1802fd..0f84d279 100644
+> --- a/s390x/unittests.cfg
+> +++ b/s390x/unittests.cfg
+> @@ -109,3 +109,6 @@ file = edat.elf
+>  
+>  [mvpg-sie]
+>  file = mvpg-sie.elf
+> +
+> +[topology]
+> +file = topology.elf
+> 
+
