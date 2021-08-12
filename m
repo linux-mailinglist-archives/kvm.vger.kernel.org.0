@@ -2,97 +2,93 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 777F53EA819
-	for <lists+kvm@lfdr.de>; Thu, 12 Aug 2021 17:56:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D34FD3EA821
+	for <lists+kvm@lfdr.de>; Thu, 12 Aug 2021 17:58:02 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238482AbhHLP4q (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 12 Aug 2021 11:56:46 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:38262 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S238477AbhHLP4q (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 12 Aug 2021 11:56:46 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1628783780;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=jP9rC4W5Rt3ibI4PmBrTL9EEbYfxjT7lG4AyqlHLOZw=;
-        b=OfzxomGvoR7lvFfc0daKdr36AOan73IIoheCgMe2r/mQPKapZGrKcXVcW8yEqjRw4Z8Bbv
-        LFpLusI0faVtHBC2JiPCLEhzNGTvurtVkEd7LzK6L2PDWg/KRhn3wPaRT4muzCsumCjRU5
-        fCDbZv904ZFlZmDsDyn/3AfWjoSV6yk=
-Received: from mail-oo1-f69.google.com (mail-oo1-f69.google.com
- [209.85.161.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-553-rJPUPUJBOtqtXisi5qwhAA-1; Thu, 12 Aug 2021 11:56:17 -0400
-X-MC-Unique: rJPUPUJBOtqtXisi5qwhAA-1
-Received: by mail-oo1-f69.google.com with SMTP id b24-20020a4ac2980000b0290269ebe9b797so2277183ooq.18
-        for <kvm@vger.kernel.org>; Thu, 12 Aug 2021 08:56:16 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=jP9rC4W5Rt3ibI4PmBrTL9EEbYfxjT7lG4AyqlHLOZw=;
-        b=elWuKMAOa8vvBdpmDxq8m+vkp7AT0u8k6SwXi6kRvxFpWc1HrDw4MnyhfVeZwm1dOm
-         JajnRhYFN//VS7AB8WmKKHoSHhyCwhO0t9L2X74+nZFxRFkUBraDOC1pR9+DWV/3aIJB
-         p5jBgK8rr9b1WFJp/4NLSTjxdWU3deMjNIBkPAuhG3Qjdf98A0Yu9oNW4EfkPKNQ3IoS
-         orbUh2jLTvph01riQNCINvPS0b1EnR73zf+Aqr/Ynichnltmh+weukna5+cDo94TsarK
-         yRhSKA1IGH1i6IQLt+ncVhxI6Vp/OAfV5/J3Fqo+2F08lM1wwPXdLju9Z1f5/9I9PeGL
-         j4iw==
-X-Gm-Message-State: AOAM532iCjzsgmRucSY4ucmQG6Q06+a3AdXGuLiZ9V12sA0+AFWL2bDu
-        IVfmf8PchuGGEJdPZKQu1hR5nCJS2rZ73r4azf31xu8s6dRTvCAwr2xh7wEfJD/0iNg39GrRR/r
-        OUA3gA46ak2FB
-X-Received: by 2002:a05:6830:3145:: with SMTP id c5mr3935364ots.245.1628783776429;
-        Thu, 12 Aug 2021 08:56:16 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJznlclP0Zx5nBNeeFvXZ3mWhBBV2KVFXd0kDScEy4VoJCRJyLLF3KeFSh05bRPBExRmJinXkg==
-X-Received: by 2002:a05:6830:3145:: with SMTP id c5mr3935350ots.245.1628783776155;
-        Thu, 12 Aug 2021 08:56:16 -0700 (PDT)
-Received: from redhat.com ([198.99.80.109])
-        by smtp.gmail.com with ESMTPSA id u14sm611344oot.36.2021.08.12.08.56.15
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 12 Aug 2021 08:56:15 -0700 (PDT)
-Date:   Thu, 12 Aug 2021 09:56:14 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Diana Craciun <diana.craciun@oss.nxp.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Kirti Wankhede <kwankhede@nvidia.com>,
-        Eric Auger <eric.auger@redhat.com>,
-        Jason Gunthorpe <jgg@ziepe.ca>, kvm@vger.kernel.org
-Subject: Re: [PATCH 05/14] vfio: refactor noiommu group creation
-Message-ID: <20210812095614.3299d7ab.alex.williamson@redhat.com>
-In-Reply-To: <20210812072617.GA28507@lst.de>
-References: <20210811151500.2744-1-hch@lst.de>
-        <20210811151500.2744-6-hch@lst.de>
-        <20210811160341.573a5b82.alex.williamson@redhat.com>
-        <20210812072617.GA28507@lst.de>
-X-Mailer: Claws Mail 3.18.0 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
+        id S238501AbhHLP5e (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 12 Aug 2021 11:57:34 -0400
+Received: from mail.kernel.org ([198.145.29.99]:48796 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S238369AbhHLP5e (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 12 Aug 2021 11:57:34 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 54B1E6103A;
+        Thu, 12 Aug 2021 15:57:08 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1628783828;
+        bh=8GwFBGz58jJD2VYjjtxO4poe0sIxyPAvRkwfEKB1zek=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:From;
+        b=ueaY50N/lQDLfwvuIeSxqrlAMo2nbgEeliWDW71YXu3IL0Bi4BKcBrFNwszVIJhFk
+         0MyvrDI3A5ozU6czjasd7iqQHgVJhBEMgj0c9BPF8oAeOaF7avM1R2hAvJP6EzeEkY
+         cGtN6BbAerWtt7NAvlhGtPcc7rAWg0Ey7F1auYtzrjCjVdJGKNITmr+acM6QbzA5F+
+         xQRDIb0wwoWrja362PZZA3HM2IggaqnswD7nWT26vE02n95mUF7XfC7FKuvvNN84Tx
+         ml0NUcsMoi56FB7A4QfOWlKjOUbS4OtDBS3UPGjVbQS5XvVlPy+/QvzKvaiI8WTnKW
+         0Ay0XRMT57FkQ==
+Date:   Thu, 12 Aug 2021 10:57:07 -0500
+From:   Bjorn Helgaas <helgaas@kernel.org>
+To:     Jason Gunthorpe <jgg@nvidia.com>
+Cc:     Yishai Hadas <yishaih@nvidia.com>, bhelgaas@google.com,
+        corbet@lwn.net, alex.williamson@redhat.com,
+        diana.craciun@oss.nxp.com, kwankhede@nvidia.com,
+        eric.auger@redhat.com, masahiroy@kernel.org,
+        michal.lkml@markovi.net, linux-pci@vger.kernel.org,
+        linux-doc@vger.kernel.org, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org, linux-kbuild@vger.kernel.org,
+        mgurtovoy@nvidia.com, maorg@nvidia.com, leonro@nvidia.com
+Subject: Re: [PATCH 09/12] PCI: Add a PCI_ID_F_VFIO_DRIVER_OVERRIDE flag to
+ struct pci_device_id
+Message-ID: <20210812155707.GA2464922@bjorn-Precision-5520>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210812132728.GB8367@nvidia.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 12 Aug 2021 09:26:17 +0200
-Christoph Hellwig <hch@lst.de> wrote:
+On Thu, Aug 12, 2021 at 10:27:28AM -0300, Jason Gunthorpe wrote:
+> On Wed, Aug 11, 2021 at 02:07:37PM -0500, Bjorn Helgaas wrote:
+> > On Thu, Aug 05, 2021 at 09:23:57PM -0300, Jason Gunthorpe wrote:
 
-> On Wed, Aug 11, 2021 at 04:03:41PM -0600, Alex Williamson wrote:
-> > > +			dev_warn(dev, "Adding kernel taint for vfio-noiommu group on device\n");
-> > > +			return vfio_noiommu_group_alloc(dev);  
-> > 
-> > Nit, we taint regardless of the success of this function, should we
-> > move the tainting back into the function (using the flags to skip for
-> > mdev in subsequent patches) or swap the order to check the return value
-> > before tainting?  Thanks,  
+> > Do the other bus types have a flag analogous to
+> > PCI_ID_F_VFIO_DRIVER_OVERRIDE?  If we're doing something similar to
+> > other bus types, it'd be nice if the approach were similar.
 > 
-> Does it really matter to have the extra thread if a memory allocation
-> failed when going down this route?
+> They could, this series doesn't attempt it. I expect the approach to
+> be similar as driver_override was copied from PCI to other
+> busses. When this is completed I hope to take a look at it.
 
-Extra thread?  In practice this is unlikely to ever fail, but if we've
-chosen the point at which we have a no-iommu group as where we taint,
-then let's at least be consistent and not move that back to the point
-where we tried to make a no-iommu group, regardless of whether it was
-successful.  Thanks,
+I think this would make more sense as two patches:
 
-Alex
+  - Add a "PCI_ID_DRIVER_OVERRIDE" flag.  This is not VFIO-specific,
+    since nothing in PCI depends on the VFIO-ness of drivers that use
+    the flag.  The only point here is that driver id_table entries
+    with this flag only match when driver_override matches the driver.
 
+  - Update file2alias.c to export the flags and the "vfio_pci:" alias.
+    This seems to be the only place where VFIO comes into play, and
+    putting it in a separate patch will make it much smaller and it
+    will be clear how it could be extended for other buses.
+
+> > I assume somewhere in here you need to unbind mlx5_core before binding
+> > mlx5_vfio_pci?
+> 
+> Er, yes, I skipped some steps here where unbind/bind has to be done
+>  
+> > >    6) cat the matched module name to driver_override:
+> > >     echo mlx5_vfio_pci > /sys/bus/pci/devices/0000:01:00.0/driver_override
+> > 
+> > Don't you need something here to trigger the driver attach, i.e.,
+> > should step 5 and step 6 be swapped?  What if the driver is already
+> > loaded? 
+> 
+> The full sequence is more like:
+> 
+>      echo mlx5_vfio_pci > /sys/bus/pci/devices/0000:01:00.0/driver_override
+>      echo 0000:01:00.0 > /sys/bus/pci/devices/0000:01:00.0/driver/unbind
+>      echo 0000:01:00.0 > /sys/bus/pci/drivers_probe
+
+Thanks a lot for this!  I didn't know about drivers_probe (see
+drivers_probe_store()), and it doesn't seem to be documented anywhere
+except sysfs-bus-usb, where it's only incidental to USB.
+
+Bjorn
