@@ -2,60 +2,61 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D55823EA1F6
-	for <lists+kvm@lfdr.de>; Thu, 12 Aug 2021 11:22:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A574E3EA208
+	for <lists+kvm@lfdr.de>; Thu, 12 Aug 2021 11:31:09 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235668AbhHLJXI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 12 Aug 2021 05:23:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34234 "EHLO
+        id S234593AbhHLJaI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 12 Aug 2021 05:30:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35808 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236098AbhHLJXE (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 12 Aug 2021 05:23:04 -0400
-Received: from mail-oi1-x234.google.com (mail-oi1-x234.google.com [IPv6:2607:f8b0:4864:20::234])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 14006C061798
-        for <kvm@vger.kernel.org>; Thu, 12 Aug 2021 02:22:40 -0700 (PDT)
-Received: by mail-oi1-x234.google.com with SMTP id h11so9439325oie.0
-        for <kvm@vger.kernel.org>; Thu, 12 Aug 2021 02:22:40 -0700 (PDT)
+        with ESMTP id S234824AbhHLJ3w (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 12 Aug 2021 05:29:52 -0400
+Received: from mail-oi1-x22d.google.com (mail-oi1-x22d.google.com [IPv6:2607:f8b0:4864:20::22d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 77F3AC0613D3
+        for <kvm@vger.kernel.org>; Thu, 12 Aug 2021 02:29:27 -0700 (PDT)
+Received: by mail-oi1-x22d.google.com with SMTP id be20so9322353oib.8
+        for <kvm@vger.kernel.org>; Thu, 12 Aug 2021 02:29:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=Ow8pOCC7Pfffi05timzyvoLwa6w/ZcLDyaYIxhtLEXc=;
-        b=BEnTTEkeoRG+ar6fm5BoupukkxVmIStsqg6p9X1L2YewdIyTkSQj1WN+P6+otJ0++C
-         OtX9opzFHCsNib5ayBH3jRJZa30tRdmfcDXAgnJh9+DmlgcpBNLpFCd4UVvvzyfris/w
-         nnstb7QJaX4Qdo8LEROO46qPuYSm8vYSv/psYVhvHn+iUtQmSXiiWUPmR/0m+vfmnoH3
-         KK7LL5G5h8tKWRidLASXmAOKd1dXuJ8aXoPGuJiKY1l7gqxEI7DbdTfujtppYtzNT+9H
-         qzhuzhUZqiCR/wo61T46BUT+5gIQQtGg0xW9QMFzqKarfdR6aBTXX1cMQt3qlC1dttYd
-         a7VA==
+        bh=U79XFkLmbTn8yZV9qpDrY5ksUSwcFQWwCLlxy1S3ZCM=;
+        b=XrAlKvRO3IhvRdo1OfWHbg5fICmE2y0uYSwhfVvs4rYQN5CsIicsYYx6Bs4fvQnjgZ
+         1/hpL5TdfGpaLaNtdcGvPBeWvKk9rEqJGgPOYiuE8PeSQq/Bp+L6vzIUH7vP8RS5UiCD
+         S446ike5fw0AnQivnWAK1804te/Ob8vIu1CzthWvfbYZVJMEOzyP8sKTFKNHq5j0HqpT
+         a8El6dzjZNsuBOljCrPy+L/RGS8k7Uk+j+BCtfS+Nr5DfOg9ETkSRCRT42zKL+wSYKs+
+         QZgYYQ+Q7DRIRJjmSg3t5RF45otrrW1S3LT5N++xJgdcQ9882GV8NuvDQdqM26arapJ9
+         OXZA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=Ow8pOCC7Pfffi05timzyvoLwa6w/ZcLDyaYIxhtLEXc=;
-        b=Vph29z1diPceWTa6pLqc1CQYDis3EYR9/iwpyoHYho0JBJznXuI7uYJjXRtwoHcqTN
-         Pug8+wdkC8pnKdmOLb6VrjOvft+WAH4qU/lbo6GVxBbZgrclRBhoH2VDa1Q8ug8hxvbj
-         FdTHGsCVatNl2olG2BaZWIBVeQ36pp9tinP7POBwBIhjg8RkbTSUq8IBhdbSn1+/dzXz
-         9o9L9hmzmsUd1bOZamoL0qbZknZFhdt1dsHg024BK6+zObXY0g5SyvSlnBPo0+6SKk9p
-         IvMrsDo2dDMMZTyDTWCY93IfPTQq3KX+tNNbWRAIG/+XlF9uS0xupDBrNirUKSrPtUmP
-         wniw==
-X-Gm-Message-State: AOAM5307xyyfdtBdl8lZtnqKkp98laxfBxy1ic4cmYOVHKW2KuyVYy2l
-        5J1ybzNWPwFg7oeCBbSBEDZGom8RWWXgTJqAXiNJBA==
-X-Google-Smtp-Source: ABdhPJyKVto4075gxkTTsWk/Og0Ua476G6PD6Md0kKz1KwdQr50M8mhKFW7wA41+P4p5DR5rb+t8mWsbdIpVjfh3lzI=
-X-Received: by 2002:aca:220a:: with SMTP id b10mr10613392oic.8.1628760159300;
- Thu, 12 Aug 2021 02:22:39 -0700 (PDT)
+        bh=U79XFkLmbTn8yZV9qpDrY5ksUSwcFQWwCLlxy1S3ZCM=;
+        b=EOFUYeeuxW9I+E/LX2tTVAvCpsjtA3QZAOfb3i6LjDgo04dN++GquMkP4jVqJ5z+3l
+         IufVvBzdSPzEYwmZ2ypKJqIZDEjyVoHs5YtNEWG0BRMleB8TgIPbIuVKwPc0b4gcvtxM
+         CZoAYrVyAo7l54yv6Is6J14ugXAt7qtRk9o8y9x7l5XdstxLc/Xi74kFI5Cc2vTKQGvx
+         mjxTGHpLvMv4hh8XudvzPG85dLAiBF0KQseA1YSSnWFTznC66UGhsmx6pcQqKHyECTHc
+         GyjKwFB/bD3yOBAq7Wg5dqOtWPVd9vylrwl++lGyH2rjEPt/E+1RwaUwFR4WrfZcQKwu
+         jnnA==
+X-Gm-Message-State: AOAM53053CrcOWSGHoAqCF3Q3E3FKX9uiFflB4OZqUD9u+gQTsx+mzN3
+        mX2An6u0W/OCFDmgnS6m20/0SuakO+Po4VWfvzUPtw==
+X-Google-Smtp-Source: ABdhPJy/aFf9zz0FkODqeQLUSWtM0BsR7RoSxRgsEV4qM8uv4EK7odLD7bTl7wQy0/py2mv9baEX0r2aaorTwAPxZfU=
+X-Received: by 2002:aca:220a:: with SMTP id b10mr10630360oic.8.1628760566696;
+ Thu, 12 Aug 2021 02:29:26 -0700 (PDT)
 MIME-Version: 1.0
-References: <20210719160346.609914-1-tabba@google.com> <20210719160346.609914-2-tabba@google.com>
- <20210812085857.GB5912@willie-the-truck>
-In-Reply-To: <20210812085857.GB5912@willie-the-truck>
+References: <20210719160346.609914-1-tabba@google.com> <20210719160346.609914-7-tabba@google.com>
+ <20210720145258.axhqog3abdvtpqhw@gator> <CA+EHjTweLPu+DQ8hR9kEW0LrawtaoAoXR_+HmSEZpP-XOEm2qg@mail.gmail.com>
+ <20210812084600.GA5912@willie-the-truck>
+In-Reply-To: <20210812084600.GA5912@willie-the-truck>
 From:   Fuad Tabba <tabba@google.com>
-Date:   Thu, 12 Aug 2021 11:22:03 +0200
-Message-ID: <CA+EHjTx++8neadZ=i5Gu-mCeZFC=CBLJ4bd_=QefBoHBb5Qe9Q@mail.gmail.com>
-Subject: Re: [PATCH v3 01/15] KVM: arm64: placeholder to check if VM is protected
+Date:   Thu, 12 Aug 2021 11:28:50 +0200
+Message-ID: <CA+EHjTx7q+DeR2dNL9X6jLcqtr=ZZ5YN4WsnnbOUPvtQZP1dSQ@mail.gmail.com>
+Subject: Re: [PATCH v3 06/15] KVM: arm64: Restore mdcr_el2 from vcpu
 To:     Will Deacon <will@kernel.org>
-Cc:     kvmarm@lists.cs.columbia.edu, maz@kernel.org, james.morse@arm.com,
-        alexandru.elisei@arm.com, suzuki.poulose@arm.com,
-        mark.rutland@arm.com, christoffer.dall@arm.com,
-        pbonzini@redhat.com, drjones@redhat.com, qperret@google.com,
+Cc:     Andrew Jones <drjones@redhat.com>, kvmarm@lists.cs.columbia.edu,
+        maz@kernel.org, james.morse@arm.com, alexandru.elisei@arm.com,
+        suzuki.poulose@arm.com, mark.rutland@arm.com,
+        christoffer.dall@arm.com, pbonzini@redhat.com, qperret@google.com,
         kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
         kernel-team@android.com
 Content-Type: text/plain; charset="UTF-8"
@@ -65,29 +66,50 @@ X-Mailing-List: kvm@vger.kernel.org
 
 Hi Will,
 
-
-On Thu, Aug 12, 2021 at 10:59 AM Will Deacon <will@kernel.org> wrote:
+On Thu, Aug 12, 2021 at 10:46 AM Will Deacon <will@kernel.org> wrote:
 >
-> On Mon, Jul 19, 2021 at 05:03:32PM +0100, Fuad Tabba wrote:
-> > Add a function to check whether a VM is protected (under pKVM).
-> > Since the creation of protected VMs isn't enabled yet, this is a
-> > placeholder that always returns false. The intention is for this
-> > to become a check for protected VMs in the future (see Will's RFC
-> > [*]).
+> On Wed, Jul 21, 2021 at 08:37:21AM +0100, Fuad Tabba wrote:
+> > On Tue, Jul 20, 2021 at 3:53 PM Andrew Jones <drjones@redhat.com> wrote:
+> > >
+> > > On Mon, Jul 19, 2021 at 05:03:37PM +0100, Fuad Tabba wrote:
+> > > > On deactivating traps, restore the value of mdcr_el2 from the
+> > > > newly created and preserved host value vcpu context, rather than
+> > > > directly reading the hardware register.
+> > > >
+> > > > Up until and including this patch the two values are the same,
+> > > > i.e., the hardware register and the vcpu one. A future patch will
+> > > > be changing the value of mdcr_el2 on activating traps, and this
+> > > > ensures that its value will be restored.
+> > > >
+> > > > No functional change intended.
+> > >
+> > > I'm probably missing something, but I can't convince myself that the host
+> > > will end up with the same mdcr_el2 value after deactivating traps after
+> > > this patch as before. We clearly now restore whatever we had when
+> > > activating traps (presumably whatever we configured at init_el2_state
+> > > time), but is that equivalent to what we had before with the masking and
+> > > ORing that this patch drops?
 > >
-> > No functional change intended.
-> >
-> > Signed-off-by: Fuad Tabba <tabba@google.com>
-> >
-> > [*] https://lore.kernel.org/kvmarm/20210603183347.1695-1-will@kernel.org/
+> > You're right. I thought that these were actually being initialized to
+> > the same values, but having a closer look at the code the mdcr values
+> > are not the same as pre-patch. I will fix this.
 >
-> You can make this a Link: tag.
+> Can you elaborate on the issue here, please? I was just looking at this
+> but aren't you now relying on __init_el2_debug to configure this, which
+> should be fine?
 
-Of course. Thanks!
+I *think* that it should be fine, but as Drew pointed out, the host
+does not end up with the same mdcr_el2 value after the deactivation in
+this patch as it did after deactivation before this patch. In my v4
+(not sent out yet), I have fixed it to ensure that the host does end
+up with the same value as the one before this patch. That should make
+it easier to check that there's no functional change.
+
+I'll look into it further, and if I can convince myself that there
+aren't any issues and that this patch makes the code cleaner, I will
+add it as a separate patch instead to make reviewing easier.
+
+Thanks,
 /fuad
-> Anyway, I think it makes lots of sense to decouple this from the user-ABI
-> series:
->
-> Acked-by: Will Deacon <will@kernel.org>
->
+
 > Will
