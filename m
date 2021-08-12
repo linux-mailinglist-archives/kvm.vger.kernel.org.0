@@ -2,109 +2,160 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C43653EA006
-	for <lists+kvm@lfdr.de>; Thu, 12 Aug 2021 09:58:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B0C023EA02F
+	for <lists+kvm@lfdr.de>; Thu, 12 Aug 2021 10:04:10 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234648AbhHLH7I (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 12 Aug 2021 03:59:08 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:44930 "EHLO
+        id S235089AbhHLIE3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 12 Aug 2021 04:04:29 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:32357 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232348AbhHLH7H (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 12 Aug 2021 03:59:07 -0400
+        by vger.kernel.org with ESMTP id S235159AbhHLIEV (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 12 Aug 2021 04:04:21 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1628755122;
+        s=mimecast20190719; t=1628755417;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=tlfrPfiZTqMaUkly1NPeqbR74SfEh3dRA53YXjnlEvY=;
-        b=WaGt4CLlG0iX3E6GCG89O6WN04Gr+MRjRvJN5NGQoiirX0k3bPpL5f2mQesEVbhBDERVfa
-        1I3t0V1v6czVM6uemB0J8Hx2BmS/cGky0cda/IMZho5/H8Jf3pRZaOgc0tZanpYGA8fpIH
-        xuLfA8zmU89RNsf7id0xsMvJ6rW970k=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-211-NIudjmZeOYGWt2NyQF9yUw-1; Thu, 12 Aug 2021 03:58:41 -0400
-X-MC-Unique: NIudjmZeOYGWt2NyQF9yUw-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 09C738799E0;
-        Thu, 12 Aug 2021 07:58:40 +0000 (UTC)
-Received: from starship (unknown [10.35.206.50])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id E8B9C3AB2;
-        Thu, 12 Aug 2021 07:58:38 +0000 (UTC)
-Message-ID: <3ad0f6db188c4483cb597036bdaca90a2e9adc74.camel@redhat.com>
-Subject: Re: [kvm-unit-tests PATCH 05/12] nSVM: Remove NPT reserved bits
- tests (new one on the way)
-From:   Maxim Levitsky <mlevitsk@redhat.com>
-To:     Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Cc:     kvm@vger.kernel.org
-Date:   Thu, 12 Aug 2021 10:58:37 +0300
-In-Reply-To: <YNTESd1rtU6RDDP0@google.com>
-References: <20210622210047.3691840-1-seanjc@google.com>
-         <20210622210047.3691840-6-seanjc@google.com>
-         <2f1c2605-e588-2eea-d2c1-ab2f4fdc531d@redhat.com>
-         <YNTESd1rtU6RDDP0@google.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
+        bh=VNcc4FKKgeh1x9olC7E03PuQx1nzor6Qv2O5Zs+wmJk=;
+        b=Sf6Yikze2SB5zWc7S+RxoPEJejWvB6o+cAOzpKrwXSxN5aGpJr6evPRps168OBX5iSMU/4
+        O+D62emJdqBKyer12IieSCYam4iSTsAoDWTPMj8PV92ZFkF8z2pFiS7/LZ/n/yR7vvs7mB
+        Kxz56V2Zfipxnawki/74wTxTgCYcCFo=
+Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
+ [209.85.208.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-547-11n09IlkPuOiieathTmCNA-1; Thu, 12 Aug 2021 04:03:36 -0400
+X-MC-Unique: 11n09IlkPuOiieathTmCNA-1
+Received: by mail-ed1-f71.google.com with SMTP id g3-20020a0564024243b02903be33db5ae6so2666537edb.18
+        for <kvm@vger.kernel.org>; Thu, 12 Aug 2021 01:03:35 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=VNcc4FKKgeh1x9olC7E03PuQx1nzor6Qv2O5Zs+wmJk=;
+        b=NmSdsF9RoyYzRWDv+Qxa8NOCWHiqPrqcGr75VfsX+4ZlxJUC7Pi59IHwN+Cd1Idi2V
+         Z+gi+bWojo20tWVb/BCIxI+VggRj0AIF0EOKPSLPowCCjSdShjR6SUnkMNi/H+2gWJh/
+         mc63iKTuH1KxGvNqP3PKfMaAvPyd+Fec3wfVvoJ0h1TrjGOwEOlUwK/zK6ruvdT6Wc1G
+         dI4B3aPCJF4pSi9aHga8ITOtN5mCIwSQGzsPnRhDwJJ8VpvaEebRzzZ9YdpKHD5DfXxW
+         E0Yd6twAdy+BvKNuqyexPpWJK9K1BuxaaK1OVyxfexH20Q5IPF3dKRgzHkJFioS+/FQX
+         z1Kw==
+X-Gm-Message-State: AOAM5324qsS9Cgw97x/qTB0g6MkGrWv1MK+OY0TNdeDf4IJx8gDhq3BP
+        0fnlNQP98uSUCXt/RVZp4QioYu/bPbTMk5CLHrIxt6U1wiuAcDL3zVliSBkDUEaZjqqJFPcuEMF
+        fLX/HAzr7X83X
+X-Received: by 2002:a17:906:4750:: with SMTP id j16mr2439927ejs.26.1628755414887;
+        Thu, 12 Aug 2021 01:03:34 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxU2tcTx6Y7xB9zzU+HQALuAB5KSTmssapC5dM7OHV8xYFOQBEDoFPmmXvbwzdWXnsrrWl5+w==
+X-Received: by 2002:a17:906:4750:: with SMTP id j16mr2439913ejs.26.1628755414694;
+        Thu, 12 Aug 2021 01:03:34 -0700 (PDT)
+Received: from steredhat (host-79-36-51-142.retail.telecomitalia.it. [79.36.51.142])
+        by smtp.gmail.com with ESMTPSA id k18sm752908edo.62.2021.08.12.01.03.33
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 12 Aug 2021 01:03:34 -0700 (PDT)
+Date:   Thu, 12 Aug 2021 10:03:32 +0200
+From:   Stefano Garzarella <sgarzare@redhat.com>
+To:     "Longpeng(Mike)" <longpeng2@huawei.com>
+Cc:     kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
+        netdev@vger.kernel.org, arei.gonglei@huawei.com,
+        linux-kernel@vger.kernel.org,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>
+Subject: Re: [PATCH resend] vsock/virtio: avoid potential deadlock when vsock
+ device remove
+Message-ID: <20210812080332.o4vxw72gn5uuqtik@steredhat>
+References: <20210812053056.1699-1-longpeng2@huawei.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <20210812053056.1699-1-longpeng2@huawei.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 2021-06-24 at 17:43 +0000, Sean Christopherson wrote:
-> On Thu, Jun 24, 2021, Paolo Bonzini wrote:
-> > On 22/06/21 23:00, Sean Christopherson wrote:
-> > > Remove two of nSVM's NPT reserved bits test, a soon-to-be-added test will
-> > > provide a superset of their functionality, e.g. the current tests are
-> > > limited in the sense that they test a single entry and a single bit,
-> > > e.g. don't test conditionally-reserved bits.
-> > > 
-> > > The npt_rsvd test in particular is quite nasty as it subtly relies on
-> > > EFER.NX=1; dropping the test will allow cleaning up the EFER.NX weirdness
-> > > (it's forced for_all_  tests, presumably to get the desired PFEC.FETCH=1
-> > > for this one test).
-> > > 
-> > > Signed-off-by: Sean Christopherson<seanjc@google.com>
-> > > ---
-> > >   x86/svm_tests.c | 45 ---------------------------------------------
-> > >   1 file changed, 45 deletions(-)
-> > 
-> > This exposes a KVM bug, reproducible with
-> > 
-> > 	./x86/run x86/svm.flat -smp 2 -cpu max,+svm -m 4g \
-> > 		-append 'npt_rw npt_rw_pfwalk'
-> 
-> Any chance you're running against an older KVM version?  The test passes if I
-> run against a build with my MMU pile on top of kvm/queue, but fails on a random
-> older KVM.
-> 
-> Side topic, these tests all fail to invalidate TLB entries after modifying PTEs.
-> I suspect they work in part because KVM flushes and syncs on all nested SVM
-> transitions...
+On Thu, Aug 12, 2021 at 01:30:56PM +0800, Longpeng(Mike) wrote:
+>There's a potential deadlock case when remove the vsock device or
+>process the RESET event:
+>
+>  vsock_for_each_connected_socket:
+>      spin_lock_bh(&vsock_table_lock) ----------- (1)
+>      ...
+>          virtio_vsock_reset_sock:
+>              lock_sock(sk) --------------------- (2)
+>      ...
+>      spin_unlock_bh(&vsock_table_lock)
+>
+>lock_sock() may do initiative schedule when the 'sk' is owned by
+>other thread at the same time, we would receivce a warning message
+>that "scheduling while atomic".
+>
+>Even worse, if the next task (selected by the scheduler) try to
+>release a 'sk', it need to request vsock_table_lock and the deadlock
+>occur, cause the system into softlockup state.
+>  Call trace:
+>   queued_spin_lock_slowpath
+>   vsock_remove_bound
+>   vsock_remove_sock
+>   virtio_transport_release
+>   __vsock_release
+>   vsock_release
+>   __sock_release
+>   sock_close
+>   __fput
+>   ____fput
+>
+>So we should not require sk_lock in this case, just like the behavior
+>in vhost_vsock or vmci.
 
-I also now tried to reproduce and the test passes.
+The difference with vhost_vsock is that here we call it also when we 
+receive an event in the event queue (for example because we are 
+migrating the VM).
 
-Best regards,
-	Maxim Levitsky
+I think the idea of this lock was to prevent concurrency with RX loop, 
+but actually if a socket is connected, it can only change state to 
+TCP_CLOSING/TCP_CLOSE.
 
-> 
-> > While running npt_rw_pfwalk, the #NPF gets an incorrect EXITINFO2
-> > (address for the NPF location; on my machine it gets 0xbfede6f0 instead of
-> > 0xbfede000).  The same tests work with QEMU from git.
-> > 
-> > I didn't quite finish analyzing it, but my current theory is
-> > that KVM receives a pagewalk NPF for a *different* page walk that is caused
-> > by read-only page tables; then it finds that the page walk to 0xbfede6f0
-> > *does fail* (after all the correct and wrong EXITINFO2 belong to the same pfn)
-> > and therefore injects it anyway.  This theory is because the 0x6f0 offset in
-> > the page table corresponds to the 0xde000 part of the faulting address.
-> > Maxim will look into it while I'm away.
-> > 
-> > Paolo
-> > 
+I don't think there is any problem not to take the lock, at most we 
+could take the rx_lock in virtio_vsock_event_handle(), but I'm not sure 
+it's necessary.
 
+>
+>Cc: Stefan Hajnoczi <stefanha@redhat.com>
+>Cc: Stefano Garzarella <sgarzare@redhat.com>
+>Cc: "David S. Miller" <davem@davemloft.net>
+>Cc: Jakub Kicinski <kuba@kernel.org>
+
+We should add:
+Fixes: 0ea9e1d3a9e3 ("VSOCK: Introduce virtio_transport.ko")
+>Signed-off-by: Longpeng(Mike) <longpeng2@huawei.com>
+>---
+> net/vmw_vsock/virtio_transport.c | 7 +++++--
+> 1 file changed, 5 insertions(+), 2 deletions(-)
+>
+>diff --git a/net/vmw_vsock/virtio_transport.c b/net/vmw_vsock/virtio_transport.c
+>index e0c2c99..4f7c99d 100644
+>--- a/net/vmw_vsock/virtio_transport.c
+>+++ b/net/vmw_vsock/virtio_transport.c
+>@@ -357,11 +357,14 @@ static void virtio_vsock_event_fill(struct virtio_vsock *vsock)
+>
+> static void virtio_vsock_reset_sock(struct sock *sk)
+> {
+>-	lock_sock(sk);
+>+	/* vmci_transport.c doesn't take sk_lock here either.  At least we're
+>+	 * under vsock_table_lock so the sock cannot disappear while 
+>we're
+>+	 * executing.
+>+	 */
+>+
+> 	sk->sk_state = TCP_CLOSE;
+> 	sk->sk_err = ECONNRESET;
+> 	sk_error_report(sk);
+>-	release_sock(sk);
+> }
+>
+> static void virtio_vsock_update_guest_cid(struct virtio_vsock *vsock)
+>-- 
+>1.8.3.1
+>
+
+With the Fixes tag added:
+
+Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
 
