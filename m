@@ -2,95 +2,118 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8178F3EA993
-	for <lists+kvm@lfdr.de>; Thu, 12 Aug 2021 19:37:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 26F7C3EA998
+	for <lists+kvm@lfdr.de>; Thu, 12 Aug 2021 19:38:59 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236477AbhHLRiC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 12 Aug 2021 13:38:02 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:40002 "EHLO
+        id S236926AbhHLRjS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 12 Aug 2021 13:39:18 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:46987 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S236442AbhHLRh7 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 12 Aug 2021 13:37:59 -0400
+        by vger.kernel.org with ESMTP id S236631AbhHLRjN (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 12 Aug 2021 13:39:13 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1628789854;
+        s=mimecast20190719; t=1628789927;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=0fN0hJhiU42MG6Y9ixqg9uAkz6xOxVcicryD5YB7e2I=;
-        b=C8Hk8B3zy5SZ3SFz2KfCkLIx3Mq8rKqToZYFWCjGMlYISuEAeFwVQkn/0EtwEdZInHXjOV
-        RI0hxelj1LQTj5hR7z6KlJMcm7dcABs34+XJOc8pg/7UPDcIuTc+UZbsGGmEn4/M0kRafQ
-        qYrXOSmlWqSbIHJ1gfcchR1L7jH6WZk=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-361-Xvn8QKT8NhqC3By6_hTAZA-1; Thu, 12 Aug 2021 13:37:32 -0400
-X-MC-Unique: Xvn8QKT8NhqC3By6_hTAZA-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6103C107ACF5;
-        Thu, 12 Aug 2021 17:37:31 +0000 (UTC)
-Received: from [172.30.41.16] (ovpn-113-77.phx2.redhat.com [10.3.113.77])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 5D1161F6;
-        Thu, 12 Aug 2021 17:37:27 +0000 (UTC)
-Subject: [PATCH] vfio_pci: Wake device to D0 before resets
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     alex.williamson@redhat.com
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Date:   Thu, 12 Aug 2021 11:37:27 -0600
-Message-ID: <162878980049.119165.8034541463589403195.stgit@omen>
-User-Agent: StGit/1.0-8-g6af9-dirty
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=H0a2yTJZSWzNBVH6vRpTpspwcHUOMwI/yXcXRTmK2RY=;
+        b=D2WtVSvJhXMd6HUxIvl2yCISIwu8rVK3PyzkDC29EVfI4Qw2Sv9toZu/ujShVQ8cceQG9D
+        v4eEoG9zA7m7UcVoSj/bZyfQWcTbz8qODgf0O5ZqgSspSzwtcXX06qAoQIeFYfvdgwMWjO
+        67BPPuDsCKYhrPKjPvLe/HsBx6DA1tA=
+Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
+ [209.85.208.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-135--K_QRdGHMui_1ifjBesA0w-1; Thu, 12 Aug 2021 13:38:46 -0400
+X-MC-Unique: -K_QRdGHMui_1ifjBesA0w-1
+Received: by mail-ed1-f69.google.com with SMTP id y39-20020a50bb2a0000b02903bc05daccbaso3404877ede.5
+        for <kvm@vger.kernel.org>; Thu, 12 Aug 2021 10:38:46 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=H0a2yTJZSWzNBVH6vRpTpspwcHUOMwI/yXcXRTmK2RY=;
+        b=JCNuVxx5aCkGhk0H0pneMeY6aovK0hM5fWgVUjA5oGErQEFbO7Ei4ajF4c9SHXp/gn
+         a8L+rShilLCyioZUjyb+/Dk1arO3UHNB6FDikzOMEVvaeB99lGxqMnK0A7v4pM2i9+oK
+         3M++hqBDoocFaq4uxs218t51pxyU4FJFNzaFX4lxl4wFCkmT7NcTsk1+nuOiH13xPkTy
+         6TAR1t5846wruQGGvfstOylxv+DA0OEnZPzgX59cakAeUoegFoG0TdMMNUGlytNgwsQx
+         AgXBIJu3NKsRRiloJ0CWD3tjigX+jFQQDUMdDBGm6jXYbuDBuqaE3AaPI9H3/d48JlFA
+         kLNQ==
+X-Gm-Message-State: AOAM532EjRTH895UFdZQg1+mBJBe33u3b9837Kcnj4Cyzj9ipyFaqYvQ
+        XcoEWi5xKFJTj5ZUL67RMk8dhGDaY1WshO4wl1x9VPiIWSZ/4ibRfFiUESDSRUixkZdjY5vTHJJ
+        lfxrp3DG/PrJv
+X-Received: by 2002:a17:907:3e05:: with SMTP id hp5mr4772839ejc.527.1628789925275;
+        Thu, 12 Aug 2021 10:38:45 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyGIauZ1M4pv9JYwwtqfs9CGEZTYw4rF6feLaT5xuwnVPEbUu6+iMXnsoUOxagvmXF1nnVrcA==
+X-Received: by 2002:a17:907:3e05:: with SMTP id hp5mr4772813ejc.527.1628789925064;
+        Thu, 12 Aug 2021 10:38:45 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+        by smtp.gmail.com with ESMTPSA id f12sm1491206edx.37.2021.08.12.10.38.44
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 12 Aug 2021 10:38:44 -0700 (PDT)
+Subject: Re: [PATCH 2/2] KVM: x86/mmu: Don't step down in the TDP iterator
+ when zapping all SPTEs
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Ben Gardon <bgardon@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm <kvm@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>
+References: <20210812050717.3176478-1-seanjc@google.com>
+ <20210812050717.3176478-3-seanjc@google.com>
+ <CANgfPd8HSYZbqmi21XQ=XeMCndXJ0+Ld0eZNKPWLa1fKtutiBA@mail.gmail.com>
+ <YRVVWC31fuZiw9tT@google.com>
+ <928be04d-e60e-924c-1f3a-cb5fef8b0042@redhat.com>
+ <YRVbamoQhvPmrEgK@google.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <7a95b2f6-a7ad-5101-baa5-6a19194695a3@redhat.com>
+Date:   Thu, 12 Aug 2021 19:38:43 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.11.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <YRVbamoQhvPmrEgK@google.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-pci_pm_reset() actually depends on the device starting in the D0 power
-state, therefore any time we're using a flavor of pci_reset_function()
-we should make sure the device is fully powered-up in case the PM reset
-method is used.
+On 12/08/21 19:33, Sean Christopherson wrote:
+> On Thu, Aug 12, 2021, Paolo Bonzini wrote:
+>> On 12/08/21 19:07, Sean Christopherson wrote:
+>>> Yeah, I was/am on the fence too, I almost included a blurb in the cover letter
+>>> saying as much.  I'll do that for v2 and let Paolo decide.
+>>
+>> I think it makes sense to have it.  You can even use the ternary operator
+> 
+> Hah, yeah, I almost used a ternary op.  Honestly don't know why I didn't, guess
+> my brain flipped a coin.
+> 
+>>
+>> 	/*
+>> 	 * When zapping everything, all entries at the top level
+>> 	 * ultimately go away, and the levels below go down with them.
+>> 	 * So do not bother iterating all the way down to the leaves.
+> 
+> The subtle part is that try_step_down() won't actually iterate down because it
+> explicitly rereads and rechecks the SPTE.
+> 
+> 	if (iter->level == iter->min_level)
+> 		return false;
+> 
+> 	/*
+> 	 * Reread the SPTE before stepping down to avoid traversing into page
+> 	 * tables that are no longer linked from this entry.
+> 	 */
+> 	iter->old_spte = READ_ONCE(*rcu_dereference(iter->sptep));  \
+>                                                                       ---> this is the code that is avoided
+> 	child_pt = spte_to_child_pt(iter->old_spte, iter->level);   /
+> 	if (!child_pt)
+> 		return false;
 
-It's not uncommon that shutdown of a VM will put the device into a D3
-state such that vfio_pci_disable() is managing a device in this low
-power state.  The reset state of a device is the D0 power state, so
-it's also reasonable to put the device into this state prior to reset.
+Ah, right - so I agree with Ben that it's not too important.
 
-Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
----
- drivers/vfio/pci/vfio_pci.c |   12 ++++++++++++
- 1 file changed, 12 insertions(+)
-
-diff --git a/drivers/vfio/pci/vfio_pci.c b/drivers/vfio/pci/vfio_pci.c
-index a4f44ea52fa3..e3faa1eb1a8c 100644
---- a/drivers/vfio/pci/vfio_pci.c
-+++ b/drivers/vfio/pci/vfio_pci.c
-@@ -454,6 +454,15 @@ static void vfio_pci_disable(struct vfio_pci_device *vdev)
- 
- 	vdev->needs_reset = true;
- 
-+	/*
-+	 * Userspace may have left the device in a low power state which
-+	 * affects our ability to trigger a PM reset, restore to D0 and
-+	 * toss any saved state from the previous session.
-+	 */
-+	pci_set_power_state(pdev, PCI_D0);
-+	kfree(vdev->pm_save);
-+	vdev->pm_save = NULL;
-+
- 	/*
- 	 * If we have saved state, restore it.  If we can reset the device,
- 	 * even better.  Resetting with current state seems better than
-@@ -1013,6 +1022,9 @@ static long vfio_pci_ioctl(struct vfio_device *core_vdev,
- 		if (!vdev->reset_works)
- 			return -EINVAL;
- 
-+		/* PM reset depends on the device not already being in D3 */
-+		vfio_pci_set_power_state(vdev, PCI_D0);
-+
- 		vfio_pci_zap_and_down_write_memory_lock(vdev);
- 		ret = pci_try_reset_function(vdev->pdev);
- 		up_write(&vdev->memory_lock);
-
+Paolo
 
