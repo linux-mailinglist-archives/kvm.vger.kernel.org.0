@@ -2,261 +2,500 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 07DB73EA22E
-	for <lists+kvm@lfdr.de>; Thu, 12 Aug 2021 11:38:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 31C2D3EA253
+	for <lists+kvm@lfdr.de>; Thu, 12 Aug 2021 11:46:29 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235233AbhHLJjK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 12 Aug 2021 05:39:10 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:62902 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S235166AbhHLJjK (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 12 Aug 2021 05:39:10 -0400
-Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 17C9Y9uc059214;
-        Thu, 12 Aug 2021 05:38:45 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=to : cc : references :
- from : subject : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=B4ESlgt/+Lrp/jkfBwwhu0O4mVP/rZklSNvJOeUHJ00=;
- b=JEvjBxQiKB3go/b8ZLo8hKWMxZrgmoK4/4ZKw6tbT9pftDQjSck8tXHnWniV8wPk9BjD
- C275GCcKXAmqOaHFSk0Ieofo0vAj9jZR9LjsLM1WuSohIcjp7rAYQEXaNpLXu3r6ZLLM
- J7ucEFheJy3v0ogEB3g4vOo4p6wtjoDOJoYTEhO8T6kOGKHnRDhU19csOyTkfsGdXrBq
- mv/jWP0oDU/X6fkTIGJC6wLJRAPbeODkS6K8u6+J03ToCqGvbb038VbwAbUhBWHX9JZf
- /yhi7/JQw36rS0yQ9LVKjuyjjtfchOdRgBbssXE24khyhk2Tl69yPCZ0PmH/qQipfkMx kQ== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3abrr6n7q9-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 12 Aug 2021 05:38:44 -0400
-Received: from m0098399.ppops.net (m0098399.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 17C9YCTx059457;
-        Thu, 12 Aug 2021 05:38:44 -0400
-Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3abrr6n7jm-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 12 Aug 2021 05:38:44 -0400
-Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
-        by ppma04ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 17C9btgT017359;
-        Thu, 12 Aug 2021 09:38:40 GMT
-Received: from b06cxnps3074.portsmouth.uk.ibm.com (d06relay09.portsmouth.uk.ibm.com [9.149.109.194])
-        by ppma04ams.nl.ibm.com with ESMTP id 3acn768vk2-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 12 Aug 2021 09:38:40 +0000
-Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
-        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 17C9ca1E54526306
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 12 Aug 2021 09:38:36 GMT
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 684DEA404D;
-        Thu, 12 Aug 2021 09:38:36 +0000 (GMT)
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 0B1C8A405F;
-        Thu, 12 Aug 2021 09:38:36 +0000 (GMT)
-Received: from localhost.localdomain (unknown [9.145.58.112])
-        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Thu, 12 Aug 2021 09:38:35 +0000 (GMT)
-To:     Pierre Morel <pmorel@linux.ibm.com>, linux-s390@vger.kernel.org
-Cc:     thuth@redhat.com, kvm@vger.kernel.org, cohuck@redhat.com,
-        imbrenda@linux.ibm.com, david@redhat.com
-References: <1628612544-25130-1-git-send-email-pmorel@linux.ibm.com>
- <1628612544-25130-4-git-send-email-pmorel@linux.ibm.com>
-From:   Janosch Frank <frankja@linux.ibm.com>
-Subject: Re: [kvm-unit-tests PATCH v2 3/4] s390x: topology: Check the Perform
- Topology Function
-Message-ID: <ae1eb2bc-8570-d114-9f45-4aaf40d23d3f@linux.ibm.com>
-Date:   Thu, 12 Aug 2021 11:38:35 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.11.0
+        id S236313AbhHLJq1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 12 Aug 2021 05:46:27 -0400
+Received: from mail.kernel.org ([198.145.29.99]:56120 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S236304AbhHLJq0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 12 Aug 2021 05:46:26 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 003E260EB9;
+        Thu, 12 Aug 2021 09:45:58 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1628761561;
+        bh=5bZmlyVl/b7T72bId5IPRnu7pDsVuzo/17CqWdiSmEw=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=IfI2gbZgoQx/sNcEAIGR1BjFnW4xSjfTS9LXTa1X3v6XjVZsATIWcwAIvKzWpRsNj
+         RgO92mPzU+ogzjqrccU2lDR2c+Vbf6rpgHOThPMdfc3q87U7h3zPzKcPc6qVbkSbDE
+         pK7WuosMXjFeP9b1SNe0h+Sy0dsnFgReDlcYKgP0506edEECkVI0F2iPxEm+RK8PEo
+         jAI9psqVr88o5jTpMpZcax0NrgMZcKwafBUtooxMaMS0AZxM1gOS4j3Ry4krBi1wKA
+         Ziqb09a6ZZzJo3ltt8i3VdAeMDEdYFV7nDHDmzfKLkZ+QhVD99hh0D8L314Q1H+OQk
+         hTtC9IrM8BQ6g==
+Date:   Thu, 12 Aug 2021 10:45:55 +0100
+From:   Will Deacon <will@kernel.org>
+To:     Fuad Tabba <tabba@google.com>
+Cc:     kvmarm@lists.cs.columbia.edu, maz@kernel.org, james.morse@arm.com,
+        alexandru.elisei@arm.com, suzuki.poulose@arm.com,
+        mark.rutland@arm.com, christoffer.dall@arm.com,
+        pbonzini@redhat.com, drjones@redhat.com, qperret@google.com,
+        kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        kernel-team@android.com
+Subject: Re: [PATCH v3 11/15] KVM: arm64: Add trap handlers for protected VMs
+Message-ID: <20210812094554.GH5912@willie-the-truck>
+References: <20210719160346.609914-1-tabba@google.com>
+ <20210719160346.609914-12-tabba@google.com>
 MIME-Version: 1.0
-In-Reply-To: <1628612544-25130-4-git-send-email-pmorel@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: 213GjdATOgSCM_V-7B0mtVshbOHL_Uxx
-X-Proofpoint-GUID: e3IqL7tTT1UHeKW3kEkSKmgeo4ooCJlh
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.790
- definitions=2021-08-12_03:2021-08-11,2021-08-12 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015
- priorityscore=1501 bulkscore=0 spamscore=0 impostorscore=0 adultscore=0
- lowpriorityscore=0 malwarescore=0 mlxscore=0 suspectscore=0 phishscore=0
- mlxlogscore=999 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2107140000 definitions=main-2108120061
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210719160346.609914-12-tabba@google.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 8/10/21 6:22 PM, Pierre Morel wrote:
-> We check the PTF instruction.
+On Mon, Jul 19, 2021 at 05:03:42PM +0100, Fuad Tabba wrote:
+> Add trap handlers for protected VMs. These are mainly for Sys64
+> and debug traps.
 > 
-> - We do not expect to support vertical polarization.
-
-KVM does not support vertical polarization and we don't expect it to be
-added in the future?
-
+> No functional change intended as these are not hooked in yet to
+> the guest exit handlers introduced earlier. So even when trapping
+> is triggered, the exit handlers would let the host handle it, as
+> before.
 > 
-> - We do not expect the Modified Topology Change Report to be
-> pending or not at the moment the first PTF instruction with
-> PTF_CHECK function code is done as some code already did run
-> a polarization change may have occur.
-
-ENOPARSE
-
-> 
-> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
+> Signed-off-by: Fuad Tabba <tabba@google.com>
 > ---
->  s390x/Makefile      |  1 +
->  s390x/topology.c    | 99 +++++++++++++++++++++++++++++++++++++++++++++
->  s390x/unittests.cfg |  3 ++
->  3 files changed, 103 insertions(+)
->  create mode 100644 s390x/topology.c
+>  arch/arm64/include/asm/kvm_fixed_config.h | 178 +++++++++
+>  arch/arm64/include/asm/kvm_host.h         |   2 +
+>  arch/arm64/include/asm/kvm_hyp.h          |   3 +
+>  arch/arm64/kvm/Makefile                   |   2 +-
+>  arch/arm64/kvm/arm.c                      |  11 +
+>  arch/arm64/kvm/hyp/nvhe/Makefile          |   2 +-
+>  arch/arm64/kvm/hyp/nvhe/sys_regs.c        | 443 ++++++++++++++++++++++
+>  arch/arm64/kvm/pkvm.c                     | 183 +++++++++
+>  8 files changed, 822 insertions(+), 2 deletions(-)
+>  create mode 100644 arch/arm64/include/asm/kvm_fixed_config.h
+>  create mode 100644 arch/arm64/kvm/hyp/nvhe/sys_regs.c
+>  create mode 100644 arch/arm64/kvm/pkvm.c
 > 
-> diff --git a/s390x/Makefile b/s390x/Makefile
-> index 6565561b..c82b7dbf 100644
-> --- a/s390x/Makefile
-> +++ b/s390x/Makefile
-> @@ -24,6 +24,7 @@ tests += $(TEST_DIR)/mvpg.elf
->  tests += $(TEST_DIR)/uv-host.elf
->  tests += $(TEST_DIR)/edat.elf
->  tests += $(TEST_DIR)/mvpg-sie.elf
-> +tests += $(TEST_DIR)/topology.elf
->  
->  tests_binary = $(patsubst %.elf,%.bin,$(tests))
->  ifneq ($(HOST_KEY_DOCUMENT),)
-> diff --git a/s390x/topology.c b/s390x/topology.c
+> diff --git a/arch/arm64/include/asm/kvm_fixed_config.h b/arch/arm64/include/asm/kvm_fixed_config.h
 > new file mode 100644
-> index 00000000..a0dc3b9e
+> index 000000000000..b39a5de2c4b9
 > --- /dev/null
-> +++ b/s390x/topology.c
-> @@ -0,0 +1,99 @@
+> +++ b/arch/arm64/include/asm/kvm_fixed_config.h
+> @@ -0,0 +1,178 @@
 > +/* SPDX-License-Identifier: GPL-2.0-only */
 > +/*
-> + * CPU Topology
-> + *
-> + * Copyright (c) 2021 IBM Corp
-> + *
-> + * Authors:
-> + *  Pierre Morel <pmorel@linux.ibm.com>
+> + * Copyright (C) 2021 Google LLC
+> + * Author: Fuad Tabba <tabba@google.com>
 > + */
 > +
-> +#include <libcflat.h>
-> +#include <asm/page.h>
-> +#include <asm/asm-offsets.h>
-> +#include <asm/interrupt.h>
-> +#include <asm/facility.h>
-> +#include <smp.h>
-> +#include <sclp.h>
+> +#ifndef __ARM64_KVM_FIXED_CONFIG_H__
+> +#define __ARM64_KVM_FIXED_CONFIG_H__
 > +
-> +static int machine_level;
+> +#include <asm/sysreg.h>
 > +
-> +#define PTF_REQ_HORIZONTAL	0
-> +#define PTF_REQ_VERTICAL	1
-> +#define PTF_REQ_CHECK		2
-> +
-> +#define PTF_ERR_NO_REASON	0
-> +#define PTF_ERR_ALRDY_POLARIZED	1
-> +#define PTF_ERR_IN_PROGRESS	2
-> +
-> +static int ptf(unsigned long fc, unsigned long *rc)
-> +{
-> +	int cc;
-> +
-> +	asm volatile(
-> +		"       .insn   rre,0xb9a20000,%1,0\n"
-> +		"       ipm     %0\n"
-> +		"       srl     %0,28\n"
-> +		: "=d" (cc), "+d" (fc)
-> +		: "d" (fc)
-> +		: "cc");
-> +
-> +	*rc = fc >> 8;
-> +	return cc;
-> +}
-> +
-> +static void test_ptf(void)
-> +{
-> +	unsigned long rc;
-> +	int cc;
-> +
-> +	report_prefix_push("Topology Report pending");
-> +	/*
-> +	 * At this moment the topology may already have changed
-> +	 * since the VM has been started.
-> +	 * However, we can test if a second PTF instruction
-> +	 * reports that the topology did not change since the
-> +	 * preceding PFT instruction.
-> +	 */
-> +	ptf(PTF_REQ_CHECK, &rc);
-> +	cc = ptf(PTF_REQ_CHECK, &rc);
-> +	report(cc == 0, "PTF check clear");
-> +
-> +	/*
-> +	 * In the LPAR we can not assume the state of the polarizatiom
+> +/*
+> + * This file contains definitions for features to be allowed or restricted for
+> + * guest virtual machines as a baseline, depending on what mode KVM is running
+> + * in and on the type of guest is running.
 
-polarization
+s/is running/that is running/
 
-> +	 * at this moment.
-> +	 * Let's skip the tests for LPAR.
-> +	 */
+> + *
+> + * The features are represented as the highest allowed value for a feature in
+> + * the feature id registers. If the field is set to all ones (i.e., 0b1111),
+> + * then it's only restricted by what the system allows. If the feature is set to
+> + * another value, then that value would be the maximum value allowed and
+> + * supported in pKVM, even if the system supports a higher value.
 
-Any idea what happens on z/VM?
-We don't necessarily need to support z/VM but we at least need to skip
-like we do on lpar :-)
+Given that some fields are signed whereas others are unsigned, I think the
+wording could be a bit tighter here when it refers to "maximum".
 
-Maybe also add a TODO, so we know we could improve the test?
-
-> +	if (machine_level < 3)
-> +		goto end;
+> + *
+> + * Some features are forced to a certain value, in which case a SET bitmap is
+> + * used to force these values.
+> + */
 > +
+> +
+> +/*
+> + * Allowed features for protected guests (Protected KVM)
+> + *
+> + * The approach taken here is to allow features that are:
+> + * - needed by common Linux distributions (e.g., flooating point)
 
-Add comments:
-We're always horizontally polarized in KVM.
+s/flooating/floating
 
-> +	cc = ptf(PTF_REQ_HORIZONTAL, &rc);
-> +	report(cc == 2 && rc == PTF_ERR_ALRDY_POLARIZED,
-> +	       "PTF horizontal already configured");
-> +
+> + * - are trivial, e.g., supporting the feature doesn't introduce or require the
+> + * tracking of additional state
 
-KVM doesn't support vertical polarization.
+... in KVM.
 
-> +	cc = ptf(PTF_REQ_VERTICAL, &rc);
-> +	report(cc == 2 && rc == PTF_ERR_NO_REASON,
-> +	       "PTF vertical non possible");
+> + * - not trapable
 
-s/non/not/
+s/not trapable/cannot be trapped/
 
+> + */
 > +
-> +end:
-> +	report_prefix_pop();
-> +}
+> +/*
+> + * - Floating-point and Advanced SIMD:
+> + *	Don't require much support other than maintaining the context, which KVM
+> + *	already has.
+
+I'd rework this sentence. We have to support fpsimd because Linux guests
+rely on it.
+
+> + * - AArch64 guests only (no support for AArch32 guests):
+> + *	Simplify support in case of asymmetric AArch32 systems.
+
+I don't think asymmetric systems come into this really; AArch32 on its
+own adds lots of complexity in trap handling, emulation, condition codes
+etc. Restricting guests to AArch64 means we don't have to worry about the
+AArch32 exception model or emulation of 32-bit instructions.
+
+> + * - RAS (v1)
+> + *	v1 doesn't require much additional support, but later versions do.
+
+Be more specific?
+
+> + * - Data Independent Timing
+> + *	Trivial
+> + * Remaining features are not supported either because they require too much
+> + * support from KVM, or risk leaking guest data.
+
+I think we should drop this sentence -- it makes it sounds like we can't
+be arsed :)
+
+> + */
+> +#define PVM_ID_AA64PFR0_ALLOW (\
+> +	FEATURE(ID_AA64PFR0_FP) | \
+> +	FIELD_PREP(FEATURE(ID_AA64PFR0_EL0), ID_AA64PFR0_ELx_64BIT_ONLY) | \
+> +	FIELD_PREP(FEATURE(ID_AA64PFR0_EL1), ID_AA64PFR0_ELx_64BIT_ONLY) | \
+> +	FIELD_PREP(FEATURE(ID_AA64PFR0_EL2), ID_AA64PFR0_ELx_64BIT_ONLY) | \
+> +	FIELD_PREP(FEATURE(ID_AA64PFR0_EL3), ID_AA64PFR0_ELx_64BIT_ONLY) | \
+> +	FIELD_PREP(FEATURE(ID_AA64PFR0_RAS), ID_AA64PFR0_RAS_V1) | \
+
+I think having the FIELD_PREP entries in the ALLOW mask is quite confusing
+here -- naively you would expect to be able to bitwise-and the host register
+value with the ALLOW mask and get the sanitised version back, but with these
+here you have to go field-by-field to compute the common value.
+
+So perhaps move those into a PVM_ID_AA64PFR0_RESTRICT mask or something?
+Then pvm_access_id_aa64pfr0() will become a little easier to read, I think.
+
+> +	FEATURE(ID_AA64PFR0_ASIMD) | \
+> +	FEATURE(ID_AA64PFR0_DIT) \
+> +	)
 > +
-> +int main(int argc, char *argv[])
-> +{
-> +	report_prefix_push("CPU Topology");
+> +/*
+> + * - Branch Target Identification
+> + * - Speculative Store Bypassing
+> + *	These features are trivial to support
+> + */
+> +#define PVM_ID_AA64PFR1_ALLOW (\
+> +	FEATURE(ID_AA64PFR1_BT) | \
+> +	FEATURE(ID_AA64PFR1_SSBS) \
+> +	)
 > +
-> +	if (!test_facility(11)) {
-> +		report_skip("Topology facility not present");
-> +		goto end;
-> +	}
+> +/*
+> + * No support for Scalable Vectors:
+> + *	Requires additional support from KVM
+
+Perhaps expand on "support" here? E.g. "context-switching and trapping
+support at EL2".
+
+> + */
+> +#define PVM_ID_AA64ZFR0_ALLOW (0ULL)
 > +
-> +	machine_level = stsi_get_fc();
-> +	report_info("Machine level %d", machine_level);
+> +/*
+> + * No support for debug, including breakpoints, and watchpoints:
+> + *	Reduce complexity and avoid exposing/leaking guest data
+> + *
+> + * NOTE: The Arm architecture mandates support for at least the Armv8 debug
+> + * architecture, which would include at least 2 hardware breakpoints and
+> + * watchpoints. Providing that support to protected guests adds considerable
+> + * state and complexity, and risks leaking guest data. Therefore, the reserved
+> + * value of 0 is used for debug-related fields.
+> + */
+
+I think the complexity of the debug architecture is a good reason to avoid
+exposing it here, but I don't understand how providing breakpoints or
+watchpoints to a guest could risk leaking guest data. What is the specific
+threat here?
+
+> +#define PVM_ID_AA64DFR0_ALLOW (0ULL)
 > +
-> +	test_ptf();
+> +/*
+> + * These features are chosen because they are supported by KVM and to limit the
+> + * confiruation state space and make it more deterministic.
+
+s/confiruation/configuration/
+
+However, I don't agree that this provides determinism since we're not
+forcing any particular values, but rather filtering the values from the
+host.
+
+> + * - 40-bit IPA
+
+This seems more about not supporting KVM_CAP_ARM_VM_IPA_SIZE for now.
+
+> + * - 16-bit ASID
+> + * - Mixed-endian
+> + * - Distinction between Secure and Non-secure Memory
+> + * - Mixed-endian at EL0 only
+> + * - Non-context synchronizing exception entry and exit
+
+These all seem to fall into the "cannot trap" category, so we just advertise
+whatever we've got.
+
+> + */
+> +#define PVM_ID_AA64MMFR0_ALLOW (\
+> +	FIELD_PREP(FEATURE(ID_AA64MMFR0_PARANGE), ID_AA64MMFR0_PARANGE_40) | \
+> +	FIELD_PREP(FEATURE(ID_AA64MMFR0_ASID), ID_AA64MMFR0_ASID_16) | \
+> +	FEATURE(ID_AA64MMFR0_BIGENDEL) | \
+> +	FEATURE(ID_AA64MMFR0_SNSMEM) | \
+> +	FEATURE(ID_AA64MMFR0_BIGENDEL0) | \
+> +	FEATURE(ID_AA64MMFR0_EXS) \
+> +	)
 > +
-> +end:
-> +	report_prefix_pop();
-> +	return report_summary();
-> +}
-> diff --git a/s390x/unittests.cfg b/s390x/unittests.cfg
-> index 9e1802fd..0f84d279 100644
-> --- a/s390x/unittests.cfg
-> +++ b/s390x/unittests.cfg
-> @@ -109,3 +109,6 @@ file = edat.elf
+> +/*
+> + * - 64KB granule not supported
+> + */
+> +#define PVM_ID_AA64MMFR0_SET (\
+> +	FIELD_PREP(FEATURE(ID_AA64MMFR0_TGRAN64), ID_AA64MMFR0_TGRAN64_NI) \
+> +	)
+
+Why not, and can we actually prevent the guest from doing that?
+
+> +/*
+> + * These features are chosen because they are supported by KVM and to limit the
+> + * confiruation state space and make it more deterministic.
+
+It's that typo again ;) But my comment from before still applies -- I don't
+think an ALLOW mask adds hugely to the determinism.
+
+> + * - Hardware translation table updates to Access flag and Dirty state
+> + * - Number of VMID bits from CPU
+> + * - Hierarchical Permission Disables
+> + * - Privileged Access Never
+> + * - SError interrupt exceptions from speculative reads
+> + * - Enhanced Translation Synchronization
+
+As before, I think this is a mixture of "trivial" and "cannot trap"
+features.
+
+> + */
+> +#define PVM_ID_AA64MMFR1_ALLOW (\
+> +	FEATURE(ID_AA64MMFR1_HADBS) | \
+> +	FEATURE(ID_AA64MMFR1_VMIDBITS) | \
+> +	FEATURE(ID_AA64MMFR1_HPD) | \
+> +	FEATURE(ID_AA64MMFR1_PAN) | \
+> +	FEATURE(ID_AA64MMFR1_SPECSEI) | \
+> +	FEATURE(ID_AA64MMFR1_ETS) \
+> +	)
+> +
+> +/*
+> + * These features are chosen because they are supported by KVM and to limit the
+> + * confiruation state space and make it more deterministic.
+
+<same comment>
+
+> + * - Common not Private translations
+> + * - User Access Override
+> + * - IESB bit in the SCTLR_ELx registers
+> + * - Unaligned single-copy atomicity and atomic functions
+> + * - ESR_ELx.EC value on an exception by read access to feature ID space
+> + * - TTL field in address operations.
+> + * - Break-before-make sequences when changing translation block size
+> + * - E0PDx mechanism
+> + */
+> +#define PVM_ID_AA64MMFR2_ALLOW (\
+> +	FEATURE(ID_AA64MMFR2_CNP) | \
+> +	FEATURE(ID_AA64MMFR2_UAO) | \
+> +	FEATURE(ID_AA64MMFR2_IESB) | \
+> +	FEATURE(ID_AA64MMFR2_AT) | \
+> +	FEATURE(ID_AA64MMFR2_IDS) | \
+> +	FEATURE(ID_AA64MMFR2_TTL) | \
+> +	FEATURE(ID_AA64MMFR2_BBM) | \
+> +	FEATURE(ID_AA64MMFR2_E0PD) \
+> +	)
+> +
+> +/*
+> + * Allow all features in this register because they are trivial to support, or
+> + * are already supported by KVM:
+> + * - LS64
+> + * - XS
+> + * - I8MM
+> + * - DGB
+> + * - BF16
+> + * - SPECRES
+> + * - SB
+> + * - FRINTTS
+> + * - PAuth
+> + * - FPAC
+> + * - LRCPC
+> + * - FCMA
+> + * - JSCVT
+> + * - DPB
+> + */
+> +#define PVM_ID_AA64ISAR1_ALLOW (~0ULL)
+> +
+> +#endif /* __ARM64_KVM_FIXED_CONFIG_H__ */
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index ac67d5699c68..e1ceadd69575 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -780,6 +780,8 @@ static inline bool kvm_vm_is_protected(struct kvm *kvm)
+>  	return false;
+>  }
 >  
->  [mvpg-sie]
->  file = mvpg-sie.elf
+> +void kvm_init_protected_traps(struct kvm_vcpu *vcpu);
 > +
-> +[topology]
-> +file = topology.elf
-> 
+>  int kvm_arm_vcpu_finalize(struct kvm_vcpu *vcpu, int feature);
+>  bool kvm_arm_vcpu_is_finalized(struct kvm_vcpu *vcpu);
+>  
+> diff --git a/arch/arm64/include/asm/kvm_hyp.h b/arch/arm64/include/asm/kvm_hyp.h
+> index 657d0c94cf82..3f4866322f85 100644
+> --- a/arch/arm64/include/asm/kvm_hyp.h
+> +++ b/arch/arm64/include/asm/kvm_hyp.h
+> @@ -115,7 +115,10 @@ int __pkvm_init(phys_addr_t phys, unsigned long size, unsigned long nr_cpus,
+>  void __noreturn __host_enter(struct kvm_cpu_context *host_ctxt);
+>  #endif
+>  
+> +extern u64 kvm_nvhe_sym(id_aa64pfr0_el1_sys_val);
+> +extern u64 kvm_nvhe_sym(id_aa64pfr1_el1_sys_val);
+>  extern u64 kvm_nvhe_sym(id_aa64mmfr0_el1_sys_val);
+>  extern u64 kvm_nvhe_sym(id_aa64mmfr1_el1_sys_val);
+> +extern u64 kvm_nvhe_sym(id_aa64mmfr2_el1_sys_val);
+>  
+>  #endif /* __ARM64_KVM_HYP_H__ */
+> diff --git a/arch/arm64/kvm/Makefile b/arch/arm64/kvm/Makefile
+> index 989bb5dad2c8..0be63f5c495f 100644
+> --- a/arch/arm64/kvm/Makefile
+> +++ b/arch/arm64/kvm/Makefile
+> @@ -14,7 +14,7 @@ kvm-y := $(KVM)/kvm_main.o $(KVM)/coalesced_mmio.o $(KVM)/eventfd.o \
+>  	 $(KVM)/vfio.o $(KVM)/irqchip.o $(KVM)/binary_stats.o \
+>  	 arm.o mmu.o mmio.o psci.o perf.o hypercalls.o pvtime.o \
+>  	 inject_fault.o va_layout.o handle_exit.o \
+> -	 guest.o debug.o reset.o sys_regs.o \
+> +	 guest.o debug.o pkvm.o reset.o sys_regs.o \
+>  	 vgic-sys-reg-v3.o fpsimd.o pmu.o \
+>  	 arch_timer.o trng.o\
+>  	 vgic/vgic.o vgic/vgic-init.o \
+> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> index 14b12f2c08c0..3f28549aff0d 100644
+> --- a/arch/arm64/kvm/arm.c
+> +++ b/arch/arm64/kvm/arm.c
+> @@ -618,6 +618,14 @@ static int kvm_vcpu_first_run_init(struct kvm_vcpu *vcpu)
+>  
+>  	ret = kvm_arm_pmu_v3_enable(vcpu);
+>  
+> +	/*
+> +	 * Initialize traps for protected VMs.
+> +	 * NOTE: Move  trap initialization to EL2 once the code is in place for
+> +	 * maintaining protected VM state at EL2 instead of the host.
+> +	 */
+> +	if (kvm_vm_is_protected(kvm))
+> +		kvm_init_protected_traps(vcpu);
+> +
+>  	return ret;
+>  }
+>  
+> @@ -1781,8 +1789,11 @@ static int kvm_hyp_init_protection(u32 hyp_va_bits)
+>  	void *addr = phys_to_virt(hyp_mem_base);
+>  	int ret;
+>  
+> +	kvm_nvhe_sym(id_aa64pfr0_el1_sys_val) = read_sanitised_ftr_reg(SYS_ID_AA64PFR0_EL1);
+> +	kvm_nvhe_sym(id_aa64pfr1_el1_sys_val) = read_sanitised_ftr_reg(SYS_ID_AA64PFR1_EL1);
+>  	kvm_nvhe_sym(id_aa64mmfr0_el1_sys_val) = read_sanitised_ftr_reg(SYS_ID_AA64MMFR0_EL1);
+>  	kvm_nvhe_sym(id_aa64mmfr1_el1_sys_val) = read_sanitised_ftr_reg(SYS_ID_AA64MMFR1_EL1);
+> +	kvm_nvhe_sym(id_aa64mmfr2_el1_sys_val) = read_sanitised_ftr_reg(SYS_ID_AA64MMFR2_EL1);
+>  
+>  	ret = create_hyp_mappings(addr, addr + hyp_mem_size, PAGE_HYP);
+>  	if (ret)
+> diff --git a/arch/arm64/kvm/hyp/nvhe/Makefile b/arch/arm64/kvm/hyp/nvhe/Makefile
+> index 5df6193fc430..a23f417a0c20 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/Makefile
+> +++ b/arch/arm64/kvm/hyp/nvhe/Makefile
+> @@ -14,7 +14,7 @@ lib-objs := $(addprefix ../../../lib/, $(lib-objs))
+>  
+>  obj-y := timer-sr.o sysreg-sr.o debug-sr.o switch.o tlb.o hyp-init.o host.o \
+>  	 hyp-main.o hyp-smp.o psci-relay.o early_alloc.o stub.o page_alloc.o \
+> -	 cache.o setup.o mm.o mem_protect.o
+> +	 cache.o setup.o mm.o mem_protect.o sys_regs.o
+>  obj-y += ../vgic-v3-sr.o ../aarch32.o ../vgic-v2-cpuif-proxy.o ../entry.o \
+>  	 ../fpsimd.o ../hyp-entry.o ../exception.o ../pgtable.o
+>  obj-y += $(lib-objs)
+> diff --git a/arch/arm64/kvm/hyp/nvhe/sys_regs.c b/arch/arm64/kvm/hyp/nvhe/sys_regs.c
+> new file mode 100644
+> index 000000000000..6c7230aa70e9
+> --- /dev/null
+> +++ b/arch/arm64/kvm/hyp/nvhe/sys_regs.c
+> @@ -0,0 +1,443 @@
+> +// SPDX-License-Identifier: GPL-2.0-only
+> +/*
+> + * Copyright (C) 2021 Google LLC
+> + * Author: Fuad Tabba <tabba@google.com>
+> + */
+> +
+> +#include <linux/kvm_host.h>
+> +
+> +#include <asm/kvm_asm.h>
+> +#include <asm/kvm_emulate.h>
+> +#include <asm/kvm_fixed_config.h>
+> +#include <asm/kvm_mmu.h>
+> +
+> +#include <hyp/adjust_pc.h>
+> +
+> +#include "../../sys_regs.h"
+> +
+> +/*
+> + * Copies of the host's CPU features registers holding sanitized values.
+> + */
+> +u64 id_aa64pfr0_el1_sys_val;
+> +u64 id_aa64pfr1_el1_sys_val;
+> +u64 id_aa64mmfr2_el1_sys_val;
+> +
+> +/*
+> + * Inject an unknown/undefined exception to the guest.
+> + */
+> +static void inject_undef(struct kvm_vcpu *vcpu)
+> +{
+> +	u32 esr = (ESR_ELx_EC_UNKNOWN << ESR_ELx_EC_SHIFT);
+> +
+> +	vcpu->arch.flags |= (KVM_ARM64_EXCEPT_AA64_EL1 |
+> +			     KVM_ARM64_EXCEPT_AA64_ELx_SYNC |
+> +			     KVM_ARM64_PENDING_EXCEPTION);
+> +
+> +	__kvm_adjust_pc(vcpu);
+> +
+> +	write_sysreg_el1(esr, SYS_ESR);
+> +	write_sysreg_el1(read_sysreg_el2(SYS_ELR), SYS_ELR);
+> +}
+> +
+> +/*
+> + * Accessor for undefined accesses.
+> + */
+> +static bool undef_access(struct kvm_vcpu *vcpu,
+> +			 struct sys_reg_params *p,
+> +			 const struct sys_reg_desc *r)
+> +{
+> +	inject_undef(vcpu);
+> +	return false;
+> +}
+> +
+> +/*
+> + * Accessors for feature registers.
+> + *
+> + * If access is allowed, set the regval to the protected VM's view of the
+> + * register and return true.
+> + * Otherwise, inject an undefined exception and return false.
+> + */
+> +
+> +/*
+> + * Returns the minimum feature supported and allowed.
+> + */
+> +static u64 get_min_feature(u64 feature, u64 allowed_features,
+> +			   u64 supported_features)
+> +{
+> +	const u64 allowed_feature = FIELD_GET(feature, allowed_features);
+> +	const u64 supported_feature = FIELD_GET(feature, supported_features);
+> +
+> +	return min(allowed_feature, supported_feature);
 
+Careful here: this is an unsigned comparison, yet some fields are signed.
+cpufeature.c uses the S_ARM64_FTR_BITS and ARM64_FTR_BITS to declare signed
+and unsigned fields respectively.
+
+Will
