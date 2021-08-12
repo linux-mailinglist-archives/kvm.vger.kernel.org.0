@@ -2,114 +2,113 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 94E113E9DC4
-	for <lists+kvm@lfdr.de>; Thu, 12 Aug 2021 07:07:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 75DF03E9DF1
+	for <lists+kvm@lfdr.de>; Thu, 12 Aug 2021 07:31:19 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234223AbhHLFHw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 12 Aug 2021 01:07:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60172 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234209AbhHLFHu (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 12 Aug 2021 01:07:50 -0400
-Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 702DFC061798
-        for <kvm@vger.kernel.org>; Wed, 11 Aug 2021 22:07:25 -0700 (PDT)
-Received: by mail-yb1-xb49.google.com with SMTP id b4-20020a252e440000b0290593da85d104so5056230ybn.6
-        for <kvm@vger.kernel.org>; Wed, 11 Aug 2021 22:07:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=reply-to:date:in-reply-to:message-id:mime-version:references
-         :subject:from:to:cc;
-        bh=tu2iufR9aI/LsGWpANNecIoICf6nuJGttYFfk37Urfg=;
-        b=gDGO2ChgUCHmoQiOTXqkDMN+duj4YxkrJ/UzuL4FTogwGRv3AadGos1imJV/VsqrPt
-         C6vf6hkGnjmL3GVWuhwyh4gpVwx/FranaKpxHrs5tF+lUSBQD6ia4eHmtLY5FAou4Gnw
-         YVYYs2VUdqRTVUBRxx+rmWhnZSmcupoOyVBcuI7uQLQpZUomvt0+nndsPD+2HVyUKE3k
-         itX9sVh8yuORhYy/81vNkmDMVNMX+rMsEzmioXflGzJJHVSjOxdlh1Na06g2bvG5xTtM
-         1comgk7mTRjn/UWZ7FVcAwhwSpzvni+E4ZqS/JG9tuI4BGNjyE6OvY0rCoz9oPgDH4cY
-         6cjw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:reply-to:date:in-reply-to:message-id
-         :mime-version:references:subject:from:to:cc;
-        bh=tu2iufR9aI/LsGWpANNecIoICf6nuJGttYFfk37Urfg=;
-        b=gx8AP/bF6vsNyx9+ENtxSiZrCILOj6+xADGO0lTtDFQjAX6NquiaL/e3sN/BjXj0NR
-         L3caf/EqPyznHrx0pt3Xcen2B+6H9IiOQQXbynU5Hatvt2/19kgPRH6Zo5XU29Ve7Ma/
-         WvZmam557MfedB5MBEkUWKtMFodkjOb2fNyxfmqgTxw2fHjskmGE1egQ1tmIvEUU7Y45
-         lyY6KltaJSSjWNWW4aP+asJXYMselOx6LoGthikj3znUDyxNpBjMscTee4WglNs7QWGr
-         rBP1VW1+8BtM2iSUU0Nws1EQdj7IwYSXjCULiL7fj/0KaVC9TaB3dofBRRo5vcqpsn3D
-         c8gw==
-X-Gm-Message-State: AOAM533VCeCW/SO47vardqj4bZvSpCgdHniu7HeljadfyaqqF/AbREH4
-        vyJzYIKtq1BIalvCEuAMjddwKIsUxo8=
-X-Google-Smtp-Source: ABdhPJwo4nyZkn+Get9j6PRPE86bGaP9wEO/nOLVaL9BNhIMi0FbZA4hRJYqpD6njTHuRw69HmoA4NIxrAI=
-X-Received: from seanjc798194.pdx.corp.google.com ([2620:15c:90:200:f150:c3bd:5e7f:59bf])
- (user=seanjc job=sendgmr) by 2002:a25:ba05:: with SMTP id t5mr2017139ybg.120.1628744844668;
- Wed, 11 Aug 2021 22:07:24 -0700 (PDT)
-Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Wed, 11 Aug 2021 22:07:17 -0700
-In-Reply-To: <20210812050717.3176478-1-seanjc@google.com>
-Message-Id: <20210812050717.3176478-3-seanjc@google.com>
-Mime-Version: 1.0
-References: <20210812050717.3176478-1-seanjc@google.com>
-X-Mailer: git-send-email 2.33.0.rc1.237.g0d66db33f3-goog
-Subject: [PATCH 2/2] KVM: x86/mmu: Don't step down in the TDP iterator when
- zapping all SPTEs
-From:   Sean Christopherson <seanjc@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Ben Gardon <bgardon@google.com>
-Content-Type: text/plain; charset="UTF-8"
+        id S234341AbhHLFbj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 12 Aug 2021 01:31:39 -0400
+Received: from szxga03-in.huawei.com ([45.249.212.189]:13308 "EHLO
+        szxga03-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S234315AbhHLFbh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 12 Aug 2021 01:31:37 -0400
+Received: from dggemv704-chm.china.huawei.com (unknown [172.30.72.57])
+        by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4GlZsp2Nv4z7tJV;
+        Thu, 12 Aug 2021 13:26:06 +0800 (CST)
+Received: from dggpeml500016.china.huawei.com (7.185.36.70) by
+ dggemv704-chm.china.huawei.com (10.3.19.47) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2176.2; Thu, 12 Aug 2021 13:31:05 +0800
+Received: from DESKTOP-27KDQMV.china.huawei.com (10.174.148.223) by
+ dggpeml500016.china.huawei.com (7.185.36.70) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2176.2; Thu, 12 Aug 2021 13:31:05 +0800
+From:   "Longpeng(Mike)" <longpeng2@huawei.com>
+To:     <sgarzare@redhat.com>
+CC:     <kvm@vger.kernel.org>, <virtualization@lists.linux-foundation.org>,
+        <netdev@vger.kernel.org>, <arei.gonglei@huawei.com>,
+        <linux-kernel@vger.kernel.org>,
+        "Longpeng(Mike)" <longpeng2@huawei.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>
+Subject: [PATCH resend] vsock/virtio: avoid potential deadlock when vsock device remove
+Date:   Thu, 12 Aug 2021 13:30:56 +0800
+Message-ID: <20210812053056.1699-1-longpeng2@huawei.com>
+X-Mailer: git-send-email 2.25.0.windows.1
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7BIT
+Content-Type:   text/plain; charset=US-ASCII
+X-Originating-IP: [10.174.148.223]
+X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
+ dggpeml500016.china.huawei.com (7.185.36.70)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Set the min_level for the TDP iterator at the root level when zapping all
-SPTEs so that the _iterator_ only processes top-level SPTEs.  Zapping a
-non-leaf SPTE will recursively zap all its children, thus there is no
-need for the iterator to attempt to step down.  This avoids rereading all
-the top-level SPTEs after they are zapped by causing try_step_down() to
-short-circuit.
+There's a potential deadlock case when remove the vsock device or
+process the RESET event:
 
-Cc: Ben Gardon <bgardon@google.com>
-Signed-off-by: Sean Christopherson <seanjc@google.com>
+  vsock_for_each_connected_socket:
+      spin_lock_bh(&vsock_table_lock) ----------- (1)
+      ...
+          virtio_vsock_reset_sock:
+              lock_sock(sk) --------------------- (2)
+      ...
+      spin_unlock_bh(&vsock_table_lock)
+
+lock_sock() may do initiative schedule when the 'sk' is owned by
+other thread at the same time, we would receivce a warning message
+that "scheduling while atomic".
+
+Even worse, if the next task (selected by the scheduler) try to
+release a 'sk', it need to request vsock_table_lock and the deadlock
+occur, cause the system into softlockup state.
+  Call trace:
+   queued_spin_lock_slowpath
+   vsock_remove_bound
+   vsock_remove_sock
+   virtio_transport_release
+   __vsock_release
+   vsock_release
+   __sock_release
+   sock_close
+   __fput
+   ____fput
+
+So we should not require sk_lock in this case, just like the behavior
+in vhost_vsock or vmci.
+
+Cc: Stefan Hajnoczi <stefanha@redhat.com>
+Cc: Stefano Garzarella <sgarzare@redhat.com>
+Cc: "David S. Miller" <davem@davemloft.net>
+Cc: Jakub Kicinski <kuba@kernel.org>
+Signed-off-by: Longpeng(Mike) <longpeng2@huawei.com>
 ---
- arch/x86/kvm/mmu/tdp_mmu.c | 13 ++++++++++++-
- 1 file changed, 12 insertions(+), 1 deletion(-)
+ net/vmw_vsock/virtio_transport.c | 7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
 
-diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
-index 6566f70a31c1..aec069c18d82 100644
---- a/arch/x86/kvm/mmu/tdp_mmu.c
-+++ b/arch/x86/kvm/mmu/tdp_mmu.c
-@@ -751,6 +751,16 @@ static bool zap_gfn_range(struct kvm *kvm, struct kvm_mmu_page *root,
+diff --git a/net/vmw_vsock/virtio_transport.c b/net/vmw_vsock/virtio_transport.c
+index e0c2c99..4f7c99d 100644
+--- a/net/vmw_vsock/virtio_transport.c
++++ b/net/vmw_vsock/virtio_transport.c
+@@ -357,11 +357,14 @@ static void virtio_vsock_event_fill(struct virtio_vsock *vsock)
+ 
+ static void virtio_vsock_reset_sock(struct sock *sk)
  {
- 	bool zap_all = (end == ZAP_ALL_END);
- 	struct tdp_iter iter;
-+	int min_level;
-+
-+	/*
-+	 * No need to step down in the iterator when zapping all SPTEs, zapping
-+	 * the top-level non-leaf SPTEs will recurse on all their children.
+-	lock_sock(sk);
++	/* vmci_transport.c doesn't take sk_lock here either.  At least we're
++	 * under vsock_table_lock so the sock cannot disappear while we're
++	 * executing.
 +	 */
-+	if (zap_all)
-+		min_level = root->role.level;
-+	else
-+		min_level = PG_LEVEL_4K;
++
+ 	sk->sk_state = TCP_CLOSE;
+ 	sk->sk_err = ECONNRESET;
+ 	sk_error_report(sk);
+-	release_sock(sk);
+ }
  
- 	/*
- 	 * Bound the walk at host.MAXPHYADDR, guest accesses beyond that will
-@@ -763,7 +773,8 @@ static bool zap_gfn_range(struct kvm *kvm, struct kvm_mmu_page *root,
- 
- 	rcu_read_lock();
- 
--	tdp_root_for_each_pte(iter, root, start, end) {
-+	for_each_tdp_pte_min_level(iter, root->spt, root->role.level,
-+				   min_level, start, end) {
- retry:
- 		if (can_yield &&
- 		    tdp_mmu_iter_cond_resched(kvm, &iter, flush, shared)) {
+ static void virtio_vsock_update_guest_cid(struct virtio_vsock *vsock)
 -- 
-2.33.0.rc1.237.g0d66db33f3-goog
+1.8.3.1
 
