@@ -2,123 +2,157 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3886C3EA674
-	for <lists+kvm@lfdr.de>; Thu, 12 Aug 2021 16:21:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5CDE53EA702
+	for <lists+kvm@lfdr.de>; Thu, 12 Aug 2021 17:00:13 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237971AbhHLOWJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 12 Aug 2021 10:22:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46568 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237968AbhHLOWI (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 12 Aug 2021 10:22:08 -0400
-Received: from mail-pl1-x629.google.com (mail-pl1-x629.google.com [IPv6:2607:f8b0:4864:20::629])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3CEDAC061756;
-        Thu, 12 Aug 2021 07:21:43 -0700 (PDT)
-Received: by mail-pl1-x629.google.com with SMTP id d1so7502241pll.1;
-        Thu, 12 Aug 2021 07:21:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=sfjh2TOrUQjWKK1WuaUcVyTMXiq8ArXgrYRkmZfmijU=;
-        b=FhCvezG0085J3wxcSiEtYzUXKlFc5dQ0hhlsg9IzzwYxm6PyVzWBfvD0MyZ+KWh7HB
-         Kyqoyddjar3UeuL+cpRXbIApFYRqd0gaFZaDgAudKc3UY625P7GXW2iTi/pmFaTXH7o5
-         iTMwNhRZLZgkqylizFg740UQxaP5flSrJW007zDgERXEREMxeG8J2lH/fTEsVxwnmzu0
-         jm38Ke/bNRBb8JoAoSH/TGR/VLXVN+CqMzuGJj9U9Fn+u1Ht52961SVp0bYp4byNwdlv
-         0yD1vQwlvnA/vr1ZS95F3RSMgXIE0D7yDAtw763uTbsacHpl0P7QR7bXcdoTN4vmqIra
-         E5Sg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=sfjh2TOrUQjWKK1WuaUcVyTMXiq8ArXgrYRkmZfmijU=;
-        b=tX17akt4arQJ5PdLPiMoSECUXGhgqmI75UBSP8DqZDBYym50ERRCUvoygm8DqL1W7L
-         WqK2BLxR6FYm7D93oeB7UGgWXxw1DjyjOZAMsEUVLIhKo3OoRb+3D17ekFbympi0P+QI
-         ZFmar37sWSVLHBXSFJpyV+eJ5hqpLd5iBNFUStr6JdTa0hw555DLeepoCW2gsurZbJrg
-         1GN1AWzWXPX6lVyI4y/19comw2XzQJ9/07VDyFhB30e9LAt5EKouAOXHYoECEd4cOsRK
-         usAZuu1OXqXSPY6Ff/RkO1gUI4jiCYYxWThsOhNvRHWk5LRJEuOr7jqB6+3iqhvQu8Wv
-         IMwg==
-X-Gm-Message-State: AOAM531kCBDFEn/q1X/gNGah2AhvsNkmvJMN4A++YTlziY3JxpHYWMDN
-        lFfLwK9M8XbGviJho5MgfuNwa/FWhY8=
-X-Google-Smtp-Source: ABdhPJySJPZUuNQ6WNcFx1/Dn2zORy43XMmZhsxk3EmGeYBs8yTi58i/+NjWG7JrUlAauljrBHgJcA==
-X-Received: by 2002:a17:90a:d711:: with SMTP id y17mr4560278pju.74.1628778102743;
-        Thu, 12 Aug 2021 07:21:42 -0700 (PDT)
-Received: from localhost ([47.251.4.198])
-        by smtp.gmail.com with ESMTPSA id g3sm3582841pfi.197.2021.08.12.07.21.41
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 12 Aug 2021 07:21:42 -0700 (PDT)
-From:   Lai Jiangshan <jiangshanlai@gmail.com>
-To:     linux-kernel@vger.kernel.org
-Cc:     Lai Jiangshan <laijs@linux.alibaba.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
-        kvm@vger.kernel.org
-Subject: [PATCH 2/2] KVM: X86: Remove the present check from for_each_shadow_entry* loop body
-Date:   Thu, 12 Aug 2021 12:36:30 +0800
-Message-Id: <20210812043630.2686-2-jiangshanlai@gmail.com>
-X-Mailer: git-send-email 2.19.1.6.gb485710b
-In-Reply-To: <20210812043630.2686-1-jiangshanlai@gmail.com>
-References: <20210812043630.2686-1-jiangshanlai@gmail.com>
+        id S237455AbhHLPAd (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 12 Aug 2021 11:00:33 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:34506 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S237129AbhHLPAc (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 12 Aug 2021 11:00:32 -0400
+Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 17CEX2c1131538
+        for <kvm@vger.kernel.org>; Thu, 12 Aug 2021 11:00:07 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=F+DnVrixQHtphiIbwcP+pveyz6BrSx7Vwt80YqkNA2I=;
+ b=EmCTQJEbY/Qg1cnM3GRPOMi+05MmYsh/9c7PUDEKMob/sfa/9M5OCh7I4bM+WjQFixqR
+ R7mSGVqNrI+LB2IsAhOwe65Hj3g/WnOemmg8+7hg3HgDVYwR0/QY4lI9js5yxWWA8sLy
+ eBeyPPP8Mfh98ec/k+dFGzTc+ZOAN04PcqD6/TdzBsKs7M8fY5P8avSjMz3EY7jUZlyG
+ 60p56nKfAUu/rRupk6eZczEJTAyX7SwK9dlTrtCDGZg5uIucH8kg5tnQS57TpE0qGDdz
+ elFBscZ/saYjMyn3NfO2eavQYS3FvfcJDh47ex34sMD00bksGjXWD81PlLj2TZLn9gVN ug== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3acy935exw-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Thu, 12 Aug 2021 11:00:06 -0400
+Received: from m0098410.ppops.net (m0098410.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 17CEXLC8133429
+        for <kvm@vger.kernel.org>; Thu, 12 Aug 2021 11:00:05 -0400
+Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3acy935eve-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 12 Aug 2021 11:00:05 -0400
+Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
+        by ppma04ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 17CEwF1d024956;
+        Thu, 12 Aug 2021 15:00:03 GMT
+Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
+        by ppma04ams.nl.ibm.com with ESMTP id 3acn76a4qt-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 12 Aug 2021 15:00:03 +0000
+Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
+        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 17CExxOx55705996
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 12 Aug 2021 14:59:59 GMT
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id C48FE4C063;
+        Thu, 12 Aug 2021 14:59:59 +0000 (GMT)
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 78AEB4C04A;
+        Thu, 12 Aug 2021 14:59:59 +0000 (GMT)
+Received: from oc3016276355.ibm.com (unknown [9.145.85.233])
+        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Thu, 12 Aug 2021 14:59:59 +0000 (GMT)
+Subject: Re: [kvm-unit-tests PATCH 1/1] s390x: css: check the CSS is working
+ with any ISC
+To:     Cornelia Huck <cohuck@redhat.com>, kvm@vger.kernel.org
+Cc:     frankja@linux.ibm.com, david@redhat.com, thuth@redhat.com,
+        imbrenda@linux.ibm.com
+References: <1628769189-10699-1-git-send-email-pmorel@linux.ibm.com>
+ <1628769189-10699-2-git-send-email-pmorel@linux.ibm.com>
+ <87fsvevo7p.fsf@redhat.com>
+From:   Pierre Morel <pmorel@linux.ibm.com>
+Message-ID: <276c5be3-2e57-d29c-a179-3b59e8b69fe1@linux.ibm.com>
+Date:   Thu, 12 Aug 2021 16:59:59 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.12.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <87fsvevo7p.fsf@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: aydZv4deCZrnUEz2Ral2wIFrDsy6xprm
+X-Proofpoint-ORIG-GUID: y7gvg6rFXqKgZu-EGAW_92dXW1QutONt
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.790
+ definitions=2021-08-12_05:2021-08-12,2021-08-12 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 impostorscore=0
+ lowpriorityscore=0 priorityscore=1501 suspectscore=0 spamscore=0
+ mlxscore=0 mlxlogscore=999 bulkscore=0 phishscore=0 malwarescore=0
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2107140000 definitions=main-2108120094
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Lai Jiangshan <laijs@linux.alibaba.com>
 
-The function __shadow_walk_next() for the for_each_shadow_entry* looping
-has the check and propagates the result to shadow_walk_okay().
 
-Signed-off-by: Lai Jiangshan <laijs@linux.alibaba.com>
----
- arch/x86/kvm/mmu/mmu.c | 11 +----------
- 1 file changed, 1 insertion(+), 10 deletions(-)
+On 8/12/21 2:31 PM, Cornelia Huck wrote:
+> On Thu, Aug 12 2021, Pierre Morel <pmorel@linux.ibm.com> wrote:
+> 
+>> In the previous version we did only check that one ISC dedicated by
+>> Linux for I/O is working fine.
+>>
+>> However, there is no reason to prefer one ISC to another ISC, we are
+>> free to take anyone.
+>>
+>> Let's check all possible ISC to verify that QEMU/KVM is really ISC
+>> independent.
+> 
+> It's probably a good idea to test for a non-standard isc. Not sure
+> whether we need all of them, but it doesn't hurt.
+> 
+> Do you also have plans for a test to verify the priority handling for
+> the different iscs?
 
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index c48ecb25d5f8..42eebba6782e 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -3152,9 +3152,6 @@ static u64 *fast_pf_get_last_sptep(struct kvm_vcpu *vcpu, gpa_t gpa, u64 *spte)
- 	for_each_shadow_entry_lockless(vcpu, gpa, iterator, old_spte) {
- 		sptep = iterator.sptep;
- 		*spte = old_spte;
--
--		if (!is_shadow_present_pte(old_spte))
--			break;
- 	}
- 
- 	return sptep;
-@@ -3694,9 +3691,6 @@ static int get_walk(struct kvm_vcpu *vcpu, u64 addr, u64 *sptes, int *root_level
- 		spte = mmu_spte_get_lockless(iterator.sptep);
- 
- 		sptes[leaf] = spte;
--
--		if (!is_shadow_present_pte(spte))
--			break;
- 	}
- 
- 	return leaf;
-@@ -3811,11 +3805,8 @@ static void shadow_page_table_clear_flood(struct kvm_vcpu *vcpu, gva_t addr)
- 	u64 spte;
- 
- 	walk_shadow_page_lockless_begin(vcpu);
--	for_each_shadow_entry_lockless(vcpu, addr, iterator, spte) {
-+	for_each_shadow_entry_lockless(vcpu, addr, iterator, spte)
- 		clear_sp_write_flooding_count(iterator.sptep);
--		if (!is_shadow_present_pte(spte))
--			break;
--	}
- 	walk_shadow_page_lockless_end(vcpu);
- }
- 
+No, I did not think about this yet.
+
+
+> 
+>>
+>> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
+>> ---
+>>   s390x/css.c | 25 +++++++++++++++++--------
+>>   1 file changed, 17 insertions(+), 8 deletions(-)
+>>
+> 
+> (...)
+> 
+>> @@ -142,7 +143,6 @@ static void sense_id(void)
+>>   
+>>   static void css_init(void)
+>>   {
+>> -	assert(register_io_int_func(css_irq_io) == 0);
+>>   	lowcore_ptr->io_int_param = 0;
+>>   
+>>   	report(get_chsc_scsc(), "Store Channel Characteristics");
+>> @@ -351,11 +351,20 @@ int main(int argc, char *argv[])
+>>   	int i;
+>>   
+>>   	report_prefix_push("Channel Subsystem");
+>> -	enable_io_isc(0x80 >> IO_SCH_ISC);
+>> -	for (i = 0; tests[i].name; i++) {
+>> -		report_prefix_push(tests[i].name);
+>> -		tests[i].func();
+>> -		report_prefix_pop();
+>> +
+>> +	for (io_isc = 0; io_isc < 8; io_isc++) {
+>> +		report_info("ISC: %d\n", io_isc);
+>> +
+>> +		enable_io_isc(0x80 >> io_isc);
+>> +		assert(register_io_int_func(css_irq_io) == 0);
+> 
+> Why are you registering/deregistering the irq handler multiple times? It
+> should be the same, regardless of the isc?
+
+Yes, right, did not pay attention when pushing all in the loop,
+I will get it out of the loop.
+
+Thanks,
+Pierre
+
+
 -- 
-2.19.1.6.gb485710b
-
+Pierre Morel
+IBM Lab Boeblingen
