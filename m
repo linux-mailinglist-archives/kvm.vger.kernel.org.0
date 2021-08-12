@@ -2,223 +2,177 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8D8F03EAD58
-	for <lists+kvm@lfdr.de>; Fri, 13 Aug 2021 00:47:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 99A943EAD90
+	for <lists+kvm@lfdr.de>; Fri, 13 Aug 2021 01:21:54 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235927AbhHLWri (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 12 Aug 2021 18:47:38 -0400
-Received: from mail-co1nam11on2041.outbound.protection.outlook.com ([40.107.220.41]:9504
-        "EHLO NAM11-CO1-obe.outbound.protection.outlook.com"
+        id S237838AbhHLXWS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 12 Aug 2021 19:22:18 -0400
+Received: from mail-bn7nam10on2045.outbound.protection.outlook.com ([40.107.92.45]:24227
+        "EHLO NAM10-BN7-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S238399AbhHLWrh (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 12 Aug 2021 18:47:37 -0400
+        id S230244AbhHLXWS (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 12 Aug 2021 19:22:18 -0400
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=ESSSZXzegywExf1wb3WGX5eOh4B3rb+yi7BW5m3Au5fEbIYJfeUBiXx475nCqfkqWWrRpxZVx4jlQm6F676jOhI/+TVpCWx/K+p3vkh1t0LD5prR/gCCinxmie3s7UhCUazBX5WE5nftBBTs78IT4rJc/g09C948gRA8XIJD13qOJtLl0bDbzUczClHRBjOz76KcdCgFX2yPZpnauSM+hwpNNVL1syo1oNYqf4rcLyCkfmrfM8jYCqySJDc40L9eaKo5/2vH/4rHPojE8AiCu5Etlv1wxW3ex5apRdPR3vIaoTlBs0LQrVhYdTP4mEJALG/y63oXUvgzyvCDZ7tYoQ==
+ b=XnFqb+fWo5mQGu6RotpN70fv0BXfDejNEzpNRkm3Q/AMfO5KLFr86mFkfiiPZ65C6ci5UAUNSIEEv5bhkrMzhuX+iHFSrO/WS9rdznKDdR1c4gtBvf9zej5HuitoYULS9HjGFRPmkqDFYDNqDf48/cjmLdwgj8K/hsSKs+VqNHkY3H35x9fspCVwqzLzCKk/sv+xoNb8z26gGe0W9wuMRStSmr55AALMxcdfaLTRlGH4r7zv01CYivQam2pYPPm2mYlC4avemlN9AewVT4Gjn1RK2P71ZtMeAFeRJ0uzL4lv00Re8lElA7N23j2Q+D76+BQav6mdKS4+LFuLEw9yOg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=02R5cXxsEh1F3qCsJALrTO0tr6W4fOR9Ikyoy6NV9zU=;
- b=UNtpz+92DujR+U25rGvhgY/quHJVkfCpDKz2NG+4Ij1w+PIbO+pGkKaRbPnbLv5FyKCfPkXqMVrdUwRqb58oZswEeI3m+9LxWJetJHVX3CiGoMznw9chZ8p6WtEJalwj9bvWOAZ2cOiD03WGODyvNiDJPpgaK3IPpi+4ZGXj6KGXVfqVGL1UX1WuunMtSQ53IWjzYwIx+4Ad0nwi6tZ/+Nk9PAdB1uhgWCqjXWCC5/bcWLIIP6IlNBy7+Ij4U3v+A5UZv6vqDi1rguUei0dZQa9TmLmM6Q/tAeMGYZEXIP8akddV0WRMh7sxf6pE+TX0Z/q1FSoQz6vZB2QKwAh2jA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ bh=kqrcG7RSY86czLZXeAO0ll0sRwM1au68ZVtHl8K5iOk=;
+ b=f9cVpKMKNgCt+2x7WfKw0bXZOCgJUe96GdEgdpdqWrP6wU7xUR3+lAmitfZ7L5dC3OfOzOIYugRj/mNSmEwSugs+xBdvuPV7w2m79+pA4wNq8A1W2Us4x8p67SJJswPQtTH9xEZgmc4RrDJNtj6GzVQv99/G9qJJg9gyBSkzBprXbE3AXF7JbnA36gulyfvkI94VRKB1RSOtTW51NW8u8QJIP7FDdwzTgGNcvUel6Tg0oRY2L7isICKOtVZKK+3vZnRX3CzmGRMsBuKvbpQwArmZjS2yAIzN1Fr8q/I9zO6BC0buWGpYPfIKxjngxrZ8OQmKn1GsTcvIBHLTJjAwaA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.112.34) smtp.rcpttodomain=redhat.com smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=quarantine sp=none pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=02R5cXxsEh1F3qCsJALrTO0tr6W4fOR9Ikyoy6NV9zU=;
- b=RiCDfYxfti310kgzOQ9xUj/ADt/VqW/iyg6Ynw8RvsdqkYFMOrcXCB69JFEukloMZHYTQZCq4FcwJ6oN6XRVgCxK57d8eSWTEjQw1OX+rgHsdJKrhIfLFE4+30uRcKgfqWBhdm+8ANlZfDzs+QBLpl4BJmYCUYfqqOo1OVQO1RU=
-Authentication-Results: redhat.com; dkim=none (message not signed)
- header.d=none;redhat.com; dmarc=none action=none header.from=amd.com;
-Received: from MW3PR12MB4553.namprd12.prod.outlook.com (2603:10b6:303:2c::19)
- by MW3PR12MB4555.namprd12.prod.outlook.com (2603:10b6:303:59::20) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4415.16; Thu, 12 Aug
- 2021 22:47:10 +0000
-Received: from MW3PR12MB4553.namprd12.prod.outlook.com
- ([fe80::3987:37e5:4db7:944e]) by MW3PR12MB4553.namprd12.prod.outlook.com
- ([fe80::3987:37e5:4db7:944e%6]) with mapi id 15.20.4394.026; Thu, 12 Aug 2021
- 22:47:10 +0000
-Subject: [kvm-unit-tests PATCH v2 2/2] nSVM: Fix NPT reserved bits test hang
-From:   Babu Moger <babu.moger@amd.com>
-To:     pbonzini@redhat.com
-Cc:     seanjc@google.com, thuth@redhat.com, drjones@redhat.com,
-        kvm@vger.kernel.org, babu.moger@amd.com
-Date:   Thu, 12 Aug 2021 17:47:08 -0500
-Message-ID: <162880842856.21995.11223675477768032640.stgit@bmoger-ubuntu>
-In-Reply-To: <162880829114.21995.10386671727462287172.stgit@bmoger-ubuntu>
-References: <162880829114.21995.10386671727462287172.stgit@bmoger-ubuntu>
-User-Agent: StGit/0.17.1-dirty
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: SN1PR12CA0096.namprd12.prod.outlook.com
- (2603:10b6:802:21::31) To MW3PR12MB4553.namprd12.prod.outlook.com
- (2603:10b6:303:2c::19)
+ bh=kqrcG7RSY86czLZXeAO0ll0sRwM1au68ZVtHl8K5iOk=;
+ b=Hs6YD/deZ/3of1zBNKM9XIF+NdEHJfFqaQar2MDcyPm2pY5Ms3utJUNUbA8AvWX99zDKuJxkJUdW6hr9W+e0z6Qq1iI7EAFo1K+SFcIniKLcc5sJC9despfA5XUWrK8bDlBeUXCiLjj9drdsefP9Ryxb32pNUsrUyKuS2vQzUt61TdjB+P7qyY+uDgE038Br9wwKh8mzquA5DdG+7PMzs5cljOkJ70ctBbstBOrKu0pzuC+Mg+rm+muCxquBQgg767ERXhTw0mkc2caLo+TrHRWBuC7RzV0lvvT5XlEkQavlEGQW45GxNPQSCA667iahLAt4ZwlXtBaopsmMfYnotw==
+Received: from DM6PR01CA0001.prod.exchangelabs.com (2603:10b6:5:296::6) by
+ CH0PR12MB5371.namprd12.prod.outlook.com (2603:10b6:610:d6::13) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.4415.15; Thu, 12 Aug 2021 23:21:50 +0000
+Received: from DM6NAM11FT014.eop-nam11.prod.protection.outlook.com
+ (2603:10b6:5:296:cafe::3f) by DM6PR01CA0001.outlook.office365.com
+ (2603:10b6:5:296::6) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4415.16 via Frontend
+ Transport; Thu, 12 Aug 2021 23:21:50 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.112.34)
+ smtp.mailfrom=nvidia.com; redhat.com; dkim=none (message not signed)
+ header.d=none;redhat.com; dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.112.34 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.112.34; helo=mail.nvidia.com;
+Received: from mail.nvidia.com (216.228.112.34) by
+ DM6NAM11FT014.mail.protection.outlook.com (10.13.173.132) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
+ 15.20.4415.16 via Frontend Transport; Thu, 12 Aug 2021 23:21:49 +0000
+Received: from [172.27.1.20] (172.20.187.6) by HQMAIL107.nvidia.com
+ (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1497.2; Thu, 12 Aug
+ 2021 23:21:44 +0000
+Subject: Re: [PATCH 09/12] PCI: Add a PCI_ID_F_VFIO_DRIVER_OVERRIDE flag to
+ struct pci_device_id
+To:     Bjorn Helgaas <helgaas@kernel.org>,
+        Jason Gunthorpe <jgg@nvidia.com>
+CC:     Yishai Hadas <yishaih@nvidia.com>, <bhelgaas@google.com>,
+        <corbet@lwn.net>, <alex.williamson@redhat.com>,
+        <diana.craciun@oss.nxp.com>, <kwankhede@nvidia.com>,
+        <eric.auger@redhat.com>, <masahiroy@kernel.org>,
+        <michal.lkml@markovi.net>, <linux-pci@vger.kernel.org>,
+        <linux-doc@vger.kernel.org>, <kvm@vger.kernel.org>,
+        <linux-s390@vger.kernel.org>, <linux-kbuild@vger.kernel.org>,
+        <maorg@nvidia.com>, <leonro@nvidia.com>
+References: <20210812202632.GA2504075@bjorn-Precision-5520>
+From:   Max Gurtovoy <mgurtovoy@nvidia.com>
+Message-ID: <580beaa0-d15d-4e42-5a7b-073885416df9@nvidia.com>
+Date:   Fri, 13 Aug 2021 02:21:41 +0300
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.12.0
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from [127.0.1.1] (165.204.77.1) by SN1PR12CA0096.namprd12.prod.outlook.com (2603:10b6:802:21::31) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4415.14 via Frontend Transport; Thu, 12 Aug 2021 22:47:09 +0000
+In-Reply-To: <20210812202632.GA2504075@bjorn-Precision-5520>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+X-Originating-IP: [172.20.187.6]
+X-ClientProxiedBy: HQMAIL111.nvidia.com (172.20.187.18) To
+ HQMAIL107.nvidia.com (172.20.187.13)
+X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 94e18909-6afd-4e5f-8e37-08d95de31ea7
-X-MS-TrafficTypeDiagnostic: MW3PR12MB4555:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <MW3PR12MB4555DB3B984D7CCD76A8199595F99@MW3PR12MB4555.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:8882;
+X-MS-Office365-Filtering-Correlation-Id: 031bc1ce-8f3c-4ec4-514a-08d95de7f649
+X-MS-TrafficTypeDiagnostic: CH0PR12MB5371:
+X-Microsoft-Antispam-PRVS: <CH0PR12MB5371F6170BEA3E7F7154C388DEF99@CH0PR12MB5371.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:9508;
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 4me2tAh7D5+TdO65b/sMgXDmDO7xEoWp0VCkgznoC5JtQxxBIC4gNCiP2Wo+81isi2sGXOzOT+H+brGxC5kLEclr+frqOlU+h7RO5XzmEUmBza2HDh3rBjYSDY5cBwa/iROoI0N4dQHM5Ngwu2ipApdtW9Us0EL3NjPkuac7FmUe701riX2BUzWSIaG0bu955aEVJbUv0AG4JFBDF0/8vLmrImabu70++4jrI0mPvi8xU6SYfdMJiirgnCDyK+6675sSZW/U9TApNy+kTI0/cjPYVdq9aWcUpbAy85ecFnLs8rqZvcR8R9+UbSSIJLUTRaYlB+9lvR2fhNQn9hniTHniyHXjNzh/+cy9WckwjtY1IDRnO2KgtxP7KmIilRhBiDknNUpn/qssGSPJCDSs8MaGBkVP0hFhW+Km/XKLvH5mziiRLH157YERd6DlnOpSIoSO3tkRhB8L53sgIKSJkv3G0whyOivinD83cIAx+7LzRSzQvHLWATAJ62jLYYE3qxxuute9EMX1GurGEB6PACpZ+zRzU70T9j//6+kQHCwiEjueiM34J6qbVD3D/tZxSBSP6RbvZKOYUgrOoj9D5JlHSKQyYrWoEvsyia8XNLOnvMW9OIGYfUn/BYhqssaTfT2pLBaIj+tmbsW0J8viqXSaXdX4dbxaeJDVL7W4vcVg1iNOoHGqZEb9mshuHdXCC49BANO3Z9AChzWrcKph5w==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MW3PR12MB4553.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(7916004)(376002)(396003)(136003)(39860400002)(346002)(366004)(83380400001)(9686003)(8936002)(86362001)(103116003)(66476007)(6486002)(66556008)(38100700002)(956004)(38350700002)(33716001)(16576012)(66946007)(316002)(8676002)(26005)(6916009)(2906002)(5660300002)(478600001)(4326008)(52116002)(44832011)(186003);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?N2hDY2tnbDNKc0JSZ3JhN3NxdHpQTEF2ZkQrREdacmpmbHlKUndHa3B3SC9z?=
- =?utf-8?B?dFdoVEtXKzAyaVhIbG1YemJJdVNuOFFmbTJ1RjNWSHJucDJXMmVKVDl3RklB?=
- =?utf-8?B?dzRUS1M4S0pyVjFmU1dRZXpsa2ZqY25nUmVaSnNJSlJNUXRwZjZBZXFhdXdW?=
- =?utf-8?B?L250TGpCVzFZMHhZT29yWjBFemFjUDRKaG9SeEdoVmo3QWp1WS9xdXpyaWpS?=
- =?utf-8?B?U2Q3OTd6V0c4MFpyV0tuMnp6UXBBeWtDOHN1UndpZ1p0OGFSRGNxeUVpZVFW?=
- =?utf-8?B?N3FRTWV6SFZRSWhjWkdzSERHU2FCT2pLOGJ5b2ZkV2tXQkpidGl1NmFROGFL?=
- =?utf-8?B?emM5WmdmbnNnZWczeDBSTFE5TFZiUzVyV0RNcWxlQU8yK2FtY25SWFc3N0Nt?=
- =?utf-8?B?eXFBdEVkYkNNRmxUQzdBWEsvREI0MmNFcjkxdWg3bzJ5SGVReFNhN2dLZjg4?=
- =?utf-8?B?T3pnYktLSWtWdDZyTTBxOFpMVWJBNkowblNCbUJxditVUHd2Q1dKYURRREs5?=
- =?utf-8?B?eVJXR1h2WnhkdmM1RDY3VTV0cktWSDJrUFhIZGkzZnlscnZmckk1SklvYkxM?=
- =?utf-8?B?Qi9lYjh4aWRnZUxlMmpnYms3ZUpSMXozOFkvS0xmdHVoVE94ZkJzUmZEbHhL?=
- =?utf-8?B?WjRHY1pNWS91alNURGFCVllvSm9QejFweHZKS0xBcEkyQkREUnZNQy9VYmVJ?=
- =?utf-8?B?TkJOMkNmalRaL29KclIzcE0vaTRpZGkwL1hwVkYwcGJJTGxLSE5ydHd1MWVz?=
- =?utf-8?B?UWxjMis5ZmU2MlNmS2xNMXJMTTRWcGcyWkNJMzJxYklPcGxBRDlTMHNKakh1?=
- =?utf-8?B?ZFhJQXQ3T3FFZDQxN215MWtFQ01KWWg4OTN1dEFpRURPREY2UkxCVExtY3Nj?=
- =?utf-8?B?Vm1PMFpKVm5RUDdOdlNWSFN0TllqdXhjTEFQZ3ZDenkzT3NnN2R3N0xZajMv?=
- =?utf-8?B?WmwzWTZMQmVoNkNucmJIQ25FaUFvS3JyUUY5SE9wT09tbUl2UnVUTU1GTko1?=
- =?utf-8?B?emZDWXdYd0tpY2xqQlU4L2lsSXh5WlgvOERpNlNuOGlPMWQ4VWVCQ1lTamgx?=
- =?utf-8?B?NXFzUTJBS3BiY2dSWDc3dUFVN01xRWVYWm9tZGIvdUdQWGx1eVhOTDhDL3dM?=
- =?utf-8?B?V0ZhWDNmMWMzTHgxdzFIbTdFZFN4NlNjRTl2L0VwaE5NUGp1UlgrK1FmZk1M?=
- =?utf-8?B?VjlTUzF1U1JmTGpLZTVadkw0WkpWRVRKa1dnNTRqMUZjZmZqZ0NGcDZ3eUhy?=
- =?utf-8?B?bnEyUEpCdVpkVmxYR1B6Y2ljeFozZ0JrSGF5bjlwK0hyMzVJU3RHMGxFVzJS?=
- =?utf-8?B?NmI4OE16SHJoVzZISzQzNGcrY05RLzVGYnZaekZvcGFPcVRGYW9JSlVmcVNG?=
- =?utf-8?B?b2JoTDhVQkFJWlB0bEZ5d21wcUx1V3o2VGs5TzZ6OWh1cXgvMzlzVVRFUTlX?=
- =?utf-8?B?dGNzcWlPMkFJeVhMbi9nTXRQbW1NTjZ2Wjd4bU0rNXYyOHlQcTUyQ1RzRnQ0?=
- =?utf-8?B?RUt1TWxWV3QxV0VOVzRlZ2Z3ZzBBRStrQjV1ZUxWNlV1ajArLzFLeWk3R3F3?=
- =?utf-8?B?NUZ2UEVvTkppcUJwbkY1M3V1SlQ1MHhxODhMYW5ZMlpvYnNMdFN1UVBWeVhn?=
- =?utf-8?B?cDVDY1g4RlU5WXJGMXZyc2J5cUxPRHZyQmkzcjFrc1BOSGl2OUl0N2l0Y0du?=
- =?utf-8?B?bC9SUENpcTFLb2lqdzN0dVpLVW42WS90MlBWSjRnYW1jZGE2bXZ3SWJhYXBJ?=
- =?utf-8?Q?fOjZ5L9RVY24grb0/H3PMZNNEvUaHl4OY7BYkJX?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 94e18909-6afd-4e5f-8e37-08d95de31ea7
-X-MS-Exchange-CrossTenant-AuthSource: MW3PR12MB4553.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Aug 2021 22:47:10.3808
+X-Microsoft-Antispam-Message-Info: 64J9atHo/pnKtRyYJUKD/HiD7FCiQMo+o8nvt3bAUcJZBOw9lcNQ1W0TCnLGZ3O015/R5NAw0Gh5AZhrn6kZmt01Cg4Ew0nayfmR66ux4bi7RhQ3JHgd/79nm6P/48WlXM6P90Mpxp86MPmOl+JxApkI6Yv1Y9hKMzCx6HWowsttq8nAeOse7iSIiVxWoaZ8IHRkJgGo6IWwnmXnL9sw8yHNuJLT2NKLMVQ4vlro9Dl3lroy2ziD7EfIkmbOiKnDf/zvxdHSt9/Dxo2/5aU666O8SjXiXheaDM6P/Rb1/Nv05sYFDYu9gbWHg37tHXCpFhyEtz9F84yIn0RgsSv65ZvZyTdIs8kFyc2EuQW+LZEu4aVSi4tvTA/sJA1Ls9f41EdJe2hfxMmjV5Pk0mk9I2sYfU9vczZ70fRj147gYPY4XZU5KrRr9TnxCtrG+vB/dHG76lDJfl1MfK0QfrZtC1YN8G2w85tOx8YzDN5jm8mrkXBVK7tetZO7Q+i2i3gJs/qQnT/eJkp6qJF2rYDJNlG000GqZSkx2WQySRgbspDo7hw9YSkIsSNLCzcDhLnqRogPKNJ1IXVDYEL3QmJYvhgkOzy/rKmqFS1MLIrlVBPOuLl2P2R1YV9BSKxMfFEC4yITdZlhKi+6UYWKOt3xxQehuLz3cuQsNB8PGVAfYJyne0G6k+gksSERykRgwINbyCtdQnTkhcdUTnEnp15wg+GejATknNsyErSt+S3ZYdo=
+X-Forefront-Antispam-Report: CIP:216.228.112.34;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:schybrid03.nvidia.com;CAT:NONE;SFS:(4636009)(396003)(376002)(346002)(39860400002)(136003)(36840700001)(46966006)(47076005)(336012)(8936002)(31686004)(83380400001)(6666004)(2616005)(107886003)(7416002)(70586007)(356005)(6636002)(426003)(82310400003)(5660300002)(7636003)(53546011)(110136005)(54906003)(70206006)(2906002)(4326008)(36906005)(316002)(16576012)(86362001)(478600001)(8676002)(16526019)(186003)(26005)(82740400003)(31696002)(36756003)(36860700001)(43740500002);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Aug 2021 23:21:49.9404
  (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 8Qov1jMlYQA9ItOKVvs+vTNs/p+ij2wG1wi06B8DarFhhLDvVzCYLNFcbjSVZhyx
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW3PR12MB4555
+X-MS-Exchange-CrossTenant-Network-Message-Id: 031bc1ce-8f3c-4ec4-514a-08d95de7f649
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.112.34];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource: DM6NAM11FT014.eop-nam11.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH0PR12MB5371
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Babu Moger <Babu.Moger@amd.com>
 
-SVM reserved bits tests hangs in a infinite loop. The test uses the
-instruction 'rdtsc' to generate the random reserved bits. It hangs
-while generating the valid reserved bits.
+On 8/12/2021 11:26 PM, Bjorn Helgaas wrote:
+> On Thu, Aug 12, 2021 at 04:51:26PM -0300, Jason Gunthorpe wrote:
+>> On Thu, Aug 12, 2021 at 10:57:07AM -0500, Bjorn Helgaas wrote:
+>>> On Thu, Aug 12, 2021 at 10:27:28AM -0300, Jason Gunthorpe wrote:
+>>>> On Wed, Aug 11, 2021 at 02:07:37PM -0500, Bjorn Helgaas wrote:
+>>>>> On Thu, Aug 05, 2021 at 09:23:57PM -0300, Jason Gunthorpe wrote:
+>>>>> Do the other bus types have a flag analogous to
+>>>>> PCI_ID_F_VFIO_DRIVER_OVERRIDE?  If we're doing something similar to
+>>>>> other bus types, it'd be nice if the approach were similar.
+>>>> They could, this series doesn't attempt it. I expect the approach to
+>>>> be similar as driver_override was copied from PCI to other
+>>>> busses. When this is completed I hope to take a look at it.
+>>> I think this would make more sense as two patches:
+>>>
+>>>    - Add a "PCI_ID_DRIVER_OVERRIDE" flag.  This is not VFIO-specific,
+>>>      since nothing in PCI depends on the VFIO-ness of drivers that use
+>>>      the flag.  The only point here is that driver id_table entries
+>>>      with this flag only match when driver_override matches the driver.
+>> This would require using two flags, one to indicate the above to the
+>> PCI code and another to indicate the vfio_pci string to
+>> file2alias. This doesn't seem justified at this point, IMHO.
+> I don't think it requires two flags.  do_pci_entry() has:
+>
+>    if (flags & PCI_ID_F_VFIO_DRIVER_OVERRIDE)
+>      strcpy(alias, "vfio_pci:");
+>
+> I'm just proposing a rename:
+>
+> s/PCI_ID_F_VFIO_DRIVER_OVERRIDE/PCI_ID_DRIVER_OVERRIDE/
+>
+>>>    - Update file2alias.c to export the flags and the "vfio_pci:" alias.
+>>>      This seems to be the only place where VFIO comes into play, and
+>>>      putting it in a separate patch will make it much smaller and it
+>>>      will be clear how it could be extended for other buses.
+>> Well, I don't want to see a flag called PCI_ID_DRIVER_OVERRIDE mapped
+>> to the string "vfio_pci", that is just really confusing.
+> Hahaha, I see, that's fair :)  It confused me for a long time why you
+> wanted "VFIO" in the flag name because from the kernel's point of
+> view, the flag is not related to any VFIO-ness.  It's only related to
+> a special variety of driver_override, and VFIO happens to be one user
+> of it.
 
-The AMD64 Architecture Programmers Manual Volume 2: System
-Programming manual says, When using the TSC to measure elapsed time,
-programmers must be aware that for some implementations, the rate at
-which the TSC is incremented varies based on the processor power
-management state (Pstate). For other implementations, the TSC
-increment rate is fixed and is not subject to power-management
-related changes in processor frequency.
+In my original patch I used
 
-In AMD gen3 machine, the rdtsc value is a P state multiplier.
-Here are the rdtsc value in 10 sucessive reads.
-0 rdtsc = 0x1ec92919b9710
-1 rdtsc = 0x1ec92919c01f0
-2 rdtsc = 0x1ec92919c0f70
-3 rdtsc = 0x1ec92919c18d0
-4 rdtsc = 0x1ec92919c2060
-5 rdtsc = 0x1ec92919c28d0
-6 rdtsc = 0x1ec92919c30b0
-7 rdtsc = 0x1ec92919c5660
-8 rdtsc = 0x1ec92919c6150
-9 rdtsc = 0x1ec92919c7c80
+#define PCI_ID_DRIVER_OVERRIDE PCI_ID_F_VFIO_DRIVER_OVERRIDE
 
-This test uses the lower nibble and right shifts to generate the
-valid reserved bit. It loops forever because the lower nibble is always
-zero.
+and in the pci core code I used PCI_ID_DRIVER_OVERRIDE in the "if" clause.
 
-Fixing the issue with replacing rdrand instruction if available or
-skipping the test if we cannot generate the valid reserved bits.
+So we can maybe do that and leave the option to future update of the 
+define without changing the core code.
 
-Signed-off-by: Babu Moger <Babu.Moger@amd.com>
----
- lib/x86/processor.h |   11 +++++++++++
- x86/svm_tests.c     |   28 ++++++++++++++++++++++++----
- 2 files changed, 35 insertions(+), 4 deletions(-)
+In the future we can have something like:
 
-diff --git a/lib/x86/processor.h b/lib/x86/processor.h
-index a08ea1f..1e10cc3 100644
---- a/lib/x86/processor.h
-+++ b/lib/x86/processor.h
-@@ -531,6 +531,17 @@ static inline void sti(void)
-     asm volatile ("sti");
- }
- 
-+static inline unsigned long long rdrand(void)
-+{
-+	long long r;
-+
-+	asm volatile("rdrand %0\n\t"
-+		     "jc 1f\n\t"
-+		     "mov $0, %0\n\t"
-+		     "1:\n\t" : "=r" (r));
-+	return r;
-+}
-+
- static inline unsigned long long rdtsc(void)
- {
- 	long long r;
-diff --git a/x86/svm_tests.c b/x86/svm_tests.c
-index 79ed48e..b998b24 100644
---- a/x86/svm_tests.c
-+++ b/x86/svm_tests.c
-@@ -2671,6 +2671,14 @@ static void _svm_npt_rsvd_bits_test(u64 *pxe, u64 pxe_rsvd_bits,  u64 efer,
- 	u64 rsvd_bits;
- 	int i;
- 
-+	/*
-+	 * RDTSC or RDRAND can sometimes fail to generate a valid reserved bits
-+	 */
-+	if (!pxe_rsvd_bits) {
-+		report_skip("svm_npt_rsvd_bits_test: Reserved bits are not valid");
-+		return;
-+	}
-+
- 	/*
- 	 * Test all combinations of guest/host EFER.NX and CR4.SMEP.  If host
- 	 * EFER.NX=0, use NX as the reserved bit, otherwise use the passed in
-@@ -2704,11 +2712,23 @@ static void _svm_npt_rsvd_bits_test(u64 *pxe, u64 pxe_rsvd_bits,  u64 efer,
- 
- static u64 get_random_bits(u64 hi, u64 low)
- {
--	u64 rsvd_bits;
-+	unsigned retry = 5;
-+	u64 rsvd_bits = 0;
-+
-+	if (this_cpu_has(X86_FEATURE_RDRAND)) {
-+		do {
-+			rsvd_bits = (rdrand() << low) & GENMASK_ULL(hi, low);
-+			retry--;
-+		} while (!rsvd_bits && retry);
-+	}
- 
--	do {
--		rsvd_bits = (rdtsc() << low) & GENMASK_ULL(hi, low);
--	} while (!rsvd_bits);
-+	if (!rsvd_bits) {
-+		retry = 5;
-+		do {
-+			rsvd_bits = (rdtsc() << low) & GENMASK_ULL(hi, low);
-+			retry--;
-+		} while (!rsvd_bits && retry);
-+	}
- 
- 	return rsvd_bits;
- }
+#define PCI_ID_DRIVER_OVERRIDE (PCI_ID_F_VFIO_DRIVER_OVERRIDE | 
+PCI_ID_F_MY_BUS_DRIVER_OVERRIDE)
 
+The file2alias.c still have to use the exact 
+PCI_ID_F_VFIO_DRIVER_OVERRIDE flag to add "vfio_" prefix.
+
+Is that better ?
+
+>
+> I think a separate patch that maps the flag to "vfio_pci" would be
+> less confusing because without the distractions of the PCI core
+> changes, it will be obvious that "vfio_" is a file2alias thing that's
+> there for userspace convenience, not for kernel reasons.
+>
+> Do you envision any other prefixes in the future?  I hope we don't
+> have to clutter pci_match_device() with checking multiple flags.
+> Maybe the problem is that the modules.alias entry includes "vfio_" --
+> maybe we need a more generic prefix with just the idea of an
+> "alternate" driver.
+>
+> Bjorn
