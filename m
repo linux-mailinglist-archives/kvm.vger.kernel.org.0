@@ -2,119 +2,95 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id DAC123EBA34
-	for <lists+kvm@lfdr.de>; Fri, 13 Aug 2021 18:39:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7B6D23EBA76
+	for <lists+kvm@lfdr.de>; Fri, 13 Aug 2021 18:53:40 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235642AbhHMQj2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 13 Aug 2021 12:39:28 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:52893 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S234367AbhHMQj1 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 13 Aug 2021 12:39:27 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1628872740;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=/XxhUQFWXy6zXss0bwZob8zlLwav1FMwUCDBU4JYgrE=;
-        b=eJVoAAYWQMGcEMx79S+WnIm90tNWjIRUFiT3cCKKS1GRPaI8bLH41IfzV4f6YtfYT72DZb
-        RGoPOLMZSzyQOu5NeSZGCaSCL9xZD7au4wxZr8yXuF4NbmVUArVLIDKSAFnfZTy7gaq+uc
-        43R/IX9fky80fcLdpnIAUyCBXLuhVJ0=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-161-4AG3GBlKOn-1BGJe5baKdA-1; Fri, 13 Aug 2021 12:38:58 -0400
-X-MC-Unique: 4AG3GBlKOn-1BGJe5baKdA-1
-Received: by mail-wm1-f71.google.com with SMTP id y206-20020a1c7dd70000b02902e6a442ea44so4495707wmc.9
-        for <kvm@vger.kernel.org>; Fri, 13 Aug 2021 09:38:58 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=/XxhUQFWXy6zXss0bwZob8zlLwav1FMwUCDBU4JYgrE=;
-        b=VmHvPFFTZFzG8BuGABFM42eIbbh4jlcwDAeul+So0yTy2GZcHeoAFb8FwOudrifu6Y
-         J5o4iZsg9cWiLlPRAR/Us6iNYmE+X+vA5fCcPDP8GjOUb0i3Lj5uecWJWNOiO66Kjqha
-         dyiN8jqK2g7S/tPKGqtRQn5x0Eh03HeJWLFu5BmDCHOg7MN879FAuMxyYas9QY0R3q4Y
-         u08p83QKNMgKv9QlgXoJmWpxWfhCD/0SXuknQpBhSczH1kyRWUIvHKTAX8JXyWBEgCt4
-         cNODJx8Zt3szSlQO5mp3GAs01Rf0LzNk+4Nv/9Pv0WPbCpd3CofuED694NdYosv03q1c
-         zb8w==
-X-Gm-Message-State: AOAM533EpnHwiz8OQlwGZd4agfcpuCpZNc2tdSjL88xih6goHynNFxlJ
-        +Gvki9LBcnsLQcE5rPaaKyGJ3uCn2FfLPcqh5+pxPspASG/0qRKEzcM4P0mC75esBaO/bTEmkho
-        gd7IdXZ8yAB+m
-X-Received: by 2002:a1c:4c05:: with SMTP id z5mr3484699wmf.145.1628872737633;
-        Fri, 13 Aug 2021 09:38:57 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwC6stTt1zfIk+HUVQG+yNxjf+4NlHQz9JRcodQI5y8z7vijkPCLwAnX/jxPPBjWVFF3V6GVQ==
-X-Received: by 2002:a1c:4c05:: with SMTP id z5mr3484685wmf.145.1628872737424;
-        Fri, 13 Aug 2021 09:38:57 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id w9sm1840071wmc.19.2021.08.13.09.38.55
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 13 Aug 2021 09:38:56 -0700 (PDT)
-Subject: Re: [PATCH 2/2] KVM: x86/mmu: Don't step down in the TDP iterator
- when zapping all SPTEs
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Ben Gardon <bgardon@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm <kvm@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>
-References: <20210812050717.3176478-1-seanjc@google.com>
- <20210812050717.3176478-3-seanjc@google.com>
- <CANgfPd8HSYZbqmi21XQ=XeMCndXJ0+Ld0eZNKPWLa1fKtutiBA@mail.gmail.com>
- <YRVVWC31fuZiw9tT@google.com>
- <928be04d-e60e-924c-1f3a-cb5fef8b0042@redhat.com>
- <YRVbamoQhvPmrEgK@google.com>
- <7a95b2f6-a7ad-5101-baa5-6a19194695a3@redhat.com>
- <YRVebIjxEv87I55b@google.com>
- <b08a7751-20c3-26fc-522e-c4cf274d9a6c@redhat.com>
- <YRaaIi9Go38E3mUh@google.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <0086ef77-ce5f-3e89-0cbd-b17d4dccaacf@redhat.com>
-Date:   Fri, 13 Aug 2021 18:38:54 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.11.0
+        id S236205AbhHMQxo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 13 Aug 2021 12:53:44 -0400
+Received: from mail.kernel.org ([198.145.29.99]:58136 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S238052AbhHMQxg (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 13 Aug 2021 12:53:36 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id B96EE60F57;
+        Fri, 13 Aug 2021 16:53:08 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1628873589;
+        bh=dRZbOK5CYvAtvA7oK4N+gmqBFrUbdbrNmbtvCzj81q0=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:From;
+        b=hinIUm9cnOHoYfuj3yiVKb8JJC/XhLobRiwFSs+7F9Opql7IHSaB2Aa6d6dGcvHYl
+         1wyBaW0nCmq1sT8lDzfP54NzgsqpIftoSPqd8CpFOWnd9qhgWgRBqd8bLU1beaQBqd
+         /NsliUXLq6K0reVtYiyRupR93M3QtBoiUeYTbYecSZgDkEza5Zn/EpavNStYTEXlel
+         m3swI0HxNvWtT+8jvwyVGz5CDMEvq2wqEHa8wR+ZCEX2wRmIYfZoEi+pZ95PJkQsEM
+         VydqS+hb/kOFvFOXN8MQuyP7pJpeNSVycy09nqS6lb3WFP7qq5B912LPL8Kja6y5j+
+         TS/LQpup3TjJQ==
+Date:   Fri, 13 Aug 2021 11:53:07 -0500
+From:   Bjorn Helgaas <helgaas@kernel.org>
+To:     Idar Lund <idarlund@gmail.com>
+Cc:     bjorn@helgaas.com, Alex Williamson <alex.williamson@redhat.com>,
+        kvm@vger.kernel.org, linux-pci@vger.kernel.org
+Subject: Re: vfio-pci problem
+Message-ID: <20210813165307.GA2587844@bjorn-Precision-5520>
 MIME-Version: 1.0
-In-Reply-To: <YRaaIi9Go38E3mUh@google.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CA+enFJkL5AWjehFAHTMG5-+9zyR2eVxqFJ-9MoaJkavjwV+MfA@mail.gmail.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 13/08/21 18:13, Sean Christopherson wrote:
-> On Fri, Aug 13, 2021, Paolo Bonzini wrote:
->> On 12/08/21 19:46, Sean Christopherson wrote:
->>>>> 	if (iter->level == iter->min_level)
->>>>> 		return false;
->>>>>
->>>>> 	/*
->>>>> 	 * Reread the SPTE before stepping down to avoid traversing into page
->>>>> 	 * tables that are no longer linked from this entry.
->>>>> 	 */
->>>>> 	iter->old_spte = READ_ONCE(*rcu_dereference(iter->sptep));  \
->>>>>                                                                         ---> this is the code that is avoided
->>>>> 	child_pt = spte_to_child_pt(iter->old_spte, iter->level);   /
->>>>> 	if (!child_pt)
->>>>> 		return false;
->>>> Ah, right - so I agree with Ben that it's not too important.
->>> Ya.  There is a measurable performance improvement, but it's really only
->>> meaningful when there aren't many SPTEs to zap, otherwise the cost of zapping
->>> completely dominates the time.
->>
->> I don't understand.  When try_step_down is called by tdp_iter_next, all it
->> does is really just the READ_ONCE, because spte_to_child_pt will see a
->> non-present PTE and return immediately.  Why do two, presumably cache hot,
->> reads cause a measurable performance improvement?
+[+cc Alex, kvm, linux-pci]
+
+On Fri, Aug 13, 2021 at 09:43:39AM +0200, Idar Lund wrote:
+> Hi,
 > 
-> It's entirely possible my measurements were bad and/or noisy.  Ah, and my kernel
-> was running with CONFIG_PROVE_RCU=y, which makes the rcu_dereference() quite a bit
-> more expensive.
+> I've been struggling with an error in linux since 5.11. Please find my bug
+> report here:
+> https://bugzilla.redhat.com/show_bug.cgi?id=1945565
+> 
+> Then I stumbled upon this mail thread:
+> https://www.spinics.net/lists/linux-pci/msg102243.html which seems related.
+> 
+> Is there another way to do this in 5.11+ or is this an unintentionally bug
+> that got introduced in 5.11?
 
-It's one line of code and it makes sense, so I can certainly include the 
-patch.  I was just a bit confused.
+Hi Idar, sorry for the trouble and thanks for the report!  I cc'd some
+VFIO experts who know more than I do about this.
 
-Paolo
+If I understand correctly, you have a PCI XHCI controller:
 
+  pci 0000:06:00.0: [1b73:1100] type 00 class 0x0c0330
+  xhci_hcd 0000:06:00.0: xHCI Host Controller
+
+and you want to unbind the xhci_hcd driver and bind vfio-pci instead:
+
+  # echo '0000:06:00.0' > /sys/bus/pci/devices/0000\:06\:00.0/driver/unbind
+  # echo 0x1b73 0x1100 > /sys/bus/pci/drivers/vfio-pci/new_id
+
+In v5.10 (5.10.17-200.fc33.x86_64) this worked fine, but in v5.11
+(5.11.9-200.fc33.x86_64) the "new_id" write returns -EEXIST and
+binding to vfio-pci fails.
+
+The patch you pointed out appeared in v5.11 as 3853f9123c18 ("PCI:
+Avoid duplicate IDs in driver dynamic IDs list") [1], and I agree it
+looks suspicious.  There haven't been any significant changes to
+pci-driver.c since then.
+
+Have you added "0x1b73 0x1100" to vfio-pci/new_id previously?  I think
+in v5.10, that would silently work (possibly adding duplicate entries
+to the dynamic ID list) and every write to vfio-pci/new_id would make
+vfio-pci try to bind to the device.
+
+In v5.11, if you write a duplicate ID to vfio-pci/new_id, you would
+get -EEXIST and no attempt to bind.  As far as I know, the dynamic ID
+list is not visible in sysfs, so it might be hard to avoid writing a
+duplicate.
+
+But if the vfio-pci dynamic ID list already contains "0x1b73 0x1100",
+you should be able to ask vfio-pci to bind to the device like this:
+
+  # echo 0000:06:00.0 > /sys/bus/pci/drivers/virtio-pci/bind
+
+I don't know if that's a solution, but would be useful to know whether
+it's a workaround.
+
+[1] https://git.kernel.org/linus/3853f9123c18
