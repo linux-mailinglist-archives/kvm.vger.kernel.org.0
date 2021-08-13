@@ -2,186 +2,129 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1037C3EB1A9
-	for <lists+kvm@lfdr.de>; Fri, 13 Aug 2021 09:39:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 47AA53EB2E8
+	for <lists+kvm@lfdr.de>; Fri, 13 Aug 2021 10:50:55 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239549AbhHMHjL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 13 Aug 2021 03:39:11 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:30717 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S239505AbhHMHjL (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 13 Aug 2021 03:39:11 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1628840324;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=SvXxk+Bwl8PSRfSCw5jxJaxQNQ1yN0WrjeALiehgCJU=;
-        b=NHcPanYWAoS0PXE+Z/WC/t6sH5v4oLx1MveyM8NhZK/5Ym8aHLMUC7Cw1opaqoUdadsXnE
-        K7A6zRu+AicMvqxrF2AlDLq91UFZ7o+aLkpMWh7JhUyfdMtxn+W8VtY+rST4Gsw6Nc8KpQ
-        p/Iaiik0Z5mg2E6myK1Qc/8817BUVpw=
-Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
- [209.85.218.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-299-mqj-FTK3OAayiJ1Z5tX-RQ-1; Fri, 13 Aug 2021 03:38:43 -0400
-X-MC-Unique: mqj-FTK3OAayiJ1Z5tX-RQ-1
-Received: by mail-ej1-f70.google.com with SMTP id h13-20020a1709062dcdb02905aec576a827so2653319eji.23
-        for <kvm@vger.kernel.org>; Fri, 13 Aug 2021 00:38:43 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=SvXxk+Bwl8PSRfSCw5jxJaxQNQ1yN0WrjeALiehgCJU=;
-        b=QOiQQdCVIQpD0AJz9AMF5MEhQdiIGW/qtTvT2R6Xoxrd+V6TFNw6UK+b1ng+ZwjwgI
-         pIYy7AwHXxbyFmgtgn2uIVg+ehX3hetubReO+3iMK6/+JXI5aU3hMYHBh6e2e+bsvXCB
-         bNYFR12p5QeVALOzBgwkwcdEZyinwCaZ1p4BuZRYWvqlrNrA5cqp/AI8jHoIS0KUjZ05
-         mpiqxY4L0mSR5hX9EOPfipvlm7ttdtpPZRUIKYXU3eY67S6zSGMaf32wf4uprY+VhUsa
-         rB1IAnWkwtQncS8hdzWvG1hZoOB+0CNj5HGP4eh50ObqXEQisbog1nf0PEPIs6atCFOz
-         p++A==
-X-Gm-Message-State: AOAM532eX8hHc/p5PRdi13K0G/T5xKIjVrPEhfGvzOsBj+Ck7N+3KSEZ
-        GXjUi7KmFpjcEQ9JLRiUEoKQ8XuoL3ZcPocF4yNxJZrjiVHJwR1huPmylP4vqLfHonyWe4ZauHe
-        B5LtNWR0SvY33
-X-Received: by 2002:aa7:c952:: with SMTP id h18mr1492223edt.18.1628840321567;
-        Fri, 13 Aug 2021 00:38:41 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyMBnpwhnGL9v9XN0Q0Cm//1oQz0wrxlCELXtuPLvzh4SzzKejsQT7MxAxkU+ZpHiU4y+TQxQ==
-X-Received: by 2002:aa7:c952:: with SMTP id h18mr1492212edt.18.1628840321422;
-        Fri, 13 Aug 2021 00:38:41 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id l19sm431732edb.86.2021.08.13.00.38.40
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 13 Aug 2021 00:38:40 -0700 (PDT)
-Subject: Re: [PATCH] KVM: Move binary stats helpers to header to effectively
- export them
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Jing Zhang <jingzhangos@google.com>
-References: <20210811165346.3110715-1-seanjc@google.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <198b5907-2f65-d469-fad5-04b2369f4e33@redhat.com>
-Date:   Fri, 13 Aug 2021 09:38:40 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.11.0
+        id S239816AbhHMIvQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 13 Aug 2021 04:51:16 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:41394 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S239799AbhHMIvO (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 13 Aug 2021 04:51:14 -0400
+Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 17D8XENE167314;
+        Fri, 13 Aug 2021 04:50:47 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : message-id : in-reply-to : references : mime-version :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=5Tam6L5GF+YkaxAs0SulSAJKk+ROpHne9xG9PtCvyqE=;
+ b=CJNLaRc/X5GnelbbFAc9XfbJz/u702fO1/586oMc6GLvqTEM//L7dG31VqG2lTDAaLJC
+ NrkNmZ6niaR/xLFFvZuPczogGM/Ltul886yrUcp5CGmJTVFi7IWuZKhjR1hIFCRFw5vf
+ n4L++cLMHRpUqN7LAdlSkJffCqHytgTSdViYMV3IV18Y4HNbbRA4HHrVQWwQ5mSWeFJr
+ m9HLu1Y6J8BH6sSfgps5Yrnb6NLKJgrzADYsuZx4lAcZH0TB2mZukyyehOhfjfGqc1Yo
+ YzVv8JW1t6U5/ysdhle4AVQsgg8g9zTuEqAXviMPNza31m0wI4WpsnxQKJ101Alovibk qg== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 3addp5ujp8-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 13 Aug 2021 04:50:47 -0400
+Received: from m0098413.ppops.net (m0098413.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 17D8f114001427;
+        Fri, 13 Aug 2021 04:50:46 -0400
+Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 3addp5ujnh-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 13 Aug 2021 04:50:46 -0400
+Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
+        by ppma06ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 17D8l5FD006058;
+        Fri, 13 Aug 2021 08:50:45 GMT
+Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
+        by ppma06ams.nl.ibm.com with ESMTP id 3acf0kutdp-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 13 Aug 2021 08:50:44 +0000
+Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
+        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 17D8ogdo55509342
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 13 Aug 2021 08:50:42 GMT
+Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 39FC95204E;
+        Fri, 13 Aug 2021 08:50:42 +0000 (GMT)
+Received: from p-imbrenda (unknown [9.145.9.6])
+        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id EB3CC52054;
+        Fri, 13 Aug 2021 08:50:41 +0000 (GMT)
+Date:   Fri, 13 Aug 2021 10:20:37 +0200
+From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
+To:     Janosch Frank <frankja@linux.ibm.com>
+Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org, david@redhat.com,
+        thuth@redhat.com, cohuck@redhat.com
+Subject: Re: [kvm-unit-tests PATCH 2/8] lib: s390x: Add 0x3d, 0x3e and 0x3f
+ PGM constants
+Message-ID: <20210813102037.74d52111@p-imbrenda>
+In-Reply-To: <20210813073615.32837-3-frankja@linux.ibm.com>
+References: <20210813073615.32837-1-frankja@linux.ibm.com>
+        <20210813073615.32837-3-frankja@linux.ibm.com>
+Organization: IBM
+X-Mailer: Claws Mail 3.18.0 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-In-Reply-To: <20210811165346.3110715-1-seanjc@google.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: dTrSiETMHe5pUyOySC2MggPJXur3nOaK
+X-Proofpoint-GUID: xBGa1hkfkF0mviAc6DSo8kER6L6JDdZa
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.790
+ definitions=2021-08-13_03:2021-08-12,2021-08-13 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0
+ lowpriorityscore=0 malwarescore=0 clxscore=1015 impostorscore=0
+ adultscore=0 phishscore=0 suspectscore=0 mlxscore=0 spamscore=0
+ priorityscore=1501 mlxlogscore=999 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2107140000 definitions=main-2108130050
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 11/08/21 18:53, Sean Christopherson wrote:
-> Move kvm_stats_linear_hist_update() and kvm_stats_log_hist_update() to
-> kvm_host.h as static inline helpers to resolve a linker error on PPC,
-> which references the latter from module code.  This also fixes a goof
-> where the functions are tagged as "inline", despite being externs and
-> thus not inline-friendy.
+On Fri, 13 Aug 2021 07:36:09 +0000
+Janosch Frank <frankja@linux.ibm.com> wrote:
+
+> For UV and format 4 SIE tests we need to handle the following PGM
+> exceptions: 0x3d Secure Storage Access (non-secure CPU accesses
+> secure storage) 0x3e Non-Secure Storage Access (secure CPU accesses
+> non-secure storage) 0x3f Mapping of secure guest is wrong
 > 
->    ERROR: modpost: ".kvm_stats_log_hist_update" [arch/powerpc/kvm/kvm-hv.ko] undefined!
-> 
-> Fixes: c8ba95948182 ("KVM: stats: Support linear and logarithmic histogram statistics")
-> Cc: Jing Zhang <jingzhangos@google.com>
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
+> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+
+Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+
 > ---
->   include/linux/kvm_host.h | 38 +++++++++++++++++++++++++++++++++++---
->   virt/kvm/binary_stats.c  | 34 ----------------------------------
->   2 files changed, 35 insertions(+), 37 deletions(-)
+>  lib/s390x/asm/arch_def.h | 3 +++
+>  lib/s390x/interrupt.c    | 3 +++
+>  2 files changed, 6 insertions(+)
 > 
-> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-> index d447b21cdd73..e4d712e9f760 100644
-> --- a/include/linux/kvm_host.h
-> +++ b/include/linux/kvm_host.h
-> @@ -1467,9 +1467,41 @@ ssize_t kvm_stats_read(char *id, const struct kvm_stats_header *header,
->   		       const struct _kvm_stats_desc *desc,
->   		       void *stats, size_t size_stats,
->   		       char __user *user_buffer, size_t size, loff_t *offset);
-> -inline void kvm_stats_linear_hist_update(u64 *data, size_t size,
-> -				  u64 value, size_t bucket_size);
-> -inline void kvm_stats_log_hist_update(u64 *data, size_t size, u64 value);
-> +
-> +/**
-> + * kvm_stats_linear_hist_update() - Update bucket value for linear histogram
-> + * statistics data.
-> + *
-> + * @data: start address of the stats data
-> + * @size: the number of bucket of the stats data
-> + * @value: the new value used to update the linear histogram's bucket
-> + * @bucket_size: the size (width) of a bucket
-> + */
-> +static inline void kvm_stats_linear_hist_update(u64 *data, size_t size,
-> +						u64 value, size_t bucket_size)
-> +{
-> +	size_t index = div64_u64(value, bucket_size);
-> +
-> +	index = min(index, size - 1);
-> +	++data[index];
-> +}
-> +
-> +/**
-> + * kvm_stats_log_hist_update() - Update bucket value for logarithmic histogram
-> + * statistics data.
-> + *
-> + * @data: start address of the stats data
-> + * @size: the number of bucket of the stats data
-> + * @value: the new value used to update the logarithmic histogram's bucket
-> + */
-> +static inline void kvm_stats_log_hist_update(u64 *data, size_t size, u64 value)
-> +{
-> +	size_t index = fls64(value);
-> +
-> +	index = min(index, size - 1);
-> +	++data[index];
-> +}
-> +
->   #define KVM_STATS_LINEAR_HIST_UPDATE(array, value, bsize)		       \
->   	kvm_stats_linear_hist_update(array, ARRAY_SIZE(array), value, bsize)
->   #define KVM_STATS_LOG_HIST_UPDATE(array, value)				       \
-> diff --git a/virt/kvm/binary_stats.c b/virt/kvm/binary_stats.c
-> index 9bd595c92d3a..eefca6c69f51 100644
-> --- a/virt/kvm/binary_stats.c
-> +++ b/virt/kvm/binary_stats.c
-> @@ -142,37 +142,3 @@ ssize_t kvm_stats_read(char *id, const struct kvm_stats_header *header,
->   	*offset = pos;
->   	return len;
->   }
-> -
-> -/**
-> - * kvm_stats_linear_hist_update() - Update bucket value for linear histogram
-> - * statistics data.
-> - *
-> - * @data: start address of the stats data
-> - * @size: the number of bucket of the stats data
-> - * @value: the new value used to update the linear histogram's bucket
-> - * @bucket_size: the size (width) of a bucket
-> - */
-> -inline void kvm_stats_linear_hist_update(u64 *data, size_t size,
-> -				  u64 value, size_t bucket_size)
-> -{
-> -	size_t index = div64_u64(value, bucket_size);
-> -
-> -	index = min(index, size - 1);
-> -	++data[index];
-> -}
-> -
-> -/**
-> - * kvm_stats_log_hist_update() - Update bucket value for logarithmic histogram
-> - * statistics data.
-> - *
-> - * @data: start address of the stats data
-> - * @size: the number of bucket of the stats data
-> - * @value: the new value used to update the logarithmic histogram's bucket
-> - */
-> -inline void kvm_stats_log_hist_update(u64 *data, size_t size, u64 value)
-> -{
-> -	size_t index = fls64(value);
-> -
-> -	index = min(index, size - 1);
-> -	++data[index];
-> -}
-> 
-
-Squashed, thanks.
-
-Paolo
+> diff --git a/lib/s390x/asm/arch_def.h b/lib/s390x/asm/arch_def.h
+> index 15cf7d48..4ca02c1d 100644
+> --- a/lib/s390x/asm/arch_def.h
+> +++ b/lib/s390x/asm/arch_def.h
+> @@ -177,6 +177,9 @@ _Static_assert(sizeof(struct lowcore) == 0x1900,
+> "Lowcore size"); #define PGM_INT_CODE_REGION_FIRST_TRANS
+> 	0x39 #define PGM_INT_CODE_REGION_SECOND_TRANS	0x3a
+>  #define PGM_INT_CODE_REGION_THIRD_TRANS		0x3b
+> +#define PGM_INT_CODE_SECURE_STOR_ACCESS		0x3d
+> +#define PGM_INT_CODE_NON_SECURE_STOR_ACCESS	0x3e
+> +#define PGM_INT_CODE_SECURE_STOR_VIOLATION	0x3f
+>  #define PGM_INT_CODE_MONITOR_EVENT		0x40
+>  #define PGM_INT_CODE_PER			0x80
+>  #define PGM_INT_CODE_CRYPTO_OPERATION		0x119
+> diff --git a/lib/s390x/interrupt.c b/lib/s390x/interrupt.c
+> index 785b7355..01ded49d 100644
+> --- a/lib/s390x/interrupt.c
+> +++ b/lib/s390x/interrupt.c
+> @@ -115,6 +115,9 @@ static void fixup_pgm_int(struct stack_frame_int
+> *stack) case PGM_INT_CODE_REGION_THIRD_TRANS:
+>  	case PGM_INT_CODE_PER:
+>  	case PGM_INT_CODE_CRYPTO_OPERATION:
+> +	case PGM_INT_CODE_SECURE_STOR_ACCESS:
+> +	case PGM_INT_CODE_NON_SECURE_STOR_ACCESS:
+> +	case PGM_INT_CODE_SECURE_STOR_VIOLATION:
+>  		/* The interrupt was nullified, the old PSW points
+> at the
+>  		 * responsible instruction. Forward the PSW so we
+> don't loop. */
 
