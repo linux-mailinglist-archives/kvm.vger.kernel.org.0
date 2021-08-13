@@ -2,166 +2,142 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 409933EBB5D
-	for <lists+kvm@lfdr.de>; Fri, 13 Aug 2021 19:23:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C01A43EBB82
+	for <lists+kvm@lfdr.de>; Fri, 13 Aug 2021 19:33:05 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230163AbhHMRXY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 13 Aug 2021 13:23:24 -0400
-Received: from mail-dm6nam10on2076.outbound.protection.outlook.com ([40.107.93.76]:12512
-        "EHLO NAM10-DM6-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S229705AbhHMRXX (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 13 Aug 2021 13:23:23 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Q5KcLB+YN5nErDPgWwKk4assRc0Yto8sv9C8W7IA5DXzVMlYsVDqi1csBCh9VJVuNy4JYWV3nKpvCru2mTqQZSDO55qXWsXTgYeT2hxkdIuFgNuGhm2MMNhNY7dM0MViPFb2G5Z317FZ6C9sTb6UdQa+jFTshlNH3t/rFn7VKKgm9v7OhKoeFL97qMLPEFWa/qyklWkkESkpWnLIq4SY4qtizOIimP2c5AOE9f+Oc6QmerFFZM/cSB4WSKT7Woz2IOngkF9Fsn9NwIlrtaOF8LOao5XorhT7c+vpKswigTRdhY7YEjT6RcYcfbtdtMYomEcSbbiiom0+ZKNBNHT6gA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=h6RvfefU119MSrSgTAgvn6AIvZu84Wui9FRpOrjCKiA=;
- b=PUJo/fSqVIyx4p2e3K8XIkPhLi8QA857Pw9UiFSF/eUUDlhuxq9uXRaP3EsntilZLbu8cjrkCDJ/Z1U+PLzt2QphuH7nEC93NHIWNYWiTxDXj8gOz3yULLpBNGvSjqpfhDKLQNQTOPNM1En5ZYlhUKxoOVhLmBoEP1d9/OdERuYZpAug++hniiwp3PK4e1+NsxhQn91RNhdWDgsOaFvBpF0wNLvg2l1KyyuZhWn04pNNIvzs4FSyvs7JqaxeYtaYzSDZyCa4GCWTCdgYIwvC3M95prcaEha41Phjb05PMxi5oXqll22DmKdN8/zLFCqvZpWZ7EW+JIrPyWEUyUSU4A==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=h6RvfefU119MSrSgTAgvn6AIvZu84Wui9FRpOrjCKiA=;
- b=ogDzJzpzVLvfrDsNISSdL/C+9bqb3m1SBEb4xGlC8iiwNQ4tnPOqHADvMjhKx1RozuzfasCa6Eee1uDMgpvIFlCIKO9M7y9n3noMT8TYkILL7BSuyCo3sw1mrz7gGp+OwTWRPl4iypZ1cIRks+Qe4swTZjRNvr+d47hM/fHBXxA=
-Authentication-Results: kernel.org; dkim=none (message not signed)
- header.d=none;kernel.org; dmarc=none action=none header.from=amd.com;
-Received: from DM4PR12MB5229.namprd12.prod.outlook.com (2603:10b6:5:398::12)
- by DM4PR12MB5214.namprd12.prod.outlook.com (2603:10b6:5:395::22) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4415.14; Fri, 13 Aug
- 2021 17:22:54 +0000
-Received: from DM4PR12MB5229.namprd12.prod.outlook.com
- ([fe80::d560:d21:cd59:9418]) by DM4PR12MB5229.namprd12.prod.outlook.com
- ([fe80::d560:d21:cd59:9418%6]) with mapi id 15.20.4415.019; Fri, 13 Aug 2021
- 17:22:54 +0000
-Subject: Re: [PATCH v2 00/12] Implement generic prot_guest_has() helper
- function
-From:   Tom Lendacky <thomas.lendacky@amd.com>
-To:     linux-kernel@vger.kernel.org, x86@kernel.org,
-        linuxppc-dev@lists.ozlabs.org, linux-s390@vger.kernel.org,
-        iommu@lists.linux-foundation.org, kvm@vger.kernel.org,
-        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
-        linux-graphics-maintainer@vmware.com,
-        amd-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
-        kexec@lists.infradead.org, linux-fsdevel@vger.kernel.org
-Cc:     Borislav Petkov <bp@alien8.de>,
-        Brijesh Singh <brijesh.singh@amd.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Andi Kleen <ak@linux.intel.com>,
-        Sathyanarayanan Kuppuswamy 
-        <sathyanarayanan.kuppuswamy@linux.intel.com>,
-        Tianyu Lan <Tianyu.Lan@microsoft.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Ard Biesheuvel <ardb@kernel.org>, Baoquan He <bhe@redhat.com>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Daniel Vetter <daniel@ffwll.ch>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Dave Young <dyoung@redhat.com>,
-        David Airlie <airlied@linux.ie>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Ingo Molnar <mingo@redhat.com>,
-        Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
-        Maxime Ripard <mripard@kernel.org>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Paul Mackerras <paulus@samba.org>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Thomas Zimmermann <tzimmermann@suse.de>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Will Deacon <will@kernel.org>
-References: <cover.1628873970.git.thomas.lendacky@amd.com>
-Message-ID: <5c5443e1-1168-078f-89d2-70275706be6a@amd.com>
-Date:   Fri, 13 Aug 2021 12:22:50 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.11.0
-In-Reply-To: <cover.1628873970.git.thomas.lendacky@amd.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: SA9PR10CA0003.namprd10.prod.outlook.com
- (2603:10b6:806:a7::8) To DM4PR12MB5229.namprd12.prod.outlook.com
- (2603:10b6:5:398::12)
+        id S229522AbhHMRd1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 13 Aug 2021 13:33:27 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:21506 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229654AbhHMRdR (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 13 Aug 2021 13:33:17 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1628875970;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=6lKHlbsNZBkOx5VcAhf5vJ7K+O7Q4ZdoYWJvgYdgjQM=;
+        b=IG0ggmF5Ig+4aLBd/XylAHB35hYQgJ80EsF8azEABNyO0U1cwlb841qxrWCJKTWtNxXrio
+        ggtXpl9GsQPsjmBtZNMF9rsYXdzr4TCxAhsLqdqf+QDrP48gUfkgLEqlbgVk+xmH+9WYgX
+        hNmpI8q+S7PDK/gg/tYjINK0VeVXdFA=
+Received: from mail-oo1-f72.google.com (mail-oo1-f72.google.com
+ [209.85.161.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-265-0Hf4rpnsOyeOpMYI5_4DiA-1; Fri, 13 Aug 2021 13:32:48 -0400
+X-MC-Unique: 0Hf4rpnsOyeOpMYI5_4DiA-1
+Received: by mail-oo1-f72.google.com with SMTP id b32-20020a4a98e30000b029026222bb0380so3582779ooj.23
+        for <kvm@vger.kernel.org>; Fri, 13 Aug 2021 10:32:48 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
+         :references:organization:mime-version:content-transfer-encoding;
+        bh=6lKHlbsNZBkOx5VcAhf5vJ7K+O7Q4ZdoYWJvgYdgjQM=;
+        b=pLWDmbVR255NzxzdEi7DqvA0uztnG/1zMMULJYY9lGEgi+zeJESagGbxHRG6p73WEw
+         BJ4x4swFankrYDLr6WkXZh9ivletzNZDaqMWnuD5gbMXvnDYxm0yWSh9v++JBhLEnCL+
+         PIbmGkavzku4BVADIUSTPLMo7V14Ug9Zn5lEbtSuJ7lN39LYLhBwyeqxqmBwyfn+4LHN
+         Y8gr2BgxtPYG1QjSxR/J4simRxAXztcpY8sOrnbKc8kNzFIcqxoLSDW4rHOwdm4Zm887
+         N3I+GhZZLjdI8xf8MTs749hDHn+TCGjEdabsCB/+vTXmO4nt1OVcMHeDRG2+8jFYcCLR
+         3rKQ==
+X-Gm-Message-State: AOAM5337lgvwBqbZf5rPPQLuzd6subEujqjpUxoB35k3xXKJ6hSvIFQZ
+        v78tGh2CE8Kg1VJgzb/3JVRFQy2yEcC5B86UHOf5AVRzCtRTgIUIz2HjZ3wQdKjyL0uPR9wweHd
+        Wmtky/Z38sFY9
+X-Received: by 2002:a4a:3f01:: with SMTP id e1mr2637372ooa.86.1628875966761;
+        Fri, 13 Aug 2021 10:32:46 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzhm72Z1z/LOGlXolrexxrrQ0+Hc3IxVMnVUi3hCBmaCacwZJo6/itaUOXumsnkndATj3EqDA==
+X-Received: by 2002:a4a:3f01:: with SMTP id e1mr2637060ooa.86.1628875961685;
+        Fri, 13 Aug 2021 10:32:41 -0700 (PDT)
+Received: from redhat.com ([198.99.80.109])
+        by smtp.gmail.com with ESMTPSA id q3sm235503ooa.13.2021.08.13.10.32.41
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 13 Aug 2021 10:32:41 -0700 (PDT)
+Date:   Fri, 13 Aug 2021 11:32:40 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Bjorn Helgaas <helgaas@kernel.org>
+Cc:     Idar Lund <idarlund@gmail.com>, bjorn@helgaas.com,
+        kvm@vger.kernel.org, linux-pci@vger.kernel.org
+Subject: Re: vfio-pci problem
+Message-ID: <20210813113240.0e9ab116.alex.williamson@redhat.com>
+In-Reply-To: <20210813165307.GA2587844@bjorn-Precision-5520>
+References: <CA+enFJkL5AWjehFAHTMG5-+9zyR2eVxqFJ-9MoaJkavjwV+MfA@mail.gmail.com>
+        <20210813165307.GA2587844@bjorn-Precision-5520>
+Organization: Red Hat
+X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from office-ryzen.texastahm.com (67.79.209.213) by SA9PR10CA0003.namprd10.prod.outlook.com (2603:10b6:806:a7::8) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4415.14 via Frontend Transport; Fri, 13 Aug 2021 17:22:51 +0000
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 9969e273-9a71-4807-01fc-08d95e7efc41
-X-MS-TrafficTypeDiagnostic: DM4PR12MB5214:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <DM4PR12MB5214A11425D4B1238BCB4A77ECFA9@DM4PR12MB5214.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:6108;
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: OLsGDn0lrE8RKaN7ImSaDuO8ZE0Ezx9lRA68/4BNy6piwFHMoiNKQodyJRKpQLS7jvEKfAPsx2l3qhESpsmbCM6XUX2lCUsT4V/+A1baxddR11K2VnYVC0tOhG+yANdck5Y0rs/SxsltxgJVNaq7etewEoFK4et4+0AOSF0h1jOHRBxHu5E2zFQiaD0gOrvI8XPQugNOg6YABH+9IoqHEOnD92FhoT+KV4pWV2BjhRUgrr9aXGgYSAKqc86iusnm2/la6TVAHEgmVLBfHff4/TBuyK1MlJDHZRh8PUEn0je4rDlBNU9qMQE7GGnbW04L8RZP07JGqYr+WLYmJ+TUhgCma+XOq0YhpYoeQKKZdfB9QYW/xh2/170wuHHhl2uHGs2XQ+96sGijmeJLXOao/+KV/ClE4zYLJlYgD0CRx3HTRTJGcPMzD5Dz0G4m/9tgkX/t60as6gjuExAq41J9L/YIc/AvcqU8GAxwvCYm/6jEkWSrJ6pAWv6/uFaT1+dBFKHvqjTF6keLICITcBKfxsQ4GGVMkKKaCnAiI0ImJ3XUC3WRnC1ZoUrNmUcdnTSd72OrkeJodd4fskyAzkX62zdBKVoa6r7/wpu/weLAzr4JFampey5FOEVjCunuQ2ShRPSNJp6ae5nGbR4eIzk8gITFuSvXI9Qg3i+wbx4BXKvbPeNqMy4avPpDQKbzDgTSOFWuAALFi9091x69ct4WEAEwooT0mKlHAlsJdEitXjt49Mc+6E+vP/93AveXnJQt33sMRyV+JM4cmsKRUWSXLw==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR12MB5229.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(396003)(366004)(376002)(346002)(136003)(39860400002)(66476007)(83380400001)(7416002)(66556008)(8676002)(86362001)(7406005)(2906002)(26005)(31686004)(4326008)(4744005)(921005)(186003)(31696002)(8936002)(36756003)(6512007)(66946007)(2616005)(6506007)(478600001)(38100700002)(5660300002)(316002)(6486002)(53546011)(54906003)(956004)(41533002)(43740500002)(45980500001);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?c0dSdlVvc0JlSDFvZ2VjUi92VXJld25CKzMwejJiQTNUMUdRa1RhT0E5TWI4?=
- =?utf-8?B?cmw0VlZMemhzVGdxRzB4NE4zclpaL2xFZDFDZFVDYy9uNFE1dFZ1ZUFlRjEz?=
- =?utf-8?B?SmwvZFZQMnpsRXREZEJZaGpqMys3Zzg4MkVveWVVaGJxakIzN1lBVWh5aTBF?=
- =?utf-8?B?dXhnU1VHTXBacGZSQ2R3ZUFpQ21tTUYzMXd5OWdsZk0zNUEwbExiRjJKaXZv?=
- =?utf-8?B?dDlsMWpCV1RGajhsTE12YnFublBCWWtrdWxFUi9zaWIyZnluVFdmeHNQaW5M?=
- =?utf-8?B?dWJCOVV6WVplSG9XcE9kVWh5NFoySXRnTGl2YjEyeDlnR28yZEs2QVhjbGhH?=
- =?utf-8?B?T0VMeTk5UjZPSzhwOE90WmVjQVJEY1pVL3BvQTZuT1R6RnFWbjBZVHNFRzIy?=
- =?utf-8?B?TW1ic1F2dkNpS01ZNlVKZWdnWkpHbXF5dmV0MjVqa1IrcFMveFlSRi85MTVX?=
- =?utf-8?B?NTV3dm5UcFI2WmhkRG05ZTNmM3pESjNMVFlyQ01Jeld3OVBaZENjeUZqMlJk?=
- =?utf-8?B?VVBMMjkwTkZUZ2tjMzNVWmR5UWszb1J0aExPd3BDbkYxSHVFVi8xTy9TWTRx?=
- =?utf-8?B?MkxRU3ZaWnBLc2RVUVdSSW90MVNrcWl2OXlpSTVVTmN3blFCN1dkUyt0WGoz?=
- =?utf-8?B?eFBBZmk2Y2ZnbkYzR3VkZzBNbXRHYXlFYlhVM0JkYmFIblJ6WnR2QVZsNTAx?=
- =?utf-8?B?ME1tWUpYRE5ZNnJBMU8wR0RpbWJyZUhocDFtM2RyZ0VoYTNGSXlDczBuWjdn?=
- =?utf-8?B?K1FBYU4vcDN0SkxCN3NnNUQ1eERoaHZjeDRoaXR4cjVsdEJ0cU1tMTRUSWpM?=
- =?utf-8?B?aWhWUUhnQjhhRC9JWEFqdFZNc1ZYcDdaeWZVTXhqbDkyUDdhT1crVGRyTVF2?=
- =?utf-8?B?a0taUEZDRml4SHYyLzlJRWFsZ0MzdHdTRE1telMxQ01sanBkdCs5cjhRcVRn?=
- =?utf-8?B?R3NHT0RjTGwwdTRDY2RkMDZOZW01T1I3U3VzNUUvaGdVd21RQ2NMQjNNRmty?=
- =?utf-8?B?NW5jZTdGQjRMRWQ0eFN6cllJWjRlTnJ4ZDhnbERJeFF5b3kyTDRHSkNKWE1W?=
- =?utf-8?B?MFJzb2w4RWRheVpwUDZOVkZEa0pvSlRmN0pWQklEVlAxVmIzN2t1RzhkREsx?=
- =?utf-8?B?YXJSRnh1QzFrcDZsaW56aUs3V0dDNnVybnVSa3loRlV1QnRXQXdmZ3U4Wmpu?=
- =?utf-8?B?bWRDUlpUdXBMUWlmRnNIeUU5OUlvVG9FZFZaek5iZVNwUmxlQlA1TkNkdVRW?=
- =?utf-8?B?ejc1b2E0U2hsTGZna1lyUHM3Z1BIVHlkMW1BRzJjV3VkTzhhMlZCbWs0dGFF?=
- =?utf-8?B?dUwrRHVNNnBiQVM5ajhaU0p4NFpUWHNQQXY3SEErczl5ejBQRW9YOEFyUFdT?=
- =?utf-8?B?c0hRNnNlUUFpL1V2eDJYbUQ2am93STJDMXRiWjFWSjlTRzBZL2hTTXJDamVE?=
- =?utf-8?B?ODNhMUVlUWVNMGFXbTVsWjZkQnFaZTJVMXAvVE5jN3Jycy90Zkc3K05nd0Fl?=
- =?utf-8?B?L1J4UE14QkJTblYzQkNuSThGekY1N1ZzbXc5Mit2dHpmR0F2eis0OW9QeXRJ?=
- =?utf-8?B?SEo1aUtuYk1McDNrbmd4ai9Kc3ZoQ0FVREpTWWtzYlR0Rkd1YjlKRjdqR3Zj?=
- =?utf-8?B?YmdwcytwTnVXS0paMC85L00wS1J1NG1JREU5d0ZMOUh5dTZDam9JaERjaHI5?=
- =?utf-8?B?akgrWXYyQzBlU3pHeDVEd3Ztbm8vS0FydzB0aEdiR2RKdENtVFZ1aE5ZL09l?=
- =?utf-8?Q?Z02W9AkJz7sBg9wEjSky1jrugMay/nZZQAI+Wdg?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 9969e273-9a71-4807-01fc-08d95e7efc41
-X-MS-Exchange-CrossTenant-AuthSource: DM4PR12MB5229.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Aug 2021 17:22:54.2217
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: Uj6QcnXXEHT0CXIxlKEIH/IA+azLA8VsCm+jOAbcy2bvSShnzEWVnDEefF9wit7AKRRZPssiJtbSJFUHliohnA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB5214
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 8/13/21 11:59 AM, Tom Lendacky wrote:
-> This patch series provides a generic helper function, prot_guest_has(),
-> to replace the sme_active(), sev_active(), sev_es_active() and
-> mem_encrypt_active() functions.
-> 
-> It is expected that as new protected virtualization technologies are
-> added to the kernel, they can all be covered by a single function call
-> instead of a collection of specific function calls all called from the
-> same locations.
-> 
-> The powerpc and s390 patches have been compile tested only. Can the
-> folks copied on this series verify that nothing breaks for them.
+On Fri, 13 Aug 2021 11:53:07 -0500
+Bjorn Helgaas <helgaas@kernel.org> wrote:
 
-There are some patches related to PPC that added new calls to the 
-mem_encrypt_active() function that are not yet in the tip tree. After the 
-merge window, I'll need to send a v3 with those additional changes before 
-this series can be applied.
+> [+cc Alex, kvm, linux-pci]
+> 
+> On Fri, Aug 13, 2021 at 09:43:39AM +0200, Idar Lund wrote:
+> > Hi,
+> > 
+> > I've been struggling with an error in linux since 5.11. Please find my bug
+> > report here:
+> > https://bugzilla.redhat.com/show_bug.cgi?id=1945565
+> > 
+> > Then I stumbled upon this mail thread:
+> > https://www.spinics.net/lists/linux-pci/msg102243.html which seems related.
+> > 
+> > Is there another way to do this in 5.11+ or is this an unintentionally bug
+> > that got introduced in 5.11?  
+> 
+> Hi Idar, sorry for the trouble and thanks for the report!  I cc'd some
+> VFIO experts who know more than I do about this.
+> 
+> If I understand correctly, you have a PCI XHCI controller:
+> 
+>   pci 0000:06:00.0: [1b73:1100] type 00 class 0x0c0330
+>   xhci_hcd 0000:06:00.0: xHCI Host Controller
+> 
+> and you want to unbind the xhci_hcd driver and bind vfio-pci instead:
+> 
+>   # echo '0000:06:00.0' > /sys/bus/pci/devices/0000\:06\:00.0/driver/unbind
+>   # echo 0x1b73 0x1100 > /sys/bus/pci/drivers/vfio-pci/new_id
+> 
+> In v5.10 (5.10.17-200.fc33.x86_64) this worked fine, but in v5.11
+> (5.11.9-200.fc33.x86_64) the "new_id" write returns -EEXIST and
+> binding to vfio-pci fails.
+> 
+> The patch you pointed out appeared in v5.11 as 3853f9123c18 ("PCI:
+> Avoid duplicate IDs in driver dynamic IDs list") [1], and I agree it
+> looks suspicious.  There haven't been any significant changes to
+> pci-driver.c since then.
+> 
+> Have you added "0x1b73 0x1100" to vfio-pci/new_id previously?  I think
+> in v5.10, that would silently work (possibly adding duplicate entries
+> to the dynamic ID list) and every write to vfio-pci/new_id would make
+> vfio-pci try to bind to the device.
+> 
+> In v5.11, if you write a duplicate ID to vfio-pci/new_id, you would
+> get -EEXIST and no attempt to bind.  As far as I know, the dynamic ID
+> list is not visible in sysfs, so it might be hard to avoid writing a
+> duplicate.
+> 
+> But if the vfio-pci dynamic ID list already contains "0x1b73 0x1100",
+> you should be able to ask vfio-pci to bind to the device like this:
+> 
+>   # echo 0000:06:00.0 > /sys/bus/pci/drivers/virtio-pci/bind
+> 
+> I don't know if that's a solution, but would be useful to know whether
+> it's a workaround.
 
+[root@x1 vfio-pci]# echo 0x1b73 0x1100 > new_id 
+[root@x1 vfio-pci]# echo 0x1b73 0x1100 > new_id 
+bash: echo: write error: File exists
+[root@x1 vfio-pci]# uname -r
+5.12.15-200.fc33.x86_64
+
+Seems like it behaves as expected now.  The new_id interface has some
+inherit issues, essentially all vfio-pci dynamic binding cases should
+instead be using the driver_override interface.  The driverctl utility
+already makes use of this and will make your life a tiny bit easier.
 Thanks,
-Tom
+
+Alex
+
