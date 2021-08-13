@@ -2,83 +2,119 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C1A5A3EB08B
-	for <lists+kvm@lfdr.de>; Fri, 13 Aug 2021 08:43:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 886B13EB122
+	for <lists+kvm@lfdr.de>; Fri, 13 Aug 2021 09:12:36 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238906AbhHMGne (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 13 Aug 2021 02:43:34 -0400
-Received: from mail.kernel.org ([198.145.29.99]:33524 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S234716AbhHMGnd (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 13 Aug 2021 02:43:33 -0400
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 0FE6D610CD;
-        Fri, 13 Aug 2021 06:43:07 +0000 (UTC)
-Received: from sofa.misterjones.org ([185.219.108.64] helo=why.lan)
-        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-        (Exim 4.94.2)
-        (envelope-from <maz@kernel.org>)
-        id 1mEQuH-004jCS-1Q; Fri, 13 Aug 2021 07:43:05 +0100
-From:   Marc Zyngier <maz@kernel.org>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Alexandru Elisei <alexandru.elisei@arm.com>,
-        David Brazdil <dbrazdil@google.com>,
-        Quentin Perret <qperret@google.com>,
-        Steven Price <steven.price@arm.com>,
-        Will Deacon <will@kernel.org>, kernel-team@android.com,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        kvm@vger.kernel.org
-Subject: [GIT PULL] KVM/arm64 fixes for 5.14, take #2
-Date:   Fri, 13 Aug 2021 07:42:41 +0100
-Message-Id: <20210813064241.2603475-1-maz@kernel.org>
+        id S239275AbhHMHMs (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 13 Aug 2021 03:12:48 -0400
+Received: from forward2-smtp.messagingengine.com ([66.111.4.226]:59575 "EHLO
+        forward2-smtp.messagingengine.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S239230AbhHMHMq (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 13 Aug 2021 03:12:46 -0400
+Received: from compute5.internal (compute5.nyi.internal [10.202.2.45])
+        by mailforward.nyi.internal (Postfix) with ESMTP id 25FA0194076A;
+        Fri, 13 Aug 2021 03:12:18 -0400 (EDT)
+Received: from mailfrontend1 ([10.202.2.162])
+  by compute5.internal (MEProxy); Fri, 13 Aug 2021 03:12:18 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+        messagingengine.com; h=cc:content-transfer-encoding:date:from
+        :message-id:mime-version:subject:to:x-me-proxy:x-me-proxy
+        :x-me-sender:x-me-sender:x-sasl-enc; s=fm3; bh=IJ84Zz7cXD2dARXk2
+        E4si9LSMTMEPXvMGAWxocLB7k8=; b=KLPKleY+V+TZn7ffDpWBbAMHhDbU5PLd4
+        CGEukJFWJMJ7zseXMfvCsGkDWVB+JlDZkCvkQXLeWg4dh3neJ1756YodHhm6klEP
+        sEVgh3+3vTpDt8hcQhyB4/vRnrn84CHG1g3FfGtK9lAjlAv4cSR6aGOYqFioCo9B
+        PcjhPSw+vhMMDSl8b0jKttvFway/muwGtKvByqBZuWNShdmX5LP5CeNv1hMwC028
+        3ZkTBN4i/+hODlDecP30cGFoJyl2ydSItwmqaknnqo+IwdktqMpZEDp1xqN/wHhd
+        c/poT2PtVokLUiSwvZvG1fMWEtgG1RSptilx/u0bPt1PJoODfp6pA==
+X-ME-Sender: <xms:TxsWYc4F_mQvQqAEI6dKg-QUCj-wNM-lCqfNGfnyD2WiHYampzItEg>
+    <xme:TxsWYd6oPX_dxxN7xCymbvl2cn_W3rvKyrqQQPtJ9UjpN9dcT60bikWeRHEgR07vh
+    z9cohHqkKo-TTAgeJU>
+X-ME-Received: <xmr:TxsWYbeyALtUZhaN4E1HFtJG-opvzR1BgNhzEfx3iSXXwpl_E_3yoqyB4D9q_lBVL6px8GYj-X9BiYOWxmWjtAzkWo1pDoZBTyYYWpm1ie0>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvtddrkeeggdduudejucetufdoteggodetrfdotf
+    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
+    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
+    cujfgurhephffvufffkffoggfgsedtkeertdertddtnecuhfhrohhmpeffrghvihguucfg
+    ughmohhnughsohhnuceouggrvhhiugdrvggumhhonhgushhonhesohhrrggtlhgvrdgtoh
+    hmqeenucggtffrrghtthgvrhhnpeduhfetvdfhgfeltddtgeelheetveeufeegteevtddu
+    iedvgeejhfdukeegteehheenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmh
+    grihhlfhhrohhmpegurghvihgurdgvughmohhnughsohhnsehorhgrtghlvgdrtghomh
+X-ME-Proxy: <xmx:TxsWYRLuc_fs7O6HqTS3E7Xb_sP6mONlxk1GtGeIDkl61UqwCFUXwg>
+    <xmx:TxsWYQJOHNVJtMx5hiOgAxILBRcTaaLGEURarB0xAIdXid2khuwZhw>
+    <xmx:TxsWYSyf4VEatx40J9CeUX9cDQf25jxvV3IL0fXvRu5Db6JqPwP3yQ>
+    <xmx:UhsWYVgvTlRhDmolQXmesWRyAzGqbNPuaa_CSzOBDQ_nOFjrmcjCDE4gnZs>
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Fri,
+ 13 Aug 2021 03:12:14 -0400 (EDT)
+Received: from localhost (disaster-area.hh.sledj.net [local])
+        by disaster-area.hh.sledj.net (OpenSMTPD) with ESMTPA id 94f31bc7;
+        Fri, 13 Aug 2021 07:12:12 +0000 (UTC)
+From:   David Edmondson <david.edmondson@oracle.com>
+To:     linux-kernel@vger.kernel.org
+Cc:     Jim Mattson <jmattson@google.com>, Borislav Petkov <bp@alien8.de>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Ingo Molnar <mingo@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        David Matlack <dmatlack@google.com>, x86@kernel.org,
+        kvm@vger.kernel.org, David Edmondson <david.edmondson@oracle.com>
+Subject: [PATCH v4 0/4] KVM: x86: Convey the exit reason, etc. to user-space on emulation failure
+Date:   Fri, 13 Aug 2021 08:12:07 +0100
+Message-Id: <20210813071211.1635310-1-david.edmondson@oracle.com>
 X-Mailer: git-send-email 2.30.2
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: pbonzini@redhat.com, alexandru.elisei@arm.com, dbrazdil@google.com, qperret@google.com, steven.price@arm.com, will@kernel.org, kernel-team@android.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Paolo,
+To help when debugging failures in the field, if instruction emulation
+fails, report the VM exit reason, etc. to userspace in order that it
+can be recorded.
 
-Here's the second batch of KVM/arm64 fixes for 5.14, and hopefully the
-last for this cycle. We have another MTE fix from Steven, but also
-have an off-by-one bug squashed by David in the protected memory path.
+The SGX changes here are compiled but untested.
 
-Please pull,
+Sean: if you want me to add your name to patch 3, given that I adopted
+your sample code almost unaltered, please say.
 
-	M.
+v4:
+- Update the API for preparing emulation failure report (Sean)
+- sgx uses the provided API in all relevant cases (Sean)
+- Clarify the intended layout of kvm_run.emulation_failure.
 
-The following changes since commit 5cf17746b302aa32a4f200cc6ce38865bfe4cf94:
+v3:
+- Convey any debug data un-flagged after the ABI specified data in
+  struct emulation_failure (Sean)
+- Obey the ABI protocol in sgx_handle_emulation_failure() (Sean)
 
-  KVM: arm64: selftests: get-reg-list: actually enable pmu regs in pmu sublist (2021-07-14 11:55:18 +0100)
+v2:
+- Improve patch comments (dmatlock)
+- Intel should provide the full exit reason (dmatlock)
+- Pass a boolean rather than flags (dmatlock)
+- Use the helper in kvm_task_switch() and kvm_handle_memory_failure()
+  (dmatlock)
+- Describe the exit_reason field of the emulation_failure structure
+  (dmatlock)
 
-are available in the Git repository at:
+David Edmondson (4):
+  KVM: x86: Clarify the kvm_run.emulation_failure structure layout
+  KVM: x86: Get exit_reason as part of kvm_x86_ops.get_exit_info
+  KVM: x86: On emulation failure, convey the exit reason, etc. to
+    userspace
+  KVM: x86: SGX must obey the KVM_INTERNAL_ERROR_EMULATION protocol
 
-  git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kvmarm-fixes-5.14-2
+ arch/x86/include/asm/kvm_host.h | 10 +++--
+ arch/x86/kvm/svm/svm.c          |  8 ++--
+ arch/x86/kvm/trace.h            |  9 ++--
+ arch/x86/kvm/vmx/nested.c       |  2 +-
+ arch/x86/kvm/vmx/sgx.c          | 16 +++-----
+ arch/x86/kvm/vmx/vmx.c          | 11 +++--
+ arch/x86/kvm/x86.c              | 73 ++++++++++++++++++++++++++-------
+ include/uapi/linux/kvm.h        | 15 ++++++-
+ 8 files changed, 100 insertions(+), 44 deletions(-)
 
-for you to fetch changes up to c4d7c51845af9542d42cd18a25c570583abf2768:
+-- 
+2.30.2
 
-  KVM: arm64: Fix race when enabling KVM_ARM_CAP_MTE (2021-07-29 17:34:01 +0100)
-
-----------------------------------------------------------------
-KVM/arm64 fixes for 5.14, take #2
-
-- Plug race between enabling MTE and creating vcpus
-- Fix off-by-one bug when checking whether an address range is RAM
-
-----------------------------------------------------------------
-David Brazdil (1):
-      KVM: arm64: Fix off-by-one in range_is_memory
-
-Steven Price (1):
-      KVM: arm64: Fix race when enabling KVM_ARM_CAP_MTE
-
- arch/arm64/kvm/arm.c                  | 12 ++++++++----
- arch/arm64/kvm/hyp/nvhe/mem_protect.c |  2 +-
- 2 files changed, 9 insertions(+), 5 deletions(-)
