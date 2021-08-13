@@ -2,100 +2,92 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 92DD53EB43B
-	for <lists+kvm@lfdr.de>; Fri, 13 Aug 2021 12:44:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 35F503EB442
+	for <lists+kvm@lfdr.de>; Fri, 13 Aug 2021 12:47:11 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240185AbhHMKpD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 13 Aug 2021 06:45:03 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:22640 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S239223AbhHMKo5 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 13 Aug 2021 06:44:57 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1628851470;
+        id S239908AbhHMKrf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 13 Aug 2021 06:47:35 -0400
+Received: from mail.skyhub.de ([5.9.137.197]:35892 "EHLO mail.skyhub.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S239606AbhHMKrf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 13 Aug 2021 06:47:35 -0400
+Received: from zn.tnic (p200300ec2f0a0d0079874d21390dee82.dip0.t-ipconnect.de [IPv6:2003:ec:2f0a:d00:7987:4d21:390d:ee82])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id CB1E81EC0390;
+        Fri, 13 Aug 2021 12:47:02 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
+        t=1628851622;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=CCRKNaL8rUMbzILuCY+AB0BP3lwlD4VuYd7MDG+p8TM=;
-        b=dT5ADOLMvVRXTm6PCG7t35yuMmu6O5UD3+m+01SNt5QuV84/DhdIQAa8XKzT4KGCO4PTgs
-        wbMk9fbKFyCkaZ2/mjLc/dzc2e0Dv/WBoVMp/YFgyeLUxOYs9Qt9WcsR+Fk3hTtCXDOg85
-        tPU/c0qv4VXsMv15vSKqvmXY0xnIDmE=
-Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
- [209.85.218.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-359-HG_VEAT9M5OhT9_esjbcQQ-1; Fri, 13 Aug 2021 06:44:29 -0400
-X-MC-Unique: HG_VEAT9M5OhT9_esjbcQQ-1
-Received: by mail-ej1-f70.google.com with SMTP id ju25-20020a17090798b9b029058c24b55273so2825043ejc.8
-        for <kvm@vger.kernel.org>; Fri, 13 Aug 2021 03:44:29 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=CCRKNaL8rUMbzILuCY+AB0BP3lwlD4VuYd7MDG+p8TM=;
-        b=Xa3enwA6PIIUidJts9JA7fnTRprsB/LgKN9ZDAZwFnaYEKcKaZ89LeTPC3Y0upyI1j
-         fozWGVCtnExTpUsAbAcsPehhULOAVRVuukYRQNPDpLPY7dAwGs4fH3qTnGJBU3QNKXHv
-         PvC6OIQLCOsVZeEUJHbtHzIEeuFqi1sYEq05qVpy+Z2ygsg2IXsxDpSQXeglYaZvaU7H
-         1oyC9R5+XM28uLQU3cc2oEYRvuCsNbIt35N+QbEoYD0Kz2rkXpMRV1yccST91pp/Km2h
-         c/D5AEMn5k8CHwQkadW09XdiadVtu9twZPIqcnK8yNE92aOpBbBA3dR+TajtwFGi7+mD
-         4tbg==
-X-Gm-Message-State: AOAM5309DZDwax4kcCDVKDCLmmJeZh2FiLZUpTN8eIwGizeMeJ/7eisZ
-        DglVo9kPwXYYkt5hsJ+IiejWqBbOjOUFru8qtb9MGvkz7NEs9YCBy2Vp03lP7vGcDsj7njCRCR4
-        EwTxrP/v56XZU
-X-Received: by 2002:a17:906:6b0c:: with SMTP id q12mr141882ejr.0.1628851468596;
-        Fri, 13 Aug 2021 03:44:28 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzbOi0KwA+drc3M+Egn5GSdsceHGVvGcEGdWBkM4ljas5GpNbvsJOOdudbDSGWUVsAACOZz2w==
-X-Received: by 2002:a17:906:6b0c:: with SMTP id q12mr141872ejr.0.1628851468394;
-        Fri, 13 Aug 2021 03:44:28 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id m19sm484596edd.38.2021.08.13.03.44.26
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 13 Aug 2021 03:44:27 -0700 (PDT)
-Subject: Re: [PATCH v6 01/21] KVM: x86: Fix potential race in KVM_GET_CLOCK
-To:     Oliver Upton <oupton@google.com>
-Cc:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
+         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
+        bh=XmnLEzAhzOr7go9Tws2WK6fpL+x7aLZgyQqDx6MzxiE=;
+        b=K7pPLi+l6xsBgICUo31Urs0pNH4asQI3bGtJ3ZL06c0vaRJVCEnWEAirmzYhQYnNvpoBmR
+        bC9rrsPLK3gHgK1reXS8f7LGdgNZGiXNBuGJsT8HMbMIG0vRBzPzUijsRpRFIW7P/lbRPP
+        MSBF/r3NSFBWWbXBRI4N672W+nm0UBY=
+Date:   Fri, 13 Aug 2021 12:47:41 +0200
+From:   Borislav Petkov <bp@alien8.de>
+To:     Brijesh Singh <brijesh.singh@amd.com>
+Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
+        linux-coco@lists.linux.dev, linux-mm@kvack.org,
+        linux-crypto@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
         Sean Christopherson <seanjc@google.com>,
-        Marc Zyngier <maz@kernel.org>, Peter Shier <pshier@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        David Matlack <dmatlack@google.com>,
-        Ricardo Koller <ricarkol@google.com>,
-        Jing Zhang <jingzhangos@google.com>,
-        Raghavendra Rao Anata <rananta@google.com>,
-        James Morse <james.morse@arm.com>,
-        Alexandru Elisei <Alexandru.Elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        linux-arm-kernel@lists.infradead.org,
-        Andrew Jones <drjones@redhat.com>,
-        Will Deacon <will@kernel.org>,
-        Catalin Marinas <catalin.marinas@arm.com>
-References: <20210804085819.846610-1-oupton@google.com>
- <20210804085819.846610-2-oupton@google.com>
- <78eeaf83-2bfa-8452-1301-a607fba7fa0c@redhat.com>
- <CAOQ_QsiwzKpaXUadGR6cWC2k0pg1P4QgkAxNdo0gpVAP1P3hSQ@mail.gmail.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <0b415872-7a67-d38b-ae01-62c38b365be0@redhat.com>
-Date:   Fri, 13 Aug 2021 12:44:26 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.11.0
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        David Rientjes <rientjes@google.com>,
+        Dov Murik <dovmurik@linux.ibm.com>,
+        Tobin Feldman-Fitzthum <tobin@ibm.com>,
+        Michael Roth <michael.roth@amd.com>,
+        Vlastimil Babka <vbabka@suse.cz>, tony.luck@intel.com,
+        npmccallum@redhat.com, brijesh.ksingh@gmail.com
+Subject: Re: [PATCH Part1 RFC v4 10/36] x86/compressed: Register GHCB memory
+ when SEV-SNP is active
+Message-ID: <YRZNzUW/QhG6UYjg@zn.tnic>
+References: <20210707181506.30489-1-brijesh.singh@amd.com>
+ <20210707181506.30489-11-brijesh.singh@amd.com>
 MIME-Version: 1.0
-In-Reply-To: <CAOQ_QsiwzKpaXUadGR6cWC2k0pg1P4QgkAxNdo0gpVAP1P3hSQ@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20210707181506.30489-11-brijesh.singh@amd.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 13/08/21 12:39, Oliver Upton wrote:
-> Might it make sense to fix this issue under the existing locking
-> scheme, then shift to what you're proposing? I say that, but the
-> locking change in 03/21 would most certainly have a short lifetime
-> until this patch supersedes it.
+On Wed, Jul 07, 2021 at 01:14:40PM -0500, Brijesh Singh wrote:
+> diff --git a/arch/x86/include/asm/sev-common.h b/arch/x86/include/asm/sev-common.h
+> index aee07d1bb138..b19d8d301f5d 100644
+> --- a/arch/x86/include/asm/sev-common.h
+> +++ b/arch/x86/include/asm/sev-common.h
+> @@ -45,6 +45,17 @@
+>  		(((unsigned long)reg & GHCB_MSR_CPUID_REG_MASK) << GHCB_MSR_CPUID_REG_POS) | \
+>  		(((unsigned long)fn) << GHCB_MSR_CPUID_FUNC_POS))
+>  
+> +/* GHCB GPA Register */
+> +#define GHCB_MSR_GPA_REG_REQ		0x012
+> +#define GHCB_MSR_GPA_REG_VALUE_POS	12
+> +#define GHCB_MSR_GPA_REG_GFN_MASK	GENMASK_ULL(51, 0)
+> +#define GHCB_MSR_GPA_REQ_GFN_VAL(v)		\
+> +	(((unsigned long)((v) & GHCB_MSR_GPA_REG_GFN_MASK) << GHCB_MSR_GPA_REG_VALUE_POS)| \
+> +	GHCB_MSR_GPA_REG_REQ)
+> +
+> +#define GHCB_MSR_GPA_REG_RESP		0x013
+> +#define GHCB_MSR_GPA_REG_RESP_VAL(v)	((v) >> GHCB_MSR_GPA_REG_VALUE_POS)
 
-Yes, definitely.  The seqcount change would definitely go in much later. 
-  Extracting KVM_{GET,SET}_CLOCK to separate function would also be a 
-patch of its own.  Give me a few more days of frantic KVM Forum 
-preparation. :)
+Simplify...
 
-Paolo
+-- 
+Regards/Gruss,
+    Boris.
 
+https://people.kernel.org/tglx/notes-about-netiquette
