@@ -2,189 +2,156 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 371333EBD31
-	for <lists+kvm@lfdr.de>; Fri, 13 Aug 2021 22:17:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7BC913EBD71
+	for <lists+kvm@lfdr.de>; Fri, 13 Aug 2021 22:35:09 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234250AbhHMURr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 13 Aug 2021 16:17:47 -0400
-Received: from mail-mw2nam12on2067.outbound.protection.outlook.com ([40.107.244.67]:62944
-        "EHLO NAM12-MW2-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S233890AbhHMURq (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 13 Aug 2021 16:17:46 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=WGw0U9FkgKp4hxsvcFdS+Z7DUF2Um0cW04RoIpgi//zy5IZ39Kz1fCX2rVhK9AfVPCzIZx/VN+/c0vKLjcELXtCeqlZEkPZhhS2XiAfPgWhgMPuEdvIhHN7rBVvbCQams9QlvgTp5FsR8jCKuu39Gtbgm0OZ+Qn86bPCokiEi4UDBO+eeCQ7XyeWjdlfMm4hv3airl6E+yaPDId+2s512TtyQbjafNM0Gx3IYB4zzGH0ejWseKFeD1hF5InIjfRLO3d/akqNGHR0KClTwfFZljax2IYs8nKrhO2BbTW5mosq8j6ZERwGi2ni9faElRKE+XquZXbgcBbdvP+h87A36Q==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=DpwOvDM3GnwNTNcL815T+RSOydEG+h+3oDIg9dnFcc8=;
- b=EMLZ5P4NMpgY2QIUrBxnmxGsz5hDMG67hy4Mog8GvtOJgYyqUItuz59aeYyBFPlRSns5aRKJYaYuB3r4WULP65T9OWtOv0RdVSGJu0Icg+VGxcNNUCgbMZFTV5Uairek2h2CXjpfoW01HVKZlpw3q+v1wM6g42M2n7dbFRJFxyWX+84zq9k25c7lFC0po7sv/rVgzcUxwaLNRYDAgcB61bcpPj46NVIOv6g5OLvE+va68vyZ8p1ex93HYhmoQhFd2O3SSzsJQZf/jjzLOe85x3iisIzBrCByNHjGXWr4CYrcpUHLMJmnaVZvTfqUucinEUcYywOo3H00deM7niXn4w==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=DpwOvDM3GnwNTNcL815T+RSOydEG+h+3oDIg9dnFcc8=;
- b=MyTmwlzgKeBu9Kr9AdaSE1zoak8QxWlRT/g45sd8A3BxVuycfnUWDTtSlbv7kbm+wPD+NOE8KuxfMaVbm1BHq28hmB5OTiCq1m8BAT98u8NbbFWus7koWMgW2ellOLwPUjgB57RbR3+znK3BrbrvmdTSLWxPBzjHKCg3KahE5E4=
-Authentication-Results: redhat.com; dkim=none (message not signed)
- header.d=none;redhat.com; dmarc=none action=none header.from=amd.com;
-Received: from DM4PR12MB5229.namprd12.prod.outlook.com (2603:10b6:5:398::12)
- by DM4PR12MB5056.namprd12.prod.outlook.com (2603:10b6:5:38b::15) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4415.16; Fri, 13 Aug
- 2021 20:17:17 +0000
-Received: from DM4PR12MB5229.namprd12.prod.outlook.com
- ([fe80::d560:d21:cd59:9418]) by DM4PR12MB5229.namprd12.prod.outlook.com
- ([fe80::d560:d21:cd59:9418%6]) with mapi id 15.20.4415.019; Fri, 13 Aug 2021
- 20:17:17 +0000
-Subject: Re: [PATCH 07/11] treewide: Replace the use of mem_encrypt_active()
- with prot_guest_has()
-From:   Tom Lendacky <thomas.lendacky@amd.com>
-To:     "Kirill A. Shutemov" <kirill@shutemov.name>
-Cc:     "Kuppuswamy, Sathyanarayanan" 
-        <sathyanarayanan.kuppuswamy@linux.intel.com>,
-        linux-kernel@vger.kernel.org, x86@kernel.org,
-        linuxppc-dev@lists.ozlabs.org, linux-s390@vger.kernel.org,
-        iommu@lists.linux-foundation.org, kvm@vger.kernel.org,
-        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
-        linux-graphics-maintainer@vmware.com,
-        amd-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
-        kexec@lists.infradead.org, linux-fsdevel@vger.kernel.org,
-        Borislav Petkov <bp@alien8.de>,
-        Brijesh Singh <brijesh.singh@amd.com>,
+        id S234037AbhHMUff (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 13 Aug 2021 16:35:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37046 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S233905AbhHMUfe (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 13 Aug 2021 16:35:34 -0400
+Received: from mail-pl1-x64a.google.com (mail-pl1-x64a.google.com [IPv6:2607:f8b0:4864:20::64a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2E744C061756
+        for <kvm@vger.kernel.org>; Fri, 13 Aug 2021 13:35:07 -0700 (PDT)
+Received: by mail-pl1-x64a.google.com with SMTP id w5-20020a170902e885b029012cf3ddd763so6825794plg.17
+        for <kvm@vger.kernel.org>; Fri, 13 Aug 2021 13:35:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=XrhioAKT7DeWiKgmwundTZ+OwNu0PRvaU+357/cSBQw=;
+        b=Uq9EXyP7sD0LnBObzCAIBWskW5rFJ9BuS+b8tEXUFNAfVV2tCncg6PI7/wuiQlgWoO
+         g4yMl0uUhh3e/kGFK8PSSLPTK8XTM4gQYcEHFgoBLpDY6Gmw7tiPsR6ALf5tjMTfVRNG
+         mItepTmn14QkqPszOcGiY94zzveT8Kh7fVlEwD+bBbwjEOs19jduWzVosrrNRydVtiFI
+         sFYKYm0Ot5SCfaWPn9fcTE3NXWmm07ln8JnZBpgYqhiJQeRc4rs0U6LdS/eGJvxOaKwS
+         +gTOfhkmt1r1PRubnVqLw25ACIBM84jLg+AjzLNYvm94nG9Fyw3ZumT64j0is94hRebm
+         FBQg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=XrhioAKT7DeWiKgmwundTZ+OwNu0PRvaU+357/cSBQw=;
+        b=s3mAOGMTOBONy9d9+/f309peUg0hHKUmf9ZS2R5ei9iK1dV36LgKQi0cTh+I56Tfpv
+         1AZYbougvq+QUG2SvGtKmdoWunqsJs4Fykf/Khr15rVUcDxkX/BhG5mPecNslW5dxhfX
+         WvYpFMwgWb1VjFyDDb/T+9R1fSXs0k9f6XjSYUO5LIx4V10dsHx+XeGPM22eXfkDl0//
+         KePRZ0aKggvmtGX9kmBFsmZfKmMUs82ysllWiGfYKs3N64en2g68xqJEc3oopHFJ7FiB
+         gnW1kmH+kaMW1vkbljJpXKFZ9cao+f6rWFJsMSK1BF0Oszy6ZnhiwlVGeG2HUyaIJvBi
+         FuXQ==
+X-Gm-Message-State: AOAM531s1TGNpsm5G9hmU+UmfO+2gkCMtjMHXTiah8el3+g9+8qa6Kj+
+        NT8vwvn7U0NnLkr0XM3TotQ/y6pmUDMyzg==
+X-Google-Smtp-Source: ABdhPJyjHkWFxeI7Nr4q5qwN/7ZgfKDB0WA88trny4DDBhYHjfXfed1lo/AKXx7W8ipOQq9u4LvYsINKiUtzvw==
+X-Received: from dmatlack-heavy.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:19cd])
+ (user=dmatlack job=sendgmr) by 2002:a17:902:c202:b029:12d:65b0:fd3b with SMTP
+ id 2-20020a170902c202b029012d65b0fd3bmr3438229pll.25.1628886906702; Fri, 13
+ Aug 2021 13:35:06 -0700 (PDT)
+Date:   Fri, 13 Aug 2021 20:34:58 +0000
+Message-Id: <20210813203504.2742757-1-dmatlack@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.33.0.rc1.237.g0d66db33f3-goog
+Subject: [RFC PATCH 0/6] Pass memslot around during page fault handling
+From:   David Matlack <dmatlack@google.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     kvm@vger.kernel.org, Ben Gardon <bgardon@google.com>,
         Joerg Roedel <joro@8bytes.org>,
-        Andi Kleen <ak@linux.intel.com>,
-        Tianyu Lan <Tianyu.Lan@microsoft.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Peter Zijlstra <peterz@infradead.org>,
-        David Airlie <airlied@linux.ie>,
-        Daniel Vetter <daniel@ffwll.ch>,
-        Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
-        Maxime Ripard <mripard@kernel.org>,
-        Thomas Zimmermann <tzimmermann@suse.de>,
-        Will Deacon <will@kernel.org>, Dave Young <dyoung@redhat.com>,
-        Baoquan He <bhe@redhat.com>
-References: <cover.1627424773.git.thomas.lendacky@amd.com>
- <029791b24c6412f9427cfe6ec598156c64395964.1627424774.git.thomas.lendacky@amd.com>
- <166f30d8-9abb-02de-70d8-6e97f44f85df@linux.intel.com>
- <4b885c52-f70a-147e-86bd-c71a8f4ef564@amd.com>
- <20210811121917.ghxi7g4mctuybhbk@box.shutemov.name>
- <0a819549-e481-c004-7da8-82ba427b13ce@amd.com>
- <20210812100724.t4cdh7xbkuqgnsc3@box.shutemov.name>
- <943223d5-5949-6aba-8a49-0b07078d68e1@amd.com>
-Message-ID: <f6399958-d161-fd58-fac7-9b849bc4f05e@amd.com>
-Date:   Fri, 13 Aug 2021 15:17:12 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.11.0
-In-Reply-To: <943223d5-5949-6aba-8a49-0b07078d68e1@amd.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: SA9PR13CA0015.namprd13.prod.outlook.com
- (2603:10b6:806:21::20) To DM4PR12MB5229.namprd12.prod.outlook.com
- (2603:10b6:5:398::12)
-MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from office-ryzen.texastahm.com (67.79.209.213) by SA9PR13CA0015.namprd13.prod.outlook.com (2603:10b6:806:21::20) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4436.9 via Frontend Transport; Fri, 13 Aug 2021 20:17:14 +0000
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: fb04504a-2bc8-4b11-096f-08d95e97582d
-X-MS-TrafficTypeDiagnostic: DM4PR12MB5056:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <DM4PR12MB5056CC972FC97575617C9C45ECFA9@DM4PR12MB5056.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:8882;
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: HeKYrRV7+y6fb+GcsgwZgLn6m+17BeFDzSYIRsWs+5gk/EvKWEu2gSmv8RvTO/nfbvLfTRsKb1Rmu/IiexH4OmM5yzL1S1M0b1KCFnlSqI8q07PgcARl23shuBOwuXMPNwYrnU2x5cFzlC5kpomANRa9DYwDAdniG9jn0sUdyUssSht9Fj45WNk5kKyCNOwzQkl4Uwfx4ThxvNPm/2ZDWUUaD9h4KXaJfbXl7FOnHluKIb2zyecyHHGHT9LymYEJz5S7RJOMqqWviTNVR18VwG2DXy3EdmYfOUSweCmgr1F5+YNeYL0xuLozBRA3iCSoJ8z186DXgEqoQzPLgGIGWaJStbn3sjliQijGiQArX8StUtsSdv7beBuRfFRJgjp+PMjE74m12pIzia7y7ArUN+9FQfFGXdeMHBWOuZEkY7sXKBpAYhVZL+IzHjCsiTDaKb1dI/aEvOT+HEP3+0pFhWM+gj7aw1TS6rvljuEKICCuVKQxw/iZMHPFqMACRshww9+CkZF74+BBgpYEEwnfE4ZD2OYbNPPAX6HfzpgGABkpn12jKR5rTpzx/1EipOB3U2sOxGm7Mj13MUhqX7AkZsVTyrgswRhjfQpHB54uounI8FMHqOtfgpkX9CKnV73XHRj3NzUtA9k4wwtBs2k808QhRQvjOOhAoq+3kMA1KWhfE7oPISSKTsZBbqCFcKnt8I9jsZEFVs34Lo4rTbbD3u/3KCSJ0GktcSNcge0JTXo=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR12MB5229.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(396003)(346002)(376002)(39860400002)(136003)(366004)(8936002)(7416002)(86362001)(31696002)(6506007)(83380400001)(36756003)(6486002)(7406005)(66476007)(66556008)(53546011)(6512007)(31686004)(478600001)(316002)(2616005)(38100700002)(956004)(8676002)(66946007)(26005)(6916009)(2906002)(5660300002)(4326008)(186003)(54906003)(43740500002)(45980500001);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?QTZOV216SVRjR2pvTmN0RGhmT3VtRnJiQzVwZ1JSSTNSZXpET1RESUUzYVNY?=
- =?utf-8?B?L1lpY2EreHNqWE1JTUpwRDhRckxnWmJSNHlqdmxva21GRXFTM2o4Q2tPeVlK?=
- =?utf-8?B?N3UrZkNkcGhLc210WFlYTmtVL3FYcWVqamloTC9PWDVVSE5ySjQ0R2RyMHc4?=
- =?utf-8?B?dFE4SmZDSFJUWnl4VldYNlFIbld2RTBCUVF2dVhuYm5UVnUwOVBRWHEyUGQ4?=
- =?utf-8?B?amdPNGxtNkxBNkRsSXJhK0lPT2lIMUdNVlBaV1FwTWNNeE95c0hYZjQ0RlpZ?=
- =?utf-8?B?YTJ5aEVHeE9VeXB0bWs0MVY4cVdqRzAyYUZLK21ScE9rbXdDNWh5a0lnZFlT?=
- =?utf-8?B?aFVTaWlGUXBrYnNhcVExR1N6V1h2K01IU0JramhHeWZvV3M0RkZERkQ1M3NK?=
- =?utf-8?B?TW5iaU1EcGEzS2hYUklXUkdLR3FmYTg0NmFPWTdmKzI4RzBUcGNnTzcxeElw?=
- =?utf-8?B?NTVTeUJwcUVvWWFMWHp2ZjYvTEtuc09wQWF1MVErdHBodGlFQVZxRWVQMVNZ?=
- =?utf-8?B?N01IbmEyQjRkUFZxcDFCOVc3SG9ERVJETnViSFBCQW1obzdUQS9ENmZ0aG9n?=
- =?utf-8?B?OHhVamdFRXRWRnJNYWlJRTVIenVoK0Y2NE42V3FBS3R6Z0dEeFpRWVRSZXps?=
- =?utf-8?B?WTNmZUNtYm5sRG8yL3RZa2FkNjQvVklLT2owWmNzUHd0K3NIQ1NZYXdIdjUr?=
- =?utf-8?B?Wi92VG9pMG5NamNVeDF5YUpkaW9rUkRGM05EdXZUcTlDQk10ZjRpMVQrb3hr?=
- =?utf-8?B?NDdjZzVZKy9XYUp1VmZSa3Rveng3RG9SOFhGWmtHVlBRVEdoV3orajVsRVlt?=
- =?utf-8?B?bFJSNnJNMWV5WmRCbkFDYm5JQXF4cEtJZ2VRR1VPZ0NiOWdyUENHUUdqTERn?=
- =?utf-8?B?NmxKM2tja0tDc2JPYUxsVFdMNXZQai96Z1c0VlgzTWxsdGFNaHFTRmI2cDNZ?=
- =?utf-8?B?VTVMV0VBaUZBVjZlZVJ0aFhKWVBvZjZCZVhzb1NneG1wMlZtK0dTRTAveWsw?=
- =?utf-8?B?V0lVYmxuNzBENlhibkV2bVVTdEZZSVhXK3B0TEozZGpZYzd4c2ZRNjE5cVhw?=
- =?utf-8?B?RjB1Tk1DbkFDUXJycElqK0t5NGVaM3B6cTcvNVlReUxiR29jVnpVK0VOcFQy?=
- =?utf-8?B?Q2xYR1JoYlJFYXlvZlJxUCtQeERlTCt5ZEl1WEsxQ3R1eVhuSUNpVEVaaE9o?=
- =?utf-8?B?VHFwNnVzU0FPOHRQaUhFUWtLU1lBNlBtZ3RsNDBIMW5EMVhQYXVSZVpKREVN?=
- =?utf-8?B?c21HQjV2RHVTK3hsazFzVEJPSzhVM1BWeEgyajZRcjk3Y0FWbG9NTWV2OXNQ?=
- =?utf-8?B?WGQweHhuMURwc00xK0UvTVB1ek9VL2ZPcVNCdFNncWRzWm9ybFlvU2V2VnNB?=
- =?utf-8?B?MlhiaThjc2FYbTdGNENXM3dRby83cTUvYWtJTmpMdjdUVlliL251QVh3QVNH?=
- =?utf-8?B?MjBoTVpQOTMraUpGcnUvY1Z1aFJDQm5pQk9vY3JmaDJqYXY1QUtqQ1BIamo4?=
- =?utf-8?B?MzRCVjJqYmdUbXRJUEN5cWJWdi8yNUZBejlPdkZVdjFwQjJoWDJtVFdGS0Q0?=
- =?utf-8?B?d0MvU1JpZm4xKzNoejhlRlhaMUVEaUN3anJHdFJhdjcxUFh5OXlRd011R3RC?=
- =?utf-8?B?NFFlVzhUcmFJcm1rL2xCY1hwK0YvVVdua0ZNSi9TaTg0cjl5YTFjbjJ4UTJ1?=
- =?utf-8?B?TnQvbnVIS2Vvb2dsMWtQTFBPRFRmNFNDc0Q4dU1oLzNPYUZXTTJ0L0Z4aTdV?=
- =?utf-8?Q?X4j/QZYAY5VhEB8ISJ7ENzxDr6z08b94zP1ag1f?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: fb04504a-2bc8-4b11-096f-08d95e97582d
-X-MS-Exchange-CrossTenant-AuthSource: DM4PR12MB5229.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Aug 2021 20:17:17.8323
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 5rYKyb1eg9llUGfYKNWymW6AFqmswxWINdi5GxJCtmBK1fz+zhjdQgfi1wjlNeI3FFBkBzHHXR4HqtkxkzDSzw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB5056
+        Jim Mattson <jmattson@google.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        David Matlack <dmatlack@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 8/13/21 12:08 PM, Tom Lendacky wrote:
-> On 8/12/21 5:07 AM, Kirill A. Shutemov wrote:
->> On Wed, Aug 11, 2021 at 10:52:55AM -0500, Tom Lendacky wrote:
->>> On 8/11/21 7:19 AM, Kirill A. Shutemov wrote:
->>>> On Tue, Aug 10, 2021 at 02:48:54PM -0500, Tom Lendacky wrote:
->>>>> On 8/10/21 1:45 PM, Kuppuswamy, Sathyanarayanan wrote:
-> ...
->>>> Looking at code agains, now I *think* the reason is accessing a global
->>>> variable from __startup_64() inside TDX version of prot_guest_has().
->>>>
->>>> __startup_64() is special. If you access any global variable you need to
->>>> use fixup_pointer(). See comment before __startup_64().
->>>>
->>>> I'm not sure how you get away with accessing sme_me_mask directly from
->>>> there. Any clues? Maybe just a luck and complier generates code just 
->>>> right
->>>> for your case, I donno.
->>>
->>> Hmm... yeah, could be that the compiler is using rip-relative addressing
->>> for it because it lives in the .data section?
->>
->> I guess. It has to be fixed. It may break with complier upgrade or any
->> random change around the code.
-> 
-> I'll look at doing that separate from this series.
-> 
->>
->> BTW, does it work with clang for you?
-> 
-> I haven't tried with clang, I'll check on that.
+This series avoids kvm_vcpu_gfn_to_memslot() calls during page fault
+handling by passing around the memslot in struct kvm_page_fault. This
+idea came from Ben Gardon who authored an similar series in Google's
+kernel.
 
-Just as an fyi, clang also uses rip relative addressing for those 
-variables. No issues booting SME and SEV guests built with clang.
+This series is an RFC because kvm_vcpu_gfn_to_memslot() calls are
+actually quite cheap after commit fe22ed827c5b ("KVM: Cache the last
+used slot index per vCPU") since we always hit the cache. However
+profiling shows there is still some time (1-2%) spent in
+kvm_vcpu_gfn_to_memslot() and that hot instructions are the memory loads
+for kvm->memslots[as_id] and slots->used_slots. This series eliminates
+this remaining overhead but at the cost of a bit of code churn.
 
-Thanks,
-Tom
+Design
+------
 
-> 
-> Thanks,
-> Tom
-> 
->>
+We can avoid the cost of kvm_vcpu_gfn_to_memslot() by looking up the
+slot once and passing it around. In fact this is quite easy to do now
+that KVM passes around struct kvm_page_fault to most of the page fault
+handling code.  We can store the slot there without changing most of the
+call sites.
+
+The one exception to this is mmu_set_spte, which does not take a
+kvm_page_fault since it is also used during spte prefetching. There are
+three memslots lookups under mmu_set_spte:
+
+mmu_set_spte
+  rmap_add
+    kvm_vcpu_gfn_to_memslot
+  rmap_recycle
+    kvm_vcpu_gfn_to_memslot
+  set_spte
+    make_spte
+      mmu_try_to_unsync_pages
+        kvm_page_track_is_active
+          kvm_vcpu_gfn_to_memslot
+
+Avoiding these lookups requires plumbing the slot through all of the
+above functions. I explored creating a synthetic kvm_page_fault for
+prefetching so that kvm_page_fault could be passed to all of these
+functions instead, but that resulted in even more code churn.
+
+Patches
+-------
+
+Patches 1-2 are small cleanups related to the series.
+
+Patches 3-4 pass the memslot through kvm_page_fault and use it where
+kvm_page_fault is already accessible.
+
+Patches 5-6 plumb the memslot down into the guts of mmu_set_spte to
+avoid the remaining memslot lookups.
+
+Performance
+-----------
+
+I measured the performance using dirty_log_perf_test and taking the
+average "Populate memory time" over 10 runs. To help inform whether or
+not different parts of this series is worth the code churn I measured
+the performance of pages 1-4 and 1-6 separately.
+
+Test                            | tdp_mmu | kvm/queue | Patches 1-4 | Patches 1-6
+------------------------------- | ------- | --------- | ----------- | -----------
+./dirty_log_perf_test -v64      | Y       | 5.22s     | 5.20s       | 5.20s
+./dirty_log_perf_test -v64 -x64 | Y       | 5.23s     | 5.14s       | 5.14s
+./dirty_log_perf_test -v64      | N       | 17.14s    | 16.39s      | 15.36s
+./dirty_log_perf_test -v64 -x64 | N       | 17.17s    | 16.60s      | 15.31s
+
+This series provides no performance improvement to the tdp_mmu but
+improves the legacy MMU page fault handling by about 10%.
+
+David Matlack (6):
+  KVM: x86/mmu: Rename try_async_pf to kvm_faultin_pfn in comment
+  KVM: x86/mmu: Fold rmap_recycle into rmap_add
+  KVM: x86/mmu: Pass around the memslot in kvm_page_fault
+  KVM: x86/mmu: Avoid memslot lookup in page_fault_handle_page_track
+  KVM: x86/mmu: Avoid memslot lookup in rmap_add
+  KVM: x86/mmu: Avoid memslot lookup in mmu_try_to_unsync_pages
+
+ arch/x86/include/asm/kvm_page_track.h |   4 +-
+ arch/x86/kvm/mmu.h                    |   5 +-
+ arch/x86/kvm/mmu/mmu.c                | 110 +++++++++-----------------
+ arch/x86/kvm/mmu/mmu_internal.h       |   3 +-
+ arch/x86/kvm/mmu/page_track.c         |   6 +-
+ arch/x86/kvm/mmu/paging_tmpl.h        |  18 ++++-
+ arch/x86/kvm/mmu/spte.c               |  11 +--
+ arch/x86/kvm/mmu/spte.h               |   9 ++-
+ arch/x86/kvm/mmu/tdp_mmu.c            |  12 +--
+ 9 files changed, 80 insertions(+), 98 deletions(-)
+
+-- 
+2.33.0.rc1.237.g0d66db33f3-goog
+
