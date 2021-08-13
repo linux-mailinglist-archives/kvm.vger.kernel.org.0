@@ -2,128 +2,169 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0B2A43EB127
-	for <lists+kvm@lfdr.de>; Fri, 13 Aug 2021 09:12:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5549C3EB15E
+	for <lists+kvm@lfdr.de>; Fri, 13 Aug 2021 09:25:29 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239297AbhHMHM6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 13 Aug 2021 03:12:58 -0400
-Received: from forward2-smtp.messagingengine.com ([66.111.4.226]:57007 "EHLO
-        forward2-smtp.messagingengine.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S239273AbhHMHMv (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 13 Aug 2021 03:12:51 -0400
-Received: from compute6.internal (compute6.nyi.internal [10.202.2.46])
-        by mailforward.nyi.internal (Postfix) with ESMTP id 6F3C5194082F;
-        Fri, 13 Aug 2021 03:12:21 -0400 (EDT)
-Received: from mailfrontend2 ([10.202.2.163])
-  by compute6.internal (MEProxy); Fri, 13 Aug 2021 03:12:21 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-        messagingengine.com; h=cc:content-transfer-encoding:date:from
-        :in-reply-to:message-id:mime-version:references:subject:to
-        :x-me-proxy:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=
-        fm3; bh=Na61p0whGR1uV8+GWb5lTvOwW2DcHuUQ9yjAwPQAWmc=; b=W3Y/bJyJ
-        s/TaP4kL5tof0EPODzquOwz633HBOZLRNMSEm/Hq2HImr6tFhslaY/U3zwWmyILZ
-        FawhNfKFIp4eDAqFglzeShF7uuEoVqRmuTRrD7vyHkJpLK+bqvZIM1fBNmANKZfo
-        FZ3sbWG6P0txP3Vd71oQIDCLFkY72Ixd32qAVXSDgnQhFOEhnJXRdo00XvlX347p
-        jEh6R5MngjM82+xjpMYeefIMpiORG4nRH/Irn8O9mqmthLEUQ+XYALChaPD5Qwk9
-        PRE8ZB7eHKHOGfUGmoaxdMp8Sd6ZQ1O9PxLuSuNpGMZJEqeyRt+JZEWN1T8FMMdw
-        QaCtEmcXB6v9yw==
-X-ME-Sender: <xms:VRsWYY86sqtmj7jKJBq3ouAeivbCIzG9vp4z4A_PVIpe_N43SMaOdA>
-    <xme:VRsWYQuFSYG8oGzJRbi7dV83z1RHmSQoEp2dli1o1aXZ-6DWTXz6pBu4p7AT1sN9G
-    Oa7z30Mwiw286VfBtg>
-X-ME-Received: <xmr:VRsWYeDfWUH0bb8nyEGI-IchxjDHA2Mz3NjRIruy6A00mcLy6s0575taWYlX2AtGPOSsEv4ld7kw4mGHk-8_zc5iFfBPMc-ieLvNImG91Go>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvtddrkeeggdduudejucetufdoteggodetrfdotf
-    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
-    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
-    cujfgurhephffvufffkffojghfggfgsedtkeertdertddtnecuhfhrohhmpeffrghvihgu
-    ucfgughmohhnughsohhnuceouggrvhhiugdrvggumhhonhgushhonhesohhrrggtlhgvrd
-    gtohhmqeenucggtffrrghtthgvrhhnpedufeetjefgfefhtdejhfehtdfftefhteekhefg
-    leehfffhiefhgeelgfejtdehkeenucevlhhushhtvghrufhiiigvpedunecurfgrrhgrmh
-    epmhgrihhlfhhrohhmpegurghvihgurdgvughmohhnughsohhnsehorhgrtghlvgdrtgho
-    mh
-X-ME-Proxy: <xmx:VRsWYYf-ynmFY7tEK14iT2xe8fDPk0EX_wpbQrsnJszIJvDzdvl9Mg>
-    <xmx:VRsWYdNt0y4WQbwrGcW7ySgbK6-Rxb5g4r2v5JTA2NQcR5kpG7bWsQ>
-    <xmx:VRsWYSnxG54vOIChmcE3RRaPOLcXd_UemQVwBkvuHgE-WvchiTrDTw>
-    <xmx:VRsWYf3IbWbdjTDavkMuRIizTPCpOoiNYfGHdepQo4pdip8Fkz_3QbZuCrs>
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Fri,
- 13 Aug 2021 03:12:19 -0400 (EDT)
-Received: from localhost (disaster-area.hh.sledj.net [local])
-        by disaster-area.hh.sledj.net (OpenSMTPD) with ESMTPA id 8c26ee67;
-        Fri, 13 Aug 2021 07:12:12 +0000 (UTC)
-From:   David Edmondson <david.edmondson@oracle.com>
-To:     linux-kernel@vger.kernel.org
-Cc:     Jim Mattson <jmattson@google.com>, Borislav Petkov <bp@alien8.de>,
+        id S239379AbhHMHZv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 13 Aug 2021 03:25:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52258 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230194AbhHMHZt (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 13 Aug 2021 03:25:49 -0400
+Received: from mail.skyhub.de (mail.skyhub.de [IPv6:2a01:4f8:190:11c2::b:1457])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 521B8C061756;
+        Fri, 13 Aug 2021 00:25:22 -0700 (PDT)
+Received: from zn.tnic (p200300ec2f0a0d00146e00bd62432576.dip0.t-ipconnect.de [IPv6:2003:ec:2f0a:d00:146e:bd:6243:2576])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id BD9B61EC0502;
+        Fri, 13 Aug 2021 09:25:15 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
+        t=1628839515;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=nmXWc9Mx9goU+spJZe7CxGWS9UU2OCWKW5H4SIieayM=;
+        b=YzhQynmWvBYmCnTxz52HlGAcyETIX4lCAmHip19viBHA47bWQM34G1oyUksbAyP47NXuGy
+        fbDAoaWjtaE7Gdv+1KkneUSRpCVtePRPFqO32TIFPpxaCuCanybmK+pAl9SZP0WvHYc0vk
+        6QIdMtDry0XYn2lNKza17EYBAYV1CHM=
+Date:   Fri, 13 Aug 2021 09:25:54 +0200
+From:   Borislav Petkov <bp@alien8.de>
+To:     Brijesh Singh <brijesh.singh@amd.com>
+Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
+        linux-coco@lists.linux.dev, linux-mm@kvack.org,
+        linux-crypto@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Ingo Molnar <mingo@redhat.com>,
         Sean Christopherson <seanjc@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        David Matlack <dmatlack@google.com>, x86@kernel.org,
-        kvm@vger.kernel.org, David Edmondson <david.edmondson@oracle.com>
-Subject: [PATCH v4 4/4] KVM: x86: SGX must obey the KVM_INTERNAL_ERROR_EMULATION protocol
-Date:   Fri, 13 Aug 2021 08:12:11 +0100
-Message-Id: <20210813071211.1635310-5-david.edmondson@oracle.com>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20210813071211.1635310-1-david.edmondson@oracle.com>
-References: <20210813071211.1635310-1-david.edmondson@oracle.com>
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        David Rientjes <rientjes@google.com>,
+        Dov Murik <dovmurik@linux.ibm.com>,
+        Tobin Feldman-Fitzthum <tobin@ibm.com>,
+        Michael Roth <michael.roth@amd.com>,
+        Vlastimil Babka <vbabka@suse.cz>, tony.luck@intel.com,
+        npmccallum@redhat.com, brijesh.ksingh@gmail.com
+Subject: Re: [PATCH Part1 RFC v4 08/36] x86/sev: check the vmpl level
+Message-ID: <YRYegqsigZfrbFbk@zn.tnic>
+References: <20210707181506.30489-1-brijesh.singh@amd.com>
+ <20210707181506.30489-9-brijesh.singh@amd.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <20210707181506.30489-9-brijesh.singh@amd.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-When passing the failing address and size out to user space, SGX must
-ensure not to trample on the earlier fields of the emulation_failure
-sub-union of struct kvm_run.
+On Wed, Jul 07, 2021 at 01:14:38PM -0500, Brijesh Singh wrote:
+> Virtual Machine Privilege Level (VMPL) is an optional feature in the
+> SEV-SNP architecture, which allows a guest VM to divide its address space
+> into four levels. The level can be used to provide the hardware isolated
+> abstraction layers with a VM. The VMPL0 is the highest privilege, and
+> VMPL3 is the least privilege. Certain operations must be done by the VMPL0
+> software, such as:
+> 
+> * Validate or invalidate memory range (PVALIDATE instruction)
+> * Allocate VMSA page (RMPADJUST instruction when VMSA=1)
+> 
+> The initial SEV-SNP support assumes that the guest kernel is running on
+> VMPL0. Let's add a check to make sure that kernel is running at VMPL0
+> before continuing the boot. There is no easy method to query the current
+> VMPL level, so use the RMPADJUST instruction to determine whether its
+> booted at the VMPL0.
+> 
+> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
+> ---
+>  arch/x86/boot/compressed/sev.c    | 41 ++++++++++++++++++++++++++++---
+>  arch/x86/include/asm/sev-common.h |  1 +
+>  arch/x86/include/asm/sev.h        |  3 +++
+>  3 files changed, 42 insertions(+), 3 deletions(-)
+> 
+> diff --git a/arch/x86/boot/compressed/sev.c b/arch/x86/boot/compressed/sev.c
+> index 7be325d9b09f..2f3081e9c78c 100644
+> --- a/arch/x86/boot/compressed/sev.c
+> +++ b/arch/x86/boot/compressed/sev.c
+> @@ -134,6 +134,36 @@ static inline bool sev_snp_enabled(void)
+>  	return msr_sev_status & MSR_AMD64_SEV_SNP_ENABLED;
+>  }
+>  
+> +static bool is_vmpl0(void)
+> +{
+> +	u64 attrs, va;
+> +	int err;
+> +
+> +	/*
+> +	 * There is no straightforward way to query the current VMPL level. The
 
-Signed-off-by: David Edmondson <david.edmondson@oracle.com>
----
- arch/x86/kvm/vmx/sgx.c | 16 +++++-----------
- 1 file changed, 5 insertions(+), 11 deletions(-)
+So this is not nice at all.
 
-diff --git a/arch/x86/kvm/vmx/sgx.c b/arch/x86/kvm/vmx/sgx.c
-index 6693ebdc0770..35e7ec91ae86 100644
---- a/arch/x86/kvm/vmx/sgx.c
-+++ b/arch/x86/kvm/vmx/sgx.c
-@@ -53,11 +53,9 @@ static int sgx_get_encls_gva(struct kvm_vcpu *vcpu, unsigned long offset,
- static void sgx_handle_emulation_failure(struct kvm_vcpu *vcpu, u64 addr,
- 					 unsigned int size)
- {
--	vcpu->run->exit_reason = KVM_EXIT_INTERNAL_ERROR;
--	vcpu->run->internal.suberror = KVM_INTERNAL_ERROR_EMULATION;
--	vcpu->run->internal.ndata = 2;
--	vcpu->run->internal.data[0] = addr;
--	vcpu->run->internal.data[1] = size;
-+	uint64_t data[2] = { addr, size };
-+
-+	__kvm_prepare_emulation_failure_exit(vcpu, data, ARRAY_SIZE(data));
- }
- 
- static int sgx_read_hva(struct kvm_vcpu *vcpu, unsigned long hva, void *data,
-@@ -112,9 +110,7 @@ static int sgx_inject_fault(struct kvm_vcpu *vcpu, gva_t gva, int trapnr)
- 	 * but the error code isn't (yet) plumbed through the ENCLS helpers.
- 	 */
- 	if (trapnr == PF_VECTOR && !boot_cpu_has(X86_FEATURE_SGX2)) {
--		vcpu->run->exit_reason = KVM_EXIT_INTERNAL_ERROR;
--		vcpu->run->internal.suberror = KVM_INTERNAL_ERROR_EMULATION;
--		vcpu->run->internal.ndata = 0;
-+		kvm_prepare_emulation_failure_exit(vcpu);
- 		return 0;
- 	}
- 
-@@ -155,9 +151,7 @@ static int __handle_encls_ecreate(struct kvm_vcpu *vcpu,
- 	sgx_12_0 = kvm_find_cpuid_entry(vcpu, 0x12, 0);
- 	sgx_12_1 = kvm_find_cpuid_entry(vcpu, 0x12, 1);
- 	if (!sgx_12_0 || !sgx_12_1) {
--		vcpu->run->exit_reason = KVM_EXIT_INTERNAL_ERROR;
--		vcpu->run->internal.suberror = KVM_INTERNAL_ERROR_EMULATION;
--		vcpu->run->internal.ndata = 0;
-+		kvm_prepare_emulation_failure_exit(vcpu);
- 		return 0;
- 	}
- 
+And this VMPL level checking can't be part of the GHCB MSR protocol
+because the HV can tell us any VPML level it wants to.
+
+Is there a way to disable VMPL levels and say, this guest should run
+only at VMPL0?
+
+Err, I see SYSCFG[VMPLEn]:
+
+"VMPLEn. Bit 25. Setting this bit to 1 enables the VMPL feature (Section
+15.36.7 “Virtual Machine Privilege Levels,” on page 580). Software
+should set this bit to 1 when SecureNestedPagingEn is being set to 1.
+Once SecureNestedPagingEn is set to 1, VMPLEn cannot be changed."
+
+But why should that bit be set if SNP is enabled? Can I run a SNP guest
+without VPMLs, i.e, at an implicit VPML level 0?
+
+It says above VPML is optional...
+
+Also, why do you even need to do this at all since the guest controls
+and validates its memory with the RMP? It can simply go and check the
+VMPLs of every page it owns to make sure it is 0.
+
+Also, if you really wanna support guests with multiple VMPLs, then
+prevalidating its memory is going to be a useless exercise because it'll
+have to go and revalidate the VMPL levels...
+
+I also see this:
+
+"When the hypervisor assigns a page to a guest using RMPUPDATE, full
+permissions are enabled for VMPL0 and are disabled for all other VMPLs."
+
+so you get your memory at VMPL0 by the HV. So what is that check for?
+
+Questions over questions, I'm sure I'm missing an aspect.
+
+> +	 * simplest method is to use the RMPADJUST instruction to change a page
+> +	 * permission to a VMPL level-1, and if the guest kernel is launched at
+> +	 * at a level <= 1, then RMPADJUST instruction will return an error.
+
+
+WARNING: Possible repeated word: 'at'
+#156: FILE: arch/x86/boot/compressed/sev.c:146:
++        * permission to a VMPL level-1, and if the guest kernel is launched at
++        * at a level <= 1, then RMPADJUST instruction will return an error.
+
+
+How many times do I have to say:
+
+Please integrate scripts/checkpatch.pl into your patch creation
+workflow. Some of the warnings/errors *actually* make sense.
+
+?
+
 -- 
-2.30.2
+Regards/Gruss,
+    Boris.
 
+https://people.kernel.org/tglx/notes-about-netiquette
