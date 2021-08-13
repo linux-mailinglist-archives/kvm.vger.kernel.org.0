@@ -2,155 +2,194 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A8A183EB69B
-	for <lists+kvm@lfdr.de>; Fri, 13 Aug 2021 16:14:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 831143EB6A3
+	for <lists+kvm@lfdr.de>; Fri, 13 Aug 2021 16:21:21 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240192AbhHMOPI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 13 Aug 2021 10:15:08 -0400
-Received: from mail-mw2nam10on2070.outbound.protection.outlook.com ([40.107.94.70]:37020
-        "EHLO NAM10-MW2-obe.outbound.protection.outlook.com"
+        id S235768AbhHMOVq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 13 Aug 2021 10:21:46 -0400
+Received: from mail-dm6nam11on2070.outbound.protection.outlook.com ([40.107.223.70]:26176
+        "EHLO NAM11-DM6-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S236081AbhHMOPH (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 13 Aug 2021 10:15:07 -0400
+        id S233567AbhHMOVp (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 13 Aug 2021 10:21:45 -0400
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=F3Sdi4jH5qhFKph5kM18Dwe6K7aEwNJeQrD/6BVgynncPy9cdUoc5jMskgRf44ajWBOEcAhCyrgglEadKfAXc7f2V2FmZtGtsmzmYJ3pTOjvB2ziS24kPd25ERI5rIURmlTEL7kPfsw47CRaU+LaDjx3ArJk0fb/YtYwb2aXMQfR6Nw/nugIOYhGUBVO0MuENEd24w/gpFrWfzBxiFdNs0qR1VVmoBJdsrdUKBfYJ/Tp9XW3ek2DCUqmcG8dQb+E7wVIVs4kG+ME8dmQn1qLiy8ckaAoI+Wxc0T2k5WqXZCAB3KIKqinQ6qEi6DJX3faNtQtKbMsvonIFyR8uXZaKg==
+ b=Ne19XzovXIUurJCUI7TYwxSZSTISSCikfAKmPccSEskYI8U0yQXr9vlXPmbILbguqjmSzaPlxnSuyMlsSZv4wGApakhk5DHL93uqMeXErUy8DOMzQ75lErRtf/Dr+mW1J5Z7fvfria6vq2yfcQW5mg114b6gVYNmLVe61pcz9Sv6OgZAkfQkmvEv9OOrzJthqsAPL3KRYrlMEneHnCvbks0X5PowbVMYbDAgX5Wv+k73mTzfEZdfE9WPzb4ijm191hG39TLkVgiTziLAKdINL9WjZEZWK1kZn7hgFymUy2frek7b4jfsIyfYj9gE3Rl379qgREDMg0IUZ3v71l2KiA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ghmwH3/nCbVcjWKYe71YwWkwpP0h8+pKVLrUC9gXz7w=;
- b=bAdC+YD51UJIG3WSBZBRlujCSRzxthQLLCYJikRezIp2wS5sfBRVo72cTIiTdMtq/GuMpyZsWYqCA2RrpT6At2YALGDKMFokeEHNUB9ke87PyD/OCLMkSKe9EHaABZUopJHSbWquLIES8IqZ6zAB5fuAEKUx5Av2n2ybf/ZLezENmdGOc9a9/JzgIljpr4TjwPT+9CJ0ISR25fuEgZ6nBvhXpDWjDQspIFr6u80/oD0ONNqCmFfNlIDWcQYzH89iVANBRG1Q+m7gv9hgcv3Q8VH86nVpVU4W79aga73MLTqu/xopnxx3kc2kjxdyq/taP+O0jNJjUn8rCEMjvj+Mfw==
+ bh=VzOEbGD1NjT7zx8CjUUzUaHGs4jadV56i48/BH3yj9Q=;
+ b=Ykcj4DF07mWTh4c7r70+Z6p9a7oiAmi92Vn9CjHYKY20dPI+Mgp/91Ib/eWtd4p+w88izqsmDJ+EWmg7ThEwgErGeFer2kzX3JcH3uDWMiNL5WYq6VZmZQ3bzeAN+pcRTBXJNnOetx8SoqjJChImVNIMQyeXDWtregfmz84+Ii0rsY2l7yC71TbMHZneHLwUToq+w9k0lAWWpMleSnJs7LeiLjaxTkeTqgeinew0bMd4PNiLaE2bZpAeo4HogjfAJGGST2BeE2lL3P8pyQlnxlT9d1bxrnLkLjh3QiPHQnQJ6j0rc0+xsz+gDnN+LbbrpkMMhTxsm4HxKWxbdQ0Zkg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
  header.d=amd.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ghmwH3/nCbVcjWKYe71YwWkwpP0h8+pKVLrUC9gXz7w=;
- b=MSsbaB3F5CU4X6MZ5aRg4GM2Jjk2XWK6qsywVTp45YRv8E6WRtWXTPe9WLSJ5G2/MwKUkLLb9Uh4RZlpdJlYqHnMx2pCC4OXFxfXXiNnC7yYfM4JCbb3DfD6KvZYZQedP9dD9jweo9D1SRRAjl1aEwNAtrFkZQv+5+5fjbOkwJE=
-Authentication-Results: vger.kernel.org; dkim=none (message not signed)
- header.d=none;vger.kernel.org; dmarc=none action=none header.from=amd.com;
-Received: from MW3PR12MB4553.namprd12.prod.outlook.com (2603:10b6:303:2c::19)
- by MWHPR12MB1232.namprd12.prod.outlook.com (2603:10b6:300:10::20) with
+ bh=VzOEbGD1NjT7zx8CjUUzUaHGs4jadV56i48/BH3yj9Q=;
+ b=X/DpPj2qKwoodKy+BbpDc5m7DwB4Tk+SwVo6UJmnq/Pk7I94eIKK78EXXr8dXFSr/XUItMcmvrYPpiIPYzvF2Um4e4PQZsCZNFgep6AwJZbqWgGROEyCBhpOjLZytXgNnundEsil8fySoycjAtNP5T6UZ6P5Rn5J5wjGEYZOWBI=
+Authentication-Results: gmail.com; dkim=none (message not signed)
+ header.d=none;gmail.com; dmarc=none action=none header.from=amd.com;
+Received: from SN6PR12MB2718.namprd12.prod.outlook.com (2603:10b6:805:6f::22)
+ by SA0PR12MB4431.namprd12.prod.outlook.com (2603:10b6:806:95::11) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4415.15; Fri, 13 Aug
- 2021 14:14:39 +0000
-Received: from MW3PR12MB4553.namprd12.prod.outlook.com
- ([fe80::3987:37e5:4db7:944e]) by MW3PR12MB4553.namprd12.prod.outlook.com
- ([fe80::3987:37e5:4db7:944e%7]) with mapi id 15.20.4415.019; Fri, 13 Aug 2021
- 14:14:39 +0000
-Subject: Re: [kvm-unit-tests PATCH v2 0/2] Couple of SVM unit test fixes
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     seanjc@google.com, thuth@redhat.com, drjones@redhat.com,
-        kvm@vger.kernel.org
-References: <162880829114.21995.10386671727462287172.stgit@bmoger-ubuntu>
- <c5d156e5-e23d-4c82-42f2-33566af06ae1@redhat.com>
-From:   Babu Moger <babu.moger@amd.com>
-Message-ID: <91d5533b-d9db-5f61-095e-ad5ac532d032@amd.com>
-Date:   Fri, 13 Aug 2021 09:14:37 -0500
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4415.16; Fri, 13 Aug
+ 2021 14:21:16 +0000
+Received: from SN6PR12MB2718.namprd12.prod.outlook.com
+ ([fe80::78b7:7336:d363:9be3]) by SN6PR12MB2718.namprd12.prod.outlook.com
+ ([fe80::78b7:7336:d363:9be3%6]) with mapi id 15.20.4415.017; Fri, 13 Aug 2021
+ 14:21:16 +0000
+Cc:     brijesh.singh@amd.com, x86@kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
+        linux-coco@lists.linux.dev, linux-mm@kvack.org,
+        linux-crypto@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        David Rientjes <rientjes@google.com>,
+        Dov Murik <dovmurik@linux.ibm.com>,
+        Tobin Feldman-Fitzthum <tobin@ibm.com>,
+        Michael Roth <michael.roth@amd.com>,
+        Vlastimil Babka <vbabka@suse.cz>, tony.luck@intel.com,
+        brijesh.ksingh@gmail.com
+Subject: Re: [PATCH Part1 RFC v4 09/36] x86/compressed: Add helper for
+ validating pages in the decompression stage
+To:     Borislav Petkov <bp@alien8.de>
+References: <20210707181506.30489-1-brijesh.singh@amd.com>
+ <20210707181506.30489-10-brijesh.singh@amd.com> <YRZIA+qQ7EpO0zxC@zn.tnic>
+From:   Brijesh Singh <brijesh.singh@amd.com>
+Message-ID: <c519e685-5447-1847-2c97-99c5fcbbaa15@amd.com>
+Date:   Fri, 13 Aug 2021 09:21:14 -0500
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.11.0
-In-Reply-To: <c5d156e5-e23d-4c82-42f2-33566af06ae1@redhat.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <YRZIA+qQ7EpO0zxC@zn.tnic>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: SN1PR12CA0064.namprd12.prod.outlook.com
- (2603:10b6:802:20::35) To MW3PR12MB4553.namprd12.prod.outlook.com
- (2603:10b6:303:2c::19)
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: SA9PR13CA0026.namprd13.prod.outlook.com
+ (2603:10b6:806:21::31) To SN6PR12MB2718.namprd12.prod.outlook.com
+ (2603:10b6:805:6f::22)
 MIME-Version: 1.0
 X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from [10.236.31.0] (165.204.77.1) by SN1PR12CA0064.namprd12.prod.outlook.com (2603:10b6:802:20::35) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4415.16 via Frontend Transport; Fri, 13 Aug 2021 14:14:38 +0000
+Received: from [10.236.31.95] (165.204.77.1) by SA9PR13CA0026.namprd13.prod.outlook.com (2603:10b6:806:21::31) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4436.9 via Frontend Transport; Fri, 13 Aug 2021 14:21:15 +0000
 X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: c5060775-cd4b-4bb6-480f-08d95e64aff0
-X-MS-TrafficTypeDiagnostic: MWHPR12MB1232:
-X-Microsoft-Antispam-PRVS: <MWHPR12MB12328B8EF58157B3FA03A43095FA9@MWHPR12MB1232.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:6108;
+X-MS-Office365-Filtering-Correlation-Id: abaf655d-65a4-4d7a-5a68-08d95e659c76
+X-MS-TrafficTypeDiagnostic: SA0PR12MB4431:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <SA0PR12MB4431E6D1A8EC8E963CF2356CE5FA9@SA0PR12MB4431.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:3826;
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: ntnMcENVEzrxHv7v+1Zi/AVTMaQZaJfmd0xwwmhQ4fb+V92noPOlGy1y6hm/Y83SHh0mEfeq/7cmYIRmSJcwTaId2qu8Cl+5r7tc3PG7fQ3Zehrrwvny6u0o8EsMTyMMB8NVF/n7IpAl43ksYSUEArgUBgLvSkjSFjUPhzgRRfFbnItKNyOlKWyfVJ+YLXWu8toG/XtV5fstAlY8y+idfMNUsEOvUEoV2ZpDCJQCTLA/agbBIyuKJeL253CCTo8K322ol0s7+gfsFZfJEhSbmLYiD48sBIivzq2MhGSzEYrkqbVYpABMllWMNMqdsBxLdtR6zsjIM5/8qNV/F4XPkAaGc2HpuRKlz0uhZ7Bx5/+Ay5YF/SPpQ9FuuCwGTFQ29HEX8XpmUiY6K/mltxWCrWn20AlQ8beMW2kmO4VvZawojRDhSyQSolxfgfPdG6LvgULLzbGdFlt5PMeopHCQJ7TNjdyNZPCCbXC8kRi3Lm5PKp741A6VSXZvBlDGtF7MYPFjldH5eTb+xzVHxfgB1ojoZQXjib12FZmCS6O2B6UDuwmSf+B5iJ99JodTjL9TGUpUTIW2ugEk8xl0KNI6Ex+5I8tsx1B/DfazF+JW13gFQSHKsrtmizpsaQu823N007S+6W1moxJJPZ5Ov4o6fBqrptZKpmy2Mh2xzn2T5mt3P92s/+H6ZZBykfwGo8wLxCLkoqeNHdaSHkeVc1nBTpqj3UYzJkQcQ+lvGx8vDm4opoFzjj+3rrEJKImqJZ6jvhum58N7lvKplM/zpf3CWfJKNF4Opnxsvmb8nv19vZ4mdsGmPBr7UtNklMin51Xu08CNm8SwAux3c5RA+hsYFhAO/sKP74Kq2ffeyLOI2uE=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MW3PR12MB4553.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(346002)(376002)(39860400002)(396003)(136003)(366004)(16576012)(186003)(6916009)(478600001)(45080400002)(316002)(6486002)(966005)(86362001)(8936002)(4326008)(8676002)(956004)(2616005)(44832011)(38100700002)(38350700002)(31696002)(53546011)(52116002)(66946007)(66556008)(66476007)(26005)(83380400001)(36756003)(2906002)(5660300002)(31686004)(43740500002)(45980500001);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam-Message-Info: ea6oVCmQ3ph4c3t/GfddKikoC24q8pRQDAOrAC7XElp5vcOPUSsJETtt0MMQNAS/IPZe7tyQ2zJZSk3iM6FIK6ye/V8cLDc9Q0gp/2c7OPET34GyrN0jVfV6CvEDt8KFYil9O/D1iDfIU4AzGcvbcmxxnSh6lGvoLtTmQPiwfLnGENSWiyeNTtHyyOH0NEHH7RmrZ2tq3Xw5KW4mUQqGylLDcIVAgWSEpjBCxrV4CjjGyhphA/XraqLvAWqovrHk8e8ludtYdwgGIHOZiOyxBbUXHbz20NEefb+5D4O9wziMpY+9xccRqm1z1zhBFhuvfuEwaUKG3Vo9g4AobI3boLIdwXciUhycMB4lb4AmNAt0Ukikn3YjhamCYerDIi0NYm7axFfwGlmtZLNPpKnvzpPcfRrqiWDFTCJKYIXCzAJbdZngwUSgb5BYyb5j2Uyqgjq3ZMTBY+LfBWu0Gu5RmdDv14uSAhKbG1pHUDLoC4V87CcoS24H5tuPKDJldNIW+zSQ/6LyoroStBh0zPknZjpi5FxZerQyc2sMkuCJ3Z1pS+sEz6SwSc2FOnP6NG/qrSN0bJ0UC5tNEGV3Mv/zlQhGcSQRklEZpjRL3PJkm0M1zJy8rGK5ltctQISvKnokAK0l1jQYxpwbEM1+ljY/xEv9m2+Razm5tlkgUUxejzePK6+llr5Url6twF0ywbxwI52Tln3372ft3+oRqUpBIhMxVRSS2xhEx/zzFCJxA8VrSGYee0rnVr2eZpdTYWTxECDEtHQscFOKwCNdouWewg==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR12MB2718.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(346002)(39860400002)(396003)(136003)(376002)(2616005)(956004)(2906002)(478600001)(52116002)(53546011)(86362001)(7416002)(7406005)(316002)(6916009)(16576012)(5660300002)(54906003)(44832011)(4326008)(36756003)(31686004)(31696002)(66946007)(66556008)(26005)(66476007)(6486002)(38100700002)(8936002)(186003)(38350700002)(8676002)(43740500002)(45980500001);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?R0k5MHhHdkJ0OU1qYTEwV2QvY3pBeDBKUEdLZ3hBaG1JbFR5OFZUUUs1Tnhu?=
- =?utf-8?B?RFE4amNtZWRFeTFxNlg2cVErakRScXRrNlBvKzU3UG5sNDBwZ214WjFVcHg4?=
- =?utf-8?B?RTRyQk14UWt5UFhlSGVUZ1lsd1NCdjBlMEh2Y1dyUFlnc05LaGFBR2RLQ2Qx?=
- =?utf-8?B?Y1B3bk5NMFdycXR1a283bEFFMEJoOGtubXBHNWxibllJOFJ4N1NmdzRlZTE0?=
- =?utf-8?B?czNqUzZCdWZVeWcxL3BQN1NVRzAyVHdvWGdnTGd2VEh3N2RIS0hCSVRmWU81?=
- =?utf-8?B?T01oaFNvYUo5L1hBU1NiaFRZQmxtTVd4c2xDc05lWFpQTmJYY3dPRnkvZE9Y?=
- =?utf-8?B?NGhrWUJmVUEzWXZSR3d3SUg1bEZoV3JxRzY1eVNweXFNaE1qSFpBVWZCeEI1?=
- =?utf-8?B?QmZXU2xOWVU1ZUpzSkFtVXJVbGNJVXZ6WElDQnBMUmhNa0dmWnlraGxyWTBo?=
- =?utf-8?B?aEM4WHhqZWFaZ0J6azJBVzM5VEhYUEY3OHhPaXZYUXBGSUtVZlJla1JRRVV5?=
- =?utf-8?B?SmhvRGx0QTQ4dkVMeFdGN3FubXpTS0xFdHZjbUszQXkrUWRrdUFUK24vaEV3?=
- =?utf-8?B?cDZDNHZpTy9jTkpFR0NWSUR5QWRLZ0Y3RkVCdnhZY0tuckVXQlZ5bkxFUnlB?=
- =?utf-8?B?aWYyMVRaSENsZlMxQkd1OHloZmRPekNiNFNvNWs5b080ZmdsUzhqKy9xSUk0?=
- =?utf-8?B?dEc1WGRpWit6YjNFQ0tiamowUzh2a0tkS3dRSjdsaVR3TkM1U3RvTUdHRE92?=
- =?utf-8?B?RUtrVTZXTmxCVUJLZ0Z6M1hEQ1V6Q01UOGVZY25rZ3VKQjFseUpjdHFTaHNU?=
- =?utf-8?B?M2J5NjQ4MWU2bkdERFZJZnZHRHcrY1c3c0dNYVNnWHZ3ZkJyRGNrNjlDUFZO?=
- =?utf-8?B?NWZZYjJHa0dtNHlzRU81Z0pkcC9vZi9qVHVVNmJqLzJnYW04T1Q2Tm5aU3ZS?=
- =?utf-8?B?SEliOVRXY2ZxaGxYTVlyNXNicFc1ZGdUWnI1OHNSdEwxSitBWEV6Vk5WQ0pR?=
- =?utf-8?B?SXY2WUJrRGhXbER0WlJxQzQwdmhHZVhGR2tvcTViMkR6aFVqNTRmZkZxeHZO?=
- =?utf-8?B?M3gzTnFRUnBsaGdLL0xkV09jV0NTMjNPVHlFVms5dmFreVMzcXI2blJpOVZB?=
- =?utf-8?B?QlhkS0tmUVJlQjVTSTFYd3F4MDBYZkNJN0tZcDFBcHVGbmhXY3J0c3Rtb2RH?=
- =?utf-8?B?QTNINzRjeTllTUNrUVFJek1TQndIWXM2OElYQnArSjBqWGI5QmdrQ3pSMW9a?=
- =?utf-8?B?REZpRlg4YlVFWmpIZjkrZGNaZkxlY1FvZnlHVXVSVUJsZlZaUW1qV1drRUdP?=
- =?utf-8?B?UVZXVll5YzV5OS9mblNyYlBSejFVZTkwM2VpM2diT29HRUpKMDJYMXZTZkhJ?=
- =?utf-8?B?RWVmcW85bVhaRXAvRUs4YkRQYVNCYVNrZzZtZUFoeUQzNkhZemJLVEp2UFJJ?=
- =?utf-8?B?aEtLVHlOSmNxdTdWcjRkQ2JqMTlwb2hVY3M0UlhaT2dxa2R2YTFvTk9WRHI3?=
- =?utf-8?B?clEwWFBIYS9tZXZ2blcrYnhvUFVlNTJTSTMxaEVTaWxVTGNaV1UwQmJBZG5J?=
- =?utf-8?B?aGNCT0c1RkJuZ2F1YWNrbldqK0gwUnNUaCsvU3hsNGQxSnBNcGpRbUF3QW9R?=
- =?utf-8?B?RU0xcnJIRllKYXozMWR1QWd0TUZQbHZUR2duR0pROVBRWU12b3FpcUEvZy9H?=
- =?utf-8?B?d2dNUVFxeEF5T0tIY1FacHhVMSsweHc2N1hIMFI3eWJhV21pZ25kdE5zcVVR?=
- =?utf-8?Q?ZqX14Ae8gOAwVNBKn7PMoXfeocGjjWf0dp1Adrk?=
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?Mm5QTi9nbGp0RmhVTWExL1ZqM2svN2I2SjBTVFJjQ05YdmdreHJjSHZBMzlM?=
+ =?utf-8?B?TnpJS2ZCaEdBOENhcFFmUkhDbTc0eUJvQnJsTm9OSEl2d0d3L1dyMCtDQ0dZ?=
+ =?utf-8?B?blNzUWFlU0U3b0RPU1ZYald2ZUN3aUFjbWoyWDZDQ0RJS0J5Tk9KQ3lhRitt?=
+ =?utf-8?B?dlRIcmRPRnZGZm9vSERmY1k1dTdQZWlpTjRHVnVyNmRSa1ZFNzdXeS9yNUtU?=
+ =?utf-8?B?emdmakNFb3duU0ZyM1pLTHlORmpqMGpaNUhCTjVWVXpjMTRzM0xxeWJSbDJ3?=
+ =?utf-8?B?ZVVTMDhSQXY5VEVpa1hGK2pjYnJ6V3hIclNuZWFIcTVDWkIxN2dEMklHb2F5?=
+ =?utf-8?B?R2xadHZUQk9lNmFsbkQwdDJEL0YrK2M5Nmg4THVGU3JPUmVyV2FWVGV0T09p?=
+ =?utf-8?B?bVh6MlRlSFk0V3g5c0tCNzZ3QUErQ09SRjMrcVlUcXNIeHptNlU0Tk1BenFr?=
+ =?utf-8?B?MUZKdXkxdWxKOXVrUXVickJtM25WVWFVVmZwZGQ1WElyWGRFRjViQjRzOGFH?=
+ =?utf-8?B?VVFpQWFSaUtvZFdLY2xQa2FpSmVPNTF5QUhLSmFmVWFXQm0zNHZSUzZhM1R1?=
+ =?utf-8?B?d1pybjdrTm1IUHY0d095dnNrY1N1dUFiRytjbDhrbUFnd0gxcjFGVmNhR1VF?=
+ =?utf-8?B?RXh0TVU2UHBacVhUVnNieUU2MkF6VzA5d0JwRkFpU3RNdnhwcGkwTFdvVFFy?=
+ =?utf-8?B?R2VPQU44TUxUcXMxNUFrUG9iN1VQT1VaNlJORHAxdGNRSTlYU3NkZFdicEYw?=
+ =?utf-8?B?RzIrVjBuSVBaOUZGUE9OUENNenZYSHRubUVoZi9ZQWg0SmtndmNnQmc4ZlpE?=
+ =?utf-8?B?SEJGUHdhZzRZOWNWOVJCTFVMK1I5MW1iY0YzeDBjQ0FOTnpHU3R2L3hDam5h?=
+ =?utf-8?B?ZUo0aFNHQStWREs2cXBKRHFpaktPTmVvRE5INGcrU3pQOFVJUmpMemFQWVhH?=
+ =?utf-8?B?TkpHSThlWlJDb1l5bXFXSzBwTXo0dE9MbHhISGRvazY3L1M0ekh5THdiN3Rw?=
+ =?utf-8?B?Nk43S1ZzMTJVb1FBNnNqcE45UmZPMGUwdnNkcmhVL1hKMERFbXEydVlKWW9P?=
+ =?utf-8?B?cmNXczA5b1NXZ0tBVzZIclJ0WkIxNmdMMXltSlY2ODlsclF2cDhDamIxUDRj?=
+ =?utf-8?B?eUVtMksvYjZqbEpBT014a1ArOVVMVkZRUUxrVjBmRUJlbWorRGVhMEEvSVQ3?=
+ =?utf-8?B?WjJiZ3JTV0xENm1zTnc2K3NGdTF6UzVTMzZUeVBrTnFIdnZsMlJTUE8xTVVa?=
+ =?utf-8?B?V0dpRWVPd1FNaWgwY2dMMUkrdkxNLzI0YjBMZyttSVhjRGh4V1ptRUxRNUdk?=
+ =?utf-8?B?QWM1N2pya3pjRkxtaHZMR3hDVHVWYmVJQWNSY1RrMUV4TjVRckpINGJJTlQ4?=
+ =?utf-8?B?OXNYMjdjcTJnNjE0NUZtTWFaek42clFheXlsZHJwaVpwdGZIY0VTeXhydEVa?=
+ =?utf-8?B?QlIyb3FXMGRmbWZLVTRiem5OaHdwVnQzTUJ5aDFoalVFV0NMSTJiZWF1dHlH?=
+ =?utf-8?B?bGVLdFM1cXNvUm9GRE9oa3puZ2N6Y0QrY3VzRU9JN0JhbnFsVFV3Q01jWWZt?=
+ =?utf-8?B?S2dhbkhiVTZhOE5uTGFEaE9lZlVuM2ZCV2I0ZWJBekxDOThwM3N1RjVRT3Ir?=
+ =?utf-8?B?QlgvdTJ3UWluTUZpMnFMT1psdDM5THZpSHozbGVaMWVTY1dVVU5QZW9NMlUw?=
+ =?utf-8?B?SFRBbUJoekVFWXFHUUZIcXc0bjUwT28zQkZuOFlVZHZ5aUxPakVIa0pFd2N2?=
+ =?utf-8?Q?IkY/oOT6KBLlZlIPSpka16KgE9E+fVuzXVp20wQ?=
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: c5060775-cd4b-4bb6-480f-08d95e64aff0
-X-MS-Exchange-CrossTenant-AuthSource: MW3PR12MB4553.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: abaf655d-65a4-4d7a-5a68-08d95e659c76
+X-MS-Exchange-CrossTenant-AuthSource: SN6PR12MB2718.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Aug 2021 14:14:39.3894
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Aug 2021 14:21:16.2513
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 3H+Eh1fATgGVhybfHRa8gX5Mr1g1JF+dAdeqSwwlNpxq8keca9EMW5ENf644RrcD
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MWHPR12MB1232
+X-MS-Exchange-CrossTenant-UserPrincipalName: nYY1dE0DoghugYyAuk6kJ7qlY0DckWtY3cWtgOgOC2FVEhz0CbNIHvZxakPMnrz1y6jNR2HAUMzwkDSe4RT9Gw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA0PR12MB4431
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
 
-On 8/13/21 5:38 AM, Paolo Bonzini wrote:
-> On 13/08/21 00:46, Babu Moger wrote:
->> This series fixes couple of unittest failures for SVM.
->> 1.The test ./x86/access is failing with timeout.
->> 2.The test ./x86/svm failure with infinite loop.
->> ---
->> v2:
->>   1. Modified the check in ac_test_legal to limit the number of test
->>      combinations based on comments from Paolo Bonzini and Sean
->> Christopherson.
->>   2. Changed the rdrand function's retry method. Kept the retry outside the
->>      function. Tom Lendacky commented that RDRAND instruction can sometimes
->>      loop forever without setting the carry flag.
->>    v1:
->>  
->> https://nam11.safelinks.protection.outlook.com/?url=https%3A%2F%2Flore.kernel.org%2Fkvm%2F162826604263.32391.7580736822527851972.stgit%40bmoger-ubuntu%2F&amp;data=04%7C01%7Cbabu.moger%40amd.com%7C37359356e8fa4a0c33bf08d95e4690ae%7C3dd8961fe4884e608e11a82d994e183d%7C0%7C0%7C637644479455847518%7CUnknown%7CTWFpbGZsb3d8eyJWIjoiMC4wLjAwMDAiLCJQIjoiV2luMzIiLCJBTiI6Ik1haWwiLCJXVCI6Mn0%3D%7C1000&amp;sdata=JFA5zk9xqFpdbASQlHyTVtpn7yBhF1mk9NFaKrllYjU%3D&amp;reserved=0
->>
->>
->> Babu Moger (2):
->>        x86: access: Fix timeout failure by limiting number of tests
->>        nSVM: Fix NPT reserved bits test hang
->>
->>
->>   lib/x86/processor.h |   11 +++++++++++
->>   x86/access.c        |   11 +++++++----
->>   x86/svm_tests.c     |   28 ++++++++++++++++++++++++----
->>   3 files changed, 42 insertions(+), 8 deletions(-)
->>
->> -- 
->>
+On 8/13/21 5:22 AM, Borislav Petkov wrote:
+>> +static void __page_state_change(unsigned long paddr, int op)
 > 
-> Applied, thanks.  I'm looking at a few more limits to the number of tests
-> as well as optimizations to ac_emulate_access, which should reduce the
-> runtime further.
+> That op should be:
+> 
+> enum psc_op {
+> 	SNP_PAGE_STATE_SHARED,
+> 	SNP_PAGE_STATE_PRIVATE,
+> };
+> 
 
-Paolo, Thanks for applying. I will test your patches and let you know.
+Noted.
+
+> and have
+> 
+> static void __page_state_change(unsigned long paddr, enum psc_op op)
+> 
+> so that the compiler can check you're at least passing from the correct
+> set of defines.
+> 
+>> diff --git a/arch/x86/include/asm/sev-common.h b/arch/x86/include/asm/sev-common.h
+>> index ea508835ab33..aee07d1bb138 100644
+>> --- a/arch/x86/include/asm/sev-common.h
+>> +++ b/arch/x86/include/asm/sev-common.h
+>> @@ -45,6 +45,23 @@
+>>   		(((unsigned long)reg & GHCB_MSR_CPUID_REG_MASK) << GHCB_MSR_CPUID_REG_POS) | \
+>>   		(((unsigned long)fn) << GHCB_MSR_CPUID_FUNC_POS))
+>>   
+>> +/* SNP Page State Change */
+>> +#define GHCB_MSR_PSC_REQ		0x014
+>> +#define SNP_PAGE_STATE_PRIVATE		1
+>> +#define SNP_PAGE_STATE_SHARED		2
+>> +#define GHCB_MSR_PSC_GFN_POS		12
+>> +#define GHCB_MSR_PSC_GFN_MASK		GENMASK_ULL(39, 0)
+>> +#define GHCB_MSR_PSC_OP_POS		52
+>> +#define GHCB_MSR_PSC_OP_MASK		0xf
+>> +#define GHCB_MSR_PSC_REQ_GFN(gfn, op)	\
+>> +	(((unsigned long)((op) & GHCB_MSR_PSC_OP_MASK) << GHCB_MSR_PSC_OP_POS) | \
+>> +	((unsigned long)((gfn) & GHCB_MSR_PSC_GFN_MASK) << GHCB_MSR_PSC_GFN_POS) | \
+>> +	GHCB_MSR_PSC_REQ)
+>> +
+>> +#define GHCB_MSR_PSC_RESP		0x015
+>> +#define GHCB_MSR_PSC_ERROR_POS		32
+>> +#define GHCB_MSR_PSC_RESP_VAL(val)	((val) >> GHCB_MSR_PSC_ERROR_POS)
+>> +
+> 
+> Also get rid of eccessive defines...
+
+I am getting conflicting review comments on function naming, comment 
+style, macro etc. While addressing the feedback I try to incorporate all 
+those comments, lets see how I do in next rev.
+
 thanks
-Babu
