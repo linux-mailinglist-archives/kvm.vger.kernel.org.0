@@ -2,108 +2,119 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0BA7A3EBA2C
-	for <lists+kvm@lfdr.de>; Fri, 13 Aug 2021 18:35:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DAC123EBA34
+	for <lists+kvm@lfdr.de>; Fri, 13 Aug 2021 18:39:03 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235378AbhHMQgJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 13 Aug 2021 12:36:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38388 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233827AbhHMQgI (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 13 Aug 2021 12:36:08 -0400
-Received: from mail-pj1-x1029.google.com (mail-pj1-x1029.google.com [IPv6:2607:f8b0:4864:20::1029])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ABF1AC061756
-        for <kvm@vger.kernel.org>; Fri, 13 Aug 2021 09:35:41 -0700 (PDT)
-Received: by mail-pj1-x1029.google.com with SMTP id w13-20020a17090aea0db029017897a5f7bcso16740085pjy.5
-        for <kvm@vger.kernel.org>; Fri, 13 Aug 2021 09:35:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=HP9HeO2dKDdIM1vYJ0w/zQNtFn885ttrO64ykJSZNtI=;
-        b=fOwLFVASK5AGXkp2LCYCLBNFRPnddmbeH6u+YCEy0mzAFCy7tlsAu8ExIR6YxyQ8Sa
-         BdjbW6XS+ZmUum8eerKCyZ6Yue1DtjDizYoAOMRnGZIN3TPwrQvGXVTamJRvIylTs+5g
-         MNbJpN5G9S4Ukd/PpnkpYlATKDrH+oPZBPsPCvNgzarLkSc5beDLm3ibXWjkTkpnB2vE
-         B6ev17fL3d7oArXRcWhBKuir35NHnbqCBQ6FpR4sQigN6cYJb1Yu58i7x7eCOBRB9oxw
-         TchZvirslzMhJ0tKT7oboJJ68NhmYDoY94woD9voFQ41J37e45kiLLDGWDVm67rjbtQx
-         yrMw==
+        id S235642AbhHMQj2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 13 Aug 2021 12:39:28 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:52893 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S234367AbhHMQj1 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 13 Aug 2021 12:39:27 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1628872740;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=/XxhUQFWXy6zXss0bwZob8zlLwav1FMwUCDBU4JYgrE=;
+        b=eJVoAAYWQMGcEMx79S+WnIm90tNWjIRUFiT3cCKKS1GRPaI8bLH41IfzV4f6YtfYT72DZb
+        RGoPOLMZSzyQOu5NeSZGCaSCL9xZD7au4wxZr8yXuF4NbmVUArVLIDKSAFnfZTy7gaq+uc
+        43R/IX9fky80fcLdpnIAUyCBXLuhVJ0=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-161-4AG3GBlKOn-1BGJe5baKdA-1; Fri, 13 Aug 2021 12:38:58 -0400
+X-MC-Unique: 4AG3GBlKOn-1BGJe5baKdA-1
+Received: by mail-wm1-f71.google.com with SMTP id y206-20020a1c7dd70000b02902e6a442ea44so4495707wmc.9
+        for <kvm@vger.kernel.org>; Fri, 13 Aug 2021 09:38:58 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=HP9HeO2dKDdIM1vYJ0w/zQNtFn885ttrO64ykJSZNtI=;
-        b=imZe2nzRXk3MfHpcKaAO+I0RVmvAT7GavFF8wBWzjLs2RN522R449xA1EBeGNywUaU
-         RPg3uGWgK6/sd1g/mhhJS+nMyV2hBTMiNf9ije1ggxxFScFGyw3b7wxs/VdrIGpe+PWG
-         Ydl/XNuhm6O3mpFjAQNcleRTEmdqwQITPwR86Iy4lmHf83CVPXAj6DYqruo2LrOfVGi1
-         SRqisvvfQMrbMKbhVVo3LvfdfqfwtXiQk5007DRasTmrkdDZn9J+Up3pgB8PPJmjRQNz
-         8p3yfdofAdILAz3XdcmcqnOYMMMqXLPE8Cf4eMyt/nFCqE5qXdeiL8e8QihzyOZtWsIo
-         48aQ==
-X-Gm-Message-State: AOAM530rpwBNBfHZYKneEkgDEY+Ard61WOtbjAE2A6v9xiSDKOV/JQV8
-        6eDSXSnI1iW0Tzwp11A40n4ZMw==
-X-Google-Smtp-Source: ABdhPJzar808ZU8LpYb9uDQ6rhW47LxD+qhmPnzoQAjdPbS6svcOjDw+3HMa4Zi//E0fbN3lKG2Ihw==
-X-Received: by 2002:a17:90a:2fc2:: with SMTP id n2mr3230144pjm.112.1628872541032;
-        Fri, 13 Aug 2021 09:35:41 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id v63sm3437412pgv.59.2021.08.13.09.35.40
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 13 Aug 2021 09:35:40 -0700 (PDT)
-Date:   Fri, 13 Aug 2021 16:35:34 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Jim Mattson <jmattson@google.com>
-Cc:     Oliver Upton <oupton@google.com>, kvm@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Peter Shier <pshier@google.com>
-Subject: Re: [PATCH v2 4/5] KVM: nVMX: Emulate MTF when performing
- instruction emulation
-Message-ID: <YRafVro7jZoswngG@google.com>
-References: <20200128092715.69429-1-oupton@google.com>
- <20200128092715.69429-5-oupton@google.com>
- <CALMp9eT+bbnjZ_CXn6900LxtZ5=fZo3-3ZLp1HL2aHo6Dgqzxg@mail.gmail.com>
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=/XxhUQFWXy6zXss0bwZob8zlLwav1FMwUCDBU4JYgrE=;
+        b=VmHvPFFTZFzG8BuGABFM42eIbbh4jlcwDAeul+So0yTy2GZcHeoAFb8FwOudrifu6Y
+         J5o4iZsg9cWiLlPRAR/Us6iNYmE+X+vA5fCcPDP8GjOUb0i3Lj5uecWJWNOiO66Kjqha
+         dyiN8jqK2g7S/tPKGqtRQn5x0Eh03HeJWLFu5BmDCHOg7MN879FAuMxyYas9QY0R3q4Y
+         u08p83QKNMgKv9QlgXoJmWpxWfhCD/0SXuknQpBhSczH1kyRWUIvHKTAX8JXyWBEgCt4
+         cNODJx8Zt3szSlQO5mp3GAs01Rf0LzNk+4Nv/9Pv0WPbCpd3CofuED694NdYosv03q1c
+         zb8w==
+X-Gm-Message-State: AOAM533EpnHwiz8OQlwGZd4agfcpuCpZNc2tdSjL88xih6goHynNFxlJ
+        +Gvki9LBcnsLQcE5rPaaKyGJ3uCn2FfLPcqh5+pxPspASG/0qRKEzcM4P0mC75esBaO/bTEmkho
+        gd7IdXZ8yAB+m
+X-Received: by 2002:a1c:4c05:: with SMTP id z5mr3484699wmf.145.1628872737633;
+        Fri, 13 Aug 2021 09:38:57 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwC6stTt1zfIk+HUVQG+yNxjf+4NlHQz9JRcodQI5y8z7vijkPCLwAnX/jxPPBjWVFF3V6GVQ==
+X-Received: by 2002:a1c:4c05:: with SMTP id z5mr3484685wmf.145.1628872737424;
+        Fri, 13 Aug 2021 09:38:57 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+        by smtp.gmail.com with ESMTPSA id w9sm1840071wmc.19.2021.08.13.09.38.55
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 13 Aug 2021 09:38:56 -0700 (PDT)
+Subject: Re: [PATCH 2/2] KVM: x86/mmu: Don't step down in the TDP iterator
+ when zapping all SPTEs
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Ben Gardon <bgardon@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm <kvm@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>
+References: <20210812050717.3176478-1-seanjc@google.com>
+ <20210812050717.3176478-3-seanjc@google.com>
+ <CANgfPd8HSYZbqmi21XQ=XeMCndXJ0+Ld0eZNKPWLa1fKtutiBA@mail.gmail.com>
+ <YRVVWC31fuZiw9tT@google.com>
+ <928be04d-e60e-924c-1f3a-cb5fef8b0042@redhat.com>
+ <YRVbamoQhvPmrEgK@google.com>
+ <7a95b2f6-a7ad-5101-baa5-6a19194695a3@redhat.com>
+ <YRVebIjxEv87I55b@google.com>
+ <b08a7751-20c3-26fc-522e-c4cf274d9a6c@redhat.com>
+ <YRaaIi9Go38E3mUh@google.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <0086ef77-ce5f-3e89-0cbd-b17d4dccaacf@redhat.com>
+Date:   Fri, 13 Aug 2021 18:38:54 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.11.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CALMp9eT+bbnjZ_CXn6900LxtZ5=fZo3-3ZLp1HL2aHo6Dgqzxg@mail.gmail.com>
+In-Reply-To: <YRaaIi9Go38E3mUh@google.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Aug 12, 2021, Jim Mattson wrote:
-> On Tue, Jan 28, 2020 at 1:27 AM Oliver Upton <oupton@google.com> wrote:
-> >
-> > Since commit 5f3d45e7f282 ("kvm/x86: add support for
-> > MONITOR_TRAP_FLAG"), KVM has allowed an L1 guest to use the monitor trap
-> > flag processor-based execution control for its L2 guest. KVM simply
-> > forwards any MTF VM-exits to the L1 guest, which works for normal
-> > instruction execution.
-> >
-> > However, when KVM needs to emulate an instruction on the behalf of an L2
-> > guest, the monitor trap flag is not emulated. Add the necessary logic to
-> > kvm_skip_emulated_instruction() to synthesize an MTF VM-exit to L1 upon
-> > instruction emulation for L2.
-> >
-> > Fixes: 5f3d45e7f282 ("kvm/x86: add support for MONITOR_TRAP_FLAG")
-> > Signed-off-by: Oliver Upton <oupton@google.com>
-> > ---
-
-...
-
-> > diff --git a/arch/x86/include/uapi/asm/kvm.h b/arch/x86/include/uapi/asm/kvm.h
-> > index 503d3f42da16..3f3f780c8c65 100644
-> > --- a/arch/x86/include/uapi/asm/kvm.h
-> > +++ b/arch/x86/include/uapi/asm/kvm.h
-> > @@ -390,6 +390,7 @@ struct kvm_sync_regs {
-> >  #define KVM_STATE_NESTED_GUEST_MODE    0x00000001
-> >  #define KVM_STATE_NESTED_RUN_PENDING   0x00000002
-> >  #define KVM_STATE_NESTED_EVMCS         0x00000004
-> > +#define KVM_STATE_NESTED_MTF_PENDING   0x00000008
+On 13/08/21 18:13, Sean Christopherson wrote:
+> On Fri, Aug 13, 2021, Paolo Bonzini wrote:
+>> On 12/08/21 19:46, Sean Christopherson wrote:
+>>>>> 	if (iter->level == iter->min_level)
+>>>>> 		return false;
+>>>>>
+>>>>> 	/*
+>>>>> 	 * Reread the SPTE before stepping down to avoid traversing into page
+>>>>> 	 * tables that are no longer linked from this entry.
+>>>>> 	 */
+>>>>> 	iter->old_spte = READ_ONCE(*rcu_dereference(iter->sptep));  \
+>>>>>                                                                         ---> this is the code that is avoided
+>>>>> 	child_pt = spte_to_child_pt(iter->old_spte, iter->level);   /
+>>>>> 	if (!child_pt)
+>>>>> 		return false;
+>>>> Ah, right - so I agree with Ben that it's not too important.
+>>> Ya.  There is a measurable performance improvement, but it's really only
+>>> meaningful when there aren't many SPTEs to zap, otherwise the cost of zapping
+>>> completely dominates the time.
+>>
+>> I don't understand.  When try_step_down is called by tdp_iter_next, all it
+>> does is really just the READ_ONCE, because spte_to_child_pt will see a
+>> non-present PTE and return immediately.  Why do two, presumably cache hot,
+>> reads cause a measurable performance improvement?
 > 
-> Maybe I don't understand the distinction, but shouldn't this new flag
-> have a KVM_STATE_NESTED_VMX prefix and live with
-> KVM_STATE_VMX_PREEMPTION_TIMER_DEADLINE, below?
+> It's entirely possible my measurements were bad and/or noisy.  Ah, and my kernel
+> was running with CONFIG_PROVE_RCU=y, which makes the rcu_dereference() quite a bit
+> more expensive.
 
-That does seem to be the case, seems highly unlikely SVM will add MTF.  And SVM's
-KVM_STATE_NESTED_GIF_SET should have been SVM specific, but kvm_svm_nested_state_hdr
-doesn't even reserve a flags field :-/
+It's one line of code and it makes sense, so I can certainly include the 
+patch.  I was just a bit confused.
 
-> >  #define KVM_STATE_NESTED_SMM_GUEST_MODE        0x00000001
-> >  #define KVM_STATE_NESTED_SMM_VMXON     0x00000002
+Paolo
+
