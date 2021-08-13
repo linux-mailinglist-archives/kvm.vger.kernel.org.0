@@ -2,77 +2,78 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D24043EB9E3
-	for <lists+kvm@lfdr.de>; Fri, 13 Aug 2021 18:18:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2F56C3EBA04
+	for <lists+kvm@lfdr.de>; Fri, 13 Aug 2021 18:28:54 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230521AbhHMQSZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 13 Aug 2021 12:18:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34094 "EHLO
+        id S235893AbhHMQ3S (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 13 Aug 2021 12:29:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36626 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229471AbhHMQSY (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 13 Aug 2021 12:18:24 -0400
-Received: from mail-ed1-x532.google.com (mail-ed1-x532.google.com [IPv6:2a00:1450:4864:20::532])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A7CA2C061756
-        for <kvm@vger.kernel.org>; Fri, 13 Aug 2021 09:17:57 -0700 (PDT)
-Received: by mail-ed1-x532.google.com with SMTP id z11so16147081edb.11
-        for <kvm@vger.kernel.org>; Fri, 13 Aug 2021 09:17:57 -0700 (PDT)
+        with ESMTP id S235597AbhHMQ3O (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 13 Aug 2021 12:29:14 -0400
+Received: from mail-pl1-x631.google.com (mail-pl1-x631.google.com [IPv6:2607:f8b0:4864:20::631])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 50707C0617AD
+        for <kvm@vger.kernel.org>; Fri, 13 Aug 2021 09:28:47 -0700 (PDT)
+Received: by mail-pl1-x631.google.com with SMTP id q2so12629633plr.11
+        for <kvm@vger.kernel.org>; Fri, 13 Aug 2021 09:28:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=u/fXuSTf/7nmSfAPH75rFa4Zgui6hAM0XOdM2IGchK0=;
-        b=qEdrsc6sVnMCk57uQk9QHcz70n6V6Fr4mtqnky5UEI1CoEz2rT0N3c7d3QFAofTPPV
-         sr6QyYAbb/9IMNnIWgsSr89ieGLwV+lS7cr459vNlfrMlee9nwsJZd+85UP4D0vdRsok
-         +5Wa3iCI4SfiIfVK6UiyCmrPjYeH4uRxGYcbbqY4q3YidsdwaIHxjdv4iC835qld0uGX
-         VuiZdLZGM5wnYRb/93iQFvfFInqlRUXVsPfakcF6AAySyLDCsIVeUMVINIyE17NYt7Fr
-         MfC9+kwupW/Tq8Uwj1aD4ONSSBF8N8BkrnwGSXZ2RaCI/0W3sadWiNeF/APLqycmrtxC
-         rMDQ==
+        d=google.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=5vsrCAhIhqleSp4ilnt79j6IYc6DztFKdxcos4U/Zdw=;
+        b=s/gPWOK8ezdqks7mEUKZQGuY3ur/s9nmz5Xm799RPiVLlhDeWVeLaq4jwY6wGUpZzk
+         kfQBYmld7FNccLGlURTq+4X5SM0Ld67qddVGTEfkj/tWtjysVvvlgA9C5m3Fkd/bpjp/
+         MU6i66OntDLzok1dUjkKiGJO+DggV18HL7D+s7JnFal3Pi8D4HjcE9JwyuF7DVt7YChG
+         uZ9Uv4Wg0ycik3MJ+eAR6cidd+x9kNOjv4dOGPtG1xUGr8TFzJYENi8fjK+8UyN3tbmS
+         rJdtxUQgeUwXjnACaHFBTrHv7iCLgOiVCAPRsmuN5zOCQFBrMI5BUO/2T2vUe5ahZfjp
+         zrMw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=u/fXuSTf/7nmSfAPH75rFa4Zgui6hAM0XOdM2IGchK0=;
-        b=ICvh5PGc1k4v5J84OAHl21bX572XbqQGInYXnc0ZtB2K2WOZuCb/3XC428/euuSQ0N
-         jEIdV8599EMC6crCAukPdhxcflelCWLFReN5QTZMcGCVZ4SKI1tMN9izKGD/EhYDo8z/
-         kvD8oeUO4tJwIbwE7OYDfrzxABd0wzEFA+48XD4PSe6Z5DL67gFIgFioiIDuTvessQRj
-         Wut80lXdDIQ83mTlPX0/AUYfanC+yTkcUOhGi/rOD+sKn7PTVsOPNSAlLLuwoQFMn5Fk
-         zkjhL/UFZzK+V+ay/1XVgXXy0Rkbbzg03/GKjrIi1fj2isWvDZDRzVWGVHm50eoHxJtI
-         L2Bw==
-X-Gm-Message-State: AOAM530oPWcEnO/PV/ZmJaWP3L9eccO8LHH8OM6REVsl8sxEe3/u/0zD
-        KvS5Fgcits+0C3VjYXvuXgNnlh06VqWtcGH9Bdwy84r9xU0=
-X-Google-Smtp-Source: ABdhPJzXb3H5cGQfMDpVz5MXqcsjTQk6WYedKZlTDpY+Hzrb8KLqZ/zXTbZ+Ged83jnzvnTFWEuqe2Gs16yLC3PVTuA=
-X-Received: by 2002:aa7:c4cd:: with SMTP id p13mr4010792edr.251.1628871476321;
- Fri, 13 Aug 2021 09:17:56 -0700 (PDT)
-MIME-Version: 1.0
-References: <20210727235201.11491-1-someguy@effective-light.com> <e84e3fe7-e644-7059-22cc-ddefd8bfc8c4@redhat.com>
-In-Reply-To: <e84e3fe7-e644-7059-22cc-ddefd8bfc8c4@redhat.com>
-From:   Peter Maydell <peter.maydell@linaro.org>
-Date:   Fri, 13 Aug 2021 17:17:11 +0100
-Message-ID: <CAFEAcA_WL4MLsgA-u+oaMOtxkchb2qrnpojsUEsGcNziXZF7sw@mail.gmail.com>
-Subject: Re: [PATCH] target/arm: kvm: use RCU_READ_LOCK_GUARD() in kvm_arch_fixup_msi_route()
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=5vsrCAhIhqleSp4ilnt79j6IYc6DztFKdxcos4U/Zdw=;
+        b=ZDfRssv/LuEYhAOsZG8ZmIe1lW4VLGSKpQyEx5RIqffhxESFzu9nNv1qb+KQnOEc4j
+         AAPnDFMFWRHsatmkk7sX98akKCYf1p2jNXaTEpIso0+isD9Hx5gxDA+zHwmpNl8C/WRQ
+         ffDYfyW2uhVDpmkP566q8jsBKUYofJfq8wW+xaFeI/xxBUmKGjVaykRXOhvNdiiM+zYA
+         VeRJZrZOURKlkA0bThTi7s3q0DFs09hBtfzVoanKIpChukn6S7RkmqbL8SJn6U6Ro4V6
+         HbvmDd+VaHUc1cCkDg/ztYG2zjCudEINniDQaquv0rmtQ55GSXtKc/S+WCPa95L7PVZE
+         IPrA==
+X-Gm-Message-State: AOAM533iCu2d+bjDksyo65L4CGy2BJNaGbpkQphCz2MnCc3fZOEVLoZ8
+        CYzdQeT+nfI0SJ0kvhRhi9+BuqoCA1voZw==
+X-Google-Smtp-Source: ABdhPJzFcDg42Qi/QLxlT+AItPtHajHKKItsai4wbDeuQpZVXo0+ztFHB94T39wdHTdSuIGS4ouPdw==
+X-Received: by 2002:aa7:8a04:0:b029:3e0:ec4a:6e65 with SMTP id m4-20020aa78a040000b02903e0ec4a6e65mr3227176pfa.47.1628872126672;
+        Fri, 13 Aug 2021 09:28:46 -0700 (PDT)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id f6sm2745044pfv.69.2021.08.13.09.28.45
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 13 Aug 2021 09:28:45 -0700 (PDT)
+Date:   Fri, 13 Aug 2021 16:28:40 +0000
+From:   Sean Christopherson <seanjc@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Hamza Mahfooz <someguy@effective-light.com>,
-        QEMU Developers <qemu-devel@nongnu.org>,
-        kvm-devel <kvm@vger.kernel.org>, qemu-arm <qemu-arm@nongnu.org>
-Content-Type: text/plain; charset="UTF-8"
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        isaku.yamahata@intel.com, David Matlack <dmatlack@google.com>,
+        peterx@redhat.com
+Subject: Re: [PATCH 02/16] KVM: x86: clamp host mapping level to max_level in
+ kvm_mmu_max_mapping_level
+Message-ID: <YRaduAFaHZ+w643k@google.com>
+References: <20210807134936.3083984-1-pbonzini@redhat.com>
+ <20210807134936.3083984-3-pbonzini@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210807134936.3083984-3-pbonzini@redhat.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 28 Jul 2021 at 08:30, Paolo Bonzini <pbonzini@redhat.com> wrote:
->
-> On 28/07/21 01:52, Hamza Mahfooz wrote:
-> > As per commit 5626f8c6d468 ("rcu: Add automatically released rcu_read_lock
-> > variants"), RCU_READ_LOCK_GUARD() should be used instead of
-> > rcu_read_{un}lock().
-> >
-> > Signed-off-by: Hamza Mahfooz <someguy@effective-light.com>
-> > ---
->
-> Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
+On Sat, Aug 07, 2021, Paolo Bonzini wrote:
+> This patch started as a way to make kvm_mmu_hugepage_adjust a bit simpler,
+> in preparation for switching it to struct kvm_page_fault, but it does
+> fix a microscopic bug in zapping collapsible PTEs.
 
-
-
-Applied to target-arm.next for 6.2, thanks.
-
--- PMM
+I think this also fixes a bug where userspace backs guest memory with a 1gb hugepage
+but only assigns a subset of the page to the guest.  1gb pages would be disallowed
+by the memslot, but not 2mb.  kvm_mmu_max_mapping_level() would fall through to the
+host_pfn_mapping_level() logic, see the 1gb huge, and map the whole thing into the
+guest.  I can't imagine any userspace would actually do something like that, but the
+failure mode is serious enough that it warrants a Fixes: + Cc: stable@.
