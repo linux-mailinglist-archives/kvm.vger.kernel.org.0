@@ -2,237 +2,167 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E3BD43EB499
-	for <lists+kvm@lfdr.de>; Fri, 13 Aug 2021 13:34:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6A5793EB5EA
+	for <lists+kvm@lfdr.de>; Fri, 13 Aug 2021 15:01:36 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239802AbhHMLfD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 13 Aug 2021 07:35:03 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:18342 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S238157AbhHMLfD (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 13 Aug 2021 07:35:03 -0400
-Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 17DBYDVT150102;
-        Fri, 13 Aug 2021 07:34:36 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=49qhHYSpUgDjtGU1yGfIrGECR86Ig9vBL6TsfU7zT3Q=;
- b=ONeaIcipHd2IfVWiJcAByZa8FpwGiLLfk15nGWQqsUJ9X/1Y49m+fW8VDq/+xMsS49kX
- lcKc7OltPCplSNoVuBsoSsMOVCiqLebI2r4B6fUgE12Boe57DXfdfDwU6nJPARVhS2j1
- OM/Vk4mfGX2agK3t1x5nsSPX+WjQTxqUmOcITMtfUqSzgGcRVa5Q/M7alaqjHpecu9Fq
- jWtSrDVZIHdErin7wpOwX5an/V2W2O55zfIIrXSr+MzttViA/nL30YCh2/r818dr4EY2
- 5QgD8Q1TXx7drWXyyOOKLf99+r6YsYUGJm4Ab3lznT3/Gju0uSZWJZt6cjI72ABdN8rU 1Q== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3ad1ky413d-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 13 Aug 2021 07:34:36 -0400
-Received: from m0098399.ppops.net (m0098399.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 17DBYZ7w154910;
-        Fri, 13 Aug 2021 07:34:35 -0400
-Received: from ppma04fra.de.ibm.com (6a.4a.5195.ip4.static.sl-reverse.com [149.81.74.106])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3ad1ky412f-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 13 Aug 2021 07:34:35 -0400
-Received: from pps.filterd (ppma04fra.de.ibm.com [127.0.0.1])
-        by ppma04fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 17DBW1CM024366;
-        Fri, 13 Aug 2021 11:34:33 GMT
-Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
-        by ppma04fra.de.ibm.com with ESMTP id 3abujqvtyh-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 13 Aug 2021 11:34:32 +0000
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
-        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 17DBVBRc45416722
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 13 Aug 2021 11:31:11 GMT
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 30C98A406F;
-        Fri, 13 Aug 2021 11:34:30 +0000 (GMT)
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id CEF0DA4062;
-        Fri, 13 Aug 2021 11:34:29 +0000 (GMT)
-Received: from localhost.localdomain (unknown [9.145.158.198])
-        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Fri, 13 Aug 2021 11:34:29 +0000 (GMT)
-Subject: Re: [kvm-unit-tests PATCH 3/8] lib: s390x: Print addressing related
- exception information
-To:     Claudio Imbrenda <imbrenda@linux.ibm.com>
-Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org, david@redhat.com,
-        thuth@redhat.com, cohuck@redhat.com
-References: <20210813073615.32837-1-frankja@linux.ibm.com>
- <20210813073615.32837-4-frankja@linux.ibm.com>
- <20210813104017.6e669d72@p-imbrenda>
-From:   Janosch Frank <frankja@linux.ibm.com>
-Message-ID: <4c6682cc-f4b5-2a70-167c-00af4b333c2d@linux.ibm.com>
-Date:   Fri, 13 Aug 2021 13:34:29 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.11.0
+        id S240533AbhHMNB6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 13 Aug 2021 09:01:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44904 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S235482AbhHMNB6 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 13 Aug 2021 09:01:58 -0400
+Received: from mail-pj1-x102e.google.com (mail-pj1-x102e.google.com [IPv6:2607:f8b0:4864:20::102e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0EEEBC061756;
+        Fri, 13 Aug 2021 06:01:30 -0700 (PDT)
+Received: by mail-pj1-x102e.google.com with SMTP id w13-20020a17090aea0db029017897a5f7bcso15883269pjy.5;
+        Fri, 13 Aug 2021 06:01:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id:in-reply-to:references
+         :mime-version:content-transfer-encoding;
+        bh=bnLufpfO1M/I0xXk1CEZGAksMpuuRTVMW7Qe6CF1MNM=;
+        b=qWyG8cDiK9tplNUY6xeZ+GTCqAL96tvC3AbXuBanDLBseByBHcN975QrMsaexrCh8t
+         ZNYz9prevV+/MoRTMv1vn+Wn5rmLxqI3pt6Q3hr30/fm71wGygC0mGVDH3o7ho0T2lEp
+         EVmZGvTv6Ebm1aIvzCycWM3EX92AAfApGOSMOaqCDi8L4pKFKDkf05VQS9dvGbIgm40a
+         uptt6oauxH5oNvQhbsPW+FKZ5+lM53I1vWYOEdBPuQDi/IDMTptozg1WjrBL2GDfM3e7
+         Dewja1QQ8U5cMHmo7GVd4ejeBCJ+Mff4/Yyh8hdiDJw5HliUJJXD3BRhmBBjznNBL90u
+         0Q9w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=bnLufpfO1M/I0xXk1CEZGAksMpuuRTVMW7Qe6CF1MNM=;
+        b=MzoT+PP2xvDluCGtfU5OqUIRCJ6XNwArFhjAiQ3sa2slEXLzhsM2NXMVJQgsEm1W4/
+         2qbRvtRukLKNAANGdnOkJ0LiTFyfExI6XMFDn9bcym9NlDb/dNchyC0+PeiRjX8YxyvY
+         beIZPrKhKT+5tql74qYN2OPmS2iAIfkZfBZivSfT3xXsDCj6FY5ZcKn+VFh+O+EcjR34
+         uWOGn5UKu/G2O7ScW6Ehj/KHvtX4zS5ITxgkjv931rr5I4DXYl2oWxH3wXJUEwCqhHLP
+         1I0XbeK2MHRvPWKs9OS5iRe0oZHuCYo30XsaOXdFgRvbozVCC/JcNUzG+V89H1qTAITP
+         pduA==
+X-Gm-Message-State: AOAM531QzJHwJAfWM7npaKa3yDMZgEH2zSh3JfwT5wLHk434t52I9a1O
+        FzUOuSVNZUeAsKdOC9RvAmMHUZWQyEA=
+X-Google-Smtp-Source: ABdhPJwWIJAyWWXRjchKYtPa3S08favAB92SPIop/1hS7R+V7f8QBr+73c7UZXdirV21DtbOd0MGAQ==
+X-Received: by 2002:a63:a902:: with SMTP id u2mr2280975pge.123.1628859689239;
+        Fri, 13 Aug 2021 06:01:29 -0700 (PDT)
+Received: from localhost ([47.251.4.198])
+        by smtp.gmail.com with ESMTPSA id o20sm2805425pgv.80.2021.08.13.06.01.27
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Fri, 13 Aug 2021 06:01:28 -0700 (PDT)
+From:   Lai Jiangshan <jiangshanlai@gmail.com>
+To:     linux-kernel@vger.kernel.org
+Cc:     Lai Jiangshan <laijs@linux.alibaba.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
+        kvm@vger.kernel.org
+Subject: [PATCH V2] KVM: X86: Move PTE present check from loop body to  __shadow_walk_next()
+Date:   Fri, 13 Aug 2021 11:16:29 +0800
+Message-Id: <20210813031629.78670-1-jiangshanlai@gmail.com>
+X-Mailer: git-send-email 2.19.1.6.gb485710b
+In-Reply-To: <YRVGY1ZK8wl9ybBH@google.com>
+References: <YRVGY1ZK8wl9ybBH@google.com>
 MIME-Version: 1.0
-In-Reply-To: <20210813104017.6e669d72@p-imbrenda>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: HzpFFfcMjZYPU4IoMS9rV2OOPJ3-LuUU
-X-Proofpoint-ORIG-GUID: NzZkN8qssEoU9G-DLP2G6fGZQpeVhTTc
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.790
- definitions=2021-08-13_03:2021-08-12,2021-08-13 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0
- malwarescore=0 mlxlogscore=999 mlxscore=0 adultscore=0 lowpriorityscore=0
- priorityscore=1501 suspectscore=0 clxscore=1015 phishscore=0 spamscore=0
- bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2107140000 definitions=main-2108130069
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 8/13/21 10:40 AM, Claudio Imbrenda wrote:
-> On Fri, 13 Aug 2021 07:36:10 +0000
-> Janosch Frank <frankja@linux.ibm.com> wrote:
-> 
->> Right now we only get told the kind of program exception as well as
->> the PSW at the point where it happened.
->>
->> For addressing exceptions the PSW is not always enough so let's print
->> the TEID which contains the failing address and flags that tell us
->> more about the kind of address exception.
->>
->> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
->> ---
->>  lib/s390x/asm/arch_def.h |  4 +++
->>  lib/s390x/interrupt.c    | 72
->> ++++++++++++++++++++++++++++++++++++++++ 2 files changed, 76
->> insertions(+)
->>
->> diff --git a/lib/s390x/asm/arch_def.h b/lib/s390x/asm/arch_def.h
->> index 4ca02c1d..39c5ba99 100644
->> --- a/lib/s390x/asm/arch_def.h
->> +++ b/lib/s390x/asm/arch_def.h
->> @@ -41,6 +41,10 @@ struct psw {
->>  	uint64_t	addr;
->>  };
->>  
->> +/* Let's ignore spaces we don't expect to use for now. */
->> +#define AS_PRIM				0
->> +#define AS_HOME				3
->> +
->>  #define PSW_MASK_EXT			0x0100000000000000UL
->>  #define PSW_MASK_IO			0x0200000000000000UL
->>  #define PSW_MASK_DAT			0x0400000000000000UL
->> diff --git a/lib/s390x/interrupt.c b/lib/s390x/interrupt.c
->> index 01ded49d..1248bceb 100644
->> --- a/lib/s390x/interrupt.c
->> +++ b/lib/s390x/interrupt.c
->> @@ -12,6 +12,7 @@
->>  #include <sclp.h>
->>  #include <interrupt.h>
->>  #include <sie.h>
->> +#include <asm/page.h>
->>  
->>  static bool pgm_int_expected;
->>  static bool ext_int_expected;
->> @@ -126,6 +127,73 @@ static void fixup_pgm_int(struct stack_frame_int
->> *stack) /* suppressed/terminated/completed point already at the next
->> address */ }
->>  
->> +static void decode_pgm_prot(uint64_t teid)
-> 
-> it is actually more complicated than this.
+From: Lai Jiangshan <laijs@linux.alibaba.com>
 
-I know it hurts to look at the spec :)
+So far, the loop bodies already ensure the PTE is present before calling
+__shadow_walk_next():  Some loop bodies simply exit with a !PRESENT
+directly and some other loop bodies, i.e. FNAME(fetch) and __direct_map()
+do not currently terminate their walks with a !PRESENT, but they get away
+with it because they install present non-leaf SPTEs in the loop itself.
 
-> 
-> if you don't want to add all the possibilities because they are
-> unlikely and/or not relevant, maybe add a comment
+But checking pte present in __shadow_walk_next() is a more prudent way of
+programing and loop bodies will not need to always check it. It allows us
+removing unneded is_shadow_present_pte() in the loop bodies.
 
-Will do!
+Terminating on !is_shadow_present_pte() is 100% the correct behavior, as
+walking past a !PRESENT SPTE would lead to attempting to read a the next
+level SPTE from a garbage iter->shadow_addr.  Even some paths that do _not_
+currently have a !is_shadow_present_pte() in the loop body is Ok since
+they will install present non-leaf SPTEs and the additinal present check
+is just an NOP.
 
-> 
->> +{
->> +	/* Low-address protection exception, 100 */
->> +	if (test_bit_inv(56, &teid) && !test_bit_inv(60, &teid) &&
->> !test_bit_inv(61, &teid)) {
->> +		printf("Type: LAP\n");
->> +		return;
->> +	}
->> +
->> +	/* Instruction execution prevention, i.e. no-execute, 101 */
->> +	if (test_bit_inv(56, &teid) && !test_bit_inv(60, &teid) &&
->> test_bit_inv(61, &teid)) {
->> +		printf("Type: IEP\n");
->> +		return;
->> +	}
->> +
->> +	/* Standard DAT exception, 001 */
->> +	if (!test_bit_inv(56, &teid) && !test_bit_inv(60, &teid) &&
->> test_bit_inv(61, &teid)) {
->> +		printf("Type: DAT\n");
->> +		return;
->> +	}
->> +}
->> +
->> +static void decode_teid(uint64_t teid)
->> +{
->> +	int asce_id = lc->trans_exc_id & 3;
->> +	bool dat = lc->pgm_old_psw.mask & PSW_MASK_DAT;
->> +
->> +	printf("Memory exception information:\n");
->> +	printf("TEID: %lx\n", teid);
->> +	printf("DAT: %s\n", dat ? "on" : "off");
->> +	printf("AS: %s\n", asce_id == AS_PRIM ? "Primary" : "Home");
->> +
->> +	if (lc->pgm_int_code == PGM_INT_CODE_PROTECTION)
->> +		decode_pgm_prot(teid);
->> +
->> +	/*
->> +	 * If teid bit 61 is off for these two exception the reported
->> +	 * address is unpredictable.
->> +	 */
->> +	if ((lc->pgm_int_code == PGM_INT_CODE_SECURE_STOR_ACCESS ||
->> +	     lc->pgm_int_code == PGM_INT_CODE_SECURE_STOR_VIOLATION)
->> &&
->> +	    !test_bit_inv(61, &teid)) {
->> +		printf("Address: %lx, unpredictable\n ", teid &
->> PAGE_MASK);
->> +		return;
->> +	}
->> +	printf("Address: %lx\n\n", teid & PAGE_MASK);
->> +}
->> +
->> +static void print_storage_exception_information(void)
->> +{
->> +	switch (lc->pgm_int_code) {
->> +	case PGM_INT_CODE_PROTECTION:
->> +	case PGM_INT_CODE_PAGE_TRANSLATION:
->> +	case PGM_INT_CODE_SEGMENT_TRANSLATION:
->> +	case PGM_INT_CODE_ASCE_TYPE:
->> +	case PGM_INT_CODE_REGION_FIRST_TRANS:
->> +	case PGM_INT_CODE_REGION_SECOND_TRANS:
->> +	case PGM_INT_CODE_REGION_THIRD_TRANS:
->> +	case PGM_INT_CODE_SECURE_STOR_ACCESS:
->> +	case PGM_INT_CODE_NON_SECURE_STOR_ACCESS:
->> +	case PGM_INT_CODE_SECURE_STOR_VIOLATION:
->> +		decode_teid(lc->trans_exc_id);
->> +		break;
->> +	default:
->> +		return;
->> +	}
->> +}
->> +
->>  static void print_int_regs(struct stack_frame_int *stack)
->>  {
->>  	printf("\n");
->> @@ -155,6 +223,10 @@ static void print_pgm_info(struct
->> stack_frame_int *stack) lc->pgm_int_code, stap(),
->> lc->pgm_old_psw.addr, lc->pgm_int_id); print_int_regs(stack);
->>  	dump_stack();
->> +
->> +	/* Dump stack doesn't end with a \n so we add it here
->> instead */
->> +	printf("\n");
->> +	print_storage_exception_information();
->>  	report_summary();
->>  	abort();
->>  }
-> 
+The checking result in __shadow_walk_next() will be propagated to
+shadow_walk_okay() for being used in any for(;;) loop.
+
+Signed-off-by: Lai Jiangshan <laijs@linux.alibaba.com>
+---
+Changed from V1:
+	Merge the two patches
+	Update changelog
+	Remove !is_shadow_present_pte() in FNAME(invlpg)
+ arch/x86/kvm/mmu/mmu.c         | 13 ++-----------
+ arch/x86/kvm/mmu/paging_tmpl.h |  2 +-
+ 2 files changed, 3 insertions(+), 12 deletions(-)
+
+diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+index a272ccbddfa1..42eebba6782e 100644
+--- a/arch/x86/kvm/mmu/mmu.c
++++ b/arch/x86/kvm/mmu/mmu.c
+@@ -2231,7 +2231,7 @@ static bool shadow_walk_okay(struct kvm_shadow_walk_iterator *iterator)
+ static void __shadow_walk_next(struct kvm_shadow_walk_iterator *iterator,
+ 			       u64 spte)
+ {
+-	if (is_last_spte(spte, iterator->level)) {
++	if (!is_shadow_present_pte(spte) || is_last_spte(spte, iterator->level)) {
+ 		iterator->level = 0;
+ 		return;
+ 	}
+@@ -3152,9 +3152,6 @@ static u64 *fast_pf_get_last_sptep(struct kvm_vcpu *vcpu, gpa_t gpa, u64 *spte)
+ 	for_each_shadow_entry_lockless(vcpu, gpa, iterator, old_spte) {
+ 		sptep = iterator.sptep;
+ 		*spte = old_spte;
+-
+-		if (!is_shadow_present_pte(old_spte))
+-			break;
+ 	}
+ 
+ 	return sptep;
+@@ -3694,9 +3691,6 @@ static int get_walk(struct kvm_vcpu *vcpu, u64 addr, u64 *sptes, int *root_level
+ 		spte = mmu_spte_get_lockless(iterator.sptep);
+ 
+ 		sptes[leaf] = spte;
+-
+-		if (!is_shadow_present_pte(spte))
+-			break;
+ 	}
+ 
+ 	return leaf;
+@@ -3811,11 +3805,8 @@ static void shadow_page_table_clear_flood(struct kvm_vcpu *vcpu, gva_t addr)
+ 	u64 spte;
+ 
+ 	walk_shadow_page_lockless_begin(vcpu);
+-	for_each_shadow_entry_lockless(vcpu, addr, iterator, spte) {
++	for_each_shadow_entry_lockless(vcpu, addr, iterator, spte)
+ 		clear_sp_write_flooding_count(iterator.sptep);
+-		if (!is_shadow_present_pte(spte))
+-			break;
+-	}
+ 	walk_shadow_page_lockless_end(vcpu);
+ }
+ 
+diff --git a/arch/x86/kvm/mmu/paging_tmpl.h b/arch/x86/kvm/mmu/paging_tmpl.h
+index f70afecbf3a2..13138b03cc69 100644
+--- a/arch/x86/kvm/mmu/paging_tmpl.h
++++ b/arch/x86/kvm/mmu/paging_tmpl.h
+@@ -977,7 +977,7 @@ static void FNAME(invlpg)(struct kvm_vcpu *vcpu, gva_t gva, hpa_t root_hpa)
+ 			FNAME(update_pte)(vcpu, sp, sptep, &gpte);
+ 		}
+ 
+-		if (!is_shadow_present_pte(*sptep) || !sp->unsync_children)
++		if (!sp->unsync_children)
+ 			break;
+ 	}
+ 	write_unlock(&vcpu->kvm->mmu_lock);
+-- 
+2.19.1.6.gb485710b
 
