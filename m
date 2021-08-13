@@ -2,108 +2,110 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9E6713EB16D
-	for <lists+kvm@lfdr.de>; Fri, 13 Aug 2021 09:27:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 809793EB195
+	for <lists+kvm@lfdr.de>; Fri, 13 Aug 2021 09:37:37 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239403AbhHMH2H (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 13 Aug 2021 03:28:07 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:56258 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230194AbhHMH2G (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 13 Aug 2021 03:28:06 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1628839660;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=+56+meTQ51PDKaVBuCzizjlRCe9SqN27YTBVgW4/XKA=;
-        b=C4g9CjJb44SNpcs//p1e1duqnFUX5BvLQcQi51eOlv14vqtreq+xTuXmdH3Ez//o1yxd2o
-        VAjPJBMVwr7gfpk/m2Cb2QA2MkCWnk6y5ZH1bU3JHblzDyCO6vTrkBuyFvvEyv1xNWAUI9
-        9ZPlDPq8CoFuMYsVj4BPOrJl6PAV9Cs=
-Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
- [209.85.208.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-581-1Ya1ApKOMfOBxczdJMQ7pA-1; Fri, 13 Aug 2021 03:27:38 -0400
-X-MC-Unique: 1Ya1ApKOMfOBxczdJMQ7pA-1
-Received: by mail-ed1-f72.google.com with SMTP id n4-20020aa7c6840000b02903be94ce771fso3894088edq.11
-        for <kvm@vger.kernel.org>; Fri, 13 Aug 2021 00:27:38 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=+56+meTQ51PDKaVBuCzizjlRCe9SqN27YTBVgW4/XKA=;
-        b=TVpVsglm5GzC7ssWuchJuF7UtMBtb3XxGX1dNnHQw2+cP2LMtPCawIL8WFo8FPgTbT
-         IlGlCeX4wWo+YiPkyv2xMCjLJaPxZWaM1aCPkP7vD5YEt/6rf+OKksHJKeHY8pse0pn8
-         QbnS5H3lMh1MLkyplK/3DB66PBRuKyN4zpPHWJkH61CbhYuzQhJpsVQCpBgOepruxpeq
-         ipvz6d2pTLlgPH863O4oR0TU89MFAkBHykrnTVN5spqAmFlqNyiJowgx+C5UnI1+0fmx
-         mGtZ6L+Kl5DjofwcCj07W6XVtyR9UxsOEmODOnwJZsVdNwyRV8fiL8NHx0Fxpsc945wb
-         U+dQ==
-X-Gm-Message-State: AOAM531IaVkz+FyJiXRzKkau878DY4MLiYiFd+TARD7dIXZxH/NmSwCq
-        KSxXBQrTGmTdFuolQAEPAJbRp2YcKHqCtBSWaWRqQjUSxrGYiXE3lBwJZ8SJvlG142rMnch57i0
-        rveVRbLbhhr5F
-X-Received: by 2002:a17:906:2844:: with SMTP id s4mr1112727ejc.263.1628839657669;
-        Fri, 13 Aug 2021 00:27:37 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxHEtaVP8ZAHfgIjyyDcFB45xD+bvzHBpqKMp9W44P/qp+xnFs22IwYLl3SbiJWJy7Z49/FpQ==
-X-Received: by 2002:a17:906:2844:: with SMTP id s4mr1112717ejc.263.1628839657499;
-        Fri, 13 Aug 2021 00:27:37 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id ay20sm428084edb.91.2021.08.13.00.27.36
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 13 Aug 2021 00:27:36 -0700 (PDT)
-Subject: Re: [PATCH 2/2] KVM: x86/mmu: Don't step down in the TDP iterator
- when zapping all SPTEs
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Ben Gardon <bgardon@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm <kvm@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>
-References: <20210812050717.3176478-1-seanjc@google.com>
- <20210812050717.3176478-3-seanjc@google.com>
- <CANgfPd8HSYZbqmi21XQ=XeMCndXJ0+Ld0eZNKPWLa1fKtutiBA@mail.gmail.com>
- <YRVVWC31fuZiw9tT@google.com>
- <928be04d-e60e-924c-1f3a-cb5fef8b0042@redhat.com>
- <YRVbamoQhvPmrEgK@google.com>
- <7a95b2f6-a7ad-5101-baa5-6a19194695a3@redhat.com>
- <YRVebIjxEv87I55b@google.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <b08a7751-20c3-26fc-522e-c4cf274d9a6c@redhat.com>
-Date:   Fri, 13 Aug 2021 09:27:35 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.11.0
+        id S239499AbhHMHiC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 13 Aug 2021 03:38:02 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:19228 "EHLO
+        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S230469AbhHMHiB (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 13 Aug 2021 03:38:01 -0400
+Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 17D7Xsvn032863;
+        Fri, 13 Aug 2021 03:37:35 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : content-transfer-encoding : mime-version; s=pp1;
+ bh=PCdSy6CZzbGdUlP6VF2k3S1KxfR9Tj1pK3QCJ6Rp5SE=;
+ b=ZO7vc/CfF2DmTFEwdhW++jSFmFyBbRZyL4nWjAWYIgoZMGEDD2XWdt8gg2lZyl+dSHmw
+ M/3HQlCah55hI0BG46LR6Vq4eRjv+VgLSpI+aLktMgSRjup7Un1NQVZIs3Q7yYhZe0/l
+ PZVSccf50XMhK7YneK/NbdYvTwv+MlCChjBsmge+jAWLpobcNyjHqMLWoq07GiHGh+sz
+ U91lyKXG2s6bbgbVY1FTz5PqNOA/Zha2SdUQsoq77nwuUSPQ/KEFa/n7ghCDxSWHXE0g
+ jRhnPNuRvMZ/u5r7hwhoTnZ/P729CfJzzbWKzICOZID7vlzEW6IC1tZjVvhdB4X1oIUa 9g== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3ad56qergj-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 13 Aug 2021 03:37:34 -0400
+Received: from m0098421.ppops.net (m0098421.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 17D7Z2fU040387;
+        Fri, 13 Aug 2021 03:37:34 -0400
+Received: from ppma04fra.de.ibm.com (6a.4a.5195.ip4.static.sl-reverse.com [149.81.74.106])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3ad56qerg0-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 13 Aug 2021 03:37:34 -0400
+Received: from pps.filterd (ppma04fra.de.ibm.com [127.0.0.1])
+        by ppma04fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 17D7NhHT007475;
+        Fri, 13 Aug 2021 07:37:32 GMT
+Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
+        by ppma04fra.de.ibm.com with ESMTP id 3abujqvhav-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 13 Aug 2021 07:37:32 +0000
+Received: from d06av24.portsmouth.uk.ibm.com (d06av24.portsmouth.uk.ibm.com [9.149.105.60])
+        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 17D7bUqR53871100
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 13 Aug 2021 07:37:30 GMT
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 4DF2242056;
+        Fri, 13 Aug 2021 07:37:30 +0000 (GMT)
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id EBD754203F;
+        Fri, 13 Aug 2021 07:37:29 +0000 (GMT)
+Received: from t46lp67.lnxne.boe (unknown [9.152.108.100])
+        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Fri, 13 Aug 2021 07:37:29 +0000 (GMT)
+From:   Janosch Frank <frankja@linux.ibm.com>
+To:     kvm@vger.kernel.org
+Cc:     linux-s390@vger.kernel.org, imbrenda@linux.ibm.com,
+        david@redhat.com, thuth@redhat.com, cohuck@redhat.com
+Subject: [kvm-unit-tests PATCH 0/8] s390x: Cleanup and maintenance
+Date:   Fri, 13 Aug 2021 07:36:07 +0000
+Message-Id: <20210813073615.32837-1-frankja@linux.ibm.com>
+X-Mailer: git-send-email 2.30.2
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: Sqpf7S34F8TIDifewPpGwUf3E9yzfIP0
+X-Proofpoint-GUID: cwFoHCU3SSAGkrdxfudbvX19Q7lEHjtS
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-UnRewURL: 0 URL was un-rewritten
 MIME-Version: 1.0
-In-Reply-To: <YRVebIjxEv87I55b@google.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.790
+ definitions=2021-08-13_01:2021-08-12,2021-08-13 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
+ mlxlogscore=999 spamscore=0 mlxscore=0 phishscore=0 clxscore=1015
+ suspectscore=0 bulkscore=0 impostorscore=0 adultscore=0 malwarescore=0
+ priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2107140000 definitions=main-2108130044
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 12/08/21 19:46, Sean Christopherson wrote:
->>> 	if (iter->level == iter->min_level)
->>> 		return false;
->>>
->>> 	/*
->>> 	 * Reread the SPTE before stepping down to avoid traversing into page
->>> 	 * tables that are no longer linked from this entry.
->>> 	 */
->>> 	iter->old_spte = READ_ONCE(*rcu_dereference(iter->sptep));  \
->>>                                                                        ---> this is the code that is avoided
->>> 	child_pt = spte_to_child_pt(iter->old_spte, iter->level);   /
->>> 	if (!child_pt)
->>> 		return false;
->> Ah, right - so I agree with Ben that it's not too important.
-> Ya.  There is a measurable performance improvement, but it's really only
-> meaningful when there aren't many SPTEs to zap, otherwise the cost of zapping
-> completely dominates the time.
+A bit more cleanup and some extensions before I start adding the PV
+SIE support.
 
-I don't understand.  When try_step_down is called by tdp_iter_next, all 
-it does is really just the READ_ONCE, because spte_to_child_pt will see 
-a non-present PTE and return immediately.  Why do two, presumably cache 
-hot, reads cause a measurable performance improvement?
+https://gitlab.com/frankja/kvm-unit-tests/-/tree/lib_clean_ext
 
-Paolo
+Janosch Frank (8):
+  s390x: lib: Extend bitops
+  lib: s390x: Add 0x3d, 0x3e and 0x3f PGM constants
+  lib: s390x: Print addressing related exception information
+  lib: s390x: Start using bitops instead of magic constants
+  s390x: uv-host: Explain why we set up the home space and remove the
+    space change
+  lib: s390x: Add PSW_MASK_64
+  lib: s390x: Control register constant cleanup
+  lib: s390x: uv: Add rc 0x100 query error handling
+
+ lib/s390x/asm/arch_def.h |  39 +++++++++------
+ lib/s390x/asm/bitops.h   | 102 +++++++++++++++++++++++++++++++++++++++
+ lib/s390x/interrupt.c    |  80 +++++++++++++++++++++++++++++-
+ lib/s390x/smp.c          |   4 +-
+ lib/s390x/uv.c           |   4 +-
+ s390x/Makefile           |   1 +
+ s390x/mvpg-sie.c         |   2 +-
+ s390x/sie.c              |   2 +-
+ s390x/skrf.c             |   8 +--
+ s390x/uv-host.c          |  11 +++--
+ 10 files changed, 223 insertions(+), 30 deletions(-)
+
+-- 
+2.30.2
 
