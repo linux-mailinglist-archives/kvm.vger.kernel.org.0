@@ -2,172 +2,140 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id CB84E3EBE2B
-	for <lists+kvm@lfdr.de>; Sat, 14 Aug 2021 00:09:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D2E923EBEBD
+	for <lists+kvm@lfdr.de>; Sat, 14 Aug 2021 01:27:08 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235174AbhHMWJj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 13 Aug 2021 18:09:39 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:32137 "EHLO
+        id S235475AbhHMX1d (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 13 Aug 2021 19:27:33 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:40417 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S235059AbhHMWJj (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 13 Aug 2021 18:09:39 -0400
+        by vger.kernel.org with ESMTP id S235397AbhHMX1c (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 13 Aug 2021 19:27:32 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1628892551;
+        s=mimecast20190719; t=1628897224;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         to:to:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=usaJn38f6PQ2CzV8drMKktA3mbOE//g70lzrQ5h58AU=;
-        b=Q91w6U4GVeLXgnN7is/at6MSpYiOzebYkPZ9pkmciYvqSrT4TSW8JAO6MpcovpheT6NPeW
-        AxGTPuZON6aMvMi4ydg9f2cZrkI+I5UYlkp3uO9A07ywMwUxh7lIlBv4Uz0Gls48MeMOOp
-        xl1F1pWsmD1Sm2WwZOpB7WlXzOq87c0=
-Received: from mail-ot1-f69.google.com (mail-ot1-f69.google.com
- [209.85.210.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-414-TZnjs6p3MmiFSMtFPNzybQ-1; Fri, 13 Aug 2021 18:09:10 -0400
-X-MC-Unique: TZnjs6p3MmiFSMtFPNzybQ-1
-Received: by mail-ot1-f69.google.com with SMTP id x47-20020a056830246fb0290451891192f0so4253994otr.1
-        for <kvm@vger.kernel.org>; Fri, 13 Aug 2021 15:09:09 -0700 (PDT)
+        bh=2ltnXqs72PoZJlgVvtR4opPys8udAwLGgtjNFBrBB1U=;
+        b=LPfofpB5wsE3uc6DItki/QQW/2eVCk/b6zL/irB70K7e4UI3+cL/cmOREnjFc++hLP1EMr
+        MzFofC7s8gNO5219Lo25faA44O6d2SsBuWj122soGep5949YYCiblXrdiQCS4mnx0gBCb7
+        L45pIbp622pk64FEBaFwRQmWVI4vK4A=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-61-SRCI0ZdoNcWdjCxpaKbbeA-1; Fri, 13 Aug 2021 19:27:03 -0400
+X-MC-Unique: SRCI0ZdoNcWdjCxpaKbbeA-1
+Received: by mail-wm1-f70.google.com with SMTP id r21-20020a05600c35d5b02902e685ef1f76so2205716wmq.5
+        for <kvm@vger.kernel.org>; Fri, 13 Aug 2021 16:27:03 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
-         :references:organization:mime-version:content-transfer-encoding;
-        bh=usaJn38f6PQ2CzV8drMKktA3mbOE//g70lzrQ5h58AU=;
-        b=D0zYYqk050d40QtZohxfcJuBdzHsAo5YUskXMY2D0k/DOi6nGJz/lTuI9wUDHBhl7r
-         Ksw3u7Ws9IqfzLY4tdIA8VVpn9a+z3x7XtSa6wofqxR3WdFCGuY+h6LvUMmpNeRDape3
-         Pxd/0JOEl4lYaLyzELZeyyA5cbfbAQnKcuU8yCqf+RP4g6M2uUvbmmfY6txQ5dD5YETd
-         jsfiLNTWYvn92wHJoR1So3v0wZiSDRBx2wUx/JErb0xCjjGQZcDHjhIcJOnkfzWBeRhK
-         ugddND2WzHMi2pY2JIZ+4MH8xWOFpCmDKBNY+1xN0gwgQ0eHgxjiyh++ZP5T1WUPvM8c
-         O3Jg==
-X-Gm-Message-State: AOAM531V9AKBicU0FgpDhqsYFbxhUmLm7z+OBvMhLgm0Q5/R+kLss3Fe
-        P4JzsX/YuolBiAZczJfkda4DzE1wtNKqSGFniwEElDi6hjwCIzaErqIIuBs2XZTjrUxCXK80597
-        L2ve7W6hnU2P3
-X-Received: by 2002:a54:4406:: with SMTP id k6mr3854320oiw.179.1628892549455;
-        Fri, 13 Aug 2021 15:09:09 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwrtmAC9v5cTUDvPTZBFMmcfmQM8HkAFjsF0PeUK7JuAMy5pZyoyDzsd6OWX3BtLoSAuKKw4w==
-X-Received: by 2002:a54:4406:: with SMTP id k6mr3854309oiw.179.1628892549258;
-        Fri, 13 Aug 2021 15:09:09 -0700 (PDT)
-Received: from redhat.com ([198.99.80.109])
-        by smtp.gmail.com with ESMTPSA id i8sm576186otk.51.2021.08.13.15.09.08
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 13 Aug 2021 15:09:08 -0700 (PDT)
-Date:   Fri, 13 Aug 2021 16:09:07 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Russ Weight <russell.h.weight@intel.com>
-Cc:     Cornelia Huck <cohuck@redhat.com>,
-        "Adler, Michael" <michael.adler@intel.com>,
-        "Whisonant, Tim" <tim.whisonant@intel.com>, <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        Tom Rix <trix@redhat.com>
-Subject: Re: BUG REPORT: vfio_pci driver
-Message-ID: <20210813160907.7b143b51.alex.williamson@redhat.com>
-In-Reply-To: <ca6977da-5657-51aa-0ef2-fb4a7e8c15dd@intel.com>
-References: <ca6977da-5657-51aa-0ef2-fb4a7e8c15dd@intel.com>
-Organization: Red Hat
-X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
+        h=x-gm-message-state:subject:to:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=2ltnXqs72PoZJlgVvtR4opPys8udAwLGgtjNFBrBB1U=;
+        b=VHOMmRbD0HSpIzY107vGpiM4Ia7zQRhHZWveJ9YPwUi30vygqGlLD1J8/KQT4+DkRL
+         zyQw0F/P3H/INO8kw2VpLWo5KLSpUuWY7CHDldcOlhQ0QcyK7uXfbAF+K9EYtM5QxkyP
+         l1B8DYxSh8VXTHREzdseAVUCKm++ohGTnkCZJnm03tWB62RX1N6noeW+slGgySS4kulV
+         S5E3SgrkiWHgiGr40uCEgDyU+8YFjPkLW6z3SmaqWmwWXBPF8RT/HZhfaZ0yBvYDi5fL
+         oX9bSOOsSG18xmlEIED7gr9aYyk8LNOa89oP9beAaV0rMwvCyoVym0RsCkLqCsb97QUI
+         zLbA==
+X-Gm-Message-State: AOAM531OMiljX8tgS7IHcqaBwQovoONBk4ZtDP5fLgtnLinLzR19V8Y7
+        lprun8z160pBYYfI6qCgxQLdr+HpQoWGpq1M6M64qfhYbFCNuodxOtJrHR4FJKLcNZSkdGq67ng
+        CzoolkI7jqJrZ
+X-Received: by 2002:a05:600c:1483:: with SMTP id c3mr4574067wmh.131.1628897222425;
+        Fri, 13 Aug 2021 16:27:02 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJx0xDBu7qLTuycfsdJlyJRztUYK2z+Cba+NWhlTJD00FCnM/bVqlz1ZvzqvrtswSGYJMSQejg==
+X-Received: by 2002:a05:600c:1483:: with SMTP id c3mr4574048wmh.131.1628897222249;
+        Fri, 13 Aug 2021 16:27:02 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+        by smtp.gmail.com with ESMTPSA id q17sm2712042wrr.91.2021.08.13.16.27.00
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 13 Aug 2021 16:27:01 -0700 (PDT)
+Subject: Re: [PATCH -next 1/2] selftests: Fix vm_handle_exception undefined
+ error
+To:     Shuah Khan <skhan@linuxfoundation.org>,
+        Chen Lifu <chenlifu@huawei.com>, shuah@kernel.org,
+        bgardon@google.com, wangyanan55@huawei.com,
+        axelrasmussen@google.com, drjones@redhat.com, seanjc@google.com,
+        vkuznets@redhat.com, dwmw@amazon.co.uk, joao.m.martins@oracle.com,
+        yangyingliang@huawei.com, kvm@vger.kernel.org,
+        linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20210709063741.355325-1-chenlifu@huawei.com>
+ <f130f6ec-0c80-7a83-fad2-7d72d389b96b@linuxfoundation.org>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <b6fca25d-f241-4de2-5a8e-cbcd34abc758@redhat.com>
+Date:   Sat, 14 Aug 2021 01:26:59 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.11.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <f130f6ec-0c80-7a83-fad2-7d72d389b96b@linuxfoundation.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 13 Aug 2021 11:34:51 -0700
-Russ Weight <russell.h.weight@intel.com> wrote:
+On 13/08/21 19:01, Shuah Khan wrote:
+> On 7/9/21 12:37 AM, Chen Lifu wrote:
+>> Compile setftests on x86_64 occurs following error:
+>> make -C tools/testing/selftests
+>> ...
+>>
+>> x86_64/hyperv_features.c:618:2: warning: implicit declaration of 
+>> function ‘vm_handle_exception’ [-Wimplicit-function-declaration]
+>>    618 |  vm_handle_exception(vm, GP_VECTOR, guest_gp_handler);
+>> /usr/bin/ld: /tmp/cclOnpml.o: in function `main':
+>> tools/testing/selftests/kvm/x86_64/hyperv_features.c:618: undefined 
+>> reference to `vm_handle_exception'
+>> collect2: error: ld returned 1 exit status
+>>
+>> The reason is that commit b78f4a596692 ("KVM: selftests: Rename 
+>> vm_handle_exception")
+>> renamed "vm_handle_exception" function to 
+>> "vm_install_exception_handler" function.
+>>
+>> Fix it by replacing "vm_handle_exception" with 
+>> "vm_install_exception_handler"
+>> in corresponding selftests files.
+>>
+>> Signed-off-by: Chen Lifu <chenlifu@huawei.com>
+>> ---
+>>   tools/testing/selftests/kvm/x86_64/hyperv_features.c | 2 +-
+>>   tools/testing/selftests/kvm/x86_64/mmu_role_test.c   | 2 +-
+>>   2 files changed, 2 insertions(+), 2 deletions(-)
+>>
+> 
+> 
+> Please include kvm in the commit summary. I think it is not getting
+> the right attention because of the summary line.
 
-> Bug Description:
->=20
-> A bug in the vfio_pci driver was reported in junction with work on FPGA
+The same patch was already committed:
 
-This looks like the documented behavior of an IRQ index reporting the
-VFIO_IRQ_INFO_NORESIZE flag.  We can certainly work towards trying to
-remove the flag from this index, but it seems the userspace driver is
-currently ignoring the flag and expecting exactly the behavior the flag
-indicates is not available.  Thanks,
+     commit f8f0edabcc09fafd695ed2adc0eb825104e35d5c
+     Author: Marc Zyngier <maz@kernel.org>
+     Date:   Thu Jul 1 08:19:28 2021 +0100
 
-Alex
+     KVM: selftests: x86: Address missing vm_install_exception_handler conversions
+     
+     Commit b78f4a59669 ("KVM: selftests: Rename vm_handle_exception")
+     raced with a couple of new x86 tests, missing two vm_handle_exception
+     to vm_install_exception_handler conversions.
+     
+     Help the two broken tests to catch up with the new world.
+     
+     Cc: Andrew Jones <drjones@redhat.com>
+     CC: Ricardo Koller <ricarkol@google.com>
+     Cc: Paolo Bonzini <pbonzini@redhat.com>
+     Signed-off-by: Marc Zyngier <maz@kernel.org>
+     Message-Id: <20210701071928.2971053-1-maz@kernel.org>
+     Reviewed-by: Andrew Jones <drjones@redhat.com>
+     Reviewed-by: Ricardo Koller <ricarkol@google.com>
+     Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 
-> cards. We were able to reproduce and root-cause the bug using system-tap.
-> The original bug description is below. An understanding of the referenced
-> dfl and opae tools is not required - it is the sequence of IOCTL calls and
-> IRQ vectors that matters:
->=20
-> > I=E2=80=99m trying to get an example AFU working that uses 2 IRQs, acti=
-ve at the same=20
-> > time. I=E2=80=99m hitting what looks to be a dfl_pci driver bug.
-> >
-> > The code tries to allocate two IRQ vectors: 0 and 1. I see opaevfio.c d=
-oing the=20
-> > right thing, picking the MSIX index. Allocating either IRQ 0 or IRQ 1 w=
-orks fine=20
-> > and I confirm that the VFIO_DEVICE_SET_IRQS looks reasonable, choosing =
-MSIX and=20
-> > either start of 0 or 1 and count 1.
-> >
-> > Note that opaevfio.c always passes count 1, so it will make separate ca=
-lls for=20
-> > each IRQ vector.
-> >
-> > When I try to allocate both, I see the following:
-> >
-> >   * If the VFIO_DEVICE_SET_IRQS ioctl is called first with start 0 and =
-then
-> >     start 1 (always count 1), the start 1 (second) ioctl trap returns E=
-INVAL.
-> >   * If I set up the vectors in decreasing order, so start 1 followed by=
- start 0,
-> >     the program works!
-> >   * I ruled out OPAE SDK user space problems by setting up my program to
-> >     allocate in increasing order, which would normally fail. I changed =
-only the
-> >     ioctl call in user space opaevfio.c, inverting bit 0 of start so th=
-at the
-> >     driver is called in decreasing index order. Of course this binds th=
-e wrong
-> >     vectors to the fds, but I don=E2=80=99t care about that for now. Th=
-is works! From
-> >     this, I conclude that it can=E2=80=99t be a user space problem sinc=
-e the difference
-> >     between working and failing is solely the order in which IRQ vector=
-s are
-> >     bound in ioctl calls. =20
->=20
-> The EINVAL is coming from vfio_msi_set_block() here:
-> https://github.com/torvalds/linux/blob/master/drivers/vfio/pci/vfio_pci_i=
-ntrs.c#L373
->=20
-> vfio_msi_set_block() is being called from vfio_pci_set_msi_trigger() here=
- on
-> the second IRQ request:
-> https://github.com/torvalds/linux/blob/master/drivers/vfio/pci/vfio_pci_i=
-ntrs.c#L530
->=20
-> We believe the bug is in vfio_pci_set_msi_trigger(), in the 2nd parameter=
- to the call
-> to vfio_msi_enable() here:
-> https://github.com/torvalds/linux/blob/master/drivers/vfio/pci/vfio_pci_i=
-ntrs.c#L533
->=20
-> In both the passing and failing cases, the first IRQ request results in a=
- call
-> to vfio_msi_enable() at line 533 and the second IRQ request results in the
-> call to vfio_msi_set_block() at line 530. It is during the first IRQ requ=
-est
-> that vfio_msi_enable() sets vdev->num_ctx based on the 2nd parameter (nve=
-c).
-> vdev->num_ctx is part of the conditional that results in the EINVAL for t=
-he
-> failing case.
->=20
-> In the passing case, vdev->num_ctx is 2. In the failing case, it is 1.
->=20
-> I am attaching two text files containing trace information from systemtap=
-: one for
-> the failing case and one for the passing case. They contain a lot more in=
-formation
-> than is needed, but if you search for vfio_pci_set_msi_trigger and vfio_m=
-si_set_block,
-> you will see values for some of the call parameters.
->=20
-> - Russ
->=20
+For the other patch, returning 0 is going to cause issues elsewhere
+in the tests.  Either the test is failed immediately, or all callers
+must be examined carefully.
+
+Paolo
 
