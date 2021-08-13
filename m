@@ -2,102 +2,102 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9D9A93EBAE3
-	for <lists+kvm@lfdr.de>; Fri, 13 Aug 2021 19:01:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D0E743EBAFA
+	for <lists+kvm@lfdr.de>; Fri, 13 Aug 2021 19:03:44 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233685AbhHMRCK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 13 Aug 2021 13:02:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44510 "EHLO
+        id S230221AbhHMREJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 13 Aug 2021 13:04:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45094 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233753AbhHMRBx (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 13 Aug 2021 13:01:53 -0400
-Received: from mail-io1-xd35.google.com (mail-io1-xd35.google.com [IPv6:2607:f8b0:4864:20::d35])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E2DAEC06129D
-        for <kvm@vger.kernel.org>; Fri, 13 Aug 2021 10:01:17 -0700 (PDT)
-Received: by mail-io1-xd35.google.com with SMTP id y1so14160919iod.10
-        for <kvm@vger.kernel.org>; Fri, 13 Aug 2021 10:01:17 -0700 (PDT)
+        with ESMTP id S230382AbhHMREH (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 13 Aug 2021 13:04:07 -0400
+Received: from mail-ot1-x32c.google.com (mail-ot1-x32c.google.com [IPv6:2607:f8b0:4864:20::32c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 493A7C061756
+        for <kvm@vger.kernel.org>; Fri, 13 Aug 2021 10:03:40 -0700 (PDT)
+Received: by mail-ot1-x32c.google.com with SMTP id e13-20020a9d63cd0000b02904fa42f9d275so12848901otl.1
+        for <kvm@vger.kernel.org>; Fri, 13 Aug 2021 10:03:40 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linuxfoundation.org; s=google;
-        h=subject:to:references:from:message-id:date:user-agent:mime-version
-         :in-reply-to:content-language:content-transfer-encoding;
-        bh=134w16+XL1sdqmwbmXVj+wovRChqhGlomUo4cVBsw7I=;
-        b=EG7LfjPlTDfqpwLeqvHlztwswzmSgwfc2KG9Fe1qeyvHQyeyUX1eHSY93uNu7QXnkn
-         vqpvR5WPHRjQSjwdB3OrtarucYEo7ZMfscPYqSVOf60HOQ5E947iU0FjcTpyNLn5zS4z
-         Zu2t/BJU5Y+42MQDMhxJrFrRlNLaOmcIP9UKM=
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=5Vya4fij45HvsBDaqcVVQb/ZojhWxXSw/4IGHIPsKPc=;
+        b=B5oa4eLsgwBKkIaZo7fb1ppSOuy3QqGM1MR7mtbYDSBvglBdFQvhhxMPDU+fgRBuBM
+         rBm8zcCHFJxE+mky6syjCUhoy4xlsXa34z77rsSpG0/MkI5UtMp049+BlP85+9l127hm
+         7f823HSk1P3jzdmGlV9FEx9T2UJVu9K4NS/rXF1FhIpLNIaP9CGbJYGYRZPAU0n4Q0Tk
+         xZ+qYJwdbrPaKX7wk2RgmVbanR051x4tIFhjl2QahRQGkPiJJtAO3KvVq4qOK0sMGnYw
+         UtnLLIB+XLDONfCsvWNP3VepLFX8H1FZ2mupHn2HV/w65zrKz9jTys4vDA3d7pGDFCCB
+         hBxA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=134w16+XL1sdqmwbmXVj+wovRChqhGlomUo4cVBsw7I=;
-        b=hTOcHLURMfw8oR4w8QEmopWlnhKlmfkh8SVrgNeiPh0z1GiJ6EPjfknRifmASPYWIS
-         0RtwaZSpEKaOJ3CvX9shatPRmhRD/lTnAvp7R6JAHQNE0aEmO/Hlw+0e33gYJJon0aiZ
-         eglT5DDMCMR4ns5rx8Ir5moI66rWJCH/GfWvXt7rOWAeRbeS2yZsMtAgBPSnmo3d27Yg
-         L0Vwq6NZf/nwMDIDqCiz66MUN75Fc6HeRnWCTsKZVoWlcer1hk3kY0o5Il9a5qe4Gd43
-         S9iCmYAWU+/101xVtVDrvC4VUHhyF61DL7ZpajY6DOoeGtDHxywlWYSe4yMjPVIsePFg
-         OI0A==
-X-Gm-Message-State: AOAM532iipQov1nY88p7HKIlZAmotVu/xazyEnsnOvSkjooWEzYgr/KT
-        KA2mmYVHf9KBNgJWnJhb9iFrzg==
-X-Google-Smtp-Source: ABdhPJwk/6vRPl8xVugiwth86cTaXEHJTpYNmDj9cN0Z1zCGNzij+Ag3N4VFhkVp8WRHmgNj80/1Ow==
-X-Received: by 2002:a05:6602:2595:: with SMTP id p21mr2778138ioo.51.1628874077347;
-        Fri, 13 Aug 2021 10:01:17 -0700 (PDT)
-Received: from [192.168.1.112] (c-24-9-64-241.hsd1.co.comcast.net. [24.9.64.241])
-        by smtp.gmail.com with ESMTPSA id l15sm1170696ilt.45.2021.08.13.10.01.16
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 13 Aug 2021 10:01:17 -0700 (PDT)
-Subject: Re: [PATCH -next 1/2] selftests: Fix vm_handle_exception undefined
- error
-To:     Chen Lifu <chenlifu@huawei.com>, pbonzini@redhat.com,
-        shuah@kernel.org, bgardon@google.com, wangyanan55@huawei.com,
-        axelrasmussen@google.com, drjones@redhat.com, seanjc@google.com,
-        vkuznets@redhat.com, dwmw@amazon.co.uk, joao.m.martins@oracle.com,
-        yangyingliang@huawei.com, kvm@vger.kernel.org,
-        linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Shuah Khan <skhan@linuxfoundation.org>
-References: <20210709063741.355325-1-chenlifu@huawei.com>
-From:   Shuah Khan <skhan@linuxfoundation.org>
-Message-ID: <f130f6ec-0c80-7a83-fad2-7d72d389b96b@linuxfoundation.org>
-Date:   Fri, 13 Aug 2021 11:01:16 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.8.1
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=5Vya4fij45HvsBDaqcVVQb/ZojhWxXSw/4IGHIPsKPc=;
+        b=ekwWz4TExYGJrihjkIpN4FF+ceXWYciCwDjytjFASi6wh+LRQiKMReOycLkgweFmUU
+         DdTuGpEIG36UZ8nJ3U5d1Y6qHItsxk9nJzGvLBrQg2BTUZ4e/QYlYE9hXYYFHs1PO4vY
+         jJczSU/6yEUKUg9CK+UTloLhxBcFpRCNPct5MTIrMKLsqot3P3aYh9YFAAk6/ROxAftM
+         zbl0zp9hFKF54pm8yA7Qe/jlyp5Ah1kK8DgxpT2NJhfV9O0h0aGLBd3O4hEXT1LbApw8
+         vyU5alL7xwpqteYu76yrFKWy3c5jNNkq7YkhEFyagQY1Cwp5kWhWpEec5hQA313xyjNp
+         JxlA==
+X-Gm-Message-State: AOAM530QNOQAyJh2gWf/J0B8CfnWVLJPmPtPxtvN/kpCTVnP9gtc7JKk
+        uHHZ6HCnlIOD6gYKI3jzOB6JFIqKzDK1OMquU7AvUA==
+X-Google-Smtp-Source: ABdhPJyLC0S+8Tt849HwLjAzYCsbpK6yyFSUuDrfiCPaGvqTNsSjPGWBRWDH4/fkUxOmIWWyhdboQgquxjqjpZMRf6Q=
+X-Received: by 2002:a9d:76d0:: with SMTP id p16mr2924065otl.241.1628874219087;
+ Fri, 13 Aug 2021 10:03:39 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20210709063741.355325-1-chenlifu@huawei.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+References: <20200128092715.69429-1-oupton@google.com> <20200128092715.69429-5-oupton@google.com>
+ <CALMp9eT+bbnjZ_CXn6900LxtZ5=fZo3-3ZLp1HL2aHo6Dgqzxg@mail.gmail.com> <YRafVro7jZoswngG@google.com>
+In-Reply-To: <YRafVro7jZoswngG@google.com>
+From:   Jim Mattson <jmattson@google.com>
+Date:   Fri, 13 Aug 2021 10:03:28 -0700
+Message-ID: <CALMp9eR4_BFwoKGRC31hFo2ZX4iyF5k_APrW-hahqWbJ3cttLQ@mail.gmail.com>
+Subject: Re: [PATCH v2 4/5] KVM: nVMX: Emulate MTF when performing instruction emulation
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Oliver Upton <oupton@google.com>, kvm@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Peter Shier <pshier@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 7/9/21 12:37 AM, Chen Lifu wrote:
-> Compile setftests on x86_64 occurs following error:
-> make -C tools/testing/selftests
+On Fri, Aug 13, 2021 at 9:35 AM Sean Christopherson <seanjc@google.com> wrote:
+>
+> On Thu, Aug 12, 2021, Jim Mattson wrote:
+> > On Tue, Jan 28, 2020 at 1:27 AM Oliver Upton <oupton@google.com> wrote:
+> > >
+> > > Since commit 5f3d45e7f282 ("kvm/x86: add support for
+> > > MONITOR_TRAP_FLAG"), KVM has allowed an L1 guest to use the monitor trap
+> > > flag processor-based execution control for its L2 guest. KVM simply
+> > > forwards any MTF VM-exits to the L1 guest, which works for normal
+> > > instruction execution.
+> > >
+> > > However, when KVM needs to emulate an instruction on the behalf of an L2
+> > > guest, the monitor trap flag is not emulated. Add the necessary logic to
+> > > kvm_skip_emulated_instruction() to synthesize an MTF VM-exit to L1 upon
+> > > instruction emulation for L2.
+> > >
+> > > Fixes: 5f3d45e7f282 ("kvm/x86: add support for MONITOR_TRAP_FLAG")
+> > > Signed-off-by: Oliver Upton <oupton@google.com>
+> > > ---
+>
 > ...
-> 
-> x86_64/hyperv_features.c:618:2: warning: implicit declaration of function ‘vm_handle_exception’ [-Wimplicit-function-declaration]
->    618 |  vm_handle_exception(vm, GP_VECTOR, guest_gp_handler);
-> /usr/bin/ld: /tmp/cclOnpml.o: in function `main':
-> tools/testing/selftests/kvm/x86_64/hyperv_features.c:618: undefined reference to `vm_handle_exception'
-> collect2: error: ld returned 1 exit status
-> 
-> The reason is that commit b78f4a596692 ("KVM: selftests: Rename vm_handle_exception")
-> renamed "vm_handle_exception" function to "vm_install_exception_handler" function.
-> 
-> Fix it by replacing "vm_handle_exception" with "vm_install_exception_handler"
-> in corresponding selftests files.
-> 
-> Signed-off-by: Chen Lifu <chenlifu@huawei.com>
-> ---
->   tools/testing/selftests/kvm/x86_64/hyperv_features.c | 2 +-
->   tools/testing/selftests/kvm/x86_64/mmu_role_test.c   | 2 +-
->   2 files changed, 2 insertions(+), 2 deletions(-)
-> 
+>
+> > > diff --git a/arch/x86/include/uapi/asm/kvm.h b/arch/x86/include/uapi/asm/kvm.h
+> > > index 503d3f42da16..3f3f780c8c65 100644
+> > > --- a/arch/x86/include/uapi/asm/kvm.h
+> > > +++ b/arch/x86/include/uapi/asm/kvm.h
+> > > @@ -390,6 +390,7 @@ struct kvm_sync_regs {
+> > >  #define KVM_STATE_NESTED_GUEST_MODE    0x00000001
+> > >  #define KVM_STATE_NESTED_RUN_PENDING   0x00000002
+> > >  #define KVM_STATE_NESTED_EVMCS         0x00000004
+> > > +#define KVM_STATE_NESTED_MTF_PENDING   0x00000008
+> >
+> > Maybe I don't understand the distinction, but shouldn't this new flag
+> > have a KVM_STATE_NESTED_VMX prefix and live with
+> > KVM_STATE_VMX_PREEMPTION_TIMER_DEADLINE, below?
+>
+> That does seem to be the case, seems highly unlikely SVM will add MTF.  And SVM's
+> KVM_STATE_NESTED_GIF_SET should have been SVM specific, but kvm_svm_nested_state_hdr
+> doesn't even reserve a flags field :-/
 
-
-Please include kvm in the commit summary. I think it is not getting
-the right attention because of the summary line.
-
-Same for the second patch in this series.
-
-thanks,
--- Shuah
+APIs are hard.
