@@ -2,170 +2,129 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 592113EBB8C
-	for <lists+kvm@lfdr.de>; Fri, 13 Aug 2021 19:38:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CBE1F3EBBA0
+	for <lists+kvm@lfdr.de>; Fri, 13 Aug 2021 19:45:04 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229468AbhHMRir (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 13 Aug 2021 13:38:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53114 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229607AbhHMRiq (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 13 Aug 2021 13:38:46 -0400
-Received: from mail-lf1-x129.google.com (mail-lf1-x129.google.com [IPv6:2a00:1450:4864:20::129])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3FD42C061756;
-        Fri, 13 Aug 2021 10:38:19 -0700 (PDT)
-Received: by mail-lf1-x129.google.com with SMTP id y34so21168511lfa.8;
-        Fri, 13 Aug 2021 10:38:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=X82TF293OjZ/KJsRk5++L79a0qP7TiWBwXkmb5RLf9E=;
-        b=Lh2FAOI4aZZiyMeIZTTLeIbgJk4V8R4tYZGKURlB4qkagDs7Pk8AWQ/klK0D0aFeJq
-         mdJaT0mxCBAI78X1I5sG+OKtdUlu2SvfV0DlSGaQX6a/askwGCO05iUbt0V5KBJTRrZV
-         bkMVP3jid+0qPBKwBIm+IqjgsYZgeD8+RYoSAI1+yoBoJPycA2ldBlVMD+HOi1Qr/RRW
-         69DTtyXVkLmt5toj1wZ5PLaHJVYZJ+AXiWiNdhCxKStlhvbDVEDJENCBrBbTDgqQuBgq
-         26XnZtFQ5BpVWqczDNsU6YJTDDcIrtyd4u/6qbPS+nsXyaAg/Ph3+jqmbx22mTFcCpZI
-         2gsQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=X82TF293OjZ/KJsRk5++L79a0qP7TiWBwXkmb5RLf9E=;
-        b=msEYt50lEQ3svWNrEjMSkoVSKpeOrjf59YlMiOoG8U8Z2412c22LSBXeoVURo+y1dO
-         UnbYJZ2j+Un3YJMqXh+MwQLovCMt+HBtLLrjfdh+l2GMAyX0Petlvuf391HcNwBRlL9P
-         PKYmosa6dltmOd+coHe3UCn5/M9hOMjUq73ajL+MU7AhphYFVS51D2BJ4uBGOvnjfSmd
-         kU6KJeLaf8QRXfxgDdlXPTI2PV0ifZ8OnR5p61/WV00i+ayGcP9Yd+1ONMj880jGewCp
-         GLOzHGGFDgjqy31PwQ/ttr93S1sDqrFjO+WHpW1i4OabRxU5lwqtMN7cbB3gpchz6SGU
-         Inxg==
-X-Gm-Message-State: AOAM532//U2nc2lFgXNFEfNT7nK1iJ2jSzRUhKaCxrlf/cYQD3OphlzR
-        +OfzvW8yz+1xHZH5axnXC9J9CsUJVGjautiK4kA=
-X-Google-Smtp-Source: ABdhPJywIa8UC7iK8kwdXMmMLho7Ei5NJ9v7JwttJMDsvm7ei63YXsxl3d4GqEbriApyzwEIPSpjzQCPo3CvD+MClUw=
-X-Received: by 2002:a05:6512:98d:: with SMTP id w13mr2450412lft.91.1628876297612;
- Fri, 13 Aug 2021 10:38:17 -0700 (PDT)
+        id S229535AbhHMRp3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 13 Aug 2021 13:45:29 -0400
+Received: from mail.kernel.org ([198.145.29.99]:42290 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229607AbhHMRp2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 13 Aug 2021 13:45:28 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 07E1760F51;
+        Fri, 13 Aug 2021 17:45:00 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1628876701;
+        bh=bjNRxrk7zkv1bWv18PnoYS0DrsVT6mJBjm94a5siq1s=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:From;
+        b=rVmzHkHhe2OWZsF033BKoxTswdFF/eMUxnledbjriHTbCZkWlAHm9HKyLbtF/H1Cl
+         5xAQ4w23l1qAcwRIO/lGPTnqceoufh08fatkyeUNJ/YQT+MAMUx417ihiIgBfQba3O
+         46gIsPG+vzTsNLCzqq3NdtDyRER2IZa3sBStd0D9D6bf2r7hqOaotOmu1h1cyqoZbo
+         5FvEqlpzAR/5EpbuMtsti5xd61YF8HowfVNesn4K/dvpGHf35B36dAwk/iyJCtJqny
+         qaLXUKXRQ6u9D9wOKrd8si+ZekC/V/+wBHZFdv4oVAN+RWgdVdtIg7ldyegIMifCSv
+         wSVZ2aCkUBgRw==
+Date:   Fri, 13 Aug 2021 12:44:59 -0500
+From:   Bjorn Helgaas <helgaas@kernel.org>
+To:     Max Gurtovoy <mgurtovoy@nvidia.com>
+Cc:     Jason Gunthorpe <jgg@nvidia.com>,
+        Yishai Hadas <yishaih@nvidia.com>, bhelgaas@google.com,
+        corbet@lwn.net, alex.williamson@redhat.com,
+        diana.craciun@oss.nxp.com, kwankhede@nvidia.com,
+        eric.auger@redhat.com, masahiroy@kernel.org,
+        michal.lkml@markovi.net, linux-pci@vger.kernel.org,
+        linux-doc@vger.kernel.org, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org, linux-kbuild@vger.kernel.org,
+        maorg@nvidia.com, leonro@nvidia.com
+Subject: Re: [PATCH 09/12] PCI: Add a PCI_ID_F_VFIO_DRIVER_OVERRIDE flag to
+ struct pci_device_id
+Message-ID: <20210813174459.GA2594783@bjorn-Precision-5520>
 MIME-Version: 1.0
-References: <CA+enFJkL5AWjehFAHTMG5-+9zyR2eVxqFJ-9MoaJkavjwV+MfA@mail.gmail.com>
- <20210813165307.GA2587844@bjorn-Precision-5520> <20210813113240.0e9ab116.alex.williamson@redhat.com>
-In-Reply-To: <20210813113240.0e9ab116.alex.williamson@redhat.com>
-From:   Idar Lund <idarlund@gmail.com>
-Date:   Fri, 13 Aug 2021 19:38:06 +0200
-Message-ID: <CA+enFJ=JX34ePMVObcumi-exVfvaQapMLKHKKNXBNEsX5PwLrA@mail.gmail.com>
-Subject: Re: vfio-pci problem
-To:     Alex Williamson <alex.williamson@redhat.com>
-Cc:     Bjorn Helgaas <helgaas@kernel.org>, bjorn@helgaas.com,
-        kvm@vger.kernel.org, linux-pci@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <580beaa0-d15d-4e42-5a7b-073885416df9@nvidia.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi all,
+On Fri, Aug 13, 2021 at 02:21:41AM +0300, Max Gurtovoy wrote:
+> 
+> On 8/12/2021 11:26 PM, Bjorn Helgaas wrote:
+> > On Thu, Aug 12, 2021 at 04:51:26PM -0300, Jason Gunthorpe wrote:
+> > > On Thu, Aug 12, 2021 at 10:57:07AM -0500, Bjorn Helgaas wrote:
+> > > > On Thu, Aug 12, 2021 at 10:27:28AM -0300, Jason Gunthorpe wrote:
+> > > > > On Wed, Aug 11, 2021 at 02:07:37PM -0500, Bjorn Helgaas wrote:
+> > > > > > On Thu, Aug 05, 2021 at 09:23:57PM -0300, Jason Gunthorpe wrote:
+> > > > > > Do the other bus types have a flag analogous to
+> > > > > > PCI_ID_F_VFIO_DRIVER_OVERRIDE?  If we're doing something similar to
+> > > > > > other bus types, it'd be nice if the approach were similar.
+> > > > > They could, this series doesn't attempt it. I expect the approach to
+> > > > > be similar as driver_override was copied from PCI to other
+> > > > > busses. When this is completed I hope to take a look at it.
+> > > > I think this would make more sense as two patches:
+> > > > 
+> > > >    - Add a "PCI_ID_DRIVER_OVERRIDE" flag.  This is not VFIO-specific,
+> > > >      since nothing in PCI depends on the VFIO-ness of drivers that use
+> > > >      the flag.  The only point here is that driver id_table entries
+> > > >      with this flag only match when driver_override matches the driver.
+> > > This would require using two flags, one to indicate the above to the
+> > > PCI code and another to indicate the vfio_pci string to
+> > > file2alias. This doesn't seem justified at this point, IMHO.
+> > I don't think it requires two flags.  do_pci_entry() has:
+> > 
+> >    if (flags & PCI_ID_F_VFIO_DRIVER_OVERRIDE)
+> >      strcpy(alias, "vfio_pci:");
+> > 
+> > I'm just proposing a rename:
+> > 
+> > s/PCI_ID_F_VFIO_DRIVER_OVERRIDE/PCI_ID_DRIVER_OVERRIDE/
+> > 
+> > > >    - Update file2alias.c to export the flags and the "vfio_pci:" alias.
+> > > >      This seems to be the only place where VFIO comes into play, and
+> > > >      putting it in a separate patch will make it much smaller and it
+> > > >      will be clear how it could be extended for other buses.
+> > > Well, I don't want to see a flag called PCI_ID_DRIVER_OVERRIDE mapped
+> > > to the string "vfio_pci", that is just really confusing.
+> > Hahaha, I see, that's fair :)  It confused me for a long time why you
+> > wanted "VFIO" in the flag name because from the kernel's point of
+> > view, the flag is not related to any VFIO-ness.  It's only related to
+> > a special variety of driver_override, and VFIO happens to be one user
+> > of it.
+> 
+> In my original patch I used
+> 
+> #define PCI_ID_DRIVER_OVERRIDE PCI_ID_F_VFIO_DRIVER_OVERRIDE
+> 
+> and in the pci core code I used PCI_ID_DRIVER_OVERRIDE in the "if" clause.
+> 
+> So we can maybe do that and leave the option to future update of the define
+> without changing the core code.
+> 
+> In the future we can have something like:
+> 
+> #define PCI_ID_DRIVER_OVERRIDE (PCI_ID_F_VFIO_DRIVER_OVERRIDE |
+> PCI_ID_F_MY_BUS_DRIVER_OVERRIDE)
+> 
+> The file2alias.c still have to use the exact PCI_ID_F_VFIO_DRIVER_OVERRIDE
+> flag to add "vfio_" prefix.
+> 
+> Is that better ?
 
-Thanks for the reply Bjorn!
+I don't think it's worth having two separate #defines.  If we need
+more in the future, we can add them when we need them.
 
-Got a Mail Delivery system message back on this e-mail because it
-contained HTML. Gawd dammit gmail! Sorry to all of you that are
-getting this 2 times.
-Also; Alex' comment got in between here. So I'll answer that one here
-too (at the bottom).
+What if we renamed "flags" to be specifically for this override case,
+e.g., "override_only"?  Then the flag could be
+PCI_ID_F_VFIO_DRIVER_OVERRIDE, which would trigger a "vfio_" prefix in
+file2alias.c, but pci_match_device() could just check for it being
+non-zero, without caring whether the reason is VFIO or something else,
+e.g.,
 
-Yes, you understand correctly. The issue here is that I have a PCI
-XHCI controller that I want to bind to the vfio-pci instead of the
-xhci_hcd. The reason is that I want to be able to pass through this
-device to a virtual machine.
+  pci_match_device(...)
+  {
+    ...
+    if (found_id->override_only) {
+      if (dev->driver_override)
+        return found_id;
+      ...
 
-I'm not sure if I understand your question 'Have you added "0x1b73
-0x1100" to vfio-pci/new_id previously', but I'll try to answer; no, I
-don't add it during the 5.11 (and newer kernels) boot process or
-anything like that, I only add it manually like the commands in the
-bugzilla bug report when starting the virtual machine. And I also do
-it only once. If someone is interested in the source on why I'm doing
-it like this, check out
-https://www.heiko-sieger.info/running-windows-10-on-linux-using-kvm-with-vga-passthrough/#Part_14_-_Passing_more_PCI_devices_to_guest
-
-Unfortunately the workaround don't seem to be working:
-[root@silje ~]# echo '0000:06:00.0' > /sys/bus/pci/drivers/virtio-pci/bind
--bash: echo: write error: No such device
-
-Alex;
-Yes, the patch works as expected for (errorusly) double adding to
-new_id, the problem here is that this is the first time echoing to
-new_id.
-
--Idar
-
-On Fri, Aug 13, 2021 at 7:32 PM Alex Williamson
-<alex.williamson@redhat.com> wrote:
->
-> On Fri, 13 Aug 2021 11:53:07 -0500
-> Bjorn Helgaas <helgaas@kernel.org> wrote:
->
-> > [+cc Alex, kvm, linux-pci]
-> >
-> > On Fri, Aug 13, 2021 at 09:43:39AM +0200, Idar Lund wrote:
-> > > Hi,
-> > >
-> > > I've been struggling with an error in linux since 5.11. Please find my bug
-> > > report here:
-> > > https://bugzilla.redhat.com/show_bug.cgi?id=1945565
-> > >
-> > > Then I stumbled upon this mail thread:
-> > > https://www.spinics.net/lists/linux-pci/msg102243.html which seems related.
-> > >
-> > > Is there another way to do this in 5.11+ or is this an unintentionally bug
-> > > that got introduced in 5.11?
-> >
-> > Hi Idar, sorry for the trouble and thanks for the report!  I cc'd some
-> > VFIO experts who know more than I do about this.
-> >
-> > If I understand correctly, you have a PCI XHCI controller:
-> >
-> >   pci 0000:06:00.0: [1b73:1100] type 00 class 0x0c0330
-> >   xhci_hcd 0000:06:00.0: xHCI Host Controller
-> >
-> > and you want to unbind the xhci_hcd driver and bind vfio-pci instead:
-> >
-> >   # echo '0000:06:00.0' > /sys/bus/pci/devices/0000\:06\:00.0/driver/unbind
-> >   # echo 0x1b73 0x1100 > /sys/bus/pci/drivers/vfio-pci/new_id
-> >
-> > In v5.10 (5.10.17-200.fc33.x86_64) this worked fine, but in v5.11
-> > (5.11.9-200.fc33.x86_64) the "new_id" write returns -EEXIST and
-> > binding to vfio-pci fails.
-> >
-> > The patch you pointed out appeared in v5.11 as 3853f9123c18 ("PCI:
-> > Avoid duplicate IDs in driver dynamic IDs list") [1], and I agree it
-> > looks suspicious.  There haven't been any significant changes to
-> > pci-driver.c since then.
-> >
-> > Have you added "0x1b73 0x1100" to vfio-pci/new_id previously?  I think
-> > in v5.10, that would silently work (possibly adding duplicate entries
-> > to the dynamic ID list) and every write to vfio-pci/new_id would make
-> > vfio-pci try to bind to the device.
-> >
-> > In v5.11, if you write a duplicate ID to vfio-pci/new_id, you would
-> > get -EEXIST and no attempt to bind.  As far as I know, the dynamic ID
-> > list is not visible in sysfs, so it might be hard to avoid writing a
-> > duplicate.
-> >
-> > But if the vfio-pci dynamic ID list already contains "0x1b73 0x1100",
-> > you should be able to ask vfio-pci to bind to the device like this:
-> >
-> >   # echo 0000:06:00.0 > /sys/bus/pci/drivers/virtio-pci/bind
-> >
-> > I don't know if that's a solution, but would be useful to know whether
-> > it's a workaround.
->
-> [root@x1 vfio-pci]# echo 0x1b73 0x1100 > new_id
-> [root@x1 vfio-pci]# echo 0x1b73 0x1100 > new_id
-> bash: echo: write error: File exists
-> [root@x1 vfio-pci]# uname -r
-> 5.12.15-200.fc33.x86_64
->
-> Seems like it behaves as expected now.  The new_id interface has some
-> inherit issues, essentially all vfio-pci dynamic binding cases should
-> instead be using the driver_override interface.  The driverctl utility
-> already makes use of this and will make your life a tiny bit easier.
-> Thanks,
->
-> Alex
->
+Bjorn
