@@ -2,226 +2,112 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A11483EC68F
-	for <lists+kvm@lfdr.de>; Sun, 15 Aug 2021 03:05:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D76F83EC7C1
+	for <lists+kvm@lfdr.de>; Sun, 15 Aug 2021 08:56:23 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237272AbhHOBEP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 14 Aug 2021 21:04:15 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:56423 "EHLO
+        id S235318AbhHOG4w (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 15 Aug 2021 02:56:52 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:22913 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S236363AbhHOBDr (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Sat, 14 Aug 2021 21:03:47 -0400
+        by vger.kernel.org with ESMTP id S233827AbhHOG4u (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Sun, 15 Aug 2021 02:56:50 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1628989398;
+        s=mimecast20190719; t=1629010580;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=JCCYPy+isCh+H1SX9xBPytDkVDyjBNBJAhFZksFryQM=;
-        b=BBKb8Wzde1k/X13cFhIeQlQvf21imczaAuiUjSlWA5nbA2FhjCTPgxe/VNyA5NM+z504tu
-        3ApC2HEZE+FS3+ZPSESghV8lSrlxMpyrawcfczMm9w2vjNobMZXhcl5IUakUrKiTwGgbzQ
-        ioDZ41r8zlFotrXEEI2Nzk2VX2BAlgE=
+         content-transfer-encoding:content-transfer-encoding;
+        bh=ysB8E3Gr1LrzW/DtzYKw9dH3L2Llbii5/d8yEzyqiHw=;
+        b=Z4R9k2pmvCvYeYXyNC+UVxlOQ4th/49OdZnNw1GNPSt9yaRv2p7uwgR+Z3mXZvHGosphJH
+        pJlBli8H7RgPHz7vBQeKRkHje56Hi+GhIcga+6D3etxDjx445JCpsfwbtzGunLUM6Rrt8g
+        suMzmwqtoYLbVrM1fnNsFXtxlDvAar8=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-455-MesHVnsDMEKsp5hfHrAQfw-1; Sat, 14 Aug 2021 21:03:14 -0400
-X-MC-Unique: MesHVnsDMEKsp5hfHrAQfw-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+ us-mta-214-3_IbAhhgODemS7a1lAwphg-1; Sun, 15 Aug 2021 02:56:18 -0400
+X-MC-Unique: 3_IbAhhgODemS7a1lAwphg-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id F3B281008060;
-        Sun, 15 Aug 2021 01:03:12 +0000 (UTC)
-Received: from gshan.redhat.com (vpn2-54-103.bne.redhat.com [10.64.54.103])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id CE3636091B;
-        Sun, 15 Aug 2021 01:03:08 +0000 (UTC)
-From:   Gavin Shan <gshan@redhat.com>
-To:     kvmarm@lists.cs.columbia.edu
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        james.morse@arm.com, mark.rutland@arm.com,
-        Jonathan.Cameron@huawei.com, will@kernel.org, maz@kernel.org,
-        pbonzini@redhat.com, vkuznets@redhat.com, shan.gavin@gmail.com
-Subject: [PATCH v4 15/15] KVM: arm64: Add async PF document
-Date:   Sun, 15 Aug 2021 08:59:47 +0800
-Message-Id: <20210815005947.83699-16-gshan@redhat.com>
-In-Reply-To: <20210815005947.83699-1-gshan@redhat.com>
-References: <20210815005947.83699-1-gshan@redhat.com>
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0776D1853028;
+        Sun, 15 Aug 2021 06:56:18 +0000 (UTC)
+Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id A9D9B2AAB5;
+        Sun, 15 Aug 2021 06:56:17 +0000 (UTC)
+From:   Paolo Bonzini <pbonzini@redhat.com>
+To:     torvalds@linux-foundation.org
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Subject: [GIT PULL] KVM fixes for Linux 5.14-rc6
+Date:   Sun, 15 Aug 2021 02:56:17 -0400
+Message-Id: <20210815065617.3754533-1-pbonzini@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This adds document to explain the interface for asynchronous page
-fault and how it works in general.
+Linus,
 
-Signed-off-by: Gavin Shan <gshan@redhat.com>
----
- Documentation/virt/kvm/arm/apf.rst   | 143 +++++++++++++++++++++++++++
- Documentation/virt/kvm/arm/index.rst |   1 +
- 2 files changed, 144 insertions(+)
- create mode 100644 Documentation/virt/kvm/arm/apf.rst
+The following changes since commit d5aaad6f83420efb8357ac8e11c868708b22d0a9:
 
-diff --git a/Documentation/virt/kvm/arm/apf.rst b/Documentation/virt/kvm/arm/apf.rst
-new file mode 100644
-index 000000000000..4f5c01b6699f
---- /dev/null
-+++ b/Documentation/virt/kvm/arm/apf.rst
-@@ -0,0 +1,143 @@
-+.. SPDX-License-Identifier: GPL-2.0
-+
-+Asynchronous Page Fault Support for arm64
-+=========================================
-+
-+There are two stages of page faults when KVM module is enabled as accelerator
-+to the guest. The guest is responsible for handling the stage-1 page faults,
-+while the host handles the stage-2 page faults. During the period of handling
-+the stage-2 page faults, the guest is suspended until the requested page is
-+ready. It could take several milliseconds, even hundreds of milliseconds in
-+extreme situations because I/O might be required to move the requested page
-+from disk to DRAM. The guest does not do any work when it is suspended. The
-+feature (Asynchronous Page Fault) is introduced to take advantage of the
-+suspending period and to improve the overall performance.
-+
-+There are two paths in order to fulfil the asynchronous page fault, called
-+as control path and data path. The control path allows the VMM or guest to
-+configure the functionality, while the notifications are delivered in data
-+path. The notifications are classified into page-not-present and page-ready
-+notifications.
-+
-+Data Path
-+---------
-+
-+There are two types of notifications delivered from host to guest in the
-+data path: page-not-present and page-ready notification. They are delivered
-+through SDEI event and (PPI) interrupt separately. Besides, there is a shared
-+buffer between host and guest to indicate the reason and sequential token,
-+which is used to identify the asynchronous page fault. The reason and token
-+resident in the shared buffer is written by host, read and cleared by guest.
-+An asynchronous page fault is delivered and completed as below.
-+
-+(1) When an asynchronous page fault starts, a (workqueue) worker is created
-+    and queued to the vCPU's pending queue. The worker makes the requested
-+    page ready and resident to DRAM in the background. The shared buffer is
-+    updated with reason and sequential token. After that, SDEI event is sent
-+    to guest as page-not-present notification.
-+
-+(2) When the SDEI event is received on guest, the current process is tagged
-+    with TIF_ASYNC_PF and associated with a wait queue. The process is ready
-+    to keep rescheduling itself on switching from kernel to user mode. After
-+    that, a reschedule IPI is sent to current CPU and the received SDEI event
-+    is acknowledged. Note that the IPI is delivered when the acknowledgment
-+    on the SDEI event is received on host.
-+
-+(3) On the host, the worker is dequeued from the vCPU's pending queue and
-+    enqueued to its completion queue when the requested page becomes ready.
-+    In the mean while, KVM_REQ_ASYNC_PF request is sent the vCPU if the
-+    worker is the first element enqueued to the completion queue.
-+
-+(4) With pending KVM_REQ_ASYNC_PF request, the first worker in the completion
-+    queue is dequeued and destroyed. In the mean while, a (PPI) interrupt is
-+    sent to guest with updated reason and token in the shared buffer.
-+
-+(5) When the (PPI) interrupt is received on guest, the affected process is
-+    located using the token and waken up after its TIF_ASYNC_PF tag is cleared.
-+    After that, the interrupt is acknowledged through SMCCC interface. The
-+    workers in the completion queue is dequeued and destroyed if any workers
-+    exist, and another (PPI) interrupt is sent to the guest.
-+
-+Control Path
-+------------
-+
-+The configurations are passed through SMCCC or ioctl interface. The SDEI
-+event and (PPI) interrupt are owned by VMM, so the SDEI event and interrupt
-+numbers are configured through ioctl command on per-vCPU basis. Besides,
-+the functionality might be enabled and configured through ioctl interface
-+by VMM during migration:
-+
-+   * KVM_ARM_ASYNC_PF_CMD_GET_VERSION
-+
-+     Returns the current version of the feature, supported by the host. It is
-+     made up of major, minor and revision fields. Each field is one byte in
-+     length.
-+
-+   * KVM_ARM_ASYNC_PF_CMD_GET_SDEI:
-+
-+     Retrieve the SDEI event number, used for page-not-present notification,
-+     so that it can be configured on destination VM in the scenario of
-+     migration.
-+
-+   * KVM_ARM_ASYNC_PF_GET_IRQ:
-+
-+     Retrieve the IRQ (PPI) number, used for page-ready notification, so that
-+     it can be configured on destination VM in the scenario of migration.
-+
-+   * KVM_ARM_ASYNC_PF_CMD_GET_CONTROL
-+
-+     Retrieve the address of control block, so that it can be configured on
-+     destination VM in the scenario of migration.
-+
-+   * KVM_ARM_ASYNC_PF_CMD_SET_SDEI:
-+
-+     Used by VMM to configure number of SDEI event, which is used to deliver
-+     page-not-present notification by host. This is used when VM is started
-+     or migrated.
-+
-+   * KVM_ARM_ASYNC_PF_CMD_SET_IRQ
-+
-+     Used by VMM to configure number of (PPI) interrupt, which is used to
-+     deliver page-ready notification by host. This is used when VM is started
-+     or migrated.
-+
-+   * KVM_ARM_ASYNC_PF_CMD_SET_CONTROL
-+
-+     Set the control block on the destination VM in the scenario of migration.
-+
-+The other configurations are passed through SMCCC interface. The host exports
-+the capability through KVM vendor specific service, which is identified by
-+ARM_SMCCC_KVM_FUNC_ASYNC_PF_FUNC_ID. There are several functions defined for
-+this:
-+
-+   * ARM_SMCCC_KVM_FUNC_ASYNC_PF_VERSION
-+
-+     Returns the current version of the feature, supported by the host. It is
-+     made up of major, minor and revision fields. Each field is one byte in
-+     length.
-+
-+   * ARM_SMCCC_KVM_FUNC_ASYNC_PF_SLOTS
-+
-+     Returns the size of the hashed GFN table. It is used by guest to set up
-+     the capacity of waiting process table.
-+
-+   * ARM_SMCCC_KVM_FUNC_ASYNC_PF_SDEI
-+   * ARM_SMCCC_KVM_FUNC_ASYNC_PF_IRQ
-+
-+     Used by the guest to retrieve the SDEI event and (PPI) interrupt number
-+     that are configured by VMM.
-+
-+   * ARM_SMCCC_KVM_FUNC_ASYNC_PF_ENABLE
-+
-+     Used by the guest to enable or disable the feature on the specific vCPU.
-+     The argument is made up of shared buffer and flags. The shared buffer
-+     is written by host to indicate the reason about the delivered asynchronous
-+     page fault and token (sequence number) to identify that. There are two
-+     flags are supported: KVM_ASYNC_PF_ENABLED is used to enable or disable
-+     the feature. KVM_ASYNC_PF_SEND_ALWAYS allows to deliver page-not-present
-+     notification regardless of the guest's state. Otherwise, the notification
-+     is delivered only when the guest is in user mode.
-+
-+   * ARM_SMCCC_KVM_FUNC_ASYNC_PF_IRQ_ACK
-+
-+     Used by the guest to acknowledge the completion of page-ready notification.
-diff --git a/Documentation/virt/kvm/arm/index.rst b/Documentation/virt/kvm/arm/index.rst
-index 78a9b670aafe..f43b5fe25f61 100644
---- a/Documentation/virt/kvm/arm/index.rst
-+++ b/Documentation/virt/kvm/arm/index.rst
-@@ -7,6 +7,7 @@ ARM
- .. toctree::
-    :maxdepth: 2
- 
-+   apf
-    hyp-abi
-    psci
-    pvtime
--- 
-2.23.0
+  KVM: x86/mmu: Fix per-cpu counter corruption on 32-bit builds (2021-08-05 03:33:56 -0400)
+
+are available in the Git repository at:
+
+  https://git.kernel.org/pub/scm/virt/kvm/kvm.git tags/for-linus
+
+for you to fetch changes up to 6e949ddb0a6337817330c897e29ca4177c646f02:
+
+  Merge branch 'kvm-tdpmmu-fixes' into kvm-master (2021-08-13 03:33:13 -0400)
+
+----------------------------------------------------------------
+ARM:
+
+- Plug race between enabling MTE and creating vcpus
+
+- Fix off-by-one bug when checking whether an address range is RAM
+
+x86:
+
+- Fixes for the new MMU, especially a memory leak on hosts with <39
+  physical address bits
+
+- Remove bogus EFER.NX checks on 32-bit non-PAE hosts
+
+- WAITPKG fix
+
+----------------------------------------------------------------
+David Brazdil (1):
+      KVM: arm64: Fix off-by-one in range_is_memory
+
+Junaid Shahid (1):
+      kvm: vmx: Sync all matching EPTPs when injecting nested EPT fault
+
+Paolo Bonzini (4):
+      KVM: x86: remove dead initialization
+      Merge branch 'kvm-vmx-secctl' into kvm-master
+      Merge tag 'kvmarm-fixes-5.14-2' of git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm into HEAD
+      Merge branch 'kvm-tdpmmu-fixes' into kvm-master
+
+Sean Christopherson (6):
+      KVM: VMX: Use current VMCS to query WAITPKG support for MSR emulation
+      KVM: x86: Allow guest to set EFER.NX=1 on non-PAE 32-bit kernels
+      KVM: nVMX: Use vmx_need_pf_intercept() when deciding if L0 wants a #PF
+      KVM: x86/mmu: Don't leak non-leaf SPTEs when zapping all SPTEs
+      KVM: x86/mmu: Don't step down in the TDP iterator when zapping all SPTEs
+      KVM: x86/mmu: Protect marking SPs unsync when using TDP MMU with spinlock
+
+Steven Price (1):
+      KVM: arm64: Fix race when enabling KVM_ARM_CAP_MTE
+
+ Documentation/virt/kvm/locking.rst    |  8 ++---
+ arch/arm64/kvm/arm.c                  | 12 +++++---
+ arch/arm64/kvm/hyp/nvhe/mem_protect.c |  2 +-
+ arch/x86/include/asm/kvm_host.h       |  7 +++++
+ arch/x86/kvm/cpuid.c                  | 28 +-----------------
+ arch/x86/kvm/hyperv.c                 |  2 +-
+ arch/x86/kvm/mmu/mmu.c                | 28 ++++++++++++++++++
+ arch/x86/kvm/mmu/tdp_mmu.c            | 35 +++++++++++++++-------
+ arch/x86/kvm/vmx/nested.c             | 56 +++++++++++++++++++++++++++--------
+ arch/x86/kvm/vmx/vmx.h                |  2 +-
+ 10 files changed, 118 insertions(+), 62 deletions(-)
 
