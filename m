@@ -2,46 +2,46 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C58913EC67A
-	for <lists+kvm@lfdr.de>; Sun, 15 Aug 2021 03:05:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 19C5D3EC67B
+	for <lists+kvm@lfdr.de>; Sun, 15 Aug 2021 03:05:06 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235534AbhHOBCi (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 14 Aug 2021 21:02:38 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:51915 "EHLO
+        id S235663AbhHOBCn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 14 Aug 2021 21:02:43 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:59561 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S235390AbhHOBCg (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Sat, 14 Aug 2021 21:02:36 -0400
+        by vger.kernel.org with ESMTP id S234573AbhHOBCm (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Sat, 14 Aug 2021 21:02:42 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1628989327;
+        s=mimecast20190719; t=1628989333;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=2Pn+9Bhmey0hAJUvL54jnfu+eDSYV7uNB+RaNeR8i2I=;
-        b=dtDZCuEFswnWr7LzzMu2TcZDSzhN9LaXwU/dduXfbvdfxSw5I12iq79hAIR7CIkfWN6vjX
-        J8Y6nccAi45Vem/Y0yc3Xw4e0MIITa6F/4YIhVXWHemkNe4X7n1yM9CTUmTjE0pto1tbaB
-        fLl5zhgiUrS9VwWle4RkO+N4rNTSuo4=
+        bh=JRydbG759m1mFtN4CviwCnmicopT7ux+dshIIUTOxsw=;
+        b=hLcpX61Mg3P4pl0ri8P79pRaTyLald2OAOkBppC9LLrEoEAAE/F7N3jLlxdUdsYoMCRKxn
+        QQJklZdrblBOOI9mbHIHqmU4XFzp9E0FFII/cWUcbrmj/prtsKLlumJlAWQb+6Ge5wgDow
+        r9V/iKgza5FtAcTqqAL2iL+QFJGQzcA=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-409-OEe-63RQMAGNWMCf71IHyA-1; Sat, 14 Aug 2021 21:02:03 -0400
-X-MC-Unique: OEe-63RQMAGNWMCf71IHyA-1
+ us-mta-167-RzFIk5a_PHC1GWDgMs3QCQ-1; Sat, 14 Aug 2021 21:02:09 -0400
+X-MC-Unique: RzFIk5a_PHC1GWDgMs3QCQ-1
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3F82A1008062;
-        Sun, 15 Aug 2021 01:02:02 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 237768799E0;
+        Sun, 15 Aug 2021 01:02:08 +0000 (UTC)
 Received: from gshan.redhat.com (vpn2-54-103.bne.redhat.com [10.64.54.103])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id F316260C59;
-        Sun, 15 Aug 2021 01:01:53 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 03AF46091B;
+        Sun, 15 Aug 2021 01:02:02 +0000 (UTC)
 From:   Gavin Shan <gshan@redhat.com>
 To:     kvmarm@lists.cs.columbia.edu
 Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
         james.morse@arm.com, mark.rutland@arm.com,
         Jonathan.Cameron@huawei.com, will@kernel.org, maz@kernel.org,
         pbonzini@redhat.com, vkuznets@redhat.com, shan.gavin@gmail.com
-Subject: [PATCH v4 04/15] KVM: x86: Use generic async PF slot management
-Date:   Sun, 15 Aug 2021 08:59:36 +0800
-Message-Id: <20210815005947.83699-5-gshan@redhat.com>
+Subject: [PATCH v4 05/15] KVM: arm64: Export kvm_handle_user_mem_abort()
+Date:   Sun, 15 Aug 2021 08:59:37 +0800
+Message-Id: <20210815005947.83699-6-gshan@redhat.com>
 In-Reply-To: <20210815005947.83699-1-gshan@redhat.com>
 References: <20210815005947.83699-1-gshan@redhat.com>
 MIME-Version: 1.0
@@ -51,212 +51,221 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This uses the generic slot management mechanism for asynchronous
-page fault by enabling CONFIG_KVM_ASYNC_PF_SLOT because the private
-implementation is totally duplicate to the generic one.
+The main work of stage-2 page fault is handled by user_mem_abort().
+When asynchronous page fault is supported, one page fault need to
+be handled with two calls to this function. It means the page fault
+needs to be replayed asynchronously in that case.
 
-The changes introduced by this is pretty mechanical and shouldn't
-cause any logical changes.
+   * This renames the function to kvm_handle_user_mem_abort() and
+     exports it.
+
+   * Add arguments @esr and @prefault to user_mem_abort(). @esr is
+     the cached value of ESR_EL2 instead of fetching from the current
+     vCPU when the page fault is replayed in scenario of asynchronous
+     page fault. @prefault is used to indicate the page fault is replayed
+     one or not.
+
+   * Define helper functions esr_dbat_*() in asm/esr.h to extract
+     or check various fields of the passed ESR_EL2 value because
+     those helper functions defined in asm/kvm_emulate.h assumes
+     the ESR_EL2 value has been cached in vCPU struct. It won't
+     be true on handling the replayed page fault in scenario of
+     asynchronous page fault.
+
+   * Some helper functions defined in asm/kvm_emulate.h are used
+     by mmu.c only and seem not to be used by other source file
+     in near future. They are moved to mmu.c and renamed accordingly.
+
+     is_exec_fault: kvm_vcpu_trap_is_exec_fault
+     is_write_fault: kvm_is_write_fault()
+     esr_abt_fault_level: kvm_vcpu_trap_get_fault_level
 
 Signed-off-by: Gavin Shan <gshan@redhat.com>
 ---
- arch/x86/include/asm/kvm_host.h |  2 -
- arch/x86/kvm/Kconfig            |  1 +
- arch/x86/kvm/mmu/mmu.c          |  2 +-
- arch/x86/kvm/x86.c              | 86 +++------------------------------
- 4 files changed, 8 insertions(+), 83 deletions(-)
+ arch/arm64/include/asm/esr.h         |  6 ++++
+ arch/arm64/include/asm/kvm_emulate.h | 27 ++---------------
+ arch/arm64/include/asm/kvm_host.h    |  4 +++
+ arch/arm64/kvm/mmu.c                 | 43 ++++++++++++++++++++++------
+ 4 files changed, 48 insertions(+), 32 deletions(-)
 
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index 974cbfb1eefe..409c1e7137cd 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -810,7 +810,6 @@ struct kvm_vcpu_arch {
+diff --git a/arch/arm64/include/asm/esr.h b/arch/arm64/include/asm/esr.h
+index 29f97eb3dad4..0f2cb27691de 100644
+--- a/arch/arm64/include/asm/esr.h
++++ b/arch/arm64/include/asm/esr.h
+@@ -321,8 +321,14 @@
+ 					 ESR_ELx_CP15_32_ISS_DIR_READ)
  
- 	struct {
- 		bool halted;
--		gfn_t gfns[ASYNC_PF_PER_VCPU];
- 		struct gfn_to_hva_cache data;
- 		u64 msr_en_val; /* MSR_KVM_ASYNC_PF_EN */
- 		u64 msr_int_val; /* MSR_KVM_ASYNC_PF_INT */
-@@ -1878,7 +1877,6 @@ void kvm_arch_async_page_ready(struct kvm_vcpu *vcpu,
- 			       struct kvm_async_pf *work);
- void kvm_arch_async_page_present_queued(struct kvm_vcpu *vcpu);
- bool kvm_arch_can_dequeue_async_page_present(struct kvm_vcpu *vcpu);
--extern bool kvm_find_async_pf_gfn(struct kvm_vcpu *vcpu, gfn_t gfn);
+ #ifndef __ASSEMBLY__
++#include <linux/bitfield.h>
+ #include <asm/types.h>
  
- int kvm_skip_emulated_instruction(struct kvm_vcpu *vcpu);
- int kvm_complete_insn_gp(struct kvm_vcpu *vcpu, int err);
-diff --git a/arch/x86/kvm/Kconfig b/arch/x86/kvm/Kconfig
-index ac69894eab88..53a6ef30b6ee 100644
---- a/arch/x86/kvm/Kconfig
-+++ b/arch/x86/kvm/Kconfig
-@@ -32,6 +32,7 @@ config KVM
- 	select HAVE_KVM_IRQ_ROUTING
- 	select HAVE_KVM_EVENTFD
- 	select KVM_ASYNC_PF
-+	select KVM_ASYNC_PF_SLOT
- 	select USER_RETURN_NOTIFIER
- 	select KVM_MMIO
- 	select SCHED_INFO
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index c4f4fa23320e..cd8aaa662ac2 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -3799,7 +3799,7 @@ static bool try_async_pf(struct kvm_vcpu *vcpu, bool prefault, gfn_t gfn,
- 
- 	if (!prefault && kvm_can_do_async_pf(vcpu)) {
- 		trace_kvm_try_async_get_page(cr2_or_gpa, gfn);
--		if (kvm_find_async_pf_gfn(vcpu, gfn)) {
-+		if (kvm_async_pf_find_slot(vcpu, gfn)) {
- 			trace_kvm_async_pf_doublefault(cr2_or_gpa, gfn);
- 			kvm_make_request(KVM_REQ_APF_HALT, vcpu);
- 			return true;
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 7f35d9324b99..a5f7d6122178 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -332,13 +332,6 @@ static struct kmem_cache *kvm_alloc_emulator_cache(void)
- 
- static int emulator_fix_hypercall(struct x86_emulate_ctxt *ctxt);
- 
--static inline void kvm_async_pf_hash_reset(struct kvm_vcpu *vcpu)
--{
--	int i;
--	for (i = 0; i < ASYNC_PF_PER_VCPU; i++)
--		vcpu->arch.apf.gfns[i] = ~0;
--}
--
- static void kvm_on_user_return(struct user_return_notifier *urn)
++#define esr_dabt_fault_type(esr)	(esr & ESR_ELx_FSC_TYPE)
++#define esr_dabt_fault_level(esr)	(FIELD_GET(ESR_ELx_FSC_LEVEL, esr))
++#define esr_dabt_is_wnr(esr)		(!!(FIELD_GET(ESR_ELx_WNR, esr)))
++#define esr_dabt_is_s1ptw(esr)		(!!(FIELD_GET(ESR_ELx_S1PTW, esr)))
++
+ static inline bool esr_is_data_abort(u32 esr)
  {
- 	unsigned slot;
-@@ -854,7 +847,7 @@ void kvm_post_set_cr0(struct kvm_vcpu *vcpu, unsigned long old_cr0, unsigned lon
+ 	const u32 ec = ESR_ELx_EC(esr);
+diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
+index 923b4d08ea9a..90742f4b1acd 100644
+--- a/arch/arm64/include/asm/kvm_emulate.h
++++ b/arch/arm64/include/asm/kvm_emulate.h
+@@ -285,13 +285,13 @@ static __always_inline int kvm_vcpu_dabt_get_rd(const struct kvm_vcpu *vcpu)
+ 
+ static __always_inline bool kvm_vcpu_abt_iss1tw(const struct kvm_vcpu *vcpu)
  {
- 	if ((cr0 ^ old_cr0) & X86_CR0_PG) {
- 		kvm_clear_async_pf_completion_queue(vcpu);
--		kvm_async_pf_hash_reset(vcpu);
-+		kvm_async_pf_reset_slot(vcpu);
- 	}
- 
- 	if ((cr0 ^ old_cr0) & KVM_MMU_CR0_ROLE_BITS)
-@@ -3118,7 +3111,7 @@ static int kvm_pv_enable_async_pf(struct kvm_vcpu *vcpu, u64 data)
- 
- 	if (!kvm_pv_async_pf_enabled(vcpu)) {
- 		kvm_clear_async_pf_completion_queue(vcpu);
--		kvm_async_pf_hash_reset(vcpu);
-+		kvm_async_pf_reset_slot(vcpu);
- 		return 0;
- 	}
- 
-@@ -10704,7 +10697,7 @@ int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu)
- 
- 	vcpu->arch.pat = MSR_IA32_CR_PAT_DEFAULT;
- 
--	kvm_async_pf_hash_reset(vcpu);
-+	kvm_async_pf_reset_slot(vcpu);
- 	kvm_pmu_init(vcpu);
- 
- 	vcpu->arch.pending_external_vector = -1;
-@@ -10828,7 +10821,7 @@ void kvm_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event)
- 	kvmclock_reset(vcpu);
- 
- 	kvm_clear_async_pf_completion_queue(vcpu);
--	kvm_async_pf_hash_reset(vcpu);
-+	kvm_async_pf_reset_slot(vcpu);
- 	vcpu->arch.apf.halted = false;
- 
- 	if (vcpu->arch.guest_fpu && kvm_mpx_supported()) {
-@@ -11737,73 +11730,6 @@ void kvm_arch_async_page_ready(struct kvm_vcpu *vcpu, struct kvm_async_pf *work)
- 	kvm_mmu_do_page_fault(vcpu, work->cr2_or_gpa, 0, true);
+-	return !!(kvm_vcpu_get_esr(vcpu) & ESR_ELx_S1PTW);
++	return esr_dabt_is_s1ptw(kvm_vcpu_get_esr(vcpu));
  }
  
--static inline u32 kvm_async_pf_hash_fn(gfn_t gfn)
--{
--	BUILD_BUG_ON(!is_power_of_2(ASYNC_PF_PER_VCPU));
--
--	return hash_32(gfn & 0xffffffff, order_base_2(ASYNC_PF_PER_VCPU));
--}
--
--static inline u32 kvm_async_pf_next_probe(u32 key)
--{
--	return (key + 1) & (ASYNC_PF_PER_VCPU - 1);
--}
--
--static void kvm_add_async_pf_gfn(struct kvm_vcpu *vcpu, gfn_t gfn)
--{
--	u32 key = kvm_async_pf_hash_fn(gfn);
--
--	while (vcpu->arch.apf.gfns[key] != ~0)
--		key = kvm_async_pf_next_probe(key);
--
--	vcpu->arch.apf.gfns[key] = gfn;
--}
--
--static u32 kvm_async_pf_gfn_slot(struct kvm_vcpu *vcpu, gfn_t gfn)
--{
--	int i;
--	u32 key = kvm_async_pf_hash_fn(gfn);
--
--	for (i = 0; i < ASYNC_PF_PER_VCPU &&
--		     (vcpu->arch.apf.gfns[key] != gfn &&
--		      vcpu->arch.apf.gfns[key] != ~0); i++)
--		key = kvm_async_pf_next_probe(key);
--
--	return key;
--}
--
--bool kvm_find_async_pf_gfn(struct kvm_vcpu *vcpu, gfn_t gfn)
--{
--	return vcpu->arch.apf.gfns[kvm_async_pf_gfn_slot(vcpu, gfn)] == gfn;
--}
--
--static void kvm_del_async_pf_gfn(struct kvm_vcpu *vcpu, gfn_t gfn)
--{
--	u32 i, j, k;
--
--	i = j = kvm_async_pf_gfn_slot(vcpu, gfn);
--
--	if (WARN_ON_ONCE(vcpu->arch.apf.gfns[i] != gfn))
--		return;
--
--	while (true) {
--		vcpu->arch.apf.gfns[i] = ~0;
--		do {
--			j = kvm_async_pf_next_probe(j);
--			if (vcpu->arch.apf.gfns[j] == ~0)
--				return;
--			k = kvm_async_pf_hash_fn(vcpu->arch.apf.gfns[j]);
--			/*
--			 * k lies cyclically in ]i,j]
--			 * |    i.k.j |
--			 * |....j i.k.| or  |.k..j i...|
--			 */
--		} while ((i <= j) ? (i < k && k <= j) : (i < k || k <= j));
--		vcpu->arch.apf.gfns[i] = vcpu->arch.apf.gfns[j];
--		i = j;
--	}
--}
--
- static inline int apf_put_user_notpresent(struct kvm_vcpu *vcpu)
+ /* Always check for S1PTW *before* using this. */
+ static __always_inline bool kvm_vcpu_dabt_iswrite(const struct kvm_vcpu *vcpu)
  {
- 	u32 reason = KVM_PV_REASON_PAGE_NOT_PRESENT;
-@@ -11867,7 +11793,7 @@ bool kvm_arch_async_page_not_present(struct kvm_vcpu *vcpu,
- 	struct x86_exception fault;
+-	return kvm_vcpu_get_esr(vcpu) & ESR_ELx_WNR;
++	return esr_dabt_is_wnr(kvm_vcpu_get_esr(vcpu));
+ }
  
- 	trace_kvm_async_pf_not_present(work->arch.token, work->cr2_or_gpa);
--	kvm_add_async_pf_gfn(vcpu, work->arch.gfn);
-+	kvm_async_pf_add_slot(vcpu, work->arch.gfn);
+ static inline bool kvm_vcpu_dabt_is_cm(const struct kvm_vcpu *vcpu)
+@@ -320,11 +320,6 @@ static inline bool kvm_vcpu_trap_is_iabt(const struct kvm_vcpu *vcpu)
+ 	return kvm_vcpu_trap_get_class(vcpu) == ESR_ELx_EC_IABT_LOW;
+ }
  
- 	if (kvm_can_deliver_async_pf(vcpu) &&
- 	    !apf_put_user_notpresent(vcpu)) {
-@@ -11904,7 +11830,7 @@ void kvm_arch_async_page_present(struct kvm_vcpu *vcpu,
- 	if (work->wakeup_all)
- 		work->arch.token = ~0; /* broadcast wakeup */
- 	else
--		kvm_del_async_pf_gfn(vcpu, work->arch.gfn);
-+		kvm_async_pf_remove_slot(vcpu, work->arch.gfn);
- 	trace_kvm_async_pf_ready(work->arch.token, work->cr2_or_gpa);
+-static inline bool kvm_vcpu_trap_is_exec_fault(const struct kvm_vcpu *vcpu)
+-{
+-	return kvm_vcpu_trap_is_iabt(vcpu) && !kvm_vcpu_abt_iss1tw(vcpu);
+-}
+-
+ static __always_inline u8 kvm_vcpu_trap_get_fault(const struct kvm_vcpu *vcpu)
+ {
+ 	return kvm_vcpu_get_esr(vcpu) & ESR_ELx_FSC;
+@@ -332,12 +327,7 @@ static __always_inline u8 kvm_vcpu_trap_get_fault(const struct kvm_vcpu *vcpu)
  
- 	if ((work->wakeup_all || work->notpresent_injected) &&
+ static __always_inline u8 kvm_vcpu_trap_get_fault_type(const struct kvm_vcpu *vcpu)
+ {
+-	return kvm_vcpu_get_esr(vcpu) & ESR_ELx_FSC_TYPE;
+-}
+-
+-static __always_inline u8 kvm_vcpu_trap_get_fault_level(const struct kvm_vcpu *vcpu)
+-{
+-	return kvm_vcpu_get_esr(vcpu) & ESR_ELx_FSC_LEVEL;
++	return esr_dabt_fault_type(kvm_vcpu_get_esr(vcpu));
+ }
+ 
+ static __always_inline bool kvm_vcpu_abt_issea(const struct kvm_vcpu *vcpu)
+@@ -365,17 +355,6 @@ static __always_inline int kvm_vcpu_sys_get_rt(struct kvm_vcpu *vcpu)
+ 	return ESR_ELx_SYS64_ISS_RT(esr);
+ }
+ 
+-static inline bool kvm_is_write_fault(struct kvm_vcpu *vcpu)
+-{
+-	if (kvm_vcpu_abt_iss1tw(vcpu))
+-		return true;
+-
+-	if (kvm_vcpu_trap_is_iabt(vcpu))
+-		return false;
+-
+-	return kvm_vcpu_dabt_iswrite(vcpu);
+-}
+-
+ static inline unsigned long kvm_vcpu_get_mpidr_aff(struct kvm_vcpu *vcpu)
+ {
+ 	return vcpu_read_sys_reg(vcpu, MPIDR_EL1) & MPIDR_HWID_BITMASK;
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index 1824f7e1f9ab..581825b9df77 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -606,6 +606,10 @@ int __kvm_arm_vcpu_set_events(struct kvm_vcpu *vcpu,
+ 
+ #define KVM_ARCH_WANT_MMU_NOTIFIER
+ 
++int kvm_handle_user_mem_abort(struct kvm_vcpu *vcpu,
++			      struct kvm_memory_slot *memslot,
++			      phys_addr_t fault_ipa, unsigned long hva,
++			      unsigned int esr, bool prefault);
+ void kvm_arm_halt_guest(struct kvm *kvm);
+ void kvm_arm_resume_guest(struct kvm *kvm);
+ 
+diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+index 0625bf2353c2..e4038c5e931d 100644
+--- a/arch/arm64/kvm/mmu.c
++++ b/arch/arm64/kvm/mmu.c
+@@ -892,9 +892,34 @@ static int sanitise_mte_tags(struct kvm *kvm, kvm_pfn_t pfn,
+ 	return 0;
+ }
+ 
+-static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+-			  struct kvm_memory_slot *memslot, unsigned long hva,
+-			  unsigned long fault_status)
++static inline bool is_exec_fault(unsigned int esr)
++{
++	if (ESR_ELx_EC(esr) != ESR_ELx_EC_IABT_LOW)
++		return false;
++
++	if (esr_dabt_is_s1ptw(esr))
++		return false;
++
++	return true;
++}
++
++static inline bool is_write_fault(unsigned int esr)
++{
++	if (esr_dabt_is_s1ptw(esr))
++		return true;
++
++	if (ESR_ELx_EC(esr) == ESR_ELx_EC_IABT_LOW)
++		return false;
++
++	return esr_dabt_is_wnr(esr);
++}
++
++int kvm_handle_user_mem_abort(struct kvm_vcpu *vcpu,
++			      struct kvm_memory_slot *memslot,
++			      phys_addr_t fault_ipa,
++			      unsigned long hva,
++			      unsigned int esr,
++			      bool prefault)
+ {
+ 	int ret = 0;
+ 	bool write_fault, writable, force_pte = false;
+@@ -909,14 +934,15 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+ 	gfn_t gfn;
+ 	kvm_pfn_t pfn;
+ 	bool logging_active = memslot_is_logging(memslot);
+-	unsigned long fault_level = kvm_vcpu_trap_get_fault_level(vcpu);
++	unsigned int fault_status = esr_dabt_fault_type(esr);
++	unsigned long fault_level = esr_dabt_fault_level(esr);
+ 	unsigned long vma_pagesize, fault_granule;
+ 	enum kvm_pgtable_prot prot = KVM_PGTABLE_PROT_R;
+ 	struct kvm_pgtable *pgt;
+ 
+ 	fault_granule = 1UL << ARM64_HW_PGTABLE_LEVEL_SHIFT(fault_level);
+-	write_fault = kvm_is_write_fault(vcpu);
+-	exec_fault = kvm_vcpu_trap_is_exec_fault(vcpu);
++	write_fault = is_write_fault(kvm_vcpu_get_esr(vcpu));
++	exec_fault = is_exec_fault(kvm_vcpu_get_esr(vcpu));
+ 	VM_BUG_ON(write_fault && exec_fault);
+ 
+ 	if (fault_status == FSC_PERM && !write_fault && !exec_fault) {
+@@ -1176,7 +1202,7 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu)
+ 	gfn = fault_ipa >> PAGE_SHIFT;
+ 	memslot = gfn_to_memslot(vcpu->kvm, gfn);
+ 	hva = gfn_to_hva_memslot_prot(memslot, gfn, &writable);
+-	write_fault = kvm_is_write_fault(vcpu);
++	write_fault = is_write_fault(kvm_vcpu_get_esr(vcpu));
+ 	if (kvm_is_error_hva(hva) || (write_fault && !writable)) {
+ 		/*
+ 		 * The guest has put either its instructions or its page-tables
+@@ -1231,7 +1257,8 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu)
+ 		goto out_unlock;
+ 	}
+ 
+-	ret = user_mem_abort(vcpu, fault_ipa, memslot, hva, fault_status);
++	ret = kvm_handle_user_mem_abort(vcpu, memslot, fault_ipa, hva,
++					kvm_vcpu_get_esr(vcpu), false);
+ 	if (ret == 0)
+ 		ret = 1;
+ out:
 -- 
 2.23.0
 
