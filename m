@@ -2,41 +2,41 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A3B5D3ED750
-	for <lists+kvm@lfdr.de>; Mon, 16 Aug 2021 15:34:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A489F3ED74C
+	for <lists+kvm@lfdr.de>; Mon, 16 Aug 2021 15:34:36 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240681AbhHPNbO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 16 Aug 2021 09:31:14 -0400
-Received: from mail-bn7nam10on2079.outbound.protection.outlook.com ([40.107.92.79]:29025
-        "EHLO NAM10-BN7-obe.outbound.protection.outlook.com"
+        id S240540AbhHPNa7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 16 Aug 2021 09:30:59 -0400
+Received: from mail-dm6nam12on2052.outbound.protection.outlook.com ([40.107.243.52]:54272
+        "EHLO NAM12-DM6-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S241005AbhHPN3M (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 16 Aug 2021 09:29:12 -0400
+        id S240863AbhHPN2z (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 16 Aug 2021 09:28:55 -0400
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=G1cXMy/YoAkT/xdDG0QPdQUodrtMBNFVAQgycLxgI3ylk9c2pdVqGtdFuhaKt5SZPvJVL6iqrUDnx5pWQduD4bMAtx+AkFhXVfi8ecUtFEkumM130jrbORashj+Zf5mqCswgm89h9dd7NI2GhlxOe9gepvxxnZ+S4jJgUotUmTT1OPbfPtT71aLxEW5f1792PAKtuTpkHSx8FP3LPu9+B6qzQYJpqahWBu/Vd2vUhEQ7CmLJW7mtGvWg2NM7MislFOYA63N7nbVHdK0EPTsHOKyiAFe+28rg1DI4FtpoT6xVxa5ns8jb1gImcPkDK4xF8F3s36z5qJk4NPfs5LmwiQ==
+ b=OqxpuU98vEVwm/RuW80Wrq0F90Xf8OvwH/j8+Ezm/B82EZuJlnlHLC1PDXiFkASvaFcdmdT5mtjYLr0sfJdH20X9c6e+JvaNwiTsCrlDUZnNQbIYLXMwv3tcIYuuPt9LnCN6wnAT3Wx9e0aHC60m5SYTySeFfHNDxnXLxefk3V0A6A4gEHdfIbVSwZdy4lvU/x8/riMv+qj2uPypTr2lKn5C24Udt8uiUmv+Z638JnBTq1bpoQkvHJszCi7wbQjA1sp14Z90Xy1xO7S9xfZUGwd3UVd16n9Dp9pWG5MDUVLyuTg+RGbe00E4C+0Dw/dJTVr+Vffzi9z5S1m+nTSO0A==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=x+C1x96+bNrOUiO/cYfsnanaIcSqz5m0ElE3dtkxq3w=;
- b=L6Yc6WT67lkPfHIRAV57YD8D9+dotCwbtdEkuuH2jTY+Sejt0MdGopBwNafP1uaAibpH9iwbaGy7lGqLOPN3uWLbzEKC8yp2qe2l33SVTefgfPxa8j+kFLnY4LdsfJDTOtvDeuXK3tFTdVfAW/19lzoSuv+nNJMffXrD++K3AxLjgTuoDiTQfMoMlu5JNJY79vrqVdXcqi3HFOpuedUXlgpLwnrq2FZxbN3oXI5aQR7pqyYQNnB9bpmwCawp85BfQ8G4UPeknrVKhDa9M0r9AjTJfJ4ZjLFwm4WMNjwebXqgRycF3ZE47r421rAqPPJBul4YXcDEafbGN4ac36LZKg==
+ bh=fa3o1BM3eiT1R/L3CWJkvhGyU1P4SYCHUKP/SZzLdGs=;
+ b=ACD8XSDsAKy4XZfbdVbMwkuwAabGvc5nun1cY9XaWt7LKa8ufVWAFakf5azsQCHLrOExhBO71l5AAOyQJk+AuqEe+HosIKMKzNN587ncWKvfFmeVpKa+NTek5HkuE9H2hjNpaBRq8RAu9biM1t/Nceb92yT1K9LtncewcRiD29UDXvLGLVv2/CKSn/QeYy8jeI0wv3ha8JlukYScwv7qCG2Jo2Gq4CCc5fw95f3YkI9PS9qDa2+GyErHwNEXVzajCYIccVSAWGS6YHWdmgCG9QpB3o4TZbHs2GmBHIznc1QVtRCGQl7yVMdXI8585vPJYagAKkmdH3rqJXUUEtWyyw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
  header.d=amd.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=x+C1x96+bNrOUiO/cYfsnanaIcSqz5m0ElE3dtkxq3w=;
- b=zzGV8UADhmEjsm1ey5ImJxdOHAs14Mru6gvv2b9L2f3EPiTkuASct9v2OnpzbNTZQibeaQUtBYg5MUmD2nWADG67dn6rGM6AsjV8dgyWAWaHhHzcScdz0jRrNS6hZPvd+nCX6g9jvM4yIntJUgkftLqKtlzaX9HlMY2+1N/eIJc=
+ bh=fa3o1BM3eiT1R/L3CWJkvhGyU1P4SYCHUKP/SZzLdGs=;
+ b=z2jmEOhqPGUwbD4MlhpPkX40rclGz7V2rQRX1wXoYZ4ySUR1HQklP24pbsA2g1F5Fd314GZkvIZZDzOYRdIKySlpqoT0agpX9gLowTfzfvzub7sD0Fpi82wuJMMmwWkLxFLJGCvKXgNn/20D6Ew0vty4m51joCebbIw/vRXEPyU=
 Authentication-Results: nongnu.org; dkim=none (message not signed)
  header.d=none;nongnu.org; dmarc=none action=none header.from=amd.com;
 Received: from SN6PR12MB2767.namprd12.prod.outlook.com (2603:10b6:805:75::23)
- by SN6PR12MB2767.namprd12.prod.outlook.com (2603:10b6:805:75::23) with
+ by SN1PR12MB2366.namprd12.prod.outlook.com (2603:10b6:802:25::19) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4415.21; Mon, 16 Aug
- 2021 13:27:56 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4415.19; Mon, 16 Aug
+ 2021 13:28:21 +0000
 Received: from SN6PR12MB2767.namprd12.prod.outlook.com
  ([fe80::491e:2642:bae2:8b73]) by SN6PR12MB2767.namprd12.prod.outlook.com
  ([fe80::491e:2642:bae2:8b73%7]) with mapi id 15.20.4415.023; Mon, 16 Aug 2021
- 13:27:56 +0000
+ 13:28:21 +0000
 From:   Ashish Kalra <Ashish.Kalra@amd.com>
 To:     qemu-devel@nongnu.org
 Cc:     pbonzini@redhat.com, thomas.lendacky@amd.com,
@@ -44,143 +44,108 @@ Cc:     pbonzini@redhat.com, thomas.lendacky@amd.com,
         richard.henderson@linaro.org, jejb@linux.ibm.com, tobin@ibm.com,
         dovmurik@linux.vnet.ibm.com, frankeh@us.ibm.com,
         dgilbert@redhat.com, kvm@vger.kernel.org
-Subject: [RFC PATCH 04/13] hw/acpi: Don't include mirror vcpus in ACPI tables
-Date:   Mon, 16 Aug 2021 13:27:40 +0000
-Message-Id: <00e8dca71ff6da4efadbcc8db7a7a3e538b09638.1629118207.git.ashish.kalra@amd.com>
+Subject: [RFC PATCH 05/13] cpu: Add boolean mirror_vcpu field to CPUState
+Date:   Mon, 16 Aug 2021 13:28:10 +0000
+Message-Id: <eeae2e7593c7ab5771158f9552d6c08a0823c115.1629118207.git.ashish.kalra@amd.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <cover.1629118207.git.ashish.kalra@amd.com>
 References: <cover.1629118207.git.ashish.kalra@amd.com>
 Content-Type: text/plain
-X-ClientProxiedBy: SN6PR01CA0013.prod.exchangelabs.com (2603:10b6:805:b6::26)
- To SN6PR12MB2767.namprd12.prod.outlook.com (2603:10b6:805:75::23)
+X-ClientProxiedBy: SA9PR13CA0152.namprd13.prod.outlook.com
+ (2603:10b6:806:28::7) To SN6PR12MB2767.namprd12.prod.outlook.com
+ (2603:10b6:805:75::23)
 MIME-Version: 1.0
 X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from ashkalra_ubuntu_server.amd.com (165.204.77.1) by SN6PR01CA0013.prod.exchangelabs.com (2603:10b6:805:b6::26) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4415.14 via Frontend Transport; Mon, 16 Aug 2021 13:27:55 +0000
+Received: from ashkalra_ubuntu_server.amd.com (165.204.77.1) by SA9PR13CA0152.namprd13.prod.outlook.com (2603:10b6:806:28::7) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4436.12 via Frontend Transport; Mon, 16 Aug 2021 13:28:21 +0000
 X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: b0b99e3a-c86e-4ea3-b1fc-08d960b9a891
-X-MS-TrafficTypeDiagnostic: SN6PR12MB2767:
+X-MS-Office365-Filtering-Correlation-Id: 9372f728-d3fa-40fe-6f48-08d960b9b79f
+X-MS-TrafficTypeDiagnostic: SN1PR12MB2366:
 X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <SN6PR12MB27673818A9C13E6D7669FA0B8EFD9@SN6PR12MB2767.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:4941;
+X-Microsoft-Antispam-PRVS: <SN1PR12MB23660BB7DC677201FA4544378EFD9@SN1PR12MB2366.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:118;
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: x6cgDSXiHf1eBGVEe6xtgS4TX4S2boFJKcPdvULNSE4D0Djc/2FA70AlAeEXIfzHzXoImvN+JZ7av/+grP1pTyRNQviuMl0cG5ma3c07XaY1zC0FgBwPvCz+tiFKMM/NiRQj36korhWfyMvrkwIJYMh7VQAICtO/R9FJUe3DeoSMoyB9K2E7Dcy/HBUUAf/FbEh3Me3rWQ9kexRpYsMSLIGx34x8fRf5N6h4fiORoqi2uj6OT9VYgWBdNGMn3goIEYNlweY49IHo41xDKs3DoLHDzfnrges+0hOxjz6QAWP50S03dK2GKZIBIv3NEsINqrT/+y4Mhd+jMZHj0317ZpIVBxEfeZ9csHG36gbf/fKjtCOCo9SCfim3ShV+uPaRygTYg7Y5BzaGTT9Iu3r7gf0BQqF15m/XWOQ8OD/Toq3QZQ03aJ9iJEEaAKaaMdVVgva6INYcRGr47/AoZHiUlBBp5GyxmG7ylS8bBJjegwfH00nnOiAYYNAQUiO3aeGyhx0xGhinWdRm/TepbAB0qPynJ2cnv0k1EPQO2t8J3N4rDhIMaOaPWwsUQHTSjqhQz4HvverJnUbuiCZPZZHhQWjwgG24qkN2ZfCdSJ09pBvqJoBP4JxIyT1zct+O8huDJQIISzvHkVejAodC8lDwQFLkKxQiB/vYhj1JRRuw86OcmliT6/Kp3vJIvI8Eh4HsWgZqRoH86/Xv/+b4viJ2wQ==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR12MB2767.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(39860400002)(346002)(376002)(136003)(396003)(478600001)(2616005)(26005)(956004)(186003)(4326008)(7696005)(52116002)(36756003)(316002)(66946007)(7416002)(66556008)(66476007)(2906002)(5660300002)(38350700002)(38100700002)(6666004)(8676002)(6916009)(86362001)(6486002)(8936002);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam-Message-Info: 6QpERTbdahWFaRc7aCjzrznw/HPt+5FrK7Y/iKe/uSCp4ZJWqZcor6PVi1CTdwwVTSpGWp+nFkS2Zr8T5aXBrXU+TzRjiN84tTzcTWUjX2s4kbkAq1jVURRI7OqOsjUphmopftLsyu0XbKZA8XaHjRD31oOwIl8atoXDoTmvfCxKd1LezmPFhtY9My4/m5gxImDYdCxaR3UmKb2usig42OsKVb1PveJhq87NvxsRHECFno5oL3YeGVIb63EYgNiGIlx/4IGKeKDIne+qde5SrzW9/YhLDiuCLDQpIGgi6bAJnyx+82oK9Iu3L+5LNhezxxvmWfEP42kFnu9yuxQ0qFJ+njoVQZFCoqB8Bc3Ghmb57Mw4rbBWy9IiJwkl0RQ0Z1nWlFdCXH+19/X4a26qu/2Exe5ugqmwVynXjoUq2T567+gB1tXYpr0sIEM4il78eSwsCFRRlGti/fQGUv1/sVqfVs5a41MwWNoQWypI+Zif6v7n0vHDDNYQbixZ+jKyvjvsEqNAS6Ovz9xLI2ZciQ/dn6Z9XUTvTS7Y1JOrAozUB8LD94sqcPF417ySR3DGgd8x8Y4aNvd3G2abmkowPjZ955ojNmSOfOQ0BDxR4OYMsIzSS1aq8H6wvpkulBbeVFNsRBkzA3kPz0WoMhs0uk8ZpGDnYKb4Eyezq78NxtPxfuRtf1Sa2jsqdiALLmUUMqgL2y6H4RqPXjXWNhhXHg==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR12MB2767.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(7416002)(7696005)(38350700002)(316002)(38100700002)(956004)(2616005)(6486002)(2906002)(6916009)(52116002)(26005)(5660300002)(508600001)(8936002)(36756003)(66476007)(4326008)(6666004)(66556008)(66946007)(186003)(86362001)(8676002);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?KTNbZPQLQwy8n1khFDD0bTEqhn2j3IJpG2xI6CRQcrfoPeh9kmktDgMtKr06?=
- =?us-ascii?Q?tz4795FRnGVMVNA9pscbzjTBQgoZQly+dsh9kxT4A729FcAf2CRxAKivQeqL?=
- =?us-ascii?Q?Brk16LM0bYKMKjbF6tln1INyHBNsWC8wvIMMNgqYUY1myLCkqwZ5MLw0RudA?=
- =?us-ascii?Q?s9fuTA/iYJw2xvnXS3LugddgHpAQ5kiDV49ADok4F40XkPlI+BXz+yZJpBo0?=
- =?us-ascii?Q?xn8/bcIGB1apEACiUuMvGcp0XoTadRyAHHMshyAtUcrPksVc7kkK55FrFcRk?=
- =?us-ascii?Q?FVfrmse0ZscLqvI3CG45GVDvfPUogHmAVWyro9Bn3RSKjvDrwZYPn7KfTWSO?=
- =?us-ascii?Q?EZmxNWwJ42D0P1+uV1lI+dN1jl0hLNPMlTaaHaBoUZe0E1pCJXJHWEeTvBd9?=
- =?us-ascii?Q?7VrqFbrt07qx73lNRu5Ak+cL0ydLuTQjeBSzA0GcKB1q5xkFqCFIvK+nFn5l?=
- =?us-ascii?Q?tqzAGgbjyxy7HHf3zl1ky1n1XlsgBt0WTpkJHGvrdpSMulHD6m/CaSivxEvo?=
- =?us-ascii?Q?4DiHm9rhxTdREq1P5Svtg7Pzr+151EIylG4Ule+kf9YWgCjZ9yHuYauGS9Se?=
- =?us-ascii?Q?BwtekvXSt2tb0fV0RN52vQGN7ynDxy2niL6QCZgzkn+FUAl3bt1UFQ0k4dTS?=
- =?us-ascii?Q?bD9GU4rSO9Q3a02nkHWdtXieRndcu+Gw6sS6mFOWBkBR02A7zqMmxX9Mx80x?=
- =?us-ascii?Q?NiGR0Tti8ycpPiYi5mlm/EPkb7JZ1q2RPbdIO0OLSwyNszotWnQfJtwxyCG1?=
- =?us-ascii?Q?0/rvsd8JdFd+SGIiXJz25Jehso71uddwbhJFtGFgbLaBIL82a9Jys9dLqAmM?=
- =?us-ascii?Q?KUpoKtl8F0roxn6sq/QrJlz7ZLkHH2SFk1PV3lkHZl6LVlOfOuKF+TSQlIT1?=
- =?us-ascii?Q?G6daCrs/9uWk5Ir2J/aFvjnxvVF2ZzSmkwlAR5gY+nGDTKZcwvpspSbI15FC?=
- =?us-ascii?Q?/seK5HFxfNUt661EciVZDEOVTeuZOI72jxiOn6KkQerwRu7P/T5k2foZSh8l?=
- =?us-ascii?Q?H9xxu6hCHE+FrgUwnKzMA2MOEiwoWYgD736BzPWsJvXYG4tS7vP/v52p2Qej?=
- =?us-ascii?Q?EM+6eC5WRWUYDxa0vV5gfVHriYUaedGrUfYs1OvefCaQTR1A/os6NUU0Czp4?=
- =?us-ascii?Q?gqV2759+TmH8k0ejgNb9WENFmvnkAmdXeDrX/Zvr3bgx53xLpqQ+ujmASHB3?=
- =?us-ascii?Q?nKFreAWH1dWj6D8QHsCPjB8LW1j/oAkEFeqrqfoUD2oW4cLPZ+KbuAsvmaWY?=
- =?us-ascii?Q?3NyhRVzvccRMeLE4n81I+apVY82xbgk0RM/3TG8Fswn/jTMiadvbYp2qaqz6?=
- =?us-ascii?Q?0n24k4cBJYZr620Z/F7diDv9?=
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?DD5Ll4dDxikEbGgrmiU7eT+qiIVog15iA8tnbk4P+BfUK6WjvorTWkk8/Z3M?=
+ =?us-ascii?Q?IB69/FMvjOmZA8nAXrBVdQp5aNVlX3yE6n6fpHgOQZjcB8jrQPPpiouVdPeD?=
+ =?us-ascii?Q?Y2wre+aCW/aRnLxN2VxFXrZCOLiXNI0NrAi3ieelRbbuqAIbmIJGH8ESvtCv?=
+ =?us-ascii?Q?OB4O4Bzgo9ufXd59T8fR0I8jqa2z4sQBgNZ5dWiFkkUANfTJo/MaorjmQZCD?=
+ =?us-ascii?Q?tlKoYKO3wfIKgDW21Z1SeWNHZYNepVd6B2gUL6aNmJSDOuVogxhTi9QuCVZ/?=
+ =?us-ascii?Q?KRHXnMhR2smDu4IU4ZOdXiO8vnbe88BTlUQU8lp7Yek1SMAylzz3CxjuX4uv?=
+ =?us-ascii?Q?l+M3XH99i3ct7iAl4kH/uEYHHBDOMeCH1yv8Yta8224ukX/yJsjWQW8qZx+a?=
+ =?us-ascii?Q?UiUwTwgF2MEev3Fkc488F4gflzsohWnY0DlykzsHLF1rcLpNTybNCARAd062?=
+ =?us-ascii?Q?LW0L4Csv4aZF8QlkE3EwaYMV9bY8nQaOPbTxBGyAVgz9RNhoNnvfoVLNw9XC?=
+ =?us-ascii?Q?4Fb7ctpUBkZR8scdo+41t4vqjoC0JUVP+U36D0NtWFetNpVCpg16llvynvZd?=
+ =?us-ascii?Q?90kITYOH8uyUHuvBaGE0h+YN8fx2dyNyYRH7HTTt/6UZWfE6DkdtV2IBkhCR?=
+ =?us-ascii?Q?aL+7eJTGuhZ1PFYYwN3XDU34k6GJ5d9ucgF0sQ8hR5aLD6UctccGPgh+SYnr?=
+ =?us-ascii?Q?pbyvFQaJ8YGvZzkbn2edQn6YVLeX2l+WgDMGC9jvQrtn5RMIfrT3T02ErHfA?=
+ =?us-ascii?Q?TPx//K35dnjl+HvSURRPlUraRuECzpauoSoYiDcLKNIDW82kzOtCRfQL9oag?=
+ =?us-ascii?Q?131n1oXx8OlFw7whaZHtdp5B6SB/ZQiudx36nwKfbTnzr4kmGXQZfzgUkDar?=
+ =?us-ascii?Q?B+6wSm3OLoCiW85Gnl72q0x9MLTyPdHCrz6t2+fByJ8YuTyoL1UFtdRph+EM?=
+ =?us-ascii?Q?VJKMA88KOW+DxSxWE9sdscIrZhb6kWJ2r42iLQ2xODBUY5bQLZPFwQHJd0sH?=
+ =?us-ascii?Q?Qu7HDwJgkfNJvZyMYapeoe6OLEnss3MixmxIh8kzgbF/zalFo9TT4cF3a8BP?=
+ =?us-ascii?Q?OMoq1ALAleRrX0ZR5JmsPQSCdxgSpqHZuY1T9HKpA9c00EQ3NKwUsTPWaNAx?=
+ =?us-ascii?Q?1IdAicZxcZ26IeqqWd9B2uavCZ/7bl9uHHPc/84lPLLd8S8IePOmt/vRpd/z?=
+ =?us-ascii?Q?lNr5kLdhT+Kw2gubhGO8Ys8Qg7C5rGzoW35hCVQ4Qg356uSkfBqWKft4gD9i?=
+ =?us-ascii?Q?sceLejjUJ1EoS8hYlUsocYXfjOJZFMJ0elqHTg7Am1j43BduYm+4ed6SFWoL?=
+ =?us-ascii?Q?2g26lZTNjW5k+eVtWLIPcQn7?=
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: b0b99e3a-c86e-4ea3-b1fc-08d960b9a891
+X-MS-Exchange-CrossTenant-Network-Message-Id: 9372f728-d3fa-40fe-6f48-08d960b9b79f
 X-MS-Exchange-CrossTenant-AuthSource: SN6PR12MB2767.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Aug 2021 13:27:56.5311
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Aug 2021 13:28:21.7010
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: nO3ib5Uw49hFzlkGqxflxScJgYqMx7B4G3G1Yxy1TbiAq8riIZMal8GGL4vGGJj30Fqt32NUDvpED4Lt6sGKkg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN6PR12MB2767
+X-MS-Exchange-CrossTenant-UserPrincipalName: W3Qk0cGk107Epz9QlSf3qzPeIFD3+IupYxhB4oQAEih+ZI9EjF4xLxspxYEmf7mcvd0ri+hBQbMymk3lj1IigA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN1PR12MB2366
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Tobin Feldman-Fitzthum <tobin@linux.ibm.com>
+From: Dov Murik <dovmurik@linux.vnet.ibm.com>
 
-By excluding mirror vcpus from the ACPI tables, we hide them from the
-guest OS.
+The mirror field indicates mirror VCPUs.  This will allow QEMU to act
+differently on mirror VCPUs.
 
-Signed-off-by: Tobin Feldman-Fitzthum <tobin@linux.ibm.com>
 Signed-off-by: Dov Murik <dovmurik@linux.vnet.ibm.com>
 Co-developed-by: Ashish Kalra <ashish.kalra@amd.com>
 Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
 ---
- hw/acpi/cpu.c         | 10 ++++++++++
- hw/i386/acpi-build.c  |  5 +++++
- hw/i386/acpi-common.c |  5 +++++
- 3 files changed, 20 insertions(+)
+ hw/core/cpu-common.c  | 1 +
+ include/hw/core/cpu.h | 3 +++
+ 2 files changed, 4 insertions(+)
 
-diff --git a/hw/acpi/cpu.c b/hw/acpi/cpu.c
-index f82e9512fd..8ac2fd018e 100644
---- a/hw/acpi/cpu.c
-+++ b/hw/acpi/cpu.c
-@@ -435,6 +435,11 @@ void build_cpus_aml(Aml *table, MachineState *machine, CPUHotplugFeatures opts,
+diff --git a/hw/core/cpu-common.c b/hw/core/cpu-common.c
+index e2f5a64604..99298f3a79 100644
+--- a/hw/core/cpu-common.c
++++ b/hw/core/cpu-common.c
+@@ -269,6 +269,7 @@ static Property cpu_common_props[] = {
+                      MemoryRegion *),
+ #endif
+     DEFINE_PROP_BOOL("start-powered-off", CPUState, start_powered_off, false),
++    DEFINE_PROP_BOOL("mirror_vcpu", CPUState, mirror_vcpu, false),
+     DEFINE_PROP_END_OF_LIST(),
+ };
  
-         method = aml_method(CPU_NOTIFY_METHOD, 2, AML_NOTSERIALIZED);
-         for (i = 0; i < arch_ids->len; i++) {
-+            if (arch_ids->cpus[i].mirror_vcpu) {
-+                /* don't build objects for mirror vCPUs */
-+                continue;
-+            }
+diff --git a/include/hw/core/cpu.h b/include/hw/core/cpu.h
+index bc864564ce..a8f5f7862d 100644
+--- a/include/hw/core/cpu.h
++++ b/include/hw/core/cpu.h
+@@ -402,6 +402,9 @@ struct CPUState {
+     /* shared by kvm, hax and hvf */
+     bool vcpu_dirty;
+ 
++    /* does this cpu belong to mirror VM */
++    bool mirror_vcpu;
 +
-             Aml *cpu = aml_name(CPU_NAME_FMT, i);
-             Aml *uid = aml_arg(0);
-             Aml *event = aml_arg(1);
-@@ -650,6 +655,11 @@ void build_cpus_aml(Aml *table, MachineState *machine, CPUHotplugFeatures opts,
- 
-         /* build Processor object for each processor */
-         for (i = 0; i < arch_ids->len; i++) {
-+            if (arch_ids->cpus[i].mirror_vcpu) {
-+                /* don't build objects for mirror vCPUs */
-+                continue;
-+            }
-+
-             Aml *dev;
-             Aml *uid = aml_int(i);
-             GArray *madt_buf = g_array_new(0, 1, 1);
-diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
-index a33ac8b91e..3c0a8b47ef 100644
---- a/hw/i386/acpi-build.c
-+++ b/hw/i386/acpi-build.c
-@@ -1928,6 +1928,11 @@ build_srat(GArray *table_data, BIOSLinker *linker, MachineState *machine)
-     srat->reserved1 = cpu_to_le32(1);
- 
-     for (i = 0; i < apic_ids->len; i++) {
-+        if (apic_ids->cpus[i].mirror_vcpu) {
-+            /* don't build objects for mirror vCPUs */
-+            continue;
-+        }
-+
-         int node_id = apic_ids->cpus[i].props.node_id;
-         uint32_t apic_id = apic_ids->cpus[i].arch_id;
- 
-diff --git a/hw/i386/acpi-common.c b/hw/i386/acpi-common.c
-index 1f5947fcf9..80aefbc920 100644
---- a/hw/i386/acpi-common.c
-+++ b/hw/i386/acpi-common.c
-@@ -91,6 +91,11 @@ void acpi_build_madt(GArray *table_data, BIOSLinker *linker,
-     madt->flags = cpu_to_le32(1);
- 
-     for (i = 0; i < apic_ids->len; i++) {
-+        if (apic_ids->cpus[i].mirror_vcpu) {
-+            /* don't build objects for mirror vCPUs */
-+            continue;
-+        }
-+
-         adevc->madt_cpu(adev, i, apic_ids, table_data);
-         if (apic_ids->cpus[i].arch_id > 254) {
-             x2apic_mode = true;
+     /* Used to keep track of an outstanding cpu throttle thread for migration
+      * autoconverge
+      */
 -- 
 2.17.1
 
