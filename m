@@ -2,175 +2,149 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2EAD03ED45A
-	for <lists+kvm@lfdr.de>; Mon, 16 Aug 2021 14:54:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 59E113ED6B9
+	for <lists+kvm@lfdr.de>; Mon, 16 Aug 2021 15:23:27 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230195AbhHPMyv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 16 Aug 2021 08:54:51 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:49858 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230001AbhHPMyu (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 16 Aug 2021 08:54:50 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1629118459;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=1aBCNid+FsdWIG1NcQ8JIRQpqhBxYRIfZblS5BKJD0E=;
-        b=INI7PYzvV+919lvlCooffj7jfAnQrxk6XlJpdGXJj1vs7tE119vxRPXplVKZy3ow+6D2hK
-        h/dSPusG22E1hSsM4WAefCgKHumpAYzCkHQqnG7RQ+/j8raSKYLnPQOVzvhVoEYn+Fn+im
-        zXk2wiIAeaQ+5WceCO8CG3ZqqJip7zw=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-340-5qcRPz2ZPB66KLVz0s1irA-1; Mon, 16 Aug 2021 08:54:16 -0400
-X-MC-Unique: 5qcRPz2ZPB66KLVz0s1irA-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B20E1190A7A3;
-        Mon, 16 Aug 2021 12:54:15 +0000 (UTC)
-Received: from starship (unknown [10.35.206.50])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 5732C5D9D3;
-        Mon, 16 Aug 2021 12:54:14 +0000 (UTC)
-Message-ID: <332b6896f595282ea3d261095612fd31ce4cf14f.camel@redhat.com>
-Subject: RFC: Proposal to create a new version of the SVM nested state
- migration blob
-From:   Maxim Levitsky <mlevitsk@redhat.com>
-To:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Jim Mattson <jmattson@google.com>
-Date:   Mon, 16 Aug 2021 15:54:13 +0300
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
-MIME-Version: 1.0
+        id S238101AbhHPNXu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 16 Aug 2021 09:23:50 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:30516 "EHLO
+        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S237308AbhHPNVq (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 16 Aug 2021 09:21:46 -0400
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 17GD5g7p056732;
+        Mon, 16 Aug 2021 09:21:14 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : content-transfer-encoding : mime-version; s=pp1;
+ bh=ehE3Lg/5UjDftoPTqUH99EseAM97zPwJoDlBcB/4kvE=;
+ b=jldeLA32jjvEXHYlWHyzU3B4691+ppDa+e46dDyFHgT8u3aVWunN7l9tyRLui0sykyFh
+ k+ppWrfCaYwED58B/9xio3Wbu08jtwTfZFeQr5O1VJsmC8VVIj+4Wfl7MVKJzq1F9d1U
+ +Gn1JEoKAYLRW32TLDbUSKloyLdNKR/cmwQubYDhe0dts8z79PPW4oeFBXF2wkTe92Gb
+ aUiTdyr2nO5p29GDpP352x1bgugDwwSvFhlok0oODTSFVdL39lVXb/waObl7RJoWydM7
+ DUi2BKmk0ed/qXQWcHZnrrGsyKE8rTlcVTi+/3iCTo7fc5DIdviUtihg7AtxulpaTWzn tA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3aeud8ffu2-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 16 Aug 2021 09:21:14 -0400
+Received: from m0098417.ppops.net (m0098417.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 17GD5qdt057642;
+        Mon, 16 Aug 2021 09:21:14 -0400
+Received: from ppma03fra.de.ibm.com (6b.4a.5195.ip4.static.sl-reverse.com [149.81.74.107])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3aeud8fftk-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 16 Aug 2021 09:21:14 -0400
+Received: from pps.filterd (ppma03fra.de.ibm.com [127.0.0.1])
+        by ppma03fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 17GDCEcW030749;
+        Mon, 16 Aug 2021 13:21:12 GMT
+Received: from b06avi18626390.portsmouth.uk.ibm.com (b06avi18626390.portsmouth.uk.ibm.com [9.149.26.192])
+        by ppma03fra.de.ibm.com with ESMTP id 3ae5f8twp7-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 16 Aug 2021 13:21:12 +0000
+Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
+        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 17GDHko258261886
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 16 Aug 2021 13:17:46 GMT
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id DC82211C054;
+        Mon, 16 Aug 2021 13:21:08 +0000 (GMT)
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 5C0FC11C070;
+        Mon, 16 Aug 2021 13:21:08 +0000 (GMT)
+Received: from localhost.localdomain.com (unknown [9.145.144.221])
+        by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Mon, 16 Aug 2021 13:21:08 +0000 (GMT)
+From:   Janosch Frank <frankja@linux.ibm.com>
+To:     pbonzini@redhat.com
+Cc:     kvm@vger.kernel.org, frankja@linux.ibm.com, david@redhat.com,
+        borntraeger@de.ibm.com, cohuck@redhat.com,
+        linux-s390@vger.kernel.org, imbrenda@linux.ibm.com,
+        thuth@redhat.com
+Subject: [kvm-unit-tests GIT PULL 00/11] s390x update 2021-16-08
+Date:   Mon, 16 Aug 2021 15:20:43 +0200
+Message-Id: <20210816132054.60078-1-frankja@linux.ibm.com>
+X-Mailer: git-send-email 2.31.1
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: O3Bd_Y_zQVImfLhO-u3fgusG-ZdEOPy-
+X-Proofpoint-ORIG-GUID: jafOcFO2cTJCbWuPYIBKkZ16WyjitWuY
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Proofpoint-UnRewURL: 0 URL was un-rewritten
+MIME-Version: 1.0
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.790
+ definitions=2021-08-16_04:2021-08-16,2021-08-16 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015
+ lowpriorityscore=0 mlxscore=0 bulkscore=0 phishscore=0 adultscore=0
+ malwarescore=0 impostorscore=0 priorityscore=1501 mlxlogscore=999
+ suspectscore=0 spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2107140000 definitions=main-2108160083
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi!
+Dear Paolo,
 
-Today I was studying again the differences between the SVM and VMX handling of the nested migration,
-and I reached the conclusion that it might be worth it to create a new format of the SVM nested
-state.
- 
-Especially since nested SVM mostly isn't yet in production, it might be a good time now
-to fix this and reduce the overall complexity and difference in implementation vs VMX.
- 
-These are the issues with the current SVM nested state format:
+please merge or pull the following changes:
 
+ - SPDX cleanup
+ - SIE lib extensions
+ - Fixes/cleanup in the lib
 
-1.
+MERGE:
+https://gitlab.com/kvm-unit-tests/kvm-unit-tests/-/merge_requests/15
 
+PIPELINE:
+https://gitlab.com/frankja/kvm-unit-tests/-/pipelines/353890035
 
-On VMX the nested state is very simple and straightforward. It is the VMCS12.
- 
-This works because while nested, the VMCS01 doesn't need to have a valid guest state at all,
-since on nested VM exit, L1 guest state will be overwritten from VMCB12 constant 'host state'.
- 
-Thus on VMX, while nested, the VMCS01 is almost fully (sans things like TSC multiplier),
-created by KVM, and can be recreated fully on the target machine, without a need to have (parts of it)
-in the migration stream.
- 
-When loading the nested state on VMX, we work in a very similar manner as for the regular nested entry.
-Even the same function that is used for regular entry, is used for loading of the nested state.
-(nested_vmx_enter_non_root_mode).
- 
-We load both the control and save state from VMCS12 thus overwriting whatever L2 state exists currently
-in the CPU registers.
- 
- 
-On SVM on the other hand, the VMCB01 contains the L1 ‘host’ state
-(after we ‘adjusted’ it, as I explain later), and it has to be migrated as well.
- 
-The straightforward nested state for the SVM, thus would be this ‘host’ state
-*and* the VMCB12.
- 
-However due to whatever reasons, we didn’t implement the nested state in this way.
- 
-Instead, we don’t store the save area of the vmcb12 in the migration stream,
-because in theory the register state of the L2 is restored prior/after setting of
-the nested state using standard KVM_SET_{S|}REGS, and such.
+PULL:
+The following changes since commit c90c646d7381c99ac7d9d7812bd8535214458978:
 
-We could have done the same for VMX as well.
- 
-And in this save area we store the *L1* save area (aka L1 ‘host state’) 
-there, which we have to preserve unlike on VMX.
- 
-Thus in the end the nested state of SVM is also a VMCB but it is ‘stitched’
-as explained above.
- 
-This forces us to have quite different code for loading the nested state and
-for regular nested entry and can be prone to errors, and various issues.
-It is also quite confusing.
- 
-One issue that is related to this, had to be worked around with another slight hack,
-was that Vitaly recently found is that it is possible to enter L1 via a 'SMM detour':
-If SMI happens while L2 is running, and L1 is not intercepting the SMI, 
-we need to enter L1, but we (more similar to VMX) have to load fixed SMM host state, 
-and don't touch the L1 'host' state stored in VMCB01.
- 
-Another issue which I am trying to fix related to the fact that on VMX it uses
-the KVM_REQ_GET_NESTED_STATE_PAGES for VM entries that happen on exit from SMM
-while SVM doesn’t, which is also a result of differences between the implementations.
+  access: treat NX as reserved if EFER.NXE=0 (2021-08-13 07:29:28 -0400)
 
+are available in the Git repository at:
 
+  https://gitlab.com/frankja/kvm-unit-tests.git s390x-pull-2021-16-08
 
-2.
+for you to fetch changes up to 454da83a513761a0cd2bfda08f335735f345ef87:
 
- 
-On SVM, the host state is transparently saved 'somewhere'.
-'somewhere' is defined as either per cpu HSAVE area, or the cpu internal cache.
- 
-For nesting we opt for ‘cpu internal cache’ and keep the L1 'host' state in VMCB01 since it is already naturally saved
-there, however we slightly modify this state which is also somewhat a hack, which also increases complexity and in this
-case even should decrease the performance a little bit: 
- 
-We replace CPU visible values of CR0/CR3/CR4/EFER, 
-with guest visible values (vcpu->arch.cr*/efer) to avoid losing them.
- 
-And then on nested VM exit we load the guest visible values again from VMCB01, and pass them to kvm_set_cr* 
-functions, which add/remove bits as needed to get back the CPU visible values, and 
-store them back to VMCB01, and store back the guest visible values into (vcpu->arch.cr*/efer)
- 
-That in theory should restore both the guest visible and cpu visible values of these registers,
-but can be prone to errors.
- 
-It would be much cleaner if we kept vmcb01 as is, and stored the guest visible cr* values
-somewhere else, which would allow us to avoid updating the vmcb01 twice.
- 
-Then on nested VM exit, 
-we would only restore the kvm's guest visible values (vcpu->arch.cr*/efer) 
-from that 'somewhere else', and could do this without any checks/etc, since these already passed all checks.
- 
-This needs to save these values in the migration stream as well of course.
- 
-Note that on VMX, this issue doesn’t exist since host state isn’t preserved, but rather
-force loaded from the VMCS on each VM exit.
- 
- 
-Finally I propose that SVM nested state would be:
- 
-* L1 save area.
-* L1 guest visible CR*/EFER/etc values (vcpu->arch.cr* values)
-* Full VMCB12 (save and control area)
- 
- 
-What do you think?
- 
- 
-For backward compatibility we can have a function that will 'convert' 
-the old state to new state by guessing the L2 save area from current CPU state and treating the L1 save area
-in the old state as area that was 'adjusted' with guest visible CR* values, thus keeping this complexity
-In this conversion function which can even go away in the future.
- 
- 
-I did most of this research today trying to fix a few bugs I introduced when I added my SREG2 ioctl,
-in regard to exit back from SMM mode, which is also done differently on SVM than on VMX.
- 
- 
-Best regards,
-	Maxim Levitsky
+  lib: s390x: Add PSW_MASK_64 (2021-08-16 11:28:02 +0000)
+
+Janosch Frank (10):
+  s390x: Add SPDX and header comments for s390x/* and lib/s390x/*
+  s390x: Add SPDX and header comments for the snippets folder
+  s390x: Fix my mail address in the headers
+  s390x: sie: Add sie lib validity handling
+  s390x: lib: Introduce HPAGE_* constants
+  s390x: lib: sie: Add struct vm (de)initialization functions
+  lib: s390x: sie: Move sie function into library
+  lib: s390x: Add 0x3d, 0x3e and 0x3f PGM constants
+  lib: s390x: uv: Add rc 0x100 query error handling
+  lib: s390x: Add PSW_MASK_64
+
+Pierre Morel (1):
+  s390x: lib: Simplify stsi_get_fc and move it to library
+
+ lib/s390x/asm/arch_def.h        | 22 +++++++++
+ lib/s390x/asm/mem.h             |  2 +-
+ lib/s390x/asm/page.h            |  4 ++
+ lib/s390x/interrupt.c           |  3 ++
+ lib/s390x/mmu.h                 |  2 +-
+ lib/s390x/sie.c                 | 83 +++++++++++++++++++++++++++++++++
+ lib/s390x/sie.h                 |  7 +++
+ lib/s390x/smp.c                 |  2 +-
+ lib/s390x/stack.c               |  2 +-
+ lib/s390x/uv.c                  | 13 +++++-
+ s390x/Makefile                  |  1 +
+ s390x/gs.c                      |  2 +-
+ s390x/iep.c                     |  2 +-
+ s390x/mvpg-sie.c                | 42 +++++------------
+ s390x/sie.c                     | 53 ++++++---------------
+ s390x/skrf.c                    |  6 +--
+ s390x/snippets/c/cstart.S       |  9 ++++
+ s390x/snippets/c/mvpg-snippet.c |  9 ++++
+ s390x/stsi.c                    | 20 +-------
+ s390x/vector.c                  |  2 +-
+ 20 files changed, 188 insertions(+), 98 deletions(-)
+ create mode 100644 lib/s390x/sie.c
+
+-- 
+2.31.1
 
