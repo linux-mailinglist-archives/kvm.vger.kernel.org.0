@@ -2,143 +2,68 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 471A33ED0A8
-	for <lists+kvm@lfdr.de>; Mon, 16 Aug 2021 10:53:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 02A6C3ED108
+	for <lists+kvm@lfdr.de>; Mon, 16 Aug 2021 11:26:53 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235201AbhHPIxo (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 16 Aug 2021 04:53:44 -0400
-Received: from mx12.kaspersky-labs.com ([91.103.66.155]:18036 "EHLO
-        mx12.kaspersky-labs.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235199AbhHPIxn (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 16 Aug 2021 04:53:43 -0400
-Received: from relay12.kaspersky-labs.com (unknown [127.0.0.10])
-        by relay12.kaspersky-labs.com (Postfix) with ESMTP id 4B1CB76602;
-        Mon, 16 Aug 2021 11:53:10 +0300 (MSK)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kaspersky.com;
-        s=mail202102; t=1629103990;
-        bh=zA66q/z+6uWww8VK3ZD3B6UBxpbsiv8++v4tgwOJAqM=;
-        h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type;
-        b=DSlK5YewvoYkVihQvJ10YCetlFkX4b8YOP4lxfpHcg94ov75dfMAYunLaBfJL45Wn
-         ldk9oFGeAf0gVw1z2/J5Yy7a1TaJYAooXQNU0yjxpyuWpOPnwu0qnAnRnc9628DTRW
-         9uVXanijA5pB2l21EbruVB+48nDbXDIbIkIHh7nWlpvylliIfkO+s5Z/MNDPaTyUTE
-         pTYVU9SAAbCKFFlSgJfbX0PAciYxxx6dz6t4zAFZHnGcMAEsU1g0xTCMv2mhCJpw/v
-         3fbiDcnpSEJdhSiB3Eev6V7Q8+knP1ul3FcMOcD4PXupe5wRXlG2dsWIHxcBg8ymur
-         xmXR9J7LjtfzA==
-Received: from mail-hq2.kaspersky.com (unknown [91.103.66.206])
-        (using TLSv1.2 with cipher AES256-GCM-SHA384 (256/256 bits))
-        (Client CN "mail-hq2.kaspersky.com", Issuer "Kaspersky MailRelays CA G3" (verified OK))
-        by mailhub12.kaspersky-labs.com (Postfix) with ESMTPS id 041F976605;
-        Mon, 16 Aug 2021 11:53:10 +0300 (MSK)
-Received: from arseniy-pc.avp.ru (10.16.171.77) by hqmailmbx3.avp.ru
- (10.64.67.243) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2308.14; Mon, 16
- Aug 2021 11:53:09 +0300
-From:   Arseny Krasnov <arseny.krasnov@kaspersky.com>
-To:     Stefan Hajnoczi <stefanha@redhat.com>,
-        Stefano Garzarella <sgarzare@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Arseny Krasnov <arseny.krasnov@kaspersky.com>,
-        Colin Ian King <colin.king@canonical.com>,
-        Norbert Slusarek <nslusarek@gmx.net>,
-        Andra Paraschiv <andraprs@amazon.com>
-CC:     <kvm@vger.kernel.org>, <virtualization@lists.linux-foundation.org>,
-        <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <stsp2@yandex.ru>, <oxffffaa@gmail.co>
-Subject: [RFC PATCH v3 6/6] vsock_test: update message bounds test for MSG_EOR
-Date:   Mon, 16 Aug 2021 11:53:00 +0300
-Message-ID: <20210816085303.4174626-1-arseny.krasnov@kaspersky.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20210816085036.4173627-1-arseny.krasnov@kaspersky.com>
-References: <20210816085036.4173627-1-arseny.krasnov@kaspersky.com>
+        id S235321AbhHPJ1W (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 16 Aug 2021 05:27:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50848 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S235190AbhHPJ1V (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 16 Aug 2021 05:27:21 -0400
+Received: from mail-pj1-x102b.google.com (mail-pj1-x102b.google.com [IPv6:2607:f8b0:4864:20::102b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DEA66C061764
+        for <kvm@vger.kernel.org>; Mon, 16 Aug 2021 02:26:50 -0700 (PDT)
+Received: by mail-pj1-x102b.google.com with SMTP id gz13-20020a17090b0ecdb0290178c0e0ce8bso18572779pjb.1
+        for <kvm@vger.kernel.org>; Mon, 16 Aug 2021 02:26:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:reply-to:in-reply-to:references:from:date:message-id
+         :subject:to;
+        bh=fW30ACZNGZaQxHJRtjgGrm+kXcrdsqkaGpRKMF86Xzk=;
+        b=FhRsIW8YZo4+VuY8KwfWRZB/NEvEUcQlc9WwuIZ5mmu5kV0BFuBD+ypChuNNDDEH/4
+         JzOOdX7V33cYbvweS1p+CdxiomMoyXJUee5Lrwfk1XAZKrVm5XN+baFhq3ZFZn8PY6d/
+         yMTkX7ZoUBo7cusVM3hH03HCtWDBVncYdlpkCjcMPyVIJwM9PsqFcfMXmCqD7pdI8fwC
+         mpBE6kQ1JLTOoSY5xQPvHbFgAmHSZ2Ne409YmaG/USpMOXKbl6kVXNVyAwdS3A3hs1mX
+         wTAwekcUAhPvAx6j4mcSU1iNYZZeX0AtwXauPb6wWlrhoENPFSCDyWYwFBIoEAr5e/yj
+         gsYw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:reply-to:in-reply-to:references
+         :from:date:message-id:subject:to;
+        bh=fW30ACZNGZaQxHJRtjgGrm+kXcrdsqkaGpRKMF86Xzk=;
+        b=iMQtr1AvT742tK5f24sSragzXLFkRW0cAugBlawljvsxXycCwIxpdkpKzBVbhE+iZU
+         ZDPw9kkEJBNfh/nv1NKwuNbM7+lrIO+Z+/uHp/lA/WcnqTq6np+lkgV7B7mjCaJrxoZ7
+         OiOZg+ZUWK1vVIc+zJgRy/w7Jal0a5fhWVY1NKNozDdsF7S+SidiWQFPtlkR1Jue0T/+
+         gPg/jiNXenL1WrfoUnHlzqnncE9UUJCbML+zTjcWdVdn7yr5ax9hE3z34XDj6gOYyFoB
+         Q12wbooxdcAf2SC/i5tIJmlXER+7cqnuPKGgzW1ttQzhTe7jn+35+0bDyjLPVtolAlRA
+         /eZA==
+X-Gm-Message-State: AOAM5338xL7byXOfgUANtr8FTecz432Mjl8UdhpoNvchFEPmE13QiR15
+        tEURTiZhAYm7rgcp72WxA1zxpnc+eDkpAcJcAIo=
+X-Google-Smtp-Source: ABdhPJzi51OuTR/dMJ6qXFe8GNrzpReC+LP8qAO4Zu4Y2pIUX2drPxxpf1M3yB2KqmMvrOS0/xqZTDSndGFaD3pYyn4=
+X-Received: by 2002:a05:6a00:1c65:b029:3cd:e06d:c0b5 with SMTP id
+ s37-20020a056a001c65b02903cde06dc0b5mr15296463pfw.38.1629106010233; Mon, 16
+ Aug 2021 02:26:50 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Originating-IP: [10.16.171.77]
-X-ClientProxiedBy: hqmailmbx2.avp.ru (10.64.67.242) To hqmailmbx3.avp.ru
- (10.64.67.243)
-X-KSE-ServerInfo: hqmailmbx3.avp.ru, 9
-X-KSE-AntiSpam-Interceptor-Info: scan successful
-X-KSE-AntiSpam-Version: 5.9.20, Database issued on: 08/16/2021 08:40:34
-X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
-X-KSE-AntiSpam-Method: none
-X-KSE-AntiSpam-Rate: 0
-X-KSE-AntiSpam-Info: Lua profiles 165570 [Aug 16 2021]
-X-KSE-AntiSpam-Info: Version: 5.9.20.0
-X-KSE-AntiSpam-Info: Envelope from: arseny.krasnov@kaspersky.com
-X-KSE-AntiSpam-Info: LuaCore: 454 454 39c6e442fd417993330528e7f9d13ac1bf7fdf8c
-X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
-X-KSE-AntiSpam-Info: 127.0.0.199:7.1.2;arseniy-pc.avp.ru:7.1.1;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;kaspersky.com:7.1.1
-X-KSE-AntiSpam-Info: Rate: 0
-X-KSE-AntiSpam-Info: Status: not_detected
-X-KSE-AntiSpam-Info: Method: none
-X-KSE-Antiphishing-Info: Clean
-X-KSE-Antiphishing-ScanningType: Deterministic
-X-KSE-Antiphishing-Method: None
-X-KSE-Antiphishing-Bases: 08/16/2021 08:42:00
-X-KSE-AttachmentFiltering-Interceptor-Info: no applicable attachment filtering
- rules found
-X-KSE-Antivirus-Interceptor-Info: scan successful
-X-KSE-Antivirus-Info: Clean, bases: 16.08.2021 4:09:00
-X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
-X-KSE-AttachmentFiltering-Interceptor-Info: no applicable attachment filtering
- rules found
-X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
-X-KLMS-Rule-ID: 52
-X-KLMS-Message-Action: clean
-X-KLMS-AntiSpam-Status: not scanned, disabled by settings
-X-KLMS-AntiSpam-Interceptor-Info: not scanned
-X-KLMS-AntiPhishing: Clean, bases: 2021/08/16 06:42:00
-X-KLMS-AntiVirus: Kaspersky Security for Linux Mail Server, version 8.0.3.30, bases: 2021/08/16 02:10:00 #17042267
-X-KLMS-AntiVirus-Status: Clean, skipped
+Received: by 2002:a05:6a20:3941:b029:51:5d73:f6db with HTTP; Mon, 16 Aug 2021
+ 02:26:49 -0700 (PDT)
+Reply-To: j8108477@gmail.com
+In-Reply-To: <CABAL+xkFcOsq6ysSMZecNkXUmevat-NyLDuL2XSS0LzbJMvdNQ@mail.gmail.com>
+References: <CABAL+xkFcOsq6ysSMZecNkXUmevat-NyLDuL2XSS0LzbJMvdNQ@mail.gmail.com>
+From:   MR NORAH JANE <adelasarah82@gmail.com>
+Date:   Mon, 16 Aug 2021 11:26:49 +0200
+Message-ID: <CABAL+xk01kagN-O7Pn-jQMufXueriKjzaossqt4HbrBP5x8PFA@mail.gmail.com>
+Subject: Fwd:
+To:     undisclosed-recipients:;
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Set 'MSG_EOR' in one of message sent, check that 'MSG_EOR'
-is visible in corresponding message at receiver.
+---------- Forwarded message ----------
+From: MR NORAH JANE <adelasarah82@gmail.com>
+Date: Mon, 16 Aug 2021 11:24:51 +0200
+Subject:
+To: adelasarah82@gmail.com
 
-Signed-off-by: Arseny Krasnov <arseny.krasnov@kaspersky.com>
-Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
----
- tools/testing/vsock/vsock_test.c | 8 +++++++-
- 1 file changed, 7 insertions(+), 1 deletion(-)
-
-diff --git a/tools/testing/vsock/vsock_test.c b/tools/testing/vsock/vsock_test.c
-index 67766bfe176f..2a3638c0a008 100644
---- a/tools/testing/vsock/vsock_test.c
-+++ b/tools/testing/vsock/vsock_test.c
-@@ -282,6 +282,7 @@ static void test_stream_msg_peek_server(const struct test_opts *opts)
- }
- 
- #define MESSAGES_CNT 7
-+#define MSG_EOR_IDX (MESSAGES_CNT / 2)
- static void test_seqpacket_msg_bounds_client(const struct test_opts *opts)
- {
- 	int fd;
-@@ -294,7 +295,7 @@ static void test_seqpacket_msg_bounds_client(const struct test_opts *opts)
- 
- 	/* Send several messages, one with MSG_EOR flag */
- 	for (int i = 0; i < MESSAGES_CNT; i++)
--		send_byte(fd, 1, 0);
-+		send_byte(fd, 1, (i == MSG_EOR_IDX) ? MSG_EOR : 0);
- 
- 	control_writeln("SENDDONE");
- 	close(fd);
-@@ -324,6 +325,11 @@ static void test_seqpacket_msg_bounds_server(const struct test_opts *opts)
- 			perror("message bound violated");
- 			exit(EXIT_FAILURE);
- 		}
-+
-+		if ((i == MSG_EOR_IDX) ^ !!(msg.msg_flags & MSG_EOR)) {
-+			perror("MSG_EOR");
-+			exit(EXIT_FAILURE);
-+		}
- 	}
- 
- 	close(fd);
--- 
-2.25.1
-
+HI, DID YOU RECEIVE MY MAIL?
