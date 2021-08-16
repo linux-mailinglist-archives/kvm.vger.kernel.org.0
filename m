@@ -2,96 +2,138 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 89A8A3EDA05
-	for <lists+kvm@lfdr.de>; Mon, 16 Aug 2021 17:39:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C4E7D3EDA14
+	for <lists+kvm@lfdr.de>; Mon, 16 Aug 2021 17:43:47 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236737AbhHPPjn (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 16 Aug 2021 11:39:43 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:28309 "EHLO
+        id S236228AbhHPPoJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 16 Aug 2021 11:44:09 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:26583 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S236598AbhHPPjd (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 16 Aug 2021 11:39:33 -0400
+        by vger.kernel.org with ESMTP id S232388AbhHPPoE (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 16 Aug 2021 11:44:04 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1629128341;
+        s=mimecast20190719; t=1629128612;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=Pvc9wD1lUPZTfEZnpljO9gINIugTu0C8zAih8i4bqK0=;
-        b=SdXbXP6SqVC9WvomXX12B40sDd9XagEro4Q/4x+Ep/zckKCtYNjH5xWypyfdjHHSzLp7GZ
-        GAqN7TQFl1wWB5hqFiUwH5qKH1RAomfJZGifSZXOF9hQQqVAQGVFyC+FUXhSE+18ODOqYv
-        P7p//79DDlLpuUXEceCNiTqrGwH++7I=
-Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
- [209.85.218.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-39-BtIk3FMGMhe3ZA_gZOEHwg-1; Mon, 16 Aug 2021 11:38:59 -0400
-X-MC-Unique: BtIk3FMGMhe3ZA_gZOEHwg-1
-Received: by mail-ej1-f70.google.com with SMTP id e1-20020a170906c001b02905b53c2f6542so4855603ejz.7
-        for <kvm@vger.kernel.org>; Mon, 16 Aug 2021 08:38:59 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=Pvc9wD1lUPZTfEZnpljO9gINIugTu0C8zAih8i4bqK0=;
-        b=VVUJCsQGSNFAI7Z9T02G0lJ0iqBMhOouVl/ab97Uq5O+22iSO+vBeYt2WDOO0vmnPv
-         L3hm8vSG+rMH9iKEYwXxzd83BVb3x9Q6esg6cHKhONfKOBWFvNUhr6yx6VeniFl18B+p
-         mImuF0Vp4/TC/ZyKpTBHhA03Kv64oPTXU0Ul3o4rIgpCGxbVX+Fcou60n0Ku5z4BTZ9R
-         QGSpdFZUsLpF6IC0zWfcc/FWYM66sgV3uCjI7qJhQY5Gtvo6ad19HBMFhlq5fn9PjeJP
-         sWZCv2EaIhfcAXVUrHoTSDkeSr8uVEyXm+mltDsRvaXLAkk/PdQrEcp7Z73EJL65K/sW
-         XhgA==
-X-Gm-Message-State: AOAM532qqGhwOtYAOYEAcVcKeYEiI3vezO3XH8qqSNoEYIAHcSbs3Z+w
-        lDDZt3BQ0zntW4CXq+n3ytxTEkJZJMU37DGhqfj6oTZxlwDKPf2zi+gVr8kDsawO7SJadRBCZVs
-        w/cUPCMHSow/kMJpw9v+y++awLKEPRZ9wHR6PYXdcBwOG+rh4mBtujAIk/T07wPlt
-X-Received: by 2002:aa7:c457:: with SMTP id n23mr21099036edr.89.1629128337949;
-        Mon, 16 Aug 2021 08:38:57 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwbx6t+UCiHCtE2k3BVUa1TE/xC6yoZ7+wjHEFzqAH3fHJRZmBdRJpiNntuibcz2UlNgdA5jQ==
-X-Received: by 2002:aa7:c457:: with SMTP id n23mr21098999edr.89.1629128337731;
-        Mon, 16 Aug 2021 08:38:57 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:63a7:c72e:ea0e:6045? ([2001:b07:6468:f312:63a7:c72e:ea0e:6045])
-        by smtp.gmail.com with ESMTPSA id hg25sm3829443ejc.109.2021.08.16.08.38.56
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 16 Aug 2021 08:38:57 -0700 (PDT)
-Subject: Re: [RFC PATCH 00/13] Add support for Mirror VM.
-To:     Ashish Kalra <ashish.kalra@amd.com>
-Cc:     qemu-devel@nongnu.org, thomas.lendacky@amd.com,
-        brijesh.singh@amd.com, ehabkost@redhat.com, mst@redhat.com,
-        richard.henderson@linaro.org, jejb@linux.ibm.com, tobin@ibm.com,
-        dovmurik@linux.vnet.ibm.com, frankeh@us.ibm.com,
-        dgilbert@redhat.com, kvm@vger.kernel.org
-References: <cover.1629118207.git.ashish.kalra@amd.com>
- <fb737cf0-3d96-173f-333b-876dfd59d32b@redhat.com>
- <20210816144413.GA29881@ashkalra_ubuntu_server>
- <b25a1cf9-5675-99da-7dd6-302b04cc7bbc@redhat.com>
- <20210816151349.GA29903@ashkalra_ubuntu_server>
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=5+H3tVuFTE/yUYCGm/toB+kJDsMZHFf9GHrqRvwC/k8=;
+        b=ZcH4mmDwaJXOgCzs8iwv9RsPo4rKHlF26YGVu6xa5T0Ch1GRCwGttqW1k5MNz9X/L3rLNg
+        7P+5hmwNiqxxS4L21KITikt0zMoL2udUwCFeGO4SpOADaixql8n+jBfPnUwIvgAEKNX7jQ
+        syWujZsbPFVAmA1pC/pIzkL095tTbpM=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-123-of79Wm1UP2mspHzNqK-t-g-1; Mon, 16 Aug 2021 11:43:30 -0400
+X-MC-Unique: of79Wm1UP2mspHzNqK-t-g-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 483131082921;
+        Mon, 16 Aug 2021 15:43:29 +0000 (UTC)
+Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id DBBDF10013D7;
+        Mon, 16 Aug 2021 15:43:28 +0000 (UTC)
 From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <f7cf142b-02e4-5c87-3102-f3acd8b07288@redhat.com>
-Date:   Mon, 16 Aug 2021 17:38:55 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.11.0
+To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Cc:     stable@vger.kernel.org, Maxim Levitsky <mlevitsk@redhat.com>
+Subject: [PATCH 5.13.y] KVM: nSVM: avoid picking up unsupported bits from L2 in int_ctl (CVE-2021-3653)
+Date:   Mon, 16 Aug 2021 11:43:27 -0400
+Message-Id: <20210816154328.3845839-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20210816151349.GA29903@ashkalra_ubuntu_server>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 16/08/21 17:13, Ashish Kalra wrote:
->>> I think that once the mirror VM starts booting and running the UEFI
->>> code, it might be only during the PEI or DXE phase where it will
->>> start actually running the MH code, so mirror VM probably still need
->>> to handles KVM_EXIT_IO when SEC phase does I/O, I can see PIC
->>> accesses and Debug Agent initialization stuff in SEC startup code.
->> That may be a design of the migration helper code that you were working
->> with, but it's not necessary.
->>
-> Actually my comments are about a more generic MH code.
+From: Maxim Levitsky <mlevitsk@redhat.com>
 
-I don't think that would be a good idea; designing QEMU's migration 
-helper interface to be as constrained as possible is a good thing.  The 
-migration helper is extremely security sensitive code, so it should not 
-expose itself to the attack surface of the whole of QEMU.
+[ upstream commit 0f923e07124df069ba68d8bb12324398f4b6b709 ]
 
-Paolo
+* Invert the mask of bits that we pick from L2 in
+  nested_vmcb02_prepare_control
+
+* Invert and explicitly use VIRQ related bits bitmask in svm_clear_vintr
+
+This fixes a security issue that allowed a malicious L1 to run L2 with
+AVIC enabled, which allowed the L2 to exploit the uninitialized and enabled
+AVIC to read/write the host physical memory at some offsets.
+
+Fixes: 3d6368ef580a ("KVM: SVM: Add VMRUN handler")
+Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ arch/x86/include/asm/svm.h | 2 ++
+ arch/x86/kvm/svm/nested.c  | 9 ++++++---
+ arch/x86/kvm/svm/svm.c     | 9 +++++----
+ 3 files changed, 13 insertions(+), 7 deletions(-)
+
+diff --git a/arch/x86/include/asm/svm.h b/arch/x86/include/asm/svm.h
+index 772e60efe243..b6c445ced0e5 100644
+--- a/arch/x86/include/asm/svm.h
++++ b/arch/x86/include/asm/svm.h
+@@ -178,6 +178,8 @@ struct __attribute__ ((__packed__)) vmcb_control_area {
+ #define V_IGN_TPR_SHIFT 20
+ #define V_IGN_TPR_MASK (1 << V_IGN_TPR_SHIFT)
+ 
++#define V_IRQ_INJECTION_BITS_MASK (V_IRQ_MASK | V_INTR_PRIO_MASK | V_IGN_TPR_MASK)
++
+ #define V_INTR_MASKING_SHIFT 24
+ #define V_INTR_MASKING_MASK (1 << V_INTR_MASKING_SHIFT)
+ 
+diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
+index 5e8d8443154e..7f3b55561ae8 100644
+--- a/arch/x86/kvm/svm/nested.c
++++ b/arch/x86/kvm/svm/nested.c
+@@ -480,7 +480,10 @@ static void nested_vmcb02_prepare_save(struct vcpu_svm *svm, struct vmcb *vmcb12
+ 
+ static void nested_vmcb02_prepare_control(struct vcpu_svm *svm)
+ {
+-	const u32 mask = V_INTR_MASKING_MASK | V_GIF_ENABLE_MASK | V_GIF_MASK;
++	const u32 int_ctl_vmcb01_bits =
++		V_INTR_MASKING_MASK | V_GIF_MASK | V_GIF_ENABLE_MASK;
++
++	const u32 int_ctl_vmcb12_bits = V_TPR_MASK | V_IRQ_INJECTION_BITS_MASK;
+ 
+ 	/*
+ 	 * Filled at exit: exit_code, exit_code_hi, exit_info_1, exit_info_2,
+@@ -511,8 +514,8 @@ static void nested_vmcb02_prepare_control(struct vcpu_svm *svm)
+ 		svm->vcpu.arch.l1_tsc_offset + svm->nested.ctl.tsc_offset;
+ 
+ 	svm->vmcb->control.int_ctl             =
+-		(svm->nested.ctl.int_ctl & ~mask) |
+-		(svm->vmcb01.ptr->control.int_ctl & mask);
++		(svm->nested.ctl.int_ctl & int_ctl_vmcb12_bits) |
++		(svm->vmcb01.ptr->control.int_ctl & int_ctl_vmcb01_bits);
+ 
+ 	svm->vmcb->control.virt_ext            = svm->nested.ctl.virt_ext;
+ 	svm->vmcb->control.int_vector          = svm->nested.ctl.int_vector;
+diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+index 62f1f06fe197..0a49a0db54e1 100644
+--- a/arch/x86/kvm/svm/svm.c
++++ b/arch/x86/kvm/svm/svm.c
+@@ -1552,17 +1552,18 @@ static void svm_set_vintr(struct vcpu_svm *svm)
+ 
+ static void svm_clear_vintr(struct vcpu_svm *svm)
+ {
+-	const u32 mask = V_TPR_MASK | V_GIF_ENABLE_MASK | V_GIF_MASK | V_INTR_MASKING_MASK;
+ 	svm_clr_intercept(svm, INTERCEPT_VINTR);
+ 
+ 	/* Drop int_ctl fields related to VINTR injection.  */
+-	svm->vmcb->control.int_ctl &= mask;
++	svm->vmcb->control.int_ctl &= ~V_IRQ_INJECTION_BITS_MASK;
+ 	if (is_guest_mode(&svm->vcpu)) {
+-		svm->vmcb01.ptr->control.int_ctl &= mask;
++		svm->vmcb01.ptr->control.int_ctl &= ~V_IRQ_INJECTION_BITS_MASK;
+ 
+ 		WARN_ON((svm->vmcb->control.int_ctl & V_TPR_MASK) !=
+ 			(svm->nested.ctl.int_ctl & V_TPR_MASK));
+-		svm->vmcb->control.int_ctl |= svm->nested.ctl.int_ctl & ~mask;
++
++		svm->vmcb->control.int_ctl |= svm->nested.ctl.int_ctl &
++			V_IRQ_INJECTION_BITS_MASK;
+ 	}
+ 
+ 	vmcb_mark_dirty(svm->vmcb, VMCB_INTR);
+-- 
+2.27.0
 
