@@ -2,140 +2,90 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3C2823ECDC9
-	for <lists+kvm@lfdr.de>; Mon, 16 Aug 2021 06:51:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1CF953ECE74
+	for <lists+kvm@lfdr.de>; Mon, 16 Aug 2021 08:10:24 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229957AbhHPEvd (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 16 Aug 2021 00:51:33 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:25380 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229561AbhHPEvc (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 16 Aug 2021 00:51:32 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1629089460;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type;
-        bh=rZs3mSB34nogWH2zmgxUCeVHfLL1OdFQlCndY96/B/0=;
-        b=LUdJlzPTp7GpIpDcHcYdiVGG1vqrkDSyfmKonYW5Wjx5ygVgiaqEUGCY1Mdz7kpnrtjg5a
-        9MlhlqvtYe1oDr5804k1S/TOrUdvupUhBFlPOXHwdsr8TMTSbEoqMiFTHiRiM8CttCc05B
-        EOlzHQz48nDwabNx9UjhdngNcKrzjp4=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-28-_7yp2elhObWs3BVOIbnbLw-1; Mon, 16 Aug 2021 00:50:59 -0400
-X-MC-Unique: _7yp2elhObWs3BVOIbnbLw-1
-Received: by mail-wm1-f71.google.com with SMTP id z186-20020a1c7ec30000b02902e6a27a9962so7150494wmc.3
-        for <kvm@vger.kernel.org>; Sun, 15 Aug 2021 21:50:59 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:mime-version
-         :content-disposition;
-        bh=rZs3mSB34nogWH2zmgxUCeVHfLL1OdFQlCndY96/B/0=;
-        b=CJURZd6ZL+hcA6fE/bAOk0LPCOGIIvVeWwMQ5GRIpRZpGrihSv1sCgMba5g2Z3yP5D
-         fDYpOv7SjQdKDE9P9uXbjZOg9Hx9qVWxLTJg9CDsVpW1/chTrwA6+mIemQMvuJWKMdU1
-         ZBUepFtqfF7uae4hf+xijw+mdndgdD9xpLukvKR33hQrgFhtcBgIrooMudq4HarnxVnQ
-         4RDeHJhktowOG+3XOxuKJw5pamYoKMP/Pp+hRFiasJD3GpgDZMbXahwaidFGiYhSKEAC
-         DNot3ni5GAkGQjeFeTZ4/urQTHzfMZrgIsaL241jgBhxkc8eFIaPUyNex2ypjayHpxEQ
-         r17A==
-X-Gm-Message-State: AOAM530V6KdZ86nE++AuuZKYpEWHQqTQtg2gGf5poXtegiFRQzicw/ET
-        bnqQKX++kzE3BTawd7ZCWO1xSrmh83zG1unjhgVgw1/sQpRq0sCWfKYfIJDx+96ftWSODlmTxQv
-        mT40oJCfg3r8O
-X-Received: by 2002:a5d:4602:: with SMTP id t2mr1228060wrq.378.1629089458120;
-        Sun, 15 Aug 2021 21:50:58 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyjBjilHWhHeVXJ212gHSVnkj7N49KZUrKpxQq7yztn932X8qS+NGWF0om+LCe2aMv5wZThUw==
-X-Received: by 2002:a5d:4602:: with SMTP id t2mr1228046wrq.378.1629089457942;
-        Sun, 15 Aug 2021 21:50:57 -0700 (PDT)
-Received: from redhat.com ([2.55.8.239])
-        by smtp.gmail.com with ESMTPSA id m10sm12398087wro.63.2021.08.15.21.50.55
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 15 Aug 2021 21:50:57 -0700 (PDT)
-Date:   Mon, 16 Aug 2021 00:50:54 -0400
-From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     Linus Torvalds <torvalds@linux-foundation.org>
-Cc:     kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
-        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-        dan.carpenter@oracle.com, elic@nvidia.com, jasowang@redhat.com,
-        mst@redhat.com, neeraju@codeaurora.org, parav@nvidia.com,
-        vincent.whitchurch@axis.com, xieyongji@bytedance.com
-Subject: [GIT PULL] virtio,vhost,vdpa: bugfixes
-Message-ID: <20210816005054-mutt-send-email-mst@kernel.org>
+        id S233272AbhHPGKw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 16 Aug 2021 02:10:52 -0400
+Received: from mail.kingsoft.com ([114.255.44.145]:34924 "EHLO
+        mail.kingsoft.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229623AbhHPGKu (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 16 Aug 2021 02:10:50 -0400
+X-AuditID: 0a580155-983ff7000002fcd1-2a-611a01488ceb
+Received: from mail.kingsoft.com (bogon [10.88.1.79])
+        (using TLS with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (Client did not present a certificate)
+        by mail.kingsoft.com (SMG-2-NODE-85) with SMTP id 1C.C7.64721.8410A116; Mon, 16 Aug 2021 14:10:16 +0800 (HKT)
+Received: from alex-virtual-machine (172.16.253.254) by KSBJMAIL4.kingsoft.cn
+ (10.88.1.79) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2176.14; Mon, 16 Aug
+ 2021 14:10:16 +0800
+Date:   Mon, 16 Aug 2021 14:10:15 +0800
+From:   Aili Yao <yaoaili@kingsoft.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>
+CC:     <yaoaili126@gmail.com>, <x86@kernel.org>,
+        "H. Peter Anvin" <hpa@zytor.com>, <kvm@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>
+Subject: Re: KVM: x86: expose HINTS_REALTIME ablility to qemu
+Message-ID: <20210816141015.31e329e3@alex-virtual-machine>
+In-Reply-To: <20210813175420.62ab2ac2@alex-virtual-machine>
+References: <20210813175420.62ab2ac2@alex-virtual-machine>
+Organization: kingsoft
+X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.30; x86_64-pc-linux-gnu)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-X-Mutt-Fcc: =sent
+Content-Type: text/plain; charset="US-ASCII"
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [172.16.253.254]
+X-ClientProxiedBy: KSbjmail3.kingsoft.cn (10.88.1.78) To KSBJMAIL4.kingsoft.cn
+ (10.88.1.79)
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFprNIsWRmVeSWpSXmKPExsXCFcHor+vBKJVo0P1P1eLzhn9sFtM2ilts
+        nX6FzaJz9gZ2izlTCy0u75rDZnHpwAImi/3b/rFaHD1/i8li86apzBaTWi8zW+y684TF4seG
+        x6wWz1qvsjjweTw5OI/J43trH4vHzll32T0WbCr12LSqk83j3blz7B7v911l82iceo3N4/Mm
+        OY8TLV9YA7iiuGxSUnMyy1KL9O0SuDJeNW9iK9jMVvHg1DaWBsb/LF2MnBwSAiYS33+vZ+xi
+        5OIQEpjMJHHxRg8LhPOaUWLp7sdsIFUsAqoSm+c1gdlsQPaue7NYQWwRgbNMEnv+M4M0MAu0
+        M0o83rqFHSQhLGArseHPQWYQm1fASmLnjLNgDZwC1hKzly4FiwsBxedvuwB2Br+AmETvlf9M
+        XYwcQCfZSzxerwjRKihxcuYTsBJmAR2JE6uOMUPY8hLb386BGqMocXjJL3aIb5QkjnTPYIOw
+        YyWurb/OOIFReBaSUbOQjJqFZNQCRuZVjCzFuelGmxgh8Re6g3FG00e9Q4xMHIyHGCU4mJVE
+        eIuFxRKFeFMSK6tSi/Lji0pzUosPMUpzsCiJ82q7CSUKCaQnlqRmp6YWpBbBZJk4OKUamBSi
+        VwnfFNqt0rC8V0v9dE9hUn1s6dNA98yJDY1MS/ft/a+wwleFlUHvXcCVvqiwNz27755mmBfl
+        XTbx+ZrfqqduFE4rsHv173CZb5GsjZn6kdt7W19P+FXxzjjo8MG7lvfXaMydqX5i6wNJwZv1
+        nBdaD3s438icZuWuXfmac86fJ2tP3J4yc5VfbCin6hulex0F3iIy01dMSF2a/oD//j/jKpmy
+        hZKnOgT6ghWquj+zFPgs9flZLP5DwZ5zY+WFZy+v38jY5Vj84fyuvjsVid1RWz+W8s3L3lHu
+        XVlf3LxZQ/qa6OyTKdw/JUwWqK/5OUtdsV2sf5XNbg8z9oS3Zw6xiMxb2ffYy3Grr7CXgxJL
+        cUaioRZzUXEiAPrdudMuAwAA
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The following changes since commit 36a21d51725af2ce0700c6ebcb6b9594aac658a6:
+On Fri, 13 Aug 2021 17:54:20 +0800
+Aili Yao <yaoaili@kingsoft.com> wrote:
 
-  Linux 5.14-rc5 (2021-08-08 13:49:31 -0700)
+> When I do a test that try to enable hint-dedicated for one VM, but qemu
+> says "warning: host doesn't support requested feature:
+> CPUID.40000001H:EDX.kvm-hint-dedicated [bit 0]".
+> 
+> It seems the kernel hasn't expose this ability even when supporting it;
+> So expose it.
 
-are available in the Git repository at:
+Sorry, I check it again:
+Ihe issue I met is because of my qemu's mis-backport,
 
-  https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git tags/for_linus
+In qemu, kvm_arch_get_supported_cpuid() will set the feature bit:
+    if (function == KVM_CPUID_FEATURES && reg == R_EDX) {
+        ret |= KVM_HINTS_DEDICATED;
+        found = 1;
+    }
+But I have mis-ported the KVM_HINTS_DEDICATED and KVM_HINTS_REALTIME macro; And it lead to
+the error I met;
 
-for you to fetch changes up to 879753c816dbbdb2a9a395aa4448d29feee92d1a:
+And it's right that kernel don't expose this ability!
 
-  vdpa/mlx5: Fix queue type selection logic (2021-08-11 06:44:43 -0400)
-
-----------------------------------------------------------------
-virtio,vhost,vdpa: bugfixes
-
-Fixes in virtio,vhost,vdpa drivers.
-
-Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-
-----------------------------------------------------------------
-Eli Cohen (2):
-      vdpa/mlx5: Avoid destroying MR on empty iotlb
-      vdpa/mlx5: Fix queue type selection logic
-
-Michael S. Tsirkin (3):
-      vringh: pull in spinlock header
-      virtio_ring: pull in spinlock header
-      tools/virtio: fix build
-
-Neeraj Upadhyay (1):
-      vringh: Use wiov->used to check for read/write desc order
-
-Parav Pandit (4):
-      virtio: Improve vq->broken access to avoid any compiler optimization
-      virtio: Keep vring_del_virtqueue() mirror of VQ create
-      virtio: Protect vqs list access
-      virtio_pci: Support surprise removal of virtio pci device
-
-Vincent Whitchurch (1):
-      virtio_vdpa: reject invalid vq indices
-
-Xie Yongji (7):
-      vhost-vdpa: Fix integer overflow in vhost_vdpa_process_iotlb_update()
-      vhost: Fix the calculation in vhost_overflow()
-      vdpa_sim: Fix return value check for vdpa_alloc_device()
-      vp_vdpa: Fix return value check for vdpa_alloc_device()
-      vDPA/ifcvf: Fix return value check for vdpa_alloc_device()
-      vdpa: Add documentation for vdpa_alloc_device() macro
-      virtio-blk: Add validation for block size in config space
-
- drivers/block/virtio_blk.c         | 39 ++++++++++++++++++++++----
- drivers/vdpa/ifcvf/ifcvf_main.c    |  4 +--
- drivers/vdpa/mlx5/core/mr.c        |  9 ------
- drivers/vdpa/mlx5/net/mlx5_vnet.c  | 14 +++++++---
- drivers/vdpa/vdpa_sim/vdpa_sim.c   |  4 ++-
- drivers/vdpa/virtio_pci/vp_vdpa.c  |  4 +--
- drivers/vhost/vdpa.c               |  3 +-
- drivers/vhost/vhost.c              | 10 +++++--
- drivers/vhost/vringh.c             |  2 +-
- drivers/virtio/virtio.c            |  1 +
- drivers/virtio/virtio_pci_common.c |  7 +++++
- drivers/virtio/virtio_ring.c       | 18 ++++++++++--
- drivers/virtio/virtio_vdpa.c       |  3 ++
- include/linux/mlx5/mlx5_ifc_vdpa.h | 10 ++++---
- include/linux/vdpa.h               | 11 ++++++++
- include/linux/virtio.h             |  1 +
- include/linux/vringh.h             |  1 +
- tools/virtio/Makefile              |  3 +-
- tools/virtio/linux/spinlock.h      | 56 ++++++++++++++++++++++++++++++++++++++
- tools/virtio/linux/virtio.h        |  2 ++
- 20 files changed, 166 insertions(+), 36 deletions(-)
- create mode 100644 tools/virtio/linux/spinlock.h
+Sorry again!
 
