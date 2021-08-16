@@ -2,286 +2,137 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id ACF883EDE9D
-	for <lists+kvm@lfdr.de>; Mon, 16 Aug 2021 22:25:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 534DE3EDEDF
+	for <lists+kvm@lfdr.de>; Mon, 16 Aug 2021 22:56:32 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232764AbhHPUZa (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 16 Aug 2021 16:25:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34858 "EHLO
+        id S233303AbhHPU5C (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 16 Aug 2021 16:57:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42154 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232556AbhHPUZ2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 16 Aug 2021 16:25:28 -0400
-Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 64CD0C06179A
-        for <kvm@vger.kernel.org>; Mon, 16 Aug 2021 13:24:56 -0700 (PDT)
-Received: by mail-yb1-xb4a.google.com with SMTP id s4-20020a259004000000b005947575ac53so3491477ybl.5
-        for <kvm@vger.kernel.org>; Mon, 16 Aug 2021 13:24:56 -0700 (PDT)
+        with ESMTP id S233335AbhHPU5B (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 16 Aug 2021 16:57:01 -0400
+Received: from mail-vk1-xa2c.google.com (mail-vk1-xa2c.google.com [IPv6:2607:f8b0:4864:20::a2c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 21CA6C061764
+        for <kvm@vger.kernel.org>; Mon, 16 Aug 2021 13:56:29 -0700 (PDT)
+Received: by mail-vk1-xa2c.google.com with SMTP id j26so2880401vkn.4
+        for <kvm@vger.kernel.org>; Mon, 16 Aug 2021 13:56:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
-        h=reply-to:date:in-reply-to:message-id:mime-version:references
-         :subject:from:to:cc;
-        bh=ytVF9QeV+MabNTM9/rkDa+0RWrj8iBIydz2kXshJL00=;
-        b=MMCS/5/YGI5geXZq2J1jLLt4Rr2E/2TX5tjz8gOWO9lYX2SX4ehLEGWEL0BCaiMiTp
-         agNVxJJtqvBJqsZdRyUCH9xL+Rfm1Wgt2HIdnQxafkxtNdX5OzW9ELX1VQogolDw+fd0
-         gIvB+lLgEI2cjdp8b+rYJpZwJUCx5ae4gVuC7AQUUmj3vpCUb4UKnaPEV9Y2RNn25Owb
-         /AjWIrNM79gx2JDdilHM3oyRLrQYKhEvDvObLx/uOGTLnVaGjkG8A4nwex/jzuiCYmqm
-         MOgG0JVtklTKjKOR4POYs4nxNuSbn3hZdj5DCTNApYKrx9cHamlBTvElapbzcVROu+AX
-         +DRg==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=PAjqAgz4SbwhR4C2g99BnpgC4FJpr+PKslvtcBCtV7g=;
+        b=Z0LdAVsVOA5UHNfiWH6pgQcaDfOI9yO7Prph0FcJkli65iCPGkn28i57u0iz4+rr/k
+         7vexRoGXmoPITr+5iwD1J66G3TX2bPkT/CXwyeVpXNo7GjzQ7AhRHto17gppMPSKbsWK
+         RuJRGjnJZUEvu08KT6euDd9I6tm7GraORU6AK3mdU3PHuwzqhr90lo9viERzvg1NotTN
+         SQEOnKw/W7fs/3/6pADSnP1TY1XrkH/jkzfAZhWNNJ5qAQpDVTkOjbT7l7Uy0t3/vrRN
+         MMadQi9Wh82FRxI2kmi5Jl9OwXaKDExXlsgp1jDNN4pukiE+JblEQPerb0tNc5/nkAmI
+         uLlA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:reply-to:date:in-reply-to:message-id
-         :mime-version:references:subject:from:to:cc;
-        bh=ytVF9QeV+MabNTM9/rkDa+0RWrj8iBIydz2kXshJL00=;
-        b=Vw5wmZjOOoh2Rhnw+qeIGEFjR/fKNLsIPv/qqGw43LA7uXBXarnAbd0M+GKJ9abmge
-         w9zEqLoLdSzKQp/KVvQfxV5sVjq7WrYF68F5/a/arFGGZsWt27LPLa+og9Ul0EinafAn
-         UPBwKadSze0qtSdXprxFfCmMCbnFGCi2k5LbRxSUF0BSWLIkslUM1weoveKkBklRz5Id
-         DJ3T26Pj+GxIqjCClow5eqOF1tyksQDfQJtD/Y7SlCMGWv+UPsHMuKblFuLBLJXHSrE2
-         IgpKREMjZRbWALvHCUeT4KY4LvSR77uPkYyHQQUMqjPq95y9mEx6dq6VuAhCX8TtKS/v
-         bLIg==
-X-Gm-Message-State: AOAM530cBgPBKBu0anE93Cy71U4ve0Tpyn745MGVjuZd2/ksQWcphGp6
-        jZgn93uwtT0a04QmiRiZ3FbtKkWNF6Lv
-X-Google-Smtp-Source: ABdhPJxRDg4XjAziDvXPV2YsT0AuxLyzM1Sc65DpyYo3GcMdJfwDr7nsBXBqr2yHD0PnwXA4/ipBmaPK8jv6
-X-Received: from mizhang-super.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:1071])
- (user=mizhang job=sendgmr) by 2002:a25:2155:: with SMTP id
- h82mr255114ybh.177.1629145495627; Mon, 16 Aug 2021 13:24:55 -0700 (PDT)
-Reply-To: Mingwei Zhang <mizhang@google.com>
-Date:   Mon, 16 Aug 2021 20:24:41 +0000
-In-Reply-To: <20210816202441.4098523-1-mizhang@google.com>
-Message-Id: <20210816202441.4098523-4-mizhang@google.com>
-Mime-Version: 1.0
-References: <20210816202441.4098523-1-mizhang@google.com>
-X-Mailer: git-send-email 2.33.0.rc1.237.g0d66db33f3-goog
-Subject: [PATCH 3/3] KVM: SVM: move sev_unbind_asid and DF_FLUSH logic into psp
-From:   Mingwei Zhang <mizhang@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        Brijesh Singh <brijesh.singh@amd.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        John Allen <john.allen@amd.com>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Alper Gun <alpergun@google.com>,
-        Borislav Petkov <bp@alien8.de>,
-        David Rienjes <rientjes@google.com>,
-        Marc Orr <marcorr@google.com>, Peter Gonda <pgonda@google.com>,
-        Vipin Sharma <vipinsh@google.com>,
-        Mingwei Zhang <mizhang@google.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=PAjqAgz4SbwhR4C2g99BnpgC4FJpr+PKslvtcBCtV7g=;
+        b=kjFOayaV/j7E7PUa8tgm7wn8r5Sbaaq7Juh/bwAqMhQhMeBqhwMb12Dbt1vzoQ7Xgn
+         z6W8L/bhq8XGKgAGCzN956lRfFWUWtVNKrBRMcBnvjmzONu57MLiNtbgNpI53HoQGe4F
+         Q38S+KSv8rARTQ5xoT3X5bscaTDN0Bk33G2NSqm5GYmOjpiewWT1q/WbffYgfOOwxV15
+         AxmIqK7rqntrgGcpctBMKGRD7JDXH4nAOEbrer2js2Jhn72r1WYKEmZUkd28wbriSNo/
+         McFqVjGwut14A0LaTWJyZKtD0o8WhSY+0JHrpKY4FXGLptWc5mTb2g1KnUJvDJRSmMrN
+         KygA==
+X-Gm-Message-State: AOAM531N8zIb0ZXax3/nXZCRSmzYjxNlTZQItE7ub3USwDOB3F4rrWKv
+        vUU74Bv0tOkoXkRTrI9fnf5C5tHgZnNP5qoTHjzQfg==
+X-Google-Smtp-Source: ABdhPJwFYs1vFOV9d+q8kCyHbjok7b0AZnXTp2WBYai2NMcFXOwpP6G4PDTDMv1OQqhNCSOcya9L68gfllHl5OFFeZI=
+X-Received: by 2002:a1f:bfc4:: with SMTP id p187mr407300vkf.17.1629147388071;
+ Mon, 16 Aug 2021 13:56:28 -0700 (PDT)
+MIME-Version: 1.0
+References: <20210813211211.2983293-1-rananta@google.com> <20210816121548.y5w624yhrql2trzt@gator.home>
+In-Reply-To: <20210816121548.y5w624yhrql2trzt@gator.home>
+From:   Raghavendra Rao Ananta <rananta@google.com>
+Date:   Mon, 16 Aug 2021 13:56:17 -0700
+Message-ID: <CAJHc60yqNcpmDCmSehVb6uDeu+FF--aPhwJ9ZBTAcJCPBVR=1Q@mail.gmail.com>
+Subject: Re: [PATCH 00/10] KVM: arm64: selftests: Introduce arch_timer selftest
+To:     Andrew Jones <drjones@redhat.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        James Morse <james.morse@arm.com>,
+        Peter Shier <pshier@google.com>,
+        Ricardo Koller <ricarkol@google.com>,
+        Oliver Upton <oupton@google.com>,
+        Reiji Watanabe <reijiw@google.com>,
+        Jing Zhang <jingzhangos@google.com>, kvm@vger.kernel.org,
+        kvmarm@lists.cs.columbia.edu
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-In KVM SEV code, sev_unbind_asid and sev_guest_df_flush needs to be
-serialized because DEACTIVATE command in PSP may clear the WBINVD indicator
-and cause DF_FLUSH to fail.
+On Mon, Aug 16, 2021 at 5:15 AM Andrew Jones <drjones@redhat.com> wrote:
+>
+> On Fri, Aug 13, 2021 at 09:12:01PM +0000, Raghavendra Rao Ananta wrote:
+> > Hello,
+> >
+> > The patch series adds a KVM selftest to validate the behavior of
+> > ARM's generic timer (patch-10). The test programs the timer IRQs
+> > periodically, and for each interrupt, it validates the behaviour
+> > against the architecture specifications. The test further provides
+> > a command-line interface to configure the number of vCPUs, the
+> > period of the timer, and the number of iterations that the test
+> > has to run for.
+> >
+> > Since the test heavily depends on interrupts, the patch series also
+> > adds a basic support for ARM Generic Interrupt Controller v3 (GICv3)
+> > to the KVM's aarch64 selftest framework (patch-9).
+> >
+> > Furthermore, additional processor utilities such as accessing the MMIO
+> > (via readl/writel), read/write to assembler unsupported registers,
+> > basic delay generation, enable/disable local IRQs, spinlock support,
+> > and so on, are also introduced that the test/GICv3 takes advantage of.
+> > These are presented in patches 1 through 8.
+> >
+> > The patch series, specifically the library support, is derived from the
+> > kvm-unit-tests and the kernel itself.
+> >
+>
+> Hi Raghavendra,
+>
+> I appreciate the new support being added to aarch64 kselftests in order to
+> support new tests. I'm curious as to why the kvm-unit-tests timer test
+> wasn't extended instead, though. Also, I'm curious if you've seen any
+> room for improvements to the kvm-unit-tests code and, if so, if you plan
+> to submit patches for those improvements.
 
-This is a PSP level detail that is not necessary to expose to KVM. So put
-both functions as well as the RWSEM into the sev-dev.c.
 
-Cc: Alper Gun <alpergun@google.com>
-Cc: Borislav Petkov <bp@alien8.de>
-Cc: Brijesh Singh <brijesh.singh@amd.com>
-Cc: David Rienjes <rientjes@google.com>
-Cc: Marc Orr <marcorr@google.com>
-Cc: John Allen <john.allen@amd.com>
-Cc: Peter Gonda <pgonda@google.com>
-Cc: Sean Christopherson <seanjc@google.com>
-Cc: Tom Lendacky <thomas.lendacky@amd.com>
-Cc: Vipin Sharma <vipinsh@google.com>
+Hi  Andrew,
 
-Signed-off-by: Mingwei Zhang <mizhang@google.com>
----
- arch/x86/kvm/svm/sev.c       | 35 +++--------------------------------
- drivers/crypto/ccp/sev-dev.c | 34 +++++++++++++++++++++++++++++++++-
- include/linux/psp-sev.h      | 19 ++++++++++++++++++-
- 3 files changed, 54 insertions(+), 34 deletions(-)
+Interesting question! It's more about ease and flexibility in
+controlling the guest via the VMM-
+Since arch_timer's interface is mostly per-CPU, we'd like to extend
+this test case to be
+more stressful, such as migrating the vCPUs across pCPUs rapidly, or
+even affining
+a large number of vCPUs to a single pCPU, and so on.
 
-diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-index 2a674acb22ce..ecf9da718d21 100644
---- a/arch/x86/kvm/svm/sev.c
-+++ b/arch/x86/kvm/svm/sev.c
-@@ -57,7 +57,6 @@ module_param_named(sev_es, sev_es_enabled, bool, 0444);
- #endif /* CONFIG_KVM_AMD_SEV */
- 
- static u8 sev_enc_bit;
--static DECLARE_RWSEM(sev_deactivate_lock);
- static DEFINE_MUTEX(sev_bitmap_lock);
- unsigned int max_sev_asid;
- static unsigned int min_sev_asid;
-@@ -84,20 +83,9 @@ static int sev_flush_asids(int min_asid, int max_asid)
- 	if (asid > max_asid)
- 		return -EBUSY;
- 
--	/*
--	 * DEACTIVATE will clear the WBINVD indicator causing DF_FLUSH to fail,
--	 * so it must be guarded.
--	 */
--	down_write(&sev_deactivate_lock);
--
--	wbinvd_on_all_cpus();
- 	ret = sev_guest_df_flush(&error);
--
--	up_write(&sev_deactivate_lock);
--
- 	if (ret)
- 		pr_err("SEV: DF_FLUSH failed, ret=%d, error=%#x\n", ret, error);
--
- 	return ret;
- }
- 
-@@ -198,23 +186,6 @@ static void sev_asid_free(struct kvm_sev_info *sev)
- 	sev->misc_cg = NULL;
- }
- 
--static void sev_unbind_asid(struct kvm *kvm, unsigned int handle)
--{
--	struct sev_data_deactivate deactivate;
--
--	if (!handle)
--		return;
--
--	deactivate.handle = handle;
--
--	/* Guard DEACTIVATE against WBINVD/DF_FLUSH used in ASID recycling */
--	down_read(&sev_deactivate_lock);
--	sev_guest_deactivate(&deactivate, NULL);
--	up_read(&sev_deactivate_lock);
--
--	sev_guest_decommission(handle, NULL);
--}
--
- static int sev_guest_init(struct kvm *kvm, struct kvm_sev_cmd *argp)
- {
- 	struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
-@@ -329,7 +300,7 @@ static int sev_launch_start(struct kvm *kvm, struct kvm_sev_cmd *argp)
- 	/* return handle to userspace */
- 	params.handle = start.handle;
- 	if (copy_to_user((void __user *)(uintptr_t)argp->data, &params, sizeof(params))) {
--		sev_unbind_asid(kvm, start.handle);
-+		sev_guest_unbind_asid(start.handle);
- 		ret = -EFAULT;
- 		goto e_free_session;
- 	}
-@@ -1378,7 +1349,7 @@ static int sev_receive_start(struct kvm *kvm, struct kvm_sev_cmd *argp)
- 	if (copy_to_user((void __user *)(uintptr_t)argp->data,
- 			 &params, sizeof(struct kvm_sev_receive_start))) {
- 		ret = -EFAULT;
--		sev_unbind_asid(kvm, start.handle);
-+		sev_guest_unbind_asid(start.handle);
- 		goto e_free_session;
- 	}
- 
-@@ -1789,7 +1760,7 @@ void sev_vm_destroy(struct kvm *kvm)
- 
- 	mutex_unlock(&kvm->lock);
- 
--	sev_unbind_asid(kvm, sev->handle);
-+	sev_guest_unbind_asid(sev->handle);
- 	sev_asid_free(sev);
- }
- 
-diff --git a/drivers/crypto/ccp/sev-dev.c b/drivers/crypto/ccp/sev-dev.c
-index ef58f007030e..7d53cd954f80 100644
---- a/drivers/crypto/ccp/sev-dev.c
-+++ b/drivers/crypto/ccp/sev-dev.c
-@@ -33,6 +33,7 @@
- #define SEV_FW_NAME_SIZE	64
- 
- static DEFINE_MUTEX(sev_cmd_mutex);
-+static DECLARE_RWSEM(sev_deactivate_lock);
- static struct sev_misc_dev *misc_dev;
- 
- static int psp_cmd_timeout = 100;
-@@ -932,10 +933,41 @@ EXPORT_SYMBOL_GPL(sev_guest_decommission);
- 
- int sev_guest_df_flush(int *error)
- {
--	return sev_do_cmd(SEV_CMD_DF_FLUSH, NULL, error);
-+	int ret;
-+	/*
-+	 * DEACTIVATE will clear the WBINVD indicator causing DF_FLUSH to fail,
-+	 * so it must be guarded.
-+	 */
-+	down_write(&sev_deactivate_lock);
-+
-+	wbinvd_on_all_cpus();
-+
-+	ret = sev_do_cmd(SEV_CMD_DF_FLUSH, NULL, error);
-+
-+	up_write(&sev_deactivate_lock);
-+
-+	return ret;
- }
- EXPORT_SYMBOL_GPL(sev_guest_df_flush);
- 
-+void sev_guest_unbind_asid(unsigned int handle)
-+{
-+	struct sev_data_deactivate deactivate;
-+
-+	if (!handle)
-+		return;
-+
-+	deactivate.handle = handle;
-+
-+	/* Guard DEACTIVATE against WBINVD/DF_FLUSH used in ASID recycling */
-+	down_read(&sev_deactivate_lock);
-+	sev_guest_deactivate(&deactivate, NULL);
-+	up_read(&sev_deactivate_lock);
-+
-+	sev_guest_decommission(handle, NULL);
-+}
-+EXPORT_SYMBOL_GPL(sev_guest_unbind_asid);
-+
- static void sev_exit(struct kref *ref)
- {
- 	misc_deregister(&misc_dev->misc);
-diff --git a/include/linux/psp-sev.h b/include/linux/psp-sev.h
-index be50446ff3f1..09447bce9665 100644
---- a/include/linux/psp-sev.h
-+++ b/include/linux/psp-sev.h
-@@ -580,6 +580,20 @@ int sev_issue_cmd_external_user(struct file *filep, unsigned int id,
-  */
- int sev_guest_deactivate(struct sev_data_deactivate *data, int *error);
- 
-+/**
-+ * sev_guest_unbind_asid - perform SEV DEACTIVATE command with lock held
-+ *
-+ * @handle: handle of the VM to deactivate
-+ *
-+ * Returns:
-+ * 0 if the sev successfully processed the command
-+ * -%ENODEV    if the sev device is not available
-+ * -%ENOTSUPP  if the sev does not support SEV
-+ * -%ETIMEDOUT if the sev command timed out
-+ * -%EIO       if the sev returned a non-zero return code
-+ */
-+int sev_guest_unbind_asid(unsigned int handle);
-+
- /**
-  * sev_guest_activate - perform SEV ACTIVATE command
-  *
-@@ -612,7 +626,7 @@ int sev_guest_activate(struct sev_data_activate *data, int *error);
- int sev_guest_bind_asid(int asid, unsigned int handle, int *error);
- 
- /**
-- * sev_guest_df_flush - perform SEV DF_FLUSH command
-+ * sev_guest_df_flush - perform SEV DF_FLUSH command with lock held
-  *
-  * @sev_ret: sev command return code
-  *
-@@ -656,6 +670,9 @@ sev_guest_deactivate(struct sev_data_deactivate *data, int *error) { return -ENO
- static inline int
- sev_guest_decommission(unsigned int handle, int *error) { return -ENODEV; }
- 
-+static inline int
-+sev_guest_unbind_asid(unsigned int handle) { return -ENODEV; }
-+
- static inline int
- sev_guest_activate(struct sev_data_activate *data, int *error) { return -ENODEV; }
- 
--- 
-2.33.0.rc1.237.g0d66db33f3-goog
+On the other hand, since the patch series brings-in a lot of aarch64
+goodies with it,
+such as interrupt support, it might encourage others to add more arch
+specific tests
+easily :) For example, we also plan to add tests that verifies KVM
+interface for interrupts,
+for which the GIC support in the series would come handy.
 
+I'm still gaining understanding of kvm-unit-tests. However, I'm
+curious to know your thoughts as
+well in-support of kvm-unit-tests.
+
+Unfortunately, I don't have any immediate plans to submit patches on
+arch_timer for
+kvm-unit-tests.
+
+Thanks,
+Raghavendra
+
+>
+>
+> Thanks,
+> drew
+>
