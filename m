@@ -2,210 +2,137 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 62C3E3EDC51
-	for <lists+kvm@lfdr.de>; Mon, 16 Aug 2021 19:22:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 73CDE3EDC57
+	for <lists+kvm@lfdr.de>; Mon, 16 Aug 2021 19:23:56 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231799AbhHPRWa (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 16 Aug 2021 13:22:30 -0400
-Received: from mail.kernel.org ([198.145.29.99]:37616 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229699AbhHPRWa (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 16 Aug 2021 13:22:30 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 3162060F36;
-        Mon, 16 Aug 2021 17:21:58 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1629134518;
-        bh=T95dy8xDwmnj3xMLg+BxdSqSlJdDFxTpNhwOo+ufyxY=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:From;
-        b=q/jcjvQp5u7c4Z4NX4k89/A9rvxJX6opl1ESU8/tEAKSG3pbBYPqGiOXIMIlu7aeE
-         VxB6xriFBE2R81fM69E497PuFPIhzmfbR8IJaL4PCQWvpt0eZuUmT1LJ4kqCErljNk
-         zsGHB9OhlpB9p7YroNnkFU2bk1LbDQIDxNe03dGq8cfIexMvwpXuyhBOTAXl/lKdz5
-         3veEAWdG+/ligzxOf1OyiNQdfIx/6GolN6wr8Eq6Xvf+lrkw+DUbaBaKJfCbRwn7tO
-         kEQ/6rMyi+6u2+FXzJh7UzzDGMaC/jXmm6fsFmyAqslon3YLwoivbBgG9ymqyzPzry
-         cmmva8bSOKDEA==
-Date:   Mon, 16 Aug 2021 12:21:56 -0500
-From:   Bjorn Helgaas <helgaas@kernel.org>
-To:     Max Gurtovoy <mgurtovoy@nvidia.com>
-Cc:     Jason Gunthorpe <jgg@nvidia.com>,
-        Yishai Hadas <yishaih@nvidia.com>, bhelgaas@google.com,
-        corbet@lwn.net, alex.williamson@redhat.com,
-        diana.craciun@oss.nxp.com, kwankhede@nvidia.com,
-        eric.auger@redhat.com, masahiroy@kernel.org,
-        michal.lkml@markovi.net, linux-pci@vger.kernel.org,
-        linux-doc@vger.kernel.org, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org, linux-kbuild@vger.kernel.org,
-        maorg@nvidia.com, leonro@nvidia.com
-Subject: Re: [PATCH 09/12] PCI: Add a PCI_ID_F_VFIO_DRIVER_OVERRIDE flag to
- struct pci_device_id
-Message-ID: <20210816172156.GA2928236@bjorn-Precision-5520>
+        id S232341AbhHPRY1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 16 Aug 2021 13:24:27 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:34633 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229699AbhHPRY0 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 16 Aug 2021 13:24:26 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1629134634;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=nSfEWJW5VOF1+UGUOs92UACFZJr9fBBVMgZfpcfs9E8=;
+        b=bCk07uH4d7basUuUHZwHLs8X9qaCJGwkHGgnNbiRyZRZfuOclwwlDEZZ9BW2W76Rmf1uXd
+        svZC/gxFtdpEErfF4ZMg/wuScTwnAR5/Nb301bJR+3JNLdXA/RctUvYKmp6tAKBLLnxiIz
+        xX1t/247IXtG0vvIwoOibzq4tXDuEYM=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-594-IZ_YgRp_Mx-MmTJRP1mpNA-1; Mon, 16 Aug 2021 13:23:53 -0400
+X-MC-Unique: IZ_YgRp_Mx-MmTJRP1mpNA-1
+Received: by mail-wm1-f71.google.com with SMTP id y186-20020a1c32c30000b02902b5ac887cfcso8056252wmy.2
+        for <kvm@vger.kernel.org>; Mon, 16 Aug 2021 10:23:52 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=nSfEWJW5VOF1+UGUOs92UACFZJr9fBBVMgZfpcfs9E8=;
+        b=sdQ8/TUFcWgzYkVeH5QaO7SQRkPCXip2old7ctPnhUFtefJSDmz3hpF7SUuWbxfsgz
+         znNb8VYTfX6+u4jipX17ctg49xbAskwSL6euPRCLWtiyP/KcB3kIQz154O5n76iIE/ri
+         dJvXhtf3UqNGlULTl80Qx5wb60pTP+dBFLrVhMecVu95rPs0pcn6+4NwsoIoQQRcMCck
+         ex9oi5TyOkYTbmc9KYZMZtHTB19bheZ7cTldRQYtnhC/JyXKGQIT27OJNqsCc6Ky5bKR
+         TlgGLvZ9OsUF27gZyJX1ljWoAcutg1fIwG0qGVybLTdRp61pEPq8yMvb/KwKsMwoNN+Z
+         l8kg==
+X-Gm-Message-State: AOAM530GA4kFNZT9kVBFTl381xMSHrVKPcUphhxrXz9EeRzVsJVsyFIS
+        QV/qOMinSrFDXD3vZkOJ7Y92I6siGt7Maux33hHsMY8NUyGT5FZQpIOkZ0vV5mRMySX5as7ruUt
+        xz+UMdP6/8LRm
+X-Received: by 2002:a5d:5228:: with SMTP id i8mr19797566wra.391.1629134631854;
+        Mon, 16 Aug 2021 10:23:51 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxr/EULMz4YbGdtxkphQbMYTUQwPQrwSV/ywAqLyZsVMQ2DuH8UYDSePKurq0qGPBM/cdYDjg==
+X-Received: by 2002:a5d:5228:: with SMTP id i8mr19797558wra.391.1629134631711;
+        Mon, 16 Aug 2021 10:23:51 -0700 (PDT)
+Received: from work-vm (cpc109021-salf6-2-0-cust453.10-2.cable.virginm.net. [82.29.237.198])
+        by smtp.gmail.com with ESMTPSA id u16sm129532wmc.41.2021.08.16.10.23.49
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 16 Aug 2021 10:23:49 -0700 (PDT)
+Date:   Mon, 16 Aug 2021 18:23:47 +0100
+From:   "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Ashish Kalra <Ashish.Kalra@amd.com>, qemu-devel@nongnu.org,
+        thomas.lendacky@amd.com, brijesh.singh@amd.com,
+        ehabkost@redhat.com, mst@redhat.com, richard.henderson@linaro.org,
+        jejb@linux.ibm.com, tobin@ibm.com, dovmurik@linux.vnet.ibm.com,
+        frankeh@us.ibm.com, kvm@vger.kernel.org
+Subject: Re: [RFC PATCH 00/13] Add support for Mirror VM.
+Message-ID: <YRqfI0YlNZ6Xowwt@work-vm>
+References: <cover.1629118207.git.ashish.kalra@amd.com>
+ <fb737cf0-3d96-173f-333b-876dfd59d32b@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <2ee30d21-5305-5e58-6fa2-da74b2c8ff5a@nvidia.com>
+In-Reply-To: <fb737cf0-3d96-173f-333b-876dfd59d32b@redhat.com>
+User-Agent: Mutt/2.0.7 (2021-05-04)
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sun, Aug 15, 2021 at 02:27:13AM +0300, Max Gurtovoy wrote:
-> On 8/13/2021 8:44 PM, Bjorn Helgaas wrote:
-> > On Fri, Aug 13, 2021 at 02:21:41AM +0300, Max Gurtovoy wrote:
-> > > On 8/12/2021 11:26 PM, Bjorn Helgaas wrote:
-> > > > On Thu, Aug 12, 2021 at 04:51:26PM -0300, Jason Gunthorpe wrote:
-> > > > > On Thu, Aug 12, 2021 at 10:57:07AM -0500, Bjorn Helgaas wrote:
-> > > > > > On Thu, Aug 12, 2021 at 10:27:28AM -0300, Jason Gunthorpe wrote:
-> > > > > > > On Wed, Aug 11, 2021 at 02:07:37PM -0500, Bjorn Helgaas wrote:
-> > > > > > > > On Thu, Aug 05, 2021 at 09:23:57PM -0300, Jason Gunthorpe wrote:
-> > > > > > > > Do the other bus types have a flag analogous to
-> > > > > > > > PCI_ID_F_VFIO_DRIVER_OVERRIDE?  If we're doing something similar to
-> > > > > > > > other bus types, it'd be nice if the approach were similar.
-> > > > > > > They could, this series doesn't attempt it. I expect the approach to
-> > > > > > > be similar as driver_override was copied from PCI to other
-> > > > > > > busses. When this is completed I hope to take a look at it.
-> > > > > > I think this would make more sense as two patches:
-> > > > > > 
-> > > > > >     - Add a "PCI_ID_DRIVER_OVERRIDE" flag.  This is not VFIO-specific,
-> > > > > >       since nothing in PCI depends on the VFIO-ness of drivers that use
-> > > > > >       the flag.  The only point here is that driver id_table entries
-> > > > > >       with this flag only match when driver_override matches the driver.
-> > > > > This would require using two flags, one to indicate the above to the
-> > > > > PCI code and another to indicate the vfio_pci string to
-> > > > > file2alias. This doesn't seem justified at this point, IMHO.
-> > > > I don't think it requires two flags.  do_pci_entry() has:
-> > > > 
-> > > >     if (flags & PCI_ID_F_VFIO_DRIVER_OVERRIDE)
-> > > >       strcpy(alias, "vfio_pci:");
-> > > > 
-> > > > I'm just proposing a rename:
-> > > > 
-> > > > s/PCI_ID_F_VFIO_DRIVER_OVERRIDE/PCI_ID_DRIVER_OVERRIDE/
-> > > > 
-> > > > > >     - Update file2alias.c to export the flags and the "vfio_pci:" alias.
-> > > > > >       This seems to be the only place where VFIO comes into play, and
-> > > > > >       putting it in a separate patch will make it much smaller and it
-> > > > > >       will be clear how it could be extended for other buses.
-> > > > > Well, I don't want to see a flag called PCI_ID_DRIVER_OVERRIDE mapped
-> > > > > to the string "vfio_pci", that is just really confusing.
-> > > > Hahaha, I see, that's fair :)  It confused me for a long time why you
-> > > > wanted "VFIO" in the flag name because from the kernel's point of
-> > > > view, the flag is not related to any VFIO-ness.  It's only related to
-> > > > a special variety of driver_override, and VFIO happens to be one user
-> > > > of it.
-> > > In my original patch I used
-> > > 
-> > > #define PCI_ID_DRIVER_OVERRIDE PCI_ID_F_VFIO_DRIVER_OVERRIDE
-> > > 
-> > > and in the pci core code I used PCI_ID_DRIVER_OVERRIDE in the "if" clause.
-> > > 
-> > > So we can maybe do that and leave the option to future update of the define
-> > > without changing the core code.
-> > > 
-> > > In the future we can have something like:
-> > > 
-> > > #define PCI_ID_DRIVER_OVERRIDE (PCI_ID_F_VFIO_DRIVER_OVERRIDE |
-> > > PCI_ID_F_MY_BUS_DRIVER_OVERRIDE)
-> > > 
-> > > The file2alias.c still have to use the exact PCI_ID_F_VFIO_DRIVER_OVERRIDE
-> > > flag to add "vfio_" prefix.
-> > > 
-> > > Is that better ?
-> > I don't think it's worth having two separate #defines.  If we need
-> > more in the future, we can add them when we need them.
-> 
-> I meant 1 #define and 1 enum:
-> 
-> enum {
->     PCI_ID_F_VFIO_DRIVER_OVERRIDE    = 1 << 0,
-> };
-> 
-> #define PCI_ID_DRIVER_OVERRIDE PCI_ID_F_VFIO_DRIVER_OVERRIDE
-
-Basically the same thing.  Doesn't seem worthwhile to me to have both.
-When reading the code, it's not at all obvious why you would define a
-new name for PCI_ID_F_VFIO_DRIVER_OVERRIDE.
-
-> > What if we renamed "flags" to be specifically for this override case,
-> > e.g., "override_only"?  Then the flag could be
-> > PCI_ID_F_VFIO_DRIVER_OVERRIDE, which would trigger a "vfio_" prefix in
-> > file2alias.c, but pci_match_device() could just check for it being
-> > non-zero, without caring whether the reason is VFIO or something else,
-> > e.g.,
+* Paolo Bonzini (pbonzini@redhat.com) wrote:
+> On 16/08/21 15:25, Ashish Kalra wrote:
+> > From: Ashish Kalra<ashish.kalra@amd.com>
 > > 
-> >    pci_match_device(...)
-> >    {
-> >      ...
-> >      if (found_id->override_only) {
-> >        if (dev->driver_override)
-> >          return found_id;
-> >        ...
+> > This is an RFC series for Mirror VM support that are
+> > essentially secondary VMs sharing the encryption context
+> > (ASID) with a primary VM. The patch-set creates a new
+> > VM and shares the primary VM's encryption context
+> > with it using the KVM_CAP_VM_COPY_ENC_CONTEXT_FROM capability.
+> > The mirror VM uses a separate pair of VM + vCPU file
+> > descriptors and also uses a simplified KVM run loop,
+> > for example, it does not support any interrupt vmexit's. etc.
+> > Currently the mirror VM shares the address space of the
+> > primary VM.
+> > 
+> > The mirror VM can be used for running an in-guest migration
+> > helper (MH). It also might have future uses for other in-guest
+> > operations.
 > 
-> Jason suggested something like this:
+> Hi,
 > 
-> static const struct pci_device_id *pci_match_device(struct pci_driver *drv,
->                             struct pci_dev *dev)
-> {
->     struct pci_dynid *dynid;
->     const struct pci_device_id *found_id = NULL, *ids;
+> first of all, thanks for posting this work and starting the discussion.
 > 
->     /* When driver_override is set, only bind to the matching driver */
->     if (dev->driver_override && strcmp(dev->driver_override, drv->name))
->         return NULL;
-> 
->     /* Look at the dynamic ids first, before the static ones */
->     spin_lock(&drv->dynids.lock);
->     list_for_each_entry(dynid, &drv->dynids.list, node) {
->         if (pci_match_one_device(&dynid->id, dev)) {
->             found_id = &dynid->id;
->             break;
->         }
->     }
->     spin_unlock(&drv->dynids.lock);
-> 
->     if (found_id)
->         return found_id;
-> 
->     for (ids = drv->id_table; (found_id = pci_match_id(ids, dev));
->          ids = found_id + 1) {
->         /*
->          * The match table is split based on driver_override. Check the
->          * flags as well so that any matching
->          * PCI_ID_F_VFIO_DRIVER_OVERRIDE entry is returned.
->          */
->         if (!(found_id->flags & PCI_ID_F_VFIO_DRIVER_OVERRIDE) ||
->             dev->driver_override)
->             return found_id;
->     }
-> 
->     /*
->      * if no static match, driver_override will always match, send a dummy
->      * id.
->      */
->     if (dev->driver_override)
->         return &pci_device_id_any;
->     return NULL;
-> }
-> 
-> 
-> It looks good to me as well.
+> However, I am not sure if the in-guest migration helper vCPUs should use the
+> existing KVM support code.  For example, they probably can just always work
+> with host CPUID (copied directly from KVM_GET_SUPPORTED_CPUID),
 
-I missed your point.  Isn't the above basically the 09/12 patch [1] we're
-talking about?
+Doesn't at least one form of SEV have some masking of CPUID that's
+visible to the guest; so perhaps we have to match the main vCPUs idea of
+CPUIDs?
 
-Yes, I see the code structure is slightly different, but the question
-we're talking about here is the name of the "flags" field and the enum
-or #define for the VFIO bit.
+>  and they do
+> not need to interface with QEMU's MMIO logic.  They would just sit on a
+> "HLT" instruction and communicate with the main migration loop using some
+> kind of standardized ring buffer protocol; the migration loop then executes
+> KVM_RUN in order to start the processing of pages, and expects a
+> KVM_EXIT_HLT when the VM has nothing to do or requires processing on the
+> host.
+> 
+> The migration helper can then also use its own address space, for example
+> operating directly on ram_addr_t values with the helper running at very high
+> virtual addresses.  Migration code can use a RAMBlockNotifier to invoke
+> KVM_SET_USER_MEMORY_REGION on the mirror VM (and never enable dirty memory
+> logging on the mirror VM, too, which has better performance).
 
-> I prefer the "flags" naming since its more generic and easy to extend.
+How does the use of a very high virtual address help ?
 
-We don't need to worry about "flags" being generic or extensible until
-we need to extend it.  It's easy to fiddle with it at that point.
+> With this implementation, the number of mirror vCPUs does not even have to
+> be indicated on the command line.  The VM and its vCPUs can simply be
+> created when migration starts.  In the SEV-ES case, the guest can even
+> provide the VMSA that starts the migration helper.
+> 
+> The disadvantage is that, as you point out, in the future some of the
+> infrastructure you introduce might be useful for VMPL0 operation on SEV-SNP.
+> My proposal above might require some code duplication. However, it might
+> even be that VMPL0 operation works best with a model more similar to my
+> sketch of the migration helper; it's really too early to say.
+> 
 
-> can we continue with the above suggestion for V2 ?
+Dave
 
-I don't see what really changed with the above suggestion.
+> Paolo
+> 
+-- 
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
-The point I'm trying to make is that using PCI_ID_F_VFIO_DRIVER_OVERRIDE 
-in pci_match_device() suggests that the code there has some connection
-or dependency on VFIO, but it does not.
-
-[1] https://lore.kernel.org/r/20210721161609.68223-10-yishaih@nvidia.com
