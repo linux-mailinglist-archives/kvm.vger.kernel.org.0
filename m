@@ -2,137 +2,106 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 534DE3EDEDF
-	for <lists+kvm@lfdr.de>; Mon, 16 Aug 2021 22:56:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1D2AF3EDF46
+	for <lists+kvm@lfdr.de>; Mon, 16 Aug 2021 23:23:31 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233303AbhHPU5C (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 16 Aug 2021 16:57:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42154 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233335AbhHPU5B (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 16 Aug 2021 16:57:01 -0400
-Received: from mail-vk1-xa2c.google.com (mail-vk1-xa2c.google.com [IPv6:2607:f8b0:4864:20::a2c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 21CA6C061764
-        for <kvm@vger.kernel.org>; Mon, 16 Aug 2021 13:56:29 -0700 (PDT)
-Received: by mail-vk1-xa2c.google.com with SMTP id j26so2880401vkn.4
-        for <kvm@vger.kernel.org>; Mon, 16 Aug 2021 13:56:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=PAjqAgz4SbwhR4C2g99BnpgC4FJpr+PKslvtcBCtV7g=;
-        b=Z0LdAVsVOA5UHNfiWH6pgQcaDfOI9yO7Prph0FcJkli65iCPGkn28i57u0iz4+rr/k
-         7vexRoGXmoPITr+5iwD1J66G3TX2bPkT/CXwyeVpXNo7GjzQ7AhRHto17gppMPSKbsWK
-         RuJRGjnJZUEvu08KT6euDd9I6tm7GraORU6AK3mdU3PHuwzqhr90lo9viERzvg1NotTN
-         SQEOnKw/W7fs/3/6pADSnP1TY1XrkH/jkzfAZhWNNJ5qAQpDVTkOjbT7l7Uy0t3/vrRN
-         MMadQi9Wh82FRxI2kmi5Jl9OwXaKDExXlsgp1jDNN4pukiE+JblEQPerb0tNc5/nkAmI
-         uLlA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=PAjqAgz4SbwhR4C2g99BnpgC4FJpr+PKslvtcBCtV7g=;
-        b=kjFOayaV/j7E7PUa8tgm7wn8r5Sbaaq7Juh/bwAqMhQhMeBqhwMb12Dbt1vzoQ7Xgn
-         z6W8L/bhq8XGKgAGCzN956lRfFWUWtVNKrBRMcBnvjmzONu57MLiNtbgNpI53HoQGe4F
-         Q38S+KSv8rARTQ5xoT3X5bscaTDN0Bk33G2NSqm5GYmOjpiewWT1q/WbffYgfOOwxV15
-         AxmIqK7rqntrgGcpctBMKGRD7JDXH4nAOEbrer2js2Jhn72r1WYKEmZUkd28wbriSNo/
-         McFqVjGwut14A0LaTWJyZKtD0o8WhSY+0JHrpKY4FXGLptWc5mTb2g1KnUJvDJRSmMrN
-         KygA==
-X-Gm-Message-State: AOAM531N8zIb0ZXax3/nXZCRSmzYjxNlTZQItE7ub3USwDOB3F4rrWKv
-        vUU74Bv0tOkoXkRTrI9fnf5C5tHgZnNP5qoTHjzQfg==
-X-Google-Smtp-Source: ABdhPJwFYs1vFOV9d+q8kCyHbjok7b0AZnXTp2WBYai2NMcFXOwpP6G4PDTDMv1OQqhNCSOcya9L68gfllHl5OFFeZI=
-X-Received: by 2002:a1f:bfc4:: with SMTP id p187mr407300vkf.17.1629147388071;
- Mon, 16 Aug 2021 13:56:28 -0700 (PDT)
+        id S232084AbhHPVX4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 16 Aug 2021 17:23:56 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:56671 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S231698AbhHPVXz (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 16 Aug 2021 17:23:55 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1629149003;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=vzaXs+GwPXQ3GQVxI8ZjHLrHrM+BXcmlyODPhL0Bihc=;
+        b=RTcyoJ44efv6zHXua6aDcLFoiooldHWbBFycqRHSZj48/RRMlzruv/VhfpWVh3j2UDXc6n
+        /1xanexDfP3nyM6xnM8u1CsDuWpzHFkMFjjHkb/8eh8Yq7a7xY6DbG4Wj6xrYDRM9F3CWz
+        oe+dVQ/iaTdN401aC54D/EShSy8xutA=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-122-4tZq8Bt7P1WR7GkucxfLDA-1; Mon, 16 Aug 2021 17:23:22 -0400
+X-MC-Unique: 4tZq8Bt7P1WR7GkucxfLDA-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B9E6D100806E;
+        Mon, 16 Aug 2021 21:23:20 +0000 (UTC)
+Received: from redhat.com (ovpn-113-125.phx2.redhat.com [10.3.113.125])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 4BD5D179B3;
+        Mon, 16 Aug 2021 21:23:16 +0000 (UTC)
+Date:   Mon, 16 Aug 2021 16:23:14 -0500
+From:   Eric Blake <eblake@redhat.com>
+To:     Ashish Kalra <Ashish.Kalra@amd.com>
+Cc:     qemu-devel@nongnu.org, pbonzini@redhat.com,
+        thomas.lendacky@amd.com, brijesh.singh@amd.com,
+        ehabkost@redhat.com, mst@redhat.com, richard.henderson@linaro.org,
+        jejb@linux.ibm.com, tobin@ibm.com, dovmurik@linux.vnet.ibm.com,
+        frankeh@us.ibm.com, dgilbert@redhat.com, kvm@vger.kernel.org
+Subject: Re: [RFC PATCH 01/13] machine: Add mirrorvcpus=N suboption to -smp
+Message-ID: <20210816212314.kxpbo2sfoxkzliwt@redhat.com>
+References: <cover.1629118207.git.ashish.kalra@amd.com>
+ <235c91b1b09f11c75bfc60597938c97d3ebb0861.1629118207.git.ashish.kalra@amd.com>
 MIME-Version: 1.0
-References: <20210813211211.2983293-1-rananta@google.com> <20210816121548.y5w624yhrql2trzt@gator.home>
-In-Reply-To: <20210816121548.y5w624yhrql2trzt@gator.home>
-From:   Raghavendra Rao Ananta <rananta@google.com>
-Date:   Mon, 16 Aug 2021 13:56:17 -0700
-Message-ID: <CAJHc60yqNcpmDCmSehVb6uDeu+FF--aPhwJ9ZBTAcJCPBVR=1Q@mail.gmail.com>
-Subject: Re: [PATCH 00/10] KVM: arm64: selftests: Introduce arch_timer selftest
-To:     Andrew Jones <drjones@redhat.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        James Morse <james.morse@arm.com>,
-        Peter Shier <pshier@google.com>,
-        Ricardo Koller <ricarkol@google.com>,
-        Oliver Upton <oupton@google.com>,
-        Reiji Watanabe <reijiw@google.com>,
-        Jing Zhang <jingzhangos@google.com>, kvm@vger.kernel.org,
-        kvmarm@lists.cs.columbia.edu
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <235c91b1b09f11c75bfc60597938c97d3ebb0861.1629118207.git.ashish.kalra@amd.com>
+User-Agent: NeoMutt/20210205-719-68949a
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Aug 16, 2021 at 5:15 AM Andrew Jones <drjones@redhat.com> wrote:
->
-> On Fri, Aug 13, 2021 at 09:12:01PM +0000, Raghavendra Rao Ananta wrote:
-> > Hello,
-> >
-> > The patch series adds a KVM selftest to validate the behavior of
-> > ARM's generic timer (patch-10). The test programs the timer IRQs
-> > periodically, and for each interrupt, it validates the behaviour
-> > against the architecture specifications. The test further provides
-> > a command-line interface to configure the number of vCPUs, the
-> > period of the timer, and the number of iterations that the test
-> > has to run for.
-> >
-> > Since the test heavily depends on interrupts, the patch series also
-> > adds a basic support for ARM Generic Interrupt Controller v3 (GICv3)
-> > to the KVM's aarch64 selftest framework (patch-9).
-> >
-> > Furthermore, additional processor utilities such as accessing the MMIO
-> > (via readl/writel), read/write to assembler unsupported registers,
-> > basic delay generation, enable/disable local IRQs, spinlock support,
-> > and so on, are also introduced that the test/GICv3 takes advantage of.
-> > These are presented in patches 1 through 8.
-> >
-> > The patch series, specifically the library support, is derived from the
-> > kvm-unit-tests and the kernel itself.
-> >
->
-> Hi Raghavendra,
->
-> I appreciate the new support being added to aarch64 kselftests in order to
-> support new tests. I'm curious as to why the kvm-unit-tests timer test
-> wasn't extended instead, though. Also, I'm curious if you've seen any
-> room for improvements to the kvm-unit-tests code and, if so, if you plan
-> to submit patches for those improvements.
+On Mon, Aug 16, 2021 at 01:26:45PM +0000, Ashish Kalra wrote:
+> From: Dov Murik <dovmurik@linux.vnet.ibm.com>
+> 
+> Add a notion of mirror vcpus to CpuTopology, which will allow to
+> designate a few vcpus (normally 1) for running the guest
+> migration handler (MH).
+> 
+> Example usage for starting a 4-vcpu guest, of which 1 vcpu is marked as
+> mirror vcpu.
+> 
+>     qemu-system-x86_64 -smp 4,mirrorvcpus=1 ...
+> 
+> Signed-off-by: Dov Murik <dovmurik@linux.vnet.ibm.com>
+> Co-developed-by: Ashish Kalra <ashish.kalra@amd.com>
+> Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
+> ---
 
+> +++ b/qapi/machine.json
+> @@ -1303,6 +1303,8 @@
+>  #
+>  # @maxcpus: maximum number of hotpluggable virtual CPUs in the virtual machine
+>  #
+> +# @mirrorvcpus: maximum number of mirror virtual CPUs in the virtual machine
+> +#
 
-Hi  Andrew,
+Needs a '(since 6.2)' tag.
 
-Interesting question! It's more about ease and flexibility in
-controlling the guest via the VMM-
-Since arch_timer's interface is mostly per-CPU, we'd like to extend
-this test case to be
-more stressful, such as migrating the vCPUs across pCPUs rapidly, or
-even affining
-a large number of vCPUs to a single pCPU, and so on.
+>  # Since: 6.1
+>  ##
+>  { 'struct': 'SMPConfiguration', 'data': {
+> @@ -1311,4 +1313,5 @@
+>       '*dies': 'int',
+>       '*cores': 'int',
+>       '*threads': 'int',
+> -     '*maxcpus': 'int' } }
+> +     '*maxcpus': 'int',
+> +     '*mirrorvcpus': 'int' } }
 
-On the other hand, since the patch series brings-in a lot of aarch64
-goodies with it,
-such as interrupt support, it might encourage others to add more arch
-specific tests
-easily :) For example, we also plan to add tests that verifies KVM
-interface for interrupts,
-for which the GIC support in the series would come handy.
+Is this really the right place to be adding it?  The rest of this
+struct feels like things that advertise what bare metal can do, and
+therefore what we are emulating.  But bare metal can't do mirrors -
+that's something that is completely in the realm of emulation only.
+If I understand the cover letter, the guest shouldn't be able to
+detect that mirroring exists, which is different from how the guest
+DOES detect how many dies, cores, and threads are available to use.
 
-I'm still gaining understanding of kvm-unit-tests. However, I'm
-curious to know your thoughts as
-well in-support of kvm-unit-tests.
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
 
-Unfortunately, I don't have any immediate plans to submit patches on
-arch_timer for
-kvm-unit-tests.
-
-Thanks,
-Raghavendra
-
->
->
-> Thanks,
-> drew
->
