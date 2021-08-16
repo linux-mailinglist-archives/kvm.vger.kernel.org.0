@@ -2,56 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3DF523ECC0E
+	by mail.lfdr.de (Postfix) with ESMTP id 85F633ECC0F
 	for <lists+kvm@lfdr.de>; Mon, 16 Aug 2021 02:13:41 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232685AbhHPANe (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 15 Aug 2021 20:13:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39430 "EHLO
+        id S232559AbhHPANf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 15 Aug 2021 20:13:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39436 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232140AbhHPAN3 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 15 Aug 2021 20:13:29 -0400
-Received: from mail-il1-x149.google.com (mail-il1-x149.google.com [IPv6:2607:f8b0:4864:20::149])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DCD4CC061764
-        for <kvm@vger.kernel.org>; Sun, 15 Aug 2021 17:12:58 -0700 (PDT)
-Received: by mail-il1-x149.google.com with SMTP id y20-20020a056e020f5400b00224400d1c21so6844023ilj.11
-        for <kvm@vger.kernel.org>; Sun, 15 Aug 2021 17:12:58 -0700 (PDT)
+        with ESMTP id S232382AbhHPANa (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 15 Aug 2021 20:13:30 -0400
+Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2BB62C0613C1
+        for <kvm@vger.kernel.org>; Sun, 15 Aug 2021 17:13:00 -0700 (PDT)
+Received: by mail-yb1-xb49.google.com with SMTP id a62-20020a254d410000b0290592f360b0ccso14953538ybb.14
+        for <kvm@vger.kernel.org>; Sun, 15 Aug 2021 17:13:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=date:in-reply-to:message-id:mime-version:references:subject:from:to
          :cc;
-        bh=LDn71X/mteHSm80S6t26TyxwkEj27LrlTf7lB/WnK0E=;
-        b=tFGja0lkfeepK+FkjFeq/aVGW+mKNcPoNNlqpTMnu0V3vovCmctbotfMUDQjFSAcD4
-         6HOZbhkVK/AJkuPU4vE4cvo6B1mF3aDEYLG107YqyjKseSoClfb8cG4UAZjnRyke0Ce+
-         WkIpMN+ybYGn2RRLaX7uoEOw+pTWEzeY7aTzSFVuig04pceKNl0TVXOGaDRVgK2a8Vhr
-         2DXYsb5DVrL2L3qN297jolFCHfD3H6kPSjk+gIA/ush9nBL2y5iojzV6Yx6PC74aeADD
-         Cak/sRa9pm9NFS5qTT+cpb8hE/wID6LMeB6ol1Ypc7u2S47YZbKgp0UUN7W+RYGywGaI
-         mVRw==
+        bh=Mo5DGr28+n9iD41dMXxXDuMQdLOo6WPPoeyjsxZY9VA=;
+        b=vEEOUVGfAVc2um+9rckN8TCJebHnpC49fB/suHi6NhcRJhm92InWkAPaxRIIq5Z6dG
+         OYjq3aT2bc+yiASefJLXGtf22AKm7Jhv/RwMsNTCAeH4C8hiAmKQom9SN9uvQTA28D9V
+         88PZIMcHvA0kQODCYk5iG4A56Yozi2FDXot2+JLTi6jIWYpbPdS9TFhOSctUOMJXX4Bm
+         9zaVrNMOtcH/5zFgBroNV/6N5tJx1rZ8+HjXvv93nHcFh1TX3rFPPqQgUzhtkSSep7pj
+         /z/vmpL6Y39kEMU53J/b244iVnOb4NxDhWpg8IGAoP0Bwrj0/7Xo+D1H9mmlO/W9sbb+
+         0ENg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=LDn71X/mteHSm80S6t26TyxwkEj27LrlTf7lB/WnK0E=;
-        b=OCXhRbC6eT90M7Or+INfOg8f/grCSjaYYXNyE/6AninWBKn2HB7kbNbYbXK3ppx2Ag
-         jIlTYYNEsfafJGuctGddKcRzybNf14YgnYnM7Oy6ytyxSCdeyekrYP72WXJEHSfbbiFd
-         +KspuB8Tm7LRwS9mzrW2K0aMKR5WE4lvXuanjsHnwpvYAgXnSG2H4HZGpn0uMrxIb4sf
-         ceBCEapyth2tvBLLmfpO9fASex0gav95v1jqSvCRwY5mQbDBgTRld5+ue2Nh94AJOacL
-         rPTXC8UFPaaSXui1SzDn5q7STiiYk+/xtHIhDFSd64zKbimymVnVMUVjXQMa/5AqyMIQ
-         qH9g==
-X-Gm-Message-State: AOAM532OW55LE6ZmPvdt0EMCDYjraw7W8m7k7sCWxuIt/bk3uWVBI4ri
-        9XQ59nRJyDnNJbZxXFrejkkUOWTMYACQK5mDzQsTO90Pj+ClZATyT9+q9jjrDjY922RN1Q1aILV
-        JI1mWb/E9aosL0NSw1gzgzue+0OHwvzo2Wkk0pF0k8utY3kZLb0jdoKZMUg==
-X-Google-Smtp-Source: ABdhPJxBGSNKp7nAwuyx4V4ZkrlD3NGCg0jwXeIu/+7/9/7758jjyZKMe4CTsweb4Xrvpxd+DmoDyTn6Lyo=
+        bh=Mo5DGr28+n9iD41dMXxXDuMQdLOo6WPPoeyjsxZY9VA=;
+        b=b438D8lNC7UyELTbWEuKk+eBnUp2q55VV3cHniSTK7IsWYVJGSz4K+6AkE9+KiAYCV
+         61c4CK66kzrq0cMGG5ltC99zd2XwAmEPZwfOpKVXtSeo/yiQraxKv9H87J6YjPmCbf+u
+         b6k0VcMwV5LOSMyVOlXplJED4pIq+26wW1qVHkq8rYsSgpclUqUvf2ujcuU5Pq8ZwJlY
+         A6CEeWz41Gi7fVHFMZDcxB/orCQiatmZ0FHilbnQLX6n9ZVSMtjQIPmA3qLA4qtsnyjC
+         k1fMz6PC4JWv7NpbKo01zE78ZemkGQVDZyWv5gkowBRNUDI/zNKfbvdOlSeqD194OGXR
+         4J3g==
+X-Gm-Message-State: AOAM530dsJKiTWOBYd7PKQjHKoZEyYg4aetZ0ivfUaIMLFlNOByE++mf
+        VfK03rIi3u9m3NJSKzJa3c2byhbsGDgfbdCijr/C+KQmXlhLD6TsMXcN/ANEMb4I6znUlBj5C6Y
+        IMOz51s2YCjIhTOpPikZ5EbjsN/YY0Eg1AnfQcaWKyU1ppxABpraihy5HJw==
+X-Google-Smtp-Source: ABdhPJzXHC3/0Ly0+ZPM9bFrtsB0V8DUl++e5d4rHoe6kt1DE0MaxEh+J8w0d9UH18WuCP1ITvcbO0Tgedk=
 X-Received: from oupton.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:404])
- (user=oupton job=sendgmr) by 2002:a6b:fb07:: with SMTP id h7mr3843368iog.201.1629072778180;
- Sun, 15 Aug 2021 17:12:58 -0700 (PDT)
-Date:   Mon, 16 Aug 2021 00:12:43 +0000
+ (user=oupton job=sendgmr) by 2002:a25:d8c7:: with SMTP id p190mr10287387ybg.481.1629072779249;
+ Sun, 15 Aug 2021 17:12:59 -0700 (PDT)
+Date:   Mon, 16 Aug 2021 00:12:44 +0000
 In-Reply-To: <20210816001246.3067312-1-oupton@google.com>
-Message-Id: <20210816001246.3067312-7-oupton@google.com>
+Message-Id: <20210816001246.3067312-8-oupton@google.com>
 Mime-Version: 1.0
 References: <20210816001246.3067312-1-oupton@google.com>
 X-Mailer: git-send-email 2.33.0.rc1.237.g0d66db33f3-goog
-Subject: [PATCH v7 6/9] selftests: KVM: Add helper to check for register presence
+Subject: [PATCH v7 7/9] selftests: KVM: Add support for aarch64 to system_counter_offset_test
 From:   Oliver Upton <oupton@google.com>
 To:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
 Cc:     Paolo Bonzini <pbonzini@redhat.com>,
@@ -75,60 +75,118 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The KVM_GET_REG_LIST vCPU ioctl returns a list of supported registers
-for a given vCPU. Add a helper to check if a register exists in the list
-of supported registers.
+KVM/arm64 now allows userspace to adjust the guest virtual counter-timer
+via a vCPU register. Test that changes to the virtual counter-timer
+offset result in the correct view being presented to the guest.
 
-Signed-off-by: Oliver Upton <oupton@google.com>
 Reviewed-by: Andrew Jones <drjones@redhat.com>
+Signed-off-by: Oliver Upton <oupton@google.com>
 ---
- .../testing/selftests/kvm/include/kvm_util.h  |  2 ++
- tools/testing/selftests/kvm/lib/kvm_util.c    | 19 +++++++++++++++++++
- 2 files changed, 21 insertions(+)
+ tools/testing/selftests/kvm/Makefile          |  1 +
+ .../selftests/kvm/include/aarch64/processor.h | 12 ++++
+ .../kvm/system_counter_offset_test.c          | 56 ++++++++++++++++++-
+ 3 files changed, 68 insertions(+), 1 deletion(-)
 
-diff --git a/tools/testing/selftests/kvm/include/kvm_util.h b/tools/testing/selftests/kvm/include/kvm_util.h
-index 1b3ef5757819..077082dd2ca7 100644
---- a/tools/testing/selftests/kvm/include/kvm_util.h
-+++ b/tools/testing/selftests/kvm/include/kvm_util.h
-@@ -215,6 +215,8 @@ void vcpu_fpu_get(struct kvm_vm *vm, uint32_t vcpuid,
- 		  struct kvm_fpu *fpu);
- void vcpu_fpu_set(struct kvm_vm *vm, uint32_t vcpuid,
- 		  struct kvm_fpu *fpu);
-+
-+bool vcpu_has_reg(struct kvm_vm *vm, uint32_t vcpuid, uint64_t reg_id);
- void vcpu_get_reg(struct kvm_vm *vm, uint32_t vcpuid, struct kvm_one_reg *reg);
- void vcpu_set_reg(struct kvm_vm *vm, uint32_t vcpuid, struct kvm_one_reg *reg);
- #ifdef __KVM_HAVE_VCPU_EVENTS
-diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
-index 0fe66ca6139a..a5801d4ed37d 100644
---- a/tools/testing/selftests/kvm/lib/kvm_util.c
-+++ b/tools/testing/selftests/kvm/lib/kvm_util.c
-@@ -1823,6 +1823,25 @@ void vcpu_fpu_set(struct kvm_vm *vm, uint32_t vcpuid, struct kvm_fpu *fpu)
- 		    ret, errno, strerror(errno));
- }
+diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
+index 2cb0a375c7db..a74d4876c69c 100644
+--- a/tools/testing/selftests/kvm/Makefile
++++ b/tools/testing/selftests/kvm/Makefile
+@@ -97,6 +97,7 @@ TEST_GEN_PROGS_aarch64 += kvm_page_table_test
+ TEST_GEN_PROGS_aarch64 += set_memory_region_test
+ TEST_GEN_PROGS_aarch64 += steal_time
+ TEST_GEN_PROGS_aarch64 += kvm_binary_stats_test
++TEST_GEN_PROGS_aarch64 += system_counter_offset_test
  
-+bool vcpu_has_reg(struct kvm_vm *vm, uint32_t vcpuid, uint64_t reg_id)
+ TEST_GEN_PROGS_s390x = s390x/memop
+ TEST_GEN_PROGS_s390x += s390x/resets
+diff --git a/tools/testing/selftests/kvm/include/aarch64/processor.h b/tools/testing/selftests/kvm/include/aarch64/processor.h
+index 27dc5c2e56b9..3168cdbae6ee 100644
+--- a/tools/testing/selftests/kvm/include/aarch64/processor.h
++++ b/tools/testing/selftests/kvm/include/aarch64/processor.h
+@@ -129,4 +129,16 @@ void vm_install_sync_handler(struct kvm_vm *vm,
+ 
+ #define isb()	asm volatile("isb" : : : "memory")
+ 
++static inline uint64_t read_cntvct_ordered(void)
 +{
-+	struct kvm_reg_list *list;
-+	bool ret = false;
-+	uint64_t i;
++	uint64_t r;
 +
-+	list = vcpu_get_reg_list(vm, vcpuid);
++	__asm__ __volatile__("isb\n\t"
++			     "mrs %0, cntvct_el0\n\t"
++			     "isb\n\t"
++			     : "=r"(r));
 +
-+	for (i = 0; i < list->n; i++) {
-+		if (list->reg[i] == reg_id) {
-+			ret = true;
-+			break;
-+		}
-+	}
-+
-+	free(list);
-+	return ret;
++	return r;
 +}
 +
- void vcpu_get_reg(struct kvm_vm *vm, uint32_t vcpuid, struct kvm_one_reg *reg)
- {
- 	int ret;
+ #endif /* SELFTEST_KVM_PROCESSOR_H */
+diff --git a/tools/testing/selftests/kvm/system_counter_offset_test.c b/tools/testing/selftests/kvm/system_counter_offset_test.c
+index b337bbbfa41f..ac933db83d03 100644
+--- a/tools/testing/selftests/kvm/system_counter_offset_test.c
++++ b/tools/testing/selftests/kvm/system_counter_offset_test.c
+@@ -53,7 +53,61 @@ static uint64_t host_read_guest_system_counter(struct test_case *test)
+ 	return rdtsc() + test->tsc_offset;
+ }
+ 
+-#else /* __x86_64__ */
++#elif __aarch64__ /* __x86_64__ */
++
++enum arch_counter {
++	VIRTUAL,
++};
++
++struct test_case {
++	enum arch_counter counter;
++	uint64_t offset;
++};
++
++static struct test_case test_cases[] = {
++	{ .counter = VIRTUAL, .offset = 0 },
++	{ .counter = VIRTUAL, .offset = 180 * NSEC_PER_SEC },
++	{ .counter = VIRTUAL, .offset = -180 * NSEC_PER_SEC },
++};
++
++static void check_preconditions(struct kvm_vm *vm)
++{
++	if (vcpu_has_reg(vm, VCPU_ID, KVM_REG_ARM_TIMER_OFFSET))
++		return;
++
++	print_skip("KVM_REG_ARM_TIMER_OFFSET not supported; skipping test");
++	exit(KSFT_SKIP);
++}
++
++static void setup_system_counter(struct kvm_vm *vm, struct test_case *test)
++{
++	struct kvm_one_reg reg = {
++		.id = KVM_REG_ARM_TIMER_OFFSET,
++		.addr = (__u64)&test->offset,
++	};
++
++	vcpu_set_reg(vm, VCPU_ID, &reg);
++}
++
++static uint64_t guest_read_system_counter(struct test_case *test)
++{
++	switch (test->counter) {
++	case VIRTUAL:
++		return read_cntvct_ordered();
++	default:
++		GUEST_ASSERT(0);
++	}
++
++	/* unreachable */
++	return 0;
++}
++
++static uint64_t host_read_guest_system_counter(struct test_case *test)
++{
++	return read_cntvct_ordered() - test->offset;
++}
++
++#else /* __aarch64__ */
+ 
+ #error test not implemented for this architecture!
+ 
 -- 
 2.33.0.rc1.237.g0d66db33f3-goog
 
