@@ -2,138 +2,161 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 39F123ECF54
-	for <lists+kvm@lfdr.de>; Mon, 16 Aug 2021 09:26:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8E34D3ED08D
+	for <lists+kvm@lfdr.de>; Mon, 16 Aug 2021 10:50:57 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234032AbhHPH1I (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 16 Aug 2021 03:27:08 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:21876 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S233885AbhHPH1I (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 16 Aug 2021 03:27:08 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1629098796;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=FA3O9kq9zZ4zw2PdWas27IkNRNFWE0SHht5f8XnWK9Q=;
-        b=fYMVLS7V3PlRNwsckrzlqWwOy37g0iU7zPSoxCreZq8yZdgRwKTde3Y9xI+K0CHvOS/2W0
-        Q+rq/Z/Ww3ES7kGmpzizBLVy7IqbpvB0Ah2ZUrFkS9r37+ZVgWeGCymnp2dvnZW61p1ieK
-        /5Hc7NX9Iry+uKcmbCXuIJHAKNy9s0s=
-Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
- [209.85.218.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-533-hj3AdDxHPlu6cFf539F-GQ-1; Mon, 16 Aug 2021 03:26:33 -0400
-X-MC-Unique: hj3AdDxHPlu6cFf539F-GQ-1
-Received: by mail-ej1-f70.google.com with SMTP id e15-20020a1709061fcf00b005bd9d618ea0so284480ejt.13
-        for <kvm@vger.kernel.org>; Mon, 16 Aug 2021 00:26:33 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=FA3O9kq9zZ4zw2PdWas27IkNRNFWE0SHht5f8XnWK9Q=;
-        b=s0GfzJ8+Kpaf5muAMazQjBbcgEAGWCnG1kjIwcjOzq+MrkCis5tCVeWlzKkim506CP
-         5TVfrz764XpJi7ItQdTrOnk6cUAtt/525M4IkDc9xjF+t/GEXPvLwEn2ynLsInxKaj3a
-         kvDcfWEImIaHq0IoQOUImq4yvVWiKBe4tQN7xPcoY8Z5RYI0/GqQTgM0zY1LIpOGIqgD
-         ooHytQQdtU1lV53GbJDUpHMGk3K+FpJ9ZqrpPynX51SK1fiEvnWoe34ilhrH43l6A9hl
-         k5GAMIUKHs7jZv6r9ZBFNzar6I0geIdgoJxr0oRKGbvAg9TuGJM0a3xLwskoSjYXkgux
-         s91w==
-X-Gm-Message-State: AOAM530GXCkfHTjkLDHXUp4nABAXlVx7CEeKLNGMc9VLaW3emRtGDfWY
-        Y0JA/fCEeXJ8ObPH+JbiS4rjXOsdHfbzJG7gdZQiFNnDnQrYIbX18W2bB0SIewuGVNtomRKhDFT
-        yKCWTwG7LqV4C
-X-Received: by 2002:a17:906:a044:: with SMTP id bg4mr14805752ejb.312.1629098792212;
-        Mon, 16 Aug 2021 00:26:32 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwhkRj547CYPZat8QFWt2HQ16Cy9ciBgzRnXN1/vV8WNUA6TfT0SSqTWAmEddXG8z5naMHWyA==
-X-Received: by 2002:a17:906:a044:: with SMTP id bg4mr14805735ejb.312.1629098792020;
-        Mon, 16 Aug 2021 00:26:32 -0700 (PDT)
-Received: from gator.home (cst2-174-132.cust.vodafone.cz. [31.30.174.132])
-        by smtp.gmail.com with ESMTPSA id v13sm3339551ejx.24.2021.08.16.00.26.31
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 16 Aug 2021 00:26:31 -0700 (PDT)
-Date:   Mon, 16 Aug 2021 09:26:29 +0200
-From:   Andrew Jones <drjones@redhat.com>
-To:     Marc Orr <marcorr@google.com>
-Cc:     Varad Gautam <varad.gautam@suse.com>,
-        kvm list <kvm@vger.kernel.org>,
-        virtualization@lists.linux-foundation.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Joerg Roedel <jroedel@suse.de>, bp@suse.de,
-        "Lendacky, Thomas" <thomas.lendacky@amd.com>,
-        "Singh, Brijesh" <brijesh.singh@amd.com>,
-        Zixuan Wang <zixuanwang@google.com>,
-        "Hyunwook (Wooky) Baek" <baekhw@google.com>,
-        Erdem Aktas <erdemaktas@google.com>,
-        Tom Roeder <tmroeder@google.com>
-Subject: Re: [kvm-unit-tests PATCH 0/6] Initial x86_64 UEFI support
-Message-ID: <20210816072629.zbxooxhr3mkxuwbx@gator.home>
-References: <20210702114820.16712-1-varad.gautam@suse.com>
- <CAA03e5HCdx2sLRqs2jkLDz3z8SB9JhCdxGv7Y6_ER-kMaqHXUg@mail.gmail.com>
+        id S234961AbhHPIvY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 16 Aug 2021 04:51:24 -0400
+Received: from mx12.kaspersky-labs.com ([91.103.66.155]:16932 "EHLO
+        mx12.kaspersky-labs.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S234025AbhHPIvW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 16 Aug 2021 04:51:22 -0400
+Received: from relay12.kaspersky-labs.com (unknown [127.0.0.10])
+        by relay12.kaspersky-labs.com (Postfix) with ESMTP id B4B657657E;
+        Mon, 16 Aug 2021 11:50:49 +0300 (MSK)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kaspersky.com;
+        s=mail202102; t=1629103849;
+        bh=4SR+5Dg5QfmMVyK/dcpCKRxZ3zJ5etuTCYNYFWSz6RU=;
+        h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type;
+        b=HaZ+mLO97UAv5JxCoHt6FWR2u9qntLDavweMLAVGo+IYcYLfFJSZfVIf99co+WRK+
+         /nFfrAK+7lRhAwi0OvLLGNp6IHPvSeo5w5Phnn7exEMDGpHQbl//tfqY/X253LMriF
+         /dYKRLCX9Go35zt0S5nbXURRC0CdJWe9bl7+w3nrpJNYFPUR5JJSwHcxdysQE/s5iD
+         EDzSCqOaSf8Q5yyIJ9L2zTg0BS0zQUfYR4Y6LFaJOIXSdw8spC4RkE+rP2BFJ3Iw7E
+         QpMSpIdHvEAu35WUtTtxaC0sCpf3nvlUTZzjc636S2YMwlJXHynb/yOP2BWalv2Mfc
+         wzlssPep0pHiw==
+Received: from mail-hq2.kaspersky.com (unknown [91.103.66.206])
+        (using TLSv1.2 with cipher AES256-GCM-SHA384 (256/256 bits))
+        (Client CN "mail-hq2.kaspersky.com", Issuer "Kaspersky MailRelays CA G3" (verified OK))
+        by mailhub12.kaspersky-labs.com (Postfix) with ESMTPS id D74D67651A;
+        Mon, 16 Aug 2021 11:50:48 +0300 (MSK)
+Received: from arseniy-pc.avp.ru (10.16.171.77) by hqmailmbx3.avp.ru
+ (10.64.67.243) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2308.14; Mon, 16
+ Aug 2021 11:50:48 +0300
+From:   Arseny Krasnov <arseny.krasnov@kaspersky.com>
+To:     Stefan Hajnoczi <stefanha@redhat.com>,
+        Stefano Garzarella <sgarzare@redhat.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Arseny Krasnov <arseny.krasnov@kaspersky.com>,
+        Norbert Slusarek <nslusarek@gmx.net>,
+        Andra Paraschiv <andraprs@amazon.com>,
+        Colin Ian King <colin.king@canonical.com>
+CC:     <kvm@vger.kernel.org>, <virtualization@lists.linux-foundation.org>,
+        <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <stsp2@yandex.ru>, <oxffffaa@gmail.co>
+Subject: [RFC PATCH v3 0/6] virtio/vsock: introduce MSG_EOR flag for SEQPACKET
+Date:   Mon, 16 Aug 2021 11:50:32 +0300
+Message-ID: <20210816085036.4173627-1-arseny.krasnov@kaspersky.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAA03e5HCdx2sLRqs2jkLDz3z8SB9JhCdxGv7Y6_ER-kMaqHXUg@mail.gmail.com>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Originating-IP: [10.16.171.77]
+X-ClientProxiedBy: hqmailmbx1.avp.ru (10.64.67.241) To hqmailmbx3.avp.ru
+ (10.64.67.243)
+X-KSE-ServerInfo: hqmailmbx3.avp.ru, 9
+X-KSE-AntiSpam-Interceptor-Info: scan successful
+X-KSE-AntiSpam-Version: 5.9.20, Database issued on: 08/16/2021 08:34:31
+X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
+X-KSE-AntiSpam-Method: none
+X-KSE-AntiSpam-Rate: 0
+X-KSE-AntiSpam-Info: Lua profiles 165570 [Aug 16 2021]
+X-KSE-AntiSpam-Info: Version: 5.9.20.0
+X-KSE-AntiSpam-Info: Envelope from: arseny.krasnov@kaspersky.com
+X-KSE-AntiSpam-Info: LuaCore: 454 454 39c6e442fd417993330528e7f9d13ac1bf7fdf8c
+X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
+X-KSE-AntiSpam-Info: kaspersky.com:7.1.1;arseniy-pc.avp.ru:7.1.1;127.0.0.199:7.1.2;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1
+X-KSE-AntiSpam-Info: Rate: 0
+X-KSE-AntiSpam-Info: Status: not_detected
+X-KSE-AntiSpam-Info: Method: none
+X-KSE-Antiphishing-Info: Clean
+X-KSE-Antiphishing-ScanningType: Deterministic
+X-KSE-Antiphishing-Method: None
+X-KSE-Antiphishing-Bases: 08/16/2021 08:37:00
+X-KSE-AttachmentFiltering-Interceptor-Info: no applicable attachment filtering
+ rules found
+X-KSE-Antivirus-Interceptor-Info: scan successful
+X-KSE-Antivirus-Info: Clean, bases: 16.08.2021 4:09:00
+X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
+X-KSE-AttachmentFiltering-Interceptor-Info: no applicable attachment filtering
+ rules found
+X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
+X-KLMS-Rule-ID: 52
+X-KLMS-Message-Action: clean
+X-KLMS-AntiSpam-Status: not scanned, disabled by settings
+X-KLMS-AntiSpam-Interceptor-Info: not scanned
+X-KLMS-AntiPhishing: Clean, bases: 2021/08/16 06:42:00
+X-KLMS-AntiVirus: Kaspersky Security for Linux Mail Server, version 8.0.3.30, bases: 2021/08/16 02:10:00 #17042267
+X-KLMS-AntiVirus-Status: Clean, skipped
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Aug 13, 2021 at 11:44:39AM -0700, Marc Orr wrote:
-> On Fri, Jul 2, 2021 at 4:48 AM Varad Gautam <varad.gautam@suse.com> wrote:
-> >
-> > This series brings EFI support to a reduced subset of kvm-unit-tests
-> > on x86_64. I'm sending it out for early review since it covers enough
-> > ground to allow adding KVM testcases for EFI-only environments.
-> >
-> > EFI support works by changing the test entrypoint to a stub entry
-> > point for the EFI loader to jump to in long mode, where the test binary
-> > exits EFI boot services, performs the remaining CPU bootstrapping,
-> > and then calls the testcase main().
-> >
-> > Since the EFI loader only understands PE objects, the first commit
-> > introduces a `configure --efi` mode which builds each test as a shared
-> > lib. This shared lib is repackaged into a PE via objdump.
-> >
-> > Commit 2-4 take a trip from the asm entrypoint to C to exit EFI and
-> > relocate ELF .dynamic contents.
-> >
-> > Commit 5 adds post-EFI long mode x86_64 setup and calls the testcase.
-> >
-> > Commit 6 patches out some broken tests for EFI. Testcases that refuse
-> > to build as shared libs are also left disabled, these need some massaging.
-> >
-> > git tree: https://github.com/varadgautam/kvm-unit-tests/commits/efi-stub
-> 
-> Thanks for this patchset. My colleague, Zixuan Wang
-> <zixuanwang@google.com>, has also been working to extend
-> kvm-unit-tests to run under UEFI. Our goal is to enable running
-> kvm-unit-tests under SEV-ES.
-> 
-> Our approach is a bit different. Rather than pull in bits of the EFI
-> library and Linux EFI ABI, we've elected to build the entire
-> kvm-unit-tests binaries as an EFI app (similar to the ARM approach).
-> 
-> To date, we have _most_ x86 test cases (39/44) working under UEFI and
-> we've also got some of the test cases to boot under SEV-ES, using the
-> UEFI #VC handler.
-> 
-> We will post our patchset as soon as possible (hopefully by Monday) so
-> that the community can see our approach. We are very eager to see
-> kvm-unit-tests running under SEV-ES (and SNP) and are happy to work
-> with you all on either approach, depending on what the community
-> thinks is the best approach.
-> 
-> Thanks in advance,
-> Marc
->
+	This patchset implements support of MSG_EOR bit for SEQPACKET
+AF_VSOCK sockets over virtio transport.
+	First we need to define 'messages' and 'records' like this:
+Message is result of sending calls: 'write()', 'send()', 'sendmsg()'
+etc. It has fixed maximum length, and it bounds are visible using
+return from receive calls: 'read()', 'recv()', 'recvmsg()' etc.
+Current implementation based on message definition above.
+	Record has unlimited length, it consists of multiple message,
+and bounds of record are visible via MSG_EOR flag returned from
+'recvmsg()' call. Sender passes MSG_EOR to sending system call and
+receiver will see MSG_EOR when corresponding message will be processed.
+	Idea of patchset comes from POSIX: it says that SEQPACKET
+supports record boundaries which are visible for receiver using
+MSG_EOR bit. So, it looks like MSG_EOR is enough thing for SEQPACKET
+and we don't need to maintain boundaries of corresponding send -
+receive system calls. But, for 'sendXXX()' and 'recXXX()' POSIX says,
+that all these calls operates with messages, e.g. 'sendXXX()' sends
+message, while 'recXXX()' reads messages and for SEQPACKET, 'recXXX()'
+must read one entire message from socket, dropping all out of size
+bytes. Thus, both message boundaries and MSG_EOR bit must be supported
+to follow POSIX rules.
+	To support MSG_EOR new bit was added along with existing
+'VIRTIO_VSOCK_SEQ_EOR': 'VIRTIO_VSOCK_SEQ_EOM'(end-of-message) - now it
+works in the same way as 'VIRTIO_VSOCK_SEQ_EOR'. But 'VIRTIO_VSOCK_SEQ_EOR'
+is used to mark 'MSG_EOR' bit passed from userspace.
+	This patchset includes simple test for MSG_EOR.
 
-Hi Marc,
+ Arseny Krasnov(6):
+  virtio/vsock: rename 'EOR' to 'EOM' bit.
+  virtio/vsock: add 'VIRTIO_VSOCK_SEQ_EOR' bit.
+  vhost/vsock: support MSG_EOR bit processing
+  virtio/vsock: support MSG_EOR bit processing
+  af_vsock: rename variables in receive loop
+  vsock_test: update message bounds test for MSG_EOR
 
-I'm definitely eager to see your approach. I was actually working on
-a second version of EFI support for ARM using the stub approach like
-this series before getting perpetually sidetracked. I've been wanted
-to experiment with Varad's code to continue that, but haven't been
-able to find the time. I'm curious if you considered the stub approach
-as well, but then opted for the app approach in the end. I was
-leaning towards the stub approach to avoid the gnu-efi dependency.
+ drivers/vhost/vsock.c                   | 22 +++++++++++++---------
+ include/uapi/linux/virtio_vsock.h       |  3 ++-
+ net/vmw_vsock/af_vsock.c                | 10 +++++-----
+ net/vmw_vsock/virtio_transport_common.c | 23 +++++++++++++++--------
+ tools/testing/vsock/vsock_test.c        |  8 +++++++-
+ 5 files changed, 42 insertions(+), 24 deletions(-)
 
-Thanks,
-drew
+ v2 -> v3:
+ - 'virtio/vsock: rename 'EOR' to 'EOM' bit.' - commit message updated.
+ - 'VIRTIO_VSOCK_SEQ_EOR' bit add moved to separate patch.
+ - 'vhost/vsock: support MSG_EOR bit processing' - commit message
+   updated.
+ - 'vhost/vsock: support MSG_EOR bit processing' - removed unneeded
+   'le32_to_cpu()', because input argument was already in CPU
+   endianness.
+
+ v1 -> v2:
+ - 'VIRTIO_VSOCK_SEQ_EOR' is renamed to 'VIRTIO_VSOCK_SEQ_EOM', to
+   support backward compatibility.
+ - use bitmask of flags to restore in vhost.c, instead of separated
+   bool variable for each flag.
+ - test for EAGAIN removed, as logically it is not part of this
+   patchset(will be sent separately).
+ - cover letter updated(added part with POSIX description).
+
+Signed-off-by: Arseny Krasnov <arseny.krasnov@kaspersky.com>
+
+-- 
+2.25.1
 
