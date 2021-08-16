@@ -2,136 +2,211 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 737763EDB3D
-	for <lists+kvm@lfdr.de>; Mon, 16 Aug 2021 18:50:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 73A0E3EDBC8
+	for <lists+kvm@lfdr.de>; Mon, 16 Aug 2021 18:54:04 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230077AbhHPQul (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 16 Aug 2021 12:50:41 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:37882 "EHLO
+        id S232768AbhHPQyf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 16 Aug 2021 12:54:35 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:54374 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229742AbhHPQuj (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 16 Aug 2021 12:50:39 -0400
+        by vger.kernel.org with ESMTP id S232554AbhHPQyd (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 16 Aug 2021 12:54:33 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1629132607;
+        s=mimecast20190719; t=1629132841;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=cVl5XTBJvniKtudSQorw+bJQwZtfOhDJO1gRPc+AecI=;
-        b=ga9brtHwa7bdx7Xrze/2TRfai3VznopCJDa8ZjuguCRk7UM38Nfq24wBcib784q0Yc4HeE
-        VcgS/3q4+r6Jm3wXx/IaojiAdT/F3Zf2z2964BmkZ/JVKXOe40i1SFgnTum3g7BX/50d1b
-        5ZGvx7gIGUfIoLkoWkb5gvvRhVljf7g=
-Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
- [209.85.208.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-557-4CkQeItzO4Ca0itlHX4Yzg-1; Mon, 16 Aug 2021 12:50:05 -0400
-X-MC-Unique: 4CkQeItzO4Ca0itlHX4Yzg-1
-Received: by mail-ed1-f69.google.com with SMTP id j15-20020aa7c40f0000b02903be5fbe68a9so9142711edq.2
-        for <kvm@vger.kernel.org>; Mon, 16 Aug 2021 09:50:05 -0700 (PDT)
+        bh=PADTFWtkgacjxL5aCb4BndbTfuIMvOWWJjkXMj5LjiI=;
+        b=Rm1RStGRxmgjw5WJBFlTLGXKCEbSm3aZUNeglFM2065dCrmMolHuCMSL5whW4ugXmYCMP9
+        lTn/ptI5bx//kkTxx73CZaHGcgZ9A9DNXhV8+Nvobt0hkibFTm+fXNiZHN+IVbIFR5a0oK
+        O4ByO+Rq280AGnsqddduJyHXh+skusc=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-263-NWcI9yM7M4GEWYqHGDGWBw-1; Mon, 16 Aug 2021 12:54:00 -0400
+X-MC-Unique: NWcI9yM7M4GEWYqHGDGWBw-1
+Received: by mail-wm1-f70.google.com with SMTP id z186-20020a1c7ec30000b02902e6a27a9962so7790493wmc.3
+        for <kvm@vger.kernel.org>; Mon, 16 Aug 2021 09:54:00 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:to:cc:references:from:subject:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=cVl5XTBJvniKtudSQorw+bJQwZtfOhDJO1gRPc+AecI=;
-        b=U8hxNpMdBUba5gUlUPSVtoMFbr4lQiIjb9Qil5O6sOv+lbALM913vNo+cek1Yget7/
-         RviocaGLvCLDk0YLdDI3eKgccvQ+NR/eEDQOdFvP0zFX8C+HAONdJZNq5uz4ny0aRDLF
-         UyQ8wuHLYfMeiKaecBOglByG+mK9nP7mlPw7nl5URfrSQ4VOI4frV2LN5lCd2w4oKkwd
-         aXwPFwyjldCCSlUmx1bp4ocYE7oS9EJUUsoKH/45h8vWDtVgtjDgX3uKRMocD9zgcTrj
-         JE/DD2dmphoLqPoq0zHiE3WJ14imWJQCIvXnc12HIZs/35IaEiOIAL2zi3HjkSnlSNtg
-         DG0w==
-X-Gm-Message-State: AOAM531Ud40A+OpwdpvpfgURvDZGE0VLwXqfEEUsZDDuMciDp8MI2gBy
-        w2NXt2/i1r5cr726F3BdfBLSJU+Ylc5fAs9NqG4+reTGszmF//d9xTZjXq5F5dqf97FrcCoU+Dx
-        htf+IFuU8XBUs
-X-Received: by 2002:aa7:dcd1:: with SMTP id w17mr20988761edu.322.1629132604558;
-        Mon, 16 Aug 2021 09:50:04 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJx8PCKQTS8AGUkKZdJCzvBNIrFQn0x+gxgg4UqVtPyx2E8oJqmu+zkAMgd11gRHp9CjqkbZ9g==
-X-Received: by 2002:aa7:dcd1:: with SMTP id w17mr20988747edu.322.1629132604424;
-        Mon, 16 Aug 2021 09:50:04 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e? ([2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e])
-        by smtp.gmail.com with ESMTPSA id j29sm3061783ejo.10.2021.08.16.09.50.03
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 16 Aug 2021 09:50:03 -0700 (PDT)
-To:     Maxim Levitsky <mlevitsk@redhat.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Jim Mattson <jmattson@google.com>
-References: <332b6896f595282ea3d261095612fd31ce4cf14f.camel@redhat.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: RFC: Proposal to create a new version of the SVM nested state
- migration blob
-Message-ID: <1ff7a205-283d-d2b3-d130-e40066f59df0@redhat.com>
-Date:   Mon, 16 Aug 2021 18:50:02 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.11.0
+        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
+         :message-id:mime-version;
+        bh=PADTFWtkgacjxL5aCb4BndbTfuIMvOWWJjkXMj5LjiI=;
+        b=gpekg2DvAcQcYFyO0LPd+4YJmvDj+xnJq0EU4DjvLLSU0Yp9nJeiTKVqxbjrsDOWUC
+         R4WWOnbKr4x6mDOesOhQE4R152l3N5+a3QIsUW8CcjcdEd9bT6BgY8fKcuHxBCAetPu2
+         HTkEMSJmrXuaOkHAuX6wnGQ/dikF4bprG2FZyg37z90Lt1Q21/l5jABM6RPRUoEAR9EA
+         fzs45f0bg1h3Nq8fm8H/z4Qz8F3cevddBfRTrmZBd2gdYpRWHFtjDbhqkLX6V6sfFPiQ
+         dHotJcbcXcs6VzxSAtXUtznLv7NHyyh4jIq9kyhFAFNzlYM9PjBGR5B6jha0crAQnG27
+         ZMJQ==
+X-Gm-Message-State: AOAM5318bGyJVA0kVBK4mN6XYFsMXwGFjZbbgyfQXNV3HnuL92HHPxUz
+        q3faGC5117nNxEb123x/F7w3i2itoN24DV1z3HQXoHu0Iybw0dFKZSdi2jwQWwE43XHyuBE89Iv
+        3BklgFW7PtHA4
+X-Received: by 2002:adf:e3d2:: with SMTP id k18mr19260248wrm.212.1629132839090;
+        Mon, 16 Aug 2021 09:53:59 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyiktEdXIUdYenTuirwoDwoW4Gw7S40sfPqijk61K8unLBFFJ1r0nluf5F4o61Bw+qZPW9CrA==
+X-Received: by 2002:adf:e3d2:: with SMTP id k18mr19260223wrm.212.1629132838897;
+        Mon, 16 Aug 2021 09:53:58 -0700 (PDT)
+Received: from vitty.brq.redhat.com (g-server-2.ign.cz. [91.219.240.2])
+        by smtp.gmail.com with ESMTPSA id i8sm9234140wrv.70.2021.08.16.09.53.57
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 16 Aug 2021 09:53:58 -0700 (PDT)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     Gavin Shan <gshan@redhat.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        james.morse@arm.com, mark.rutland@arm.com,
+        Jonathan.Cameron@huawei.com, will@kernel.org, maz@kernel.org,
+        pbonzini@redhat.com, shan.gavin@gmail.com,
+        kvmarm@lists.cs.columbia.edu
+Subject: Re: [PATCH v4 02/15] KVM: async_pf: Add helper function to check
+ completion queue
+In-Reply-To: <20210815005947.83699-3-gshan@redhat.com>
+References: <20210815005947.83699-1-gshan@redhat.com>
+ <20210815005947.83699-3-gshan@redhat.com>
+Date:   Mon, 16 Aug 2021 18:53:57 +0200
+Message-ID: <87bl5xmiu2.fsf@vitty.brq.redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <332b6896f595282ea3d261095612fd31ce4cf14f.camel@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 16/08/21 14:54, Maxim Levitsky wrote:
-> Then on nested VM exit,
-> we would only restore the kvm's guest visible values (vcpu->arch.cr*/efer)
-> from that 'somewhere else', and could do this without any checks/etc, since these already passed all checks.
->   
-> This needs to save these values in the migration stream as well of course.
+Gavin Shan <gshan@redhat.com> writes:
 
-Note that there could be differences between the guest-visible values 
-and the processor values of CRx.  In particular, say you have a 
-hypervisor that uses PSE for its page tables.  The CR4 would have 
-CR4.PSE=1 on a machine that uses NPT and CR4.PAE=1 on a machine that 
-doesn't.
-
-> Finally I propose that SVM nested state would be:
+> This adds inline helper kvm_check_async_pf_completion_queue() to
+> check if there are pending completion in the queue. The empty stub
+> is also added on !CONFIG_KVM_ASYNC_PF so that the caller needn't
+> consider if CONFIG_KVM_ASYNC_PF is enabled.
+>
+> All checks on the completion queue is done by the newly added inline
+> function since list_empty() and list_empty_careful() are interchangeable.
+>
+> Signed-off-by: Gavin Shan <gshan@redhat.com>
+> ---
+>  arch/x86/kvm/x86.c       |  2 +-
+>  include/linux/kvm_host.h | 10 ++++++++++
+>  virt/kvm/async_pf.c      | 10 +++++-----
+>  virt/kvm/kvm_main.c      |  4 +---
+>  4 files changed, 17 insertions(+), 9 deletions(-)
+>
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index e5d5c5ed7dd4..7f35d9324b99 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -11591,7 +11591,7 @@ static inline bool kvm_guest_apic_has_interrupt(struct kvm_vcpu *vcpu)
 >  
-> * L1 save area.
-> * L1 guest visible CR*/EFER/etc values (vcpu->arch.cr* values)
-> * Full VMCB12 (save and control area)
+>  static inline bool kvm_vcpu_has_events(struct kvm_vcpu *vcpu)
+>  {
+> -	if (!list_empty_careful(&vcpu->async_pf.done))
+> +	if (kvm_check_async_pf_completion_queue(vcpu))
+>  		return true;
+>  
+>  	if (kvm_apic_has_events(vcpu))
+> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+> index 85b61a456f1c..a5f990f6dc35 100644
+> --- a/include/linux/kvm_host.h
+> +++ b/include/linux/kvm_host.h
+> @@ -339,12 +339,22 @@ struct kvm_async_pf {
+>  	bool				notpresent_injected;
+>  };
+>  
+> +static inline bool kvm_check_async_pf_completion_queue(struct kvm_vcpu *vcpu)
 
-So your proposal would basically be to:
+Nitpicking: When not reading the implementation, I'm not exactly sure
+what this function returns as 'check' is too ambiguous ('true' when the
+queue is full? when it's empty? when it's not empty? when it was
+properly set up?). I'd suggest we go with a more specific:
 
-* do the equivalent of sync_vmcs02_to_vmcs12+sync_vmcs02_to_vmcs12_rare 
-on KVM_GET_NESTED_STATE
+kvm_async_pf_completion_queue_empty() or something like that instead
+(we'll have to invert the logic everywhere then). 
 
-* discard the current state on KVM_SET_NESTED_STATE.
+Side note: x86 seems to already use a shortened 'apf' instead of
+'async_pf' in a number of places (e.g. 'apf_put_user_ready()'), we may
+want to either fight this practice or support the rebelion by renaming
+all functions from below instead :-)
 
-That does make sense.  It wasn't done this way just because the "else" 
-branch of
+> +{
+> +	return !list_empty_careful(&vcpu->async_pf.done);
+> +}
+> +
+>  void kvm_clear_async_pf_completion_queue(struct kvm_vcpu *vcpu);
+>  void kvm_check_async_pf_completion(struct kvm_vcpu *vcpu);
+>  bool kvm_setup_async_pf(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa,
+>  			unsigned long hva, struct kvm_arch_async_pf *arch);
+>  int kvm_async_pf_wakeup_all(struct kvm_vcpu *vcpu);
+>  #else
+> +static inline bool kvm_check_async_pf_completion_queue(struct kvm_vcpu *vcpu)
+> +{
+> +	return false;
+> +}
+> +
+>  static inline void kvm_check_async_pf_completion(struct kvm_vcpu *vcpu) { }
+>  #endif
+>  
+> diff --git a/virt/kvm/async_pf.c b/virt/kvm/async_pf.c
+> index dd777688d14a..d145a61a046a 100644
+> --- a/virt/kvm/async_pf.c
+> +++ b/virt/kvm/async_pf.c
+> @@ -70,7 +70,7 @@ static void async_pf_execute(struct work_struct *work)
+>  		kvm_arch_async_page_present(vcpu, apf);
+>  
+>  	spin_lock(&vcpu->async_pf.lock);
+> -	first = list_empty(&vcpu->async_pf.done);
+> +	first = !kvm_check_async_pf_completion_queue(vcpu);
+>  	list_add_tail(&apf->link, &vcpu->async_pf.done);
+>  	apf->vcpu = NULL;
+>  	spin_unlock(&vcpu->async_pf.lock);
+> @@ -122,7 +122,7 @@ void kvm_clear_async_pf_completion_queue(struct kvm_vcpu *vcpu)
+>  		spin_lock(&vcpu->async_pf.lock);
+>  	}
+>  
+> -	while (!list_empty(&vcpu->async_pf.done)) {
+> +	while (kvm_check_async_pf_completion_queue(vcpu)) {
+>  		struct kvm_async_pf *work =
+>  			list_first_entry(&vcpu->async_pf.done,
+>  					 typeof(*work), link);
+> @@ -138,7 +138,7 @@ void kvm_check_async_pf_completion(struct kvm_vcpu *vcpu)
+>  {
+>  	struct kvm_async_pf *work;
+>  
+> -	while (!list_empty_careful(&vcpu->async_pf.done) &&
+> +	while (kvm_check_async_pf_completion_queue(vcpu) &&
+>  	      kvm_arch_can_dequeue_async_page_present(vcpu)) {
+>  		spin_lock(&vcpu->async_pf.lock);
+>  		work = list_first_entry(&vcpu->async_pf.done, typeof(*work),
+> @@ -205,7 +205,7 @@ int kvm_async_pf_wakeup_all(struct kvm_vcpu *vcpu)
+>  	struct kvm_async_pf *work;
+>  	bool first;
+>  
+> -	if (!list_empty_careful(&vcpu->async_pf.done))
+> +	if (kvm_check_async_pf_completion_queue(vcpu))
+>  		return 0;
+>  
+>  	work = kmem_cache_zalloc(async_pf_cache, GFP_ATOMIC);
+> @@ -216,7 +216,7 @@ int kvm_async_pf_wakeup_all(struct kvm_vcpu *vcpu)
+>  	INIT_LIST_HEAD(&work->queue); /* for list_del to work */
+>  
+>  	spin_lock(&vcpu->async_pf.lock);
+> -	first = list_empty(&vcpu->async_pf.done);
+> +	first = !kvm_check_async_pf_completion_queue(vcpu);
+>  	list_add_tail(&work->link, &vcpu->async_pf.done);
+>  	spin_unlock(&vcpu->async_pf.lock);
+>  
+> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> index b50dbe269f4b..8795503651b1 100644
+> --- a/virt/kvm/kvm_main.c
+> +++ b/virt/kvm/kvm_main.c
+> @@ -3282,10 +3282,8 @@ static bool vcpu_dy_runnable(struct kvm_vcpu *vcpu)
+>  	if (kvm_arch_dy_runnable(vcpu))
+>  		return true;
+>  
+> -#ifdef CONFIG_KVM_ASYNC_PF
+> -	if (!list_empty_careful(&vcpu->async_pf.done))
+> +	if (kvm_check_async_pf_completion_queue(vcpu))
+>  		return true;
+> -#endif
+>  
+>  	return false;
+>  }
 
-         if (is_guest_mode(vcpu)) {
-                 sync_vmcs02_to_vmcs12(vcpu, vmcs12);
-                 sync_vmcs02_to_vmcs12_rare(vcpu, vmcs12);
-         } else  {
-                 copy_vmcs02_to_vmcs12_rare(vcpu, get_vmcs12(vcpu));
-                 if (!vmx->nested.need_vmcs12_to_shadow_sync) {
-                         if (vmx->nested.hv_evmcs)
-                                 copy_enlightened_to_vmcs12(vmx);
-                         else if (enable_shadow_vmcs)
-                                 copy_shadow_to_vmcs12(vmx);
-                 }
-         }
-
-isn't needed on SVM and thus it seemed "obvious" to remove the "then" 
-branch as well.  I just focused on enter_svm_guest_mode when refactoring 
-the common bits of vmentry and KVM_SET_NESTED_STATE, so there is not 
-even a function like sync_vmcb02_to_vmcb12 (instead it's just done in 
-nested_svm_vmexit).
-
-It does have some extra complications, for example with SREGS2 and the 
-always more complicated ordering of KVM_SET_* ioctls.
-
-On the other hand, issues like not migrating PDPTRs were not specific to 
-nested SVM, and merely exposed by it.  The ordering issues with 
-KVM_SET_VCPU_EVENTS and KVM_SET_MP_STATE's handling of INIT and SIPI are 
-also not specific to nested SVM.  I am not sure that including the full 
-VMCB12 in the SVM nested state would solve any of these.  Anything that 
-would be solved, probably would be just because migrating a large blob 
-is easier than juggling a dozen ioctls.
-
-Thanks,
-
-Paolo
+-- 
+Vitaly
 
