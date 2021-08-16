@@ -2,149 +2,118 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 16F853ED865
-	for <lists+kvm@lfdr.de>; Mon, 16 Aug 2021 16:01:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5AC603ED879
+	for <lists+kvm@lfdr.de>; Mon, 16 Aug 2021 16:02:51 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237012AbhHPOBx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 16 Aug 2021 10:01:53 -0400
-Received: from smtp-out1.suse.de ([195.135.220.28]:60186 "EHLO
-        smtp-out1.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231852AbhHPOBl (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 16 Aug 2021 10:01:41 -0400
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        id S231297AbhHPODU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 16 Aug 2021 10:03:20 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:23514 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S231558AbhHPODT (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 16 Aug 2021 10:03:19 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1629122566;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=TSOZBB/TDEaNpRJQBTy8N/e/HtpbbKTdZtReQY2ithg=;
+        b=IrG3Lz0sNQO99/8IcE8396w5jARaTZOlztGFEkwlOe9gUcZkGrWsEOnfIRAECcLt2zjdhr
+        +GX1FWRF/B4yV5b7W7Pkh+P5cQeb8zMNE5aNIV3oeItn6xPU30J9SJOPhQFaqvPRS5dI0y
+        gDX0WJmzv9r0bkU+WH0xtw1LtJ1AZfw=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-198-YRpzyLvePLK4HOFJytRujQ-1; Mon, 16 Aug 2021 10:02:44 -0400
+X-MC-Unique: YRpzyLvePLK4HOFJytRujQ-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by smtp-out1.suse.de (Postfix) with ESMTPS id A767421DD3;
-        Mon, 16 Aug 2021 14:01:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1629122469; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=zmqfa2UunehoeozKut2ZQc6fJWOON8YgBnQ/2Wb5cCc=;
-        b=MV+hkeQDkdENq+vQrGYU7lGmGYgdVRb78qom8odxESJPDsQCvY2XtFmZ26CywrGjpqsuCi
-        EVIj7M5kozbcLC+5/4NLJ8VPeDliAvdO0ji8fziEKYlPZRgX3o04RK9iK9ImT/JBdUuFXB
-        S38pVXwSrf6KXyWjqgBoM9VwomNgaTU=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1629122469;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=zmqfa2UunehoeozKut2ZQc6fJWOON8YgBnQ/2Wb5cCc=;
-        b=DDFLZSXRqHSv2Rv0+TOLME0tbNzatLvnN0KGa2Mv9ur8hkDXKQRhNzKLPQLuAAHkSsTsPu
-        VAtWXzD2XxRtA3BA==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 4076E13BF2;
-        Mon, 16 Aug 2021 14:01:09 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id tcY+DqVvGmGvFQAAMHmgww
-        (envelope-from <cfontana@suse.de>); Mon, 16 Aug 2021 14:01:09 +0000
-Subject: Re: [RFC PATCH 00/13] Add support for Mirror VM.
-To:     Ashish Kalra <Ashish.Kalra@amd.com>, qemu-devel@nongnu.org
-Cc:     pbonzini@redhat.com, thomas.lendacky@amd.com,
-        brijesh.singh@amd.com, ehabkost@redhat.com, mst@redhat.com,
-        richard.henderson@linaro.org, jejb@linux.ibm.com, tobin@ibm.com,
-        dovmurik@linux.vnet.ibm.com, frankeh@us.ibm.com,
-        dgilbert@redhat.com, kvm@vger.kernel.org
-References: <cover.1629118207.git.ashish.kalra@amd.com>
-From:   Claudio Fontana <cfontana@suse.de>
-Message-ID: <4ffdca0d-a495-07aa-316d-4dcee5fe8007@suse.de>
-Date:   Mon, 16 Aug 2021 16:01:08 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.12.0
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 447A5C7400;
+        Mon, 16 Aug 2021 14:02:43 +0000 (UTC)
+Received: from avogadro.lan (unknown [10.39.192.155])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 089CF1803D;
+        Mon, 16 Aug 2021 14:02:41 +0000 (UTC)
+From:   Paolo Bonzini <pbonzini@redhat.com>
+To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Cc:     stable@vger.kernel.org, Maxim Levitsky <mlevitsk@redhat.com>
+Subject: [PATCH 4.14.y] KVM: nSVM: avoid picking up unsupported bits from L2 in int_ctl (CVE-2021-3653)
+Date:   Mon, 16 Aug 2021 16:02:29 +0200
+Message-Id: <20210816140240.11399-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <cover.1629118207.git.ashish.kalra@amd.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+From: Maxim Levitsky <mlevitsk@redhat.com>
 
+[ upstream commit 0f923e07124df069ba68d8bb12324398f4b6b709 ]
 
-On 8/16/21 3:25 PM, Ashish Kalra wrote:
-> From: Ashish Kalra <ashish.kalra@amd.com>
-> 
-> This is an RFC series for Mirror VM support that are 
-> essentially secondary VMs sharing the encryption context 
-> (ASID) with a primary VM. The patch-set creates a new 
-> VM and shares the primary VM's encryption context
-> with it using the KVM_CAP_VM_COPY_ENC_CONTEXT_FROM capability.
-> The mirror VM uses a separate pair of VM + vCPU file 
-> descriptors and also uses a simplified KVM run loop, 
-> for example, it does not support any interrupt vmexit's. etc.
-> Currently the mirror VM shares the address space of the
-> primary VM. 
+* Invert the mask of bits that we pick from L2 in
+  nested_vmcb02_prepare_control
 
-Hi,
+* Invert and explicitly use VIRQ related bits bitmask in svm_clear_vintr
 
-I'd expect some entry in docs/ ?
+This fixes a security issue that allowed a malicious L1 to run L2 with
+AVIC enabled, which allowed the L2 to exploit the uninitialized and enabled
+AVIC to read/write the host physical memory at some offsets.
 
-Thanks,
+Fixes: 3d6368ef580a ("KVM: SVM: Add VMRUN handler")
+Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+	The above upstream SHA1 is still on its way to Linus
 
-Claudio
+ arch/x86/include/asm/svm.h |    2 ++
+ arch/x86/kvm/svm.c         |   15 ++++++++-------
+ 2 files changed, 10 insertions(+), 7 deletions(-)
 
-> 
-> The mirror VM can be used for running an in-guest migration 
-> helper (MH). It also might have future uses for other in-guest
-> operations.
-> 
-> The mirror VM support is enabled by adding a mirrorvcpus=N
-> suboption to -smp, which also designates a few vcpus (normally 1)
-> to the mirror VM.
-> 
-> Example usage for starting a 4-vcpu guest, of which 1 vcpu is marked as
-> mirror vcpu.
-> 
->     qemu-system-x86_64 -smp 4,mirrorvcpus=1 ...
-> 
-> Ashish Kalra (7):
->   kvm: Add Mirror VM ioctl and enable cap interfaces.
->   kvm: Add Mirror VM support.
->   kvm: create Mirror VM and share primary VM's encryption context.
->   softmmu/cpu: Skip mirror vcpu's for pause, resume and synchronization.
->   kvm/apic: Disable in-kernel APIC support for mirror vcpu's.
->   hw/acpi: disable modern CPU hotplug interface for mirror vcpu's
->   hw/i386/pc: reduce fw_cfg boot cpu count taking into account mirror
->     vcpu's.
-> 
-> Dov Murik (5):
->   machine: Add mirrorvcpus=N suboption to -smp
->   hw/boards: Add mirror_vcpu flag to CPUArchId
->   hw/i386: Mark mirror vcpus in possible_cpus
->   cpu: Add boolean mirror_vcpu field to CPUState
->   hw/i386: Set CPUState.mirror_vcpu=true for mirror vcpus
-> 
-> Tobin Feldman-Fitzthum (1):
->   hw/acpi: Don't include mirror vcpus in ACPI tables
-> 
->  accel/kvm/kvm-accel-ops.c |  45 ++++++-
->  accel/kvm/kvm-all.c       | 244 +++++++++++++++++++++++++++++++++++++-
->  accel/kvm/kvm-cpus.h      |   2 +
->  hw/acpi/cpu.c             |  21 +++-
->  hw/core/cpu-common.c      |   1 +
->  hw/core/machine.c         |   7 ++
->  hw/i386/acpi-build.c      |   5 +
->  hw/i386/acpi-common.c     |   5 +
->  hw/i386/kvm/apic.c        |  15 +++
->  hw/i386/pc.c              |  10 ++
->  hw/i386/x86.c             |  11 +-
->  include/hw/acpi/cpu.h     |   1 +
->  include/hw/boards.h       |   3 +
->  include/hw/core/cpu.h     |   3 +
->  include/hw/i386/x86.h     |   3 +-
->  include/sysemu/kvm.h      |  15 +++
->  qapi/machine.json         |   5 +-
->  softmmu/cpus.c            |  27 +++++
->  softmmu/vl.c              |   3 +
->  target/i386/kvm/kvm.c     |  42 +++++++
->  20 files changed, 459 insertions(+), 9 deletions(-)
-> 
+diff --git a/arch/x86/include/asm/svm.h b/arch/x86/include/asm/svm.h
+index 78dd9df88157..2a9e81e93aac 100644
+--- a/arch/x86/include/asm/svm.h
++++ b/arch/x86/include/asm/svm.h
+@@ -117,6 +117,8 @@ struct __attribute__ ((__packed__)) vmcb_control_area {
+ #define V_IGN_TPR_SHIFT 20
+ #define V_IGN_TPR_MASK (1 << V_IGN_TPR_SHIFT)
+ 
++#define V_IRQ_INJECTION_BITS_MASK (V_IRQ_MASK | V_INTR_PRIO_MASK | V_IGN_TPR_MASK)
++
+ #define V_INTR_MASKING_SHIFT 24
+ #define V_INTR_MASKING_MASK (1 << V_INTR_MASKING_SHIFT)
+ 
+diff --git a/arch/x86/kvm/svm.c b/arch/x86/kvm/svm.c
+index 3571253b8690..0dfd0af61a29 100644
+--- a/arch/x86/kvm/svm.c
++++ b/arch/x86/kvm/svm.c
+@@ -1208,12 +1208,7 @@ static __init int svm_hardware_setup(void)
+ 		}
+ 	}
+ 
+-	if (vgif) {
+-		if (!boot_cpu_has(X86_FEATURE_VGIF))
+-			vgif = false;
+-		else
+-			pr_info("Virtual GIF supported\n");
+-	}
++	vgif = false; /* Disabled for CVE-2021-3653 */
+ 
+ 	return 0;
+ 
+@@ -3161,7 +3161,13 @@ static bool nested_svm_vmrun(struct vcpu_svm *svm)
+ 	svm->nested.intercept            = nested_vmcb->control.intercept;
+ 
+ 	svm_flush_tlb(&svm->vcpu, true);
+-	svm->vmcb->control.int_ctl = nested_vmcb->control.int_ctl | V_INTR_MASKING_MASK;
++
++	svm->vmcb->control.int_ctl &=
++			V_INTR_MASKING_MASK | V_GIF_ENABLE_MASK | V_GIF_MASK;
++
++	svm->vmcb->control.int_ctl |= nested_vmcb->control.int_ctl &
++			(V_TPR_MASK | V_IRQ_INJECTION_BITS_MASK);
++
+ 	if (nested_vmcb->control.int_ctl & V_INTR_MASKING_MASK)
+ 		svm->vcpu.arch.hflags |= HF_VINTR_MASK;
+ 	else
+-- 
+2.26.3
 
