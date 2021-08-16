@@ -2,189 +2,92 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 315043EDE60
-	for <lists+kvm@lfdr.de>; Mon, 16 Aug 2021 22:01:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2BB893EDE96
+	for <lists+kvm@lfdr.de>; Mon, 16 Aug 2021 22:24:55 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231448AbhHPUBq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 16 Aug 2021 16:01:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57544 "EHLO
+        id S232248AbhHPUZZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 16 Aug 2021 16:25:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34822 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230026AbhHPUBp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 16 Aug 2021 16:01:45 -0400
-Received: from mail-vs1-xe2b.google.com (mail-vs1-xe2b.google.com [IPv6:2607:f8b0:4864:20::e2b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8038FC061764
-        for <kvm@vger.kernel.org>; Mon, 16 Aug 2021 13:01:13 -0700 (PDT)
-Received: by mail-vs1-xe2b.google.com with SMTP id j186so9075640vsc.10
-        for <kvm@vger.kernel.org>; Mon, 16 Aug 2021 13:01:13 -0700 (PDT)
+        with ESMTP id S232227AbhHPUZX (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 16 Aug 2021 16:25:23 -0400
+Received: from mail-qk1-x749.google.com (mail-qk1-x749.google.com [IPv6:2607:f8b0:4864:20::749])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D0E90C0613CF
+        for <kvm@vger.kernel.org>; Mon, 16 Aug 2021 13:24:51 -0700 (PDT)
+Received: by mail-qk1-x749.google.com with SMTP id y27-20020a05620a09db00b003d3401f54ceso2906163qky.5
+        for <kvm@vger.kernel.org>; Mon, 16 Aug 2021 13:24:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=/KwqlZeT6sdGRreX5g/ke/YMCXwSEo7rp8jOlCMxsII=;
-        b=mwdSDvWVIjvElZeYJ1YVAkD625BhTxrGwgCGPtGfzVVFj5UFz7ScpbHXnydzovM1vP
-         BJ+axQl4nEU4wZJrpsSc5OkDPMXIS8f797JO2zCwFnhDH9rVz/PbVoqPggcufln3CPRo
-         uC5KIxcBFNbdxVURt2NmdkT+8YaMmGaT1s4I39BmyKCOvPZmCL7iHW1BSbHcb6cnbtUD
-         42SM2ypUxKkEl7j/69NEOpyMr624OI4qWWlIjMlJ9yutTN/YO5MG4s+CXb80XJUSIpTE
-         2X6qTZIRp1c7Ldk40dyAbgFKkfI3y9YCVF3knkWftif0DugP9qDBWnSAABR+lZaKLCQE
-         +rYw==
+        h=reply-to:date:message-id:mime-version:subject:from:to:cc;
+        bh=g9/o/9z4zsHt0A4xliRLw6qm1WgAQq/NIv8diVlT8V8=;
+        b=Na3X8WB7HU4+Q6rnHbcbEUye2yyaMseyJnz+LAjXQqSHQ88sIut7dcBkUtIvj5yhwc
+         Qh9OamjchJgGSoPW1u+0tow9mQJgUyZa+mm9ZTwwnTkOCfgvVpqx/U0Nchu8VA+SpdBq
+         nH1pUu/wDwfzNKECulGVxKPyIpva3VxJ97CmiP7zHpT0fsO6DeRWlR1BPb9LusFYUGKF
+         zemhX6whtx4nl7UcGBgmYqbxxfadoJFdSBrHA3Hn+PjKHP3Vw4zPyURNaT5XDwpIZl1K
+         fWJZtzTAb3p/oAriDfOGX8Qv7HEV0vRtryfhpjq7LEVn0iDeCXMebHWwDq1D2ozwKtwc
+         I7ig==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=/KwqlZeT6sdGRreX5g/ke/YMCXwSEo7rp8jOlCMxsII=;
-        b=ZKPDVqZVmYwta0aTjgzWEJQ//WPK8mQKeVDLTjaekdxLJpac0iCsO02zvb2Pu0CnQf
-         pg6apN7Or+S1bJ0yRpgG2VQ9hrrvyPjGoOUEgXKufF19kn20Br/ZhvcaEAUARCoDMNUB
-         tCrzEL1Xy0QcDsW+cq8Qk0htoQoWCfQFVM0o4uvqnfmae12Bk+rQWQxbXRHIhPa4pcOB
-         H/sYe5ExnKbXXdi1uHMDBDT5Wbvn75Y4XHrlYoynkTdA0F150gCUea4JZzyEgVf5ksd1
-         S5gsyI186Mkj0C4Ausy2jv9/zLXzpM6faPsmoIw2Ibs2n+ySi8Fuxg/OjCcRCGAt1CI5
-         PqBw==
-X-Gm-Message-State: AOAM531uy47x8nsfm7laY/JiCrGeP647wXpFhuMZZlgcudX3V+sK08f3
-        pV5vWBV1KbcTNnyUVID1pmB6zidJmLPoTcD14bzcvQ==
-X-Google-Smtp-Source: ABdhPJynTv01BWxGnAkTuRLxJ40jk1zjrNBPt6FCIz1AgO0PbibFSIyewQo/9Ua+dYvwQmQ2ZPLZIIOLv9nOWuE2siM=
-X-Received: by 2002:a67:ec88:: with SMTP id h8mr8108vsp.47.1629144072541; Mon,
- 16 Aug 2021 13:01:12 -0700 (PDT)
-MIME-Version: 1.0
-References: <20210813211211.2983293-1-rananta@google.com> <20210813211211.2983293-5-rananta@google.com>
- <35c06dff-36cf-3836-e469-bedcf3c04a4d@huawei.com>
-In-Reply-To: <35c06dff-36cf-3836-e469-bedcf3c04a4d@huawei.com>
-From:   Raghavendra Rao Ananta <rananta@google.com>
-Date:   Mon, 16 Aug 2021 13:01:01 -0700
-Message-ID: <CAJHc60x2XdRKywRytMG-B95ZYd5fdrybau0mXp1UrHngyWiuDA@mail.gmail.com>
-Subject: Re: [PATCH 04/10] KVM: arm64: selftests: Add basic support for arch_timers
-To:     Zenghui Yu <yuzenghui@huawei.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        James Morse <james.morse@arm.com>,
-        Peter Shier <pshier@google.com>,
-        Ricardo Koller <ricarkol@google.com>,
-        Oliver Upton <oupton@google.com>,
-        Reiji Watanabe <reijiw@google.com>,
-        Jing Zhang <jingzhangos@google.com>, kvm@vger.kernel.org,
-        kvmarm@lists.cs.columbia.edu
+        h=x-gm-message-state:reply-to:date:message-id:mime-version:subject
+         :from:to:cc;
+        bh=g9/o/9z4zsHt0A4xliRLw6qm1WgAQq/NIv8diVlT8V8=;
+        b=UYCqzHUsRY9C0z/AFyYMkxHV5CX5ZHhtib+/sHDThxVF5duAJmkUZzOqMoteezuzcb
+         AFFq4tuVJAqmHG8IIBmJ6qLHuzdtf++5O21mwba8OIlnO3kqGJpTk1z7FO4ayUgTw0+u
+         xhTe70WdLL9ygwwAKjECRwEnbLrcrL1y58JjdWWm2L725XZKO/qGfg5rbmGT66WpV1Gi
+         R2knM88eBSNBpJvE1PLOBRQNUXizu0P1mjQD/4AjYUvu6/KFJ//pifPmMmKbXUp3xyBw
+         7thWdnmISbUNg9p7rnEt0dxswnkh9PmMoxQmG3Jcq/AMBDKmB8ypomWxgdG+M3J70wUJ
+         jrCw==
+X-Gm-Message-State: AOAM532FJWJcWtnbDavlTcv9nphDFtSqQm6o0lL5nI056zoUgINcShtH
+        i52OVTeURo2SGgPxjAlyX1E39JI6qeTG
+X-Google-Smtp-Source: ABdhPJwyQSwjPkR0qaUuTjnATtBd/G0GgK4bzkRXvZ/+QgTGS2i6L2iov1MK4VgKXMwVdCMhqbzs5CiyzQUN
+X-Received: from mizhang-super.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:1071])
+ (user=mizhang job=sendgmr) by 2002:ad4:5dcf:: with SMTP id
+ m15mr560462qvh.35.1629145490981; Mon, 16 Aug 2021 13:24:50 -0700 (PDT)
+Reply-To: Mingwei Zhang <mizhang@google.com>
+Date:   Mon, 16 Aug 2021 20:24:38 +0000
+Message-Id: <20210816202441.4098523-1-mizhang@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.33.0.rc1.237.g0d66db33f3-goog
+Subject: [PATCH 0/3] clean up interface between KVM and psp
+From:   Mingwei Zhang <mizhang@google.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        Brijesh Singh <brijesh.singh@amd.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        John Allen <john.allen@amd.com>
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Alper Gun <alpergun@google.com>,
+        Borislav Petkov <bp@alien8.de>,
+        David Rienjes <rientjes@google.com>,
+        Marc Orr <marcorr@google.com>, Peter Gonda <pgonda@google.com>,
+        Vipin Sharma <vipinsh@google.com>,
+        Mingwei Zhang <mizhang@google.com>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Zenghui,
+This patch set is trying to help make the interface between KVM and psp
+cleaner and simpler. In particular, the patches do the following
+improvements:
+ - avoid the requirement of psp data structures for some psp APIs.
+ - hide error handling within psp API, eg., using sev_decommission.
+ - hide the serialization requirement between DF_FLUSH and DEACTIVATE.
 
-On Sat, Aug 14, 2021 at 2:10 AM Zenghui Yu <yuzenghui@huawei.com> wrote:
->
-> On 2021/8/14 5:12, Raghavendra Rao Ananta wrote:
-> > Add a minimalistic library support to access the virtual timers,
-> > that can be used for simple timing functionalities, such as
-> > introducing delays in the guest.
-> >
-> > Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
-> > ---
-> >  .../kvm/include/aarch64/arch_timer.h          | 138 ++++++++++++++++++
-> >  1 file changed, 138 insertions(+)
-> >  create mode 100644 tools/testing/selftests/kvm/include/aarch64/arch_timer.h
-> >
-> > diff --git a/tools/testing/selftests/kvm/include/aarch64/arch_timer.h b/tools/testing/selftests/kvm/include/aarch64/arch_timer.h
-> > new file mode 100644
-> > index 000000000000..e6144ab95348
-> > --- /dev/null
-> > +++ b/tools/testing/selftests/kvm/include/aarch64/arch_timer.h
-> > @@ -0,0 +1,138 @@
-> > +/* SPDX-License-Identifier: GPL-2.0 */
-> > +/*
-> > + * ARM Generic Interrupt Controller (GIC) specific defines
->
-> This isn't GIC specific, but arch timer.
+Mingwei Zhang (3):
+  KVM: SVM: move sev_decommission to psp driver
+  KVM: SVM: move sev_bind_asid to psp
+  KVM: SVM: move sev_unbind_asid and DF_FLUSH logic into psp
 
-You are right. That's my bad.
->
->
-> > + */
-> > +
-> > +#ifndef SELFTEST_KVM_ARCH_TIMER_H
-> > +#define SELFTEST_KVM_ARCH_TIMER_H
-> > +
-> > +#include <linux/sizes.h>
->
-> Do we really need it?
+ arch/x86/kvm/svm/sev.c       | 69 ++++--------------------------------
+ drivers/crypto/ccp/sev-dev.c | 57 +++++++++++++++++++++++++++--
+ include/linux/psp-sev.h      | 44 ++++++++++++++++++++---
+ 3 files changed, 102 insertions(+), 68 deletions(-)
 
+--
+2.33.0.rc1.237.g0d66db33f3-goog
 
-I must have left it from some code re-org. We don't need it anymore.
-Will remove.
->
->
-> > +
-> > +#include "processor.h"
-> > +
-> > +enum arch_timer {
-> > +     VIRTUAL,
-> > +     PHYSICAL,
-> > +};
-> > +
-> > +#define CTL_ENABLE   (1 << 0)
-> > +#define CTL_ISTATUS  (1 << 2)
-> > +#define CTL_IMASK    (1 << 1)
->
-> nitpick: Move CTL_IMASK before CTL_ISTATUS ?
-
-
-Sure, that's cleaner!
->
->
-> > +
-> > +#define msec_to_cycles(msec) \
-> > +     (timer_get_cntfrq() * (uint64_t)(msec) / 1000)
-> > +
-> > +#define usec_to_cycles(usec) \
-> > +     (timer_get_cntfrq() * (uint64_t)(usec) / 1000000)
-> > +
-> > +#define cycles_to_usec(cycles) \
-> > +     ((uint64_t)(cycles) * 1000000 / timer_get_cntfrq())
-> > +
-> > +static inline uint32_t timer_get_cntfrq(void)
-> > +{
-> > +     return read_sysreg(cntfrq_el0);
-> > +}
-> > +
-> > +static inline uint64_t timer_get_cntct(enum arch_timer timer)
-> > +{
-> > +     isb();
-> > +
-> > +     switch (timer) {
-> > +     case VIRTUAL:
-> > +             return read_sysreg(cntvct_el0);
-> > +     case PHYSICAL:
-> > +             return read_sysreg(cntpct_el0);
-> > +     default:
-> > +             GUEST_ASSERT_1(0, timer);
-> > +     }
-> > +
-> > +     /* We should not reach here */
-> > +     return 0;
-> > +}
-> > +
-> > +static inline void timer_set_cval(enum arch_timer timer, uint64_t cval)
-> > +{
-> > +     switch (timer) {
-> > +     case VIRTUAL:
-> > +             return write_sysreg(cntv_cval_el0, cval);
-> > +     case PHYSICAL:
-> > +             return write_sysreg(cntp_cval_el0, cval);
-> > +     default:
-> > +             GUEST_ASSERT_1(0, timer);
-> > +     }
-> > +
-> > +     isb();
->
-> ISB should be performed before 'return'. And the same for
-> timer_set_{tval,ctl}.
-
-
-Seems like a copy-paste error on my side. The timer_set_*() functions
-shouldn't even have a 'return'. Thanks for catching this! Will fix it.
->
->
-> Thanks,
-> Zenghui
-
-
-Regards,
-Raghavendra
