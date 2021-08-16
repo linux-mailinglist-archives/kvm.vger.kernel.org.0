@@ -2,41 +2,41 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4266D3ED758
-	for <lists+kvm@lfdr.de>; Mon, 16 Aug 2021 15:34:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 669D63ED764
+	for <lists+kvm@lfdr.de>; Mon, 16 Aug 2021 15:34:49 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240932AbhHPNbq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 16 Aug 2021 09:31:46 -0400
-Received: from mail-dm6nam12on2042.outbound.protection.outlook.com ([40.107.243.42]:46656
-        "EHLO NAM12-DM6-obe.outbound.protection.outlook.com"
+        id S241095AbhHPNcX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 16 Aug 2021 09:32:23 -0400
+Received: from mail-bn8nam12on2066.outbound.protection.outlook.com ([40.107.237.66]:59104
+        "EHLO NAM12-BN8-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S241528AbhHPN3r (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 16 Aug 2021 09:29:47 -0400
+        id S239058AbhHPNa2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 16 Aug 2021 09:30:28 -0400
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=D2nD/y7SC/mrCPewxBJ7ECSGYAc85Fbo0QgOol86RHfSSuldrWPxtyqHR/ToDIdxQZTmImkDWG2Domt8Pih5OWdGquBVokOODoNlsVnGmU0hiCIglnCqO7MuiUC1q4gfhLt7jA7vgE5y8qRXp/nR6yTBfGZbKWIv73Lez4KXdLQzbwdrgLRAO3bYUQR6no1RbzyPj7YUzyKlXRXeHYoCjPNiCrMOONgW/GSUhZZ8jN+hnCZl87pNV4SMGZMkZJOPXze7iBFRbrIRvJq8QXsAqHKmbKy9CX5Hbmyjc9MOYjgnwUgz8ROAcCttWHLDdgMpl4ISVQJLNryn3T/dHhP3og==
+ b=iMT8P2M3vWG1UISIj7GoVld/an6nprOVvj2f4dO/5YBLmkuHSPIWElZ66aNl52XJxCLRFO7zQOubHhPgXywL/14YqUkAQVMgFLA7kgfElInlkDdzWIfKWO5CQkBZPr2wJeJcyd1VvU0lI5M5Y0Bq87JBh5Dt66GoGyVVR+NmuncEVny/XhLJ1iG2iKaEYtKDxkBjV8zk6D8QZGOnvlSb/Wu3qkC4qFl1pkzVkJGSMHx8dOlArra6EH2z6vRrg/d2bYdLHobsYuUt3/i3CUBi9c3NMsUwHlmARKyR+R+xViY0vBYaJOoZ2TacUO62F1SI0bEAxmqPetisxW8moWktag==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=zeF0PyPYyeyXcMJOf5tpXQiylrY13tMzVY/RYEekCwk=;
- b=UIKpwQGbcktylAMZ9QaQMMjJokl9LRrzfAhDhWazK8ey6vriciaZWrDqZOYkOEZ/HZ9rzfO4FaeFlqT7TAtMEhGMY0YyStujmTlc86uBQMJ03T/XLrBOEWa4+ZjbzBfBORG0Ya2sbyJ1LAF27ouyNqC9OJ7X+l8VdKbY8UcypWWZE21TLkyn4ChLsFI2DOyxhjPAIb3G8Xw+vB9/rraQqLr+ua4xqVcwvUaWuQ/4JpQX7XcRgyDjj3lccWPeKIFv3Zc3+/2ybF8XIvahFFsf9XDLMsX5dlWOoMVhFQS5Q587NfskIpUabr1VmBMyJ/+rfdYxxMIetgzw+lLHUuat1A==
+ bh=Kyr2iEPWOnduvOBFmnbYcRn7VS6C8JYB2gGFQQZT1X0=;
+ b=BawsDCfR3PBfCMEOkeqjTtl75a8FKlRKtKqJU6chmhtJrV6ZrUbXbdCVdlWvFmnh4TUxggXxq5c3IyEoNfXHWaYNr3y9Az8ONTIocNhRcySywh9KOQyI8uiAQijIIX80m/eDC0M8dZ0ld5HqABmZt5f7rq5GLHMzGzPWRIBWv+rSHub+3l7Y9jFie3Z4TI/t1TUdNpHS1kXrevIMEiWKy5wngYEGtXj4m+Zh4ZgFw4LlwAJKO9hj6X2wyk+YGFKgnb17ZfcYk6aDadLfnAgicAVTZOfzEqNaZUguBSOE1qbfVWYGcrPZBTBnrNQ0chm9ZgJjLgkNzxN7pywkTNQNZw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
  header.d=amd.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=zeF0PyPYyeyXcMJOf5tpXQiylrY13tMzVY/RYEekCwk=;
- b=pC4C4656h7cKv5XEzlDQTfGdbB51Xy/S/57J1U3FdntLmVmdDLDTHVuIBf1dhaDGM1VbwXufE5+WokLWs9yHxx9crR9cBXVfoUbco/FaEdwi7fEpw5FgWzX25fInNJhJBGsahkbqCS5dzB0S7Vg3eA1PI7t5PYmAy/7zb5GsdgM=
+ bh=Kyr2iEPWOnduvOBFmnbYcRn7VS6C8JYB2gGFQQZT1X0=;
+ b=PLnoiqCkNflQX9iw2P13l1ThdQz0KEHRBMSt+K6Dsm0PS7siu0QBqz5F25qV3WIcGqBJUvMu7TkVnvVnCOD4ytIIbqTMuxydvEC2XJmkROua8BJoMvAq4MrEzfdqQ8nYqChoy3v6N8v8rpYIS6/9ZNP8K6UfAYiWLcVDHHLukMM=
 Authentication-Results: nongnu.org; dkim=none (message not signed)
  header.d=none;nongnu.org; dmarc=none action=none header.from=amd.com;
 Received: from SN6PR12MB2767.namprd12.prod.outlook.com (2603:10b6:805:75::23)
  by SN1PR12MB2366.namprd12.prod.outlook.com (2603:10b6:802:25::19) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4415.19; Mon, 16 Aug
- 2021 13:28:42 +0000
+ 2021 13:29:22 +0000
 Received: from SN6PR12MB2767.namprd12.prod.outlook.com
  ([fe80::491e:2642:bae2:8b73]) by SN6PR12MB2767.namprd12.prod.outlook.com
  ([fe80::491e:2642:bae2:8b73%7]) with mapi id 15.20.4415.023; Mon, 16 Aug 2021
- 13:28:42 +0000
+ 13:29:22 +0000
 From:   Ashish Kalra <Ashish.Kalra@amd.com>
 To:     qemu-devel@nongnu.org
 Cc:     pbonzini@redhat.com, thomas.lendacky@amd.com,
@@ -44,128 +44,157 @@ Cc:     pbonzini@redhat.com, thomas.lendacky@amd.com,
         richard.henderson@linaro.org, jejb@linux.ibm.com, tobin@ibm.com,
         dovmurik@linux.vnet.ibm.com, frankeh@us.ibm.com,
         dgilbert@redhat.com, kvm@vger.kernel.org
-Subject: [RFC PATCH 06/13] hw/i386: Set CPUState.mirror_vcpu=true for mirror vcpus
-Date:   Mon, 16 Aug 2021 13:28:31 +0000
-Message-Id: <8c04d77d3a5a60436aa2b77264b2b7d40b402497.1629118207.git.ashish.kalra@amd.com>
+Subject: [RFC PATCH 07/13] kvm: Add Mirror VM ioctl and enable cap interfaces.
+Date:   Mon, 16 Aug 2021 13:29:11 +0000
+Message-Id: <dd4fb978e10c1a07a65e176a32cb59feb1b78244.1629118207.git.ashish.kalra@amd.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <cover.1629118207.git.ashish.kalra@amd.com>
 References: <cover.1629118207.git.ashish.kalra@amd.com>
 Content-Type: text/plain
-X-ClientProxiedBy: SN2PR01CA0023.prod.exchangelabs.com (2603:10b6:804:2::33)
- To SN6PR12MB2767.namprd12.prod.outlook.com (2603:10b6:805:75::23)
+X-ClientProxiedBy: SA0PR11CA0070.namprd11.prod.outlook.com
+ (2603:10b6:806:d2::15) To SN6PR12MB2767.namprd12.prod.outlook.com
+ (2603:10b6:805:75::23)
 MIME-Version: 1.0
 X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from ashkalra_ubuntu_server.amd.com (165.204.77.1) by SN2PR01CA0023.prod.exchangelabs.com (2603:10b6:804:2::33) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4415.16 via Frontend Transport; Mon, 16 Aug 2021 13:28:41 +0000
+Received: from ashkalra_ubuntu_server.amd.com (165.204.77.1) by SA0PR11CA0070.namprd11.prod.outlook.com (2603:10b6:806:d2::15) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4415.16 via Frontend Transport; Mon, 16 Aug 2021 13:29:21 +0000
 X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: de6a6442-e4d7-4060-9588-08d960b9c3d5
+X-MS-Office365-Filtering-Correlation-Id: b3ad602e-145f-43ce-7314-08d960b9dba1
 X-MS-TrafficTypeDiagnostic: SN1PR12MB2366:
 X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <SN1PR12MB23662C55F94A2DB774066E398EFD9@SN1PR12MB2366.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:4303;
+X-Microsoft-Antispam-PRVS: <SN1PR12MB2366D4A313614C18604FD6638EFD9@SN1PR12MB2366.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:57;
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: +uY/ZVSckIG3ytvbPs+Rce8L5ci8+L+cbcbrXpOY942zDboafjyigp9eC23OoIFMGqk0NhkHFMPuR5NWR+/cl1D74P/TpkEDWKdbanPJo2hynFA8UgTpNPQIv82JW1c1VKF1dYhDbHMnwqsWahUapd+Yyp/fxBGNTK8TPI72SzbnJ7WxNvo7ObFgn2lsyKxkEac5DC+3ue1pi0cIhx52rolleIKgagPAWL889NQeg0SFNaBW/LvNkuQhr+90ljaeB0dmp0MgwY5aFVeWCaOhdgvEwlDyUAJZbibrUNmefe1U783RgLZPcZ3lBSVbVpN0hu9l22pj9RJM8FrwRiRKpy5bj2j180SqkWSj0frei02oUwK4lBmqYaiwfKKRRM51O7iP7Wfl5hF/BYJmz46Dsj5ZMf/eIdqK4sWfnYzwZ8BalFlbil3kwJIYePhJP6OLTQrVa5e5E0xe/4eswbotLJn5U6iG9pExfP5/dbgkm86+HnBiDC1dWvPEp9SdfucSNdHQRKSB1E38h+A63j2M0H668ulfOXk4qdhMucWY7k53P06z/bicNiVRTPNA9MdODS/vvShnz01eJ4jSvWXpML2/ddQ+8ePUeBWw2XZa4Q1SapUF35kuEUtYDqCLL9d3IaMgiE5lEA0quDZbVRCFU2zSZl2Nv4Wd2uav55PSek9Ln3h/CF1rhv7V7WJmqvDiF686f1Cjw91vT6EvyLtZyQ==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR12MB2767.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(7416002)(7696005)(38350700002)(316002)(38100700002)(956004)(2616005)(6486002)(2906002)(6916009)(52116002)(26005)(5660300002)(508600001)(8936002)(36756003)(66476007)(4326008)(6666004)(66556008)(66946007)(186003)(86362001)(8676002)(83380400001);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam-Message-Info: baLDtnTp68wDK2TOECgmBx1fm0lQHyre9D76e85XqgheOXD/GnicI1PVkNmPe9iZg2U9kLmYZ4JbYqPAUWq6Ysg8NWUt5bpEIZimJP7MUwBmFo0xivB4G/lgxICskHjdUBEZHkfIticxcvXbDPS6rf13L5Veq2pql3C7P9thqsFKSUQjETraJ83/WtYzrL46X1YftKVx1mNNASD1UVRTWCbz/Y0anuci7aJ9LCd/FHVB7L3bAEZH36+l5OMGL8Wh3z8zoi3dy7oEMLFxgSW4rHY1cEwdVRygbGC9XF+xhYCL5NdD/CN6O/cXsMRLHl50uvFQJX1C9XPyxpwb91H5bOZolL6+STuFSqUT6TGbKmBFaPhdjVLtMXqotZmr2/9bZLs2526/83+SH2nAbkUuHCL/IlUhDKBibfnjFrl/31ycVzw2nqS2quF+kD8mmEiAYsnOGJqUsnz/ui9NyBp/5v2G7ytPieSnfoh4FlYjQ1vg70ufmLmOeo1ZAbv4nm2Cfq+MExEISY9a3OJ1fTVGBkSJC84ABRhwVaYfproSJHz4JxZeTyRAnFzfVua026nKtBXod4JPe187LkWtH70ogO6vIFYgytKFMPsif+B7AJWPfubV7C6Q6ZPO/jmbxWodjFAAX1a1EARUfyKohJYnsOXSHTgbUQ5j0yBJhY4YeVboTIKYexEW1EV1jWG0jajFa2DWuoJNcX/27Z6ah6pnsA==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR12MB2767.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(7416002)(7696005)(38350700002)(316002)(38100700002)(956004)(2616005)(6486002)(2906002)(6916009)(52116002)(26005)(5660300002)(508600001)(8936002)(36756003)(66476007)(4326008)(6666004)(66556008)(66946007)(186003)(86362001)(8676002);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?5IbKoteHIfvENzUsyi1usAvbshjOWEe/fEEPs+bd/rH0BNWU0gCeJ4CRYUtb?=
- =?us-ascii?Q?OJfzjMvLpLhkJmrQKay6wMKOTP+rVvYfUySbIUM58QFysTCUq/V2qRp5Mwpf?=
- =?us-ascii?Q?gbd1a2yFXIAahwhV+GPPnow6u/55s3+Vh7BejIQ7Nkuh/ulkMBLJh+K8AA4S?=
- =?us-ascii?Q?oBc8gAdt4UTugg0lY3YtaAnBei/fyZ2TGg2H1wIHv3fECYiSFatIlIF0w/v5?=
- =?us-ascii?Q?DB2SEg6IP/rGhwpFWaVY9N5EuISNOWFkfcnDhYpy0zdNohKQ0vkbXL3nu86k?=
- =?us-ascii?Q?kJBjlt/shzkOFH1wIGfLgAXMs8GqH5H7lNuVpM0ZVMB9BKxg6j4W3Uwp7VLl?=
- =?us-ascii?Q?HmxBPBjZLb5aol1sjyaKWGSq/nudwT60zR99e8LuZswrqvolBWbwAPzd1BUW?=
- =?us-ascii?Q?6ubymLPmEH246/bqShuMRjhTwP2BAn4GwyThsPAZAscb2juQMzCsFKdU0cpY?=
- =?us-ascii?Q?UHU1J6nvZ4o+gFvWQxszU8mDsS/bqqYD4WHK/vw265rlBurcfXiOgdOEtPnS?=
- =?us-ascii?Q?NuMI4KYHuTpWFiSnzeyRIJc6OH/YpYyql4aqqsv6J26dPsxiHJFIpkzfQ+cb?=
- =?us-ascii?Q?ZN1SOG7KZj2JnKJG6XXdR9unYnGLtpPITLGe7NOu/zO2dI6+hQUJsZgvoeVl?=
- =?us-ascii?Q?LwN4o6mkjBMVTWnpnBONOYwy+QbvZxF1T9UJpC2TQickjGxvqplNzR5F/kkz?=
- =?us-ascii?Q?Eoqw3ns7q5Rg0dazwIdjopZms77GM+aJBX8Wkt/bXuxYOHehk2Bz7/49nJLj?=
- =?us-ascii?Q?say3hyQ9jwzmG8QxUeak0hy94Vz698ZutovuDRsy7KvZuoO+nIcokeisOrhk?=
- =?us-ascii?Q?EafXLp8lL1FUTYNTP6C/NFLof0PHW5JdNvyXLtZxp15gOs9YFsqeZ0Z79VaT?=
- =?us-ascii?Q?JkEle8V8n0Q0iZNxdR4IoOV8Ay7UTOTtCdg1RVHNHDYIopiiKNAG9tYI66IL?=
- =?us-ascii?Q?dp7XeyjuC9xKukBsCz0OHLhvnK7QnH9zZBVTDzEHxlzdPbKIpvr1Kk6omkrT?=
- =?us-ascii?Q?RVyFM29V8MZX+FFk6XLUtCO4qnNxA6TUdowlMMToPj7BC3AvvAVZGbOog2Nq?=
- =?us-ascii?Q?xtod6AFYqSjRmjTXiTYunTFUooPLqbdchPH/D/qKojvlA5p+AmlKo3qubUXq?=
- =?us-ascii?Q?lgp3hA+OXuAoAHmRPnbAYZqKi9kgfEejEXqcA1i4TbBiQaZXvRYrt7Z3g98M?=
- =?us-ascii?Q?gRUUGLCvIyLMAEloCBzQUHLxED/hTVYWoFVr/dQ+QARktVqa2HzZ9YD6hHRP?=
- =?us-ascii?Q?TUeJ9ckBT0PbYMMhG6JgHxLxyksbZf2jWYE/h1KFRnAbl5FIlSvWZ6e5KiFz?=
- =?us-ascii?Q?efiEa+a31vCZ8/bxtMEyaV7v?=
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?2y33Nk1uHocThnYwm6X+rs8jTIyuISppq8XcHf/XO1LC7IlzqJTdJQQoqGWD?=
+ =?us-ascii?Q?LAfK0r7RlpzGgD42ARPI+sKIFf8Y9WJ7qSMfR9vDff1x9u7JYWfiQClmgtoy?=
+ =?us-ascii?Q?i7s+QXyHSWowOr2CfToSd/PBaKQfMNAHBUiifLYLXNbdSRIrVwDHuSOONJVJ?=
+ =?us-ascii?Q?kZZtqJqUkSws4GryY0GPganG3UddlA0uuEhpmNtdeg7eosBKmh69YRVhoYPd?=
+ =?us-ascii?Q?9WCFdF2TX0ip2wIB29zawx+FNTkoCIb/Lp4sicWSP1+LDkj3Zn0hmJVP6GXw?=
+ =?us-ascii?Q?wpvPbqBeusA/K5dmwAJ8pehz0HuGG8fCULjPh/1FjVPA9bt7sqTZ3pAjILZh?=
+ =?us-ascii?Q?dUmMXk1HkGj3OZ1pHldurYk6ZkZ5vsLlIOX+o6ZX/fWKqjAzUEgRRk/x5eeG?=
+ =?us-ascii?Q?c2HG5ACVrLKXXnkzgcf8SeZWCqY8IleTslBTIkBS3lXpJ8hYNlI7CWAtR665?=
+ =?us-ascii?Q?x4OTh8XyJpyl7mr7JMYSk/5wlXzGUzMkvl8HfJTtH3pO4nVN8YLKPxkDYc8b?=
+ =?us-ascii?Q?q7hZVDyeoh0epSkBsN0c3YAJYjXdcxPsbRajjwP0a79Pc+XLsBQuQCKIlnRM?=
+ =?us-ascii?Q?oFtBUOg8bZ8p9mt2tq04dkXI2CvN23zSBbNJb4rHqK0fQaXdxuKSmZY5cbCQ?=
+ =?us-ascii?Q?PaFPyTsIGG4YjCHBXpUdht2GoDIMfW/nEzRIWg5hISzqMi1HGuiHa6uKreR+?=
+ =?us-ascii?Q?2sNlr7nuX69HQpGVXNlm/bA1KeJ1bFbmMbnZPfiTlTynDWAhAnCRHPFouafp?=
+ =?us-ascii?Q?hf5coJI3Tk9MDooaH1PMMscLOtaMheYonjxS/6eaisFNYGT89tuVzap3GIzV?=
+ =?us-ascii?Q?zGoj5b7szpLm9BiCyNIRO+bmiVgnM3/ByOXCvxYcbDMqE9WPGL7EskOHYUFT?=
+ =?us-ascii?Q?ELoiVJBoDbLk2LD13xpu3JaiEHwOtgEUbDnfddWIhe2QUZXnIGheBdiZfjOG?=
+ =?us-ascii?Q?TZcL8xOPD4EKoZn4gk+68/xb5fPkXLmHhZ1SyobdoH0aCUOSZG+N4/Yn63dN?=
+ =?us-ascii?Q?Rpk4AS/y5diygycDlWpROd+rjZi9CqiMbJOVBsEdxd55r7p+s/6VZlUhNVOl?=
+ =?us-ascii?Q?t6urQDKqnq9LG7nUoo3gvSAkZg/yCym2Bpz0TrAXFaYhj81oojtcwmBUNwQW?=
+ =?us-ascii?Q?5gG0ML3H90Amf3jc013GFIbzqqXKDTQtHzTw7LEJhgv18ib3Co03Ole6JIJ0?=
+ =?us-ascii?Q?Ity3ev+p6/2eWQp3tY0+e0J1+9VDAVC2kqNGQKMRrPTMNOTT00aCn3Ws+EEq?=
+ =?us-ascii?Q?Mp3tL4p4S3ka1aTelwDlFzMJJHR43PT+TjNKzpJfGAf6r45gpnUMdIQAtnqH?=
+ =?us-ascii?Q?7wHN/SdbnIa6tFloacr5l/4X?=
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: de6a6442-e4d7-4060-9588-08d960b9c3d5
+X-MS-Exchange-CrossTenant-Network-Message-Id: b3ad602e-145f-43ce-7314-08d960b9dba1
 X-MS-Exchange-CrossTenant-AuthSource: SN6PR12MB2767.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Aug 2021 13:28:42.2225
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Aug 2021 13:29:22.1222
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: ZBu0UuKwRRWhTgkAJB1w9SgfqCjjaHU5pDlAoVLn9q1+bTUi7CcJVjA45Bo7SP+RkYo1nAT0IGcdME/aspbAFA==
+X-MS-Exchange-CrossTenant-UserPrincipalName: Wl8tNpTxPcKroUi7RPDs077bQNrzTJQIAWjpPCaeSKz+fzDk6hgnpVI3ZAoc9hiMRSWjIhi54/A4XnroPM8a5Q==
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN1PR12MB2366
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Dov Murik <dovmurik@linux.vnet.ibm.com>
+From: Ashish Kalra <ashish.kalra@amd.com>
 
-On x86 machines, when initializing the CPUState structs, set the
-mirror_vcpu flag to true for mirror vcpus.
+Add VM ioctl and enable cap support for Mirror VM's and
+a new VM file descriptor for Mirror VM's in KVMState.
 
-Signed-off-by: Dov Murik <dovmurik@linux.vnet.ibm.com>
-Co-developed-by: Ashish Kalra <ashish.kalra@amd.com>
+The VCPU ioctl interface for Mirror VM works as it is,
+as it uses a CPUState and VCPU file descriptor allocated
+and setup for mirror vcpus.
+
 Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
 ---
- hw/i386/x86.c         | 9 +++++++--
- include/hw/i386/x86.h | 3 ++-
- 2 files changed, 9 insertions(+), 3 deletions(-)
+ accel/kvm/kvm-all.c  | 23 +++++++++++++++++++++++
+ include/sysemu/kvm.h | 14 ++++++++++++++
+ 2 files changed, 37 insertions(+)
 
-diff --git a/hw/i386/x86.c b/hw/i386/x86.c
-index a0103cb0aa..67e2b331fc 100644
---- a/hw/i386/x86.c
-+++ b/hw/i386/x86.c
-@@ -101,13 +101,17 @@ uint32_t x86_cpu_apic_id_from_index(X86MachineState *x86ms,
+diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
+index 0125c17edb..4bc5971881 100644
+--- a/accel/kvm/kvm-all.c
++++ b/accel/kvm/kvm-all.c
+@@ -149,6 +149,7 @@ struct KVMState
+     uint64_t kvm_dirty_ring_bytes;  /* Size of the per-vcpu dirty ring */
+     uint32_t kvm_dirty_ring_size;   /* Number of dirty GFNs per ring */
+     struct KVMDirtyRingReaper reaper;
++    int mirror_vm_fd;
+ };
+ 
+ KVMState *kvm_state;
+@@ -3003,6 +3004,28 @@ int kvm_vm_ioctl(KVMState *s, int type, ...)
+     return ret;
  }
  
- 
--void x86_cpu_new(X86MachineState *x86ms, int64_t apic_id, Error **errp)
-+void x86_cpu_new(X86MachineState *x86ms, int64_t apic_id, bool mirror_vcpu,
-+                 Error **errp)
- {
-     Object *cpu = object_new(MACHINE(x86ms)->cpu_type);
- 
-     if (!object_property_set_uint(cpu, "apic-id", apic_id, errp)) {
-         goto out;
-     }
-+    if (!object_property_set_bool(cpu, "mirror_vcpu", mirror_vcpu, errp)) {
-+        goto out;
++int kvm_mirror_vm_ioctl(KVMState *s, int type, ...)
++{
++    int ret;
++    void *arg;
++    va_list ap;
++
++    if (!s->mirror_vm_fd) {
++        return 0;
 +    }
-     qdev_realize(DEVICE(cpu), NULL, errp);
++
++    va_start(ap, type);
++    arg = va_arg(ap, void *);
++    va_end(ap);
++
++    trace_kvm_vm_ioctl(type, arg);
++    ret = ioctl(s->mirror_vm_fd, type, arg);
++    if (ret == -1) {
++        ret = -errno;
++    }
++    return ret;
++}
++
+ int kvm_vcpu_ioctl(CPUState *cpu, int type, ...)
+ {
+     int ret;
+diff --git a/include/sysemu/kvm.h b/include/sysemu/kvm.h
+index a1ab1ee12d..6847ffcdfd 100644
+--- a/include/sysemu/kvm.h
++++ b/include/sysemu/kvm.h
+@@ -255,6 +255,8 @@ int kvm_ioctl(KVMState *s, int type, ...);
  
- out:
-@@ -135,7 +139,8 @@ void x86_cpus_init(X86MachineState *x86ms, int default_cpu_version)
-                                                       ms->smp.max_cpus - 1) + 1;
-     possible_cpus = mc->possible_cpu_arch_ids(ms);
-     for (i = 0; i < ms->smp.cpus; i++) {
--        x86_cpu_new(x86ms, possible_cpus->cpus[i].arch_id, &error_fatal);
-+        x86_cpu_new(x86ms, possible_cpus->cpus[i].arch_id,
-+                    possible_cpus->cpus[i].mirror_vcpu, &error_fatal);
-     }
- }
+ int kvm_vm_ioctl(KVMState *s, int type, ...);
  
-diff --git a/include/hw/i386/x86.h b/include/hw/i386/x86.h
-index 6e9244a82c..9206826c36 100644
---- a/include/hw/i386/x86.h
-+++ b/include/hw/i386/x86.h
-@@ -96,7 +96,8 @@ void init_topo_info(X86CPUTopoInfo *topo_info, const X86MachineState *x86ms);
- uint32_t x86_cpu_apic_id_from_index(X86MachineState *pcms,
-                                     unsigned int cpu_index);
++int kvm_mirror_vm_ioctl(KVMState *s, int type, ...);
++
+ int kvm_vcpu_ioctl(CPUState *cpu, int type, ...);
  
--void x86_cpu_new(X86MachineState *pcms, int64_t apic_id, Error **errp);
-+void x86_cpu_new(X86MachineState *pcms, int64_t apic_id, bool mirror_vcpu,
-+                 Error **errp);
- void x86_cpus_init(X86MachineState *pcms, int default_cpu_version);
- CpuInstanceProperties x86_cpu_index_to_props(MachineState *ms,
-                                              unsigned cpu_index);
+ /**
+@@ -434,6 +436,18 @@ int kvm_vm_check_extension(KVMState *s, unsigned int extension);
+         kvm_vm_ioctl(s, KVM_ENABLE_CAP, &cap);                       \
+     })
+ 
++#define kvm_mirror_vm_enable_cap(s, capability, cap_flags, ...)      \
++    ({                                                               \
++        struct kvm_enable_cap cap = {                                \
++            .cap = capability,                                       \
++            .flags = cap_flags,                                      \
++        };                                                           \
++        uint64_t args_tmp[] = { __VA_ARGS__ };                       \
++        size_t n = MIN(ARRAY_SIZE(args_tmp), ARRAY_SIZE(cap.args));  \
++        memcpy(cap.args, args_tmp, n * sizeof(cap.args[0]));         \
++        kvm_mirror_vm_ioctl(s, KVM_ENABLE_CAP, &cap);                \
++    })
++
+ #define kvm_vcpu_enable_cap(cpu, capability, cap_flags, ...)         \
+     ({                                                               \
+         struct kvm_enable_cap cap = {                                \
 -- 
 2.17.1
 
