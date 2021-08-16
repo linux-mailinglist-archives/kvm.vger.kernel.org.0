@@ -2,87 +2,92 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 678853ED974
-	for <lists+kvm@lfdr.de>; Mon, 16 Aug 2021 17:05:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CB85F3ED97B
+	for <lists+kvm@lfdr.de>; Mon, 16 Aug 2021 17:07:35 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229586AbhHPPFf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 16 Aug 2021 11:05:35 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:37539 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232271AbhHPPFe (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 16 Aug 2021 11:05:34 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1629126302;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=ABrWgRhABY2HK4NysZy+JCnEPDW3vpIo9/TFVUA3ibc=;
-        b=NcEPebUTVUULCKGM8rGS339+rn+a0MtdC7YRKdGbaNWOYQQ+/8IRygD8QlgYxfVX6Aym1H
-        68OGeo+J1zXCxckQr179VG4U1v2bv99nulVYZrvze/KXlPz3roSzu7+rZRcWpsgbmUsi8G
-        dZR53KyciLuJb4PgE9ue2OFU9IXBBpg=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-189-LZhyEbqWMVaVlFF4He1Xig-1; Mon, 16 Aug 2021 11:05:01 -0400
-X-MC-Unique: LZhyEbqWMVaVlFF4He1Xig-1
-Received: by mail-wm1-f71.google.com with SMTP id y186-20020a1c32c30000b02902b5ac887cfcso7918210wmy.2
-        for <kvm@vger.kernel.org>; Mon, 16 Aug 2021 08:05:00 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=ABrWgRhABY2HK4NysZy+JCnEPDW3vpIo9/TFVUA3ibc=;
-        b=cgUEIrhKZCMISyrEoPJg3l1qaxPf9koHHn3pma2bfMprBZ6OXSNzCjmT0J9T5UQv2t
-         bJGCzD1kXAb2TLBqlhmE8Z4E7V/qZSd18LXNDohSIOalPL5kHy9slwLI3dg5YTB6H1Pu
-         P9YqvsJxJGipsFWlJxPcJT4ZTGWnXax5wUj1h/HBK/qFeoU2zAJzDw7YGIKaErFWXcgE
-         62q8RwYdHq0xjWLW1JCKMAc7p63EgPJXLYt6k3DoTyeKcgDn8XNi23qUsTf6SHXnPA7f
-         aXvhCRBmfx5rVkroglUywkB9JcKxKgm5/wyfhQJeg6Cx4FZfSMVyXd6qm9ECM84waPtf
-         jokQ==
-X-Gm-Message-State: AOAM530zZ2AD6oW+Q7bctAeePCrMDB24X554/CHdxJig2y/0N3dnDp1S
-        /BpEWwcznTB4Dk/Y0AcoPIFl55TM/hvnwRsRug4ZkY3wV2L5BW/6S2bzA5KhFqGGIWHNjvqN5o3
-        co8TJHiYN+KoX
-X-Received: by 2002:a1c:7dd0:: with SMTP id y199mr15424191wmc.23.1629126299869;
-        Mon, 16 Aug 2021 08:04:59 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJx09VPZkGLXWDG+tXpHYc3YeJl3pSZSqRdKI6EYU61EuoygC/wIwMn44PmYT5H+5icPrjj/xw==
-X-Received: by 2002:a1c:7dd0:: with SMTP id y199mr15424176wmc.23.1629126299653;
-        Mon, 16 Aug 2021 08:04:59 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:63a7:c72e:ea0e:6045? ([2001:b07:6468:f312:63a7:c72e:ea0e:6045])
-        by smtp.gmail.com with ESMTPSA id w29sm12856049wra.88.2021.08.16.08.04.58
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 16 Aug 2021 08:04:59 -0700 (PDT)
-Subject: Re: [PATCH 5.12.y] KVM: nSVM: avoid picking up unsupported bits from
- L2 in int_ctl (CVE-2021-3653)
-To:     Greg KH <gregkh@linuxfoundation.org>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        stable@vger.kernel.org, Maxim Levitsky <mlevitsk@redhat.com>
-References: <20210816140240.11399-6-pbonzini@redhat.com>
- <YRp1bUv85GWsFsuO@kroah.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <97448bb5-1f58-07f9-1110-96c7ffefd4b2@redhat.com>
-Date:   Mon, 16 Aug 2021 17:04:58 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.11.0
+        id S232492AbhHPPIG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 16 Aug 2021 11:08:06 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:22282 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S231438AbhHPPIC (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 16 Aug 2021 11:08:02 -0400
+Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 17GF3ItD145308;
+        Mon, 16 Aug 2021 11:07:30 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : mime-version : content-transfer-encoding; s=pp1;
+ bh=8VuV6kkubQLx/fXq4+8jf1QCpapuUKeWDRUmz/1F54I=;
+ b=fO4YD09fQniAJIteOW7mqeKYhtTW6Ui9cv3T9HrRl6pEblH7LdqQfSDS4ubn8DNOX8iQ
+ njMaBlbYNtD95f5AT/KWK3fJP/P53gx4n1HU5rahppSEJJkyDijuR8IyKl9g00VJRp/L
+ AXsc9qw2LDIyvt1dlRSA5IrCYjNm/Gql5owONNa9isjvFbvBtHLpJlkWBB5Lv+e37JtR
+ IBgvZbzFpjpLlx2BW650KBsrshiiwFaNZPkhtRk082q1e8rqKGyE2I77lRQqYZ5Cz7mv
+ N7P9qggfSyWH9cGXeLPR2XRcokJeaI5ZCPQxTd1cI8FUR0c3YSYk+pH9zYJ88uznuf5Q Yw== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3aetu0b4c2-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 16 Aug 2021 11:07:30 -0400
+Received: from m0098410.ppops.net (m0098410.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 17GF41eA002819;
+        Mon, 16 Aug 2021 11:07:30 -0400
+Received: from ppma05fra.de.ibm.com (6c.4a.5195.ip4.static.sl-reverse.com [149.81.74.108])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3aetu0b4b0-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 16 Aug 2021 11:07:30 -0400
+Received: from pps.filterd (ppma05fra.de.ibm.com [127.0.0.1])
+        by ppma05fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 17GF64C0020523;
+        Mon, 16 Aug 2021 15:07:27 GMT
+Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
+        by ppma05fra.de.ibm.com with ESMTP id 3ae5f8b1ju-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 16 Aug 2021 15:07:27 +0000
+Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
+        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 17GF7NpH54395174
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 16 Aug 2021 15:07:23 GMT
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 7BFF611C04A;
+        Mon, 16 Aug 2021 15:07:23 +0000 (GMT)
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 1D47D11C085;
+        Mon, 16 Aug 2021 15:07:23 +0000 (GMT)
+Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
+        by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Mon, 16 Aug 2021 15:07:23 +0000 (GMT)
+From:   Janis Schoetterl-Glausch <scgl@linux.ibm.com>
+To:     kvm@vger.kernel.org, borntraeger@de.ibm.com, frankja@linux.ibm.com,
+        imbrenda@linux.ibm.com
+Cc:     scgl@linux.ibm.com, david@redhat.com, cohuck@redhat.com,
+        linux-s390@vger.kernel.org
+Subject: [PATCH 0/2] KVM: s390: Some gaccess cleanup
+Date:   Mon, 16 Aug 2021 17:07:15 +0200
+Message-Id: <20210816150718.3063877-1-scgl@linux.ibm.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-In-Reply-To: <YRp1bUv85GWsFsuO@kroah.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: aL3zqgpaSkHAmSzSIGNeWXX6NTErAtPq
+X-Proofpoint-GUID: mUQ3-TXg6J4qJDXwjo5cRnj8SIBT_Kq5
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.790
+ definitions=2021-08-16_04:2021-08-16,2021-08-16 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0 spamscore=0
+ priorityscore=1501 lowpriorityscore=0 mlxlogscore=905 mlxscore=0
+ malwarescore=0 bulkscore=0 adultscore=0 clxscore=1011 phishscore=0
+ suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2107140000 definitions=main-2108160096
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 16/08/21 16:25, Greg KH wrote:
->> [ upstream commit 0f923e07124df069ba68d8bb12324398f4b6b709 ]
-> 
-> And 5.12.y is long end-of-life, take a look at the front page of
-> kernel.org for the active kernels.
+Cleanup s390 guest access code a bit, getting rid of some code
+duplication and improving readability.
 
-Ok, sorry I didn't notice that... it wasn't end of life when the issue 
-was discovered. O:)
+Janis Schoetterl-Glausch (2):
+  KVM: s390: gaccess: Cleanup access to guest frames
+  KVM: s390: gaccess: Refactor access address range check
 
-(Damn, the one time that we prepare all the backports in advance, we end 
-up doing too many of them!)
+ arch/s390/kvm/gaccess.c | 129 ++++++++++++++++++++--------------------
+ 1 file changed, 63 insertions(+), 66 deletions(-)
 
-Paolo
+-- 
+2.25.1
 
