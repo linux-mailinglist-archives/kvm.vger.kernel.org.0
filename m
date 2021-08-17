@@ -2,55 +2,55 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7244A3EE81F
-	for <lists+kvm@lfdr.de>; Tue, 17 Aug 2021 10:12:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CFEA23EE81C
+	for <lists+kvm@lfdr.de>; Tue, 17 Aug 2021 10:12:02 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239044AbhHQIMf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 17 Aug 2021 04:12:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53634 "EHLO
+        id S239015AbhHQIMe (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 17 Aug 2021 04:12:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53664 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238727AbhHQIMa (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 17 Aug 2021 04:12:30 -0400
-Received: from mail-wm1-x34a.google.com (mail-wm1-x34a.google.com [IPv6:2a00:1450:4864:20::34a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 21884C06179A
-        for <kvm@vger.kernel.org>; Tue, 17 Aug 2021 01:11:57 -0700 (PDT)
-Received: by mail-wm1-x34a.google.com with SMTP id m13-20020a7bcf2d000000b002e6cd9941a9so701582wmg.1
-        for <kvm@vger.kernel.org>; Tue, 17 Aug 2021 01:11:57 -0700 (PDT)
+        with ESMTP id S239044AbhHQIMb (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 17 Aug 2021 04:12:31 -0400
+Received: from mail-qv1-xf49.google.com (mail-qv1-xf49.google.com [IPv6:2607:f8b0:4864:20::f49])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 42098C0617AE
+        for <kvm@vger.kernel.org>; Tue, 17 Aug 2021 01:11:58 -0700 (PDT)
+Received: by mail-qv1-xf49.google.com with SMTP id f10-20020a0ccc8a0000b02903521ac3b9d7so14791211qvl.15
+        for <kvm@vger.kernel.org>; Tue, 17 Aug 2021 01:11:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=date:in-reply-to:message-id:mime-version:references:subject:from:to
          :cc;
-        bh=8n83SYPJFagVj2+maLVaB3cngisvORRV9MwxIVnJLmI=;
-        b=QK/oT43c/HyLP/flGctPFGgv7ERt829+s64w8tFk/HXu62cv5ewT8zROH3wOTe2tvj
-         /aS4rS4XvL+VdJ9fohamgn6Nyg59PZxWDrodzia7PUArQfMO26PTAh+H6xoSWEEE3mr9
-         dDmCJJ0j+3nII+H807f9g0TIew5R2UMyYDEfLyjS2RBXhILL7blWPMY7mBzm07CD2FZV
-         R8adqZDTDufewJarzOCN7pgqdsv7Vx+iayW4OdoLDVJoz3VzmOcOn+/+N4eEAJqA5HBX
-         c3eEB1npKGLlrrR/cCsOka1MAFIAwLC4Wyfv2oF357gfPE6pnUPWzc5uT0kVfitF8n0b
-         Bl7w==
+        bh=a1FkHacsvxlpxAzLdiQ+8Ppyqt1oFw+G4RPgD2elyDM=;
+        b=t0d/tLo4vOpJ97R2R+WJ7E/Mn4CRyatYvLNI5+XDc6d/D+D+iLgcP9l1mJgMMW9YmC
+         kVwXzlYCgOVFk41QkuGxihN3Ogbvf8N7scHCRdnhB4nAXWmv7IzXURY2zHD/BEaiAYQ6
+         TjllHsJE6UJZxmu5jPld1CQCptRH4i9F1tLftMV5Up+OoJBqprQPLjcmAPDwjY/fPrPm
+         MgayAcPlA5qUJ9BfoFBR4cwAWBAWBStqE38TrSHqPxMV2Y/TZ/+xqz54kWQ1t5U7JoFY
+         tyqZiyJQxEAJV5Ngl04xPkh8FINI1IP4yATCktZ30SJa5aIxa3ns9CXj2hbSkYio9nU2
+         0ZrQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=8n83SYPJFagVj2+maLVaB3cngisvORRV9MwxIVnJLmI=;
-        b=k2bwFLCjAf1Iqw6jItlq97pcR5Roxo7coQqNKAcbT5HEn77eryqTnctg7WjlIqkkZa
-         0bSvxAD/5wQoQaTnfwWwEfYBNvBbqBtbxIApfUzTCQeJSJzx5VS1tyUMYbse72pJJhpk
-         nK2A3dNzEi+1b3+1CJTif8Ur9xOmirN6WKfQqW6KRQ1aMkrroRwzkVcSvEGMi2ZQp2qq
-         6FzweJ9l+g/N5eFlDnn4T4XOvraF63Ndje5hkM07TQ8kUWnoT6nBj3mJ/zEJr25uGyU6
-         KOY9axfpWAccRc1Zv2tMX+GZy/gsURmZ/z/Jl+LSr9D57eh9JXtoIJcUDCZFxyCIzYgH
-         rq2w==
-X-Gm-Message-State: AOAM530vAQZoxBCkQl4sfaMpAEo7f5HCraj4n8mw8rYrw/OBeH2tmDPN
-        L6HbBZeaTIST5IYiRCNTbBfXT++Ydw==
-X-Google-Smtp-Source: ABdhPJyTMMnMvo44W4iioAshOfXYGiB/EBOESDhi7wJydM3Tnpejk+WoPKZaFjTVp97hac/tbSdCEeXM2g==
+        bh=a1FkHacsvxlpxAzLdiQ+8Ppyqt1oFw+G4RPgD2elyDM=;
+        b=Gr+VOeVmambwjvSaEjdAoXQ1uVUsCFVF8fGZSh/AjphAIZDd8UUt0bP3/0GTxIrz0z
+         Zh8KIyxZupMw2Pmh42YeYFE4rxaBtTwx1Ne/nTeW82EkAasIKIsP1jbIAnzGRtCU/sW/
+         6P7tBMehcSCz30Uvn6X5NIPoVqVoeZQbq2DJPKklxv3rg9d8i0JKustVt2WE5wMP1SX3
+         q3vIK4gDfsJsJf6m50QVQ6hyulmVr+4jWRTlwqbYx+dRtTWWdEecq2RBzCW2K/QDIOxs
+         UhYObP+Wn0Ollx0ZEOMfn3qQCGbWVAUYbhftbHTSEO6uWj9llm1TXnHcYc8XUqxQOXSD
+         jhzg==
+X-Gm-Message-State: AOAM530U/3aZDuvkIYa+9Ac1iZnOsMXfqbnnTYJau+6zeyXnnhIS5ujU
+        OJ5hxuE6sXMfyZVUa72Q9J3n6dtIyQ==
+X-Google-Smtp-Source: ABdhPJxzcsyia+26TWJ1TMac1dWdSAXLmVDa71Pii4xoLoi/YWFmQv5nVNTZT9RkOEJvlwiLzHDZH4e6Ug==
 X-Received: from tabba.c.googlers.com ([fda3:e722:ac3:cc00:28:9cb1:c0a8:482])
- (user=tabba job=sendgmr) by 2002:a05:600c:5116:: with SMTP id
- o22mr227673wms.0.1629187915361; Tue, 17 Aug 2021 01:11:55 -0700 (PDT)
-Date:   Tue, 17 Aug 2021 09:11:28 +0100
+ (user=tabba job=sendgmr) by 2002:a05:6214:10c4:: with SMTP id
+ r4mr2134444qvs.58.1629187917427; Tue, 17 Aug 2021 01:11:57 -0700 (PDT)
+Date:   Tue, 17 Aug 2021 09:11:29 +0100
 In-Reply-To: <20210817081134.2918285-1-tabba@google.com>
-Message-Id: <20210817081134.2918285-10-tabba@google.com>
+Message-Id: <20210817081134.2918285-11-tabba@google.com>
 Mime-Version: 1.0
 References: <20210817081134.2918285-1-tabba@google.com>
 X-Mailer: git-send-email 2.33.0.rc1.237.g0d66db33f3-goog
-Subject: [PATCH v4 09/15] KVM: arm64: Add feature register flag definitions
+Subject: [PATCH v4 10/15] KVM: arm64: Add config register bit definitions
 From:   Fuad Tabba <tabba@google.com>
 To:     kvmarm@lists.cs.columbia.edu
 Cc:     maz@kernel.org, will@kernel.org, james.morse@arm.com,
@@ -65,121 +65,79 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Add feature register flag definitions to clarify which features
-might be supported.
-
-Consolidate the various ID_AA64PFR0_ELx flags for all ELs.
+Add hardware configuration register bit definitions for HCR_EL2
+and MDCR_EL2. Future patches toggle these hyp configuration
+register bits to trap on certain accesses.
 
 No functional change intended.
 
+Acked-by: Will Deacon <will@kernel.org>
 Signed-off-by: Fuad Tabba <tabba@google.com>
 ---
- arch/arm64/include/asm/cpufeature.h |  4 ++--
- arch/arm64/include/asm/sysreg.h     | 12 ++++++++----
- arch/arm64/kernel/cpufeature.c      |  8 ++++----
- 3 files changed, 14 insertions(+), 10 deletions(-)
+ arch/arm64/include/asm/kvm_arm.h | 22 ++++++++++++++++++++++
+ 1 file changed, 22 insertions(+)
 
-diff --git a/arch/arm64/include/asm/cpufeature.h b/arch/arm64/include/asm/cpufeature.h
-index 9bb9d11750d7..b7d9bb17908d 100644
---- a/arch/arm64/include/asm/cpufeature.h
-+++ b/arch/arm64/include/asm/cpufeature.h
-@@ -602,14 +602,14 @@ static inline bool id_aa64pfr0_32bit_el1(u64 pfr0)
- {
- 	u32 val = cpuid_feature_extract_unsigned_field(pfr0, ID_AA64PFR0_EL1_SHIFT);
+diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
+index a928b2dc0b0f..327120c0089f 100644
+--- a/arch/arm64/include/asm/kvm_arm.h
++++ b/arch/arm64/include/asm/kvm_arm.h
+@@ -12,8 +12,13 @@
+ #include <asm/types.h>
  
--	return val == ID_AA64PFR0_EL1_32BIT_64BIT;
-+	return val == ID_AA64PFR0_ELx_32BIT_64BIT;
- }
- 
- static inline bool id_aa64pfr0_32bit_el0(u64 pfr0)
- {
- 	u32 val = cpuid_feature_extract_unsigned_field(pfr0, ID_AA64PFR0_EL0_SHIFT);
- 
--	return val == ID_AA64PFR0_EL0_32BIT_64BIT;
-+	return val == ID_AA64PFR0_ELx_32BIT_64BIT;
- }
- 
- static inline bool id_aa64pfr0_sve(u64 pfr0)
-diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
-index 53a93a9c5253..f84a00f5874d 100644
---- a/arch/arm64/include/asm/sysreg.h
-+++ b/arch/arm64/include/asm/sysreg.h
-@@ -784,14 +784,13 @@
- #define ID_AA64PFR0_AMU			0x1
- #define ID_AA64PFR0_SVE			0x1
- #define ID_AA64PFR0_RAS_V1		0x1
-+#define ID_AA64PFR0_RAS_V1P1		0x2
- #define ID_AA64PFR0_FP_NI		0xf
- #define ID_AA64PFR0_FP_SUPPORTED	0x0
- #define ID_AA64PFR0_ASIMD_NI		0xf
- #define ID_AA64PFR0_ASIMD_SUPPORTED	0x0
--#define ID_AA64PFR0_EL1_64BIT_ONLY	0x1
--#define ID_AA64PFR0_EL1_32BIT_64BIT	0x2
--#define ID_AA64PFR0_EL0_64BIT_ONLY	0x1
--#define ID_AA64PFR0_EL0_32BIT_64BIT	0x2
-+#define ID_AA64PFR0_ELx_64BIT_ONLY	0x1
-+#define ID_AA64PFR0_ELx_32BIT_64BIT	0x2
- 
- /* id_aa64pfr1 */
- #define ID_AA64PFR1_MPAMFRAC_SHIFT	16
-@@ -847,12 +846,16 @@
- #define ID_AA64MMFR0_ASID_SHIFT		4
- #define ID_AA64MMFR0_PARANGE_SHIFT	0
- 
-+#define ID_AA64MMFR0_ASID_8		0x0
-+#define ID_AA64MMFR0_ASID_16		0x2
+ /* Hyp Configuration Register (HCR) bits */
 +
- #define ID_AA64MMFR0_TGRAN4_NI		0xf
- #define ID_AA64MMFR0_TGRAN4_SUPPORTED	0x0
- #define ID_AA64MMFR0_TGRAN64_NI		0xf
- #define ID_AA64MMFR0_TGRAN64_SUPPORTED	0x0
- #define ID_AA64MMFR0_TGRAN16_NI		0x0
- #define ID_AA64MMFR0_TGRAN16_SUPPORTED	0x1
-+#define ID_AA64MMFR0_PARANGE_40		0x2
- #define ID_AA64MMFR0_PARANGE_48		0x5
- #define ID_AA64MMFR0_PARANGE_52		0x6
++#define HCR_TID5	(UL(1) << 58)
++#define HCR_DCT		(UL(1) << 57)
+ #define HCR_ATA_SHIFT	56
+ #define HCR_ATA		(UL(1) << HCR_ATA_SHIFT)
++#define HCR_AMVOFFEN	(UL(1) << 51)
++#define HCR_FIEN	(UL(1) << 47)
+ #define HCR_FWB		(UL(1) << 46)
+ #define HCR_API		(UL(1) << 41)
+ #define HCR_APK		(UL(1) << 40)
+@@ -56,6 +61,7 @@
+ #define HCR_PTW		(UL(1) << 2)
+ #define HCR_SWIO	(UL(1) << 1)
+ #define HCR_VM		(UL(1) << 0)
++#define HCR_RES0	((UL(1) << 48) | (UL(1) << 39))
  
-@@ -900,6 +903,7 @@
- #define ID_AA64MMFR2_CNP_SHIFT		0
+ /*
+  * The bits we set in HCR:
+@@ -277,11 +283,21 @@
+ #define CPTR_EL2_TZ	(1 << 8)
+ #define CPTR_NVHE_EL2_RES1	0x000032ff /* known RES1 bits in CPTR_EL2 (nVHE) */
+ #define CPTR_EL2_DEFAULT	CPTR_NVHE_EL2_RES1
++#define CPTR_NVHE_EL2_RES0	(GENMASK(63, 32) |	\
++				 GENMASK(29, 21) |	\
++				 GENMASK(19, 14) |	\
++				 BIT(11))
  
- /* id_aa64dfr0 */
-+#define ID_AA64DFR0_MTPMU_SHIFT		48
- #define ID_AA64DFR0_TRBE_SHIFT		44
- #define ID_AA64DFR0_TRACE_FILT_SHIFT	40
- #define ID_AA64DFR0_DOUBLELOCK_SHIFT	36
-diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
-index 0ead8bfedf20..5b59fe5e26e4 100644
---- a/arch/arm64/kernel/cpufeature.c
-+++ b/arch/arm64/kernel/cpufeature.c
-@@ -239,8 +239,8 @@ static const struct arm64_ftr_bits ftr_id_aa64pfr0[] = {
- 	S_ARM64_FTR_BITS(FTR_VISIBLE, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64PFR0_FP_SHIFT, 4, ID_AA64PFR0_FP_NI),
- 	ARM64_FTR_BITS(FTR_HIDDEN, FTR_NONSTRICT, FTR_LOWER_SAFE, ID_AA64PFR0_EL3_SHIFT, 4, 0),
- 	ARM64_FTR_BITS(FTR_HIDDEN, FTR_NONSTRICT, FTR_LOWER_SAFE, ID_AA64PFR0_EL2_SHIFT, 4, 0),
--	ARM64_FTR_BITS(FTR_HIDDEN, FTR_NONSTRICT, FTR_LOWER_SAFE, ID_AA64PFR0_EL1_SHIFT, 4, ID_AA64PFR0_EL1_64BIT_ONLY),
--	ARM64_FTR_BITS(FTR_HIDDEN, FTR_NONSTRICT, FTR_LOWER_SAFE, ID_AA64PFR0_EL0_SHIFT, 4, ID_AA64PFR0_EL0_64BIT_ONLY),
-+	ARM64_FTR_BITS(FTR_HIDDEN, FTR_NONSTRICT, FTR_LOWER_SAFE, ID_AA64PFR0_EL1_SHIFT, 4, ID_AA64PFR0_ELx_64BIT_ONLY),
-+	ARM64_FTR_BITS(FTR_HIDDEN, FTR_NONSTRICT, FTR_LOWER_SAFE, ID_AA64PFR0_EL0_SHIFT, 4, ID_AA64PFR0_ELx_64BIT_ONLY),
- 	ARM64_FTR_END,
- };
+ /* Hyp Debug Configuration Register bits */
+ #define MDCR_EL2_E2TB_MASK	(UL(0x3))
+ #define MDCR_EL2_E2TB_SHIFT	(UL(24))
++#define MDCR_EL2_HPMFZS		(UL(1) << 36)
++#define MDCR_EL2_HPMFZO		(UL(1) << 29)
++#define MDCR_EL2_MTPME		(UL(1) << 28)
++#define MDCR_EL2_TDCC		(UL(1) << 27)
++#define MDCR_EL2_HCCD		(UL(1) << 23)
+ #define MDCR_EL2_TTRF		(UL(1) << 19)
++#define MDCR_EL2_HPMD		(UL(1) << 17)
+ #define MDCR_EL2_TPMS		(UL(1) << 14)
+ #define MDCR_EL2_E2PB_MASK	(UL(0x3))
+ #define MDCR_EL2_E2PB_SHIFT	(UL(12))
+@@ -293,6 +309,12 @@
+ #define MDCR_EL2_TPM		(UL(1) << 6)
+ #define MDCR_EL2_TPMCR		(UL(1) << 5)
+ #define MDCR_EL2_HPMN_MASK	(UL(0x1F))
++#define MDCR_EL2_RES0		(GENMASK(63, 37) |	\
++				 GENMASK(35, 30) |	\
++				 GENMASK(25, 24) |	\
++				 GENMASK(22, 20) |	\
++				 BIT(18) |		\
++				 GENMASK(16, 15))
  
-@@ -1956,7 +1956,7 @@ static const struct arm64_cpu_capabilities arm64_features[] = {
- 		.sys_reg = SYS_ID_AA64PFR0_EL1,
- 		.sign = FTR_UNSIGNED,
- 		.field_pos = ID_AA64PFR0_EL0_SHIFT,
--		.min_field_value = ID_AA64PFR0_EL0_32BIT_64BIT,
-+		.min_field_value = ID_AA64PFR0_ELx_32BIT_64BIT,
- 	},
- #ifdef CONFIG_KVM
- 	{
-@@ -1967,7 +1967,7 @@ static const struct arm64_cpu_capabilities arm64_features[] = {
- 		.sys_reg = SYS_ID_AA64PFR0_EL1,
- 		.sign = FTR_UNSIGNED,
- 		.field_pos = ID_AA64PFR0_EL1_SHIFT,
--		.min_field_value = ID_AA64PFR0_EL1_32BIT_64BIT,
-+		.min_field_value = ID_AA64PFR0_ELx_32BIT_64BIT,
- 	},
- 	{
- 		.desc = "Protected KVM",
+ /* For compatibility with fault code shared with 32-bit */
+ #define FSC_FAULT	ESR_ELx_FSC_FAULT
 -- 
 2.33.0.rc1.237.g0d66db33f3-goog
 
