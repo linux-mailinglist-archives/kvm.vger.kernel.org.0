@@ -2,33 +2,33 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0A5283EE9E5
-	for <lists+kvm@lfdr.de>; Tue, 17 Aug 2021 11:31:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id F03843EE9E8
+	for <lists+kvm@lfdr.de>; Tue, 17 Aug 2021 11:31:59 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239377AbhHQJcL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 17 Aug 2021 05:32:11 -0400
+        id S237180AbhHQJcO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 17 Aug 2021 05:32:14 -0400
 Received: from mga01.intel.com ([192.55.52.88]:49582 "EHLO mga01.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S237640AbhHQJcK (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 17 Aug 2021 05:32:10 -0400
-X-IronPort-AV: E=McAfee;i="6200,9189,10078"; a="238111520"
+        id S237640AbhHQJcM (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 17 Aug 2021 05:32:12 -0400
+X-IronPort-AV: E=McAfee;i="6200,9189,10078"; a="238111532"
 X-IronPort-AV: E=Sophos;i="5.84,328,1620716400"; 
-   d="scan'208";a="238111520"
+   d="scan'208";a="238111532"
 Received: from fmsmga007.fm.intel.com ([10.253.24.52])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Aug 2021 02:31:37 -0700
+  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Aug 2021 02:31:40 -0700
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.84,328,1620716400"; 
-   d="scan'208";a="449200718"
+   d="scan'208";a="449200730"
 Received: from sqa-gate.sh.intel.com (HELO robert-ivt.tsp.org) ([10.239.48.212])
-  by fmsmga007.fm.intel.com with ESMTP; 17 Aug 2021 02:31:35 -0700
+  by fmsmga007.fm.intel.com with ESMTP; 17 Aug 2021 02:31:37 -0700
 From:   Robert Hoo <robert.hu@linux.intel.com>
 To:     seanjc@google.com, pbonzini@redhat.com, vkuznets@redhat.com,
         wanpengli@tencent.com, jmattson@google.com, joro@8bytes.org
 Cc:     kvm@vger.kernel.org, yu.c.zhang@linux.intel.com,
         Robert Hoo <robert.hu@linux.intel.com>
-Subject: [PATCH v1 3/5] KVM: x86: nVMX: VMCS12 field's read/write respects field existence bitmap
-Date:   Tue, 17 Aug 2021 17:31:11 +0800
-Message-Id: <1629192673-9911-4-git-send-email-robert.hu@linux.intel.com>
+Subject: [PATCH v1 4/5] KVM: x86: nVMX: Respect vmcs12 field existence when calc vmx_vmcs_enum_msr
+Date:   Tue, 17 Aug 2021 17:31:12 +0800
+Message-Id: <1629192673-9911-5-git-send-email-robert.hu@linux.intel.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1629192673-9911-1-git-send-email-robert.hu@linux.intel.com>
 References: <1629192673-9911-1-git-send-email-robert.hu@linux.intel.com>
@@ -36,156 +36,91 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-In vmcs12_{read,write}_any(), check the field exist or not. If not, return
-failure. Hence their function prototype changed a little accordingly.
-In handle_vm{read,write}(), above function's caller, check return value, if
-failed, emulate nested vmx fail with instruction error of
-VMXERR_UNSUPPORTED_VMCS_COMPONENT.
+Check each fields existence when calculating vmx_vmcs_enum_msr.
+Note, in initial nested VMX Ctrl MSRs setup, the early stage before VM is
+created, we have no idea about VMX features user space would set, therefore
+set to raw physical MSR's value for user space's reference.
+After vCPU features are settled, we update dynamic field's existence.
 
 Signed-off-by: Robert Hoo <robert.hu@linux.intel.com>
 Signed-off-by: Yu Zhang <yu.c.zhang@linux.intel.com>
 ---
- arch/x86/kvm/vmx/nested.c | 20 ++++++++++++------
- arch/x86/kvm/vmx/vmcs12.h | 43 ++++++++++++++++++++++++++++++---------
- 2 files changed, 47 insertions(+), 16 deletions(-)
+ arch/x86/kvm/vmx/nested.c | 15 ++++++++++++---
+ arch/x86/kvm/vmx/nested.h |  1 +
+ arch/x86/kvm/vmx/vmx.c    |  5 ++++-
+ 3 files changed, 17 insertions(+), 4 deletions(-)
 
 diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-index b8121f8f6d96..9a35953ede22 100644
+index 9a35953ede22..9a733c703662 100644
 --- a/arch/x86/kvm/vmx/nested.c
 +++ b/arch/x86/kvm/vmx/nested.c
-@@ -1547,7 +1547,8 @@ static void copy_shadow_to_vmcs12(struct vcpu_vmx *vmx)
- 	for (i = 0; i < max_shadow_read_write_fields; i++) {
- 		field = shadow_read_write_fields[i];
- 		val = __vmcs_readl(field.encoding);
--		vmcs12_write_any(vmcs12, field.encoding, field.offset, val);
-+		vmcs12_write_any(vmcs12, field.encoding, field.offset, val,
-+				 vmx->nested.vmcs12_field_existence_bitmap);
- 	}
- 
- 	vmcs_clear(shadow_vmcs);
-@@ -1580,8 +1581,9 @@ static void copy_vmcs12_to_shadow(struct vcpu_vmx *vmx)
- 	for (q = 0; q < ARRAY_SIZE(fields); q++) {
- 		for (i = 0; i < max_fields[q]; i++) {
- 			field = fields[q][i];
--			val = vmcs12_read_any(vmcs12, field.encoding,
--					      field.offset);
-+			vmcs12_read_any(vmcs12, field.encoding,
-+					      field.offset, &val,
-+					      vmx->nested.vmcs12_field_existence_bitmap);
- 			__vmcs_writel(field.encoding, val);
- 		}
- 	}
-@@ -5070,7 +5072,7 @@ static int handle_vmread(struct kvm_vcpu *vcpu)
- 	struct vcpu_vmx *vmx = to_vmx(vcpu);
- 	struct x86_exception e;
- 	unsigned long field;
--	u64 value;
-+	unsigned long value;
- 	gva_t gva = 0;
- 	short offset;
- 	int len, r;
-@@ -5098,7 +5100,10 @@ static int handle_vmread(struct kvm_vcpu *vcpu)
- 		copy_vmcs02_to_vmcs12_rare(vcpu, vmcs12);
- 
- 	/* Read the field, zero-extended to a u64 value */
--	value = vmcs12_read_any(vmcs12, field, offset);
-+	r = vmcs12_read_any(vmcs12, field, offset, &value,
-+				vmx->nested.vmcs12_field_existence_bitmap);
-+	if (r < 0)
-+		return nested_vmx_fail(vcpu, VMXERR_UNSUPPORTED_VMCS_COMPONENT);
- 
- 	/*
- 	 * Now copy part of this value to register or memory, as requested.
-@@ -5223,7 +5228,10 @@ static int handle_vmwrite(struct kvm_vcpu *vcpu)
- 	if (field >= GUEST_ES_AR_BYTES && field <= GUEST_TR_AR_BYTES)
- 		value &= 0x1f0ff;
- 
--	vmcs12_write_any(vmcs12, field, offset, value);
-+	r = vmcs12_write_any(vmcs12, field, offset, value,
-+			 vmx->nested.vmcs12_field_existence_bitmap);
-+	if (r < 0)
-+		return nested_vmx_fail(vcpu, VMXERR_UNSUPPORTED_VMCS_COMPONENT);
- 
- 	/*
- 	 * Do not track vmcs12 dirty-state if in guest-mode as we actually
-diff --git a/arch/x86/kvm/vmx/vmcs12.h b/arch/x86/kvm/vmx/vmcs12.h
-index 5c39370dff3c..9ac3d6ac1b6b 100644
---- a/arch/x86/kvm/vmx/vmcs12.h
-+++ b/arch/x86/kvm/vmx/vmcs12.h
-@@ -413,31 +413,51 @@ static inline short vmcs_field_to_offset(unsigned long field)
- 
- #undef ROL16
- 
--static inline u64 vmcs12_read_any(struct vmcs12 *vmcs12, unsigned long field,
--				  u16 offset)
-+static inline int vmcs12_read_any(struct vmcs12 *vmcs12, unsigned long field,
-+				  u16 offset, unsigned long *value, unsigned long *bitmap)
+@@ -6421,8 +6421,7 @@ void nested_vmx_set_vmcs_shadowing_bitmap(void)
+  * that madness to get the encoding for comparison.
+  */
+ #define VMCS12_IDX_TO_ENC(idx) ((u16)(((u16)(idx) >> 6) | ((u16)(idx) << 10)))
+-
+-static u64 nested_vmx_calc_vmcs_enum_msr(void)
++u64 nested_vmx_calc_vmcs_enum_msr(struct nested_vmx *nvmx)
  {
- 	char *p = (char *)vmcs12 + offset;
+ 	/*
+ 	 * Note these are the so called "index" of the VMCS field encoding, not
+@@ -6442,6 +6441,15 @@ static u64 nested_vmx_calc_vmcs_enum_msr(void)
+ 		if (!vmcs_field_to_offset_table[i])
+ 			continue;
  
-+	if (unlikely(bitmap == NULL)) {
-+		pr_err_once("vmcs12 read: NULL bitmap");
-+		return -EINVAL;
-+	}
-+	if (!test_bit(offset / sizeof(u16), bitmap))
-+		return -ENOENT;
++		if (unlikely(!nvmx->vmcs12_field_existence_bitmap)) {
++			WARN_ON(1);
++			break;
++		}
 +
- 	switch (vmcs_field_width(field)) {
- 	case VMCS_FIELD_WIDTH_NATURAL_WIDTH:
--		return *((natural_width *)p);
-+		*value = *((natural_width *)p);
-+		break;
- 	case VMCS_FIELD_WIDTH_U16:
--		return *((u16 *)p);
-+		*value = *((u16 *)p);
-+		break;
- 	case VMCS_FIELD_WIDTH_U32:
--		return *((u32 *)p);
-+		*value = *((u32 *)p);
-+		break;
- 	case VMCS_FIELD_WIDTH_U64:
--		return *((u64 *)p);
-+		*value = *((u64 *)p);
-+		break;
- 	default:
- 		WARN_ON_ONCE(1);
--		return -1;
-+		return -ENOENT;
- 	}
++		if (!test_bit(vmcs_field_to_offset_table[i] / sizeof(u16),
++		    nvmx->vmcs12_field_existence_bitmap))
++			continue;
 +
-+	return 0;
+ 		idx = vmcs_field_index(VMCS12_IDX_TO_ENC(i));
+ 		if (idx > max_idx)
+ 			max_idx = idx;
+@@ -6695,7 +6703,8 @@ void nested_vmx_setup_ctls_msrs(struct nested_vmx_msrs *msrs, u32 ept_caps)
+ 	rdmsrl(MSR_IA32_VMX_CR0_FIXED1, msrs->cr0_fixed1);
+ 	rdmsrl(MSR_IA32_VMX_CR4_FIXED1, msrs->cr4_fixed1);
+ 
+-	msrs->vmcs_enum = nested_vmx_calc_vmcs_enum_msr();
++	/* In initial setup, simply read HW value for reference */
++	rdmsrl(MSR_IA32_VMX_VMCS_ENUM, msrs->vmcs_enum);
  }
  
--static inline void vmcs12_write_any(struct vmcs12 *vmcs12, unsigned long field,
--				    u16 offset, u64 field_value)
-+static inline int vmcs12_write_any(struct vmcs12 *vmcs12, unsigned long field,
-+				    u16 offset, u64 field_value, unsigned long *bitmap)
+ void nested_vmx_hardware_unsetup(void)
+diff --git a/arch/x86/kvm/vmx/nested.h b/arch/x86/kvm/vmx/nested.h
+index b69a80f43b37..34235d276aad 100644
+--- a/arch/x86/kvm/vmx/nested.h
++++ b/arch/x86/kvm/vmx/nested.h
+@@ -36,6 +36,7 @@ void nested_vmx_pmu_entry_exit_ctls_update(struct kvm_vcpu *vcpu);
+ void nested_mark_vmcs12_pages_dirty(struct kvm_vcpu *vcpu);
+ bool nested_vmx_check_io_bitmaps(struct kvm_vcpu *vcpu, unsigned int port,
+ 				 int size);
++u64 nested_vmx_calc_vmcs_enum_msr(struct nested_vmx *nvmx);
+ 
+ static inline struct vmcs12 *get_vmcs12(struct kvm_vcpu *vcpu)
  {
- 	char *p = (char *)vmcs12 + offset;
- 
-+	if (unlikely(bitmap == NULL)) {
-+		pr_err_once("%s: NULL bitmap", __func__);
-+		return -EINVAL;
-+	}
-+	if (!test_bit(offset / sizeof(u16), bitmap))
-+		return -ENOENT;
-+
- 	switch (vmcs_field_width(field)) {
- 	case VMCS_FIELD_WIDTH_U16:
- 		*(u16 *)p = field_value;
-@@ -453,8 +473,11 @@ static inline void vmcs12_write_any(struct vmcs12 *vmcs12, unsigned long field,
- 		break;
- 	default:
- 		WARN_ON_ONCE(1);
--		break;
-+		return -ENOENT;
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index 6ab37e1d04c9..f44a4971cc8d 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -7156,10 +7156,13 @@ static void vmx_vcpu_after_set_cpuid(struct kvm_vcpu *vcpu)
+ 		vmcs_set_secondary_exec_control(vmx);
  	}
-+
-+	return 0;
- }
  
-+
- #endif /* __KVM_X86_VMX_VMCS12_H */
+-	if (nested_vmx_allowed(vcpu))
++	if (nested_vmx_allowed(vcpu)) {
+ 		to_vmx(vcpu)->msr_ia32_feature_control_valid_bits |=
+ 			FEAT_CTL_VMX_ENABLED_INSIDE_SMX |
+ 			FEAT_CTL_VMX_ENABLED_OUTSIDE_SMX;
++		to_vmx(vcpu)->nested.msrs.vmcs_enum =
++			nested_vmx_calc_vmcs_enum_msr(&to_vmx(vcpu)->nested);
++	}
+ 	else
+ 		to_vmx(vcpu)->msr_ia32_feature_control_valid_bits &=
+ 			~(FEAT_CTL_VMX_ENABLED_INSIDE_SMX |
 -- 
 2.27.0
 
