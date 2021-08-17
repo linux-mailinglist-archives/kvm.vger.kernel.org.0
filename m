@@ -2,163 +2,86 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id CBAAF3EEFE4
-	for <lists+kvm@lfdr.de>; Tue, 17 Aug 2021 17:59:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EED603EF005
+	for <lists+kvm@lfdr.de>; Tue, 17 Aug 2021 18:13:59 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240332AbhHQP7f (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 17 Aug 2021 11:59:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48250 "EHLO
+        id S230019AbhHQQOb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 17 Aug 2021 12:14:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51928 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241126AbhHQP7U (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 17 Aug 2021 11:59:20 -0400
-Received: from mail-pj1-x1036.google.com (mail-pj1-x1036.google.com [IPv6:2607:f8b0:4864:20::1036])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 338C4C0698D7
-        for <kvm@vger.kernel.org>; Tue, 17 Aug 2021 08:54:45 -0700 (PDT)
-Received: by mail-pj1-x1036.google.com with SMTP id mq2-20020a17090b3802b0290178911d298bso7042652pjb.1
-        for <kvm@vger.kernel.org>; Tue, 17 Aug 2021 08:54:45 -0700 (PDT)
+        with ESMTP id S229958AbhHQQOa (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 17 Aug 2021 12:14:30 -0400
+Received: from mail-lf1-x132.google.com (mail-lf1-x132.google.com [IPv6:2a00:1450:4864:20::132])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 71220C061764
+        for <kvm@vger.kernel.org>; Tue, 17 Aug 2021 09:13:57 -0700 (PDT)
+Received: by mail-lf1-x132.google.com with SMTP id r9so32957681lfn.3
+        for <kvm@vger.kernel.org>; Tue, 17 Aug 2021 09:13:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=I1l3vZa0URKOckP8ZHcl+lHfQe0Kl3UQRzLmDqnGS5U=;
-        b=czc5bHBd4pE61LajmSvZA9qVMzb7K1LIIpHFoK7naUz/DrEH6GsyB/vtfxxH7MeMHC
-         oFxES/GzckeHiNOoYE3eK2W65/I+pe2/W7Y7o4++P2U9aR3DiL5vBJr3ElmFh8LDD4NE
-         p/2302BHhPW3kAVjKIEmCxEmOOigwxfEYmWpCYt+wratu4wehskS2Vv+j75xJjOx8iQe
-         sxpCvIJLN8iAIifnBLUNt/bILG8K65zZIzNmT+dg6NgqtogFYqiyDHXLyI4keLt4OJwD
-         p1A6LzggV+eCX7pFdiZKbfItYGm9Fb0CK+fYpKo9qC5y+a889tsjC087sdycQJxE9yKp
-         K9oA==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=fz45eN0YQHrKq12xvU/L4mmZWr7+0QJnj2cWINTpG+U=;
+        b=e/fBzXAGdi+9wuL+52RbMoiWcCtf/FmvvhByvW5Y7kXwBCi1sHxMUn1+Eu1S2LO7/n
+         oR5ZbehPiEM6Yd4Q4SkKhTdLXeoFLJYVP3q9pd6dsHf0RdEtEq0SiSC2G1NXnmZL6zHD
+         Z6gq4Z41ORn1MQvyHD1AdwIPvyuKI56I4RxrzHps6dk1fG8//Y+VTSuaoWYM4sgjs3SE
+         fVCA3VYhvIH4j4LPiebbpPiExKzhziyiqKDq5XfPHKP1TU4GlQgtXCUa9n9U0UgyNUOe
+         pjvGzSqaUy4oho/jVz5CB21dkiJ3phqhNMi30LGmJiFb3JguHUAD1OVA+0badBhDuNS6
+         mdLQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=I1l3vZa0URKOckP8ZHcl+lHfQe0Kl3UQRzLmDqnGS5U=;
-        b=kY4GMGqIWDEWvSs3d271i9/r1L9qZOzZCCEzH3hssDosE8kfJvxilFIfeANPdLdI2d
-         2BzB/cibICD1R4mFKIrLNlMJQxCxcNtBoVCI+r9Mmio8nROFnsoSkd1I56cj57j4borX
-         O1E5fO3akiJuTMc5zANAQIbIfCzK0hN18pTYFjW4oHvUAgiw+ciAj3w7BfHwUlyiRJ34
-         JxBgHdZVqlRpTakoRL2gpLkZR85QNWHN9r6kQSNgurIj9z8XBOcf+bZ9B1cgdhVDY+gw
-         7tZvMH+QMLsVTEZUryq2TkZor9sQ3Dn6+U59tr9pwUmO/ueeE4wQcEJ8HrwYFvjU5Dcv
-         uFjA==
-X-Gm-Message-State: AOAM531a1Y9SrjYFHEfzxgHuc1DvZ/oQG8VoxjO/kk9nHTOJYIL4SPmI
-        17QP8q6ugyDZ4XAob+hg7ZlZhg==
-X-Google-Smtp-Source: ABdhPJxJLTgQK/vAiqla8Vk97OlAx7/e1Q0CJK9MNPf5E1wI7Xh8Eb3eE3HzeUjTPkkFONhKH8MRnw==
-X-Received: by 2002:a65:67d8:: with SMTP id b24mr4123928pgs.407.1629215684481;
-        Tue, 17 Aug 2021 08:54:44 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id y12sm3099983pfa.25.2021.08.17.08.54.43
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 17 Aug 2021 08:54:43 -0700 (PDT)
-Date:   Tue, 17 Aug 2021 15:54:38 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Robert Hoo <robert.hu@linux.intel.com>
-Cc:     pbonzini@redhat.com, vkuznets@redhat.com, wanpengli@tencent.com,
-        jmattson@google.com, joro@8bytes.org, kvm@vger.kernel.org,
-        yu.c.zhang@linux.intel.com
-Subject: Re: [PATCH v1 3/5] KVM: x86: nVMX: VMCS12 field's read/write
- respects field existence bitmap
-Message-ID: <YRvbvqhz6sknDEWe@google.com>
-References: <1629192673-9911-1-git-send-email-robert.hu@linux.intel.com>
- <1629192673-9911-4-git-send-email-robert.hu@linux.intel.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=fz45eN0YQHrKq12xvU/L4mmZWr7+0QJnj2cWINTpG+U=;
+        b=U+m7HuJ7aDlqKblK46Er9qkfA0v47+6G1bXS5TgzPe5dQrcVAtY3hM9Up+Duy2faWM
+         1ASeOXgJszkhHekRR2rqCC89CfOC1DXk+b9T34OXbhgMTPSG3lCQrps0zNANZxffVfY6
+         4FKI/3J2suQ6F53c6yIu7CIXWjokNoGrG5pD2qrsNBLM99Gy+9tGouuIn/rTcB7HxYUO
+         ZWAL9EgCvk+4Twx4A/wJK8wa1S2Sp6BX05Yu6Gd6TFjaPa/X+htocm/LwtGdoeAIrPuI
+         C6lt2sIizI39kVnUUcKXJz/6jPaM2raqQo0nUXMx/OEnZfta2/bpQF2P/x8nU8N5WBE6
+         6/Qw==
+X-Gm-Message-State: AOAM530suG3xT5uE63gQ5M0GBVYYSKaIHEAEtmAi5OPUXNZ3ZyPaklS7
+        eFb6OBpFkv2xEwZ0E4cuBCl7vzCI8kXMOTuwGg1jFQ==
+X-Google-Smtp-Source: ABdhPJwAmYsV/GTAPBww3boiqGtk0HFPfKSKeHhWavXFO5X6kDFymmHw46nVdMIe/t/QYb0/fC1cJDA5Vv9R6puRLyE=
+X-Received: by 2002:ac2:4e62:: with SMTP id y2mr3090399lfs.9.1629216835591;
+ Tue, 17 Aug 2021 09:13:55 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1629192673-9911-4-git-send-email-robert.hu@linux.intel.com>
+References: <20210813203504.2742757-1-dmatlack@google.com> <20210813203504.2742757-4-dmatlack@google.com>
+ <613778fe-475d-fcd6-7046-55f05ee1be6c@redhat.com>
+In-Reply-To: <613778fe-475d-fcd6-7046-55f05ee1be6c@redhat.com>
+From:   David Matlack <dmatlack@google.com>
+Date:   Tue, 17 Aug 2021 09:13:29 -0700
+Message-ID: <CALzav=cXzvWnSP3d_Krcwa3wUteoFe+ufd=37W+9ug+BGMhcGg@mail.gmail.com>
+Subject: Re: [RFC PATCH 3/6] KVM: x86/mmu: Pass the memslot around via struct kvm_page_fault
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     kvm list <kvm@vger.kernel.org>, Ben Gardon <bgardon@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Jim Mattson <jmattson@google.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Sean Christopherson <seanjc@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Aug 17, 2021, Robert Hoo wrote:
-> In vmcs12_{read,write}_any(), check the field exist or not. If not, return
-> failure. Hence their function prototype changed a little accordingly.
-> In handle_vm{read,write}(), above function's caller, check return value, if
-> failed, emulate nested vmx fail with instruction error of
-> VMXERR_UNSUPPORTED_VMCS_COMPONENT.
-> 
-> Signed-off-by: Robert Hoo <robert.hu@linux.intel.com>
-> Signed-off-by: Yu Zhang <yu.c.zhang@linux.intel.com>
+On Tue, Aug 17, 2021 at 6:00 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
+>
+> On 13/08/21 22:35, David Matlack wrote:
+> > -     if (is_writable_pte(new_spte) && !is_writable_pte(old_spte)) {
+> > -             /*
+> > -              * The gfn of direct spte is stable since it is
+> > -              * calculated by sp->gfn.
+> > -              */
+> > -             gfn = kvm_mmu_page_get_gfn(sp, sptep - sp->spt);
+> > -             kvm_vcpu_mark_page_dirty(vcpu, gfn);
+> > -     }
+> > +     if (is_writable_pte(new_spte) && !is_writable_pte(old_spte))
+> > +             mark_page_dirty_in_slot(vcpu->kvm, fault->slot, fault->gfn);
+>
+> Oops, this actually needs kvm_vcpu_mark_page_dirty to receive the slot.
 
-Assuming Yu is a co-author, this needs to be:
+What do you mean? kvm_vcpu_mark_page_dirty ultimately just calls
+mark_page_dirty_in_slot.
 
-  Co-developed-by: Yu Zhang <yu.c.zhang@linux.intel.com>
-  Signed-off-by: Yu Zhang <yu.c.zhang@linux.intel.com>
-  Signed-off-by: Robert Hoo <robert.hu@linux.intel.com>
-
-See "When to use Acked-by:, Cc:, and Co-developed-by:" in
-Documentation/process/submitting-patches.rst.
-
-> ---
->  arch/x86/kvm/vmx/nested.c | 20 ++++++++++++------
->  arch/x86/kvm/vmx/vmcs12.h | 43 ++++++++++++++++++++++++++++++---------
->  2 files changed, 47 insertions(+), 16 deletions(-)
-> 
-> diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-> index b8121f8f6d96..9a35953ede22 100644
-> --- a/arch/x86/kvm/vmx/nested.c
-> +++ b/arch/x86/kvm/vmx/nested.c
-> @@ -1547,7 +1547,8 @@ static void copy_shadow_to_vmcs12(struct vcpu_vmx *vmx)
->  	for (i = 0; i < max_shadow_read_write_fields; i++) {
->  		field = shadow_read_write_fields[i];
->  		val = __vmcs_readl(field.encoding);
-> -		vmcs12_write_any(vmcs12, field.encoding, field.offset, val);
-> +		vmcs12_write_any(vmcs12, field.encoding, field.offset, val,
-> +				 vmx->nested.vmcs12_field_existence_bitmap);
-
-There is no need to perform existence checks when KVM is copying to/from vmcs12,
-the checks are only needed for VMREAD and VMWRITE.  Architecturally, the VMCS is
-an opaque blob, software cannot rely on any assumptions about its layout or data,
-i.e. KVM is free to read/write whatever it wants.   VMREAD and VMWRITE need to be
-enforced because architecturally they are defined to fail if the field does not exist.
-
-Limiting this to VMREAD/VMWRITE means we shouldn't need a bitmap and can use a
-more static lookup, e.g. a switch statement.  And an idea to optimize for fields
-that unconditionally exist would be to use bit 0 in the field->offset table to
-denote conditional fields, e.g. the VMREAD/VMRITE lookups could be something like:
-
-diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-index bc6327950657..ef8c48f80d1a 100644
---- a/arch/x86/kvm/vmx/nested.c
-+++ b/arch/x86/kvm/vmx/nested.c
-@@ -5064,7 +5064,7 @@ static int handle_vmread(struct kvm_vcpu *vcpu)
-        /* Decode instruction info and find the field to read */
-        field = kvm_register_read(vcpu, (((instr_info) >> 28) & 0xf));
-
--       offset = vmcs_field_to_offset(field);
-+       offset = vmcs_field_to_offset(vmx, field);
-        if (offset < 0)
-                return nested_vmx_fail(vcpu, VMXERR_UNSUPPORTED_VMCS_COMPONENT);
-
-@@ -5167,7 +5167,7 @@ static int handle_vmwrite(struct kvm_vcpu *vcpu)
-
-        field = kvm_register_read(vcpu, (((instr_info) >> 28) & 0xf));
-
--       offset = vmcs_field_to_offset(field);
-+       offset = vmcs_field_to_offset(vmx, field);
-        if (offset < 0)
-                return nested_vmx_fail(vcpu, VMXERR_UNSUPPORTED_VMCS_COMPONENT);
-
-diff --git a/arch/x86/kvm/vmx/vmcs12.h b/arch/x86/kvm/vmx/vmcs12.h
-index 2a45f026ee11..3c27631e0119 100644
---- a/arch/x86/kvm/vmx/vmcs12.h
-+++ b/arch/x86/kvm/vmx/vmcs12.h
-@@ -364,7 +364,8 @@ static inline void vmx_check_vmcs12_offsets(void)
- extern const unsigned short vmcs_field_to_offset_table[];
- extern const unsigned int nr_vmcs12_fields;
-
--static inline short vmcs_field_to_offset(unsigned long field)
-+static inline short vmcs_field_to_offset(struct vcpu_vmx *vmx,
-+                                        unsigned long field)
- {
-        unsigned short offset;
-        unsigned int index;
-@@ -378,9 +379,10 @@ static inline short vmcs_field_to_offset(unsigned long field)
-
-        index = array_index_nospec(index, nr_vmcs12_fields);
-        offset = vmcs_field_to_offset_table[index];
--       if (offset == 0)
-+       if (offset == 0 ||
-+           ((offset & 1) && !vmcs12_field_exists(vmx, field)))
-                return -ENOENT;
--       return offset;
-+       return offset & ~1;
- }
-
- static inline u64 vmcs12_read_any(struct vmcs12 *vmcs12, unsigned long field,
+>
+> Paolo
+>
