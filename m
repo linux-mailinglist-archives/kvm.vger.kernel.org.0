@@ -2,86 +2,128 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id EED603EF005
-	for <lists+kvm@lfdr.de>; Tue, 17 Aug 2021 18:13:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2A57D3EF038
+	for <lists+kvm@lfdr.de>; Tue, 17 Aug 2021 18:32:50 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230019AbhHQQOb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 17 Aug 2021 12:14:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51928 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229958AbhHQQOa (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 17 Aug 2021 12:14:30 -0400
-Received: from mail-lf1-x132.google.com (mail-lf1-x132.google.com [IPv6:2a00:1450:4864:20::132])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 71220C061764
-        for <kvm@vger.kernel.org>; Tue, 17 Aug 2021 09:13:57 -0700 (PDT)
-Received: by mail-lf1-x132.google.com with SMTP id r9so32957681lfn.3
-        for <kvm@vger.kernel.org>; Tue, 17 Aug 2021 09:13:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=fz45eN0YQHrKq12xvU/L4mmZWr7+0QJnj2cWINTpG+U=;
-        b=e/fBzXAGdi+9wuL+52RbMoiWcCtf/FmvvhByvW5Y7kXwBCi1sHxMUn1+Eu1S2LO7/n
-         oR5ZbehPiEM6Yd4Q4SkKhTdLXeoFLJYVP3q9pd6dsHf0RdEtEq0SiSC2G1NXnmZL6zHD
-         Z6gq4Z41ORn1MQvyHD1AdwIPvyuKI56I4RxrzHps6dk1fG8//Y+VTSuaoWYM4sgjs3SE
-         fVCA3VYhvIH4j4LPiebbpPiExKzhziyiqKDq5XfPHKP1TU4GlQgtXCUa9n9U0UgyNUOe
-         pjvGzSqaUy4oho/jVz5CB21dkiJ3phqhNMi30LGmJiFb3JguHUAD1OVA+0badBhDuNS6
-         mdLQ==
+        id S229983AbhHQQdW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 17 Aug 2021 12:33:22 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:40374 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229477AbhHQQdV (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 17 Aug 2021 12:33:21 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1629217967;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=AwlQ32nbtd+hjp/fxoi8kJbjSm7VsIyjZaetwBPpk0Y=;
+        b=L3mX7e/3FQ07dNfGdveW1MZDCWWeirp0c+Fb/AQYWN8tPmgdjM8OG8dG7/0uJngS2rVe00
+        G6KkwIX7ZDerI+ewqxDZ629rnF5AGue1UXBY5RHGNH7SbQB41Dzk9hcWXyz3pjlI4emwMJ
+        CIRewr6yc+R1PTPSRlbKzYAvDjeQk+s=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-118-whk63u52Nf-yYNrHWQVqzw-1; Tue, 17 Aug 2021 12:32:46 -0400
+X-MC-Unique: whk63u52Nf-yYNrHWQVqzw-1
+Received: by mail-wm1-f71.google.com with SMTP id f19-20020a1c1f13000000b002e6bd83c344so946596wmf.3
+        for <kvm@vger.kernel.org>; Tue, 17 Aug 2021 09:32:46 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=fz45eN0YQHrKq12xvU/L4mmZWr7+0QJnj2cWINTpG+U=;
-        b=U+m7HuJ7aDlqKblK46Er9qkfA0v47+6G1bXS5TgzPe5dQrcVAtY3hM9Up+Duy2faWM
-         1ASeOXgJszkhHekRR2rqCC89CfOC1DXk+b9T34OXbhgMTPSG3lCQrps0zNANZxffVfY6
-         4FKI/3J2suQ6F53c6yIu7CIXWjokNoGrG5pD2qrsNBLM99Gy+9tGouuIn/rTcB7HxYUO
-         ZWAL9EgCvk+4Twx4A/wJK8wa1S2Sp6BX05Yu6Gd6TFjaPa/X+htocm/LwtGdoeAIrPuI
-         C6lt2sIizI39kVnUUcKXJz/6jPaM2raqQo0nUXMx/OEnZfta2/bpQF2P/x8nU8N5WBE6
-         6/Qw==
-X-Gm-Message-State: AOAM530suG3xT5uE63gQ5M0GBVYYSKaIHEAEtmAi5OPUXNZ3ZyPaklS7
-        eFb6OBpFkv2xEwZ0E4cuBCl7vzCI8kXMOTuwGg1jFQ==
-X-Google-Smtp-Source: ABdhPJwAmYsV/GTAPBww3boiqGtk0HFPfKSKeHhWavXFO5X6kDFymmHw46nVdMIe/t/QYb0/fC1cJDA5Vv9R6puRLyE=
-X-Received: by 2002:ac2:4e62:: with SMTP id y2mr3090399lfs.9.1629216835591;
- Tue, 17 Aug 2021 09:13:55 -0700 (PDT)
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=AwlQ32nbtd+hjp/fxoi8kJbjSm7VsIyjZaetwBPpk0Y=;
+        b=eMC53UUZXcMz2IH/4Aw+Y53K7ZP67OlUdKBPZjgogk8xl0cck2paWoipV71AOBhlzd
+         7uk0c6iBsnAo+qfvRJyFzMeMqlQI1JJ52Sd0lNpXhViaNnWjG+qnPTttxi59t4PNbJHt
+         ekje6io+2sKhp+tuum7z6NZvqzL3hfLpl0f7JoBfF7TAHwZ82hKf823WpsjPc3SkiIlv
+         gUlQcVs+5ipQ4vfgOYdYnA++OY+BylOrKHNWZO3C3iA1mQDKvPFHgWmx9OUgdDCU0XZF
+         K4dABm7NUyZBhTH7sG+KeQClLFfme7qXSpUCBUu9TpdDmEZqKprO3Qj/QpRGBslXaBGZ
+         3k1Q==
+X-Gm-Message-State: AOAM533DrreB/lXiJIe+xaOlqzJuDl1RPBWFyazIrwDukjIJgJ9tGgKP
+        sDqXPIvALaFGK+Hlm7QsHFtzH3C5yO4glJY+X0YJ9K/uQX/vo2pw0OmzI/ilZEWjhWNuOJp9jej
+        WgoDid8QSH9upYCtK6Hsa/OA7TAA/P0EkZ4T/iBt8qMdq4eeLFXjRbhyCouUIYgrz
+X-Received: by 2002:a5d:4c4e:: with SMTP id n14mr5179080wrt.226.1629217964798;
+        Tue, 17 Aug 2021 09:32:44 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwMJCcYPUHVU8yjKtJYrLiw+Md+qWmOarkciP0cgLNxW8rE93pg1Ebun+7oZFVWBLYOcwDKKA==
+X-Received: by 2002:a5d:4c4e:: with SMTP id n14mr5179029wrt.226.1629217964444;
+        Tue, 17 Aug 2021 09:32:44 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e? ([2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e])
+        by smtp.gmail.com with ESMTPSA id o14sm2454877wms.2.2021.08.17.09.32.43
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 17 Aug 2021 09:32:43 -0700 (PDT)
+Subject: Re: [RFC PATCH 00/13] Add support for Mirror VM.
+To:     Steve Rutherford <srutherford@google.com>,
+        Ashish Kalra <Ashish.Kalra@amd.com>
+Cc:     qemu-devel@nongnu.org, thomas.lendacky@amd.com,
+        brijesh.singh@amd.com, ehabkost@redhat.com, mst@redhat.com,
+        richard.henderson@linaro.org, jejb@linux.ibm.com, tobin@ibm.com,
+        dovmurik@linux.vnet.ibm.com, frankeh@us.ibm.com,
+        dgilbert@redhat.com, kvm@vger.kernel.org
+References: <cover.1629118207.git.ashish.kalra@amd.com>
+ <CABayD+fyrcyPGg5TdXLr95AFkPFY+EeeNvY=NvQw_j3_igOd6Q@mail.gmail.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <0fcfafde-a690-f53a-01fc-542054948bb2@redhat.com>
+Date:   Tue, 17 Aug 2021 18:32:42 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.11.0
 MIME-Version: 1.0
-References: <20210813203504.2742757-1-dmatlack@google.com> <20210813203504.2742757-4-dmatlack@google.com>
- <613778fe-475d-fcd6-7046-55f05ee1be6c@redhat.com>
-In-Reply-To: <613778fe-475d-fcd6-7046-55f05ee1be6c@redhat.com>
-From:   David Matlack <dmatlack@google.com>
-Date:   Tue, 17 Aug 2021 09:13:29 -0700
-Message-ID: <CALzav=cXzvWnSP3d_Krcwa3wUteoFe+ufd=37W+9ug+BGMhcGg@mail.gmail.com>
-Subject: Re: [RFC PATCH 3/6] KVM: x86/mmu: Pass the memslot around via struct kvm_page_fault
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     kvm list <kvm@vger.kernel.org>, Ben Gardon <bgardon@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Jim Mattson <jmattson@google.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Sean Christopherson <seanjc@google.com>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <CABayD+fyrcyPGg5TdXLr95AFkPFY+EeeNvY=NvQw_j3_igOd6Q@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Aug 17, 2021 at 6:00 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
->
-> On 13/08/21 22:35, David Matlack wrote:
-> > -     if (is_writable_pte(new_spte) && !is_writable_pte(old_spte)) {
-> > -             /*
-> > -              * The gfn of direct spte is stable since it is
-> > -              * calculated by sp->gfn.
-> > -              */
-> > -             gfn = kvm_mmu_page_get_gfn(sp, sptep - sp->spt);
-> > -             kvm_vcpu_mark_page_dirty(vcpu, gfn);
-> > -     }
-> > +     if (is_writable_pte(new_spte) && !is_writable_pte(old_spte))
-> > +             mark_page_dirty_in_slot(vcpu->kvm, fault->slot, fault->gfn);
->
-> Oops, this actually needs kvm_vcpu_mark_page_dirty to receive the slot.
+On 17/08/21 01:53, Steve Rutherford wrote:
+> Separately, I'm a little weary of leaving the migration helper mapped
+> into the shared address space as writable.
 
-What do you mean? kvm_vcpu_mark_page_dirty ultimately just calls
-mark_page_dirty_in_slot.
+A related question here is what the API should be for how the migration 
+helper sees the memory in both physical and virtual address.
 
->
-> Paolo
->
+First of all, I would like the addresses passed to and from the 
+migration helper to *not* be guest physical addresses (this is what I 
+referred to as QEMU's ram_addr_t in other messages).  The reason is that 
+some unmapped memory regions, such as virtio-mem hotplugged memory, 
+would still have to be transferred and could be encrypted.  While the 
+guest->host hypercall interface uses guest physical addresses to 
+communicate which pages are encrypted, the host can do the 
+GPA->ram_addr_t conversion and remember the encryption status of 
+currently-unmapped regions.
+
+This poses a problem, in that the guest needs to prepare the page tables 
+for the migration helper and those need to use the migration helper's 
+physical address space.
+
+There's three possibilities for this:
+
+1) the easy one: the bottom 4G of guest memory are mapped in the mirror 
+VM 1:1.  The ram_addr_t-based addresses are shifted by either 4G or a 
+huge value such as 2^42 (MAXPHYADDR - physical address reduction - 1). 
+This even lets the migration helper reuse the OVMF runtime services 
+memory map (but be careful about thread safety...).
+
+2) the more future-proof one.  Here, the migration helper tells QEMU 
+which area to copy from the guest to the mirror VM, as a (main GPA, 
+length, mirror GPA) tuple.  This could happen for example the first time 
+the guest writes 1 to MSR_KVM_MIGRATION_CONTROL.  When migration starts, 
+QEMU uses this information to issue KVM_SET_USER_MEMORY_REGION 
+accordingly.  The page tables are built for this (usually very high) 
+mirror GPA and the migration helper operates in a completely separate 
+address space.  However, the backing memory would still be shared 
+between the main and mirror VMs.  I am saying this is more future proof 
+because we have more flexibility in setting up the physical address 
+space of the mirror VM.
+
+3) the paranoid one, which I think is what you hint at above: this is an 
+extension of (2), where userspace invokes the PSP send/receive API to 
+copy the small requested area of the main VM into the mirror VM.  The 
+mirror VM code and data are completely separate from the main VM.  All 
+that the mirror VM shares is the ram_addr_t data.  Though I am not even 
+sure it is possible to use the send/receive API this way...
+
+What do you think?
+
+Paolo
+
