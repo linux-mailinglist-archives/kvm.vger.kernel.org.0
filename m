@@ -2,128 +2,137 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2A57D3EF038
-	for <lists+kvm@lfdr.de>; Tue, 17 Aug 2021 18:32:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 224503EF041
+	for <lists+kvm@lfdr.de>; Tue, 17 Aug 2021 18:35:35 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229983AbhHQQdW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 17 Aug 2021 12:33:22 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:40374 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229477AbhHQQdV (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 17 Aug 2021 12:33:21 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1629217967;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=AwlQ32nbtd+hjp/fxoi8kJbjSm7VsIyjZaetwBPpk0Y=;
-        b=L3mX7e/3FQ07dNfGdveW1MZDCWWeirp0c+Fb/AQYWN8tPmgdjM8OG8dG7/0uJngS2rVe00
-        G6KkwIX7ZDerI+ewqxDZ629rnF5AGue1UXBY5RHGNH7SbQB41Dzk9hcWXyz3pjlI4emwMJ
-        CIRewr6yc+R1PTPSRlbKzYAvDjeQk+s=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-118-whk63u52Nf-yYNrHWQVqzw-1; Tue, 17 Aug 2021 12:32:46 -0400
-X-MC-Unique: whk63u52Nf-yYNrHWQVqzw-1
-Received: by mail-wm1-f71.google.com with SMTP id f19-20020a1c1f13000000b002e6bd83c344so946596wmf.3
-        for <kvm@vger.kernel.org>; Tue, 17 Aug 2021 09:32:46 -0700 (PDT)
+        id S230208AbhHQQgF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 17 Aug 2021 12:36:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56838 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229477AbhHQQgE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 17 Aug 2021 12:36:04 -0400
+Received: from mail-qk1-x72e.google.com (mail-qk1-x72e.google.com [IPv6:2607:f8b0:4864:20::72e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 18002C061764;
+        Tue, 17 Aug 2021 09:35:31 -0700 (PDT)
+Received: by mail-qk1-x72e.google.com with SMTP id 14so23742356qkc.4;
+        Tue, 17 Aug 2021 09:35:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=X66JXd8TkYUtNgpL3dedMaEApQt+UVVwJJYfA0n1YPg=;
+        b=g4zglayFs+OL2K1Tv5FWDo95NGXXY+tGDfEDov2cEemXLUcWHxppV7kaJhjKlxcOrQ
+         oHuvXm/1NLEueeijcc4k/pdxM6Mcwr6Rl3B3D7wFZy2ccLhUt4vZeoQJfZfhrPomyELx
+         GW+C0UiShHbqj3n/zGjS26Xwp4uQ61Z7LoZVhXIKdcRcj7Sdhe8A3DrLEAc6nInsJUvl
+         dp18hI9oI9+JlQYtUPxQqvz7toBSYsOVPi7y9JftNaV8NSLYZ/DiplGaFcbmP3J6IdzX
+         /fxmtbTG72QjQmjUz5DePLa7WUGZoqPqI4I9C2Rmp2XHKrgJhxvGhIuRvnmdts6lZMbP
+         wyDw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=AwlQ32nbtd+hjp/fxoi8kJbjSm7VsIyjZaetwBPpk0Y=;
-        b=eMC53UUZXcMz2IH/4Aw+Y53K7ZP67OlUdKBPZjgogk8xl0cck2paWoipV71AOBhlzd
-         7uk0c6iBsnAo+qfvRJyFzMeMqlQI1JJ52Sd0lNpXhViaNnWjG+qnPTttxi59t4PNbJHt
-         ekje6io+2sKhp+tuum7z6NZvqzL3hfLpl0f7JoBfF7TAHwZ82hKf823WpsjPc3SkiIlv
-         gUlQcVs+5ipQ4vfgOYdYnA++OY+BylOrKHNWZO3C3iA1mQDKvPFHgWmx9OUgdDCU0XZF
-         K4dABm7NUyZBhTH7sG+KeQClLFfme7qXSpUCBUu9TpdDmEZqKprO3Qj/QpRGBslXaBGZ
-         3k1Q==
-X-Gm-Message-State: AOAM533DrreB/lXiJIe+xaOlqzJuDl1RPBWFyazIrwDukjIJgJ9tGgKP
-        sDqXPIvALaFGK+Hlm7QsHFtzH3C5yO4glJY+X0YJ9K/uQX/vo2pw0OmzI/ilZEWjhWNuOJp9jej
-        WgoDid8QSH9upYCtK6Hsa/OA7TAA/P0EkZ4T/iBt8qMdq4eeLFXjRbhyCouUIYgrz
-X-Received: by 2002:a5d:4c4e:: with SMTP id n14mr5179080wrt.226.1629217964798;
-        Tue, 17 Aug 2021 09:32:44 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwMJCcYPUHVU8yjKtJYrLiw+Md+qWmOarkciP0cgLNxW8rE93pg1Ebun+7oZFVWBLYOcwDKKA==
-X-Received: by 2002:a5d:4c4e:: with SMTP id n14mr5179029wrt.226.1629217964444;
-        Tue, 17 Aug 2021 09:32:44 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e? ([2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e])
-        by smtp.gmail.com with ESMTPSA id o14sm2454877wms.2.2021.08.17.09.32.43
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 17 Aug 2021 09:32:43 -0700 (PDT)
-Subject: Re: [RFC PATCH 00/13] Add support for Mirror VM.
-To:     Steve Rutherford <srutherford@google.com>,
-        Ashish Kalra <Ashish.Kalra@amd.com>
-Cc:     qemu-devel@nongnu.org, thomas.lendacky@amd.com,
-        brijesh.singh@amd.com, ehabkost@redhat.com, mst@redhat.com,
-        richard.henderson@linaro.org, jejb@linux.ibm.com, tobin@ibm.com,
-        dovmurik@linux.vnet.ibm.com, frankeh@us.ibm.com,
-        dgilbert@redhat.com, kvm@vger.kernel.org
-References: <cover.1629118207.git.ashish.kalra@amd.com>
- <CABayD+fyrcyPGg5TdXLr95AFkPFY+EeeNvY=NvQw_j3_igOd6Q@mail.gmail.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <0fcfafde-a690-f53a-01fc-542054948bb2@redhat.com>
-Date:   Tue, 17 Aug 2021 18:32:42 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.11.0
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=X66JXd8TkYUtNgpL3dedMaEApQt+UVVwJJYfA0n1YPg=;
+        b=ORjTzeyqPQaBh0uyn/NC4C11EiCihBNYaSnvbWaI3sZQyf9ShRgJVwEjVds14wz3V6
+         bjLG59W9LjVl7sUP2IKiBvfWNyIHGm3/gpLjPOHLUc+qDCIFFxAnsWMJdB++PmU0biqd
+         LKP0CPophlzLhDJQr/NRlmbEkSjU3WqkBxvOD0KmLZy8DsB2edlqEKWIosv86ABN4oKI
+         /C7mH3XPmxATKG3TQFjs7uByl9RaZQMmUVaZHsCIUYspcYq3CN0kOCmxofE6mQKrLeZJ
+         0Cbeows5P4GXGtStvw1AiyaADxyLdDAErZcc1Tvd/f1c7iYpOJwVF+mu8Pvozh1vcw9E
+         jd/w==
+X-Gm-Message-State: AOAM531rb4r/Ekcks2FQRMUOyDUsxUn+jJ+bcvVZ6cFP3WszGxkusO2d
+        w371uGSeD4bH5SavYYwAsHY=
+X-Google-Smtp-Source: ABdhPJy2J9eIa9r5vu8RSDOAqKg1RDnXqD3PiG96WXh1xZ4GPhHRSNuK2PyNoYNfQalFqu4qZofQxQ==
+X-Received: by 2002:a37:d54:: with SMTP id 81mr4580109qkn.103.1629218130100;
+        Tue, 17 Aug 2021 09:35:30 -0700 (PDT)
+Received: from localhost ([12.28.44.171])
+        by smtp.gmail.com with ESMTPSA id k8sm1584346qkk.96.2021.08.17.09.35.29
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 17 Aug 2021 09:35:29 -0700 (PDT)
+Date:   Tue, 17 Aug 2021 09:35:28 -0700
+From:   Yury Norov <yury.norov@gmail.com>
+To:     Andy Shevchenko <andy.shevchenko@gmail.com>
+Cc:     Andrew Morton <akpm@linux-foundation.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        linux-mm <linux-mm@kvack.org>,
+        Linux-Arch <linux-arch@vger.kernel.org>,
+        "open list:KERNEL SELFTEST FRAMEWORK" 
+        <linux-kselftest@vger.kernel.org>,
+        linux-mmc <linux-mmc@vger.kernel.org>,
+        linux-perf-users@vger.kernel.org,
+        "open list:VFIO DRIVER" <kvm@vger.kernel.org>,
+        "James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>,
+        Alexander Lobakin <alobakin@pm.me>,
+        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+        Alexey Klimov <aklimov@redhat.com>,
+        Andrea Merello <andrea.merello@gmail.com>,
+        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+        Arnaldo Carvalho de Melo <acme@redhat.com>,
+        Arnd Bergmann <arnd@arndb.de>, Ben Gardon <bgardon@google.com>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        Brian Cain <bcain@codeaurora.org>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Christoph Lameter <cl@linux.com>,
+        Daniel Bristot de Oliveira <bristot@redhat.com>,
+        David Hildenbrand <david@redhat.com>,
+        Dennis Zhou <dennis@kernel.org>,
+        Geert Uytterhoeven <geert@linux-m68k.org>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Ian Rogers <irogers@google.com>,
+        Ingo Molnar <mingo@redhat.com>,
+        Jaegeuk Kim <jaegeuk@kernel.org>,
+        Jakub Kicinski <kuba@kernel.org>, Jiri Olsa <jolsa@redhat.com>,
+        Joe Perches <joe@perches.com>, Jonas Bonn <jonas@southpole.se>,
+        Leo Yan <leo.yan@linaro.org>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Namhyung Kim <namhyung@kernel.org>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Peter Xu <peterx@redhat.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Petr Mladek <pmladek@suse.com>,
+        Rasmus Villemoes <linux@rasmusvillemoes.dk>,
+        Rich Felker <dalias@libc.org>,
+        Samuel Mendoza-Jonas <sam@mendozajonas.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Sergey Senozhatsky <senozhatsky@chromium.org>,
+        Shuah Khan <shuah@kernel.org>,
+        Stefan Kristiansson <stefan.kristiansson@saunalahti.fi>,
+        Steven Rostedt <rostedt@goodmis.org>,
+        Tejun Heo <tj@kernel.org>,
+        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+        Ulf Hansson <ulf.hansson@linaro.org>,
+        Will Deacon <will@kernel.org>,
+        Wolfram Sang <wsa+renesas@sang-engineering.com>,
+        Yoshinori Sato <ysato@users.sourceforge.jp>
+Subject: Re: [PATCH 17/17] vsprintf: rework bitmap_list_string
+Message-ID: <YRvlUO87e7czAico@yury-ThinkPad>
+References: <20210814211713.180533-1-yury.norov@gmail.com>
+ <20210814211713.180533-18-yury.norov@gmail.com>
+ <CAHp75Vcjq-XmX-rikawj+wVwG+V+gXzZPishpanZ79-SGFb8rA@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <CABayD+fyrcyPGg5TdXLr95AFkPFY+EeeNvY=NvQw_j3_igOd6Q@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAHp75Vcjq-XmX-rikawj+wVwG+V+gXzZPishpanZ79-SGFb8rA@mail.gmail.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 17/08/21 01:53, Steve Rutherford wrote:
-> Separately, I'm a little weary of leaving the migration helper mapped
-> into the shared address space as writable.
+On Sun, Aug 15, 2021 at 02:09:45PM +0300, Andy Shevchenko wrote:
+> On Sun, Aug 15, 2021 at 12:21 AM Yury Norov <yury.norov@gmail.com> wrote:
+> >
+> > bitmap_list_string() is very ineffective when printing bitmaps with long
+> > ranges of set bits because it calls find_next_bit for each bit in the
+> > bitmap.  We can do better by detecting ranges of set bits.
+> >
+> > In my environment, before/after is 943008/31008 ns.
+> 
+> I would add a couple of words, maybe in parentheses, to describe what
+> your environment is.
+> 
+> ...
+> 
+> > +               buf = number(++buf, end, rtop - 1, default_dec_spec);
+> 
+> ++buf is a bit confusing here. Since you will rewrite the buf value
+> anyway, I would write the parameter as buf + 1.
 
-A related question here is what the API should be for how the migration 
-helper sees the memory in both physical and virtual address.
-
-First of all, I would like the addresses passed to and from the 
-migration helper to *not* be guest physical addresses (this is what I 
-referred to as QEMU's ram_addr_t in other messages).  The reason is that 
-some unmapped memory regions, such as virtio-mem hotplugged memory, 
-would still have to be transferred and could be encrypted.  While the 
-guest->host hypercall interface uses guest physical addresses to 
-communicate which pages are encrypted, the host can do the 
-GPA->ram_addr_t conversion and remember the encryption status of 
-currently-unmapped regions.
-
-This poses a problem, in that the guest needs to prepare the page tables 
-for the migration helper and those need to use the migration helper's 
-physical address space.
-
-There's three possibilities for this:
-
-1) the easy one: the bottom 4G of guest memory are mapped in the mirror 
-VM 1:1.  The ram_addr_t-based addresses are shifted by either 4G or a 
-huge value such as 2^42 (MAXPHYADDR - physical address reduction - 1). 
-This even lets the migration helper reuse the OVMF runtime services 
-memory map (but be careful about thread safety...).
-
-2) the more future-proof one.  Here, the migration helper tells QEMU 
-which area to copy from the guest to the mirror VM, as a (main GPA, 
-length, mirror GPA) tuple.  This could happen for example the first time 
-the guest writes 1 to MSR_KVM_MIGRATION_CONTROL.  When migration starts, 
-QEMU uses this information to issue KVM_SET_USER_MEMORY_REGION 
-accordingly.  The page tables are built for this (usually very high) 
-mirror GPA and the migration helper operates in a completely separate 
-address space.  However, the backing memory would still be shared 
-between the main and mirror VMs.  I am saying this is more future proof 
-because we have more flexibility in setting up the physical address 
-space of the mirror VM.
-
-3) the paranoid one, which I think is what you hint at above: this is an 
-extension of (2), where userspace invokes the PSP send/receive API to 
-copy the small requested area of the main VM into the mirror VM.  The 
-mirror VM code and data are completely separate from the main VM.  All 
-that the mirror VM shares is the ram_addr_t data.  Though I am not even 
-sure it is possible to use the send/receive API this way...
-
-What do you think?
-
-Paolo
-
+Agree, it's sloppy. I'll  send the patch by tomorrow.
