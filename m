@@ -2,55 +2,55 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id CFEA23EE81C
-	for <lists+kvm@lfdr.de>; Tue, 17 Aug 2021 10:12:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 83AB93EE822
+	for <lists+kvm@lfdr.de>; Tue, 17 Aug 2021 10:12:09 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239015AbhHQIMe (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 17 Aug 2021 04:12:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53664 "EHLO
+        id S234923AbhHQIMk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 17 Aug 2021 04:12:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53674 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239044AbhHQIMb (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 17 Aug 2021 04:12:31 -0400
-Received: from mail-qv1-xf49.google.com (mail-qv1-xf49.google.com [IPv6:2607:f8b0:4864:20::f49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 42098C0617AE
-        for <kvm@vger.kernel.org>; Tue, 17 Aug 2021 01:11:58 -0700 (PDT)
-Received: by mail-qv1-xf49.google.com with SMTP id f10-20020a0ccc8a0000b02903521ac3b9d7so14791211qvl.15
-        for <kvm@vger.kernel.org>; Tue, 17 Aug 2021 01:11:58 -0700 (PDT)
+        with ESMTP id S234952AbhHQIMe (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 17 Aug 2021 04:12:34 -0400
+Received: from mail-wm1-x34a.google.com (mail-wm1-x34a.google.com [IPv6:2a00:1450:4864:20::34a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 24A04C061764
+        for <kvm@vger.kernel.org>; Tue, 17 Aug 2021 01:12:01 -0700 (PDT)
+Received: by mail-wm1-x34a.google.com with SMTP id f6-20020a05600c1546b029025af999e04dso4756112wmg.7
+        for <kvm@vger.kernel.org>; Tue, 17 Aug 2021 01:12:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=date:in-reply-to:message-id:mime-version:references:subject:from:to
          :cc;
-        bh=a1FkHacsvxlpxAzLdiQ+8Ppyqt1oFw+G4RPgD2elyDM=;
-        b=t0d/tLo4vOpJ97R2R+WJ7E/Mn4CRyatYvLNI5+XDc6d/D+D+iLgcP9l1mJgMMW9YmC
-         kVwXzlYCgOVFk41QkuGxihN3Ogbvf8N7scHCRdnhB4nAXWmv7IzXURY2zHD/BEaiAYQ6
-         TjllHsJE6UJZxmu5jPld1CQCptRH4i9F1tLftMV5Up+OoJBqprQPLjcmAPDwjY/fPrPm
-         MgayAcPlA5qUJ9BfoFBR4cwAWBAWBStqE38TrSHqPxMV2Y/TZ/+xqz54kWQ1t5U7JoFY
-         tyqZiyJQxEAJV5Ngl04xPkh8FINI1IP4yATCktZ30SJa5aIxa3ns9CXj2hbSkYio9nU2
-         0ZrQ==
+        bh=wCAlPucxwkxQDsZjrMwYYiCi5QbYeNWxBim5zrWnq2Y=;
+        b=Aakqhp0ujPFBkz2t9XKF2sWAACl4G7B5hxJDrt2uXINVbL4SDQRXJFOegBUQ1cWZ/J
+         0jUUeLw9Od7HUTBaHF2bEbcWHbDSiLs7WOuMmHvkgQ9aKAKEc1Se9jaIc0RdmvVOh0fO
+         2EN/wB6tJc5Zuqxbzk63h/bmcGOdULfseyFm4sZABt1qcXnPvBSlGoCTvs5yVR6Y8Yo1
+         YMuBWKj78N9MEBXEHK0yav34qJ6J/ferOrSpzyXe15duHhdaVH3IinJtQB7TmOXkIdhf
+         EGOlFmuP1fTlBQFW97lGVUPjXY5ipiWvG/UMC6271totgCudngPKM0tiXwaU5gQ9KdQm
+         5UzA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=a1FkHacsvxlpxAzLdiQ+8Ppyqt1oFw+G4RPgD2elyDM=;
-        b=Gr+VOeVmambwjvSaEjdAoXQ1uVUsCFVF8fGZSh/AjphAIZDd8UUt0bP3/0GTxIrz0z
-         Zh8KIyxZupMw2Pmh42YeYFE4rxaBtTwx1Ne/nTeW82EkAasIKIsP1jbIAnzGRtCU/sW/
-         6P7tBMehcSCz30Uvn6X5NIPoVqVoeZQbq2DJPKklxv3rg9d8i0JKustVt2WE5wMP1SX3
-         q3vIK4gDfsJsJf6m50QVQ6hyulmVr+4jWRTlwqbYx+dRtTWWdEecq2RBzCW2K/QDIOxs
-         UhYObP+Wn0Ollx0ZEOMfn3qQCGbWVAUYbhftbHTSEO6uWj9llm1TXnHcYc8XUqxQOXSD
-         jhzg==
-X-Gm-Message-State: AOAM530U/3aZDuvkIYa+9Ac1iZnOsMXfqbnnTYJau+6zeyXnnhIS5ujU
-        OJ5hxuE6sXMfyZVUa72Q9J3n6dtIyQ==
-X-Google-Smtp-Source: ABdhPJxzcsyia+26TWJ1TMac1dWdSAXLmVDa71Pii4xoLoi/YWFmQv5nVNTZT9RkOEJvlwiLzHDZH4e6Ug==
+        bh=wCAlPucxwkxQDsZjrMwYYiCi5QbYeNWxBim5zrWnq2Y=;
+        b=l3dy4+ONtDDRAefMC+TYSfXtYczqZ5r/SWp9MoMv47nS5vV2XajIWitYkJhYt/yeq7
+         DQx0xwdCWlADzUV8jAVtdYwLOWrIMwjEJOwGlxnSb1jN0nowG081ci97vFqoSXCtd+u8
+         6okGt7/JySMjGpsmOFoqdBLAx1yEgKm8e+WYGPOuJz10P81pZJc09LUFFamCS6IMt6Vy
+         Qb2hVnlix+u4958pQmgT4jf+kJsjzUGq9mhmdgzEhoMLc/FT0jWXCtNoXfX4TvAK4awp
+         MkNQ5B0xiHzKuN/zYPDFoabLuaNME49a3n6eQRbzFWx1VWmhtVsLj4xzobBfNlToa0zD
+         PWnQ==
+X-Gm-Message-State: AOAM530tdTvCybLt08oJTDzbiWmmIIkF4FpQb3HhGS0jcqrNUL7s3Wvm
+        yM1wyD+74qt+cHBpkIggK8J5oeZKaw==
+X-Google-Smtp-Source: ABdhPJyYTcbz4UVboGo7zKDmnSidrFF2RAjsx5lYf6M4UE4X0H/bCAlk0j+kiCGYLkR2pXqzSg2USK4ZwA==
 X-Received: from tabba.c.googlers.com ([fda3:e722:ac3:cc00:28:9cb1:c0a8:482])
- (user=tabba job=sendgmr) by 2002:a05:6214:10c4:: with SMTP id
- r4mr2134444qvs.58.1629187917427; Tue, 17 Aug 2021 01:11:57 -0700 (PDT)
-Date:   Tue, 17 Aug 2021 09:11:29 +0100
+ (user=tabba job=sendgmr) by 2002:a1c:c914:: with SMTP id f20mr2057147wmb.140.1629187919570;
+ Tue, 17 Aug 2021 01:11:59 -0700 (PDT)
+Date:   Tue, 17 Aug 2021 09:11:30 +0100
 In-Reply-To: <20210817081134.2918285-1-tabba@google.com>
-Message-Id: <20210817081134.2918285-11-tabba@google.com>
+Message-Id: <20210817081134.2918285-12-tabba@google.com>
 Mime-Version: 1.0
 References: <20210817081134.2918285-1-tabba@google.com>
 X-Mailer: git-send-email 2.33.0.rc1.237.g0d66db33f3-goog
-Subject: [PATCH v4 10/15] KVM: arm64: Add config register bit definitions
+Subject: [PATCH v4 11/15] KVM: arm64: Guest exit handlers for nVHE hyp
 From:   Fuad Tabba <tabba@google.com>
 To:     kvmarm@lists.cs.columbia.edu
 Cc:     maz@kernel.org, will@kernel.org, james.morse@arm.com,
@@ -65,79 +65,128 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Add hardware configuration register bit definitions for HCR_EL2
-and MDCR_EL2. Future patches toggle these hyp configuration
-register bits to trap on certain accesses.
+Add an array of pointers to handlers for various trap reasons in
+nVHE code.
 
-No functional change intended.
+The current code selects how to fixup a guest on exit based on a
+series of if/else statements. Future patches will also require
+different handling for guest exists. Create an array of handlers
+to consolidate them.
+
+No functional change intended as the array isn't populated yet.
 
 Acked-by: Will Deacon <will@kernel.org>
 Signed-off-by: Fuad Tabba <tabba@google.com>
 ---
- arch/arm64/include/asm/kvm_arm.h | 22 ++++++++++++++++++++++
- 1 file changed, 22 insertions(+)
+ arch/arm64/kvm/hyp/include/hyp/switch.h | 43 +++++++++++++++++++++++++
+ arch/arm64/kvm/hyp/nvhe/switch.c        | 33 +++++++++++++++++++
+ 2 files changed, 76 insertions(+)
 
-diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
-index a928b2dc0b0f..327120c0089f 100644
---- a/arch/arm64/include/asm/kvm_arm.h
-+++ b/arch/arm64/include/asm/kvm_arm.h
-@@ -12,8 +12,13 @@
- #include <asm/types.h>
+diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
+index a0e78a6027be..5a2b89b96c67 100644
+--- a/arch/arm64/kvm/hyp/include/hyp/switch.h
++++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
+@@ -409,6 +409,46 @@ static inline bool __hyp_handle_ptrauth(struct kvm_vcpu *vcpu)
+ 	return true;
+ }
  
- /* Hyp Configuration Register (HCR) bits */
++typedef int (*exit_handle_fn)(struct kvm_vcpu *);
 +
-+#define HCR_TID5	(UL(1) << 58)
-+#define HCR_DCT		(UL(1) << 57)
- #define HCR_ATA_SHIFT	56
- #define HCR_ATA		(UL(1) << HCR_ATA_SHIFT)
-+#define HCR_AMVOFFEN	(UL(1) << 51)
-+#define HCR_FIEN	(UL(1) << 47)
- #define HCR_FWB		(UL(1) << 46)
- #define HCR_API		(UL(1) << 41)
- #define HCR_APK		(UL(1) << 40)
-@@ -56,6 +61,7 @@
- #define HCR_PTW		(UL(1) << 2)
- #define HCR_SWIO	(UL(1) << 1)
- #define HCR_VM		(UL(1) << 0)
-+#define HCR_RES0	((UL(1) << 48) | (UL(1) << 39))
- 
++exit_handle_fn kvm_get_nvhe_exit_handler(struct kvm_vcpu *vcpu);
++
++static exit_handle_fn kvm_get_hyp_exit_handler(struct kvm_vcpu *vcpu)
++{
++	return is_nvhe_hyp_code() ? kvm_get_nvhe_exit_handler(vcpu) : NULL;
++}
++
++/*
++ * Allow the hypervisor to handle the exit with an exit handler if it has one.
++ *
++ * Returns true if the hypervisor handled the exit, and control should go back
++ * to the guest, or false if it hasn't.
++ */
++static bool kvm_hyp_handle_exit(struct kvm_vcpu *vcpu)
++{
++	bool is_handled = false;
++	exit_handle_fn exit_handler = kvm_get_hyp_exit_handler(vcpu);
++
++	if (exit_handler) {
++		/*
++		 * There's limited vcpu context here since it's not synced yet.
++		 * Ensure that relevant vcpu context that might be used by the
++		 * exit_handler is in sync before it's called and if handled.
++		 */
++		*vcpu_pc(vcpu) = read_sysreg_el2(SYS_ELR);
++		*vcpu_cpsr(vcpu) = read_sysreg_el2(SYS_SPSR);
++
++		is_handled = exit_handler(vcpu);
++
++		if (is_handled) {
++			write_sysreg_el2(*vcpu_pc(vcpu), SYS_ELR);
++			write_sysreg_el2(*vcpu_cpsr(vcpu), SYS_SPSR);
++		}
++	}
++
++	return is_handled;
++}
++
  /*
-  * The bits we set in HCR:
-@@ -277,11 +283,21 @@
- #define CPTR_EL2_TZ	(1 << 8)
- #define CPTR_NVHE_EL2_RES1	0x000032ff /* known RES1 bits in CPTR_EL2 (nVHE) */
- #define CPTR_EL2_DEFAULT	CPTR_NVHE_EL2_RES1
-+#define CPTR_NVHE_EL2_RES0	(GENMASK(63, 32) |	\
-+				 GENMASK(29, 21) |	\
-+				 GENMASK(19, 14) |	\
-+				 BIT(11))
+  * Return true when we were able to fixup the guest exit and should return to
+  * the guest, false when we should restore the host state and return to the
+@@ -496,6 +536,9 @@ static inline bool fixup_guest_exit(struct kvm_vcpu *vcpu, u64 *exit_code)
+ 			goto guest;
+ 	}
  
- /* Hyp Debug Configuration Register bits */
- #define MDCR_EL2_E2TB_MASK	(UL(0x3))
- #define MDCR_EL2_E2TB_SHIFT	(UL(24))
-+#define MDCR_EL2_HPMFZS		(UL(1) << 36)
-+#define MDCR_EL2_HPMFZO		(UL(1) << 29)
-+#define MDCR_EL2_MTPME		(UL(1) << 28)
-+#define MDCR_EL2_TDCC		(UL(1) << 27)
-+#define MDCR_EL2_HCCD		(UL(1) << 23)
- #define MDCR_EL2_TTRF		(UL(1) << 19)
-+#define MDCR_EL2_HPMD		(UL(1) << 17)
- #define MDCR_EL2_TPMS		(UL(1) << 14)
- #define MDCR_EL2_E2PB_MASK	(UL(0x3))
- #define MDCR_EL2_E2PB_SHIFT	(UL(12))
-@@ -293,6 +309,12 @@
- #define MDCR_EL2_TPM		(UL(1) << 6)
- #define MDCR_EL2_TPMCR		(UL(1) << 5)
- #define MDCR_EL2_HPMN_MASK	(UL(0x1F))
-+#define MDCR_EL2_RES0		(GENMASK(63, 37) |	\
-+				 GENMASK(35, 30) |	\
-+				 GENMASK(25, 24) |	\
-+				 GENMASK(22, 20) |	\
-+				 BIT(18) |		\
-+				 GENMASK(16, 15))
++	/* Check if there's an exit handler and allow it to handle the exit. */
++	if (kvm_hyp_handle_exit(vcpu))
++		goto guest;
+ exit:
+ 	/* Return to the host kernel and handle the exit */
+ 	return false;
+diff --git a/arch/arm64/kvm/hyp/nvhe/switch.c b/arch/arm64/kvm/hyp/nvhe/switch.c
+index 86f3d6482935..b7f25307a7b9 100644
+--- a/arch/arm64/kvm/hyp/nvhe/switch.c
++++ b/arch/arm64/kvm/hyp/nvhe/switch.c
+@@ -158,6 +158,39 @@ static void __pmu_switch_to_host(struct kvm_cpu_context *host_ctxt)
+ 		write_sysreg(pmu->events_host, pmcntenset_el0);
+ }
  
- /* For compatibility with fault code shared with 32-bit */
- #define FSC_FAULT	ESR_ELx_FSC_FAULT
++static exit_handle_fn hyp_exit_handlers[] = {
++	[0 ... ESR_ELx_EC_MAX]		= NULL,
++	[ESR_ELx_EC_WFx]		= NULL,
++	[ESR_ELx_EC_CP15_32]		= NULL,
++	[ESR_ELx_EC_CP15_64]		= NULL,
++	[ESR_ELx_EC_CP14_MR]		= NULL,
++	[ESR_ELx_EC_CP14_LS]		= NULL,
++	[ESR_ELx_EC_CP14_64]		= NULL,
++	[ESR_ELx_EC_HVC32]		= NULL,
++	[ESR_ELx_EC_SMC32]		= NULL,
++	[ESR_ELx_EC_HVC64]		= NULL,
++	[ESR_ELx_EC_SMC64]		= NULL,
++	[ESR_ELx_EC_SYS64]		= NULL,
++	[ESR_ELx_EC_SVE]		= NULL,
++	[ESR_ELx_EC_IABT_LOW]		= NULL,
++	[ESR_ELx_EC_DABT_LOW]		= NULL,
++	[ESR_ELx_EC_SOFTSTP_LOW]	= NULL,
++	[ESR_ELx_EC_WATCHPT_LOW]	= NULL,
++	[ESR_ELx_EC_BREAKPT_LOW]	= NULL,
++	[ESR_ELx_EC_BKPT32]		= NULL,
++	[ESR_ELx_EC_BRK64]		= NULL,
++	[ESR_ELx_EC_FP_ASIMD]		= NULL,
++	[ESR_ELx_EC_PAC]		= NULL,
++};
++
++exit_handle_fn kvm_get_nvhe_exit_handler(struct kvm_vcpu *vcpu)
++{
++	u32 esr = kvm_vcpu_get_esr(vcpu);
++	u8 esr_ec = ESR_ELx_EC(esr);
++
++	return hyp_exit_handlers[esr_ec];
++}
++
+ /* Switch to the guest for legacy non-VHE systems */
+ int __kvm_vcpu_run(struct kvm_vcpu *vcpu)
+ {
 -- 
 2.33.0.rc1.237.g0d66db33f3-goog
 
