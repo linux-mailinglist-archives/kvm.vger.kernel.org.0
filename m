@@ -2,130 +2,141 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E93BA3EF5E9
-	for <lists+kvm@lfdr.de>; Wed, 18 Aug 2021 00:51:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0A47D3EF5F6
+	for <lists+kvm@lfdr.de>; Wed, 18 Aug 2021 00:57:48 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234825AbhHQWvd (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 17 Aug 2021 18:51:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59170 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229466AbhHQWvd (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 17 Aug 2021 18:51:33 -0400
-Received: from mail-il1-x12c.google.com (mail-il1-x12c.google.com [IPv6:2607:f8b0:4864:20::12c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A5FBFC061764
-        for <kvm@vger.kernel.org>; Tue, 17 Aug 2021 15:50:59 -0700 (PDT)
-Received: by mail-il1-x12c.google.com with SMTP id h18so199083ilc.5
-        for <kvm@vger.kernel.org>; Tue, 17 Aug 2021 15:50:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=kJF4ZjAfLVqVGakZdtq7slT5DgNeQPyF9be1SJwj1Hw=;
-        b=WO9c2QU3Rm2pxOkmPo3AjUE8xD5dFp5H0PSGK5grzjQmciMODNSL22Zp4RSjoEY94H
-         YfcPOe6WNeAWprC+6IYhHnqWMMYcefPncqKab6WFpoYh6SgO5pPaRz24RgIFR0BB7hZd
-         hZwXrGGKflEsK54TiEY7x007y5705IjpZ3dVDtKptBdiZDJdqVlj7kl8BdNcEFZXj64a
-         ggLzVwkDsJDp83zyN4n2mhpq99SvPffSjD3srWPL57EQRM0eKQIOLZwUhcUudv+BJ4k/
-         FyV3hprr5oHGe+X6b7/tWiRrsPSm1hLfRILzP/t1I3+7zx24CaU0IuE7aLyT/7sYMKVZ
-         +LGg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=kJF4ZjAfLVqVGakZdtq7slT5DgNeQPyF9be1SJwj1Hw=;
-        b=GAGZKBrZoQQGLwYoddya5p6WKk/knH6N6P+2yZQV3otRi+pzc5qiSvtFWyH8Vyxnda
-         OzHTcoESbE89eQzyvvWq2N6FFj3a7gWv8ISx6/qcKKzUim7sqcbCyVzDBZhN0ZJT4op6
-         +zT1A1+lUaa/9EqQhoN6dSPDykvlkhU5XrvalC/vhI0gJ0QkrbzwVTNie6Yu+xndLexn
-         ZzL0IyLhd2hBSp1l123XdaBur4yUkmOHorl/EjapwPVJEFaXR7HhJ8ZXIXdt0zEK9Aqy
-         9wiZBaBdCNzdYu0XMZdrOn6qDWRqevDSPAEoptIZdT+Trw3IK5/YnFPnOh0O7A3bQ8B5
-         9SVQ==
-X-Gm-Message-State: AOAM531+2Lx0BkoDr9Xxeu2HftP6b6ORES1LJMzQYk7WskSvM47ihBU9
-        dx2fs0JaZ8C4D8VxX7wRXoEkbo4b+3s82LgyVgM5Ew==
-X-Google-Smtp-Source: ABdhPJyuXoUtjClO2XGjUvJ2jPKvvD6Oev6zK+cSmuR2nXNTv2OiJ8PR9E4e1vYMb2o+/X6JTTnGUfU3qmZ1b3XMejw=
-X-Received: by 2002:a92:c808:: with SMTP id v8mr3929501iln.110.1629240658875;
- Tue, 17 Aug 2021 15:50:58 -0700 (PDT)
-MIME-Version: 1.0
-References: <cover.1624978790.git.ashish.kalra@amd.com> <8fce27b8477073b9c7750f7cfc0c68f7ebd3a97d.1624978790.git.ashish.kalra@amd.com>
-In-Reply-To: <8fce27b8477073b9c7750f7cfc0c68f7ebd3a97d.1624978790.git.ashish.kalra@amd.com>
-From:   Steve Rutherford <srutherford@google.com>
-Date:   Tue, 17 Aug 2021 15:50:22 -0700
-Message-ID: <CABayD+fWA2bVe_MhR4SnOo7VH7Qs5kR5n9Jb6s7byqaP+UhXQA@mail.gmail.com>
-Subject: Re: [PATCH v5 6/6] x86/kvm: Add kexec support for SEV Live Migration.
-To:     Ashish Kalra <Ashish.Kalra@amd.com>
-Cc:     pbonzini@redhat.com, seanjc@google.com, tglx@linutronix.de,
-        mingo@redhat.com, hpa@zytor.com, joro@8bytes.org, bp@alien8.de,
-        thomas.lendacky@amd.com, x86@kernel.org, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, brijesh.singh@amd.com
+        id S236293AbhHQW6U (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 17 Aug 2021 18:58:20 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:1766 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S231207AbhHQW6T (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 17 Aug 2021 18:58:19 -0400
+Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 17HMWs3T071831;
+        Tue, 17 Aug 2021 18:57:39 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
+ from : reply-to : to : cc : date : in-reply-to : references : content-type
+ : mime-version : content-transfer-encoding; s=pp1;
+ bh=np8wlXqYL7QJhV0IaVvxG0wg0wMrgdlyCqBNxaJ13XI=;
+ b=nMayQ45eleUHLzZXq0Hs9yeDrp7KGwFewyINDtlsz5KHjoIOmb/MWeFFtjTJhMEiD+pL
+ vaDsvsGGEG6Wk8+UwqzwXbQ4UgwqwDLS4AhGVhmWT6w/Q/Tw6GqZqBRcLk6qs0nWJwNx
+ 9cQqabgN5+E4hhVRzFNoZvheP4HLq8K54H+d13uWzAKSI6ytiU3Lmb9zflBR3oIP/dwW
+ yVTXwSQ21AIuPMSq4WXJb+Srb/m2fHyt+YNwsIfRNts7YgBSU03i8O7d50lfc2Kpe1D8
+ FUELfsLXqqV9s31uTuPQmLvcx4Fo2QMlDFQWyc1y+WbwqrjVEJ5xHh6E9oJdvlDtov3d +g== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3agg09kapk-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 17 Aug 2021 18:57:39 -0400
+Received: from m0098396.ppops.net (m0098396.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 17HMuAGE158281;
+        Tue, 17 Aug 2021 18:57:39 -0400
+Received: from ppma02dal.us.ibm.com (a.bd.3ea9.ip4.static.sl-reverse.com [169.62.189.10])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3agg09kapb-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 17 Aug 2021 18:57:39 -0400
+Received: from pps.filterd (ppma02dal.us.ibm.com [127.0.0.1])
+        by ppma02dal.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 17HMqM3g016046;
+        Tue, 17 Aug 2021 22:57:38 GMT
+Received: from b03cxnp07028.gho.boulder.ibm.com (b03cxnp07028.gho.boulder.ibm.com [9.17.130.15])
+        by ppma02dal.us.ibm.com with ESMTP id 3aeexvrykd-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 17 Aug 2021 22:57:38 +0000
+Received: from b03ledav004.gho.boulder.ibm.com (b03ledav004.gho.boulder.ibm.com [9.17.130.235])
+        by b03cxnp07028.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 17HMvaNG48300294
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 17 Aug 2021 22:57:36 GMT
+Received: from b03ledav004.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id B9C567806A;
+        Tue, 17 Aug 2021 22:57:36 +0000 (GMT)
+Received: from b03ledav004.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id E98E77805E;
+        Tue, 17 Aug 2021 22:57:33 +0000 (GMT)
+Received: from jarvis.lan (unknown [9.160.128.138])
+        by b03ledav004.gho.boulder.ibm.com (Postfix) with ESMTP;
+        Tue, 17 Aug 2021 22:57:33 +0000 (GMT)
+Message-ID: <b1b5adcdbf51112d7b3cc2c66123dea5276a4a6d.camel@linux.ibm.com>
+Subject: Re: [RFC PATCH 00/13] Add support for Mirror VM.
+From:   James Bottomley <jejb@linux.ibm.com>
+Reply-To: jejb@linux.ibm.com
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        Steve Rutherford <srutherford@google.com>
+Cc:     Ashish Kalra <Ashish.Kalra@amd.com>,
+        qemu-devel <qemu-devel@nongnu.org>,
+        Thomas Lendacky <thomas.lendacky@amd.com>,
+        Brijesh Singh <brijesh.singh@amd.com>,
+        "Habkost, Eduardo" <ehabkost@redhat.com>,
+        "S. Tsirkin, Michael" <mst@redhat.com>,
+        Richard Henderson <richard.henderson@linaro.org>,
+        Tobin Feldman-Fitzthum <tobin@ibm.com>,
+        Dov Murik <dovmurik@linux.vnet.ibm.com>,
+        Hubertus Franke <frankeh@us.ibm.com>,
+        David Gilbert <dgilbert@redhat.com>, kvm <kvm@vger.kernel.org>
+Date:   Tue, 17 Aug 2021 18:57:32 -0400
+In-Reply-To: <CABgObfZbyTxSO9ScE0RMK2vgyOam_REo+SgLA+-1XyP=8Vx+uQ@mail.gmail.com>
+References: <cover.1629118207.git.ashish.kalra@amd.com>
+         <CABayD+fyrcyPGg5TdXLr95AFkPFY+EeeNvY=NvQw_j3_igOd6Q@mail.gmail.com>
+         <0fcfafde-a690-f53a-01fc-542054948bb2@redhat.com>
+         <CABayD+d4dHBMbshx_gMUxaHkJZENYYRMrzatDtS-a1awGQKv2A@mail.gmail.com>
+         <CABgObfZbyTxSO9ScE0RMK2vgyOam_REo+SgLA+-1XyP=8Vx+uQ@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.34.4 
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: sybo2ptpItzNBncfSeigdBQAf3gTpsTy
+X-Proofpoint-GUID: q0XuyEINbO1nT3UB2CBwJ8qbUZslk6X5
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.790
+ definitions=2021-08-17_08:2021-08-17,2021-08-17 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 bulkscore=0
+ adultscore=0 mlxlogscore=623 phishscore=0 impostorscore=0 malwarescore=0
+ priorityscore=1501 clxscore=1011 spamscore=0 lowpriorityscore=0
+ suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2107140000 definitions=main-2108170141
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jun 29, 2021 at 8:14 AM Ashish Kalra <Ashish.Kalra@amd.com> wrote:
->
-> From: Ashish Kalra <ashish.kalra@amd.com>
->
-> Reset the host's shared pages list related to kernel
-> specific page encryption status settings before we load a
-> new kernel by kexec. We cannot reset the complete
-> shared pages list here as we need to retain the
-> UEFI/OVMF firmware specific settings.
->
-> The host's shared pages list is maintained for the
-> guest to keep track of all unencrypted guest memory regions,
-> therefore we need to explicitly mark all shared pages as
-> encrypted again before rebooting into the new guest kernel.
->
-> Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
-> ---
->  arch/x86/kernel/kvm.c | 25 +++++++++++++++++++++++++
->  1 file changed, 25 insertions(+)
->
-> diff --git a/arch/x86/kernel/kvm.c b/arch/x86/kernel/kvm.c
-> index a014c9bb5066..a55712ee58a1 100644
-> --- a/arch/x86/kernel/kvm.c
-> +++ b/arch/x86/kernel/kvm.c
-> @@ -869,10 +869,35 @@ static void __init kvm_init_platform(void)
->         if (sev_active() &&
->             kvm_para_has_feature(KVM_FEATURE_MIGRATION_CONTROL)) {
->                 unsigned long nr_pages;
-> +               int i;
->
->                 pv_ops.mmu.notify_page_enc_status_changed =
->                         kvm_sev_hc_page_enc_status;
->
-> +               /*
-> +                * Reset the host's shared pages list related to kernel
-> +                * specific page encryption status settings before we load a
-> +                * new kernel by kexec. Reset the page encryption status
-> +                * during early boot intead of just before kexec to avoid SMP
-> +                * races during kvm_pv_guest_cpu_reboot().
-> +                * NOTE: We cannot reset the complete shared pages list
-> +                * here as we need to retain the UEFI/OVMF firmware
-> +                * specific settings.
-> +                */
-> +
-> +               for (i = 0; i < e820_table->nr_entries; i++) {
-> +                       struct e820_entry *entry = &e820_table->entries[i];
-> +
-> +                       if (entry->type != E820_TYPE_RAM)
-> +                               continue;
-> +
-> +                       nr_pages = DIV_ROUND_UP(entry->size, PAGE_SIZE);
-> +
-> +                       kvm_hypercall3(KVM_HC_MAP_GPA_RANGE, entry->addr,
-> +                                      nr_pages,
-> +                                      KVM_MAP_GPA_RANGE_ENCRYPTED | KVM_MAP_GPA_RANGE_PAGE_SZ_4K);
-> +               }
-> +
->                 /*
->                  * Ensure that _bss_decrypted section is marked as decrypted in the
->                  * shared pages list.
-> --
-> 2.17.1
->
-I believe this entire series has been reviewed. Is there any appetite
-to queue these for 915?
-They may need to be resent, since I'm not sure there is a single patch
-series that contains all the patches.
+On Wed, 2021-08-18 at 00:37 +0200, Paolo Bonzini wrote:
+> On Tue, Aug 17, 2021 at 11:54 PM Steve Rutherford
+> <srutherford@google.com> wrote:
+> > > 1) the easy one: the bottom 4G of guest memory are mapped in the
+> > > mirror
+> > > VM 1:1.  The ram_addr_t-based addresses are shifted by either 4G
+> > > or a
+> > > huge value such as 2^42 (MAXPHYADDR - physical address reduction
+> > > - 1).
+> > > This even lets the migration helper reuse the OVMF runtime
+> > > services
+> > > memory map (but be careful about thread safety...).
+> > 
+> > If I understand what you are proposing, this would only work for
+> > SEV/SEV-ES, since the RMP prevents these remapping games. This
+> > makes
+> > me less enthusiastic about this (but I suspect that's why you call
+> > this less future proof).
+> 
+> I called it less future proof because it allows the migration helper
+> to rely more on OVMF details, but those may not apply in the future.
+> 
+> However you're right about SNP; the same page cannot be mapped twice
+> at different GPAs by a single ASID (which includes the VM and the
+> migration helper). :( That does throw a wrench in the idea of mapping
+> pages by ram_addr_t(*), and this applies to both schemes.
 
---Steve
+Right, but in the current IBM approach, since we use the same mapping
+for guest and mirror, we have the same GPA in both and it should work
+with -SNP.
+
+> Migrating RAM in PCI BARs is a mess anyway for SNP, because PCI BARs
+> can be moved and every time they do the migration helper needs to
+> wait for validation to happen. :(
+
+Realistically, migration is becoming a royal pain, not just for
+confidential computing, but for virtual functions in general.  I really
+think we should look at S3 suspend, where we shut down the drivers and
+then reattach on S3 resume as the potential pathway to getting
+migration working both for virtual functions and this use case.
+
+James
+
+
