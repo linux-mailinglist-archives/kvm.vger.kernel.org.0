@@ -2,105 +2,196 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 82EDA3EF563
-	for <lists+kvm@lfdr.de>; Wed, 18 Aug 2021 00:05:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2A81D3EF595
+	for <lists+kvm@lfdr.de>; Wed, 18 Aug 2021 00:14:04 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235130AbhHQWFo (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 17 Aug 2021 18:05:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48566 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229700AbhHQWFn (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 17 Aug 2021 18:05:43 -0400
-Received: from mail-il1-x12e.google.com (mail-il1-x12e.google.com [IPv6:2607:f8b0:4864:20::12e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BAA3FC061764
-        for <kvm@vger.kernel.org>; Tue, 17 Aug 2021 15:05:09 -0700 (PDT)
-Received: by mail-il1-x12e.google.com with SMTP id x5so96320ill.3
-        for <kvm@vger.kernel.org>; Tue, 17 Aug 2021 15:05:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=OZqPgounEIER6ocdPyrnXbdW3TYtXZWjlNEg5NQfLK8=;
-        b=hRJyAcxfN5jVh6JWF7HUfeYFRkenRRp99StwCAkKyZPNNfrG6a/NC4COGxHzCvLlQz
-         I6UwnYV58HANPjcsP+De8UwFM5Ro/+lnePUBlXbAtenAkq9loOCb8XAkORhs6jI4ZD68
-         HjF0Xog7zdzjiuNljLfPYFT4/jDtn/yRf8qCcxHpOO3ziLuB4ckrsfme7TtnCqMbiC7Y
-         VtJo82ezAZwhl/nYkl5QBJzeKZOH8TlxLwSIIFupdoCetchMUzmC0kouyoQfT82UXGp2
-         yRPAR2D5W993Yx9G7yITCkeSJdKh+JJ72NQnWSFLqq4CyOaaZy1o0BqO5Kl20wozqX1M
-         b3iQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=OZqPgounEIER6ocdPyrnXbdW3TYtXZWjlNEg5NQfLK8=;
-        b=SyOqnXw8uaNMA2UzMKFXMoe/rSthG1sM1l7XXzvOkBAwjwljssoQj4/bULXEtu/Cl7
-         q/8h4uAGGSjqmAxu/4XvwuOYldydjxmGPTzavT45G1JVsWRvwPY/wOuYhUhN2oIEfcpu
-         FK+3Xrk3woVMZR4EkKVnYgDcrA1faUxP4W8+00Qqg6zGtlWIHB4TPeg0/PsI3qe3wdC7
-         Ejlb0VF276QhDV9pb8qOk7azWotoNjc98ATAg0GVP8204B8ZxjynqI9aHRDJyqiPK17O
-         n9koD49zPUc0i5n0Lh9VBp8pWfmXGBYTWajYDcBq8F3dhILOjcjCMnPM9i/zNNASBtXZ
-         HYzA==
-X-Gm-Message-State: AOAM533h+kH9l72GssaJu/Pmby+VUMxECNyivN8SHHyftcegA6UKl3GO
-        8J5N1avrou1V3phh7h0kmdtQbzoG9Gqjnbi9l4Z/9A==
-X-Google-Smtp-Source: ABdhPJxlYq9gxQzuDtH+0kqvgJ74s7MMMkyqidnNO4T4Qi8RoJvXSbWnXgHR/zI+wGlJhp33pfEuo3XvpED6dR4bes0=
-X-Received: by 2002:a05:6e02:688:: with SMTP id o8mr4088723ils.182.1629237908890;
- Tue, 17 Aug 2021 15:05:08 -0700 (PDT)
+        id S235865AbhHQWOg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 17 Aug 2021 18:14:36 -0400
+Received: from mail-dm6nam12on2058.outbound.protection.outlook.com ([40.107.243.58]:43329
+        "EHLO NAM12-DM6-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S229869AbhHQWOf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 17 Aug 2021 18:14:35 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Wb+1rkb5g3oOjlLyh+tMGerPJwM3vzeUa0yCKA/owBXiSuhw+jb+KM1gPgkd4r8mo0MnENeT8uimHrM/M9sQxyAKk8SQ00KBLr89IApcfRZn7VfrHcYww4C9awbwqRPNcGe8Sy/MeajXu9YgTEHFoiWGZBrx9PpYWD8HPBQDW7AziQa/yXUmXBw+viy3ar6t41EsbrxYCDOqEM+7CBp6ybRMNVMz7O59I8zvH83HMZi3iyLwtU55gXOZxyVcfH0jQTogi1zlrfZYU4wH9dl3yhao1+1mqRTi64z/uHAqDyyR2ggKK44LetmrxmVJsnoTNIv2T2vMqXyIXeTDCb+MOQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=35BH7pL4XK1kRjaV3x8R3Am0K0hm3uIKDr9dZ2/L57A=;
+ b=XRuxpbi6dK/7QNfviSvpdaioCE7lB3RBuF/1y3wYBMpkFOJYzU7bh8B5PNfRTOkYQ6Y36Gk2D5tWcgqxK+cAH9N5xYCLx25B3FM0XJlFGdeyltSGpX31aOVY6Za67o/TS7h9k3/IiD9i4+qT7l6qNsWiy8cj3OdgN7Wy/SmDxY7ziHb7P3Z4Aiqjt9ggv9+xC9sS3U64q75vTO2wf01cJdAleyVeyDKtlT2BhZOktFEcJR/R6ahtb9TS+prU+Y/p6wFY8LJVXKBrkJazK3I4vnyDlS+g74EcO4KH+6c/Kx7YRWC4DYWmBgzQdjpN7vZwr/Vu1H9iZ960vhbl6FPjJg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=35BH7pL4XK1kRjaV3x8R3Am0K0hm3uIKDr9dZ2/L57A=;
+ b=13db37pkehf1lJcWXIzgkC2jotDopyEXXi5dbsUKxknsvJwUBqqAlvPYGut58zshNfL1PFgMHzaI8wrM6PKmio2wEXDmQG4Jsuzk8MQZdeOsyRLLImK/GfSogQpxzHglfBEBdac0L5622v5RY83fx8fIpcSxRk5TjRD/LAsaC/Y=
+Authentication-Results: gmail.com; dkim=none (message not signed)
+ header.d=none;gmail.com; dmarc=none action=none header.from=amd.com;
+Received: from DM4PR12MB5229.namprd12.prod.outlook.com (2603:10b6:5:398::12)
+ by DM4PR12MB5103.namprd12.prod.outlook.com (2603:10b6:5:392::13) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4415.16; Tue, 17 Aug
+ 2021 22:13:58 +0000
+Received: from DM4PR12MB5229.namprd12.prod.outlook.com
+ ([fe80::d560:d21:cd59:9418]) by DM4PR12MB5229.namprd12.prod.outlook.com
+ ([fe80::d560:d21:cd59:9418%6]) with mapi id 15.20.4415.024; Tue, 17 Aug 2021
+ 22:13:58 +0000
+Subject: Re: [PATCH Part1 RFC v4 20/36] x86/sev: Use SEV-SNP AP creation to
+ start secondary CPUs
+To:     Borislav Petkov <bp@alien8.de>,
+        Brijesh Singh <brijesh.singh@amd.com>
+Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
+        linux-coco@lists.linux.dev, linux-mm@kvack.org,
+        linux-crypto@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        David Rientjes <rientjes@google.com>,
+        Dov Murik <dovmurik@linux.ibm.com>,
+        Tobin Feldman-Fitzthum <tobin@ibm.com>,
+        Michael Roth <michael.roth@amd.com>,
+        Vlastimil Babka <vbabka@suse.cz>, tony.luck@intel.com,
+        npmccallum@redhat.com, brijesh.ksingh@gmail.com
+References: <20210707181506.30489-1-brijesh.singh@amd.com>
+ <20210707181506.30489-21-brijesh.singh@amd.com> <YRwWSizr/xoWXivV@zn.tnic>
+From:   Tom Lendacky <thomas.lendacky@amd.com>
+Message-ID: <35b57719-5f31-c71a-7a2f-d34f6e239d26@amd.com>
+Date:   Tue, 17 Aug 2021 17:13:54 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.11.0
+In-Reply-To: <YRwWSizr/xoWXivV@zn.tnic>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: SN4PR0201CA0013.namprd02.prod.outlook.com
+ (2603:10b6:803:2b::23) To DM4PR12MB5229.namprd12.prod.outlook.com
+ (2603:10b6:5:398::12)
 MIME-Version: 1.0
-References: <cover.1629118207.git.ashish.kalra@amd.com> <CABayD+fyrcyPGg5TdXLr95AFkPFY+EeeNvY=NvQw_j3_igOd6Q@mail.gmail.com>
- <0fcfafde-a690-f53a-01fc-542054948bb2@redhat.com> <37796fd1-bbc2-f22c-b786-eb44f4d473b9@linux.ibm.com>
-In-Reply-To: <37796fd1-bbc2-f22c-b786-eb44f4d473b9@linux.ibm.com>
-From:   Steve Rutherford <srutherford@google.com>
-Date:   Tue, 17 Aug 2021 15:04:32 -0700
-Message-ID: <CABayD+evf56U4yT2V1TmEzaJjvV8gutUG5t8Ob2ifamruw5Qrg@mail.gmail.com>
-Subject: Re: [RFC PATCH 00/13] Add support for Mirror VM.
-To:     Tobin Feldman-Fitzthum <tobin@linux.ibm.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Ashish Kalra <Ashish.Kalra@amd.com>, thomas.lendacky@amd.com,
-        brijesh.singh@amd.com, ehabkost@redhat.com, kvm@vger.kernel.org,
-        mst@redhat.com, tobin@ibm.com, jejb@linux.ibm.com,
-        richard.henderson@linaro.org, qemu-devel@nongnu.org,
-        dgilbert@redhat.com, frankeh@us.ibm.com,
-        dovmurik@linux.vnet.ibm.com
-Content-Type: text/plain; charset="UTF-8"
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from [10.236.30.241] (165.204.77.1) by SN4PR0201CA0013.namprd02.prod.outlook.com (2603:10b6:803:2b::23) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4436.19 via Frontend Transport; Tue, 17 Aug 2021 22:13:56 +0000
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 6ced03bb-ef65-4998-c2db-08d961cc4f69
+X-MS-TrafficTypeDiagnostic: DM4PR12MB5103:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <DM4PR12MB51037B266727D22E2012F09BECFE9@DM4PR12MB5103.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:9508;
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: tyHo0us+7RWYJAqLllr6UUOMbpFcpRTEdfGR5HAfoMHnoM6+GDTKJAgefEJtX6ezVrkMtmJmA1ZoWFaV7F4BwI2IUXhqYFlhwY5hZfSe3DZSY7C2TqukFL8jX3gCeN+NrQblHrqdmmXx6Gf1IRvQzvYKBgaRbEOh7/yRaKSUWrrWxNbGdJzuaWvttegdPyfUo/Izc2T8O2S3/bvNH4zy5vhu5lWAxwRAmTowjDTwUtxXGQ8kCRmjaf3b34awwuNpOkFEGQ7kdpvsbWZ0gTOfzciUbmfDPltlFfdmSngaB3nwIRu5iIxH8NoWtF+wY33kmu0zy4GPA+CD8BTNpqJtDiI6T3dCylfRD+2S/2DAdS3M1/fCWBjvlTbAsL22RkOp4T8IrCSDq63AGEgxfUdzOVpWIhg1brZy9uy5IiAB/RzAjyoVtVTHaoq/DK/tPXNR+hvQgnEHhDZ4ui/rODrbnROL6ZQZt/rLyI8IUxlwmkHiCTOV6N/rt9ONurbuF/EPS61zzcXU9227qfFtaW383VTntUfhajqibT95GpKhHFnct26MdgVXOoRgOgN5hH4K/egluC9zsre+SSdUNA9G0kdXaMJ1vYsmCYFwAjXCTiYppPxgsKaagR4MCimZoDs/tjPXKZgMg10SFFSXhuVysJbeBXS25ftmtk0l/q1jCe5+a69YKxCiGW67ntscEXFqn8sl3K74OjW0H3BrQUzfeYh11923mHPmvQi7pz5nWNw=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR12MB5229.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(136003)(346002)(396003)(376002)(39860400002)(366004)(54906003)(86362001)(8936002)(5660300002)(478600001)(186003)(26005)(956004)(38100700002)(83380400001)(53546011)(31696002)(7406005)(2616005)(36756003)(6486002)(16576012)(31686004)(6636002)(2906002)(316002)(110136005)(8676002)(66946007)(4326008)(66556008)(66476007)(7416002)(43740500002)(45980500001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?cnduMkRuY0dWRWtHcldKd1BKRFRlTFVXUTUwcTN1TVhjdCtmbjhTcjUwZ1NN?=
+ =?utf-8?B?TTRjY0ZZRnBOSzJERGtDSjB5S092TllRU1B1dzVieGJkNG02dm1aVXFUcytH?=
+ =?utf-8?B?QlVuWmRwT2x2WWJDSFdmb1BVMVVLSHM1eksvRDV2dS9kZldtbzJDNXJYb1ZW?=
+ =?utf-8?B?N1JHSWxKemVPTkJMM1RtdGFVWUIxZVBveDluL1FBVmtIN1VPSkRhL01FYWJi?=
+ =?utf-8?B?OFBqUFEzdGxrZmlSYktLeGZnK1d1cTdwbHZKMnRjKytFSzRwa3Vna2JqQmdm?=
+ =?utf-8?B?eE1aUVFRTU92ZXFrV2RyQWZ0T253aHEvOU5MZW1UaWdNNlgyWkdJdEpTeTBS?=
+ =?utf-8?B?SzF4TEZjcFZ5ZnpKYVV1Uit6UldaaSt4Qll5S2FjVk1CUUd0WTJBeHo0NEMx?=
+ =?utf-8?B?b0p4MGlCYS9Bb2pQN0hadEs0eVpyYnA3R2pmdVNQaVlxdHNHdDRrZENBMXl2?=
+ =?utf-8?B?K1FLMDFkdW0xKytrZTFHTUVzTHVRTFFxN3k2VFdaRFM0YjZkWXJHS2Vralo1?=
+ =?utf-8?B?TGJQVFQwUEsvTVJ2ak1hNGl3dnh2ZHcrK0lXaGxuMStVRlMwdDFQVlorWXlP?=
+ =?utf-8?B?WjVvM2VPQnlyVklRZTMyZU5kRUdGMTdvWjY2WStwRWZtMnRKT3NOQ2xZYzU5?=
+ =?utf-8?B?cWlFdXlLcThzampkRnk0R1lNRDlPemg3bEFSQXhNeHlXVGlhdXFydXduSTRK?=
+ =?utf-8?B?SHpVR2ZuRi9sZElvZVJwNTlEUEdoRjVweXlubFZKQjl0TFZvaDFSQmQyRTcx?=
+ =?utf-8?B?dW11VWZYTWpWcmZnZStGc3dsbmFneXZsUld5K1VTUUFZYVJaNVdLN1Q3WmVU?=
+ =?utf-8?B?TEZFYmxXaWhMQWl0eVFYZHlDOFZCdHBwT28rVkJKWHB6cVozaEtGWXpRWll6?=
+ =?utf-8?B?Wm8xd1JqbUJOdE5JSTJlSmxBd29PN1FWMlNzOEV3NjF4OHp6RFROSTRIZGtN?=
+ =?utf-8?B?c3BoRUo0R1h5bXJ5WVNNdjJUMTVZbFZPdDE1ZmU4Z1gyWURHZEdKa0ZFWm5q?=
+ =?utf-8?B?Qk96SUxtY0JiMGMrWHRSbnd4dzVZZmM2M2JjVlhZeHdXby9qU0xBYk9YdzJi?=
+ =?utf-8?B?K2xvWjBWZWpxelJRd1JJeERLWmFvRjFiOEJZRVVQNmowRGxvOXlYK1p0VlZv?=
+ =?utf-8?B?UXk0aTA0NUhlTnlIUHk0YnB1RFNEQTl6SU83RUpWMWNXUHhtOWRGaW5xUlVB?=
+ =?utf-8?B?aUdHYVJhdXFoYU9BWHk5WmN6WCtZUGVYL0E3bjJpWWFDUlpEVGVMS2lpR1Jv?=
+ =?utf-8?B?dlhPbDU0YXY4ZUhNa21mV3ZMTFFiS0xjK2xpbGJpRGJ6cDRpK1JMckhCaDBO?=
+ =?utf-8?B?ZEg1OVpmQkR2QWM1R01RbGRwa29KMklMSXlGWkx1SDhtQXZ3eEl1ZERJbXFl?=
+ =?utf-8?B?U1Jja3pJZS9jK25pbFgwWjZ4akpnTTZXd2NiVWs4clZybGdMVXAvaXkzL2N5?=
+ =?utf-8?B?SElHMlU1NFNnUTBuNnovMGlqaWhJeWkySytaaWowVEVHY1NpM0htZ3Vza3hS?=
+ =?utf-8?B?YWQ3U1RkSmVxRG1GWHFoTGY1eThwSlQ4Ti9tVWM1SHJNUGJVdHQ5MDc3NStO?=
+ =?utf-8?B?My9xcTdlV21vb3UvdmQ2MzVwSFpPb2tWRWQxSS9DMWV3eXdNLys4VDhFSnZw?=
+ =?utf-8?B?cG4vUDgyOTdteXRBb2owVzd3d2N0VW1zbktlTXR6YWE4TGdlSyt5YW1keXZ4?=
+ =?utf-8?B?Znc3ODB4Z1oyU0lJdXdTR1B6WWRVdnJmUVZHVXVRelU0OXpQV2lUVXloUnpI?=
+ =?utf-8?Q?/vhrUGup+JlTnao5on9baiqP4hT+7t4RYcLu8+Z?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 6ced03bb-ef65-4998-c2db-08d961cc4f69
+X-MS-Exchange-CrossTenant-AuthSource: DM4PR12MB5229.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 Aug 2021 22:13:58.5648
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: SP9Vc9TwddUauL86k8aob8dxlc3+3sLHFx1+kRkzizvTDAPTxQyUVjZVpnBL7amVBIhOQLZQvV++rfz+P4oK9w==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB5103
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Aug 17, 2021 at 1:50 PM Tobin Feldman-Fitzthum
-<tobin@linux.ibm.com> wrote:
->
->
-> On 8/17/21 12:32 PM, Paolo Bonzini wrote:
-> > There's three possibilities for this:
-> >
-> > 1) the easy one: the bottom 4G of guest memory are mapped in the
-> > mirror VM 1:1.  The ram_addr_t-based addresses are shifted by either
-> > 4G or a huge value such as 2^42 (MAXPHYADDR - physical address
-> > reduction - 1). This even lets the migration helper reuse the OVMF
-> > runtime services memory map (but be careful about thread safety...).
->
-> This is essentially what we do in our prototype, although we have an
-> even simpler approach. We have a 1:1 mapping that maps an address to
-> itself with the cbit set. During Migration QEMU asks the migration
-> handler to import/export encrypted pages and provides the GPA for said
-> page. Since the migration handler only exports/imports encrypted pages,
-> we can have the cbit set for every page in our mapping. We can still use
-> OVMF functions with these mappings because they are on encrypted pages.
-> The MH does need to use a few shared pages (to communicate with QEMU,
-> for instance), so we have another mapping without the cbit that is at a
-> large offset.
->
-> I think this is basically equivalent to what you suggest. As you point
-> out above, this approach does require that any page that will be
-> exported/imported by the MH is mapped in the guest. Is this a bad
-> assumption? The VMSA for SEV-ES is one example of a region that is
-> encrypted but not mapped in the guest (the PSP handles it directly). We
-> have been planning to map the VMSA into the guest to support migration
-> with SEV-ES (along with other changes).
+On 8/17/21 3:04 PM, Borislav Petkov wrote:
+> On Wed, Jul 07, 2021 at 01:14:50PM -0500, Brijesh Singh wrote:
+>> @@ -854,6 +858,207 @@ void snp_set_memory_private(unsigned long vaddr, unsigned int npages)
+>>  	pvalidate_pages(vaddr, npages, 1);
+>>  }
+>>  
+>> +static int vmsa_rmpadjust(void *va, bool vmsa)
+> 
+> I know, I know it gets a bool vmsa param but you can still call it
+> simply rmpadjust() because this is what it does - it is a wrapper around
+> the insn. Just like pvalidate() and so on.
 
-Ahh, It sounds like you are looking into sidestepping the existing
-AMD-SP flows for migration. I assume the idea is to spin up a VM on
-the target side, and have the two VMs attest to each other. How do the
-two sides know if the other is legitimate? I take it that the source
-is directing the LAUNCH flows?
+Well, yes and no. It really is just setting or clearing the VMSA page
+attribute. It isn't trying to update permissions for the lower VMPLs, so I
+didn't want to mislabel it as a general rmpadjust function. But it's a
+simple enough thing to change and if multiple VMPL levels are ever
+supported it can be evaluated at that time.
 
+> 
+> ...
+> 
+>> +static int wakeup_cpu_via_vmgexit(int apic_id, unsigned long start_ip)
+>> +{
+>> +	struct sev_es_save_area *cur_vmsa, *vmsa;
+>> +	struct ghcb_state state;
+>> +	unsigned long flags;
+>> +	struct ghcb *ghcb;
+>> +	int cpu, err, ret;
+>> +	u8 sipi_vector;
+>> +	u64 cr4;
+>> +
+>> +	if ((sev_hv_features & GHCB_HV_FT_SNP_AP_CREATION) != GHCB_HV_FT_SNP_AP_CREATION)
+>> +		return -EOPNOTSUPP;
+>> +
+>> +	/*
+>> +	 * Verify the desired start IP against the known trampoline start IP
+>> +	 * to catch any future new trampolines that may be introduced that
+>> +	 * would require a new protected guest entry point.
+>> +	 */
+>> +	if (WARN_ONCE(start_ip != real_mode_header->trampoline_start,
+>> +		      "unsupported SEV-SNP start_ip: %lx\n", start_ip))
+> 
+> "Unsupported... " - with a capital letter
 
---Steve
+Will do.
+
+Thanks,
+Tom
+
+> 
+>> +		return -EINVAL;
+>> +
+>> +	/* Override start_ip with known protected guest start IP */
+>> +	start_ip = real_mode_header->sev_es_trampoline_start;
+>> +
+> 
+> ...
+> 
