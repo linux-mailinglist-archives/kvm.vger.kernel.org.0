@@ -2,117 +2,128 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A060C3EF60F
-	for <lists+kvm@lfdr.de>; Wed, 18 Aug 2021 01:20:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3F2CA3EF64A
+	for <lists+kvm@lfdr.de>; Wed, 18 Aug 2021 01:46:55 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234500AbhHQXVV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 17 Aug 2021 19:21:21 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:21039 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229466AbhHQXVU (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 17 Aug 2021 19:21:20 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1629242446;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=CEwhor+Z+8oa4WM8Oi5cJsChDqCNGSHq7j3GEIZe8Nw=;
-        b=fHiNewyF8Z5HzF+J0BDtIf7w9VVheq+c2hsGKavXRfM3SxrChMbuWCwVsuMQc8YWr6jMM5
-        jWyPG9sD65hTLv3Vbo8QtrHkasjcfWaTAEDzL9kDmBl5g8WgsNzSMdiIHe4TBWiOh8NaCl
-        t8N+vJDJ4tPaB6et53UCC9iZUzznN+0=
-Received: from mail-pj1-f72.google.com (mail-pj1-f72.google.com
- [209.85.216.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-186-MZODdHxYPQCnJXmyhzM-Eg-1; Tue, 17 Aug 2021 19:20:45 -0400
-X-MC-Unique: MZODdHxYPQCnJXmyhzM-Eg-1
-Received: by mail-pj1-f72.google.com with SMTP id h21-20020a17090adb95b029017797967ffbso568710pjv.5
-        for <kvm@vger.kernel.org>; Tue, 17 Aug 2021 16:20:45 -0700 (PDT)
+        id S236635AbhHQXr2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 17 Aug 2021 19:47:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43290 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S235369AbhHQXrZ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 17 Aug 2021 19:47:25 -0400
+Received: from mail-pg1-x52a.google.com (mail-pg1-x52a.google.com [IPv6:2607:f8b0:4864:20::52a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1D753C061764
+        for <kvm@vger.kernel.org>; Tue, 17 Aug 2021 16:46:52 -0700 (PDT)
+Received: by mail-pg1-x52a.google.com with SMTP id w8so344239pgf.5
+        for <kvm@vger.kernel.org>; Tue, 17 Aug 2021 16:46:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=XqQFpWeHcUSQ+PzurepI7rzfCx4vcTPngCOlB1Frgp8=;
+        b=lFKC+5yRwUMxrTd/aU32KYVl6pxWSqvF2ahYEDOtdrp1Vo0Uoendl7WxGHRZMdh4jd
+         NQqluvnTV1RQuEvnI0VZAmFmxBEnChGj3HCvdS/RQPGyw7SFoWR/t7L9pkh5FDHBQ0hE
+         0kuW3kkAozYwZ9sLpVGqRIFKPq7xPrGxw9KDgW3E/OK8oQKe9IC4u4GPLU1kIN27qCNj
+         rBRowlRKGyZMnJfn/Nrl6xQu3bDkUg4YUkG713hP2hawXKwI59QoysKHY7mw4BsNpec4
+         zWRebUy9+q4sDI+p2yKO8aCVbOqJBmSzSoExJbxoGOCeOMksyHrv4xmMsAjUugC9Xvsw
+         52HQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=CEwhor+Z+8oa4WM8Oi5cJsChDqCNGSHq7j3GEIZe8Nw=;
-        b=Rj1OoTA6sN7pYBrjm+H8zOtU0o1g371ZzyLrxARIapcUr9XbmRlhsyuOnZTNf8ZTwu
-         mugiQBk6N74s9wcfCWkxKw77BLnncgse7muS12Boi2lPNF85BXUHVf+UpilcYgH68RKo
-         hYRz91OlyjxGUQ7k7X0uVPorVS9OzdKvWuiIDRtAPiJlYCG8wUYPj8QE5rE/+KkUyMKS
-         jBXuO3HAozztjawi+RNZ+g8kADOgAIvZuXgd0UwvY2Hu+9E48aXc11jmN92JZtssktTj
-         BuXV99Xt0L972WG/pJlq0g8/ugzNbUUsEoX5ZsmN9s6+cYT1NAq1Cx91CbtZmImFjBOb
-         +gZA==
-X-Gm-Message-State: AOAM533G4blwVGPM1ti7IRwtW8hC9VQMH+VB4xKl+zU0A4Br+w2cj685
-        HdhmB77vjfU62u5BXQRf5FP1+6mcswyQEzUFFZBFZgL/L6aYUiLbvB5jxpEwtwN9fXL9clMF286
-        i8Ka5xibeUcJabj8m8LEfRu6hwH9v
-X-Received: by 2002:a63:5fcc:: with SMTP id t195mr5711415pgb.146.1629242444189;
-        Tue, 17 Aug 2021 16:20:44 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyTwNjlO02zRXcWFcI9eLHyW5ECSSGVrU7Ymey0gNtRDmaWq9MUtZjMO0REfPSw5PQYLTxrmLK3CwPE9pyeFMI=
-X-Received: by 2002:a63:5fcc:: with SMTP id t195mr5711389pgb.146.1629242443919;
- Tue, 17 Aug 2021 16:20:43 -0700 (PDT)
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=XqQFpWeHcUSQ+PzurepI7rzfCx4vcTPngCOlB1Frgp8=;
+        b=tgmNXcc/RakYrwZEuhErMROixgZvvynog2GCLC+y3x2mocgaIgu95zehEEZEaB7nap
+         49WxeLyH/I4WPBrz5E2PHtyebC670/xcOF1pQeY4HPCcaX8pTUOyYBPfoD3HlfXSvDEK
+         tJX9mEIXA0T6Hbp/X7l3rES7hrgu63peAgmAnmz/+xQEbq0utXMUzPqPrMhgpd0RbRAw
+         cWpAsm3Hl66bdYinLMEy6egWuzsL9fhazB+xIqaMWaYPuC0UuJ930I12XzO9Piu7Z/Xk
+         9lZguEnflt7Adl8gw9dCaTFjV5MtLq++BCzgzh4cegndvmAIxVILLdlBeU+Wt6aYe3VH
+         320g==
+X-Gm-Message-State: AOAM5310BmGb6rT9954Wdk+u9OsrwJb8ZfQfYlYCrtxVxGd2CBpUy9Le
+        uUWNoVdEyzpF/WqUX+rOyaiUenpN/54lzA==
+X-Google-Smtp-Source: ABdhPJzPZi/rbcDO/mYvuJ8vRPrRzQvJbWlrYqeHyb74ExzFJcNnNFPVzvXV3W9Tu7TP+2eheAFEpg==
+X-Received: by 2002:a63:5b04:: with SMTP id p4mr5969927pgb.236.1629244011395;
+        Tue, 17 Aug 2021 16:46:51 -0700 (PDT)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id g26sm4356226pgb.45.2021.08.17.16.46.50
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 17 Aug 2021 16:46:50 -0700 (PDT)
+Date:   Tue, 17 Aug 2021 23:46:45 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Jing Zhang <jingzhangos@google.com>
+Cc:     KVM <kvm@vger.kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
+        David Matlack <dmatlack@google.com>,
+        Peter Shier <pshier@google.com>,
+        Oliver Upton <oupton@google.com>,
+        Cannon Matthews <cannonmatthews@google.com>
+Subject: Re: [PATCH] KVM: stats: add stats to detect if vcpu is currently
+ halted
+Message-ID: <YRxKZXm68FZ0jr34@google.com>
+References: <20210817230508.142907-1-jingzhangos@google.com>
 MIME-Version: 1.0
-References: <cover.1629118207.git.ashish.kalra@amd.com> <CABayD+fyrcyPGg5TdXLr95AFkPFY+EeeNvY=NvQw_j3_igOd6Q@mail.gmail.com>
- <0fcfafde-a690-f53a-01fc-542054948bb2@redhat.com> <37796fd1-bbc2-f22c-b786-eb44f4d473b9@linux.ibm.com>
-In-Reply-To: <37796fd1-bbc2-f22c-b786-eb44f4d473b9@linux.ibm.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Date:   Wed, 18 Aug 2021 01:20:31 +0200
-Message-ID: <CABgObfYz8=+u1nsiSiLbOo7t7uSyQzro+crRsK4fANS1_TZR9Q@mail.gmail.com>
-Subject: Re: [RFC PATCH 00/13] Add support for Mirror VM.
-To:     Tobin Feldman-Fitzthum <tobin@linux.ibm.com>
-Cc:     Steve Rutherford <srutherford@google.com>,
-        Ashish Kalra <Ashish.Kalra@amd.com>,
-        Thomas Lendacky <thomas.lendacky@amd.com>,
-        Brijesh Singh <brijesh.singh@amd.com>,
-        "Habkost, Eduardo" <ehabkost@redhat.com>,
-        kvm <kvm@vger.kernel.org>,
-        "S. Tsirkin, Michael" <mst@redhat.com>,
-        Tobin Feldman-Fitzthum <tobin@ibm.com>,
-        "James E . J . Bottomley" <jejb@linux.ibm.com>,
-        Richard Henderson <richard.henderson@linaro.org>,
-        qemu-devel <qemu-devel@nongnu.org>,
-        David Gilbert <dgilbert@redhat.com>,
-        Hubertus Franke <frankeh@us.ibm.com>,
-        Dov Murik <dovmurik@linux.vnet.ibm.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210817230508.142907-1-jingzhangos@google.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Aug 17, 2021 at 10:51 PM Tobin Feldman-Fitzthum
-<tobin@linux.ibm.com> wrote:
-> This is essentially what we do in our prototype, although we have an
-> even simpler approach. We have a 1:1 mapping that maps an address to
-> itself with the cbit set. During Migration QEMU asks the migration
-> handler to import/export encrypted pages and provides the GPA for said
-> page. Since the migration handler only exports/imports encrypted pages,
-> we can have the cbit set for every page in our mapping. We can still use
-> OVMF functions with these mappings because they are on encrypted pages.
-> The MH does need to use a few shared pages (to communicate with QEMU,
-> for instance), so we have another mapping without the cbit that is at a
-> large offset.
->
-> I think this is basically equivalent to what you suggest. As you point
-> out above, this approach does require that any page that will be
-> exported/imported by the MH is mapped in the guest. Is this a bad
-> assumption?
+On Tue, Aug 17, 2021, Jing Zhang wrote:
+> Current guest/host/halt stats don't show when we are currently halting
 
-It should work well enough in the common case; and with SNP it looks
-like it is a necessary assumption anyway. *shrug*
+s/we are/KVM is
 
-It would be a bit ugly because QEMU has to constantly convert
-ram_addr_t's to guest physical addresses and back. But that's not a
-performance problem.
+And I would probably reword it to "when KVM is blocking a vCPU in response to
+the vCPU activity state, e.g. halt".  More on that below.
 
-The only important bit is that the encryption status bitmap be indexed
-by ram_addr_t. This lets QEMU detect the problem of a ram_addr_t that
-is marked encrypted but is not currently mapped, and abort migration.
+> well. If a guest halts for a long period of time they could appear
+> pathologically blocked but really it's the opposite there's nothing to
+> do.
+> Simply count the number of times we enter and leave the kvm_vcpu_block
 
-> The Migration Handler in OVMF is not a contiguous region of memory. The
-> MH uses OVMF helper functions that are allocated in various regions of
-> runtime memory. I guess I can see how separating the memory of the MH
-> and the guest OS could be positive. On the other hand, since the MH is
-> in OVMF, it is fundamentally designed to coexist with the guest OS.
+s/we/KVM
 
-IIRC runtime services are not SMP-safe, so the migration helper cannot
-coexist with the guest OS without extra care. I checked quickly and
-CryptoPkg/Library/BaseCryptLib/SysCall/RuntimeMemAllocation.c does not
-use any lock, so it would be bad if both OS-invoked runtime services
-and the MH invoked the CryptoPkg malloc at the same time.
+In general, it's good practice to avoid pronouns in comments and changelogs as
+doing so all but forces using precise, unambiguous language.  Things like 'it'
+and 'they' are ok when it's abundantly clear what they refer to, but 'we' and 'us'
+are best avoided entirely.
 
-Paolo
+> function per vcpu, if they are unequal, then a VCPU is currently
+> halting.
+> The existing stats like halt_exits and halt_wakeups don't quite capture
+> this. The time spend halted and halt polling is reported eventually, but
+> not until we wakeup and resume. If a guest were to indefinitely halt one
+> of it's CPUs we would never know, it may simply appear blocked.
+     ^^^^      ^^
+     its       userspace?
 
+
+The "blocked" terminology is a bit confusing since KVM is explicitly blocking
+the vCPU, it just happens to mostly do so in response to a guest HLT.  I think
+"block" is intended to mean "vCPU task not run", but it would be helpful to make
+that clear.
+
+> Original-by: Cannon Matthews <cannonmatthews@google.com>
+> Signed-off-by: Jing Zhang <jingzhangos@google.com>
+> ---
+>  include/linux/kvm_host.h  | 4 +++-
+>  include/linux/kvm_types.h | 2 ++
+>  virt/kvm/kvm_main.c       | 2 ++
+>  3 files changed, 7 insertions(+), 1 deletion(-)
+> 
+> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+> index d447b21cdd73..23d2e19af3ce 100644
+> --- a/include/linux/kvm_host.h
+> +++ b/include/linux/kvm_host.h
+> @@ -1459,7 +1459,9 @@ struct _kvm_stats_desc {
+>  	STATS_DESC_LOGHIST_TIME_NSEC(VCPU_GENERIC, halt_poll_fail_hist,	       \
+>  			HALT_POLL_HIST_COUNT),				       \
+>  	STATS_DESC_LOGHIST_TIME_NSEC(VCPU_GENERIC, halt_wait_hist,	       \
+> -			HALT_POLL_HIST_COUNT)
+> +			HALT_POLL_HIST_COUNT),				       \
+> +	STATS_DESC_COUNTER(VCPU_GENERIC, halt_block_starts),		       \
+> +	STATS_DESC_COUNTER(VCPU_GENERIC, halt_block_ends)
+
+Why two counters?  It's per-vCPU, can't this just be a "blocked" flag or so?  I
+get that all the other stats use "halt", but that's technically wrong as KVM will
+block vCPUs that are not runnable for other reason, e.g. because they're in WFS
+on x86.
