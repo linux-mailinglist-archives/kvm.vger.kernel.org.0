@@ -2,55 +2,55 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1ED453EE82D
-	for <lists+kvm@lfdr.de>; Tue, 17 Aug 2021 10:12:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2B0343EE82E
+	for <lists+kvm@lfdr.de>; Tue, 17 Aug 2021 10:12:42 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239233AbhHQINE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 17 Aug 2021 04:13:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53728 "EHLO
+        id S239088AbhHQINM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 17 Aug 2021 04:13:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53736 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239011AbhHQIMk (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 17 Aug 2021 04:12:40 -0400
-Received: from mail-wr1-x449.google.com (mail-wr1-x449.google.com [IPv6:2a00:1450:4864:20::449])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5BD88C061764
-        for <kvm@vger.kernel.org>; Tue, 17 Aug 2021 01:12:07 -0700 (PDT)
-Received: by mail-wr1-x449.google.com with SMTP id z1-20020adfdf810000b0290154f7f8c412so6297829wrl.21
-        for <kvm@vger.kernel.org>; Tue, 17 Aug 2021 01:12:07 -0700 (PDT)
+        with ESMTP id S239046AbhHQIMl (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 17 Aug 2021 04:12:41 -0400
+Received: from mail-qt1-x84a.google.com (mail-qt1-x84a.google.com [IPv6:2607:f8b0:4864:20::84a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C5014C0613CF
+        for <kvm@vger.kernel.org>; Tue, 17 Aug 2021 01:12:08 -0700 (PDT)
+Received: by mail-qt1-x84a.google.com with SMTP id w19-20020ac87e930000b029025a2609eb04so10638757qtj.17
+        for <kvm@vger.kernel.org>; Tue, 17 Aug 2021 01:12:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=date:in-reply-to:message-id:mime-version:references:subject:from:to
          :cc;
-        bh=RY75TCp6EAmYPGA4I7+3iKQeuuwEdqY335GXVfnDS7k=;
-        b=JYCa6cCgNtWF/sF0Bltf5bVCZmJFXv4748Iy5bRGGb+tbvHOCstp6BQWGgNwnjAz++
-         ykeIvouot4Gx+7bHS4lR/vf4n38EIQV5c0vwbqfIxMWQ0Duh2plc+Z1hOYwMDf/PE7ii
-         vrpDAnMRve8T7iTnx6xxkIr8J6d4/pGuQTJBcGtf72MnjQEoMT5z3cZE0IFKB4vIYZ8N
-         Qyi+s2nQAKNGBdoqQCdd1Xj7jHpqX8ASK00m5yoxaaItWnRhIdmYBTuHaw8wSd2taDTR
-         qMDZNZI/1U33C12jgjXOkicmnbPFKTwXX6/BXOCPPyKK1haKx+ejllyelOjzD62GHB4r
-         Khbg==
+        bh=GwBibOWYXter2+CeY3r4WjkndBFtBCh1zMuQU5reF9A=;
+        b=TaP5HLSckkUY51veXyfP8aLq+lpBiNGYeORdB1m4e2OGEMWyXysqyPJyKmc2EZNCfT
+         b+BUDY7wqFaCh1GTw+y3WhaHIuLBAXcejHOZ1kIT1UVJKPD0DTkOR9zpQFlGtSut54Ve
+         6FcMYxuttHsA//J8xglMwAWQCdnipLpW9fhs0u+809xR3ZywlmJvTe96+EukUGktBjmr
+         aFtP6OzyrKvd1jZCbUsvkpDwUpjW/98ueluGuPPWIjSy046HBebTfZ5xeJ66cDRvQgzH
+         /ewp8xIjK8m9eN64A9+NmEsmtIEtg8Wi7yInIrgXAa3JA+Y7iFlP1iATJHT0q5tn9PCG
+         RsYA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=RY75TCp6EAmYPGA4I7+3iKQeuuwEdqY335GXVfnDS7k=;
-        b=ZHBTU4/xgsWgkxFkFgvchjX+Zxd0ePbagaATU0ruXyw7eIuuKvEJO4DlGRGoBmpzyf
-         j+5n5JXLQZPfvob3SkjPlJZ0bqptvtMvJu7ApEeT6YugofX9Dd9k1I9Q3wktSj0kSBWg
-         /zq2Lf2uPSjZWl6WKG0+ezncfi3XSr+cAgoj+5+BAoaH0E0BHoP8G/xM4cGZxUKUvxYs
-         02jIWCUzH47jrt9TOehiuR08gHzlWAzUr+70X1VB2Tc2sHhilgymhf9cVW8T0n7dzHL0
-         ZlzQqd+wPzkIzU/LfaxBaHcwm4CsDcxTBhAxCdfHr8rjzfZ9sclEfbJoyWREK+zSHNez
-         uqWw==
-X-Gm-Message-State: AOAM531yV4Bn3SB1xP59R3Xds3F5lDGO2qoxZ86grqzsxynUxZtM6yi4
-        L+0YQthI1JXvI4ttxuSiOEd48krFjg==
-X-Google-Smtp-Source: ABdhPJy/OtVFqjYy4H9XKyK309GPg+Qg6SCvxgN3Qdf+Y2tTkAyZkPf+vBPU02aV6SLjKwZnco28Op+O2Q==
+        bh=GwBibOWYXter2+CeY3r4WjkndBFtBCh1zMuQU5reF9A=;
+        b=h7GpIKSL62Qf2R00uC2jsw9I6rs3FQ+r7LQ3PN5tvbbwSLo+xsqi8RrDRXPXTR1iAj
+         b5NRIh2epDgCkxSbq7qEgUaQzWl/ThUfEzGOJAWV/DahRbR391nZQNf4PPC2wmP1KW8D
+         mlGOM2QQrIj7/Uk6Cp7w7RvHtz5/4ZWlr0gy+eVuhTaXZl0iMEdwDBK9nDz8twu0x1IR
+         jQFOuahYjmNQY9gREdJKRFzC+lWsJBqI+0zxmK1b5HS/NbYL3GKGidwBNbvfaq9EZgPt
+         D1/gzL5MyhpMbdgal2bGSDcFPVaGUkv7TU2CkxujrbX17MJiNNjrZajzA1884OozOuue
+         thag==
+X-Gm-Message-State: AOAM533i5BKJvJeium2HuGd9hQCdeFvHsOPj4rwyCjqKfuPfmNguH1w4
+        7/Bxt25+rZB58DflOg86V3K6gW8j7Q==
+X-Google-Smtp-Source: ABdhPJzdIqbLAYM6kPwUzmsBpGGJcl8EyMI40ZKNefrU0jERoj9lntCdBUE9/mgLqEPe2aj2UczmekLMtQ==
 X-Received: from tabba.c.googlers.com ([fda3:e722:ac3:cc00:28:9cb1:c0a8:482])
- (user=tabba job=sendgmr) by 2002:a1c:32c1:: with SMTP id y184mr2010593wmy.70.1629187925926;
- Tue, 17 Aug 2021 01:12:05 -0700 (PDT)
-Date:   Tue, 17 Aug 2021 09:11:33 +0100
+ (user=tabba job=sendgmr) by 2002:a05:6214:902:: with SMTP id
+ dj2mr2109786qvb.62.1629187927890; Tue, 17 Aug 2021 01:12:07 -0700 (PDT)
+Date:   Tue, 17 Aug 2021 09:11:34 +0100
 In-Reply-To: <20210817081134.2918285-1-tabba@google.com>
-Message-Id: <20210817081134.2918285-15-tabba@google.com>
+Message-Id: <20210817081134.2918285-16-tabba@google.com>
 Mime-Version: 1.0
 References: <20210817081134.2918285-1-tabba@google.com>
 X-Mailer: git-send-email 2.33.0.rc1.237.g0d66db33f3-goog
-Subject: [PATCH v4 14/15] KVM: arm64: Trap access to pVM restricted features
+Subject: [PATCH v4 15/15] KVM: arm64: Handle protected guests at 32 bits
 From:   Fuad Tabba <tabba@google.com>
 To:     kvmarm@lists.cs.columbia.edu
 Cc:     maz@kernel.org, will@kernel.org, james.morse@arm.com,
@@ -65,103 +65,87 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Trap accesses to restricted features for VMs running in protected
-mode.
+Protected KVM does not support protected AArch32 guests. However,
+it is possible for the guest to force run AArch32, potentially
+causing problems. Add an extra check so that if the hypervisor
+catches the guest doing that, it can prevent the guest from
+running again by resetting vcpu->arch.target and returning
+ARM_EXCEPTION_IL.
 
-Access to feature registers are emulated, and only supported
-features are exposed to protected VMs.
+If this were to happen, The VMM can try and fix it by re-
+initializing the vcpu with KVM_ARM_VCPU_INIT, however, this is
+likely not possible for protected VMs.
 
-Accesses to restricted registers as well as restricted
-instructions are trapped, and an undefined exception is injected
-into the protected guests, i.e., with EC = 0x0 (unknown reason).
-This EC is the one used, according to the Arm Architecture
-Reference Manual, for unallocated or undefined system registers
-or instructions.
+Adapted from commit 22f553842b14 ("KVM: arm64: Handle Asymmetric
+AArch32 systems")
 
-Only affects the functionality of protected VMs. Otherwise,
-should not affect non-protected VMs when KVM is running in
-protected mode.
-
-Acked-by: Will Deacon <will@kernel.org>
 Signed-off-by: Fuad Tabba <tabba@google.com>
 ---
- arch/arm64/kvm/hyp/include/hyp/switch.h |  3 +++
- arch/arm64/kvm/hyp/nvhe/switch.c        | 34 ++++++++++++++-----------
- 2 files changed, 22 insertions(+), 15 deletions(-)
+ arch/arm64/kvm/hyp/nvhe/switch.c | 37 ++++++++++++++++++++++++++++++++
+ 1 file changed, 37 insertions(+)
 
-diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
-index 5a2b89b96c67..8431f1514280 100644
---- a/arch/arm64/kvm/hyp/include/hyp/switch.h
-+++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
-@@ -33,6 +33,9 @@
- extern struct exception_table_entry __start___kvm_ex_table;
- extern struct exception_table_entry __stop___kvm_ex_table;
- 
-+int kvm_handle_pvm_sys64(struct kvm_vcpu *vcpu);
-+int kvm_handle_pvm_restricted(struct kvm_vcpu *vcpu);
-+
- /* Check whether the FP regs were dirtied while in the host-side run loop: */
- static inline bool update_fp_enabled(struct kvm_vcpu *vcpu)
- {
 diff --git a/arch/arm64/kvm/hyp/nvhe/switch.c b/arch/arm64/kvm/hyp/nvhe/switch.c
-index b7f25307a7b9..398e62098898 100644
+index 398e62098898..0c24b7f473bf 100644
 --- a/arch/arm64/kvm/hyp/nvhe/switch.c
 +++ b/arch/arm64/kvm/hyp/nvhe/switch.c
-@@ -159,27 +159,27 @@ static void __pmu_switch_to_host(struct kvm_cpu_context *host_ctxt)
+@@ -20,6 +20,7 @@
+ #include <asm/kprobes.h>
+ #include <asm/kvm_asm.h>
+ #include <asm/kvm_emulate.h>
++#include <asm/kvm_fixed_config.h>
+ #include <asm/kvm_hyp.h>
+ #include <asm/kvm_mmu.h>
+ #include <asm/fpsimd.h>
+@@ -195,6 +196,39 @@ exit_handle_fn kvm_get_nvhe_exit_handler(struct kvm_vcpu *vcpu)
+ 		return NULL;
  }
  
- static exit_handle_fn hyp_exit_handlers[] = {
--	[0 ... ESR_ELx_EC_MAX]		= NULL,
-+	[0 ... ESR_ELx_EC_MAX]		= kvm_handle_pvm_restricted,
- 	[ESR_ELx_EC_WFx]		= NULL,
--	[ESR_ELx_EC_CP15_32]		= NULL,
--	[ESR_ELx_EC_CP15_64]		= NULL,
--	[ESR_ELx_EC_CP14_MR]		= NULL,
--	[ESR_ELx_EC_CP14_LS]		= NULL,
--	[ESR_ELx_EC_CP14_64]		= NULL,
-+	[ESR_ELx_EC_CP15_32]		= kvm_handle_pvm_restricted,
-+	[ESR_ELx_EC_CP15_64]		= kvm_handle_pvm_restricted,
-+	[ESR_ELx_EC_CP14_MR]		= kvm_handle_pvm_restricted,
-+	[ESR_ELx_EC_CP14_LS]		= kvm_handle_pvm_restricted,
-+	[ESR_ELx_EC_CP14_64]		= kvm_handle_pvm_restricted,
- 	[ESR_ELx_EC_HVC32]		= NULL,
- 	[ESR_ELx_EC_SMC32]		= NULL,
- 	[ESR_ELx_EC_HVC64]		= NULL,
- 	[ESR_ELx_EC_SMC64]		= NULL,
--	[ESR_ELx_EC_SYS64]		= NULL,
--	[ESR_ELx_EC_SVE]		= NULL,
-+	[ESR_ELx_EC_SYS64]		= kvm_handle_pvm_sys64,
-+	[ESR_ELx_EC_SVE]		= kvm_handle_pvm_restricted,
- 	[ESR_ELx_EC_IABT_LOW]		= NULL,
- 	[ESR_ELx_EC_DABT_LOW]		= NULL,
--	[ESR_ELx_EC_SOFTSTP_LOW]	= NULL,
--	[ESR_ELx_EC_WATCHPT_LOW]	= NULL,
--	[ESR_ELx_EC_BREAKPT_LOW]	= NULL,
--	[ESR_ELx_EC_BKPT32]		= NULL,
--	[ESR_ELx_EC_BRK64]		= NULL,
--	[ESR_ELx_EC_FP_ASIMD]		= NULL,
-+	[ESR_ELx_EC_SOFTSTP_LOW]	= kvm_handle_pvm_restricted,
-+	[ESR_ELx_EC_WATCHPT_LOW]	= kvm_handle_pvm_restricted,
-+	[ESR_ELx_EC_BREAKPT_LOW]	= kvm_handle_pvm_restricted,
-+	[ESR_ELx_EC_BKPT32]		= kvm_handle_pvm_restricted,
-+	[ESR_ELx_EC_BRK64]		= kvm_handle_pvm_restricted,
-+	[ESR_ELx_EC_FP_ASIMD]		= kvm_handle_pvm_restricted,
- 	[ESR_ELx_EC_PAC]		= NULL,
- };
- 
-@@ -188,7 +188,11 @@ exit_handle_fn kvm_get_nvhe_exit_handler(struct kvm_vcpu *vcpu)
- 	u32 esr = kvm_vcpu_get_esr(vcpu);
- 	u8 esr_ec = ESR_ELx_EC(esr);
- 
--	return hyp_exit_handlers[esr_ec];
-+	/* For now, only protected VMs have exit handlers. */
-+	if (unlikely(kvm_vm_is_protected(kern_hyp_va(vcpu->kvm))))
-+		return hyp_exit_handlers[esr_ec];
-+	else
-+		return NULL;
- }
- 
++/*
++ * Some guests (e.g., protected VMs) might not be allowed to run in AArch32. The
++ * check below is based on the one in kvm_arch_vcpu_ioctl_run().
++ * The ARMv8 architecture does not give the hypervisor a mechanism to prevent a
++ * guest from dropping to AArch32 EL0 if implemented by the CPU. If the
++ * hypervisor spots a guest in such a state ensure it is handled, and don't
++ * trust the host to spot or fix it.
++ *
++ * Returns true if the check passed and the guest run loop can continue, or
++ * false if the guest should exit to the host.
++ */
++static bool check_aarch32_guest(struct kvm_vcpu *vcpu, u64 *exit_code)
++{
++	if (kvm_vm_is_protected(kern_hyp_va(vcpu->kvm)) &&
++	    vcpu_mode_is_32bit(vcpu) &&
++	    FIELD_GET(ARM64_FEATURE_MASK(ID_AA64PFR0_EL0),
++					 PVM_ID_AA64PFR0_RESTRICT_UNSIGNED) <
++		ID_AA64PFR0_ELx_32BIT_64BIT) {
++		/*
++		 * As we have caught the guest red-handed, decide that it isn't
++		 * fit for purpose anymore by making the vcpu invalid. The VMM
++		 * can try and fix it by re-initializing the vcpu with
++		 * KVM_ARM_VCPU_INIT, however, this is likely not possible for
++		 * protected VMs.
++		 */
++		vcpu->arch.target = -1;
++		*exit_code = ARM_EXCEPTION_IL;
++		return false;
++	}
++
++	return true;
++}
++
  /* Switch to the guest for legacy non-VHE systems */
+ int __kvm_vcpu_run(struct kvm_vcpu *vcpu)
+ {
+@@ -255,6 +289,9 @@ int __kvm_vcpu_run(struct kvm_vcpu *vcpu)
+ 		/* Jump in the fire! */
+ 		exit_code = __guest_enter(vcpu);
+ 
++		if (unlikely(!check_aarch32_guest(vcpu, &exit_code)))
++			break;
++
+ 		/* And we're baaack! */
+ 	} while (fixup_guest_exit(vcpu, &exit_code));
+ 
 -- 
 2.33.0.rc1.237.g0d66db33f3-goog
 
