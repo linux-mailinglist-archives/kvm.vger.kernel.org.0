@@ -2,55 +2,55 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D82553EE81B
-	for <lists+kvm@lfdr.de>; Tue, 17 Aug 2021 10:12:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D6CBC3EE820
+	for <lists+kvm@lfdr.de>; Tue, 17 Aug 2021 10:12:08 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239083AbhHQIMd (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 17 Aug 2021 04:12:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53630 "EHLO
+        id S239103AbhHQIMi (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 17 Aug 2021 04:12:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53624 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239041AbhHQIMZ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 17 Aug 2021 04:12:25 -0400
-Received: from mail-qt1-x84a.google.com (mail-qt1-x84a.google.com [IPv6:2607:f8b0:4864:20::84a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B8BB2C0617AE
-        for <kvm@vger.kernel.org>; Tue, 17 Aug 2021 01:11:51 -0700 (PDT)
-Received: by mail-qt1-x84a.google.com with SMTP id o19-20020a05622a0093b029029624b5db4fso10667483qtw.23
-        for <kvm@vger.kernel.org>; Tue, 17 Aug 2021 01:11:51 -0700 (PDT)
+        with ESMTP id S239088AbhHQIM1 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 17 Aug 2021 04:12:27 -0400
+Received: from mail-wr1-x44a.google.com (mail-wr1-x44a.google.com [IPv6:2a00:1450:4864:20::44a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 915A8C0613C1
+        for <kvm@vger.kernel.org>; Tue, 17 Aug 2021 01:11:54 -0700 (PDT)
+Received: by mail-wr1-x44a.google.com with SMTP id v18-20020adfe2920000b029013bbfb19640so6271793wri.17
+        for <kvm@vger.kernel.org>; Tue, 17 Aug 2021 01:11:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=date:in-reply-to:message-id:mime-version:references:subject:from:to
          :cc;
-        bh=aHCf3CwNNBrmIRx2wJpLYl7QdQEwhZAoOTdqtlemKNA=;
-        b=nmj5YInKovfYpQ7u2gu+Y7J66loXt+NDQNemJ7HGUcKXj0fC7wwCSMymCEi4G21L3p
-         IArJSFzNsytGyM9Aj+pPYXesA9Vm/c7zfGQmeaSoLhwVGjTFnvS9R+lIcvVEM8C1k/YR
-         vWzurZ7ebNzykXtZc9niVn9GYk9PSDHnApssgQ253v3a0E1TACnW+kba/jsCf/OUQST1
-         lRY+I29CFT8E6+v1g/A8yjDZEgGVBkXRxQmXua664ZpNGjHjWAh/aYXWpdE3sTpV5KSC
-         4F2hbJOwiqlbmgpuhHpxBsZ8LyTztDaiQNI7jgWINBi0Cz59uNMk+MX/4294lx7erU0g
-         aByA==
+        bh=+LnYz68K0/l+zVlwhzMBHhFllBcdwA8o9zPnuvPdhe0=;
+        b=eNCBRoMkjOMI1w4Bde0MwYe/+fVCHL1uO5oA1/7mvgpVquoq/U7usqWzx9nDuVenns
+         BQi5B7hZi3es7WYC/W87KlBzYklGyJPgnQV7TfmgIoys5AQ4YA6+IunfsZvAIidGmumc
+         XPNo4d52vG8FKOb94+28WQIeUjE2bFAMqVAHwcYCHWKtJC23mfmij3uHJSrBA7NsjnHn
+         OydKvJ4RnpdwTpLfFQ+i/NK/GHDCZP3c5L+oe3KhCnYAiU9B9KOjwd0rQDJccClee7/z
+         0KtgAGBKfcMOFu2mGsWMrmdAw//fBve6xiM1Yq8lW8dhDvbha/o14XZtd/52XL/ZIk1U
+         Okng==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=aHCf3CwNNBrmIRx2wJpLYl7QdQEwhZAoOTdqtlemKNA=;
-        b=dZS3GxMKcMxG7gnMzSo5UWZALW3+1/RsB2bb4fr04z9nxIBnZiePjRMkOSZqx5FEIi
-         56N1RetuBmTZ/t6WGqsFJW/4+2htDnQv8gnh8QYpEUBHBAvw4g8IdYqWPiKfXPT322tV
-         +HdQLcTXcGqNpzGx/pyVvOb8mz5pA1iyAiha2U46CBHQUmuO/CRh6tPTWR2GUIaEgrOP
-         T715l8wA9zK1Skx+EyyVUlBZ58fjbqDqTULyngtYUog8rtjkFSSNVn71J+G0CChcAAB2
-         RaXcDK64SkPmkOGJdbK3EC/DOeEvkT1jEnnh+EXBcyTjaybXQ13qCQFb37e4vMNSCIK6
-         HY2Q==
-X-Gm-Message-State: AOAM532qGoKP+Z6+pNCR1EwkT2zU+MeOXxQPCA7MO6/G4RJXZ2GGdGY3
-        EnqtRXfOV0c46GfzpZhw1QU356ecDw==
-X-Google-Smtp-Source: ABdhPJwo9+n3O7kUXlMfd9UmZiDXQnjQGGvtzSb/qI8QL6++MTL6aNWs0u51HkTG4jUJ6+mkEPCkxCl2mw==
+        bh=+LnYz68K0/l+zVlwhzMBHhFllBcdwA8o9zPnuvPdhe0=;
+        b=HKDMB/t2XwHEhSkGq8YUOUIaSO+SP5xJmAcMypGzrTbOeRX0X/aCNbUMDyxA6G9h2X
+         qVJ4z3/wjIZRSU3+CmUh/s64URUE+qqaHGbX2eKSb6DG+DLQA7lmjO7onTVbMwhWufL7
+         koP0aoAGTJqsOU4ztHIjzD2EuJ/oeJBeQ0C7CEtEpofgWwz9XO8RB2hIOjrhirK8cRYQ
+         S3U//+25naap5prNkxSiiQKA0nGD/Q5S+wa6gYQMH0APFYegD7v1TPZlepMCV9PTPwKg
+         TZuiJZPWx2FjeSuGTKqnSHPsx8N3qJBINjVxzS0ReCuudptB5Wjv3qPdrh0vDHHk4HQ3
+         YKWQ==
+X-Gm-Message-State: AOAM533LLWy1n13MC4MwoqLX0Hsd+X+GYx9GgDPyBGIhLIFkxi3W9VMJ
+        JDtdpCWl9m3ItUtFBhr8iit90VqUow==
+X-Google-Smtp-Source: ABdhPJyZWFpU/vfGQ67R9j5JsRWqvs8PPjjGpxXblDdr0ny97M2MYAIupQIWIGkVZyPx3cSOzFUeUusJBQ==
 X-Received: from tabba.c.googlers.com ([fda3:e722:ac3:cc00:28:9cb1:c0a8:482])
- (user=tabba job=sendgmr) by 2002:a05:6214:1933:: with SMTP id
- es19mr2165343qvb.42.1629187910879; Tue, 17 Aug 2021 01:11:50 -0700 (PDT)
-Date:   Tue, 17 Aug 2021 09:11:26 +0100
+ (user=tabba job=sendgmr) by 2002:a1c:4c:: with SMTP id 73mr2053153wma.139.1629187912994;
+ Tue, 17 Aug 2021 01:11:52 -0700 (PDT)
+Date:   Tue, 17 Aug 2021 09:11:27 +0100
 In-Reply-To: <20210817081134.2918285-1-tabba@google.com>
-Message-Id: <20210817081134.2918285-8-tabba@google.com>
+Message-Id: <20210817081134.2918285-9-tabba@google.com>
 Mime-Version: 1.0
 References: <20210817081134.2918285-1-tabba@google.com>
 X-Mailer: git-send-email 2.33.0.rc1.237.g0d66db33f3-goog
-Subject: [PATCH v4 07/15] KVM: arm64: Keep mdcr_el2's value as set by __init_el2_debug
+Subject: [PATCH v4 08/15] KVM: arm64: Track value of cptr_el2 in struct kvm_vcpu_arch
 From:   Fuad Tabba <tabba@google.com>
 To:     kvmarm@lists.cs.columbia.edu
 Cc:     maz@kernel.org, will@kernel.org, james.morse@arm.com,
@@ -65,50 +65,61 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-__init_el2_debug configures mdcr_el2 at initialization based on,
-among other things, available hardware support. Trap deactivation
-doesn't check that, so keep the initial value.
+Track the baseline guest value for cptr_el2 in struct
+kvm_vcpu_arch, similar to the other registers that control traps.
+Use this value when setting cptr_el2 for the guest.
 
-No functional change intended. However, the value of mdcr_el2
-might be different after deactivating traps than it was before
-this patch.
+Currently this value is unchanged (CPTR_EL2_DEFAULT), but future
+patches will set trapping bits based on features supported for
+the guest.
 
+No functional change intended.
+
+Acked-by: Will Deacon <will@kernel.org>
 Signed-off-by: Fuad Tabba <tabba@google.com>
 ---
- arch/arm64/kvm/hyp/nvhe/switch.c | 4 ----
- arch/arm64/kvm/hyp/vhe/switch.c  | 4 ----
- 2 files changed, 8 deletions(-)
+ arch/arm64/include/asm/kvm_host.h | 1 +
+ arch/arm64/kvm/arm.c              | 1 +
+ arch/arm64/kvm/hyp/nvhe/switch.c  | 2 +-
+ 3 files changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/arch/arm64/kvm/hyp/nvhe/switch.c b/arch/arm64/kvm/hyp/nvhe/switch.c
-index 2ea764a48958..1778593a08a9 100644
---- a/arch/arm64/kvm/hyp/nvhe/switch.c
-+++ b/arch/arm64/kvm/hyp/nvhe/switch.c
-@@ -90,10 +90,6 @@ static void __deactivate_traps(struct kvm_vcpu *vcpu)
- 		isb();
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index 76462c6a91ee..ac67d5699c68 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -290,6 +290,7 @@ struct kvm_vcpu_arch {
+ 	/* Values of trap registers for the guest. */
+ 	u64 hcr_el2;
+ 	u64 mdcr_el2;
++	u64 cptr_el2;
+ 
+ 	/* Values of trap registers for the host before guest entry. */
+ 	u64 mdcr_el2_host;
+diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+index e9a2b8f27792..14b12f2c08c0 100644
+--- a/arch/arm64/kvm/arm.c
++++ b/arch/arm64/kvm/arm.c
+@@ -1104,6 +1104,7 @@ static int kvm_arch_vcpu_ioctl_vcpu_init(struct kvm_vcpu *vcpu,
  	}
  
--	vcpu->arch.mdcr_el2_host &= MDCR_EL2_HPMN_MASK |
--				    MDCR_EL2_E2PB_MASK << MDCR_EL2_E2PB_SHIFT |
--				    MDCR_EL2_E2TB_MASK << MDCR_EL2_E2TB_SHIFT;
--
- 	__deactivate_traps_common(vcpu);
+ 	vcpu_reset_hcr(vcpu);
++	vcpu->arch.cptr_el2 = CPTR_EL2_DEFAULT;
  
- 	write_sysreg(this_cpu_ptr(&kvm_init_params)->hcr_el2, hcr_el2);
-diff --git a/arch/arm64/kvm/hyp/vhe/switch.c b/arch/arm64/kvm/hyp/vhe/switch.c
-index ec158fa41ae6..0d0c9550fb08 100644
---- a/arch/arm64/kvm/hyp/vhe/switch.c
-+++ b/arch/arm64/kvm/hyp/vhe/switch.c
-@@ -93,10 +93,6 @@ void activate_traps_vhe_load(struct kvm_vcpu *vcpu)
+ 	/*
+ 	 * Handle the "start in power-off" case.
+diff --git a/arch/arm64/kvm/hyp/nvhe/switch.c b/arch/arm64/kvm/hyp/nvhe/switch.c
+index 1778593a08a9..86f3d6482935 100644
+--- a/arch/arm64/kvm/hyp/nvhe/switch.c
++++ b/arch/arm64/kvm/hyp/nvhe/switch.c
+@@ -41,7 +41,7 @@ static void __activate_traps(struct kvm_vcpu *vcpu)
+ 	___activate_traps(vcpu);
+ 	__activate_traps_common(vcpu);
  
- void deactivate_traps_vhe_put(struct kvm_vcpu *vcpu)
- {
--	vcpu->arch.mdcr_el2_host &= MDCR_EL2_HPMN_MASK |
--				    MDCR_EL2_E2PB_MASK << MDCR_EL2_E2PB_SHIFT |
--				    MDCR_EL2_TPMS;
--
- 	__deactivate_traps_common(vcpu);
- }
- 
+-	val = CPTR_EL2_DEFAULT;
++	val = vcpu->arch.cptr_el2;
+ 	val |= CPTR_EL2_TTA | CPTR_EL2_TAM;
+ 	if (!update_fp_enabled(vcpu)) {
+ 		val |= CPTR_EL2_TFP | CPTR_EL2_TZ;
 -- 
 2.33.0.rc1.237.g0d66db33f3-goog
 
