@@ -2,101 +2,160 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 86F0B3EE8EC
-	for <lists+kvm@lfdr.de>; Tue, 17 Aug 2021 10:54:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id ECF253EE8FD
+	for <lists+kvm@lfdr.de>; Tue, 17 Aug 2021 11:00:52 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235078AbhHQIzM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 17 Aug 2021 04:55:12 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:35519 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S234347AbhHQIzK (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 17 Aug 2021 04:55:10 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1629190476;
+        id S235313AbhHQJBA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 17 Aug 2021 05:01:00 -0400
+Received: from mail.skyhub.de ([5.9.137.197]:53982 "EHLO mail.skyhub.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S234339AbhHQJA5 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 17 Aug 2021 05:00:57 -0400
+Received: from zn.tnic (p200300ec2f1175003091845243004ed4.dip0.t-ipconnect.de [IPv6:2003:ec:2f11:7500:3091:8452:4300:4ed4])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id C31EA1EC01B5;
+        Tue, 17 Aug 2021 11:00:17 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
+        t=1629190817;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=q7dT68S5InJZhNBx9TRr7Eqppd3kXow67HBH2rTIYNw=;
-        b=VFwZz4ABAO1IiJ4ZCFy/N3T9rl7aMA082XpLoC1J0bAnwsKpwDBAxZmYQ/dpMpDVaPw0qt
-        Hp4s6FLev3+/1DGj8x3EPIIRIo/bW2WTVOF/N6NVx52Hye/+LZigDIBGqkmEacMkHGWkw2
-        7bVd0P8IqMaSfh4oy3WHzlSWAZWiTLg=
-Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
- [209.85.208.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-576-DE_bqB72Px-mDvfb2herLA-1; Tue, 17 Aug 2021 04:54:35 -0400
-X-MC-Unique: DE_bqB72Px-mDvfb2herLA-1
-Received: by mail-ed1-f71.google.com with SMTP id d12-20020a50fe8c0000b02903a4b519b413so10291124edt.9
-        for <kvm@vger.kernel.org>; Tue, 17 Aug 2021 01:54:34 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=q7dT68S5InJZhNBx9TRr7Eqppd3kXow67HBH2rTIYNw=;
-        b=BhAWVv3SoRp1aFx/4ryfFRNaW1a+X9PAirg2H2HlieFsRPnAJ1uiPmkscDz8hLbCTG
-         kj4n5AfqAoANZ2+4UQRtGZLeIp6gvbD6bfVZqYjcxInkXPzvk5VBGsm0TAT6/sQ2E6IY
-         mpmy5fK+rIwi1ThkpsMgvqAqJmvVReuawBZvOp/y7CElmn9xd+8oo/RzwbkmtXmHeiyU
-         Pm/Rg1wrx4wkBgBuNBbsDbn1FClF8Uns+lZr/yCrYOgeCXCdpxx3bgkg/uSGeOSmohcY
-         0M5aeykH6wfpHVA6tWAa2F3kr2W4wMbotJxURe6oBGwaNCxLItBdArkzWjMbhnPo7n57
-         0R+Q==
-X-Gm-Message-State: AOAM532T2FBPKPVF6Yuz4Ik7WgYROUHmb+xm2nEN4VlKVrGGGSVZLDMt
-        L4f3bnndQ+GAbg4Mw8qKS2iPoYBnAI0N7OzP6k8yBbSiEj2DVBPZLZC6FQXILypV3XLhhVX0Iv9
-        OvNPJzRy/aO/K
-X-Received: by 2002:a17:906:7302:: with SMTP id di2mr2755611ejc.409.1629190473902;
-        Tue, 17 Aug 2021 01:54:33 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzyaZzx8M+BoKRkmTA5CfaBnIow9YCTFU9Nx/CQxSA2xF72pC5gtASADBR6/oFNOwPsBO4xVA==
-X-Received: by 2002:a17:906:7302:: with SMTP id di2mr2755582ejc.409.1629190473745;
-        Tue, 17 Aug 2021 01:54:33 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id gh23sm484905ejb.27.2021.08.17.01.54.32
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 17 Aug 2021 01:54:33 -0700 (PDT)
-Subject: Re: [PATCH 0/3] clean up interface between KVM and psp
-To:     Mingwei Zhang <mizhang@google.com>,
+         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
+        bh=CTZxwlhCTYBphd87lvceDZBtTDENyNB6RWw2n2fhNqo=;
+        b=cLyGe6Vfp/ZbXlGAJcu8s+oDyI+Cek5fSPumAUCPjd+TtrDcq8WnlTuq148AmmSefmwouf
+        U4RljFOl7bpVd/jo/MMo7NW5c66AcB8pntylvfCw1TSAnl6S3l0D/M7WEba3xU2EPv7jkK
+        R7PUFWJBwQxeCIeQqdKssk1UJ8FLB8Y=
+Date:   Tue, 17 Aug 2021 11:00:56 +0200
+From:   Borislav Petkov <bp@alien8.de>
+To:     Tom Lendacky <thomas.lendacky@amd.com>
+Cc:     linux-kernel@vger.kernel.org, x86@kernel.org,
+        linuxppc-dev@lists.ozlabs.org, linux-s390@vger.kernel.org,
+        iommu@lists.linux-foundation.org, kvm@vger.kernel.org,
+        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
+        linux-graphics-maintainer@vmware.com,
+        amd-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
+        kexec@lists.infradead.org, linux-fsdevel@vger.kernel.org,
         Brijesh Singh <brijesh.singh@amd.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        John Allen <john.allen@amd.com>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Alper Gun <alpergun@google.com>,
-        Borislav Petkov <bp@alien8.de>,
-        David Rienjes <rientjes@google.com>,
-        Marc Orr <marcorr@google.com>, Peter Gonda <pgonda@google.com>,
-        Vipin Sharma <vipinsh@google.com>
-References: <20210816202441.4098523-1-mizhang@google.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <c66484d2-3524-d061-1e65-70dab0703cc3@redhat.com>
-Date:   Tue, 17 Aug 2021 10:54:31 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.11.0
+        Joerg Roedel <joro@8bytes.org>,
+        Andi Kleen <ak@linux.intel.com>,
+        Sathyanarayanan Kuppuswamy 
+        <sathyanarayanan.kuppuswamy@linux.intel.com>,
+        Tianyu Lan <Tianyu.Lan@microsoft.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Will Deacon <will@kernel.org>, Joerg Roedel <jroedel@suse.de>
+Subject: Re: [PATCH v2 05/12] x86/sme: Replace occurrences of sme_active()
+ with prot_guest_has()
+Message-ID: <YRt6yCNCBLwyyx5X@zn.tnic>
+References: <cover.1628873970.git.thomas.lendacky@amd.com>
+ <c6c38d6253dc78381f9ff0f1823b6ee5ddeefacc.1628873970.git.thomas.lendacky@amd.com>
 MIME-Version: 1.0
-In-Reply-To: <20210816202441.4098523-1-mizhang@google.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <c6c38d6253dc78381f9ff0f1823b6ee5ddeefacc.1628873970.git.thomas.lendacky@amd.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 16/08/21 22:24, Mingwei Zhang wrote:
-> This patch set is trying to help make the interface between KVM and psp
-> cleaner and simpler. In particular, the patches do the following
-> improvements:
->   - avoid the requirement of psp data structures for some psp APIs.
->   - hide error handling within psp API, eg., using sev_decommission.
->   - hide the serialization requirement between DF_FLUSH and DEACTIVATE.
-> 
-> Mingwei Zhang (3):
->    KVM: SVM: move sev_decommission to psp driver
->    KVM: SVM: move sev_bind_asid to psp
->    KVM: SVM: move sev_unbind_asid and DF_FLUSH logic into psp
+On Fri, Aug 13, 2021 at 11:59:24AM -0500, Tom Lendacky wrote:
+> diff --git a/arch/x86/mm/mem_encrypt.c b/arch/x86/mm/mem_encrypt.c
+> index edc67ddf065d..5635ca9a1fbe 100644
+> --- a/arch/x86/mm/mem_encrypt.c
+> +++ b/arch/x86/mm/mem_encrypt.c
+> @@ -144,7 +144,7 @@ void __init sme_unmap_bootdata(char *real_mode_data)
+>  	struct boot_params *boot_data;
+>  	unsigned long cmdline_paddr;
+>  
+> -	if (!sme_active())
+> +	if (!amd_prot_guest_has(PATTR_SME))
+>  		return;
+>  
+>  	/* Get the command line address before unmapping the real_mode_data */
+> @@ -164,7 +164,7 @@ void __init sme_map_bootdata(char *real_mode_data)
+>  	struct boot_params *boot_data;
+>  	unsigned long cmdline_paddr;
+>  
+> -	if (!sme_active())
+> +	if (!amd_prot_guest_has(PATTR_SME))
+>  		return;
+>  
+>  	__sme_early_map_unmap_mem(real_mode_data, sizeof(boot_params), true);
+> @@ -378,7 +378,7 @@ bool sev_active(void)
+>  	return sev_status & MSR_AMD64_SEV_ENABLED;
+>  }
+>  
+> -bool sme_active(void)
+> +static bool sme_active(void)
 
-No objections apart from the build failure on patch 1.  However, it's up 
-to Tom whether they prefer this logic in KVM or the PSP driver.
+Just get rid of it altogether. Also, there's an
 
-Paolo
+EXPORT_SYMBOL_GPL(sev_active);
 
+which needs to go under the actual function. Here's a diff ontop:
+
+---
+diff --git a/arch/x86/mm/mem_encrypt.c b/arch/x86/mm/mem_encrypt.c
+index 5635ca9a1fbe..a3a2396362a5 100644
+--- a/arch/x86/mm/mem_encrypt.c
++++ b/arch/x86/mm/mem_encrypt.c
+@@ -364,8 +364,9 @@ int __init early_set_memory_encrypted(unsigned long vaddr, unsigned long size)
+ /*
+  * SME and SEV are very similar but they are not the same, so there are
+  * times that the kernel will need to distinguish between SME and SEV. The
+- * sme_active() and sev_active() functions are used for this.  When a
+- * distinction isn't needed, the mem_encrypt_active() function can be used.
++ * PATTR_HOST_MEM_ENCRYPT and PATTR_GUEST_MEM_ENCRYPT flags to
++ * amd_prot_guest_has() are used for this. When a distinction isn't needed,
++ * the mem_encrypt_active() function can be used.
+  *
+  * The trampoline code is a good example for this requirement.  Before
+  * paging is activated, SME will access all memory as decrypted, but SEV
+@@ -377,11 +378,6 @@ bool sev_active(void)
+ {
+ 	return sev_status & MSR_AMD64_SEV_ENABLED;
+ }
+-
+-static bool sme_active(void)
+-{
+-	return sme_me_mask && !sev_active();
+-}
+ EXPORT_SYMBOL_GPL(sev_active);
+ 
+ /* Needs to be called from non-instrumentable code */
+@@ -398,7 +394,7 @@ bool amd_prot_guest_has(unsigned int attr)
+ 
+ 	case PATTR_SME:
+ 	case PATTR_HOST_MEM_ENCRYPT:
+-		return sme_active();
++		return sme_me_mask && !sev_active();
+ 
+ 	case PATTR_SEV:
+ 	case PATTR_GUEST_MEM_ENCRYPT:
+
+>  {
+>  	return sme_me_mask && !sev_active();
+>  }
+> @@ -428,7 +428,7 @@ bool force_dma_unencrypted(struct device *dev)
+>  	 * device does not support DMA to addresses that include the
+>  	 * encryption mask.
+>  	 */
+> -	if (sme_active()) {
+> +	if (amd_prot_guest_has(PATTR_SME)) {
+
+So I'm not sure: you add PATTR_SME which you call with
+amd_prot_guest_has() and PATTR_HOST_MEM_ENCRYPT which you call with
+prot_guest_has() and they both end up being the same thing on AMD.
+
+So why even bother with PATTR_SME?
+
+This is only going to cause confusion later and I'd say let's simply use
+prot_guest_has(PATTR_HOST_MEM_ENCRYPT) everywhere...
+
+-- 
+Regards/Gruss,
+    Boris.
+
+https://people.kernel.org/tglx/notes-about-netiquette
