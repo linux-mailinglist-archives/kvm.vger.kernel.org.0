@@ -2,160 +2,75 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id ECF253EE8FD
-	for <lists+kvm@lfdr.de>; Tue, 17 Aug 2021 11:00:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 164D63EE9E1
+	for <lists+kvm@lfdr.de>; Tue, 17 Aug 2021 11:31:35 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235313AbhHQJBA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 17 Aug 2021 05:01:00 -0400
-Received: from mail.skyhub.de ([5.9.137.197]:53982 "EHLO mail.skyhub.de"
+        id S235559AbhHQJcG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 17 Aug 2021 05:32:06 -0400
+Received: from mga01.intel.com ([192.55.52.88]:49582 "EHLO mga01.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S234339AbhHQJA5 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 17 Aug 2021 05:00:57 -0400
-Received: from zn.tnic (p200300ec2f1175003091845243004ed4.dip0.t-ipconnect.de [IPv6:2003:ec:2f11:7500:3091:8452:4300:4ed4])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id C31EA1EC01B5;
-        Tue, 17 Aug 2021 11:00:17 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
-        t=1629190817;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
-        bh=CTZxwlhCTYBphd87lvceDZBtTDENyNB6RWw2n2fhNqo=;
-        b=cLyGe6Vfp/ZbXlGAJcu8s+oDyI+Cek5fSPumAUCPjd+TtrDcq8WnlTuq148AmmSefmwouf
-        U4RljFOl7bpVd/jo/MMo7NW5c66AcB8pntylvfCw1TSAnl6S3l0D/M7WEba3xU2EPv7jkK
-        R7PUFWJBwQxeCIeQqdKssk1UJ8FLB8Y=
-Date:   Tue, 17 Aug 2021 11:00:56 +0200
-From:   Borislav Petkov <bp@alien8.de>
-To:     Tom Lendacky <thomas.lendacky@amd.com>
-Cc:     linux-kernel@vger.kernel.org, x86@kernel.org,
-        linuxppc-dev@lists.ozlabs.org, linux-s390@vger.kernel.org,
-        iommu@lists.linux-foundation.org, kvm@vger.kernel.org,
-        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
-        linux-graphics-maintainer@vmware.com,
-        amd-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
-        kexec@lists.infradead.org, linux-fsdevel@vger.kernel.org,
-        Brijesh Singh <brijesh.singh@amd.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Andi Kleen <ak@linux.intel.com>,
-        Sathyanarayanan Kuppuswamy 
-        <sathyanarayanan.kuppuswamy@linux.intel.com>,
-        Tianyu Lan <Tianyu.Lan@microsoft.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Will Deacon <will@kernel.org>, Joerg Roedel <jroedel@suse.de>
-Subject: Re: [PATCH v2 05/12] x86/sme: Replace occurrences of sme_active()
- with prot_guest_has()
-Message-ID: <YRt6yCNCBLwyyx5X@zn.tnic>
-References: <cover.1628873970.git.thomas.lendacky@amd.com>
- <c6c38d6253dc78381f9ff0f1823b6ee5ddeefacc.1628873970.git.thomas.lendacky@amd.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <c6c38d6253dc78381f9ff0f1823b6ee5ddeefacc.1628873970.git.thomas.lendacky@amd.com>
+        id S232769AbhHQJcE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 17 Aug 2021 05:32:04 -0400
+X-IronPort-AV: E=McAfee;i="6200,9189,10078"; a="238111494"
+X-IronPort-AV: E=Sophos;i="5.84,328,1620716400"; 
+   d="scan'208";a="238111494"
+Received: from fmsmga007.fm.intel.com ([10.253.24.52])
+  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Aug 2021 02:31:32 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.84,328,1620716400"; 
+   d="scan'208";a="449200677"
+Received: from sqa-gate.sh.intel.com (HELO robert-ivt.tsp.org) ([10.239.48.212])
+  by fmsmga007.fm.intel.com with ESMTP; 17 Aug 2021 02:31:28 -0700
+From:   Robert Hoo <robert.hu@linux.intel.com>
+To:     seanjc@google.com, pbonzini@redhat.com, vkuznets@redhat.com,
+        wanpengli@tencent.com, jmattson@google.com, joro@8bytes.org
+Cc:     kvm@vger.kernel.org, yu.c.zhang@linux.intel.com,
+        Robert Hoo <robert.hu@linux.intel.com>
+Subject: [PATCH v1 0/5] KVM/x86/nVMX: Add field existence support in VMCS12
+Date:   Tue, 17 Aug 2021 17:31:08 +0800
+Message-Id: <1629192673-9911-1-git-send-email-robert.hu@linux.intel.com>
+X-Mailer: git-send-email 1.8.3.1
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Aug 13, 2021 at 11:59:24AM -0500, Tom Lendacky wrote:
-> diff --git a/arch/x86/mm/mem_encrypt.c b/arch/x86/mm/mem_encrypt.c
-> index edc67ddf065d..5635ca9a1fbe 100644
-> --- a/arch/x86/mm/mem_encrypt.c
-> +++ b/arch/x86/mm/mem_encrypt.c
-> @@ -144,7 +144,7 @@ void __init sme_unmap_bootdata(char *real_mode_data)
->  	struct boot_params *boot_data;
->  	unsigned long cmdline_paddr;
->  
-> -	if (!sme_active())
-> +	if (!amd_prot_guest_has(PATTR_SME))
->  		return;
->  
->  	/* Get the command line address before unmapping the real_mode_data */
-> @@ -164,7 +164,7 @@ void __init sme_map_bootdata(char *real_mode_data)
->  	struct boot_params *boot_data;
->  	unsigned long cmdline_paddr;
->  
-> -	if (!sme_active())
-> +	if (!amd_prot_guest_has(PATTR_SME))
->  		return;
->  
->  	__sme_early_map_unmap_mem(real_mode_data, sizeof(boot_params), true);
-> @@ -378,7 +378,7 @@ bool sev_active(void)
->  	return sev_status & MSR_AMD64_SEV_ENABLED;
->  }
->  
-> -bool sme_active(void)
-> +static bool sme_active(void)
+SDM[1] has stated that many VMCS fields' existence depend on some other
+VMX feature's status.
+In nested case, VMCS12 shall respect this, i.e., L0's VMCS configuration
+for L1 has limited the L1's VMX "physical" capability, some vmcs12.fields
+shall appear not exist when L1 vmread/vmwrite.
 
-Just get rid of it altogether. Also, there's an
+This patch set
+1) Add a bitmap in nested_vmx to reflect vmcs12 fields' existence
+2) Implement those update functions according to dependencies stated in SDM
+and update dynamically
+3) Make VMCS12 read/write respect this
+4) Make nested MSR_IA32_VMX_VMCS_ENUM read-only and respect this
 
-EXPORT_SYMBOL_GPL(sev_active);
-
-which needs to go under the actual function. Here's a diff ontop:
-
+[1] Notes in SDM Vol.3, Appedix B FIELD ENCODING IN VMCS
 ---
-diff --git a/arch/x86/mm/mem_encrypt.c b/arch/x86/mm/mem_encrypt.c
-index 5635ca9a1fbe..a3a2396362a5 100644
---- a/arch/x86/mm/mem_encrypt.c
-+++ b/arch/x86/mm/mem_encrypt.c
-@@ -364,8 +364,9 @@ int __init early_set_memory_encrypted(unsigned long vaddr, unsigned long size)
- /*
-  * SME and SEV are very similar but they are not the same, so there are
-  * times that the kernel will need to distinguish between SME and SEV. The
-- * sme_active() and sev_active() functions are used for this.  When a
-- * distinction isn't needed, the mem_encrypt_active() function can be used.
-+ * PATTR_HOST_MEM_ENCRYPT and PATTR_GUEST_MEM_ENCRYPT flags to
-+ * amd_prot_guest_has() are used for this. When a distinction isn't needed,
-+ * the mem_encrypt_active() function can be used.
-  *
-  * The trampoline code is a good example for this requirement.  Before
-  * paging is activated, SME will access all memory as decrypted, but SEV
-@@ -377,11 +378,6 @@ bool sev_active(void)
- {
- 	return sev_status & MSR_AMD64_SEV_ENABLED;
- }
--
--static bool sme_active(void)
--{
--	return sme_me_mask && !sev_active();
--}
- EXPORT_SYMBOL_GPL(sev_active);
- 
- /* Needs to be called from non-instrumentable code */
-@@ -398,7 +394,7 @@ bool amd_prot_guest_has(unsigned int attr)
- 
- 	case PATTR_SME:
- 	case PATTR_HOST_MEM_ENCRYPT:
--		return sme_active();
-+		return sme_me_mask && !sev_active();
- 
- 	case PATTR_SEV:
- 	case PATTR_GUEST_MEM_ENCRYPT:
+This patch set is a follow-up to Sean's suggestion in ba1f82456b
+(Dynamically compute max VMCS index for vmcs12).
 
->  {
->  	return sme_me_mask && !sev_active();
->  }
-> @@ -428,7 +428,7 @@ bool force_dma_unencrypted(struct device *dev)
->  	 * device does not support DMA to addresses that include the
->  	 * encryption mask.
->  	 */
-> -	if (sme_active()) {
-> +	if (amd_prot_guest_has(PATTR_SME)) {
+Robert Hoo (5):
+  KVM: x86: nVMX: Add vmcs12 field existence bitmap in nested_vmx
+  KVM: x86: nVMX: Update VMCS12 fields existence when nVMX MSRs are set
+  KVM: x86: nVMX: VMCS12 field's read/write respects field existence
+    bitmap
+  KVM: x86: nVMX: Respect vmcs12 field existence when calc
+    vmx_vmcs_enum_msr
+  KVM: x86: nVMX: Ignore user space set value to MSR_IA32_VMX_VMCS_ENUM
 
-So I'm not sure: you add PATTR_SME which you call with
-amd_prot_guest_has() and PATTR_HOST_MEM_ENCRYPT which you call with
-prot_guest_has() and they both end up being the same thing on AMD.
+ arch/x86/kvm/vmx/nested.c |  68 +++++--
+ arch/x86/kvm/vmx/nested.h |   1 +
+ arch/x86/kvm/vmx/vmcs12.c | 363 ++++++++++++++++++++++++++++++++++++++
+ arch/x86/kvm/vmx/vmcs12.h |  69 ++++++--
+ arch/x86/kvm/vmx/vmx.c    |  17 +-
+ arch/x86/kvm/vmx/vmx.h    |   3 +
+ 6 files changed, 499 insertions(+), 22 deletions(-)
 
-So why even bother with PATTR_SME?
 
-This is only going to cause confusion later and I'd say let's simply use
-prot_guest_has(PATTR_HOST_MEM_ENCRYPT) everywhere...
-
+base-commit: 32bdc01988413031c6e743714c2b40bdd773e5db
 -- 
-Regards/Gruss,
-    Boris.
+2.27.0
 
-https://people.kernel.org/tglx/notes-about-netiquette
