@@ -2,259 +2,105 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7BDEC3F0C9D
-	for <lists+kvm@lfdr.de>; Wed, 18 Aug 2021 22:21:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9A97F3F0CF4
+	for <lists+kvm@lfdr.de>; Wed, 18 Aug 2021 22:49:20 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233833AbhHRUWQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 18 Aug 2021 16:22:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48364 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233682AbhHRUWP (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 18 Aug 2021 16:22:15 -0400
-Received: from mail-io1-xd4a.google.com (mail-io1-xd4a.google.com [IPv6:2607:f8b0:4864:20::d4a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B0E99C061764
-        for <kvm@vger.kernel.org>; Wed, 18 Aug 2021 13:21:40 -0700 (PDT)
-Received: by mail-io1-xd4a.google.com with SMTP id k21-20020a5e93150000b02905b30d664397so1927294iom.0
-        for <kvm@vger.kernel.org>; Wed, 18 Aug 2021 13:21:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:in-reply-to:message-id:mime-version:references:subject:from:to
-         :cc;
-        bh=yAtZtpeE6rXx+fuJoapWocNkmFQzDonUY35/KDI+IeY=;
-        b=ukh2RD/BqyAU1d74OgmsRHjzX4dQVXV1GIVny8z/opUmJkGoCQ/baXzWOQljwKEOTb
-         5ddhuBSix/6R092GSSnXFbderKVgnVxTCPDY3KYc5QZqttwKL6vjv0i7RK8O3JGT4dfi
-         7irNwrj0kpxnn9/kqFtij4Nhx8U4tp2agScQ8QRcGIK2dUaUm8nOSoQa8RyJCad1PmZi
-         0JFbI6UCd69QZh07OetfzMgHSXui+I4Qo/gULNtjX4fdDdc3Mo25mLubw5GlhEfZjJde
-         jzeMkxU8bNbLZ6MXCKP3h5sVQuxfx8vKQj6tTKbvFar9IvV60AJ3eRVE71QkvjN+M5Qa
-         Uo6g==
+        id S233425AbhHRUtx (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 18 Aug 2021 16:49:53 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:35175 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229965AbhHRUts (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 18 Aug 2021 16:49:48 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1629319752;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=AbzZthqq85Mzm5v2qgNRHWx+Tco9li7Sl4qu+JxfsRo=;
+        b=UKri+ZbTWc/5SM0X3DsRzeSE8IbB7hXrbORLAnBX2ErHxDNHxAHJMF7fIMcJl+ABEjbGOi
+        XPass+91k97xrb6AtRrPUETRmViCYJ658p2CAHVTmLoVo3hnymdqvE51HCeqcA8xAIooXk
+        jWC2WxQBj7pMu/qazeHfnJ4y/LrG2w8=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-596-T7-u-lFGP2GzbRlzJ944mQ-1; Wed, 18 Aug 2021 16:49:11 -0400
+X-MC-Unique: T7-u-lFGP2GzbRlzJ944mQ-1
+Received: by mail-wm1-f72.google.com with SMTP id y206-20020a1c7dd70000b02902e6a442ea44so2638487wmc.9
+        for <kvm@vger.kernel.org>; Wed, 18 Aug 2021 13:49:11 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:in-reply-to:message-id:mime-version
-         :references:subject:from:to:cc;
-        bh=yAtZtpeE6rXx+fuJoapWocNkmFQzDonUY35/KDI+IeY=;
-        b=l1HORsLLVtGxALZyOQrokkjbKykxA/O+1WuMiG0+n0iXwuMtk8GR4Ad3k8hOLlXd4A
-         wuhc7KXBjpgP7FCvNh0wW+mRgqcWcixlje3XquTl4lO8R615D4I13kJwwCGKj0v/x/FZ
-         yD4goHZ904Rsturo8ginJsCLhqaqyv0E2lTPAntElYtXQ3lyxMg9Iy+I8YhO4TmYj+kD
-         6A9vdeeLnbfRwVztguQ1imcLmKAWi/K93tmjFthRuVxI7A2ZWUuuJ6pXVbbBKVrQiLIz
-         M77CBo0WdFJRvltSnLBnEVgZHJoFSlMock0U/hP0p2YgjoRHO0+36SSUDHCQ70RZ+SLv
-         LrLQ==
-X-Gm-Message-State: AOAM531U0legifUIROXtIrDnvimrL3E8GPgmlZzsjUQHTbgD3r9cCEIE
-        8CuNzp87vH9LEXo7FSv1SBf6wsk6Cn6YsbzlwrSNPwoXJOCSxegDKEPNCpwXTdaokr1AygkvnON
-        lC2MNz51lUxV3Qcv35BnrKDWjHJoeLD7xsvzJOd7wWo5N2JXMgAML9wx3xQ==
-X-Google-Smtp-Source: ABdhPJx8L5x+5ANU3cfMuUU/WOy3ghT1hZAvB2jAQ+JGEZsTwEMjLQGWVLtPcPNJTc+zHhaeV0CsGw50XNM=
-X-Received: from oupton.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:404])
- (user=oupton job=sendgmr) by 2002:a92:d10d:: with SMTP id a13mr7518827ilb.87.1629318099945;
- Wed, 18 Aug 2021 13:21:39 -0700 (PDT)
-Date:   Wed, 18 Aug 2021 20:21:33 +0000
-In-Reply-To: <20210818202133.1106786-1-oupton@google.com>
-Message-Id: <20210818202133.1106786-5-oupton@google.com>
-Mime-Version: 1.0
-References: <20210818202133.1106786-1-oupton@google.com>
-X-Mailer: git-send-email 2.33.0.rc1.237.g0d66db33f3-goog
-Subject: [PATCH v2 4/4] selftests: KVM: Introduce psci_cpu_on_test
-From:   Oliver Upton <oupton@google.com>
-To:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
-Cc:     Marc Zyngier <maz@kernel.org>, Peter Shier <pshier@google.com>,
-        Ricardo Koller <ricarkol@google.com>,
-        Jing Zhang <jingzhangos@google.com>,
-        Raghavendra Rao Anata <rananta@google.com>,
-        James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Andrew Jones <drjones@redhat.com>,
-        Oliver Upton <oupton@google.com>
-Content-Type: text/plain; charset="UTF-8"
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=AbzZthqq85Mzm5v2qgNRHWx+Tco9li7Sl4qu+JxfsRo=;
+        b=eaARxr161oDdcU4cEpZ0bRpmaOuU/drwLU3AS6pNP9XBSFM+QXufedpA0iGH+8qEqc
+         f/h8AdHoaOFNYIDudl3R4IACAEeFOwns+qN3lAkb887svukbJsvn8uXOQgTfGMcXMjVY
+         /+pmEB5lQyu7ejoiQnOBklVDTaV/Y+2AhFZe+b/w/qreLf8eUcyFbcilkD3MCiTrJXZB
+         mcXp2inzsN9CIj+FtfQoZMKpKHbnBHorshySJbpoCiELIvt9XYjy4HWMv059MWRiLEpm
+         de/za4rMI0sqKJfmjGP1966tszrSV6iQJ3myFcXZbUf7Dgt8KrD7lxbrdw6YoiMfh7mJ
+         bzkw==
+X-Gm-Message-State: AOAM530TcisVfCH233h/c1oEPKh2qg1a3FYRY0qjWxDdvnbtiqkpoXWo
+        7NphbaZ/Pl3gH0xyqZ7csanCndYhF60vI2tyts78y0VN4pTNKRJ3ByDokKcEbQB5yJZaBmWKiCM
+        UiMhQzM9ofR2K
+X-Received: by 2002:adf:c044:: with SMTP id c4mr12427203wrf.275.1629319750157;
+        Wed, 18 Aug 2021 13:49:10 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJw0Eo6oygWl8lAFdXSffqYVMIQaXeGAPcMmU5UMd7P96IRiGy+kHIlBCcOVqKfluWZbcw/kCw==
+X-Received: by 2002:adf:c044:: with SMTP id c4mr12427171wrf.275.1629319749865;
+        Wed, 18 Aug 2021 13:49:09 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:63a7:c72e:ea0e:6045? ([2001:b07:6468:f312:63a7:c72e:ea0e:6045])
+        by smtp.gmail.com with ESMTPSA id i8sm6144247wma.7.2021.08.18.13.49.06
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 18 Aug 2021 13:49:09 -0700 (PDT)
+Subject: Re: [v2 PATCH 3/4] x86/kvm: Add host side support for virtual suspend
+ time injection
+To:     Vitaly Kuznetsov <vkuznets@redhat.com>
+Cc:     suleiman@google.com, Borislav Petkov <bp@alien8.de>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ingo Molnar <mingo@redhat.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        John Stultz <john.stultz@linaro.org>,
+        Sean Christopherson <seanjc@google.com>,
+        Stephen Boyd <sboyd@kernel.org>,
+        Wanpeng Li <wanpengli@tencent.com>, kvm@vger.kernel.org,
+        x86@kernel.org, Hikaru Nishida <hikalium@chromium.org>,
+        linux-kernel@vger.kernel.org, dme@dme.org, tglx@linutronix.de,
+        mlevitsk@redhat.com
+References: <20210806100710.2425336-1-hikalium@chromium.org>
+ <20210806190607.v2.3.Ib0cb8ecae99f0ccd0e2814b310adba00b9e81d94@changeid>
+ <2ec642dd-dde6-bee6-3de3-0fa78d288995@redhat.com>
+ <87o89vksiq.fsf@vitty.brq.redhat.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <89fa5648-e034-6435-9b21-a6ca0cb22a46@redhat.com>
+Date:   Wed, 18 Aug 2021 22:49:05 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.11.0
+MIME-Version: 1.0
+In-Reply-To: <87o89vksiq.fsf@vitty.brq.redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Introduce a test for aarch64 that ensures CPU resets induced by PSCI are
-reflected in the target vCPU's state, even if the target is never run
-again. This is a regression test for a race between vCPU migration and
-PSCI.
+On 18/08/21 11:32, Vitaly Kuznetsov wrote:
+> On the host side, I'd vote for keeping MSR_KVM_ASYNC_PF_INT for async PF
+> mechanism only for two reasons:
+> - We may want to use (currently reserved) upper 56 bits of it for new
+> asyncPF related features (e.g. flags) and it would be unnatural to add
+> them to 'MSR_KVM_HYPERVISOR_CALLBACK_INT'
+> - We should probably leave it to the guest if it wants to share 'suspend
+> time' notification interrupt with async PF (and if it actually wants to
+> get one/another).
 
-Reviewed-by: Andrew Jones <drjones@redhat.com>
-Signed-off-by: Oliver Upton <oupton@google.com>
----
- tools/testing/selftests/kvm/.gitignore        |   1 +
- tools/testing/selftests/kvm/Makefile          |   1 +
- .../selftests/kvm/aarch64/psci_cpu_on_test.c  | 121 ++++++++++++++++++
- .../selftests/kvm/include/aarch64/processor.h |   3 +
- 4 files changed, 126 insertions(+)
- create mode 100644 tools/testing/selftests/kvm/aarch64/psci_cpu_on_test.c
+I agree that it's fine either way.  That said, more MSRs are more 
+complexity and more opportunity for getting things wrong (in either KVM 
+or userspace---for example, migration).  There are still 14 free bits in 
+MSR_ASYNC_PF_EN (bits 63-52 and 5-4, so it should not be a problem to 
+repurpose MSR_ASYNC_PF_INT.
 
-diff --git a/tools/testing/selftests/kvm/.gitignore b/tools/testing/selftests/kvm/.gitignore
-index 0709af0144c8..98053d3afbda 100644
---- a/tools/testing/selftests/kvm/.gitignore
-+++ b/tools/testing/selftests/kvm/.gitignore
-@@ -1,6 +1,7 @@
- # SPDX-License-Identifier: GPL-2.0-only
- /aarch64/debug-exceptions
- /aarch64/get-reg-list
-+/aarch64/psci_cpu_on_test
- /aarch64/vgic_init
- /s390x/memop
- /s390x/resets
-diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
-index 5832f510a16c..5d05801ab816 100644
---- a/tools/testing/selftests/kvm/Makefile
-+++ b/tools/testing/selftests/kvm/Makefile
-@@ -86,6 +86,7 @@ TEST_GEN_PROGS_x86_64 += kvm_binary_stats_test
- 
- TEST_GEN_PROGS_aarch64 += aarch64/debug-exceptions
- TEST_GEN_PROGS_aarch64 += aarch64/get-reg-list
-+TEST_GEN_PROGS_aarch64 += aarch64/psci_cpu_on_test
- TEST_GEN_PROGS_aarch64 += aarch64/vgic_init
- TEST_GEN_PROGS_aarch64 += demand_paging_test
- TEST_GEN_PROGS_aarch64 += dirty_log_test
-diff --git a/tools/testing/selftests/kvm/aarch64/psci_cpu_on_test.c b/tools/testing/selftests/kvm/aarch64/psci_cpu_on_test.c
-new file mode 100644
-index 000000000000..018c269990e1
---- /dev/null
-+++ b/tools/testing/selftests/kvm/aarch64/psci_cpu_on_test.c
-@@ -0,0 +1,121 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+/*
-+ * psci_cpu_on_test - Test that the observable state of a vCPU targeted by the
-+ * CPU_ON PSCI call matches what the caller requested.
-+ *
-+ * Copyright (c) 2021 Google LLC.
-+ *
-+ * This is a regression test for a race between KVM servicing the PSCI call and
-+ * userspace reading the vCPUs registers.
-+ */
-+
-+#define _GNU_SOURCE
-+
-+#include <linux/psci.h>
-+
-+#include "kvm_util.h"
-+#include "processor.h"
-+#include "test_util.h"
-+
-+#define VCPU_ID_SOURCE 0
-+#define VCPU_ID_TARGET 1
-+
-+#define CPU_ON_ENTRY_ADDR 0xfeedf00dul
-+#define CPU_ON_CONTEXT_ID 0xdeadc0deul
-+
-+static uint64_t psci_cpu_on(uint64_t target_cpu, uint64_t entry_addr,
-+			    uint64_t context_id)
-+{
-+	register uint64_t x0 asm("x0") = PSCI_0_2_FN64_CPU_ON;
-+	register uint64_t x1 asm("x1") = target_cpu;
-+	register uint64_t x2 asm("x2") = entry_addr;
-+	register uint64_t x3 asm("x3") = context_id;
-+
-+	asm("hvc #0"
-+	    : "=r"(x0)
-+	    : "r"(x0), "r"(x1), "r"(x2), "r"(x3)
-+	    : "memory");
-+
-+	return x0;
-+}
-+
-+static uint64_t psci_affinity_info(uint64_t target_affinity,
-+				   uint64_t lowest_affinity_level)
-+{
-+	register uint64_t x0 asm("x0") = PSCI_0_2_FN64_AFFINITY_INFO;
-+	register uint64_t x1 asm("x1") = target_affinity;
-+	register uint64_t x2 asm("x2") = lowest_affinity_level;
-+
-+	asm("hvc #0"
-+	    : "=r"(x0)
-+	    : "r"(x0), "r"(x1), "r"(x2)
-+	    : "memory");
-+
-+	return x0;
-+}
-+
-+static void guest_main(uint64_t target_cpu)
-+{
-+	GUEST_ASSERT(!psci_cpu_on(target_cpu, CPU_ON_ENTRY_ADDR, CPU_ON_CONTEXT_ID));
-+	uint64_t target_state;
-+
-+	do {
-+		target_state = psci_affinity_info(target_cpu, 0);
-+
-+		GUEST_ASSERT((target_state == PSCI_0_2_AFFINITY_LEVEL_ON) ||
-+			     (target_state == PSCI_0_2_AFFINITY_LEVEL_OFF));
-+	} while (target_state != PSCI_0_2_AFFINITY_LEVEL_ON);
-+
-+	GUEST_DONE();
-+}
-+
-+int main(void)
-+{
-+	uint64_t target_mpidr, obs_pc, obs_x0;
-+	struct kvm_vcpu_init init;
-+	struct kvm_vm *vm;
-+	struct ucall uc;
-+
-+	vm = vm_create(VM_MODE_DEFAULT, DEFAULT_GUEST_PHY_PAGES, O_RDWR);
-+	kvm_vm_elf_load(vm, program_invocation_name);
-+	ucall_init(vm, NULL);
-+
-+	vm_ioctl(vm, KVM_ARM_PREFERRED_TARGET, &init);
-+	init.features[0] |= (1 << KVM_ARM_VCPU_PSCI_0_2);
-+
-+	aarch64_vcpu_add_default(vm, VCPU_ID_SOURCE, &init, guest_main);
-+
-+	/*
-+	 * make sure the target is already off when executing the test.
-+	 */
-+	init.features[0] |= (1 << KVM_ARM_VCPU_POWER_OFF);
-+	aarch64_vcpu_add_default(vm, VCPU_ID_TARGET, &init, guest_main);
-+
-+	get_reg(vm, VCPU_ID_TARGET, ARM64_SYS_REG(MPIDR_EL1), &target_mpidr);
-+	vcpu_args_set(vm, VCPU_ID_SOURCE, 1, target_mpidr & MPIDR_HWID_BITMASK);
-+	vcpu_run(vm, VCPU_ID_SOURCE);
-+
-+	switch (get_ucall(vm, VCPU_ID_SOURCE, &uc)) {
-+	case UCALL_DONE:
-+		break;
-+	case UCALL_ABORT:
-+		TEST_FAIL("%s at %s:%ld", (const char *)uc.args[0], __FILE__,
-+			  uc.args[1]);
-+		break;
-+	default:
-+		TEST_FAIL("Unhandled ucall: %lu", uc.cmd);
-+	}
-+
-+	get_reg(vm, VCPU_ID_TARGET, ARM64_CORE_REG(regs.pc), &obs_pc);
-+	get_reg(vm, VCPU_ID_TARGET, ARM64_CORE_REG(regs.regs[0]), &obs_x0);
-+
-+	TEST_ASSERT(obs_pc == CPU_ON_ENTRY_ADDR,
-+		    "unexpected target cpu pc: %lx (expected: %lx)",
-+		    obs_pc, CPU_ON_ENTRY_ADDR);
-+	TEST_ASSERT(obs_x0 == CPU_ON_CONTEXT_ID,
-+		    "unexpected target context id: %lx (expected: %lx)",
-+		    obs_x0, CPU_ON_CONTEXT_ID);
-+
-+	kvm_vm_free(vm);
-+	return 0;
-+}
-diff --git a/tools/testing/selftests/kvm/include/aarch64/processor.h b/tools/testing/selftests/kvm/include/aarch64/processor.h
-index 27dc5c2e56b9..c0273aefa63d 100644
---- a/tools/testing/selftests/kvm/include/aarch64/processor.h
-+++ b/tools/testing/selftests/kvm/include/aarch64/processor.h
-@@ -17,6 +17,7 @@
- #define CPACR_EL1               3, 0,  1, 0, 2
- #define TCR_EL1                 3, 0,  2, 0, 2
- #define MAIR_EL1                3, 0, 10, 2, 0
-+#define MPIDR_EL1               3, 0,  0, 0, 5
- #define TTBR0_EL1               3, 0,  2, 0, 0
- #define SCTLR_EL1               3, 0,  1, 0, 0
- #define VBAR_EL1                3, 0, 12, 0, 0
-@@ -40,6 +41,8 @@
- 			  (0xfful << (4 * 8)) | \
- 			  (0xbbul << (5 * 8)))
- 
-+#define MPIDR_HWID_BITMASK (0xff00fffffful)
-+
- static inline void get_reg(struct kvm_vm *vm, uint32_t vcpuid, uint64_t id, uint64_t *addr)
- {
- 	struct kvm_one_reg reg;
--- 
-2.33.0.rc1.237.g0d66db33f3-goog
+Paolo
+
+> On the guest side, it is perfectly fine to reuse
+> HYPERVISOR_CALLBACK_VECTOR for everything.
 
