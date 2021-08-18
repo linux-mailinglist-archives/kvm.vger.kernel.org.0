@@ -2,173 +2,221 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id BF6873F09CC
-	for <lists+kvm@lfdr.de>; Wed, 18 Aug 2021 19:02:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 220103F09E7
+	for <lists+kvm@lfdr.de>; Wed, 18 Aug 2021 19:07:29 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232519AbhHRRCe (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 18 Aug 2021 13:02:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58096 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232344AbhHRRCd (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 18 Aug 2021 13:02:33 -0400
-Received: from mail-wm1-x32e.google.com (mail-wm1-x32e.google.com [IPv6:2a00:1450:4864:20::32e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6A7F7C0613CF
-        for <kvm@vger.kernel.org>; Wed, 18 Aug 2021 10:01:58 -0700 (PDT)
-Received: by mail-wm1-x32e.google.com with SMTP id o15so2041858wmr.3
-        for <kvm@vger.kernel.org>; Wed, 18 Aug 2021 10:01:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=ogBzypcUa1lTzda8tPWMYRgvwhOz6jdmlJy9fp/v4UY=;
-        b=k0P4K6sqnCTe/kaKB5/P+ucvQZcXFK/2O5lgvKFmChlC+QbxR6GR14pO1G6EzqWN5i
-         VIWRsv0Be68iS/jF9Blx08rps0eu1+Yjal7YvIuUtUxjA2o8Y8UC9ropxssEXNJd6JR2
-         R9BDQg2oOn7qZRQaFEdJi4Pcch2H9JQJyY+2uw2HlG2PZ7SHn/d1ISVzKIPMcXkyKcTt
-         uDAZULOzw4AcX6qH4O18xoFcxyvwSpYLdG7M1NkqjbanjL9bPWSuByZ28Pbadw3eQ8jC
-         ivPAYOmeypeBCHxeGEAPli1Fe76/6iRK83PQEiGLfbEAK7rdVPxmNitHVW0zy0Z/Xh/2
-         evJA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=ogBzypcUa1lTzda8tPWMYRgvwhOz6jdmlJy9fp/v4UY=;
-        b=fYmZ1VoHmzHCGrXENFgM5Yjd2CnW7wFKkkVFzV+mGph2Y96RqL42Ur+VHZaKQZ/3Nk
-         cHNaFzqxd6JpiaBg2UNGMBZ8+dUcfay7mdtNSo8vEApENjfFUAVUwFlU9qhPme3DUEMM
-         LcQctszL1+lcVS8FRGy3T1V7RLEEW2JH5Vvq7CBanWPTSjhs16tJO1xyq3L0RktQVep9
-         ZANpDJLPOOZphhCI1VKrWGUbh0VQOdptYsNyWHDwPdNDlBHTsBV+dzAkGFKVZ1HMYQpB
-         MrwgHTU4M7p3J7PWd7PcbiynEtU11UO8Hey1+NmQ/iyX5wfhb106af4uwvVxHtBRQL+h
-         Z9tQ==
-X-Gm-Message-State: AOAM532yWpUc+Jzb+ndv6LFE8RMzzKvYlih5jEv2vw+3x8wjg1Y8kWr1
-        T2Vo5bhL9ja9O4vCodNxr3BPr9oW/ICpCXuA728qmw==
-X-Google-Smtp-Source: ABdhPJzLb+kYkQv5AfDCY188gkhGXH5aIeH473/dBXIckKFjAM5OFmtRnm6Usz/tzE7/+V8MGxYXZrISnaPkdnM3HUM=
-X-Received: by 2002:a1c:a401:: with SMTP id n1mr9492800wme.74.1629306115059;
- Wed, 18 Aug 2021 10:01:55 -0700 (PDT)
+        id S230036AbhHRRIC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 18 Aug 2021 13:08:02 -0400
+Received: from mail-dm6nam10on2060.outbound.protection.outlook.com ([40.107.93.60]:36961
+        "EHLO NAM10-DM6-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S229784AbhHRRIB (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 18 Aug 2021 13:08:01 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=bxVQ10/Hc59gWB7mBew0zze1l1OnxXtb0N0u/b3RbMysrFQBXDEue8xUIlagTZOwVnjC2nNQKNfhKJhU3BS2N8JPmkreC/7OEloh/KYGoR/XNkU5bEjT179rgLiUNhjP2W6LmJoXE7VNAuWi2tKJRf3RT6LHjfUHrcVvYBbHMmqKmOGh2XU52fRa7ARmLWi8pVegfEMYaWzh2Qs1YtGsXOCUoJ0xm+ITN9LWu54hV2CYlOWKxNYFDhEW7A9LgevoXW05PKHTE6yAFdXPQbRuMPHzY7FvxHNkKruSHn1oBWjdq0vB6FFFdD1DON1qQPvTF1LH8BLn0RuLuMQkke0iqA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=61r9TJ3XTxeaXxSUATCpmunRaz4+YF0zA3527HSj/Vc=;
+ b=UCGftC3U3NdB5KunMYp+NOlyFWE7d0NDcR6j1j3dIuq5RgQx+u+f0uUHkizb5RgLta93Uei4VizR1O4OyUMv7j6BTK6MBJ6YRcoU/KBd8zASqvUdYehT6YkfzV1jCsgGY82vCdX/4+62Xu66P7WZQ+BTMHiLpkEj1EkiT8xFNqR7LuK/3uo8kPiVjawSJ2ZXSRj+TEXmKvHg7rEMhN0Rl0dgq/jSOVd6JNZo/pVcQ7U7sHEnplG3YzFho3KfF+mYKf8LgPPvCZNcB4mteUGJ4zhlB3ipxRu9ivUxO45jkptk8SJqoc91XQIumSy7P7QsREVen5/p3WAPJ/FK2s9ulg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=61r9TJ3XTxeaXxSUATCpmunRaz4+YF0zA3527HSj/Vc=;
+ b=k58PO/MM8WFJQh97L3KA843VCgq1Rsf7mOwLA8VLwKroJZLXB8JHiZpomrU6b7FoCL5C/5griSQcoaRi/GWDyLS4080WGK2f+4gmWnUpwMSbuEbpuw/HJlLP7EYbbWWJG56tWuaJAl4kBN4AoLcapIHPHfjhsKrrwbHe/fP1H7E=
+Authentication-Results: redhat.com; dkim=none (message not signed)
+ header.d=none;redhat.com; dmarc=none action=none header.from=amd.com;
+Received: from SN6PR12MB2767.namprd12.prod.outlook.com (2603:10b6:805:75::23)
+ by SN6PR12MB2768.namprd12.prod.outlook.com (2603:10b6:805:72::11) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4415.15; Wed, 18 Aug
+ 2021 17:07:23 +0000
+Received: from SN6PR12MB2767.namprd12.prod.outlook.com
+ ([fe80::491e:2642:bae2:8b73]) by SN6PR12MB2767.namprd12.prod.outlook.com
+ ([fe80::491e:2642:bae2:8b73%7]) with mapi id 15.20.4415.024; Wed, 18 Aug 2021
+ 17:07:23 +0000
+Date:   Wed, 18 Aug 2021 17:07:17 +0000
+From:   Ashish Kalra <ashish.kalra@amd.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Steve Rutherford <srutherford@google.com>,
+        qemu-devel <qemu-devel@nongnu.org>,
+        Thomas Lendacky <thomas.lendacky@amd.com>,
+        Brijesh Singh <brijesh.singh@amd.com>,
+        "Habkost, Eduardo" <ehabkost@redhat.com>,
+        "S. Tsirkin, Michael" <mst@redhat.com>,
+        Richard Henderson <richard.henderson@linaro.org>,
+        "James E . J . Bottomley" <jejb@linux.ibm.com>,
+        Tobin Feldman-Fitzthum <tobin@ibm.com>,
+        Dov Murik <dovmurik@linux.vnet.ibm.com>,
+        Hubertus Franke <frankeh@us.ibm.com>,
+        David Gilbert <dgilbert@redhat.com>, kvm <kvm@vger.kernel.org>
+Subject: Re: [RFC PATCH 00/13] Add support for Mirror VM.
+Message-ID: <20210818170717.GA32572@ashkalra_ubuntu_server>
+References: <cover.1629118207.git.ashish.kalra@amd.com>
+ <CABayD+fyrcyPGg5TdXLr95AFkPFY+EeeNvY=NvQw_j3_igOd6Q@mail.gmail.com>
+ <0fcfafde-a690-f53a-01fc-542054948bb2@redhat.com>
+ <CABayD+d4dHBMbshx_gMUxaHkJZENYYRMrzatDtS-a1awGQKv2A@mail.gmail.com>
+ <CABgObfZbyTxSO9ScE0RMK2vgyOam_REo+SgLA+-1XyP=8Vx+uQ@mail.gmail.com>
+ <20210818140625.GA32492@ashkalra_ubuntu_server>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210818140625.GA32492@ashkalra_ubuntu_server>
+User-Agent: Mutt/1.9.4 (2018-02-28)
+X-ClientProxiedBy: SN1PR12CA0102.namprd12.prod.outlook.com
+ (2603:10b6:802:21::37) To SN6PR12MB2767.namprd12.prod.outlook.com
+ (2603:10b6:805:75::23)
 MIME-Version: 1.0
-References: <20210817230508.142907-1-jingzhangos@google.com>
- <YRxKZXm68FZ0jr34@google.com> <CAAdAUthw0gT2_K+WzkWeEHApGqM14qpH+kuoO6WZBnjvez6ZAg@mail.gmail.com>
-In-Reply-To: <CAAdAUthw0gT2_K+WzkWeEHApGqM14qpH+kuoO6WZBnjvez6ZAg@mail.gmail.com>
-From:   Cannon Matthews <cannonmatthews@google.com>
-Date:   Wed, 18 Aug 2021 12:01:43 -0500
-Message-ID: <CAJfu=UcwHWzqCvTjniAMkGj1mmjw9QCy5a-fGJ2mxTK8EFW7Dg@mail.gmail.com>
-Subject: Re: [PATCH] KVM: stats: add stats to detect if vcpu is currently halted
-To:     Jing Zhang <jingzhangos@google.com>
-Cc:     Sean Christopherson <seanjc@google.com>, KVM <kvm@vger.kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        David Matlack <dmatlack@google.com>,
-        Peter Shier <pshier@google.com>,
-        Oliver Upton <oupton@google.com>
-Content-Type: text/plain; charset="UTF-8"
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from ashkalra_ubuntu_server (165.204.77.1) by SN1PR12CA0102.namprd12.prod.outlook.com (2603:10b6:802:21::37) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4436.19 via Frontend Transport; Wed, 18 Aug 2021 17:07:23 +0000
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: cd09e118-a4bd-4031-16c4-08d9626aa5b4
+X-MS-TrafficTypeDiagnostic: SN6PR12MB2768:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <SN6PR12MB27689B84E1ADE054B49E7EE28EFF9@SN6PR12MB2768.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:7219;
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: Jhnmg/LeClsYWCynUKWK8H624QtQ1ry3IyXK1nIO9KIgO0XpYI/RSS4GZSPtRoO1yx5MjCCOj97mvt41CvfEUPCXJnLNj9gqY97mKBZ3laCPhzUo9fsFBXiOEQhOY0zSin0aFgve7neca8vSnbmEiAqpfXHRvVwf1Sd6wjpMKHaePiPyE0APlS2t6vdldoRo6Frk27gH0sIfk03QP+lepeYCQkeqRbIq1Y6f/2pC3z95FLe1OCj96WXZ9hVHfvhNQr6MmA+9AhegUt6ASUo4SX7pSRRg+fjmP6O3x9IPT9rDX8/lR/x6Uc0iYUBUipdRoFl3A03JfKonCTrqeP+wR4e609jaK7+AZ7usIu0vmms61y9/aM+25QVJJdtIJtytouv5pSGDgeC7bLz968ImnjhkFmnf3lmETFex5prjD7OP+mRkLTz9OCIJj6EOzOA8BtTpGcvQ7a8UittHbNMb4aZUWtm+F29gIVikxJL9av3FAunoElbjxj3sUZeDAHkWREVDMQasld4FhyPCHT5SVHEA0pvI0gJov23yUJHoIjHKVoYPRRFXEDqFOJ5N6GsZw+Q2hoJMdP1dXSI4Lue7ol6ElcSNHOsIDK+GxwiopdD1kJ3YJBQfq+CXOw/GaySz5Y9YRxUG9cWGqs8f2QRb0RTlpcB044jL8BxFqLNEnSmKZNaWVhg4h7YYNT/god9/vydGw4zTUpaYNNk3tg/rgw==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR12MB2767.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(396003)(39860400002)(366004)(136003)(376002)(346002)(33716001)(52116002)(1076003)(8676002)(8936002)(86362001)(956004)(54906003)(26005)(186003)(53546011)(4326008)(66476007)(2906002)(66556008)(6916009)(316002)(33656002)(55016002)(6496006)(44832011)(5660300002)(478600001)(38350700002)(9686003)(38100700002)(66946007)(7416002)(6666004);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?R/TvzVomzHXcjryniqNNcDWAM5bg6TeSVBVTVFNtJP8biJcQKQKLnDOni+R+?=
+ =?us-ascii?Q?XFVBSwYRHqde6gQFVAkmhau96t3V+QnmAQMRibSTHa4BoX51/hU/+dfR05ra?=
+ =?us-ascii?Q?mqCcefVfmQDPfK4ljInnf+UI5gUasP0nrYS/l0gJx1ywxUvS9r0m/85PQf5z?=
+ =?us-ascii?Q?hBXUymwJ3hHulZlmNYpDXOJLEK9eBzWpm/8pVALlZVkgu7SGKe9K081TbR8X?=
+ =?us-ascii?Q?IsP9RfTn/a5fDBiO9QGr4+TzLzvebF7fwHB9wM3JWi65CglYDrVhjXH1q6ks?=
+ =?us-ascii?Q?wFRL7xPjQT8DsIXPdagPPLMPmI1LFJWTnuwjSTkJbg9tfL4NKf+b8eVZybzS?=
+ =?us-ascii?Q?gnLAX9pIqBlMap75V3OR3Z6h0GAcBUBKX9K8eCJ03oHoG3mSsCfCZ1tKtWu3?=
+ =?us-ascii?Q?RzOLGtx66i4zyHse0rS82cFnULG9L3TX6//HxEDm3B2KIQ7w7UC2CZ5NSzF0?=
+ =?us-ascii?Q?dJM4oAH4k1CrJ3uruqbz2fPfbmPR+6I/rjxdAI8/CsiqKUpHVS4+E+DHVitc?=
+ =?us-ascii?Q?v7QYt2YmFRk1qylyYbXsGRb0jkK7kxWNU4JDjti66SeJp85LJy9/fobBVEcd?=
+ =?us-ascii?Q?bfXAXQ2fd7OyntYvzn02NXkmOxTdgquKcsQBtXanvGkG49MYaFyIZqUo7Kju?=
+ =?us-ascii?Q?5tqgbunWQteTTJjNtb/+VzwT3B48pgdpLCSvW/+F1040tDX5qjNGUlyy3kWl?=
+ =?us-ascii?Q?zH5uj2qP+DwwaRpgXhc4X43o0tZsTpuA/lMYUDeXoTLUFtGUfPtWti35omPL?=
+ =?us-ascii?Q?akz+gE0kDyuCZGtnpEFNSYfbQ9ZD3+vezggyPj64SS/uK24kOy0Ney3y3vB3?=
+ =?us-ascii?Q?zLni9E9f73pmTj+USGOhdG3Fkrtsx/QJgINTtkNekuPRMUZHhJHFvA9A3nZj?=
+ =?us-ascii?Q?45akfB8aAneqZjuVrvuqFwEh6gsSrfzZ4NqaRWWil1LNoexFoVrDGdTA+2bx?=
+ =?us-ascii?Q?bXO7y5kHJsXJHj4SEw9tKgUL+mx2b2UUSnxwIVtaMficrLJFcVhN/wKsD0Q9?=
+ =?us-ascii?Q?y7GpgwkpGSAn+sPE2UTN1XEoGz+YD2qlCIdgrNSJJ5TNPLP19qYmNmuBAoS5?=
+ =?us-ascii?Q?CEE4fsiua7EYIXHGGOl/fGzbCi6w5dHXIXxm8c7m/DKsvhIWv0+zzERdCcPt?=
+ =?us-ascii?Q?gaYmRMpyGLFPJpPINqgck2ojz95jgWf/QCiaMEIx7w+vRdPZyQ6upkMalA8y?=
+ =?us-ascii?Q?ygyC1yvy8fXPZM3DQA7ZjruhhDTH8qf82qdyLXlFMZ0B2OX37sO+OVJlVaWz?=
+ =?us-ascii?Q?ra9/xn45lQKI+hOF/FvRxLfrPspFb10jy5a3g45vwBpS26YS9Oej0nWDfBPa?=
+ =?us-ascii?Q?9ezFY/T3KqsVQhZfh5CCSdvt?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: cd09e118-a4bd-4031-16c4-08d9626aa5b4
+X-MS-Exchange-CrossTenant-AuthSource: SN6PR12MB2767.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Aug 2021 17:07:23.7793
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: KJpBHGyckCe5Bw0rBgFDvjlOYQr6CpOteU61r7oQN3lofxKG7DQ4p8ljKXX5oIEfcSH5ACM/EuEhhcWFz3LinA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN6PR12MB2768
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-+1 to the rephrasing of the commit message.
-
-On Wed, Aug 18, 2021 at 11:09 AM Jing Zhang <jingzhangos@google.com> wrote:
->
-> Hi Sean,
->
-> On Tue, Aug 17, 2021 at 4:46 PM Sean Christopherson <seanjc@google.com> wrote:
-> >
-> > On Tue, Aug 17, 2021, Jing Zhang wrote:
-> > > Current guest/host/halt stats don't show when we are currently halting
-> >
-> > s/we are/KVM is
-> >
-> > And I would probably reword it to "when KVM is blocking a vCPU in response to
-> > the vCPU activity state, e.g. halt".  More on that below.
-> >
-> > > well. If a guest halts for a long period of time they could appear
-> > > pathologically blocked but really it's the opposite there's nothing to
-> > > do.
-> > > Simply count the number of times we enter and leave the kvm_vcpu_block
-> >
-> > s/we/KVM
-> >
-> > In general, it's good practice to avoid pronouns in comments and changelogs as
-> > doing so all but forces using precise, unambiguous language.  Things like 'it'
-> > and 'they' are ok when it's abundantly clear what they refer to, but 'we' and 'us'
-> > are best avoided entirely.
-> >
-> > > function per vcpu, if they are unequal, then a VCPU is currently
-> > > halting.
-> > > The existing stats like halt_exits and halt_wakeups don't quite capture
-> > > this. The time spend halted and halt polling is reported eventually, but
-> > > not until we wakeup and resume. If a guest were to indefinitely halt one
-> > > of it's CPUs we would never know, it may simply appear blocked.
-> >      ^^^^      ^^
-> >      its       userspace?
-> >
-> >
-> > The "blocked" terminology is a bit confusing since KVM is explicitly blocking
-> > the vCPU, it just happens to mostly do so in response to a guest HLT.  I think
-> > "block" is intended to mean "vCPU task not run", but it would be helpful to make
-> > that clear.
-> >
-> That's a good point. Will reword the comments as you suggested.
-> > > Original-by: Cannon Matthews <cannonmatthews@google.com>
-> > > Signed-off-by: Jing Zhang <jingzhangos@google.com>
-> > > ---
-> > >  include/linux/kvm_host.h  | 4 +++-
-> > >  include/linux/kvm_types.h | 2 ++
-> > >  virt/kvm/kvm_main.c       | 2 ++
-> > >  3 files changed, 7 insertions(+), 1 deletion(-)
+On Wed, Aug 18, 2021 at 02:06:25PM +0000, Ashish Kalra wrote:
+> On Wed, Aug 18, 2021 at 12:37:32AM +0200, Paolo Bonzini wrote:
+> > On Tue, Aug 17, 2021 at 11:54 PM Steve Rutherford
+> > <srutherford@google.com> wrote:
+> > > > 1) the easy one: the bottom 4G of guest memory are mapped in the mirror
+> > > > VM 1:1.  The ram_addr_t-based addresses are shifted by either 4G or a
+> > > > huge value such as 2^42 (MAXPHYADDR - physical address reduction - 1).
+> > > > This even lets the migration helper reuse the OVMF runtime services
+> > > > memory map (but be careful about thread safety...).
 > > >
-> > > diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-> > > index d447b21cdd73..23d2e19af3ce 100644
-> > > --- a/include/linux/kvm_host.h
-> > > +++ b/include/linux/kvm_host.h
-> > > @@ -1459,7 +1459,9 @@ struct _kvm_stats_desc {
-> > >       STATS_DESC_LOGHIST_TIME_NSEC(VCPU_GENERIC, halt_poll_fail_hist,        \
-> > >                       HALT_POLL_HIST_COUNT),                                 \
-> > >       STATS_DESC_LOGHIST_TIME_NSEC(VCPU_GENERIC, halt_wait_hist,             \
-> > > -                     HALT_POLL_HIST_COUNT)
-> > > +                     HALT_POLL_HIST_COUNT),                                 \
-> > > +     STATS_DESC_COUNTER(VCPU_GENERIC, halt_block_starts),                   \
-> > > +     STATS_DESC_COUNTER(VCPU_GENERIC, halt_block_ends)
-> >
-> > Why two counters?  It's per-vCPU, can't this just be a "blocked" flag or so?  I
-> > get that all the other stats use "halt", but that's technically wrong as KVM will
-> > block vCPUs that are not runnable for other reason, e.g. because they're in WFS
-> > on x86.
+> > > If I understand what you are proposing, this would only work for
+> > > SEV/SEV-ES, since the RMP prevents these remapping games. This makes
+> > > me less enthusiastic about this (but I suspect that's why you call
+> > > this less future proof).
+> > 
+> > I called it less future proof because it allows the migration helper
+> > to rely more on OVMF details, but those may not apply in the future.
+> > 
+> > However you're right about SNP; the same page cannot be mapped twice
+> > at different GPAs by a single ASID (which includes the VM and the
+> > migration helper). :( That does throw a wrench in the idea of mapping
+> > pages by ram_addr_t(*), and this applies to both schemes.
+> > 
+> > Migrating RAM in PCI BARs is a mess anyway for SNP, because PCI BARs
+> > can be moved and every time they do the migration helper needs to wait
+> > for validation to happen. :(
+> > 
+> > Paolo
+> > 
+> > (*) ram_addr_t is not a GPA; it is constant throughout the life of the
+> > guest and independent of e.g. PCI BARs. Internally, when QEMU
+> > retrieves the dirty page bitmap from KVM it stores the bits indexed by
+> > ram_addr_t (shifted right by PAGE_SHIFT).
+> 
+> With reference to SNP here, the mirror VM model seems to have a nice
+> fit with SNP:
+> 
+> SNP will support the separate address spaces for main VM and mirror VMs
+> implicitly, with the MH/MA running in VMPL0. 
+> 
 
-The point is to separate "blocked because not runable" and "guest
-explicitly asked to do nothing"
+Need to correct this statement, there is no separate address space as
+such, there is basically page level permission/protection between VMPL
+levels. 
 
-IIRC I originally wrote this patch to help discriminate how we spent
-VCPU thread time,
-in particular into two categories of essentially  "doing useful work
-on behalf of the guest" and
-"blocked from doing useful work."
+> Additionally, vTOM can be used to separate mirror VM and main VM memory,
+> with private mirror VM memory below vTOM and all the shared stuff with
+> main VM setup above vTOM. 
+> 
 
-Since a guest has explictly asked for a vcpu to HLT, this is "useful
-work on behalf of the guest"
-even though the thread is "blocked" from running.
+I need to take back the above statement, memory above vTOM is basically
+decrypted memory. 
 
-This allows answering questions like, are we spending too much time
-waiting on mutexes, or
-long running kernel routines rather than running the vcpu in guest
-mode, or did the guest explictly
-tell us to not doing anything.
+Thanks,
+Ashish
 
-So I would suggest keeping the "halt" part of the counters' name, and
-remove the "blocked" part
-rather than the other way around. We explicitly do not want to include
-non-halt blockages in this.
+> The design here should probably base itself on this model to probably
+> allow an easy future port to SNP and also make it more futurer-proof.
 
-That being said I suppose a boolean could work as well. I think we did
-this because it worked with
-and mirrored existing stats rather than anything particularly nuanced.
-Though there might be some
-eventual consistency sort of concerns with how these stats are updated
-and exported that could make
-monotonic increasing counters more useful.
-
-> The two counters are used to determine the reason why vCPU is not
-> running. If the halt_block_ends is one less than halt_block_starts,
-> then we know the vCPU is explicitly blocked by KVM. Otherwise, we know
-> there might be something wrong with the vCPU. Does this make sense?
-> Will rename from "halt_block_*" to "vcpu_block_*".
->
-> Thanks,
-> Jing
+> > > > 2) the more future-proof one.  Here, the migration helper tells QEMU
+> > > > which area to copy from the guest to the mirror VM, as a (main GPA,
+> > > > length, mirror GPA) tuple.  This could happen for example the first time
+> > > > the guest writes 1 to MSR_KVM_MIGRATION_CONTROL.  When migration starts,
+> > > > QEMU uses this information to issue KVM_SET_USER_MEMORY_REGION
+> > > > accordingly.  The page tables are built for this (usually very high)
+> > > > mirror GPA and the migration helper operates in a completely separate
+> > > > address space.  However, the backing memory would still be shared
+> > > > between the main and mirror VMs.  I am saying this is more future proof
+> > > > because we have more flexibility in setting up the physical address
+> > > > space of the mirror VM.
+> > >
+> > > My intuition for this leans more on the host, but matches some of the
+> > > bits you've mentioned in (2)/(3). My intuition would be to put the
+> > > migration helper incredibly high in gPA space, so that it does not
+> > > collide with the rest of the guest (and can then stay in the same
+> > > place for a fairly long period of time without needing to poke a hole
+> > > in the guest). Then you can leave the ram_addr_t-based addresses
+> > > mapped normally (without the offsetting). All this together allows the
+> > > migration helper to be orthogonal to the normal guest and normal
+> > > firmware.
+> > >
+> > > In this case, since the migration helper has a somewhat stable base
+> > > address, you can have a prebaked entry point and page tables
+> > > (determined at build time). The shared communication pages can come
+> > > from neighboring high-memory. The migration helper can support a
+> > > straightforward halt loop (or PIO loop, or whatever) where it reads
+> > > from a predefined page to find what work needs to be done (perhaps
+> > > with that page depending on which CPU it is, so you can support
+> > > multithreading of the migration helper). Additionally, having it high
+> > > in memory makes it quite easy to assess who owns which addresses: high
+> > > mem is under the purview of the migration helper and does not need to
+> > > be dirty tracked. Only "low" memory can and needs to be encrypted for
+> > > transport to the target side.
+> > >
+> > > --Steve
+> > > >
+> > > > Paolo
+> > > >
+> > >
+> > 
