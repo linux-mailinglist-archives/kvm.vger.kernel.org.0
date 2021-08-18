@@ -2,58 +2,58 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7DC833F07BF
-	for <lists+kvm@lfdr.de>; Wed, 18 Aug 2021 17:17:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 51BAE3F07C4
+	for <lists+kvm@lfdr.de>; Wed, 18 Aug 2021 17:17:06 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239904AbhHRPRd (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 18 Aug 2021 11:17:33 -0400
-Received: from mail-bn7nam10on2070.outbound.protection.outlook.com ([40.107.92.70]:58811
-        "EHLO NAM10-BN7-obe.outbound.protection.outlook.com"
+        id S239746AbhHRPRj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 18 Aug 2021 11:17:39 -0400
+Received: from mail-mw2nam08on2061.outbound.protection.outlook.com ([40.107.101.61]:14987
+        "EHLO NAM04-MW2-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S239765AbhHRPRb (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 18 Aug 2021 11:17:31 -0400
+        id S239910AbhHRPRh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 18 Aug 2021 11:17:37 -0400
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=N2JnnJ8lXn/dgqW7CWIXl0OzW1y4+nk0qdLdQRieoyzPAUzLSnPyEFQdYQqnCTAniGy6yQ+WGeIyVf2r5D0HI+/qXPP9w6l5fwRYpGkk2BpiebDQHhvRJlZ0vyjaLpwheZeDH2ThW88RhW8v26tZc3R8PP5GpMl4Yat2veh+uGstjyQ6wgcRb3MNkTKqq7PhXOoDPjcHsEOJH1z1TBC43NAQdESQBXW986rIYIIN6siuRmhToNpZt7rN/VG6XqPYSWMEnqhF2WbXyn93PA/76Lopvcg5MI3FmdMS2wYFvBtKshiK6JtsTbPBbSaQ535jU95/WWSEc9u0NAxsoThw8g==
+ b=TK0uznFKpQkp2pKSnXCh73QiSwfnfWDXEVMY6CksnWXm3Wplgq84I0TwdjQM0YPnKnJqPPkVqcZc9JXVQ3lXABDCDuduaQyxnvKaRtLqaMA/jeoD7SBBSWQ1pqGTgzs5sQDkem8Nu+ScmKCXFfKi07787GfnHHt7qbfYvyt8mIywUQ+IA/UaVjB4NFkEzQJCMtK4lnjAcu8I9xAYAG+HsyomDZVXwWnY5DSSQ96om/7gtzjdbjLHu9VEuKVuZ/WICXJMSLX7/EU0e583eKNq8h+S466OPo0BjJsiBPTnNRQ0hkjfWpERjzDsmJzj+uqNotOZo1zr7sHk9jiQ1ErA+A==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=avPJWx9gy4zVxC1qWS4sqVAT0xbrd6qNQq/ja6mJt34=;
- b=Zsh3nYUScv6POR/t9gpo0GtpsdF64Fh+tqrjp0d0DKZgpZKy1rQ7KH3YI4WLB2QSQFlqkaJmoJzp052s3/Ycs8PReeVJoaXEe/gTxSx1NYH/sIa6r7xBK8ZX6z304BJeYwELaNoQvWrvwIh4+wyqB23sWi9GJSBXmfKhY+wEFZV+ZJXt2biGsmZ8tCVxb2q+yfF8UE9dITGO0zMrc2CzlEZE//lJPYJi86jJF4t4lfiOXPn7szP3TL1hKJj9ZWcvQK3tvbNKyQnmcHVmomWbPS0RzSnxu7/6i1DsvvoMZXBX0Pa+w5Lp3VQJ52SdktmrJUGhNwOfc/6hLKcJ9cO1QQ==
+ bh=ZsdBtj9wo82yKnZ4DcPbHBJpSKchUPH724zKdfw2mck=;
+ b=EGfCiY7wRGvqFd6+Yp8+QonwpX+q8KVLelyjp1kjzF/erv9YeOUdt1WSrY/7erQB2uL3JZrl1UgDnVBEnnsaSDU8a0THZpOS+lSpdNHxhIOhIQQFMm2vOp4Lto2OOEuflTzd7athbPKp+ncAyQNOdc+h0UwO6RslrJPSoEiQmYuubSZ672xRBnmBMuvyh3hjZSYF4qTK96Th1KHz/nolKrBHJpA/SuNaiYwlGuTYH6H7X4tPafhjQxRhCL3UO0maUfLTjtJqkdZKgLU6rXiKRztFpJyWXk75wZdJB/Trj6qJNlXKCJr7Vatx66cL3w7pzmx3CGk1riUZCsRimK3eIw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.112.35) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
+ 216.228.112.36) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
  dmarc=pass (p=quarantine sp=none pct=100) action=none header.from=nvidia.com;
  dkim=none (message not signed); arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=avPJWx9gy4zVxC1qWS4sqVAT0xbrd6qNQq/ja6mJt34=;
- b=Piu+1ah1m78jxa7hF8aTjeKfFQowGpwBx1Gf7LTdDWAJJDv4qpoGEsofRFOrMBpo7hLdmIxA4x4VQOAi9peo98RQnDdbtRn0GkUzS4vowyWzbEgYgY95XjzDppTi5xrJe+9MUsgRc1ElGwja7VZM94ZeYVUZXjc5itCbyhBSGWUun/8NBdArx1xhbofRYxKs27Rgnjf5u4JClx3yXd7DvohLN1QrO8k8AhmDuojn8S6zxHxgMr7g5a/T5ImsafO/4V1LReV67eZvXJEu+gyecMG20AD3k3hSW9uB3R+7yVNDcOOvjTmXGPKMuKZcUIQzSlmD85y75/221TzdjhgCYQ==
-Received: from BN6PR18CA0008.namprd18.prod.outlook.com (2603:10b6:404:121::18)
- by MN2PR12MB2992.namprd12.prod.outlook.com (2603:10b6:208:d2::18) with
+ bh=ZsdBtj9wo82yKnZ4DcPbHBJpSKchUPH724zKdfw2mck=;
+ b=f0oaj8MHuJX5x1IWFBw+x0w0qFSQ0wUB5N7p/fiBTOr+14s61FjurOpnOnwnDWjLnPYOWR5LVIu+b6lS5fQr47JQEYMqcEFU7OGjW9uL7fjhFcw48HtNx/YhFHrZq+T84f5sMhm9HN8Hasu8ckVEyRMAd8M6sfdHDTvSqIGvI0trcTFXCrrV+1dPbOeitz8zGAwv7K1yUMAwry+fohJwKzJqo3C4rn84wz28/gZGsKxVZgX/tWk1X3mXE5elN/mhWuzqlD8dEi7zRdwU1XasRFULIAgfXDBA894UVcOfyJaWxB8WWUgRP03D6ju/MFW0W/YJRl0Ex4hWFwA/6h2hwA==
+Received: from BN9PR03CA0771.namprd03.prod.outlook.com (2603:10b6:408:13a::26)
+ by DM6PR12MB4843.namprd12.prod.outlook.com (2603:10b6:5:1d1::16) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4436.19; Wed, 18 Aug
- 2021 15:16:55 +0000
-Received: from BN8NAM11FT023.eop-nam11.prod.protection.outlook.com
- (2603:10b6:404:121:cafe::16) by BN6PR18CA0008.outlook.office365.com
- (2603:10b6:404:121::18) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4436.18 via Frontend
- Transport; Wed, 18 Aug 2021 15:16:55 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.112.35)
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4415.19; Wed, 18 Aug
+ 2021 15:16:59 +0000
+Received: from BN8NAM11FT048.eop-nam11.prod.protection.outlook.com
+ (2603:10b6:408:13a:cafe::cf) by BN9PR03CA0771.outlook.office365.com
+ (2603:10b6:408:13a::26) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4436.19 via Frontend
+ Transport; Wed, 18 Aug 2021 15:16:59 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.112.36)
  smtp.mailfrom=nvidia.com; vger.kernel.org; dkim=none (message not signed)
  header.d=none;vger.kernel.org; dmarc=pass action=none header.from=nvidia.com;
 Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.112.35 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.112.35; helo=mail.nvidia.com;
-Received: from mail.nvidia.com (216.228.112.35) by
- BN8NAM11FT023.mail.protection.outlook.com (10.13.177.103) with Microsoft SMTP
+ 216.228.112.36 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.112.36; helo=mail.nvidia.com;
+Received: from mail.nvidia.com (216.228.112.36) by
+ BN8NAM11FT048.mail.protection.outlook.com (10.13.177.117) with Microsoft SMTP
  Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
- 15.20.4436.19 via Frontend Transport; Wed, 18 Aug 2021 15:16:54 +0000
-Received: from HQMAIL107.nvidia.com (172.20.187.13) by HQMAIL111.nvidia.com
- (172.20.187.18) with Microsoft SMTP Server (TLS) id 15.0.1497.2; Wed, 18 Aug
- 2021 15:16:53 +0000
+ 15.20.4436.19 via Frontend Transport; Wed, 18 Aug 2021 15:16:58 +0000
+Received: from HQMAIL107.nvidia.com (172.20.187.13) by HQMAIL101.nvidia.com
+ (172.20.187.10) with Microsoft SMTP Server (TLS) id 15.0.1497.2; Wed, 18 Aug
+ 2021 15:16:57 +0000
 Received: from vdi.nvidia.com (172.20.187.5) by mail.nvidia.com
  (172.20.187.13) with Microsoft SMTP Server id 15.0.1497.2 via Frontend
- Transport; Wed, 18 Aug 2021 15:16:49 +0000
+ Transport; Wed, 18 Aug 2021 15:16:53 +0000
 From:   Yishai Hadas <yishaih@nvidia.com>
 To:     <bhelgaas@google.com>, <corbet@lwn.net>,
         <alex.williamson@redhat.com>, <diana.craciun@oss.nxp.com>,
@@ -64,9 +64,9 @@ CC:     <linux-pci@vger.kernel.org>, <linux-doc@vger.kernel.org>,
         <linux-kbuild@vger.kernel.org>, <mgurtovoy@nvidia.com>,
         <jgg@nvidia.com>, <yishaih@nvidia.com>, <maorg@nvidia.com>,
         <leonro@nvidia.com>
-Subject: [PATCH V2 02/12] vfio/pci: Rename vfio_pci_private.h to vfio_pci_core.h
-Date:   Wed, 18 Aug 2021 18:15:56 +0300
-Message-ID: <20210818151606.202815-3-yishaih@nvidia.com>
+Subject: [PATCH V2 03/12] vfio/pci: Rename vfio_pci_device to vfio_pci_core_device
+Date:   Wed, 18 Aug 2021 18:15:57 +0300
+Message-ID: <20210818151606.202815-4-yishaih@nvidia.com>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20210818151606.202815-1-yishaih@nvidia.com>
 References: <20210818151606.202815-1-yishaih@nvidia.com>
@@ -75,25 +75,25 @@ Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 0980e150-4cf5-415f-29bc-08d9625b36dd
-X-MS-TrafficTypeDiagnostic: MN2PR12MB2992:
-X-Microsoft-Antispam-PRVS: <MN2PR12MB29924D037A907A8E3D943106C3FF9@MN2PR12MB2992.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:1824;
+X-MS-Office365-Filtering-Correlation-Id: e0d5589f-0c5b-47e0-d61c-08d9625b393a
+X-MS-TrafficTypeDiagnostic: DM6PR12MB4843:
+X-Microsoft-Antispam-PRVS: <DM6PR12MB48436A767736A8B876A81659C3FF9@DM6PR12MB4843.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:10000;
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: HNi0Fqxh75pHs9HHII9BFhv74aAJFYiSa2iAaHzklS4m2Ub/wCH9UOcqWLPy24vKeCOlmXtrWpK6+BAg8AhCy+niGl0X/7zMO5ZGZlZJdVuHY8KZepuDR8fYcdCW8BLpT6Mprlx8noipmvR8sv9CAHK53q0TUWeCN/oUfBYg/Y9CkylZa/LqsD52BOlWJdYVsBJcl3kg1c1GGy0AXpIw0JKLJLliRWL2Cz/sSPaWBzj+LOu+akkYv1a87gLrXR7a4o7AMOIOV0c5ReoHnaug6IMziglp0uQfyfEgpAgJVBvaqj7+8wfdoS8rLsKheqEZHJ6iViiEPus/v4ybPBNS++gSACbNziXQ3F5G1iX+SRCdNoHWuuzzs/fbU+5mTI187SHOnolQAC0nWD1nW9jYcElWW+UggWI12DOsVYBamEsXfDIn9FvNNHGkwFXHlFEopBfnNUJeIKuIDfDq38ganiMC64n8lK8UJkC9uguBaWCJ1AkUmt6tgsJKk0Uj19ZCT1HOuLElwLllo5nQCrWspPXzQ7ls5ZAAmMzus4naovY9KcLgS5Egsx1+JGNjH8b2UVPxIHItg33ftGNGx3jy0npoSmVnRhUtyn/1SMagYO8pehPdWBrwR6ghI5tyzYrVSwxRQTo8TbARhG1EBv2HpZlm0KpxKLVxgvNZplVtb3dB6azcUKU4XYFoTcicrVCes8MXDOQdXQUWiAa6unk8RiwbfNgE/RskypB/980zEzA=
-X-Forefront-Antispam-Report: CIP:216.228.112.35;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:schybrid04.nvidia.com;CAT:NONE;SFS:(4636009)(46966006)(36840700001)(54906003)(8676002)(2616005)(6666004)(186003)(86362001)(36756003)(1076003)(4326008)(70206006)(7416002)(70586007)(2906002)(508600001)(26005)(82310400003)(110136005)(83380400001)(5660300002)(8936002)(316002)(356005)(7636003)(47076005)(336012)(107886003)(426003)(36860700001)(7696005)(2101003);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam-Message-Info: jPybwhOaFplNfw8hAOl/mkmefJTIh9SXLZaj32f8TaHFvbg5ezGF4l09k6eVcNcTPgCumPAb6+RpnkLLwDDjvO6B6rNnBzpaD26NlJMHYZqdiAIY7RPBCcgksXi7v256+iZ3CicJtyId6qyZtntp6SxXgvTrdSTtmvw1aw6C914NBEAfI2OMDdhFPI/wCiw0srtEwMrrKOfxVd8i1/3sPsdjzFEIytioKV03ZImq+KmMhWgLMNCecNzAhtNZptwnoEOfs6TbW5ptivo5IdxRj+oLjmLqT4AvhI6IiAc6SlDo7XLox253qg8vvFeA35AXxjbUM8I47su+JUMH5d4inHU/pz2F7Y8NA5x9y5N9YrbKoAxBAIvZkcFWjPyweDCwqYS6uDkBry8CIfPXEVhzycCYkbxkxC1ZPrH49juLs+4E9aZBW0NsLHpfKxcq+B2CRIRLBvkSOdRwQKrNPdcUb/O+GMwGssOrxVve9j+mYRed0tC9w6l40vutD0Jl3wMjhew4+5P3UeA5Rh6Cg/aFTOh/5Q/mILbxBVj/ebm4pVQG19BUmoQScbA0h7W/byc4Y5P0x7eHM7KETy61q8PyQWIZsa13vwllpaTZzRrDeC3rbaQBqnjp2sHP9IjJKN4bS697JavUPjDG6R6e7aPNaLwaNrxjWMNTq7lUZjmMzwmm3jC6zsAChTF2ljktctPnewrDypzmlpu0VTyCaGNyNgamYpjDJxsvALrXdIlIFoE=
+X-Forefront-Antispam-Report: CIP:216.228.112.36;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:schybrid05.nvidia.com;CAT:NONE;SFS:(4636009)(39860400002)(376002)(396003)(346002)(136003)(36840700001)(46966006)(1076003)(36756003)(26005)(47076005)(107886003)(82740400003)(7416002)(2616005)(4326008)(7696005)(36860700001)(8936002)(86362001)(30864003)(82310400003)(2906002)(8676002)(70206006)(54906003)(186003)(110136005)(356005)(70586007)(316002)(426003)(336012)(5660300002)(83380400001)(478600001)(7636003)(2101003)(579004);DIR:OUT;SFP:1101;
 X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Aug 2021 15:16:54.9976
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Aug 2021 15:16:58.9150
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 0980e150-4cf5-415f-29bc-08d9625b36dd
+X-MS-Exchange-CrossTenant-Network-Message-Id: e0d5589f-0c5b-47e0-d61c-08d9625b393a
 X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.112.35];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource: BN8NAM11FT023.eop-nam11.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.112.36];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource: BN8NAM11FT048.eop-nam11.prod.protection.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR12MB2992
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB4843
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
@@ -104,121 +104,1226 @@ This is a preparation patch for separating the vfio_pci driver to a
 subsystem driver and a generic pci driver. This patch doesn't change any
 logic.
 
+The new vfio_pci_core_device structure will be the main structure of the
+core driver and later on vfio_pci_device structure will be the main
+structure of the generic vfio_pci driver.
+
 Signed-off-by: Max Gurtovoy <mgurtovoy@nvidia.com>
 Signed-off-by: Yishai Hadas <yishaih@nvidia.com>
 ---
- drivers/vfio/pci/vfio_pci_config.c                       | 2 +-
- drivers/vfio/pci/vfio_pci_core.c                         | 2 +-
- drivers/vfio/pci/{vfio_pci_private.h => vfio_pci_core.h} | 6 +++---
- drivers/vfio/pci/vfio_pci_igd.c                          | 2 +-
- drivers/vfio/pci/vfio_pci_intrs.c                        | 2 +-
- drivers/vfio/pci/vfio_pci_rdwr.c                         | 2 +-
- drivers/vfio/pci/vfio_pci_zdev.c                         | 2 +-
- 7 files changed, 9 insertions(+), 9 deletions(-)
- rename drivers/vfio/pci/{vfio_pci_private.h => vfio_pci_core.h} (98%)
+ drivers/vfio/pci/vfio_pci_config.c |  68 ++++++++---------
+ drivers/vfio/pci/vfio_pci_core.c   | 118 +++++++++++++++--------------
+ drivers/vfio/pci/vfio_pci_core.h   |  52 ++++++-------
+ drivers/vfio/pci/vfio_pci_igd.c    |  17 +++--
+ drivers/vfio/pci/vfio_pci_intrs.c  |  40 +++++-----
+ drivers/vfio/pci/vfio_pci_rdwr.c   |  16 ++--
+ drivers/vfio/pci/vfio_pci_zdev.c   |   2 +-
+ 7 files changed, 158 insertions(+), 155 deletions(-)
 
 diff --git a/drivers/vfio/pci/vfio_pci_config.c b/drivers/vfio/pci/vfio_pci_config.c
-index 70e28efbc51f..0bc269c0b03f 100644
+index 0bc269c0b03f..1f034f768a27 100644
 --- a/drivers/vfio/pci/vfio_pci_config.c
 +++ b/drivers/vfio/pci/vfio_pci_config.c
-@@ -26,7 +26,7 @@
- #include <linux/vfio.h>
- #include <linux/slab.h>
+@@ -108,9 +108,9 @@ static const u16 pci_ext_cap_length[PCI_EXT_CAP_ID_MAX + 1] = {
+ struct perm_bits {
+ 	u8	*virt;		/* read/write virtual data, not hw */
+ 	u8	*write;		/* writeable bits */
+-	int	(*readfn)(struct vfio_pci_device *vdev, int pos, int count,
++	int	(*readfn)(struct vfio_pci_core_device *vdev, int pos, int count,
+ 			  struct perm_bits *perm, int offset, __le32 *val);
+-	int	(*writefn)(struct vfio_pci_device *vdev, int pos, int count,
++	int	(*writefn)(struct vfio_pci_core_device *vdev, int pos, int count,
+ 			   struct perm_bits *perm, int offset, __le32 val);
+ };
  
--#include "vfio_pci_private.h"
-+#include "vfio_pci_core.h"
+@@ -171,7 +171,7 @@ static int vfio_user_config_write(struct pci_dev *pdev, int offset,
+ 	return ret;
+ }
  
- /* Fake capability ID for standard config space */
- #define PCI_CAP_ID_BASIC	0
+-static int vfio_default_config_read(struct vfio_pci_device *vdev, int pos,
++static int vfio_default_config_read(struct vfio_pci_core_device *vdev, int pos,
+ 				    int count, struct perm_bits *perm,
+ 				    int offset, __le32 *val)
+ {
+@@ -197,7 +197,7 @@ static int vfio_default_config_read(struct vfio_pci_device *vdev, int pos,
+ 	return count;
+ }
+ 
+-static int vfio_default_config_write(struct vfio_pci_device *vdev, int pos,
++static int vfio_default_config_write(struct vfio_pci_core_device *vdev, int pos,
+ 				     int count, struct perm_bits *perm,
+ 				     int offset, __le32 val)
+ {
+@@ -244,7 +244,7 @@ static int vfio_default_config_write(struct vfio_pci_device *vdev, int pos,
+ }
+ 
+ /* Allow direct read from hardware, except for capability next pointer */
+-static int vfio_direct_config_read(struct vfio_pci_device *vdev, int pos,
++static int vfio_direct_config_read(struct vfio_pci_core_device *vdev, int pos,
+ 				   int count, struct perm_bits *perm,
+ 				   int offset, __le32 *val)
+ {
+@@ -269,7 +269,7 @@ static int vfio_direct_config_read(struct vfio_pci_device *vdev, int pos,
+ }
+ 
+ /* Raw access skips any kind of virtualization */
+-static int vfio_raw_config_write(struct vfio_pci_device *vdev, int pos,
++static int vfio_raw_config_write(struct vfio_pci_core_device *vdev, int pos,
+ 				 int count, struct perm_bits *perm,
+ 				 int offset, __le32 val)
+ {
+@@ -282,7 +282,7 @@ static int vfio_raw_config_write(struct vfio_pci_device *vdev, int pos,
+ 	return count;
+ }
+ 
+-static int vfio_raw_config_read(struct vfio_pci_device *vdev, int pos,
++static int vfio_raw_config_read(struct vfio_pci_core_device *vdev, int pos,
+ 				int count, struct perm_bits *perm,
+ 				int offset, __le32 *val)
+ {
+@@ -296,7 +296,7 @@ static int vfio_raw_config_read(struct vfio_pci_device *vdev, int pos,
+ }
+ 
+ /* Virt access uses only virtualization */
+-static int vfio_virt_config_write(struct vfio_pci_device *vdev, int pos,
++static int vfio_virt_config_write(struct vfio_pci_core_device *vdev, int pos,
+ 				  int count, struct perm_bits *perm,
+ 				  int offset, __le32 val)
+ {
+@@ -304,7 +304,7 @@ static int vfio_virt_config_write(struct vfio_pci_device *vdev, int pos,
+ 	return count;
+ }
+ 
+-static int vfio_virt_config_read(struct vfio_pci_device *vdev, int pos,
++static int vfio_virt_config_read(struct vfio_pci_core_device *vdev, int pos,
+ 				 int count, struct perm_bits *perm,
+ 				 int offset, __le32 *val)
+ {
+@@ -396,7 +396,7 @@ static inline void p_setd(struct perm_bits *p, int off, u32 virt, u32 write)
+ }
+ 
+ /* Caller should hold memory_lock semaphore */
+-bool __vfio_pci_memory_enabled(struct vfio_pci_device *vdev)
++bool __vfio_pci_memory_enabled(struct vfio_pci_core_device *vdev)
+ {
+ 	struct pci_dev *pdev = vdev->pdev;
+ 	u16 cmd = le16_to_cpu(*(__le16 *)&vdev->vconfig[PCI_COMMAND]);
+@@ -413,7 +413,7 @@ bool __vfio_pci_memory_enabled(struct vfio_pci_device *vdev)
+  * Restore the *real* BARs after we detect a FLR or backdoor reset.
+  * (backdoor = some device specific technique that we didn't catch)
+  */
+-static void vfio_bar_restore(struct vfio_pci_device *vdev)
++static void vfio_bar_restore(struct vfio_pci_core_device *vdev)
+ {
+ 	struct pci_dev *pdev = vdev->pdev;
+ 	u32 *rbar = vdev->rbar;
+@@ -460,7 +460,7 @@ static __le32 vfio_generate_bar_flags(struct pci_dev *pdev, int bar)
+  * Pretend we're hardware and tweak the values of the *virtual* PCI BARs
+  * to reflect the hardware capabilities.  This implements BAR sizing.
+  */
+-static void vfio_bar_fixup(struct vfio_pci_device *vdev)
++static void vfio_bar_fixup(struct vfio_pci_core_device *vdev)
+ {
+ 	struct pci_dev *pdev = vdev->pdev;
+ 	int i;
+@@ -514,7 +514,7 @@ static void vfio_bar_fixup(struct vfio_pci_device *vdev)
+ 	vdev->bardirty = false;
+ }
+ 
+-static int vfio_basic_config_read(struct vfio_pci_device *vdev, int pos,
++static int vfio_basic_config_read(struct vfio_pci_core_device *vdev, int pos,
+ 				  int count, struct perm_bits *perm,
+ 				  int offset, __le32 *val)
+ {
+@@ -536,7 +536,7 @@ static int vfio_basic_config_read(struct vfio_pci_device *vdev, int pos,
+ }
+ 
+ /* Test whether BARs match the value we think they should contain */
+-static bool vfio_need_bar_restore(struct vfio_pci_device *vdev)
++static bool vfio_need_bar_restore(struct vfio_pci_core_device *vdev)
+ {
+ 	int i = 0, pos = PCI_BASE_ADDRESS_0, ret;
+ 	u32 bar;
+@@ -552,7 +552,7 @@ static bool vfio_need_bar_restore(struct vfio_pci_device *vdev)
+ 	return false;
+ }
+ 
+-static int vfio_basic_config_write(struct vfio_pci_device *vdev, int pos,
++static int vfio_basic_config_write(struct vfio_pci_core_device *vdev, int pos,
+ 				   int count, struct perm_bits *perm,
+ 				   int offset, __le32 val)
+ {
+@@ -692,7 +692,7 @@ static int __init init_pci_cap_basic_perm(struct perm_bits *perm)
+ 	return 0;
+ }
+ 
+-static int vfio_pm_config_write(struct vfio_pci_device *vdev, int pos,
++static int vfio_pm_config_write(struct vfio_pci_core_device *vdev, int pos,
+ 				int count, struct perm_bits *perm,
+ 				int offset, __le32 val)
+ {
+@@ -747,7 +747,7 @@ static int __init init_pci_cap_pm_perm(struct perm_bits *perm)
+ 	return 0;
+ }
+ 
+-static int vfio_vpd_config_write(struct vfio_pci_device *vdev, int pos,
++static int vfio_vpd_config_write(struct vfio_pci_core_device *vdev, int pos,
+ 				 int count, struct perm_bits *perm,
+ 				 int offset, __le32 val)
+ {
+@@ -829,7 +829,7 @@ static int __init init_pci_cap_pcix_perm(struct perm_bits *perm)
+ 	return 0;
+ }
+ 
+-static int vfio_exp_config_write(struct vfio_pci_device *vdev, int pos,
++static int vfio_exp_config_write(struct vfio_pci_core_device *vdev, int pos,
+ 				 int count, struct perm_bits *perm,
+ 				 int offset, __le32 val)
+ {
+@@ -913,7 +913,7 @@ static int __init init_pci_cap_exp_perm(struct perm_bits *perm)
+ 	return 0;
+ }
+ 
+-static int vfio_af_config_write(struct vfio_pci_device *vdev, int pos,
++static int vfio_af_config_write(struct vfio_pci_core_device *vdev, int pos,
+ 				int count, struct perm_bits *perm,
+ 				int offset, __le32 val)
+ {
+@@ -1072,7 +1072,7 @@ int __init vfio_pci_init_perm_bits(void)
+ 	return ret;
+ }
+ 
+-static int vfio_find_cap_start(struct vfio_pci_device *vdev, int pos)
++static int vfio_find_cap_start(struct vfio_pci_core_device *vdev, int pos)
+ {
+ 	u8 cap;
+ 	int base = (pos >= PCI_CFG_SPACE_SIZE) ? PCI_CFG_SPACE_SIZE :
+@@ -1089,7 +1089,7 @@ static int vfio_find_cap_start(struct vfio_pci_device *vdev, int pos)
+ 	return pos;
+ }
+ 
+-static int vfio_msi_config_read(struct vfio_pci_device *vdev, int pos,
++static int vfio_msi_config_read(struct vfio_pci_core_device *vdev, int pos,
+ 				int count, struct perm_bits *perm,
+ 				int offset, __le32 *val)
+ {
+@@ -1109,7 +1109,7 @@ static int vfio_msi_config_read(struct vfio_pci_device *vdev, int pos,
+ 	return vfio_default_config_read(vdev, pos, count, perm, offset, val);
+ }
+ 
+-static int vfio_msi_config_write(struct vfio_pci_device *vdev, int pos,
++static int vfio_msi_config_write(struct vfio_pci_core_device *vdev, int pos,
+ 				 int count, struct perm_bits *perm,
+ 				 int offset, __le32 val)
+ {
+@@ -1189,7 +1189,7 @@ static int init_pci_cap_msi_perm(struct perm_bits *perm, int len, u16 flags)
+ }
+ 
+ /* Determine MSI CAP field length; initialize msi_perms on 1st call per vdev */
+-static int vfio_msi_cap_len(struct vfio_pci_device *vdev, u8 pos)
++static int vfio_msi_cap_len(struct vfio_pci_core_device *vdev, u8 pos)
+ {
+ 	struct pci_dev *pdev = vdev->pdev;
+ 	int len, ret;
+@@ -1222,7 +1222,7 @@ static int vfio_msi_cap_len(struct vfio_pci_device *vdev, u8 pos)
+ }
+ 
+ /* Determine extended capability length for VC (2 & 9) and MFVC */
+-static int vfio_vc_cap_len(struct vfio_pci_device *vdev, u16 pos)
++static int vfio_vc_cap_len(struct vfio_pci_core_device *vdev, u16 pos)
+ {
+ 	struct pci_dev *pdev = vdev->pdev;
+ 	u32 tmp;
+@@ -1263,7 +1263,7 @@ static int vfio_vc_cap_len(struct vfio_pci_device *vdev, u16 pos)
+ 	return len;
+ }
+ 
+-static int vfio_cap_len(struct vfio_pci_device *vdev, u8 cap, u8 pos)
++static int vfio_cap_len(struct vfio_pci_core_device *vdev, u8 cap, u8 pos)
+ {
+ 	struct pci_dev *pdev = vdev->pdev;
+ 	u32 dword;
+@@ -1338,7 +1338,7 @@ static int vfio_cap_len(struct vfio_pci_device *vdev, u8 cap, u8 pos)
+ 	return 0;
+ }
+ 
+-static int vfio_ext_cap_len(struct vfio_pci_device *vdev, u16 ecap, u16 epos)
++static int vfio_ext_cap_len(struct vfio_pci_core_device *vdev, u16 ecap, u16 epos)
+ {
+ 	struct pci_dev *pdev = vdev->pdev;
+ 	u8 byte;
+@@ -1412,7 +1412,7 @@ static int vfio_ext_cap_len(struct vfio_pci_device *vdev, u16 ecap, u16 epos)
+ 	return 0;
+ }
+ 
+-static int vfio_fill_vconfig_bytes(struct vfio_pci_device *vdev,
++static int vfio_fill_vconfig_bytes(struct vfio_pci_core_device *vdev,
+ 				   int offset, int size)
+ {
+ 	struct pci_dev *pdev = vdev->pdev;
+@@ -1459,7 +1459,7 @@ static int vfio_fill_vconfig_bytes(struct vfio_pci_device *vdev,
+ 	return ret;
+ }
+ 
+-static int vfio_cap_init(struct vfio_pci_device *vdev)
++static int vfio_cap_init(struct vfio_pci_core_device *vdev)
+ {
+ 	struct pci_dev *pdev = vdev->pdev;
+ 	u8 *map = vdev->pci_config_map;
+@@ -1549,7 +1549,7 @@ static int vfio_cap_init(struct vfio_pci_device *vdev)
+ 	return 0;
+ }
+ 
+-static int vfio_ecap_init(struct vfio_pci_device *vdev)
++static int vfio_ecap_init(struct vfio_pci_core_device *vdev)
+ {
+ 	struct pci_dev *pdev = vdev->pdev;
+ 	u8 *map = vdev->pci_config_map;
+@@ -1669,7 +1669,7 @@ static const struct pci_device_id known_bogus_vf_intx_pin[] = {
+  * for each area requiring emulated bits, but the array of pointers
+  * would be comparable in size (at least for standard config space).
+  */
+-int vfio_config_init(struct vfio_pci_device *vdev)
++int vfio_config_init(struct vfio_pci_core_device *vdev)
+ {
+ 	struct pci_dev *pdev = vdev->pdev;
+ 	u8 *map, *vconfig;
+@@ -1773,7 +1773,7 @@ int vfio_config_init(struct vfio_pci_device *vdev)
+ 	return pcibios_err_to_errno(ret);
+ }
+ 
+-void vfio_config_free(struct vfio_pci_device *vdev)
++void vfio_config_free(struct vfio_pci_core_device *vdev)
+ {
+ 	kfree(vdev->vconfig);
+ 	vdev->vconfig = NULL;
+@@ -1790,7 +1790,7 @@ void vfio_config_free(struct vfio_pci_device *vdev)
+  * Find the remaining number of bytes in a dword that match the given
+  * position.  Stop at either the end of the capability or the dword boundary.
+  */
+-static size_t vfio_pci_cap_remaining_dword(struct vfio_pci_device *vdev,
++static size_t vfio_pci_cap_remaining_dword(struct vfio_pci_core_device *vdev,
+ 					   loff_t pos)
+ {
+ 	u8 cap = vdev->pci_config_map[pos];
+@@ -1802,7 +1802,7 @@ static size_t vfio_pci_cap_remaining_dword(struct vfio_pci_device *vdev,
+ 	return i;
+ }
+ 
+-static ssize_t vfio_config_do_rw(struct vfio_pci_device *vdev, char __user *buf,
++static ssize_t vfio_config_do_rw(struct vfio_pci_core_device *vdev, char __user *buf,
+ 				 size_t count, loff_t *ppos, bool iswrite)
+ {
+ 	struct pci_dev *pdev = vdev->pdev;
+@@ -1885,7 +1885,7 @@ static ssize_t vfio_config_do_rw(struct vfio_pci_device *vdev, char __user *buf,
+ 	return ret;
+ }
+ 
+-ssize_t vfio_pci_config_rw(struct vfio_pci_device *vdev, char __user *buf,
++ssize_t vfio_pci_config_rw(struct vfio_pci_core_device *vdev, char __user *buf,
+ 			   size_t count, loff_t *ppos, bool iswrite)
+ {
+ 	size_t done = 0;
 diff --git a/drivers/vfio/pci/vfio_pci_core.c b/drivers/vfio/pci/vfio_pci_core.c
-index a4f44ea52fa3..2a5dca0823c4 100644
+index 2a5dca0823c4..2729479390a0 100644
 --- a/drivers/vfio/pci/vfio_pci_core.c
 +++ b/drivers/vfio/pci/vfio_pci_core.c
-@@ -28,7 +28,7 @@
- #include <linux/nospec.h>
- #include <linux/sched/mm.h>
+@@ -121,7 +121,7 @@ static bool vfio_pci_is_denylisted(struct pci_dev *pdev)
+  */
+ static unsigned int vfio_pci_set_vga_decode(void *opaque, bool single_vga)
+ {
+-	struct vfio_pci_device *vdev = opaque;
++	struct vfio_pci_core_device *vdev = opaque;
+ 	struct pci_dev *tmp = NULL, *pdev = vdev->pdev;
+ 	unsigned char max_busnr;
+ 	unsigned int decodes;
+@@ -155,7 +155,7 @@ static inline bool vfio_pci_is_vga(struct pci_dev *pdev)
+ 	return (pdev->class >> 8) == PCI_CLASS_DISPLAY_VGA;
+ }
  
--#include "vfio_pci_private.h"
-+#include "vfio_pci_core.h"
+-static void vfio_pci_probe_mmaps(struct vfio_pci_device *vdev)
++static void vfio_pci_probe_mmaps(struct vfio_pci_core_device *vdev)
+ {
+ 	struct resource *res;
+ 	int i;
+@@ -225,7 +225,7 @@ static void vfio_pci_probe_mmaps(struct vfio_pci_device *vdev)
  
- #define DRIVER_VERSION  "0.2"
- #define DRIVER_AUTHOR   "Alex Williamson <alex.williamson@redhat.com>"
-diff --git a/drivers/vfio/pci/vfio_pci_private.h b/drivers/vfio/pci/vfio_pci_core.h
-similarity index 98%
-rename from drivers/vfio/pci/vfio_pci_private.h
-rename to drivers/vfio/pci/vfio_pci_core.h
-index 70414b6c904d..ef26e781961d 100644
---- a/drivers/vfio/pci/vfio_pci_private.h
+ struct vfio_pci_group_info;
+ static bool vfio_pci_dev_set_try_reset(struct vfio_device_set *dev_set);
+-static void vfio_pci_disable(struct vfio_pci_device *vdev);
++static void vfio_pci_disable(struct vfio_pci_core_device *vdev);
+ static int vfio_pci_dev_set_hot_reset(struct vfio_device_set *dev_set,
+ 				      struct vfio_pci_group_info *groups);
+ 
+@@ -260,7 +260,7 @@ static bool vfio_pci_nointx(struct pci_dev *pdev)
+ 	return false;
+ }
+ 
+-static void vfio_pci_probe_power_state(struct vfio_pci_device *vdev)
++static void vfio_pci_probe_power_state(struct vfio_pci_core_device *vdev)
+ {
+ 	struct pci_dev *pdev = vdev->pdev;
+ 	u16 pmcsr;
+@@ -280,7 +280,7 @@ static void vfio_pci_probe_power_state(struct vfio_pci_device *vdev)
+  * by PM capability emulation and separately from pci_dev internal saved state
+  * to avoid it being overwritten and consumed around other resets.
+  */
+-int vfio_pci_set_power_state(struct vfio_pci_device *vdev, pci_power_t state)
++int vfio_pci_set_power_state(struct vfio_pci_core_device *vdev, pci_power_t state)
+ {
+ 	struct pci_dev *pdev = vdev->pdev;
+ 	bool needs_restore = false, needs_save = false;
+@@ -311,7 +311,7 @@ int vfio_pci_set_power_state(struct vfio_pci_device *vdev, pci_power_t state)
+ 	return ret;
+ }
+ 
+-static int vfio_pci_enable(struct vfio_pci_device *vdev)
++static int vfio_pci_enable(struct vfio_pci_core_device *vdev)
+ {
+ 	struct pci_dev *pdev = vdev->pdev;
+ 	int ret;
+@@ -399,7 +399,7 @@ static int vfio_pci_enable(struct vfio_pci_device *vdev)
+ 	return ret;
+ }
+ 
+-static void vfio_pci_disable(struct vfio_pci_device *vdev)
++static void vfio_pci_disable(struct vfio_pci_core_device *vdev)
+ {
+ 	struct pci_dev *pdev = vdev->pdev;
+ 	struct vfio_pci_dummy_resource *dummy_res, *tmp;
+@@ -498,7 +498,7 @@ static void vfio_pci_disable(struct vfio_pci_device *vdev)
+ 
+ static struct pci_driver vfio_pci_driver;
+ 
+-static struct vfio_pci_device *get_pf_vdev(struct vfio_pci_device *vdev)
++static struct vfio_pci_core_device *get_pf_vdev(struct vfio_pci_core_device *vdev)
+ {
+ 	struct pci_dev *physfn = pci_physfn(vdev->pdev);
+ 	struct vfio_device *pf_dev;
+@@ -515,12 +515,12 @@ static struct vfio_pci_device *get_pf_vdev(struct vfio_pci_device *vdev)
+ 		return NULL;
+ 	}
+ 
+-	return container_of(pf_dev, struct vfio_pci_device, vdev);
++	return container_of(pf_dev, struct vfio_pci_core_device, vdev);
+ }
+ 
+-static void vfio_pci_vf_token_user_add(struct vfio_pci_device *vdev, int val)
++static void vfio_pci_vf_token_user_add(struct vfio_pci_core_device *vdev, int val)
+ {
+-	struct vfio_pci_device *pf_vdev = get_pf_vdev(vdev);
++	struct vfio_pci_core_device *pf_vdev = get_pf_vdev(vdev);
+ 
+ 	if (!pf_vdev)
+ 		return;
+@@ -535,8 +535,8 @@ static void vfio_pci_vf_token_user_add(struct vfio_pci_device *vdev, int val)
+ 
+ static void vfio_pci_close_device(struct vfio_device *core_vdev)
+ {
+-	struct vfio_pci_device *vdev =
+-		container_of(core_vdev, struct vfio_pci_device, vdev);
++	struct vfio_pci_core_device *vdev =
++		container_of(core_vdev, struct vfio_pci_core_device, vdev);
+ 
+ 	vfio_pci_vf_token_user_add(vdev, -1);
+ 	vfio_spapr_pci_eeh_release(vdev->pdev);
+@@ -556,8 +556,8 @@ static void vfio_pci_close_device(struct vfio_device *core_vdev)
+ 
+ static int vfio_pci_open_device(struct vfio_device *core_vdev)
+ {
+-	struct vfio_pci_device *vdev =
+-		container_of(core_vdev, struct vfio_pci_device, vdev);
++	struct vfio_pci_core_device *vdev =
++		container_of(core_vdev, struct vfio_pci_core_device, vdev);
+ 	int ret = 0;
+ 
+ 	ret = vfio_pci_enable(vdev);
+@@ -569,7 +569,7 @@ static int vfio_pci_open_device(struct vfio_device *core_vdev)
+ 	return 0;
+ }
+ 
+-static int vfio_pci_get_irq_count(struct vfio_pci_device *vdev, int irq_type)
++static int vfio_pci_get_irq_count(struct vfio_pci_core_device *vdev, int irq_type)
+ {
+ 	if (irq_type == VFIO_PCI_INTX_IRQ_INDEX) {
+ 		u8 pin;
+@@ -690,7 +690,7 @@ static int vfio_pci_for_each_slot_or_bus(struct pci_dev *pdev,
+ 	return walk.ret;
+ }
+ 
+-static int msix_mmappable_cap(struct vfio_pci_device *vdev,
++static int msix_mmappable_cap(struct vfio_pci_core_device *vdev,
+ 			      struct vfio_info_cap *caps)
+ {
+ 	struct vfio_info_cap_header header = {
+@@ -701,7 +701,7 @@ static int msix_mmappable_cap(struct vfio_pci_device *vdev,
+ 	return vfio_info_add_capability(caps, &header, sizeof(header));
+ }
+ 
+-int vfio_pci_register_dev_region(struct vfio_pci_device *vdev,
++int vfio_pci_register_dev_region(struct vfio_pci_core_device *vdev,
+ 				 unsigned int type, unsigned int subtype,
+ 				 const struct vfio_pci_regops *ops,
+ 				 size_t size, u32 flags, void *data)
+@@ -730,8 +730,8 @@ int vfio_pci_register_dev_region(struct vfio_pci_device *vdev,
+ static long vfio_pci_ioctl(struct vfio_device *core_vdev,
+ 			   unsigned int cmd, unsigned long arg)
+ {
+-	struct vfio_pci_device *vdev =
+-		container_of(core_vdev, struct vfio_pci_device, vdev);
++	struct vfio_pci_core_device *vdev =
++		container_of(core_vdev, struct vfio_pci_core_device, vdev);
+ 	unsigned long minsz;
+ 
+ 	if (cmd == VFIO_DEVICE_GET_INFO) {
+@@ -1271,7 +1271,7 @@ static long vfio_pci_ioctl(struct vfio_device *core_vdev,
+ 	return -ENOTTY;
+ }
+ 
+-static ssize_t vfio_pci_rw(struct vfio_pci_device *vdev, char __user *buf,
++static ssize_t vfio_pci_rw(struct vfio_pci_core_device *vdev, char __user *buf,
+ 			   size_t count, loff_t *ppos, bool iswrite)
+ {
+ 	unsigned int index = VFIO_PCI_OFFSET_TO_INDEX(*ppos);
+@@ -1305,8 +1305,8 @@ static ssize_t vfio_pci_rw(struct vfio_pci_device *vdev, char __user *buf,
+ static ssize_t vfio_pci_read(struct vfio_device *core_vdev, char __user *buf,
+ 			     size_t count, loff_t *ppos)
+ {
+-	struct vfio_pci_device *vdev =
+-		container_of(core_vdev, struct vfio_pci_device, vdev);
++	struct vfio_pci_core_device *vdev =
++		container_of(core_vdev, struct vfio_pci_core_device, vdev);
+ 
+ 	if (!count)
+ 		return 0;
+@@ -1317,8 +1317,8 @@ static ssize_t vfio_pci_read(struct vfio_device *core_vdev, char __user *buf,
+ static ssize_t vfio_pci_write(struct vfio_device *core_vdev, const char __user *buf,
+ 			      size_t count, loff_t *ppos)
+ {
+-	struct vfio_pci_device *vdev =
+-		container_of(core_vdev, struct vfio_pci_device, vdev);
++	struct vfio_pci_core_device *vdev =
++		container_of(core_vdev, struct vfio_pci_core_device, vdev);
+ 
+ 	if (!count)
+ 		return 0;
+@@ -1327,7 +1327,7 @@ static ssize_t vfio_pci_write(struct vfio_device *core_vdev, const char __user *
+ }
+ 
+ /* Return 1 on zap and vma_lock acquired, 0 on contention (only with @try) */
+-static int vfio_pci_zap_and_vma_lock(struct vfio_pci_device *vdev, bool try)
++static int vfio_pci_zap_and_vma_lock(struct vfio_pci_core_device *vdev, bool try)
+ {
+ 	struct vfio_pci_mmap_vma *mmap_vma, *tmp;
+ 
+@@ -1415,14 +1415,14 @@ static int vfio_pci_zap_and_vma_lock(struct vfio_pci_device *vdev, bool try)
+ 	}
+ }
+ 
+-void vfio_pci_zap_and_down_write_memory_lock(struct vfio_pci_device *vdev)
++void vfio_pci_zap_and_down_write_memory_lock(struct vfio_pci_core_device *vdev)
+ {
+ 	vfio_pci_zap_and_vma_lock(vdev, false);
+ 	down_write(&vdev->memory_lock);
+ 	mutex_unlock(&vdev->vma_lock);
+ }
+ 
+-u16 vfio_pci_memory_lock_and_enable(struct vfio_pci_device *vdev)
++u16 vfio_pci_memory_lock_and_enable(struct vfio_pci_core_device *vdev)
+ {
+ 	u16 cmd;
+ 
+@@ -1435,14 +1435,14 @@ u16 vfio_pci_memory_lock_and_enable(struct vfio_pci_device *vdev)
+ 	return cmd;
+ }
+ 
+-void vfio_pci_memory_unlock_and_restore(struct vfio_pci_device *vdev, u16 cmd)
++void vfio_pci_memory_unlock_and_restore(struct vfio_pci_core_device *vdev, u16 cmd)
+ {
+ 	pci_write_config_word(vdev->pdev, PCI_COMMAND, cmd);
+ 	up_write(&vdev->memory_lock);
+ }
+ 
+ /* Caller holds vma_lock */
+-static int __vfio_pci_add_vma(struct vfio_pci_device *vdev,
++static int __vfio_pci_add_vma(struct vfio_pci_core_device *vdev,
+ 			      struct vm_area_struct *vma)
+ {
+ 	struct vfio_pci_mmap_vma *mmap_vma;
+@@ -1468,7 +1468,7 @@ static void vfio_pci_mmap_open(struct vm_area_struct *vma)
+ 
+ static void vfio_pci_mmap_close(struct vm_area_struct *vma)
+ {
+-	struct vfio_pci_device *vdev = vma->vm_private_data;
++	struct vfio_pci_core_device *vdev = vma->vm_private_data;
+ 	struct vfio_pci_mmap_vma *mmap_vma;
+ 
+ 	mutex_lock(&vdev->vma_lock);
+@@ -1485,7 +1485,7 @@ static void vfio_pci_mmap_close(struct vm_area_struct *vma)
+ static vm_fault_t vfio_pci_mmap_fault(struct vm_fault *vmf)
+ {
+ 	struct vm_area_struct *vma = vmf->vma;
+-	struct vfio_pci_device *vdev = vma->vm_private_data;
++	struct vfio_pci_core_device *vdev = vma->vm_private_data;
+ 	struct vfio_pci_mmap_vma *mmap_vma;
+ 	vm_fault_t ret = VM_FAULT_NOPAGE;
+ 
+@@ -1535,8 +1535,8 @@ static const struct vm_operations_struct vfio_pci_mmap_ops = {
+ 
+ static int vfio_pci_mmap(struct vfio_device *core_vdev, struct vm_area_struct *vma)
+ {
+-	struct vfio_pci_device *vdev =
+-		container_of(core_vdev, struct vfio_pci_device, vdev);
++	struct vfio_pci_core_device *vdev =
++		container_of(core_vdev, struct vfio_pci_core_device, vdev);
+ 	struct pci_dev *pdev = vdev->pdev;
+ 	unsigned int index;
+ 	u64 phys_len, req_len, pgoff, req_start;
+@@ -1606,8 +1606,8 @@ static int vfio_pci_mmap(struct vfio_device *core_vdev, struct vm_area_struct *v
+ 
+ static void vfio_pci_request(struct vfio_device *core_vdev, unsigned int count)
+ {
+-	struct vfio_pci_device *vdev =
+-		container_of(core_vdev, struct vfio_pci_device, vdev);
++	struct vfio_pci_core_device *vdev =
++		container_of(core_vdev, struct vfio_pci_core_device, vdev);
+ 	struct pci_dev *pdev = vdev->pdev;
+ 
+ 	mutex_lock(&vdev->igate);
+@@ -1626,7 +1626,7 @@ static void vfio_pci_request(struct vfio_device *core_vdev, unsigned int count)
+ 	mutex_unlock(&vdev->igate);
+ }
+ 
+-static int vfio_pci_validate_vf_token(struct vfio_pci_device *vdev,
++static int vfio_pci_validate_vf_token(struct vfio_pci_core_device *vdev,
+ 				      bool vf_token, uuid_t *uuid)
+ {
+ 	/*
+@@ -1658,7 +1658,7 @@ static int vfio_pci_validate_vf_token(struct vfio_pci_device *vdev,
+ 		return 0; /* No VF token provided or required */
+ 
+ 	if (vdev->pdev->is_virtfn) {
+-		struct vfio_pci_device *pf_vdev = get_pf_vdev(vdev);
++		struct vfio_pci_core_device *pf_vdev = get_pf_vdev(vdev);
+ 		bool match;
+ 
+ 		if (!pf_vdev) {
+@@ -1722,8 +1722,8 @@ static int vfio_pci_validate_vf_token(struct vfio_pci_device *vdev,
+ 
+ static int vfio_pci_match(struct vfio_device *core_vdev, char *buf)
+ {
+-	struct vfio_pci_device *vdev =
+-		container_of(core_vdev, struct vfio_pci_device, vdev);
++	struct vfio_pci_core_device *vdev =
++		container_of(core_vdev, struct vfio_pci_core_device, vdev);
+ 	bool vf_token = false;
+ 	uuid_t uuid;
+ 	int ret;
+@@ -1785,8 +1785,8 @@ static const struct vfio_device_ops vfio_pci_ops = {
+ static int vfio_pci_bus_notifier(struct notifier_block *nb,
+ 				 unsigned long action, void *data)
+ {
+-	struct vfio_pci_device *vdev = container_of(nb,
+-						    struct vfio_pci_device, nb);
++	struct vfio_pci_core_device *vdev = container_of(nb,
++						    struct vfio_pci_core_device, nb);
+ 	struct device *dev = data;
+ 	struct pci_dev *pdev = to_pci_dev(dev);
+ 	struct pci_dev *physfn = pci_physfn(pdev);
+@@ -1810,7 +1810,7 @@ static int vfio_pci_bus_notifier(struct notifier_block *nb,
+ 	return 0;
+ }
+ 
+-static int vfio_pci_vf_init(struct vfio_pci_device *vdev)
++static int vfio_pci_vf_init(struct vfio_pci_core_device *vdev)
+ {
+ 	struct pci_dev *pdev = vdev->pdev;
+ 	int ret;
+@@ -1834,7 +1834,7 @@ static int vfio_pci_vf_init(struct vfio_pci_device *vdev)
+ 	return 0;
+ }
+ 
+-static void vfio_pci_vf_uninit(struct vfio_pci_device *vdev)
++static void vfio_pci_vf_uninit(struct vfio_pci_core_device *vdev)
+ {
+ 	if (!vdev->vf_token)
+ 		return;
+@@ -1845,7 +1845,7 @@ static void vfio_pci_vf_uninit(struct vfio_pci_device *vdev)
+ 	kfree(vdev->vf_token);
+ }
+ 
+-static int vfio_pci_vga_init(struct vfio_pci_device *vdev)
++static int vfio_pci_vga_init(struct vfio_pci_core_device *vdev)
+ {
+ 	struct pci_dev *pdev = vdev->pdev;
+ 	int ret;
+@@ -1860,7 +1860,7 @@ static int vfio_pci_vga_init(struct vfio_pci_device *vdev)
+ 	return 0;
+ }
+ 
+-static void vfio_pci_vga_uninit(struct vfio_pci_device *vdev)
++static void vfio_pci_vga_uninit(struct vfio_pci_core_device *vdev)
+ {
+ 	struct pci_dev *pdev = vdev->pdev;
+ 
+@@ -1874,7 +1874,7 @@ static void vfio_pci_vga_uninit(struct vfio_pci_device *vdev)
+ 
+ static int vfio_pci_probe(struct pci_dev *pdev, const struct pci_device_id *id)
+ {
+-	struct vfio_pci_device *vdev;
++	struct vfio_pci_core_device *vdev;
+ 	struct iommu_group *group;
+ 	int ret;
+ 
+@@ -1978,7 +1978,7 @@ static int vfio_pci_probe(struct pci_dev *pdev, const struct pci_device_id *id)
+ 
+ static void vfio_pci_remove(struct pci_dev *pdev)
+ {
+-	struct vfio_pci_device *vdev = dev_get_drvdata(&pdev->dev);
++	struct vfio_pci_core_device *vdev = dev_get_drvdata(&pdev->dev);
+ 
+ 	pci_disable_sriov(pdev);
+ 
+@@ -2002,14 +2002,14 @@ static void vfio_pci_remove(struct pci_dev *pdev)
+ static pci_ers_result_t vfio_pci_aer_err_detected(struct pci_dev *pdev,
+ 						  pci_channel_state_t state)
+ {
+-	struct vfio_pci_device *vdev;
++	struct vfio_pci_core_device *vdev;
+ 	struct vfio_device *device;
+ 
+ 	device = vfio_device_get_from_dev(&pdev->dev);
+ 	if (device == NULL)
+ 		return PCI_ERS_RESULT_DISCONNECT;
+ 
+-	vdev = container_of(device, struct vfio_pci_device, vdev);
++	vdev = container_of(device, struct vfio_pci_core_device, vdev);
+ 
+ 	mutex_lock(&vdev->igate);
+ 
+@@ -2060,7 +2060,7 @@ static struct pci_driver vfio_pci_driver = {
+ 	.err_handler		= &vfio_err_handlers,
+ };
+ 
+-static bool vfio_dev_in_groups(struct vfio_pci_device *vdev,
++static bool vfio_dev_in_groups(struct vfio_pci_core_device *vdev,
+ 			       struct vfio_pci_group_info *groups)
+ {
+ 	unsigned int i;
+@@ -2104,7 +2104,8 @@ vfio_pci_dev_set_resettable(struct vfio_device_set *dev_set)
+ 	 * reset, so any pci_dev will have the same outcomes for
+ 	 * pci_probe_reset_*() and pci_reset_bus().
+ 	 */
+-	pdev = list_first_entry(&dev_set->device_list, struct vfio_pci_device,
++	pdev = list_first_entry(&dev_set->device_list,
++				struct vfio_pci_core_device,
+ 				vdev.dev_set_list)->pdev;
+ 
+ 	/* pci_reset_bus() is supported */
+@@ -2126,16 +2127,17 @@ vfio_pci_dev_set_resettable(struct vfio_device_set *dev_set)
+ static int vfio_pci_dev_set_hot_reset(struct vfio_device_set *dev_set,
+ 				      struct vfio_pci_group_info *groups)
+ {
+-	struct vfio_pci_device *cur_mem;
+-	struct vfio_pci_device *cur_vma;
+-	struct vfio_pci_device *cur;
++	struct vfio_pci_core_device *cur_mem;
++	struct vfio_pci_core_device *cur_vma;
++	struct vfio_pci_core_device *cur;
+ 	struct pci_dev *pdev;
+ 	bool is_mem = true;
+ 	int ret;
+ 
+ 	mutex_lock(&dev_set->lock);
+ 	cur_mem = list_first_entry(&dev_set->device_list,
+-				   struct vfio_pci_device, vdev.dev_set_list);
++				   struct vfio_pci_core_device,
++				   vdev.dev_set_list);
+ 
+ 	pdev = vfio_pci_dev_set_resettable(dev_set);
+ 	if (!pdev) {
+@@ -2193,7 +2195,7 @@ static int vfio_pci_dev_set_hot_reset(struct vfio_device_set *dev_set,
+ 
+ static bool vfio_pci_dev_set_needs_reset(struct vfio_device_set *dev_set)
+ {
+-	struct vfio_pci_device *cur;
++	struct vfio_pci_core_device *cur;
+ 	bool needs_reset = false;
+ 
+ 	list_for_each_entry(cur, &dev_set->device_list, vdev.dev_set_list) {
+@@ -2215,7 +2217,7 @@ static bool vfio_pci_dev_set_needs_reset(struct vfio_device_set *dev_set)
+  */
+ static bool vfio_pci_dev_set_try_reset(struct vfio_device_set *dev_set)
+ {
+-	struct vfio_pci_device *cur;
++	struct vfio_pci_core_device *cur;
+ 	struct pci_dev *pdev;
+ 	int ret;
+ 
+diff --git a/drivers/vfio/pci/vfio_pci_core.h b/drivers/vfio/pci/vfio_pci_core.h
+index ef26e781961d..2ceaa6e4ca25 100644
+--- a/drivers/vfio/pci/vfio_pci_core.h
 +++ b/drivers/vfio/pci/vfio_pci_core.h
-@@ -15,8 +15,8 @@
- #include <linux/uuid.h>
- #include <linux/notifier.h>
+@@ -33,7 +33,7 @@
  
--#ifndef VFIO_PCI_PRIVATE_H
--#define VFIO_PCI_PRIVATE_H
-+#ifndef VFIO_PCI_CORE_H
-+#define VFIO_PCI_CORE_H
+ struct vfio_pci_ioeventfd {
+ 	struct list_head	next;
+-	struct vfio_pci_device	*vdev;
++	struct vfio_pci_core_device	*vdev;
+ 	struct virqfd		*virqfd;
+ 	void __iomem		*addr;
+ 	uint64_t		data;
+@@ -52,18 +52,18 @@ struct vfio_pci_irq_ctx {
+ 	struct irq_bypass_producer	producer;
+ };
  
- #define VFIO_PCI_OFFSET_SHIFT   40
+-struct vfio_pci_device;
++struct vfio_pci_core_device;
+ struct vfio_pci_region;
  
-@@ -205,4 +205,4 @@ static inline int vfio_pci_info_zdev_add_caps(struct vfio_pci_device *vdev,
+ struct vfio_pci_regops {
+-	ssize_t	(*rw)(struct vfio_pci_device *vdev, char __user *buf,
++	ssize_t (*rw)(struct vfio_pci_core_device *vdev, char __user *buf,
+ 		      size_t count, loff_t *ppos, bool iswrite);
+-	void	(*release)(struct vfio_pci_device *vdev,
++	void	(*release)(struct vfio_pci_core_device *vdev,
+ 			   struct vfio_pci_region *region);
+-	int	(*mmap)(struct vfio_pci_device *vdev,
++	int	(*mmap)(struct vfio_pci_core_device *vdev,
+ 			struct vfio_pci_region *region,
+ 			struct vm_area_struct *vma);
+-	int	(*add_capability)(struct vfio_pci_device *vdev,
++	int	(*add_capability)(struct vfio_pci_core_device *vdev,
+ 				  struct vfio_pci_region *region,
+ 				  struct vfio_info_cap *caps);
+ };
+@@ -94,7 +94,7 @@ struct vfio_pci_mmap_vma {
+ 	struct list_head	vma_next;
+ };
+ 
+-struct vfio_pci_device {
++struct vfio_pci_core_device {
+ 	struct vfio_device	vdev;
+ 	struct pci_dev		*pdev;
+ 	void __iomem		*barmap[PCI_STD_NUM_BARS];
+@@ -144,61 +144,61 @@ struct vfio_pci_device {
+ #define is_irq_none(vdev) (!(is_intx(vdev) || is_msi(vdev) || is_msix(vdev)))
+ #define irq_is(vdev, type) (vdev->irq_type == type)
+ 
+-extern void vfio_pci_intx_mask(struct vfio_pci_device *vdev);
+-extern void vfio_pci_intx_unmask(struct vfio_pci_device *vdev);
++extern void vfio_pci_intx_mask(struct vfio_pci_core_device *vdev);
++extern void vfio_pci_intx_unmask(struct vfio_pci_core_device *vdev);
+ 
+-extern int vfio_pci_set_irqs_ioctl(struct vfio_pci_device *vdev,
++extern int vfio_pci_set_irqs_ioctl(struct vfio_pci_core_device *vdev,
+ 				   uint32_t flags, unsigned index,
+ 				   unsigned start, unsigned count, void *data);
+ 
+-extern ssize_t vfio_pci_config_rw(struct vfio_pci_device *vdev,
++extern ssize_t vfio_pci_config_rw(struct vfio_pci_core_device *vdev,
+ 				  char __user *buf, size_t count,
+ 				  loff_t *ppos, bool iswrite);
+ 
+-extern ssize_t vfio_pci_bar_rw(struct vfio_pci_device *vdev, char __user *buf,
++extern ssize_t vfio_pci_bar_rw(struct vfio_pci_core_device *vdev, char __user *buf,
+ 			       size_t count, loff_t *ppos, bool iswrite);
+ 
+-extern ssize_t vfio_pci_vga_rw(struct vfio_pci_device *vdev, char __user *buf,
++extern ssize_t vfio_pci_vga_rw(struct vfio_pci_core_device *vdev, char __user *buf,
+ 			       size_t count, loff_t *ppos, bool iswrite);
+ 
+-extern long vfio_pci_ioeventfd(struct vfio_pci_device *vdev, loff_t offset,
++extern long vfio_pci_ioeventfd(struct vfio_pci_core_device *vdev, loff_t offset,
+ 			       uint64_t data, int count, int fd);
+ 
+ extern int vfio_pci_init_perm_bits(void);
+ extern void vfio_pci_uninit_perm_bits(void);
+ 
+-extern int vfio_config_init(struct vfio_pci_device *vdev);
+-extern void vfio_config_free(struct vfio_pci_device *vdev);
++extern int vfio_config_init(struct vfio_pci_core_device *vdev);
++extern void vfio_config_free(struct vfio_pci_core_device *vdev);
+ 
+-extern int vfio_pci_register_dev_region(struct vfio_pci_device *vdev,
++extern int vfio_pci_register_dev_region(struct vfio_pci_core_device *vdev,
+ 					unsigned int type, unsigned int subtype,
+ 					const struct vfio_pci_regops *ops,
+ 					size_t size, u32 flags, void *data);
+ 
+-extern int vfio_pci_set_power_state(struct vfio_pci_device *vdev,
++extern int vfio_pci_set_power_state(struct vfio_pci_core_device *vdev,
+ 				    pci_power_t state);
+ 
+-extern bool __vfio_pci_memory_enabled(struct vfio_pci_device *vdev);
+-extern void vfio_pci_zap_and_down_write_memory_lock(struct vfio_pci_device
++extern bool __vfio_pci_memory_enabled(struct vfio_pci_core_device *vdev);
++extern void vfio_pci_zap_and_down_write_memory_lock(struct vfio_pci_core_device
+ 						    *vdev);
+-extern u16 vfio_pci_memory_lock_and_enable(struct vfio_pci_device *vdev);
+-extern void vfio_pci_memory_unlock_and_restore(struct vfio_pci_device *vdev,
++extern u16 vfio_pci_memory_lock_and_enable(struct vfio_pci_core_device *vdev);
++extern void vfio_pci_memory_unlock_and_restore(struct vfio_pci_core_device *vdev,
+ 					       u16 cmd);
+ 
+ #ifdef CONFIG_VFIO_PCI_IGD
+-extern int vfio_pci_igd_init(struct vfio_pci_device *vdev);
++extern int vfio_pci_igd_init(struct vfio_pci_core_device *vdev);
+ #else
+-static inline int vfio_pci_igd_init(struct vfio_pci_device *vdev)
++static inline int vfio_pci_igd_init(struct vfio_pci_core_device *vdev)
+ {
+ 	return -ENODEV;
  }
  #endif
  
--#endif /* VFIO_PCI_PRIVATE_H */
-+#endif /* VFIO_PCI_CORE_H */
+ #ifdef CONFIG_S390
+-extern int vfio_pci_info_zdev_add_caps(struct vfio_pci_device *vdev,
++extern int vfio_pci_info_zdev_add_caps(struct vfio_pci_core_device *vdev,
+ 				       struct vfio_info_cap *caps);
+ #else
+-static inline int vfio_pci_info_zdev_add_caps(struct vfio_pci_device *vdev,
++static inline int vfio_pci_info_zdev_add_caps(struct vfio_pci_core_device *vdev,
+ 					      struct vfio_info_cap *caps)
+ {
+ 	return -ENODEV;
 diff --git a/drivers/vfio/pci/vfio_pci_igd.c b/drivers/vfio/pci/vfio_pci_igd.c
-index aa0a29fd2762..d57c409b4033 100644
+index d57c409b4033..a324ca7e6b5a 100644
 --- a/drivers/vfio/pci/vfio_pci_igd.c
 +++ b/drivers/vfio/pci/vfio_pci_igd.c
-@@ -15,7 +15,7 @@
- #include <linux/uaccess.h>
- #include <linux/vfio.h>
+@@ -25,8 +25,9 @@
+ #define OPREGION_RVDS		0x3c2
+ #define OPREGION_VERSION	0x16
  
--#include "vfio_pci_private.h"
-+#include "vfio_pci_core.h"
+-static ssize_t vfio_pci_igd_rw(struct vfio_pci_device *vdev, char __user *buf,
+-			       size_t count, loff_t *ppos, bool iswrite)
++static ssize_t vfio_pci_igd_rw(struct vfio_pci_core_device *vdev,
++			       char __user *buf, size_t count, loff_t *ppos,
++			       bool iswrite)
+ {
+ 	unsigned int i = VFIO_PCI_OFFSET_TO_INDEX(*ppos) - VFIO_PCI_NUM_REGIONS;
+ 	void *base = vdev->region[i].data;
+@@ -45,7 +46,7 @@ static ssize_t vfio_pci_igd_rw(struct vfio_pci_device *vdev, char __user *buf,
+ 	return count;
+ }
  
- #define OPREGION_SIGNATURE	"IntelGraphicsMem"
- #define OPREGION_SIZE		(8 * 1024)
+-static void vfio_pci_igd_release(struct vfio_pci_device *vdev,
++static void vfio_pci_igd_release(struct vfio_pci_core_device *vdev,
+ 				 struct vfio_pci_region *region)
+ {
+ 	memunmap(region->data);
+@@ -56,7 +57,7 @@ static const struct vfio_pci_regops vfio_pci_igd_regops = {
+ 	.release	= vfio_pci_igd_release,
+ };
+ 
+-static int vfio_pci_igd_opregion_init(struct vfio_pci_device *vdev)
++static int vfio_pci_igd_opregion_init(struct vfio_pci_core_device *vdev)
+ {
+ 	__le32 *dwordp = (__le32 *)(vdev->vconfig + OPREGION_PCI_ADDR);
+ 	u32 addr, size;
+@@ -160,7 +161,7 @@ static int vfio_pci_igd_opregion_init(struct vfio_pci_device *vdev)
+ 	return ret;
+ }
+ 
+-static ssize_t vfio_pci_igd_cfg_rw(struct vfio_pci_device *vdev,
++static ssize_t vfio_pci_igd_cfg_rw(struct vfio_pci_core_device *vdev,
+ 				   char __user *buf, size_t count, loff_t *ppos,
+ 				   bool iswrite)
+ {
+@@ -253,7 +254,7 @@ static ssize_t vfio_pci_igd_cfg_rw(struct vfio_pci_device *vdev,
+ 	return count;
+ }
+ 
+-static void vfio_pci_igd_cfg_release(struct vfio_pci_device *vdev,
++static void vfio_pci_igd_cfg_release(struct vfio_pci_core_device *vdev,
+ 				     struct vfio_pci_region *region)
+ {
+ 	struct pci_dev *pdev = region->data;
+@@ -266,7 +267,7 @@ static const struct vfio_pci_regops vfio_pci_igd_cfg_regops = {
+ 	.release	= vfio_pci_igd_cfg_release,
+ };
+ 
+-static int vfio_pci_igd_cfg_init(struct vfio_pci_device *vdev)
++static int vfio_pci_igd_cfg_init(struct vfio_pci_core_device *vdev)
+ {
+ 	struct pci_dev *host_bridge, *lpc_bridge;
+ 	int ret;
+@@ -314,7 +315,7 @@ static int vfio_pci_igd_cfg_init(struct vfio_pci_device *vdev)
+ 	return 0;
+ }
+ 
+-int vfio_pci_igd_init(struct vfio_pci_device *vdev)
++int vfio_pci_igd_init(struct vfio_pci_core_device *vdev)
+ {
+ 	int ret;
+ 
 diff --git a/drivers/vfio/pci/vfio_pci_intrs.c b/drivers/vfio/pci/vfio_pci_intrs.c
-index 869dce5f134d..df1e8c8c274c 100644
+index df1e8c8c274c..945ddbdf4d11 100644
 --- a/drivers/vfio/pci/vfio_pci_intrs.c
 +++ b/drivers/vfio/pci/vfio_pci_intrs.c
-@@ -20,7 +20,7 @@
- #include <linux/wait.h>
- #include <linux/slab.h>
+@@ -27,13 +27,13 @@
+  */
+ static void vfio_send_intx_eventfd(void *opaque, void *unused)
+ {
+-	struct vfio_pci_device *vdev = opaque;
++	struct vfio_pci_core_device *vdev = opaque;
  
--#include "vfio_pci_private.h"
-+#include "vfio_pci_core.h"
+ 	if (likely(is_intx(vdev) && !vdev->virq_disabled))
+ 		eventfd_signal(vdev->ctx[0].trigger, 1);
+ }
  
+-void vfio_pci_intx_mask(struct vfio_pci_device *vdev)
++void vfio_pci_intx_mask(struct vfio_pci_core_device *vdev)
+ {
+ 	struct pci_dev *pdev = vdev->pdev;
+ 	unsigned long flags;
+@@ -73,7 +73,7 @@ void vfio_pci_intx_mask(struct vfio_pci_device *vdev)
+  */
+ static int vfio_pci_intx_unmask_handler(void *opaque, void *unused)
+ {
+-	struct vfio_pci_device *vdev = opaque;
++	struct vfio_pci_core_device *vdev = opaque;
+ 	struct pci_dev *pdev = vdev->pdev;
+ 	unsigned long flags;
+ 	int ret = 0;
+@@ -107,7 +107,7 @@ static int vfio_pci_intx_unmask_handler(void *opaque, void *unused)
+ 	return ret;
+ }
+ 
+-void vfio_pci_intx_unmask(struct vfio_pci_device *vdev)
++void vfio_pci_intx_unmask(struct vfio_pci_core_device *vdev)
+ {
+ 	if (vfio_pci_intx_unmask_handler(vdev, NULL) > 0)
+ 		vfio_send_intx_eventfd(vdev, NULL);
+@@ -115,7 +115,7 @@ void vfio_pci_intx_unmask(struct vfio_pci_device *vdev)
+ 
+ static irqreturn_t vfio_intx_handler(int irq, void *dev_id)
+ {
+-	struct vfio_pci_device *vdev = dev_id;
++	struct vfio_pci_core_device *vdev = dev_id;
+ 	unsigned long flags;
+ 	int ret = IRQ_NONE;
+ 
+@@ -139,7 +139,7 @@ static irqreturn_t vfio_intx_handler(int irq, void *dev_id)
+ 	return ret;
+ }
+ 
+-static int vfio_intx_enable(struct vfio_pci_device *vdev)
++static int vfio_intx_enable(struct vfio_pci_core_device *vdev)
+ {
+ 	if (!is_irq_none(vdev))
+ 		return -EINVAL;
+@@ -168,7 +168,7 @@ static int vfio_intx_enable(struct vfio_pci_device *vdev)
+ 	return 0;
+ }
+ 
+-static int vfio_intx_set_signal(struct vfio_pci_device *vdev, int fd)
++static int vfio_intx_set_signal(struct vfio_pci_core_device *vdev, int fd)
+ {
+ 	struct pci_dev *pdev = vdev->pdev;
+ 	unsigned long irqflags = IRQF_SHARED;
+@@ -223,7 +223,7 @@ static int vfio_intx_set_signal(struct vfio_pci_device *vdev, int fd)
+ 	return 0;
+ }
+ 
+-static void vfio_intx_disable(struct vfio_pci_device *vdev)
++static void vfio_intx_disable(struct vfio_pci_core_device *vdev)
+ {
+ 	vfio_virqfd_disable(&vdev->ctx[0].unmask);
+ 	vfio_virqfd_disable(&vdev->ctx[0].mask);
+@@ -244,7 +244,7 @@ static irqreturn_t vfio_msihandler(int irq, void *arg)
+ 	return IRQ_HANDLED;
+ }
+ 
+-static int vfio_msi_enable(struct vfio_pci_device *vdev, int nvec, bool msix)
++static int vfio_msi_enable(struct vfio_pci_core_device *vdev, int nvec, bool msix)
+ {
+ 	struct pci_dev *pdev = vdev->pdev;
+ 	unsigned int flag = msix ? PCI_IRQ_MSIX : PCI_IRQ_MSI;
+@@ -285,7 +285,7 @@ static int vfio_msi_enable(struct vfio_pci_device *vdev, int nvec, bool msix)
+ 	return 0;
+ }
+ 
+-static int vfio_msi_set_vector_signal(struct vfio_pci_device *vdev,
++static int vfio_msi_set_vector_signal(struct vfio_pci_core_device *vdev,
+ 				      int vector, int fd, bool msix)
+ {
+ 	struct pci_dev *pdev = vdev->pdev;
+@@ -364,7 +364,7 @@ static int vfio_msi_set_vector_signal(struct vfio_pci_device *vdev,
+ 	return 0;
+ }
+ 
+-static int vfio_msi_set_block(struct vfio_pci_device *vdev, unsigned start,
++static int vfio_msi_set_block(struct vfio_pci_core_device *vdev, unsigned start,
+ 			      unsigned count, int32_t *fds, bool msix)
+ {
+ 	int i, j, ret = 0;
+@@ -385,7 +385,7 @@ static int vfio_msi_set_block(struct vfio_pci_device *vdev, unsigned start,
+ 	return ret;
+ }
+ 
+-static void vfio_msi_disable(struct vfio_pci_device *vdev, bool msix)
++static void vfio_msi_disable(struct vfio_pci_core_device *vdev, bool msix)
+ {
+ 	struct pci_dev *pdev = vdev->pdev;
+ 	int i;
+@@ -417,7 +417,7 @@ static void vfio_msi_disable(struct vfio_pci_device *vdev, bool msix)
  /*
-  * INTx
+  * IOCTL support
+  */
+-static int vfio_pci_set_intx_unmask(struct vfio_pci_device *vdev,
++static int vfio_pci_set_intx_unmask(struct vfio_pci_core_device *vdev,
+ 				    unsigned index, unsigned start,
+ 				    unsigned count, uint32_t flags, void *data)
+ {
+@@ -444,7 +444,7 @@ static int vfio_pci_set_intx_unmask(struct vfio_pci_device *vdev,
+ 	return 0;
+ }
+ 
+-static int vfio_pci_set_intx_mask(struct vfio_pci_device *vdev,
++static int vfio_pci_set_intx_mask(struct vfio_pci_core_device *vdev,
+ 				  unsigned index, unsigned start,
+ 				  unsigned count, uint32_t flags, void *data)
+ {
+@@ -464,7 +464,7 @@ static int vfio_pci_set_intx_mask(struct vfio_pci_device *vdev,
+ 	return 0;
+ }
+ 
+-static int vfio_pci_set_intx_trigger(struct vfio_pci_device *vdev,
++static int vfio_pci_set_intx_trigger(struct vfio_pci_core_device *vdev,
+ 				     unsigned index, unsigned start,
+ 				     unsigned count, uint32_t flags, void *data)
+ {
+@@ -507,7 +507,7 @@ static int vfio_pci_set_intx_trigger(struct vfio_pci_device *vdev,
+ 	return 0;
+ }
+ 
+-static int vfio_pci_set_msi_trigger(struct vfio_pci_device *vdev,
++static int vfio_pci_set_msi_trigger(struct vfio_pci_core_device *vdev,
+ 				    unsigned index, unsigned start,
+ 				    unsigned count, uint32_t flags, void *data)
+ {
+@@ -613,7 +613,7 @@ static int vfio_pci_set_ctx_trigger_single(struct eventfd_ctx **ctx,
+ 	return -EINVAL;
+ }
+ 
+-static int vfio_pci_set_err_trigger(struct vfio_pci_device *vdev,
++static int vfio_pci_set_err_trigger(struct vfio_pci_core_device *vdev,
+ 				    unsigned index, unsigned start,
+ 				    unsigned count, uint32_t flags, void *data)
+ {
+@@ -624,7 +624,7 @@ static int vfio_pci_set_err_trigger(struct vfio_pci_device *vdev,
+ 					       count, flags, data);
+ }
+ 
+-static int vfio_pci_set_req_trigger(struct vfio_pci_device *vdev,
++static int vfio_pci_set_req_trigger(struct vfio_pci_core_device *vdev,
+ 				    unsigned index, unsigned start,
+ 				    unsigned count, uint32_t flags, void *data)
+ {
+@@ -635,11 +635,11 @@ static int vfio_pci_set_req_trigger(struct vfio_pci_device *vdev,
+ 					       count, flags, data);
+ }
+ 
+-int vfio_pci_set_irqs_ioctl(struct vfio_pci_device *vdev, uint32_t flags,
++int vfio_pci_set_irqs_ioctl(struct vfio_pci_core_device *vdev, uint32_t flags,
+ 			    unsigned index, unsigned start, unsigned count,
+ 			    void *data)
+ {
+-	int (*func)(struct vfio_pci_device *vdev, unsigned index,
++	int (*func)(struct vfio_pci_core_device *vdev, unsigned index,
+ 		    unsigned start, unsigned count, uint32_t flags,
+ 		    void *data) = NULL;
+ 
 diff --git a/drivers/vfio/pci/vfio_pci_rdwr.c b/drivers/vfio/pci/vfio_pci_rdwr.c
-index a0b5fc8e46f4..667e82726e75 100644
+index 667e82726e75..8fff4689dd44 100644
 --- a/drivers/vfio/pci/vfio_pci_rdwr.c
 +++ b/drivers/vfio/pci/vfio_pci_rdwr.c
-@@ -17,7 +17,7 @@
- #include <linux/vfio.h>
- #include <linux/vgaarb.h>
+@@ -38,7 +38,7 @@
+ #define vfio_iowrite8	iowrite8
  
--#include "vfio_pci_private.h"
-+#include "vfio_pci_core.h"
+ #define VFIO_IOWRITE(size) \
+-static int vfio_pci_iowrite##size(struct vfio_pci_device *vdev,		\
++static int vfio_pci_iowrite##size(struct vfio_pci_core_device *vdev,		\
+ 			bool test_mem, u##size val, void __iomem *io)	\
+ {									\
+ 	if (test_mem) {							\
+@@ -65,7 +65,7 @@ VFIO_IOWRITE(64)
+ #endif
  
- #ifdef __LITTLE_ENDIAN
- #define vfio_ioread64	ioread64
+ #define VFIO_IOREAD(size) \
+-static int vfio_pci_ioread##size(struct vfio_pci_device *vdev,		\
++static int vfio_pci_ioread##size(struct vfio_pci_core_device *vdev,		\
+ 			bool test_mem, u##size *val, void __iomem *io)	\
+ {									\
+ 	if (test_mem) {							\
+@@ -94,7 +94,7 @@ VFIO_IOREAD(32)
+  * reads with -1.  This is intended for handling MSI-X vector tables and
+  * leftover space for ROM BARs.
+  */
+-static ssize_t do_io_rw(struct vfio_pci_device *vdev, bool test_mem,
++static ssize_t do_io_rw(struct vfio_pci_core_device *vdev, bool test_mem,
+ 			void __iomem *io, char __user *buf,
+ 			loff_t off, size_t count, size_t x_start,
+ 			size_t x_end, bool iswrite)
+@@ -200,7 +200,7 @@ static ssize_t do_io_rw(struct vfio_pci_device *vdev, bool test_mem,
+ 	return done;
+ }
+ 
+-static int vfio_pci_setup_barmap(struct vfio_pci_device *vdev, int bar)
++static int vfio_pci_setup_barmap(struct vfio_pci_core_device *vdev, int bar)
+ {
+ 	struct pci_dev *pdev = vdev->pdev;
+ 	int ret;
+@@ -224,7 +224,7 @@ static int vfio_pci_setup_barmap(struct vfio_pci_device *vdev, int bar)
+ 	return 0;
+ }
+ 
+-ssize_t vfio_pci_bar_rw(struct vfio_pci_device *vdev, char __user *buf,
++ssize_t vfio_pci_bar_rw(struct vfio_pci_core_device *vdev, char __user *buf,
+ 			size_t count, loff_t *ppos, bool iswrite)
+ {
+ 	struct pci_dev *pdev = vdev->pdev;
+@@ -288,7 +288,7 @@ ssize_t vfio_pci_bar_rw(struct vfio_pci_device *vdev, char __user *buf,
+ 	return done;
+ }
+ 
+-ssize_t vfio_pci_vga_rw(struct vfio_pci_device *vdev, char __user *buf,
++ssize_t vfio_pci_vga_rw(struct vfio_pci_core_device *vdev, char __user *buf,
+ 			       size_t count, loff_t *ppos, bool iswrite)
+ {
+ 	int ret;
+@@ -384,7 +384,7 @@ static void vfio_pci_ioeventfd_do_write(struct vfio_pci_ioeventfd *ioeventfd,
+ static int vfio_pci_ioeventfd_handler(void *opaque, void *unused)
+ {
+ 	struct vfio_pci_ioeventfd *ioeventfd = opaque;
+-	struct vfio_pci_device *vdev = ioeventfd->vdev;
++	struct vfio_pci_core_device *vdev = ioeventfd->vdev;
+ 
+ 	if (ioeventfd->test_mem) {
+ 		if (!down_read_trylock(&vdev->memory_lock))
+@@ -410,7 +410,7 @@ static void vfio_pci_ioeventfd_thread(void *opaque, void *unused)
+ 	vfio_pci_ioeventfd_do_write(ioeventfd, ioeventfd->test_mem);
+ }
+ 
+-long vfio_pci_ioeventfd(struct vfio_pci_device *vdev, loff_t offset,
++long vfio_pci_ioeventfd(struct vfio_pci_core_device *vdev, loff_t offset,
+ 			uint64_t data, int count, int fd)
+ {
+ 	struct pci_dev *pdev = vdev->pdev;
 diff --git a/drivers/vfio/pci/vfio_pci_zdev.c b/drivers/vfio/pci/vfio_pci_zdev.c
-index 7b011b62c766..ecae0c3d95a0 100644
+index ecae0c3d95a0..2ffbdc11f089 100644
 --- a/drivers/vfio/pci/vfio_pci_zdev.c
 +++ b/drivers/vfio/pci/vfio_pci_zdev.c
-@@ -19,7 +19,7 @@
- #include <asm/pci_clp.h>
- #include <asm/pci_io.h>
- 
--#include "vfio_pci_private.h"
-+#include "vfio_pci_core.h"
- 
+@@ -114,7 +114,7 @@ static int zpci_pfip_cap(struct zpci_dev *zdev, struct vfio_info_cap *caps)
  /*
-  * Add the Base PCI Function information to the device info region.
+  * Add all supported capabilities to the VFIO_DEVICE_GET_INFO capability chain.
+  */
+-int vfio_pci_info_zdev_add_caps(struct vfio_pci_device *vdev,
++int vfio_pci_info_zdev_add_caps(struct vfio_pci_core_device *vdev,
+ 				struct vfio_info_cap *caps)
+ {
+ 	struct zpci_dev *zdev = to_zpci(vdev->pdev);
 -- 
 2.18.1
 
