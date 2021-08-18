@@ -2,56 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 27EA43EF68C
-	for <lists+kvm@lfdr.de>; Wed, 18 Aug 2021 02:09:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9F53D3EF68D
+	for <lists+kvm@lfdr.de>; Wed, 18 Aug 2021 02:09:49 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237006AbhHRAKD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 17 Aug 2021 20:10:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48432 "EHLO
+        id S237042AbhHRAKG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 17 Aug 2021 20:10:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48444 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236904AbhHRAKC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 17 Aug 2021 20:10:02 -0400
+        with ESMTP id S237022AbhHRAKE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 17 Aug 2021 20:10:04 -0400
 Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2070EC061764
-        for <kvm@vger.kernel.org>; Tue, 17 Aug 2021 17:09:29 -0700 (PDT)
-Received: by mail-yb1-xb4a.google.com with SMTP id f64-20020a2538430000b0290593bfc4b046so958110yba.9
-        for <kvm@vger.kernel.org>; Tue, 17 Aug 2021 17:09:29 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 02796C0613C1
+        for <kvm@vger.kernel.org>; Tue, 17 Aug 2021 17:09:31 -0700 (PDT)
+Received: by mail-yb1-xb4a.google.com with SMTP id b127-20020a25e485000000b005943f1efa05so947764ybh.15
+        for <kvm@vger.kernel.org>; Tue, 17 Aug 2021 17:09:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=date:in-reply-to:message-id:mime-version:references:subject:from:to
          :cc;
-        bh=Gq+z6grPiM8Bpp7zLCRJwpCsdutqoD4UjnEbmJiL6NA=;
-        b=kqXgG1XZdIU3HpLEmSJpGSKl2oZ3npyVzYqbbTVbH4yYr1Pf4WeFxOK961vSEM2nu0
-         gfJyyLmKIFC8qrCYASgAd2+vwJAIGlRCYNWMyXDzoSSMPgB9A1dkcu3J5oo6K9Tp6sAY
-         mT3EB6h9sI+xQUYGEm1bxtFSlXMykEC/QD6HJMxunGreCwzeuQUqsnt/Wxmq2mzMJ3cn
-         ZqtR1sO6Q5hgFcqQzo9ewdIgNR59ISYqukhBwvpNcL3LTp+MYqgUqey7Q15AEQVaeibQ
-         MEt3e2ybGdmh7s+9W/XgWoSW8o9dHeDQ+d0jaM5tKFim2arxstz8IGLMib7QsHm7p2dB
-         85rw==
+        bh=K8jwsKzs7IEe9iRNrLfVJdwIHJGIIxqcPB0yjD0e3tQ=;
+        b=KlTTUR+o3+BFUUCaZ9TQXlPXog9BsPKwgcz7XjAK1Pkm+PLiDrwckDGPTWgHq3PaMA
+         XXC/Iibv+EHgtuCpqEuOvVUW/JGyhUkNPRSedtDd4YtmWuGOtt+RiBl0u79hA3PTXiCT
+         qhn+WcnrjXYeUjhDp5/rtG3GlLS3LjDrtjCo48oDj9wIetA4o4t8gsnvx87bWlH2EWv0
+         8gX6W7zs08rxAQgKQ+oTy3FPEusGQP9h5Uhs7a6AU1pIp2+zrXmcKd40U7mhbLqpmHSA
+         ltx++VbHnaxukwin6N01eR+KO1zrJxDaif360y4LXSScIE6kUAswNtXsoG5I1qQeJVVy
+         gStg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=Gq+z6grPiM8Bpp7zLCRJwpCsdutqoD4UjnEbmJiL6NA=;
-        b=sZhPSzFr4qJeDNFTlUuPfUvLvXG+6uXo2tE/64CIKP7tcy6LFIWvoHXNEMqx1BkR7j
-         uJnZhLhSw/hwQPsjHQluZg4Bn996HI+ufF3m+nmze4Tezm/Y5txnxrRPdZtZedSnBUZI
-         D4hzwCJuTKyS5H4S0AJ0PTcRRXRZ96WbgfsDA+OCepVCmH9IKLYhWYQa35B+9xhPuiCQ
-         /LZ41W7Zor7T7dlDf5Xv+Y48QfHQ127tJ1yo0xZ4B61fWQKruioXqrh+LfHruzkf1kuE
-         OF/bduQHhhIb0qbuL55kvvafzQae4Ey0K1jt1VVBxZJuFs8R+/X00Jbn1CCavaIuaiT5
-         /fSA==
-X-Gm-Message-State: AOAM533zJ428yJ3RW/2BZ1LmfXO2EeBfQ3HX6X2IeVWLSvYg7yaP76OD
-        n0ZMAIz3K1rZd9y/h2d1asJkxNexEO5TOnEDgRYZZwSqvbU8ux4C0wezjp2sjBbyvSCBT9NBBnm
-        XToRS13yQScLIYwbY9lx+dPJD+fckXlCAz6SEXa2fMzqMAGTRNDR3ZZYplMCj3QaTEbir
-X-Google-Smtp-Source: ABdhPJyeJDna0GZVSILfrz2p8E7rZnockMypKmYclgL417G/Kl0HNMvwJ3gECaJ+yYM9q8aO2NljMTx1Owvkh1T+
+        bh=K8jwsKzs7IEe9iRNrLfVJdwIHJGIIxqcPB0yjD0e3tQ=;
+        b=VBALWmmwo6r3tHJO9kURWkiQwEbOmE4bwEWAYOimN5EMlM29pBSsVtKFPxeEoXd4bp
+         bre2ub6jTeISDvFXjXB0Llk2iB1ZUM7+FUS7okxaivsKPqskU/udz9lyP2Ao4Cn0n89F
+         eqWOMC4L+zi9olRoI8eCpYugO68pZGvnIkXjS/QkvaIqMsDIZcVvZqeXVMTSemvd+5hZ
+         Ub4uJmEwbkfTIkRV3YfGZleXkN6tfeqNpUtyk1nHlG36wQgZ4hqnJU8ngnGKtP+u//YL
+         5Gm4u9M0yNPNah/YFeiCWemgTbGzv2om/9WN6u4QWc+CX0Fa2+Jp21SN6bc0KR17UsTp
+         ojgQ==
+X-Gm-Message-State: AOAM531q1GqyzCERSe2ItQbOyvjKnQWUB8x3FU7YqFsa1bO/8Ir+3/Fc
+        H0jq6e8lcy0YqDLnOdFX3boxMwVQY/hXlFjIEcpYiAS94ylji/8KPeedEXEcaTbkV4IRBcBs7Nv
+        6yznHUTRmkhndBD4/L0qYBUqsrwuiK2ebzMiEck0hxDmv405aYttD/rwhJqVKE6nxjXwZ
+X-Google-Smtp-Source: ABdhPJy+0Un8M2L4iyvOHpxOeLvC6CSdYs2xEe/z8PrrfpcVouYxQPqT0d2BTN9JWKZcgIo1j/Snk1mHEnXuJ2Fa
 X-Received: from zxwang42.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:2936])
- (user=zixuanwang job=sendgmr) by 2002:a25:3717:: with SMTP id
- e23mr1708144yba.66.1629245368348; Tue, 17 Aug 2021 17:09:28 -0700 (PDT)
-Date:   Wed, 18 Aug 2021 00:08:57 +0000
+ (user=zixuanwang job=sendgmr) by 2002:a25:80d4:: with SMTP id
+ c20mr7831758ybm.345.1629245370090; Tue, 17 Aug 2021 17:09:30 -0700 (PDT)
+Date:   Wed, 18 Aug 2021 00:08:58 +0000
 In-Reply-To: <20210818000905.1111226-1-zixuanwang@google.com>
-Message-Id: <20210818000905.1111226-9-zixuanwang@google.com>
+Message-Id: <20210818000905.1111226-10-zixuanwang@google.com>
 Mime-Version: 1.0
 References: <20210818000905.1111226-1-zixuanwang@google.com>
 X-Mailer: git-send-email 2.33.0.rc1.237.g0d66db33f3-goog
-Subject: [kvm-unit-tests RFC 08/16] x86 UEFI: Set up page tables
+Subject: [kvm-unit-tests RFC 09/16] x86 UEFI: Convert x86 test cases to PIC
 From:   Zixuan Wang <zixuanwang@google.com>
 To:     kvm@vger.kernel.org, pbonzini@redhat.com, drjones@redhat.com
 Cc:     marcorr@google.com, baekhw@google.com, tmroeder@google.com,
@@ -64,174 +64,280 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-UEFI sets up page tables before executing EFI application binaries.
-These page tables do not allow user space code to access kernel space
-memory. But `x86/syscall.c` test case places a user space function
-`syscall_tf_user32` inside kernel space memory. When using UEFI page
-tables, fetching this kernel memory from user space triggers a #PF
-fault, which is not expected by this test case.
+UEFI loads EFI applications to dynamic runtime addresses, so it requires
+all applications to be compiled as PIC (position independent code). PIC
+does not allow the usage of compile time absolute address.
 
-KVM-Unit-Tests defines page tables that allow such behavior. So the
-solution to this problem is to load KVM-Unit-Tests' page tables:
+This commit converts multiple x86 test cases to PIC so they can compile
+and run in UEFI:
 
-   1. Copy the page table definition from `x86/cstart64.S`
-   2. Update page table entries with runtime memory addresses
-   3. Update CR3 register with the new page table root address
+- x86/cet.efi
 
-Since this commit, `x86/syscall.c` can run in UEFI and generate same
-output as in Seabios, using the following command:
+- x86/emulator.c: x86/emulator.c depends on lib/x86/usermode.c. But
+usermode.c contains non-PIC inline assembly code and thus blocks the
+compilation with GNU-EFI. This commit converts lib/x86/usermode.c and
+x86/emulator.c to PIC, so x86/emulator.c can compile and run in UEFI.
 
-   ./x86/efi/run ./x86/syscall.efi --cpu Opteron_G1,vendor=AuthenticAMD
+- x86/vmware_backdoors.c: it depends on lib/x86/usermode.c and now works
+without modifications
+
+- x86/eventinj.c
+
+- x86/smap.c
+
+- x86/access.c
+
+- x86/umip.c
 
 Signed-off-by: Zixuan Wang <zixuanwang@google.com>
 ---
- lib/x86/asm/page.h   |  1 +
- lib/x86/asm/setup.h  |  3 +++
- lib/x86/setup.c      | 57 ++++++++++++++++++++++++++++++++++++++++++++
- x86/efi/efistart64.S | 21 ++++++++++++++++
- 4 files changed, 82 insertions(+)
+ lib/x86/usermode.c  |  3 ++-
+ x86/Makefile.common | 10 +++++-----
+ x86/Makefile.x86_64 |  7 ++++---
+ x86/access.c        |  6 +++---
+ x86/cet.c           |  8 +++++---
+ x86/emulator.c      |  5 +++--
+ x86/eventinj.c      |  6 ++++--
+ x86/smap.c          |  8 ++++----
+ x86/umip.c          | 10 +++++++---
+ 9 files changed, 37 insertions(+), 26 deletions(-)
 
-diff --git a/lib/x86/asm/page.h b/lib/x86/asm/page.h
-index fc14160..f6f740b 100644
---- a/lib/x86/asm/page.h
-+++ b/lib/x86/asm/page.h
-@@ -31,6 +31,7 @@ typedef unsigned long pgd_t;
- #define PT_ACCESSED_MASK	(1ull << 5)
- #define PT_DIRTY_MASK		(1ull << 6)
- #define PT_PAGE_SIZE_MASK	(1ull << 7)
-+#define PT_GLOBAL_MASK		(1ull << 8)
- #define PT64_NX_MASK		(1ull << 63)
- #define PT_ADDR_MASK		GENMASK_ULL(51, 12)
+diff --git a/lib/x86/usermode.c b/lib/x86/usermode.c
+index f032523..c550545 100644
+--- a/lib/x86/usermode.c
++++ b/lib/x86/usermode.c
+@@ -58,7 +58,8 @@ uint64_t run_in_user(usermode_func func, unsigned int fault_vector,
+ 			"pushq %[user_stack_top]\n\t"
+ 			"pushfq\n\t"
+ 			"pushq %[user_cs]\n\t"
+-			"pushq $user_mode\n\t"
++			"lea user_mode(%%rip), %%rdx\n\t"
++			"pushq %%rdx\n\t"
+ 			"iretq\n"
  
-diff --git a/lib/x86/asm/setup.h b/lib/x86/asm/setup.h
-index 2115a75..c32168e 100644
---- a/lib/x86/asm/setup.h
-+++ b/lib/x86/asm/setup.h
-@@ -4,7 +4,9 @@
- #ifdef TARGET_EFI
- #include "x86/acpi.h"
- #include "x86/apic.h"
-+#include "x86/processor.h"
- #include "x86/smp.h"
-+#include "asm/page.h"
+ 			"user_mode:\n\t"
+diff --git a/x86/Makefile.common b/x86/Makefile.common
+index 314bf47..e77de6b 100644
+--- a/x86/Makefile.common
++++ b/x86/Makefile.common
+@@ -81,16 +81,16 @@ tests-common = $(TEST_DIR)/vmexit.$(exe) $(TEST_DIR)/tsc.$(exe) \
+                $(TEST_DIR)/init.$(exe) \
+                $(TEST_DIR)/hyperv_synic.$(exe) $(TEST_DIR)/hyperv_stimer.$(exe) \
+                $(TEST_DIR)/hyperv_connections.$(exe) \
+-               $(TEST_DIR)/tsx-ctrl.$(exe)
++               $(TEST_DIR)/tsx-ctrl.$(exe) \
++	       $(TEST_DIR)/eventinj.$(exe) \
++               $(TEST_DIR)/umip.$(exe)
  
- #ifdef ALIGN
- #undef ALIGN
-@@ -26,6 +28,7 @@ typedef struct {
- void setup_efi_bootinfo(efi_bootinfo_t *efi_bootinfo);
- void setup_efi(efi_bootinfo_t *efi_bootinfo);
- EFI_STATUS setup_efi_pre_boot(UINTN *mapkey, efi_bootinfo_t *efi_bootinfo);
-+void setup_5level_page_table(void);
- #endif /* TARGET_EFI */
+ # The following test cases are disabled when building EFI tests because they
+ # use absolute addresses in their inline assembly code, which cannot compile
+ # with the '-fPIC' flag
+ ifneq ($(TARGET_EFI),y)
+-tests-common += $(TEST_DIR)/eventinj.$(exe) \
+-                $(TEST_DIR)/smap.$(exe) \
+-                $(TEST_DIR)/realmode.$(exe) \
+-                $(TEST_DIR)/umip.$(exe)
++tests-common += $(TEST_DIR)/smap.$(exe) \
++                $(TEST_DIR)/realmode.$(exe)
+ endif
  
- #endif /* _X86_ASM_SETUP_H_ */
-diff --git a/lib/x86/setup.c b/lib/x86/setup.c
-index 3695c4a..0b0dbea 100644
---- a/lib/x86/setup.c
-+++ b/lib/x86/setup.c
-@@ -217,6 +217,62 @@ EFI_STATUS setup_efi_pre_boot(UINTN *mapkey, efi_bootinfo_t *efi_bootinfo)
- 	return EFI_SUCCESS;
+ test_cases: $(tests-common) $(tests)
+diff --git a/x86/Makefile.x86_64 b/x86/Makefile.x86_64
+index aa23b22..7e8a57a 100644
+--- a/x86/Makefile.x86_64
++++ b/x86/Makefile.x86_64
+@@ -30,20 +30,21 @@ tests += $(TEST_DIR)/intel-iommu.$(exe)
+ tests += $(TEST_DIR)/rdpru.$(exe)
+ tests += $(TEST_DIR)/pks.$(exe)
+ tests += $(TEST_DIR)/pmu_lbr.$(exe)
++tests += $(TEST_DIR)/emulator.$(exe)
++tests += $(TEST_DIR)/vmware_backdoors.$(exe)
+ 
+ # The following test cases are disabled when building EFI tests because they
+ # use absolute addresses in their inline assembly code, which cannot compile
+ # with the '-fPIC' flag
+ ifneq ($(TARGET_EFI),y)
+ tests += $(TEST_DIR)/access.$(exe)
+-tests += $(TEST_DIR)/emulator.$(exe)
+ tests += $(TEST_DIR)/svm.$(exe)
+ tests += $(TEST_DIR)/vmx.$(exe)
+-tests += $(TEST_DIR)/vmware_backdoors.$(exe)
++endif
++
+ ifneq ($(fcf_protection_full),)
+ tests += $(TEST_DIR)/cet.$(exe)
+ endif
+-endif
+ 
+ include $(SRCDIR)/$(TEST_DIR)/Makefile.common
+ 
+diff --git a/x86/access.c b/x86/access.c
+index 4725bbd..d0c84ca 100644
+--- a/x86/access.c
++++ b/x86/access.c
+@@ -700,7 +700,7 @@ static int ac_test_do_access(ac_test_t *at)
+ 
+     if (F(AC_ACCESS_TWICE)) {
+ 	asm volatile (
+-	    "mov $fixed2, %%rsi \n\t"
++	    "lea fixed2(%%rip), %%rsi \n\t"
+ 	    "mov (%[addr]), %[reg] \n\t"
+ 	    "fixed2:"
+ 	    : [reg]"=r"(r), [fault]"=a"(fault), "=b"(e)
+@@ -710,7 +710,7 @@ static int ac_test_do_access(ac_test_t *at)
+ 	fault = 0;
+     }
+ 
+-    asm volatile ("mov $fixed1, %%rsi \n\t"
++    asm volatile ("lea fixed1(%%rip), %%rsi \n\t"
+ 		  "mov %%rsp, %%rdx \n\t"
+ 		  "cmp $0, %[user] \n\t"
+ 		  "jz do_access \n\t"
+@@ -719,7 +719,7 @@ static int ac_test_do_access(ac_test_t *at)
+ 		  "pushq %[user_stack_top] \n\t"
+ 		  "pushfq \n\t"
+ 		  "pushq %[user_cs] \n\t"
+-		  "pushq $do_access \n\t"
++		  "lea do_access(%%rip), %%rsi; pushq %%rsi; lea fixed1(%%rip), %%rsi\n\t"
+ 		  "iretq \n"
+ 		  "do_access: \n\t"
+ 		  "cmp $0, %[fetch] \n\t"
+diff --git a/x86/cet.c b/x86/cet.c
+index a21577a..a4b79cb 100644
+--- a/x86/cet.c
++++ b/x86/cet.c
+@@ -52,7 +52,7 @@ static u64 cet_ibt_func(void)
+ 	printf("No endbr64 instruction at jmp target, this triggers #CP...\n");
+ 	asm volatile ("movq $2, %rcx\n"
+ 		      "dec %rcx\n"
+-		      "leaq 2f, %rax\n"
++		      "leaq 2f(%rip), %rax\n"
+ 		      "jmp *%rax \n"
+ 		      "2:\n"
+ 		      "dec %rcx\n");
+@@ -67,7 +67,8 @@ void test_func(void) {
+ 			"pushq %[user_stack_top]\n\t"
+ 			"pushfq\n\t"
+ 			"pushq %[user_cs]\n\t"
+-			"pushq $user_mode\n\t"
++			"lea user_mode(%%rip), %%rax\n\t"
++			"pushq %%rax\n\t"
+ 			"iretq\n"
+ 
+ 			"user_mode:\n\t"
+@@ -77,7 +78,8 @@ void test_func(void) {
+ 			[user_ds]"i"(USER_DS),
+ 			[user_cs]"i"(USER_CS),
+ 			[user_stack_top]"r"(user_stack +
+-					sizeof(user_stack)));
++					sizeof(user_stack))
++			: "rax");
  }
  
-+/* Defined in cstart64.S or efistart64.S */
-+extern phys_addr_t ptl5;
-+extern phys_addr_t ptl4;
-+extern phys_addr_t ptl3;
-+extern phys_addr_t ptl2;
-+
-+static void setup_page_table(void)
-+{
-+	pgd_t *curr_pt;
-+	phys_addr_t flags;
-+	int i;
-+
-+	/* Set default flags */
-+	flags = PT_PRESENT_MASK | PT_WRITABLE_MASK | PT_USER_MASK;
-+
-+	/* Level 5 */
-+	curr_pt = (pgd_t *)&ptl5;
-+	curr_pt[0] = ((phys_addr_t)&ptl4) | flags;
-+	/* Level 4 */
-+	curr_pt = (pgd_t *)&ptl4;
-+	curr_pt[0] = ((phys_addr_t)&ptl3) | flags;
-+	/* Level 3 */
-+	curr_pt = (pgd_t *)&ptl3;
-+	for (i = 0; i < 4; i++) {
-+		curr_pt[i] = (((phys_addr_t)&ptl2) + i * PAGE_SIZE) | flags;
-+	}
-+	/* Level 2 */
-+	curr_pt = (pgd_t *)&ptl2;
-+	flags |= PT_ACCESSED_MASK | PT_DIRTY_MASK | PT_PAGE_SIZE_MASK | PT_GLOBAL_MASK;
-+	for (i = 0; i < 4 * 512; i++)	{
-+		curr_pt[i] = ((phys_addr_t)(i << 21)) | flags;
-+	}
-+
-+	/* Load 4-level page table */
-+	write_cr3((ulong)&ptl4);
-+}
-+
-+void setup_5level_page_table(void)
-+{
-+	/*  Check if 5-level page table is already enabled */
-+	if (read_cr4() & X86_CR4_LA57) {
-+		return;
-+	}
-+
-+	/* Disable CR4.PCIDE */
-+	write_cr4(read_cr4() & ~(X86_CR4_PCIDE));
-+	/* Disable CR0.PG */
-+	write_cr0(read_cr0() & ~(X86_CR0_PG));
-+
-+	/* Load new page table */
-+	write_cr3((ulong)&ptl5);
-+
-+	/* Enable CR4.LA57 */
-+	write_cr4(read_cr4() | X86_CR4_LA57);
-+}
-+
- static void setup_gdt_tss(void)
- {
- 	gdt_entry_t *tss_lo, *tss_hi;
-@@ -268,6 +324,7 @@ void setup_efi(efi_bootinfo_t *efi_bootinfo)
- 	phys_alloc_init(efi_bootinfo->free_mem_start,
- 			efi_bootinfo->free_mem_size);
- 	setup_efi_rsdp(efi_bootinfo->rsdp);
-+	setup_page_table();
- }
+ #define SAVE_REGS() \
+diff --git a/x86/emulator.c b/x86/emulator.c
+index 9fda1a0..4d2de24 100644
+--- a/x86/emulator.c
++++ b/x86/emulator.c
+@@ -262,12 +262,13 @@ static void test_pop(void *mem)
  
- #endif /* TARGET_EFI */
-diff --git a/x86/efi/efistart64.S b/x86/efi/efistart64.S
-index cc993e5..315f8d3 100644
---- a/x86/efi/efistart64.S
-+++ b/x86/efi/efistart64.S
-@@ -21,6 +21,27 @@ ring0stacktop:
+ 	asm volatile("mov %%rsp, %[tmp] \n\t"
+ 		     "mov %[stack_top], %%rsp \n\t"
+-		     "push $1f \n\t"
++		     "lea 1f(%%rip), %%rax \n\t"
++		     "push %%rax \n\t"
+ 		     "ret \n\t"
+ 		     "2: jmp 2b \n\t"
+ 		     "1: mov %[tmp], %%rsp"
+ 		     : [tmp]"=&r"(tmp) : [stack_top]"r"(stack_top)
+-		     : "memory");
++		     : "memory", "rax");
+ 	report(1, "ret");
  
- .data
+ 	stack_top[-1] = 0x778899;
+diff --git a/x86/eventinj.c b/x86/eventinj.c
+index 46593c9..0cd68e8 100644
+--- a/x86/eventinj.c
++++ b/x86/eventinj.c
+@@ -155,9 +155,11 @@ asm("do_iret:"
+ 	"pushf"W" \n\t"
+ 	"mov %cs, %ecx \n\t"
+ 	"push"W" %"R "cx \n\t"
+-	"push"W" $2f \n\t"
++	"lea"W" 2f(%"R "ip), %"R "bx \n\t"
++	"push"W" %"R "bx \n\t"
  
-+.align PAGE_SIZE
-+.globl ptl2
-+ptl2:
-+	. = . + 4 * PAGE_SIZE
-+.align PAGE_SIZE
-+
-+.globl ptl3
-+ptl3:
-+	. = . + PAGE_SIZE
-+.align PAGE_SIZE
-+
-+.globl ptl4
-+ptl4:
-+	. = . + PAGE_SIZE
-+.align PAGE_SIZE
-+
-+.globl ptl5
-+ptl5:
-+	. = . + PAGE_SIZE
-+.align PAGE_SIZE
-+
- boot_idt:
- 	.rept 256
- 	.quad 0
+-	"cmpb $0, no_test_device\n\t"	// see if need to flush
++	"mov no_test_device(%"R "ip), %bl \n\t"
++	"cmpb $0, %bl\n\t"		// see if need to flush
+ 	"jnz 1f\n\t"
+ 	"outl %eax, $0xe4 \n\t"		// flush page
+ 	"1: \n\t"
+diff --git a/x86/smap.c b/x86/smap.c
+index ac2c8d5..b3ee16f 100644
+--- a/x86/smap.c
++++ b/x86/smap.c
+@@ -161,10 +161,10 @@ int main(int ac, char **av)
+ 		test = -1;
+ 		asm("or $(" xstr(USER_BASE) "), %"R "sp \n"
+ 		    "push $44 \n "
+-		    "decl test\n"
++		    "decl test(%"R "ip)\n"
+ 		    "and $~(" xstr(USER_BASE) "), %"R "sp \n"
+ 		    "pop %"R "ax\n"
+-		    "movl %eax, test");
++		    "movl %eax, test(%"R "ip)");
+ 		report(pf_count == 0 && test == 44,
+ 		       "write to user stack with AC=1");
+ 
+@@ -173,10 +173,10 @@ int main(int ac, char **av)
+ 		test = -1;
+ 		asm("or $(" xstr(USER_BASE) "), %"R "sp \n"
+ 		    "push $45 \n "
+-		    "decl test\n"
++		    "decl test(%"R "ip)\n"
+ 		    "and $~(" xstr(USER_BASE) "), %"R "sp \n"
+ 		    "pop %"R "ax\n"
+-		    "movl %eax, test");
++		    "movl %eax, test(%"R "ip)");
+ 		report(pf_count == 1 && test == 45 && save == -1,
+ 		       "write to user stack with AC=0");
+ 
+diff --git a/x86/umip.c b/x86/umip.c
+index c5700b3..8b4e798 100644
+--- a/x86/umip.c
++++ b/x86/umip.c
+@@ -23,7 +23,10 @@ static void gp_handler(struct ex_regs *regs)
+ 
+ #define GP_ASM(stmt, in, clobber)                  \
+     asm volatile (                                 \
+-          "mov" W " $1f, %[expected_rip]\n\t"      \
++          "push" W " %%" R "ax\n\t"                \
++	  "lea 1f(%%" R "ip), %%" R "ax\n\t"       \
++          "mov %%" R "ax, %[expected_rip]\n\t"     \
++          "pop" W " %%" R "ax\n\t"                 \
+           "movl $2f-1f, %[skip_count]\n\t"         \
+           "1: " stmt "\n\t"                        \
+           "2: "                                    \
+@@ -130,7 +133,8 @@ static int do_ring3(void (*fn)(const char *), const char *arg)
+ 		  "push" W " %%" R "dx \n\t"
+ 		  "pushf" W "\n\t"
+ 		  "push" W " %[user_cs] \n\t"
+-		  "push" W " $1f \n\t"
++		  "lea 1f(%%" R "ip), %%" R "dx \n\t"
++		  "push" W " %%" R "dx \n\t"
+ 		  "iret" W "\n"
+ 		  "1: \n\t"
+ 		  "push %%" R "cx\n\t"   /* save kernel SP */
+@@ -144,7 +148,7 @@ static int do_ring3(void (*fn)(const char *), const char *arg)
+ #endif
+ 
+ 		  "pop %%" R "cx\n\t"
+-		  "mov $1f, %%" R "dx\n\t"
++		  "lea 1f(%%" R "ip), %%" R "dx\n\t"
+ 		  "int %[kernel_entry_vector]\n\t"
+ 		  ".section .text.entry \n\t"
+ 		  "kernel_entry: \n\t"
 -- 
 2.33.0.rc1.237.g0d66db33f3-goog
 
