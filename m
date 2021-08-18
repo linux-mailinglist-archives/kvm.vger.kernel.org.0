@@ -2,257 +2,167 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 747283EFF94
-	for <lists+kvm@lfdr.de>; Wed, 18 Aug 2021 10:51:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 601193EFFBE
+	for <lists+kvm@lfdr.de>; Wed, 18 Aug 2021 10:57:57 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231971AbhHRIvj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 18 Aug 2021 04:51:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55274 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229985AbhHRIvf (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 18 Aug 2021 04:51:35 -0400
-Received: from mail-io1-xd49.google.com (mail-io1-xd49.google.com [IPv6:2607:f8b0:4864:20::d49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D607FC0617A8
-        for <kvm@vger.kernel.org>; Wed, 18 Aug 2021 01:51:00 -0700 (PDT)
-Received: by mail-io1-xd49.google.com with SMTP id k21-20020a5e93150000b02905b30d664397so829647iom.0
-        for <kvm@vger.kernel.org>; Wed, 18 Aug 2021 01:51:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:in-reply-to:message-id:mime-version:references:subject:from:to
-         :cc;
-        bh=Wes1UjyhNb61b4GTAEq2Q+YSBftTpn4TLv1okMP9rPY=;
-        b=ZK5M9W68s5nTbzUHPvmL+qtsMzhMy+l1OrZh8ZuK50KIGHllTOP/A8fEdzPdWyXyyy
-         u0Gw9qiHmvT8ZiIGpnkpF7ANyq+1T5vZr1QHUUrPHl1ItdDDluF5IbIspLapmCaxmWLQ
-         T/wqrv5JGdaRa3B9ETygi2KX6LfbPdeXbwPMrPkmYftPkUCc9HOmZt+cuyxkElsy3CO5
-         6nxWCk0d7Ph0HqEAuIHrKl5fahxkEIusx2+WYVMdHcw298EF2j+FvvgLsbJ+JLJCnNM8
-         jSHvKldxrQ9Yyt2QJturqRZ9lRIUlFcTO8vwuzF/pYU2fyha6a9CniIbkUp0jKptBa+S
-         zh9A==
+        id S231241AbhHRI6Z (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 18 Aug 2021 04:58:25 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:39152 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S231232AbhHRI6T (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 18 Aug 2021 04:58:19 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1629277065;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=jS5Oo5yG40hvfsBpZlz+cQmBdONR4SqLP55eL+HtH88=;
+        b=cSCylv0kfT+1p5U6oSdJR0K1W4lPWyD1+hnpHnLbtdlEcL2bCNMu2aHcuT45D1IJFNY5LS
+        L/D89KS0yrK0E3OYw8+rsAV0qxSqyVC7YUCREunqX+Qj0ik/rouYYhtauUv1HFTVO8S+rk
+        0Oc9yIPFeQIFrrZESOqBoJ9VBKfXydg=
+Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
+ [209.85.218.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-24-HuRN3Af8PjqLnUSunoG8fA-1; Wed, 18 Aug 2021 04:57:43 -0400
+X-MC-Unique: HuRN3Af8PjqLnUSunoG8fA-1
+Received: by mail-ej1-f71.google.com with SMTP id k21-20020a1709062a55b0290590e181cc34so629056eje.3
+        for <kvm@vger.kernel.org>; Wed, 18 Aug 2021 01:57:43 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:in-reply-to:message-id:mime-version
-         :references:subject:from:to:cc;
-        bh=Wes1UjyhNb61b4GTAEq2Q+YSBftTpn4TLv1okMP9rPY=;
-        b=JRvEJa8PMQWWtUaWoCKu439bVesGUwF28qAJHQhPhq+A6O7qeNfUMxTVBQep0v2TNd
-         n6dmiSVFAy4iVKiuPaVettv9oYUd2TnjS4qay/Npl7swfxKSuwy+FGBd1iH7LQKxZALl
-         1AUryw++N0Ne3pAqWFILyMPrtJqlUOpExcQ707kkS0+/ww2Dc8r6rlGIxOJ9K3zl6b6l
-         y7ofJ1v458l6IOOlttDxX9FiGynIClhhfcnr0r29KIUj8HWbvEidtge3dD3VqEgSRP3N
-         Y6Cd6FzWHAZa0T5kbtPYGTpQPA1h3fOigVhIkUzOSPEZ3ML14s1pAhIMYWXNrP8JJ1eg
-         wu8w==
-X-Gm-Message-State: AOAM530k1y/hG2RNrKR+AuuCccn+Xbrj0aRWkuhjfB3NqFhM06HJqOWV
-        NWKGwVrWWvVqazLfYSll6rEnzShl+vWgifcH9ytUAtMLfD7fVGh+UKpvcD/0AyMqQfSGIDizhpK
-        31HXNMb+6m3nC4J7tuSDmnOodKz5z3dQrq0NS5wozol5DhnYhE+xNTYtE1w==
-X-Google-Smtp-Source: ABdhPJy1RMvdwtOyt0N5TjIFDfranB+puWXV4+WT/ytcFX8r9cHhydBVlxTN0laPL8LiyiaqHtJfcCK0/Cw=
-X-Received: from oupton.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:404])
- (user=oupton job=sendgmr) by 2002:a92:6605:: with SMTP id a5mr5715036ilc.15.1629276660243;
- Wed, 18 Aug 2021 01:51:00 -0700 (PDT)
-Date:   Wed, 18 Aug 2021 08:50:47 +0000
-In-Reply-To: <20210818085047.1005285-1-oupton@google.com>
-Message-Id: <20210818085047.1005285-5-oupton@google.com>
-Mime-Version: 1.0
-References: <20210818085047.1005285-1-oupton@google.com>
-X-Mailer: git-send-email 2.33.0.rc1.237.g0d66db33f3-goog
-Subject: [PATCH 4/4] selftests: KVM: Introduce psci_cpu_on_test
-From:   Oliver Upton <oupton@google.com>
-To:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
-Cc:     Marc Zyngier <maz@kernel.org>, Peter Shier <pshier@google.com>,
-        Ricardo Koller <ricarkol@google.com>,
-        Jing Zhang <jingzhangos@google.com>,
-        Raghavendra Rao Anata <rananta@google.com>,
-        James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Oliver Upton <oupton@google.com>
-Content-Type: text/plain; charset="UTF-8"
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=jS5Oo5yG40hvfsBpZlz+cQmBdONR4SqLP55eL+HtH88=;
+        b=QBIniMVoP9/TsD+QhZhMclwiY+efARKkavOcbYbJ1DYkoC3oukK+ejo6Ez4QzJlc7t
+         E3EF5hMc6qabnBBiO/aRRyjC+GYdyVBC4rdMT2jczDZ13EaZb8zvwmcxvCd2AY48oFaf
+         WYCw90apGES5xLIMpGx4DNHWM365qfi2t9kjILvym2w5lnwjPMDajhZKZESj14zjsnc2
+         GViOpq9jAOM/kwXXSdJ8WktLUXVU+JIxsyv9YJp27fV3F5CVJ6MwEgbM389iSexCfPsb
+         rDdFKnlUNdZJ9mKbRHtWt4DX6rZkZQ5MF21N+AbrqYmwepTdHWs9GB8xvQa8JAjk9ABj
+         BlIA==
+X-Gm-Message-State: AOAM530HgQUSbmvX30ir0+U0KCjlLYQ681t4jh84Role9hkEZtB7Uk9H
+        orjxcRrXV9oqpbigJzMnekq3rGJ4smYEfpgdvnDzbMfWY6t5zWoZVcFrIfjPHBElI28LwCeFx61
+        WLppUDbYWbxgg
+X-Received: by 2002:a05:6402:22ab:: with SMTP id cx11mr8864088edb.240.1629277062710;
+        Wed, 18 Aug 2021 01:57:42 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxuZrPP72Z6Kp1pulO+le0Ubk5WDCJty44KO5sKHwMCufqo3iEffftwcerpwf9X2f6Zg5xCEg==
+X-Received: by 2002:a05:6402:22ab:: with SMTP id cx11mr8864080edb.240.1629277062490;
+        Wed, 18 Aug 2021 01:57:42 -0700 (PDT)
+Received: from thuth.remote.csb (pd9e83070.dip0.t-ipconnect.de. [217.232.48.112])
+        by smtp.gmail.com with ESMTPSA id q21sm1721005ejs.43.2021.08.18.01.57.41
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 18 Aug 2021 01:57:41 -0700 (PDT)
+Subject: Re: [kvm-unit-tests PATCH 1/8] s390x: lib: Extend bitops
+To:     Janosch Frank <frankja@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>
+Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org, david@redhat.com,
+        cohuck@redhat.com
+References: <20210813073615.32837-1-frankja@linux.ibm.com>
+ <20210813073615.32837-2-frankja@linux.ibm.com>
+ <20210813103240.33710ea6@p-imbrenda>
+ <e0bcb199-7254-01bb-baee-7de83b62495a@linux.ibm.com>
+ <de5b6d16-9ec1-5d77-00ac-61305d90851a@redhat.com>
+ <9d6730f4-21a2-d161-d609-557da2254909@linux.ibm.com>
+From:   Thomas Huth <thuth@redhat.com>
+Message-ID: <c72191c5-64d0-e66e-6519-b0df51023338@redhat.com>
+Date:   Wed, 18 Aug 2021 10:57:40 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.12.0
+MIME-Version: 1.0
+In-Reply-To: <9d6730f4-21a2-d161-d609-557da2254909@linux.ibm.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Introduce a test for aarch64 that ensures CPU resets induced by PSCI are
-reflected in the target vCPU's state, even if the target is never run
-again. This is a regression test for a race between vCPU migration and
-PSCI.
+On 18/08/2021 10.39, Janosch Frank wrote:
+> On 8/18/21 10:20 AM, Thomas Huth wrote:
+>> On 13/08/2021 13.31, Janosch Frank wrote:
+>>> On 8/13/21 10:32 AM, Claudio Imbrenda wrote:
+>>>> On Fri, 13 Aug 2021 07:36:08 +0000
+>>>> Janosch Frank <frankja@linux.ibm.com> wrote:
+>>>>
+>>>>> Bit setting and clearing is never bad to have.
+>>>>>
+>>>>> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+>>>>> ---
+>>>>>    lib/s390x/asm/bitops.h | 102
+>>>>> +++++++++++++++++++++++++++++++++++++++++ 1 file changed, 102
+>>>>> insertions(+)
+>>>>>
+>>>>> diff --git a/lib/s390x/asm/bitops.h b/lib/s390x/asm/bitops.h
+>>>>> index 792881ec..f5612855 100644
+>>>>> --- a/lib/s390x/asm/bitops.h
+>>>>> +++ b/lib/s390x/asm/bitops.h
+>>>>> @@ -17,6 +17,78 @@
+>>>>>    
+>>>>>    #define BITS_PER_LONG	64
+>>>>>    
+>>>>> +static inline unsigned long *bitops_word(unsigned long nr,
+>>>>> +					 const volatile unsigned
+>>>>> long *ptr) +{
+>>>>> +	unsigned long addr;
+>>>>> +
+>>>>> +	addr = (unsigned long)ptr + ((nr ^ (nr & (BITS_PER_LONG -
+>>>>> 1))) >> 3);
+>>>>> +	return (unsigned long *)addr;
+>>>>
+>>>> why not just
+>>>>
+>>>> return ptr + (nr / BITS_PER_LONG);
+>>>>
+>>>>> +}
+>>>>> +
+>>>>> +static inline unsigned long bitops_mask(unsigned long nr)
+>>>>> +{
+>>>>> +	return 1UL << (nr & (BITS_PER_LONG - 1));
+>>>>> +}
+>>>>> +
+>>>>> +static inline uint64_t laog(volatile unsigned long *ptr, uint64_t
+>>>>> mask) +{
+>>>>> +	uint64_t old;
+>>>>> +
+>>>>> +	/* load and or 64bit concurrent and interlocked */
+>>>>> +	asm volatile(
+>>>>> +		"	laog	%[old],%[mask],%[ptr]\n"
+>>>>> +		: [old] "=d" (old), [ptr] "+Q" (*ptr)
+>>>>> +		: [mask] "d" (mask)
+>>>>> +		: "memory", "cc" );
+>>>>> +	return old;
+>>>>> +}
+>>>>
+>>>> do we really need the artillery (asm) here?
+>>>> is there a reason why we can't do this in C?
+>>>
+>>> Those are the interlocked/atomic instructions and even though we don't
+>>> exactly need them right now I wanted to add them for completeness.
+>>
+>> I think I agree with Claudio - unless we really need them, we should not
+>> clog the sources with arbitrary inline assembly functions.
+> 
+> Alright I can trim it down
+> 
+>>
+>>> We might be able to achieve the same via compiler functionality but this
+>>> is not my expertise. Maybe Thomas or David have a few pointers for me?
+>>
+>> I'm not an expert with atomic builtins either, but what's the point of this
+>> at all? Loading a value and OR-ing something into the value in one go?
+>> What's that good for?
+> 
+> Well it's a block-concurrent interlocked-update load, or and store.
+> I.e. it loads the data from the ptr and copies it into [old] then ors
+> the mask and stores it back to the ptr address.
+> 
+> The instruction name "load and or" does not represent the full actions
+> of the instruction.
 
-Signed-off-by: Oliver Upton <oupton@google.com>
----
- tools/testing/selftests/kvm/.gitignore        |   1 +
- tools/testing/selftests/kvm/Makefile          |   1 +
- .../selftests/kvm/aarch64/psci_cpu_on_test.c  | 121 ++++++++++++++++++
- .../selftests/kvm/include/aarch64/processor.h |   3 +
- 4 files changed, 126 insertions(+)
- create mode 100644 tools/testing/selftests/kvm/aarch64/psci_cpu_on_test.c
+Ok, thanks, that makes more sense now, but you could at least have mentioned 
+this in the comment that you added in front of it :-)
 
-diff --git a/tools/testing/selftests/kvm/.gitignore b/tools/testing/selftests/kvm/.gitignore
-index 0709af0144c8..98053d3afbda 100644
---- a/tools/testing/selftests/kvm/.gitignore
-+++ b/tools/testing/selftests/kvm/.gitignore
-@@ -1,6 +1,7 @@
- # SPDX-License-Identifier: GPL-2.0-only
- /aarch64/debug-exceptions
- /aarch64/get-reg-list
-+/aarch64/psci_cpu_on_test
- /aarch64/vgic_init
- /s390x/memop
- /s390x/resets
-diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
-index 5832f510a16c..5d05801ab816 100644
---- a/tools/testing/selftests/kvm/Makefile
-+++ b/tools/testing/selftests/kvm/Makefile
-@@ -86,6 +86,7 @@ TEST_GEN_PROGS_x86_64 += kvm_binary_stats_test
- 
- TEST_GEN_PROGS_aarch64 += aarch64/debug-exceptions
- TEST_GEN_PROGS_aarch64 += aarch64/get-reg-list
-+TEST_GEN_PROGS_aarch64 += aarch64/psci_cpu_on_test
- TEST_GEN_PROGS_aarch64 += aarch64/vgic_init
- TEST_GEN_PROGS_aarch64 += demand_paging_test
- TEST_GEN_PROGS_aarch64 += dirty_log_test
-diff --git a/tools/testing/selftests/kvm/aarch64/psci_cpu_on_test.c b/tools/testing/selftests/kvm/aarch64/psci_cpu_on_test.c
-new file mode 100644
-index 000000000000..17a6234b4b42
---- /dev/null
-+++ b/tools/testing/selftests/kvm/aarch64/psci_cpu_on_test.c
-@@ -0,0 +1,121 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+/*
-+ * psci_cpu_on_test - Test that the observable state of a vCPU targeted by the
-+ * CPU_ON PSCI call matches what the caller requested.
-+ *
-+ * Copyright (c) 2021 Google LLC.
-+ *
-+ * This is a regression test for a race between KVM servicing the PSCI call and
-+ * userspace reading the vCPUs registers.
-+ */
-+
-+#define _GNU_SOURCE
-+
-+#include <linux/psci.h>
-+
-+#include "kvm_util.h"
-+#include "processor.h"
-+#include "test_util.h"
-+
-+#define VCPU_ID_SOURCE 0
-+#define VCPU_ID_TARGET 1
-+
-+#define CPU_ON_ENTRY_ADDR 0xfeedf00dul
-+#define CPU_ON_CONTEXT_ID 0xdeadc0deul
-+
-+static uint64_t psci_cpu_on(uint64_t target_cpu, uint64_t entry_addr,
-+			    uint64_t context_id)
-+{
-+	register uint64_t x0 asm("x0") = PSCI_0_2_FN64_CPU_ON;
-+	register uint64_t x1 asm("x1") = target_cpu;
-+	register uint64_t x2 asm("x2") = entry_addr;
-+	register uint64_t x3 asm("x3") = context_id;
-+
-+	asm("hvc #0"
-+	    : "=r"(x0)
-+	    : "r"(x0), "r"(x1), "r"(x2), "r"(x3)
-+	    : "memory");
-+
-+	return x0;
-+}
-+
-+static uint64_t psci_affinity_info(uint64_t target_affinity,
-+				   uint64_t lowest_affinity_level)
-+{
-+	register uint64_t x0 asm("x0") = PSCI_0_2_FN64_AFFINITY_INFO;
-+	register uint64_t x1 asm("x1") = target_affinity;
-+	register uint64_t x2 asm("x2") = lowest_affinity_level;
-+
-+	asm("hvc #0"
-+	    : "=r"(x0)
-+	    : "r"(x0), "r"(x1), "r"(x2)
-+	    : "memory");
-+
-+	return x0;
-+}
-+
-+static void guest_main(uint64_t target_cpu)
-+{
-+	GUEST_ASSERT(!psci_cpu_on(target_cpu, CPU_ON_ENTRY_ADDR, CPU_ON_CONTEXT_ID));
-+	uint64_t target_state;
-+
-+	do {
-+		target_state = psci_affinity_info(target_cpu, 0);
-+
-+		GUEST_ASSERT((target_state == PSCI_0_2_AFFINITY_LEVEL_ON) ||
-+			     (target_state == PSCI_0_2_AFFINITY_LEVEL_OFF));
-+	} while (target_state != PSCI_0_2_AFFINITY_LEVEL_ON);
-+
-+	GUEST_DONE();
-+}
-+
-+int main(void)
-+{
-+	uint64_t target_mpidr, obs_pc, obs_x0;
-+	struct kvm_vcpu_init init;
-+	struct kvm_vm *vm;
-+	struct ucall uc;
-+
-+	vm = vm_create(VM_MODE_DEFAULT, DEFAULT_GUEST_PHY_PAGES, O_RDWR);
-+	kvm_vm_elf_load(vm, program_invocation_name);
-+	ucall_init(vm, NULL);
-+
-+	vm_ioctl(vm, KVM_ARM_PREFERRED_TARGET, &init);
-+	init.features[0] |= (1 << KVM_ARM_VCPU_PSCI_0_2);
-+
-+	aarch64_vcpu_add_default(vm, VCPU_ID_SOURCE, &init, guest_main);
-+
-+	/*
-+	 * make sure the target is already off when executing the test.
-+	 */
-+	init.features[0] |= (1 << KVM_ARM_VCPU_POWER_OFF);
-+	aarch64_vcpu_add_default(vm, VCPU_ID_TARGET, &init, guest_main);
-+
-+	get_reg(vm, VCPU_ID_TARGET, ARM64_SYS_REG(MPIDR_EL1), &target_mpidr);
-+	vcpu_args_set(vm, VCPU_ID_SOURCE, 1, target_mpidr & MPIDR_HWID_BITMASK);
-+	vcpu_run(vm, VCPU_ID_SOURCE);
-+
-+	switch (get_ucall(vm, VCPU_ID_SOURCE, &uc)) {
-+	case UCALL_DONE:
-+		break;
-+	case UCALL_ABORT:
-+		TEST_FAIL("%s at %s:%ld", (const char *)uc.args[0], __FILE__,
-+			  uc.args[1]);
-+		break;
-+	default:
-+		TEST_FAIL("Unhandled ucall: %lu", uc.cmd);
-+	}
-+
-+	get_reg(vm, VCPU_ID_TARGET, ARM64_CORE_REG(regs.pc), &obs_pc);
-+	get_reg(vm, VCPU_ID_TARGET, ARM64_CORE_REG(regs.regs[0]), &obs_x0);
-+
-+	TEST_ASSERT(obs_pc == CPU_ON_ENTRY_ADDR,
-+		    "unexpected target cpu pc: %lx (expected: %lx)",
-+		    obs_pc, CPU_ON_ENTRY_ADDR);
-+	TEST_ASSERT(obs_x0 == CPU_ON_CONTEXT_ID,
-+		    "unexpected target context id: %lx (expected: %lx)",
-+		    obs_x0, CPU_ON_CONTEXT_ID);
-+
-+	kvm_vm_free(vm);
-+	return 0;
-+}
-diff --git a/tools/testing/selftests/kvm/include/aarch64/processor.h b/tools/testing/selftests/kvm/include/aarch64/processor.h
-index 27dc5c2e56b9..c0273aefa63d 100644
---- a/tools/testing/selftests/kvm/include/aarch64/processor.h
-+++ b/tools/testing/selftests/kvm/include/aarch64/processor.h
-@@ -17,6 +17,7 @@
- #define CPACR_EL1               3, 0,  1, 0, 2
- #define TCR_EL1                 3, 0,  2, 0, 2
- #define MAIR_EL1                3, 0, 10, 2, 0
-+#define MPIDR_EL1               3, 0,  0, 0, 5
- #define TTBR0_EL1               3, 0,  2, 0, 0
- #define SCTLR_EL1               3, 0,  1, 0, 0
- #define VBAR_EL1                3, 0, 12, 0, 0
-@@ -40,6 +41,8 @@
- 			  (0xfful << (4 * 8)) | \
- 			  (0xbbul << (5 * 8)))
- 
-+#define MPIDR_HWID_BITMASK (0xff00fffffful)
-+
- static inline void get_reg(struct kvm_vm *vm, uint32_t vcpuid, uint64_t id, uint64_t *addr)
- {
- 	struct kvm_one_reg reg;
--- 
-2.33.0.rc1.237.g0d66db33f3-goog
+Anyway, I guess it's easier to use the builtin atomic functions like 
+__atomic_or_fetch() for stuff like this in case we ever need it.
+
+  Thomas
 
