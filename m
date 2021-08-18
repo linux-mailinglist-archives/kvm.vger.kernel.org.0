@@ -2,54 +2,54 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2216D3F0DA5
-	for <lists+kvm@lfdr.de>; Wed, 18 Aug 2021 23:45:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D260B3F0DEC
+	for <lists+kvm@lfdr.de>; Thu, 19 Aug 2021 00:10:48 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234140AbhHRVqM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 18 Aug 2021 17:46:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39204 "EHLO
+        id S234433AbhHRWLW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 18 Aug 2021 18:11:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44826 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234116AbhHRVqM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 18 Aug 2021 17:46:12 -0400
-Received: from mail-vk1-xa32.google.com (mail-vk1-xa32.google.com [IPv6:2607:f8b0:4864:20::a32])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C76CEC061764
-        for <kvm@vger.kernel.org>; Wed, 18 Aug 2021 14:45:36 -0700 (PDT)
-Received: by mail-vk1-xa32.google.com with SMTP id l21so1055471vkd.10
-        for <kvm@vger.kernel.org>; Wed, 18 Aug 2021 14:45:36 -0700 (PDT)
+        with ESMTP id S234121AbhHRWLV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 18 Aug 2021 18:11:21 -0400
+Received: from mail-ej1-x642.google.com (mail-ej1-x642.google.com [IPv6:2a00:1450:4864:20::642])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 698AAC061764
+        for <kvm@vger.kernel.org>; Wed, 18 Aug 2021 15:10:46 -0700 (PDT)
+Received: by mail-ej1-x642.google.com with SMTP id b10so8164560eju.9
+        for <kvm@vger.kernel.org>; Wed, 18 Aug 2021 15:10:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=mime-version:reply-to:from:date:message-id:subject:to;
-        bh=hnpkbT75MvyH2IRqK0mBTKtD1fn5ppfDx2DGzJoxSw4=;
-        b=grJeB6a8GBGAeOYRdgmo2e2nObruIyZVOnniPRGqHPUdoIHguWUM051ZYNHb89QbGK
-         9FkQw9FXM/themzbcDFWRzMuI9lKXZJSKFFcreOV/sqVTUBMmgPi3whzbExFaB10ca+O
-         UO417noWN9TU/rVRC/vyPMjfaQ77a0deHR2RpD19DQVJu3XVOEOduIeYtrr17ePfP5UQ
-         sv7xEG9g+9jlImIbiI3y5VU0KeHTGiDF6w2+NabthYtsnSGRh7XrCTt4kTLQscuhsVgR
-         WTdUQtbGaeOd/jqDYS3gq64t6VwrVJZlKjsxLwscCbiw42vAVPwCEqMaoMOZI2h9KZ53
-         Suyg==
+        bh=d3t/0aB1Hb6b8x3cPGobwFTgI937lYUWcHaLVtAx3vY=;
+        b=mEQ8RWxlCGHxDYcu1w8gyV6J5v1glBEBGgcyr4pvJrqBUVqU17vqJMbhOgyef1jOLC
+         Q2/mkYsYRvO07nUX5/jjwGhvQ6uj8eaC7EUILB0x6g8Y6xp0x87uFZte+SBIB7ZpH3F7
+         9DWhOuReTNLMhY8Qlsx7JJkDZL9YQDdzRnlaLUOSzjxzj1i77M8fCZKg98iIQuFXae5J
+         VSEgrCiNUahXboCNp4x0z5qVZ2sgPRk0cR11a7ewxV7oshd+eeHyR34ELisvkdudXRVJ
+         85+LHiD0t245MJdlrz9EPph4rdlwXkdWBQuaiJ5eGJb5hhlNKATMQeuALs05dYwLOU64
+         wQdA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:reply-to:from:date:message-id
          :subject:to;
-        bh=hnpkbT75MvyH2IRqK0mBTKtD1fn5ppfDx2DGzJoxSw4=;
-        b=CyOIPPlLnlVhaVbS9fgYk1I3c6I+HeYUknOGDIIwTmk0RvACIIVf4NO34iJUf28Dkl
-         icrAOwIxe/JNAa7nG/9TlQX9lhTemJHrjKggiqvJ6zBRyeUZHUfuTnz7CmpI6hVU3r1i
-         STV9N7tr6F8L0LgEQFc9WOKwkSVwoldtVKhXtXWM8KiTrDu6slFvOviA8RuHyTWCYflE
-         sB14+NVF5qvXGsPfwQS+PHy7USMs85zI6fvSSd/SnXgA8CQKhUEw+tdHCrf2VTlhJ6zK
-         RiCX8GrtTz47JY5bvzdb5XdB4h1pwrkNOdgAEzhpQfOPeX2H2xMlVGqK9NbeASb9AyeS
-         rR7A==
-X-Gm-Message-State: AOAM531S3xeG1sgJ94frwcqQqq1koimnYbpQpGMdecM5RTbatXJVorum
-        2A593K524WANrXaiTGVxclX29L5MuuTGAK9A/Ls=
-X-Google-Smtp-Source: ABdhPJwWLZJUQsXQku9/1sX7DigchJTTBZCCH1kiR5mg1ObWfXzoWbUyISf0hZqyIQA9mDAmQRWT67AjmBB/LMGdQPE=
-X-Received: by 2002:a1f:5f55:: with SMTP id t82mr8996333vkb.9.1629323135275;
- Wed, 18 Aug 2021 14:45:35 -0700 (PDT)
+        bh=d3t/0aB1Hb6b8x3cPGobwFTgI937lYUWcHaLVtAx3vY=;
+        b=fl+XLqTvIcVt1xPHMS/T2d5FR8rvFmLD+5y0Gj26rkOgLELGpAUXJ6RgITzSWJeNQt
+         AZx2A3IvVJdCymLbhRFvgxGZy8Lfk+tWpPPrMFbL1+xDVPqMz+PTY3a/EO+5HvcvJZvN
+         NOnm8BBKSB78GzMMxCnUxuMrQaXBYDJ6SrayHuQ6MxuTjhoNxN5cOOTWWQ+Pvwcu2QNP
+         k/kcsuTmEtBYm9JHe6JX5XcFaX9qr+DnaSVbNkns1D16KPMblS+D+qjh4u2taiLLEpKa
+         Khx0WFYsWlJwP8c6T05FuPZmaTFzP2s27HRBZhZlhRqLYzOBYyMQb/trtsr+N+9enx2d
+         te+g==
+X-Gm-Message-State: AOAM5300KNqcACP0CSDrW/eflrqdzSGXUnUuZ1PpqA8VVUZQjspw4mgQ
+        MxqT1A8IQR7FapCY+caBt1IrYRGzdZfJA5eD9xA=
+X-Google-Smtp-Source: ABdhPJycibDfQH8LCxX4rSCF5Yob960Z6dCsE5InyydFoQqgEnZCnJFvlRVnrQVSf77imDvv8WYaRu/7zVokY7tJFe8=
+X-Received: by 2002:a17:906:11c7:: with SMTP id o7mr12047551eja.480.1629324644938;
+ Wed, 18 Aug 2021 15:10:44 -0700 (PDT)
 MIME-Version: 1.0
-Received: by 2002:a9f:3206:0:0:0:0:0 with HTTP; Wed, 18 Aug 2021 14:45:34
+Received: by 2002:ab4:a42e:0:0:0:0:0 with HTTP; Wed, 18 Aug 2021 15:10:44
  -0700 (PDT)
-Reply-To: th509232@gmail.com
-From:   "Mr. TOM HASSAN" <joej93149@gmail.com>
-Date:   Wed, 18 Aug 2021 14:45:34 -0700
-Message-ID: <CAAtFf91yGQ1Jg=AFL961wounozEjhXedLQK08QV9HFLMHYXb=g@mail.gmail.com>
-Subject: Dear Friend,
+Reply-To: samuelakin244@gmail.com
+From:   Mr Samuel Akin <amorsomda@gmail.com>
+Date:   Wed, 18 Aug 2021 22:10:44 +0000
+Message-ID: <CAAj8QhgyPCHheu=fwmT3gwPOewS26t6JNi_FQgED1AhxCxi3UQ@mail.gmail.com>
+Subject: Dear friend, Greetings!
 To:     undisclosed-recipients:;
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
@@ -57,42 +57,12 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 -- 
-Dear Friend,
+Dear friend, Greetings!
 
-I Am Mr.Tom HASSAN. from west Africa i have a business deal to sharewith
-you in the sum of10.2M USD dollars that is been held in our here in
-(B.O.A) bank of Africa the fund mentioned rightful belong to one of
-our late client who deposited the money in our bank here ever since he
-died nobody have been able to apply to claim the fund so i wish that
-you will come and
-assume as his foreign business partner alsonote this business is risk
-free not to be sacred or doubt is real please my dearest one also note
-this once we succeed in transferringthis fund to your wish provided
-account in your country it
-will shared among us inagreement of 60%40 i believe that after this
-deal joy and happiness will be on or face's and family's please reply
-to me with your detailsso we can move on with this great plan ok.
+I apologize if this email comes as a surprise to you. I have a
+business proposal that will be of great benefit to both of us. If you
+are willing to discuss further on this matter, I expect you reply.
+promptly so that I will give you further details.
 
-
-REPLY TO-- ( th509232@gmail.com)
-
-
-Your Full Name.......
-
-Your Age&Sex........
-
-Your Marital Status......
-
-Your Country Name.......
-
-Your Phone Number......
-
-Your Occupation.....
-
-Your Bank Name......
-
-Your Account Number......
-
-Thanks Yours Brotherly
-
-Mr. TOM HASSAN
+Best Regards,
+Mr.Samuel Akin
