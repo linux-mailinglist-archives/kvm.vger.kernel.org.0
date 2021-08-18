@@ -2,292 +2,194 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3E4833EFA3B
-	for <lists+kvm@lfdr.de>; Wed, 18 Aug 2021 07:39:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1625A3EFA5B
+	for <lists+kvm@lfdr.de>; Wed, 18 Aug 2021 07:50:58 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237960AbhHRFkA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 18 Aug 2021 01:40:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38196 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237868AbhHRFj4 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 18 Aug 2021 01:39:56 -0400
-Received: from mail-qv1-xf49.google.com (mail-qv1-xf49.google.com [IPv6:2607:f8b0:4864:20::f49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 38F34C061764
-        for <kvm@vger.kernel.org>; Tue, 17 Aug 2021 22:39:22 -0700 (PDT)
-Received: by mail-qv1-xf49.google.com with SMTP id z8-20020a0ce9880000b02903528f1b338aso1462633qvn.6
-        for <kvm@vger.kernel.org>; Tue, 17 Aug 2021 22:39:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=reply-to:date:in-reply-to:message-id:mime-version:references
-         :subject:from:to:cc;
-        bh=Ly2mUbxWquJWXZ0n6mTgg8xCjEBs0jIcnS3CpYGgC5c=;
-        b=vPynDVXk6ehrhHgxl1+QUtZVgsSVAdooemO288d0Th3g9VuiMFd0vBEfRJ5sZl+oIh
-         Equoj8czaMRmDg30celH+1WeSMqy/eeC228Y4vAoxCR8UHLlcAXc9jiM4Aoncw+Ob3tC
-         GVSAOYRy9Rbz//XzvA+cGNHoJs7eRXfvSU0uln0Q1RM+OAGa1ivo0osSRWhmZkuklxwE
-         DyXXlA3shXC1MV8e0DCrne/rrfc0haRaM8gmRigsLZxgcu5inkI8wiDAaMNBLY0dW6I8
-         q6NMrCZiOLetroHAZ3WGqOCkFz1RL5iEQNL9jNMWM3Py4MLdcd/SyoKDfGoQhdEFjJ1f
-         Twlg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:reply-to:date:in-reply-to:message-id
-         :mime-version:references:subject:from:to:cc;
-        bh=Ly2mUbxWquJWXZ0n6mTgg8xCjEBs0jIcnS3CpYGgC5c=;
-        b=coF5iccYB/wK1D5laA6M0REtUfzHzymBr7yFwHOxZuPOyAsXpw3hdTZiauy+JsIyau
-         q+vqeECZfPrFY/kPjHF/tJqjMwt1uE7bc55G0uvKobuDcHFR/U0270n8kF6acOAbMklu
-         8Q+g5YWq8839w/EcTWyoF96fVzh6/qA2rPEIuk++CgOyNKl+bNya1PYSdhZQSdFtBwhT
-         ulRZUnOGvacISzcplB3NSIh9RujT+Ld0UcvZmwlywdUibtX3MR/qe/wIq4t/IZfoxZr9
-         o2LLz4HkvhIzWHe/mB+prxL3uyqo5KcamSLnSp5BESXqLMypy+XbUCQ18nzZ0x+a2NSv
-         stSA==
-X-Gm-Message-State: AOAM532ofQNUSaDHYZdboJb+JVEgEy+tHCmI0RN/44WIXQRlJjS3XrLY
-        7D3pqf/eydv59DVip1eX7v6IZAAqQq9D
-X-Google-Smtp-Source: ABdhPJzzp5zo1v7+tkTWIY0BI2yhSNUQ8K2xJDgnqbCm1fHs6P2WetL/0J1YhbNXLy5m2t0dl7vwoLSI1OBG
-X-Received: from mizhang-super.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:1071])
- (user=mizhang job=sendgmr) by 2002:a05:6214:f0c:: with SMTP id
- gw12mr7442298qvb.2.1629265161426; Tue, 17 Aug 2021 22:39:21 -0700 (PDT)
-Reply-To: Mingwei Zhang <mizhang@google.com>
-Date:   Wed, 18 Aug 2021 05:39:08 +0000
-In-Reply-To: <20210818053908.1907051-1-mizhang@google.com>
-Message-Id: <20210818053908.1907051-5-mizhang@google.com>
-Mime-Version: 1.0
-References: <20210818053908.1907051-1-mizhang@google.com>
-X-Mailer: git-send-email 2.33.0.rc1.237.g0d66db33f3-goog
-Subject: [PATCH v2 4/4] KVM: SVM: move sev_unbind_asid and DF_FLUSH logic into psp
-From:   Mingwei Zhang <mizhang@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        Brijesh Singh <brijesh.singh@amd.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        John Allen <john.allen@amd.com>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Alper Gun <alpergun@google.com>,
-        Borislav Petkov <bp@alien8.de>,
-        David Rienjes <rientjes@google.com>,
-        Marc Orr <marcorr@google.com>, Peter Gonda <pgonda@google.com>,
-        Vipin Sharma <vipinsh@google.com>,
-        Mingwei Zhang <mizhang@google.com>
+        id S237905AbhHRFva (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 18 Aug 2021 01:51:30 -0400
+Received: from mga07.intel.com ([134.134.136.100]:41725 "EHLO mga07.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S237889AbhHRFva (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 18 Aug 2021 01:51:30 -0400
+X-IronPort-AV: E=McAfee;i="6200,9189,10079"; a="279996974"
+X-IronPort-AV: E=Sophos;i="5.84,330,1620716400"; 
+   d="scan'208";a="279996974"
+Received: from fmsmga007.fm.intel.com ([10.253.24.52])
+  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Aug 2021 22:50:55 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.84,330,1620716400"; 
+   d="scan'208";a="449543028"
+Received: from sqa-gate.sh.intel.com (HELO robert-ivt.tsp.org) ([10.239.48.212])
+  by fmsmga007.fm.intel.com with ESMTP; 17 Aug 2021 22:50:53 -0700
+Message-ID: <b2bf00a6a8f3f88555bebf65b35579968ea45e2a.camel@linux.intel.com>
+Subject: Re: [PATCH v1 3/5] KVM: x86: nVMX: VMCS12 field's read/write
+ respects field existence bitmap
+From:   Robert Hoo <robert.hu@linux.intel.com>
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     pbonzini@redhat.com, vkuznets@redhat.com, wanpengli@tencent.com,
+        jmattson@google.com, joro@8bytes.org, kvm@vger.kernel.org,
+        yu.c.zhang@linux.intel.com
+Date:   Wed, 18 Aug 2021 13:50:52 +0800
+In-Reply-To: <YRvbvqhz6sknDEWe@google.com>
+References: <1629192673-9911-1-git-send-email-robert.hu@linux.intel.com>
+         <1629192673-9911-4-git-send-email-robert.hu@linux.intel.com>
+         <YRvbvqhz6sknDEWe@google.com>
 Content-Type: text/plain; charset="UTF-8"
+X-Mailer: Evolution 3.28.5 (3.28.5-8.el7) 
+Mime-Version: 1.0
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-In KVM SEV code, sev_unbind_asid and sev_guest_df_flush needs to be
-serialized because DEACTIVATE command in PSP may clear the WBINVD indicator
-and cause DF_FLUSH to fail.
+On Tue, 2021-08-17 at 15:54 +0000, Sean Christopherson wrote:
+> On Tue, Aug 17, 2021, Robert Hoo wrote:
+> > In vmcs12_{read,write}_any(), check the field exist or not. If not,
+> > return
+> > failure. Hence their function prototype changed a little
+> > accordingly.
+> > In handle_vm{read,write}(), above function's caller, check return
+> > value, if
+> > failed, emulate nested vmx fail with instruction error of
+> > VMXERR_UNSUPPORTED_VMCS_COMPONENT.
+> > 
+> > Signed-off-by: Robert Hoo <robert.hu@linux.intel.com>
+> > Signed-off-by: Yu Zhang <yu.c.zhang@linux.intel.com>
+> 
+> Assuming Yu is a co-author, this needs to be:
+> 
+>   Co-developed-by: Yu Zhang <yu.c.zhang@linux.intel.com>
+>   Signed-off-by: Yu Zhang <yu.c.zhang@linux.intel.com>
+>   Signed-off-by: Robert Hoo <robert.hu@linux.intel.com>
+> 
+> See "When to use Acked-by:, Cc:, and Co-developed-by:" in
+> Documentation/process/submitting-patches.rst.
+OK, thanks.
 
-This is a PSP level detail that is not necessary to expose to KVM. So put
-both functions as well as the RWSEM into the sev-dev.c.
+> 
+> > ---
+> >  arch/x86/kvm/vmx/nested.c | 20 ++++++++++++------
+> >  arch/x86/kvm/vmx/vmcs12.h | 43 ++++++++++++++++++++++++++++++-----
+> > ----
+> >  2 files changed, 47 insertions(+), 16 deletions(-)
+> > 
+> > diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+> > index b8121f8f6d96..9a35953ede22 100644
+> > --- a/arch/x86/kvm/vmx/nested.c
+> > +++ b/arch/x86/kvm/vmx/nested.c
+> > @@ -1547,7 +1547,8 @@ static void copy_shadow_to_vmcs12(struct
+> > vcpu_vmx *vmx)
+> >  	for (i = 0; i < max_shadow_read_write_fields; i++) {
+> >  		field = shadow_read_write_fields[i];
+> >  		val = __vmcs_readl(field.encoding);
+> > -		vmcs12_write_any(vmcs12, field.encoding, field.offset,
+> > val);
+> > +		vmcs12_write_any(vmcs12, field.encoding, field.offset,
+> > val,
+> > +				 vmx-
+> > >nested.vmcs12_field_existence_bitmap);
+> 
+> There is no need to perform existence checks when KVM is copying
+> to/from vmcs12,
+> the checks are only needed for VMREAD and VMWRITE.  Architecturally,
+> the VMCS is
+> an opaque blob, software cannot rely on any assumptions about its
+> layout or data,
+> i.e. KVM is free to read/write whatever it wants.   VMREAD and
+> VMWRITE need to be
+> enforced because architecturally they are defined to fail if the
+> field does not exist.
+OK, agree.
 
-No functional change intended.
+> 
+> Limiting this to VMREAD/VMWRITE means we shouldn't need a bitmap and
+> can use a
+> more static lookup, e.g. a switch statement.  
+Emm, hard for me to choose:
 
-Cc: Alper Gun <alpergun@google.com>
-Cc: Borislav Petkov <bp@alien8.de>
-Cc: Brijesh Singh <brijesh.singh@amd.com>
-Cc: David Rienjes <rientjes@google.com>
-Cc: Marc Orr <marcorr@google.com>
-Cc: John Allen <john.allen@amd.com>
-Cc: Peter Gonda <pgonda@google.com>
-Cc: Sean Christopherson <seanjc@google.com>
-Cc: Tom Lendacky <thomas.lendacky@amd.com>
-Cc: Vipin Sharma <vipinsh@google.com>
+Your approach sounds more efficient for CPU: Once VMX MSR's updated, no
+bother to update the bitmap. Each field's existence check will directly
+consult related VMX MSR. Well, the switch statement will be long...
 
-Acked-by: Brijesh Singh <brijesh.singh@amd.com>
-Signed-off-by: Mingwei Zhang <mizhang@google.com>
----
- arch/x86/kvm/svm/sev.c       | 35 +++-------------------------------
- drivers/crypto/ccp/sev-dev.c | 37 +++++++++++++++++++++++++++++++++++-
- include/linux/psp-sev.h      | 19 +++++++++++++++++-
- 3 files changed, 57 insertions(+), 34 deletions(-)
+My this implementation: once VMX MSR's updated, the update needs to be
+passed to bitmap, this is 1 extra step comparing to aforementioned
+above. But, later, when query field existence, especially the those
+consulting vm{entry,exit}_ctrl, they usually would have to consult both
+MSRs if otherwise no bitmap, and we cannot guarantee if in the future
+there's no more complicated dependencies. If using bitmap, this consult
+is just 1-bit reading. If no bitmap, several MSR's read and compare
+happen.
+And, VMX MSR --> bitmap, usually happens only once when vCPU model is
+settled. But VMRead/VMWrite might happen frequently, depends on guest
+itself. I'd rather leave complicated comparison in former than in
+later.
 
-diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-index 157962aa4aff..ab5f14adc591 100644
---- a/arch/x86/kvm/svm/sev.c
-+++ b/arch/x86/kvm/svm/sev.c
-@@ -57,7 +57,6 @@ module_param_named(sev_es, sev_es_enabled, bool, 0444);
- #endif /* CONFIG_KVM_AMD_SEV */
- 
- static u8 sev_enc_bit;
--static DECLARE_RWSEM(sev_deactivate_lock);
- static DEFINE_MUTEX(sev_bitmap_lock);
- unsigned int max_sev_asid;
- static unsigned int min_sev_asid;
-@@ -84,20 +83,9 @@ static int sev_flush_asids(int min_asid, int max_asid)
- 	if (asid > max_asid)
- 		return -EBUSY;
- 
--	/*
--	 * DEACTIVATE will clear the WBINVD indicator causing DF_FLUSH to fail,
--	 * so it must be guarded.
--	 */
--	down_write(&sev_deactivate_lock);
--
--	wbinvd_on_all_cpus();
- 	ret = sev_guest_df_flush(&error);
--
--	up_write(&sev_deactivate_lock);
--
- 	if (ret)
- 		pr_err("SEV: DF_FLUSH failed, ret=%d, error=%#x\n", ret, error);
--
- 	return ret;
- }
- 
-@@ -198,23 +186,6 @@ static void sev_asid_free(struct kvm_sev_info *sev)
- 	sev->misc_cg = NULL;
- }
- 
--static void sev_unbind_asid(struct kvm *kvm, unsigned int handle)
--{
--	struct sev_data_deactivate deactivate;
--
--	if (!handle)
--		return;
--
--	deactivate.handle = handle;
--
--	/* Guard DEACTIVATE against WBINVD/DF_FLUSH used in ASID recycling */
--	down_read(&sev_deactivate_lock);
--	sev_guest_deactivate(&deactivate, NULL);
--	up_read(&sev_deactivate_lock);
--
--	sev_guest_decommission(handle, NULL);
--}
--
- static int sev_guest_init(struct kvm *kvm, struct kvm_sev_cmd *argp)
- {
- 	struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
-@@ -329,7 +300,7 @@ static int sev_launch_start(struct kvm *kvm, struct kvm_sev_cmd *argp)
- 	/* return handle to userspace */
- 	params.handle = start.handle;
- 	if (copy_to_user((void __user *)(uintptr_t)argp->data, &params, sizeof(params))) {
--		sev_unbind_asid(kvm, start.handle);
-+		sev_guest_unbind_asid(start.handle);
- 		ret = -EFAULT;
- 		goto e_free_session;
- 	}
-@@ -1377,7 +1348,7 @@ static int sev_receive_start(struct kvm *kvm, struct kvm_sev_cmd *argp)
- 	if (copy_to_user((void __user *)(uintptr_t)argp->data,
- 			 &params, sizeof(struct kvm_sev_receive_start))) {
- 		ret = -EFAULT;
--		sev_unbind_asid(kvm, start.handle);
-+		sev_guest_unbind_asid(start.handle);
- 		goto e_free_session;
- 	}
- 
-@@ -1788,7 +1759,7 @@ void sev_vm_destroy(struct kvm *kvm)
- 
- 	mutex_unlock(&kvm->lock);
- 
--	sev_unbind_asid(kvm, sev->handle);
-+	sev_guest_unbind_asid(sev->handle);
- 	sev_asid_free(sev);
- }
- 
-diff --git a/drivers/crypto/ccp/sev-dev.c b/drivers/crypto/ccp/sev-dev.c
-index 325e79360d9e..e318a1a222f9 100644
---- a/drivers/crypto/ccp/sev-dev.c
-+++ b/drivers/crypto/ccp/sev-dev.c
-@@ -33,6 +33,7 @@
- #define SEV_FW_NAME_SIZE	64
- 
- static DEFINE_MUTEX(sev_cmd_mutex);
-+static DECLARE_RWSEM(sev_deactivate_lock);
- static struct sev_misc_dev *misc_dev;
- 
- static int psp_cmd_timeout = 100;
-@@ -932,10 +933,44 @@ EXPORT_SYMBOL_GPL(sev_guest_decommission);
- 
- int sev_guest_df_flush(int *error)
- {
--	return sev_do_cmd(SEV_CMD_DF_FLUSH, NULL, error);
-+	int ret;
-+	/*
-+	 * DEACTIVATE will clear the WBINVD indicator causing DF_FLUSH to fail,
-+	 * so it must be guarded.
-+	 */
-+	down_write(&sev_deactivate_lock);
-+
-+	wbinvd_on_all_cpus();
-+
-+	ret = sev_do_cmd(SEV_CMD_DF_FLUSH, NULL, error);
-+
-+	up_write(&sev_deactivate_lock);
-+
-+	return ret;
- }
- EXPORT_SYMBOL_GPL(sev_guest_df_flush);
- 
-+int sev_guest_unbind_asid(unsigned int handle)
-+{
-+	struct sev_data_deactivate deactivate;
-+	int ret;
-+
-+	if (!handle)
-+		return -EINVAL;
-+
-+	deactivate.handle = handle;
-+
-+	/* Guard DEACTIVATE against WBINVD/DF_FLUSH used in ASID recycling */
-+	down_read(&sev_deactivate_lock);
-+	ret = sev_guest_deactivate(&deactivate, NULL);
-+	up_read(&sev_deactivate_lock);
-+
-+	sev_guest_decommission(handle, NULL);
-+
-+	return ret;
-+}
-+EXPORT_SYMBOL_GPL(sev_guest_unbind_asid);
-+
- static void sev_exit(struct kref *ref)
- {
- 	misc_deregister(&misc_dev->misc);
-diff --git a/include/linux/psp-sev.h b/include/linux/psp-sev.h
-index be50446ff3f1..09447bce9665 100644
---- a/include/linux/psp-sev.h
-+++ b/include/linux/psp-sev.h
-@@ -580,6 +580,20 @@ int sev_issue_cmd_external_user(struct file *filep, unsigned int id,
-  */
- int sev_guest_deactivate(struct sev_data_deactivate *data, int *error);
- 
-+/**
-+ * sev_guest_unbind_asid - perform SEV DEACTIVATE command with lock held
-+ *
-+ * @handle: handle of the VM to deactivate
-+ *
-+ * Returns:
-+ * 0 if the sev successfully processed the command
-+ * -%ENODEV    if the sev device is not available
-+ * -%ENOTSUPP  if the sev does not support SEV
-+ * -%ETIMEDOUT if the sev command timed out
-+ * -%EIO       if the sev returned a non-zero return code
-+ */
-+int sev_guest_unbind_asid(unsigned int handle);
-+
- /**
-  * sev_guest_activate - perform SEV ACTIVATE command
-  *
-@@ -612,7 +626,7 @@ int sev_guest_activate(struct sev_data_activate *data, int *error);
- int sev_guest_bind_asid(int asid, unsigned int handle, int *error);
- 
- /**
-- * sev_guest_df_flush - perform SEV DF_FLUSH command
-+ * sev_guest_df_flush - perform SEV DF_FLUSH command with lock held
-  *
-  * @sev_ret: sev command return code
-  *
-@@ -656,6 +670,9 @@ sev_guest_deactivate(struct sev_data_deactivate *data, int *error) { return -ENO
- static inline int
- sev_guest_decommission(unsigned int handle, int *error) { return -ENODEV; }
- 
-+static inline int
-+sev_guest_unbind_asid(unsigned int handle) { return -ENODEV; }
-+
- static inline int
- sev_guest_activate(struct sev_data_activate *data, int *error) { return -ENODEV; }
- 
--- 
-2.33.0.rc1.237.g0d66db33f3-goog
+
+> And an idea to optimize for fields
+> that unconditionally exist would be to use bit 0 in the field->offset 
+> table to
+> denote conditional fields, e.g. the VMREAD/VMRITE lookups could be
+> something like:
+Though all fields offset is even today, can we assert no new odd-offset 
+field won't be added some day?
+And, what if some day, some field's conditional/unconditional existence
+depends on CPU model?
+
+> 
+> diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+> index bc6327950657..ef8c48f80d1a 100644
+> --- a/arch/x86/kvm/vmx/nested.c
+> +++ b/arch/x86/kvm/vmx/nested.c
+> @@ -5064,7 +5064,7 @@ static int handle_vmread(struct kvm_vcpu *vcpu)
+>         /* Decode instruction info and find the field to read */
+>         field = kvm_register_read(vcpu, (((instr_info) >> 28) &
+> 0xf));
+> 
+> -       offset = vmcs_field_to_offset(field);
+> +       offset = vmcs_field_to_offset(vmx, field);
+>         if (offset < 0)
+>                 return nested_vmx_fail(vcpu,
+> VMXERR_UNSUPPORTED_VMCS_COMPONENT);
+> 
+> @@ -5167,7 +5167,7 @@ static int handle_vmwrite(struct kvm_vcpu
+> *vcpu)
+> 
+>         field = kvm_register_read(vcpu, (((instr_info) >> 28) &
+> 0xf));
+> 
+> -       offset = vmcs_field_to_offset(field);
+> +       offset = vmcs_field_to_offset(vmx, field);
+>         if (offset < 0)
+>                 return nested_vmx_fail(vcpu,
+> VMXERR_UNSUPPORTED_VMCS_COMPONENT);
+> 
+> diff --git a/arch/x86/kvm/vmx/vmcs12.h b/arch/x86/kvm/vmx/vmcs12.h
+> index 2a45f026ee11..3c27631e0119 100644
+> --- a/arch/x86/kvm/vmx/vmcs12.h
+> +++ b/arch/x86/kvm/vmx/vmcs12.h
+> @@ -364,7 +364,8 @@ static inline void vmx_check_vmcs12_offsets(void)
+>  extern const unsigned short vmcs_field_to_offset_table[];
+>  extern const unsigned int nr_vmcs12_fields;
+> 
+> -static inline short vmcs_field_to_offset(unsigned long field)
+> +static inline short vmcs_field_to_offset(struct vcpu_vmx *vmx,
+> +                                        unsigned long field)
+>  {
+>         unsigned short offset;
+>         unsigned int index;
+> @@ -378,9 +379,10 @@ static inline short
+> vmcs_field_to_offset(unsigned long field)
+> 
+>         index = array_index_nospec(index, nr_vmcs12_fields);
+>         offset = vmcs_field_to_offset_table[index];
+> -       if (offset == 0)
+> +       if (offset == 0 ||
+> +           ((offset & 1) && !vmcs12_field_exists(vmx, field)))
+>                 return -ENOENT;
+> -       return offset;
+> +       return offset & ~1;
+>  }
+> 
+>  static inline u64 vmcs12_read_any(struct vmcs12 *vmcs12, unsigned
+> long field,
 
