@@ -2,56 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9F53D3EF68D
+	by mail.lfdr.de (Postfix) with ESMTP id E7A323EF68E
 	for <lists+kvm@lfdr.de>; Wed, 18 Aug 2021 02:09:49 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237042AbhHRAKG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 17 Aug 2021 20:10:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48444 "EHLO
+        id S237059AbhHRAKK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 17 Aug 2021 20:10:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48452 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237022AbhHRAKE (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 17 Aug 2021 20:10:04 -0400
-Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 02796C0613C1
-        for <kvm@vger.kernel.org>; Tue, 17 Aug 2021 17:09:31 -0700 (PDT)
-Received: by mail-yb1-xb4a.google.com with SMTP id b127-20020a25e485000000b005943f1efa05so947764ybh.15
-        for <kvm@vger.kernel.org>; Tue, 17 Aug 2021 17:09:30 -0700 (PDT)
+        with ESMTP id S237043AbhHRAKG (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 17 Aug 2021 20:10:06 -0400
+Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C35B6C061764
+        for <kvm@vger.kernel.org>; Tue, 17 Aug 2021 17:09:32 -0700 (PDT)
+Received: by mail-yb1-xb49.google.com with SMTP id n20-20020a2540140000b0290593b8e64cd5so987171yba.3
+        for <kvm@vger.kernel.org>; Tue, 17 Aug 2021 17:09:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=date:in-reply-to:message-id:mime-version:references:subject:from:to
          :cc;
-        bh=K8jwsKzs7IEe9iRNrLfVJdwIHJGIIxqcPB0yjD0e3tQ=;
-        b=KlTTUR+o3+BFUUCaZ9TQXlPXog9BsPKwgcz7XjAK1Pkm+PLiDrwckDGPTWgHq3PaMA
-         XXC/Iibv+EHgtuCpqEuOvVUW/JGyhUkNPRSedtDd4YtmWuGOtt+RiBl0u79hA3PTXiCT
-         qhn+WcnrjXYeUjhDp5/rtG3GlLS3LjDrtjCo48oDj9wIetA4o4t8gsnvx87bWlH2EWv0
-         8gX6W7zs08rxAQgKQ+oTy3FPEusGQP9h5Uhs7a6AU1pIp2+zrXmcKd40U7mhbLqpmHSA
-         ltx++VbHnaxukwin6N01eR+KO1zrJxDaif360y4LXSScIE6kUAswNtXsoG5I1qQeJVVy
-         gStg==
+        bh=g1e1WEzulI/qW8EFIHbSbX5jFfcwcrpuQfCUljk8RHk=;
+        b=gWVjCgotjyUmyCPXRuM3cNQoD7BH0xo2ZXjOw7NpKBHm0nOlDguYxR2C3kQqJ8xCg/
+         b+QZ9wJkIUZKIElsCAqHcbAnp5MjFUjcSfpjxDsw7tUmY1WfHMcsbwe1BKxDlYdgBJoH
+         KGq0L7mVgjPYvEjQDbJnkPTAu5uhVcQN75xri8HKrUjDYClZdJz0Y6TKTvyMFKW5l5i9
+         M2/IGYoNewoLwUjiarMUR3O3jEbA3eJNJK/CrEAeMRvNbFgozXjgyF4NinlezxywWE00
+         nh0v7Hcn9dtaRq4S9nbhCPDunLIzrZ4ffLpJS399jF+lrBIcWmeM+W1huYgYQbORDT9H
+         GZ4Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=K8jwsKzs7IEe9iRNrLfVJdwIHJGIIxqcPB0yjD0e3tQ=;
-        b=VBALWmmwo6r3tHJO9kURWkiQwEbOmE4bwEWAYOimN5EMlM29pBSsVtKFPxeEoXd4bp
-         bre2ub6jTeISDvFXjXB0Llk2iB1ZUM7+FUS7okxaivsKPqskU/udz9lyP2Ao4Cn0n89F
-         eqWOMC4L+zi9olRoI8eCpYugO68pZGvnIkXjS/QkvaIqMsDIZcVvZqeXVMTSemvd+5hZ
-         Ub4uJmEwbkfTIkRV3YfGZleXkN6tfeqNpUtyk1nHlG36wQgZ4hqnJU8ngnGKtP+u//YL
-         5Gm4u9M0yNPNah/YFeiCWemgTbGzv2om/9WN6u4QWc+CX0Fa2+Jp21SN6bc0KR17UsTp
-         ojgQ==
-X-Gm-Message-State: AOAM531q1GqyzCERSe2ItQbOyvjKnQWUB8x3FU7YqFsa1bO/8Ir+3/Fc
-        H0jq6e8lcy0YqDLnOdFX3boxMwVQY/hXlFjIEcpYiAS94ylji/8KPeedEXEcaTbkV4IRBcBs7Nv
-        6yznHUTRmkhndBD4/L0qYBUqsrwuiK2ebzMiEck0hxDmv405aYttD/rwhJqVKE6nxjXwZ
-X-Google-Smtp-Source: ABdhPJy+0Un8M2L4iyvOHpxOeLvC6CSdYs2xEe/z8PrrfpcVouYxQPqT0d2BTN9JWKZcgIo1j/Snk1mHEnXuJ2Fa
+        bh=g1e1WEzulI/qW8EFIHbSbX5jFfcwcrpuQfCUljk8RHk=;
+        b=fpNKGpAzpFv19i57sJ6rv1+Qm5PRf5O0JPoWjrhydMoE3VqpA/2rn7dHYmBOnlp62W
+         NZY+RrGwXrsH1cTUY5v8q6z2IYHx/9kDXKoi9UM984cqtx5bprlWyO2i6rfpoiKDrCUh
+         6IoZcJk6Zp4XTvi2YDe7YO7ot2kDq+8g6grJhLCj+1tt3ch/ltUSNRJzhDkwwW85/7Eu
+         ArkdSjJmRaOtExT577F7+PM5a/p5t/9n+nN1AXUCj89OUykzNiDIB6g0dqk+QcTMdQVA
+         PrygvPeT6CJSO6Jsrr3n4TXK6/68jSLXqQrGWENDzBqhVav7LUr2cfhhJ/xyJytdbvp9
+         DFaQ==
+X-Gm-Message-State: AOAM533RxP8tnjSLZ01QDk1X9fbA98SEZtbrRTnBQjCfeHun2sZBfWgW
+        ccIceBBwvOF8SqLCKmyoXW8Cz4KSw2RbRr6pc5yTmvt/NUoQ2oNKJ9lYQy9Cp9nzahQndjngWKS
+        8P49YcHUt7jC/KcWeANW+Swuamv5yjKPFFziNZUJP2H7UU0WAJpFVtuN4ECuypWZE/MGW
+X-Google-Smtp-Source: ABdhPJw/DBBxWSZBULObvBikoETdpp24JkTVO7aUKoNRK07ILolguhM2PtaQ9f5PoExlS6QNMe8v7Z9YFklbA/MU
 X-Received: from zxwang42.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:2936])
- (user=zixuanwang job=sendgmr) by 2002:a25:80d4:: with SMTP id
- c20mr7831758ybm.345.1629245370090; Tue, 17 Aug 2021 17:09:30 -0700 (PDT)
-Date:   Wed, 18 Aug 2021 00:08:58 +0000
+ (user=zixuanwang job=sendgmr) by 2002:a25:e7d0:: with SMTP id
+ e199mr7960619ybh.203.1629245371930; Tue, 17 Aug 2021 17:09:31 -0700 (PDT)
+Date:   Wed, 18 Aug 2021 00:08:59 +0000
 In-Reply-To: <20210818000905.1111226-1-zixuanwang@google.com>
-Message-Id: <20210818000905.1111226-10-zixuanwang@google.com>
+Message-Id: <20210818000905.1111226-11-zixuanwang@google.com>
 Mime-Version: 1.0
 References: <20210818000905.1111226-1-zixuanwang@google.com>
 X-Mailer: git-send-email 2.33.0.rc1.237.g0d66db33f3-goog
-Subject: [kvm-unit-tests RFC 09/16] x86 UEFI: Convert x86 test cases to PIC
+Subject: [kvm-unit-tests RFC 10/16] x86 AMD SEV: Initial support
 From:   Zixuan Wang <zixuanwang@google.com>
 To:     kvm@vger.kernel.org, pbonzini@redhat.com, drjones@redhat.com
 Cc:     marcorr@google.com, baekhw@google.com, tmroeder@google.com,
@@ -64,280 +64,341 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-UEFI loads EFI applications to dynamic runtime addresses, so it requires
-all applications to be compiled as PIC (position independent code). PIC
-does not allow the usage of compile time absolute address.
+AMD Secure Encrypted Virtualization (SEV) is a hardware accelerated
+memory encryption feature that protects guest VMs from host attacks.
 
-This commit converts multiple x86 test cases to PIC so they can compile
-and run in UEFI:
-
-- x86/cet.efi
-
-- x86/emulator.c: x86/emulator.c depends on lib/x86/usermode.c. But
-usermode.c contains non-PIC inline assembly code and thus blocks the
-compilation with GNU-EFI. This commit converts lib/x86/usermode.c and
-x86/emulator.c to PIC, so x86/emulator.c can compile and run in UEFI.
-
-- x86/vmware_backdoors.c: it depends on lib/x86/usermode.c and now works
-without modifications
-
-- x86/eventinj.c
-
-- x86/smap.c
-
-- x86/access.c
-
-- x86/umip.c
+This commit provides set up code and a test case for AMD SEV. The set up
+code checks if SEV is supported and enabled, and then sets SEV c-bit for
+each page table entry.
 
 Signed-off-by: Zixuan Wang <zixuanwang@google.com>
+Co-developed-by: Hyunwook (Wooky) Baek <baekhw@google.com>
 ---
- lib/x86/usermode.c  |  3 ++-
- x86/Makefile.common | 10 +++++-----
- x86/Makefile.x86_64 |  7 ++++---
- x86/access.c        |  6 +++---
- x86/cet.c           |  8 +++++---
- x86/emulator.c      |  5 +++--
- x86/eventinj.c      |  6 ++++--
- x86/smap.c          |  8 ++++----
- x86/umip.c          | 10 +++++++---
- 9 files changed, 37 insertions(+), 26 deletions(-)
+ configure           |  9 +++++++
+ lib/x86/amd_sev.c   | 50 +++++++++++++++++++++++++++++++++++
+ lib/x86/amd_sev.h   | 41 +++++++++++++++++++++++++++++
+ lib/x86/asm/setup.h |  3 +++
+ lib/x86/setup.c     | 24 +++++++++++++++++
+ x86/Makefile.common | 10 +++++++
+ x86/Makefile.x86_64 |  3 +++
+ x86/amd_sev.c       | 64 +++++++++++++++++++++++++++++++++++++++++++++
+ 8 files changed, 204 insertions(+)
+ create mode 100644 lib/x86/amd_sev.c
+ create mode 100644 lib/x86/amd_sev.h
+ create mode 100644 x86/amd_sev.c
 
-diff --git a/lib/x86/usermode.c b/lib/x86/usermode.c
-index f032523..c550545 100644
---- a/lib/x86/usermode.c
-+++ b/lib/x86/usermode.c
-@@ -58,7 +58,8 @@ uint64_t run_in_user(usermode_func func, unsigned int fault_vector,
- 			"pushq %[user_stack_top]\n\t"
- 			"pushfq\n\t"
- 			"pushq %[user_cs]\n\t"
--			"pushq $user_mode\n\t"
-+			"lea user_mode(%%rip), %%rdx\n\t"
-+			"pushq %%rdx\n\t"
- 			"iretq\n"
+diff --git a/configure b/configure
+index 3094375..c165ba7 100755
+--- a/configure
++++ b/configure
+@@ -31,6 +31,8 @@ earlycon=
+ target_efi=
+ efi_include_path=
+ efi_libs_path=
++amd_sev=
++amd_sev_variant=
  
- 			"user_mode:\n\t"
-diff --git a/x86/Makefile.common b/x86/Makefile.common
-index 314bf47..e77de6b 100644
---- a/x86/Makefile.common
-+++ b/x86/Makefile.common
-@@ -81,16 +81,16 @@ tests-common = $(TEST_DIR)/vmexit.$(exe) $(TEST_DIR)/tsc.$(exe) \
-                $(TEST_DIR)/init.$(exe) \
-                $(TEST_DIR)/hyperv_synic.$(exe) $(TEST_DIR)/hyperv_stimer.$(exe) \
-                $(TEST_DIR)/hyperv_connections.$(exe) \
--               $(TEST_DIR)/tsx-ctrl.$(exe)
-+               $(TEST_DIR)/tsx-ctrl.$(exe) \
-+	       $(TEST_DIR)/eventinj.$(exe) \
-+               $(TEST_DIR)/umip.$(exe)
- 
- # The following test cases are disabled when building EFI tests because they
- # use absolute addresses in their inline assembly code, which cannot compile
- # with the '-fPIC' flag
- ifneq ($(TARGET_EFI),y)
--tests-common += $(TEST_DIR)/eventinj.$(exe) \
--                $(TEST_DIR)/smap.$(exe) \
--                $(TEST_DIR)/realmode.$(exe) \
--                $(TEST_DIR)/umip.$(exe)
-+tests-common += $(TEST_DIR)/smap.$(exe) \
-+                $(TEST_DIR)/realmode.$(exe)
- endif
- 
- test_cases: $(tests-common) $(tests)
-diff --git a/x86/Makefile.x86_64 b/x86/Makefile.x86_64
-index aa23b22..7e8a57a 100644
---- a/x86/Makefile.x86_64
-+++ b/x86/Makefile.x86_64
-@@ -30,20 +30,21 @@ tests += $(TEST_DIR)/intel-iommu.$(exe)
- tests += $(TEST_DIR)/rdpru.$(exe)
- tests += $(TEST_DIR)/pks.$(exe)
- tests += $(TEST_DIR)/pmu_lbr.$(exe)
-+tests += $(TEST_DIR)/emulator.$(exe)
-+tests += $(TEST_DIR)/vmware_backdoors.$(exe)
- 
- # The following test cases are disabled when building EFI tests because they
- # use absolute addresses in their inline assembly code, which cannot compile
- # with the '-fPIC' flag
- ifneq ($(TARGET_EFI),y)
- tests += $(TEST_DIR)/access.$(exe)
--tests += $(TEST_DIR)/emulator.$(exe)
- tests += $(TEST_DIR)/svm.$(exe)
- tests += $(TEST_DIR)/vmx.$(exe)
--tests += $(TEST_DIR)/vmware_backdoors.$(exe)
-+endif
+ usage() {
+     cat <<-EOF
+@@ -77,6 +79,7 @@ usage() {
+ 	    --efi-libs-path        Path to GNU-EFI libraries, e.g. "/usr/lib/". This dir should
+ 	                           contain 3 files from GNU-EFI: crt0-efi-x86_64.o, libefi.a,
+ 	                           and libgnuefi.a
++	    --amd-sev=VARIANT      AMD SEV variant, [SEV|ES|SNP]
+ EOF
+     exit 1
+ }
+@@ -150,6 +153,10 @@ while [[ "$1" = -* ]]; do
+ 	--efi-libs-path)
+ 	    efi_libs_path="$arg"
+ 	    ;;
++	--amd-sev)
++	    amd_sev=y
++	    [ "${arg^^}" != "SEV" ] && amd_sev_variant="${arg^^}"
++	    ;;
+ 	--help)
+ 	    usage
+ 	    ;;
+@@ -361,6 +368,8 @@ HOST_KEY_DOCUMENT=$host_key_document
+ TARGET_EFI=$target_efi
+ EFI_INCLUDE_PATH=$efi_include_path
+ EFI_LIBS_PATH=$efi_libs_path
++AMD_SEV=$amd_sev
++AMD_SEV_VARIANT=$amd_sev_variant
+ EOF
+ if [ "$arch" = "arm" ] || [ "$arch" = "arm64" ]; then
+     echo "TARGET=$target" >> config.mak
+diff --git a/lib/x86/amd_sev.c b/lib/x86/amd_sev.c
+new file mode 100644
+index 0000000..bd8d536
+--- /dev/null
++++ b/lib/x86/amd_sev.c
+@@ -0,0 +1,50 @@
++/*
++ * AMD SEV support in KVM-Unit-Tests
++ *
++ * Copyright (c) 2021, Google Inc
++ *
++ * Authors:
++ *   Zixuan Wang <zixuanwang@google.com>
++ *
++ * SPDX-License-Identifier: LGPL-2.0-or-later
++ */
 +
- ifneq ($(fcf_protection_full),)
- tests += $(TEST_DIR)/cet.$(exe)
- endif
--endif
++#include "amd_sev.h"
++#include "x86/processor.h"
++
++static unsigned long long amd_sev_c_bit_pos;
++
++EFI_STATUS setup_amd_sev(void)
++{
++	struct cpuid cpuid_out;
++
++	/* Test if we can query SEV features */
++	cpuid_out = cpuid(CPUID_FN_LARGEST_EXT_FUNC_NUM);
++	if (cpuid_out.a < CPUID_FN_ENCRYPT_MEM_CAPAB) {
++		return EFI_UNSUPPORTED;
++	}
++
++	/* Test if SEV is supported */
++	cpuid_out = cpuid(CPUID_FN_ENCRYPT_MEM_CAPAB);
++	if (!(cpuid_out.a & SEV_SUPPORT_MASK)) {
++		return EFI_UNSUPPORTED;
++	}
++
++	/* Test if SEV is enabled */
++	if (!(rdmsr(MSR_SEV_STATUS) & SEV_ENABLED_MASK)) {
++		return EFI_NOT_READY;
++	}
++
++	/* Extract C-Bit position from ebx[5:0]
++	 * AMD64 Architecture Programmer's Manual Volume 3
++	 *   - Section " Function 8000_001Fh - Encrypted Memory Capabilities"
++	 */
++	amd_sev_c_bit_pos = (unsigned long long)(cpuid_out.b & 0x3f);
++
++	return EFI_SUCCESS;
++}
++
++unsigned long long get_amd_sev_c_bit_mask(void)
++{
++	return 1ull << amd_sev_c_bit_pos;
++}
+diff --git a/lib/x86/amd_sev.h b/lib/x86/amd_sev.h
+new file mode 100644
+index 0000000..c1b08e8
+--- /dev/null
++++ b/lib/x86/amd_sev.h
+@@ -0,0 +1,41 @@
++/*
++ * AMD SEV support in KVM-Unit-Tests
++ *
++ * Copyright (c) 2021, Google Inc
++ *
++ * Authors:
++ *   Zixuan Wang <zixuanwang@google.com>
++ *
++ * SPDX-License-Identifier: LGPL-2.0-or-later
++ */
++
++#ifndef _X86_AMD_SEV_H_
++#define _X86_AMD_SEV_H_
++
++#include "libcflat.h"
++#include "desc.h"
++#include "asm/page.h"
++
++#ifdef ALIGN
++#undef ALIGN
++#endif
++#include <efi.h>
++
++/* AMD Programmer's Manual Volume 3
++ *   - Section "Function 8000_0000h - Maximum Extended Function Number and Vendor String"
++ *   - Section "Function 8000_001Fh - Encrypted Memory Capabilities"
++ */
++#define CPUID_FN_LARGEST_EXT_FUNC_NUM 0x80000000
++#define CPUID_FN_ENCRYPT_MEM_CAPAB    0x8000001f
++#define SEV_SUPPORT_MASK              0b10
++
++/* AMD Programmer's Manual Volume 2
++ *   - Section "SEV_STATUS MSR"
++ */
++#define MSR_SEV_STATUS   0xc0010131
++#define SEV_ENABLED_MASK 0b1
++
++EFI_STATUS setup_amd_sev(void);
++unsigned long long get_amd_sev_c_bit_mask(void);
++
++#endif /* _X86_AMD_SEV_H_ */
+diff --git a/lib/x86/asm/setup.h b/lib/x86/asm/setup.h
+index c32168e..1d69c6e 100644
+--- a/lib/x86/asm/setup.h
++++ b/lib/x86/asm/setup.h
+@@ -7,6 +7,9 @@
+ #include "x86/processor.h"
+ #include "x86/smp.h"
+ #include "asm/page.h"
++#ifdef CONFIG_AMD_SEV
++#include "x86/amd_sev.h"
++#endif /* CONFIG_AMD_SEV */
  
- include $(SRCDIR)/$(TEST_DIR)/Makefile.common
+ #ifdef ALIGN
+ #undef ALIGN
+diff --git a/lib/x86/setup.c b/lib/x86/setup.c
+index 0b0dbea..aaa1cce 100644
+--- a/lib/x86/setup.c
++++ b/lib/x86/setup.c
+@@ -214,6 +214,25 @@ EFI_STATUS setup_efi_pre_boot(UINTN *mapkey, efi_bootinfo_t *efi_bootinfo)
+ 		return status;
+ 	}
  
-diff --git a/x86/access.c b/x86/access.c
-index 4725bbd..d0c84ca 100644
---- a/x86/access.c
-+++ b/x86/access.c
-@@ -700,7 +700,7 @@ static int ac_test_do_access(ac_test_t *at)
- 
-     if (F(AC_ACCESS_TWICE)) {
- 	asm volatile (
--	    "mov $fixed2, %%rsi \n\t"
-+	    "lea fixed2(%%rip), %%rsi \n\t"
- 	    "mov (%[addr]), %[reg] \n\t"
- 	    "fixed2:"
- 	    : [reg]"=r"(r), [fault]"=a"(fault), "=b"(e)
-@@ -710,7 +710,7 @@ static int ac_test_do_access(ac_test_t *at)
- 	fault = 0;
-     }
- 
--    asm volatile ("mov $fixed1, %%rsi \n\t"
-+    asm volatile ("lea fixed1(%%rip), %%rsi \n\t"
- 		  "mov %%rsp, %%rdx \n\t"
- 		  "cmp $0, %[user] \n\t"
- 		  "jz do_access \n\t"
-@@ -719,7 +719,7 @@ static int ac_test_do_access(ac_test_t *at)
- 		  "pushq %[user_stack_top] \n\t"
- 		  "pushfq \n\t"
- 		  "pushq %[user_cs] \n\t"
--		  "pushq $do_access \n\t"
-+		  "lea do_access(%%rip), %%rsi; pushq %%rsi; lea fixed1(%%rip), %%rsi\n\t"
- 		  "iretq \n"
- 		  "do_access: \n\t"
- 		  "cmp $0, %[fetch] \n\t"
-diff --git a/x86/cet.c b/x86/cet.c
-index a21577a..a4b79cb 100644
---- a/x86/cet.c
-+++ b/x86/cet.c
-@@ -52,7 +52,7 @@ static u64 cet_ibt_func(void)
- 	printf("No endbr64 instruction at jmp target, this triggers #CP...\n");
- 	asm volatile ("movq $2, %rcx\n"
- 		      "dec %rcx\n"
--		      "leaq 2f, %rax\n"
-+		      "leaq 2f(%rip), %rax\n"
- 		      "jmp *%rax \n"
- 		      "2:\n"
- 		      "dec %rcx\n");
-@@ -67,7 +67,8 @@ void test_func(void) {
- 			"pushq %[user_stack_top]\n\t"
- 			"pushfq\n\t"
- 			"pushq %[user_cs]\n\t"
--			"pushq $user_mode\n\t"
-+			"lea user_mode(%%rip), %%rax\n\t"
-+			"pushq %%rax\n\t"
- 			"iretq\n"
- 
- 			"user_mode:\n\t"
-@@ -77,7 +78,8 @@ void test_func(void) {
- 			[user_ds]"i"(USER_DS),
- 			[user_cs]"i"(USER_CS),
- 			[user_stack_top]"r"(user_stack +
--					sizeof(user_stack)));
-+					sizeof(user_stack))
-+			: "rax");
++#ifdef CONFIG_AMD_SEV
++	status = setup_amd_sev();
++	if (EFI_ERROR(status)) {
++		printf("setup_amd_sev() failed: ");
++		switch (status) {
++		case EFI_UNSUPPORTED:
++			printf("SEV is not supported\n");
++			break;
++		case EFI_NOT_READY:
++			printf("SEV is not enabled\n");
++			break;
++		default:
++			printf("Unknown error\n");
++			break;
++		}
++		return status;
++	}
++#endif /* CONFIG_AMD_SEV */
++
+ 	return EFI_SUCCESS;
  }
  
- #define SAVE_REGS() \
-diff --git a/x86/emulator.c b/x86/emulator.c
-index 9fda1a0..4d2de24 100644
---- a/x86/emulator.c
-+++ b/x86/emulator.c
-@@ -262,12 +262,13 @@ static void test_pop(void *mem)
+@@ -232,6 +251,11 @@ static void setup_page_table(void)
+ 	/* Set default flags */
+ 	flags = PT_PRESENT_MASK | PT_WRITABLE_MASK | PT_USER_MASK;
  
- 	asm volatile("mov %%rsp, %[tmp] \n\t"
- 		     "mov %[stack_top], %%rsp \n\t"
--		     "push $1f \n\t"
-+		     "lea 1f(%%rip), %%rax \n\t"
-+		     "push %%rax \n\t"
- 		     "ret \n\t"
- 		     "2: jmp 2b \n\t"
- 		     "1: mov %[tmp], %%rsp"
- 		     : [tmp]"=&r"(tmp) : [stack_top]"r"(stack_top)
--		     : "memory");
-+		     : "memory", "rax");
- 	report(1, "ret");
++#ifdef CONFIG_AMD_SEV
++	/* Set AMD SEV C-Bit for page table entries */
++	flags |= get_amd_sev_c_bit_mask();
++#endif /* CONFIG_AMD_SEV */
++
+ 	/* Level 5 */
+ 	curr_pt = (pgd_t *)&ptl5;
+ 	curr_pt[0] = ((phys_addr_t)&ptl4) | flags;
+diff --git a/x86/Makefile.common b/x86/Makefile.common
+index e77de6b..8f9ddad 100644
+--- a/x86/Makefile.common
++++ b/x86/Makefile.common
+@@ -25,6 +25,9 @@ cflatobjs += lib/x86/delay.o
+ ifeq ($(TARGET_EFI),y)
+ cflatobjs += lib/x86/setup.o
+ cflatobjs += lib/efi.o
++ifeq ($(AMD_SEV),y)
++cflatobjs += lib/x86/amd_sev.o
++endif
+ endif
  
- 	stack_top[-1] = 0x778899;
-diff --git a/x86/eventinj.c b/x86/eventinj.c
-index 46593c9..0cd68e8 100644
---- a/x86/eventinj.c
-+++ b/x86/eventinj.c
-@@ -155,9 +155,11 @@ asm("do_iret:"
- 	"pushf"W" \n\t"
- 	"mov %cs, %ecx \n\t"
- 	"push"W" %"R "cx \n\t"
--	"push"W" $2f \n\t"
-+	"lea"W" 2f(%"R "ip), %"R "bx \n\t"
-+	"push"W" %"R "bx \n\t"
+ OBJDIRS += lib/x86
+@@ -38,6 +41,13 @@ COMMON_CFLAGS += -Wa,--divide
+ endif
+ COMMON_CFLAGS += -O1
  
--	"cmpb $0, no_test_device\n\t"	// see if need to flush
-+	"mov no_test_device(%"R "ip), %bl \n\t"
-+	"cmpb $0, %bl\n\t"		// see if need to flush
- 	"jnz 1f\n\t"
- 	"outl %eax, $0xe4 \n\t"		// flush page
- 	"1: \n\t"
-diff --git a/x86/smap.c b/x86/smap.c
-index ac2c8d5..b3ee16f 100644
---- a/x86/smap.c
-+++ b/x86/smap.c
-@@ -161,10 +161,10 @@ int main(int ac, char **av)
- 		test = -1;
- 		asm("or $(" xstr(USER_BASE) "), %"R "sp \n"
- 		    "push $44 \n "
--		    "decl test\n"
-+		    "decl test(%"R "ip)\n"
- 		    "and $~(" xstr(USER_BASE) "), %"R "sp \n"
- 		    "pop %"R "ax\n"
--		    "movl %eax, test");
-+		    "movl %eax, test(%"R "ip)");
- 		report(pf_count == 0 && test == 44,
- 		       "write to user stack with AC=1");
++ifeq ($(AMD_SEV),y)
++COMMON_CFLAGS += -DCONFIG_AMD_SEV
++ifneq ($(AMD_SEV_VARIANT),)
++COMMON_CFLAGS += -DCONFIG_AMD_SEV_$(AMD_SEV_VARIANT)
++endif
++endif
++
+ # stack.o relies on frame pointers.
+ KEEP_FRAME_POINTER := y
  
-@@ -173,10 +173,10 @@ int main(int ac, char **av)
- 		test = -1;
- 		asm("or $(" xstr(USER_BASE) "), %"R "sp \n"
- 		    "push $45 \n "
--		    "decl test\n"
-+		    "decl test(%"R "ip)\n"
- 		    "and $~(" xstr(USER_BASE) "), %"R "sp \n"
- 		    "pop %"R "ax\n"
--		    "movl %eax, test");
-+		    "movl %eax, test(%"R "ip)");
- 		report(pf_count == 1 && test == 45 && save == -1,
- 		       "write to user stack with AC=0");
+diff --git a/x86/Makefile.x86_64 b/x86/Makefile.x86_64
+index 7e8a57a..c1af80c 100644
+--- a/x86/Makefile.x86_64
++++ b/x86/Makefile.x86_64
+@@ -32,6 +32,9 @@ tests += $(TEST_DIR)/pks.$(exe)
+ tests += $(TEST_DIR)/pmu_lbr.$(exe)
+ tests += $(TEST_DIR)/emulator.$(exe)
+ tests += $(TEST_DIR)/vmware_backdoors.$(exe)
++ifeq ($(AMD_SEV),y)
++tests += $(TEST_DIR)/amd_sev.$(exe)
++endif
  
-diff --git a/x86/umip.c b/x86/umip.c
-index c5700b3..8b4e798 100644
---- a/x86/umip.c
-+++ b/x86/umip.c
-@@ -23,7 +23,10 @@ static void gp_handler(struct ex_regs *regs)
- 
- #define GP_ASM(stmt, in, clobber)                  \
-     asm volatile (                                 \
--          "mov" W " $1f, %[expected_rip]\n\t"      \
-+          "push" W " %%" R "ax\n\t"                \
-+	  "lea 1f(%%" R "ip), %%" R "ax\n\t"       \
-+          "mov %%" R "ax, %[expected_rip]\n\t"     \
-+          "pop" W " %%" R "ax\n\t"                 \
-           "movl $2f-1f, %[skip_count]\n\t"         \
-           "1: " stmt "\n\t"                        \
-           "2: "                                    \
-@@ -130,7 +133,8 @@ static int do_ring3(void (*fn)(const char *), const char *arg)
- 		  "push" W " %%" R "dx \n\t"
- 		  "pushf" W "\n\t"
- 		  "push" W " %[user_cs] \n\t"
--		  "push" W " $1f \n\t"
-+		  "lea 1f(%%" R "ip), %%" R "dx \n\t"
-+		  "push" W " %%" R "dx \n\t"
- 		  "iret" W "\n"
- 		  "1: \n\t"
- 		  "push %%" R "cx\n\t"   /* save kernel SP */
-@@ -144,7 +148,7 @@ static int do_ring3(void (*fn)(const char *), const char *arg)
- #endif
- 
- 		  "pop %%" R "cx\n\t"
--		  "mov $1f, %%" R "dx\n\t"
-+		  "lea 1f(%%" R "ip), %%" R "dx\n\t"
- 		  "int %[kernel_entry_vector]\n\t"
- 		  ".section .text.entry \n\t"
- 		  "kernel_entry: \n\t"
+ # The following test cases are disabled when building EFI tests because they
+ # use absolute addresses in their inline assembly code, which cannot compile
+diff --git a/x86/amd_sev.c b/x86/amd_sev.c
+new file mode 100644
+index 0000000..a07a48f
+--- /dev/null
++++ b/x86/amd_sev.c
+@@ -0,0 +1,64 @@
++/*
++ * AMD SEV test cases
++ *
++ * Copyright (c) 2021, Google Inc
++ *
++ * Authors:
++ *   Hyunwook (Wooky) Baek <baekhw@google.com>
++ *   Zixuan Wang <zixuanwang@google.com>
++ *
++ * SPDX-License-Identifier: LGPL-2.0-or-later
++ */
++
++#include "libcflat.h"
++#include "x86/processor.h"
++#include "x86/amd_sev.h"
++
++#define EXIT_SUCCESS 0
++#define EXIT_FAILURE 1
++
++static int test_sev_activation(void)
++{
++	struct cpuid cpuid_out;
++	u64 msr_out;
++
++	printf("SEV activation test is loaded.\n");
++
++	/* Tests if CPUID function to check SEV is implemented */
++	cpuid_out = cpuid(CPUID_FN_LARGEST_EXT_FUNC_NUM);
++	printf("CPUID Fn8000_0000[EAX]: 0x%08x\n", cpuid_out.a);
++	if (cpuid_out.a < CPUID_FN_ENCRYPT_MEM_CAPAB) {
++		printf("CPUID does not support FN%08x\n",
++		       CPUID_FN_ENCRYPT_MEM_CAPAB);
++		return EXIT_FAILURE;
++	}
++
++	/* Tests if SEV is supported */
++	cpuid_out = cpuid(CPUID_FN_ENCRYPT_MEM_CAPAB);
++	printf("CPUID Fn8000_001F[EAX]: 0x%08x\n", cpuid_out.a);
++	printf("CPUID Fn8000_001F[EBX]: 0x%08x\n", cpuid_out.b);
++	if (!(cpuid_out.a & SEV_SUPPORT_MASK)) {
++		printf("SEV is not supported.\n");
++		return EXIT_FAILURE;
++	}
++	printf("SEV is supported\n");
++
++	/* Tests if SEV is enabled */
++	msr_out = rdmsr(MSR_SEV_STATUS);
++	printf("MSR C001_0131[EAX]: 0x%08lx\n", msr_out & 0xffffffff);
++	if (!(msr_out & SEV_ENABLED_MASK)) {
++		printf("SEV is not enabled.\n");
++		return EXIT_FAILURE;
++	}
++	printf("SEV is enabled\n");
++
++	return EXIT_SUCCESS;
++}
++
++int main(void)
++{
++	int rtn;
++	rtn = test_sev_activation();
++	report(rtn == EXIT_SUCCESS, "SEV activation test.");
++	return report_summary();
++}
 -- 
 2.33.0.rc1.237.g0d66db33f3-goog
 
