@@ -2,149 +2,135 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id F3D603F0843
-	for <lists+kvm@lfdr.de>; Wed, 18 Aug 2021 17:43:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B8B033F08BB
+	for <lists+kvm@lfdr.de>; Wed, 18 Aug 2021 18:09:47 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239978AbhHRPoK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 18 Aug 2021 11:44:10 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:32314 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230360AbhHRPoJ (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 18 Aug 2021 11:44:09 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1629301414;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=L9XsdG57Mi9fqdOK1OUJnUMTmL7H16XFYw0UC4znLZo=;
-        b=BciLRQ36ShtIFgGd3fBgd46HkgeqEUaLVqjjv5fnKb3s5Yct0xqxDb2PSWI8Bi9yLuRa4I
-        SqAcO/Iv5gM2KTBdX3BvxJl9m1aWzE5ycNpSTCe4odPf30TlVGQ+EJs9MudIpfZ0mTL5zj
-        TBUKubBB7tO671lEyP22DcltacZYOKM=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-116--KYnFeGyPd-y1hr_r38Q8w-1; Wed, 18 Aug 2021 11:43:33 -0400
-X-MC-Unique: -KYnFeGyPd-y1hr_r38Q8w-1
-Received: by mail-wr1-f72.google.com with SMTP id k15-20020a5d628f0000b029015501bab520so724027wru.16
-        for <kvm@vger.kernel.org>; Wed, 18 Aug 2021 08:43:33 -0700 (PDT)
+        id S229847AbhHRQKV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 18 Aug 2021 12:10:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45798 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229558AbhHRQKU (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 18 Aug 2021 12:10:20 -0400
+Received: from mail-lj1-x231.google.com (mail-lj1-x231.google.com [IPv6:2a00:1450:4864:20::231])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 673C2C061764
+        for <kvm@vger.kernel.org>; Wed, 18 Aug 2021 09:09:45 -0700 (PDT)
+Received: by mail-lj1-x231.google.com with SMTP id q21so6045745ljj.6
+        for <kvm@vger.kernel.org>; Wed, 18 Aug 2021 09:09:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=tHnhNtLddRQOA3Axt0k000vlO0Owd0of5+pA/CBW0xs=;
+        b=o1phBxQPnIMlCJ2jcvqW8gIZosfP3pj2y0s3lI4HpqRVRrOk3kukEsommA9bJPpmQJ
+         DEB4GVDIqayhVTfboGPjynmDZarCjHdW1UdnEaXGgnDRHUq9SedOBY59SBPzEkPjEeS1
+         v9iK4T3uxEz6pWfowbtFOBp7b5yNCeyM9pGkektgr4bjrFswfX0p78qi+VXk3sSOS5bD
+         cU7MJHaMRJKMRXMNsZyzZurKcOfAH0ILzqTn16KRnjSeTXrWiIavOGifzUXz1nMHsjeC
+         NCfwVd7PULoFWE/n0sNkeT9yVnVk1i4RGamtDOk15WK70BX5l4P2ZTtKbToqO3UeCX4c
+         dZRg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=L9XsdG57Mi9fqdOK1OUJnUMTmL7H16XFYw0UC4znLZo=;
-        b=XYfSlPb7YIUMnQOJ6w7QeHzX6YNMGRPnwp1h8hSIkBM8HdVfWrCN3nmvq6oC5VPzb1
-         /2bwz7YE4IIlaxQokYNb9x8P3EVdExXxk5wjB46zlGgZm5/b/Cmyt6dGarUIx6xDPR0u
-         5Zyp/QB/3NYjr56GREd9qZjU5i/L+/zyKB41Cnf3pjShH3aHFlVXHogUsq47Y3iOiLs9
-         j9tpsUNsW9MpNDbbUWx07B0ILQ81MZt34FKd0CX4/FLeDLvPBr5/i9q55QDdevfolvn/
-         kXAapar23mYYtec35oyiBB3a0JrEXBWD8bWkcexPoPI2iUnUmrwqwv8WyPrmjzeO9m9S
-         tN7g==
-X-Gm-Message-State: AOAM531qxXW1pmxQooudCoQ+qeXWk8ZY23Y1w/waqtRiJhS6qIh4VKge
-        O0/r7xHmta9LBbSfcsPNErG7UlLT9LXC94fmBjNVEO4fz6uYAgaEpd7b5U+q/mvuaMkIsxHPdbG
-        t8uYBZQfweqlc
-X-Received: by 2002:a5d:674b:: with SMTP id l11mr11356166wrw.357.1629301412132;
-        Wed, 18 Aug 2021 08:43:32 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJy0QLznTozFHj6dO5NFZppXGV148A/UjiKNLlJKdwsUvNNAdEIUrsiMCURfRCpVi7cNzBvvMw==
-X-Received: by 2002:a5d:674b:: with SMTP id l11mr11356149wrw.357.1629301411981;
-        Wed, 18 Aug 2021 08:43:31 -0700 (PDT)
-Received: from work-vm (cpc109021-salf6-2-0-cust453.10-2.cable.virginm.net. [82.29.237.198])
-        by smtp.gmail.com with ESMTPSA id b10sm228285wrn.9.2021.08.18.08.43.30
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 18 Aug 2021 08:43:31 -0700 (PDT)
-Date:   Wed, 18 Aug 2021 16:43:29 +0100
-From:   "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To:     James Bottomley <jejb@linux.ibm.com>
-Cc:     Ashish Kalra <ashish.kalra@amd.com>,
-        Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org,
-        thomas.lendacky@amd.com, brijesh.singh@amd.com,
-        ehabkost@redhat.com, mst@redhat.com, richard.henderson@linaro.org,
-        tobin@ibm.com, dovmurik@linux.vnet.ibm.com, frankeh@us.ibm.com,
-        kvm@vger.kernel.org
-Subject: Re: [RFC PATCH 00/13] Add support for Mirror VM.
-Message-ID: <YR0qoV6tDuVxddL5@work-vm>
-References: <cover.1629118207.git.ashish.kalra@amd.com>
- <fb737cf0-3d96-173f-333b-876dfd59d32b@redhat.com>
- <20210816144413.GA29881@ashkalra_ubuntu_server>
- <b25a1cf9-5675-99da-7dd6-302b04cc7bbc@redhat.com>
- <20210816151349.GA29903@ashkalra_ubuntu_server>
- <f7cf142b-02e4-5c87-3102-f3acd8b07288@redhat.com>
- <20210818103147.GB31834@ashkalra_ubuntu_server>
- <f0b5b725fc879d72c702f88a6ed90e956ec32865.camel@linux.ibm.com>
- <YR0nwVPKymrAeIzV@work-vm>
- <8ae11fca26e8d7f96ffc7ec6353c87353cadc63a.camel@linux.ibm.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=tHnhNtLddRQOA3Axt0k000vlO0Owd0of5+pA/CBW0xs=;
+        b=ijvvSOH4nQweBYXQHkXi1gTvQowmasSmLEVMul6uWwSSryLQlckp2vrx5Bl9GCWakf
+         mUMNcRCYa89Zig882Q3DqtxZ50XoLZI9qXq3hVmyNdOMI9CmYsHvgzGJsmbIu2Wihmll
+         BoZ0ha+KESuqseGpp9nY6vVl/fUYvoKL9PjByUTfxD9jRMNhDUQS93Bdtng1zk2ynYT7
+         FAbaJ3bt86aHzCj4wpgclmOYIjj7b7b6yzy1M8Mo3lemXCM8Y9SOu6d6Yf8cc0qqQVne
+         ikjZek3ppZopF+Go1hzR5UrAqeQHCcGCFjgODD71wBJg53heKli/MbdaK9oqnmtpvk2D
+         6/xg==
+X-Gm-Message-State: AOAM533PzY2RfYRMpAuPsHuOxZDxcGRZmhKR16VpydsuVyngySpjAd6P
+        6+O04+flRjDyTf21o7DTH1JQfkvH9akvnQBsWQP4lg==
+X-Google-Smtp-Source: ABdhPJzsDlNkQ1AEA+WEQnod1wuALKA3XaZkKbgYB208IkOx2w+pz5Y+F26mEuk3gMA4X4W5tJkkVg45pEKVnfSxDrA=
+X-Received: by 2002:a2e:a7d4:: with SMTP id x20mr8780153ljp.394.1629302983447;
+ Wed, 18 Aug 2021 09:09:43 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <8ae11fca26e8d7f96ffc7ec6353c87353cadc63a.camel@linux.ibm.com>
-User-Agent: Mutt/2.0.7 (2021-05-04)
+References: <20210817230508.142907-1-jingzhangos@google.com> <YRxKZXm68FZ0jr34@google.com>
+In-Reply-To: <YRxKZXm68FZ0jr34@google.com>
+From:   Jing Zhang <jingzhangos@google.com>
+Date:   Wed, 18 Aug 2021 09:09:32 -0700
+Message-ID: <CAAdAUthw0gT2_K+WzkWeEHApGqM14qpH+kuoO6WZBnjvez6ZAg@mail.gmail.com>
+Subject: Re: [PATCH] KVM: stats: add stats to detect if vcpu is currently halted
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     KVM <kvm@vger.kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
+        David Matlack <dmatlack@google.com>,
+        Peter Shier <pshier@google.com>,
+        Oliver Upton <oupton@google.com>,
+        Cannon Matthews <cannonmatthews@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-* James Bottomley (jejb@linux.ibm.com) wrote:
-> On Wed, 2021-08-18 at 16:31 +0100, Dr. David Alan Gilbert wrote:
-> > * James Bottomley (jejb@linux.ibm.com) wrote:
-> > > On Wed, 2021-08-18 at 10:31 +0000, Ashish Kalra wrote:
-> > > > Hello Paolo,
-> > > > 
-> > > > On Mon, Aug 16, 2021 at 05:38:55PM +0200, Paolo Bonzini wrote:
-> > > > > On 16/08/21 17:13, Ashish Kalra wrote:
-> > > > > > > > I think that once the mirror VM starts booting and
-> > > > > > > > running the UEFI code, it might be only during the PEI or
-> > > > > > > > DXE phase where it will start actually running the MH
-> > > > > > > > code, so mirror VM probably still need to handles
-> > > > > > > > KVM_EXIT_IO when SEC phase does I/O, I can see PIC
-> > > > > > > > accesses and Debug Agent initialization stuff in SEC
-> > > > > > > > startup code.
-> > > > > > > That may be a design of the migration helper code that you
-> > > > > > > were working with, but it's not necessary.
-> > > > > > > 
-> > > > > > Actually my comments are about a more generic MH code.
-> > > > > 
-> > > > > I don't think that would be a good idea; designing QEMU's
-> > > > > migration helper interface to be as constrained as possible is
-> > > > > a good thing.  The migration helper is extremely security
-> > > > > sensitive code, so it should not expose itself to the attack
-> > > > > surface of the whole of QEMU.
-> > > 
-> > > The attack surface of the MH in the guest is simply the API.  The
-> > > API needs to do two things:
-> > > 
-> > >    1. validate a correct endpoint and negotiate a wrapping key
-> > >    2. When requested by QEMU, wrap a section of guest encrypted
-> > > memory
-> > >       with the wrapping key and return it.
-> > > 
-> > > The big security risk is in 1. if the MH can be tricked into
-> > > communicating with the wrong endpoint it will leak the entire
-> > > guest.  If we can lock that down, I don't see any particular
-> > > security problem with 2. So, provided we get the security
-> > > properties of the API correct, I think we won't have to worry over
-> > > much about exposure of the API.
-> > 
-> > Well, we'd have to make sure it only does stuff on behalf of qemu; if
-> > the guest can ever write to MH's memory it could do something that
-> > the guest shouldn't be able to.
-> 
-> Given the lack of SMI, we can't guarantee that with plain SEV and -ES. 
-> Once we move to -SNP, we can use VMPLs to achieve this.
+Hi Sean,
 
-Doesn't the MH have access to different slots and running on separate
-vCPUs; so it's still got some separation?
+On Tue, Aug 17, 2021 at 4:46 PM Sean Christopherson <seanjc@google.com> wrote:
+>
+> On Tue, Aug 17, 2021, Jing Zhang wrote:
+> > Current guest/host/halt stats don't show when we are currently halting
+>
+> s/we are/KVM is
+>
+> And I would probably reword it to "when KVM is blocking a vCPU in response to
+> the vCPU activity state, e.g. halt".  More on that below.
+>
+> > well. If a guest halts for a long period of time they could appear
+> > pathologically blocked but really it's the opposite there's nothing to
+> > do.
+> > Simply count the number of times we enter and leave the kvm_vcpu_block
+>
+> s/we/KVM
+>
+> In general, it's good practice to avoid pronouns in comments and changelogs as
+> doing so all but forces using precise, unambiguous language.  Things like 'it'
+> and 'they' are ok when it's abundantly clear what they refer to, but 'we' and 'us'
+> are best avoided entirely.
+>
+> > function per vcpu, if they are unequal, then a VCPU is currently
+> > halting.
+> > The existing stats like halt_exits and halt_wakeups don't quite capture
+> > this. The time spend halted and halt polling is reported eventually, but
+> > not until we wakeup and resume. If a guest were to indefinitely halt one
+> > of it's CPUs we would never know, it may simply appear blocked.
+>      ^^^^      ^^
+>      its       userspace?
+>
+>
+> The "blocked" terminology is a bit confusing since KVM is explicitly blocking
+> the vCPU, it just happens to mostly do so in response to a guest HLT.  I think
+> "block" is intended to mean "vCPU task not run", but it would be helpful to make
+> that clear.
+>
+That's a good point. Will reword the comments as you suggested.
+> > Original-by: Cannon Matthews <cannonmatthews@google.com>
+> > Signed-off-by: Jing Zhang <jingzhangos@google.com>
+> > ---
+> >  include/linux/kvm_host.h  | 4 +++-
+> >  include/linux/kvm_types.h | 2 ++
+> >  virt/kvm/kvm_main.c       | 2 ++
+> >  3 files changed, 7 insertions(+), 1 deletion(-)
+> >
+> > diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+> > index d447b21cdd73..23d2e19af3ce 100644
+> > --- a/include/linux/kvm_host.h
+> > +++ b/include/linux/kvm_host.h
+> > @@ -1459,7 +1459,9 @@ struct _kvm_stats_desc {
+> >       STATS_DESC_LOGHIST_TIME_NSEC(VCPU_GENERIC, halt_poll_fail_hist,        \
+> >                       HALT_POLL_HIST_COUNT),                                 \
+> >       STATS_DESC_LOGHIST_TIME_NSEC(VCPU_GENERIC, halt_wait_hist,             \
+> > -                     HALT_POLL_HIST_COUNT)
+> > +                     HALT_POLL_HIST_COUNT),                                 \
+> > +     STATS_DESC_COUNTER(VCPU_GENERIC, halt_block_starts),                   \
+> > +     STATS_DESC_COUNTER(VCPU_GENERIC, halt_block_ends)
+>
+> Why two counters?  It's per-vCPU, can't this just be a "blocked" flag or so?  I
+> get that all the other stats use "halt", but that's technically wrong as KVM will
+> block vCPUs that are not runnable for other reason, e.g. because they're in WFS
+> on x86.
+The two counters are used to determine the reason why vCPU is not
+running. If the halt_block_ends is one less than halt_block_starts,
+then we know the vCPU is explicitly blocked by KVM. Otherwise, we know
+there might be something wrong with the vCPU. Does this make sense?
+Will rename from "halt_block_*" to "vcpu_block_*".
 
-> But realistically, given the above API, even if the guest is malicious,
-> what can it do?  I think it's simply return bogus pages that cause a
-> crash on start after migration, which doesn't look like a huge risk to
-> the cloud to me (it's more a self destructive act on behalf of the
-> guest).
-
-I'm a bit worried about the data structures that are shared between the
-migration code in qemu and the MH; the code in qemu is going to have to
-be paranoid about not trusting anything coming from the MH.
-
-Dave
-
-> James
-> 
-> 
--- 
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
-
+Thanks,
+Jing
