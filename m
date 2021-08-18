@@ -2,54 +2,54 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3BDD93F04A4
+	by mail.lfdr.de (Postfix) with ESMTP id 890A63F04A6
 	for <lists+kvm@lfdr.de>; Wed, 18 Aug 2021 15:26:50 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237748AbhHRN1U (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 18 Aug 2021 09:27:20 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:19438 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S235943AbhHRN1G (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 18 Aug 2021 09:27:06 -0400
-Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 17ID2dLc068178;
-        Wed, 18 Aug 2021 09:26:31 -0400
+        id S237395AbhHRN1X (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 18 Aug 2021 09:27:23 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:3274 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S236993AbhHRN1H (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 18 Aug 2021 09:27:07 -0400
+Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 17ID2tmo131673;
+        Wed, 18 Aug 2021 09:26:32 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
  : date : message-id : in-reply-to : references : mime-version :
  content-transfer-encoding; s=pp1;
- bh=6eOiGibZdhHMDVRHKt6bVfmaZCJUOA1fvvP8U7H1cV0=;
- b=gyJNWlX3idShaQhS6qk6+nisabqIf+0UMzqwcRwYBTpjo9KwMuwB4HcRreCqkZGElFfd
- AHqYFUDU0u8asqge3t6SLdOsTplagp9ToOJeJp6bYN0klysMfsie7cJ7WBsdskhqqnM9
- oCuVSTqAxaeDQX8F79z35PEHKvBJtnn2cxdmhZuf3xuzcjJLQdTITYRfXvvBUSCqjPSg
- fHaacM6ZFPFfj4PdTLkUM/uG0MpT0TWPAwwMmVKMvK7qzJXltmWEioebKzvvdprGuQUZ
- 4Q9nrYg+INnp1wPdekESXSaVZ7s+bKLgrosuZQwM8p+XG6mNS/jEE20NU4fsSjtaQEk/ vQ== 
+ bh=27slXD3Y7o5k12p033188Z4V+R5GoVkuvNOzohMAd3g=;
+ b=sK7y2ltIHllpRIg7ukHR2DLcJtzKAfX9yI9uKzjIHhVJcivpYz6yhho4RSC99/I68uAO
+ AbYZGH+Luz3IItZMv8ydODLkHkgogOJ9ltPMqLRrhIEJGcqYa9ho5A+bNKDDctqK1Z5b
+ imXrSjt6rssgEJ+AFPDHsLF1oozKpq4BzxaGve8uhRleBnwxuIxAWVPEbQtRZBiSg3Iq
+ AbOa6+PJD2c6R7zJE4XwRHb61JZG9sWbDfrEGv8E+VeH5Kf+JikYUsfYo0qsJHnH4YQz
+ R9xP3S00P6AwsxeXSiDiUUJszxnZGwW2nUlSf1PW/tYjsCbIwNWQ0jO7GI0nt3YVn1yR 6w== 
 Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3agkvmqm9d-1
+        by mx0b-001b2d01.pphosted.com with ESMTP id 3agp1yknmj-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
         Wed, 18 Aug 2021 09:26:31 -0400
-Received: from m0098394.ppops.net (m0098394.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 17ID3Hql070311;
-        Wed, 18 Aug 2021 09:26:30 -0400
-Received: from ppma03fra.de.ibm.com (6b.4a.5195.ip4.static.sl-reverse.com [149.81.74.107])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3agkvmqm8d-1
+Received: from m0098419.ppops.net (m0098419.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 17ID2wBB131961;
+        Wed, 18 Aug 2021 09:26:31 -0400
+Received: from ppma05fra.de.ibm.com (6c.4a.5195.ip4.static.sl-reverse.com [149.81.74.108])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 3agp1yknkg-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 18 Aug 2021 09:26:30 -0400
-Received: from pps.filterd (ppma03fra.de.ibm.com [127.0.0.1])
-        by ppma03fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 17IDCnKm019195;
-        Wed, 18 Aug 2021 13:26:28 GMT
-Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
-        by ppma03fra.de.ibm.com with ESMTP id 3agh2xh6b5-1
+        Wed, 18 Aug 2021 09:26:31 -0400
+Received: from pps.filterd (ppma05fra.de.ibm.com [127.0.0.1])
+        by ppma05fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 17IDCeim014904;
+        Wed, 18 Aug 2021 13:26:29 GMT
+Received: from b06avi18626390.portsmouth.uk.ibm.com (b06avi18626390.portsmouth.uk.ibm.com [9.149.26.192])
+        by ppma05fra.de.ibm.com with ESMTP id 3afwrhtehh-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 18 Aug 2021 13:26:28 +0000
+        Wed, 18 Aug 2021 13:26:29 +0000
 Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
-        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 17IDMrNg56754432
+        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 17IDMvRL61800816
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 18 Aug 2021 13:22:53 GMT
+        Wed, 18 Aug 2021 13:22:57 GMT
 Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id C5BDA4C05A;
-        Wed, 18 Aug 2021 13:26:23 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id 759C14C046;
+        Wed, 18 Aug 2021 13:26:24 +0000 (GMT)
 Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 37E824C058;
+        by IMSVA (Postfix) with ESMTP id DC07F4C050;
         Wed, 18 Aug 2021 13:26:23 +0000 (GMT)
 Received: from p-imbrenda.bredband2.com (unknown [9.145.14.177])
         by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
@@ -60,103 +60,139 @@ Cc:     cohuck@redhat.com, borntraeger@de.ibm.com, frankja@linux.ibm.com,
         thuth@redhat.com, pasic@linux.ibm.com, david@redhat.com,
         linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
         Ulrich.Weigand@de.ibm.com
-Subject: [PATCH v4 04/14] KVM: s390: pv: avoid stalls when making pages secure
-Date:   Wed, 18 Aug 2021 15:26:10 +0200
-Message-Id: <20210818132620.46770-5-imbrenda@linux.ibm.com>
+Subject: [PATCH v4 05/14] KVM: s390: pv: leak the ASCE page when destroy fails
+Date:   Wed, 18 Aug 2021 15:26:11 +0200
+Message-Id: <20210818132620.46770-6-imbrenda@linux.ibm.com>
 X-Mailer: git-send-email 2.31.1
 In-Reply-To: <20210818132620.46770-1-imbrenda@linux.ibm.com>
 References: <20210818132620.46770-1-imbrenda@linux.ibm.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: 2M-n8KDoYeZNt5RkwZ3JpA99AMb8JUHy
-X-Proofpoint-GUID: 6QECtlvLqhtMEpmlA4zj13t0wNQWCiVI
+X-Proofpoint-ORIG-GUID: 035iyZJkmzpwP9ANpc0uRlnm_aM_Weg-
+X-Proofpoint-GUID: c7MRnumkwfA5jLSgeFmAKB-2erH11Ysl
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.790
  definitions=2021-08-18_04:2021-08-17,2021-08-18 signatures=0
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=999 clxscore=1015
- priorityscore=1501 malwarescore=0 impostorscore=0 mlxscore=0 phishscore=0
- spamscore=0 bulkscore=0 lowpriorityscore=0 suspectscore=0 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2107140000
- definitions=main-2108180082
+ priorityscore=1501 lowpriorityscore=0 phishscore=0 malwarescore=0
+ mlxscore=0 bulkscore=0 impostorscore=0 suspectscore=0 spamscore=0
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2107140000 definitions=main-2108180082
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Improve make_secure_pte to avoid stalls when the system is heavily
-overcommitted. This was especially problematic in kvm_s390_pv_unpack,
-because of the loop over all pages that needed unpacking.
+When a protected VM is created, the topmost level of page tables of its
+ASCE is marked by the Ultravisor; any attempt to use that memory for
+protected virtualization will result in failure.
 
-Due to the locks being held, it was not possible to simply replace
-uv_call with uv_call_sched. A more complex approach was
-needed, in which uv_call is replaced with __uv_call, which does not
-loop. When the UVC needs to be executed again, -EAGAIN is returned, and
-the caller (or its caller) will try again.
+Only a successful Destroy Configuration UVC will remove the marking.
 
-When -EAGAIN is returned, the path is the same as when the page is in
-writeback (and the writeback check is also performed, which is
-harmless).
+When the Destroy Configuration UVC fails, the topmost level of page
+tables of the VM does not get its marking cleared; to avoid issues it
+must not be used again.
+
+This is a permanent error and the page becomes in practice unusable, so
+we set it aside and leak it.
 
 Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
-Fixes: 214d9bbcd3a672 ("s390/mm: provide memory management functions for protected KVM guests")
 ---
- arch/s390/kernel/uv.c | 29 +++++++++++++++++++++++------
- 1 file changed, 23 insertions(+), 6 deletions(-)
+ arch/s390/include/asm/gmap.h |  2 ++
+ arch/s390/kvm/pv.c           |  4 ++-
+ arch/s390/mm/gmap.c          | 55 ++++++++++++++++++++++++++++++++++++
+ 3 files changed, 60 insertions(+), 1 deletion(-)
 
-diff --git a/arch/s390/kernel/uv.c b/arch/s390/kernel/uv.c
-index aeb0a15bcbb7..68a8fbafcb9c 100644
---- a/arch/s390/kernel/uv.c
-+++ b/arch/s390/kernel/uv.c
-@@ -180,7 +180,7 @@ static int make_secure_pte(pte_t *ptep, unsigned long addr,
- {
- 	pte_t entry = READ_ONCE(*ptep);
- 	struct page *page;
--	int expected, rc = 0;
-+	int expected, cc = 0;
- 
- 	if (!pte_present(entry))
- 		return -ENXIO;
-@@ -196,12 +196,25 @@ static int make_secure_pte(pte_t *ptep, unsigned long addr,
- 	if (!page_ref_freeze(page, expected))
- 		return -EBUSY;
- 	set_bit(PG_arch_1, &page->flags);
--	rc = uv_call(0, (u64)uvcb);
-+	/*
-+	 * If the UVC does not succeed or fail immediately, we don't want to
-+	 * loop for long, or we might get stall notifications.
-+	 * On the other hand, this is a complex scenario and we are holding a lot of
-+	 * locks, so we can't easily sleep and reschedule. We try only once,
-+	 * and if the UVC returned busy or partial completion, we return
-+	 * -EAGAIN and we let the callers deal with it.
-+	 */
-+	cc = __uv_call(0, (u64)uvcb);
- 	page_ref_unfreeze(page, expected);
--	/* Return -ENXIO if the page was not mapped, -EINVAL otherwise */
--	if (rc)
--		rc = uvcb->rc == 0x10a ? -ENXIO : -EINVAL;
--	return rc;
-+	/*
-+	 * Return -ENXIO if the page was not mapped, -EINVAL for other errors.
-+	 * If busy or partially completed, return -EAGAIN.
-+	 */
-+	if (cc == UVC_CC_OK)
-+		return 0;
-+	else if (cc == UVC_CC_BUSY || cc == UVC_CC_PARTIAL)
-+		return -EAGAIN;
-+	return uvcb->rc == 0x10a ? -ENXIO : -EINVAL;
+diff --git a/arch/s390/include/asm/gmap.h b/arch/s390/include/asm/gmap.h
+index 40264f60b0da..746e18bf8984 100644
+--- a/arch/s390/include/asm/gmap.h
++++ b/arch/s390/include/asm/gmap.h
+@@ -148,4 +148,6 @@ void gmap_sync_dirty_log_pmd(struct gmap *gmap, unsigned long dirty_bitmap[4],
+ 			     unsigned long gaddr, unsigned long vmaddr);
+ int gmap_mark_unmergeable(void);
+ void s390_reset_acc(struct mm_struct *mm);
++void s390_remove_old_asce(struct gmap *gmap);
++int s390_replace_asce(struct gmap *gmap);
+ #endif /* _ASM_S390_GMAP_H */
+diff --git a/arch/s390/kvm/pv.c b/arch/s390/kvm/pv.c
+index 00d272d134c2..76b0d64ce8fa 100644
+--- a/arch/s390/kvm/pv.c
++++ b/arch/s390/kvm/pv.c
+@@ -168,9 +168,11 @@ int kvm_s390_pv_deinit_vm(struct kvm *kvm, u16 *rc, u16 *rrc)
+ 	atomic_set(&kvm->mm->context.is_protected, 0);
+ 	KVM_UV_EVENT(kvm, 3, "PROTVIRT DESTROY VM: rc %x rrc %x", *rc, *rrc);
+ 	WARN_ONCE(cc, "protvirt destroy vm failed rc %x rrc %x", *rc, *rrc);
+-	/* Inteded memory leak on "impossible" error */
++	/* Intended memory leak on "impossible" error */
+ 	if (!cc)
+ 		kvm_s390_pv_dealloc_vm(kvm);
++	else
++		s390_replace_asce(kvm->arch.gmap);
+ 	return cc ? -EIO : 0;
  }
  
- /*
-@@ -254,6 +267,10 @@ int gmap_make_secure(struct gmap *gmap, unsigned long gaddr, void *uvcb)
- 	mmap_read_unlock(gmap->mm);
- 
- 	if (rc == -EAGAIN) {
-+		/*
-+		 * If we are here because the UVC returned busy or partial
-+		 * completion, this is just a useless check, but it is safe.
-+		 */
- 		wait_on_page_writeback(page);
- 	} else if (rc == -EBUSY) {
- 		/*
+diff --git a/arch/s390/mm/gmap.c b/arch/s390/mm/gmap.c
+index 9bb2c7512cd5..5a138f6220c4 100644
+--- a/arch/s390/mm/gmap.c
++++ b/arch/s390/mm/gmap.c
+@@ -2706,3 +2706,58 @@ void s390_reset_acc(struct mm_struct *mm)
+ 	mmput(mm);
+ }
+ EXPORT_SYMBOL_GPL(s390_reset_acc);
++
++/*
++ * Remove the topmost level of page tables from the list of page tables of
++ * the gmap.
++ * This means that it will not be freed when the VM is torn down, and needs
++ * to be handled separately by the caller, unless an intentional leak is
++ * intended.
++ */
++void s390_remove_old_asce(struct gmap *gmap)
++{
++	struct page *old;
++
++	old = virt_to_page(gmap->table);
++	spin_lock(&gmap->guest_table_lock);
++	list_del(&old->lru);
++	spin_unlock(&gmap->guest_table_lock);
++	/* in case the ASCE needs to be "removed" multiple times */
++	INIT_LIST_HEAD(&old->lru);
++}
++EXPORT_SYMBOL_GPL(s390_remove_old_asce);
++
++/*
++ * Try to replace the current ASCE with another equivalent one.
++ * If the allocation of the new top level page table fails, the ASCE is not
++ * replaced.
++ * In any case, the old ASCE is removed from the list, therefore the caller
++ * has to make sure to save a pointer to it beforehands, unless an
++ * intentional leak is intended.
++ */
++int s390_replace_asce(struct gmap *gmap)
++{
++	unsigned long asce;
++	struct page *page;
++	void *table;
++
++	s390_remove_old_asce(gmap);
++
++	page = alloc_pages(GFP_KERNEL_ACCOUNT, CRST_ALLOC_ORDER);
++	if (!page)
++		return -ENOMEM;
++	table = page_to_virt(page);
++	memcpy(table, gmap->table, 1UL << (CRST_ALLOC_ORDER + PAGE_SHIFT));
++
++	spin_lock(&gmap->guest_table_lock);
++	list_add(&page->lru, &gmap->crst_list);
++	spin_unlock(&gmap->guest_table_lock);
++
++	asce = (gmap->asce & ~PAGE_MASK) | __pa(table);
++	WRITE_ONCE(gmap->asce, asce);
++	WRITE_ONCE(gmap->mm->context.gmap_asce, asce);
++	WRITE_ONCE(gmap->table, table);
++
++	return 0;
++}
++EXPORT_SYMBOL_GPL(s390_replace_asce);
 -- 
 2.31.1
 
