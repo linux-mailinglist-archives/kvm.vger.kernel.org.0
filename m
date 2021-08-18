@@ -2,132 +2,140 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D7B953EF694
-	for <lists+kvm@lfdr.de>; Wed, 18 Aug 2021 02:09:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DB7DA3EF69A
+	for <lists+kvm@lfdr.de>; Wed, 18 Aug 2021 02:12:26 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237091AbhHRAKS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 17 Aug 2021 20:10:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48506 "EHLO
+        id S237094AbhHRAM7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 17 Aug 2021 20:12:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49188 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237045AbhHRAKR (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 17 Aug 2021 20:10:17 -0400
-Received: from mail-qk1-x74a.google.com (mail-qk1-x74a.google.com [IPv6:2607:f8b0:4864:20::74a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D0BDBC061764
-        for <kvm@vger.kernel.org>; Tue, 17 Aug 2021 17:09:43 -0700 (PDT)
-Received: by mail-qk1-x74a.google.com with SMTP id 21-20020a370815000000b003d5a81a4d12so512046qki.3
-        for <kvm@vger.kernel.org>; Tue, 17 Aug 2021 17:09:43 -0700 (PDT)
+        with ESMTP id S235514AbhHRAM6 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 17 Aug 2021 20:12:58 -0400
+Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 77567C0613C1
+        for <kvm@vger.kernel.org>; Tue, 17 Aug 2021 17:12:24 -0700 (PDT)
+Received: by mail-yb1-xb4a.google.com with SMTP id s4-20020a259004000000b005947575ac53so1004442ybl.5
+        for <kvm@vger.kernel.org>; Tue, 17 Aug 2021 17:12:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
-        h=date:in-reply-to:message-id:mime-version:references:subject:from:to
-         :cc;
-        bh=JACHLJ0Fahm0I2H/knzBqTe9jo7I2AGHtG7OfwVGa3k=;
-        b=OLcXEUXO7R95X0ZdMaeFXZVj+6TOfi4t9CjhY4MJjuLGszthc+TcwX6MgX2th+o58v
-         Mg7jv8B7luWI2P7jn5oXffs4x8+XFBlFDZDJXn2DKfgWVdn6mR/uYpOaWBQ8z+9P2V2T
-         0EXtR9zU/JLw61TRPD3Qgfp8R+pslgNYBTjGhiWRTf/jX02U2+9pkMpUbgifLDusMxvQ
-         Cbzhxy0+M5YL8EnZwj58U3SbOL1SRUOKM0LMmmNF1k+vBjGNEDscAZ1AlPhyXh119TTZ
-         tnL/YPvX1wSYSc5GXHNscL386edbphV1XBZxtRow1E3FGFzklpmqeIPp2xsXG9QQwRIQ
-         nlqQ==
+        h=reply-to:date:message-id:mime-version:subject:from:to:cc;
+        bh=JTnvoGQPkzSY6sftzgGOupURPM7Ep9m5Wy1FXJgvwt8=;
+        b=fyeUao6f185gl09ZYsAcdA7yqynUAarWJxtZWYjEguvdRD3P7FagvzAviDCjWFv9rL
+         hkTapS9n0MejNBYX2Q5yho2bHtiNxihusqY+CxIRaDELLoNGX+rLqUW5lJrnEo/Mnm0e
+         tdASNb+sSeLR5tAQ8VguxhX7xu/etGncJN6MqDGLgROWk+szWdS+QKryOwUk7KtLD9kc
+         VIB77hKdU4R/GCrKDGfJV45g5i0FA1HckPWMpfpc96fmGXzvuG0a3+dtXdvgVNUn85ch
+         0fl8hUM/hx3+Jt5MkdC3np01fB7+YS8SSyrKtslPuKN3R0rpXVrltaB4IU7mkT2jcj3C
+         EtqA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:in-reply-to:message-id:mime-version
-         :references:subject:from:to:cc;
-        bh=JACHLJ0Fahm0I2H/knzBqTe9jo7I2AGHtG7OfwVGa3k=;
-        b=sm9sk/BrR/kSdeMCnijefwoAu/N7cZ/mPUYpe/+f7pwLVgYeK4UhiVF1UrGg7HdsbC
-         voBwflVZa6QwvVdXlkBqHMWXI1wbjq1KOWRjPN0t0vzDykHm/Me+GH6ITBc5PsxKU4/u
-         Rq9ZFePPleSreyHW2K/o2HaaxKlfRQMBAXC6Nsx2jmeFpNZ8dlphvcWI4G+ecmk8gzLR
-         SH7rqlwbDdYUiA6QtVaUFiYR/mhRf1zUCYuiGCoO3LGtiNEgq7PfeA5w43FQPIaPX6pO
-         o914vf7JZS8KOpOHNdPs8gWx0pxGQEeWXgIdVzhOrodXnQ/WO/XLfktQNPtww+zFskjT
-         zN0A==
-X-Gm-Message-State: AOAM532vQOgtG2uHT8Jyl8ldEjvBsQQDKiDJSEDMr06m2KbFXKgrcB9I
-        Q7tcKA+nyIlH4n75v0tntS7sEEG8rHKm1yGkcO2dlmgdbsBk9uR0RJ2/cOv8cV0/5JCAdmcUeWH
-        qLPkbw+0eN1im8PNnaBRbMqwd6ziVP5li/Ln9IPTPYNELCGm8EoTUX0C5HH0vPhEmbHkl
-X-Google-Smtp-Source: ABdhPJxSDvazqMVNdYnLZb0ESa7bGb5q79dZvQ616HRunDDXIqYGLr3j80vSQyLy8QNDPmfYSbG6ZwYkukSOs29Q
-X-Received: from zxwang42.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:2936])
- (user=zixuanwang job=sendgmr) by 2002:a05:6214:3ca:: with SMTP id
- ce10mr6047440qvb.42.1629245382978; Tue, 17 Aug 2021 17:09:42 -0700 (PDT)
-Date:   Wed, 18 Aug 2021 00:09:05 +0000
-In-Reply-To: <20210818000905.1111226-1-zixuanwang@google.com>
-Message-Id: <20210818000905.1111226-17-zixuanwang@google.com>
+        h=x-gm-message-state:reply-to:date:message-id:mime-version:subject
+         :from:to:cc;
+        bh=JTnvoGQPkzSY6sftzgGOupURPM7Ep9m5Wy1FXJgvwt8=;
+        b=P5CK3MXEEYqyrSw1VGz9Ei5krHZYd/CcANW9VjSamoVyGFio0AkKlYqQC6XdT1xJO2
+         dpKbShlKlJKn8EiMZKQDdHHZEUACo+d8vciktsF7Q0tH1njbxJhyDPFe60IQ8misGGvC
+         gYl442jNVS9xl4jn2p9CwuJfEiIkraBswCu2pu28QChP4ZQgq1NlVMVZVD3zGb+LoWIj
+         fCdsuzedK/kdBocq8rPFZ7EsmkFlGsaPBULbbx/URcuDsOwXS9blo3CyOItneC9KJCux
+         159VSktdU7wq+C7QOw4cR2MWMDosbH868o/3zH8Tejm6MTOVB998sVvo5/o0EnPH1Dr6
+         tPYw==
+X-Gm-Message-State: AOAM530cwC2gEyUucHZg6IpWX2in68feueF8GjiErDMvxh3GXUlm2Qub
+        BAmYgDuNDdX+2aA8iywzVTjdfzQlkAM=
+X-Google-Smtp-Source: ABdhPJx/sMOLc7HCSgjqqqa43Z4/KNb0h6Qo8TurrCfZhkWk410D/oOp9imaDI4DVCS6cpPHQf2wmOXKS3s=
+X-Received: from seanjc798194.pdx.corp.google.com ([2620:15c:90:200:158e:55a:74dd:5197])
+ (user=seanjc job=sendgmr) by 2002:a25:7743:: with SMTP id s64mr7874463ybc.214.1629245543687;
+ Tue, 17 Aug 2021 17:12:23 -0700 (PDT)
+Reply-To: Sean Christopherson <seanjc@google.com>
+Date:   Tue, 17 Aug 2021 17:12:05 -0700
+Message-Id: <20210818001210.4073390-1-seanjc@google.com>
 Mime-Version: 1.0
-References: <20210818000905.1111226-1-zixuanwang@google.com>
 X-Mailer: git-send-email 2.33.0.rc1.237.g0d66db33f3-goog
-Subject: [kvm-unit-tests RFC 16/16] x86 AMD SEV-ES: Add test cases
-From:   Zixuan Wang <zixuanwang@google.com>
-To:     kvm@vger.kernel.org, pbonzini@redhat.com, drjones@redhat.com
-Cc:     marcorr@google.com, baekhw@google.com, tmroeder@google.com,
-        erdemaktas@google.com, rientjes@google.com, seanjc@google.com,
-        brijesh.singh@amd.com, Thomas.Lendacky@amd.com,
-        varad.gautam@suse.com, jroedel@suse.de, bp@suse.de,
-        Zixuan Wang <zixuanwang@google.com>
+Subject: [PATCH 0/5] KVM: rseq: Fix and a test for a KVM+rseq bug
+From:   Sean Christopherson <seanjc@google.com>
+To:     Russell King <linux@armlinux.org.uk>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Will Deacon <will@kernel.org>, Guo Ren <guoren@kernel.org>,
+        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Oleg Nesterov <oleg@redhat.com>,
+        Steven Rostedt <rostedt@goodmis.org>,
+        Ingo Molnar <mingo@redhat.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Andy Lutomirski <luto@kernel.org>,
+        Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+        "Paul E. McKenney" <paulmck@kernel.org>,
+        Boqun Feng <boqun.feng@gmail.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Shuah Khan <shuah@kernel.org>
+Cc:     Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        Paul Mackerras <paulus@samba.org>,
+        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+        linux-csky@vger.kernel.org, linux-mips@vger.kernel.org,
+        linuxppc-dev@lists.ozlabs.org, linux-s390@vger.kernel.org,
+        kvm@vger.kernel.org, linux-kselftest@vger.kernel.org,
+        Peter Foley <pefoley@google.com>,
+        Shakeel Butt <shakeelb@google.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Ben Gardon <bgardon@google.com>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-SEV-ES introduces #VC handler for guest/host communications, e.g.,
-accessing MSR, executing CPUID. This commit provides test cases to check
-if SEV-ES is enabled and if rdmsr/wrmsr are handled correctly in SEV-ES.
+Patch 1 fixes a KVM+rseq bug where KVM's handling of TIF_NOTIFY_RESUME,
+e.g. for task migration, clears the flag without informing rseq and leads
+to stale data in userspace's rseq struct.
 
-Signed-off-by: Zixuan Wang <zixuanwang@google.com>
----
- x86/amd_sev.c | 33 +++++++++++++++++++++++++++++++++
- 1 file changed, 33 insertions(+)
+Patch 2 is a cleanup to try and make future bugs less likely.  It's also
+a baby step towards moving and renaming tracehook_notify_resume() since
+it has nothing to do with tracing.  It kills me to not do the move/rename
+as part of this series, but having a dedicated series/discussion seems
+more appropriate given the sheer number of architectures that call
+tracehook_notify_resume() and the lack of an obvious home for the code.
 
-diff --git a/x86/amd_sev.c b/x86/amd_sev.c
-index a07a48f..660196e 100644
---- a/x86/amd_sev.c
-+++ b/x86/amd_sev.c
-@@ -13,6 +13,7 @@
- #include "libcflat.h"
- #include "x86/processor.h"
- #include "x86/amd_sev.h"
-+#include "msr.h"
- 
- #define EXIT_SUCCESS 0
- #define EXIT_FAILURE 1
-@@ -55,10 +56,42 @@ static int test_sev_activation(void)
- 	return EXIT_SUCCESS;
- }
- 
-+#ifdef CONFIG_AMD_SEV_ES
-+static int test_sev_es_activation(void)
-+{
-+	if (!(rdmsr(MSR_SEV_STATUS) & SEV_ES_ENABLED_MASK)) {
-+		return EXIT_FAILURE;
-+	}
-+
-+	return EXIT_SUCCESS;
-+}
-+
-+static int test_sev_es_msr(void)
-+{
-+	/* With SEV-ES, rdmsr/wrmsr trigger #VC exception. If #VC is handled
-+	 * correctly, rdmsr/wrmsr should work like without SEV-ES and not crash
-+	 * the guest VM.
-+	 */
-+	u64 val = 0x1234;
-+	wrmsr(MSR_TSC_AUX, val);
-+	if(val != rdmsr(MSR_TSC_AUX)) {
-+		return EXIT_FAILURE;
-+	}
-+
-+	return EXIT_SUCCESS;
-+}
-+#endif /* CONFIG_AMD_SEV_ES */
-+
- int main(void)
- {
- 	int rtn;
- 	rtn = test_sev_activation();
- 	report(rtn == EXIT_SUCCESS, "SEV activation test.");
-+#ifdef CONFIG_AMD_SEV_ES
-+	rtn = test_sev_es_activation();
-+	report(rtn == EXIT_SUCCESS, "SEV-ES activation test.");
-+	rtn = test_sev_es_msr();
-+	report(rtn == EXIT_SUCCESS, "SEV-ES MSR test.");
-+#endif /* CONFIG_AMD_SEV_ES */
- 	return report_summary();
- }
+Patch 3 is a fix/cleanup to stop overriding x86's unistd_{32,64}.h when
+the include path (intentionally) omits tools' uapi headers.  KVM's
+selftests do exactly that so that they can pick up the uapi headers from
+the installed kernel headers, and still use various tools/ headers that
+mirror kernel code, e.g. linux/types.h.  This allows the new test in
+patch 4 to reference __NR_rseq without having to manually define it.
+
+Patch 4 is a regression test for the KVM+rseq bug.
+
+Patch 5 is a cleanup made possible by patch 3.
+
+
+Sean Christopherson (5):
+  KVM: rseq: Update rseq when processing NOTIFY_RESUME on xfer to KVM
+    guest
+  entry: rseq: Call rseq_handle_notify_resume() in
+    tracehook_notify_resume()
+  tools: Move x86 syscall number fallbacks to .../uapi/
+  KVM: selftests: Add a test for KVM_RUN+rseq to detect task migration
+    bugs
+  KVM: selftests: Remove __NR_userfaultfd syscall fallback
+
+ arch/arm/kernel/signal.c                      |   1 -
+ arch/arm64/kernel/signal.c                    |   1 -
+ arch/csky/kernel/signal.c                     |   4 +-
+ arch/mips/kernel/signal.c                     |   4 +-
+ arch/powerpc/kernel/signal.c                  |   4 +-
+ arch/s390/kernel/signal.c                     |   1 -
+ include/linux/tracehook.h                     |   2 +
+ kernel/entry/common.c                         |   4 +-
+ kernel/rseq.c                                 |   4 +-
+ .../x86/include/{ => uapi}/asm/unistd_32.h    |   0
+ .../x86/include/{ => uapi}/asm/unistd_64.h    |   3 -
+ tools/testing/selftests/kvm/.gitignore        |   1 +
+ tools/testing/selftests/kvm/Makefile          |   3 +
+ tools/testing/selftests/kvm/rseq_test.c       | 131 ++++++++++++++++++
+ 14 files changed, 143 insertions(+), 20 deletions(-)
+ rename tools/arch/x86/include/{ => uapi}/asm/unistd_32.h (100%)
+ rename tools/arch/x86/include/{ => uapi}/asm/unistd_64.h (83%)
+ create mode 100644 tools/testing/selftests/kvm/rseq_test.c
+
 -- 
 2.33.0.rc1.237.g0d66db33f3-goog
 
