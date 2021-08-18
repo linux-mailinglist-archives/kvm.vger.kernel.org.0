@@ -2,135 +2,129 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D614C3EF791
-	for <lists+kvm@lfdr.de>; Wed, 18 Aug 2021 03:36:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1001E3EF7B5
+	for <lists+kvm@lfdr.de>; Wed, 18 Aug 2021 03:52:20 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235426AbhHRBgs (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 17 Aug 2021 21:36:48 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39812 "EHLO
+        id S235278AbhHRBww (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 17 Aug 2021 21:52:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43350 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234723AbhHRBgs (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 17 Aug 2021 21:36:48 -0400
-Received: from mail-il1-x129.google.com (mail-il1-x129.google.com [IPv6:2607:f8b0:4864:20::129])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 50E2FC061764;
-        Tue, 17 Aug 2021 18:36:14 -0700 (PDT)
-Received: by mail-il1-x129.google.com with SMTP id x5so554913ill.3;
-        Tue, 17 Aug 2021 18:36:14 -0700 (PDT)
+        with ESMTP id S233380AbhHRBwv (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 17 Aug 2021 21:52:51 -0400
+Received: from mail-qk1-x733.google.com (mail-qk1-x733.google.com [IPv6:2607:f8b0:4864:20::733])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 00A09C061764
+        for <kvm@vger.kernel.org>; Tue, 17 Aug 2021 18:52:17 -0700 (PDT)
+Received: by mail-qk1-x733.google.com with SMTP id y144so1245083qkb.6
+        for <kvm@vger.kernel.org>; Tue, 17 Aug 2021 18:52:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
+        d=google.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=mTlSpJCOzYSWnHbCprL/LUgcu5gZ9W6lRJHq3m6wgZk=;
-        b=iW5IOfKJ/qGWdHJ2LaVQt4BPBwNdma2W7XPIbEedF5x9QtSmWqXi0t47R7gspHSAE9
-         YMfgUbj1wDyH2kIO/W3JZVL6coNuCmVvmzoTAgGWemMjql3So83TMdBOVa/ueZ+4ZzBM
-         FwO8dty9fGehQjQY1x0AEyMctRUHFIz3gNx0Pu95jf62/M0CGdemV+i+Ik8YBd89Iytt
-         txf/q7UXb00R2G+mbHAAifqw4FnvV7ffP3AdQBjtv+Hud9Ahm9L5Fn/0AyJFOE8OeHba
-         innVQtnFRhnjNKmK+ARDpeUo2BAqS+syMCUENoHb4mYtvrVQEjlfD5QN/6IDLxrtSb/l
-         QJYQ==
+         :cc:content-transfer-encoding;
+        bh=K9cGV/bQnvIU70B+bzceYi+yYSYuqAcHwpt18Lo9Rtw=;
+        b=WOrM92z5TG0QGj0Sd66P3624D9HNAokSuQcMCcm/5oro26ZL/Kx9PRqeURusV6vmdo
+         D11Hp2ZjGal5RNDgQquGF6tYaXKw1o/7iig25JGgg756+RIIsdh2eO4qiQ0KIklm9cSo
+         7GVNj/HVLu/HmP2Os3IFoNfiJ5uNxoNlJjD8giNED1k4Xz/a0cMgP4ag45hNdaGydTUq
+         QTjsNcTyOIGf56uu/H/GNRSEtWlvnBloOXwfPbF/tTkj04P5uFATJSuxXBmARjF1DXOk
+         RehKBwblxGFnQPff1oEc0Yz3ZZ8N/SaVTdl98FbNiK3S87YqN1OQOLTs7TaZkhJV2DuX
+         IlIA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=mTlSpJCOzYSWnHbCprL/LUgcu5gZ9W6lRJHq3m6wgZk=;
-        b=EBXpqFOq3ZJzNx9ktuIcBlKEpTmw17VgBxBszrtWvO8erj3B9SV/PBF3ugBlmrOcuk
-         u/r8/N8/Ashbp7xiCsCl4IUBqQ6TgfvQQwi6LdpZcSvZU5jVAkT8N4yD8pIZL1Jxzo7Q
-         O0S99Q2l2idJswJ3Gs4LRtf4VDBkEP2uY7fAX+e9MKMmZBkZdOdlOBbWrECJGQgAxmrb
-         Cdw57dtuRETR1KpG6tJZipB2dERhKUY8wXobXkyHo0Ejw00QhZUAHJMu3jXKtAtoODQQ
-         l51uGeJL6oy6kC43WZFTvT7cY8vCEA0NfQQiulCtqjJmqTsnW/PPzUL6dVq7FiVxETIm
-         /K6g==
-X-Gm-Message-State: AOAM530ipW7qS4ELYyCfnvFGQ8A8Zl/j+P4j0agFkR7Llt0eo5+RlZIo
-        xGQ1LBu731GxvTl32eheqxufCvg89XkM9KK+YVQH7UzK
-X-Google-Smtp-Source: ABdhPJyxUkahOsLKnX8Ep/9lBH+xqyhCNmyJPUcgJpmnQvOulOk8TGU+hJcupEH8yrzbehczHT9tghdgUkVkYpsU/30=
-X-Received: by 2002:a05:6e02:13f3:: with SMTP id w19mr4242402ilj.164.1629250573650;
- Tue, 17 Aug 2021 18:36:13 -0700 (PDT)
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=K9cGV/bQnvIU70B+bzceYi+yYSYuqAcHwpt18Lo9Rtw=;
+        b=Deq87NTNYdIJpYgOLXRhxosvxE9nQWi+4tYLhwahjRzbGenKEvVZsTqtOjK47EcRV/
+         fBd5XsVdI3T0zOk1eiG1RXnjAkVFOfHs9mA7/R/iEFogXoffCoI2xek3+iqTh060PuRE
+         0gfcK+L8MZ4cYbo8hbJdYUiYnP9qS4+jZd5su/zZDK65fjBTVFYNMWOkZp82Faj8bL7+
+         PM1QkjfY0VZXSNHv7ONjAw2fCbFKtoP7ltZOg8wqBDdElBNBtlqy6VZqyA4Yx+5dzQ15
+         +IV95WG8gZf18Yw1cBznZMvwqWylHqvP7ktvUvqBmM4Wc8iHGlEMQdCoZ1UKt4qg90qP
+         4dvw==
+X-Gm-Message-State: AOAM530953Z8w/Xl36S06qHxmZ/c8czgI96BEq6gJGHGGIoAZFONYfou
+        K2hJ1LjzuwLsJ/j18445O8bHi4TmlDwkKAYN/aWijA==
+X-Google-Smtp-Source: ABdhPJwUGaPJAcf7ZY3glyfDe01/RiBPl232bSVi8CCynx/cbvS7pPlfrJjmGcZrIJB76jl7or1XQQtywu1tePphoYg=
+X-Received: by 2002:a37:45c9:: with SMTP id s192mr7190967qka.21.1629251536754;
+ Tue, 17 Aug 2021 18:52:16 -0700 (PDT)
 MIME-Version: 1.0
-References: <20210814035129.154242-1-jiangshanlai@gmail.com>
-In-Reply-To: <20210814035129.154242-1-jiangshanlai@gmail.com>
-From:   Lai Jiangshan <jiangshanlai@gmail.com>
-Date:   Wed, 18 Aug 2021 09:36:02 +0800
-Message-ID: <CAJhGHyBbWBwyVZvcT_ExghfDp_D+nw_s=izcgjBcLXnPjmWbdA@mail.gmail.com>
-Subject: Re: [PATCH] x86/kvm: Don't enable IRQ when IRQ enabled in kvm_wait
-To:     LKML <linux-kernel@vger.kernel.org>
-Cc:     Lai Jiangshan <laijs@linux.alibaba.com>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Peter Zijlstra <peterz@infradead.org>,
+References: <20210702114820.16712-1-varad.gautam@suse.com> <CAA03e5HCdx2sLRqs2jkLDz3z8SB9JhCdxGv7Y6_ER-kMaqHXUg@mail.gmail.com>
+ <YRuURERGp8CQ1jAX@suse.de>
+In-Reply-To: <YRuURERGp8CQ1jAX@suse.de>
+From:   Marc Orr <marcorr@google.com>
+Date:   Tue, 17 Aug 2021 18:52:05 -0700
+Message-ID: <CAA03e5FTrkLpZ3yr3nBphOW3D+8HF-Wmo4um4MTXum3BR6BMQw@mail.gmail.com>
+Subject: Re: [kvm-unit-tests PATCH 0/6] Initial x86_64 UEFI support
+To:     Joerg Roedel <jroedel@suse.de>
+Cc:     Varad Gautam <varad.gautam@suse.com>,
+        kvm list <kvm@vger.kernel.org>,
+        virtualization@lists.linux-foundation.org,
         Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        X86 ML <x86@kernel.org>, "H. Peter Anvin" <hpa@zytor.com>,
-        kvm@vger.kernel.org
+        Andrew Jones <drjones@redhat.com>, bp@suse.de,
+        "Lendacky, Thomas" <thomas.lendacky@amd.com>,
+        "Singh, Brijesh" <brijesh.singh@amd.com>,
+        Zixuan Wang <zixuanwang@google.com>,
+        "Hyunwook (Wooky) Baek" <baekhw@google.com>,
+        Erdem Aktas <erdemaktas@google.com>,
+        Tom Roeder <tmroeder@google.com>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Ping
+On Tue, Aug 17, 2021 at 3:49 AM Joerg Roedel <jroedel@suse.de> wrote:
+>
+> Hi Marc,
+>
+> On Fri, Aug 13, 2021 at 11:44:39AM -0700, Marc Orr wrote:
+> > To date, we have _most_ x86 test cases (39/44) working under UEFI and
+> > we've also got some of the test cases to boot under SEV-ES, using the
+> > UEFI #VC handler.
+>
+> While the EFI APP approach simplifies the implementation a lot, I don't
+> think it is the best path to SEV and TDX testing for a couple of
+> reasons:
+>
+>         1) It leaves the details of #VC/#VE handling and the SEV-ES
+>            specific communication channels (GHCB) under control of the
+>            firmware. So we can't reliably test those interfaces from an
+>            EFI APP.
+>
+>         2) Same for the memory validation/acceptance interface needed
+>            for SEV-SNP and TDX. Using an EFI APP leaves those under
+>            firmware control and we are not able to reliably test them.
+>
+>         3) The IDT also stays under control of the firmware in an EFI
+>            APP, otherwise the firmware couldn't provide a #VC handler.
+>            This makes it unreliable to test anything IDT or IRQ related.
+>
+>         4) Relying on the firmware #VC hanlder limits the tests to its
+>            abilities. Implementing a separate #VC handler routine for
+>            kvm-unit-tests is more work, but it makes test development
+>            much more flexible.
+>
+> So it comes down to the fact that and EFI APP leaves control over
+> SEV/TDX specific hypervisor interfaces in the firmware, making it hard
+> and unreliable to test these interfaces from kvm-unit-tests. The stub
+> approach on the other side gives the tests full control over the VM,
+> allowing to test all aspects of the guest-host interface.
 
-On Sat, Aug 14, 2021 at 9:36 PM Lai Jiangshan <jiangshanlai@gmail.com> wrote:
->
-> From: Lai Jiangshan <laijs@linux.alibaba.com>
->
-> Commit f4e61f0c9add3 ("x86/kvm: Fix broken irq restoration in kvm_wait")
-> replaced "local_irq_restore() when IRQ enabled" with "local_irq_enable()
-> when IRQ enabled" to suppress a warnning.
->
-> Although there is no similar debugging warnning for doing local_irq_enable()
-> when IRQ enabled as doing local_irq_restore() in the same IRQ situation.  But
-> doing local_irq_enable() when IRQ enabled is no less broken as doing
-> local_irq_restore() and we'd better avoid it.
->
-> Cc: Mark Rutland <mark.rutland@arm.com>
-> Cc: Peter Zijlstra (Intel) <peterz@infradead.org>
-> Signed-off-by: Lai Jiangshan <laijs@linux.alibaba.com>
-> ---
->
-> The original debugging warnning was introduced in commit 997acaf6b4b5
-> ("lockdep: report broken irq restoration").  I think a similar debugging
-> check and warnning should also be added to "local_irq_enable() when IRQ
-> enabled" and even maybe "local_irq_disable() when IRQ disabled" to detect
-> something this:
->
->     | local_irq_save(flags);
->     | local_irq_disable();
->     | local_irq_restore(flags);
->     | local_irq_enable();
->
-> Or even we can do the check in lockdep+TRACE_IRQFLAGS:
->
-> In lockdep_hardirqs_on_prepare(), lockdep_hardirqs_enabled() was checked
-> (and exit) before checking DEBUG_LOCKS_WARN_ON(!irqs_disabled()), so lockdep
-> can't give any warning for these kind of situations.  If we did the check
-> in lockdep, we would have found the problem before, and we don't need
-> 997acaf6b4b5.
->
-> Any thought? Mark? Peter?
->
->  arch/x86/kernel/kvm.c | 5 +++--
->  1 file changed, 3 insertions(+), 2 deletions(-)
->
-> diff --git a/arch/x86/kernel/kvm.c b/arch/x86/kernel/kvm.c
-> index a26643dc6bd6..b656456c3a94 100644
-> --- a/arch/x86/kernel/kvm.c
-> +++ b/arch/x86/kernel/kvm.c
-> @@ -884,10 +884,11 @@ static void kvm_wait(u8 *ptr, u8 val)
->         } else {
->                 local_irq_disable();
->
-> +               /* safe_halt() will enable IRQ */
->                 if (READ_ONCE(*ptr) == val)
->                         safe_halt();
-> -
-> -               local_irq_enable();
-> +               else
-> +                       local_irq_enable();
->         }
->  }
->
-> --
-> 2.19.1.6.gb485710b
->
+I think we might be using terminology differently. (Maybe I mis-used
+the term =E2=80=9CEFI app=E2=80=9D?) With our approach, it is true that all
+pre-existing x86_64 test cases work out of the box with the UEFI #VC
+handler. However, because kvm-unit-tests calls `ExitBootServices` to
+take full control of the system it executes as a =E2=80=9CUEFI-stubbed
+kernel=E2=80=9D. Thus, it should be trivial for test cases to update the ID=
+T
+to set up a custom #VC handler for the duration of a test. (Some of
+the x86_64 test cases already do something similar where they install
+a temporary exception handler and then restore the =E2=80=9Cdefault=E2=80=
+=9D
+kvm-unit-tests exception handler.)
+
+In general, our approach is to set up the test cases to run with the
+kvm-unit-tests configuration (e.g., IDT, GDT). The one exception is
+the #VC handler. However, all of this state can be overridden within a
+test as needed.
+
+Zixuan just posted the patches. So hopefully they make things more clear.
+
+Thanks,
+Marc
