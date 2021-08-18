@@ -2,94 +2,173 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8B8893F06E5
-	for <lists+kvm@lfdr.de>; Wed, 18 Aug 2021 16:42:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6D7F03F06E7
+	for <lists+kvm@lfdr.de>; Wed, 18 Aug 2021 16:42:28 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239496AbhHROmr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 18 Aug 2021 10:42:47 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:22903 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S239485AbhHROmr (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 18 Aug 2021 10:42:47 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1629297732;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=oHOC6qM8SYsxg5GXK1RakJzITqPj1QkZBCg9QMQDUco=;
-        b=WN/p2Jq5u3CErt5ePIFGqAZk07OzU6H2IPIZY8ynAj8SXAbDrM5vBH2xTewXxqnC8jHkC4
-        29DjLhpzU3+Quxks/FR34pqrGg2txtIL3XlYIL/NNA4g/Z6C3aEuemS95qdc8eEkzut9Kv
-        m3xJTnpO9DZ+5J2iZPFNh8lx4heIZp4=
-Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
- [209.85.208.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-230-1zaPGECXPAyQi6uVfEG3nQ-1; Wed, 18 Aug 2021 10:42:10 -0400
-X-MC-Unique: 1zaPGECXPAyQi6uVfEG3nQ-1
-Received: by mail-ed1-f70.google.com with SMTP id e18-20020a0564020892b02903be9702d63eso1143927edy.17
-        for <kvm@vger.kernel.org>; Wed, 18 Aug 2021 07:42:10 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=oHOC6qM8SYsxg5GXK1RakJzITqPj1QkZBCg9QMQDUco=;
-        b=AeasNp53iwyMt3s5bvI5NArLvOcfe9f6nzqsc+GLhZ4Cxi/wrr4hLFHwNkvZ0ebGCk
-         8FWGTS2z1HFj8JxErEF9tumn0VH61jk22VEWnM3F3qZ6c4sUnezWmtAz8JXF1w8h4EFp
-         xG4+LrY3vO4Ie2aTuso05mKa9lCUeC0mI+iC8waRrDcjQy/8niwHxjaiLXgqvxfQrrCM
-         ck/a13qWx3PPn5J1mVmHnGobLP9ImEviimIe+MdB4YxlVNsJlqZYBrrTug3lyK5koq2s
-         8+x386lvn4+x0L8Z1BW1gRreAM1OKcwJJD4c3KX2qe4ND3OWa+ep++YwtEgSgmbaVMYW
-         Bnhw==
-X-Gm-Message-State: AOAM530Kce1FiR+LoeJSVhAzvLNb6S0z0qqx/RBGyLViGkKlyyfEXRaY
-        t5Nxv5+Nwbn2h7i9Y0IYs6cT/PLssVIwVuBdtK2wwvqNTCHa6nqYWJypCJ4LyqFS1oJLMQ6vqtX
-        jmAFp+OGgJgzf
-X-Received: by 2002:a17:906:769a:: with SMTP id o26mr10260107ejm.18.1629297729714;
-        Wed, 18 Aug 2021 07:42:09 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzsUMjWsJZkdAO5Ia6PsQSh8NFeDEF2eu0vMI7nX2SYA8sWVGkvZya4kW3CwJkzpaxp1jcgJQ==
-X-Received: by 2002:a17:906:769a:: with SMTP id o26mr10260095ejm.18.1629297729568;
-        Wed, 18 Aug 2021 07:42:09 -0700 (PDT)
-Received: from gator.home (cst2-174-132.cust.vodafone.cz. [31.30.174.132])
-        by smtp.gmail.com with ESMTPSA id a2sm112760edm.72.2021.08.18.07.42.08
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 18 Aug 2021 07:42:09 -0700 (PDT)
-Date:   Wed, 18 Aug 2021 16:42:07 +0200
-From:   Andrew Jones <drjones@redhat.com>
-To:     Oliver Upton <oupton@google.com>
-Cc:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
-        Marc Zyngier <maz@kernel.org>, Peter Shier <pshier@google.com>,
-        Ricardo Koller <ricarkol@google.com>,
-        Jing Zhang <jingzhangos@google.com>,
-        Raghavendra Rao Anata <rananta@google.com>,
-        James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>
-Subject: Re: [PATCH 4/4] selftests: KVM: Introduce psci_cpu_on_test
-Message-ID: <20210818144207.o7ycdaiy5iyap63k@gator.home>
-References: <20210818085047.1005285-1-oupton@google.com>
- <20210818085047.1005285-5-oupton@google.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210818085047.1005285-5-oupton@google.com>
+        id S239485AbhHROnB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 18 Aug 2021 10:43:01 -0400
+Received: from mail.kernel.org ([198.145.29.99]:42144 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S238113AbhHROnA (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 18 Aug 2021 10:43:00 -0400
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 085CB6108D;
+        Wed, 18 Aug 2021 14:42:26 +0000 (UTC)
+Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94.2)
+        (envelope-from <maz@kernel.org>)
+        id 1mGMlr-005mN8-Hi; Wed, 18 Aug 2021 15:42:23 +0100
+Date:   Wed, 18 Aug 2021 15:42:23 +0100
+Message-ID: <87im02stkg.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Fuad Tabba <tabba@google.com>
+Cc:     kvmarm@lists.cs.columbia.edu, will@kernel.org, james.morse@arm.com,
+        alexandru.elisei@arm.com, suzuki.poulose@arm.com,
+        mark.rutland@arm.com, christoffer.dall@arm.com,
+        pbonzini@redhat.com, drjones@redhat.com, oupton@google.com,
+        qperret@google.com, kvm@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, kernel-team@android.com
+Subject: Re: [PATCH v4 06/15] KVM: arm64: Restore mdcr_el2 from vcpu
+In-Reply-To: <20210817081134.2918285-7-tabba@google.com>
+References: <20210817081134.2918285-1-tabba@google.com>
+        <20210817081134.2918285-7-tabba@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: tabba@google.com, kvmarm@lists.cs.columbia.edu, will@kernel.org, james.morse@arm.com, alexandru.elisei@arm.com, suzuki.poulose@arm.com, mark.rutland@arm.com, christoffer.dall@arm.com, pbonzini@redhat.com, drjones@redhat.com, oupton@google.com, qperret@google.com, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kernel-team@android.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Aug 18, 2021 at 08:50:47AM +0000, Oliver Upton wrote:
-> Introduce a test for aarch64 that ensures CPU resets induced by PSCI are
-> reflected in the target vCPU's state, even if the target is never run
-> again. This is a regression test for a race between vCPU migration and
-> PSCI.
+On Tue, 17 Aug 2021 09:11:25 +0100,
+Fuad Tabba <tabba@google.com> wrote:
 > 
-> Signed-off-by: Oliver Upton <oupton@google.com>
+> On deactivating traps, restore the value of mdcr_el2 from the
+> newly created and preserved host value vcpu context, rather than
+> directly reading the hardware register.
+> 
+> Up until and including this patch the two values are the same,
+> i.e., the hardware register and the vcpu one. A future patch will
+> be changing the value of mdcr_el2 on activating traps, and this
+> ensures that its value will be restored.
+> 
+> No functional change intended.
+> 
+> Signed-off-by: Fuad Tabba <tabba@google.com>
 > ---
->  tools/testing/selftests/kvm/.gitignore        |   1 +
->  tools/testing/selftests/kvm/Makefile          |   1 +
->  .../selftests/kvm/aarch64/psci_cpu_on_test.c  | 121 ++++++++++++++++++
->  .../selftests/kvm/include/aarch64/processor.h |   3 +
->  4 files changed, 126 insertions(+)
->  create mode 100644 tools/testing/selftests/kvm/aarch64/psci_cpu_on_test.c
->
+>  arch/arm64/include/asm/kvm_host.h       |  5 ++++-
+>  arch/arm64/include/asm/kvm_hyp.h        |  2 +-
+>  arch/arm64/kvm/hyp/include/hyp/switch.h |  6 +++++-
+>  arch/arm64/kvm/hyp/nvhe/switch.c        | 13 +++++--------
+>  arch/arm64/kvm/hyp/vhe/switch.c         | 14 +++++---------
+>  arch/arm64/kvm/hyp/vhe/sysreg-sr.c      |  2 +-
+>  6 files changed, 21 insertions(+), 21 deletions(-)
+> 
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index 4d2d974c1522..76462c6a91ee 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -287,10 +287,13 @@ struct kvm_vcpu_arch {
+>  	/* Stage 2 paging state used by the hardware on next switch */
+>  	struct kvm_s2_mmu *hw_mmu;
+>  
+> -	/* HYP configuration */
+> +	/* Values of trap registers for the guest. */
+>  	u64 hcr_el2;
+>  	u64 mdcr_el2;
+>  
+> +	/* Values of trap registers for the host before guest entry. */
+> +	u64 mdcr_el2_host;
 
-Reviewed-by: Andrew Jones <drjones@redhat.com>
+This probably should then eventually replace the per-CPU copy of
+mdcr_el2 that lives in debug.c, shouldn't it?
+
+> +
+>  	/* Exception Information */
+>  	struct kvm_vcpu_fault_info fault;
+>  
+> diff --git a/arch/arm64/include/asm/kvm_hyp.h b/arch/arm64/include/asm/kvm_hyp.h
+> index 9d60b3006efc..657d0c94cf82 100644
+> --- a/arch/arm64/include/asm/kvm_hyp.h
+> +++ b/arch/arm64/include/asm/kvm_hyp.h
+> @@ -95,7 +95,7 @@ void __sve_restore_state(void *sve_pffr, u32 *fpsr);
+>  
+>  #ifndef __KVM_NVHE_HYPERVISOR__
+>  void activate_traps_vhe_load(struct kvm_vcpu *vcpu);
+> -void deactivate_traps_vhe_put(void);
+> +void deactivate_traps_vhe_put(struct kvm_vcpu *vcpu);
+>  #endif
+>  
+>  u64 __guest_enter(struct kvm_vcpu *vcpu);
+> diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
+> index e4a2f295a394..a0e78a6027be 100644
+> --- a/arch/arm64/kvm/hyp/include/hyp/switch.h
+> +++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
+> @@ -92,11 +92,15 @@ static inline void __activate_traps_common(struct kvm_vcpu *vcpu)
+>  		write_sysreg(0, pmselr_el0);
+>  		write_sysreg(ARMV8_PMU_USERENR_MASK, pmuserenr_el0);
+>  	}
+> +
+> +	vcpu->arch.mdcr_el2_host = read_sysreg(mdcr_el2);
+>  	write_sysreg(vcpu->arch.mdcr_el2, mdcr_el2);
+>  }
+>  
+> -static inline void __deactivate_traps_common(void)
+> +static inline void __deactivate_traps_common(struct kvm_vcpu *vcpu)
+>  {
+> +	write_sysreg(vcpu->arch.mdcr_el2_host, mdcr_el2);
+> +
+>  	write_sysreg(0, hstr_el2);
+>  	if (kvm_arm_support_pmu_v3())
+>  		write_sysreg(0, pmuserenr_el0);
+> diff --git a/arch/arm64/kvm/hyp/nvhe/switch.c b/arch/arm64/kvm/hyp/nvhe/switch.c
+> index f7af9688c1f7..2ea764a48958 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/switch.c
+> +++ b/arch/arm64/kvm/hyp/nvhe/switch.c
+> @@ -69,12 +69,10 @@ static void __activate_traps(struct kvm_vcpu *vcpu)
+>  static void __deactivate_traps(struct kvm_vcpu *vcpu)
+>  {
+>  	extern char __kvm_hyp_host_vector[];
+> -	u64 mdcr_el2, cptr;
+> +	u64 cptr;
+>  
+>  	___deactivate_traps(vcpu);
+>  
+> -	mdcr_el2 = read_sysreg(mdcr_el2);
+> -
+>  	if (cpus_have_final_cap(ARM64_WORKAROUND_SPECULATIVE_AT)) {
+>  		u64 val;
+>  
+> @@ -92,13 +90,12 @@ static void __deactivate_traps(struct kvm_vcpu *vcpu)
+>  		isb();
+>  	}
+>  
+> -	__deactivate_traps_common();
+> +	vcpu->arch.mdcr_el2_host &= MDCR_EL2_HPMN_MASK |
+> +				    MDCR_EL2_E2PB_MASK << MDCR_EL2_E2PB_SHIFT |
+> +				    MDCR_EL2_E2TB_MASK << MDCR_EL2_E2TB_SHIFT;
+>  
+> -	mdcr_el2 &= MDCR_EL2_HPMN_MASK;
+> -	mdcr_el2 |= MDCR_EL2_E2PB_MASK << MDCR_EL2_E2PB_SHIFT;
+> -	mdcr_el2 |= MDCR_EL2_E2TB_MASK << MDCR_EL2_E2TB_SHIFT;
+> +	__deactivate_traps_common(vcpu);
+>  
+> -	write_sysreg(mdcr_el2, mdcr_el2);
+
+FWIW, I found this whole sequence massively confusing, and it is only
+when I came to patch #7 that the various pieces did come together.
 
 Thanks,
-drew
 
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
