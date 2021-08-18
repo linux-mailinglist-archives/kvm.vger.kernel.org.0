@@ -2,50 +2,69 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 33BBA3F0AEC
-	for <lists+kvm@lfdr.de>; Wed, 18 Aug 2021 20:14:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B457E3F0B29
+	for <lists+kvm@lfdr.de>; Wed, 18 Aug 2021 20:41:10 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232081AbhHRSPN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 18 Aug 2021 14:15:13 -0400
-Received: from mail.kernel.org ([198.145.29.99]:58228 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229448AbhHRSPN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 18 Aug 2021 14:15:13 -0400
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 2E17860E09;
-        Wed, 18 Aug 2021 18:14:38 +0000 (UTC)
-Received: from sofa.misterjones.org ([185.219.108.64] helo=hot-poop.lan)
-        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-        (Exim 4.94.2)
-        (envelope-from <maz@kernel.org>)
-        id 1mGQ5E-005oZa-4d; Wed, 18 Aug 2021 19:14:36 +0100
-From:   Marc Zyngier <maz@kernel.org>
-To:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        kvm@vger.kernel.org
-Cc:     James Morse <james.morse@arm.com>,
+        id S230163AbhHRSlo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 18 Aug 2021 14:41:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52732 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229468AbhHRSlo (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 18 Aug 2021 14:41:44 -0400
+Received: from mail-pj1-x104a.google.com (mail-pj1-x104a.google.com [IPv6:2607:f8b0:4864:20::104a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 56139C061764
+        for <kvm@vger.kernel.org>; Wed, 18 Aug 2021 11:41:09 -0700 (PDT)
+Received: by mail-pj1-x104a.google.com with SMTP id s1-20020a17090a948100b001795fab0f86so5048668pjo.1
+        for <kvm@vger.kernel.org>; Wed, 18 Aug 2021 11:41:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=xD+scnBT+0IdTxaCEWT+M7b4WeM+uY6s3ymzr0wpIrU=;
+        b=XDOamdUDVTxzgoy91NR4R5K1937svZezTPcmRNRvFChxWiMpWCXBj5vtbAdtGEMk26
+         7TBu0t81eUXbGwbzaQDLjL5dL+w2ezC8Y53ItdpJZvslYDnA7PCsehCL5ljF4afeAYqc
+         BH4iJBbnJ5ogOjFFOztgb0mesXs3E2yt21Gbaew+a3CY38PIqfGsfyCGBz3b2A6123v9
+         CHnRw5y84RdfqqgD4uCGLZGPb+JJtqpi5MH5x60oufXLoa3n9fv5YWWdFfhJOADTsQdb
+         sgERAulmKSh6Q5CzSXtnc02MJShDgccMPMp7ULVGtXcuRQLwuIV/cs96Uo5L0W+ZJpGl
+         7/jg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=xD+scnBT+0IdTxaCEWT+M7b4WeM+uY6s3ymzr0wpIrU=;
+        b=F1h6eai/6l+e0zKlycBNleYRjwM0qdO1Vi0GFizKJaSKjd3yg/JXshcauC0CGHt5kP
+         v6Q4xYWbiNdpbbHB6Swhjed//VXC2N5Jgxy3QSPZHbJlyPuFsvyYHyxFCTH6wI4cOHhD
+         O6GjRm3NnhN5K3StPiRwqz8l7USoEaqlkbJ21AtXhlguNl62wbW4FQzwCqvA+3mDu50C
+         rpYhRTZb3da/cf1zoXOsGpoVV9zUhua2Dq1gZHoDIhInxG9Z5aYnEovkivrGQbTEgOOM
+         dPjUkOKnqpXvhWK+GDyPQRN9NxY0nxFFPMe1+atRUY6CmrC3T45J7j5SieoAVio9F+CU
+         10gg==
+X-Gm-Message-State: AOAM530M3TXusjo5uWGWE00f3id/DrP9y8QNSNeFwAJUXO2NgaHysBGT
+        SHGlb+4IiKsJ1yp9R5Dei4t1GOdFZWkc
+X-Google-Smtp-Source: ABdhPJz3j5oyASlGWvT7bl3fJWxHQ5lxymCMwaigmkTyurZ0vcaXcz9a3YEpDp30nvtiqYJJbAG/3JUcDknM
+X-Received: from rananta-virt.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:1bcc])
+ (user=rananta job=sendgmr) by 2002:a17:90a:43a7:: with SMTP id
+ r36mr91295pjg.1.1629312068379; Wed, 18 Aug 2021 11:41:08 -0700 (PDT)
+Date:   Wed, 18 Aug 2021 18:40:57 +0000
+Message-Id: <20210818184057.515187-1-rananta@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.33.0.rc1.237.g0d66db33f3-goog
+Subject: KVM: arm64: vgic: Resample HW pending state on deactivation
+From:   Raghavendra Rao Ananta <rananta@google.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>
+Cc:     Alexandru Elisei <alexandru.elisei@arm.com>,
         Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Andre Przywara <andre.przywara@arm.com>,
-        Eric Auger <eric.auger@redhat.com>,
+        James Morse <james.morse@arm.com>,
+        Peter Shier <pshier@google.com>,
+        Ricardo Koller <ricarkol@google.com>,
         Oliver Upton <oupton@google.com>,
-        Ricardo Koller <ricarkol@google.com>, kernel-team@android.com,
-        Raghavendra Rao Ananta <rananta@google.com>,
-        stable@vger.kernel.org
-Subject: [PATCH] KVM: arm64: vgic: Resample HW pending state on deactivation
-Date:   Wed, 18 Aug 2021 19:14:32 +0100
-Message-Id: <20210818181432.432256-1-maz@kernel.org>
-X-Mailer: git-send-email 2.30.2
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, alexandru.elisei@arm.com, andre.przywara@arm.com, eric.auger@redhat.com, oupton@google.com, ricarkol@google.com, kernel-team@android.com, rananta@google.com, stable@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+        Reiji Watanabe <reijiw@google.com>,
+        Jing Zhang <jingzhangos@google.com>,
+        Raghavendra Rao Anata <rananta@google.com>,
+        kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
+
+From: Marc Zyngier <maz@kernel.org>
 
 When a mapped level interrupt (a timer, for example) is deactivated
 by the guest, the corresponding host interrupt is equally deactivated.
@@ -63,17 +82,15 @@ interrupts are always possible), we can improve the emulation by
 detecting the deactivation-while-pending case and resample the
 interrupt.
 
-Fixes: e40cc57bac79 ("KVM: arm/arm64: vgic: Support level-triggered mapped interrupts")
 Reported-by: Raghavendra Rao Ananta <rananta@google.com>
 Signed-off-by: Marc Zyngier <maz@kernel.org>
-Cc: stable@vger.kernel.org
 ---
  arch/arm64/kvm/vgic/vgic-v2.c | 25 ++++++++++++++++++-------
  arch/arm64/kvm/vgic/vgic-v3.c | 25 ++++++++++++++++++-------
  2 files changed, 36 insertions(+), 14 deletions(-)
 
 diff --git a/arch/arm64/kvm/vgic/vgic-v2.c b/arch/arm64/kvm/vgic/vgic-v2.c
-index 2c580204f1dc..3e52ea86a87f 100644
+index 2c580204f1dc9..3e52ea86a87ff 100644
 --- a/arch/arm64/kvm/vgic/vgic-v2.c
 +++ b/arch/arm64/kvm/vgic/vgic-v2.c
 @@ -60,6 +60,7 @@ void vgic_v2_fold_lr_state(struct kvm_vcpu *vcpu)
@@ -130,7 +147,7 @@ index 2c580204f1dc..3e52ea86a87f 100644
  
  			if (resample)
 diff --git a/arch/arm64/kvm/vgic/vgic-v3.c b/arch/arm64/kvm/vgic/vgic-v3.c
-index 66004f61cd83..74f9aefffd5e 100644
+index 66004f61cd83d..74f9aefffd5e0 100644
 --- a/arch/arm64/kvm/vgic/vgic-v3.c
 +++ b/arch/arm64/kvm/vgic/vgic-v3.c
 @@ -46,6 +46,7 @@ void vgic_v3_fold_lr_state(struct kvm_vcpu *vcpu)
@@ -187,5 +204,5 @@ index 66004f61cd83..74f9aefffd5e 100644
  
  			if (resample)
 -- 
-2.30.2
+cgit 1.2.3-1.el7
 
