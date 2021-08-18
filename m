@@ -2,152 +2,160 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 473633EFBD0
-	for <lists+kvm@lfdr.de>; Wed, 18 Aug 2021 08:15:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 792B33EFDE7
+	for <lists+kvm@lfdr.de>; Wed, 18 Aug 2021 09:40:36 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239985AbhHRGQE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 18 Aug 2021 02:16:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45502 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238122AbhHRGPt (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 18 Aug 2021 02:15:49 -0400
-Received: from mail-pf1-x434.google.com (mail-pf1-x434.google.com [IPv6:2607:f8b0:4864:20::434])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F1757C061226
-        for <kvm@vger.kernel.org>; Tue, 17 Aug 2021 23:14:13 -0700 (PDT)
-Received: by mail-pf1-x434.google.com with SMTP id x16so1083185pfh.2
-        for <kvm@vger.kernel.org>; Tue, 17 Aug 2021 23:14:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=YsZhptKgT8RdO2UT2M60Q/NccyUdJGsE7yDhN1K90D8=;
-        b=AqV5GrGQ6APa9jCXTlZsEv0yNQBd1buoKBsvC1Patiai/MrqWa7b1XmHW51ubErKfR
-         FKiWQ3qq8B5Ew32gz8StW83bO7rlDl3YjixVsDHSJA4wz/kFX3VFE/RVvNNLh2rGw6uj
-         aLVD1eBZqiJktmYYzr55zSr1HRkW5dhGCex20=
+        id S239178AbhHRHlD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 18 Aug 2021 03:41:03 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:45980 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S239045AbhHRHlB (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 18 Aug 2021 03:41:01 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1629272427;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=LayocC0CiLEAoj+bUdeIdNWvBdq+Y8wlxH81H8i9dIo=;
+        b=Ema5pmsGM//uSAnJsdghLtdh/eD9+BABEopDEKdEb04GlrsG++MsMuFTxZbTHEpPGcxOd8
+        A2cpoWBiAMi1kbBIZICqT40+lxRxTxyWwnLw7eQJHEWAtE8x72ZQlGWZcZegxFHy4Qi26a
+        5LitTObkNZkBGcOkrRAg+BAInUoXpLA=
+Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
+ [209.85.208.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-500-aCnFq_e7MOqM4qnAn1FLrg-1; Wed, 18 Aug 2021 03:40:25 -0400
+X-MC-Unique: aCnFq_e7MOqM4qnAn1FLrg-1
+Received: by mail-ed1-f70.google.com with SMTP id o17-20020aa7d3d1000000b003beaf992d17so589920edr.13
+        for <kvm@vger.kernel.org>; Wed, 18 Aug 2021 00:40:25 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=YsZhptKgT8RdO2UT2M60Q/NccyUdJGsE7yDhN1K90D8=;
-        b=rO/LDdXK/vL+G4S6iujGNT1oSzGmzMrGtWjlcT7wY2CAvFbZNdgmc3HNq/+GZNtyZ9
-         ITZIfI9FALGmPmf+w8OTOEQVn5IGjugUd2FsFwoZcLXqNKBnIZJYj0CaPpbof88ITt9F
-         dZozRQcvk+vW5GU8uMRAugI16GMuoVK7bBe5eSBtYha/HyD5N0qQ2ul7XYzy2aDsSbAD
-         pHWoPFCmBbrSymL1/gnX3ZsfVWn+9HR+xQmjBnFZ8bQY6Tq2cHfFHJEd7nXWkldvMG5X
-         7MphmP0Dh6jpy9lshJ75cPipeZvOrA0yX2FdiE0Xv2/7iRWXUVXMDwB/REuv2Q+5HTXv
-         MvAg==
-X-Gm-Message-State: AOAM531fxnD0F2RyGe7r+InHz6geGhRP0bxuPOre7mpLpkm0/YIaa4Uf
-        V9q90/T04vAoebpPcSF4gDRK8w==
-X-Google-Smtp-Source: ABdhPJxPAH0mQ5JRMc8So+cEOoTT47AjgR2xcCPW7BD+067I11NQTK24J7A1TqH0vYvVkR9Q0mkDOA==
-X-Received: by 2002:a63:2242:: with SMTP id t2mr7083803pgm.111.1629267253551;
-        Tue, 17 Aug 2021 23:14:13 -0700 (PDT)
-Received: from www.outflux.net (smtp.outflux.net. [198.145.64.163])
-        by smtp.gmail.com with ESMTPSA id u20sm5380627pgm.4.2021.08.17.23.14.12
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 17 Aug 2021 23:14:12 -0700 (PDT)
-From:   Kees Cook <keescook@chromium.org>
-To:     linux-kernel@vger.kernel.org
-Cc:     Kees Cook <keescook@chromium.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
-        kvm@vger.kernel.org, "Gustavo A. R. Silva" <gustavoars@kernel.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        linux-wireless@vger.kernel.org, netdev@vger.kernel.org,
-        dri-devel@lists.freedesktop.org, linux-staging@lists.linux.dev,
-        linux-block@vger.kernel.org, linux-kbuild@vger.kernel.org,
-        clang-built-linux@googlegroups.com,
-        Rasmus Villemoes <linux@rasmusvillemoes.dk>,
-        linux-hardening@vger.kernel.org
-Subject: [PATCH v2 53/63] KVM: x86: Use struct_group() to zero decode cache
-Date:   Tue, 17 Aug 2021 23:05:23 -0700
-Message-Id: <20210818060533.3569517-54-keescook@chromium.org>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20210818060533.3569517-1-keescook@chromium.org>
-References: <20210818060533.3569517-1-keescook@chromium.org>
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=LayocC0CiLEAoj+bUdeIdNWvBdq+Y8wlxH81H8i9dIo=;
+        b=AEJFFUmZJ2ExmSvBGgH76Q+xNKy1v00kFm/ImVaVHDmkj63M+2/iqUz31blCkgYA81
+         gHLI/TvfvODTWH72NF6Wzohpd1EeXVTfpmFHg40VqojKkcMI7cXMNG4F2Qi+8KqjjMQ9
+         BzMw7Gw5Uj6/4JK0pi521wGh+2VzC+mL//cdNe8xzWFluVE05ZjzMxjCJmfXE0zKCPsD
+         JxSoWP7mjrIFnTNO5WBPfdPQAbFbxsu30KSdXLKTNQHsgMs4k6zj+ICSH8NXbk78B5qH
+         Y088mRTM6JOKfkot0vQ82l2nMUif09cKNkhqpA+WXqahpeT6Ek7IaenNVc7B9erBf4YQ
+         Q/Cg==
+X-Gm-Message-State: AOAM532r3Xd3EI6BfVeAdYvU8fk304okZV0Bk5mwV9PpX3MNTlNiBkdo
+        LHFrc/8KqwSq+JPO5aR4XMdp3ytnWMr/hJa9XYbB4lHkhFZ//16TI+yFAInOOh7F9ZD6+f3B0G9
+        8iq9wqBQTWWvd
+X-Received: by 2002:a17:906:2817:: with SMTP id r23mr8252881ejc.285.1629272424332;
+        Wed, 18 Aug 2021 00:40:24 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJy1d4Deq3fHMtKFHMm82ypcInyEW7LdEPY4KhLe4VS8YLB1ouLtJ1yldbS6F6bmlbRw5YqZUg==
+X-Received: by 2002:a17:906:2817:: with SMTP id r23mr8252874ejc.285.1629272424142;
+        Wed, 18 Aug 2021 00:40:24 -0700 (PDT)
+Received: from thuth.remote.csb (pd9e83070.dip0.t-ipconnect.de. [217.232.48.112])
+        by smtp.gmail.com with ESMTPSA id r16sm1629802ejz.41.2021.08.18.00.40.23
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 18 Aug 2021 00:40:23 -0700 (PDT)
+Subject: Re: [kvm-unit-tests PATCH 1/1] s390x: css: check the CSS is working
+ with any ISC
+To:     Pierre Morel <pmorel@linux.ibm.com>, kvm@vger.kernel.org
+Cc:     frankja@linux.ibm.com, david@redhat.com, cohuck@redhat.com,
+        imbrenda@linux.ibm.com
+References: <1628769189-10699-1-git-send-email-pmorel@linux.ibm.com>
+ <1628769189-10699-2-git-send-email-pmorel@linux.ibm.com>
+From:   Thomas Huth <thuth@redhat.com>
+Message-ID: <b9191517-a20b-f5e4-0e78-a819512ee328@redhat.com>
+Date:   Wed, 18 Aug 2021 09:40:22 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.12.0
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=2338; h=from:subject; bh=Ox8odXNGawRcDoEtGWzS1ckYpMUjtDsTTZYtgzhZK3w=; b=owEBbQKS/ZANAwAKAYly9N/cbcAmAcsmYgBhHKMqj0+1jVnOnluvpSmjVC4NV24/mrWjdCYNGFB9 jwBTeKuJAjMEAAEKAB0WIQSlw/aPIp3WD3I+bhOJcvTf3G3AJgUCYRyjKgAKCRCJcvTf3G3AJvAxD/ 9iMuZIH7PHSmcbrF42uGoRIdS+nUfoKIZhbDR6xmtYDi0vxGbsdnyFZjSwy/XynEIH0Vdlrjpr81jC i9bK6rBJ6rF+TFv4HczlsySW3y3N1xIFaafTX6oJZJQC4gwj1WFe3QmoGDtyXKzIY3V9LTS+crmZ19 PKzynOfjnFyeQ88B1mbEeWil4T6EpIx+uc0Ly+QDT6NMxAjAahBFGnwpD01G5vsMAaUmvcocZEMyl7 7YIHmOz/j/dYDz4RvvjZx/Tcs75qRmaGJF5mD4G1uKSyBTSMrXFMz+xPji8ym/CQJOmxlJncwK1ZeJ 0q5RhAcBUU40d3SC6gNEwZxhqKp/+y9g5sTKSmizT6qqLhtju9XaLkFreo8BocUmC87/U8XumMROux H7hTx08E0OLINGfNct+Ilqcl/d8BtuufZvpRurcgDGLCiLVLOmp2EUpSW3/7zdBVa5/XtPcJMzTFjA lNxvtKUV7fsVvqiI/nL2V5pRPIqiN0Z49mX6zaB2ugX7c6zSuVN8n/lv7Vp7R7Z9ej1ZhByTkOtJJP THc7Uk079v0yMLps1P5flkXnDnRV6bEq0RtAKVLAUn5d/wqA8wB7KtIGzZ6iai9BxNsS1Z4r3pqD7h bI8Pa7iryL+NoaVDaYWVnzlhrUa4TSXPjODvqjZoZfkoykTseBzmuBsI+cpg==
-X-Developer-Key: i=keescook@chromium.org; a=openpgp; fpr=A5C3F68F229DD60F723E6E138972F4DFDC6DC026
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <1628769189-10699-2-git-send-email-pmorel@linux.ibm.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-In preparation for FORTIFY_SOURCE performing compile-time and run-time
-field bounds checking for memset(), avoid intentionally writing across
-neighboring fields.
+On 12/08/2021 13.53, Pierre Morel wrote:
+> In the previous version we did only check that one ISC dedicated by
+> Linux for I/O is working fine.
+> 
+> However, there is no reason to prefer one ISC to another ISC, we are
+> free to take anyone.
+> 
+> Let's check all possible ISC to verify that QEMU/KVM is really ISC
+> independent.
+> 
+> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
+> ---
+>   s390x/css.c | 25 +++++++++++++++++--------
+>   1 file changed, 17 insertions(+), 8 deletions(-)
+> 
+> diff --git a/s390x/css.c b/s390x/css.c
+> index c340c539..aa005309 100644
+> --- a/s390x/css.c
+> +++ b/s390x/css.c
+> @@ -22,6 +22,7 @@
+>   
+>   #define DEFAULT_CU_TYPE		0x3832 /* virtio-ccw */
+>   static unsigned long cu_type = DEFAULT_CU_TYPE;
+> +static int io_isc;
+>   
+>   static int test_device_sid;
+>   static struct senseid *senseid;
+> @@ -46,7 +47,7 @@ static void test_enable(void)
+>   		return;
+>   	}
+>   
+> -	cc = css_enable(test_device_sid, IO_SCH_ISC);
+> +	cc = css_enable(test_device_sid, io_isc);
+>   
+>   	report(cc == 0, "Enable subchannel %08x", test_device_sid);
+>   }
+> @@ -67,7 +68,7 @@ static void test_sense(void)
+>   		return;
+>   	}
+>   
+> -	ret = css_enable(test_device_sid, IO_SCH_ISC);
+> +	ret = css_enable(test_device_sid, io_isc);
+>   	if (ret) {
+>   		report(0, "Could not enable the subchannel: %08x",
+>   		       test_device_sid);
+> @@ -142,7 +143,6 @@ static void sense_id(void)
+>   
+>   static void css_init(void)
+>   {
+> -	assert(register_io_int_func(css_irq_io) == 0);
+>   	lowcore_ptr->io_int_param = 0;
+>   
+>   	report(get_chsc_scsc(), "Store Channel Characteristics");
+> @@ -351,11 +351,20 @@ int main(int argc, char *argv[])
+>   	int i;
+>   
+>   	report_prefix_push("Channel Subsystem");
+> -	enable_io_isc(0x80 >> IO_SCH_ISC);
+> -	for (i = 0; tests[i].name; i++) {
+> -		report_prefix_push(tests[i].name);
+> -		tests[i].func();
+> -		report_prefix_pop();
+> +
+> +	for (io_isc = 0; io_isc < 8; io_isc++) {
+> +		report_info("ISC: %d\n", io_isc);
 
-Add struct_group() to mark region of struct x86_emulate_ctxt that should
-be initialized to zero.
+Would it make sense to add the "ISC" string as a prefix with 
+report_prefix_push() instead, so that the tests get individual test names?
 
-Cc: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Sean Christopherson <seanjc@google.com>
-Cc: Vitaly Kuznetsov <vkuznets@redhat.com>
-Cc: Wanpeng Li <wanpengli@tencent.com>
-Cc: Jim Mattson <jmattson@google.com>
-Cc: Joerg Roedel <joro@8bytes.org>
-Cc: Thomas Gleixner <tglx@linutronix.de>
-Cc: Ingo Molnar <mingo@redhat.com>
-Cc: Borislav Petkov <bp@alien8.de>
-Cc: x86@kernel.org
-Cc: "H. Peter Anvin" <hpa@zytor.com>
-Cc: kvm@vger.kernel.org
-Signed-off-by: Kees Cook <keescook@chromium.org>
----
- arch/x86/kvm/emulate.c     |  3 +--
- arch/x86/kvm/kvm_emulate.h | 19 +++++++++++--------
- 2 files changed, 12 insertions(+), 10 deletions(-)
+  Thomas
 
-diff --git a/arch/x86/kvm/emulate.c b/arch/x86/kvm/emulate.c
-index 2837110e66ed..2608a047e769 100644
---- a/arch/x86/kvm/emulate.c
-+++ b/arch/x86/kvm/emulate.c
-@@ -5377,8 +5377,7 @@ static int fastop(struct x86_emulate_ctxt *ctxt, fastop_t fop)
- 
- void init_decode_cache(struct x86_emulate_ctxt *ctxt)
- {
--	memset(&ctxt->rip_relative, 0,
--	       (void *)&ctxt->modrm - (void *)&ctxt->rip_relative);
-+	memset(&ctxt->decode_cache, 0, sizeof(ctxt->decode_cache));
- 
- 	ctxt->io_read.pos = 0;
- 	ctxt->io_read.end = 0;
-diff --git a/arch/x86/kvm/kvm_emulate.h b/arch/x86/kvm/kvm_emulate.h
-index 68b420289d7e..9b8afcb8ad39 100644
---- a/arch/x86/kvm/kvm_emulate.h
-+++ b/arch/x86/kvm/kvm_emulate.h
-@@ -341,14 +341,17 @@ struct x86_emulate_ctxt {
- 	 * the rest are initialized unconditionally in x86_decode_insn
- 	 * or elsewhere
- 	 */
--	bool rip_relative;
--	u8 rex_prefix;
--	u8 lock_prefix;
--	u8 rep_prefix;
--	/* bitmaps of registers in _regs[] that can be read */
--	u32 regs_valid;
--	/* bitmaps of registers in _regs[] that have been written */
--	u32 regs_dirty;
-+	struct_group(decode_cache,
-+		bool rip_relative;
-+		u8 rex_prefix;
-+		u8 lock_prefix;
-+		u8 rep_prefix;
-+		/* bitmaps of registers in _regs[] that can be read */
-+		u32 regs_valid;
-+		/* bitmaps of registers in _regs[] that have been written */
-+		u32 regs_dirty;
-+	);
-+
- 	/* modrm */
- 	u8 modrm;
- 	u8 modrm_mod;
--- 
-2.30.2
+
+> +		enable_io_isc(0x80 >> io_isc);
+> +		assert(register_io_int_func(css_irq_io) == 0);
+> +
+> +		for (i = 0; tests[i].name; i++) {
+> +			report_prefix_push(tests[i].name);
+> +			tests[i].func();
+> +			report_prefix_pop();
+> +		}
+> +
+> +		unregister_io_int_func(css_irq_io);
+>   	}
+>   	report_prefix_pop();
+>   
+> 
 
