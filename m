@@ -2,211 +2,222 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 926F43EFFC9
-	for <lists+kvm@lfdr.de>; Wed, 18 Aug 2021 11:00:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6DFE73F0015
+	for <lists+kvm@lfdr.de>; Wed, 18 Aug 2021 11:13:04 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230426AbhHRJAv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 18 Aug 2021 05:00:51 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:1098 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230344AbhHRJAt (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 18 Aug 2021 05:00:49 -0400
-Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 17I8Zf1n077928;
-        Wed, 18 Aug 2021 05:00:15 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=koZyDJ5M5B8mJGjjUNX6ImXe8elhxJEcIzpkDgjwuBI=;
- b=sF4VTXbbEVuJCun4EYhS6vp/thcQg4eogzm0qc0BEDoGHKrEFXG5IS64lPU0nE0JC8xl
- 2ep35x6j8p5Pm8WqmREeIQhq9FM/kf4NHqmoaJXEMomnkj+OoHeefcGP5/8tMKcx9F6v
- IbOac10qaDOEcSCUo63icVRxIKHIheVH+NJYgaANfwqzJFZHjR4fVlaEuJDZ1LIwN4el
- 3kiC7b9ijW3EQdofbJ+PAX0m6uy3nT+w6NxwABq8wjodcA+UTIHEX0K3uqN9/pgnd2hK
- Zo3f9Iops05iRBuh7dVmsdjL3K26m3hlGM0l0zIB3jUMoMFwJ45v8PmddqqnPQQcctUm Gw== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3agcf67fbp-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 18 Aug 2021 05:00:14 -0400
-Received: from m0098410.ppops.net (m0098410.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 17I8ccXo085286;
-        Wed, 18 Aug 2021 05:00:14 -0400
-Received: from ppma06fra.de.ibm.com (48.49.7a9f.ip4.static.sl-reverse.com [159.122.73.72])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3agcf67fa3-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 18 Aug 2021 05:00:14 -0400
-Received: from pps.filterd (ppma06fra.de.ibm.com [127.0.0.1])
-        by ppma06fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 17I8wQIp027686;
-        Wed, 18 Aug 2021 09:00:11 GMT
-Received: from b06cxnps4074.portsmouth.uk.ibm.com (d06relay11.portsmouth.uk.ibm.com [9.149.109.196])
-        by ppma06fra.de.ibm.com with ESMTP id 3ae53hded1-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 18 Aug 2021 09:00:11 +0000
-Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
-        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 17I907Rk50463196
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 18 Aug 2021 09:00:07 GMT
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 7D5E411C058;
-        Wed, 18 Aug 2021 09:00:07 +0000 (GMT)
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 9021E11C073;
-        Wed, 18 Aug 2021 09:00:06 +0000 (GMT)
-Received: from li-7e0de7cc-2d9d-11b2-a85c-de26c016e5ad.ibm.com (unknown [9.171.50.49])
-        by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Wed, 18 Aug 2021 09:00:06 +0000 (GMT)
-Subject: Re: [PATCH 1/2] KVM: s390: gaccess: Cleanup access to guest frames
-To:     David Hildenbrand <david@redhat.com>,
-        Janis Schoetterl-Glausch <scgl@linux.ibm.com>,
-        kvm@vger.kernel.org, borntraeger@de.ibm.com, frankja@linux.ibm.com,
-        imbrenda@linux.ibm.com, Heiko Carstens <hca@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>
-Cc:     cohuck@redhat.com, linux-s390@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-References: <20210816150718.3063877-1-scgl@linux.ibm.com>
- <20210816150718.3063877-2-scgl@linux.ibm.com>
- <d11128bb-18f6-5210-6f42-74a89d8edcf7@redhat.com>
-From:   Janis Schoetterl-Glausch <scgl@linux.vnet.ibm.com>
-Message-ID: <3326a23b-be19-4461-6268-809d4ed194e8@linux.vnet.ibm.com>
-Date:   Wed, 18 Aug 2021 11:00:06 +0200
+        id S230176AbhHRJNh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 18 Aug 2021 05:13:37 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:21303 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229780AbhHRJNg (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 18 Aug 2021 05:13:36 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1629277981;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=4ottHHj7zWc7J92l6pIK4Ru/1GKlXrPvFUE129DlVp0=;
+        b=KlE8vKwmLuECs7RXJuVsO4oVgczR0gBBKNxsOHiO5nC0vgTTrTusihMH17Ku0dYL9IVvhF
+        ZZ4leSjcBK91pWngQSPfpypBr9SoqMC8epijvD5weDtPW3ZuhEOchu4lHFoQvli+7Kua8t
+        oCKuO9mzznuZAb4xJEyFxyNR6HDicEg=
+Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
+ [209.85.208.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-572-vgzRIdwpNGKS-wtQr0SYxw-1; Wed, 18 Aug 2021 05:13:00 -0400
+X-MC-Unique: vgzRIdwpNGKS-wtQr0SYxw-1
+Received: by mail-ed1-f71.google.com with SMTP id z4-20020a05640240c4b02903be90a10a52so700423edb.19
+        for <kvm@vger.kernel.org>; Wed, 18 Aug 2021 02:13:00 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:to:cc:references:from:subject:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=4ottHHj7zWc7J92l6pIK4Ru/1GKlXrPvFUE129DlVp0=;
+        b=QP441XfhOV6qGPbh07oTmZn6rgpuleNDIhQ2F56UlBzQuX8rX0ZvRFqmgoW/4hw+bV
+         W0TS11NTdZxfQlxgATqY0mr9955idwmzEgWkUH/4+AbXQ197vz1ritS9A7dcUOcgzP7P
+         FwaIMELeutXnG7rVWHWqZu0W+PXc6CgeHwkOueozZAqKr7wWRgM8Su+6ltZNMqxPa2ks
+         j2onFW9ut/gQ/DrxarsbNEtHBB9uS3zEI7rjIJycH2MRDihZjyQxltfYqZS036Ifus7o
+         iXu/JfnzEW5H3o9RA7B8Db7ITtAQttYfjTUBlOcuHBPHYF3hh8peMM+ksABiaIOpbATM
+         o7Pw==
+X-Gm-Message-State: AOAM532nhgLfDFjlpJTXKbhZL/guTX4nzpZo0eKcpoaUWviW2WeHr+gq
+        P4LPhpriZBBBOqWhhiizxM195rNw8IsBL9gKSA5koc+MLNCprpTC/eRC6GfCpbL4lhG1h2ZIxfU
+        Fx6ehH6lc45Yg
+X-Received: by 2002:a17:906:9be1:: with SMTP id de33mr3532570ejc.180.1629277979492;
+        Wed, 18 Aug 2021 02:12:59 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzWIz+43XuJoqExXJvuXXomY91EWFU0asL8Ii9JrcJQFA5OO0osAfU91XdLit+YY3ImytX5DA==
+X-Received: by 2002:a17:906:9be1:: with SMTP id de33mr3532550ejc.180.1629277979216;
+        Wed, 18 Aug 2021 02:12:59 -0700 (PDT)
+Received: from thuth.remote.csb (pd9e83070.dip0.t-ipconnect.de. [217.232.48.112])
+        by smtp.gmail.com with ESMTPSA id dg24sm2321392edb.6.2021.08.18.02.12.58
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 18 Aug 2021 02:12:58 -0700 (PDT)
+To:     Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org
+Cc:     linux-s390@vger.kernel.org, imbrenda@linux.ibm.com,
+        david@redhat.com, cohuck@redhat.com
+References: <20210813073615.32837-1-frankja@linux.ibm.com>
+ <20210813073615.32837-4-frankja@linux.ibm.com>
+From:   Thomas Huth <thuth@redhat.com>
+Subject: Re: [kvm-unit-tests PATCH 3/8] lib: s390x: Print addressing related
+ exception information
+Message-ID: <1f99e6f8-27d1-7e4a-f706-12912e84f6f4@redhat.com>
+Date:   Wed, 18 Aug 2021 11:12:57 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.11.0
+ Thunderbird/78.12.0
 MIME-Version: 1.0
-In-Reply-To: <d11128bb-18f6-5210-6f42-74a89d8edcf7@redhat.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20210813073615.32837-4-frankja@linux.ibm.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: wmzpbC0jIajJkIWG-rhofcUhKMMC6FRQ
-X-Proofpoint-GUID: nLpErGr8BYpo90rsZOXxLoVSZthVwYJw
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.790
- definitions=2021-08-18_03:2021-08-17,2021-08-18 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 spamscore=0
- mlxscore=0 suspectscore=0 phishscore=0 adultscore=0 priorityscore=1501
- bulkscore=0 clxscore=1015 mlxlogscore=999 lowpriorityscore=0
- impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2107140000 definitions=main-2108180052
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 8/18/21 9:54 AM, David Hildenbrand wrote:
-> On 16.08.21 17:07, Janis Schoetterl-Glausch wrote:
->> Introduce a helper function for guest frame access.
->> Rewrite the calculation of the gpa and the length of the segment
->> to be more readable.
->>
->> Signed-off-by: Janis Schoetterl-Glausch <scgl@linux.ibm.com>
->> ---
->>   arch/s390/kvm/gaccess.c | 48 +++++++++++++++++++++++++----------------
->>   1 file changed, 29 insertions(+), 19 deletions(-)
->>
->> diff --git a/arch/s390/kvm/gaccess.c b/arch/s390/kvm/gaccess.c
->> index b9f85b2dc053..df83de0843de 100644
->> --- a/arch/s390/kvm/gaccess.c
->> +++ b/arch/s390/kvm/gaccess.c
->> @@ -827,11 +827,26 @@ static int guest_page_range(struct kvm_vcpu *vcpu, unsigned long ga, u8 ar,
->>       return 0;
->>   }
->>   +static int access_guest_frame(struct kvm *kvm, enum gacc_mode mode, gpa_t gpa,
->> +                  void *data, unsigned int len)
+On 13/08/2021 09.36, Janosch Frank wrote:
+> Right now we only get told the kind of program exception as well as
+> the PSW at the point where it happened.
 > 
-> I know, "frame" is a beautiful term for "page" -- can we just avoid using it because we're not using it anywhere else here? :)
+> For addressing exceptions the PSW is not always enough so let's print
+> the TEID which contains the failing address and flags that tell us
+> more about the kind of address exception.
 > 
-> What's wrong with "access_guest_page()" ?
+> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+> ---
+>   lib/s390x/asm/arch_def.h |  4 +++
+>   lib/s390x/interrupt.c    | 72 ++++++++++++++++++++++++++++++++++++++++
+>   2 files changed, 76 insertions(+)
+> 
+> diff --git a/lib/s390x/asm/arch_def.h b/lib/s390x/asm/arch_def.h
+> index 4ca02c1d..39c5ba99 100644
+> --- a/lib/s390x/asm/arch_def.h
+> +++ b/lib/s390x/asm/arch_def.h
+> @@ -41,6 +41,10 @@ struct psw {
+>   	uint64_t	addr;
+>   };
+>   
+> +/* Let's ignore spaces we don't expect to use for now. */
+> +#define AS_PRIM				0
+> +#define AS_HOME				3
+> +
+>   #define PSW_MASK_EXT			0x0100000000000000UL
+>   #define PSW_MASK_IO			0x0200000000000000UL
+>   #define PSW_MASK_DAT			0x0400000000000000UL
+> diff --git a/lib/s390x/interrupt.c b/lib/s390x/interrupt.c
+> index 01ded49d..1248bceb 100644
+> --- a/lib/s390x/interrupt.c
+> +++ b/lib/s390x/interrupt.c
+> @@ -12,6 +12,7 @@
+>   #include <sclp.h>
+>   #include <interrupt.h>
+>   #include <sie.h>
+> +#include <asm/page.h>
+>   
+>   static bool pgm_int_expected;
+>   static bool ext_int_expected;
+> @@ -126,6 +127,73 @@ static void fixup_pgm_int(struct stack_frame_int *stack)
+>   	/* suppressed/terminated/completed point already at the next address */
+>   }
+>   
+> +static void decode_pgm_prot(uint64_t teid)
+> +{
+> +	/* Low-address protection exception, 100 */
+> +	if (test_bit_inv(56, &teid) && !test_bit_inv(60, &teid) && !test_bit_inv(61, &teid)) {
 
-Ok, I'll use page for consistency's sake.
-> 
-> 
->> +{
->> +    gfn_t gfn = gpa_to_gfn(gpa);
->> +    unsigned int offset = offset_in_page(gpa);
->> +    int rc;
-> 
-> You could turn both const. You might want to consider reverse-christmas-treeing this.
+Likely just a matter of taste, but I'd prefer something like:
 
-Ok
-> 
->> +
->> +    if (mode == GACC_STORE)
->> +        rc = kvm_write_guest_page(kvm, gfn, data, offset, len);
->> +    else
->> +        rc = kvm_read_guest_page(kvm, gfn, data, offset, len);
-> 
-> Personally, I prefer passing in pfn + offset instead of a gpa. Also avoids having to convert back and forth.
+	if ((teid & 0x8c) == 0x80) {
 
-In access_guest_real we get back the gpa directly from the translation function.
-After the next patch the same is true for access_guest.
-So using gpas everywhere is nicer.
-And if we were to introduce a len_in_page function the offset would not even show up as an intermediary.
-> 
->> +    return rc;
->> +}
->> +
->>   int access_guest(struct kvm_vcpu *vcpu, unsigned long ga, u8 ar, void *data,
->>            unsigned long len, enum gacc_mode mode)
->>   {
->>       psw_t *psw = &vcpu->arch.sie_block->gpsw;
->> -    unsigned long _len, nr_pages, gpa, idx;
->> +    unsigned long nr_pages, gpa, idx;
->> +    unsigned int seg;
-> 
-> Dito, reverse christmas tree might be worth keeping.
-> 
->>       unsigned long pages_array[2];
->>       unsigned long *pages;
->>       int need_ipte_lock;
->> @@ -855,15 +870,12 @@ int access_guest(struct kvm_vcpu *vcpu, unsigned long ga, u8 ar, void *data,
->>           ipte_lock(vcpu);
->>       rc = guest_page_range(vcpu, ga, ar, pages, nr_pages, asce, mode);
->>       for (idx = 0; idx < nr_pages && !rc; idx++) {
->> -        gpa = *(pages + idx) + (ga & ~PAGE_MASK);
->> -        _len = min(PAGE_SIZE - (gpa & ~PAGE_MASK), len);
->> -        if (mode == GACC_STORE)
->> -            rc = kvm_write_guest(vcpu->kvm, gpa, data, _len);
->> -        else
->> -            rc = kvm_read_guest(vcpu->kvm, gpa, data, _len);
->> -        len -= _len;
->> -        ga += _len;
->> -        data += _len;
->> +        gpa = pages[idx] + offset_in_page(ga);
->> +        seg = min(PAGE_SIZE - offset_in_page(gpa), len);
->> +        rc = access_guest_frame(vcpu->kvm, mode, gpa, data, seg);
->> +        len -= seg;
->> +        ga += seg;
->> +        data += seg;
->>       }
->>       if (need_ipte_lock)
->>           ipte_unlock(vcpu);
->> @@ -875,19 +887,17 @@ int access_guest(struct kvm_vcpu *vcpu, unsigned long ga, u8 ar, void *data,
->>   int access_guest_real(struct kvm_vcpu *vcpu, unsigned long gra,
->>                 void *data, unsigned long len, enum gacc_mode mode)
->>   {
->> -    unsigned long _len, gpa;
->> +    unsigned long gpa;
->> +    unsigned int seg;
->>       int rc = 0;
->>         while (len && !rc) {
->>           gpa = kvm_s390_real_to_abs(vcpu, gra);
->> -        _len = min(PAGE_SIZE - (gpa & ~PAGE_MASK), len);
->> -        if (mode)
->> -            rc = write_guest_abs(vcpu, gpa, data, _len);
->> -        else
->> -            rc = read_guest_abs(vcpu, gpa, data, _len);
->> -        len -= _len;
->> -        gra += _len;
->> -        data += _len;
->> +        seg = min(PAGE_SIZE - offset_in_page(gpa), len);
-> 
-> What does "seg" mean? I certainly know when "len" means -- which is also what the function eats.
-> 
->> +        rc = access_guest_frame(vcpu->kvm, mode, gpa, data, seg);
->> +        len -= seg;
->> +        gra += seg;
->> +        data += seg;
->>       }
->>       return rc;
->>   }
->>
-> 
+> +		printf("Type: LAP\n");
+> +		return;
+> +	}
+> +
+> +	/* Instruction execution prevention, i.e. no-execute, 101 */
+> +	if (test_bit_inv(56, &teid) && !test_bit_inv(60, &teid) && test_bit_inv(61, &teid)) {
+> +		printf("Type: IEP\n");
+> +		return;
+> +	}
+> +
+> +	/* Standard DAT exception, 001 */
+> +	if (!test_bit_inv(56, &teid) && !test_bit_inv(60, &teid) && test_bit_inv(61, &teid)) {
+> +		printf("Type: DAT\n");
+> +		return;
+> +	}
+
+What about 010 (key controlled protection) and 011 (access-list controlled 
+protection)? Even if we do not trigger those yet, it might make sense to add 
+them right from the start, too?
+
+> +}
+> +
+> +static void decode_teid(uint64_t teid)
+> +{
+> +	int asce_id = lc->trans_exc_id & 3;
+
+Why are you referencing the lc->trans_exc_id here again? It's already passed 
+as "teid" parameter.
+
+> +	bool dat = lc->pgm_old_psw.mask & PSW_MASK_DAT;
+> +
+> +	printf("Memory exception information:\n");
+> +	printf("TEID: %lx\n", teid);
+> +	printf("DAT: %s\n", dat ? "on" : "off");
+> +	printf("AS: %s\n", asce_id == AS_PRIM ? "Primary" : "Home");
+
+Could "secondary" or "AR" mode really never happen here? I'd rather like to 
+see a switch-case statement here that is able to print all four modes, just 
+to avoid confusion.
+
+> +	if (lc->pgm_int_code == PGM_INT_CODE_PROTECTION)
+> +		decode_pgm_prot(teid);
+> +
+> +	/*
+> +	 * If teid bit 61 is off for these two exception the reported
+> +	 * address is unpredictable.
+> +	 */
+> +	if ((lc->pgm_int_code == PGM_INT_CODE_SECURE_STOR_ACCESS ||
+> +	     lc->pgm_int_code == PGM_INT_CODE_SECURE_STOR_VIOLATION) &&
+> +	    !test_bit_inv(61, &teid)) {
+> +		printf("Address: %lx, unpredictable\n ", teid & PAGE_MASK);
+> +		return;
+> +	}
+> +	printf("Address: %lx\n\n", teid & PAGE_MASK);
+> +}
+> +
+> +static void print_storage_exception_information(void)
+> +{
+> +	switch (lc->pgm_int_code) {
+> +	case PGM_INT_CODE_PROTECTION:
+> +	case PGM_INT_CODE_PAGE_TRANSLATION:
+> +	case PGM_INT_CODE_SEGMENT_TRANSLATION:
+> +	case PGM_INT_CODE_ASCE_TYPE:
+> +	case PGM_INT_CODE_REGION_FIRST_TRANS:
+> +	case PGM_INT_CODE_REGION_SECOND_TRANS:
+> +	case PGM_INT_CODE_REGION_THIRD_TRANS:
+> +	case PGM_INT_CODE_SECURE_STOR_ACCESS:
+> +	case PGM_INT_CODE_NON_SECURE_STOR_ACCESS:
+> +	case PGM_INT_CODE_SECURE_STOR_VIOLATION:
+> +		decode_teid(lc->trans_exc_id);
+> +		break;
+> +	default:
+> +		return;
+
+I think you could drop that default case.
+
+> +	}
+> +}
+> +
+>   static void print_int_regs(struct stack_frame_int *stack)
+>   {
+>   	printf("\n");
+> @@ -155,6 +223,10 @@ static void print_pgm_info(struct stack_frame_int *stack)
+>   	       lc->pgm_int_code, stap(), lc->pgm_old_psw.addr, lc->pgm_int_id);
+>   	print_int_regs(stack);
+>   	dump_stack();
+> +
+> +	/* Dump stack doesn't end with a \n so we add it here instead */
+> +	printf("\n");
+> +	print_storage_exception_information();
+>   	report_summary();
+>   	abort();
+>   }
 > 
 
