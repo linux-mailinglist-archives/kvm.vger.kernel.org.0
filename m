@@ -2,128 +2,97 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3BD8D3F0DA3
-	for <lists+kvm@lfdr.de>; Wed, 18 Aug 2021 23:45:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2216D3F0DA5
+	for <lists+kvm@lfdr.de>; Wed, 18 Aug 2021 23:45:39 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234331AbhHRVpq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 18 Aug 2021 17:45:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39092 "EHLO
+        id S234140AbhHRVqM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 18 Aug 2021 17:46:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39204 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234045AbhHRVpp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 18 Aug 2021 17:45:45 -0400
-Received: from mail-pj1-x1030.google.com (mail-pj1-x1030.google.com [IPv6:2607:f8b0:4864:20::1030])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A0713C061764
-        for <kvm@vger.kernel.org>; Wed, 18 Aug 2021 14:45:10 -0700 (PDT)
-Received: by mail-pj1-x1030.google.com with SMTP id m24-20020a17090a7f98b0290178b1a81700so3327374pjl.4
-        for <kvm@vger.kernel.org>; Wed, 18 Aug 2021 14:45:10 -0700 (PDT)
+        with ESMTP id S234116AbhHRVqM (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 18 Aug 2021 17:46:12 -0400
+Received: from mail-vk1-xa32.google.com (mail-vk1-xa32.google.com [IPv6:2607:f8b0:4864:20::a32])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C76CEC061764
+        for <kvm@vger.kernel.org>; Wed, 18 Aug 2021 14:45:36 -0700 (PDT)
+Received: by mail-vk1-xa32.google.com with SMTP id l21so1055471vkd.10
+        for <kvm@vger.kernel.org>; Wed, 18 Aug 2021 14:45:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=muQCcqaPenKykG4PGOy+YxdceqzyYMRDPJOUz8KbyH0=;
-        b=TexX8C3gmVxHzDuCEwQRrA5o/2oXdFco2ACSFpQmgmxiHjLGxJI3P5NtFHwrAo7JSQ
-         4e1LI98IUf45La8KMqOqirtwGyAayWFz/u2zn6V7H2zMBiJZgLKuoTMHeS3A9KUyZn/G
-         OPKZdImH3sH8BQQNACUqUrOjxwfBrNA1T34tHRAbVubPFhasl+HWOPmhsHntGlW6ar6e
-         XcG0O64PG81S8SXwSC8Op0rH5qvnG8AfcRchXmfeGXC+UMF2CkfpgvNPNkkhQyqhpETE
-         /Qh4oCmGyopz9nlk65pUw42LtQ1hIoPAZSg3m0dlsJy3sk4k4Me0/mrAgJUC71QujBTH
-         EV2w==
+        d=gmail.com; s=20161025;
+        h=mime-version:reply-to:from:date:message-id:subject:to;
+        bh=hnpkbT75MvyH2IRqK0mBTKtD1fn5ppfDx2DGzJoxSw4=;
+        b=grJeB6a8GBGAeOYRdgmo2e2nObruIyZVOnniPRGqHPUdoIHguWUM051ZYNHb89QbGK
+         9FkQw9FXM/themzbcDFWRzMuI9lKXZJSKFFcreOV/sqVTUBMmgPi3whzbExFaB10ca+O
+         UO417noWN9TU/rVRC/vyPMjfaQ77a0deHR2RpD19DQVJu3XVOEOduIeYtrr17ePfP5UQ
+         sv7xEG9g+9jlImIbiI3y5VU0KeHTGiDF6w2+NabthYtsnSGRh7XrCTt4kTLQscuhsVgR
+         WTdUQtbGaeOd/jqDYS3gq64t6VwrVJZlKjsxLwscCbiw42vAVPwCEqMaoMOZI2h9KZ53
+         Suyg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=muQCcqaPenKykG4PGOy+YxdceqzyYMRDPJOUz8KbyH0=;
-        b=ILeLgEzS9G2Q2GkYJeq+3Vv0kGBX/89rvmZ4tXE2LZ7TvTMuc2+t1iKav8zRaJ/MnQ
-         sN7QE6rs+atTZWgbVO41o9qHwkK2M5+9VorYytoa3PFYTP25qmKmgvLjAGuwjFLxT56L
-         X/vpP0aXFnTvdA9uqLguQKLCN8a2WJ/rayMUZCe1Uu+j2eFCMFPCkNUyXzMTAhtI18Ag
-         GFrMy+NrWge+49StVueuWLONe5MOqY/ZFfpBmoP3QL/plLJGFMJBN16o5TAA2hXpchow
-         9crMhNSHrw1NnlqsrdgzTZxNdTDrRu4ebPrEIEeCea6Yn/qWEjD5lcd13jcfqFcvm3LG
-         iAwQ==
-X-Gm-Message-State: AOAM532z8sJ/T4V0yIXnR9yBJiE7FETs4XRnq4cGbxAJhDDK7CBoibXN
-        uIz0WVzzG13ZGRNeVHthL+aejQ==
-X-Google-Smtp-Source: ABdhPJyBiBhnl7bejibYMgU7hymcLriNmoYbU76Tnmv+ZM5Ar+/vDRcYxghD3weIQN8BHvvxpxxKlg==
-X-Received: by 2002:a17:90a:2845:: with SMTP id p5mr11221708pjf.96.1629323109999;
-        Wed, 18 Aug 2021 14:45:09 -0700 (PDT)
-Received: from google.com (150.12.83.34.bc.googleusercontent.com. [34.83.12.150])
-        by smtp.gmail.com with ESMTPSA id y1sm829132pga.50.2021.08.18.14.45.09
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 18 Aug 2021 14:45:09 -0700 (PDT)
-Date:   Wed, 18 Aug 2021 14:45:04 -0700
-From:   Ricardo Koller <ricarkol@google.com>
-To:     Oliver Upton <oupton@google.com>
-Cc:     kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, maz@kernel.org,
-        james.morse@arm.com, Alexandru.Elisei@arm.com, drjones@redhat.com,
-        catalin.marinas@arm.com, suzuki.poulose@arm.com,
-        jingzhangos@google.com, pshier@google.com, rananta@google.com,
-        reijiw@google.com
-Subject: Re: [PATCH] KVM: arm64: vgic: drop WARN from vgic_get_irq
-Message-ID: <YR1/YEY8DX+r05nt@google.com>
-References: <20210818213205.598471-1-ricarkol@google.com>
- <CAOQ_QshVenuri8WdZdEis4szCv03U0KRNt4CqDNtvUBsqBqUoA@mail.gmail.com>
+        h=x-gm-message-state:mime-version:reply-to:from:date:message-id
+         :subject:to;
+        bh=hnpkbT75MvyH2IRqK0mBTKtD1fn5ppfDx2DGzJoxSw4=;
+        b=CyOIPPlLnlVhaVbS9fgYk1I3c6I+HeYUknOGDIIwTmk0RvACIIVf4NO34iJUf28Dkl
+         icrAOwIxe/JNAa7nG/9TlQX9lhTemJHrjKggiqvJ6zBRyeUZHUfuTnz7CmpI6hVU3r1i
+         STV9N7tr6F8L0LgEQFc9WOKwkSVwoldtVKhXtXWM8KiTrDu6slFvOviA8RuHyTWCYflE
+         sB14+NVF5qvXGsPfwQS+PHy7USMs85zI6fvSSd/SnXgA8CQKhUEw+tdHCrf2VTlhJ6zK
+         RiCX8GrtTz47JY5bvzdb5XdB4h1pwrkNOdgAEzhpQfOPeX2H2xMlVGqK9NbeASb9AyeS
+         rR7A==
+X-Gm-Message-State: AOAM531S3xeG1sgJ94frwcqQqq1koimnYbpQpGMdecM5RTbatXJVorum
+        2A593K524WANrXaiTGVxclX29L5MuuTGAK9A/Ls=
+X-Google-Smtp-Source: ABdhPJwWLZJUQsXQku9/1sX7DigchJTTBZCCH1kiR5mg1ObWfXzoWbUyISf0hZqyIQA9mDAmQRWT67AjmBB/LMGdQPE=
+X-Received: by 2002:a1f:5f55:: with SMTP id t82mr8996333vkb.9.1629323135275;
+ Wed, 18 Aug 2021 14:45:35 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAOQ_QshVenuri8WdZdEis4szCv03U0KRNt4CqDNtvUBsqBqUoA@mail.gmail.com>
+Received: by 2002:a9f:3206:0:0:0:0:0 with HTTP; Wed, 18 Aug 2021 14:45:34
+ -0700 (PDT)
+Reply-To: th509232@gmail.com
+From:   "Mr. TOM HASSAN" <joej93149@gmail.com>
+Date:   Wed, 18 Aug 2021 14:45:34 -0700
+Message-ID: <CAAtFf91yGQ1Jg=AFL961wounozEjhXedLQK08QV9HFLMHYXb=g@mail.gmail.com>
+Subject: Dear Friend,
+To:     undisclosed-recipients:;
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Aug 18, 2021 at 02:34:03PM -0700, Oliver Upton wrote:
-> Hi Ricardo,
-> 
-> On Wed, Aug 18, 2021 at 2:32 PM Ricardo Koller <ricarkol@google.com> wrote:
-> >
-> > vgic_get_irq(intid) is used all over the vgic code in order to get a
-> > reference to a struct irq. It warns whenever intid is not a valid number
-> > (like when it's a reserved IRQ number). The issue is that this warning
-> > can be triggered from userspace (e.g., KVM_IRQ_LINE for intid 1020).
-> >
-> > Drop the WARN call from vgic_get_irq.
-> >
-> > Signed-off-by: Ricardo Koller <ricarkol@google.com>
-> > ---
-> >  arch/arm64/kvm/vgic/vgic.c | 1 -
-> >  1 file changed, 1 deletion(-)
-> >
-> > diff --git a/arch/arm64/kvm/vgic/vgic.c b/arch/arm64/kvm/vgic/vgic.c
-> > index 111bff47e471..81cec508d413 100644
-> > --- a/arch/arm64/kvm/vgic/vgic.c
-> > +++ b/arch/arm64/kvm/vgic/vgic.c
-> > @@ -106,7 +106,6 @@ struct vgic_irq *vgic_get_irq(struct kvm *kvm, struct kvm_vcpu *vcpu,
-> >         if (intid >= VGIC_MIN_LPI)
-> >                 return vgic_get_lpi(kvm, intid);
-> >
-> > -       WARN(1, "Looking up struct vgic_irq for reserved INTID");
-> 
-> Could we maybe downgrade the message to WARN_ONCE() (to get a stack)
-> or pr_warn_ratelimited()? I agree it is problematic that userspace can
-> cause this WARN to fire, but it'd be helpful for debugging too.
-> 
+-- 
+Dear Friend,
 
-Was thinking about that, until I found this in bug.h:
+I Am Mr.Tom HASSAN. from west Africa i have a business deal to sharewith
+you in the sum of10.2M USD dollars that is been held in our here in
+(B.O.A) bank of Africa the fund mentioned rightful belong to one of
+our late client who deposited the money in our bank here ever since he
+died nobody have been able to apply to claim the fund so i wish that
+you will come and
+assume as his foreign business partner alsonote this business is risk
+free not to be sacred or doubt is real please my dearest one also note
+this once we succeed in transferringthis fund to your wish provided
+account in your country it
+will shared among us inagreement of 60%40 i believe that after this
+deal joy and happiness will be on or face's and family's please reply
+to me with your detailsso we can move on with this great plan ok.
 
-	/*
-	 * WARN(), WARN_ON(), WARN_ON_ONCE, and so on can be used to report
-	 * significant kernel issues that need prompt attention if they should ever
-	 * appear at runtime.
-	 *
-	 * Do not use these macros when checking for invalid external inputs
-	 * (e.g. invalid system call arguments, or invalid data coming from
-	 * network/devices),
 
-Just in case, KVM_IRQ_LINE returns -EINVAL for an invalid intid (like
-1020). I think it's more appropriate for the vmm to log it. What do you
-think?
+REPLY TO-- ( th509232@gmail.com)
 
-Thanks,
-Ricardo
 
-> --
-> Thanks,
-> Oliver
-> 
-> >         return NULL;
-> >  }
-> >
-> > --
-> > 2.33.0.rc2.250.ged5fa647cd-goog
-> >
+Your Full Name.......
+
+Your Age&Sex........
+
+Your Marital Status......
+
+Your Country Name.......
+
+Your Phone Number......
+
+Your Occupation.....
+
+Your Bank Name......
+
+Your Account Number......
+
+Thanks Yours Brotherly
+
+Mr. TOM HASSAN
