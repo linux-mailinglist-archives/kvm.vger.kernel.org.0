@@ -2,157 +2,132 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3A3713F0B4A
-	for <lists+kvm@lfdr.de>; Wed, 18 Aug 2021 20:52:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 69C633F0B66
+	for <lists+kvm@lfdr.de>; Wed, 18 Aug 2021 21:04:36 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233010AbhHRSwj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 18 Aug 2021 14:52:39 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:56262 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S232676AbhHRSwj (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 18 Aug 2021 14:52:39 -0400
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 17IIZOjj097790;
-        Wed, 18 Aug 2021 14:51:57 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
- from : reply-to : to : cc : date : in-reply-to : references : content-type
- : mime-version : content-transfer-encoding; s=pp1;
- bh=bhlerqPzxKDsl5WHelFKWWyiLBMMmsCeRU/M1mVJyH0=;
- b=h1WI4H21SdXczB1KHk3NbOahHjdAscSjQGsKYXXawrfYsWL0By3EkV/etAgOWdZ/WD7U
- RHauODwyO/zKGMo6A0lZPA+UIag2I6nuMOelPh8jntzOWi+lQHyccWfLdyoYvD2J99ya
- hf9AFOOqdABFJfN8Lz0SJ1q16DWv/MFRIoGoLSz/nHnqHiHGEgc49yF1E2VVXw/AIvae
- XGC029oGESOnhHu20Te6od6j5egTPuezGSiE5f/63/sVRUOoaXjxT8SEU5aDdgwLtM1U
- BnMoToRnszWpdPd/5DSsd2wspUe9np7xje/L8AsAHgsLPHynxrAOkaN1jssIXaY+bnTm 3A== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 3agp1ywqae-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 18 Aug 2021 14:51:57 -0400
-Received: from m0098419.ppops.net (m0098419.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 17IIa4Q7104833;
-        Wed, 18 Aug 2021 14:51:56 -0400
-Received: from ppma01wdc.us.ibm.com (fd.55.37a9.ip4.static.sl-reverse.com [169.55.85.253])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 3agp1ywqa5-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 18 Aug 2021 14:51:56 -0400
-Received: from pps.filterd (ppma01wdc.us.ibm.com [127.0.0.1])
-        by ppma01wdc.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 17IIWHRR027267;
-        Wed, 18 Aug 2021 18:51:56 GMT
-Received: from b03cxnp08025.gho.boulder.ibm.com (b03cxnp08025.gho.boulder.ibm.com [9.17.130.17])
-        by ppma01wdc.us.ibm.com with ESMTP id 3ae5fdhdbd-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 18 Aug 2021 18:51:55 +0000
-Received: from b03ledav004.gho.boulder.ibm.com (b03ledav004.gho.boulder.ibm.com [9.17.130.235])
-        by b03cxnp08025.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 17IIpskK53477640
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 18 Aug 2021 18:51:54 GMT
-Received: from b03ledav004.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 945977807E;
-        Wed, 18 Aug 2021 18:51:54 +0000 (GMT)
-Received: from b03ledav004.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id D398C7805C;
-        Wed, 18 Aug 2021 18:51:51 +0000 (GMT)
-Received: from [10.50.3.223] (unknown [9.160.128.138])
-        by b03ledav004.gho.boulder.ibm.com (Postfix) with ESMTP;
-        Wed, 18 Aug 2021 18:51:51 +0000 (GMT)
-Message-ID: <bc11c76e083784537a8ceaf8d3d2f74b5ca9e655.camel@linux.ibm.com>
+        id S232657AbhHRTFK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 18 Aug 2021 15:05:10 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:50739 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229558AbhHRTFJ (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 18 Aug 2021 15:05:09 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1629313474;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=RKRaR8ialZrJcZ2q5uYwpXQ6txvGrMjrVXBzyK2J2jo=;
+        b=Mlj1Yvgwf0s3ZM3jNG9lVvlwjU86oQkIR/7l4RXPEo6qWcxw1P+YHCU4E5vps4WAsA8Utv
+        pB3Mf25lQrsogh02wGtnDBBAYSKo3M/HeTVQAoqsRGzw5b99pPfuQ6OTGGBuilYrU4ICSZ
+        EZVLabEirFGRc53OMQLaTe8Ozf51tlY=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-356-Y7BPqjTBMvmHHXneobN2BQ-1; Wed, 18 Aug 2021 15:04:32 -0400
+X-MC-Unique: Y7BPqjTBMvmHHXneobN2BQ-1
+Received: by mail-wr1-f69.google.com with SMTP id m5-20020a5d6a050000b0290154e83dce73so873338wru.19
+        for <kvm@vger.kernel.org>; Wed, 18 Aug 2021 12:04:32 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=RKRaR8ialZrJcZ2q5uYwpXQ6txvGrMjrVXBzyK2J2jo=;
+        b=e55AlmJtmzcj9v0CcUcPevGDzZmyhMUWhfdp+bhfTEQae/Pmoi85WHLSlG7IFroll2
+         ryrg53rDuhT3nBX9PywsRumpCBIyPx/QxLuMvcZG5fEpJt/su5dwsssVLJEma/o7Srbf
+         z2eQ4BOIZ4+TzX2/oIEiqPL59aG9cWq89i0x6NtMItJJCwQ9t+hubohQeY4SD1iD/tk9
+         64vkX1ceIzcn7/JLllG2VWKLjMIEqMLeiGotPeM9aolFHqtD+y8HGPQaE3D34LwmeG5H
+         c57IGsSNVp+gU3IEC1oPTSxluFjyPknRsLfR3zG1KZqxoR/Zsiz3tAOCOYJdyWFGdDWh
+         j9nQ==
+X-Gm-Message-State: AOAM533nSDRNp3IA2QFFqJHUNHgRp8dHPMI2rkBQjAUHBYzgGcafPnAi
+        Ukbtxn3LmjQzc2aAjfPJa+/rWuxOe13oNCs1OIWHGt7sWV7tqwfPV9je3G9s/gij5H48jtWDboC
+        NRhfpOgMjF7MH
+X-Received: by 2002:adf:9c8b:: with SMTP id d11mr12014206wre.43.1629313471464;
+        Wed, 18 Aug 2021 12:04:31 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxLdMDbMSjp9h1NdcljIpckt7ie6vJPkq0kBmu03yZevd4oVZWyroH52DVVQV60VqXHh9XvBQ==
+X-Received: by 2002:adf:9c8b:: with SMTP id d11mr12014177wre.43.1629313471328;
+        Wed, 18 Aug 2021 12:04:31 -0700 (PDT)
+Received: from work-vm (cpc109021-salf6-2-0-cust453.10-2.cable.virginm.net. [82.29.237.198])
+        by smtp.gmail.com with ESMTPSA id k3sm5996868wms.28.2021.08.18.12.04.30
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 18 Aug 2021 12:04:30 -0700 (PDT)
+Date:   Wed, 18 Aug 2021 20:04:28 +0100
+From:   "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To:     Tobin Feldman-Fitzthum <tobin@linux.ibm.com>
+Cc:     Steve Rutherford <srutherford@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Ashish Kalra <Ashish.Kalra@amd.com>, thomas.lendacky@amd.com,
+        brijesh.singh@amd.com, ehabkost@redhat.com, kvm@vger.kernel.org,
+        mst@redhat.com, tobin@ibm.com, jejb@linux.ibm.com,
+        richard.henderson@linaro.org, qemu-devel@nongnu.org,
+        frankeh@us.ibm.com, dovmurik@linux.vnet.ibm.com
 Subject: Re: [RFC PATCH 00/13] Add support for Mirror VM.
-From:   James Bottomley <jejb@linux.ibm.com>
-Reply-To: jejb@linux.ibm.com
-To:     "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc:     Ashish Kalra <ashish.kalra@amd.com>,
-        Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org,
-        thomas.lendacky@amd.com, brijesh.singh@amd.com,
-        ehabkost@redhat.com, mst@redhat.com, richard.henderson@linaro.org,
-        tobin@ibm.com, dovmurik@linux.vnet.ibm.com, frankeh@us.ibm.com,
-        kvm@vger.kernel.org
-Date:   Wed, 18 Aug 2021 14:51:50 -0400
-In-Reply-To: <YR1Dnl6kDjsz+gWI@work-vm>
-References: <20210816144413.GA29881@ashkalra_ubuntu_server>
-         <b25a1cf9-5675-99da-7dd6-302b04cc7bbc@redhat.com>
-         <20210816151349.GA29903@ashkalra_ubuntu_server>
-         <f7cf142b-02e4-5c87-3102-f3acd8b07288@redhat.com>
-         <20210818103147.GB31834@ashkalra_ubuntu_server>
-         <f0b5b725fc879d72c702f88a6ed90e956ec32865.camel@linux.ibm.com>
-         <YR0nwVPKymrAeIzV@work-vm>
-         <8ae11fca26e8d7f96ffc7ec6353c87353cadc63a.camel@linux.ibm.com>
-         <YR0qoV6tDuVxddL5@work-vm>
-         <8a94ce57b4aa28df1504dcf08aace88d594ffb32.camel@linux.ibm.com>
-         <YR1Dnl6kDjsz+gWI@work-vm>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.34.4 
+Message-ID: <YR1ZvArdq4sKVyTJ@work-vm>
+References: <cover.1629118207.git.ashish.kalra@amd.com>
+ <CABayD+fyrcyPGg5TdXLr95AFkPFY+EeeNvY=NvQw_j3_igOd6Q@mail.gmail.com>
+ <0fcfafde-a690-f53a-01fc-542054948bb2@redhat.com>
+ <37796fd1-bbc2-f22c-b786-eb44f4d473b9@linux.ibm.com>
+ <CABayD+evf56U4yT2V1TmEzaJjvV8gutUG5t8Ob2ifamruw5Qrg@mail.gmail.com>
+ <458ba932-5150-8706-3958-caa4cc67c8e3@linux.ibm.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: x-45Xgu6qoWXHlQTR3NofZmC10lFf2er
-X-Proofpoint-GUID: c7KHo02ECctrgq7sFpC_LzDmd3sKXJ0m
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.790
- definitions=2021-08-18_07:2021-08-17,2021-08-18 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=999 clxscore=1015
- priorityscore=1501 lowpriorityscore=0 phishscore=0 malwarescore=0
- mlxscore=0 bulkscore=0 impostorscore=0 suspectscore=0 spamscore=0
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2107140000 definitions=main-2108180116
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <458ba932-5150-8706-3958-caa4cc67c8e3@linux.ibm.com>
+User-Agent: Mutt/2.0.7 (2021-05-04)
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 2021-08-18 at 18:30 +0100, Dr. David Alan Gilbert wrote:
-> * James Bottomley (jejb@linux.ibm.com) wrote:
-> > On Wed, 2021-08-18 at 16:43 +0100, Dr. David Alan Gilbert wrote:
-> > > * James Bottomley (jejb@linux.ibm.com) wrote:
-> > [...]
-> > > > Given the lack of SMI, we can't guarantee that with plain SEV
-> > > > and -ES. Once we move to -SNP, we can use VMPLs to achieve
-> > > > this.
+* Tobin Feldman-Fitzthum (tobin@linux.ibm.com) wrote:
+> On 8/17/21 6:04 PM, Steve Rutherford wrote:
+> > On Tue, Aug 17, 2021 at 1:50 PM Tobin Feldman-Fitzthum
+> > <tobin@linux.ibm.com> wrote:
+> > > This is essentially what we do in our prototype, although we have an
+> > > even simpler approach. We have a 1:1 mapping that maps an address to
+> > > itself with the cbit set. During Migration QEMU asks the migration
+> > > handler to import/export encrypted pages and provides the GPA for said
+> > > page. Since the migration handler only exports/imports encrypted pages,
+> > > we can have the cbit set for every page in our mapping. We can still use
+> > > OVMF functions with these mappings because they are on encrypted pages.
+> > > The MH does need to use a few shared pages (to communicate with QEMU,
+> > > for instance), so we have another mapping without the cbit that is at a
+> > > large offset.
 > > > 
-> > > Doesn't the MH have access to different slots and running on
-> > > separate vCPUs; so it's still got some separation?
-> > 
-> > Remember that the OVMF code is provided by the host, but its
-> > attested to and run by the guest.  Once the guest takes control
-> > (i.e. after OVMF boots the next thing), we can't guarantee that it
-> > wont overwrite the MH code, so the host must treat the MH as
-> > untrusted.
+> > > I think this is basically equivalent to what you suggest. As you point
+> > > out above, this approach does require that any page that will be
+> > > exported/imported by the MH is mapped in the guest. Is this a bad
+> > > assumption? The VMSA for SEV-ES is one example of a region that is
+> > > encrypted but not mapped in the guest (the PSP handles it directly). We
+> > > have been planning to map the VMSA into the guest to support migration
+> > > with SEV-ES (along with other changes).
+> > Ahh, It sounds like you are looking into sidestepping the existing
+> > AMD-SP flows for migration. I assume the idea is to spin up a VM on
+> > the target side, and have the two VMs attest to each other. How do the
+> > two sides know if the other is legitimate? I take it that the source
+> > is directing the LAUNCH flows?
 > 
-> Yeh; if it's in a romimage I guess we could write protect it?
-> (Not that I'd trust it still)
+> Yeah we don't use PSP migration flows at all. We don't need to send the MH
+> code from the source to the target because the MH lives in firmware, which
+> is common between the two.
 
-Yes, but unfortunately OVMF (and edk2 in general) has another pitfall
-for you: the initial pflash may be a read only ROM image, but it
-uncompresses itself to low RAM and executes itself out of there. 
-Anything in either PEI or DXE (which is where the migration handler
-lies) is RAM based after decompression.
+Are you relying on the target firmware to be *identical* or purely for
+it to be *compatible* ?  It's normal for a migration to be the result of
+wanting to do an upgrade; and that means the destination build of OVMF
+might be newer (or older, or ...).
 
-> > > > But realistically, given the above API, even if the guest is
-> > > > malicious, what can it do?  I think it's simply return bogus
-> > > > pages that cause a crash on start after migration, which
-> > > > doesn't look like a huge risk to the cloud to me (it's more a
-> > > > self destructive act on behalf of the guest).
-> > > 
-> > > I'm a bit worried about the data structures that are shared
-> > > between the migration code in qemu and the MH; the code in qemu
-> > > is going to have to be paranoid about not trusting anything
-> > > coming from the MH.
-> > 
-> > Given that we have to treat the host MH structure as untrusted,
-> > this is definitely something we have to do.  Although the primary
-> > API is simply "here's a buffer, please fill it", so there's not
-> > much checking to do, we just have to be careful that we don't
-> > expose any more of the buffer than the guest needs to write to ...
-> > and, obviously, clean it before exposing it to the guest.
+Dave
+
+
+> We start the target like a normal VM rather than
+> waiting for an incoming migration. The plan is to treat the target like a
+> normal VM for attestation as well. The guest owner will attest the target VM
+> just like they would any other VM that is started on their behalf. Secret
+> injection can be used to establish a shared key for the source and target.
 > 
-> I was assuming life got a bit more complicated than that; and we had
-> to have lists of pages we were requesting, and a list of pages that
-> were cooked and the qemu thread and the helper thread all had to work
-> in parallel.  So I'm guessing some list or bookkeeeping that we need
-> to be very careful of.
-
-I was more or less imagining a GPA address and length, so range based,
-but it could be we need something more sophisticated ... Tobin will
-look after that part.  However, either way, we just need to be careful.
-
-Regards,
-
-James
-
+> -Tobin
+> 
+> > 
+> > --Steve
+> > 
+> 
+-- 
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
