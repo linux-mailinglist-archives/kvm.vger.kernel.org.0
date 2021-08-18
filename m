@@ -2,103 +2,106 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id DD8D63F0D9C
-	for <lists+kvm@lfdr.de>; Wed, 18 Aug 2021 23:43:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5AB593F0D9E
+	for <lists+kvm@lfdr.de>; Wed, 18 Aug 2021 23:43:36 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234174AbhHRVnw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 18 Aug 2021 17:43:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38620 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234141AbhHRVnv (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 18 Aug 2021 17:43:51 -0400
-Received: from mail-pl1-x632.google.com (mail-pl1-x632.google.com [IPv6:2607:f8b0:4864:20::632])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4FDF5C0613CF
-        for <kvm@vger.kernel.org>; Wed, 18 Aug 2021 14:43:16 -0700 (PDT)
-Received: by mail-pl1-x632.google.com with SMTP id c17so2713457plz.2
-        for <kvm@vger.kernel.org>; Wed, 18 Aug 2021 14:43:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=Urwa3UzEqM6bx1rqTWjruQFp6e8+joKwTq2oMTg9VIE=;
-        b=HFPtXnpPGToF7LCczbWSo9uUFLMpq1xJe6bOqNTdwgZ/Hr6PAZgnVrspCPVfWRhFWt
-         rXuBP7jVpW7XDWjtzuYMkoW3oqSSAq2RPNpjdDYIAu3KB9SdI8VnW2apoOES+q2zYfNP
-         HifGUo6eGQfzj1Zd/Oisr47+RHwWxJUbxEQij+zH6t0HWiNLVvUGyBjHWbIKN588QnxF
-         bXGIf1/FeTC4ph2lD1GqFNF3cbPOpCZoeYAPHQCavJdwom5os3Pbz/92qDQic+qC9Fu5
-         04DFs+QWycTIIZ05qptcENV8520XVElyTa/b2FsAHIISxxksSkaKOMpNletTdNPmAVbw
-         WHIg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=Urwa3UzEqM6bx1rqTWjruQFp6e8+joKwTq2oMTg9VIE=;
-        b=o8vUvVNsle45tYTp0suzljabeGQUACmIYcM86CAf0lRs5kF3VWh6oJhzf9MvWcM219
-         Iko3SRzsAt9XK2pdi86yZPkR+Gmsi13wTtn0ttXhBteQpjuBfJ6kF8NWzbUR6DJLR0hH
-         nD+RjsCr5oAty/9nx6eyFmxKqBgouMDHwi+c7DRUng3qJ1va3legq0/JWSfUefRXXU5O
-         xD+uDr+josGtlnLKVJPiprPSksuRTaS3aFe/ZLBi1VdGaKLaJ+2Iscfihf4ncXsWMZbu
-         cOLdDQ7ruaKDgXSjVmzXaIyMsCqqxCxvPmkh4eV8jAJprFKVakiUVaNTGqXm1tQeiNjm
-         0+bQ==
-X-Gm-Message-State: AOAM5313vosVQUF2Zd7yXj4yoftUCtiJs21Ymdhqlkf4FMoLkmw8LeIg
-        y2PPIZWVkmlxGOuG3rpdEXgTXA==
-X-Google-Smtp-Source: ABdhPJxt6sDtb2wo4PVjm4LVmvOTJ2/mxYkpW4jXJXIh0eYt3JJ/1DSVMNFXZHEPQlo6BCB0iUrAGA==
-X-Received: by 2002:a17:902:e9c6:b029:12d:4cb3:3985 with SMTP id 6-20020a170902e9c6b029012d4cb33985mr8921304plk.56.1629322995681;
-        Wed, 18 Aug 2021 14:43:15 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id r16sm705172pje.10.2021.08.18.14.43.14
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 18 Aug 2021 14:43:15 -0700 (PDT)
-Date:   Wed, 18 Aug 2021 21:43:09 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Hou Wenlong <houwenlong93@linux.alibaba.com>
-Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        id S234268AbhHRVoJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 18 Aug 2021 17:44:09 -0400
+Received: from vps-vb.mhejs.net ([37.28.154.113]:34654 "EHLO vps-vb.mhejs.net"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S234140AbhHRVoJ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 18 Aug 2021 17:44:09 -0400
+Received: from MUA
+        by vps-vb.mhejs.net with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+        (Exim 4.94.2)
+        (envelope-from <mail@maciej.szmigiero.name>)
+        id 1mGTLL-000665-Kq; Wed, 18 Aug 2021 23:43:27 +0200
+To:     David Hildenbrand <david@redhat.com>
+Cc:     Sean Christopherson <seanjc@google.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
-        Avi Kivity <avi@redhat.com>, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] kvm: fix wrong exception emulation in check_rdtsc
-Message-ID: <YR1+7awNToPmkitb@google.com>
-References: <1297c0dd3f1bb47a6d089f850b629c7aa0247040.1629257115.git.houwenlong93@linux.alibaba.com>
+        Igor Mammedov <imammedo@redhat.com>,
+        Marc Zyngier <maz@kernel.org>,
+        James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Huacai Chen <chenhuacai@kernel.org>,
+        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+        Paul Mackerras <paulus@ozlabs.org>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>
+References: <cover.1628871411.git.maciej.szmigiero@oracle.com>
+ <8db0f1d1901768b5de1417caa425e62d1118e5e8.1628871413.git.maciej.szmigiero@oracle.com>
+ <957c6b3d-9621-a5a5-418c-f61f87a32ee0@redhat.com>
+From:   "Maciej S. Szmigiero" <mail@maciej.szmigiero.name>
+Subject: Re: [PATCH v4 06/13] KVM: Move WARN on invalid memslot index to
+ update_memslots()
+Message-ID: <fa71d652-8b7f-e0d7-5617-8958e3e78f6e@maciej.szmigiero.name>
+Date:   Wed, 18 Aug 2021 23:43:21 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.13.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1297c0dd3f1bb47a6d089f850b629c7aa0247040.1629257115.git.houwenlong93@linux.alibaba.com>
+In-Reply-To: <957c6b3d-9621-a5a5-418c-f61f87a32ee0@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Aug 18, 2021, Hou Wenlong wrote:
-> According to Intel's SDM Vol2 and AMD's APM Vol3, when
-> CR4.TSD is set, use rdtsc/rdtscp instruction above privilege
-> level 0 should trigger a #GP.
+On 18.08.2021 16:35, David Hildenbrand wrote:
+> On 13.08.21 21:33, Maciej S. Szmigiero wrote:
+>> From: "Maciej S. Szmigiero" <maciej.szmigiero@oracle.com>
+>>
+>> Since kvm_memslot_move_forward() can theoretically return a negative
+>> memslot index even when kvm_memslot_move_backward() returned a positive one
+>> (and so did not WARN) let's just move the warning to the common code.
+>>
+>> Signed-off-by: Maciej S. Szmigiero <maciej.szmigiero@oracle.com>
+>> ---
+>>   virt/kvm/kvm_main.c | 6 ++++--
+>>   1 file changed, 4 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+>> index 03ef42d2e421..7000efff1425 100644
+>> --- a/virt/kvm/kvm_main.c
+>> +++ b/virt/kvm/kvm_main.c
+>> @@ -1293,8 +1293,7 @@ static inline int kvm_memslot_move_backward(struct kvm_memslots *slots,
+>>       struct kvm_memory_slot *mslots = slots->memslots;
+>>       int i;
+>> -    if (WARN_ON_ONCE(slots->id_to_index[memslot->id] == -1) ||
+>> -        WARN_ON_ONCE(!slots->used_slots))
+>> +    if (slots->id_to_index[memslot->id] == -1 || !slots->used_slots)
+>>           return -1;
+>>       /*
+>> @@ -1398,6 +1397,9 @@ static void update_memslots(struct kvm_memslots *slots,
+>>               i = kvm_memslot_move_backward(slots, memslot);
+>>           i = kvm_memslot_move_forward(slots, memslot, i);
+>> +        if (WARN_ON_ONCE(i < 0))
+>> +            return;
+>> +
+>>           /*
+>>            * Copy the memslot to its new position in memslots and update
+>>            * its index accordingly.
+>>
 > 
-> Fixes: d7eb82030699e ("KVM: SVM: Add intercept checks for remaining group7 instructions")
-> Signed-off-by: Hou Wenlong <houwenlong93@linux.alibaba.com>
-> ---
->  arch/x86/kvm/emulate.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
 > 
-> diff --git a/arch/x86/kvm/emulate.c b/arch/x86/kvm/emulate.c
-> index 2837110e66ed..c589ac832265 100644
-> --- a/arch/x86/kvm/emulate.c
-> +++ b/arch/x86/kvm/emulate.c
-> @@ -4206,7 +4206,7 @@ static int check_rdtsc(struct x86_emulate_ctxt *ctxt)
->  	u64 cr4 = ctxt->ops->get_cr(ctxt, 4);
->  
->  	if (cr4 & X86_CR4_TSD && ctxt->ops->cpl(ctxt))
-> -		return emulate_ud(ctxt);
-> +		return emulate_gp(ctxt, 0);
-
-Heh, I was having some serious deja vu, but the fix I was thinking of was
-for em_rdpid, and that was changing #GP -> #UD (commit a9e2e0ae6860).
-
-Reviewed-by: Sean Christopherson <seanjc@google.com>
-
->  	return X86EMUL_CONTINUE;
->  }
-> -- 
-> 2.31.1
+> Note that WARN_ON_* is frowned upon, because it can result in crashes with panic_on_warn enabled, which is what some distributions do enable.
 > 
+> We tend to work around that by using pr_warn()/pr_warn_once(), avoiding eventually crashing the system when there is a way to continue.
+> 
+
+This patch uses WARN_ON_ONCE because:
+1) It was used in the old code and the patch merely moves the check
+from kvm_memslot_move_backward() to its caller,
+
+2) This chunk of code is wholly replaced by patch 11 from this series
+anyway ("Keep memslots in tree-based structures instead of array-based ones").
+
+Thanks,
+Maciej
