@@ -2,56 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 80FDA3F0B33
-	for <lists+kvm@lfdr.de>; Wed, 18 Aug 2021 20:43:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CB8963F0B39
+	for <lists+kvm@lfdr.de>; Wed, 18 Aug 2021 20:45:34 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232979AbhHRSoH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 18 Aug 2021 14:44:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53312 "EHLO
+        id S233134AbhHRSoK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 18 Aug 2021 14:44:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53322 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232584AbhHRSoD (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 18 Aug 2021 14:44:03 -0400
-Received: from mail-pl1-x64a.google.com (mail-pl1-x64a.google.com [IPv6:2607:f8b0:4864:20::64a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 32297C061764
-        for <kvm@vger.kernel.org>; Wed, 18 Aug 2021 11:43:28 -0700 (PDT)
-Received: by mail-pl1-x64a.google.com with SMTP id 5-20020a170902ee45b029012d3a69c6c5so781543plo.7
-        for <kvm@vger.kernel.org>; Wed, 18 Aug 2021 11:43:28 -0700 (PDT)
+        with ESMTP id S232854AbhHRSoF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 18 Aug 2021 14:44:05 -0400
+Received: from mail-pf1-x449.google.com (mail-pf1-x449.google.com [IPv6:2607:f8b0:4864:20::449])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 964E9C0613CF
+        for <kvm@vger.kernel.org>; Wed, 18 Aug 2021 11:43:30 -0700 (PDT)
+Received: by mail-pf1-x449.google.com with SMTP id t62-20020a625f410000b029032bc3dda599so1779001pfb.17
+        for <kvm@vger.kernel.org>; Wed, 18 Aug 2021 11:43:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=date:in-reply-to:message-id:mime-version:references:subject:from:to
          :cc;
-        bh=JcHymXf2ERbzAFxFFXQtQ/oPOCBg0VdgmGHaGoYCh8I=;
-        b=XclqRPUA0/dOnnUxZ6e5xfFEGz1bzMNLZDMWFZSNFvSFo8M+XkqAR82qhWjdPE04Gd
-         aXBogWWruyzy9kxHz03pmBGH/UtNF0W3hCs5Aaq4tpFylnvpbS77o1qVZhE6gSQuUQw4
-         mJkGlM8sPbtWCf+da7Jh+QMhfXB3oiO3IwX+9fwS1X7zzd6PquEQPLAul6Z6D2FsdeuH
-         O1YzzLW8k2PHAi3uM/cXlCc5b8E7dTrTBvjTkL5DH6rkSScy+NHjgpTDduDeCEmNH+mF
-         K/Okj9Ec+GiUjBFew8hgsuz9H4bIcWhcekTwVtjgiLg39+UVOacGwheMLt6SoqfOWwiK
-         SluA==
+        bh=hVS0vPea/E7ymOuCPsOem1y67EWYYT9eWBeHAHepsoY=;
+        b=M4v7edVYyKBY+V84oWDNulNY+yx4Uze2wbZlUXRS2Aln9eqOffhXiBXP5DqvkJiSS6
+         ixVqUwuDxfj3hQwR3DyYk3Rg1Es+zp4/+Bndw5JEEMqIa2SqRk9ViwSiUkA2wFuFM5xB
+         EDVY79ZV26X/y44fJVpZSzHM0O24OQkHsMiGP5NVaAgMOxCNwyzeNlaj98UnYeNLSiVV
+         3NPTU3nkl3+FXba1M7nb9zipmihuU6BPali7X4+fro6+nVTtq7oJkwx3jU0X53Bb+xsz
+         zfnz4UOTYUCfp5iGx6vwnuOZu6kevvHSd+WSbDX4FYIDV6ERrruszwVx7V3PRnFU8XAO
+         Dyug==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=JcHymXf2ERbzAFxFFXQtQ/oPOCBg0VdgmGHaGoYCh8I=;
-        b=nkmdYRT/z2FzGgC1NpvaEff+Sz9QzLgR8/KyArEPodANV6cJo64ayZBWDMsX3yQDQJ
-         dLlt+RbDNtZ7Udc/wg74DvxFn/eM5ISkz+OoAEpHorplJ+GShydOj/sQEEYYI2Y4+9iQ
-         1wtTR7GWKSDUo4SJ0ynsM+CqlJthkFeXThKJz98Yt7erogVOj+r2KA/DB4vKKW8EIYVU
-         8L++KPCcUnD3B9sgQgq9qAcqqDZomdUQuw6HZfDlqbTORPpz1L+U03upbRljTWrDeBG3
-         z7Kv9aGGPWeTDQ4Vt86TrdjcdonytHZ2pWcHhbBCrXiTKZH50oyMgXpwBCkp0l6D0+A2
-         lDRA==
-X-Gm-Message-State: AOAM533ZhWqxU/Pp6+2bHH/p40BDrdnWAbRkRN5iE71xY7gyKOKhnsws
-        slosoe9kFgLGb3wt4J6rglQcDezpPDHW
-X-Google-Smtp-Source: ABdhPJxc2j/d30LFbliRbem66L7CuOMyzlZyrRGCesZ+JnC9QmoojdAvcyujHgWDyq8CQJl8cLQINmB345v+
+        bh=hVS0vPea/E7ymOuCPsOem1y67EWYYT9eWBeHAHepsoY=;
+        b=l+OYHYrRGQKkKzjxlexyMfIsydsomCi+ot6mQf5Q1u/wDHBODE8KylXyLG+Qq1XOIm
+         J1M2UfGYUApycFVoJ/AEhhcQBqHpSBdgJF7NCZc0eGpseiIBDoD0jjXjmBzzoo2RZrkh
+         YLIAqjzwO8MxA1pmMeQfwZVUOToGEKmPu27GRY/bh6FWr9ZNwKxKVHxzjEH9G2qAlb/m
+         myD2DbT8xKg8rPMqpjpYugEvTJ84BIEgWoDXO71jzi09OPl9wfJuRQwycAYfgeuvV8UK
+         P99MykOAIoRV1JAwnBBw6PRfNBcVF11Ktt9wsn0USR7TcRnjPJlVqqD5wxrDimHklWkC
+         SQIA==
+X-Gm-Message-State: AOAM530cUtOaj63mwfNLLKhx1DWeByfY0Ml5wemCYpyIOyh5mFUTj87E
+        8SI5hcAd4lzyzLA6InmK8eFoh2LUmRRu
+X-Google-Smtp-Source: ABdhPJwYcXARLYf9x4AaQrRYJ8sgbNkV+MLILfJmXoYMtcvFdw4v4vbdtvvWUMKaPFR8/UlVv8HOd2W4xggq
 X-Received: from rananta-virt.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:1bcc])
- (user=rananta job=sendgmr) by 2002:a17:903:4055:b0:12e:ce88:e896 with SMTP id
- n21-20020a170903405500b0012ece88e896mr4978961pla.21.1629312207724; Wed, 18
- Aug 2021 11:43:27 -0700 (PDT)
-Date:   Wed, 18 Aug 2021 18:43:06 +0000
+ (user=rananta job=sendgmr) by 2002:a17:902:e850:b0:12d:91c6:1cd with SMTP id
+ t16-20020a170902e85000b0012d91c601cdmr8429954plg.16.1629312210095; Wed, 18
+ Aug 2021 11:43:30 -0700 (PDT)
+Date:   Wed, 18 Aug 2021 18:43:07 +0000
 In-Reply-To: <20210818184311.517295-1-rananta@google.com>
-Message-Id: <20210818184311.517295-6-rananta@google.com>
+Message-Id: <20210818184311.517295-7-rananta@google.com>
 Mime-Version: 1.0
 References: <20210818184311.517295-1-rananta@google.com>
 X-Mailer: git-send-email 2.33.0.rc1.237.g0d66db33f3-goog
-Subject: [PATCH v2 05/10] KVM: arm64: selftests: Add basic support to generate delays
+Subject: [PATCH v2 06/10] KVM: arm64: selftests: Add support to disable and
+ enable local IRQs
 From:   Raghavendra Rao Ananta <rananta@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>
 Cc:     Alexandru Elisei <alexandru.elisei@arm.com>,
@@ -69,48 +70,33 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Add udelay() support to generate a delay in the guest.
-
-The routines are derived and simplified from kernel's
-arch/arm64/lib/delay.c.
+Add functions local_irq_enable() and local_irq_disable() to
+enable and disable the IRQs from the guest, respectively.
 
 Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
 ---
- .../selftests/kvm/include/aarch64/delay.h     | 25 +++++++++++++++++++
- 1 file changed, 25 insertions(+)
- create mode 100644 tools/testing/selftests/kvm/include/aarch64/delay.h
+ .../testing/selftests/kvm/include/aarch64/processor.h  | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
 
-diff --git a/tools/testing/selftests/kvm/include/aarch64/delay.h b/tools/testing/selftests/kvm/include/aarch64/delay.h
-new file mode 100644
-index 000000000000..329e4f5079ea
---- /dev/null
-+++ b/tools/testing/selftests/kvm/include/aarch64/delay.h
-@@ -0,0 +1,25 @@
-+/* SPDX-License-Identifier: GPL-2.0 */
-+/*
-+ * ARM simple delay routines
-+ */
-+
-+#ifndef SELFTEST_KVM_ARM_DELAY_H
-+#define SELFTEST_KVM_ARM_DELAY_H
-+
-+#include "arch_timer.h"
-+
-+static inline void __delay(uint64_t cycles)
+diff --git a/tools/testing/selftests/kvm/include/aarch64/processor.h b/tools/testing/selftests/kvm/include/aarch64/processor.h
+index c83ff99282ed..ae7a079ae180 100644
+--- a/tools/testing/selftests/kvm/include/aarch64/processor.h
++++ b/tools/testing/selftests/kvm/include/aarch64/processor.h
+@@ -238,4 +238,14 @@ static __always_inline u32 __raw_readl(const volatile void *addr)
+ #define writel(v,c)		({ __iowmb(); writel_relaxed((v),(c));})
+ #define readl(c)		({ u32 __v = readl_relaxed(c); __iormb(__v); __v; })
+ 
++static inline void local_irq_enable(void)
 +{
-+	enum arch_timer timer = VIRTUAL;
-+	uint64_t start = timer_get_cntct(timer);
-+
-+	while ((timer_get_cntct(timer) - start) < cycles)
-+		cpu_relax();
++	asm volatile("msr daifclr, #3" : : : "memory");
 +}
 +
-+static inline void udelay(unsigned long usec)
++static inline void local_irq_disable(void)
 +{
-+	__delay(usec_to_cycles(usec));
++	asm volatile("msr daifset, #3" : : : "memory");
 +}
 +
-+#endif /* SELFTEST_KVM_ARM_DELAY_H */
+ #endif /* SELFTEST_KVM_PROCESSOR_H */
 -- 
 2.33.0.rc1.237.g0d66db33f3-goog
 
