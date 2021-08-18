@@ -2,131 +2,207 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D60793F091D
-	for <lists+kvm@lfdr.de>; Wed, 18 Aug 2021 18:29:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 04EA23F0979
+	for <lists+kvm@lfdr.de>; Wed, 18 Aug 2021 18:45:55 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232380AbhHRQ3i (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 18 Aug 2021 12:29:38 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:35650 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231685AbhHRQ3e (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 18 Aug 2021 12:29:34 -0400
-Received: from pps.filterd (m0187473.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 17IG3NkT184839;
-        Wed, 18 Aug 2021 12:28:54 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
- from : reply-to : to : cc : date : in-reply-to : references : content-type
- : mime-version : content-transfer-encoding; s=pp1;
- bh=qpUkguJI2IHHjoUq21Nh2itgr+pixs+jbpaoqO+Oa7A=;
- b=NOGX6V8VYCKm1K9MmfleWk1fev52Xlpc5fjbtamkO9Hpgh50ecZbE9G647OAe6ZAkGzl
- f4IeTsD+EMJtxxHqUYe4hj/NEYuKylzYhgtP01ogGBJtZyGk49rBL89/GvGrrufC6cLy
- /wwwE2P9e0WvVOMjcQpWuNqAtdq77SDxa2o49/zFFW3tF2epqKCpQbvEZFwBF1y4/vVO
- YvrzJR2E7FSauXOJdQ64LlSr6em1m1/SJymbRlgFERq5mo8/GTonbDtGBLb314lCgQbg
- 6wILApQ4LXAT7IQI9Nus6nofSp5w/c234fWpu9pXsbrflg5meso+t/qOQuLyn1i+pvkB Aw== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3agcvsbaa0-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 18 Aug 2021 12:28:54 -0400
-Received: from m0187473.ppops.net (m0187473.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 17IG3XCj186030;
-        Wed, 18 Aug 2021 12:28:54 -0400
-Received: from ppma01wdc.us.ibm.com (fd.55.37a9.ip4.static.sl-reverse.com [169.55.85.253])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3agcvsba9m-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 18 Aug 2021 12:28:54 -0400
-Received: from pps.filterd (ppma01wdc.us.ibm.com [127.0.0.1])
-        by ppma01wdc.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 17IGIHNW023179;
-        Wed, 18 Aug 2021 16:28:52 GMT
-Received: from b03cxnp07029.gho.boulder.ibm.com (b03cxnp07029.gho.boulder.ibm.com [9.17.130.16])
-        by ppma01wdc.us.ibm.com with ESMTP id 3ae5fdd3xb-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 18 Aug 2021 16:28:52 +0000
-Received: from b03ledav004.gho.boulder.ibm.com (b03ledav004.gho.boulder.ibm.com [9.17.130.235])
-        by b03cxnp07029.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 17IGSpu047317418
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 18 Aug 2021 16:28:51 GMT
-Received: from b03ledav004.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id BD1917805C;
-        Wed, 18 Aug 2021 16:28:51 +0000 (GMT)
-Received: from b03ledav004.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 4396878076;
-        Wed, 18 Aug 2021 16:28:48 +0000 (GMT)
-Received: from jarvis.lan (unknown [9.160.128.138])
-        by b03ledav004.gho.boulder.ibm.com (Postfix) with ESMTP;
-        Wed, 18 Aug 2021 16:28:47 +0000 (GMT)
-Message-ID: <8a94ce57b4aa28df1504dcf08aace88d594ffb32.camel@linux.ibm.com>
-Subject: Re: [RFC PATCH 00/13] Add support for Mirror VM.
-From:   James Bottomley <jejb@linux.ibm.com>
-Reply-To: jejb@linux.ibm.com
-To:     "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc:     Ashish Kalra <ashish.kalra@amd.com>,
-        Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org,
-        thomas.lendacky@amd.com, brijesh.singh@amd.com,
-        ehabkost@redhat.com, mst@redhat.com, richard.henderson@linaro.org,
-        tobin@ibm.com, dovmurik@linux.vnet.ibm.com, frankeh@us.ibm.com,
-        kvm@vger.kernel.org
-Date:   Wed, 18 Aug 2021 12:28:46 -0400
-In-Reply-To: <YR0qoV6tDuVxddL5@work-vm>
-References: <cover.1629118207.git.ashish.kalra@amd.com>
-         <fb737cf0-3d96-173f-333b-876dfd59d32b@redhat.com>
-         <20210816144413.GA29881@ashkalra_ubuntu_server>
-         <b25a1cf9-5675-99da-7dd6-302b04cc7bbc@redhat.com>
-         <20210816151349.GA29903@ashkalra_ubuntu_server>
-         <f7cf142b-02e4-5c87-3102-f3acd8b07288@redhat.com>
-         <20210818103147.GB31834@ashkalra_ubuntu_server>
-         <f0b5b725fc879d72c702f88a6ed90e956ec32865.camel@linux.ibm.com>
-         <YR0nwVPKymrAeIzV@work-vm>
-         <8ae11fca26e8d7f96ffc7ec6353c87353cadc63a.camel@linux.ibm.com>
-         <YR0qoV6tDuVxddL5@work-vm>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.34.4 
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: Q0wVqsHPHARWCH8EB1T5FpLbLGo0iFMk
-X-Proofpoint-GUID: o5li9DePPmUjO3hmzPHgsfOD_bAvPOaA
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.790
- definitions=2021-08-18_05:2021-08-17,2021-08-18 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0 clxscore=1015
- suspectscore=0 mlxscore=0 mlxlogscore=999 phishscore=0 priorityscore=1501
- malwarescore=0 impostorscore=0 bulkscore=0 adultscore=0 lowpriorityscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2107140000
- definitions=main-2108180101
+        id S229839AbhHRQq2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 18 Aug 2021 12:46:28 -0400
+Received: from mail.kernel.org ([198.145.29.99]:52480 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229623AbhHRQq2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 18 Aug 2021 12:46:28 -0400
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 77417610A6;
+        Wed, 18 Aug 2021 16:45:53 +0000 (UTC)
+Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94.2)
+        (envelope-from <maz@kernel.org>)
+        id 1mGOhL-005nlG-BY; Wed, 18 Aug 2021 17:45:51 +0100
+Date:   Wed, 18 Aug 2021 17:45:50 +0100
+Message-ID: <87fsv6snup.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Fuad Tabba <tabba@google.com>
+Cc:     kvmarm@lists.cs.columbia.edu, will@kernel.org, james.morse@arm.com,
+        alexandru.elisei@arm.com, suzuki.poulose@arm.com,
+        mark.rutland@arm.com, christoffer.dall@arm.com,
+        pbonzini@redhat.com, drjones@redhat.com, oupton@google.com,
+        qperret@google.com, kvm@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, kernel-team@android.com
+Subject: Re: [PATCH v4 11/15] KVM: arm64: Guest exit handlers for nVHE hyp
+In-Reply-To: <20210817081134.2918285-12-tabba@google.com>
+References: <20210817081134.2918285-1-tabba@google.com>
+        <20210817081134.2918285-12-tabba@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: tabba@google.com, kvmarm@lists.cs.columbia.edu, will@kernel.org, james.morse@arm.com, alexandru.elisei@arm.com, suzuki.poulose@arm.com, mark.rutland@arm.com, christoffer.dall@arm.com, pbonzini@redhat.com, drjones@redhat.com, oupton@google.com, qperret@google.com, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kernel-team@android.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 2021-08-18 at 16:43 +0100, Dr. David Alan Gilbert wrote:
-> * James Bottomley (jejb@linux.ibm.com) wrote:
-[...]
-> > Given the lack of SMI, we can't guarantee that with plain SEV and
-> > -ES. Once we move to -SNP, we can use VMPLs to achieve this.
+On Tue, 17 Aug 2021 09:11:30 +0100,
+Fuad Tabba <tabba@google.com> wrote:
 > 
-> Doesn't the MH have access to different slots and running on separate
-> vCPUs; so it's still got some separation?
-
-Remember that the OVMF code is provided by the host, but its attested
-to and run by the guest.  Once the guest takes control (i.e. after OVMF
-boots the next thing), we can't guarantee that it wont overwrite the MH
-code, so the host must treat the MH as untrusted.
-
-> > But realistically, given the above API, even if the guest is
-> > malicious, what can it do?  I think it's simply return bogus pages
-> > that cause a crash on start after migration, which doesn't look
-> > like a huge risk to the cloud to me (it's more a self destructive
-> > act on behalf of the guest).
+> Add an array of pointers to handlers for various trap reasons in
+> nVHE code.
 > 
-> I'm a bit worried about the data structures that are shared between
-> the migration code in qemu and the MH; the code in qemu is going to
-> have to be paranoid about not trusting anything coming from the MH.
+> The current code selects how to fixup a guest on exit based on a
+> series of if/else statements. Future patches will also require
+> different handling for guest exists. Create an array of handlers
+> to consolidate them.
+> 
+> No functional change intended as the array isn't populated yet.
+> 
+> Acked-by: Will Deacon <will@kernel.org>
+> Signed-off-by: Fuad Tabba <tabba@google.com>
+> ---
+>  arch/arm64/kvm/hyp/include/hyp/switch.h | 43 +++++++++++++++++++++++++
+>  arch/arm64/kvm/hyp/nvhe/switch.c        | 33 +++++++++++++++++++
+>  2 files changed, 76 insertions(+)
+> 
+> diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
+> index a0e78a6027be..5a2b89b96c67 100644
+> --- a/arch/arm64/kvm/hyp/include/hyp/switch.h
+> +++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
+> @@ -409,6 +409,46 @@ static inline bool __hyp_handle_ptrauth(struct kvm_vcpu *vcpu)
+>  	return true;
+>  }
+>  
+> +typedef int (*exit_handle_fn)(struct kvm_vcpu *);
 
-Given that we have to treat the host MH structure as untrusted, this is
-definitely something we have to do.  Although the primary API is simply
-"here's a buffer, please fill it", so there's not much checking to do,
-we just have to be careful that we don't expose any more of the buffer
-than the guest needs to write to ... and, obviously, clean it before
-exposing it to the guest.
+This returns an int...
 
-James
+> +
+> +exit_handle_fn kvm_get_nvhe_exit_handler(struct kvm_vcpu *vcpu);
+> +
+> +static exit_handle_fn kvm_get_hyp_exit_handler(struct kvm_vcpu *vcpu)
+> +{
+> +	return is_nvhe_hyp_code() ? kvm_get_nvhe_exit_handler(vcpu) : NULL;
+> +}
+> +
+> +/*
+> + * Allow the hypervisor to handle the exit with an exit handler if it has one.
+> + *
+> + * Returns true if the hypervisor handled the exit, and control should go back
+> + * to the guest, or false if it hasn't.
+> + */
+> +static bool kvm_hyp_handle_exit(struct kvm_vcpu *vcpu)
+> +{
+> +	bool is_handled = false;
 
+... which you then implicitly cast as a bool.
 
+> +	exit_handle_fn exit_handler = kvm_get_hyp_exit_handler(vcpu);
+> +
+> +	if (exit_handler) {
+> +		/*
+> +		 * There's limited vcpu context here since it's not synced yet.
+> +		 * Ensure that relevant vcpu context that might be used by the
+> +		 * exit_handler is in sync before it's called and if handled.
+> +		 */
+> +		*vcpu_pc(vcpu) = read_sysreg_el2(SYS_ELR);
+> +		*vcpu_cpsr(vcpu) = read_sysreg_el2(SYS_SPSR);
+> +
+> +		is_handled = exit_handler(vcpu);
+
+What does 'is_handled' mean here? By definition, any trap *must* be
+handled, one way or another. By the look of it, what you really mean
+is something like "I have updated the vcpu state and you'd better
+reload it". Is that what it means?
+
+> +
+> +		if (is_handled) {
+> +			write_sysreg_el2(*vcpu_pc(vcpu), SYS_ELR);
+> +			write_sysreg_el2(*vcpu_cpsr(vcpu), SYS_SPSR);
+> +		}
+> +	}
+> +
+> +	return is_handled;
+> +}
+
+All these functions really should be marked inline. Have you checked
+how this expands on VHE? I think some compilers could be pretty
+unhappy about the undefined symbol in kvm_get_hyp_exit_handler().
+
+It is also unfortunate that we get a bunch of tests for various
+flavours of traps (FP, PAuth, page faults...), only to hit yet another
+decoding tree. Is there a way we could use this infrastructure for
+everything?
+
+> +
+>  /*
+>   * Return true when we were able to fixup the guest exit and should return to
+>   * the guest, false when we should restore the host state and return to the
+> @@ -496,6 +536,9 @@ static inline bool fixup_guest_exit(struct kvm_vcpu *vcpu, u64 *exit_code)
+>  			goto guest;
+>  	}
+>  
+> +	/* Check if there's an exit handler and allow it to handle the exit. */
+> +	if (kvm_hyp_handle_exit(vcpu))
+> +		goto guest;
+>  exit:
+>  	/* Return to the host kernel and handle the exit */
+>  	return false;
+> diff --git a/arch/arm64/kvm/hyp/nvhe/switch.c b/arch/arm64/kvm/hyp/nvhe/switch.c
+> index 86f3d6482935..b7f25307a7b9 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/switch.c
+> +++ b/arch/arm64/kvm/hyp/nvhe/switch.c
+> @@ -158,6 +158,39 @@ static void __pmu_switch_to_host(struct kvm_cpu_context *host_ctxt)
+>  		write_sysreg(pmu->events_host, pmcntenset_el0);
+>  }
+>  
+> +static exit_handle_fn hyp_exit_handlers[] = {
+> +	[0 ... ESR_ELx_EC_MAX]		= NULL,
+> +	[ESR_ELx_EC_WFx]		= NULL,
+> +	[ESR_ELx_EC_CP15_32]		= NULL,
+> +	[ESR_ELx_EC_CP15_64]		= NULL,
+> +	[ESR_ELx_EC_CP14_MR]		= NULL,
+> +	[ESR_ELx_EC_CP14_LS]		= NULL,
+> +	[ESR_ELx_EC_CP14_64]		= NULL,
+> +	[ESR_ELx_EC_HVC32]		= NULL,
+> +	[ESR_ELx_EC_SMC32]		= NULL,
+> +	[ESR_ELx_EC_HVC64]		= NULL,
+> +	[ESR_ELx_EC_SMC64]		= NULL,
+> +	[ESR_ELx_EC_SYS64]		= NULL,
+> +	[ESR_ELx_EC_SVE]		= NULL,
+> +	[ESR_ELx_EC_IABT_LOW]		= NULL,
+> +	[ESR_ELx_EC_DABT_LOW]		= NULL,
+> +	[ESR_ELx_EC_SOFTSTP_LOW]	= NULL,
+> +	[ESR_ELx_EC_WATCHPT_LOW]	= NULL,
+> +	[ESR_ELx_EC_BREAKPT_LOW]	= NULL,
+> +	[ESR_ELx_EC_BKPT32]		= NULL,
+> +	[ESR_ELx_EC_BRK64]		= NULL,
+> +	[ESR_ELx_EC_FP_ASIMD]		= NULL,
+> +	[ESR_ELx_EC_PAC]		= NULL,
+
+You can safely drop all these and only keep the top one for now. This
+will also keep the idiot robot at bay for until the next patch... ;-)
+
+> +};
+> +
+> +exit_handle_fn kvm_get_nvhe_exit_handler(struct kvm_vcpu *vcpu)
+> +{
+> +	u32 esr = kvm_vcpu_get_esr(vcpu);
+> +	u8 esr_ec = ESR_ELx_EC(esr);
+> +
+> +	return hyp_exit_handlers[esr_ec];
+> +}
+> +
+>  /* Switch to the guest for legacy non-VHE systems */
+>  int __kvm_vcpu_run(struct kvm_vcpu *vcpu)
+>  {
+
+Thanks,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
