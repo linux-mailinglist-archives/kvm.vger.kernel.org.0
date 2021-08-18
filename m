@@ -2,313 +2,150 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 71FEB3F0146
-	for <lists+kvm@lfdr.de>; Wed, 18 Aug 2021 12:08:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5F7593F01A7
+	for <lists+kvm@lfdr.de>; Wed, 18 Aug 2021 12:31:55 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233757AbhHRKJH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 18 Aug 2021 06:09:07 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:10188 "EHLO
-        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S233539AbhHRKI7 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 18 Aug 2021 06:08:59 -0400
-Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 17IA4uDw116913;
-        Wed, 18 Aug 2021 06:08:24 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
- subject : message-id : in-reply-to : references : mime-version :
- content-type : content-transfer-encoding; s=pp1;
- bh=QBg4YKjBgxoS8cUqlhRCYzFYZVz/JCU0DmHCbhz9S9o=;
- b=LXwI+QnATCZVKVwppTE6mo9asSGpnvSAx0F/D9Ij5AXfHbtl7drbvDaXiTTP0hs7700a
- c+HxvhfoSfQrwx+VqQa1vP8C7U2n3zEJvRIH8Z1+oq/0KKa3CkFWPrjDNAtwZqBHDAVP
- JqCXJJqF+9Sje/kyQ3o16iVrkAA5qQBHH6+wfHYyFaU7+uUb07uMD/9G/oAHE9uotDcn
- MDqoC4GJR3dHA5BQ3aUZ06Xbk2TVAw8VPb9JiFNXPhGexqmCFRHrLwQmeU5JHPSSBNnM
- aeZ1+mv5XzE8m5Y3wD2dghxRVSKdz+I0+TajRvbB6X++dHhU926H8PJr6SLxVKAvkcpH VQ== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3agp1nxc9w-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 18 Aug 2021 06:08:24 -0400
-Received: from m0098417.ppops.net (m0098417.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 17IA52Oo117411;
-        Wed, 18 Aug 2021 06:08:24 -0400
-Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3agp1nxc9f-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 18 Aug 2021 06:08:24 -0400
-Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
-        by ppma06ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 17IA7Ad1000447;
-        Wed, 18 Aug 2021 10:08:22 GMT
-Received: from b06avi18626390.portsmouth.uk.ibm.com (b06avi18626390.portsmouth.uk.ibm.com [9.149.26.192])
-        by ppma06ams.nl.ibm.com with ESMTP id 3ae53hxcwe-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 18 Aug 2021 10:08:22 +0000
-Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
-        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 17IA4p7t53477812
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 18 Aug 2021 10:04:51 GMT
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id A9EE34C05E;
-        Wed, 18 Aug 2021 10:08:18 +0000 (GMT)
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 1BC444C04A;
-        Wed, 18 Aug 2021 10:08:18 +0000 (GMT)
-Received: from p-imbrenda (unknown [9.145.14.177])
-        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Wed, 18 Aug 2021 10:08:18 +0000 (GMT)
-Date:   Wed, 18 Aug 2021 12:08:15 +0200
-From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
-To:     Janis Schoetterl-Glausch <scgl@linux.ibm.com>
-Cc:     kvm@vger.kernel.org, borntraeger@de.ibm.com, frankja@linux.ibm.com,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>, david@redhat.com,
-        cohuck@redhat.com, linux-s390@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 2/2] KVM: s390: gaccess: Refactor access address range
- check
-Message-ID: <20210818120815.6e048149@p-imbrenda>
-In-Reply-To: <20210816150718.3063877-3-scgl@linux.ibm.com>
-References: <20210816150718.3063877-1-scgl@linux.ibm.com>
-        <20210816150718.3063877-3-scgl@linux.ibm.com>
-Organization: IBM
-X-Mailer: Claws Mail 3.18.0 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
+        id S233576AbhHRKc1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 18 Aug 2021 06:32:27 -0400
+Received: from mail-bn1nam07on2055.outbound.protection.outlook.com ([40.107.212.55]:31555
+        "EHLO NAM02-BN1-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S230424AbhHRKc0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 18 Aug 2021 06:32:26 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Jy6bBU/5mbayZMtme04mMQSb6pGt7qON/ua7B/xALMML0EiFZDSFuoYS8dfFiI0Ov3m0+od3Hy1mR9fB0R9zlA7NU92ZuzcJjY2qNEOUPzseqwvCyEGLGoWQiha7E5osuTSNkYQHXj8X6Mq4rNKfPD5ulU+h4eksSmYIvVTU/GpXhYVgPXke8LMtxa1e4BsceFO9xcY+I5V6//s4quDJxkIV/A623jgJxQjZL0XN6srNwx5hcxLE7N9iODXcdLyyPsvCCsvBV4by/LCH+0uMOVqAxZt1g7V7nBkohaXwdaJnEQ/5QMa7uNduBpak7VJpxLv0sa8uqFOkCZ2DAyl3kw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=n/G19iFaEWOoaqlznXhU0x/LsP1wXT/T0iifTOKlgNY=;
+ b=i2i6oJfPn+QK1YPNN4jTPs//GchmiQdAjoKPR0tvQy0s2Dm/Y2KKjjG/h05DXNgw65S6lsMAAf9XCGWl/C06BTBQ6VpPO0U3y/TY+dGk9nTMKKsTWwWy2/6UhkmfnHCAnGt5zdpg+DWlnfY13MCMIXs7e3zvedJboLW5CznsI2UNbo1RVAZ1Zy9OgfuqTW1M9/eAfxrW0T9cxJ0Ne+UqLaQugWfEeZJjkRwA6+Y7w90n2eNZsaWDJYfnzIKTbATY1vB0o63lWB9pAfr18x4VSqHxxZXcndZM1WlBcckAUgTYHP6x8gWbwbxAezIEH+weuz1/lF9Ps8BslR8HyYmXyA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=n/G19iFaEWOoaqlznXhU0x/LsP1wXT/T0iifTOKlgNY=;
+ b=nyvqVh6BnXzaJmxJ9qOPWdWEqkHa/nw/7PEQ3FuI/xxk1z1ZDLWsjefCrOX31yt3Y5Tk9de/RgCe5UW57UKOQFCE+EslDPQIqjAEYv81JEREiWrw+6dm3dUflyQWJqvDtAZE0gXSmnFWkOb+N3syjlP72qBhGW2r0iZuJxEdl9Y=
+Authentication-Results: redhat.com; dkim=none (message not signed)
+ header.d=none;redhat.com; dmarc=none action=none header.from=amd.com;
+Received: from SN6PR12MB2767.namprd12.prod.outlook.com (2603:10b6:805:75::23)
+ by SA0PR12MB4429.namprd12.prod.outlook.com (2603:10b6:806:73::20) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4415.16; Wed, 18 Aug
+ 2021 10:31:49 +0000
+Received: from SN6PR12MB2767.namprd12.prod.outlook.com
+ ([fe80::491e:2642:bae2:8b73]) by SN6PR12MB2767.namprd12.prod.outlook.com
+ ([fe80::491e:2642:bae2:8b73%7]) with mapi id 15.20.4415.024; Wed, 18 Aug 2021
+ 10:31:49 +0000
+Date:   Wed, 18 Aug 2021 10:31:47 +0000
+From:   Ashish Kalra <ashish.kalra@amd.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     qemu-devel@nongnu.org, thomas.lendacky@amd.com,
+        brijesh.singh@amd.com, ehabkost@redhat.com, mst@redhat.com,
+        richard.henderson@linaro.org, jejb@linux.ibm.com, tobin@ibm.com,
+        dovmurik@linux.vnet.ibm.com, frankeh@us.ibm.com,
+        dgilbert@redhat.com, kvm@vger.kernel.org
+Subject: Re: [RFC PATCH 00/13] Add support for Mirror VM.
+Message-ID: <20210818103147.GB31834@ashkalra_ubuntu_server>
+References: <cover.1629118207.git.ashish.kalra@amd.com>
+ <fb737cf0-3d96-173f-333b-876dfd59d32b@redhat.com>
+ <20210816144413.GA29881@ashkalra_ubuntu_server>
+ <b25a1cf9-5675-99da-7dd6-302b04cc7bbc@redhat.com>
+ <20210816151349.GA29903@ashkalra_ubuntu_server>
+ <f7cf142b-02e4-5c87-3102-f3acd8b07288@redhat.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <f7cf142b-02e4-5c87-3102-f3acd8b07288@redhat.com>
+User-Agent: Mutt/1.9.4 (2018-02-28)
+X-ClientProxiedBy: SN6PR04CA0077.namprd04.prod.outlook.com
+ (2603:10b6:805:f2::18) To SN6PR12MB2767.namprd12.prod.outlook.com
+ (2603:10b6:805:75::23)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: ffk4o2FR6aiU1o0tQRAl5esKg0JbwDGw
-X-Proofpoint-ORIG-GUID: drQLDQnLtpKqS6EF83ZTGxwhGrRhDw3n
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.790
- definitions=2021-08-18_03:2021-08-17,2021-08-18 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 mlxlogscore=999
- mlxscore=0 suspectscore=0 bulkscore=0 malwarescore=0 lowpriorityscore=0
- phishscore=0 priorityscore=1501 spamscore=0 impostorscore=0 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2107140000
- definitions=main-2108180063
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from ashkalra_ubuntu_server (165.204.77.1) by SN6PR04CA0077.namprd04.prod.outlook.com (2603:10b6:805:f2::18) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4436.19 via Frontend Transport; Wed, 18 Aug 2021 10:31:48 +0000
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 609ffaba-679e-494c-4096-08d9623362c2
+X-MS-TrafficTypeDiagnostic: SA0PR12MB4429:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <SA0PR12MB4429DEAC5F58C4CB2B70CE678EFF9@SA0PR12MB4429.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:10000;
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: 8JmlOPiC89HN7HHZden0cjFACwIiWY328Tx72wEbmhpldCPrwfCHi6tZha+FHiuShqd7q9wG00V+kU3MjASvgg6+5qxePSHe/OKNnKSxgUG4pa5NEeAloIW9XGApXTQVrl50xBWB6+hNqBr5Ye9uSXwz2Wii922+ZNOQWmURYaDXmekq5JBlxbADINd626wafpON0cpRcxOnAQjvCll4IDS0BONfXJjRh2sCJ6JWRo9PahNM48d3ydrNBjBZrHZcx9w5qhAOQYnyCISpCQrbzJoa+swskGbkRQExVofPAoE/DdXCATx/HVfuIfSjPLV5POMi09ZuiPfbHv6pfsISSsE0T8m/GykQ71R/XNFU45+96uMoRP4Qu2z4NGEjMsz4co8k7AK6kLdlvm7bOQ0ccWDUSJUI5tJX18pcK/mCshNLbIp2zFYJvWk68XCMywVgILBxBNi+gCEu585TFcQR1xW/gcPLkoK3scmK71vVCQtDj9PIH3JZx69cnoBCexsP3Lhdyyd1Hhfh7P3BoU7U+iZMvNPN3vNsA6p3oCfwAOvKdEB/eLom0aLGY2+ntIvecx1P5ywg4cxL/VZeX27Um3H/Bc01XTqXBMAty90BWcIH962X0n2fD4EVIC4z5TSphrt671SWjbCeavd9C9H8fuFKYbMvd+B22tKyJoq2epDh7g0cHkGlWU/saH+4blo3m2g3FIzb+XUexITmaoGhCw==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR12MB2767.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(396003)(136003)(39860400002)(366004)(376002)(346002)(478600001)(33656002)(33716001)(8676002)(956004)(4326008)(38350700002)(38100700002)(1076003)(52116002)(8936002)(6496006)(44832011)(7416002)(9686003)(55016002)(53546011)(5660300002)(6916009)(186003)(26005)(86362001)(2906002)(66946007)(83380400001)(66476007)(66556008)(316002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?Sh8olur/OEsiSUlpKJ9BH1UIhW1VlW52XErVqx8hnj092Zj/aHSsQaGTqO/l?=
+ =?us-ascii?Q?RutmD3fjEo311gJmJwPH9mBjNhH5OaxyL4bTl6XrMbm7zuT9kW6BiRKZJ+8p?=
+ =?us-ascii?Q?A6e+knZFjnsCPOyiToqRI/dIe7YSvxYL/ZRxYJfSqxRcOsSJEu8NBFCk3NZB?=
+ =?us-ascii?Q?InW2UmkmiL649LSylqbvGiQb/0gXK2qchwbvusgdVidFSKlcHXpQgBVOwiRn?=
+ =?us-ascii?Q?nxDd591xFpBpDX6261xmpfb1lmYvYpPjyFxOJxOCJ9gtHqS2wTmK4E/7aJ06?=
+ =?us-ascii?Q?d3QJ4oXMZbm4C+7VrjNJ7nTrwq/oTVqXIghZqNMeZKN8tZtNo8wLgZDzl436?=
+ =?us-ascii?Q?i7+LzNsSWXgFxpwkVLiYj9eRQtEsQMgBzjOyoUyG/xWOvshOAfljECOMMbrW?=
+ =?us-ascii?Q?X/Jo0dalmWqbIgflUIaa0HaCCk1S7HVZdx83bOhiAZnTXAm6Ad1T0D2ziz82?=
+ =?us-ascii?Q?Q1pnOdnZhVzEjFTUIg3ZFv4u4GoHV/iqDzjVNgQH169gF+gZGEg2XXkfHl6Z?=
+ =?us-ascii?Q?It4Q8M7yJ/AuL7bbDJfVrPLLepxI1YgudTb47JPaSirnUKeDv3j2xNXUAMdn?=
+ =?us-ascii?Q?eS2iAo70wU6aYdlDRX+TYFm0+moEVcDhQOKY8upbBfIPAyBbujXTfz5547sT?=
+ =?us-ascii?Q?KHYZViLglaeQoSUp1NlwKa3xCFvBV0IwgcRstoL6TfpUsNawuuyyDQWfbp5r?=
+ =?us-ascii?Q?++u1D5d8YY/z/18k/MPjbPvHvhJvBIL4GqgIqP6jOM0AZBKT1SHXicmeq+mU?=
+ =?us-ascii?Q?Mn9KN3k6Wz5dfYky1t9UAFFFEh1qJOPrsIPIuRklyguqGL+yNk6sB5wsyDzB?=
+ =?us-ascii?Q?AzWwtF12bYQfkT8HgWTHHshc6yb/U8v0nblKQlOwg/6o6X/KzxVib8GXGKaL?=
+ =?us-ascii?Q?appLoQaUwvHMNHBINcBIlhMeMPZ9LS++fOhxpIYuQ01iciy4NSmdJEfD7tvv?=
+ =?us-ascii?Q?nAv3AYZpS1hRQUNt7FMyoHfSsdzQcmN4E34Tt2DdkZpKBmndsWgdArwyt1RV?=
+ =?us-ascii?Q?tmTCo8zAj7yhcoJYskYxHcxQlOezHQNFGHcyqVZwfffGUQFGmIewitFiTiRp?=
+ =?us-ascii?Q?Lpa6aSsBgDlcr+bCtyeH9pnoXOjZpjTBp9XzxXwiOZ+vKumMzIYEmfKbSIDn?=
+ =?us-ascii?Q?q68RgFRHKD72GhT44psWc4FkqAWfeCQF6KJ/Z/N8H5sJ0fK+jfY/4rQL5cP/?=
+ =?us-ascii?Q?9BpUkzZieHa8lISLXbqvFpTV1i+YJlnBaic3UvxXQdj8lZAUzWeENMgiH3Lt?=
+ =?us-ascii?Q?Bn6+icU5HrcJ7uqEtB1phgzBDzLsy8l/kJCwnohottryfp2591/85pd9gzpa?=
+ =?us-ascii?Q?puXeoiobCKBhHux7Ply1EGje?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 609ffaba-679e-494c-4096-08d9623362c2
+X-MS-Exchange-CrossTenant-AuthSource: SN6PR12MB2767.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Aug 2021 10:31:49.1296
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 0sGrD9ITQPbCLEePUplC2rSBA6/nPc/apSj1GD/xTo7OcY88MLGeEYNANSpKrS5B4TnMyYvhh6DZD1A+MPk7Sg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA0PR12MB4429
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 16 Aug 2021 17:07:17 +0200
-Janis Schoetterl-Glausch <scgl@linux.ibm.com> wrote:
+Hello Paolo,
 
-> Do not round down the first address to the page boundary, just translate
-> it normally, which gives the value we care about in the first place.
-> Given this, translating a single address is just the special case of
-> translating a range spanning a single page.
+On Mon, Aug 16, 2021 at 05:38:55PM +0200, Paolo Bonzini wrote:
+> On 16/08/21 17:13, Ashish Kalra wrote:
+> > > > I think that once the mirror VM starts booting and running the UEFI
+> > > > code, it might be only during the PEI or DXE phase where it will
+> > > > start actually running the MH code, so mirror VM probably still need
+> > > > to handles KVM_EXIT_IO when SEC phase does I/O, I can see PIC
+> > > > accesses and Debug Agent initialization stuff in SEC startup code.
+> > > That may be a design of the migration helper code that you were working
+> > > with, but it's not necessary.
+> > > 
+> > Actually my comments are about a more generic MH code.
 > 
-> Make the output optional, so the function can be used to just check a
-> range.
-
-I like the idea, but see a few nits below
-
+> I don't think that would be a good idea; designing QEMU's migration helper
+> interface to be as constrained as possible is a good thing.  The migration
+> helper is extremely security sensitive code, so it should not expose itself
+> to the attack surface of the whole of QEMU.
 > 
-> Signed-off-by: Janis Schoetterl-Glausch <scgl@linux.ibm.com>
-> ---
->  arch/s390/kvm/gaccess.c | 91 ++++++++++++++++++-----------------------
->  1 file changed, 39 insertions(+), 52 deletions(-)
 > 
-> diff --git a/arch/s390/kvm/gaccess.c b/arch/s390/kvm/gaccess.c
-> index df83de0843de..e5a19d8b30e2 100644
-> --- a/arch/s390/kvm/gaccess.c
-> +++ b/arch/s390/kvm/gaccess.c
-> @@ -794,35 +794,45 @@ static int low_address_protection_enabled(struct kvm_vcpu *vcpu,
->  	return 1;
->  }
->  
-> -static int guest_page_range(struct kvm_vcpu *vcpu, unsigned long ga, u8 ar,
-> -			    unsigned long *pages, unsigned long nr_pages,
-> -			    const union asce asce, enum gacc_mode mode)
-> +/* Stores the gpas for each page in a real/virtual range into @gpas
-> + * Modifies the 'struct kvm_s390_pgm_info pgm' member of @vcpu in the same
-> + * way read_guest/write_guest do, the meaning of the return value is likewise
+One question i have here, is that where exactly will the MH code exist
+in QEMU ?
 
-this comment is a bit confusing; why telling us to look what a
-different function is doing?
+I assume it will be only x86 platform specific code, we probably will
+never support it on other platforms ?
 
-either don't mention this at all (since it's more or less the expected
-behaviour), or explain in full what's going on
+So it will probably exist in hw/i386, something similar to "microvm"
+support and using the same TYPE_X86_MACHINE ?
 
-> + * the same.
-> + * If @gpas is NULL only the checks are performed.
-> + */
-> +static int guest_range_to_gpas(struct kvm_vcpu *vcpu, unsigned long ga, u8 ar,
-> +			       unsigned long *gpas, unsigned long len,
-> +			       const union asce asce, enum gacc_mode mode)
->  {
->  	psw_t *psw = &vcpu->arch.sie_block->gpsw;
-> +	unsigned long gpa;
-> +	unsigned int seg;
-> +	unsigned int offset = offset_in_page(ga);
->  	int lap_enabled, rc = 0;
->  	enum prot_type prot;
->  
->  	lap_enabled = low_address_protection_enabled(vcpu, asce);
-> -	while (nr_pages) {
-> +	while ((seg = min(PAGE_SIZE - offset, len)) != 0) {
+Also if we are not going to use the existing KVM support code and
+adding some duplicate KVM interface code, do we need to interface with
+this added KVM code via the QEMU accelerator framework, or simply invoke
+this KVM code statically ?
 
-I'm not terribly fond of assignments-as-values; moreover offset is used
-only once.
-
-why not something like:
-
-	seg = min(PAGE_SIZE - offset, len);
-	while (seg) {
-
-		...
-
-		seg = min(PAGE_SIZE, len);
-	}
-
-or maybe even:
-
-	seg = min(PAGE_SIZE - offset, len);
-	for (; seg; seg = min(PAGE_SIZE, len)) {
-
-(although the one with the while is perhaps more readable)
-
->  		ga = kvm_s390_logical_to_effective(vcpu, ga);
->  		if (mode == GACC_STORE && lap_enabled && is_low_address(ga))
->  			return trans_exc(vcpu, PGM_PROTECTION, ga, ar, mode,
->  					 PROT_TYPE_LA);
-> -		ga &= PAGE_MASK;
->  		if (psw_bits(*psw).dat) {
-> -			rc = guest_translate(vcpu, ga, pages, asce, mode, &prot);
-> +			rc = guest_translate(vcpu, ga, &gpa, asce, mode, &prot);
->  			if (rc < 0)
->  				return rc;
->  		} else {
-> -			*pages = kvm_s390_real_to_abs(vcpu, ga);
-> -			if (kvm_is_error_gpa(vcpu->kvm, *pages))
-> +			gpa = kvm_s390_real_to_abs(vcpu, ga);
-> +			if (kvm_is_error_gpa(vcpu->kvm, gpa))
->  				rc = PGM_ADDRESSING;
->  		}
->  		if (rc)
->  			return trans_exc(vcpu, rc, ga, ar, mode, prot);
-> -		ga += PAGE_SIZE;
-> -		pages++;
-> -		nr_pages--;
-> +		if (gpas)
-> +			*gpas++ = gpa;
-> +		offset = 0;
-> +		ga += seg;
-> +		len -= seg;
->  	}
->  	return 0;
->  }
-> @@ -845,10 +855,10 @@ int access_guest(struct kvm_vcpu *vcpu, unsigned long ga, u8 ar, void *data,
->  		 unsigned long len, enum gacc_mode mode)
->  {
->  	psw_t *psw = &vcpu->arch.sie_block->gpsw;
-> -	unsigned long nr_pages, gpa, idx;
-> +	unsigned long nr_pages, idx;
->  	unsigned int seg;
-> -	unsigned long pages_array[2];
-> -	unsigned long *pages;
-> +	unsigned long gpa_array[2];
-> +	unsigned long *gpas;
-
-reverse Christmas tree?
-
-also, since you're touching this: have you checked if a different size
-for the array would bring any benefit?
-2 seems a little too small, but I have no idea if anything bigger would
-bring any advantages.
-
->  	int need_ipte_lock;
->  	union asce asce;
->  	int rc;
-> @@ -860,27 +870,25 @@ int access_guest(struct kvm_vcpu *vcpu, unsigned long ga, u8 ar, void *data,
->  	if (rc)
->  		return rc;
->  	nr_pages = (((ga & ~PAGE_MASK) + len - 1) >> PAGE_SHIFT) + 1;
-> -	pages = pages_array;
-> -	if (nr_pages > ARRAY_SIZE(pages_array))
-> -		pages = vmalloc(array_size(nr_pages, sizeof(unsigned long)));
-> -	if (!pages)
-> +	gpas = gpa_array;
-> +	if (nr_pages > ARRAY_SIZE(gpa_array))
-> +		gpas = vmalloc(array_size(nr_pages, sizeof(unsigned long)));
-> +	if (!gpas)
->  		return -ENOMEM;
->  	need_ipte_lock = psw_bits(*psw).dat && !asce.r;
->  	if (need_ipte_lock)
->  		ipte_lock(vcpu);
-> -	rc = guest_page_range(vcpu, ga, ar, pages, nr_pages, asce, mode);
-> +	rc = guest_range_to_gpas(vcpu, ga, ar, gpas, len, asce, mode);
->  	for (idx = 0; idx < nr_pages && !rc; idx++) {
-> -		gpa = pages[idx] + offset_in_page(ga);
-> -		seg = min(PAGE_SIZE - offset_in_page(gpa), len);
-> -		rc = access_guest_frame(vcpu->kvm, mode, gpa, data, seg);
-> +		seg = min(PAGE_SIZE - offset_in_page(gpas[idx]), len);
-> +		rc = access_guest_frame(vcpu->kvm, mode, gpas[idx], data, seg);
->  		len -= seg;
-> -		ga += seg;
->  		data += seg;
->  	}
->  	if (need_ipte_lock)
->  		ipte_unlock(vcpu);
-> -	if (nr_pages > ARRAY_SIZE(pages_array))
-> -		vfree(pages);
-> +	if (nr_pages > ARRAY_SIZE(gpa_array))
-> +		vfree(gpas);
->  	return rc;
->  }
->  
-> @@ -914,8 +922,6 @@ int access_guest_real(struct kvm_vcpu *vcpu, unsigned long gra,
->  int guest_translate_address(struct kvm_vcpu *vcpu, unsigned long gva, u8 ar,
->  			    unsigned long *gpa, enum gacc_mode mode)
->  {
-> -	psw_t *psw = &vcpu->arch.sie_block->gpsw;
-> -	enum prot_type prot;
->  	union asce asce;
->  	int rc;
->  
-> @@ -923,23 +929,7 @@ int guest_translate_address(struct kvm_vcpu *vcpu, unsigned long gva, u8 ar,
->  	rc = get_vcpu_asce(vcpu, &asce, gva, ar, mode);
->  	if (rc)
->  		return rc;
-> -	if (is_low_address(gva) && low_address_protection_enabled(vcpu, asce)) {
-> -		if (mode == GACC_STORE)
-> -			return trans_exc(vcpu, PGM_PROTECTION, gva, 0,
-> -					 mode, PROT_TYPE_LA);
-> -	}
-> -
-> -	if (psw_bits(*psw).dat && !asce.r) {	/* Use DAT? */
-> -		rc = guest_translate(vcpu, gva, gpa, asce, mode, &prot);
-> -		if (rc > 0)
-> -			return trans_exc(vcpu, rc, gva, 0, mode, prot);
-> -	} else {
-> -		*gpa = kvm_s390_real_to_abs(vcpu, gva);
-> -		if (kvm_is_error_gpa(vcpu->kvm, *gpa))
-> -			return trans_exc(vcpu, rc, gva, PGM_ADDRESSING, mode, 0);
-> -	}
-> -
-> -	return rc;
-> +	return guest_range_to_gpas(vcpu, gva, ar, gpa, 1, asce, mode);
->  }
->  
->  /**
-> @@ -948,17 +938,14 @@ int guest_translate_address(struct kvm_vcpu *vcpu, unsigned long gva, u8 ar,
->  int check_gva_range(struct kvm_vcpu *vcpu, unsigned long gva, u8 ar,
->  		    unsigned long length, enum gacc_mode mode)
->  {
-> -	unsigned long gpa;
-> -	unsigned long currlen;
-> +	union asce asce;
->  	int rc = 0;
->  
-> +	rc = get_vcpu_asce(vcpu, &asce, gva, ar, mode);
-> +	if (rc)
-> +		return rc;
->  	ipte_lock(vcpu);
-> -	while (length > 0 && !rc) {
-> -		currlen = min(length, PAGE_SIZE - (gva % PAGE_SIZE));
-> -		rc = guest_translate_address(vcpu, gva, ar, &gpa, mode);
-> -		gva += currlen;
-> -		length -= currlen;
-> -	}
-> +	rc = guest_range_to_gpas(vcpu, gva, ar, NULL, length, asce, mode);
->  	ipte_unlock(vcpu);
->  
->  	return rc;
-
+Thanks,
+Ashish
