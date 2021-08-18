@@ -2,140 +2,103 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id CB60A3F005D
-	for <lists+kvm@lfdr.de>; Wed, 18 Aug 2021 11:24:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A22983F006A
+	for <lists+kvm@lfdr.de>; Wed, 18 Aug 2021 11:28:57 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231665AbhHRJZY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 18 Aug 2021 05:25:24 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:39356 "EHLO
+        id S232484AbhHRJ3N (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 18 Aug 2021 05:29:13 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:40164 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232720AbhHRJZS (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 18 Aug 2021 05:25:18 -0400
+        by vger.kernel.org with ESMTP id S232123AbhHRJ3H (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 18 Aug 2021 05:29:07 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1629278683;
+        s=mimecast20190719; t=1629278913;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=xRaF4ibqqTKL4gf4bLxzmr31/JCFub6/Guzco44M6h8=;
-        b=KhV3bFyTSHi4hTldQrn42UzE2OiaT0/7Y7Y5aTBafaVNpkkRvkDl0aUTduL9zuTiKB3+c0
-        HNtYiKxOABt2luoBcP26O658+CDS4hP3SqoLI6ao6KNztSJ9lks5VdU1wuFATar/jtMk9r
-        2/WisGsOAGUw1ifPOmAH3e1O06tqd8g=
-Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
- [209.85.208.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-510-KGwiHPO0Ov6se8AMneU0LA-1; Wed, 18 Aug 2021 05:24:42 -0400
-X-MC-Unique: KGwiHPO0Ov6se8AMneU0LA-1
-Received: by mail-ed1-f70.google.com with SMTP id bx23-20020a0564020b5700b003bf2eb11718so711642edb.20
-        for <kvm@vger.kernel.org>; Wed, 18 Aug 2021 02:24:42 -0700 (PDT)
+        bh=ss0YteSxGieknf/N001L6Bbd+tVJgnRWWRu4Uer/1WI=;
+        b=QKNU1oNzhYZg7M92aodDAEiNp7zZCrZUQZdl28ZE3Fc7GIAKf99/onGmaXCd+0aAKm2USP
+        7SXMx4Tt43VaIQp+aLMafZoVP0RGHLpPisB8V7qMHU30aH4e631EfBrFmpO3soGAWZuimR
+        Obln96FW5JByJcpW9OYpn7oepotS3q8=
+Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
+ [209.85.208.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-516-XPpWU28pN1es-l1G-6n-AQ-1; Wed, 18 Aug 2021 05:28:32 -0400
+X-MC-Unique: XPpWU28pN1es-l1G-6n-AQ-1
+Received: by mail-ed1-f69.google.com with SMTP id eg56-20020a05640228b8b02903be79801f9aso713658edb.21
+        for <kvm@vger.kernel.org>; Wed, 18 Aug 2021 02:28:31 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:to:cc:references:from:subject:message-id:date
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=xRaF4ibqqTKL4gf4bLxzmr31/JCFub6/Guzco44M6h8=;
-        b=PrVT7RZ50b5k1gVG5KIB16dAvABjPOisSKw7YquBrlfCFmB0OJ6/h5im9ImwfKr3h7
-         H4MZQEv4THXUY7fXlb9i5HRlaZbN3+Gs/et9kFwa/OByTaEPKT76TyNyWzvDuQhuIrCX
-         EeTmE//7Jf/+xoaezhYz9yHlYkU45rfCr6gxClgxQFXg6a/kPhvlG/CgUTfCQGmYw2eV
-         +Dr1k27vR1rlq7haXvmjkm2ARmOccPk4pHA7JN1WaoGN/krREm3VXI6YPkjNpchsQCBf
-         Zya/FYdeZbB9FEw/TvLnQYLsaeiW+k/rqxOna0S7OngdY46VHXu7qxmlje+7Mq2Y8guj
-         6B3A==
-X-Gm-Message-State: AOAM5316LDvOO7kj/jvIjKJUleiWunhher0P5rsr8c32TTmwBtOWcVwx
-        BGLZgR+Gpt4ULmZn1i1smiHqUv2fQOm1r2UHWecQ2Zg+FKGC8ZYOI9mh4/abpsLXe68pyUc3+mb
-        B3SEjZk+1BRxQ
-X-Received: by 2002:a05:6402:3485:: with SMTP id v5mr8808893edc.205.1629278681027;
-        Wed, 18 Aug 2021 02:24:41 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwO505jA4aGPl6io2+Nh1IAJVCOX0AktdhZUSJw4e+bZqPYCXsHvz5GeLIm5mhlAg1LvlC4qQ==
-X-Received: by 2002:a05:6402:3485:: with SMTP id v5mr8808883edc.205.1629278680883;
-        Wed, 18 Aug 2021 02:24:40 -0700 (PDT)
+        bh=ss0YteSxGieknf/N001L6Bbd+tVJgnRWWRu4Uer/1WI=;
+        b=Yi1wCCUF/NWitd56Yb9MqaAANhSe/HddGyxBBGGgGoKVBEuS1VbwTpssWSqVNCgUFq
+         /LeO/w0TV7HoWUOn77qcCsA3XJTkD5hY+EqsA1wYNhhOehR49TsZrZgUa3AZW8HJhlwj
+         S3OX+XvlqMZ1JbhdXsyCy5LVDO3U4nED61F9rOt+tCFN7bCWIO8ehSUqCEKG0gFZH04I
+         ObvIO6HympV+ZDdBwy1n76iiAFKpeLLsn8jIk3mUPJISQd/T6lR1B1OJ/a0fJRd6WL/n
+         VAOiy1T6I9zALzzVexGRp2UBKYtbgcG3x27iDCynJgVo2x0mVEqrO4PyMI9t1eLp/6Ox
+         y8vg==
+X-Gm-Message-State: AOAM531R9aznzAM62MlZyLlfix0jtP/FpVVYosvY6iZog5cP8W/FgFVF
+        QU/uauktGXzrqoEmJjT2KQ4uPu/idPxs+tA37+n9wnE6YOpiSVvOl+pp1k1f8NZ6vpXOwoSPCGW
+        8jlZ98u6c9Vbr
+X-Received: by 2002:a17:906:c249:: with SMTP id bl9mr8838937ejb.225.1629278910823;
+        Wed, 18 Aug 2021 02:28:30 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJy2i3IaJ6FUHdnF7ye+k0n1lpDd35whxOvMpbIkocaOGGDMWrn6gFBYEsKYZJiDIyide4gNYg==
+X-Received: by 2002:a17:906:c249:: with SMTP id bl9mr8838930ejb.225.1629278910663;
+        Wed, 18 Aug 2021 02:28:30 -0700 (PDT)
 Received: from thuth.remote.csb (pd9e83070.dip0.t-ipconnect.de. [217.232.48.112])
-        by smtp.gmail.com with ESMTPSA id c28sm1742579ejc.102.2021.08.18.02.24.39
+        by smtp.gmail.com with ESMTPSA id l19sm2271962edq.62.2021.08.18.02.28.29
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 18 Aug 2021 02:24:40 -0700 (PDT)
+        Wed, 18 Aug 2021 02:28:30 -0700 (PDT)
+Subject: Re: [kvm-unit-tests PATCH 6/8] lib: s390x: Add PSW_MASK_64
 To:     Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org
 Cc:     linux-s390@vger.kernel.org, imbrenda@linux.ibm.com,
         david@redhat.com, cohuck@redhat.com
 References: <20210813073615.32837-1-frankja@linux.ibm.com>
- <20210813073615.32837-5-frankja@linux.ibm.com>
+ <20210813073615.32837-7-frankja@linux.ibm.com>
 From:   Thomas Huth <thuth@redhat.com>
-Subject: Re: [kvm-unit-tests PATCH 4/8] lib: s390x: Start using bitops instead
- of magic constants
-Message-ID: <f6b4c1e2-ac05-3567-5209-be9227b39786@redhat.com>
-Date:   Wed, 18 Aug 2021 11:24:39 +0200
+Message-ID: <76f5c0bb-6a28-c480-6b69-25056accb5b6@redhat.com>
+Date:   Wed, 18 Aug 2021 11:28:29 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.12.0
 MIME-Version: 1.0
-In-Reply-To: <20210813073615.32837-5-frankja@linux.ibm.com>
+In-Reply-To: <20210813073615.32837-7-frankja@linux.ibm.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 On 13/08/2021 09.36, Janosch Frank wrote:
-> TEID data is specified in the Principles of Operation as bits so it
-> makes more sens to test the bits instead of anding the mask.
-> 
-> We need to set -Wno-address-of-packed-member since for test bit we
-> take an address of a struct lowcore member.
+> Let's replace the magic 0x0000000180000000ULL numeric constants with
+> PSW_MASK_64 as it's used more often since the introduction of smp and
+> sie.
 > 
 > Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
 > ---
->   lib/s390x/interrupt.c | 5 +++--
->   s390x/Makefile        | 1 +
->   2 files changed, 4 insertions(+), 2 deletions(-)
+>   lib/s390x/asm/arch_def.h | 3 +++
+>   lib/s390x/smp.c          | 2 +-
+>   s390x/mvpg-sie.c         | 2 +-
+>   s390x/sie.c              | 2 +-
+>   s390x/skrf.c             | 6 +++---
+>   5 files changed, 9 insertions(+), 6 deletions(-)
 > 
-> diff --git a/lib/s390x/interrupt.c b/lib/s390x/interrupt.c
-> index 1248bceb..e05c212e 100644
-> --- a/lib/s390x/interrupt.c
-> +++ b/lib/s390x/interrupt.c
-> @@ -8,6 +8,7 @@
->    *  David Hildenbrand <david@redhat.com>
->    */
->   #include <libcflat.h>
-> +#include <bitops.h>
->   #include <asm/barrier.h>
->   #include <sclp.h>
->   #include <interrupt.h>
-> @@ -77,8 +78,8 @@ static void fixup_pgm_int(struct stack_frame_int *stack)
->   		break;
->   	case PGM_INT_CODE_PROTECTION:
->   		/* Handling for iep.c test case. */
-> -		if (lc->trans_exc_id & 0x80UL && lc->trans_exc_id & 0x04UL &&
-> -		    !(lc->trans_exc_id & 0x08UL))
-> +		if (test_bit_inv(56, &lc->trans_exc_id) && test_bit_inv(61, &lc->trans_exc_id) &&
-> +		    !test_bit_inv(60, &lc->trans_exc_id))
+> diff --git a/lib/s390x/asm/arch_def.h b/lib/s390x/asm/arch_def.h
+> index 39c5ba99..245453c3 100644
+> --- a/lib/s390x/asm/arch_def.h
+> +++ b/lib/s390x/asm/arch_def.h
+> @@ -50,6 +50,9 @@ struct psw {
+>   #define PSW_MASK_DAT			0x0400000000000000UL
+>   #define PSW_MASK_WAIT			0x0002000000000000UL
+>   #define PSW_MASK_PSTATE			0x0001000000000000UL
+> +#define PSW_MASK_EA			0x0000000100000000UL
+> +#define PSW_MASK_BA			0x0000000080000000UL
+> +#define PSW_MASK_64			PSW_MASK_BA | PSW_MASK_EA;
 
-I'd rather prefer:
-
-	if ((lc->trans_exc_id & 0x8c) == 0x84)
-
-... or maybe you could add a helper function for these checks a la:
-
-bool check_teid_prot_cause(uint64_t teid, bool bit56, bool bit60,
-                            bool bit61)
-
-then you could replace the if statement with:
-
-	if (check_teid_prot_cause(lc->trans_exc_id, 1, 0, 1))
-
-which would be way more readable, IMHO.
-
->   			/*
->   			 * We branched to the instruction that caused
->   			 * the exception so we can use the return
-> diff --git a/s390x/Makefile b/s390x/Makefile
-> index ef8041a6..d260b336 100644
-> --- a/s390x/Makefile
-> +++ b/s390x/Makefile
-> @@ -45,6 +45,7 @@ CFLAGS += -O2
->   CFLAGS += -march=zEC12
->   CFLAGS += -mbackchain
->   CFLAGS += -fno-delete-null-pointer-checks
-> +CFLAGS += -Wno-address-of-packed-member
-
-I think we should avoid this since this also affects the common code, 
-doesn't it? And in common code, we might need to deal with this.
+Please put some parentheses around PSW_MASK_BA | PSW_MASK_EA and remove the 
+semicolon at the end.
 
   Thomas
 
