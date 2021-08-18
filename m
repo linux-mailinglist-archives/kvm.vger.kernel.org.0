@@ -2,83 +2,125 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 381073F0ECD
-	for <lists+kvm@lfdr.de>; Thu, 19 Aug 2021 01:49:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3CE173F0EDC
+	for <lists+kvm@lfdr.de>; Thu, 19 Aug 2021 01:56:24 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235225AbhHRXuG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 18 Aug 2021 19:50:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38800 "EHLO
+        id S235070AbhHRX46 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 18 Aug 2021 19:56:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40412 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235064AbhHRXuG (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 18 Aug 2021 19:50:06 -0400
-Received: from mail-pf1-x430.google.com (mail-pf1-x430.google.com [IPv6:2607:f8b0:4864:20::430])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D1B18C0613D9
-        for <kvm@vger.kernel.org>; Wed, 18 Aug 2021 16:49:30 -0700 (PDT)
-Received: by mail-pf1-x430.google.com with SMTP id y190so3791628pfg.7
-        for <kvm@vger.kernel.org>; Wed, 18 Aug 2021 16:49:30 -0700 (PDT)
+        with ESMTP id S235005AbhHRX44 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 18 Aug 2021 19:56:56 -0400
+Received: from mail-pf1-x44a.google.com (mail-pf1-x44a.google.com [IPv6:2607:f8b0:4864:20::44a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 64DBCC0613CF
+        for <kvm@vger.kernel.org>; Wed, 18 Aug 2021 16:56:21 -0700 (PDT)
+Received: by mail-pf1-x44a.google.com with SMTP id x18-20020a056a000bd200b003e14701b71dso2133446pfu.21
+        for <kvm@vger.kernel.org>; Wed, 18 Aug 2021 16:56:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=xWVGgzNhg0bKowDgMtAJdc0jrte6ReRvwJNGpqgXHy0=;
-        b=kMt57PvYngH7Nf3lS9QzTNHmKMN8MCBHcYbGc/18ZJHNioFors2TS2bW66NQljnmeH
-         hK0oD00wN+LBenyrm02ZNL1bVlJIOCEUY6xuY/iLm2b5XUvyNJFV/31mwM/BgbcnXXnE
-         9PwpurECHnsefQZDhHp6+8FkngJoW6norYKIzgwi7rWhMh1ByU+q6e94WQupwcjG3DQQ
-         rLpPVyj/oHStckruB5Gce3dYVffe4FzOnBGfPv2+3ZLRmy7eutFMAsbo2II54+MImTlV
-         IvF7LaR4ZJxbAK4dCbrgyKzbM74kuuRvLn622jGRzGZWYgRPc0EvrMgTvJLoR3K60L6Q
-         UNJQ==
+        h=reply-to:date:message-id:mime-version:subject:from:to:cc;
+        bh=Scvb2gfJzrYfNJq90EL74fT7SS7nVGstZhceM9SRTyY=;
+        b=CPqsJcRdPyzWVw2UkNu0Wn9hUr9Qxq5bXEX1GOFSOmGUzn4ZXDSKec71mwcN+FHo9/
+         J7Hl7xy+UKc/xgVNUN88urCR/U61zjMcY6asIwsJ1NN2YS9qGf+aKvKCDIrLpWvwMxY7
+         2BngKUPmIzEBdYGZPYHGwKJ9jNq1gVsHj9z0RLCoU1r/NmEOi3G9vIVtbVYCcORZAjlI
+         UndfdDGE3KQaTr65pLvCdgbH6llmSIJz96OFnUlXCMFadPkBkt7tK63U5VkNx63TbLCo
+         ERRq3MYzS7Mvlz1HG8GN5rM0km+KLmdMUSZjv6uehqHwlltzlCfbOOiB7zBMlniQMnlZ
+         qqtg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=xWVGgzNhg0bKowDgMtAJdc0jrte6ReRvwJNGpqgXHy0=;
-        b=Lx/PioVoWPbASYfHFLwpbuxa52/BbjrNUJZJtTJDgkoXKOlsuJ8hlFhmnJdm2bn+yp
-         AEKr6EZaJ/I1Oyrqhbsz6mC0Ralmt1+hAe9wkUZw5LmXPG+dTLaYA0IWdIY1mhKrEb6d
-         itfS5GcVyTlJDT7+wJyZQaKe1W11EG5l9ibDY5f2YGGkC/ZoSvc4xkCTTMtQf1QwMfbe
-         tteDRIhO3fZMLSOh0ouOzQuCds7DkaelV8iGaSa0EgAQdln2ILfVoZdxPMrpiESbusPH
-         X6p4dPHqbwGd6XlAGyLDj8q2AE8Gk7uuPs36Mr7U/ytTXHvvuqsFayC4zlCofT+fsddu
-         Oygw==
-X-Gm-Message-State: AOAM533MrHSOPVaZpoxC16bVLWQyv70tKRzWOB+OblisT1cBaDiMQFvN
-        sRo2oCF+f4rZPidiA4RQsToWTA==
-X-Google-Smtp-Source: ABdhPJzG9Vf9ORYGtC4jJSfs7Mu1PycovbhksanngZOwZI+w+ZRYjv3xIxU/XsOEKcW6GEHsWVXKsA==
-X-Received: by 2002:a63:204a:: with SMTP id r10mr11186295pgm.365.1629330570276;
-        Wed, 18 Aug 2021 16:49:30 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id ga22sm5519792pjb.29.2021.08.18.16.49.29
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 18 Aug 2021 16:49:29 -0700 (PDT)
-Date:   Wed, 18 Aug 2021 23:49:24 +0000
+        h=x-gm-message-state:reply-to:date:message-id:mime-version:subject
+         :from:to:cc;
+        bh=Scvb2gfJzrYfNJq90EL74fT7SS7nVGstZhceM9SRTyY=;
+        b=MnyUH+A8DaHUFnxiu4wXvae5D8ApyB9Syoz3wrhduRN7Kh+fn01BPN3pdS0dO4slPc
+         mOLETo7bqNpxs+1Shj5jqoYtmHAfLpsnclLjN3OXrEXmRE9jzcGt+SNoDjaCrAgOJJt3
+         6EjNlgch+iraErQ2Etdj60SP3euyRdc6fL1/BCk2fgkWhIKmhnLyxu5o/NXpJuJJc4j6
+         Lawy6q49gyQ0DtQsm1pO3fMlJZ+RlTisAyv58ZgizKTu2C3gfFYIGFmnvucJkL7xA3zg
+         NuPHJfKYgGsEE8Wtodf9A6HxZkCNk0yDICHnItb1uGHAIeQUiW8ddrAGF/2gHOudDWbZ
+         IPXQ==
+X-Gm-Message-State: AOAM532GNovmsFw5hTAurydQaWh10f8i8ZghTXY1uUx/NRoJX4NpQ3iq
+        1O7075HiZLNQ1+YPAF736KVqIJf8kuk=
+X-Google-Smtp-Source: ABdhPJyqChTXz2F80g0qJy/+xySrxm2DGETkwfuo5JqfDwHZAekTYYLYUCbmnHGiPShsiTlZr2Nz/k/ji+0=
+X-Received: from seanjc.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:3e5])
+ (user=seanjc job=sendgmr) by 2002:a17:902:e9c6:b029:12d:4cb3:3985 with SMTP
+ id 6-20020a170902e9c6b029012d4cb33985mr9312260plk.56.1629330980601; Wed, 18
+ Aug 2021 16:56:20 -0700 (PDT)
+Reply-To: Sean Christopherson <seanjc@google.com>
+Date:   Wed, 18 Aug 2021 23:56:15 +0000
+Message-Id: <20210818235615.2047588-1-seanjc@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.33.0.rc1.237.g0d66db33f3-goog
+Subject: [PATCH] KVM: x86/mmu: Complete prefetch for trailing SPTEs for
+ direct, legacy MMU
 From:   Sean Christopherson <seanjc@google.com>
-To:     Jim Mattson <jmattson@google.com>
-Cc:     Robert Hoo <robert.hu@linux.intel.com>, pbonzini@redhat.com,
-        vkuznets@redhat.com, wanpengli@tencent.com, joro@8bytes.org,
-        kvm@vger.kernel.org, yu.c.zhang@linux.intel.com
-Subject: Re: [PATCH v1 3/5] KVM: x86: nVMX: VMCS12 field's read/write
- respects field existence bitmap
-Message-ID: <YR2chNdSyyAtjCU3@google.com>
-References: <1629192673-9911-1-git-send-email-robert.hu@linux.intel.com>
- <1629192673-9911-4-git-send-email-robert.hu@linux.intel.com>
- <YRvbvqhz6sknDEWe@google.com>
- <b2bf00a6a8f3f88555bebf65b35579968ea45e2a.camel@linux.intel.com>
- <YR2Tf9WPNEzrE7Xg@google.com>
- <CALMp9eQnq9RDQiRmfOge52Yx8SCM5D2nAM-0bcqaGJQJXvgfDA@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CALMp9eQnq9RDQiRmfOge52Yx8SCM5D2nAM-0bcqaGJQJXvgfDA@mail.gmail.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Sergey Senozhatsky <senozhatsky@google.com>,
+        Ben Gardon <bgardon@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Aug 18, 2021, Jim Mattson wrote:
-> On Wed, Aug 18, 2021 at 4:11 PM Sean Christopherson <seanjc@google.com> wrote:
-> > This is quite the complicated mess for something I'm guessing no one actually
-> > cares about.  At what point do we chalk this up as a virtualization hole and
-> > sweep it under the rug?
-> 
-> Good point! Note that hardware doesn't even get this right. See
-> erratum CF77 in
-> https://www.intel.com/content/dam/www/public/us/en/documents/specification-updates/xeon-e7-v2-spec-update.pdf.
-> I'd cut and paste the text here, but Intel won't allow that.
+Make a final call to direct_pte_prefetch_many() if there are "trailing"
+SPTEs to prefetch, i.e. SPTEs for GFNs following the faulting GFN.  The
+call to direct_pte_prefetch_many() in the loop only handles the case
+where there are !PRESENT SPTEs preceding a PRESENT SPTE.
 
-Ha!  KVM's behavior is a feature, not a bug, we're just matching hardware! ;-)
+E.g. if the faulting GFN is a multiple of 8 (the prefetch size) and all
+SPTEs for the following GFNs are !PRESENT, the loop will terminate with
+"start = sptep+1" and not prefetch any SPTEs.
+
+Prefetching trailing SPTEs as intended can drastically reduce the number
+of guest page faults, e.g. accessing the first byte of every 4kb page in
+a 6gb chunk of virtual memory, in a VM with 8gb of preallocated memory,
+the number of pf_fixed events observed in L0 drops from ~1.75M to <0.27M.
+
+Note, this only affects memory that is backed by 4kb pages as KVM doesn't
+prefetch when installing hugepages.  Shadow paging prefetching is not
+affected as it does not batch the prefetches due to the need to process
+the corresponding guest PTE.  The TDP MMU is not affected because it
+doesn't have prefetching, yet...
+
+Fixes: 957ed9effd80 ("KVM: MMU: prefetch ptes when intercepted guest #PF")
+Cc: Sergey Senozhatsky <senozhatsky@google.com>
+Cc: Ben Gardon <bgardon@google.com>
+Signed-off-by: Sean Christopherson <seanjc@google.com>
+---
+
+Cc'd Ben as this highlights a potential gap with the TDP MMU, which lacks
+prefetching of any sort.  For large VMs, which are likely backed by
+hugepages anyways, this is a non-issue as the benefits of holding mmu_lock
+for read likely masks the cost of taking more VM-Exits.  But VMs with a
+small number of vCPUs won't benefit as much from parallel page faults,
+e.g. there's no benefit at all if there's a single vCPU.
+
+ arch/x86/kvm/mmu/mmu.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+index a272ccbddfa1..daf7df35f788 100644
+--- a/arch/x86/kvm/mmu/mmu.c
++++ b/arch/x86/kvm/mmu/mmu.c
+@@ -2818,11 +2818,13 @@ static void __direct_pte_prefetch(struct kvm_vcpu *vcpu,
+ 			if (!start)
+ 				continue;
+ 			if (direct_pte_prefetch_many(vcpu, sp, start, spte) < 0)
+-				break;
++				return;
+ 			start = NULL;
+ 		} else if (!start)
+ 			start = spte;
+ 	}
++	if (start)
++		direct_pte_prefetch_many(vcpu, sp, start, spte);
+ }
+ 
+ static void direct_pte_prefetch(struct kvm_vcpu *vcpu, u64 *sptep)
+-- 
+2.33.0.rc1.237.g0d66db33f3-goog
+
