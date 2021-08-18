@@ -2,132 +2,215 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 69C633F0B66
-	for <lists+kvm@lfdr.de>; Wed, 18 Aug 2021 21:04:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A08BA3F0B68
+	for <lists+kvm@lfdr.de>; Wed, 18 Aug 2021 21:05:46 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232657AbhHRTFK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 18 Aug 2021 15:05:10 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:50739 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229558AbhHRTFJ (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 18 Aug 2021 15:05:09 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1629313474;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=RKRaR8ialZrJcZ2q5uYwpXQ6txvGrMjrVXBzyK2J2jo=;
-        b=Mlj1Yvgwf0s3ZM3jNG9lVvlwjU86oQkIR/7l4RXPEo6qWcxw1P+YHCU4E5vps4WAsA8Utv
-        pB3Mf25lQrsogh02wGtnDBBAYSKo3M/HeTVQAoqsRGzw5b99pPfuQ6OTGGBuilYrU4ICSZ
-        EZVLabEirFGRc53OMQLaTe8Ozf51tlY=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-356-Y7BPqjTBMvmHHXneobN2BQ-1; Wed, 18 Aug 2021 15:04:32 -0400
-X-MC-Unique: Y7BPqjTBMvmHHXneobN2BQ-1
-Received: by mail-wr1-f69.google.com with SMTP id m5-20020a5d6a050000b0290154e83dce73so873338wru.19
-        for <kvm@vger.kernel.org>; Wed, 18 Aug 2021 12:04:32 -0700 (PDT)
+        id S229558AbhHRTGT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 18 Aug 2021 15:06:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58632 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232713AbhHRTGS (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 18 Aug 2021 15:06:18 -0400
+Received: from mail-vs1-xe2c.google.com (mail-vs1-xe2c.google.com [IPv6:2607:f8b0:4864:20::e2c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9D119C061764
+        for <kvm@vger.kernel.org>; Wed, 18 Aug 2021 12:05:43 -0700 (PDT)
+Received: by mail-vs1-xe2c.google.com with SMTP id f13so2417542vsl.13
+        for <kvm@vger.kernel.org>; Wed, 18 Aug 2021 12:05:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=9CV1B2mH8PK4XbUS0fPPBFZHJZg1PKiQmC6aaYtPD7k=;
+        b=jlC/SdCD3at4dNG9kwSjwhqtOpbuTijAXLqLPHWLUEMhf2AvMCdfIZ+/0CUUgvBS5m
+         70xiWmtQq58RG8dRBT2p4w4Dq0K135uW+5foCGQy4cdg4AlrF3vmPu87Lk/RQWuHEv0F
+         zkeHKX6vol4QAexO0QKEnFFJDdHZobyH7A5Rq2f3aVQeg4nGwFhrxHpFZeJrg8jZENCW
+         6Rzr+wt2lDFbrnjJpEVbMzf+tjTI+hzyZKypDgwf7ywF+n7Zb7U6HIOthtbc90P2NcAe
+         9pAQRlZVFq6PeW0GAghT+3Mdgl9E3HCcDHERiMWFCc+/KeTiOmM+OjcCLqo9lruPQaYz
+         CdRA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=RKRaR8ialZrJcZ2q5uYwpXQ6txvGrMjrVXBzyK2J2jo=;
-        b=e55AlmJtmzcj9v0CcUcPevGDzZmyhMUWhfdp+bhfTEQae/Pmoi85WHLSlG7IFroll2
-         ryrg53rDuhT3nBX9PywsRumpCBIyPx/QxLuMvcZG5fEpJt/su5dwsssVLJEma/o7Srbf
-         z2eQ4BOIZ4+TzX2/oIEiqPL59aG9cWq89i0x6NtMItJJCwQ9t+hubohQeY4SD1iD/tk9
-         64vkX1ceIzcn7/JLllG2VWKLjMIEqMLeiGotPeM9aolFHqtD+y8HGPQaE3D34LwmeG5H
-         c57IGsSNVp+gU3IEC1oPTSxluFjyPknRsLfR3zG1KZqxoR/Zsiz3tAOCOYJdyWFGdDWh
-         j9nQ==
-X-Gm-Message-State: AOAM533nSDRNp3IA2QFFqJHUNHgRp8dHPMI2rkBQjAUHBYzgGcafPnAi
-        Ukbtxn3LmjQzc2aAjfPJa+/rWuxOe13oNCs1OIWHGt7sWV7tqwfPV9je3G9s/gij5H48jtWDboC
-        NRhfpOgMjF7MH
-X-Received: by 2002:adf:9c8b:: with SMTP id d11mr12014206wre.43.1629313471464;
-        Wed, 18 Aug 2021 12:04:31 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxLdMDbMSjp9h1NdcljIpckt7ie6vJPkq0kBmu03yZevd4oVZWyroH52DVVQV60VqXHh9XvBQ==
-X-Received: by 2002:adf:9c8b:: with SMTP id d11mr12014177wre.43.1629313471328;
-        Wed, 18 Aug 2021 12:04:31 -0700 (PDT)
-Received: from work-vm (cpc109021-salf6-2-0-cust453.10-2.cable.virginm.net. [82.29.237.198])
-        by smtp.gmail.com with ESMTPSA id k3sm5996868wms.28.2021.08.18.12.04.30
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 18 Aug 2021 12:04:30 -0700 (PDT)
-Date:   Wed, 18 Aug 2021 20:04:28 +0100
-From:   "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To:     Tobin Feldman-Fitzthum <tobin@linux.ibm.com>
-Cc:     Steve Rutherford <srutherford@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Ashish Kalra <Ashish.Kalra@amd.com>, thomas.lendacky@amd.com,
-        brijesh.singh@amd.com, ehabkost@redhat.com, kvm@vger.kernel.org,
-        mst@redhat.com, tobin@ibm.com, jejb@linux.ibm.com,
-        richard.henderson@linaro.org, qemu-devel@nongnu.org,
-        frankeh@us.ibm.com, dovmurik@linux.vnet.ibm.com
-Subject: Re: [RFC PATCH 00/13] Add support for Mirror VM.
-Message-ID: <YR1ZvArdq4sKVyTJ@work-vm>
-References: <cover.1629118207.git.ashish.kalra@amd.com>
- <CABayD+fyrcyPGg5TdXLr95AFkPFY+EeeNvY=NvQw_j3_igOd6Q@mail.gmail.com>
- <0fcfafde-a690-f53a-01fc-542054948bb2@redhat.com>
- <37796fd1-bbc2-f22c-b786-eb44f4d473b9@linux.ibm.com>
- <CABayD+evf56U4yT2V1TmEzaJjvV8gutUG5t8Ob2ifamruw5Qrg@mail.gmail.com>
- <458ba932-5150-8706-3958-caa4cc67c8e3@linux.ibm.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=9CV1B2mH8PK4XbUS0fPPBFZHJZg1PKiQmC6aaYtPD7k=;
+        b=RVSAhIN7ANS9acB0Ph3SQt0waPgCpClMkJTPUR46a20ya1lr8/gdL+PBwMNp1idVZS
+         TJebv6p/t7awyYqYBGPXKdfzoDQahD6Ls/PJzpBfJUFk3d9mYeDiDS5lcMsDmPguMggU
+         o9JOgfw7jJsvXAnnpYVMDaIPA4VB4M2/cQmLTAM63FIwV1tOIC87OF6VbcLfsDqkZiS+
+         TjWw+EzZfRVZtPaokXqqFTYe5UbKSmtEtTCC5ycLQVZEfQ62cugB5Bwe+5UjKjFvSSG1
+         SeXP/utK8yqF8InR9wUPEwxSw761JnviOO2VCOrCz3yMuQ477fvGpWJfMJpnHVi1ypHm
+         eIBg==
+X-Gm-Message-State: AOAM530WQDzBI3aJa8L9uIi9yEtBgIa/epZydHwRj1y78C5I4sjQ1rIl
+        3bLZAAkQgLNlJMGrfTp+CN+11cZAe6VMaxEd8FuYvA==
+X-Google-Smtp-Source: ABdhPJzxU71p18xMzChBvv1uRBdKk5rlC4hzgstASnkvOKd+KGr7ohhYYBMh0iPqs21uTd7beQSd7ILYgInPHYYKiRo=
+X-Received: by 2002:a67:2e43:: with SMTP id u64mr9474774vsu.30.1629313542587;
+ Wed, 18 Aug 2021 12:05:42 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <458ba932-5150-8706-3958-caa4cc67c8e3@linux.ibm.com>
-User-Agent: Mutt/2.0.7 (2021-05-04)
+References: <20210818181432.432256-1-maz@kernel.org>
+In-Reply-To: <20210818181432.432256-1-maz@kernel.org>
+From:   Raghavendra Rao Ananta <rananta@google.com>
+Date:   Wed, 18 Aug 2021 12:05:32 -0700
+Message-ID: <CAJHc60zUZS3K4q88QYwP2CkGn7ywt-_fedjk7OK_W7cdQRJvxA@mail.gmail.com>
+Subject: Re: [PATCH] KVM: arm64: vgic: Resample HW pending state on deactivation
+To:     Marc Zyngier <maz@kernel.org>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org
+Cc:     James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Andre Przywara <andre.przywara@arm.com>,
+        Eric Auger <eric.auger@redhat.com>,
+        Oliver Upton <oupton@google.com>,
+        Ricardo Koller <ricarkol@google.com>, kernel-team@android.com,
+        stable@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-* Tobin Feldman-Fitzthum (tobin@linux.ibm.com) wrote:
-> On 8/17/21 6:04 PM, Steve Rutherford wrote:
-> > On Tue, Aug 17, 2021 at 1:50 PM Tobin Feldman-Fitzthum
-> > <tobin@linux.ibm.com> wrote:
-> > > This is essentially what we do in our prototype, although we have an
-> > > even simpler approach. We have a 1:1 mapping that maps an address to
-> > > itself with the cbit set. During Migration QEMU asks the migration
-> > > handler to import/export encrypted pages and provides the GPA for said
-> > > page. Since the migration handler only exports/imports encrypted pages,
-> > > we can have the cbit set for every page in our mapping. We can still use
-> > > OVMF functions with these mappings because they are on encrypted pages.
-> > > The MH does need to use a few shared pages (to communicate with QEMU,
-> > > for instance), so we have another mapping without the cbit that is at a
-> > > large offset.
-> > > 
-> > > I think this is basically equivalent to what you suggest. As you point
-> > > out above, this approach does require that any page that will be
-> > > exported/imported by the MH is mapped in the guest. Is this a bad
-> > > assumption? The VMSA for SEV-ES is one example of a region that is
-> > > encrypted but not mapped in the guest (the PSP handles it directly). We
-> > > have been planning to map the VMSA into the guest to support migration
-> > > with SEV-ES (along with other changes).
-> > Ahh, It sounds like you are looking into sidestepping the existing
-> > AMD-SP flows for migration. I assume the idea is to spin up a VM on
-> > the target side, and have the two VMs attest to each other. How do the
-> > two sides know if the other is legitimate? I take it that the source
-> > is directing the LAUNCH flows?
-> 
-> Yeah we don't use PSP migration flows at all. We don't need to send the MH
-> code from the source to the target because the MH lives in firmware, which
-> is common between the two.
+On Wed, Aug 18, 2021 at 11:14 AM Marc Zyngier <maz@kernel.org> wrote:
+>
+> When a mapped level interrupt (a timer, for example) is deactivated
+> by the guest, the corresponding host interrupt is equally deactivated.
+> However, the fate of the pending state still needs to be dealt
+> with in SW.
+>
+> This is specially true when the interrupt was in the active+pending
+> state in the virtual distributor at the point where the guest
+> was entered. On exit, the pending state is potentially stale
+> (the guest may have put the interrupt in a non-pending state).
+>
+> If we don't do anything, the interrupt will be spuriously injected
+> in the guest. Although this shouldn't have any ill effect (spurious
+> interrupts are always possible), we can improve the emulation by
+> detecting the deactivation-while-pending case and resample the
+> interrupt.
+>
+> Fixes: e40cc57bac79 ("KVM: arm/arm64: vgic: Support level-triggered mapped interrupts")
+> Reported-by: Raghavendra Rao Ananta <rananta@google.com>
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> Cc: stable@vger.kernel.org
+> ---
+>  arch/arm64/kvm/vgic/vgic-v2.c | 25 ++++++++++++++++++-------
+>  arch/arm64/kvm/vgic/vgic-v3.c | 25 ++++++++++++++++++-------
+>  2 files changed, 36 insertions(+), 14 deletions(-)
+>
+Tested-by: Raghavendra Rao Ananta <rananta@google.com>
 
-Are you relying on the target firmware to be *identical* or purely for
-it to be *compatible* ?  It's normal for a migration to be the result of
-wanting to do an upgrade; and that means the destination build of OVMF
-might be newer (or older, or ...).
-
-Dave
-
-
-> We start the target like a normal VM rather than
-> waiting for an incoming migration. The plan is to treat the target like a
-> normal VM for attestation as well. The guest owner will attest the target VM
-> just like they would any other VM that is started on their behalf. Secret
-> injection can be used to establish a shared key for the source and target.
-> 
-> -Tobin
-> 
-> > 
-> > --Steve
-> > 
-> 
--- 
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
-
+Thanks,
+Raghavendra
+> diff --git a/arch/arm64/kvm/vgic/vgic-v2.c b/arch/arm64/kvm/vgic/vgic-v2.c
+> index 2c580204f1dc..3e52ea86a87f 100644
+> --- a/arch/arm64/kvm/vgic/vgic-v2.c
+> +++ b/arch/arm64/kvm/vgic/vgic-v2.c
+> @@ -60,6 +60,7 @@ void vgic_v2_fold_lr_state(struct kvm_vcpu *vcpu)
+>                 u32 val = cpuif->vgic_lr[lr];
+>                 u32 cpuid, intid = val & GICH_LR_VIRTUALID;
+>                 struct vgic_irq *irq;
+> +               bool deactivated;
+>
+>                 /* Extract the source vCPU id from the LR */
+>                 cpuid = val & GICH_LR_PHYSID_CPUID;
+> @@ -75,7 +76,8 @@ void vgic_v2_fold_lr_state(struct kvm_vcpu *vcpu)
+>
+>                 raw_spin_lock(&irq->irq_lock);
+>
+> -               /* Always preserve the active bit */
+> +               /* Always preserve the active bit, note deactivation */
+> +               deactivated = irq->active && !(val & GICH_LR_ACTIVE_BIT);
+>                 irq->active = !!(val & GICH_LR_ACTIVE_BIT);
+>
+>                 if (irq->active && vgic_irq_is_sgi(intid))
+> @@ -105,6 +107,12 @@ void vgic_v2_fold_lr_state(struct kvm_vcpu *vcpu)
+>                  * device state could have changed or we simply need to
+>                  * process the still pending interrupt later.
+>                  *
+> +                * We could also have entered the guest with the interrupt
+> +                * active+pending. On the next exit, we need to re-evaluate
+> +                * the pending state, as it could otherwise result in a
+> +                * spurious interrupt by injecting a now potentially stale
+> +                * pending state.
+> +                *
+>                  * If this causes us to lower the level, we have to also clear
+>                  * the physical active state, since we will otherwise never be
+>                  * told when the interrupt becomes asserted again.
+> @@ -115,12 +123,15 @@ void vgic_v2_fold_lr_state(struct kvm_vcpu *vcpu)
+>                 if (vgic_irq_is_mapped_level(irq)) {
+>                         bool resample = false;
+>
+> -                       if (val & GICH_LR_PENDING_BIT) {
+> -                               irq->line_level = vgic_get_phys_line_level(irq);
+> -                               resample = !irq->line_level;
+> -                       } else if (vgic_irq_needs_resampling(irq) &&
+> -                                  !(irq->active || irq->pending_latch)) {
+> -                               resample = true;
+> +                       if (unlikely(vgic_irq_needs_resampling(irq))) {
+> +                               if (!(irq->active || irq->pending_latch))
+> +                                       resample = true;
+> +                       } else {
+> +                               if ((val & GICH_LR_PENDING_BIT) ||
+> +                                   (deactivated && irq->line_level)) {
+> +                                       irq->line_level = vgic_get_phys_line_level(irq);
+> +                                       resample = !irq->line_level;
+> +                               }
+>                         }
+>
+>                         if (resample)
+> diff --git a/arch/arm64/kvm/vgic/vgic-v3.c b/arch/arm64/kvm/vgic/vgic-v3.c
+> index 66004f61cd83..74f9aefffd5e 100644
+> --- a/arch/arm64/kvm/vgic/vgic-v3.c
+> +++ b/arch/arm64/kvm/vgic/vgic-v3.c
+> @@ -46,6 +46,7 @@ void vgic_v3_fold_lr_state(struct kvm_vcpu *vcpu)
+>                 u32 intid, cpuid;
+>                 struct vgic_irq *irq;
+>                 bool is_v2_sgi = false;
+> +               bool deactivated;
+>
+>                 cpuid = val & GICH_LR_PHYSID_CPUID;
+>                 cpuid >>= GICH_LR_PHYSID_CPUID_SHIFT;
+> @@ -68,7 +69,8 @@ void vgic_v3_fold_lr_state(struct kvm_vcpu *vcpu)
+>
+>                 raw_spin_lock(&irq->irq_lock);
+>
+> -               /* Always preserve the active bit */
+> +               /* Always preserve the active bit, note deactivation */
+> +               deactivated = irq->active && !(val & ICH_LR_ACTIVE_BIT);
+>                 irq->active = !!(val & ICH_LR_ACTIVE_BIT);
+>
+>                 if (irq->active && is_v2_sgi)
+> @@ -98,6 +100,12 @@ void vgic_v3_fold_lr_state(struct kvm_vcpu *vcpu)
+>                  * device state could have changed or we simply need to
+>                  * process the still pending interrupt later.
+>                  *
+> +                * We could also have entered the guest with the interrupt
+> +                * active+pending. On the next exit, we need to re-evaluate
+> +                * the pending state, as it could otherwise result in a
+> +                * spurious interrupt by injecting a now potentially stale
+> +                * pending state.
+> +                *
+>                  * If this causes us to lower the level, we have to also clear
+>                  * the physical active state, since we will otherwise never be
+>                  * told when the interrupt becomes asserted again.
+> @@ -108,12 +116,15 @@ void vgic_v3_fold_lr_state(struct kvm_vcpu *vcpu)
+>                 if (vgic_irq_is_mapped_level(irq)) {
+>                         bool resample = false;
+>
+> -                       if (val & ICH_LR_PENDING_BIT) {
+> -                               irq->line_level = vgic_get_phys_line_level(irq);
+> -                               resample = !irq->line_level;
+> -                       } else if (vgic_irq_needs_resampling(irq) &&
+> -                                  !(irq->active || irq->pending_latch)) {
+> -                               resample = true;
+> +                       if (unlikely(vgic_irq_needs_resampling(irq))) {
+> +                               if (!(irq->active || irq->pending_latch))
+> +                                       resample = true;
+> +                       } else {
+> +                               if ((val & ICH_LR_PENDING_BIT) ||
+> +                                   (deactivated && irq->line_level)) {
+> +                                       irq->line_level = vgic_get_phys_line_level(irq);
+> +                                       resample = !irq->line_level;
+> +                               }
+>                         }
+>
+>                         if (resample)
+> --
+> 2.30.2
+>
