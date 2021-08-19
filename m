@@ -2,246 +2,175 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id DE8E63F2052
-	for <lists+kvm@lfdr.de>; Thu, 19 Aug 2021 21:01:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C9D333F212F
+	for <lists+kvm@lfdr.de>; Thu, 19 Aug 2021 21:57:45 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233142AbhHSTC3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 19 Aug 2021 15:02:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51092 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230058AbhHSTC1 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 19 Aug 2021 15:02:27 -0400
-Received: from mail-lf1-x136.google.com (mail-lf1-x136.google.com [IPv6:2a00:1450:4864:20::136])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B411DC061575
-        for <kvm@vger.kernel.org>; Thu, 19 Aug 2021 12:01:50 -0700 (PDT)
-Received: by mail-lf1-x136.google.com with SMTP id f10so293234lfv.6
-        for <kvm@vger.kernel.org>; Thu, 19 Aug 2021 12:01:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=VFzrnE3a6L9Tczohj9RQoEEFySSh7029ha5hRjL+eHw=;
-        b=nAXPqnq8r7hRAo7LMukK3FFDgAFvo2pTbT/9kA4weITIpvudhMRFjcyZuQSF1+Tidc
-         4to5t2isU4WD+5oY2M+EXS65EE1dc0/ysfqB9QJ9qElKerQkHTRlJ105G08UQvxQ668u
-         jFQHZISKbmEaUfZRL1RrahlJlqbdN1K/VbVWMshTvjBiktCHxxB2l4x2OLRL7lFQv0ij
-         4PsMbCaJp+KlqFx4Kzb6LqQjQEzLVpejIGtxN1wHuYfX0Q4M2CnVsTmKeNsZz9HTKC/I
-         tmoCBPmf6kBzuNjSlhbSni179zh7s3QVbQcxFxnL8Gat2T1un+H3YuszPKDOA+L4Igi/
-         DZnA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=VFzrnE3a6L9Tczohj9RQoEEFySSh7029ha5hRjL+eHw=;
-        b=cLAdGCEHlRDPPScqbbcR1G4VvLorWGs5vyanpBaF58KhbXPuI2sJyN7qy1HXVwxvbh
-         5SV9GXcFjHT+uvp363qnadMhdUvm+BmMSDS3dPfqoNJswVpNZNra0sqF8/+M1Meo8rtV
-         xSC5HqIagkXX75fwHVAqVfq227pN5l0OmomJG+C6EhA1XYRtDiDMk8JDwJr+F5T2zIqF
-         Ja2sQY9uTpRffKDmjrj99GrhRF9DXovSZfIiRO+Umkpa0Nss7bLP0hEFRJXQ9mVdsztQ
-         2wcOQ9hqAshuzecxhyaxsZyumWKKzxXCRhp5EBEccMnKosiOmFabfuDfE9HfLhHi2lLI
-         erOg==
-X-Gm-Message-State: AOAM530ASHU8EDAFKHUqoXxdG/FEXHqvuT+qt10oIqR7y5rYsYsN3nzH
-        Q9lDh387Y9NCsNMxF/4GiIi0kLs4be4mK0Cfn31nBw==
-X-Google-Smtp-Source: ABdhPJy2Rp/Ofz/vN4S4Mu6xZhzJcQL/XGazpZ0dZOz9gs/hSB8B5S+3xc07DJs8r696z9LWxTff8d/C/uRfaW8cMfQ=
-X-Received: by 2002:ac2:5964:: with SMTP id h4mr11906960lfp.473.1629399708798;
- Thu, 19 Aug 2021 12:01:48 -0700 (PDT)
+        id S234795AbhHST6U (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 19 Aug 2021 15:58:20 -0400
+Received: from mail-dm6nam11on2085.outbound.protection.outlook.com ([40.107.223.85]:15178
+        "EHLO NAM11-DM6-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S233995AbhHST6T (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 19 Aug 2021 15:58:19 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=OKyzgdMzuPmcGOKipIGph2vKHxhRwOiXZWxDOIEFhxJKT6jXHhwOCY++z9HIx0O2F3gy/SDEfBvGtfneb6aJnZsYFRopMCxprWPw1/nGESrntXcONTm4MGQP9EYAoBMyem0oPalyErJ6fmL9S2gGuCpBKlT3yqrlH23LcWhu7QBgJHDETkl6ZzabTIdw+GsZtzn4xCO2Q0EoWl/LpJ6i6Ak95wRKIgQG+ga+RQp7akHbpsU7xOHgnvAapDz/1jGlorudxuJSDGB1jeqPO/YV41PVhiJTI6Z4fJv6PVclNP8rMdMDz/vKF+cyeXjsN0QnjSfZdNwe0rk3EtJT0hYTIw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=AGcv4PF/48/Hux1yYzJyaDdbFQHx+eBFulGw2SnXz88=;
+ b=k6JzrFyXx9hz2Elqr5AjTwzz8CbSCExiBrHhN1l6g5NsI423DWJQRmtm53QrFVPiRfaSO7zE6umFJuaJ5dmicvuPUDhDIoC97Vm+0MnfeO3nCA1zweINbc1/0yFZXBBEv+FWyFhbz+zWW3eBnN0UeEQfwgdfJVouUy4x66h5CHGTIszysuwgrkoIpGuvxaJarap1UMBrIgZrSOVBS7JI1ml129yYalYbD1Y6sIA4ueHJkVZp6JrXXEuow58stzm9d5ye5T6HGzPxbDuvDbLrKizjHIXvv52KOJJMGfyMa5e/W4eMXj3LWKe3W3OLtnvIZsEl6cd143hxTKz+K0vYig==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.112.36) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=quarantine sp=none pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=AGcv4PF/48/Hux1yYzJyaDdbFQHx+eBFulGw2SnXz88=;
+ b=YfPwbM7pLTWDhJD2czOsVZOx0i1muKGOiZihqRfj8U4biXbDPv+lbWLlm4wnM7rQ+IGQMFOPojjIWA8O8p5ZzGEgBkN4qW13EULOWr9/yWL91WSr0umBMUqPJifP7VYsMWFeQTOUYK0XqSwZF7HakpwDaWP+j0EXvv926hdKfjBvkExsNVj2IY9oJIyQzGhek+wCJZRQOgRkIYtzzGn/jw1S+AxbaH1YglIXSgWbom4Xm8+Lr2geAi0MS4ErRon4a/PLBD6eBrdxgCh9n39tRIxhkfWth/DaIfPJmP7/UjgoleL2vulJL2du+0jnmCEmbbnSGGx/dxW3uqPCFzaEDw==
+Received: from DM5PR15CA0059.namprd15.prod.outlook.com (2603:10b6:3:ae::21) by
+ DM5PR12MB1818.namprd12.prod.outlook.com (2603:10b6:3:114::13) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.4415.19; Thu, 19 Aug 2021 19:57:40 +0000
+Received: from DM6NAM11FT016.eop-nam11.prod.protection.outlook.com
+ (2603:10b6:3:ae:cafe::23) by DM5PR15CA0059.outlook.office365.com
+ (2603:10b6:3:ae::21) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4436.19 via Frontend
+ Transport; Thu, 19 Aug 2021 19:57:40 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.112.36)
+ smtp.mailfrom=nvidia.com; vger.kernel.org; dkim=none (message not signed)
+ header.d=none;vger.kernel.org; dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.112.36 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.112.36; helo=mail.nvidia.com;
+Received: from mail.nvidia.com (216.228.112.36) by
+ DM6NAM11FT016.mail.protection.outlook.com (10.13.173.139) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
+ 15.20.4436.19 via Frontend Transport; Thu, 19 Aug 2021 19:57:40 +0000
+Received: from DRHQMAIL107.nvidia.com (10.27.9.16) by HQMAIL101.nvidia.com
+ (172.20.187.10) with Microsoft SMTP Server (TLS) id 15.0.1497.2; Thu, 19 Aug
+ 2021 19:57:38 +0000
+Received: from [172.27.0.75] (172.20.187.5) by DRHQMAIL107.nvidia.com
+ (10.27.9.16) with Microsoft SMTP Server (TLS) id 15.0.1497.2; Thu, 19 Aug
+ 2021 19:57:34 +0000
+Subject: Re: [PATCH V2 09/12] PCI: Add 'override_only' bitmap to struct
+ pci_device_id
+To:     Bjorn Helgaas <helgaas@kernel.org>,
+        Yishai Hadas <yishaih@nvidia.com>
+CC:     <bhelgaas@google.com>, <corbet@lwn.net>,
+        <alex.williamson@redhat.com>, <diana.craciun@oss.nxp.com>,
+        <kwankhede@nvidia.com>, <eric.auger@redhat.com>,
+        <masahiroy@kernel.org>, <michal.lkml@markovi.net>,
+        <linux-pci@vger.kernel.org>, <linux-doc@vger.kernel.org>,
+        <kvm@vger.kernel.org>, <linux-s390@vger.kernel.org>,
+        <linux-kbuild@vger.kernel.org>, <jgg@nvidia.com>,
+        <maorg@nvidia.com>, <leonro@nvidia.com>
+References: <20210819163945.GA3211852@bjorn-Precision-5520>
+From:   Max Gurtovoy <mgurtovoy@nvidia.com>
+Message-ID: <cd749d14-16ba-6442-0855-32c1bfac6e2d@nvidia.com>
+Date:   Thu, 19 Aug 2021 22:57:30 +0300
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.13.0
 MIME-Version: 1.0
-References: <20210819180012.744855-1-jingzhangos@google.com> <CALzav=cP17YXD8dRJnYFe_qmox3CTtpVBtLbU42Ei9zea2w21Q@mail.gmail.com>
-In-Reply-To: <CALzav=cP17YXD8dRJnYFe_qmox3CTtpVBtLbU42Ei9zea2w21Q@mail.gmail.com>
-From:   Jing Zhang <jingzhangos@google.com>
-Date:   Thu, 19 Aug 2021 12:01:37 -0700
-Message-ID: <CAAdAUtj95EGkJOacbhtK81EvK6vg7QKNPq4H_3SU_Qwv7Lu2NA@mail.gmail.com>
-Subject: Re: [PATCH] KVM: stats: x86: vmx: add exit reason stats to vt-x instructions
-To:     David Matlack <dmatlack@google.com>
-Cc:     KVM <kvm@vger.kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
-        Peter Shier <pshier@google.com>,
-        Oliver Upton <oupton@google.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Peter Feiner <pfeiner@google.com>,
-        Jim Mattson <jmattson@google.com>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <20210819163945.GA3211852@bjorn-Precision-5520>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+X-Originating-IP: [172.20.187.5]
+X-ClientProxiedBy: HQMAIL107.nvidia.com (172.20.187.13) To
+ DRHQMAIL107.nvidia.com (10.27.9.16)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 5ac3aa0a-87d2-46fe-45ef-08d9634b99ce
+X-MS-TrafficTypeDiagnostic: DM5PR12MB1818:
+X-Microsoft-Antispam-PRVS: <DM5PR12MB18186E41DD8C7D297B2E3943DEC09@DM5PR12MB1818.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:9508;
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: 0x/5UAfpCXV0ZPbd9xafMPswjLFlqAWpJrQyhlN2LmBL6HeA7Vrv9Oud3v+shADZs65XvNhVJEVqMD5HgHw+Fzem6AYmwQGDySnjiQ8J/FE3TkzSCaWCd7RUcioUy1tjnuEptuSxVg2jNaWPA0zg/l5A2XvMSSxHi+xa0NPgi/qZVNeGqN7JEcxnTFmQnZWHnfRxin8+brZiH6Ng00SD/AVMbO42kz727BeLUU5CfL8IAmt42WregHocqu6fG7m/aIWVgTLDz+ENrkHE4Ai/EK8nqznWvvwHAnVO2bcWvBBcVA00U9NPEtctx2z6cYmMnD5uLLX542A1XtO2igYuhN6VkX6FnwyLkF5j+1GKbNIpBUSrooOaPEvVfEGWNnQnFLCL9+eC0bruo4KFr9BWvs9zBUQJLe/S/rn9ofhdPGPpx5YgyCj8uYZJsDcvYMh1/fxfH0044X77b8/NZZJENEkVjwFX2pRV5VWcjs6Gbvbu7G3+HN9Wnk495C5xEb568/TZtyU6rH+PATbmU3sbUPz73lWlCScQBGaYMRqy1DZtG0CxWzZSclJteMNCJnRo4JVY60oYK/WbjHk1Mlio2O3e9A69rKrQrjk9rrgjcmBOcZOQDooRP7EAQSHLfqmyQDaTXPDThAxXN4zPwyoRkJdBm3HZBINpd+k8ZZhIi8cqJC1n1OMpwTR8Y1gIRnLFdtYCRM+Y8fAQrZ0nFUC5YrVSBLO2rUz0d0xXS1Mpe8Q=
+X-Forefront-Antispam-Report: CIP:216.228.112.36;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:schybrid05.nvidia.com;CAT:NONE;SFS:(4636009)(346002)(136003)(396003)(376002)(39860400002)(46966006)(36840700001)(2616005)(426003)(16576012)(5660300002)(31696002)(16526019)(8936002)(53546011)(336012)(478600001)(86362001)(186003)(82310400003)(31686004)(110136005)(70586007)(356005)(2906002)(47076005)(7416002)(7636003)(4326008)(54906003)(8676002)(82740400003)(316002)(107886003)(6666004)(26005)(6636002)(36860700001)(70206006)(36756003)(43740500002);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Aug 2021 19:57:40.2725
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 5ac3aa0a-87d2-46fe-45ef-08d9634b99ce
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.112.36];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource: DM6NAM11FT016.eop-nam11.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM5PR12MB1818
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi David,
 
-On Thu, Aug 19, 2021 at 11:43 AM David Matlack <dmatlack@google.com> wrote:
+On 8/19/2021 7:39 PM, Bjorn Helgaas wrote:
+> On Thu, Aug 19, 2021 at 07:16:20PM +0300, Yishai Hadas wrote:
+>> On 8/19/2021 6:15 PM, Bjorn Helgaas wrote:
+>>> On Wed, Aug 18, 2021 at 06:16:03PM +0300, Yishai Hadas wrote:
+>>>> From: Max Gurtovoy <mgurtovoy@nvidia.com>
+>>>>    /**
+>>>>     * struct pci_device_id - PCI device ID structure
+>>>>     * @vendor:		Vendor ID to match (or PCI_ANY_ID)
+>>>> @@ -34,12 +38,14 @@ typedef unsigned long kernel_ulong_t;
+>>>>     *			Best practice is to use driver_data as an index
+>>>>     *			into a static list of equivalent device types,
+>>>>     *			instead of using it as a pointer.
+>>>> + * @override_only:	Bitmap for override_only PCI drivers.
+>>> "Match only when dev->driver_override is this driver"?
+>> Just to be aligned here,
+>>
+>> This field will stay __u32 and may hold at the most 1 bit value set to
+>> represent the actual subsystem/driver.
+> The PCI core does not require "at most 1 bit is set."
 >
-> On Thu, Aug 19, 2021 at 11:00 AM Jing Zhang <jingzhangos@google.com> wrote:
-> >
-> > These stats will be used to monitor the nested virtualization use in
-> > VMs. Most importantly: VMXON exits are evidence that the guest has
-> > enabled VMX, VMLAUNCH/VMRESUME exits are evidence that the guest has run
-> > an L2.
+> Actually, I don't think even the file2alias code requires that.  If
+> you set two bits, you can generate two aliases.
 >
-> This series is superseded by Peter Feiner's internal KVM patch that
-> exports an array of counts, one for each VM-exit reason ("kvm: vmx
-> exit reason stats"). This is better since it does not require
-> instrumenting every VM-exit handler in KVM and introducing a stat for
-> every exit.
->
-> Assuming upstream would want exit count stats I would suggest we drop
-> this patch and upstream Peter's instead. Although we need to sort out
-> AMD and other architectures as well.
->
-Sure, will drop this.
+>> This is required to later on set the correct prefix in the modules.alias
+>> file, and you just suggested to change the comment as of above, right ?
+> Yes, __u32 is fine and I'm only suggesting a comment change here.
 
-Thanks,
-Jing
-> >
-> > Original-by: David Matlack <dmatlack@google.com>
-> > Signed-off-by: Jing Zhang <jingzhangos@google.com>
-> > ---
-> >  arch/x86/include/asm/kvm_host.h | 11 +++++++++++
-> >  arch/x86/kvm/vmx/nested.c       | 17 +++++++++++++++++
-> >  arch/x86/kvm/x86.c              | 13 ++++++++++++-
-> >  3 files changed, 40 insertions(+), 1 deletion(-)
-> >
-> > diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-> > index 09b256db394a..e3afbc7926e0 100644
-> > --- a/arch/x86/include/asm/kvm_host.h
-> > +++ b/arch/x86/include/asm/kvm_host.h
-> > @@ -1257,6 +1257,17 @@ struct kvm_vcpu_stat {
-> >         u64 directed_yield_attempted;
-> >         u64 directed_yield_successful;
-> >         u64 guest_mode;
-> > +       u64 vmclear_exits;
-> > +       u64 vmlaunch_exits;
-> > +       u64 vmptrld_exits;
-> > +       u64 vmptrst_exits;
-> > +       u64 vmread_exits;
-> > +       u64 vmresume_exits;
-> > +       u64 vmwrite_exits;
-> > +       u64 vmoff_exits;
-> > +       u64 vmon_exits;
-> > +       u64 invept_exits;
-> > +       u64 invvpid_exits;
-> >  };
-> >
-> >  struct x86_instruction_info;
-> > diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-> > index bc6327950657..8696f2612953 100644
-> > --- a/arch/x86/kvm/vmx/nested.c
-> > +++ b/arch/x86/kvm/vmx/nested.c
-> > @@ -4879,6 +4879,7 @@ static int handle_vmon(struct kvm_vcpu *vcpu)
-> >         const u64 VMXON_NEEDED_FEATURES = FEAT_CTL_LOCKED
-> >                 | FEAT_CTL_VMX_ENABLED_OUTSIDE_SMX;
-> >
-> > +       ++vcpu->stat.vmon_exits;
-> >         /*
-> >          * The Intel VMX Instruction Reference lists a bunch of bits that are
-> >          * prerequisite to running VMXON, most notably cr4.VMXE must be set to
-> > @@ -4964,6 +4965,7 @@ static inline void nested_release_vmcs12(struct kvm_vcpu *vcpu)
-> >  /* Emulate the VMXOFF instruction */
-> >  static int handle_vmoff(struct kvm_vcpu *vcpu)
-> >  {
-> > +       ++vcpu->stat.vmoff_exits;
-> >         if (!nested_vmx_check_permission(vcpu))
-> >                 return 1;
-> >
-> > @@ -4984,6 +4986,7 @@ static int handle_vmclear(struct kvm_vcpu *vcpu)
-> >         u64 evmcs_gpa;
-> >         int r;
-> >
-> > +       ++vcpu->stat.vmclear_exits;
-> >         if (!nested_vmx_check_permission(vcpu))
-> >                 return 1;
-> >
-> > @@ -5025,6 +5028,7 @@ static int handle_vmclear(struct kvm_vcpu *vcpu)
-> >  /* Emulate the VMLAUNCH instruction */
-> >  static int handle_vmlaunch(struct kvm_vcpu *vcpu)
-> >  {
-> > +       ++vcpu->stat.vmlaunch_exits;
-> >         return nested_vmx_run(vcpu, true);
-> >  }
-> >
-> > @@ -5032,6 +5036,7 @@ static int handle_vmlaunch(struct kvm_vcpu *vcpu)
-> >  static int handle_vmresume(struct kvm_vcpu *vcpu)
-> >  {
-> >
-> > +       ++vcpu->stat.vmresume_exits;
-> >         return nested_vmx_run(vcpu, false);
-> >  }
-> >
-> > @@ -5049,6 +5054,8 @@ static int handle_vmread(struct kvm_vcpu *vcpu)
-> >         short offset;
-> >         int len, r;
-> >
-> > +       ++vcpu->stat.vmread_exits;
-> > +
-> >         if (!nested_vmx_check_permission(vcpu))
-> >                 return 1;
-> >
-> > @@ -5141,6 +5148,8 @@ static int handle_vmwrite(struct kvm_vcpu *vcpu)
-> >          */
-> >         u64 value = 0;
-> >
-> > +       ++vcpu->stat.vmwrite_exits;
-> > +
-> >         if (!nested_vmx_check_permission(vcpu))
-> >                 return 1;
-> >
-> > @@ -5245,6 +5254,8 @@ static int handle_vmptrld(struct kvm_vcpu *vcpu)
-> >         gpa_t vmptr;
-> >         int r;
-> >
-> > +       ++vcpu->stat.vmptrld_exits;
-> > +
-> >         if (!nested_vmx_check_permission(vcpu))
-> >                 return 1;
-> >
-> > @@ -5311,6 +5322,8 @@ static int handle_vmptrst(struct kvm_vcpu *vcpu)
-> >         gva_t gva;
-> >         int r;
-> >
-> > +       ++vcpu->stat.vmptrst_exits;
-> > +
-> >         if (!nested_vmx_check_permission(vcpu))
-> >                 return 1;
-> >
-> > @@ -5351,6 +5364,8 @@ static int handle_invept(struct kvm_vcpu *vcpu)
-> >         } operand;
-> >         int i, r;
-> >
-> > +       ++vcpu->stat.invept_exits;
-> > +
-> >         if (!(vmx->nested.msrs.secondary_ctls_high &
-> >               SECONDARY_EXEC_ENABLE_EPT) ||
-> >             !(vmx->nested.msrs.ept_caps & VMX_EPT_INVEPT_BIT)) {
-> > @@ -5431,6 +5446,8 @@ static int handle_invvpid(struct kvm_vcpu *vcpu)
-> >         u16 vpid02;
-> >         int r;
-> >
-> > +       ++vcpu->stat.invvpid_exits;
-> > +
-> >         if (!(vmx->nested.msrs.secondary_ctls_high &
-> >               SECONDARY_EXEC_ENABLE_VPID) ||
-> >                         !(vmx->nested.msrs.vpid_caps & VMX_VPID_INVVPID_BIT)) {
-> > diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> > index 1a00af1b076b..c2c95b4c1a68 100644
-> > --- a/arch/x86/kvm/x86.c
-> > +++ b/arch/x86/kvm/x86.c
-> > @@ -277,7 +277,18 @@ const struct _kvm_stats_desc kvm_vcpu_stats_desc[] = {
-> >         STATS_DESC_COUNTER(VCPU, nested_run),
-> >         STATS_DESC_COUNTER(VCPU, directed_yield_attempted),
-> >         STATS_DESC_COUNTER(VCPU, directed_yield_successful),
-> > -       STATS_DESC_ICOUNTER(VCPU, guest_mode)
-> > +       STATS_DESC_ICOUNTER(VCPU, guest_mode),
-> > +       STATS_DESC_COUNTER(VCPU, vmclear_exits),
-> > +       STATS_DESC_COUNTER(VCPU, vmlaunch_exits),
-> > +       STATS_DESC_COUNTER(VCPU, vmptrld_exits),
-> > +       STATS_DESC_COUNTER(VCPU, vmptrst_exits),
-> > +       STATS_DESC_COUNTER(VCPU, vmread_exits),
-> > +       STATS_DESC_COUNTER(VCPU, vmresume_exits),
-> > +       STATS_DESC_COUNTER(VCPU, vmwrite_exits),
-> > +       STATS_DESC_COUNTER(VCPU, vmoff_exits),
-> > +       STATS_DESC_COUNTER(VCPU, vmon_exits),
-> > +       STATS_DESC_COUNTER(VCPU, invept_exits),
-> > +       STATS_DESC_COUNTER(VCPU, invvpid_exits),
-> >  };
-> >
-> >  const struct kvm_stats_header kvm_vcpu_stats_header = {
-> >
-> > base-commit: 47e7414d53fc12407b7a43bba412ecbf54c84f82
-> > --
-> > 2.33.0.rc2.250.ged5fa647cd-goog
-> >
+great.
+
+
+>
+>>> As far as PCI core is concerned there's no need for this to be a
+>>> bitmap.
+>>>
+>>> I think this would make more sense if split into two patches.  The
+>>> first would add override_only and change pci_match_device().  Then
+>>> there's no confusion about whether this is specific to VFIO.
+>> Splitting may end-up the first patch with a dead-code on below, as
+>> found_id->override_only will be always 0.
+>>
+>> If you still believe that this is better we can do it.
+> I think it's fine to add the functionality in one patch and use it in
+> the next if it makes the commit clearer.  I wouldn't want to add
+> functionality that's not used at all in the series, but it's OK when
+> they're both posted together.
+
+Ok. We can do the separation if all agree that the first commit is have 
+a dead section.
+
+Alex,
+
+we would like to get few more reviewed-by signatures and we'll send the 
+V3 series in a couple of days to make it to 5.15 merge window as we planned.
+
+Are you ok with the series after we got the green light for this patch ?
+
+do you think we need another pair of eyes to review the other patches ?
+
+-Max.
+
+>
+>> if (found_id->override_only) {
+>>      if (dev->driver_override)
+>>        return found_id;
+>>    } else
+>>      return found_id;
+>>
+>>> The second can add PCI_ID_F_VFIO_DRIVER_OVERRIDE and make the
+>>> file2alias.c changes.  Most of the commit log applies to this part.
