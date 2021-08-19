@@ -2,143 +2,104 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A31403F23B1
-	for <lists+kvm@lfdr.de>; Fri, 20 Aug 2021 01:33:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 988583F23C5
+	for <lists+kvm@lfdr.de>; Fri, 20 Aug 2021 01:42:07 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236596AbhHSXef (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 19 Aug 2021 19:34:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56932 "EHLO
+        id S232326AbhHSXmn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 19 Aug 2021 19:42:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58800 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229808AbhHSXee (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 19 Aug 2021 19:34:34 -0400
-Received: from mail-pj1-x1031.google.com (mail-pj1-x1031.google.com [IPv6:2607:f8b0:4864:20::1031])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9225AC061575
-        for <kvm@vger.kernel.org>; Thu, 19 Aug 2021 16:33:57 -0700 (PDT)
-Received: by mail-pj1-x1031.google.com with SMTP id om1-20020a17090b3a8100b0017941c44ce4so12519226pjb.3
-        for <kvm@vger.kernel.org>; Thu, 19 Aug 2021 16:33:57 -0700 (PDT)
+        with ESMTP id S229468AbhHSXmm (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 19 Aug 2021 19:42:42 -0400
+Received: from mail-io1-xd4a.google.com (mail-io1-xd4a.google.com [IPv6:2607:f8b0:4864:20::d4a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A0B10C061575
+        for <kvm@vger.kernel.org>; Thu, 19 Aug 2021 16:42:05 -0700 (PDT)
+Received: by mail-io1-xd4a.google.com with SMTP id n189-20020a6b8bc6000000b005b92c64b625so2759022iod.20
+        for <kvm@vger.kernel.org>; Thu, 19 Aug 2021 16:42:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=FSqOrapu64fBYafjbU5tjcyWOc2DrNI0dbheqGMVOMc=;
-        b=qPf6yOnP+Rcz9FT3tKuWykTPcKe82BX3Np45gaPnFPSg6PdUJnLygVgfX+kzI3cJ9H
-         jtESUvUqN1Ez+DTuoTUzsGouHIoQxocdabjlXnhhXdwEIL3SL3EPMESdP1tUYWRrWW5X
-         56WH9AV8Z8I1+Dv+ob4dltRCZxxppIzcXuZZbDajZOYY+UHcUj8zqAQ2N2zC8ir+rqzQ
-         7xRIzOV9hhvssqy3laN9jfhD8920m0bpiZR1ld4i0qnlmpXy3nqZRp+SXiFRJw3tk0Cb
-         jAkYC7GX39D/8+SHQHrfwZ3zlTN2RbLaSSUFeut9erJLOEf2TnrtjesxTQV5Xd8hTAQL
-         GItQ==
+        h=date:in-reply-to:message-id:mime-version:references:subject:from:to
+         :cc;
+        bh=/0OMjN/h8z3QOxG0xTT9R/7SiBAh42bxZ0UDmtmp5Ok=;
+        b=McLLjVqZw9/DLQ6myoLXBd1HCxzyu2Buz0DI48N8xlHLKObry0AIzIbeJnj9cxGJPB
+         AzPUI/A7of4JO1ICGVviwA7+CgvoMp1ao/mnyOwsgEpYH9MDF3HelFRT4S6U/EHz9lF0
+         2QY6bNyu05fdTHVRxkfOrzDeyYtPyJxehrm2Onfl7Hu29GHiHgr2iN6aZcuXSOI2TP2f
+         vyn6Mx0C5t0KDCsPzcy2wp2mEbAeCIDz2qyFnvHACrmpzL9oZ9c8frh7z+JheWJDO0Hr
+         gZ9SG0fuN3zCiufw3em2BxEFg7Ljulf42+mQmN5q08GbPf4WGeVhE3INvF//5hmtX1sP
+         YKyA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=FSqOrapu64fBYafjbU5tjcyWOc2DrNI0dbheqGMVOMc=;
-        b=Rw0AcImjD8cjMAyxmKdoiLlRsfeKEUaYSYgHPYJTwosjxZNNVGQedd9xgwjZ2KQ7Pg
-         QsetaaKCLhyiJGab83SsISieXG+lBffuA23YnSKesR8LB5IhU/lQY78bYx83DZtbt8ye
-         RjZgnybxNT2dCkxGJocvRjTKNR6nwDJtRK/4srG++awcOtGXocxejPP/RDwmm2fy/A3L
-         Wp+HF0lpHbIFzXht3Oag7k4nfM3+hpbREpy4gk1riMo+qEAIGo+8kru8i4stLRwKPMrW
-         rdW+07zk6HMijkdk84JQFUR8sYuQV1EQnvd1cSUe/03stlt+P0VQm+2LAvJFY5ms3BnB
-         bYug==
-X-Gm-Message-State: AOAM533GOSGFmaRCXIJu+6WnYwrYUlSZzyW5Ut1jtZ7VK6kHoI7l0vP3
-        ObvXJN5DuRIoRUnTwSZ7g7zFmg==
-X-Google-Smtp-Source: ABdhPJyN4VYmA4QdN+DQJ6bFcB8JQlcPHEw8dvqiqzL/oaDUmvZhZqDC612NpYT8Mg6IsLybHUWCkQ==
-X-Received: by 2002:a17:90a:d686:: with SMTP id x6mr1336693pju.227.1629416036922;
-        Thu, 19 Aug 2021 16:33:56 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id j185sm4649122pfb.86.2021.08.19.16.33.56
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 19 Aug 2021 16:33:56 -0700 (PDT)
-Date:   Thu, 19 Aug 2021 23:33:50 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Mathieu Desnoyers <mathieu.desnoyers@efficios.com>
-Cc:     "Russell King, ARM Linux" <linux@armlinux.org.uk>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Will Deacon <will@kernel.org>, Guo Ren <guoren@kernel.org>,
-        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Heiko Carstens <hca@linux.ibm.com>, gor <gor@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Oleg Nesterov <oleg@redhat.com>, rostedt <rostedt@goodmis.org>,
-        Ingo Molnar <mingo@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Andy Lutomirski <luto@kernel.org>,
-        paulmck <paulmck@kernel.org>, Boqun Feng <boqun.feng@gmail.com>,
-        Paolo Bonzini <pbonzini@redhat.com>, shuah <shuah@kernel.org>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        Paul Mackerras <paulus@samba.org>,
-        linux-arm-kernel <linux-arm-kernel@lists.infradead.org>,
-        linux-kernel <linux-kernel@vger.kernel.org>,
-        linux-csky <linux-csky@vger.kernel.org>,
-        linux-mips@vger.kernel.org,
-        linuxppc-dev <linuxppc-dev@lists.ozlabs.org>,
-        linux-s390@vger.kernel.org, KVM list <kvm@vger.kernel.org>,
-        linux-kselftest <linux-kselftest@vger.kernel.org>,
-        Peter Foley <pefoley@google.com>,
-        Shakeel Butt <shakeelb@google.com>,
-        Ben Gardon <bgardon@google.com>
-Subject: Re: [PATCH 4/5] KVM: selftests: Add a test for KVM_RUN+rseq to
- detect task migration bugs
-Message-ID: <YR7qXvnI/AQM10gU@google.com>
-References: <20210818001210.4073390-1-seanjc@google.com>
- <20210818001210.4073390-5-seanjc@google.com>
- <1540548616.19739.1629409956315.JavaMail.zimbra@efficios.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1540548616.19739.1629409956315.JavaMail.zimbra@efficios.com>
+        h=x-gm-message-state:date:in-reply-to:message-id:mime-version
+         :references:subject:from:to:cc;
+        bh=/0OMjN/h8z3QOxG0xTT9R/7SiBAh42bxZ0UDmtmp5Ok=;
+        b=ZWwHuGNuNumqx/maCEQCccN+Rwgr+qpqBG9kXVMmBABPc29rYz56PraVsZ4uAy6G32
+         RJeXa3fAY4Wvfce/xBuWljrcqnT5nSEW29jQl/AY1iccBjg15n8yi1omZBkEd1+vMpkH
+         QG8ycyIzNjO+trNJ6JfmyLu1NOsSOfNCaDEWeQXAorysrrCx7As+DRu9eDBe3n+VBzTn
+         K7U7kGaJTZiGNCsHrUIfh08PIMOlUCMH1JFEQdz/WJ7LyeSpMxjA7DXYS4FSjMZurxGp
+         M6P0bHWe2Xyf2C0lsmNL7lJbcft7391AnCOCgJC052T5xAfufwaA0ejZ7AeKmCF45H+/
+         J+jA==
+X-Gm-Message-State: AOAM533i/MoCahyCQQBTLXW/CT7Gp/OxqqMI3enzTiSLaZuIzotFfs0S
+        QP1slrRHKfV5u8XU0XSFkupB373MDfZvKfWi1iI04JJUpyUUJOCVdkVnve9ZMidTwjmcd7F8YoE
+        rvcN5V40ZW9KzMz5XGqnOvCiBMVJSu5hHpp8OTWO/ePde33QcJZdtb+hr5w==
+X-Google-Smtp-Source: ABdhPJwEvHvNfN4h3UNOhf35nFKUXzTJy88XHWag7W5Cmin+j2sU1JiG7Xa0XPza8UDTgOfGMq6AKZ65uC4=
+X-Received: from oupton.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:404])
+ (user=oupton job=sendgmr) by 2002:a02:5107:: with SMTP id s7mr15206839jaa.65.1629416524925;
+ Thu, 19 Aug 2021 16:42:04 -0700 (PDT)
+Date:   Thu, 19 Aug 2021 23:41:42 +0000
+In-Reply-To: <20210819223640.3564975-1-oupton@google.com>
+Message-Id: <20210819234142.3581631-1-oupton@google.com>
+Mime-Version: 1.0
+References: <20210819223640.3564975-1-oupton@google.com>
+X-Mailer: git-send-email 2.33.0.rc2.250.ged5fa647cd-goog
+Subject: [PATCH] Documentation: kvm: Document KVM_SYSTEM_EVENT_SUSPEND exit type
+From:   Oliver Upton <oupton@google.com>
+To:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
+Cc:     Marc Zyngier <maz@kernel.org>, Peter Shier <pshier@google.com>,
+        Ricardo Koller <ricarkol@google.com>,
+        Jing Zhang <jingzhangos@google.com>,
+        Raghavendra Rao Anata <rananta@google.com>,
+        James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Andrew Jones <drjones@redhat.com>,
+        Oliver Upton <oupton@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Aug 19, 2021, Mathieu Desnoyers wrote:
-> ----- On Aug 17, 2021, at 8:12 PM, Sean Christopherson seanjc@google.com wrote:
-> 
-> > Add a test to verify an rseq's CPU ID is updated correctly if the task is
-> > migrated while the kernel is handling KVM_RUN.  This is a regression test
-> > for a bug introduced by commit 72c3c0fe54a3 ("x86/kvm: Use generic xfer
-> > to guest work function"), where TIF_NOTIFY_RESUME would be cleared by KVM
-> > without updating rseq, leading to a stale CPU ID and other badness.
-> > 
-> > Signed-off-by: Sean Christopherson <seanjc@google.com>
-> > ---
-> 
-> [...]
-> 
-> > +	while (!done) {
-> > +		vcpu_run(vm, VCPU_ID);
-> > +		TEST_ASSERT(get_ucall(vm, VCPU_ID, NULL) == UCALL_SYNC,
-> > +			    "Guest failed?");
-> > +
-> > +		cpu = sched_getcpu();
-> > +		rseq_cpu = READ_ONCE(__rseq.cpu_id);
-> > +
-> > +		/*
-> > +		 * Verify rseq's CPU matches sched's CPU, and that sched's CPU
-> > +		 * is stable.  This doesn't handle the case where the task is
-> > +		 * migrated between sched_getcpu() and reading rseq, and again
-> > +		 * between reading rseq and sched_getcpu(), but in practice no
-> > +		 * false positives have been observed, while on the other hand
-> > +		 * blocking migration while this thread reads CPUs messes with
-> > +		 * the timing and prevents hitting failures on a buggy kernel.
-> > +		 */
-> 
-> I think you could get a stable cpu id between sched_getcpu and __rseq_abi.cpu_id
-> if you add a pthread mutex to protect:
-> 
-> sched_getcpu and __rseq_abi.cpu_id  reads
-> 
-> vs
-> 
-> sched_setaffinity calls within the migration thread.
-> 
-> Thoughts ?
+KVM now has the capability to exit to userspace for VM suspend events.
+Document the intended UAPI behavior, such that a VMM can simply ignore
+the guest intentions and resume.
 
-I tried that and couldn't reproduce the bug.  That's what I attempted to call out
-in the blurb "blocking migration while this thread reads CPUs ... prevents hitting
-failures on a buggy kernel".
+Signed-off-by: Oliver Upton <oupton@google.com>
+---
+ Documentation/virt/kvm/api.rst | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-I considered adding arbitrary delays around the mutex to try and hit the bug, but
-I was worried that even if I got it "working" for this bug, the test would be too
-tailored to this bug and potentially miss future regression.  Letting the two
-threads run wild seemed like it would provide the best coverage, at the cost of
-potentially causing to false failures.
+diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+index dae68e68ca23..d4dfc6f84dfc 100644
+--- a/Documentation/virt/kvm/api.rst
++++ b/Documentation/virt/kvm/api.rst
+@@ -5632,6 +5632,7 @@ should put the acknowledged interrupt vector into the 'epr' field.
+   #define KVM_SYSTEM_EVENT_SHUTDOWN       1
+   #define KVM_SYSTEM_EVENT_RESET          2
+   #define KVM_SYSTEM_EVENT_CRASH          3
++  #define KVM_SYSTEM_EVENT_SUSPEND        4
+ 			__u32 type;
+ 			__u64 flags;
+ 		} system_event;
+@@ -5656,6 +5657,10 @@ Valid values for 'type' are:
+    has requested a crash condition maintenance. Userspace can choose
+    to ignore the request, or to gather VM memory core dump and/or
+    reset/shutdown of the VM.
++ - KVM_SYSTEM_EVENT_SUSPEND -- the guest has requested that the VM
++   suspends. Userspace is not obliged to honor this, and may call KVM_RUN
++   again. Doing so will cause the guest to resume at its requested entry
++   point.
+ 
+ ::
+ 
+-- 
+2.33.0.rc2.250.ged5fa647cd-goog
+
