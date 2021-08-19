@@ -2,51 +2,51 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8504A3F1844
+	by mail.lfdr.de (Postfix) with ESMTP id D077B3F1845
 	for <lists+kvm@lfdr.de>; Thu, 19 Aug 2021 13:35:18 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238650AbhHSLfw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 19 Aug 2021 07:35:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58888 "EHLO
+        id S238785AbhHSLfx (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 19 Aug 2021 07:35:53 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58894 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238581AbhHSLfv (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 19 Aug 2021 07:35:51 -0400
-Received: from mail-wr1-x42b.google.com (mail-wr1-x42b.google.com [IPv6:2a00:1450:4864:20::42b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4862DC061575
-        for <kvm@vger.kernel.org>; Thu, 19 Aug 2021 04:35:15 -0700 (PDT)
-Received: by mail-wr1-x42b.google.com with SMTP id k8so8621100wrn.3
-        for <kvm@vger.kernel.org>; Thu, 19 Aug 2021 04:35:15 -0700 (PDT)
+        with ESMTP id S238749AbhHSLfw (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 19 Aug 2021 07:35:52 -0400
+Received: from mail-wr1-x42e.google.com (mail-wr1-x42e.google.com [IPv6:2a00:1450:4864:20::42e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 19CF4C061575
+        for <kvm@vger.kernel.org>; Thu, 19 Aug 2021 04:35:16 -0700 (PDT)
+Received: by mail-wr1-x42e.google.com with SMTP id k29so8598272wrd.7
+        for <kvm@vger.kernel.org>; Thu, 19 Aug 2021 04:35:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=X0PCbfsKKi5Z5ypmtVXwwsJ90tFRD61CKAIuZBznxzQ=;
-        b=mzvwOZaxCgFZJGyZvMfId3C3IezCI6GyI+GXQdTVCBCVlj7kcvUJMFYnK26acek0rl
-         WmCUCVot3wpH91GQPmi0JDCcUb8JP2bpZw4VdBRjXT97TjARFJbrpDgkTO8Dh5ETGLUs
-         4wom4pVJ4Jq+fxOjf6paiMhqfMaKjcKQmDRht1rrbcdAbV/GcKFTKz2/xPYBbl6W1z1b
-         4lDdLMz9hTS7+SVl7Gw7UJMxEJ0NopJoHc3EDraRE+L+qs611THjRfspyYT0TB/z150E
-         5vLfqtXePQw+TF3zoMKjUC1Jlsv5lHPl7Hy+mGvNkkSaTBkOlvmDpgFgdcqPdh9erbuH
-         FYzw==
+        bh=eC9zp1q36Ee/jP4TtRNuvYFMVVhl5Tzhsv3C+E9+clA=;
+        b=LJZf/WYhzqWl0RAfYmmDt5TufJvd03obtVO8/gTVcFVlmXAEAlkW+GAqOt2ieAMeaC
+         LhQqse5t9BoLo2hOnVXTuJKzb5pPNwFela0R32qMBcWhLPt3qFtPlwppUvbJRI8pGEmT
+         CCU8+e36tt+MlGC6d+WgudecFRacLdJEqaEOqwuG4ggdzk9SD91H6ezzYcSfyzJh1Ods
+         ZcXUNtkYCyynMIec8V7dNXhRX9oLCyhgv3G8p8vgfGArcAKbjpwi0BRbt83XrS56pq/9
+         RM6/0KBCmW8wUniowS2SXA5PBY7bqUeRfRssb2tpUejOvZjCIkXKfCTpFaGFxnjQaDp0
+         nlKg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=X0PCbfsKKi5Z5ypmtVXwwsJ90tFRD61CKAIuZBznxzQ=;
-        b=OL/mZRa0VF8yTIx/EwbzQ7uqE9eEt62nZPXrUWeiHTYFwqlsulOpOke43tn1FL6lQx
-         71ET5sDEmei2nScYr4xhNJgybfj4wm4kDGiGqRe3ckOzWFkNzdMfpF1t24csle/LQ6Op
-         p2uUVLSoq4k7A8BHS2n6DVSzTM8PMBIdR9yW3znqjWmzLyHL4ktNdCOQFMi2EvSo7NwP
-         f3c5cK8BkKMqvgtAoMTfgNNvhsCsiwfCjrUA9lCZ/4O8+temZN9Zm9nyAK2e9loqfKE3
-         w7ZcBWEKNMwsrWUzH4PhTSGOAy9auuYRD2MxIabov5eyUjNGfv8Xm6YSj+F6GHTnV/kR
-         /RrQ==
-X-Gm-Message-State: AOAM5325qu3bpcbdVuYnAx7TWoWfF5a7Rm8uEEgLaI4eBWEfWezpdwO4
-        0FYBLmGYMmW2/6uyXAxKE9Y=
-X-Google-Smtp-Source: ABdhPJwcoN9t04+Zqlr6/VR/FODLc0YPg4z4DCX5jXKkw1S7saURHlykzyFEsxwRuaB2BERyAWlM+w==
-X-Received: by 2002:adf:90b1:: with SMTP id i46mr3335993wri.159.1629372913691;
-        Thu, 19 Aug 2021 04:35:13 -0700 (PDT)
+        bh=eC9zp1q36Ee/jP4TtRNuvYFMVVhl5Tzhsv3C+E9+clA=;
+        b=o2yMS/HjmqTCqFrHUumAYEEuTJAmKi5Ab4geUdglzkQkIhlhw3tYMRSgvoaynMlTZc
+         rC0VhVN8wE2+AZ/TkweLsk2cztTZRtrkzPKPCKEeUAsJMT4BugDii8tw66MKa1z23YyY
+         cwOofeNZaqIKPKsNV4dhA4wU/g9Z5jREMgSB1WSabxhuAWI0CieR3Pr5p5IVbYWtK4bn
+         zt+w3jg1VO71vqAQrQ/uOiGX+STRXVMm/PT+jrfiEkmzk2VKekYyj6AaJExdb27YfuwE
+         PEje0tOml0o/SioEb5ya8aezHvgsVw+vz/zi2PZtoz8Lk1hNwYrd9SZZ1ehXg9/AwjIJ
+         2lEg==
+X-Gm-Message-State: AOAM531jkr29H7KWX9BclG0n9JeEcAvQjahBTDfQnIQQl/5rKq9R9kiW
+        3wafzICbOsLeEjCvfk0lJnU=
+X-Google-Smtp-Source: ABdhPJz4Y9alIqUQrC1EJg6AywOllPOB1o2+33bJpldYtzx/8W5FlFar+l6BOMRspJEmtv8LOjVKag==
+X-Received: by 2002:adf:f943:: with SMTP id q3mr3301475wrr.118.1629372914735;
+        Thu, 19 Aug 2021 04:35:14 -0700 (PDT)
 Received: from xps13.suse.de (ip5f5a5c19.dynamic.kabel-deutschland.de. [95.90.92.25])
-        by smtp.gmail.com with ESMTPSA id w11sm2682859wrr.48.2021.08.19.04.35.12
+        by smtp.gmail.com with ESMTPSA id w11sm2682859wrr.48.2021.08.19.04.35.13
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 19 Aug 2021 04:35:13 -0700 (PDT)
+        Thu, 19 Aug 2021 04:35:14 -0700 (PDT)
 From:   Varad Gautam <varadgautam@gmail.com>
 X-Google-Original-From: Varad Gautam <varad.gautam@suse.com>
 To:     Zixuan Wang <zixuanwang@google.com>,
@@ -61,9 +61,9 @@ To:     Zixuan Wang <zixuanwang@google.com>,
         Erdem Aktas <erdemaktas@google.com>,
         Tom Roeder <tmroeder@google.com>
 Cc:     Varad Gautam <varad.gautam@suse.com>
-Subject: [kvm-unit-tests PATCH v2 3/6] x86: efi_main: Get EFI memory map and exit boot services
-Date:   Thu, 19 Aug 2021 13:33:57 +0200
-Message-Id: <20210819113400.26516-4-varad.gautam@suse.com>
+Subject: [kvm-unit-tests PATCH v2 4/6] x86: efi_main: Self-relocate ELF .dynamic addresses
+Date:   Thu, 19 Aug 2021 13:33:58 +0200
+Message-Id: <20210819113400.26516-5-varad.gautam@suse.com>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20210819113400.26516-1-varad.gautam@suse.com>
 References: <20210819113400.26516-1-varad.gautam@suse.com>
@@ -73,119 +73,104 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The largest EFI_CONVENTIONAL_MEMORY chunk is passed over to
-alloc_phys for the testcase.
+EFI expects a relocatable PE, and the loader will patch in the
+relocations from the COFF.
+
+Since we are wrapping an ELF into a PE here, the EFI loader will
+not handle ELF relocations, and we need to patch the ELF .dynamic
+section manually on early boot.
 
 Signed-off-by: Varad Gautam <varad.gautam@suse.com>
 ---
- x86/efi_main.c | 92 ++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 92 insertions(+)
+ x86/efi_main.c | 63 ++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 63 insertions(+)
 
 diff --git a/x86/efi_main.c b/x86/efi_main.c
-index 00e7086..237d4e7 100644
+index 237d4e7..be3f9ab 100644
 --- a/x86/efi_main.c
 +++ b/x86/efi_main.c
-@@ -1,11 +1,103 @@
-+#include <alloc_phys.h>
+@@ -1,9 +1,13 @@
+ #include <alloc_phys.h>
  #include <linux/uefi.h>
++#include <elf.h>
  
  unsigned long __efiapi efi_main(efi_handle_t handle, efi_system_table_t *sys_tab);
  efi_system_table_t *efi_system_table = NULL;
  
-+static void efi_free_pool(void *ptr)
++extern char ImageBase;
++extern char _DYNAMIC;
++
+ static void efi_free_pool(void *ptr)
+ {
+ 	efi_bs_call(free_pool, ptr);
+@@ -93,11 +97,70 @@ static efi_status_t exit_efi(void *handle)
+ 	return EFI_SUCCESS;
+ }
+ 
++static efi_status_t elf_reloc(unsigned long image_base, unsigned long dynamic)
 +{
-+	efi_bs_call(free_pool, ptr);
-+}
++	long relsz = 0, relent = 0;
++	Elf64_Rel *rel = 0;
++	Elf64_Dyn *dyn = (Elf64_Dyn *) dynamic;
++	unsigned long *addr;
++	int i;
 +
-+static efi_status_t efi_get_memory_map(struct efi_boot_memmap *map)
-+{
-+	efi_memory_desc_t *m = NULL;
-+	efi_status_t status;
-+	unsigned long key = 0, map_size = 0, desc_size = 0;
-+
-+	status = efi_bs_call(get_memory_map, &map_size,
-+			     NULL, &key, &desc_size, NULL);
-+	if (status != EFI_BUFFER_TOO_SMALL || map_size == 0)
-+		goto out;
-+
-+	/* Pad map_size with additional descriptors so we don't need to
-+	 * retry. */
-+	map_size += 4 * desc_size;
-+	*map->buff_size = map_size;
-+	status = efi_bs_call(allocate_pool, EFI_LOADER_DATA,
-+			     map_size, (void **)&m);
-+	if (status != EFI_SUCCESS)
-+		goto out;
-+
-+	/* Get the map. */
-+	status = efi_bs_call(get_memory_map, &map_size,
-+			     m, &key, &desc_size, NULL);
-+	if (status != EFI_SUCCESS) {
-+		efi_free_pool(m);
-+		goto out;
-+	}
-+
-+	*map->desc_size = desc_size;
-+	*map->map_size = map_size;
-+	*map->key_ptr = key;
-+out:
-+	*map->map = m;
-+	return status;
-+}
-+
-+static efi_status_t efi_exit_boot_services(void *handle,
-+					   struct efi_boot_memmap *map)
-+{
-+	return efi_bs_call(exit_boot_services, handle, *map->key_ptr);
-+}
-+
-+static efi_status_t exit_efi(void *handle)
-+{
-+	unsigned long map_size = 0, key = 0, desc_size = 0, buff_size;
-+	efi_memory_desc_t *mem_map, *md, *conventional = NULL;
-+	efi_status_t status;
-+	unsigned num_ents, i;
-+	unsigned long pages = 0;
-+	struct efi_boot_memmap map;
-+
-+	map.map = &mem_map;
-+	map.map_size = &map_size;
-+	map.desc_size = &desc_size;
-+	map.desc_ver = NULL;
-+	map.key_ptr = &key;
-+	map.buff_size = &buff_size;
-+
-+	status = efi_get_memory_map(&map);
-+	if (status != EFI_SUCCESS)
-+		return status;
-+
-+	status = efi_exit_boot_services(handle, &map);
-+	if (status != EFI_SUCCESS) {
-+		efi_free_pool(mem_map);
-+		return status;
-+	}
-+
-+	/* Use the largest EFI_CONVENTIONAL_MEMORY range for phys_alloc_init. */
-+	num_ents = map_size / desc_size;
-+	for (i = 0; i < num_ents; i++) {
-+		md = (efi_memory_desc_t *) (((u8 *) mem_map) + i * (desc_size));
-+
-+		if (md->type == EFI_CONVENTIONAL_MEMORY && md->num_pages > pages) {
-+			conventional = md;
-+			pages = md->num_pages;
++	for (i = 0; dyn[i].d_tag != DT_NULL; i++) {
++		switch (dyn[i].d_tag) {
++		case DT_RELA:
++			rel = (Elf64_Rel *)
++				((unsigned long) dyn[i].d_un.d_ptr + image_base);
++			break;
++		case DT_RELASZ:
++			relsz = dyn[i].d_un.d_val;
++			break;
++		case DT_RELAENT:
++			relent = dyn[i].d_un.d_val;
++			break;
++		default:
++			break;
 +		}
 +	}
-+	phys_alloc_init(conventional->phys_addr,
-+			conventional->num_pages << EFI_PAGE_SHIFT);
 +
++	if (!rel && relent == 0)
++		return EFI_SUCCESS;
++
++	if (!rel || relent == 0)
++		return EFI_LOAD_ERROR;
++
++	while (relsz > 0) {
++		/* apply the relocs */
++		switch (ELF64_R_TYPE (rel->r_info)) {
++		case R_X86_64_NONE:
++			break;
++		case R_X86_64_RELATIVE:
++			addr = (unsigned long *) (image_base + rel->r_offset);
++			*addr += image_base;
++			break;
++		default:
++			break;
++		}
++		rel = (Elf64_Rel *) ((char *) rel + relent);
++		relsz -= relent;
++	}
 +	return EFI_SUCCESS;
 +}
 +
  unsigned long __efiapi efi_main(efi_handle_t handle, efi_system_table_t *sys_tab)
  {
++	unsigned long image_base, dyn;
  	efi_system_table = sys_tab;
  
-+	exit_efi(handle);
+ 	exit_efi(handle);
+ 
++	image_base = (unsigned long) &ImageBase;
++	dyn = image_base + (unsigned long) &_DYNAMIC;
++
++	/* The EFI loader does not handle ELF relocations, so fixup
++	 * .dynamic addresses before proceeding any further. */
++	elf_reloc(image_base, dyn);
++
++	start64();
 +
  	return 0;
  }
