@@ -2,103 +2,97 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 73AAE3F2309
-	for <lists+kvm@lfdr.de>; Fri, 20 Aug 2021 00:21:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4915E3F231C
+	for <lists+kvm@lfdr.de>; Fri, 20 Aug 2021 00:30:53 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235989AbhHSWW0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 19 Aug 2021 18:22:26 -0400
-Received: from bilbo.ozlabs.org ([203.11.71.1]:42295 "EHLO ozlabs.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S233263AbhHSWW0 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 19 Aug 2021 18:22:26 -0400
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-        (No client certificate requested)
-        by mail.ozlabs.org (Postfix) with ESMTPSA id 4GrK4W6hHqz9sWq;
-        Fri, 20 Aug 2021 08:21:47 +1000 (AEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
-        s=201702; t=1629411708;
-        bh=ih9GzC7aT5ldVZBLq+qhG2HopKLJfSbTSOMck1JCNc4=;
-        h=Date:From:To:Cc:Subject:From;
-        b=BLCAxz1x/NgM6xI2zuNlc0lG0Emf9y5k0sse979sfisGLRqlC02C30zB37glEfUf/
-         2uKE2i06LbsI+CO6vXzCMs0iROspotY7st2+C70BQaq3UUfdkvwE7LISDPpZFt58CK
-         EpRLRl3QpNeqTCEfylsQTTkbE5F8hDQJQJkjp2UiGz0wtYCfJvzVMP/r80W3cip5M+
-         M9VJsWxFd0Qt3yOo5hroIgvrmx+QhPzdp0ODhIP4m4OXCO/zEIKBXd+fuL2a0VsrHa
-         qTTtewObTHEnlAMtiRKA/hKtHN0ScRZ0nPeqjhEuXEAhGTWaSDfbVHc0wucL94mP3M
-         uPOgxD1rlgzeQ==
-Date:   Fri, 20 Aug 2021 08:21:47 +1000
-From:   Stephen Rothwell <sfr@canb.auug.org.au>
-To:     Paolo Bonzini <pbonzini@redhat.com>, KVM <kvm@vger.kernel.org>
-Cc:     Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Linux Next Mailing List <linux-next@vger.kernel.org>
-Subject: linux-next: Signed-off-by missing for commits in the kvm tree
-Message-ID: <20210820082147.5fcc36b8@canb.auug.org.au>
-MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/HvBC8pNB2hPZNoVrbDcW7qu";
- protocol="application/pgp-signature"; micalg=pgp-sha256
+        id S232919AbhHSWb2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 19 Aug 2021 18:31:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42646 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229532AbhHSWb2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 19 Aug 2021 18:31:28 -0400
+Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 67622C061575
+        for <kvm@vger.kernel.org>; Thu, 19 Aug 2021 15:30:51 -0700 (PDT)
+Received: by mail-yb1-xb49.google.com with SMTP id b127-20020a25e485000000b005943f1efa05so8005783ybh.15
+        for <kvm@vger.kernel.org>; Thu, 19 Aug 2021 15:30:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=RG48wLZpmkVWmFAgeiCFjLWl4QHYtJvNQmZHx9cng3U=;
+        b=bvgbvQThIF5mhwg8O6C4LPKBSTcK1WwlDB7Op+iy/eMr24Q1seNwGSxz92114HfL6O
+         oOOx+i620GP7M//Obl63+vgbVhy44b/ePR+yE5Eomu6spdt7OI2+HvMMAQn5PVEtIfI3
+         NBfJ5xF004GBZlctcVwlhg+gOSDVkI+7qNQY+5o8lk36AGmcr7EdAY5aKX19GKtq0tmK
+         f0i5p05DI72KB5EUIS50KUr9fYHhWkgHujch3QF6L77IWzlgTDxXCv3oXwxSa1LI7hHd
+         C6n9L4hohQpvUGBKZHf7J02q+MbRO14dB2EcNRo8NWYFRSZuTPYiVpF3Mz9gqYiWkVFk
+         eL/A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=RG48wLZpmkVWmFAgeiCFjLWl4QHYtJvNQmZHx9cng3U=;
+        b=YQuE7NLmc2+z3a8ydiuIvC6XqqbUtP4s61m4TkxF3awYFRub1bBjp//aIxV/g+YWX8
+         AJ/xq9++NI6/P909Q2RWAHrb6gokJzIFDxYsLQX246nTzJMCzJj4GQirINjEWqZHaMdW
+         RTDyayzoI44v87Cb+nVDAFah+EBLdbSsq1u+s5GWoNGQgo8rBJVdcbkVGNLHxtRJ+6xb
+         KdH5ew08S8Zq1W7DbnRh4aKH0rCtR0oQaX0RZq1AK2YjEOSZAiKwTJ6wP7DMuiuYenI1
+         avLPtdETYT2BQYVDx6hoxg/SKPbZIIHTcjdgObKYpHGBfv0q5tJ8bf3pyGOCkie+n46K
+         eZfQ==
+X-Gm-Message-State: AOAM531VgHuS9pBmWQGSOr+W8ftROIp6C4YgbQuy64pqRFfOJkC7KrEi
+        Rg83IRbRy/ytNQlYrtq9DDzh143M4wNJ3gtfcApmM7CfN5oth1z+UbQUqJeTG5RkrqiccHbKt45
+        PlQ1mDCwJA9bTLES0XTlWF5BYvBOlZa05q8DZNpyP8xPK85nPANV4w5RD/ayVyNY=
+X-Google-Smtp-Source: ABdhPJyg9s8mUNZZ0GfIbfiWuHKUwe0pyiTm6hz2LEySEEcSL/wFlv76Tn768XQjJM0eO/NiDzye69oQ8atmQQ==
+X-Received: from ricarkol2.c.googlers.com ([fda3:e722:ac3:cc00:24:72f4:c0a8:62fe])
+ (user=ricarkol job=sendgmr) by 2002:a25:bd7:: with SMTP id
+ 206mr4890819ybl.240.1629412250581; Thu, 19 Aug 2021 15:30:50 -0700 (PDT)
+Date:   Thu, 19 Aug 2021 15:30:47 -0700
+Message-Id: <20210819223047.2813268-1-ricarkol@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.33.0.rc2.250.ged5fa647cd-goog
+Subject: [kvm-unit-tests PATCH] arm64: Link with -z notext
+From:   Ricardo Koller <ricarkol@google.com>
+To:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+        drjones@redhat.com
+Cc:     oupton@google.com, jacobhxu@google.com, jingzhangos@google.com,
+        pshier@google.com, rananta@google.com, reijiw@google.com,
+        Ricardo Koller <ricarkol@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
---Sig_/HvBC8pNB2hPZNoVrbDcW7qu
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+Building the tests on arm64 fails when using LLD (the LLVM linker):
 
-Hi all,
+  ld.lld: error: can't create dynamic relocation R_AARCH64_ABS64 against
+  local symbol in readonly segment; recompile object files with -fPIC or
+  pass '-Wl,-z,notext' to allow text relocations in the output
+  >>> defined in lib/libcflat.a(processor.o)
+  >>> referenced by processor.c
+  >>>               processor.o:(vector_names) in archive lib/libcflat.a
 
-Commits
+The reason is that LLD defaults to errors for text relocations. The GNU
+LD defaults to let it go. In fact, the same error can be reproduced when
+using GNU LD with the '-z text' arg (to error on text relocations):
 
-  5ac66856417a ("KVM: SVM: AVIC: drop unsupported AVIC base relocation code=
-")
-  6b0f5cfa6207 ("KVM: SVM: call avic_vcpu_load/avic_vcpu_put when enabling/=
-disabling AVIC")
-  28471728a851 ("KVM: SVM: move check for kvm_vcpu_apicv_active outside of =
-avic_vcpu_{put|load}")
-  5f3c6f56ad99 ("KVM: SVM: avoid refreshing avic if its state didn't change=
-")
-  2c8c05f69ac3 ("KVM: SVM: remove svm_toggle_avic_for_irq_window")
-  11d9e063e484 ("KVM: x86: hyper-v: Deactivate APICv only when AutoEOI feat=
-ure is in use")
-  46cd27246e22 ("KVM: SVM: add warning for mistmatch between AVIC vcpu stat=
-e and AVIC inhibition")
-  626fcb4e640e ("KVM: x86: APICv: fix race in kvm_request_apicv_update on S=
-VM")
-  049e1cd8365e ("KVM: x86: don't disable APICv memslot when inhibited")
-  6ca19df1ae70 ("KVM: x86/mmu: allow APICv memslot to be enabled but invisi=
-ble")
-  359a029cf50e ("KVM: x86/mmu: allow kvm_faultin_pfn to return page fault h=
-andling code")
-  d67c15c4ac94 ("KVM: x86/mmu: rename try_async_pf to kvm_faultin_pfn")
-  b04260e0857d ("KVM: x86/mmu: bump mmu notifier count in kvm_zap_gfn_range=
-")
-  7b03fdb9eba6 ("KVM: x86/mmu: add comment explaining arguments to kvm_zap_=
-gfn_range")
-  cb3b2438457d ("KVM: x86/mmu: fix parameters to kvm_flush_remote_tlbs_with=
-_address")
-  175c4f82f59f ("Revert "KVM: x86/mmu: Allow zap gfn range to operate under=
- the mmu read lock"")
+  aarch64-linux-gnu-ld: read-only segment has dynamic relocations
 
-are missing a Signed-off-by from their committer.
+Fix this link error by adding `-z notext` into the arm64 linker flags.
 
---=20
-Cheers,
-Stephen Rothwell
+Signed-off-by: Ricardo Koller <ricarkol@google.com>
+---
+ arm/Makefile.arm64 | 1 +
+ 1 file changed, 1 insertion(+)
 
---Sig_/HvBC8pNB2hPZNoVrbDcW7qu
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
+diff --git a/arm/Makefile.arm64 b/arm/Makefile.arm64
+index dbc7524..e8a38d7 100644
+--- a/arm/Makefile.arm64
++++ b/arm/Makefile.arm64
+@@ -7,6 +7,7 @@ bits = 64
+ ldarch = elf64-littleaarch64
+ 
+ arch_LDFLAGS = -pie -n
++arch_LDFLAGS += -z notext
+ CFLAGS += -mstrict-align
+ 
+ mno_outline_atomics := $(call cc-option, -mno-outline-atomics, "")
+-- 
+2.33.0.rc2.250.ged5fa647cd-goog
 
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmEe2XsACgkQAVBC80lX
-0GyDPAf8DPFWV90VNumtC3XrWznuY9fRl/QsUBoGO1zv8AUehEM5siSd988TcSZl
-Zs9P+dq7MR4L1xDeqrt5jUDxnc6Poj62jLgnA4KbLVnW3XDy6F/Qto7Hx69EV7Lo
-Vw5Ea1ZeCXOBroi1ZYQyKO2rtUivoPO5hUuqwjfXezI+s8sypg5EZIto3DVB9+cJ
-c2YHf+wPiXsk5TdoTrAciijxFx02vT8quP/potnULip+oddJnvxDphYy1O0BeqSE
-QrpT2k13OBNyr1z7VRrwKecZ9mtJhZHadokoZueFns6rsgQYx38Gtcc4QgNTZENZ
-7DaHQ/+PnSj+RpAFSZyT6T7akpy2iw==
-=/O09
------END PGP SIGNATURE-----
-
---Sig_/HvBC8pNB2hPZNoVrbDcW7qu--
