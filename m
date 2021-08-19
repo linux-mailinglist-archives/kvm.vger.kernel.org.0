@@ -2,165 +2,99 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3C42A3F16DB
-	for <lists+kvm@lfdr.de>; Thu, 19 Aug 2021 11:58:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7AD943F1712
+	for <lists+kvm@lfdr.de>; Thu, 19 Aug 2021 12:07:39 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237692AbhHSJ7S (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 19 Aug 2021 05:59:18 -0400
-Received: from mga09.intel.com ([134.134.136.24]:23366 "EHLO mga09.intel.com"
+        id S238088AbhHSKIA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 19 Aug 2021 06:08:00 -0400
+Received: from mail.skyhub.de ([5.9.137.197]:39222 "EHLO mail.skyhub.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S236149AbhHSJ7Q (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 19 Aug 2021 05:59:16 -0400
-X-IronPort-AV: E=McAfee;i="6200,9189,10080"; a="216518025"
-X-IronPort-AV: E=Sophos;i="5.84,334,1620716400"; 
-   d="scan'208";a="216518025"
-Received: from orsmga001.jf.intel.com ([10.7.209.18])
-  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Aug 2021 02:58:40 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.84,334,1620716400"; 
-   d="scan'208";a="505969818"
-Received: from sqa-gate.sh.intel.com (HELO robert-ivt.tsp.org) ([10.239.48.212])
-  by orsmga001.jf.intel.com with ESMTP; 19 Aug 2021 02:58:37 -0700
-Message-ID: <3ac79d874fb32c6472151cf879edfb2f1b646abf.camel@linux.intel.com>
-Subject: Re: [PATCH v1 3/5] KVM: x86: nVMX: VMCS12 field's read/write
- respects field existence bitmap
-From:   Robert Hoo <robert.hu@linux.intel.com>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     pbonzini@redhat.com, vkuznets@redhat.com, wanpengli@tencent.com,
-        jmattson@google.com, joro@8bytes.org, kvm@vger.kernel.org,
-        yu.c.zhang@linux.intel.com
-Date:   Thu, 19 Aug 2021 17:58:36 +0800
-In-Reply-To: <YR2Tf9WPNEzrE7Xg@google.com>
-References: <1629192673-9911-1-git-send-email-robert.hu@linux.intel.com>
-         <1629192673-9911-4-git-send-email-robert.hu@linux.intel.com>
-         <YRvbvqhz6sknDEWe@google.com>
-         <b2bf00a6a8f3f88555bebf65b35579968ea45e2a.camel@linux.intel.com>
-         <YR2Tf9WPNEzrE7Xg@google.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Mailer: Evolution 3.28.5 (3.28.5-8.el7) 
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
+        id S237746AbhHSKH7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 19 Aug 2021 06:07:59 -0400
+Received: from zn.tnic (p200300ec2f0f6a00d82486aa7bad8753.dip0.t-ipconnect.de [IPv6:2003:ec:2f0f:6a00:d824:86aa:7bad:8753])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 2673C1EC046C;
+        Thu, 19 Aug 2021 12:07:18 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
+        t=1629367638;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
+        bh=sk5ZD+uyIjjDf0+aatLf0S7xfivyYV6bPrM1F6VipEk=;
+        b=Y6FVeyAYXMeHPizyC5o6zJzLiuV/IhxAjDLo6FCKzcMLEDjVwawaEoZEfI1d09NV3g86Gb
+        /OHjrCMIO3pHa/Hz0SpocJgGnMVprSJh/GXv8fp4B/pnD1yoxoo989RTjkJxcEffrshvM/
+        o18P6GSHp4ATumKPb7v6v2tacColPgw=
+Date:   Thu, 19 Aug 2021 12:07:56 +0200
+From:   Borislav Petkov <bp@alien8.de>
+To:     Brijesh Singh <brijesh.singh@amd.com>
+Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
+        linux-coco@lists.linux.dev, linux-mm@kvack.org,
+        linux-crypto@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        David Rientjes <rientjes@google.com>,
+        Dov Murik <dovmurik@linux.ibm.com>,
+        Tobin Feldman-Fitzthum <tobin@ibm.com>,
+        Michael Roth <michael.roth@amd.com>,
+        Vlastimil Babka <vbabka@suse.cz>, tony.luck@intel.com,
+        brijesh.ksingh@gmail.com
+Subject: Re: [PATCH Part1 RFC v4 23/36] KVM: x86: move lookup of indexed
+ CPUID leafs to helper
+Message-ID: <YR4tfIp+wjlaZNI/@zn.tnic>
+References: <20210707181506.30489-1-brijesh.singh@amd.com>
+ <20210707181506.30489-24-brijesh.singh@amd.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20210707181506.30489-24-brijesh.singh@amd.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 2021-08-18 at 23:10 +0000, Sean Christopherson wrote:
-> On Wed, Aug 18, 2021, Robert Hoo wrote:
-> > > Limiting this to VMREAD/VMWRITE means we shouldn't need a bitmap
-> > > and
-> > > can use a more static lookup, e.g. a switch statement.  
-> > 
-> > Emm, hard for me to choose:
-> > 
-> > Your approach sounds more efficient for CPU: Once VMX MSR's
-> > updated, no
-> > bother to update the bitmap. Each field's existence check will
-> > directly
-> > consult related VMX MSR. Well, the switch statement will be long...
+On Wed, Jul 07, 2021 at 01:14:53PM -0500, Brijesh Singh wrote:
+> From: Michael Roth <michael.roth@amd.com>
 > 
-> How long?  Honest question, off the top of my head I don't have a
-> feel for how
-> many fields conditionally exist.
-
-Per my just manual count, ~51 fields till today.
+> Determining which CPUID leafs have significant ECX/index values is
+> also needed by guest kernel code when doing SEV-SNP-validated CPUID
+> lookups. Move this to common code to keep future updates in sync.
 > 
-> > My this implementation: once VMX MSR's updated, the update needs to
-> > be
-> > passed to bitmap, this is 1 extra step comparing to aforementioned
-> > above. But, later, when query field existence, especially the those
-> > consulting vm{entry,exit}_ctrl, they usually would have to consult
-> > both
-> > MSRs if otherwise no bitmap, and we cannot guarantee if in the
-> > future
-> > there's no more complicated dependencies. If using bitmap, this
-> > consult
-> > is just 1-bit reading. If no bitmap, several MSR's read and compare
-> > happen.
+> Signed-off-by: Michael Roth <michael.roth@amd.com>
+> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
+> ---
+>  arch/x86/include/asm/cpuid-indexed.h | 26 ++++++++++++++++++++++++++
+>  arch/x86/kvm/cpuid.c                 | 17 ++---------------
+>  2 files changed, 28 insertions(+), 15 deletions(-)
+>  create mode 100644 arch/x86/include/asm/cpuid-indexed.h
 > 
-> Yes, but the bitmap is per-VM and likely may or may not be cache-hot
-> for back-to-back
-> VMREAD/VMWRITE to different fields, whereas the shadow controls are
-> much more likely
-> to reside somewhere in the caches.
+> diff --git a/arch/x86/include/asm/cpuid-indexed.h b/arch/x86/include/asm/cpuid-indexed.h
+> new file mode 100644
+> index 000000000000..f5ab746f5712
+> --- /dev/null
+> +++ b/arch/x86/include/asm/cpuid-indexed.h
 
-Sorry I don't quite understand the "shadow controls" here. Do you mean
-shadow VMCS? what does field existence to do with shadow VMCS? emm,
-here you indeed remind me a questions: what if L1 VMREAD/VMWRITE a
-shadow field that doesn't exist?
+Just call it arch/x86/include/asm/cpuid.h
 
-If your here "shadow controls" means nested_vmx.nested_vmx_msrs,
-they're like bitmap, per-vCPU, I think no essential difference for
-their cache hit possibilities. BTW, till current VMCS12 size, the
-bitmap can be contained in a cache line.
-> 
-> > And, VMX MSR --> bitmap, usually happens only once when vCPU model
-> > is
-> > settled. But VMRead/VMWrite might happen frequently, depends on
-> > guest
-> > itself. I'd rather leave complicated comparison in former than in
-> > later.
-> 
-> I'm not terribly concerned about the runtime performance, it's the
-> extra per-VM
-> allocation for something that's not thaaat interesting that I don't
-> like.
+And if you feel bored, you can move the cpuid* primitives from
+asm/processor.h to it, in another patch so that processor.h gets
+slimmer.
 
-OK, it's even further, per-vCPU/vmx ;)
-> 
-> And for performance, most of the frequently accessed VMCS fields will
-> be shadowed
-> anyways, i.e. won't VM-Exit in the first place.
-> 
-> And that brings up another wrinkle.  The shadow VMCS bitmaps are
-> global across
-> all VMs, 
-OK, that's the problem. Ideally, it should be per-VM or per-vCPU, but
-that means each VM/vCPU will consume 2 more pages for vm{read,write}
-bitmap.
+Thx.
 
-> e.g. if the preemption timer is supported in hardware but hidden from
-> L1, then a misbehaving L1 can VMREAD/VMWRITE the field even with this
-> patch.
-> If it was just the preemption timer we could consider disabling
-> shadow VMCS for
-> the VM ifthe timer exists but is hidden from L1, but GUEST_PML_INDEX
-> and
-> GUEST_INTR_STATUS are also conditional :-(
+-- 
+Regards/Gruss,
+    Boris.
 
-Yes, if the vm{read,write}-bitmap is KVM global, cannot implement field
-existence with shadow VMCS functioning. I don't think it's right. It
-just did't cause any trouble until we consider today's field existence
-implementation.
-
-If we stringently implement this per spec, i.e. each VMCS has its own
-vm{read,write}-bitmap, or at least each VM has its own, then doable.
-> 
-> Maybe there's a middle ground, e.g. let userspace tell KVM which
-> fields it plans
-> on exposing to L1, use that to build the bitmaps, and disable shadow
-> VMCS if
-> userspace creates VMs that don't match the specified configuration.  
-
-Here "specific configuration" means: if KVM vm{write,read}-bitmap
-enables some L1 non-exist field shadow read/write, we turn of shadow
-VMCS for that VM, right? I guess user would rather abandon this field
-existence check for VMCS shadowing.
-
-
-> Burning
-> three more pages per VM isn't very enticing...
-
-Why 3 more? I count 2 more pages, i.e. vm{read,write}-bitmap.
-And, just 2 pages (8KB) per VM isn't huge consumption, is it? ;)
-
-> 
-> This is quite the complicated mess for something I'm guessing no one
-> actually
-> cares about.  At what point do we chalk this up as a virtualization
-> hole and
-> sweep it under the rug?
-Yes, too complicated, beyond my imagination of vmcs12 field existence
-implementation at first. I guess perhaps the original guy who hard
-coded nested_msr.vmcs_enum had tried this before ;)
-
-
+https://people.kernel.org/tglx/notes-about-netiquette
