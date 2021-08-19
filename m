@@ -2,99 +2,117 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D51143F123A
-	for <lists+kvm@lfdr.de>; Thu, 19 Aug 2021 06:11:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5F3313F1247
+	for <lists+kvm@lfdr.de>; Thu, 19 Aug 2021 06:15:31 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229668AbhHSELx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 19 Aug 2021 00:11:53 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:47775 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229520AbhHSELw (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 19 Aug 2021 00:11:52 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1629346276;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=VBYriaxQXLlAIO2jBLfdlJqsXE4thEUkTkWuNBb3xSE=;
-        b=jTB9d5CywGiL9GEk4/rlMOCd1ZL8Er31etGoHhK1daVm9GXiXVIAj4PJhunnDTQdVENhjD
-        I+GHN5IXWbbactlYo7M5h6+Gd8fvYBtMNRWmjb79EyD+1nIb+cwGrqucRU562wRdm/gBLa
-        0pqVYlYA3O7IEjU62j8NFawIBN+WRW8=
-Received: from mail-pf1-f198.google.com (mail-pf1-f198.google.com
- [209.85.210.198]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-126-6jP9jiOZOBSphdz_PicS0A-1; Thu, 19 Aug 2021 00:11:15 -0400
-X-MC-Unique: 6jP9jiOZOBSphdz_PicS0A-1
-Received: by mail-pf1-f198.google.com with SMTP id n27-20020a056a000d5b00b003e147fb595eso2427389pfv.6
-        for <kvm@vger.kernel.org>; Wed, 18 Aug 2021 21:11:15 -0700 (PDT)
+        id S229592AbhHSEQF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 19 Aug 2021 00:16:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42776 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229520AbhHSEQE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 19 Aug 2021 00:16:04 -0400
+Received: from mail-pl1-x62c.google.com (mail-pl1-x62c.google.com [IPv6:2607:f8b0:4864:20::62c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2715EC0613CF
+        for <kvm@vger.kernel.org>; Wed, 18 Aug 2021 21:15:29 -0700 (PDT)
+Received: by mail-pl1-x62c.google.com with SMTP id n12so3175372plf.4
+        for <kvm@vger.kernel.org>; Wed, 18 Aug 2021 21:15:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google;
+        h=date:from:to:cc:subject:message-id:mime-version:content-disposition
+         :in-reply-to;
+        bh=w221Be1EofjnjmiRhYveteUIPXXfoWBMfLJIKwhzc6c=;
+        b=fhEA6xLbFlhjCuprHe1t9zZjCHnVtAM2fFfth+B1eUBRu6EInah6dTHDMDKwsz0mV1
+         65BqyoyCpNPZLSPi8XCLuuOA1+WEfawyX/VoKt1E6KGHsSqmRqLH0CYhis0m0bEyFhm6
+         GxHz9MjLC+9q453UuBgVTOwQGhg8cEVz5iusw=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-transfer-encoding
-         :content-language;
-        bh=VBYriaxQXLlAIO2jBLfdlJqsXE4thEUkTkWuNBb3xSE=;
-        b=dxlDYD22dxckNTq/qPS501fG7B26YrvbR/8dWmDqoUMH7+EgjM0nid1EQ4sSyGe+oL
-         7jYC2XicQAIjz9NYL8EoW0cDxp/BOnOlQI3l4ELZDwHpUETnpqLMGYGn8H43QerTKxBs
-         NcS7zA3v8j2DkhOhfLVUqMWa9A7Eo6rMBX+BdW+McymWn1Uu9yOFxW5BnY5S7guxF77E
-         RTdzj20riaJpsc1maG8ohrRlZBqyWzlitap+ACUn5H808vJAYsqYih/JAdoa6XfjdfWb
-         VPLGFnU9ZbUS0CNBcV0HMhDnC5O4I3nNhkdEv1e5Lw+7faknm2T3FNHIr650o6AkoW2a
-         4zGQ==
-X-Gm-Message-State: AOAM532O1NDQzexqg+EoX+EXZX3K7oWHwkALVgJab/n2nzKWWYlXUkpH
-        rXZmSBrwDByWXHQJN2K3keI/7sf36Na5ryzI168bZGMVNULgi7QitogIJiM8L/QaXyjeY++Bk2v
-        tSzVQGaMH1F2BPVKgcc51d4Fk0q11OCSwN6y/DvPUAiUVSTJrOtWcY0EX4HS6JTqL
-X-Received: by 2002:a05:6a00:1ace:b0:3e2:2a73:e0a4 with SMTP id f14-20020a056a001ace00b003e22a73e0a4mr12939448pfv.73.1629346274024;
-        Wed, 18 Aug 2021 21:11:14 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyLQPUem25xDlLQ3uF4CA7Dea+zPxgfi0RExMgvKM2TveGCChyP8g6txlY/nWsye2RZ0v3/9w==
-X-Received: by 2002:a05:6a00:1ace:b0:3e2:2a73:e0a4 with SMTP id f14-20020a056a001ace00b003e22a73e0a4mr12939432pfv.73.1629346273757;
-        Wed, 18 Aug 2021 21:11:13 -0700 (PDT)
-Received: from wangxiaodeMacBook-Air.local ([209.132.188.80])
-        by smtp.gmail.com with ESMTPSA id nv11sm6500567pjb.48.2021.08.18.21.11.11
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 18 Aug 2021 21:11:13 -0700 (PDT)
-Subject: Re: [PATCH 0/2] vDPA/ifcvf: enable multiqueue and control vq
-To:     Zhu Lingshan <lingshan.zhu@intel.com>, mst@redhat.com
-Cc:     virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        kvm@vger.kernel.org
-References: <20210818095714.3220-1-lingshan.zhu@intel.com>
-From:   Jason Wang <jasowang@redhat.com>
-Message-ID: <e3ec8ed7-84ac-73cc-0b74-4de1bb6c0030@redhat.com>
-Date:   Thu, 19 Aug 2021 12:11:09 +0800
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0)
- Gecko/20100101 Thunderbird/78.13.0
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:mime-version
+         :content-disposition:in-reply-to;
+        bh=w221Be1EofjnjmiRhYveteUIPXXfoWBMfLJIKwhzc6c=;
+        b=s0ZCQE9EfvbUg01xPzKrwV51ODuMFHQE6A3UwQcxmW7RiB3dPHYMZREHJgbferq0Uq
+         Va4+6wgodsY/yNrKrTVtvua8PmwvC7R451ypVy67P/cItwPJQoKseHDeN39sXiGsKbau
+         H04uouMvOGpFRTEUcozdLSFsc5p4cs6HYFpXpuSIPkA2TB82pHsDyWE25F22nvfuyJhj
+         NF0i21wzkJfK6HeJRy6GqaB35Wkhkg6PEncRe/gM1BG1AN0OXwizo8wLY9x/v1WB7vcT
+         EUmOAPlL8K3JcPZCCSnDq68eJ5MBP8lYZ0wuXA9GxT08u/oQJPblLWpHUCiOlqcbTdLO
+         Q4dg==
+X-Gm-Message-State: AOAM530ydC8RHJ/bjPcNUDtDmy8nybGNoEmILrIEku7v8tXOg9aqB1iH
+        NbMHuRV6j1UczkX0+5EXzcMM4A==
+X-Google-Smtp-Source: ABdhPJzUBrbcAUKyLF8ssbZuxfEH/VxtoJMLhDuWpgrTCiufrvnOHyomjO1vi21CQR+W587Vz3n2AQ==
+X-Received: by 2002:a17:902:f703:b029:12c:982:c9ae with SMTP id h3-20020a170902f703b029012c0982c9aemr10078207plo.20.1629346528626;
+        Wed, 18 Aug 2021 21:15:28 -0700 (PDT)
+Received: from google.com ([2409:10:2e40:5100:bc71:80fb:7292:eb8e])
+        by smtp.gmail.com with ESMTPSA id 141sm1421497pfv.15.2021.08.18.21.15.25
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 18 Aug 2021 21:15:28 -0700 (PDT)
+Date:   Thu, 19 Aug 2021 13:15:23 +0900
+From:   Sergey Senozhatsky <senozhatsky@chromium.org>
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Sergey Senozhatsky <senozhatsky@google.com>,
+        Ben Gardon <bgardon@google.com>
+Subject: Re: [PATCH] KVM: x86/mmu: Complete prefetch for trailing SPTEs for
+ direct, legacy MMU
+Message-ID: <YR3a21l6TC/gmw3/@google.com>
 MIME-Version: 1.0
-In-Reply-To: <20210818095714.3220-1-lingshan.zhu@intel.com>
-Content-Type: text/plain; charset=gbk; format=flowed
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210818235615.2047588-1-seanjc@google.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+[..]
 
-ÔÚ 2021/8/18 ÏÂÎç5:57, Zhu Lingshan Ð´µÀ:
-> This series enables multi-queue and control vq features
-> for ifcvf.
->
-> These patches are based on my previous vDPA/ifcvf management link
-> implementation series:
-> https://lore.kernel.org/kvm/20210812032454.24486-2-lingshan.zhu@intel.com/T/
->
-> Thanks!
->
-> Zhu Lingshan (2):
->    vDPA/ifcvf: detect and use the onboard number of queues directly
->    vDPA/ifcvf: enable multiqueue and control vq
->
->   drivers/vdpa/ifcvf/ifcvf_base.c |  8 +++++---
->   drivers/vdpa/ifcvf/ifcvf_base.h | 19 ++++---------------
->   drivers/vdpa/ifcvf/ifcvf_main.c | 32 +++++++++++++++-----------------
->   3 files changed, 24 insertions(+), 35 deletions(-)
->
+> Make a final call to direct_pte_prefetch_many() if there are "trailing"
+> SPTEs to prefetch, i.e. SPTEs for GFNs following the faulting GFN.  The
+> call to direct_pte_prefetch_many() in the loop only handles the case
+> where there are !PRESENT SPTEs preceding a PRESENT SPTE.
+> 
+> E.g. if the faulting GFN is a multiple of 8 (the prefetch size) and all
+> SPTEs for the following GFNs are !PRESENT, the loop will terminate with
+> "start = sptep+1" and not prefetch any SPTEs.
+> 
+> Prefetching trailing SPTEs as intended can drastically reduce the number
+> of guest page faults, e.g. accessing the first byte of every 4kb page in
+> a 6gb chunk of virtual memory, in a VM with 8gb of preallocated memory,
+> the number of pf_fixed events observed in L0 drops from ~1.75M to <0.27M.
+> 
+> Note, this only affects memory that is backed by 4kb pages as KVM doesn't
+> prefetch when installing hugepages.  Shadow paging prefetching is not
+> affected as it does not batch the prefetches due to the need to process
+> the corresponding guest PTE.  The TDP MMU is not affected because it
+> doesn't have prefetching, yet...
 
-Patch looks good.
 
-I wonder the compatibility. E.g does it work on the qemu master without 
-cvq support? (mq=off or not specified)
+Tested-by: Sergey Senozhatsky <senozhatsky@chromium.org>
 
-Thanks
 
+
+I ran some tests.
+
+
+- VM Boot up
+
+From
+
+EPT_VIOLATION    1192184    75.18%     4.40%      0.77us  18020.01us      4.32us ( +-   1.71% )
+
+to
+
+EPT_VIOLATION     947460    69.92%     4.64%      0.69us  34902.15us      5.06us ( +-   1.64% )
+
+
+
+- Running test app (in VM)
+
+From
+
+EPT_VIOLATION    6550167    71.05%    11.76%      0.77us  32562.18us      3.51us ( +-   0.36% )
+
+to
+
+EPT_VIOLATION    5489904    68.32%    11.29%      0.71us  16564.19us      3.92us ( +-   0.29% )
