@@ -2,139 +2,152 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E9C833F22CE
-	for <lists+kvm@lfdr.de>; Fri, 20 Aug 2021 00:11:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D63DE3F22E9
+	for <lists+kvm@lfdr.de>; Fri, 20 Aug 2021 00:19:24 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236898AbhHSWL2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 19 Aug 2021 18:11:28 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:52066 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S236988AbhHSWLO (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 19 Aug 2021 18:11:14 -0400
-Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 17JM3UMq073374;
-        Thu, 19 Aug 2021 18:10:29 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
- from : reply-to : to : cc : date : in-reply-to : references : content-type
- : mime-version : content-transfer-encoding; s=pp1;
- bh=s9oQOAi1oMeLWbk2SGSqnGs5buytPLYhHtKMOaBIb6A=;
- b=aM14whoIUSVhsMuqIdU5/2qLydGj9CPyPAK8w6xAZDsQ5OaRDPa4wMqll3fcLI2UJiQu
- 64WyMSA3LGRpcWrurZbKkPMJNT8wb2tzl2ldhFOgIJRAiTBh6/n33Re5HAKYPyxz6Osx
- XeHG2HdHkZwiMmNpCJeqMg5J29fIEiBNw9MamP5NQoETjSQLxk3UGrjVT4zhpoDKAGHJ
- GCSxHEPtr4VksPfcTOjwMjNEWEPqPG/4+yHTvOuy9qqGeFcnpGb7QpXAZ55MaI0VqhZc
- RWOWYDzYTRmvhYDw0zaD3K6YwvjdSV3hKwBbaN33lZWJsmTXxnLUeecL7f3vuGP9nsjq Bg== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3ahk0yr6j4-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 19 Aug 2021 18:10:29 -0400
-Received: from m0098410.ppops.net (m0098410.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 17JM5UAk086447;
-        Thu, 19 Aug 2021 18:10:28 -0400
-Received: from ppma01dal.us.ibm.com (83.d6.3fa9.ip4.static.sl-reverse.com [169.63.214.131])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3ahk0yr6hu-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 19 Aug 2021 18:10:28 -0400
-Received: from pps.filterd (ppma01dal.us.ibm.com [127.0.0.1])
-        by ppma01dal.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 17JM3T03021949;
-        Thu, 19 Aug 2021 22:10:27 GMT
-Received: from b03cxnp07027.gho.boulder.ibm.com (b03cxnp07027.gho.boulder.ibm.com [9.17.130.14])
-        by ppma01dal.us.ibm.com with ESMTP id 3ahu0ta8yy-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 19 Aug 2021 22:10:27 +0000
-Received: from b03ledav004.gho.boulder.ibm.com (b03ledav004.gho.boulder.ibm.com [9.17.130.235])
-        by b03cxnp07027.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 17JMAPCL34865546
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 19 Aug 2021 22:10:25 GMT
-Received: from b03ledav004.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 7474878063;
-        Thu, 19 Aug 2021 22:10:25 +0000 (GMT)
-Received: from b03ledav004.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id A97567805E;
-        Thu, 19 Aug 2021 22:10:22 +0000 (GMT)
-Received: from jarvis.int.hansenpartnership.com (unknown [9.160.128.138])
-        by b03ledav004.gho.boulder.ibm.com (Postfix) with ESMTP;
-        Thu, 19 Aug 2021 22:10:22 +0000 (GMT)
-Message-ID: <d6eb8f7ff2d78296b5ba3a20d1dc9640f4bb8fa5.camel@linux.ibm.com>
-Subject: Re: [RFC PATCH 00/13] Add support for Mirror VM.
-From:   James Bottomley <jejb@linux.ibm.com>
-Reply-To: jejb@linux.ibm.com
-To:     "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc:     Tobin Feldman-Fitzthum <tobin@linux.ibm.com>,
-        Steve Rutherford <srutherford@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Ashish Kalra <Ashish.Kalra@amd.com>, thomas.lendacky@amd.com,
-        brijesh.singh@amd.com, ehabkost@redhat.com, kvm@vger.kernel.org,
-        mst@redhat.com, tobin@ibm.com, richard.henderson@linaro.org,
-        qemu-devel@nongnu.org, frankeh@us.ibm.com,
-        dovmurik@linux.vnet.ibm.com
-Date:   Thu, 19 Aug 2021 15:10:21 -0700
-In-Reply-To: <YR5qka5aoJqlouhO@work-vm>
-References: <cover.1629118207.git.ashish.kalra@amd.com>
-         <CABayD+fyrcyPGg5TdXLr95AFkPFY+EeeNvY=NvQw_j3_igOd6Q@mail.gmail.com>
-         <0fcfafde-a690-f53a-01fc-542054948bb2@redhat.com>
-         <37796fd1-bbc2-f22c-b786-eb44f4d473b9@linux.ibm.com>
-         <CABayD+evf56U4yT2V1TmEzaJjvV8gutUG5t8Ob2ifamruw5Qrg@mail.gmail.com>
-         <458ba932-5150-8706-3958-caa4cc67c8e3@linux.ibm.com>
-         <YR1ZvArdq4sKVyTJ@work-vm>
-         <c1d8dbca-c6a9-58da-6f95-b33b74e0485a@linux.ibm.com>
-         <YR4U11ssVUztsPyx@work-vm>
-         <538733190532643cc19b6e30f0eda4dd1bc2a767.camel@linux.ibm.com>
-         <YR5qka5aoJqlouhO@work-vm>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.34.4 
+        id S235679AbhHSWT7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 19 Aug 2021 18:19:59 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:54144 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S235805AbhHSWT5 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 19 Aug 2021 18:19:57 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1629411559;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=EbhZJqeN1nM9qIrKQm6mxxNUIRdgxznhenqwUNNt6uM=;
+        b=IYbl6FGEUZN0CgLVj9Q2tvLRbGaTSkfWW7aWXdzMpbxEjVSn0IICuA7XXu0Bne07oXpzPh
+        VSst/rxjWvyvNTio0TBnQP8yjzEu2mQ5/0i+Szj4QILHcMXVPJywAqvgq84YGJ62L2uYkj
+        FEsX4gUUJSfLC0WbeSUsxhV5JBOYNPs=
+Received: from mail-ot1-f69.google.com (mail-ot1-f69.google.com
+ [209.85.210.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-222-tyvhZXe6NR-ANRcrxTYtKg-1; Thu, 19 Aug 2021 18:19:17 -0400
+X-MC-Unique: tyvhZXe6NR-ANRcrxTYtKg-1
+Received: by mail-ot1-f69.google.com with SMTP id q5-20020a9d65450000b0290510db97edd8so3504710otl.8
+        for <kvm@vger.kernel.org>; Thu, 19 Aug 2021 15:19:17 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=EbhZJqeN1nM9qIrKQm6mxxNUIRdgxznhenqwUNNt6uM=;
+        b=HwTy3UxNoL4BlJ3XjAFsE1M+yFXslJqIFWBgsrZDfraSDRtZxBwY+t7YwgIfR/lYoY
+         mDP2HjY04LdaWcHFDEAofzp5nsuF8JQR3lmZ31Gmwntx0EE0u1+9DykzvxDokuyS3xvQ
+         e/ifolFO1dRpzr+0IW96j6c2OGs5H7HinqNXD9elRwUSaORmcsjPg21DGKjxq5TG8JtM
+         x/nWfsARP14kqO/KVPKFzZV+gvgoxAWkknAKZIIuvJuf6kTnxvi9fjk7pQNfzqD55iTU
+         LL2ulKPLSvZEifPHxJohhHBza1hAU6bVEz0CYAzOFGxmMEQz99qaimbE8CDDQAMxHc/9
+         BFxQ==
+X-Gm-Message-State: AOAM533+tott63a5efnqx5Tq6BZ4u1uOwcLm1mCJJjsLE7hQZTvLP0Hj
+        EbtjmlzgtQgFP3mqlTf+8F7l0NfYXRj+NdHKtkIq1Z4gIu3K3JOCnI2Tk/iyJncLhNdKR5j2OgT
+        neSszQQgxmkKh
+X-Received: by 2002:a4a:a552:: with SMTP id s18mr13338725oom.1.1629411556752;
+        Thu, 19 Aug 2021 15:19:16 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzX5rfq5sQLsDwtph+vjRR0C26I9lgF4XK9hL1qrYyyg0cWYI/hPwJPKxCIkfjVts0o9JG5Kg==
+X-Received: by 2002:a4a:a552:: with SMTP id s18mr13338701oom.1.1629411556534;
+        Thu, 19 Aug 2021 15:19:16 -0700 (PDT)
+Received: from redhat.com ([198.99.80.109])
+        by smtp.gmail.com with ESMTPSA id z25sm942600oic.24.2021.08.19.15.19.15
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 19 Aug 2021 15:19:16 -0700 (PDT)
+Date:   Thu, 19 Aug 2021 16:19:14 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Max Gurtovoy <mgurtovoy@nvidia.com>
+Cc:     Bjorn Helgaas <helgaas@kernel.org>,
+        Yishai Hadas <yishaih@nvidia.com>, <bhelgaas@google.com>,
+        <corbet@lwn.net>, <diana.craciun@oss.nxp.com>,
+        <kwankhede@nvidia.com>, <eric.auger@redhat.com>,
+        <masahiroy@kernel.org>, <michal.lkml@markovi.net>,
+        <linux-pci@vger.kernel.org>, <linux-doc@vger.kernel.org>,
+        <kvm@vger.kernel.org>, <linux-s390@vger.kernel.org>,
+        <linux-kbuild@vger.kernel.org>, <jgg@nvidia.com>,
+        <maorg@nvidia.com>, <leonro@nvidia.com>
+Subject: Re: [PATCH V2 09/12] PCI: Add 'override_only' bitmap to struct
+ pci_device_id
+Message-ID: <20210819161914.7ad2e80e.alex.williamson@redhat.com>
+In-Reply-To: <cd749d14-16ba-6442-0855-32c1bfac6e2d@nvidia.com>
+References: <20210819163945.GA3211852@bjorn-Precision-5520>
+        <cd749d14-16ba-6442-0855-32c1bfac6e2d@nvidia.com>
+X-Mailer: Claws Mail 3.18.0 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: KeEQZ4f5mgVctXjPAxt3LZpPoLy6mHZn
-X-Proofpoint-ORIG-GUID: 22mbp_qpwaXsEiVgdQPm2zFx57CDAg1s
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.790
- definitions=2021-08-19_07:2021-08-17,2021-08-19 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=999 phishscore=0
- impostorscore=0 suspectscore=0 clxscore=1015 malwarescore=0 adultscore=0
- spamscore=0 bulkscore=0 lowpriorityscore=0 priorityscore=1501 mlxscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2107140000
- definitions=main-2108190126
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 2021-08-19 at 15:28 +0100, Dr. David Alan Gilbert wrote:
-> * James Bottomley (jejb@linux.ibm.com) wrote:
-> > On Thu, 2021-08-19 at 09:22 +0100, Dr. David Alan Gilbert wrote:
-[...]
-> > > I think it really does have to cope with migration to a new
-> > > version of host.
-> > 
-> > Well, you're thinking of OVMF as belonging to the host because of
-> > the way it is supplied, but think about the way it works in
-> > practice now, forgetting about confidential computing: OVMF is RAM
-> > resident in ordinary guests, so when you migrate them, the whole of
-> > OVMF (or at least what's left at runtime) goes with the migration,
-> > thus it's not possible to change the guest OVMF by migration.  The
-> > above is really just an extension of that principle, the only
-> > difference for confidential computing being you have to have an
-> > image of the current OVMF ROM in the target to seed migration.
-> > 
-> > Technically, the problem is we can't overwrite running code and
-> > once the guest is re-sited to the target, the OVMF there has to
-> > match exactly what was on the source for the RT to still
-> > function.   Once the migration has run, the OVMF on the target must
-> > be identical to what was on the source (including internally
-> > allocated OVMF memory), and if we can't copy the MH code, we have
-> > to rely on the target image providing this identical code and we
-> > copy the rest.
+On Thu, 19 Aug 2021 22:57:30 +0300
+Max Gurtovoy <mgurtovoy@nvidia.com> wrote:
+
+> On 8/19/2021 7:39 PM, Bjorn Helgaas wrote:
+> > On Thu, Aug 19, 2021 at 07:16:20PM +0300, Yishai Hadas wrote:  
+> >> On 8/19/2021 6:15 PM, Bjorn Helgaas wrote:  
+> >>> On Wed, Aug 18, 2021 at 06:16:03PM +0300, Yishai Hadas wrote:  
+> >>>> From: Max Gurtovoy <mgurtovoy@nvidia.com>
+> >>>>    /**
+> >>>>     * struct pci_device_id - PCI device ID structure
+> >>>>     * @vendor:		Vendor ID to match (or PCI_ANY_ID)
+> >>>> @@ -34,12 +38,14 @@ typedef unsigned long kernel_ulong_t;
+> >>>>     *			Best practice is to use driver_data as an index
+> >>>>     *			into a static list of equivalent device types,
+> >>>>     *			instead of using it as a pointer.
+> >>>> + * @override_only:	Bitmap for override_only PCI drivers.  
+> >>> "Match only when dev->driver_override is this driver"?  
+> >> Just to be aligned here,
+> >>
+> >> This field will stay __u32 and may hold at the most 1 bit value set to
+> >> represent the actual subsystem/driver.  
+> > The PCI core does not require "at most 1 bit is set."
+> >
+> > Actually, I don't think even the file2alias code requires that.  If
+> > you set two bits, you can generate two aliases.
+> >  
+> >> This is required to later on set the correct prefix in the modules.alias
+> >> file, and you just suggested to change the comment as of above, right ?  
+> > Yes, __u32 is fine and I'm only suggesting a comment change here.  
 > 
-> I'm OK with the OVMF now being part of the guest image, and having to
-> exist on both; it's a bit delicate though unless we have a way to
-> check it (is there an attest of the destination happening here?)
+> great.
+> 
+> 
+> >  
+> >>> As far as PCI core is concerned there's no need for this to be a
+> >>> bitmap.
+> >>>
+> >>> I think this would make more sense if split into two patches.  The
+> >>> first would add override_only and change pci_match_device().  Then
+> >>> there's no confusion about whether this is specific to VFIO.  
+> >> Splitting may end-up the first patch with a dead-code on below, as
+> >> found_id->override_only will be always 0.
+> >>
+> >> If you still believe that this is better we can do it.  
+> > I think it's fine to add the functionality in one patch and use it in
+> > the next if it makes the commit clearer.  I wouldn't want to add
+> > functionality that's not used at all in the series, but it's OK when
+> > they're both posted together.  
+> 
+> Ok. We can do the separation if all agree that the first commit is have 
+> a dead section.
+> 
+> Alex,
+> 
+> we would like to get few more reviewed-by signatures and we'll send the 
+> V3 series in a couple of days to make it to 5.15 merge window as we planned.
+> 
+> Are you ok with the series after we got the green light for this patch ?
+> 
+> do you think we need another pair of eyes to review the other patches ?
 
-There will be in the final version.  The attestations of the source and
-target, being the hash of the OVMF (with the registers in the -ES
-case), should be the same (modulo any firmware updates to the PSP,
-whose firmware version is also hashed) to guarantee the OVMF is the
-same on both sides.  We'll definitely take an action to get QEMU to
-verify this ... made a lot easier now we have signed attestations ...
+More eyes is always better, but I'm not finding much to complain about
+in this series.  This patch was probably the most pivotal for agreement,
+the rest is largely mechanical at this point.
 
-James
+In addition to Bjorn for the PCI parts of this, I'd also like to see an
+ack from Yamada-san or Michal for scripts/mod/, who are already cc'd 
 
+I also notice include/linux/vfio_pci_core.h doesn't get added to
+MAINTAINERS in the series.  Please fix in patch 12/
+
+It seems plausible that this could be ready for v5.15.  Thanks,
+
+Alex
 
