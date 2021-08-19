@@ -2,51 +2,51 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id BB50B3F1846
-	for <lists+kvm@lfdr.de>; Thu, 19 Aug 2021 13:35:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3489E3F1847
+	for <lists+kvm@lfdr.de>; Thu, 19 Aug 2021 13:35:22 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238827AbhHSLfy (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 19 Aug 2021 07:35:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58900 "EHLO
+        id S238866AbhHSLfz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 19 Aug 2021 07:35:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58906 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238812AbhHSLfx (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 19 Aug 2021 07:35:53 -0400
-Received: from mail-wm1-x32f.google.com (mail-wm1-x32f.google.com [IPv6:2a00:1450:4864:20::32f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 20D3FC061575
-        for <kvm@vger.kernel.org>; Thu, 19 Aug 2021 04:35:17 -0700 (PDT)
-Received: by mail-wm1-x32f.google.com with SMTP id u15so3650752wmj.1
-        for <kvm@vger.kernel.org>; Thu, 19 Aug 2021 04:35:17 -0700 (PDT)
+        with ESMTP id S238749AbhHSLfy (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 19 Aug 2021 07:35:54 -0400
+Received: from mail-wr1-x430.google.com (mail-wr1-x430.google.com [IPv6:2a00:1450:4864:20::430])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 38F35C061575
+        for <kvm@vger.kernel.org>; Thu, 19 Aug 2021 04:35:18 -0700 (PDT)
+Received: by mail-wr1-x430.google.com with SMTP id v4so8549608wro.12
+        for <kvm@vger.kernel.org>; Thu, 19 Aug 2021 04:35:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=F7CUliUhTh7aYBcRJq4Ct3KX4RaFX+ihicrQzvXmF1k=;
-        b=Lh7mKG1xnrUE0QX/clk3lJQL/rB5ItP2bbJuP/gbfx2gzYCFM2F18LqVTAcg2QLRb8
-         HmRv/QT7kcpz5Bm7emUi4DL368v22ogZXl4RZCkTEW1SeAPlEETo2nNfRFa17DDjxiPz
-         PKVppsQRzE5tEDWPdz8SNwdP6zEtGatq1/if4j/6T+2ca3gPyPLXnAyzBtKOHJSryHq4
-         tzFXnJkyBP6xhiaaqIx89dGZ+eyw57b688V6VhBZKTQWiD4HamWYJb1quPIM6ZaTO9J2
-         hyKJ8weMatJJkx7fCpdAbxV8gpjEXuNoN0D6P1MrtKZNbjq2SBjdiKAE9FG/8sTWJt2w
-         n24Q==
+        h=from:to:subject:date:message-id:in-reply-to:references:mime-version
+         :content-transfer-encoding;
+        bh=getEzT2IMj3U2MYsPIPzBO2g/DoPkjIiRV/IoBHF0hU=;
+        b=cZVgnBOTz79nvzvPsSH5jMjXNZ1usDMp1a3XXXSTA201zMGv+/tJ0RYo++RFJTCmYd
+         VauCN55uVNX15CpwsdHUCK/9NHXZtunUxH5nz4uAlesCCthgNerTL4NhUecsW4RxucxC
+         VT/NqOTFXUOhw+Pf2rO5vns3QyPhYY5Fl7lsZcLKvBwG/Dk2cGTPo2keJmdGIHGOpkJF
+         Mxuqa4G566y1omo25FvyRy/UPfLpuh9/bVXysZhhCDk8F8AevLiVzkDW0ifjx8zDjDrQ
+         oNXoBgsDxt36WdfiWd8rE9Zdw0G3HdfvxnWCNLPWOz+kqTlBROxMpzovrHtjmoIe5O0e
+         MS/Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+        h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=F7CUliUhTh7aYBcRJq4Ct3KX4RaFX+ihicrQzvXmF1k=;
-        b=M6d2sinS9Lzs7rOFVfiEu1H3DkTfet3cgMrHUgP7TsUX8dWeFO/wib8kXRRD1oeor0
-         JwcNPudJqw7sYV6nJMU4C4kTYCagGbLBFLK7D4hklxzWLVCk8RBdYKI0lubCf1Nxl/B0
-         32uik7s+X60ImZKuceqvXoenV/LWaYAGtss4EMb8VoVlD5A3Rb0qsHKCQKELO4fdADCh
-         ZDbJjFaHUbbIxyoEPh4yI3Ykr8VvOoPd8EXpHaWCN/WFgkKbSIOq16uHmYASBlr/jkwe
-         x6EIEXIL7I0tH50/uBFwpLyxWzIkfdgVGL+YdGNHMkDGtow2ETl6G5cuU4oExYocZcYe
-         KCyA==
-X-Gm-Message-State: AOAM530z1oH9X/BoiwasSiY5qyo4QH8hJqswBwBhzzxygYbfPAYQfsgl
-        grzoxTAAxEdgzLgxQEaUEWzrL2F++9N1tyHB
-X-Google-Smtp-Source: ABdhPJy1g7Kbjvf5xddOt0JuhNey4fL7UoxK+qFu1AzhGMA8ugyF1w/mrT1hSsP8vbn+ZZ7SqT/H8g==
-X-Received: by 2002:a1c:f314:: with SMTP id q20mr13453730wmq.154.1629372915735;
-        Thu, 19 Aug 2021 04:35:15 -0700 (PDT)
+        bh=getEzT2IMj3U2MYsPIPzBO2g/DoPkjIiRV/IoBHF0hU=;
+        b=QG34bLAmYw3GvdnrhaMPZFlHR7QtfNuZS3fLxRU6Y6IBg9ix2Csh86vUzKPmSBm6EN
+         tVvP31Fuc+XlWzvClCIWbCVkcZooKQcob7DeKCEwwanzk5TvDvCZLiRYVyl2fZ2DoEhJ
+         H15T4Vmv2QV7VeLGUsrs0bpiTiVmBICOzNchVpgXBeTQN3+Ijnvp4G6kkaDhp07iQTCZ
+         ggdNnwFZ+BOXJ2H5d+U6mNel5wTuGLrWmDzzfjkurRGzuM9jDIJJiaFP21RrVCZ4/Zoe
+         sGj6hpQtkPnoyVw1KeO/JlxDI+jHef+t0f3bQ9Kz/8+XkXkRwriYHeTbzCiAFOjc4QaE
+         QeJA==
+X-Gm-Message-State: AOAM531WKIomkab2mSBxYJSPQnhDDQ2otuRgiwuYlE/LaJ1Ok9S6QLEX
+        GCwn7oLKQ1sU2yHbOH7CRu9bwtBndbRcCGZh
+X-Google-Smtp-Source: ABdhPJxwxFEimQDL1ngUNfNmRySMOdSFUyp6fERueNLUVKTUBmg5OD3k3Yxq4SmhCt+QrA7SHiN/qA==
+X-Received: by 2002:adf:f406:: with SMTP id g6mr3320498wro.131.1629372916775;
+        Thu, 19 Aug 2021 04:35:16 -0700 (PDT)
 Received: from xps13.suse.de (ip5f5a5c19.dynamic.kabel-deutschland.de. [95.90.92.25])
-        by smtp.gmail.com with ESMTPSA id w11sm2682859wrr.48.2021.08.19.04.35.14
+        by smtp.gmail.com with ESMTPSA id w11sm2682859wrr.48.2021.08.19.04.35.15
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 19 Aug 2021 04:35:15 -0700 (PDT)
+        Thu, 19 Aug 2021 04:35:16 -0700 (PDT)
 From:   Varad Gautam <varadgautam@gmail.com>
 X-Google-Original-From: Varad Gautam <varad.gautam@suse.com>
 To:     Zixuan Wang <zixuanwang@google.com>,
@@ -60,10 +60,9 @@ To:     Zixuan Wang <zixuanwang@google.com>,
         Hyunwook Baek <baekhw@google.com>,
         Erdem Aktas <erdemaktas@google.com>,
         Tom Roeder <tmroeder@google.com>
-Cc:     Varad Gautam <varad.gautam@suse.com>
-Subject: [kvm-unit-tests PATCH v2 5/6] cstart64.S: x86_64 bootstrapping after exiting EFI
-Date:   Thu, 19 Aug 2021 13:33:59 +0200
-Message-Id: <20210819113400.26516-6-varad.gautam@suse.com>
+Subject: [kvm-unit-tests PATCH v2 6/6] x86 UEFI: Convert x86 test cases to PIC
+Date:   Thu, 19 Aug 2021 13:34:00 +0200
+Message-Id: <20210819113400.26516-7-varad.gautam@suse.com>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20210819113400.26516-1-varad.gautam@suse.com>
 References: <20210819113400.26516-1-varad.gautam@suse.com>
@@ -73,196 +72,276 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-EFI sets up long mode with arbitrary state before calling the
-image entrypoint. To run the testcases at hand, it is necessary
-to redo some of the bootstrapping to not rely on what EFI
-provided.
+From: Zixuan Wang <zixuanwang@google.com>
 
-Adapt start64() for EFI testcases to fixup %rsp/GDT/IDT/TSS and
-friends, and jump here after relocation from efi_main. Switch to
-RIP-relative addressing where necessary.
+UEFI loads EFI applications to dynamic runtime addresses, so it requires
+all applications to be compiled as PIC (position independent code). PIC
+does not allow the usage of compile time absolute address.
 
-Initially leave out:
-- AP init - leave EFI to single CPU
-- Testcase arg passing
+This commit converts multiple x86 test cases to PIC so they can compile
+and run in UEFI:
 
-Signed-off-by: Varad Gautam <varad.gautam@suse.com>
+- x86/cet.efi
+
+- x86/emulator.c: x86/emulator.c depends on lib/x86/usermode.c. But
+usermode.c contains non-PIC inline assembly code and thus blocks the
+compilation with GNU-EFI. This commit converts lib/x86/usermode.c and
+x86/emulator.c to PIC, so x86/emulator.c can compile and run in UEFI.
+
+- x86/vmware_backdoors.c: it depends on lib/x86/usermode.c and now works
+without modifications
+
+- x86/eventinj.c
+
+- x86/smap.c
+
+- x86/access.c
+
+- x86/umip.c
+
+Signed-off-by: Zixuan Wang <zixuanwang@google.com>
 ---
-v2: Fix TSS setup in cstart64 on CONFIG_EFI.
+ lib/x86/usermode.c  |  3 ++-
+ x86/Makefile.common |  7 ++++---
+ x86/Makefile.x86_64 |  5 +++--
+ x86/access.c        |  6 +++---
+ x86/cet.c           |  8 +++++---
+ x86/emulator.c      |  5 +++--
+ x86/eventinj.c      |  6 ++++--
+ x86/smap.c          |  8 ++++----
+ x86/umip.c          | 10 +++++++---
+ 9 files changed, 35 insertions(+), 23 deletions(-)
 
- x86/cstart64.S | 70 +++++++++++++++++++++++++++++++++++++++++++++-----
- x86/efi_main.c |  1 +
- 2 files changed, 65 insertions(+), 6 deletions(-)
-
-diff --git a/x86/cstart64.S b/x86/cstart64.S
-index 98e7848..547f3fb 100644
---- a/x86/cstart64.S
-+++ b/x86/cstart64.S
-@@ -242,16 +242,17 @@ ap_start32:
+diff --git a/lib/x86/usermode.c b/lib/x86/usermode.c
+index f032523..c550545 100644
+--- a/lib/x86/usermode.c
++++ b/lib/x86/usermode.c
+@@ -58,7 +58,8 @@ uint64_t run_in_user(usermode_func func, unsigned int fault_vector,
+ 			"pushq %[user_stack_top]\n\t"
+ 			"pushfq\n\t"
+ 			"pushq %[user_cs]\n\t"
+-			"pushq $user_mode\n\t"
++			"lea user_mode(%%rip), %%rdx\n\t"
++			"pushq %%rdx\n\t"
+ 			"iretq\n"
  
- .code64
- save_id:
--#ifndef CONFIG_EFI
- 	movl $(APIC_DEFAULT_PHYS_BASE + APIC_ID), %eax
- 	movl (%rax), %eax
- 	shrl $24, %eax
-+#ifdef CONFIG_EFI
-+	lock btsl %eax, online_cpus(%rip)
-+#else
- 	lock btsl %eax, online_cpus
+ 			"user_mode:\n\t"
+diff --git a/x86/Makefile.common b/x86/Makefile.common
+index ca33e8e..a91fd4c 100644
+--- a/x86/Makefile.common
++++ b/x86/Makefile.common
+@@ -61,8 +61,8 @@ FLATLIBS = lib/libcflat.a
+ 		    -j .reloc -j .init --target efi-app-x86_64 $*.so $@
+ 	@chmod a-x $@
+ 
+-tests-flatonly = $(TEST_DIR)/realmode.$(out) $(TEST_DIR)/eventinj.$(out)		\
+-		$(TEST_DIR)/smap.$(out) $(TEST_DIR)/umip.$(out)
++tests-flatonly = $(TEST_DIR)/realmode.$(out)						\
++		$(TEST_DIR)/smap.$(out)
+ 
+ tests-common = $(TEST_DIR)/vmexit.$(out) $(TEST_DIR)/tsc.$(out)				\
+ 		$(TEST_DIR)/smptest.$(out) $(TEST_DIR)/msr.$(out)			\
+@@ -72,7 +72,8 @@ tests-common = $(TEST_DIR)/vmexit.$(out) $(TEST_DIR)/tsc.$(out)				\
+ 		$(TEST_DIR)/tsc_adjust.$(out) $(TEST_DIR)/asyncpf.$(out)		\
+ 		$(TEST_DIR)/init.$(out) $(TEST_DIR)/hyperv_synic.$(out)			\
+ 		$(TEST_DIR)/hyperv_stimer.$(out) $(TEST_DIR)/hyperv_connections.$(out)	\
+-		$(TEST_DIR)/tsx-ctrl.$(out)
++		$(TEST_DIR)/tsx-ctrl.$(out)						\
++		$(TEST_DIR)/eventinj.$(out) $(TEST_DIR)/umip.$(out)
+ 
+ ifneq ($(CONFIG_EFI),y)
+ tests-common += $(tests-flatonly)
+diff --git a/x86/Makefile.x86_64 b/x86/Makefile.x86_64
+index f6c7bd7..e8843aa 100644
+--- a/x86/Makefile.x86_64
++++ b/x86/Makefile.x86_64
+@@ -18,9 +18,8 @@ cflatobjs += lib/x86/intel-iommu.o
+ cflatobjs += lib/x86/usermode.o
+ 
+ # Tests that have relocation / PIC problems and need more attention for EFI.
+-tests_flatonly = $(TEST_DIR)/access.$(out) $(TEST_DIR)/emulator.$(out) \
++tests_flatonly = $(TEST_DIR)/access.$(out) \
+ 	$(TEST_DIR)/svm.$(out) $(TEST_DIR)/vmx.$(out) \
+-	$(TEST_DIR)/vmware_backdoors.$(out)
+ 
+ tests = $(TEST_DIR)/apic.$(out) $(TEST_DIR)/idt_test.$(out) \
+ 	  $(TEST_DIR)/xsave.$(out) $(TEST_DIR)/rmap_chain.$(out) \
+@@ -33,6 +32,8 @@ tests += $(TEST_DIR)/intel-iommu.$(out)
+ tests += $(TEST_DIR)/rdpru.$(out)
+ tests += $(TEST_DIR)/pks.$(out)
+ tests += $(TEST_DIR)/pmu_lbr.$(out)
++tests += $(TEST_DIR)/emulator.$(out)
++tests += $(TEST_DIR)/vmware_backdoors.$(out)
+ 
+ ifneq ($(fcf_protection_full),)
+ tests_flatonly += $(TEST_DIR)/cet.$(out)
+diff --git a/x86/access.c b/x86/access.c
+index 4725bbd..d0c84ca 100644
+--- a/x86/access.c
++++ b/x86/access.c
+@@ -700,7 +700,7 @@ static int ac_test_do_access(ac_test_t *at)
+ 
+     if (F(AC_ACCESS_TWICE)) {
+ 	asm volatile (
+-	    "mov $fixed2, %%rsi \n\t"
++	    "lea fixed2(%%rip), %%rsi \n\t"
+ 	    "mov (%[addr]), %[reg] \n\t"
+ 	    "fixed2:"
+ 	    : [reg]"=r"(r), [fault]"=a"(fault), "=b"(e)
+@@ -710,7 +710,7 @@ static int ac_test_do_access(ac_test_t *at)
+ 	fault = 0;
+     }
+ 
+-    asm volatile ("mov $fixed1, %%rsi \n\t"
++    asm volatile ("lea fixed1(%%rip), %%rsi \n\t"
+ 		  "mov %%rsp, %%rdx \n\t"
+ 		  "cmp $0, %[user] \n\t"
+ 		  "jz do_access \n\t"
+@@ -719,7 +719,7 @@ static int ac_test_do_access(ac_test_t *at)
+ 		  "pushq %[user_stack_top] \n\t"
+ 		  "pushfq \n\t"
+ 		  "pushq %[user_cs] \n\t"
+-		  "pushq $do_access \n\t"
++		  "lea do_access(%%rip), %%rsi; pushq %%rsi; lea fixed1(%%rip), %%rsi\n\t"
+ 		  "iretq \n"
+ 		  "do_access: \n\t"
+ 		  "cmp $0, %[fetch] \n\t"
+diff --git a/x86/cet.c b/x86/cet.c
+index a21577a..a4b79cb 100644
+--- a/x86/cet.c
++++ b/x86/cet.c
+@@ -52,7 +52,7 @@ static u64 cet_ibt_func(void)
+ 	printf("No endbr64 instruction at jmp target, this triggers #CP...\n");
+ 	asm volatile ("movq $2, %rcx\n"
+ 		      "dec %rcx\n"
+-		      "leaq 2f, %rax\n"
++		      "leaq 2f(%rip), %rax\n"
+ 		      "jmp *%rax \n"
+ 		      "2:\n"
+ 		      "dec %rcx\n");
+@@ -67,7 +67,8 @@ void test_func(void) {
+ 			"pushq %[user_stack_top]\n\t"
+ 			"pushfq\n\t"
+ 			"pushq %[user_cs]\n\t"
+-			"pushq $user_mode\n\t"
++			"lea user_mode(%%rip), %%rax\n\t"
++			"pushq %%rax\n\t"
+ 			"iretq\n"
+ 
+ 			"user_mode:\n\t"
+@@ -77,7 +78,8 @@ void test_func(void) {
+ 			[user_ds]"i"(USER_DS),
+ 			[user_cs]"i"(USER_CS),
+ 			[user_stack_top]"r"(user_stack +
+-					sizeof(user_stack)));
++					sizeof(user_stack))
++			: "rax");
+ }
+ 
+ #define SAVE_REGS() \
+diff --git a/x86/emulator.c b/x86/emulator.c
+index 9fda1a0..4d2de24 100644
+--- a/x86/emulator.c
++++ b/x86/emulator.c
+@@ -262,12 +262,13 @@ static void test_pop(void *mem)
+ 
+ 	asm volatile("mov %%rsp, %[tmp] \n\t"
+ 		     "mov %[stack_top], %%rsp \n\t"
+-		     "push $1f \n\t"
++		     "lea 1f(%%rip), %%rax \n\t"
++		     "push %%rax \n\t"
+ 		     "ret \n\t"
+ 		     "2: jmp 2b \n\t"
+ 		     "1: mov %[tmp], %%rsp"
+ 		     : [tmp]"=&r"(tmp) : [stack_top]"r"(stack_top)
+-		     : "memory");
++		     : "memory", "rax");
+ 	report(1, "ret");
+ 
+ 	stack_top[-1] = 0x778899;
+diff --git a/x86/eventinj.c b/x86/eventinj.c
+index 46593c9..0cd68e8 100644
+--- a/x86/eventinj.c
++++ b/x86/eventinj.c
+@@ -155,9 +155,11 @@ asm("do_iret:"
+ 	"pushf"W" \n\t"
+ 	"mov %cs, %ecx \n\t"
+ 	"push"W" %"R "cx \n\t"
+-	"push"W" $2f \n\t"
++	"lea"W" 2f(%"R "ip), %"R "bx \n\t"
++	"push"W" %"R "bx \n\t"
+ 
+-	"cmpb $0, no_test_device\n\t"	// see if need to flush
++	"mov no_test_device(%"R "ip), %bl \n\t"
++	"cmpb $0, %bl\n\t"		// see if need to flush
+ 	"jnz 1f\n\t"
+ 	"outl %eax, $0xe4 \n\t"		// flush page
+ 	"1: \n\t"
+diff --git a/x86/smap.c b/x86/smap.c
+index ac2c8d5..b3ee16f 100644
+--- a/x86/smap.c
++++ b/x86/smap.c
+@@ -161,10 +161,10 @@ int main(int ac, char **av)
+ 		test = -1;
+ 		asm("or $(" xstr(USER_BASE) "), %"R "sp \n"
+ 		    "push $44 \n "
+-		    "decl test\n"
++		    "decl test(%"R "ip)\n"
+ 		    "and $~(" xstr(USER_BASE) "), %"R "sp \n"
+ 		    "pop %"R "ax\n"
+-		    "movl %eax, test");
++		    "movl %eax, test(%"R "ip)");
+ 		report(pf_count == 0 && test == 44,
+ 		       "write to user stack with AC=1");
+ 
+@@ -173,10 +173,10 @@ int main(int ac, char **av)
+ 		test = -1;
+ 		asm("or $(" xstr(USER_BASE) "), %"R "sp \n"
+ 		    "push $45 \n "
+-		    "decl test\n"
++		    "decl test(%"R "ip)\n"
+ 		    "and $~(" xstr(USER_BASE) "), %"R "sp \n"
+ 		    "pop %"R "ax\n"
+-		    "movl %eax, test");
++		    "movl %eax, test(%"R "ip)");
+ 		report(pf_count == 1 && test == 45 && save == -1,
+ 		       "write to user stack with AC=0");
+ 
+diff --git a/x86/umip.c b/x86/umip.c
+index c5700b3..8b4e798 100644
+--- a/x86/umip.c
++++ b/x86/umip.c
+@@ -23,7 +23,10 @@ static void gp_handler(struct ex_regs *regs)
+ 
+ #define GP_ASM(stmt, in, clobber)                  \
+     asm volatile (                                 \
+-          "mov" W " $1f, %[expected_rip]\n\t"      \
++          "push" W " %%" R "ax\n\t"                \
++	  "lea 1f(%%" R "ip), %%" R "ax\n\t"       \
++          "mov %%" R "ax, %[expected_rip]\n\t"     \
++          "pop" W " %%" R "ax\n\t"                 \
+           "movl $2f-1f, %[skip_count]\n\t"         \
+           "1: " stmt "\n\t"                        \
+           "2: "                                    \
+@@ -130,7 +133,8 @@ static int do_ring3(void (*fn)(const char *), const char *arg)
+ 		  "push" W " %%" R "dx \n\t"
+ 		  "pushf" W "\n\t"
+ 		  "push" W " %[user_cs] \n\t"
+-		  "push" W " $1f \n\t"
++		  "lea 1f(%%" R "ip), %%" R "dx \n\t"
++		  "push" W " %%" R "dx \n\t"
+ 		  "iret" W "\n"
+ 		  "1: \n\t"
+ 		  "push %%" R "cx\n\t"   /* save kernel SP */
+@@ -144,7 +148,7 @@ static int do_ring3(void (*fn)(const char *), const char *arg)
  #endif
- 	retq
  
- ap_start64:
--#ifndef CONFIG_EFI
- 	call reset_apic
- 	call load_tss
- 	call enable_apic
-@@ -259,12 +260,38 @@ ap_start64:
- 	call enable_x2apic
- 	sti
- 	nop
-+#ifdef CONFIG_EFI
-+	lock incw cpu_online_count(%rip)
-+#else
- 	lock incw cpu_online_count
- #endif
-+
- 1:	hlt
- 	jmp 1b
- 
- #ifdef CONFIG_EFI
-+setup_gdt64:
-+	lgdt gdt64_desc(%rip)
-+	call load_tss
-+
-+	setup_segments
-+
-+	movabsq $flush_cs, %rax
-+	pushq $0x8
-+	pushq %rax
-+	retfq
-+flush_cs:
-+	ret
-+
-+setup_idt64:
-+	lidtq idt_descr(%rip)
-+	ret
-+
-+setup_cr3:
-+	movabsq $ptl4, %rax
-+	mov %rax, %cr3
-+	ret
-+
- .globl _efi_pe_entry
- _efi_pe_entry:
- 	# EFI image loader calls this with rcx=efi_handle,
-@@ -276,15 +303,27 @@ _efi_pe_entry:
- 	pushq   %rsi
- 
- 	call efi_main
--#endif
- 
-+.globl start64
- start64:
--#ifndef CONFIG_EFI
-+	cli
-+	lea stacktop(%rip), %rsp
-+
-+	setup_percpu_area
-+	call setup_gdt64
-+	call setup_idt64
-+	call setup_cr3
-+#else
-+start64:
-+#endif
- 	call reset_apic
-+#ifndef CONFIG_EFI
- 	call load_tss
-+#endif
- 	call mask_pic_interrupts
- 	call enable_apic
- 	call save_id
-+#ifndef CONFIG_EFI
- 	mov mb_boot_info(%rip), %rbx
- 	mov %rbx, %rdi
- 	call setup_multiboot
-@@ -292,18 +331,24 @@ start64:
- 	mov mb_cmdline(%rbx), %eax
- 	mov %rax, __args(%rip)
- 	call __setup_args
-+#endif
- 
- 	call ap_init
- 	call enable_x2apic
- 	call smp_init
- 
-+#ifdef CONFIG_EFI
-+	mov $0, %edi
-+	mov $0, %rsi
-+	mov $0, %rdx
-+#else
- 	mov __argc(%rip), %edi
- 	lea __argv(%rip), %rsi
- 	lea __environ(%rip), %rdx
-+#endif
- 	call main
- 	mov %eax, %edi
- 	call exit
--#endif
- 
- .globl setup_5level_page_table
- setup_5level_page_table:
-@@ -330,6 +375,7 @@ online_cpus:
- load_tss:
- #ifndef CONFIG_EFI
- 	lidtq idt_descr
-+#endif
- 	mov $(APIC_DEFAULT_PHYS_BASE + APIC_ID), %eax
- 	mov (%rax), %eax
- 	shr $24, %eax
-@@ -337,6 +383,18 @@ load_tss:
- 	shl $4, %ebx
- 	mov $((tss_end - tss) / max_cpus), %edx
- 	imul %edx
-+#ifdef CONFIG_EFI
-+	lea tss(%rip), %rax
-+	lea tss_descr(%rip), %rcx
-+	add %rbx, %rcx
-+	mov %ax, 2(%rcx)
-+	shr $16, %rax
-+	mov %al, 4(%rcx)
-+	shr $8, %rax
-+	mov %al, 7(%rcx)
-+	shr $8, %rax
-+	mov %eax, 8(%rcx)
-+#else
- 	add $tss, %rax
- 	mov %ax, tss_descr+2(%rbx)
- 	shr $16, %rax
-@@ -345,9 +403,9 @@ load_tss:
- 	mov %al, tss_descr+7(%rbx)
- 	shr $8, %rax
- 	mov %eax, tss_descr+8(%rbx)
-+#endif
- 	lea tss_descr-gdt64(%rbx), %rax
- 	ltr %ax
--#endif
- 	ret
- 
- ap_init:
-diff --git a/x86/efi_main.c b/x86/efi_main.c
-index be3f9ab..c542fb9 100644
---- a/x86/efi_main.c
-+++ b/x86/efi_main.c
-@@ -7,6 +7,7 @@ efi_system_table_t *efi_system_table = NULL;
- 
- extern char ImageBase;
- extern char _DYNAMIC;
-+extern void start64(void);
- 
- static void efi_free_pool(void *ptr)
- {
+ 		  "pop %%" R "cx\n\t"
+-		  "mov $1f, %%" R "dx\n\t"
++		  "lea 1f(%%" R "ip), %%" R "dx\n\t"
+ 		  "int %[kernel_entry_vector]\n\t"
+ 		  ".section .text.entry \n\t"
+ 		  "kernel_entry: \n\t"
 -- 
 2.30.2
 
