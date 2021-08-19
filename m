@@ -2,152 +2,89 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D63DE3F22E9
-	for <lists+kvm@lfdr.de>; Fri, 20 Aug 2021 00:19:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id F15733F22FB
+	for <lists+kvm@lfdr.de>; Fri, 20 Aug 2021 00:20:23 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235679AbhHSWT7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 19 Aug 2021 18:19:59 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:54144 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S235805AbhHSWT5 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 19 Aug 2021 18:19:57 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1629411559;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=EbhZJqeN1nM9qIrKQm6mxxNUIRdgxznhenqwUNNt6uM=;
-        b=IYbl6FGEUZN0CgLVj9Q2tvLRbGaTSkfWW7aWXdzMpbxEjVSn0IICuA7XXu0Bne07oXpzPh
-        VSst/rxjWvyvNTio0TBnQP8yjzEu2mQ5/0i+Szj4QILHcMXVPJywAqvgq84YGJ62L2uYkj
-        FEsX4gUUJSfLC0WbeSUsxhV5JBOYNPs=
-Received: from mail-ot1-f69.google.com (mail-ot1-f69.google.com
- [209.85.210.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-222-tyvhZXe6NR-ANRcrxTYtKg-1; Thu, 19 Aug 2021 18:19:17 -0400
-X-MC-Unique: tyvhZXe6NR-ANRcrxTYtKg-1
-Received: by mail-ot1-f69.google.com with SMTP id q5-20020a9d65450000b0290510db97edd8so3504710otl.8
-        for <kvm@vger.kernel.org>; Thu, 19 Aug 2021 15:19:17 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=EbhZJqeN1nM9qIrKQm6mxxNUIRdgxznhenqwUNNt6uM=;
-        b=HwTy3UxNoL4BlJ3XjAFsE1M+yFXslJqIFWBgsrZDfraSDRtZxBwY+t7YwgIfR/lYoY
-         mDP2HjY04LdaWcHFDEAofzp5nsuF8JQR3lmZ31Gmwntx0EE0u1+9DykzvxDokuyS3xvQ
-         e/ifolFO1dRpzr+0IW96j6c2OGs5H7HinqNXD9elRwUSaORmcsjPg21DGKjxq5TG8JtM
-         x/nWfsARP14kqO/KVPKFzZV+gvgoxAWkknAKZIIuvJuf6kTnxvi9fjk7pQNfzqD55iTU
-         LL2ulKPLSvZEifPHxJohhHBza1hAU6bVEz0CYAzOFGxmMEQz99qaimbE8CDDQAMxHc/9
-         BFxQ==
-X-Gm-Message-State: AOAM533+tott63a5efnqx5Tq6BZ4u1uOwcLm1mCJJjsLE7hQZTvLP0Hj
-        EbtjmlzgtQgFP3mqlTf+8F7l0NfYXRj+NdHKtkIq1Z4gIu3K3JOCnI2Tk/iyJncLhNdKR5j2OgT
-        neSszQQgxmkKh
-X-Received: by 2002:a4a:a552:: with SMTP id s18mr13338725oom.1.1629411556752;
-        Thu, 19 Aug 2021 15:19:16 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzX5rfq5sQLsDwtph+vjRR0C26I9lgF4XK9hL1qrYyyg0cWYI/hPwJPKxCIkfjVts0o9JG5Kg==
-X-Received: by 2002:a4a:a552:: with SMTP id s18mr13338701oom.1.1629411556534;
-        Thu, 19 Aug 2021 15:19:16 -0700 (PDT)
-Received: from redhat.com ([198.99.80.109])
-        by smtp.gmail.com with ESMTPSA id z25sm942600oic.24.2021.08.19.15.19.15
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 19 Aug 2021 15:19:16 -0700 (PDT)
-Date:   Thu, 19 Aug 2021 16:19:14 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Max Gurtovoy <mgurtovoy@nvidia.com>
-Cc:     Bjorn Helgaas <helgaas@kernel.org>,
-        Yishai Hadas <yishaih@nvidia.com>, <bhelgaas@google.com>,
-        <corbet@lwn.net>, <diana.craciun@oss.nxp.com>,
-        <kwankhede@nvidia.com>, <eric.auger@redhat.com>,
-        <masahiroy@kernel.org>, <michal.lkml@markovi.net>,
-        <linux-pci@vger.kernel.org>, <linux-doc@vger.kernel.org>,
-        <kvm@vger.kernel.org>, <linux-s390@vger.kernel.org>,
-        <linux-kbuild@vger.kernel.org>, <jgg@nvidia.com>,
-        <maorg@nvidia.com>, <leonro@nvidia.com>
-Subject: Re: [PATCH V2 09/12] PCI: Add 'override_only' bitmap to struct
- pci_device_id
-Message-ID: <20210819161914.7ad2e80e.alex.williamson@redhat.com>
-In-Reply-To: <cd749d14-16ba-6442-0855-32c1bfac6e2d@nvidia.com>
-References: <20210819163945.GA3211852@bjorn-Precision-5520>
-        <cd749d14-16ba-6442-0855-32c1bfac6e2d@nvidia.com>
-X-Mailer: Claws Mail 3.18.0 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
+        id S237471AbhHSWU6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 19 Aug 2021 18:20:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40078 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S237447AbhHSWUr (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 19 Aug 2021 18:20:47 -0400
+Received: from ozlabs.org (bilbo.ozlabs.org [IPv6:2401:3900:2:1::2])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1B71CC06175F;
+        Thu, 19 Aug 2021 15:20:08 -0700 (PDT)
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+        (No client certificate requested)
+        by mail.ozlabs.org (Postfix) with ESMTPSA id 4GrK2Y4V2jz9sWq;
+        Fri, 20 Aug 2021 08:20:05 +1000 (AEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
+        s=201702; t=1629411605;
+        bh=G1uxALNrsDthQbLStYQZE882NWSvU8HeHilDVuGLI7Y=;
+        h=Date:From:To:Cc:Subject:From;
+        b=S4bQ726j0cOYxE4icldqJsoeSnq/7OmWSX4FfmU+QAVhNC7kJA+eOglBh6yczNcjz
+         a7kSPl/YKsD5WYqy0qC8+ABUE36VXzgSwrllFSpEh/2vjox/0lC09sqhH/ZtKkYgcF
+         Bp5+p3HV8PNzlUbkU2y+k5jzqI1zTvByO65O+o8xExLkhcawoUfviAKxiwSCBDr1TW
+         Mw9NVW/EhoBPDJPUiJJqelzOw4UmQ47M/42UiyNpmBjyCph3ugRvtrxUl///g9Lulk
+         a58NoFn5qdTIRq97MJI7HQlomtOVwbJMsUtAcYRPgZyFj83P//2gPJar3eCvNm+qTl
+         Q0XLroCzvLOfg==
+Date:   Fri, 20 Aug 2021 08:20:04 +1000
+From:   Stephen Rothwell <sfr@canb.auug.org.au>
+To:     Paolo Bonzini <pbonzini@redhat.com>, KVM <kvm@vger.kernel.org>
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Linux Next Mailing List <linux-next@vger.kernel.org>
+Subject: linux-next: Fixes tag needs some work in the kvm tree
+Message-ID: <20210820082004.7556d96a@canb.auug.org.au>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: multipart/signed; boundary="Sig_//Cb20sIlI7P9t9utNT3Zluz";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 19 Aug 2021 22:57:30 +0300
-Max Gurtovoy <mgurtovoy@nvidia.com> wrote:
+--Sig_//Cb20sIlI7P9t9utNT3Zluz
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-> On 8/19/2021 7:39 PM, Bjorn Helgaas wrote:
-> > On Thu, Aug 19, 2021 at 07:16:20PM +0300, Yishai Hadas wrote:  
-> >> On 8/19/2021 6:15 PM, Bjorn Helgaas wrote:  
-> >>> On Wed, Aug 18, 2021 at 06:16:03PM +0300, Yishai Hadas wrote:  
-> >>>> From: Max Gurtovoy <mgurtovoy@nvidia.com>
-> >>>>    /**
-> >>>>     * struct pci_device_id - PCI device ID structure
-> >>>>     * @vendor:		Vendor ID to match (or PCI_ANY_ID)
-> >>>> @@ -34,12 +38,14 @@ typedef unsigned long kernel_ulong_t;
-> >>>>     *			Best practice is to use driver_data as an index
-> >>>>     *			into a static list of equivalent device types,
-> >>>>     *			instead of using it as a pointer.
-> >>>> + * @override_only:	Bitmap for override_only PCI drivers.  
-> >>> "Match only when dev->driver_override is this driver"?  
-> >> Just to be aligned here,
-> >>
-> >> This field will stay __u32 and may hold at the most 1 bit value set to
-> >> represent the actual subsystem/driver.  
-> > The PCI core does not require "at most 1 bit is set."
-> >
-> > Actually, I don't think even the file2alias code requires that.  If
-> > you set two bits, you can generate two aliases.
-> >  
-> >> This is required to later on set the correct prefix in the modules.alias
-> >> file, and you just suggested to change the comment as of above, right ?  
-> > Yes, __u32 is fine and I'm only suggesting a comment change here.  
-> 
-> great.
-> 
-> 
-> >  
-> >>> As far as PCI core is concerned there's no need for this to be a
-> >>> bitmap.
-> >>>
-> >>> I think this would make more sense if split into two patches.  The
-> >>> first would add override_only and change pci_match_device().  Then
-> >>> there's no confusion about whether this is specific to VFIO.  
-> >> Splitting may end-up the first patch with a dead-code on below, as
-> >> found_id->override_only will be always 0.
-> >>
-> >> If you still believe that this is better we can do it.  
-> > I think it's fine to add the functionality in one patch and use it in
-> > the next if it makes the commit clearer.  I wouldn't want to add
-> > functionality that's not used at all in the series, but it's OK when
-> > they're both posted together.  
-> 
-> Ok. We can do the separation if all agree that the first commit is have 
-> a dead section.
-> 
-> Alex,
-> 
-> we would like to get few more reviewed-by signatures and we'll send the 
-> V3 series in a couple of days to make it to 5.15 merge window as we planned.
-> 
-> Are you ok with the series after we got the green light for this patch ?
-> 
-> do you think we need another pair of eyes to review the other patches ?
+Hi all,
 
-More eyes is always better, but I'm not finding much to complain about
-in this series.  This patch was probably the most pivotal for agreement,
-the rest is largely mechanical at this point.
+In commit
 
-In addition to Bjorn for the PCI parts of this, I'd also like to see an
-ack from Yamada-san or Michal for scripts/mod/, who are already cc'd 
+  f7782bb8d818 ("KVM: nVMX: Unconditionally clear nested.pi_pending on nest=
+ed VM-Enter")
 
-I also notice include/linux/vfio_pci_core.h doesn't get added to
-MAINTAINERS in the series.  Please fix in patch 12/
+Fixes tag
 
-It seems plausible that this could be ready for v5.15.  Thanks,
+  Fixes: 47d3530f86c0 ("KVM: x86: Exit to userspace when kvm_check_nested_e=
+vents fails")
 
-Alex
+has these problem(s):
 
+  - Target SHA1 does not exist
+
+I can't easily find the intended commit.
+
+--=20
+Cheers,
+Stephen Rothwell
+
+--Sig_//Cb20sIlI7P9t9utNT3Zluz
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmEe2RQACgkQAVBC80lX
+0GyUOAf/TBsldQpVzbM6uAs40tBOzQd+I70cPQKGiKSqFP1/2uRlVDA1lo+wp0hw
+h0xIi3yOzYk8LUZt/cb7z0CB1eeKRXHPhrYOclzsX/1qLZVofe5TZoMukNhGNxPh
+aTnrTTofJZr9PgrgjB8TTYUUszxECSxXEsAF85VBx35pWXzQuK9o2YMguFK5ZICb
+M0hDdjQd2lne9qAYCMG92s/KF4VGv1SCuXquz9uICV0fYh2ioM5svgEcBwXQ25hH
+HAlDTMC1zjVTQAv5T2bSDxq17eCbN9JWHryonDYWuPNWqEij5RruIknpiKTL+11q
+pxX7GuC8GAB/nB0ZxuFh7T79hGMTow==
+=487y
+-----END PGP SIGNATURE-----
+
+--Sig_//Cb20sIlI7P9t9utNT3Zluz--
