@@ -2,177 +2,190 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B41BD3F23DE
-	for <lists+kvm@lfdr.de>; Fri, 20 Aug 2021 01:54:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A8CE83F254A
+	for <lists+kvm@lfdr.de>; Fri, 20 Aug 2021 05:29:45 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236282AbhHSXyt (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 19 Aug 2021 19:54:49 -0400
-Received: from mx0b-00069f02.pphosted.com ([205.220.177.32]:2642 "EHLO
-        mx0b-00069f02.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S233972AbhHSXyr (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 19 Aug 2021 19:54:47 -0400
-Received: from pps.filterd (m0246632.ppops.net [127.0.0.1])
-        by mx0b-00069f02.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 17JNkH2D012599;
-        Thu, 19 Aug 2021 23:54:09 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
- subject : date : message-id : content-type : mime-version;
- s=corp-2021-07-09; bh=bhjxAZ5P+bzBUsSJKq2APgMuCkbOsayAgCEXev1Q3tk=;
- b=ERCQkw2DkdChiMaJG0U+zMy1yhWR4xq3XVGA8qawU5naFRBAorv/URSlv7C5gyYLuUnm
- uiNKbax+bfmEOc+nDsZV5v7LYyXoUldVqRxoa350kwvtCgVIS0/8B3dWsqHUEaeW9puI
- mOsoC9xpQ5BfJ45tklK8eSosbquI5siF2MMCRQ8OjyctspNdoh30gVm+mqO/snbV+4Hf
- NhcKJJ3X9hZsj384ivHwuZOQopKxydvGJwTfafpbE0QP9E/n0P7Qo0hjnQrzq/009Rm6
- tvhNJS+quePhCamU9j+vddY/I8Qio2z+H2Mf/hqFo52keCCS7HjwTWVB5gJTv6G+jKQK lw== 
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
- subject : date : message-id : content-type : mime-version;
- s=corp-2020-01-29; bh=bhjxAZ5P+bzBUsSJKq2APgMuCkbOsayAgCEXev1Q3tk=;
- b=o4S6EhSgUrVXSb/poz/qj6aHR5WxbV8CQwSqhWwPdHOZU2Lp8aq18Vv6ckwSTOwKgM7V
- 59n6SEVsJjaWZSyH3QxSZuBHSgElia9TojYjeCvH3JlcFW0vBGvjJ48QYCQP2cccBb9C
- Wbb4dZTsdTrnyLBPca0r/8UJ5Awux5ATD/HxSzh1ZdA5VBmNTz7SFUtJv0UtysGKGRh+
- vPNklKTdeB+ne5BcTKALY5ftMEmXmSO3uDI48TBliWjgoxVsQ33FzyQtW4U6qJLLUqPm
- DbsPoMUGDhkl34lIJIb0iouv4uaWeXwvILZ/NgYf3kSUGNGwFpY6zkiEw+1wkKoIkKj4 8A== 
-Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
-        by mx0b-00069f02.pphosted.com with ESMTP id 3agw7t51cw-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 19 Aug 2021 23:54:09 +0000
-Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
-        by aserp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 17JNiu0M020308;
-        Thu, 19 Aug 2021 23:54:08 GMT
-Received: from nam11-co1-obe.outbound.protection.outlook.com (mail-co1nam11lp2175.outbound.protection.outlook.com [104.47.56.175])
-        by aserp3020.oracle.com with ESMTP id 3ae5ncgfen-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 19 Aug 2021 23:54:07 +0000
+        id S238229AbhHTDaR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 19 Aug 2021 23:30:17 -0400
+Received: from mail-dm3nam07on2048.outbound.protection.outlook.com ([40.107.95.48]:5601
+        "EHLO NAM02-DM3-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S238069AbhHTDaP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 19 Aug 2021 23:30:15 -0400
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=m93J/VY3dAy1/OmOCT8aeUWorJOnDnZ/z3ZSvr8MWzVCdXsviCx8oflrtgymuYwBRLW58nxvDYWPjLQiowyQjIy4JnFnIPNuPReuzf5FG+PmNWyOL8t1rxK4tXPo4sLGVjBNeydsJuWV8/vT14gDsuur8o9FTPAVuBrdoSbJ3y3kG6ls6wVhTH5jxIvI5knf50MxzbaRnTVjSkRFnmW+dkc+U2ih4COKF/yBGl66M5bh1FAfFVUfXxgVLxM7F92okozpsRLgY1qASqyuBB0P+LrS/mh4YhwnEZfvUSnKBn/QlWAg5R+AS3qtIdjYRCPH5XIwPaTmdva38N2LGNlC8g==
+ b=Z/Kpr4EKW5UC0iAIM/EUgPqcxi8lx09nxQP5nu7oN56GVBg/G/BfcJpQxV1aY9g+qljvpl2erwr7IQaeqSqTCmHEtf/eHFdYhXmw1pmULSKJktToHkvROtjA8vblqBv2mz3Moxea3riVyYv+UsZeOwSgSYWuqfU1Sczh/2fMGhNK3T08tg49jCbe8JUZRQORcr1EBf/hRqYgdK2YW3MC9R5c1CEUlgyZXKk6MpPkGWMnRMDtu0Dr+It946hweHV49xl8/RlJ4kggUFweJRhr0bsJmUdCtT9jES7ZgfooVpKUDkHl8li/+jE3kkibvXPhkfymdQkh4N15BMfpWC/OYg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=bhjxAZ5P+bzBUsSJKq2APgMuCkbOsayAgCEXev1Q3tk=;
- b=DEBQ66HiFdkJztzKPiqrHSm9fJVmXTfuzinFEu4O2+UgZmP/Uyw8HPJU7Ui9h4j6xQNUyWJMhI8PIodO2mobgiv0pQ5YfL5ZKgymuWvvdmGXUw6/Rk2xQMvxOjTs2VG2j8OrIM4MD2XKrllcMaTcBDJ9gEv3oGbTYPBAFPMvMV5C7jUzcReaMQycDFj7hGuT7PYYoQGeTKzuXBelwCam/bsXRuvchOKLsu1dr5xvu004tW8ztfaeoCQIn9SO/V0rEPM541jwBfVwMIaRyMv90dl0cIhIUS9b+OBJVXwFif+R5F4CvY6TQytq7TT5LEmq0e+d47Cj7IUymdlLqF0kWA==
+ bh=gAEepqksv1hZbO8bByQqarnykxMa9JTCMjNo3XGp1r0=;
+ b=ZXZR31fk0Q59J61BZR5UX6agBljKDprVULXSTk/ss3gAz5O1UXx34eEApg2DAlDg1zTGllO6HlOag1g7fP9vwEnDn59Zf0odlmClc+4+95JVo5dmuWJaJzdFLbDXWeOIax3PdALiluGB0VllG0O5i+7R+BtCiU8K56i8RzsK6AWNaZOxuuZM6HyvI2Jo3QfJ/zNM0cbiqZojh2eeDKoVy8U7YTBrJo7jsGleutoKiw7A9OLqBq3+NimolgxCSQ9b3pyLePRpAHg0XFPBgNWTpjtCFtBqfV8VWAYHLMyzCef0sqVETV10h7nh30zaGBakNWDDXkpGD/Hs4LrkYP9Aaw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
- dkim=pass header.d=oracle.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=bhjxAZ5P+bzBUsSJKq2APgMuCkbOsayAgCEXev1Q3tk=;
- b=BP/DOp1YOObb++3tgEQt9RZe+tEg97HqvaJG8rQXWtjqwMlPKdZAqn7fYff0Zn9JfpgHnmq8i96FpICoc16biqSAtzMuiwua68+sO+lVL4v50EVlOxHRSrMsVoVg8MdnnLaAQ2arjzPIzAyJ/WN8SWx5y57OiofKnowwvCncbbM=
-Authentication-Results: vger.kernel.org; dkim=none (message not signed)
- header.d=none;vger.kernel.org; dmarc=none action=none header.from=oracle.com;
-Received: from MN2PR10MB3533.namprd10.prod.outlook.com (2603:10b6:208:118::32)
- by MN2PR10MB3135.namprd10.prod.outlook.com (2603:10b6:208:121::15) with
+ bh=gAEepqksv1hZbO8bByQqarnykxMa9JTCMjNo3XGp1r0=;
+ b=XaXDDvQD2n7ia11F1PAqn9M5CTWNDOfdXxdDiV3zlwCLXh7+Zxb85K6WtceXbJYSowcHdU/DyVo5FK6iQZWYi0OYRNy/+ttpcIkUrrRYfShbEEmVMzsD8ufD+/+HFOIB32GPnbVv2+MKZbSMaArdNIZOWVXjf9NR/iPGIuym0Ik=
+Authentication-Results: alien8.de; dkim=none (message not signed)
+ header.d=none;alien8.de; dmarc=none action=none header.from=amd.com;
+Received: from CH2PR12MB4133.namprd12.prod.outlook.com (2603:10b6:610:7a::13)
+ by CH2PR12MB4005.namprd12.prod.outlook.com (2603:10b6:610:22::32) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4415.21; Thu, 19 Aug
- 2021 23:54:06 +0000
-Received: from MN2PR10MB3533.namprd10.prod.outlook.com
- ([fe80::b4a5:da86:b597:8547]) by MN2PR10MB3533.namprd10.prod.outlook.com
- ([fe80::b4a5:da86:b597:8547%7]) with mapi id 15.20.4415.024; Thu, 19 Aug 2021
- 23:54:06 +0000
-From:   Anthony Yznaga <anthony.yznaga@oracle.com>
-To:     kvm@vger.kernel.org
-Cc:     alex.williamson@redhat.com, steven.sistare@oracle.com
-Subject: [PATCH] vfio/type1: Fix vfio_find_dma_valid return
-Date:   Thu, 19 Aug 2021 16:53:57 -0700
-Message-Id: <1629417237-8924-1-git-send-email-anthony.yznaga@oracle.com>
-X-Mailer: git-send-email 1.8.3.1
-Content-Type: text/plain
-X-ClientProxiedBy: SA0PR11CA0191.namprd11.prod.outlook.com
- (2603:10b6:806:1bc::16) To MN2PR10MB3533.namprd10.prod.outlook.com
- (2603:10b6:208:118::32)
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4436.19; Fri, 20 Aug
+ 2021 03:29:35 +0000
+Received: from CH2PR12MB4133.namprd12.prod.outlook.com
+ ([fe80::d19e:b657:5259:24d0]) by CH2PR12MB4133.namprd12.prod.outlook.com
+ ([fe80::d19e:b657:5259:24d0%8]) with mapi id 15.20.4436.019; Fri, 20 Aug 2021
+ 03:29:35 +0000
+Date:   Thu, 19 Aug 2021 18:42:58 -0500
+From:   Michael Roth <michael.roth@amd.com>
+To:     Borislav Petkov <bp@alien8.de>
+Cc:     Brijesh Singh <brijesh.singh@amd.com>, x86@kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
+        linux-coco@lists.linux.dev, linux-mm@kvack.org,
+        linux-crypto@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        David Rientjes <rientjes@google.com>,
+        Dov Murik <dovmurik@linux.ibm.com>,
+        Tobin Feldman-Fitzthum <tobin@ibm.com>,
+        Vlastimil Babka <vbabka@suse.cz>, tony.luck@intel.com,
+        brijesh.ksingh@gmail.com
+Subject: Re: [PATCH Part1 RFC v4 24/36] x86/compressed/acpi: move EFI config
+ table access to common code
+Message-ID: <20210819234258.drlyzowk7y3t5wnw@amd.com>
+References: <20210707181506.30489-1-brijesh.singh@amd.com>
+ <20210707181506.30489-25-brijesh.singh@amd.com>
+ <YR42323cUxsbQo5h@zn.tnic>
+ <20210819145831.42uszc4lcsffebzu@amd.com>
+ <YR6QVh3qZUxqsyI+@zn.tnic>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <YR6QVh3qZUxqsyI+@zn.tnic>
+X-ClientProxiedBy: SN7PR04CA0029.namprd04.prod.outlook.com
+ (2603:10b6:806:f2::34) To CH2PR12MB4133.namprd12.prod.outlook.com
+ (2603:10b6:610:7a::13)
 MIME-Version: 1.0
 X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from ca-qasparc-x86-2.us.oracle.com (148.87.23.4) by SA0PR11CA0191.namprd11.prod.outlook.com (2603:10b6:806:1bc::16) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4436.19 via Frontend Transport; Thu, 19 Aug 2021 23:54:05 +0000
+Received: from localhost (165.204.77.11) by SN7PR04CA0029.namprd04.prod.outlook.com (2603:10b6:806:f2::34) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4436.19 via Frontend Transport; Fri, 20 Aug 2021 03:29:34 +0000
 X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 0828a191-8bff-47e6-af7d-08d9636ca0eb
-X-MS-TrafficTypeDiagnostic: MN2PR10MB3135:
+X-MS-Office365-Filtering-Correlation-Id: 72df3fc7-eb2c-4948-b7d8-08d9638abb34
+X-MS-TrafficTypeDiagnostic: CH2PR12MB4005:
 X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <MN2PR10MB31350917FB5BA9D9D1DD8026ECC09@MN2PR10MB3135.namprd10.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:6108;
+X-Microsoft-Antispam-PRVS: <CH2PR12MB400520FED0F33BE3A6894A0695C19@CH2PR12MB4005.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:8273;
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: e57H1jWOlw/uZlYr9y4KK1+FgSws8XSLbvWiJ2IdeNjq90cU7aEFtlYHDi4cn1Fh9m/503F7HKY6H8sJTLEl69OM1XI4NfwUpmDOSY0Gzs0yWiAAisU69vLRs0pot3sb1AhB3fcXXw8QyjSvYEwk/W3qvShdNpY4qYTxYOk1DoPxcFHI8xHLW3dvLsvOHoZ9TZEiJ2Z8yRb8/zrxJb0tQJbLMwcGG8ajrd9f1Piwx63xaF5wAYYcdPmy9JCyK4KpAfUz19rbpfw5H5hIvoP0qGl4p7gG2/vO2GG34EOYDsUxVwxKDl1k+qcv9/l2xnRXLZP41jhPzRSs1AOVoVG6D+c/6600nxDORJgdrSnxRoP6lg4fDAQR9cem85Sw0f45ivx6H9ss0yGw5BdchOWysNnVRjJmawtYHXqJ4vg9SgyAm1YxXEMAoC3hKBqKeGvFgQxxu6iFTvZ+C5pcwgoKFltDaIg0ovj7QUAdVDZnOwrW49SgICwKvp4OCsFohKS9e1jny8I02zdkYC4AR30x72epJKHz3QNo5X6Wz4LhYRhrg9BU1UUZJf0uPPVEugo+1UFXDljYsZwc1YEkz4w+hQl7cbRMxp3Zf6xvrgyhUx1LjMl8PGK/3ieHP+S5wlBbKbck2jQSISPY2xiSgYEPhx7llP6yCGT9PXwfudrabVS3j8+hOsiY3xursCyqeV3HKpDDefu/75LdtJNP6vsvYA==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN2PR10MB3533.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(39860400002)(346002)(136003)(396003)(376002)(366004)(107886003)(4326008)(8936002)(36756003)(38100700002)(52116002)(956004)(2616005)(44832011)(26005)(86362001)(6916009)(8676002)(186003)(2906002)(66946007)(5660300002)(316002)(38350700002)(6486002)(7696005)(478600001)(6666004)(66476007)(66556008)(83380400001);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam-Message-Info: wIpLG1cuHuoUZAvFO4GCjJ1e3sq/euyjP9yjvpl6lymCIbZH+y/y6sM3gEnM1hrjuhpOk64gW964D5Qcq3yoCHYfyemJdqjW2xR+aHH5pwCRmCSEwIWHkRVLLGzhls2RiNidkve/O3mC97VqDhKPktsAeDYR3Z30JYNnlhriPMpeZmQofBEBaUpk3BvPPy5zNmRH97NZVxH/ji7pIEi6SdqS0dn2t0/5PI86wGj0A2S5L5SAgVX7W7gGmgQDFdtEPrkKn6otipK4vn4KO6h9PAJaDeg60nlfybkRHkRxSUJ520aCaZp4jT9T55kAJFxO7z9uRxeonP9bHwwa70wZ9nBMmwxpZTKjDQTc/n5N4jnnDsE83gk+7n2IoIbtRd1/2s0ii9MTw0p3kucuvtmyFOzDfymi+7Xb8Sw7FweFatXvLjspjs8jP5iYte7Clwr7izAJ1xbDRixygDpEnFBh7yRM5rHa9+bkyblrgtwcw2ORimy6X3cejhgPe14b/2jrzONXM/lv/egwxnC3j2IpSmFSazPpbw4BOk9dmOvmNTNjK+YkxFjcozILhEfHWLDfn0iylJPCSF8G4vhGSz3DXMPWRxy1QL6z0Mo4mXghsUkriiZiqYKTCON8s+Svbx3FSw9lv7ZN1ckmGQzemvOmT89cfuPDGSxIS0vZDJiK5Coh+zgVHRnkFgUIPLPkW9vil3k+aP00ESth3ePY1fUiApX84yZ+nSoQuhscDYW4tI0e686jgQkNcScFBDSWAgbHyDpnNl+ZiLCDF8Sjvshfqg==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH2PR12MB4133.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(346002)(366004)(396003)(39860400002)(376002)(136003)(4326008)(54906003)(83380400001)(5660300002)(966005)(36756003)(45080400002)(186003)(66476007)(52116002)(1076003)(6486002)(6496006)(66946007)(478600001)(6666004)(66556008)(26005)(7406005)(8936002)(6916009)(7416002)(8676002)(2616005)(956004)(38350700002)(44832011)(38100700002)(2906002)(86362001)(316002);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?l+zS/rpa/NcSJJl76ikpYEgZKH1PWs+UqvUukbJZPBenjHpLai8FEauWuCqQ?=
- =?us-ascii?Q?CuTDC011bwgNIKlYEa01YcumD9nfpjr93R40sPHifNQA4PyCcrvDEiCxD5k2?=
- =?us-ascii?Q?ub8pfRAu1F4Runlrt5c6oichRliIPtDixfYd1i50C/tVmVKjJKmf0tjeBon1?=
- =?us-ascii?Q?cf3OfOmVouERMKfDOLKmBnGiJgk++9d72Gm/21lmdkuGnJsxz3YqIGob+htg?=
- =?us-ascii?Q?52dO/azhVqJNPkY554HOK4zwKRrhNHMDE0xJFTsS40EoZNxK98y5bgE+ldc+?=
- =?us-ascii?Q?4DKzDTU97NuLdEhUVxpjVwe/wWYz9Y1TRJlA0AyZNBUHv+4JH8h6SMyDgED/?=
- =?us-ascii?Q?y+dU2LFJQXSPCqA0vpLVee4AD/R9d6GgO7U0lQ+2y+5TECYNOKfzy9illDdK?=
- =?us-ascii?Q?BcMeLPUl9ks6rE47v6flnJ1hKfHiOuhKQ4N/M4j9yAbkRUnGGfErIFuzfFmr?=
- =?us-ascii?Q?rglzCoVpcToo/Ejc7yUmJVd/GcnnsLZGImhQ6yBk5vsDnZU8XmxxWPCUgUBt?=
- =?us-ascii?Q?OT0PyH/HcjzHMZZV+39w7FCTviitGUeW6+rGZ9SD1ZnxHmC+uorUyuiAHihb?=
- =?us-ascii?Q?evRa5L6MT+pJ0YgaL55E3d8V1pHhBitNpwCQypXmjUIknFnuLYqsQPVtIydp?=
- =?us-ascii?Q?b/plXt2wySmEGxU1MG9lfaPD4S/XJKEz5xfETEt9SCpNIpc7UCQi1xrWKP0s?=
- =?us-ascii?Q?j6UXBTjqOhBPODY5SOeQdwQeZsPls6l8mvAukHpJkl+il70mCPoSTkIVIWpE?=
- =?us-ascii?Q?UbJ29d4dNQcPO11U34n5yoj9VkY3xCTIvQosaGwjrtNWERuJ1iVrrl9Dqfbq?=
- =?us-ascii?Q?jHuZYNcUrPzL0w4lui8pYr7HCAmJdCLxIdt6GNIyNjQqbdIHiOK6h5VcM+7w?=
- =?us-ascii?Q?yB+AoFGOctB8A4v3ifVbQodccrwNJxcF+j8sSIABQSfjWew8la2n3VGi5Dan?=
- =?us-ascii?Q?fYpiaGNnqOZ/zOnLkFYOamVrd/tmyyDUkQafj4QccT6jfC5rVz5GNja1wNVp?=
- =?us-ascii?Q?c51atv9BugzewQrLzfY4TlcFl24SzgotDbULCIyxzud62SU29OeqyI9EsFkI?=
- =?us-ascii?Q?BdUGcQSFcRj2GtERdo4Ay/4SLyfmK3CsvavR8hT/2Ah0MZJ+SCUDCwbbtkZ6?=
- =?us-ascii?Q?sn+O6r2Iar2iFA5/PeNbathvkFGJG5F0cJM2AyiHStague2wCUS78v/laJKG?=
- =?us-ascii?Q?1J2lgnwpG7nAFuntt4/LH3EE+7cZy1Edccf3YJskoGI5Ob68q5G9BEZyHBhX?=
- =?us-ascii?Q?bJvQ2z+IO1PZh6y7wNmvxeoY5WnO8SNVW5HlcEl2uhpIXPJTReoZ/xcsDpnI?=
- =?us-ascii?Q?YQj+N14OFYaSeM3TfKvUVKWV?=
-X-OriginatorOrg: oracle.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 0828a191-8bff-47e6-af7d-08d9636ca0eb
-X-MS-Exchange-CrossTenant-AuthSource: MN2PR10MB3533.namprd10.prod.outlook.com
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?vweFfnElvbXHBDMUDyjsmNuz75vS+IeJ23nxMF1ce8c5z9GyzkJeCLIsLSIh?=
+ =?us-ascii?Q?InnLkSMt9tspJOfOIOozUKXh/Xhj6iibmbKyyOVWG1r6EfJx07/YuDjfBnaQ?=
+ =?us-ascii?Q?QG0yErgs1HaClM5pMvqSs3IuYwjiwHscmQdS2PjkJFvqSQfofnlb3bnaCCfe?=
+ =?us-ascii?Q?GnFL1dGJhj7RfSMDwhZOQzKIz5G9xA0H/ViPFt0J0l2Xuy7REUHZVp75OWgz?=
+ =?us-ascii?Q?LItYUi7WIhwxVFUEMPkHAvJwlKZRVCdpN6IQArI0kdnUhSehpXdKUHcHfIET?=
+ =?us-ascii?Q?c605ktmbYlwnYcgYKcA7d4fqDgKhdTblKCBoToB2NZhOQ2tNZb+dFCW4GpBM?=
+ =?us-ascii?Q?05r59An7CGmg4vADrbsXOZeOX2sLBN4EpIpdPVjoPJ15euApxFhXuYcBoU9g?=
+ =?us-ascii?Q?4rqciOstfRFC8FXeeqdtRcmxu4A0w8rVtvB+Qda/PwTgP7koqrG+NMurlEP7?=
+ =?us-ascii?Q?8mr9TkTO5dBbtJsYXBK6KG58Z2ExeCiEkBpyqL7zlx4UnQWRlDyVK+TPhy0O?=
+ =?us-ascii?Q?7pBLoNARAHePoo6W9gvL5PptzKauPujnCTBdE2PqAzGAziTKP5771c+ihche?=
+ =?us-ascii?Q?c38KOs0XYN3ZzdnCiHh/lrt1F7KKEY2konFQSat9ffqnbSz6BCYFuW6GwrLV?=
+ =?us-ascii?Q?Sk8un/QY3OeFabHGf4R8K8vW5NlxO8+RhEBYEosyXIPqpcqdXnxwNs7GmQCY?=
+ =?us-ascii?Q?4wfAcm/8Iah+XjkO984QndTgIZj1nrU+BBmbp1pltgBqjuHiQk1j3kW4gRcF?=
+ =?us-ascii?Q?hOj2M5VjHdJ65cwsWzbKGB5ZREhCMSCsLVIekd2V/5WEaQ1GfjCf6VkhYfy4?=
+ =?us-ascii?Q?Mfk7zsAaUb9bAV0fFanEkul0HwscI57cRpRf8QviMJJREHotBUjGvp8O65Wv?=
+ =?us-ascii?Q?DdrrSBeWfUY+TqGUl9fMSP9vw08kBojTDmZHhhfRTRt8c+BB7uITa+vOZJvj?=
+ =?us-ascii?Q?eKlyFwc2To6R+NEL/yWJjEv9NgyvFt1WooHfS3c7CWhBOKNPy7RG7dEGv+HE?=
+ =?us-ascii?Q?+7Ea6Dh/Q9I+SKXQ37ESkvPwpcHU7y0Rlnurxgc0uAxKlX/mIdw/mRQMa/aj?=
+ =?us-ascii?Q?nvFZkXEB2rY2+uU9g993Z2izzGXbXSA1seI7U+wGOF8wzPiCErhK1j8rGBoj?=
+ =?us-ascii?Q?u2/NBH1LAxgDyhYDoeAoWYuN5XgnYJIqG7+5ZO7z19GZKTbrjwIDr7guRoK2?=
+ =?us-ascii?Q?OBuwoV0C9qgigm+y4j63zBEXk/JIt6qil469+GIV/lhVp9EboWbrMiruzJBh?=
+ =?us-ascii?Q?Jj21knDs8XaehnKhbiue1+pExAgGtyNXdM9+HPwCDSFQbyCUG1e6ZN07BCCj?=
+ =?us-ascii?Q?f48GZMtKJXHJCumpx+lzEAxx?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 72df3fc7-eb2c-4948-b7d8-08d9638abb34
+X-MS-Exchange-CrossTenant-AuthSource: CH2PR12MB4133.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Aug 2021 23:54:05.8623
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Aug 2021 03:29:35.6714
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: VjiBz/kvHPqKpWER94MK9tZQlZ2rTztwCFUsO/3bPob07CyXWlQBtx0InskY0ql8vQ4lOYs8ZUY6lmbxgUvaim3E0Q+An37OPDCzdWx+BqA=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR10MB3135
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=10081 signatures=668682
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 malwarescore=0 adultscore=0 bulkscore=0
- suspectscore=0 mlxlogscore=999 phishscore=0 mlxscore=0 spamscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2107140000
- definitions=main-2108190137
-X-Proofpoint-ORIG-GUID: d-RTGt9F3oOquEOIRtMluPQkRWJ0q0HM
-X-Proofpoint-GUID: d-RTGt9F3oOquEOIRtMluPQkRWJ0q0HM
+X-MS-Exchange-CrossTenant-UserPrincipalName: 1LoElluitC5lRWD9vh7TZQ595Ap9WWphGMwUVbHA5Iwww2mgjToXchFiTuNb0cwaS61fgTIg8pm52OvNOiAHxQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH2PR12MB4005
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Fix vfio_find_dma_valid to return WAITED on success if it was necessary
-to wait which mean iommu lock was dropped and reacquired.  This allows
-vfio_iommu_type1_pin_pages to recheck vaddr_invalid_count and possibly
-avoid the checking the validity of every vaddr in its list.
+On Thu, Aug 19, 2021 at 07:09:42PM +0200, Borislav Petkov wrote:
+> On Thu, Aug 19, 2021 at 09:58:31AM -0500, Michael Roth wrote:
+> > Not sure what you mean here. All the interfaces introduced here are used
+> > by acpi.c. There is another helper added later (efi_bp_find_vendor_table())
+> > in "enable SEV-SNP-validated CPUID in #VC handler", since it's not used
+> > here by acpi.c.
+> 
+> Maybe I got confused by the amount of changes in a single patch. I'll
+> try harder with your v5. :)
+> 
+> > There is the aforementioned efi_bp_find_vendor_table() that does the
+> > simple iteration, but I wasn't sure how to build the "find one of these,
+> > but this one is preferred" logic into it in a reasonable way.
+> 
+> Instead of efi_foreach_conf_entry() you simply do a bog-down simple
+> loop and each time you stop at a table, you examine it and overwrite
+> pointers, if you've found something better.
+> 
+> With "overwrite pointers" I mean you cache the pointers to those conf
+> tables you iterate over and dig out so that you don't have to do it a
+> second time. That is, *if* you need them a second time. I believe you
+> call at least efi_bp_get_conf_table() twice... you get the idea.
 
-Signed-off-by: Anthony Yznaga <anthony.yznaga@oracle.com>
----
- drivers/vfio/vfio_iommu_type1.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+Sorry I'm still a little confused on how to determine "something better",
+since it's acpi.c that decides which GUID is preferred, whereas
+efi_find_vendor_table() is a library function with no outside knowledge
+other than its arguments, so to return the preferred pointer it would need
+both/multiple GUIDs passed in as arguments, wouldn't it? (or a callback)
 
-diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
-index a3e925a41b0d..7ca8c4e95da4 100644
---- a/drivers/vfio/vfio_iommu_type1.c
-+++ b/drivers/vfio/vfio_iommu_type1.c
-@@ -612,6 +612,7 @@ static int vfio_find_dma_valid(struct vfio_iommu *iommu, dma_addr_t start,
- 			       size_t size, struct vfio_dma **dma_p)
- {
- 	int ret;
-+	int waited = 0;
- 
- 	do {
- 		*dma_p = vfio_find_dma(iommu, start, size);
-@@ -620,10 +621,10 @@ static int vfio_find_dma_valid(struct vfio_iommu *iommu, dma_addr_t start,
- 		else if (!(*dma_p)->vaddr_invalid)
- 			ret = 0;
- 		else
--			ret = vfio_wait(iommu);
-+			ret = waited = vfio_wait(iommu);
- 	} while (ret > 0);
- 
--	return ret;
-+	return ret ? ret : waited;
- }
- 
- /*
--- 
-1.8.3.1
+Another alternative is something like what
+drivers/firmware/efi/efi.c:common_tables does, where interesting table
+GUIDs are each associated with a pointer, and all the pointers can then
+be initialized with to the corresponding table address with a single pass.
+But would need to be careful to re-initialize those pointers when BSS gets
+cleared, or declare them in __section(".data"). Is that closer to what
+you were thinking?
 
+> 
+> > I could just call it once for each of these GUIDs though. I was
+> > hesitant to do so since it's less efficient than existing code, but if
+> > it's worth it for the simplification then I'm all for it.
+> 
+> Yeah, this is executed once during boot so I don't think you can make it
+> more efficient than a single iteration over the config table blobs.
+
+In v5, I've simplified things to just call efi_find_vendor_table() once
+for ACPI_20_TABLE_GUID, then once for ACPI_TABLE_GUID if that's not
+available. So definitely doesn't sound like what you are suggesting here,
+but does at least simplify code and gets rid of the efi_foreach* stuff. But
+happy to rework things if you had something else in mind.
+
+> 
+> I hope that makes more sense.
+> 
+> -- 
+> Regards/Gruss,
+>     Boris.
+> 
+> https://nam11.safelinks.protection.outlook.com/?url=https%3A%2F%2Fpeople.kernel.org%2Ftglx%2Fnotes-about-netiquette&amp;data=04%7C01%7Cmichael.roth%40amd.com%7C2a4304e70b5b4f2137f808d963340eec%7C3dd8961fe4884e608e11a82d994e183d%7C0%7C0%7C637649897546039774%7CUnknown%7CTWFpbGZsb3d8eyJWIjoiMC4wLjAwMDAiLCJQIjoiV2luMzIiLCJBTiI6Ik1haWwiLCJXVCI6Mn0%3D%7C1000&amp;sdata=GKDogD%2BOCN0swhmT4RZ2%2B3JmURF3e4qq%2FzgrxxFqJt0%3D&amp;reserved=0
