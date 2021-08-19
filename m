@@ -2,183 +2,160 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 003B23F1B33
-	for <lists+kvm@lfdr.de>; Thu, 19 Aug 2021 16:06:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3B0CC3F1B35
+	for <lists+kvm@lfdr.de>; Thu, 19 Aug 2021 16:07:07 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240400AbhHSOHF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 19 Aug 2021 10:07:05 -0400
-Received: from vps-vb.mhejs.net ([37.28.154.113]:54668 "EHLO vps-vb.mhejs.net"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S240278AbhHSOHF (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 19 Aug 2021 10:07:05 -0400
-Received: from MUA
-        by vps-vb.mhejs.net with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-        (Exim 4.94.2)
-        (envelope-from <mail@maciej.szmigiero.name>)
-        id 1mGig5-0001oq-BZ; Thu, 19 Aug 2021 16:05:53 +0200
-To:     Paul Menzel <pmenzel@molgen.mpg.de>,
-        Sean Christopherson <seanjc@google.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        id S240415AbhHSOHm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 19 Aug 2021 10:07:42 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:1822 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S240200AbhHSOHl (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 19 Aug 2021 10:07:41 -0400
+Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 17JE2kjZ126271;
+        Thu, 19 Aug 2021 10:06:58 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
+ from : reply-to : to : cc : date : in-reply-to : references : content-type
+ : mime-version : content-transfer-encoding; s=pp1;
+ bh=cJ/S1M1hg9zd6qWUv0l7ZRLFUiNJv5/lYnSw0pINsSA=;
+ b=ak8LhFRtnfgH87kVqWeRblsnLMpVDy6L6Vn72pJ8x//Jo7QhuvOkSxv4jdL/Ejv/qrEp
+ 0NeNlEDTMqQRe6iwPsw6UQLoKn8bOt44XtYmadEqKI6uSUWhxVRt4irgrj0knVOAKSXM
+ W+zibSP4/FSo0vr28vDJHAvL+u5wl9S3s1YFVCxbUZrJKQA7u7KQVBA0SWNUI8h3lvM4
+ vI9rNvtX2ZAH9hYGKSU3ycEOePCqKvSeuaDkLfZvZ2FeYSOfo+VjjXMH0r7hj9+cQR/G
+ k6lr59rcpcYUvOwOy2mCkUW9glPlKbvKt8JpR0tte/sLS2jpwRBhoaw25OyrRYQfUeBM +g== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3agkvnrw2y-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 19 Aug 2021 10:06:57 -0400
+Received: from m0098394.ppops.net (m0098394.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 17JE3ah1130177;
+        Thu, 19 Aug 2021 10:06:57 -0400
+Received: from ppma03wdc.us.ibm.com (ba.79.3fa9.ip4.static.sl-reverse.com [169.63.121.186])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3agkvnrw2c-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 19 Aug 2021 10:06:57 -0400
+Received: from pps.filterd (ppma03wdc.us.ibm.com [127.0.0.1])
+        by ppma03wdc.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 17JDv3jM015857;
+        Thu, 19 Aug 2021 14:06:56 GMT
+Received: from b03cxnp07029.gho.boulder.ibm.com (b03cxnp07029.gho.boulder.ibm.com [9.17.130.16])
+        by ppma03wdc.us.ibm.com with ESMTP id 3ae5fexwft-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 19 Aug 2021 14:06:56 +0000
+Received: from b03ledav004.gho.boulder.ibm.com (b03ledav004.gho.boulder.ibm.com [9.17.130.235])
+        by b03cxnp07029.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 17JE6smx43712998
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 19 Aug 2021 14:06:54 GMT
+Received: from b03ledav004.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 65F3B78076;
+        Thu, 19 Aug 2021 14:06:54 +0000 (GMT)
+Received: from b03ledav004.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id C7C7D7808C;
+        Thu, 19 Aug 2021 14:06:51 +0000 (GMT)
+Received: from jarvis.int.hansenpartnership.com (unknown [9.160.128.138])
+        by b03ledav004.gho.boulder.ibm.com (Postfix) with ESMTP;
+        Thu, 19 Aug 2021 14:06:51 +0000 (GMT)
+Message-ID: <538733190532643cc19b6e30f0eda4dd1bc2a767.camel@linux.ibm.com>
+Subject: Re: [RFC PATCH 00/13] Add support for Mirror VM.
+From:   James Bottomley <jejb@linux.ibm.com>
+Reply-To: jejb@linux.ibm.com
+To:     "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+        Tobin Feldman-Fitzthum <tobin@linux.ibm.com>
+Cc:     Steve Rutherford <srutherford@google.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, Ingo Molnar <mingo@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Borislav Petkov <bp@alien8.de>, x86@kernel.org,
-        "H. Peter Anvin" <hpa@zytor.com>
-References: <20210818114956.7171-1-pmenzel@molgen.mpg.de>
- <f9ba6fec-f764-dae7-e4f9-c532f4672359@maciej.szmigiero.name>
- <YR2Id14e9kagM6u0@google.com>
- <1c5ac4f8-4c39-a969-9ffa-2f527535a4b1@molgen.mpg.de>
-From:   "Maciej S. Szmigiero" <mail@maciej.szmigiero.name>
-Subject: Re: [PATCH] x86: kvm: Demote level of already loaded message from
- error to info
-Message-ID: <36208232-f936-9eed-22cf-88a61b294c7e@maciej.szmigiero.name>
-Date:   Thu, 19 Aug 2021 16:05:47 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.13.0
+        Ashish Kalra <Ashish.Kalra@amd.com>, thomas.lendacky@amd.com,
+        brijesh.singh@amd.com, ehabkost@redhat.com, kvm@vger.kernel.org,
+        mst@redhat.com, tobin@ibm.com, richard.henderson@linaro.org,
+        qemu-devel@nongnu.org, frankeh@us.ibm.com,
+        dovmurik@linux.vnet.ibm.com
+Date:   Thu, 19 Aug 2021 10:06:50 -0400
+In-Reply-To: <YR4U11ssVUztsPyx@work-vm>
+References: <cover.1629118207.git.ashish.kalra@amd.com>
+         <CABayD+fyrcyPGg5TdXLr95AFkPFY+EeeNvY=NvQw_j3_igOd6Q@mail.gmail.com>
+         <0fcfafde-a690-f53a-01fc-542054948bb2@redhat.com>
+         <37796fd1-bbc2-f22c-b786-eb44f4d473b9@linux.ibm.com>
+         <CABayD+evf56U4yT2V1TmEzaJjvV8gutUG5t8Ob2ifamruw5Qrg@mail.gmail.com>
+         <458ba932-5150-8706-3958-caa4cc67c8e3@linux.ibm.com>
+         <YR1ZvArdq4sKVyTJ@work-vm>
+         <c1d8dbca-c6a9-58da-6f95-b33b74e0485a@linux.ibm.com>
+         <YR4U11ssVUztsPyx@work-vm>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.34.4 
 MIME-Version: 1.0
-In-Reply-To: <1c5ac4f8-4c39-a969-9ffa-2f527535a4b1@molgen.mpg.de>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: vnuA3H72Yed_XiAueAWi-AudofFAPh8v
+X-Proofpoint-GUID: uJBNORBi0RtY44VsHzuVydBprpPJ_Zv-
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.790
+ definitions=2021-08-19_04:2021-08-17,2021-08-19 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=999 clxscore=1015
+ priorityscore=1501 malwarescore=0 impostorscore=0 mlxscore=0 phishscore=0
+ spamscore=0 bulkscore=0 lowpriorityscore=0 suspectscore=0 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2107140000
+ definitions=main-2108190083
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 19.08.2021 08:39, Paul Menzel wrote:
-> Am 19.08.21 um 00:23 schrieb Sean Christopherson:
->> On Wed, Aug 18, 2021, Maciej S. Szmigiero wrote:
->>> On 18.08.2021 13:49, Paul Menzel wrote:
->>>> In scripts, running
->>>>
->>>>       modprobe kvm_amd     2>/dev/null
->>>>       modprobe kvm_intel   2>/dev/null
->>>>
->>>> to ensure the modules are loaded causes Linux to log errors.
->>>>
->>>>       $ dmesg --level=err
->>>>       [    0.641747] [Firmware Bug]: TSC_DEADLINE disabled due to Errata; please update microcode to version: 0x3a (or later)
->>>>       [   40.196868] kvm: already loaded the other module
->>>>       [   40.219857] kvm: already loaded the other module
->>>>       [   55.501362] kvm [1177]: vcpu0, guest rIP: 0xffffffff96e5b644 disabled perfctr wrmsr: 0xc2 data 0xffff
->>>>       [   56.397974] kvm [1418]: vcpu0, guest rIP: 0xffffffff81046158 disabled perfctr wrmsr: 0xc1 data 0xabcd
->>>>       [1007981.827781] kvm: already loaded the other module
->>>>       [1008000.394089] kvm: already loaded the other module
->>>>       [1008030.706999] kvm: already loaded the other module
->>>>       [1020396.054470] kvm: already loaded the other module
->>>>       [1020405.614774] kvm: already loaded the other module
->>>>       [1020410.140069] kvm: already loaded the other module
->>>>       [1020704.049231] kvm: already loaded the other module
->>>>
->>>> As one of the two KVM modules is already loaded, KVM is functioning, and
->>>> their is no error condition. Therefore, demote the log message level to
->>>> informational.
->>
->> Hrm, but there is an error condition.  Userspace explicitly requested something
->> and KVM couldn't satisfy the request.
+On Thu, 2021-08-19 at 09:22 +0100, Dr. David Alan Gilbert wrote:
+> * Tobin Feldman-Fitzthum (tobin@linux.ibm.com) wrote:
+> > On 8/18/21 3:04 PM, Dr. David Alan Gilbert wrote:
+> > > * Tobin Feldman-Fitzthum (tobin@linux.ibm.com) wrote:
+> > > > On 8/17/21 6:04 PM, Steve Rutherford wrote:
+> > > > > Ahh, It sounds like you are looking into sidestepping the
+> > > > > existing AMD-SP flows for migration. I assume the idea is to
+> > > > > spin up a VM on the target side, and have the two VMs attest
+> > > > > to each other. How do the two sides know if the other is
+> > > > > legitimate? I take it that the source is directing the LAUNCH
+> > > > > flows?
+> > > >  
+> > > > Yeah we don't use PSP migration flows at all. We don't need to
+> > > > send the MH code from the source to the target because the MH
+> > > > lives in firmware, which is common between the two.
+> > >  
+> > > Are you relying on the target firmware to be *identical* or
+> > > purely for it to be *compatible* ?  It's normal for a migration
+> > > to be the result of wanting to do an upgrade; and that means the
+> > > destination build of OVMF might be newer (or older, or ...).
+> > > 
+> > > Dave
+> > 
+> > This is a good point. The migration handler on the source and
+> > target must have the same memory footprint or bad things will
+> > happen. Using the same firmware on the source and target is an easy
+> > way to guarantee this. Since the MH in OVMF is not a contiguous
+> > region of memory, but a group of functions scattered around OVMF,
+> > it is a bit difficult to guarantee that the memory footprint is the
+> > same if the build is different.
 > 
-> Yes, that’s the other perspective. ;-) I’d argue, as the Intel/AMD module can’t work on AMD/Intel, the load failure is expected and error. But as “error condition” is not well defined:
-> 
->      $ dmesg -h
->      […]
->      Supported log levels (priorities):
->         emerg - system is unusable
->         alert - action must be taken immediately
->          crit - critical conditions
->           err - error conditions
->          warn - warning conditions
->        notice - normal but significant condition
->          info - informational
->         debug - debug-level messages
-> 
+> Can you explain what the 'memory footprint' consists of? Can't it
+> just be the whole of the OVMF rom space if you have no way of nudging
+> the MH into it's own chunk?
 
-Why is that script repeatably trying to load kvm_amd and kvm_intel
-modules?
-I would assume these would be loaded once at system boot time (either
-manually or based on their modalias).
-If your script absolutely has to load them manually, it could check first
-whether /dev/kvm already exists.
+It might be possible depending on how we link it. At the moment it's
+using the core OVMF libraries, but it is possible to retool the OVMF
+build to copy those libraries into the MH DXE.
 
->>> Shouldn't this return ENODEV when loading one of these modules instead
->>> as there is no hardware that supports both VMX and SVM?
->>
->> Probably not, as KVM would effectively be speculating, e.g. someone could load an
->> out-of-tree variant of kvm_{intel,amd}.  Maybe instead of switching to ENODEV,
->> reword the comment, make it ratelimited, and shove it down?  That way the message
->> and -EEXIST fires iff the vendor module actually has some chance of being loaded.
->>
->>  From 3528e66bd5107d5ac4f6a6ae50503cf64446866a Mon Sep 17 00:00:00 2001
->> From: Sean Christopherson <seanjc@google.com>
->> Date: Wed, 18 Aug 2021 15:17:43 -0700
->> Subject: [PATCH] KVM: x86: Tweak handling and message when vendor module is
->>   already loaded
->>
->> Reword KVM's error message if a vendor module is already loaded to state
->> exactly that instead of assuming "the other" module is loaded,
-> 
-> The rewording is definitely an improvement.
-> 
->> ratelimit
->> said message to match the other errors, and move the check down below the
->> basic functionality checks so that attempting to load an unsupported
->> module provides the same result regardless of whether or not a supported
->> vendor module is already loaded.
-> 
-> Maybe add an example, how it would log the error before, and how it’s done now.
-> 
->> Reported-by: Paul Menzel <pmenzel@molgen.mpg.de>
->> Cc: Maciej S. Szmigiero <mail@maciej.szmigiero.name>
->> Signed-off-by: Sean Christopherson <seanjc@google.com>
->> ---
->>   arch/x86/kvm/x86.c | 12 ++++++------
->>   1 file changed, 6 insertions(+), 6 deletions(-)
->>
->> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
->> index fdc0c18339fb..15bd4bd3c81d 100644
->> --- a/arch/x86/kvm/x86.c
->> +++ b/arch/x86/kvm/x86.c
->> @@ -8357,12 +8357,6 @@ int kvm_arch_init(void *opaque)
->>       struct kvm_x86_init_ops *ops = opaque;
->>       int r;
->>
->> -    if (kvm_x86_ops.hardware_enable) {
->> -        printk(KERN_ERR "kvm: already loaded the other module\n");
->> -        r = -EEXIST;
->> -        goto out;
->> -    }
->> -
->>       if (!ops->cpu_has_kvm_support()) {
->>           pr_err_ratelimited("kvm: no hardware support\n");
->>           r = -EOPNOTSUPP;
->> @@ -8374,6 +8368,12 @@ int kvm_arch_init(void *opaque)
->>           goto out;
->>       }
->>
->> +    if (kvm_x86_ops.hardware_enable) {
->> +        pr_err_ratelimited("kvm: already loaded a vendor module\n");
->> +        r = -EEXIST;
->> +        goto out;
->> +    }
->> +
->>       /*
->>        * KVM explicitly assumes that the guest has an FPU and
->>        * FXSAVE/FXRSTOR. For example, the KVM_GET_FPU explicitly casts the
->> -- 
->> 2.33.0.rc2.250.ged5fa647cd-goog
-> 
-> Sounds also good at first sight. No idea, if monitoring scripts in userspace would get confused now.
+> I think it really does have to cope with migration to a new version
+> of host.
 
-This definitely looks more informative than the existing message.
+Well, you're thinking of OVMF as belonging to the host because of the
+way it is supplied, but think about the way it works in practice now,
+forgetting about confidential computing: OVMF is RAM resident in
+ordinary guests, so when you migrate them, the whole of OVMF (or at
+least what's left at runtime) goes with the migration, thus it's not
+possible to change the guest OVMF by migration.  The above is really
+just an extension of that principle, the only difference for
+confidential computing being you have to have an image of the current
+OVMF ROM in the target to seed migration.
 
-It would be even better if it wasn't "kvm: no hardware support" (as this
-message is technically incorrect), but something like
-"kvm: no VMX hardware support" or "kvm: no SVM hardware support".
+Technically, the problem is we can't overwrite running code and once
+the guest is re-sited to the target, the OVMF there has to match
+exactly what was on the source for the RT to still function.   Once the
+migration has run, the OVMF on the target must be identical to what was
+on the source (including internally allocated OVMF memory), and if we
+can't copy the MH code, we have to rely on the target image providing
+this identical code and we copy the rest.
 
-> Kind regards,
-> 
-> Paul
+James
 
-Thanks,
-Maciej
+
