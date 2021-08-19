@@ -2,224 +2,271 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6854D3F1F77
-	for <lists+kvm@lfdr.de>; Thu, 19 Aug 2021 20:00:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 17F463F1F80
+	for <lists+kvm@lfdr.de>; Thu, 19 Aug 2021 20:03:15 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233688AbhHSSA4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 19 Aug 2021 14:00:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36940 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229465AbhHSSAx (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 19 Aug 2021 14:00:53 -0400
-Received: from mail-pj1-x104a.google.com (mail-pj1-x104a.google.com [IPv6:2607:f8b0:4864:20::104a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 71ABFC061575
-        for <kvm@vger.kernel.org>; Thu, 19 Aug 2021 11:00:16 -0700 (PDT)
-Received: by mail-pj1-x104a.google.com with SMTP id y3-20020a17090a8b03b02901787416b139so3357906pjn.4
-        for <kvm@vger.kernel.org>; Thu, 19 Aug 2021 11:00:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:message-id:mime-version:subject:from:to:cc;
-        bh=fgj1be2lYTnEccMqJY8pfghLKR/GOjvNRFO7wD8waAU=;
-        b=KP210tjAXleOG5PS8J/OAoKFw0ahf2SBXkvvBkc9GII9QUlC1mtbp7cNh4IB+zYOpV
-         CrwAzP4cleLm6e/c8HgE36pd6IxhB3uZm52re+NDV9m2o3GAhrQQKZf6mX9iauR7YpZb
-         OcqWn3xqiBdsLSMGr/1BjlPu7hUvPTHzvjOz3vn25o+OQkwxRCZOxDomHJkI5TVOGvaZ
-         j71SB7MhsINd19vw4kWYChD3s42mfY8uVphU00sBuFPS5ceB48EOBZKiiAfJbbXoh+oO
-         6dWMnL3IFhZo0YMvSAever8MBh+DJOA7UBbWRDUwLIqpWPfOW8nwmyG/yAcLgTQh1a/Z
-         UVRQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
-        bh=fgj1be2lYTnEccMqJY8pfghLKR/GOjvNRFO7wD8waAU=;
-        b=hflvTqg227eYpxn80+f3tOs4UnkFbWrPC66WQ88bP0IEjONI17RrUb6yo0JRMwIVEu
-         Zgdb7D9cP495x5j6hMz10y3gSnhJbO1ZgAvK87KWz73A8nmJw6j9u7UjHs1zWJBEJc2x
-         gcoxIzgIBruzjVgl+C9UWM5afxEvIA9CiRmSc5guHiEkvLn+zIGM3p4LAQDucnIDKtHr
-         /EMiQVZxQPPfYCTYSjHE7hzEQTW1w3YY+AgAnm4YN0kYzoit5z8zrtPqgs0p1WcCeTah
-         qIOX8AEOHt0df9pL9Gd2dC1YXsZE4iU1qYtocVswC2ndl2+dqLa2njHNI/ixYnqwvWYh
-         fA7g==
-X-Gm-Message-State: AOAM530AKyxg0bxJyPae4M6LOGaU5n31ptcRfVfMJtc0HOVW+Vtc0PS9
-        YbUNGx3DnwKUqwdKIXxziMDCNMZYdaNX55dkY2w65LNMh8z/rLdjzwEOT2+QUV6gmvkNQL/py4D
-        NTSDHmw/icJe7vcLtTMZcXRyqOR6FbJN7f+OXajnzJz+Gn/CC4vgBVOoNB2nl/NDvpv3oJF4=
-X-Google-Smtp-Source: ABdhPJyLPY8kYCJ6cqRGpdJWkQLiz68+H+gVdl/Yp6cxugMpjO/U1UluVKx90qjnprP+4cuvwy+shGcyrKatIVV6ug==
-X-Received: from jgzg.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:1acf])
- (user=jingzhangos job=sendgmr) by 2002:a17:902:aa47:b029:12d:693f:14a0 with
- SMTP id c7-20020a170902aa47b029012d693f14a0mr12765292plr.68.1629396015765;
- Thu, 19 Aug 2021 11:00:15 -0700 (PDT)
-Date:   Thu, 19 Aug 2021 18:00:12 +0000
-Message-Id: <20210819180012.744855-1-jingzhangos@google.com>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.33.0.rc2.250.ged5fa647cd-goog
-Subject: [PATCH] KVM: stats: x86: vmx: add exit reason stats to vt-x instructions
-From:   Jing Zhang <jingzhangos@google.com>
-To:     KVM <kvm@vger.kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
-        David Matlack <dmatlack@google.com>,
-        Peter Shier <pshier@google.com>,
+        id S234030AbhHSSDu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 19 Aug 2021 14:03:50 -0400
+Received: from mail.kernel.org ([198.145.29.99]:52738 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S233379AbhHSSDt (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 19 Aug 2021 14:03:49 -0400
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 283066109F;
+        Thu, 19 Aug 2021 18:03:13 +0000 (UTC)
+Received: from sofa.misterjones.org ([185.219.108.64] helo=hot-poop.lan)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94.2)
+        (envelope-from <maz@kernel.org>)
+        id 1mGmNj-006293-CQ; Thu, 19 Aug 2021 19:03:11 +0100
+From:   Marc Zyngier <maz@kernel.org>
+To:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org
+Cc:     James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Andre Przywara <andre.przywara@arm.com>,
+        Eric Auger <eric.auger@redhat.com>,
         Oliver Upton <oupton@google.com>,
-        Sean Christopherson <seanjc@google.com>
-Cc:     Jing Zhang <jingzhangos@google.com>
-Content-Type: text/plain; charset="UTF-8"
+        Ricardo Koller <ricarkol@google.com>, kernel-team@android.com,
+        Raghavendra Rao Ananta <rananta@google.com>,
+        stable@vger.kernel.org
+Subject: [PATCH v2] KVM: arm64: vgic: Resample HW pending state on deactivation
+Date:   Thu, 19 Aug 2021 19:03:05 +0100
+Message-Id: <20210819180305.1670525-1-maz@kernel.org>
+X-Mailer: git-send-email 2.30.2
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, alexandru.elisei@arm.com, andre.przywara@arm.com, eric.auger@redhat.com, oupton@google.com, ricarkol@google.com, kernel-team@android.com, rananta@google.com, stable@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-These stats will be used to monitor the nested virtualization use in
-VMs. Most importantly: VMXON exits are evidence that the guest has
-enabled VMX, VMLAUNCH/VMRESUME exits are evidence that the guest has run
-an L2.
+When a mapped level interrupt (a timer, for example) is deactivated
+by the guest, the corresponding host interrupt is equally deactivated.
+However, the fate of the pending state still needs to be dealt
+with in SW.
 
-Original-by: David Matlack <dmatlack@google.com>
-Signed-off-by: Jing Zhang <jingzhangos@google.com>
+This is specially true when the interrupt was in the active+pending
+state in the virtual distributor at the point where the guest
+was entered. On exit, the pending state is potentially stale
+(the guest may have put the interrupt in a non-pending state).
+
+If we don't do anything, the interrupt will be spuriously injected
+in the guest. Although this shouldn't have any ill effect (spurious
+interrupts are always possible), we can improve the emulation by
+detecting the deactivation-while-pending case and resample the
+interrupt.
+
+While we're at it, move the logic into a common helper that can
+be shared between the two GIC implementations.
+
+Fixes: e40cc57bac79 ("KVM: arm/arm64: vgic: Support level-triggered mapped interrupts")
+Reported-by: Raghavendra Rao Ananta <rananta@google.com>
+Tested-by: Raghavendra Rao Ananta <rananta@google.com>
+Reviewed-by: Oliver Upton <oupton@google.com>
+Signed-off-by: Marc Zyngier <maz@kernel.org>
+Cc: stable@vger.kernel.org
 ---
- arch/x86/include/asm/kvm_host.h | 11 +++++++++++
- arch/x86/kvm/vmx/nested.c       | 17 +++++++++++++++++
- arch/x86/kvm/x86.c              | 13 ++++++++++++-
- 3 files changed, 40 insertions(+), 1 deletion(-)
 
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index 09b256db394a..e3afbc7926e0 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -1257,6 +1257,17 @@ struct kvm_vcpu_stat {
- 	u64 directed_yield_attempted;
- 	u64 directed_yield_successful;
- 	u64 guest_mode;
-+	u64 vmclear_exits;
-+	u64 vmlaunch_exits;
-+	u64 vmptrld_exits;
-+	u64 vmptrst_exits;
-+	u64 vmread_exits;
-+	u64 vmresume_exits;
-+	u64 vmwrite_exits;
-+	u64 vmoff_exits;
-+	u64 vmon_exits;
-+	u64 invept_exits;
-+	u64 invvpid_exits;
- };
- 
- struct x86_instruction_info;
-diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-index bc6327950657..8696f2612953 100644
---- a/arch/x86/kvm/vmx/nested.c
-+++ b/arch/x86/kvm/vmx/nested.c
-@@ -4879,6 +4879,7 @@ static int handle_vmon(struct kvm_vcpu *vcpu)
- 	const u64 VMXON_NEEDED_FEATURES = FEAT_CTL_LOCKED
- 		| FEAT_CTL_VMX_ENABLED_OUTSIDE_SMX;
- 
-+	++vcpu->stat.vmon_exits;
- 	/*
- 	 * The Intel VMX Instruction Reference lists a bunch of bits that are
- 	 * prerequisite to running VMXON, most notably cr4.VMXE must be set to
-@@ -4964,6 +4965,7 @@ static inline void nested_release_vmcs12(struct kvm_vcpu *vcpu)
- /* Emulate the VMXOFF instruction */
- static int handle_vmoff(struct kvm_vcpu *vcpu)
- {
-+	++vcpu->stat.vmoff_exits;
- 	if (!nested_vmx_check_permission(vcpu))
- 		return 1;
- 
-@@ -4984,6 +4986,7 @@ static int handle_vmclear(struct kvm_vcpu *vcpu)
- 	u64 evmcs_gpa;
- 	int r;
- 
-+	++vcpu->stat.vmclear_exits;
- 	if (!nested_vmx_check_permission(vcpu))
- 		return 1;
- 
-@@ -5025,6 +5028,7 @@ static int handle_vmclear(struct kvm_vcpu *vcpu)
- /* Emulate the VMLAUNCH instruction */
- static int handle_vmlaunch(struct kvm_vcpu *vcpu)
- {
-+	++vcpu->stat.vmlaunch_exits;
- 	return nested_vmx_run(vcpu, true);
- }
- 
-@@ -5032,6 +5036,7 @@ static int handle_vmlaunch(struct kvm_vcpu *vcpu)
- static int handle_vmresume(struct kvm_vcpu *vcpu)
- {
- 
-+	++vcpu->stat.vmresume_exits;
- 	return nested_vmx_run(vcpu, false);
- }
- 
-@@ -5049,6 +5054,8 @@ static int handle_vmread(struct kvm_vcpu *vcpu)
- 	short offset;
- 	int len, r;
- 
-+	++vcpu->stat.vmread_exits;
-+
- 	if (!nested_vmx_check_permission(vcpu))
- 		return 1;
- 
-@@ -5141,6 +5148,8 @@ static int handle_vmwrite(struct kvm_vcpu *vcpu)
- 	 */
- 	u64 value = 0;
- 
-+	++vcpu->stat.vmwrite_exits;
-+
- 	if (!nested_vmx_check_permission(vcpu))
- 		return 1;
- 
-@@ -5245,6 +5254,8 @@ static int handle_vmptrld(struct kvm_vcpu *vcpu)
- 	gpa_t vmptr;
- 	int r;
- 
-+	++vcpu->stat.vmptrld_exits;
-+
- 	if (!nested_vmx_check_permission(vcpu))
- 		return 1;
- 
-@@ -5311,6 +5322,8 @@ static int handle_vmptrst(struct kvm_vcpu *vcpu)
- 	gva_t gva;
- 	int r;
- 
-+	++vcpu->stat.vmptrst_exits;
-+
- 	if (!nested_vmx_check_permission(vcpu))
- 		return 1;
- 
-@@ -5351,6 +5364,8 @@ static int handle_invept(struct kvm_vcpu *vcpu)
- 	} operand;
- 	int i, r;
- 
-+	++vcpu->stat.invept_exits;
-+
- 	if (!(vmx->nested.msrs.secondary_ctls_high &
- 	      SECONDARY_EXEC_ENABLE_EPT) ||
- 	    !(vmx->nested.msrs.ept_caps & VMX_EPT_INVEPT_BIT)) {
-@@ -5431,6 +5446,8 @@ static int handle_invvpid(struct kvm_vcpu *vcpu)
- 	u16 vpid02;
- 	int r;
- 
-+	++vcpu->stat.invvpid_exits;
-+
- 	if (!(vmx->nested.msrs.secondary_ctls_high &
- 	      SECONDARY_EXEC_ENABLE_VPID) ||
- 			!(vmx->nested.msrs.vpid_caps & VMX_VPID_INVVPID_BIT)) {
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 1a00af1b076b..c2c95b4c1a68 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -277,7 +277,18 @@ const struct _kvm_stats_desc kvm_vcpu_stats_desc[] = {
- 	STATS_DESC_COUNTER(VCPU, nested_run),
- 	STATS_DESC_COUNTER(VCPU, directed_yield_attempted),
- 	STATS_DESC_COUNTER(VCPU, directed_yield_successful),
--	STATS_DESC_ICOUNTER(VCPU, guest_mode)
-+	STATS_DESC_ICOUNTER(VCPU, guest_mode),
-+	STATS_DESC_COUNTER(VCPU, vmclear_exits),
-+	STATS_DESC_COUNTER(VCPU, vmlaunch_exits),
-+	STATS_DESC_COUNTER(VCPU, vmptrld_exits),
-+	STATS_DESC_COUNTER(VCPU, vmptrst_exits),
-+	STATS_DESC_COUNTER(VCPU, vmread_exits),
-+	STATS_DESC_COUNTER(VCPU, vmresume_exits),
-+	STATS_DESC_COUNTER(VCPU, vmwrite_exits),
-+	STATS_DESC_COUNTER(VCPU, vmoff_exits),
-+	STATS_DESC_COUNTER(VCPU, vmon_exits),
-+	STATS_DESC_COUNTER(VCPU, invept_exits),
-+	STATS_DESC_COUNTER(VCPU, invvpid_exits),
- };
- 
- const struct kvm_stats_header kvm_vcpu_stats_header = {
+Notes:
+    * From v1:
+      - Moved the resampling into a separate helper, and pointed both
+        GIC implementations to it.
+      - Collected TB, RB, with thanks.
 
-base-commit: 47e7414d53fc12407b7a43bba412ecbf54c84f82
+ arch/arm64/kvm/vgic/vgic-v2.c | 36 +++++----------------------------
+ arch/arm64/kvm/vgic/vgic-v3.c | 36 +++++----------------------------
+ arch/arm64/kvm/vgic/vgic.c    | 38 +++++++++++++++++++++++++++++++++++
+ arch/arm64/kvm/vgic/vgic.h    |  2 ++
+ 4 files changed, 50 insertions(+), 62 deletions(-)
+
+diff --git a/arch/arm64/kvm/vgic/vgic-v2.c b/arch/arm64/kvm/vgic/vgic-v2.c
+index 2c580204f1dc..95a18cec14a3 100644
+--- a/arch/arm64/kvm/vgic/vgic-v2.c
++++ b/arch/arm64/kvm/vgic/vgic-v2.c
+@@ -60,6 +60,7 @@ void vgic_v2_fold_lr_state(struct kvm_vcpu *vcpu)
+ 		u32 val = cpuif->vgic_lr[lr];
+ 		u32 cpuid, intid = val & GICH_LR_VIRTUALID;
+ 		struct vgic_irq *irq;
++		bool deactivated;
+ 
+ 		/* Extract the source vCPU id from the LR */
+ 		cpuid = val & GICH_LR_PHYSID_CPUID;
+@@ -75,7 +76,8 @@ void vgic_v2_fold_lr_state(struct kvm_vcpu *vcpu)
+ 
+ 		raw_spin_lock(&irq->irq_lock);
+ 
+-		/* Always preserve the active bit */
++		/* Always preserve the active bit, note deactivation */
++		deactivated = irq->active && !(val & GICH_LR_ACTIVE_BIT);
+ 		irq->active = !!(val & GICH_LR_ACTIVE_BIT);
+ 
+ 		if (irq->active && vgic_irq_is_sgi(intid))
+@@ -96,36 +98,8 @@ void vgic_v2_fold_lr_state(struct kvm_vcpu *vcpu)
+ 		if (irq->config == VGIC_CONFIG_LEVEL && !(val & GICH_LR_STATE))
+ 			irq->pending_latch = false;
+ 
+-		/*
+-		 * Level-triggered mapped IRQs are special because we only
+-		 * observe rising edges as input to the VGIC.
+-		 *
+-		 * If the guest never acked the interrupt we have to sample
+-		 * the physical line and set the line level, because the
+-		 * device state could have changed or we simply need to
+-		 * process the still pending interrupt later.
+-		 *
+-		 * If this causes us to lower the level, we have to also clear
+-		 * the physical active state, since we will otherwise never be
+-		 * told when the interrupt becomes asserted again.
+-		 *
+-		 * Another case is when the interrupt requires a helping hand
+-		 * on deactivation (no HW deactivation, for example).
+-		 */
+-		if (vgic_irq_is_mapped_level(irq)) {
+-			bool resample = false;
+-
+-			if (val & GICH_LR_PENDING_BIT) {
+-				irq->line_level = vgic_get_phys_line_level(irq);
+-				resample = !irq->line_level;
+-			} else if (vgic_irq_needs_resampling(irq) &&
+-				   !(irq->active || irq->pending_latch)) {
+-				resample = true;
+-			}
+-
+-			if (resample)
+-				vgic_irq_set_phys_active(irq, false);
+-		}
++		/* Handle resampling for mapped interrupts if required */
++		vgic_irq_handle_resampling(irq, deactivated, val & GICH_LR_PENDING_BIT);
+ 
+ 		raw_spin_unlock(&irq->irq_lock);
+ 		vgic_put_irq(vcpu->kvm, irq);
+diff --git a/arch/arm64/kvm/vgic/vgic-v3.c b/arch/arm64/kvm/vgic/vgic-v3.c
+index 66004f61cd83..21a6207fb2ee 100644
+--- a/arch/arm64/kvm/vgic/vgic-v3.c
++++ b/arch/arm64/kvm/vgic/vgic-v3.c
+@@ -46,6 +46,7 @@ void vgic_v3_fold_lr_state(struct kvm_vcpu *vcpu)
+ 		u32 intid, cpuid;
+ 		struct vgic_irq *irq;
+ 		bool is_v2_sgi = false;
++		bool deactivated;
+ 
+ 		cpuid = val & GICH_LR_PHYSID_CPUID;
+ 		cpuid >>= GICH_LR_PHYSID_CPUID_SHIFT;
+@@ -68,7 +69,8 @@ void vgic_v3_fold_lr_state(struct kvm_vcpu *vcpu)
+ 
+ 		raw_spin_lock(&irq->irq_lock);
+ 
+-		/* Always preserve the active bit */
++		/* Always preserve the active bit, note deactivation */
++		deactivated = irq->active && !(val & ICH_LR_ACTIVE_BIT);
+ 		irq->active = !!(val & ICH_LR_ACTIVE_BIT);
+ 
+ 		if (irq->active && is_v2_sgi)
+@@ -89,36 +91,8 @@ void vgic_v3_fold_lr_state(struct kvm_vcpu *vcpu)
+ 		if (irq->config == VGIC_CONFIG_LEVEL && !(val & ICH_LR_STATE))
+ 			irq->pending_latch = false;
+ 
+-		/*
+-		 * Level-triggered mapped IRQs are special because we only
+-		 * observe rising edges as input to the VGIC.
+-		 *
+-		 * If the guest never acked the interrupt we have to sample
+-		 * the physical line and set the line level, because the
+-		 * device state could have changed or we simply need to
+-		 * process the still pending interrupt later.
+-		 *
+-		 * If this causes us to lower the level, we have to also clear
+-		 * the physical active state, since we will otherwise never be
+-		 * told when the interrupt becomes asserted again.
+-		 *
+-		 * Another case is when the interrupt requires a helping hand
+-		 * on deactivation (no HW deactivation, for example).
+-		 */
+-		if (vgic_irq_is_mapped_level(irq)) {
+-			bool resample = false;
+-
+-			if (val & ICH_LR_PENDING_BIT) {
+-				irq->line_level = vgic_get_phys_line_level(irq);
+-				resample = !irq->line_level;
+-			} else if (vgic_irq_needs_resampling(irq) &&
+-				   !(irq->active || irq->pending_latch)) {
+-				resample = true;
+-			}
+-
+-			if (resample)
+-				vgic_irq_set_phys_active(irq, false);
+-		}
++		/* Handle resampling for mapped interrupts if required */
++		vgic_irq_handle_resampling(irq, deactivated, val & ICH_LR_PENDING_BIT);
+ 
+ 		raw_spin_unlock(&irq->irq_lock);
+ 		vgic_put_irq(vcpu->kvm, irq);
+diff --git a/arch/arm64/kvm/vgic/vgic.c b/arch/arm64/kvm/vgic/vgic.c
+index 111bff47e471..42a6ac78fe95 100644
+--- a/arch/arm64/kvm/vgic/vgic.c
++++ b/arch/arm64/kvm/vgic/vgic.c
+@@ -1022,3 +1022,41 @@ bool kvm_vgic_map_is_active(struct kvm_vcpu *vcpu, unsigned int vintid)
+ 
+ 	return map_is_active;
+ }
++
++/*
++ * Level-triggered mapped IRQs are special because we only observe rising
++ * edges as input to the VGIC.
++ *
++ * If the guest never acked the interrupt we have to sample the physical
++ * line and set the line level, because the device state could have changed
++ * or we simply need to process the still pending interrupt later.
++ *
++ * We could also have entered the guest with the interrupt active+pending.
++ * On the next exit, we need to re-evaluate the pending state, as it could
++ * otherwise result in a spurious interrupt by injecting a now potentially
++ * stale pending state.
++ *
++ * If this causes us to lower the level, we have to also clear the physical
++ * active state, since we will otherwise never be told when the interrupt
++ * becomes asserted again.
++ *
++ * Another case is when the interrupt requires a helping hand on
++ * deactivation (no HW deactivation, for example).
++ */
++void vgic_irq_handle_resampling(struct vgic_irq *irq,
++				bool lr_deactivated, bool lr_pending)
++{
++	if (vgic_irq_is_mapped_level(irq)) {
++		bool resample = false;
++
++		if (unlikely(vgic_irq_needs_resampling(irq))) {
++			resample = !(irq->active || irq->pending_latch);
++		} else if (lr_pending || (lr_deactivated && irq->line_level)) {
++			irq->line_level = vgic_get_phys_line_level(irq);
++			resample = !irq->line_level;
++		}
++
++		if (resample)
++			vgic_irq_set_phys_active(irq, false);
++	}
++}
+diff --git a/arch/arm64/kvm/vgic/vgic.h b/arch/arm64/kvm/vgic/vgic.h
+index dc1f3d1657ee..14a9218641f5 100644
+--- a/arch/arm64/kvm/vgic/vgic.h
++++ b/arch/arm64/kvm/vgic/vgic.h
+@@ -169,6 +169,8 @@ void vgic_irq_set_phys_active(struct vgic_irq *irq, bool active);
+ bool vgic_queue_irq_unlock(struct kvm *kvm, struct vgic_irq *irq,
+ 			   unsigned long flags);
+ void vgic_kick_vcpus(struct kvm *kvm);
++void vgic_irq_handle_resampling(struct vgic_irq *irq,
++				bool lr_deactivated, bool lr_pending);
+ 
+ int vgic_check_ioaddr(struct kvm *kvm, phys_addr_t *ioaddr,
+ 		      phys_addr_t addr, phys_addr_t alignment);
 -- 
-2.33.0.rc2.250.ged5fa647cd-goog
+2.30.2
 
