@@ -2,147 +2,238 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 32BEA3F1FFA
-	for <lists+kvm@lfdr.de>; Thu, 19 Aug 2021 20:34:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B18373F2014
+	for <lists+kvm@lfdr.de>; Thu, 19 Aug 2021 20:43:59 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234651AbhHSSf2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 19 Aug 2021 14:35:28 -0400
-Received: from mail-mw2nam12on2068.outbound.protection.outlook.com ([40.107.244.68]:28000
-        "EHLO NAM12-MW2-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S230047AbhHSSf1 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 19 Aug 2021 14:35:27 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=K36/XhBvsNQ5QG3s6foC7LIr4QUHWIMfZXTx5NVVZJwlQlGKjLGoYkxWfy10uT5AYqIo/UpGfeSVATMK+n9GXSUUrhqcQhAo7mA4/3CiiBzNBUEoWdDDsquz7hokkfWHC4sPcVvDrlJ5xfKVnMlPOFYEooh1pWznqeCVV4md6RohbXL1roQP9NI5zaRzwXrUVGQdNHO8bKhGqXw3yW+WHRDpKNqlQNMRnhKAthIhaynxnhSURt3yMacG4eA9+nWBrGSvMfxAM7t/Zbl0qkUGYrANG3CtXiqTmRNQn/BX6iM1BpiIgBITQ1ZpuDYiFT3rv/2LN+Jzkk4/0sAYQJxcmw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=jkoOiP7x6m2+t8qBJzrDXi37Y5A8ztZsxXi32Mj+XxA=;
- b=EONvqT3Q+VfIrTRtgEjJovq7jEe5uoFCmECU18TxSxxgubMb1Td3oNNY9lvYVzplsBWiSlJbLUweQtKl17pBF8+tkpQQyxsNC3EbQgAW5af4fnHMzD6oUBLWSz1kuMPFdnkFnSr6dnu5a3GELMRehS6BUuz7ZQ5uRx5DvrVx3CmG0U76cDYW9cZK4EMh5CTPZFK6NZg1Ume7L1e2pTwxmmY0GAT9NQEvPxB4D4qidXK8TGzAg/MY2Fxs114ie36NsO8Un7bFNBHGzr2lWzQT22x4n4m/eqTR9aVjb91epRb+2WaOvNbua3A/l+PjpK3Q0HX+xsA2O8Rjjj/o0TrlCA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=jkoOiP7x6m2+t8qBJzrDXi37Y5A8ztZsxXi32Mj+XxA=;
- b=Aftoc2D3n6/XywBAyIGz268OIwAKRmNWHK++yhacYGDpFzE+sXFnjna1o8nOGhmCo6wVhYLXk02kxRMft/tz86st4rDjb7h+d96MKFV0Had1gLbghZtUbuYAZsJKjdxLSO2AlxSQ2nwdFQ++gSo78ojjJLZPZHqiZWsPtMjJ2vw=
-Authentication-Results: samba.org; dkim=none (message not signed)
- header.d=none;samba.org; dmarc=none action=none header.from=amd.com;
-Received: from DM4PR12MB5229.namprd12.prod.outlook.com (2603:10b6:5:398::12)
- by DM4PR12MB5120.namprd12.prod.outlook.com (2603:10b6:5:393::13) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4436.19; Thu, 19 Aug
- 2021 18:34:48 +0000
-Received: from DM4PR12MB5229.namprd12.prod.outlook.com
- ([fe80::d560:d21:cd59:9418]) by DM4PR12MB5229.namprd12.prod.outlook.com
- ([fe80::d560:d21:cd59:9418%6]) with mapi id 15.20.4436.019; Thu, 19 Aug 2021
- 18:34:48 +0000
-Subject: Re: [PATCH v2 04/12] powerpc/pseries/svm: Add a powerpc version of
- prot_guest_has()
-To:     Christoph Hellwig <hch@infradead.org>
-Cc:     linux-kernel@vger.kernel.org, x86@kernel.org,
-        linuxppc-dev@lists.ozlabs.org, linux-s390@vger.kernel.org,
-        iommu@lists.linux-foundation.org, kvm@vger.kernel.org,
-        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
-        linux-graphics-maintainer@vmware.com,
-        amd-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
-        kexec@lists.infradead.org, linux-fsdevel@vger.kernel.org,
-        Borislav Petkov <bp@alien8.de>,
-        Brijesh Singh <brijesh.singh@amd.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Andi Kleen <ak@linux.intel.com>,
-        Sathyanarayanan Kuppuswamy 
-        <sathyanarayanan.kuppuswamy@linux.intel.com>,
-        Tianyu Lan <Tianyu.Lan@microsoft.com>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        Paul Mackerras <paulus@samba.org>
-References: <cover.1628873970.git.thomas.lendacky@amd.com>
- <000f627ce20c6504dd8d118d85bd69e7717b752f.1628873970.git.thomas.lendacky@amd.com>
- <YR4qfZdkv+91zNZk@infradead.org>
-From:   Tom Lendacky <thomas.lendacky@amd.com>
-Message-ID: <58381b1c-79a4-e639-ba48-41b0f3da671c@amd.com>
-Date:   Thu, 19 Aug 2021 13:34:45 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.11.0
-In-Reply-To: <YR4qfZdkv+91zNZk@infradead.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: SN6PR04CA0092.namprd04.prod.outlook.com
- (2603:10b6:805:f2::33) To DM4PR12MB5229.namprd12.prod.outlook.com
- (2603:10b6:5:398::12)
+        id S234246AbhHSSof (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 19 Aug 2021 14:44:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47040 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231745AbhHSSoe (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 19 Aug 2021 14:44:34 -0400
+Received: from mail-lf1-x12e.google.com (mail-lf1-x12e.google.com [IPv6:2a00:1450:4864:20::12e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C21E8C061575
+        for <kvm@vger.kernel.org>; Thu, 19 Aug 2021 11:43:57 -0700 (PDT)
+Received: by mail-lf1-x12e.google.com with SMTP id p38so15081828lfa.0
+        for <kvm@vger.kernel.org>; Thu, 19 Aug 2021 11:43:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=TAHcCpbNsADEIy5uQWRhjOty4DIAiubyC6IVpmYQSHQ=;
+        b=RdufmYRTdJkQcqK9ZsMZafx6l/C3Fev/o9fY9Yjqz+jVuqEdOtCQriKTyeYCzJzdd2
+         /jSlCfBL13TznSSg6JEnprEi5oTKM1JHUpRTxPuJ7WazlwMg7kv8GmakXxFIPcTgnqWW
+         poOUERb87Fd6z/0p0+r1LyCW8Szsq/JUFImSFD7Gvwkltebu4o+d9pcqpSwBKcF4a0Tm
+         gfJ1VraL6txS5lj6eyprRVYvoimDhq4d1gGRwE60MdEOMepgQj1X7kCiohCORcjPGXRK
+         L1y3qWr3qS69pl2eGzFDSv/QjGiT59H0H5VJHQpNqktWiXboh4x6h4kSZD1FbxhMEQYR
+         yHkg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=TAHcCpbNsADEIy5uQWRhjOty4DIAiubyC6IVpmYQSHQ=;
+        b=soq2dRMdxxe4lT8EmYJH73JLFTesPBa/UrATrXZxWmUl0lk/NUT2kmUXPgWB0OX3Ko
+         lk6VUeAfGbJbsSIOUANOLYFQeA39yg955hDUsy5WN92Xn550GBdxmbA9nnCX96neROYY
+         t2v8xvUUykYnmgxbuCUVFr74K6avhrDpFzX2V2UMZfDItFqLHI63DSQdDN2WPebBrfvg
+         v29512m4bUGMgv3EHnoKDxuaa6PQ8f6rjkzJN19VpaDQppiN9F1DgiXcnaC5gnIDqczK
+         UnAAnoVrZWJQrQCI605IW9g8J8FwCR0ETeqBtMA4A/W0I+VjtrgIxPEhp4EigFEgB4ao
+         BgkQ==
+X-Gm-Message-State: AOAM531kjmA/NBWpHOxCcBr6ONRW29OQips9uyKlYesqA2oXqDbp3wzi
+        e+FJU111S1bu36w690SoM8UUnGAVZBjWs2tqxbsPfw==
+X-Google-Smtp-Source: ABdhPJzvN93wNHreZLD51pXKPTWUzieqBNGSCrWwF1tYINdn8C74ntJhTYT7h6m25M/CWpPrPbYIfFEEZH1PDCWDh78=
+X-Received: by 2002:ac2:4e62:: with SMTP id y2mr12146609lfs.9.1629398635827;
+ Thu, 19 Aug 2021 11:43:55 -0700 (PDT)
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from [10.236.30.241] (165.204.77.1) by SN6PR04CA0092.namprd04.prod.outlook.com (2603:10b6:805:f2::33) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4436.19 via Frontend Transport; Thu, 19 Aug 2021 18:34:46 +0000
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 65dd0c8c-f1f5-4ee6-8ef7-08d9634005f8
-X-MS-TrafficTypeDiagnostic: DM4PR12MB5120:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <DM4PR12MB51204710E8C66AABED9BADF1ECC09@DM4PR12MB5120.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:5516;
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 7GsebWkP3tX7HXAFN74pFjWPxlbXXuIvJZJRBCbGTtCcHXc57azDpDEtZTFi59nOs9rf/yCOZDl2hqOcg91DynjGBCVNtbEfs0GBuvNiQYAUvDEDFghEfbOJARMBHEPOax8KjxlXGkk7oD/4Rd2WsLk3YBnjCy/KK8Xj8ov4DAxKAi8fkdpkYlQhyVgsng7gneTN0lfYZ46zVH8YPHFL9CIs217ccUNJvj0dkRz1pSg/D4JlGWeUBHspmIe7G/bk5B3knpgEXx1SlI1MAuMqEH3qqNid5sBEpAIyqkEMkwdFrDKGDGcgncxNQPyZVAin3wW9RgH2kf4d+X3nEkK05p5xxITQDfR3hIznz0NxqxnleNwTC6fZrKNDmmgf30Oy7teLaelFcD8ZG8FxpAYmaIlHbohN2sum6CP1kGkmQbM02GGb8XCKRVAwpwIrKBMQbHiG8LVQr5qlc+ZhHWAjZ7ch7MtwEv7EE2F6qb10Dx6yscJrLq7tpIu5UR6H1p2XaSJ5ILJ++kv82LB6RmVwQ7QF9BB7NWDrNTy/1Ld8A+H/COqzikjCrGIulpbvMpRRb5vum3nxS0KqMP+kE2vIpTa8fhEGvaGtaFi7QA4cr+aiXr+zm390xBMNDsGoy5F6UhGDlOABUmEopenon1+5v/Q9xe31ojoIfK2qpesnFI/PCkxU1u+BCzXo0k6fo44gE0B6kJhIQ4khDqeqNhJF2YdH+ycnkXC16bSA5iUrSE8=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR12MB5229.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(396003)(346002)(366004)(376002)(136003)(39860400002)(2906002)(66476007)(26005)(53546011)(7416002)(16576012)(66946007)(66556008)(5660300002)(6486002)(6916009)(186003)(2616005)(36756003)(478600001)(31696002)(4744005)(86362001)(956004)(8936002)(4326008)(31686004)(8676002)(54906003)(38100700002)(316002)(45980500001)(43740500002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?UlN2eU5LTndLVCtST2hjQXhRekJzdXlISXZQVzlMMTdYTWRmZ0xaRmhoeFBH?=
- =?utf-8?B?V2IxdlVDOWxLcHRwd0pFLzFXMkFYREhkdjMxMWlEemxqZnU0aUN4MXJROWFp?=
- =?utf-8?B?UDJRdHI1ZGFJYyt3Z2FpeUV3dUsyVGNKRGxCUUNxZDBIallBRk14TTRpck5C?=
- =?utf-8?B?ZmZnWjdWL05vclVLUGQwSHN0R0R1OUNnVXVzdEhxWStFUmFuYlhzV0JKUTAr?=
- =?utf-8?B?OVBFMStmcXE0Ly94TzRyMTUyTHZkVUlrdHM3eTByVllpMVUxTStTVWM4SzNT?=
- =?utf-8?B?UEIvRUswL2ZJdGFJUC9CUmpxWFBpUWRGU09CcjduUFJnQ2VVdEhJYkpNdHhl?=
- =?utf-8?B?VGtEd1ErQkwwREpBdlF1Z3lTQm4rUklreTRwbzMwUXljTzFjSDhPVlN3cmZv?=
- =?utf-8?B?WGRrSW43ekJQdTl6dm1ITUUzK1o1YVlHcjZJdDZjcmY5NVo1K2JrT0VPbmRZ?=
- =?utf-8?B?aDl0d1YxZDNxY2tRM3pNelB5YWQ4aTlUcUgyaHFXSjJnZ0t3ZEpaenlwTmdY?=
- =?utf-8?B?RkZIODFLbmJ2N3kxdElPME1Ndm0zWlo4YUFtbHpPMGFCNzZZNEFtTndyKzQ0?=
- =?utf-8?B?aUVqc1pUdlNwbm1qVjRxUCtYMGRLLzErYXdOQitYK0JjalJXQ01SMDF2ZkYw?=
- =?utf-8?B?VVd5Y2w0VWxxV2l0eC9SQzBhS3dld21LcTVxM3IwZmZMa1M5QnFOZ0dCZldS?=
- =?utf-8?B?N0hhRWtiWXQxYlNEaTlXK0JOdXpQV0hyTHZMTVQxZjFOOVJyQmVlMkk2Z3FW?=
- =?utf-8?B?azRHeEdQZTlCN0tiUGJLS0g5VHh2OFNPanJzR3JqWkE0enJEKzBzaVJmUGdj?=
- =?utf-8?B?cTd1TCszamJtYVNlMmNyd3N1UzY2UVZSdVk1bGtqQ3YzK0wwcG5MUXBsRThu?=
- =?utf-8?B?UVY5ZU44QlcrUCtMZDVLR05UcUtLQlZaRmhRNjNoWlZ5NDFWK083ZWFPZmQv?=
- =?utf-8?B?VlQzQURPSjgyaHR4M2llZVFOL09vZWJBUzJoQjRTaU1FSVRQQ2xoMG1qMzM2?=
- =?utf-8?B?c0dTYzdocm1UM2lFbjdpRHdEVTI1NE1nYU5YWnZIWFZxTENrNEpYNnlJUzJB?=
- =?utf-8?B?VkdxTkNlV3pxajB3cUJRb0VBOEg5RlRxekdWSFFLSG05Z2dZdmp0RHRvOExx?=
- =?utf-8?B?VVE0OFZ5Z2c4emFNa1dyZENsaEhTTTRobUVqZzhWWGR6dFd3akV4VzZQNEt6?=
- =?utf-8?B?eGMvZjdsV2dWaEIzc096bFpIdnpLcUhFdXQzbGlHbGtZTlQ3OUZoWXl4a2ho?=
- =?utf-8?B?TnFscmR4KzVYWXdRQ2FjSzU2dzRyL1hqT083bHlldDZvVXMrbU8vcnJZam9m?=
- =?utf-8?B?Umt5b1FuSmcxdnZSYXdMRisxUnBOZzNGR2p1dm9ndEMrZUpza2FuN1JreGY0?=
- =?utf-8?B?MHVrT2JjcTB1eTFMYUpkRUhOdWxYTTlNVXRUL3FxMXRGVmNWdmgvdEVqekJW?=
- =?utf-8?B?RW5LTlVFbExLNnV4WXZXL1hmV2ltSzdFWjZ6bDR3UllWNTN3eW5kdzhpSVVn?=
- =?utf-8?B?TzgzR3ljaS9rUGlWU3ppVnljMmI1b0IxdWxvWnVrdTV1dXBpVGFtaXBmVjBF?=
- =?utf-8?B?cE5xRGY0VHpuV29VYkUybGFYVkRjYlFodWh4SkpoSHlyRnNOQVY3T0FDNmxI?=
- =?utf-8?B?Sk5USkNGdk1GVjJnL3JKaGxUR1ZyNTA3cmdud2kyS3VQSWtWNHBPeE53Nkp6?=
- =?utf-8?B?U0M4NFlYSEQvVW4vS0g1TDh0ckQrVjRlWm1RbzNpNFhyWnY4cE9iblhhekVB?=
- =?utf-8?Q?sV+xTXzYThefJa3yzve2YqpTUx3snYcMNuqHUqS?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 65dd0c8c-f1f5-4ee6-8ef7-08d9634005f8
-X-MS-Exchange-CrossTenant-AuthSource: DM4PR12MB5229.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Aug 2021 18:34:48.1108
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: Hvhu8fd+ca8A7Jb4Mg4s5OcWHiGNfpem4B0wi/GRSdnsAOa4lvZnB4mmr0J5Rju8m27AO4LX/DcgNK57h3EaGA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB5120
+References: <20210819180012.744855-1-jingzhangos@google.com>
+In-Reply-To: <20210819180012.744855-1-jingzhangos@google.com>
+From:   David Matlack <dmatlack@google.com>
+Date:   Thu, 19 Aug 2021 11:43:29 -0700
+Message-ID: <CALzav=cP17YXD8dRJnYFe_qmox3CTtpVBtLbU42Ei9zea2w21Q@mail.gmail.com>
+Subject: Re: [PATCH] KVM: stats: x86: vmx: add exit reason stats to vt-x instructions
+To:     Jing Zhang <jingzhangos@google.com>
+Cc:     KVM <kvm@vger.kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
+        Peter Shier <pshier@google.com>,
+        Oliver Upton <oupton@google.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Peter Feiner <pfeiner@google.com>,
+        Jim Mattson <jmattson@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 8/19/21 4:55 AM, Christoph Hellwig wrote:
-> On Fri, Aug 13, 2021 at 11:59:23AM -0500, Tom Lendacky wrote:
->> +static inline bool prot_guest_has(unsigned int attr)
-> 
-> No reall need to have this inline.  In fact I'd suggest we havea the
-> prototype in a common header so that everyone must implement it out
-> of line.
+On Thu, Aug 19, 2021 at 11:00 AM Jing Zhang <jingzhangos@google.com> wrote:
+>
+> These stats will be used to monitor the nested virtualization use in
+> VMs. Most importantly: VMXON exits are evidence that the guest has
+> enabled VMX, VMLAUNCH/VMRESUME exits are evidence that the guest has run
+> an L2.
 
-I'll do the same thing I end up doing for x86.
+This series is superseded by Peter Feiner's internal KVM patch that
+exports an array of counts, one for each VM-exit reason ("kvm: vmx
+exit reason stats"). This is better since it does not require
+instrumenting every VM-exit handler in KVM and introducing a stat for
+every exit.
 
-Thanks,
-Tom
+Assuming upstream would want exit count stats I would suggest we drop
+this patch and upstream Peter's instead. Although we need to sort out
+AMD and other architectures as well.
 
-> 
+>
+> Original-by: David Matlack <dmatlack@google.com>
+> Signed-off-by: Jing Zhang <jingzhangos@google.com>
+> ---
+>  arch/x86/include/asm/kvm_host.h | 11 +++++++++++
+>  arch/x86/kvm/vmx/nested.c       | 17 +++++++++++++++++
+>  arch/x86/kvm/x86.c              | 13 ++++++++++++-
+>  3 files changed, 40 insertions(+), 1 deletion(-)
+>
+> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+> index 09b256db394a..e3afbc7926e0 100644
+> --- a/arch/x86/include/asm/kvm_host.h
+> +++ b/arch/x86/include/asm/kvm_host.h
+> @@ -1257,6 +1257,17 @@ struct kvm_vcpu_stat {
+>         u64 directed_yield_attempted;
+>         u64 directed_yield_successful;
+>         u64 guest_mode;
+> +       u64 vmclear_exits;
+> +       u64 vmlaunch_exits;
+> +       u64 vmptrld_exits;
+> +       u64 vmptrst_exits;
+> +       u64 vmread_exits;
+> +       u64 vmresume_exits;
+> +       u64 vmwrite_exits;
+> +       u64 vmoff_exits;
+> +       u64 vmon_exits;
+> +       u64 invept_exits;
+> +       u64 invvpid_exits;
+>  };
+>
+>  struct x86_instruction_info;
+> diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+> index bc6327950657..8696f2612953 100644
+> --- a/arch/x86/kvm/vmx/nested.c
+> +++ b/arch/x86/kvm/vmx/nested.c
+> @@ -4879,6 +4879,7 @@ static int handle_vmon(struct kvm_vcpu *vcpu)
+>         const u64 VMXON_NEEDED_FEATURES = FEAT_CTL_LOCKED
+>                 | FEAT_CTL_VMX_ENABLED_OUTSIDE_SMX;
+>
+> +       ++vcpu->stat.vmon_exits;
+>         /*
+>          * The Intel VMX Instruction Reference lists a bunch of bits that are
+>          * prerequisite to running VMXON, most notably cr4.VMXE must be set to
+> @@ -4964,6 +4965,7 @@ static inline void nested_release_vmcs12(struct kvm_vcpu *vcpu)
+>  /* Emulate the VMXOFF instruction */
+>  static int handle_vmoff(struct kvm_vcpu *vcpu)
+>  {
+> +       ++vcpu->stat.vmoff_exits;
+>         if (!nested_vmx_check_permission(vcpu))
+>                 return 1;
+>
+> @@ -4984,6 +4986,7 @@ static int handle_vmclear(struct kvm_vcpu *vcpu)
+>         u64 evmcs_gpa;
+>         int r;
+>
+> +       ++vcpu->stat.vmclear_exits;
+>         if (!nested_vmx_check_permission(vcpu))
+>                 return 1;
+>
+> @@ -5025,6 +5028,7 @@ static int handle_vmclear(struct kvm_vcpu *vcpu)
+>  /* Emulate the VMLAUNCH instruction */
+>  static int handle_vmlaunch(struct kvm_vcpu *vcpu)
+>  {
+> +       ++vcpu->stat.vmlaunch_exits;
+>         return nested_vmx_run(vcpu, true);
+>  }
+>
+> @@ -5032,6 +5036,7 @@ static int handle_vmlaunch(struct kvm_vcpu *vcpu)
+>  static int handle_vmresume(struct kvm_vcpu *vcpu)
+>  {
+>
+> +       ++vcpu->stat.vmresume_exits;
+>         return nested_vmx_run(vcpu, false);
+>  }
+>
+> @@ -5049,6 +5054,8 @@ static int handle_vmread(struct kvm_vcpu *vcpu)
+>         short offset;
+>         int len, r;
+>
+> +       ++vcpu->stat.vmread_exits;
+> +
+>         if (!nested_vmx_check_permission(vcpu))
+>                 return 1;
+>
+> @@ -5141,6 +5148,8 @@ static int handle_vmwrite(struct kvm_vcpu *vcpu)
+>          */
+>         u64 value = 0;
+>
+> +       ++vcpu->stat.vmwrite_exits;
+> +
+>         if (!nested_vmx_check_permission(vcpu))
+>                 return 1;
+>
+> @@ -5245,6 +5254,8 @@ static int handle_vmptrld(struct kvm_vcpu *vcpu)
+>         gpa_t vmptr;
+>         int r;
+>
+> +       ++vcpu->stat.vmptrld_exits;
+> +
+>         if (!nested_vmx_check_permission(vcpu))
+>                 return 1;
+>
+> @@ -5311,6 +5322,8 @@ static int handle_vmptrst(struct kvm_vcpu *vcpu)
+>         gva_t gva;
+>         int r;
+>
+> +       ++vcpu->stat.vmptrst_exits;
+> +
+>         if (!nested_vmx_check_permission(vcpu))
+>                 return 1;
+>
+> @@ -5351,6 +5364,8 @@ static int handle_invept(struct kvm_vcpu *vcpu)
+>         } operand;
+>         int i, r;
+>
+> +       ++vcpu->stat.invept_exits;
+> +
+>         if (!(vmx->nested.msrs.secondary_ctls_high &
+>               SECONDARY_EXEC_ENABLE_EPT) ||
+>             !(vmx->nested.msrs.ept_caps & VMX_EPT_INVEPT_BIT)) {
+> @@ -5431,6 +5446,8 @@ static int handle_invvpid(struct kvm_vcpu *vcpu)
+>         u16 vpid02;
+>         int r;
+>
+> +       ++vcpu->stat.invvpid_exits;
+> +
+>         if (!(vmx->nested.msrs.secondary_ctls_high &
+>               SECONDARY_EXEC_ENABLE_VPID) ||
+>                         !(vmx->nested.msrs.vpid_caps & VMX_VPID_INVVPID_BIT)) {
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index 1a00af1b076b..c2c95b4c1a68 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -277,7 +277,18 @@ const struct _kvm_stats_desc kvm_vcpu_stats_desc[] = {
+>         STATS_DESC_COUNTER(VCPU, nested_run),
+>         STATS_DESC_COUNTER(VCPU, directed_yield_attempted),
+>         STATS_DESC_COUNTER(VCPU, directed_yield_successful),
+> -       STATS_DESC_ICOUNTER(VCPU, guest_mode)
+> +       STATS_DESC_ICOUNTER(VCPU, guest_mode),
+> +       STATS_DESC_COUNTER(VCPU, vmclear_exits),
+> +       STATS_DESC_COUNTER(VCPU, vmlaunch_exits),
+> +       STATS_DESC_COUNTER(VCPU, vmptrld_exits),
+> +       STATS_DESC_COUNTER(VCPU, vmptrst_exits),
+> +       STATS_DESC_COUNTER(VCPU, vmread_exits),
+> +       STATS_DESC_COUNTER(VCPU, vmresume_exits),
+> +       STATS_DESC_COUNTER(VCPU, vmwrite_exits),
+> +       STATS_DESC_COUNTER(VCPU, vmoff_exits),
+> +       STATS_DESC_COUNTER(VCPU, vmon_exits),
+> +       STATS_DESC_COUNTER(VCPU, invept_exits),
+> +       STATS_DESC_COUNTER(VCPU, invvpid_exits),
+>  };
+>
+>  const struct kvm_stats_header kvm_vcpu_stats_header = {
+>
+> base-commit: 47e7414d53fc12407b7a43bba412ecbf54c84f82
+> --
+> 2.33.0.rc2.250.ged5fa647cd-goog
+>
