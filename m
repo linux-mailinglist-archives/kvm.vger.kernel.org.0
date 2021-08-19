@@ -2,51 +2,51 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4CAA53F1842
-	for <lists+kvm@lfdr.de>; Thu, 19 Aug 2021 13:35:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 730D93F1843
+	for <lists+kvm@lfdr.de>; Thu, 19 Aug 2021 13:35:18 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238612AbhHSLfu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 19 Aug 2021 07:35:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58878 "EHLO
+        id S238629AbhHSLfv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 19 Aug 2021 07:35:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58884 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238581AbhHSLft (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 19 Aug 2021 07:35:49 -0400
-Received: from mail-wr1-x434.google.com (mail-wr1-x434.google.com [IPv6:2a00:1450:4864:20::434])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CA1FCC061575
-        for <kvm@vger.kernel.org>; Thu, 19 Aug 2021 04:35:12 -0700 (PDT)
-Received: by mail-wr1-x434.google.com with SMTP id q6so8611487wrv.6
-        for <kvm@vger.kernel.org>; Thu, 19 Aug 2021 04:35:12 -0700 (PDT)
+        with ESMTP id S238581AbhHSLfu (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 19 Aug 2021 07:35:50 -0400
+Received: from mail-wr1-x435.google.com (mail-wr1-x435.google.com [IPv6:2a00:1450:4864:20::435])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E7CE4C061575
+        for <kvm@vger.kernel.org>; Thu, 19 Aug 2021 04:35:13 -0700 (PDT)
+Received: by mail-wr1-x435.google.com with SMTP id u16so8616171wrn.5
+        for <kvm@vger.kernel.org>; Thu, 19 Aug 2021 04:35:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=vDadItZXpijpjYHiURYi7uEmcHdMQSBRqtK6hkt8w9w=;
-        b=aaN8+BLwNQdgrsrLEJaU88hl0tKWSvZjUfxnCQy3tbmahTqA8iaXJ2LZqVz9Ni+aCB
-         0lhVyOwnPcYE8pZxt4vyVKunCfRJIBIpfJwbg3SWZEO8KhTvBkUFwlYHNZejS3jRWoGt
-         n7XbjstLWUc7BGw//sc+vLDfthOEkQXZbIdd6g9yzKw25Wxc9+Hk8Fkqo+7M5ieebwSA
-         1jsRnCdV4rpxFiUjQZKg5fDMBJSINkAGz4xh2CqDqktmZpeKC9dsbnwdUfVOq0h3eSDU
-         tBM2SZxKLhFyCHYi7VYgL2mCyYdBvSs3ZTZOM0QP54am/X9xeZgM6KkbpXJz3x+E25rS
-         gZSQ==
+        bh=2KFXeGBWucyq5NvTkBhHz6fhu2b4mdNQpxuqJ7MWcBw=;
+        b=AYT9rnBo9y0oHUZ+ZZamnV/ZUmP0s+GA/sz4OHvUjviJJ5pmA+fTL+2VsM9fe2EG2z
+         u8vQXC/NJ5YmdodUtDOO9lFKFIOBvpVF8HhLpgMexod5SApEkU236IpZ1zVeOt82Dp8R
+         ZbZLSPNvzXIX+WWLnPf8cdS7SakiZvcNs0q6BSgeXu59vcNwjN9FaNwmYacWrk/hKUca
+         gvBaoCN6lw/g+L4oxV+7gRvph1JO05aW8pRn0plDbZf/gYT8pvRsa1m3+bwPI0yW9xIl
+         vns0EtogqaQ/vM96Zt/STDtHcvp9MBqs7d8r0MRPpXnv+ihU8NOQYqDeioe8FjbVGF1L
+         346w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=vDadItZXpijpjYHiURYi7uEmcHdMQSBRqtK6hkt8w9w=;
-        b=GBH7fcxoDUHer6Gh3ynVs8DPZxvHiLZ8dJJi1MLb5cX7yDmQApDY0yCjCy+14nlbfq
-         nyGUE5KrheCR4Tye40m6m7sQlY6rm++tvGwNj/4G0phpSGB1cAwe8a+Wkzx57LwNgNdC
-         dZyJ5pmzq1iRlcK8mqG9wCNwHQB30UOPebiHWMNvNp9ZRhXmjzoUmzGCownfnWO75x+l
-         mxUtB+OHnXUiprtxc2R1D4VRZBU4XY0fPbvNOrYue3IdBMf5rMZ/vADcsDKOheqxmbQ3
-         uxe3aZWZKdCeh09FUbCllmNAX98ANZ6neXUv+2RH+Bv6Xi1gsDop9+SsXoHSIHg/JK7g
-         PZew==
-X-Gm-Message-State: AOAM531cmiK44a82LyLXRTlS0YWCV9TBPWt5K2jf2SI0tMRl48fiiVJ+
-        MvZ4rQeWclZDlQlJWuDLl1mxf5UecReHP5y4
-X-Google-Smtp-Source: ABdhPJxRx8skEbjgyHxM5T8RhebdM9qzDQc90k023Qr/9DpUb49lA/GacOs1dewK83TW+iYbI2NGtQ==
-X-Received: by 2002:adf:fcc5:: with SMTP id f5mr3356719wrs.114.1629372911306;
-        Thu, 19 Aug 2021 04:35:11 -0700 (PDT)
+        bh=2KFXeGBWucyq5NvTkBhHz6fhu2b4mdNQpxuqJ7MWcBw=;
+        b=p5cSY5bZdY8VKu/M2AMZfGBnEjyr8dHaB9nJBI9wjrUaJi5pFMBaJGWvUsGAq0Gz5u
+         BGxruAzTvPG0j7di9vw1V7zj9vXKiDrua7cU7yfbEjgjjemfA5G29FBsgqLSVJxjtpJ9
+         3ospZKOyfwdFHRwWodzv3+ql3hIQ5IQOpp9mvzuOS0PmSCwFwbSt173yYM6rs4BoIsZD
+         wvWDkHukCcqrZqOaGhYxpjeqaSwWYgIeu7rUnpLlXyl6F5YUZsiOgO34uwYZYlJCxNhm
+         m0vrG+Yz5BjiyJWVcIBa1SBgjtgLJ/jrn6s8u1PTwnGLgzCLel/5EkT3Q8dWiU2aV1j+
+         ERyA==
+X-Gm-Message-State: AOAM531fog3pql08caTDfdrFjEyAEy+Cs3XYagwxyswkJOu/s68TmShh
+        u+VG0C62JCh/EdkC7gygOAI=
+X-Google-Smtp-Source: ABdhPJydCgKlTdESe7w/2HZHr9nwWvA7Ivpnfoz/19dakOFjvSy1uqoft3za1cg+G78/lQUZGON+eA==
+X-Received: by 2002:a5d:5228:: with SMTP id i8mr3246382wra.391.1629372912458;
+        Thu, 19 Aug 2021 04:35:12 -0700 (PDT)
 Received: from xps13.suse.de (ip5f5a5c19.dynamic.kabel-deutschland.de. [95.90.92.25])
-        by smtp.gmail.com with ESMTPSA id w11sm2682859wrr.48.2021.08.19.04.35.10
+        by smtp.gmail.com with ESMTPSA id w11sm2682859wrr.48.2021.08.19.04.35.11
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 19 Aug 2021 04:35:10 -0700 (PDT)
+        Thu, 19 Aug 2021 04:35:12 -0700 (PDT)
 From:   Varad Gautam <varadgautam@gmail.com>
 X-Google-Original-From: Varad Gautam <varad.gautam@suse.com>
 To:     Zixuan Wang <zixuanwang@google.com>,
@@ -61,9 +61,9 @@ To:     Zixuan Wang <zixuanwang@google.com>,
         Erdem Aktas <erdemaktas@google.com>,
         Tom Roeder <tmroeder@google.com>
 Cc:     Varad Gautam <varad.gautam@suse.com>
-Subject: [kvm-unit-tests PATCH v2 1/6] x86: Build tests as PE objects for the EFI loader
-Date:   Thu, 19 Aug 2021 13:33:55 +0200
-Message-Id: <20210819113400.26516-2-varad.gautam@suse.com>
+Subject: [kvm-unit-tests PATCH v2 2/6] x86: Call efi_main from _efi_pe_entry
+Date:   Thu, 19 Aug 2021 13:33:56 +0200
+Message-Id: <20210819113400.26516-3-varad.gautam@suse.com>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20210819113400.26516-1-varad.gautam@suse.com>
 References: <20210819113400.26516-1-varad.gautam@suse.com>
@@ -73,496 +73,597 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-kvm-unit-tests produces tests as ELF binaries that can't be directly
-loaded with EFI. One way of doing so however, is to build the tests
-as shared libs (-pic, -shared), and then objcopy-ing out the relevant
-sections into a PE32+.
-
-This adds support to compile the tests as an intermediary .so lib,
-which is linked via x86/efi.lds to contain 4K aligned COFF-compatible
-sections. The linker script sets up _efi_pe_entry as the image
-entrypoint, and the .so sections get repackaged to an EFI binary via
-`objcopy --target efi-app-x86_64`.
-
-The 32-bit / long mode transition / multiboot / AP setup code within
-cstart64.S being incompatible with EFI builds is now hidden behind
-!CONFIG_EFI. It stays enabled without `configure --efi`.
-
-Some tests that don't support building with -fpic / -shared (and need
-some cleanups) are also moved to build on non-EFI only for now.
-
-This gets us dud EFI binaries that enter into _efi_pe_entry and die.
-No change to non- --efi builds.
+EFI calls _efi_pe_entry in long mode with the location of EFI
+handle/system table. Add an efi_main() C handler to make it easier
+to communicate with EFI for initial setup. efi_main will later,
+1. Acquire the efi memmap
+2. Call ExitBootServices
+3. Perform remaining bootstrapping before calling the testcase main()
 
 Signed-off-by: Varad Gautam <varad.gautam@suse.com>
 ---
- .gitignore          |  2 ++
- Makefile            | 16 +++++++++--
- configure           | 11 ++++++++
- x86/Makefile.common | 52 +++++++++++++++++++++++------------
- x86/Makefile.x86_64 | 51 +++++++++++++++++++++-------------
- x86/cstart64.S      | 27 +++++++++++++++++-
- x86/efi.lds         | 67 +++++++++++++++++++++++++++++++++++++++++++++
- 7 files changed, 186 insertions(+), 40 deletions(-)
- create mode 100644 x86/efi.lds
+ lib/linux/uefi.h    | 518 ++++++++++++++++++++++++++++++++++++++++++++
+ x86/Makefile.common |   2 +-
+ x86/cstart64.S      |  10 +-
+ x86/efi_main.c      |  11 +
+ 4 files changed, 539 insertions(+), 2 deletions(-)
+ create mode 100644 lib/linux/uefi.h
+ create mode 100644 x86/efi_main.c
 
-diff --git a/.gitignore b/.gitignore
-index b3cf2cb..f83bdf6 100644
---- a/.gitignore
-+++ b/.gitignore
-@@ -3,7 +3,9 @@ tags
- *.a
- *.d
- *.o
-+*.so
- *.flat
-+*.efi
- *.elf
- .pc
- patches
-diff --git a/Makefile b/Makefile
-index f7b9f28..273b1df 100644
---- a/Makefile
-+++ b/Makefile
-@@ -50,7 +50,11 @@ fomit_frame_pointer := $(call cc-option, $(frame-pointer-flag), "")
- fno_stack_protector := $(call cc-option, -fno-stack-protector, "")
- fno_stack_protector_all := $(call cc-option, -fno-stack-protector-all, "")
- wno_frame_address := $(call cc-option, -Wno-frame-address, "")
--fno_pic := $(call cc-option, -fno-pic, "")
-+ifeq ($(CONFIG_EFI), y)
-+opt_pic := -fpic
-+else
-+opt_pic := $(call cc-option, -fno-pic, "")
-+endif
- no_pie := $(call cc-option, -no-pie, "")
- wclobbered := $(call cc-option, -Wclobbered, "")
- wunused_but_set_parameter := $(call cc-option, -Wunused-but-set-parameter, "")
-@@ -62,10 +66,15 @@ COMMON_CFLAGS += $(fno_stack_protector)
- COMMON_CFLAGS += $(fno_stack_protector_all)
- COMMON_CFLAGS += $(wno_frame_address)
- COMMON_CFLAGS += $(if $(U32_LONG_FMT),-D__U32_LONG_FMT__,)
--COMMON_CFLAGS += $(fno_pic) $(no_pie)
-+COMMON_CFLAGS += $(opt_pic) $(no_pie)
- COMMON_CFLAGS += $(wclobbered)
- COMMON_CFLAGS += $(wunused_but_set_parameter)
- 
-+ifeq ($(CONFIG_EFI),y)
-+COMMON_CFLAGS += -mno-red-zone -fshort-wchar -DCONFIG_EFI -ffreestanding \
-+	-fno-stack-check
-+endif
+diff --git a/lib/linux/uefi.h b/lib/linux/uefi.h
+new file mode 100644
+index 0000000..15692eb
+--- /dev/null
++++ b/lib/linux/uefi.h
+@@ -0,0 +1,518 @@
++/* SPDX-License-Identifier: GPL-2.0 */
++/* Relevant definitions from linux/efi.h. */
 +
- CFLAGS += $(COMMON_CFLAGS)
- CFLAGS += $(wmissing_parameter_type)
- CFLAGS += $(wold_style_declaration)
-@@ -74,6 +83,9 @@ CFLAGS += -Woverride-init -Wmissing-prototypes -Wstrict-prototypes
- autodepend-flags = -MMD -MF $(dir $*).$(notdir $*).d
- 
- LDFLAGS += $(CFLAGS)
-+ifeq ($(CONFIG_EFI),y)
-+LDFLAGS += -nostdlib --warn-common --no-undefined --fatal-warnings
-+endif
- 
- $(libcflat): $(cflatobjs)
- 	$(AR) rcs $@ $^
-diff --git a/configure b/configure
-index 1d4d855..2d1b1bc 100755
---- a/configure
-+++ b/configure
-@@ -28,6 +28,7 @@ erratatxt="$srcdir/errata.txt"
- host_key_document=
- page_size=
- earlycon=
-+config_efi=
- 
- usage() {
-     cat <<-EOF
-@@ -69,6 +70,7 @@ usage() {
- 	               pl011,mmio32,ADDR
- 	                           Specify a PL011 compatible UART at address ADDR. Supported
- 	                           register stride is 32 bit only.
-+	    --efi                  Build with EFI support (x86_64 only).
- EOF
-     exit 1
- }
-@@ -133,6 +135,9 @@ while [[ "$1" = -* ]]; do
- 	--earlycon)
- 	    earlycon="$arg"
- 	    ;;
-+	--efi)
-+	    config_efi=y
-+	    ;;
- 	--help)
- 	    usage
- 	    ;;
-@@ -192,6 +197,11 @@ elif [ "$processor" = "arm" ]; then
-     processor="cortex-a15"
- fi
- 
-+if [ "$config_efi" = y ] && [ "$arch" != "x86_64" ]; then
-+    echo "--efi only supported on x86_64"
-+    usage
-+fi
++#ifndef __LINUX_UEFI_H
++#define __LINUX_UEFI_H
 +
- if [ "$arch" = "i386" ] || [ "$arch" = "x86_64" ]; then
-     testdir=x86
- elif [ "$arch" = "arm" ] || [ "$arch" = "arm64" ]; then
-@@ -341,6 +351,7 @@ U32_LONG_FMT=$u32_long
- WA_DIVIDE=$wa_divide
- GENPROTIMG=${GENPROTIMG-genprotimg}
- HOST_KEY_DOCUMENT=$host_key_document
-+CONFIG_EFI=$config_efi
- EOF
- if [ "$arch" = "arm" ] || [ "$arch" = "arm64" ]; then
-     echo "TARGET=$target" >> config.mak
++#define BITS_PER_LONG 64
++
++#define EFI_SUCCESS		0
++#define EFI_LOAD_ERROR		( 1 | (1UL << (BITS_PER_LONG-1)))
++#define EFI_INVALID_PARAMETER	( 2 | (1UL << (BITS_PER_LONG-1)))
++#define EFI_UNSUPPORTED		( 3 | (1UL << (BITS_PER_LONG-1)))
++#define EFI_BAD_BUFFER_SIZE	( 4 | (1UL << (BITS_PER_LONG-1)))
++#define EFI_BUFFER_TOO_SMALL	( 5 | (1UL << (BITS_PER_LONG-1)))
++#define EFI_NOT_READY		( 6 | (1UL << (BITS_PER_LONG-1)))
++#define EFI_DEVICE_ERROR	( 7 | (1UL << (BITS_PER_LONG-1)))
++#define EFI_WRITE_PROTECTED	( 8 | (1UL << (BITS_PER_LONG-1)))
++#define EFI_OUT_OF_RESOURCES	( 9 | (1UL << (BITS_PER_LONG-1)))
++#define EFI_NOT_FOUND		(14 | (1UL << (BITS_PER_LONG-1)))
++#define EFI_TIMEOUT		(18 | (1UL << (BITS_PER_LONG-1)))
++#define EFI_ABORTED		(21 | (1UL << (BITS_PER_LONG-1)))
++#define EFI_SECURITY_VIOLATION	(26 | (1UL << (BITS_PER_LONG-1)))
++
++typedef unsigned long efi_status_t;
++typedef u8 efi_bool_t;
++typedef u16 efi_char16_t;		/* UNICODE character */
++typedef u64 efi_physical_addr_t;
++typedef void *efi_handle_t;
++
++#define __efiapi __attribute__((ms_abi))
++
++/*
++ * The UEFI spec and EDK2 reference implementation both define EFI_GUID as
++ * struct { u32 a; u16; b; u16 c; u8 d[8]; }; and so the implied alignment
++ * is 32 bits not 8 bits like our guid_t. In some cases (i.e., on 32-bit ARM),
++ * this means that firmware services invoked by the kernel may assume that
++ * efi_guid_t* arguments are 32-bit aligned, and use memory accessors that
++ * do not tolerate misalignment. So let's set the minimum alignment to 32 bits.
++ *
++ * Note that the UEFI spec as well as some comments in the EDK2 code base
++ * suggest that EFI_GUID should be 64-bit aligned, but this appears to be
++ * a mistake, given that no code seems to exist that actually enforces that
++ * or relies on it.
++ */
++typedef struct {
++	u8 b[16];
++} guid_t;
++typedef guid_t efi_guid_t;
++
++#define EFI_GUID(a, b, c, d...) (efi_guid_t){ {					\
++	(a) & 0xff, ((a) >> 8) & 0xff, ((a) >> 16) & 0xff, ((a) >> 24) & 0xff,	\
++	(b) & 0xff, ((b) >> 8) & 0xff,						\
++	(c) & 0xff, ((c) >> 8) & 0xff, d } }
++
++/*
++ * Generic EFI table header
++ */
++typedef	struct {
++	u64 signature;
++	u32 revision;
++	u32 headersize;
++	u32 crc32;
++	u32 reserved;
++} efi_table_hdr_t;
++
++/*
++ * Memory map descriptor:
++ */
++
++/* Memory types: */
++#define EFI_RESERVED_TYPE		 0
++#define EFI_LOADER_CODE			 1
++#define EFI_LOADER_DATA			 2
++#define EFI_BOOT_SERVICES_CODE		 3
++#define EFI_BOOT_SERVICES_DATA		 4
++#define EFI_RUNTIME_SERVICES_CODE	 5
++#define EFI_RUNTIME_SERVICES_DATA	 6
++#define EFI_CONVENTIONAL_MEMORY		 7
++#define EFI_UNUSABLE_MEMORY		 8
++#define EFI_ACPI_RECLAIM_MEMORY		 9
++#define EFI_ACPI_MEMORY_NVS		10
++#define EFI_MEMORY_MAPPED_IO		11
++#define EFI_MEMORY_MAPPED_IO_PORT_SPACE	12
++#define EFI_PAL_CODE			13
++#define EFI_PERSISTENT_MEMORY		14
++#define EFI_MAX_MEMORY_TYPE		15
++
++/* Attribute values: */
++#define EFI_MEMORY_UC		((u64)0x0000000000000001ULL)	/* uncached */
++#define EFI_MEMORY_WC		((u64)0x0000000000000002ULL)	/* write-coalescing */
++#define EFI_MEMORY_WT		((u64)0x0000000000000004ULL)	/* write-through */
++#define EFI_MEMORY_WB		((u64)0x0000000000000008ULL)	/* write-back */
++#define EFI_MEMORY_UCE		((u64)0x0000000000000010ULL)	/* uncached, exported */
++#define EFI_MEMORY_WP		((u64)0x0000000000001000ULL)	/* write-protect */
++#define EFI_MEMORY_RP		((u64)0x0000000000002000ULL)	/* read-protect */
++#define EFI_MEMORY_XP		((u64)0x0000000000004000ULL)	/* execute-protect */
++#define EFI_MEMORY_NV		((u64)0x0000000000008000ULL)	/* non-volatile */
++#define EFI_MEMORY_MORE_RELIABLE \
++				((u64)0x0000000000010000ULL)	/* higher reliability */
++#define EFI_MEMORY_RO		((u64)0x0000000000020000ULL)	/* read-only */
++#define EFI_MEMORY_SP		((u64)0x0000000000040000ULL)	/* soft reserved */
++#define EFI_MEMORY_CPU_CRYPTO	((u64)0x0000000000080000ULL)	/* supports encryption */
++#define EFI_MEMORY_RUNTIME	((u64)0x8000000000000000ULL)	/* range requires runtime mapping */
++#define EFI_MEMORY_DESCRIPTOR_VERSION	1
++
++#define EFI_PAGE_SHIFT		12
++#define EFI_PAGE_SIZE		(1UL << EFI_PAGE_SHIFT)
++#define EFI_PAGES_MAX		(U64_MAX >> EFI_PAGE_SHIFT)
++
++typedef struct {
++	u32 type;
++	u32 pad;
++	u64 phys_addr;
++	u64 virt_addr;
++	u64 num_pages;
++	u64 attribute;
++} efi_memory_desc_t;
++
++typedef struct {
++	efi_guid_t guid;
++	u32 headersize;
++	u32 flags;
++	u32 imagesize;
++} efi_capsule_header_t;
++
++/*
++ * EFI capsule flags
++ */
++#define EFI_CAPSULE_PERSIST_ACROSS_RESET	0x00010000
++#define EFI_CAPSULE_POPULATE_SYSTEM_TABLE	0x00020000
++#define EFI_CAPSULE_INITIATE_RESET		0x00040000
++
++struct capsule_info {
++	efi_capsule_header_t	header;
++	efi_capsule_header_t	*capsule;
++	int			reset_type;
++	long			index;
++	size_t			count;
++	size_t			total_size;
++	struct page		**pages;
++	phys_addr_t		*phys;
++	size_t			page_bytes_remain;
++};
++
++int __efi_capsule_setup_info(struct capsule_info *cap_info);
++
++/*
++ * Types and defines for Time Services
++ */
++#define EFI_TIME_ADJUST_DAYLIGHT 0x1
++#define EFI_TIME_IN_DAYLIGHT     0x2
++#define EFI_UNSPECIFIED_TIMEZONE 0x07ff
++
++typedef struct {
++	u16 year;
++	u8 month;
++	u8 day;
++	u8 hour;
++	u8 minute;
++	u8 second;
++	u8 pad1;
++	u32 nanosecond;
++	s16 timezone;
++	u8 daylight;
++	u8 pad2;
++} efi_time_t;
++
++typedef struct {
++	u32 resolution;
++	u32 accuracy;
++	u8 sets_to_zero;
++} efi_time_cap_t;
++
++typedef void *efi_event_t;
++/* Note that notifications won't work in mixed mode */
++typedef void (__efiapi *efi_event_notify_t)(efi_event_t, void *);
++
++typedef enum {
++	EfiTimerCancel,
++	EfiTimerPeriodic,
++	EfiTimerRelative
++} EFI_TIMER_DELAY;
++
++/*
++ * EFI Device Path information
++ */
++#define EFI_DEV_HW			0x01
++#define  EFI_DEV_PCI				 1
++#define  EFI_DEV_PCCARD				 2
++#define  EFI_DEV_MEM_MAPPED			 3
++#define  EFI_DEV_VENDOR				 4
++#define  EFI_DEV_CONTROLLER			 5
++#define EFI_DEV_ACPI			0x02
++#define   EFI_DEV_BASIC_ACPI			 1
++#define   EFI_DEV_EXPANDED_ACPI			 2
++#define EFI_DEV_MSG			0x03
++#define   EFI_DEV_MSG_ATAPI			 1
++#define   EFI_DEV_MSG_SCSI			 2
++#define   EFI_DEV_MSG_FC			 3
++#define   EFI_DEV_MSG_1394			 4
++#define   EFI_DEV_MSG_USB			 5
++#define   EFI_DEV_MSG_USB_CLASS			15
++#define   EFI_DEV_MSG_I20			 6
++#define   EFI_DEV_MSG_MAC			11
++#define   EFI_DEV_MSG_IPV4			12
++#define   EFI_DEV_MSG_IPV6			13
++#define   EFI_DEV_MSG_INFINIBAND		 9
++#define   EFI_DEV_MSG_UART			14
++#define   EFI_DEV_MSG_VENDOR			10
++#define EFI_DEV_MEDIA			0x04
++#define   EFI_DEV_MEDIA_HARD_DRIVE		 1
++#define   EFI_DEV_MEDIA_CDROM			 2
++#define   EFI_DEV_MEDIA_VENDOR			 3
++#define   EFI_DEV_MEDIA_FILE			 4
++#define   EFI_DEV_MEDIA_PROTOCOL		 5
++#define EFI_DEV_BIOS_BOOT		0x05
++#define EFI_DEV_END_PATH		0x7F
++#define EFI_DEV_END_PATH2		0xFF
++#define   EFI_DEV_END_INSTANCE			0x01
++#define   EFI_DEV_END_ENTIRE			0xFF
++
++struct efi_generic_dev_path {
++	u8				type;
++	u8				sub_type;
++	u16				length;
++} __packed;
++
++typedef struct efi_generic_dev_path efi_device_path_protocol_t;
++
++/*
++ * EFI Boot Services table
++ */
++union efi_boot_services {
++	struct {
++		efi_table_hdr_t hdr;
++		void *raise_tpl;
++		void *restore_tpl;
++		efi_status_t (__efiapi *allocate_pages)(int, int, unsigned long,
++							efi_physical_addr_t *);
++		efi_status_t (__efiapi *free_pages)(efi_physical_addr_t,
++						    unsigned long);
++		efi_status_t (__efiapi *get_memory_map)(unsigned long *, void *,
++							unsigned long *,
++							unsigned long *, u32 *);
++		efi_status_t (__efiapi *allocate_pool)(int, unsigned long,
++						       void **);
++		efi_status_t (__efiapi *free_pool)(void *);
++		efi_status_t (__efiapi *create_event)(u32, unsigned long,
++						      efi_event_notify_t, void *,
++						      efi_event_t *);
++		efi_status_t (__efiapi *set_timer)(efi_event_t,
++						  EFI_TIMER_DELAY, u64);
++		efi_status_t (__efiapi *wait_for_event)(unsigned long,
++							efi_event_t *,
++							unsigned long *);
++		void *signal_event;
++		efi_status_t (__efiapi *close_event)(efi_event_t);
++		void *check_event;
++		void *install_protocol_interface;
++		void *reinstall_protocol_interface;
++		void *uninstall_protocol_interface;
++		efi_status_t (__efiapi *handle_protocol)(efi_handle_t,
++							 efi_guid_t *, void **);
++		void *__reserved;
++		void *register_protocol_notify;
++		efi_status_t (__efiapi *locate_handle)(int, efi_guid_t *,
++						       void *, unsigned long *,
++						       efi_handle_t *);
++		efi_status_t (__efiapi *locate_device_path)(efi_guid_t *,
++							    efi_device_path_protocol_t **,
++							    efi_handle_t *);
++		efi_status_t (__efiapi *install_configuration_table)(efi_guid_t *,
++								     void *);
++		void *load_image;
++		void *start_image;
++		efi_status_t (__efiapi *exit)(efi_handle_t,
++							 efi_status_t,
++							 unsigned long,
++							 efi_char16_t *);
++		void *unload_image;
++		efi_status_t (__efiapi *exit_boot_services)(efi_handle_t,
++							    unsigned long);
++		void *get_next_monotonic_count;
++		efi_status_t (__efiapi *stall)(unsigned long);
++		void *set_watchdog_timer;
++		void *connect_controller;
++		efi_status_t (__efiapi *disconnect_controller)(efi_handle_t,
++							       efi_handle_t,
++							       efi_handle_t);
++		void *open_protocol;
++		void *close_protocol;
++		void *open_protocol_information;
++		void *protocols_per_handle;
++		void *locate_handle_buffer;
++		efi_status_t (__efiapi *locate_protocol)(efi_guid_t *, void *,
++							 void **);
++		void *install_multiple_protocol_interfaces;
++		void *uninstall_multiple_protocol_interfaces;
++		void *calculate_crc32;
++		void *copy_mem;
++		void *set_mem;
++		void *create_event_ex;
++	};
++	struct {
++		efi_table_hdr_t hdr;
++		u32 raise_tpl;
++		u32 restore_tpl;
++		u32 allocate_pages;
++		u32 free_pages;
++		u32 get_memory_map;
++		u32 allocate_pool;
++		u32 free_pool;
++		u32 create_event;
++		u32 set_timer;
++		u32 wait_for_event;
++		u32 signal_event;
++		u32 close_event;
++		u32 check_event;
++		u32 install_protocol_interface;
++		u32 reinstall_protocol_interface;
++		u32 uninstall_protocol_interface;
++		u32 handle_protocol;
++		u32 __reserved;
++		u32 register_protocol_notify;
++		u32 locate_handle;
++		u32 locate_device_path;
++		u32 install_configuration_table;
++		u32 load_image;
++		u32 start_image;
++		u32 exit;
++		u32 unload_image;
++		u32 exit_boot_services;
++		u32 get_next_monotonic_count;
++		u32 stall;
++		u32 set_watchdog_timer;
++		u32 connect_controller;
++		u32 disconnect_controller;
++		u32 open_protocol;
++		u32 close_protocol;
++		u32 open_protocol_information;
++		u32 protocols_per_handle;
++		u32 locate_handle_buffer;
++		u32 locate_protocol;
++		u32 install_multiple_protocol_interfaces;
++		u32 uninstall_multiple_protocol_interfaces;
++		u32 calculate_crc32;
++		u32 copy_mem;
++		u32 set_mem;
++		u32 create_event_ex;
++	} mixed_mode;
++};
++
++typedef union efi_boot_services efi_boot_services_t;
++
++/*
++ * Types and defines for EFI ResetSystem
++ */
++#define EFI_RESET_COLD 0
++#define EFI_RESET_WARM 1
++#define EFI_RESET_SHUTDOWN 2
++
++/*
++ * EFI Runtime Services table
++ */
++#define EFI_RUNTIME_SERVICES_SIGNATURE ((u64)0x5652453544e5552ULL)
++#define EFI_RUNTIME_SERVICES_REVISION  0x00010000
++
++typedef struct {
++	efi_table_hdr_t hdr;
++	u32 get_time;
++	u32 set_time;
++	u32 get_wakeup_time;
++	u32 set_wakeup_time;
++	u32 set_virtual_address_map;
++	u32 convert_pointer;
++	u32 get_variable;
++	u32 get_next_variable;
++	u32 set_variable;
++	u32 get_next_high_mono_count;
++	u32 reset_system;
++	u32 update_capsule;
++	u32 query_capsule_caps;
++	u32 query_variable_info;
++} efi_runtime_services_32_t;
++
++typedef efi_status_t efi_get_time_t (efi_time_t *tm, efi_time_cap_t *tc);
++typedef efi_status_t efi_set_time_t (efi_time_t *tm);
++typedef efi_status_t efi_get_wakeup_time_t (efi_bool_t *enabled, efi_bool_t *pending,
++					    efi_time_t *tm);
++typedef efi_status_t efi_set_wakeup_time_t (efi_bool_t enabled, efi_time_t *tm);
++typedef efi_status_t efi_get_variable_t (efi_char16_t *name, efi_guid_t *vendor, u32 *attr,
++					 unsigned long *data_size, void *data);
++typedef efi_status_t efi_get_next_variable_t (unsigned long *name_size, efi_char16_t *name,
++					      efi_guid_t *vendor);
++typedef efi_status_t efi_set_variable_t (efi_char16_t *name, efi_guid_t *vendor, 
++					 u32 attr, unsigned long data_size,
++					 void *data);
++typedef efi_status_t efi_get_next_high_mono_count_t (u32 *count);
++typedef void efi_reset_system_t (int reset_type, efi_status_t status,
++				 unsigned long data_size, efi_char16_t *data);
++typedef efi_status_t efi_set_virtual_address_map_t (unsigned long memory_map_size,
++						unsigned long descriptor_size,
++						u32 descriptor_version,
++						efi_memory_desc_t *virtual_map);
++typedef efi_status_t efi_query_variable_info_t(u32 attr,
++					       u64 *storage_space,
++					       u64 *remaining_space,
++					       u64 *max_variable_size);
++typedef efi_status_t efi_update_capsule_t(efi_capsule_header_t **capsules,
++					  unsigned long count,
++					  unsigned long sg_list);
++typedef efi_status_t efi_query_capsule_caps_t(efi_capsule_header_t **capsules,
++					      unsigned long count,
++					      u64 *max_size,
++					      int *reset_type);
++typedef efi_status_t efi_query_variable_store_t(u32 attributes,
++						unsigned long size,
++						bool nonblocking);
++
++typedef union {
++	struct {
++		efi_table_hdr_t				hdr;
++		efi_get_time_t __efiapi			*get_time;
++		efi_set_time_t __efiapi			*set_time;
++		efi_get_wakeup_time_t __efiapi		*get_wakeup_time;
++		efi_set_wakeup_time_t __efiapi		*set_wakeup_time;
++		efi_set_virtual_address_map_t __efiapi	*set_virtual_address_map;
++		void					*convert_pointer;
++		efi_get_variable_t __efiapi		*get_variable;
++		efi_get_next_variable_t __efiapi	*get_next_variable;
++		efi_set_variable_t __efiapi		*set_variable;
++		efi_get_next_high_mono_count_t __efiapi	*get_next_high_mono_count;
++		efi_reset_system_t __efiapi		*reset_system;
++		efi_update_capsule_t __efiapi		*update_capsule;
++		efi_query_capsule_caps_t __efiapi	*query_capsule_caps;
++		efi_query_variable_info_t __efiapi	*query_variable_info;
++	};
++	efi_runtime_services_32_t mixed_mode;
++} efi_runtime_services_t;
++
++#define EFI_SYSTEM_TABLE_SIGNATURE ((u64)0x5453595320494249ULL)
++
++#define EFI_2_30_SYSTEM_TABLE_REVISION  ((2 << 16) | (30))
++#define EFI_2_20_SYSTEM_TABLE_REVISION  ((2 << 16) | (20))
++#define EFI_2_10_SYSTEM_TABLE_REVISION  ((2 << 16) | (10))
++#define EFI_2_00_SYSTEM_TABLE_REVISION  ((2 << 16) | (00))
++#define EFI_1_10_SYSTEM_TABLE_REVISION  ((1 << 16) | (10))
++#define EFI_1_02_SYSTEM_TABLE_REVISION  ((1 << 16) | (02))
++
++typedef struct {
++	efi_table_hdr_t hdr;
++	u64 fw_vendor;	/* physical addr of CHAR16 vendor string */
++	u32 fw_revision;
++	u32 __pad1;
++	u64 con_in_handle;
++	u64 con_in;
++	u64 con_out_handle;
++	u64 con_out;
++	u64 stderr_handle;
++	u64 stderr;
++	u64 runtime;
++	u64 boottime;
++	u32 nr_tables;
++	u32 __pad2;
++	u64 tables;
++} efi_system_table_64_t;
++
++typedef struct {
++	efi_table_hdr_t hdr;
++	u32 fw_vendor;	/* physical addr of CHAR16 vendor string */
++	u32 fw_revision;
++	u32 con_in_handle;
++	u32 con_in;
++	u32 con_out_handle;
++	u32 con_out;
++	u32 stderr_handle;
++	u32 stderr;
++	u32 runtime;
++	u32 boottime;
++	u32 nr_tables;
++	u32 tables;
++} efi_system_table_32_t;
++
++typedef union efi_simple_text_input_protocol efi_simple_text_input_protocol_t;
++typedef union efi_simple_text_output_protocol efi_simple_text_output_protocol_t;
++
++typedef union {
++	struct {
++		efi_table_hdr_t hdr;
++		unsigned long fw_vendor;	/* physical addr of CHAR16 vendor string */
++		u32 fw_revision;
++		unsigned long con_in_handle;
++		efi_simple_text_input_protocol_t *con_in;
++		unsigned long con_out_handle;
++		efi_simple_text_output_protocol_t *con_out;
++		unsigned long stderr_handle;
++		unsigned long stderr;
++		efi_runtime_services_t *runtime;
++		efi_boot_services_t *boottime;
++		unsigned long nr_tables;
++		unsigned long tables;
++	};
++	efi_system_table_32_t mixed_mode;
++} efi_system_table_t;
++
++struct efi_boot_memmap {
++	efi_memory_desc_t       **map;
++	unsigned long           *map_size;
++	unsigned long           *desc_size;
++	u32                     *desc_ver;
++	unsigned long           *key_ptr;
++	unsigned long           *buff_size;
++};
++
++#define efi_bs_call(func, ...)						\
++	efi_system_table->boottime->func(__VA_ARGS__)
++
++#endif /* __LINUX_UEFI_H */
 diff --git a/x86/Makefile.common b/x86/Makefile.common
-index 52bb7aa..fc9a693 100644
+index fc9a693..ca33e8e 100644
 --- a/x86/Makefile.common
 +++ b/x86/Makefile.common
-@@ -38,7 +38,7 @@ COMMON_CFLAGS += -O1
- KEEP_FRAME_POINTER := y
- 
- # We want to keep intermediate file: %.elf and %.o 
--.PRECIOUS: %.elf %.o
-+.PRECIOUS: %.elf %.o %.so
- 
- FLATLIBS = lib/libcflat.a
- %.elf: %.o $(FLATLIBS) $(SRCDIR)/x86/flat.lds $(cstart.o)
-@@ -50,17 +50,33 @@ FLATLIBS = lib/libcflat.a
+@@ -50,7 +50,7 @@ FLATLIBS = lib/libcflat.a
  	$(OBJCOPY) -O elf32-i386 $^ $@
  	@chmod a-x $@
  
--tests-common = $(TEST_DIR)/vmexit.flat $(TEST_DIR)/tsc.flat \
--               $(TEST_DIR)/smptest.flat  \
--               $(TEST_DIR)/realmode.flat $(TEST_DIR)/msr.flat \
--               $(TEST_DIR)/hypercall.flat $(TEST_DIR)/sieve.flat \
--               $(TEST_DIR)/kvmclock_test.flat  $(TEST_DIR)/eventinj.flat \
--               $(TEST_DIR)/s3.flat $(TEST_DIR)/pmu.flat $(TEST_DIR)/setjmp.flat \
--               $(TEST_DIR)/tsc_adjust.flat $(TEST_DIR)/asyncpf.flat \
--               $(TEST_DIR)/init.flat $(TEST_DIR)/smap.flat \
--               $(TEST_DIR)/hyperv_synic.flat $(TEST_DIR)/hyperv_stimer.flat \
--               $(TEST_DIR)/hyperv_connections.flat \
--               $(TEST_DIR)/umip.flat $(TEST_DIR)/tsx-ctrl.flat
-+%.so: %.o $(FLATLIBS) $(cstart.o)
-+	$(LD) -shared -nostdlib -znocombreloc -Bsymbolic -T $(SRCDIR)/x86/efi.lds $^ \
-+		-o $@ $(FLATLIBS)
-+	@chmod a-x $@
-+
-+%.efi: %.so
-+	$(OBJCOPY) -j .text -j .sdata -j .data -j .dynamic -j .dynsym -j .rel \
-+		    -j .rela -j .rel.* -j .rela.* -j .rel* -j .rela* \
-+		    -j .reloc -j .init --target efi-app-x86_64 $*.so $@
-+	@chmod a-x $@
-+
-+tests-flatonly = $(TEST_DIR)/realmode.$(out) $(TEST_DIR)/eventinj.$(out)		\
-+		$(TEST_DIR)/smap.$(out) $(TEST_DIR)/umip.$(out)
-+
-+tests-common = $(TEST_DIR)/vmexit.$(out) $(TEST_DIR)/tsc.$(out)				\
-+		$(TEST_DIR)/smptest.$(out) $(TEST_DIR)/msr.$(out)			\
-+		$(TEST_DIR)/hypercall.$(out) $(TEST_DIR)/sieve.$(out)			\
-+		$(TEST_DIR)/kvmclock_test.$(out) $(TEST_DIR)/s3.$(out)			\
-+		$(TEST_DIR)/pmu.$(out) $(TEST_DIR)/setjmp.$(out)			\
-+		$(TEST_DIR)/tsc_adjust.$(out) $(TEST_DIR)/asyncpf.$(out)		\
-+		$(TEST_DIR)/init.$(out) $(TEST_DIR)/hyperv_synic.$(out)			\
-+		$(TEST_DIR)/hyperv_stimer.$(out) $(TEST_DIR)/hyperv_connections.$(out)	\
-+		$(TEST_DIR)/tsx-ctrl.$(out)
-+
-+ifneq ($(CONFIG_EFI),y)
-+tests-common += $(tests-flatonly)
-+endif
- 
- test_cases: $(tests-common) $(tests)
- 
-@@ -72,14 +88,14 @@ $(TEST_DIR)/realmode.elf: $(TEST_DIR)/realmode.o
- 
- $(TEST_DIR)/realmode.o: bits = $(if $(call cc-option,-m16,""),16,32)
- 
--$(TEST_DIR)/kvmclock_test.elf: $(TEST_DIR)/kvmclock.o
-+$(TEST_DIR)/kvmclock_test.$(bin): $(TEST_DIR)/kvmclock.o
- 
--$(TEST_DIR)/hyperv_synic.elf: $(TEST_DIR)/hyperv.o
-+$(TEST_DIR)/hyperv_synic.$(bin): $(TEST_DIR)/hyperv.o
- 
--$(TEST_DIR)/hyperv_stimer.elf: $(TEST_DIR)/hyperv.o
-+$(TEST_DIR)/hyperv_stimer.$(bin): $(TEST_DIR)/hyperv.o
- 
--$(TEST_DIR)/hyperv_connections.elf: $(TEST_DIR)/hyperv.o
-+$(TEST_DIR)/hyperv_connections.$(bin): $(TEST_DIR)/hyperv.o
- 
- arch_clean:
--	$(RM) $(TEST_DIR)/*.o $(TEST_DIR)/*.flat $(TEST_DIR)/*.elf \
--	$(TEST_DIR)/.*.d lib/x86/.*.d \
-+	$(RM) $(TEST_DIR)/*.o $(TEST_DIR)/*.$(out) $(TEST_DIR)/*.elf \
-+	$(TEST_DIR)/.*.d lib/x86/.*.d $(TEST_DIR)/*.so  \
-diff --git a/x86/Makefile.x86_64 b/x86/Makefile.x86_64
-index 8134952..f6c7bd7 100644
---- a/x86/Makefile.x86_64
-+++ b/x86/Makefile.x86_64
-@@ -5,33 +5,46 @@ ldarch = elf64-x86-64
- fcf_protection_full := $(call cc-option, -fcf-protection=full,)
- COMMON_CFLAGS += -mno-red-zone -mno-sse -mno-sse2 $(fcf_protection_full)
- 
-+ifeq ($(CONFIG_EFI),y)
-+out = efi
-+bin = so
-+else
-+out = flat
-+bin = elf
-+endif
-+
- cflatobjs += lib/x86/setjmp64.o
- cflatobjs += lib/x86/intel-iommu.o
- cflatobjs += lib/x86/usermode.o
- 
--tests = $(TEST_DIR)/access.flat $(TEST_DIR)/apic.flat \
--	  $(TEST_DIR)/emulator.flat $(TEST_DIR)/idt_test.flat \
--	  $(TEST_DIR)/xsave.flat $(TEST_DIR)/rmap_chain.flat \
--	  $(TEST_DIR)/pcid.flat $(TEST_DIR)/debug.flat \
--	  $(TEST_DIR)/ioapic.flat $(TEST_DIR)/memory.flat \
--	  $(TEST_DIR)/pku.flat $(TEST_DIR)/hyperv_clock.flat
--tests += $(TEST_DIR)/syscall.flat
--tests += $(TEST_DIR)/svm.flat
--tests += $(TEST_DIR)/vmx.flat
--tests += $(TEST_DIR)/tscdeadline_latency.flat
--tests += $(TEST_DIR)/intel-iommu.flat
--tests += $(TEST_DIR)/vmware_backdoors.flat
--tests += $(TEST_DIR)/rdpru.flat
--tests += $(TEST_DIR)/pks.flat
--tests += $(TEST_DIR)/pmu_lbr.flat
-+# Tests that have relocation / PIC problems and need more attention for EFI.
-+tests_flatonly = $(TEST_DIR)/access.$(out) $(TEST_DIR)/emulator.$(out) \
-+	$(TEST_DIR)/svm.$(out) $(TEST_DIR)/vmx.$(out) \
-+	$(TEST_DIR)/vmware_backdoors.$(out)
-+
-+tests = $(TEST_DIR)/apic.$(out) $(TEST_DIR)/idt_test.$(out) \
-+	  $(TEST_DIR)/xsave.$(out) $(TEST_DIR)/rmap_chain.$(out) \
-+	  $(TEST_DIR)/pcid.$(out) $(TEST_DIR)/debug.$(out) \
-+	  $(TEST_DIR)/ioapic.$(out) $(TEST_DIR)/memory.$(out) \
-+	  $(TEST_DIR)/pku.$(out) $(TEST_DIR)/hyperv_clock.$(out)
-+tests += $(TEST_DIR)/syscall.$(out)
-+tests += $(TEST_DIR)/tscdeadline_latency.$(out)
-+tests += $(TEST_DIR)/intel-iommu.$(out)
-+tests += $(TEST_DIR)/rdpru.$(out)
-+tests += $(TEST_DIR)/pks.$(out)
-+tests += $(TEST_DIR)/pmu_lbr.$(out)
- 
- ifneq ($(fcf_protection_full),)
--tests += $(TEST_DIR)/cet.flat
-+tests_flatonly += $(TEST_DIR)/cet.$(out)
-+endif
-+
-+ifneq ($(CONFIG_EFI),y)
-+tests += $(tests_flatonly)
- endif
- 
- include $(SRCDIR)/$(TEST_DIR)/Makefile.common
- 
--$(TEST_DIR)/hyperv_clock.elf: $(TEST_DIR)/hyperv_clock.o
-+$(TEST_DIR)/hyperv_clock.$(bin): $(TEST_DIR)/hyperv_clock.o
- 
--$(TEST_DIR)/vmx.elf: $(TEST_DIR)/vmx_tests.o
--$(TEST_DIR)/svm.elf: $(TEST_DIR)/svm_tests.o
-+$(TEST_DIR)/vmx.$(bin): $(TEST_DIR)/vmx_tests.o
-+$(TEST_DIR)/svm.$(bin): $(TEST_DIR)/svm_tests.o
+-%.so: %.o $(FLATLIBS) $(cstart.o)
++%.so: %.o $(FLATLIBS) $(TEST_DIR)/efi_main.o $(cstart.o)
+ 	$(LD) -shared -nostdlib -znocombreloc -Bsymbolic -T $(SRCDIR)/x86/efi.lds $^ \
+ 		-o $@ $(FLATLIBS)
+ 	@chmod a-x $@
 diff --git a/x86/cstart64.S b/x86/cstart64.S
-index 5c6ad38..404fcac 100644
+index 404fcac..98e7848 100644
 --- a/x86/cstart64.S
 +++ b/x86/cstart64.S
-@@ -101,20 +101,26 @@ i = i + 1
- 	.endr
- tss_end:
- 
-+#ifndef CONFIG_EFI
- mb_boot_info:	.quad 0
-+#endif
- 
- pt_root:	.quad ptl4
- 
-+#ifndef CONFIG_EFI
- .section .init
-+#endif
- 
- .code32
- 
-+#ifndef CONFIG_EFI
- mb_magic = 0x1BADB002
- mb_flags = 0x0
- 
- 	# multiboot header
- 	.long mb_magic, mb_flags, 0 - (mb_magic + mb_flags)
- mb_cmdline = 16
-+#endif
- 
- MSR_GS_BASE = 0xc0000101
- 
-@@ -140,6 +146,7 @@ MSR_GS_BASE = 0xc0000101
- 	wrmsr
- .endm
- 
-+#ifndef CONFIG_EFI
- .globl start
- start:
- 	mov %ebx, mb_boot_info
-@@ -231,16 +238,20 @@ ap_start32:
- 	setup_percpu_area
- 	call prepare_64
- 	ljmpl $8, $ap_start64
-+#endif	/* CONFIG_EFI */
- 
- .code64
- save_id:
-+#ifndef CONFIG_EFI
- 	movl $(APIC_DEFAULT_PHYS_BASE + APIC_ID), %eax
- 	movl (%rax), %eax
- 	shrl $24, %eax
- 	lock btsl %eax, online_cpus
-+#endif
- 	retq
- 
- ap_start64:
-+#ifndef CONFIG_EFI
- 	call reset_apic
- 	call load_tss
- 	call enable_apic
-@@ -249,11 +260,18 @@ ap_start64:
- 	sti
- 	nop
- 	lock incw cpu_online_count
--
-+#endif
- 1:	hlt
- 	jmp 1b
- 
-+#ifdef CONFIG_EFI
-+.globl _efi_pe_entry
-+_efi_pe_entry:
-+	ret
-+#endif
+@@ -267,7 +267,15 @@ ap_start64:
+ #ifdef CONFIG_EFI
+ .globl _efi_pe_entry
+ _efi_pe_entry:
+-	ret
++	# EFI image loader calls this with rcx=efi_handle,
++	# rdx=efi_system_table. Pass these to efi_main.
++	mov     %rcx, %rdi
++	mov     %rdx, %rsi
 +
++	pushq   %rdi
++	pushq   %rsi
++
++	call efi_main
+ #endif
+ 
  start64:
-+#ifndef CONFIG_EFI
- 	call reset_apic
- 	call load_tss
- 	call mask_pic_interrupts
-@@ -277,9 +295,11 @@ start64:
- 	call main
- 	mov %eax, %edi
- 	call exit
-+#endif
- 
- .globl setup_5level_page_table
- setup_5level_page_table:
-+#ifndef CONFIG_EFI
- 	/* Check if 5-level paging has already enabled */
- 	mov %cr4, %rax
- 	test $0x1000, %eax
-@@ -287,6 +307,7 @@ setup_5level_page_table:
- 
- 	pushq $32
- 	pushq $switch_to_5level
-+#endif
- 	lretq
- lvl5:
- 	retq
-@@ -299,6 +320,7 @@ online_cpus:
- 	.fill (max_cpus + 7) / 8, 1, 0
- 
- load_tss:
-+#ifndef CONFIG_EFI
- 	lidtq idt_descr
- 	mov $(APIC_DEFAULT_PHYS_BASE + APIC_ID), %eax
- 	mov (%rax), %eax
-@@ -317,9 +339,11 @@ load_tss:
- 	mov %eax, tss_descr+8(%rbx)
- 	lea tss_descr-gdt64(%rbx), %rax
- 	ltr %ax
-+#endif
- 	ret
- 
- ap_init:
-+#ifndef CONFIG_EFI
- 	cld
- 	lea sipi_entry, %rsi
- 	xor %rdi, %rdi
-@@ -332,6 +356,7 @@ ap_init:
- 1:	pause
- 	cmpw %ax, cpu_online_count
- 	jne 1b
-+#endif
- 	ret
- 
- cpu_online_count:	.word 1
-diff --git a/x86/efi.lds b/x86/efi.lds
+diff --git a/x86/efi_main.c b/x86/efi_main.c
 new file mode 100644
-index 0000000..9ed1272
+index 0000000..00e7086
 --- /dev/null
-+++ b/x86/efi.lds
-@@ -0,0 +1,67 @@
-+/* Same as gnu-efi's elf_x86_64_fbsd_efi.lds. */
-+OUTPUT_FORMAT("elf64-x86-64", "elf64-x86-64", "elf64-x86-64")
-+OUTPUT_ARCH(i386:x86-64)
-+ENTRY(_efi_pe_entry)
-+SECTIONS
++++ b/x86/efi_main.c
+@@ -0,0 +1,11 @@
++#include <linux/uefi.h>
++
++unsigned long __efiapi efi_main(efi_handle_t handle, efi_system_table_t *sys_tab);
++efi_system_table_t *efi_system_table = NULL;
++
++unsigned long __efiapi efi_main(efi_handle_t handle, efi_system_table_t *sys_tab)
 +{
-+	. = 0;
-+	ImageBase = .;
-+	.hash : { *(.hash) }
-+	.gnu.hash : { *(.gnu.hash) }
-+	. = ALIGN(4096);
-+	.text :
-+	{
-+		_text = .;
-+		*(.text)
-+		*(.text.*)
-+		*(.gnu.linkonce.t.*)
-+		. = ALIGN(16);
-+	}
-+	_etext = .;
-+	_text_size = . - _text;
-+	. = ALIGN(4096);
-+	.reloc :
-+	{
-+		LONG(_data);
-+		LONG(10);
-+		SHORT(0);
-+		*(.reloc)
-+	}
-+	. = ALIGN(4096);
-+	.data :
-+	{
-+		_data = .;
-+		exception_table_start = .;
-+		*(.data.ex)
-+		exception_table_end = .;
-+		*(.rodata*)
-+		*(.got.plt)
-+		*(.got)
-+		*(.data*)
-+		*(.sdata)
-+		*(.sbss)
-+		*(.scommon)
-+		*(.dynbss)
-+		*(.bss)
-+		*(COMMON)
-+		*(.rel.local)
-+	}
-+	.note.gnu.build-id : { *(.note.gnu.build-id) }
-+	edata = .;
-+	_data_size = . - _etext;
-+	. = ALIGN(4096);
-+	.dynamic  : { *(.dynamic) }
-+	. = ALIGN(4096);
-+	.rela :
-+	{
-+		*(.rela.data*)
-+		*(.rela.got)
-+		*(.rela.stab)
-+	}
-+	. = ALIGN(4096);
-+	.dynsym   : { *(.dynsym) }
-+	. = ALIGN(4096);
-+	.dynstr   : { *(.dynstr) }
-+	. = ALIGN(4096);
-+	.comment 0 : { *(.comment) }
++	efi_system_table = sys_tab;
++
++	return 0;
 +}
 -- 
 2.30.2
