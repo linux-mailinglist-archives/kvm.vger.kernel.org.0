@@ -2,125 +2,166 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3CE173F0EDC
-	for <lists+kvm@lfdr.de>; Thu, 19 Aug 2021 01:56:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DD2503F1000
+	for <lists+kvm@lfdr.de>; Thu, 19 Aug 2021 03:32:47 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235070AbhHRX46 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 18 Aug 2021 19:56:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40412 "EHLO
+        id S235119AbhHSBdV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 18 Aug 2021 21:33:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33958 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235005AbhHRX44 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 18 Aug 2021 19:56:56 -0400
-Received: from mail-pf1-x44a.google.com (mail-pf1-x44a.google.com [IPv6:2607:f8b0:4864:20::44a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 64DBCC0613CF
-        for <kvm@vger.kernel.org>; Wed, 18 Aug 2021 16:56:21 -0700 (PDT)
-Received: by mail-pf1-x44a.google.com with SMTP id x18-20020a056a000bd200b003e14701b71dso2133446pfu.21
-        for <kvm@vger.kernel.org>; Wed, 18 Aug 2021 16:56:21 -0700 (PDT)
+        with ESMTP id S234194AbhHSBdU (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 18 Aug 2021 21:33:20 -0400
+Received: from mail-qk1-x732.google.com (mail-qk1-x732.google.com [IPv6:2607:f8b0:4864:20::732])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0C381C061764
+        for <kvm@vger.kernel.org>; Wed, 18 Aug 2021 18:32:45 -0700 (PDT)
+Received: by mail-qk1-x732.google.com with SMTP id 14so5419133qkc.4
+        for <kvm@vger.kernel.org>; Wed, 18 Aug 2021 18:32:45 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
-        h=reply-to:date:message-id:mime-version:subject:from:to:cc;
-        bh=Scvb2gfJzrYfNJq90EL74fT7SS7nVGstZhceM9SRTyY=;
-        b=CPqsJcRdPyzWVw2UkNu0Wn9hUr9Qxq5bXEX1GOFSOmGUzn4ZXDSKec71mwcN+FHo9/
-         J7Hl7xy+UKc/xgVNUN88urCR/U61zjMcY6asIwsJ1NN2YS9qGf+aKvKCDIrLpWvwMxY7
-         2BngKUPmIzEBdYGZPYHGwKJ9jNq1gVsHj9z0RLCoU1r/NmEOi3G9vIVtbVYCcORZAjlI
-         UndfdDGE3KQaTr65pLvCdgbH6llmSIJz96OFnUlXCMFadPkBkt7tK63U5VkNx63TbLCo
-         ERRq3MYzS7Mvlz1HG8GN5rM0km+KLmdMUSZjv6uehqHwlltzlCfbOOiB7zBMlniQMnlZ
-         qqtg==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=qo2MsIXPqPv5VvJq6LQyvJSKStE9z/C19qzo0B1ToA0=;
+        b=nA7kV1d7NodeTusNFegecqOiXfHClfnQn45FglU69HSjh0lRxz2u4T/wNQ2np21tIB
+         +UIDAWvwiWn0wvGXYFOg4Gm+tZZbJdR87huD2QyjG5fVP26sWq8WWer2rVGw3H/G+Fcx
+         pqtaMIT4shAtStAHttnbpN3RQJ+CCSXV8m/B4OPA5jErWXvFgNlCcAZ87YVEVPrKj/v4
+         sDWArk+Lk0tOrPDy6VuFdjplCLKNpMtbpfA0SsUs717R2CsbGl9T1/mLYXtzE/GX1ASi
+         tK2RqqLwxkJKkPX5FsUxJ61InSeote6q+YTsmg2lXdrUpz7dO26zeGe+11ZRqQMDka8N
+         nw3w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:reply-to:date:message-id:mime-version:subject
-         :from:to:cc;
-        bh=Scvb2gfJzrYfNJq90EL74fT7SS7nVGstZhceM9SRTyY=;
-        b=MnyUH+A8DaHUFnxiu4wXvae5D8ApyB9Syoz3wrhduRN7Kh+fn01BPN3pdS0dO4slPc
-         mOLETo7bqNpxs+1Shj5jqoYtmHAfLpsnclLjN3OXrEXmRE9jzcGt+SNoDjaCrAgOJJt3
-         6EjNlgch+iraErQ2Etdj60SP3euyRdc6fL1/BCk2fgkWhIKmhnLyxu5o/NXpJuJJc4j6
-         Lawy6q49gyQ0DtQsm1pO3fMlJZ+RlTisAyv58ZgizKTu2C3gfFYIGFmnvucJkL7xA3zg
-         NuPHJfKYgGsEE8Wtodf9A6HxZkCNk0yDICHnItb1uGHAIeQUiW8ddrAGF/2gHOudDWbZ
-         IPXQ==
-X-Gm-Message-State: AOAM532GNovmsFw5hTAurydQaWh10f8i8ZghTXY1uUx/NRoJX4NpQ3iq
-        1O7075HiZLNQ1+YPAF736KVqIJf8kuk=
-X-Google-Smtp-Source: ABdhPJyqChTXz2F80g0qJy/+xySrxm2DGETkwfuo5JqfDwHZAekTYYLYUCbmnHGiPShsiTlZr2Nz/k/ji+0=
-X-Received: from seanjc.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:3e5])
- (user=seanjc job=sendgmr) by 2002:a17:902:e9c6:b029:12d:4cb3:3985 with SMTP
- id 6-20020a170902e9c6b029012d4cb33985mr9312260plk.56.1629330980601; Wed, 18
- Aug 2021 16:56:20 -0700 (PDT)
-Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Wed, 18 Aug 2021 23:56:15 +0000
-Message-Id: <20210818235615.2047588-1-seanjc@google.com>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.33.0.rc1.237.g0d66db33f3-goog
-Subject: [PATCH] KVM: x86/mmu: Complete prefetch for trailing SPTEs for
- direct, legacy MMU
-From:   Sean Christopherson <seanjc@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Sergey Senozhatsky <senozhatsky@google.com>,
-        Ben Gardon <bgardon@google.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=qo2MsIXPqPv5VvJq6LQyvJSKStE9z/C19qzo0B1ToA0=;
+        b=VEvWWzn0r2/q54+Cn5RSnV+gW84OS/D365ls7JhH3bx1THdMc55auPzdB6K1PxWh9b
+         IWUqThVGr13ePUejK+8KwJqrg9GlBEUt4FNxNTSJdAkkoue4xeI6mGGJVyIxKmD87TNx
+         N7MP9JMZkECIjj8pm1XpKfR8wlj17Apx3bmV3mK1U7aL/fFW7BvAyCn8FdcPqYceqluV
+         bs7F32VGlC06SVEOwKJ4b4PjtsiWLqJa0wtlhMfjOfRlExyx/VmfSWepBUp+/OCOLWKO
+         UM/ukHtZZiNimmTrKdbV9mieIvtoqb2Fd4r16sLwRfAsK9cuEA8z//0oc4fIS/HDtmEX
+         467A==
+X-Gm-Message-State: AOAM531flLweDIXNKa1L+tZGk4LWdUvwhugATwbq1UUmSUHIVm9IlKRK
+        5Y031zv+afOh09OtKKQt1ig/qqfR48ivPW/NAf1FDw==
+X-Google-Smtp-Source: ABdhPJwd/s3LzsFEtLYDThddFTqD76bXBEESWPiOVS4UaWZg2qyn44pIa0SCEEmucFFXWoK1+BrmXqIS0N+ui8Qo5Ns=
+X-Received: by 2002:a37:66d1:: with SMTP id a200mr1217378qkc.440.1629336763931;
+ Wed, 18 Aug 2021 18:32:43 -0700 (PDT)
+MIME-Version: 1.0
+References: <20210702114820.16712-1-varad.gautam@suse.com> <CAA03e5HCdx2sLRqs2jkLDz3z8SB9JhCdxGv7Y6_ER-kMaqHXUg@mail.gmail.com>
+ <YRuURERGp8CQ1jAX@suse.de> <CAA03e5FTrkLpZ3yr3nBphOW3D+8HF-Wmo4um4MTXum3BR6BMQw@mail.gmail.com>
+ <71db10eb-997f-aac1-5d41-3bcbc34c114d@suse.com>
+In-Reply-To: <71db10eb-997f-aac1-5d41-3bcbc34c114d@suse.com>
+From:   Marc Orr <marcorr@google.com>
+Date:   Wed, 18 Aug 2021 18:32:32 -0700
+Message-ID: <CAA03e5H6mM0z5r4knbjHDLS4svLP6WQuhC_5BnSgCyXpRZgqAQ@mail.gmail.com>
+Subject: Re: [kvm-unit-tests PATCH 0/6] Initial x86_64 UEFI support
+To:     Varad Gautam <varad.gautam@suse.com>
+Cc:     Joerg Roedel <jroedel@suse.de>, kvm list <kvm@vger.kernel.org>,
+        virtualization@lists.linux-foundation.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Andrew Jones <drjones@redhat.com>, bp@suse.de,
+        "Lendacky, Thomas" <thomas.lendacky@amd.com>,
+        "Singh, Brijesh" <brijesh.singh@amd.com>,
+        Zixuan Wang <zixuanwang@google.com>,
+        "Hyunwook (Wooky) Baek" <baekhw@google.com>,
+        Erdem Aktas <erdemaktas@google.com>,
+        Tom Roeder <tmroeder@google.com>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Make a final call to direct_pte_prefetch_many() if there are "trailing"
-SPTEs to prefetch, i.e. SPTEs for GFNs following the faulting GFN.  The
-call to direct_pte_prefetch_many() in the loop only handles the case
-where there are !PRESENT SPTEs preceding a PRESENT SPTE.
+On Wed, Aug 18, 2021 at 1:38 AM Varad Gautam <varad.gautam@suse.com> wrote:
+>
+> Hi Marc, Zixuan,
+>
+> On 8/18/21 3:52 AM, Marc Orr wrote:
+> > On Tue, Aug 17, 2021 at 3:49 AM Joerg Roedel <jroedel@suse.de> wrote:
+> >>
+> >> Hi Marc,
+> >>
+> >> On Fri, Aug 13, 2021 at 11:44:39AM -0700, Marc Orr wrote:
+> >>> To date, we have _most_ x86 test cases (39/44) working under UEFI and
+> >>> we've also got some of the test cases to boot under SEV-ES, using the
+> >>> UEFI #VC handler.
+> >>
+> >> While the EFI APP approach simplifies the implementation a lot, I don'=
+t
+> >> think it is the best path to SEV and TDX testing for a couple of
+> >> reasons:
+> >>
+> >>         1) It leaves the details of #VC/#VE handling and the SEV-ES
+> >>            specific communication channels (GHCB) under control of the
+> >>            firmware. So we can't reliably test those interfaces from a=
+n
+> >>            EFI APP.
+> >>
+> >>         2) Same for the memory validation/acceptance interface needed
+> >>            for SEV-SNP and TDX. Using an EFI APP leaves those under
+> >>            firmware control and we are not able to reliably test them.
+> >>
+> >>         3) The IDT also stays under control of the firmware in an EFI
+> >>            APP, otherwise the firmware couldn't provide a #VC handler.
+> >>            This makes it unreliable to test anything IDT or IRQ relate=
+d.
+> >>
+> >>         4) Relying on the firmware #VC hanlder limits the tests to its
+> >>            abilities. Implementing a separate #VC handler routine for
+> >>            kvm-unit-tests is more work, but it makes test development
+> >>            much more flexible.
+> >>
+> >> So it comes down to the fact that and EFI APP leaves control over
+> >> SEV/TDX specific hypervisor interfaces in the firmware, making it hard
+> >> and unreliable to test these interfaces from kvm-unit-tests. The stub
+> >> approach on the other side gives the tests full control over the VM,
+> >> allowing to test all aspects of the guest-host interface.
+> >
+> > I think we might be using terminology differently. (Maybe I mis-used
+> > the term =E2=80=9CEFI app=E2=80=9D?) With our approach, it is true that=
+ all
+> > pre-existing x86_64 test cases work out of the box with the UEFI #VC
+> > handler. However, because kvm-unit-tests calls `ExitBootServices` to
+> > take full control of the system it executes as a =E2=80=9CUEFI-stubbed
+> > kernel=E2=80=9D. Thus, it should be trivial for test cases to update th=
+e IDT
+> > to set up a custom #VC handler for the duration of a test. (Some of
+> > the x86_64 test cases already do something similar where they install
+> > a temporary exception handler and then restore the =E2=80=9Cdefault=E2=
+=80=9D
+> > kvm-unit-tests exception handler.)
+> >
+> > In general, our approach is to set up the test cases to run with the
+> > kvm-unit-tests configuration (e.g., IDT, GDT). The one exception is
+> > the #VC handler. However, all of this state can be overridden within a
+> > test as needed.
+> >
+> > Zixuan just posted the patches. So hopefully they make things more clea=
+r.
+> >
+>
+> Nomenclature aside, I believe Zixuan's patchset [1] takes the same approa=
+ch
+> as I posted here. In the end, we need to:
+> - build the testcases as ELF shared objs and link them to look like a PE
+> - switch away from UEFI GDT/IDT/pagetable states on early boot to what
+>   kvm-unit-tests needs
+> - modify the testcases that contain non-PIC asm stubs to allow building
+>   them as shared objs
+>
+> I went with avoiding to bring in gnu-efi objects into kvm-unit-tests
+> for EFI helpers, and disabling the non-PIC testcases for the RFC's sake.
+>
+> I'll try out "x86 UEFI: Convert x86 test cases to PIC" [2] from Zixuan's
+> patchset with my series and see what breaks. I think we can combine
+> the two patchsets.
+>
+> [1] https://lore.kernel.org/r/20210818000905.1111226-1-zixuanwang@google.=
+com/
+> [2] https://lore.kernel.org/r/20210818000905.1111226-10-zixuanwang@google=
+.com/
 
-E.g. if the faulting GFN is a multiple of 8 (the prefetch size) and all
-SPTEs for the following GFNs are !PRESENT, the loop will terminate with
-"start = sptep+1" and not prefetch any SPTEs.
+This sounds great to us. We will also experiment with combining the
+two patchsets and report back when we have some experience with this.
+Though, please do also report back if you have an update on this
+before we do.
 
-Prefetching trailing SPTEs as intended can drastically reduce the number
-of guest page faults, e.g. accessing the first byte of every 4kb page in
-a 6gb chunk of virtual memory, in a VM with 8gb of preallocated memory,
-the number of pf_fixed events observed in L0 drops from ~1.75M to <0.27M.
-
-Note, this only affects memory that is backed by 4kb pages as KVM doesn't
-prefetch when installing hugepages.  Shadow paging prefetching is not
-affected as it does not batch the prefetches due to the need to process
-the corresponding guest PTE.  The TDP MMU is not affected because it
-doesn't have prefetching, yet...
-
-Fixes: 957ed9effd80 ("KVM: MMU: prefetch ptes when intercepted guest #PF")
-Cc: Sergey Senozhatsky <senozhatsky@google.com>
-Cc: Ben Gardon <bgardon@google.com>
-Signed-off-by: Sean Christopherson <seanjc@google.com>
----
-
-Cc'd Ben as this highlights a potential gap with the TDP MMU, which lacks
-prefetching of any sort.  For large VMs, which are likely backed by
-hugepages anyways, this is a non-issue as the benefits of holding mmu_lock
-for read likely masks the cost of taking more VM-Exits.  But VMs with a
-small number of vCPUs won't benefit as much from parallel page faults,
-e.g. there's no benefit at all if there's a single vCPU.
-
- arch/x86/kvm/mmu/mmu.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
-
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index a272ccbddfa1..daf7df35f788 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -2818,11 +2818,13 @@ static void __direct_pte_prefetch(struct kvm_vcpu *vcpu,
- 			if (!start)
- 				continue;
- 			if (direct_pte_prefetch_many(vcpu, sp, start, spte) < 0)
--				break;
-+				return;
- 			start = NULL;
- 		} else if (!start)
- 			start = spte;
- 	}
-+	if (start)
-+		direct_pte_prefetch_many(vcpu, sp, start, spte);
- }
- 
- static void direct_pte_prefetch(struct kvm_vcpu *vcpu, u64 *sptep)
--- 
-2.33.0.rc1.237.g0d66db33f3-goog
-
+Thanks,
+Marc
