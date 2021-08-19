@@ -2,83 +2,251 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2BA633F101D
-	for <lists+kvm@lfdr.de>; Thu, 19 Aug 2021 03:55:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E62B63F1233
+	for <lists+kvm@lfdr.de>; Thu, 19 Aug 2021 06:09:40 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235566AbhHSBzu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 18 Aug 2021 21:55:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38944 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235258AbhHSBzt (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 18 Aug 2021 21:55:49 -0400
-Received: from mail-ej1-x62d.google.com (mail-ej1-x62d.google.com [IPv6:2a00:1450:4864:20::62d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3DB22C061764
-        for <kvm@vger.kernel.org>; Wed, 18 Aug 2021 18:55:13 -0700 (PDT)
-Received: by mail-ej1-x62d.google.com with SMTP id qk33so9178285ejc.12
-        for <kvm@vger.kernel.org>; Wed, 18 Aug 2021 18:55:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=5fJ4QoiERO7mOVVJY9cLiWJv+BztYXiri0O71N77ysY=;
-        b=lQHz0HhI+tmXSNmvB+z7rPxLyvp75l75RCvqUqw387YPqBN7pEp6Q2UxR1dYmkOIWV
-         JlkRpy30JLTQ/Be3XH/BmPAF5G1btNEDI3gFX9WnT1oqTfxjaZ9xscPITNtN7bvGEdRA
-         Ri4aA1GiWiteaIaPR0C+6cPJYN/nTD/5PsxkHhIgv4j+dnQzP8KXL6TO8+fvAUhv69UC
-         eqwPWrLRc48dfGkPwcj9X8Bjnz0xpUX3JvhlUqgh6BVge3ray73UA5ztGYG1or9DeXEH
-         CIs4VOCgMBglsMSZaayal03KAaLEmzwMtiI8CsC1LPkhAF7zsgxh8utjfg+ELx8ChfkR
-         biwg==
+        id S229570AbhHSEKP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 19 Aug 2021 00:10:15 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:34436 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229560AbhHSEKJ (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 19 Aug 2021 00:10:09 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1629346173;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=845M9dCu0BBwxxguLiM0h6US9TVl5Oo1nvahLbWOs4I=;
+        b=aSPKH132rZhVsJoDG7gvbPpWT+NUpg6B8mzsJ47/S0rZoerg8zuXXCKYTEutH4n39y+4Un
+        PvdrhlxxHmuoOvjUeFJydzPF0sR9TLDjD2XZN4Mv+0F1NZKh3GzRm6MG9PXVrXxyry6rdo
+        Ku86h1tPykt3Ge7pV/fU0uOYEFjg574=
+Received: from mail-pl1-f199.google.com (mail-pl1-f199.google.com
+ [209.85.214.199]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-238-QBvdOKCmMZSSWa171eP6AQ-1; Thu, 19 Aug 2021 00:09:28 -0400
+X-MC-Unique: QBvdOKCmMZSSWa171eP6AQ-1
+Received: by mail-pl1-f199.google.com with SMTP id s6-20020a170902b186b029012cbebe7236so1130193plr.11
+        for <kvm@vger.kernel.org>; Wed, 18 Aug 2021 21:09:28 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=5fJ4QoiERO7mOVVJY9cLiWJv+BztYXiri0O71N77ysY=;
-        b=cpybUlzLNtbq7MCWy3IBRm4jUJwNxdOdaC+qwMWisIQ5z5QiKg3fV5S51tD3BOlie3
-         IUGU+N6iak5DSJnZYIeSWtpwKb2WPRvLRAGCzgRzfkWvs7s3GUp5Hk+YzzAvIa8hkFjK
-         KL/jSnw7n1+/lJp5lkDtFF0Y+cMBy4hZjRdFdQ0eCG5qvT/3SUefLcigHEhy7KXpFMoP
-         cmY7FwNHF0JefniHRRltVkYyc5i72/EyK70AXMUjuLroqr5foC6uOjFYcZTbKZTF5/1Q
-         hwMSZvkj2fsQ5u/25i/lF91NvY3f8xijxROhQ8wlFZlUfC9c1qHBWP2OhYawTIKEZitB
-         3Qng==
-X-Gm-Message-State: AOAM530XlqwZ23g0/riFDex20if5R/VEykAzT2bBmgBUixM/Tt46pRWg
-        xk0wStxQIkmv+DRDQVb3xdlvQC0mc/xF3TYEKfwwEoz8rt1ANg==
-X-Google-Smtp-Source: ABdhPJyYvmrVOhbqDOLa/51WUU5KfYudtavo0eLESA8/YbfCWY4HvLHgAC9vU3wIXnj2UUZLfcdsAOXTMOZ69Sf7Fxw=
-X-Received: by 2002:a17:906:b094:: with SMTP id x20mr12676768ejy.257.1629338111678;
- Wed, 18 Aug 2021 18:55:11 -0700 (PDT)
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-transfer-encoding
+         :content-language;
+        bh=845M9dCu0BBwxxguLiM0h6US9TVl5Oo1nvahLbWOs4I=;
+        b=rEF7ND5XMg9z8y3+c9kEM26VW4UGsP8C5WU4v8BhymfRwDuIfLxDoTcCukKsqX3jT7
+         6wNyQ56EamruedK/a01VUynPp3Y+WYwHJILATu0/9qy+XtOIMkI9dDSRUDOIccGdfA5a
+         srPShTeTUI6x7MgTHlEV36VPvN593EVwgh4hyEDSw1j7LV9JCBBpWBdyzqSDuCracNDA
+         ce7UgAXmMz7FsvMRBrxN5VOt8z8a9mHXXpNxmAfPiyBHKtZVsJyL7AzjUcExHpgZJLhC
+         nGJ3fxZBwQP61B5WnlZfBbL5E0xKAkGpjXHfo1MewMTilsTkxI3OjL0RaQml6co3szEA
+         GOCA==
+X-Gm-Message-State: AOAM533O3xNUpaYQmUL6A7Z6RSVS7R0GK36Yac6Sa+Zq0d4E+RStN0gN
+        8TfofOZaSILPy5hvqVASmgB3N7Z0aXBdU2KmjKk3Vhq65XOoLTOQZK/TD7mAOHbnX75dsPMsTda
+        LXeLLmggimhXTYs0ypRJIrsf0Qb6XH4Hn7dXVdq9/77jsksw6x1k6cBh6kphIkk0W
+X-Received: by 2002:a65:51c7:: with SMTP id i7mr11985385pgq.300.1629346167530;
+        Wed, 18 Aug 2021 21:09:27 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwdDjel8iMgCuyVB7vKLugcmk5D1NVeufi9kRNTtKpFwx5blvUXV+sVKfFzR0MS5E4wBrhB6A==
+X-Received: by 2002:a65:51c7:: with SMTP id i7mr11985360pgq.300.1629346167179;
+        Wed, 18 Aug 2021 21:09:27 -0700 (PDT)
+Received: from wangxiaodeMacBook-Air.local ([209.132.188.80])
+        by smtp.gmail.com with ESMTPSA id p34sm1355587pfh.172.2021.08.18.21.09.22
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 18 Aug 2021 21:09:26 -0700 (PDT)
+Subject: Re: [PATCH 1/2] vDPA/ifcvf: detect and use the onboard number of
+ queues directly
+To:     Zhu Lingshan <lingshan.zhu@intel.com>, mst@redhat.com
+Cc:     virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        kvm@vger.kernel.org
+References: <20210818095714.3220-1-lingshan.zhu@intel.com>
+ <20210818095714.3220-2-lingshan.zhu@intel.com>
+From:   Jason Wang <jasowang@redhat.com>
+Message-ID: <78c25559-0423-7ef6-9cdd-d2b81df111ca@redhat.com>
+Date:   Thu, 19 Aug 2021 12:09:19 +0800
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0)
+ Gecko/20100101 Thunderbird/78.13.0
 MIME-Version: 1.0
-References: <20210702114820.16712-1-varad.gautam@suse.com> <CAA03e5HCdx2sLRqs2jkLDz3z8SB9JhCdxGv7Y6_ER-kMaqHXUg@mail.gmail.com>
- <YRuURERGp8CQ1jAX@suse.de> <CAA03e5FTrkLpZ3yr3nBphOW3D+8HF-Wmo4um4MTXum3BR6BMQw@mail.gmail.com>
- <71db10eb-997f-aac1-5d41-3bcbc34c114d@suse.com> <CAA03e5H6mM0z5r4knbjHDLS4svLP6WQuhC_5BnSgCyXpRZgqAQ@mail.gmail.com>
- <0250F07B-AC9A-4110-B2F4-8537A40D8848@gmail.com>
-In-Reply-To: <0250F07B-AC9A-4110-B2F4-8537A40D8848@gmail.com>
-From:   Zixuan Wang <zixuanwang@google.com>
-Date:   Wed, 18 Aug 2021 18:54:59 -0700
-Message-ID: <CAFVYft2ObMDtPsZHgLNo1VgWxfgCq6+FPmyv2dsQCzM=JRMbeg@mail.gmail.com>
-Subject: Re: [kvm-unit-tests PATCH 0/6] Initial x86_64 UEFI support
-To:     Nadav Amit <nadav.amit@gmail.com>
-Cc:     Marc Orr <marcorr@google.com>,
-        Varad Gautam <varad.gautam@suse.com>,
-        Joerg Roedel <jroedel@suse.de>, kvm list <kvm@vger.kernel.org>,
-        Linux Virtualization <virtualization@lists.linux-foundation.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Andrew Jones <drjones@redhat.com>, bp@suse.de,
-        "Lendacky, Thomas" <Thomas.Lendacky@amd.com>,
-        "Singh, Brijesh" <brijesh.singh@amd.com>,
-        "Hyunwook (Wooky) Baek" <baekhw@google.com>,
-        Erdem Aktas <erdemaktas@google.com>,
-        Tom Roeder <tmroeder@google.com>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <20210818095714.3220-2-lingshan.zhu@intel.com>
+Content-Type: text/plain; charset=gbk; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Aug 18, 2021 at 6:42 PM Nadav Amit <nadav.amit@gmail.com> wrote:
+
+ÔÚ 2021/8/18 ÏÂÎç5:57, Zhu Lingshan Ð´µÀ:
+> To enable this multi-queue feature for ifcvf, this commit
+> intends to detect and use the onboard number of queues
+> directly than IFCVF_MAX_QUEUE_PAIRS = 1 (removed)
 >
-> Just wondering (aka, my standard question): does it work on
-> bare-metal (putting aside tests that rely on test-devices)?
+> Signed-off-by: Zhu Lingshan <lingshan.zhu@intel.com>
+> ---
+>   drivers/vdpa/ifcvf/ifcvf_base.c |  8 +++++---
+>   drivers/vdpa/ifcvf/ifcvf_base.h | 10 ++++------
+>   drivers/vdpa/ifcvf/ifcvf_main.c | 21 ++++++++++++---------
+>   3 files changed, 21 insertions(+), 18 deletions(-)
 >
+> diff --git a/drivers/vdpa/ifcvf/ifcvf_base.c b/drivers/vdpa/ifcvf/ifcvf_base.c
+> index 6e197fe0fcf9..2808f1ba9f7b 100644
+> --- a/drivers/vdpa/ifcvf/ifcvf_base.c
+> +++ b/drivers/vdpa/ifcvf/ifcvf_base.c
+> @@ -158,7 +158,9 @@ int ifcvf_init_hw(struct ifcvf_hw *hw, struct pci_dev *pdev)
+>   		return -EIO;
+>   	}
+>   
+> -	for (i = 0; i < IFCVF_MAX_QUEUE_PAIRS * 2; i++) {
+> +	hw->nr_vring = ifc_ioread16(&hw->common_cfg->num_queues);
+> +
+> +	for (i = 0; i < hw->nr_vring; i++) {
+>   		ifc_iowrite16(i, &hw->common_cfg->queue_select);
+>   		notify_off = ifc_ioread16(&hw->common_cfg->queue_notify_off);
+>   		hw->vring[i].notify_addr = hw->notify_base +
+> @@ -304,7 +306,7 @@ u16 ifcvf_get_vq_state(struct ifcvf_hw *hw, u16 qid)
+>   	u32 q_pair_id;
+>   
+>   	ifcvf_lm = (struct ifcvf_lm_cfg __iomem *)hw->lm_cfg;
+> -	q_pair_id = qid / (IFCVF_MAX_QUEUE_PAIRS * 2);
+> +	q_pair_id = qid / hw->nr_vring;
+>   	avail_idx_addr = &ifcvf_lm->vring_lm_cfg[q_pair_id].idx_addr[qid % 2];
+>   	last_avail_idx = ifc_ioread16(avail_idx_addr);
+>   
+> @@ -318,7 +320,7 @@ int ifcvf_set_vq_state(struct ifcvf_hw *hw, u16 qid, u16 num)
+>   	u32 q_pair_id;
+>   
+>   	ifcvf_lm = (struct ifcvf_lm_cfg __iomem *)hw->lm_cfg;
+> -	q_pair_id = qid / (IFCVF_MAX_QUEUE_PAIRS * 2);
+> +	q_pair_id = qid / hw->nr_vring;
+>   	avail_idx_addr = &ifcvf_lm->vring_lm_cfg[q_pair_id].idx_addr[qid % 2];
+>   	hw->vring[qid].last_avail_idx = num;
+>   	ifc_iowrite16(num, avail_idx_addr);
+> diff --git a/drivers/vdpa/ifcvf/ifcvf_base.h b/drivers/vdpa/ifcvf/ifcvf_base.h
+> index 1601e87870da..97d9019a3ec0 100644
+> --- a/drivers/vdpa/ifcvf/ifcvf_base.h
+> +++ b/drivers/vdpa/ifcvf/ifcvf_base.h
+> @@ -31,8 +31,8 @@
+>   		 (1ULL << VIRTIO_F_ACCESS_PLATFORM)		| \
+>   		 (1ULL << VIRTIO_NET_F_MRG_RXBUF))
+>   
+> -/* Only one queue pair for now. */
+> -#define IFCVF_MAX_QUEUE_PAIRS	1
+> +/* Max 8 data queue pairs(16 queues) and one control vq for now. */
+> +#define IFCVF_MAX_QUEUES	17
 
-Hi Nadav,
 
-We tested our patches in VMs, and have not tested on bare-metal machines.
+While at it, I wonder if we can get rid of this.
 
-Regards,
-Zixuan Wang
+Other than this,
+
+Acked-by: Jason Wang <jasowang@redhat.com>
+
+
+>   
+>   #define IFCVF_QUEUE_ALIGNMENT	PAGE_SIZE
+>   #define IFCVF_QUEUE_MAX		32768
+> @@ -51,8 +51,6 @@
+>   #define ifcvf_private_to_vf(adapter) \
+>   	(&((struct ifcvf_adapter *)adapter)->vf)
+>   
+> -#define IFCVF_MAX_INTR (IFCVF_MAX_QUEUE_PAIRS * 2 + 1)
+> -
+>   struct vring_info {
+>   	u64 desc;
+>   	u64 avail;
+> @@ -83,7 +81,7 @@ struct ifcvf_hw {
+>   	u32 dev_type;
+>   	struct virtio_pci_common_cfg __iomem *common_cfg;
+>   	void __iomem *net_cfg;
+> -	struct vring_info vring[IFCVF_MAX_QUEUE_PAIRS * 2];
+> +	struct vring_info vring[IFCVF_MAX_QUEUES];
+>   	void __iomem * const *base;
+>   	char config_msix_name[256];
+>   	struct vdpa_callback config_cb;
+> @@ -103,7 +101,7 @@ struct ifcvf_vring_lm_cfg {
+>   
+>   struct ifcvf_lm_cfg {
+>   	u8 reserved[IFCVF_LM_RING_STATE_OFFSET];
+> -	struct ifcvf_vring_lm_cfg vring_lm_cfg[IFCVF_MAX_QUEUE_PAIRS];
+> +	struct ifcvf_vring_lm_cfg vring_lm_cfg[IFCVF_MAX_QUEUES];
+>   };
+>   
+>   struct ifcvf_vdpa_mgmt_dev {
+> diff --git a/drivers/vdpa/ifcvf/ifcvf_main.c b/drivers/vdpa/ifcvf/ifcvf_main.c
+> index 4b623253f460..e34c2ec2b69b 100644
+> --- a/drivers/vdpa/ifcvf/ifcvf_main.c
+> +++ b/drivers/vdpa/ifcvf/ifcvf_main.c
+> @@ -63,9 +63,13 @@ static int ifcvf_request_irq(struct ifcvf_adapter *adapter)
+>   	struct pci_dev *pdev = adapter->pdev;
+>   	struct ifcvf_hw *vf = &adapter->vf;
+>   	int vector, i, ret, irq;
+> +	u16 max_intr;
+>   
+> -	ret = pci_alloc_irq_vectors(pdev, IFCVF_MAX_INTR,
+> -				    IFCVF_MAX_INTR, PCI_IRQ_MSIX);
+> +	/* all queues and config interrupt  */
+> +	max_intr = vf->nr_vring + 1;
+> +
+> +	ret = pci_alloc_irq_vectors(pdev, max_intr,
+> +				    max_intr, PCI_IRQ_MSIX);
+>   	if (ret < 0) {
+>   		IFCVF_ERR(pdev, "Failed to alloc IRQ vectors\n");
+>   		return ret;
+> @@ -83,7 +87,7 @@ static int ifcvf_request_irq(struct ifcvf_adapter *adapter)
+>   		return ret;
+>   	}
+>   
+> -	for (i = 0; i < IFCVF_MAX_QUEUE_PAIRS * 2; i++) {
+> +	for (i = 0; i < vf->nr_vring; i++) {
+>   		snprintf(vf->vring[i].msix_name, 256, "ifcvf[%s]-%d\n",
+>   			 pci_name(pdev), i);
+>   		vector = i + IFCVF_MSI_QUEUE_OFF;
+> @@ -112,7 +116,6 @@ static int ifcvf_start_datapath(void *private)
+>   	u8 status;
+>   	int ret;
+>   
+> -	vf->nr_vring = IFCVF_MAX_QUEUE_PAIRS * 2;
+>   	ret = ifcvf_start_hw(vf);
+>   	if (ret < 0) {
+>   		status = ifcvf_get_status(vf);
+> @@ -128,7 +131,7 @@ static int ifcvf_stop_datapath(void *private)
+>   	struct ifcvf_hw *vf = ifcvf_private_to_vf(private);
+>   	int i;
+>   
+> -	for (i = 0; i < IFCVF_MAX_QUEUE_PAIRS * 2; i++)
+> +	for (i = 0; i < vf->nr_vring; i++)
+>   		vf->vring[i].cb.callback = NULL;
+>   
+>   	ifcvf_stop_hw(vf);
+> @@ -141,7 +144,7 @@ static void ifcvf_reset_vring(struct ifcvf_adapter *adapter)
+>   	struct ifcvf_hw *vf = ifcvf_private_to_vf(adapter);
+>   	int i;
+>   
+> -	for (i = 0; i < IFCVF_MAX_QUEUE_PAIRS * 2; i++) {
+> +	for (i = 0; i < vf->nr_vring; i++) {
+>   		vf->vring[i].last_avail_idx = 0;
+>   		vf->vring[i].desc = 0;
+>   		vf->vring[i].avail = 0;
+> @@ -227,7 +230,7 @@ static void ifcvf_vdpa_set_status(struct vdpa_device *vdpa_dev, u8 status)
+>   	if ((status_old & VIRTIO_CONFIG_S_DRIVER_OK) &&
+>   	    !(status & VIRTIO_CONFIG_S_DRIVER_OK)) {
+>   		ifcvf_stop_datapath(adapter);
+> -		ifcvf_free_irq(adapter, IFCVF_MAX_QUEUE_PAIRS * 2);
+> +		ifcvf_free_irq(adapter, vf->nr_vring);
+>   	}
+>   
+>   	if (status == 0) {
+> @@ -526,13 +529,13 @@ static int ifcvf_vdpa_dev_add(struct vdpa_mgmt_dev *mdev, const char *name)
+>   		goto err;
+>   	}
+>   
+> -	for (i = 0; i < IFCVF_MAX_QUEUE_PAIRS * 2; i++)
+> +	for (i = 0; i < vf->nr_vring; i++)
+>   		vf->vring[i].irq = -EINVAL;
+>   
+>   	vf->hw_features = ifcvf_get_hw_features(vf);
+>   
+>   	adapter->vdpa.mdev = &ifcvf_mgmt_dev->mdev;
+> -	ret = _vdpa_register_device(&adapter->vdpa, IFCVF_MAX_QUEUE_PAIRS * 2);
+> +	ret = _vdpa_register_device(&adapter->vdpa, vf->nr_vring);
+>   	if (ret) {
+>   		IFCVF_ERR(pdev, "Failed to register to vDPA bus");
+>   		goto err;
+
