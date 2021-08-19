@@ -2,107 +2,129 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 399313F1DF4
-	for <lists+kvm@lfdr.de>; Thu, 19 Aug 2021 18:37:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D2ACB3F1E23
+	for <lists+kvm@lfdr.de>; Thu, 19 Aug 2021 18:39:28 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229521AbhHSQiN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 19 Aug 2021 12:38:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45582 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229465AbhHSQiM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 19 Aug 2021 12:38:12 -0400
-Received: from mail-pf1-x429.google.com (mail-pf1-x429.google.com [IPv6:2607:f8b0:4864:20::429])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5548EC061575
-        for <kvm@vger.kernel.org>; Thu, 19 Aug 2021 09:37:36 -0700 (PDT)
-Received: by mail-pf1-x429.google.com with SMTP id k19so6019041pfc.11
-        for <kvm@vger.kernel.org>; Thu, 19 Aug 2021 09:37:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=113bVJbsP9diowruwEeCAKf5QQDoYra/E0SzbMOGGlY=;
-        b=RzLmC+/Cy/M7zc24FvWrozMC1HWaWjizmEelwunmGWserl9ZC+HiwQ0F6/FLz9tXIL
-         waRQHBGrsUV0dQ4dtGUxmxVAewowYAdxlCnoAPJVrXQED02XxeeXn2Gj7VtTr6DIqpM1
-         AtlAhjftCgk0UkHk6pnnwl61T0spE85LsZ+qmQAXIwy/Ns78N5eXRQzVngWfpo4tkK9t
-         DdrTomYy3bSeR/f2iDDaUvhOn66sKjuyFzPcuklLdaGGArX1LuxX2BZMqZHi+Kr9Curg
-         cYYyua2VwnNJLp78GQYZKQBxDUMhCFKd6Ph1CRc9em/GEOf3/61N27uy4Hwavwef3vFG
-         ALIg==
+        id S234207AbhHSQkD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 19 Aug 2021 12:40:03 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:40835 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S234789AbhHSQjj (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 19 Aug 2021 12:39:39 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1629391142;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=3p2/vtk0jECaEq9Opdy1U0ndXxwF4zZ0NkReVHjVbJo=;
+        b=FXJMBj+foCCU1nZivMeHH8RmPNc+FjWQlgmdRiU5OFVPVAzAai9mwu4qy2BjvC1XtiHocA
+        ULnTPuFc9p1mm1OJLuw7+zwKq5EnMZ666r1gxVL0/aUOswa/lwp2cMdRNzDqNLFYuqnKdB
+        YCExbgX5P1PWX2zCh0ONxgUHIMyqxJQ=
+Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
+ [209.85.218.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-123-kF9uFPxXPsKsFizpNbctdA-1; Thu, 19 Aug 2021 12:39:01 -0400
+X-MC-Unique: kF9uFPxXPsKsFizpNbctdA-1
+Received: by mail-ej1-f69.google.com with SMTP id e1-20020a170906c001b02905b53c2f6542so2483727ejz.7
+        for <kvm@vger.kernel.org>; Thu, 19 Aug 2021 09:39:00 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=113bVJbsP9diowruwEeCAKf5QQDoYra/E0SzbMOGGlY=;
-        b=cnlVOC4OuQvXdykalO0ARI7tbrU68XzMMnV7pfopXX6bPHv6+geXSwWv8PrfYDsFRz
-         nQgRh/qdR55p8lbzPRnEVQRfp+sJ4ckAhNmJyy7C64tObMrOS+L4099JIVTw1t/X9CNI
-         pOe2rD9kPNZNpv+Q9FpjRskCKkyUyhkZUopWbzsdLjBwlUFTANUgvcfIPFAv91/BxRAn
-         kBhzt4sQ8vjqFuHENnG/W4/KFEpGjGPqoXeTUvUIFkG/TJu94oMGB1I45FjaWO5V0T14
-         UuVvFW3SCEz3Tx7UGJL+hbFBw088rXzaERUcvQOgI1pluME8eLdqkb8htoEYGj4qFjrq
-         yczw==
-X-Gm-Message-State: AOAM533lL+xU+/V0PR2u7CSWp+ZgurHZOGlA80ZNx+lghuXbCNMOBRWe
-        sxQ/NFBFFa2VnfPsGfgYJbxsIg==
-X-Google-Smtp-Source: ABdhPJw94yPjz6lkpQeH4PMVXdutytK/se+SZVHyaKAXsf4M6GT/CAc6297WbxdZ5baSLbxGO3Hjdg==
-X-Received: by 2002:a63:b59:: with SMTP id a25mr14635125pgl.373.1629391055651;
-        Thu, 19 Aug 2021 09:37:35 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id b12sm4074197pff.63.2021.08.19.09.37.34
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 19 Aug 2021 09:37:34 -0700 (PDT)
-Date:   Thu, 19 Aug 2021 16:37:29 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     David Matlack <dmatlack@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-        Ben Gardon <bgardon@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Jim Mattson <jmattson@google.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>
-Subject: Re: [RFC PATCH 3/6] KVM: x86/mmu: Pass the memslot around via struct
- kvm_page_fault
-Message-ID: <YR6Iyc3PNqUey7LM@google.com>
-References: <20210813203504.2742757-1-dmatlack@google.com>
- <20210813203504.2742757-4-dmatlack@google.com>
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=3p2/vtk0jECaEq9Opdy1U0ndXxwF4zZ0NkReVHjVbJo=;
+        b=BvA01XcNvopAU/j5aF898Wu6yhd51mZ3IFemVrKUmpADJtN0oOYu/R8ntErrN8Te5W
+         j9PtdTCWzq6LucO6hKMkGx+PvgYHwg1YwCxrn0jH0ypGEUPag5OdagR88l1nt+LOFMLr
+         xCmhYjIbEXuJbBlTkF+tZHCoDRRtRs+spLmia0iDa8aS0FoknY+WwB6JkYbvkEndnC++
+         KPsqnCtRGnFjyLMhqSF9kfrFduF7LVinc8otcLxJpINI4Lm/XKMqg3bWgps2FED421UI
+         SB0xjiWWD7bYcZ6CXOkog3scXIlx7d92qw7dhZnjhjfg3cRoEC9Z1/Ok0bLK55qZAgq2
+         0t3Q==
+X-Gm-Message-State: AOAM533gGjrQtmNPbHjt/JmK/mlz4aksRNW2SKz78v4dVNzxmm2n0HzU
+        t2TRNmgvK6Pd9M5UI2IiFOdPSp2AeLZQ7tTBoDbX0kJV/LDSB+YQvWrLASMcqqBet6O1tzBB8qi
+        raAhwgqc4Ewqv
+X-Received: by 2002:a17:906:a18b:: with SMTP id s11mr17076315ejy.8.1629391139969;
+        Thu, 19 Aug 2021 09:38:59 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwOdH+eJ6Wno44KalFXnhRgah0GFAbuXK7572PyLLUjd5u6riwor5wGbINUfFiggJne5e+AnA==
+X-Received: by 2002:a17:906:a18b:: with SMTP id s11mr17076280ejy.8.1629391139764;
+        Thu, 19 Aug 2021 09:38:59 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:63a7:c72e:ea0e:6045? ([2001:b07:6468:f312:63a7:c72e:ea0e:6045])
+        by smtp.gmail.com with ESMTPSA id da1sm2054086edb.26.2021.08.19.09.38.58
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 19 Aug 2021 09:38:59 -0700 (PDT)
+Subject: Re: [PATCH v3 3/3] KVM: SVM: Add 5-level page table support for SVM
+To:     Sean Christopherson <seanjc@google.com>,
+        Wei Huang <wei.huang2@amd.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com,
+        joro@8bytes.org, tglx@linutronix.de, mingo@redhat.com,
+        bp@alien8.de, x86@kernel.org, hpa@zytor.com
+References: <20210818165549.3771014-1-wei.huang2@amd.com>
+ <20210818165549.3771014-4-wei.huang2@amd.com> <YR1EPNRNtIZZ7LXd@google.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <d5894435-c5e1-890d-880c-6b6390fe50d8@redhat.com>
+Date:   Thu, 19 Aug 2021 18:38:57 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.11.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210813203504.2742757-4-dmatlack@google.com>
+In-Reply-To: <YR1EPNRNtIZZ7LXd@google.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Aug 13, 2021, David Matlack wrote:
-> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> index 3352312ab1c9..fb2c95e8df00 100644
-> --- a/arch/x86/kvm/mmu/mmu.c
-> +++ b/arch/x86/kvm/mmu/mmu.c
-> @@ -2890,7 +2890,7 @@ int kvm_mmu_max_mapping_level(struct kvm *kvm,
->  
->  void kvm_mmu_hugepage_adjust(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
->  {
-> -	struct kvm_memory_slot *slot;
-> +	struct kvm_memory_slot *slot = fault->slot;
->  	kvm_pfn_t mask;
->  
->  	fault->huge_page_disallowed = fault->exec && fault->nx_huge_page_workaround_enabled;
-> @@ -2901,8 +2901,7 @@ void kvm_mmu_hugepage_adjust(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault
->  	if (is_error_noslot_pfn(fault->pfn) || kvm_is_reserved_pfn(fault->pfn))
->  		return;
->  
-> -	slot = gfn_to_memslot_dirty_bitmap(vcpu, fault->gfn, true);
-> -	if (!slot)
-> +	if (kvm_slot_dirty_track_enabled(slot))
+On 18/08/21 19:32, Sean Christopherson wrote:
+> On Wed, Aug 18, 2021, Wei Huang wrote:
+>> When the 5-level page table is enabled on host OS, the nested page table
+>> for guest VMs must use 5-level as well. Update get_npt_level() function
+>> to reflect this requirement. In the meanwhile, remove the code that
+>> prevents kvm-amd driver from being loaded when 5-level page table is
+>> detected.
+>>
+>> Signed-off-by: Wei Huang <wei.huang2@amd.com>
+>> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> 
+> If this patch authored by Paolo, he needs to be attributed via From:.  If Paolo
+> is a co-author, he needs a Co-developed-by:.  If either of those is true, your
+> SOB needs to be last in the chain since you are the last handler of the patch.
+> If neither is true, Paolo's SOB should be removed.
 
-This is unnecessarily obfuscated.  It relies on the is_error_noslot_pfn() to
-ensure fault->slot is valid, but the only reason that helper is used is because
-it was the most efficient code when slot wasn't available.  IMO, this would be
-better:
+I didn't even remember writing this, but it's possible I pseudocoded in 
+an email just like you did below.
 
-	if (!slot || kvm_slot_dirty_track_enabled(slot))
-		return;
+>> -	return PT64_ROOT_4LEVEL;
+>> +	bool la57 = (cr4_read_shadow() & X86_CR4_LA57) != 0;
+>> +
+>> +	return la57 ? PT64_ROOT_5LEVEL : PT64_ROOT_4LEVEL;
+> 
+> Why obfuscate this?  KVM is completely hosed if pgtable_l5_enabled() doesn't
+> match host CR4.  E.g.
+> 
+> 	return pgtable_l5_enabled() ? PT64_ROOT_5LEVEL : PT64_ROOT_4LEVEL;
 
-	if (kvm_is_reserved_pfn(fault->pfn))
-		return;
+That also suggests the above pseudocoding scenario, where I'd be too 
+lazy to look up the correct spelling of pgtable_l5_enabled().
 
-On a related topic, a good follow-up to this series would be to pass @fault into
-the prefetch helpers, and modify the prefetch logic to re-use fault->slot and
-refuse to prefetch across memslot boundaries.  That would eliminate all users of
-gfn_to_memslot_dirty_bitmap() and allow us to drop that abomination.
+Paolo
+
+>>   #else
+>>   	return PT32E_ROOT_LEVEL;
+>>   #endif
+>> @@ -462,11 +464,6 @@ static int has_svm(void)
+>>   		return 0;
+>>   	}
+>>   
+>> -	if (pgtable_l5_enabled()) {
+>> -		pr_info("KVM doesn't yet support 5-level paging on AMD SVM\n");
+>> -		return 0;
+>> -	}
+>> -
+>>   	return 1;
+>>   }
+>>   
+>> -- 
+>> 2.31.1
+>>
+> 
+
