@@ -2,100 +2,95 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id BC3713F1E44
-	for <lists+kvm@lfdr.de>; Thu, 19 Aug 2021 18:46:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4A02A3F1E4B
+	for <lists+kvm@lfdr.de>; Thu, 19 Aug 2021 18:47:29 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229670AbhHSQrC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 19 Aug 2021 12:47:02 -0400
-Received: from mail.skyhub.de ([5.9.137.197]:39558 "EHLO mail.skyhub.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229474AbhHSQqz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 19 Aug 2021 12:46:55 -0400
-Received: from zn.tnic (p200300ec2f0f6a00ce256b49be690694.dip0.t-ipconnect.de [IPv6:2003:ec:2f0f:6a00:ce25:6b49:be69:694])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 5E6841EC036B;
-        Thu, 19 Aug 2021 18:46:13 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
-        t=1629391573;
+        id S230269AbhHSQsE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 19 Aug 2021 12:48:04 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:54147 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S230365AbhHSQsD (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 19 Aug 2021 12:48:03 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1629391646;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
-        bh=fIwP1+vEtACNuhDJX1089jOgPxnYArbRitc0H03M4jk=;
-        b=G7FIywfCO3FzHcSZo6uJxFKDypgTWl3QpsMOQwYIHr8Aj0u5NhjsPUQYUhbNukPre1B3mJ
-        ZrB9vGLLF2oT1Q9/lYAsLtv6ENPS2Ajr1TI20FVF9VQuMW7i4iKC2Dx+5anOnGhWfvR2oP
-        P/8V4kfLy1Jfr9qisxvNsRJpg/mJ2nU=
-Date:   Thu, 19 Aug 2021 18:46:48 +0200
-From:   Borislav Petkov <bp@alien8.de>
-To:     Michael Roth <michael.roth@amd.com>
-Cc:     Brijesh Singh <brijesh.singh@amd.com>, x86@kernel.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
-        linux-coco@lists.linux.dev, linux-mm@kvack.org,
-        linux-crypto@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=JS6+KgPuFS71NJ3a/aV8YKo6n5PSfgJ9w8mrHKj266c=;
+        b=GyYtdgGqsBHGZ0erXqGzIjKorEpCV3M4HN5uI5Xf/JpKDoQYDw/E8dGmRVDGJzj38HVyR2
+        qe01XaHan/6ArMLPExss/omUmR/56WTzfCO75gp7fEr9S2L0P2Z1nAAExtfWg929MzJ7Bs
+        GEMpO/tGpPtviymnFBQk1RyCgFGSGW8=
+Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
+ [209.85.208.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-433-47mtdvMnM9WzWbsEgy9hbg-1; Thu, 19 Aug 2021 12:47:25 -0400
+X-MC-Unique: 47mtdvMnM9WzWbsEgy9hbg-1
+Received: by mail-ed1-f70.google.com with SMTP id o17-20020aa7d3d1000000b003beaf992d17so3111882edr.13
+        for <kvm@vger.kernel.org>; Thu, 19 Aug 2021 09:47:24 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=JS6+KgPuFS71NJ3a/aV8YKo6n5PSfgJ9w8mrHKj266c=;
+        b=VqiANsrsXpJRY7hIEvX8/bCRknWU/9d/JiqNxvWDOXDA7oUml/QvnsBbfGrx7dsW7Z
+         da6tVnKAKq/4OaI7YnQ1Nh6gA9uWFhBGJvQNMJe77mUcjiExXobjlEBY7lPk6IMlBqkR
+         3Iu2qA/dMdvaQBzQh0SV5aseAwaJPSx0osybBTT8OOF03qWbVJUrDabxc8XcLVQ8MVpl
+         vuoezeWVlwLsOE0KTW9M1AJSUPBXSh0jYcVkWYbAMnhrsl01MBGUAClkRylcWK1ydYKR
+         yJCFWGeuknzOMiSoM9rz90uS5GCvXTub6P0cKhgbG+Rk9raZGPQPgl3CF+G+PDbSYRDI
+         YUeQ==
+X-Gm-Message-State: AOAM533jmwmNlORtPPb5sCgSI510g1HsWeOwfnaq4JKAeAtCH8IFtwxB
+        d35EMHFcz5mon06SSsGwgVUhKvTefgLA6rLwcxrovF60dYZnAV1XO0uNs5FlJnRrReaq7Zq8e65
+        7m1oTHGARS5Ee
+X-Received: by 2002:a17:907:3e05:: with SMTP id hp5mr16688232ejc.527.1629391644045;
+        Thu, 19 Aug 2021 09:47:24 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwVdStx8EZOkBqFjVSj/6s9v6MyE7O8rtL2qYCu/AVVVxEB88b5ZeHRjLerFJVpOPyRgW4eHQ==
+X-Received: by 2002:a17:907:3e05:: with SMTP id hp5mr16688212ejc.527.1629391643849;
+        Thu, 19 Aug 2021 09:47:23 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:63a7:c72e:ea0e:6045? ([2001:b07:6468:f312:63a7:c72e:ea0e:6045])
+        by smtp.gmail.com with ESMTPSA id v8sm1917790edc.2.2021.08.19.09.47.22
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 19 Aug 2021 09:47:23 -0700 (PDT)
+Subject: Re: [RFC PATCH 5/6] KVM: x86/mmu: Avoid memslot lookup in rmap_add
+To:     Sean Christopherson <seanjc@google.com>,
+        David Matlack <dmatlack@google.com>
+Cc:     kvm list <kvm@vger.kernel.org>, Ben Gardon <bgardon@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
         Jim Mattson <jmattson@google.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
-        David Rientjes <rientjes@google.com>,
-        Dov Murik <dovmurik@linux.ibm.com>,
-        Tobin Feldman-Fitzthum <tobin@ibm.com>,
-        Vlastimil Babka <vbabka@suse.cz>, tony.luck@intel.com,
-        brijesh.ksingh@gmail.com
-Subject: Re: [PATCH Part1 RFC v4 22/36] x86/sev: move MSR-based VMGEXITs for
- CPUID to helper
-Message-ID: <YR6K+BzCB9Tokw85@zn.tnic>
-References: <20210707181506.30489-1-brijesh.singh@amd.com>
- <20210707181506.30489-23-brijesh.singh@amd.com>
- <YR4oP+PDnmJbvfKR@zn.tnic>
- <20210819153741.h6yloeihz5vl6hvu@amd.com>
+        Wanpeng Li <wanpengli@tencent.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>
+References: <20210813203504.2742757-1-dmatlack@google.com>
+ <20210813203504.2742757-6-dmatlack@google.com>
+ <e6070335-3f7e-aebd-93cd-3fb42a426425@redhat.com>
+ <CALzav=do97h9LtbWJfDaj0xRv5Ccq5m-bPq0u0=_h8ut=M6Eow@mail.gmail.com>
+ <YR6JXKqSRlDcVqHL@google.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <03ed8989-5816-40e0-0047-b61d89e2a1fe@redhat.com>
+Date:   Thu, 19 Aug 2021 18:47:22 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.11.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20210819153741.h6yloeihz5vl6hvu@amd.com>
+In-Reply-To: <YR6JXKqSRlDcVqHL@google.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Aug 19, 2021 at 10:37:41AM -0500, Michael Roth wrote:
-> That makes sense, but I think it helps in making sense of the security
-> aspects of the code to know that sev_cpuid() would be fetching cpuid
-> information from the hypervisor.
+On 19/08/21 18:39, Sean Christopherson wrote:
+> On Thu, Aug 19, 2021, David Matlack wrote:
+>> On Tue, Aug 17, 2021 at 5:03 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
+>>> I've started hacking on the above, but didn't quite finish.  I'll
+>>> keep patches 4-6 in my queue, but they'll have to wait for 5.15.
+>>
+>> Ack. 5.15 sounds good. Let me know if you want any helping with testing.
+> 
+> Paolo, I assume you meant 5.16?  Or is my math worse than usual?
 
-Why is it important for the callers to know where do we fetch the CPUID
-info from?
+Yeah, of course.  In fact, kvm/queue is mostly final at this point, 
+unless something bad happens in the next 2-3 hours of testing, and 
+commit 5a4bfabcc865 will be my first pull request to Linus for 5.15.
 
-> "msr_proto" is meant to be an indicator that it will be using the GHCB
-> MSR protocol to do it, but maybe just "_hyp" is enough to get the idea
-> across? I use the convention elsewhere in the series as well.
->
-> So sev_cpuid_hyp() maybe?
+Paolo
 
-sev_cpuid_hv() pls. We abbreviate the hypervisor as HV usually.
-
-> In "enable SEV-SNP-validated CPUID in #VC handler", it does:
->
->   sev_snp_cpuid() -> sev_snp_cpuid_hyp(),
->
-> which will call this with NULL e{a,b,c,d}x arguments in some cases. There
-> are enough call-sites in sev_snp_cpuid() that it seemed worthwhile to
-> add the guards so we wouldn't need to declare dummy variables for arguments.
-
-Yah, saw that in the later patches.
-
-Thx.
-
--- 
-Regards/Gruss,
-    Boris.
-
-https://people.kernel.org/tglx/notes-about-netiquette
