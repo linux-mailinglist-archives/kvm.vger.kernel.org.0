@@ -2,157 +2,81 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6BB9D3F1730
-	for <lists+kvm@lfdr.de>; Thu, 19 Aug 2021 12:21:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 012243F1744
+	for <lists+kvm@lfdr.de>; Thu, 19 Aug 2021 12:28:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237834AbhHSKVi (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 19 Aug 2021 06:21:38 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:21072 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S236149AbhHSKVb (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 19 Aug 2021 06:21:31 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1629368454;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=L1CCzAeJSpDDezCsXtRC9C3/Zrf0t5tN8EP1vLgFDsA=;
-        b=PGsom/lHPOUwk23xAPZs0kT7+1kbMAkC5MPD2WlBwlgkFvM4L3M9PxCbBTGOStweljI+C+
-        EtxzFXoc/Hf9PpnnOxyPSCqPgqpErKBOug5aP81gSANGTPuabnsfWDRXkXD5OByS/v6iuq
-        KC/hwYt1X9yhkP9ih9FN9yeNmGm85To=
-Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
- [209.85.218.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-309-NTvHQAb4OHWqdwGUdEDw0A-1; Thu, 19 Aug 2021 06:20:53 -0400
-X-MC-Unique: NTvHQAb4OHWqdwGUdEDw0A-1
-Received: by mail-ej1-f70.google.com with SMTP id e15-20020a1709061fcf00b005bd9d618ea0so2054895ejt.13
-        for <kvm@vger.kernel.org>; Thu, 19 Aug 2021 03:20:53 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=L1CCzAeJSpDDezCsXtRC9C3/Zrf0t5tN8EP1vLgFDsA=;
-        b=HT6usEX5htZ25Wo2FyOBGXkIARicvsuXGKslbCbVq/wVib/NzgO4JuJyaS2XqSB90z
-         8opIR9j/Q8k4ztiRjLIcQbZkqVm/2oaVjz7NrqncBxwAhIbpzQ2BOOzPW/mq4YFEc8BV
-         tOmNew9upf9dIGjMWCP8iiv3I88HuBlo+9g5Tx+RqTZtG4BzG798wpxUTrffiRHullD9
-         2dpcRS2hBxKUswyXShE/WOYbvDhiySZmlwZ3cPIzycDajwCMflRKERZ+BTRBaT+y5o5k
-         NE1KM0vdOMVbNuVX54///dD5FS7PMbu8dNs67Nic4eLoWT+0NKxi2RXJsK1c8r25QTWU
-         RDpQ==
-X-Gm-Message-State: AOAM531ALvUTRu35UbCmW+tu5SLrE+lp1oNKBuH06+O4U7+rNlZCF2Y5
-        gLCSb6fx7Z0WFcIg2JDYIv75EJlbGLH7SKLrj+sdCBKC7za5dUXc+zUgz5dAnhrR5UWV5TyeWUk
-        l3d2GsTxFAjVY
-X-Received: by 2002:a17:907:98b1:: with SMTP id ju17mr8008283ejc.184.1629368452319;
-        Thu, 19 Aug 2021 03:20:52 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzBfnTVCvp6rGinFVT8nbfW7JjQV7oLtknw18f9vGb86D+Jkir22d3T6cemMPFhCyhW/uyIrg==
-X-Received: by 2002:a17:907:98b1:: with SMTP id ju17mr8008256ejc.184.1629368452082;
-        Thu, 19 Aug 2021 03:20:52 -0700 (PDT)
-Received: from gator.home (cst2-174-132.cust.vodafone.cz. [31.30.174.132])
-        by smtp.gmail.com with ESMTPSA id f20sm1065910ejz.30.2021.08.19.03.20.50
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 19 Aug 2021 03:20:51 -0700 (PDT)
-Date:   Thu, 19 Aug 2021 12:20:49 +0200
-From:   Andrew Jones <drjones@redhat.com>
-To:     Marc Zyngier <maz@kernel.org>
-Cc:     Oliver Upton <oupton@google.com>, kvm@vger.kernel.org,
-        kvmarm@lists.cs.columbia.edu, Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Peter Shier <pshier@google.com>,
-        Jim Mattson <jmattson@google.com>,
-        David Matlack <dmatlack@google.com>,
-        Ricardo Koller <ricarkol@google.com>,
-        Jing Zhang <jingzhangos@google.com>,
-        Raghavendra Rao Anata <rananta@google.com>,
-        James Morse <james.morse@arm.com>,
+        id S238143AbhHSK27 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 19 Aug 2021 06:28:59 -0400
+Received: from mail.kernel.org ([198.145.29.99]:48940 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S237889AbhHSK27 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 19 Aug 2021 06:28:59 -0400
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 1531B60ED3;
+        Thu, 19 Aug 2021 10:28:23 +0000 (UTC)
+Received: from sofa.misterjones.org ([185.219.108.64] helo=hot-poop.lan)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94.2)
+        (envelope-from <maz@kernel.org>)
+        id 1mGfHZ-005wq0-4o; Thu, 19 Aug 2021 11:28:21 +0100
+From:   Marc Zyngier <maz@kernel.org>
+To:     kvmarm@lists.cs.columbia.edu, Oliver Upton <oupton@google.com>
+Cc:     Peter Zijlstra <peterz@infradead.org>,
+        Andy Lutomirski <luto@kernel.org>,
+        Catalin Marinas <catalin.marinas@arm.com>,
         Alexandru Elisei <alexandru.elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Shakeel Butt <shakeelb@google.com>,
         linux-arm-kernel@lists.infradead.org,
-        Will Deacon <will@kernel.org>,
-        Catalin Marinas <catalin.marinas@arm.com>
-Subject: Re: [PATCH v7 3/7] KVM: arm64: Allow userspace to configure a vCPU's
- virtual offset
-Message-ID: <20210819102049.xbpwancdrram6ujj@gator.home>
-References: <20210816001217.3063400-1-oupton@google.com>
- <20210816001217.3063400-4-oupton@google.com>
- <874kblsssy.wl-maz@kernel.org>
+        Paolo Bonzini <pbonzini@redhat.com>,
+        James Morse <james.morse@arm.com>,
+        Guangyu Shi <guangyus@google.com>, kvm@vger.kernel.org,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        linux-kernel@vger.kernel.org, Will Deacon <will@kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Peter Shier <pshier@google.com>
+Subject: Re: [PATCH v3 0/3] KVM: arm64: Use generic guest entry infrastructure
+Date:   Thu, 19 Aug 2021 11:28:16 +0100
+Message-Id: <162936887458.598180.10185839299725357336.b4-ty@kernel.org>
+X-Mailer: git-send-email 2.30.2
+In-Reply-To: <20210802192809.1851010-1-oupton@google.com>
+References: <20210802192809.1851010-1-oupton@google.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <874kblsssy.wl-maz@kernel.org>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: kvmarm@lists.cs.columbia.edu, oupton@google.com, peterz@infradead.org, luto@kernel.org, catalin.marinas@arm.com, alexandru.elisei@arm.com, shakeelb@google.com, linux-arm-kernel@lists.infradead.org, pbonzini@redhat.com, james.morse@arm.com, guangyus@google.com, kvm@vger.kernel.org, suzuki.poulose@arm.com, linux-kernel@vger.kernel.org, will@kernel.org, tglx@linutronix.de, pshier@google.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Aug 19, 2021 at 10:11:09AM +0100, Marc Zyngier wrote:
-> On Mon, 16 Aug 2021 01:12:13 +0100,
-> Oliver Upton <oupton@google.com> wrote:
-> > 
-> > Allow userspace to access the guest's virtual counter-timer offset
-> > through the ONE_REG interface. The value read or written is defined to
-> > be an offset from the guest's physical counter-timer. Add some
-> > documentation to clarify how a VMM should use this and the existing
-> > CNTVCT_EL0.
-> > 
-> > Signed-off-by: Oliver Upton <oupton@google.com>
-> > Reviewed-by: Andrew Jones <drjones@redhat.com>
-> > ---
-> >  Documentation/virt/kvm/api.rst    | 10 ++++++++++
-> >  arch/arm64/include/uapi/asm/kvm.h |  1 +
-> >  arch/arm64/kvm/arch_timer.c       | 23 +++++++++++++++++++++++
-> >  arch/arm64/kvm/guest.c            |  6 +++++-
-> >  include/kvm/arm_arch_timer.h      |  1 +
-> >  5 files changed, 40 insertions(+), 1 deletion(-)
-> > 
-> > diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-> > index dae68e68ca23..adb04046a752 100644
-> > --- a/Documentation/virt/kvm/api.rst
-> > +++ b/Documentation/virt/kvm/api.rst
-> > @@ -2463,6 +2463,16 @@ arm64 system registers have the following id bit patterns::
-> >       derived from the register encoding for CNTV_CVAL_EL0.  As this is
-> >       API, it must remain this way.
-> >  
-> > +.. warning::
-> > +
-> > +     The value of KVM_REG_ARM_TIMER_OFFSET is defined as an offset from
-> > +     the guest's view of the physical counter-timer.
-> > +
-> > +     Userspace should use either KVM_REG_ARM_TIMER_OFFSET or
-> > +     KVM_REG_ARM_TIMER_CNT to pause and resume a guest's virtual
-> > +     counter-timer. Mixed use of these registers could result in an
-> > +     unpredictable guest counter value.
-> > +
-> >  arm64 firmware pseudo-registers have the following bit pattern::
-> >  
-> >    0x6030 0000 0014 <regno:16>
-> > diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
-> > index b3edde68bc3e..949a31bc10f0 100644
-> > --- a/arch/arm64/include/uapi/asm/kvm.h
-> > +++ b/arch/arm64/include/uapi/asm/kvm.h
-> > @@ -255,6 +255,7 @@ struct kvm_arm_copy_mte_tags {
-> >  #define KVM_REG_ARM_TIMER_CTL		ARM64_SYS_REG(3, 3, 14, 3, 1)
-> >  #define KVM_REG_ARM_TIMER_CVAL		ARM64_SYS_REG(3, 3, 14, 0, 2)
-> >  #define KVM_REG_ARM_TIMER_CNT		ARM64_SYS_REG(3, 3, 14, 3, 2)
-> > +#define KVM_REG_ARM_TIMER_OFFSET	ARM64_SYS_REG(3, 4, 14, 0, 3)
-> >
+On Mon, 2 Aug 2021 19:28:06 +0000, Oliver Upton wrote:
+> The arm64 kernel doesn't yet support the full generic entry
+> infrastructure. That being said, KVM/arm64 doesn't properly handle
+> TIF_NOTIFY_RESUME and could pick this up by switching to the generic
+> guest entry infrasturture.
 > 
-> Andrew, does this warrant an update to the selftest that checks for
-> sysreg visibility?
-
-Yup, until we do, the test will emit a warning with a suggestion to add
-the new register to the list. It won't be a test FAIL, because adding new
-registers doesn't break migration from older kernels, but we might as well
-update the list sooner than later.
-
+> Patch 1 adds a missing vCPU stat to ARM64 to record the number of signal
+> exits to userspace.
 > 
-> I am also wondering how a VMM such as QEMU is going to deal with the
-> above restriction, given the way it blindly saves/restores all the
-> registers that KVM exposes, hence hitting that mixed-use that the
-> documentation warns about...
+> [...]
 
-You're right and I think it's a problem. While we can special case
-registers in QEMU using a cpreg "level" so they won't get saved/restored
-all the time, it doesn't help here since we won't be special casing
-KVM_REG_ARM_TIMER_OFFSET in older QEMU. We need a way for the VMM to opt
-in to using KVM_REG_ARM_TIMER_OFFSET, such as with a CAP we can enable.
+Applied to next, thanks!
 
-Thanks,
-drew
+[1/3] KVM: arm64: Record number of signal exits as a vCPU stat
+      commit: fe5161d2c39b8c2801f0e786631460c6e8a1cae4
+[2/3] entry: KVM: Allow use of generic KVM entry w/o full generic support
+      commit: e1c6b9e1669e44fb7f9688e34e460b759e3b9187
+[3/3] KVM: arm64: Use generic KVM xfer to guest work function
+      commit: 6caa5812e2d126a0aa8a17816c1ba6f0a0c2b309
+
+Cheers,
+
+	M.
+-- 
+Without deviation from the norm, progress is not possible.
+
 
