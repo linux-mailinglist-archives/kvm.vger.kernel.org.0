@@ -2,56 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id CFBCF3F2334
-	for <lists+kvm@lfdr.de>; Fri, 20 Aug 2021 00:36:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CF46D3F2335
+	for <lists+kvm@lfdr.de>; Fri, 20 Aug 2021 00:36:50 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236414AbhHSWhZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 19 Aug 2021 18:37:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44006 "EHLO
+        id S236417AbhHSWh0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 19 Aug 2021 18:37:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44010 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232906AbhHSWhY (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 19 Aug 2021 18:37:24 -0400
-Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 83D50C061575
-        for <kvm@vger.kernel.org>; Thu, 19 Aug 2021 15:36:47 -0700 (PDT)
-Received: by mail-yb1-xb4a.google.com with SMTP id j21-20020a25d2150000b029057ac4b4e78fso7936655ybg.4
-        for <kvm@vger.kernel.org>; Thu, 19 Aug 2021 15:36:47 -0700 (PDT)
+        with ESMTP id S232906AbhHSWhZ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 19 Aug 2021 18:37:25 -0400
+Received: from mail-qt1-x84a.google.com (mail-qt1-x84a.google.com [IPv6:2607:f8b0:4864:20::84a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B8233C061575
+        for <kvm@vger.kernel.org>; Thu, 19 Aug 2021 15:36:48 -0700 (PDT)
+Received: by mail-qt1-x84a.google.com with SMTP id m6-20020ac807c6000000b0029994381c5fso3654879qth.5
+        for <kvm@vger.kernel.org>; Thu, 19 Aug 2021 15:36:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=date:in-reply-to:message-id:mime-version:references:subject:from:to
          :cc;
-        bh=B7ft+C53yDXB0+yPktYYFl4h/nCqhSyvFK9vusSpZaQ=;
-        b=wSbb7a2mokCW7Vs5IFUwP7z/yN0MDjb+llO8oOLIteb4rYqrhrSDAD8r0dm2TYxEaU
-         foypJs+EmRl/rYnzANu/2VINLqpPj2EDZEFhOdmgKAQLsh0KaF9rMcPDcN/1UV+7kJQI
-         INkUs4cEizbVIdRHclAk9zBN/drqrBDSe3UYSKR02DbKbXD6EK/M7A0dIiAjxFc54LGC
-         DnfWlorZc82U81Qio71vbTW/wZnCGpoKbXDH3mgFnokwNnIrDsQGvtrvCpfHje7YKdWh
-         VFjvUR18CrDWpd9WAn13H0Xwzs1xl8xUMCfetGXNTW/9I1lDUA7LfqgbhinO6UbrYYcL
-         z+ug==
+        bh=rzg4aWaMxCZtAeRElslHw81uG1luZUIir4vgArIv1Rk=;
+        b=X5V0Q/frltVwjxnhUAYSu7ef0WmyYQx3FBZqJQN+heXrjovHTCUfw9lYl/6KRrId4A
+         Ps+lsSQQTppfCOg6iJyQUt28x/eNrLNqAIxU1Eez2KQgUZYbH6psr5pfX2PvKyWC1g+f
+         OxYI22/e6AibjghLO0VvZsnm75v80LS/TwKAldxt995vEcqo4h096ITlxehoPPkr5tWT
+         UXH7HTu4LWpM3NUK1toxzAQH1MLQYsVQEu5sGHC+ePZ6aJnzoCoEhTx9O1xZ9xLiE+TG
+         iWRSka7qjHSo1d24kHi6TDvU5Pxn5sNKtlDpqjjTiVxG88Qv35Aa8TnJdtl4hirQEaLe
+         a+Rg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=B7ft+C53yDXB0+yPktYYFl4h/nCqhSyvFK9vusSpZaQ=;
-        b=tuUqy9z3ZpfCOILB9CeE7d8l8kT48LqQfO513SapNamO7E6PHGJwKJqaoLY//DqkJJ
-         pI3NhDGsJo0lCIhxPH7ML6klyu1r4gNzW0BQcQjMhN6Np+VauIt4deLFYt+7X/VA06iH
-         2oeuFoAwPml2of02oWL/jMp++Tonms9G+9oXocm+U3g1gLOTagYrTU2bRXt4zrs3C0Y4
-         9ojcg8lNm8FyMGlJSTvSp7YI6wqKRY7IETv3SHle5nl/mbAN4Bz9IQ572EVsExBmcsqC
-         yW0R2N1HCoPJ3/KYbYc5fPz5HNjsV1/iPnkyCm37TAGsSmX85IVCpQdYJqUCzoo5PE8M
-         GuDA==
-X-Gm-Message-State: AOAM530fjg0ukrFjccHhkFkbLoRqQRjQmxqU8yGuif82xc8m89BnI6Ht
-        7T5KbZXvwiKPC+ureX780J9PK6EEUdinl99SwXFDYeGl8EPJfxA2wVoMr0KUuK6RwGVP5wZjBYX
-        E++GcEjMadYOEabVUkt+ioxqlS6cuGAmhHnffeInglwszdUANZhj9t1CIRw==
-X-Google-Smtp-Source: ABdhPJwtsiVe5jRaLujMbQ5x1J3N15UiiWapXS3MYaqiqc1m7Pd0dt6bAARdt2fFZ+uOeGFvehaMJLs0gUE=
+        bh=rzg4aWaMxCZtAeRElslHw81uG1luZUIir4vgArIv1Rk=;
+        b=sjCX/p59kTTscwERpbAjjKe3/9JYZTyjAtG1SViW12PwEz8/fKhGxwDLWE73C61NAE
+         JLGGyPVqUQXEgf2UTdBZDe0/96k1wt1jLEZ659QW+jRYy2VY3SOeOAQBY5wJp+IJOIlb
+         nFKd6Y4ENZpMOyRbA1J3KPy879o2+WTpNQQNy17fyfCs14fcrW5m1wk8MMpo6zFETMVv
+         FopQ/sVxUtkiEWxVzB1Bcyw/WOwjF3i+4EJx0ppv38QLHHCqQYohwfYitzM5SIxLeOM9
+         QNjGlHld+mn5K8ONiyNpIvRsuCuitCaFRHieDgS+Ydvz2q5/EjjPt1Bmx4LI1MAjPqo7
+         qd9Q==
+X-Gm-Message-State: AOAM533WiPb3QvzRoirI88jy7qCRzDpwSSpdsHUGFJFI6Vo7JWuJelb0
+        DeBLAf9QEgyI1iQu0FS2oIIO7AV9NDHBDQdHP9WCid9stjDWHWhr/TSbKGCoDk5Pe6hLWyX3kso
+        OuHCi43Qmhb+BjYYG2Y0USebMGnIkmC9sYjJlWHzCyZwqxP/XpG4GuOyxEw==
+X-Google-Smtp-Source: ABdhPJyLKotdPFAI3HZVhOejdbxxgjxtv6obcHVflNcA0vdE775X6LSp9WJU4w8/d1bEHEvwwlVWh9984JY=
 X-Received: from oupton.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:404])
- (user=oupton job=sendgmr) by 2002:a25:d68a:: with SMTP id n132mr20212107ybg.483.1629412606727;
- Thu, 19 Aug 2021 15:36:46 -0700 (PDT)
-Date:   Thu, 19 Aug 2021 22:36:37 +0000
+ (user=oupton job=sendgmr) by 2002:a05:6214:a02:: with SMTP id
+ dw2mr16898960qvb.61.1629412607827; Thu, 19 Aug 2021 15:36:47 -0700 (PDT)
+Date:   Thu, 19 Aug 2021 22:36:38 +0000
 In-Reply-To: <20210819223640.3564975-1-oupton@google.com>
-Message-Id: <20210819223640.3564975-4-oupton@google.com>
+Message-Id: <20210819223640.3564975-5-oupton@google.com>
 Mime-Version: 1.0
 References: <20210819223640.3564975-1-oupton@google.com>
 X-Mailer: git-send-email 2.33.0.rc2.250.ged5fa647cd-goog
-Subject: [PATCH 3/6] KVM: arm64: Encapsulate reset request logic in a helper function
+Subject: [PATCH 4/6] KVM: arm64: Add support for SYSTEM_SUSPEND PSCI call
 From:   Oliver Upton <oupton@google.com>
 To:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
 Cc:     Marc Zyngier <maz@kernel.org>, Peter Shier <pshier@google.com>,
@@ -68,97 +68,185 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-In its implementation of the PSCI function, KVM needs to request that a
-target vCPU resets before its next entry into the guest. Wrap the logic
-for requesting a reset in a function for later use by other implemented
-PSCI calls.
+ARM DEN0022D 5.19 "SYSTEM_SUSPEND" describes a PSCI call that may be
+used to request a system be suspended. This is optional for PSCI v1.0
+and to date KVM has elected to not implement the call. However, a
+VMM/operator may wish to provide their guests with the ability to
+suspend/resume, necessitating this PSCI call.
 
-No functional change intended.
+Implement support for SYSTEM_SUSPEND according to the prescribed
+behavior in the specification. Add a new system event exit type,
+KVM_SYSTEM_EVENT_SUSPEND, to notify userspace when a VM has requested a
+system suspend.
 
 Signed-off-by: Oliver Upton <oupton@google.com>
 ---
- arch/arm64/kvm/psci.c | 59 +++++++++++++++++++++++++------------------
- 1 file changed, 35 insertions(+), 24 deletions(-)
+ arch/arm64/include/asm/kvm_host.h |  3 ++
+ arch/arm64/kvm/arm.c              |  5 +++
+ arch/arm64/kvm/psci.c             | 60 +++++++++++++++++++++++++++++++
+ include/uapi/linux/kvm.h          |  2 ++
+ 4 files changed, 70 insertions(+)
 
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index bdab1754c71f..b5cc83b938cb 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -136,6 +136,9 @@ struct kvm_arch {
+ 
+ 	/* Memory Tagging Extension enabled for the guest */
+ 	bool mte_enabled;
++
++	/* PSCI SYSTEM_SUSPEND call enabled for the guest */
++	bool suspend_enabled;
+ };
+ 
+ struct kvm_vcpu_fault_info {
+diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+index 3496cb0d014e..45890ba897ee 100644
+--- a/arch/arm64/kvm/arm.c
++++ b/arch/arm64/kvm/arm.c
+@@ -97,6 +97,10 @@ int kvm_vm_ioctl_enable_cap(struct kvm *kvm,
+ 		r = 0;
+ 		kvm->arch.mte_enabled = true;
+ 		break;
++	case KVM_CAP_ARM_SYSTEM_SUSPEND:
++		r = 0;
++		kvm->arch.suspend_enabled = true;
++		break;
+ 	default:
+ 		r = -EINVAL;
+ 		break;
+@@ -211,6 +215,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+ 	case KVM_CAP_SET_GUEST_DEBUG:
+ 	case KVM_CAP_VCPU_ATTRIBUTES:
+ 	case KVM_CAP_PTP_KVM:
++	case KVM_CAP_ARM_SYSTEM_SUSPEND:
+ 		r = 1;
+ 		break;
+ 	case KVM_CAP_SET_GUEST_DEBUG2:
 diff --git a/arch/arm64/kvm/psci.c b/arch/arm64/kvm/psci.c
-index 310b9cb2b32b..bb59b692998b 100644
+index bb59b692998b..8e30a0fb1c60 100644
 --- a/arch/arm64/kvm/psci.c
 +++ b/arch/arm64/kvm/psci.c
-@@ -64,9 +64,40 @@ static inline bool kvm_psci_valid_affinity(unsigned long affinity)
- 	return !(affinity & ~MPIDR_HWID_BITMASK);
+@@ -205,6 +205,46 @@ static void kvm_psci_system_reset(struct kvm_vcpu *vcpu)
+ 	kvm_prepare_system_event(vcpu, KVM_SYSTEM_EVENT_RESET);
  }
  
--static unsigned long kvm_psci_vcpu_on(struct kvm_vcpu *source_vcpu)
-+static void kvm_psci_vcpu_request_reset(struct kvm_vcpu *vcpu,
-+					unsigned long entry_addr,
-+					unsigned long context_id,
-+					bool big_endian)
- {
- 	struct vcpu_reset_state *reset_state;
-+
-+	lockdep_assert_held(&vcpu->kvm->lock);
-+
-+	reset_state = &vcpu->arch.reset_state;
-+	reset_state->pc = entry_addr;
-+
-+	/* Propagate caller endianness */
-+	reset_state->be = big_endian;
++static int kvm_psci_system_suspend(struct kvm_vcpu *vcpu)
++{
++	unsigned long entry_addr, context_id;
++	struct kvm *kvm = vcpu->kvm;
++	unsigned long psci_ret = 0;
++	struct kvm_vcpu *tmp;
++	int ret = 0;
++	int i;
 +
 +	/*
-+	 * NOTE: We always update r0 (or x0) because for PSCI v0.1
-+	 * the general purpose registers are undefined upon CPU_ON.
++	 * The SYSTEM_SUSPEND PSCI call requires that all vCPUs (except the
++	 * calling vCPU) be in an OFF state, as determined by the
++	 * implementation.
++	 *
++	 * See ARM DEN0022D, 5.19 "SYSTEM_SUSPEND" for more details.
 +	 */
-+	reset_state->r0 = context_id;
++	mutex_lock(&kvm->lock);
++	kvm_for_each_vcpu(i, tmp, kvm) {
++		if (tmp != vcpu && !tmp->arch.power_off) {
++			psci_ret = PSCI_RET_DENIED;
++			ret = 1;
++			goto out;
++		}
++	}
 +
-+	WRITE_ONCE(reset_state->reset, true);
-+	kvm_make_request(KVM_REQ_VCPU_RESET, vcpu);
++	entry_addr = smccc_get_arg1(vcpu);
++	context_id = smccc_get_arg2(vcpu);
 +
-+	/*
-+	 * Make sure the reset request is observed if the change to
-+	 * power_state is observed.
-+	 */
-+	smp_wmb();
-+	vcpu->arch.power_off = false;
++	kvm_psci_vcpu_request_reset(vcpu, entry_addr, context_id,
++				    kvm_vcpu_is_be(vcpu));
++
++	memset(&vcpu->run->system_event, 0, sizeof(vcpu->run->system_event));
++	vcpu->run->system_event.type = KVM_SYSTEM_EVENT_SUSPEND;
++	vcpu->run->exit_reason = KVM_EXIT_SYSTEM_EVENT;
++out:
++	mutex_unlock(&kvm->lock);
++	smccc_set_retval(vcpu, psci_ret, 0, 0, 0);
++	return ret;
 +}
 +
-+static unsigned long kvm_psci_vcpu_on(struct kvm_vcpu *source_vcpu)
-+{
- 	struct kvm *kvm = source_vcpu->kvm;
- 	struct kvm_vcpu *vcpu = NULL;
- 	unsigned long cpu_id;
-@@ -90,29 +121,9 @@ static unsigned long kvm_psci_vcpu_on(struct kvm_vcpu *source_vcpu)
- 			return PSCI_RET_INVALID_PARAMS;
+ static void kvm_psci_narrow_to_32bit(struct kvm_vcpu *vcpu)
+ {
+ 	int i;
+@@ -225,6 +265,14 @@ static unsigned long kvm_psci_check_allowed_function(struct kvm_vcpu *vcpu, u32
+ 	if ((fn & PSCI_0_2_64BIT) && vcpu_mode_is_32bit(vcpu))
+ 		return PSCI_RET_NOT_SUPPORTED;
+ 
++	switch (fn) {
++	case PSCI_1_0_FN_SYSTEM_SUSPEND:
++	case PSCI_1_0_FN64_SYSTEM_SUSPEND:
++		if (!vcpu->kvm->arch.suspend_enabled)
++			return PSCI_RET_NOT_SUPPORTED;
++		break;
++	}
++
+ 	return 0;
+ }
+ 
+@@ -318,6 +366,10 @@ static int kvm_psci_1_0_call(struct kvm_vcpu *vcpu)
+ 	unsigned long val;
+ 	int ret = 1;
+ 
++	val = kvm_psci_check_allowed_function(vcpu, psci_fn);
++	if (val)
++		goto out;
++
+ 	switch(psci_fn) {
+ 	case PSCI_0_2_FN_PSCI_VERSION:
+ 		val = KVM_ARM_PSCI_1_0;
+@@ -341,6 +393,8 @@ static int kvm_psci_1_0_call(struct kvm_vcpu *vcpu)
+ 		case PSCI_0_2_FN_SYSTEM_OFF:
+ 		case PSCI_0_2_FN_SYSTEM_RESET:
+ 		case PSCI_1_0_FN_PSCI_FEATURES:
++		case PSCI_1_0_FN_SYSTEM_SUSPEND:
++		case PSCI_1_0_FN64_SYSTEM_SUSPEND:
+ 		case ARM_SMCCC_VERSION_FUNC_ID:
+ 			val = 0;
+ 			break;
+@@ -349,10 +403,16 @@ static int kvm_psci_1_0_call(struct kvm_vcpu *vcpu)
+ 			break;
+ 		}
+ 		break;
++	case PSCI_1_0_FN_SYSTEM_SUSPEND:
++		kvm_psci_narrow_to_32bit(vcpu);
++		fallthrough;
++	case PSCI_1_0_FN64_SYSTEM_SUSPEND:
++		return kvm_psci_system_suspend(vcpu);
+ 	default:
+ 		return kvm_psci_0_2_call(vcpu);
  	}
  
--	reset_state = &vcpu->arch.reset_state;
--
--	reset_state->pc = smccc_get_arg2(source_vcpu);
--
--	/* Propagate caller endianness */
--	reset_state->be = kvm_vcpu_is_be(source_vcpu);
--
--	/*
--	 * NOTE: We always update r0 (or x0) because for PSCI v0.1
--	 * the general purpose registers are undefined upon CPU_ON.
--	 */
--	reset_state->r0 = smccc_get_arg3(source_vcpu);
--
--	WRITE_ONCE(reset_state->reset, true);
--	kvm_make_request(KVM_REQ_VCPU_RESET, vcpu);
--
--	/*
--	 * Make sure the reset request is observed if the change to
--	 * power_state is observed.
--	 */
--	smp_wmb();
--
--	vcpu->arch.power_off = false;
-+	kvm_psci_vcpu_request_reset(vcpu, smccc_get_arg2(source_vcpu),
-+				    smccc_get_arg3(source_vcpu),
-+				    kvm_vcpu_is_be(source_vcpu));
- 	kvm_vcpu_wake_up(vcpu);
++out:
+ 	smccc_set_retval(vcpu, val, 0, 0, 0);
+ 	return ret;
+ }
+diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+index d9e4aabcb31a..8e97d9c11a1b 100644
+--- a/include/uapi/linux/kvm.h
++++ b/include/uapi/linux/kvm.h
+@@ -433,6 +433,7 @@ struct kvm_run {
+ #define KVM_SYSTEM_EVENT_SHUTDOWN       1
+ #define KVM_SYSTEM_EVENT_RESET          2
+ #define KVM_SYSTEM_EVENT_CRASH          3
++#define KVM_SYSTEM_EVENT_SUSPEND        4
+ 			__u32 type;
+ 			__u64 flags;
+ 		} system_event;
+@@ -1112,6 +1113,7 @@ struct kvm_ppc_resize_hpt {
+ #define KVM_CAP_BINARY_STATS_FD 203
+ #define KVM_CAP_EXIT_ON_EMULATION_FAILURE 204
+ #define KVM_CAP_ARM_MTE 205
++#define KVM_CAP_ARM_SYSTEM_SUSPEND 206
  
- 	return PSCI_RET_SUCCESS;
+ #ifdef KVM_CAP_IRQ_ROUTING
+ 
 -- 
 2.33.0.rc2.250.ged5fa647cd-goog
 
