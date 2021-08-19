@@ -2,125 +2,138 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0DAC33F2201
-	for <lists+kvm@lfdr.de>; Thu, 19 Aug 2021 23:00:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6CB523F221C
+	for <lists+kvm@lfdr.de>; Thu, 19 Aug 2021 23:12:46 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231474AbhHSVBQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 19 Aug 2021 17:01:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50414 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229791AbhHSVBP (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 19 Aug 2021 17:01:15 -0400
-Received: from mail-lf1-x12d.google.com (mail-lf1-x12d.google.com [IPv6:2a00:1450:4864:20::12d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1A18FC061575
-        for <kvm@vger.kernel.org>; Thu, 19 Aug 2021 14:00:39 -0700 (PDT)
-Received: by mail-lf1-x12d.google.com with SMTP id u22so15642661lfq.13
-        for <kvm@vger.kernel.org>; Thu, 19 Aug 2021 14:00:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=AvQxXkt+Y6T63punRpouLEiLYsNbGvwmAz8WS2jurfQ=;
-        b=ZHJEMjfbNtf35/3ppqO8FcW3EFGc2NwLvO7lliyfTYD1V0n6TJ5XeANhrwSukFXGOX
-         GGgDsPfdM7qXmFqZDk2BDcVTdONCimPPNwcSKABKAFEJFgq9zbheE8v07glt5S1C9vt6
-         bhSZgY58nsHjAKnWfCThu2+tIy3YFtK5xNiKCB5l2GwFwzu+EvCxTVpzUiaDpWP/z78p
-         BLS4SkE+NV3yQ5n4FshQidB5qaRn5URGvO7sn7YsN6Zz44zkzUdl4y9VhDIPCouRcKdy
-         DYM279xkUC8peyXwJarTC2OV+W8+KxfV5HMupHVWOzb448KigQIwDGtABxLM1uCErlhc
-         2vzA==
+        id S235659AbhHSVNU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 19 Aug 2021 17:13:20 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:58263 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S235406AbhHSVNT (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 19 Aug 2021 17:13:19 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1629407562;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=E6gvO9OrXFcUe/cpRZ8MFuADLEe52cpmbYRUrdRkJ+A=;
+        b=JQP4oyN/cRNavLeUgPWKTD3uj02ZMP33AqbOrFBqYgtJuAFBSs2P0RICGZ+dTlwFSDU2YC
+        7wN/G19rnLV8j8y+gSIbf5vGd/ktpCQskA5+V7KugfYHi8CLfpLFe5Z+LVW6I5AfLet7KN
+        kpbmZQ63L/9jM9wPrgmNO3I1LCyvScQ=
+Received: from mail-oi1-f199.google.com (mail-oi1-f199.google.com
+ [209.85.167.199]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-243-2Clk6EnZMl-tkH50hd5-Ag-1; Thu, 19 Aug 2021 17:12:38 -0400
+X-MC-Unique: 2Clk6EnZMl-tkH50hd5-Ag-1
+Received: by mail-oi1-f199.google.com with SMTP id q7-20020a0568082007b0290267cebbbabeso2693074oiw.20
+        for <kvm@vger.kernel.org>; Thu, 19 Aug 2021 14:12:37 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=AvQxXkt+Y6T63punRpouLEiLYsNbGvwmAz8WS2jurfQ=;
-        b=FduYUOH4rV//PwOKqD1UCqRVxazM9pYEV9oEcMx7RCMuOEN8YTtwz1wP3nOIGXfbkd
-         3nVDrnBO0G5zd9Lr9o7z9zewrmJ77sf+Fj9zEhLXZfvdSbGg90w6Z0fFM762RQ1sD9aS
-         JfytWrsp4OZ91CVQ4ycctMXzJCjeODH+sr2gnxeW4hRCw6M+DOOqfZbd3EpQs2DssjBz
-         1lr6I1T1MYPqWW+vjcrJZT7kU4Z6PXwlhKU6kBnEipsAVYwBPtICtWtiI92bTkkEnT44
-         zVdN3P0caa/GfbZpY6txGhZrm2FjHkybpXUe8AvxsRprLPnl3eDqOwPWdNynXCub1yqP
-         KjYg==
-X-Gm-Message-State: AOAM5300rotIQTCxivm3CWo5wjBHAEhAwA/PicmWJ66Y7kuS2eDBsxLX
-        LZFg/kLaqNrwdvEQcXDbfg8FC7qcGs2Jn+3CY17nSzDD9K27Ww==
-X-Google-Smtp-Source: ABdhPJxp++TjNQXMJ8YzShPEqdPBvPvWAicd6N7rmRgG0JhAycXTuNBtCUcrdcmI3FunPK8cEQ8Mj7WKWWnhFK53gM4=
-X-Received: by 2002:a19:6541:: with SMTP id c1mr11833577lfj.423.1629406836921;
- Thu, 19 Aug 2021 14:00:36 -0700 (PDT)
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=E6gvO9OrXFcUe/cpRZ8MFuADLEe52cpmbYRUrdRkJ+A=;
+        b=fSIHL225XlIK4PT6hAOuZWczzHZSWvlxYfmJwlPInjTQMSMf5fUrYqVu6l5Pc/C2I4
+         +FdB+TDjP/Pr1Ep9hsH+AZhUSpeRm2AsLqe3FDRa5wdE+PNGPghjhBNMma2zFRbqpt8q
+         rw6v9X/jFg0a5XTTG3dVzcbOhH02Nxw14ElKtsDgbcEgrWwqOaGip12HdrwRwDEID7ds
+         PQ2qapli/mGEZI4g86SQJ6I87OI5GW3mGdCzvaL0C9lJsOvFTUogKQQz+Bz5Rgnpj5MK
+         XrKkg9AlljRTwOm5/lqC4jXlbcK8LAZGvPEeTDfv9WkiKMK0F543umDMlHT4PI0xTcgP
+         MHLw==
+X-Gm-Message-State: AOAM533MCDLMnm452cSSzwYiHvsT13MG4ElPlWrOL8MEE8PikKtemLzc
+        j7QRKwNAiTBIwlO4y+UxHEzuD+b77cp4MnJlRQunQO7qXtjegoLZtwcnAl0TxgMZpsKtQxRt5bb
+        1lbNIpXB192h8
+X-Received: by 2002:a9d:2623:: with SMTP id a32mr13182302otb.230.1629407557348;
+        Thu, 19 Aug 2021 14:12:37 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzUeeSwDkzPyIuUpTTNozB4BrJ608hcWg5fGUZ6DQun89xaPNcF182TXCouJfusmvYM/5S3YA==
+X-Received: by 2002:a9d:2623:: with SMTP id a32mr13182284otb.230.1629407557130;
+        Thu, 19 Aug 2021 14:12:37 -0700 (PDT)
+Received: from redhat.com ([198.99.80.109])
+        by smtp.gmail.com with ESMTPSA id 32sm969567otr.2.2021.08.19.14.12.36
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 19 Aug 2021 14:12:36 -0700 (PDT)
+Date:   Thu, 19 Aug 2021 15:12:35 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Yishai Hadas <yishaih@nvidia.com>
+Cc:     <bhelgaas@google.com>, <corbet@lwn.net>,
+        <diana.craciun@oss.nxp.com>, <kwankhede@nvidia.com>,
+        <eric.auger@redhat.com>, <masahiroy@kernel.org>,
+        <michal.lkml@markovi.net>, <linux-pci@vger.kernel.org>,
+        <linux-doc@vger.kernel.org>, <kvm@vger.kernel.org>,
+        <linux-s390@vger.kernel.org>, <linux-kbuild@vger.kernel.org>,
+        <mgurtovoy@nvidia.com>, <jgg@nvidia.com>, <maorg@nvidia.com>,
+        <leonro@nvidia.com>
+Subject: Re: [PATCH V2 06/12] vfio/pci: Split the pci_driver code out of
+ vfio_pci_core.c
+Message-ID: <20210819151235.6fe61269.alex.williamson@redhat.com>
+In-Reply-To: <20210818151606.202815-7-yishaih@nvidia.com>
+References: <20210818151606.202815-1-yishaih@nvidia.com>
+        <20210818151606.202815-7-yishaih@nvidia.com>
+X-Mailer: Claws Mail 3.18.0 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-References: <20210819154910.1064090-1-pgonda@google.com> <20210819154910.1064090-2-pgonda@google.com>
- <CAA03e5Gh0kJYHP1R3F7uh6x83LBFPp=af2xt7q3epgg+8XW53g@mail.gmail.com>
-In-Reply-To: <CAA03e5Gh0kJYHP1R3F7uh6x83LBFPp=af2xt7q3epgg+8XW53g@mail.gmail.com>
-From:   Peter Gonda <pgonda@google.com>
-Date:   Thu, 19 Aug 2021 15:00:25 -0600
-Message-ID: <CAMkAt6oJcW3MHP3fod9RnRHCEYp-whdEtBTyfuqgFgATKa=3Hg@mail.gmail.com>
-Subject: Re: [PATCH 1/2 V4] KVM, SEV: Add support for SEV intra host migration
-To:     Marc Orr <marcorr@google.com>
-Cc:     kvm list <kvm@vger.kernel.org>,
-        Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        David Rientjes <rientjes@google.com>,
-        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
-        Brijesh Singh <brijesh.singh@amd.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        "H. Peter Anvin" <hpa@zytor.com>, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-> >
-> > +static int svm_sev_lock_for_migration(struct kvm *kvm)
-> > +{
-> > +       struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
-> > +       int ret;
-> > +
-> > +       /*
-> > +        * Bail if this VM is already involved in a migration to avoid deadlock
-> > +        * between two VMs trying to migrate to/from each other.
-> > +        */
-> > +       spin_lock(&sev->migration_lock);
-> > +       if (sev->migration_in_progress)
-> > +               ret = -EBUSY;
-> > +       else {
-> > +               /*
-> > +                * Otherwise indicate VM is migrating and take the KVM lock.
-> > +                */
-> > +               sev->migration_in_progress = true;
-> > +               mutex_lock(&kvm->lock);
-> > +               ret = 0;
-> > +       }
-> > +       spin_unlock(&sev->migration_lock);
-> > +
-> > +       return ret;
-> > +}
-> > +
-> > +static void svm_unlock_after_migration(struct kvm *kvm)
-> > +{
-> > +       struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
-> > +
-> > +       mutex_unlock(&kvm->lock);
-> > +       WRITE_ONCE(sev->migration_in_progress, false);
-> > +}
-> > +
->
-> This entire locking scheme seems over-complicated to me. Can we simply
-> rely on `migration_lock` and get rid of `migration_in_progress`? I was
-> chatting about these patches with Peter, while he worked on this new
-> version. But he mentioned that this locking scheme had been suggested
-> by Sean in a previous review. Sean: what do you think? My rationale
-> was that this is called via a VM-level ioctl. So serializing the
-> entire code path on `migration_lock` seems fine. But maybe I'm missing
-> something?
->
+On Wed, 18 Aug 2021 18:16:00 +0300
+Yishai Hadas <yishaih@nvidia.com> wrote:
+> +
+> +static int vfio_pci_sriov_configure(struct pci_dev *pdev, int nr_virtfn)
+> +{
+> +	might_sleep();
 
-Marc I think that only having the spin lock could result in
-deadlocking. If userspace double migrated 2 VMs, A and B for
-discussion, A could grab VM_A.spin_lock then VM_A.kvm_mutex. Meanwhile
-B could grab VM_B.spin_lock and VM_B.kvm_mutex. Then A attempts to
-grab VM_B.spin_lock and we have a deadlock. If the same happens with
-the proposed scheme when A attempts to lock B, VM_B.spin_lock will be
-open but the bool will mark the VM under migration so A will unlock
-and bail. Sean originally proposed a global spin lock but I thought a
-per kvm_sev_info struct would also be safe.
+vfio_pci_core_sriov_configure() retained the might_sleep(), it
+shouldn't be needed here.
+
+> +
+> +	if (!enable_sriov)
+> +		return -ENOENT;
+> +
+> +	return vfio_pci_core_sriov_configure(pdev, nr_virtfn);
+> +}
+...
+> @@ -509,7 +449,7 @@ static struct vfio_pci_core_device *get_pf_vdev(struct vfio_pci_core_device *vde
+>  	if (!pf_dev)
+>  		return NULL;
+>  
+> -	if (pci_dev_driver(physfn) != &vfio_pci_driver) {
+> +	if (pci_dev_driver(physfn) != pci_dev_driver(vdev->pdev)) {
+
+I think this means that the PF and VF must use the same vfio-pci
+"variant" driver, it's too bad we're not enabling vfio-pci to own the
+PF while vfio-vendor-foo-pci owns the VF since our SR-IOV security
+model remains in the core.  We can work on that later though, no loss
+of functionality here.
+
+...
+> @@ -1795,12 +1723,12 @@ static int vfio_pci_bus_notifier(struct notifier_block *nb,
+>  		pci_info(vdev->pdev, "Captured SR-IOV VF %s driver_override\n",
+>  			 pci_name(pdev));
+>  		pdev->driver_override = kasprintf(GFP_KERNEL, "%s",
+> -						  vfio_pci_ops.name);
+> +						  vdev->vdev.ops->name);
+>  	} else if (action == BUS_NOTIFY_BOUND_DRIVER &&
+>  		   pdev->is_virtfn && physfn == vdev->pdev) {
+>  		struct pci_driver *drv = pci_dev_driver(pdev);
+>  
+> -		if (drv && drv != &vfio_pci_driver)
+> +		if (drv && drv != pci_dev_driver(vdev->pdev))
+>  			pci_warn(vdev->pdev,
+>  				 "VF %s bound to driver %s while PF bound to vfio-pci\n",
+
+"vfio-pci" is hardcoded in this comment.  There are a few other user
+visible instances of this in vfio-pci-core.c as well:
+
+MODULE_PARM_DESC(disable_vga, "Disable VGA resource access through vfio-pci");
+
+                ret = pci_request_selected_regions(pdev,
+                                                   1 << index, "vfio-pci");
+
+                        pci_info_ratelimited(vdev->pdev,
+                                "VF token incorrectly provided, PF not bound to vfio-pci\n");
+
+We should try to fix or reword as many of these as we reasonably can.
+Thanks,
+
+Alex
+
