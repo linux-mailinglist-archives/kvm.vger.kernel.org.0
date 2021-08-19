@@ -2,109 +2,100 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8086E3F1E3D
-	for <lists+kvm@lfdr.de>; Thu, 19 Aug 2021 18:43:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BC3713F1E44
+	for <lists+kvm@lfdr.de>; Thu, 19 Aug 2021 18:46:27 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230191AbhHSQo2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 19 Aug 2021 12:44:28 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:23120 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230089AbhHSQo1 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 19 Aug 2021 12:44:27 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1629391430;
+        id S229670AbhHSQrC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 19 Aug 2021 12:47:02 -0400
+Received: from mail.skyhub.de ([5.9.137.197]:39558 "EHLO mail.skyhub.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229474AbhHSQqz (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 19 Aug 2021 12:46:55 -0400
+Received: from zn.tnic (p200300ec2f0f6a00ce256b49be690694.dip0.t-ipconnect.de [IPv6:2003:ec:2f0f:6a00:ce25:6b49:be69:694])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 5E6841EC036B;
+        Thu, 19 Aug 2021 18:46:13 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
+        t=1629391573;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=ovmo8eHJLt09NnHE2KsMUgZOEZ1fOMoSIqw+9nEdI3o=;
-        b=ZUMJVEpP1xrmW7YNVk9CRMYFcOoeFAmJpqZbUz0D238R/Zoa69hP8VBeSfP0xBn6ftIjlO
-        B42ELNnRoIfCALfxnpGqIH8+fftJKaxkECCkd+EdslTBdz4CyC9IE6W32o9MIflJYX6E0O
-        HBUJRxCsnlXorZQxxTRCOjwiVQoR7Qw=
-Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
- [209.85.208.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-239-3LQAQfCRMOmwPMNU7b6jaA-1; Thu, 19 Aug 2021 12:43:49 -0400
-X-MC-Unique: 3LQAQfCRMOmwPMNU7b6jaA-1
-Received: by mail-ed1-f70.google.com with SMTP id e18-20020a0564020892b02903be9702d63eso3110289edy.17
-        for <kvm@vger.kernel.org>; Thu, 19 Aug 2021 09:43:49 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=ovmo8eHJLt09NnHE2KsMUgZOEZ1fOMoSIqw+9nEdI3o=;
-        b=TawHuL4mVqUUDpMWLEqc4DPAbl1Q0k2v87b6bHJ4nm8cv/Onc1AB02njvwjL0QgQ3x
-         EdEkqLJWNRNMtRuNIHnAAwGID//BpqG1BQLYTSi8+85Mujt132VPX6FB1xrBQtrHnOaM
-         Xwd/tnj3a5hxvomR6I49xHCoyKWrrQ1coTmXiCu6YcQFEickhKJkz3nHwgFB8/Ijt4hL
-         vqSSX8Mecx5+YfRZBG0SVy/qJ4+wL59Kl++W/BNQSCnYhFu3YYDOCnBHcns06f/v6/Gp
-         FYf8lvGTRguzbHYefprElItsGzAQsleNKhZgQ3E9kntk3aoSRXQ1ITUpgFkeaT7O/SCT
-         xIYg==
-X-Gm-Message-State: AOAM532pI/v4Qj7Nu/cKcNAYGJ/W9akFGrNFiujNxxRabmCfSP7Dq5uT
-        4s6DALIiKj6wZdmc5cEgF+X13zsBhDg+rm0AVMhsWZrBdFeDFs1Gi2ESE2t35Bmqt2mgSs2gjWp
-        I6fB86oPcFV/J
-X-Received: by 2002:a05:6402:2926:: with SMTP id ee38mr17265803edb.95.1629391428204;
-        Thu, 19 Aug 2021 09:43:48 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxBQI9xf53Gfkx4OcP68mxTenuILG5G2+AguBk/JQcIho0t27TP75Z4OOF/3/ibyGxTkTNgoA==
-X-Received: by 2002:a05:6402:2926:: with SMTP id ee38mr17265786edb.95.1629391428020;
-        Thu, 19 Aug 2021 09:43:48 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:63a7:c72e:ea0e:6045? ([2001:b07:6468:f312:63a7:c72e:ea0e:6045])
-        by smtp.gmail.com with ESMTPSA id q21sm1504758eji.59.2021.08.19.09.43.45
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 19 Aug 2021 09:43:47 -0700 (PDT)
-Subject: Re: [PATCH v3 0/3] SVM 5-level page table support
-To:     Wei Huang <wei.huang2@amd.com>, kvm@vger.kernel.org
-Cc:     linux-kernel@vger.kernel.org, vkuznets@redhat.com,
-        seanjc@google.com, wanpengli@tencent.com, jmattson@google.com,
-        joro@8bytes.org, tglx@linutronix.de, mingo@redhat.com,
-        bp@alien8.de, x86@kernel.org, hpa@zytor.com
-References: <20210818165549.3771014-1-wei.huang2@amd.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <46a54a13-b934-263a-9539-6c922ceb70d3@redhat.com>
-Date:   Thu, 19 Aug 2021 18:43:45 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.11.0
+         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
+        bh=fIwP1+vEtACNuhDJX1089jOgPxnYArbRitc0H03M4jk=;
+        b=G7FIywfCO3FzHcSZo6uJxFKDypgTWl3QpsMOQwYIHr8Aj0u5NhjsPUQYUhbNukPre1B3mJ
+        ZrB9vGLLF2oT1Q9/lYAsLtv6ENPS2Ajr1TI20FVF9VQuMW7i4iKC2Dx+5anOnGhWfvR2oP
+        P/8V4kfLy1Jfr9qisxvNsRJpg/mJ2nU=
+Date:   Thu, 19 Aug 2021 18:46:48 +0200
+From:   Borislav Petkov <bp@alien8.de>
+To:     Michael Roth <michael.roth@amd.com>
+Cc:     Brijesh Singh <brijesh.singh@amd.com>, x86@kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
+        linux-coco@lists.linux.dev, linux-mm@kvack.org,
+        linux-crypto@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        David Rientjes <rientjes@google.com>,
+        Dov Murik <dovmurik@linux.ibm.com>,
+        Tobin Feldman-Fitzthum <tobin@ibm.com>,
+        Vlastimil Babka <vbabka@suse.cz>, tony.luck@intel.com,
+        brijesh.ksingh@gmail.com
+Subject: Re: [PATCH Part1 RFC v4 22/36] x86/sev: move MSR-based VMGEXITs for
+ CPUID to helper
+Message-ID: <YR6K+BzCB9Tokw85@zn.tnic>
+References: <20210707181506.30489-1-brijesh.singh@amd.com>
+ <20210707181506.30489-23-brijesh.singh@amd.com>
+ <YR4oP+PDnmJbvfKR@zn.tnic>
+ <20210819153741.h6yloeihz5vl6hvu@amd.com>
 MIME-Version: 1.0
-In-Reply-To: <20210818165549.3771014-1-wei.huang2@amd.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20210819153741.h6yloeihz5vl6hvu@amd.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 18/08/21 18:55, Wei Huang wrote:
-> This patch set adds 5-level page table support for AMD SVM. When the
-> 5-level page table is enabled on host OS, the nested page table for guest
-> VMs will use the same format as host OS (i.e. 5-level NPT). These patches
-> were tested with various combination of different settings and test cases
-> (nested/regular VMs, AMD64/i686 kernels, kvm-unit-tests, etc.)
-> 
-> v2->v3:
->   * Change the way of building root_hpa by following the existing flow (Sean)
-> 
-> v1->v2:
->   * Remove v1's arch-specific get_tdp_level() and add a new parameter,
->     tdp_forced_root_level, to allow forced TDP level (Sean)
->   * Add additional comment on tdp_root table chaining trick and change the
->     PML root table allocation code (Sean)
->   * Revise Patch 1's commit msg (Sean and Jim)
-> 
-> Thanks,
-> -Wei
-> 
-> Wei Huang (3):
->    KVM: x86: Allow CPU to force vendor-specific TDP level
->    KVM: x86: Handle the case of 5-level shadow page table
->    KVM: SVM: Add 5-level page table support for SVM
-> 
->   arch/x86/include/asm/kvm_host.h |  6 ++--
->   arch/x86/kvm/mmu/mmu.c          | 56 ++++++++++++++++++++++-----------
->   arch/x86/kvm/svm/svm.c          | 13 ++++----
->   arch/x86/kvm/vmx/vmx.c          |  3 +-
->   4 files changed, 49 insertions(+), 29 deletions(-)
-> 
+On Thu, Aug 19, 2021 at 10:37:41AM -0500, Michael Roth wrote:
+> That makes sense, but I think it helps in making sense of the security
+> aspects of the code to know that sev_cpuid() would be fetching cpuid
+> information from the hypervisor.
 
-Queued, thanks, with NULL initializations according to Tom's review.
+Why is it important for the callers to know where do we fetch the CPUID
+info from?
 
-Paolo
+> "msr_proto" is meant to be an indicator that it will be using the GHCB
+> MSR protocol to do it, but maybe just "_hyp" is enough to get the idea
+> across? I use the convention elsewhere in the series as well.
+>
+> So sev_cpuid_hyp() maybe?
 
+sev_cpuid_hv() pls. We abbreviate the hypervisor as HV usually.
+
+> In "enable SEV-SNP-validated CPUID in #VC handler", it does:
+>
+>   sev_snp_cpuid() -> sev_snp_cpuid_hyp(),
+>
+> which will call this with NULL e{a,b,c,d}x arguments in some cases. There
+> are enough call-sites in sev_snp_cpuid() that it seemed worthwhile to
+> add the guards so we wouldn't need to declare dummy variables for arguments.
+
+Yah, saw that in the later patches.
+
+Thx.
+
+-- 
+Regards/Gruss,
+    Boris.
+
+https://people.kernel.org/tglx/notes-about-netiquette
