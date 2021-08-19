@@ -2,286 +2,354 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 876853F1C6F
-	for <lists+kvm@lfdr.de>; Thu, 19 Aug 2021 17:15:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 74F4D3F1C76
+	for <lists+kvm@lfdr.de>; Thu, 19 Aug 2021 17:15:56 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239513AbhHSPQO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 19 Aug 2021 11:16:14 -0400
-Received: from mail-bn8nam08on2047.outbound.protection.outlook.com ([40.107.100.47]:41184
-        "EHLO NAM04-BN8-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S239535AbhHSPQM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 19 Aug 2021 11:16:12 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=QRxLz9E93HDVO/a/bQJ+OoJ9Im78ugF1QGJTJ0t8+Gf6Q41WXaNFN66/sTOGn70rSjC4ffYfvj5NTcAYNgcZggMEml1IlOK2/dv7IZDgGtxbmQKYWzFyz7rruNi5q2UDSRGW7Z87XzZnI3Pp229ozC4qGaw8RzSZ1bM20OuQlMLDbTZ6PKQ7wjqU3D4NSiFD14vUidx37hZE339qjWI+jfkLZU8e0F9H7Mr3n+V7g4mjv9PPhKUdG9H/o8cr2VpyYVZZdUqvJ76k04IQXahQMRbZ9ZInkMwkc6dA6IKvCi6pWSemPDiyfR5K4DiFJINSVIi4NdoBUyv5oHcXWr9Gdg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=q6Q4aZpTrTrSxMi8jm6gjI8LpAwyQhSTcVk0h0ryq+w=;
- b=IqyxNcOsjC+9VIkCFhUs/FAseWcd4nSlBEwCyBkQzHgSNPqDoyq+O9PIyyOhgcWcLJYEiBHMOgmMJuSsH1H2NWi4LCTMBOKRTzPuFIPgQYgYYzBC30Re8whJvYbICgTKmnEkG3+TGo7L4xtS6fNff1SZStUhOgpvk2JLF3EFMZC/uCk9MsLMvJZPOTALTSumB9FGGifkEiI6hq67zjpLtn97P5TPsCX7KaBVKy0rJsVYtywHK/eWVwtb5csr+b5RkbTSpcdv3eHjzsSxlDhLvMok2FHOk9gdXvCoV5yJ6rt3llRBm5+RWe3NKESPUJ6FvE6As0CII52ZAEzj6PnGOA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=q6Q4aZpTrTrSxMi8jm6gjI8LpAwyQhSTcVk0h0ryq+w=;
- b=3PxQvRcWD4C1tH/y3H8KMzByXVqvwvcVwazfU2Q778aIdvpZ5eoxLMaP93Fn6g1w9dsJH+3eIbDNAzQHgTfAGSsbxy0/yup00UM7yCjAalpDzmUqG9k+ycayhCDcKAuGuip48TT1b+pv5ZXNt6KXP4bm5JlRRkPoXEtkBl+bD34=
-Authentication-Results: alien8.de; dkim=none (message not signed)
- header.d=none;alien8.de; dmarc=none action=none header.from=amd.com;
-Received: from CH2PR12MB4133.namprd12.prod.outlook.com (2603:10b6:610:7a::13)
- by CH2PR12MB4859.namprd12.prod.outlook.com (2603:10b6:610:62::14) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4394.16; Thu, 19 Aug
- 2021 15:15:32 +0000
-Received: from CH2PR12MB4133.namprd12.prod.outlook.com
- ([fe80::d19e:b657:5259:24d0]) by CH2PR12MB4133.namprd12.prod.outlook.com
- ([fe80::d19e:b657:5259:24d0%8]) with mapi id 15.20.4436.019; Thu, 19 Aug 2021
- 15:15:32 +0000
-Date:   Thu, 19 Aug 2021 09:58:31 -0500
-From:   Michael Roth <michael.roth@amd.com>
-To:     Borislav Petkov <bp@alien8.de>
-Cc:     Brijesh Singh <brijesh.singh@amd.com>, x86@kernel.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
-        linux-coco@lists.linux.dev, linux-mm@kvack.org,
-        linux-crypto@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
-        David Rientjes <rientjes@google.com>,
-        Dov Murik <dovmurik@linux.ibm.com>,
-        Tobin Feldman-Fitzthum <tobin@ibm.com>,
-        Vlastimil Babka <vbabka@suse.cz>, tony.luck@intel.com,
-        brijesh.ksingh@gmail.com
-Subject: Re: [PATCH Part1 RFC v4 24/36] x86/compressed/acpi: move EFI config
- table access to common code
-Message-ID: <20210819145831.42uszc4lcsffebzu@amd.com>
-References: <20210707181506.30489-1-brijesh.singh@amd.com>
- <20210707181506.30489-25-brijesh.singh@amd.com>
- <YR42323cUxsbQo5h@zn.tnic>
+        id S239835AbhHSPQ2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 19 Aug 2021 11:16:28 -0400
+Received: from mail.kernel.org ([198.145.29.99]:55322 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S239794AbhHSPQ1 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 19 Aug 2021 11:16:27 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id B251560E76;
+        Thu, 19 Aug 2021 15:15:50 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1629386151;
+        bh=i1VsQzbWxkLiM4lRhcPbE6ZrAU7xTQ0DnEcnhBk918k=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:From;
+        b=BCDvHR9020/3JsfA181x32CkqWtrZ0eEFmFXBMyuX5O5Jualf8RB6mb4JJx5UPksM
+         ogzqtEszZLP9hEBTtRlIzFi/3BU80Z9r8j9/hyaLW4d3RKlTFgL3Llqns9+bxrziRH
+         Vi8hkLpnCgVNbgq04TEf4KzTjE6D/ri5+DqqYva1GrIdHzrqh+VEeBWfuWpyTq780e
+         soOfGGDyApjs8an8iSqSrmZg7FLIUw4ViPaeTMfHQRIP83nf7ULjYUgvMmsHQ0gkt1
+         eCHDd98yq4UAJ7qsoGEycOqqtSUJ36SkSgcg05i/edgRoIdvtJWhJf8p9WOu1BzbT1
+         x+XJkH81YdD3w==
+Date:   Thu, 19 Aug 2021 10:15:49 -0500
+From:   Bjorn Helgaas <helgaas@kernel.org>
+To:     Yishai Hadas <yishaih@nvidia.com>
+Cc:     bhelgaas@google.com, corbet@lwn.net, alex.williamson@redhat.com,
+        diana.craciun@oss.nxp.com, kwankhede@nvidia.com,
+        eric.auger@redhat.com, masahiroy@kernel.org,
+        michal.lkml@markovi.net, linux-pci@vger.kernel.org,
+        linux-doc@vger.kernel.org, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org, linux-kbuild@vger.kernel.org,
+        mgurtovoy@nvidia.com, jgg@nvidia.com, maorg@nvidia.com,
+        leonro@nvidia.com
+Subject: Re: [PATCH V2 09/12] PCI: Add 'override_only' bitmap to struct
+ pci_device_id
+Message-ID: <20210819151549.GA3128368@bjorn-Precision-5520>
+MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <YR42323cUxsbQo5h@zn.tnic>
-X-ClientProxiedBy: SA9P223CA0012.NAMP223.PROD.OUTLOOK.COM
- (2603:10b6:806:26::17) To CH2PR12MB4133.namprd12.prod.outlook.com
- (2603:10b6:610:7a::13)
-MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from localhost (165.204.77.11) by SA9P223CA0012.NAMP223.PROD.OUTLOOK.COM (2603:10b6:806:26::17) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4436.19 via Frontend Transport; Thu, 19 Aug 2021 15:15:32 +0000
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: fc90c317-a1c6-4eb4-abcc-08d963242ff0
-X-MS-TrafficTypeDiagnostic: CH2PR12MB4859:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <CH2PR12MB485977827F7A1280C5635C5995C09@CH2PR12MB4859.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:3968;
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: BQM1is44vhxsAs0KpkyeyIBuOVMsVP5fl8mxDHCayIf32/kIlfoFBr8++uU+HE2Z1A1qZr0VbTKsOVa4aEwXtzt5rVZgIV5Ufchq6CwXyxMtaHxorBzwgPSQBnN0GZ89TJKkuzWrn1JukUone4Iq/ifj3DLnDuxtS5RK5W6Ipjki8Gz3VMsk0F2G5CCjRMtHiMrkHQ1KJKS6J1Fww5X3eL9Kpu22dW2H3u/gUgB+8x9AzTMt9oYYp/1tL2PsEdONMWLW4CevIa++c65yWVxLq+Qik+SR6qiT35CP1CJHYRGmpQ1PsuaU7A/33E5//zInZNY5bY0COsUEqNtIktVkOhGblkuOPQl/h/tlCkRh4UnWyaLYSgpNSk/Vjt/iQUEo6ZadUppjaTIsIfeSMADuyeMVyJnC82niZlu2FM23HwIeV670TowLOnUAO1SKOOl4EQZwgXh8wQntTtVEj5MPELtnVVRaQn1rBOhBxJuiWDb2b8NyL3UTVSBUqEap+n/HHCSmNQuNfQDw4+DByp71rhqTbTpHj/lZatYTwbgpKB5xIfwe2siYPZimR998zbnVOKXuDqLW6pNhJB3rFhEFC5d/FiOWaM4ELdQpT0QXCWA1mIySDy4KKufl13uQqz6vXwxZvPGQDN2f8uLCRDkAYpugk7XH8kUDeluy24f3WoOLWOJy4lH7uNuItMaqfydmxiaX3PAig9lGOLGVoyKSSVjvCpeFvTFIvmcHsXIFLFwUHxyul/DxZEI8JEPh1AA+t2yUNt9yeAmhcu0JltzUrw==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH2PR12MB4133.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(508600001)(66946007)(52116002)(186003)(6496006)(66556008)(45080400002)(54906003)(2616005)(66476007)(38350700002)(316002)(4326008)(1076003)(5660300002)(8676002)(8936002)(83380400001)(38100700002)(966005)(6916009)(86362001)(6486002)(2906002)(36756003)(44832011)(7406005)(7416002)(26005)(956004);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?j4FR+zn1y4kYy+pxvFi5MseihUj8C6wgQo9FDe4CtOOAcpkRwHo3X9km9bJq?=
- =?us-ascii?Q?9GyMjKsjqIhOXPwhJoY2+Fncf/f62ifdDPxK8qArZALDxAlcjtz1iWP/34yV?=
- =?us-ascii?Q?mjyu7NwczYXt0yKEmsv+J+ik+CWoXSGjDkIeHqY3BFgWZuwQrF20FGFUQp2T?=
- =?us-ascii?Q?ppXViZ8mFB4AHETh2t/jNfJkKLaWDu0yPBryCrz1RLx/qUs+wJsXIzPh5uuj?=
- =?us-ascii?Q?CDTcfpfktEISlwvCCyYFSEWgmvR24creNHx+/h9S4AdpGVHuBD5UYlz93DX0?=
- =?us-ascii?Q?TdDknzLRgJfwUUTGfow3j/HbqVs8ArzywaDOmRhn6oOQ6C+/TwJd5LpVITcY?=
- =?us-ascii?Q?bjtm1c4gSo/7epiLo/lVQvA4Rq5Lnku1ZTNij12XwUpZ6TyNyjy1hYHxH1hL?=
- =?us-ascii?Q?8z/+IT3+LXhgx02EC2nvq7P/DA+cduCGCne4mAtiQYhgFRIhI114fKx57oxj?=
- =?us-ascii?Q?1x4uoJSVtQk27+tXjdQFRl39NWYun7Drlsc2mzdBzt0kDaaBWNvPn3Gs92+a?=
- =?us-ascii?Q?sHXKtJQt/z8hmNfygTDx4DU1zYs1ZB2PARhGFB6jAiyDLFF8ulGywGM3OhdF?=
- =?us-ascii?Q?WNzhTIbt6gn9QSCy5EbGoxAn9kTB733y73hDnhfUCXm0YxbmS5qA13IvqN4m?=
- =?us-ascii?Q?tHm/QAQvN5kPppJe2ofUviNP1tZus8/iVMsMHtrgAFkSxBW754ovmyC0zAhB?=
- =?us-ascii?Q?9FQ6x17rLppWWhwfo1/U8VDCuqBtW/kETRGiv+0b4SiKeksqh5aBqsQ2BokB?=
- =?us-ascii?Q?6Mdt7JwUdLbDRQkwwwVT5n9KQr0AXndvhq/hY9FJAUVmiw661PBlBsX13sRf?=
- =?us-ascii?Q?lKWy04P11n3QGq36sBlpQNJV+4PASiP0iPS4ZrvL8dm0XqzvMPt3Uzx+GznS?=
- =?us-ascii?Q?w0TXZ2PK7cV+8GQ/SWb0705XTDHPvIZND/Dh4sI8jUvLoSeNLu4O0CNy/XVg?=
- =?us-ascii?Q?HQDaIB3TI/ez4ES1QyBhkoV95OOavO5qw9Xb+yDruzJtZ6jUx6CfB7k/nzJa?=
- =?us-ascii?Q?NNj/JTgyfIvMgVa8YaL6or00CvDJK/mGzxTblHSCWX6FG/DNBHt5dsH+VhwS?=
- =?us-ascii?Q?QLuZGpqB/k5keEyXpdMW2jYX7NXizuqchGTUOicTk0y3sqB2DAi0S2EN+jAj?=
- =?us-ascii?Q?il+2fW6jsuKHwLtR+vxm9lV8jRf2ZmpwNvr4NXDua9Lm+CKuLM3q5j0GovW3?=
- =?us-ascii?Q?WDwCa8ssfA0DgIEwTkCUdkNCNo3yGwe9ql0doJS+7Z1Yr4g+xSbokXDcqvtw?=
- =?us-ascii?Q?s7AfcX3h/4CODhuyWhfLAyDac36QQFZ2ao8C0hzg/lSi1Vyi2aW4bo0MvM2E?=
- =?us-ascii?Q?e+j9klhawesqnbH2Lm321ddD?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: fc90c317-a1c6-4eb4-abcc-08d963242ff0
-X-MS-Exchange-CrossTenant-AuthSource: CH2PR12MB4133.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Aug 2021 15:15:32.6777
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: kIgTykC8Nf6W5bCgtpiHquY1iWnEq000Vlf9HJjcuiePzYAnATYqrtspcl9fYdNOgP+NYT1/MYureReyC0V77A==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH2PR12MB4859
+In-Reply-To: <20210818151606.202815-10-yishaih@nvidia.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Aug 19, 2021 at 12:47:59PM +0200, Borislav Petkov wrote:
-> On Wed, Jul 07, 2021 at 01:14:54PM -0500, Brijesh Singh wrote:
-> > From: Michael Roth <michael.roth@amd.com>
-> > 
-> > Future patches for SEV-SNP-validated CPUID will also require early
-> > parsing of the EFI configuration. Move the related code into a set of
-> > helpers that can be re-used for that purpose.
-> > 
-> > Signed-off-by: Michael Roth <michael.roth@amd.com>
-> > Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
-> > ---
-> >  arch/x86/boot/compressed/Makefile           |   1 +
-> >  arch/x86/boot/compressed/acpi.c             | 124 +++++---------
-> >  arch/x86/boot/compressed/efi-config-table.c | 180 ++++++++++++++++++++
-> >  arch/x86/boot/compressed/misc.h             |  50 ++++++
-> >  4 files changed, 272 insertions(+), 83 deletions(-)
-> >  create mode 100644 arch/x86/boot/compressed/efi-config-table.c
+On Wed, Aug 18, 2021 at 06:16:03PM +0300, Yishai Hadas wrote:
+> From: Max Gurtovoy <mgurtovoy@nvidia.com>
 > 
+> Allow device drivers to include match entries in the modules.alias file
+> produced by kbuild that are not used for normal driver autoprobing and
+> module autoloading. Drivers using these match entries can be connected
+> to the PCI device manually, by userspace, using the existing
+> driver_override sysfs.
+> 
+> To achieve it, we add the 'override_only' bitmap to struct pci_device_id
+> and a helper macro named 'PCI_DEVICE_DRIVER_OVERRIDE' to enable setting
+> specific bits on it.
+> 
+> The first bit (i.e. 'PCI_ID_F_VFIO_DRIVER_OVERRIDE') indicates that the
+> match entry is for the VFIO subsystem, it can be set by another helper
+> macro named 'PCI_DRIVER_OVERRIDE_DEVICE_VFIO'.
+> 
+> These match entries are prefixed with "vfio_" in the modules.alias.
+> 
+> For example the resulting modules.alias may have:
+> 
+>   alias pci:v000015B3d00001021sv*sd*bc*sc*i* mlx5_core
+>   alias vfio_pci:v000015B3d00001021sv*sd*bc*sc*i* mlx5_vfio_pci
+>   alias vfio_pci:v*d*sv*sd*bc*sc*i* vfio_pci
+> 
+> In this example mlx5_core and mlx5_vfio_pci match to the same PCI
+> device. The kernel will autoload and autobind to mlx5_core but the kernel
+> and udev mechanisms will ignore mlx5_vfio_pci.
+> 
+> When userspace wants to change a device to the VFIO subsystem userspace
+> can implement a generic algorithm:
+> 
+>    1) Identify the sysfs path to the device:
+>     /sys/devices/pci0000:00/0000:00:01.0/0000:01:00.0
+> 
+>    2) Get the modalias string from the kernel:
+>     $ cat /sys/bus/pci/devices/0000:01:00.0/modalias
+>     pci:v000015B3d00001021sv000015B3sd00000001bc02sc00i00
+> 
+>    3) Prefix it with vfio_:
+>     vfio_pci:v000015B3d00001021sv000015B3sd00000001bc02sc00i00
+> 
+>    4) Search modules.alias for the above string and select the entry that
+>       has the fewest *'s:
+>     alias vfio_pci:v000015B3d00001021sv*sd*bc*sc*i* mlx5_vfio_pci
+> 
+>    5) modprobe the matched module name:
+>     $ modprobe mlx5_vfio_pci
+> 
+>    6) cat the matched module name to driver_override:
+>     echo mlx5_vfio_pci > /sys/bus/pci/devices/0000:01:00.0/driver_override
+> 
+>    7) unbind device from original module
+>     echo 0000:01:00.0 > /sys/bus/pci/devices/0000:01:00.0/driver/unbind
+> 
+>    8) probe PCI drivers (or explicitly bind to mlx5_vfio_pci)
+>     echo 0000:01:00.0 > /sys/bus/pci/drivers_probe
+> 
+> The algorithm is independent of bus type. In future the other buses's with
 
-Hi Boris,
+s/buses's/buses/
 
-Thanks for reviewing. Just FYI, Brijesh is prepping v5 to post soon, and I
-will work to get all your comments addressed as part of that, but there has
-also been a change to the CPUID handling in the #VC handlers in case you
-wanted to wait for that to land.
+> VFIO device drivers, like platform and ACPI, can use this algorithm as
+> well.
+> 
+> This patch is the infrastructure to provide the information in the
+> modules.alias to userspace. Convert the only VFIO pci_driver which results
+> in one new line in the modules.alias:
+> 
+>   alias vfio_pci:v*d*sv*sd*bc*sc*i* vfio_pci
+> 
+> Later series introduce additional HW specific VFIO PCI drivers, such as
+> mlx5_vfio_pci.
+> 
+> Signed-off-by: Max Gurtovoy <mgurtovoy@nvidia.com>
+> Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
+> Signed-off-by: Yishai Hadas <yishaih@nvidia.com>
+> ---
+>  Documentation/PCI/pci.rst         |  1 +
+>  drivers/pci/pci-driver.c          | 27 ++++++++++++++++++++-------
+>  drivers/vfio/pci/vfio_pci.c       |  9 ++++++++-
+>  include/linux/mod_devicetable.h   |  6 ++++++
+>  include/linux/pci.h               | 28 ++++++++++++++++++++++++++++
+>  scripts/mod/devicetable-offsets.c |  1 +
+>  scripts/mod/file2alias.c          |  8 ++++++--
+>  7 files changed, 70 insertions(+), 10 deletions(-)
+> 
+> diff --git a/Documentation/PCI/pci.rst b/Documentation/PCI/pci.rst
+> index fa651e25d98c..87c6f4a6ca32 100644
+> --- a/Documentation/PCI/pci.rst
+> +++ b/Documentation/PCI/pci.rst
+> @@ -103,6 +103,7 @@ need pass only as many optional fields as necessary:
+>    - subvendor and subdevice fields default to PCI_ANY_ID (FFFFFFFF)
+>    - class and classmask fields default to 0
+>    - driver_data defaults to 0UL.
+> +  - override_only field defaults to 0.
+>  
+>  Note that driver_data must match the value used by any of the pci_device_id
+>  entries defined in the driver. This makes the driver_data field mandatory
+> diff --git a/drivers/pci/pci-driver.c b/drivers/pci/pci-driver.c
+> index 3a72352aa5cf..8a6bd3364127 100644
+> --- a/drivers/pci/pci-driver.c
+> +++ b/drivers/pci/pci-driver.c
+> @@ -136,7 +136,7 @@ static const struct pci_device_id *pci_match_device(struct pci_driver *drv,
+>  						    struct pci_dev *dev)
+>  {
+>  	struct pci_dynid *dynid;
+> -	const struct pci_device_id *found_id = NULL;
+> +	const struct pci_device_id *found_id = NULL, *ids;
+>  
+>  	/* When driver_override is set, only bind to the matching driver */
+>  	if (dev->driver_override && strcmp(dev->driver_override, drv->name))
+> @@ -152,14 +152,27 @@ static const struct pci_device_id *pci_match_device(struct pci_driver *drv,
+>  	}
+>  	spin_unlock(&drv->dynids.lock);
+>  
+> -	if (!found_id)
+> -		found_id = pci_match_id(drv->id_table, dev);
+> +	if (found_id)
+> +		return found_id;
+>  
+> -	/* driver_override will always match, send a dummy id */
+> -	if (!found_id && dev->driver_override)
+> -		found_id = &pci_device_id_any;
+> +	for (ids = drv->id_table; (found_id = pci_match_id(ids, dev));
+> +	     ids = found_id + 1) {
+> +		/*
+> +		 * The match table is split based on driver_override. Check the
+> +		 * override_only as well so that any matching entry is
+> +		 * returned.
+> +		 */
+> +		if (!found_id->override_only || dev->driver_override)
+> +			return found_id;
 
-> arch/x86/boot/compressed/efi.c
-> 
-> should be good enough.
-> 
-> And in general, this patch is hard to review because it does a bunch of
-> things at the same time. You should split it:
-> 
-> - the first patch sould carve out only the functionality into helpers
-> without adding or changing the existing functionality.
-> 
-> - later ones should add the new functionality, in single logical steps.
+The negation makes this short, but IMO, makes this harder to read.
+I'd rather test for the special case directly instead of testing for
+the *absence* of the special case, e.g.,
 
-Not sure what you mean here. All the interfaces introduced here are used
-by acpi.c. There is another helper added later (efi_bp_find_vendor_table())
-in "enable SEV-SNP-validated CPUID in #VC handler", since it's not used
-here by acpi.c.
+  if (found_id->override_only) {
+    if (dev->driver_override)
+      return found_id;
+  } else
+    return found_id;
 
-> 
-> Some preliminary comments below as far as I can:
-> 
-> > diff --git a/arch/x86/boot/compressed/Makefile b/arch/x86/boot/compressed/Makefile
-> > index 431bf7f846c3..b41aecfda49c 100644
-> > --- a/arch/x86/boot/compressed/Makefile
-> > +++ b/arch/x86/boot/compressed/Makefile
-> > @@ -100,6 +100,7 @@ endif
-> >  vmlinux-objs-$(CONFIG_ACPI) += $(obj)/acpi.o
-> >  
-> >  vmlinux-objs-$(CONFIG_EFI_MIXED) += $(obj)/efi_thunk_$(BITS).o
-> > +vmlinux-objs-$(CONFIG_EFI) += $(obj)/efi-config-table.o
-> >  efi-obj-$(CONFIG_EFI_STUB) = $(objtree)/drivers/firmware/efi/libstub/lib.a
-> >  
-> >  $(obj)/vmlinux: $(vmlinux-objs-y) $(efi-obj-y) FORCE
-> > diff --git a/arch/x86/boot/compressed/acpi.c b/arch/x86/boot/compressed/acpi.c
-> > index 8bcbcee54aa1..e087dcaf43b3 100644
-> > --- a/arch/x86/boot/compressed/acpi.c
-> > +++ b/arch/x86/boot/compressed/acpi.c
-> > @@ -24,42 +24,36 @@ struct mem_vector immovable_mem[MAX_NUMNODES*2];
-> >   * Search EFI system tables for RSDP.  If both ACPI_20_TABLE_GUID and
-> >   * ACPI_TABLE_GUID are found, take the former, which has more features.
-> >   */
-> > +#ifdef CONFIG_EFI
-> > +static bool
-> > +rsdp_find_fn(efi_guid_t guid, unsigned long vendor_table, bool efi_64,
-> > +	     void *opaque)
-> > +{
-> > +	acpi_physical_address *rsdp_addr = opaque;
-> > +
-> > +	if (!(efi_guidcmp(guid, ACPI_TABLE_GUID))) {
-> > +		*rsdp_addr = vendor_table;
-> > +	} else if (!(efi_guidcmp(guid, ACPI_20_TABLE_GUID))) {
-> > +		*rsdp_addr = vendor_table;
-> > +		return false;
-> 
-> No "return false" in the ACPI_TABLE_GUID branch above? Maybe this has to
-> do with the preference to ACPI_20_TABLE_GUID.
+> +	}
+>  
+> -	return found_id;
+> +	/*
+> +	 * if no static match, driver_override will always match, send a dummy
+> +	 * id.
 
-Right, current acpi.c keeps searching in case the preferred
-ACPI_20_TABLE_GUID is found.
+I think the original comment was better.  This comment implies that we
+only checked for static matches above, but we actually checked for
+*both* dynamic IDs and static IDs.
 
-> 
-> In any case, this looks silly. Please do the iteration simple
-> and stupid without the function pointer and get rid of that
-> efi_foreach_conf_entry() thing - this is not firmware.
+> +	 */
+> +	if (dev->driver_override)
+> +		return &pci_device_id_any;
+> +	return NULL;
+>  }
+>  
+>  /**
+> diff --git a/drivers/vfio/pci/vfio_pci.c b/drivers/vfio/pci/vfio_pci.c
+> index 07edddf7e6ca..c52620ac5e70 100644
+> --- a/drivers/vfio/pci/vfio_pci.c
+> +++ b/drivers/vfio/pci/vfio_pci.c
+> @@ -180,9 +180,16 @@ static int vfio_pci_sriov_configure(struct pci_dev *pdev, int nr_virtfn)
+>  	return vfio_pci_core_sriov_configure(pdev, nr_virtfn);
+>  }
+>  
+> +static const struct pci_device_id vfio_pci_table[] = {
+> +	{ PCI_DRIVER_OVERRIDE_DEVICE_VFIO(PCI_ANY_ID, PCI_ANY_ID) }, /* match all by default */
+> +	{}
+> +};
+> +
+> +MODULE_DEVICE_TABLE(pci, vfio_pci_table);
+> +
+>  static struct pci_driver vfio_pci_driver = {
+>  	.name			= "vfio-pci",
+> -	.id_table		= NULL, /* only dynamic ids */
+> +	.id_table		= vfio_pci_table,
+>  	.probe			= vfio_pci_probe,
+>  	.remove			= vfio_pci_remove,
+>  	.sriov_configure	= vfio_pci_sriov_configure,
+> diff --git a/include/linux/mod_devicetable.h b/include/linux/mod_devicetable.h
+> index 8e291cfdaf06..39c229a7ab8c 100644
+> --- a/include/linux/mod_devicetable.h
+> +++ b/include/linux/mod_devicetable.h
+> @@ -16,6 +16,10 @@ typedef unsigned long kernel_ulong_t;
+>  
+>  #define PCI_ANY_ID (~0)
+>  
+> +enum {
+> +	PCI_ID_F_VFIO_DRIVER_OVERRIDE	= 1 << 0,
+> +};
+> +
+>  /**
+>   * struct pci_device_id - PCI device ID structure
+>   * @vendor:		Vendor ID to match (or PCI_ANY_ID)
+> @@ -34,12 +38,14 @@ typedef unsigned long kernel_ulong_t;
+>   *			Best practice is to use driver_data as an index
+>   *			into a static list of equivalent device types,
+>   *			instead of using it as a pointer.
+> + * @override_only:	Bitmap for override_only PCI drivers.
 
-There is the aforementioned efi_bp_find_vendor_table() that does the
-simple iteration, but I wasn't sure how to build the "find one of these,
-but this one is preferred" logic into it in a reasonable way.
+"Match only when dev->driver_override is this driver"?
 
-I could just call it once for each of these GUIDs though. I was hesitant
-to do so since it's less efficient than existing code, but if it's worth
-it for the simplification then I'm all for it.
+As far as PCI core is concerned there's no need for this to be a
+bitmap.
 
-So I'll pull efi_bp_find_vendor_table() into this patch, rename to
-efi_find_vendor_table(), and drop efi_foreach_conf_entry() in favor
-of it.
+I think this would make more sense if split into two patches.  The
+first would add override_only and change pci_match_device().  Then
+there's no confusion about whether this is specific to VFIO.
 
-> 
-> > diff --git a/arch/x86/boot/compressed/efi-config-table.c b/arch/x86/boot/compressed/efi-config-table.c
-> > new file mode 100644
-> > index 000000000000..d1a34aa7cefd
-> > --- /dev/null
-> > +++ b/arch/x86/boot/compressed/efi-config-table.c
-> 
-> ...
-> 
-> > +/*
-> 
-> If you're going to add proper comments, make them kernel-doc. I.e., it
-> should start with
-> 
-> /**
-> 
-> and then use
-> 
-> ./scripts/kernel-doc -none arch/x86/boot/compressed/efi-config-table.c
-> 
-> to check them all they're proper.
+The second can add PCI_ID_F_VFIO_DRIVER_OVERRIDE and make the
+file2alias.c changes.  Most of the commit log applies to this part.
 
-Nice, thanks for the tip.
-
-> 
-> 
-> > + * Given boot_params, retrieve the physical address of EFI system table.
-> > + *
-> > + * @boot_params:        pointer to boot_params
-> > + * @sys_table_pa:       location to store physical address of system table
-> > + * @is_efi_64:          location to store whether using 64-bit EFI or not
-> > + *
-> > + * Returns 0 on success. On error, return params are left unchanged.
-> > + */
-> > +int
-> > +efi_bp_get_system_table(struct boot_params *boot_params,
-> 
-> There's no need for the "_bp_" - just efi_get_system_table(). Ditto for
-> the other naming.
-
-There used to also be an efi_get_conf_table() that did the lookup given
-a direct pointer to systab rather than going through bootparams, so I
-needed some way to differentiate, but looks like I dropped that at some
-point, so I'll rename these as suggested.
-
-> 
-> I'll review the rest properly after you've split it.
-> 
-> Thx.
-> 
+>   */
+>  struct pci_device_id {
+>  	__u32 vendor, device;		/* Vendor and device ID or PCI_ANY_ID*/
+>  	__u32 subvendor, subdevice;	/* Subsystem ID's or PCI_ANY_ID */
+>  	__u32 class, class_mask;	/* (class,subclass,prog-if) triplet */
+>  	kernel_ulong_t driver_data;	/* Data private to the driver */
+> +	__u32 override_only;
+>  };
+>  
+>  
+> diff --git a/include/linux/pci.h b/include/linux/pci.h
+> index 540b377ca8f6..57f9aa60f3b4 100644
+> --- a/include/linux/pci.h
+> +++ b/include/linux/pci.h
+> @@ -901,6 +901,34 @@ struct pci_driver {
+>  	.vendor = (vend), .device = (dev), \
+>  	.subvendor = PCI_ANY_ID, .subdevice = PCI_ANY_ID
+>  
+> +/**
+> + * PCI_DEVICE_DRIVER_OVERRIDE - macro used to describe a PCI device with
+> + *                              override_only flags.
+> + * @vend: the 16 bit PCI Vendor ID
+> + * @dev: the 16 bit PCI Device ID
+> + * @driver_override: PCI Device override_only bitmap
+> + *
+> + * This macro is used to create a struct pci_device_id that matches a
+> + * specific device. The subvendor and subdevice fields will be set to
+> + * PCI_ANY_ID.
+> + */
+> +#define PCI_DEVICE_DRIVER_OVERRIDE(vend, dev, driver_override) \
+> +	.vendor = (vend), .device = (dev), .subvendor = PCI_ANY_ID, \
+> +	.subdevice = PCI_ANY_ID, .override_only = (driver_override)
+> +
+> +/**
+> + * PCI_DRIVER_OVERRIDE_DEVICE_VFIO - macro used to describe a VFIO
+> + *                                   "driver_override" PCI device.
+> + * @vend: the 16 bit PCI Vendor ID
+> + * @dev: the 16 bit PCI Device ID
+> + *
+> + * This macro is used to create a struct pci_device_id that matches a
+> + * specific device. The subvendor and subdevice fields will be set to
+> + * PCI_ANY_ID and the flags will be set to PCI_ID_F_VFIO_DRIVER_OVERRIDE.
+> + */
+> +#define PCI_DRIVER_OVERRIDE_DEVICE_VFIO(vend, dev) \
+> +	PCI_DEVICE_DRIVER_OVERRIDE(vend, dev, PCI_ID_F_VFIO_DRIVER_OVERRIDE)
+> +
+>  /**
+>   * PCI_DEVICE_SUB - macro used to describe a specific PCI device with subsystem
+>   * @vend: the 16 bit PCI Vendor ID
+> diff --git a/scripts/mod/devicetable-offsets.c b/scripts/mod/devicetable-offsets.c
+> index 9bb6c7edccc4..cc3625617a0e 100644
+> --- a/scripts/mod/devicetable-offsets.c
+> +++ b/scripts/mod/devicetable-offsets.c
+> @@ -42,6 +42,7 @@ int main(void)
+>  	DEVID_FIELD(pci_device_id, subdevice);
+>  	DEVID_FIELD(pci_device_id, class);
+>  	DEVID_FIELD(pci_device_id, class_mask);
+> +	DEVID_FIELD(pci_device_id, override_only);
+>  
+>  	DEVID(ccw_device_id);
+>  	DEVID_FIELD(ccw_device_id, match_flags);
+> diff --git a/scripts/mod/file2alias.c b/scripts/mod/file2alias.c
+> index 7c97fa8e36bc..c3edbf73157e 100644
+> --- a/scripts/mod/file2alias.c
+> +++ b/scripts/mod/file2alias.c
+> @@ -426,7 +426,7 @@ static int do_ieee1394_entry(const char *filename,
+>  	return 1;
+>  }
+>  
+> -/* Looks like: pci:vNdNsvNsdNbcNscNiN. */
+> +/* Looks like: pci:vNdNsvNsdNbcNscNiN or <prefix>_pci:vNdNsvNsdNbcNscNiN. */
+>  static int do_pci_entry(const char *filename,
+>  			void *symval, char *alias)
+>  {
+> @@ -440,8 +440,12 @@ static int do_pci_entry(const char *filename,
+>  	DEF_FIELD(symval, pci_device_id, subdevice);
+>  	DEF_FIELD(symval, pci_device_id, class);
+>  	DEF_FIELD(symval, pci_device_id, class_mask);
+> +	DEF_FIELD(symval, pci_device_id, override_only);
+>  
+> -	strcpy(alias, "pci:");
+> +	if (override_only & PCI_ID_F_VFIO_DRIVER_OVERRIDE)
+> +		strcpy(alias, "vfio_pci:");
+> +	else
+> +		strcpy(alias, "pci:");
+>  	ADD(alias, "v", vendor != PCI_ANY_ID, vendor);
+>  	ADD(alias, "d", device != PCI_ANY_ID, device);
+>  	ADD(alias, "sv", subvendor != PCI_ANY_ID, subvendor);
 > -- 
-> Regards/Gruss,
->     Boris.
+> 2.18.1
 > 
-> https://nam11.safelinks.protection.outlook.com/?url=https%3A%2F%2Fpeople.kernel.org%2Ftglx%2Fnotes-about-netiquette&amp;data=04%7C01%7Cmichael.roth%40amd.com%7C5a35d1d920024a99451608d962febc38%7C3dd8961fe4884e608e11a82d994e183d%7C0%7C0%7C637649668538296788%7CUnknown%7CTWFpbGZsb3d8eyJWIjoiMC4wLjAwMDAiLCJQIjoiV2luMzIiLCJBTiI6Ik1haWwiLCJXVCI6Mn0%3D%7C1000&amp;sdata=ED6tez8A1ktSULe%2FhJTxeqPlp4LVb0Yt4i44P9gytAw%3D&amp;reserved=0
