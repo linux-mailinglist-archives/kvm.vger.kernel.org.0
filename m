@@ -2,229 +2,213 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 24D513F131F
-	for <lists+kvm@lfdr.de>; Thu, 19 Aug 2021 08:13:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A6C733F13AB
+	for <lists+kvm@lfdr.de>; Thu, 19 Aug 2021 08:40:03 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230274AbhHSGOe (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 19 Aug 2021 02:14:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40656 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229782AbhHSGOe (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 19 Aug 2021 02:14:34 -0400
-Received: from mail-io1-xd2c.google.com (mail-io1-xd2c.google.com [IPv6:2607:f8b0:4864:20::d2c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 80858C061575
-        for <kvm@vger.kernel.org>; Wed, 18 Aug 2021 23:13:58 -0700 (PDT)
-Received: by mail-io1-xd2c.google.com with SMTP id a21so6245075ioq.6
-        for <kvm@vger.kernel.org>; Wed, 18 Aug 2021 23:13:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=hau+lDTq9Vb9TyOnVnIceEZbFlNptP4zxXLpB8kHO3I=;
-        b=C+xA5UmbGF4UtYT3zBcOIEN2SxMWjm/PKCnqnMt2g+S6dDR6uuWG9uETKBgQrThB03
-         VQCBaexJU5bdNSyq1AxaM/tFvpTfWDOUOXMWkKe9vcj2g0siw36JBnQhfYNzQ3LLtBEK
-         Wl5gpFXmFjTzLq867CO9XI/hthER86dl6n+vohILItMg7VNp9fGEejljpjcynaamST91
-         NpAATLV4B9SqzFzFKG9agtlZxHfXRAABYSGkrb3NKgcHi/lgZIIDOvISD6xpvKoTC17P
-         8mdmFeJxYvJsUUBlqQrCUOOqLl0I5epfnIgzD/Nv917qeSLR26xmig7AgwNkqwieV+hS
-         z5Lw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=hau+lDTq9Vb9TyOnVnIceEZbFlNptP4zxXLpB8kHO3I=;
-        b=HWxVyXcyNAZLbxvS4xGUg+R6W8nHHHThsMwT0DpKUQZDlec87PxkbrC31QftLnVG0Z
-         x13esWYCk+Ge773eLu4EXuDs979tApQA3OI34k77B72edMYk5jLo/orAR888w6uzm6Y1
-         6nPI7SITE7gf3ZECTV2Vo0QhyoNIREO7xGlgnvwmn5W5q/UVawNfF2W5X/fJxJuAqq4b
-         XubX4DZj3QxdcA6mj1eEzkZC4+y7mvaTWg8No92KtlFnhYyA+5pWRMfev7d2s58x4bl0
-         5jIqnktmBTBVCdU7zHma1c2JiTIDmXbmt8z9DN975rTCqwlv/J22niWunvcybqHRPinM
-         niKA==
-X-Gm-Message-State: AOAM530HuIWk6clOaHBsskCo4jv5NnWLIN63f6tQV2STptdMqnj6U897
-        RDEu+nJLJHLxM8D8tG6+FVDeNXd4ALUob6qY4P0=
-X-Google-Smtp-Source: ABdhPJziOzMst9AmuYG2afBE04QJKvczKncxVwPpgTJJdW1cCQh7eLl9vKVNIMOJb56juc54WB/Knn+YTqv9vc88xAc=
-X-Received: by 2002:a5d:8541:: with SMTP id b1mr10193893ios.105.1629353637845;
- Wed, 18 Aug 2021 23:13:57 -0700 (PDT)
+        id S231540AbhHSGke (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 19 Aug 2021 02:40:34 -0400
+Received: from mx3.molgen.mpg.de ([141.14.17.11]:35743 "EHLO mx1.molgen.mpg.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S230483AbhHSGkd (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 19 Aug 2021 02:40:33 -0400
+Received: from [192.168.0.2] (ip5f5aedd3.dynamic.kabel-deutschland.de [95.90.237.211])
+        (using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+        (No client certificate requested)
+        (Authenticated sender: pmenzel)
+        by mx.molgen.mpg.de (Postfix) with ESMTPSA id 95E4761E64760;
+        Thu, 19 Aug 2021 08:39:54 +0200 (CEST)
+Subject: Re: [PATCH] x86: kvm: Demote level of already loaded message from
+ error to info
+To:     Sean Christopherson <seanjc@google.com>,
+        "Maciej S. Szmigiero" <mail@maciej.szmigiero.name>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, Ingo Molnar <mingo@redhat.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Borislav Petkov <bp@alien8.de>, x86@kernel.org,
+        "H. Peter Anvin" <hpa@zytor.com>
+References: <20210818114956.7171-1-pmenzel@molgen.mpg.de>
+ <f9ba6fec-f764-dae7-e4f9-c532f4672359@maciej.szmigiero.name>
+ <YR2Id14e9kagM6u0@google.com>
+From:   Paul Menzel <pmenzel@molgen.mpg.de>
+Message-ID: <1c5ac4f8-4c39-a969-9ffa-2f527535a4b1@molgen.mpg.de>
+Date:   Thu, 19 Aug 2021 08:39:54 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.13.0
 MIME-Version: 1.0
-References: <20210817032447.2055-1-jiangyifei@huawei.com> <20210817032447.2055-9-jiangyifei@huawei.com>
-In-Reply-To: <20210817032447.2055-9-jiangyifei@huawei.com>
-From:   Alistair Francis <alistair23@gmail.com>
-Date:   Thu, 19 Aug 2021 16:13:31 +1000
-Message-ID: <CAKmqyKOm6fxqzScq74hS1NS2=K786MX-oCEA8fG+xOrQi+LQOQ@mail.gmail.com>
-Subject: Re: [PATCH RFC v6 08/12] target/riscv: Handle KVM_EXIT_RISCV_SBI exit
-To:     Yifei Jiang <jiangyifei@huawei.com>
-Cc:     "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
-        "open list:RISC-V" <qemu-riscv@nongnu.org>,
-        Bin Meng <bin.meng@windriver.com>,
-        "limingwang (A)" <limingwang@huawei.com>,
-        "open list:Overall" <kvm@vger.kernel.org>, libvir-list@redhat.com,
-        Anup Patel <anup.patel@wdc.com>,
-        Alistair Francis <Alistair.Francis@wdc.com>,
-        kvm-riscv@lists.infradead.org, wanghaibin.wang@huawei.com,
-        Palmer Dabbelt <palmer@dabbelt.com>, fanliang@huawei.com,
-        "Wubin (H)" <wu.wubin@huawei.com>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <YR2Id14e9kagM6u0@google.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Aug 17, 2021 at 1:25 PM Yifei Jiang <jiangyifei@huawei.com> wrote:
->
-> Use char-fe to handle console sbi call, which implement early
-> console io while apply 'earlycon=sbi' into kernel parameters.
->
-> Signed-off-by: Yifei Jiang <jiangyifei@huawei.com>
-> Signed-off-by: Mingwang Li <limingwang@huawei.com>
+Dear Sean,
+
+
+Am 19.08.21 um 00:23 schrieb Sean Christopherson:
+> On Wed, Aug 18, 2021, Maciej S. Szmigiero wrote:
+>> On 18.08.2021 13:49, Paul Menzel wrote:
+>>> In scripts, running
+>>>
+>>>       modprobe kvm_amd     2>/dev/null
+>>>       modprobe kvm_intel   2>/dev/null
+>>>
+>>> to ensure the modules are loaded causes Linux to log errors.
+>>>
+>>>       $ dmesg --level=err
+>>>       [    0.641747] [Firmware Bug]: TSC_DEADLINE disabled due to Errata; please update microcode to version: 0x3a (or later)
+>>>       [   40.196868] kvm: already loaded the other module
+>>>       [   40.219857] kvm: already loaded the other module
+>>>       [   55.501362] kvm [1177]: vcpu0, guest rIP: 0xffffffff96e5b644 disabled perfctr wrmsr: 0xc2 data 0xffff
+>>>       [   56.397974] kvm [1418]: vcpu0, guest rIP: 0xffffffff81046158 disabled perfctr wrmsr: 0xc1 data 0xabcd
+>>>       [1007981.827781] kvm: already loaded the other module
+>>>       [1008000.394089] kvm: already loaded the other module
+>>>       [1008030.706999] kvm: already loaded the other module
+>>>       [1020396.054470] kvm: already loaded the other module
+>>>       [1020405.614774] kvm: already loaded the other module
+>>>       [1020410.140069] kvm: already loaded the other module
+>>>       [1020704.049231] kvm: already loaded the other module
+>>>
+>>> As one of the two KVM modules is already loaded, KVM is functioning, and
+>>> their is no error condition. Therefore, demote the log message level to
+>>> informational.
+> 
+> Hrm, but there is an error condition.  Userspace explicitly requested something
+> and KVM couldn't satisfy the request.
+
+Yes, that’s the other perspective. ;-) I’d argue, as the Intel/AMD 
+module can’t work on AMD/Intel, the load failure is expected and error. 
+But as “error condition” is not well defined:
+
+     $ dmesg -h
+     […]
+     Supported log levels (priorities):
+        emerg - system is unusable
+        alert - action must be taken immediately
+         crit - critical conditions
+          err - error conditions
+         warn - warning conditions
+       notice - normal but significant condition
+         info - informational
+        debug - debug-level messages
+
+> KVM is also going to complain at level=err one way or another, e.g. if a script
+> probes kvm_amd before kvm_intel on an Intel CPU it's going to get "kvm: no hardware
+> support", so this isn't truly fixing the problem.
+
+In my case, modprobe already errors out in that case, which is fine for me.
+
+     $ lsmod | grep kvm
+     kvm_intel             249856  0
+     kvm                   851968  1 kvm_intel
+     irqbypass              16384  1 kvm
+     $ sudo modprobe -r kvm_intel
+     $ sudo modprobe kvm_amd
+     modprobe: ERROR: could not insert 'kvm_amd': Operation not supported
+     $ dmesg | tail -2
+     [212685.034278] has_svm: not amd or hygon
+     [212685.037998] kvm: no hardware support
+
+> Is the issue perhaps that this particular message isn't ratelimited?
+
+It would help my use case, as I am not interested in the error, and 
+would be another solution than just changing the log levle. But for your 
+viewpoint “Userspace explicitly requested something and KVM couldn't 
+satisfy the request”, the user wouldn’t see the immediate error at the 
+end of the output of `dmesg`.
+
+> It's also easy for the script to grep /proc/cpuinfo, so it's hard to feel too
+> bad about the kludgy message, e.g. look for a specific vendor, 'vmx' or 'svm', etc...
+> 
+> if [[ -z $kvm ]]; then
+>      grep vendor_id "/proc/cpuinfo" | grep -q AuthenticAMD
+>      if [[ $? -eq 0 ]]; then
+>          kvm=kvm_amd
+>      else
+>          kvm=kvm_intel
+>      fi
+> fi
+
+Yes, it could be worked around.
+
+>> Shouldn't this return ENODEV when loading one of these modules instead
+>> as there is no hardware that supports both VMX and SVM?
+> 
+> Probably not, as KVM would effectively be speculating, e.g. someone could load an
+> out-of-tree variant of kvm_{intel,amd}.  Maybe instead of switching to ENODEV,
+> reword the comment, make it ratelimited, and shove it down?  That way the message
+> and -EEXIST fires iff the vendor module actually has some chance of being loaded.
+> 
+>  From 3528e66bd5107d5ac4f6a6ae50503cf64446866a Mon Sep 17 00:00:00 2001
+> From: Sean Christopherson <seanjc@google.com>
+> Date: Wed, 18 Aug 2021 15:17:43 -0700
+> Subject: [PATCH] KVM: x86: Tweak handling and message when vendor module is
+>   already loaded
+> 
+> Reword KVM's error message if a vendor module is already loaded to state
+> exactly that instead of assuming "the other" module is loaded,
+
+The rewording is definitely an improvement.
+
+> ratelimit
+> said message to match the other errors, and move the check down below the
+> basic functionality checks so that attempting to load an unsupported
+> module provides the same result regardless of whether or not a supported
+> vendor module is already loaded.
+
+Maybe add an example, how it would log the error before, and how it’s 
+done now.
+
+> Reported-by: Paul Menzel <pmenzel@molgen.mpg.de>
+> Cc: Maciej S. Szmigiero <mail@maciej.szmigiero.name>
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
 > ---
->  target/riscv/kvm.c                 | 42 ++++++++++++++++-
->  target/riscv/sbi_ecall_interface.h | 72 ++++++++++++++++++++++++++++++
->  2 files changed, 113 insertions(+), 1 deletion(-)
->  create mode 100644 target/riscv/sbi_ecall_interface.h
->
-> diff --git a/target/riscv/kvm.c b/target/riscv/kvm.c
-> index bc9cb5d8f9..a68f31c2f3 100644
-> --- a/target/riscv/kvm.c
-> +++ b/target/riscv/kvm.c
-> @@ -38,6 +38,8 @@
->  #include "qemu/log.h"
->  #include "hw/loader.h"
->  #include "kvm_riscv.h"
-> +#include "sbi_ecall_interface.h"
-> +#include "chardev/char-fe.h"
->
->  static uint64_t kvm_riscv_reg_id(CPURISCVState *env, uint64_t type, uint64_t idx)
->  {
-> @@ -435,9 +437,47 @@ bool kvm_arch_stop_on_emulation_error(CPUState *cs)
->      return true;
->  }
->
-> +static int kvm_riscv_handle_sbi(struct kvm_run *run)
-> +{
-> +    int ret = 0;
-> +    unsigned char ch;
-> +    switch (run->riscv_sbi.extension_id) {
-> +    case SBI_EXT_0_1_CONSOLE_PUTCHAR:
-> +        ch = run->riscv_sbi.args[0];
-> +        qemu_chr_fe_write(serial_hd(0)->be, &ch, sizeof(ch));
-> +        break;
-> +    case SBI_EXT_0_1_CONSOLE_GETCHAR:
-> +        ret = qemu_chr_fe_read_all(serial_hd(0)->be, &ch, sizeof(ch));
-> +        if (ret == sizeof(ch)) {
-> +            run->riscv_sbi.args[0] = ch;
-> +        } else {
-> +            run->riscv_sbi.args[0] = -1;
-> +        }
-> +        break;
-
-These have been deprecated (see
-https://github.com/riscv/riscv-sbi-doc/blob/master/riscv-sbi.adoc#4-legacy-extensions-eids-0x00---0x0f),
-is it even worth supporting them?
-
-> +    default:
-> +        qemu_log_mask(LOG_UNIMP,
-> +                      "%s: un-handled SBI EXIT, specific reasons is %lu\n",
-> +                      __func__, run->riscv_sbi.extension_id);
-> +        ret = -1;
-> +        break;
-> +    }
-> +    return ret;
-> +}
+>   arch/x86/kvm/x86.c | 12 ++++++------
+>   1 file changed, 6 insertions(+), 6 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index fdc0c18339fb..15bd4bd3c81d 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -8357,12 +8357,6 @@ int kvm_arch_init(void *opaque)
+>   	struct kvm_x86_init_ops *ops = opaque;
+>   	int r;
+> 
+> -	if (kvm_x86_ops.hardware_enable) {
+> -		printk(KERN_ERR "kvm: already loaded the other module\n");
+> -		r = -EEXIST;
+> -		goto out;
+> -	}
+> -
+>   	if (!ops->cpu_has_kvm_support()) {
+>   		pr_err_ratelimited("kvm: no hardware support\n");
+>   		r = -EOPNOTSUPP;
+> @@ -8374,6 +8368,12 @@ int kvm_arch_init(void *opaque)
+>   		goto out;
+>   	}
+> 
+> +	if (kvm_x86_ops.hardware_enable) {
+> +		pr_err_ratelimited("kvm: already loaded a vendor module\n");
+> +		r = -EEXIST;
+> +		goto out;
+> +	}
 > +
->  int kvm_arch_handle_exit(CPUState *cs, struct kvm_run *run)
->  {
-> -    return 0;
-> +    int ret = 0;
-> +    switch (run->exit_reason) {
-> +    case KVM_EXIT_RISCV_SBI:
-> +        ret = kvm_riscv_handle_sbi(run);
-> +        break;
-> +    default:
-> +        qemu_log_mask(LOG_UNIMP, "%s: un-handled exit reason %d\n",
-> +                      __func__, run->exit_reason);
-> +        ret = -1;
-> +        break;
-> +    }
-> +    return ret;
->  }
->
->  void kvm_riscv_reset_vcpu(RISCVCPU *cpu)
-> diff --git a/target/riscv/sbi_ecall_interface.h b/target/riscv/sbi_ecall_interface.h
-> new file mode 100644
-> index 0000000000..fb1a3fa8f2
-> --- /dev/null
-> +++ b/target/riscv/sbi_ecall_interface.h
-> @@ -0,0 +1,72 @@
-> +/*
-> + * SPDX-License-Identifier: BSD-2-Clause
-> + *
-> + * Copyright (c) 2019 Western Digital Corporation or its affiliates.
-> + *
-> + * Authors:
-> + *   Anup Patel <anup.patel@wdc.com>
-> + */
-> +
-> +#ifndef __SBI_ECALL_INTERFACE_H__
-> +#define __SBI_ECALL_INTERFACE_H__
-> +
-> +/* clang-format off */
-> +
-> +/* SBI Extension IDs */
-> +#define SBI_EXT_0_1_SET_TIMER           0x0
-> +#define SBI_EXT_0_1_CONSOLE_PUTCHAR     0x1
-> +#define SBI_EXT_0_1_CONSOLE_GETCHAR     0x2
-> +#define SBI_EXT_0_1_CLEAR_IPI           0x3
-> +#define SBI_EXT_0_1_SEND_IPI            0x4
-> +#define SBI_EXT_0_1_REMOTE_FENCE_I      0x5
-> +#define SBI_EXT_0_1_REMOTE_SFENCE_VMA   0x6
-> +#define SBI_EXT_0_1_REMOTE_SFENCE_VMA_ASID 0x7
-> +#define SBI_EXT_0_1_SHUTDOWN            0x8
-> +#define SBI_EXT_BASE                    0x10
-> +#define SBI_EXT_TIME                    0x54494D45
-> +#define SBI_EXT_IPI                     0x735049
-> +#define SBI_EXT_RFENCE                  0x52464E43
-> +#define SBI_EXT_HSM                     0x48534D
-> +
-> +/* SBI function IDs for BASE extension*/
-> +#define SBI_EXT_BASE_GET_SPEC_VERSION   0x0
-> +#define SBI_EXT_BASE_GET_IMP_ID         0x1
-> +#define SBI_EXT_BASE_GET_IMP_VERSION    0x2
-> +#define SBI_EXT_BASE_PROBE_EXT          0x3
-> +#define SBI_EXT_BASE_GET_MVENDORID      0x4
-> +#define SBI_EXT_BASE_GET_MARCHID        0x5
-> +#define SBI_EXT_BASE_GET_MIMPID         0x6
-> +
-> +/* SBI function IDs for TIME extension*/
-> +#define SBI_EXT_TIME_SET_TIMER          0x0
-> +
-> +/* SBI function IDs for IPI extension*/
-> +#define SBI_EXT_IPI_SEND_IPI            0x0
-> +
-> +/* SBI function IDs for RFENCE extension*/
-> +#define SBI_EXT_RFENCE_REMOTE_FENCE_I       0x0
-> +#define SBI_EXT_RFENCE_REMOTE_SFENCE_VMA    0x1
-> +#define SBI_EXT_RFENCE_REMOTE_SFENCE_VMA_ASID  0x2
-> +#define SBI_EXT_RFENCE_REMOTE_HFENCE_GVMA   0x3
-> +#define SBI_EXT_RFENCE_REMOTE_HFENCE_GVMA_VMID 0x4
-> +#define SBI_EXT_RFENCE_REMOTE_HFENCE_VVMA   0x5
-> +#define SBI_EXT_RFENCE_REMOTE_HFENCE_VVMA_ASID 0x6
-> +
-> +/* SBI function IDs for HSM extension */
-> +#define SBI_EXT_HSM_HART_START          0x0
-> +#define SBI_EXT_HSM_HART_STOP           0x1
-> +#define SBI_EXT_HSM_HART_GET_STATUS     0x2
-> +
-> +#define SBI_HSM_HART_STATUS_STARTED     0x0
-> +#define SBI_HSM_HART_STATUS_STOPPED     0x1
-> +#define SBI_HSM_HART_STATUS_START_PENDING   0x2
-> +#define SBI_HSM_HART_STATUS_STOP_PENDING    0x3
-> +
-> +#define SBI_SPEC_VERSION_MAJOR_OFFSET   24
-> +#define SBI_SPEC_VERSION_MAJOR_MASK     0x7f
-> +#define SBI_SPEC_VERSION_MINOR_MASK     0xffffff
-> +#define SBI_EXT_VENDOR_START            0x09000000
-> +#define SBI_EXT_VENDOR_END              0x09FFFFFF
-> +/* clang-format on */
-> +
-> +#endif
+>   	/*
+>   	 * KVM explicitly assumes that the guest has an FPU and
+>   	 * FXSAVE/FXRSTOR. For example, the KVM_GET_FPU explicitly casts the
 > --
-> 2.19.1
->
->
+> 2.33.0.rc2.250.ged5fa647cd-goog
+
+Sounds also good at first sight. No idea, if monitoring scripts in 
+userspace would get confused now.
+
+
+Kind regards,
+
+Paul
