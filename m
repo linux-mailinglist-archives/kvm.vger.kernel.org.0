@@ -2,169 +2,154 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 706143F14DE
-	for <lists+kvm@lfdr.de>; Thu, 19 Aug 2021 10:10:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A9C433F14F9
+	for <lists+kvm@lfdr.de>; Thu, 19 Aug 2021 10:16:37 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236878AbhHSIK5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 19 Aug 2021 04:10:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39030 "EHLO
+        id S233920AbhHSIRL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 19 Aug 2021 04:17:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40522 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237013AbhHSIKz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 19 Aug 2021 04:10:55 -0400
-Received: from mail-lf1-x12a.google.com (mail-lf1-x12a.google.com [IPv6:2a00:1450:4864:20::12a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 39322C061575
-        for <kvm@vger.kernel.org>; Thu, 19 Aug 2021 01:10:19 -0700 (PDT)
-Received: by mail-lf1-x12a.google.com with SMTP id r9so11022780lfn.3
-        for <kvm@vger.kernel.org>; Thu, 19 Aug 2021 01:10:19 -0700 (PDT)
+        with ESMTP id S233364AbhHSIRJ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 19 Aug 2021 04:17:09 -0400
+Received: from mail-lf1-x136.google.com (mail-lf1-x136.google.com [IPv6:2a00:1450:4864:20::136])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9FC06C061575
+        for <kvm@vger.kernel.org>; Thu, 19 Aug 2021 01:16:33 -0700 (PDT)
+Received: by mail-lf1-x136.google.com with SMTP id i9so10975704lfg.10
+        for <kvm@vger.kernel.org>; Thu, 19 Aug 2021 01:16:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=cPvH0LAivty+kbGWONu/jrOGMYsTsQGu9Ph+/kEuth0=;
-        b=g5iwvH8XtD7qDEMB1qOF7bydpGwXpsD48tcbfS1oqQ1/AOUKJ58PaLfDH/Uf7ZvMxL
-         9slA7pl+LKesXBh9sAoUdK8o5t7/R5NlMqMlsMViU2NaAAcTiRSwM9+7In32BROIWMiO
-         SLXjhlfNgiP3XulDo6rYqIecUgk3X+GLsp90ZdVudD00utjZ/I5aZxIXqeJgsjP9XKRk
-         xZ9lJZVoq7lNj7IF4r7/R+A5/lprgvfHhUtkOsOjq8Bdz71XvbkC1TqNd33VIYEGH1AE
-         Gr/YN0lpgkXlpvE3F/PsNvtpnxlN/ehBHKhLXsjjZbil2pQuuexGvvUKmhZKRpsm7Gj6
-         tj0w==
+        bh=yIjfNruIRqoaZMP1dFgzuYg2bekGFWIjBtMbeKsjOv4=;
+        b=Uh1Rb4Tubmyt9cse91ISt5kDTlQA5cOUNtpTo3ndsgr8Ck+k+NFexFFUz7dyuM2H3t
+         m3kAPtmzO3DBlZuQbQOS1BGJjUv9r6yFgy0WnVgPSxucBCkqke5QvTkuTCy+8oy0eOTb
+         JkmkswyVt1D3ZoaYkI5dov/HLiOeTx2Mr0bQ2TJFhtusQPTrCpPomFM4IItSUMn8JFmy
+         Q9HWWiKPZA6ri/QVNnb34rhV/YDwcBDhhZlbiewsQu0Tsb8x3P4CosXJJGeXo3yOBl4Y
+         D8HnhI1tOhAnkfLZwT3K4kw7633qGlsmUBv1GFT8pq0ffBfsjvKvZ0yKkegYDWU7Uxxr
+         5cGw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=cPvH0LAivty+kbGWONu/jrOGMYsTsQGu9Ph+/kEuth0=;
-        b=GcEjhfIeRuP7wemGjXbE1pdlsNVtwurWo4gOKIN46nqfUJ9NuMCl69UOruWohwcF5h
-         pXIZ30kSydHRb2wyNMz52nSSZZ12JlTeqwfdZq+IL8YA6bVRD3R5RsnXdD5K6Q//xogt
-         TF2GGjr0uLbenapxRj2hZmWWHco4qcDLLoxRZLzmeF4ceNRPK2yUxiLTh4MhEyNqmy4u
-         eO53kLM5D8nf1IwPBV9iv3Vt9AxuEr6VYf490rR0zvtY3iFohsin0aJe1DZOD6FZoXaI
-         SWInSs68roQN0WZjq6aK+gZSCqEk8CTk4pVbmK04AJ2fWD6Dnh3y6tXkKzYG+8t6bfGR
-         9ceg==
-X-Gm-Message-State: AOAM533HyClhDI2aP23NBOmDIB4xezmzCSPbeCBzRR+babmKD9neP0RP
-        eBaz7DIIKnsZzx2RmzEA3adLEi/wRB5m9GI3kBEqHw==
-X-Google-Smtp-Source: ABdhPJwRJHRfC6bp+yucaRYcXg+6U4jr3ewQU/A/l03h51iZvbtfcjZ1PlG9Cpe3GEnFknctx1QJD+vQf8rj5XBM0m8=
-X-Received: by 2002:a05:6512:3fa8:: with SMTP id x40mr9659895lfa.0.1629360617193;
- Thu, 19 Aug 2021 01:10:17 -0700 (PDT)
+        bh=yIjfNruIRqoaZMP1dFgzuYg2bekGFWIjBtMbeKsjOv4=;
+        b=rbZGc9p06kYl8PmcjeVtyzMl9fBIWLv65Ws4f0VCZb0Jp0sZeAR1JO9n022XzETM1K
+         z3cvEytZpWhZlAcpDgAELbCwRsOdBLoGDh53r0jz4LaiE+KkX6XrYK3j5eOovB6rZIC9
+         iOEHr2Q/UWTMJ6lpbYU2SuCt7c1h6mlu7HdtwIIYz+y+fTtGYrnPwbF+3nD+1Ux1iYCD
+         ce0fRwh6AExZiXrsBMGsjjn58zK6630V6winpfs04f1hXkSFiUaXNrVvzEY3wcIxSxKm
+         OAoKz2RNIRD18ZXndWdgG+wGeLKkKE3E1DZM7VblJOzX77olUebW0gxTpLSTMUslQmXQ
+         cEGw==
+X-Gm-Message-State: AOAM5312Zb2F+COpCfZsXX7dwQR7Z+a7PKJBqhPoKjpMOwzd9HdSn46q
+        +rUtGKpN/mht/v6pwv/SvtJfxBLjHNUiYwJWpTXfrA==
+X-Google-Smtp-Source: ABdhPJwrWW9U4piKXkDbBKX+qAG8nI3LRbhJGUFw/CctYUBkZ/9YzEYznpDVd1/rjsXd1dFJ2yjXMXs2F+/onMOvPlM=
+X-Received: by 2002:a05:6512:4025:: with SMTP id br37mr9473510lfb.23.1629360990837;
+ Thu, 19 Aug 2021 01:16:30 -0700 (PDT)
 MIME-Version: 1.0
-References: <20210817081134.2918285-1-tabba@google.com> <20210817081134.2918285-16-tabba@google.com>
-In-Reply-To: <20210817081134.2918285-16-tabba@google.com>
+References: <20210818213205.598471-1-ricarkol@google.com> <CAOQ_QshVenuri8WdZdEis4szCv03U0KRNt4CqDNtvUBsqBqUoA@mail.gmail.com>
+ <YR1/YEY8DX+r05nt@google.com> <CAOQ_Qsgy7d7pWc=0AHpR2LHO67Z=gCa-TV46NxXMsFP8yqOzTw@mail.gmail.com>
+ <877dghsvvt.wl-maz@kernel.org>
+In-Reply-To: <877dghsvvt.wl-maz@kernel.org>
 From:   Oliver Upton <oupton@google.com>
-Date:   Thu, 19 Aug 2021 01:10:06 -0700
-Message-ID: <CAOQ_QsgSfHVjJkSJku5DwUe0_=ds4GduPbJ7vC-t+4_=fPVFBQ@mail.gmail.com>
-Subject: Re: [PATCH v4 15/15] KVM: arm64: Handle protected guests at 32 bits
-To:     Fuad Tabba <tabba@google.com>
-Cc:     kvmarm@lists.cs.columbia.edu, maz@kernel.org, will@kernel.org,
-        james.morse@arm.com, Alexandru.Elisei@arm.com,
-        suzuki.poulose@arm.com, mark.rutland@arm.com,
-        christoffer.dall@arm.com, pbonzini@redhat.com, drjones@redhat.com,
-        qperret@google.com, kvm@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, kernel-team@android.com
+Date:   Thu, 19 Aug 2021 01:16:19 -0700
+Message-ID: <CAOQ_QsiwWHWM_p8KOdehtCFP_yUzsCp7uF0ePXn9EGmvfYD7Aw@mail.gmail.com>
+Subject: Re: [PATCH] KVM: arm64: vgic: drop WARN from vgic_get_irq
+To:     Marc Zyngier <maz@kernel.org>
+Cc:     Ricardo Koller <ricarkol@google.com>, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org, james.morse@arm.com, Alexandru.Elisei@arm.com,
+        drjones@redhat.com, catalin.marinas@arm.com,
+        suzuki.poulose@arm.com, jingzhangos@google.com, pshier@google.com,
+        rananta@google.com, reijiw@google.com
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Fuad,
-
-On Tue, Aug 17, 2021 at 1:12 AM Fuad Tabba <tabba@google.com> wrote:
+On Thu, Aug 19, 2021 at 1:04 AM Marc Zyngier <maz@kernel.org> wrote:
 >
-> Protected KVM does not support protected AArch32 guests. However,
-> it is possible for the guest to force run AArch32, potentially
-> causing problems. Add an extra check so that if the hypervisor
-> catches the guest doing that, it can prevent the guest from
-> running again by resetting vcpu->arch.target and returning
-> ARM_EXCEPTION_IL.
+> On Thu, 19 Aug 2021 08:41:19 +0100,
+> Oliver Upton <oupton@google.com> wrote:
+> >
+> > On Wed, Aug 18, 2021 at 2:45 PM Ricardo Koller <ricarkol@google.com> wrote:
+> > >
+> > > On Wed, Aug 18, 2021 at 02:34:03PM -0700, Oliver Upton wrote:
+> > > > Hi Ricardo,
+> > > >
+> > > > On Wed, Aug 18, 2021 at 2:32 PM Ricardo Koller <ricarkol@google.com> wrote:
+> > > > >
+> > > > > vgic_get_irq(intid) is used all over the vgic code in order to get a
+> > > > > reference to a struct irq. It warns whenever intid is not a valid number
+> > > > > (like when it's a reserved IRQ number). The issue is that this warning
+> > > > > can be triggered from userspace (e.g., KVM_IRQ_LINE for intid 1020).
+> > > > >
+> > > > > Drop the WARN call from vgic_get_irq.
+> > > > >
+> > > > > Signed-off-by: Ricardo Koller <ricarkol@google.com>
+> > > > > ---
+> > > > >  arch/arm64/kvm/vgic/vgic.c | 1 -
+> > > > >  1 file changed, 1 deletion(-)
+> > > > >
+> > > > > diff --git a/arch/arm64/kvm/vgic/vgic.c b/arch/arm64/kvm/vgic/vgic.c
+> > > > > index 111bff47e471..81cec508d413 100644
+> > > > > --- a/arch/arm64/kvm/vgic/vgic.c
+> > > > > +++ b/arch/arm64/kvm/vgic/vgic.c
+> > > > > @@ -106,7 +106,6 @@ struct vgic_irq *vgic_get_irq(struct kvm *kvm, struct kvm_vcpu *vcpu,
+> > > > >         if (intid >= VGIC_MIN_LPI)
+> > > > >                 return vgic_get_lpi(kvm, intid);
+> > > > >
+> > > > > -       WARN(1, "Looking up struct vgic_irq for reserved INTID");
+> > > >
+> > > > Could we maybe downgrade the message to WARN_ONCE() (to get a stack)
+> > > > or pr_warn_ratelimited()? I agree it is problematic that userspace can
+> > > > cause this WARN to fire, but it'd be helpful for debugging too.
+> > > >
+> > >
+> > > Was thinking about that, until I found this in bug.h:
+> > >
+> > >         /*
+> > >          * WARN(), WARN_ON(), WARN_ON_ONCE, and so on can be used to report
+> > >          * significant kernel issues that need prompt attention if they should ever
+> > >          * appear at runtime.
+> > >          *
+> > >          * Do not use these macros when checking for invalid external inputs
+> > >          * (e.g. invalid system call arguments, or invalid data coming from
+> > >          * network/devices),
+> > >
+> > > Just in case, KVM_IRQ_LINE returns -EINVAL for an invalid intid (like
+> > > 1020). I think it's more appropriate for the vmm to log it. What do you
+> > > think?
+> >
+> > vgic_get_irq() is called in a bunch of other places though, right?
+> > IOW, intid doesn't necessarily come from userspace. In fact, I believe
+> > KVM_IRQ_LINE is the only place we pass a value from userspace to
+> > vgic_get_irq() (don't quote me on that).
+> >
+> > Perhaps instead the fix could be to explicitly check that the intid
+> > from userspace is valid and exit early rather than count on
+> > vgic_get_irq() to do the right thing.
 >
-> If this were to happen, The VMM can try and fix it by re-
-> initializing the vcpu with KVM_ARM_VCPU_INIT, however, this is
-> likely not possible for protected VMs.
+> vgic_get_irq() is designed to do the right thing. Returning NULL is
+> the way it reports an error, and this NULL value is already checked at
+> when directly provided either by the VMM or the guest. If we missed
+> any of those, that would be what needs addressing.  Obtaining a NULL
+> pointer is a good way to catch those.
 >
-> Adapted from commit 22f553842b14 ("KVM: arm64: Handle Asymmetric
-> AArch32 systems")
+> In general, the kernel log is not how we report userspace errors (we
+> have been there before...). It is slow, noisy, unclear and ultimately
+> leaks information.
+
+Absolutely. My comments were aimed at calls to vgic_get_irq() where
+intid is coming from the kernel, not userspace. That being said,
+probably no good reason to buy a full fat WARN() in a function such as
+this one.  I'm done waffling on this one liner now :)
+
+Reviewed-by: Oliver Upton <oupton@google.com>
+
+> If you really want something, then a pr_debug is a
+> potential tool as it can be dynamically enabled with the right
+> configuration.
 >
-> Signed-off-by: Fuad Tabba <tabba@google.com>
-> ---
->  arch/arm64/kvm/hyp/nvhe/switch.c | 37 ++++++++++++++++++++++++++++++++
->  1 file changed, 37 insertions(+)
+> Thanks,
 >
-> diff --git a/arch/arm64/kvm/hyp/nvhe/switch.c b/arch/arm64/kvm/hyp/nvhe/switch.c
-> index 398e62098898..0c24b7f473bf 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/switch.c
-> +++ b/arch/arm64/kvm/hyp/nvhe/switch.c
-> @@ -20,6 +20,7 @@
->  #include <asm/kprobes.h>
->  #include <asm/kvm_asm.h>
->  #include <asm/kvm_emulate.h>
-> +#include <asm/kvm_fixed_config.h>
->  #include <asm/kvm_hyp.h>
->  #include <asm/kvm_mmu.h>
->  #include <asm/fpsimd.h>
-> @@ -195,6 +196,39 @@ exit_handle_fn kvm_get_nvhe_exit_handler(struct kvm_vcpu *vcpu)
->                 return NULL;
->  }
->
-> +/*
-> + * Some guests (e.g., protected VMs) might not be allowed to run in AArch32. The
-> + * check below is based on the one in kvm_arch_vcpu_ioctl_run().
-> + * The ARMv8 architecture does not give the hypervisor a mechanism to prevent a
-> + * guest from dropping to AArch32 EL0 if implemented by the CPU. If the
-> + * hypervisor spots a guest in such a state ensure it is handled, and don't
-> + * trust the host to spot or fix it.
-> + *
-> + * Returns true if the check passed and the guest run loop can continue, or
-> + * false if the guest should exit to the host.
-> + */
-> +static bool check_aarch32_guest(struct kvm_vcpu *vcpu, u64 *exit_code)
-
-This does a bit more than just check & return, so maybe call it
-handle_aarch32_guest()?
-
-> +{
-> +       if (kvm_vm_is_protected(kern_hyp_va(vcpu->kvm)) &&
-
-maybe initialize a local with a hyp pointer to the kvm structure.
-
-> +           vcpu_mode_is_32bit(vcpu) &&
-> +           FIELD_GET(ARM64_FEATURE_MASK(ID_AA64PFR0_EL0),
-> +                                        PVM_ID_AA64PFR0_RESTRICT_UNSIGNED) <
-> +               ID_AA64PFR0_ELx_32BIT_64BIT) {
-
-It may be more readable to initialize a local variable with this
-feature check, i.e:
-
-bool aarch32_allowed = FIELD_GET(...) == ID_AA64PFR0_ELx_32BIT_64BIT;
-
-and then:
-
-  if (kvm_vm_is_protected(kvm) && vcpu_mode_is_32bit(vcpu) &&
-!aarch32_allowed) {
-
-> +               /*
-> +                * As we have caught the guest red-handed, decide that it isn't
-> +                * fit for purpose anymore by making the vcpu invalid. The VMM
-> +                * can try and fix it by re-initializing the vcpu with
-> +                * KVM_ARM_VCPU_INIT, however, this is likely not possible for
-> +                * protected VMs.
-> +                */
-> +               vcpu->arch.target = -1;
-> +               *exit_code = ARM_EXCEPTION_IL;
-> +               return false;
-> +       }
-> +
-> +       return true;
-> +}
-> +
->  /* Switch to the guest for legacy non-VHE systems */
->  int __kvm_vcpu_run(struct kvm_vcpu *vcpu)
->  {
-> @@ -255,6 +289,9 @@ int __kvm_vcpu_run(struct kvm_vcpu *vcpu)
->                 /* Jump in the fire! */
->                 exit_code = __guest_enter(vcpu);
->
-> +               if (unlikely(!check_aarch32_guest(vcpu, &exit_code)))
-> +                       break;
-> +
->                 /* And we're baaack! */
->         } while (fixup_guest_exit(vcpu, &exit_code));
+>         M.
 >
 > --
-> 2.33.0.rc1.237.g0d66db33f3-goog
->
+> Without deviation from the norm, progress is not possible.
