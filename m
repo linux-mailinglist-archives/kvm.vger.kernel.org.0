@@ -2,30 +2,30 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 72F6E3F30DB
-	for <lists+kvm@lfdr.de>; Fri, 20 Aug 2021 18:04:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9E8F23F30DF
+	for <lists+kvm@lfdr.de>; Fri, 20 Aug 2021 18:04:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233148AbhHTQEr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 20 Aug 2021 12:04:47 -0400
-Received: from mail-bn8nam12on2072.outbound.protection.outlook.com ([40.107.237.72]:45024
+        id S239528AbhHTQE4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 20 Aug 2021 12:04:56 -0400
+Received: from mail-bn8nam12on2059.outbound.protection.outlook.com ([40.107.237.59]:3905
         "EHLO NAM12-BN8-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S235727AbhHTQCm (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 20 Aug 2021 12:02:42 -0400
+        id S236436AbhHTQCv (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 20 Aug 2021 12:02:51 -0400
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=fQEffHwOEfJXe3Ct9qXrtiswzDlIw8nvYocXaKheU8VOb/nD/nroQu6Gp/6HTv5zygnmgabInn7AcfdgMgujPdckZvyO+6CFfLcXv2aIQrDGVcfc9ZbqmtVeYiIo0CWMZo/g5retS5Gt3gceq+Miuj+11X53szM6cRWC+q7UMQiQL7O6hpEcdeUxqsslEYPfT4RPVCxBfEtCC2xUNWkQO6+HP513v2/a46Ljwvy7zqR1Mmth+vakTtLYbBpTRRxg55ulpl6l4T51Ps8wQkx/rIsD/Ejtz1v0WNt98lSFKg+jENoT2yMvN3/27U83N3eN1m+WJyzRVOMz66CRkPMQrQ==
+ b=JC2NnvQUfzdzuvdpvW3AWvskmIon5SBMXg7vQTOy6vvenG0jEmRU+IyIjpvNqA3hCfGFcC17NkR3SAVCXaDuALSOxI6p1A6xEoScQA6h+yWXheuwq8/pyAFaWfs98BfXP16g9dKj5VDmKIrYtoStzdQMKaSOHqJ/QaVLV2rIaR2+vEWETLpX0YPFSYtqW+6YlbkAhEu/gJ1bke/HQ9/g3IuotOJWzoBd8J72K7ScJDnzaxwcQLUnmA4dd8h5OoUaFnkew8Ba7UufuPdgHHZFwFPdHxyQ86arocmfMgrSGX4M5rwgUeMghwvfthTmMrD3sXsNGqa1I52XNsy04fNTIw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=RKqVjfxJwfOckUs4khLKJnX2F948fdlcNswk7S6UPNM=;
- b=fA69D8CqR4Ak1vz4UwcGqEmhpmgfS6MuxT3IXGl0sWCSRa09f4A78dWQhurgfpFbF1X/rixqcx5OTQezrAbumv6SHkrjnlOR6lM1VGNFIOEwLx88EYoTPh9Mx0wRFzSDjDiNvZQ6j7GUs+wKGwljFWpQQTcLm0lPjNsaSw0Yav1m3Ql31k/98vj3NjsZldRj4602MT7vc88DYStw4h5tuNyMYD0VkdNHLOysXHeBa3Svqy9ioSgLfcUskU/pLP7ZLPYSEL0SHJZoNLsA6OBAS9Ahm6/BYqhQPtWca9RoiHkRKiZv8zNVFqZ4fyD8hVYXQmrCPwuFeJQBnx++eiZG5w==
+ bh=OwdgEaPmKyxwoGNdGmt5BLL68r7SDTmY/rgZpxhckmE=;
+ b=etzkRr09vtAnsLnE7KJ0ZBX16YZ697xYKekrrj104ESorfhHJ81sXWoMztVte/aVPJZ/+xQ0VOIcn7EyA1oXieqc285x8KAYMSupkUOZIpsKyhEYeDI3li//rZPKAS0fZVSI+95OHapDqXShHM1Inj+HAtoQiS41Hyo9K+VBYYnwnwiGreWETxtGuSGOVkwE32/nQIpZgfS+8teIwtgC9Hc7NWwZkcpPR/xWQ2gtfy13hjyywwSQmq/qEVLfDI+yST/gujNbuhuuzn5quNeQSmY6a8f4It4qzgm3BHymDptkVWwTUkAwdzPkSuNgkDOnHidzLOdzsRXL4KhBgEWMzw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
  header.d=amd.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=RKqVjfxJwfOckUs4khLKJnX2F948fdlcNswk7S6UPNM=;
- b=5K1yoKnvRFhHgpfgZZ9bbKk6CUO7R1ZFZZfKpeFZuHWfwF68VfGKpCENlvikGnyuZg/VL8LLAcFmdQ78Rpycxp1XqD4F1JoVZHlM4hm77mGoPm7si27Jqk3wCQcbisAH/EBkxl4wNvi2HoHszrZ9TDdWcN76ZQO+Wa++ecVdy1Q=
+ bh=OwdgEaPmKyxwoGNdGmt5BLL68r7SDTmY/rgZpxhckmE=;
+ b=vwOz6unwEXY0PXoRsJbUWjILi8W4teSm1Kr+zXKKe3xTU57QnkHJBMk2MUk/dD+hraM3ZGNWpzDYVCdUFe2wh2MSupsMPiJZodahvUqNk0N3V0GYEPpUF9xQWPIoN3ZAq6p2ZbVF+EA+ds6IlQZ8MXzQEMVBWM8HX358aDY0ev4=
 Authentication-Results: kernel.org; dkim=none (message not signed)
  header.d=none;kernel.org; dmarc=none action=none header.from=amd.com;
 Received: from SN6PR12MB2718.namprd12.prod.outlook.com (2603:10b6:805:6f::22)
@@ -65,9 +65,9 @@ Cc:     Thomas Gleixner <tglx@linutronix.de>,
         Andi Kleen <ak@linux.intel.com>, tony.luck@intel.com,
         marcorr@google.com, sathyanarayanan.kuppuswamy@linux.intel.com,
         Brijesh Singh <brijesh.singh@amd.com>
-Subject: [PATCH Part2 v5 38/45] KVM: SVM: Add support to handle Page State Change VMGEXIT
-Date:   Fri, 20 Aug 2021 10:59:11 -0500
-Message-Id: <20210820155918.7518-39-brijesh.singh@amd.com>
+Subject: [PATCH Part2 v5 39/45] KVM: SVM: Introduce ops for the post gfn map and unmap
+Date:   Fri, 20 Aug 2021 10:59:12 -0500
+Message-Id: <20210820155918.7518-40-brijesh.singh@amd.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20210820155918.7518-1-brijesh.singh@amd.com>
 References: <20210820155918.7518-1-brijesh.singh@amd.com>
@@ -77,226 +77,479 @@ X-ClientProxiedBy: SN7P222CA0013.NAMP222.PROD.OUTLOOK.COM
  (2603:10b6:805:6f::22)
 MIME-Version: 1.0
 X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from sbrijesh-desktop.amd.com (165.204.77.1) by SN7P222CA0013.NAMP222.PROD.OUTLOOK.COM (2603:10b6:806:124::11) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4436.18 via Frontend Transport; Fri, 20 Aug 2021 16:00:41 +0000
+Received: from sbrijesh-desktop.amd.com (165.204.77.1) by SN7P222CA0013.NAMP222.PROD.OUTLOOK.COM (2603:10b6:806:124::11) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4436.18 via Frontend Transport; Fri, 20 Aug 2021 16:00:42 +0000
 X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: e62dcf92-fe45-40fc-7e05-08d963f3a9b9
+X-MS-Office365-Filtering-Correlation-Id: dd062faa-06fd-48f7-5340-08d963f3aa69
 X-MS-TrafficTypeDiagnostic: SA0PR12MB4509:
 X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <SA0PR12MB45099F26A8D70E0B0C175156E5C19@SA0PR12MB4509.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:6430;
+X-Microsoft-Antispam-PRVS: <SA0PR12MB4509B29D76574BC6529D968DE5C19@SA0PR12MB4509.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:5516;
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: EKwXIJnjKzVKz2BIRqhf2v+ZkITCFmpQZZ0jtwfG2+ECZo/xp65UNVA3K7sWYHDNTjMI8C3bHAsjRW7TVL3rVhU8ZLGEkBUwXBqcOr8gnzqEQYZx4s56PQQ3hLeJ8boInlm1lnSSRU/6dIrz5pGVsS1oatsaN2UhxNN2Uda6yjSu7RvBrB1ZVpfCzI08VctbMUvLHZC/b8BuRjApmfn5oFG44o7uQOB/QS75Rz/zsSFTv2xXf6Z4blrukdjk5gp1fd+vb9IJqAXwmuatOpY/y83h6THS3w+mxIykLBGXNG+caNWLX32Fk0npanpXuJYtb7Y2OARg/3hRxvBR/YPqW1nx1kek1oEzbN+Sw3PyfEhI2cWgH2gEIeGQJe0X7BoZKETdDE/4RPW+yrrfhmWNRnYAp3OiD1SKAmoxl1QfOQh+6qmAq35z20xDG3TrfFtPKKjGK1B81Yl/iVvBB9nrXRQAlPGC78fmBGyCFCvC81TJ7uUrVELcnRutAZ1pqkCqpbe98gmGAFdci3K9l0AsV1UuVL1Ac0VuU6DJWqZnZKiuG1dXBBFncTRYWAERbW/tUBdr2eoBZalNb/oq0kjKHA2wEw7ABEhzKnNB7gZTuJRcTxzLO8GfT7hxukOs7TK54GF7gwZNfxNIu2qSJ77+BEm4b7eTfVb9YNKnMr0gFtIJcQ4y3viO/mwi4u0wIsD2lZDJ8pCBN4ZHGhGO5IQKwA==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR12MB2718.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(508600001)(4326008)(36756003)(7416002)(44832011)(54906003)(316002)(66946007)(66556008)(66476007)(86362001)(7406005)(956004)(6486002)(2616005)(2906002)(83380400001)(38350700002)(38100700002)(186003)(5660300002)(8936002)(52116002)(1076003)(7696005)(8676002)(26005)(6666004);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam-Message-Info: ly00cJWLaWxy2BCRy7RUuzBo8TQXhVINA386Mlr2v7U5rTrx8k26n3kvwpTLXcePtSaZDLOTIF+q/MD+zxgWeM1cn+iI6GzSWAUpmqCcOfuW/XzO4DqQo+orP341mBFZTsT39YDDY5eHmQLb0sym1NSJu+Py9GMjJNFimLHE+25vj4uMvRyRmhN0WXOcd6LxZwT71G5A86hn0Oalxy90k2zXhHKdNtqBWduMYmmzsytEpBV9NQvXLm+Em1RbbUw30xZQT7WivZJEUQS+mmKkhpRgdmugYkVZpK6r4/MLDEncI1M4fHVRs4ytWdvRTHEDT+iYEh5BLHJ/uurvwpdnVKyoe2rYGoD+a529TkFs4iSvwAGy3iyFesEgn2yXSG41b8d15+zNw2DHzIhBz6y+nxhTdnwjLclPONgNv3b3bAZrGcAqTN60+sTqBI6vNxXy70ZJqUtUNOFklJmFx6OOdsVH/WvCfPJv8s4ZiV52b73bMjYHkKQc/LZKp76ZLidiWK6/esC2BGTXpdlLIO3MuSpAeSfQLCQOIuQmy0TnA3sUs39ejBeSRnpDwl+/UA6wvdnMwyzqL3WEwb3jPdw+VE8eHupw5ZHY/gjEDO3hIV2wuNafE3/QKIRukRT4BkXfQJWbGM4YrQ2tHhhIt8Ly+cjp6VKqeQqoCL8IM8okkMNNaj4XKRAkJn6OgYyMxJwTjtjbCbXcDH4xZ84GYHAgVQ==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR12MB2718.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(508600001)(4326008)(36756003)(7416002)(44832011)(54906003)(316002)(66946007)(66556008)(66476007)(86362001)(7406005)(956004)(6486002)(2616005)(2906002)(83380400001)(38350700002)(38100700002)(186003)(30864003)(5660300002)(8936002)(52116002)(1076003)(7696005)(8676002)(26005)(6666004);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?rjlfMhIPXa+DTQgIUGb6trSvmM1cAdXYxlJdCzD/CeWdjOGXqnj1btcJKjFB?=
- =?us-ascii?Q?j3wiq4ik6Sb6gKmHn6mYAlM7EvySqpd7BglcjreJFDylXZ6NA3kL206CdzN1?=
- =?us-ascii?Q?ZdEt1U3YwOwyIaBdnicDmNYJNwxnIc9aSNcWzVftVFAmR1ELYbyLGFPqsEvS?=
- =?us-ascii?Q?aSBTj2sjsjm9QomQMbEu3zgxJHFCSOr1UD1ZaEFBbBLoLqVHQWgSD6zevTeY?=
- =?us-ascii?Q?kWrkWoGpVnZIG9pPU1DGuvVZMzJ1e+M0rKfXewfynR3NVEgHpYaXtDaV3ZEX?=
- =?us-ascii?Q?PDCaz2nUMxTOfn4DKBgKhuW8usCOpFrLXq8ZJ0c5RgwZl+bjYSj1x0QEZ1qX?=
- =?us-ascii?Q?wTVittFktJfZg2S15rG2G32Y/gipG2urmWkQ+gQATTMADw1klBR+TXqqjqlG?=
- =?us-ascii?Q?JgFRf1vp+ubXTm5rEGZnFlQoFbHvFXDkOg51Lzv9C4kT9LjO1hvTAWvt3aRy?=
- =?us-ascii?Q?wpITmnwUrV3Hpmqt/uDgSJi98bBpJtPUdDryAOz8oZA5SL7820PXLZwj8W0Q?=
- =?us-ascii?Q?W/E1kl6kSxZDV77V40oeAiES9U0bTUJiPHIEq/oLGnVyMDt3FovA8w//jVQa?=
- =?us-ascii?Q?o9gZ7B23Ll9NP8BQ6229N9ozsk7W1ovZJbfL0bbkMDT74K6OY9l+TgwKlHN3?=
- =?us-ascii?Q?xDJM34ZEhA/n0PQ1ILZtinmkvvDP7UcrulUoLsXrB2qOS7F4Xprq/nPKH0X/?=
- =?us-ascii?Q?5V6mj53upOKxtAqNXaklUoLGqfCyrW/j+yU9IOhf6fz6Wcy1YVU6d8hfMq5E?=
- =?us-ascii?Q?NEO00NWSLgZyOcj76pDJ7BlyoPCHRHhqu4lhGyla6xnCn3cMUprjt7d5bZ+r?=
- =?us-ascii?Q?x+CLk4kDewspfTCKUL2fmYBNK6S/fpUmBTFuBnO+hDITWuCG8ydcon1zvFlR?=
- =?us-ascii?Q?JabmGR+ws99LWRI63uB5gCwwsChh5nEnGU9XGqdX5zvKBnwYBX6JS0QlUJZF?=
- =?us-ascii?Q?9JfQMIDf18hjiKkHFROzbqS3THDIs0cGTPGG8V1tEcxfXu/FBV8nkgXlc/e7?=
- =?us-ascii?Q?G2OjlifhXPEoQJBw1gMFYXSSm45YNXJMbzdfmDuax8I+VZFvw+n5+LHXV3Zf?=
- =?us-ascii?Q?13wRNuy+BDbcgMG2h1vv7J6cZVS+y8lm3p52m+PyM1Fu+Icx8StAJFcX+lJg?=
- =?us-ascii?Q?LSYV/Ug2Ajjs9q5yw4uDhjaEGgpDDo/OnvAfZUrlZXAf3+p4IqdOhaBtdtRv?=
- =?us-ascii?Q?ZMV5Y/nG/ULuZO+mM37J0aCCZDAoR0GbfC0AXXHNQ33XnwGoXcZDMcYQnTx7?=
- =?us-ascii?Q?B2Tyxe8ki4MIeIZswzfbXcIf3Am8hrzyYHRYu7Nyqztmxjx3s+tiHIw94g4a?=
- =?us-ascii?Q?LcKznLGggTKtwMmcScRjV5GE?=
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?woOLjS+XF8yNGlLgkSZB+5xoCW42xrqvfgJaOVMQmGAFKd0c3HBHXZg4MAzG?=
+ =?us-ascii?Q?aGUDAAexIkWgv7QJcGmVNcrBRuvx0qeqAlwOg3gYGNrSwofeQZrHuirDJUnr?=
+ =?us-ascii?Q?eJhICm80tLvK/QXQAqMvmcYd/KdHwslxMQ9+eSETJuY4H/v/LEtBQY16c/Aw?=
+ =?us-ascii?Q?63dBW9RCdDB0sQRNWL3+61vcVYWn90XM7oCRfLAxmoMGOapdqBE2OBVmB4gV?=
+ =?us-ascii?Q?WJKI2/UdoTD3aDx1T9lADWROSp5YXueMK/ZEIrfLK05OckhGbmc4dlRcGm53?=
+ =?us-ascii?Q?n1MIvAdR6DPHT4FMKU9Fq4+yGSQfk2mKem1gN83nwRhPso8uI/l5UjVVrV1S?=
+ =?us-ascii?Q?+8jJgv4tJ+/wOeCjNsSKA+OQao8Y9hndLp3mUWx3Td2PsUgk0ojtUrq8RfHx?=
+ =?us-ascii?Q?3c9DL0OUgepKrlruNsVqP9RTPjOndFCnBT7+TCXFV+EIOWpRACTTwyuGIPpM?=
+ =?us-ascii?Q?oIn0Q8Ar86d7nx69SkeDK2zwYra8nBlzetvNBJV1cLdtgVWg5ACaUbIzUobP?=
+ =?us-ascii?Q?Cc6AsO0PZJ1pFyvKI08auS/KJYktwGMNzj1idFNd/EVDxb0hYK7n3vLA2TT4?=
+ =?us-ascii?Q?f5qSI/ht17Z12yuFkEhACHr+Yz2izAFj5mEEyKQ0bKP4RtGeLWYBus5ej+oI?=
+ =?us-ascii?Q?8vKdijNKgAbQd5vNuitgpKUzMnhUHSVIU0g42JOlgKQOZB9KrDeb50OH68RH?=
+ =?us-ascii?Q?42h+J41e5tdX6XaLOd3eC8IQLOt/JFecct1BCELGcFXY3qJ/AAz5FUiReSGW?=
+ =?us-ascii?Q?is8V2G8pbSzoiLaogJpO17YYtD+wxoLPydaIoEUnZXlsuzZuB7JMLsnGwS4f?=
+ =?us-ascii?Q?Vq5+421lmQUrOJxBMrXF7sISfZoAqjIG7aWs3oVEGb6+47umku/EsxDxB4n7?=
+ =?us-ascii?Q?U+HarBPsyd89S4CI5MlT3R0rjoNHKeS9B2aTaAI+SW09kFBDxBDiPNMZh3JX?=
+ =?us-ascii?Q?zxop5583vtTF4VwGwlIuseo1Q+WK1/qZYV6kHtsqLyDKthaTg9tFnEwZ8VTk?=
+ =?us-ascii?Q?/lZVcnj4sgUWqJzqH0UefibAoV9c55LbWwqeelFHNDccC8JeLhXnIbN13PY1?=
+ =?us-ascii?Q?/wiCb5dBOPiiY/AamBxcVx34kx2Bq2x1yjKRrvsTRRDPQyPL9JZTskZ4v0Z+?=
+ =?us-ascii?Q?wUlx1l95u18kNj70fayQel2ofhdB/hA6AMbIr1ZJ92/4eXh5+EViJLGSU0fy?=
+ =?us-ascii?Q?VXDv6iAV6nQeRyOkcqyjNAHQmZgrbDURGsWSYklb8OmLKeeAkPRyfmT/Yx1U?=
+ =?us-ascii?Q?vB5IVeoTmH+SKWWH2p6V09VnyJHqzoyCrJhUi7FXY/RFXsUkWORqsOEolkE/?=
+ =?us-ascii?Q?vdxs84W5IQK1oU1hFc+VKTwy?=
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: e62dcf92-fe45-40fc-7e05-08d963f3a9b9
+X-MS-Exchange-CrossTenant-Network-Message-Id: dd062faa-06fd-48f7-5340-08d963f3aa69
 X-MS-Exchange-CrossTenant-AuthSource: SN6PR12MB2718.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Aug 2021 16:00:42.7113
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Aug 2021 16:00:43.9216
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: Rvk5ds+fS47zaWT837BcOlwYkyXp2vJ8AaieqY+gk7nzlfpMQY2j8hZTW4s6cc7tR76Y8hUaTlFxwU82I9sp6A==
+X-MS-Exchange-CrossTenant-UserPrincipalName: wRX/wIHf4rTRznryyLKto9ardUDI2nV53f1dFJ/Xfit32EC42OjhiGn4Q483d67+TCDofbQb7yiryKq/jXMAbA==
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA0PR12MB4509
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-SEV-SNP VMs can ask the hypervisor to change the page state in the RMP
-table to be private or shared using the Page State Change NAE event
-as defined in the GHCB specification version 2.
+When SEV-SNP is enabled in the guest VM, the guest memory pages can
+either be a private or shared. A write from the hypervisor goes through
+the RMP checks. If hardware sees that hypervisor is attempting to write
+to a guest private page, then it triggers an RMP violation #PF.
+
+To avoid the RMP violation, add post_{map,unmap}_gfn() ops that can be
+used to verify that its safe to map a given guest page. Use the SRCU to
+protect against the page state change for existing mapped pages.
 
 Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
 ---
- arch/x86/include/asm/sev-common.h |  7 +++
- arch/x86/kvm/svm/sev.c            | 82 +++++++++++++++++++++++++++++--
- 2 files changed, 84 insertions(+), 5 deletions(-)
+ arch/x86/include/asm/kvm-x86-ops.h |  2 +
+ arch/x86/include/asm/kvm_host.h    |  4 ++
+ arch/x86/kvm/svm/sev.c             | 69 +++++++++++++++++++++-----
+ arch/x86/kvm/svm/svm.c             |  4 ++
+ arch/x86/kvm/svm/svm.h             |  8 +++
+ arch/x86/kvm/x86.c                 | 78 +++++++++++++++++++++++++++---
+ 6 files changed, 146 insertions(+), 19 deletions(-)
 
-diff --git a/arch/x86/include/asm/sev-common.h b/arch/x86/include/asm/sev-common.h
-index 4980f77aa1d5..5ee30bb2cdb8 100644
---- a/arch/x86/include/asm/sev-common.h
-+++ b/arch/x86/include/asm/sev-common.h
-@@ -126,6 +126,13 @@ enum psc_op {
- /* SNP Page State Change NAE event */
- #define VMGEXIT_PSC_MAX_ENTRY		253
+diff --git a/arch/x86/include/asm/kvm-x86-ops.h b/arch/x86/include/asm/kvm-x86-ops.h
+index 371756c7f8f4..c09bd40e0160 100644
+--- a/arch/x86/include/asm/kvm-x86-ops.h
++++ b/arch/x86/include/asm/kvm-x86-ops.h
+@@ -124,6 +124,8 @@ KVM_X86_OP(msr_filter_changed)
+ KVM_X86_OP_NULL(complete_emulated_msr)
+ KVM_X86_OP(alloc_apic_backing_page)
+ KVM_X86_OP_NULL(rmp_page_level_adjust)
++KVM_X86_OP(post_map_gfn)
++KVM_X86_OP(post_unmap_gfn)
  
-+/* The page state change hdr structure in not valid */
-+#define PSC_INVALID_HDR			1
-+/* The hdr.cur_entry or hdr.end_entry is not valid */
-+#define PSC_INVALID_ENTRY		2
-+/* Page state change encountered undefined error */
-+#define PSC_UNDEF_ERR			3
+ #undef KVM_X86_OP
+ #undef KVM_X86_OP_NULL
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index a6e764458f3e..5ac1ff097e8c 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -1463,7 +1463,11 @@ struct kvm_x86_ops {
+ 	void (*vcpu_deliver_sipi_vector)(struct kvm_vcpu *vcpu, u8 vector);
+ 
+ 	void *(*alloc_apic_backing_page)(struct kvm_vcpu *vcpu);
 +
- struct psc_hdr {
- 	u16 cur_entry;
- 	u16 end_entry;
+ 	void (*rmp_page_level_adjust)(struct kvm *kvm, kvm_pfn_t pfn, int *level);
++
++	int (*post_map_gfn)(struct kvm *kvm, gfn_t gfn, kvm_pfn_t pfn, int *token);
++	void (*post_unmap_gfn)(struct kvm *kvm, gfn_t gfn, kvm_pfn_t pfn, int token);
+ };
+ 
+ struct kvm_x86_nested_ops {
 diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-index 6d9483ec91ab..0de85ed63e9b 100644
+index 0de85ed63e9b..65b578463271 100644
 --- a/arch/x86/kvm/svm/sev.c
 +++ b/arch/x86/kvm/svm/sev.c
-@@ -2731,6 +2731,7 @@ static int sev_es_validate_vmgexit(struct vcpu_svm *svm, u64 *exit_code)
- 	case SVM_VMGEXIT_AP_JUMP_TABLE:
- 	case SVM_VMGEXIT_UNSUPPORTED_EVENT:
- 	case SVM_VMGEXIT_HV_FEATURES:
-+	case SVM_VMGEXIT_PSC:
- 		break;
- 	default:
- 		goto vmgexit_err;
-@@ -3004,13 +3005,13 @@ static int __snp_handle_page_state_change(struct kvm_vcpu *vcpu, enum psc_op op,
- 		 */
- 		rc = snp_check_and_build_npt(vcpu, gpa, level);
- 		if (rc)
--			return -EINVAL;
-+			return PSC_UNDEF_ERR;
+@@ -336,6 +336,7 @@ static int sev_guest_init(struct kvm *kvm, struct kvm_sev_cmd *argp)
+ 		if (ret)
+ 			goto e_free;
  
- 		if (op == SNP_PAGE_STATE_PRIVATE) {
- 			hva_t hva;
- 
- 			if (snp_gpa_to_hva(kvm, gpa, &hva))
--				return -EINVAL;
-+				return PSC_UNDEF_ERR;
- 
- 			/*
- 			 * Verify that the hva range is registered. This enforcement is
-@@ -3022,7 +3023,7 @@ static int __snp_handle_page_state_change(struct kvm_vcpu *vcpu, enum psc_op op,
- 			rc = is_hva_registered(kvm, hva, page_level_size(level));
- 			mutex_unlock(&kvm->lock);
- 			if (!rc)
--				return -EINVAL;
-+				return PSC_UNDEF_ERR;
- 
- 			/*
- 			 * Mark the userspace range unmerable before adding the pages
-@@ -3032,7 +3033,7 @@ static int __snp_handle_page_state_change(struct kvm_vcpu *vcpu, enum psc_op op,
- 			rc = snp_mark_unmergable(kvm, hva, page_level_size(level));
- 			mmap_write_unlock(kvm->mm);
- 			if (rc)
--				return -EINVAL;
-+				return PSC_UNDEF_ERR;
++		init_srcu_struct(&sev->psc_srcu);
+ 		ret = sev_snp_init(&argp->error);
+ 	} else {
+ 		ret = sev_platform_init(&argp->error);
+@@ -2293,6 +2294,7 @@ void sev_vm_destroy(struct kvm *kvm)
+ 			WARN_ONCE(1, "Failed to free SNP guest context, leaking asid!\n");
+ 			return;
  		}
++		cleanup_srcu_struct(&sev->psc_srcu);
+ 	} else {
+ 		sev_unbind_asid(kvm, sev->handle);
+ 	}
+@@ -2494,23 +2496,32 @@ void sev_free_vcpu(struct kvm_vcpu *vcpu)
+ 	kfree(svm->ghcb_sa);
+ }
  
- 		write_lock(&kvm->mmu_lock);
-@@ -3062,8 +3063,11 @@ static int __snp_handle_page_state_change(struct kvm_vcpu *vcpu, enum psc_op op,
- 		case SNP_PAGE_STATE_PRIVATE:
- 			rc = rmp_make_private(pfn, gpa, level, sev->asid, false);
- 			break;
-+		case SNP_PAGE_STATE_PSMASH:
-+		case SNP_PAGE_STATE_UNSMASH:
-+			/* TODO: Add support to handle it */
- 		default:
--			rc = -EINVAL;
-+			rc = PSC_INVALID_ENTRY;
- 			break;
- 		}
+-static inline int svm_map_ghcb(struct vcpu_svm *svm, struct kvm_host_map *map)
++static inline int svm_map_ghcb(struct vcpu_svm *svm, struct kvm_host_map *map, int *token)
+ {
+ 	struct vmcb_control_area *control = &svm->vmcb->control;
+ 	u64 gfn = gpa_to_gfn(control->ghcb_gpa);
++	struct kvm_vcpu *vcpu = &svm->vcpu;
  
-@@ -3081,6 +3085,65 @@ static int __snp_handle_page_state_change(struct kvm_vcpu *vcpu, enum psc_op op,
+-	if (kvm_vcpu_map(&svm->vcpu, gfn, map)) {
++	if (kvm_vcpu_map(vcpu, gfn, map)) {
+ 		/* Unable to map GHCB from guest */
+ 		pr_err("error mapping GHCB GFN [%#llx] from guest\n", gfn);
+ 		return -EFAULT;
+ 	}
+ 
++	if (sev_post_map_gfn(vcpu->kvm, map->gfn, map->pfn, token)) {
++		kvm_vcpu_unmap(vcpu, map, false);
++		return -EBUSY;
++	}
++
  	return 0;
  }
  
-+static inline unsigned long map_to_psc_vmgexit_code(int rc)
-+{
-+	switch (rc) {
-+	case PSC_INVALID_HDR:
-+		return ((1ul << 32) | 1);
-+	case PSC_INVALID_ENTRY:
-+		return ((1ul << 32) | 2);
-+	case RMPUPDATE_FAIL_OVERLAP:
-+		return ((3ul << 32) | 2);
-+	default: return (4ul << 32);
-+	}
-+}
-+
-+static unsigned long snp_handle_page_state_change(struct vcpu_svm *svm)
-+{
-+	struct kvm_vcpu *vcpu = &svm->vcpu;
-+	int level, op, rc = PSC_UNDEF_ERR;
-+	struct snp_psc_desc *info;
-+	struct psc_entry *entry;
-+	u16 cur, end;
-+	gpa_t gpa;
-+
-+	if (!sev_snp_guest(vcpu->kvm))
-+		return PSC_INVALID_HDR;
-+
-+	if (!setup_vmgexit_scratch(svm, true, sizeof(*info))) {
-+		pr_err("vmgexit: scratch area is not setup.\n");
-+		return PSC_INVALID_HDR;
-+	}
-+
-+	info = (struct snp_psc_desc *)svm->ghcb_sa;
-+	cur = info->hdr.cur_entry;
-+	end = info->hdr.end_entry;
-+
-+	if (cur >= VMGEXIT_PSC_MAX_ENTRY ||
-+	    end >= VMGEXIT_PSC_MAX_ENTRY || cur > end)
-+		return PSC_INVALID_ENTRY;
-+
-+	for (; cur <= end; cur++) {
-+		entry = &info->entries[cur];
-+		gpa = gfn_to_gpa(entry->gfn);
-+		level = RMP_TO_X86_PG_LEVEL(entry->pagesize);
-+		op = entry->operation;
-+
-+		if (!IS_ALIGNED(gpa, page_level_size(level))) {
-+			rc = PSC_INVALID_ENTRY;
-+			goto out;
-+		}
-+
-+		rc = __snp_handle_page_state_change(vcpu, op, gpa, level);
-+		if (rc)
-+			goto out;
-+	}
-+
-+out:
-+	info->hdr.cur_entry = cur;
-+	return rc ? map_to_psc_vmgexit_code(rc) : 0;
-+}
-+
- static int sev_handle_vmgexit_msr_protocol(struct vcpu_svm *svm)
+-static inline void svm_unmap_ghcb(struct vcpu_svm *svm, struct kvm_host_map *map)
++static inline void svm_unmap_ghcb(struct vcpu_svm *svm, struct kvm_host_map *map, int token)
  {
- 	struct vmcb_control_area *control = &svm->vmcb->control;
-@@ -3315,6 +3378,15 @@ int sev_handle_vmgexit(struct kvm_vcpu *vcpu)
- 		ret = 1;
- 		break;
- 	}
-+	case SVM_VMGEXIT_PSC: {
-+		unsigned long rc;
+-	kvm_vcpu_unmap(&svm->vcpu, map, true);
++	struct kvm_vcpu *vcpu = &svm->vcpu;
 +
-+		ret = 1;
++	kvm_vcpu_unmap(vcpu, map, true);
++	sev_post_unmap_gfn(vcpu->kvm, map->gfn, map->pfn, token);
+ }
+ 
+ static void dump_ghcb(struct vcpu_svm *svm)
+@@ -2518,8 +2529,9 @@ static void dump_ghcb(struct vcpu_svm *svm)
+ 	struct kvm_host_map map;
+ 	unsigned int nbits;
+ 	struct ghcb *ghcb;
++	int token;
+ 
+-	if (svm_map_ghcb(svm, &map))
++	if (svm_map_ghcb(svm, &map, &token))
+ 		return;
+ 
+ 	ghcb = map.hva;
+@@ -2544,7 +2556,7 @@ static void dump_ghcb(struct vcpu_svm *svm)
+ 	pr_err("%-20s%*pb\n", "valid_bitmap", nbits, ghcb->save.valid_bitmap);
+ 
+ e_unmap:
+-	svm_unmap_ghcb(svm, &map);
++	svm_unmap_ghcb(svm, &map, token);
+ }
+ 
+ static bool sev_es_sync_to_ghcb(struct vcpu_svm *svm)
+@@ -2552,8 +2564,9 @@ static bool sev_es_sync_to_ghcb(struct vcpu_svm *svm)
+ 	struct kvm_vcpu *vcpu = &svm->vcpu;
+ 	struct kvm_host_map map;
+ 	struct ghcb *ghcb;
++	int token;
+ 
+-	if (svm_map_ghcb(svm, &map))
++	if (svm_map_ghcb(svm, &map, &token))
+ 		return false;
+ 
+ 	ghcb = map.hva;
+@@ -2579,7 +2592,7 @@ static bool sev_es_sync_to_ghcb(struct vcpu_svm *svm)
+ 
+ 	trace_kvm_vmgexit_exit(svm->vcpu.vcpu_id, ghcb);
+ 
+-	svm_unmap_ghcb(svm, &map);
++	svm_unmap_ghcb(svm, &map, token);
+ 
+ 	return true;
+ }
+@@ -2636,8 +2649,9 @@ static int sev_es_validate_vmgexit(struct vcpu_svm *svm, u64 *exit_code)
+ 	struct kvm_vcpu *vcpu = &svm->vcpu;
+ 	struct kvm_host_map map;
+ 	struct ghcb *ghcb;
++	int token;
+ 
+-	if (svm_map_ghcb(svm, &map))
++	if (svm_map_ghcb(svm, &map, &token))
+ 		return -EFAULT;
+ 
+ 	ghcb = map.hva;
+@@ -2739,7 +2753,7 @@ static int sev_es_validate_vmgexit(struct vcpu_svm *svm, u64 *exit_code)
+ 
+ 	sev_es_sync_from_ghcb(svm, ghcb);
+ 
+-	svm_unmap_ghcb(svm, &map);
++	svm_unmap_ghcb(svm, &map, token);
+ 	return 0;
+ 
+ vmgexit_err:
+@@ -2760,7 +2774,7 @@ static int sev_es_validate_vmgexit(struct vcpu_svm *svm, u64 *exit_code)
+ 	vcpu->run->internal.data[0] = *exit_code;
+ 	vcpu->run->internal.data[1] = vcpu->arch.last_vmentry_cpu;
+ 
+-	svm_unmap_ghcb(svm, &map);
++	svm_unmap_ghcb(svm, &map, token);
+ 	return -EINVAL;
+ }
+ 
+@@ -3036,6 +3050,9 @@ static int __snp_handle_page_state_change(struct kvm_vcpu *vcpu, enum psc_op op,
+ 				return PSC_UNDEF_ERR;
+ 		}
+ 
++		/* Wait for all the existing mapped gfn to unmap */
++		synchronize_srcu_expedited(&sev->psc_srcu);
 +
-+		rc = snp_handle_page_state_change(svm);
-+		svm_set_ghcb_sw_exit_info_2(vcpu, rc);
-+		break;
+ 		write_lock(&kvm->mmu_lock);
+ 
+ 		rc = kvm_mmu_get_tdp_walk(vcpu, gpa, &pfn, &npt_level);
+@@ -3604,3 +3621,33 @@ void sev_rmp_page_level_adjust(struct kvm *kvm, kvm_pfn_t pfn, int *level)
+ 	/* Adjust the level to keep the NPT and RMP in sync */
+ 	*level = min_t(size_t, *level, rmp_level);
+ }
++
++int sev_post_map_gfn(struct kvm *kvm, gfn_t gfn, kvm_pfn_t pfn, int *token)
++{
++	struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
++	int level;
++
++	if (!sev_snp_guest(kvm))
++		return 0;
++
++	*token = srcu_read_lock(&sev->psc_srcu);
++
++	/* If pfn is not added as private then fail */
++	if (snp_lookup_rmpentry(pfn, &level) == 1) {
++		srcu_read_unlock(&sev->psc_srcu, *token);
++		pr_err_ratelimited("failed to map private gfn 0x%llx pfn 0x%llx\n", gfn, pfn);
++		return -EBUSY;
 +	}
- 	case SVM_VMGEXIT_UNSUPPORTED_EVENT:
- 		vcpu_unimpl(vcpu,
- 			    "vmgexit: unsupported event - exit_info_1=%#llx, exit_info_2=%#llx\n",
++
++	return 0;
++}
++
++void sev_post_unmap_gfn(struct kvm *kvm, gfn_t gfn, kvm_pfn_t pfn, int token)
++{
++	struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
++
++	if (!sev_snp_guest(kvm))
++		return;
++
++	srcu_read_unlock(&sev->psc_srcu, token);
++}
+diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+index 5f73f21a37a1..3784d389247b 100644
+--- a/arch/x86/kvm/svm/svm.c
++++ b/arch/x86/kvm/svm/svm.c
+@@ -4679,7 +4679,11 @@ static struct kvm_x86_ops svm_x86_ops __initdata = {
+ 	.vcpu_deliver_sipi_vector = svm_vcpu_deliver_sipi_vector,
+ 
+ 	.alloc_apic_backing_page = svm_alloc_apic_backing_page,
++
+ 	.rmp_page_level_adjust = sev_rmp_page_level_adjust,
++
++	.post_map_gfn = sev_post_map_gfn,
++	.post_unmap_gfn = sev_post_unmap_gfn,
+ };
+ 
+ static struct kvm_x86_init_ops svm_init_ops __initdata = {
+diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
+index d10f7166b39d..ff91184f9b4a 100644
+--- a/arch/x86/kvm/svm/svm.h
++++ b/arch/x86/kvm/svm/svm.h
+@@ -76,16 +76,22 @@ struct kvm_sev_info {
+ 	bool active;		/* SEV enabled guest */
+ 	bool es_active;		/* SEV-ES enabled guest */
+ 	bool snp_active;	/* SEV-SNP enabled guest */
++
+ 	unsigned int asid;	/* ASID used for this guest */
+ 	unsigned int handle;	/* SEV firmware handle */
+ 	int fd;			/* SEV device fd */
++
+ 	unsigned long pages_locked; /* Number of pages locked */
+ 	struct list_head regions_list;  /* List of registered regions */
++
+ 	u64 ap_jump_table;	/* SEV-ES AP Jump Table address */
++
+ 	struct kvm *enc_context_owner; /* Owner of copied encryption context */
+ 	struct misc_cg *misc_cg; /* For misc cgroup accounting */
++
+ 	u64 snp_init_flags;
+ 	void *snp_context;      /* SNP guest context page */
++	struct srcu_struct psc_srcu;
+ };
+ 
+ struct kvm_svm {
+@@ -618,6 +624,8 @@ void sev_es_prepare_guest_switch(struct vcpu_svm *svm, unsigned int cpu);
+ void sev_es_unmap_ghcb(struct vcpu_svm *svm);
+ struct page *snp_safe_alloc_page(struct kvm_vcpu *vcpu);
+ void sev_rmp_page_level_adjust(struct kvm *kvm, kvm_pfn_t pfn, int *level);
++int sev_post_map_gfn(struct kvm *kvm, gfn_t gfn, kvm_pfn_t pfn, int *token);
++void sev_post_unmap_gfn(struct kvm *kvm, gfn_t gfn, kvm_pfn_t pfn, int token);
+ 
+ /* vmenter.S */
+ 
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index afcdc75a99f2..bf4389ffc88f 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -3095,6 +3095,65 @@ static inline bool kvm_pv_async_pf_enabled(struct kvm_vcpu *vcpu)
+ 	return (vcpu->arch.apf.msr_en_val & mask) == mask;
+ }
+ 
++static int kvm_map_gfn_protected(struct kvm_vcpu *vcpu, gfn_t gfn, struct kvm_host_map *map,
++				 struct gfn_to_pfn_cache *cache, bool atomic, int *token)
++{
++	int ret;
++
++	ret = kvm_map_gfn(vcpu, gfn, map, cache, atomic);
++	if (ret)
++		return ret;
++
++	if (kvm_x86_ops.post_map_gfn) {
++		ret = static_call(kvm_x86_post_map_gfn)(vcpu->kvm, map->gfn, map->pfn, token);
++		if (ret)
++			kvm_unmap_gfn(vcpu, map, cache, false, atomic);
++	}
++
++	return ret;
++}
++
++static int kvm_unmap_gfn_protected(struct kvm_vcpu *vcpu, struct kvm_host_map *map,
++				   struct gfn_to_pfn_cache *cache, bool dirty,
++				   bool atomic, int token)
++{
++	int ret;
++
++	ret = kvm_unmap_gfn(vcpu, map, cache, dirty, atomic);
++
++	if (kvm_x86_ops.post_unmap_gfn)
++		static_call(kvm_x86_post_unmap_gfn)(vcpu->kvm, map->gfn, map->pfn, token);
++
++	return ret;
++}
++
++static int kvm_vcpu_map_protected(struct kvm_vcpu *vcpu, gpa_t gpa, struct kvm_host_map *map,
++				  int *token)
++{
++	int ret;
++
++	ret = kvm_vcpu_map(vcpu, gpa, map);
++	if (ret)
++		return ret;
++
++	if (kvm_x86_ops.post_map_gfn) {
++		ret = static_call(kvm_x86_post_map_gfn)(vcpu->kvm, map->gfn, map->pfn, token);
++		if (ret)
++			kvm_vcpu_unmap(vcpu, map, false);
++	}
++
++	return ret;
++}
++
++static void kvm_vcpu_unmap_protected(struct kvm_vcpu *vcpu, struct kvm_host_map *map,
++				     bool dirty, int token)
++{
++	kvm_vcpu_unmap(vcpu, map, dirty);
++
++	if (kvm_x86_ops.post_unmap_gfn)
++		static_call(kvm_x86_post_unmap_gfn)(vcpu->kvm, map->gfn, map->pfn, token);
++}
++
+ static int kvm_pv_enable_async_pf(struct kvm_vcpu *vcpu, u64 data)
+ {
+ 	gpa_t gpa = data & ~0x3f;
+@@ -3185,6 +3244,7 @@ static void record_steal_time(struct kvm_vcpu *vcpu)
+ {
+ 	struct kvm_host_map map;
+ 	struct kvm_steal_time *st;
++	int token;
+ 
+ 	if (kvm_xen_msr_enabled(vcpu->kvm)) {
+ 		kvm_xen_runstate_set_running(vcpu);
+@@ -3195,8 +3255,8 @@ static void record_steal_time(struct kvm_vcpu *vcpu)
+ 		return;
+ 
+ 	/* -EAGAIN is returned in atomic context so we can just return. */
+-	if (kvm_map_gfn(vcpu, vcpu->arch.st.msr_val >> PAGE_SHIFT,
+-			&map, &vcpu->arch.st.cache, false))
++	if (kvm_map_gfn_protected(vcpu, vcpu->arch.st.msr_val >> PAGE_SHIFT,
++				  &map, &vcpu->arch.st.cache, false, &token))
+ 		return;
+ 
+ 	st = map.hva +
+@@ -3234,7 +3294,7 @@ static void record_steal_time(struct kvm_vcpu *vcpu)
+ 
+ 	st->version += 1;
+ 
+-	kvm_unmap_gfn(vcpu, &map, &vcpu->arch.st.cache, true, false);
++	kvm_unmap_gfn_protected(vcpu, &map, &vcpu->arch.st.cache, true, false, token);
+ }
+ 
+ int kvm_set_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+@@ -4271,6 +4331,7 @@ static void kvm_steal_time_set_preempted(struct kvm_vcpu *vcpu)
+ {
+ 	struct kvm_host_map map;
+ 	struct kvm_steal_time *st;
++	int token;
+ 
+ 	if (!(vcpu->arch.st.msr_val & KVM_MSR_ENABLED))
+ 		return;
+@@ -4278,8 +4339,8 @@ static void kvm_steal_time_set_preempted(struct kvm_vcpu *vcpu)
+ 	if (vcpu->arch.st.preempted)
+ 		return;
+ 
+-	if (kvm_map_gfn(vcpu, vcpu->arch.st.msr_val >> PAGE_SHIFT, &map,
+-			&vcpu->arch.st.cache, true))
++	if (kvm_map_gfn_protected(vcpu, vcpu->arch.st.msr_val >> PAGE_SHIFT,
++				  &map, &vcpu->arch.st.cache, true, &token))
+ 		return;
+ 
+ 	st = map.hva +
+@@ -4287,7 +4348,7 @@ static void kvm_steal_time_set_preempted(struct kvm_vcpu *vcpu)
+ 
+ 	st->preempted = vcpu->arch.st.preempted = KVM_VCPU_PREEMPTED;
+ 
+-	kvm_unmap_gfn(vcpu, &map, &vcpu->arch.st.cache, true, true);
++	kvm_unmap_gfn_protected(vcpu, &map, &vcpu->arch.st.cache, true, true, token);
+ }
+ 
+ void kvm_arch_vcpu_put(struct kvm_vcpu *vcpu)
+@@ -6816,6 +6877,7 @@ static int emulator_cmpxchg_emulated(struct x86_emulate_ctxt *ctxt,
+ 	gpa_t gpa;
+ 	char *kaddr;
+ 	bool exchanged;
++	int token;
+ 
+ 	/* guests cmpxchg8b have to be emulated atomically */
+ 	if (bytes > 8 || (bytes & (bytes - 1)))
+@@ -6839,7 +6901,7 @@ static int emulator_cmpxchg_emulated(struct x86_emulate_ctxt *ctxt,
+ 	if (((gpa + bytes - 1) & page_line_mask) != (gpa & page_line_mask))
+ 		goto emul_write;
+ 
+-	if (kvm_vcpu_map(vcpu, gpa_to_gfn(gpa), &map))
++	if (kvm_vcpu_map_protected(vcpu, gpa_to_gfn(gpa), &map, &token))
+ 		goto emul_write;
+ 
+ 	kaddr = map.hva + offset_in_page(gpa);
+@@ -6861,7 +6923,7 @@ static int emulator_cmpxchg_emulated(struct x86_emulate_ctxt *ctxt,
+ 		BUG();
+ 	}
+ 
+-	kvm_vcpu_unmap(vcpu, &map, true);
++	kvm_vcpu_unmap_protected(vcpu, &map, true, token);
+ 
+ 	if (!exchanged)
+ 		return X86EMUL_CMPXCHG_FAILED;
 -- 
 2.17.1
 
