@@ -2,149 +2,93 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C266F3F2918
-	for <lists+kvm@lfdr.de>; Fri, 20 Aug 2021 11:27:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5EE903F2A26
+	for <lists+kvm@lfdr.de>; Fri, 20 Aug 2021 12:34:49 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236737AbhHTJ2Z (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 20 Aug 2021 05:28:25 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:29691 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S235321AbhHTJ2Y (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 20 Aug 2021 05:28:24 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1629451666;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=/u+8okw9NC3TUEzgwTlSaEbJlbpO/sr31TcVmCIG3eM=;
-        b=DBHx2SlI27WlW9ojjfoOSM6wjAYkCL+Tu/so9T7tu/IqAXpYn4N+t4HojW6N+vEYNR9n0Z
-        KdCda0WKDC1V6DmU5qJxGEKafDnbIMs/KzXpsdU2WNQjfASwKrfWidtbr8ZMhPP94AqdAo
-        Pm3GCT5FC7HISpupfkcxi46BQtJ80Io=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-487-dQQqQHerM9eP6iYI_1MIkg-1; Fri, 20 Aug 2021 05:27:45 -0400
-X-MC-Unique: dQQqQHerM9eP6iYI_1MIkg-1
-Received: by mail-wm1-f69.google.com with SMTP id z18-20020a1c7e120000b02902e69f6fa2e0so1738478wmc.9
-        for <kvm@vger.kernel.org>; Fri, 20 Aug 2021 02:27:45 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:organization
-         :message-id:date:user-agent:mime-version:in-reply-to
-         :content-language:content-transfer-encoding;
-        bh=/u+8okw9NC3TUEzgwTlSaEbJlbpO/sr31TcVmCIG3eM=;
-        b=IT4m26Be8dySwtK0KKuH25hyT36wxg2Qo1mBkSOiS3x1f6PgEwB4rzQX1Eh/uwUR9C
-         pHOVycv4lh3F1SidDHcBcIjVpyQj7kvoIqT31GN314JjiGU5qG0EW6Pn3Iry10Luo9yJ
-         aeCXthoTfArXj643Fsnw6pbOndiHyUJbbHTqOj9MYnk1UENqsd4OErLXBHpjnc2qR0L1
-         f5xeynqeStRghkmaTg7yaERQrCZSX7ExOqMohNRof6jBxxlqPvD8EOKNuJgISllMVm1I
-         bWdWdXsOFyZUYfgfV6XlZUmOyzBfVSaxXLr93gx0+IC8jmz1cKXoRRGiWMVRbHf+R6Jy
-         kKRA==
-X-Gm-Message-State: AOAM533M0O7ZuIivs5eg4t9TPiFIAzqR3x65ZKHVKFduJ5Niol+5Y3yn
-        k8dXY0HEXYgER55vg8Og+IO/npgJI1n0xFr54WW4Oyqr7IwdqzzsqCyJqj2/7nTdra9o7JUBgVc
-        DWhd/iD1EwQXr
-X-Received: by 2002:a7b:c7c3:: with SMTP id z3mr2877115wmk.96.1629451664153;
-        Fri, 20 Aug 2021 02:27:44 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwrv/MO6I4VJiNFhu/exeX4GinBGO52T7kneA302ioQqlyE7/IysNBUL0jrYV0CaHBwzkxm4w==
-X-Received: by 2002:a7b:c7c3:: with SMTP id z3mr2877101wmk.96.1629451663998;
-        Fri, 20 Aug 2021 02:27:43 -0700 (PDT)
-Received: from ?IPv6:2003:d8:2f0a:7f00:fad7:3bc9:69d:31f? (p200300d82f0a7f00fad73bc9069d031f.dip0.t-ipconnect.de. [2003:d8:2f0a:7f00:fad7:3bc9:69d:31f])
-        by smtp.gmail.com with ESMTPSA id c7sm4478795wmq.13.2021.08.20.02.27.42
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 20 Aug 2021 02:27:43 -0700 (PDT)
-Subject: Re: [PATCH v4 06/13] KVM: Move WARN on invalid memslot index to
- update_memslots()
-To:     "Maciej S. Szmigiero" <mail@maciej.szmigiero.name>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Igor Mammedov <imammedo@redhat.com>,
-        Marc Zyngier <maz@kernel.org>,
-        James Morse <james.morse@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Huacai Chen <chenhuacai@kernel.org>,
-        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
-        Paul Mackerras <paulus@ozlabs.org>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>
-References: <cover.1628871411.git.maciej.szmigiero@oracle.com>
- <8db0f1d1901768b5de1417caa425e62d1118e5e8.1628871413.git.maciej.szmigiero@oracle.com>
- <957c6b3d-9621-a5a5-418c-f61f87a32ee0@redhat.com>
- <fa71d652-8b7f-e0d7-5617-8958e3e78f6e@maciej.szmigiero.name>
-From:   David Hildenbrand <david@redhat.com>
-Organization: Red Hat
-Message-ID: <633bf50b-5de4-1e76-736c-067d10bf92b3@redhat.com>
-Date:   Fri, 20 Aug 2021 11:27:42 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.11.0
+        id S239048AbhHTKfG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 20 Aug 2021 06:35:06 -0400
+Received: from mail.kernel.org ([198.145.29.99]:60528 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S239095AbhHTKfE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 20 Aug 2021 06:35:04 -0400
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 8481861106;
+        Fri, 20 Aug 2021 10:34:26 +0000 (UTC)
+Received: from sofa.misterjones.org ([185.219.108.64] helo=hot-poop.lan)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94.2)
+        (envelope-from <maz@kernel.org>)
+        id 1mH1qy-006AHg-Bb; Fri, 20 Aug 2021 11:34:24 +0100
+From:   Marc Zyngier <maz@kernel.org>
+To:     kvmarm@lists.cs.columbia.edu, Fuad Tabba <tabba@google.com>
+Cc:     oupton@google.com, james.morse@arm.com, drjones@redhat.com,
+        mark.rutland@arm.com, alexandru.elisei@arm.com,
+        kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        kernel-team@android.com, suzuki.poulose@arm.com, will@kernel.org,
+        pbonzini@redhat.com, christoffer.dall@arm.com, qperret@google.com
+Subject: Re: [PATCH v4 00/15] KVM: arm64: Fixed features for protected VMs
+Date:   Fri, 20 Aug 2021 11:34:20 +0100
+Message-Id: <162945557041.2025988.6137048861111259637.b4-ty@kernel.org>
+X-Mailer: git-send-email 2.30.2
+In-Reply-To: <20210817081134.2918285-1-tabba@google.com>
+References: <20210817081134.2918285-1-tabba@google.com>
 MIME-Version: 1.0
-In-Reply-To: <fa71d652-8b7f-e0d7-5617-8958e3e78f6e@maciej.szmigiero.name>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: kvmarm@lists.cs.columbia.edu, tabba@google.com, oupton@google.com, james.morse@arm.com, drjones@redhat.com, mark.rutland@arm.com, alexandru.elisei@arm.com, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kernel-team@android.com, suzuki.poulose@arm.com, will@kernel.org, pbonzini@redhat.com, christoffer.dall@arm.com, qperret@google.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 18.08.21 23:43, Maciej S. Szmigiero wrote:
-> On 18.08.2021 16:35, David Hildenbrand wrote:
->> On 13.08.21 21:33, Maciej S. Szmigiero wrote:
->>> From: "Maciej S. Szmigiero" <maciej.szmigiero@oracle.com>
->>>
->>> Since kvm_memslot_move_forward() can theoretically return a negative
->>> memslot index even when kvm_memslot_move_backward() returned a positive one
->>> (and so did not WARN) let's just move the warning to the common code.
->>>
->>> Signed-off-by: Maciej S. Szmigiero <maciej.szmigiero@oracle.com>
->>> ---
->>>    virt/kvm/kvm_main.c | 6 ++++--
->>>    1 file changed, 4 insertions(+), 2 deletions(-)
->>>
->>> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
->>> index 03ef42d2e421..7000efff1425 100644
->>> --- a/virt/kvm/kvm_main.c
->>> +++ b/virt/kvm/kvm_main.c
->>> @@ -1293,8 +1293,7 @@ static inline int kvm_memslot_move_backward(struct kvm_memslots *slots,
->>>        struct kvm_memory_slot *mslots = slots->memslots;
->>>        int i;
->>> -    if (WARN_ON_ONCE(slots->id_to_index[memslot->id] == -1) ||
->>> -        WARN_ON_ONCE(!slots->used_slots))
->>> +    if (slots->id_to_index[memslot->id] == -1 || !slots->used_slots)
->>>            return -1;
->>>        /*
->>> @@ -1398,6 +1397,9 @@ static void update_memslots(struct kvm_memslots *slots,
->>>                i = kvm_memslot_move_backward(slots, memslot);
->>>            i = kvm_memslot_move_forward(slots, memslot, i);
->>> +        if (WARN_ON_ONCE(i < 0))
->>> +            return;
->>> +
->>>            /*
->>>             * Copy the memslot to its new position in memslots and update
->>>             * its index accordingly.
->>>
->>
->>
->> Note that WARN_ON_* is frowned upon, because it can result in crashes with panic_on_warn enabled, which is what some distributions do enable.
->>
->> We tend to work around that by using pr_warn()/pr_warn_once(), avoiding eventually crashing the system when there is a way to continue.
->>
+On Tue, 17 Aug 2021 09:11:19 +0100, Fuad Tabba wrote:
+> Changes since v3 [1]:
+> - Redid calculating restricted values of feature register fields, ensuring that
+>   the code distinguishes between unsigned and (potentially in the future)
+>   signed fields (Will)
+> - Refactoring and fixes (Drew, Will)
+> - More documentation and comments (Oliver, Will)
+> - Dropped patch "Restrict protected VM capabilities", since it should come with
+>   or after the user ABI series for pKVM (Will)
+> - Carried Will's acks
 > 
-> This patch uses WARN_ON_ONCE because:
-> 1) It was used in the old code and the patch merely moves the check
-> from kvm_memslot_move_backward() to its caller,
-> 
-> 2) This chunk of code is wholly replaced by patch 11 from this series
-> anyway ("Keep memslots in tree-based structures instead of array-based ones").
+> [...]
 
-Okay, that makes sense then, thanks!
+I've taken the first 10 patches of this series in order to
+progress it. I also stashed a fixlet on top to address the
+tracepoint issue.
 
+Hopefully we can resolve the rest of the issues quickly.
+
+[01/15] KVM: arm64: placeholder to check if VM is protected
+        commit: 2ea7f655800b00b109951f22539fe2025add210b
+[02/15] KVM: arm64: Remove trailing whitespace in comment
+        commit: e6bc555c96990046d680ff92c8e2e7b6b43b509f
+[03/15] KVM: arm64: MDCR_EL2 is a 64-bit register
+        commit: d6c850dd6ce9ce4b410142a600d8c34dc041d860
+[04/15] KVM: arm64: Fix names of config register fields
+        commit: dabb1667d8573302712a75530cccfee8f3ffff84
+[05/15] KVM: arm64: Refactor sys_regs.h,c for nVHE reuse
+        commit: f76f89e2f73d93720cfcad7fb7b24d022b2846bf
+[06/15] KVM: arm64: Restore mdcr_el2 from vcpu
+        commit: 1460b4b25fde52cbee746c11a4b1d3185f2e2847
+[07/15] KVM: arm64: Keep mdcr_el2's value as set by __init_el2_debug
+        commit: 12849badc6d2456f15f8f2c93037628d5176810b
+[08/15] KVM: arm64: Track value of cptr_el2 in struct kvm_vcpu_arch
+        commit: cd496228fd8de2e82b6636d3d89105631ea2b69c
+[09/15] KVM: arm64: Add feature register flag definitions
+        commit: 95b54c3e4c92b9185b15c83e8baab9ba312195f6
+[10/15] KVM: arm64: Add config register bit definitions
+        commit: 2d701243b9f231b5d7f9a8cb81870650d3eb32bc
+
+Cheers,
+
+	M.
 -- 
-Thanks,
+Without deviation from the norm, progress is not possible.
 
-David / dhildenb
 
