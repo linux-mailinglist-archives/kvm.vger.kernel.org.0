@@ -2,201 +2,145 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D050B3F33D8
-	for <lists+kvm@lfdr.de>; Fri, 20 Aug 2021 20:31:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 22FE63F3406
+	for <lists+kvm@lfdr.de>; Fri, 20 Aug 2021 20:42:47 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238408AbhHTScX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 20 Aug 2021 14:32:23 -0400
-Received: from mail.efficios.com ([167.114.26.124]:34946 "EHLO
-        mail.efficios.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237277AbhHTScW (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 20 Aug 2021 14:32:22 -0400
-Received: from localhost (localhost [127.0.0.1])
-        by mail.efficios.com (Postfix) with ESMTP id 1AC0B37ECEE;
-        Fri, 20 Aug 2021 14:31:43 -0400 (EDT)
-Received: from mail.efficios.com ([127.0.0.1])
-        by localhost (mail03.efficios.com [127.0.0.1]) (amavisd-new, port 10032)
-        with ESMTP id kkYr13An0u20; Fri, 20 Aug 2021 14:31:38 -0400 (EDT)
-Received: from localhost (localhost [127.0.0.1])
-        by mail.efficios.com (Postfix) with ESMTP id 88B7737EF3D;
-        Fri, 20 Aug 2021 14:31:38 -0400 (EDT)
-DKIM-Filter: OpenDKIM Filter v2.10.3 mail.efficios.com 88B7737EF3D
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=efficios.com;
-        s=default; t=1629484298;
-        bh=rcXcxanfB6QYZhHo4b7EbXJ6cIL6JRW1zubXgC7Qst4=;
-        h=Date:From:To:Message-ID:MIME-Version;
-        b=X4Je8ormAn0YaA6FlkV1/U8Tl59mByp1mWAIToyIQma9hFegqTueeXe6R/TVChI/E
-         0nOZb1vTCAMapORr4Chx/N31Lj/dN2PDXIbl0wz4lBKPddFZnhKp0IYd1UT6iJrdA5
-         Sd+GFUUFRAgQSz/n2usWwRTNPJ5yj6eHon7Hg5qRU3ie5/iWZbhaSiD0S4jY73XHJZ
-         fbulqoP0HfYCA/L9kAQKGcawUG/fWz+/M+z+nE53KmXoQ+iydSUnVFMvGwkllwl/Vu
-         lV+X3jPatZos15gbSLySJGS9WD9gr0qevh4fI/ZX8A2L7p+brg2l4MIljseex/R7cZ
-         ZDeYUH2f6XKAA==
-X-Virus-Scanned: amavisd-new at efficios.com
-Received: from mail.efficios.com ([127.0.0.1])
-        by localhost (mail03.efficios.com [127.0.0.1]) (amavisd-new, port 10026)
-        with ESMTP id IM83p2M2TmSm; Fri, 20 Aug 2021 14:31:38 -0400 (EDT)
-Received: from mail03.efficios.com (mail03.efficios.com [167.114.26.124])
-        by mail.efficios.com (Postfix) with ESMTP id 6426637EF39;
-        Fri, 20 Aug 2021 14:31:38 -0400 (EDT)
-Date:   Fri, 20 Aug 2021 14:31:38 -0400 (EDT)
-From:   Mathieu Desnoyers <mathieu.desnoyers@efficios.com>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     "Russell King, ARM Linux" <linux@armlinux.org.uk>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Will Deacon <will@kernel.org>, Guo Ren <guoren@kernel.org>,
-        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Heiko Carstens <hca@linux.ibm.com>, gor <gor@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Oleg Nesterov <oleg@redhat.com>, rostedt <rostedt@goodmis.org>,
-        Ingo Molnar <mingo@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Andy Lutomirski <luto@kernel.org>,
-        paulmck <paulmck@kernel.org>, Boqun Feng <boqun.feng@gmail.com>,
-        Paolo Bonzini <pbonzini@redhat.com>, shuah <shuah@kernel.org>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        Paul Mackerras <paulus@samba.org>,
-        linux-arm-kernel <linux-arm-kernel@lists.infradead.org>,
-        linux-kernel <linux-kernel@vger.kernel.org>,
-        linux-csky <linux-csky@vger.kernel.org>,
-        linux-mips <linux-mips@vger.kernel.org>,
-        linuxppc-dev <linuxppc-dev@lists.ozlabs.org>,
-        linux-s390 <linux-s390@vger.kernel.org>,
-        KVM list <kvm@vger.kernel.org>,
-        linux-kselftest <linux-kselftest@vger.kernel.org>,
-        Peter Foley <pefoley@google.com>,
-        Shakeel Butt <shakeelb@google.com>,
-        Ben Gardon <bgardon@google.com>
-Message-ID: <407716135.20250.1629484298288.JavaMail.zimbra@efficios.com>
-In-Reply-To: <YR7qXvnI/AQM10gU@google.com>
-References: <20210818001210.4073390-1-seanjc@google.com> <20210818001210.4073390-5-seanjc@google.com> <1540548616.19739.1629409956315.JavaMail.zimbra@efficios.com> <YR7qXvnI/AQM10gU@google.com>
-Subject: Re: [PATCH 4/5] KVM: selftests: Add a test for KVM_RUN+rseq to
- detect task migration bugs
+        id S235644AbhHTSnX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 20 Aug 2021 14:43:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38214 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229927AbhHTSnW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 20 Aug 2021 14:43:22 -0400
+Received: from mail-lf1-x133.google.com (mail-lf1-x133.google.com [IPv6:2a00:1450:4864:20::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 95D02C061756
+        for <kvm@vger.kernel.org>; Fri, 20 Aug 2021 11:42:43 -0700 (PDT)
+Received: by mail-lf1-x133.google.com with SMTP id g20so3827366lfr.7
+        for <kvm@vger.kernel.org>; Fri, 20 Aug 2021 11:42:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=YIxdmdOK93PDI+3/pOtlT4h8TOVvTfwI7jxbnF4v/8I=;
+        b=o8+3gnoBM3c+ATq9Vukii1eFIe61G3lGZOFUEDDzxuzH4ztaiJQwabCRtO1Y9Wm3Wx
+         FeLKuAWt9M6Bel3wmTw69OZQibdUIA4T6ACOyfZrmF/PiPU6/0BvFlD9N5lElCd9DqLM
+         aVsOXyN1vB4L/WCboQnqaua428UHP+AB9k/pPBNoD6JT64wIHdPh6IEtjjFIlfAWCEWA
+         iINuZPiGwHcmDpe4DlFm83lgOKyhL5FnPmmcty0vZvq7q/PBiU20ODxOPSWFVubXZTNR
+         JXVNNLAzzkM0qgLsWtuFCvCcV6DKJeMN1aurlKyK2FKy80sP7apxRPdV3GyWoHDkHAoh
+         BBSg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=YIxdmdOK93PDI+3/pOtlT4h8TOVvTfwI7jxbnF4v/8I=;
+        b=lgv1c3B4+yMgB/EvXYZWvGYVDddPhBSrw/mEgK0smxF58rFOjZyPZfLsIHC97sFITs
+         zsrqRgZPMXpTI1ywAtjbOkzMPhVvyuGbbz+BZbKq6NXZNal0IKrilG7ml85I5YkAeS7/
+         KiUKibuKpDJ4XQ65a5K0oLSJclGyz6AxgqrPqY/BIl/+2rHYKzXGpVyjgmw5RfVgOFw5
+         oL2n/2yZB1PibyFbgVm8PtTkBMLc9YNCLH+qNCLqJM5DzpqcX/KN6WGU46LYBnehJw3D
+         J63l3CRv+qCfU2akF/LeCce6CYQd2GNooSXHQdkjbZyvv6d4s/I/BJyh1J7yODzoos5Y
+         9C3g==
+X-Gm-Message-State: AOAM532aYK+QZ2/hYI64HTKkQqQIcD65Hgru5auxCBxFJwkZ2He2mlfI
+        h6zzzdI7DDI3VGvXLEFPUewOQ0WfhP2ONw4GIHgp6A==
+X-Google-Smtp-Source: ABdhPJxGSQkui+u6oxP9qSpGFHbnvSHr9Xx5ldGdIeKBFFyQ3Iw8ZMHKcOvlSq/HVIZhncng4jucqhE/Hx0YmGcMcsk=
+X-Received: by 2002:ac2:5324:: with SMTP id f4mr16017789lfh.106.1629484961611;
+ Fri, 20 Aug 2021 11:42:41 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [167.114.26.124]
-X-Mailer: Zimbra 8.8.15_GA_4101 (ZimbraWebClient - FF90 (Linux)/8.8.15_GA_4059)
-Thread-Topic: selftests: Add a test for KVM_RUN+rseq to detect task migration bugs
-Thread-Index: E5JNfmxU00VeJZRF4swNzJN5Z7I5gQ==
+References: <20210817230508.142907-1-jingzhangos@google.com>
+ <YRxKZXm68FZ0jr34@google.com> <CAAdAUthw0gT2_K+WzkWeEHApGqM14qpH+kuoO6WZBnjvez6ZAg@mail.gmail.com>
+ <CAJfu=UcwHWzqCvTjniAMkGj1mmjw9QCy5a-fGJ2mxTK8EFW7Dg@mail.gmail.com> <YR7dJflS7yBR52tL@google.com>
+In-Reply-To: <YR7dJflS7yBR52tL@google.com>
+From:   Jing Zhang <jingzhangos@google.com>
+Date:   Fri, 20 Aug 2021 11:42:30 -0700
+Message-ID: <CAAdAUtj-Y_MuaeqAHKonNTBDR=kjjmWP__Siqjv5=AxvZbe-Bw@mail.gmail.com>
+Subject: Re: [PATCH] KVM: stats: add stats to detect if vcpu is currently halted
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Cannon Matthews <cannonmatthews@google.com>,
+        KVM <kvm@vger.kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
+        David Matlack <dmatlack@google.com>,
+        Peter Shier <pshier@google.com>,
+        Oliver Upton <oupton@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
------ On Aug 19, 2021, at 7:33 PM, Sean Christopherson seanjc@google.com wrote:
+Hi Sean,
 
-> On Thu, Aug 19, 2021, Mathieu Desnoyers wrote:
->> ----- On Aug 17, 2021, at 8:12 PM, Sean Christopherson seanjc@google.com wrote:
->> 
->> > Add a test to verify an rseq's CPU ID is updated correctly if the task is
->> > migrated while the kernel is handling KVM_RUN.  This is a regression test
->> > for a bug introduced by commit 72c3c0fe54a3 ("x86/kvm: Use generic xfer
->> > to guest work function"), where TIF_NOTIFY_RESUME would be cleared by KVM
->> > without updating rseq, leading to a stale CPU ID and other badness.
->> > 
->> > Signed-off-by: Sean Christopherson <seanjc@google.com>
->> > ---
->> 
->> [...]
->> 
->> > +	while (!done) {
->> > +		vcpu_run(vm, VCPU_ID);
->> > +		TEST_ASSERT(get_ucall(vm, VCPU_ID, NULL) == UCALL_SYNC,
->> > +			    "Guest failed?");
->> > +
->> > +		cpu = sched_getcpu();
->> > +		rseq_cpu = READ_ONCE(__rseq.cpu_id);
->> > +
->> > +		/*
->> > +		 * Verify rseq's CPU matches sched's CPU, and that sched's CPU
->> > +		 * is stable.  This doesn't handle the case where the task is
->> > +		 * migrated between sched_getcpu() and reading rseq, and again
->> > +		 * between reading rseq and sched_getcpu(), but in practice no
->> > +		 * false positives have been observed, while on the other hand
->> > +		 * blocking migration while this thread reads CPUs messes with
->> > +		 * the timing and prevents hitting failures on a buggy kernel.
->> > +		 */
->> 
->> I think you could get a stable cpu id between sched_getcpu and __rseq_abi.cpu_id
->> if you add a pthread mutex to protect:
->> 
->> sched_getcpu and __rseq_abi.cpu_id  reads
->> 
->> vs
->> 
->> sched_setaffinity calls within the migration thread.
->> 
->> Thoughts ?
-> 
-> I tried that and couldn't reproduce the bug.  That's what I attempted to call
-> out
-> in the blurb "blocking migration while this thread reads CPUs ... prevents
-> hitting
-> failures on a buggy kernel".
-> 
-> I considered adding arbitrary delays around the mutex to try and hit the bug,
-> but
-> I was worried that even if I got it "working" for this bug, the test would be
-> too
-> tailored to this bug and potentially miss future regression.  Letting the two
-> threads run wild seemed like it would provide the best coverage, at the cost of
-> potentially causing to false failures.
-
-OK, so your point is that using mutual exclusion to ensure stability of the cpu id
-changes the timings too much, to a point where the issues don't reproduce. I understand
-that this mutex ties the migration thread timings to the vcpu thread's use of the mutex,
-which will reduce timings randomness, which is unwanted here.
-
-I still really hate flakiness in tests, because then people stop caring when they
-fail once in a while. And with the nature of rseq, a once-in-a-while failure is a
-big deal. Let's see if we can use other tricks to ensure stability of the cpu id
-without changing timings too much.
-
-One idea would be to use a seqcount lock. But even if we use that, I'm concerned that
-the very long writer critical section calling sched_setaffinity would need to be
-alternated with a sleep to ensure the read-side progresses. The sleep delay could be
-relatively small compared to the duration of the sched_setaffinity call, e.g. ratio
-1:10.
-
-static volatile uint64_t seqcnt;
-
-The thread responsible for setting the affinity would do something like:
-
-for (;;) {
-  atomic_inc_seq_cst(&seqcnt);
-  sched_setaffinity(..., n++ % nr_cpus);
-  atomic_inc_seq_cst(&seqcnt);
-  usleep(1);  /* this is where read-side is allowed to progress. */
-}
-
-And the thread reading the rseq cpu id and calling sched_getcpu():
-
-uint64_t snapshot;
-
-do {
-  snapshot = atomic_load(&seqcnt) & ~1; /* force retry if odd */
-  smp_rmb();
-  cpu = sched_getcpu();
-  rseq_cpu = READ_ONCE(__rseq.cpu_id);
-  smp_rmb();
-} while (snapshot != atomic_load(&seqcnt));
-
-So the reader retry the cpu id reads whenever sched_setaffinity is being
-called by the migration thread, and whenever it is preempted for more
-than one migration thread loop.
-
-That should achieve our goal of providing cpu id stability without significantly
-changing the timings of the migration thread, given that it never blocks waiting
-for the reader.
-
-Thoughts ?
-
+On Thu, Aug 19, 2021 at 3:37 PM Sean Christopherson <seanjc@google.com> wrote:
+>
+> On Wed, Aug 18, 2021, Cannon Matthews wrote:
+> > Since a guest has explictly asked for a vcpu to HLT, this is "useful work on
+> > behalf of the guest" even though the thread is "blocked" from running.
+> >
+> > This allows answering questions like, are we spending too much time waiting
+> > on mutexes, or long running kernel routines rather than running the vcpu in
+> > guest mode, or did the guest explictly tell us to not doing anything.
+> >
+> > So I would suggest keeping the "halt" part of the counters' name, and remove
+> > the "blocked" part rather than the other way around. We explicitly do not
+> > want to include non-halt blockages in this.
+>
+> But this patch does include non-halt blockages, which is why I brought up the
+> technically-wrong naming.  Specifically, x86 reaches this path for any !RUNNABLE
+> vCPU state, e.g. if the vCPU is in WFS.  Non-x86 usage appears to mostly call
+> this for halt-like behavior, but PPC looks like it has at least one path that's
+> not halt-like.
+>
+> I doubt anyone actually cares if the stat is a misnomer in some cases, but at the
+> same time I think there's opportunity for clean up here.  E.g. halt polling if a
+> vCPU is in WFS or UNINITIALIZED is a waste of cycles.  Ditto for the calls to
+> kvm_arch_vcpu_blocking() and kvm_arch_vcpu_unblocking() when halt polling is
+> successful, e.g. arm64 puts and reloads the vgic, which I assume is a complete
+> waste of cycles if the vCPU doesn't actually block.  And kvm_arch_vcpu_block_finish()
+> can be dropped by moving the one line of code into s390, which can add its own
+> wrapper if necessary.
+>
+> So with a bit of massaging and a slight change in tracing behavior, I believe we
+> can isolate the actual wait/halt and avoid "halted" being technically-wrong, and
+> fix some inefficiencies at the same time.
+>
+> Jing, can you do a v2 of this patch and send it to me off-list?  With luck, my
+> idea will work and I can fold your patch in, and if not we can always post v2
+> standalone in a few weeks.
+Of course, will do.
 Thanks,
-
-Mathieu
-
--- 
-Mathieu Desnoyers
-EfficiOS Inc.
-http://www.efficios.com
+Jing
+>
+> E.g. I'm thinking something like...
+>
+> void kvm_vcpu_halt(struct kvm_vcpu *vcpu)
+> {
+>         vcpu->stat.generic.halted = 1;
+>
+>         if (<halt polling failed>)
+>                 kvm_vcpu_block();
+>
+>         vcpu->stat.generic.halted = 0;
+>
+>         <update halt polling stuff>
+> }
+>
+> void kvm_vcpu_block(struct kvm_vcpu *vcpu)
+> {
+>         bool waited = false;
+>         ktime_t start, cur;
+>         u64 block_ns;
+>
+>         start = ktime_get();
+>
+>
+>         prepare_to_rcuwait(&vcpu->wait);
+>         for (;;) {
+>                 set_current_state(TASK_INTERRUPTIBLE);
+>
+>                 if (kvm_vcpu_check_block(vcpu) < 0)
+>                         break;
+>
+>                 waited = true;
+>                 schedule();
+>         }
+>         finish_rcuwait(&vcpu->wait);
+>
+>         block_ns = ktime_to_ns(cur) - ktime_to_ns(start);
+>         trace_kvm_vcpu_wakeup(block_ns, waited, vcpu_valid_wakeup(vcpu));
+> }
+>
