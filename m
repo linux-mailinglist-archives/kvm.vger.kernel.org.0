@@ -2,116 +2,111 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E7E9A3F36D1
-	for <lists+kvm@lfdr.de>; Sat, 21 Aug 2021 00:50:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2711F3F370F
+	for <lists+kvm@lfdr.de>; Sat, 21 Aug 2021 00:55:23 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240900AbhHTWvU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 20 Aug 2021 18:51:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37866 "EHLO
+        id S232835AbhHTW4A (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 20 Aug 2021 18:56:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38968 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240896AbhHTWvQ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 20 Aug 2021 18:51:16 -0400
-Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 58F9DC0617AD
-        for <kvm@vger.kernel.org>; Fri, 20 Aug 2021 15:50:36 -0700 (PDT)
-Received: by mail-yb1-xb49.google.com with SMTP id f64-20020a2538430000b0290593bfc4b046so11044725yba.9
-        for <kvm@vger.kernel.org>; Fri, 20 Aug 2021 15:50:36 -0700 (PDT)
+        with ESMTP id S231511AbhHTWz7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 20 Aug 2021 18:55:59 -0400
+Received: from mail-lj1-x22e.google.com (mail-lj1-x22e.google.com [IPv6:2a00:1450:4864:20::22e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 05254C061575
+        for <kvm@vger.kernel.org>; Fri, 20 Aug 2021 15:55:21 -0700 (PDT)
+Received: by mail-lj1-x22e.google.com with SMTP id j12so5202460ljg.10
+        for <kvm@vger.kernel.org>; Fri, 20 Aug 2021 15:55:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
-        h=reply-to:date:in-reply-to:message-id:mime-version:references
-         :subject:from:to:cc;
-        bh=Ut0lClAqKM9RGqTS5MESEM+F5WoPZRTQUckNTBRjTyg=;
-        b=TA/KEkzCm9eGIgSQhw9KNiaLFa6mERWpjzl8Sm2LP0D8MHshBELhR9PNTUHRE29ifz
-         mo90lRoRaNLAOUKwpDqprlo0/pMwtc5l0/AtaGDQuwQPp72yFVvsNL3ynlMO5kSBRj5m
-         LzAltW2EylkOxsEkvhRVhVSBOVOdYc11dmbjDqZ/XhKiygxbSFOOyUayIR4kGClbFLgR
-         /kFKufJdXalO6BD5koMO2tBk/9JBu0VO4U4stsueIYQrrElmsEUFhO7RIz6hEZLybaDq
-         KKumExIW2OSfE2RbrTkormhrvk3570q+R6kLizKIzC3ltGy9bDIK5NfDidM6k/fKRiu/
-         zAPw==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=OVgl6NYG6keKKu00zAIKlyoS+SlGhGRMo5kOSa5PnG0=;
+        b=RQvpyG3rM+U2rBpkWf3bcovUJEsSPs8JCcMYDACloI6yu2K0oVsFLge+L2z/znEmg0
+         9Ip7J3zbvn1PKlgEFZTxxmuwtyFhe6O0qP9befQNZZRiH5zJ4RzxWOpfQI6m44C8ZyJk
+         ti47fPEb3zcxHFQpdYRDcrQ1k4FZELUPr9B1w3c44yeiqgcZ7amfsNw3U4VGKF/3aYlj
+         uCc9S46W2M1yVJnvncGDXzY87nJBY+hRR6JD8tGbPdfzq2W9rB76MUpA/zttl6hL+W4o
+         bCwAozGDbQZtTQx0HOurh4hGA13Dz+Ig8TshIEXqaB3kG4wNUSMql3H2kFu5eaUaOJNO
+         8jOg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:reply-to:date:in-reply-to:message-id
-         :mime-version:references:subject:from:to:cc;
-        bh=Ut0lClAqKM9RGqTS5MESEM+F5WoPZRTQUckNTBRjTyg=;
-        b=DEo1ss8zUXaiDhMp4Ubn+Qnw+9O1r4DrRGcDzPCSIZZ7RnlIEHpyk/7NGmAUrbXI5P
-         02D/0sHBe1ucoOFNplb8be5SbhgGxU+LaJynXYz5Q/grSxeOi+w9sqzJuzmkcwV4oZEJ
-         2ML1AL029typ6Uaht9xPXlQrFvXmXMUkA3nz6PJDFQVKq4M7y6yvooUnsEfIJTVGFrYU
-         YVJybDYlYe22U99cInTYnMRTR8AxfEx9oNmorDefzPTxSI4Nmzs+iNwoK65Zn7GnQSSc
-         yKjwLxBKxiOl2iZNZ+vURVTTWMf5b6n/UTbjgVknxZiuNDIg47skbpWE+EO+FAyM9axi
-         tA3g==
-X-Gm-Message-State: AOAM531oZx/GDMD/ZGO9T/EjXflRdQJuvc/VtmCwunuV3HSHF+UD20cN
-        aFp6LqK60lZTj8NZ/W7ntMYFFqJaE0I=
-X-Google-Smtp-Source: ABdhPJx3Gy465odAHrKuwh+xxU3EOcrY9EoPkXADk8KHQbivIS4NsZANbgwhJ1nQlBB3M+0Hs3NCAAyvqg4=
-X-Received: from seanjc798194.pdx.corp.google.com ([2620:15c:90:200:f11d:a281:af9b:5de6])
- (user=seanjc job=sendgmr) by 2002:a25:acc4:: with SMTP id x4mr8790476ybd.376.1629499835531;
- Fri, 20 Aug 2021 15:50:35 -0700 (PDT)
-Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Fri, 20 Aug 2021 15:50:02 -0700
-In-Reply-To: <20210820225002.310652-1-seanjc@google.com>
-Message-Id: <20210820225002.310652-6-seanjc@google.com>
-Mime-Version: 1.0
-References: <20210820225002.310652-1-seanjc@google.com>
-X-Mailer: git-send-email 2.33.0.rc2.250.ged5fa647cd-goog
-Subject: [PATCH v2 5/5] KVM: selftests: Remove __NR_userfaultfd syscall fallback
-From:   Sean Christopherson <seanjc@google.com>
-To:     Russell King <linux@armlinux.org.uk>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Will Deacon <will@kernel.org>, Guo Ren <guoren@kernel.org>,
-        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Steven Rostedt <rostedt@goodmis.org>,
-        Ingo Molnar <mingo@redhat.com>,
-        Oleg Nesterov <oleg@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Andy Lutomirski <luto@kernel.org>,
-        Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
-        "Paul E. McKenney" <paulmck@kernel.org>,
-        Boqun Feng <boqun.feng@gmail.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Shuah Khan <shuah@kernel.org>
-Cc:     Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        Paul Mackerras <paulus@samba.org>,
-        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-        linux-csky@vger.kernel.org, linux-mips@vger.kernel.org,
-        linuxppc-dev@lists.ozlabs.org, linux-s390@vger.kernel.org,
-        kvm@vger.kernel.org, linux-kselftest@vger.kernel.org,
-        Peter Foley <pefoley@google.com>,
-        Shakeel Butt <shakeelb@google.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Ben Gardon <bgardon@google.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=OVgl6NYG6keKKu00zAIKlyoS+SlGhGRMo5kOSa5PnG0=;
+        b=KZhjCXY/MLk+yuIYSeIrTjodefIE4ks5CU8nXo1C/NMviZ9m/xhRy+5IiWhz9K6mdW
+         s4vx1tcOHicZM+yUuWZZf8igiMpGr97ZxulT0v4t7T/g2ZD7KzePv4FLLYqGpZbttVSb
+         2KDmuEapwZMjJo/pTeBvSYr4FPPQCzqn9kkkbOLKCYZmiL8k8lWcGzx2gqJO6PvELGDl
+         ubpNSYfjr9dawaJ18WKbvZvPu976d5zRrC5HvewLDyhEERPuXscsacQ7/Y3UgELdmEZc
+         EtNBx3Yi9+ebViLoYdxVS0JviDa8NdlYjeSYjVr1UoQkY8sCncqAcaYCGPswW1wjvMo7
+         e08g==
+X-Gm-Message-State: AOAM530Vjhnu8wAD1K4aSzmK0CT4Fr5p3GXZgeuLOqY4fOSiQmiDeFFk
+        v2Fm/Qs90LnronFmA5TkLwvUNj6gb+cBIsl9SgCuCg==
+X-Google-Smtp-Source: ABdhPJw/Xio5KUM0x4cOAc1XscTNHCzOk+Tjxz6AHiMkra7KNMNEZFgsa1SeplbKgvHF1o7SWkqEATsCuWcMjnxdgeA=
+X-Received: by 2002:a2e:9903:: with SMTP id v3mr17420283lji.383.1629500119004;
+ Fri, 20 Aug 2021 15:55:19 -0700 (PDT)
+MIME-Version: 1.0
+References: <20210813203504.2742757-1-dmatlack@google.com> <20210813203504.2742757-4-dmatlack@google.com>
+ <YR6Iyc3PNqUey7LM@google.com>
+In-Reply-To: <YR6Iyc3PNqUey7LM@google.com>
+From:   David Matlack <dmatlack@google.com>
+Date:   Fri, 20 Aug 2021 15:54:52 -0700
+Message-ID: <CALzav=crHjGo0fBg2=npaJyQSS9cvQ6b8nbU0W_4fX_ABC4O+Q@mail.gmail.com>
+Subject: Re: [RFC PATCH 3/6] KVM: x86/mmu: Pass the memslot around via struct kvm_page_fault
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        kvm list <kvm@vger.kernel.org>,
+        Ben Gardon <bgardon@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Jim Mattson <jmattson@google.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Revert the __NR_userfaultfd syscall fallback added for KVM selftests now
-that x86's unistd_{32,63}.h overrides are under uapi/ and thus not in
-KVM sefltests' search path, i.e. now that KVM gets x86 syscall numbers
-from the installed kernel headers.
+On Thu, Aug 19, 2021 at 9:37 AM Sean Christopherson <seanjc@google.com> wrote:
+>
+> On Fri, Aug 13, 2021, David Matlack wrote:
+> > diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> > index 3352312ab1c9..fb2c95e8df00 100644
+> > --- a/arch/x86/kvm/mmu/mmu.c
+> > +++ b/arch/x86/kvm/mmu/mmu.c
+> > @@ -2890,7 +2890,7 @@ int kvm_mmu_max_mapping_level(struct kvm *kvm,
+> >
+> >  void kvm_mmu_hugepage_adjust(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
+> >  {
+> > -     struct kvm_memory_slot *slot;
+> > +     struct kvm_memory_slot *slot = fault->slot;
+> >       kvm_pfn_t mask;
+> >
+> >       fault->huge_page_disallowed = fault->exec && fault->nx_huge_page_workaround_enabled;
+> > @@ -2901,8 +2901,7 @@ void kvm_mmu_hugepage_adjust(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault
+> >       if (is_error_noslot_pfn(fault->pfn) || kvm_is_reserved_pfn(fault->pfn))
+> >               return;
+> >
+> > -     slot = gfn_to_memslot_dirty_bitmap(vcpu, fault->gfn, true);
+> > -     if (!slot)
+> > +     if (kvm_slot_dirty_track_enabled(slot))
+>
+> This is unnecessarily obfuscated.
 
-No functional change intended.
+Ugh. It's pure luck too. I meant to check if the slot is null here.
 
-Cc: Ben Gardon <bgardon@google.com>
-Signed-off-by: Sean Christopherson <seanjc@google.com>
----
- tools/arch/x86/include/uapi/asm/unistd_64.h | 3 ---
- 1 file changed, 3 deletions(-)
+> It relies on the is_error_noslot_pfn() to
+> ensure fault->slot is valid, but the only reason that helper is used is because
+> it was the most efficient code when slot wasn't available.  IMO, this would be
+> better:
+>
+>         if (!slot || kvm_slot_dirty_track_enabled(slot))
+>                 return;
+>
+>         if (kvm_is_reserved_pfn(fault->pfn))
+>                 return;
 
-diff --git a/tools/arch/x86/include/uapi/asm/unistd_64.h b/tools/arch/x86/include/uapi/asm/unistd_64.h
-index 4205ed4158bf..cb52a3a8b8fc 100644
---- a/tools/arch/x86/include/uapi/asm/unistd_64.h
-+++ b/tools/arch/x86/include/uapi/asm/unistd_64.h
-@@ -1,7 +1,4 @@
- /* SPDX-License-Identifier: GPL-2.0 */
--#ifndef __NR_userfaultfd
--#define __NR_userfaultfd 282
--#endif
- #ifndef __NR_perf_event_open
- # define __NR_perf_event_open 298
- #endif
--- 
-2.33.0.rc2.250.ged5fa647cd-goog
+That looks reasonable to me. I can send a patch next week with this change.
 
+>
+> On a related topic, a good follow-up to this series would be to pass @fault into
+> the prefetch helpers, and modify the prefetch logic to re-use fault->slot and
+> refuse to prefetch across memslot boundaries.  That would eliminate all users of
+> gfn_to_memslot_dirty_bitmap() and allow us to drop that abomination.
