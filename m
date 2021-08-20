@@ -2,159 +2,75 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 20FAC3F26E1
-	for <lists+kvm@lfdr.de>; Fri, 20 Aug 2021 08:36:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6139D3F27FF
+	for <lists+kvm@lfdr.de>; Fri, 20 Aug 2021 09:58:31 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238560AbhHTGgf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 20 Aug 2021 02:36:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38338 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238406AbhHTGge (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 20 Aug 2021 02:36:34 -0400
-Received: from mail-qt1-x82b.google.com (mail-qt1-x82b.google.com [IPv6:2607:f8b0:4864:20::82b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6ECBEC061756
-        for <kvm@vger.kernel.org>; Thu, 19 Aug 2021 23:35:57 -0700 (PDT)
-Received: by mail-qt1-x82b.google.com with SMTP id d5so6708009qtd.3
-        for <kvm@vger.kernel.org>; Thu, 19 Aug 2021 23:35:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=x4BUx2XF2g+eANj8K3DiizaXKH8rES+7+IBJDMT/M84=;
-        b=fEKmCkmPW2WRSTH0UOBZIggTO3VzSvZceyA2rDxv0GHM/eIW9xyTtwRGG/IG/RrvHQ
-         RBDQ3PojrK85BTJLS06A3fsNsYc5EVQtSPEq9AzUDWDIvX6a0h16icO9BtnIDDmt3BP3
-         U/6YCDEnnYBoCiSP8ZOF5TFvwLEzE38eCQ2Srvh3Xtik7z8B+nPZUESn81VTYA1NWtyh
-         cf/Ps0dsmzJ3hwsXf1UUDYyOP13BVC5tGK59tTydrAvmHV+93tpyzOPdKT9yYT3UpP6a
-         Kq2TMZY1/YwVAivFFABqh2kp+D4Bvqecwmlhx2/MFzKwkba0wXFURlimYWn0vDLbsTIL
-         ALNw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=x4BUx2XF2g+eANj8K3DiizaXKH8rES+7+IBJDMT/M84=;
-        b=DBIX+CbQEJXo5rL+xyIXIfrpV3imC0bmZfwdRW/lkw+617IxyndcznQf18DQzaBnr+
-         vg9k8AFTb70fcoadK8zkevbjOvzwDUTt1PMqMn7iR6H4sJhosgnDRHQyrxVGHAK4AU4M
-         6a8iXxAhIVhUQjBeeUgXHZ8CK5ZJQ+te/fC956wuJVbf+/kVp1au08PNati2Lm/STfQl
-         JSg8jGVy72PHHnsgvhxT5GxbAbm8iH1sUP4cSAdKCWozPB6s3ShCJvLqn5WotP3WklOX
-         x39SLZd+PWaAkvOXPEEncECPQd3Ez7e4ir0POLmO3Kn+W5b16eE9ZpzegTg7vqg/kp2m
-         0gAA==
-X-Gm-Message-State: AOAM532/ZikdGPqHnqa7+AI2Z2vrtK/xR6WlXuvVy8F7VWHmgCWzthby
-        V/DyAX2dDnGDBfz3u79syzASKzABODYn8Kw6ShZ/2w==
-X-Google-Smtp-Source: ABdhPJzszjsxOcKw23gqj3JYe++tO8Il5Wrqncm/dBgLF58wQcrlK8qhJO/51V6bt9Fg98a0gcw497JTpdQHs5q+b14=
-X-Received: by 2002:ac8:7154:: with SMTP id h20mr16540010qtp.251.1629441356449;
- Thu, 19 Aug 2021 23:35:56 -0700 (PDT)
+        id S230481AbhHTH7F (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 20 Aug 2021 03:59:05 -0400
+Received: from mail.kernel.org ([198.145.29.99]:49586 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229780AbhHTH7F (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 20 Aug 2021 03:59:05 -0400
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 9F80861042;
+        Fri, 20 Aug 2021 07:58:27 +0000 (UTC)
+Received: from sofa.misterjones.org ([185.219.108.64] helo=hot-poop.lan)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94.2)
+        (envelope-from <maz@kernel.org>)
+        id 1mGzQ1-0068ip-K3; Fri, 20 Aug 2021 08:58:25 +0100
+From:   Marc Zyngier <maz@kernel.org>
+To:     kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, Marc Zyngier <maz@kernel.org>
+Cc:     James Morse <james.morse@arm.com>,
+        Andre Przywara <andre.przywara@arm.com>,
+        kernel-team@android.com, Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Raghavendra Rao Ananta <rananta@google.com>,
+        Ricardo Koller <ricarkol@google.com>,
+        Eric Auger <eric.auger@redhat.com>, stable@vger.kernel.org,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Oliver Upton <oupton@google.com>
+Subject: Re: [PATCH v2] KVM: arm64: vgic: Resample HW pending state on deactivation
+Date:   Fri, 20 Aug 2021 08:58:22 +0100
+Message-Id: <162944629227.1671663.6947098620852443792.b4-ty@kernel.org>
+X-Mailer: git-send-email 2.30.2
+In-Reply-To: <20210819180305.1670525-1-maz@kernel.org>
+References: <20210819180305.1670525-1-maz@kernel.org>
 MIME-Version: 1.0
-References: <20210819154910.1064090-1-pgonda@google.com> <20210819154910.1064090-2-pgonda@google.com>
- <CAA03e5Gh0kJYHP1R3F7uh6x83LBFPp=af2xt7q3epgg+8XW53g@mail.gmail.com>
- <CAMkAt6oJcW3MHP3fod9RnRHCEYp-whdEtBTyfuqgFgATKa=3Hg@mail.gmail.com> <YR7iD6kdTUpWwwRn@google.com>
-In-Reply-To: <YR7iD6kdTUpWwwRn@google.com>
-From:   Marc Orr <marcorr@google.com>
-Date:   Thu, 19 Aug 2021 23:35:45 -0700
-Message-ID: <CAA03e5FAXDVSwMAQO57gztYmB2K8K8fNrHwsX_N3Hbgwch8pBw@mail.gmail.com>
-Subject: Re: [PATCH 1/2 V4] KVM, SEV: Add support for SEV intra host migration
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Peter Gonda <pgonda@google.com>, kvm list <kvm@vger.kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        David Rientjes <rientjes@google.com>,
-        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
-        Brijesh Singh <brijesh.singh@amd.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        "H. Peter Anvin" <hpa@zytor.com>, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, maz@kernel.org, james.morse@arm.com, andre.przywara@arm.com, kernel-team@android.com, suzuki.poulose@arm.com, rananta@google.com, ricarkol@google.com, eric.auger@redhat.com, stable@vger.kernel.org, alexandru.elisei@arm.com, oupton@google.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Aug 19, 2021 at 3:58 PM Sean Christopherson <seanjc@google.com> wrote:
->
-> On Thu, Aug 19, 2021, Peter Gonda wrote:
-> > > >
-> > > > +static int svm_sev_lock_for_migration(struct kvm *kvm)
-> > > > +{
-> > > > +       struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
-> > > > +       int ret;
-> > > > +
-> > > > +       /*
-> > > > +        * Bail if this VM is already involved in a migration to avoid deadlock
-> > > > +        * between two VMs trying to migrate to/from each other.
-> > > > +        */
-> > > > +       spin_lock(&sev->migration_lock);
-> > > > +       if (sev->migration_in_progress)
-> > > > +               ret = -EBUSY;
-> > > > +       else {
-> > > > +               /*
-> > > > +                * Otherwise indicate VM is migrating and take the KVM lock.
-> > > > +                */
-> > > > +               sev->migration_in_progress = true;
-> > > > +               mutex_lock(&kvm->lock);
->
-> Deadlock aside, mutex_lock() can sleep, which is not allowed while holding a
-> spinlock, i.e. this patch does not work.  That's my suggestion did the crazy
-> dance of "acquiring" a flag.
->
-> What I don't know is why on earth I suggested a global spinlock, a simple atomic
-> should work, e.g.
->
->                 if (atomic_cmpxchg_acquire(&sev->migration_in_progress, 0, 1))
->                         return -EBUSY;
->
->                 mutex_lock(&kvm->lock);
->
-> and on the backend...
->
->                 mutex_unlock(&kvm->lock);
->
->                 atomic_set_release(&sev->migration_in_progress, 0);
->
-> > > > +               ret = 0;
-> > > > +       }
-> > > > +       spin_unlock(&sev->migration_lock);
-> > > > +
-> > > > +       return ret;
-> > > > +}
-> > > > +
-> > > > +static void svm_unlock_after_migration(struct kvm *kvm)
-> > > > +{
-> > > > +       struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
-> > > > +
-> > > > +       mutex_unlock(&kvm->lock);
-> > > > +       WRITE_ONCE(sev->migration_in_progress, false);
-> > > > +}
-> > > > +
-> > >
-> > > This entire locking scheme seems over-complicated to me. Can we simply
-> > > rely on `migration_lock` and get rid of `migration_in_progress`? I was
-> > > chatting about these patches with Peter, while he worked on this new
-> > > version. But he mentioned that this locking scheme had been suggested
-> > > by Sean in a previous review. Sean: what do you think? My rationale
-> > > was that this is called via a VM-level ioctl. So serializing the
-> > > entire code path on `migration_lock` seems fine. But maybe I'm missing
-> > > something?
-> >
-> >
-> > Marc I think that only having the spin lock could result in
-> > deadlocking. If userspace double migrated 2 VMs, A and B for
-> > discussion, A could grab VM_A.spin_lock then VM_A.kvm_mutex. Meanwhile
-> > B could grab VM_B.spin_lock and VM_B.kvm_mutex. Then A attempts to
-> > grab VM_B.spin_lock and we have a deadlock. If the same happens with
-> > the proposed scheme when A attempts to lock B, VM_B.spin_lock will be
-> > open but the bool will mark the VM under migration so A will unlock
-> > and bail. Sean originally proposed a global spin lock but I thought a
-> > per kvm_sev_info struct would also be safe.
->
-> Close.  The issue is taking kvm->lock from both VM_A and VM_B.  If userspace
-> double migrates we'll end up with lock ordering A->B and B-A, so we need a way
-> to guarantee one of those wins.  My proposed solution is to use a flag as a sort
-> of one-off "try lock" to detect a mean userspace.
+On Thu, 19 Aug 2021 19:03:05 +0100, Marc Zyngier wrote:
+> When a mapped level interrupt (a timer, for example) is deactivated
+> by the guest, the corresponding host interrupt is equally deactivated.
+> However, the fate of the pending state still needs to be dealt
+> with in SW.
+> 
+> This is specially true when the interrupt was in the active+pending
+> state in the virtual distributor at the point where the guest
+> was entered. On exit, the pending state is potentially stale
+> (the guest may have put the interrupt in a non-pending state).
+> 
+> [...]
 
-Got it now. Thanks to you both, for the explanation. By the way, just
-to make sure I completely follow, I assume that if a "double
-migration" occurs, then user space is mis-behaving -- correct? But
-presumably, we need to reason about how to respond to such
-mis-behavior so that buggy or malicious user-space code cannot stumble
-over/exploit this scenario?
+Applied to next, thanks!
+
+[1/1] KVM: arm64: vgic: Resample HW pending state on deactivation
+      commit: 3134cc8beb69d0db9de651081707c4651c011621
+
+Cheers,
+
+	M.
+-- 
+Without deviation from the norm, progress is not possible.
+
+
