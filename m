@@ -2,138 +2,95 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 026693F37D1
-	for <lists+kvm@lfdr.de>; Sat, 21 Aug 2021 02:43:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1391A3F37D6
+	for <lists+kvm@lfdr.de>; Sat, 21 Aug 2021 02:48:31 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234488AbhHUAnv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 20 Aug 2021 20:43:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34642 "EHLO
+        id S240612AbhHUAtH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 20 Aug 2021 20:49:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35786 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229783AbhHUAnu (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 20 Aug 2021 20:43:50 -0400
-Received: from mail-ej1-x629.google.com (mail-ej1-x629.google.com [IPv6:2a00:1450:4864:20::629])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 888BCC061575
-        for <kvm@vger.kernel.org>; Fri, 20 Aug 2021 17:43:11 -0700 (PDT)
-Received: by mail-ej1-x629.google.com with SMTP id mf2so4913518ejb.9
-        for <kvm@vger.kernel.org>; Fri, 20 Aug 2021 17:43:11 -0700 (PDT)
+        with ESMTP id S229783AbhHUAtG (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 20 Aug 2021 20:49:06 -0400
+Received: from mail-ed1-x52c.google.com (mail-ed1-x52c.google.com [IPv6:2a00:1450:4864:20::52c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1499EC061575
+        for <kvm@vger.kernel.org>; Fri, 20 Aug 2021 17:48:27 -0700 (PDT)
+Received: by mail-ed1-x52c.google.com with SMTP id n12so16391585edx.8
+        for <kvm@vger.kernel.org>; Fri, 20 Aug 2021 17:48:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=YCTjZi2TUDy4za21r2QAZ6XJ4IzDWNLkHU1IvKEb6Fs=;
-        b=qNb/3kJFYEiaUmQF++Fg+uXHAqZ+dAM7nLy9lXhj4BkrdJZx6R8m0OACFHrxVlFbga
-         qZwlHNS295iGDEzI2zgPtd2ciJRy/eVCju9dpJwJ0CpwiKc7k+UQlcH1zJn6cxWlPyZ1
-         XqKqbsGYoavUu1wga6WeiBK3NVj+co5TA9z2aYzLJx4E6U3HVP+8MiIJ9xqeZrBam71D
-         eFvAtN6JhboYLtD5zqkS3N5uPB60Glw25n7E9OEbVepoxiLYZHSgDOqESVln9/oD4Q1P
-         Nkan2n4sJOf7JHxMigKp3DOSgRYpj12l+8OaY//IWXk+xqohRQXS5sFagnjvZVRKAQEn
-         kLVg==
+         :cc;
+        bh=jKvFK3ZttTtS1RC7m96P6R+9n7wr5sGga2H63cHhoI4=;
+        b=ScM1wlquP52p4C6Re/rkgbfGv3Jxfo/qS5/3NUv9EiDFEYRzoYm/SBOFFN23M6xPiE
+         NFxNBye36eh7Vqip3BgytJmPo4HIsgcntzIlmcVHDTMTxGPsD4VCOiELEMyzYF6z604R
+         gBupBz+J2aflQbETMtE+BgCc+cImqwsupfRaO65HG95ieHs8tyeTuOErJlp+GtO6B/Id
+         3LHaOO6Y9V1Xpw39mowi32K6jqtIqG2hGAiwOVsvb2XlKNp5O/JOkfAsBP9OVdL6wilf
+         Xn96b18i3hgxoVEoFMBIlx2ypHZY1sLDGQ1Kg8BqH6Ol8HnylRF4SKyl0zkVGLvjP4Y8
+         UWRw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=YCTjZi2TUDy4za21r2QAZ6XJ4IzDWNLkHU1IvKEb6Fs=;
-        b=Agi4D8IfcHX6xLntQ1x1ua/4+1vtP/7jjquhdi87wUkzpaPqP+Dhzxm4gaH2ADgVW+
-         c5p9NExLDw7o26d69ZPYOs7gvQEXF9/yhOqctoB0/Vn/ARZKXdw26uo65luMbrE0sKEy
-         uIX68AJoySJaIDtIkN95uzgzJz5gukgypAKeZ/TrY6hsMhlPFDVWBMn2H746LlUQvXXV
-         qypjEAOZFF1rmIf2XnGxCmOzKJiyE+Le5mzY4QGJKVx7FL1ueLBbr59TK7hg+urj7ANY
-         Wi90bTdZVq3cN2gEepRH/RE2EVoNt5dHd3CxUKwH4SM77oA5O6XMOKYpbT9yj59hGSti
-         5B0w==
-X-Gm-Message-State: AOAM531m1Q19YcMUWGwGIPWWsK+Mx9dJx/eVdf1cd587D9CHb1OrXbyF
-        SBglO2ectdB5VX5fyXH26CYzvqjkis0vSOIcjEIApg==
-X-Google-Smtp-Source: ABdhPJzoIf61TDjM9lb+sQmI9DrnNBfyDWvArnAqkUO1xQu6kmEcbCCWFgY9/BAnWdQ+UiSa/xajUbNTeDjiJgAi90o=
-X-Received: by 2002:a17:906:3542:: with SMTP id s2mr24515564eja.379.1629506589763;
- Fri, 20 Aug 2021 17:43:09 -0700 (PDT)
+         :message-id:subject:to:cc;
+        bh=jKvFK3ZttTtS1RC7m96P6R+9n7wr5sGga2H63cHhoI4=;
+        b=HI+q8etINwQDGoEj8Iukks38zZIHKD1KrX1VOkCnG/Npgip9WhtUWm0xMZ0CuPoI52
+         NvCKz+dvC1heHCXmt6HTUQrGwvmnbGVeOr28CFCROGzMc48/t2c9P4EzgWbOrp71Ht4m
+         5w1zc0Jt8r68W8vLdqAgNrjGsar6hBlTUkNZ7gk63kfk7wEQVkKj259zG+lqpCvN1vjH
+         NlK0tgLBi5mrDli77kQlW2dTk1XWKBz0WgeMt5+kEm2ZH7QJTAgtTDdpDOG3BIXPhNX+
+         i4ZWZXdhAh2fhLeerqUFAh15nwNUKHgaves6ZMs6Pp6sepblW9pSrBUBypgI9PkhK5x5
+         9IYg==
+X-Gm-Message-State: AOAM532zHT6ze1/mfZbysQ929DP021Lrv1/OG43eGXjGisPwStreG1iw
+        m/+6+OdkdU5Crbe3VwEFXTNogF/9gHRyoF6AMi752A==
+X-Google-Smtp-Source: ABdhPJzSDSu+IJe0CWe5H+zMpYM8uy/2uT8qY2aeIBgQALywqd5X6l/Zkk9lmNb3sxxTmT4YiD925ztie9ShG2vZF94=
+X-Received: by 2002:a05:6402:1014:: with SMTP id c20mr22960177edu.71.1629506905443;
+ Fri, 20 Aug 2021 17:48:25 -0700 (PDT)
 MIME-Version: 1.0
-References: <20210819113400.26516-1-varad.gautam@suse.com> <YSBCSjJKvvowFbyb@google.com>
-In-Reply-To: <YSBCSjJKvvowFbyb@google.com>
+References: <20210818000905.1111226-1-zixuanwang@google.com>
+ <20210818000905.1111226-15-zixuanwang@google.com> <YSA/sYhGgMU72tn+@google.com>
+In-Reply-To: <YSA/sYhGgMU72tn+@google.com>
 From:   Zixuan Wang <zixuanwang@google.com>
-Date:   Fri, 20 Aug 2021 17:42:57 -0700
-Message-ID: <CAFVYft099UxddW_BRv7sQCGhtwwo-id=4YWQTUKDpaU-Oad2ng@mail.gmail.com>
-Subject: Re: [kvm-unit-tests PATCH v2 0/6] Initial x86_64 UEFI support
+Date:   Fri, 20 Aug 2021 17:47:48 -0700
+Message-ID: <CAFVYft0XjHOX1yMh_B1DuC5MHUp0UmLHYoZue8qzmvaFrF6AzA@mail.gmail.com>
+Subject: Re: [kvm-unit-tests RFC 14/16] x86 AMD SEV-ES: Copy UEFI #VC IDT entry
 To:     Sean Christopherson <seanjc@google.com>
-Cc:     Varad Gautam <varadgautam@gmail.com>,
-        Nadav Amit <nadav.amit@gmail.com>,
-        Marc Orr <marcorr@google.com>, Joerg Roedel <jroedel@suse.de>,
-        kvm list <kvm@vger.kernel.org>,
-        Linux Virtualization <virtualization@lists.linux-foundation.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Andrew Jones <drjones@redhat.com>, bp@suse.de,
-        Thomas.Lendacky@amd.com, brijesh.singh@amd.com,
-        Hyunwook Baek <baekhw@google.com>,
-        Erdem Aktas <erdemaktas@google.com>,
-        Tom Roeder <tmroeder@google.com>,
-        Varad Gautam <varad.gautam@suse.com>
+Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, drjones@redhat.com,
+        marcorr@google.com, baekhw@google.com, tmroeder@google.com,
+        erdemaktas@google.com, rientjes@google.com, brijesh.singh@amd.com,
+        Thomas.Lendacky@amd.com, varad.gautam@suse.com, jroedel@suse.de,
+        bp@suse.de
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Aug 20, 2021 at 5:01 PM Sean Christopherson <seanjc@google.com> wro=
-te:
+> On Fri, Aug 20, 2021 at 4:50 PM Sean Christopherson <seanjc@google.com> wrote:
+> > Signed-off-by: Zixuan Wang <zixuanwang@google.com>
+> > ---
+> >  lib/x86/amd_sev.c | 10 ++++++++++
+> >  lib/x86/amd_sev.h |  5 +++++
+> >  2 files changed, 15 insertions(+)
+> >
+> > diff --git a/lib/x86/amd_sev.c b/lib/x86/amd_sev.c
+> > index c2aebdf..04b6912 100644
+> > --- a/lib/x86/amd_sev.c
+> > +++ b/lib/x86/amd_sev.c
+> > @@ -46,11 +46,21 @@ EFI_STATUS setup_amd_sev(void)
+> >
+> >  #ifdef CONFIG_AMD_SEV_ES
+> >  EFI_STATUS setup_amd_sev_es(void){
+> > +     struct descriptor_table_ptr idtr;
+> > +     idt_entry_t *idt;
+> > +
+> >       /* Test if SEV-ES is enabled */
+> >       if (!(rdmsr(MSR_SEV_STATUS) & SEV_ES_ENABLED_MASK)) {
+> >               return EFI_UNSUPPORTED;
+> >       }
+> >
+> > +     /* Copy UEFI's #VC IDT entry, so KVM-Unit-Tests can reuse it and does
 >
-> On Thu, Aug 19, 2021, Varad Gautam wrote:
-> > This series brings EFI support to kvm-unit-tests on x86_64.
-> >
-> > EFI support works by changing the test entrypoint to a stub entry
-> > point for the EFI loader to jump to in long mode, where the test binary
-> > exits EFI boot services, performs the remaining CPU bootstrapping,
-> > and then calls the testcase main().
-> >
-> > Since the EFI loader only understands PE objects, the first commit
-> > introduces a `configure --efi` mode which builds each test as a shared
-> > lib. This shared lib is repackaged into a PE via objdump.
-> >
-> > Commit 2-4 take a trip from the asm entrypoint to C to exit EFI and
-> > relocate ELF .dynamic contents.
-> >
-> > Commit 5 adds post-EFI long mode x86_64 setup and calls the testcase.
-> >
-> > Commit 6 from Zixuan [1] fixes up some testcases with non-PIC inline
-> > asm stubs which allows building these as PIC.
-> >
-> > Changes in v2:
-> > - Add Zixuan's patch to enable more testcases.
-> > - Fix TSS setup in cstart64.S for CONFIG_EFI.
-> >
-> > [1]: https://lore.kernel.org/r/20210818000905.1111226-10-zixuanwang@goo=
-gle.com/
-> > git tree: https://github.com/varadgautam/kvm-unit-tests/tree/efi-stub-v=
-2
-> >
-> > Varad Gautam (5):
-> >   x86: Build tests as PE objects for the EFI loader
-> >   x86: Call efi_main from _efi_pe_entry
-> >   x86: efi_main: Get EFI memory map and exit boot services
-> >   x86: efi_main: Self-relocate ELF .dynamic addresses
-> >   cstart64.S: x86_64 bootstrapping after exiting EFI
+> Nit, multiline comments should have a leading bare /*, i.e.
 >
-> Zixuan and Varad, are your two series complimentary or do they conflict? =
- E.g.
-> can Zixuan's series be applied on top with little-to-no change to Varad's=
- patches,
-> or are both series trying to do the same things in different ways?
->
-> And if they conflict, are the conflicts largely superficial, or are there
-> fundamental differences in how the problems are being solved?
->
-> Thanks!
+>         /*
+>          * Copy ....
+>          * not have to ...
 
-I=E2=80=99m currently building my patches on top of Varad=E2=80=99s. This d=
-oes not
-require too many changes to my patches: I just need to (1) replace the
-GNU-EFI function calls with Varad=E2=80=99s approach; (2) copy more
-EFI-related definitions from Linux to implement several additional
-UEFI service calls, e.g. a reset_system() call to shutdown the guest
-VM; and (3) remove some duplicated code from Varad=E2=80=99s patches, e.g. =
-I
-remove Varad=E2=80=99s modifications in x86/cstart64.S because I implement
-similar setup code in lib/x86/setup.c.
-
-This migration affects only the first part of my patch series, and I=E2=80=
-=99m
-currently working on it. Hopefully I can send out the second version
-where I take Varad=E2=80=99s patches as the foundation of mine.
-
-Regards,
-Zixuan
+Thanks for pointing this out, I will fix this issue in the next version.
