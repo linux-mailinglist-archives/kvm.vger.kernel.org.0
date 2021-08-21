@@ -2,119 +2,82 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C01C13F3776
-	for <lists+kvm@lfdr.de>; Sat, 21 Aug 2021 02:01:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 832E53F3777
+	for <lists+kvm@lfdr.de>; Sat, 21 Aug 2021 02:05:10 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233364AbhHUACA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 20 Aug 2021 20:02:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53622 "EHLO
+        id S238124AbhHUAFp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 20 Aug 2021 20:05:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54432 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229529AbhHUAB7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 20 Aug 2021 20:01:59 -0400
-Received: from mail-pj1-x1035.google.com (mail-pj1-x1035.google.com [IPv6:2607:f8b0:4864:20::1035])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 38C11C061575
-        for <kvm@vger.kernel.org>; Fri, 20 Aug 2021 17:01:21 -0700 (PDT)
-Received: by mail-pj1-x1035.google.com with SMTP id oc2-20020a17090b1c0200b00179e56772d6so5064916pjb.4
-        for <kvm@vger.kernel.org>; Fri, 20 Aug 2021 17:01:21 -0700 (PDT)
+        with ESMTP id S231713AbhHUAFp (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 20 Aug 2021 20:05:45 -0400
+Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 760F9C061756
+        for <kvm@vger.kernel.org>; Fri, 20 Aug 2021 17:05:06 -0700 (PDT)
+Received: by mail-yb1-xb4a.google.com with SMTP id z2-20020a5b0b02000000b005982be23a34so4671655ybp.19
+        for <kvm@vger.kernel.org>; Fri, 20 Aug 2021 17:05:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=mRc8XPC5uWxIlThaxLzdA1idj/Rq74IpjJRy+C3iwoM=;
-        b=bfz4ROZ6LLFlWNA00f+eUgiocCenZJFHavOdFcjLE4H7uM1NznzUTYXM03Jkd+X0EV
-         6ihQtANFTxGEDJdHCtzWUWjODEIW/ZZoHVWVYwtfsHYwuDrN77b6oPJorUgWEohy+9pO
-         IhFpLOYWSEY5eaGuX9Fxu2Sercy5cJqmH94AAmGs3J2PyoSfzg8x9QAYWccz2gDCYmlX
-         h0WOEc6hOd5G3c6dIOsfF5xWBw5Ebq43V2rhhRtFHG+6o78GITjBw3ijvPlowTIFXz4S
-         Nwxn5gs0XlwwKESK3Ccj5F4AuZQXXBqfQpmtOcmU6Oj6wDCvdtPvA8NQSAC6pCvmpOpd
-         NqxA==
+        h=reply-to:date:message-id:mime-version:subject:from:to:cc;
+        bh=v5+oztcUWF1tsHkXWU5dtrULoyd6t4n/rFzGBM2+LiE=;
+        b=e+bb+TkiQMZJXlGX82szk2loy6RZejnh/9ul5hxji7BXLcGBs/qHQ2y3USTrrr3RLk
+         G4qD2UDaZpqeuGtqDo/XCtu1vog/i+aVVz8wOwFtwncWz+N78YghqvOOjPMeJ5NJ6a0C
+         VjK4ENTRg59Gb54HGfdyfZLyUsvNTLTwASucxsvnfc9EoZizmHOFouSyDryWXUtb7MaJ
+         PYhCG7qmP192KO63u60EgYoNukRDrMsB/ltXQVdgnPTj/vw/MLP/T91JpzXqDMDrbGV5
+         MFDdo+UVSz5IXVnSPx+G3CIma5sp+0yQ7nbMMhYLu5OvGUF+zG7FwUih5xFrZ15HjKBi
+         Q5eg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=mRc8XPC5uWxIlThaxLzdA1idj/Rq74IpjJRy+C3iwoM=;
-        b=TkwEswTk9XArw521rXndDJWOe6sYDAuHDekrKyibuLGIEcpFD1OG3ArJazZlHG6KPt
-         Vk7/xr1o45tU0ACgzTwZo97sFsTMQN9h8um5qZD5JXR++jfeX0dH1nu7GvPHqDTCRfX5
-         8NX7TPEX96k8K6gTNk/nhvLfwpifQ8Ao0CRYr5sKII6iFQQo9NIhHrUil9KoPVHeODz3
-         voOw9aaKStkDmOFGCz5JxdQvX5P0PN6ycRGxVD/T22ab7qtKMDJyo4ChGPaCGUmaI+0V
-         giI789j1d2VMmMOhyvl742IJB1Gn6U3hiPoKCxUNdM43iq3zThkJlCguqeIiBruGfVoJ
-         BPDQ==
-X-Gm-Message-State: AOAM5318/eROHqiJhKv1XAz7cKHtU2O/crIKZo1hXZJa/w4MOO/eEQS5
-        JqiEAd88gmiDhrVgjunVQhsqZQ==
-X-Google-Smtp-Source: ABdhPJxbI0sA3/UIUm29t0FkXc+C4RPgdNWi//8mqNoFsvYCWpdAJXuumfEnAa7JBmd/1OHG505qOg==
-X-Received: by 2002:a17:902:8685:b0:12d:7f02:f7a6 with SMTP id g5-20020a170902868500b0012d7f02f7a6mr18475177plo.49.1629504080481;
-        Fri, 20 Aug 2021 17:01:20 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id o1sm8131215pfd.129.2021.08.20.17.01.19
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 20 Aug 2021 17:01:20 -0700 (PDT)
-Date:   Sat, 21 Aug 2021 00:01:14 +0000
+        h=x-gm-message-state:reply-to:date:message-id:mime-version:subject
+         :from:to:cc;
+        bh=v5+oztcUWF1tsHkXWU5dtrULoyd6t4n/rFzGBM2+LiE=;
+        b=jXzVZrQ24EXSmJMBNgZQaY+YSxPUFnE0K/A6FOVJYejpAWb8CNEF2ZtOyFRTdJ5s8I
+         V9PXegsJtTPGQXz/ha7FET4Gk2DbD4MmDxemSivT2wVdXi12aBH4Av7gDHr57dRDaZRI
+         3vJikUaQQNPyt3YYQqQnEt1v4+/cJ89CP0TxBWfqIzgeDUBVhqT0U2VPuOijiAW81ShD
+         jHYH8DcaSHY+uFEWhW6RnynilYNaW749MkUH2nfV6Bcx/MLm6rvD/9C5k7WSKZSVagol
+         Zs3ROTVjKGg/T6zA7e7d6rtTiYGcT805d2BNGDTo4tu/QC+3tbDJGjNNNVE7nUynm0Y8
+         +n3A==
+X-Gm-Message-State: AOAM530yp1HjMx1zXDmb0V1ta7yf6279AaT6j3VGpIPe1bMEPlmZF3D9
+        OM2+KSw4QGcEFl3yu7+2k0FKBd3Lhx0=
+X-Google-Smtp-Source: ABdhPJw6qyZ/x0/x8bWL4yd+NvmJ6KamcS8WpBb1Ezie6D9yRM/YBI+Kr7Dfm9WJxC8UO8GuCupKMqxWjro=
+X-Received: from seanjc798194.pdx.corp.google.com ([2620:15c:90:200:f11d:a281:af9b:5de6])
+ (user=seanjc job=sendgmr) by 2002:a25:3625:: with SMTP id d37mr31728766yba.140.1629504305587;
+ Fri, 20 Aug 2021 17:05:05 -0700 (PDT)
+Reply-To: Sean Christopherson <seanjc@google.com>
+Date:   Fri, 20 Aug 2021 17:04:59 -0700
+Message-Id: <20210821000501.375978-1-seanjc@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.33.0.rc2.250.ged5fa647cd-goog
+Subject: [PATCH 0/2] VM: Fix a benign race in kicking vCPUs
 From:   Sean Christopherson <seanjc@google.com>
-To:     Varad Gautam <varadgautam@gmail.com>
-Cc:     Zixuan Wang <zixuanwang@google.com>,
-        Nadav Amit <nadav.amit@gmail.com>,
-        Marc Orr <marcorr@google.com>, Joerg Roedel <jroedel@suse.de>,
-        kvm list <kvm@vger.kernel.org>,
-        Linux Virtualization <virtualization@lists.linux-foundation.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Andrew Jones <drjones@redhat.com>, bp@suse.de,
-        Thomas.Lendacky@amd.com, brijesh.singh@amd.com,
-        Hyunwook Baek <baekhw@google.com>,
-        Erdem Aktas <erdemaktas@google.com>,
-        Tom Roeder <tmroeder@google.com>,
-        Varad Gautam <varad.gautam@suse.com>
-Subject: Re: [kvm-unit-tests PATCH v2 0/6] Initial x86_64 UEFI support
-Message-ID: <YSBCSjJKvvowFbyb@google.com>
-References: <20210819113400.26516-1-varad.gautam@suse.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210819113400.26516-1-varad.gautam@suse.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Venkatesh Srinivas <venkateshs@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Sean Christopherson <seanjc@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Aug 19, 2021, Varad Gautam wrote:
-> This series brings EFI support to kvm-unit-tests on x86_64.
-> 
-> EFI support works by changing the test entrypoint to a stub entry
-> point for the EFI loader to jump to in long mode, where the test binary
-> exits EFI boot services, performs the remaining CPU bootstrapping,
-> and then calls the testcase main().
-> 
-> Since the EFI loader only understands PE objects, the first commit
-> introduces a `configure --efi` mode which builds each test as a shared
-> lib. This shared lib is repackaged into a PE via objdump.
-> 
-> Commit 2-4 take a trip from the asm entrypoint to C to exit EFI and
-> relocate ELF .dynamic contents.
-> 
-> Commit 5 adds post-EFI long mode x86_64 setup and calls the testcase.
-> 
-> Commit 6 from Zixuan [1] fixes up some testcases with non-PIC inline
-> asm stubs which allows building these as PIC.
-> 
-> Changes in v2:
-> - Add Zixuan's patch to enable more testcases.
-> - Fix TSS setup in cstart64.S for CONFIG_EFI.
-> 
-> [1]: https://lore.kernel.org/r/20210818000905.1111226-10-zixuanwang@google.com/
-> git tree: https://github.com/varadgautam/kvm-unit-tests/tree/efi-stub-v2
-> 
-> Varad Gautam (5):
->   x86: Build tests as PE objects for the EFI loader
->   x86: Call efi_main from _efi_pe_entry
->   x86: efi_main: Get EFI memory map and exit boot services
->   x86: efi_main: Self-relocate ELF .dynamic addresses
->   cstart64.S: x86_64 bootstrapping after exiting EFI
+Fix benign races when kicking vCPUs where the task doing the kicking can
+consume a stale vcpu->cpu.  The races are benign because of the
+impliciations of task migration with respect to interrupts and being in
+guest mode, but IMO they're worth fixing if only as an excuse to
+document the flows.
 
-Zixuan and Varad, are your two series complimentary or do they conflict?  E.g.
-can Zixuan's series be applied on top with little-to-no change to Varad's patches,
-or are both series trying to do the same things in different ways?
+Patch 2 is a tangentially related cleanup to prevent future me from
+trying to get rid of the NULL check on the cpumask parameters, which
+_looks_ like it can't ever be NULL, but has a subtle edge case due to the
+way CONFIG_CPUMASK_OFFSTACK=y handles cpumasks.
 
-And if they conflict, are the conflicts largely superficial, or are there
-fundamental differences in how the problems are being solved?
+Sean Christopherson (2):
+  KVM: Clean up benign vcpu->cpu data races when kicking vCPUs
+  KVM: Guard cpusmask NULL check with CONFIG_CPUMASK_OFFSTACK
 
-Thanks!
+ virt/kvm/kvm_main.c | 46 ++++++++++++++++++++++++++++++++++++---------
+ 1 file changed, 37 insertions(+), 9 deletions(-)
 
-> Zixuan Wang (1):
->   x86 UEFI: Convert x86 test cases to PIC
+-- 
+2.33.0.rc2.250.ged5fa647cd-goog
+
