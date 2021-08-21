@@ -2,163 +2,119 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8BFA13F3770
-	for <lists+kvm@lfdr.de>; Sat, 21 Aug 2021 01:50:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C01C13F3776
+	for <lists+kvm@lfdr.de>; Sat, 21 Aug 2021 02:01:29 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239025AbhHTXuy (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 20 Aug 2021 19:50:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51208 "EHLO
+        id S233364AbhHUACA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 20 Aug 2021 20:02:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53622 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233785AbhHTXuy (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 20 Aug 2021 19:50:54 -0400
-Received: from mail-pl1-x62b.google.com (mail-pl1-x62b.google.com [IPv6:2607:f8b0:4864:20::62b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A7C69C061575
-        for <kvm@vger.kernel.org>; Fri, 20 Aug 2021 16:50:15 -0700 (PDT)
-Received: by mail-pl1-x62b.google.com with SMTP id l11so6865437plk.6
-        for <kvm@vger.kernel.org>; Fri, 20 Aug 2021 16:50:15 -0700 (PDT)
+        with ESMTP id S229529AbhHUAB7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 20 Aug 2021 20:01:59 -0400
+Received: from mail-pj1-x1035.google.com (mail-pj1-x1035.google.com [IPv6:2607:f8b0:4864:20::1035])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 38C11C061575
+        for <kvm@vger.kernel.org>; Fri, 20 Aug 2021 17:01:21 -0700 (PDT)
+Received: by mail-pj1-x1035.google.com with SMTP id oc2-20020a17090b1c0200b00179e56772d6so5064916pjb.4
+        for <kvm@vger.kernel.org>; Fri, 20 Aug 2021 17:01:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=PlnsturUjPgqEunt42wgadCO1dYcV5yvVTufXahXHZM=;
-        b=ig8mBGB54P2iWRrMNXzGcF0wHSCu2C24e0Z+0PHN1eJioLpKYCRSYG5dj7NaydhmtN
-         Zm7pdyIUrFA3hnji8EpqUvo+Wbs7XOCAIRrNH+JuoxtDLKqpFBW4dSRF4W/kO5ZVFbzb
-         jrDbkwNquofeHVFm5cGmQS7XXZykM9AVwb7FrAoDWldAXwsjoIsQaw6x2SVs/XSLpoN2
-         3wVasQ+itwnLMqjgi7U092YMfFnSf18/PUhFB7cTB+jUM3V24y0NFDan7N1Jej60Lfwm
-         P2Ea5Yb1jXaB9xq7eLLPcf6gVQNBoouYzVsCD6UpYY6Ett1jCiO6/hZN9bFIMH8BfVcY
-         ht5g==
+        bh=mRc8XPC5uWxIlThaxLzdA1idj/Rq74IpjJRy+C3iwoM=;
+        b=bfz4ROZ6LLFlWNA00f+eUgiocCenZJFHavOdFcjLE4H7uM1NznzUTYXM03Jkd+X0EV
+         6ihQtANFTxGEDJdHCtzWUWjODEIW/ZZoHVWVYwtfsHYwuDrN77b6oPJorUgWEohy+9pO
+         IhFpLOYWSEY5eaGuX9Fxu2Sercy5cJqmH94AAmGs3J2PyoSfzg8x9QAYWccz2gDCYmlX
+         h0WOEc6hOd5G3c6dIOsfF5xWBw5Ebq43V2rhhRtFHG+6o78GITjBw3ijvPlowTIFXz4S
+         Nwxn5gs0XlwwKESK3Ccj5F4AuZQXXBqfQpmtOcmU6Oj6wDCvdtPvA8NQSAC6pCvmpOpd
+         NqxA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=PlnsturUjPgqEunt42wgadCO1dYcV5yvVTufXahXHZM=;
-        b=XFLnCalbkF/YCUXuaHo1UM5A8gQ9Z6UyOnRpp7ec2YCvDInX/q/dkbX7cSEK0pJlu4
-         eQihM6he6ixKoXqVcTUU5ZpPvxoPgMjOiAQRPcj3exru/XEC41pmi2mQSDyDcKpHIIkY
-         YNduXyT/44mLkdCXwEFQrg+ratKwp0pFuF5RVgHSqGR3/F4OqbQhbC+/MJbnNAYud4Vu
-         B3puUlW2InYZi2tFCkOsTqOXKV0t1a+apIt53x3Um3GmweYUahRE6e+1MACjFbmSIQaX
-         xaMWtd2oJVcGrZuS9afokN8XNK8E6nJLQcghH/MW5z69SKemm4zKuBglvNKO6rVJO2wk
-         UvuQ==
-X-Gm-Message-State: AOAM5319zltwDFuMiQSBpJGyuwNvl+sUJ/oDjGBATtzlc7+N/q8Aqr26
-        HhX+oQYQ1sPrriEDDp3UG6I0Nw==
-X-Google-Smtp-Source: ABdhPJzxThBX8laoFxDrJ+7mkcnExW3pjpXMmB+MUlfDlotHDf5Iii9uUAnBbBx7JWPLa4Iil/Z4vA==
-X-Received: by 2002:a17:90a:d814:: with SMTP id a20mr3816710pjv.130.1629503414969;
-        Fri, 20 Aug 2021 16:50:14 -0700 (PDT)
+        bh=mRc8XPC5uWxIlThaxLzdA1idj/Rq74IpjJRy+C3iwoM=;
+        b=TkwEswTk9XArw521rXndDJWOe6sYDAuHDekrKyibuLGIEcpFD1OG3ArJazZlHG6KPt
+         Vk7/xr1o45tU0ACgzTwZo97sFsTMQN9h8um5qZD5JXR++jfeX0dH1nu7GvPHqDTCRfX5
+         8NX7TPEX96k8K6gTNk/nhvLfwpifQ8Ao0CRYr5sKII6iFQQo9NIhHrUil9KoPVHeODz3
+         voOw9aaKStkDmOFGCz5JxdQvX5P0PN6ycRGxVD/T22ab7qtKMDJyo4ChGPaCGUmaI+0V
+         giI789j1d2VMmMOhyvl742IJB1Gn6U3hiPoKCxUNdM43iq3zThkJlCguqeIiBruGfVoJ
+         BPDQ==
+X-Gm-Message-State: AOAM5318/eROHqiJhKv1XAz7cKHtU2O/crIKZo1hXZJa/w4MOO/eEQS5
+        JqiEAd88gmiDhrVgjunVQhsqZQ==
+X-Google-Smtp-Source: ABdhPJxbI0sA3/UIUm29t0FkXc+C4RPgdNWi//8mqNoFsvYCWpdAJXuumfEnAa7JBmd/1OHG505qOg==
+X-Received: by 2002:a17:902:8685:b0:12d:7f02:f7a6 with SMTP id g5-20020a170902868500b0012d7f02f7a6mr18475177plo.49.1629504080481;
+        Fri, 20 Aug 2021 17:01:20 -0700 (PDT)
 Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id p10sm7812542pjv.39.2021.08.20.16.50.14
+        by smtp.gmail.com with ESMTPSA id o1sm8131215pfd.129.2021.08.20.17.01.19
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 20 Aug 2021 16:50:14 -0700 (PDT)
-Date:   Fri, 20 Aug 2021 23:50:09 +0000
+        Fri, 20 Aug 2021 17:01:20 -0700 (PDT)
+Date:   Sat, 21 Aug 2021 00:01:14 +0000
 From:   Sean Christopherson <seanjc@google.com>
-To:     Zixuan Wang <zixuanwang@google.com>
-Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, drjones@redhat.com,
-        marcorr@google.com, baekhw@google.com, tmroeder@google.com,
-        erdemaktas@google.com, rientjes@google.com, brijesh.singh@amd.com,
-        Thomas.Lendacky@amd.com, varad.gautam@suse.com, jroedel@suse.de,
-        bp@suse.de
-Subject: Re: [kvm-unit-tests RFC 14/16] x86 AMD SEV-ES: Copy UEFI #VC IDT
- entry
-Message-ID: <YSA/sYhGgMU72tn+@google.com>
-References: <20210818000905.1111226-1-zixuanwang@google.com>
- <20210818000905.1111226-15-zixuanwang@google.com>
+To:     Varad Gautam <varadgautam@gmail.com>
+Cc:     Zixuan Wang <zixuanwang@google.com>,
+        Nadav Amit <nadav.amit@gmail.com>,
+        Marc Orr <marcorr@google.com>, Joerg Roedel <jroedel@suse.de>,
+        kvm list <kvm@vger.kernel.org>,
+        Linux Virtualization <virtualization@lists.linux-foundation.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Andrew Jones <drjones@redhat.com>, bp@suse.de,
+        Thomas.Lendacky@amd.com, brijesh.singh@amd.com,
+        Hyunwook Baek <baekhw@google.com>,
+        Erdem Aktas <erdemaktas@google.com>,
+        Tom Roeder <tmroeder@google.com>,
+        Varad Gautam <varad.gautam@suse.com>
+Subject: Re: [kvm-unit-tests PATCH v2 0/6] Initial x86_64 UEFI support
+Message-ID: <YSBCSjJKvvowFbyb@google.com>
+References: <20210819113400.26516-1-varad.gautam@suse.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20210818000905.1111226-15-zixuanwang@google.com>
+In-Reply-To: <20210819113400.26516-1-varad.gautam@suse.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Aug 18, 2021, Zixuan Wang wrote:
-> AMD SEV-ES introduces a new #VC exception that handles the communication
-> between guest and host.  UEFI already implements a #VC handler so there
-> is no need to re-implement it in KVM-Unit-Tests. To reuse this #VC
-> handler, this commit reads UEFI's IDT, copy the #VC IDT entry into
-> KVM-Unit-Tests' IDT.
+On Thu, Aug 19, 2021, Varad Gautam wrote:
+> This series brings EFI support to kvm-unit-tests on x86_64.
 > 
-> In this commit, load_idt() can work and now guest crashes in
-> setup_page_table(), which will be fixed by follow-up commits.
-
-As a stop gap to get SEV testing of any kind enabled, I think piggybacking the
-vBIOS #VC handler is a great idea.  But long term, kvm-unit-tests absolutely
-needs to have its own #VC handler.
-
-In addition to the downsides Joerg pointed out[*], relying on an external #VC
-introduces the possibility of test failures that are tied to the vBIOS being
-used.  Such dependencies already exist to some extent, e.g. using a buggy QEMU or
-SeaBIOS could certainly introduce failures, but those components are far more
-mature and less likely to break in weird ways unique to a specific test.
-
-Another potential issue is that it's possible vBIOS will be enlightened to the
-point where it _never_ expects a #VC, e.g. does #VMGEXIT directly, and thus panics
-on any #VC instead of requesting the necessary emulation.
-
-Fixing the vBIOS image in the repo would mostly solve those problems, but it
-wouldn't solve the lack of flexibility for the #VC handler, and debugging a third
-party #VC handler would likely be far more difficult to debug when failures
-inevitably occur.
-
-So, if these shenanigans give us test coverage now instead of a few months from
-now, than I say go for it.  But, we need clear line of sight to a "native" #VC
-handler, confidence that it will actually get written in a timely manner, and an
-easily reverted set of commits to unwind all of the UEFI stuff.
-
-[*] https://lkml.kernel.org/r/YRuURERGp8CQ1jAX@suse.de
-
-> Signed-off-by: Zixuan Wang <zixuanwang@google.com>
-> ---
->  lib/x86/amd_sev.c | 10 ++++++++++
->  lib/x86/amd_sev.h |  5 +++++
->  2 files changed, 15 insertions(+)
+> EFI support works by changing the test entrypoint to a stub entry
+> point for the EFI loader to jump to in long mode, where the test binary
+> exits EFI boot services, performs the remaining CPU bootstrapping,
+> and then calls the testcase main().
 > 
-> diff --git a/lib/x86/amd_sev.c b/lib/x86/amd_sev.c
-> index c2aebdf..04b6912 100644
-> --- a/lib/x86/amd_sev.c
-> +++ b/lib/x86/amd_sev.c
-> @@ -46,11 +46,21 @@ EFI_STATUS setup_amd_sev(void)
->  
->  #ifdef CONFIG_AMD_SEV_ES
->  EFI_STATUS setup_amd_sev_es(void){
-> +	struct descriptor_table_ptr idtr;
-> +	idt_entry_t *idt;
-> +
->  	/* Test if SEV-ES is enabled */
->  	if (!(rdmsr(MSR_SEV_STATUS) & SEV_ES_ENABLED_MASK)) {
->  		return EFI_UNSUPPORTED;
->  	}
->  
-> +	/* Copy UEFI's #VC IDT entry, so KVM-Unit-Tests can reuse it and does
-
-Nit, multiline comments should have a leading bare /*, i.e.
-
-	/*
-	 * Copy ....
-	 * not have to ...
-
-> +	 * not have to re-implement a #VC handler
-> +	 */
-> +	sidt(&idtr);
-> +	idt = (idt_entry_t *)idtr.base;
-> +	boot_idt[SEV_ES_VC_HANDLER_VECTOR] = idt[SEV_ES_VC_HANDLER_VECTOR];
-> +
->  	return EFI_SUCCESS;
->  }
->  
-> diff --git a/lib/x86/amd_sev.h b/lib/x86/amd_sev.h
-> index 4d81cae..5ebd4a6 100644
-> --- a/lib/x86/amd_sev.h
-> +++ b/lib/x86/amd_sev.h
-> @@ -36,6 +36,11 @@
->  #define SEV_ENABLED_MASK    0b1
->  #define SEV_ES_ENABLED_MASK 0b10
->  
-> +/* AMD Programmer's Manual Volume 2
-> + *   - Section "#VC Exception"
-> + */
-> +#define SEV_ES_VC_HANDLER_VECTOR 29
-> +
->  EFI_STATUS setup_amd_sev(void);
->  #ifdef CONFIG_AMD_SEV_ES
->  EFI_STATUS setup_amd_sev_es(void);
-> -- 
-> 2.33.0.rc1.237.g0d66db33f3-goog
+> Since the EFI loader only understands PE objects, the first commit
+> introduces a `configure --efi` mode which builds each test as a shared
+> lib. This shared lib is repackaged into a PE via objdump.
 > 
+> Commit 2-4 take a trip from the asm entrypoint to C to exit EFI and
+> relocate ELF .dynamic contents.
+> 
+> Commit 5 adds post-EFI long mode x86_64 setup and calls the testcase.
+> 
+> Commit 6 from Zixuan [1] fixes up some testcases with non-PIC inline
+> asm stubs which allows building these as PIC.
+> 
+> Changes in v2:
+> - Add Zixuan's patch to enable more testcases.
+> - Fix TSS setup in cstart64.S for CONFIG_EFI.
+> 
+> [1]: https://lore.kernel.org/r/20210818000905.1111226-10-zixuanwang@google.com/
+> git tree: https://github.com/varadgautam/kvm-unit-tests/tree/efi-stub-v2
+> 
+> Varad Gautam (5):
+>   x86: Build tests as PE objects for the EFI loader
+>   x86: Call efi_main from _efi_pe_entry
+>   x86: efi_main: Get EFI memory map and exit boot services
+>   x86: efi_main: Self-relocate ELF .dynamic addresses
+>   cstart64.S: x86_64 bootstrapping after exiting EFI
+
+Zixuan and Varad, are your two series complimentary or do they conflict?  E.g.
+can Zixuan's series be applied on top with little-to-no change to Varad's patches,
+or are both series trying to do the same things in different ways?
+
+And if they conflict, are the conflicts largely superficial, or are there
+fundamental differences in how the problems are being solved?
+
+Thanks!
+
+> Zixuan Wang (1):
+>   x86 UEFI: Convert x86 test cases to PIC
