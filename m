@@ -2,83 +2,68 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C4A9B3F3A99
-	for <lists+kvm@lfdr.de>; Sat, 21 Aug 2021 14:36:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7263D3F3AB5
+	for <lists+kvm@lfdr.de>; Sat, 21 Aug 2021 14:54:04 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231806AbhHUMeY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 21 Aug 2021 08:34:24 -0400
-Received: from mx21.baidu.com ([220.181.3.85]:59778 "EHLO baidu.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S230042AbhHUMeX (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 21 Aug 2021 08:34:23 -0400
-Received: from BJHW-Mail-Ex12.internal.baidu.com (unknown [10.127.64.35])
-        by Forcepoint Email with ESMTPS id 006E2AF749E98B88988C;
-        Sat, 21 Aug 2021 20:33:41 +0800 (CST)
-Received: from BJHW-MAIL-EX27.internal.baidu.com (10.127.64.42) by
- BJHW-Mail-Ex12.internal.baidu.com (10.127.64.35) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
- 15.1.2308.14; Sat, 21 Aug 2021 20:33:41 +0800
-Received: from LAPTOP-UKSR4ENP.internal.baidu.com (172.31.62.17) by
- BJHW-MAIL-EX27.internal.baidu.com (10.127.64.42) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
- 15.1.2308.14; Sat, 21 Aug 2021 20:33:34 +0800
-From:   Cai Huoqing <caihuoqing@baidu.com>
-To:     <mst@redhat.com>, <jasowang@redhat.com>, <pbonzini@redhat.com>,
-        <stefanha@redhat.com>
-CC:     <virtualization@lists.linux-foundation.org>, <kvm@vger.kernel.org>,
-        "Cai Huoqing" <caihuoqing@baidu.com>
-Subject: [PATCH] vhost scsi: Convert to SPDX identifier
-Date:   Sat, 21 Aug 2021 20:33:20 +0800
-Message-ID: <20210821123320.734-1-caihuoqing@baidu.com>
-X-Mailer: git-send-email 2.32.0.windows.2
+        id S230189AbhHUMym (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 21 Aug 2021 08:54:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52730 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229722AbhHUMyl (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 21 Aug 2021 08:54:41 -0400
+Received: from mail-lj1-x231.google.com (mail-lj1-x231.google.com [IPv6:2a00:1450:4864:20::231])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A0951C061575
+        for <kvm@vger.kernel.org>; Sat, 21 Aug 2021 05:54:01 -0700 (PDT)
+Received: by mail-lj1-x231.google.com with SMTP id w4so20525027ljh.13
+        for <kvm@vger.kernel.org>; Sat, 21 Aug 2021 05:54:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:sender:from:date:message-id:subject:to;
+        bh=hzZXbpT/9+wDw3N6aqYgduBefhron0LmudcQy0UaXt8=;
+        b=IsL5QAB3XbRi190uW94K+bUefsijc48mYzLGqQo//VnOOdkbTR7ILbeY3z2BUu+YiD
+         K4KNQOSniIDR0+O3CCG387igKNwhmSVC9Iedrtdobu2+0flIYVGkDpnLrsYN1i45iQK/
+         r8cC/8kORIoDoyINVL/wyTC5vldYw3FeTsKgNel6qTyc+oe9qXQ4mdRDGz09DoWrH47W
+         uDaQ2+DVndqRbWcjzzYJfDpcLij3P6bijtXEPRdpi1M3NZKXZWTS5H81w1xRnA0RDpnD
+         Rw0n5jBKIti2d6CK6y62mUF3AjQizZZP6SYaNICyX+4CyXctoMUP6tuDSwNCkOcGuhsx
+         7Lig==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:sender:from:date:message-id:subject
+         :to;
+        bh=hzZXbpT/9+wDw3N6aqYgduBefhron0LmudcQy0UaXt8=;
+        b=MtGxvkNOMPMuNgavoxJ5WhpjiPx0E9KtZhLQHMsK1UUYg/iD5BAXpOtWnrQJacYbzp
+         DGtChdpSeJMdD2gARw82GvKdSSD69HkPMZJHLpIuA4x8vjT5WB8MX43azwBsNgtHkYt1
+         pcwVbqZbRL1Gq1PvNVDXEoMdNI0rBd/P/g1jDTZsIDDpPUxlRYrtxXj+lHquS45HXm5i
+         cww7qqaEAckRHLWRSckXzrKJQTQAzUOg8ckOOb5ZcNiiaSP+9bmeCcGoh3zLBLtQgY+I
+         YvrVW/ZzTPIzA6xJiKjF1bamEd5vhcG7b8NQR/ARymHRkfsqD+xsop0bOrsuvyd4DkQp
+         Np3Q==
+X-Gm-Message-State: AOAM5309RAYfHdIgPJyY1OMQvwMZvyCxdFs+mMc5Tp/R2HxIGeo0WpAI
+        Gl3murs57ESgP/OOHr0Fffcvu6XiGXZKoCJXEr8=
+X-Google-Smtp-Source: ABdhPJx3IEHYI6oKzURxuBUFiDle8RSKtc02O8NybHKG4GRd3y91YP0WM9EGUQyctdvn4c9q4YfcjsIFaRKYVMY2b7E=
+X-Received: by 2002:a2e:96c7:: with SMTP id d7mr9024266ljj.191.1629550438841;
+ Sat, 21 Aug 2021 05:53:58 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7BIT
-Content-Type:   text/plain; charset=US-ASCII
-X-Originating-IP: [172.31.62.17]
-X-ClientProxiedBy: BJHW-Mail-Ex11.internal.baidu.com (10.127.64.34) To
- BJHW-MAIL-EX27.internal.baidu.com (10.127.64.42)
-X-Baidu-BdMsfe-DateCheck: 1_BJHW-Mail-Ex12_2021-08-21 20:33:41:971
+Sender: brotherpaul637@gmail.com
+Received: by 2002:a2e:bd05:0:0:0:0:0 with HTTP; Sat, 21 Aug 2021 05:53:58
+ -0700 (PDT)
+From:   Aisha Al-Qaddafi <aisha.gdaffi24@gmail.com>
+Date:   Sat, 21 Aug 2021 13:53:58 +0100
+X-Google-Sender-Auth: bfzOZcapSCl_Ki6g_Bh9h1tc9yQ
+Message-ID: <CAJuXCoAnm28rLjOYaj4ijPn+sgyPZjMV_6Y-0DW6EdxyzH32xA@mail.gmail.com>
+Subject: My Dear Friend
+To:     undisclosed-recipients:;
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-use SPDX-License-Identifier instead of a verbose license text
-
-Signed-off-by: Cai Huoqing <caihuoqing@baidu.com>
----
- drivers/vhost/scsi.c | 14 +-------------
- 1 file changed, 1 insertion(+), 13 deletions(-)
-
-diff --git a/drivers/vhost/scsi.c b/drivers/vhost/scsi.c
-index 46f897e41217..532e204f2b1b 100644
---- a/drivers/vhost/scsi.c
-+++ b/drivers/vhost/scsi.c
-@@ -1,24 +1,12 @@
-+// SPDX-License-Identifier: GPL-2.0+
- /*******************************************************************************
-  * Vhost kernel TCM fabric driver for virtio SCSI initiators
-  *
-  * (C) Copyright 2010-2013 Datera, Inc.
-  * (C) Copyright 2010-2012 IBM Corp.
-  *
-- * Licensed to the Linux Foundation under the General Public License (GPL) version 2.
-- *
-  * Authors: Nicholas A. Bellinger <nab@daterainc.com>
-  *          Stefan Hajnoczi <stefanha@linux.vnet.ibm.com>
-- *
-- * This program is free software; you can redistribute it and/or modify
-- * it under the terms of the GNU General Public License as published by
-- * the Free Software Foundation; either version 2 of the License, or
-- * (at your option) any later version.
-- *
-- * This program is distributed in the hope that it will be useful,
-- * but WITHOUT ANY WARRANTY; without even the implied warranty of
-- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-- * GNU General Public License for more details.
-- *
-  ****************************************************************************/
- 
- #include <linux/module.h>
--- 
-2.25.1
-
+Assalamu alaikum,
+I came across your e-mail contact prior to a private search while in
+need of a trusted person. My name is Mrs. Aisha Gaddafi, a single
+Mother and a Widow with three Children. I am the only biological
+Daughter of late Libyan President (Late Colonel Muammar Gaddafi)I have
+a business Proposal for you worth $27.5Million dollars and I need
+mutual respect, trust, honesty, transparency, adequate support and
+assistance, Hope to hear from you for more details.
+Warmest regards
+Mrs Aisha Gaddafi
