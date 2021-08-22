@@ -2,71 +2,98 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3F73C3F3DBD
-	for <lists+kvm@lfdr.de>; Sun, 22 Aug 2021 06:37:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E182E3F3F37
+	for <lists+kvm@lfdr.de>; Sun, 22 Aug 2021 14:11:36 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231195AbhHVEhj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 22 Aug 2021 00:37:39 -0400
-Received: from mx21.baidu.com ([220.181.3.85]:50418 "EHLO baidu.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S229849AbhHVEhj (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 22 Aug 2021 00:37:39 -0400
-Received: from BJHW-Mail-Ex11.internal.baidu.com (unknown [10.127.64.34])
-        by Forcepoint Email with ESMTPS id BB843F65306EBEB7CDCC;
-        Sun, 22 Aug 2021 12:36:57 +0800 (CST)
-Received: from BJHW-MAIL-EX27.internal.baidu.com (10.127.64.42) by
- BJHW-Mail-Ex11.internal.baidu.com (10.127.64.34) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
- 15.1.2308.14; Sun, 22 Aug 2021 12:36:57 +0800
-Received: from LAPTOP-UKSR4ENP.internal.baidu.com (172.31.62.15) by
- BJHW-MAIL-EX27.internal.baidu.com (10.127.64.42) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
- 15.1.2308.14; Sun, 22 Aug 2021 12:36:57 +0800
-From:   Cai Huoqing <caihuoqing@baidu.com>
-To:     <eric.auger@redhat.com>, <alex.williamson@redhat.com>,
-        <cohuck@redhat.com>
-CC:     <kvm@vger.kernel.org>, Cai Huoqing <caihuoqing@baidu.com>
-Subject: [PATCH] vfio: platform: reset: Convert to SPDX identifier
-Date:   Sun, 22 Aug 2021 12:36:43 +0800
-Message-ID: <20210822043643.2040-1-caihuoqing@baidu.com>
-X-Mailer: git-send-email 2.32.0.windows.2
+        id S231468AbhHVMMP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 22 Aug 2021 08:12:15 -0400
+Received: from mail.kernel.org ([198.145.29.99]:51860 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229961AbhHVMML (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 22 Aug 2021 08:12:11 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPS id 63ECC61354
+        for <kvm@vger.kernel.org>; Sun, 22 Aug 2021 12:11:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1629634290;
+        bh=/UsrHwTZxwhF1qFbCYtV6D1yNL4w88tq4OpRQLqioHs=;
+        h=From:To:Subject:Date:In-Reply-To:References:From;
+        b=BH/qzpeY0KWJLuH+Hi29rAsL7WNzg/BoiT2jtMxb5+w2nkV/MAx/IFQGxzqcXlYDF
+         aKHJP+9kIfaG3ebXJymRtJUeLedGiTyqPEKxA10cdIxoqiNRZzZcOFt8osFhYGIRlC
+         A/BrKomhhMoOfP/p83a792SVkH8Tau2MdNSaNybja+HOl4Vp7yc1+nJm8bCqj8+U/c
+         me5OxoVorzipx66fi17S6CxpkFQF3lFlWHeBW9U+Q/nJAvzAMaRu7p1QTvfjHHZ4pl
+         Ub6Q3XSJ9eLxG0UkLNyp+iY62YdRuK/M5tW3O+iU77vph2AIDBC4eAk+glda++PHai
+         Y2eg2kS4apArw==
+Received: by pdx-korg-bugzilla-2.web.codeaurora.org (Postfix, from userid 48)
+        id 59D5F60F4D; Sun, 22 Aug 2021 12:11:30 +0000 (UTC)
+From:   bugzilla-daemon@bugzilla.kernel.org
+To:     kvm@vger.kernel.org
+Subject: [Bug 199727] CPU freezes in KVM guests during high IO load on host
+Date:   Sun, 22 Aug 2021 12:11:30 +0000
+X-Bugzilla-Reason: None
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
+X-Bugzilla-Product: Virtualization
+X-Bugzilla-Component: kvm
+X-Bugzilla-Version: unspecified
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: high
+X-Bugzilla-Who: devzero@web.de
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P1
+X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: 
+Message-ID: <bug-199727-28872-0XofQ63Wzh@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-199727-28872@https.bugzilla.kernel.org/>
+References: <bug-199727-28872@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7BIT
-Content-Type:   text/plain; charset=US-ASCII
-X-Originating-IP: [172.31.62.15]
-X-ClientProxiedBy: BC-Mail-Ex28.internal.baidu.com (172.31.51.22) To
- BJHW-MAIL-EX27.internal.baidu.com (10.127.64.42)
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-use SPDX-License-Identifier instead of a verbose license text
+https://bugzilla.kernel.org/show_bug.cgi?id=3D199727
 
-Signed-off-by: Cai Huoqing <caihuoqing@baidu.com>
----
- drivers/vfio/platform/reset/vfio_platform_bcmflexrm.c | 10 +---------
- 1 file changed, 1 insertion(+), 9 deletions(-)
+--- Comment #4 from Roland Kletzing (devzero@web.de) ---
+http://blog.vmsplice.net/2015/08/asynchronous-file-io-on-linux-plus-ca.html
 
-diff --git a/drivers/vfio/platform/reset/vfio_platform_bcmflexrm.c b/drivers/vfio/platform/reset/vfio_platform_bcmflexrm.c
-index 96064ef8f629..1131ebe4837d 100644
---- a/drivers/vfio/platform/reset/vfio_platform_bcmflexrm.c
-+++ b/drivers/vfio/platform/reset/vfio_platform_bcmflexrm.c
-@@ -1,14 +1,6 @@
-+// SPDX-License-Identifier: GPL-2.0
- /*
-  * Copyright (C) 2017 Broadcom
-- *
-- * This program is free software; you can redistribute it and/or
-- * modify it under the terms of the GNU General Public License as
-- * published by the Free Software Foundation version 2.
-- *
-- * This program is distributed "as is" WITHOUT ANY WARRANTY of any
-- * kind, whether express or implied; without even the implied warranty
-- * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-- * GNU General Public License for more details.
-  */
- 
- /*
--- 
-2.25.1
+"However, the io_submit(2) system call remains a treacherous ally in the qu=
+est
+for asynchronous file I/O. I don't think much has changed since 2009 in mak=
+ing
+Linux AIO the best asynchronous file I/O mechanism.
 
+The main problem is that io_submit(2) waits for I/O in some cases. It can
+block! This defeats the purpose of asynchronous file I/O because the caller=
+ is
+stuck until the system call completes. If called from a program's event loo=
+p,
+the program becomes unresponsive until the system call returns. But even if
+io_submit(2) is invoked from a dedicated thread where blocking doesn't matt=
+er,
+latency is introduced to any further I/O requests submitted in the same
+io_submit(2) call.
+
+Sources of blocking in io_submit(2) depend on the file system and block dev=
+ices
+being used. There are many different cases but in general they occur because
+file I/O code paths contain synchronous I/O (for metadata I/O or page cache
+write-out) as well as locks/waiting (for serializing operations). This is w=
+hy
+the io_submit(2) system call can be held up while submitting a request.
+
+This means io_submit(2) works best on fully-allocated files, volumes, or bl=
+ock
+devices. Anything else is likely to result in blocking behavior and cause p=
+oor
+performance."
+
+--=20
+You may reply to this email to add a comment.
+
+You are receiving this mail because:
+You are watching the assignee of the bug.=
