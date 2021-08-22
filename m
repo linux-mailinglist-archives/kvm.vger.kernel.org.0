@@ -2,57 +2,58 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6921C3F4005
-	for <lists+kvm@lfdr.de>; Sun, 22 Aug 2021 16:37:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B5E443F400C
+	for <lists+kvm@lfdr.de>; Sun, 22 Aug 2021 16:37:58 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234236AbhHVOiY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 22 Aug 2021 10:38:24 -0400
-Received: from mail-dm6nam10on2073.outbound.protection.outlook.com ([40.107.93.73]:29264
-        "EHLO NAM10-DM6-obe.outbound.protection.outlook.com"
+        id S233571AbhHVOi1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 22 Aug 2021 10:38:27 -0400
+Received: from mail-bn7nam10on2042.outbound.protection.outlook.com ([40.107.92.42]:5729
+        "EHLO NAM10-BN7-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S233976AbhHVOiV (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 22 Aug 2021 10:38:21 -0400
+        id S234497AbhHVOiZ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 22 Aug 2021 10:38:25 -0400
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=n31Q1F3tyk1s6CfnoxeA9UXkcxQFFgrKBZ3QkdGfqHgB6jicnY6O7oiLbxKsSJy6Zh6GdmicfFkUj0T1JFMqzNhpp81u+ysgHkYzrKeR3UjVCnFWiJBHlaUVSQFab24lrcBnyAewVA2Z/WGkRmh5HCxRKz4xwgNYLme6onALOsHP0wsnN2oxeRr3vedvJBR0F6hIHyjcu6gkNqHXP8bNBRbZz6aQascJSyHYFYgPF2FLN1c5VqNboCYSv49jFu+Wd6cXWgUDFTZ3oTjOdiLd5b4DC/0+2XaD/phLM+ZeKTJ9PItyzhve1dW5YMxqb4W9epa9X735dcasginMf3YjCg==
+ b=W4ZshAaHdBGYMv6RfpVB8oiknrZe6IXPB5KC8kXJmX6Xqphtf+AwylkN6GarxvScwZxh+cmZvnIeRl+0qv+nMZoscSupjgdXYIpvvShV85ra9WzMPDENFLRmOX/NfJLqahC2qC25zEVOiDgKcrv+2Xaqwb8tEK2K1OOpeDnDH9fGTuwK4w1YL+cjme6FgjGuKDmtfvbbESgRZsYl7NJw7ErOi2QTq7NFCzNpboanj8JBFiPo/+222ys1PsbZ0qvkFiS+0d4YWwJRCPNhGKsU2xGTQV3Mdl1M+t+SMNc6H9LQWxM5GxZ2LP2OtUCtSEnnQz2O36bEI5OFzwlvNu/Xtg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=c68CavaZQdzjNnkSiiX1CXVkFOE4ACJC6dBBsAKHYUc=;
- b=J7S+Zq+iX588P7CBLhWl2F/VDzLp1yHW2n11SS2QAioZzFL8GM62yfP6jM5icIzofxzF+IJbEHXShYgFqRkJ9zA7AvzLUk4k5bSVTdJFuHL7169kFIw1PwVKAz2sIlCkwCFwpQ7Jak1RSc2MOj3im0dgYfbiWfoyhW2TdyOrf6SSYw5pnllMaKDBJfvJ1Dd1fwW9nBjRLBiqorNDF64JJox3YkV5jNvwSYpv4Au6U3dcBqfh04w5tVQijgBbyl8swPKUMSPXWUUPCtc5/+ZaX3/phrxXRd33UO2xuQeyfTja/m81QJ/o1+iTn2nPwC64TU1GUhE4pX9wcMETMtZldg==
+ bh=hcoz+mtO8t1q9AsRo4d5AWcflMVS8b8syDqG8CJho7c=;
+ b=QhGkmr4hmdnVZX6ko9fSxc1D508ZHC5qSeVzfmSwVM+6u8Tmn0NssfqGDfvNWKeBpHUDJOSGRXmBR3FOqBwwyNimHUA7sJd9lhHjQ/2lZ/L/jl/x3Klh3RE6S1BGCcuXqlwhkgJvuHM0TgyIiFzMHkdd+NeeyOdu2Q6rrCh5NDo0i8FCN4P3BWvI82wgrEG7E2/NQUDBlcLpNOMB6h9jrpvUmYvAXKZEljkwy9S288Ih7oU8QbexSPwlPM9CadniFXDNiQ2TvWp2nfQOZE5jn1JbRS8pbi17wEkx6uSpJB5GpXqKhgZxWbxo53/IZo9uM/MNPXo8CwsAOLnSJ3tbmw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.112.35) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
+ 216.228.112.32) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
  dmarc=pass (p=quarantine sp=none pct=100) action=none header.from=nvidia.com;
  dkim=none (message not signed); arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=c68CavaZQdzjNnkSiiX1CXVkFOE4ACJC6dBBsAKHYUc=;
- b=chie4cxiSBpge5VZckjvC1+RQv+Kau8YEwFWO9P8DHskpe4QCIGjxTGKZG2tnjGklmHkZ9nNuFu0w3khODnLNY8oxAIRMlwfWJGBZvJlUd6Dru0UjdCIYAoYnzciBPLdHLkHwxLNov0FZK/mPkgDm/fJKXBmSp3CTgCnVsprRfaXAsKmLhttGhOgnZJCjYzV/bJXc3wzzogPIbUq8dRP4JNaRPBv5vLsF+DIFjbdcrB5yQhyArLOi2KqH6u0YbmfKxtyp7mecnnnKvpwZ6yyUPieIY2pP/HO25DVEym4VBGB7c3GdxcWnq8zCmcSObd+D9GsnWcRjlV8wCqDBXtfkw==
-Received: from DM6PR03CA0076.namprd03.prod.outlook.com (2603:10b6:5:333::9) by
- BL0PR12MB2468.namprd12.prod.outlook.com (2603:10b6:207:44::29) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.4436.19; Sun, 22 Aug 2021 14:37:38 +0000
-Received: from DM6NAM11FT050.eop-nam11.prod.protection.outlook.com
- (2603:10b6:5:333:cafe::38) by DM6PR03CA0076.outlook.office365.com
- (2603:10b6:5:333::9) with Microsoft SMTP Server (version=TLS1_2,
+ bh=hcoz+mtO8t1q9AsRo4d5AWcflMVS8b8syDqG8CJho7c=;
+ b=rKH/PYDkME3a24vYZyI6KWQAWvGHOl5Y430S08TBxbmP1HS+Y6bEmaSypzNH+a4TtSaACL97dW2TbSRB+lG6uVcOiOfAS651lw3+Nbn8RfUhcYUEj6/juugNNgFgm+SAyKzrqKiNI3d5EIaQIdMtxdDvf0ZryPa4+OyYpsiMv+qlUGa1cWV8sy1po0azilh8TzBM2/akltM7+rWqihIwPKnjBjnd1nc/Txl9Ssb97xob0eCj/0rcHk2mHpaPdS+eqf50j4CMIl0uGbWSBYnZQaBsgBZlUFdoRWri147O+IMWDIE8ztXlE9mJBKA2JewFMW9BLTn8noR5TNw+Wq4V9w==
+Received: from DM5PR07CA0067.namprd07.prod.outlook.com (2603:10b6:4:ad::32) by
+ BL0PR12MB4948.namprd12.prod.outlook.com (2603:10b6:208:1cc::20) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4436.19; Sun, 22 Aug
+ 2021 14:37:43 +0000
+Received: from DM6NAM11FT042.eop-nam11.prod.protection.outlook.com
+ (2603:10b6:4:ad:cafe::7e) by DM5PR07CA0067.outlook.office365.com
+ (2603:10b6:4:ad::32) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4436.19 via Frontend
- Transport; Sun, 22 Aug 2021 14:37:38 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.112.35)
+ Transport; Sun, 22 Aug 2021 14:37:43 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.112.32)
  smtp.mailfrom=nvidia.com; vger.kernel.org; dkim=none (message not signed)
  header.d=none;vger.kernel.org; dmarc=pass action=none header.from=nvidia.com;
 Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.112.35 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.112.35; helo=mail.nvidia.com;
-Received: from mail.nvidia.com (216.228.112.35) by
- DM6NAM11FT050.mail.protection.outlook.com (10.13.173.111) with Microsoft SMTP
+ 216.228.112.32 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.112.32; helo=mail.nvidia.com;
+Received: from mail.nvidia.com (216.228.112.32) by
+ DM6NAM11FT042.mail.protection.outlook.com (10.13.173.165) with Microsoft SMTP
  Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
- 15.20.4436.19 via Frontend Transport; Sun, 22 Aug 2021 14:37:38 +0000
-Received: from HQMAIL105.nvidia.com (172.20.187.12) by HQMAIL111.nvidia.com
- (172.20.187.18) with Microsoft SMTP Server (TLS) id 15.0.1497.2; Sun, 22 Aug
- 2021 14:37:37 +0000
+ 15.20.4436.19 via Frontend Transport; Sun, 22 Aug 2021 14:37:43 +0000
+Received: from HQMAIL105.nvidia.com (172.20.187.12) by HQMAIL109.nvidia.com
+ (172.20.187.15) with Microsoft SMTP Server (TLS) id 15.0.1497.2; Sun, 22 Aug
+ 2021 07:37:42 -0700
 Received: from vdi.nvidia.com (172.20.187.5) by mail.nvidia.com
  (172.20.187.12) with Microsoft SMTP Server id 15.0.1497.2 via Frontend
- Transport; Sun, 22 Aug 2021 14:37:34 +0000
+ Transport; Sun, 22 Aug 2021 14:37:38 +0000
 From:   Yishai Hadas <yishaih@nvidia.com>
 To:     <bhelgaas@google.com>, <corbet@lwn.net>,
         <alex.williamson@redhat.com>, <diana.craciun@oss.nxp.com>,
@@ -63,9 +64,9 @@ CC:     <linux-pci@vger.kernel.org>, <linux-doc@vger.kernel.org>,
         <linux-kbuild@vger.kernel.org>, <mgurtovoy@nvidia.com>,
         <jgg@nvidia.com>, <yishaih@nvidia.com>, <maorg@nvidia.com>,
         <leonro@nvidia.com>
-Subject: [PATCH V3 10/13] PCI / VFIO: Add 'override_only' support for VFIO PCI sub system
-Date:   Sun, 22 Aug 2021 17:35:59 +0300
-Message-ID: <20210822143602.153816-11-yishaih@nvidia.com>
+Subject: [PATCH V3 11/13] vfio: Use select for eventfd
+Date:   Sun, 22 Aug 2021 17:36:00 +0300
+Message-ID: <20210822143602.153816-12-yishaih@nvidia.com>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20210822143602.153816-1-yishaih@nvidia.com>
 References: <20210822143602.153816-1-yishaih@nvidia.com>
@@ -74,206 +75,96 @@ Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 5e724b3a-0f04-4184-46e4-08d9657a63b9
-X-MS-TrafficTypeDiagnostic: BL0PR12MB2468:
-X-Microsoft-Antispam-PRVS: <BL0PR12MB2468DE357028DB4674A3D2F3C3C39@BL0PR12MB2468.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:4941;
+X-MS-Office365-Filtering-Correlation-Id: b19185d1-f971-418f-76a7-08d9657a669c
+X-MS-TrafficTypeDiagnostic: BL0PR12MB4948:
+X-Microsoft-Antispam-PRVS: <BL0PR12MB4948C4268EF24E27BA8CFA77C3C39@BL0PR12MB4948.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:6430;
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 6znBPvUe3bkigUqMR/FZdW9FD1h4Hjtpl7DemHA/FJzlAQYect43eLvZBwfCGe1Qs5EadvLOz2M2frbkO3R6FK0o7yItm2DMI2vljwtoxlgmRdSmJMEgawFl6jq8we6/V5SOyaouJsF74zY5zQoYhqhe2y3o2stxg+UBd9k7Vk6muAizUIST6cNm8MtAj7wY0h6ZQoM/NMeKaaHONCi6GWPX+zbOWQ0UsSIM/tjMCvEZCpAReKIiiwVaLfoE4SlvUn976ekDxqcwBTsg9fIqsDOq7EqoDNlx2wWZA4ZxdYGRoIqIvsPezFNFgzzQmpxgAn662doWjgvNY3IHUM/uR+j8oUMzsOeUkq3MxoIpyGHuCU1KxbFaBh5cJT/aK2XafzIwIN1Mtikpx4+LrQfyVL3yNi7AXD6cbAjoldamjOrCsTUI1cYg5AJJFJNnh1JSl6zJBEF4LmyQyVsWiscn/2qze3vJEGBc1GXhNtokPwF5qQ/64ZbqYLwsSiihotxR+Ik2zx8lNdHin7A1HmnaDie2NxTF6C+JODVxz2uVTOnO+qP7ejnO7zEQQRC+rmN4NHzOfXrM5+mD8P7MV4oWpToa6kZxrFb9TIVEerulr3Kg0l4YkSLj617XJHKQf5tFC8iLlp5E21Lz16D/L1GI82BvmdkzSL8Ie7IX5xMxUlm7mylq1XaeaEs9TChDdQEIV/BTKz34Kxq4DMOOFs87mafrcVByEDGzKk5J9Wz4S8Q=
-X-Forefront-Antispam-Report: CIP:216.228.112.35;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:schybrid04.nvidia.com;CAT:NONE;SFS:(4636009)(376002)(396003)(39860400002)(346002)(136003)(46966006)(36840700001)(36860700001)(7636003)(107886003)(478600001)(6666004)(36906005)(316002)(36756003)(356005)(7696005)(2906002)(5660300002)(4326008)(82310400003)(47076005)(82740400003)(70206006)(70586007)(8676002)(186003)(426003)(2616005)(1076003)(86362001)(7416002)(26005)(54906003)(110136005)(336012)(8936002)(83380400001)(2101003);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam-Message-Info: 4zyemKeiOBeR7KR9Lx1nqTmQ1GE6tf9LFCm2tR6Q0Txbzffvh4brvIjtLNw4CRA56ZLrtxYCwQd62wmYssEAfKkNvBOPAhQPonQugjbdFUwyUq7zj0FGbi/IVfFWx0P4fk4g9+Ljpq4tZDoZbelHEa887eMtlj1HTlE1QbvVv5GAV3K00UPgQNbG7XrUAdjjy+6+Y1NNUZ7z+tt3sZNp+8JWWOnkkWjO6VF3pLDOQehrPI05y0/2b+NRWw+o0ipmW3FGstoAQAC++H2F3MsU0I01TJuS9u6JSMD3zCpC1oxaJmERet8w4NRyAj7Haz/jnJjIr3UeMvYBgFqooCdjXX+OqU2YbXmREKsQdVJNeFFb/LuQcPAT26a/7Qm2IDSFHp/b8SZjapePUCaIvAFlyF0k8s+QHP9ps1tGC7KHoiVJ5RlHu6vLfXy6BWbNBu0zNnVRMWoeVHepU/oo01pv3h+XFB/1v//Q2yxDZeQOmxbwSaYkdqPcyU1SeKBJWBPZkif6aiQpRrk9aYKfM63d6u8G5tJywx9chwvp4O9li1nEhpFTw+waF83uaU4rCxlFcGUDWIVFTdKbxy3H33IiI+4WUbUoLyG7ZA9u94j+mQu2KdKRUHJAfPrMBizysLJ0lZW770MJ+Ecq1TRDAygQztaaXD2PnQ+fuWHXaa0W5xbIqr+BqfslmC/mdRPXcftbzbLGEYzGPX1QF65W6pcPTo3KnHZ8dVtKG+0VualA9P8=
+X-Forefront-Antispam-Report: CIP:216.228.112.32;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:schybrid01.nvidia.com;CAT:NONE;SFS:(4636009)(346002)(136003)(39860400002)(376002)(396003)(36840700001)(46966006)(4326008)(5660300002)(8676002)(54906003)(2906002)(426003)(107886003)(1076003)(36860700001)(36756003)(83380400001)(8936002)(86362001)(7696005)(70586007)(2616005)(47076005)(82740400003)(478600001)(26005)(186003)(6666004)(70206006)(82310400003)(7416002)(336012)(110136005)(7636003)(356005)(316002)(2101003);DIR:OUT;SFP:1101;
 X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Aug 2021 14:37:38.2018
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Aug 2021 14:37:43.0501
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 5e724b3a-0f04-4184-46e4-08d9657a63b9
+X-MS-Exchange-CrossTenant-Network-Message-Id: b19185d1-f971-418f-76a7-08d9657a669c
 X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.112.35];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource: DM6NAM11FT050.eop-nam11.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.112.32];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource: DM6NAM11FT042.eop-nam11.prod.protection.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL0PR12MB2468
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL0PR12MB4948
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Max Gurtovoy <mgurtovoy@nvidia.com>
+From: Jason Gunthorpe <jgg@nvidia.com>
 
-Expose an 'override_only' helper macro (i.e.
-PCI_DRIVER_OVERRIDE_DEVICE_VFIO) for VFIO PCI sub system and add the
-required code to prefix its matching entries with "vfio_" in
-modules.alias file.
+If VFIO_VIRQFD is required then turn on eventfd automatically.
+The majority of kconfig users of the EVENTFD use select not depends on.
 
-It allows VFIO device drivers to include match entries in the
-modules.alias file produced by kbuild that are not used for normal
-driver autoprobing and module autoloading. Drivers using these match
-entries can be connected to the PCI device manually, by userspace, using
-the existing driver_override sysfs.
-
-For example the resulting modules.alias may have:
-
-  alias pci:v000015B3d00001021sv*sd*bc*sc*i* mlx5_core
-  alias vfio_pci:v000015B3d00001021sv*sd*bc*sc*i* mlx5_vfio_pci
-  alias vfio_pci:v*d*sv*sd*bc*sc*i* vfio_pci
-
-In this example mlx5_core and mlx5_vfio_pci match to the same PCI
-device. The kernel will autoload and autobind to mlx5_core but the
-kernel and udev mechanisms will ignore mlx5_vfio_pci.
-
-When userspace wants to change a device to the VFIO subsystem it can
-implement a generic algorithm:
-
-   1) Identify the sysfs path to the device:
-    /sys/devices/pci0000:00/0000:00:01.0/0000:01:00.0
-
-   2) Get the modalias string from the kernel:
-    $ cat /sys/bus/pci/devices/0000:01:00.0/modalias
-    pci:v000015B3d00001021sv000015B3sd00000001bc02sc00i00
-
-   3) Prefix it with vfio_:
-    vfio_pci:v000015B3d00001021sv000015B3sd00000001bc02sc00i00
-
-   4) Search modules.alias for the above string and select the entry that
-      has the fewest *'s:
-    alias vfio_pci:v000015B3d00001021sv*sd*bc*sc*i* mlx5_vfio_pci
-
-   5) modprobe the matched module name:
-    $ modprobe mlx5_vfio_pci
-
-   6) cat the matched module name to driver_override:
-    echo mlx5_vfio_pci > /sys/bus/pci/devices/0000:01:00.0/driver_override
-
-   7) unbind device from original module
-    echo 0000:01:00.0 > /sys/bus/pci/devices/0000:01:00.0/driver/unbind
-
-   8) probe PCI drivers (or explicitly bind to mlx5_vfio_pci)
-    echo 0000:01:00.0 > /sys/bus/pci/drivers_probe
-
-The algorithm is independent of bus type. In future the other buses with
-VFIO device drivers, like platform and ACPI, can use this algorithm as
-well.
-
-This patch is the infrastructure to provide the information in the
-modules.alias to userspace. Convert the only VFIO pci_driver which results
-in one new line in the modules.alias:
-
-  alias vfio_pci:v*d*sv*sd*bc*sc*i* vfio_pci
-
-Later series introduce additional HW specific VFIO PCI drivers, such as
-mlx5_vfio_pci.
-
-Signed-off-by: Max Gurtovoy <mgurtovoy@nvidia.com>
 Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
 Signed-off-by: Yishai Hadas <yishaih@nvidia.com>
 ---
- drivers/vfio/pci/vfio_pci.c       |  9 ++++++++-
- include/linux/mod_devicetable.h   |  4 ++++
- include/linux/pci.h               | 14 ++++++++++++++
- scripts/mod/devicetable-offsets.c |  1 +
- scripts/mod/file2alias.c          |  8 ++++++--
- 5 files changed, 33 insertions(+), 3 deletions(-)
+ drivers/vfio/Kconfig          | 3 ++-
+ drivers/vfio/fsl-mc/Kconfig   | 3 ++-
+ drivers/vfio/pci/Kconfig      | 2 +-
+ drivers/vfio/platform/Kconfig | 2 +-
+ 4 files changed, 6 insertions(+), 4 deletions(-)
 
-diff --git a/drivers/vfio/pci/vfio_pci.c b/drivers/vfio/pci/vfio_pci.c
-index 07edddf7e6ca..c52620ac5e70 100644
---- a/drivers/vfio/pci/vfio_pci.c
-+++ b/drivers/vfio/pci/vfio_pci.c
-@@ -180,9 +180,16 @@ static int vfio_pci_sriov_configure(struct pci_dev *pdev, int nr_virtfn)
- 	return vfio_pci_core_sriov_configure(pdev, nr_virtfn);
- }
+diff --git a/drivers/vfio/Kconfig b/drivers/vfio/Kconfig
+index e44bf736e2b2..698ca35b3f03 100644
+--- a/drivers/vfio/Kconfig
++++ b/drivers/vfio/Kconfig
+@@ -16,7 +16,8 @@ config VFIO_SPAPR_EEH
  
-+static const struct pci_device_id vfio_pci_table[] = {
-+	{ PCI_DRIVER_OVERRIDE_DEVICE_VFIO(PCI_ANY_ID, PCI_ANY_ID) }, /* match all by default */
-+	{}
-+};
-+
-+MODULE_DEVICE_TABLE(pci, vfio_pci_table);
-+
- static struct pci_driver vfio_pci_driver = {
- 	.name			= "vfio-pci",
--	.id_table		= NULL, /* only dynamic ids */
-+	.id_table		= vfio_pci_table,
- 	.probe			= vfio_pci_probe,
- 	.remove			= vfio_pci_remove,
- 	.sriov_configure	= vfio_pci_sriov_configure,
-diff --git a/include/linux/mod_devicetable.h b/include/linux/mod_devicetable.h
-index 2e3ba6d9ece0..f0325a172f87 100644
---- a/include/linux/mod_devicetable.h
-+++ b/include/linux/mod_devicetable.h
-@@ -16,6 +16,10 @@ typedef unsigned long kernel_ulong_t;
+ config VFIO_VIRQFD
+ 	tristate
+-	depends on VFIO && EVENTFD
++	depends on VFIO
++	select EVENTFD
+ 	default n
  
- #define PCI_ANY_ID (~0)
- 
-+enum {
-+	PCI_ID_F_VFIO_DRIVER_OVERRIDE	= 1 << 0,
-+};
-+
- /**
-  * struct pci_device_id - PCI device ID structure
-  * @vendor:		Vendor ID to match (or PCI_ANY_ID)
-diff --git a/include/linux/pci.h b/include/linux/pci.h
-index 0506b1a8c921..527a1dfd1d06 100644
---- a/include/linux/pci.h
-+++ b/include/linux/pci.h
-@@ -916,6 +916,20 @@ struct pci_driver {
- 	.vendor = (vend), .device = (dev), .subvendor = PCI_ANY_ID, \
- 	.subdevice = PCI_ANY_ID, .override_only = (driver_override)
- 
-+/**
-+ * PCI_DRIVER_OVERRIDE_DEVICE_VFIO - macro used to describe a VFIO
-+ *                                   "driver_override" PCI device.
-+ * @vend: the 16 bit PCI Vendor ID
-+ * @dev: the 16 bit PCI Device ID
-+ *
-+ * This macro is used to create a struct pci_device_id that matches a
-+ * specific device. The subvendor and subdevice fields will be set to
-+ * PCI_ANY_ID and the driver_override will be set to
-+ * PCI_ID_F_VFIO_DRIVER_OVERRIDE.
-+ */
-+#define PCI_DRIVER_OVERRIDE_DEVICE_VFIO(vend, dev) \
-+	PCI_DEVICE_DRIVER_OVERRIDE(vend, dev, PCI_ID_F_VFIO_DRIVER_OVERRIDE)
-+
- /**
-  * PCI_DEVICE_SUB - macro used to describe a specific PCI device with subsystem
-  * @vend: the 16 bit PCI Vendor ID
-diff --git a/scripts/mod/devicetable-offsets.c b/scripts/mod/devicetable-offsets.c
-index 9bb6c7edccc4..cc3625617a0e 100644
---- a/scripts/mod/devicetable-offsets.c
-+++ b/scripts/mod/devicetable-offsets.c
-@@ -42,6 +42,7 @@ int main(void)
- 	DEVID_FIELD(pci_device_id, subdevice);
- 	DEVID_FIELD(pci_device_id, class);
- 	DEVID_FIELD(pci_device_id, class_mask);
-+	DEVID_FIELD(pci_device_id, override_only);
- 
- 	DEVID(ccw_device_id);
- 	DEVID_FIELD(ccw_device_id, match_flags);
-diff --git a/scripts/mod/file2alias.c b/scripts/mod/file2alias.c
-index 7c97fa8e36bc..c3edbf73157e 100644
---- a/scripts/mod/file2alias.c
-+++ b/scripts/mod/file2alias.c
-@@ -426,7 +426,7 @@ static int do_ieee1394_entry(const char *filename,
- 	return 1;
- }
- 
--/* Looks like: pci:vNdNsvNsdNbcNscNiN. */
-+/* Looks like: pci:vNdNsvNsdNbcNscNiN or <prefix>_pci:vNdNsvNsdNbcNscNiN. */
- static int do_pci_entry(const char *filename,
- 			void *symval, char *alias)
- {
-@@ -440,8 +440,12 @@ static int do_pci_entry(const char *filename,
- 	DEF_FIELD(symval, pci_device_id, subdevice);
- 	DEF_FIELD(symval, pci_device_id, class);
- 	DEF_FIELD(symval, pci_device_id, class_mask);
-+	DEF_FIELD(symval, pci_device_id, override_only);
- 
--	strcpy(alias, "pci:");
-+	if (override_only & PCI_ID_F_VFIO_DRIVER_OVERRIDE)
-+		strcpy(alias, "vfio_pci:");
-+	else
-+		strcpy(alias, "pci:");
- 	ADD(alias, "v", vendor != PCI_ANY_ID, vendor);
- 	ADD(alias, "d", device != PCI_ANY_ID, device);
- 	ADD(alias, "sv", subvendor != PCI_ANY_ID, subvendor);
+ menuconfig VFIO
+diff --git a/drivers/vfio/fsl-mc/Kconfig b/drivers/vfio/fsl-mc/Kconfig
+index b1a527d6b6f2..6df66813c882 100644
+--- a/drivers/vfio/fsl-mc/Kconfig
++++ b/drivers/vfio/fsl-mc/Kconfig
+@@ -1,6 +1,7 @@
+ config VFIO_FSL_MC
+ 	tristate "VFIO support for QorIQ DPAA2 fsl-mc bus devices"
+-	depends on VFIO && FSL_MC_BUS && EVENTFD
++	depends on VFIO && FSL_MC_BUS
++	select EVENTFD
+ 	help
+ 	  Driver to enable support for the VFIO QorIQ DPAA2 fsl-mc
+ 	  (Management Complex) devices. This is required to passthrough
+diff --git a/drivers/vfio/pci/Kconfig b/drivers/vfio/pci/Kconfig
+index 5e2e1b9a9fd3..d208a95a2767 100644
+--- a/drivers/vfio/pci/Kconfig
++++ b/drivers/vfio/pci/Kconfig
+@@ -1,7 +1,7 @@
+ # SPDX-License-Identifier: GPL-2.0-only
+ config VFIO_PCI
+ 	tristate "VFIO support for PCI devices"
+-	depends on VFIO && PCI && EVENTFD
++	depends on VFIO && PCI
+ 	depends on MMU
+ 	select VFIO_VIRQFD
+ 	select IRQ_BYPASS_MANAGER
+diff --git a/drivers/vfio/platform/Kconfig b/drivers/vfio/platform/Kconfig
+index ab341108a0be..7f78eb96a5d5 100644
+--- a/drivers/vfio/platform/Kconfig
++++ b/drivers/vfio/platform/Kconfig
+@@ -1,7 +1,7 @@
+ # SPDX-License-Identifier: GPL-2.0-only
+ config VFIO_PLATFORM
+ 	tristate "VFIO support for platform devices"
+-	depends on VFIO && EVENTFD && (ARM || ARM64 || COMPILE_TEST)
++	depends on VFIO && (ARM || ARM64 || COMPILE_TEST)
+ 	select VFIO_VIRQFD
+ 	help
+ 	  Support for platform devices with VFIO. This is required to make
 -- 
 2.18.1
 
