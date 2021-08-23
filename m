@@ -2,285 +2,148 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 586F53F4F91
-	for <lists+kvm@lfdr.de>; Mon, 23 Aug 2021 19:35:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E4BC63F5017
+	for <lists+kvm@lfdr.de>; Mon, 23 Aug 2021 20:07:02 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231560AbhHWRfy (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 23 Aug 2021 13:35:54 -0400
-Received: from mail.skyhub.de ([5.9.137.197]:43398 "EHLO mail.skyhub.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S230506AbhHWRfx (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 23 Aug 2021 13:35:53 -0400
-Received: from zn.tnic (p200300ec2f07d9009c2198849783fa17.dip0.t-ipconnect.de [IPv6:2003:ec:2f07:d900:9c21:9884:9783:fa17])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 13E521EC0528;
-        Mon, 23 Aug 2021 19:35:05 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
-        t=1629740105;
+        id S230516AbhHWSHn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 23 Aug 2021 14:07:43 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:28220 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229627AbhHWSHm (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 23 Aug 2021 14:07:42 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1629742019;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
-        bh=TiZALGDSEWIiufJ1GIkWJr3HKfwJGDBp71m/QWnuYZs=;
-        b=YkDCDo7P/QnwB/Jrx31RJAjVBTsWcd5qj8YgpONQ1x8EbWo7ctcvcYu5P1dW9oMHqdpGhh
-        +gVuhIcDOlPUDx1WNR6Ag2yNNOvAhoxL8txwYh6ukepPYbWlhebXHKwOasCFnNGrWPNzVe
-        tkRQfz/Yuowsq26rHyGYFNk1KqwYa/c=
-Date:   Mon, 23 Aug 2021 19:35:46 +0200
-From:   Borislav Petkov <bp@alien8.de>
-To:     Brijesh Singh <brijesh.singh@amd.com>
-Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
-        linux-coco@lists.linux.dev, linux-mm@kvack.org,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
-        David Rientjes <rientjes@google.com>,
-        Dov Murik <dovmurik@linux.ibm.com>,
-        Tobin Feldman-Fitzthum <tobin@ibm.com>,
-        Michael Roth <michael.roth@amd.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        "Kirill A . Shutemov" <kirill@shutemov.name>,
-        Andi Kleen <ak@linux.intel.com>, tony.luck@intel.com,
-        marcorr@google.com, sathyanarayanan.kuppuswamy@linux.intel.com
-Subject: Re: [PATCH Part1 v5 13/38] x86/sev: Register GHCB memory when
- SEV-SNP is active
-Message-ID: <YSPcck0xAohlWHyd@zn.tnic>
-References: <20210820151933.22401-1-brijesh.singh@amd.com>
- <20210820151933.22401-14-brijesh.singh@amd.com>
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=+YwpCsG2ZbMV2oZWqFVoHV4FWr2+W3wXxfcqVtmyjw0=;
+        b=Pne8IjU75RtJ9dTzzVQXsGCryInqSagf5Cd67gBd3eGQQ4hWcz6CdjkZc4bRaWcm2HeUvq
+        1MG0iNd6whiSwdtJlfsciFHUoqk0TdqK4oCQKjQ2ewoguPksxtmBzcaLjjXYs4OCTWTyQE
+        cKvnKdumRn0YOdNCjq3zSQSFy777GJk=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-368-H03xb_XWPxSGYDyVwqnD_A-1; Mon, 23 Aug 2021 14:06:58 -0400
+X-MC-Unique: H03xb_XWPxSGYDyVwqnD_A-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6FD521008061;
+        Mon, 23 Aug 2021 18:06:56 +0000 (UTC)
+Received: from starship (unknown [10.35.206.50])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 7BC0810016FC;
+        Mon, 23 Aug 2021 18:06:52 +0000 (UTC)
+Message-ID: <9d982f1a5e3b57780445aadd08fcb5315f72cab9.camel@redhat.com>
+Subject: Re: [PATCH v3 0/3] SVM 5-level page table support
+From:   Maxim Levitsky <mlevitsk@redhat.com>
+To:     Wei Huang <wei.huang2@amd.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, vkuznets@redhat.com,
+        seanjc@google.com, wanpengli@tencent.com, jmattson@google.com,
+        joro@8bytes.org, tglx@linutronix.de, mingo@redhat.com,
+        bp@alien8.de, x86@kernel.org, hpa@zytor.com
+Date:   Mon, 23 Aug 2021 21:06:51 +0300
+In-Reply-To: <20210823151549.rkkrktvtpu6yapmd@weiserver.amd.com>
+References: <20210818165549.3771014-1-wei.huang2@amd.com>
+         <46a54a13-b934-263a-9539-6c922ceb70d3@redhat.com>
+         <c10faf24c11fc86074945ca535572a8c5926dcf9.camel@redhat.com>
+         <20210823151549.rkkrktvtpu6yapmd@weiserver.amd.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20210820151933.22401-14-brijesh.singh@amd.com>
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Aug 20, 2021 at 10:19:08AM -0500, Brijesh Singh wrote:
-> The SEV-SNP guest is required to perform GHCB GPA registration. This is
-> because the hypervisor may prefer that a guest use a consistent and/or
-> specific GPA for the GHCB associated with a vCPU. For more information,
-> see the GHCB specification section GHCB GPA Registration.
+On Mon, 2021-08-23 at 10:15 -0500, Wei Huang wrote:
+> On 08/23 12:20, Maxim Levitsky wrote:
+> > On Thu, 2021-08-19 at 18:43 +0200, Paolo Bonzini wrote:
+> > > On 18/08/21 18:55, Wei Huang wrote:
+> > > > This patch set adds 5-level page table support for AMD SVM. When the
+> > > > 5-level page table is enabled on host OS, the nested page table for guest
+> > > > VMs will use the same format as host OS (i.e. 5-level NPT). These patches
+> > > > were tested with various combination of different settings and test cases
+> > > > (nested/regular VMs, AMD64/i686 kernels, kvm-unit-tests, etc.)
+> > > > 
+> > > > v2->v3:
+> > > >   * Change the way of building root_hpa by following the existing flow (Sean)
+> > > > 
+> > > > v1->v2:
+> > > >   * Remove v1's arch-specific get_tdp_level() and add a new parameter,
+> > > >     tdp_forced_root_level, to allow forced TDP level (Sean)
+> > > >   * Add additional comment on tdp_root table chaining trick and change the
+> > > >     PML root table allocation code (Sean)
+> > > >   * Revise Patch 1's commit msg (Sean and Jim)
+> > > > 
+> > > > Thanks,
+> > > > -Wei
+> > > > 
+> > > > Wei Huang (3):
+> > > >    KVM: x86: Allow CPU to force vendor-specific TDP level
+> > > >    KVM: x86: Handle the case of 5-level shadow page table
+> > > >    KVM: SVM: Add 5-level page table support for SVM
+> > > > 
+> > > >   arch/x86/include/asm/kvm_host.h |  6 ++--
+> > > >   arch/x86/kvm/mmu/mmu.c          | 56 ++++++++++++++++++++++-----------
+> > > >   arch/x86/kvm/svm/svm.c          | 13 ++++----
+> > > >   arch/x86/kvm/vmx/vmx.c          |  3 +-
+> > > >   4 files changed, 49 insertions(+), 29 deletions(-)
+> > > > 
+> > > 
+> > > Queued, thanks, with NULL initializations according to Tom's review.
+> > > 
+> > > Paolo
+> > > 
+> > 
+> > Hi,
+> > Yesterday while testing my SMM patches, I noticed a minor issue: 
+> > It seems that this patchset breaks my 32 bit nested VM testcase with NPT=0.
+> > 
 > 
-> During the boot, init_ghcb() allocates a per-cpu GHCB page. On very first
-> VC exception, the exception handler switch to using the per-cpu GHCB page
-> allocated during the init_ghcb(). The GHCB page must be registered in
-> the current vcpu context.
+> Could you elaborate the detailed setup? NPT=0 for KVM running on L1?
+> Which VM is 32bit - L1 or L2?
+
+NPT=0, L1 and L2 were 32 bit PAE VMs. The test was done to see how well
+this setup deals with SMM mode entry/exits with SMM generated by L1 guest,
+and see if I have any PDPTR related shenanigans.
+
+I disabled the TDP MMU for now, although in this setup it won't be used anyway.
+
+BIOS was seabios, patched to use PAE itself during bootm, as well in SMM.
+(from https://mail.coreboot.org/pipermail/seabios/2015-September/009788.html, patch applied by hand)
+
+Failure was immediate without my hack - L1 died as soon as L2 was started due to an assert in
+this code.
+
+
+Best regards,
+	Maxim Levitsky
 > 
-> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
-> ---
->  arch/x86/kernel/sev-internal.h | 12 ++++++++++++
->  arch/x86/kernel/sev.c          | 28 ++++++++++++++++++++++++++++
->  2 files changed, 40 insertions(+)
->  create mode 100644 arch/x86/kernel/sev-internal.h
+> Thanks,
+> -Wei
 > 
-> diff --git a/arch/x86/kernel/sev-internal.h b/arch/x86/kernel/sev-internal.h
-> new file mode 100644
-> index 000000000000..0fb7324803b4
-> --- /dev/null
-> +++ b/arch/x86/kernel/sev-internal.h
-> @@ -0,0 +1,12 @@
-> +/* SPDX-License-Identifier: GPL-2.0-only */
-> +/*
-> + * Forward declarations for sev-shared.c
-> + *
-> + * Author: Brijesh Singh <brijesh.singh@amd.com>
-> + */
-> +
-> +#ifndef __X86_SEV_INTERNAL_H__
-> +
-> +static void snp_register_ghcb_early(unsigned long paddr);
-> +
-> +#endif	/* __X86_SEV_INTERNAL_H__ */
+> > This hack makes it work again for me (I don't yet use TDP mmu).
+> > 
+> > diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> > index caa3f9aee7d1..c25e0d40a620 100644
+> > --- a/arch/x86/kvm/mmu/mmu.c
+> > +++ b/arch/x86/kvm/mmu/mmu.c
+> > @@ -3562,7 +3562,7 @@ static int mmu_alloc_special_roots(struct kvm_vcpu *vcpu)
+> >             mmu->shadow_root_level < PT64_ROOT_4LEVEL)
+> >                 return 0;
+> >  
+> > -       if (mmu->pae_root && mmu->pml4_root && mmu->pml5_root)
+> > +       if (mmu->pae_root && mmu->pml4_root)
+> >                 return 0;
+> >  
+> >         /*
+> > 
+> > 
+> > 
+> > Best regards,
+> > 	Maxim Levitsky
+> > 
 
-I believe you don't need that header if you move __sev_get_ghcb()
-and snp_register_ghcb() under the #include "sev-shared.c" so that
-snp_register_ghcb_early() is visible by then.
 
-diff --git a/arch/x86/kernel/sev-internal.h b/arch/x86/kernel/sev-internal.h
-deleted file mode 100644
-index 0fb7324803b4..000000000000
---- a/arch/x86/kernel/sev-internal.h
-+++ /dev/null
-@@ -1,12 +0,0 @@
--/* SPDX-License-Identifier: GPL-2.0-only */
--/*
-- * Forward declarations for sev-shared.c
-- *
-- * Author: Brijesh Singh <brijesh.singh@amd.com>
-- */
--
--#ifndef __X86_SEV_INTERNAL_H__
--
--static void snp_register_ghcb_early(unsigned long paddr);
--
--#endif	/* __X86_SEV_INTERNAL_H__ */
-diff --git a/arch/x86/kernel/sev.c b/arch/x86/kernel/sev.c
-index 9ab541b893c2..0ec0602e4bed 100644
---- a/arch/x86/kernel/sev.c
-+++ b/arch/x86/kernel/sev.c
-@@ -31,8 +31,6 @@
- #include <asm/smp.h>
- #include <asm/cpu.h>
- 
--#include "sev-internal.h"
--
- #define DR7_RESET_VALUE        0x400
- 
- /* For early boot hypervisor communication in SEV-ES enabled guests */
-@@ -200,69 +198,6 @@ void noinstr __sev_es_ist_exit(void)
- 	this_cpu_write(cpu_tss_rw.x86_tss.ist[IST_INDEX_VC], *(unsigned long *)ist);
- }
- 
--static void snp_register_ghcb(struct sev_es_runtime_data *data, unsigned long paddr)
--{
--	if (data->snp_ghcb_registered)
--		return;
--
--	snp_register_ghcb_early(paddr);
--
--	data->snp_ghcb_registered = true;
--}
--
--/*
-- * Nothing shall interrupt this code path while holding the per-CPU
-- * GHCB. The backup GHCB is only for NMIs interrupting this path.
-- *
-- * Callers must disable local interrupts around it.
-- */
--static noinstr struct ghcb *__sev_get_ghcb(struct ghcb_state *state)
--{
--	struct sev_es_runtime_data *data;
--	struct ghcb *ghcb;
--
--	WARN_ON(!irqs_disabled());
--
--	data = this_cpu_read(runtime_data);
--	ghcb = &data->ghcb_page;
--
--	if (unlikely(data->ghcb_active)) {
--		/* GHCB is already in use - save its contents */
--
--		if (unlikely(data->backup_ghcb_active)) {
--			/*
--			 * Backup-GHCB is also already in use. There is no way
--			 * to continue here so just kill the machine. To make
--			 * panic() work, mark GHCBs inactive so that messages
--			 * can be printed out.
--			 */
--			data->ghcb_active        = false;
--			data->backup_ghcb_active = false;
--
--			instrumentation_begin();
--			panic("Unable to handle #VC exception! GHCB and Backup GHCB are already in use");
--			instrumentation_end();
--		}
--
--		/* Mark backup_ghcb active before writing to it */
--		data->backup_ghcb_active = true;
--
--		state->ghcb = &data->backup_ghcb;
--
--		/* Backup GHCB content */
--		*state->ghcb = *ghcb;
--	} else {
--		state->ghcb = NULL;
--		data->ghcb_active = true;
--	}
--
--	/* SEV-SNP guest requires that GHCB must be registered. */
--	if (sev_feature_enabled(SEV_SNP))
--		snp_register_ghcb(data, __pa(ghcb));
--
--	return ghcb;
--}
--
- /* Needed in vc_early_forward_exception */
- void do_early_exception(struct pt_regs *regs, int trapnr);
- 
-@@ -518,6 +453,69 @@ static enum es_result vc_slow_virt_to_phys(struct ghcb *ghcb, struct es_em_ctxt
- /* Include code shared with pre-decompression boot stage */
- #include "sev-shared.c"
- 
-+static void snp_register_ghcb(struct sev_es_runtime_data *data, unsigned long paddr)
-+{
-+	if (data->snp_ghcb_registered)
-+		return;
-+
-+	snp_register_ghcb_early(paddr);
-+
-+	data->snp_ghcb_registered = true;
-+}
-+
-+/*
-+ * Nothing shall interrupt this code path while holding the per-CPU
-+ * GHCB. The backup GHCB is only for NMIs interrupting this path.
-+ *
-+ * Callers must disable local interrupts around it.
-+ */
-+static noinstr struct ghcb *__sev_get_ghcb(struct ghcb_state *state)
-+{
-+	struct sev_es_runtime_data *data;
-+	struct ghcb *ghcb;
-+
-+	WARN_ON(!irqs_disabled());
-+
-+	data = this_cpu_read(runtime_data);
-+	ghcb = &data->ghcb_page;
-+
-+	if (unlikely(data->ghcb_active)) {
-+		/* GHCB is already in use - save its contents */
-+
-+		if (unlikely(data->backup_ghcb_active)) {
-+			/*
-+			 * Backup-GHCB is also already in use. There is no way
-+			 * to continue here so just kill the machine. To make
-+			 * panic() work, mark GHCBs inactive so that messages
-+			 * can be printed out.
-+			 */
-+			data->ghcb_active        = false;
-+			data->backup_ghcb_active = false;
-+
-+			instrumentation_begin();
-+			panic("Unable to handle #VC exception! GHCB and Backup GHCB are already in use");
-+			instrumentation_end();
-+		}
-+
-+		/* Mark backup_ghcb active before writing to it */
-+		data->backup_ghcb_active = true;
-+
-+		state->ghcb = &data->backup_ghcb;
-+
-+		/* Backup GHCB content */
-+		*state->ghcb = *ghcb;
-+	} else {
-+		state->ghcb = NULL;
-+		data->ghcb_active = true;
-+	}
-+
-+	/* SEV-SNP guest requires that GHCB must be registered. */
-+	if (sev_feature_enabled(SEV_SNP))
-+		snp_register_ghcb(data, __pa(ghcb));
-+
-+	return ghcb;
-+}
-+
- static noinstr void __sev_put_ghcb(struct ghcb_state *state)
- {
- 	struct sev_es_runtime_data *data;
-
--- 
-Regards/Gruss,
-    Boris.
-
-https://people.kernel.org/tglx/notes-about-netiquette
