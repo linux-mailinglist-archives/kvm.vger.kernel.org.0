@@ -2,190 +2,119 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 96D663F4675
-	for <lists+kvm@lfdr.de>; Mon, 23 Aug 2021 10:14:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 82C833F471E
+	for <lists+kvm@lfdr.de>; Mon, 23 Aug 2021 11:08:00 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235511AbhHWIPd (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 23 Aug 2021 04:15:33 -0400
-Received: from smtp2.axis.com ([195.60.68.18]:18544 "EHLO smtp2.axis.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S235353AbhHWIPa (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 23 Aug 2021 04:15:30 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=axis.com; q=dns/txt; s=axis-central1; t=1629706489;
-  x=1661242489;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=32tMdW/MLxZqNlGhqw7Ozd6NQxd2ifBcs6cYnFP5KZA=;
-  b=pcEBjlviIHWUa+SvTHTOznfq9Uw3e6TJSzBgd37NOSx+MGBl5ithppVI
-   bJVJ5zh96absMrvmNNzesuUOEDIBYm5EvgVBEnM5LHyech5fwwlxfMvsW
-   wQ00WjgXY1Row4qlFbSHzjYyCNO0akTkGm4UuCe40Eh3t2pHBv3Ep88wh
-   n7x9dRQR0fUa1/dCLqoNCRZ554yjrBkfaP8qRajjsRJQa1VpIyFxOR/UG
-   B1nikl6A9vYOE+9cFWYo3jAo/v6ZpYs9wbBoCS1MKObqra28uFu9DX8pP
-   m2gwXXZbfu0Tnb6a0Jb0Lnnl1nAhKJmHTcWxZzdXV1PW1saIBy4IYzi7f
-   A==;
-From:   Vincent Whitchurch <vincent.whitchurch@axis.com>
-To:     "Michael S. Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>
-CC:     <kernel@axis.com>,
-        Vincent Whitchurch <vincent.whitchurch@axis.com>,
-        <kvm@vger.kernel.org>, <virtualization@lists.linux-foundation.org>,
-        <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-Subject: [PATCH] vhost: add support for mandatory barriers
-Date:   Mon, 23 Aug 2021 10:14:37 +0200
-Message-ID: <20210823081437.14274-1-vincent.whitchurch@axis.com>
-X-Mailer: git-send-email 2.28.0
+        id S230496AbhHWJIk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 23 Aug 2021 05:08:40 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:26429 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229944AbhHWJIj (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 23 Aug 2021 05:08:39 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1629709676;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=aISp5M1izx4NH4v0Hn06V3ODxv34YeYXayvZgVqi7XI=;
+        b=VVC0xQ88CHPih/Hasxu6hGx0QckDyJoNwYwMGrvYnFDEy5DtbU3KQ7PeM1oJuW+GnzhcI1
+        5IIBpbZ9sBPsSlyEE0iAteqBgUr3Cd9tblZCM9U/gBwGw6qdR2R1R8w3/IJBfonqCpMeGY
+        zW5FCYvq3kvwQwR/VP9mBF0NzDoYzUg=
+Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
+ [209.85.208.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-586-eRzZ5eI9NV-DAxubZd9VSQ-1; Mon, 23 Aug 2021 05:07:55 -0400
+X-MC-Unique: eRzZ5eI9NV-DAxubZd9VSQ-1
+Received: by mail-ed1-f71.google.com with SMTP id l18-20020a0564021252b02903be7bdd65ccso8489447edw.12
+        for <kvm@vger.kernel.org>; Mon, 23 Aug 2021 02:07:55 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=aISp5M1izx4NH4v0Hn06V3ODxv34YeYXayvZgVqi7XI=;
+        b=jUzVXFDqymQc022Ug/Me13DIMKh5vAUndsmKtkCYxU94ICn+oTzCuELCZ1GG2jTsiH
+         QXUnkB8VSeHKdKzJ1DFELFyItSIEJ8otjDRjhtJUR7hp7MZeCaeuf8Ymv16Qhqpbk2el
+         B/kE0H6lzALHvli7szOjVpJU8O9wuhywJmPJJwBIJ1xTvYBxGAczGoehbePIBtVI24nI
+         DyjvATUSCxnAfKfoD2xauy5zLMSMEJjhv/+ripQAwz9PQdcYOCO/byLYvS2RJX4mxjj+
+         sKanxMqFomw7oB+Q2yl1KJw+NO97+Y5VchCaFvhL9k8gEtXVJDyeB19R5tfk4UlE5vio
+         B3LA==
+X-Gm-Message-State: AOAM532HGyWyaDQpQVF8wzf7cvFKyQ1W3UjYOdb5MScmMjcVE/7ur1oM
+        /2Uj9R/NWLhIeLXPGu4h3Tr22f+s3v4fIaGibdhmdNAkf2025rV7egu4UNdfwYf7JjY5Lh/uEIl
+        uB1P9PMQPVax2
+X-Received: by 2002:a05:6402:1907:: with SMTP id e7mr8322339edz.201.1629709674295;
+        Mon, 23 Aug 2021 02:07:54 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxB8djTuJSNghEDmXQfwZUrFrUJ+XhpXaA6T6sK1VZ2LMR5UNf4tuXRgxUvxp5oivYQUoq5rg==
+X-Received: by 2002:a05:6402:1907:: with SMTP id e7mr8322319edz.201.1629709674115;
+        Mon, 23 Aug 2021 02:07:54 -0700 (PDT)
+Received: from gator.home (cst2-174-132.cust.vodafone.cz. [31.30.174.132])
+        by smtp.gmail.com with ESMTPSA id ks20sm6977968ejb.101.2021.08.23.02.07.53
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 23 Aug 2021 02:07:53 -0700 (PDT)
+Date:   Mon, 23 Aug 2021 11:07:52 +0200
+From:   Andrew Jones <drjones@redhat.com>
+To:     Marc Zyngier <maz@kernel.org>
+Cc:     qemu-devel@nongnu.org, Eric Auger <eric.auger@redhat.com>,
+        Peter Maydell <peter.maydell@linaro.org>,
+        kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
+        kernel-team@android.com
+Subject: Re: [PATCH 1/3] hw/arm/virt: KVM: Probe for KVM_CAP_ARM_VM_IPA_SIZE
+ when creating scratch VM
+Message-ID: <20210823090752.nanm4wttyefg3txh@gator.home>
+References: <20210822144441.1290891-1-maz@kernel.org>
+ <20210822144441.1290891-2-maz@kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210822144441.1290891-2-maz@kernel.org>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-vhost always uses SMP-conditional barriers, but these may not be
-sufficient when vhost is used to communicate between heterogeneous
-processors in an AMP configuration, especially since they're NOPs on
-!SMP builds.
+On Sun, Aug 22, 2021 at 03:44:39PM +0100, Marc Zyngier wrote:
+> Although we probe for the IPA limits imposed by KVM (and the hardware)
+> when computing the memory map, we still use the old style '0' when
+> creating a scratch VM in kvm_arm_create_scratch_host_vcpu().
+> 
+> On systems that are severely IPA challenged (such as the Apple M1),
+> this results in a failure as KVM cannot use the default 40bit that
+> '0' represents.
+> 
+> Instead, probe for the extension and use the reported IPA limit
+> if available.
+> 
+> Cc: Andrew Jones <drjones@redhat.com>
+> Cc: Eric Auger <eric.auger@redhat.com>
+> Cc: Peter Maydell <peter.maydell@linaro.org>
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> ---
+>  target/arm/kvm.c | 7 ++++++-
+>  1 file changed, 6 insertions(+), 1 deletion(-)
+> 
+> diff --git a/target/arm/kvm.c b/target/arm/kvm.c
+> index d8381ba224..cc3371a99b 100644
+> --- a/target/arm/kvm.c
+> +++ b/target/arm/kvm.c
+> @@ -70,12 +70,17 @@ bool kvm_arm_create_scratch_host_vcpu(const uint32_t *cpus_to_try,
+>                                        struct kvm_vcpu_init *init)
+>  {
+>      int ret = 0, kvmfd = -1, vmfd = -1, cpufd = -1;
+> +    int max_vm_pa_size;
+>  
+>      kvmfd = qemu_open_old("/dev/kvm", O_RDWR);
+>      if (kvmfd < 0) {
+>          goto err;
+>      }
+> -    vmfd = ioctl(kvmfd, KVM_CREATE_VM, 0);
+> +    max_vm_pa_size = ioctl(kvmfd, KVM_CHECK_EXTENSION, KVM_CAP_ARM_VM_IPA_SIZE);
+> +    if (max_vm_pa_size < 0) {
+> +        max_vm_pa_size = 0;
+> +    }
+> +    vmfd = ioctl(kvmfd, KVM_CREATE_VM, max_vm_pa_size);
+>      if (vmfd < 0) {
+>          goto err;
+>      }
+> -- 
+> 2.30.2
+>
 
-To solve this, use the virtio_*() barrier functions and ask them for
-non-weak barriers if requested by userspace.
-
-Signed-off-by: Vincent Whitchurch <vincent.whitchurch@axis.com>
----
- drivers/vhost/vhost.c      | 23 ++++++++++++++---------
- drivers/vhost/vhost.h      |  2 ++
- include/uapi/linux/vhost.h |  2 ++
- 3 files changed, 18 insertions(+), 9 deletions(-)
-
-diff --git a/drivers/vhost/vhost.c b/drivers/vhost/vhost.c
-index b9e853e6094d..f7172e1bc395 100644
---- a/drivers/vhost/vhost.c
-+++ b/drivers/vhost/vhost.c
-@@ -500,6 +500,7 @@ void vhost_dev_init(struct vhost_dev *dev,
- 		vq->indirect = NULL;
- 		vq->heads = NULL;
- 		vq->dev = dev;
-+		vq->weak_barriers = true;
- 		mutex_init(&vq->mutex);
- 		vhost_vq_reset(dev, vq);
- 		if (vq->handle_kick)
-@@ -1801,6 +1802,10 @@ long vhost_dev_ioctl(struct vhost_dev *d, unsigned int ioctl, void __user *argp)
- 		if (ctx)
- 			eventfd_ctx_put(ctx);
- 		break;
-+	case VHOST_SET_STRONG_BARRIERS:
-+		for (i = 0; i < d->nvqs; ++i)
-+			d->vqs[i]->weak_barriers = false;
-+		break;
- 	default:
- 		r = -ENOIOCTLCMD;
- 		break;
-@@ -1927,7 +1932,7 @@ int vhost_log_write(struct vhost_virtqueue *vq, struct vhost_log *log,
- 	int i, r;
- 
- 	/* Make sure data written is seen before log. */
--	smp_wmb();
-+	virtio_wmb(vq->weak_barriers);
- 
- 	if (vq->iotlb) {
- 		for (i = 0; i < count; i++) {
-@@ -1964,7 +1969,7 @@ static int vhost_update_used_flags(struct vhost_virtqueue *vq)
- 		return -EFAULT;
- 	if (unlikely(vq->log_used)) {
- 		/* Make sure the flag is seen before log. */
--		smp_wmb();
-+		virtio_wmb(vq->weak_barriers);
- 		/* Log used flag write. */
- 		used = &vq->used->flags;
- 		log_used(vq, (used - (void __user *)vq->used),
-@@ -1982,7 +1987,7 @@ static int vhost_update_avail_event(struct vhost_virtqueue *vq, u16 avail_event)
- 	if (unlikely(vq->log_used)) {
- 		void __user *used;
- 		/* Make sure the event is seen before log. */
--		smp_wmb();
-+		virtio_wmb(vq->weak_barriers);
- 		/* Log avail event write */
- 		used = vhost_avail_event(vq);
- 		log_used(vq, (used - (void __user *)vq->used),
-@@ -2228,7 +2233,7 @@ int vhost_get_vq_desc(struct vhost_virtqueue *vq,
- 		/* Only get avail ring entries after they have been
- 		 * exposed by guest.
- 		 */
--		smp_rmb();
-+		virtio_rmb(vq->weak_barriers);
- 	}
- 
- 	/* Grab the next descriptor number they're advertising, and increment
-@@ -2367,7 +2372,7 @@ static int __vhost_add_used_n(struct vhost_virtqueue *vq,
- 	}
- 	if (unlikely(vq->log_used)) {
- 		/* Make sure data is seen before log. */
--		smp_wmb();
-+		virtio_wmb(vq->weak_barriers);
- 		/* Log used ring entry write. */
- 		log_used(vq, ((void __user *)used - (void __user *)vq->used),
- 			 count * sizeof *used);
-@@ -2402,14 +2407,14 @@ int vhost_add_used_n(struct vhost_virtqueue *vq, struct vring_used_elem *heads,
- 	r = __vhost_add_used_n(vq, heads, count);
- 
- 	/* Make sure buffer is written before we update index. */
--	smp_wmb();
-+	virtio_wmb(vq->weak_barriers);
- 	if (vhost_put_used_idx(vq)) {
- 		vq_err(vq, "Failed to increment used idx");
- 		return -EFAULT;
- 	}
- 	if (unlikely(vq->log_used)) {
- 		/* Make sure used idx is seen before log. */
--		smp_wmb();
-+		virtio_wmb(vq->weak_barriers);
- 		/* Log used index update. */
- 		log_used(vq, offsetof(struct vring_used, idx),
- 			 sizeof vq->used->idx);
-@@ -2428,7 +2433,7 @@ static bool vhost_notify(struct vhost_dev *dev, struct vhost_virtqueue *vq)
- 	/* Flush out used index updates. This is paired
- 	 * with the barrier that the Guest executes when enabling
- 	 * interrupts. */
--	smp_mb();
-+	virtio_mb(vq->weak_barriers);
- 
- 	if (vhost_has_feature(vq, VIRTIO_F_NOTIFY_ON_EMPTY) &&
- 	    unlikely(vq->avail_idx == vq->last_avail_idx))
-@@ -2530,7 +2535,7 @@ bool vhost_enable_notify(struct vhost_dev *dev, struct vhost_virtqueue *vq)
- 	}
- 	/* They could have slipped one in as we were doing that: make
- 	 * sure it's written, then check again. */
--	smp_mb();
-+	virtio_mb(vq->weak_barriers);
- 	r = vhost_get_avail_idx(vq, &avail_idx);
- 	if (r) {
- 		vq_err(vq, "Failed to check avail idx at %p: %d\n",
-diff --git a/drivers/vhost/vhost.h b/drivers/vhost/vhost.h
-index 638bb640d6b4..5bd20d0db457 100644
---- a/drivers/vhost/vhost.h
-+++ b/drivers/vhost/vhost.h
-@@ -108,6 +108,8 @@ struct vhost_virtqueue {
- 	bool log_used;
- 	u64 log_addr;
- 
-+	bool weak_barriers;
-+
- 	struct iovec iov[UIO_MAXIOV];
- 	struct iovec iotlb_iov[64];
- 	struct iovec *indirect;
-diff --git a/include/uapi/linux/vhost.h b/include/uapi/linux/vhost.h
-index c998860d7bbc..4b8656307f51 100644
---- a/include/uapi/linux/vhost.h
-+++ b/include/uapi/linux/vhost.h
-@@ -97,6 +97,8 @@
- #define VHOST_SET_BACKEND_FEATURES _IOW(VHOST_VIRTIO, 0x25, __u64)
- #define VHOST_GET_BACKEND_FEATURES _IOR(VHOST_VIRTIO, 0x26, __u64)
- 
-+#define VHOST_SET_STRONG_BARRIERS _IO(VHOST_VIRTIO, 0x27)
-+
- /* VHOST_NET specific defines */
- 
- /* Attach virtio net ring to a raw socket, or tap device.
--- 
-2.28.0
+Reviewed-by: Andrew Jones <drjones@redhat.com>
 
