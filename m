@@ -2,56 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E54C13F44F6
-	for <lists+kvm@lfdr.de>; Mon, 23 Aug 2021 08:32:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B17E03F455C
+	for <lists+kvm@lfdr.de>; Mon, 23 Aug 2021 08:56:53 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231749AbhHWGdA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 23 Aug 2021 02:33:00 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:48516 "EHLO
+        id S234943AbhHWG5d (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 23 Aug 2021 02:57:33 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:32193 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231997AbhHWGc7 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 23 Aug 2021 02:32:59 -0400
+        by vger.kernel.org with ESMTP id S231715AbhHWG5c (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 23 Aug 2021 02:57:32 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1629700337;
+        s=mimecast20190719; t=1629701809;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=F427DPlADbCH/M2u7fz/h7ndiMrb6AVw4qTHSvYRC+w=;
-        b=DCzM5i35ExJMLNvv7UguV+GarRVqJ2FxcZh4qwMW8Eg8Sj/CeSAuoAUKWCLjq8ccDIRm9K
-        g21Aj2IPQEdGm5sk8DT4dwsVpqWp+C0tmkWJJuw5WSKnquBemqwVLcgP6TF1T+8kwNGbRa
-        u/ryfb+7i9IOS0oJyT5//OkA6p9sU2o=
-Received: from mail-pf1-f198.google.com (mail-pf1-f198.google.com
- [209.85.210.198]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-114-Q-Z9Dju6NCasWRm07JogAw-1; Mon, 23 Aug 2021 02:32:15 -0400
-X-MC-Unique: Q-Z9Dju6NCasWRm07JogAw-1
-Received: by mail-pf1-f198.google.com with SMTP id 71-20020a62144a0000b02903cde387cf77so8147664pfu.2
-        for <kvm@vger.kernel.org>; Sun, 22 Aug 2021 23:32:14 -0700 (PDT)
+        bh=O6CVC1MYmQ2Yd0dGkq2W7I4r7P5G0FEqZECeGZvY4DU=;
+        b=e5tDJk+O+zv2l/1N6jCBxTUOPg9lJh78n2pcEEGpI1mC2sxfqrAzAVUu0pgUyqbhrWFQEX
+        zWSMCTuC/0DEKsMvCX8yZTRajQknFdMx2Sm6sT3JnSdGRwmZjntKkpkqqvzhYM/GClQ4u3
+        Nvx7SKjpChn4uazomz5KdAiEDjqMrgw=
+Received: from mail-pg1-f199.google.com (mail-pg1-f199.google.com
+ [209.85.215.199]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-543-mQOJLKo5Mne9tYvUxaHyIw-1; Mon, 23 Aug 2021 02:56:48 -0400
+X-MC-Unique: mQOJLKo5Mne9tYvUxaHyIw-1
+Received: by mail-pg1-f199.google.com with SMTP id r35-20020a635d230000b0290239a31e9f24so9834401pgb.9
+        for <kvm@vger.kernel.org>; Sun, 22 Aug 2021 23:56:48 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-transfer-encoding
          :content-language;
-        bh=F427DPlADbCH/M2u7fz/h7ndiMrb6AVw4qTHSvYRC+w=;
-        b=J955/NFWkIqygaGGXkS5Kpp+W0E85Spr3iInl+lyvNT4kgHJZ2ZKEu4wAujXcShSwu
-         f3Rthh7DPusJYMKinQ7bOzJpXmlrSvv0W0faqmCXEiYhd1ciqFa/+WqrRZLdicVWx/w1
-         f6xk4ZRzm7Q9ks8GMTHMHcr0Ns9fvjLG+L9hKgh6Ldhp7AvfF/vjfIo2mC3yRQcNYo9f
-         VFPVQB64GwzCJK6mlD3/bYd8qjHRRK813lZVIMMT3OwKVCy1JfXAIXl3I7gF5AR7NPbX
-         zDb8c7P95JeYm5p+DG3tZBqhJnN1NE7MVaJSC8/abSd7KyUcXAgKjhGNJZebIfKQWVVW
-         PWXA==
-X-Gm-Message-State: AOAM532jpaJSrNJHknstlZic+NWsmKksBD9vlGeMpBZF3Lc1wV8s6GBt
-        2QChJQinAutkpTObxisJ2Y4Ti/qXUcoiSeBNEAsRL7I2orkaqGIbn2AnTTRpgd9mulENk38VNwK
-        vuSmZtlTqAimu
-X-Received: by 2002:a65:40c4:: with SMTP id u4mr30729283pgp.186.1629700333935;
-        Sun, 22 Aug 2021 23:32:13 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyMdGRZ8bEDFR6mhq5hnskFTgOQcLb0mODJnisTe/klfXgBImg93E0Jn9mD7e+X41rM+h1P3A==
-X-Received: by 2002:a65:40c4:: with SMTP id u4mr30729265pgp.186.1629700333764;
-        Sun, 22 Aug 2021 23:32:13 -0700 (PDT)
+        bh=O6CVC1MYmQ2Yd0dGkq2W7I4r7P5G0FEqZECeGZvY4DU=;
+        b=VBqYbzmTbaXkDwPjnLpdNPjofW6IY9gITkOsLFzQvqgKuAqVMJ+IXDhu+sO4mvzwOT
+         FIzQLv2aFtka2GLOyox+YCjNkez6Fi6KgxtwnIsPEDjyYWNk3Lr4Gnyh6DcwYZzZP3Ff
+         L894IjHHv5BoV9sa62Z65+6izSLsBxrOGtQALWDdevtSUWzgd/sRzcGl08jONPthggIn
+         voWMpbSN81phgyabxMVWpuQFa1HczyKUQrkB9X2DTWYZmAua/5Xl4lLLVcqPRxz8CycP
+         UCvVvJA4NbbzJdeJE7XI1q2QRgAlD0IntR7vKnR7qVyCJpbLxnipqBPfz7twCoNah+rf
+         Fp8g==
+X-Gm-Message-State: AOAM531wCMdHW9T3A7M+CET1tNYd5I5KuVyjEz9dQNb45OL1RGr9J/3P
+        reQD32xrKqqV2sSob0nasl4S1/Fae5TvXLxTRHYXX58yLHaUoKAhyMMCwDZx2pJyZKCpnFsXcx6
+        cLGvnGs94AKTr
+X-Received: by 2002:aa7:9ddc:0:b0:3e1:5fc1:1d20 with SMTP id g28-20020aa79ddc000000b003e15fc11d20mr32664026pfq.48.1629701807247;
+        Sun, 22 Aug 2021 23:56:47 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxeDlxuu1bqct4xksqs7isW8FxpMxOH+GNhpdYUwjloBQhDlJbitQ/vFhNd4D+BhyIvDS4Fgg==
+X-Received: by 2002:aa7:9ddc:0:b0:3e1:5fc1:1d20 with SMTP id g28-20020aa79ddc000000b003e15fc11d20mr32664016pfq.48.1629701807013;
+        Sun, 22 Aug 2021 23:56:47 -0700 (PDT)
 Received: from wangxiaodeMacBook-Air.local ([209.132.188.80])
-        by smtp.gmail.com with ESMTPSA id d7sm17831032pgu.78.2021.08.22.23.32.06
+        by smtp.gmail.com with ESMTPSA id n30sm14807096pfv.87.2021.08.22.23.56.38
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 22 Aug 2021 23:32:13 -0700 (PDT)
-Subject: Re: [PATCH v11 05/12] vhost-vdpa: Handle the failure of vdpa_reset()
+        Sun, 22 Aug 2021 23:56:46 -0700 (PDT)
+Subject: Re: [PATCH v11 11/12] vduse: Introduce VDUSE - vDPA Device in
+ Userspace
 To:     Xie Yongji <xieyongji@bytedance.com>, mst@redhat.com,
         stefanha@redhat.com, sgarzare@redhat.com, parav@nvidia.com,
         hch@infradead.org, christian.brauner@canonical.com,
@@ -66,14 +67,14 @@ Cc:     songmuchun@bytedance.com,
         kvm@vger.kernel.org, linux-fsdevel@vger.kernel.org,
         iommu@lists.linux-foundation.org, linux-kernel@vger.kernel.org
 References: <20210818120642.165-1-xieyongji@bytedance.com>
- <20210818120642.165-6-xieyongji@bytedance.com>
+ <20210818120642.165-12-xieyongji@bytedance.com>
 From:   Jason Wang <jasowang@redhat.com>
-Message-ID: <a9283bf7-bf24-b092-e79d-37c5c4f9e087@redhat.com>
-Date:   Mon, 23 Aug 2021 14:32:04 +0800
+Message-ID: <cfc11f6b-764b-7a52-2c4a-6fa22e6c1585@redhat.com>
+Date:   Mon, 23 Aug 2021 14:56:33 +0800
 User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0)
  Gecko/20100101 Thunderbird/78.13.0
 MIME-Version: 1.0
-In-Reply-To: <20210818120642.165-6-xieyongji@bytedance.com>
+In-Reply-To: <20210818120642.165-12-xieyongji@bytedance.com>
 Content-Type: text/plain; charset=gbk; format=flowed
 Content-Transfer-Encoding: 8bit
 Content-Language: en-US
@@ -83,48 +84,29 @@ X-Mailing-List: kvm@vger.kernel.org
 
 
 ÔÚ 2021/8/18 ÏÂÎç8:06, Xie Yongji Ð´µÀ:
-> The vdpa_reset() may fail now. This adds check to its return
-> value and fail the vhost_vdpa_open().
+> This VDUSE driver enables implementing software-emulated vDPA
+> devices in userspace. The vDPA device is created by
+> ioctl(VDUSE_CREATE_DEV) on /dev/vduse/control. Then a char device
+> interface (/dev/vduse/$NAME) is exported to userspace for device
+> emulation.
+>
+> In order to make the device emulation more secure, the device's
+> control path is handled in kernel. A message mechnism is introduced
+> to forward some dataplane related control messages to userspace.
+>
+> And in the data path, the DMA buffer will be mapped into userspace
+> address space through different ways depending on the vDPA bus to
+> which the vDPA device is attached. In virtio-vdpa case, the MMU-based
+> software IOTLB is used to achieve that. And in vhost-vdpa case, the
+> DMA buffer is reside in a userspace memory region which can be shared
+> to the VDUSE userspace processs via transferring the shmfd.
+>
+> For more details on VDUSE design and usage, please see the follow-on
+> Documentation commit.
 >
 > Signed-off-by: Xie Yongji <xieyongji@bytedance.com>
 
 
 Acked-by: Jason Wang <jasowang@redhat.com>
 
-
-> ---
->   drivers/vhost/vdpa.c | 9 ++++++---
->   1 file changed, 6 insertions(+), 3 deletions(-)
->
-> diff --git a/drivers/vhost/vdpa.c b/drivers/vhost/vdpa.c
-> index b1c91b4db0ba..d99d75ad30cc 100644
-> --- a/drivers/vhost/vdpa.c
-> +++ b/drivers/vhost/vdpa.c
-> @@ -116,12 +116,13 @@ static void vhost_vdpa_unsetup_vq_irq(struct vhost_vdpa *v, u16 qid)
->   	irq_bypass_unregister_producer(&vq->call_ctx.producer);
->   }
->   
-> -static void vhost_vdpa_reset(struct vhost_vdpa *v)
-> +static int vhost_vdpa_reset(struct vhost_vdpa *v)
->   {
->   	struct vdpa_device *vdpa = v->vdpa;
->   
-> -	vdpa_reset(vdpa);
->   	v->in_batch = 0;
-> +
-> +	return vdpa_reset(vdpa);
->   }
->   
->   static long vhost_vdpa_get_device_id(struct vhost_vdpa *v, u8 __user *argp)
-> @@ -868,7 +869,9 @@ static int vhost_vdpa_open(struct inode *inode, struct file *filep)
->   		return -EBUSY;
->   
->   	nvqs = v->nvqs;
-> -	vhost_vdpa_reset(v);
-> +	r = vhost_vdpa_reset(v);
-> +	if (r)
-> +		goto err;
->   
->   	vqs = kmalloc_array(nvqs, sizeof(*vqs), GFP_KERNEL);
->   	if (!vqs) {
 
