@@ -2,170 +2,181 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7A5F23F4898
-	for <lists+kvm@lfdr.de>; Mon, 23 Aug 2021 12:24:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C88203F489E
+	for <lists+kvm@lfdr.de>; Mon, 23 Aug 2021 12:26:40 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236019AbhHWKZF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 23 Aug 2021 06:25:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57694 "EHLO
+        id S233518AbhHWK0n (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 23 Aug 2021 06:26:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58058 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232173AbhHWKZF (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 23 Aug 2021 06:25:05 -0400
-Received: from mail-ot1-x32d.google.com (mail-ot1-x32d.google.com [IPv6:2607:f8b0:4864:20::32d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 16132C061575
-        for <kvm@vger.kernel.org>; Mon, 23 Aug 2021 03:24:23 -0700 (PDT)
-Received: by mail-ot1-x32d.google.com with SMTP id m7-20020a9d4c87000000b0051875f56b95so34972530otf.6
-        for <kvm@vger.kernel.org>; Mon, 23 Aug 2021 03:24:23 -0700 (PDT)
+        with ESMTP id S235975AbhHWK0j (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 23 Aug 2021 06:26:39 -0400
+Received: from mail-ot1-x335.google.com (mail-ot1-x335.google.com [IPv6:2607:f8b0:4864:20::335])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8D469C061575
+        for <kvm@vger.kernel.org>; Mon, 23 Aug 2021 03:25:57 -0700 (PDT)
+Received: by mail-ot1-x335.google.com with SMTP id i3-20020a056830210300b0051af5666070so25264243otc.4
+        for <kvm@vger.kernel.org>; Mon, 23 Aug 2021 03:25:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=k3uARFKW5i95Stpaj6QcX5SJb/gBsd5wlKEHWvxTOlE=;
-        b=WC9BKVUPEOP7oxtXFoSslK3UCllSr4wtkJ5GS7jnuiGbxOzFlvh7IZH+Zcvxg89wPQ
-         QLL+AV1Z4hLDWp7zZi+e7cgUJ4/d/R04W4gED4FYKdPm7pKrVoqI4OGGkOEK8bvxM6/z
-         v8Dytaoxjljppi25q2KvOdmn0mMabXeYaZS8x1psv5tICnFjLs2WJDIJmorv5CkkNZgz
-         AM2rNAOhO+sYIr1VYvV3LOMLQDsbUWmDVAY26Dm4YGsZe9HSn0QCtOe4/6wYGomGJiEn
-         2NF/PD3DFr7UcQNbwDAl+HdY1Yr+LI+El0+wL+KWzeUftDzjsEjh57ggEak3wLVQl6ym
-         f8IQ==
+        bh=iil3g1xzE54TUwgwxXbVjp/I2BXWoZeDWrISpeeZe14=;
+        b=BEW3pF7bCpIXQquKczEegFeZjB4PN2FJINV+cpI96e+ZQKAUumwIkxkDwpbx3KxVX/
+         jEV7r2X/PXB2J5H9vROz1yIGrg/C9BzHL2ENP4rws1a69K/LMgiALseDgDCqMkZf1zTT
+         iXMVQXasH/iLEIZZQ2O019Dd8bfQCg7UE4mAC5hsYCzmN3+VqRSGWNbgF2jwGtyaNrbq
+         2dh21hx5nfjAG1EedyrdGR+2AIZE0gAzriJ9sCGtm4N9Rxdpdj5w5BYRgmlh+IHNZiu9
+         wOpyw2qGxapWYcgQ0s4wMPR5DW1y51wv1BZX/EIraK4Wzwln68WzoQTFeaTaW1NQ3nYg
+         c3VQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=k3uARFKW5i95Stpaj6QcX5SJb/gBsd5wlKEHWvxTOlE=;
-        b=Ib/o5i4I1udXSC99TaiLxFly6jqjYnxxmu8T6PdzUoWHRdEL8+7FPWaA8EZ63QNkA9
-         NrnXJgZDRV0xMexPRFUKE7EcazZ3E/Y3zkWyFDch42A72MOTPthkHuIsGTyU8fihiYCo
-         /HofQveGoJuq4BaUGSQKR1voOSX7XMSMkRwLN4Q6gJtdouG5RMJdPoQ8cyUldMBvc5hE
-         3bRRjmxBhdEjIEPMuHn9UskOU5bj8ttWyGaa4n2hQ+sqRvcrjqTli611YzAqpjulgefo
-         cgOjyCcszEZ8eIjFvw9FclawAKYKuyalXV/dIy3DjbZoRTf9qqXwZJw/w4tRUcQncWX+
-         NLTg==
-X-Gm-Message-State: AOAM533q5NGCDVJrs2QTaIeVxPicQvfY5UM7OZlOrEFcyH74G1bwRq+U
-        o9Y7/awwIKCQAgb9d7jUEI1s3vhuIpHiqFfwVtRi3g==
-X-Google-Smtp-Source: ABdhPJw47asjLGg3IHhq6DwkpRq1WK6eZuxYYe87HFmvJkCVR3ngD76xFymCkYMGEPR3xZRntez8Vcl8RXyvpG9rt38=
-X-Received: by 2002:a9d:309:: with SMTP id 9mr27320777otv.365.1629714262300;
- Mon, 23 Aug 2021 03:24:22 -0700 (PDT)
+        bh=iil3g1xzE54TUwgwxXbVjp/I2BXWoZeDWrISpeeZe14=;
+        b=LDg37IEYGPCmi2MB72xlnt0OTw4xJ/ijjrsiDvYQVpB19em2I+vAvCW9ocj2iEoOVJ
+         udQJqNFDckQD5q4uvaQQtdcl+RjOiaX5VGkc1r9CPppvUzrSxBKNeKyhcp5QCJZ83Ia4
+         O3cTlg36fd84r6LcsyAho6YBapqIwmJaoTCkLBK8UwXLJFBYQ3pobNNTXCu4EdyVL2U8
+         3g8w33/iHfM9MQ4PWxTcX/V63ASnZmUJPk11UeGi+S40j4t6dcFJYwuE1jzYNkawC4FG
+         95WnRIuPsEVbMqRBAl/l3b+59CQAEE6M0JMT0+3oVjUe2V3N7NGsw7+00+/PLnfQ/L2t
+         habQ==
+X-Gm-Message-State: AOAM533h3Atd/xro7YoOjv7bFq+JXaYaAbI58uIiOyVZ1PUV2Ab+39a9
+        rB9kGPwqSI8zPspGVuhkhoq/hHsV3fTzALxAVt+FpQ==
+X-Google-Smtp-Source: ABdhPJyc5KKsDid+ISzlkW07QeZX7D5K3hIbXU4y15H3axJsNCGDbA+XxfiyQc68SzeSTbGJu39OzYXXM1Av29ZlITE=
+X-Received: by 2002:a05:6830:1dac:: with SMTP id z12mr23465282oti.52.1629714356807;
+ Mon, 23 Aug 2021 03:25:56 -0700 (PDT)
 MIME-Version: 1.0
-References: <20210817081134.2918285-1-tabba@google.com> <162945557041.2025988.6137048861111259637.b4-ty@kernel.org>
-In-Reply-To: <162945557041.2025988.6137048861111259637.b4-ty@kernel.org>
+References: <20210817081134.2918285-1-tabba@google.com> <20210817081134.2918285-16-tabba@google.com>
+ <CAOQ_QsgSfHVjJkSJku5DwUe0_=ds4GduPbJ7vC-t+4_=fPVFBQ@mail.gmail.com>
+In-Reply-To: <CAOQ_QsgSfHVjJkSJku5DwUe0_=ds4GduPbJ7vC-t+4_=fPVFBQ@mail.gmail.com>
 From:   Fuad Tabba <tabba@google.com>
-Date:   Mon, 23 Aug 2021 11:23:46 +0100
-Message-ID: <CA+EHjTzZn+_4VZ+J7gToBv6XYXUBDxmHT0zkHVy+-2RDFY=-wQ@mail.gmail.com>
-Subject: Re: [PATCH v4 00/15] KVM: arm64: Fixed features for protected VMs
-To:     Marc Zyngier <maz@kernel.org>
-Cc:     kvmarm@lists.cs.columbia.edu, oupton@google.com,
-        james.morse@arm.com, drjones@redhat.com, mark.rutland@arm.com,
-        alexandru.elisei@arm.com, kvm@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, kernel-team@android.com,
-        suzuki.poulose@arm.com, will@kernel.org, pbonzini@redhat.com,
-        christoffer.dall@arm.com, qperret@google.com
+Date:   Mon, 23 Aug 2021 11:25:20 +0100
+Message-ID: <CA+EHjTwPgjXtrR5dFx0RBN9xdX0j7ugO=NqAmkmZqYE9N_jP7w@mail.gmail.com>
+Subject: Re: [PATCH v4 15/15] KVM: arm64: Handle protected guests at 32 bits
+To:     Oliver Upton <oupton@google.com>
+Cc:     kvmarm@lists.cs.columbia.edu, maz@kernel.org, will@kernel.org,
+        james.morse@arm.com, alexandru.elisei@arm.com,
+        suzuki.poulose@arm.com, mark.rutland@arm.com,
+        christoffer.dall@arm.com, pbonzini@redhat.com, drjones@redhat.com,
+        qperret@google.com, kvm@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, kernel-team@android.com
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Marc,
+Hi Oliver,
 
-On Fri, Aug 20, 2021 at 11:34 AM Marc Zyngier <maz@kernel.org> wrote:
+On Thu, Aug 19, 2021 at 9:10 AM Oliver Upton <oupton@google.com> wrote:
 >
-> On Tue, 17 Aug 2021 09:11:19 +0100, Fuad Tabba wrote:
-> > Changes since v3 [1]:
-> > - Redid calculating restricted values of feature register fields, ensuring that
-> >   the code distinguishes between unsigned and (potentially in the future)
-> >   signed fields (Will)
-> > - Refactoring and fixes (Drew, Will)
-> > - More documentation and comments (Oliver, Will)
-> > - Dropped patch "Restrict protected VM capabilities", since it should come with
-> >   or after the user ABI series for pKVM (Will)
-> > - Carried Will's acks
+> Hi Fuad,
+>
+> On Tue, Aug 17, 2021 at 1:12 AM Fuad Tabba <tabba@google.com> wrote:
 > >
-> > [...]
+> > Protected KVM does not support protected AArch32 guests. However,
+> > it is possible for the guest to force run AArch32, potentially
+> > causing problems. Add an extra check so that if the hypervisor
+> > catches the guest doing that, it can prevent the guest from
+> > running again by resetting vcpu->arch.target and returning
+> > ARM_EXCEPTION_IL.
+> >
+> > If this were to happen, The VMM can try and fix it by re-
+> > initializing the vcpu with KVM_ARM_VCPU_INIT, however, this is
+> > likely not possible for protected VMs.
+> >
+> > Adapted from commit 22f553842b14 ("KVM: arm64: Handle Asymmetric
+> > AArch32 systems")
+> >
+> > Signed-off-by: Fuad Tabba <tabba@google.com>
+> > ---
+> >  arch/arm64/kvm/hyp/nvhe/switch.c | 37 ++++++++++++++++++++++++++++++++
+> >  1 file changed, 37 insertions(+)
+> >
+> > diff --git a/arch/arm64/kvm/hyp/nvhe/switch.c b/arch/arm64/kvm/hyp/nvhe/switch.c
+> > index 398e62098898..0c24b7f473bf 100644
+> > --- a/arch/arm64/kvm/hyp/nvhe/switch.c
+> > +++ b/arch/arm64/kvm/hyp/nvhe/switch.c
+> > @@ -20,6 +20,7 @@
+> >  #include <asm/kprobes.h>
+> >  #include <asm/kvm_asm.h>
+> >  #include <asm/kvm_emulate.h>
+> > +#include <asm/kvm_fixed_config.h>
+> >  #include <asm/kvm_hyp.h>
+> >  #include <asm/kvm_mmu.h>
+> >  #include <asm/fpsimd.h>
+> > @@ -195,6 +196,39 @@ exit_handle_fn kvm_get_nvhe_exit_handler(struct kvm_vcpu *vcpu)
+> >                 return NULL;
+> >  }
+> >
+> > +/*
+> > + * Some guests (e.g., protected VMs) might not be allowed to run in AArch32. The
+> > + * check below is based on the one in kvm_arch_vcpu_ioctl_run().
+> > + * The ARMv8 architecture does not give the hypervisor a mechanism to prevent a
+> > + * guest from dropping to AArch32 EL0 if implemented by the CPU. If the
+> > + * hypervisor spots a guest in such a state ensure it is handled, and don't
+> > + * trust the host to spot or fix it.
+> > + *
+> > + * Returns true if the check passed and the guest run loop can continue, or
+> > + * false if the guest should exit to the host.
+> > + */
+> > +static bool check_aarch32_guest(struct kvm_vcpu *vcpu, u64 *exit_code)
 >
-> I've taken the first 10 patches of this series in order to
-> progress it. I also stashed a fixlet on top to address the
-> tracepoint issue.
+> This does a bit more than just check & return, so maybe call it
+> handle_aarch32_guest()?
 >
-> Hopefully we can resolve the rest of the issues quickly.
+> > +{
+> > +       if (kvm_vm_is_protected(kern_hyp_va(vcpu->kvm)) &&
+>
+> maybe initialize a local with a hyp pointer to the kvm structure.
 
-Thanks. I am working on a patch series with the remaining patches to
-address the issues. Stay tuned :)
+Will do.
 
-Cheers,
+> > +           vcpu_mode_is_32bit(vcpu) &&
+> > +           FIELD_GET(ARM64_FEATURE_MASK(ID_AA64PFR0_EL0),
+> > +                                        PVM_ID_AA64PFR0_RESTRICT_UNSIGNED) <
+> > +               ID_AA64PFR0_ELx_32BIT_64BIT) {
+>
+> It may be more readable to initialize a local variable with this
+> feature check, i.e:
+>
+> bool aarch32_allowed = FIELD_GET(...) == ID_AA64PFR0_ELx_32BIT_64BIT;
+>
+> and then:
+>
+>   if (kvm_vm_is_protected(kvm) && vcpu_mode_is_32bit(vcpu) &&
+> !aarch32_allowed) {
+
+I agree.
+
+Thanks,
 /fuad
 
-> [01/15] KVM: arm64: placeholder to check if VM is protected
->         commit: 2ea7f655800b00b109951f22539fe2025add210b
-> [02/15] KVM: arm64: Remove trailing whitespace in comment
->         commit: e6bc555c96990046d680ff92c8e2e7b6b43b509f
-> [03/15] KVM: arm64: MDCR_EL2 is a 64-bit register
->         commit: d6c850dd6ce9ce4b410142a600d8c34dc041d860
-> [04/15] KVM: arm64: Fix names of config register fields
->         commit: dabb1667d8573302712a75530cccfee8f3ffff84
-> [05/15] KVM: arm64: Refactor sys_regs.h,c for nVHE reuse
->         commit: f76f89e2f73d93720cfcad7fb7b24d022b2846bf
-> [06/15] KVM: arm64: Restore mdcr_el2 from vcpu
->         commit: 1460b4b25fde52cbee746c11a4b1d3185f2e2847
-> [07/15] KVM: arm64: Keep mdcr_el2's value as set by __init_el2_debug
->         commit: 12849badc6d2456f15f8f2c93037628d5176810b
-> [08/15] KVM: arm64: Track value of cptr_el2 in struct kvm_vcpu_arch
->         commit: cd496228fd8de2e82b6636d3d89105631ea2b69c
-> [09/15] KVM: arm64: Add feature register flag definitions
->         commit: 95b54c3e4c92b9185b15c83e8baab9ba312195f6
-> [10/15] KVM: arm64: Add config register bit definitions
->         commit: 2d701243b9f231b5d7f9a8cb81870650d3eb32bc
->
-> Cheers,
->
->         M.
-> --
-> Without deviation from the norm, progress is not possible.
->
->
-
-On Fri, Aug 20, 2021 at 11:34 AM Marc Zyngier <maz@kernel.org> wrote:
->
-> On Tue, 17 Aug 2021 09:11:19 +0100, Fuad Tabba wrote:
-> > Changes since v3 [1]:
-> > - Redid calculating restricted values of feature register fields, ensuring that
-> >   the code distinguishes between unsigned and (potentially in the future)
-> >   signed fields (Will)
-> > - Refactoring and fixes (Drew, Will)
-> > - More documentation and comments (Oliver, Will)
-> > - Dropped patch "Restrict protected VM capabilities", since it should come with
-> >   or after the user ABI series for pKVM (Will)
-> > - Carried Will's acks
+> > +               /*
+> > +                * As we have caught the guest red-handed, decide that it isn't
+> > +                * fit for purpose anymore by making the vcpu invalid. The VMM
+> > +                * can try and fix it by re-initializing the vcpu with
+> > +                * KVM_ARM_VCPU_INIT, however, this is likely not possible for
+> > +                * protected VMs.
+> > +                */
+> > +               vcpu->arch.target = -1;
+> > +               *exit_code = ARM_EXCEPTION_IL;
+> > +               return false;
+> > +       }
+> > +
+> > +       return true;
+> > +}
+> > +
+> >  /* Switch to the guest for legacy non-VHE systems */
+> >  int __kvm_vcpu_run(struct kvm_vcpu *vcpu)
+> >  {
+> > @@ -255,6 +289,9 @@ int __kvm_vcpu_run(struct kvm_vcpu *vcpu)
+> >                 /* Jump in the fire! */
+> >                 exit_code = __guest_enter(vcpu);
 > >
-> > [...]
->
-> I've taken the first 10 patches of this series in order to
-> progress it. I also stashed a fixlet on top to address the
-> tracepoint issue.
->
-> Hopefully we can resolve the rest of the issues quickly.
->
-> [01/15] KVM: arm64: placeholder to check if VM is protected
->         commit: 2ea7f655800b00b109951f22539fe2025add210b
-> [02/15] KVM: arm64: Remove trailing whitespace in comment
->         commit: e6bc555c96990046d680ff92c8e2e7b6b43b509f
-> [03/15] KVM: arm64: MDCR_EL2 is a 64-bit register
->         commit: d6c850dd6ce9ce4b410142a600d8c34dc041d860
-> [04/15] KVM: arm64: Fix names of config register fields
->         commit: dabb1667d8573302712a75530cccfee8f3ffff84
-> [05/15] KVM: arm64: Refactor sys_regs.h,c for nVHE reuse
->         commit: f76f89e2f73d93720cfcad7fb7b24d022b2846bf
-> [06/15] KVM: arm64: Restore mdcr_el2 from vcpu
->         commit: 1460b4b25fde52cbee746c11a4b1d3185f2e2847
-> [07/15] KVM: arm64: Keep mdcr_el2's value as set by __init_el2_debug
->         commit: 12849badc6d2456f15f8f2c93037628d5176810b
-> [08/15] KVM: arm64: Track value of cptr_el2 in struct kvm_vcpu_arch
->         commit: cd496228fd8de2e82b6636d3d89105631ea2b69c
-> [09/15] KVM: arm64: Add feature register flag definitions
->         commit: 95b54c3e4c92b9185b15c83e8baab9ba312195f6
-> [10/15] KVM: arm64: Add config register bit definitions
->         commit: 2d701243b9f231b5d7f9a8cb81870650d3eb32bc
->
-> Cheers,
->
->         M.
-> --
-> Without deviation from the norm, progress is not possible.
->
->
+> > +               if (unlikely(!check_aarch32_guest(vcpu, &exit_code)))
+> > +                       break;
+> > +
+> >                 /* And we're baaack! */
+> >         } while (fixup_guest_exit(vcpu, &exit_code));
+> >
+> > --
+> > 2.33.0.rc1.237.g0d66db33f3-goog
+> >
