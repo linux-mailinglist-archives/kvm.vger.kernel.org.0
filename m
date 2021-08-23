@@ -2,116 +2,129 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B841D3F4BC6
-	for <lists+kvm@lfdr.de>; Mon, 23 Aug 2021 15:36:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id F1CD93F4BD2
+	for <lists+kvm@lfdr.de>; Mon, 23 Aug 2021 15:43:14 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232228AbhHWNgD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 23 Aug 2021 09:36:03 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:60896 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230032AbhHWNgC (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 23 Aug 2021 09:36:02 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1629725719;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=ne4Ip6WS3LAOGjVDAKZbBeZT7LXeg8mARLCTka3qBbM=;
-        b=ABXprEX/RT6NU5+5aU+B+wCV6XOw0I/ceUbaNfpdOb4EaHM5lnAER1kI7s9oZPmZlapLnB
-        KLqnLcYoZ18FQSRccxJGTdYXiAVpvvRo3QBR17dpq95lYfEbCzHfsfsRiI87g8gLieD2En
-        hoS4mO7PDQk+FnTjZNvGAKyK3h+a0+0=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-436-l-Y-W3G2Me2XP94Utr9QIw-1; Mon, 23 Aug 2021 09:35:18 -0400
-X-MC-Unique: l-Y-W3G2Me2XP94Utr9QIw-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1067A87D544;
-        Mon, 23 Aug 2021 13:35:17 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-112-4.ams2.redhat.com [10.36.112.4])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 7769B1042A42;
-        Mon, 23 Aug 2021 13:35:16 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
-        id 0A24A11380A9; Mon, 23 Aug 2021 15:35:15 +0200 (CEST)
-From:   Markus Armbruster <armbru@redhat.com>
-To:     Eduardo Habkost <ehabkost@redhat.com>
-Cc:     Thomas Huth <thuth@redhat.com>,
-        Valeriy Vdovin <valeriy.vdovin@virtuozzo.com>,
-        "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
-        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-        Eric Blake <eblake@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Marcelo Tosatti <mtosatti@redhat.com>,
-        Richard Henderson <richard.henderson@linaro.org>,
-        Laurent Vivier <lvivier@redhat.com>, kvm@vger.kernel.org,
-        Denis Lunev <den@openvz.org>,
-        Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Subject: Re: [PATCH v12] qapi: introduce 'query-x86-cpuid' QMP command.
-References: <20210728125402.2496-1-valeriy.vdovin@virtuozzo.com>
-        <87eeb59vwt.fsf@dusky.pond.sub.org>
-        <20210810185644.iyqt3iao2qdqd5jk@habkost.net>
-        <2191952f-6989-771a-1f0a-ece58262d141@redhat.com>
-        <CAOpTY_qbsqh9Tf8LB3EOOi_gkREotdpUyuF3-d_sBFsof3-9KQ@mail.gmail.com>
-        <97ce9800-ff69-46cd-b6ab-c7645ee10d2c@redhat.com>
-        <CAOpTY_rv4nZib1Eymm9ZVcLf=v=-QjpUm24U7FtS-1pUqS_6VQ@mail.gmail.com>
-Date:   Mon, 23 Aug 2021 15:35:14 +0200
-In-Reply-To: <CAOpTY_rv4nZib1Eymm9ZVcLf=v=-QjpUm24U7FtS-1pUqS_6VQ@mail.gmail.com>
-        (Eduardo Habkost's message of "Wed, 11 Aug 2021 09:58:19 -0400")
-Message-ID: <87lf4scmi5.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/27.2 (gnu/linux)
+        id S229672AbhHWNne (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 23 Aug 2021 09:43:34 -0400
+Received: from mga17.intel.com ([192.55.52.151]:53980 "EHLO mga17.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229477AbhHWNne (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 23 Aug 2021 09:43:34 -0400
+X-IronPort-AV: E=McAfee;i="6200,9189,10084"; a="197353299"
+X-IronPort-AV: E=Sophos;i="5.84,344,1620716400"; 
+   d="scan'208";a="197353299"
+Received: from fmsmga008.fm.intel.com ([10.253.24.58])
+  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Aug 2021 06:42:48 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.84,344,1620716400"; 
+   d="scan'208";a="492703467"
+Received: from black.fi.intel.com (HELO black.fi.intel.com.) ([10.237.72.28])
+  by fmsmga008.fm.intel.com with ESMTP; 23 Aug 2021 06:42:45 -0700
+From:   Alexander Shishkin <alexander.shishkin@linux.intel.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Peter Zijlstra <a.p.zijlstra@chello.nl>,
+        Arnaldo Carvalho de Melo <acme@redhat.com>,
+        Ingo Molnar <mingo@redhat.com>, linux-kernel@vger.kernel.org,
+        Jiri Olsa <jolsa@kernel.org>, kvm@vger.kernel.org,
+        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+        Artem Kashkanov <artem.kashkanov@intel.com>
+Subject: [PATCH] kvm/x86: Fix PT "host mode"
+Date:   Mon, 23 Aug 2021 16:42:39 +0300
+Message-Id: <20210823134239.45402-1-alexander.shishkin@linux.intel.com>
+X-Mailer: git-send-email 2.32.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Eduardo Habkost <ehabkost@redhat.com> writes:
+Regardless of the "pt_mode", the kvm driver installs its interrupt handler
+for Intel PT, which always overrides the native handler, causing data loss
+inside kvm guests, while we're expecting to trace them.
 
-> On Wed, Aug 11, 2021 at 9:44 AM Thomas Huth <thuth@redhat.com> wrote:
->>
->> On 11/08/2021 15.40, Eduardo Habkost wrote:
->> > On Wed, Aug 11, 2021 at 2:10 AM Thomas Huth <thuth@redhat.com> wrote:
->> >>
->> >> On 10/08/2021 20.56, Eduardo Habkost wrote:
->> >>> On Sat, Aug 07, 2021 at 04:22:42PM +0200, Markus Armbruster wrote:
->> >>>> Is this intended to be a stable interface?  Interfaces intended jus=
-t for
->> >>>> debugging usually aren't.
->> >>>
->> >>> I don't think we need to make it a stable interface, but I won't
->> >>> mind if we declare it stable.
->> >>
->> >> If we don't feel 100% certain yet, it's maybe better to introduce thi=
-s with
->> >> a "x-" prefix first, isn't it? I.e. "x-query-x86-cpuid" ... then it's=
- clear
->> >> that this is only experimental/debugging/not-stable yet. Just my 0.02=
- =E2=82=AC.
->> >
->> > That would be my expectation. Is this a documented policy?
->> >
->>
->> According to docs/interop/qmp-spec.txt :
->>
->>   Any command or member name beginning with "x-" is deemed
->>   experimental, and may be withdrawn or changed in an incompatible
->>   manner in a future release.
->
-> Thanks! I had looked at other QMP docs, but not qmp-spec.txt.
->
-> In my reply above, please read "make it a stable interface" as
-> "declare it as supported by not using the 'x-' prefix".
->
-> I don't think we have to make it stable, but I won't argue against it
-> if the current proposal is deemed acceptable by other maintainers.
->
-> Personally, I'm still frustrated by the complexity of the current
-> proposal, but I don't want to block it just because of my frustration.
+Fix this by only installing kvm's perf_guest_cbs if pt_mode is set to
+guest tracing.
 
-Is this a case of "there must be a simpler way", or did you actually
-propose a simpler way?  I don't remember...
+Signed-off-by: Alexander Shishkin <alexander.shishkin@linux.intel.com>
+Fixes: ff9d07a0e7ce7 ("KVM: Implement perf callbacks for guest sampling")
+Reported-by: Artem Kashkanov <artem.kashkanov@intel.com>
+Tested-by: Artem Kashkanov <artem.kashkanov@intel.com>
+---
+ arch/x86/include/asm/kvm_host.h |  1 +
+ arch/x86/kvm/vmx/vmx.c          |  6 ++++++
+ arch/x86/kvm/x86.c              | 10 ++++++++--
+ 3 files changed, 15 insertions(+), 2 deletions(-)
+
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index 55efbacfc244..84a1ed067f35 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -1408,6 +1408,7 @@ struct kvm_x86_init_ops {
+ 	int (*disabled_by_bios)(void);
+ 	int (*check_processor_compatibility)(void);
+ 	int (*hardware_setup)(void);
++	int (*intel_pt_enabled)(void);
+ 
+ 	struct kvm_x86_ops *runtime_ops;
+ };
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index 4bceb5ca3a89..0c239aa3532a 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -7943,11 +7943,17 @@ static __init int hardware_setup(void)
+ 	return r;
+ }
+ 
++static int vmx_intel_pt_enabled(void)
++{
++	return vmx_pt_mode_is_host_guest();
++}
++
+ static struct kvm_x86_init_ops vmx_init_ops __initdata = {
+ 	.cpu_has_kvm_support = cpu_has_kvm_support,
+ 	.disabled_by_bios = vmx_disabled_by_bios,
+ 	.check_processor_compatibility = vmx_check_processor_compat,
+ 	.hardware_setup = hardware_setup,
++	.intel_pt_enabled = vmx_intel_pt_enabled,
+ 
+ 	.runtime_ops = &vmx_x86_ops,
+ };
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 9b6bca616929..3ba0001e7388 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -268,6 +268,8 @@ static struct kmem_cache *x86_fpu_cache;
+ 
+ static struct kmem_cache *x86_emulator_cache;
+ 
++static int __read_mostly intel_pt_enabled;
++
+ /*
+  * When called, it means the previous get/set msr reached an invalid msr.
+  * Return true if we want to ignore/silent this failed msr access.
+@@ -8194,7 +8196,10 @@ int kvm_arch_init(void *opaque)
+ 
+ 	kvm_timer_init();
+ 
+-	perf_register_guest_info_callbacks(&kvm_guest_cbs);
++	if (ops->intel_pt_enabled && ops->intel_pt_enabled()) {
++		perf_register_guest_info_callbacks(&kvm_guest_cbs);
++		intel_pt_enabled = 1;
++	}
+ 
+ 	if (boot_cpu_has(X86_FEATURE_XSAVE)) {
+ 		host_xcr0 = xgetbv(XCR_XFEATURE_ENABLED_MASK);
+@@ -8229,7 +8234,8 @@ void kvm_arch_exit(void)
+ 		clear_hv_tscchange_cb();
+ #endif
+ 	kvm_lapic_exit();
+-	perf_unregister_guest_info_callbacks(&kvm_guest_cbs);
++	if (intel_pt_enabled)
++		perf_unregister_guest_info_callbacks(&kvm_guest_cbs);
+ 
+ 	if (!boot_cpu_has(X86_FEATURE_CONSTANT_TSC))
+ 		cpufreq_unregister_notifier(&kvmclock_cpufreq_notifier_block,
+-- 
+2.32.0
 
