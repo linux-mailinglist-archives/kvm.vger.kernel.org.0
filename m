@@ -2,231 +2,125 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1D6033F449C
-	for <lists+kvm@lfdr.de>; Mon, 23 Aug 2021 07:16:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D3B233F44E1
+	for <lists+kvm@lfdr.de>; Mon, 23 Aug 2021 08:25:02 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232852AbhHWFRS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 23 Aug 2021 01:17:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43544 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231276AbhHWFRM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 23 Aug 2021 01:17:12 -0400
-Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B8DCFC061756
-        for <kvm@vger.kernel.org>; Sun, 22 Aug 2021 22:16:30 -0700 (PDT)
-Received: by mail-yb1-xb49.google.com with SMTP id f64-20020a2538430000b0290593bfc4b046so15512686yba.9
-        for <kvm@vger.kernel.org>; Sun, 22 Aug 2021 22:16:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=reply-to:date:message-id:mime-version:subject:from:to:cc;
-        bh=SZp9jopn6L2gGcjaBST5d963oFablXCgT4VwmaYX6c8=;
-        b=BWDOf9o4rquaek14MDqqotPhxfN7ahfaqMx6tz5jr8+1ICDTokXwzaWj9OiWvGGlCY
-         xhpf17kFVXBYtpSAPmuHEzf8x0lpZylcyF/q96KBfzZOdcd+rnm+AnGXTqFvzCNdv1nx
-         lcQRiwvQrD9I1j42OQo3g2Wfc7/jWA8TPQzhZFgtDg3tNEpOtdgao/VPZ4Q7US7woJvr
-         JIXVPexNEV9hSe9N3zGuTM4TbsYWIrafPJnq/+dbaafxrjVxhSOsn3O1KNpXRTQ7X+zz
-         s1VBxLXXdRvPBRGp1nfHT3OSPatiwwllLizCMmrMv6a/yhg+hSnhUldaNCHO5KFLQXj0
-         tm5Q==
+        id S234925AbhHWGZm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 23 Aug 2021 02:25:42 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:31863 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S231267AbhHWGZl (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 23 Aug 2021 02:25:41 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1629699898;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=fTBmg72UzrJzwwgyL0XX6MmGnq4XiN30FwOUg0WyeL8=;
+        b=FP2I2eF6Vxj4C/mxETXrKldB7G93JIfxP2rg+iQuY6zkP7hxPWMnt/LYHoLJPesp5185TT
+        2M2WmoRjIDg1DTPRbPilW/A8x+plT6ZweSyMVBOdwaOXI8PutPBFnfXl31D/yohln3perb
+        4DnkMDSyWr8ktMsfO1ZigPp2uOdA4bU=
+Received: from mail-pj1-f71.google.com (mail-pj1-f71.google.com
+ [209.85.216.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-583-AueEpO_fNVefREIZ6vdMmg-1; Mon, 23 Aug 2021 02:24:56 -0400
+X-MC-Unique: AueEpO_fNVefREIZ6vdMmg-1
+Received: by mail-pj1-f71.google.com with SMTP id d23-20020a17090a115700b0018eb24dca9eso862778pje.1
+        for <kvm@vger.kernel.org>; Sun, 22 Aug 2021 23:24:56 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:reply-to:date:message-id:mime-version:subject
-         :from:to:cc;
-        bh=SZp9jopn6L2gGcjaBST5d963oFablXCgT4VwmaYX6c8=;
-        b=mFZmKfpMRm1tE4W+gX0uubK+NZmsrYvabRlsPuORHDZ6uypKIR2OBb+PJ4arADmI32
-         45/QM1VCQ+ZTmPcQSuY2RLisse5QYad7BDSXTf3oOtHUzXpOcgAWilxrGs/ak4bHEJy7
-         pys+HkS9cUknClO5JBAPSA7MJ0rN3pVtCkULSSvkDokZHIfyUeLvjr8jZ7AOvsNu7A4p
-         /G6wAvws13Azx4lUpOv+M5jDSnrF1QcjQkfqfUOo6VkprlJVpgskVbCY/vQRJCDWoWmE
-         u2ScHaOySzp2zdfMQew8da04uxJ9nRIzLxHPV5Lqzo16d5bRQieRE05yWysW3erdmNOF
-         +o1g==
-X-Gm-Message-State: AOAM531kPVoFBb/srHRntp27NxaASqLbw3e4X6+ZPl5UnP3+ta6aepHv
-        iz44JFp6/PUi0ajzs3umpVbpwXbTj6+H
-X-Google-Smtp-Source: ABdhPJw3+CP6MbRvTm7KTzVWXTtryJM4LQ+VtZvRUcmHJyEdIEagZ7K+YREB0AIgRqanEJCzlZAlPTiij5mT
-X-Received: from mizhang-super.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:1071])
- (user=mizhang job=sendgmr) by 2002:a25:da89:: with SMTP id
- n131mr41861469ybf.255.1629695789605; Sun, 22 Aug 2021 22:16:29 -0700 (PDT)
-Reply-To: Mingwei Zhang <mizhang@google.com>
-Date:   Mon, 23 Aug 2021 05:16:22 +0000
-Message-Id: <20210823051622.312890-1-mizhang@google.com>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.33.0.rc2.250.ged5fa647cd-goog
-Subject: [PATCH] selftests: KVM: use dirty logging to check if page stats work correctly
-From:   Mingwei Zhang <mizhang@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Sean Christopherson <seanjc@google.com>,
-        David Matlack <dmatlack@google.com>,
-        Jing Zhang <jingzhangos@google.com>,
-        Peter Xu <peterx@redhat.com>, Ben Gardon <bgorden@google.com>,
-        Mingwei Zhang <mizhang@google.com>
-Content-Type: text/plain; charset="UTF-8"
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-transfer-encoding
+         :content-language;
+        bh=fTBmg72UzrJzwwgyL0XX6MmGnq4XiN30FwOUg0WyeL8=;
+        b=J/YABGk7r/YGeqsMSdNlJNTJN4fRy96LXpKF5qeMvuv64yB2iRR35tww+OXV7xGaxJ
+         6mS6DbOjA1ravV+6qVQFnAJ0FUOKof8x4pQkbiD4E0tqTlr68BzWk+OcpX5mzqUbw7gX
+         xMhgHMDHruVDqGg430XFuKKdapQmFDkyJ503T2egmyHW9nQkHJ00pk2TnUet/xbPSnXy
+         AXfircreL5eyqYqPQotvTpgDf8qF32hDdhNK2xyEiByY4elCF5Yty4pP1r+tajEj5zjA
+         FlGQv06c6kiUJKyKPqizh/Yhe7d/5YwVpbCUVvXzHR7DA0aGIlRmpBht0UnYB+02/cYC
+         HrlQ==
+X-Gm-Message-State: AOAM531BXKjzOjh0oRnchnkHWqKcSmXVAL9/lgyDuR7P07hmVjaNM/ur
+        tDYlSI5KXTJThd1yR8Q2co+2HkyuvPWWgsTjq0foKHbFwvxFhuPkkUWXswT64GRT5vEUoqKPgp7
+        AS7e+vrGC/CLV
+X-Received: by 2002:a17:90a:b016:: with SMTP id x22mr7315302pjq.205.1629699895443;
+        Sun, 22 Aug 2021 23:24:55 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwYnrO75usjjlrGCgZzdsLDtPE2dKORuqu4cQ6/SLHByjgTAawINCsTeerUMEDWc0TN8ooDAw==
+X-Received: by 2002:a17:90a:b016:: with SMTP id x22mr7315281pjq.205.1629699895193;
+        Sun, 22 Aug 2021 23:24:55 -0700 (PDT)
+Received: from wangxiaodeMacBook-Air.local ([209.132.188.80])
+        by smtp.gmail.com with ESMTPSA id g3sm14314416pfi.197.2021.08.22.23.24.47
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sun, 22 Aug 2021 23:24:54 -0700 (PDT)
+Subject: Re: [PATCH v11 01/12] iova: Export alloc_iova_fast() and
+ free_iova_fast()
+To:     Xie Yongji <xieyongji@bytedance.com>, mst@redhat.com,
+        stefanha@redhat.com, sgarzare@redhat.com, parav@nvidia.com,
+        hch@infradead.org, christian.brauner@canonical.com,
+        rdunlap@infradead.org, willy@infradead.org,
+        viro@zeniv.linux.org.uk, axboe@kernel.dk, bcrl@kvack.org,
+        corbet@lwn.net, mika.penttila@nextfour.com,
+        dan.carpenter@oracle.com, joro@8bytes.org,
+        gregkh@linuxfoundation.org, zhe.he@windriver.com,
+        xiaodong.liu@intel.com, joe@perches.com, robin.murphy@arm.com
+Cc:     songmuchun@bytedance.com,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        kvm@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        iommu@lists.linux-foundation.org, linux-kernel@vger.kernel.org
+References: <20210818120642.165-1-xieyongji@bytedance.com>
+ <20210818120642.165-2-xieyongji@bytedance.com>
+From:   Jason Wang <jasowang@redhat.com>
+Message-ID: <3ff77bab-8bb7-ae5b-4cf1-a90ebcc00118@redhat.com>
+Date:   Mon, 23 Aug 2021 14:24:42 +0800
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0)
+ Gecko/20100101 Thunderbird/78.13.0
+MIME-Version: 1.0
+In-Reply-To: <20210818120642.165-2-xieyongji@bytedance.com>
+Content-Type: text/plain; charset=gbk; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-When dirty logging is enabled, KVM splits the all hugepage mapping in
-NPT/EPT into the smallest 4K size. This property could be used to check if
-the page stats metrics work properly in KVM mmu. At the same time, this
-logic might be used the other way around: using page stats to verify if
-dirty logging really splits all huge pages.
 
-So add page stats checking in dirty logging performance selftest. In
-particular, add checks in three locations:
- - just after vm is created;
- - after populating memory into vm but before enabling dirty logging;
- - after turning off dirty logging.
+ÔÚ 2021/8/18 ÏÂÎç8:06, Xie Yongji Ð´µÀ:
+> Export alloc_iova_fast() and free_iova_fast() so that
+> some modules can make use of the per-CPU cache to get
+> rid of rbtree spinlock in alloc_iova() and free_iova()
+> during IOVA allocation.
+>
+> Signed-off-by: Xie Yongji <xieyongji@bytedance.com>
 
-Tested using commands:
- - ./dirty_log_perf_test -s anonymous_hugetlb_1gb
- - ./dirty_log_perf_test -s anonymous_thp
 
-Cc: Sean Christopherson <seanjc@google.com>
-Cc: David Matlack <dmatlack@google.com>
-Cc: Jing Zhang <jingzhangos@google.com>
-Cc: Peter Xu <peterx@redhat.com>
+Acked-by: Jason Wang <jasowang@redhat.com>
 
-Suggested-by: Ben Gardon <bgorden@google.com>
-Signed-off-by: Mingwei Zhang <mizhang@google.com>
----
- .../selftests/kvm/dirty_log_perf_test.c       | 30 +++++++++++++++++++
- .../testing/selftests/kvm/include/test_util.h |  1 +
- .../selftests/kvm/lib/perf_test_util.c        |  3 ++
- tools/testing/selftests/kvm/lib/test_util.c   | 29 ++++++++++++++++++
- 4 files changed, 63 insertions(+)
+(If we need respin, I'd suggest to put the numbers you measured here)
 
-diff --git a/tools/testing/selftests/kvm/dirty_log_perf_test.c b/tools/testing/selftests/kvm/dirty_log_perf_test.c
-index 3c30d0045d8d..e190f6860166 100644
---- a/tools/testing/selftests/kvm/dirty_log_perf_test.c
-+++ b/tools/testing/selftests/kvm/dirty_log_perf_test.c
-@@ -19,6 +19,10 @@
- #include "perf_test_util.h"
- #include "guest_modes.h"
- 
-+#ifdef __x86_64__
-+#include "processor.h"
-+#endif
-+
- /* How many host loops to run by default (one KVM_GET_DIRTY_LOG for each loop)*/
- #define TEST_HOST_LOOP_N		2UL
- 
-@@ -166,6 +170,14 @@ static void run_test(enum vm_guest_mode mode, void *arg)
- 	vm = perf_test_create_vm(mode, nr_vcpus, guest_percpu_mem_size,
- 				 p->slots, p->backing_src);
- 
-+#ifdef __x86_64__
-+	TEST_ASSERT(get_page_stats(X86_PAGE_SIZE_4K) == 0,
-+		    "4K page is non zero");
-+	TEST_ASSERT(get_page_stats(X86_PAGE_SIZE_2M) == 0,
-+		    "2M page is non zero");
-+	TEST_ASSERT(get_page_stats(X86_PAGE_SIZE_1G) == 0,
-+		    "1G page is non zero");
-+#endif
- 	perf_test_args.wr_fract = p->wr_fract;
- 
- 	guest_num_pages = (nr_vcpus * guest_percpu_mem_size) >> vm_get_page_shift(vm);
-@@ -211,6 +223,16 @@ static void run_test(enum vm_guest_mode mode, void *arg)
- 	pr_info("Populate memory time: %ld.%.9lds\n",
- 		ts_diff.tv_sec, ts_diff.tv_nsec);
- 
-+#ifdef __x86_64__
-+	TEST_ASSERT(get_page_stats(X86_PAGE_SIZE_4K) != 0,
-+		    "4K page is zero");
-+	if (p->backing_src == VM_MEM_SRC_ANONYMOUS_THP)
-+		TEST_ASSERT(get_page_stats(X86_PAGE_SIZE_2M) != 0,
-+			    "2M page is zero");
-+	if (p->backing_src == VM_MEM_SRC_ANONYMOUS_HUGETLB_1GB)
-+		TEST_ASSERT(get_page_stats(X86_PAGE_SIZE_1G) != 0,
-+			    "1G page is zero");
-+#endif
- 	/* Enable dirty logging */
- 	clock_gettime(CLOCK_MONOTONIC, &start);
- 	enable_dirty_logging(vm, p->slots);
-@@ -256,6 +278,14 @@ static void run_test(enum vm_guest_mode mode, void *arg)
- 				iteration, ts_diff.tv_sec, ts_diff.tv_nsec);
- 		}
- 	}
-+#ifdef __x86_64__
-+	TEST_ASSERT(get_page_stats(X86_PAGE_SIZE_4K) != 0,
-+		    "4K page is zero after dirty logging");
-+	TEST_ASSERT(get_page_stats(X86_PAGE_SIZE_2M) == 0,
-+		    "2M page is non-zero after dirty logging");
-+	TEST_ASSERT(get_page_stats(X86_PAGE_SIZE_1G) == 0,
-+		    "1G page is non-zero after dirty logging");
-+#endif
- 
- 	/* Disable dirty logging */
- 	clock_gettime(CLOCK_MONOTONIC, &start);
-diff --git a/tools/testing/selftests/kvm/include/test_util.h b/tools/testing/selftests/kvm/include/test_util.h
-index d79be15dd3d2..dca5fcf7aa87 100644
---- a/tools/testing/selftests/kvm/include/test_util.h
-+++ b/tools/testing/selftests/kvm/include/test_util.h
-@@ -102,6 +102,7 @@ const struct vm_mem_backing_src_alias *vm_mem_backing_src_alias(uint32_t i);
- size_t get_backing_src_pagesz(uint32_t i);
- void backing_src_help(void);
- enum vm_mem_backing_src_type parse_backing_src_type(const char *type_name);
-+size_t get_page_stats(uint32_t page_level);
- 
- /*
-  * Whether or not the given source type is shared memory (as opposed to
-diff --git a/tools/testing/selftests/kvm/lib/perf_test_util.c b/tools/testing/selftests/kvm/lib/perf_test_util.c
-index 0ef80dbdc116..c2c532990fb0 100644
---- a/tools/testing/selftests/kvm/lib/perf_test_util.c
-+++ b/tools/testing/selftests/kvm/lib/perf_test_util.c
-@@ -96,6 +96,9 @@ struct kvm_vm *perf_test_create_vm(enum vm_guest_mode mode, int vcpus,
- #ifdef __s390x__
- 	/* Align to 1M (segment size) */
- 	guest_test_phys_mem &= ~((1 << 20) - 1);
-+#elif __x86_64__
-+	/* Align to 1G (segment size) to allow hugepage mapping. */
-+	guest_test_phys_mem &= ~((1 << 30) - 1);
- #endif
- 	pr_info("guest physical test memory offset: 0x%lx\n", guest_test_phys_mem);
- 
-diff --git a/tools/testing/selftests/kvm/lib/test_util.c b/tools/testing/selftests/kvm/lib/test_util.c
-index af1031fed97f..07eb6b5c125e 100644
---- a/tools/testing/selftests/kvm/lib/test_util.c
-+++ b/tools/testing/selftests/kvm/lib/test_util.c
-@@ -15,6 +15,13 @@
- #include "linux/kernel.h"
- 
- #include "test_util.h"
-+#include "processor.h"
-+
-+static const char * const pagestat_filepaths[] = {
-+	"/sys/kernel/debug/kvm/pages_4k",
-+	"/sys/kernel/debug/kvm/pages_2m",
-+	"/sys/kernel/debug/kvm/pages_1g",
-+};
- 
- /*
-  * Parses "[0-9]+[kmgt]?".
-@@ -141,6 +148,28 @@ size_t get_trans_hugepagesz(void)
- 	return size;
- }
- 
-+#ifdef __x86_64__
-+size_t get_stats_from_file(const char *path)
-+{
-+	size_t value;
-+	FILE *f;
-+
-+	f = fopen(path, "r");
-+	TEST_ASSERT(f != NULL, "Error in opening file: %s\n", path);
-+
-+	fscanf(f, "%ld", &value);
-+	fclose(f);
-+
-+	return value;
-+}
-+
-+size_t get_page_stats(uint32_t page_level)
-+{
-+	TEST_ASSERT(page_level <= X86_PAGE_SIZE_1G, "page type error.");
-+	return get_stats_from_file(pagestat_filepaths[page_level]);
-+}
-+#endif
-+
- size_t get_def_hugetlb_pagesz(void)
- {
- 	char buf[64];
--- 
-2.33.0.rc2.250.ged5fa647cd-goog
+Thanks
+
+
+> ---
+>   drivers/iommu/iova.c | 2 ++
+>   1 file changed, 2 insertions(+)
+>
+> diff --git a/drivers/iommu/iova.c b/drivers/iommu/iova.c
+> index b6cf5f16123b..3941ed6bb99b 100644
+> --- a/drivers/iommu/iova.c
+> +++ b/drivers/iommu/iova.c
+> @@ -521,6 +521,7 @@ alloc_iova_fast(struct iova_domain *iovad, unsigned long size,
+>   
+>   	return new_iova->pfn_lo;
+>   }
+> +EXPORT_SYMBOL_GPL(alloc_iova_fast);
+>   
+>   /**
+>    * free_iova_fast - free iova pfn range into rcache
+> @@ -538,6 +539,7 @@ free_iova_fast(struct iova_domain *iovad, unsigned long pfn, unsigned long size)
+>   
+>   	free_iova(iovad, pfn);
+>   }
+> +EXPORT_SYMBOL_GPL(free_iova_fast);
+>   
+>   #define fq_ring_for_each(i, fq) \
+>   	for ((i) = (fq)->head; (i) != (fq)->tail; (i) = ((i) + 1) % IOVA_FQ_SIZE)
 
