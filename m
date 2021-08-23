@@ -2,161 +2,135 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A12B23F515A
-	for <lists+kvm@lfdr.de>; Mon, 23 Aug 2021 21:37:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5D5AD3F517D
+	for <lists+kvm@lfdr.de>; Mon, 23 Aug 2021 21:45:13 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232339AbhHWTiU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 23 Aug 2021 15:38:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45198 "EHLO
+        id S232088AbhHWTpy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 23 Aug 2021 15:45:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47020 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232295AbhHWTiR (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 23 Aug 2021 15:38:17 -0400
-Received: from mail-qv1-xf49.google.com (mail-qv1-xf49.google.com [IPv6:2607:f8b0:4864:20::f49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 796F2C0613CF
-        for <kvm@vger.kernel.org>; Mon, 23 Aug 2021 12:37:30 -0700 (PDT)
-Received: by mail-qv1-xf49.google.com with SMTP id dl8-20020ad44e08000000b0035f1f1b9cefso13139748qvb.19
-        for <kvm@vger.kernel.org>; Mon, 23 Aug 2021 12:37:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=reply-to:date:in-reply-to:message-id:mime-version:references
-         :subject:from:to:cc;
-        bh=rmYIpDdU3QK7p6S3HsrzN12lySY7VGfi8e7ewdZ2wvA=;
-        b=wJL7Xz9VU1rOK6hlGPydrdtHKr/VbFayeoZuxgI/pClqesV+XUtE4QUu6XbrrGKUZV
-         ITPHTHT20kry0avyUfIqLBA5JQIDxHabRE0taMXo5NdR5kv+wryPWEN84fvWo+bgfMCk
-         gsHovFqh4jAGff4gsw+zhuTuVahcourpbCDWAlPWtNjHNgrYonayLLqtPlPy7tWmSIYj
-         SV2v2u/HMZREXghd0Hpq/8lks5BDnj089jgrDv/KYMCPEauxiUC5forh8V9GGgO1yjGr
-         oWDhGoeu9Dc2hqnIrJJb0hakosarXIXsCuDxJGiDyZkJO4UhCloFjVRUdM2sYTUdJq/C
-         CGng==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:reply-to:date:in-reply-to:message-id
-         :mime-version:references:subject:from:to:cc;
-        bh=rmYIpDdU3QK7p6S3HsrzN12lySY7VGfi8e7ewdZ2wvA=;
-        b=cdDAEeredVYIPR5TNE1DDokNHbvpPyooJuE+xKwhx4uQ3s5cN/N0VHWLYfrVXJ1WlV
-         GycNRUeFQiT1iQTviDnzeW2h8KzW2O5BVsX8JJNJMdIoZquV/2pGh6SzNp1MIjNoELOn
-         twMujRcbHqTVZwS8rppdAvBGIsN5xCOlx6OXsRvSzdlFVYP7Wj1zBKlAZPm2l8Z+DcnV
-         bbp+pwe32VEQtXE3gCMLO6nWSIJquxlDqQ3vcyjEW7sSOE+EgIfDyA3pCrQBzU5d35X7
-         wyvncUP/wZHli3CQLolON8fE8jBBcAbxE7/Bglq0JyA+WCFS61/1mwJgt6+qSYgPGr1i
-         IrYQ==
-X-Gm-Message-State: AOAM53223NROCfKtAi7MxZDSLiMecB3+KHHFefByyCFfpg1JjXfrVSnB
-        bEPnnVCR3Em5hoJy9qYkmF0elLYcYe8=
-X-Google-Smtp-Source: ABdhPJxMughRTeNGSfkS7sQ5RCx/BDaAhNO0JOHhWF1MAuK3EB9WU/08l/gP2MCeN22B+W0LyWkDmS1X6TU=
-X-Received: from seanjc798194.pdx.corp.google.com ([2620:15c:90:200:109c:7eb8:d5ed:2e59])
- (user=seanjc job=sendgmr) by 2002:a05:6214:312:: with SMTP id
- i18mr2221144qvu.48.1629747449581; Mon, 23 Aug 2021 12:37:29 -0700 (PDT)
-Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Mon, 23 Aug 2021 12:37:09 -0700
-In-Reply-To: <20210823193709.55886-1-seanjc@google.com>
-Message-Id: <20210823193709.55886-4-seanjc@google.com>
-Mime-Version: 1.0
-References: <20210823193709.55886-1-seanjc@google.com>
-X-Mailer: git-send-email 2.33.0.rc2.250.ged5fa647cd-goog
-Subject: [PATCH 3/3] perf/x86/intel: Fold current_vcpu check into KVM's PT
- intr handler
-From:   Sean Christopherson <seanjc@google.com>
-To:     Peter Zijlstra <peterz@infradead.org>,
-        Ingo Molnar <mingo@redhat.com>,
-        Arnaldo Carvalho de Melo <acme@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Mark Rutland <mark.rutland@arm.com>,
-        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
-        Jiri Olsa <jolsa@redhat.com>,
-        Namhyung Kim <namhyung@kernel.org>,
+        with ESMTP id S230187AbhHWTpu (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 23 Aug 2021 15:45:50 -0400
+Received: from mail.skyhub.de (mail.skyhub.de [IPv6:2a01:4f8:190:11c2::b:1457])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BF29BC061575;
+        Mon, 23 Aug 2021 12:45:07 -0700 (PDT)
+Received: from zn.tnic (p200300ec2f07d9004625a010a35f3837.dip0.t-ipconnect.de [IPv6:2003:ec:2f07:d900:4625:a010:a35f:3837])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 40FB61EC0464;
+        Mon, 23 Aug 2021 21:45:02 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
+        t=1629747902;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
+        bh=7KwRhm2sTocXwEJarLiY5c63owI3J860DzvYo8UM4I8=;
+        b=ZMOl0Uklc7bTZqwVps5ltCyOrz0+FYqz+dpP/aACFQ5Dos6WO4MgcEOy3r0FBiZjU+kJ+5
+        N0XA+EgVhoccBaK31KeyV4yvoOZ6kurVQy4BmaOX4gvBTG52GczLHUiF4GOTbuMVEr85yf
+        6fDl9R5iUfEDGLSzg2RsxzO59rtBet8=
+Date:   Mon, 23 Aug 2021 21:45:44 +0200
+From:   Borislav Petkov <bp@alien8.de>
+To:     Brijesh Singh <brijesh.singh@amd.com>
+Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
+        linux-coco@lists.linux.dev, linux-mm@kvack.org,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
         Sean Christopherson <seanjc@google.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        linux-perf-users@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, Artem Kashkanov <artem.kashkanov@intel.com>
-Content-Type: text/plain; charset="UTF-8"
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        David Rientjes <rientjes@google.com>,
+        Dov Murik <dovmurik@linux.ibm.com>,
+        Tobin Feldman-Fitzthum <tobin@ibm.com>,
+        Michael Roth <michael.roth@amd.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        "Kirill A . Shutemov" <kirill@shutemov.name>,
+        Andi Kleen <ak@linux.intel.com>, tony.luck@intel.com,
+        marcorr@google.com, sathyanarayanan.kuppuswamy@linux.intel.com
+Subject: [PATCH] x86/sev: Remove do_early_exception() forward declarations
+Message-ID: <YSP66L7m4J6c5cNL@zn.tnic>
+References: <20210820151933.22401-1-brijesh.singh@amd.com>
+ <20210820151933.22401-14-brijesh.singh@amd.com>
+ <YSPcck0xAohlWHyd@zn.tnic>
+ <815a054a-b0a2-e549-8d1c-086540521979@amd.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <815a054a-b0a2-e549-8d1c-086540521979@amd.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Move the check for a non-NULL current_vcpu into KVM's PT intr handler
-instead of relying on the caller to perform the check.  In addition to
-ensuring KVM's handler won't dereference a NULL pointer (and making it
-obvious that it can't), this avoids a reptoline when KVM is configured to
-run PT in "system mode", in which case handle_intel_pt_intr will be NULL.
+On Mon, Aug 23, 2021 at 01:56:06PM -0500, Brijesh Singh wrote:
+> thanks, I will merge this in next version.
 
-No functional change intended.
+Thx.
 
-Signed-off-by: Sean Christopherson <seanjc@google.com>
+One more thing I stumbled upon while staring at this, see below. Can you
+add it to your set or should I simply apply it now?
+
+Thx.
+
 ---
- arch/x86/events/intel/core.c | 7 +++----
- arch/x86/kvm/pmu.h           | 2 +-
- arch/x86/kvm/x86.c           | 6 +++++-
- include/linux/perf_event.h   | 2 +-
- 4 files changed, 10 insertions(+), 7 deletions(-)
+From: Borislav Petkov <bp@suse.de>
+Date: Mon, 23 Aug 2021 20:01:35 +0200
+Subject: [PATCH] x86/sev: Remove do_early_exception() forward declarations
 
-diff --git a/arch/x86/events/intel/core.c b/arch/x86/events/intel/core.c
-index fca7a6e2242f..060f1f1ebe15 100644
---- a/arch/x86/events/intel/core.c
-+++ b/arch/x86/events/intel/core.c
-@@ -2852,10 +2852,9 @@ static int handle_pmi_common(struct pt_regs *regs, u64 status)
- 	 */
- 	if (__test_and_clear_bit(GLOBAL_STATUS_TRACE_TOPAPMI_BIT, (unsigned long *)&status)) {
- 		handled++;
--		if (unlikely(perf_guest_cbs && perf_guest_cbs->is_in_guest() &&
--			perf_guest_cbs->handle_intel_pt_intr))
--			perf_guest_cbs->handle_intel_pt_intr();
--		else
-+		if (likely(!perf_guest_cbs ||
-+			   !perf_guest_cbs->handle_intel_pt_intr ||
-+			   perf_guest_cbs->handle_intel_pt_intr()))
- 			intel_pt_interrupt();
- 	}
+There's a perfectly fine prototype in the asm/setup.h header. Use it.
+
+No functional changes.
+
+Signed-off-by: Borislav Petkov <bp@suse.de>
+---
+ arch/x86/kernel/sev.c | 7 +------
+ 1 file changed, 1 insertion(+), 6 deletions(-)
+
+diff --git a/arch/x86/kernel/sev.c b/arch/x86/kernel/sev.c
+index a6895e440bc3..700ef31d32f8 100644
+--- a/arch/x86/kernel/sev.c
++++ b/arch/x86/kernel/sev.c
+@@ -26,6 +26,7 @@
+ #include <asm/fpu/internal.h>
+ #include <asm/processor.h>
+ #include <asm/realmode.h>
++#include <asm/setup.h>
+ #include <asm/traps.h>
+ #include <asm/svm.h>
+ #include <asm/smp.h>
+@@ -96,9 +97,6 @@ struct ghcb_state {
+ static DEFINE_PER_CPU(struct sev_es_runtime_data*, runtime_data);
+ DEFINE_STATIC_KEY_FALSE(sev_es_enable_key);
  
-diff --git a/arch/x86/kvm/pmu.h b/arch/x86/kvm/pmu.h
-index b06dbbd7eeeb..4e8a38eca72b 100644
---- a/arch/x86/kvm/pmu.h
-+++ b/arch/x86/kvm/pmu.h
-@@ -41,7 +41,7 @@ struct kvm_pmu_ops {
- 	void (*reset)(struct kvm_vcpu *vcpu);
- 	void (*deliver_pmi)(struct kvm_vcpu *vcpu);
- 	void (*cleanup)(struct kvm_vcpu *vcpu);
--	void (*handle_intel_pt_intr)(void);
-+	int (*handle_intel_pt_intr)(void);
- };
- 
- static inline u64 pmc_bitmask(struct kvm_pmc *pmc)
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index b5ade47dad9c..3f289192f25f 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -8292,13 +8292,17 @@ static unsigned long kvm_get_guest_ip(void)
- 	return ip;
- }
- 
--static void kvm_handle_intel_pt_intr(void)
-+static int kvm_handle_intel_pt_intr(void)
+-/* Needed in vc_early_forward_exception */
+-void do_early_exception(struct pt_regs *regs, int trapnr);
+-
+ static void __init setup_vc_stacks(int cpu)
  {
- 	struct kvm_vcpu *vcpu = __this_cpu_read(current_vcpu);
- 
-+	if (!vcpu)
-+		return -ENXIO;
-+
- 	kvm_make_request(KVM_REQ_PMI, vcpu);
- 	__set_bit(MSR_CORE_PERF_GLOBAL_OVF_CTRL_TRACE_TOPA_PMI_BIT,
- 			(unsigned long *)&vcpu->arch.pmu.global_status);
-+	return 0;
+ 	struct sev_es_runtime_data *data;
+@@ -240,9 +238,6 @@ static noinstr struct ghcb *__sev_get_ghcb(struct ghcb_state *state)
+ 	return ghcb;
  }
  
- static struct perf_guest_info_callbacks kvm_guest_cbs = {
-diff --git a/include/linux/perf_event.h b/include/linux/perf_event.h
-index 2d510ad750ed..f812c2570285 100644
---- a/include/linux/perf_event.h
-+++ b/include/linux/perf_event.h
-@@ -30,7 +30,7 @@ struct perf_guest_info_callbacks {
- 	int				(*is_in_guest)(void);
- 	int				(*is_user_mode)(void);
- 	unsigned long			(*get_guest_ip)(void);
--	void				(*handle_intel_pt_intr)(void);
-+	int				(*handle_intel_pt_intr)(void);
- };
- 
- #ifdef CONFIG_HAVE_HW_BREAKPOINT
+-/* Needed in vc_early_forward_exception */
+-void do_early_exception(struct pt_regs *regs, int trapnr);
+-
+ static inline u64 sev_es_rd_ghcb_msr(void)
+ {
+ 	return __rdmsr(MSR_AMD64_SEV_ES_GHCB);
 -- 
-2.33.0.rc2.250.ged5fa647cd-goog
+2.29.2
 
+-- 
+Regards/Gruss,
+    Boris.
+
+https://people.kernel.org/tglx/notes-about-netiquette
