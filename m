@@ -2,181 +2,161 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C88203F489E
-	for <lists+kvm@lfdr.de>; Mon, 23 Aug 2021 12:26:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E299E3F4A00
+	for <lists+kvm@lfdr.de>; Mon, 23 Aug 2021 13:46:40 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233518AbhHWK0n (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 23 Aug 2021 06:26:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58058 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235975AbhHWK0j (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 23 Aug 2021 06:26:39 -0400
-Received: from mail-ot1-x335.google.com (mail-ot1-x335.google.com [IPv6:2607:f8b0:4864:20::335])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8D469C061575
-        for <kvm@vger.kernel.org>; Mon, 23 Aug 2021 03:25:57 -0700 (PDT)
-Received: by mail-ot1-x335.google.com with SMTP id i3-20020a056830210300b0051af5666070so25264243otc.4
-        for <kvm@vger.kernel.org>; Mon, 23 Aug 2021 03:25:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=iil3g1xzE54TUwgwxXbVjp/I2BXWoZeDWrISpeeZe14=;
-        b=BEW3pF7bCpIXQquKczEegFeZjB4PN2FJINV+cpI96e+ZQKAUumwIkxkDwpbx3KxVX/
-         jEV7r2X/PXB2J5H9vROz1yIGrg/C9BzHL2ENP4rws1a69K/LMgiALseDgDCqMkZf1zTT
-         iXMVQXasH/iLEIZZQ2O019Dd8bfQCg7UE4mAC5hsYCzmN3+VqRSGWNbgF2jwGtyaNrbq
-         2dh21hx5nfjAG1EedyrdGR+2AIZE0gAzriJ9sCGtm4N9Rxdpdj5w5BYRgmlh+IHNZiu9
-         wOpyw2qGxapWYcgQ0s4wMPR5DW1y51wv1BZX/EIraK4Wzwln68WzoQTFeaTaW1NQ3nYg
-         c3VQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=iil3g1xzE54TUwgwxXbVjp/I2BXWoZeDWrISpeeZe14=;
-        b=LDg37IEYGPCmi2MB72xlnt0OTw4xJ/ijjrsiDvYQVpB19em2I+vAvCW9ocj2iEoOVJ
-         udQJqNFDckQD5q4uvaQQtdcl+RjOiaX5VGkc1r9CPppvUzrSxBKNeKyhcp5QCJZ83Ia4
-         O3cTlg36fd84r6LcsyAho6YBapqIwmJaoTCkLBK8UwXLJFBYQ3pobNNTXCu4EdyVL2U8
-         3g8w33/iHfM9MQ4PWxTcX/V63ASnZmUJPk11UeGi+S40j4t6dcFJYwuE1jzYNkawC4FG
-         95WnRIuPsEVbMqRBAl/l3b+59CQAEE6M0JMT0+3oVjUe2V3N7NGsw7+00+/PLnfQ/L2t
-         habQ==
-X-Gm-Message-State: AOAM533h3Atd/xro7YoOjv7bFq+JXaYaAbI58uIiOyVZ1PUV2Ab+39a9
-        rB9kGPwqSI8zPspGVuhkhoq/hHsV3fTzALxAVt+FpQ==
-X-Google-Smtp-Source: ABdhPJyc5KKsDid+ISzlkW07QeZX7D5K3hIbXU4y15H3axJsNCGDbA+XxfiyQc68SzeSTbGJu39OzYXXM1Av29ZlITE=
-X-Received: by 2002:a05:6830:1dac:: with SMTP id z12mr23465282oti.52.1629714356807;
- Mon, 23 Aug 2021 03:25:56 -0700 (PDT)
+        id S236522AbhHWLrS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 23 Aug 2021 07:47:18 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:22245 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S236129AbhHWLrK (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 23 Aug 2021 07:47:10 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1629719188;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=C5hEG46HD9x4sAs8ZS+FjrJatm/5w+e21T3b1r40Y1M=;
+        b=EX8ABwQvqp1eDO/arH7HYmVpRKAtJzd5Ou4qatjhixKxDZqoZOjYf9Mja0uC/FEw5OIrEa
+        CMHMpSHJ4LXxW99wCKse4Bl3qb1gbUWCUt9LBJLo2Tnahl2HThYL+r7N7jti3J5KYuWUkf
+        oniTn+3+lyk9QvmClVOapu5yoqVzeaM=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-287-ioETjXvmPYqTqPG-KsZKqw-1; Mon, 23 Aug 2021 07:46:25 -0400
+X-MC-Unique: ioETjXvmPYqTqPG-KsZKqw-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E9D9D87D542;
+        Mon, 23 Aug 2021 11:46:23 +0000 (UTC)
+Received: from localhost.localdomain (unknown [10.35.206.50])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 1A41F5F707;
+        Mon, 23 Aug 2021 11:46:19 +0000 (UTC)
+From:   Maxim Levitsky <mlevitsk@redhat.com>
+To:     kvm@vger.kernel.org
+Cc:     Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Jim Mattson <jmattson@google.com>,
+        x86@kernel.org (maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)),
+        linux-kernel@vger.kernel.org (open list:X86 ARCHITECTURE (32-BIT AND
+        64-BIT)), Wanpeng Li <wanpengli@tencent.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Borislav Petkov <bp@alien8.de>,
+        Sean Christopherson <seanjc@google.com>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Maxim Levitsky <mlevitsk@redhat.com>,
+        Ingo Molnar <mingo@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>
+Subject: [PATCH v2 0/3] KVM: few more SMM fixes
+Date:   Mon, 23 Aug 2021 14:46:15 +0300
+Message-Id: <20210823114618.1184209-1-mlevitsk@redhat.com>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-References: <20210817081134.2918285-1-tabba@google.com> <20210817081134.2918285-16-tabba@google.com>
- <CAOQ_QsgSfHVjJkSJku5DwUe0_=ds4GduPbJ7vC-t+4_=fPVFBQ@mail.gmail.com>
-In-Reply-To: <CAOQ_QsgSfHVjJkSJku5DwUe0_=ds4GduPbJ7vC-t+4_=fPVFBQ@mail.gmail.com>
-From:   Fuad Tabba <tabba@google.com>
-Date:   Mon, 23 Aug 2021 11:25:20 +0100
-Message-ID: <CA+EHjTwPgjXtrR5dFx0RBN9xdX0j7ugO=NqAmkmZqYE9N_jP7w@mail.gmail.com>
-Subject: Re: [PATCH v4 15/15] KVM: arm64: Handle protected guests at 32 bits
-To:     Oliver Upton <oupton@google.com>
-Cc:     kvmarm@lists.cs.columbia.edu, maz@kernel.org, will@kernel.org,
-        james.morse@arm.com, alexandru.elisei@arm.com,
-        suzuki.poulose@arm.com, mark.rutland@arm.com,
-        christoffer.dall@arm.com, pbonzini@redhat.com, drjones@redhat.com,
-        qperret@google.com, kvm@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, kernel-team@android.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Oliver,
+These are few SMM fixes I was working on last week.=0D
+=0D
+* First patch fixes a minor issue that remained after=0D
+  commit 37be407b2ce8 ("KVM: nSVM: Fix L1 state corruption upon return from=
+ SMM")=0D
+=0D
+  While now, returns to guest mode from SMM work due to restored state from=
+ HSAVE=0D
+  area, the guest entry still sees incorrect HSAVE state.=0D
+=0D
+  This for example breaks return from SMM when the guest is 32 bit, due to =
+PDPTRs=0D
+  loading which are done using incorrect MMU state which is incorrect,=0D
+  because it was setup with incorrect L1 HSAVE state.=0D
+=0D
+* 2nd patch fixes a theoretical issue that I introduced with my SREGS2 patc=
+hset,=0D
+  which Sean Christopherson pointed out.=0D
+=0D
+  The issue is that KVM_REQ_GET_NESTED_STATE_PAGES request is not only used=
+=0D
+  for completing the load of the nested state, but it is also used to compl=
+ete=0D
+  exit from SMM to guest mode, and my compatibility hack of pdptrs_from_use=
+rspace=0D
+  was done assuming that this is not done.=0D
+=0D
+  While it is safe to just reset 'pdptrs_from_userspace' on each VM entry,=
+=0D
+  I don't want to slow down the common code for this very rare hack.=0D
+  Instead I explicitly zero this variable when SMM exit to guest mode is do=
+ne,=0D
+  because in this case PDPTRs do need to be reloaded from memory always.=0D
+=0D
+  Note that this is a theoretical issue only, because after 'vendor' return=
+ from=0D
+  smm code (aka .leave_smm) is done, even when it returned to the guest mod=
+e,=0D
+  which loads some of L2 CPU state, we still load again all of the L2 cpu s=
+tate=0D
+  captured in SMRAM which includes CR3, at which point guest PDPTRs are re-=
+loaded=0D
+  anyway.=0D
+=0D
+  Also note that across SMI entries the CR3 seems not to be updated, and In=
+tel's=0D
+  SDM notes that it saved value in SMRAM isn't writable, thus it is possibl=
+e=0D
+  that if SMM handler didn't change CR3, the pdptrs would not be touched.=0D
+=0D
+  I guess that means that a SMI handler can in theory preserve PDPTRs by ne=
+ver=0D
+  touching CR3, but since recently we removed that code that didn't update =
+PDPTRs=0D
+  if CR3 didn't change, I guess it won't work.=0D
+=0D
+  Anyway I don't think any OS bothers to have PDPTRs not synced with whatev=
+er=0D
+  page CR3 points at, thus I didn't bother to try and test what the real ha=
+rdware=0D
+  does in this case.=0D
+=0D
+* 3rd patch makes SVM SMM exit to be a bit more similar to how VMX does it=
+=0D
+  by also raising KVM_REQ_GET_NESTED_STATE_PAGES requests.=0D
+=0D
+  I do have doubts about why we need to do this on VMX though. The initial=
+=0D
+  justification for this comes from=0D
+=0D
+  7f7f1ba33cf2 ("KVM: x86: do not load vmcs12 pages while still in SMM")=0D
+=0D
+  With all the MMU changes, I am not sure that we can still have a case=0D
+  of not up to date MMU when we enter the nested guest from SMM.=0D
+  On SVM it does seem to work anyway without this.=0D
+=0D
+I still track another SMM issue, which I debugged a bit today but still=0D
+no lead on what is going on:=0D
+=0D
+When HyperV guest is running nested, and uses SMM enabled OVMF, it crashes =
+and=0D
+reboots during the boot process.=0D
+=0D
+Best regards,=0D
+	Maxim Levitsky=0D
+=0D
+Maxim Levitsky (3):=0D
+  KVM: nSVM: restore the L1 host state prior to resuming a nested guest=0D
+    on SMM exit=0D
+  KVM: x86: force PDPTRs reload on SMM exit=0D
+  KVM: nSVM: call KVM_REQ_GET_NESTED_STATE_PAGES on exit from SMM mode=0D
+=0D
+ arch/x86/kvm/svm/nested.c |  9 ++++++---=0D
+ arch/x86/kvm/svm/svm.c    | 27 ++++++++++++++++++---------=0D
+ arch/x86/kvm/svm/svm.h    |  3 ++-=0D
+ arch/x86/kvm/vmx/vmx.c    |  7 +++++++=0D
+ 4 files changed, 33 insertions(+), 13 deletions(-)=0D
+=0D
+-- =0D
+2.26.3=0D
+=0D
 
-On Thu, Aug 19, 2021 at 9:10 AM Oliver Upton <oupton@google.com> wrote:
->
-> Hi Fuad,
->
-> On Tue, Aug 17, 2021 at 1:12 AM Fuad Tabba <tabba@google.com> wrote:
-> >
-> > Protected KVM does not support protected AArch32 guests. However,
-> > it is possible for the guest to force run AArch32, potentially
-> > causing problems. Add an extra check so that if the hypervisor
-> > catches the guest doing that, it can prevent the guest from
-> > running again by resetting vcpu->arch.target and returning
-> > ARM_EXCEPTION_IL.
-> >
-> > If this were to happen, The VMM can try and fix it by re-
-> > initializing the vcpu with KVM_ARM_VCPU_INIT, however, this is
-> > likely not possible for protected VMs.
-> >
-> > Adapted from commit 22f553842b14 ("KVM: arm64: Handle Asymmetric
-> > AArch32 systems")
-> >
-> > Signed-off-by: Fuad Tabba <tabba@google.com>
-> > ---
-> >  arch/arm64/kvm/hyp/nvhe/switch.c | 37 ++++++++++++++++++++++++++++++++
-> >  1 file changed, 37 insertions(+)
-> >
-> > diff --git a/arch/arm64/kvm/hyp/nvhe/switch.c b/arch/arm64/kvm/hyp/nvhe/switch.c
-> > index 398e62098898..0c24b7f473bf 100644
-> > --- a/arch/arm64/kvm/hyp/nvhe/switch.c
-> > +++ b/arch/arm64/kvm/hyp/nvhe/switch.c
-> > @@ -20,6 +20,7 @@
-> >  #include <asm/kprobes.h>
-> >  #include <asm/kvm_asm.h>
-> >  #include <asm/kvm_emulate.h>
-> > +#include <asm/kvm_fixed_config.h>
-> >  #include <asm/kvm_hyp.h>
-> >  #include <asm/kvm_mmu.h>
-> >  #include <asm/fpsimd.h>
-> > @@ -195,6 +196,39 @@ exit_handle_fn kvm_get_nvhe_exit_handler(struct kvm_vcpu *vcpu)
-> >                 return NULL;
-> >  }
-> >
-> > +/*
-> > + * Some guests (e.g., protected VMs) might not be allowed to run in AArch32. The
-> > + * check below is based on the one in kvm_arch_vcpu_ioctl_run().
-> > + * The ARMv8 architecture does not give the hypervisor a mechanism to prevent a
-> > + * guest from dropping to AArch32 EL0 if implemented by the CPU. If the
-> > + * hypervisor spots a guest in such a state ensure it is handled, and don't
-> > + * trust the host to spot or fix it.
-> > + *
-> > + * Returns true if the check passed and the guest run loop can continue, or
-> > + * false if the guest should exit to the host.
-> > + */
-> > +static bool check_aarch32_guest(struct kvm_vcpu *vcpu, u64 *exit_code)
->
-> This does a bit more than just check & return, so maybe call it
-> handle_aarch32_guest()?
->
-> > +{
-> > +       if (kvm_vm_is_protected(kern_hyp_va(vcpu->kvm)) &&
->
-> maybe initialize a local with a hyp pointer to the kvm structure.
-
-Will do.
-
-> > +           vcpu_mode_is_32bit(vcpu) &&
-> > +           FIELD_GET(ARM64_FEATURE_MASK(ID_AA64PFR0_EL0),
-> > +                                        PVM_ID_AA64PFR0_RESTRICT_UNSIGNED) <
-> > +               ID_AA64PFR0_ELx_32BIT_64BIT) {
->
-> It may be more readable to initialize a local variable with this
-> feature check, i.e:
->
-> bool aarch32_allowed = FIELD_GET(...) == ID_AA64PFR0_ELx_32BIT_64BIT;
->
-> and then:
->
->   if (kvm_vm_is_protected(kvm) && vcpu_mode_is_32bit(vcpu) &&
-> !aarch32_allowed) {
-
-I agree.
-
-Thanks,
-/fuad
-
-> > +               /*
-> > +                * As we have caught the guest red-handed, decide that it isn't
-> > +                * fit for purpose anymore by making the vcpu invalid. The VMM
-> > +                * can try and fix it by re-initializing the vcpu with
-> > +                * KVM_ARM_VCPU_INIT, however, this is likely not possible for
-> > +                * protected VMs.
-> > +                */
-> > +               vcpu->arch.target = -1;
-> > +               *exit_code = ARM_EXCEPTION_IL;
-> > +               return false;
-> > +       }
-> > +
-> > +       return true;
-> > +}
-> > +
-> >  /* Switch to the guest for legacy non-VHE systems */
-> >  int __kvm_vcpu_run(struct kvm_vcpu *vcpu)
-> >  {
-> > @@ -255,6 +289,9 @@ int __kvm_vcpu_run(struct kvm_vcpu *vcpu)
-> >                 /* Jump in the fire! */
-> >                 exit_code = __guest_enter(vcpu);
-> >
-> > +               if (unlikely(!check_aarch32_guest(vcpu, &exit_code)))
-> > +                       break;
-> > +
-> >                 /* And we're baaack! */
-> >         } while (fixup_guest_exit(vcpu, &exit_code));
-> >
-> > --
-> > 2.33.0.rc1.237.g0d66db33f3-goog
-> >
