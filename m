@@ -2,82 +2,87 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2319D3F4F04
-	for <lists+kvm@lfdr.de>; Mon, 23 Aug 2021 19:11:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 549803F4F64
+	for <lists+kvm@lfdr.de>; Mon, 23 Aug 2021 19:19:18 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230298AbhHWRMh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 23 Aug 2021 13:12:37 -0400
-Received: from mga02.intel.com ([134.134.136.20]:64991 "EHLO mga02.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229479AbhHWRMe (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 23 Aug 2021 13:12:34 -0400
-X-IronPort-AV: E=McAfee;i="6200,9189,10085"; a="204342899"
-X-IronPort-AV: E=Sophos;i="5.84,344,1620716400"; 
-   d="scan'208";a="204342899"
-Received: from orsmga001.jf.intel.com ([10.7.209.18])
-  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Aug 2021 10:11:51 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.84,344,1620716400"; 
-   d="scan'208";a="507325544"
-Received: from um.fi.intel.com (HELO um) ([10.237.72.62])
-  by orsmga001.jf.intel.com with ESMTP; 23 Aug 2021 10:11:48 -0700
-From:   Alexander Shishkin <alexander.shishkin@linux.intel.com>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Peter Zijlstra <a.p.zijlstra@chello.nl>,
-        Arnaldo Carvalho de Melo <acme@redhat.com>,
-        Ingo Molnar <mingo@redhat.com>, linux-kernel@vger.kernel.org,
-        Jiri Olsa <jolsa@kernel.org>, kvm@vger.kernel.org,
-        Artem Kashkanov <artem.kashkanov@intel.com>,
-        alexander.shishkin@linux.intel.com
-Subject: Re: [PATCH] kvm/x86: Fix PT "host mode"
-In-Reply-To: <YSPJ8/PgcFRnp4N9@google.com>
-References: <20210823134239.45402-1-alexander.shishkin@linux.intel.com>
- <YSPJ8/PgcFRnp4N9@google.com>
-Date:   Mon, 23 Aug 2021 20:11:47 +0300
-Message-ID: <87zgt8hyr0.fsf@ashishki-desk.ger.corp.intel.com>
+        id S231403AbhHWRT6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 23 Aug 2021 13:19:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41494 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230360AbhHWRT4 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 23 Aug 2021 13:19:56 -0400
+Received: from mail-pf1-x42d.google.com (mail-pf1-x42d.google.com [IPv6:2607:f8b0:4864:20::42d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8CF53C061757
+        for <kvm@vger.kernel.org>; Mon, 23 Aug 2021 10:19:13 -0700 (PDT)
+Received: by mail-pf1-x42d.google.com with SMTP id 18so15958622pfh.9
+        for <kvm@vger.kernel.org>; Mon, 23 Aug 2021 10:19:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=IWL7Yh+mP65xmvAitJG8b6Di+ZqbYJAqwLYk9jhbuJA=;
+        b=HxHnaTbLz9/e7xkXCnUYhY/tMz8hJs+Dx98kRcQoj8kkPcbBhBYtGEJKBn+3ayLFYd
+         zJwdWA8cuMtmtCtYDqAbxn2DP1y69H+qQKCvveWQZJQeixoPrhQFJZNDajvWqu4ninzD
+         /pSwkXlIXyDarPPlMI7K2e+Wf8F8Ln3mNo6jD1PW3CNu1vqjcq72RUTc62fugkMF6svz
+         KFll8FmyuETvuMsjySSQYf/2z02qFnL2KJ+t0UpwGI8AUbumynMo84ICtCsSCw2uWpRm
+         F6si4fM9HnkKxsr0CzIpMFeaz9pxXQyb84yG/ymKaipcPDi2bDhimAVzjf1saPcyVkM+
+         BxWQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=IWL7Yh+mP65xmvAitJG8b6Di+ZqbYJAqwLYk9jhbuJA=;
+        b=CmN5soIwE+VvrBogxJ1DTRrZZNGwIdZDlSMt6WJAAPPUSSTGzfuKPShH57u0tKuQpg
+         NFcYAiHZCHduri/9/nBq3qUBIouqOjQy42i/xQHbZ+k3zYjpkToAGDq+76QpHmyfPS6y
+         hs8JEfRrBrn6uBoUW0x5e8lhkg+wh5EMECR/pRZF5XUHzvABxnS9YvAyou2ldk4Nnrxd
+         Ygo1VW86ck4WnZL9AQFgGWSsxYsQh7PJJ1EiYZzrRm4/zUSpyQrkKmVU/Tcd0MQYWa9z
+         tjsNvwfE573itYsEKTaiXwtkyzBmTQp0mOH4RjOcxA3rGQP4HwdLUJ1Vn+KqoAMk+VGt
+         BPpQ==
+X-Gm-Message-State: AOAM530EDA3cxtRAd+LBHRMFkTzVDysWTCzJ4KzrfINuMiSAG4lxlE4M
+        Ut3OIl8m77mpBXBaxIFcWuDy0Q==
+X-Google-Smtp-Source: ABdhPJxzIOCoUVt4Ja+vSdSKmWsDnBnppesoRISHVIhFr00eatLZ/wC33b0j+2gt2n/J4IpFJb6pHw==
+X-Received: by 2002:a63:ef12:: with SMTP id u18mr32753706pgh.331.1629739152905;
+        Mon, 23 Aug 2021 10:19:12 -0700 (PDT)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id z131sm17195346pfc.159.2021.08.23.10.19.12
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 23 Aug 2021 10:19:12 -0700 (PDT)
+Date:   Mon, 23 Aug 2021 17:19:06 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Peter Gonda <pgonda@google.com>
+Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+        David Rientjes <rientjes@google.com>,
+        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
+        Brijesh Singh <brijesh.singh@amd.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        "H. Peter Anvin" <hpa@zytor.com>, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 0/2 V5] Add AMD SEV and SEV-ES intra host migration
+ support
+Message-ID: <YSPYinqcP3yr6SpO@google.com>
+References: <20210823162756.2686856-1-pgonda@google.com>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210823162756.2686856-1-pgonda@google.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Sean Christopherson <seanjc@google.com> writes:
+On Mon, Aug 23, 2021, Peter Gonda wrote:
+> V5:
+>  * Fix up locking scheme
 
-> On Mon, Aug 23, 2021, Alexander Shishkin wrote:
->
->> Signed-off-by: Alexander Shishkin <alexander.shishkin@linux.intel.com>
->> Fixes: ff9d07a0e7ce7 ("KVM: Implement perf callbacks for guest sampling")
->
-> This should be another clue that the fix isn't correct.
-> That patch is from 2010,
-
-Right, this should have been 8479e04e7d6b1 ("KVM: x86: Inject PMI for
-KVM guest") instead.
-
-> Intel PT was announced in 2013 and merged in 2019.
-
-Technically, 2019 is when kvm started breaking host PT.
-
-> This is not remotely correct.  vmx.c's "pt_mode", which is queried via this path,
-> is modified by hardware_setup(), a.k.a. kvm_x86_ops.hardware_setup(), which runs
-> _after_ this code.  And as alluded to above, these are generic perf callbacks,
-> installing them if and only if Intel PT is enabled in a specific mode completely
-> breaks "regular" perf.
-
-I see your point, the callchain code will catch fire.
-
-> I'll post a small series, there's a bit of code massage needed to fix this
-> properly.  The PMI handler can also be optimized to avoid a retpoline when PT is
-> not exposed to the guest.
-
-The actual PMU handler also needs to know that kvm won't be needing it
-so it can call the regular PT handler.
-
-One could unset cbs->handle_intel_pt_intr() or one could have it return
-different things depending on whether it was actually taken in kvm. But
-both are rather disgusting.
-
-Regards,
---
-Alex
+Please add a selftest to prove/verify the anti-deadlock scheme actually works.
+Unless I'm mistaken, only KVM_SEV_INIT needs to be invoked, i.e. the selftest
+wouldn't need anything remotely close to full SEV support.  And that means it
+should be trivial to verify the success path as well.  E.g. create three SEV VMs
+(A, B, and C) and verify migrating from any VM to any other VM works (since none
+of the VMs have memory regions).  Then spin up eight pthreads and have each thread
+concurrently migrate a specific combination an arbitrary number of times.  Ignore
+whether the migration failed or succeeded, "success" from the test's perspective
+is purely that it completed, i.e. didn't deadlock.
