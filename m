@@ -2,121 +2,251 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 88A5C3F4D2E
-	for <lists+kvm@lfdr.de>; Mon, 23 Aug 2021 17:16:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7E0093F4D41
+	for <lists+kvm@lfdr.de>; Mon, 23 Aug 2021 17:19:07 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230470AbhHWPRN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 23 Aug 2021 11:17:13 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:57042 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230399AbhHWPRM (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 23 Aug 2021 11:17:12 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1629731789;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=DN1b/ZryAIDQdlT9EYOFyEAWtXpqjUmEBD/b/C3QFkQ=;
-        b=CdbPIEq3nX11WfwPTN6qcUKfceqMaA4jAW8mbp+gXioAFLhzH2IS6x+YhppjOXxV+5+0Rl
-        6r3bPQotegA3ZCGShJSb7uUCrulJru3xvKXGm8o47bfOtbTVxFxhWnCc6SVUl3dKUp+OET
-        lmZ0/4idaRa8Ds4rm9VPnfbxoSodXkI=
-Received: from mail-ot1-f72.google.com (mail-ot1-f72.google.com
- [209.85.210.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-557-50VtS4RXNaeToKu7NO8WoA-1; Mon, 23 Aug 2021 11:16:27 -0400
-X-MC-Unique: 50VtS4RXNaeToKu7NO8WoA-1
-Received: by mail-ot1-f72.google.com with SMTP id m32-20020a9d1d230000b02905103208125aso10225360otm.3
-        for <kvm@vger.kernel.org>; Mon, 23 Aug 2021 08:16:27 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
-         :references:organization:mime-version:content-transfer-encoding;
-        bh=DN1b/ZryAIDQdlT9EYOFyEAWtXpqjUmEBD/b/C3QFkQ=;
-        b=DqAT8GQdgOmvGdPvLyQZ3rt/r92hoOOtepI9LEcTzkMXlNfPbdD1YfMMbutErU45Fd
-         fZ/ksurTZ/7Qxsw0iFCG4uxUSPTs4aSaDKRliWA5QaQV2IsrXXbbdkfs5tq8le4okK4f
-         Lr+F6aQsBkKdNrpaA364/8ekEHJNRN8u44GytVXqbNJh5PA9CMbNweBozGbtBVsXEQVm
-         PAwRhAb/wbAyJAQ9lIk9sCy+Al9J1Sm7oyg1C9kKvjMuO3M4lsSErS0Fy6jJw5C+QySy
-         XsapKKcP4lIu1rmn2WvhqioXD7OWLwPzsYQX781KgfiR/XU9m2SqqgSKnt6a4LchgaE0
-         hLaQ==
-X-Gm-Message-State: AOAM530c6XShOoHmqieC3z3nFlZJ5e2I+9DUYSQ4Y1zSh837S5Hasi0Y
-        AQi2ljDmpduEyFYwkhVzh9SQVEdz/+wMXMSoHC+S7/3qkQQn2ssj7kyph7oKh+m4l4oTyi1p+ov
-        LKcVtNawlY30Q
-X-Received: by 2002:a05:6830:1dac:: with SMTP id z12mr24543868oti.52.1629731787081;
-        Mon, 23 Aug 2021 08:16:27 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzqOeF/H0qDGnn9D02GiZCSA4DRcSR8LiSLGylhEba8t1EsbxXzTz8dIto+iigT90XxNROCzg==
-X-Received: by 2002:a05:6830:1dac:: with SMTP id z12mr24543850oti.52.1629731786895;
-        Mon, 23 Aug 2021 08:16:26 -0700 (PDT)
-Received: from redhat.com ([198.99.80.109])
-        by smtp.gmail.com with ESMTPSA id x1sm2557766otu.8.2021.08.23.08.16.25
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 23 Aug 2021 08:16:26 -0700 (PDT)
-Date:   Mon, 23 Aug 2021 09:16:24 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Yishai Hadas <yishaih@nvidia.com>
-Cc:     <bhelgaas@google.com>, <corbet@lwn.net>,
-        <diana.craciun@oss.nxp.com>, <kwankhede@nvidia.com>,
-        <eric.auger@redhat.com>, <masahiroy@kernel.org>,
-        <michal.lkml@markovi.net>, <linux-pci@vger.kernel.org>,
-        <linux-doc@vger.kernel.org>, <kvm@vger.kernel.org>,
-        <linux-s390@vger.kernel.org>, <linux-kbuild@vger.kernel.org>,
-        <mgurtovoy@nvidia.com>, <jgg@nvidia.com>, <maorg@nvidia.com>,
-        <leonro@nvidia.com>
-Subject: Re: [PATCH V3 06/13] vfio/pci: Split the pci_driver code out of
- vfio_pci_core.c
-Message-ID: <20210823091624.697c67d6.alex.williamson@redhat.com>
-In-Reply-To: <20210822143602.153816-7-yishaih@nvidia.com>
-References: <20210822143602.153816-1-yishaih@nvidia.com>
-        <20210822143602.153816-7-yishaih@nvidia.com>
-Organization: Red Hat
-X-Mailer: Claws Mail 3.18.0 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
+        id S231495AbhHWPTo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 23 Aug 2021 11:19:44 -0400
+Received: from mail.efficios.com ([167.114.26.124]:40164 "EHLO
+        mail.efficios.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231447AbhHWPTm (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 23 Aug 2021 11:19:42 -0400
+Received: from localhost (localhost [127.0.0.1])
+        by mail.efficios.com (Postfix) with ESMTP id D3C4C33517E;
+        Mon, 23 Aug 2021 11:18:58 -0400 (EDT)
+Received: from mail.efficios.com ([127.0.0.1])
+        by localhost (mail03.efficios.com [127.0.0.1]) (amavisd-new, port 10032)
+        with ESMTP id nmtOY9Ei1y27; Mon, 23 Aug 2021 11:18:54 -0400 (EDT)
+Received: from localhost (localhost [127.0.0.1])
+        by mail.efficios.com (Postfix) with ESMTP id 54EB4334FEE;
+        Mon, 23 Aug 2021 11:18:54 -0400 (EDT)
+DKIM-Filter: OpenDKIM Filter v2.10.3 mail.efficios.com 54EB4334FEE
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=efficios.com;
+        s=default; t=1629731934;
+        bh=2ZrSQOBO8bFOj55pwjt/9awIJm+JC/tsi3zqC/kFRO0=;
+        h=Date:From:To:Message-ID:MIME-Version;
+        b=jRQcKOzs5v3QJnUvnsKlue7ycCzhzQHAmMQi7MRz0p0iknI4p+fXV+7jnPexhdsWT
+         vvX2GnY4QFbZwOMc2xP+jrEhJMrh75uA/7zvTC/Xi34yQHZ6vNkLKoHfQFJIqPkCFT
+         JzPLax2kDSWgxFU0liHytyoTw2Kf2Wu0pJB9fhut7JTgObKuxq+DbYstR3ZSXcXWeJ
+         CuOGXr7C83Fq/TLHuVSNDmjlbCCbbekGItXqWI8+IHUTNIbOrZOORDROiIgXKZmgqA
+         loNI5CAaFpbVsdx0+GILWY6fAl1GfFEa5dliKewU05O5hEMUWMeGHZYZIFT4XL463H
+         o2yPiOSDA7ltQ==
+X-Virus-Scanned: amavisd-new at efficios.com
+Received: from mail.efficios.com ([127.0.0.1])
+        by localhost (mail03.efficios.com [127.0.0.1]) (amavisd-new, port 10026)
+        with ESMTP id hExHD00CioXs; Mon, 23 Aug 2021 11:18:54 -0400 (EDT)
+Received: from mail03.efficios.com (mail03.efficios.com [167.114.26.124])
+        by mail.efficios.com (Postfix) with ESMTP id 307BC335424;
+        Mon, 23 Aug 2021 11:18:54 -0400 (EDT)
+Date:   Mon, 23 Aug 2021 11:18:54 -0400 (EDT)
+From:   Mathieu Desnoyers <mathieu.desnoyers@efficios.com>
+To:     Sean Christopherson <seanjc@google.com>,
+        Darren Hart <dvhart@linux.intel.com>
+Cc:     "Russell King, ARM Linux" <linux@armlinux.org.uk>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Will Deacon <will@kernel.org>, Guo Ren <guoren@kernel.org>,
+        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Heiko Carstens <hca@linux.ibm.com>, gor <gor@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        rostedt <rostedt@goodmis.org>, Ingo Molnar <mingo@redhat.com>,
+        Oleg Nesterov <oleg@redhat.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Andy Lutomirski <luto@kernel.org>,
+        paulmck <paulmck@kernel.org>, Boqun Feng <boqun.feng@gmail.com>,
+        Paolo Bonzini <pbonzini@redhat.com>, shuah <shuah@kernel.org>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        Paul Mackerras <paulus@samba.org>,
+        linux-arm-kernel <linux-arm-kernel@lists.infradead.org>,
+        linux-kernel <linux-kernel@vger.kernel.org>,
+        linux-csky <linux-csky@vger.kernel.org>,
+        linux-mips <linux-mips@vger.kernel.org>,
+        linuxppc-dev <linuxppc-dev@lists.ozlabs.org>,
+        linux-s390 <linux-s390@vger.kernel.org>,
+        KVM list <kvm@vger.kernel.org>,
+        linux-kselftest <linux-kselftest@vger.kernel.org>,
+        Peter Foley <pefoley@google.com>,
+        Shakeel Butt <shakeelb@google.com>,
+        Ben Gardon <bgardon@google.com>
+Message-ID: <766990430.21713.1629731934069.JavaMail.zimbra@efficios.com>
+In-Reply-To: <20210820225002.310652-5-seanjc@google.com>
+References: <20210820225002.310652-1-seanjc@google.com> <20210820225002.310652-5-seanjc@google.com>
+Subject: Re: [PATCH v2 4/5] KVM: selftests: Add a test for KVM_RUN+rseq to
+ detect task migration bugs
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
+X-Originating-IP: [167.114.26.124]
+X-Mailer: Zimbra 8.8.15_GA_4101 (ZimbraWebClient - FF90 (Linux)/8.8.15_GA_4059)
+Thread-Topic: selftests: Add a test for KVM_RUN+rseq to detect task migration bugs
+Thread-Index: 9INcR4B9tvRD6E6sZQ8uPmTSeu5zxA==
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sun, 22 Aug 2021 17:35:55 +0300
-Yishai Hadas <yishaih@nvidia.com> wrote:
-> diff --git a/drivers/vfio/pci/vfio_pci.c b/drivers/vfio/pci/vfio_pci.c
-> new file mode 100644
-> index 000000000000..15474ebadd98
-> --- /dev/null
-> +++ b/drivers/vfio/pci/vfio_pci.c
-...
-> +static int vfio_pci_sriov_configure(struct pci_dev *pdev, int nr_virtfn)
+----- On Aug 20, 2021, at 6:50 PM, Sean Christopherson seanjc@google.com wrote:
+
+> Add a test to verify an rseq's CPU ID is updated correctly if the task is
+> migrated while the kernel is handling KVM_RUN.  This is a regression test
+> for a bug introduced by commit 72c3c0fe54a3 ("x86/kvm: Use generic xfer
+> to guest work function"), where TIF_NOTIFY_RESUME would be cleared by KVM
+> without updating rseq, leading to a stale CPU ID and other badness.
+> 
+
+[...]
+
++#define RSEQ_SIG 0xdeadbeef
+
+Is there any reason for defining a custom signature rather than including
+tools/testing/selftests/rseq/rseq.h ? This should take care of including
+the proper architecture header which will define the appropriate signature.
+
+Arguably you don't define rseq critical sections in this test per se, but
+I'm wondering why the custom signature here.
+
+[...]
+
+> +
+> +static void *migration_worker(void *ign)
 > +{
-> +	might_sleep();
+> +	cpu_set_t allowed_mask;
+> +	int r, i, nr_cpus, cpu;
 > +
-> +	if (!enable_sriov)
-> +		return -ENOENT;
+> +	CPU_ZERO(&allowed_mask);
 > +
-> +	return vfio_pci_core_sriov_configure(pdev, nr_virtfn);
+> +	nr_cpus = CPU_COUNT(&possible_mask);
+> +
+> +	for (i = 0; i < 20000; i++) {
+> +		cpu = i % nr_cpus;
+> +		if (!CPU_ISSET(cpu, &possible_mask))
+> +			continue;
+> +
+> +		CPU_SET(cpu, &allowed_mask);
+> +
+> +		/*
+> +		 * Bump the sequence count twice to allow the reader to detect
+> +		 * that a migration may have occurred in between rseq and sched
+> +		 * CPU ID reads.  An odd sequence count indicates a migration
+> +		 * is in-progress, while a completely different count indicates
+> +		 * a migration occurred since the count was last read.
+> +		 */
+> +		atomic_inc(&seq_cnt);
+
+So technically this atomic_inc contains the required barriers because the selftests
+implementation uses "__sync_add_and_fetch(&addr->val, 1)". But it's rather odd that
+the semantic differs from the kernel implementation in terms of memory barriers: the
+kernel implementation of atomic_inc guarantees no memory barriers, but this one
+happens to provide full barriers pretty much by accident (selftests
+futex/include/atomic.h documents no such guarantee).
+
+If this full barrier guarantee is indeed provided by the selftests atomic.h header,
+I would really like a comment stating that in the atomic.h header so the carpet is
+not pulled from under our feet by a future optimization.
+
+
+> +		r = sched_setaffinity(0, sizeof(allowed_mask), &allowed_mask);
+> +		TEST_ASSERT(!r, "sched_setaffinity failed, errno = %d (%s)",
+> +			    errno, strerror(errno));
+> +		atomic_inc(&seq_cnt);
+> +
+> +		CPU_CLR(cpu, &allowed_mask);
+> +
+> +		/*
+> +		 * Let the read-side get back into KVM_RUN to improve the odds
+> +		 * of task migration coinciding with KVM's run loop.
+
+This comment should be about increasing the odds of letting the seqlock read-side
+complete. Otherwise, the delay between the two back-to-back atomic_inc is so small
+that the seqlock read-side may never have time to complete the reading the rseq
+cpu id and the sched_getcpu() call, and can retry forever.
+
+I'm wondering if 1 microsecond is sufficient on other architectures as well. One
+alternative way to make this depend less on the architecture's implementation of
+sched_getcpu (whether it's a vDSO, or goes through a syscall) would be to read
+the rseq cpu id and call sched_getcpu a few times (e.g. 3 times) in the migration
+thread rather than use usleep, and throw away the value read. This would ensure
+the delay is appropriate on all architectures.
+
+Thanks!
+
+Mathieu
+
+> +		 */
+> +		usleep(1);
+> +	}
+> +	done = true;
+> +	return NULL;
 > +}
+> +
+> +int main(int argc, char *argv[])
+> +{
+> +	struct kvm_vm *vm;
+> +	u32 cpu, rseq_cpu;
+> +	int r, snapshot;
+> +
+> +	/* Tell stdout not to buffer its content */
+> +	setbuf(stdout, NULL);
+> +
+> +	r = sched_getaffinity(0, sizeof(possible_mask), &possible_mask);
+> +	TEST_ASSERT(!r, "sched_getaffinity failed, errno = %d (%s)", errno,
+> +		    strerror(errno));
+> +
+> +	if (CPU_COUNT(&possible_mask) < 2) {
+> +		print_skip("Only one CPU, task migration not possible\n");
+> +		exit(KSFT_SKIP);
+> +	}
+> +
+> +	sys_rseq(0);
+> +
+> +	/*
+> +	 * Create and run a dummy VM that immediately exits to userspace via
+> +	 * GUEST_SYNC, while concurrently migrating the process by setting its
+> +	 * CPU affinity.
+> +	 */
+> +	vm = vm_create_default(VCPU_ID, 0, guest_code);
+> +
+> +	pthread_create(&migration_thread, NULL, migration_worker, 0);
+> +
+> +	while (!done) {
+> +		vcpu_run(vm, VCPU_ID);
+> +		TEST_ASSERT(get_ucall(vm, VCPU_ID, NULL) == UCALL_SYNC,
+> +			    "Guest failed?");
+> +
+> +		/*
+> +		 * Verify rseq's CPU matches sched's CPU.  Ensure migration
+> +		 * doesn't occur between sched_getcpu() and reading the rseq
+> +		 * cpu_id by rereading both if the sequence count changes, or
+> +		 * if the count is odd (migration in-progress).
+> +		 */
+> +		do {
+> +			/*
+> +			 * Drop bit 0 to force a mismatch if the count is odd,
+> +			 * i.e. if a migration is in-progress.
+> +			 */
+> +			snapshot = atomic_read(&seq_cnt) & ~1;
+> +			smp_rmb();
+> +			cpu = sched_getcpu();
+> +			rseq_cpu = READ_ONCE(__rseq.cpu_id);
+> +			smp_rmb();
+> +		} while (snapshot != atomic_read(&seq_cnt));
+> +
+> +		TEST_ASSERT(rseq_cpu == cpu,
+> +			    "rseq CPU = %d, sched CPU = %d\n", rseq_cpu, cpu);
+> +	}
+> +
+> +	pthread_join(migration_thread, NULL);
+> +
+> +	kvm_vm_free(vm);
+> +
+> +	sys_rseq(RSEQ_FLAG_UNREGISTER);
+> +
+> +	return 0;
+> +}
+> --
+> 2.33.0.rc2.250.ged5fa647cd-goog
 
-As noted in previous version, why do we need the might_sleep() above
-when the core code below includes it and there's nothing above that
-might sleep before that?  Thanks,
-
-Alex
-
-> diff --git a/drivers/vfio/pci/vfio_pci_core.c b/drivers/vfio/pci/vfio_pci_core.c
-> index 94f062818e0c..87d1960d0d61 100644
-> --- a/drivers/vfio/pci/vfio_pci_core.c
-> +++ b/drivers/vfio/pci/vfio_pci_core.c
-...
-> -static int vfio_pci_sriov_configure(struct pci_dev *pdev, int nr_virtfn)
-> +int vfio_pci_core_sriov_configure(struct pci_dev *pdev, int nr_virtfn)
->  {
->  	struct vfio_device *device;
->  	int ret = 0;
->  
->  	might_sleep();
->  
-> -	if (!enable_sriov)
-> -		return -ENOENT;
-> -
->  	device = vfio_device_get_from_dev(&pdev->dev);
->  	if (!device)
->  		return -ENODEV;
-
+-- 
+Mathieu Desnoyers
+EfficiOS Inc.
+http://www.efficios.com
