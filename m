@@ -2,195 +2,138 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 337353F4E58
-	for <lists+kvm@lfdr.de>; Mon, 23 Aug 2021 18:28:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E48CE3F4E5A
+	for <lists+kvm@lfdr.de>; Mon, 23 Aug 2021 18:28:39 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230164AbhHWQ2w (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 23 Aug 2021 12:28:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57612 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230083AbhHWQ2v (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 23 Aug 2021 12:28:51 -0400
-Received: from mail-pj1-x1049.google.com (mail-pj1-x1049.google.com [IPv6:2607:f8b0:4864:20::1049])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6B3B2C061757
-        for <kvm@vger.kernel.org>; Mon, 23 Aug 2021 09:28:08 -0700 (PDT)
-Received: by mail-pj1-x1049.google.com with SMTP id c2-20020a17090a558200b001873dcb7f09so1794095pji.7
-        for <kvm@vger.kernel.org>; Mon, 23 Aug 2021 09:28:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:in-reply-to:message-id:mime-version:references:subject:from:to
-         :cc;
-        bh=WhC88oeHU3q8AoHfgipLtOjjmR8hfUdN/cT1NWJmJsQ=;
-        b=GZAvK1dNq1drjpMCj7HE9gJqJ+V4FJmIlRvoUMhRe1e34vROEQbT4Ks6SsuLIzVdOp
-         6BwlUICnhTk85R1B9jJEA2SuX6YxkLJJk5x1UJQ98Xta7xMNEafmyoJ+HPcIWm7VFQZ3
-         cLI4MqYGfh80rBmNFCtc0fBq6VyOpb9yiltEv//SnYOpbSJtRy4cYywyDDOhNb9IIStO
-         ow5TfMQlpjaPVlbXuDrK8/keV9wSY7+f9ApnhBUuaoxipnChS8C5NsPKs3fo/UlVkjnk
-         c81wQ8sPt98qIj8VkjCspQigFMW6XDdQ4Dr8uTE6aPVGeIqcOD4PVOJcELH3WzWFmm9G
-         JJhw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:in-reply-to:message-id:mime-version
-         :references:subject:from:to:cc;
-        bh=WhC88oeHU3q8AoHfgipLtOjjmR8hfUdN/cT1NWJmJsQ=;
-        b=uPZLNPa6RaI58p2pneCQgskETa3EGDD1OXo6RTCacYyLnY7XxPZH7EeDBXmf0FPo5u
-         nOZBszLGKXRXw1w5Zywi4NhcANAxod2aeAR+Q1CQaZAxCuS5tAqr2J6grJ+nGAC8dccW
-         F0qU1q1/ES5nQpH+jOJvSL6g2bFNu59x6kUWNYnbRhxHINr/hxYEnhvCBWOUDF5Os/pJ
-         3+c68GEAhsiKzmD4t6YXHjGVnQW/96l6Pa3oZsRbW3Wwpe04KZU69fhwTPlmAKH/+CpW
-         Du9FG30dCDO+msX+JvAo5rXNYRq8p9qtKM22z5QGgmGPihf+4dxiIoBTWe+4IrGaQk94
-         jVfw==
-X-Gm-Message-State: AOAM531E2OdWuIGk1BID1r4uCy3gNntxP6LH5+KXqkGwmn9G9ialIHuJ
-        vZSZrfQ7W8lCSgOwOc2dXRH83NaHJEvPdsxFcm8yuxl/BGr/q4PLSQjRxMaN335sPepLHeNVF7I
-        SX/BiQwsDA9ljtmkkFC8lNKL5rpFsZPvv6S8Mj4HcFbU12EJs08eK/3gdRQ==
-X-Google-Smtp-Source: ABdhPJyBs+jEUCFKL7VEGjwfU6TLP9g5jRBkYqJZCFbXF3pZZsHRRle3ZhBKr7oQssBUkoSIjSDaz56HcJ4=
-X-Received: from pgonda1.kir.corp.google.com ([2620:15c:29:204:672c:389d:3532:4d07])
- (user=pgonda job=sendgmr) by 2002:a05:6a00:1703:b0:3e9:568e:d13 with SMTP id
- h3-20020a056a00170300b003e9568e0d13mr19652068pfc.60.1629736087698; Mon, 23
- Aug 2021 09:28:07 -0700 (PDT)
-Date:   Mon, 23 Aug 2021 09:27:56 -0700
-In-Reply-To: <20210823162756.2686856-1-pgonda@google.com>
-Message-Id: <20210823162756.2686856-3-pgonda@google.com>
-Mime-Version: 1.0
-References: <20210823162756.2686856-1-pgonda@google.com>
-X-Mailer: git-send-email 2.33.0.rc2.250.ged5fa647cd-goog
-Subject: [PATCH 2/2 V5] KVM, SEV: Add support for SEV-ES intra host migration
-From:   Peter Gonda <pgonda@google.com>
-To:     kvm@vger.kernel.org
-Cc:     Peter Gonda <pgonda@google.com>, Marc Orr <marcorr@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        David Rientjes <rientjes@google.com>,
-        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
-        Brijesh Singh <brijesh.singh@amd.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        "H. Peter Anvin" <hpa@zytor.com>, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+        id S230210AbhHWQ3T (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 23 Aug 2021 12:29:19 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:27404 "EHLO
+        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229477AbhHWQ3S (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 23 Aug 2021 12:29:18 -0400
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 17NG2nc8177166;
+        Mon, 23 Aug 2021 12:28:29 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : subject : to : cc
+ : references : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=Envgh1shC26UgCJP6Bb9m3IzkLDdYHPU0eAN6NLyMXk=;
+ b=rR9EH1OCt4KsbePIHN3yImmfmOr7s4C/rbS9lcvl8/6KYypzFlL9U/G94v/u6EfeL68J
+ 31LNuIHDnpXKB8w75Tg23HEQ0ZRgb9ozZFFcfC6Mupnq7eIrVv+iLBWL+hFlkFkWK15t
+ 5iaOWeiujiTtvQMArlBkW8Bu4OCo7pOVz+80jUWBbNK1zaJXMGR933vKq+GytqbCBu6P
+ 0SjUBa7WwL/GfewvGd/p9QAwnawKp12iQ4kDh9lrkv55b9ng1Oj9eXMYNJgKgHAa8zhv
+ cJepmhNn5fCA/TLYfKFvixsyWbb1q7AgoEdotbR1I1sr50475R7t1Nt6HdP8fx5Npeip tQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3akf28wqsj-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 23 Aug 2021 12:28:29 -0400
+Received: from m0098417.ppops.net (m0098417.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 17NG3Sqm180006;
+        Mon, 23 Aug 2021 12:28:29 -0400
+Received: from ppma04dal.us.ibm.com (7a.29.35a9.ip4.static.sl-reverse.com [169.53.41.122])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3akf28wqs6-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 23 Aug 2021 12:28:29 -0400
+Received: from pps.filterd (ppma04dal.us.ibm.com [127.0.0.1])
+        by ppma04dal.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 17NGNDQm007687;
+        Mon, 23 Aug 2021 16:28:28 GMT
+Received: from b01cxnp22035.gho.pok.ibm.com (b01cxnp22035.gho.pok.ibm.com [9.57.198.25])
+        by ppma04dal.us.ibm.com with ESMTP id 3ajs4btgqd-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 23 Aug 2021 16:28:28 +0000
+Received: from b01ledav002.gho.pok.ibm.com (b01ledav002.gho.pok.ibm.com [9.57.199.107])
+        by b01cxnp22035.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 17NGSQN325362818
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 23 Aug 2021 16:28:26 GMT
+Received: from b01ledav002.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id C86C9124060;
+        Mon, 23 Aug 2021 16:28:26 +0000 (GMT)
+Received: from b01ledav002.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 5BB3712406C;
+        Mon, 23 Aug 2021 16:28:26 +0000 (GMT)
+Received: from Tobins-MacBook-Pro-2.local (unknown [9.160.190.1])
+        by b01ledav002.gho.pok.ibm.com (Postfix) with ESMTP;
+        Mon, 23 Aug 2021 16:28:26 +0000 (GMT)
+From:   Tobin Feldman-Fitzthum <tobin@linux.ibm.com>
+Subject: Re: [RFC PATCH 00/13] Add support for Mirror VM.
+To:     "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+        James Bottomley <jejb@linux.ibm.com>
+Cc:     thomas.lendacky@amd.com, Ashish Kalra <Ashish.Kalra@amd.com>,
+        brijesh.singh@amd.com, ehabkost@redhat.com, kvm@vger.kernel.org,
+        mst@redhat.com, Steve Rutherford <srutherford@google.com>,
+        richard.henderson@linaro.org, tobin@ibm.com, qemu-devel@nongnu.org,
+        frankeh@us.ibm.com, Paolo Bonzini <pbonzini@redhat.com>,
+        dovmurik@linux.vnet.ibm.com
+References: <0fcfafde-a690-f53a-01fc-542054948bb2@redhat.com>
+ <37796fd1-bbc2-f22c-b786-eb44f4d473b9@linux.ibm.com>
+ <CABayD+evf56U4yT2V1TmEzaJjvV8gutUG5t8Ob2ifamruw5Qrg@mail.gmail.com>
+ <458ba932-5150-8706-3958-caa4cc67c8e3@linux.ibm.com>
+ <YR1ZvArdq4sKVyTJ@work-vm>
+ <c1d8dbca-c6a9-58da-6f95-b33b74e0485a@linux.ibm.com>
+ <YR4U11ssVUztsPyx@work-vm>
+ <538733190532643cc19b6e30f0eda4dd1bc2a767.camel@linux.ibm.com>
+ <YR5qka5aoJqlouhO@work-vm>
+ <d6eb8f7ff2d78296b5ba3a20d1dc9640f4bb8fa5.camel@linux.ibm.com>
+ <YSOT87eg4UjCG+jG@work-vm>
+Message-ID: <3d141f28-1abe-32ed-1f72-2cbec707a669@linux.ibm.com>
+Date:   Mon, 23 Aug 2021 12:28:25 -0400
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0)
+ Gecko/20100101 Thunderbird/78.12.0
+MIME-Version: 1.0
+In-Reply-To: <YSOT87eg4UjCG+jG@work-vm>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: 75ZlngP1WPAGLebF7lPS-dLpTQCgIgN-
+X-Proofpoint-ORIG-GUID: IoOD8nALGipGQT9Pea8zgRt_HVwacQQ0
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.790
+ definitions=2021-08-23_03:2021-08-23,2021-08-23 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=999 clxscore=1015
+ lowpriorityscore=0 priorityscore=1501 phishscore=0 spamscore=0
+ adultscore=0 bulkscore=0 suspectscore=0 impostorscore=0 malwarescore=0
+ mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2107140000 definitions=main-2108230110
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-For SEV-ES to work with intra host migration the VMSAs, GHCB metadata,
-and other SEV-ES info needs to be preserved along with the guest's
-memory.
+On 8/23/21 8:26 AM, Dr. David Alan Gilbert wrote:
 
-Signed-off-by: Peter Gonda <pgonda@google.com>
-Cc: Marc Orr <marcorr@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Sean Christopherson <seanjc@google.com>
-Cc: David Rientjes <rientjes@google.com>
-Cc: Dr. David Alan Gilbert <dgilbert@redhat.com>
-Cc: Brijesh Singh <brijesh.singh@amd.com>
-Cc: Vitaly Kuznetsov <vkuznets@redhat.com>
-Cc: Wanpeng Li <wanpengli@tencent.com>
-Cc: Jim Mattson <jmattson@google.com>
-Cc: Joerg Roedel <joro@8bytes.org>
-Cc: Thomas Gleixner <tglx@linutronix.de>
-Cc: Ingo Molnar <mingo@redhat.com>
-Cc: Borislav Petkov <bp@alien8.de>
-Cc: "H. Peter Anvin" <hpa@zytor.com>
-Cc: kvm@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org
----
- arch/x86/kvm/svm/sev.c | 62 ++++++++++++++++++++++++++++++++++++++++--
- 1 file changed, 60 insertions(+), 2 deletions(-)
+> * James Bottomley (jejb@linux.ibm.com) wrote:
+>
+>> (is there an attest of the destination happening here?)
+>> There will be in the final version.  The attestations of the source and
+>> target, being the hash of the OVMF (with the registers in the -ES
+>> case), should be the same (modulo any firmware updates to the PSP,
+>> whose firmware version is also hashed) to guarantee the OVMF is the
+>> same on both sides.  We'll definitely take an action to get QEMU to
+>> verify this ... made a lot easier now we have signed attestations ...
+> Hmm; I'm not sure you're allowed to have QEMU verify that - we don't
+> trust it; you need to have either the firmware say it's OK to migrate
+> to the destination (using the existing PSP mechanism) or get the source
+> MH to verify a quote from the destination.
 
-diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-index 3467e18d63e0..f17bdf5ce723 100644
---- a/arch/x86/kvm/svm/sev.c
-+++ b/arch/x86/kvm/svm/sev.c
-@@ -1545,6 +1545,59 @@ static void migrate_info_from(struct kvm_sev_info *dst,
- 	list_replace_init(&src->regions_list, &dst->regions_list);
- }
- 
-+static int migrate_vmsa_from(struct kvm *dst, struct kvm *src)
-+{
-+	int i, num_vcpus;
-+	struct kvm_vcpu *dst_vcpu, *src_vcpu;
-+	struct vcpu_svm *dst_svm, *src_svm;
-+
-+	num_vcpus = atomic_read(&dst->online_vcpus);
-+	if (num_vcpus != atomic_read(&src->online_vcpus)) {
-+		pr_warn_ratelimited(
-+			"Source and target VMs must have same number of vCPUs.\n");
-+		return -EINVAL;
-+	}
-+
-+	for (i = 0; i < num_vcpus; ++i) {
-+		src_vcpu = src->vcpus[i];
-+		if (!src_vcpu->arch.guest_state_protected) {
-+			pr_warn_ratelimited(
-+				"Source ES VM vCPUs must have protected state.\n");
-+			return -EINVAL;
-+		}
-+	}
-+
-+	for (i = 0; i < num_vcpus; ++i) {
-+		src_vcpu = src->vcpus[i];
-+		src_svm = to_svm(src_vcpu);
-+		dst_vcpu = dst->vcpus[i];
-+		dst_svm = to_svm(dst_vcpu);
-+
-+		/*
-+		 * Copy VMSA and GHCB fields from the source to the destination.
-+		 * Clear them on the source to prevent the VM running and
-+		 * changing the state of the VMSA/GHCB unexpectedly.
-+		 */
-+		dst_vcpu->vcpu_id = src_vcpu->vcpu_id;
-+		dst_svm->vmsa = src_svm->vmsa;
-+		src_svm->vmsa = NULL;
-+		dst_svm->ghcb = src_svm->ghcb;
-+		src_svm->ghcb = NULL;
-+		dst_svm->vmcb->control.ghcb_gpa =
-+				src_svm->vmcb->control.ghcb_gpa;
-+		src_svm->vmcb->control.ghcb_gpa = 0;
-+		dst_svm->ghcb_sa = src_svm->ghcb_sa;
-+		src_svm->ghcb_sa = NULL;
-+		dst_svm->ghcb_sa_len = src_svm->ghcb_sa_len;
-+		src_svm->ghcb_sa_len = 0;
-+		dst_svm->ghcb_sa_sync = src_svm->ghcb_sa_sync;
-+		src_svm->ghcb_sa_sync = false;
-+		dst_svm->ghcb_sa_free = src_svm->ghcb_sa_free;
-+		src_svm->ghcb_sa_free = false;
-+	}
-+	return 0;
-+}
-+
- int svm_vm_migrate_from(struct kvm *kvm, unsigned int source_fd)
- {
- 	struct kvm_sev_info *dst_sev = &to_kvm_svm(kvm)->sev_info;
-@@ -1556,7 +1609,7 @@ int svm_vm_migrate_from(struct kvm *kvm, unsigned int source_fd)
- 	if (ret)
- 		return ret;
- 
--	if (!sev_guest(kvm) || sev_es_guest(kvm)) {
-+	if (!sev_guest(kvm)) {
- 		ret = -EINVAL;
- 		pr_warn_ratelimited("VM must be SEV enabled to migrate to.\n");
- 		goto out_unlock;
-@@ -1580,13 +1633,18 @@ int svm_vm_migrate_from(struct kvm *kvm, unsigned int source_fd)
- 	if (ret)
- 		goto out_fput;
- 
--	if (!sev_guest(source_kvm) || sev_es_guest(source_kvm)) {
-+	if (!sev_guest(source_kvm)) {
- 		ret = -EINVAL;
- 		pr_warn_ratelimited(
- 			"Source VM must be SEV enabled to migrate from.\n");
- 		goto out_source;
- 	}
- 
-+	if (sev_es_guest(kvm)) {
-+		ret = migrate_vmsa_from(kvm, source_kvm);
-+		if (ret)
-+			goto out_source;
-+	}
- 	migrate_info_from(dst_sev, &to_kvm_svm(source_kvm)->sev_info);
- 	ret = 0;
- 
--- 
-2.33.0.rc2.250.ged5fa647cd-goog
+I think the check in QEMU would only be a convenience. The launch 
+measurement of the target (verified by the guest owner) is what 
+guarantees that the firmware, as well as the policy, of the target is 
+what is expected. In PSP-assisted migration the source verifies the 
+target, but our plan is to have the guest owner verify both the source 
+and the target. The target will only be provisioned with the transport 
+key if the measurement checks out. We will have some more details about 
+this key agreement scheme soon.
 
+> [Somewhere along the line, if you're not using the PSP, I think you also
+> need to check the guest policy to check it is allowed to migrate].
+
+Sources that aren't allowed to migrate won't be provisioned with 
+transport key to encrypt pages. A non-migrateable guest could also be 
+booted with OvmfPkg firmware, which does not contain the migration handler.
+
+-Tobin
+
+> Dave
+>
+>> James
+>>
+>>
