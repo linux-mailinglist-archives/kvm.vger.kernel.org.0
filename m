@@ -2,113 +2,151 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 97F603F4DF1
-	for <lists+kvm@lfdr.de>; Mon, 23 Aug 2021 18:02:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3FD7C3F4E09
+	for <lists+kvm@lfdr.de>; Mon, 23 Aug 2021 18:10:50 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230043AbhHWQDS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 23 Aug 2021 12:03:18 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:39448 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229465AbhHWQDS (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 23 Aug 2021 12:03:18 -0400
-Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 17NFZMl3042002;
-        Mon, 23 Aug 2021 12:02:34 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=3hKfoY9tkVj90yiJGaBtBd9Ta9C3SApNM8CIeJ4UbXE=;
- b=XT2RHU7H3k9TqKUy+aElqegrwmVbHQlqJOrxYCmcLKRhZpJNJA9xYcbhcgq0LfAfhq+1
- gOC7tK1IS6MLdB1Xk70wb6jh4t8WYZBm4frpGEQ1R1KdHlGRcryE7Yj4CT58IVr2Rthl
- iDn3Bha6uF/vz4Lc4la4KXna/WfqjXPX5bCTcLHW/EsccPADE/86BRfUbWAAmfo0wdHl
- Nyeh+bJrsWSUgAYvrlovG7XRey23k0Bu5UGiRSJWJ8bCiRqWWPTbf7HVrdSxR2QATpv9
- 9CT8Qs4THdPrsotmOPDjFNGU3xSKoFmo3wOk+ACKM5op/Gdd4YOzFLxXckDIKkPTNa+k gw== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3am1evdat8-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 23 Aug 2021 12:02:34 -0400
-Received: from m0098393.ppops.net (m0098393.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 17NFZTXE045050;
-        Mon, 23 Aug 2021 12:02:33 -0400
-Received: from ppma01wdc.us.ibm.com (fd.55.37a9.ip4.static.sl-reverse.com [169.55.85.253])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3am1evdasg-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 23 Aug 2021 12:02:33 -0400
-Received: from pps.filterd (ppma01wdc.us.ibm.com [127.0.0.1])
-        by ppma01wdc.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 17NFvHmN025945;
-        Mon, 23 Aug 2021 16:02:32 GMT
-Received: from b03cxnp07028.gho.boulder.ibm.com (b03cxnp07028.gho.boulder.ibm.com [9.17.130.15])
-        by ppma01wdc.us.ibm.com with ESMTP id 3ajs4b2mq6-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 23 Aug 2021 16:02:32 +0000
-Received: from b03ledav006.gho.boulder.ibm.com (b03ledav006.gho.boulder.ibm.com [9.17.130.237])
-        by b03cxnp07028.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 17NG2VgZ24707460
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 23 Aug 2021 16:02:31 GMT
-Received: from b03ledav006.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id DD38DC6059;
-        Mon, 23 Aug 2021 16:02:30 +0000 (GMT)
-Received: from b03ledav006.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 53083C606E;
-        Mon, 23 Aug 2021 16:02:30 +0000 (GMT)
-Received: from oc4221205838.ibm.com (unknown [9.163.11.57])
-        by b03ledav006.gho.boulder.ibm.com (Postfix) with ESMTP;
-        Mon, 23 Aug 2021 16:02:30 +0000 (GMT)
-Subject: Re: [PATCH] vfio-pci/zdev: Remove repeated verbose license text
-To:     Cai Huoqing <caihuoqing@baidu.com>, farman@linux.ibm.com,
-        alex.williamson@redhat.com, cohuck@redhat.com
-Cc:     linux-s390@vger.kernel.org, kvm@vger.kernel.org
-References: <20210822043500.561-1-caihuoqing@baidu.com>
-From:   Matthew Rosato <mjrosato@linux.ibm.com>
-Message-ID: <45493e42-f3af-eb5a-e503-9ea1ea71a927@linux.ibm.com>
-Date:   Mon, 23 Aug 2021 12:02:29 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.12.0
+        id S229773AbhHWQLb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 23 Aug 2021 12:11:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53588 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229477AbhHWQLa (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 23 Aug 2021 12:11:30 -0400
+Received: from mail-pg1-x52b.google.com (mail-pg1-x52b.google.com [IPv6:2607:f8b0:4864:20::52b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DCF15C061575
+        for <kvm@vger.kernel.org>; Mon, 23 Aug 2021 09:10:47 -0700 (PDT)
+Received: by mail-pg1-x52b.google.com with SMTP id q2so17080493pgt.6
+        for <kvm@vger.kernel.org>; Mon, 23 Aug 2021 09:10:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=jGmbzviqWn2myoss+SliOPWH/SHZgh+AI6V3Q1gvNEQ=;
+        b=poFX8+XHFq4U93MQW5xHTCCSB5K6yHjAkYcOIEMEaz05LFviIgdN2cTvCL7jWDwuPg
+         T4KGNybNYKrBtIrPiPExMuYTkA6wQTJ69QPwLWa/Ro6Lq6bTB7rpdSuWM9QA2Dwcwy6U
+         6I3LvOGU4Id2dFpgA2OoUpKVX2FehCQBwloXsFPpww16YrBYFRLjyDBTTIKzevCk7+ao
+         AB2SutlVEfQaeGnYq+octlQoaEacqYkcK5lLRY4xWf/jAEriX99zEpYNwApAf2/YUgb4
+         i9nXbvSWuI1TdyLA/8zZa7aGX3O5Kr5YdE5n6OM7i+iPtbvGOrRFbVH1zs+Ons0o2je4
+         lTYA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=jGmbzviqWn2myoss+SliOPWH/SHZgh+AI6V3Q1gvNEQ=;
+        b=CeJ7Hc8fgVX1d8nR1E7trawoyEGealF0JHLbQomY2CtYv54gWRLabKo+2G+5g1hXlR
+         Kx9xAr9LTziHY1eySZQy7DUo23FdtUBZMTY4PIo3YGE9nesYwy4+Aeb8IAJK6Cvw/Df4
+         7glfKH2RshTKC6+2Ai7V08gLzrHqVCDjrYqtjV9h1mYfxbG0zPoWXoEe2P5tYk3xMNps
+         /8nlWqzNgLawMUrlpSOouyAPW+6E+uERWpkCSPDqsUwquHzVV/Kcv32dKhNshkVU7DUc
+         bomYOajMayZ2CvAaVAqLJY0eJMutKEx85VaL7IEKxtglArsmRdrB9jeJ/+Lkz762aBG0
+         dleA==
+X-Gm-Message-State: AOAM532i0tYrN4poSr6OrVNBCOXQRp5gtEMXml+/ZFkXIP4So/I/aJ09
+        WcYFVmJNmXb1lxvvqeVVjBmtOg==
+X-Google-Smtp-Source: ABdhPJyDRLUb89nW6/5dHVbTOnk9DCBHnRskADapAc2hPSL0OVH0E1lm9WUfyoCTO5m63xIpaFSBGA==
+X-Received: by 2002:aa7:90cd:0:b029:333:baa9:87b7 with SMTP id k13-20020aa790cd0000b0290333baa987b7mr34498040pfk.23.1629735047148;
+        Mon, 23 Aug 2021 09:10:47 -0700 (PDT)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id s26sm18572118pgv.46.2021.08.23.09.10.46
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 23 Aug 2021 09:10:46 -0700 (PDT)
+Date:   Mon, 23 Aug 2021 16:10:40 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Wei Huang <wei.huang2@amd.com>
+Cc:     Maxim Levitsky <mlevitsk@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, vkuznets@redhat.com,
+        wanpengli@tencent.com, jmattson@google.com, joro@8bytes.org,
+        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, x86@kernel.org,
+        hpa@zytor.com
+Subject: Re: [PATCH v3 0/3] SVM 5-level page table support
+Message-ID: <YSPIgBNiMZkwAOSG@google.com>
+References: <20210818165549.3771014-1-wei.huang2@amd.com>
+ <46a54a13-b934-263a-9539-6c922ceb70d3@redhat.com>
+ <c10faf24c11fc86074945ca535572a8c5926dcf9.camel@redhat.com>
+ <20210823151549.rkkrktvtpu6yapmd@weiserver.amd.com>
 MIME-Version: 1.0
-In-Reply-To: <20210822043500.561-1-caihuoqing@baidu.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: gPFUutsmq-7yClS9qwqc6BqCnJV-CKoj
-X-Proofpoint-ORIG-GUID: XsOYlejOdyxWkkl5YnIEsWPBDgiCdxJ9
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.790
- definitions=2021-08-23_03:2021-08-23,2021-08-23 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0 mlxscore=0
- mlxlogscore=999 spamscore=0 adultscore=0 lowpriorityscore=0 clxscore=1011
- priorityscore=1501 phishscore=0 suspectscore=0 bulkscore=0 malwarescore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2107140000
- definitions=main-2108230107
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210823151549.rkkrktvtpu6yapmd@weiserver.amd.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 8/22/21 12:35 AM, Cai Huoqing wrote:
-> remove it because SPDX-License-Identifier is already used
-> 
-> Signed-off-by: Cai Huoqing <caihuoqing@baidu.com>
+On Mon, Aug 23, 2021, Wei Huang wrote:
+> On 08/23 12:20, Maxim Levitsky wrote:
+> > This hack makes it work again for me (I don't yet use TDP mmu).
+> > 
+> > diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> > index caa3f9aee7d1..c25e0d40a620 100644
+> > --- a/arch/x86/kvm/mmu/mmu.c
+> > +++ b/arch/x86/kvm/mmu/mmu.c
+> > @@ -3562,7 +3562,7 @@ static int mmu_alloc_special_roots(struct kvm_vcpu *vcpu)
+> >             mmu->shadow_root_level < PT64_ROOT_4LEVEL)
+> >                 return 0;
+> >  
+> > -       if (mmu->pae_root && mmu->pml4_root && mmu->pml5_root)
 
-Reviewed-by: Matthew Rosato <mjrosato@linux.ibm.com>
+Maxim, I assume you hit this WARN and bail?
 
-> ---
->   drivers/vfio/pci/vfio_pci_zdev.c | 5 -----
->   1 file changed, 5 deletions(-)
-> 
-> diff --git a/drivers/vfio/pci/vfio_pci_zdev.c b/drivers/vfio/pci/vfio_pci_zdev.c
-> index 7b011b62c766..dfd8d826223d 100644
-> --- a/drivers/vfio/pci/vfio_pci_zdev.c
-> +++ b/drivers/vfio/pci/vfio_pci_zdev.c
-> @@ -5,11 +5,6 @@
->    * Copyright (C) IBM Corp. 2020.  All rights reserved.
->    *	Author(s): Pierre Morel <pmorel@linux.ibm.com>
->    *                 Matthew Rosato <mjrosato@linux.ibm.com>
-> - *
-> - * This program is free software; you can redistribute it and/or modify
-> - * it under the terms of the GNU General Public License version 2 as
-> - * published by the Free Software Foundation.
-> - *
->    */
->   #include <linux/io.h>
->   #include <linux/pci.h>
-> 
+        if (WARN_ON_ONCE(!tdp_enabled || mmu->pae_root || mmu->pml4_root ||
+                         mmu->pml5_root))
+		return -EIO;
 
+Because as the comment states, KVM expects all the special roots to be allocated
+together.  The 5-level paging supported breaks that assumption because pml5_root
+will be allocated iff the host is using 5-level paging.
+
+        if (mmu->shadow_root_level > PT64_ROOT_4LEVEL) {
+                pml5_root = (void *)get_zeroed_page(GFP_KERNEL_ACCOUNT);
+                if (!pml5_root)
+                        goto err_pml5;
+        }
+
+I think this is the least awful fix, I'll test and send a proper patch later today.
+
+diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+index 4853c033e6ce..93b2ed422b48 100644
+--- a/arch/x86/kvm/mmu/mmu.c
++++ b/arch/x86/kvm/mmu/mmu.c
+@@ -3548,6 +3548,7 @@ static int mmu_alloc_shadow_roots(struct kvm_vcpu *vcpu)
+ static int mmu_alloc_special_roots(struct kvm_vcpu *vcpu)
+ {
+        struct kvm_mmu *mmu = vcpu->arch.mmu;
++       bool need_pml5 = mmu->shadow_root_level > PT64_ROOT_4LEVEL;
+        u64 *pml5_root = NULL;
+        u64 *pml4_root = NULL;
+        u64 *pae_root;
+@@ -3562,7 +3563,14 @@ static int mmu_alloc_special_roots(struct kvm_vcpu *vcpu)
+            mmu->shadow_root_level < PT64_ROOT_4LEVEL)
+                return 0;
+
+-       if (mmu->pae_root && mmu->pml4_root && mmu->pml5_root)
++       /*
++        * NPT, the only paging mode that uses this horror, uses a fixed number
++        * of levels for the shadow page tables, e.g. all MMUs are 4-level or
++        * all MMus are 5-level.  Thus, this can safely require that pml5_root
++        * is allocated if the other roots are valid and pml5 is needed, as any
++        * prior MMU would also have required pml5.
++        */
++       if (mmu->pae_root && mmu->pml4_root && (!need_pml5 || mmu->pml5_root))
+                return 0;
+
+        /*
+@@ -3570,7 +3578,7 @@ static int mmu_alloc_special_roots(struct kvm_vcpu *vcpu)
+         * bail if KVM ends up in a state where only one of the roots is valid.
+         */
+        if (WARN_ON_ONCE(!tdp_enabled || mmu->pae_root || mmu->pml4_root ||
+-                        mmu->pml5_root))
++                        (need_pml5 && mmu->pml5_root)))
+                return -EIO;
+
+        /*
+
+> > +       if (mmu->pae_root && mmu->pml4_root)
+> >                 return 0;
+> >  
+> >         /*
+> > 
+> > 
+> > 
+> > Best regards,
+> > 	Maxim Levitsky
+> >
