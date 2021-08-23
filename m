@@ -2,151 +2,147 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3FD7C3F4E09
-	for <lists+kvm@lfdr.de>; Mon, 23 Aug 2021 18:10:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1A78D3F4E26
+	for <lists+kvm@lfdr.de>; Mon, 23 Aug 2021 18:17:06 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229773AbhHWQLb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 23 Aug 2021 12:11:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53588 "EHLO
+        id S229902AbhHWQRm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 23 Aug 2021 12:17:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55046 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229477AbhHWQLa (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 23 Aug 2021 12:11:30 -0400
-Received: from mail-pg1-x52b.google.com (mail-pg1-x52b.google.com [IPv6:2607:f8b0:4864:20::52b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DCF15C061575
-        for <kvm@vger.kernel.org>; Mon, 23 Aug 2021 09:10:47 -0700 (PDT)
-Received: by mail-pg1-x52b.google.com with SMTP id q2so17080493pgt.6
-        for <kvm@vger.kernel.org>; Mon, 23 Aug 2021 09:10:47 -0700 (PDT)
+        with ESMTP id S229845AbhHWQRl (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 23 Aug 2021 12:17:41 -0400
+Received: from mail-pl1-x62c.google.com (mail-pl1-x62c.google.com [IPv6:2607:f8b0:4864:20::62c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 418BAC061575
+        for <kvm@vger.kernel.org>; Mon, 23 Aug 2021 09:16:58 -0700 (PDT)
+Received: by mail-pl1-x62c.google.com with SMTP id q21so1456601plq.3
+        for <kvm@vger.kernel.org>; Mon, 23 Aug 2021 09:16:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=jGmbzviqWn2myoss+SliOPWH/SHZgh+AI6V3Q1gvNEQ=;
-        b=poFX8+XHFq4U93MQW5xHTCCSB5K6yHjAkYcOIEMEaz05LFviIgdN2cTvCL7jWDwuPg
-         T4KGNybNYKrBtIrPiPExMuYTkA6wQTJ69QPwLWa/Ro6Lq6bTB7rpdSuWM9QA2Dwcwy6U
-         6I3LvOGU4Id2dFpgA2OoUpKVX2FehCQBwloXsFPpww16YrBYFRLjyDBTTIKzevCk7+ao
-         AB2SutlVEfQaeGnYq+octlQoaEacqYkcK5lLRY4xWf/jAEriX99zEpYNwApAf2/YUgb4
-         i9nXbvSWuI1TdyLA/8zZa7aGX3O5Kr5YdE5n6OM7i+iPtbvGOrRFbVH1zs+Ons0o2je4
-         lTYA==
+        bh=ryhD7Cthvbr45hQrpnqITGrpB6V3gOLxyGixZ7GwrfQ=;
+        b=Y/VkN+1gxsoSe3hsQkEe6PMVj7mm2IHbg36U1kjpignPshE6jeCwDWaJ2eGVOcy7fo
+         g7HYe8UWQTY8A0vodGIdznQPx5HKdAr+AG1tkba7z+zr6NlXwNJ6puA6ZimMj4O5i72w
+         p55fh+Dh7cRtGdX/l8acD/lrMu4AYKWyTqbG1IRPB2uGF4IFb5KA+coz0LB2DMNzGiq4
+         YQc6WOXOeRmaSygsObdne7yJZmDvXPV7ZZnNUgDcxlvHF4zwoHNUE4bfnQunQQNH3iEM
+         XXBxAwCro3B+wx1+YOs4XTXhOJQQEc4FO1kckqijf+W2SrFQGXSbepi/Zo5z6lM8Ak4I
+         GicQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=jGmbzviqWn2myoss+SliOPWH/SHZgh+AI6V3Q1gvNEQ=;
-        b=CeJ7Hc8fgVX1d8nR1E7trawoyEGealF0JHLbQomY2CtYv54gWRLabKo+2G+5g1hXlR
-         Kx9xAr9LTziHY1eySZQy7DUo23FdtUBZMTY4PIo3YGE9nesYwy4+Aeb8IAJK6Cvw/Df4
-         7glfKH2RshTKC6+2Ai7V08gLzrHqVCDjrYqtjV9h1mYfxbG0zPoWXoEe2P5tYk3xMNps
-         /8nlWqzNgLawMUrlpSOouyAPW+6E+uERWpkCSPDqsUwquHzVV/Kcv32dKhNshkVU7DUc
-         bomYOajMayZ2CvAaVAqLJY0eJMutKEx85VaL7IEKxtglArsmRdrB9jeJ/+Lkz762aBG0
-         dleA==
-X-Gm-Message-State: AOAM532i0tYrN4poSr6OrVNBCOXQRp5gtEMXml+/ZFkXIP4So/I/aJ09
-        WcYFVmJNmXb1lxvvqeVVjBmtOg==
-X-Google-Smtp-Source: ABdhPJyDRLUb89nW6/5dHVbTOnk9DCBHnRskADapAc2hPSL0OVH0E1lm9WUfyoCTO5m63xIpaFSBGA==
-X-Received: by 2002:aa7:90cd:0:b029:333:baa9:87b7 with SMTP id k13-20020aa790cd0000b0290333baa987b7mr34498040pfk.23.1629735047148;
-        Mon, 23 Aug 2021 09:10:47 -0700 (PDT)
+        bh=ryhD7Cthvbr45hQrpnqITGrpB6V3gOLxyGixZ7GwrfQ=;
+        b=Z+Hkxg+7ou4VSIVV1/ypiTEzDEeNWf+mZ7SbCZD782OnKB7joBx/hz6UFiYP77+/cC
+         61VU4mrRt3AHCDhHtkfj7M9GRM1rdpo4oM/up/2RS2gZMIWG7BYexy6jehBemO+au2EX
+         vVMlR2pvmKKpMMkB9r9imWlGZdkIizC4PX75Jt1PfzwiLFPUtbloAFcKQKzPruE7Ar9M
+         G0jIt4Kj/KDR/i2Cl+eRHsgp6eAFwCDRf50fo7FLykZ+4lA2EOMLxRMFyyJozLsdAQWP
+         GAvtQQHLWhIp761TqNidjQA0BW9n/Yxgg9kNRyZAK5l/p09l0YTJzsnPsQ0pzcSFRi5G
+         1arA==
+X-Gm-Message-State: AOAM532pwEaouzfs8BEgs1AIyYA/b87wHHDYo3DSpOvEuhSbslT1fby5
+        e5zMmfwQzAnmi+OQVB3y7+wdRQ==
+X-Google-Smtp-Source: ABdhPJzv654+gSOvsBhG6JLFQHFEeDZqCyH0hXgt9M8TwxOdfjcH9xRvORZYmiN8Q7XjIgNcrkTbBw==
+X-Received: by 2002:a17:90a:12ca:: with SMTP id b10mr7399333pjg.180.1629735417434;
+        Mon, 23 Aug 2021 09:16:57 -0700 (PDT)
 Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id s26sm18572118pgv.46.2021.08.23.09.10.46
+        by smtp.gmail.com with ESMTPSA id b14sm16201529pfo.76.2021.08.23.09.16.56
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 23 Aug 2021 09:10:46 -0700 (PDT)
-Date:   Mon, 23 Aug 2021 16:10:40 +0000
+        Mon, 23 Aug 2021 09:16:56 -0700 (PDT)
+Date:   Mon, 23 Aug 2021 16:16:51 +0000
 From:   Sean Christopherson <seanjc@google.com>
-To:     Wei Huang <wei.huang2@amd.com>
-Cc:     Maxim Levitsky <mlevitsk@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, vkuznets@redhat.com,
-        wanpengli@tencent.com, jmattson@google.com, joro@8bytes.org,
-        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, x86@kernel.org,
-        hpa@zytor.com
-Subject: Re: [PATCH v3 0/3] SVM 5-level page table support
-Message-ID: <YSPIgBNiMZkwAOSG@google.com>
-References: <20210818165549.3771014-1-wei.huang2@amd.com>
- <46a54a13-b934-263a-9539-6c922ceb70d3@redhat.com>
- <c10faf24c11fc86074945ca535572a8c5926dcf9.camel@redhat.com>
- <20210823151549.rkkrktvtpu6yapmd@weiserver.amd.com>
+To:     Alexander Shishkin <alexander.shishkin@linux.intel.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Peter Zijlstra <a.p.zijlstra@chello.nl>,
+        Arnaldo Carvalho de Melo <acme@redhat.com>,
+        Ingo Molnar <mingo@redhat.com>, linux-kernel@vger.kernel.org,
+        Jiri Olsa <jolsa@kernel.org>, kvm@vger.kernel.org,
+        Artem Kashkanov <artem.kashkanov@intel.com>
+Subject: Re: [PATCH] kvm/x86: Fix PT "host mode"
+Message-ID: <YSPJ8/PgcFRnp4N9@google.com>
+References: <20210823134239.45402-1-alexander.shishkin@linux.intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20210823151549.rkkrktvtpu6yapmd@weiserver.amd.com>
+In-Reply-To: <20210823134239.45402-1-alexander.shishkin@linux.intel.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Aug 23, 2021, Wei Huang wrote:
-> On 08/23 12:20, Maxim Levitsky wrote:
-> > This hack makes it work again for me (I don't yet use TDP mmu).
-> > 
-> > diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> > index caa3f9aee7d1..c25e0d40a620 100644
-> > --- a/arch/x86/kvm/mmu/mmu.c
-> > +++ b/arch/x86/kvm/mmu/mmu.c
-> > @@ -3562,7 +3562,7 @@ static int mmu_alloc_special_roots(struct kvm_vcpu *vcpu)
-> >             mmu->shadow_root_level < PT64_ROOT_4LEVEL)
-> >                 return 0;
-> >  
-> > -       if (mmu->pae_root && mmu->pml4_root && mmu->pml5_root)
+On Mon, Aug 23, 2021, Alexander Shishkin wrote:
+> Regardless of the "pt_mode", the kvm driver installs its interrupt handler
+> for Intel PT, which always overrides the native handler, causing data loss
+> inside kvm guests, while we're expecting to trace them.
+> 
+> Fix this by only installing kvm's perf_guest_cbs if pt_mode is set to
+> guest tracing.
 
-Maxim, I assume you hit this WARN and bail?
+Uh, regardless of the correctness of such a change (spoiler alert), making an
+enormous leap from "one thing is wrong" to "nuke it all!" needs way more
+justfication/explanation.  Or more realistically, such a leap should be a good
+indication that the proposed change is not correct.
 
-        if (WARN_ON_ONCE(!tdp_enabled || mmu->pae_root || mmu->pml4_root ||
-                         mmu->pml5_root))
-		return -EIO;
+> Signed-off-by: Alexander Shishkin <alexander.shishkin@linux.intel.com>
+> Fixes: ff9d07a0e7ce7 ("KVM: Implement perf callbacks for guest sampling")
 
-Because as the comment states, KVM expects all the special roots to be allocated
-together.  The 5-level paging supported breaks that assumption because pml5_root
-will be allocated iff the host is using 5-level paging.
+This should be another clue that the fix isn't correct.  That patch is from 2010,
+Intel PT was announced in 2013 and merged in 2019.
 
-        if (mmu->shadow_root_level > PT64_ROOT_4LEVEL) {
-                pml5_root = (void *)get_zeroed_page(GFP_KERNEL_ACCOUNT);
-                if (!pml5_root)
-                        goto err_pml5;
-        }
+> Reported-by: Artem Kashkanov <artem.kashkanov@intel.com>
+> Tested-by: Artem Kashkanov <artem.kashkanov@intel.com>
+> ---
+>  arch/x86/include/asm/kvm_host.h |  1 +
+>  arch/x86/kvm/vmx/vmx.c          |  6 ++++++
+>  arch/x86/kvm/x86.c              | 10 ++++++++--
+>  3 files changed, 15 insertions(+), 2 deletions(-)
+> 
 
-I think this is the least awful fix, I'll test and send a proper patch later today.
+...
 
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index 4853c033e6ce..93b2ed422b48 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -3548,6 +3548,7 @@ static int mmu_alloc_shadow_roots(struct kvm_vcpu *vcpu)
- static int mmu_alloc_special_roots(struct kvm_vcpu *vcpu)
- {
-        struct kvm_mmu *mmu = vcpu->arch.mmu;
-+       bool need_pml5 = mmu->shadow_root_level > PT64_ROOT_4LEVEL;
-        u64 *pml5_root = NULL;
-        u64 *pml4_root = NULL;
-        u64 *pae_root;
-@@ -3562,7 +3563,14 @@ static int mmu_alloc_special_roots(struct kvm_vcpu *vcpu)
-            mmu->shadow_root_level < PT64_ROOT_4LEVEL)
-                return 0;
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index 9b6bca616929..3ba0001e7388 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -268,6 +268,8 @@ static struct kmem_cache *x86_fpu_cache;
+>  
+>  static struct kmem_cache *x86_emulator_cache;
+>  
+> +static int __read_mostly intel_pt_enabled;
+> +
+>  /*
+>   * When called, it means the previous get/set msr reached an invalid msr.
+>   * Return true if we want to ignore/silent this failed msr access.
+> @@ -8194,7 +8196,10 @@ int kvm_arch_init(void *opaque)
+>  
+>  	kvm_timer_init();
+>  
+> -	perf_register_guest_info_callbacks(&kvm_guest_cbs);
+> +	if (ops->intel_pt_enabled && ops->intel_pt_enabled()) r
 
--       if (mmu->pae_root && mmu->pml4_root && mmu->pml5_root)
-+       /*
-+        * NPT, the only paging mode that uses this horror, uses a fixed number
-+        * of levels for the shadow page tables, e.g. all MMUs are 4-level or
-+        * all MMus are 5-level.  Thus, this can safely require that pml5_root
-+        * is allocated if the other roots are valid and pml5 is needed, as any
-+        * prior MMU would also have required pml5.
-+        */
-+       if (mmu->pae_root && mmu->pml4_root && (!need_pml5 || mmu->pml5_root))
-                return 0;
+This is not remotely correct.  vmx.c's "pt_mode", which is queried via this path,
+is modified by hardware_setup(), a.k.a. kvm_x86_ops.hardware_setup(), which runs
+_after_ this code.  And as alluded to above, these are generic perf callbacks,
+installing them if and only if Intel PT is enabled in a specific mode completely
+breaks "regular" perf.
 
-        /*
-@@ -3570,7 +3578,7 @@ static int mmu_alloc_special_roots(struct kvm_vcpu *vcpu)
-         * bail if KVM ends up in a state where only one of the roots is valid.
-         */
-        if (WARN_ON_ONCE(!tdp_enabled || mmu->pae_root || mmu->pml4_root ||
--                        mmu->pml5_root))
-+                        (need_pml5 && mmu->pml5_root)))
-                return -EIO;
+I'll post a small series, there's a bit of code massage needed to fix this
+properly.  The PMI handler can also be optimized to avoid a retpoline when PT is
+not exposed to the guest.
 
-        /*
-
-> > +       if (mmu->pae_root && mmu->pml4_root)
-> >                 return 0;
-> >  
-> >         /*
-> > 
-> > 
-> > 
-> > Best regards,
-> > 	Maxim Levitsky
-> >
+> +		perf_register_guest_info_callbacks(&kvm_guest_cbs);
+> +		intel_pt_enabled = 1;
+> +	}
+>  
+>  	if (boot_cpu_has(X86_FEATURE_XSAVE)) {
+>  		host_xcr0 = xgetbv(XCR_XFEATURE_ENABLED_MASK);
+> @@ -8229,7 +8234,8 @@ void kvm_arch_exit(void)
+>  		clear_hv_tscchange_cb();
+>  #endif
+>  	kvm_lapic_exit();
+> -	perf_unregister_guest_info_callbacks(&kvm_guest_cbs);
+> +	if (intel_pt_enabled)
+> +		perf_unregister_guest_info_callbacks(&kvm_guest_cbs);
+>  
+>  	if (!boot_cpu_has(X86_FEATURE_CONSTANT_TSC))
+>  		cpufreq_unregister_notifier(&kvmclock_cpufreq_notifier_block,
+> -- 
+> 2.32.0
+> 
