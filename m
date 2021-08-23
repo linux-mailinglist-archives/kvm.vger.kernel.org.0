@@ -2,167 +2,124 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2DB503F47E9
-	for <lists+kvm@lfdr.de>; Mon, 23 Aug 2021 11:47:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3E4A13F482D
+	for <lists+kvm@lfdr.de>; Mon, 23 Aug 2021 12:04:48 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232784AbhHWJrs (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 23 Aug 2021 05:47:48 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48768 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230118AbhHWJrr (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 23 Aug 2021 05:47:47 -0400
-Received: from mail.skyhub.de (mail.skyhub.de [IPv6:2a01:4f8:190:11c2::b:1457])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7A71AC061575;
-        Mon, 23 Aug 2021 02:47:05 -0700 (PDT)
-Received: from zn.tnic (p200300ec2f07d9000a71bbbd2fefb12e.dip0.t-ipconnect.de [IPv6:2003:ec:2f07:d900:a71:bbbd:2fef:b12e])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id C78C11EC0236;
-        Mon, 23 Aug 2021 11:46:59 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
-        t=1629712019;
+        id S232338AbhHWKFT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 23 Aug 2021 06:05:19 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:25692 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S232144AbhHWKFS (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 23 Aug 2021 06:05:18 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1629713075;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
-        bh=hTGqJSB99PZEZoaa2JK7dAiOoUAbusV7wq0edRHIa4g=;
-        b=Xl+0l4zzO8gkqhdQvxLoxh3KL93gUcH3KDD59hvOgRQE36+mZUnrVYTwCnD+iTjmwHCIiP
-        osVL7c/3rUhL3Adl9pKRURCPUI5Q8LTL2zMZhvpc1mdFy8wydrUlp+nOJZXEKF1/wJX6Gb
-        OG9ruTq3Y/JCAN274stHJ5fgoZNgwzo=
-Date:   Mon, 23 Aug 2021 11:47:34 +0200
-From:   Borislav Petkov <bp@alien8.de>
-To:     Brijesh Singh <brijesh.singh@amd.com>
-Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
-        linux-coco@lists.linux.dev, linux-mm@kvack.org,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
-        David Rientjes <rientjes@google.com>,
-        Dov Murik <dovmurik@linux.ibm.com>,
-        Tobin Feldman-Fitzthum <tobin@ibm.com>,
-        Michael Roth <michael.roth@amd.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        "Kirill A . Shutemov" <kirill@shutemov.name>,
-        Andi Kleen <ak@linux.intel.com>, tony.luck@intel.com,
-        marcorr@google.com, sathyanarayanan.kuppuswamy@linux.intel.com
-Subject: Re: [PATCH Part1 v5 07/38] x86/sev: Add support for hypervisor
- feature VMGEXIT
-Message-ID: <YSNutt/E0bm0kKsl@zn.tnic>
-References: <20210820151933.22401-1-brijesh.singh@amd.com>
- <20210820151933.22401-8-brijesh.singh@amd.com>
+         in-reply-to:in-reply-to:references:references;
+        bh=vt2o0y6T/PidcpWu/Q2Vn+bKqtgu+iFP1bn5zMbE4Wo=;
+        b=CxJgHcTdDCGrAcNP1BfyEhbXjFwX0+Zjvseny+xiSGl5Ejlx+QQmruBSUidLglvkMxDVdC
+        3SrZjb1ThJXwdJj0qhx+CMr0BB6wu6e6FB0XG97Rm/WhbVDT1meUwuk6a93CjrMC6dzxqq
+        /+kXr7Jpl1F3qVQL+4AUdL+MYjjqt8w=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-567-SQxE48x9NB-gP2eBAC56NA-1; Mon, 23 Aug 2021 06:04:34 -0400
+X-MC-Unique: SQxE48x9NB-gP2eBAC56NA-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E19C0801A92;
+        Mon, 23 Aug 2021 10:04:32 +0000 (UTC)
+Received: from localhost (unknown [10.39.194.67])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 1D1F15D9D3;
+        Mon, 23 Aug 2021 10:04:29 +0000 (UTC)
+Date:   Mon, 23 Aug 2021 11:04:23 +0100
+From:   Stefan Hajnoczi <stefanha@redhat.com>
+To:     Cai Huoqing <caihuoqing@baidu.com>
+Cc:     mst@redhat.com, jasowang@redhat.com, pbonzini@redhat.com,
+        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
+        nab@daterainc.com
+Subject: Re: [PATCH] vhost scsi: Convert to SPDX identifier
+Message-ID: <YSNyp3VpgEgX/53I@stefanha-x1.localdomain>
+References: <20210821123320.734-1-caihuoqing@baidu.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: multipart/signed; micalg=pgp-sha256;
+        protocol="application/pgp-signature"; boundary="6h2eKcyYkGGKJcwh"
 Content-Disposition: inline
-In-Reply-To: <20210820151933.22401-8-brijesh.singh@amd.com>
+In-Reply-To: <20210821123320.734-1-caihuoqing@baidu.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Aug 20, 2021 at 10:19:02AM -0500, Brijesh Singh wrote:
-> Version 2 of GHCB specification introduced advertisement of a features
-> that are supported by the hypervisor. Add support to query the HV
-> features on boot.
-> 
-> Version 2 of GHCB specification adds several new NAEs, most of them are
-> optional except the hypervisor feature. Now that hypervisor feature NAE
-> is implemented, so bump the GHCB maximum support protocol version.
-> 
-> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
+
+--6h2eKcyYkGGKJcwh
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Sat, Aug 21, 2021 at 08:33:20PM +0800, Cai Huoqing wrote:
+> use SPDX-License-Identifier instead of a verbose license text
+>=20
+> Signed-off-by: Cai Huoqing <caihuoqing@baidu.com>
 > ---
->  arch/x86/include/asm/mem_encrypt.h |  2 ++
->  arch/x86/include/asm/sev-common.h  |  3 +++
->  arch/x86/include/asm/sev.h         |  2 +-
->  arch/x86/include/uapi/asm/svm.h    |  2 ++
->  arch/x86/kernel/sev-shared.c       | 23 +++++++++++++++++++++++
->  5 files changed, 31 insertions(+), 1 deletion(-)
+>  drivers/vhost/scsi.c | 14 +-------------
+>  1 file changed, 1 insertion(+), 13 deletions(-)
 
-I think you can simplify more.
+I have CCed Nic.
 
-The HV features are read twice - once in the decompressor stub and again
-in kernel proper - but I guess that's not such a big deal.
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 
-Also, sev_hv_features can be static.
+> diff --git a/drivers/vhost/scsi.c b/drivers/vhost/scsi.c
+> index 46f897e41217..532e204f2b1b 100644
+> --- a/drivers/vhost/scsi.c
+> +++ b/drivers/vhost/scsi.c
+> @@ -1,24 +1,12 @@
+> +// SPDX-License-Identifier: GPL-2.0+
+>  /***********************************************************************=
+********
+>   * Vhost kernel TCM fabric driver for virtio SCSI initiators
+>   *
+>   * (C) Copyright 2010-2013 Datera, Inc.
+>   * (C) Copyright 2010-2012 IBM Corp.
+>   *
+> - * Licensed to the Linux Foundation under the General Public License (GP=
+L) version 2.
+> - *
+>   * Authors: Nicholas A. Bellinger <nab@daterainc.com>
+>   *          Stefan Hajnoczi <stefanha@linux.vnet.ibm.com>
+> - *
+> - * This program is free software; you can redistribute it and/or modify
+> - * it under the terms of the GNU General Public License as published by
+> - * the Free Software Foundation; either version 2 of the License, or
+> - * (at your option) any later version.
+> - *
+> - * This program is distributed in the hope that it will be useful,
+> - * but WITHOUT ANY WARRANTY; without even the implied warranty of
+> - * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+> - * GNU General Public License for more details.
+> - *
+>   ***********************************************************************=
+*****/
+> =20
+>  #include <linux/module.h>
+> --=20
+> 2.25.1
+>=20
 
-Diff ontop:
+--6h2eKcyYkGGKJcwh
+Content-Type: application/pgp-signature; name="signature.asc"
 
----
-diff --git a/arch/x86/include/asm/mem_encrypt.h b/arch/x86/include/asm/mem_encrypt.h
-index fb857f2e72cb..df14291d65de 100644
---- a/arch/x86/include/asm/mem_encrypt.h
-+++ b/arch/x86/include/asm/mem_encrypt.h
-@@ -26,7 +26,6 @@ enum sev_feature_type {
- 
- extern u64 sme_me_mask;
- extern u64 sev_status;
--extern u64 sev_hv_features;
- 
- void sme_encrypt_execute(unsigned long encrypted_kernel_vaddr,
- 			 unsigned long decrypted_kernel_vaddr,
-@@ -67,7 +66,6 @@ bool sev_feature_enabled(unsigned int feature_type);
- #else	/* !CONFIG_AMD_MEM_ENCRYPT */
- 
- #define sme_me_mask	0ULL
--#define sev_hv_features	0ULL
- 
- static inline void __init sme_early_encrypt(resource_size_t paddr,
- 					    unsigned long size) { }
-diff --git a/arch/x86/kernel/sev-shared.c b/arch/x86/kernel/sev-shared.c
-index 8bd67087d79e..d657c2c5a1ee 100644
---- a/arch/x86/kernel/sev-shared.c
-+++ b/arch/x86/kernel/sev-shared.c
-@@ -24,7 +24,7 @@
- static u16 __ro_after_init ghcb_version;
- 
- /* Bitmap of SEV features supported by the hypervisor */
--u64 __ro_after_init sev_hv_features = 0;
-+static u64 __ro_after_init sev_hv_features;
- 
- static bool __init sev_es_check_cpu_features(void)
- {
-@@ -51,10 +51,18 @@ static void __noreturn sev_es_terminate(unsigned int set, unsigned int reason)
- 		asm volatile("hlt\n" : : : "memory");
- }
- 
-+/*
-+ * The hypervisor features are available from GHCB version 2 onward.
-+ */
- static bool get_hv_features(void)
- {
- 	u64 val;
- 
-+	sev_hv_features = 0;
-+
-+	if (ghcb_version < 2)
-+		return false;
-+
- 	sev_es_wr_ghcb_msr(GHCB_MSR_HV_FT_REQ);
- 	VMGEXIT();
- 
-@@ -85,8 +93,7 @@ static bool sev_es_negotiate_protocol(void)
- 
- 	ghcb_version = min_t(size_t, GHCB_MSR_PROTO_MAX(val), GHCB_PROTOCOL_MAX);
- 
--	/* The hypervisor features are available from version 2 onward. */
--	if (ghcb_version >= 2 && !get_hv_features())
-+	if (!get_hv_features())
- 		return false;
- 
- 	return true;
+-----BEGIN PGP SIGNATURE-----
 
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAmEjcqcACgkQnKSrs4Gr
+c8huGgf9EGXjN0ece/7icZoSIWIeooKpfRYrOTF35aW6dhXKXoXO2NYFlTqmwI6b
+nl3jRY4jGk3htjwg1Axp9Yvd781YY16jqkEOSHJ9jaq7TpC9H65EKDUMlmzKzIYK
+LZnsQltlwjnksFZxZQas/oX6RyE6K27xaKGOA0wYRDrIzdo3rOlWJyY+m6VLnPVt
+Qs6bV39ZGVnRZgM49LmBHZw/MMq8hcrpjacCTPzno1T5HS/1KjISVgIpBCg6nxUL
+5DzKB+3UnW8M0ow8OOmxz+8WsuTq+dSmCYE2WSoYHPEjL+Rjci76RUIiXhHAguIO
+m2dVbB4tYyR+rrFytQrORTOSVVMrxA==
+=LmNU
+-----END PGP SIGNATURE-----
 
--- 
-Regards/Gruss,
-    Boris.
+--6h2eKcyYkGGKJcwh--
 
-https://people.kernel.org/tglx/notes-about-netiquette
