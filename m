@@ -2,118 +2,122 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B612F3F6141
-	for <lists+kvm@lfdr.de>; Tue, 24 Aug 2021 17:06:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2476A3F618D
+	for <lists+kvm@lfdr.de>; Tue, 24 Aug 2021 17:24:43 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238081AbhHXPGu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 24 Aug 2021 11:06:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58308 "EHLO
+        id S238347AbhHXPZX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 24 Aug 2021 11:25:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34392 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237966AbhHXPGt (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 24 Aug 2021 11:06:49 -0400
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A32CCC061757
-        for <kvm@vger.kernel.org>; Tue, 24 Aug 2021 08:06:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
-        References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:
-        Content-Type:Content-ID:Content-Description;
-        bh=1VNBK0D56SUo2dHkmlJ33YIGrsDG4gY27rkWRbTafAE=; b=q26kwGeqzNjnNyXMahBApnKGVg
-        ZjxvJLdz/wy2Q7+ALiU9bZ/G8E23b+XcbqRCAm7hKp5IQsoCB8xISiPkhyfJHUDP6690xsn02eahB
-        he3Fdv+hJUidR4GC+FDIJiJa5FC53/XhL0OgiBu38gp5TJOSfTwciWMfLIGBvFPvsMDEsdGmr7X2H
-        Xa8vJpIredgrVxeCxUmsgY6r95tiOawsAYvple5Z7m3mKN4e5rJGvd2xnsk7xRFv1IcnkCAQwTuBG
-        gmacVL29Re4qoTMvAsDLAOoezewKA2IVk6tbt0NtxhFIQ7wEeMjTqeqMtLf+PHhkj7woyFvTK8pYo
-        GoEezaGw==;
-Received: from [2001:4bb8:193:fd10:b8ba:7bad:652e:75fa] (helo=localhost)
-        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1mIXyW-00BCu1-Oh; Tue, 24 Aug 2021 15:04:39 +0000
-From:   Christoph Hellwig <hch@lst.de>
-To:     Alex Williamson <alex.williamson@redhat.com>
-Cc:     Diana Craciun <diana.craciun@oss.nxp.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Kirti Wankhede <kwankhede@nvidia.com>,
-        Eric Auger <eric.auger@redhat.com>,
-        Jason Gunthorpe <jgg@ziepe.ca>, kvm@vger.kernel.org
-Subject: [PATCH 14/14] vfio/iommu_type1: remove IS_IOMMU_CAP_DOMAIN_IN_CONTAINER
-Date:   Tue, 24 Aug 2021 16:46:49 +0200
-Message-Id: <20210824144649.1488190-15-hch@lst.de>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20210824144649.1488190-1-hch@lst.de>
-References: <20210824144649.1488190-1-hch@lst.de>
+        with ESMTP id S238337AbhHXPZW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 24 Aug 2021 11:25:22 -0400
+Received: from mail-pf1-x435.google.com (mail-pf1-x435.google.com [IPv6:2607:f8b0:4864:20::435])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E56B7C061764
+        for <kvm@vger.kernel.org>; Tue, 24 Aug 2021 08:24:37 -0700 (PDT)
+Received: by mail-pf1-x435.google.com with SMTP id y11so18682167pfl.13
+        for <kvm@vger.kernel.org>; Tue, 24 Aug 2021 08:24:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=dOpXg+FJdBLWI5rzPlpee9Thq8Rl+rTtOGkPC38d/eM=;
+        b=JeIic1euaNtoLKNq9Q2VWjbFLkdZFTk39npgl9ehainLBb57csCZPGQnFvb8pOYRlY
+         SdtJJN6+MbbojDL4x0iduT7RFArHpVi6EPsEJ2JWQ9IdgmYPP+rCtQma07PZk6OpRoEw
+         3LQSiQJlRijueWh/uB7/CSX/ousA0s9uTsqzOq6mEVlNw11OHU/xzZqTYgeN6bPc2SQv
+         Tyh97N6Z3hy0YNpcckKClrX2zX7jMAEBtyujYVM0bf2Ylz528MqHKSbhdhY5R4K1KuD6
+         mu6txVs2KD7trtXyKliX6MGsbP+TnGqMr+Or6YrnvKIyD6/oDBwJzgyzgSMAY71xe9Fi
+         2LWA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=dOpXg+FJdBLWI5rzPlpee9Thq8Rl+rTtOGkPC38d/eM=;
+        b=HJ5+FdprGqBh/MHSKDeBYR+Tk5m/n/tTmAKYJtFgf82jRVngn8DkXnOgEj8TQc5zBK
+         ntdgP5CHNbqojRXblm1sE2/Q66VZslhQfWvHp8Je4mLZZ1VZhQSQ0aqRS4d4YfVj+1JG
+         Qb5xMkPhZN3tNuHcOR2tm/zbgqT6nc2s/Lby7D5AilGAAQlQJsuUx0KdEh1PtZ9OALA6
+         MjxnL5fUxoIoQDfoLFKAsGXTrUItcRHeQoqAF4NS8raSs/8u+/psPfxOZnwSx2p8WWiL
+         DNg1z/X0D9VODM3sDGzAXn0XGZKpR98c1AU0fktfpbkJHeyEJLD3+u7enq7Hv6YE3SbL
+         txuw==
+X-Gm-Message-State: AOAM5332YWsZO3yKLcZGLUFfjdbQ1w/URtgP9gOxUNVDRwQYvII63Elb
+        +YoOpvVsyWAJLFRA1HbqhgbugA==
+X-Google-Smtp-Source: ABdhPJzRLPy8KIFVr1u2JWlVmZFkhe9C3VHpJlsLA0fV++hreJjotD//9FSKzU53CDs5iITtPa44MA==
+X-Received: by 2002:a63:480b:: with SMTP id v11mr37586366pga.413.1629818677254;
+        Tue, 24 Aug 2021 08:24:37 -0700 (PDT)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id b7sm18844657pfl.195.2021.08.24.08.24.36
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 24 Aug 2021 08:24:36 -0700 (PDT)
+Date:   Tue, 24 Aug 2021 15:24:26 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Xiaoyao Li <xiaoyao.li@intel.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 2/5] KVM: VMX: Use cached vmx->pt_desc.addr_range
+Message-ID: <YSUPKmtP6Dcl1yio@google.com>
+References: <20210824110743.531127-1-xiaoyao.li@intel.com>
+ <20210824110743.531127-3-xiaoyao.li@intel.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210824110743.531127-3-xiaoyao.li@intel.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-IS_IOMMU_CAP_DOMAIN_IN_CONTAINER just obsfucated the checks being
-performed, so open code it in the callers.
+On Tue, Aug 24, 2021, Xiaoyao Li wrote:
+> The number of guest's valid PT ADDR MSRs is cached in
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- drivers/vfio/vfio_iommu_type1.c | 13 +++++--------
- 1 file changed, 5 insertions(+), 8 deletions(-)
+Can you do s/cached/precomputed in the shortlog and changelog?  Explanation below.
 
-diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
-index 205f13c05b236e..42bd902243eca5 100644
---- a/drivers/vfio/vfio_iommu_type1.c
-+++ b/drivers/vfio/vfio_iommu_type1.c
-@@ -144,9 +144,6 @@ struct vfio_regions {
- 	size_t len;
- };
- 
--#define IS_IOMMU_CAP_DOMAIN_IN_CONTAINER(iommu)	\
--					(!list_empty(&iommu->domain_list))
--
- #define DIRTY_BITMAP_BYTES(n)	(ALIGN(n, BITS_PER_TYPE(u64)) / BITS_PER_BYTE)
- 
- /*
-@@ -884,7 +881,7 @@ static int vfio_iommu_type1_pin_pages(void *iommu_data,
- 	 * already pinned and accounted. Accounting should be done if there is no
- 	 * iommu capable domain in the container.
- 	 */
--	do_accounting = !IS_IOMMU_CAP_DOMAIN_IN_CONTAINER(iommu);
-+	do_accounting = list_empty(&iommu->domain_list);
- 
- 	for (i = 0; i < npage; i++) {
- 		struct vfio_pfn *vpfn;
-@@ -973,7 +970,7 @@ static int vfio_iommu_type1_unpin_pages(void *iommu_data,
- 
- 	mutex_lock(&iommu->lock);
- 
--	do_accounting = !IS_IOMMU_CAP_DOMAIN_IN_CONTAINER(iommu);
-+	do_accounting = list_empty(&iommu->domain_list);
- 	for (i = 0; i < npage; i++) {
- 		struct vfio_dma *dma;
- 		dma_addr_t iova;
-@@ -1094,7 +1091,7 @@ static long vfio_unmap_unpin(struct vfio_iommu *iommu, struct vfio_dma *dma,
- 	if (!dma->size)
- 		return 0;
- 
--	if (!IS_IOMMU_CAP_DOMAIN_IN_CONTAINER(iommu))
-+	if (list_empty(&iommu->domain_list))
- 		return 0;
- 
- 	/*
-@@ -1671,7 +1668,7 @@ static int vfio_dma_do_map(struct vfio_iommu *iommu,
- 	vfio_link_dma(iommu, dma);
- 
- 	/* Don't pin and map if container doesn't contain IOMMU capable domain*/
--	if (!IS_IOMMU_CAP_DOMAIN_IN_CONTAINER(iommu))
-+	if (list_empty(&iommu->domain_list))
- 		dma->size = size;
- 	else
- 		ret = vfio_pin_map_dma(iommu, dma, size);
-@@ -2477,7 +2474,7 @@ static void vfio_iommu_type1_detach_group(void *iommu_data,
- 		kfree(group);
- 
- 		if (list_empty(&iommu->mediated_groups) &&
--		    !IS_IOMMU_CAP_DOMAIN_IN_CONTAINER(iommu)) {
-+		    list_empty(&iommu->domain_list)) {
- 			WARN_ON(iommu->notifier.head);
- 			vfio_iommu_unmap_unpin_all(iommu);
- 		}
--- 
-2.30.2
+> vmx->pt_desc.addr_range. Use it instead of calculating it again.
+> 
+> Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
+> ---
+>  arch/x86/kvm/vmx/vmx.c | 3 +--
+>  1 file changed, 1 insertion(+), 2 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+> index e0a9460e4dab..7ed96c460661 100644
+> --- a/arch/x86/kvm/vmx/vmx.c
+> +++ b/arch/x86/kvm/vmx/vmx.c
+> @@ -2202,8 +2202,7 @@ static int vmx_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+>  		if (!pt_can_write_msr(vmx))
+>  			return 1;
+>  		index = msr_info->index - MSR_IA32_RTIT_ADDR0_A;
+> -		if (index >= 2 * intel_pt_validate_cap(vmx->pt_desc.caps,
+> -						       PT_CAP_num_address_ranges))
+> +		if (index >= 2 * vmx->pt_desc.addr_range)
 
+Ugh, "validate" is a lie, a better name would be intel_pt_get_cap() or so.  There
+is no validation, the helper is simply extracting the requested cap from the
+passed in array of capabilities.
+
+That matters in this case because the number of address ranges exposed to the
+guest is not bounded by the number of address ranges present in hardware, i.e.
+it's not "validated".  And that matters because KVM uses vmx->pt_desc.addr_range
+to pass through the ADDRn_{A,B} MSRs when tracing enabled.  In other words,
+userspace can expose MSRs to the guest that do not exist.
+
+The bug shouldn't be a security issue, so long as Intel CPUs are bug free and
+aren't doing silly things with MSR indexes.  The number of possible address ranges
+is encoded in three bits, thus the theoretical max is 8 ranges.  So userspace can't
+get access to arbitrary MSRs, just ADDR0_A -> ADDR7_B.
+
+And since KVM would be modifying the "validated" value, it's more than just a
+cache, hence the request to use "precomputed".
+
+Finally, vmx_get_msr() should use the precomputed value as well.
+
+P.S. If you want to introduce a bit of churn, s/addr_range/nr_addr_ranges would
+     be a welcome change as well.
+
+>  			return 1;
+>  		if (is_noncanonical_address(data, vcpu))
+>  			return 1;
+> -- 
+> 2.27.0
+> 
