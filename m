@@ -2,143 +2,90 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id DC6E93F5D28
-	for <lists+kvm@lfdr.de>; Tue, 24 Aug 2021 13:35:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 81CF63F5D5A
+	for <lists+kvm@lfdr.de>; Tue, 24 Aug 2021 13:52:49 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236656AbhHXLf5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 24 Aug 2021 07:35:57 -0400
-Received: from mx12.kaspersky-labs.com ([91.103.66.155]:34212 "EHLO
-        mx12.kaspersky-labs.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236205AbhHXLfz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 24 Aug 2021 07:35:55 -0400
-Received: from relay12.kaspersky-labs.com (unknown [127.0.0.10])
-        by relay12.kaspersky-labs.com (Postfix) with ESMTP id 7306875957;
-        Tue, 24 Aug 2021 14:35:06 +0300 (MSK)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kaspersky.com;
-        s=mail202102; t=1629804906;
-        bh=GYBaQLze7V8QkffIPN1VdgsX/1gXYT+yCMz9naFMfN4=;
-        h=Subject:To:From:Message-ID:Date:MIME-Version:Content-Type;
-        b=pm5kl2r/3XsNo8wLflIie8bPCLk6TZGUFX2SfpkUbOnggCdIMiPz3svKCKRm7gzPS
-         ckwnbNTeJROsCchTQ4mkhfHsbpMCHOtsvOyQJ8PIamXTyyIMBn6EbT5QqHHVDKa/z9
-         85BYe1HjbnMX3FbXvipi3IIZKjHhTmZNJheAvx4FJy/gjOTvWcUTVM4AxsQ6i8Iq5i
-         y82ffc6A6EFX1nRz357sEitxa/B6CvJyrTpW9iRUMHSnWaTb4/JWsipWyZlH/Q+mZI
-         rml4F+pmYTlTQE+xtTRt2KRGC50JKZmCI8JRLmo+oaXiayH8qg+cvp7e1IwPY9Su0X
-         Wo5VO0vlHpERw==
-Received: from mail-hq2.kaspersky.com (unknown [91.103.66.206])
-        (using TLSv1.2 with cipher AES256-GCM-SHA384 (256/256 bits))
-        (Client CN "mail-hq2.kaspersky.com", Issuer "Kaspersky MailRelays CA G3" (verified OK))
-        by mailhub12.kaspersky-labs.com (Postfix) with ESMTPS id 2C35175967;
-        Tue, 24 Aug 2021 14:35:05 +0300 (MSK)
-Received: from [10.16.171.77] (10.64.64.121) by hqmailmbx3.avp.ru
- (10.64.67.243) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2308.14; Tue, 24
- Aug 2021 14:35:04 +0300
-Subject: Re: [RFC PATCH v3 0/6] virtio/vsock: introduce MSG_EOR flag for
- SEQPACKET
-To:     Stefano Garzarella <sgarzare@redhat.com>
-CC:     Stefan Hajnoczi <stefanha@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Norbert Slusarek <nslusarek@gmx.net>,
-        Andra Paraschiv <andraprs@amazon.com>,
-        Colin Ian King <colin.king@canonical.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "virtualization@lists.linux-foundation.org" 
-        <virtualization@lists.linux-foundation.org>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "stsp2@yandex.ru" <stsp2@yandex.ru>,
-        "oxffffaa@gmail.com" <oxffffaa@gmail.com>
-References: <20210816085036.4173627-1-arseny.krasnov@kaspersky.com>
- <3f3fc268-10fc-1917-32c2-dc0e7737dc48@kaspersky.com>
- <20210824100523.yn5hgiycz2ysdnvm@steredhat>
- <d28ff03e-c8ab-f7c6-68a2-90c9a400d029@kaspersky.com>
- <20210824103137.v3fny2yc5ww46p33@steredhat>
-From:   Arseny Krasnov <arseny.krasnov@kaspersky.com>
-Message-ID: <0c0a7b61-524e-ab44-7d7e-b35bd094c7ca@kaspersky.com>
-Date:   Tue, 24 Aug 2021 14:35:03 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        id S236829AbhHXLxb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 24 Aug 2021 07:53:31 -0400
+Received: from mail.kernel.org ([198.145.29.99]:55902 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S236614AbhHXLxb (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 24 Aug 2021 07:53:31 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPS id 493B061246
+        for <kvm@vger.kernel.org>; Tue, 24 Aug 2021 11:52:47 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1629805967;
+        bh=A6DZ6tlFEhpGh4vmU1kNSMWwzVJEgQKEx71NLcJAMAk=;
+        h=From:To:Subject:Date:From;
+        b=bu2Od9lxp6Y0O+c30sCemACg577dhKBJ/HSH+pqWe6Cg7/j6fjDapgryvdz1S9CVF
+         0FQjz9giqfsWFLPeasxSguINqt6/DH6yUTPCD4M24ZZrr5BGf2yBXtupgJDbNMg5QF
+         eHhA33YCgHSIc1VqWyx9zPA7B+B/ct/pu4IrupqEzWmbrXMG8hhneDtl/za/snouJa
+         xKanPvBiodsbMQ33Bf3zXLNG2oZli5A2gvqWkoPCKoTLVuqSuQdGO3mks3c0Em0v7h
+         PSM7yCPnBHkRKa8AZX6+knPlwVhxryY6hQXaqOjR9qJWu74CrghAXjDcNmuPanuhKM
+         4xhC9chp7RgYg==
+Received: by pdx-korg-bugzilla-2.web.codeaurora.org (Postfix, from userid 48)
+        id 424C860FF2; Tue, 24 Aug 2021 11:52:47 +0000 (UTC)
+From:   bugzilla-daemon@bugzilla.kernel.org
+To:     kvm@vger.kernel.org
+Subject: [Bug 214165] New: Missing clflush before RECEIVE_UPDATE_DATA
+Date:   Tue, 24 Aug 2021 11:52:46 +0000
+X-Bugzilla-Reason: None
+X-Bugzilla-Type: new
+X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
+X-Bugzilla-Product: Virtualization
+X-Bugzilla-Component: kvm
+X-Bugzilla-Version: unspecified
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: masa.koz@seera-networks.com
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P1
+X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: bug_id short_desc product version
+ cf_kernel_version rep_platform op_sys cf_tree bug_status bug_severity
+ priority component assigned_to reporter cf_regression attachments.created
+Message-ID: <bug-214165-28872@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 MIME-Version: 1.0
-In-Reply-To: <20210824103137.v3fny2yc5ww46p33@steredhat>
-Content-Type: text/plain; charset="windows-1252"
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-X-Originating-IP: [10.64.64.121]
-X-ClientProxiedBy: hqmailmbx1.avp.ru (10.64.67.241) To hqmailmbx3.avp.ru
- (10.64.67.243)
-X-KSE-ServerInfo: hqmailmbx3.avp.ru, 9
-X-KSE-AntiSpam-Interceptor-Info: scan successful
-X-KSE-AntiSpam-Version: 5.9.20, Database issued on: 08/24/2021 10:59:13
-X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
-X-KSE-AntiSpam-Method: none
-X-KSE-AntiSpam-Rate: 0
-X-KSE-AntiSpam-Info: Lua profiles 165761 [Aug 24 2021]
-X-KSE-AntiSpam-Info: Version: 5.9.20.0
-X-KSE-AntiSpam-Info: Envelope from: arseny.krasnov@kaspersky.com
-X-KSE-AntiSpam-Info: LuaCore: 454 454 39c6e442fd417993330528e7f9d13ac1bf7fdf8c
-X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
-X-KSE-AntiSpam-Info: kaspersky.com:7.1.1;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;127.0.0.199:7.1.2
-X-KSE-AntiSpam-Info: Rate: 0
-X-KSE-AntiSpam-Info: Status: not_detected
-X-KSE-AntiSpam-Info: Method: none
-X-KSE-Antiphishing-Info: Clean
-X-KSE-Antiphishing-ScanningType: Deterministic
-X-KSE-Antiphishing-Method: None
-X-KSE-Antiphishing-Bases: 08/24/2021 11:01:00
-X-KSE-AttachmentFiltering-Interceptor-Info: no applicable attachment filtering
- rules found
-X-KSE-Antivirus-Interceptor-Info: scan successful
-X-KSE-Antivirus-Info: Clean, bases: 24.08.2021 7:59:00
-X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
-X-KSE-AttachmentFiltering-Interceptor-Info: no applicable attachment filtering
- rules found
-X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
-X-KLMS-Rule-ID: 52
-X-KLMS-Message-Action: clean
-X-KLMS-AntiSpam-Status: not scanned, disabled by settings
-X-KLMS-AntiSpam-Interceptor-Info: not scanned
-X-KLMS-AntiPhishing: Clean, bases: 2021/08/24 10:44:00
-X-KLMS-AntiVirus: Kaspersky Security for Linux Mail Server, version 8.0.3.30, bases: 2021/08/24 07:59:00 #17090872
-X-KLMS-AntiVirus-Status: Clean, skipped
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+https://bugzilla.kernel.org/show_bug.cgi?id=3D214165
 
-On 24.08.2021 13:31, Stefano Garzarella wrote:
-> Caution: This is an external email. Be cautious while opening links or attachments.
->
->
->
-> On Tue, Aug 24, 2021 at 01:18:06PM +0300, Arseny Krasnov wrote:
->> On 24.08.2021 13:05, Stefano Garzarella wrote:
->>> Caution: This is an external email. Be cautious while opening links or attachments.
->>>
->>>
->>>
->>> Hi Arseny,
->>>
->>> On Mon, Aug 23, 2021 at 09:41:16PM +0300, Arseny Krasnov wrote:
->>>> Hello, please ping :)
->>>>
->>> Sorry, I was off last week.
->>> I left some minor comments in the patches.
->>>
->>> Let's wait a bit for other comments before next version, also on the
->>> spec, then I think you can send the next version without RFC tag.
->>> The target should be the net-next tree, since this is a new feature.
->> Hello,
->>
->> E.g. next version will be [net-next] instead of [RFC] for both
->> kernel and spec patches?
-> Nope, net-next tag is useful only for kernel patches (net tree -
-> Documentation/networking/netdev-FAQ.rst).
-Ack
->
-> Thanks,
-> Stefano
->
->
+            Bug ID: 214165
+           Summary: Missing clflush before RECEIVE_UPDATE_DATA
+           Product: Virtualization
+           Version: unspecified
+    Kernel Version: 5.13.12
+          Hardware: x86-64
+                OS: Linux
+              Tree: Mainline
+            Status: NEW
+          Severity: normal
+          Priority: P1
+         Component: kvm
+          Assignee: virtualization_kvm@kernel-bugs.osdl.org
+          Reporter: masa.koz@seera-networks.com
+        Regression: No
+
+Created attachment 298457
+  --> https://bugzilla.kernel.org/attachment.cgi?id=3D298457&action=3Dedit
+Add the missing sev_clflush_pages()
+
+In sev_receive_update_data(), sev_clflush_pages() is not called b/w
+sev_pin_memory() and RECEIVE_UPDATE_DATA. Because of this missing, we will
+often see the pre-written contents in the memory updated by
+RECEIVE_UPDATE_DATA. I guess that we should call sev_clflush_pages() as
+LAUNCH_UPDATE_DATA.
+
+--=20
+You may reply to this email to add a comment.
+
+You are receiving this mail because:
+You are watching the assignee of the bug.=
