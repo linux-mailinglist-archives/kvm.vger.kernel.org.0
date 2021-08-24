@@ -2,55 +2,55 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6FF5F3F6C4F
-	for <lists+kvm@lfdr.de>; Wed, 25 Aug 2021 01:43:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3C9633F6C50
+	for <lists+kvm@lfdr.de>; Wed, 25 Aug 2021 01:45:04 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234218AbhHXXoL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 24 Aug 2021 19:44:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36278 "EHLO
+        id S234317AbhHXXpr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 24 Aug 2021 19:45:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36632 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231552AbhHXXoJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 24 Aug 2021 19:44:09 -0400
-Received: from mail-qt1-x82f.google.com (mail-qt1-x82f.google.com [IPv6:2607:f8b0:4864:20::82f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AD8B3C061757
-        for <kvm@vger.kernel.org>; Tue, 24 Aug 2021 16:43:24 -0700 (PDT)
-Received: by mail-qt1-x82f.google.com with SMTP id g11so18361930qtk.5
-        for <kvm@vger.kernel.org>; Tue, 24 Aug 2021 16:43:24 -0700 (PDT)
+        with ESMTP id S231552AbhHXXpr (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 24 Aug 2021 19:45:47 -0400
+Received: from mail-qk1-x72a.google.com (mail-qk1-x72a.google.com [IPv6:2607:f8b0:4864:20::72a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3E27FC061757
+        for <kvm@vger.kernel.org>; Tue, 24 Aug 2021 16:45:02 -0700 (PDT)
+Received: by mail-qk1-x72a.google.com with SMTP id a10so16327350qka.12
+        for <kvm@vger.kernel.org>; Tue, 24 Aug 2021 16:45:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=ziepe.ca; s=google;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=l4iKy8AdsMkh2tUYA9fH1OSgTMNNzf2itCWkC7it1fY=;
-        b=keyF7qq0TiXarQqf6zXLi7//XMXrx4l4paYin+aPleUb3CY6udSMLX/Ewaxrc3/rhU
-         Ls8B0jp4eAY9mpcbqU1BssmWhgIMlT4JAhwej4QsH/Skrht9cXZEdsC1m8xYOQ4HY9AQ
-         7dLHY0b8ALcNHuHNavRNjbam7oPwOtUT29ZXUK6Dc/RAOKBTRWtWQ3ufZFANg1CG4xmX
-         YAmvRRjlBhGtKixJQOaJTdN9OWkSv6iLKkCdXAsk+Oq6+6Rnwqqt5AdZNeUyOy7H3UOB
-         nsrVSNASO8FmJ2xHN+F0quagcrLas0aSONFmTjFntlE9G+T0MejliRbtYq9etrt+/L/x
-         Jm9w==
+        bh=nPISlNnlijRS7NGI6x3M1PPe4bWd9ZSJLM/30kpeaB0=;
+        b=Qbw6WJ01jaIYd91ayRmU/BWJkssM8zGdkK0Afw02PCSZr1lhWCTgEBw466Mx6Ns7zQ
+         CW7yGY/PY8TubTNkr9krq3BTj+h9PL3Q/HSrUZc6fXlfYnWiYZcvoWthDMcPiopP8CkD
+         6vhOvwJL5wSRio3RbW+vtahQeRS9wHIpENsMFj++tkz374r8oQIoem5WkWPG8G8m6lJh
+         Oii8VkRBdmFVKRwjVNeeDKUztcZUrDlrklTznylVWD3gwRj400PI9S754FJRCF7He09O
+         jpW2OhqbnjYJHO3cXPfVBZq06Axx6cYxsxUInwiyI5jIVI9jLI9E2MCHiaRmCduhyo1K
+         ++Mw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=l4iKy8AdsMkh2tUYA9fH1OSgTMNNzf2itCWkC7it1fY=;
-        b=bWy4ftBC+CKy+bhgb7juv2RR+uVjCFZEX7hES+htheCw8fFYNIx3bxWvfXMvG+5kbP
-         RDi5desM1cjQ9Js787IPtigbhqO+4KVeqvb2jf4fxt0reWiXMSnJ3UDylw+2mR855mC1
-         pipYmgm9Y79DRv+wpnLizcdBBnQCXFyxHh36+wuhpz7YsqEWFOxz93G5yUq0q/Kv+gtJ
-         kfPwiDjVSWmA7aidKAQJM0ds8XqJFLeVW239SoDEEsE2iUeleJMS/ltXKrNqk6OEGzUy
-         XQld9Eh4Qtj22cbOq5DoZ6nWwfdRJxPFD/jjF/IahWBctgDDf7rfoAK/cIFn6k1stxTN
-         Onow==
-X-Gm-Message-State: AOAM532UN/PrSmFCFFMnOq8Pk+3DjTWX8sWRL43zCh4Kp/XB03ynTLCt
-        i/1xFavAvVPjRkKheiY6sCoESA==
-X-Google-Smtp-Source: ABdhPJyh8avDPGcXxgOrPr0fontyaf7079cGJvVnUN++x6eNBXzF0FWzPF0Xn3O26ArhT9N8dkHlew==
-X-Received: by 2002:ac8:70b:: with SMTP id g11mr37229860qth.387.1629848603624;
-        Tue, 24 Aug 2021 16:43:23 -0700 (PDT)
+        bh=nPISlNnlijRS7NGI6x3M1PPe4bWd9ZSJLM/30kpeaB0=;
+        b=NSadqWTIQkaMXFQmQbdsKNlTTvA2L+WIMabFmSNptNjsm1TvqxMAqY2qGr3pcqZIho
+         rs1fWI8tv16FiY/XtvTdW2Tepakx/jYJsrqT1r1wMqzed7I5EHgQDuMohiJJfKuaGNZ0
+         6uMPYCcF4syAAAaJGmlsU+IwgRiKihoGcbpRcu1Xhg4V1T+AUY1OF2RWEX/xjzv6h/i9
+         lTEqw+TQa1NQacxGSku5Ohv6hbnbqGb+Fynr0Jh5t10ZF6GnY1HKqsNDMJJhNThTDI94
+         cXUorGClTrgEk/55GrjGVgx0ovQ2LKMPBeBmp2lpQnxh4ozTIr9bz5iphoU/2/xevl2p
+         Hw2Q==
+X-Gm-Message-State: AOAM531e0GVH81RiRZZY+4AXyi/NCprpYSUL10ViBfjjcEu9aigmbKL/
+        7f6j4UJrTzfbnk2TOdwwCpcutQ==
+X-Google-Smtp-Source: ABdhPJzmGMnmWYw3eKFis9TTi7p3t5HAJUBsGVSXkPKfaaSiOswmaljly0DMHjlBfNcFaOrhVAa8Jw==
+X-Received: by 2002:a37:e10c:: with SMTP id c12mr28760125qkm.199.1629848701495;
+        Tue, 24 Aug 2021 16:45:01 -0700 (PDT)
 Received: from ziepe.ca (hlfxns017vw-142-162-113-129.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.162.113.129])
-        by smtp.gmail.com with ESMTPSA id z6sm11673388qke.24.2021.08.24.16.43.23
+        by smtp.gmail.com with ESMTPSA id k9sm9079705qtj.12.2021.08.24.16.45.00
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 24 Aug 2021 16:43:23 -0700 (PDT)
+        Tue, 24 Aug 2021 16:45:01 -0700 (PDT)
 Received: from jgg by mlx with local (Exim 4.94)
         (envelope-from <jgg@ziepe.ca>)
-        id 1mIg4g-004iTb-K7; Tue, 24 Aug 2021 20:43:22 -0300
-Date:   Tue, 24 Aug 2021 20:43:22 -0300
+        id 1mIg6G-004iVa-Gg; Tue, 24 Aug 2021 20:45:00 -0300
+Date:   Tue, 24 Aug 2021 20:45:00 -0300
 From:   Jason Gunthorpe <jgg@ziepe.ca>
 To:     Christoph Hellwig <hch@lst.de>
 Cc:     Alex Williamson <alex.williamson@redhat.com>,
@@ -58,28 +58,29 @@ Cc:     Alex Williamson <alex.williamson@redhat.com>,
         Cornelia Huck <cohuck@redhat.com>,
         Kirti Wankhede <kwankhede@nvidia.com>,
         Eric Auger <eric.auger@redhat.com>, kvm@vger.kernel.org
-Subject: Re: [PATCH 05/14] vfio: refactor noiommu group creation
-Message-ID: <20210824234322.GL543798@ziepe.ca>
+Subject: Re: [PATCH 06/14] vfio: remove the iommudata hack for noiommu groups
+Message-ID: <20210824234500.GM543798@ziepe.ca>
 References: <20210824144649.1488190-1-hch@lst.de>
- <20210824144649.1488190-6-hch@lst.de>
+ <20210824144649.1488190-7-hch@lst.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20210824144649.1488190-6-hch@lst.de>
+In-Reply-To: <20210824144649.1488190-7-hch@lst.de>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Aug 24, 2021 at 04:46:40PM +0200, Christoph Hellwig wrote:
-> Split the actual noiommu group creation from vfio_iommu_group_get into a
-> new helper, and open code the rest of vfio_iommu_group_get in its only
-> caller.  This creates an antirely separate and clear code path for the
-> noiommu group creation.
+On Tue, Aug 24, 2021 at 04:46:41PM +0200, Christoph Hellwig wrote:
+> Just pass a noiommu argument to vfio_create_group and set up the
+> ->noiommu flag directly, and remove the now superflous
+> vfio_iommu_group_put helper.
 > 
 > Signed-off-by: Christoph Hellwig <hch@lst.de>
 > ---
->  drivers/vfio/vfio.c | 100 +++++++++++++++++++++++---------------------
->  1 file changed, 53 insertions(+), 47 deletions(-)
+>  drivers/vfio/vfio.c | 30 +++++++++++-------------------
+>  1 file changed, 11 insertions(+), 19 deletions(-)
+
+I like this a lot better
 
 Reviewed-by: Jason Gunthorpe <jgg@nvidia.com>
 
