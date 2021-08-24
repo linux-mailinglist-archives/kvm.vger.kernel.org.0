@@ -2,54 +2,54 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9C4A23F5CE5
-	for <lists+kvm@lfdr.de>; Tue, 24 Aug 2021 13:10:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 047323F5CEC
+	for <lists+kvm@lfdr.de>; Tue, 24 Aug 2021 13:12:21 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236683AbhHXLKt (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 24 Aug 2021 07:10:49 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:30568 "EHLO
+        id S236640AbhHXLNB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 24 Aug 2021 07:13:01 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:55289 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S236443AbhHXLKs (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 24 Aug 2021 07:10:48 -0400
+        by vger.kernel.org with ESMTP id S236477AbhHXLNA (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 24 Aug 2021 07:13:00 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1629803403;
+        s=mimecast20190719; t=1629803536;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=6MzIVYD6Rkcf1avefY9xlULEY3kI1KocMJ7+mbhVSUk=;
-        b=J9zoicPacGc8JCVXDTJ1GPTrxpOvQpo1Q/257vWmOFjmtp5Agg0IF8Dg9Q/xwcx1Ik7eRK
-        BWYjpB6K7Aqy5VmftBmDWsYkhPbASYgWnqYorRktJDMywF5vTY/k8HvGljgnemD44ew/Nv
-        OpbAykFaiQPxE3CZdd2bEWOOJrxEAyM=
+        bh=sp6r3OzWSMu57KiEYb4z4Sr1QBf9aXwrMsxdCi+UL3c=;
+        b=LnaeJtdnvz+wt9mV7wf6yrYySFJSe+PR7Kxt0NeeHv1rz71UVGb+kQQszA1jNvyKvgFnUS
+        gNkR2qacvPoA33fDQFBMueHDjoBn4/Z5+5qA0c3yKMHNqi0sICGdhTgaYtVOmOzEi8E9P+
+        02Km4iX82Y25gwrtbMTf3DHTAJWFh6Y=
 Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
  [209.85.208.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-540-JWit5o4PM2q_M-3CvRDOcw-1; Tue, 24 Aug 2021 07:10:02 -0400
-X-MC-Unique: JWit5o4PM2q_M-3CvRDOcw-1
-Received: by mail-ed1-f70.google.com with SMTP id b6-20020aa7c6c6000000b003c2b5b2ddf8so3300722eds.0
-        for <kvm@vger.kernel.org>; Tue, 24 Aug 2021 04:10:02 -0700 (PDT)
+ us-mta-298-Fojqv9iHMWCnc8IN9pNvEg-1; Tue, 24 Aug 2021 07:12:15 -0400
+X-MC-Unique: Fojqv9iHMWCnc8IN9pNvEg-1
+Received: by mail-ed1-f70.google.com with SMTP id bx23-20020a0564020b5700b003bf2eb11718so10323560edb.20
+        for <kvm@vger.kernel.org>; Tue, 24 Aug 2021 04:12:14 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=6MzIVYD6Rkcf1avefY9xlULEY3kI1KocMJ7+mbhVSUk=;
-        b=TL08LMl6j4ZW7era1yHb7H7JLtU6iiJqf+3FloduZ4Xc9lAezLjfehkj/+hK2hqccm
-         kWTS2fnEOcQ36uZzs6V9jkWSIYMnVSdgtgbM3tjB5BhzHOZ3RltET8H4936IKpXxiIgP
-         vXYbqako3+ittHF4Sfs8BEThgt+upZdQY9afxwGdXKFpKaZYHeuNYekr6OjY8AsJfclr
-         Ruzmby6blkSgIecIvR7/ri1UPkuL2SLGmXcdXv9TbGqlw0P9M8KRCm2iwuL7ZGPExA2a
-         WeGxoJ+++N4p+rwwIkgIuGsCQVXcS5jNhTS9sqe1EZ5nqBoCL86zCTcmIHiXz7NGgHBc
-         3RIg==
-X-Gm-Message-State: AOAM531kLEkMgL7ULk53BL8GeCuxarMAmXMkU1AAdsfwiPdp0cPaC0Uy
-        pE2jr2L5UqC2tiAyJmVgA3PC87UgXHbSnsvp4JbJ6y5013x8IGT/0GgdreCohr5VcisFaagiqpI
-        jQNU5uuXuPfNt
-X-Received: by 2002:a17:906:9bdc:: with SMTP id de28mr40030301ejc.154.1629803401150;
-        Tue, 24 Aug 2021 04:10:01 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJym2zZCfOfkB6aYg6hvpM9EYCUNutnmi5ZkMGiE/H3YmE4qf/VSJ5+nHLjDGlfYfIZpl2VYMg==
-X-Received: by 2002:a17:906:9bdc:: with SMTP id de28mr40030281ejc.154.1629803400969;
-        Tue, 24 Aug 2021 04:10:00 -0700 (PDT)
+        bh=sp6r3OzWSMu57KiEYb4z4Sr1QBf9aXwrMsxdCi+UL3c=;
+        b=GuIC8ksN+nvBrtr8bMNmpah6eSVEjPKCyhBOtShU+kvhKxr7leLLK0o/BlwUF67eat
+         VbPT3iRcxkKj7FtcsMMHNs+e2caJSpfCR6z+4oSHzDejyxfTTNi3O49dJho7UBI3IuOJ
+         l/zoHACn9pOyCugXeA1gXaM4S0YF721U8e/A+3GjAPZ5OSld4pgGoTzzhp4qS5R89xlU
+         2X6MrJTuGijVAN1IxO486bXNm/IDjJbX0tFwQTxTCWnTKYqx1QZsEpujANXIvYrrs070
+         0s3QQ5PQ7KHXAKyGjUy93jjEoGX5yla6KV7LTqHVBU4Tb7L3fMi9KWd3AnXrxWyvPy3J
+         Obpw==
+X-Gm-Message-State: AOAM532z6vODBHy7UHP1plDjuujrLmSEwUZoqSg72u2RxMKq4bkGY7MP
+        KVNCmpMD7OKqmPWcP4X6gR4guEqQEX9kiRi8tgVMUzQWYdPtOkLRpcAxApKdXiveHtyGgFfym/+
+        Ulo284xMRANZ1
+X-Received: by 2002:a17:906:1701:: with SMTP id c1mr40193390eje.425.1629803534063;
+        Tue, 24 Aug 2021 04:12:14 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyDklZBFBy5QnXrgs3+cqOF2EU5CCgdvdd15GqRk67R8P3Nj6qlQx0g2cCYgrph1uoICqAc7Q==
+X-Received: by 2002:a17:906:1701:: with SMTP id c1mr40193358eje.425.1629803533933;
+        Tue, 24 Aug 2021 04:12:13 -0700 (PDT)
 Received: from steredhat (host-79-45-8-152.retail.telecomitalia.it. [79.45.8.152])
-        by smtp.gmail.com with ESMTPSA id u2sm9003772ejc.61.2021.08.24.04.09.58
+        by smtp.gmail.com with ESMTPSA id h21sm331619ejb.101.2021.08.24.04.12.10
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 24 Aug 2021 04:10:00 -0700 (PDT)
-Date:   Tue, 24 Aug 2021 13:09:56 +0200
+        Tue, 24 Aug 2021 04:12:13 -0700 (PDT)
+Date:   Tue, 24 Aug 2021 13:12:07 +0200
 From:   Stefano Garzarella <sgarzare@redhat.com>
 To:     Xie Yongji <xieyongji@bytedance.com>
 Cc:     mst@redhat.com, jasowang@redhat.com, stefanha@redhat.com,
@@ -64,107 +64,26 @@ Cc:     mst@redhat.com, jasowang@redhat.com, stefanha@redhat.com,
         virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
         kvm@vger.kernel.org, linux-fsdevel@vger.kernel.org,
         iommu@lists.linux-foundation.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v11 03/12] vdpa: Fix some coding style issues
-Message-ID: <20210824110956.gtajf34s2xpm66gx@steredhat>
+Subject: Re: [PATCH v11 05/12] vhost-vdpa: Handle the failure of vdpa_reset()
+Message-ID: <20210824111207.ppvop52hyq5xyny5@steredhat>
 References: <20210818120642.165-1-xieyongji@bytedance.com>
- <20210818120642.165-4-xieyongji@bytedance.com>
+ <20210818120642.165-6-xieyongji@bytedance.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii; format=flowed
 Content-Disposition: inline
-In-Reply-To: <20210818120642.165-4-xieyongji@bytedance.com>
+In-Reply-To: <20210818120642.165-6-xieyongji@bytedance.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Aug 18, 2021 at 08:06:33PM +0800, Xie Yongji wrote:
->Fix some code indent issues and following checkpatch warning:
->
->WARNING: Prefer 'unsigned int' to bare use of 'unsigned'
->371: FILE: include/linux/vdpa.h:371:
->+static inline void vdpa_get_config(struct vdpa_device *vdev, unsigned offset,
+On Wed, Aug 18, 2021 at 08:06:35PM +0800, Xie Yongji wrote:
+>The vdpa_reset() may fail now. This adds check to its return
+>value and fail the vhost_vdpa_open().
 >
 >Signed-off-by: Xie Yongji <xieyongji@bytedance.com>
 >---
-> include/linux/vdpa.h | 34 +++++++++++++++++-----------------
-> 1 file changed, 17 insertions(+), 17 deletions(-)
+> drivers/vhost/vdpa.c | 9 ++++++---
+> 1 file changed, 6 insertions(+), 3 deletions(-)
 
 Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
-
->
->diff --git a/include/linux/vdpa.h b/include/linux/vdpa.h
->index 954b340f6c2f..8a645f8f4476 100644
->--- a/include/linux/vdpa.h
->+++ b/include/linux/vdpa.h
->@@ -43,17 +43,17 @@ struct vdpa_vq_state_split {
->  * @last_used_idx: used index
->  */
-> struct vdpa_vq_state_packed {
->-        u16	last_avail_counter:1;
->-        u16	last_avail_idx:15;
->-        u16	last_used_counter:1;
->-        u16	last_used_idx:15;
->+	u16	last_avail_counter:1;
->+	u16	last_avail_idx:15;
->+	u16	last_used_counter:1;
->+	u16	last_used_idx:15;
-> };
->
-> struct vdpa_vq_state {
->-     union {
->-          struct vdpa_vq_state_split split;
->-          struct vdpa_vq_state_packed packed;
->-     };
->+	union {
->+		struct vdpa_vq_state_split split;
->+		struct vdpa_vq_state_packed packed;
->+	};
-> };
->
-> struct vdpa_mgmt_dev;
->@@ -131,7 +131,7 @@ struct vdpa_iova_range {
->  *				@vdev: vdpa device
->  *				@idx: virtqueue index
->  *				@state: pointer to returned state (last_avail_idx)
->- * @get_vq_notification: 	Get the notification area for a virtqueue
->+ * @get_vq_notification:	Get the notification area for a virtqueue
->  *				@vdev: vdpa device
->  *				@idx: virtqueue index
->  *				Returns the notifcation area
->@@ -353,25 +353,25 @@ static inline struct device *vdpa_get_dma_dev(struct vdpa_device *vdev)
->
-> static inline void vdpa_reset(struct vdpa_device *vdev)
-> {
->-        const struct vdpa_config_ops *ops = vdev->config;
->+	const struct vdpa_config_ops *ops = vdev->config;
->
-> 	vdev->features_valid = false;
->-        ops->set_status(vdev, 0);
->+	ops->set_status(vdev, 0);
-> }
->
-> static inline int vdpa_set_features(struct vdpa_device *vdev, u64 features)
-> {
->-        const struct vdpa_config_ops *ops = vdev->config;
->+	const struct vdpa_config_ops *ops = vdev->config;
->
-> 	vdev->features_valid = true;
->-        return ops->set_features(vdev, features);
->+	return ops->set_features(vdev, features);
-> }
->
->-
->-static inline void vdpa_get_config(struct vdpa_device *vdev, unsigned offset,
->-				   void *buf, unsigned int len)
->+static inline void vdpa_get_config(struct vdpa_device *vdev,
->+				   unsigned int offset, void *buf,
->+				   unsigned int len)
-> {
->-        const struct vdpa_config_ops *ops = vdev->config;
->+	const struct vdpa_config_ops *ops = vdev->config;
->
-> 	/*
-> 	 * Config accesses aren't supposed to trigger before features are set.
->-- 
->2.11.0
->
 
