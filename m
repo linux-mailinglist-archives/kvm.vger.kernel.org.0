@@ -2,75 +2,75 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1E7C73F6B92
-	for <lists+kvm@lfdr.de>; Wed, 25 Aug 2021 00:10:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B38073F6B94
+	for <lists+kvm@lfdr.de>; Wed, 25 Aug 2021 00:11:10 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238716AbhHXWLP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 24 Aug 2021 18:11:15 -0400
-Received: from mx0a-00069f02.pphosted.com ([205.220.165.32]:53826 "EHLO
-        mx0a-00069f02.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S238734AbhHXWLO (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 24 Aug 2021 18:11:14 -0400
-Received: from pps.filterd (m0246629.ppops.net [127.0.0.1])
-        by mx0b-00069f02.pphosted.com (8.16.1.2/8.16.0.43) with SMTP id 17OLbBZe015031;
-        Tue, 24 Aug 2021 22:10:14 GMT
+        id S238781AbhHXWLy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 24 Aug 2021 18:11:54 -0400
+Received: from mx0b-00069f02.pphosted.com ([205.220.177.32]:54134 "EHLO
+        mx0b-00069f02.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S237178AbhHXWLx (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 24 Aug 2021 18:11:53 -0400
+Received: from pps.filterd (m0246631.ppops.net [127.0.0.1])
+        by mx0b-00069f02.pphosted.com (8.16.1.2/8.16.0.43) with SMTP id 17OKuw4H021207;
+        Tue, 24 Aug 2021 22:10:56 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : subject : to :
  cc : references : message-id : date : in-reply-to : content-type :
  content-transfer-encoding : mime-version; s=corp-2021-07-09;
- bh=+8KUNJlY3hhpJxiVsMil9ZHjhHtYQnlBOvwP1u5ZVbM=;
- b=A3kWBClzmimYm/qCNFpmhkodCpDayV+1lYcRmC8aLjyvUbntWfyQWeBsPQCZN1ONnIe1
- iG3xPjPnTzTtWvmbBZDekDVdi6IQ1We+I5N7ELO14IuLKFofy1uvdxdytu6tlOfYGHHl
- NX4pzre3HAeiQfD7zKlWKlxO7y3IeYbCM8RtFhidU2TCG578hHFrywGciAVJQ8QgtU88
- ebClFGT8cz7fB2HZuGw1zhXg6zWP5iV275d3KzA1VqSEXr2N212fQNya+d5KCFQ1NBaF
- KSHWRM1sKnigF2qVTSm0Bqx3ITc5sj/jRnsr3F2I/p0nBFxbjPyg27VKmL6bi4anZUBY 4w== 
+ bh=mYkvt2+J+gH4k8TSOFzOVUfRAPjRFIAhh3uqeq46kiE=;
+ b=gIPfytDIh0P/Zgoe6bsmaruO2ndwHd2RyQSoFWqiTGOSXWrcggpqe3rGXt+CXX1dWPlC
+ J9vIUVGamvXEyjnrkEc9mFTSY9Je2yyVbnmhRdcR6/cvvqPlj03U0wau49R06dUxtJ7C
+ JBUHfe9pE1MXBP1dwRkcjnuR80Mafy/ZGVXZZDngMqg6rNjtHVSSg0HxsA/i2S+M59m7
+ NqwbhElvoBBAlRfI20TVtkvn9cZdj75Fyin6vVo5Y/4H7qp6rjKebD34KiYkj13Jl2QD
+ 03+POFV9KgqFvDEcTamPkwKsdaz48ubiAk0IO2UuItBU01UK1c+SVcSLziMiLcZ2xsAa EA== 
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : subject : to :
  cc : references : message-id : date : in-reply-to : content-type :
  content-transfer-encoding : mime-version; s=corp-2020-01-29;
- bh=+8KUNJlY3hhpJxiVsMil9ZHjhHtYQnlBOvwP1u5ZVbM=;
- b=rvQqCtccaqXIVdqF2WJZylDI6BFQReaJLwWKPCsJFBEyb2gQkwO91mXSepgKFv1mUU/n
- 2XUyXl5ugS5DDvZ8iFszdSfNUl+FLpnixFIjvQfETHe9a4djVJ0gaArXzAdJj50Il9d3
- Xw1Drfhpf/CIVHUcniv/eZ7TgVrj1sQiqqt5I4FIsPgvdz2ggcEsRAYL+fDJOTRkGP3I
- 9EhpxQ5hecDtX5mEn4ucHOjrCMTVAM7YSF2uhRVS7YIG3KY5m2P7v3LJIfQavHVrlftg
- fpoJeE3mN8HbKPUDZEf08px9hh4krxjTtjf660BhDWCqHrUtSAfwg0zyfdJZ4W4hVqbD dA== 
+ bh=mYkvt2+J+gH4k8TSOFzOVUfRAPjRFIAhh3uqeq46kiE=;
+ b=VCGllmka28OvbTtwJA8ERAGrr+G/F9en98jHqTGIATOTOOMq6s5yoaZyeJYdINUP5NoW
+ G8MlopZFEUCSI0259XyEh7a1bxzMmiBWBokojyZPlgkp63Q7QF4Deqw1E5GHLYGivmVv
+ K1G1oNTODPIooYVQ9Dhhzj0N3bNKeBX7A0YCA0FuK62JzPRObU4hdvieFLjavIYCXeFW
+ UJObb3KxPu6uQSzekn63ORtsHI/H6Le6t9xKKLdd5+vWc9sa2u/gkhjEaOad1y/9OHXC
+ v5T2CaKDiqeJ4XN8WuDl5S18uocWnB0+rqRK7kkPEy6Dk0jfQguCdZYMZZzfBEXQGKq3 0g== 
 Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
-        by mx0b-00069f02.pphosted.com with ESMTP id 3amwh6hwf3-1
+        by mx0b-00069f02.pphosted.com with ESMTP id 3amwmv9xp8-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 24 Aug 2021 22:10:14 +0000
+        Tue, 24 Aug 2021 22:10:56 +0000
 Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
-        by aserp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 17OM5GBO134902;
-        Tue, 24 Aug 2021 22:10:12 GMT
-Received: from nam04-dm6-obe.outbound.protection.outlook.com (mail-dm6nam08lp2047.outbound.protection.outlook.com [104.47.73.47])
-        by aserp3020.oracle.com with ESMTP id 3ajsa62g2b-1
+        by aserp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 17OM5Ful134874;
+        Tue, 24 Aug 2021 22:10:55 GMT
+Received: from nam12-dm6-obe.outbound.protection.outlook.com (mail-dm6nam12lp2172.outbound.protection.outlook.com [104.47.59.172])
+        by aserp3020.oracle.com with ESMTP id 3ajsa62h3k-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 24 Aug 2021 22:10:12 +0000
+        Tue, 24 Aug 2021 22:10:55 +0000
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=I8HPWag19yB3ZqMYmd6Fmxb/QSAdsURElh2W82wQ691HHAuyE0irW8JWQb3UfcRZ0HJx8GMwhTSg5m6Y7cWYLAyRs90w/tIGTkfY0Ft7EOCnqBBvl/oWtMTI+/WskNDEIIOL0rv7pbkLm5z00N9lAwvgaLEDpQr1e3AqY8AVbf3SxiEGoVzF053sS24KgOQ1sdh1+TPBSqHA0Ya/WSA4HCs78ZUA7pePrvZe8JJMr/jrYSXQYvyCQgKWX+3oSiViZzCaM1jDTatv/rN3vnb68l7ePrqEK8ES7bQZ4Z2WX8/lXbUp4gRJ+XqHkdTGqa9mVWzOYN69RIffwwjf5FlAQg==
+ b=XBHH1UKt67w80k+DDM26YSJabAjcAOTJWlq0ryISACYnYaSaHaifyGx7GZ0GIkOB5rn5631xqItxrbTT02tK5bXhC9vgQP8DHX1eRb4Ut+jXUWwr5mdthHfVq/+9x9WjfsvdSNbEbu9eFdG4Z9qNdxzVXdGkSHyyvDscyRAUFqFqYuN7T2A5WnmVzrZpPcbkyeTNeh2xeYm/LFiHBps4sskU1WfgA2ClnPi3wxswWVGrJzU1PgJh7WUdd9MchvF+cPmzvfXEyCM4HyRA2kM4AWwerH+Iumy3epYgIYgHlfFYNR74z8ZgPnbyXywxkNA/q8i27jHJo+DVy+cfEpch7g==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=+8KUNJlY3hhpJxiVsMil9ZHjhHtYQnlBOvwP1u5ZVbM=;
- b=d9hegwu5xepx3aIEtr3s5XW8B15uAvDMS/dWRRhgAu7xCWrig1se3gLDGXb0v+xlU6yfeMFNLJUSsckf/ZPVSmxmr7Df39OxJkBaIQnHKsC3Pt+Xczmrs6MHAKJo5P0yPWDOl7Qk51sL2fSsKXKy7MhT+CkFWAxakIfLIJNXY7H9FbakFf/Om99WjLqWDyBCFvRzNVSu++8y1QGSjYEkylOHm8qZuPjj792DOcmf7+ZPw4juvQVyxhKI/mAww6e01MrKr152hopZITqdIathYF3MQcCyZMRsd3hkmrcIRmpRVKCG8PdJiumwneqlE4D71PvRr8Dfed7BwqtAHDRxJw==
+ bh=mYkvt2+J+gH4k8TSOFzOVUfRAPjRFIAhh3uqeq46kiE=;
+ b=X2T8haYvAPr20bKzgwuPBuH248gyGSdiHJcI8LrqV8752zaIojTLLRtWjvGVx6pcwff9fWJLuC/YFYUrfk/g94mm5SczdJSHi8m+i0f44hDMXiZvy0PcpeTsD1Un2b/hahYbnv15FNnSQL3aAR+Mvi4r+sz7ueD/c4HaR1yzdPWQf6KvBpQn4ApUTJ+z4A1G/kTiOjheHPaUg3he8W+jIpODhUtqYMpSGKuOX4aOzKJRuDUTBJA+4HiimceGw7vVtg7CCmhzZeNJFGjD9xvEl5DJbUiMF5K3l94SicQEkzuihfSUk06+h1sNc7s5kBxMRLzgVaLkr1ZmT/RZ3pRefA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
  dkim=pass header.d=oracle.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=+8KUNJlY3hhpJxiVsMil9ZHjhHtYQnlBOvwP1u5ZVbM=;
- b=j+edcmUQ+/GYmuMHGqxQeeFe/8TTSdlsr8WOstAREdeDOXGEY6i4ZYUijlQKN/LjTcXYYYSv01goipHYSsElU0LkLlj2UYRcuZsErcxdw3YAnR5P2C9OQ6+4hp3uhdy3bV530AqX9X31bGidT0srBuvYpUb7TNWa7q5pRZA1dYo=
+ bh=mYkvt2+J+gH4k8TSOFzOVUfRAPjRFIAhh3uqeq46kiE=;
+ b=tDp2thghraVYxgMb8Wa538vsYHIGRD0Mc+53n92vEHpz9YCSzOeSlGFHpSOJR/gE/3CayWe/1lKvhRP9S2wXR42xjVjk8I6UrqkMP3Q/Rr8VYqQHf6JUG+9MbfLJCcv8caPhEXQjhyDve6NQRJWzLTK/Q9NyqTRtbIN2Nx8UoeY=
 Authentication-Results: suse.com; dkim=none (message not signed)
  header.d=none;suse.com; dmarc=none action=none header.from=oracle.com;
 Received: from DM6PR10MB3019.namprd10.prod.outlook.com (2603:10b6:5:6f::23) by
- DM6PR10MB4281.namprd10.prod.outlook.com (2603:10b6:5:216::20) with Microsoft
+ DM8PR10MB5400.namprd10.prod.outlook.com (2603:10b6:8:27::24) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.4436.19; Tue, 24 Aug 2021 22:10:10 +0000
+ 15.20.4436.19; Tue, 24 Aug 2021 22:10:53 +0000
 Received: from DM6PR10MB3019.namprd10.prod.outlook.com
  ([fe80::f9b8:94dd:1c44:cb2b]) by DM6PR10MB3019.namprd10.prod.outlook.com
  ([fe80::f9b8:94dd:1c44:cb2b%7]) with mapi id 15.20.4415.023; Tue, 24 Aug 2021
- 22:10:10 +0000
+ 22:10:53 +0000
 From:   Krish Sadhukhan <krish.sadhukhan@oracle.com>
-Subject: Re: [kvm-unit-tests PATCH v2 3/6] x86: efi_main: Get EFI memory map
- and exit boot services
+Subject: Re: [kvm-unit-tests PATCH v2 4/6] x86: efi_main: Self-relocate ELF
+ .dynamic addresses
 To:     Varad Gautam <varadgautam@gmail.com>,
         Zixuan Wang <zixuanwang@google.com>,
         Nadav Amit <nadav.amit@gmail.com>,
@@ -85,216 +85,195 @@ To:     Varad Gautam <varadgautam@gmail.com>,
         Tom Roeder <tmroeder@google.com>
 Cc:     Varad Gautam <varad.gautam@suse.com>
 References: <20210819113400.26516-1-varad.gautam@suse.com>
- <20210819113400.26516-4-varad.gautam@suse.com>
-Message-ID: <6bca2840-467f-ca90-0409-f36f4801bb4f@oracle.com>
-Date:   Tue, 24 Aug 2021 15:10:07 -0700
+ <20210819113400.26516-5-varad.gautam@suse.com>
+Message-ID: <430f4a8a-4eff-5f32-3dd9-103e8e5b354c@oracle.com>
+Date:   Tue, 24 Aug 2021 15:10:50 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.6.0
-In-Reply-To: <20210819113400.26516-4-varad.gautam@suse.com>
+In-Reply-To: <20210819113400.26516-5-varad.gautam@suse.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 Content-Language: en-US
-X-ClientProxiedBy: SJ0PR05CA0135.namprd05.prod.outlook.com
- (2603:10b6:a03:33d::20) To DM6PR10MB3019.namprd10.prod.outlook.com
+X-ClientProxiedBy: SA0PR11CA0010.namprd11.prod.outlook.com
+ (2603:10b6:806:d3::15) To DM6PR10MB3019.namprd10.prod.outlook.com
  (2603:10b6:5:6f::23)
 MIME-Version: 1.0
 X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from localhost.localdomain (2606:b400:8301:1010::16aa) by SJ0PR05CA0135.namprd05.prod.outlook.com (2603:10b6:a03:33d::20) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4457.6 via Frontend Transport; Tue, 24 Aug 2021 22:10:08 +0000
+Received: from localhost.localdomain (2606:b400:8301:1010::16aa) by SA0PR11CA0010.namprd11.prod.outlook.com (2603:10b6:806:d3::15) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4436.19 via Frontend Transport; Tue, 24 Aug 2021 22:10:52 +0000
 X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: e1ded38b-0654-4d08-2d05-08d9674bf01b
-X-MS-TrafficTypeDiagnostic: DM6PR10MB4281:
-X-Microsoft-Antispam-PRVS: <DM6PR10MB42816B902BA9753A8B65FE5581C59@DM6PR10MB4281.namprd10.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:454;
+X-MS-Office365-Filtering-Correlation-Id: 19ede1b8-c7ac-4086-ddd7-08d9674c0a24
+X-MS-TrafficTypeDiagnostic: DM8PR10MB5400:
+X-Microsoft-Antispam-PRVS: <DM8PR10MB5400B5303C56F293B49E138681C59@DM8PR10MB5400.namprd10.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:6108;
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 7rOUSZJmOW5Yu2vEJn+RvMuhVIQLuWPWvcUAUYKrMBksWaKvm8TTjoSUKmEIZoMWXWjGmfomHevYWQ++0NUZVaJ7bk/jb+gBnZBbMMpFwadDj0YFlc9IKNR9UCi1emwW2+fGeMRJcuzA9k3MogVGe30trahl57kSbIXoVig8YOQl0UsCofyUIucYXqPicIyDmaf7Vr71ZQPCPTYMRlCfY5+6XuTtU8zTeYP+A3PzB6pQxDzKAIyQ5/H24i8Gx8lu6mOi96/LQGnL0Y++lg1F5q/bTt6QXOuUHYxsOrudcOI9iAZb9brAWyWnDQu5RG03dV9BdgqoRyLKJWNJrZPHIb4dN4vVi3IuLOS82CEWZJKBhM8uQvZygYla7Yx5vTUjitgt/9HwY+HvrlC3QnesyvWy8coKkS9ksqCBxA6EQtyPFVIy9dFjYB+almAvttn0/6CYNqq2JxZM0H3eo2G0PR4xlaUsBtln2CKWuoOTXJyl7TLcXqqI+1jAmUychc+Vntg4htM63uXAvguXuFjCPtUOjqcb17eJTNlacPHu1NTsxd9jUygguGcbFEzx21EHT8XMEMy2l7TKR/0KvvXf/HX736cTDjZPqUhQnP6jb60Imp78+/SEFrNwj2Odey8hB9V18jgDGTkyEiZdCtTu/EPZBMYy99AEkQfc3x/F/xQU5wASEBZcEfBJEPjizXqEBVQxDQ5b93+h7SxCxrcQ5QETclAps1jkxXQZ94YvP/vJeRNA8s3+eTS6IkuTyKpa
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR10MB3019.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(376002)(366004)(346002)(136003)(39860400002)(396003)(110136005)(316002)(6512007)(2616005)(66476007)(478600001)(66946007)(66556008)(44832011)(53546011)(186003)(6506007)(6486002)(7416002)(31696002)(2906002)(86362001)(31686004)(8676002)(36756003)(5660300002)(8936002)(4326008)(921005)(38100700002)(45980500001)(43740500002);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam-Message-Info: wm1tvXzjPUC1HO8+hDYiiH3nh2YXhQhEmB2ZX4W7Gv7J+J1ZCwITzIM2vcDPRcgm8T/NRSskzdPvaFLn5zgm2QLojvI9/TSLGIE/70pEey08C7zbFbVQnrIdn4xv4HVbI4oElFfdK3eHsNSmCjrT5TXAmkOKArNsliXuGmU5cU+Cip5nP5nJh0PO792FeAs7T9xVIWuGPuiZon8HSNUCoRN2Vqy+zOqDboik5VqNeze9SLlx5zGNI7n0vbuBO8Osk/EHEZpPL+9nt1vsePM6U7gIzQvj0A6e8IAMhobPP5vXpGXxyRAoYxtlEta9I+ABCvxwfrH7WI8kpiTioXyXBWv86sfyD5BHjwKW493aQZb+x3e/X091FKOehHOFLVGBQ60E9s03hk54TJ0nP3tsFsWuldFHupMCPmnddr6ZZIYxry4X4EsJ5ujaC5wVq/CwT7LOZ6MasjhchEPuxy/5fLPUaXt6ffjlPC0NU4BOqcnB12zKK29A7YzbUOqeC7u2r+Snw9KGYcjRKOfp0GubF/jJNhpatambLmiJtEiRCyRYUrXOvwQ7LIDMkYIisELJTVJkuT7+8+vsoSN/hBZLBhzMfHDi4OyL11fUto+dcAO6IPZ1FtoCxMQO0QM6xgaOPi01ANfmo0IgDxBpepeqncXDaOnvORwWmEtL8UO58iUQCHNJU/lgko9Gmm4HmMZm5LdGoMPRps27mjuFhm/2La3lumGB4/9R8TMA0rPn9VHwQqo3o6JulXFQ5Oy86K6Ev9FYi6fBBLAttRcohxUk/vhwp/iVYYAJPUB6P8pbCLY=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR10MB3019.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(396003)(366004)(376002)(346002)(39860400002)(136003)(478600001)(2906002)(921005)(5660300002)(86362001)(2616005)(8676002)(31686004)(8936002)(316002)(31696002)(4326008)(6506007)(36756003)(110136005)(53546011)(6486002)(66556008)(66476007)(66946007)(44832011)(6512007)(7416002)(186003)(38100700002)(142923001)(45980500001)(43740500002);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?eXpjbjNQMkxOTVNTdjBQSTkyTFBqV0p0d09lMy9pSEV0WU5mRzZoWU84MDh3?=
- =?utf-8?B?YzdWOVJySXdOTFlnWFkwLzNSTzZzVGN6VlE5azlrRzUxYjAvRGlISjFrbXZH?=
- =?utf-8?B?RUpIdU0yb25pODBJRVkrRGhZNVJZSG5VNy9jdGxHQXdXUXFVc0FZbFB6ek1o?=
- =?utf-8?B?WHByY3dkSzFTK1pXOGVvOHFITHdSQmlsWGhpYU0yZW42YWtOMVY3R285UDBB?=
- =?utf-8?B?dGNSU1lEcHVnejZjekNyZSt3WnJQTUhjalFFNmdzMXc0NHllRVB0OUJNQlJR?=
- =?utf-8?B?M1RkK3dKNGpiSGJPejJ0aXl2MUYwR1I5NkExbDBCQm5DemtBTW1LL3VaeUM3?=
- =?utf-8?B?S2VuV25BOEJkOENxNEMwY3A5ZjkxbXZnclJPbEE3Uk93aHdRcFVUZUxQcEJ6?=
- =?utf-8?B?ZjRHWGMxNkdzNmpzbXM3L0huRGtiRk0rN0k3bjVpSXJKaTZNQmlOTGV6OWFp?=
- =?utf-8?B?U1lSUk1WdEhNRGRWd3BmZmI3aHcvRmV1OXJkVVZlNzhyUG5OS0oydklZdGxt?=
- =?utf-8?B?OHdObzE1UVdQeTdORmRBc3hadWRxT1hWY3pYTkR3ZEg5dVJBTStoTFFwVng3?=
- =?utf-8?B?UVlUTWVndWxROS9rc3hDRUY4V2xlaXJadXJ6RWJ2ODFSWHlPNDIvZ3ZQaVE4?=
- =?utf-8?B?NXBlWXlMSUVicndZbEdJTEZRZjdpY3hMd24vOS9za0dxekhBNTVCdGNBQnVk?=
- =?utf-8?B?V1FYSGtIM0ZjQThKYTdPM053bm9zT21Pc3JGTm5HOHM0dkFmZEpSOUtpMnRk?=
- =?utf-8?B?enBFKzFaUlFaUm4rYXhwVG5tVm5kVjlvYUQ2N2RXamVqbW5HWDBFc1hOWGFl?=
- =?utf-8?B?ZTRaUGsxMlNZZkxQaFdEQzV5ZlEzOU5GbVZvQmlxQWtFaVVtNUdQdzJQVTJD?=
- =?utf-8?B?a09Gd2plWFNSOXhWVmNHU3V5USsvcjBYVWtHNkJMZkVYNDJNaVlWRld5WHVO?=
- =?utf-8?B?OWl5V1g4T3ozU3FZQVovcHNwNHRHVjE1MXVGeGtYblc0eFFaWGZvWC9qMHhH?=
- =?utf-8?B?Ujdnc2ZnanJ2THY0R2QzRHlmYzlhWWpjU09aMFVLcXlFUStXcisyclhCN0Ri?=
- =?utf-8?B?YTdQWGdTSmJKYkpWbTYwQjBFTGpQQ1VSY1lOUzVtL0tuVlBmQ0NCcXFqR0FR?=
- =?utf-8?B?NWlvVzNiY1dzWElkelF5U3BQZHhDWC9FelppN2N4WTRKVEY2WDZJOHRZOEpa?=
- =?utf-8?B?SEV3YzYzS3Y2c0JHODdCRmk2WXcvQXByY3g1S2JLeDdEZlFqRWVRVXdsVHh0?=
- =?utf-8?B?bTlpbmYzbS9vMy9keHJna09BTUVjUHNxWS9HMkl6dGUzdm82M0twd3NBSk9Q?=
- =?utf-8?B?NVZ1UjRmd2tUQmVsY0lTRW9BVEwrZ3oxV2xjcUpZMjdRdzRJQll6eFVvODhJ?=
- =?utf-8?B?WFIyL09xZkRuOUhjbGpSWVpreGdOK1lqM3VZL3dJTXpTbnR3Yi85Z0xqd0tm?=
- =?utf-8?B?Y1F3SXFKalMyTUJ3ZVczYmRKV0hHSjI2aDNaeVhieVRYZjFzYUtaODhqcHpE?=
- =?utf-8?B?OHlaWGZiM0ZhRFFLMlRSc3oxU1pYcEVFRlRXYjRHeHhiU050T2JDRmpRS0Fk?=
- =?utf-8?B?NFNDZXVGYmZFb21VZHJ1dHh6akh6cVZQM1MzSzkxZjNsUjdnb0FvSERnUnE0?=
- =?utf-8?B?S255ZlVVaEVJcm0wN29SNTNhSTd5MEQ2NTlsVXROL2l1ZDMwNWtGSVRPQWh1?=
- =?utf-8?B?d3JFM2piVkdBWGlXaGVrNHF3MndEeHlaQytsVDZyOHdTSlZ3S3pQdmx0ZFMx?=
- =?utf-8?B?OEgxSzlYUkZNVllnVVB0YndWMUdiTC95S2tiajdPUDQ1RTZGbU1qYzNUT1ZE?=
- =?utf-8?B?RWFQazQ0OHR0Y21SSUhPUT09?=
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?Z2MwMFNhckwrRHdiL29vTW1kZDlIV0RNYlpGYXA1Y0UxRGxEd2hTdUJhMHJS?=
+ =?utf-8?B?bktwRzZwWFpuYjF3VmYxRXVtSGlhaXA5UGFVMHc4MllIYUlCY01oNzZHVWlQ?=
+ =?utf-8?B?eXBOMFd5a25JNm53THAyVEk0YzYzTHNJajZlVEUyRXNHSmlsNHVHbFl3SHhz?=
+ =?utf-8?B?UENiR0VFQ2FoTVBUdGtNZHFxZ2d1b0FidHBGTGpFWmd5dnNwRVZwUFkzMlRG?=
+ =?utf-8?B?MXA2ZFo5cUpDYnZBZlN5c3BRcmgreUZqWm5Rdmg2bkkwdlFSWTVnUjZHeHFL?=
+ =?utf-8?B?dXZtZDBqdE9YQzZCS2dNcE1NSUhIRmMxbDJFRWI4NmVkWmNFRFNOa04xZ3dY?=
+ =?utf-8?B?ejFVRmRXRmFXc2JKdDFyWkVjZE1DcnlWdkNHcEV5cWRGbXZQVDRaSkpObjNO?=
+ =?utf-8?B?Z09RcFI3VW9ZVmZUY09VeTBxazVUbC82dlZyLzNtdExaR3pUR2x1T01rcUI5?=
+ =?utf-8?B?a3JJMkt3SWF6blpISEZaOU0yZ3JKL09td1dvYlRwTGNWUWRCV3VycjZNSGd5?=
+ =?utf-8?B?dzZIRkI3NWorRWh2MmxkZUp5NHBhSjJNYTBvUkxPMFlXU1RMQzJnVkVaVzBB?=
+ =?utf-8?B?N1U2UVZSd2hHS1BoMmxHUWkyZFFYd0NrUithak1tS0s4eXpUZTRXTEQ4T1dF?=
+ =?utf-8?B?ZWdBNWszUlJQVUFyVGNja0FkeCtPYXJDY2w5WXNYWHlFamhYbitnOU42dUtP?=
+ =?utf-8?B?WmNwWm9QNjEvVTdWRkNmcUNleTNuTmJKVmY2MjJwM2M3UVNob2F6YTlXWXdY?=
+ =?utf-8?B?WkVaYW16OHpLYkttVEMza093YTVNcE1RNUZTMFliazVPRS84b2N6cWVVWWli?=
+ =?utf-8?B?YWhoYlZORmhPTGlja3BWYzNMNVpxdXZyZlNJbXRIM1dZc1BwQ2s2ZFp4Rm41?=
+ =?utf-8?B?T1NGdzlXMWxwdG9aR21TeFd6Nk50KzQwR3BYM3FDUXV6ZFExVllnMDFWbjl0?=
+ =?utf-8?B?SGZaeStlcm1NdGFjUi9sbUcyQ0VEUXhzTXA0WW95L0EwT1BwUnI1V1Q1WlM3?=
+ =?utf-8?B?blN0bk9Iam56WVZ3NnNQbHhiaWNNTXR3NnhrMUc4amYxL3M2bUlFSjhJNGV0?=
+ =?utf-8?B?OFREd09LTlBTNWo0YUlkdUdIcVpxamw3MzNTRWg3cDJwMDIzZU0yVGgrMkNO?=
+ =?utf-8?B?R3cyTkdRaHZRdllBUTgzZjdzRjg3SFpqRXlFNDNHcVUyODh4YXNVV2ltcWE2?=
+ =?utf-8?B?WmRNSGlNS2VaUWMwK1pkTkZSVFVQdW5aVHlWUmRJRGRKRGxXUXkrdGtmYWQ3?=
+ =?utf-8?B?bXpZM2Y0VS9Mc00vVnhCM0hwR213ejNtTnNpOEJmWWlZNTIzL2ZVbEZOUVVp?=
+ =?utf-8?B?QVZEalN4d01DT2ZpVThTWGRYdnRJVXVCYUVXYU9aUm40ZVJPUkxIdGtXeEww?=
+ =?utf-8?B?dFpXVXN0M1MzZFk2N3FraStKQ1Vzb1VndGtyL2lDRVcrZDBTSGVMUjZCUzha?=
+ =?utf-8?B?OVlUaTg0eFJnNzU4cGJSUjRaVXVGZzZqSEw1bEtQL3lpaTAzeEpRQVJCQlRv?=
+ =?utf-8?B?bmFaYWFNOFRhVkZxanlzSDROUDgxREp5RFFqOFdXQlZ4eUFLNHkzM2o1TFNY?=
+ =?utf-8?B?S2s0OTg4MjJQOHJXV0t4czJBMXk0WXFqRFZSaFpHN0ozb3hBSVBieTlyMmxT?=
+ =?utf-8?B?MllJRWVzejc3VUMrdDhwTGwrTUxMUFc2bEdjT2x3WlJzL2lwZzIxQWJnaVdi?=
+ =?utf-8?B?SVQxUW9qbTNVVVl3eVhkbUhMNTdsT1YwUDRXR2Rwd1hMYk4wQWJmd2tZQTd3?=
+ =?utf-8?B?aW92NXJEOUJxRmFqeEkzSVlJUkFqdVZiMUNGbHo0U2x3Wms3bHY2U3llMUVn?=
+ =?utf-8?B?YzVwZDFNMkRaOUNFZDlwQT09?=
 X-OriginatorOrg: oracle.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: e1ded38b-0654-4d08-2d05-08d9674bf01b
+X-MS-Exchange-CrossTenant-Network-Message-Id: 19ede1b8-c7ac-4086-ddd7-08d9674c0a24
 X-MS-Exchange-CrossTenant-AuthSource: DM6PR10MB3019.namprd10.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Aug 2021 22:10:09.9845
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Aug 2021 22:10:53.6208
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: y9qBdnpXtoAy19nuM6LvlIWwRIiL3ySZcEsOji44bCDY6tQZND6IwWRxmizpZord7d7q2JfBHaME87grHzsQeZ64Nv5bCgAJ6q1bT/B50uc=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR10MB4281
+X-MS-Exchange-CrossTenant-UserPrincipalName: czyzT0JWdEQ/5JKZ5/XYY5bzTFXGqCwsFHjhpcVt+BUq7jXVNhwsBuuPoHKxXYMyw0Jz/DowBOXumY3fL2vl9svxK67TnmhTosu45Hz7XMQ=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM8PR10MB5400
 X-Proofpoint-Virus-Version: vendor=nai engine=6300 definitions=10086 signatures=668682
 X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 phishscore=0 spamscore=0
  mlxlogscore=999 bulkscore=0 mlxscore=0 adultscore=0 malwarescore=0
  suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
  engine=8.12.0-2107140000 definitions=main-2108240138
-X-Proofpoint-ORIG-GUID: DNCNeB99mpCXfWOtt1D7wiP89N75mveQ
-X-Proofpoint-GUID: DNCNeB99mpCXfWOtt1D7wiP89N75mveQ
+X-Proofpoint-GUID: Utroc6I27v45uUq-sJxpqv7vsBlajgiP
+X-Proofpoint-ORIG-GUID: Utroc6I27v45uUq-sJxpqv7vsBlajgiP
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
 On 8/19/21 4:33 AM, Varad Gautam wrote:
-> The largest EFI_CONVENTIONAL_MEMORY chunk is passed over to
-> alloc_phys for the testcase.
+> EFI expects a relocatable PE, and the loader will patch in the
+> relocations from the COFF.
+>
+> Since we are wrapping an ELF into a PE here, the EFI loader will
+> not handle ELF relocations, and we need to patch the ELF .dynamic
+> section manually on early boot.
 >
 > Signed-off-by: Varad Gautam<varad.gautam@suse.com>
 > ---
->   x86/efi_main.c | 92 ++++++++++++++++++++++++++++++++++++++++++++++++++
->   1 file changed, 92 insertions(+)
+>   x86/efi_main.c | 63 ++++++++++++++++++++++++++++++++++++++++++++++++++
+>   1 file changed, 63 insertions(+)
 >
 > diff --git a/x86/efi_main.c b/x86/efi_main.c
-> index 00e7086..237d4e7 100644
+> index 237d4e7..be3f9ab 100644
 > --- a/x86/efi_main.c
 > +++ b/x86/efi_main.c
-> @@ -1,11 +1,103 @@
-> +#include <alloc_phys.h>
+> @@ -1,9 +1,13 @@
+>   #include <alloc_phys.h>
 >   #include <linux/uefi.h>
+> +#include <elf.h>
 >   
 >   unsigned long __efiapi efi_main(efi_handle_t handle, efi_system_table_t *sys_tab);
 >   efi_system_table_t *efi_system_table = NULL;
 >   
-> +static void efi_free_pool(void *ptr)
-> +{
-> +	efi_bs_call(free_pool, ptr);
-> +}
+> +extern char ImageBase;
+> +extern char _DYNAMIC;
 > +
-> +static efi_status_t efi_get_memory_map(struct efi_boot_memmap *map)
-> +{
-> +	efi_memory_desc_t *m = NULL;
-> +	efi_status_t status;
-> +	unsigned long key = 0, map_size = 0, desc_size = 0;
-> +
-> +	status = efi_bs_call(get_memory_map, &map_size,
-> +			     NULL, &key, &desc_size, NULL);
-> +	if (status != EFI_BUFFER_TOO_SMALL || map_size == 0)
-> +		goto out;
-> +
-> +	/* Pad map_size with additional descriptors so we don't need to
-> +	 * retry. */
-> +	map_size += 4 * desc_size;
-> +	*map->buff_size = map_size;
-> +	status = efi_bs_call(allocate_pool, EFI_LOADER_DATA,
-> +			     map_size, (void **)&m);
-> +	if (status != EFI_SUCCESS)
-> +		goto out;
-> +
-> +	/* Get the map. */
-> +	status = efi_bs_call(get_memory_map, &map_size,
-> +			     m, &key, &desc_size, NULL);
-> +	if (status != EFI_SUCCESS) {
-> +		efi_free_pool(m);
-> +		goto out;
-> +	}
-> +
-> +	*map->desc_size = desc_size;
-> +	*map->map_size = map_size;
-> +	*map->key_ptr = key;
-> +out:
-> +	*map->map = m;
-> +	return status;
-> +}
-> +
-> +static efi_status_t efi_exit_boot_services(void *handle,
-> +					   struct efi_boot_memmap *map)
-> +{
-> +	return efi_bs_call(exit_boot_services, handle, *map->key_ptr);
-> +}
-> +
-> +static efi_status_t exit_efi(void *handle)
+>   static void efi_free_pool(void *ptr)
+>   {
+>   	efi_bs_call(free_pool, ptr);
+> @@ -93,11 +97,70 @@ static efi_status_t exit_efi(void *handle)
+>   	return EFI_SUCCESS;
+>   }
+>   
+> +static efi_status_t elf_reloc(unsigned long image_base, unsigned long dynamic)
 
 
-Based on the naming pattern, we should call it 'efi_exit' ?
+Since this function is only relocating the dynamic section, we should 
+probably name it something like elf_reloc_dyn().
 
 > +{
-> +	unsigned long map_size = 0, key = 0, desc_size = 0, buff_size;
-> +	efi_memory_desc_t *mem_map, *md, *conventional = NULL;
-> +	efi_status_t status;
-> +	unsigned num_ents, i;
-> +	unsigned long pages = 0;
-> +	struct efi_boot_memmap map;
+> +	long relsz = 0, relent = 0;
+> +	Elf64_Rel *rel = 0;
+> +	Elf64_Dyn *dyn = (Elf64_Dyn *) dynamic;
+> +	unsigned long *addr;
+> +	int i;
 > +
-> +	map.map = &mem_map;
-> +	map.map_size = &map_size;
-> +	map.desc_size = &desc_size;
-> +	map.desc_ver = NULL;
-> +	map.key_ptr = &key;
-> +	map.buff_size = &buff_size;
-> +
-> +	status = efi_get_memory_map(&map);
-> +	if (status != EFI_SUCCESS)
-> +		return status;
-> +
-> +	status = efi_exit_boot_services(handle, &map);
-> +	if (status != EFI_SUCCESS) {
-> +		efi_free_pool(mem_map);
-> +		return status;
-> +	}
-
-
-The kernel calls efi_get_memory_map() inside of 
-efi_exit_boot_services(). May be we should stick to the same call-chain 
-pattern to minimize deviation ?
-
-May be, we should add a check for EFI table signature like the following 
-kernel check ?
-
-     if (efi_system_table->hdr.signature != EFI_SYSTEM_TABLE_SIGNATURE)
-                 efi_exit(handle, EFI_INVALID_PARAMETER);
-
-> +
-> +	/* Use the largest EFI_CONVENTIONAL_MEMORY range for phys_alloc_init. */
-> +	num_ents = map_size / desc_size;
-> +	for (i = 0; i < num_ents; i++) {
-> +		md = (efi_memory_desc_t *) (((u8 *) mem_map) + i * (desc_size));
-> +
-> +		if (md->type == EFI_CONVENTIONAL_MEMORY && md->num_pages > pages) {
-> +			conventional = md;
-> +			pages = md->num_pages;
+> +	for (i = 0; dyn[i].d_tag != DT_NULL; i++) {
+> +		switch (dyn[i].d_tag) {
+> +		case DT_RELA:
+> +			rel = (Elf64_Rel *)
+> +				((unsigned long) dyn[i].d_un.d_ptr + image_base);
+> +			break;
+> +		case DT_RELASZ:
+> +			relsz = dyn[i].d_un.d_val;
+> +			break;
+> +		case DT_RELAENT:
+> +			relent = dyn[i].d_un.d_val;
+> +			break;
+> +		default:
+> +			break;
 > +		}
 > +	}
-> +	phys_alloc_init(conventional->phys_addr,
-> +			conventional->num_pages << EFI_PAGE_SHIFT);
 > +
+> +	if (!rel && relent == 0)
+> +		return EFI_SUCCESS;
+> +
+> +	if (!rel || relent == 0)
+> +		return EFI_LOAD_ERROR;
+> +
+> +	while (relsz > 0) {
+> +		/* apply the relocs */
+> +		switch (ELF64_R_TYPE (rel->r_info)) {
+> +		case R_X86_64_NONE:
+> +			break;
+> +		case R_X86_64_RELATIVE:
+> +			addr = (unsigned long *) (image_base + rel->r_offset);
+> +			*addr += image_base;
+> +			break;
+> +		default:
+> +			break;
+> +		}
+> +		rel = (Elf64_Rel *) ((char *) rel + relent);
+> +		relsz -= relent;
+> +	}
 > +	return EFI_SUCCESS;
 > +}
 > +
 >   unsigned long __efiapi efi_main(efi_handle_t handle, efi_system_table_t *sys_tab)
 >   {
+> +	unsigned long image_base, dyn;
 >   	efi_system_table = sys_tab;
 >   
-> +	exit_efi(handle);
+>   	exit_efi(handle);
+>   
+> +	image_base = (unsigned long) &ImageBase;
+> +	dyn = image_base + (unsigned long) &_DYNAMIC;
+> +
+> +	/* The EFI loader does not handle ELF relocations, so fixup
+> +	 * .dynamic addresses before proceeding any further. */
+> +	elf_reloc(image_base, dyn);
+> +
+> +	start64();
+
+
+Should this call to start64() be moved to your next patch because the 
+function needs to be fixed and you are fixing it in there ?
+
 > +
 >   	return 0;
 >   }
