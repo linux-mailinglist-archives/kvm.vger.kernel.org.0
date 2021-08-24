@@ -2,27 +2,27 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9E9F33F54DA
-	for <lists+kvm@lfdr.de>; Tue, 24 Aug 2021 02:57:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D15983F54F2
+	for <lists+kvm@lfdr.de>; Tue, 24 Aug 2021 02:57:27 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234219AbhHXA5N (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 23 Aug 2021 20:57:13 -0400
-Received: from mail.kernel.org ([198.145.29.99]:47756 "EHLO mail.kernel.org"
+        id S235117AbhHXA5l (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 23 Aug 2021 20:57:41 -0400
+Received: from mail.kernel.org ([198.145.29.99]:47890 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S234603AbhHXA4A (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 23 Aug 2021 20:56:00 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id C077E615A6;
-        Tue, 24 Aug 2021 00:55:02 +0000 (UTC)
+        id S234362AbhHXA4N (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 23 Aug 2021 20:56:13 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 011B66140A;
+        Tue, 24 Aug 2021 00:55:17 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1629766503;
-        bh=e9FOK3hE7ppakL8i/xLcGFGvFPB+l0tdIXhg9/AfHQY=;
+        s=k20201202; t=1629766519;
+        bh=MRtasKcZC6zA0u1WWKSlS/dxg7gw7FIhvKi51Z/23H0=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=tVSD12qOScVsplfydNaQT01a4jXaPP+hUlBmTHnslDwcjI0Em16t7jtVekMutBBXE
-         FKklr2zjjrQTphs0qbTdZCVY1zTRHwrxaU2QkII84nup1XEDkvO7dmgAAKBsSt6wAL
-         vlAHfrVo5Bloz9SXr2T0u7ydbXDvFzhKxo19M0XGyVQnigQinvFch3lUxP3IVqGgnY
-         ai50tKXm62WnZqhJTfwEGXFgvhPaBaqnr6NrZ+QLtju51PcGBW7sclOQdzwtPSgyvY
-         XUzyL2ApR7C90p4MZp/WEh2TnzC0M8EwvgQM+gvrkwXsREV/+Zo2QYebgDv44ax3aj
-         PXFQViXxt3b6g==
+        b=SsZvaBCBi2Hrs1sQD216caznABZYLsdYh9aTSGu71OiEaSjR8y+S7exQlISxJgzYc
+         yAEJwrQAe1jnx2b2EEx3i2v8WOe+S/GvG0gYH4D0fwuF7l4W9D2H+tm7j8nSulRQya
+         elTxFY26qJjhw4v2Sz6Tr5ZmG6wT+yf//kWqwljk8/a93pifipq/jBSUhfJLg1GgJs
+         +NzjYy5yWW4tOIvSezfiNo798PQhICTElvTlIxb6XtOdiuRFBCFl55KgMZCrcxqWhs
+         D6658Uc4rDw2XbMoIdZDCiqLYkqAN0yed2nxzfByL86oLJiVyyjG2jMut0CeDlxesV
+         iCT2PgaWefxww==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Neeraj Upadhyay <neeraju@codeaurora.org>,
@@ -31,12 +31,12 @@ Cc:     Neeraj Upadhyay <neeraju@codeaurora.org>,
         "Michael S . Tsirkin" <mst@redhat.com>,
         Sasha Levin <sashal@kernel.org>, kvm@vger.kernel.org,
         virtualization@lists.linux-foundation.org, netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.4 04/10] vringh: Use wiov->used to check for read/write desc order
-Date:   Mon, 23 Aug 2021 20:54:51 -0400
-Message-Id: <20210824005458.631377-4-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 4.19 04/10] vringh: Use wiov->used to check for read/write desc order
+Date:   Mon, 23 Aug 2021 20:55:06 -0400
+Message-Id: <20210824005513.631557-4-sashal@kernel.org>
 X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20210824005458.631377-1-sashal@kernel.org>
-References: <20210824005458.631377-1-sashal@kernel.org>
+In-Reply-To: <20210824005513.631557-1-sashal@kernel.org>
+References: <20210824005513.631557-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -75,10 +75,10 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/drivers/vhost/vringh.c b/drivers/vhost/vringh.c
-index 026a37ee4177..4653de001e26 100644
+index 59c61744dcc1..97aa9b87e572 100644
 --- a/drivers/vhost/vringh.c
 +++ b/drivers/vhost/vringh.c
-@@ -331,7 +331,7 @@ __vringh_iov(struct vringh *vrh, u16 i,
+@@ -330,7 +330,7 @@ __vringh_iov(struct vringh *vrh, u16 i,
  			iov = wiov;
  		else {
  			iov = riov;
