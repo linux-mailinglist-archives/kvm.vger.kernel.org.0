@@ -2,133 +2,231 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7A1D93F554B
-	for <lists+kvm@lfdr.de>; Tue, 24 Aug 2021 03:05:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 46B9E3F55FA
+	for <lists+kvm@lfdr.de>; Tue, 24 Aug 2021 04:56:54 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234109AbhHXBFl (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 23 Aug 2021 21:05:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33072 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237149AbhHXBFb (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 23 Aug 2021 21:05:31 -0400
-Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DB785C08ED09
-        for <kvm@vger.kernel.org>; Mon, 23 Aug 2021 17:58:57 -0700 (PDT)
-Received: by mail-yb1-xb49.google.com with SMTP id d78-20020a256851000000b00598b2a660e2so8419796ybc.6
-        for <kvm@vger.kernel.org>; Mon, 23 Aug 2021 17:58:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=reply-to:date:message-id:mime-version:subject:from:to:cc;
-        bh=eqKZvx2NEWdWUywVE7o+7WbkVltPDxcAK3SK8y8cE5I=;
-        b=ideYI6rW0bgrh/fedrB+RL5aHrSk83ztK6diIE4XR3kX5Jz74EC8bDK7Skq5mS0Yxw
-         2hF7MDVZKwUkVyookaXigmu87li99XM/Id//oNCduez0RPE9ejijIhULE6ZBcxctzifS
-         gvzYSZziHCwpUBLqVKhcXBZQ9nTnCPpoBAodLXqk/UUdTdeKB/ngN4gjd9h0On7uisuO
-         nQRWOIzS2/qWFgRHYOzgFiQ8yV3KxVNF3KXX4fpGxMnqoa8LWB9DOeYAHtHymg1BMYiH
-         FDCtajxeEaOeBN5xSIcCGqLANgoVqkZL8fFP6POOS8LHweuw4g0ED3t3jNk+Qgk5AMUf
-         ++dw==
+        id S233821AbhHXC50 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 23 Aug 2021 22:57:26 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:26215 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S233399AbhHXC5Y (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 23 Aug 2021 22:57:24 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1629773800;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=6T5JAPZVa1j86BfQYVY4oz5vWxgay/VARFozO23Y+KY=;
+        b=GB4LVvpkXjTlXGxPCT4I13/j7jncBoM1NvGCAwbd2+/ZTFYjboumBfzJn/GieiyZmFplm7
+        J6GYLLXi5ZvLyZO5A+gWh2Ffyeyrg7Sore5o8Grc+b4w9jQ3FhcTZNkLvozmkMIgRz58y5
+        bqzBdHd9HiAUDAsAzsGpuNrpUklM0kw=
+Received: from mail-lj1-f199.google.com (mail-lj1-f199.google.com
+ [209.85.208.199]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-313-mJMHOzUtNMq8sgUwqpOvBw-1; Mon, 23 Aug 2021 22:56:39 -0400
+X-MC-Unique: mJMHOzUtNMq8sgUwqpOvBw-1
+Received: by mail-lj1-f199.google.com with SMTP id w28-20020a2e161c000000b001ba14fc0cd4so7030292ljd.10
+        for <kvm@vger.kernel.org>; Mon, 23 Aug 2021 19:56:38 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:reply-to:date:message-id:mime-version:subject
-         :from:to:cc;
-        bh=eqKZvx2NEWdWUywVE7o+7WbkVltPDxcAK3SK8y8cE5I=;
-        b=fpi/ZNNvut53htwXwQbw6uNSENP7nR8gXR2Jmh3oM0O3Z0ZD6UbIBO/Bm1qJUlrMJR
-         yZa1OQO3zxTJntiawZtrHXS779ccqjKNq/4jZinY1EeILJX1tvBpIEhrugLQHY0EYZKO
-         VPhZvHT9Y0RnBQDrBrJjRsQoWwX/XsAV3gRXOGrMj8h00aywdAzbbbQQFYNsVdy8a2Ap
-         3AAMEHZzh4e0k5/TBWe+7yOaWEBJtYHfaAa0HzkH79XSw/pbZ9VUZ/9KJesdb74VCj+0
-         b/5ksGm6Xz6Z/yhqHDrtj3d7snSkSo0R7b/8z+67S5sS7KrcbtaYOeS2f/R8N0ZYFouK
-         MsPg==
-X-Gm-Message-State: AOAM53205cn0qb0anHgDYJzB/RfdoDqyTKEPghy7omA761cvf2V4BKIn
-        Cu6xM0qqhZjeJegm7ZtWv4F8zvoENvI=
-X-Google-Smtp-Source: ABdhPJwvhC0fzP6F5HxLL/WkcOnJE1wXciVJSipTLJGumDJ5e7VdUuRva+Jwwap8G6VVHxGKryuGJCeewj4=
-X-Received: from seanjc798194.pdx.corp.google.com ([2620:15c:90:200:109c:7eb8:d5ed:2e59])
- (user=seanjc job=sendgmr) by 2002:a5b:70c:: with SMTP id g12mr39851143ybq.336.1629766737181;
- Mon, 23 Aug 2021 17:58:57 -0700 (PDT)
-Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Mon, 23 Aug 2021 17:58:24 -0700
-Message-Id: <20210824005824.205536-1-seanjc@google.com>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.33.0.rc2.250.ged5fa647cd-goog
-Subject: [PATCH] KVM: x86/mmu: Don't freak out if pml5_root is NULL on 4-level host
-From:   Sean Christopherson <seanjc@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Maxim Levitsky <mlevitsk@redhat.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=6T5JAPZVa1j86BfQYVY4oz5vWxgay/VARFozO23Y+KY=;
+        b=NEXiu0yT0eOSaPrcEgETva6KCcXEn4NhOMewkni6J4Yw7rq8FoMDH6ttmT1tUozyYe
+         c6PVI30rdTQ20F1LyEGClBsG1RL+YRq7cZ/S6Ug7vy4pebm/QXQoq55xCk/oeMGKCFEW
+         3bNV6YviRj2H7c9MOT6hVImWqmbMYUHIV74lrOw/Yzdj2cpHvZZmokZzwTL5k++oe+p5
+         /MRZ7RufWws42Nbo/hkEaUrEf1lgYP5QwjsEciEY080yahOBMGV1LZk7wiX63tPUpOH0
+         xYxcaoRO+lWsVfykdJ6NV8WS877Zk0AlqIBDyV749OKm1EXOEPv/oHI1UPSlzSXxx86/
+         Klvg==
+X-Gm-Message-State: AOAM531hGXkSzzaHk6G2lfzm/s7EW7oiAqkowhxbbo+QZeheD10CbLQa
+        bd9GKX2pqNjBqX3qiofnMqvdl0xrLbXbOwODpehNkmb4XZzjMEomxT+STzZvJj08DBDM8377X3+
+        CgbWXuLibGfwEVEdzrNBoUqgqepir
+X-Received: by 2002:ac2:5e7a:: with SMTP id a26mr27408930lfr.312.1629773797663;
+        Mon, 23 Aug 2021 19:56:37 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJygN5Mp6svg11K/9VEguoba3q4eEUcZcOAs1YmNXhHdqBM6qZVfDQCXZvrAlkEnufKmKVwkrzwSGyn7HWxTtX0=
+X-Received: by 2002:ac2:5e7a:: with SMTP id a26mr27408919lfr.312.1629773797467;
+ Mon, 23 Aug 2021 19:56:37 -0700 (PDT)
+MIME-Version: 1.0
+References: <20210823081437.14274-1-vincent.whitchurch@axis.com> <20210823171609-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20210823171609-mutt-send-email-mst@kernel.org>
+From:   Jason Wang <jasowang@redhat.com>
+Date:   Tue, 24 Aug 2021 10:56:26 +0800
+Message-ID: <CACGkMEvR6GVfgSCDvFWvHJ3UryN4GOMDQhWMSAAqVHsbfAfPiA@mail.gmail.com>
+Subject: Re: [PATCH] vhost: add support for mandatory barriers
+To:     "Michael S. Tsirkin" <mst@redhat.com>
+Cc:     Vincent Whitchurch <vincent.whitchurch@axis.com>, kernel@axis.com,
+        kvm <kvm@vger.kernel.org>,
+        virtualization <virtualization@lists.linux-foundation.org>,
+        netdev <netdev@vger.kernel.org>,
+        linux-kernel <linux-kernel@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Include pml5_root in the set of special roots if and only if the host,
-and thus NPT, is using 5-level paging.  mmu_alloc_special_roots() expects
-special roots to be allocated as a bundle, i.e. they're either all valid
-or all NULL.  But for pml5_root, that expectation only holds true if the
-host uses 5-level paging, which causes KVM to WARN about pml5_root being
-NULL when the other special roots are valid.
+On Tue, Aug 24, 2021 at 5:20 AM Michael S. Tsirkin <mst@redhat.com> wrote:
+>
+> On Mon, Aug 23, 2021 at 10:14:37AM +0200, Vincent Whitchurch wrote:
+> > vhost always uses SMP-conditional barriers, but these may not be
+> > sufficient when vhost is used to communicate between heterogeneous
+> > processors in an AMP configuration, especially since they're NOPs on
+> > !SMP builds.
+> >
+> > To solve this, use the virtio_*() barrier functions and ask them for
+> > non-weak barriers if requested by userspace.
+> >
+> > Signed-off-by: Vincent Whitchurch <vincent.whitchurch@axis.com>
+>
+> I am inclined to say let's (ab)use VIRTIO_F_ORDER_PLATFORM for this.
+> Jason what do you think?
 
-The silver lining of 4-level vs. 5-level NPT being tied to the host
-kernel's paging level is that KVM's shadow root level is constant; unlike
-VMX's EPT, KVM can't choose 4-level NPT based on guest.MAXPHYADDR.  That
-means KVM can still expect pml5_root to be bundled with the other special
-roots, it just needs to be conditioned on the shadow root level.
+Yes, it looks fine to me.
 
-Fixes: cb0f722aff6e ("KVM: x86/mmu: Support shadowing NPT when 5-level paging is enabled in host")
-Reported-by: Maxim Levitsky <mlevitsk@redhat.com>
-Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
-Signed-off-by: Sean Christopherson <seanjc@google.com>
----
- arch/x86/kvm/mmu/mmu.c | 14 +++++++++++---
- 1 file changed, 11 insertions(+), 3 deletions(-)
+>
+> Also is the use of DMA variants really the intended thing here? Could
+> you point me at some examples please?
 
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index 4853c033e6ce..39c7b5a587df 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -3548,6 +3548,7 @@ static int mmu_alloc_shadow_roots(struct kvm_vcpu *vcpu)
- static int mmu_alloc_special_roots(struct kvm_vcpu *vcpu)
- {
- 	struct kvm_mmu *mmu = vcpu->arch.mmu;
-+	bool need_pml5 = mmu->shadow_root_level > PT64_ROOT_4LEVEL;
- 	u64 *pml5_root = NULL;
- 	u64 *pml4_root = NULL;
- 	u64 *pae_root;
-@@ -3562,7 +3563,14 @@ static int mmu_alloc_special_roots(struct kvm_vcpu *vcpu)
- 	    mmu->shadow_root_level < PT64_ROOT_4LEVEL)
- 		return 0;
- 
--	if (mmu->pae_root && mmu->pml4_root && mmu->pml5_root)
-+	/*
-+	 * NPT, the only paging mode that uses this horror, uses a fixed number
-+	 * of levels for the shadow page tables, e.g. all MMUs are 4-level or
-+	 * all MMus are 5-level.  Thus, this can safely require that pml5_root
-+	 * is allocated if the other roots are valid and pml5 is needed, as any
-+	 * prior MMU would also have required pml5.
-+	 */
-+	if (mmu->pae_root && mmu->pml4_root && (!need_pml5 || mmu->pml5_root))
- 		return 0;
- 
- 	/*
-@@ -3570,7 +3578,7 @@ static int mmu_alloc_special_roots(struct kvm_vcpu *vcpu)
- 	 * bail if KVM ends up in a state where only one of the roots is valid.
- 	 */
- 	if (WARN_ON_ONCE(!tdp_enabled || mmu->pae_root || mmu->pml4_root ||
--			 mmu->pml5_root))
-+			 (need_pml5 && mmu->pml5_root)))
- 		return -EIO;
- 
- 	/*
-@@ -3586,7 +3594,7 @@ static int mmu_alloc_special_roots(struct kvm_vcpu *vcpu)
- 	if (!pml4_root)
- 		goto err_pml4;
- 
--	if (mmu->shadow_root_level > PT64_ROOT_4LEVEL) {
-+	if (need_pml5) {
- 		pml5_root = (void *)get_zeroed_page(GFP_KERNEL_ACCOUNT);
- 		if (!pml5_root)
- 			goto err_pml5;
--- 
-2.33.0.rc2.250.ged5fa647cd-goog
+Yes, we need to know which setup we need.
+
+Thanks
+
+>
+>
+> > ---
+> >  drivers/vhost/vhost.c      | 23 ++++++++++++++---------
+> >  drivers/vhost/vhost.h      |  2 ++
+> >  include/uapi/linux/vhost.h |  2 ++
+> >  3 files changed, 18 insertions(+), 9 deletions(-)
+> >
+> > diff --git a/drivers/vhost/vhost.c b/drivers/vhost/vhost.c
+> > index b9e853e6094d..f7172e1bc395 100644
+> > --- a/drivers/vhost/vhost.c
+> > +++ b/drivers/vhost/vhost.c
+> > @@ -500,6 +500,7 @@ void vhost_dev_init(struct vhost_dev *dev,
+> >               vq->indirect = NULL;
+> >               vq->heads = NULL;
+> >               vq->dev = dev;
+> > +             vq->weak_barriers = true;
+> >               mutex_init(&vq->mutex);
+> >               vhost_vq_reset(dev, vq);
+> >               if (vq->handle_kick)
+> > @@ -1801,6 +1802,10 @@ long vhost_dev_ioctl(struct vhost_dev *d, unsigned int ioctl, void __user *argp)
+> >               if (ctx)
+> >                       eventfd_ctx_put(ctx);
+> >               break;
+> > +     case VHOST_SET_STRONG_BARRIERS:
+> > +             for (i = 0; i < d->nvqs; ++i)
+> > +                     d->vqs[i]->weak_barriers = false;
+> > +             break;
+> >       default:
+> >               r = -ENOIOCTLCMD;
+> >               break;
+> > @@ -1927,7 +1932,7 @@ int vhost_log_write(struct vhost_virtqueue *vq, struct vhost_log *log,
+> >       int i, r;
+> >
+> >       /* Make sure data written is seen before log. */
+> > -     smp_wmb();
+> > +     virtio_wmb(vq->weak_barriers);
+> >
+> >       if (vq->iotlb) {
+> >               for (i = 0; i < count; i++) {
+> > @@ -1964,7 +1969,7 @@ static int vhost_update_used_flags(struct vhost_virtqueue *vq)
+> >               return -EFAULT;
+> >       if (unlikely(vq->log_used)) {
+> >               /* Make sure the flag is seen before log. */
+> > -             smp_wmb();
+> > +             virtio_wmb(vq->weak_barriers);
+> >               /* Log used flag write. */
+> >               used = &vq->used->flags;
+> >               log_used(vq, (used - (void __user *)vq->used),
+> > @@ -1982,7 +1987,7 @@ static int vhost_update_avail_event(struct vhost_virtqueue *vq, u16 avail_event)
+> >       if (unlikely(vq->log_used)) {
+> >               void __user *used;
+> >               /* Make sure the event is seen before log. */
+> > -             smp_wmb();
+> > +             virtio_wmb(vq->weak_barriers);
+> >               /* Log avail event write */
+> >               used = vhost_avail_event(vq);
+> >               log_used(vq, (used - (void __user *)vq->used),
+> > @@ -2228,7 +2233,7 @@ int vhost_get_vq_desc(struct vhost_virtqueue *vq,
+> >               /* Only get avail ring entries after they have been
+> >                * exposed by guest.
+> >                */
+> > -             smp_rmb();
+> > +             virtio_rmb(vq->weak_barriers);
+> >       }
+> >
+> >       /* Grab the next descriptor number they're advertising, and increment
+> > @@ -2367,7 +2372,7 @@ static int __vhost_add_used_n(struct vhost_virtqueue *vq,
+> >       }
+> >       if (unlikely(vq->log_used)) {
+> >               /* Make sure data is seen before log. */
+> > -             smp_wmb();
+> > +             virtio_wmb(vq->weak_barriers);
+> >               /* Log used ring entry write. */
+> >               log_used(vq, ((void __user *)used - (void __user *)vq->used),
+> >                        count * sizeof *used);
+> > @@ -2402,14 +2407,14 @@ int vhost_add_used_n(struct vhost_virtqueue *vq, struct vring_used_elem *heads,
+> >       r = __vhost_add_used_n(vq, heads, count);
+> >
+> >       /* Make sure buffer is written before we update index. */
+> > -     smp_wmb();
+> > +     virtio_wmb(vq->weak_barriers);
+> >       if (vhost_put_used_idx(vq)) {
+> >               vq_err(vq, "Failed to increment used idx");
+> >               return -EFAULT;
+> >       }
+> >       if (unlikely(vq->log_used)) {
+> >               /* Make sure used idx is seen before log. */
+> > -             smp_wmb();
+> > +             virtio_wmb(vq->weak_barriers);
+> >               /* Log used index update. */
+> >               log_used(vq, offsetof(struct vring_used, idx),
+> >                        sizeof vq->used->idx);
+> > @@ -2428,7 +2433,7 @@ static bool vhost_notify(struct vhost_dev *dev, struct vhost_virtqueue *vq)
+> >       /* Flush out used index updates. This is paired
+> >        * with the barrier that the Guest executes when enabling
+> >        * interrupts. */
+> > -     smp_mb();
+> > +     virtio_mb(vq->weak_barriers);
+> >
+> >       if (vhost_has_feature(vq, VIRTIO_F_NOTIFY_ON_EMPTY) &&
+> >           unlikely(vq->avail_idx == vq->last_avail_idx))
+> > @@ -2530,7 +2535,7 @@ bool vhost_enable_notify(struct vhost_dev *dev, struct vhost_virtqueue *vq)
+> >       }
+> >       /* They could have slipped one in as we were doing that: make
+> >        * sure it's written, then check again. */
+> > -     smp_mb();
+> > +     virtio_mb(vq->weak_barriers);
+> >       r = vhost_get_avail_idx(vq, &avail_idx);
+> >       if (r) {
+> >               vq_err(vq, "Failed to check avail idx at %p: %d\n",
+> > diff --git a/drivers/vhost/vhost.h b/drivers/vhost/vhost.h
+> > index 638bb640d6b4..5bd20d0db457 100644
+> > --- a/drivers/vhost/vhost.h
+> > +++ b/drivers/vhost/vhost.h
+> > @@ -108,6 +108,8 @@ struct vhost_virtqueue {
+> >       bool log_used;
+> >       u64 log_addr;
+> >
+> > +     bool weak_barriers;
+> > +
+> >       struct iovec iov[UIO_MAXIOV];
+> >       struct iovec iotlb_iov[64];
+> >       struct iovec *indirect;
+> > diff --git a/include/uapi/linux/vhost.h b/include/uapi/linux/vhost.h
+> > index c998860d7bbc..4b8656307f51 100644
+> > --- a/include/uapi/linux/vhost.h
+> > +++ b/include/uapi/linux/vhost.h
+> > @@ -97,6 +97,8 @@
+> >  #define VHOST_SET_BACKEND_FEATURES _IOW(VHOST_VIRTIO, 0x25, __u64)
+> >  #define VHOST_GET_BACKEND_FEATURES _IOR(VHOST_VIRTIO, 0x26, __u64)
+> >
+> > +#define VHOST_SET_STRONG_BARRIERS _IO(VHOST_VIRTIO, 0x27)
+> > +
+> >  /* VHOST_NET specific defines */
+> >
+> >  /* Attach virtio net ring to a raw socket, or tap device.
+> > --
+> > 2.28.0
+>
 
