@@ -2,137 +2,177 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id DF8A83F5877
-	for <lists+kvm@lfdr.de>; Tue, 24 Aug 2021 08:48:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8BEB03F58BF
+	for <lists+kvm@lfdr.de>; Tue, 24 Aug 2021 09:13:51 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230378AbhHXGtZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 24 Aug 2021 02:49:25 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:41875 "EHLO
+        id S231332AbhHXHOb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 24 Aug 2021 03:14:31 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:42355 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230192AbhHXGtX (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 24 Aug 2021 02:49:23 -0400
+        by vger.kernel.org with ESMTP id S233025AbhHXHOZ (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 24 Aug 2021 03:14:25 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1629787716;
+        s=mimecast20190719; t=1629789221;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=Rjxh505OL6u6F/NVid7cy0TCy5b55IVOXKH+vnMfT84=;
-        b=fG8/ViQ+VBbzQSJqrOtexA1jB/lw6LUG0uWYJs7SQBaUhIJ4xVuSeF7x8yt7beAyU7ZlOG
-        8ISCAJoBXyTg0USWkXcEsPqtS+/UG6fxXPgtWzg2GCIdaLIzhTKEnH4n/d5+qgbNMFCgjI
-        PMMMBQKBiQiQ50f5htOgfEPV3dOgNdY=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-507-RrAzkk0ZP7S_RuhaqRrX3A-1; Tue, 24 Aug 2021 02:48:35 -0400
-X-MC-Unique: RrAzkk0ZP7S_RuhaqRrX3A-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E3A88760C5;
-        Tue, 24 Aug 2021 06:48:33 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-112-4.ams2.redhat.com [10.36.112.4])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 533BE6E0B7;
-        Tue, 24 Aug 2021 06:48:33 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
-        id DFD7011380A9; Tue, 24 Aug 2021 08:48:31 +0200 (CEST)
-From:   Markus Armbruster <armbru@redhat.com>
+        bh=mHQV1RhDVLp4LgprkNafJyD8Xso+/EcdUT8pyuTCElk=;
+        b=f2EPsMo8Q5UU2Nk3hH8ACLV4TnvG+w1SzvnAVo3fdg4R6nAYPwdBGsLzaZKLA6jW8r1Ryy
+        dAFDaD1LSUfywbQrsrZZC/a2dowTJR+WtuVXHaDBBScKpE9uVC4kgHEtxJCN58RkQc4gRX
+        nQJV80GgZ/6X6Q01Lo+/2CMHNqXGZwM=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-357-nfeN-m4VOhOCBMccxUTXWw-1; Tue, 24 Aug 2021 03:13:39 -0400
+X-MC-Unique: nfeN-m4VOhOCBMccxUTXWw-1
+Received: by mail-wm1-f72.google.com with SMTP id c4-20020a1c9a04000000b002e864b7edd1so524875wme.6
+        for <kvm@vger.kernel.org>; Tue, 24 Aug 2021 00:13:38 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
+         :message-id:mime-version;
+        bh=mHQV1RhDVLp4LgprkNafJyD8Xso+/EcdUT8pyuTCElk=;
+        b=iEfeK7ukH2e5qsU46UDNTlLzt0IGrthpB6+fvueHWjIYqeTvsiMiC+LnRjn+HhRlEA
+         jLFp1bsueKwePOeeWwy5lWiIuHB3/vd12dKT6MoRXO3oGHHj58JghwpACOBMTT72DO0Q
+         O6rJ2mC+aYDsikqFglKJlYpthTk80gCm7N2Q/eChZF7mBHMInc13k80Qux5BPGn2CO2o
+         JY8LlEUWHCEB3k0r7nN1UMnzCrw5NAcPOUy7ekZXoUl13kghMSEqhaCree2pe/v6ygf9
+         mwnr7nubUUf/GfG6yaw+TUyXr2UMDCdFGNvUjanNB93yJriUEY0cy2qmGOEvsZX4H280
+         mlLQ==
+X-Gm-Message-State: AOAM530wjID3r6kvV8sY1ixI506ORnQiccZ+D0g9PYgjy2SqTG8D1fzr
+        KpufUNCW1oukKHB893SWu5ZqCwemrjAtfRR4RntUzkTvHrkj19g/9hKm2qQHuirfkBUN1f1+2qV
+        9LhzVBJkD+SZA
+X-Received: by 2002:a05:600c:41d4:: with SMTP id t20mr2600486wmh.92.1629789217825;
+        Tue, 24 Aug 2021 00:13:37 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJw2mWaXyMXXUDC26Nsu4dEPI1cRg93LOjwHFu68ci+aDY5hV5E4VxH/FtAZhbEk/qFV2v2OWw==
+X-Received: by 2002:a05:600c:41d4:: with SMTP id t20mr2600466wmh.92.1629789217592;
+        Tue, 24 Aug 2021 00:13:37 -0700 (PDT)
+Received: from vitty.brq.redhat.com (g-server-2.ign.cz. [91.219.240.2])
+        by smtp.gmail.com with ESMTPSA id c14sm8302080wrr.58.2021.08.24.00.13.36
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 24 Aug 2021 00:13:37 -0700 (PDT)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
 To:     Eduardo Habkost <ehabkost@redhat.com>
-Cc:     Thomas Huth <thuth@redhat.com>,
-        Valeriy Vdovin <valeriy.vdovin@virtuozzo.com>,
-        "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
-        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-        Eric Blake <eblake@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Marcelo Tosatti <mtosatti@redhat.com>,
-        Richard Henderson <richard.henderson@linaro.org>,
-        Laurent Vivier <lvivier@redhat.com>, kvm@vger.kernel.org,
-        Denis Lunev <den@openvz.org>,
-        Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Subject: Re: [PATCH v12] qapi: introduce 'query-x86-cpuid' QMP command.
-References: <20210728125402.2496-1-valeriy.vdovin@virtuozzo.com>
-        <87eeb59vwt.fsf@dusky.pond.sub.org>
-        <20210810185644.iyqt3iao2qdqd5jk@habkost.net>
-        <2191952f-6989-771a-1f0a-ece58262d141@redhat.com>
-        <CAOpTY_qbsqh9Tf8LB3EOOi_gkREotdpUyuF3-d_sBFsof3-9KQ@mail.gmail.com>
-        <97ce9800-ff69-46cd-b6ab-c7645ee10d2c@redhat.com>
-        <CAOpTY_rv4nZib1Eymm9ZVcLf=v=-QjpUm24U7FtS-1pUqS_6VQ@mail.gmail.com>
-        <87lf4scmi5.fsf@dusky.pond.sub.org>
-        <CAOpTY_p3vxv8dM54sLQ1WkEHesJ9w-famusHPw040e=HiZj9pw@mail.gmail.com>
-Date:   Tue, 24 Aug 2021 08:48:31 +0200
-In-Reply-To: <CAOpTY_p3vxv8dM54sLQ1WkEHesJ9w-famusHPw040e=HiZj9pw@mail.gmail.com>
-        (Eduardo Habkost's message of "Mon, 23 Aug 2021 11:55:34 -0400")
-Message-ID: <8735qzpccg.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/27.2 (gnu/linux)
+Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+        Nitesh Narayan Lal <nitesh@redhat.com>,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 4/4] KVM: x86: Fix stack-out-of-bounds memory access
+ from ioapic_write_indirect()
+In-Reply-To: <20210823185841.ov7ejn2thwebcwqk@habkost.net>
+References: <20210823143028.649818-1-vkuznets@redhat.com>
+ <20210823143028.649818-5-vkuznets@redhat.com>
+ <20210823185841.ov7ejn2thwebcwqk@habkost.net>
+Date:   Tue, 24 Aug 2021 09:13:36 +0200
+Message-ID: <87mtp7jowv.fsf@vitty.brq.redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 Eduardo Habkost <ehabkost@redhat.com> writes:
 
-> On Mon, Aug 23, 2021 at 9:35 AM Markus Armbruster <armbru@redhat.com> wro=
-te:
->>
->> Eduardo Habkost <ehabkost@redhat.com> writes:
->>
->> > On Wed, Aug 11, 2021 at 9:44 AM Thomas Huth <thuth@redhat.com> wrote:
->> >>
->> >> On 11/08/2021 15.40, Eduardo Habkost wrote:
->> >> > On Wed, Aug 11, 2021 at 2:10 AM Thomas Huth <thuth@redhat.com> wrot=
-e:
->> >> >>
->> >> >> On 10/08/2021 20.56, Eduardo Habkost wrote:
->> >> >>> On Sat, Aug 07, 2021 at 04:22:42PM +0200, Markus Armbruster wrote:
->> >> >>>> Is this intended to be a stable interface?  Interfaces intended =
-just for
->> >> >>>> debugging usually aren't.
->> >> >>>
->> >> >>> I don't think we need to make it a stable interface, but I won't
->> >> >>> mind if we declare it stable.
->> >> >>
->> >> >> If we don't feel 100% certain yet, it's maybe better to introduce =
-this with
->> >> >> a "x-" prefix first, isn't it? I.e. "x-query-x86-cpuid" ... then i=
-t's clear
->> >> >> that this is only experimental/debugging/not-stable yet. Just my 0=
-.02 =E2=82=AC.
->> >> >
->> >> > That would be my expectation. Is this a documented policy?
->> >> >
->> >>
->> >> According to docs/interop/qmp-spec.txt :
->> >>
->> >>   Any command or member name beginning with "x-" is deemed
->> >>   experimental, and may be withdrawn or changed in an incompatible
->> >>   manner in a future release.
->> >
->> > Thanks! I had looked at other QMP docs, but not qmp-spec.txt.
->> >
->> > In my reply above, please read "make it a stable interface" as
->> > "declare it as supported by not using the 'x-' prefix".
->> >
->> > I don't think we have to make it stable, but I won't argue against it
->> > if the current proposal is deemed acceptable by other maintainers.
->> >
->> > Personally, I'm still frustrated by the complexity of the current
->> > proposal, but I don't want to block it just because of my frustration.
->>
->> Is this a case of "there must be a simpler way", or did you actually
->> propose a simpler way?  I don't remember...
->>
+> On Mon, Aug 23, 2021 at 04:30:28PM +0200, Vitaly Kuznetsov wrote:
+>> KASAN reports the following issue:
+>> 
+>>  BUG: KASAN: stack-out-of-bounds in kvm_make_vcpus_request_mask+0x174/0x440 [kvm]
+>>  Read of size 8 at addr ffffc9001364f638 by task qemu-kvm/4798
+>> 
+>>  CPU: 0 PID: 4798 Comm: qemu-kvm Tainted: G               X --------- ---
+>>  Hardware name: AMD Corporation DAYTONA_X/DAYTONA_X, BIOS RYM0081C 07/13/2020
+>>  Call Trace:
+>>   dump_stack+0xa5/0xe6
+>>   print_address_description.constprop.0+0x18/0x130
+>>   ? kvm_make_vcpus_request_mask+0x174/0x440 [kvm]
+>>   __kasan_report.cold+0x7f/0x114
+>>   ? kvm_make_vcpus_request_mask+0x174/0x440 [kvm]
+>>   kasan_report+0x38/0x50
+>>   kasan_check_range+0xf5/0x1d0
+>>   kvm_make_vcpus_request_mask+0x174/0x440 [kvm]
+>>   kvm_make_scan_ioapic_request_mask+0x84/0xc0 [kvm]
+>>   ? kvm_arch_exit+0x110/0x110 [kvm]
+>>   ? sched_clock+0x5/0x10
+>>   ioapic_write_indirect+0x59f/0x9e0 [kvm]
+>>   ? static_obj+0xc0/0xc0
+>>   ? __lock_acquired+0x1d2/0x8c0
+>>   ? kvm_ioapic_eoi_inject_work+0x120/0x120 [kvm]
+>> 
+>> The problem appears to be that 'vcpu_bitmap' is allocated as a single long
+>> on stack and it should really be KVM_MAX_VCPUS long. We also seem to clear
+>> the lower 16 bits of it with bitmap_zero() for no particular reason (my
+>> guess would be that 'bitmap' and 'vcpu_bitmap' variables in
+>> kvm_bitmap_or_dest_vcpus() caused the confusion: while the later is indeed
+>> 16-bit long, the later should accommodate all possible vCPUs).
+>> 
+>> Fixes: 7ee30bc132c6 ("KVM: x86: deliver KVM IOAPIC scan request to target vCPUs")
+>> Fixes: 9a2ae9f6b6bb ("KVM: x86: Zero the IOAPIC scan request dest vCPUs bitmap")
+>> Reported-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+>> Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+>> ---
+>>  arch/x86/kvm/ioapic.c | 10 +++++-----
+>>  1 file changed, 5 insertions(+), 5 deletions(-)
+>> 
+>> diff --git a/arch/x86/kvm/ioapic.c b/arch/x86/kvm/ioapic.c
+>> index ff005fe738a4..92cd4b02e9ba 100644
+>> --- a/arch/x86/kvm/ioapic.c
+>> +++ b/arch/x86/kvm/ioapic.c
+>> @@ -319,7 +319,7 @@ static void ioapic_write_indirect(struct kvm_ioapic *ioapic, u32 val)
+>>  	unsigned index;
+>>  	bool mask_before, mask_after;
+>>  	union kvm_ioapic_redirect_entry *e;
+>> -	unsigned long vcpu_bitmap;
+>> +	unsigned long vcpu_bitmap[BITS_TO_LONGS(KVM_MAX_VCPUS)];
 >
-> I did propose a simpler way at
-> https://lore.kernel.org/qemu-devel/20210810195053.6vsjadglrexf6jwy@habkos=
-t.net/
+> Is there a way to avoid this KVM_MAX_VCPUS-sized variable on the
+> stack?  This might hit us back when we increase KVM_MAX_VCPUS to
+> a few thousand VCPUs (I was planning to submit a patch for that
+> soon).
 
-Valeriy, would the simpler way still work for you?
+What's the short- or mid-term target?
 
-If no, please explain why.  If you already did, just provide a pointer.
+Note, we're allocating KVM_MAX_VCPUS bits (not bytes!) here, this means
+that for e.g. 2048 vCPUs we need 256 bytes of the stack only. In case
+the target much higher than that, we will need to either switch to
+dynamic allocation or e.g. use pre-allocated per-CPU variables and make
+this a preempt-disabled region. I, however, would like to understand if
+the problem with allocating this from stack is real or not first.
 
-If yes, we need to choose between the complex solution we have and the
-simpler solution we still need to code up.  The latter is extra work,
-but having to carry more complex code is going to be extra work, too.
+>
+>
+>>  	int old_remote_irr, old_delivery_status, old_dest_id, old_dest_mode;
+>>  
+>>  	switch (ioapic->ioregsel) {
+>> @@ -384,9 +384,9 @@ static void ioapic_write_indirect(struct kvm_ioapic *ioapic, u32 val)
+>>  			irq.shorthand = APIC_DEST_NOSHORT;
+>>  			irq.dest_id = e->fields.dest_id;
+>>  			irq.msi_redir_hint = false;
+>> -			bitmap_zero(&vcpu_bitmap, 16);
+>> +			bitmap_zero(vcpu_bitmap, KVM_MAX_VCPUS);
+>>  			kvm_bitmap_or_dest_vcpus(ioapic->kvm, &irq,
+>> -						 &vcpu_bitmap);
+>> +						 vcpu_bitmap);
+>>  			if (old_dest_mode != e->fields.dest_mode ||
+>>  			    old_dest_id != e->fields.dest_id) {
+>>  				/*
+>> @@ -399,10 +399,10 @@ static void ioapic_write_indirect(struct kvm_ioapic *ioapic, u32 val)
+>>  				    kvm_lapic_irq_dest_mode(
+>>  					!!e->fields.dest_mode);
+>>  				kvm_bitmap_or_dest_vcpus(ioapic->kvm, &irq,
+>> -							 &vcpu_bitmap);
+>> +							 vcpu_bitmap);
+>>  			}
+>>  			kvm_make_scan_ioapic_request_mask(ioapic->kvm,
+>> -							  &vcpu_bitmap);
+>> +							  vcpu_bitmap);
+>>  		} else {
+>>  			kvm_make_scan_ioapic_request(ioapic->kvm);
+>>  		}
+>> -- 
+>> 2.31.1
+>> 
+
+-- 
+Vitaly
 
