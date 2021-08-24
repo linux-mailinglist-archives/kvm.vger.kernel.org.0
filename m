@@ -2,54 +2,54 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 952D13F5B95
-	for <lists+kvm@lfdr.de>; Tue, 24 Aug 2021 12:01:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C9B803F5BA4
+	for <lists+kvm@lfdr.de>; Tue, 24 Aug 2021 12:05:44 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236233AbhHXKB4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 24 Aug 2021 06:01:56 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:36770 "EHLO
+        id S236022AbhHXKG1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 24 Aug 2021 06:06:27 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:33317 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S235952AbhHXKBn (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 24 Aug 2021 06:01:43 -0400
+        by vger.kernel.org with ESMTP id S235933AbhHXKG0 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 24 Aug 2021 06:06:26 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1629799259;
+        s=mimecast20190719; t=1629799542;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=AsfgonFEhHbtRW9+iWzj2iDpJcwnghT7FgzSm7rVr3I=;
-        b=OWntaB+NXPrlDtpTakkoZitch+/NkZHvciZ1tMnzCLzbrTa6cv+akeAekm7k6zWvFYnEKj
-        gfZSvdHp1qVRCQa+ZhG9ROXqwIeKPj2Ga3hBk6zZv/jK+0/3I7++oIYcJPPEL7kEwNf3TQ
-        Im9JBqzCxKEKAtIqmBBPLzAeapdAvsE=
-Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
- [209.85.218.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-411-eiOTflBtO36aAXUrMZxzdg-1; Tue, 24 Aug 2021 06:00:58 -0400
-X-MC-Unique: eiOTflBtO36aAXUrMZxzdg-1
-Received: by mail-ej1-f69.google.com with SMTP id q19-20020a1709064cd3b02904c5f93c0124so6819892ejt.14
-        for <kvm@vger.kernel.org>; Tue, 24 Aug 2021 03:00:58 -0700 (PDT)
+        bh=acXZTsv+ZGRCIMsgyzotp4JqHaREWpj8Vd1U498dQK8=;
+        b=WBzmgeo4tq7NZN8G5eTa7GoNWaKzJHS8oizDsLqQrT4qk8dKgqMIpcenyxdN82jwNqlTud
+        uQfAJpqIsphChX8LizRaGX9TxDv4BjhALTwTSU4bTyMP6o5+odyTrpqigOHZkK/8Z4pIwI
+        eB45wl7XMTM/6XXcm/iOwb9w6kFTO7k=
+Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
+ [209.85.218.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-267-vdnEUR5FOi-INKKK8xu_QQ-1; Tue, 24 Aug 2021 06:05:27 -0400
+X-MC-Unique: vdnEUR5FOi-INKKK8xu_QQ-1
+Received: by mail-ej1-f71.google.com with SMTP id r21-20020a1709067055b02904be5f536463so6854246ejj.0
+        for <kvm@vger.kernel.org>; Tue, 24 Aug 2021 03:05:27 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=AsfgonFEhHbtRW9+iWzj2iDpJcwnghT7FgzSm7rVr3I=;
-        b=UKTUNxxpxuzMjkB5FjBh8b8FMLzNZjHmnSRRPJYxqFVAb02F7shjui4B99p0rv+6nV
-         RXMS0XWgz29J81edU2w+7Mfw6UW7shYNYEY4Soy5Xw87JK7UvPkcjWGNMZ9rm7DFa96m
-         DSTK0+i6ZkYC5qCABkY5vIUlpaoBubWpgjjP1ao7U4C6EKyHzQX8KDXozYer317Dh3X4
-         1hZIOljfbSVh0LhErRB3awxX3xHCJcAkghU1AP+iiWeTr8yvj5PQTYoS1Jw3rEFbm4kP
-         Y2SFpMX4uZAbJbhvfKNxO7Z1dhCYQ6o5tovsmwq+8ST8utBIbBcwUchfd2zFT5sfRxBr
-         KZ9A==
-X-Gm-Message-State: AOAM530yIzFq6TtvJqPLVOfcvN+chA/dw9Wuo2GEPH39t4VAjiy68MUQ
-        7Lloh7zyqTlz59mgmUF75aY8I2aafd7CfG7kyd0RpRSwh6nY9JW6Vk5QEPChGBkIP6wvWEqJTEo
-        HALtJ7m6ekUux
-X-Received: by 2002:a17:906:a0ce:: with SMTP id bh14mr38811945ejb.434.1629799257237;
-        Tue, 24 Aug 2021 03:00:57 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJz1OFEVEhnIhV9jwM2SN934WwXV2gbD7ZeMHy2q4u+7FfCSG2W+EV79uua+jleY+7NYrWEmuQ==
-X-Received: by 2002:a17:906:a0ce:: with SMTP id bh14mr38811918ejb.434.1629799257043;
-        Tue, 24 Aug 2021 03:00:57 -0700 (PDT)
+        bh=acXZTsv+ZGRCIMsgyzotp4JqHaREWpj8Vd1U498dQK8=;
+        b=Re2A7ECtbPlsCixMzwW95/8f3k1wHTxfZrTFDTcWp7Db1EvBkj2ekw5tR2lVmY41ht
+         WhEm2BQd+rKZcYi2iKhECoYbbwSWQkNYOBtgU3Q0u3MIZEABawp7ilWJ1f5vPgaXjnVf
+         iqxUhofJ56lzVcK/U2/+xD5nqsPyPCzaeK4lUZNQoyW4ldvrDVqhVwYlJc2Qf3k5QhGt
+         OT+X+PYSIWwuV44B/gYD/K7iBiE1HItlDD0pUZSkrU4Rl4fy4yTKrwMuaVqDpA8oCwwS
+         i7ZjxsitLSaVJbldxj1hEWHkMGGlOqFF5FpEqlsP1OId2Q1PJVO5A3Rte0edBtp3VI1G
+         cgvg==
+X-Gm-Message-State: AOAM5303qAP2UQwJm1L76T1rBit4Xrk2mcYNk+N1r1MD7wZryzEZ+x/v
+        WySjUy9G8uD0qdM9Xzvd0ReSJyRy39cLGJYYR3z0+AqOWuH1EOn6LLw3sp1Xh/6PlkPidcJDDWH
+        8YD9VJaYhNmNu
+X-Received: by 2002:a05:6402:5206:: with SMTP id s6mr42111217edd.151.1629799526306;
+        Tue, 24 Aug 2021 03:05:26 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzI44Z4judGCzN7R2zpOlFSwZBSbEmkd/UBfNZmHvvZCXJIff7B6uB+tsb4YfaMzeFQo6RVNA==
+X-Received: by 2002:a05:6402:5206:: with SMTP id s6mr42111185edd.151.1629799526106;
+        Tue, 24 Aug 2021 03:05:26 -0700 (PDT)
 Received: from steredhat (host-79-45-8-152.retail.telecomitalia.it. [79.45.8.152])
-        by smtp.gmail.com with ESMTPSA id f30sm3469843ejl.78.2021.08.24.03.00.55
+        by smtp.gmail.com with ESMTPSA id k21sm8853122ejj.55.2021.08.24.03.05.24
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 24 Aug 2021 03:00:56 -0700 (PDT)
-Date:   Tue, 24 Aug 2021 12:00:53 +0200
+        Tue, 24 Aug 2021 03:05:25 -0700 (PDT)
+Date:   Tue, 24 Aug 2021 12:05:23 +0200
 From:   Stefano Garzarella <sgarzare@redhat.com>
 To:     Arseny Krasnov <arseny.krasnov@kaspersky.com>
 Cc:     Stefan Hajnoczi <stefanha@redhat.com>,
@@ -57,91 +57,41 @@ Cc:     Stefan Hajnoczi <stefanha@redhat.com>,
         Jason Wang <jasowang@redhat.com>,
         "David S. Miller" <davem@davemloft.net>,
         Jakub Kicinski <kuba@kernel.org>,
+        Norbert Slusarek <nslusarek@gmx.net>,
         Andra Paraschiv <andraprs@amazon.com>,
         Colin Ian King <colin.king@canonical.com>,
-        Norbert Slusarek <nslusarek@gmx.net>, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org, stsp2@yandex.ru, oxffffaa@gmail.co
-Subject: Re: [RFC PATCH v3 3/6] vhost/vsock: support MSG_EOR bit processing
-Message-ID: <20210824100053.jc2pgttgwq5sujvu@steredhat>
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "virtualization@lists.linux-foundation.org" 
+        <virtualization@lists.linux-foundation.org>,
+        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "stsp2@yandex.ru" <stsp2@yandex.ru>, oxffffaa@gmail.com
+Subject: Re: [RFC PATCH v3 0/6] virtio/vsock: introduce MSG_EOR flag for
+ SEQPACKET
+Message-ID: <20210824100523.yn5hgiycz2ysdnvm@steredhat>
 References: <20210816085036.4173627-1-arseny.krasnov@kaspersky.com>
- <20210816085143.4174099-1-arseny.krasnov@kaspersky.com>
+ <3f3fc268-10fc-1917-32c2-dc0e7737dc48@kaspersky.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii; format=flowed
 Content-Disposition: inline
-In-Reply-To: <20210816085143.4174099-1-arseny.krasnov@kaspersky.com>
+In-Reply-To: <3f3fc268-10fc-1917-32c2-dc0e7737dc48@kaspersky.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Aug 16, 2021 at 11:51:40AM +0300, Arseny Krasnov wrote:
->'MSG_EOR' handling has same logic as 'MSG_EOM' - if bit present
+Hi Arseny,
 
-s/same/similar
-
->in packet's header, reset it to 0. Then restore it back if packet
->processing wasn't completed. Instead of bool variable for each
->flag, bit mask variable was added: it has logical OR of 'MSG_EOR'
->and 'MSG_EOM' if needed, to restore flags, this variable is ORed
->with flags field of packet.
->
->Signed-off-by: Arseny Krasnov <arseny.krasnov@kaspersky.com>
->---
-> drivers/vhost/vsock.c | 12 ++++++++----
-> 1 file changed, 8 insertions(+), 4 deletions(-)
->
->diff --git a/drivers/vhost/vsock.c b/drivers/vhost/vsock.c
->index feaf650affbe..d217955bbcd4 100644
->--- a/drivers/vhost/vsock.c
->+++ b/drivers/vhost/vsock.c
->@@ -114,7 +114,7 @@ vhost_transport_do_send_pkt(struct vhost_vsock *vsock,
-> 		size_t nbytes;
-> 		size_t iov_len, payload_len;
-> 		int head;
->-		bool restore_flag = false;
->+		uint32_t flags_to_restore = 0;
-
-checkpatch.pl suggest the following:
-CHECK: Prefer kernel type 'u32' over 'uint32_t'
-
-Sorry, I suggested that, I forgot that u32 is preferable :-)
-
->
-> 		spin_lock_bh(&vsock->send_pkt_list_lock);
-> 		if (list_empty(&vsock->send_pkt_list)) {
->@@ -187,7 +187,12 @@ vhost_transport_do_send_pkt(struct vhost_vsock 
->*vsock,
-> 			 */
-
-Please also update the comment above with the new flag handled.
-
-> 			if (le32_to_cpu(pkt->hdr.flags) & VIRTIO_VSOCK_SEQ_EOM) {
-> 				pkt->hdr.flags &= ~cpu_to_le32(VIRTIO_VSOCK_SEQ_EOM);
->-				restore_flag = true;
->+				flags_to_restore |= VIRTIO_VSOCK_SEQ_EOM;
->+
->+				if (le32_to_cpu(pkt->hdr.flags) & VIRTIO_VSOCK_SEQ_EOR) {
->+					pkt->hdr.flags &= ~cpu_to_le32(VIRTIO_VSOCK_SEQ_EOR);
->+					flags_to_restore |= VIRTIO_VSOCK_SEQ_EOR;
->+				}
-> 			}
-> 		}
->
->@@ -224,8 +229,7 @@ vhost_transport_do_send_pkt(struct vhost_vsock *vsock,
-> 		 * to send it with the next available buffer.
-> 		 */
-> 		if (pkt->off < pkt->len) {
->-			if (restore_flag)
->-				pkt->hdr.flags |= cpu_to_le32(VIRTIO_VSOCK_SEQ_EOM);
->+			pkt->hdr.flags |= cpu_to_le32(flags_to_restore);
->
-> 			/* We are queueing the same virtio_vsock_pkt to handle
-> 			 * the remaining bytes, and we want to deliver it
->-- 
->2.25.1
+On Mon, Aug 23, 2021 at 09:41:16PM +0300, Arseny Krasnov wrote:
+>Hello, please ping :)
 >
 
-The rest LGTM.
+Sorry, I was off last week.
+I left some minor comments in the patches.
 
+Let's wait a bit for other comments before next version, also on the 
+spec, then I think you can send the next version without RFC tag.
+The target should be the net-next tree, since this is a new feature.
+
+Thanks,
 Stefano
 
