@@ -2,139 +2,143 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id BBD5F3F6B58
-	for <lists+kvm@lfdr.de>; Tue, 24 Aug 2021 23:48:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1C95A3F6B81
+	for <lists+kvm@lfdr.de>; Wed, 25 Aug 2021 00:01:16 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235582AbhHXVtb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 24 Aug 2021 17:49:31 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:42698 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S235738AbhHXVta (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 24 Aug 2021 17:49:30 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1629841726;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=w5pw4YrTSgHugcG2Eo+G7n0AOgzo2eruh1sMMnqSXgQ=;
-        b=dLUX2FmPmyX7XrPtMwjaFtXCEBacsGlwHPy7QV0+YRJh8HuLXjsrH8X6L5KCYVjP1OSaeT
-        3MFYMGQCK12s8hyk+YacNu6buKJ01pUaDG4eUY/LAgpQCg8xkcr0P0xb9h8EAq8Eqnw/Vv
-        QbuUBBwsfBpYx6KqRJKZAgTKvxZqARw=
-Received: from mail-il1-f197.google.com (mail-il1-f197.google.com
- [209.85.166.197]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-590-0AtVUfiwM0i4Rkp4mjR1XA-1; Tue, 24 Aug 2021 17:48:43 -0400
-X-MC-Unique: 0AtVUfiwM0i4Rkp4mjR1XA-1
-Received: by mail-il1-f197.google.com with SMTP id a15-20020a92444f000000b0022473393120so12641229ilm.16
-        for <kvm@vger.kernel.org>; Tue, 24 Aug 2021 14:48:43 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
-         :references:organization:mime-version:content-transfer-encoding;
-        bh=w5pw4YrTSgHugcG2Eo+G7n0AOgzo2eruh1sMMnqSXgQ=;
-        b=s0CvIdSeLOngaIGjbARJoNIkQasyyQETjuWjB8TdfvX26JMCpL+Izofpaapwu3wUKv
-         Gz5Mu+bmFuIGUr6C9fOGNUaAN+j1NdmeuvlGxqr5Ts81N3I8LYkeps6YgI2yJOqfvXxO
-         kER286hBl4SDG8S4wTJdvlPpITRkgXzXOcThHHaMrHB41D8edwW2svrX9zPagn+ivUIf
-         nPamEE/n/9hkXBFEPm75BneYgW81aeAyHyiwF7Zbp9gKQP5MYrgNTXugyDfGFcW5eZBH
-         1Od2QWa/O8gbNo6QpkiLz70ucIxCyjlXXKlXLtdvOJGn8Z2eQDQA5uiahmJnv30sLa76
-         dPsA==
-X-Gm-Message-State: AOAM530tVdglDTy7WA4ZXYBVHaLk8PBN4u5TuTKklM2+CXMQ+QWnOCCx
-        VVB7QlmE8pvSyIsGuyr6v0fk59rheH58V2/xXks9R/yCYHfQkzbe+lmUT9Gou5+nKTJo8W9dRxd
-        WRQ22ohcAqUq0
-X-Received: by 2002:a5d:8484:: with SMTP id t4mr31967454iom.126.1629841723234;
-        Tue, 24 Aug 2021 14:48:43 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyV/BFYIt+phRVOjM0gliAb4WNS6a2RZJbXAlwZJ6Po16uZZA+rPyg3jivRBbxcxlIzm02ZEg==
-X-Received: by 2002:a5d:8484:: with SMTP id t4mr31967436iom.126.1629841723033;
-        Tue, 24 Aug 2021 14:48:43 -0700 (PDT)
-Received: from redhat.com ([198.99.80.109])
-        by smtp.gmail.com with ESMTPSA id a8sm10590565ilq.63.2021.08.24.14.48.41
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 24 Aug 2021 14:48:42 -0700 (PDT)
-Date:   Tue, 24 Aug 2021 15:48:39 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Max Gurtovoy <mgurtovoy@nvidia.com>
-Cc:     Yishai Hadas <yishaih@nvidia.com>, <bhelgaas@google.com>,
-        <corbet@lwn.net>, <diana.craciun@oss.nxp.com>,
-        <kwankhede@nvidia.com>, <eric.auger@redhat.com>,
-        <masahiroy@kernel.org>, <michal.lkml@markovi.net>,
-        <linux-pci@vger.kernel.org>, <linux-doc@vger.kernel.org>,
-        <kvm@vger.kernel.org>, <linux-s390@vger.kernel.org>,
-        <linux-kbuild@vger.kernel.org>, <jgg@nvidia.com>,
-        <maorg@nvidia.com>, <leonro@nvidia.com>
-Subject: Re: [PATCH V3 06/13] vfio/pci: Split the pci_driver code out of
- vfio_pci_core.c
-Message-ID: <20210824154839.159a1243.alex.williamson@redhat.com>
-In-Reply-To: <393721ae-2183-2b1b-f670-8006992c4e55@nvidia.com>
-References: <20210822143602.153816-1-yishaih@nvidia.com>
-        <20210822143602.153816-7-yishaih@nvidia.com>
-        <20210823091624.697c67d6.alex.williamson@redhat.com>
-        <393721ae-2183-2b1b-f670-8006992c4e55@nvidia.com>
-Organization: Red Hat
-X-Mailer: Claws Mail 3.18.0 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
+        id S238664AbhHXWB6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 24 Aug 2021 18:01:58 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:2880 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S235507AbhHXWB5 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 24 Aug 2021 18:01:57 -0400
+Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 17OLZcHT128489;
+        Tue, 24 Aug 2021 18:00:55 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : subject : to : cc
+ : message-id : date : mime-version : content-type :
+ content-transfer-encoding; s=pp1;
+ bh=II37AGyoTqYl1RM2pq4+IkYzWq0/yoTZqOEp89zr4gs=;
+ b=fyVSq3x/CH9u3ZqpHm+MvckuoLmVQDd3Wkb8HRE4RfBQ8VKRF8dNJOFmz6QcoXrpkHc4
+ CH0hZzqL5NXzDJB3kjtIDXW145UweVeNFiKjPLJ5pCtYLNPdIthIVeVUfDeugcvLf1hH
+ OQTebVE7CdhwM2v4P7+osuNSOombUHd02InYZ8eWHC1A206869IhDPsqZvxRIQn7tvXH
+ uL0lxY9HxAgF4qpFZCJWI4yukTKGZRqa0/fUdL0CN3WstKkTnhIxWOkynFDKsZhcb1tl
+ +65HHwXy3q4oSfd0Zf9fJKo1GA32aH0AOykjU8qaH0sToZZPoujz3qrWlnRQxvZT2OSL ew== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3an3wn13et-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 24 Aug 2021 18:00:55 -0400
+Received: from m0098409.ppops.net (m0098409.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 17OLZfET128711;
+        Tue, 24 Aug 2021 18:00:55 -0400
+Received: from ppma05wdc.us.ibm.com (1b.90.2fa9.ip4.static.sl-reverse.com [169.47.144.27])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3an3wn13e9-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 24 Aug 2021 18:00:55 -0400
+Received: from pps.filterd (ppma05wdc.us.ibm.com [127.0.0.1])
+        by ppma05wdc.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 17OLxWiW010171;
+        Tue, 24 Aug 2021 22:00:53 GMT
+Received: from b01cxnp22034.gho.pok.ibm.com (b01cxnp22034.gho.pok.ibm.com [9.57.198.24])
+        by ppma05wdc.us.ibm.com with ESMTP id 3ajs4ck1w6-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 24 Aug 2021 22:00:53 +0000
+Received: from b01ledav001.gho.pok.ibm.com (b01ledav001.gho.pok.ibm.com [9.57.199.106])
+        by b01cxnp22034.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 17OM0q9U25887014
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 24 Aug 2021 22:00:52 GMT
+Received: from b01ledav001.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id A082E2805A;
+        Tue, 24 Aug 2021 22:00:52 +0000 (GMT)
+Received: from b01ledav001.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 3D5B828068;
+        Tue, 24 Aug 2021 22:00:52 +0000 (GMT)
+Received: from Tobins-MacBook-Pro-2.local (unknown [9.65.80.64])
+        by b01ledav001.gho.pok.ibm.com (Postfix) with ESMTP;
+        Tue, 24 Aug 2021 22:00:52 +0000 (GMT)
+From:   Tobin Feldman-Fitzthum <tobin@linux.ibm.com>
+Subject: Re: Fw: [EXTERNAL] Re: [RFC PATCH 00/13] Add support for Mirror VM.
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     qemu-devel <qemu-devel@nongnu.org>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Brijesh Singh <brijesh.singh@amd.com>,
+        "Habkost, Eduardo" <ehabkost@redhat.com>,
+        "S. Tsirkin, Michael" <mst@redhat.com>,
+        Richard Henderson <richard.henderson@linaro.org>,
+        James Bottomley <jejb@linux.ibm.com>,
+        Dov Murik <dovmurik@linux.vnet.ibm.com>,
+        Hubertus Franke <frankeh@us.ibm.com>,
+        "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+        kvm <kvm@vger.kernel.org>,
+        Tobin Feldman-Fitzthum <tobin@ibm.com>,
+        Ashish Kalra <ashish.kalra@amd.com>
+Message-ID: <6213e737-66ec-f8f0-925b-eeb847b7b790@linux.ibm.com>
+Date:   Tue, 24 Aug 2021 18:00:51 -0400
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0)
+ Gecko/20100101 Thunderbird/78.12.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: weIC-8CrKeGkeJtRqB0EKUGbtFxsBjC-
+X-Proofpoint-ORIG-GUID: jc8ZCyAUh1KLGF-Qy60Ii-tB29ayTfVO
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.790
+ definitions=2021-08-24_06:2021-08-24,2021-08-24 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 malwarescore=0
+ adultscore=0 impostorscore=0 bulkscore=0 mlxlogscore=999 clxscore=1015
+ lowpriorityscore=0 priorityscore=1501 phishscore=0 spamscore=0
+ suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2107140000 definitions=main-2108240134
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 23 Aug 2021 18:28:49 +0300
-Max Gurtovoy <mgurtovoy@nvidia.com> wrote:
+On Mon, Aug 16, 2021 at 04:15:46PM +0200, Paolo Bonzini wrote:
 
-> On 8/23/2021 6:16 PM, Alex Williamson wrote:
-> > On Sun, 22 Aug 2021 17:35:55 +0300
-> > Yishai Hadas <yishaih@nvidia.com> wrote:  
-> >> diff --git a/drivers/vfio/pci/vfio_pci.c b/drivers/vfio/pci/vfio_pci.c
-> >> new file mode 100644
-> >> index 000000000000..15474ebadd98
-> >> --- /dev/null
-> >> +++ b/drivers/vfio/pci/vfio_pci.c  
-> > ...  
-> >> +static int vfio_pci_sriov_configure(struct pci_dev *pdev, int nr_virtfn)
-> >> +{
-> >> +	might_sleep();
-> >> +
-> >> +	if (!enable_sriov)
-> >> +		return -ENOENT;
-> >> +
-> >> +	return vfio_pci_core_sriov_configure(pdev, nr_virtfn);
-> >> +}  
-> > As noted in previous version, why do we need the might_sleep() above
-> > when the core code below includes it and there's nothing above that
-> > might sleep before that?  Thanks,  
-> 
-> This is used to mention vfio_pci_core_sriov_configure might sleep.
-> 
-> If this is redundant, can you please remove this one line upon merge ?
+> Hi,
+>
+> first of all, thanks for posting this work and starting the discussion.
+>
+> However, I am not sure if the in-guest migration helper vCPUs should use
+> the existing KVM support code.  For example, they probably can just
+> always work with host CPUID (copied directly from
+> KVM_GET_SUPPORTED_CPUID), and they do not need to interface with QEMU's
+> MMIO logic.  They would just sit on a "HLT" instruction and communicate
+> with the main migration loop using some kind of standardized ring buffer
+> protocol; the migration loop then executes KVM_RUN in order to start the
+> processing of pages, and expects a KVM_EXIT_HLT when the VM has nothing
+> to do or requires processing on the host.
+> The migration helper can then also use its own address space, for
+> example operating directly on ram_addr_t values with the helper running
+> at very high virtual addresses.  Migration code can use a
+> RAMBlockNotifier to invoke KVM_SET_USER_MEMORY_REGION on the mirror VM
+> (and never enable dirty memory logging on the mirror VM, too, which has
+> better performance).
+>
+> With this implementation, the number of mirror vCPUs does not even have
+> to be indicated on the command line.  The VM and its vCPUs can simply be
+> created when migration starts.  In the SEV-ES case, the guest can even
+> provide the VMSA that starts the migration helper.
 
-I guess I'm not sure how far up we need to, or should, percolate
-might_sleep() annotations.  vfio_pci_core_sriov_configure() calls
-vfio_device_get_from_dev() which makes use of mutexes, which I think is
-the original reason for the annotation there ahead of those in the PCI
-iov code.  But is the annotation through mutex_lock() enough on its own,
-ie. should we remove all of our gratuitous annotations in the vfio part
-of the code path?  Thanks,
+It might make sense to tweak the mirror support code so that it is more
+closely tied to migration and the migration handler. On the other hand,
+the usage of a mirror VM might be more general than just migration. In
+some ways the mirror offers similar functionality to the VMPL in SNP,
+providing a way to run non-workload code inside the enclave. This
+potentially has uses beyond migration. If this is the case, do maybe we
+want to keep the mirror more general.
 
-Alex
+It's also worth noting that the SMP interface that Ashish is using to
+specify the mirror might come in handy if we ever want to have more than
+one vCPU in the mirror. For instance we might want to use multiple MH
+vCPUs to increase throughput.
 
-> >> diff --git a/drivers/vfio/pci/vfio_pci_core.c b/drivers/vfio/pci/vfio_pci_core.c
-> >> index 94f062818e0c..87d1960d0d61 100644
-> >> --- a/drivers/vfio/pci/vfio_pci_core.c
-> >> +++ b/drivers/vfio/pci/vfio_pci_core.c  
-> > ...  
-> >> -static int vfio_pci_sriov_configure(struct pci_dev *pdev, int nr_virtfn)
-> >> +int vfio_pci_core_sriov_configure(struct pci_dev *pdev, int nr_virtfn)
-> >>   {
-> >>   	struct vfio_device *device;
-> >>   	int ret = 0;
-> >>   
-> >>   	might_sleep();
-> >>   
-> >> -	if (!enable_sriov)
-> >> -		return -ENOENT;
-> >> -
-> >>   	device = vfio_device_get_from_dev(&pdev->dev);
-> >>   	if (!device)
-> >>   		return -ENODEV;  
-> 
+-Tobin
 
+> The disadvantage is that, as you point out, in the future some of the
+> infrastructure you introduce might be useful for VMPL0 operation on
+> SEV-SNP.  My proposal above might require some code duplication.
+> However, it might even be that VMPL0 operation works best with a model
+> more similar to my sketch of the migration helper; it's really too early
+> to say.
+>
+> Paolo
