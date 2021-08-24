@@ -2,27 +2,27 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3E36C3F5524
-	for <lists+kvm@lfdr.de>; Tue, 24 Aug 2021 02:59:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3859F3F5514
+	for <lists+kvm@lfdr.de>; Tue, 24 Aug 2021 02:59:03 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233806AbhHXBAN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 23 Aug 2021 21:00:13 -0400
-Received: from mail.kernel.org ([198.145.29.99]:47770 "EHLO mail.kernel.org"
+        id S235038AbhHXA7W (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 23 Aug 2021 20:59:22 -0400
+Received: from mail.kernel.org ([198.145.29.99]:47890 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S233986AbhHXA5N (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 23 Aug 2021 20:57:13 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 77560617E2;
-        Tue, 24 Aug 2021 00:55:41 +0000 (UTC)
+        id S234499AbhHXA5P (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 23 Aug 2021 20:57:15 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id ED54D617E3;
+        Tue, 24 Aug 2021 00:55:46 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1629766542;
+        s=k20201202; t=1629766548;
         bh=qhESlreqaguGA6UjYwAFl9MniaY/yGL8vZMgJ69S/zY=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=KQcbf4OsSTUMWcexDJg6LKYFdW3xQkGX3kgU+bF+RK7rtq8V3yTdKqSGfjLTc2yy5
-         oNggMYYiZfu+3lXKiBg5ZZcVCTVIjQDvuXYh/cFCVMQK2Wfbjmerq9v1YI9O0MbLKJ
-         0ty5wfylSsCfyJ7NfYgWnaWwO2TPVewZnxp/cKhQFS5W4fXrutBTVo9Oo3oeoVfAc8
-         sAvLbUADY3bxqHUyydwKB+6t1UdmEZ9Cc6OVcdqXd5lkMA7b3glwniedZKhFn4O39T
-         7M99vaYyn9+1on7XsSsByB3Eqr6XwnnKtjWqR6qYFKOhIQq4i0pk2AUZQJKK7+Qbm5
-         7aHEzv0PWnXkw==
+        b=XYURGX/CL5ldnw/JWmVHfi16J/AsCY+U3c8Lp7VeusUJfUUEeyWr26H0GD4r8N+sy
+         OHt3CF3o+lz1z8Dqicj4n2KREF+UfrGbqJTTZmMc7MLocTksRSTA9+zIQNbH9bNEBQ
+         ZeTNE7j6t8an1/1ex0sUGGuiEXpYeWYIUsaaDjBe4GEKeNrp3czL5pG4PxmUS4C6Jg
+         7zHhwOMc/zDtew4V80TIMF78SJB1l12WT7hL/O1zxkw8sXWuapBBBgVZdHCgR3SpZ7
+         HU5pRKKnZX+7xX//VGZjslZBljm3PFdujXVMLTdjnuhyLJzpiYI/PWVsnDhdZiBf4P
+         pS0wrn+hQxAiw==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Neeraj Upadhyay <neeraju@codeaurora.org>,
@@ -31,12 +31,12 @@ Cc:     Neeraj Upadhyay <neeraju@codeaurora.org>,
         "Michael S . Tsirkin" <mst@redhat.com>,
         Sasha Levin <sashal@kernel.org>, kvm@vger.kernel.org,
         virtualization@lists.linux-foundation.org, netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.9 2/3] vringh: Use wiov->used to check for read/write desc order
-Date:   Mon, 23 Aug 2021 20:55:38 -0400
-Message-Id: <20210824005539.631820-2-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 4.4 2/2] vringh: Use wiov->used to check for read/write desc order
+Date:   Mon, 23 Aug 2021 20:55:44 -0400
+Message-Id: <20210824005544.631899-2-sashal@kernel.org>
 X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20210824005539.631820-1-sashal@kernel.org>
-References: <20210824005539.631820-1-sashal@kernel.org>
+In-Reply-To: <20210824005544.631899-1-sashal@kernel.org>
+References: <20210824005544.631899-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
