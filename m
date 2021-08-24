@@ -2,350 +2,187 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A49553F5C59
-	for <lists+kvm@lfdr.de>; Tue, 24 Aug 2021 12:48:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 612DF3F5CC5
+	for <lists+kvm@lfdr.de>; Tue, 24 Aug 2021 13:03:55 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236435AbhHXKtP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 24 Aug 2021 06:49:15 -0400
-Received: from mga12.intel.com ([192.55.52.136]:5085 "EHLO mga12.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S236416AbhHXKtO (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 24 Aug 2021 06:49:14 -0400
-X-IronPort-AV: E=McAfee;i="6200,9189,10085"; a="196860693"
-X-IronPort-AV: E=Sophos;i="5.84,347,1620716400"; 
-   d="scan'208";a="196860693"
-Received: from fmsmga003.fm.intel.com ([10.253.24.29])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Aug 2021 03:48:30 -0700
-X-IronPort-AV: E=Sophos;i="5.84,347,1620716400"; 
-   d="scan'208";a="526582378"
-Received: from yizhanli-mobl.ccr.corp.intel.com (HELO localhost) ([10.249.172.236])
-  by fmsmga003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Aug 2021 03:48:21 -0700
-Date:   Tue, 24 Aug 2021 18:48:21 +0800
-From:   Yu Zhang <yu.c.zhang@linux.intel.com>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Borislav Petkov <bp@alien8.de>,
-        Andy Lutomirski <luto@kernel.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Joerg Roedel <jroedel@suse.de>,
-        Andi Kleen <ak@linux.intel.com>,
-        David Rientjes <rientjes@google.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Ingo Molnar <mingo@redhat.com>,
-        Varad Gautam <varad.gautam@suse.com>,
-        Dario Faggioli <dfaggioli@suse.com>, x86@kernel.org,
-        linux-mm@kvack.org, linux-coco@lists.linux.dev,
-        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
-        "Kirill A . Shutemov" <kirill@shutemov.name>,
-        Kuppuswamy Sathyanarayanan 
-        <sathyanarayanan.kuppuswamy@linux.intel.com>,
-        David Hildenbrand <david@redhat.com>,
-        Dave Hansen <dave.hansen@intel.com>,
-        Isaku Yamahata <isaku.yamahata@gmail.com>
-Subject: Re: [RFC] KVM: mm: fd-based approach for supporting KVM guest
- private memory
-Message-ID: <20210824104821.gwbxdvu43lhviuwl@linux.intel.com>
-References: <20210824005248.200037-1-seanjc@google.com>
+        id S236523AbhHXLEi (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 24 Aug 2021 07:04:38 -0400
+Received: from mail-bn8nam11on2058.outbound.protection.outlook.com ([40.107.236.58]:15273
+        "EHLO NAM11-BN8-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S236421AbhHXLEh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 24 Aug 2021 07:04:37 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=dE8U23HbkmtvGSque4wwquZn2n3LLfi6odDg17YPqFd0x8/f+DDueQVGJE8uZiBUMqv5Pcpj7xdUB6BrwZFHZ1RCde+KT0K5YpqCQlY+2+3mIDPtHI7oRRruQN3eSWAkIvOWaXkuhEwgJzHxYI47SzD+t4yrD0acxwnGl16k4pamOdLl4PRPnxaWJvtn063Zc+5vlu8w2ONOct+peID16brvnN8VvC32pWFUXno2pQZMd1QeZyxktqjNjbJnbKzFS4vU2nHoCtlJbDiIXdoIX7u7c/YCh6YKr31Xsfb4RdXZ7f0jVAf46ekyI7d47em7NyrpBDvmpzC9qcG10VXang==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=REgg/qvo15B7vy3kDfXU1VugLAQyA6syxIErlJu18yU=;
+ b=hIfNjgURAtgq7gRPN8tJZXIYJ2ITLAQDyYy6zt8F2FanjWl73ulodz9OH5B21pm+OVCkDpSZvYZLrVd37OpMFhzSuvQkriIqb35SwQ8ifJA4M6f61co3DCpxKA/+nbPPDjjSLVFT5KekRez42pS7XjRPmyjOXB4xVdy+TmUVuVpCON9soi3rDdXLJM8zS1chSGwRrCZjPt9JaErs66bPd8yCMOUL+iBTEPg6Vpkd2Hg1j29qjCEo/20jXXGH4Q8nPkIysASB0hnKEU3bBhVZPQDaVjHqNR1C5IGsy1qBK9jy58OcYPVuC8PoxDzX3GbWVGG3OLlgupW/28KvsZiPbw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=REgg/qvo15B7vy3kDfXU1VugLAQyA6syxIErlJu18yU=;
+ b=r+h1l4itFvFg+WXIglIB0EowLv8T6k+Euhff0xP/SFB1Z7M9irczABjjs9lLvb7/lCHjlVfXtJ69bcWhZDlhT5ay1MhrfBX2pB0uePsAEfFJduD7pm+IODvu4cMKJS3Cvz+tOQbeTRQe6lowFaV6OIpJIV0KZTDnWARI9HP7pUA=
+Authentication-Results: redhat.com; dkim=none (message not signed)
+ header.d=none;redhat.com; dmarc=none action=none header.from=amd.com;
+Received: from SN6PR12MB2767.namprd12.prod.outlook.com (2603:10b6:805:75::23)
+ by SN1PR12MB2544.namprd12.prod.outlook.com (2603:10b6:802:2b::16) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4436.19; Tue, 24 Aug
+ 2021 11:03:51 +0000
+Received: from SN6PR12MB2767.namprd12.prod.outlook.com
+ ([fe80::491e:2642:bae2:8b73]) by SN6PR12MB2767.namprd12.prod.outlook.com
+ ([fe80::491e:2642:bae2:8b73%7]) with mapi id 15.20.4436.024; Tue, 24 Aug 2021
+ 11:03:51 +0000
+From:   Ashish Kalra <Ashish.Kalra@amd.com>
+To:     pbonzini@redhat.com
+Cc:     seanjc@google.com, tglx@linutronix.de, mingo@redhat.com,
+        hpa@zytor.com, joro@8bytes.org, bp@alien8.de,
+        Thomas.Lendacky@amd.com, x86@kernel.org, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, srutherford@google.com,
+        brijesh.singh@amd.com, dovmurik@linux.ibm.com, tobin@linux.ibm.com,
+        jejb@linux.ibm.com, dgilbert@redhat.com
+Subject: [PATCH v6 0/5] Add Guest API & Guest Kernel support for SEV live migration.
+Date:   Tue, 24 Aug 2021 11:03:38 +0000
+Message-Id: <cover.1629726117.git.ashish.kalra@amd.com>
+X-Mailer: git-send-email 2.17.1
+Content-Type: text/plain
+X-ClientProxiedBy: SN4PR0201CA0056.namprd02.prod.outlook.com
+ (2603:10b6:803:20::18) To SN6PR12MB2767.namprd12.prod.outlook.com
+ (2603:10b6:805:75::23)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210824005248.200037-1-seanjc@google.com>
-User-Agent: NeoMutt/20171215
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from ashkalra_ubuntu_server.amd.com (165.204.77.1) by SN4PR0201CA0056.namprd02.prod.outlook.com (2603:10b6:803:20::18) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4436.19 via Frontend Transport; Tue, 24 Aug 2021 11:03:50 +0000
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: abe250b1-e7c5-46c0-a3b3-08d966eedae6
+X-MS-TrafficTypeDiagnostic: SN1PR12MB2544:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <SN1PR12MB25447637809307C0C95FF9CB8EC59@SN1PR12MB2544.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:9508;
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: b7cdm+HHuhyZpFX87KFiG5nbgtmcUCXystUt6Qzb5t8/5alE6MvpyUi08pH7Ce34tKirrcG9IDWgwU/6A9JsYDntvKxeIWKQgzRPrmWacQiixxKQN3iwxu5CxTwFnEB6BNgPvk8XJVJJExd8+I5S5tNFCGoMtRziAhaT4MNigF0rwveCi6G92wphRcp2COdMKeDg3PhT9vjmliJ/VMSdEjSVhYHctwGbn+mlNyyK48yVMNQseil1JkP8Axn7J4mhaSt9QJmQHCh4MG2kS/KM5eU5SuJLDht3Cj73sV+aFmZgLDwdqXElSXzKSjKBET2VudaMYCI4dTz9akkclMgbrepjjMaDg8syXpTmhG+Gr96lA1lOhTMxi94kJ/LHu4CfoEO3GrCrIQGIfTWABlBfASQZWonH2FpBkPmo40TSAikDfeUjj3Pc73PqzC+xblBZcMYKd9EIh9c7FhNTH8W07wYqIglp3OTlhjcmB4elud1XeFUkNF1pjI/R0uJd0imHHVie9NN3172cDoXaPhvK3/VXsB11XWHm/rlf5+7FoICODCJ5JlbgNxCuRocTLDloNMsOgeVhA+aHGrzOxoZhwIC2iddC0OnibXQGt4XBB3dT7vAbEmuNP2mSCJ6+laJ11OYjs7fQh1Z3MXEJGFx/2FISCPPK/U7d8pkSNhbPvpdRHaA28+PPmL8zNAWPFkgnn5cMoraP4yRMvG9ClZ5MAA==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR12MB2767.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(136003)(376002)(396003)(39860400002)(346002)(36756003)(83380400001)(2906002)(6666004)(6916009)(956004)(86362001)(66476007)(5660300002)(52116002)(8936002)(26005)(2616005)(7696005)(66946007)(478600001)(38350700002)(38100700002)(6486002)(186003)(4326008)(316002)(8676002)(7416002)(66556008);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?QQ2eoLXApe/yU7pQa30jTuAPwZW0UCiQeacyiwEidnnYAcycaSnRQZ9K4FAr?=
+ =?us-ascii?Q?pYKv5VL5EWGKJYqX8M7jlFfDUqf3EF6GYCERPhKW8xWANbliHvpfC5te8gir?=
+ =?us-ascii?Q?n3TP4vz3tMmHaNPE4YXzTfTqqwpZXm12DN7rNfb+qzNFAazCF2a7p5OHmbwo?=
+ =?us-ascii?Q?gVMSDXLlls2AvCE8hPoJW1wd19vGqKesejoJOsCv2tLaUWbWaKiC9y9+kC+Z?=
+ =?us-ascii?Q?V8k5ceDjaBsg9icjPiuMUakkqSMFicmEOJGWhCihWCw8m0R5hf4OtQ4AdUoS?=
+ =?us-ascii?Q?kI+8ulgc39T8Jr57l19r06qLwo6xhih1bry9X6gfTzGsmCBjOVyQ+owdlimQ?=
+ =?us-ascii?Q?E77fb1LrH2eZt2QAPZDMsai8UIhoCmn0tAnjq0eY7Kul9u6SlmXe83QU34kk?=
+ =?us-ascii?Q?UUmA+iuIvxIMpXBMFxRI1TU8tzzqoRC8yFhT57yRH0QalSoG23DFGcTmsxh4?=
+ =?us-ascii?Q?EAWDnA/ATO1zXFfPI8Rhax8391gHdIZE6qcWfKG8QLI6/dC9oPyxjxgzVXhI?=
+ =?us-ascii?Q?l/40y9ddcXqsX+9eQf75GUEJ6mtOCOZ0vMtTbZbm8D4NTuJO6rT1hiEuv/Cz?=
+ =?us-ascii?Q?4lmchKnY5QMWuJ5nsnnq/sAoj+yaTnAJuvv+hIVPOsIHY6y3ZedPdatkwPH8?=
+ =?us-ascii?Q?Z0W0PJPZ2yZM7Ce0XD+9w8pXtBojSZpka3W9Mo3T2soA1xAdOf2VOUVju6By?=
+ =?us-ascii?Q?pBe8x+yCRCWWQJ2qg9Qo91Yyz31YNRhN+xZ/w4FtnLu3XCeAa7PZOmtRlK+/?=
+ =?us-ascii?Q?xr94o5Ojst5mTNpBBg+fk51cOl0yQPBVY5hDnB0brgsamN2qhqkqskcDi2GP?=
+ =?us-ascii?Q?thZdLF2puxSXDV2Yn7qvsBABmTJzUz1zu/ZHeY3wwxkXXntnOYzVOSbETlkZ?=
+ =?us-ascii?Q?yU+Ux4gYzbTByx+Fw0WPir/F4f94iznk6x5TjAqtUH/tYo4RC55i9uWKEKuu?=
+ =?us-ascii?Q?CQqNyvNyImlWeUwsfRX8vwZRYcd9kbfLYZ6GWWsHow4vMSuAYbM5q4n58yZB?=
+ =?us-ascii?Q?pnv+AaYGdPg5yz3riJCTwWX3Ipeub3hTBgZGGqO4KvD8kzKWyu1OU9dV4cxd?=
+ =?us-ascii?Q?jYlTw9BEJJR8/Boo2BJPnsKlumPpVl/8sMZGJhPLJ8pIJz3f/WlIQ0b41Fpt?=
+ =?us-ascii?Q?vFfNm/j8eIZni3OOChJ0zjLVZ6IA6OMc6JcewDG0WRwKECwwU1LLGjO+970R?=
+ =?us-ascii?Q?X4Ecxe7ZPdMi8ZcMofU6iq8no1Ntw5xHTdOnq9GznXDGPOF1ycIPSq6wbMFa?=
+ =?us-ascii?Q?ySece5125+WrLQ6E3A1Psl9oBILqvbuaBTlBV4TKFM9muA0C6UJXJ3gP1kDe?=
+ =?us-ascii?Q?IZUlgN+WlxV18ibVRUwZyNoG?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: abe250b1-e7c5-46c0-a3b3-08d966eedae6
+X-MS-Exchange-CrossTenant-AuthSource: SN6PR12MB2767.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Aug 2021 11:03:51.2192
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: iz0TyHgqybTKev9eu8J+iLhtsHJ46XaxFewf+YQYgh3i1eQFlCp2NWESbqaWaRPIA2+FqzRq0wZt7JVlpt567g==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN1PR12MB2544
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Aug 23, 2021 at 05:52:48PM -0700, Sean Christopherson wrote:
+From: Ashish Kalra <ashish.kalra@amd.com>
 
-Thanks a lot for sharing these ideas. Lots of questions are inlined below. :)
+The series adds guest api and guest kernel support for SEV live migration.
 
-> The goal of this RFC is to try and align KVM, mm, and anyone else with skin in the
-> game, on an acceptable direction for supporting guest private memory, e.g. for
-> Intel's TDX.  The TDX architectural effectively allows KVM guests to crash the
-> host if guest private memory is accessible to host userspace, and thus does not
+The patch series introduces a new hypercall. The guest OS can use this
+hypercall to notify the page encryption status. If the page is encrypted
+with guest specific-key then we use SEV command during the migration.
+If page is not encrypted then fallback to default. This new hypercall
+is invoked using paravirt_ops.
 
-What about incorrect/malicious accesses from host kernel? Should the direct mapping
-also be removed for guest private memory?
+This section descibes how the SEV live migration feature is negotiated
+between the host and guest, the host indicates this feature support via 
+KVM_FEATURE_CPUID. The guest firmware (OVMF) detects this feature and
+sets a UEFI enviroment variable indicating OVMF support for live
+migration, the guest kernel also detects the host support for this
+feature via cpuid and in case of an EFI boot verifies if OVMF also
+supports this feature by getting the UEFI enviroment variable and if it
+set then enables live migration feature on host by writing to a custom
+MSR, if not booted under EFI, then it simply enables the feature by
+again writing to the custom MSR.
 
-> play nice with KVM's existing approach of pulling the pfn and mapping level from
-> the host page tables.
-> 
-> This is by no means a complete patch; it's a rough sketch of the KVM changes that
-> would be needed.  The kernel side of things is completely omitted from the patch;
-> the design concept is below.
-> 
-> There's also fair bit of hand waving on implementation details that shouldn't
-> fundamentally change the overall ABI, e.g. how the backing store will ensure
-> there are no mappings when "converting" to guest private.
-> 
-> Background
-> ==========
-> 
-> This is a loose continuation of Kirill's RFC[*] to support TDX guest private
-> memory by tracking guest memory at the 'struct page' level.  This proposal is the
-> result of several offline discussions that were prompted by Andy Lutomirksi's
-> concerns with tracking via 'struct page':
-> 
->   1. The kernel wouldn't easily be able to enforce a 1:1 page:guest association,
->      let alone a 1:1 pfn:gfn mapping.
+Changes since v5:
+ - Add detailed comments and explanation why SEV hypercalls need to
+   be made before apply_alternative() and how adding kvm_sev_hypercall3()
+   function is abstracted using the early_set_memory_XX() interfaces
+   invoking the paravirt_ops (pv_ops).
+ - Reverting to the earlier kvm_sev_hypercall3() interface after
+   feedback from Sean that inversion of KVM_HYPERCALL to VMMCALL
+   is causing issues and not going to work.
 
-May I ask why? Doesn't FOLL_GUEST in Kirill's earlier patch work? Or just
-because traversing the host PT to get a PFN(for a PageGuest(page)) is too
-heavy?
+Changes since v4:
+ - Split the guest kernel support for SEV live migration and kexec support
+   for live migration into separate patches.
 
-> 
->   2. Does not work for memory that isn't backed by 'struct page', e.g. if devices
->      gain support for exposing encrypted memory regions to guests.
+Changes since v3:
+ - Add Code style fixes as per review from Boris.
 
-Do you mean that a page not backed by 'struct page' might be mapped to other
-user space? I thought the VM_GUEST flags for the VMA could prevent that(though
-I may possiblely be wrong). Could you explain more? Thanks!
+Changes since v2:
+ - Add guest api patch to this patchset.
+ - Replace KVM_HC_PAGE_ENC_STATUS hypercall with the more generic
+   KVM_HC_MAP_GPA_RANGE hypercall.
+ - Add WARN_ONCE() messages if address lookup fails during kernel
+   page table walk while issuing KVM_HC_MAP_GPA_RANGE hypercall.
 
-> 
->   3. Does not help march toward page migration or swap support (though it doesn't
->      hurt either).
-> 
-> [*] https://lkml.kernel.org/r/20210416154106.23721-1-kirill.shutemov@linux.intel.com
-> 
-> Concept
-> =======
-> 
-> Guest private memory must be backed by an "enlightened" file descriptor, where
-> "enlightened" means the implementing subsystem supports a one-way "conversion" to
-> guest private memory and provides bi-directional hooks to communicate directly
-> with KVM.  Creating a private fd doesn't necessarily have to be a conversion, e.g. it
-> could also be a flag provided at file creation, a property of the file system itself,
-> etc...
-> 
-> Before a private fd can be mapped into a KVM guest, it must be paired 1:1 with a
-> KVM guest, i.e. multiple guests cannot share a fd.  At pairing, KVM and the fd's
-> subsystem exchange a set of function pointers to allow KVM to call into the subsystem,
-> e.g. to translate gfn->pfn, and vice versa to allow the subsystem to call into KVM,
-> e.g. to invalidate/move/swap a gfn range.
+Changes since v1:
+ - Avoid having an SEV specific variant of kvm_hypercall3() and instead
+   invert the default to VMMCALL.
 
-So the gfn->pfn translation is done by the fd's subsystem? Again, could you
-please elaborate how?
+Ashish Kalra (4):
+  KVM: X86: Introduce KVM_HC_MAP_GPA_RANGE hypercall
+  KVM: x86: invert KVM_HYPERCALL to default to VMMCALL
+  EFI: Introduce the new AMD Memory Encryption GUID.
+  x86/kvm: Add guest support for detecting and enabling SEV Live
+    Migration feature.
 
-And each private memory region would need a seperate group of callbacks? 
+Ashish Kalra (3):
+  EFI: Introduce the new AMD Memory Encryption GUID.
+  x86/kvm: Add guest support for detecting and enabling SEV Live
+    Migration feature.
+  x86/kvm: Add kexec support for SEV Live Migration.
 
-> 
-> Mapping a private fd in host userspace is disallowed, i.e. there is never a host
-> virtual address associated with the fd and thus no userspace page tables pointing
-> at the private memory.
-> 
-> Pinning _from KVM_ is not required.  If the backing store supports page migration
-> and/or swap, it can query the KVM-provided function pointers to see if KVM supports
-> the operation.  If the operation is not supported (this will be the case initially
-> in KVM), the backing store is responsible for ensuring correct functionality.
-> 
-> Unmapping guest memory, e.g. to prevent use-after-free, is handled via a callback
-> from the backing store to KVM.  KVM will employ techniques similar to those it uses
-> for mmu_notifiers to ensure the guest cannot access freed memory.
-> 
-> A key point is that, unlike similar failed proposals of the past, e.g. /dev/mktme,
-> existing backing stores can be englightened, a from-scratch implementations is not
-> required (though would obviously be possible as well).
-> 
-> One idea for extending existing backing stores, e.g. HugeTLBFS and tmpfs, is
-> to add F_SEAL_GUEST, which would convert the entire file to guest private memory
-> and either fail if the current size is non-zero or truncate the size to zero.
+Brijesh Singh (2):
+  x86/kvm: Add AMD SEV specific Hypercall3
+  mm: x86: Invoke hypercall when page encryption status is changed
 
-Have you discussed memfd_secret(if host direct mapping is also to be removed)? 
+ arch/x86/include/asm/kvm_para.h       |  12 +++
+ arch/x86/include/asm/mem_encrypt.h    |   4 +
+ arch/x86/include/asm/paravirt.h       |   6 ++
+ arch/x86/include/asm/paravirt_types.h |   1 +
+ arch/x86/include/asm/set_memory.h     |   1 +
+ arch/x86/kernel/kvm.c                 | 107 ++++++++++++++++++++++++++
+ arch/x86/kernel/paravirt.c            |   1 +
+ arch/x86/mm/mem_encrypt.c             |  72 ++++++++++++++---
+ arch/x86/mm/pat/set_memory.c          |   6 ++
+ include/linux/efi.h                   |   1 +
+ 10 files changed, 202 insertions(+), 9 deletions(-)
 
-And how does this F_SEAL_GUEST work?
-
-> 
-> KVM
-> ===
-> 
-> Guest private memory is managed as a new address space, i.e. as a different set of
-> memslots, similar to how KVM has a separate memory view for when a guest vCPU is
-> executing in virtual SMM.  SMM is mutually exclusive with guest private memory.
-> 
-> The fd (the actual integer) is provided to KVM when a private memslot is added
-> via KVM_SET_USER_MEMORY_REGION.  This is when the aforementioned pairing occurs.
-
-My understanding of KVM_SET_USER_MEMORY_REGION is that, this ioctl is to
-facilitate the binding of HVA and GPA ranges. But if there's no HVAs for
-a private region at all, why do we need a memslot for it? Besides to keep
-track of the private GFN ranges, and provide the callbacks, is there any
-other reason?
-
-Another question is: why do we need a whole new address space, instead of
-one address space accommodating memslot types?
-
-> 
-> By default, KVM memslot lookups will be "shared", only specific touchpoints will
-> be modified to work with private memslots, e.g. guest page faults.  All host
-> accesses to guest memory, e.g. for emulation, will thus look for shared memory
-> and naturally fail without attempting copy_to/from_user() if the guest attempts
-
-Becasue gfn_to_hva() will fail first?
-
-> to coerce KVM into access private memory.  Note, avoiding copy_to/from_user() and
-> friends isn't strictly necessary, it's more of a happy side effect.
-> 
-> A new KVM exit reason, e.g. KVM_EXIT_MEMORY_ERROR, and data struct in vcpu->run
-> is added to propagate illegal accesses (see above) and implicit conversions
-
-Sorry, illegal accesses from VM?
-
-Do you actually mean a KVM page fault caused by private access from VM, which
-implicitly notifies KVM to mark it as private(e.g. by bouncing to Qemu, which
-then creates a private memory region and ioctls into KVM)?
-
-If the answer is yes, how about naming the exit reason as KVM_EXIT_MEMORY_PRIVATE?
-Meanwhile, is Qemu also supposed to invoke some system call into host kernel
-before ioctls into KVM? I'm still confused where the kernel callbacks like
-the gfn_to_pfn() come from(and how they function)... :)
-
-> to userspace (see below).  Note, the new exit reason + struct can also be to
-> support several other feature requests in KVM[1][2].
-> 
-> The guest may explicitly or implicity request KVM to map a shared/private variant
-> of a GFN.  An explicit map request is done via hypercall (out of scope for this
-> proposal as both TDX and SNP ABIs define such a hypercall).  An implicit map request
-> is triggered simply by the guest accessing the shared/private variant, which KVM
-> sees as a guest page fault (EPT violation or #NPF).  Ideally only explicit requests
-> would be supported, but neither TDX nor SNP require this in their guest<->host ABIs.
-
-Well, I am wondering, should we assume all guest pages as shared or private by
-default? I mean, if all guest pages are private when the VM is created, maybe
-the private memslots can be initialized in VM creation time, and be deleted/splited
-later(e.g. in response to guest sharing  hypercalls)?
-
-It may simplify the logic, but may also restrict the VM type(e.g. to be TD guest).
-
-> 
-> For implicit or explicit mappings, if a memslot is found that fully covers the
-> requested range (which is a single gfn for implicit mappings), KVM's normal guest
-> page fault handling works with minimal modification.
-> 
-> If a memslot is not found, for explicit mappings, KVM will exit to userspace with
-> the aforementioned dedicated exit reason.  For implict _private_ mappings, KVM will
-> also immediately exit with the same dedicated reason.  For implicit shared mappings,
-> an additional check is required to differentiate between emulated MMIO and an
-> implicit private->shared conversion[*].  If there is an existing private memslot
-> for the gfn, KVM will exit to userspace, otherwise KVM will treat the access as an
-> emulated MMIO access and handle the page fault accordingly.
-> 
-> [1] https://lkml.kernel.org/r/YKxJLcg/WomPE422@google.com
-> [2] https://lkml.kernel.org/r/20200617230052.GB27751@linux.intel.com
-> 
-> Punching Holes
-> ==============
-> 
-> The expected userspace memory model is that mapping requests will be handled as
-> conversions, e.g. on a shared mapping request, first unmap the private gfn range,
-> then map the shared gfn range.  A new KVM ioctl() will likely be needed to allow
-> userspace to punch a hole in a memslot, as expressing such an operation isn't
-> possible with KVM_SET_USER_MEMORY_REGION.  While userspace could delete the
-> memslot, then recreate three new memslots, doing so would be destructive to guest
-> data as unmapping guest private memory (from the EPT/NPT tables) is destructive
-> to the data for both TDX and SEV-SNP guests.
-
-May I ask why? Thanks!
-
-> 
-> Pros (vs. struct page)
-> ======================
-> 
-> Easy to enforce 1:1 fd:guest pairing, as well as 1:1 gfn:pfn mapping.
-> 
-> Userspace page tables are not populated, e.g. reduced memory footprint, lower
-> probability of making private memory accessible to userspace.
-> 
-> Provides line of sight to supporting page migration and swap.
-> 
-> Provides line of sight to mapping MMIO pages into guest private memory.
-> 
-> Cons (vs. struct page)
-> ======================
-> 
-> Significantly more churn in KVM, e.g. to plumb 'private' through where needed,
-> support memslot hole punching, etc...
-> 
-> KVM's MMU gets another method of retrieving host pfn and page size.
-
-And the method is provided by host kernel? How does this method work?
-
-[...]
-> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> index a272ccbddfa1..771080235b2d 100644
-> --- a/arch/x86/kvm/mmu/mmu.c
-> +++ b/arch/x86/kvm/mmu/mmu.c
-> @@ -2896,6 +2896,9 @@ int kvm_mmu_max_mapping_level(struct kvm *kvm,
->  	if (max_level == PG_LEVEL_4K)
->  		return PG_LEVEL_4K;
->  
-> +	if (memslot_is_private(slot))
-> +		return slot->private_ops->pfn_mapping_level(...);
-> +
-
-Oh, any suggestion how host kernel decides the mapping level here?
-
->  	host_level = host_pfn_mapping_level(kvm, gfn, pfn, slot);
->  	return min(host_level, max_level);
->  }
-> @@ -3835,9 +3838,11 @@ static bool kvm_arch_setup_async_pf(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa,
->  
->  static bool kvm_faultin_pfn(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault, int *r)
->  {
-> -	struct kvm_memory_slot *slot = kvm_vcpu_gfn_to_memslot(vcpu, fault->gfn);
-> +	struct kvm_memory_slot *slot;
->  	bool async;
->  
-> +	slot = __kvm_vcpu_gfn_to_memslot(vcpu, fault->gfn, fault->private);
-> +
->  	/*
->  	 * Retry the page fault if the gfn hit a memslot that is being deleted
->  	 * or moved.  This ensures any existing SPTEs for the old memslot will
-> @@ -3846,8 +3851,19 @@ static bool kvm_faultin_pfn(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault,
->  	if (slot && (slot->flags & KVM_MEMSLOT_INVALID))
->  		goto out_retry;
->  
-> +	/*
-> +	 * Exit to userspace to map the requested private/shared memory region
-> +	 * if there is no memslot and (a) the access is private or (b) there is
-> +	 * an existing private memslot.  Emulated MMIO must be accessed through
-> +	 * shared GPAs, thus a memslot miss on a private GPA is always handled
-> +	 * as an implicit conversion "request".
-> +	 */
-
-For (b), do you mean this fault is for a GFN which marked as private, but now
-converted to a shared? If true, could we just disallow it if no explict sharing
-hypercall is triggered?
-
-> +	if (!slot &&
-> +	    (fault->private || __kvm_vcpu_gfn_to_memslot(vcpu, fault->gfn, true)))
-> +		goto out_convert;
-> +
->  	if (!kvm_is_visible_memslot(slot)) {
-> -		/* Don't expose private memslots to L2. */
-> +		/* Don't expose KVM's internal memslots to L2. */
->  		if (is_guest_mode(vcpu)) {
->  			fault->pfn = KVM_PFN_NOSLOT;
->  			fault->map_writable = false;
-> @@ -3890,6 +3906,12 @@ static bool kvm_faultin_pfn(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault,
->  out_retry:
->  	*r = RET_PF_RETRY;
->  	return true;
-> +
-> +out_convert:
-> +	vcpu->run->exit_reason = KVM_EXIT_MAP_MEMORY;
-> +	/* TODO: fill vcpu->run with more info. */
-> +	*r = 0;
-> +	return true;
->  }
-
-
-B.R.
-Yu
+-- 
+2.17.1
 
