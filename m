@@ -2,75 +2,74 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7948D3F6B95
-	for <lists+kvm@lfdr.de>; Wed, 25 Aug 2021 00:11:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EC4F13F6B97
+	for <lists+kvm@lfdr.de>; Wed, 25 Aug 2021 00:13:03 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234720AbhHXWMc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 24 Aug 2021 18:12:32 -0400
-Received: from mx0b-00069f02.pphosted.com ([205.220.177.32]:42084 "EHLO
-        mx0b-00069f02.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230177AbhHXWMb (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 24 Aug 2021 18:12:31 -0400
-Received: from pps.filterd (m0246630.ppops.net [127.0.0.1])
-        by mx0b-00069f02.pphosted.com (8.16.1.2/8.16.0.43) with SMTP id 17OLmaqU000921;
-        Tue, 24 Aug 2021 22:11:34 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : subject : to :
- cc : references : message-id : date : in-reply-to : content-type :
+        id S235507AbhHXWNr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 24 Aug 2021 18:13:47 -0400
+Received: from mx0a-00069f02.pphosted.com ([205.220.165.32]:11448 "EHLO
+        mx0a-00069f02.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S230177AbhHXWNq (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 24 Aug 2021 18:13:46 -0400
+Received: from pps.filterd (m0246627.ppops.net [127.0.0.1])
+        by mx0b-00069f02.pphosted.com (8.16.1.2/8.16.0.43) with SMTP id 17OJtIqw001072;
+        Tue, 24 Aug 2021 22:12:53 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to :
+ references : from : message-id : date : in-reply-to : content-type :
  content-transfer-encoding : mime-version; s=corp-2021-07-09;
- bh=Wor+K+OCWXVBXj3hTMD7rr6wFy0edP217mblMMn37vs=;
- b=lglBvAInFJotcsn3rv8GyB3u+4JoLbYsEuPVmhbH2u/KLTHD80r8y6j4RsxV+sEMY3Br
- uFrMnZmTAPuW2X4DGYu1Y2saTfAndUkB0bBQtiye/RLiv6a0c15DdGWd4yALoFYpOQAY
- YRD/401jA0xGyuzkmrtP8DkcVeckBn31fF69ujpYeba0VHMxZQTdrY65e91OMXzrcAlA
- +JzXtSbc7lj6iARQr8M+eTygJygFzKhElBFDG6oydKLRw77LLNEenBK0WAUD0zE6NzrF
- U3tSv/b4Oq8FPOm/R23dsRiOBJKhGa7vEVqtL2Y3InYRrSKzB1b5m/ru9AwxIvtSp7ef Cw== 
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : subject : to :
- cc : references : message-id : date : in-reply-to : content-type :
+ bh=57wrucMCrw1q8RIEKhP7wXD7d1s/1TReV6LMgZYVCAA=;
+ b=vwOQLn+x4I6giDrwBjTIEDUsqUtGfwR9MvGGA1GrONASM3X3dnj8w/beJUNwKGUoi34D
+ wJa9WixL+GZpEhmaT/CdEGqKYl7Dik6GLluZPmit/HU7m27IMVe2XC3Y08sHX9fQMUKK
+ 29MIeAjF0tUi57ISUQCcroZ99I/U6MRsqccMcWkSlXV2aAleMBCVpBgFUeeKWeD30Omy
+ 6ZpoV/YgQVZNqj/E/IMsNI9wHNwxy0ylcukrWrWvjegTOvdAeSmnkuQY8vlybTk1vZUl
+ 0UpAmN+PTXjPVMDagOtpZG7r2mvIYv3Je9t2HVnBEa6H2I8n7hTvDKw27UD1M/lOY9e6 1g== 
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to :
+ references : from : message-id : date : in-reply-to : content-type :
  content-transfer-encoding : mime-version; s=corp-2020-01-29;
- bh=Wor+K+OCWXVBXj3hTMD7rr6wFy0edP217mblMMn37vs=;
- b=JzhZ5nlkHd2GIQ8UPyqmJ7Bvo8NNqBkwALsrvRbIjPIBqn+eeqJxkkVftLOY0ORDEqc5
- MvTHcvUlXQsEF9O8Xw/AcbyBNFYRlifWdIgdy31VItEKpzRmjNkfwMX/Wl2t7thwU8jr
- uYir2pmhAASk597Q/LqTp/rfP9MzDAjurtj06XqCAIABMGL0kixqK1woqpYru5TPxLzO
- 2DNw46WZJE6p0QZshtJpwVCfp9i2NBRyLoEjjvJgHsBbwTV8ueP/b13zzjoQE60+wIqs
- 6Y9QHK8biWSkNi9tYsEcPYGVj6krKS6/m9RTc4A/iPmBIrALKPrLr3jaak6R9kjRfO6c pg== 
-Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
-        by mx0b-00069f02.pphosted.com with ESMTP id 3amwpd9v1d-1
+ bh=57wrucMCrw1q8RIEKhP7wXD7d1s/1TReV6LMgZYVCAA=;
+ b=tAnTfobgYh4wFZBmdLr1qfsQNSxOB1YDJa52cU5QkPQQcU92xjBoO6ceF+FiffjPlBQW
+ 1Kcim8Edr/cqS/cTDE+xH48hhedDcpBBJ3FTaHW3ZP8hp50P4ry1YpObnVq+86LrK4lr
+ 7RaF7+luYaxFMNuK/b6oTzyt/nbUrJn4v8VF7fyzgJB5t9y4dJfY1Y/Tf/IFbhzPKaZW
+ fHxnrh1SGHR7fIIXdsaclK6U3NefRSlpdsCngBpfROTCM3HGw83Qkxh6ukF0fO2Z56Mv
+ Jr2HTWc2BNSoBgkV40xezJFCSOyYEVTSVxQZJhDBUycXaSG/5HARvTuw+DAFlphpFMol lw== 
+Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
+        by mx0b-00069f02.pphosted.com with ESMTP id 3amvtvt3fn-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 24 Aug 2021 22:11:33 +0000
-Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
-        by aserp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 17OMBMkf054386;
-        Tue, 24 Aug 2021 22:11:33 GMT
-Received: from nam12-dm6-obe.outbound.protection.outlook.com (mail-dm6nam12lp2177.outbound.protection.outlook.com [104.47.59.177])
-        by aserp3030.oracle.com with ESMTP id 3ajqhfd8bg-1
+        Tue, 24 Aug 2021 22:12:53 +0000
+Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
+        by aserp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 17OMBGVk152557;
+        Tue, 24 Aug 2021 22:12:52 GMT
+Received: from nam12-dm6-obe.outbound.protection.outlook.com (mail-dm6nam12lp2173.outbound.protection.outlook.com [104.47.59.173])
+        by aserp3020.oracle.com with ESMTP id 3ajsa62kbj-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 24 Aug 2021 22:11:32 +0000
+        Tue, 24 Aug 2021 22:12:51 +0000
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=ZAsqUt539p2Z14Wkapo/5i7td5Atn5F29a8n5/7NP0ReWZKpwwqkWpxYr5POAMLCTGchnwPx8JyqXDu0r1qE4KHcTNnEfsEywI1o19D93oLyNOKot4DO/+BVGzKQOdUEusufFYBa8Kje7x7Zxl/EIpPL/t2JJ4/1AWerLxelyeR1+MyGD8+QW453IfCHljXR+RJnQOYVDPOUMHWvPjOSG3Fw2IjxeWdn9QoljBbOr4XdexxRAA4sNpB7lGACJ0BPWvaLuSvL1QQozPHyUCKphd5z804s2aVNmDeZPnBGqHNtrbmDmZGXDnWFwp+Ka6gu0dwGqRVHQtsFXjpfweLyTw==
+ b=VNxZz55KkWSYntsIT32SGbD61tOIwVxTFDMwGkcoRS34iDNp+rm2Pe9m4zlPiTGP+qXBQ/D4uCaIBpD3ALmVkhwrNIkJup92wtsDSoiFyur621F4yLKLIpbpxe6aL/f3jJVRd+V4ht7X6XQRxSQPHAtFlo3fTOvuDejI/vbMTWBGOJrp5pFvHb45QKb0kMvD3PIIB5Kx19DbeQuAav9NWx4CtKdvo5Y+e9ZUF8BgYwQ8SIWwVOv+l+UJA/xE71v03nJeakSNGNfZjjV+4AL/D/FNWSHaw3tOTM+ndudhCUbDfj+aGthXqmFSFNo/kMvr8zPpcbSdkT9WfcpwsSMx4A==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Wor+K+OCWXVBXj3hTMD7rr6wFy0edP217mblMMn37vs=;
- b=B3lb4/KFNHatuEhwxNXDNlaj+jjHbWdjRwtj3hEFecGUloizErloyDF8Rf4bYSXRv7EV0GKJe8EmVBjgmUmGr5Sb4oQMUu0Bfab90eKH1X8Jbhisyb/gJAUgCecNsa+mVntDk+k3iAH/tEvc6FfiVjXobTtqcLwmovvj0kXdir7vWHbJqYhHprB2ZHxyp8y5OCJ/7gasmKjkY/KEYfNyXePl8sYA/5tirBskEXyDyZJ9hkqKNsnKfpIdnwda5DmRz6uBnVSqqQlYFx1E/9GSHhIoG40y1my+QYi93jqPXK4haD45ikpwQE2jSFY8tqmZKiWfYMPmFn3Cd7Rds7hZTw==
+ bh=57wrucMCrw1q8RIEKhP7wXD7d1s/1TReV6LMgZYVCAA=;
+ b=DciGtbh5UNvs1jd3jzR8AZl2SMOZyoyCEJOK+Y/EiR1frlmeR9PVlnlNpqxFeCHipxZ3W5pog750W5wsthe4De355ISZJsnkCsPhO5Sg7iqfPRfmt++7wPKlEyOV8KdMjUNzeKL4F+oYuMskly6bTb5THj11yG1NdciQ/llban/rX8rpuP9GQa4CYnnFcGGIM2irPOkJMFcJ+0DUKq5WWgUnqbfP1rG1e8pVgUpjLXArMDnPvqSvJwE2EuhmPGsdgV7PBOrglMdHO8cgp2+TmodRfrwcnpT2kSMiGyoevb+mrllyytmdATR5iszgibqIbyNyiv0aZA0gm2PxXbCBjg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
  dkim=pass header.d=oracle.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Wor+K+OCWXVBXj3hTMD7rr6wFy0edP217mblMMn37vs=;
- b=xdXmJ6CRIySBUWQ5MkXvvLIYQzOUY7xNrCzGu/363R6zK4qUR7imnZLG5TxjK35eswYvuHiWQ4Ss2KhN8sasX5GL7UYorz8OcvMCAdpuFC9CY1c/odnslLLYy3FZCtZUyoIr5ZXXPyEQY6u5MKqAOuNhAQceCe5t9c1jMsfJxBE=
-Authentication-Results: suse.com; dkim=none (message not signed)
- header.d=none;suse.com; dmarc=none action=none header.from=oracle.com;
+ bh=57wrucMCrw1q8RIEKhP7wXD7d1s/1TReV6LMgZYVCAA=;
+ b=PzP12dppo1cdWWEk1GAWMTlDogxS5rkd7fmEb4XiX7+aT/ysyd7jW2cnF0mwgHIjAdcn7OM8HFoxO7mUjxm1R4DD5fNghL2JwfJ+BwEWTOInofwt2IKank5LXoIfN7DGouuHjBrJXHSok/F2M9cNTYCZ4kYpq8yy789GgBCDHiw=
+Authentication-Results: google.com; dkim=none (message not signed)
+ header.d=none;google.com; dmarc=none action=none header.from=oracle.com;
 Received: from DM6PR10MB3019.namprd10.prod.outlook.com (2603:10b6:5:6f::23) by
  DM8PR10MB5400.namprd10.prod.outlook.com (2603:10b6:8:27::24) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.4436.19; Tue, 24 Aug 2021 22:11:31 +0000
+ 15.20.4436.19; Tue, 24 Aug 2021 22:12:50 +0000
 Received: from DM6PR10MB3019.namprd10.prod.outlook.com
  ([fe80::f9b8:94dd:1c44:cb2b]) by DM6PR10MB3019.namprd10.prod.outlook.com
  ([fe80::f9b8:94dd:1c44:cb2b%7]) with mapi id 15.20.4415.023; Tue, 24 Aug 2021
- 22:11:31 +0000
-From:   Krish Sadhukhan <krish.sadhukhan@oracle.com>
-Subject: Re: [kvm-unit-tests PATCH v2 5/6] cstart64.S: x86_64 bootstrapping
- after exiting EFI
+ 22:12:50 +0000
+Subject: Re: [kvm-unit-tests PATCH v2 6/6] x86 UEFI: Convert x86 test cases to
+ PIC
 To:     Varad Gautam <varadgautam@gmail.com>,
         Zixuan Wang <zixuanwang@google.com>,
         Nadav Amit <nadav.amit@gmail.com>,
@@ -83,281 +82,361 @@ To:     Varad Gautam <varadgautam@gmail.com>,
         Hyunwook Baek <baekhw@google.com>,
         Erdem Aktas <erdemaktas@google.com>,
         Tom Roeder <tmroeder@google.com>
-Cc:     Varad Gautam <varad.gautam@suse.com>
 References: <20210819113400.26516-1-varad.gautam@suse.com>
- <20210819113400.26516-6-varad.gautam@suse.com>
-Message-ID: <6cba72a3-3db7-674d-29e2-43fa7d117a1a@oracle.com>
-Date:   Tue, 24 Aug 2021 15:11:27 -0700
+ <20210819113400.26516-7-varad.gautam@suse.com>
+From:   Krish Sadhukhan <krish.sadhukhan@oracle.com>
+Message-ID: <2b3efdc2-2fc1-1b3f-3f07-edc4ccf41583@oracle.com>
+Date:   Tue, 24 Aug 2021 15:12:47 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.6.0
-In-Reply-To: <20210819113400.26516-6-varad.gautam@suse.com>
+In-Reply-To: <20210819113400.26516-7-varad.gautam@suse.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 7bit
 Content-Language: en-US
-X-ClientProxiedBy: SA0PR11CA0026.namprd11.prod.outlook.com
- (2603:10b6:806:d3::31) To DM6PR10MB3019.namprd10.prod.outlook.com
+X-ClientProxiedBy: SA9P221CA0012.NAMP221.PROD.OUTLOOK.COM
+ (2603:10b6:806:25::17) To DM6PR10MB3019.namprd10.prod.outlook.com
  (2603:10b6:5:6f::23)
 MIME-Version: 1.0
 X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from localhost.localdomain (2606:b400:8301:1010::16aa) by SA0PR11CA0026.namprd11.prod.outlook.com (2603:10b6:806:d3::31) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4457.17 via Frontend Transport; Tue, 24 Aug 2021 22:11:29 +0000
+Received: from localhost.localdomain (2606:b400:8301:1010::16aa) by SA9P221CA0012.NAMP221.PROD.OUTLOOK.COM (2603:10b6:806:25::17) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4457.17 via Frontend Transport; Tue, 24 Aug 2021 22:12:48 +0000
 X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: de728109-ae05-49e3-fbf7-08d9674c209d
+X-MS-Office365-Filtering-Correlation-Id: d2d97966-85be-4232-29f9-08d9674c4fb6
 X-MS-TrafficTypeDiagnostic: DM8PR10MB5400:
-X-Microsoft-Antispam-PRVS: <DM8PR10MB540012A603E92F9E806E9B2A81C59@DM8PR10MB5400.namprd10.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:4303;
+X-Microsoft-Antispam-PRVS: <DM8PR10MB54003EB38DC7F5994ECB55DA81C59@DM8PR10MB5400.namprd10.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:546;
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: mCTkKS/Nb/rjFF5pEd3Fkm2gm1P8pPCwnlt3Drcm48u+JPwMktzXEFaypcHCA74fNRmUms6uXPCrFcBrA0jo9dTIFt8EYPSUIHjZ0MfRP0OyV1HyfssD5KWd7AVINY+lSFp4kAEZtfXBd6lWZ1/fkfiwOpmbmJZQz9aMt572X1aCzUrmus5nSgSFhDpeBQ+Vva9LhjagbxUsKzEdnvb0KH5q1d/owwCeUze6xPY8OdRQtEFlFOrcgk9lWerzvAL67FQdlc+gSpkrNGSmp4lt6/QEjY9ppID7h7Hix7T32ccXieoXtm5uS09pjWbR/AJ4hMi866IrD7G0ki1jKXHYR1KmuKLKSi83KNHqrjzRKqVgs+iyZqf0PfwqVn6ZspownQH7cJc4DjQJWmlIKIRvzDKY4W/p1Je7Xqb6E3zGQSWkjXiKPRKSRgBhgTqg1fbgxuzPz95zFPSUPmli6197jyJJDO9SWejeVp8dWDma1VXO2aYT2IJawHXHr8xfkj0yaz9dEvt65/jXI7gqu08Bt6A0e7SbssOMOnjQiNo/JdbNU8nICI8N0MPLHDFObThaCBQa4daawdFFw+q3Opj88rI5Pg1Br3sT7nahVPyUeW7LHfmwu1etbCRus/oHBudmqlEtFj5HeKcf6fbc+pd1sopU2f1LKLntyb8ktBbc34fy+xZyxk6HIzkT8sEGstrTwWDpYblDmQokCu1ozXmarrOx2CaRhoi1EBxeL9jxlKgB2LXAxMCjZthGu8RUQ6Ul
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR10MB3019.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(396003)(366004)(376002)(346002)(39860400002)(136003)(478600001)(2906002)(921005)(5660300002)(83380400001)(86362001)(2616005)(8676002)(31686004)(8936002)(316002)(31696002)(4326008)(6506007)(36756003)(110136005)(53546011)(6486002)(66556008)(66476007)(66946007)(44832011)(6512007)(7416002)(186003)(38100700002)(45980500001)(43740500002);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam-Message-Info: moWte8xpIsZlbc2VXr1XYLk8jBx0NomLtq0y/x0gH87Yd0t6vT1qgsUW/7WM/ctAJYtlUYdFXvrCb01SOOHnuTtqjUzjTmqMhr2K5Pwt+t6+fXyCsdbq/mO8XqQKfshKbF0MUw/pvsmeT8Kt0R5LiW9ITKfuBsam1CaILsoDFIoj7OxilcYus80JU4CjN3Zyw637WUpWtoILgw9keyn5IrJZXI+tUGhLr0vZ2UqJt//7/hgmayLDxsVEzGHlfVua9FUuVDkyb1LFXmEBfO3RG3urRwZaFSOKSn7md2zBcljNZR/UM/q820/lkYFV2aA+jWPeF1Wkdg/bMEfpr5p2vYUvGSdGW95/q/ifbSy8tIGbzEc4zGSTUTfS8gxTQNaUphXtsvpIM/aUkCwcMV98wZg+yskbtZvnurz47Os/p1u/340/BXWX7d6Av4mtm/GKojGbWMUsEmJfpzWCAop7t0nwIugDJDDEuWE+0IBRV0QTMUpm2MAXy29XQttTopAaanx4DM6Gf8YxgiX2zWoz4xqSotAvkJ/auRZbdrfw+bP/ALFbt+1+1CAavjQV/GDOq7yzm8/+TbPuJvs3MD+VkXL1hWvgPFVVxVAawitfR6uhSk5oKQuMJ5L1dWIuZhYMy+0PP96XK6hPR/1XHD6OHUV7nsRqS9eJXityS8ys9Mhu7UQL2jdgMX8D+Xj7g3IfD0N5CU31k5alE83r8ykSiGZsQat7zCKbGks+bXMH0Mbgj0lHY2em9emtMooeCh9E
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR10MB3019.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(396003)(366004)(376002)(346002)(39860400002)(136003)(478600001)(2906002)(921005)(5660300002)(83380400001)(86362001)(2616005)(8676002)(31686004)(8936002)(316002)(31696002)(6506007)(36756003)(110136005)(53546011)(6486002)(66556008)(66476007)(66946007)(44832011)(6512007)(7416002)(186003)(38100700002)(45980500001)(43740500002);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?bHFFKzlzanJFemc3a1BUcGI1Z0s2MHhmYWllMFI5V21jVEpvcmJkRERnMWln?=
- =?utf-8?B?bk9NNGZSM1ZyOVJUMlRNZDdwd2NESHY4MVc1SFB5YWx2aEwxMXlEZlZDSTVH?=
- =?utf-8?B?d202dElJSkprVzkyclp5M2hHME1Sb2hNMGhjUHRLQ0xXaU5NTklGN3hDM2pq?=
- =?utf-8?B?VWFrSW01NGR5NnpZdnUxUlVkUWxFZERSUW1MTnV1dUlQcGpZQW1VdEIwTk9Q?=
- =?utf-8?B?OEhMNkcxNVlkTW4ySjA2NE5QcGkyamxiMWdGUFpka2NJMWFKVFk1TER1Zndo?=
- =?utf-8?B?ellMQk9rL3kzZjBqNUhRNGt4ZjFmL3ZwWUprTWgzYnY4MHZrSFBxK3J6aWpu?=
- =?utf-8?B?MExsd2kxRVdlKzBRdE84TDBUOGtqYjhJZ2EvL09GbGJNVmJvc3BSbDdPd3pJ?=
- =?utf-8?B?Zm50UTArcThUWC9ENHRwS01YcERzT3V4NzRMeXlLbzMxSWdReDhzci9hWFhn?=
- =?utf-8?B?QU5tU2t0OGx2Tjh1TWVkcTl4V3VEWTk3K2FDSTYyR0xmRmxjK2U0T3hlSlJY?=
- =?utf-8?B?ZEt3elgzd3gyb2RVc1RIUWNkZitMcXJmUTVsOS8vSVZDUGI1VmpBYTlwUG03?=
- =?utf-8?B?T25WcU5TaFNrcW5VZGZKN3VsNDdEQm53MkJDK3I2N1NkRmNzR3pmdVQxcmZ5?=
- =?utf-8?B?M2dvbURBQlJKekRXQXAySWEwTUl6VWU2WUlQTUJsaFc3NU11QnJUN2dkMlpM?=
- =?utf-8?B?T3hXdWdGaUptMFM1My82UGdRYkZmVmRpTFByRWtTQVFqR3Z0Zkl2OGE3V2NQ?=
- =?utf-8?B?VnFtazBMT20rMzVNYUM1RWU2aXBzQnJ0d241Q0lSMVlURXFGVEVXcWZlUUZn?=
- =?utf-8?B?Z3A2VVVvWlcyZFZENXk2VjZkK0VvRWlpTW5MY2xpMTI5Y0xramtVTWFSOVA3?=
- =?utf-8?B?VzBGQUZGam0yaU05UEh1UzRvWkh1ZWh5TFdxMWlYV1pDdzkrRHFDU21ucmVm?=
- =?utf-8?B?RjJwOUxUZmRuZXNJRVUvWFZRQk1aQkNOUG9iRXpHaXYzdU1vZ0trclJVZmlE?=
- =?utf-8?B?dk1NMmo4RkZQMFd1UzhWVzlvZW5yMXZZSmNnMlAxNzRvalFQTWRSNWZ3Wllr?=
- =?utf-8?B?eklCMnB2VWpTT04xMmFLT09POEMvYTR0UHp1a1ZIUjNuZHZpUUdDN3hEZWV3?=
- =?utf-8?B?eERCYXpWQVczaXE3bHp2dUUyT2tWaEJNY1J0WmpEK0VTdzB6R0trSzZQQ2JM?=
- =?utf-8?B?RmFiemZFdVFXSlNTTFpNOGV5WURTTXQxbjFaWlFSME53NGtWNUpuak9uTE50?=
- =?utf-8?B?L3paL2tlM2hvM2JtRk10VlFvc2xnT3hON3NRcnVUekRxM2hTVndyRHBuZE9r?=
- =?utf-8?B?MXhUZFdxem0vdUR1TVh3M3pDRHlVRXlXVTYrMGpxVy93cWZlTFRJRTE0YUN6?=
- =?utf-8?B?MkJmU1RoZEJ2NVNQaW9NaFFlM0JWd2Y2b2NyMEtidUE5N2pMTTRDRURjd2pJ?=
- =?utf-8?B?ZDNlQU5QMVNVcGZSUVBCVDBjWDQ3VlEzQlV6UGw0NytVcGdBL2RtNjV1a3BO?=
- =?utf-8?B?ZithY1NIeHhmVFFERGp1a2Z4emZISVJ6cCtnMjZZUUVPVThuWHRsTzhjUmd5?=
- =?utf-8?B?ZzNIYzlqVnc3aEZDREo1RGlqN0JyYlNNZU9mVTIxdDlyOE1vS3ZxUUlLOTlk?=
- =?utf-8?B?ZUZVUGtzVE02aUkxdXQxZ1NsQzZ5TW1wc1FBK3FRNkRKbXp0M3MzNTl2cUxT?=
- =?utf-8?B?dGZrZDBGVTlMa2tJNlhzVVVYK2lCMThjZkdyTmFnemkxWDNHbTdXWkhONzMx?=
- =?utf-8?B?RXJwWm95blV4TGo3QURwTE9XdW1aQ01zdzhFVVZEby9WRVFlTEZ4dTBuNVRE?=
- =?utf-8?B?b25OMk9nZEhXZXVDa0hKdz09?=
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?RGI3aG9JSFhGOU1Hd0NrZ0FQSzVkbVI2dWExQXlQanJaYXdoTldyTWk2M0xT?=
+ =?utf-8?B?QTdZOXcxK1FlekdBcHE3SHZmMFlLdndZeHU5UGx5NXVVQXdDSlJ6MzVoMWJD?=
+ =?utf-8?B?d2ZWMDJjOEpHRGw1U0tkUzcwU2Q5VzdPd3VlKzFzdkdrUFVmeDhLVStMdDE0?=
+ =?utf-8?B?cVRPSG5XeTk2S05NRVAwODNrejEwTzNvY2dlRkJXWldOR3FjOU5lTzVuTG1q?=
+ =?utf-8?B?RkpVekJhREVVZldWWEhCcndqTithWTkwdEVUM0owL3hzZlRtby9aaUZEQ2M5?=
+ =?utf-8?B?SGZMNGNtN1RJb3BMRjBrTExPWExEVzZlbFBQUG9hdEV3UmY5eDhYblE3YmpZ?=
+ =?utf-8?B?eW1na0swdTZUNFMvVEEzSitWWFZBdis0UkYzWG1UMEV4ZmYxaDEwUnVMcDZO?=
+ =?utf-8?B?UW5BRE1jd2ZSNkxGenFuM3JYNmFsbXVyMys5RXAxUWV6QjJhOWtzaFJDL1lQ?=
+ =?utf-8?B?SGo4ZytyQThWRHZOMHphdTA4SHhlYVRVSjVzeGZtVmxNdW41emxtWEorSjk5?=
+ =?utf-8?B?Vk5WRWxwT3VJZjBBT1hIQ1FIbEhHdzNZMzBQWTRCY0VKblFPcm1vdkt0dVdM?=
+ =?utf-8?B?UWQ2Y0FNQ0hHcTFpRTFBOFFFdi9tQW9sckpCemhadDlJVjFxS3phUFFsMXNM?=
+ =?utf-8?B?MVdyZlR2VkFJQ0lyVzdGMW5VNUd3Nm5wTWhHNDBtdTRUMmNMYkE3MjlWbFlL?=
+ =?utf-8?B?Zi9SM25VcmJSSVdvQWRvTHcwYnZQMzZIVHRFRHA5Z3VlUitMdXM4SkdrckpM?=
+ =?utf-8?B?SDgyOEVXZndrNFVsVy9veFhHcWNEYVdkTDBsbWNOZGdJa3BycmtIdmI2NTNJ?=
+ =?utf-8?B?MWZFeE4vV3czYkc3Z2lZdk5JVDJDWWdMd0E2eGxTWU9kd1EvNjFxV1g3dVVQ?=
+ =?utf-8?B?V0xoR3B2ZmtBdVJYaE9DQ3RuWGFPQjFaZmZHWmlLbUJFV0dybnFOVW1qeUdU?=
+ =?utf-8?B?QWFDRjFWa0YwbEpEQzRubll2anFaYzFXVk9qMERBS0ozTitXZlFwZmRMcGlB?=
+ =?utf-8?B?TjdETXdVL2RmbFc5K0pqbFU4ak5EUXFqaXN4bE9zbFUvTkpmeDgwdVJxUXoy?=
+ =?utf-8?B?NDBlNzZvMGpUekwxNFE5VGM5NDFQcG92RytlSWgyMVpsKzhrYVB0aUJrekRS?=
+ =?utf-8?B?YWU0R200K090VlNHSGtYZEFlUVVrNjdxaUF6UkRGQXJxTXp6VWV2OVA2UlI3?=
+ =?utf-8?B?OHMwbmJraGxqcTZ1Zmw0UWNnK280d0ppM3JTTFdWVFFUTFBiTTFvcG5WejYv?=
+ =?utf-8?B?QVNyamVvVnF0cHlMQWZGVmYxY2U3cTFQdE5HYU4vUzhaRzFXK1ZMTjBFVTdH?=
+ =?utf-8?B?UUt1VC80QVJ6T3VPYThySTJrOGxXQ1RJMkhDVjJOdC9qdnNkVm1QWWRlZ05z?=
+ =?utf-8?B?WW9QYVQ4MEljait2eEU3U2JUejZhTjV1bllFVENJd0dVWE9UcDhHaHFEZ2tJ?=
+ =?utf-8?B?ait3dVF5cTI1bVRmMmMyeUtwa1pCUThzdm0vWTB1VzlyK1FUUnFDeGJZNVNN?=
+ =?utf-8?B?bkVuMjJsaEM4bnZPZUtzdWNxSkh3VGUyd05NVDFHb2k5TlhHTXcybFFqVk1Y?=
+ =?utf-8?B?bXQvZnRVeGd4enpSSk9WM1E2anBpT0ltNWw4RmhXQVVLbXU2d0FJRXRvblFB?=
+ =?utf-8?B?T2tRSU9HMFZ4ZUsxd0xtNXEzVjdFQ0JnWEFmbnFPZmNvMHEvdzQyU1VPdzBJ?=
+ =?utf-8?B?YVp3dGVYMDVKVHh6VWpMY052ZUFaQjVJT1hQTFFFNHpZVklZOFpMSVJXNFJ1?=
+ =?utf-8?B?WFZpZmF1N1VOMFc3N09vUUFoVUpNbGhXVHhZMmM5UHJ2eFA0TDNTdmFFNFZ0?=
+ =?utf-8?B?M1pmc1FNMnJDVFNnZXRBdz09?=
 X-OriginatorOrg: oracle.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: de728109-ae05-49e3-fbf7-08d9674c209d
+X-MS-Exchange-CrossTenant-Network-Message-Id: d2d97966-85be-4232-29f9-08d9674c4fb6
 X-MS-Exchange-CrossTenant-AuthSource: DM6PR10MB3019.namprd10.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Aug 2021 22:11:31.3365
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Aug 2021 22:12:50.3408
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: GFOFqEU8JMQ/lI3VFk8Kz49WV1yVlVGRdWP+ksRqP7tzud2qCRLpn91iMdQHCXGhfAcHZ3BO66hya3tIOD57xCqGlGJ43BQRUfl1Xr1nMm0=
+X-MS-Exchange-CrossTenant-UserPrincipalName: LBXhcpsc1lSXFdZVOiaTI5xeRBCubZ6/eTgqUJwmSumDWUjkLPjmgVmNZcmCkbsKLF0s2CPkxxoaF6FXZrZLGYHX1Uz1Z7ZJG1nbkdrBDvE=
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM8PR10MB5400
 X-Proofpoint-Virus-Version: vendor=nai engine=6300 definitions=10086 signatures=668682
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 phishscore=0 bulkscore=0 malwarescore=0
- spamscore=0 adultscore=0 mlxlogscore=999 suspectscore=0 mlxscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2107140000
- definitions=main-2108240139
-X-Proofpoint-ORIG-GUID: WUUheKqtUFXFJzq6VjCsGHn4BT9qONNf
-X-Proofpoint-GUID: WUUheKqtUFXFJzq6VjCsGHn4BT9qONNf
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 phishscore=0 spamscore=0
+ mlxlogscore=999 bulkscore=0 mlxscore=0 adultscore=0 malwarescore=0
+ suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2107140000 definitions=main-2108240139
+X-Proofpoint-ORIG-GUID: CAvzHlXsC7XVxePI7AvL-uFimIYUNqZF
+X-Proofpoint-GUID: CAvzHlXsC7XVxePI7AvL-uFimIYUNqZF
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
-On 8/19/21 4:33 AM, Varad Gautam wrote:
-> EFI sets up long mode with arbitrary state before calling the
-> image entrypoint. To run the testcases at hand, it is necessary
-> to redo some of the bootstrapping to not rely on what EFI
-> provided.
+On 8/19/21 4:34 AM, Varad Gautam wrote:
+> From: Zixuan Wang <zixuanwang@google.com>
 >
-> Adapt start64() for EFI testcases to fixup %rsp/GDT/IDT/TSS and
-> friends, and jump here after relocation from efi_main. Switch to
-> RIP-relative addressing where necessary.
+> UEFI loads EFI applications to dynamic runtime addresses, so it requires
+> all applications to be compiled as PIC (position independent code). PIC
+> does not allow the usage of compile time absolute address.
 >
-> Initially leave out:
-> - AP init - leave EFI to single CPU
-> - Testcase arg passing
+> This commit converts multiple x86 test cases to PIC so they can compile
+> and run in UEFI:
 >
-> Signed-off-by: Varad Gautam<varad.gautam@suse.com>
+> - x86/cet.efi
+>
+> - x86/emulator.c: x86/emulator.c depends on lib/x86/usermode.c. But
+> usermode.c contains non-PIC inline assembly code and thus blocks the
+> compilation with GNU-EFI. This commit converts lib/x86/usermode.c and
+> x86/emulator.c to PIC, so x86/emulator.c can compile and run in UEFI.
+>
+> - x86/vmware_backdoors.c: it depends on lib/x86/usermode.c and now works
+> without modifications
+>
+> - x86/eventinj.c
+>
+> - x86/smap.c
+>
+> - x86/access.c
+>
+> - x86/umip.c
+
+
+I am wondering if these changes can be part of patch# 1 instead of being 
+a separate patch.
+
+>
+> Signed-off-by: Zixuan Wang <zixuanwang@google.com>
 > ---
-> v2: Fix TSS setup in cstart64 on CONFIG_EFI.
+>   lib/x86/usermode.c  |  3 ++-
+>   x86/Makefile.common |  7 ++++---
+>   x86/Makefile.x86_64 |  5 +++--
+>   x86/access.c        |  6 +++---
+>   x86/cet.c           |  8 +++++---
+>   x86/emulator.c      |  5 +++--
+>   x86/eventinj.c      |  6 ++++--
+>   x86/smap.c          |  8 ++++----
+>   x86/umip.c          | 10 +++++++---
+>   9 files changed, 35 insertions(+), 23 deletions(-)
 >
->   x86/cstart64.S | 70 +++++++++++++++++++++++++++++++++++++++++++++-----
->   x86/efi_main.c |  1 +
->   2 files changed, 65 insertions(+), 6 deletions(-)
->
-> diff --git a/x86/cstart64.S b/x86/cstart64.S
-> index 98e7848..547f3fb 100644
-> --- a/x86/cstart64.S
-> +++ b/x86/cstart64.S
-
-
-I am wondering if it's cleaner to create a separate .S file for EFI 
-because so many #ifdefs are reducing readability of the code.
-
-> @@ -242,16 +242,17 @@ ap_start32:
+> diff --git a/lib/x86/usermode.c b/lib/x86/usermode.c
+> index f032523..c550545 100644
+> --- a/lib/x86/usermode.c
+> +++ b/lib/x86/usermode.c
+> @@ -58,7 +58,8 @@ uint64_t run_in_user(usermode_func func, unsigned int fault_vector,
+>   			"pushq %[user_stack_top]\n\t"
+>   			"pushfq\n\t"
+>   			"pushq %[user_cs]\n\t"
+> -			"pushq $user_mode\n\t"
+> +			"lea user_mode(%%rip), %%rdx\n\t"
+> +			"pushq %%rdx\n\t"
+>   			"iretq\n"
 >   
->   .code64
->   save_id:
-> -#ifndef CONFIG_EFI
->   	movl $(APIC_DEFAULT_PHYS_BASE + APIC_ID), %eax
->   	movl (%rax), %eax
->   	shrl $24, %eax
-> +#ifdef CONFIG_EFI
-> +	lock btsl %eax, online_cpus(%rip)
-> +#else
->   	lock btsl %eax, online_cpus
+>   			"user_mode:\n\t"
+> diff --git a/x86/Makefile.common b/x86/Makefile.common
+> index ca33e8e..a91fd4c 100644
+> --- a/x86/Makefile.common
+> +++ b/x86/Makefile.common
+> @@ -61,8 +61,8 @@ FLATLIBS = lib/libcflat.a
+>   		    -j .reloc -j .init --target efi-app-x86_64 $*.so $@
+>   	@chmod a-x $@
+>   
+> -tests-flatonly = $(TEST_DIR)/realmode.$(out) $(TEST_DIR)/eventinj.$(out)		\
+> -		$(TEST_DIR)/smap.$(out) $(TEST_DIR)/umip.$(out)
+> +tests-flatonly = $(TEST_DIR)/realmode.$(out)						\
+> +		$(TEST_DIR)/smap.$(out)
+>   
+>   tests-common = $(TEST_DIR)/vmexit.$(out) $(TEST_DIR)/tsc.$(out)				\
+>   		$(TEST_DIR)/smptest.$(out) $(TEST_DIR)/msr.$(out)			\
+> @@ -72,7 +72,8 @@ tests-common = $(TEST_DIR)/vmexit.$(out) $(TEST_DIR)/tsc.$(out)				\
+>   		$(TEST_DIR)/tsc_adjust.$(out) $(TEST_DIR)/asyncpf.$(out)		\
+>   		$(TEST_DIR)/init.$(out) $(TEST_DIR)/hyperv_synic.$(out)			\
+>   		$(TEST_DIR)/hyperv_stimer.$(out) $(TEST_DIR)/hyperv_connections.$(out)	\
+> -		$(TEST_DIR)/tsx-ctrl.$(out)
+> +		$(TEST_DIR)/tsx-ctrl.$(out)						\
+> +		$(TEST_DIR)/eventinj.$(out) $(TEST_DIR)/umip.$(out)
+>   
+>   ifneq ($(CONFIG_EFI),y)
+>   tests-common += $(tests-flatonly)
+> diff --git a/x86/Makefile.x86_64 b/x86/Makefile.x86_64
+> index f6c7bd7..e8843aa 100644
+> --- a/x86/Makefile.x86_64
+> +++ b/x86/Makefile.x86_64
+> @@ -18,9 +18,8 @@ cflatobjs += lib/x86/intel-iommu.o
+>   cflatobjs += lib/x86/usermode.o
+>   
+>   # Tests that have relocation / PIC problems and need more attention for EFI.
+> -tests_flatonly = $(TEST_DIR)/access.$(out) $(TEST_DIR)/emulator.$(out) \
+> +tests_flatonly = $(TEST_DIR)/access.$(out) \
+>   	$(TEST_DIR)/svm.$(out) $(TEST_DIR)/vmx.$(out) \
+> -	$(TEST_DIR)/vmware_backdoors.$(out)
+>   
+>   tests = $(TEST_DIR)/apic.$(out) $(TEST_DIR)/idt_test.$(out) \
+>   	  $(TEST_DIR)/xsave.$(out) $(TEST_DIR)/rmap_chain.$(out) \
+> @@ -33,6 +32,8 @@ tests += $(TEST_DIR)/intel-iommu.$(out)
+>   tests += $(TEST_DIR)/rdpru.$(out)
+>   tests += $(TEST_DIR)/pks.$(out)
+>   tests += $(TEST_DIR)/pmu_lbr.$(out)
+> +tests += $(TEST_DIR)/emulator.$(out)
+> +tests += $(TEST_DIR)/vmware_backdoors.$(out)
+>   
+>   ifneq ($(fcf_protection_full),)
+>   tests_flatonly += $(TEST_DIR)/cet.$(out)
+> diff --git a/x86/access.c b/x86/access.c
+> index 4725bbd..d0c84ca 100644
+> --- a/x86/access.c
+> +++ b/x86/access.c
+> @@ -700,7 +700,7 @@ static int ac_test_do_access(ac_test_t *at)
+>   
+>       if (F(AC_ACCESS_TWICE)) {
+>   	asm volatile (
+> -	    "mov $fixed2, %%rsi \n\t"
+> +	    "lea fixed2(%%rip), %%rsi \n\t"
+>   	    "mov (%[addr]), %[reg] \n\t"
+>   	    "fixed2:"
+>   	    : [reg]"=r"(r), [fault]"=a"(fault), "=b"(e)
+> @@ -710,7 +710,7 @@ static int ac_test_do_access(ac_test_t *at)
+>   	fault = 0;
+>       }
+>   
+> -    asm volatile ("mov $fixed1, %%rsi \n\t"
+> +    asm volatile ("lea fixed1(%%rip), %%rsi \n\t"
+>   		  "mov %%rsp, %%rdx \n\t"
+>   		  "cmp $0, %[user] \n\t"
+>   		  "jz do_access \n\t"
+> @@ -719,7 +719,7 @@ static int ac_test_do_access(ac_test_t *at)
+>   		  "pushq %[user_stack_top] \n\t"
+>   		  "pushfq \n\t"
+>   		  "pushq %[user_cs] \n\t"
+> -		  "pushq $do_access \n\t"
+> +		  "lea do_access(%%rip), %%rsi; pushq %%rsi; lea fixed1(%%rip), %%rsi\n\t"
+>   		  "iretq \n"
+>   		  "do_access: \n\t"
+>   		  "cmp $0, %[fetch] \n\t"
+> diff --git a/x86/cet.c b/x86/cet.c
+> index a21577a..a4b79cb 100644
+> --- a/x86/cet.c
+> +++ b/x86/cet.c
+> @@ -52,7 +52,7 @@ static u64 cet_ibt_func(void)
+>   	printf("No endbr64 instruction at jmp target, this triggers #CP...\n");
+>   	asm volatile ("movq $2, %rcx\n"
+>   		      "dec %rcx\n"
+> -		      "leaq 2f, %rax\n"
+> +		      "leaq 2f(%rip), %rax\n"
+>   		      "jmp *%rax \n"
+>   		      "2:\n"
+>   		      "dec %rcx\n");
+> @@ -67,7 +67,8 @@ void test_func(void) {
+>   			"pushq %[user_stack_top]\n\t"
+>   			"pushfq\n\t"
+>   			"pushq %[user_cs]\n\t"
+> -			"pushq $user_mode\n\t"
+> +			"lea user_mode(%%rip), %%rax\n\t"
+> +			"pushq %%rax\n\t"
+>   			"iretq\n"
+>   
+>   			"user_mode:\n\t"
+> @@ -77,7 +78,8 @@ void test_func(void) {
+>   			[user_ds]"i"(USER_DS),
+>   			[user_cs]"i"(USER_CS),
+>   			[user_stack_top]"r"(user_stack +
+> -					sizeof(user_stack)));
+> +					sizeof(user_stack))
+> +			: "rax");
+>   }
+>   
+>   #define SAVE_REGS() \
+> diff --git a/x86/emulator.c b/x86/emulator.c
+> index 9fda1a0..4d2de24 100644
+> --- a/x86/emulator.c
+> +++ b/x86/emulator.c
+> @@ -262,12 +262,13 @@ static void test_pop(void *mem)
+>   
+>   	asm volatile("mov %%rsp, %[tmp] \n\t"
+>   		     "mov %[stack_top], %%rsp \n\t"
+> -		     "push $1f \n\t"
+> +		     "lea 1f(%%rip), %%rax \n\t"
+> +		     "push %%rax \n\t"
+>   		     "ret \n\t"
+>   		     "2: jmp 2b \n\t"
+>   		     "1: mov %[tmp], %%rsp"
+>   		     : [tmp]"=&r"(tmp) : [stack_top]"r"(stack_top)
+> -		     : "memory");
+> +		     : "memory", "rax");
+>   	report(1, "ret");
+>   
+>   	stack_top[-1] = 0x778899;
+> diff --git a/x86/eventinj.c b/x86/eventinj.c
+> index 46593c9..0cd68e8 100644
+> --- a/x86/eventinj.c
+> +++ b/x86/eventinj.c
+> @@ -155,9 +155,11 @@ asm("do_iret:"
+>   	"pushf"W" \n\t"
+>   	"mov %cs, %ecx \n\t"
+>   	"push"W" %"R "cx \n\t"
+> -	"push"W" $2f \n\t"
+> +	"lea"W" 2f(%"R "ip), %"R "bx \n\t"
+> +	"push"W" %"R "bx \n\t"
+>   
+> -	"cmpb $0, no_test_device\n\t"	// see if need to flush
+> +	"mov no_test_device(%"R "ip), %bl \n\t"
+> +	"cmpb $0, %bl\n\t"		// see if need to flush
+>   	"jnz 1f\n\t"
+>   	"outl %eax, $0xe4 \n\t"		// flush page
+>   	"1: \n\t"
+> diff --git a/x86/smap.c b/x86/smap.c
+> index ac2c8d5..b3ee16f 100644
+> --- a/x86/smap.c
+> +++ b/x86/smap.c
+> @@ -161,10 +161,10 @@ int main(int ac, char **av)
+>   		test = -1;
+>   		asm("or $(" xstr(USER_BASE) "), %"R "sp \n"
+>   		    "push $44 \n "
+> -		    "decl test\n"
+> +		    "decl test(%"R "ip)\n"
+>   		    "and $~(" xstr(USER_BASE) "), %"R "sp \n"
+>   		    "pop %"R "ax\n"
+> -		    "movl %eax, test");
+> +		    "movl %eax, test(%"R "ip)");
+>   		report(pf_count == 0 && test == 44,
+>   		       "write to user stack with AC=1");
+>   
+> @@ -173,10 +173,10 @@ int main(int ac, char **av)
+>   		test = -1;
+>   		asm("or $(" xstr(USER_BASE) "), %"R "sp \n"
+>   		    "push $45 \n "
+> -		    "decl test\n"
+> +		    "decl test(%"R "ip)\n"
+>   		    "and $~(" xstr(USER_BASE) "), %"R "sp \n"
+>   		    "pop %"R "ax\n"
+> -		    "movl %eax, test");
+> +		    "movl %eax, test(%"R "ip)");
+>   		report(pf_count == 1 && test == 45 && save == -1,
+>   		       "write to user stack with AC=0");
+>   
+> diff --git a/x86/umip.c b/x86/umip.c
+> index c5700b3..8b4e798 100644
+> --- a/x86/umip.c
+> +++ b/x86/umip.c
+> @@ -23,7 +23,10 @@ static void gp_handler(struct ex_regs *regs)
+>   
+>   #define GP_ASM(stmt, in, clobber)                  \
+>       asm volatile (                                 \
+> -          "mov" W " $1f, %[expected_rip]\n\t"      \
+> +          "push" W " %%" R "ax\n\t"                \
+> +	  "lea 1f(%%" R "ip), %%" R "ax\n\t"       \
+> +          "mov %%" R "ax, %[expected_rip]\n\t"     \
+> +          "pop" W " %%" R "ax\n\t"                 \
+>             "movl $2f-1f, %[skip_count]\n\t"         \
+>             "1: " stmt "\n\t"                        \
+>             "2: "                                    \
+> @@ -130,7 +133,8 @@ static int do_ring3(void (*fn)(const char *), const char *arg)
+>   		  "push" W " %%" R "dx \n\t"
+>   		  "pushf" W "\n\t"
+>   		  "push" W " %[user_cs] \n\t"
+> -		  "push" W " $1f \n\t"
+> +		  "lea 1f(%%" R "ip), %%" R "dx \n\t"
+> +		  "push" W " %%" R "dx \n\t"
+>   		  "iret" W "\n"
+>   		  "1: \n\t"
+>   		  "push %%" R "cx\n\t"   /* save kernel SP */
+> @@ -144,7 +148,7 @@ static int do_ring3(void (*fn)(const char *), const char *arg)
 >   #endif
->   	retq
 >   
->   ap_start64:
-> -#ifndef CONFIG_EFI
->   	call reset_apic
->   	call load_tss
->   	call enable_apic
-> @@ -259,12 +260,38 @@ ap_start64:
->   	call enable_x2apic
->   	sti
->   	nop
-> +#ifdef CONFIG_EFI
-> +	lock incw cpu_online_count(%rip)
-> +#else
->   	lock incw cpu_online_count
->   #endif
-> +
->   1:	hlt
->   	jmp 1b
->   
->   #ifdef CONFIG_EFI
-> +setup_gdt64:
-> +	lgdt gdt64_desc(%rip)
-> +	call load_tss
-> +
-> +	setup_segments
-> +
-> +	movabsq $flush_cs, %rax
-> +	pushq $0x8
-> +	pushq %rax
-> +	retfq
-> +flush_cs:
-> +	ret
-> +
-> +setup_idt64:
-> +	lidtq idt_descr(%rip)
-> +	ret
-> +
-> +setup_cr3:
-> +	movabsq $ptl4, %rax
-> +	mov %rax, %cr3
-> +	ret
-> +
->   .globl _efi_pe_entry
->   _efi_pe_entry:
->   	# EFI image loader calls this with rcx=efi_handle,
-> @@ -276,15 +303,27 @@ _efi_pe_entry:
->   	pushq   %rsi
->   
->   	call efi_main
-> -#endif
->   
-> +.globl start64
->   start64:
-> -#ifndef CONFIG_EFI
-> +	cli
-> +	lea stacktop(%rip), %rsp
-> +
-> +	setup_percpu_area
-> +	call setup_gdt64
-> +	call setup_idt64
-> +	call setup_cr3
-> +#else
-> +start64:
-> +#endif
->   	call reset_apic
-> +#ifndef CONFIG_EFI
->   	call load_tss
-> +#endif
->   	call mask_pic_interrupts
->   	call enable_apic
->   	call save_id
-> +#ifndef CONFIG_EFI
->   	mov mb_boot_info(%rip), %rbx
->   	mov %rbx, %rdi
->   	call setup_multiboot
-> @@ -292,18 +331,24 @@ start64:
->   	mov mb_cmdline(%rbx), %eax
->   	mov %rax, __args(%rip)
->   	call __setup_args
-> +#endif
->   
->   	call ap_init
->   	call enable_x2apic
->   	call smp_init
->   
-> +#ifdef CONFIG_EFI
-> +	mov $0, %edi
-> +	mov $0, %rsi
-> +	mov $0, %rdx
-> +#else
->   	mov __argc(%rip), %edi
->   	lea __argv(%rip), %rsi
->   	lea __environ(%rip), %rdx
-> +#endif
->   	call main
->   	mov %eax, %edi
->   	call exit
-> -#endif
->   
->   .globl setup_5level_page_table
->   setup_5level_page_table:
-> @@ -330,6 +375,7 @@ online_cpus:
->   load_tss:
->   #ifndef CONFIG_EFI
->   	lidtq idt_descr
-> +#endif
->   	mov $(APIC_DEFAULT_PHYS_BASE + APIC_ID), %eax
->   	mov (%rax), %eax
->   	shr $24, %eax
-> @@ -337,6 +383,18 @@ load_tss:
->   	shl $4, %ebx
->   	mov $((tss_end - tss) / max_cpus), %edx
->   	imul %edx
-> +#ifdef CONFIG_EFI
-> +	lea tss(%rip), %rax
-> +	lea tss_descr(%rip), %rcx
-> +	add %rbx, %rcx
-> +	mov %ax, 2(%rcx)
-> +	shr $16, %rax
-> +	mov %al, 4(%rcx)
-> +	shr $8, %rax
-> +	mov %al, 7(%rcx)
-> +	shr $8, %rax
-> +	mov %eax, 8(%rcx)
-> +#else
->   	add $tss, %rax
->   	mov %ax, tss_descr+2(%rbx)
->   	shr $16, %rax
-> @@ -345,9 +403,9 @@ load_tss:
->   	mov %al, tss_descr+7(%rbx)
->   	shr $8, %rax
->   	mov %eax, tss_descr+8(%rbx)
-> +#endif
->   	lea tss_descr-gdt64(%rbx), %rax
->   	ltr %ax
-> -#endif
->   	ret
->   
->   ap_init:
-> diff --git a/x86/efi_main.c b/x86/efi_main.c
-> index be3f9ab..c542fb9 100644
-> --- a/x86/efi_main.c
-> +++ b/x86/efi_main.c
-> @@ -7,6 +7,7 @@ efi_system_table_t *efi_system_table = NULL;
->   
->   extern char ImageBase;
->   extern char _DYNAMIC;
-> +extern void start64(void);
->   
->   static void efi_free_pool(void *ptr)
->   {
+>   		  "pop %%" R "cx\n\t"
+> -		  "mov $1f, %%" R "dx\n\t"
+> +		  "lea 1f(%%" R "ip), %%" R "dx\n\t"
+>   		  "int %[kernel_entry_vector]\n\t"
+>   		  ".section .text.entry \n\t"
+>   		  "kernel_entry: \n\t"
