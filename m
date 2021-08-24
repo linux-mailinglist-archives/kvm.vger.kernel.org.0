@@ -2,171 +2,91 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A2AA23F59DC
-	for <lists+kvm@lfdr.de>; Tue, 24 Aug 2021 10:30:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 553B13F5B65
+	for <lists+kvm@lfdr.de>; Tue, 24 Aug 2021 11:52:21 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235369AbhHXIb2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 24 Aug 2021 04:31:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49848 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235291AbhHXIb1 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 24 Aug 2021 04:31:27 -0400
-Received: from mail-io1-xd2a.google.com (mail-io1-xd2a.google.com [IPv6:2607:f8b0:4864:20::d2a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ACD55C061757;
-        Tue, 24 Aug 2021 01:30:43 -0700 (PDT)
-Received: by mail-io1-xd2a.google.com with SMTP id q3so7892165iot.3;
-        Tue, 24 Aug 2021 01:30:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=+j7IjoUFYR/jGQIsG5Kc/GnPz7mkjdiN+rdILANXXEQ=;
-        b=cw7kQmPLTiLl+GcnjDtkNylKIH5YQtQ1Evnmix6ZwvW1SORH65Sh2h8dyigIa2RHSx
-         5kuogtWnnigiA79DLq1MlyNKAFeHbmoPiQ6cbtp88jc3Zx7kXQee1ix6XgoNj68cYpaX
-         34ETEjUo3OHirUDomXGn/aOhPwfLtEvx5NqC1fX5cUh0neHKoFBbFhTyUfYu+lCwVFCJ
-         YVab9WlnkYN5VSJOD4rRHcdeLJ23RmvWy1o/E6urHZFaODhaaFwolTvYo/REghMniLJi
-         kpVIjAW6uq9N/WrqmxI6PBWdOCMLkgWc0BAc5uF5XtR8JnYmn34AHPRKcf/1IbzLFizl
-         PG7Q==
+        id S235876AbhHXJxD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 24 Aug 2021 05:53:03 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:44140 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S235658AbhHXJxC (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 24 Aug 2021 05:53:02 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1629798738;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=kg6z7dt36I6LiVKwFciZ2psrGVbf2/o69+fbyjnvf4U=;
+        b=K+ZSkxXeABECk6jRYbwZD3AZ4j9Ov1+qEQrllGV81DaGd7feB0ZAgvWjhuusEDvkxKUcX0
+        eXZw4Spcmdi6iPf1CUOykhp1L24P2OnR9VxeKH2wdl2HE1wPgjg2C+QqGtMsSaLt2l0zc/
+        z05mKazh8sJwf8WT+O8Tar2wvz2ZMYs=
+Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
+ [209.85.208.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-264-8vfJf6x9PSuBh7NK3X3ozA-1; Tue, 24 Aug 2021 05:52:14 -0400
+X-MC-Unique: 8vfJf6x9PSuBh7NK3X3ozA-1
+Received: by mail-ed1-f70.google.com with SMTP id b25-20020a05640202d9b02903be7281a80cso10261983edx.3
+        for <kvm@vger.kernel.org>; Tue, 24 Aug 2021 02:52:14 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=+j7IjoUFYR/jGQIsG5Kc/GnPz7mkjdiN+rdILANXXEQ=;
-        b=OlTaTbg7a8hHg58/fgCaGHvzfyeGxxE2UE2S7Fo6LUFcZtXVFaM4n5sSNwELrYCIUs
-         UgW3fHEXNv4+BpnttBf3Ntjw10VDIXvN0nI46aw9FIqsSIKTsekavRhSrPZYni/CHhUJ
-         gBXwuZFBzLtf8swRcZxp4hAbMleJX0I+uuqzIP72FZOoQ0eBbPQ0jcRrP/q4TSzcE5vN
-         z297MAPPHEwh4YPrPP3AykPiphWkUZwVJqPxLnvzMcCuuNWO8CwoAK62r4BV3TrupKY5
-         e014OJNjj2WiSG86FymEBlUMV1Kdm/v4mWRa5X31NBaq923VGpctArtVNVloQzY2959A
-         MZGg==
-X-Gm-Message-State: AOAM530X8ay3UUpVOKFvNfnPwXgv+JkZUO7CxrZw9g+2Exh5rV0gXMSk
-        FOn9fy43kEwn9XsJp4C3p3lA3d3tUODEYj4HQlHGcEzz
-X-Google-Smtp-Source: ABdhPJyTgmhzpAyp/zZOvJ8sEkMJXon/cESPXGJG4jfzkW0CnkZ0MUVxnfQyOs0gTKzpE4HhiqsQTpWaaI10Rk6RIkg=
-X-Received: by 2002:a6b:ec0b:: with SMTP id c11mr15025302ioh.207.1629793843119;
- Tue, 24 Aug 2021 01:30:43 -0700 (PDT)
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=kg6z7dt36I6LiVKwFciZ2psrGVbf2/o69+fbyjnvf4U=;
+        b=jjd5TLqe+P04XD81PaTvHlHwNSrDGaCjQKiK16cEP4j/RJXwgkP2rnpg1dNBPhchMs
+         +GInPoFIju8iOXa4m7hcpzL3wmg6etE8CppIBrGPvY6HOq5buh3/YSEH7PIpjGNhPYyw
+         LiwBy+gwfDYaBRDs4TQ5kyDhUhKh8ZMQAQt2BFgCc3HnMTTksixmI+V3v2dA+4/9FUiQ
+         jY1GwMxCw5bdDOAlFYI+UKImVgLolh0k8uWRy00NaQ4WFnJbOX+zqWepYGc3efrkfk0+
+         kBoZizfp7Nplk913bCe/P82P7cuJHR7xVl9eIgE6brAJ7P1P2UcZbRk+Qh0LvyhLbC3v
+         DhjQ==
+X-Gm-Message-State: AOAM5316r8LeA5lA5REzt9DWJyL71YqH/HiMKt/C8VbLCun1I+iv9yn4
+        hnV9ktzAAdd+3KJt8nc7WtpsivPvDMh1b0nwGPQut7oRC6dtDYZRAHuBm8UkhdjQfW4S9fBcA7P
+        7/k3P37S1k2h+
+X-Received: by 2002:a05:6402:358d:: with SMTP id y13mr42408319edc.300.1629798733736;
+        Tue, 24 Aug 2021 02:52:13 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJy4YQVPnF4P439rZmYEXIkrS86lreoMk06pzGCFXpJnDrLV059NdnDnDKyu+XUq3zGXCMLhIw==
+X-Received: by 2002:a05:6402:358d:: with SMTP id y13mr42408309edc.300.1629798733637;
+        Tue, 24 Aug 2021 02:52:13 -0700 (PDT)
+Received: from steredhat (host-79-45-8-152.retail.telecomitalia.it. [79.45.8.152])
+        by smtp.gmail.com with ESMTPSA id h8sm9152292ejj.22.2021.08.24.02.52.12
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 24 Aug 2021 02:52:13 -0700 (PDT)
+Date:   Tue, 24 Aug 2021 11:52:10 +0200
+From:   Stefano Garzarella <sgarzare@redhat.com>
+To:     Arseny Krasnov <arseny.krasnov@kaspersky.com>
+Cc:     Stefan Hajnoczi <stefanha@redhat.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Andra Paraschiv <andraprs@amazon.com>,
+        Norbert Slusarek <nslusarek@gmx.net>,
+        Colin Ian King <colin.king@canonical.com>,
+        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
+        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+        stsp2@yandex.ru, oxffffaa@gmail.co
+Subject: Re: [RFC PATCH v3 1/6] virtio/vsock: rename 'EOR' to 'EOM' bit.
+Message-ID: <20210824095210.z3iwnjmyztys3yja@steredhat>
+References: <20210816085036.4173627-1-arseny.krasnov@kaspersky.com>
+ <20210816085112.4173869-1-arseny.krasnov@kaspersky.com>
 MIME-Version: 1.0
-References: <YRVGY1ZK8wl9ybBH@google.com> <20210813031629.78670-1-jiangshanlai@gmail.com>
-In-Reply-To: <20210813031629.78670-1-jiangshanlai@gmail.com>
-From:   Lai Jiangshan <jiangshanlai@gmail.com>
-Date:   Tue, 24 Aug 2021 16:30:31 +0800
-Message-ID: <CAJhGHyBhx1+HdZ_a43HtMBUApOoVC=MvP-R13XHtycOAtUW7ew@mail.gmail.com>
-Subject: Re: [PATCH V2] KVM: X86: Move PTE present check from loop body to __shadow_walk_next()
-To:     LKML <linux-kernel@vger.kernel.org>
-Cc:     Lai Jiangshan <laijs@linux.alibaba.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        X86 ML <x86@kernel.org>, "H. Peter Anvin" <hpa@zytor.com>,
-        kvm@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <20210816085112.4173869-1-arseny.krasnov@kaspersky.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hello, Paolo
+On Mon, Aug 16, 2021 at 11:51:09AM +0300, Arseny Krasnov wrote:
+>This current implemented bit is used to mark end of messages
+>('EOM' - end of message), not records('EOR' - end of record).
+>Also rename 'record' to 'message' in implementation as it is
+>different things.
+>
+>Signed-off-by: Arseny Krasnov <arseny.krasnov@kaspersky.com>
+>---
+> drivers/vhost/vsock.c                   | 12 ++++++------
+> include/uapi/linux/virtio_vsock.h       |  2 +-
+> net/vmw_vsock/virtio_transport_common.c | 14 +++++++-------
+> 3 files changed, 14 insertions(+), 14 deletions(-)
 
-Could you have a review please.
+Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
 
-Thanks
-Lai
-
-On Fri, Aug 13, 2021 at 9:01 PM Lai Jiangshan <jiangshanlai@gmail.com> wrote:
->
-> From: Lai Jiangshan <laijs@linux.alibaba.com>
->
-> So far, the loop bodies already ensure the PTE is present before calling
-> __shadow_walk_next():  Some loop bodies simply exit with a !PRESENT
-> directly and some other loop bodies, i.e. FNAME(fetch) and __direct_map()
-> do not currently terminate their walks with a !PRESENT, but they get away
-> with it because they install present non-leaf SPTEs in the loop itself.
->
-> But checking pte present in __shadow_walk_next() is a more prudent way of
-> programing and loop bodies will not need to always check it. It allows us
-> removing unneded is_shadow_present_pte() in the loop bodies.
->
-> Terminating on !is_shadow_present_pte() is 100% the correct behavior, as
-> walking past a !PRESENT SPTE would lead to attempting to read a the next
-> level SPTE from a garbage iter->shadow_addr.  Even some paths that do _not_
-> currently have a !is_shadow_present_pte() in the loop body is Ok since
-> they will install present non-leaf SPTEs and the additinal present check
-> is just an NOP.
->
-> The checking result in __shadow_walk_next() will be propagated to
-> shadow_walk_okay() for being used in any for(;;) loop.
->
-> Signed-off-by: Lai Jiangshan <laijs@linux.alibaba.com>
-> ---
-> Changed from V1:
->         Merge the two patches
->         Update changelog
->         Remove !is_shadow_present_pte() in FNAME(invlpg)
->  arch/x86/kvm/mmu/mmu.c         | 13 ++-----------
->  arch/x86/kvm/mmu/paging_tmpl.h |  2 +-
->  2 files changed, 3 insertions(+), 12 deletions(-)
->
-> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> index a272ccbddfa1..42eebba6782e 100644
-> --- a/arch/x86/kvm/mmu/mmu.c
-> +++ b/arch/x86/kvm/mmu/mmu.c
-> @@ -2231,7 +2231,7 @@ static bool shadow_walk_okay(struct kvm_shadow_walk_iterator *iterator)
->  static void __shadow_walk_next(struct kvm_shadow_walk_iterator *iterator,
->                                u64 spte)
->  {
-> -       if (is_last_spte(spte, iterator->level)) {
-> +       if (!is_shadow_present_pte(spte) || is_last_spte(spte, iterator->level)) {
->                 iterator->level = 0;
->                 return;
->         }
-> @@ -3152,9 +3152,6 @@ static u64 *fast_pf_get_last_sptep(struct kvm_vcpu *vcpu, gpa_t gpa, u64 *spte)
->         for_each_shadow_entry_lockless(vcpu, gpa, iterator, old_spte) {
->                 sptep = iterator.sptep;
->                 *spte = old_spte;
-> -
-> -               if (!is_shadow_present_pte(old_spte))
-> -                       break;
->         }
->
->         return sptep;
-> @@ -3694,9 +3691,6 @@ static int get_walk(struct kvm_vcpu *vcpu, u64 addr, u64 *sptes, int *root_level
->                 spte = mmu_spte_get_lockless(iterator.sptep);
->
->                 sptes[leaf] = spte;
-> -
-> -               if (!is_shadow_present_pte(spte))
-> -                       break;
->         }
->
->         return leaf;
-> @@ -3811,11 +3805,8 @@ static void shadow_page_table_clear_flood(struct kvm_vcpu *vcpu, gva_t addr)
->         u64 spte;
->
->         walk_shadow_page_lockless_begin(vcpu);
-> -       for_each_shadow_entry_lockless(vcpu, addr, iterator, spte) {
-> +       for_each_shadow_entry_lockless(vcpu, addr, iterator, spte)
->                 clear_sp_write_flooding_count(iterator.sptep);
-> -               if (!is_shadow_present_pte(spte))
-> -                       break;
-> -       }
->         walk_shadow_page_lockless_end(vcpu);
->  }
->
-> diff --git a/arch/x86/kvm/mmu/paging_tmpl.h b/arch/x86/kvm/mmu/paging_tmpl.h
-> index f70afecbf3a2..13138b03cc69 100644
-> --- a/arch/x86/kvm/mmu/paging_tmpl.h
-> +++ b/arch/x86/kvm/mmu/paging_tmpl.h
-> @@ -977,7 +977,7 @@ static void FNAME(invlpg)(struct kvm_vcpu *vcpu, gva_t gva, hpa_t root_hpa)
->                         FNAME(update_pte)(vcpu, sp, sptep, &gpte);
->                 }
->
-> -               if (!is_shadow_present_pte(*sptep) || !sp->unsync_children)
-> +               if (!sp->unsync_children)
->                         break;
->         }
->         write_unlock(&vcpu->kvm->mmu_lock);
-> --
-> 2.19.1.6.gb485710b
->
