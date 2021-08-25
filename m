@@ -2,189 +2,114 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3A3A13F7823
-	for <lists+kvm@lfdr.de>; Wed, 25 Aug 2021 17:18:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8484E3F781F
+	for <lists+kvm@lfdr.de>; Wed, 25 Aug 2021 17:18:49 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241518AbhHYPTk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 25 Aug 2021 11:19:40 -0400
-Received: from mail-co1nam11on2043.outbound.protection.outlook.com ([40.107.220.43]:35726
-        "EHLO NAM11-CO1-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S240918AbhHYPTf (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 25 Aug 2021 11:19:35 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=MI9zaJqctj9DT/XvrDbFMDbJUXrY16+MkmFZHVW6hx137nC0mJpd8Z6mYI0Ti1kB4L1REY5N5/Taja9vkRJMFrqNRp25i7lN1tB098AHoc0FTQiKU4aOhDDwEQ2zDlsaiZCbjPti02F2SPoETSQ7YEohVSXJKlxqvXstECfOwA+l6nJUJ6hrJ0ZHihoXj2dKRgej8Xk/Hl3WcRlykzSRnr16K2V8egiAJTeTPIy8Xnslu8LZ831fbS0NpmsCxFuYKp0wr56rIUo8CQ58ZL390wMc3ZPPAMiuYCEsp3lIj2QkMBx4p+8HsOR1XGUW+MKfRd56gKGi0SxV81K40cxsCA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=3sZKvX4kWKcQ6r52UHNwDUGtvKa+ygMYOy/WhDv2Fh4=;
- b=XVhd5UDYqlc81BoSDrLc9SAYTQpSJQYv8zu7i6XvT0CG9oONPomcpGJfKBXSQPpwF5aMF7FgVAwUoO3BMipAgTTR/OSpTSmVLUm8QEs9ZvpNCy3mMoBB+X/9k1HzMzN/Q6ToG6qszX4KlXT7CJXthYLy34Ue2QVnTIru5NHZvs3PG9lIdzIGE2R3vvigSqg9+YITRwU+kZMxDgUZYV/AaL2M1MilSGCkHca/xdq3eiwiewmZU8c4Sw9p1TlH+sVf2Wf0Yww8ukjI8Y3VjOpka0vJE8AwqVuxeVGpWs7OfVWSGwPkCZ+YfDS6ybAbo8Af7EsSM9C3EXfzunlxPrFzgA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=3sZKvX4kWKcQ6r52UHNwDUGtvKa+ygMYOy/WhDv2Fh4=;
- b=UQdkKHQwgWmT6Mh4vXxK//9qnMpunzWHlgDnsHlRH8l8teFlvcQxSeSWovjv6kWtwUDp0aCd/C6ggz5owwOvq/H7Rv5X1PqQtDPU2rhCe2ednMU2mH1o3Lp6tr+A7d0zKYKzvQVZTZaVi2qA9w8ad6rb4NkgF1EIqGBBYp1OzyQ=
-Authentication-Results: alien8.de; dkim=none (message not signed)
- header.d=none;alien8.de; dmarc=none action=none header.from=amd.com;
-Received: from CH2PR12MB4133.namprd12.prod.outlook.com (2603:10b6:610:7a::13)
- by CH2PR12MB3878.namprd12.prod.outlook.com (2603:10b6:610:2a::21) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4436.19; Wed, 25 Aug
- 2021 15:18:46 +0000
-Received: from CH2PR12MB4133.namprd12.prod.outlook.com
- ([fe80::d19e:b657:5259:24d0]) by CH2PR12MB4133.namprd12.prod.outlook.com
- ([fe80::d19e:b657:5259:24d0%8]) with mapi id 15.20.4436.019; Wed, 25 Aug 2021
- 15:18:46 +0000
-Date:   Wed, 25 Aug 2021 10:18:35 -0500
-From:   Michael Roth <michael.roth@amd.com>
-To:     Borislav Petkov <bp@alien8.de>
-Cc:     Brijesh Singh <brijesh.singh@amd.com>, x86@kernel.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
-        linux-coco@lists.linux.dev, linux-mm@kvack.org,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
+        id S241457AbhHYPTd (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 25 Aug 2021 11:19:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52600 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S237968AbhHYPTc (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 25 Aug 2021 11:19:32 -0400
+Received: from mail-pg1-x52f.google.com (mail-pg1-x52f.google.com [IPv6:2607:f8b0:4864:20::52f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 428B6C061757
+        for <kvm@vger.kernel.org>; Wed, 25 Aug 2021 08:18:47 -0700 (PDT)
+Received: by mail-pg1-x52f.google.com with SMTP id e7so58108pgk.2
+        for <kvm@vger.kernel.org>; Wed, 25 Aug 2021 08:18:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=XF1x8B/ZG+F34bQ5051hv3MrWVrItt8QQmW8Vc8uix8=;
+        b=NzpAD+6a7NO6y8+3tcRH6gm+u56SAvRDBjAOIh8Fx6VgBbSWJRlzzIC/1CYBfRDWkz
+         L0EBsf5sV+zs8RXVEZQvGjka9VIRhZZRAP31Et8lmWdV2VMawSdEl181drDeIhKMc7iG
+         zeO7bhzgyzKfpTW8MO9Zwdjbd0xYvn2yI5JIwKLPyJK/pEKmZ6arbQFaHcza/3fT+YA/
+         DuCMIZqRhDaU4sMLNMLg0KlMYki195HD9qtZ8F//KRB5mVNCc9MZ81wv8LriIVL0/ghT
+         AozVt7i1NX2untQ1Jk8LFAkDnO3kRS3+P5Tg2habkcmyPu4tKyrxTFwJXg2ABBrA5qxk
+         e5lw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=XF1x8B/ZG+F34bQ5051hv3MrWVrItt8QQmW8Vc8uix8=;
+        b=DuQ1NKyqXVQ9Xj69mbUyhPU605WNHw5XP82YvHvMsMhm3UlkInVaoMm99B1JFtl3rb
+         9WSVMF/cZV4vZIVJM/t1yumCAh2KNxzuWKBaTXPruMd5ZYtMVKFW9EBbnWp5tIo1yNG5
+         Hs7ZgESUv2cvGwLVMAPiDkBjD05/f2jCwFIGF5Y0MS/VIfmcl1pgP6E3sWuiWTdfe/Gb
+         B1ju3S422bMM+waOyRTRnJWbqd2y0vbWTNL9hMSN3lsgQwwmo0kqV6OzDHPblsq2dz52
+         yRsGob6yJ8WhGZpWTCHp+UiEWscv9ou71oe22LDhPQ7HiurITgN/ByDVOFwOysFKbIAx
+         K/cQ==
+X-Gm-Message-State: AOAM530r9wg48kL5BmPe/iDBJJRWlFBLAtGtN5Br1kA5lITV6GpDduHe
+        rNOXTYlcGkkhAPe53jcR6XmYdA==
+X-Google-Smtp-Source: ABdhPJwFscpynT8cC50el9VfgECR2sNqwfJbOc3s01idcQI7wYJQHzIUtihpQepaA+F7ckmzeWHfGg==
+X-Received: by 2002:a63:411:: with SMTP id 17mr33488845pge.335.1629904726625;
+        Wed, 25 Aug 2021 08:18:46 -0700 (PDT)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id 23sm289495pgk.89.2021.08.25.08.18.45
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 25 Aug 2021 08:18:46 -0700 (PDT)
+Date:   Wed, 25 Aug 2021 15:18:42 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Lai Jiangshan <jiangshanlai@gmail.com>
+Cc:     linux-kernel@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+        Lai Jiangshan <laijs@linux.alibaba.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
-        David Rientjes <rientjes@google.com>,
-        Dov Murik <dovmurik@linux.ibm.com>,
-        Tobin Feldman-Fitzthum <tobin@ibm.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        "Kirill A . Shutemov" <kirill@shutemov.name>,
-        Andi Kleen <ak@linux.intel.com>, tony.luck@intel.com,
-        marcorr@google.com, sathyanarayanan.kuppuswamy@linux.intel.com
-Subject: Re: [PATCH Part1 v5 23/38] x86/head/64: set up a startup %gs for
- stack protector
-Message-ID: <20210825151835.wzgabnl7rbrge3a2@amd.com>
-References: <20210820151933.22401-1-brijesh.singh@amd.com>
- <20210820151933.22401-24-brijesh.singh@amd.com>
- <YSZTubkROktMMSba@zn.tnic>
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
+        kvm@vger.kernel.org
+Subject: Re: [PATCH 7/7] KVM: X86: Also prefetch the last range in
+ __direct_pte_prefetch().
+Message-ID: <YSZfUqPuhENCDa9z@google.com>
+References: <20210824075524.3354-1-jiangshanlai@gmail.com>
+ <20210824075524.3354-8-jiangshanlai@gmail.com>
+MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <YSZTubkROktMMSba@zn.tnic>
-X-ClientProxiedBy: SA0PR11CA0163.namprd11.prod.outlook.com
- (2603:10b6:806:1bb::18) To CH2PR12MB4133.namprd12.prod.outlook.com
- (2603:10b6:610:7a::13)
-MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from localhost (76.251.165.188) by SA0PR11CA0163.namprd11.prod.outlook.com (2603:10b6:806:1bb::18) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4436.19 via Frontend Transport; Wed, 25 Aug 2021 15:18:45 +0000
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 4fb37a8a-e7d9-407f-3799-08d967dba1b2
-X-MS-TrafficTypeDiagnostic: CH2PR12MB3878:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <CH2PR12MB3878FE20D7FA4C675F6CF6B595C69@CH2PR12MB3878.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:8273;
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: /Hyw+i4c5KbcugAWvKk3Q+40yq852DLKoZk+2jxLbxLdfJnTKGwgL3wehYwNC+F8qtB9t6XiRuFMJCTUB5J5nQmKIJ49y9S3CrjThEZNXHtMSva78GTUXUejiSpZOeU1Cq5fQ4iCCrWntPKUeokJphNHtJmIIrLr6ndLefS/gRpDiEiuJ024Q0jtL5MH+0D43xijye7DPgcmVCSEv/UbsIGP9W8xM4n2Ss8eDaZSiQJuAYjeV29RlgvhooCBfs5Q6+HqGp3Yrn2MsINU9QokzwsmmdVPS95YzbN5tu1gKNa51LZ2eRtDGVHL6Jzca50Yc1emDam1iowQsTiC2JrIhtMmIY0p1CoJgYvfNo/NoUTTjVSLM5IFJciwHQ8HO9SqJ9nk+tYDua6tQUhqAf0c6z86rgi5JuPrKasObpVn3MDAXdohszT0ojBPSCfV5daiP9xF97qO+BrCBOvzQ8shmTJEnx0OZ1MME2uQpdt0J6Cqw7a276ZKFRm2wvXM17RmEcR116cDkFvpwr0WujP3RkDs4AFmcVPVyaeoaEg9bc4LDKlnk2M9oj/I7aQJz60IisaL9eao6z4F5B/wVQr9HQ4F3gIAjvp04AQhQgMN+EyJLkEbnxg8lZZE5ST/VDJRaDEV5pIGJbr+zj8GYD+pYiz40B6wI03F/Yrm6zFsT9loo7Pr2rpfDFkYMva1Zw/x
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH2PR12MB4133.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(396003)(39860400002)(376002)(136003)(346002)(366004)(2616005)(66556008)(2906002)(4326008)(6916009)(44832011)(956004)(83380400001)(36756003)(6486002)(66946007)(66476007)(86362001)(6666004)(54906003)(316002)(26005)(5660300002)(8936002)(1076003)(52116002)(38100700002)(38350700002)(6496006)(8676002)(478600001)(186003)(7416002)(7406005);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?Fr1ohqs5z2Qzy04libSMiGmzF+rqBzYDLvRdwQg3objTtRnjGCz0vuDnI+LO?=
- =?us-ascii?Q?AZxS1MEBDmh6tKDj/IzgGRhvf9HL05fofsrzyykofdYw7fQmY6MIU/ei1+I2?=
- =?us-ascii?Q?Ro7c5QlgwKrBtwmo/3boYCJ32u4Dee3aSToKI5z6AyBNXe5IrnynNXGmCL+n?=
- =?us-ascii?Q?j/FJ5vQG5msnJ4aCsCGaTuqf6yP0QS9o+URSDuC3UTYrcaTfLCsdJVuvs9W2?=
- =?us-ascii?Q?wF1xUki7u2fowlPF5UW8g/ffmoQWEksq3xn8ySBJnES/cRbFt2rDgKfGTbno?=
- =?us-ascii?Q?iG/3OLIVZCg3KypyaDD2jGyygi3NJ2j6Tv7tICyuTJpgQMhLy9/YrduAYEnu?=
- =?us-ascii?Q?K59KjWN1qvMBJLlpWP7d3ZWFJa8roWuytuKvzyHnyDZVAzmxzXo3JpJ7pBYs?=
- =?us-ascii?Q?8sgBRtLuivX8GSwg4PxVY7sigdT7UdtbY1lTO6cob3hCHIgW8WOnN0dy0O4p?=
- =?us-ascii?Q?F0CafVz+jnIVsVJz5QoTsLZzAHD+oz2Fy2hU6M51YP7i0MZSWqDHYfFrsuTo?=
- =?us-ascii?Q?6+6hFATlaoGrU38h0YjvCOhOoW7gK7KSSOpa71tP0lZ5ydj2xQcFiJHZsOAK?=
- =?us-ascii?Q?k717T6qjpH+sY6ObSES1bXcj0honWGPJWG8jZPQH093J1wGU2q5drKwr2AFK?=
- =?us-ascii?Q?b2fcX6uxEC5+aqJSx13Ncnf+bS0KJlP4tljBLo7F8OKRWu4jr9TRW34zZoQF?=
- =?us-ascii?Q?SLE8Mjc312FBhktj1tyHYo/uWkuirvasWBQMvCv2melhuOHTTubfOmsMfaUh?=
- =?us-ascii?Q?qBjt1X4/LnXZbQUPvS9YHfG08QKmDCMNI+Y4pUTqeKqQdzYOnUYPkJJVczLI?=
- =?us-ascii?Q?a9l5nXTS50rOejkGj0z9l3DEpa16S6GcuSXktAg9FWbcyWnaMnB6bd8/n1kP?=
- =?us-ascii?Q?oqktgpVde+3M2HO5b2WDrPBQcl8ki/k5zCzV42PPz5UbugWwNiaUbshUZZbz?=
- =?us-ascii?Q?/Xlg+oqR9CH57Y8CbV7kEqp8n3v58K+9opVe70dEKnYs2ekpx+ME8ZyKgEYe?=
- =?us-ascii?Q?uPOd6A3xcq1yqjU3TjsK02K+uq1cFSt09+4sgh39vW9HXFJXSkHUJ6vIvYN2?=
- =?us-ascii?Q?FQgFfRmsbIH1SGwJMFtrr79jGD+sMsah9OMMX8Wl7hkES8lh5IsbcsSwjpOx?=
- =?us-ascii?Q?JMRhX19fYm/r4l6uME+kHIReLuVuPyqtAKYBxT1cHIuXMIw+MbwdFXkEqi/E?=
- =?us-ascii?Q?UyvA81qTgMJ3Hym1F7HlrAElwKOVH16j0d0DmD9zrYyLFBZw7oUzU8MbKxRw?=
- =?us-ascii?Q?C/HyB5jNItbeyxE7vL2V+W9q4xEUtokhGqs/IpWh/5tMI5takIwROz5x8O8H?=
- =?us-ascii?Q?5+pEbq6NsS7uXupwnHF5/jRz?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 4fb37a8a-e7d9-407f-3799-08d967dba1b2
-X-MS-Exchange-CrossTenant-AuthSource: CH2PR12MB4133.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Aug 2021 15:18:46.0216
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: ojff3LW/fTu8/eZW+JAIFFbDFJ87oksWvi1ATRy835GWHAC516GymBhSG9wlobGKdZBQupu3978/eJNNvMaOlQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH2PR12MB3878
+In-Reply-To: <20210824075524.3354-8-jiangshanlai@gmail.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Aug 25, 2021 at 04:29:13PM +0200, Borislav Petkov wrote:
-> On Fri, Aug 20, 2021 at 10:19:18AM -0500, Brijesh Singh wrote:
-> > From: Michael Roth <michael.roth@amd.com>
-> > 
-> > As of commit 103a4908ad4d ("x86/head/64: Disable stack protection for
-> > head$(BITS).o") kernel/head64.c is compiled with -fno-stack-protector
-> > to allow a call to set_bringup_idt_handler(), which would otherwise
-> > have stack protection enabled with CONFIG_STACKPROTECTOR_STRONG. While
-> > sufficient for that case, this will still cause issues if we attempt to
-> > call out to any external functions that were compiled with stack
-> > protection enabled that in-turn make stack-protected calls, or if the
-> > exception handlers set up by set_bringup_idt_handler() make calls to
-> > stack-protected functions.
-> > 
-> > Subsequent patches for SEV-SNP CPUID validation support will introduce
-> > both such cases. Attempting to disable stack protection for everything
-> > in scope to address that is prohibitive since much of the code, like
-> > SEV-ES #VC handler, is shared code that remains in use after boot and
-> > could benefit from having stack protection enabled. Attempting to inline
-> > calls is brittle and can quickly balloon out to library/helper code
-> > where that's not really an option.
-> > 
-> > Instead, set up %gs to point a buffer that stack protector can use for
-> > canary values when needed.
-> > 
-> > In doing so, it's likely we can stop using -no-stack-protector for
-> > head64.c, but that hasn't been tested yet, and head32.c would need a
-> > similar solution to be safe, so that is left as a potential follow-up.
+On Tue, Aug 24, 2021, Lai Jiangshan wrote:
+> From: Lai Jiangshan <laijs@linux.alibaba.com>
 > 
-> That...
-
-Argh! I had this fixed up but I think it got clobbered in the patch
-shuffle. I'll make sure to fix this, and remember to actually test
-without CONFIG_STACKPTROTECTOR this time. Sorry for the screw-up.
-
+> __direct_pte_prefetch() skips prefetching the last range.
 > 
-> > Signed-off-by: Michael Roth <michael.roth@amd.com>
-> > Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
-> > ---
-> >  arch/x86/kernel/Makefile |  2 +-
-> >  arch/x86/kernel/head64.c | 20 ++++++++++++++++++++
-> >  2 files changed, 21 insertions(+), 1 deletion(-)
-> > 
-> > diff --git a/arch/x86/kernel/Makefile b/arch/x86/kernel/Makefile
-> > index 3e625c61f008..5abdfd0dbbc3 100644
-> > --- a/arch/x86/kernel/Makefile
-> > +++ b/arch/x86/kernel/Makefile
-> > @@ -46,7 +46,7 @@ endif
-> >  # non-deterministic coverage.
-> >  KCOV_INSTRUMENT		:= n
-> >  
-> > -CFLAGS_head$(BITS).o	+= -fno-stack-protector
-> > +CFLAGS_head32.o		+= -fno-stack-protector
+> The last range are often the whole range after the faulted spte when
+> guest is touching huge-page-mapped(in guest view) memory forwardly
+> which means prefetching them can reduce pagefault.
 > 
-> ... and that needs to be taken care of too.
+> Signed-off-by: Lai Jiangshan <laijs@linux.alibaba.com>
+> ---
+>  arch/x86/kvm/mmu/mmu.c | 5 +++--
+>  1 file changed, 3 insertions(+), 2 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> index e5932af6f11c..ac260e01e9d8 100644
+> --- a/arch/x86/kvm/mmu/mmu.c
+> +++ b/arch/x86/kvm/mmu/mmu.c
+> @@ -2847,8 +2847,9 @@ static void __direct_pte_prefetch(struct kvm_vcpu *vcpu,
+>  	i = (sptep - sp->spt) & ~(PTE_PREFETCH_NUM - 1);
+>  	spte = sp->spt + i;
+>  
+> -	for (i = 0; i < PTE_PREFETCH_NUM; i++, spte++) {
+> -		if (is_shadow_present_pte(*spte) || spte == sptep) {
+> +	for (i = 0; i <= PTE_PREFETCH_NUM; i++, spte++) {
+> +		if (i == PTE_PREFETCH_NUM ||
+> +		    is_shadow_present_pte(*spte) || spte == sptep) {
 
-I didn't realize the the 32-bit path was something you were suggesting
-to have added in this patch, but I'll take a look at that as well.
+Heh, I posted a fix just a few days ago.  I prefer having a separate call after
+the loop.  The "<= PTE_PREFETCH_NUM" is subtle, and a check at the ends avoids
+a CMP+Jcc in the loop, though I highly doubt that actually affects performance.
+
+https://lkml.kernel.org/r/20210818235615.2047588-1-seanjc@google.com
+
+>  			if (!start)
+>  				continue;
+>  			if (direct_pte_prefetch_many(vcpu, sp, start, spte) < 0)
+> -- 
+> 2.19.1.6.gb485710b
+> 
