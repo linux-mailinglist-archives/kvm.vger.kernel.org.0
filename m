@@ -2,116 +2,173 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C8AB63F6EE2
-	for <lists+kvm@lfdr.de>; Wed, 25 Aug 2021 07:37:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id AF5443F6F28
+	for <lists+kvm@lfdr.de>; Wed, 25 Aug 2021 08:08:34 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232776AbhHYFiR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 25 Aug 2021 01:38:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58326 "EHLO
+        id S238079AbhHYGJM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 25 Aug 2021 02:09:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37054 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232571AbhHYFiJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 25 Aug 2021 01:38:09 -0400
-Received: from mail-ed1-x531.google.com (mail-ed1-x531.google.com [IPv6:2a00:1450:4864:20::531])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A7303C0613D9
-        for <kvm@vger.kernel.org>; Tue, 24 Aug 2021 22:37:22 -0700 (PDT)
-Received: by mail-ed1-x531.google.com with SMTP id d6so35227997edt.7
-        for <kvm@vger.kernel.org>; Tue, 24 Aug 2021 22:37:22 -0700 (PDT)
+        with ESMTP id S232442AbhHYGJK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 25 Aug 2021 02:09:10 -0400
+Received: from mail-pg1-x530.google.com (mail-pg1-x530.google.com [IPv6:2607:f8b0:4864:20::530])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0CC84C061757;
+        Tue, 24 Aug 2021 23:08:24 -0700 (PDT)
+Received: by mail-pg1-x530.google.com with SMTP id e7so22034571pgk.2;
+        Tue, 24 Aug 2021 23:08:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance-com.20150623.gappssmtp.com; s=20150623;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=3yeuD/AKt6duI6f+LLwvmXj5/7qzqoMz+rmo5sVDYrk=;
-        b=Vp7EsjbsKk4CbMZuzoUYLzrpydiTBr1zHF+HyG9J/wtoW8bsVHI746U+1hvWAKn7pY
-         S2KGD1hdXhYpvRVmdQ6WR1fQxGII47CoeOMGBaYQ/Mi4TolUM5hV7u25ftgsXF0RWGh/
-         oyRF1xadCZb6aP6wOK20F7wxGFstAZ7BuyRbsRE+aDrQ7ch+4LllkUaJdROcaj8x+KAj
-         ZOy85WB4jyz34slTJHHU6QuKku6j+KC19AfzueBsMNFAdKQmlECIKMC6wJ+DZ7prxUj4
-         ddL12p3dIBF+Z7rYjgciVlV8upMbYsRSCOxkj2pFlsJcMFqU9/31/TAQO6ln7+ZPJcon
-         AYgw==
+        d=gmail.com; s=20161025;
+        h=to:cc:references:from:organization:subject:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=wIZlsjM71KEU8VEYx3CYCCiwZOwOrPf1v6bA8/dbf1M=;
+        b=poIPxVJMp1vIk+6ctNkoP6Yf4Z/gg8JU/Ef81md8mUQMac8TNjT6k5wGcXgLp9vxsn
+         700A7wKIpHG0LrL5H0+f/ZTG6QYyOPJRbj/Pd2uc5D6L/vkf5Ow/7vReZB7GBrv1T8BI
+         0u908fKeOEI0gqx3ecC/XtxoDDn3OCYcyKhX+biYEgFYKCu48TkwtkrL49+SrgbpmryS
+         SkjxPS2CkSqPRW06zqtLede1qq6PgjdEfcR5fUe33/ojSCW4vEjqXrVbptQyDer3gVWE
+         xHnEkMh8NXbHKxQEgJmaiqeSEEccEx1UG3hw09WMgT4d0xJM7D7vMVJz5xyIoEcMvdXH
+         3KXg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=3yeuD/AKt6duI6f+LLwvmXj5/7qzqoMz+rmo5sVDYrk=;
-        b=PzWlwC2MLKaGxI1wvgiF4Q3oE8CSzYGRTcNoJ0u1sRvjtqjoNkK+QyPel8Olmit9dY
-         vXIeiR9dOoXQDdSv4FYuERf9dTVYdayjajJRtO/xQwAbPtFtrfsUjibI0JNhdJNZt/Ef
-         tUy91MsxJakuaj4aCzDfmQ7lYF3TQXBr9FXWSqQtTrw75xz1q1Q9O1rTygUjQAJhMAk8
-         OgRO+Fis5ng2lDST83H0njjlvTXU3tofH7J1SxG2zR21KnQBqZy2m1xlSup8EuuhTxHk
-         zDeQmrqx98Yz8MyOPKLI3mLLehueuUR4A0scZS72+bWEXxuj9OLrhkpi0SkgfkhlriAM
-         PA5Q==
-X-Gm-Message-State: AOAM531UbYt/+qkJfyTQkfmA4UHDVFAuqOvtO7i68hpvskPiMG1MHEbJ
-        Kl4LJ91kJfin1iCAIB3Yv9bA2kMCW4/7gS87kpwn
-X-Google-Smtp-Source: ABdhPJyZTxYAJpwJ1zytuFP4isC6BozsaW7fwdKwUj6HuqFf6QhFlF2KyJtLZvCBCv/uMpGPvMvKn/tLFmS1aI89w14=
-X-Received: by 2002:a50:fd86:: with SMTP id o6mr6104183edt.312.1629869841320;
- Tue, 24 Aug 2021 22:37:21 -0700 (PDT)
+        h=x-gm-message-state:to:cc:references:from:organization:subject
+         :message-id:date:user-agent:mime-version:in-reply-to
+         :content-language:content-transfer-encoding;
+        bh=wIZlsjM71KEU8VEYx3CYCCiwZOwOrPf1v6bA8/dbf1M=;
+        b=R5TqJwxbXaRA0GOo3/JvXrH9hIr7WhK+bNvxlR/5Rge3qQFoLvEhP05J66eBgWH6Be
+         4pEEOnBRoDia+hddnMOGLih0xy69roLWKG/GArk88eMzHy0EOAy13rdlUY/dvCYQLBnB
+         viGb/yuiJcQCq83AdzLf0QabGgQQ/ZseoL1Yx5gPe4ZUN++e8hBVq4FjnqQhKtbrRKzT
+         gLS0ednFxFLdT5imofgHsFz1Ccxqnggn0r5kgDTAfpg817YxLUv7i5ZQ9q7lkJ36JOqy
+         YuSyERbzYyMfFwdKZouQHFPBJFO+Sq92cZrvq/nLBr0Z4i4IY7w8/bRGdFKiOtHObZ7P
+         oA+g==
+X-Gm-Message-State: AOAM5328FXC2Rj8h6HO9r1MfLaR+CaORwtNfw2YlAp/GNg4UzdlQ4R9W
+        rkf5/Ss/NppRlLj4GaXXeXw=
+X-Google-Smtp-Source: ABdhPJzd9YoztbUBqgaGrFSlp1hqXpvsm5D/4Z3VRoDCdRxO6wM6ON41FlmkMEvWBZe3mItrmU/Png==
+X-Received: by 2002:a05:6a00:1989:b0:3e2:a387:e1d9 with SMTP id d9-20020a056a00198900b003e2a387e1d9mr40845804pfl.64.1629871703520;
+        Tue, 24 Aug 2021 23:08:23 -0700 (PDT)
+Received: from Likes-MacBook-Pro.local ([103.7.29.32])
+        by smtp.gmail.com with ESMTPSA id u24sm22298098pfm.81.2021.08.24.23.08.20
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 24 Aug 2021 23:08:23 -0700 (PDT)
+To:     Xiaoyao Li <xiaoyao.li@intel.com>
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+        "Alexander Shishkin (hwtracing + intel_th + stm + R:perf)" 
+        <alexander.shishkin@linux.intel.com>
+References: <20210824110743.531127-1-xiaoyao.li@intel.com>
+ <20210824110743.531127-4-xiaoyao.li@intel.com>
+ <711265db-f634-36ac-40d2-c09cea825df6@gmail.com>
+ <b80a91db-cb35-ba6d-ab36-a0fa1ca051e7@intel.com>
+From:   Like Xu <like.xu.linux@gmail.com>
+Organization: Tencent
+Subject: Re: [PATCH 3/5] KVM: VMX: RTIT_CTL_BRANCH_EN has no dependency on
+ other CPUID bit
+Message-ID: <6dddf3c0-fa8f-f70c-bd5d-b43c7140ed9a@gmail.com>
+Date:   Wed, 25 Aug 2021 14:08:14 +0800
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0)
+ Gecko/20100101 Thunderbird/78.13.0
 MIME-Version: 1.0
-References: <20210818120642.165-1-xieyongji@bytedance.com> <20210818120642.165-12-xieyongji@bytedance.com>
- <20210824140945-mutt-send-email-mst@kernel.org>
-In-Reply-To: <20210824140945-mutt-send-email-mst@kernel.org>
-From:   Yongji Xie <xieyongji@bytedance.com>
-Date:   Wed, 25 Aug 2021 13:37:10 +0800
-Message-ID: <CACycT3s0Pp+LOD2h_vocPUMEqMhYioJmRPFYGL=Su-eL2p2O3w@mail.gmail.com>
-Subject: Re: [PATCH v11 11/12] vduse: Introduce VDUSE - vDPA Device in Userspace
-To:     "Michael S. Tsirkin" <mst@redhat.com>
-Cc:     Jason Wang <jasowang@redhat.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Stefano Garzarella <sgarzare@redhat.com>,
-        Parav Pandit <parav@nvidia.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Christian Brauner <christian.brauner@canonical.com>,
-        Randy Dunlap <rdunlap@infradead.org>,
-        Matthew Wilcox <willy@infradead.org>,
-        Al Viro <viro@zeniv.linux.org.uk>,
-        Jens Axboe <axboe@kernel.dk>, bcrl@kvack.org,
-        Jonathan Corbet <corbet@lwn.net>,
-        =?UTF-8?Q?Mika_Penttil=C3=A4?= <mika.penttila@nextfour.com>,
-        Dan Carpenter <dan.carpenter@oracle.com>, joro@8bytes.org,
-        Greg KH <gregkh@linuxfoundation.org>,
-        He Zhe <zhe.he@windriver.com>,
-        Liu Xiaodong <xiaodong.liu@intel.com>,
-        Joe Perches <joe@perches.com>,
-        Robin Murphy <robin.murphy@arm.com>, songmuchun@bytedance.com,
-        virtualization <virtualization@lists.linux-foundation.org>,
-        netdev@vger.kernel.org, kvm <kvm@vger.kernel.org>,
-        linux-fsdevel@vger.kernel.org, iommu@lists.linux-foundation.org,
-        linux-kernel <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <b80a91db-cb35-ba6d-ab36-a0fa1ca051e7@intel.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Aug 25, 2021 at 2:10 AM Michael S. Tsirkin <mst@redhat.com> wrote:
->
-> On Wed, Aug 18, 2021 at 08:06:41PM +0800, Xie Yongji wrote:
-> > This VDUSE driver enables implementing software-emulated vDPA
-> > devices in userspace. The vDPA device is created by
-> > ioctl(VDUSE_CREATE_DEV) on /dev/vduse/control. Then a char device
-> > interface (/dev/vduse/$NAME) is exported to userspace for device
-> > emulation.
-> >
-> > In order to make the device emulation more secure, the device's
-> > control path is handled in kernel. A message mechnism is introduced
-> > to forward some dataplane related control messages to userspace.
-> >
-> > And in the data path, the DMA buffer will be mapped into userspace
-> > address space through different ways depending on the vDPA bus to
-> > which the vDPA device is attached. In virtio-vdpa case, the MMU-based
-> > software IOTLB is used to achieve that. And in vhost-vdpa case, the
-> > DMA buffer is reside in a userspace memory region which can be shared
-> > to the VDUSE userspace processs via transferring the shmfd.
-> >
-> > For more details on VDUSE design and usage, please see the follow-on
-> > Documentation commit.
-> >
-> > Signed-off-by: Xie Yongji <xieyongji@bytedance.com>
->
-> Build bot seems unhappy with this patch.
->
+On 25/8/2021 12:19 pm, Xiaoyao Li wrote:
+> On 8/25/2021 11:30 AM, Like Xu wrote:
+>> +Alexander
+>>
+>> On 24/8/2021 7:07 pm, Xiaoyao Li wrote:
+>>> Per Intel SDM, RTIT_CTL_BRANCH_EN bit has no dependency on any CPUID
+>>> leaf 0x14.
+>>>
+>>> Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
+>>> ---
+>>>   arch/x86/kvm/vmx/vmx.c | 8 ++++----
+>>>   1 file changed, 4 insertions(+), 4 deletions(-)
+>>>
+>>> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+>>> index 7ed96c460661..4a70a6d2f442 100644
+>>> --- a/arch/x86/kvm/vmx/vmx.c
+>>> +++ b/arch/x86/kvm/vmx/vmx.c
+>>> @@ -7116,7 +7116,8 @@ static void update_intel_pt_cfg(struct kvm_vcpu *vcpu)
+>>>       /* Initialize and clear the no dependency bits */
+>>>       vmx->pt_desc.ctl_bitmask = ~(RTIT_CTL_TRACEEN | RTIT_CTL_OS |
+>>> -            RTIT_CTL_USR | RTIT_CTL_TSC_EN | RTIT_CTL_DISRETC);
+>>> +            RTIT_CTL_USR | RTIT_CTL_TSC_EN | RTIT_CTL_DISRETC |
+>>> +            RTIT_CTL_BRANCH_EN);
+>>>       /*
+>>>        * If CPUID.(EAX=14H,ECX=0):EBX[0]=1 CR3Filter can be set otherwise
+>>> @@ -7134,12 +7135,11 @@ static void update_intel_pt_cfg(struct kvm_vcpu *vcpu)
+>>>                   RTIT_CTL_CYC_THRESH | RTIT_CTL_PSB_FREQ);
+>>>       /*
+>>> -     * If CPUID.(EAX=14H,ECX=0):EBX[3]=1 MTCEn BranchEn and
+>>> -     * MTCFreq can be set
+>>> +     * If CPUID.(EAX=14H,ECX=0):EBX[3]=1 MTCEn and MTCFreq can be set
+>>
+>> If CPUID.(EAX=14H,ECX=0):EBX[3]=1,
+>>
+>>      "indicates support of MTC timing packet and suppression of COFI-based 
+>> packets."
+> 
+> I think it's a mistake of SDM in CPUID instruction.
+> 
+> If you read 31.3.1, table 31-11 of SDM 325462-075US,
+> 
+> It just says CPUID(0x14, 0):EBX[3]: MTC supprted.
+> It doesn't talk anything about COFI packets suppression.
+> 
+> Further as below.
+> 
+>> Per 31.2.5.4 Branch Enable (BranchEn),
+>>
+>>      "If BranchEn is not set, then relevant COFI packets (TNT, TIP*, FUP, 
+>> MODE.*) are suppressed."
+>>
+>> I think if the COFI capability is suppressed, the software can't set the 
+>> BranchEn bit, right ?
+> 
+> Based on your understanding, isn't it that
+> 
+> 1. if CPUID.(EAX=14H,ECX=0):EBX[3]=0, it doesn't support "suppression of 
+> COFI-based packets".
+> 2. if it doesn't support "suppression of COFI-based packets", then it doens't 
+> support "If BranchEn is not set, then relevant COFI packets (TNT, TIP*, FUP, 
+> MODE.*) are suppressed", i.e. BranchEn must be 1.
 
-Yes, this is because the series relies on the unmerged patch:
+That's it.
 
-https://lore.kernel.org/lkml/20210705071910.31965-1-jasowang@redhat.com/
+> 
+> Anyway, I think it's just a mistake on CPUID instruction document of SDM.
 
-Do I need to remove this dependency in the next version?
+Is this an ambiguity rather than a mistake ?
 
-Thanks,
-Yongji
+> 
+> CPUD.(EAX=14H,ECX=0):EBX[3] should only indicates the MTC support.
+
+Please do not make assertions that you do not confirm with hw.
+
+> 
+> BranchEn should be always supported if PT is available. Per "31.2.7.2 
+
+Check d35869ba348d3f1ff3e6d8214fe0f674bb0e404e.
+
+> IA32_RTIT_CTL MSR" on SDM:
+> When BranchEn is 1, it enables COFI-based packets.
+> When BranchEn is 0, it disables COFI-based packtes. i.e., COFI packets are 
+> suppressed.
+> 
+>>>        */
+>>>       if (intel_pt_validate_cap(vmx->pt_desc.caps, PT_CAP_mtc))
+>>>           vmx->pt_desc.ctl_bitmask &= ~(RTIT_CTL_MTC_EN |
+>>> -                RTIT_CTL_BRANCH_EN | RTIT_CTL_MTC_RANGE);
+>>> +                          RTIT_CTL_MTC_RANGE);
+>>>       /* If CPUID.(EAX=14H,ECX=0):EBX[4]=1 FUPonPTW and PTWEn can be set */
+>>>       if (intel_pt_validate_cap(vmx->pt_desc.caps, PT_CAP_ptwrite))
+>>>
+> 
