@@ -2,201 +2,142 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8FF2D3F775E
-	for <lists+kvm@lfdr.de>; Wed, 25 Aug 2021 16:28:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 04A473F77E5
+	for <lists+kvm@lfdr.de>; Wed, 25 Aug 2021 17:00:11 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241686AbhHYO32 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 25 Aug 2021 10:29:28 -0400
-Received: from mail.skyhub.de ([5.9.137.197]:34544 "EHLO mail.skyhub.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S240965AbhHYO32 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 25 Aug 2021 10:29:28 -0400
-Received: from zn.tnic (p200300ec2f0ea7006bb4dcd1613a8626.dip0.t-ipconnect.de [IPv6:2003:ec:2f0e:a700:6bb4:dcd1:613a:8626])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 5A5871EC0105;
-        Wed, 25 Aug 2021 16:28:36 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
-        t=1629901716;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=3v7laBTLPusI9805TqhSEWh/kBZlYAamedfXZbBSnLU=;
-        b=dLCHo7HWETYfS7H4XHg00/WGizadW5nY9mPEki9CYXa9RCKzGzDE5ttcA117vyw9s+6syQ
-        pX96sdHhQBnXZohHx4U1syr2ruibQoXqL3vY6pzNZ/EH0jo2c6T2XZtCmohYx5rvQu98x3
-        uGe059IFPH2Te0eqdKzxS559VD+aBhw=
-Date:   Wed, 25 Aug 2021 16:29:13 +0200
-From:   Borislav Petkov <bp@alien8.de>
-To:     Brijesh Singh <brijesh.singh@amd.com>
-Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
-        linux-coco@lists.linux.dev, linux-mm@kvack.org,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
+        id S240963AbhHYPAu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 25 Aug 2021 11:00:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48270 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S240941AbhHYPAs (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 25 Aug 2021 11:00:48 -0400
+Received: from mail-pj1-x102b.google.com (mail-pj1-x102b.google.com [IPv6:2607:f8b0:4864:20::102b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 52D35C061757
+        for <kvm@vger.kernel.org>; Wed, 25 Aug 2021 08:00:03 -0700 (PDT)
+Received: by mail-pj1-x102b.google.com with SMTP id z24-20020a17090acb1800b0018e87a24300so43399pjt.0
+        for <kvm@vger.kernel.org>; Wed, 25 Aug 2021 08:00:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=kn/AYMVeYnmieiIHFjFN8sDP9OZuVONc2B9QEaekI3A=;
+        b=Waai87LKp635jm1pb/aC2JPtvvsoBVA8xxaMLtj3ABGHD9d09uoxQcvp9uO7RN6gse
+         1vGFTMXryIfiPG+GWpphQXX48S1azU87y8pJh98TkZHqhCFAsawJfwk+ZhWnwfVfNq4/
+         niaQoZuEWe28eHccWmpPQrvoobpXnYcyNb0cH3Jzmgq8o0LPoqMt2ULbhZ77iaJV6lyN
+         uquZ5dJdKD8eAWidXPjClTw+o0bWwiXv0xw7lN2rsjHM9PmH38iH+DKgJPI8FtmMucE2
+         i6Cwu7k+e2QfZh9P9euJNi7awa3Ud8iJ5ZdlgKrB/3kFwO6Q29c53NX3Onot0osIJleO
+         luqw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=kn/AYMVeYnmieiIHFjFN8sDP9OZuVONc2B9QEaekI3A=;
+        b=VfSBAZMyLfsIfS9GyAndrmldC7v4iTah8SUavZyMbmbEBrVAn/u4zJE2sVGpq9zR98
+         P3tjLJ2vu+3aEBnvvljctVRI6b8uenubW4y9F8FOXVY7bQrpOxK/C/uvd6WUJkPAJKVQ
+         Yw8A2ivVoJncqvzRZUgni++YZlVIiJTvU3oV14lw7gPsa5qJnRemjFv8qxrzxyTa6bme
+         nFD98MwJhkImeLEd7KOER0yKEU1dKmiJcOT4/Ct+d09EGQ4vx4AYIvwyN1L9JMzMHfO8
+         TBTahKHLzuhnB13NlP1L9aUHnaAQiYeF0SXHINOOeZKUnGGVtF+xznHlGQ7efz/QL7Bb
+         cHbg==
+X-Gm-Message-State: AOAM5331sbODZQHpH7Mjvkz+BfOgogDxx/RqFDOsImGkaDvllq/eZ4XS
+        s8q8QOmsvL+XaY1BoEwR0JLp5w==
+X-Google-Smtp-Source: ABdhPJx+5iZUz3c/bQH0SD/kXyMauyq2qFirxiVHJwjy0MwTFV+vSSXt34Qnp6xy+b81CeSt+wq3lg==
+X-Received: by 2002:a17:90b:384f:: with SMTP id nl15mr10874650pjb.203.1629903602513;
+        Wed, 25 Aug 2021 08:00:02 -0700 (PDT)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id v5sm5965271pjs.45.2021.08.25.08.00.01
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 25 Aug 2021 08:00:01 -0700 (PDT)
+Date:   Wed, 25 Aug 2021 14:59:57 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Like Xu <like.xu.linux@gmail.com>
+Cc:     Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Jiri Olsa <jolsa@redhat.com>,
+        Namhyung Kim <namhyung@kernel.org>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
-        David Rientjes <rientjes@google.com>,
-        Dov Murik <dovmurik@linux.ibm.com>,
-        Tobin Feldman-Fitzthum <tobin@ibm.com>,
-        Michael Roth <michael.roth@amd.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        "Kirill A . Shutemov" <kirill@shutemov.name>,
-        Andi Kleen <ak@linux.intel.com>, tony.luck@intel.com,
-        marcorr@google.com, sathyanarayanan.kuppuswamy@linux.intel.com
-Subject: Re: [PATCH Part1 v5 23/38] x86/head/64: set up a startup %gs for
- stack protector
-Message-ID: <YSZTubkROktMMSba@zn.tnic>
-References: <20210820151933.22401-1-brijesh.singh@amd.com>
- <20210820151933.22401-24-brijesh.singh@amd.com>
+        Joerg Roedel <joro@8bytes.org>,
+        linux-perf-users@vger.kernel.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, Artem Kashkanov <artem.kashkanov@intel.com>,
+        Arnaldo Carvalho de Melo <acme@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Ingo Molnar <mingo@redhat.com>,
+        Peter Zijlstra <peterz@infradead.org>
+Subject: Re: [PATCH 2/3] KVM: x86: Register Processor Trace interrupt hook
+ iff PT enabled in guest
+Message-ID: <YSZa7dkw6t7yN6vL@google.com>
+References: <20210823193709.55886-1-seanjc@google.com>
+ <20210823193709.55886-3-seanjc@google.com>
+ <3021c1cc-a4eb-e3ab-d6b7-558cbaefd03b@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20210820151933.22401-24-brijesh.singh@amd.com>
+In-Reply-To: <3021c1cc-a4eb-e3ab-d6b7-558cbaefd03b@gmail.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Aug 20, 2021 at 10:19:18AM -0500, Brijesh Singh wrote:
-> From: Michael Roth <michael.roth@amd.com>
+On Wed, Aug 25, 2021, Like Xu wrote:
+> On 24/8/2021 3:37 am, Sean Christopherson wrote:
+> > @@ -11061,6 +11061,8 @@ int kvm_arch_hardware_setup(void *opaque)
+> >   	memcpy(&kvm_x86_ops, ops->runtime_ops, sizeof(kvm_x86_ops));
+> >   	kvm_ops_static_call_update();
+> > +	if (ops->intel_pt_intr_in_guest && ops->intel_pt_intr_in_guest())
+> > +		kvm_guest_cbs.handle_intel_pt_intr = kvm_handle_intel_pt_intr;
 > 
-> As of commit 103a4908ad4d ("x86/head/64: Disable stack protection for
-> head$(BITS).o") kernel/head64.c is compiled with -fno-stack-protector
-> to allow a call to set_bringup_idt_handler(), which would otherwise
-> have stack protection enabled with CONFIG_STACKPROTECTOR_STRONG. While
-> sufficient for that case, this will still cause issues if we attempt to
-> call out to any external functions that were compiled with stack
-> protection enabled that in-turn make stack-protected calls, or if the
-> exception handlers set up by set_bringup_idt_handler() make calls to
-> stack-protected functions.
+> Emm, it's still buggy.
 > 
-> Subsequent patches for SEV-SNP CPUID validation support will introduce
-> both such cases. Attempting to disable stack protection for everything
-> in scope to address that is prohibitive since much of the code, like
-> SEV-ES #VC handler, is shared code that remains in use after boot and
-> could benefit from having stack protection enabled. Attempting to inline
-> calls is brittle and can quickly balloon out to library/helper code
-> where that's not really an option.
+> The guest "unknown NMI" from the host Intel PT can still be reproduced
+> after the following operation:
 > 
-> Instead, set up %gs to point a buffer that stack protector can use for
-> canary values when needed.
+> 	rmmod kvm_intel
+> 	modprobe kvm-intel pt_mode=1 ept=1
+> 	rmmod kvm_intel
+> 	modprobe kvm-intel pt_mode=1 ept=0
 > 
-> In doing so, it's likely we can stop using -no-stack-protector for
-> head64.c, but that hasn't been tested yet, and head32.c would need a
-> similar solution to be safe, so that is left as a potential follow-up.
+> Since the handle_intel_pt_intr is not reset to NULL in kvm_arch_hardware_unsetup(),
+> and the previous function pointer still exists in the generic KVM data structure.
 
-That...
+Ooof, good catch.  Any preference between nullifying handle_intel_pt_intr in
+setup() vs. unsetup()?  I think I like the idea of "unwinding" during unsetup(),
+even though it splits the logic a bit.
 
-> Signed-off-by: Michael Roth <michael.roth@amd.com>
-> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
-> ---
->  arch/x86/kernel/Makefile |  2 +-
->  arch/x86/kernel/head64.c | 20 ++++++++++++++++++++
->  2 files changed, 21 insertions(+), 1 deletion(-)
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index b5ade47dad9c..ffc6c2d73508 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -11093,6 +11093,7 @@ int kvm_arch_hardware_setup(void *opaque)
+ void kvm_arch_hardware_unsetup(void)
+ {
+        perf_unregister_guest_info_callbacks(&kvm_guest_cbs);
++       kvm_guest_cbs.handle_intel_pt_intr = NULL;
+
+        static_call(kvm_x86_hardware_unsetup)();
+ }
+
+
+vs.
+
+
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index b5ade47dad9c..462aa7a360e9 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -11063,6 +11063,8 @@ int kvm_arch_hardware_setup(void *opaque)
+
+        if (ops->intel_pt_intr_in_guest && ops->intel_pt_intr_in_guest())
+                kvm_guest_cbs.handle_intel_pt_intr = kvm_handle_intel_pt_intr;
++       else
++               kvm_guest_cbs.handle_intel_pt_intr = NULL;
+        perf_register_guest_info_callbacks(&kvm_guest_cbs);
+
+        if (!kvm_cpu_cap_has(X86_FEATURE_XSAVES))
+
+> But I have to say that this fix is much better than the one I proposed [1].
 > 
-> diff --git a/arch/x86/kernel/Makefile b/arch/x86/kernel/Makefile
-> index 3e625c61f008..5abdfd0dbbc3 100644
-> --- a/arch/x86/kernel/Makefile
-> +++ b/arch/x86/kernel/Makefile
-> @@ -46,7 +46,7 @@ endif
->  # non-deterministic coverage.
->  KCOV_INSTRUMENT		:= n
->  
-> -CFLAGS_head$(BITS).o	+= -fno-stack-protector
-> +CFLAGS_head32.o		+= -fno-stack-protector
-
-... and that needs to be taken care of too.
-
->  CFLAGS_irq.o := -I $(srctree)/$(src)/../include/asm/trace
->  
-> diff --git a/arch/x86/kernel/head64.c b/arch/x86/kernel/head64.c
-> index a1711c4594fa..f1b76a54c84e 100644
-> --- a/arch/x86/kernel/head64.c
-> +++ b/arch/x86/kernel/head64.c
-> @@ -74,6 +74,11 @@ static struct desc_struct startup_gdt[GDT_ENTRIES] = {
->  	[GDT_ENTRY_KERNEL_DS]           = GDT_ENTRY_INIT(0xc093, 0, 0xfffff),
->  };
->  
-> +/* For use by stack protector code before switching to virtual addresses */
-> +#if CONFIG_STACKPROTECTOR
-
-That's "#ifdef". Below too.
-
-Did you even build this with CONFIG_STACKPROTECTOR disabled?
-
-Because if you did, you would've seen this:
-
-arch/x86/kernel/head64.c:78:5: warning: "CONFIG_STACKPROTECTOR" is not defined, evaluates to 0 [-Wundef]
-   78 | #if CONFIG_STACKPROTECTOR
-      |     ^~~~~~~~~~~~~~~~~~~~~
-arch/x86/kernel/head64.c: In function ‘startup_64_setup_env’:
-arch/x86/kernel/head64.c:613:35: error: ‘startup_gs_area’ undeclared (first use in this function)
-  613 |  u64 gs_area = (u64)fixup_pointer(startup_gs_area, physbase);
-      |                                   ^~~~~~~~~~~~~~~
-arch/x86/kernel/head64.c:613:35: note: each undeclared identifier is reported only once for each function it appears in
-arch/x86/kernel/head64.c:632:5: warning: "CONFIG_STACKPROTECTOR" is not defined, evaluates to 0 [-Wundef]
-  632 | #if CONFIG_STACKPROTECTOR
-      |     ^~~~~~~~~~~~~~~~~~~~~
-arch/x86/kernel/head64.c:613:6: warning: unused variable ‘gs_area’ [-Wunused-variable]
-  613 |  u64 gs_area = (u64)fixup_pointer(startup_gs_area, physbase);
-      |      ^~~~~~~
-make[2]: *** [scripts/Makefile.build:271: arch/x86/kernel/head64.o] Error 1
-make[1]: *** [scripts/Makefile.build:514: arch/x86/kernel] Error 2
-make[1]: *** Waiting for unfinished jobs....
-make: *** [Makefile:1851: arch/x86] Error 2
-make: *** Waiting for unfinished jobs....
-
-> +static char startup_gs_area[64];
-> +#endif
-> +
->  /*
->   * Address needs to be set at runtime because it references the startup_gdt
->   * while the kernel still uses a direct mapping.
-> @@ -605,6 +610,8 @@ void early_setup_idt(void)
->   */
->  void __head startup_64_setup_env(unsigned long physbase)
->  {
-> +	u64 gs_area = (u64)fixup_pointer(startup_gs_area, physbase);
-> +
->  	/* Load GDT */
->  	startup_gdt_descr.address = (unsigned long)fixup_pointer(startup_gdt, physbase);
->  	native_load_gdt(&startup_gdt_descr);
-> @@ -614,5 +621,18 @@ void __head startup_64_setup_env(unsigned long physbase)
->  		     "movl %%eax, %%ss\n"
->  		     "movl %%eax, %%es\n" : : "a"(__KERNEL_DS) : "memory");
->  
-> +	/*
-> +	 * GCC stack protection needs a place to store canary values. The
-> +	 * default is %gs:0x28, which is what the kernel currently uses.
-> +	 * Point GS base to a buffer that can be used for this purpose.
-> +	 * Note that newer GCCs now allow this location to be configured,
-> +	 * so if we change from the default in the future we need to ensure
-> +	 * that this buffer overlaps whatever address ends up being used.
-> +	 */
-> +#if CONFIG_STACKPROTECTOR
-> +	asm volatile("movl %%eax, %%gs\n" : : "a"(__KERNEL_DS) : "memory");
-> +	native_wrmsr(MSR_GS_BASE, gs_area, gs_area >> 32);
-> +#endif
-> +
->  	startup_64_load_idt(physbase);
->  }
-> -- 
-> 2.17.1
+> [1] https://lore.kernel.org/lkml/20210514084436.848396-1-like.xu@linux.intel.com/
 > 
-
--- 
-Regards/Gruss,
-    Boris.
-
-https://people.kernel.org/tglx/notes-about-netiquette
+> >   	perf_register_guest_info_callbacks(&kvm_guest_cbs);
+> >   	if (!kvm_cpu_cap_has(X86_FEATURE_XSAVES))
+> > 
