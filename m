@@ -2,129 +2,108 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A41483F74EE
-	for <lists+kvm@lfdr.de>; Wed, 25 Aug 2021 14:18:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4EBA33F7500
+	for <lists+kvm@lfdr.de>; Wed, 25 Aug 2021 14:21:48 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240736AbhHYMS4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 25 Aug 2021 08:18:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38594 "EHLO
+        id S240715AbhHYMWc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 25 Aug 2021 08:22:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39518 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240602AbhHYMSz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 25 Aug 2021 08:18:55 -0400
-Received: from mail-ed1-x533.google.com (mail-ed1-x533.google.com [IPv6:2a00:1450:4864:20::533])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 95F9EC0613C1
-        for <kvm@vger.kernel.org>; Wed, 25 Aug 2021 05:18:09 -0700 (PDT)
-Received: by mail-ed1-x533.google.com with SMTP id z10so1791121edb.6
-        for <kvm@vger.kernel.org>; Wed, 25 Aug 2021 05:18:09 -0700 (PDT)
+        with ESMTP id S240593AbhHYMWb (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 25 Aug 2021 08:22:31 -0400
+Received: from mail-qt1-x82f.google.com (mail-qt1-x82f.google.com [IPv6:2607:f8b0:4864:20::82f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 56279C061757
+        for <kvm@vger.kernel.org>; Wed, 25 Aug 2021 05:21:46 -0700 (PDT)
+Received: by mail-qt1-x82f.google.com with SMTP id g11so19605796qtk.5
+        for <kvm@vger.kernel.org>; Wed, 25 Aug 2021 05:21:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance-com.20150623.gappssmtp.com; s=20150623;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=tFbYUBxT5F02ETxWPNYnDT/IzVXwtvTQ/hB2M/j5I40=;
-        b=S1Gv6G7NlFrvneSYqnBSOeyE66l/w2OvgLtQGyc2ete205Cc/K9titvobBEHOkV7Jd
-         LF+IGAbQBYCZgtY/Oc+VQjeSILHfyY0qY86cKKFbFI9eKSjibGyEMQbH+ejgmKSjcgC5
-         7Ky78pwYl3ckT1x+pt8+vBGkO34Qu9FkKuJyYOZHJxs8JFezX8A9akOzr4r+RFN6WG3I
-         Ku/K/lCbctjWFcI5f456bKKJQs0YE9FPfHmoAitDy6E/v21XOApT6h0Cwzr8rwCnMRdX
-         GH00tomNPmmrq5p2YIaWuULxkUShxdgVCD8W5xkwuXFKP/V/+9cDwXz5fK1Dz7KM8amN
-         GWuw==
+        d=ziepe.ca; s=google;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=WAz3siWMAeX+sT+8/4g01n9e1gFGKv6rZrHD5W5FCKA=;
+        b=RuMOFqyfWmRRZbrFH7vvZJBL+w+JonfG6Wl3dCD25bunONFW9Uv6ihsSuvapVU80hT
+         XNDeuJGc5niMs+GScBEpN3ZIvRAlZuALYXYEbIYk3+K+8h89P8L/TsBTUKbHoWvGToWR
+         tcs8LZwjrThbFa3VMIPxxd/PhWrNe/JpHPc0XH5o1EbtGfeyU2hngFwkwHl6VIKIuULZ
+         yBtzYmYYeSg+N6OUOT1Ie3ms+H1lorxWXwMiTimeRfaa0ZUONs5NLspD7NhWXltzeld1
+         mqPy3E0jyrU0Bgi7ngX7nJKvstGIMa++6JJZVFbVwufpztYHkBaSFF0Q4tPBvap5f54i
+         NV+w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=tFbYUBxT5F02ETxWPNYnDT/IzVXwtvTQ/hB2M/j5I40=;
-        b=AFCksTZse8KT00VWYdRmo68BkXdpdj0O+LJsde/khzAqC6VyAaZ1bJMSrAgQAVHSTX
-         YfqPW2v2vrlQLfvrB72zB9awAPdc+fdD0ijGDmfWJ4bcWwUaaTWJKp7AWHC/j5uFWFoT
-         Woy8sRbwu56SBFWGYjZSZ74kFaIYQKwcRoAwdnOsWoGxBqJu+BqsIrJss+HftdeqciEy
-         FyqKoO9LLbi4MFdBy3Ogruuh2Fauh9seN4/DTaDoOs4ZkNS8Za2+TQSOCRS5yFYyk0zd
-         cQgO5Ut2FIm4SbwEZ1nC56VklghASf7/jpA/X3uABZMHkI61apJ0PVJpDkFYu2Z8DWee
-         /Rww==
-X-Gm-Message-State: AOAM530+XUp4IDHMtszMJ2Gtx2Oneeo/rPheh3+lpkhE5ywRvrSFej/H
-        LC71MVX4h2d5we4ts6c6TAtV41T8xlpsdXiUxZDA
-X-Google-Smtp-Source: ABdhPJxiDpOcq8C+5T5VQdj2MSQ986LjNwq+2D/7Hfzk3BtSiet2580JVQtXlr3OiUAX1rd9+hgAp9kuHH1qjNotBK4=
-X-Received: by 2002:a05:6402:705:: with SMTP id w5mr15141991edx.344.1629893888145;
- Wed, 25 Aug 2021 05:18:08 -0700 (PDT)
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=WAz3siWMAeX+sT+8/4g01n9e1gFGKv6rZrHD5W5FCKA=;
+        b=OR6hwjxojHyBG/JmfbNjsDPIR5kdZd/AiFJRxiNUjuRF0hEOoVKR7uHoUpr10e9edl
+         7Q12/R0/z9CVwaLmyif1PMjF1HGWnGKDQCaPPzsUSkZPeoxVkUbkP7ZDh6lKwX56tpkg
+         6nqr+SzyBCX+T9oJHzq7cFLuhHjnSNF54hLG7WH0S0N30mPQjwx99Mn5P0HVN4vTK/3c
+         yNdNZqUoIZnXKfI/r7jmDc63G0Bup+Hv4XgRpX4PZN+B5sbuMFvqSaOFZHw2NJh4xbbn
+         7U2B6BjRUMYfXQqr42D5I9/W7jAYg0RSwguSbWeS+2WT1AjD9SlkSra9q6FYTjTZwEO5
+         4brg==
+X-Gm-Message-State: AOAM533DDDHs6OJETsxb6kb/ZzqdhE5iXaiBuTf3pRUg63OqPxhwgcUV
+        lzCgT/2hqKVXGtt84d5ZBG75Nw==
+X-Google-Smtp-Source: ABdhPJy1q4yNxoJnAcXokyACqmDNMgShSOl5WJwZRsuNTLnvM6qZmrIQNWRuzgqcnX/m1hmVOadZ8w==
+X-Received: by 2002:a05:622a:100e:: with SMTP id d14mr3231043qte.350.1629894105523;
+        Wed, 25 Aug 2021 05:21:45 -0700 (PDT)
+Received: from ziepe.ca (hlfxns017vw-142-162-113-129.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.162.113.129])
+        by smtp.gmail.com with ESMTPSA id y124sm12774640qke.70.2021.08.25.05.21.44
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 25 Aug 2021 05:21:45 -0700 (PDT)
+Received: from jgg by mlx with local (Exim 4.94)
+        (envelope-from <jgg@ziepe.ca>)
+        id 1mIrua-004sb0-5S; Wed, 25 Aug 2021 09:21:44 -0300
+Date:   Wed, 25 Aug 2021 09:21:44 -0300
+From:   Jason Gunthorpe <jgg@ziepe.ca>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Alex Williamson <alex.williamson@redhat.com>,
+        Diana Craciun <diana.craciun@oss.nxp.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Kirti Wankhede <kwankhede@nvidia.com>,
+        Eric Auger <eric.auger@redhat.com>, kvm@vger.kernel.org
+Subject: Re: [PATCH 07/14] vfio: simplify iommu group allocation for mediated
+ devices
+Message-ID: <20210825122144.GV543798@ziepe.ca>
+References: <20210824144649.1488190-1-hch@lst.de>
+ <20210824144649.1488190-8-hch@lst.de>
+ <20210825001916.GN543798@ziepe.ca>
+ <20210825053237.GB26806@lst.de>
 MIME-Version: 1.0
-References: <20210818120642.165-1-xieyongji@bytedance.com> <20210818120642.165-2-xieyongji@bytedance.com>
- <20210824140758-mutt-send-email-mst@kernel.org> <20210825095540.GA24546@willie-the-truck>
- <5f4eadda-5500-9bac-4368-48cfca6d0a4d@huawei.com>
-In-Reply-To: <5f4eadda-5500-9bac-4368-48cfca6d0a4d@huawei.com>
-From:   Yongji Xie <xieyongji@bytedance.com>
-Date:   Wed, 25 Aug 2021 20:17:57 +0800
-Message-ID: <CACycT3uWyhNNK_YbfEAEhTk-V9CoxFg1tzVjJnXeKBFpkndnfg@mail.gmail.com>
-Subject: Re: [PATCH v11 01/12] iova: Export alloc_iova_fast() and free_iova_fast()
-To:     John Garry <john.garry@huawei.com>
-Cc:     Will Deacon <will@kernel.org>,
-        "Michael S. Tsirkin" <mst@redhat.com>, kvm <kvm@vger.kernel.org>,
-        Jason Wang <jasowang@redhat.com>,
-        virtualization <virtualization@lists.linux-foundation.org>,
-        Christian Brauner <christian.brauner@canonical.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Matthew Wilcox <willy@infradead.org>,
-        Christoph Hellwig <hch@infradead.org>,
-        Dan Carpenter <dan.carpenter@oracle.com>,
-        Stefano Garzarella <sgarzare@redhat.com>,
-        Liu Xiaodong <xiaodong.liu@intel.com>,
-        linux-fsdevel@vger.kernel.org, Al Viro <viro@zeniv.linux.org.uk>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        songmuchun@bytedance.com, Jens Axboe <axboe@kernel.dk>,
-        He Zhe <zhe.he@windriver.com>,
-        Greg KH <gregkh@linuxfoundation.org>,
-        Randy Dunlap <rdunlap@infradead.org>,
-        linux-kernel <linux-kernel@vger.kernel.org>,
-        iommu@lists.linux-foundation.org, bcrl@kvack.org,
-        netdev@vger.kernel.org, Joe Perches <joe@perches.com>,
-        Robin Murphy <robin.murphy@arm.com>,
-        =?UTF-8?Q?Mika_Penttil=C3=A4?= <mika.penttila@nextfour.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210825053237.GB26806@lst.de>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Aug 25, 2021 at 6:35 PM John Garry <john.garry@huawei.com> wrote:
->
-> On 25/08/2021 10:55, Will Deacon wrote:
-> > On Tue, Aug 24, 2021 at 02:08:33PM -0400, Michael S. Tsirkin wrote:
-> >> On Wed, Aug 18, 2021 at 08:06:31PM +0800, Xie Yongji wrote:
-> >>> Export alloc_iova_fast() and free_iova_fast() so that
-> >>> some modules can make use of the per-CPU cache to get
-> >>> rid of rbtree spinlock in alloc_iova() and free_iova()
-> >>> during IOVA allocation.
-> >>>
-> >>> Signed-off-by: Xie Yongji <xieyongji@bytedance.com>
-> >>
-> >>
-> >> This needs ack from iommu maintainers. Guys?
-> >
-> > Looks fine to me:
-> >
-> > Acked-by: Will Deacon <will@kernel.org>
-> >
-> > Will
-> > _______________________________________________
-> > iommu mailing list
-> > iommu@lists.linux-foundation.org
-> > https://lists.linuxfoundation.org/mailman/listinfo/iommu
-> > .
-> >
->
-> JFYI, There was a preliminary discussion to move the iova rcache code
-> (which the iova fast alloc and free functions are based on) out of the
-> iova code and maybe into dma-iommu (being the only user). There was
-> other motivation.
->
+On Wed, Aug 25, 2021 at 07:32:37AM +0200, Christoph Hellwig wrote:
+> On Tue, Aug 24, 2021 at 09:19:16PM -0300, Jason Gunthorpe wrote:
+> > The mechanism looks fine, but I think the core code is much clearer if
+> > the name is not 'mediated' but 'sw_iommu' or something that implies
+> > the group is running with a software page table. mediated has become
+> > so overloaded in this code.
+> 
+> I thought that was sort of the definition of mediated - there needs to
+> ben entify that "mediates" access so that a user of this interface
+> can't trigger undmediated DMA to arbitrary addresses.  My other choice
+> that I used for a while was "virtual".  sw_iommu sounds a little clumsy.
 
-Would it be better to move the code into ./lib as a general library?
+vfio mediated is really some toolbox of different features that a
+driver can use to build what it wants.
 
-> https://lore.kernel.org/linux-iommu/83de3911-145d-77c8-17c1-981e4ff825d3@arm.com/
->
-> Having more users complicates that...
->
+For instance Intel is looking at this concept of a mediated device
+that uses PASID for the IOMMU. It would have a real IOMMU, use real
+IOMMU page tables and in this language it would create some PASID
+group, not a "sw_iommu" group.
 
-Do we have some plan for this work? From our test [1],
-iova_alloc_fast() is much better than iova_alloc(). So I'd like to use
-it as much as possible
+This feature is about creating a device that is not connected to a HW
+IO page table (at least by the VFIO iommu code) but the IO page table
+is held in software and accessed by the VFIO driver through the pin
+API.
 
-[1] https://lore.kernel.org/kvm/CACycT3steXFeg7NRbWpo2J59dpYcumzcvM2zcPJAVe40-EvvEg@mail.gmail.com/
+virtual_iommu is somewhat overloaded with the idea of a vIOMMU created
+by qemu and stuffed into a guest..
 
-Thanks,
-Yongji
+"domainless" might work but I also find it confusing that the iommu
+code uses the word domain to refer to a HW IO page table :\
+
+Maybe "sw io page table" ?
+
+Jason
