@@ -2,75 +2,129 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A65BA3F749B
-	for <lists+kvm@lfdr.de>; Wed, 25 Aug 2021 13:53:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A41483F74EE
+	for <lists+kvm@lfdr.de>; Wed, 25 Aug 2021 14:18:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240321AbhHYLyD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 25 Aug 2021 07:54:03 -0400
-Received: from mga17.intel.com ([192.55.52.151]:16989 "EHLO mga17.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S239257AbhHYLyC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 25 Aug 2021 07:54:02 -0400
-X-IronPort-AV: E=McAfee;i="6200,9189,10086"; a="197749106"
-X-IronPort-AV: E=Sophos;i="5.84,350,1620716400"; 
-   d="scan'208";a="197749106"
-Received: from fmsmga003.fm.intel.com ([10.253.24.29])
-  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Aug 2021 04:53:10 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.84,350,1620716400"; 
-   d="scan'208";a="527231434"
-Received: from um.fi.intel.com (HELO um) ([10.237.72.62])
-  by FMSMGA003.fm.intel.com with ESMTP; 25 Aug 2021 04:53:05 -0700
-From:   Alexander Shishkin <alexander.shishkin@linux.intel.com>
-To:     Xiaoyao Li <xiaoyao.li@intel.com>,
-        Like Xu <like.xu.linux@gmail.com>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-        alexander.shishkin@linux.intel.com
-Subject: Re: [PATCH 3/5] KVM: VMX: RTIT_CTL_BRANCH_EN has no dependency on
- other CPUID bit
-In-Reply-To: <ed18e08f-1ea6-4ffa-91a7-9d8706a1b781@intel.com>
-References: <20210824110743.531127-1-xiaoyao.li@intel.com>
- <20210824110743.531127-4-xiaoyao.li@intel.com>
- <711265db-f634-36ac-40d2-c09cea825df6@gmail.com>
- <b80a91db-cb35-ba6d-ab36-a0fa1ca051e7@intel.com>
- <6dddf3c0-fa8f-f70c-bd5d-b43c7140ed9a@gmail.com>
- <ed18e08f-1ea6-4ffa-91a7-9d8706a1b781@intel.com>
-Date:   Wed, 25 Aug 2021 14:53:04 +0300
-Message-ID: <87pmu1ivvj.fsf@ashishki-desk.ger.corp.intel.com>
+        id S240736AbhHYMS4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 25 Aug 2021 08:18:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38594 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S240602AbhHYMSz (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 25 Aug 2021 08:18:55 -0400
+Received: from mail-ed1-x533.google.com (mail-ed1-x533.google.com [IPv6:2a00:1450:4864:20::533])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 95F9EC0613C1
+        for <kvm@vger.kernel.org>; Wed, 25 Aug 2021 05:18:09 -0700 (PDT)
+Received: by mail-ed1-x533.google.com with SMTP id z10so1791121edb.6
+        for <kvm@vger.kernel.org>; Wed, 25 Aug 2021 05:18:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=bytedance-com.20150623.gappssmtp.com; s=20150623;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=tFbYUBxT5F02ETxWPNYnDT/IzVXwtvTQ/hB2M/j5I40=;
+        b=S1Gv6G7NlFrvneSYqnBSOeyE66l/w2OvgLtQGyc2ete205Cc/K9titvobBEHOkV7Jd
+         LF+IGAbQBYCZgtY/Oc+VQjeSILHfyY0qY86cKKFbFI9eKSjibGyEMQbH+ejgmKSjcgC5
+         7Ky78pwYl3ckT1x+pt8+vBGkO34Qu9FkKuJyYOZHJxs8JFezX8A9akOzr4r+RFN6WG3I
+         Ku/K/lCbctjWFcI5f456bKKJQs0YE9FPfHmoAitDy6E/v21XOApT6h0Cwzr8rwCnMRdX
+         GH00tomNPmmrq5p2YIaWuULxkUShxdgVCD8W5xkwuXFKP/V/+9cDwXz5fK1Dz7KM8amN
+         GWuw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=tFbYUBxT5F02ETxWPNYnDT/IzVXwtvTQ/hB2M/j5I40=;
+        b=AFCksTZse8KT00VWYdRmo68BkXdpdj0O+LJsde/khzAqC6VyAaZ1bJMSrAgQAVHSTX
+         YfqPW2v2vrlQLfvrB72zB9awAPdc+fdD0ijGDmfWJ4bcWwUaaTWJKp7AWHC/j5uFWFoT
+         Woy8sRbwu56SBFWGYjZSZ74kFaIYQKwcRoAwdnOsWoGxBqJu+BqsIrJss+HftdeqciEy
+         FyqKoO9LLbi4MFdBy3Ogruuh2Fauh9seN4/DTaDoOs4ZkNS8Za2+TQSOCRS5yFYyk0zd
+         cQgO5Ut2FIm4SbwEZ1nC56VklghASf7/jpA/X3uABZMHkI61apJ0PVJpDkFYu2Z8DWee
+         /Rww==
+X-Gm-Message-State: AOAM530+XUp4IDHMtszMJ2Gtx2Oneeo/rPheh3+lpkhE5ywRvrSFej/H
+        LC71MVX4h2d5we4ts6c6TAtV41T8xlpsdXiUxZDA
+X-Google-Smtp-Source: ABdhPJxiDpOcq8C+5T5VQdj2MSQ986LjNwq+2D/7Hfzk3BtSiet2580JVQtXlr3OiUAX1rd9+hgAp9kuHH1qjNotBK4=
+X-Received: by 2002:a05:6402:705:: with SMTP id w5mr15141991edx.344.1629893888145;
+ Wed, 25 Aug 2021 05:18:08 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain
+References: <20210818120642.165-1-xieyongji@bytedance.com> <20210818120642.165-2-xieyongji@bytedance.com>
+ <20210824140758-mutt-send-email-mst@kernel.org> <20210825095540.GA24546@willie-the-truck>
+ <5f4eadda-5500-9bac-4368-48cfca6d0a4d@huawei.com>
+In-Reply-To: <5f4eadda-5500-9bac-4368-48cfca6d0a4d@huawei.com>
+From:   Yongji Xie <xieyongji@bytedance.com>
+Date:   Wed, 25 Aug 2021 20:17:57 +0800
+Message-ID: <CACycT3uWyhNNK_YbfEAEhTk-V9CoxFg1tzVjJnXeKBFpkndnfg@mail.gmail.com>
+Subject: Re: [PATCH v11 01/12] iova: Export alloc_iova_fast() and free_iova_fast()
+To:     John Garry <john.garry@huawei.com>
+Cc:     Will Deacon <will@kernel.org>,
+        "Michael S. Tsirkin" <mst@redhat.com>, kvm <kvm@vger.kernel.org>,
+        Jason Wang <jasowang@redhat.com>,
+        virtualization <virtualization@lists.linux-foundation.org>,
+        Christian Brauner <christian.brauner@canonical.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Matthew Wilcox <willy@infradead.org>,
+        Christoph Hellwig <hch@infradead.org>,
+        Dan Carpenter <dan.carpenter@oracle.com>,
+        Stefano Garzarella <sgarzare@redhat.com>,
+        Liu Xiaodong <xiaodong.liu@intel.com>,
+        linux-fsdevel@vger.kernel.org, Al Viro <viro@zeniv.linux.org.uk>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        songmuchun@bytedance.com, Jens Axboe <axboe@kernel.dk>,
+        He Zhe <zhe.he@windriver.com>,
+        Greg KH <gregkh@linuxfoundation.org>,
+        Randy Dunlap <rdunlap@infradead.org>,
+        linux-kernel <linux-kernel@vger.kernel.org>,
+        iommu@lists.linux-foundation.org, bcrl@kvack.org,
+        netdev@vger.kernel.org, Joe Perches <joe@perches.com>,
+        Robin Murphy <robin.murphy@arm.com>,
+        =?UTF-8?Q?Mika_Penttil=C3=A4?= <mika.penttila@nextfour.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Xiaoyao Li <xiaoyao.li@intel.com> writes:
-
-> On 8/25/2021 2:08 PM, Like Xu wrote:
->> On 25/8/2021 12:19 pm, Xiaoyao Li wrote:
->>> On 8/25/2021 11:30 AM, Like Xu wrote:
->>> BranchEn should be always supported if PT is available. Per "31.2.7.2 
->> 
->> Check d35869ba348d3f1ff3e6d8214fe0f674bb0e404e.
+On Wed, Aug 25, 2021 at 6:35 PM John Garry <john.garry@huawei.com> wrote:
 >
-> This commit shows BranchEn is supported on BDW, and must be enabled on 
-> BDW. This doesn't conflict the description above that BranchEn should be 
-> always supported.
+> On 25/08/2021 10:55, Will Deacon wrote:
+> > On Tue, Aug 24, 2021 at 02:08:33PM -0400, Michael S. Tsirkin wrote:
+> >> On Wed, Aug 18, 2021 at 08:06:31PM +0800, Xie Yongji wrote:
+> >>> Export alloc_iova_fast() and free_iova_fast() so that
+> >>> some modules can make use of the per-CPU cache to get
+> >>> rid of rbtree spinlock in alloc_iova() and free_iova()
+> >>> during IOVA allocation.
+> >>>
+> >>> Signed-off-by: Xie Yongji <xieyongji@bytedance.com>
+> >>
+> >>
+> >> This needs ack from iommu maintainers. Guys?
+> >
+> > Looks fine to me:
+> >
+> > Acked-by: Will Deacon <will@kernel.org>
+> >
+> > Will
+> > _______________________________________________
+> > iommu mailing list
+> > iommu@lists.linux-foundation.org
+> > https://lists.linuxfoundation.org/mailman/listinfo/iommu
+> > .
+> >
+>
+> JFYI, There was a preliminary discussion to move the iova rcache code
+> (which the iova fast alloc and free functions are based on) out of the
+> iova code and maybe into dma-iommu (being the only user). There was
+> other motivation.
+>
 
-It's the *not* setting BranchEn that's not supported on BDW. The point
-of BranchEn is to allow the user to not set it and filter out all the
-branch trace related packets. The main point of PT, however, is the
-branch trace, so in the first implementation BranchEn was reserved as
-1.
+Would it be better to move the code into ./lib as a general library?
 
-IOW, it's always available, doesn't depend on CPUID, but on BDW,
-BranchEn==0 should throw a #GP, if I remember right. Check BDM106 for
-details.
+> https://lore.kernel.org/linux-iommu/83de3911-145d-77c8-17c1-981e4ff825d3@arm.com/
+>
+> Having more users complicates that...
+>
 
-Regards,
---
-Alex
+Do we have some plan for this work? From our test [1],
+iova_alloc_fast() is much better than iova_alloc(). So I'd like to use
+it as much as possible
+
+[1] https://lore.kernel.org/kvm/CACycT3steXFeg7NRbWpo2J59dpYcumzcvM2zcPJAVe40-EvvEg@mail.gmail.com/
+
+Thanks,
+Yongji
