@@ -2,31 +2,31 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2EAEC3F7ACE
-	for <lists+kvm@lfdr.de>; Wed, 25 Aug 2021 18:38:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 203DA3F7AD4
+	for <lists+kvm@lfdr.de>; Wed, 25 Aug 2021 18:40:20 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231297AbhHYQjX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 25 Aug 2021 12:39:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43824 "EHLO
+        id S241646AbhHYQlE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 25 Aug 2021 12:41:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44278 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239550AbhHYQjT (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 25 Aug 2021 12:39:19 -0400
+        with ESMTP id S237319AbhHYQlE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 25 Aug 2021 12:41:04 -0400
 Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C46DDC061757
-        for <kvm@vger.kernel.org>; Wed, 25 Aug 2021 09:38:33 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 410E7C061757
+        for <kvm@vger.kernel.org>; Wed, 25 Aug 2021 09:40:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
         References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:
         Content-Type:Content-ID:Content-Description;
-        bh=tP3wiPlxJ4gpvBQ1mMiQWsUYdaiNdjnRCznDh8P8hqA=; b=ObDXY7vBUcwrfKonWx8itobxtX
-        CvxvEibwkITOaYRRJhTiBQN77BnADGbgC4u9vPnLVS2WA3F5kBajWnweVzJDACPcTNwFKs+Yr14po
-        Juoj/Tq9wEnlIqyQAQcskffiWrHwM108uvRx8CtOv1jO4K209Rxu5iPDdbiENJNJAFqO42cY6A8VX
-        WjNpdhz6D6PCZrWYC+2g/eXXpFOrQL7MIapzIi9+K6HPYX/MJnGahD0kkyPofIPDqpNHF1t1Czknz
-        z88JwIc+prM9vNt/vVRpWpmosa7x/WlbUaKweMEBhVEtf1EJZYa1jiD8HL59jEOODvCP7VEwELVWo
-        u0SlVEvg==;
+        bh=vCkH8llpWDueT5TLArkUVhiYLuQxLbYGiOucUBacphc=; b=Onlp8tSz8hwr79mCRv/5U1MYqO
+        DTZeUjjwQNY/DQcafJrnsW+GVWQt5rIc1F6Ly+rpWSnhdQ/nvXcFSByGko7fwRRLRAaIQxO7ZBGG1
+        Hcd/xJ3SgRm+dM5hXJ36FrqPpt3Stvzg5ZayXRaK0LvKKXC3RCN1XmzuyH+rWDF3JmT0SLVLqBa4a
+        bSamVcZEbkEcd32YBtfiDzfEgmxBzi999UIUrubjSlteqPCp2OkCMjF85AXQg7Hyu3sSZEaCkEjF6
+        mNS0VLKtSlvc3SUwryINC+cCkz5e7ebABD4Je61Qt8pdgtPzpD/hKmgQLlAwElsRBGUxETM/qfeUe
+        /m67UW5g==;
 Received: from [2001:4bb8:193:fd10:a3f9:5689:21a4:711f] (helo=localhost)
         by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1mIvsv-00CTrG-Fr; Wed, 25 Aug 2021 16:36:50 +0000
+        id 1mIvu3-00CTzj-TV; Wed, 25 Aug 2021 16:37:46 +0000
 From:   Christoph Hellwig <hch@lst.de>
 To:     Alex Williamson <alex.williamson@redhat.com>
 Cc:     Diana Craciun <diana.craciun@oss.nxp.com>,
@@ -35,9 +35,9 @@ Cc:     Diana Craciun <diana.craciun@oss.nxp.com>,
         Eric Auger <eric.auger@redhat.com>,
         Jason Gunthorpe <jgg@ziepe.ca>, kvm@vger.kernel.org,
         Jason Gunthorpe <jgg@nvidia.com>
-Subject: [PATCH 11/14] vfio: clean up the check for mediated device in vfio_iommu_type1
-Date:   Wed, 25 Aug 2021 18:19:12 +0200
-Message-Id: <20210825161916.50393-12-hch@lst.de>
+Subject: [PATCH 12/14] vfio/spapr_tce: reject mediated devices
+Date:   Wed, 25 Aug 2021 18:19:13 +0200
+Message-Id: <20210825161916.50393-13-hch@lst.de>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20210825161916.50393-1-hch@lst.de>
 References: <20210825161916.50393-1-hch@lst.de>
@@ -48,150 +48,30 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Pass the group flags to ->attach_group and remove the messy check for
-the bus type.
+Unlike the the type1 IOMMU backend, the SPAPR one does not contain any
+support for the magic non-IOMMU backed iommu_group used by mediated
+devices, so reject them in ->attach_group.
 
 Signed-off-by: Christoph Hellwig <hch@lst.de>
 Reviewed-by: Jason Gunthorpe <jgg@nvidia.com>
 ---
- drivers/vfio/vfio.c                 | 11 +++++------
- drivers/vfio/vfio.h                 |  7 ++++++-
- drivers/vfio/vfio_iommu_spapr_tce.c |  2 +-
- drivers/vfio/vfio_iommu_type1.c     | 19 ++-----------------
- 4 files changed, 14 insertions(+), 25 deletions(-)
+ drivers/vfio/vfio_iommu_spapr_tce.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/drivers/vfio/vfio.c b/drivers/vfio/vfio.c
-index f73158fce8c446..8b31eca02e0be7 100644
---- a/drivers/vfio/vfio.c
-+++ b/drivers/vfio/vfio.c
-@@ -68,9 +68,6 @@ struct vfio_unbound_dev {
- 	struct list_head		unbound_next;
- };
- 
--#define VFIO_EMULATED_IOMMU	(1 << 0)
--#define VFIO_NO_IOMMU		(1 << 1)
--
- struct vfio_group {
- 	struct kref			kref;
- 	int				minor;
-@@ -198,7 +195,7 @@ static long vfio_noiommu_ioctl(void *iommu_data,
- }
- 
- static int vfio_noiommu_attach_group(void *iommu_data,
--				     struct iommu_group *iommu_group)
-+		struct iommu_group *iommu_group, unsigned int flags)
- {
- 	return 0;
- }
-@@ -1105,7 +1102,8 @@ static int __vfio_container_attach_groups(struct vfio_container *container,
- 	int ret = -ENODEV;
- 
- 	list_for_each_entry(group, &container->group_list, container_next) {
--		ret = driver->ops->attach_group(data, group->iommu_group);
-+		ret = driver->ops->attach_group(data, group->iommu_group,
-+						group->flags);
- 		if (ret)
- 			goto unwind;
- 	}
-@@ -1363,7 +1361,8 @@ static int vfio_group_set_container(struct vfio_group *group, int container_fd)
- 	driver = container->iommu_driver;
- 	if (driver) {
- 		ret = driver->ops->attach_group(container->iommu_data,
--						group->iommu_group);
-+						group->iommu_group,
-+						group->flags);
- 		if (ret)
- 			goto unlock_out;
- 	}
-diff --git a/drivers/vfio/vfio.h b/drivers/vfio/vfio.h
-index a78de649eb2f16..1e02433d3992ef 100644
---- a/drivers/vfio/vfio.h
-+++ b/drivers/vfio/vfio.h
-@@ -9,6 +9,10 @@ enum vfio_iommu_notify_type {
- 	VFIO_IOMMU_CONTAINER_CLOSE = 0,
- };
- 
-+/* flags for group->flags and ->attach_group */
-+#define VFIO_EMULATED_IOMMU	(1 << 0)
-+#define VFIO_NO_IOMMU		(1 << 1)
-+
- /**
-  * struct vfio_iommu_driver_ops - VFIO IOMMU driver callbacks
-  */
-@@ -20,7 +24,8 @@ struct vfio_iommu_driver_ops {
- 	long		(*ioctl)(void *iommu_data, unsigned int cmd,
- 				 unsigned long arg);
- 	int		(*attach_group)(void *iommu_data,
--					struct iommu_group *group);
-+					struct iommu_group *group,
-+					unsigned int flags);
- 	void		(*detach_group)(void *iommu_data,
- 					struct iommu_group *group);
- 	int		(*pin_pages)(void *iommu_data,
 diff --git a/drivers/vfio/vfio_iommu_spapr_tce.c b/drivers/vfio/vfio_iommu_spapr_tce.c
-index 3efd09faeca4a8..7567328d347d25 100644
+index 7567328d347d25..0fbce1bcb6493b 100644
 --- a/drivers/vfio/vfio_iommu_spapr_tce.c
 +++ b/drivers/vfio/vfio_iommu_spapr_tce.c
-@@ -1239,7 +1239,7 @@ static long tce_iommu_take_ownership_ddw(struct tce_container *container,
- }
+@@ -1246,6 +1246,9 @@ static int tce_iommu_attach_group(void *iommu_data,
+ 	struct iommu_table_group *table_group;
+ 	struct tce_iommu_group *tcegrp = NULL;
  
- static int tce_iommu_attach_group(void *iommu_data,
--		struct iommu_group *iommu_group)
-+		struct iommu_group *iommu_group, unsigned int flags)
- {
- 	int ret = 0;
- 	struct tce_container *container = iommu_data;
-diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
-index 39e2706d0b3f34..ca3c995c84166f 100644
---- a/drivers/vfio/vfio_iommu_type1.c
-+++ b/drivers/vfio/vfio_iommu_type1.c
-@@ -36,7 +36,6 @@
- #include <linux/uaccess.h>
- #include <linux/vfio.h>
- #include <linux/workqueue.h>
--#include <linux/mdev.h>
- #include <linux/notifier.h>
- #include <linux/dma-iommu.h>
- #include <linux/irqdomain.h>
-@@ -1934,20 +1933,6 @@ static bool vfio_iommu_has_sw_msi(struct list_head *group_resv_regions,
- 	return ret;
- }
++	if (flags & VFIO_EMULATED_IOMMU)
++		return -EINVAL;
++
+ 	mutex_lock(&container->lock);
  
--static bool vfio_bus_is_mdev(struct bus_type *bus)
--{
--	struct bus_type *mdev_bus;
--	bool ret = false;
--
--	mdev_bus = symbol_get(mdev_bus_type);
--	if (mdev_bus) {
--		ret = (bus == mdev_bus);
--		symbol_put(mdev_bus_type);
--	}
--
--	return ret;
--}
--
- /*
-  * This is a helper function to insert an address range to iova list.
-  * The list is initially created with a single entry corresponding to
-@@ -2172,7 +2157,7 @@ static void vfio_iommu_iova_insert_copy(struct vfio_iommu *iommu,
- }
- 
- static int vfio_iommu_type1_attach_group(void *iommu_data,
--					 struct iommu_group *iommu_group)
-+		struct iommu_group *iommu_group, unsigned int flags)
- {
- 	struct vfio_iommu *iommu = iommu_data;
- 	struct vfio_iommu_group *group;
-@@ -2207,7 +2192,7 @@ static int vfio_iommu_type1_attach_group(void *iommu_data,
- 	if (ret)
- 		goto out_free;
- 
--	if (vfio_bus_is_mdev(bus)) {
-+	if (flags & VFIO_EMULATED_IOMMU) {
- 		if (!iommu->external_domain) {
- 			INIT_LIST_HEAD(&domain->group_list);
- 			iommu->external_domain = domain;
+ 	/* pr_debug("tce_vfio: Attaching group #%u to iommu %p\n",
 -- 
 2.30.2
 
