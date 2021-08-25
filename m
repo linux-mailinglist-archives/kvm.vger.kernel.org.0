@@ -2,82 +2,116 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B16613F6EDB
-	for <lists+kvm@lfdr.de>; Wed, 25 Aug 2021 07:36:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C8AB63F6EE2
+	for <lists+kvm@lfdr.de>; Wed, 25 Aug 2021 07:37:38 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232416AbhHYFh1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 25 Aug 2021 01:37:27 -0400
-Received: from mail.kernel.org ([198.145.29.99]:32836 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S232420AbhHYFhZ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 25 Aug 2021 01:37:25 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPS id 145C2610FD
-        for <kvm@vger.kernel.org>; Wed, 25 Aug 2021 05:36:40 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1629869800;
-        bh=YDzXHv3O6ZSM0MjPeYM62PhfRbKTerIE9g1T/4bpCMw=;
-        h=From:To:Subject:Date:In-Reply-To:References:From;
-        b=WMhLB/wjSCDbaKbkZfI1Qr720pRdiQw45YoMoxa9a4w6wvVRqb+J2DKr71gORrUsN
-         1Wt3Arj1Q5YwJitfyS4llcff3GkAPcfAoR+PBG9JrZocCdmiNyw5oz8nm05mHZqw0h
-         +fqcKdCeLlFU6WAjDUVaJIkEo2Ih4f/W3V2Bx7IdWjZrm0hCPvnvin4ASCnrA4EldS
-         m3jx8/dGypCbzeJ+JVWXxpy2GL+Mc6hksAO966KM665xL2moKZkQknikL7RFKOo8qE
-         TUHbkD6WEE/wZC8FtGii66YMjREFvKuzbkPNsn3qzzIe2EnuZE6j6s5ANL5OF5EhOq
-         K7nWq8avkE/SQ==
-Received: by pdx-korg-bugzilla-2.web.codeaurora.org (Postfix, from userid 48)
-        id 0C5E561003; Wed, 25 Aug 2021 05:36:40 +0000 (UTC)
-From:   bugzilla-daemon@bugzilla.kernel.org
-To:     kvm@vger.kernel.org
-Subject: [Bug 110441] KVM guests randomly get I/O errors on VirtIO based
- devices
-Date:   Wed, 25 Aug 2021 05:36:39 +0000
-X-Bugzilla-Reason: None
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Product: Virtualization
-X-Bugzilla-Component: kvm
-X-Bugzilla-Version: unspecified
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: almaza24map@gmail.com
-X-Bugzilla-Status: RESOLVED
-X-Bugzilla-Resolution: INVALID
-X-Bugzilla-Priority: P1
-X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: cc
-Message-ID: <bug-110441-28872-Anmr9hI22o@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-110441-28872@https.bugzilla.kernel.org/>
-References: <bug-110441-28872@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+        id S232776AbhHYFiR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 25 Aug 2021 01:38:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58326 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232571AbhHYFiJ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 25 Aug 2021 01:38:09 -0400
+Received: from mail-ed1-x531.google.com (mail-ed1-x531.google.com [IPv6:2a00:1450:4864:20::531])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A7303C0613D9
+        for <kvm@vger.kernel.org>; Tue, 24 Aug 2021 22:37:22 -0700 (PDT)
+Received: by mail-ed1-x531.google.com with SMTP id d6so35227997edt.7
+        for <kvm@vger.kernel.org>; Tue, 24 Aug 2021 22:37:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=bytedance-com.20150623.gappssmtp.com; s=20150623;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=3yeuD/AKt6duI6f+LLwvmXj5/7qzqoMz+rmo5sVDYrk=;
+        b=Vp7EsjbsKk4CbMZuzoUYLzrpydiTBr1zHF+HyG9J/wtoW8bsVHI746U+1hvWAKn7pY
+         S2KGD1hdXhYpvRVmdQ6WR1fQxGII47CoeOMGBaYQ/Mi4TolUM5hV7u25ftgsXF0RWGh/
+         oyRF1xadCZb6aP6wOK20F7wxGFstAZ7BuyRbsRE+aDrQ7ch+4LllkUaJdROcaj8x+KAj
+         ZOy85WB4jyz34slTJHHU6QuKku6j+KC19AfzueBsMNFAdKQmlECIKMC6wJ+DZ7prxUj4
+         ddL12p3dIBF+Z7rYjgciVlV8upMbYsRSCOxkj2pFlsJcMFqU9/31/TAQO6ln7+ZPJcon
+         AYgw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=3yeuD/AKt6duI6f+LLwvmXj5/7qzqoMz+rmo5sVDYrk=;
+        b=PzWlwC2MLKaGxI1wvgiF4Q3oE8CSzYGRTcNoJ0u1sRvjtqjoNkK+QyPel8Olmit9dY
+         vXIeiR9dOoXQDdSv4FYuERf9dTVYdayjajJRtO/xQwAbPtFtrfsUjibI0JNhdJNZt/Ef
+         tUy91MsxJakuaj4aCzDfmQ7lYF3TQXBr9FXWSqQtTrw75xz1q1Q9O1rTygUjQAJhMAk8
+         OgRO+Fis5ng2lDST83H0njjlvTXU3tofH7J1SxG2zR21KnQBqZy2m1xlSup8EuuhTxHk
+         zDeQmrqx98Yz8MyOPKLI3mLLehueuUR4A0scZS72+bWEXxuj9OLrhkpi0SkgfkhlriAM
+         PA5Q==
+X-Gm-Message-State: AOAM531UbYt/+qkJfyTQkfmA4UHDVFAuqOvtO7i68hpvskPiMG1MHEbJ
+        Kl4LJ91kJfin1iCAIB3Yv9bA2kMCW4/7gS87kpwn
+X-Google-Smtp-Source: ABdhPJyZTxYAJpwJ1zytuFP4isC6BozsaW7fwdKwUj6HuqFf6QhFlF2KyJtLZvCBCv/uMpGPvMvKn/tLFmS1aI89w14=
+X-Received: by 2002:a50:fd86:: with SMTP id o6mr6104183edt.312.1629869841320;
+ Tue, 24 Aug 2021 22:37:21 -0700 (PDT)
 MIME-Version: 1.0
+References: <20210818120642.165-1-xieyongji@bytedance.com> <20210818120642.165-12-xieyongji@bytedance.com>
+ <20210824140945-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20210824140945-mutt-send-email-mst@kernel.org>
+From:   Yongji Xie <xieyongji@bytedance.com>
+Date:   Wed, 25 Aug 2021 13:37:10 +0800
+Message-ID: <CACycT3s0Pp+LOD2h_vocPUMEqMhYioJmRPFYGL=Su-eL2p2O3w@mail.gmail.com>
+Subject: Re: [PATCH v11 11/12] vduse: Introduce VDUSE - vDPA Device in Userspace
+To:     "Michael S. Tsirkin" <mst@redhat.com>
+Cc:     Jason Wang <jasowang@redhat.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Stefano Garzarella <sgarzare@redhat.com>,
+        Parav Pandit <parav@nvidia.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Christian Brauner <christian.brauner@canonical.com>,
+        Randy Dunlap <rdunlap@infradead.org>,
+        Matthew Wilcox <willy@infradead.org>,
+        Al Viro <viro@zeniv.linux.org.uk>,
+        Jens Axboe <axboe@kernel.dk>, bcrl@kvack.org,
+        Jonathan Corbet <corbet@lwn.net>,
+        =?UTF-8?Q?Mika_Penttil=C3=A4?= <mika.penttila@nextfour.com>,
+        Dan Carpenter <dan.carpenter@oracle.com>, joro@8bytes.org,
+        Greg KH <gregkh@linuxfoundation.org>,
+        He Zhe <zhe.he@windriver.com>,
+        Liu Xiaodong <xiaodong.liu@intel.com>,
+        Joe Perches <joe@perches.com>,
+        Robin Murphy <robin.murphy@arm.com>, songmuchun@bytedance.com,
+        virtualization <virtualization@lists.linux-foundation.org>,
+        netdev@vger.kernel.org, kvm <kvm@vger.kernel.org>,
+        linux-fsdevel@vger.kernel.org, iommu@lists.linux-foundation.org,
+        linux-kernel <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D110441
+On Wed, Aug 25, 2021 at 2:10 AM Michael S. Tsirkin <mst@redhat.com> wrote:
+>
+> On Wed, Aug 18, 2021 at 08:06:41PM +0800, Xie Yongji wrote:
+> > This VDUSE driver enables implementing software-emulated vDPA
+> > devices in userspace. The vDPA device is created by
+> > ioctl(VDUSE_CREATE_DEV) on /dev/vduse/control. Then a char device
+> > interface (/dev/vduse/$NAME) is exported to userspace for device
+> > emulation.
+> >
+> > In order to make the device emulation more secure, the device's
+> > control path is handled in kernel. A message mechnism is introduced
+> > to forward some dataplane related control messages to userspace.
+> >
+> > And in the data path, the DMA buffer will be mapped into userspace
+> > address space through different ways depending on the vDPA bus to
+> > which the vDPA device is attached. In virtio-vdpa case, the MMU-based
+> > software IOTLB is used to achieve that. And in vhost-vdpa case, the
+> > DMA buffer is reside in a userspace memory region which can be shared
+> > to the VDUSE userspace processs via transferring the shmfd.
+> >
+> > For more details on VDUSE design and usage, please see the follow-on
+> > Documentation commit.
+> >
+> > Signed-off-by: Xie Yongji <xieyongji@bytedance.com>
+>
+> Build bot seems unhappy with this patch.
+>
 
-Jerick Fischer (almaza24map@gmail.com) changed:
+Yes, this is because the series relies on the unmerged patch:
 
-           What    |Removed                     |Added
-----------------------------------------------------------------------------
-                 CC|                            |almaza24map@gmail.com
+https://lore.kernel.org/lkml/20210705071910.31965-1-jasowang@redhat.com/
 
---- Comment #2 from Jerick Fischer (almaza24map@gmail.com) ---
-(In reply to Jordi Mallach from comment #1)
-> Sorry for the noise. This is actually caused by os-prober opening the
-> devices and causing corruption and mayhem. See
-> https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=3D788062 for details.
+Do I need to remove this dependency in the next version?
 
-Thank you much for sharing your knowledge and a reference, much appreciated.
-
-Respectfully,
-RJ from https://www.sanjosetruckingcompany.com/
-
---=20
-You may reply to this email to add a comment.
-
-You are receiving this mail because:
-You are watching the assignee of the bug.=
+Thanks,
+Yongji
