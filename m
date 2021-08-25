@@ -2,114 +2,120 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8484E3F781F
-	for <lists+kvm@lfdr.de>; Wed, 25 Aug 2021 17:18:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B50D43F78A7
+	for <lists+kvm@lfdr.de>; Wed, 25 Aug 2021 17:33:32 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241457AbhHYPTd (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 25 Aug 2021 11:19:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52600 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237968AbhHYPTc (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 25 Aug 2021 11:19:32 -0400
-Received: from mail-pg1-x52f.google.com (mail-pg1-x52f.google.com [IPv6:2607:f8b0:4864:20::52f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 428B6C061757
-        for <kvm@vger.kernel.org>; Wed, 25 Aug 2021 08:18:47 -0700 (PDT)
-Received: by mail-pg1-x52f.google.com with SMTP id e7so58108pgk.2
-        for <kvm@vger.kernel.org>; Wed, 25 Aug 2021 08:18:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=XF1x8B/ZG+F34bQ5051hv3MrWVrItt8QQmW8Vc8uix8=;
-        b=NzpAD+6a7NO6y8+3tcRH6gm+u56SAvRDBjAOIh8Fx6VgBbSWJRlzzIC/1CYBfRDWkz
-         L0EBsf5sV+zs8RXVEZQvGjka9VIRhZZRAP31Et8lmWdV2VMawSdEl181drDeIhKMc7iG
-         zeO7bhzgyzKfpTW8MO9Zwdjbd0xYvn2yI5JIwKLPyJK/pEKmZ6arbQFaHcza/3fT+YA/
-         DuCMIZqRhDaU4sMLNMLg0KlMYki195HD9qtZ8F//KRB5mVNCc9MZ81wv8LriIVL0/ghT
-         AozVt7i1NX2untQ1Jk8LFAkDnO3kRS3+P5Tg2habkcmyPu4tKyrxTFwJXg2ABBrA5qxk
-         e5lw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=XF1x8B/ZG+F34bQ5051hv3MrWVrItt8QQmW8Vc8uix8=;
-        b=DuQ1NKyqXVQ9Xj69mbUyhPU605WNHw5XP82YvHvMsMhm3UlkInVaoMm99B1JFtl3rb
-         9WSVMF/cZV4vZIVJM/t1yumCAh2KNxzuWKBaTXPruMd5ZYtMVKFW9EBbnWp5tIo1yNG5
-         Hs7ZgESUv2cvGwLVMAPiDkBjD05/f2jCwFIGF5Y0MS/VIfmcl1pgP6E3sWuiWTdfe/Gb
-         B1ju3S422bMM+waOyRTRnJWbqd2y0vbWTNL9hMSN3lsgQwwmo0kqV6OzDHPblsq2dz52
-         yRsGob6yJ8WhGZpWTCHp+UiEWscv9ou71oe22LDhPQ7HiurITgN/ByDVOFwOysFKbIAx
-         K/cQ==
-X-Gm-Message-State: AOAM530r9wg48kL5BmPe/iDBJJRWlFBLAtGtN5Br1kA5lITV6GpDduHe
-        rNOXTYlcGkkhAPe53jcR6XmYdA==
-X-Google-Smtp-Source: ABdhPJwFscpynT8cC50el9VfgECR2sNqwfJbOc3s01idcQI7wYJQHzIUtihpQepaA+F7ckmzeWHfGg==
-X-Received: by 2002:a63:411:: with SMTP id 17mr33488845pge.335.1629904726625;
-        Wed, 25 Aug 2021 08:18:46 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id 23sm289495pgk.89.2021.08.25.08.18.45
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 25 Aug 2021 08:18:46 -0700 (PDT)
-Date:   Wed, 25 Aug 2021 15:18:42 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Lai Jiangshan <jiangshanlai@gmail.com>
-Cc:     linux-kernel@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Lai Jiangshan <laijs@linux.alibaba.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
+        id S241783AbhHYPeQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 25 Aug 2021 11:34:16 -0400
+Received: from mail.kernel.org ([198.145.29.99]:35478 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S241514AbhHYPeK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 25 Aug 2021 11:34:10 -0400
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 408A46109E;
+        Wed, 25 Aug 2021 15:33:24 +0000 (UTC)
+Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94.2)
+        (envelope-from <maz@kernel.org>)
+        id 1mIuu2-007Agb-6J; Wed, 25 Aug 2021 16:33:22 +0100
+Date:   Wed, 25 Aug 2021 16:33:21 +0100
+Message-ID: <87a6l5pmim.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Andre Przywara <andre.przywara@arm.com>
+Cc:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
+        kernel-team@android.com,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
         Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
-        kvm@vger.kernel.org
-Subject: Re: [PATCH 7/7] KVM: X86: Also prefetch the last range in
- __direct_pte_prefetch().
-Message-ID: <YSZfUqPuhENCDa9z@google.com>
-References: <20210824075524.3354-1-jiangshanlai@gmail.com>
- <20210824075524.3354-8-jiangshanlai@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210824075524.3354-8-jiangshanlai@gmail.com>
+        Will Deacon <will@kernel.org>
+Subject: Re: [PATCH][kvmtool] virtio/pci: Correctly handle MSI-X masking while MSI-X is disabled
+In-Reply-To: <87tujeq5ey.wl-maz@kernel.org>
+References: <20210821120742.855712-1-maz@kernel.org>
+        <20210823174833.05adee5d@slackpad.fritz.box>
+        <87tujeq5ey.wl-maz@kernel.org>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: andre.przywara@arm.com, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, kernel-team@android.com, alexandru.elisei@arm.com, tglx@linutronix.de, will@kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Aug 24, 2021, Lai Jiangshan wrote:
-> From: Lai Jiangshan <laijs@linux.alibaba.com>
+On Tue, 24 Aug 2021 15:32:53 +0100,
+Marc Zyngier <maz@kernel.org> wrote:
 > 
-> __direct_pte_prefetch() skips prefetching the last range.
+> Hi Andre,
 > 
-> The last range are often the whole range after the faulted spte when
-> guest is touching huge-page-mapped(in guest view) memory forwardly
-> which means prefetching them can reduce pagefault.
+> On Mon, 23 Aug 2021 17:48:33 +0100,
+> Andre Przywara <andre.przywara@arm.com> wrote:
+> > 
+> > On Sat, 21 Aug 2021 13:07:42 +0100
+> > Marc Zyngier <maz@kernel.org> wrote:
+> > 
+> > Hi Marc,
+> > 
+> > > Since Linux commit 7d5ec3d36123 ("PCI/MSI: Mask all unused MSI-X
+> > > entries"), kvmtool segfaults when the guest boots and tries to
+> > > disable all the MSI-X entries of a virtio device while MSI-X itself
+> > > is disabled.
+> > > 
+> > > What Linux does is seems perfectly correct. However, kvmtool uses
+> > > a different decoding depending on whether MSI-X is enabled for
+> > > this device or not. Which seems pretty wrong.
+> > 
+> > While I really wish this would be wrong, I think this is
+> > indeed how this is supposed to work: The Virtio legacy spec makes the
+> > existence of those two virtio config fields dependent on the
+> > (dynamic!) enablement status of MSI-X. This is reflected in:
+> > https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/include/uapi/linux/virtio_pci.h#n72
+> > and explicitly mentioned as a footnote in the virtio 0.9.5 spec[1]:
+> > "3) ie. once you enable MSI-X on the device, the other fields move. If
+> > you turn it off again, they move back!"
 > 
-> Signed-off-by: Lai Jiangshan <laijs@linux.alibaba.com>
-> ---
->  arch/x86/kvm/mmu/mmu.c | 5 +++--
->  1 file changed, 3 insertions(+), 2 deletions(-)
+> Madness! What was Rusty on at the time? I really hope the bitcoin
+> thing is buying him better stuff...
 > 
-> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> index e5932af6f11c..ac260e01e9d8 100644
-> --- a/arch/x86/kvm/mmu/mmu.c
-> +++ b/arch/x86/kvm/mmu/mmu.c
-> @@ -2847,8 +2847,9 @@ static void __direct_pte_prefetch(struct kvm_vcpu *vcpu,
->  	i = (sptep - sp->spt) & ~(PTE_PREFETCH_NUM - 1);
->  	spte = sp->spt + i;
->  
-> -	for (i = 0; i < PTE_PREFETCH_NUM; i++, spte++) {
-> -		if (is_shadow_present_pte(*spte) || spte == sptep) {
-> +	for (i = 0; i <= PTE_PREFETCH_NUM; i++, spte++) {
-> +		if (i == PTE_PREFETCH_NUM ||
-> +		    is_shadow_present_pte(*spte) || spte == sptep) {
+> > I agree that this looks like a bad idea, but I am afraid we are stuck
+> > with this. It looks like the Linux driver is at fault here, it should
+> > not issue the config access when MSIs are disabled. Something like this
+> > (untested):
+> > 
+> > --- a/drivers/virtio/virtio_pci_legacy.c
+> > +++ b/drivers/virtio/virtio_pci_legacy.c
+> > @@ -103,6 +103,9 @@ static void vp_reset(struct virtio_device *vdev)
+> >  
+> >  static u16 vp_config_vector(struct virtio_pci_device *vp_dev, u16 vector)
+> >  {
+> > +       if (!vp_dev->msix_enabled)
+> > +               return VIRTIO_MSI_NO_VECTOR;
+> > +
+> >         /* Setup the vector used for configuration events */
+> >         iowrite16(vector, vp_dev->ioaddr + VIRTIO_MSI_CONFIG_VECTOR);
+> >         /* Verify we had enough resources to assign the vector */
+> > 
+> > This is just my first idea after looking at this, happy to stand
+> > corrected or hear about a better solution.
+> 
+> I don't think this works. It instead completely disables MSI-X, which
+> is a total bore. I think the only way to deal with it is to quirk it
+> to prevent the bulk masking to take effect before MSI-X is enabled.
 
-Heh, I posted a fix just a few days ago.  I prefer having a separate call after
-the loop.  The "<= PTE_PREFETCH_NUM" is subtle, and a check at the ends avoids
-a CMP+Jcc in the loop, though I highly doubt that actually affects performance.
+Actually, let me correct myself. I tested the wrong configuration (why
+isn't --force-pci the bloody default in kvmtool?). This patch doesn't
+fix anything at all, and kvmtool just explodes.
 
-https://lkml.kernel.org/r/20210818235615.2047588-1-seanjc@google.com
+Having dug further, it isn't the config space that causes problems,
+but the programming of the MSI-X vectors. I'm starting to suspect the
+layout of the MSI-X bar in kvmtool.
 
->  			if (!start)
->  				continue;
->  			if (direct_pte_prefetch_many(vcpu, sp, start, spte) < 0)
-> -- 
-> 2.19.1.6.gb485710b
-> 
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
