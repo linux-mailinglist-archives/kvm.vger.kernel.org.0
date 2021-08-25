@@ -2,147 +2,75 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 37F223F7403
-	for <lists+kvm@lfdr.de>; Wed, 25 Aug 2021 13:05:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A65BA3F749B
+	for <lists+kvm@lfdr.de>; Wed, 25 Aug 2021 13:53:18 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239815AbhHYLGV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 25 Aug 2021 07:06:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50254 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236038AbhHYLGU (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 25 Aug 2021 07:06:20 -0400
-Received: from mail.skyhub.de (mail.skyhub.de [IPv6:2a01:4f8:190:11c2::b:1457])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A9086C061757;
-        Wed, 25 Aug 2021 04:05:34 -0700 (PDT)
-Received: from zn.tnic (p200300ec2f0ea70083109ebf80d1db9a.dip0.t-ipconnect.de [IPv6:2003:ec:2f0e:a700:8310:9ebf:80d1:db9a])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 301C91EC036B;
-        Wed, 25 Aug 2021 13:05:29 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
-        t=1629889529;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
-        bh=FmlAznHkQY06DZXhalxR6XDiPNF7pgBGfOoUZA3D+vo=;
-        b=jy+S22x5BGqIj6wZ/EDYcRcJ7KPx0io4/u4mhOd7rT/8pZqVzhf5Cv5q8b5BXMaTO9Timc
-        ZVVHryDmAoSKY5ydD29ngcwnWz0d+uh9eroCZsSt0bdmcrorGFplMCnF55w0a8eFPJAonF
-        XDRO2IL3+/d30AH0qTY8rSaSuGIxBaU=
-Date:   Wed, 25 Aug 2021 13:06:06 +0200
-From:   Borislav Petkov <bp@alien8.de>
-To:     Brijesh Singh <brijesh.singh@amd.com>
-Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
-        linux-coco@lists.linux.dev, linux-mm@kvack.org,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
+        id S240321AbhHYLyD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 25 Aug 2021 07:54:03 -0400
+Received: from mga17.intel.com ([192.55.52.151]:16989 "EHLO mga17.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S239257AbhHYLyC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 25 Aug 2021 07:54:02 -0400
+X-IronPort-AV: E=McAfee;i="6200,9189,10086"; a="197749106"
+X-IronPort-AV: E=Sophos;i="5.84,350,1620716400"; 
+   d="scan'208";a="197749106"
+Received: from fmsmga003.fm.intel.com ([10.253.24.29])
+  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Aug 2021 04:53:10 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.84,350,1620716400"; 
+   d="scan'208";a="527231434"
+Received: from um.fi.intel.com (HELO um) ([10.237.72.62])
+  by FMSMGA003.fm.intel.com with ESMTP; 25 Aug 2021 04:53:05 -0700
+From:   Alexander Shishkin <alexander.shishkin@linux.intel.com>
+To:     Xiaoyao Li <xiaoyao.li@intel.com>,
+        Like Xu <like.xu.linux@gmail.com>
+Cc:     Sean Christopherson <seanjc@google.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
-        David Rientjes <rientjes@google.com>,
-        Dov Murik <dovmurik@linux.ibm.com>,
-        Tobin Feldman-Fitzthum <tobin@ibm.com>,
-        Michael Roth <michael.roth@amd.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        "Kirill A . Shutemov" <kirill@shutemov.name>,
-        Andi Kleen <ak@linux.intel.com>, tony.luck@intel.com,
-        marcorr@google.com, sathyanarayanan.kuppuswamy@linux.intel.com
-Subject: Re: [PATCH Part1 v5 17/38] x86/mm: Add support to validate memory
- when changing C-bit
-Message-ID: <YSYkHhAMSOotEzXQ@zn.tnic>
-References: <20210820151933.22401-1-brijesh.singh@amd.com>
- <20210820151933.22401-18-brijesh.singh@amd.com>
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+        alexander.shishkin@linux.intel.com
+Subject: Re: [PATCH 3/5] KVM: VMX: RTIT_CTL_BRANCH_EN has no dependency on
+ other CPUID bit
+In-Reply-To: <ed18e08f-1ea6-4ffa-91a7-9d8706a1b781@intel.com>
+References: <20210824110743.531127-1-xiaoyao.li@intel.com>
+ <20210824110743.531127-4-xiaoyao.li@intel.com>
+ <711265db-f634-36ac-40d2-c09cea825df6@gmail.com>
+ <b80a91db-cb35-ba6d-ab36-a0fa1ca051e7@intel.com>
+ <6dddf3c0-fa8f-f70c-bd5d-b43c7140ed9a@gmail.com>
+ <ed18e08f-1ea6-4ffa-91a7-9d8706a1b781@intel.com>
+Date:   Wed, 25 Aug 2021 14:53:04 +0300
+Message-ID: <87pmu1ivvj.fsf@ashishki-desk.ger.corp.intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20210820151933.22401-18-brijesh.singh@amd.com>
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Aug 20, 2021 at 10:19:12AM -0500, Brijesh Singh wrote:
-> +	while (hdr->cur_entry <= hdr->end_entry) {
-> +		ghcb_set_sw_scratch(ghcb, (u64)__pa(data));
-> +
-> +		ret = sev_es_ghcb_hv_call(ghcb, NULL, SVM_VMGEXIT_PSC, 0, 0);
-> +
-> +		/*
-> +		 * Page State Change VMGEXIT can pass error code through
-> +		 * exit_info_2.
-> +		 */
-> +		if (WARN(ret || ghcb->save.sw_exit_info_2,
-> +			 "SEV-SNP: PSC failed ret=%d exit_info_2=%llx\n",
-> +			 ret, ghcb->save.sw_exit_info_2)) {
-> +			ret = 1;
-> +			goto out;
-> +		}
-> +
-> +		/*
-> +		 * Sanity check that entry processing is not going backward.
-> +		 * This will happen only if hypervisor is tricking us.
-> +		 */
-> +		if (WARN(hdr->end_entry > end_entry || cur_entry > hdr->cur_entry,
-> +			 "SEV-SNP:  PSC processing going backward, end_entry %d (got %d) cur_entry %d (got %d)\n",
+Xiaoyao Li <xiaoyao.li@intel.com> writes:
 
-I really meant putting the beginning of that string at the very first
-position on the line:
+> On 8/25/2021 2:08 PM, Like Xu wrote:
+>> On 25/8/2021 12:19 pm, Xiaoyao Li wrote:
+>>> On 8/25/2021 11:30 AM, Like Xu wrote:
+>>> BranchEn should be always supported if PT is available. Per "31.2.7.2 
+>> 
+>> Check d35869ba348d3f1ff3e6d8214fe0f674bb0e404e.
+>
+> This commit shows BranchEn is supported on BDW, and must be enabled on 
+> BDW. This doesn't conflict the description above that BranchEn should be 
+> always supported.
 
-                if (WARN(hdr->end_entry > end_entry || cur_entry > hdr->cur_entry,
-"SEV-SNP: PSC processing going backward, end_entry %d (got %d) cur_entry %d (got %d)\n",
-                         end_entry, hdr->end_entry, cur_entry, hdr->cur_entry)) {
+It's the *not* setting BranchEn that's not supported on BDW. The point
+of BranchEn is to allow the user to not set it and filter out all the
+branch trace related packets. The main point of PT, however, is the
+branch trace, so in the first implementation BranchEn was reserved as
+1.
 
-Exactly like this!
+IOW, it's always available, doesn't depend on CPUID, but on BDW,
+BranchEn==0 should throw a #GP, if I remember right. Check BDM106 for
+details.
 
-...
-
-> +static void set_page_state(unsigned long vaddr, unsigned int npages, int op)
-> +{
-> +	unsigned long vaddr_end, next_vaddr;
-> +	struct snp_psc_desc *desc;
-> +
-> +	vaddr = vaddr & PAGE_MASK;
-> +	vaddr_end = vaddr + (npages << PAGE_SHIFT);
-> +
-> +	desc = kmalloc(sizeof(*desc), GFP_KERNEL_ACCOUNT);
-
-And again, from previous review:
-
-kzalloc() so that you don't have to memset() later in
-__set_page_state().
-
-> +	if (!desc)
-> +		panic("SEV-SNP: failed to alloc memory for PSC descriptor\n");
-
-"allocate" fits just fine too.
-
-> +
-> +	while (vaddr < vaddr_end) {
-> +		/*
-> +		 * Calculate the last vaddr that can be fit in one
-> +		 * struct snp_psc_desc.
-> +		 */
-> +		next_vaddr = min_t(unsigned long, vaddr_end,
-> +				   (VMGEXIT_PSC_MAX_ENTRY * PAGE_SIZE) + vaddr);
-> +
-> +		__set_page_state(desc, vaddr, next_vaddr, op);
-> +
-> +		vaddr = next_vaddr;
-> +	}
-> +
-> +	kfree(desc);
-> +}
-
--- 
-Regards/Gruss,
-    Boris.
-
-https://people.kernel.org/tglx/notes-about-netiquette
+Regards,
+--
+Alex
