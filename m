@@ -2,106 +2,62 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 382A73F752B
-	for <lists+kvm@lfdr.de>; Wed, 25 Aug 2021 14:35:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id AF4303F752C
+	for <lists+kvm@lfdr.de>; Wed, 25 Aug 2021 14:37:46 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240880AbhHYMgK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 25 Aug 2021 08:36:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42604 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240564AbhHYMgK (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 25 Aug 2021 08:36:10 -0400
-Received: from mail-qk1-x731.google.com (mail-qk1-x731.google.com [IPv6:2607:f8b0:4864:20::731])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9BE21C061757
-        for <kvm@vger.kernel.org>; Wed, 25 Aug 2021 05:35:24 -0700 (PDT)
-Received: by mail-qk1-x731.google.com with SMTP id f22so17140084qkm.5
-        for <kvm@vger.kernel.org>; Wed, 25 Aug 2021 05:35:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=/yscRSEIDvdm5rn6ygNKjbv8KaB47GNeKmxu+T1nxJg=;
-        b=H1BKJvl+rMCOJt1PSz7XJ9MhMmDQ659JOS5/o0Zepd7Rd0ijq+IcmRPZFy9+fvHmQU
-         2D0kD78UOCKJC6Ql8A37M4dsC0PAxs+7qAYCKdP/3Ez4Nlst7vvlvfrWnMH5tiJ+u0vQ
-         75pe9zjc2AiDFj63zEsPqKtD/1ktWrPThP7V1Ib09zvCmFAvvbpLah7a0h2soeqtuWam
-         L0WHF9vT70+buOlJvBMeShLvkhR2r3ua18TaKQhnf7R87JYqYt26eTf0fqnE5R69Rum4
-         TdU10wyy5RzrJL/AWsK4xtPWN9Ep34IGcPiYRYud97i7gqcIPX3UcEQYI2UnEM1m058R
-         EKsw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=/yscRSEIDvdm5rn6ygNKjbv8KaB47GNeKmxu+T1nxJg=;
-        b=PY+8xCPujJuhbcpQDYFNB7O0r/W9JOoBFszXxA3u1Q/s3jfDBO7Z+hanOTLvCmoB/M
-         e1L7eaXgyg37uhmuexb41Xe6ln1/DWlpHl1/1iBdWsgE8i/BMH4XfArbpUgUyZrC+I5v
-         Pb1ZsZhWR4F9+NjKYMIe0U8TPqDuPmJNNs2sSVN0xtQMn1V521wU1SGjruKTb1O7J3Jb
-         TOzU4G8kVCuXFNuwPQtz+IuT/zE+8otrP2EdT7OmJ0E4rHxx0/ZnVbtbQu8PqfpmkakN
-         IQ4mr7FNH3N9T8M6MEXhxmtqrYTOPmHAEB9sfdsiMM7oqlCbFMXwZVxc2gZE7WYbZXhc
-         mHIw==
-X-Gm-Message-State: AOAM533UKRk6NEO6YnljNNIOameL1+ulIx957rfmVj8cVqsG1kqbeWT1
-        Mk6M3d9JCWJZ7g3Q5c7oQ09yDw==
-X-Google-Smtp-Source: ABdhPJz7oFpZbQZfaf483nQExWtM/t+Sup4K1MuBvZ50GKh5QtrLKpOBuH8l6EqnPBn2gUG/sg4/4w==
-X-Received: by 2002:a05:620a:2408:: with SMTP id d8mr30627482qkn.148.1629894923882;
-        Wed, 25 Aug 2021 05:35:23 -0700 (PDT)
-Received: from ziepe.ca (hlfxns017vw-142-162-113-129.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.162.113.129])
-        by smtp.gmail.com with ESMTPSA id f7sm12833793qko.52.2021.08.25.05.35.23
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 25 Aug 2021 05:35:23 -0700 (PDT)
-Received: from jgg by mlx with local (Exim 4.94)
-        (envelope-from <jgg@ziepe.ca>)
-        id 1mIs7m-004snX-UJ; Wed, 25 Aug 2021 09:35:22 -0300
-Date:   Wed, 25 Aug 2021 09:35:22 -0300
-From:   Jason Gunthorpe <jgg@ziepe.ca>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Alex Williamson <alex.williamson@redhat.com>,
+        id S240664AbhHYMib (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 25 Aug 2021 08:38:31 -0400
+Received: from verein.lst.de ([213.95.11.211]:56044 "EHLO verein.lst.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S240372AbhHYMia (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 25 Aug 2021 08:38:30 -0400
+Received: by verein.lst.de (Postfix, from userid 2407)
+        id 1BB2E6736F; Wed, 25 Aug 2021 14:37:43 +0200 (CEST)
+Date:   Wed, 25 Aug 2021 14:37:42 +0200
+From:   Christoph Hellwig <hch@lst.de>
+To:     Jason Gunthorpe <jgg@ziepe.ca>
+Cc:     Christoph Hellwig <hch@lst.de>,
+        Alex Williamson <alex.williamson@redhat.com>,
         Diana Craciun <diana.craciun@oss.nxp.com>,
         Cornelia Huck <cohuck@redhat.com>,
         Kirti Wankhede <kwankhede@nvidia.com>,
         Eric Auger <eric.auger@redhat.com>, kvm@vger.kernel.org
-Subject: Re: [PATCH 11/14] vfio: clean up the check for mediated device in
- vfio_iommu_type1
-Message-ID: <20210825123522.GX543798@ziepe.ca>
-References: <20210824144649.1488190-1-hch@lst.de>
- <20210824144649.1488190-12-hch@lst.de>
- <20210825002850.GR543798@ziepe.ca>
- <20210825053427.GC26806@lst.de>
+Subject: Re: [PATCH 07/14] vfio: simplify iommu group allocation for
+ mediated devices
+Message-ID: <20210825123742.GA17251@lst.de>
+References: <20210824144649.1488190-1-hch@lst.de> <20210824144649.1488190-8-hch@lst.de> <20210825001916.GN543798@ziepe.ca> <20210825053237.GB26806@lst.de> <20210825122144.GV543798@ziepe.ca> <20210825122400.GA16194@lst.de> <20210825123454.GW543798@ziepe.ca>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20210825053427.GC26806@lst.de>
+In-Reply-To: <20210825123454.GW543798@ziepe.ca>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Aug 25, 2021 at 07:34:27AM +0200, Christoph Hellwig wrote:
-> On Tue, Aug 24, 2021 at 09:28:50PM -0300, Jason Gunthorpe wrote:
-> > On Tue, Aug 24, 2021 at 04:46:46PM +0200, Christoph Hellwig wrote:
-> > > Pass the group flags to ->attach_group and remove the messy check for
-> > > the bus type.
+On Wed, Aug 25, 2021 at 09:34:54AM -0300, Jason Gunthorpe wrote:
+> On Wed, Aug 25, 2021 at 02:24:00PM +0200, Christoph Hellwig wrote:
+> > On Wed, Aug 25, 2021 at 09:21:44AM -0300, Jason Gunthorpe wrote:
+> > > This feature is about creating a device that is not connected to a HW
+> > > IO page table (at least by the VFIO iommu code) but the IO page table
+> > > is held in software and accessed by the VFIO driver through the pin
+> > > API.
 > > > 
-> > > Signed-off-by: Christoph Hellwig <hch@lst.de>
-> > >  drivers/vfio/vfio.c                 | 11 +++++------
-> > >  drivers/vfio/vfio.h                 |  7 ++++++-
-> > >  drivers/vfio/vfio_iommu_spapr_tce.c |  2 +-
-> > >  drivers/vfio/vfio_iommu_type1.c     | 19 ++-----------------
-> > >  4 files changed, 14 insertions(+), 25 deletions(-)
+> > > virtual_iommu is somewhat overloaded with the idea of a vIOMMU created
+> > > by qemu and stuffed into a guest..
+> > > 
+> > > "domainless" might work but I also find it confusing that the iommu
+> > > code uses the word domain to refer to a HW IO page table :\
+> > > 
+> > > Maybe "sw io page table" ?
 > > 
-> > Every caller is doing group->iommu_group, maybe change the signature
-> > to
-> > 
-> >  (*attach_group)(struct vfio_iommu *iommu, struct vfio_iommu_group *group)
-> >  
-> > ?
+> > Or simply emulated?  At least looking at i915 there is very little
+> > direct connection to the actual hardware, and while I don't understand
+> > them fully the s390 driver look similar.  And the samples are completely
+> > faked up anyway.
 > 
-> s/vfio_iommu/vfio_container/, but yes.  I actually have a series that
-> does this (also for a few other methods), but this requires exposing
-> vfio_container and vfio_iommu_group outside of vfio.c.  Given that this
-> series is big enough I decided to skip it for now, but that plus a few
-> other changes will eventually simplify the group lookups in
-> vfio_iommu_type1.c.
+> Emulated IO page table works for me!
 
-Fair enough
-
-Reviewed-by: Jason Gunthorpe <jgg@nvidia.com>
-
-Jason
+Hmm, that is a full sentence for the comment that needs to be added.
+Are you fine with just s/mediated/emulated/ for the symbol names or
+do you want something more specific?
