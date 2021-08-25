@@ -2,158 +2,131 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D97F03F7E0E
-	for <lists+kvm@lfdr.de>; Thu, 26 Aug 2021 00:02:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 705663F7E2C
+	for <lists+kvm@lfdr.de>; Thu, 26 Aug 2021 00:19:09 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233073AbhHYV61 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 25 Aug 2021 17:58:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59922 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229707AbhHYV61 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 25 Aug 2021 17:58:27 -0400
-Received: from mail-pg1-x531.google.com (mail-pg1-x531.google.com [IPv6:2607:f8b0:4864:20::531])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D3B81C061757
-        for <kvm@vger.kernel.org>; Wed, 25 Aug 2021 14:57:40 -0700 (PDT)
-Received: by mail-pg1-x531.google.com with SMTP id t1so1054020pgv.3
-        for <kvm@vger.kernel.org>; Wed, 25 Aug 2021 14:57:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=aY2Omr8i3Z9RwPbY54XXhXLRfUqWVte3e22E3NiG+6A=;
-        b=FNb6SF3dWu5bz3CZwYjIHyp/Ad372Ye+fDKa95pqLlnZVKUBrBChVl4trOAAEsnfCs
-         ynmibgEKUJ/jyhCDTvIQeHjFSVj45VngNJLjfy6ovC2CU1BMQ9iCaxehKxrX5VGPnO6A
-         oFsiqLkv31ymPKBE4kHFicXJckjQ4JoKUsCqp+Sy/QApqhgwC596vQEi2e93ZoMUHkVJ
-         P8IwujeB2vSyfuE3boY73apirKocGkCEKg8JNq6OHja9w6HozdsW22fzzAwrICtH2BS9
-         gx0jnwyQsa/eAS/1jowbZ6cjvVSRFsbQ68pKxMRx9sPVflJqOM4LlkukjAuz8zu9W170
-         NLkw==
+        id S234859AbhHYWGh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 25 Aug 2021 18:06:37 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:50087 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S233792AbhHYWGg (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 25 Aug 2021 18:06:36 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1629929150;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=9bzdPdbfmLgeq8dXUQB3sYM02KhzqlIwyVi1sq5m3r8=;
+        b=VJnLL38O49XMrj/PZZfU+c/jwtb49k8r6PomE+zAC+S2KVaxs6HhvNrHfkF/iiRDsIhx9y
+        P9IWsfDcxOk7M3Vnl5l20LqPDmf9uwllO/1s+Zr05frF9fkEc+dJfXA0DKbnh/53F6hsyX
+        +Apx0njxoLM8snZOQDH30ZWI0pK/3sU=
+Received: from mail-ot1-f69.google.com (mail-ot1-f69.google.com
+ [209.85.210.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-318-WaOLEBG5MGG6jDUR9B8ehQ-1; Wed, 25 Aug 2021 18:05:49 -0400
+X-MC-Unique: WaOLEBG5MGG6jDUR9B8ehQ-1
+Received: by mail-ot1-f69.google.com with SMTP id r10-20020a056830448a00b0051b9c05a2a8so301266otv.2
+        for <kvm@vger.kernel.org>; Wed, 25 Aug 2021 15:05:48 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=aY2Omr8i3Z9RwPbY54XXhXLRfUqWVte3e22E3NiG+6A=;
-        b=o0si78Glz/WF2vDJc9oapKGXR7qymzaNhiioWgrVX4RoAB4rUbDxbSQjAtWXBbYqyS
-         o+TsqU16aBQJwt+eH577mt87myIkleb0RE14hdhL2Vkxnd/CxIPez1aKc1bdCwKZmAlt
-         zRj12pOegs7QnFgXW5WRGcZRo/vvpGcbksoqTlq7Lpl6iUoq4OWQWcXriHEET7LowEXo
-         VTjlVfZcQOyv5IvV2X5oza8xBSrZxRztpudHMiPE3Ut9XByBNDfScMh1L4Vc3yxaIKau
-         NPK1G1HCTbzs20UeKOqc2jylaPQlC9+LjyD44rIilgQEGDRd9jjzW0JwZRNPnUeAZw7A
-         1fWQ==
-X-Gm-Message-State: AOAM531u0CT3k3Rswuwy0f0EFIvJVh/GCYy/uSlxfShguOewWcq//CsU
-        PVRz98JGyk2mOYgsh4lygvRa0Q==
-X-Google-Smtp-Source: ABdhPJx35HhsxvEq8d26HAearzhLATVZmQWASK01NsxB79Vfv7kp3LIb0fMMn26+jwwn+WXje9OZzA==
-X-Received: by 2002:a63:62c7:: with SMTP id w190mr295791pgb.105.1629928660133;
-        Wed, 25 Aug 2021 14:57:40 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id v63sm918511pgv.59.2021.08.25.14.57.39
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
+         :references:organization:mime-version:content-transfer-encoding;
+        bh=9bzdPdbfmLgeq8dXUQB3sYM02KhzqlIwyVi1sq5m3r8=;
+        b=Rlkfh2xHC2cSAArIpF4m7fwE+/57ua5B4VHpMC2nJkmcSdtjKXhQEeCyP88PZQa4K6
+         2Ka8DaNUmdOcbc+ioo/L32CpYI47InnQdpOzRdmYHwsINELzzi5Qq2RyvyBrPIruqEpA
+         DZ4G2mtBHuHc+yV9Tx24MTbpgG448N17DgKF3Ypqe3PvZkcfOPuVPfIN2sOeuXuPn412
+         N0OU/C2cNwwpWsB+Giyg2SCkgV3ze0VvW0Hj6wzkVlAiyNYKBvapRBcpkNKK3LSc1bwk
+         QwO8sMvQYKDeZmDzr5GUn4VkOj4uVutpfDgz90AUAmFKyFQG4AxGfUmC/bWt8B6gfu1J
+         smow==
+X-Gm-Message-State: AOAM532ofyc10nR+E5rofPxLvNOY70o2I7omfxYCF8FuqyM5OpcafWXG
+        zXmjHM2GXc1CLSBdeqHU3SLeq+jqDJR4uiRyDD87KpuQQ7OMx5j/UFWH1BtWrscqKS9ax+10Jaf
+        DWJDXaw5XnFqL
+X-Received: by 2002:a54:450b:: with SMTP id l11mr8671648oil.116.1629929148301;
+        Wed, 25 Aug 2021 15:05:48 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxBPtV6CuqHqtqxC3bi9fduSn7Z2NGiUT0Qa4bHqAHrOYoWOX545z6m1qYxokoWHNK1MtiyiA==
+X-Received: by 2002:a54:450b:: with SMTP id l11mr8671630oil.116.1629929148116;
+        Wed, 25 Aug 2021 15:05:48 -0700 (PDT)
+Received: from redhat.com ([198.99.80.109])
+        by smtp.gmail.com with ESMTPSA id f3sm237418otc.49.2021.08.25.15.05.47
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 25 Aug 2021 14:57:39 -0700 (PDT)
-Date:   Wed, 25 Aug 2021 21:57:35 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Lai Jiangshan <jiangshanlai+lkml@gmail.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-        LKML <linux-kernel@vger.kernel.org>,
-        Venkatesh Srinivas <venkateshs@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>
-Subject: Re: [PATCH 2/2] KVM: Guard cpusmask NULL check with
- CONFIG_CPUMASK_OFFSTACK
-Message-ID: <YSa8z5vQKbFuLtew@google.com>
-References: <20210821000501.375978-1-seanjc@google.com>
- <20210821000501.375978-3-seanjc@google.com>
- <CAJhGHyB1RjBLRLtaS80XQSTb0g35smxnBQPjEp-BwieKu1cwXw@mail.gmail.com>
+        Wed, 25 Aug 2021 15:05:47 -0700 (PDT)
+Date:   Wed, 25 Aug 2021 16:05:46 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Yishai Hadas <yishaih@nvidia.com>
+Cc:     <bhelgaas@google.com>, <corbet@lwn.net>,
+        <diana.craciun@oss.nxp.com>, <kwankhede@nvidia.com>,
+        <eric.auger@redhat.com>, <masahiroy@kernel.org>,
+        <michal.lkml@markovi.net>, <linux-pci@vger.kernel.org>,
+        <linux-doc@vger.kernel.org>, <kvm@vger.kernel.org>,
+        <linux-s390@vger.kernel.org>, <linux-kbuild@vger.kernel.org>,
+        <mgurtovoy@nvidia.com>, <jgg@nvidia.com>, <maorg@nvidia.com>,
+        <leonro@nvidia.com>
+Subject: Re: [PATCH V4 10/13] PCI / VFIO: Add 'override_only' support for
+ VFIO PCI sub system
+Message-ID: <20210825160546.380c0137.alex.williamson@redhat.com>
+In-Reply-To: <20210825135139.79034-11-yishaih@nvidia.com>
+References: <20210825135139.79034-1-yishaih@nvidia.com>
+        <20210825135139.79034-11-yishaih@nvidia.com>
+Organization: Red Hat
+X-Mailer: Claws Mail 3.18.0 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAJhGHyB1RjBLRLtaS80XQSTb0g35smxnBQPjEp-BwieKu1cwXw@mail.gmail.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Aug 25, 2021, Lai Jiangshan wrote:
-> On Sat, Aug 21, 2021 at 8:09 AM Sean Christopherson <seanjc@google.com> wrote:
-> > @@ -277,6 +277,14 @@ bool kvm_make_vcpus_request_mask(struct kvm *kvm, unsigned int req,
-> >                 if (!(req & KVM_REQUEST_NO_WAKEUP) && kvm_vcpu_wake_up(vcpu))
-> >                         continue;
-> >
-> > +               /*
-> > +                * tmp can be NULL if cpumasks are allocated off stack, as
-> > +                * allocation of the mask is deliberately not fatal and is
-> > +                * handled by falling back to kicking all online CPUs.
-> > +                */
-> > +               if (IS_ENABLED(CONFIG_CPUMASK_OFFSTACK) && !tmp)
-> > +                       continue;
-> > +
-> 
-> Hello, Sean
-> 
-> I don't think it is a good idea to reinvent the cpumask_available().
+On Wed, 25 Aug 2021 16:51:36 +0300
+Yishai Hadas <yishaih@nvidia.com> wrote:
+> diff --git a/scripts/mod/file2alias.c b/scripts/mod/file2alias.c
+> index 7c97fa8e36bc..c3edbf73157e 100644
+> --- a/scripts/mod/file2alias.c
+> +++ b/scripts/mod/file2alias.c
+> @@ -426,7 +426,7 @@ static int do_ieee1394_entry(const char *filename,
+>  	return 1;
+>  }
+>  
+> -/* Looks like: pci:vNdNsvNsdNbcNscNiN. */
+> +/* Looks like: pci:vNdNsvNsdNbcNscNiN or <prefix>_pci:vNdNsvNsdNbcNscNiN. */
+>  static int do_pci_entry(const char *filename,
+>  			void *symval, char *alias)
+>  {
+> @@ -440,8 +440,12 @@ static int do_pci_entry(const char *filename,
+>  	DEF_FIELD(symval, pci_device_id, subdevice);
+>  	DEF_FIELD(symval, pci_device_id, class);
+>  	DEF_FIELD(symval, pci_device_id, class_mask);
+> +	DEF_FIELD(symval, pci_device_id, override_only);
+>  
+> -	strcpy(alias, "pci:");
+> +	if (override_only & PCI_ID_F_VFIO_DRIVER_OVERRIDE)
+> +		strcpy(alias, "vfio_pci:");
+> +	else
+> +		strcpy(alias, "pci:");
 
-Using cpumask_available() is waaaay better, thanks!
+I'm a little concerned that we're allowing unknown, non-zero
+override_only values to fall through to create "pci:" alias matches.
+Should this be something like:
 
-Vitaly / Paolo, take this one instead?
+	if (override_only & PCI_ID_F_VFIO_DRIVER_OVERRIDE) {
+		strcpy(alias, "vfio_pci:");
+	} else if (override_only) {
+		warn("Unknown PCI driver_override alias %08X\n",
+			driver_override);
+		return 0;
+	} else {
+		strcpy(alias, "pci:");
+	}
 
-From deff3e168c0612a2947d1ef29e488282631a788c Mon Sep 17 00:00:00 2001
-From: Sean Christopherson <seanjc@google.com>
-Date: Fri, 20 Aug 2021 13:36:21 -0700
-Subject: [PATCH] KVM: Use cpumask_available() to check for NULL cpumask when
- kicking vCPUs
+And then if we can only have a single bit set in override_only (I
+can't think of a use case for a single entry to have multiple
+override options), should PCI_DEVICE_DRIVER_OVERRIDE() be defined to
+take a "driver_override_shift" value where .driver_override is assigned
+(1 << driver_override_shift)?  That would encode the semantics in the
+prototypes a little better.  Thanks,
 
-Check for a NULL cpumask_var_t when kicking multiple vCPUs via
-cpumask_available(), which performs a !NULL check if and only if cpumasks
-are configured to be allocated off-stack.  This is a meaningless
-optimization, e.g. avoids a TEST+Jcc and TEST+CMOV on x86, but more
-importantly helps document that the NULL check is necessary even though
-all callers pass in a local variable.
+Alex
 
-No functional change intended.
+>  	ADD(alias, "v", vendor != PCI_ANY_ID, vendor);
+>  	ADD(alias, "d", device != PCI_ANY_ID, device);
+>  	ADD(alias, "sv", subvendor != PCI_ANY_ID, subvendor);
 
-Cc: Lai Jiangshan <jiangshanlai@gmail.com>
-Signed-off-by: Sean Christopherson <seanjc@google.com>
----
- virt/kvm/kvm_main.c | 18 +++++++++++++++---
- 1 file changed, 15 insertions(+), 3 deletions(-)
-
-diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index 786b914db98f..2082aceffbf6 100644
---- a/virt/kvm/kvm_main.c
-+++ b/virt/kvm/kvm_main.c
-@@ -245,9 +245,13 @@ static void ack_flush(void *_completed)
- {
- }
-
--static inline bool kvm_kick_many_cpus(const struct cpumask *cpus, bool wait)
-+static inline bool kvm_kick_many_cpus(cpumask_var_t tmp, bool wait)
- {
--	if (unlikely(!cpus))
-+	const struct cpumask *cpus;
-+
-+	if (likely(cpumask_available(tmp)))
-+		cpus = tmp;
-+	else
- 		cpus = cpu_online_mask;
-
- 	if (cpumask_empty(cpus))
-@@ -277,6 +281,14 @@ bool kvm_make_vcpus_request_mask(struct kvm *kvm, unsigned int req,
- 		if (!(req & KVM_REQUEST_NO_WAKEUP) && kvm_vcpu_wake_up(vcpu))
- 			continue;
-
-+		/*
-+		 * tmp can be "unavailable" if cpumasks are allocated off stack
-+		 * as allocation of the mask is deliberately not fatal and is
-+		 * handled by falling back to kicking all online CPUs.
-+		 */
-+		if (!cpumask_available(tmp))
-+			continue;
-+
- 		/*
- 		 * Note, the vCPU could get migrated to a different pCPU at any
- 		 * point after kvm_request_needs_ipi(), which could result in
-@@ -288,7 +300,7 @@ bool kvm_make_vcpus_request_mask(struct kvm *kvm, unsigned int req,
- 		 * were reading SPTEs _before_ any changes were finalized.  See
- 		 * kvm_vcpu_kick() for more details on handling requests.
- 		 */
--		if (tmp != NULL && kvm_request_needs_ipi(vcpu, req)) {
-+		if (kvm_request_needs_ipi(vcpu, req)) {
- 			cpu = READ_ONCE(vcpu->cpu);
- 			if (cpu != -1 && cpu != me)
- 				__cpumask_set_cpu(cpu, tmp);
---
