@@ -2,141 +2,120 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7220F3F718A
-	for <lists+kvm@lfdr.de>; Wed, 25 Aug 2021 11:17:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3225B3F71B1
+	for <lists+kvm@lfdr.de>; Wed, 25 Aug 2021 11:27:16 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239555AbhHYJRp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 25 Aug 2021 05:17:45 -0400
-Received: from smtp-out1.suse.de ([195.135.220.28]:47480 "EHLO
-        smtp-out1.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233272AbhHYJRp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 25 Aug 2021 05:17:45 -0400
-Received: from imap1.suse-dmz.suse.de (imap1.suse-dmz.suse.de [192.168.254.73])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        id S239450AbhHYJ17 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 25 Aug 2021 05:27:59 -0400
+Received: from mail.kernel.org ([198.145.29.99]:50484 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S233076AbhHYJ15 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 25 Aug 2021 05:27:57 -0400
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by smtp-out1.suse.de (Postfix) with ESMTPS id 7DC1C22118;
-        Wed, 25 Aug 2021 09:16:58 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-        t=1629883018; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=Af1e3tXHfDmT+9DXS/it5aFxSlFxaJjERigjhxDIiFU=;
-        b=afayu3X7kmeLNmWI9HNgB4XgqHLBu/38tnAdiLCX9Wvv9JUPYhhqAUI7a/198WLzrBO1pt
-        MCGZ8/3foZ6/6cl72S53bhKn34JCT2VLupgzf4BlEsi0s1nYVM5CintXUCBgve41+Me+qr
-        Jh5/Hxh5KZt5Sneik0OjP1jblLJRJk4=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-        s=susede2_ed25519; t=1629883018;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=Af1e3tXHfDmT+9DXS/it5aFxSlFxaJjERigjhxDIiFU=;
-        b=R1a/N7HLX60OgiBSyY2rCXzD3P3OK3BckIgrns05/Noa9UYraEMBisfjXuXabmk6KK8bEd
-        5zhn9vYRNDDzXjBg==
-Received: from imap1.suse-dmz.suse.de (imap1.suse-dmz.suse.de [192.168.254.73])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap1.suse-dmz.suse.de (Postfix) with ESMTPS id F0B0C13887;
-        Wed, 25 Aug 2021 09:16:57 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap1.suse-dmz.suse.de with ESMTPSA
-        id QV/vOYkKJmGFAQAAGKfGzw
-        (envelope-from <vbabka@suse.cz>); Wed, 25 Aug 2021 09:16:57 +0000
-Message-ID: <c5a8f7e8-7146-0737-81a1-1faceb6992ab@suse.cz>
-Date:   Wed, 25 Aug 2021 11:16:56 +0200
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.0.1
-Content-Language: en-US
-To:     Joerg Roedel <jroedel@suse.de>, Dave Hansen <dave.hansen@intel.com>
-Cc:     Brijesh Singh <brijesh.singh@amd.com>, x86@kernel.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-coco@lists.linux.dev, linux-mm@kvack.org,
-        linux-crypto@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
-        David Rientjes <rientjes@google.com>,
-        Dov Murik <dovmurik@linux.ibm.com>,
-        Tobin Feldman-Fitzthum <tobin@ibm.com>,
-        Borislav Petkov <bp@alien8.de>,
-        Michael Roth <michael.roth@amd.com>,
-        "Kirill A . Shutemov" <kirill@shutemov.name>,
-        Andi Kleen <ak@linux.intel.com>, tony.luck@intel.com,
-        marcorr@google.com, sathyanarayanan.kuppuswamy@linux.intel.com,
-        Mike Kravetz <mike.kravetz@oracle.com>
-References: <20210820155918.7518-1-brijesh.singh@amd.com>
- <20210820155918.7518-9-brijesh.singh@amd.com>
- <f6d778a0-840d-8c9c-392d-5c9ffcc0bdc6@intel.com>
- <19599ede-9fc5-25e1-dcb3-98aafd8b7e87@amd.com>
- <3f426ef8-060e-ccc9-71b9-2448f2582a30@intel.com> <YSUhg/87jZPocLDP@suse.de>
-From:   Vlastimil Babka <vbabka@suse.cz>
-Subject: Re: [PATCH Part2 v5 08/45] x86/fault: Add support to handle the RMP
- fault for user address
-In-Reply-To: <YSUhg/87jZPocLDP@suse.de>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+        by mail.kernel.org (Postfix) with ESMTPSA id 9A62061100;
+        Wed, 25 Aug 2021 09:27:12 +0000 (UTC)
+Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94.2)
+        (envelope-from <maz@kernel.org>)
+        id 1mIpBe-0076Pu-J0; Wed, 25 Aug 2021 10:27:10 +0100
+Date:   Wed, 25 Aug 2021 10:27:10 +0100
+Message-ID: <87mtp5q3gx.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Oliver Upton <oupton@google.com>
+Cc:     kvmarm@lists.cs.columbia.edu, pshier@google.com,
+        ricarkol@google.com, rananta@google.com, reijiw@google.com,
+        jingzhangos@google.com, kvm@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, james.morse@arm.com,
+        alexandru.elisei@arm.com, suzuki.poulose@arm.com,
+        Drew Jones <drjones@redhat.com>,
+        Peter Maydell <peter.maydell@linaro.org>
+Subject: Re: KVM/arm64: Guest ABI changes do not appear rollback-safe
+In-Reply-To: <YSVhV+UIMY12u2PW@google.com>
+References: <YSVhV+UIMY12u2PW@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: oupton@google.com, kvmarm@lists.cs.columbia.edu, pshier@google.com, ricarkol@google.com, rananta@google.com, reijiw@google.com, jingzhangos@google.com, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, james.morse@arm.com, alexandru.elisei@arm.com, suzuki.poulose@arm.com, drjones@redhat.com, peter.maydell@linaro.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 8/24/21 18:42, Joerg Roedel wrote:
-> On Mon, Aug 23, 2021 at 07:50:22AM -0700, Dave Hansen wrote:
->> It *has* to be done in KVM, IMNHO.
->> 
->> The core kernel really doesn't know much about SEV.  It *really* doesn't
->> know when its memory is being exposed to a virtualization architecture
->> that doesn't know how to split TLBs like every single one before it.
->> 
->> This essentially *must* be done at the time that the KVM code realizes
->> that it's being asked to shove a non-splittable page mapping into the
->> SEV hardware structures.
->> 
->> The only other alternative is raising a signal from the fault handler
->> when the page can't be split.  That's a *LOT* nastier because it's so
->> much later in the process.
->> 
->> It's either that, or figure out a way to split hugetlbfs (and DAX)
->> mappings in a failsafe way.
+Hi Oliver,
+
+Adding Andrew and Peter to the discussion.
+
+On Tue, 24 Aug 2021 22:15:03 +0100,
+Oliver Upton <oupton@google.com> wrote:
 > 
-> Yes, I agree with that. KVM needs a check to disallow HugeTLB pages in
-> SEV-SNP guests, at least as a temporary workaround. When HugeTLBfs
-> mappings can be split into smaller pages the check can be removed.
-
-FTR, this is Sean's reply with concerns in v4:
-https://lore.kernel.org/linux-coco/YPCuTiNET%2FhJHqOY@google.com/
-
-I think there are two main arguments there:
-- it's not KVM business to decide
-- guest may do all page state changes with 2mb granularity so it might be fine
-with hugetlb
-
-The latter might become true, but I think it's more probable that sooner
-hugetlbfs will learn to split the mappings to base pages - I know people plan to
-work on that. At that point qemu will have to recognize if the host kernel is
-the new one that can do this splitting vs older one that can't. Preferably
-without relying on kernel version number, as backports exist. Thus, trying to
-register a hugetlbfs range that either is rejected (kernel can't split) or
-passes (kernel can split) seems like a straightforward way. So I'm also in favor
-of adding that, hopefuly temporary, check.
-
-Vlastimil
-
-> Regards,
+> Hey folks,
 > 
-> 	Joerg
+> Ricardo and I were discussing hypercall support in KVM/arm64 and
+> something seems to be a bit problematic. I do not see anywhere that KVM
+> requires opt-in from the VMM to expose new hypercalls to the guest. To
+> name a few, the TRNG and KVM PTP hypercalls are unconditionally provided
+> to the guest.
 > 
+> Exposing new hypercalls to guests in this manner seems very unsafe to
+> me. Suppose an operator is trying to upgrade from kernel N to kernel
+> N+1, which brings in the new 'widget' hypercall. Guests are live
+> migrated onto the N+1 kernel, but the operator finds a defect that
+> warrants a kernel rollback. VMs are then migrated from kernel N+1 -> N.
+> Any guests that discovered the 'widget' hypercall are likely going to
+> get fussy _very_ quickly on the old kernel.
 
+This goes against what we decided to support for the *only* publicly
+available VMM that cares about save/restore, which is that we only
+move forward and don't rollback. Hypercalls are the least of your
+worries, and there is a whole range of other architectural features
+that will have also appeared/disappeared (your own CNTPOFF series is a
+glaring example of this).
+
+I appreciate that you may have different considerations, but I felt
+that it was important to state *why* this is the way it is.
+
+> 
+> Really, we need to ensure that the exposed guest ABI is
+> backwards-compatible. Running a VMM that is blissfully unaware of the
+> 'widget' hypercall should not implicitly expose it to its guest on a new
+> kernel.
+> 
+> This conversation was in the context of devising a new UAPI that allows
+> VMMs to trap hypercalls to userspace. While such an interface would
+> easily work around the issue, the onus of ABI compatibility lies with
+> the kernel.
+> 
+> So, this is all a long-winded way of asking: how do we dig ourselves out
+> of this situation, and how to we avoid it happening again in the future?
+> I believe the answer to both is to have new VM capabilities for sets of
+> hypercalls exposed to the guest. Unfortunately, the unconditional
+> exposure of TRNG and PTP hypercalls is ABI now, so we'd have to provide
+> an opt-out at this point. For anything new, require opt-in from the VMM
+> before we give it to the guest.
+>
+> Have I missed something blatantly obvious, or do others see this as an
+> issue as well? I'll reply with an example of adding opt-out for PTP.
+> I'm sure other hypercalls could be handled similarly.
+
+Why do we need this? For future hypercalls, we could have some buy-in
+capabilities. For existing ones, it is too late, and negative features
+are just too horrible.
+
+For KVM-specific hypercalls, we could get the VMM to save/restore the
+bitmap of supported functions. That would be "less horrible". This
+could be implemented using extra "firmware pseudo-registers" such as
+the ones described in Documentation/virt/kvm/arm/psci.rst.
+
+Thanks,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
