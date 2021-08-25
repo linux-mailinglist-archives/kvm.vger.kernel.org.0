@@ -2,230 +2,149 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C8E443F7985
-	for <lists+kvm@lfdr.de>; Wed, 25 Aug 2021 17:55:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 71DD33F79E5
+	for <lists+kvm@lfdr.de>; Wed, 25 Aug 2021 18:08:50 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241538AbhHYP40 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 25 Aug 2021 11:56:26 -0400
-Received: from mail.kernel.org ([198.145.29.99]:44028 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S240495AbhHYP4Z (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 25 Aug 2021 11:56:25 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 6A8F461151;
-        Wed, 25 Aug 2021 15:55:39 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1629906939;
-        bh=V9s9KJfOQtTa6v8mYQHZaDcryO1e0OuOtnamjdvnDW8=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:From;
-        b=j48Eos7dG1irfytts2VXxMQlEKVsprLOBBgHDV3Ke2GU5I+HG+NxN6NED0G+RBwR1
-         reNklRdpyDciCXFAItYXzKe4nz+n+M6UVjYszJ0Oq+ciOT5XA95Q5HhnKN0Lam1lMF
-         AqamKFiBc9g1iuIQanioHWG3eOwETCdO/QIgfgZKqSMy3+Tr4uSwnlPFjw9267fe/W
-         uNiSrp2XpF9dOFIyqXhVF7CoZM+1dFWsVW6Z9YM+YAOnlbGIf+n1hnWYZu4WD0yjln
-         AH46VkxDg9bry8APkUAsKeDSHIdo+D3We7r6+9eWqoBYn6EkDmiFtPQg1teKQyaD1Z
-         feR2+12oRRprg==
-Date:   Wed, 25 Aug 2021 10:55:38 -0500
-From:   Bjorn Helgaas <helgaas@kernel.org>
-To:     Yishai Hadas <yishaih@nvidia.com>
-Cc:     bhelgaas@google.com, corbet@lwn.net, alex.williamson@redhat.com,
-        diana.craciun@oss.nxp.com, kwankhede@nvidia.com,
-        eric.auger@redhat.com, masahiroy@kernel.org,
-        michal.lkml@markovi.net, linux-pci@vger.kernel.org,
-        linux-doc@vger.kernel.org, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org, linux-kbuild@vger.kernel.org,
-        mgurtovoy@nvidia.com, jgg@nvidia.com, maorg@nvidia.com,
-        leonro@nvidia.com
-Subject: Re: [PATCH V4 10/13] PCI / VFIO: Add 'override_only' support for
- VFIO PCI sub system
-Message-ID: <20210825155538.GA3575783@bjorn-Precision-5520>
-MIME-Version: 1.0
+        id S230523AbhHYQJe (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 25 Aug 2021 12:09:34 -0400
+Received: from mail-bn8nam11on2089.outbound.protection.outlook.com ([40.107.236.89]:36064
+        "EHLO NAM11-BN8-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S240493AbhHYQJV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 25 Aug 2021 12:09:21 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=mACu4d7mqtjXpw7E86GwGeH6SUA362QyzrU03V2WOHgavxweMMztt/tV1+mI7lj95EhGa5TA+kJ+uPt39Hk9sYadYvVc08jagxNPXyX0/Z6ffX6nXW4wo1vpdSeMBsetD4gFLBAOhrIDYQ9Szjsn4joFAu4Wbn9EM8abNd6k7pNhmB71o7BXhs/fuf65KJZezRyJZ7nWE36xHN+wYQT9I41GDL/BjtcIyiddiiYWiksi9GJ5uugoqbvoJhIzSleijXpwRCaoyVsI9fNl4cKmHgp27r+cyB5Soh6zI9oztcm6groTBOhinyZKMzFQR95jwZ5/ER8gIcOlcljwpMdQYA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=GZZH9z4vDS7n7dSohoSc9inIUaV+O5E71WLyFVdKlNA=;
+ b=b1A87/kYYTaI5fzo2sBJ+a+T56p++i9pOiWimrwVF7/GSzRXGXYI2Usrq9uqDpo2kXdgpgHo0civSKwdnUftmtll4UZNLIxpeySG3HiU2cxRpHKQpRJutuG+RzzLvtLTTyJ9Hror/C7D2cErlnU2h9PBi33uwOy+I/i0j8yVi+ffF+CzRvjrF+/dsRAFOrmjhPyDY9hUKgxMr7Dg/m3+sAyRp5DpgN6STlQrZInucxck7t4kCR2p78/zsd1FHJyHQq8/zWCOnplxizwnDFV4FQLw0nfZQCStBligRxERgmZR+zeAx+5vk71tAgE9UdkDgBHBccZcP6PG4ACeZxPqkA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=GZZH9z4vDS7n7dSohoSc9inIUaV+O5E71WLyFVdKlNA=;
+ b=Z6pMKamExxjubsRepYlmZbm1msX3CBZQ5Smh11beMhCU8h4CTX62KqETKzbInQb0GPWUkSGvlWIsCJ7CWgiqYZ1Pntu+psmcGEDzV7Uet0CRGJkeQP8YXe9XMA2kR3vYRRcCZN5x8IEWLnf2AgszJQQaCvGFelgEvZ/sttuPvyVUeOx+5F45pIbsHogZJc9ZsYcnqI2w8R5D8d0+MjAICCQQDXC5gw/KJuOYcHWYlrCQJSkZGmfg8xf4jBPzrnlfvR/wxCP2TbPAOMinh+QmjAA5l0M6K0+0Rk1JLxSipgWh/jIbGGmtWOSm2LTvjFWuse5Lb6ni08nvWkIW5jtFpg==
+Authentication-Results: redhat.com; dkim=none (message not signed)
+ header.d=none;redhat.com; dmarc=none action=none header.from=nvidia.com;
+Received: from BL0PR12MB5506.namprd12.prod.outlook.com (2603:10b6:208:1cb::22)
+ by BL0PR12MB5522.namprd12.prod.outlook.com (2603:10b6:208:17d::13) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4436.19; Wed, 25 Aug
+ 2021 16:08:34 +0000
+Received: from BL0PR12MB5506.namprd12.prod.outlook.com
+ ([fe80::1de1:52a9:cf66:f336]) by BL0PR12MB5506.namprd12.prod.outlook.com
+ ([fe80::1de1:52a9:cf66:f336%8]) with mapi id 15.20.4436.024; Wed, 25 Aug 2021
+ 16:08:34 +0000
+Date:   Wed, 25 Aug 2021 13:08:32 -0300
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     Alex Williamson <alex.williamson@redhat.com>
+Cc:     Christoph Hellwig <hch@lst.de>,
+        Diana Craciun <diana.craciun@oss.nxp.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Kirti Wankhede <kwankhede@nvidia.com>,
+        Eric Auger <eric.auger@redhat.com>, kvm@vger.kernel.org,
+        Max Gurtovoy <mgurtovoy@nvidia.com>,
+        Yishai Hadas <yishaih@nvidia.com>
+Subject: Re: [PATCH 01/14] vfio: Move vfio_iommu_group_get() to
+ vfio_register_group_dev()
+Message-ID: <20210825160832.GI1721383@nvidia.com>
+References: <20210824144649.1488190-1-hch@lst.de>
+ <20210824144649.1488190-2-hch@lst.de>
+ <20210824142508.3a72fe4a.alex.williamson@redhat.com>
+ <20210825124303.GA17334@lst.de>
+ <20210825094819.1f433068.alex.williamson@redhat.com>
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20210825135139.79034-11-yishaih@nvidia.com>
+In-Reply-To: <20210825094819.1f433068.alex.williamson@redhat.com>
+X-ClientProxiedBy: MN2PR01CA0035.prod.exchangelabs.com (2603:10b6:208:10c::48)
+ To BL0PR12MB5506.namprd12.prod.outlook.com (2603:10b6:208:1cb::22)
+MIME-Version: 1.0
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from mlx.ziepe.ca (142.162.113.129) by MN2PR01CA0035.prod.exchangelabs.com (2603:10b6:208:10c::48) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4436.19 via Frontend Transport; Wed, 25 Aug 2021 16:08:33 +0000
+Received: from jgg by mlx with local (Exim 4.94)        (envelope-from <jgg@nvidia.com>)        id 1mIvS4-004yP3-Co; Wed, 25 Aug 2021 13:08:32 -0300
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 753abe00-be5a-4a81-185b-08d967e29673
+X-MS-TrafficTypeDiagnostic: BL0PR12MB5522:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <BL0PR12MB55226CA5A8490211D6F2E837C2C69@BL0PR12MB5522.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:9508;
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: ILHcpPWNcao1Zgnd9AcUJFiwJcjUumUgY3OWz3yEPOSPrk0trQkthqbm66cQ9DK6zWY8FtZrv119KNvqo+9FSliNcpx2bzIcbOsvZesRzVcB+5736N4M7PisOw2Pv8SRlMlv1h650YIpAqgxk12/nXX5Owza5lLJqRfdsB1FZecwMKFu8GXQV7+JB6nQX58EjLFAyYyTvqWSIlylHUj4p2LGS0RwBSjpicmIyhhUTY+CLOWGWHcAUnwme0qB1qsk4zwIwJrq5ad+Tgph+AFyM+oJ1KyGFPgnI3WAucM0CvU+2kYpTJ464aXLbYTaND0+u6zFni8vlVNasvYn3fD+FR2heTPJZxPCc6DlSHJ/MVmy8FpfcAJVWnXRvz7uSJagFv59NWQyi+uub/AGDnkN2JdZ05TKDnWYuqVjE0IazyQ5h7//oFwGeeVXvcP1jXyvRb9RZZy8HoRWdCbcPCNmgl/ibSShVMbudIia5E2PoLkiMTCik2WTqZbLLVHRTU+1pAl8F0bhMjbgnPPbvsGXLRravduFek+P1XsCsJJUFgoVgkhN29BXHxeyRkXoLgoXYxufs0eML+EvZyoBwQjZtTQrtEHD8svGGktJXdmlwTc9e4GK6V9EomcEF1hnnfe2CvIspcXhDzVDes6XEO7k6Q==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL0PR12MB5506.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(136003)(346002)(396003)(376002)(39860400002)(366004)(36756003)(2906002)(9746002)(86362001)(9786002)(2616005)(186003)(54906003)(66556008)(5660300002)(107886003)(66476007)(6916009)(8676002)(316002)(1076003)(83380400001)(478600001)(4326008)(26005)(33656002)(38100700002)(8936002)(66946007)(426003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?vtI9WdeSeAuK0Oy71gJqhMrm3CWLuB73ldvcynGsjhDKOzmy2EcATCEBzraj?=
+ =?us-ascii?Q?f39FOq8aSPsZDe4WZSCxSZOO6b3qWyUl8dOFxbwByy2QpGwBdG46RaHv576T?=
+ =?us-ascii?Q?2HIfBhv4wdK45amXmDcOjtp9kmHaXRptPdt+UW+yt2NiYDuv7yHzaneVWc3R?=
+ =?us-ascii?Q?V2zcRvRWRrsbnPlRfaQWv+7E6aHH666lzQD1K+umHuVsLoyoscQImZYjv8kh?=
+ =?us-ascii?Q?ISO2+wVq9BeSDd7FjnPFZ+z+awKnlWdkfmxplN729poe9SehfaGwNoha9RYT?=
+ =?us-ascii?Q?eeE9sphmJYj1t8POVUBzrSg7i/lciRpj0+7ZglQLcO5Zb1CJBejYkYCvThU/?=
+ =?us-ascii?Q?UBwYKwPt/12Jh+3odivztGm+zBGlDXfm6nStvlMKTh/xvTvNnKkM7P65ymZa?=
+ =?us-ascii?Q?TQKh/vF2uCDVsWkKoRn/UfXoNsLY2P/sDwdywpk3d6zAs6TRAri2hKMxOAYb?=
+ =?us-ascii?Q?3AYqKcWHnI4dfCFinLCuMjzCRo8ZyTEpYFNophuhx4DZJkDL1oTJBBygNi1s?=
+ =?us-ascii?Q?D2d5nwcCtJ60LPb64ycnlw0qI1ZLUUpe2m0bt39EapF3kKWqCDjOpnDKmv8r?=
+ =?us-ascii?Q?IX1EECeVMLiwRWxTuSbgNQcXCY61eczQBG2szAl3F2WFmEoZoxXc7gOZjIkI?=
+ =?us-ascii?Q?oQt5CVdp+luFwUQ/tU0f5Nd9iQDRF+WZFszAf/br9FYzmmIRC0JjClJS2ehQ?=
+ =?us-ascii?Q?9Re/NionU6inuf4FXt5v5iW5Ukm19dD0FXn+qPzIJXertj/3fKq1OAVXCGt2?=
+ =?us-ascii?Q?5GRJzVW/t09UxMf5cSdS7MoJHiKLS/AwLsM1hdVM9CBJA4nOj/5d97Hp28Zi?=
+ =?us-ascii?Q?cfVoXPmw1NRq+DWU2NkAdfKpOgS63fm06e5Qi2fto4FFaENjG0ZB+Xgx56+v?=
+ =?us-ascii?Q?km0NCh9U8F7DOaKaPriQtiv1ZXRbyqvzXtj9CtbRYV8LdjxSQI8MIbKxz27R?=
+ =?us-ascii?Q?2ilPp5PVltDI3+B8JHA+Eq4asV8zutOCcpl121R1pbeB4o7JYfXIByygiBOU?=
+ =?us-ascii?Q?OWB7RxHPDJQc+gsLWs/5aiN4HG27GeRAGaBfVgBPxyNTaqdN3126LAYDqkM/?=
+ =?us-ascii?Q?Abu0iFFbI8d34FWRBDURb49/FqRUFCJ5CuyrBVy5iba0UEQDqbmxbUvztNFP?=
+ =?us-ascii?Q?Ov9iVHrAQuxv7Ik1UxsCKkMbtevpMFIz+T7WjWOnJy2Jy3jwePe75Qg4IBWS?=
+ =?us-ascii?Q?bYC8vYOTfLX94fhmlN/EGc5xiuSvD7Jehk9lLeOZuidmQ/XD3Nsk8ZQHFKXO?=
+ =?us-ascii?Q?g5xVv2O7/el7l8I412umMiObz3rtyy82CcI/6m4RCJ7fufAMP70nJYwHakNG?=
+ =?us-ascii?Q?UQ3kkDZGMKwrUjXtoiFZynmz?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 753abe00-be5a-4a81-185b-08d967e29673
+X-MS-Exchange-CrossTenant-AuthSource: BL0PR12MB5506.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Aug 2021 16:08:34.4096
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: rMR3YsR/Oqs7nL6seED0VyY8BqPVvHccSNAKpa+74EB3DDdmp+Bv/2w2J9PBQ28C
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL0PR12MB5522
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Aug 25, 2021 at 04:51:36PM +0300, Yishai Hadas wrote:
-> From: Max Gurtovoy <mgurtovoy@nvidia.com>
+On Wed, Aug 25, 2021 at 09:48:19AM -0600, Alex Williamson wrote:
+> On Wed, 25 Aug 2021 14:43:03 +0200
+> Christoph Hellwig <hch@lst.de> wrote:
 > 
-> Expose an 'override_only' helper macro (i.e.
-> PCI_DRIVER_OVERRIDE_DEVICE_VFIO) for VFIO PCI sub system and add the
-> required code to prefix its matching entries with "vfio_" in
-> modules.alias file.
+> > On Tue, Aug 24, 2021 at 02:25:08PM -0600, Alex Williamson wrote:
+> > > I think this turns into the patch below on top of Yishai's
+> > > vfio-pci-core series.  Please verify.  If you'd like something
+> > > different, please post an update.  Thanks,  
+> > 
+> > The change looks fine to me.  Does that mean you want me to rebase
+> > on top of the above series?
 > 
-> It allows VFIO device drivers to include match entries in the
-> modules.alias file produced by kbuild that are not used for normal
-> driver autoprobing and module autoloading. Drivers using these match
-> entries can be connected to the PCI device manually, by userspace, using
-> the existing driver_override sysfs.
+> I wish the answer here was more obvious, but we're still waiting for
+> PCI and scripts/mod/ acks for that series.  I note however that while
+> the functionality of other driver's having a userspace driver discovery
+> mechanism hinges on patches 9 & 10 of Yishai's series, those patches
+> can also be cleanly moved to the end of the series, or a follow-on
+> series if necessary, and current vfio-pci binding continues to work.
 > 
-> For example the resulting modules.alias may have:
-> 
->   alias pci:v000015B3d00001021sv*sd*bc*sc*i* mlx5_core
->   alias vfio_pci:v000015B3d00001021sv*sd*bc*sc*i* mlx5_vfio_pci
->   alias vfio_pci:v*d*sv*sd*bc*sc*i* vfio_pci
-> 
-> In this example mlx5_core and mlx5_vfio_pci match to the same PCI
-> device. The kernel will autoload and autobind to mlx5_core but the
-> kernel and udev mechanisms will ignore mlx5_vfio_pci.
-> 
-> When userspace wants to change a device to the VFIO subsystem it can
-> implement a generic algorithm:
-> 
->    1) Identify the sysfs path to the device:
->     /sys/devices/pci0000:00/0000:00:01.0/0000:01:00.0
-> 
->    2) Get the modalias string from the kernel:
->     $ cat /sys/bus/pci/devices/0000:01:00.0/modalias
->     pci:v000015B3d00001021sv000015B3sd00000001bc02sc00i00
-> 
->    3) Prefix it with vfio_:
->     vfio_pci:v000015B3d00001021sv000015B3sd00000001bc02sc00i00
-> 
->    4) Search modules.alias for the above string and select the entry that
->       has the fewest *'s:
->     alias vfio_pci:v000015B3d00001021sv*sd*bc*sc*i* mlx5_vfio_pci
-> 
->    5) modprobe the matched module name:
->     $ modprobe mlx5_vfio_pci
-> 
->    6) cat the matched module name to driver_override:
->     echo mlx5_vfio_pci > /sys/bus/pci/devices/0000:01:00.0/driver_override
-> 
->    7) unbind device from original module
->      echo 0000:01:00.0 > /sys/bus/pci/devices/0000:01:00.0/driver/unbind
-> 
->    8) probe PCI drivers (or explicitly bind to mlx5_vfio_pci)
->     echo 0000:01:00.0 > /sys/bus/pci/drivers_probe
-> 
-> The algorithm is independent of bus type. In future the other buses with
-> VFIO device drivers, like platform and ACPI, can use this algorithm as
-> well.
-> 
-> This patch is the infrastructure to provide the information in the
-> modules.alias to userspace. Convert the only VFIO pci_driver which results
-> in one new line in the modules.alias:
-> 
->   alias vfio_pci:v*d*sv*sd*bc*sc*i* vfio_pci
-> 
-> Later series introduce additional HW specific VFIO PCI drivers, such as
-> mlx5_vfio_pci.
-> 
-> Signed-off-by: Max Gurtovoy <mgurtovoy@nvidia.com>
-> Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
-> Signed-off-by: Yishai Hadas <yishaih@nvidia.com>
+> Should we go ahead and get final reviews for {1-8,11-13} of Yishai's
+> series to get them in my next branch so we have a consistent base to
+> work from?  Thanks,
 
-Acked-by: Bjorn Helgaas <bhelgaas@google.com>  # for pci.h
+I see Bjorn has just now ack'd the PCI parts so I think it is also
+fine to go ahead. A subsystem is ultimately responsible to define the
+modalias format under its bus, the file2alias changes are supposed to
+track it.
 
-> ---
->  drivers/vfio/pci/vfio_pci.c       |  9 ++++++++-
->  include/linux/mod_devicetable.h   |  4 ++++
->  include/linux/pci.h               | 14 ++++++++++++++
->  scripts/mod/devicetable-offsets.c |  1 +
->  scripts/mod/file2alias.c          |  8 ++++++--
->  5 files changed, 33 insertions(+), 3 deletions(-)
-> 
-> diff --git a/drivers/vfio/pci/vfio_pci.c b/drivers/vfio/pci/vfio_pci.c
-> index 163e560c4495..85fd638a5955 100644
-> --- a/drivers/vfio/pci/vfio_pci.c
-> +++ b/drivers/vfio/pci/vfio_pci.c
-> @@ -178,9 +178,16 @@ static int vfio_pci_sriov_configure(struct pci_dev *pdev, int nr_virtfn)
->  	return vfio_pci_core_sriov_configure(pdev, nr_virtfn);
->  }
->  
-> +static const struct pci_device_id vfio_pci_table[] = {
-> +	{ PCI_DRIVER_OVERRIDE_DEVICE_VFIO(PCI_ANY_ID, PCI_ANY_ID) }, /* match all by default */
-> +	{}
-> +};
-> +
-> +MODULE_DEVICE_TABLE(pci, vfio_pci_table);
-> +
->  static struct pci_driver vfio_pci_driver = {
->  	.name			= "vfio-pci",
-> -	.id_table		= NULL, /* only dynamic ids */
-> +	.id_table		= vfio_pci_table,
->  	.probe			= vfio_pci_probe,
->  	.remove			= vfio_pci_remove,
->  	.sriov_configure	= vfio_pci_sriov_configure,
-> diff --git a/include/linux/mod_devicetable.h b/include/linux/mod_devicetable.h
-> index 2e3ba6d9ece0..f0325a172f87 100644
-> --- a/include/linux/mod_devicetable.h
-> +++ b/include/linux/mod_devicetable.h
-> @@ -16,6 +16,10 @@ typedef unsigned long kernel_ulong_t;
->  
->  #define PCI_ANY_ID (~0)
->  
-> +enum {
-> +	PCI_ID_F_VFIO_DRIVER_OVERRIDE	= 1 << 0,
-> +};
-> +
->  /**
->   * struct pci_device_id - PCI device ID structure
->   * @vendor:		Vendor ID to match (or PCI_ANY_ID)
-> diff --git a/include/linux/pci.h b/include/linux/pci.h
-> index 0506b1a8c921..527a1dfd1d06 100644
-> --- a/include/linux/pci.h
-> +++ b/include/linux/pci.h
-> @@ -916,6 +916,20 @@ struct pci_driver {
->  	.vendor = (vend), .device = (dev), .subvendor = PCI_ANY_ID, \
->  	.subdevice = PCI_ANY_ID, .override_only = (driver_override)
->  
-> +/**
-> + * PCI_DRIVER_OVERRIDE_DEVICE_VFIO - macro used to describe a VFIO
-> + *                                   "driver_override" PCI device.
-> + * @vend: the 16 bit PCI Vendor ID
-> + * @dev: the 16 bit PCI Device ID
-> + *
-> + * This macro is used to create a struct pci_device_id that matches a
-> + * specific device. The subvendor and subdevice fields will be set to
-> + * PCI_ANY_ID and the driver_override will be set to
-> + * PCI_ID_F_VFIO_DRIVER_OVERRIDE.
-> + */
-> +#define PCI_DRIVER_OVERRIDE_DEVICE_VFIO(vend, dev) \
-> +	PCI_DEVICE_DRIVER_OVERRIDE(vend, dev, PCI_ID_F_VFIO_DRIVER_OVERRIDE)
-> +
->  /**
->   * PCI_DEVICE_SUB - macro used to describe a specific PCI device with subsystem
->   * @vend: the 16 bit PCI Vendor ID
-> diff --git a/scripts/mod/devicetable-offsets.c b/scripts/mod/devicetable-offsets.c
-> index 9bb6c7edccc4..cc3625617a0e 100644
-> --- a/scripts/mod/devicetable-offsets.c
-> +++ b/scripts/mod/devicetable-offsets.c
-> @@ -42,6 +42,7 @@ int main(void)
->  	DEVID_FIELD(pci_device_id, subdevice);
->  	DEVID_FIELD(pci_device_id, class);
->  	DEVID_FIELD(pci_device_id, class_mask);
-> +	DEVID_FIELD(pci_device_id, override_only);
->  
->  	DEVID(ccw_device_id);
->  	DEVID_FIELD(ccw_device_id, match_flags);
-> diff --git a/scripts/mod/file2alias.c b/scripts/mod/file2alias.c
-> index 7c97fa8e36bc..c3edbf73157e 100644
-> --- a/scripts/mod/file2alias.c
-> +++ b/scripts/mod/file2alias.c
-> @@ -426,7 +426,7 @@ static int do_ieee1394_entry(const char *filename,
->  	return 1;
->  }
->  
-> -/* Looks like: pci:vNdNsvNsdNbcNscNiN. */
-> +/* Looks like: pci:vNdNsvNsdNbcNscNiN or <prefix>_pci:vNdNsvNsdNbcNscNiN. */
->  static int do_pci_entry(const char *filename,
->  			void *symval, char *alias)
->  {
-> @@ -440,8 +440,12 @@ static int do_pci_entry(const char *filename,
->  	DEF_FIELD(symval, pci_device_id, subdevice);
->  	DEF_FIELD(symval, pci_device_id, class);
->  	DEF_FIELD(symval, pci_device_id, class_mask);
-> +	DEF_FIELD(symval, pci_device_id, override_only);
->  
-> -	strcpy(alias, "pci:");
-> +	if (override_only & PCI_ID_F_VFIO_DRIVER_OVERRIDE)
-> +		strcpy(alias, "vfio_pci:");
-> +	else
-> +		strcpy(alias, "pci:");
->  	ADD(alias, "v", vendor != PCI_ANY_ID, vendor);
->  	ADD(alias, "d", device != PCI_ANY_ID, device);
->  	ADD(alias, "sv", subvendor != PCI_ANY_ID, subvendor);
-> -- 
-> 2.18.1
-> 
+Also I'm looking at past changes to file2alias and I don't really see
+many acks..
+
+Thanks,
+Jason
