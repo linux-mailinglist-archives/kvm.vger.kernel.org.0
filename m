@@ -2,65 +2,66 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 96ABF3F710C
-	for <lists+kvm@lfdr.de>; Wed, 25 Aug 2021 10:21:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6730D3F711A
+	for <lists+kvm@lfdr.de>; Wed, 25 Aug 2021 10:26:57 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239352AbhHYIWE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 25 Aug 2021 04:22:04 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:28890 "EHLO
+        id S239326AbhHYI1l (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 25 Aug 2021 04:27:41 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:24353 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S239338AbhHYIWB (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 25 Aug 2021 04:22:01 -0400
+        by vger.kernel.org with ESMTP id S231971AbhHYI1j (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 25 Aug 2021 04:27:39 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1629879675;
+        s=mimecast20190719; t=1629880013;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=QW7PXYP8IfyOJUWBjxnrPNW0xt14Kogt0NQDd6gwJ6Y=;
-        b=GMP6eY7Q7fFz8eqlaHeB0FoCTqZw392l0vmKjWa0i7EfClsDsaVthFBMp1OguEu4M0SJXv
-        kQbVrdR8jn5PkCnf8U3w3lr6vZ6vhPNTpNuu0rSb1g0flvM7sJHXD0CdzYg8WEwcfrtAs0
-        rraQkzO2Jb0wQc8lfLNSM04RwT8neYw=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-571-tQ0wEnuZPQCxqEyWbPeXYg-1; Wed, 25 Aug 2021 04:21:07 -0400
-X-MC-Unique: tQ0wEnuZPQCxqEyWbPeXYg-1
-Received: by mail-wr1-f69.google.com with SMTP id b7-20020a5d4d87000000b001575d1053d2so1543873wru.23
-        for <kvm@vger.kernel.org>; Wed, 25 Aug 2021 01:21:07 -0700 (PDT)
+        bh=hw2zPmIxOckhD41uqS/X7JqPhnbQ+Fo/eKabxGOh6b8=;
+        b=dJo62gZhqniAv0nJEodfTb257a+kx9Hbvn8gHLSOq/uB2HzoJNkhPZfSdQ4+t9dNO1ERyA
+        H0CkKjycfBMdS8sP8WrLsNITZ401uioJnwfHHEn5AaF0HxOffi5DFjVSYNnzfP6b6VhsCo
+        twWFU1idfzT+HRz3fa/h+nka2ajWXnA=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-159-gpGCLyLEOzyemqtmq4F3Uw-1; Wed, 25 Aug 2021 04:26:46 -0400
+X-MC-Unique: gpGCLyLEOzyemqtmq4F3Uw-1
+Received: by mail-wr1-f71.google.com with SMTP id n10-20020a5d660a0000b02901551ef5616eso6399772wru.20
+        for <kvm@vger.kernel.org>; Wed, 25 Aug 2021 01:26:46 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
          :message-id:mime-version;
-        bh=QW7PXYP8IfyOJUWBjxnrPNW0xt14Kogt0NQDd6gwJ6Y=;
-        b=hEEhycMvjcQznN6lEn8r5Znr2B/gNKraOWn4+UManR6lRwFqQ6/Xd4j+HBPdsPamwF
-         GMfYlGaOE2XR0g5QWxydg0ucdCsM0oi32iPhOK3MEfZGqpkrfxOJP/ZlRlxaMHPk8kyK
-         v31wW/lS2e3kGG+xdC92Q4Tgwrqh0grGryixOrnFpZse9eUyBQNSLkAQjMghvh/Hlkcn
-         pgtXhQPAPbncu1eqMTfQstDgYRTJS3ebaukm93ilwvU5knODNED6/la6kQ5kFqW2h2yF
-         qmXdubeRPbbCddgnpiIQ13RIGUeQT1c8Uvmf4HpG8Of/gIkE4Zdl5ShmpeXHMyuaAa+H
-         tykA==
-X-Gm-Message-State: AOAM533Df8WXTaXwVy6qS/4H2HjL8aBa1wnbLPsaauxUfgEA7cwjlqZ0
-        Jy8XOisUYePWCGNS3yVwnXyajTQk4fp+SvzyZXI0Wcg1TeV9a6tUKi+4fis9/pgEmvYSl28cjLW
-        d0M2tyxZ8vVbA
-X-Received: by 2002:a05:600c:22d3:: with SMTP id 19mr8046410wmg.36.1629879666474;
-        Wed, 25 Aug 2021 01:21:06 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxTA19up2LH13aznsuiyStC+W/wWm3m+AvccbfYlcYYMsVuq7TaIZTrQj6ozbcDLZF+FTmrug==
-X-Received: by 2002:a05:600c:22d3:: with SMTP id 19mr8046395wmg.36.1629879666254;
-        Wed, 25 Aug 2021 01:21:06 -0700 (PDT)
+        bh=hw2zPmIxOckhD41uqS/X7JqPhnbQ+Fo/eKabxGOh6b8=;
+        b=nGji/Vf0SjZOEm9wtlhZmVe7beCQ/wzDeYQCA8UJYHrwecwVxSeNi2wXfnTDwcyZVg
+         KtBxJjU6mnvS8gEBYhaMu12vJWPfGytECBVOUG1NCQzvx1C2c35EKN53kQ4B9+O4HVyY
+         fHeN1FOevyjZUftoK4YvHfo00CToZD4tGuywokfdpy3qqK9pnIRKc+yrWJ2Uuf9V7LEG
+         Fz1V3bHmzUq+BNPpDq6pJkSAn8R0tIirduzkwA3DIohjVxuMYIQ/wdbzj7r+OQa5xKAN
+         I3f5WT+2ysKrueCBCF0Vy1b5QyhqHFB7+1AtVw6/O5kCiHpmDDorBX8NYoNRivafjuPn
+         C5kA==
+X-Gm-Message-State: AOAM532wURKOHhd2ysbh+CJ4OAVwa+I4neKkqtT6OhKnAmRMnlwUzwWL
+        5kPi64A2Z+sJXyv3TXvw3lYSwVRsjPzZdu4idK6p6hJxV8geHwCPqrXbuf1cHyzjtZaPOKD8RGU
+        R3DzKMLOwIETY
+X-Received: by 2002:adf:c506:: with SMTP id q6mr789736wrf.78.1629880005743;
+        Wed, 25 Aug 2021 01:26:45 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJw6A5hiH3U/43h6cOiMSnLit5EgFI1b0pDXuQx1QTuJr31niaj9920rv40BxROGgkMGDI5wDQ==
+X-Received: by 2002:adf:c506:: with SMTP id q6mr789715wrf.78.1629880005568;
+        Wed, 25 Aug 2021 01:26:45 -0700 (PDT)
 Received: from vitty.brq.redhat.com (g-server-2.ign.cz. [91.219.240.2])
-        by smtp.gmail.com with ESMTPSA id d24sm4510653wmb.35.2021.08.25.01.21.05
+        by smtp.gmail.com with ESMTPSA id f23sm4484806wmc.3.2021.08.25.01.26.44
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 25 Aug 2021 01:21:05 -0700 (PDT)
+        Wed, 25 Aug 2021 01:26:45 -0700 (PDT)
 From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     Maxim Levitsky <mlevitsk@redhat.com>
-Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
+To:     Sean Christopherson <seanjc@google.com>,
+        Maxim Levitsky <mlevitsk@redhat.com>
+Cc:     Eduardo Habkost <ehabkost@redhat.com>, kvm@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
         "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
         Nitesh Narayan Lal <nitesh@redhat.com>,
-        linux-kernel@vger.kernel.org, Eduardo Habkost <ehabkost@redhat.com>
+        linux-kernel@vger.kernel.org
 Subject: Re: [PATCH v2 4/4] KVM: x86: Fix stack-out-of-bounds memory access
  from ioapic_write_indirect()
-In-Reply-To: <2df0b6d18115fb7f2701587b7937d8ddae38e36a.camel@redhat.com>
+In-Reply-To: <YSUvESHcms6B3+DA@google.com>
 References: <20210823143028.649818-1-vkuznets@redhat.com>
  <20210823143028.649818-5-vkuznets@redhat.com>
  <20210823185841.ov7ejn2thwebcwqk@habkost.net>
@@ -68,93 +69,108 @@ References: <20210823143028.649818-1-vkuznets@redhat.com>
  <CAOpTY_ot8teH5x5vVS2HvuMx5LSKLPtyen_ZUM1p7ncci4LFbA@mail.gmail.com>
  <87k0kakip9.fsf@vitty.brq.redhat.com>
  <2df0b6d18115fb7f2701587b7937d8ddae38e36a.camel@redhat.com>
-Date:   Wed, 25 Aug 2021 10:21:04 +0200
-Message-ID: <87h7fej5ov.fsf@vitty.brq.redhat.com>
+ <YSUvESHcms6B3+DA@google.com>
+Date:   Wed, 25 Aug 2021 10:26:44 +0200
+Message-ID: <87eeaij5ff.fsf@vitty.brq.redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Maxim Levitsky <mlevitsk@redhat.com> writes:
+Sean Christopherson <seanjc@google.com> writes:
 
-> On Tue, 2021-08-24 at 16:42 +0200, Vitaly Kuznetsov wrote:
-...
+> On Tue, Aug 24, 2021, Maxim Levitsky wrote:
+>> On Tue, 2021-08-24 at 16:42 +0200, Vitaly Kuznetsov wrote:
+>> > Eduardo Habkost <ehabkost@redhat.com> writes:
+>> > 
+>> > > On Tue, Aug 24, 2021 at 3:13 AM Vitaly Kuznetsov <vkuznets@redhat.com> wrote:
+>> > > > Eduardo Habkost <ehabkost@redhat.com> writes:
+>> > > > 
+>> > > > > On Mon, Aug 23, 2021 at 04:30:28PM +0200, Vitaly Kuznetsov wrote:
+>> > > > > > diff --git a/arch/x86/kvm/ioapic.c b/arch/x86/kvm/ioapic.c
+>> > > > > > index ff005fe738a4..92cd4b02e9ba 100644
+>> > > > > > --- a/arch/x86/kvm/ioapic.c
+>> > > > > > +++ b/arch/x86/kvm/ioapic.c
+>> > > > > > @@ -319,7 +319,7 @@ static void ioapic_write_indirect(struct kvm_ioapic *ioapic, u32 val)
+>> > > > > >      unsigned index;
+>> > > > > >      bool mask_before, mask_after;
+>> > > > > >      union kvm_ioapic_redirect_entry *e;
+>> > > > > > -    unsigned long vcpu_bitmap;
+>> > > > > > +    unsigned long vcpu_bitmap[BITS_TO_LONGS(KVM_MAX_VCPUS)];
 >
-> Not a classical review but,
-> I did some digital archaeology with this one, trying to understand what is going on:
+> The preferred pattern is:
 >
+> 	DECLARE_BITMAP(vcpu_bitmap, KVM_MAX_VCPUS);
 >
-> I think that 16 bit vcpu bitmap is due to the fact that IOAPIC spec states that
-> it can address up to 16 cpus in physical destination mode.
->  
-> In logical destination mode, assuming flat addressing and that logical id = 1 << physical id
-> which KVM hardcodes, it is also only possible to address 8 CPUs.
->  
-> However(!) in flat cluster mode, the logical apic id is split in two.
-> We have 16 clusters and each have 4 CPUs, so it is possible to address 64 CPUs,
-> and unlike the logical ID, the KVM does honour cluster ID, 
-> thus one can stick say cluster ID 0 to any vCPU.
->  
->  
-> Let's look at ioapic_write_indirect.
-> It does:
->  
->     -> bitmap_zero(&vcpu_bitmap, 16);
->     -> kvm_bitmap_or_dest_vcpus(ioapic->kvm, &irq, &vcpu_bitmap);
->     -> kvm_make_scan_ioapic_request_mask(ioapic->kvm, &vcpu_bitmap); // use of the above bitmap
->  
->  
-> When we call kvm_bitmap_or_dest_vcpus, we can already overflow the bitmap,
-> since we pass all 8 bit of the destination even when it is physical.
->  
->  
-> Lets examine the kvm_bitmap_or_dest_vcpus:
->  
->   -> It calls the kvm_apic_map_get_dest_lapic which 
->  
->        -> for physical destinations, it just sets the bitmap, which can overflow
->           if we pass it 8 bit destination (which basically includes reserved bits + 4 bit destination).
->  
->  
->        -> For logical apic ID, it seems to truncate the result to 16 bit, which isn't correct as I explained
->           above, but should not overflow the result.
->  
->   
->    -> If call to kvm_apic_map_get_dest_lapic fails, it goes over all vcpus and tries to match the destination
->        This can overflow as well.
->  
->  
-> I also don't like that ioapic_write_indirect calls the kvm_bitmap_or_dest_vcpus twice,
-> and second time with 'old_dest_id'
->  
-> I am not 100%  sure why old_dest_id/old_dest_mode are needed as I don't see anything in the
-> function changing them.
-> I think only the guest can change them, so maybe the code deals with the guest changing them
-> while the code is running from a different vcpu?
->  
-> The commit that introduced this code is 7ee30bc132c683d06a6d9e360e39e483e3990708
-> Nitesh Narayan Lal, maybe you remember something about it?
->  
 
-Before posting this patch I've contacted Nitesh privately, he's
-currently on vacation but will take a look when he gets back.
+Yes, thanks!
+
+>> > > > > 
+>> > > > > Is there a way to avoid this KVM_MAX_VCPUS-sized variable on the
+>> > > > > stack?  This might hit us back when we increase KVM_MAX_VCPUS to
+>> > > > > a few thousand VCPUs (I was planning to submit a patch for that
+>> > > > > soon).
+>> > > > 
+>> > > > What's the short- or mid-term target?
+>> > > 
+>> > > Short term target is 2048 (which was already tested). Mid-term target
+>> > > (not tested yet) is 4096, maybe 8192.
+>> > > 
+>> > > > Note, we're allocating KVM_MAX_VCPUS bits (not bytes!) here, this means
+>> > > > that for e.g. 2048 vCPUs we need 256 bytes of the stack only. In case
+>> > > > the target much higher than that, we will need to either switch to
+>> > > > dynamic allocation or e.g. use pre-allocated per-CPU variables and make
+>> > > > this a preempt-disabled region. I, however, would like to understand if
+>> > > > the problem with allocating this from stack is real or not first.
+>> > > 
+>> > > Is 256 bytes too much here, or would that be OK?
+>> > > 
+>> > 
+>> > AFAIR, on x86_64 stack size (both reqular and irq) is 16k, eating 256
+>
+> Don't forget i386!  :-)
+>
+
+I'm not forgetting, I'm deliberately ignoring its existence :-)
+
+Whoever tries to raise KVM_MAX_VCPUS from '288' may limit the change to
+x86_64, I seriosly doubt 32bit users want to run guests with thouthands
+of CPUs.
+
+>> > bytes of it is probably OK. I'd start worrying when we go to 1024 (8k
+>> > vCPUs) and above (but this is subjective of course).
+>
+> 256 is fine, 1024 would indeed be problematic, e.g. CONFIG_FRAME_WARN defaults to
+> 1024 on 32-bit kernels.  That's not a hard limit per se, but ideally KVM will stay
+> warn-free on all flavors of x86.
+
+Thanks for the CONFIG_FRAME_WARN pointer, I said '1024' out of top of my
+head but it seems the number wasn't random after all)
 
 >
-> Also I worry a lot about other callers of kvm_apic_map_get_dest_lapic
->  
-> It is also called from kvm_irq_delivery_to_apic_fast, and from kvm_intr_is_single_vcpu_fast
-> and both seem to also use 'unsigned long' for bitmap, and then only use 16 bits of it.
->  
-> I haven't dug into them, but these don't seem to be IOAPIC related and I think
-> can overwrite the stack as well.
+>> On the topic of enlarging these bitmaps to cover all vCPUs.
+>> 
+>> I also share the worry of having the whole bitmap on kernel stack for very
+>> large number of vcpus.
+>> Maybe we need to abstract and use a bitmap for a sane number of vcpus, 
+>> and use otherwise a 'kmalloc'ed buffer?
+>
+> That's a future problem.  More specifically, it's the problem of whoever wants to
+> push KVM_MAX_VCPUS > ~2048.  There are a lot of ways to solve the problem, e.g.
+> this I/O APIC code runs under a spinlock so a dedicated bitmap in struct kvm_ioapic
+> could be used to avoid a large stack allocation.
 
-I'm no expert in this code but when writing the patch I somehow
-convinced myself that a single unsigned long is always enough. I think
-that for cluster mode 'bitmap' needs 64-bits (and it is *not* a
-vcpu_bitmap, we need to convert). I may be completely wrong of course
-but in any case this is a different issue. In ioapic_write_indirect() we
-have 'vcpu_bitmap' which should certainly be longer than 64 bits.
++1
+
+>
+>> Also in theory large bitmaps might affect performance a bit.
+>
+> Maybe.  The only possible degredation for small VMs, i.e. VMs that don't need the
+> full bitmap, is if the compiler puts other variables below the bitmap and causes
+> sub-optimal cache line usage.  But I suspect/hope the compiler is smart enough to
+> use GPRs and/or organize the local variables on the stack so that doesn't happen.
+>
 
 -- 
 Vitaly
