@@ -2,178 +2,192 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8C0003F7055
-	for <lists+kvm@lfdr.de>; Wed, 25 Aug 2021 09:25:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0218C3F70C2
+	for <lists+kvm@lfdr.de>; Wed, 25 Aug 2021 09:57:29 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239241AbhHYHZy (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 25 Aug 2021 03:25:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55060 "EHLO
+        id S235358AbhHYH6H (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 25 Aug 2021 03:58:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34178 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236402AbhHYHZg (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 25 Aug 2021 03:25:36 -0400
-Received: from mail-pf1-x436.google.com (mail-pf1-x436.google.com [IPv6:2607:f8b0:4864:20::436])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8AFAFC061757;
-        Wed, 25 Aug 2021 00:24:51 -0700 (PDT)
-Received: by mail-pf1-x436.google.com with SMTP id j187so20482362pfg.4;
-        Wed, 25 Aug 2021 00:24:51 -0700 (PDT)
+        with ESMTP id S230124AbhHYH6G (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 25 Aug 2021 03:58:06 -0400
+Received: from mail-ed1-x530.google.com (mail-ed1-x530.google.com [IPv6:2a00:1450:4864:20::530])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EA189C0613C1
+        for <kvm@vger.kernel.org>; Wed, 25 Aug 2021 00:57:20 -0700 (PDT)
+Received: by mail-ed1-x530.google.com with SMTP id s25so22918903edw.0
+        for <kvm@vger.kernel.org>; Wed, 25 Aug 2021 00:57:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=to:cc:references:from:organization:subject:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=q73Nnih7jpsSbpkSWK5EpPqifAUWwvTUzbwSd8zUZyU=;
-        b=o0UyFPQi4xqO3PzR7TAOaCJwvDbpz3DniRpvtWeJdH3bFKibc0Yv2FCWreUqPUHbyZ
-         Y1N2wuqBQWtbQaQH7wEj9h421tRii3HA2gQDlxgU0aH1dmKS5U6xlLi7vCYFKJKacBdr
-         wOSLbe2P+r08qzSvRTwT1TDrPBOcfBnQzivOflu3J6Q+FfFF9gr5BHFTr7EwnfGZZMi+
-         1LEVYTlC/JfyZtCQNfPaSRWb+2BYOKgYScjhmqBgTE8zd1OSTZFHOplLv4GaVi4eEHRc
-         oRKws3ayh76IwdphWNE2OupsCFlWEn6n70gHYJ8bEHx0kMhZXvWZYsY/z7gjgmakFECF
-         Dd+Q==
+        d=bytedance-com.20150623.gappssmtp.com; s=20150623;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=A3eDvUGO7s6rgbcqfVCZxuvxMbSRmJ1Jj8MfBoaTMPU=;
+        b=I0obnZsM9J3DhGn8Ys+njqxlL+bvBvgmQCONvmFRG3akvZreIl/ty1+M2K3Frb8Fb2
+         hSsA5AFpaI9srN6CIlMZizcgQO8A3NxT+xtcTgs9d/8FlFmBT0j8teuNajfiQhV4UrlU
+         DI4rUsLWVef+y7quOM7/ssYW5S0FO4s1op+sfCFZlto6iKWSI6BCPaEtzhirnHYYVo06
+         mikpSeFfIaI0sbYIAkO/PbG1HKRbajG9sRnjQyNlbNYpw7ddU/f5Svq12UMTS5SgkREH
+         pYTyBM0g3UtNqg9Y7/2GqaKcShwxlSMVjWTG9unOAYYzvataVgFp+/PCUmIBVtPe6b1G
+         9T/g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:to:cc:references:from:organization:subject
-         :message-id:date:user-agent:mime-version:in-reply-to
-         :content-language:content-transfer-encoding;
-        bh=q73Nnih7jpsSbpkSWK5EpPqifAUWwvTUzbwSd8zUZyU=;
-        b=F6cyJyWgs8rG8GKodMAGxGM5duumb/f7TXJGPoR3NaWAAeSHMBHXQhmWHFz3I0gxjg
-         I5xzapv39Ws0X4qErOMMVAkTQ2vsL2rDhwta2dwwV4iK2odji1lQVK3MtnYgvQuefIfI
-         Nmy02Rfuc74q/17N9uEyIvOADWER8dCbA/BCphhCrOF+dO/zG3GU2WHYq5DWSOKJ9ILw
-         6DL1K0UrZ2VTxGzoBmv4zQuwAU9kcFtcrLvUUlYCxtbj5v/W+N2q8Yo7awjf+tlCUg7r
-         b6hFPt/xh+RCQ3UQQdEz8A4mCHmUQkATT5x1QtcDUskRXN5an+KNdgz04Aq62NJKexzB
-         7JkA==
-X-Gm-Message-State: AOAM531UoVMb6gl4+lmot2dHGBNiLcRcwOQOZr/wu0H31qdHkVKstAhz
-        mj0C4Lb62DV9hsJsNQaBcs8=
-X-Google-Smtp-Source: ABdhPJzRSyE5neu6RJ+gjTEVDHfBcpu6bsE7zXSnqjaD48x+obpgYGzPEezUn8K5kdl+d36SDtMxRw==
-X-Received: by 2002:a05:6a00:168a:b0:3e2:789e:5fd0 with SMTP id k10-20020a056a00168a00b003e2789e5fd0mr43048282pfc.68.1629876291052;
-        Wed, 25 Aug 2021 00:24:51 -0700 (PDT)
-Received: from Likes-MacBook-Pro.local ([103.7.29.32])
-        by smtp.gmail.com with ESMTPSA id z3sm4482928pjn.43.2021.08.25.00.24.47
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 25 Aug 2021 00:24:50 -0700 (PDT)
-To:     Sean Christopherson <seanjc@google.com>,
-        Alexander Shishkin <alexander.shishkin@linux.intel.com>
-Cc:     Mark Rutland <mark.rutland@arm.com>, Jiri Olsa <jolsa@redhat.com>,
-        Namhyung Kim <namhyung@kernel.org>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        linux-perf-users@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, Artem Kashkanov <artem.kashkanov@intel.com>,
-        Arnaldo Carvalho de Melo <acme@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Ingo Molnar <mingo@redhat.com>,
-        Peter Zijlstra <peterz@infradead.org>
-References: <20210823193709.55886-1-seanjc@google.com>
- <20210823193709.55886-3-seanjc@google.com>
-From:   Like Xu <like.xu.linux@gmail.com>
-Organization: Tencent
-Subject: Re: [PATCH 2/3] KVM: x86: Register Processor Trace interrupt hook iff
- PT enabled in guest
-Message-ID: <3021c1cc-a4eb-e3ab-d6b7-558cbaefd03b@gmail.com>
-Date:   Wed, 25 Aug 2021 15:24:41 +0800
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0)
- Gecko/20100101 Thunderbird/78.13.0
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=A3eDvUGO7s6rgbcqfVCZxuvxMbSRmJ1Jj8MfBoaTMPU=;
+        b=BXf6quz3TC6pUlhGPUjEliQGZzIwECunKc6T/tneRGGhWpwHvTC7gXSmvspRVXSUFb
+         FgzhGCqMR2p5H5Hr/L4LXs1VHroDIMVSeiKhXOeCWBooT89/bQyfsCbcRpZxLzib/fHK
+         eNWbg5jvPlX530rTXCwNT5qwgy2qUOUq9A+5Gbs1Sjn8SHV/uVxng/E01K48t4mLpLPT
+         IbtqA2yHtbKjJKDQ7e6cHyhzC/oeUSK1jDP3hqxydD9mWIoRFyRo9JmPB9XfOHsA/W5j
+         OFExENHvigceMWhAIrw5p+E1jU14JrWrFcrfMVYqUhoVPHzWBvD23M5vQBTRGzx2ZgzU
+         Re+g==
+X-Gm-Message-State: AOAM532K7BTD53Z5muJG80+DmY2HAb2bk65LfcIrSIcaA6UIELTBa3zE
+        M6Fb/yMWJiLp7j0ZjwF1aWzB2PYHx/vgTphlWb7e
+X-Google-Smtp-Source: ABdhPJx++s4yL0aljTFECCTgTqB0y8G0ZDiiFqmfkcPa/z8HtCB9PzVuE2+kCr4soT/hE2Bnuo8u47S4GL5NNC9DCyc=
+X-Received: by 2002:a50:eb95:: with SMTP id y21mr46534633edr.5.1629878239593;
+ Wed, 25 Aug 2021 00:57:19 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20210823193709.55886-3-seanjc@google.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+References: <CACycT3t1Dgrzsr7LbBrDhRLDa3qZ85ZOgj9H7r1fqPi-kf7r6Q@mail.gmail.com>
+ <20210618084412.18257-1-zhe.he@windriver.com>
+In-Reply-To: <20210618084412.18257-1-zhe.he@windriver.com>
+From:   Yongji Xie <xieyongji@bytedance.com>
+Date:   Wed, 25 Aug 2021 15:57:08 +0800
+Message-ID: <CACycT3sri2-GyaW08JhS2j1V2DRc7-Cv-tm6-T-dD7XVO=S6Vw@mail.gmail.com>
+Subject: Re: [PATCH] eventfd: Enlarge recursion limit to allow vhost to work
+To:     He Zhe <zhe.he@windriver.com>
+Cc:     "Michael S. Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Stefano Garzarella <sgarzare@redhat.com>,
+        Parav Pandit <parav@nvidia.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Christian Brauner <christian.brauner@canonical.com>,
+        Randy Dunlap <rdunlap@infradead.org>,
+        Matthew Wilcox <willy@infradead.org>,
+        Al Viro <viro@zeniv.linux.org.uk>,
+        Jens Axboe <axboe@kernel.dk>, bcrl@kvack.org,
+        Jonathan Corbet <corbet@lwn.net>,
+        =?UTF-8?Q?Mika_Penttil=C3=A4?= <mika.penttila@nextfour.com>,
+        Dan Carpenter <dan.carpenter@oracle.com>,
+        Greg KH <gregkh@linuxfoundation.org>, songmuchun@bytedance.com,
+        virtualization <virtualization@lists.linux-foundation.org>,
+        kvm <kvm@vger.kernel.org>, linux-fsdevel@vger.kernel.org,
+        iommu@lists.linux-foundation.org,
+        linux-kernel <linux-kernel@vger.kernel.org>,
+        qiang.zhang@windriver.com
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 24/8/2021 3:37 am, Sean Christopherson wrote:
-> Override the Processor Trace (PT) interrupt handler for guest mode if and
-> only if PT is configured for host+guest mode, i.e. is being used
-> independently by both host and guest.  If PT is configured for system
-> mode, the host fully controls PT and must handle all events.
-> 
-> Fixes: 8479e04e7d6b ("KVM: x86: Inject PMI for KVM guest")
-> Cc: stable@vger.kernel.org
-> Reported-by: Alexander Shishkin <alexander.shishkin@linux.intel.com>
-> Reported-by: Artem Kashkanov <artem.kashkanov@intel.com>
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
+Hi guys,
+
+Is there any comments or update for this patch?
+
+Thanks,
+Yongji
+
+On Fri, Jun 18, 2021 at 4:47 PM He Zhe <zhe.he@windriver.com> wrote:
+>
+> commit b5e683d5cab8 ("eventfd: track eventfd_signal() recursion depth")
+> introduces a percpu counter that tracks the percpu recursion depth and
+> warn if it greater than zero, to avoid potential deadlock and stack
+> overflow.
+>
+> However sometimes different eventfds may be used in parallel. Specifically,
+> when heavy network load goes through kvm and vhost, working as below, it
+> would trigger the following call trace.
+>
+> -  100.00%
+>    - 66.51%
+>         ret_from_fork
+>         kthread
+>       - vhost_worker
+>          - 33.47% handle_tx_kick
+>               handle_tx
+>               handle_tx_copy
+>               vhost_tx_batch.isra.0
+>               vhost_add_used_and_signal_n
+>               eventfd_signal
+>          - 33.05% handle_rx_net
+>               handle_rx
+>               vhost_add_used_and_signal_n
+>               eventfd_signal
+>    - 33.49%
+>         ioctl
+>         entry_SYSCALL_64_after_hwframe
+>         do_syscall_64
+>         __x64_sys_ioctl
+>         ksys_ioctl
+>         do_vfs_ioctl
+>         kvm_vcpu_ioctl
+>         kvm_arch_vcpu_ioctl_run
+>         vmx_handle_exit
+>         handle_ept_misconfig
+>         kvm_io_bus_write
+>         __kvm_io_bus_write
+>         eventfd_signal
+>
+> 001: WARNING: CPU: 1 PID: 1503 at fs/eventfd.c:73 eventfd_signal+0x85/0xa0
+> ---- snip ----
+> 001: Call Trace:
+> 001:  vhost_signal+0x15e/0x1b0 [vhost]
+> 001:  vhost_add_used_and_signal_n+0x2b/0x40 [vhost]
+> 001:  handle_rx+0xb9/0x900 [vhost_net]
+> 001:  handle_rx_net+0x15/0x20 [vhost_net]
+> 001:  vhost_worker+0xbe/0x120 [vhost]
+> 001:  kthread+0x106/0x140
+> 001:  ? log_used.part.0+0x20/0x20 [vhost]
+> 001:  ? kthread_park+0x90/0x90
+> 001:  ret_from_fork+0x35/0x40
+> 001: ---[ end trace 0000000000000003 ]---
+>
+> This patch enlarges the limit to 1 which is the maximum recursion depth we
+> have found so far.
+>
+> The credit of modification for eventfd_signal_count goes to
+> Xie Yongji <xieyongji@bytedance.com>
+>
+> Signed-off-by: He Zhe <zhe.he@windriver.com>
 > ---
->   arch/x86/include/asm/kvm_host.h | 1 +
->   arch/x86/kvm/pmu.h              | 1 +
->   arch/x86/kvm/vmx/vmx.c          | 1 +
->   arch/x86/kvm/x86.c              | 4 +++-
->   4 files changed, 6 insertions(+), 1 deletion(-)
-> 
-> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-> index 09b256db394a..1ea4943a73d7 100644
-> --- a/arch/x86/include/asm/kvm_host.h
-> +++ b/arch/x86/include/asm/kvm_host.h
-> @@ -1494,6 +1494,7 @@ struct kvm_x86_init_ops {
->   	int (*disabled_by_bios)(void);
->   	int (*check_processor_compatibility)(void);
->   	int (*hardware_setup)(void);
-> +	bool (*intel_pt_intr_in_guest)(void);
->   
->   	struct kvm_x86_ops *runtime_ops;
->   };
-> diff --git a/arch/x86/kvm/pmu.h b/arch/x86/kvm/pmu.h
-> index 0e4f2b1fa9fb..b06dbbd7eeeb 100644
-> --- a/arch/x86/kvm/pmu.h
-> +++ b/arch/x86/kvm/pmu.h
-> @@ -41,6 +41,7 @@ struct kvm_pmu_ops {
->   	void (*reset)(struct kvm_vcpu *vcpu);
->   	void (*deliver_pmi)(struct kvm_vcpu *vcpu);
->   	void (*cleanup)(struct kvm_vcpu *vcpu);
-> +	void (*handle_intel_pt_intr)(void);
->   };
->   
->   static inline u64 pmc_bitmask(struct kvm_pmc *pmc)
-> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> index fada1055f325..f19d72136f77 100644
-> --- a/arch/x86/kvm/vmx/vmx.c
-> +++ b/arch/x86/kvm/vmx/vmx.c
-> @@ -7896,6 +7896,7 @@ static struct kvm_x86_init_ops vmx_init_ops __initdata = {
->   	.disabled_by_bios = vmx_disabled_by_bios,
->   	.check_processor_compatibility = vmx_check_processor_compat,
->   	.hardware_setup = hardware_setup,
-> +	.intel_pt_intr_in_guest = vmx_pt_mode_is_host_guest,
->   
->   	.runtime_ops = &vmx_x86_ops,
->   };
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index fb6015f97f9e..b5ade47dad9c 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -8305,7 +8305,7 @@ static struct perf_guest_info_callbacks kvm_guest_cbs = {
->   	.is_in_guest		= kvm_is_in_guest,
->   	.is_user_mode		= kvm_is_user_mode,
->   	.get_guest_ip		= kvm_get_guest_ip,
-> -	.handle_intel_pt_intr	= kvm_handle_intel_pt_intr,
-> +	.handle_intel_pt_intr	= NULL,
->   };
->   
->   #ifdef CONFIG_X86_64
-> @@ -11061,6 +11061,8 @@ int kvm_arch_hardware_setup(void *opaque)
->   	memcpy(&kvm_x86_ops, ops->runtime_ops, sizeof(kvm_x86_ops));
->   	kvm_ops_static_call_update();
->   
-> +	if (ops->intel_pt_intr_in_guest && ops->intel_pt_intr_in_guest())
-> +		kvm_guest_cbs.handle_intel_pt_intr = kvm_handle_intel_pt_intr;
-
-Emm, it's still buggy.
-
-The guest "unknown NMI" from the host Intel PT can still be reproduced
-after the following operation:
-
-	rmmod kvm_intel
-	modprobe kvm-intel pt_mode=1 ept=1
-	rmmod kvm_intel
-	modprobe kvm-intel pt_mode=1 ept=0
-
-Since the handle_intel_pt_intr is not reset to NULL in kvm_arch_hardware_unsetup(),
-and the previous function pointer still exists in the generic KVM data structure.
-
-But I have to say that this fix is much better than the one I proposed [1].
-
-[1] https://lore.kernel.org/lkml/20210514084436.848396-1-like.xu@linux.intel.com/
-
->   	perf_register_guest_info_callbacks(&kvm_guest_cbs);
->   
->   	if (!kvm_cpu_cap_has(X86_FEATURE_XSAVES))
-> 
+>  fs/eventfd.c            | 3 ++-
+>  include/linux/eventfd.h | 5 ++++-
+>  2 files changed, 6 insertions(+), 2 deletions(-)
+>
+> diff --git a/fs/eventfd.c b/fs/eventfd.c
+> index e265b6dd4f34..add6af91cacf 100644
+> --- a/fs/eventfd.c
+> +++ b/fs/eventfd.c
+> @@ -71,7 +71,8 @@ __u64 eventfd_signal(struct eventfd_ctx *ctx, __u64 n)
+>          * it returns true, the eventfd_signal() call should be deferred to a
+>          * safe context.
+>          */
+> -       if (WARN_ON_ONCE(this_cpu_read(eventfd_wake_count)))
+> +       if (WARN_ON_ONCE(this_cpu_read(eventfd_wake_count) >
+> +           EFD_WAKE_COUNT_MAX))
+>                 return 0;
+>
+>         spin_lock_irqsave(&ctx->wqh.lock, flags);
+> diff --git a/include/linux/eventfd.h b/include/linux/eventfd.h
+> index fa0a524baed0..74be152ebe87 100644
+> --- a/include/linux/eventfd.h
+> +++ b/include/linux/eventfd.h
+> @@ -29,6 +29,9 @@
+>  #define EFD_SHARED_FCNTL_FLAGS (O_CLOEXEC | O_NONBLOCK)
+>  #define EFD_FLAGS_SET (EFD_SHARED_FCNTL_FLAGS | EFD_SEMAPHORE)
+>
+> +/* This is the maximum recursion depth we find so far */
+> +#define EFD_WAKE_COUNT_MAX 1
+> +
+>  struct eventfd_ctx;
+>  struct file;
+>
+> @@ -47,7 +50,7 @@ DECLARE_PER_CPU(int, eventfd_wake_count);
+>
+>  static inline bool eventfd_signal_count(void)
+>  {
+> -       return this_cpu_read(eventfd_wake_count);
+> +       return this_cpu_read(eventfd_wake_count) > EFD_WAKE_COUNT_MAX;
+>  }
+>
+>  #else /* CONFIG_EVENTFD */
+> --
+> 2.17.1
+>
