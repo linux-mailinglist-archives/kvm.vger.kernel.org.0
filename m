@@ -2,171 +2,232 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 822B43F764C
-	for <lists+kvm@lfdr.de>; Wed, 25 Aug 2021 15:50:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9F93F3F7656
+	for <lists+kvm@lfdr.de>; Wed, 25 Aug 2021 15:52:03 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240347AbhHYNvG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 25 Aug 2021 09:51:06 -0400
-Received: from mail-dm3nam07on2081.outbound.protection.outlook.com ([40.107.95.81]:41632
-        "EHLO NAM02-DM3-obe.outbound.protection.outlook.com"
+        id S241431AbhHYNwr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 25 Aug 2021 09:52:47 -0400
+Received: from mail-bn8nam12on2080.outbound.protection.outlook.com ([40.107.237.80]:2208
+        "EHLO NAM12-BN8-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S237799AbhHYNvD (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 25 Aug 2021 09:51:03 -0400
+        id S240294AbhHYNwq (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 25 Aug 2021 09:52:46 -0400
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Y/vagrbM/RvmfHhJalLKKIHivSRpq7bfAJ56ZV//MIIgbYnGYg4X/m1CmkyybGQe709HnkdXMaYLLwC541RndXBSYt7tVoYyqdLq/+m+nC/uPP78WSjmkrxSdXOLCY7KJAjYvqtauXal2d/7rKK1hZiV8at2HHnWeVqsKxctoL1yDw7yjdTNEh6dLtNUCmRQUqjNRpVr4FzPH6YX3WvWC4Fk9r4aY/lRNE9flkbwQ84sOqRKNqSf9uXqJbggtA0oBTXLH+bd+nw3V8Jz4Jw3QJd92/G3LH5lPG/v6EDKVFAiS3SMGPEDQ+VIa0Racd5b6oMMpSyw5qLz9V7atKsocQ==
+ b=bT0tWTbuWudaogVMMVrBopuHIVNRZNLwErfOvKS7OffcqlwVgiD7/3hqdnMgN3w+QF4GUySEKSqamqTjv8HF5fumczIkWu5yLbEkWEumrVmfCbF71FuVGyWYY4M1sOwz2flIkz8krCPRtZy7lwznVEgd187FTICTyKL4uVlOpO7I8MPoyPTiwbannG0BKJtdz+0mn9K46RD42YuXlvY7VMwzFOqvfUU6V/Xsf9DlNAwwa9mganaVOdqZ0aCZNWR++dkOUARWTCiUHSP5ihXYJ9gVQ3d/jZT5xe4RxPMjLPQWbG6e+54PUsmt55yqlAXCne+/56chgTPyFbMUGP3roQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=zwgJyZjTlByZgyJipd8xiHMYLZhCJeRlNDBEN4L/T3w=;
- b=cBsxwwUSj43JKL88w+N4vnVxPyQPh0Ws+3ui1S6OvqAn3CWtLicpK0zuGc7Z/x563UbyQYBt43+kuuO3x2kmui1t3e8yo6I1ynSB4u2rZFWjvN8K4Mst2K7e0BTQGa5BlPbS74OMi1ifZbFhMdb9xnC5XowHbI+giJgcSize7Fvvb8ZGsZKjSsIZCweapZtRpR+6e9aOXfXJyPRCxpDrgKYXBgU+0kyAURTjLwAOS8sy+zKOVezefrDWzvqukVU4t6Q33f216tAAnyOUFzoNvSJTvbLH4ux7zWQj77FZrEhI4a2GvEG76OgeeFOXWZ2+y/xXOD1E4jTKtD30X2SQwQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ bh=0yrSRaR+bqQt1ZpL8ctIvtTSSPVi3OiuoGWr8xwrr2w=;
+ b=hMDFihFat+7GhovQ9F49bcN7GUkDLl7WWO2+oKE0eYBtR8elFdMdCVVS9UxT3pdCPec76b21va6e7WeAJPOzZU58sHFn+HzjhDLSL1I2IGD7dwuqJGET/Z8W8SVeo/ef+jcDlPfWGzUKm8V2jsDF/YDt0rHlEmeM4pqYak/vLS6CTkrCL8vwLnwkhi/ic6CI7FQTs7n4tmjHG3ceUWxKscJ6R6a0L5qVLl9b9k42FzRwsKw/BYKrSDWo5zz8goI3YdycauyrLV7s896onW2j4iHU4XrpwFzTPR0ipU8EGstFdXsGrjq7t3kRjpQmupaGA7rilD16sQyiknE6UcR6Ow==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.112.35) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=quarantine sp=none pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=zwgJyZjTlByZgyJipd8xiHMYLZhCJeRlNDBEN4L/T3w=;
- b=uSB0wy9GaK6qv/jLwmsT/SC9cZtB0AUwAE+jFHIO9d/2wpW8eWRUUd+rk8hWUvYNkci1VBjd9dSGJmRnhTO8gJRZnt/4XgdhmuHMv67juwiTdJyELoR9gGf+RoWMcG8ktOKhQpl84x/2gk3cX7/qYX1/6OiHsCAHEXaUjFBlncE=
-Authentication-Results: oracle.com; dkim=none (message not signed)
- header.d=none;oracle.com; dmarc=none action=none header.from=amd.com;
-Received: from DM4PR12MB5229.namprd12.prod.outlook.com (2603:10b6:5:398::12)
- by DM6PR12MB5568.namprd12.prod.outlook.com (2603:10b6:5:20c::8) with
+ bh=0yrSRaR+bqQt1ZpL8ctIvtTSSPVi3OiuoGWr8xwrr2w=;
+ b=XfE+WGlUKm0urIgzKXxKwOxq/sRxlL9y4YAfgLlbTNDd5KgwIsrv27cWlsbfBPPdpTmdeqoUmhEESdoGC7Hx14iM0cJR0FPytq6goce7gBFlCOiCCSQZVXkh2c1JQDt3B5p5OrmROOnWtlHtud1MantyJHt4re/vXgE5HErPxqhgY4xzUUL6mzUgWQnnRRzIezG0RZxpTn3A5sxZy8rAnvrEuyLfnARM9qBddrJ5B/W9Ld6q5sD0w2NVsoe2Rv2G78fdwAx29bOlWvtQRZ4dS2EjaLMKJ+TnU0O5Pv/YS+A7Q5v0o2KVltqQxC6/YvJSgC8dikZuIugg03VZjzAk8w==
+Received: from MWHPR22CA0059.namprd22.prod.outlook.com (2603:10b6:300:12a::21)
+ by BY5PR12MB4067.namprd12.prod.outlook.com (2603:10b6:a03:212::17) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4415.16; Wed, 25 Aug
- 2021 13:50:15 +0000
-Received: from DM4PR12MB5229.namprd12.prod.outlook.com
- ([fe80::d560:d21:cd59:9418]) by DM4PR12MB5229.namprd12.prod.outlook.com
- ([fe80::d560:d21:cd59:9418%6]) with mapi id 15.20.4436.024; Wed, 25 Aug 2021
- 13:50:15 +0000
-Subject: Re: [PATCH Part2 v5 08/45] x86/fault: Add support to handle the RMP
- fault for user address
-To:     Vlastimil Babka <vbabka@suse.cz>, Joerg Roedel <jroedel@suse.de>,
-        Dave Hansen <dave.hansen@intel.com>
-Cc:     Brijesh Singh <brijesh.singh@amd.com>, x86@kernel.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-coco@lists.linux.dev, linux-mm@kvack.org,
-        linux-crypto@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
-        David Rientjes <rientjes@google.com>,
-        Dov Murik <dovmurik@linux.ibm.com>,
-        Tobin Feldman-Fitzthum <tobin@ibm.com>,
-        Borislav Petkov <bp@alien8.de>,
-        Michael Roth <michael.roth@amd.com>,
-        "Kirill A . Shutemov" <kirill@shutemov.name>,
-        Andi Kleen <ak@linux.intel.com>, tony.luck@intel.com,
-        marcorr@google.com, sathyanarayanan.kuppuswamy@linux.intel.com,
-        Mike Kravetz <mike.kravetz@oracle.com>
-References: <20210820155918.7518-1-brijesh.singh@amd.com>
- <20210820155918.7518-9-brijesh.singh@amd.com>
- <f6d778a0-840d-8c9c-392d-5c9ffcc0bdc6@intel.com>
- <19599ede-9fc5-25e1-dcb3-98aafd8b7e87@amd.com>
- <3f426ef8-060e-ccc9-71b9-2448f2582a30@intel.com> <YSUhg/87jZPocLDP@suse.de>
- <c5a8f7e8-7146-0737-81a1-1faceb6992ab@suse.cz>
-From:   Tom Lendacky <thomas.lendacky@amd.com>
-Message-ID: <3a82fd1d-c801-840b-afe8-63d000efe7cd@amd.com>
-Date:   Wed, 25 Aug 2021 08:50:11 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.11.0
-In-Reply-To: <c5a8f7e8-7146-0737-81a1-1faceb6992ab@suse.cz>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: SN7PR04CA0031.namprd04.prod.outlook.com
- (2603:10b6:806:120::6) To DM4PR12MB5229.namprd12.prod.outlook.com
- (2603:10b6:5:398::12)
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4436.21; Wed, 25 Aug
+ 2021 13:51:58 +0000
+Received: from CO1NAM11FT014.eop-nam11.prod.protection.outlook.com
+ (2603:10b6:300:12a:cafe::5b) by MWHPR22CA0059.outlook.office365.com
+ (2603:10b6:300:12a::21) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4457.18 via Frontend
+ Transport; Wed, 25 Aug 2021 13:51:58 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.112.35)
+ smtp.mailfrom=nvidia.com; vger.kernel.org; dkim=none (message not signed)
+ header.d=none;vger.kernel.org; dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.112.35 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.112.35; helo=mail.nvidia.com;
+Received: from mail.nvidia.com (216.228.112.35) by
+ CO1NAM11FT014.mail.protection.outlook.com (10.13.175.99) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
+ 15.20.4457.17 via Frontend Transport; Wed, 25 Aug 2021 13:51:57 +0000
+Received: from HQMAIL109.nvidia.com (172.20.187.15) by HQMAIL111.nvidia.com
+ (172.20.187.18) with Microsoft SMTP Server (TLS) id 15.0.1497.2; Wed, 25 Aug
+ 2021 13:51:57 +0000
+Received: from vdi.nvidia.com (172.20.187.5) by mail.nvidia.com
+ (172.20.187.15) with Microsoft SMTP Server id 15.0.1497.2 via Frontend
+ Transport; Wed, 25 Aug 2021 06:51:53 -0700
+From:   Yishai Hadas <yishaih@nvidia.com>
+To:     <bhelgaas@google.com>, <corbet@lwn.net>,
+        <alex.williamson@redhat.com>, <diana.craciun@oss.nxp.com>,
+        <kwankhede@nvidia.com>, <eric.auger@redhat.com>,
+        <masahiroy@kernel.org>, <michal.lkml@markovi.net>
+CC:     <linux-pci@vger.kernel.org>, <linux-doc@vger.kernel.org>,
+        <kvm@vger.kernel.org>, <linux-s390@vger.kernel.org>,
+        <linux-kbuild@vger.kernel.org>, <mgurtovoy@nvidia.com>,
+        <jgg@nvidia.com>, <yishaih@nvidia.com>, <maorg@nvidia.com>,
+        <leonro@nvidia.com>
+Subject: [PATCH V4 00/13] Introduce vfio_pci_core subsystem
+Date:   Wed, 25 Aug 2021 16:51:26 +0300
+Message-ID: <20210825135139.79034-1-yishaih@nvidia.com>
+X-Mailer: git-send-email 2.21.0
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from [10.236.30.241] (165.204.77.1) by SN7PR04CA0031.namprd04.prod.outlook.com (2603:10b6:806:120::6) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4457.17 via Frontend Transport; Wed, 25 Aug 2021 13:50:13 +0000
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 605c1b0b-35e0-4a23-9af8-08d967cf441e
-X-MS-TrafficTypeDiagnostic: DM6PR12MB5568:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <DM6PR12MB556868D8FA7760E01A7452AEECC69@DM6PR12MB5568.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:6790;
+X-MS-Office365-Filtering-Correlation-Id: ee104d5b-ef27-47b1-9234-08d967cf8194
+X-MS-TrafficTypeDiagnostic: BY5PR12MB4067:
+X-Microsoft-Antispam-PRVS: <BY5PR12MB40676716AC508C0FC511999EC3C69@BY5PR12MB4067.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:5797;
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: xeLCStfkEf0l7VMbsB/anRekrdE3QW8MA1wkxk2/wNA6W/py7+UA/jcBHeCbkpiA+W7Pq38rBwBETdRPqP7d25hN0/8rKojRkkITXcoao25+8FTwHCaj6ESjlBmQwegQATjtqX5XeYs90Av33cN8JhEPo+cL7fTC6j0YleXrivZYOMaWFrw8B4muu1p8WBSFjozbwTVu+TWIBIvQesEBB6ePJFDemxCKDbhs2tc2rqcf+Q33kYatu/797fsDs8hMI06eoJ/R43tF1y7x9i1FO4J++99d5E7FnruV98Fiu1H7ObG6uhnxReJKSJVzWfvLyfgqcb6fZq7ltPHvRj6yp58IvZz1JtV9tS0WwVtpffjP+0NS+7f5mdfqXUVdxggkNJd7AIlcjxDDgWyN5Vze+KyrRLGwr60Vh7X/zD0gmJ2Z1Nr/gA/rLXB2OsXQ9cB2dKJDelJtYyI35jM8nK+nDfy/+i6X+4us3zANTIrk6kxNcBCUF96TfKXvh1hkwJMkG7INpa2E32W8pK88ROTHexRf5u2pf3dM1+sp3FczoHiYOeiyMFdu/sBBYAAZucD5J3Kvr2f8oZm/Of6/0qwPEAn7KuwZ2r3lwyKO/OLHNLArdy3WsX8BSAtQ1tfa7GZTvDsE5b0rgNiKy3QqM3KIDoBPQHGj7/ANhC65xM60gQ4vEr6OX7orTloYRbGmEQi37Kyd1aJ9wi6WZz8zGvjAZTJRkkz2x8sAwLtvNZu4nF2oEgTU4vXwIhyifbREtw/Nfkqr36uSay70r/BEovSHQPCy7MGq5O0vK13m+ANK7DOZTuwGokTIXa5pBabDVQyr
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR12MB5229.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(136003)(346002)(376002)(39860400002)(396003)(366004)(7416002)(16576012)(31686004)(2906002)(53546011)(966005)(316002)(38100700002)(7406005)(4326008)(5660300002)(45080400002)(8676002)(110136005)(54906003)(26005)(478600001)(86362001)(8936002)(31696002)(66476007)(186003)(956004)(2616005)(36756003)(66946007)(6486002)(66556008)(45980500001)(43740500002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: WVvowln/HdWy7KTO+joE9ZFo2xC8XNrkKFZpMYZPLfQZGTogdZprqS+l04ADzE987pHa4fXFfOkp961eCotzgkiYq0wiSVBHBy1Y2kYtX2vMf5pro/CgSQn+IN7/tFelFK51a3QSrl2MvaMtmTLKWuNDGrDcTscUxCltxOzKeX1DQcb6BW/Q4k3f0NN6KNuUiQnfsoVgaROz+zuHGwM+c9F+4THGTQuzAJQi/sS9PF0AlQNFbFST/N1wW3/QeEHJVFRB2OXZ7xye+hUlto/H2tC+RvUObVJYK23BMpOjMUxiBsVWPKX7iD8UgsFdqn5nVa8uTcY3m+YsB55i/4Uph26PNpNmTr+W/4plrkitV1KUZ266jHHqusUQI7wTzPFZq2AkLEysH5N8mwSt7a9A3tLIdMHExdcFqhHFdGLaf0w4p0F3Jx/TT5YHKCBmkDpd690VEEo+fkWIegCkqqzlS5Dg++SP3kRCLwM+ozkbKJ32uAvE6LI0u1Jv6Nswdy4n1ZIjNCo68cl9lug4i0U1Brzaahx8hDLyi3M/odm6VVC6puU4AS5aG9AmIGq214BkFAHoDz37sskgmjd85LGz99n1yuQPaBOV1DPXyxzjrKoooQQlt07lzXgw6PQQdsX6SQZEVQJp4Q9BPehVFLIpECh1769QQeKGO0cHsCrnQ3gwkUW2ilbl/LhG7bAum6DYJNuT6m9r7jJhW50wEnBQCIHgimLduZyvilb0/Bh1FV2zRrcCiT5mQlTj5LxpPFBq
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 605c1b0b-35e0-4a23-9af8-08d967cf441e
-X-MS-Exchange-CrossTenant-AuthSource: DM4PR12MB5229.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Aug 2021 13:50:15.0862
+X-Microsoft-Antispam-Message-Info: q7ax3xXo2P+VybE99ppf1yIAbUKFa/mB/ckki+sFHE6BdVU87J0bEDA4nCiiHzYzaNqP4hFAI4lnZYJDpTv4dKzMOnfxYy0ANgNlJ614J0Mokqdgr8RRmTL12ODgZ52ysKB8A2hs27I/mV86tpHKwGSyIXcJJP8pWPtLGNRtpPKdaWeRHa7Pn0YmLVdwL18PdvIHbP+ULYNu4fxK98cj0cFAK0A1MAh8+xS3MxJqY7EVGYg51OOf1xVtOm2TYU+2pXIZP7Oh6YOs9Yh+HTMceOLZd6z6jiLjm4UY1OWxnpNIuIpG+Hcba7Ga+6uOXmbzDOw7xSUqXb8LgH2i7j1j2Fe8okILJY+2KSMNUho6qnplXUaOa0N50EtPLc0RsL+VeXiZXM0kXFZRGy1U+5pAtuVBMEnrrs0ttw56puyoYUczU2BZM1T+wBRGh+O0Yowq9t58v4YLs6zf/uM3SKdMg8BmrMdspIb/jLwpxFueUL14RB2UjDFvJB/z9lyJqRymFjvVwBKxX5i5d7Zts7t3pB7YHbaogh52/inQ5+GccA3HrUmQcx4qHEjLdviz5cziUhI8KYpCIADXmbCW8D7NkV+ooAr3hmq3Eta3BeLHTK0kOF5rCojWQNa8cmLHt6D0ecgO5eUQFwYNkqYnwFJJa2VoefTqejpeDJmziQ9noH2EVa/GqyqSD+cg9Wer3UopKQ7U1peP94iwC/oXkyzbNb50dTWCeiFmHDsIPuYeZJLHAvliYlCJenVN/4mTRWcDSyNbZfcKsV9RTSeHqJiqKRkiN5hnJ3+V0oFa11iDnhMeTIa49OHoppq+RRGGvdU3DgMgLmpSNU8SDg6cGqFezQqTGREEmynyeX2Xg1BZ2co=
+X-Forefront-Antispam-Report: CIP:216.228.112.35;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:schybrid04.nvidia.com;CAT:NONE;SFS:(4636009)(396003)(136003)(39860400002)(376002)(346002)(36840700001)(46966006)(82740400003)(70206006)(426003)(2906002)(6666004)(8676002)(336012)(26005)(356005)(186003)(70586007)(5660300002)(36756003)(110136005)(86362001)(4326008)(478600001)(966005)(2616005)(82310400003)(54906003)(7696005)(7636003)(83380400001)(36906005)(7416002)(316002)(36860700001)(107886003)(47076005)(1076003)(8936002)(2101003);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Aug 2021 13:51:57.8205
  (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: pOveZbmb+c0NZEHqDgEZOQjBrbwKMnGbk5sWmBb5O4ojIe7n4Rw6HkH+DDyHdd/wYeAXyx2yG6m5kEY29LKiWw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB5568
+X-MS-Exchange-CrossTenant-Network-Message-Id: ee104d5b-ef27-47b1-9234-08d967cf8194
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.112.35];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource: CO1NAM11FT014.eop-nam11.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BY5PR12MB4067
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 8/25/21 4:16 AM, Vlastimil Babka wrote:
-> On 8/24/21 18:42, Joerg Roedel wrote:
->> On Mon, Aug 23, 2021 at 07:50:22AM -0700, Dave Hansen wrote:
->>> It *has* to be done in KVM, IMNHO.
->>>
->>> The core kernel really doesn't know much about SEV.  It *really* doesn't
->>> know when its memory is being exposed to a virtualization architecture
->>> that doesn't know how to split TLBs like every single one before it.
->>>
->>> This essentially *must* be done at the time that the KVM code realizes
->>> that it's being asked to shove a non-splittable page mapping into the
->>> SEV hardware structures.
->>>
->>> The only other alternative is raising a signal from the fault handler
->>> when the page can't be split.  That's a *LOT* nastier because it's so
->>> much later in the process.
->>>
->>> It's either that, or figure out a way to split hugetlbfs (and DAX)
->>> mappings in a failsafe way.
->>
->> Yes, I agree with that. KVM needs a check to disallow HugeTLB pages in
->> SEV-SNP guests, at least as a temporary workaround. When HugeTLBfs
->> mappings can be split into smaller pages the check can be removed.
-> 
-> FTR, this is Sean's reply with concerns in v4:
-> https://nam11.safelinks.protection.outlook.com/?url=https%3A%2F%2Flore.kernel.org%2Flinux-coco%2FYPCuTiNET%252FhJHqOY%40google.com%2F&amp;data=04%7C01%7Cthomas.lendacky%40amd.com%7C692ea2e8bfd744e7ab5d08d967a918d3%7C3dd8961fe4884e608e11a82d994e183d%7C0%7C0%7C637654798234874418%7CUnknown%7CTWFpbGZsb3d8eyJWIjoiMC4wLjAwMDAiLCJQIjoiV2luMzIiLCJBTiI6Ik1haWwiLCJXVCI6Mn0%3D%7C1000&amp;sdata=leZuMY0%2FX8xbHA%2FOrxkXNoLCGNoVUQpY5eB3EInM55A%3D&amp;reserved=0
-> 
-> I think there are two main arguments there:
-> - it's not KVM business to decide
-> - guest may do all page state changes with 2mb granularity so it might be fine
-> with hugetlb
-> 
-> The latter might become true, but I think it's more probable that sooner
-> hugetlbfs will learn to split the mappings to base pages - I know people plan to
-> work on that. At that point qemu will have to recognize if the host kernel is
-> the new one that can do this splitting vs older one that can't. Preferably
-> without relying on kernel version number, as backports exist. Thus, trying to
-> register a hugetlbfs range that either is rejected (kernel can't split) or
-> passes (kernel can split) seems like a straightforward way. So I'm also in favor
-> of adding that, hopefuly temporary, check.
+From Max Gurtovoy:
+====================
+This series splits the vfio_pci driver into two parts, a PCI driver and
+a subsystem driver that will also be library of code. The main PCI
+driver, vfio_pci.ko, will remain as before and it will use the library
+module vfio_pci_core.ko to help create the vfio_device.
 
-If that's the direction taken, I think we'd be able to use a KVM_CAP_
-value that can be queried by the VMM to make the determination.
+This series is intended to solve the issues that were raised in the
+previous attempts for extending vfio-pci for device specific
+functionality:
 
-Thanks,
-Tom
+1.
+https://lore.kernel.org/kvm/20200518024202.13996-1-yan.y.zhao@intel.com
+   by Yan Zhao
+2.
+https://lore.kernel.org/kvm/20210702095849.1610-1-shameerali.kolothum.thodi@huawei.com
+   by Longfang Liu
 
-> 
-> Vlastimil
-> 
->> Regards,
->>
->> 	Joerg
->>
-> 
+Also to support proposed future changes to virtio and other common
+protocols to support migration:
+
+https://lists.oasis-open.org/archives/virtio-comment/202106/msg00044.html
+
+This subsystem framework will also ease adding new device specific
+functionality to VFIO devices in the future by allowing another module
+to provide the pci_driver that can setup a number of details before
+registering to the VFIO subsystem, such as injecting its own operations.
+
+This series also extends the "driver_override" mechanism. A flag is
+added for PCI drivers that will declare themselves as "driver_override"
+capable which sends their match table to the modules.alias file but
+otherwise leaves them outside of the normal driver core auto-binding
+world, like vfio_pci.
+
+In order to get the best match for "driver_override" drivers, one can
+create a userspace program to inspect the modules.alias, an example can
+be found at:
+
+https://github.com/maxgurtovoy/linux_tools/blob/main/vfio/bind_vfio_pci_driver.py
+
+Which finds the 'best match' according to a simple algorithm: "the
+driver with the fewest '*' matches wins."
+
+For example, the vfio-pci driver will match to any pci device. So it
+will have the maximal '*' matches.
+
+In case we are looking for a match to a mlx5 based device, we'll have a
+match to vfio-pci.ko and mlx5-vfio-pci.ko. We'll prefer mlx5-vfio-pci.ko
+since it will have less '*' matches (probably vendor and device IDs will
+match). This will work in the future for NVMe/Virtio devices that can
+match according to a class code or other criteria.
+
+v4:
+Patch #6:
+- Delete might_sleep() from the vfio_pci_sriov_configure() path as the
+  annotation through mutex_lock() which is used down the road is enough
+  on its own.
+
+Patch #13:
+- Add include/linux/vfio_pci_core.h to the MAINTAINERS file as was
+  previously asked by Alex Williamson.
+
+v3:
+Patch #6:
+- Upon error flow, print PF driver name instead of hard-coded vfio-pci.
+Patch #9:
+- Split into two patches and follow the notes given by Bjorn Helgaas.
+
+v2:
+Patch #6:
+- Drop DRIVER_VERSION as it's useless and not required any more.
+
+Patch #9:
+- Follow Bjorn Helgaas suggestion to enable having "vfio_" prefix in
+  modules.alias file without the unnecessary VFIO connection in
+  pci_match_device.
+
+- Add the sequence of commands/algorithm that is required by
+  userspace to discover the matching driver to the commit message to let
+  the patch documentation be self-contained.
+
+Patch #12:
+- Save compatibility with Kconfig as was asked in the mailing list.
+- Drop DRIVER_VERSION as it's useless and not required any more.
+
+Yishai
+
+Jason Gunthorpe (2):
+  vfio: Use select for eventfd
+  vfio: Use kconfig if XX/endif blocks instead of repeating 'depends on'
+
+Max Gurtovoy (10):
+  vfio/pci: Rename vfio_pci.c to vfio_pci_core.c
+  vfio/pci: Rename vfio_pci_private.h to vfio_pci_core.h
+  vfio/pci: Rename vfio_pci_device to vfio_pci_core_device
+  vfio/pci: Rename ops functions to fit core namings
+  vfio/pci: Include vfio header in vfio_pci_core.h
+  vfio/pci: Split the pci_driver code out of vfio_pci_core.c
+  vfio/pci: Move igd initialization to vfio_pci.c
+  PCI: Add 'override_only' field to struct pci_device_id
+  PCI / VFIO: Add 'override_only' support for VFIO PCI sub system
+  vfio/pci: Introduce vfio_pci_core.ko
+
+Yishai Hadas (1):
+  vfio/pci: Move module parameters to vfio_pci.c
+
+ Documentation/PCI/pci.rst                     |    1 +
+ MAINTAINERS                                   |    1 +
+ drivers/pci/pci-driver.c                      |   28 +-
+ drivers/vfio/Kconfig                          |   29 +-
+ drivers/vfio/fsl-mc/Kconfig                   |    3 +-
+ drivers/vfio/mdev/Kconfig                     |    1 -
+ drivers/vfio/pci/Kconfig                      |   40 +-
+ drivers/vfio/pci/Makefile                     |    8 +-
+ drivers/vfio/pci/vfio_pci.c                   | 2262 +----------------
+ drivers/vfio/pci/vfio_pci_config.c            |   70 +-
+ drivers/vfio/pci/vfio_pci_core.c              | 2158 ++++++++++++++++
+ drivers/vfio/pci/vfio_pci_igd.c               |   19 +-
+ drivers/vfio/pci/vfio_pci_intrs.c             |   42 +-
+ drivers/vfio/pci/vfio_pci_rdwr.c              |   18 +-
+ drivers/vfio/pci/vfio_pci_zdev.c              |    4 +-
+ drivers/vfio/platform/Kconfig                 |    6 +-
+ drivers/vfio/platform/reset/Kconfig           |    4 +-
+ include/linux/mod_devicetable.h               |    6 +
+ include/linux/pci.h                           |   29 +
+ .../linux/vfio_pci_core.h                     |   89 +-
+ scripts/mod/devicetable-offsets.c             |    1 +
+ scripts/mod/file2alias.c                      |    8 +-
+ 22 files changed, 2516 insertions(+), 2311 deletions(-)
+ create mode 100644 drivers/vfio/pci/vfio_pci_core.c
+ rename drivers/vfio/pci/vfio_pci_private.h => include/linux/vfio_pci_core.h (56%)
+
+-- 
+2.18.1
+
