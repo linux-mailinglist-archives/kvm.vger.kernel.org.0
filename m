@@ -2,24 +2,24 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8427B3F716C
-	for <lists+kvm@lfdr.de>; Wed, 25 Aug 2021 11:06:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 62C1D3F716F
+	for <lists+kvm@lfdr.de>; Wed, 25 Aug 2021 11:06:15 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239502AbhHYJGr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 25 Aug 2021 05:06:47 -0400
-Received: from inva020.nxp.com ([92.121.34.13]:57176 "EHLO inva020.nxp.com"
+        id S239534AbhHYJG4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 25 Aug 2021 05:06:56 -0400
+Received: from inva021.nxp.com ([92.121.34.21]:48428 "EHLO inva021.nxp.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S239389AbhHYJGq (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 25 Aug 2021 05:06:46 -0400
-Received: from inva020.nxp.com (localhost [127.0.0.1])
-        by inva020.eu-rdc02.nxp.com (Postfix) with ESMTP id B02271A07D8;
-        Wed, 25 Aug 2021 11:05:56 +0200 (CEST)
+        id S239536AbhHYJGv (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 25 Aug 2021 05:06:51 -0400
+Received: from inva021.nxp.com (localhost [127.0.0.1])
+        by inva021.eu-rdc02.nxp.com (Postfix) with ESMTP id 55F6F201621;
+        Wed, 25 Aug 2021 11:06:05 +0200 (CEST)
 Received: from inva024.eu-rdc02.nxp.com (inva024.eu-rdc02.nxp.com [134.27.226.22])
-        by inva020.eu-rdc02.nxp.com (Postfix) with ESMTP id A0E881A073E;
-        Wed, 25 Aug 2021 11:05:56 +0200 (CEST)
+        by inva021.eu-rdc02.nxp.com (Postfix) with ESMTP id 49020200C06;
+        Wed, 25 Aug 2021 11:06:05 +0200 (CEST)
 Received: from fsr-ub1864-111.ea.freescale.net (fsr-ub1864-111.ea.freescale.net [10.171.82.141])
-        by inva024.eu-rdc02.nxp.com (Postfix) with ESMTP id 45A6B203BA;
-        Wed, 25 Aug 2021 11:05:56 +0200 (CEST)
+        by inva024.eu-rdc02.nxp.com (Postfix) with ESMTP id E9E78203BA;
+        Wed, 25 Aug 2021 11:06:04 +0200 (CEST)
 From:   Diana Craciun <diana.craciun@oss.nxp.com>
 To:     Laurentiu Tudor <laurentiu.tudor@nxp.com>,
         linux-kernel@vger.kernel.org, gregkh@linuxfoundation.org,
@@ -27,258 +27,97 @@ To:     Laurentiu Tudor <laurentiu.tudor@nxp.com>,
         kvm@vger.kernel.org
 Cc:     Li Yang <leoyang.li@nxp.com>, linux-arm-kernel@lists.infradead.org,
         Diana Craciun <diana.craciun@oss.nxp.com>
-Subject: [PATCH 1/2] bus/fsl-mc: Add generic implementation for open/reset/close commands
-Date:   Wed, 25 Aug 2021 12:05:37 +0300
-Message-Id: <20210825090538.4860-1-diana.craciun@oss.nxp.com>
+Subject: [PATCH 2/2] vfio/fsl-mc: Add per device reset support
+Date:   Wed, 25 Aug 2021 12:05:38 +0300
+Message-Id: <20210825090538.4860-2-diana.craciun@oss.nxp.com>
 X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20210825090538.4860-1-diana.craciun@oss.nxp.com>
+References: <20210825090538.4860-1-diana.craciun@oss.nxp.com>
 X-Virus-Scanned: ClamAV using ClamSMTP
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The open/reset/close commands format is similar for all objects.
-Currently there are multiple implementations for these commands
-scattered through various drivers. The code is cavsi-identical.
-Create a generic implementation for the open/reset/close commands.
-One of the consumer will be the VFIO driver which needs to
-be able to reset a device.
+Currently when a fsl-mc device is reset, the entire DPRC container
+is reset which is very inefficient because the devices within a
+container will be reset multiple times.
+Add support for individually resetting a device.
 
 Signed-off-by: Diana Craciun <diana.craciun@oss.nxp.com>
 ---
- drivers/bus/fsl-mc/Makefile         |   3 +-
- drivers/bus/fsl-mc/fsl-mc-private.h |  39 +++++++++--
- drivers/bus/fsl-mc/obj-api.c        | 104 ++++++++++++++++++++++++++++
- include/linux/fsl/mc.h              |  14 ++++
- 4 files changed, 155 insertions(+), 5 deletions(-)
- create mode 100644 drivers/bus/fsl-mc/obj-api.c
+ drivers/vfio/fsl-mc/vfio_fsl_mc.c | 45 ++++++++++++++++++++-----------
+ 1 file changed, 29 insertions(+), 16 deletions(-)
 
-diff --git a/drivers/bus/fsl-mc/Makefile b/drivers/bus/fsl-mc/Makefile
-index 4ae292a30e53..892946245527 100644
---- a/drivers/bus/fsl-mc/Makefile
-+++ b/drivers/bus/fsl-mc/Makefile
-@@ -15,7 +15,8 @@ mc-bus-driver-objs := fsl-mc-bus.o \
- 		      dprc-driver.o \
- 		      fsl-mc-allocator.o \
- 		      fsl-mc-msi.o \
--		      dpmcp.o
-+		      dpmcp.o \
-+		      obj-api.o
+diff --git a/drivers/vfio/fsl-mc/vfio_fsl_mc.c b/drivers/vfio/fsl-mc/vfio_fsl_mc.c
+index 90cad109583b..46126d41dc32 100644
+--- a/drivers/vfio/fsl-mc/vfio_fsl_mc.c
++++ b/drivers/vfio/fsl-mc/vfio_fsl_mc.c
+@@ -155,6 +155,33 @@ static int vfio_fsl_mc_open(struct vfio_device *core_vdev)
+ 	return ret;
+ }
  
- # MC userspace support
- obj-$(CONFIG_FSL_MC_UAPI_SUPPORT) += fsl-mc-uapi.o
-diff --git a/drivers/bus/fsl-mc/fsl-mc-private.h b/drivers/bus/fsl-mc/fsl-mc-private.h
-index 1958fa065360..6055ef3e9e02 100644
---- a/drivers/bus/fsl-mc/fsl-mc-private.h
-+++ b/drivers/bus/fsl-mc/fsl-mc-private.h
-@@ -48,7 +48,6 @@ struct dpmng_rsp_get_version {
- 
- /* DPMCP command IDs */
- #define DPMCP_CMDID_CLOSE		DPMCP_CMD(0x800)
--#define DPMCP_CMDID_OPEN		DPMCP_CMD(0x80b)
- #define DPMCP_CMDID_RESET		DPMCP_CMD(0x005)
- 
- struct dpmcp_cmd_open {
-@@ -91,7 +90,6 @@ int dpmcp_reset(struct fsl_mc_io *mc_io,
- 
- /* DPRC command IDs */
- #define DPRC_CMDID_CLOSE                        DPRC_CMD(0x800)
--#define DPRC_CMDID_OPEN                         DPRC_CMD(0x805)
- #define DPRC_CMDID_GET_API_VERSION              DPRC_CMD(0xa05)
- 
- #define DPRC_CMDID_GET_ATTR                     DPRC_CMD(0x004)
-@@ -453,7 +451,6 @@ int dprc_get_connection(struct fsl_mc_io *mc_io,
- 
- /* Command IDs */
- #define DPBP_CMDID_CLOSE		DPBP_CMD(0x800)
--#define DPBP_CMDID_OPEN			DPBP_CMD(0x804)
- 
- #define DPBP_CMDID_ENABLE		DPBP_CMD(0x002)
- #define DPBP_CMDID_DISABLE		DPBP_CMD(0x003)
-@@ -492,7 +489,6 @@ struct dpbp_rsp_get_attributes {
- 
- /* Command IDs */
- #define DPCON_CMDID_CLOSE			DPCON_CMD(0x800)
--#define DPCON_CMDID_OPEN			DPCON_CMD(0x808)
- 
- #define DPCON_CMDID_ENABLE			DPCON_CMD(0x002)
- #define DPCON_CMDID_DISABLE			DPCON_CMD(0x003)
-@@ -524,6 +520,41 @@ struct dpcon_cmd_set_notification {
- 	__le64 user_ctx;
- };
- 
-+/*
-+ * Generic FSL MC API
-+ */
-+
-+/* generic command versioning */
-+#define OBJ_CMD_BASE_VERSION		1
-+#define OBJ_CMD_ID_OFFSET		4
-+
-+#define OBJ_CMD(id)	(((id) << OBJ_CMD_ID_OFFSET) | OBJ_CMD_BASE_VERSION)
-+
-+/* open command codes */
-+#define DPRTC_CMDID_OPEN		OBJ_CMD(0x810)
-+#define DPNI_CMDID_OPEN		OBJ_CMD(0x801)
-+#define DPSW_CMDID_OPEN		OBJ_CMD(0x802)
-+#define DPIO_CMDID_OPEN		OBJ_CMD(0x803)
-+#define DPBP_CMDID_OPEN		OBJ_CMD(0x804)
-+#define DPRC_CMDID_OPEN		OBJ_CMD(0x805)
-+#define DPDMUX_CMDID_OPEN		OBJ_CMD(0x806)
-+#define DPCI_CMDID_OPEN		OBJ_CMD(0x807)
-+#define DPCON_CMDID_OPEN		OBJ_CMD(0x808)
-+#define DPSECI_CMDID_OPEN		OBJ_CMD(0x809)
-+#define DPAIOP_CMDID_OPEN		OBJ_CMD(0x80a)
-+#define DPMCP_CMDID_OPEN		OBJ_CMD(0x80b)
-+#define DPMAC_CMDID_OPEN		OBJ_CMD(0x80c)
-+#define DPDCEI_CMDID_OPEN		OBJ_CMD(0x80d)
-+#define DPDMAI_CMDID_OPEN		OBJ_CMD(0x80e)
-+#define DPDBG_CMDID_OPEN		OBJ_CMD(0x80f)
-+
-+/* Generic object command IDs */
-+#define OBJ_CMDID_CLOSE		OBJ_CMD(0x800)
-+#define OBJ_CMDID_RESET		OBJ_CMD(0x005)
-+
-+struct obj_cmd_open {
-+	__le32 obj_id;
-+};
- 
- /**
-  * struct fsl_mc_resource_pool - Pool of MC resources of a given
-diff --git a/drivers/bus/fsl-mc/obj-api.c b/drivers/bus/fsl-mc/obj-api.c
-new file mode 100644
-index 000000000000..8eee28c7f86a
---- /dev/null
-+++ b/drivers/bus/fsl-mc/obj-api.c
-@@ -0,0 +1,104 @@
-+// SPDX-License-Identifier: (GPL-2.0+ OR BSD-3-Clause)
-+/*
-+ * Copyright 2021 NXP
-+ *
-+ */
-+#include <linux/kernel.h>
-+#include <linux/fsl/mc.h>
-+
-+#include "fsl-mc-private.h"
-+
-+static int fsl_mc_get_open_cmd_id(const char *type)
++static int vfio_fsl_mc_reset_device(struct vfio_fsl_mc_device *vdev)
 +{
-+	static const struct {
-+		int cmd_id;
-+		const char *type;
-+	} dev_ids[] = {
-+		{ DPRTC_CMDID_OPEN, "dprtc" },
-+		{ DPRC_CMDID_OPEN, "dprc" },
-+		{ DPNI_CMDID_OPEN, "dpni" },
-+		{ DPIO_CMDID_OPEN, "dpio" },
-+		{ DPSW_CMDID_OPEN, "dpsw" },
-+		{ DPBP_CMDID_OPEN, "dpbp" },
-+		{ DPCON_CMDID_OPEN, "dpcon" },
-+		{ DPMCP_CMDID_OPEN, "dpmcp" },
-+		{ DPMAC_CMDID_OPEN, "dpmac" },
-+		{ DPSECI_CMDID_OPEN, "dpseci" },
-+		{ DPDMUX_CMDID_OPEN, "dpdmux" },
-+		{ DPDCEI_CMDID_OPEN, "dpdcei" },
-+		{ DPAIOP_CMDID_OPEN, "dpaiop" },
-+		{ DPCI_CMDID_OPEN, "dpci" },
-+		{ DPDMAI_CMDID_OPEN, "dpdmai" },
-+		{ DPDBG_CMDID_OPEN, "dpdbg" },
-+		{ 0, NULL }
-+	};
-+	int i;
++	struct fsl_mc_device *mc_dev = vdev->mc_dev;
++	int ret = 0;
 +
-+	for (i = 0; dev_ids[i].type; i++)
-+		if (!strcmp(dev_ids[i].type, type))
-+			return dev_ids[i].cmd_id;
++	if (is_fsl_mc_bus_dprc(vdev->mc_dev)) {
++		return dprc_reset_container(mc_dev->mc_io, 0,
++					mc_dev->mc_handle,
++					mc_dev->obj_desc.id,
++					DPRC_RESET_OPTION_NON_RECURSIVE);
++	} else {
++		int err;
++		u16 token;
 +
-+	return -1;
++		err = fsl_mc_obj_open(mc_dev->mc_io, 0, mc_dev->obj_desc.id,
++				      mc_dev->obj_desc.type,
++				      &token);
++		if (err)
++			return err;
++		ret = fsl_mc_obj_reset(mc_dev->mc_io, 0, token);
++		err = fsl_mc_obj_close(mc_dev->mc_io, 0, token);
++		if (err)
++			return err;
++	}
++	return ret;
 +}
 +
-+int fsl_mc_obj_open(struct fsl_mc_io *mc_io,
-+		    u32 cmd_flags,
-+		    int obj_id,
-+		    char *obj_type,
-+		    u16 *token)
-+{
-+	struct fsl_mc_command cmd = { 0 };
-+	struct obj_cmd_open *cmd_params;
-+	int err = 0;
-+	int cmd_id = fsl_mc_get_open_cmd_id(obj_type);
-+
-+	if (cmd_id == -1)
-+		return -ENODEV;
-+
-+	/* prepare command */
-+	cmd.header = mc_encode_cmd_header(cmd_id, cmd_flags, 0);
-+	cmd_params = (struct obj_cmd_open *)cmd.params;
-+	cmd_params->obj_id = cpu_to_le32(obj_id);
-+
-+	/* send command to mc*/
-+	err = mc_send_command(mc_io, &cmd);
-+	if (err)
-+		return err;
-+
-+	/* retrieve response parameters */
-+	*token = mc_cmd_hdr_read_token(&cmd);
-+
-+	return err;
-+}
-+EXPORT_SYMBOL_GPL(fsl_mc_obj_open);
-+
-+int fsl_mc_obj_close(struct fsl_mc_io *mc_io,
-+		     u32 cmd_flags,
-+		     u16 token)
-+{
-+	struct fsl_mc_command cmd = { 0 };
-+
-+	/* prepare command */
-+	cmd.header = mc_encode_cmd_header(OBJ_CMDID_CLOSE, cmd_flags,
-+					  token);
-+
-+	/* send command to mc*/
-+	return mc_send_command(mc_io, &cmd);
-+}
-+EXPORT_SYMBOL_GPL(fsl_mc_obj_close);
-+
-+int fsl_mc_obj_reset(struct fsl_mc_io *mc_io,
-+		     u32 cmd_flags,
-+		     u16 token)
-+{
-+	struct fsl_mc_command cmd = { 0 };
-+
-+	/* prepare command */
-+	cmd.header = mc_encode_cmd_header(OBJ_CMDID_RESET, cmd_flags,
-+					  token);
-+
-+	/* send command to mc*/
-+	return mc_send_command(mc_io, &cmd);
-+}
-+EXPORT_SYMBOL_GPL(fsl_mc_obj_reset);
-+
-diff --git a/include/linux/fsl/mc.h b/include/linux/fsl/mc.h
-index 63b56aba925a..fafea154242d 100644
---- a/include/linux/fsl/mc.h
-+++ b/include/linux/fsl/mc.h
-@@ -619,6 +619,20 @@ int dpcon_reset(struct fsl_mc_io *mc_io,
- 		u32 cmd_flags,
- 		u16 token);
+ static void vfio_fsl_mc_release(struct vfio_device *core_vdev)
+ {
+ 	struct vfio_fsl_mc_device *vdev =
+@@ -171,10 +198,7 @@ static void vfio_fsl_mc_release(struct vfio_device *core_vdev)
+ 		vfio_fsl_mc_regions_cleanup(vdev);
  
-+int fsl_mc_obj_open(struct fsl_mc_io *mc_io,
-+		    u32 cmd_flags,
-+		    int obj_id,
-+		    char *obj_type,
-+		    u16 *token);
-+
-+int fsl_mc_obj_close(struct fsl_mc_io *mc_io,
-+		     u32 cmd_flags,
-+		     u16 token);
-+
-+int fsl_mc_obj_reset(struct fsl_mc_io *mc_io,
-+		     u32 cmd_flags,
-+		     u16 token);
-+
- /**
-  * struct dpcon_attr - Structure representing DPCON attributes
-  * @id: DPCON object ID
+ 		/* reset the device before cleaning up the interrupts */
+-		ret = dprc_reset_container(mc_cont->mc_io, 0,
+-		      mc_cont->mc_handle,
+-			  mc_cont->obj_desc.id,
+-			  DPRC_RESET_OPTION_NON_RECURSIVE);
++		ret = vfio_fsl_mc_reset_device(vdev);
+ 
+ 		if (ret) {
+ 			dev_warn(&mc_cont->dev, "VFIO_FLS_MC: reset device has failed (%d)\n",
+@@ -302,18 +326,7 @@ static long vfio_fsl_mc_ioctl(struct vfio_device *core_vdev,
+ 	}
+ 	case VFIO_DEVICE_RESET:
+ 	{
+-		int ret;
+-		struct fsl_mc_device *mc_dev = vdev->mc_dev;
+-
+-		/* reset is supported only for the DPRC */
+-		if (!is_fsl_mc_bus_dprc(mc_dev))
+-			return -ENOTTY;
+-
+-		ret = dprc_reset_container(mc_dev->mc_io, 0,
+-					   mc_dev->mc_handle,
+-					   mc_dev->obj_desc.id,
+-					   DPRC_RESET_OPTION_NON_RECURSIVE);
+-		return ret;
++		return vfio_fsl_mc_reset_device(vdev);
+ 
+ 	}
+ 	default:
 -- 
 2.17.1
 
