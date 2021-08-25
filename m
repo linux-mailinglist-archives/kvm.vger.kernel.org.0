@@ -2,28 +2,28 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id AE03A3F797C
-	for <lists+kvm@lfdr.de>; Wed, 25 Aug 2021 17:54:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C8E443F7985
+	for <lists+kvm@lfdr.de>; Wed, 25 Aug 2021 17:55:41 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241469AbhHYPze (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 25 Aug 2021 11:55:34 -0400
-Received: from mail.kernel.org ([198.145.29.99]:43580 "EHLO mail.kernel.org"
+        id S241538AbhHYP40 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 25 Aug 2021 11:56:26 -0400
+Received: from mail.kernel.org ([198.145.29.99]:44028 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S237144AbhHYPzd (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 25 Aug 2021 11:55:33 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 98E8E6113C;
-        Wed, 25 Aug 2021 15:54:47 +0000 (UTC)
+        id S240495AbhHYP4Z (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 25 Aug 2021 11:56:25 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 6A8F461151;
+        Wed, 25 Aug 2021 15:55:39 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1629906887;
-        bh=TCaeqsA8D2KWuPxjsXVTeKWgWn8CA9TYMwTL+5QAHJQ=;
+        s=k20201202; t=1629906939;
+        bh=V9s9KJfOQtTa6v8mYQHZaDcryO1e0OuOtnamjdvnDW8=;
         h=Date:From:To:Cc:Subject:In-Reply-To:From;
-        b=CmIsEqZCC1jsEZ7r3VcgW8L+FXL1sLOX3x5iSFQ0togj5IV65JDSKOJk2yfkgSMaA
-         bTH4LCLoV2/akZ5v3EtZzrzz8fo6L+cdg+ARSshOcHaFpPQDWnnPUhA2adkDagblWF
-         oUh0GSXedq3u5pjxWWaFWkKXjoMZJjSDuxBzBDeb2lt/9fzRZQvdkfITEtxscVisCv
-         /zAZ/WKPlvyq0Ix55JJZAN9S1+PbOW0pnsIayWcuSDH5GetjDu4dgA+3p/p8OPnmuQ
-         JPTCGGF/5EruSMFfc643hB6QUJc5tXCbbB5k5XWPEH//z9VLXQxNfH2ICbKhV5CIm3
-         LU53cX/Kf+Ugw==
-Date:   Wed, 25 Aug 2021 10:54:46 -0500
+        b=j48Eos7dG1irfytts2VXxMQlEKVsprLOBBgHDV3Ke2GU5I+HG+NxN6NED0G+RBwR1
+         reNklRdpyDciCXFAItYXzKe4nz+n+M6UVjYszJ0Oq+ciOT5XA95Q5HhnKN0Lam1lMF
+         AqamKFiBc9g1iuIQanioHWG3eOwETCdO/QIgfgZKqSMy3+Tr4uSwnlPFjw9267fe/W
+         uNiSrp2XpF9dOFIyqXhVF7CoZM+1dFWsVW6Z9YM+YAOnlbGIf+n1hnWYZu4WD0yjln
+         AH46VkxDg9bry8APkUAsKeDSHIdo+D3We7r6+9eWqoBYn6EkDmiFtPQg1teKQyaD1Z
+         feR2+12oRRprg==
+Date:   Wed, 25 Aug 2021 10:55:38 -0500
 From:   Bjorn Helgaas <helgaas@kernel.org>
 To:     Yishai Hadas <yishaih@nvidia.com>
 Cc:     bhelgaas@google.com, corbet@lwn.net, alex.williamson@redhat.com,
@@ -34,155 +34,198 @@ Cc:     bhelgaas@google.com, corbet@lwn.net, alex.williamson@redhat.com,
         linux-s390@vger.kernel.org, linux-kbuild@vger.kernel.org,
         mgurtovoy@nvidia.com, jgg@nvidia.com, maorg@nvidia.com,
         leonro@nvidia.com
-Subject: Re: [PATCH V4 09/13] PCI: Add 'override_only' field to struct
- pci_device_id
-Message-ID: <20210825155446.GA3575423@bjorn-Precision-5520>
+Subject: Re: [PATCH V4 10/13] PCI / VFIO: Add 'override_only' support for
+ VFIO PCI sub system
+Message-ID: <20210825155538.GA3575783@bjorn-Precision-5520>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20210825135139.79034-10-yishaih@nvidia.com>
+In-Reply-To: <20210825135139.79034-11-yishaih@nvidia.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Aug 25, 2021 at 04:51:35PM +0300, Yishai Hadas wrote:
+On Wed, Aug 25, 2021 at 04:51:36PM +0300, Yishai Hadas wrote:
 > From: Max Gurtovoy <mgurtovoy@nvidia.com>
 > 
-> Add 'override_only' field to struct pci_device_id to be used as part of
-> pci_match_device().
+> Expose an 'override_only' helper macro (i.e.
+> PCI_DRIVER_OVERRIDE_DEVICE_VFIO) for VFIO PCI sub system and add the
+> required code to prefix its matching entries with "vfio_" in
+> modules.alias file.
 > 
-> When set, it means that matching is true only when dev->driver_override
-> is this driver.
-
-Maybe:
-
-  When set, a driver only matches the entry when dev->driver_override
-  is set to that driver.
-
-> In addition, add a helper macro named 'PCI_DEVICE_DRIVER_OVERRIDE' to
-> enable setting some data on it.
+> It allows VFIO device drivers to include match entries in the
+> modules.alias file produced by kbuild that are not used for normal
+> driver autoprobing and module autoloading. Drivers using these match
+> entries can be connected to the PCI device manually, by userspace, using
+> the existing driver_override sysfs.
 > 
-> Next patch from this series will use the above functionality.
+> For example the resulting modules.alias may have:
+> 
+>   alias pci:v000015B3d00001021sv*sd*bc*sc*i* mlx5_core
+>   alias vfio_pci:v000015B3d00001021sv*sd*bc*sc*i* mlx5_vfio_pci
+>   alias vfio_pci:v*d*sv*sd*bc*sc*i* vfio_pci
+> 
+> In this example mlx5_core and mlx5_vfio_pci match to the same PCI
+> device. The kernel will autoload and autobind to mlx5_core but the
+> kernel and udev mechanisms will ignore mlx5_vfio_pci.
+> 
+> When userspace wants to change a device to the VFIO subsystem it can
+> implement a generic algorithm:
+> 
+>    1) Identify the sysfs path to the device:
+>     /sys/devices/pci0000:00/0000:00:01.0/0000:01:00.0
+> 
+>    2) Get the modalias string from the kernel:
+>     $ cat /sys/bus/pci/devices/0000:01:00.0/modalias
+>     pci:v000015B3d00001021sv000015B3sd00000001bc02sc00i00
+> 
+>    3) Prefix it with vfio_:
+>     vfio_pci:v000015B3d00001021sv000015B3sd00000001bc02sc00i00
+> 
+>    4) Search modules.alias for the above string and select the entry that
+>       has the fewest *'s:
+>     alias vfio_pci:v000015B3d00001021sv*sd*bc*sc*i* mlx5_vfio_pci
+> 
+>    5) modprobe the matched module name:
+>     $ modprobe mlx5_vfio_pci
+> 
+>    6) cat the matched module name to driver_override:
+>     echo mlx5_vfio_pci > /sys/bus/pci/devices/0000:01:00.0/driver_override
+> 
+>    7) unbind device from original module
+>      echo 0000:01:00.0 > /sys/bus/pci/devices/0000:01:00.0/driver/unbind
+> 
+>    8) probe PCI drivers (or explicitly bind to mlx5_vfio_pci)
+>     echo 0000:01:00.0 > /sys/bus/pci/drivers_probe
+> 
+> The algorithm is independent of bus type. In future the other buses with
+> VFIO device drivers, like platform and ACPI, can use this algorithm as
+> well.
+> 
+> This patch is the infrastructure to provide the information in the
+> modules.alias to userspace. Convert the only VFIO pci_driver which results
+> in one new line in the modules.alias:
+> 
+>   alias vfio_pci:v*d*sv*sd*bc*sc*i* vfio_pci
+> 
+> Later series introduce additional HW specific VFIO PCI drivers, such as
+> mlx5_vfio_pci.
 > 
 > Signed-off-by: Max Gurtovoy <mgurtovoy@nvidia.com>
 > Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
 > Signed-off-by: Yishai Hadas <yishaih@nvidia.com>
 
-Acked-by: Bjorn Helgaas <bhelgaas@google.com>
+Acked-by: Bjorn Helgaas <bhelgaas@google.com>  # for pci.h
 
 > ---
-
->  Documentation/PCI/pci.rst       |  1 +
->  drivers/pci/pci-driver.c        | 28 +++++++++++++++++++++-------
->  include/linux/mod_devicetable.h |  2 ++
->  include/linux/pci.h             | 15 +++++++++++++++
->  4 files changed, 39 insertions(+), 7 deletions(-)
+>  drivers/vfio/pci/vfio_pci.c       |  9 ++++++++-
+>  include/linux/mod_devicetable.h   |  4 ++++
+>  include/linux/pci.h               | 14 ++++++++++++++
+>  scripts/mod/devicetable-offsets.c |  1 +
+>  scripts/mod/file2alias.c          |  8 ++++++--
+>  5 files changed, 33 insertions(+), 3 deletions(-)
 > 
-> diff --git a/Documentation/PCI/pci.rst b/Documentation/PCI/pci.rst
-> index fa651e25d98c..87c6f4a6ca32 100644
-> --- a/Documentation/PCI/pci.rst
-> +++ b/Documentation/PCI/pci.rst
-> @@ -103,6 +103,7 @@ need pass only as many optional fields as necessary:
->    - subvendor and subdevice fields default to PCI_ANY_ID (FFFFFFFF)
->    - class and classmask fields default to 0
->    - driver_data defaults to 0UL.
-> +  - override_only field defaults to 0.
->  
->  Note that driver_data must match the value used by any of the pci_device_id
->  entries defined in the driver. This makes the driver_data field mandatory
-> diff --git a/drivers/pci/pci-driver.c b/drivers/pci/pci-driver.c
-> index 3a72352aa5cf..123c590ebe1d 100644
-> --- a/drivers/pci/pci-driver.c
-> +++ b/drivers/pci/pci-driver.c
-> @@ -136,7 +136,7 @@ static const struct pci_device_id *pci_match_device(struct pci_driver *drv,
->  						    struct pci_dev *dev)
->  {
->  	struct pci_dynid *dynid;
-> -	const struct pci_device_id *found_id = NULL;
-> +	const struct pci_device_id *found_id = NULL, *ids;
->  
->  	/* When driver_override is set, only bind to the matching driver */
->  	if (dev->driver_override && strcmp(dev->driver_override, drv->name))
-> @@ -152,14 +152,28 @@ static const struct pci_device_id *pci_match_device(struct pci_driver *drv,
->  	}
->  	spin_unlock(&drv->dynids.lock);
->  
-> -	if (!found_id)
-> -		found_id = pci_match_id(drv->id_table, dev);
-> +	if (found_id)
-> +		return found_id;
->  
-> -	/* driver_override will always match, send a dummy id */
-> -	if (!found_id && dev->driver_override)
-> -		found_id = &pci_device_id_any;
-> +	for (ids = drv->id_table; (found_id = pci_match_id(ids, dev));
-> +	     ids = found_id + 1) {
-> +		/*
-> +		 * The match table is split based on driver_override.
-> +		 * In case override_only was set, enforce driver_override
-> +		 * matching.
-> +		 */
-> +		if (found_id->override_only) {
-> +			if (dev->driver_override)
-> +				return found_id;
-> +		} else {
-> +			return found_id;
-> +		}
-> +	}
->  
-> -	return found_id;
-> +	/* driver_override will always match, send a dummy id */
-> +	if (dev->driver_override)
-> +		return &pci_device_id_any;
-> +	return NULL;
+> diff --git a/drivers/vfio/pci/vfio_pci.c b/drivers/vfio/pci/vfio_pci.c
+> index 163e560c4495..85fd638a5955 100644
+> --- a/drivers/vfio/pci/vfio_pci.c
+> +++ b/drivers/vfio/pci/vfio_pci.c
+> @@ -178,9 +178,16 @@ static int vfio_pci_sriov_configure(struct pci_dev *pdev, int nr_virtfn)
+>  	return vfio_pci_core_sriov_configure(pdev, nr_virtfn);
 >  }
 >  
->  /**
+> +static const struct pci_device_id vfio_pci_table[] = {
+> +	{ PCI_DRIVER_OVERRIDE_DEVICE_VFIO(PCI_ANY_ID, PCI_ANY_ID) }, /* match all by default */
+> +	{}
+> +};
+> +
+> +MODULE_DEVICE_TABLE(pci, vfio_pci_table);
+> +
+>  static struct pci_driver vfio_pci_driver = {
+>  	.name			= "vfio-pci",
+> -	.id_table		= NULL, /* only dynamic ids */
+> +	.id_table		= vfio_pci_table,
+>  	.probe			= vfio_pci_probe,
+>  	.remove			= vfio_pci_remove,
+>  	.sriov_configure	= vfio_pci_sriov_configure,
 > diff --git a/include/linux/mod_devicetable.h b/include/linux/mod_devicetable.h
-> index 8e291cfdaf06..2e3ba6d9ece0 100644
+> index 2e3ba6d9ece0..f0325a172f87 100644
 > --- a/include/linux/mod_devicetable.h
 > +++ b/include/linux/mod_devicetable.h
-> @@ -34,12 +34,14 @@ typedef unsigned long kernel_ulong_t;
->   *			Best practice is to use driver_data as an index
->   *			into a static list of equivalent device types,
->   *			instead of using it as a pointer.
-> + * @override_only:	Match only when dev->driver_override is this driver.
->   */
->  struct pci_device_id {
->  	__u32 vendor, device;		/* Vendor and device ID or PCI_ANY_ID*/
->  	__u32 subvendor, subdevice;	/* Subsystem ID's or PCI_ANY_ID */
->  	__u32 class, class_mask;	/* (class,subclass,prog-if) triplet */
->  	kernel_ulong_t driver_data;	/* Data private to the driver */
-> +	__u32 override_only;
->  };
+> @@ -16,6 +16,10 @@ typedef unsigned long kernel_ulong_t;
 >  
+>  #define PCI_ANY_ID (~0)
 >  
+> +enum {
+> +	PCI_ID_F_VFIO_DRIVER_OVERRIDE	= 1 << 0,
+> +};
+> +
+>  /**
+>   * struct pci_device_id - PCI device ID structure
+>   * @vendor:		Vendor ID to match (or PCI_ANY_ID)
 > diff --git a/include/linux/pci.h b/include/linux/pci.h
-> index 540b377ca8f6..0506b1a8c921 100644
+> index 0506b1a8c921..527a1dfd1d06 100644
 > --- a/include/linux/pci.h
 > +++ b/include/linux/pci.h
-> @@ -901,6 +901,21 @@ struct pci_driver {
->  	.vendor = (vend), .device = (dev), \
->  	.subvendor = PCI_ANY_ID, .subdevice = PCI_ANY_ID
+> @@ -916,6 +916,20 @@ struct pci_driver {
+>  	.vendor = (vend), .device = (dev), .subvendor = PCI_ANY_ID, \
+>  	.subdevice = PCI_ANY_ID, .override_only = (driver_override)
 >  
 > +/**
-> + * PCI_DEVICE_DRIVER_OVERRIDE - macro used to describe a PCI device with
-> + *                              override_only flags.
+> + * PCI_DRIVER_OVERRIDE_DEVICE_VFIO - macro used to describe a VFIO
+> + *                                   "driver_override" PCI device.
 > + * @vend: the 16 bit PCI Vendor ID
 > + * @dev: the 16 bit PCI Device ID
-> + * @driver_override: the 32 bit PCI Device override_only
 > + *
-> + * This macro is used to create a struct pci_device_id that matches only a
-> + * driver_override device. The subvendor and subdevice fields will be set to
-> + * PCI_ANY_ID.
+> + * This macro is used to create a struct pci_device_id that matches a
+> + * specific device. The subvendor and subdevice fields will be set to
+> + * PCI_ANY_ID and the driver_override will be set to
+> + * PCI_ID_F_VFIO_DRIVER_OVERRIDE.
 > + */
-> +#define PCI_DEVICE_DRIVER_OVERRIDE(vend, dev, driver_override) \
-> +	.vendor = (vend), .device = (dev), .subvendor = PCI_ANY_ID, \
-> +	.subdevice = PCI_ANY_ID, .override_only = (driver_override)
+> +#define PCI_DRIVER_OVERRIDE_DEVICE_VFIO(vend, dev) \
+> +	PCI_DEVICE_DRIVER_OVERRIDE(vend, dev, PCI_ID_F_VFIO_DRIVER_OVERRIDE)
 > +
 >  /**
 >   * PCI_DEVICE_SUB - macro used to describe a specific PCI device with subsystem
 >   * @vend: the 16 bit PCI Vendor ID
+> diff --git a/scripts/mod/devicetable-offsets.c b/scripts/mod/devicetable-offsets.c
+> index 9bb6c7edccc4..cc3625617a0e 100644
+> --- a/scripts/mod/devicetable-offsets.c
+> +++ b/scripts/mod/devicetable-offsets.c
+> @@ -42,6 +42,7 @@ int main(void)
+>  	DEVID_FIELD(pci_device_id, subdevice);
+>  	DEVID_FIELD(pci_device_id, class);
+>  	DEVID_FIELD(pci_device_id, class_mask);
+> +	DEVID_FIELD(pci_device_id, override_only);
+>  
+>  	DEVID(ccw_device_id);
+>  	DEVID_FIELD(ccw_device_id, match_flags);
+> diff --git a/scripts/mod/file2alias.c b/scripts/mod/file2alias.c
+> index 7c97fa8e36bc..c3edbf73157e 100644
+> --- a/scripts/mod/file2alias.c
+> +++ b/scripts/mod/file2alias.c
+> @@ -426,7 +426,7 @@ static int do_ieee1394_entry(const char *filename,
+>  	return 1;
+>  }
+>  
+> -/* Looks like: pci:vNdNsvNsdNbcNscNiN. */
+> +/* Looks like: pci:vNdNsvNsdNbcNscNiN or <prefix>_pci:vNdNsvNsdNbcNscNiN. */
+>  static int do_pci_entry(const char *filename,
+>  			void *symval, char *alias)
+>  {
+> @@ -440,8 +440,12 @@ static int do_pci_entry(const char *filename,
+>  	DEF_FIELD(symval, pci_device_id, subdevice);
+>  	DEF_FIELD(symval, pci_device_id, class);
+>  	DEF_FIELD(symval, pci_device_id, class_mask);
+> +	DEF_FIELD(symval, pci_device_id, override_only);
+>  
+> -	strcpy(alias, "pci:");
+> +	if (override_only & PCI_ID_F_VFIO_DRIVER_OVERRIDE)
+> +		strcpy(alias, "vfio_pci:");
+> +	else
+> +		strcpy(alias, "pci:");
+>  	ADD(alias, "v", vendor != PCI_ANY_ID, vendor);
+>  	ADD(alias, "d", device != PCI_ANY_ID, device);
+>  	ADD(alias, "sv", subvendor != PCI_ANY_ID, subvendor);
 > -- 
 > 2.18.1
 > 
