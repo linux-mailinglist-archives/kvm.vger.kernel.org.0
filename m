@@ -2,155 +2,132 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3951A3F6E14
-	for <lists+kvm@lfdr.de>; Wed, 25 Aug 2021 06:06:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CA9CF3F6E37
+	for <lists+kvm@lfdr.de>; Wed, 25 Aug 2021 06:19:34 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229636AbhHYEGn (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 25 Aug 2021 00:06:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38114 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229379AbhHYEGn (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 25 Aug 2021 00:06:43 -0400
-Received: from mail-io1-xd32.google.com (mail-io1-xd32.google.com [IPv6:2607:f8b0:4864:20::d32])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1BBCCC061757;
-        Tue, 24 Aug 2021 21:05:58 -0700 (PDT)
-Received: by mail-io1-xd32.google.com with SMTP id a21so29150136ioq.6;
-        Tue, 24 Aug 2021 21:05:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=NZoI/2t89xBZsKpePuesqEGL96FIMPFUNLVpR72Rozg=;
-        b=EegF7oqbZkc2syS4cXBmSapTwbjI4P79ZFnOvmTcRGDf1kVVRrqdOELBgYukAMVcRF
-         E5L0A65z7uT82650RwrmS3opolb9Z0mBUOg4LsgLiDhQldz++hVRAipq2bIJghRVUEHd
-         wN+ZgZFdXl7G+cbp2HlnKij+sP9dWtX9h1sr6fh+Thp2l4oajwXETlk4CL3tjSQP95Kq
-         JRg1F4lVdlrkiu7JvQ6zV4mvbwfrJinel9BV6bjsC9Wwo2t8Dtfov7YT27pmbBuQz/jf
-         Hp0lXMS5ZggnkGmfhrAjIkOhfyJr3MU4MyRLSGqJ78LkVbcAv6TxYqsGfoRd66ksCdF9
-         w3mg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=NZoI/2t89xBZsKpePuesqEGL96FIMPFUNLVpR72Rozg=;
-        b=e7BDFNsQjNKMBlkhlgs+E2MkH0GQtsfAKecuhwxinEiairYO5cTkEdsYGQYvs8PT3Y
-         HnCV/aDiflBVJCKLWF25AyFe7qa6jvGekpEsXqQHJLBU1XqFa0aAzzEwhK3uJm8tcC7o
-         AI4BIjnFKnOqaZRcnEa5ynpVeMsM/SWKPJafpELh65R1HbSkGOwHXksJQwoVHHAHj1F4
-         6mptRVpIdEbG7sfDck3EnIu3WgK77QdsdGUWlxxDU74jnjhPKNa8Y4c3WQ4xxkFID1zi
-         /DMooDkcuq9+Xj26cTIGdzOP3etaSV7VOFoNy7NkDAlRLppH+xB+xpItk9Vs7oYYRLy0
-         0U0g==
-X-Gm-Message-State: AOAM530yZB4GoHFjq3K5kU2G7ZqUOcoSak80UdEZhX5iXF3ZibUEgJAY
-        B+f4V3qc7E7yUoEsh4HkUFSSa60nwRIeeTfAdHY=
-X-Google-Smtp-Source: ABdhPJyBMWkZD2uYn2FqafJci0TEl6KsEXYS9GefAs47Rcnz5EruGKrU3wGb07bVNKki4a1w4hfLPGSN8iSuh7e6ies=
-X-Received: by 2002:a5d:96da:: with SMTP id r26mr34232231iol.47.1629864357564;
- Tue, 24 Aug 2021 21:05:57 -0700 (PDT)
+        id S230247AbhHYEUS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 25 Aug 2021 00:20:18 -0400
+Received: from mga09.intel.com ([134.134.136.24]:62675 "EHLO mga09.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229446AbhHYEUR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 25 Aug 2021 00:20:17 -0400
+X-IronPort-AV: E=McAfee;i="6200,9189,10086"; a="217449836"
+X-IronPort-AV: E=Sophos;i="5.84,349,1620716400"; 
+   d="scan'208";a="217449836"
+Received: from fmsmga003.fm.intel.com ([10.253.24.29])
+  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Aug 2021 21:19:31 -0700
+X-IronPort-AV: E=Sophos;i="5.84,349,1620716400"; 
+   d="scan'208";a="527064572"
+Received: from xiaoyaol-mobl.ccr.corp.intel.com (HELO [10.239.13.122]) ([10.239.13.122])
+  by fmsmga003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Aug 2021 21:19:27 -0700
+Subject: Re: [PATCH 3/5] KVM: VMX: RTIT_CTL_BRANCH_EN has no dependency on
+ other CPUID bit
+To:     Like Xu <like.xu.linux@gmail.com>,
+        "Alexander Shishkin (hwtracing + intel_th + stm + R:perf)" 
+        <alexander.shishkin@linux.intel.com>
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
+References: <20210824110743.531127-1-xiaoyao.li@intel.com>
+ <20210824110743.531127-4-xiaoyao.li@intel.com>
+ <711265db-f634-36ac-40d2-c09cea825df6@gmail.com>
+From:   Xiaoyao Li <xiaoyao.li@intel.com>
+Message-ID: <b80a91db-cb35-ba6d-ab36-a0fa1ca051e7@intel.com>
+Date:   Wed, 25 Aug 2021 12:19:25 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Firefox/78.0 Thunderbird/78.13.0
 MIME-Version: 1.0
-References: <20210821000501.375978-1-seanjc@google.com> <20210821000501.375978-3-seanjc@google.com>
-In-Reply-To: <20210821000501.375978-3-seanjc@google.com>
-From:   Lai Jiangshan <jiangshanlai+lkml@gmail.com>
-Date:   Wed, 25 Aug 2021 12:05:45 +0800
-Message-ID: <CAJhGHyB1RjBLRLtaS80XQSTb0g35smxnBQPjEp-BwieKu1cwXw@mail.gmail.com>
-Subject: Re: [PATCH 2/2] KVM: Guard cpusmask NULL check with CONFIG_CPUMASK_OFFSTACK
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-        LKML <linux-kernel@vger.kernel.org>,
-        Venkatesh Srinivas <venkateshs@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <711265db-f634-36ac-40d2-c09cea825df6@gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sat, Aug 21, 2021 at 8:09 AM Sean Christopherson <seanjc@google.com> wrote:
->
-> Check for a NULL cpumask_var_t when kicking multiple vCPUs if and only if
-> cpumasks are configured to be allocated off-stack.  This is a meaningless
-> optimization, e.g. avoids a TEST+Jcc and TEST+CMOV on x86, but more
-> importantly helps document that the NULL check is necessary even though
-> all callers pass in a local variable.
->
-> No functional change intended.
->
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
-> ---
->  virt/kvm/kvm_main.c | 12 ++++++++++--
->  1 file changed, 10 insertions(+), 2 deletions(-)
->
-> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> index 786b914db98f..82c5280dd5ce 100644
-> --- a/virt/kvm/kvm_main.c
-> +++ b/virt/kvm/kvm_main.c
-> @@ -247,7 +247,7 @@ static void ack_flush(void *_completed)
->
->  static inline bool kvm_kick_many_cpus(const struct cpumask *cpus, bool wait)
->  {
-> -       if (unlikely(!cpus))
-> +       if (IS_ENABLED(CONFIG_CPUMASK_OFFSTACK) && unlikely(!cpus))
->                 cpus = cpu_online_mask;
->
->         if (cpumask_empty(cpus))
-> @@ -277,6 +277,14 @@ bool kvm_make_vcpus_request_mask(struct kvm *kvm, unsigned int req,
->                 if (!(req & KVM_REQUEST_NO_WAKEUP) && kvm_vcpu_wake_up(vcpu))
->                         continue;
->
-> +               /*
-> +                * tmp can be NULL if cpumasks are allocated off stack, as
-> +                * allocation of the mask is deliberately not fatal and is
-> +                * handled by falling back to kicking all online CPUs.
-> +                */
-> +               if (IS_ENABLED(CONFIG_CPUMASK_OFFSTACK) && !tmp)
-> +                       continue;
-> +
+On 8/25/2021 11:30 AM, Like Xu wrote:
+> +Alexander
+> 
+> On 24/8/2021 7:07 pm, Xiaoyao Li wrote:
+>> Per Intel SDM, RTIT_CTL_BRANCH_EN bit has no dependency on any CPUID
+>> leaf 0x14.
+>>
+>> Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
+>> ---
+>>   arch/x86/kvm/vmx/vmx.c | 8 ++++----
+>>   1 file changed, 4 insertions(+), 4 deletions(-)
+>>
+>> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+>> index 7ed96c460661..4a70a6d2f442 100644
+>> --- a/arch/x86/kvm/vmx/vmx.c
+>> +++ b/arch/x86/kvm/vmx/vmx.c
+>> @@ -7116,7 +7116,8 @@ static void update_intel_pt_cfg(struct kvm_vcpu 
+>> *vcpu)
+>>       /* Initialize and clear the no dependency bits */
+>>       vmx->pt_desc.ctl_bitmask = ~(RTIT_CTL_TRACEEN | RTIT_CTL_OS |
+>> -            RTIT_CTL_USR | RTIT_CTL_TSC_EN | RTIT_CTL_DISRETC);
+>> +            RTIT_CTL_USR | RTIT_CTL_TSC_EN | RTIT_CTL_DISRETC |
+>> +            RTIT_CTL_BRANCH_EN);
+>>       /*
+>>        * If CPUID.(EAX=14H,ECX=0):EBX[0]=1 CR3Filter can be set otherwise
+>> @@ -7134,12 +7135,11 @@ static void update_intel_pt_cfg(struct 
+>> kvm_vcpu *vcpu)
+>>                   RTIT_CTL_CYC_THRESH | RTIT_CTL_PSB_FREQ);
+>>       /*
+>> -     * If CPUID.(EAX=14H,ECX=0):EBX[3]=1 MTCEn BranchEn and
+>> -     * MTCFreq can be set
+>> +     * If CPUID.(EAX=14H,ECX=0):EBX[3]=1 MTCEn and MTCFreq can be set
+> 
+> If CPUID.(EAX=14H,ECX=0):EBX[3]=1,
+> 
+>      "indicates support of MTC timing packet and suppression of 
+> COFI-based packets."
 
-Hello, Sean
+I think it's a mistake of SDM in CPUID instruction.
 
-I don't think it is a good idea to reinvent the cpumask_available().
-You can rework the patch as the following code if cpumask_available()
-fits for you.
+If you read 31.3.1, table 31-11 of SDM 325462-075US,
 
-Thanks
-Lai
+It just says CPUID(0x14, 0):EBX[3]: MTC supprted.
+It doesn't talk anything about COFI packets suppression.
 
-diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index 3e67c93ca403..ca043ec7ed74 100644
---- a/virt/kvm/kvm_main.c
-+++ b/virt/kvm/kvm_main.c
-@@ -245,9 +245,11 @@ static void ack_flush(void *_completed)
- {
- }
+Further as below.
 
--static inline bool kvm_kick_many_cpus(const struct cpumask *cpus, bool wait)
-+static inline bool kvm_kick_many_cpus(cpumask_var_t tmp, bool wait)
- {
--       if (unlikely(!cpus))
-+       const struct cpumask *cpus = tmp;
-+
-+       if (unlikely(!cpumask_available(tmp)))
-                cpus = cpu_online_mask;
+> Per 31.2.5.4 Branch Enable (BranchEn),
+> 
+>      "If BranchEn is not set, then relevant COFI packets (TNT, TIP*, 
+> FUP, MODE.*) are suppressed."
+> 
+> I think if the COFI capability is suppressed, the software can't set the 
+> BranchEn bit, right ?
 
-        if (cpumask_empty(cpus))
-@@ -278,7 +280,7 @@ bool kvm_make_vcpus_request_mask(struct kvm *kvm,
-unsigned int req,
-                if (!(req & KVM_REQUEST_NO_WAKEUP) && kvm_vcpu_wake_up(vcpu))
-                        continue;
+Based on your understanding, isn't it that
 
--               if (tmp != NULL && cpu != -1 && cpu != me &&
-+               if (cpumask_available(tmp) && cpu != -1 && cpu != me &&
-                    kvm_request_needs_ipi(vcpu, req))
-                        __cpumask_set_cpu(cpu, tmp);
-        }
+1. if CPUID.(EAX=14H,ECX=0):EBX[3]=0, it doesn't support "suppression of 
+COFI-based packets".
+2. if it doesn't support "suppression of COFI-based packets", then it 
+doens't support "If BranchEn is not set, then relevant COFI packets 
+(TNT, TIP*, FUP, MODE.*) are suppressed", i.e. BranchEn must be 1.
 
->                 /*
->                  * Note, the vCPU could get migrated to a different pCPU at any
->                  * point after kvm_request_needs_ipi(), which could result in
-> @@ -288,7 +296,7 @@ bool kvm_make_vcpus_request_mask(struct kvm *kvm, unsigned int req,
->                  * were reading SPTEs _before_ any changes were finalized.  See
->                  * kvm_vcpu_kick() for more details on handling requests.
->                  */
-> -               if (tmp != NULL && kvm_request_needs_ipi(vcpu, req)) {
-> +               if (kvm_request_needs_ipi(vcpu, req)) {
->                         cpu = READ_ONCE(vcpu->cpu);
->                         if (cpu != -1 && cpu != me)
->                                 __cpumask_set_cpu(cpu, tmp);
-> --
-> 2.33.0.rc2.250.ged5fa647cd-goog
->
+Anyway, I think it's just a mistake on CPUID instruction document of SDM.
+
+CPUD.(EAX=14H,ECX=0):EBX[3] should only indicates the MTC support.
+
+BranchEn should be always supported if PT is available. Per "31.2.7.2 
+IA32_RTIT_CTL MSR" on SDM:
+When BranchEn is 1, it enables COFI-based packets.
+When BranchEn is 0, it disables COFI-based packtes. i.e., COFI packets 
+are suppressed.
+
+>>        */
+>>       if (intel_pt_validate_cap(vmx->pt_desc.caps, PT_CAP_mtc))
+>>           vmx->pt_desc.ctl_bitmask &= ~(RTIT_CTL_MTC_EN |
+>> -                RTIT_CTL_BRANCH_EN | RTIT_CTL_MTC_RANGE);
+>> +                          RTIT_CTL_MTC_RANGE);
+>>       /* If CPUID.(EAX=14H,ECX=0):EBX[4]=1 FUPonPTW and PTWEn can be 
+>> set */
+>>       if (intel_pt_validate_cap(vmx->pt_desc.caps, PT_CAP_ptwrite))
+>>
+
