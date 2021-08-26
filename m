@@ -2,41 +2,41 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5E9443F90B0
-	for <lists+kvm@lfdr.de>; Fri, 27 Aug 2021 01:00:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 01FA43F90B2
+	for <lists+kvm@lfdr.de>; Fri, 27 Aug 2021 01:00:56 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243768AbhHZW2B (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 26 Aug 2021 18:28:01 -0400
-Received: from mail-dm6nam11hn2239.outbound.protection.outlook.com ([52.100.172.239]:3008
+        id S243778AbhHZW2D (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 26 Aug 2021 18:28:03 -0400
+Received: from mail-dm6nam11hn2225.outbound.protection.outlook.com ([52.100.172.225]:47361
         "EHLO NAM11-DM6-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S243752AbhHZW16 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 26 Aug 2021 18:27:58 -0400
+        id S243764AbhHZW2C (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 26 Aug 2021 18:28:02 -0400
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=mX2QD2Hau4qzjDM7GbJVxmTk9cfjvHyF+//UhG/meW15/m/bnxM3wrfz1osYyrMQo76yOO2YOm1nn9pfCEdgKRQESEasPIolh7KLAMi2qBhI21HEK8VapSfKjzx6ix0larthqD8A4Z+b0vlYzgXrGqB+41OWVY5EWsIfBBC2Y5gnLgWvVXitfsfiRws1J94150kVf2KKA81RHim3svbvdLj6LunCx2JP57Tfrwd52BiQ79OyVNQFTWsU0JzkHciuvoaiQLAZu54hvytlPYRFqDhoNHvP52mW8dqD4OlpuP3n7pUghmqmZty6C8AK5i+zGowYRoLnRg1oXLCHJJxiyg==
+ b=eepTJ0F8KtgqoF1p4sz2khFvqkS46aNyj3gKN+BD8rW1GloapfOdIAecIW7DEULGkpBegA25Z6WbP2AFp861C7oskWD7ByjeBiIki1zVSD4i6r2RVKGxJ/LUH1T6FrmaAl/TJrlAqPNcXcZ5GHyyIjz5fdDMZycP1I48hT5/pPR1vLo32QpZJOKfRi/bFFsGHtk2b4bCpEMs2bqlBjoJs2ALk0m8fYLgKUKKi1AhR7NObn41lCvQexf9S4pkv5ERtNn5jzg9+WCMo4Iw5UGbsFvY5n80ODyuRu+TG9eB4ozuKvK+/WSSKUzyrAxXc8iBiE7qPm6DrBrqT9gZhQoHDg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ptkfNS7CJnmRZOVylvDJ4BEuceFQJsPgNWd50EsnjsI=;
- b=HB1yYBZkP+Z/B08dYDG7HncIxecaKrgO21FxPu+PgBrYFq3x4kqK+k23COL/db77uXlsgX4tq9iAwvC52M8FTLsGGC2JhZDdu9eCkxqpe0sMvxyGLuyMv1lFBnSpiMnPJ8paW8/dyv6+AAG15HCMm9zBCoghCU/556vIrNAXu1qtY+nLKcBEg2rOwrHHSBSnb1QXKX2PB3gH1+L56X26ecCaCc3etfJhI9aac0MXGsNWZsN0DS7S9CYVxx+3Jp2hen+YU1TUbN5cSj9mTTceScxv5qiT+wilJIGvQYPIku9sg7j11DxaIJNmEOAHmpxYes2WpsK2NkYdfb1/IGC18g==
+ bh=+COgJlQSZtZ2EaaufkaqxyCvux1xLYqGTWWciI8S6lI=;
+ b=Ads0Pi9Rme27nhUdvMlNVH4RMLRaaYzlzXHQ45Bi5Ppwm/uJEaQkvmGja5xQJF/Bd+MwqB1cCQYvlm3ees8kF0YLk6YOlaTuViQKrOXblQQmlGC94k2sdbHwDlbUDkiFtlGg46L7lfZXTJjkZwJzA9y0xHJQWzbhNrZFX5khc/2ghI+vipdyvOzz7xD+gmTJEAC+Eer4HvLg5ag9SuOQ6cU/EonHiZEk533nIKF6W/BVe8RgimYI53U/R0Y5u9BOJhvu1RKGYTkzDcSUADZt+NFdwbDOT9BI8xg9bxoRV1khTbH3vN6yXq9dtmhJVR0/m/aKcKqPDwxv/B4SgFpmmA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
  header.d=amd.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ptkfNS7CJnmRZOVylvDJ4BEuceFQJsPgNWd50EsnjsI=;
- b=bV2HmFT+wureybpabzmOos2VNiZA/7etMaI+rySIt6Q5FzN4SuSVyrGECFsKerERNEgpyQpHKjL7Atyg0TJd0ezbg7fr56+V/nizlXsBN2W5L5wsnPRmzTYAltXZII9+/HP7QxQxUykXazhQomdXXJywiN3yU1GxfXXwL1YqPtQ=
+ bh=+COgJlQSZtZ2EaaufkaqxyCvux1xLYqGTWWciI8S6lI=;
+ b=ZItGjn89110ye/3VL6VHw/S27lHvIsSXSw+exDIsME2Lfti9jgyTaIPOXrI2zTkGtXljK/WXZKqa8p8xNgUVnMKKrQi+oAGwbDKW/QNcG63ZkFbP8iO23tyR30Cs9NGiw0Oz1V6+kKJ6Iz+e7x8M5CitEUXgUKskq5zJBOBhA6M=
 Authentication-Results: nongnu.org; dkim=none (message not signed)
  header.d=none;nongnu.org; dmarc=none action=none header.from=amd.com;
 Received: from CH2PR12MB4133.namprd12.prod.outlook.com (2603:10b6:610:7a::13)
- by CH2PR12MB4293.namprd12.prod.outlook.com (2603:10b6:610:7e::19) with
+ by CH2PR12MB3925.namprd12.prod.outlook.com (2603:10b6:610:21::22) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4436.19; Thu, 26 Aug
- 2021 22:27:09 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4436.22; Thu, 26 Aug
+ 2021 22:27:12 +0000
 Received: from CH2PR12MB4133.namprd12.prod.outlook.com
  ([fe80::d19e:b657:5259:24d0]) by CH2PR12MB4133.namprd12.prod.outlook.com
  ([fe80::d19e:b657:5259:24d0%8]) with mapi id 15.20.4436.019; Thu, 26 Aug 2021
- 22:27:09 +0000
+ 22:27:12 +0000
 From:   Michael Roth <michael.roth@amd.com>
 To:     qemu-devel@nongnu.org
 Cc:     Connor Kuehl <ckuehl@redhat.com>,
@@ -53,329 +53,275 @@ Cc:     Connor Kuehl <ckuehl@redhat.com>,
         Brijesh Singh <brijesh.singh@amd.com>,
         Markus Armbruster <armbru@redhat.com>,
         Eric Blake <eblake@redhat.com>
-Subject: [RFC PATCH v2 10/12] target/i386: add new EPYC CPU versions with updated cache_info
-Date:   Thu, 26 Aug 2021 17:26:25 -0500
-Message-Id: <20210826222627.3556-11-michael.roth@amd.com>
+Subject: [RFC PATCH v2 11/12] i386/sev: sev-snp: add support for CPUID validation
+Date:   Thu, 26 Aug 2021 17:26:26 -0500
+Message-Id: <20210826222627.3556-12-michael.roth@amd.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20210826222627.3556-1-michael.roth@amd.com>
 References: <20210826222627.3556-1-michael.roth@amd.com>
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-ClientProxiedBy: SN7PR04CA0007.namprd04.prod.outlook.com
- (2603:10b6:806:f2::12) To CH2PR12MB4133.namprd12.prod.outlook.com
+X-ClientProxiedBy: SA0PR11CA0067.namprd11.prod.outlook.com
+ (2603:10b6:806:d2::12) To CH2PR12MB4133.namprd12.prod.outlook.com
  (2603:10b6:610:7a::13)
 MIME-Version: 1.0
 X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from localhost (165.204.77.1) by SN7PR04CA0007.namprd04.prod.outlook.com (2603:10b6:806:f2::12) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4457.17 via Frontend Transport; Thu, 26 Aug 2021 22:27:08 +0000
+Received: from localhost (165.204.77.1) by SA0PR11CA0067.namprd11.prod.outlook.com (2603:10b6:806:d2::12) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4457.18 via Frontend Transport; Thu, 26 Aug 2021 22:27:12 +0000
 X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: dcb9eccd-bd82-463e-bf05-08d968e0a454
-X-MS-TrafficTypeDiagnostic: CH2PR12MB4293:
+X-MS-Office365-Filtering-Correlation-Id: beb8c79a-92ba-4a13-5634-08d968e0a691
+X-MS-TrafficTypeDiagnostic: CH2PR12MB3925:
 X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <CH2PR12MB4293588B896926DEC7481B0595C79@CH2PR12MB4293.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:6108;
+X-Microsoft-Antispam-PRVS: <CH2PR12MB39252410E2058E4282FA860F95C79@CH2PR12MB3925.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:2449;
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: =?us-ascii?Q?r5wARpzZVzGw0zxLE02RRcqvRhuUg2ffkQFGmhFoiF+Z/OFT8rOBynRKzcs0?=
- =?us-ascii?Q?dzrSW/d54LG6C8ZaQhly+wulw+Sg/z2I1zjQncZApkHENhn3Vx+eA2ULPxP7?=
- =?us-ascii?Q?WMf85sUh742kxt45F3bp8XAA7rLlADsI6ePbmn182dgsqb2zP/zhcJQo4oW5?=
- =?us-ascii?Q?etOSMSanIy29+VIuxWJasFexNVXr7OrG+uTit38I2Gi6Tnvu93xiUlZ3NlZk?=
- =?us-ascii?Q?3vF83OGVTWNTS0J/MYaDpd2Fz5LJo2yax7ZUMEUaDLiObIuKKHYNUhliqiPe?=
- =?us-ascii?Q?qIidH5K7O7FRmxBGfhbzkYGMkDYFVlfNPU7jTg/3WjL9r7CZwQSRtIp00ZVk?=
- =?us-ascii?Q?kMTjV79sxC4CgNrBozh2uysQ1lPBw6Mgd88LRIfKj4DVRyhLrTlATJ8M7Ehw?=
- =?us-ascii?Q?NtwnNUaRcs3hCCxPi9eGjofdEJF1/5vL7wi6wBNKPXpLA5LHEtiyDxWhST5P?=
- =?us-ascii?Q?qBDtlWxdIVFdVRx2GjOOH40JvtjR1LB4pRdj+L7LnZ7XC1iarVlFZWRTbBYD?=
- =?us-ascii?Q?x7vtbOBIDtv0ESWxF2/fE8Tv0DdDIsDH318u8Om9k5SdOowm12N+ZnST/AAY?=
- =?us-ascii?Q?c21Iq9vldXcEWmAWIeI+KEfBieAySeFj1JLNzcKyW0L0igMFx2LE76voIM5z?=
- =?us-ascii?Q?5zbTqcbYSSCBeoSoiPRibHo6DTwUB4QVu8PKoxlpGxMI0nuSswYEFjQom9L2?=
- =?us-ascii?Q?KfCjq2I4VvVqlZbkCKh1EdCZwdyCDHTZulOMcxZ/+klTe3LH6b/4Usa+aSt+?=
- =?us-ascii?Q?2cI0Cu0xZmfj5S5VSj8jBOLqll37KTBKsIzhLQ6Y6D+0rxv9bFyGy0gePnkE?=
- =?us-ascii?Q?2PUWqOGougo8yw1v6BiG4hdTdOU1IVHaHNc55Qzz72buTWwEOaHpn4KEcd5f?=
- =?us-ascii?Q?J6qzpHaGFnXLKr6PoIZ8DO5rlmwW2nf+4h5PqJAGqBIYOcfhsm72NgXFNd6j?=
- =?us-ascii?Q?cWG6dnQ53qks1/5CT9QwIgqWurAzTYH7jvH996NSslSFoujivqggt6AqJmZa?=
- =?us-ascii?Q?/s4ifI2oXDgT/cnYhhecVLi4/vQLUAafTUEby08JiGvBqAk=3D?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:5;SRV:;IPV:NLI;SFV:SPM;H:CH2PR12MB4133.namprd12.prod.outlook.com;PTR:;CAT:OSPM;SFS:(4636009)(366004)(38100700002)(38350700002)(508600001)(6916009)(54906003)(15650500001)(66556008)(66476007)(1076003)(2906002)(5660300002)(6496006)(8936002)(52116002)(86362001)(316002)(186003)(6486002)(6666004)(2616005)(4326008)(26005)(83380400001)(66946007)(36756003)(44832011)(956004)(8676002)(7416002)(23200700001);DIR:OUT;SFP:1501;
+X-Microsoft-Antispam-Message-Info: =?us-ascii?Q?DmiEU9wagF08pitKrB5IyLy9D44adZbmzX8Smbq+71yAP4KU2syh/9wUOfrO?=
+ =?us-ascii?Q?z9GNYIeqXGN50vMYIzl7maSXidjwbXR9qwoCL7TUokX5YN60yLrLwjNOR7nh?=
+ =?us-ascii?Q?7OVQ9e0vEQyB+QvA1dVXsPIUcuZ614ZS4Q0RCbEUtvnyZtmC+G9RpMybmMbJ?=
+ =?us-ascii?Q?WlFq/kQ84toocPspwcLXkexFPFYh3fxJ+0m700kRJkMLp8apW+S9EWfQ1kB7?=
+ =?us-ascii?Q?rDd+P67g8gIWZ3qsZis4chfVLLFVzTTHlSMVGOnN/R83ixrb5Fuh9WF1u1KX?=
+ =?us-ascii?Q?gbLb6mMImrhPrOgh6GS72mM3d2lU74NiESilxrbKqj54TwMGkZnLOpyhoh5k?=
+ =?us-ascii?Q?J1B5xM2Ui4pnrWnL5LlcBl6HQw5GTdlV8pnzXs+10d5EhYBEt45IP1/1ylDC?=
+ =?us-ascii?Q?V+YBGiFGPLasq3MYPK+IwKjCnTcSJ9EGWLmhWmkon2gYIJ1N3YKurBUD9YxU?=
+ =?us-ascii?Q?U8/ygUUdsmYKHqqdlxwNQYVVhah/Ta1sGW/A3JA1mPbcU1vTIjlEuYyP7rTo?=
+ =?us-ascii?Q?WYaMdWJFbbYVgb669o7ukR+fLzjNX9yYs5XIayMi/kWlMHHx8jYeuLPeyuPD?=
+ =?us-ascii?Q?FUqvrcI/13EO6vcu1D+hQrZ3VFId/Lv4l2iZNtKhlEVYvuYNIFR2i38dshTf?=
+ =?us-ascii?Q?in1mcWV3YllGm0c073QgDkyptbee4kx2TEfZJYzbsSIL1Ha8Is2PKPoax2T/?=
+ =?us-ascii?Q?2ggbCEZttc1U1GatEPGWWS1FBTorCsY3I836TITfXYayEgUjmm4TXSG8jysi?=
+ =?us-ascii?Q?SX8YrpZa4MpRcqud21oPqpxzDiC96Vraj5JwjvFJc/xx3Nl4psiNiMonU70g?=
+ =?us-ascii?Q?+xuKgfG4t56NBR/nNWsJrak6Bm0Fucc7rKl3SGQi19+w6+/uza8mC4LDSnqM?=
+ =?us-ascii?Q?rDEMT25cGoff5w7umBHDQ96kUXfoQqVlLXCInUooxCiUxc1RMJy6HDDfQod9?=
+ =?us-ascii?Q?Gg4V7mXmeVZ40cm8dnJqgJ38vk2joJuChXVfWrHyW/Fbiadk835TXMEKPSjY?=
+ =?us-ascii?Q?ZmGfbonzI4FBysiMI7RjSbnOz+BU/peWsS63FMtcbBV1Vnk=3D?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:5;SRV:;IPV:NLI;SFV:SPM;H:CH2PR12MB4133.namprd12.prod.outlook.com;PTR:;CAT:OSPM;SFS:(4636009)(376002)(396003)(346002)(136003)(39860400002)(366004)(8676002)(38350700002)(66476007)(38100700002)(956004)(2616005)(6666004)(66556008)(83380400001)(186003)(6916009)(478600001)(36756003)(316002)(4326008)(44832011)(54906003)(66946007)(52116002)(6496006)(2906002)(86362001)(1076003)(6486002)(5660300002)(7416002)(8936002)(26005)(23200700001);DIR:OUT;SFP:1501;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?T3bcylOwBB5V46Zc+kSDzBH69jx1gHsRD2jK9aCNyVVaMwyX0/v2Gk0whulq?=
- =?us-ascii?Q?wIIf12LVQNwFvuA0yChPoYlDzZ+JxVEdMbGC0RKXB2etR3LnkjfvqAlWgA4S?=
- =?us-ascii?Q?iXxzUlXSjQFW2qwTCfPiF/Nqf3JFleSab0ygPVgUqxt2NKFvEsJQDLIhkp+A?=
- =?us-ascii?Q?HqXlwlb+NLNgLeGoKIR9UoLPHwoYpsq0diXAWHTA82YtoeZ9aLN31MUdSuza?=
- =?us-ascii?Q?irnP7ldVUK3w8PbXQc2pLssB+fho1vgCb9sDEguThaHNhHBXQ/9z4EkjD6p+?=
- =?us-ascii?Q?cHjYNXtiFmI41UOhm17PMbWbVAOGhdxUWWqUZ6VnDMxcS3qOf1N0XijaY4xv?=
- =?us-ascii?Q?FDCUzi8Dkk2B/hA3Z/IgrT6RVXiw6EYfYQsHlPwimYJr3r3cGUmwV6jy0ka5?=
- =?us-ascii?Q?MQyPzmWXsDLhZGc2C+Cg8di7wliAbjIlAcezRpbbbEFAMX/wYUfwPvs+6Aub?=
- =?us-ascii?Q?myOrATU0c5jhioTH3RDgHvOox4HrlFRH744ovAMlY+E7KKXPTlDYotXiNbJm?=
- =?us-ascii?Q?L0i091pNI394M83WkLj4KED/h2H1lmmAGwQJFEz3+kYy/2Q1Owc7fRxipp5d?=
- =?us-ascii?Q?oUoW/G1eyJOIRzmbjBoG+cHcX9Hlum3KNAiqANfI34NuNZVyrrmwCP2u2ifR?=
- =?us-ascii?Q?cIqXM00wJr2P6sczjsfro1cozOylCz8KAKGhzTTHiLkiiTA4GMl85z6jmkwS?=
- =?us-ascii?Q?RVSkxpKnVmQ4zAd0GEL0jeyYgaL4MUvUs7YOLrd7MyBh4jjoPpXz42sIDiib?=
- =?us-ascii?Q?Ny1iejCPqJhMzbuNsNHUnoh+gfAiywtSyt7thblAiB8HTUPK9KuIsefdmRbf?=
- =?us-ascii?Q?m7uH9dlEdARf6RwG6HF74wg0H0zSIverSHIU8sgaRmkE8i9EnnyGL0smLpLF?=
- =?us-ascii?Q?HEqG6X2Ly9ixc8Zd09USrXq9+YtqylT1U1E+unvubskHl20VZJvXb6wiUmVe?=
- =?us-ascii?Q?zs9dhNvNNMMuyPAEggSSO2nKLFiwkYMhCEXmzc/iITV1L4GpwLCOtybLBS9b?=
- =?us-ascii?Q?iIZIoFlLWUJtc+3g4/KdXU56LYNgDZDkWWIUlt5guFiJcqfc6VVBpXNOIGku?=
- =?us-ascii?Q?mtqTXwAV7rWlBJQbD0gZ+PCmMXfzxkWHBjqfDK6HTsGau4tl4CAey/U66Td/?=
- =?us-ascii?Q?0G0adICnyxaB/xgBhlHXS9NPCW/k12XQmJ/o2d8Hmno8m7AcOKY2b9AdQ70o?=
- =?us-ascii?Q?f/zLfg0sm/Mtbr4EclVhFLPRJowgAYtXyOEYcV5o8IrouXTAJEzafErozTV7?=
- =?us-ascii?Q?qbph7G/kPd0iEISJe0CLO1eHgCm4yjxX5zg6jQ/4Rk2K2JC0jQnHojktLMEu?=
- =?us-ascii?Q?tOEN5DwyWPgF1poM4iuNM0BI?=
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?xT5c+HdCyVNtJC2Zkr6TF7fKW/cnK8ezw9xICV+giJ04TozLrZbb+ssSUr5h?=
+ =?us-ascii?Q?QI4vCV27mpFMCwLjvO+2ToqCOxnaoqrlTNYjPQ3sjHsO4albWgIQnfLahnL2?=
+ =?us-ascii?Q?vxQZx51dQ3BD0jsK09KWL2/BaoOXZnEZMsmHSvGAN8iuGN0JmwuArM7QJ85j?=
+ =?us-ascii?Q?qRnrAfzhGkjrXalaVWmQUWrxuO4qpLDpNqDvwh/AW9fycsgq5R6BXOLlhcWb?=
+ =?us-ascii?Q?kkUjIl234EWFcfZCKQtd4XOeqwjaeQtSsG9goxG0xKH7D57KAM0vI6f2tvqZ?=
+ =?us-ascii?Q?8TepC17Ow2Y4N5/WUPyOZOwixkq34pYX7FR6FshdE+zR/IklCQByNyylP7qu?=
+ =?us-ascii?Q?GX4e7+kmWZpqgtLDpiU9CEuJ+13easBtYWNhLdsX39yBoJ8+uWB9oKSrKlAE?=
+ =?us-ascii?Q?S+G/bLG6E8eET8vXCrxtQJwxIbIexD7ioNDMik47fc6Wzs188eSbqhtIUKlV?=
+ =?us-ascii?Q?kcGikPwD+hdldiqX5kZ7UpOkbaJ7wyyUboUzwZQUvLtDy+tOUwnCqmPNI6qA?=
+ =?us-ascii?Q?5g1GodxRCV7SOOUDWLtyd3i1NG26mXnHDrOpQVcmkyoF5XLs0D+Mwh60Cwjl?=
+ =?us-ascii?Q?fdRGEo1xR2iEDPWxFJJmAKV9095t1nntTYxcJ6NlRDxy6ANSqv/lunU/NhfI?=
+ =?us-ascii?Q?bRYFFLd+GFF8TcMi+qf0GRG4vz4PkOyR8EdOTBnD6A5Fa6dKpf+28pK7trUL?=
+ =?us-ascii?Q?QAz/oaurSfWCylzutvck6aP08cUE//1TRbKbwwVH+/8JwFMvZepYiI612H3n?=
+ =?us-ascii?Q?KwON6QQc4IXcOus2dYoWxzDsRv2RLps550SBPAf7ddksIQbE2qAXuGEfn2Be?=
+ =?us-ascii?Q?2LyxqshbI0+cxfVQIb0KjOcjbIhWYoV0LNg3M+NwyExOTEU9BaPMC+HmqemK?=
+ =?us-ascii?Q?9FgKVWPbbOxeAcIYcAy4hkg6kXkd7kGlWXLhdjYXMelR2jBSnS24P5OUGBZ5?=
+ =?us-ascii?Q?sagK+MgoG419WnjOdHN5oGw/tkYUcQY26undg3cNdjA9oYpmHBOMwNI57r/k?=
+ =?us-ascii?Q?BqMZPcQ7fsxCtI5pt27OicdTsNVIo+CcguswZjdSzgCS1WWeyIR+tPst6d9y?=
+ =?us-ascii?Q?12LvWeLx77dew25pGA/HNTp7isp0B/3h7iq7gnZXK14QVroYn/YKyZ3AiIaZ?=
+ =?us-ascii?Q?6GN7aCwAIWIWTrQv2xWNMu+CxpENY5UTRQ2wZIUa6u0b95tOTmj18LMFOwUH?=
+ =?us-ascii?Q?FUSKK9Wv6QtvXfM63tpp/CaiZNuNxMP+vhrAwcGYEyxKosv0lcDFfrw1RAgg?=
+ =?us-ascii?Q?Q02xpE8EaA+LMVKMqqS/BWMbZxRq9diWjTNhL9O44l6kKVXacVn0Ss1Y9qcF?=
+ =?us-ascii?Q?41gwdAc0q8Yhh6YJqeuE/ZF3?=
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: dcb9eccd-bd82-463e-bf05-08d968e0a454
+X-MS-Exchange-CrossTenant-Network-Message-Id: beb8c79a-92ba-4a13-5634-08d968e0a691
 X-MS-Exchange-CrossTenant-AuthSource: CH2PR12MB4133.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 Aug 2021 22:27:08.9900
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 Aug 2021 22:27:12.7445
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: tJ7/4YncYxyzXJQXPrtTF0KRzbL1P9tP5NOm1WNeblaavTBxTyPgLkZbBzIC9xD8PDtMVO8MACL3ueYIqXw9Dg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH2PR12MB4293
+X-MS-Exchange-CrossTenant-UserPrincipalName: uncT576zmPbhUxKqixaYgU2cEArhT6MPhVXozUaxAITs7R2Ac5xhmSPAhiPrmkpFqmb0cgo6UF4ZPVHVx+JI4Q==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH2PR12MB3925
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This patch introduces new EPYC cpu versions: EPYC-v4, EPYC-Rome-v3,
-and EPYC-Milan-v2. The only difference vs. older models is an updated
-cache_info with the 'complex_indexing' bit unset, since this bit is
-not currently defined for AMD and may cause problems should it be used
-for something else in the future. Setting this bit will also cause
-CPUID validation failures when running SEV-SNP guests.
+SEV-SNP firmware allows a special guest page to be populated with a
+table of guest CPUID values so that they can be validated through
+firmware before being loaded into encrypted guest memory where they can
+be used in place of hypervisor-provided values[1].
+
+As part of SEV-SNP guest initialization, use this process to validate
+the CPUID entries reported by KVM_GET_CPUID2 prior to initial guest
+start.
+
+[1]: SEV SNP Firmware ABI Specification, Rev. 0.8, 8.13.2.6
 
 Signed-off-by: Michael Roth <michael.roth@amd.com>
 ---
- target/i386/cpu.c | 184 ++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 184 insertions(+)
+ target/i386/sev.c | 146 +++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 143 insertions(+), 3 deletions(-)
 
-diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-index 85d387163a..45e456b557 100644
---- a/target/i386/cpu.c
-+++ b/target/i386/cpu.c
-@@ -1567,6 +1567,56 @@ static const CPUCaches epyc_cache_info = {
-     },
- };
+diff --git a/target/i386/sev.c b/target/i386/sev.c
+index 0009c93d28..72a6146295 100644
+--- a/target/i386/sev.c
++++ b/target/i386/sev.c
+@@ -153,6 +153,36 @@ static const char *const sev_fw_errlist[] = {
  
-+static CPUCaches epyc_v4_cache_info = {
-+    .l1d_cache = &(CPUCacheInfo) {
-+        .type = DATA_CACHE,
-+        .level = 1,
-+        .size = 32 * KiB,
-+        .line_size = 64,
-+        .associativity = 8,
-+        .partitions = 1,
-+        .sets = 64,
-+        .lines_per_tag = 1,
-+        .self_init = 1,
-+        .no_invd_sharing = true,
-+    },
-+    .l1i_cache = &(CPUCacheInfo) {
-+        .type = INSTRUCTION_CACHE,
-+        .level = 1,
-+        .size = 64 * KiB,
-+        .line_size = 64,
-+        .associativity = 4,
-+        .partitions = 1,
-+        .sets = 256,
-+        .lines_per_tag = 1,
-+        .self_init = 1,
-+        .no_invd_sharing = true,
-+    },
-+    .l2_cache = &(CPUCacheInfo) {
-+        .type = UNIFIED_CACHE,
-+        .level = 2,
-+        .size = 512 * KiB,
-+        .line_size = 64,
-+        .associativity = 8,
-+        .partitions = 1,
-+        .sets = 1024,
-+        .lines_per_tag = 1,
-+    },
-+    .l3_cache = &(CPUCacheInfo) {
-+        .type = UNIFIED_CACHE,
-+        .level = 3,
-+        .size = 8 * MiB,
-+        .line_size = 64,
-+        .associativity = 16,
-+        .partitions = 1,
-+        .sets = 8192,
-+        .lines_per_tag = 1,
-+        .self_init = true,
-+        .inclusive = true,
-+        .complex_indexing = false,
-+    },
-+};
-+
- static const CPUCaches epyc_rome_cache_info = {
-     .l1d_cache = &(CPUCacheInfo) {
-         .type = DATA_CACHE,
-@@ -1617,6 +1667,56 @@ static const CPUCaches epyc_rome_cache_info = {
-     },
- };
+ #define SEV_FW_MAX_ERROR      ARRAY_SIZE(sev_fw_errlist)
  
-+static const CPUCaches epyc_rome_v3_cache_info = {
-+    .l1d_cache = &(CPUCacheInfo) {
-+        .type = DATA_CACHE,
-+        .level = 1,
-+        .size = 32 * KiB,
-+        .line_size = 64,
-+        .associativity = 8,
-+        .partitions = 1,
-+        .sets = 64,
-+        .lines_per_tag = 1,
-+        .self_init = 1,
-+        .no_invd_sharing = true,
-+    },
-+    .l1i_cache = &(CPUCacheInfo) {
-+        .type = INSTRUCTION_CACHE,
-+        .level = 1,
-+        .size = 32 * KiB,
-+        .line_size = 64,
-+        .associativity = 8,
-+        .partitions = 1,
-+        .sets = 64,
-+        .lines_per_tag = 1,
-+        .self_init = 1,
-+        .no_invd_sharing = true,
-+    },
-+    .l2_cache = &(CPUCacheInfo) {
-+        .type = UNIFIED_CACHE,
-+        .level = 2,
-+        .size = 512 * KiB,
-+        .line_size = 64,
-+        .associativity = 8,
-+        .partitions = 1,
-+        .sets = 1024,
-+        .lines_per_tag = 1,
-+    },
-+    .l3_cache = &(CPUCacheInfo) {
-+        .type = UNIFIED_CACHE,
-+        .level = 3,
-+        .size = 16 * MiB,
-+        .line_size = 64,
-+        .associativity = 16,
-+        .partitions = 1,
-+        .sets = 16384,
-+        .lines_per_tag = 1,
-+        .self_init = true,
-+        .inclusive = true,
-+        .complex_indexing = false,
-+    },
-+};
++/* <linux/kvm.h> doesn't expose this, so re-use the max from kvm.c */
++#define KVM_MAX_CPUID_ENTRIES 100
 +
- static const CPUCaches epyc_milan_cache_info = {
-     .l1d_cache = &(CPUCacheInfo) {
-         .type = DATA_CACHE,
-@@ -1667,6 +1767,56 @@ static const CPUCaches epyc_milan_cache_info = {
-     },
- };
++typedef struct KvmCpuidInfo {
++    struct kvm_cpuid2 cpuid;
++    struct kvm_cpuid_entry2 entries[KVM_MAX_CPUID_ENTRIES];
++} KvmCpuidInfo;
++
++#define SNP_CPUID_FUNCTION_MAXCOUNT 64
++#define SNP_CPUID_FUNCTION_UNKNOWN 0xFFFFFFFF
++
++typedef struct {
++    uint32_t eax_in;
++    uint32_t ecx_in;
++    uint64_t xcr0_in;
++    uint64_t xss_in;
++    uint32_t eax;
++    uint32_t ebx;
++    uint32_t ecx;
++    uint32_t edx;
++    uint64_t reserved;
++} __attribute__((packed)) SnpCpuidFunc;
++
++typedef struct {
++    uint32_t count;
++    uint32_t reserved1;
++    uint64_t reserved2;
++    SnpCpuidFunc entries[SNP_CPUID_FUNCTION_MAXCOUNT];
++} __attribute__((packed)) SnpCpuidInfo;
++
+ static int
+ sev_ioctl(int fd, int cmd, void *data, int *error)
+ {
+@@ -1141,6 +1171,117 @@ detect_first_overlap(uint64_t start, uint64_t end, Range *range_list,
+     return overlap;
+ }
  
-+static const CPUCaches epyc_milan_v2_cache_info = {
-+    .l1d_cache = &(CPUCacheInfo) {
-+        .type = DATA_CACHE,
-+        .level = 1,
-+        .size = 32 * KiB,
-+        .line_size = 64,
-+        .associativity = 8,
-+        .partitions = 1,
-+        .sets = 64,
-+        .lines_per_tag = 1,
-+        .self_init = 1,
-+        .no_invd_sharing = true,
-+    },
-+    .l1i_cache = &(CPUCacheInfo) {
-+        .type = INSTRUCTION_CACHE,
-+        .level = 1,
-+        .size = 32 * KiB,
-+        .line_size = 64,
-+        .associativity = 8,
-+        .partitions = 1,
-+        .sets = 64,
-+        .lines_per_tag = 1,
-+        .self_init = 1,
-+        .no_invd_sharing = true,
-+    },
-+    .l2_cache = &(CPUCacheInfo) {
-+        .type = UNIFIED_CACHE,
-+        .level = 2,
-+        .size = 512 * KiB,
-+        .line_size = 64,
-+        .associativity = 8,
-+        .partitions = 1,
-+        .sets = 1024,
-+        .lines_per_tag = 1,
-+    },
-+    .l3_cache = &(CPUCacheInfo) {
-+        .type = UNIFIED_CACHE,
-+        .level = 3,
-+        .size = 32 * MiB,
-+        .line_size = 64,
-+        .associativity = 16,
-+        .partitions = 1,
-+        .sets = 32768,
-+        .lines_per_tag = 1,
-+        .self_init = true,
-+        .inclusive = true,
-+        .complex_indexing = false,
-+    },
-+};
++static int
++sev_snp_cpuid_info_fill(SnpCpuidInfo *snp_cpuid_info,
++                        const KvmCpuidInfo *kvm_cpuid_info)
++{
++    size_t i;
 +
- /* The following VMX features are not supported by KVM and are left out in the
-  * CPU definitions:
-  *
-@@ -3935,6 +4085,16 @@ static const X86CPUDefinition builtin_x86_defs[] = {
-                     { /* end of list */ }
-                 }
-             },
-+            {
-+                .version = 4,
-+                .note = "compatible with SEV-SNP CPUID enforcement",
-+                .props = (PropValue[]) {
-+                    { "model-id",
-+                      "AMD EPYC-v4 Processor" },
-+                    { /* end of list */ }
-+                },
-+                .cache_info = &epyc_v4_cache_info
-+            },
-             { /* end of list */ }
-         }
-     },
-@@ -4054,6 +4214,16 @@ static const X86CPUDefinition builtin_x86_defs[] = {
-                     { /* end of list */ }
-                 }
-             },
-+            {
-+                .version = 3,
-+                .note = "compatible with SEV-SNP CPUID enforcement",
-+                .props = (PropValue[]) {
-+                    { "model-id",
-+                      "AMD EPYC-Rome-v3 Processor" },
-+                    { /* end of list */ }
-+                },
-+                .cache_info = &epyc_rome_v3_cache_info
-+            },
-             { /* end of list */ }
-         }
-     },
-@@ -4111,6 +4281,20 @@ static const X86CPUDefinition builtin_x86_defs[] = {
-         .xlevel = 0x8000001E,
-         .model_id = "AMD EPYC-Milan Processor",
-         .cache_info = &epyc_milan_cache_info,
-+        .versions = (X86CPUVersionDefinition[]) {
-+            {   .version = 1 },
-+            {
-+                .version = 2,
-+                .note = "compatible with SEV-SNP CPUID enforcement",
-+                .props = (PropValue[]) {
-+                    { "model-id",
-+                      "AMD EPYC-Milan-v2 Processor" },
-+                    { /* end of list */ }
-+                },
-+                .cache_info = &epyc_milan_v2_cache_info
-+            },
-+            { /* end of list */ }
++    memset(snp_cpuid_info, 0, sizeof(*snp_cpuid_info));
++
++    for (i = 0; kvm_cpuid_info->entries[i].function != 0xFFFFFFFF; i++) {
++        const struct kvm_cpuid_entry2 *kvm_cpuid_entry;
++        SnpCpuidFunc *snp_cpuid_entry;
++
++        kvm_cpuid_entry = &kvm_cpuid_info->entries[i];
++        snp_cpuid_entry = &snp_cpuid_info->entries[i];
++
++        snp_cpuid_entry->eax_in = kvm_cpuid_entry->function;
++        if (kvm_cpuid_entry->flags == KVM_CPUID_FLAG_SIGNIFCANT_INDEX) {
++            snp_cpuid_entry->ecx_in = kvm_cpuid_entry->index;
 +        }
-     },
- };
++        snp_cpuid_entry->eax = kvm_cpuid_entry->eax;
++        snp_cpuid_entry->ebx = kvm_cpuid_entry->ebx;
++        snp_cpuid_entry->ecx = kvm_cpuid_entry->ecx;
++        snp_cpuid_entry->edx = kvm_cpuid_entry->edx;
++
++        if (snp_cpuid_entry->eax_in == 0xD &&
++            (snp_cpuid_entry->ecx_in == 0x0 || snp_cpuid_entry->ecx_in == 0x1)) {
++            snp_cpuid_entry->ebx = 0x240;
++        }
++    }
++
++    if (i > SNP_CPUID_FUNCTION_MAXCOUNT) {
++        error_report("SEV-SNP: CPUID count '%lu' exceeds max '%u'",
++                     i, SNP_CPUID_FUNCTION_MAXCOUNT);
++        return -1;
++    }
++
++    snp_cpuid_info->count = i;
++
++    return 0;
++}
++
++static void
++sev_snp_cpuid_report_mismatches(SnpCpuidInfo *old,
++                                SnpCpuidInfo *new)
++{
++    size_t i;
++
++    for (i = 0; i < old->count; i++) {
++        SnpCpuidFunc *old_func, *new_func;
++
++        old_func = &old->entries[i];
++        new_func = &new->entries[i];
++
++        if (memcmp(old_func, new_func, sizeof(SnpCpuidFunc))) {
++            error_report("SEV-SNP: CPUID validation failed for function %x, index: %x.\n"
++                         "provided: eax:0x%08x, ebx: 0x%08x, ecx: 0x%08x, edx: 0x%08x\n"
++                         "expected: eax:0x%08x, ebx: 0x%08x, ecx: 0x%08x, edx: 0x%08x",
++                         old_func->eax_in, old_func->ecx_in,
++                         old_func->eax, old_func->ebx, old_func->ecx, old_func->edx,
++                         new_func->eax, new_func->ebx, new_func->ecx, new_func->edx);
++        }
++    }
++}
++
++static int
++sev_snp_launch_update_cpuid(uint32_t cpuid_addr, uint32_t cpuid_len)
++{
++    KvmCpuidInfo kvm_cpuid_info;
++    SnpCpuidInfo snp_cpuid_info;
++    CPUState *cs = first_cpu;
++    MemoryRegion *mr = NULL;
++    void *snp_cpuid_hva;
++    int ret;
++
++    snp_cpuid_hva = gpa2hva(&mr, cpuid_addr, cpuid_len, NULL);
++    if (!snp_cpuid_hva) {
++        error_report("SEV-SNP: unable to access CPUID memory range at GPA %d",
++                     cpuid_addr);
++        return 1;
++    }
++
++    /* get the cpuid list from KVM */
++    memset(&kvm_cpuid_info.entries, 0xFF,
++           KVM_MAX_CPUID_ENTRIES * sizeof(struct kvm_cpuid_entry2));
++    kvm_cpuid_info.cpuid.nent = KVM_MAX_CPUID_ENTRIES;
++
++    ret = kvm_vcpu_ioctl(cs, KVM_GET_CPUID2, &kvm_cpuid_info);
++    if (ret) {
++        error_report("SEV-SNP: unable to query CPUID values for CPU: '%s'",
++                     strerror(-ret));
++    }
++
++    ret = sev_snp_cpuid_info_fill(&snp_cpuid_info, &kvm_cpuid_info);
++    if (ret) {
++        error_report("SEV-SNP: failed to generate CPUID table information");
++        exit(1);
++    }
++
++    memcpy(snp_cpuid_hva, &snp_cpuid_info, sizeof(snp_cpuid_info));
++
++    ret = sev_snp_launch_update_gpa(cpuid_addr, cpuid_len,
++                                    KVM_SEV_SNP_PAGE_TYPE_CPUID);
++    if (ret) {
++        sev_snp_cpuid_report_mismatches(&snp_cpuid_info, snp_cpuid_hva);
++        error_report("SEV-SNP: failed update CPUID page");
++        exit(1);
++    }
++
++    return 0;
++}
++
+ static void snp_ovmf_boot_block_setup(void)
+ {
+     SevSnpBootInfoBlock *info;
+@@ -1176,10 +1317,9 @@ static void snp_ovmf_boot_block_setup(void)
+     }
  
+     /* Populate the cpuid page */
+-    ret = sev_snp_launch_update_gpa(info->cpuid_addr, info->cpuid_len,
+-                                    KVM_SEV_SNP_PAGE_TYPE_CPUID);
++    ret = sev_snp_launch_update_cpuid(info->cpuid_addr, info->cpuid_len);
+     if (ret) {
+-        error_report("SEV-SNP: failed to insert cpuid page GPA 0x%x",
++        error_report("SEV-SNP: failed to populate cpuid tables GPA 0x%x",
+                      info->cpuid_addr);
+         exit(1);
+     }
 -- 
 2.25.1
 
