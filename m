@@ -2,122 +2,126 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 233D43F8966
-	for <lists+kvm@lfdr.de>; Thu, 26 Aug 2021 15:51:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1DE6D3F897D
+	for <lists+kvm@lfdr.de>; Thu, 26 Aug 2021 15:57:33 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242687AbhHZNwZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 26 Aug 2021 09:52:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51410 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231934AbhHZNwY (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 26 Aug 2021 09:52:24 -0400
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 818EAC061757
-        for <kvm@vger.kernel.org>; Thu, 26 Aug 2021 06:51:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
-        References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:
-        Content-Type:Content-ID:Content-Description;
-        bh=20dC0MIl5V0+AlR4PNwSgV2vrmvVudgZDf3FOUU0Hpg=; b=h1ajGa+0Mn0OIVtGqi+Q+uwZr4
-        CPwko4pn6j/rb5qnOoBH9tFnird4fIpEbW2rNkrN+VL805h1/jTnI6NQvRkcgw7gIAlvNKKifNnuB
-        L8238/3LRExm7bRbCHyzsgUTtzVLyQIL9/WKhgqcpSJvrzZXERbyoWD6GLl8VC9mgiKmB5PY20shM
-        KBSLAPARtPWz9lvTt9c4tNHDZ/kq+yreahnR/PDENy+V3Izs3ogc/c2EdZ994b6lc0Ays5IU4fC8x
-        6vqquyRO3rIjxrCLydu/xQ+eVF7Txsz1ZnH8ZJpx7Y+aMQFnqu0Syv8BDDOa7hXwiBN2QeRFQ9xaf
-        7EJiXgHg==;
-Received: from [2001:4bb8:193:fd10:d9d9:6c15:481b:99c4] (helo=localhost)
-        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1mJFlB-00DLpF-Ta; Thu, 26 Aug 2021 13:50:04 +0000
-From:   Christoph Hellwig <hch@lst.de>
-To:     Alex Williamson <alex.williamson@redhat.com>
-Cc:     Diana Craciun <diana.craciun@oss.nxp.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Kirti Wankhede <kwankhede@nvidia.com>,
-        Eric Auger <eric.auger@redhat.com>,
-        Jason Gunthorpe <jgg@ziepe.ca>, kvm@vger.kernel.org,
-        Jason Gunthorpe <jgg@nvidia.com>,
-        Kevin Tian <kevin.tian@intel.com>
-Subject: [PATCH 14/14] vfio/iommu_type1: remove IS_IOMMU_CAP_DOMAIN_IN_CONTAINER
-Date:   Thu, 26 Aug 2021 15:34:24 +0200
-Message-Id: <20210826133424.3362-15-hch@lst.de>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20210826133424.3362-1-hch@lst.de>
-References: <20210826133424.3362-1-hch@lst.de>
+        id S242750AbhHZN6S (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 26 Aug 2021 09:58:18 -0400
+Received: from smtp-out1.suse.de ([195.135.220.28]:38674 "EHLO
+        smtp-out1.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S242781AbhHZN6J (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 26 Aug 2021 09:58:09 -0400
+Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
+        by smtp-out1.suse.de (Postfix) with ESMTP id C645F22303;
+        Thu, 26 Aug 2021 13:57:17 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
+        t=1629986237; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=EnhMvs9n1nhsU1o7+xe9+Bo6hjRyCva0kdWrwKPRW08=;
+        b=GR//V0SiIEZKLC6w/96Ri/cMSee15eFRF7D1Vw13XhIHov2iDzsBhkCDnzKVLSJpFK3HsG
+        8kGlTGpPk7GQg4S3H0Q3HtwEcMPUwRcy6z3BgXTc4to++5I4qh2Z3tVt7aaH90iUtXrGB+
+        XxO2hZXNgRy0t1NpHNzYylTUjcl8whY=
+Received: from suse.cz (unknown [10.100.224.162])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by relay2.suse.de (Postfix) with ESMTPS id 7E2C5A3B99;
+        Thu, 26 Aug 2021 13:57:14 +0000 (UTC)
+Date:   Thu, 26 Aug 2021 15:57:13 +0200
+From:   Petr Mladek <pmladek@suse.com>
+To:     Yury Norov <yury.norov@gmail.com>
+Cc:     Andrew Morton <akpm@linux-foundation.org>,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        linux-arch@vger.kernel.org, linux-kselftest@vger.kernel.org,
+        linux-mmc@vger.kernel.org, linux-perf-users@vger.kernel.org,
+        kvm@vger.kernel.org,
+        "James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>,
+        Alexander Lobakin <alobakin@pm.me>,
+        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+        Alexey Klimov <aklimov@redhat.com>,
+        Andrea Merello <andrea.merello@gmail.com>,
+        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+        Arnaldo Carvalho de Melo <acme@redhat.com>,
+        Arnd Bergmann <arnd@arndb.de>, Ben Gardon <bgardon@google.com>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        Brian Cain <bcain@codeaurora.org>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Christoph Lameter <cl@linux.com>,
+        Daniel Bristot de Oliveira <bristot@redhat.com>,
+        David Hildenbrand <david@redhat.com>,
+        Dennis Zhou <dennis@kernel.org>,
+        Geert Uytterhoeven <geert@linux-m68k.org>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Ian Rogers <irogers@google.com>,
+        Ingo Molnar <mingo@redhat.com>,
+        Jaegeuk Kim <jaegeuk@kernel.org>,
+        Jakub Kicinski <kuba@kernel.org>, Jiri Olsa <jolsa@redhat.com>,
+        Joe Perches <joe@perches.com>, Jonas Bonn <jonas@southpole.se>,
+        Leo Yan <leo.yan@linaro.org>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Namhyung Kim <namhyung@kernel.org>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Peter Xu <peterx@redhat.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Rasmus Villemoes <linux@rasmusvillemoes.dk>,
+        Rich Felker <dalias@libc.org>,
+        Samuel Mendoza-Jonas <sam@mendozajonas.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Sergey Senozhatsky <senozhatsky@chromium.org>,
+        Shuah Khan <shuah@kernel.org>,
+        Stefan Kristiansson <stefan.kristiansson@saunalahti.fi>,
+        Steven Rostedt <rostedt@goodmis.org>,
+        Tejun Heo <tj@kernel.org>,
+        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+        Ulf Hansson <ulf.hansson@linaro.org>,
+        Will Deacon <will@kernel.org>,
+        Wolfram Sang <wsa+renesas@sang-engineering.com>,
+        Yoshinori Sato <ysato@users.sourceforge.jp>
+Subject: Re: [PATCH 11/17] find: micro-optimize for_each_{set,clear}_bit()
+Message-ID: <YSeduU41Ef568xhS@alley>
+References: <20210814211713.180533-1-yury.norov@gmail.com>
+ <20210814211713.180533-12-yury.norov@gmail.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210814211713.180533-12-yury.norov@gmail.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-IS_IOMMU_CAP_DOMAIN_IN_CONTAINER just obsfucated the checks being
-performed, so open code it in the callers.
+On Sat 2021-08-14 14:17:07, Yury Norov wrote:
+> The macros iterate thru all set/clear bits in a bitmap. They search a
+> first bit using find_first_bit(), and the rest bits using find_next_bit().
+> 
+> Since find_next_bit() is called shortly after find_first_bit(), we can
+> save few lines of I-cache by not using find_first_bit().
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: Jason Gunthorpe <jgg@nvidia.com>
-Reviewed-by: Kevin Tian <kevin.tian@intel.com>
----
- drivers/vfio/vfio_iommu_type1.c | 13 +++++--------
- 1 file changed, 5 insertions(+), 8 deletions(-)
+Is this only a speculation or does it fix a real performance problem?
 
-diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
-index 1ef98d4e2abecf..94441e6c0983be 100644
---- a/drivers/vfio/vfio_iommu_type1.c
-+++ b/drivers/vfio/vfio_iommu_type1.c
-@@ -139,9 +139,6 @@ struct vfio_regions {
- 	size_t len;
- };
- 
--#define IS_IOMMU_CAP_DOMAIN_IN_CONTAINER(iommu)	\
--					(!list_empty(&iommu->domain_list))
--
- #define DIRTY_BITMAP_BYTES(n)	(ALIGN(n, BITS_PER_TYPE(u64)) / BITS_PER_BYTE)
- 
- /*
-@@ -879,7 +876,7 @@ static int vfio_iommu_type1_pin_pages(void *iommu_data,
- 	 * already pinned and accounted. Accounting should be done if there is no
- 	 * iommu capable domain in the container.
- 	 */
--	do_accounting = !IS_IOMMU_CAP_DOMAIN_IN_CONTAINER(iommu);
-+	do_accounting = list_empty(&iommu->domain_list);
- 
- 	for (i = 0; i < npage; i++) {
- 		struct vfio_pfn *vpfn;
-@@ -968,7 +965,7 @@ static int vfio_iommu_type1_unpin_pages(void *iommu_data,
- 
- 	mutex_lock(&iommu->lock);
- 
--	do_accounting = !IS_IOMMU_CAP_DOMAIN_IN_CONTAINER(iommu);
-+	do_accounting = list_empty(&iommu->domain_list);
- 	for (i = 0; i < npage; i++) {
- 		struct vfio_dma *dma;
- 		dma_addr_t iova;
-@@ -1089,7 +1086,7 @@ static long vfio_unmap_unpin(struct vfio_iommu *iommu, struct vfio_dma *dma,
- 	if (!dma->size)
- 		return 0;
- 
--	if (!IS_IOMMU_CAP_DOMAIN_IN_CONTAINER(iommu))
-+	if (list_empty(&iommu->domain_list))
- 		return 0;
- 
- 	/*
-@@ -1666,7 +1663,7 @@ static int vfio_dma_do_map(struct vfio_iommu *iommu,
- 	vfio_link_dma(iommu, dma);
- 
- 	/* Don't pin and map if container doesn't contain IOMMU capable domain*/
--	if (!IS_IOMMU_CAP_DOMAIN_IN_CONTAINER(iommu))
-+	if (list_empty(&iommu->domain_list))
- 		dma->size = size;
- 	else
- 		ret = vfio_pin_map_dma(iommu, dma, size);
-@@ -2472,7 +2469,7 @@ static void vfio_iommu_type1_detach_group(void *iommu_data,
- 		kfree(group);
- 
- 		if (list_empty(&iommu->emulated_iommu_groups) &&
--		    !IS_IOMMU_CAP_DOMAIN_IN_CONTAINER(iommu)) {
-+		    list_empty(&iommu->domain_list)) {
- 			WARN_ON(iommu->notifier.head);
- 			vfio_iommu_unmap_unpin_all(iommu);
- 		}
--- 
-2.30.2
+The macro is used like:
 
+	for_each_set_bit(bit, addr, size) {
+		fn(bit);
+	}
+
+IMHO, the micro-opimization does not help when fn() is non-trivial.
+
+
+> --- a/include/linux/find.h
+> +++ b/include/linux/find.h
+> @@ -280,7 +280,7 @@ unsigned long find_next_bit_le(const void *addr, unsigned
+>  #endif
+>  
+>  #define for_each_set_bit(bit, addr, size) \
+> -	for ((bit) = find_first_bit((addr), (size));		\
+> +	for ((bit) = find_next_bit((addr), (size), 0);		\
+>  	     (bit) < (size);					\
+>  	     (bit) = find_next_bit((addr), (size), (bit) + 1))
+>  
+
+It is not a big deal. I just think that the original code is slightly
+more self-explaining.
+
+Best Regards,
+Petr
