@@ -2,287 +2,153 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D4C3D3F8E07
-	for <lists+kvm@lfdr.de>; Thu, 26 Aug 2021 20:42:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E171B3F8E22
+	for <lists+kvm@lfdr.de>; Thu, 26 Aug 2021 20:49:35 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243362AbhHZSnG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 26 Aug 2021 14:43:06 -0400
-Received: from mail.efficios.com ([167.114.26.124]:39244 "EHLO
-        mail.efficios.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S243354AbhHZSnF (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 26 Aug 2021 14:43:05 -0400
-Received: from localhost (localhost [127.0.0.1])
-        by mail.efficios.com (Postfix) with ESMTP id 074BB37A06D;
-        Thu, 26 Aug 2021 14:42:17 -0400 (EDT)
-Received: from mail.efficios.com ([127.0.0.1])
-        by localhost (mail03.efficios.com [127.0.0.1]) (amavisd-new, port 10032)
-        with ESMTP id hyX1F_x0infM; Thu, 26 Aug 2021 14:42:12 -0400 (EDT)
-Received: from localhost (localhost [127.0.0.1])
-        by mail.efficios.com (Postfix) with ESMTP id 6C19237A436;
-        Thu, 26 Aug 2021 14:42:12 -0400 (EDT)
-DKIM-Filter: OpenDKIM Filter v2.10.3 mail.efficios.com 6C19237A436
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=efficios.com;
-        s=default; t=1630003332;
-        bh=MHHcFtZedk5dfBxVUbSOnkW6LP6W2tP2mrVDcSXqhw8=;
-        h=Date:From:To:Message-ID:MIME-Version;
-        b=k1F7XJGKCycLJ8+hy0uElUJQUfXIoFIlQhvVyEMy0Z6EgL3dHeMXWBPIY3wy0QmQF
-         1pd+brzQueTHV8L6NrVCIChphOnuSThyO35g/pTOpMRyeOgWiVev/+/2hACIUBh45T
-         v9rZBZw+QeLwCR+0SLJvKhSCnAupnSaA+37NUYHJF3xahjuqyuVIGoshV5Vj/TyeMK
-         7RF+8KVS1osPynBZdXF5qnP4TGEtI+DqI8Xyz5WouRSxvk8E/WhbtfxSrVI5GDb7AL
-         qq0IoZGDzzFGeJDZTDgfoeiSbA/KdKomuNYUeohR40Fux8jYBNItpxiSW7dR1FfV3l
-         +TrK9KA3zsW1g==
-X-Virus-Scanned: amavisd-new at efficios.com
-Received: from mail.efficios.com ([127.0.0.1])
-        by localhost (mail03.efficios.com [127.0.0.1]) (amavisd-new, port 10026)
-        with ESMTP id lVLwZn_2C8lo; Thu, 26 Aug 2021 14:42:12 -0400 (EDT)
-Received: from mail03.efficios.com (mail03.efficios.com [167.114.26.124])
-        by mail.efficios.com (Postfix) with ESMTP id 39CBB37A1FC;
-        Thu, 26 Aug 2021 14:42:12 -0400 (EDT)
-Date:   Thu, 26 Aug 2021 14:42:12 -0400 (EDT)
-From:   Mathieu Desnoyers <mathieu.desnoyers@efficios.com>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     dvhart <dvhart@infradead.org>,
-        "Russell King, ARM Linux" <linux@armlinux.org.uk>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Will Deacon <will@kernel.org>, Guo Ren <guoren@kernel.org>,
-        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Heiko Carstens <hca@linux.ibm.com>, gor <gor@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        rostedt <rostedt@goodmis.org>, Ingo Molnar <mingo@redhat.com>,
-        Oleg Nesterov <oleg@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Andy Lutomirski <luto@kernel.org>,
-        paulmck <paulmck@kernel.org>, Boqun Feng <boqun.feng@gmail.com>,
-        Paolo Bonzini <pbonzini@redhat.com>, shuah <shuah@kernel.org>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        Paul Mackerras <paulus@samba.org>,
-        linux-arm-kernel <linux-arm-kernel@lists.infradead.org>,
-        linux-kernel <linux-kernel@vger.kernel.org>,
-        linux-csky <linux-csky@vger.kernel.org>,
-        linux-mips <linux-mips@vger.kernel.org>,
-        linuxppc-dev <linuxppc-dev@lists.ozlabs.org>,
-        linux-s390 <linux-s390@vger.kernel.org>,
-        KVM list <kvm@vger.kernel.org>,
-        linux-kselftest <linux-kselftest@vger.kernel.org>,
-        Peter Foley <pefoley@google.com>,
-        Shakeel Butt <shakeelb@google.com>,
-        Ben Gardon <bgardon@google.com>
-Message-ID: <1700758714.29394.1630003332081.JavaMail.zimbra@efficios.com>
-In-Reply-To: <YSblqrrpKcORzilX@google.com>
-References: <20210820225002.310652-1-seanjc@google.com> <20210820225002.310652-5-seanjc@google.com> <766990430.21713.1629731934069.JavaMail.zimbra@efficios.com> <282257549.21721.1629732017655.JavaMail.zimbra@efficios.com> <YSblqrrpKcORzilX@google.com>
-Subject: Re: [PATCH v2 4/5] KVM: selftests: Add a test for KVM_RUN+rseq to
- detect task migration bugs
+        id S243349AbhHZSuU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 26 Aug 2021 14:50:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35676 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231453AbhHZSuT (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 26 Aug 2021 14:50:19 -0400
+Received: from mail-io1-xd2c.google.com (mail-io1-xd2c.google.com [IPv6:2607:f8b0:4864:20::d2c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6D6C0C061757
+        for <kvm@vger.kernel.org>; Thu, 26 Aug 2021 11:49:32 -0700 (PDT)
+Received: by mail-io1-xd2c.google.com with SMTP id z1so4999812ioh.7
+        for <kvm@vger.kernel.org>; Thu, 26 Aug 2021 11:49:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=RVUTQwfXwIWJ8KSHNLLKmgxbQdeuJteYiwLVXKrHs2E=;
+        b=RlH7+pWHb6AHxbU3UBBJJ37bcoBxFJ+OtQc00AVbSygJknZ/usx11UO93s13G1kXX9
+         CcZJrRyf0UdTbKCwUaojenkX5SVnXL9NHwvsqqAY/zQ//p0C+YM4cQD7FneQjJ3tB8Aa
+         cMrJUpb9BQzx2jUWBC1kV31Q8634J4jt38JtglF1vnnYuD+EgmbxuiAdKNe0yIPy5viO
+         tbjYlVlNGUw9dtSd01/0cTaV2aGVOlCz1pzGl7CAV/zNmDWjdq1bz6VMh9cU5i4GYnxj
+         4F3MA1cOOAlb0UtfQ1G0jAbM/WTqp+4jaVkgoa7ZNZ7B4nBPcn1mEfwDWFAId+KT8PYw
+         UaHw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=RVUTQwfXwIWJ8KSHNLLKmgxbQdeuJteYiwLVXKrHs2E=;
+        b=HcZgTJtKVw4c5huz58v6OMo7ckyBeuP2qdK3+9MfwcKiaFikm9m69f1JiJ06qav9sq
+         53kSc/Bz0iXJNj4+GbG4iPv/GkGNIWWw8SnZwCD1Qs/eWD7Sln3/kRZl3BTf7pSI/L74
+         UM2Gp9RcYt1VHhTND3fMVVFcnpE9rLGCAtiYcj3JGJtJF39lI+rdzxXGpHUryfILrpie
+         ImnCN0mfbpp1Es3D/ahPWlV6CkwY40I01TlMtbNCFsqZGU89U+NQB4DdnAE/MwKiN//v
+         uYLaocICPjzEX64UqGRazeccFwolUfSYGv+s0BPVVC1p5gN+nbGxgaaCfOXdhJCJt7FL
+         tp/g==
+X-Gm-Message-State: AOAM531EEkDBd6Iw7dkHwWbMRaKFjBQY4h9N8twGRd3gLjIbLvbo/bt4
+        1eON7v6R/3nmTRm2robsPLarZA==
+X-Google-Smtp-Source: ABdhPJx5cxoJqj5jt4PGdlUhbRpwDMVgyY3ef2R2HYspFPIJb/ORtT336DtZE2lfPru1xakwQbOqEA==
+X-Received: by 2002:a6b:3c16:: with SMTP id k22mr4252523iob.130.1630003771571;
+        Thu, 26 Aug 2021 11:49:31 -0700 (PDT)
+Received: from google.com (194.225.68.34.bc.googleusercontent.com. [34.68.225.194])
+        by smtp.gmail.com with ESMTPSA id a11sm2067749ilf.79.2021.08.26.11.49.30
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 26 Aug 2021 11:49:30 -0700 (PDT)
+Date:   Thu, 26 Aug 2021 18:49:27 +0000
+From:   Oliver Upton <oupton@google.com>
+To:     Marc Zyngier <maz@kernel.org>
+Cc:     Andrew Jones <drjones@redhat.com>, kvmarm@lists.cs.columbia.edu,
+        pshier@google.com, ricarkol@google.com, rananta@google.com,
+        reijiw@google.com, jingzhangos@google.com, kvm@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, james.morse@arm.com,
+        Alexandru.Elisei@arm.com, suzuki.poulose@arm.com,
+        Peter Maydell <peter.maydell@linaro.org>
+Subject: Re: KVM/arm64: Guest ABI changes do not appear rollback-safe
+Message-ID: <YSfiN3Xq1vUzHeap@google.com>
+References: <YSVhV+UIMY12u2PW@google.com>
+ <87mtp5q3gx.wl-maz@kernel.org>
+ <CAOQ_QshSaEm_cMYQfRTaXJwnVqeoN29rMLBej-snWd6_0HsgGw@mail.gmail.com>
+ <87fsuxq049.wl-maz@kernel.org>
+ <20210825150713.5rpwzm4grfn7akcw@gator.home>
+ <CAOQ_QsgWiw9-BuGTUFpHqBw3simUaM4Tweb9y5_oz1UHdr4ELg@mail.gmail.com>
+ <877dg8ppnt.wl-maz@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [167.114.26.124]
-X-Mailer: Zimbra 8.8.15_GA_4101 (ZimbraWebClient - FF91 (Linux)/8.8.15_GA_4059)
-Thread-Topic: selftests: Add a test for KVM_RUN+rseq to detect task migration bugs
-Thread-Index: JTQ3Sjskf2jZ9hZQxbhtvyInF90Pow==
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <877dg8ppnt.wl-maz@kernel.org>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
------ On Aug 25, 2021, at 8:51 PM, Sean Christopherson seanjc@google.com wrote:
-
-> On Mon, Aug 23, 2021, Mathieu Desnoyers wrote:
->> [ re-send to Darren Hart ]
->> 
->> ----- On Aug 23, 2021, at 11:18 AM, Mathieu Desnoyers
->> mathieu.desnoyers@efficios.com wrote:
->> 
->> > ----- On Aug 20, 2021, at 6:50 PM, Sean Christopherson seanjc@google.com wrote:
->> > 
->> >> Add a test to verify an rseq's CPU ID is updated correctly if the task is
->> >> migrated while the kernel is handling KVM_RUN.  This is a regression test
->> >> for a bug introduced by commit 72c3c0fe54a3 ("x86/kvm: Use generic xfer
->> >> to guest work function"), where TIF_NOTIFY_RESUME would be cleared by KVM
->> >> without updating rseq, leading to a stale CPU ID and other badness.
->> >> 
->> > 
->> > [...]
->> > 
->> > +#define RSEQ_SIG 0xdeadbeef
->> > 
->> > Is there any reason for defining a custom signature rather than including
->> > tools/testing/selftests/rseq/rseq.h ? This should take care of including
->> > the proper architecture header which will define the appropriate signature.
->> > 
->> > Arguably you don't define rseq critical sections in this test per se, but
->> > I'm wondering why the custom signature here.
+On Thu, Aug 26, 2021 at 09:37:42AM +0100, Marc Zyngier wrote:
+> On Wed, 25 Aug 2021 19:14:59 +0100,
+> Oliver Upton <oupton@google.com> wrote:
+> > 
+> > On Wed, Aug 25, 2021 at 8:07 AM Andrew Jones <drjones@redhat.com> wrote:
 > 
-> Partly to avoid taking a dependency on rseq.h, and partly to try to call out
-> that
-> the test doesn't actually do any rseq critical sections.
-
-It might be good to add a comment near this define stating this then, so nobody
-attempts to copy this as an example.
-
+> [...]
 > 
->> > [...]
->> > 
->> >> +
->> >> +static void *migration_worker(void *ign)
->> >> +{
->> >> +	cpu_set_t allowed_mask;
->> >> +	int r, i, nr_cpus, cpu;
->> >> +
->> >> +	CPU_ZERO(&allowed_mask);
->> >> +
->> >> +	nr_cpus = CPU_COUNT(&possible_mask);
->> >> +
->> >> +	for (i = 0; i < 20000; i++) {
->> >> +		cpu = i % nr_cpus;
->> >> +		if (!CPU_ISSET(cpu, &possible_mask))
->> >> +			continue;
->> >> +
->> >> +		CPU_SET(cpu, &allowed_mask);
->> >> +
->> >> +		/*
->> >> +		 * Bump the sequence count twice to allow the reader to detect
->> >> +		 * that a migration may have occurred in between rseq and sched
->> >> +		 * CPU ID reads.  An odd sequence count indicates a migration
->> >> +		 * is in-progress, while a completely different count indicates
->> >> +		 * a migration occurred since the count was last read.
->> >> +		 */
->> >> +		atomic_inc(&seq_cnt);
->> > 
->> > So technically this atomic_inc contains the required barriers because the
->> > selftests implementation uses "__sync_add_and_fetch(&addr->val, 1)". But
->> > it's rather odd that the semantic differs from the kernel implementation in
->> > terms of memory barriers: the kernel implementation of atomic_inc
->> > guarantees no memory barriers, but this one happens to provide full
->> > barriers pretty much by accident (selftests futex/include/atomic.h
->> > documents no such guarantee).
+> > > Thanks for including me Marc. I think you've mentioned all the examples
+> > > of why we don't generally expect N+1 -> N migrations to work that I
+> > > can think of. While some of the examples like get-reg-list could
+> > > eventually be eliminated if we had CPU models to tighten our machine type
+> > > state, I think N+1 -> N migrations will always be best effort at most.
+> > >
+> > > I agree with giving userspace control over the exposer of the hypercalls
+> > > though. Using pseudo-registers for that purpose rather than a pile of
+> > > CAPs also seems reasonable to me.
+> > >
+> > > And, while I don't think this patch is going to proceed, I thought I'd
+> > > point out that the opt-out approach doesn't help much with expanding
+> > > our migration support unless we require the VMM to be upgraded first.
+> > >
+> > > And, even then, the (N_kern, N+1_vmm) -> (N+1_kern, N_vmm) case won't
+> > > work as expected, since the source enforce opt-out, but the destination
+> > > won't.
+> > 
+> > Right, there's going to need to be a fence in both kernel and VMM
+> > versions. Before the fence, you can't rollback with either component.
+> > Once on the other side of the fence, the user may freely migrate
+> > between kernel + VMM combinations.
+> >
+> > > Also, since the VMM doesn't key off the kernel version, for the
+> > > most part N+1 VMMs won't know when they're supposed to opt-out or not,
+> > > leaving it to the user to ensure they consider everything. opt-in
+> > > usually only needs the user to consider what machine type they want to
+> > > launch.
+> > 
+> > Going the register route will implicitly require opt-out for all old
+> > hypercalls. We exposed them unconditionally to the guest before, and
+> > we must uphold that behavior. The default value for the bitmap will
+> > have those features set. Any hypercalls added after that register
+> > interface will then require explicit opt-in from userspace.
 > 
-> Yeah, I got quite lost trying to figure out what atomics the test would actually
-> end up with.
-
-At the very least, until things are clarified in the selftests atomic header, I would
-recommend adding a comment stating which memory barriers are required alongside each
-use of atomic_inc here. I would even prefer that we add extra (currently unneeded)
-write barriers to make extra sure that this stays documented. Performance of the write-side
-does not matter much here.
-
+> I disagree here. This makes the ABI inconsistent, and means that no
+> feature can be implemented without changing userspace. If you can deal
+> with the existing features, you should be able to deal with the next
+> lot.
+>
+> > With regards to the pseudoregister interface, how would a VMM discover
+> > new bits? From my perspective, you need to have two bitmaps that the
+> > VMM can get at: the set of supported feature bits and the active
+> > bitmap of features for a running guest.
 > 
->> > If this full barrier guarantee is indeed provided by the selftests atomic.h
->> > header, I would really like a comment stating that in the atomic.h header
->> > so the carpet is not pulled from under our feet by a future optimization.
->> > 
->> > 
->> >> +		r = sched_setaffinity(0, sizeof(allowed_mask), &allowed_mask);
->> >> +		TEST_ASSERT(!r, "sched_setaffinity failed, errno = %d (%s)",
->> >> +			    errno, strerror(errno));
->> >> +		atomic_inc(&seq_cnt);
->> >> +
->> >> +		CPU_CLR(cpu, &allowed_mask);
->> >> +
->> >> +		/*
->> >> +		 * Let the read-side get back into KVM_RUN to improve the odds
->> >> +		 * of task migration coinciding with KVM's run loop.
->> > 
->> > This comment should be about increasing the odds of letting the seqlock
->> > read-side complete. Otherwise, the delay between the two back-to-back
->> > atomic_inc is so small that the seqlock read-side may never have time to
->> > complete the reading the rseq cpu id and the sched_getcpu() call, and can
->> > retry forever.
-> 
-> Hmm, but that's not why there's a delay.  I'm not arguing that a livelock isn't
-> possible (though that syscall would have to be screaming fast),
+> My proposal is that we have a single pseudo-register exposing the list
+> of implemented by the kernel. Clear the bits you don't want, and write
+> back the result. As long as you haven't written anything, you have the
+> full feature set. That's pretty similar to the virtio feature
+> negotiation.
 
-I don't think we have the same understanding of the livelock scenario. AFAIU the livelock
-would be caused by a too-small delay between the two consecutive atomic_inc() from one
-loop iteration to the next compared to the time it takes to perform a read-side critical
-section of the seqlock. Back-to-back atomic_inc can be performed very quickly, so I
-doubt that the sched_getcpu implementation have good odds to be fast enough to complete
-in that narrow window, leading to lots of read seqlock retry.
+Ah, yes I agree. Thinking about it more we will not need something
+similar to KVM_GET_SUPPORTED_CPUID.
 
-> but the primary
-> motivation is very much to allow the read-side enough time to get back into KVM
-> proper.
+So then, for any register where userspace/KVM need to negotiate
+features, the default value will return the maximum feature set that is
+supported. If userspace wants to constrain features, read out the
+register, make sure everything you want is there, and write it back
+blowing away the superfluous bits. Given this should we enforce ordering
+on feature registers, such that a VMM can only write to the registers
+before a VM is started?
 
-I'm puzzled by your statement. AFAIU, let's say we don't have the delay, then we
-have:
+Also, Reiji is working on making the identity registers writable for the
+sake of feature restriction. The suggested negotiation interface would
+be applicable there too, IMO.
 
-migration thread                             KVM_RUN/read-side thread
------------------------------------------------------------------------------------
-                                             - ioctl(KVM_RUN)
-- atomic_inc_seq_cst(&seqcnt)
-- sched_setaffinity
-- atomic_inc_seq_cst(&seqcnt)
-                                             - a = atomic_load(&seqcnt) & ~1
-                                             - smp_rmb()
-                                             - b = LOAD_ONCE(__rseq_abi->cpu_id);
-                                             - sched_getcpu()
-                                             - smp_rmb()
-                                             - re-load seqcnt/compare (succeeds)
-                                               - Can only succeed if entire read-side happens while the seqcnt
-                                                 is in an even numbered state.
-                                             - if (a != b) abort()
-  /* no delay. Even counter state is very
-     short. */
-- atomic_inc_seq_cst(&seqcnt)
-  /* Let's suppose the lack of delay causes the
-     setaffinity to complete too early compared
-     with KVM_RUN ioctl */
-- sched_setaffinity
-- atomic_inc_seq_cst(&seqcnt)
+Many thanks to both you and Drew for working this out with me.
 
-  /* no delay. Even counter state is very
-     short. */
-- atomic_inc_seq_cst(&seqcnt)
-  /* Then a setaffinity from a following
-     migration thread loop will run
-     concurrently with KVM_RUN */
-                                             - ioctl(KVM_RUN)
-- sched_setaffinity
-- atomic_inc_seq_cst(&seqcnt)
-
-As pointed out here, if the first setaffinity runs too early compared with KVM_RUN,
-a following setaffinity will run concurrently with it. However, the fact that 
-the even counter state is very short may very well hurt progress of the read seqlock.
-
-> 
-> To encounter the bug, TIF_NOTIFY_RESUME has to be recognized by KVM in its run
-> loop, i.e. sched_setaffinity() must induce task migration after the read-side
-> has
-> invoked ioctl(KVM_RUN).
-
-No argument here.
-
-> 
->> > I'm wondering if 1 microsecond is sufficient on other architectures as
->> > well.
-> 
-> I'm definitely wondering that as well :-)
-> 
->> > One alternative way to make this depend less on the architecture's
->> > implementation of sched_getcpu (whether it's a vDSO, or goes through a
->> > syscall) would be to read the rseq cpu id and call sched_getcpu a few times
->> > (e.g. 3 times) in the migration thread rather than use usleep, and throw
->> > away the value read. This would ensure the delay is appropriate on all
->> > architectures.
-> 
-> As above, I think an arbitrary delay is required regardless of how fast
-> sched_getcpu() can execute.  One thought would be to do sched_getcpu() _and_
-> usleep() to account for sched_getcpu() overhead and to satisfy the KVM_RUN part,
-> but I don't know that that adds meaningful value.
-> 
-> The real test is if someone could see if the bug repros on non-x86 hardware...
-
-As I explain in the scenario above, I don't think we agree on the reason why the
-delay is required. One way to confirm this would be to run the code without delay,
-and count how many seqcnt read-side succeed vs fail. We can then compare that with
-a run with a 1us delay between the migration thread loops. This data should help us
-come to a common understanding of the delay's role.
-
-Thanks,
-
-Mathieu
-
--- 
-Mathieu Desnoyers
-EfficiOS Inc.
-http://www.efficios.com
+--
+Best,
+Oliver
