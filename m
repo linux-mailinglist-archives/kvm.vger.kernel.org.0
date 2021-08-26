@@ -2,41 +2,41 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3132C3F90BB
+	by mail.lfdr.de (Postfix) with ESMTP id 7A0F53F90BC
 	for <lists+kvm@lfdr.de>; Fri, 27 Aug 2021 01:00:59 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243809AbhHZW2P (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 26 Aug 2021 18:28:15 -0400
-Received: from mail-bn8nam12hn2202.outbound.protection.outlook.com ([52.100.165.202]:17408
+        id S243816AbhHZW2R (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 26 Aug 2021 18:28:17 -0400
+Received: from mail-bn8nam12hn2223.outbound.protection.outlook.com ([52.100.165.223]:18432
         "EHLO NAM12-BN8-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S243799AbhHZW2O (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 26 Aug 2021 18:28:14 -0400
+        id S243805AbhHZW2Q (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 26 Aug 2021 18:28:16 -0400
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=beoRXoISE9z2LBU1N9jQ3FAjglJheapKaW8/gNrCCGBoAyCjwFxeKvdrezfPF71e17REJFxRGJ2/rdnPpDy0HfCkMMXVl3l4wmEvC1PBd5drWLtWCVMUVe8g2Wu0FC46ypKgZvBv7lFkIRhkuZ5Zd2jCS6GPPhnNPnozswqMKdyNUvkDK6BKG71BRkz21eb2xI7Hb4CCt1x7X6aeSMKXRFJ50qojPQhzp94TViZoVZbudI/c0rW7XKdzSRsnrZV5+bBi27LmoPtFSMiNJXcVavW6QVQvlebkrrIKTmM9Dtm8O28UQNldDIBXVO5x0DK0alnqX6sM0jNbSkLeegXKrw==
+ b=XWpdgEJq4IEFq628TsilOUsEnwkFZbpIrVCM6Le9+LkdrwB0Ra82yE4hz+heyC9auejsRN/z7hQnA/a8+rGX0Svo2irYpVw4WkaenjAsnBLDeo7LxnKMrZgugtcI97z7481lpaXTtfzBaMj8k8+3LCeEier3mF5HLcsx1IdOk3QkwxNJa9+jledbHWthGii9ehwsUhlWsCNHZSM380Yl3N4RmVmP/QcTKD33ZbrtXTDprQ7MPSKdEQWU0JhNyW9WmsbLEuMTlYiGPqlqC5JgfNFs/WzsD/YuCCHKIXnM2h2Qpm5AeSpYG7VPVXDHOYIHt8NS6+YKRVPZYo8DaYACKQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=8Y0U6T3TrceInT8zsv9jg8p9uixc2V5XYlE9SNVdYnU=;
- b=lf13FypuL4aUerOCXCqo3dTUFWUg3fLXh7CautEz6zWKbQSvkFrL6q0J4OQqBiZiLHblLoTk8YTlu/KTLrv6pGiS7dgwA4NE0XMorfFNd7WHAjjbS95tjdP6OgTTKmeeWgJ6Peyf1Gb5aCLA4HSWSD29QcnaCvfCpkM/GbLpdsBUbGR38AoBkJIKbtUX+r+FBsWbOhcAMBNcbbgDNR881K3kMbMT4YHU7nHNPQeS7QNrqFSiRP4DlLtWdKiDJBMbuO+uCl9rYdnk0jCla3UrGsJ0lrzcEKKrAMqxHBicptbXOV6IUNStT8knwTGHOFdxC1dvnofEtJD7MlL+u0r5Sw==
+ bh=yd6nAHvM5keukv7hka7KvDWF8u8LRdbOZvMs6rJwNpk=;
+ b=JTMGNAlodiq8UzjAF7zo/e/i0n4fkxX9TnN4ifmzGeqrdgj8eHyAj1S0C7oYSZNYFjRiQwr/f2Burbz/fQLhApzHiHFrz8/RS9cFEq3m2SIu4AdJ0asYpx+dnClaTslJZUMdtkIqXGfxvFDZCo9536ifaxUY0Y3dHWOVeT31TlS7jmQMx4mVQcv5OFUPwrBWQJ/PDbVA/aedBrZj4N7VVYNr0er1QSjUPq7S/gRgRO6ClgzptO2NXm8ZtUfk+yrPfW2yEPzlN58hBgMQPPkyi3VCUdN+h5GvmNwGvIl1bgyQqnHA+goZooK5wj99iQwvyTeGtXtz/oFhrdZjJgHF+A==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
  header.d=amd.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=8Y0U6T3TrceInT8zsv9jg8p9uixc2V5XYlE9SNVdYnU=;
- b=rwWHUHt4zpNNlcXpqb2JYZtV1GDBaxTIUoW2esSAJv70QIAWxKF5umaPQWCdeDd8hEWILAzYRssjv5MdA2C4h1BsOFTfVqD06Tvbe8WQFGXkn4yt3pgN1qswX/dlaFMbFnhrbq2Rn405T+FyWsZoGu3WcPrOObuw9sxM/6seqZU=
+ bh=yd6nAHvM5keukv7hka7KvDWF8u8LRdbOZvMs6rJwNpk=;
+ b=sekz1ODay5VnFYEZsRrhATDSZPKOkMQReerRvRhRXKAdCK6ag5bQmWR8yTNq4la6FeRLo0TmDNXB6nDlSwMDymg+LgNMSW8O6n8USVW5jflnjOV32STcVqQGLkxVtGdq2chovRQ95v7zgiYb2QvHLnffAP5Dk/Do8olcx4jfGSg=
 Authentication-Results: nongnu.org; dkim=none (message not signed)
  header.d=none;nongnu.org; dmarc=none action=none header.from=amd.com;
 Received: from CH2PR12MB4133.namprd12.prod.outlook.com (2603:10b6:610:7a::13)
  by CH2PR12MB3925.namprd12.prod.outlook.com (2603:10b6:610:21::22) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4436.22; Thu, 26 Aug
- 2021 22:27:25 +0000
+ 2021 22:27:27 +0000
 Received: from CH2PR12MB4133.namprd12.prod.outlook.com
  ([fe80::d19e:b657:5259:24d0]) by CH2PR12MB4133.namprd12.prod.outlook.com
  ([fe80::d19e:b657:5259:24d0%8]) with mapi id 15.20.4436.019; Thu, 26 Aug 2021
- 22:27:25 +0000
+ 22:27:27 +0000
 From:   Michael Roth <michael.roth@amd.com>
 To:     qemu-devel@nongnu.org
 Cc:     Connor Kuehl <ckuehl@redhat.com>,
@@ -53,82 +53,82 @@ Cc:     Connor Kuehl <ckuehl@redhat.com>,
         Brijesh Singh <brijesh.singh@amd.com>,
         Markus Armbruster <armbru@redhat.com>,
         Eric Blake <eblake@redhat.com>
-Subject: [RFC PATCH v2 06/12] i386/sev: add support to encrypt BIOS when SEV-SNP is enabled
-Date:   Thu, 26 Aug 2021 17:26:21 -0500
-Message-Id: <20210826222627.3556-7-michael.roth@amd.com>
+Subject: [RFC PATCH v2 07/12] i386/sev: populate secrets and cpuid page and finalize the SNP launch
+Date:   Thu, 26 Aug 2021 17:26:22 -0500
+Message-Id: <20210826222627.3556-8-michael.roth@amd.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20210826222627.3556-1-michael.roth@amd.com>
 References: <20210826222627.3556-1-michael.roth@amd.com>
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-ClientProxiedBy: SA9P221CA0024.NAMP221.PROD.OUTLOOK.COM
- (2603:10b6:806:25::29) To CH2PR12MB4133.namprd12.prod.outlook.com
+X-ClientProxiedBy: SA0PR11CA0079.namprd11.prod.outlook.com
+ (2603:10b6:806:d2::24) To CH2PR12MB4133.namprd12.prod.outlook.com
  (2603:10b6:610:7a::13)
 MIME-Version: 1.0
 X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from localhost (165.204.77.1) by SA9P221CA0024.NAMP221.PROD.OUTLOOK.COM (2603:10b6:806:25::29) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4457.18 via Frontend Transport; Thu, 26 Aug 2021 22:27:24 +0000
+Received: from localhost (165.204.77.1) by SA0PR11CA0079.namprd11.prod.outlook.com (2603:10b6:806:d2::24) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4436.19 via Frontend Transport; Thu, 26 Aug 2021 22:27:27 +0000
 X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: c83bb0ef-0250-4bf4-6d62-08d968e0ae02
+X-MS-Office365-Filtering-Correlation-Id: 4d7115f8-03ad-4e4e-1e83-08d968e0af3e
 X-MS-TrafficTypeDiagnostic: CH2PR12MB3925:
 X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <CH2PR12MB3925D19B7A704A5878D4AA9395C79@CH2PR12MB3925.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:262;
+X-Microsoft-Antispam-PRVS: <CH2PR12MB39258F72FC8CDEAB7EB0755F95C79@CH2PR12MB3925.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:525;
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: =?us-ascii?Q?iuFs9INAzndsl4LFujevoznRAI/3MFO0FuyS3rg2d9oyL2Qy5sTmjk9s+pPX?=
- =?us-ascii?Q?YmRJIC6Do+yjqO1dnPQ9THh2S/zn9+B2vH/IGtwMh4g6qTGbDcwaX8fK43y0?=
- =?us-ascii?Q?eRPd6HutwC0n7uAf/T/H61IiWxwYw5uoTuNWfoqQEwTGvL0m4PQT6ZOUK58Y?=
- =?us-ascii?Q?mYrzNS41D9j4BceOf38HGA2y6mtHJ6z4SB7otFFWTUTd2+5sH4PFJP9WIwho?=
- =?us-ascii?Q?RnJzaf538g8kLm/DJd7oFVR+K35JrSQ2j/YbYJZU2S9zEjVAl+qzE86D684s?=
- =?us-ascii?Q?rbvrH79YPZy4jzQ+DPOFwOBydHJFHptUgmXsBOfkh4O0sj9mRb2l8Wjy+mxn?=
- =?us-ascii?Q?JyUTAD/IIqa5TTl+nMUOxeP+cYmdsaMYqN1TwX5vOsvpwVIldVllgGcUK4Ow?=
- =?us-ascii?Q?d1ZvcoRo6GKt25R4Lwhdjo5fIjdP+0MLS+Zwv+XAnlOd3q4BSkUedkixolOV?=
- =?us-ascii?Q?EjOBwSFhBu2LF8CIL8kDQJ5GRpmwQOo6BVX7xBbZhnB3Ll291bVkwx5pZCtP?=
- =?us-ascii?Q?5rT8rIAh8g0wR/koQynCPIoZZLQNMAhBNiJ9divffYPezzK57O1HI9cdNuxo?=
- =?us-ascii?Q?ws8Iruw6xBiQ2DPLerya7RDFKpf+eKxMr/JmYXaGWHNI7Gj36znfnYu3zOgN?=
- =?us-ascii?Q?J5uyUeI66siAj+oQ2u2U62ZKUJQ5n6Qhzi5xOdypghhBqZKhMoreOBayqxZR?=
- =?us-ascii?Q?YA6bsb7xlpkhERqXm6F95SmynFhOzcrNj2c6Von2Fi9ysbDxf7gXOuzx+gvO?=
- =?us-ascii?Q?EY5l25jj0xCrdIPYwsGM4qxHeKjBAYJUBZR1+D6l+GZEHHPYDGt5cr4oZM8d?=
- =?us-ascii?Q?H/BYlnoZV7n1D+yCCfwVo412MhahksLVqjmieWbDrrSI5iDWuxLaudissZnk?=
- =?us-ascii?Q?UuZTzrypL7g0tVBQs7o6NUmDzMkxJW/Np+kfk0iECWSazC7x4HBXtEmonHr2?=
- =?us-ascii?Q?XTCox13o4NPh/hP/WNSTp9sNuVCcbBOT9EOzjuBpaivBxAtxdPRdG0Ul6RCa?=
- =?us-ascii?Q?ukWWqDUlghc+dYewShw37SrhdG1ry3t1usU5Js6CsbILVXI=3D?=
+X-Microsoft-Antispam-Message-Info: =?us-ascii?Q?2EKhb9kDpwPRYSSCehm9m+oTfD9Rs88JQnq9yLCJDa3DasV4JFGGVv8bbKgm?=
+ =?us-ascii?Q?BXuzShjp/OTJ7+ZJkKdDGoCdBhZAfH6tpH2h5PhozuIhbrwwmbmkBm1WZMqI?=
+ =?us-ascii?Q?8gPY+InyEBPZV7y26vRsfFWauunMfjZzbu6+1OSZFuDcu2rYLVuqNL5GpHAR?=
+ =?us-ascii?Q?+RPcv4gAGGHxUk9KvyF2grUxUebfK6/Upo0VnvsECWPknhPukzBjAYDQ0S3A?=
+ =?us-ascii?Q?Wu+SGGWexxhmMdLa5JS4MW078DHmnBrK/F+KSpZszXq7IGKcSDVK437UtJME?=
+ =?us-ascii?Q?hhj2fmqtefALczl7TCrAJTpray5g0/FUWzaprvVgy4TihdU6t5luLXcyLxOs?=
+ =?us-ascii?Q?idnTrnl2ELgdSvJ+eXPzYf6Rm429x6TLy5UH7Z2PlOQErBjnHsrWtGKcIfB5?=
+ =?us-ascii?Q?u5EO2jnrOYEpgAMzHK2aBBZWsMpPZibNO21DKsHR5RUwjZ+Y2JS/fDntAdJ5?=
+ =?us-ascii?Q?Dsu0dhq5FTY1fp2sb7q+HwNIdkdXFrYqIPGwb56FlD0Z5xnA5QGNQ43w/303?=
+ =?us-ascii?Q?Iu83/PbenBOANJPcZlpDOELnYCLO1A96SPrnTXqRjtCEENl1ETVq3m2Dmlt8?=
+ =?us-ascii?Q?gJadDzzZfcwY+cpaf+eICtAuhegMWjkpbpmkK5N1iMqFJDepmnwxmRYVfiHi?=
+ =?us-ascii?Q?XHHdryxFTVsIcCQpaSqXwoHcJiLEnz7BJGjVgfphnPrgo6UsELf1lXA9z+Sa?=
+ =?us-ascii?Q?200z4C5TDKIKvTsBeM4oU8ratlRekVJa7jVMFC6gVX5VnAPTTfwlR2PKV3cW?=
+ =?us-ascii?Q?++pO/txX7kVtH1eDfPUJ5INpFUmoWVuhzvbmEeKpGony96JTImNvbXFEQpcU?=
+ =?us-ascii?Q?mSB5wHGOhw6WMf8/UIvnzeEEVjQAE5xicnjqO1Fw240bH7gEK5WtIQNFygxc?=
+ =?us-ascii?Q?+sXREY49XnrvAPJeMwq40Lm0mHX4PjyMZcglCgtzWncwVJqbwo/33YoaJq/l?=
+ =?us-ascii?Q?XE+vTOYQCs0jhALOC44iLajMIAGosDdmtMded2Iv/twE94XS0VZ9jZZZtYbq?=
+ =?us-ascii?Q?2SxSSOC7dlACJjm9maFuAcA9WR7fnNH7ogQHebdL4y64PY0=3D?=
 X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:5;SRV:;IPV:NLI;SFV:SPM;H:CH2PR12MB4133.namprd12.prod.outlook.com;PTR:;CAT:OSPM;SFS:(4636009)(376002)(396003)(346002)(136003)(39860400002)(366004)(8676002)(38350700002)(66476007)(38100700002)(956004)(2616005)(6666004)(66556008)(83380400001)(186003)(6916009)(478600001)(36756003)(316002)(4326008)(44832011)(54906003)(66946007)(52116002)(6496006)(2906002)(86362001)(1076003)(6486002)(5660300002)(7416002)(8936002)(26005)(23200700001);DIR:OUT;SFP:1501;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?AAzUXDvXqH0ST0/i70b+8UE7ob6KOpI5CvDG867qTHuAvTRZynHGXHWf2WCk?=
- =?us-ascii?Q?tLl73cn34mCoWr/kA5E6s+Oh3MTGswvmhU6d/kEmdMdESXXLGf5QVBe5j99s?=
- =?us-ascii?Q?uEpwWzE5fIl0exn6czEA1LyXEFvGvhB3FrVG+mJXcM8/lsfciqUVyn7kBxZ1?=
- =?us-ascii?Q?Mt5IUt3LXBZXc0QQLkfkmBlak+8pFcOyN0nfN2pz6ajUjyWmK1/y76qF8VK8?=
- =?us-ascii?Q?DwpmxFmbL2B0PPPRU5D7RXaftC7ZqvuAw4nu0Dvc59vpYgP2EdqgZisPFh8y?=
- =?us-ascii?Q?MShCXwfWooy/i1y80d487yOvur2O4KUS1cOzT8Zyc7DQmSzbm7DVO+Sfgg8Y?=
- =?us-ascii?Q?raDohLCWyMMFjgE5Bl9jzLp44y77OKvXo5JZ0wq32v1ey+vWxzS/eQYyqYx0?=
- =?us-ascii?Q?Altk4qu1CCzrvdC5I5Z3jKf77BR9Q+2dbvfrT0wxzNw8C4Amg5236lMo2zEy?=
- =?us-ascii?Q?kz1rHh1rHeotYMsreoCtHgURuMdaQfoMp27N6LoHP8fjiAr1fPrYOD4rJCRe?=
- =?us-ascii?Q?1eQUgZe5OmEjuDEh9ZT/KSsoYKxH1bzzFsRTTeABElXrS7cscc/vplRSJkwZ?=
- =?us-ascii?Q?6gyYLmIiu81Ny6i40WlNm2ct3l9Vx6mf1uSgVQWpdeUsvEEH3RD7x4REiPQH?=
- =?us-ascii?Q?hv8zWd5U2gcnC1dKpJNgBGRuPcOrHkEqrRuV/zXaKMTfTvvGFHQFQ6HMoPMX?=
- =?us-ascii?Q?63NDsOARedtaHUW7kvz7LwB5YTpARpHFS7c9AqBYXaFz+kLw3p7AO0Yw5zJ8?=
- =?us-ascii?Q?hGYiduP1yxUiE7257TEdhnfQAJ15CI4D0xMnH8r56ILedEnZ1v5H3R2N9iFP?=
- =?us-ascii?Q?pkqwYE+8a6D/Dn09slVLtgCH2KhalqjZSmf19XEXepAx4eJcc/sGrcFKDqKP?=
- =?us-ascii?Q?m+gPnTJ9jKcJgMaea2cfGshfFRwa877g0R3jrS+cF/4tpJCcFOS1J3GEc8wJ?=
- =?us-ascii?Q?lFOrTGDAb4DtTQw64vSvCw6rUJDMuOHfTbdLNI+qZAs8NX0jnTPnrPqDCQeD?=
- =?us-ascii?Q?Q8xd/jHIGUepgBA9kjPYx0ziW6Z6xH7rpXUrV5R8suSP9hKMby8NWO6iQHVk?=
- =?us-ascii?Q?jY9UciBOQHEPMYTKbAP8m9ZmqM34IFZac3EoaqKQ06W+lCw28C7jl4HNOsuY?=
- =?us-ascii?Q?Kp1lSiPEPB2/YFrunDSF2wdSfEtWnPA2HOuiKPOq/zjbX4KFyTSEmiInfX52?=
- =?us-ascii?Q?EV4p10lO4Ok0U7rweGHdlEWta6n2u8C66w8laaulun5/LFXsWlQSixWVRmqQ?=
- =?us-ascii?Q?vNNFrOMLYtfnW8EuyY6c0VbjpFBhFzKLWdsjIlvVhWSIo0GYZfrwFw/ASzJd?=
- =?us-ascii?Q?Wr7Y7EPTMNySXm3N+tSdNy5k?=
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?v0LuheBf0gxrg8Y5/zVgcFObQPqdlYD7tD53A9l37SoCV5hQpzxzOkdSMT//?=
+ =?us-ascii?Q?nUql4tEAFb/c9O55eTBn6yL80onFyqvWdAPV7ndMiZapx6S06Q13F8ZNGBx3?=
+ =?us-ascii?Q?/WY4fD30VYCUOaR3jL5krBAD5f4XNobK+Cf6aT65be++9DFBJZmKaiFtLrxj?=
+ =?us-ascii?Q?1G+D2jTqRMrOw2y3M72A5Cng6rqnhqWDZutxQObmTgDeKYR/LMQR/BQQFXl9?=
+ =?us-ascii?Q?d71NEkbi10eEL6MU6G53rosR5S0GE54c94SMkE3m8WILgPcVu3ld8LRRBwf2?=
+ =?us-ascii?Q?hxz81+ikBiUEUYwP76EK1nqSpCwBwYOzUFcqBeguA53axqcQ3Wbs9JAvYfBn?=
+ =?us-ascii?Q?iyK+JLOCI7w74dQ6rTYBcxQ1EgFwNCtm6fkvrr6TTs42uREmua2BSXItbNNW?=
+ =?us-ascii?Q?hgRf1eF0+bK81gYF2xQeRmquQ47lfgYh7JWSDC+UwGVzn5qIXcDnHpVJXS2u?=
+ =?us-ascii?Q?SY62jW/eCq9cZ/y6Ly1fu7gpVP9bMwi3KQG4FIuAQ50msgUJ+erOpyQ5tECe?=
+ =?us-ascii?Q?6+W1T9HGeaNRTrua5AqgxAmLybUn1jiKjvMzdl2SBbvajz3DQ9bbt1U+Vycx?=
+ =?us-ascii?Q?Ayp9lLBQrRk2CBMT4luGS33PLyY8gzTCOb2o9IngxC4gOvH4pe2qIV4GFTTS?=
+ =?us-ascii?Q?FuIiKa4WIDSXvD6zLrmlDucnVTBjOwyL9cGmvv33fUsEL+UhQlR47aN/FFTw?=
+ =?us-ascii?Q?sLztPT72NMRZqseCnM0Mboae3DnBwVyVFbHqpqC5hH8DDTKqKdsPr9Epg4J0?=
+ =?us-ascii?Q?ekQgruxDwJ40XCASdiHN91hfy+97Dfaed8a6/+p8o0pZpVyd5EOG9Sof33ZQ?=
+ =?us-ascii?Q?IQ+RIwWPgcZRbgIp7vmVcgRD11CTbdUozSGfgY8OF63HKka68XScw9GcVtBZ?=
+ =?us-ascii?Q?anOv9zoRxQ8/XXE9DEq/Sevqu12butGUGcEkwvxSrlKn0aCcwYI+xMa6O93k?=
+ =?us-ascii?Q?O5sWh7QwplRr7WlADctY0DLZ6OZ4myQ4rIgTOKElm3uCi1kRI0jRLuM/cGko?=
+ =?us-ascii?Q?jhaN6pULBT9UmUNyfXlABs8dmsnqpg/WsEF1ahK9pQ6qj1bsrSWwH3ziqCQZ?=
+ =?us-ascii?Q?SSUIfAUZVAqPkOKrbXgcGpUCtZszeM279AzZSk3aANXZADlZwmUKKlnWsxsR?=
+ =?us-ascii?Q?4XXgIvwPGGRbP8POieNsnYkmMMh7tbi/rjxVF8utNkqV7JnbfJ3V8pawC47p?=
+ =?us-ascii?Q?OwtAUHULxHJDVESsXnUD/PvFZvYtSLSjGU3/adgwGLzvW2Vv4J5/Dpg40IKm?=
+ =?us-ascii?Q?neGK3kERPXafFhtL0sw7Y0iXqLd8tXR5r3Qx2yFeeNiCylsoq4Nl8EpBlEjE?=
+ =?us-ascii?Q?FLTMjQvYhwpbIHGm6DC9vJeB?=
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: c83bb0ef-0250-4bf4-6d62-08d968e0ae02
+X-MS-Exchange-CrossTenant-Network-Message-Id: 4d7115f8-03ad-4e4e-1e83-08d968e0af3e
 X-MS-Exchange-CrossTenant-AuthSource: CH2PR12MB4133.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 Aug 2021 22:27:25.2526
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 Aug 2021 22:27:27.2977
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: eQ1FcZe+kg6owZGglcQ+OZpNXKzlGjMJq4mke9LFqYfOoeoKHiyxAQeja++0dokCpnf+rKih7DqqALaUaJe9NA==
+X-MS-Exchange-CrossTenant-UserPrincipalName: G2QRoJ61LxFn7a++bPkVO1usn4aDWhXWGZtFpXAEqZssLNQrfVPg8MOz8Uww7T2GK/fK0Sf1vsJkRGLkJ/tAfg==
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH2PR12MB3925
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
@@ -136,154 +136,270 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Brijesh Singh <brijesh.singh@amd.com>
 
-The KVM_SEV_SNP_LAUNCH_UPDATE command is used for encrypting the bios
-image used for booting the SEV-SNP guest.
+During the SNP guest launch sequence, a special secrets and cpuid page
+needs to be populated by the SEV-SNP firmware. The secrets page contains
+the VM Platform Communication Key (VMPCKs) used by the guest to send and
+receive secure messages to the PSP. And CPUID page will contain the CPUID
+value filtered through the PSP.
+
+The guest BIOS (OVMF) reserves these pages in MEMFD and location of it
+is available through the SNP boot block GUID. While finalizing the guest
+boot flow, lookup for the boot block and call the SNP_LAUNCH_UPDATE
+command to populate secrets and cpuid pages.
+
+In order to support early boot code, the OVMF may ask hypervisor to
+request the pre-validation of certain memory range. If such range is
+present the call SNP_LAUNCH_UPDATE command to validate those address
+range without affecting the measurement. See the SEV-SNP specification
+for further details.
+
+Finally, call the SNP_LAUNCH_FINISH to finalize the guest boot.
 
 Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
 Signed-off-by: Michael Roth <michael.roth@amd.com>
 ---
- hw/i386/pc_sysfw.c       |  7 ++++---
- include/sysemu/sev.h     |  2 +-
- target/i386/sev-stub.c   |  2 +-
- target/i386/sev.c        | 40 ++++++++++++++++++++++++++++++++++++++--
- target/i386/trace-events |  1 +
- 5 files changed, 45 insertions(+), 7 deletions(-)
+ target/i386/sev.c        | 189 ++++++++++++++++++++++++++++++++++++++-
+ target/i386/trace-events |   2 +
+ 2 files changed, 189 insertions(+), 2 deletions(-)
 
-diff --git a/hw/i386/pc_sysfw.c b/hw/i386/pc_sysfw.c
-index 68d6b1f783..54ccf13c0e 100644
---- a/hw/i386/pc_sysfw.c
-+++ b/hw/i386/pc_sysfw.c
-@@ -149,6 +149,7 @@ static void pc_system_flash_map(PCMachineState *pcms,
-     void *flash_ptr;
-     int flash_size;
-     int ret;
-+    hwaddr gpa;
- 
-     assert(PC_MACHINE_GET_CLASS(pcms)->pci_enabled);
- 
-@@ -182,11 +183,11 @@ static void pc_system_flash_map(PCMachineState *pcms,
-         }
- 
-         total_size += size;
-+        gpa = 0x100000000ULL - total_size; /* where the flash is mapped */
-         qdev_prop_set_uint32(DEVICE(system_flash), "num-blocks",
-                              size / FLASH_SECTOR_SIZE);
-         sysbus_realize_and_unref(SYS_BUS_DEVICE(system_flash), &error_fatal);
--        sysbus_mmio_map(SYS_BUS_DEVICE(system_flash), 0,
--                        0x100000000ULL - total_size);
-+        sysbus_mmio_map(SYS_BUS_DEVICE(system_flash), 0, gpa);
- 
-         if (i == 0) {
-             flash_mem = pflash_cfi01_get_memory(system_flash);
-@@ -208,7 +209,7 @@ static void pc_system_flash_map(PCMachineState *pcms,
-                     exit(1);
-                 }
- 
--                sev_encrypt_flash(flash_ptr, flash_size, &error_fatal);
-+                sev_encrypt_flash(gpa, flash_ptr, flash_size, &error_fatal);
-             }
-         }
-     }
-diff --git a/include/sysemu/sev.h b/include/sysemu/sev.h
-index 94d821d737..78e3bf97e8 100644
---- a/include/sysemu/sev.h
-+++ b/include/sysemu/sev.h
-@@ -18,7 +18,7 @@
- 
- bool sev_enabled(void);
- int sev_kvm_init(ConfidentialGuestSupport *cgs, Error **errp);
--int sev_encrypt_flash(uint8_t *ptr, uint64_t len, Error **errp);
-+int sev_encrypt_flash(hwaddr gpa, uint8_t *ptr, uint64_t len, Error **errp);
- int sev_inject_launch_secret(const char *hdr, const char *secret,
-                              uint64_t gpa, Error **errp);
- 
-diff --git a/target/i386/sev-stub.c b/target/i386/sev-stub.c
-index e4fb8e882e..8b35704937 100644
---- a/target/i386/sev-stub.c
-+++ b/target/i386/sev-stub.c
-@@ -56,7 +56,7 @@ int sev_inject_launch_secret(const char *hdr, const char *secret,
-     return 1;
- }
- 
--int sev_encrypt_flash(uint8_t *ptr, uint64_t len, Error **errp)
-+int sev_encrypt_flash(hwaddr gpa, uint8_t *ptr, uint64_t len, Error **errp)
- {
-     return 0;
- }
 diff --git a/target/i386/sev.c b/target/i386/sev.c
-index 51689d4fa4..867c0cb457 100644
+index 867c0cb457..0009c93d28 100644
 --- a/target/i386/sev.c
 +++ b/target/i386/sev.c
-@@ -946,6 +946,35 @@ out:
-     return ret;
- }
+@@ -33,6 +33,7 @@
+ #include "monitor/monitor.h"
+ #include "exec/confidential-guest-support.h"
+ #include "hw/i386/pc.h"
++#include "qemu/range.h"
+ 
+ #define TYPE_SEV_COMMON "sev-common"
+ OBJECT_DECLARE_SIMPLE_TYPE(SevCommonState, SEV_COMMON)
+@@ -107,6 +108,19 @@ typedef struct __attribute__((__packed__)) SevInfoBlock {
+     uint32_t reset_addr;
+ } SevInfoBlock;
+ 
++#define SEV_SNP_BOOT_BLOCK_GUID "bd39c0c2-2f8e-4243-83e8-1b74cebcb7d9"
++typedef struct __attribute__((__packed__)) SevSnpBootInfoBlock {
++    /* Prevalidate range address */
++    uint32_t pre_validated_start;
++    uint32_t pre_validated_end;
++    /* Secrets page address */
++    uint32_t secrets_addr;
++    uint32_t secrets_len;
++    /* CPUID page address */
++    uint32_t cpuid_addr;
++    uint32_t cpuid_len;
++} SevSnpBootInfoBlock;
++
+ static Error *sev_mig_blocker;
+ 
+ static const char *const sev_fw_errlist[] = {
+@@ -1086,6 +1100,162 @@ static Notifier sev_machine_done_notify = {
+     .notify = sev_launch_get_measure,
+ };
  
 +static int
-+sev_snp_launch_update(SevSnpGuestState *sev_snp_guest, hwaddr gpa, uint8_t *addr,
-+                      uint64_t len, int type)
++sev_snp_launch_update_gpa(uint32_t hwaddr, uint32_t size, uint8_t type)
 +{
-+    int ret, fw_error;
-+    struct kvm_sev_snp_launch_update update = {0};
++    void *hva;
++    MemoryRegion *mr = NULL;
++    SevSnpGuestState *sev_snp_guest =
++        SEV_SNP_GUEST(MACHINE(qdev_get_machine())->cgs);
 +
-+    if (!addr || !len) {
-+        error_report("%s: SNP_LAUNCH_UPDATE called with invalid address / length: %lx / %lx",
-+                __func__, gpa, len);
++    hva = gpa2hva(&mr, hwaddr, size, NULL);
++    if (!hva) {
++        error_report("SEV-SNP failed to get HVA for GPA 0x%x", hwaddr);
 +        return 1;
 +    }
 +
-+    update.uaddr = (__u64)(unsigned long)addr;
-+    update.start_gfn = gpa >> TARGET_PAGE_BITS;
-+    update.len = len;
-+    update.page_type = type;
-+    trace_kvm_sev_snp_launch_update(addr, len, type);
-+    ret = sev_ioctl(SEV_COMMON(sev_snp_guest)->sev_fd,
-+                    KVM_SEV_SNP_LAUNCH_UPDATE,
-+                    &update, &fw_error);
-+    if (ret) {
-+        error_report("%s: SNP_LAUNCH_UPDATE ret=%d fw_error=%d '%s'",
-+                __func__, ret, fw_error, fw_error_to_str(fw_error));
-+    }
-+
-+    return ret;
++    return sev_snp_launch_update(sev_snp_guest, hwaddr, hva, size, type);
 +}
 +
- static int
- sev_launch_update_data(SevGuestState *sev_guest, uint8_t *addr, uint64_t len)
- {
-@@ -1219,7 +1248,7 @@ err:
- }
- 
- int
--sev_encrypt_flash(uint8_t *ptr, uint64_t len, Error **errp)
-+sev_encrypt_flash(hwaddr gpa, uint8_t *ptr, uint64_t len, Error **errp)
- {
-     SevCommonState *sev_common = SEV_COMMON(MACHINE(qdev_get_machine())->cgs);
- 
-@@ -1229,7 +1258,14 @@ sev_encrypt_flash(uint8_t *ptr, uint64_t len, Error **errp)
- 
-     /* if SEV is in update state then encrypt the data else do nothing */
-     if (sev_check_state(sev_common, SEV_STATE_LAUNCH_UPDATE)) {
--        int ret = sev_launch_update_data(SEV_GUEST(sev_common), ptr, len);
-+        int ret;
++static bool
++detect_first_overlap(uint64_t start, uint64_t end, Range *range_list,
++                     size_t range_count, Range *overlap_range)
++{
++    int i;
++    bool overlap = false;
++    Range new;
 +
-+        if (sev_snp_enabled()) {
-+            ret = sev_snp_launch_update(SEV_SNP_GUEST(sev_common), gpa, ptr,
-+                                        len, KVM_SEV_SNP_PAGE_TYPE_NORMAL);
-+        } else {
-+            ret = sev_launch_update_data(SEV_GUEST(sev_common), ptr, len);
++    assert(overlap_range);
++    range_make_empty(overlap_range);
++    range_init_nofail(&new, start, end - start + 1);
++
++    for (i = 0; i < range_count; i++) {
++        if (range_overlaps_range(&new, &range_list[i]) &&
++            (range_is_empty(overlap_range) ||
++             range_lob(&range_list[i]) < range_lob(overlap_range))) {
++            *overlap_range = range_list[i];
++            overlap = true;
 +        }
-         if (ret < 0) {
-             error_setg(errp, "failed to encrypt pflash rom");
-             return ret;
++    }
++
++    return overlap;
++}
++
++static void snp_ovmf_boot_block_setup(void)
++{
++    SevSnpBootInfoBlock *info;
++    uint32_t start, end, sz;
++    int ret;
++    Range validated_ranges[2];
++
++    /*
++     * Extract the SNP boot block for the SEV-SNP guests by locating the
++     * SNP_BOOT GUID. The boot block contains the information such as location
++     * of secrets and CPUID page, additionaly it may contain the range of
++     * memory that need to be pre-validated for the boot.
++     */
++    if (!pc_system_ovmf_table_find(SEV_SNP_BOOT_BLOCK_GUID,
++        (uint8_t **)&info, NULL)) {
++        error_report("SEV-SNP: failed to find the SNP boot block");
++        exit(1);
++    }
++
++    trace_kvm_sev_snp_ovmf_boot_block_info(info->secrets_addr,
++                                           info->secrets_len, info->cpuid_addr,
++                                           info->cpuid_len,
++                                           info->pre_validated_start,
++                                           info->pre_validated_end);
++
++    /* Populate the secrets page */
++    ret = sev_snp_launch_update_gpa(info->secrets_addr, info->secrets_len,
++                                    KVM_SEV_SNP_PAGE_TYPE_SECRETS);
++    if (ret) {
++        error_report("SEV-SNP: failed to insert secret page GPA 0x%x",
++                     info->secrets_addr);
++        exit(1);
++    }
++
++    /* Populate the cpuid page */
++    ret = sev_snp_launch_update_gpa(info->cpuid_addr, info->cpuid_len,
++                                    KVM_SEV_SNP_PAGE_TYPE_CPUID);
++    if (ret) {
++        error_report("SEV-SNP: failed to insert cpuid page GPA 0x%x",
++                     info->cpuid_addr);
++        exit(1);
++    }
++
++    /*
++     * Pre-validate the range using the LAUNCH_UPDATE_DATA, if the
++     * pre-validation range contains the CPUID and Secret page GPA then skip
++     * it. This is because SEV-SNP firmware pre-validates those pages as part
++     * of adding secrets and cpuid LAUNCH_UPDATE type.
++     */
++    range_init_nofail(&validated_ranges[0], info->secrets_addr, info->secrets_len);
++    range_init_nofail(&validated_ranges[1], info->cpuid_addr, info->cpuid_len);
++    start = info->pre_validated_start;
++    end = info->pre_validated_end;
++
++    while (start < end) {
++        Range overlap_range;
++
++        /* Check if the requested range overlaps with Secrets and CPUID page */
++        if (detect_first_overlap(start, end, validated_ranges, 2,
++                                 &overlap_range)) {
++            if (start < range_lob(&overlap_range)) {
++                sz = range_lob(&overlap_range) - start;
++                if (sev_snp_launch_update_gpa(start, sz,
++                    KVM_SEV_SNP_PAGE_TYPE_UNMEASURED)) {
++                    error_report("SEV-SNP: failed to validate gpa 0x%x sz %d",
++                                 start, sz);
++                    exit(1);
++                }
++            }
++
++            start = range_upb(&overlap_range) + 1;
++            continue;
++        }
++
++        /* Validate the remaining range */
++        if (sev_snp_launch_update_gpa(start, end - start,
++            KVM_SEV_SNP_PAGE_TYPE_UNMEASURED)) {
++            error_report("SEV-SNP: failed to validate gpa 0x%x sz %d",
++                         start, end - start);
++            exit(1);
++        }
++
++        start = end;
++    }
++}
++
++static void
++sev_snp_launch_finish(SevSnpGuestState *sev_snp)
++{
++    int ret, error;
++    Error *local_err = NULL;
++    struct kvm_sev_snp_launch_finish *finish = &sev_snp->kvm_finish_conf;
++
++    trace_kvm_sev_snp_launch_finish();
++    ret = sev_ioctl(SEV_COMMON(sev_snp)->sev_fd, KVM_SEV_SNP_LAUNCH_FINISH, finish, &error);
++    if (ret) {
++        error_report("%s: SNP_LAUNCH_FINISH ret=%d fw_error=%d '%s'",
++                     __func__, ret, error, fw_error_to_str(error));
++        exit(1);
++    }
++
++    sev_set_guest_state(SEV_COMMON(sev_snp), SEV_STATE_RUNNING);
++
++    /* add migration blocker */
++    error_setg(&sev_mig_blocker,
++               "SEV: Migration is not implemented");
++    ret = migrate_add_blocker(sev_mig_blocker, &local_err);
++    if (local_err) {
++        error_report_err(local_err);
++        error_free(sev_mig_blocker);
++        exit(1);
++    }
++}
++
++
+ static void
+ sev_launch_finish(SevGuestState *sev_guest)
+ {
+@@ -1121,7 +1291,12 @@ sev_vm_state_change(void *opaque, bool running, RunState state)
+ 
+     if (running) {
+         if (!sev_check_state(sev_common, SEV_STATE_RUNNING)) {
+-            sev_launch_finish(SEV_GUEST(sev_common));
++            if (sev_snp_enabled()) {
++                snp_ovmf_boot_block_setup();
++                sev_snp_launch_finish(SEV_SNP_GUEST(sev_common));
++            } else {
++                sev_launch_finish(SEV_GUEST(sev_common));
++            }
+         }
+     }
+ }
+@@ -1236,7 +1411,17 @@ int sev_kvm_init(ConfidentialGuestSupport *cgs, Error **errp)
+     }
+ 
+     ram_block_notifier_add(&sev_ram_notifier);
+-    qemu_add_machine_init_done_notifier(&sev_machine_done_notify);
++
++    /*
++     * The machine done notify event is used by the SEV guest to get the
++     * measurement of the encrypted images. When SEV-SNP is enabled then
++     * measurement is part of the attestation report and the measurement
++     * command does not exist. So skip registering the notifier.
++     */
++    if (!sev_snp_enabled()) {
++        qemu_add_machine_init_done_notifier(&sev_machine_done_notify);
++    }
++
+     qemu_add_vm_change_state_handler(sev_vm_state_change, sev_common);
+ 
+     cgs->ready = true;
 diff --git a/target/i386/trace-events b/target/i386/trace-events
-index 18cc14b956..0c2d250206 100644
+index 0c2d250206..db91287439 100644
 --- a/target/i386/trace-events
 +++ b/target/i386/trace-events
-@@ -12,3 +12,4 @@ kvm_sev_launch_finish(void) ""
- kvm_sev_launch_secret(uint64_t hpa, uint64_t hva, uint64_t secret, int len) "hpa 0x%" PRIx64 " hva 0x%" PRIx64 " data 0x%" PRIx64 " len %d"
+@@ -13,3 +13,5 @@ kvm_sev_launch_secret(uint64_t hpa, uint64_t hva, uint64_t secret, int len) "hpa
  kvm_sev_attestation_report(const char *mnonce, const char *data) "mnonce %s data %s"
  kvm_sev_snp_launch_start(uint64_t policy) "policy 0x%" PRIx64
-+kvm_sev_snp_launch_update(void *addr, uint64_t len, int type) "addr %p len 0x%" PRIx64 " type %d"
+ kvm_sev_snp_launch_update(void *addr, uint64_t len, int type) "addr %p len 0x%" PRIx64 " type %d"
++kvm_sev_snp_launch_finish(void) ""
++kvm_sev_snp_ovmf_boot_block_info(uint32_t secrets_gpa, uint32_t slen, uint32_t cpuid_gpa, uint32_t clen, uint32_t s, uint32_t e) "secrets 0x%x+0x%x cpuid 0x%x+0x%x pre-validate 0x%x+0x%x"
 -- 
 2.25.1
 
