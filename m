@@ -2,130 +2,93 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3C1443F8DB0
-	for <lists+kvm@lfdr.de>; Thu, 26 Aug 2021 20:14:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 850083F8DC5
+	for <lists+kvm@lfdr.de>; Thu, 26 Aug 2021 20:21:50 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241975AbhHZSOv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 26 Aug 2021 14:14:51 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:50600 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S234536AbhHZSOu (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 26 Aug 2021 14:14:50 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1630001643;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=sRuC5V6T0HI9RSkyu52RSwPk8VQRtun3hwD4VTXAwFo=;
-        b=Ls3+/dzyKAyFZf5T6W6xIqiYXIErqeplQ5VaWL1X9S+nuFb4QgU8yt8o5nhTaKYFOjotaN
-        gV08HhE1YwhROM7Z2Tj4lgKusUczIWWFmNMoWBauVOzsLfHdND/v9UaGgwdJ8q6FJV4Ihg
-        iDqlAySAL/GiHhf4c74YjpjCnBwRn3E=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-275-7Z0Km1TOOo-84TcMbwWzYA-1; Thu, 26 Aug 2021 14:14:01 -0400
-X-MC-Unique: 7Z0Km1TOOo-84TcMbwWzYA-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5BABF18C89C4;
-        Thu, 26 Aug 2021 18:14:00 +0000 (UTC)
-Received: from localhost (unknown [10.22.10.96])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 52D055D9C6;
-        Thu, 26 Aug 2021 18:13:57 +0000 (UTC)
-Date:   Thu, 26 Aug 2021 14:13:56 -0400
-From:   Eduardo Habkost <ehabkost@redhat.com>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Maxim Levitsky <mlevitsk@redhat.com>, kvm@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
-        Nitesh Narayan Lal <nitesh@redhat.com>,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 4/4] KVM: x86: Fix stack-out-of-bounds memory access
- from ioapic_write_indirect()
-Message-ID: <20210826181356.xhsie7kkqoeukeju@habkost.net>
-References: <CAOpTY_ot8teH5x5vVS2HvuMx5LSKLPtyen_ZUM1p7ncci4LFbA@mail.gmail.com>
- <87k0kakip9.fsf@vitty.brq.redhat.com>
- <2df0b6d18115fb7f2701587b7937d8ddae38e36a.camel@redhat.com>
- <87h7fej5ov.fsf@vitty.brq.redhat.com>
- <36b6656637d1e6aaa2ab5098f7ebc27644466294.camel@redhat.com>
- <87bl5lkgfm.fsf@vitty.brq.redhat.com>
- <CAOpTY_q=0cuxXAToJrcqCRERY_sUSB1HNVBVNiEpH6Dsy0-+yA@mail.gmail.com>
- <87tujcidka.fsf@vitty.brq.redhat.com>
- <20210826145210.gpfbiagntwoswrzp@habkost.net>
- <YSfW62JxXXBI1/UE@google.com>
+        id S243228AbhHZSWF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 26 Aug 2021 14:22:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57400 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232420AbhHZSWF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 26 Aug 2021 14:22:05 -0400
+Received: from mail-pg1-x52f.google.com (mail-pg1-x52f.google.com [IPv6:2607:f8b0:4864:20::52f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AACA3C061757
+        for <kvm@vger.kernel.org>; Thu, 26 Aug 2021 11:21:17 -0700 (PDT)
+Received: by mail-pg1-x52f.google.com with SMTP id w7so2618716pgk.13
+        for <kvm@vger.kernel.org>; Thu, 26 Aug 2021 11:21:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=Ikh4nw6GQUFaIaUFygN35ys+PxM12rR1q0Xpov8w4z4=;
+        b=FkDZtcV4x0upZJ5pGiwBa4oNw0Kn5WMWZUOe2sNuNPhI1+xJcU9EInTWdIVaBftZ5p
+         V3T1ewSvUDpfhZpKu6sj+kB6whTol2OApF8uMaEhk4bKXPS9SO5LOOjhdJmlNvobVAQV
+         eGoeeMxLTGZ/EfvQgqrAcS+y3LZ7/QbF1WljIaO3cFF7q6+9ruTJExO7jJsmXFR9fR0f
+         EVyz9sRl1k4x1CqgCisxC5plkPDDQqvo6ZfBvmEWLZIu+6OUvM+TapIQ1TZ8uqYIN5gu
+         O6L6RacrlPTBlQ6CrzhZsLmhRphVXe1vsOi9yvaJPRwlYiXp0yBCkdAtwyr9SvQ3KEHe
+         PD4Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=Ikh4nw6GQUFaIaUFygN35ys+PxM12rR1q0Xpov8w4z4=;
+        b=AVtNkkyA9ubgLYt9+G6EFPpkcMz3nuWX7nn2wNC3h+N5AgXnX4AyqjkRzTHjQ4c3uP
+         P1QrXqMiKoqLy3y9QzZ8gScwGNOwVuic6SpydKn6BZPXZOt9Jm/N6JKccPqGS+67oSzE
+         3/1TNTHLmalM13B8Z4fl2epDrjIESwTg7Y65L/3m3DzoEiUoe5hnSUxI9Mzvs2oUOUv5
+         EGU4Y7bZX+LilT2Y94JLEw2Ekdbsv28WoGc1zHF+IrBpQYAvRjkbl9uQiK6aCpfQzkNs
+         PAyPJHIyuRD57ybuRh6vnvz1DHbe0x+Dijd3T/99jm6hPGLdPo7FnzU3uMHhf+nRG5Iv
+         rAwg==
+X-Gm-Message-State: AOAM532pli0jxnszQsmfVTjfit5U0xm/EaZsaWRcNmeI3c977d+qlJxV
+        8IljENzgXLFHAuJ+NflvtGxOUdO1a5/ZTA==
+X-Google-Smtp-Source: ABdhPJxhwGU2kdvYHc9DW3srhKR/tUQ1naENWXcs8OcDjfwn+ZiiI2NhGYMdQFwMVV+99ko8HJYm+A==
+X-Received: by 2002:a63:4cd:: with SMTP id 196mr4435440pge.239.1630002076943;
+        Thu, 26 Aug 2021 11:21:16 -0700 (PDT)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id a2sm4363174pgb.19.2021.08.26.11.21.16
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 26 Aug 2021 11:21:16 -0700 (PDT)
+Date:   Thu, 26 Aug 2021 18:21:12 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Bill Wendling <morbo@google.com>
+Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+        Roman Bolshakov <r.bolshakov@yadro.com>,
+        David Matlack <dmatlack@google.com>
+Subject: Re: [PATCH 0/4] Prevent inlining for asm blocks with labels
+Message-ID: <YSfbmPmlGcCM1TPL@google.com>
+References: <20210825222604.2659360-1-morbo@google.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <YSfW62JxXXBI1/UE@google.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+In-Reply-To: <20210825222604.2659360-1-morbo@google.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Aug 26, 2021 at 06:01:15PM +0000, Sean Christopherson wrote:
-> On Thu, Aug 26, 2021, Eduardo Habkost wrote:
-> > > @@ -918,7 +918,7 @@ static bool kvm_apic_is_broadcast_dest(struct kvm *kvm, struct kvm_lapic **src,
-> > >  static inline bool kvm_apic_map_get_dest_lapic(struct kvm *kvm,
-> > >                 struct kvm_lapic **src, struct kvm_lapic_irq *irq,
-> > >                 struct kvm_apic_map *map, struct kvm_lapic ***dst,
-> > > -               unsigned long *bitmap)
-> > > +               unsigned long *bitmap64)
-> > 
-> > You can communicate the expected bitmap size to the compiler
-> > without typedefs if using DECLARE_BITMAP inside the function
-> > parameter list is acceptable coding style (is it?).
-> > 
-> > For example, the following would have allowed the compiler to
-> > catch the bug you are fixing:
-> > 
-> > Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
-> > ---
-> > diff --git a/arch/x86/kvm/lapic.h b/arch/x86/kvm/lapic.h
-> > index d7c25d0c1354..e8c64747121a 100644
-> > --- a/arch/x86/kvm/lapic.h
-> > +++ b/arch/x86/kvm/lapic.h
-> > @@ -236,7 +236,7 @@ bool kvm_apic_pending_eoi(struct kvm_vcpu *vcpu, int vector);
-> >  void kvm_wait_lapic_expire(struct kvm_vcpu *vcpu);
-> >  
-> >  void kvm_bitmap_or_dest_vcpus(struct kvm *kvm, struct kvm_lapic_irq *irq,
-> > -			      unsigned long *vcpu_bitmap);
-> > +			      DECLARE_BITMAP(vcpu_bitmap, KVM_MAX_VCPUS));
-> >  
-> >  bool kvm_intr_is_single_vcpu_fast(struct kvm *kvm, struct kvm_lapic_irq *irq,
-> >  			struct kvm_vcpu **dest_vcpu);
-> > diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
-> > index 76fb00921203..1df113894cba 100644
-> > --- a/arch/x86/kvm/lapic.c
-> > +++ b/arch/x86/kvm/lapic.c
-> > @@ -1166,7 +1166,7 @@ static int __apic_accept_irq(struct kvm_lapic *apic, int delivery_mode,
-> >   * each available vcpu to identify the same.
-> >   */
-> >  void kvm_bitmap_or_dest_vcpus(struct kvm *kvm, struct kvm_lapic_irq *irq,
-> > -			      unsigned long *vcpu_bitmap)
-> > +			      DECLARE_BITMAP(vcpu_bitmap, KVM_MAX_VCPUS))
-> >  {
-> >  	struct kvm_lapic **dest_vcpu = NULL;
-> >  	struct kvm_lapic *src = NULL;
+On Wed, Aug 25, 2021, Bill Wendling wrote:
+> Clang may decide to inline some functions that have inline asm with labels.
+
+For all changlogs, it's probably worth clarifying that they have _global_ labels,
+e.g. local labels within an asm block are perfectly ok for inlining, as are local
+labels in the function (but outside of the block) used by asm goto.
+
+And maybe add a "#define noinline ..." to match the kernel and convert the two
+existing uses in pmu_lbr.c as a prep patch?
+
+> Doing this duplicates the labels, causing the assembler to be complain. These
+> patches add the "noinline" attribute to the functions to prevent this.
 > 
-> Sadly, that would not have actually caught the bug.  In C++, an array param does
-> indeed have a fixed size, but in C an array param is nothing more than syntatic
-> sugar that is demoted to a plain ol' pointer.  E.g. gcc-10 and clang-11 both
-> happily compile with "DECLARE_BITMAP(vcpu_bitmap, 0)" and the original single
-> "unsigned long vcpu_bitmap".  Maybe there are gcc extensions to enforce array
-> sizes?  But if there are, they are not (yet) enabled for kernel builds.
-
-The compiler wouldn't have caught it today only because Linux is
-compiled with `-Wno-stringop-overflow`.  I have some hope that
-eventually the warning will be enabled, as indicated on the
-commit message if commit 5a76021c2eff ("gcc-10: disable
-'stringop-overflow' warning for now").
-
-Even if the warning isn't enabled, the bitmap size declaration
-would be a hint for humans reading the code.
-
--- 
-Eduardo
-
+> Bill Wendling (4):
+>   x86: realmode: mark exec_in_big_real_mode as noinline
+>   x86: svm: mark test_run as noinline
+>   x86: umip: mark do_ring3 as noinline
+>   x86: vmx: mark some test_* functions as noinline
+> 
+>  x86/realmode.c | 2 +-
+>  x86/svm.c      | 2 +-
+>  x86/umip.c     | 2 +-
+>  x86/vmx.c      | 6 +++---
+>  4 files changed, 6 insertions(+), 6 deletions(-)
+> 
+> -- 
+> 2.33.0.rc2.250.ged5fa647cd-goog
+> 
