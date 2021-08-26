@@ -2,41 +2,41 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 01FA43F90B2
+	by mail.lfdr.de (Postfix) with ESMTP id B805A3F90B4
 	for <lists+kvm@lfdr.de>; Fri, 27 Aug 2021 01:00:56 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243778AbhHZW2D (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 26 Aug 2021 18:28:03 -0400
-Received: from mail-dm6nam11hn2225.outbound.protection.outlook.com ([52.100.172.225]:47361
+        id S243790AbhHZW2E (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 26 Aug 2021 18:28:04 -0400
+Received: from mail-dm6nam11hn2210.outbound.protection.outlook.com ([52.100.172.210]:54368
         "EHLO NAM11-DM6-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S243764AbhHZW2C (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 26 Aug 2021 18:28:02 -0400
+        id S243764AbhHZW2D (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 26 Aug 2021 18:28:03 -0400
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=eepTJ0F8KtgqoF1p4sz2khFvqkS46aNyj3gKN+BD8rW1GloapfOdIAecIW7DEULGkpBegA25Z6WbP2AFp861C7oskWD7ByjeBiIki1zVSD4i6r2RVKGxJ/LUH1T6FrmaAl/TJrlAqPNcXcZ5GHyyIjz5fdDMZycP1I48hT5/pPR1vLo32QpZJOKfRi/bFFsGHtk2b4bCpEMs2bqlBjoJs2ALk0m8fYLgKUKKi1AhR7NObn41lCvQexf9S4pkv5ERtNn5jzg9+WCMo4Iw5UGbsFvY5n80ODyuRu+TG9eB4ozuKvK+/WSSKUzyrAxXc8iBiE7qPm6DrBrqT9gZhQoHDg==
+ b=HN1iLeJAaPoQsdojU21/liyShiO6koabel459X/QiN3buNHmdwGVDZv3tbLZ2pTWfMojJOsws/G0kcWGD+ToGhYtluY9/3jpsyNtdDhF2wuJPGAJC2Ie2+cKkdsTwevUW3urDNZwsDYYcIV5YKCVWmNshifG3JZBfsZitN+C4laPlT4dR3p8WDG8U9oCP7QUiyFOOctApdYireOThwBWCvi6tECHjjkSAA9ZioUkN22D+uddElneXtaqVbkQSBVt5mGrM1s8/geusM9stg7Zlph7KSQRRd2Eyeb9j7ENvSlTjAzEfxhnFWMlk93+W91ZlzQIl+rCeFd8jXV6FaGrrQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=+COgJlQSZtZ2EaaufkaqxyCvux1xLYqGTWWciI8S6lI=;
- b=Ads0Pi9Rme27nhUdvMlNVH4RMLRaaYzlzXHQ45Bi5Ppwm/uJEaQkvmGja5xQJF/Bd+MwqB1cCQYvlm3ees8kF0YLk6YOlaTuViQKrOXblQQmlGC94k2sdbHwDlbUDkiFtlGg46L7lfZXTJjkZwJzA9y0xHJQWzbhNrZFX5khc/2ghI+vipdyvOzz7xD+gmTJEAC+Eer4HvLg5ag9SuOQ6cU/EonHiZEk533nIKF6W/BVe8RgimYI53U/R0Y5u9BOJhvu1RKGYTkzDcSUADZt+NFdwbDOT9BI8xg9bxoRV1khTbH3vN6yXq9dtmhJVR0/m/aKcKqPDwxv/B4SgFpmmA==
+ bh=8/wkLwzfkOgt/2bG/cujvUbHRaOsA55eoytZuC+4wqA=;
+ b=ZCVBULMRwYhtx8owbPBgJYnCEKmoxf/q1BFvdr0QyLst54qSNBBYD8VUQJEluPRyjpCsDX7mNKzc6vNm9GXJpiAOLmui8dkv+YVAbyzQfrUBR91Pbp1sN/8G6Zxjg+oBxks9sucw2CcGeNjqDQNp4HjxsNbOH9QxlfPwgnLM+ZGXbhB9t5UYsz1LEqPuTP6n4eiHo0fD6BjI9XMCdSMjAa5LXCNP2jzGxv8c+gmQp5IOaR1TlbBk+ze5PbJGZeBtbtAXV7Da/hOMsbQh2PxN0hnL6ibDCdjJua4C5hosAhVlNaOS2F8JuKdKFrFVpTD+foospqkBu25Gx2wLRPrxIg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
  header.d=amd.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=+COgJlQSZtZ2EaaufkaqxyCvux1xLYqGTWWciI8S6lI=;
- b=ZItGjn89110ye/3VL6VHw/S27lHvIsSXSw+exDIsME2Lfti9jgyTaIPOXrI2zTkGtXljK/WXZKqa8p8xNgUVnMKKrQi+oAGwbDKW/QNcG63ZkFbP8iO23tyR30Cs9NGiw0Oz1V6+kKJ6Iz+e7x8M5CitEUXgUKskq5zJBOBhA6M=
+ bh=8/wkLwzfkOgt/2bG/cujvUbHRaOsA55eoytZuC+4wqA=;
+ b=aRA4I+MtPiLFIIlPruY+yas3xlgGOuFsypUk/zW7MjjfxMuuKp2JO1+0eOdMyt5yuU6sc0jUIjUfMvGl2f5dmpCY/RJ+4DiINxjebpit4lo1cZYdGFhmZ3Ascbz+ldGbmPQPHJCkncsuRfXSHigRppO8RWy+3A/uwCYehq/9+2Y=
 Authentication-Results: nongnu.org; dkim=none (message not signed)
  header.d=none;nongnu.org; dmarc=none action=none header.from=amd.com;
 Received: from CH2PR12MB4133.namprd12.prod.outlook.com (2603:10b6:610:7a::13)
  by CH2PR12MB3925.namprd12.prod.outlook.com (2603:10b6:610:21::22) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4436.22; Thu, 26 Aug
- 2021 22:27:12 +0000
+ 2021 22:27:14 +0000
 Received: from CH2PR12MB4133.namprd12.prod.outlook.com
  ([fe80::d19e:b657:5259:24d0]) by CH2PR12MB4133.namprd12.prod.outlook.com
  ([fe80::d19e:b657:5259:24d0%8]) with mapi id 15.20.4436.019; Thu, 26 Aug 2021
- 22:27:12 +0000
+ 22:27:14 +0000
 From:   Michael Roth <michael.roth@amd.com>
 To:     qemu-devel@nongnu.org
 Cc:     Connor Kuehl <ckuehl@redhat.com>,
@@ -53,275 +53,308 @@ Cc:     Connor Kuehl <ckuehl@redhat.com>,
         Brijesh Singh <brijesh.singh@amd.com>,
         Markus Armbruster <armbru@redhat.com>,
         Eric Blake <eblake@redhat.com>
-Subject: [RFC PATCH v2 11/12] i386/sev: sev-snp: add support for CPUID validation
-Date:   Thu, 26 Aug 2021 17:26:26 -0500
-Message-Id: <20210826222627.3556-12-michael.roth@amd.com>
+Subject: [RFC PATCH v2 12/12] i386/sev: update query-sev QAPI format to handle SEV-SNP
+Date:   Thu, 26 Aug 2021 17:26:27 -0500
+Message-Id: <20210826222627.3556-13-michael.roth@amd.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20210826222627.3556-1-michael.roth@amd.com>
 References: <20210826222627.3556-1-michael.roth@amd.com>
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-ClientProxiedBy: SA0PR11CA0067.namprd11.prod.outlook.com
- (2603:10b6:806:d2::12) To CH2PR12MB4133.namprd12.prod.outlook.com
+X-ClientProxiedBy: SA0PR11CA0082.namprd11.prod.outlook.com
+ (2603:10b6:806:d2::27) To CH2PR12MB4133.namprd12.prod.outlook.com
  (2603:10b6:610:7a::13)
 MIME-Version: 1.0
 X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from localhost (165.204.77.1) by SA0PR11CA0067.namprd11.prod.outlook.com (2603:10b6:806:d2::12) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4457.18 via Frontend Transport; Thu, 26 Aug 2021 22:27:12 +0000
+Received: from localhost (165.204.77.1) by SA0PR11CA0082.namprd11.prod.outlook.com (2603:10b6:806:d2::27) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4457.18 via Frontend Transport; Thu, 26 Aug 2021 22:27:14 +0000
 X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: beb8c79a-92ba-4a13-5634-08d968e0a691
+X-MS-Office365-Filtering-Correlation-Id: 5682fe39-3908-4abd-bdb5-08d968e0a78e
 X-MS-TrafficTypeDiagnostic: CH2PR12MB3925:
 X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <CH2PR12MB39252410E2058E4282FA860F95C79@CH2PR12MB3925.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:2449;
+X-Microsoft-Antispam-PRVS: <CH2PR12MB39257B7A08A53616734920A095C79@CH2PR12MB3925.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:1091;
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: =?us-ascii?Q?DmiEU9wagF08pitKrB5IyLy9D44adZbmzX8Smbq+71yAP4KU2syh/9wUOfrO?=
- =?us-ascii?Q?z9GNYIeqXGN50vMYIzl7maSXidjwbXR9qwoCL7TUokX5YN60yLrLwjNOR7nh?=
- =?us-ascii?Q?7OVQ9e0vEQyB+QvA1dVXsPIUcuZ614ZS4Q0RCbEUtvnyZtmC+G9RpMybmMbJ?=
- =?us-ascii?Q?WlFq/kQ84toocPspwcLXkexFPFYh3fxJ+0m700kRJkMLp8apW+S9EWfQ1kB7?=
- =?us-ascii?Q?rDd+P67g8gIWZ3qsZis4chfVLLFVzTTHlSMVGOnN/R83ixrb5Fuh9WF1u1KX?=
- =?us-ascii?Q?gbLb6mMImrhPrOgh6GS72mM3d2lU74NiESilxrbKqj54TwMGkZnLOpyhoh5k?=
- =?us-ascii?Q?J1B5xM2Ui4pnrWnL5LlcBl6HQw5GTdlV8pnzXs+10d5EhYBEt45IP1/1ylDC?=
- =?us-ascii?Q?V+YBGiFGPLasq3MYPK+IwKjCnTcSJ9EGWLmhWmkon2gYIJ1N3YKurBUD9YxU?=
- =?us-ascii?Q?U8/ygUUdsmYKHqqdlxwNQYVVhah/Ta1sGW/A3JA1mPbcU1vTIjlEuYyP7rTo?=
- =?us-ascii?Q?WYaMdWJFbbYVgb669o7ukR+fLzjNX9yYs5XIayMi/kWlMHHx8jYeuLPeyuPD?=
- =?us-ascii?Q?FUqvrcI/13EO6vcu1D+hQrZ3VFId/Lv4l2iZNtKhlEVYvuYNIFR2i38dshTf?=
- =?us-ascii?Q?in1mcWV3YllGm0c073QgDkyptbee4kx2TEfZJYzbsSIL1Ha8Is2PKPoax2T/?=
- =?us-ascii?Q?2ggbCEZttc1U1GatEPGWWS1FBTorCsY3I836TITfXYayEgUjmm4TXSG8jysi?=
- =?us-ascii?Q?SX8YrpZa4MpRcqud21oPqpxzDiC96Vraj5JwjvFJc/xx3Nl4psiNiMonU70g?=
- =?us-ascii?Q?+xuKgfG4t56NBR/nNWsJrak6Bm0Fucc7rKl3SGQi19+w6+/uza8mC4LDSnqM?=
- =?us-ascii?Q?rDEMT25cGoff5w7umBHDQ96kUXfoQqVlLXCInUooxCiUxc1RMJy6HDDfQod9?=
- =?us-ascii?Q?Gg4V7mXmeVZ40cm8dnJqgJ38vk2joJuChXVfWrHyW/Fbiadk835TXMEKPSjY?=
- =?us-ascii?Q?ZmGfbonzI4FBysiMI7RjSbnOz+BU/peWsS63FMtcbBV1Vnk=3D?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:5;SRV:;IPV:NLI;SFV:SPM;H:CH2PR12MB4133.namprd12.prod.outlook.com;PTR:;CAT:OSPM;SFS:(4636009)(376002)(396003)(346002)(136003)(39860400002)(366004)(8676002)(38350700002)(66476007)(38100700002)(956004)(2616005)(6666004)(66556008)(83380400001)(186003)(6916009)(478600001)(36756003)(316002)(4326008)(44832011)(54906003)(66946007)(52116002)(6496006)(2906002)(86362001)(1076003)(6486002)(5660300002)(7416002)(8936002)(26005)(23200700001);DIR:OUT;SFP:1501;
+X-Microsoft-Antispam-Message-Info: =?us-ascii?Q?6A4VcQp/oSFycSxY7pSffXkaQZQRZ2bhRkpquDlfXXRkFYQHrKOtk+JW9rE2?=
+ =?us-ascii?Q?yGuq7+mElcJrPw/ae72KZ3kfPCykQ6wUJqm7QR7lKLPu5NSq6NWQY8QdGcPH?=
+ =?us-ascii?Q?GS+FXWlkwDkAfMUMN2hQN1aIOwyvr8ewKGLoP+JujL6wXO1kpXxwsQrZ4B83?=
+ =?us-ascii?Q?Hfh6DVm52oBlz5TD+7yrz+RXCwSZX3sq4lTqXquJp/hcus6i58ldEP7zstAa?=
+ =?us-ascii?Q?K1Y94XueOBHKIjxs0DkvB+s0trP34MImbh/FO+rOmi4qj/+z8zhix7Fi0uwZ?=
+ =?us-ascii?Q?hA9vLr96bZJHMBEDCdb0yJBCCCK8PHsE7iT41OJn/VMWXv167KVTmmE5Q3g2?=
+ =?us-ascii?Q?gbkct56JhdLeBnrc3nDCdsKbRjjbRp5NNn6gjg0ori7bH7beUg0tj3zilARJ?=
+ =?us-ascii?Q?/atD1xVVP9rx1tHE2o2Up/dHEKCx0dp3ufDgkQmT6R7Cr95x17OY1KD3vcxU?=
+ =?us-ascii?Q?2AF/RrXAuYfnVDMTOzNU08PqAlwmoFpDRLrVGl+jClL4BTXGEx4RrZgE8Fvd?=
+ =?us-ascii?Q?AKbQkVgu54QPbcUpOxgzaVdr/vcYKBgdQgDg+GwYwD7DgcUecO83qKBzk40J?=
+ =?us-ascii?Q?sMfn+f6R3htAJjjf4d7zkjTT5NJa/KaJkoHlg/Ir7ndDdypkdvvEfLFoJME0?=
+ =?us-ascii?Q?V7R0UVuy8ob8BwiRKm4jwyqYPGYuIrGxsorTMXbytl7uTX52+7wLiCTLCmeq?=
+ =?us-ascii?Q?TUK9yYh2s5ilmNJ6i3OsdOXv1o1my4GNJE1hyhLTrEJov37lsKi64nwfbMno?=
+ =?us-ascii?Q?uGRVBnTC8Ed7OcKZ2cNd2UUJ7fh2WbxZwcQuFp0m4jBf93ss74PV50NuMAVu?=
+ =?us-ascii?Q?tQmmcXmenf7PnxQx4ax+u8UWRWVGgYANX2TFgFVnmBtYMouxo/xnmgnd57CG?=
+ =?us-ascii?Q?CHFvuwlUtKS+MlOkSY5sU2vAT2co9NewoA+Rn01oSsU72eSfWU6D37H9vgUo?=
+ =?us-ascii?Q?TVbutNy1qaQiQw45TMtYDGqW7gukgWSSmrBdYJK5ylBNBMl4rJgETd8qnIVe?=
+ =?us-ascii?Q?O9PCcXuh8msICpJq6yeLmbf7dtsE4hbRkphcd0/qHLFDkng=3D?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:5;SRV:;IPV:NLI;SFV:SPM;H:CH2PR12MB4133.namprd12.prod.outlook.com;PTR:;CAT:OSPM;SFS:(4636009)(376002)(396003)(346002)(136003)(39860400002)(366004)(8676002)(38350700002)(66476007)(38100700002)(956004)(2616005)(6666004)(66556008)(83380400001)(186003)(6916009)(478600001)(36756003)(316002)(4326008)(44832011)(54906003)(66946007)(52116002)(6496006)(2906002)(86362001)(1076003)(6486002)(5660300002)(7416002)(8936002)(26005)(15650500001)(23200700001);DIR:OUT;SFP:1501;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?xT5c+HdCyVNtJC2Zkr6TF7fKW/cnK8ezw9xICV+giJ04TozLrZbb+ssSUr5h?=
- =?us-ascii?Q?QI4vCV27mpFMCwLjvO+2ToqCOxnaoqrlTNYjPQ3sjHsO4albWgIQnfLahnL2?=
- =?us-ascii?Q?vxQZx51dQ3BD0jsK09KWL2/BaoOXZnEZMsmHSvGAN8iuGN0JmwuArM7QJ85j?=
- =?us-ascii?Q?qRnrAfzhGkjrXalaVWmQUWrxuO4qpLDpNqDvwh/AW9fycsgq5R6BXOLlhcWb?=
- =?us-ascii?Q?kkUjIl234EWFcfZCKQtd4XOeqwjaeQtSsG9goxG0xKH7D57KAM0vI6f2tvqZ?=
- =?us-ascii?Q?8TepC17Ow2Y4N5/WUPyOZOwixkq34pYX7FR6FshdE+zR/IklCQByNyylP7qu?=
- =?us-ascii?Q?GX4e7+kmWZpqgtLDpiU9CEuJ+13easBtYWNhLdsX39yBoJ8+uWB9oKSrKlAE?=
- =?us-ascii?Q?S+G/bLG6E8eET8vXCrxtQJwxIbIexD7ioNDMik47fc6Wzs188eSbqhtIUKlV?=
- =?us-ascii?Q?kcGikPwD+hdldiqX5kZ7UpOkbaJ7wyyUboUzwZQUvLtDy+tOUwnCqmPNI6qA?=
- =?us-ascii?Q?5g1GodxRCV7SOOUDWLtyd3i1NG26mXnHDrOpQVcmkyoF5XLs0D+Mwh60Cwjl?=
- =?us-ascii?Q?fdRGEo1xR2iEDPWxFJJmAKV9095t1nntTYxcJ6NlRDxy6ANSqv/lunU/NhfI?=
- =?us-ascii?Q?bRYFFLd+GFF8TcMi+qf0GRG4vz4PkOyR8EdOTBnD6A5Fa6dKpf+28pK7trUL?=
- =?us-ascii?Q?QAz/oaurSfWCylzutvck6aP08cUE//1TRbKbwwVH+/8JwFMvZepYiI612H3n?=
- =?us-ascii?Q?KwON6QQc4IXcOus2dYoWxzDsRv2RLps550SBPAf7ddksIQbE2qAXuGEfn2Be?=
- =?us-ascii?Q?2LyxqshbI0+cxfVQIb0KjOcjbIhWYoV0LNg3M+NwyExOTEU9BaPMC+HmqemK?=
- =?us-ascii?Q?9FgKVWPbbOxeAcIYcAy4hkg6kXkd7kGlWXLhdjYXMelR2jBSnS24P5OUGBZ5?=
- =?us-ascii?Q?sagK+MgoG419WnjOdHN5oGw/tkYUcQY26undg3cNdjA9oYpmHBOMwNI57r/k?=
- =?us-ascii?Q?BqMZPcQ7fsxCtI5pt27OicdTsNVIo+CcguswZjdSzgCS1WWeyIR+tPst6d9y?=
- =?us-ascii?Q?12LvWeLx77dew25pGA/HNTp7isp0B/3h7iq7gnZXK14QVroYn/YKyZ3AiIaZ?=
- =?us-ascii?Q?6GN7aCwAIWIWTrQv2xWNMu+CxpENY5UTRQ2wZIUa6u0b95tOTmj18LMFOwUH?=
- =?us-ascii?Q?FUSKK9Wv6QtvXfM63tpp/CaiZNuNxMP+vhrAwcGYEyxKosv0lcDFfrw1RAgg?=
- =?us-ascii?Q?Q02xpE8EaA+LMVKMqqS/BWMbZxRq9diWjTNhL9O44l6kKVXacVn0Ss1Y9qcF?=
- =?us-ascii?Q?41gwdAc0q8Yhh6YJqeuE/ZF3?=
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?HYlvLfs+4hRx6MWMDCOVMFiWlZe7riTGugsciDzMw0I1YPf9B3Drhvlnnkoq?=
+ =?us-ascii?Q?6KXlkPnqWFvGFnQy8ML6IM0O+N8ITxyGAqWXjqhOU/Jq1qkf2l3t2VZ8RbU8?=
+ =?us-ascii?Q?NlxSFYxkL8er969HMq4WtC8+0Cc3PMduKyx2BbY3u1jOCUI6ZfgIz8dbO/Eu?=
+ =?us-ascii?Q?3jyAe3V4FZFC/1bzOZUgU8sksW6Vle2xmCXH81o9PcLG4/LLHzrkR3fkNons?=
+ =?us-ascii?Q?fnOBJygBpP/4rtaOzchDbTfb3NYcd+KMifluft5wVP6cMeGar07k69APj3fM?=
+ =?us-ascii?Q?B+mG+9pG87H6BiYyfm+TIp6/gBlwIMijUTrVT1bKjwUrJkZfcs14/1ibFVUL?=
+ =?us-ascii?Q?xu3NoBS2/zDdQmVSOD8qblchepYCvZ2TNG6kzc9IOl6A83JAD/gUmNAZ6+BA?=
+ =?us-ascii?Q?X/8RpPzrrM+2OCAUQkb9lBCnmAzNoo1vckIdBqe0cML/wajzQnbkCOehyrFS?=
+ =?us-ascii?Q?LJgDCc/+b+5729xbhvpRuwQW9g/yWS9I8+zClyFBGwwJO3brAiV4s+Qj8dLb?=
+ =?us-ascii?Q?NcJlygoBKf0Pvs6ZNVfRabhOgkJxLnY/7qARNHAB3dVzSDDcdRgY2mixnSyD?=
+ =?us-ascii?Q?ndskBqAP3SoX9laaIULXjx5bqt4zxaHKSCmz1Lt3VoYzb1do3H/HcvfB+DYy?=
+ =?us-ascii?Q?EHYxmeYrMSXs3i+0gL/NZEcv9nX0gQt/m/muD+6uuW646xMeO7w8/mpZBDHF?=
+ =?us-ascii?Q?dEiZke60dnT8l3O6eZtxcyciilpAmYRaQ7+VcALFj4U2GQBpeKitnOuVOks1?=
+ =?us-ascii?Q?pO4Ez0NhFbAHh5Cy9F1nTH57REUnVcAba74+CofaYHqb8tmfkQrbZYhOxto5?=
+ =?us-ascii?Q?LXDb6fZBw2qf1gOhqNmEjk8FpG3TcwqUSk69KoH+7MlkgtzDsx+S1oXtkEJJ?=
+ =?us-ascii?Q?XHAZ0eX8eZF4chPJ1Q/3kjrP+wmGFoWZdAu2LvY0azoTRZOkc2HwER87YuNQ?=
+ =?us-ascii?Q?0zzwx2OxmYlLmg2pRyrnKO7JwgLmPg+Bl4koY1n3uWwwzJYnPVqHeu+Zv8qR?=
+ =?us-ascii?Q?2RV59FDk98cVtL2QIjg5cgw2x/pBH/6EljNXETZ9oWtGzHaFQic00OYThEq9?=
+ =?us-ascii?Q?yMuOenSwVZddt+O8VBadZouovxBmZ0E63hrVXNNQj+Rx5fYIM3smrjzi6zqN?=
+ =?us-ascii?Q?E8JVAJj2pwPMSsgBGaWDtkC0WkmvtOlu6dEPQHhFtQG/MLtx33+imDCWBO5M?=
+ =?us-ascii?Q?e/lfrPPzPw0QPIMX2sIEvNk5Ab89CjZ6BwNpC8q1ZZs9HWGgUkrInlyaNXzk?=
+ =?us-ascii?Q?hJ/Hn77E1KwI9b2D/xzhIgPZBl8nkWTWwcCLq+v1/SNGRy5Y3p+EwRfVQZ1v?=
+ =?us-ascii?Q?BaCVD9r/W7YZA//ZOngP5AmI?=
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: beb8c79a-92ba-4a13-5634-08d968e0a691
+X-MS-Exchange-CrossTenant-Network-Message-Id: 5682fe39-3908-4abd-bdb5-08d968e0a78e
 X-MS-Exchange-CrossTenant-AuthSource: CH2PR12MB4133.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 Aug 2021 22:27:12.7445
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 Aug 2021 22:27:14.4441
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: uncT576zmPbhUxKqixaYgU2cEArhT6MPhVXozUaxAITs7R2Ac5xhmSPAhiPrmkpFqmb0cgo6UF4ZPVHVx+JI4Q==
+X-MS-Exchange-CrossTenant-UserPrincipalName: bm+ZOJRI499a0Nvk3qxYqik/smfyARx7SOLZrA4OvBK7VFOMvnWUuU1OO8aIfL2oOczSOZiGCVQNp3KCc37LQA==
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH2PR12MB3925
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-SEV-SNP firmware allows a special guest page to be populated with a
-table of guest CPUID values so that they can be validated through
-firmware before being loaded into encrypted guest memory where they can
-be used in place of hypervisor-provided values[1].
+Most of the current 'query-sev' command is relevant to both legacy
+SEV/SEV-ES guests and SEV-SNP guests, with 2 exceptions:
 
-As part of SEV-SNP guest initialization, use this process to validate
-the CPUID entries reported by KVM_GET_CPUID2 prior to initial guest
-start.
+  - 'policy' is a 64-bit field for SEV-SNP, not 32-bit, and
+    the meaning of the bit positions has changed
+  - 'handle' is not relevant to SEV-SNP
 
-[1]: SEV SNP Firmware ABI Specification, Rev. 0.8, 8.13.2.6
+To address this, this patch adds a new 'sev-type' field that can be
+used as a discriminator to select between SEV and SEV-SNP-specific
+fields/formats without breaking compatibility for existing management
+tools (so long as management tools that add support for launching
+SEV-SNP guest update their handling of query-sev appropriately).
+
+The corresponding HMP command has also been fixed up similarly.
 
 Signed-off-by: Michael Roth <michael.roth@amd.com>
 ---
- target/i386/sev.c | 146 +++++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 143 insertions(+), 3 deletions(-)
+ qapi/misc-target.json  | 71 +++++++++++++++++++++++++++++++++---------
+ target/i386/monitor.c  | 29 +++++++++++++----
+ target/i386/sev.c      | 22 +++++++------
+ target/i386/sev_i386.h |  3 ++
+ 4 files changed, 95 insertions(+), 30 deletions(-)
 
-diff --git a/target/i386/sev.c b/target/i386/sev.c
-index 0009c93d28..72a6146295 100644
---- a/target/i386/sev.c
-+++ b/target/i386/sev.c
-@@ -153,6 +153,36 @@ static const char *const sev_fw_errlist[] = {
+diff --git a/qapi/misc-target.json b/qapi/misc-target.json
+index 3b05ad3dbf..80f994ff9b 100644
+--- a/qapi/misc-target.json
++++ b/qapi/misc-target.json
+@@ -81,6 +81,49 @@
+            'send-update', 'receive-update' ],
+   'if': 'TARGET_I386' }
  
- #define SEV_FW_MAX_ERROR      ARRAY_SIZE(sev_fw_errlist)
++##
++# @SevGuestType:
++#
++# An enumeration indicating the type of SEV guest being run.
++#
++# @sev:     The guest is a legacy SEV or SEV-ES guest.
++# @sev-snp: The guest is an SEV-SNP guest.
++#
++# Since: 6.2
++##
++{ 'enum': 'SevGuestType',
++  'data': [ 'sev', 'sev-snp' ],
++  'if': 'TARGET_I386' }
++
++##
++# @SevGuestInfo:
++#
++# Information specific to legacy SEV/SEV-ES guests.
++#
++# @policy: SEV policy value
++#
++# @handle: SEV firmware handle
++#
++# Since: 2.12
++##
++{ 'struct': 'SevGuestInfo',
++  'data': { 'policy': 'uint32',
++            'handle': 'uint32' },
++  'if': 'TARGET_I386' }
++
++##
++# @SevSnpGuestInfo:
++#
++# Information specific to SEV-SNP guests.
++#
++# @policy: SEV-SNP policy value
++#
++# Since: 6.2
++##
++{ 'struct': 'SevSnpGuestInfo',
++  'data': { 'policy': 'uint64' },
++  'if': 'TARGET_I386' }
++
+ ##
+ # @SevInfo:
+ #
+@@ -94,25 +137,25 @@
+ #
+ # @build-id: SEV FW build id
+ #
+-# @policy: SEV policy value
+-#
+ # @state: SEV guest state
+ #
+-# @handle: SEV firmware handle
++# @sev-type: Type of SEV guest being run
+ #
+ # Since: 2.12
+ ##
+-{ 'struct': 'SevInfo',
+-    'data': { 'enabled': 'bool',
+-              'api-major': 'uint8',
+-              'api-minor' : 'uint8',
+-              'build-id' : 'uint8',
+-              'policy' : 'uint32',
+-              'state' : 'SevState',
+-              'handle' : 'uint32'
+-            },
+-  'if': 'TARGET_I386'
+-}
++{ 'union': 'SevInfo',
++  'base': { 'enabled': 'bool',
++            'api-major': 'uint8',
++            'api-minor' : 'uint8',
++            'build-id' : 'uint8',
++            'state' : 'SevState',
++            'sev-type' : 'SevGuestType' },
++  'discriminator': 'sev-type',
++  'data': {
++      'sev': 'SevGuestInfo',
++      'sev-snp': 'SevSnpGuestInfo' },
++  'if': 'TARGET_I386' }
++
  
-+/* <linux/kvm.h> doesn't expose this, so re-use the max from kvm.c */
-+#define KVM_MAX_CPUID_ENTRIES 100
-+
-+typedef struct KvmCpuidInfo {
-+    struct kvm_cpuid2 cpuid;
-+    struct kvm_cpuid_entry2 entries[KVM_MAX_CPUID_ENTRIES];
-+} KvmCpuidInfo;
-+
-+#define SNP_CPUID_FUNCTION_MAXCOUNT 64
-+#define SNP_CPUID_FUNCTION_UNKNOWN 0xFFFFFFFF
-+
-+typedef struct {
-+    uint32_t eax_in;
-+    uint32_t ecx_in;
-+    uint64_t xcr0_in;
-+    uint64_t xss_in;
-+    uint32_t eax;
-+    uint32_t ebx;
-+    uint32_t ecx;
-+    uint32_t edx;
-+    uint64_t reserved;
-+} __attribute__((packed)) SnpCpuidFunc;
-+
-+typedef struct {
-+    uint32_t count;
-+    uint32_t reserved1;
-+    uint64_t reserved2;
-+    SnpCpuidFunc entries[SNP_CPUID_FUNCTION_MAXCOUNT];
-+} __attribute__((packed)) SnpCpuidInfo;
-+
- static int
- sev_ioctl(int fd, int cmd, void *data, int *error)
+ ##
+ # @query-sev:
+diff --git a/target/i386/monitor.c b/target/i386/monitor.c
+index 119211f0b0..85a8bc2bef 100644
+--- a/target/i386/monitor.c
++++ b/target/i386/monitor.c
+@@ -692,20 +692,37 @@ void hmp_info_sev(Monitor *mon, const QDict *qdict)
  {
-@@ -1141,6 +1171,117 @@ detect_first_overlap(uint64_t start, uint64_t end, Range *range_list,
-     return overlap;
+     SevInfo *info = sev_get_info();
+ 
+-    if (info && info->enabled) {
+-        monitor_printf(mon, "handle: %d\n", info->handle);
++    if (!info || !info->enabled) {
++        monitor_printf(mon, "SEV is not enabled\n");
++        goto out;
++    }
++
++    if (sev_snp_enabled()) {
+         monitor_printf(mon, "state: %s\n", SevState_str(info->state));
+         monitor_printf(mon, "build: %d\n", info->build_id);
+         monitor_printf(mon, "api version: %d.%d\n",
+                        info->api_major, info->api_minor);
+         monitor_printf(mon, "debug: %s\n",
+-                       info->policy & SEV_POLICY_NODBG ? "off" : "on");
+-        monitor_printf(mon, "key-sharing: %s\n",
+-                       info->policy & SEV_POLICY_NOKS ? "off" : "on");
++                       info->u.sev_snp.policy & SEV_SNP_POLICY_DBG ? "on"
++                                                                   : "off");
++        monitor_printf(mon, "SMT allowed: %s\n",
++                       info->u.sev_snp.policy & SEV_SNP_POLICY_SMT ? "on"
++                                                                   : "off");
++        monitor_printf(mon, "SEV type: %s\n", SevGuestType_str(info->sev_type));
+     } else {
+-        monitor_printf(mon, "SEV is not enabled\n");
++        monitor_printf(mon, "handle: %d\n", info->u.sev.handle);
++        monitor_printf(mon, "state: %s\n", SevState_str(info->state));
++        monitor_printf(mon, "build: %d\n", info->build_id);
++        monitor_printf(mon, "api version: %d.%d\n",
++                       info->api_major, info->api_minor);
++        monitor_printf(mon, "debug: %s\n",
++                       info->u.sev.policy & SEV_POLICY_NODBG ? "off" : "on");
++        monitor_printf(mon, "key-sharing: %s\n",
++                       info->u.sev.policy & SEV_POLICY_NOKS ? "off" : "on");
++        monitor_printf(mon, "SEV type: %s\n", SevGuestType_str(info->sev_type));
+     }
+ 
++out:
+     qapi_free_SevInfo(info);
  }
  
-+static int
-+sev_snp_cpuid_info_fill(SnpCpuidInfo *snp_cpuid_info,
-+                        const KvmCpuidInfo *kvm_cpuid_info)
-+{
-+    size_t i;
-+
-+    memset(snp_cpuid_info, 0, sizeof(*snp_cpuid_info));
-+
-+    for (i = 0; kvm_cpuid_info->entries[i].function != 0xFFFFFFFF; i++) {
-+        const struct kvm_cpuid_entry2 *kvm_cpuid_entry;
-+        SnpCpuidFunc *snp_cpuid_entry;
-+
-+        kvm_cpuid_entry = &kvm_cpuid_info->entries[i];
-+        snp_cpuid_entry = &snp_cpuid_info->entries[i];
-+
-+        snp_cpuid_entry->eax_in = kvm_cpuid_entry->function;
-+        if (kvm_cpuid_entry->flags == KVM_CPUID_FLAG_SIGNIFCANT_INDEX) {
-+            snp_cpuid_entry->ecx_in = kvm_cpuid_entry->index;
-+        }
-+        snp_cpuid_entry->eax = kvm_cpuid_entry->eax;
-+        snp_cpuid_entry->ebx = kvm_cpuid_entry->ebx;
-+        snp_cpuid_entry->ecx = kvm_cpuid_entry->ecx;
-+        snp_cpuid_entry->edx = kvm_cpuid_entry->edx;
-+
-+        if (snp_cpuid_entry->eax_in == 0xD &&
-+            (snp_cpuid_entry->ecx_in == 0x0 || snp_cpuid_entry->ecx_in == 0x1)) {
-+            snp_cpuid_entry->ebx = 0x240;
-+        }
-+    }
-+
-+    if (i > SNP_CPUID_FUNCTION_MAXCOUNT) {
-+        error_report("SEV-SNP: CPUID count '%lu' exceeds max '%u'",
-+                     i, SNP_CPUID_FUNCTION_MAXCOUNT);
-+        return -1;
-+    }
-+
-+    snp_cpuid_info->count = i;
-+
-+    return 0;
-+}
-+
-+static void
-+sev_snp_cpuid_report_mismatches(SnpCpuidInfo *old,
-+                                SnpCpuidInfo *new)
-+{
-+    size_t i;
-+
-+    for (i = 0; i < old->count; i++) {
-+        SnpCpuidFunc *old_func, *new_func;
-+
-+        old_func = &old->entries[i];
-+        new_func = &new->entries[i];
-+
-+        if (memcmp(old_func, new_func, sizeof(SnpCpuidFunc))) {
-+            error_report("SEV-SNP: CPUID validation failed for function %x, index: %x.\n"
-+                         "provided: eax:0x%08x, ebx: 0x%08x, ecx: 0x%08x, edx: 0x%08x\n"
-+                         "expected: eax:0x%08x, ebx: 0x%08x, ecx: 0x%08x, edx: 0x%08x",
-+                         old_func->eax_in, old_func->ecx_in,
-+                         old_func->eax, old_func->ebx, old_func->ecx, old_func->edx,
-+                         new_func->eax, new_func->ebx, new_func->ecx, new_func->edx);
-+        }
-+    }
-+}
-+
-+static int
-+sev_snp_launch_update_cpuid(uint32_t cpuid_addr, uint32_t cpuid_len)
-+{
-+    KvmCpuidInfo kvm_cpuid_info;
-+    SnpCpuidInfo snp_cpuid_info;
-+    CPUState *cs = first_cpu;
-+    MemoryRegion *mr = NULL;
-+    void *snp_cpuid_hva;
-+    int ret;
-+
-+    snp_cpuid_hva = gpa2hva(&mr, cpuid_addr, cpuid_len, NULL);
-+    if (!snp_cpuid_hva) {
-+        error_report("SEV-SNP: unable to access CPUID memory range at GPA %d",
-+                     cpuid_addr);
-+        return 1;
-+    }
-+
-+    /* get the cpuid list from KVM */
-+    memset(&kvm_cpuid_info.entries, 0xFF,
-+           KVM_MAX_CPUID_ENTRIES * sizeof(struct kvm_cpuid_entry2));
-+    kvm_cpuid_info.cpuid.nent = KVM_MAX_CPUID_ENTRIES;
-+
-+    ret = kvm_vcpu_ioctl(cs, KVM_GET_CPUID2, &kvm_cpuid_info);
-+    if (ret) {
-+        error_report("SEV-SNP: unable to query CPUID values for CPU: '%s'",
-+                     strerror(-ret));
-+    }
-+
-+    ret = sev_snp_cpuid_info_fill(&snp_cpuid_info, &kvm_cpuid_info);
-+    if (ret) {
-+        error_report("SEV-SNP: failed to generate CPUID table information");
-+        exit(1);
-+    }
-+
-+    memcpy(snp_cpuid_hva, &snp_cpuid_info, sizeof(snp_cpuid_info));
-+
-+    ret = sev_snp_launch_update_gpa(cpuid_addr, cpuid_len,
-+                                    KVM_SEV_SNP_PAGE_TYPE_CPUID);
-+    if (ret) {
-+        sev_snp_cpuid_report_mismatches(&snp_cpuid_info, snp_cpuid_hva);
-+        error_report("SEV-SNP: failed update CPUID page");
-+        exit(1);
-+    }
-+
-+    return 0;
-+}
-+
- static void snp_ovmf_boot_block_setup(void)
+diff --git a/target/i386/sev.c b/target/i386/sev.c
+index 72a6146295..fac2755e68 100644
+--- a/target/i386/sev.c
++++ b/target/i386/sev.c
+@@ -704,25 +704,27 @@ sev_get_info(void)
  {
-     SevSnpBootInfoBlock *info;
-@@ -1176,10 +1317,9 @@ static void snp_ovmf_boot_block_setup(void)
+     SevInfo *info;
+     SevCommonState *sev_common = SEV_COMMON(MACHINE(qdev_get_machine())->cgs);
+-    SevGuestState *sev_guest =
+-        (SevGuestState *)object_dynamic_cast(OBJECT(sev_common),
+-                                             TYPE_SEV_GUEST);
+ 
+     info = g_new0(SevInfo, 1);
+     info->enabled = sev_enabled();
+ 
+     if (info->enabled) {
+-        if (sev_guest) {
+-            info->handle = sev_guest->handle;
+-        }
+         info->api_major = sev_common->api_major;
+         info->api_minor = sev_common->api_minor;
+         info->build_id = sev_common->build_id;
+         info->state = sev_common->state;
+-        /* we only report the lower 32-bits of policy for SNP, ok for now... */
+-        info->policy =
+-            (uint32_t)object_property_get_uint(OBJECT(sev_common),
+-                                               "policy", NULL);
++
++        if (sev_snp_enabled()) {
++            info->sev_type = SEV_GUEST_TYPE_SEV_SNP;
++            info->u.sev_snp.policy =
++                object_property_get_uint(OBJECT(sev_common), "policy", NULL);
++        } else {
++            info->sev_type = SEV_GUEST_TYPE_SEV;
++            info->u.sev.handle = SEV_GUEST(sev_common)->handle;
++            info->u.sev.policy =
++                (uint32_t)object_property_get_uint(OBJECT(sev_common),
++                                                   "policy", NULL);
++        }
      }
  
-     /* Populate the cpuid page */
--    ret = sev_snp_launch_update_gpa(info->cpuid_addr, info->cpuid_len,
--                                    KVM_SEV_SNP_PAGE_TYPE_CPUID);
-+    ret = sev_snp_launch_update_cpuid(info->cpuid_addr, info->cpuid_len);
-     if (ret) {
--        error_report("SEV-SNP: failed to insert cpuid page GPA 0x%x",
-+        error_report("SEV-SNP: failed to populate cpuid tables GPA 0x%x",
-                      info->cpuid_addr);
-         exit(1);
-     }
+     return info;
+diff --git a/target/i386/sev_i386.h b/target/i386/sev_i386.h
+index e0e1a599be..948d8f1079 100644
+--- a/target/i386/sev_i386.h
++++ b/target/i386/sev_i386.h
+@@ -28,6 +28,9 @@
+ #define SEV_POLICY_DOMAIN       0x10
+ #define SEV_POLICY_SEV          0x20
+ 
++#define SEV_SNP_POLICY_SMT      0x10000
++#define SEV_SNP_POLICY_DBG      0x80000
++
+ extern bool sev_es_enabled(void);
+ extern bool sev_snp_enabled(void);
+ extern uint64_t sev_get_me_mask(void);
 -- 
 2.25.1
 
