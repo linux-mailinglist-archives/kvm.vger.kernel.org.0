@@ -2,71 +2,74 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6D6C03F8514
-	for <lists+kvm@lfdr.de>; Thu, 26 Aug 2021 12:10:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CB8283F8523
+	for <lists+kvm@lfdr.de>; Thu, 26 Aug 2021 12:13:31 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241288AbhHZKKy (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 26 Aug 2021 06:10:54 -0400
-Received: from mail.kernel.org ([198.145.29.99]:44780 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S233880AbhHZKKx (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 26 Aug 2021 06:10:53 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPS id 7AA28610E9;
-        Thu, 26 Aug 2021 10:10:06 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1629972606;
-        bh=bRlNbWjWJdP1+itFRLbB52Xs7pco+kB/NRCXYlnJnC0=;
-        h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-        b=Nii1y9lrl4YCUv26fY/LFrZcZxvwaERuBH0ZKw/i4nkdLgM8pHFtCA5x3nKd4wfej
-         Lv+aSjx/q+cj1kN0t1KaJRkdqH0SmpqEDOkEMS8P7lD3pYmYjGhIFG/98fNyowWtEI
-         NXnK0DMQUVz+ldWyl7kqdAswYVpVXoI5unOngiUy2+eRJAlRbhMR7PeM36qxcp89hy
-         XBb0En7UBC7m5XPh3E91yoDzhLIgCl5h4b4wzHpOXDfdOX2lzxiARflPu4iQcf+q0g
-         ST7rSCwL5AUtXnLS18kTXUjsQywxRbROcxtb/NnsOOqVINDB85+Uux47mr962NEoo1
-         75kQTbXPAUTWw==
-Received: from pdx-korg-docbuild-2.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by pdx-korg-docbuild-2.ci.codeaurora.org (Postfix) with ESMTP id 6CFF260A14;
-        Thu, 26 Aug 2021 10:10:06 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+        id S241131AbhHZKOL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 26 Aug 2021 06:14:11 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:22874 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S233409AbhHZKOK (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 26 Aug 2021 06:14:10 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1629972802;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=0a9FyQ8pkS9692Sgt+LnpoD5fEBDwGdQCkploFJtYOY=;
+        b=GGaFdNSbkSnuxzn/+9FuYxBvNahh8z2Hj6esAPBn3+2KGsBklGd5YwYgesUOmJLB+A8LBw
+        86oKLEA+JeMc0vY1kST/7CCwXm4n7AcZU1jfStFrW3NSumqXI6qGOs7c3divJMf5cwNRdJ
+        sQBkm2bEvJkIOM8PMLGVX04uAiUkVQA=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-200-P2LE4Q-cMCuIxU4yJ0A88Q-1; Thu, 26 Aug 2021 06:13:21 -0400
+X-MC-Unique: P2LE4Q-cMCuIxU4yJ0A88Q-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id AA6A1800EB8;
+        Thu, 26 Aug 2021 10:13:19 +0000 (UTC)
+Received: from sirius.home.kraxel.org (unknown [10.39.192.91])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 6BECD5C22B;
+        Thu, 26 Aug 2021 10:13:16 +0000 (UTC)
+Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
+        id 91BC018003AA; Thu, 26 Aug 2021 12:13:14 +0200 (CEST)
+Date:   Thu, 26 Aug 2021 12:13:14 +0200
+From:   Gerd Hoffmann <kraxel@redhat.com>
+To:     isaku.yamahata@gmail.com
+Cc:     qemu-devel@nongnu.org, pbonzini@redhat.com, alistair@alistair23.me,
+        ehabkost@redhat.com, marcel.apfelbaum@gmail.com, mst@redhat.com,
+        cohuck@redhat.com, mtosatti@redhat.com, xiaoyao.li@intel.com,
+        seanjc@google.com, erdemaktas@google.com, kvm@vger.kernel.org,
+        isaku.yamahata@intel.com
+Subject: Re: [RFC PATCH v2 04/44] vl: Introduce machine_init_done_late
+ notifier
+Message-ID: <20210826101314.bi5fkgelnkfo6d7b@sirius.home.kraxel.org>
+References: <cover.1625704980.git.isaku.yamahata@intel.com>
+ <80ac3e382a248bac13662d4052d17c41f1c21e3a.1625704980.git.isaku.yamahata@intel.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] sock: remove one redundant SKB_FRAG_PAGE_ORDER macro
-From:   patchwork-bot+netdevbpf@kernel.org
-Message-Id: <162997260644.16360.3820820200576524198.git-patchwork-notify@kernel.org>
-Date:   Thu, 26 Aug 2021 10:10:06 +0000
-References: <1629946187-60536-1-git-send-email-linyunsheng@huawei.com>
-In-Reply-To: <1629946187-60536-1-git-send-email-linyunsheng@huawei.com>
-To:     Yunsheng Lin <linyunsheng@huawei.com>
-Cc:     davem@davemloft.net, kuba@kernel.org, linuxarm@openeuler.org,
-        mst@redhat.com, jasowang@redhat.com, edumazet@google.com,
-        pabeni@redhat.com, fw@strlen.de, aahringo@redhat.com,
-        xiangxia.m.yue@gmail.com, yangbo.lu@nxp.com, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <80ac3e382a248bac13662d4052d17c41f1c21e3a.1625704980.git.isaku.yamahata@intel.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hello:
-
-This patch was applied to netdev/net-next.git (refs/heads/master):
-
-On Thu, 26 Aug 2021 10:49:47 +0800 you wrote:
-> Both SKB_FRAG_PAGE_ORDER are defined to the same value in
-> net/core/sock.c and drivers/vhost/net.c.
+On Wed, Jul 07, 2021 at 05:54:34PM -0700, isaku.yamahata@gmail.com wrote:
+> From: Isaku Yamahata <isaku.yamahata@intel.com>
 > 
-> Move the SKB_FRAG_PAGE_ORDER definition to net/core/sock.h,
-> as both net/core/sock.c and drivers/vhost/net.c include it,
-> and it seems a reasonable file to put the macro.
-> 
-> [...]
+> Introduce a new notifier, machine_init_done_late, that is notified after
+> machine_init_done.  This will be used by TDX to generate the HOB for its
+> virtual firmware, which needs to be done after all guest memory has been
+> added, i.e. after machine_init_done notifiers have run.  Some code
+> registers memory by machine_init_done().
 
-Here is the summary with links:
-  - [net-next] sock: remove one redundant SKB_FRAG_PAGE_ORDER macro
-    https://git.kernel.org/netdev/net-next/c/723783d077e3
+Can you be more specific than "some code"?
 
-You are awesome, thank you!
---
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+I see only pc_memory_init() adding guest ram (and the corresponding e820
+entries), and that should run early enough ...
 
+thanks,
+  Gerd
 
