@@ -2,339 +2,189 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4905E3F90DA
-	for <lists+kvm@lfdr.de>; Fri, 27 Aug 2021 01:08:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 09BAE3F90FD
+	for <lists+kvm@lfdr.de>; Fri, 27 Aug 2021 01:36:09 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243731AbhHZXJd (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 26 Aug 2021 19:09:33 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:33633 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231251AbhHZXJc (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 26 Aug 2021 19:09:32 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1630019324;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=lK4TopQi3jbqo9nNLov/8HsowxPiPoWmzVqHQD+2VVo=;
-        b=aAvBfclQBN7dZggMethp9CnNUneoldUzp8CnO10d3QGULodxYZRyhSVvKRNA6lthVPiqf0
-        SpU2Ddav+vjoT+/9BNEto9JI3Akjiu8SLXParXawYq32tFoGqi0fr2N+yP6VR1g4SfP9MW
-        dUKIqfOlxAzA/wAo+Xt8SM7tWQh+Gfw=
-Received: from mail-oi1-f199.google.com (mail-oi1-f199.google.com
- [209.85.167.199]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-529-W4aOMJdjNOybC8TJ4URvjg-1; Thu, 26 Aug 2021 19:08:43 -0400
-X-MC-Unique: W4aOMJdjNOybC8TJ4URvjg-1
-Received: by mail-oi1-f199.google.com with SMTP id r25-20020a056808211900b00268b48af6baso2309186oiw.23
-        for <kvm@vger.kernel.org>; Thu, 26 Aug 2021 16:08:42 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=lK4TopQi3jbqo9nNLov/8HsowxPiPoWmzVqHQD+2VVo=;
-        b=sijp7ZJul8ULG/McKndFYiS09oDMRsB+hwiYRAXQWZG2PziY4Z9w7i6vVYbXjNuYW0
-         8mBl74FmFP0DiRzBeL/txiZ4itk3KkoGjHBK9obktST0KUyJ5kUKcWYHLX2hyOsbGc+a
-         Vei/oOBnIrrdJWTqzf0I1lb0E3fVWxuiA9FFhvFATL+2O5DN0VpREG0CIiL/slY9AtT1
-         PwodVdDNwH5+OXx8yBWQPPo1Je93Pjgl9zD2hycqdTyLe6XJuP5Lsg5MSQ29Mw3eoHdR
-         QFTNOgphRBuimrpRZUOenvYuSxoqaYV2uGwTQBBnLzKEOL0MhvaxnbXxR+Urz/2hGC2p
-         4xGQ==
-X-Gm-Message-State: AOAM532UWkrM3+sW93WtMrRm58QZj7DOFvbr4yJF5faJPUsWiZn8SJqM
-        IlwXI3wJJ94GU71of4X8bY/rFS13UJTkEbAPh281jnEJgYQwdaG8tWgZTmKEDnlomFJQgOaV1Z2
-        iXEPLcTBCjuNH
-X-Received: by 2002:a9d:6e81:: with SMTP id a1mr5528027otr.248.1630019322182;
-        Thu, 26 Aug 2021 16:08:42 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwrC/P30WQ5eHX8Hd6bFsDhqC+jPE0fR6ygBv457k9q7SAAxFBqq3co4oeAHZ0rredBDJrRhw==
-X-Received: by 2002:a9d:6e81:: with SMTP id a1mr5528013otr.248.1630019321944;
-        Thu, 26 Aug 2021 16:08:41 -0700 (PDT)
-Received: from redhat.com ([198.99.80.109])
-        by smtp.gmail.com with ESMTPSA id l44sm767635otv.81.2021.08.26.16.08.41
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 26 Aug 2021 16:08:41 -0700 (PDT)
-Date:   Thu, 26 Aug 2021 17:08:40 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Diana Craciun <diana.craciun@oss.nxp.com>,
+        id S243796AbhHZXgt (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 26 Aug 2021 19:36:49 -0400
+Received: from mail-mw2nam12on2062.outbound.protection.outlook.com ([40.107.244.62]:12672
+        "EHLO NAM12-MW2-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S231509AbhHZXgs (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 26 Aug 2021 19:36:48 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=BOEeujhmq1cAL1QxQmFRlGkjE1prdT2Ip8Nj+sHwgMUdTqr7PcPkfi+MVrgl0x0LnC5ISoXqeD3zuWnXkyUSQpWKvKw0I8BU8mbYbon93Z/yiUfn0MB/qmsz8t/CnEf/ln+kgRDt39Ag41OwOxG6EwvCAqslfaa/t6rR21mO9waOKazP//70xqvZWckQ7Oin6yjywF3plVFWbVwtKt0RXt0evOca39IzOu2f8Ap3DJXnnWQsFuA+GeLwTsGlAVvIl9VnCa5OUSR6CGB0YMGhQ0SmzklvZZgPTuPV3gMxCOoJqVdMbFrjgJbsZ0uJ2yY//EYMN0UNX7YXZrzSPdr3Ww==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=A64SXhw5fZQyhCL4W4TYxsvGlOiN0yaR5KnfGx5+9Lg=;
+ b=OGOaJGBrySiAbyQEjPMkNAbzG8uh+zlYDmv+weEavquxEuMOHSSifPNTaUve1Wkolw84H4Zg1hZmGtz9McxEDyBV1G85T5iyJJH4fCWQUHvbFQYxlsj+F3uq4VJY1e04TUxuyrFC1abjyGq74R3FRcKAu7LC23Y2KQ/Yc52QEN2h/LqCLZUV0PWN4Jt/2JPA73l1CPQxdGrAbnZoBaGEzSqydEqjwHRygRjEYo5H2KK2zhIAgWmn3pq//6t2eEXE8N49g2boKtqFYUtW1RQFNIcROz6q767erPViPCxL6LAPmPdLG3DoaDEXciYsLR8bGnKoUnq9gKmypb01Iy1TMw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=A64SXhw5fZQyhCL4W4TYxsvGlOiN0yaR5KnfGx5+9Lg=;
+ b=gx5jexESmkxBlxnc1R8ZmD+AXjfjhJD8/6lKb8v4PJdm0qVKYtT3TINyOOn7k9chJEBKGCSCmjimxtpqfumHfXPgCUKOXSxH+MPC4zOxJC+lgwH0rXp1HdLqrFObd9H3mSyVw3VzOVb63Kz1GFHw/lUms4PSuxx+RwT+u/EA8fh/y3klWK98yWx0veaajAfK50z0MNG5KfI6ifp1o/1np5ymQrfanUUtFCe3K6vNg+pJlMjPgQwCJhbJBk+6Oh6Epxx3lftJpzJq37SN+DxK2qNPUsdQPc+CJsy/kY+DRRCku+HAQpVGhmHAWqzmIXP8u26eupguGBXL/EsTKR0yRQ==
+Authentication-Results: redhat.com; dkim=none (message not signed)
+ header.d=none;redhat.com; dmarc=none action=none header.from=nvidia.com;
+Received: from BL0PR12MB5506.namprd12.prod.outlook.com (2603:10b6:208:1cb::22)
+ by BL1PR12MB5256.namprd12.prod.outlook.com (2603:10b6:208:319::8) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4436.22; Thu, 26 Aug
+ 2021 23:35:59 +0000
+Received: from BL0PR12MB5506.namprd12.prod.outlook.com
+ ([fe80::1de1:52a9:cf66:f336]) by BL0PR12MB5506.namprd12.prod.outlook.com
+ ([fe80::1de1:52a9:cf66:f336%8]) with mapi id 15.20.4436.027; Thu, 26 Aug 2021
+ 23:35:59 +0000
+Date:   Thu, 26 Aug 2021 20:35:58 -0300
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     Alex Williamson <alex.williamson@redhat.com>
+Cc:     Christoph Hellwig <hch@lst.de>,
+        Diana Craciun <diana.craciun@oss.nxp.com>,
         Cornelia Huck <cohuck@redhat.com>,
         Kirti Wankhede <kwankhede@nvidia.com>,
-        Eric Auger <eric.auger@redhat.com>,
-        Jason Gunthorpe <jgg@ziepe.ca>, kvm@vger.kernel.org,
-        Jason Gunthorpe <jgg@nvidia.com>,
-        Kevin Tian <kevin.tian@intel.com>
-Subject: Re: [PATCH 13/14] vfio/iommu_type1: remove the "external" domain
-Message-ID: <20210826170840.48618414.alex.williamson@redhat.com>
-In-Reply-To: <20210826133424.3362-14-hch@lst.de>
+        Eric Auger <eric.auger@redhat.com>, kvm@vger.kernel.org
+Subject: Re: [PATCH 04/14] vfio: factor out a vfio_group_find_or_alloc helper
+Message-ID: <20210826233558.GT1721383@nvidia.com>
 References: <20210826133424.3362-1-hch@lst.de>
-        <20210826133424.3362-14-hch@lst.de>
-X-Mailer: Claws Mail 3.18.0 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
+ <20210826133424.3362-5-hch@lst.de>
+ <20210826135413.239e6d4e.alex.williamson@redhat.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210826135413.239e6d4e.alex.williamson@redhat.com>
+X-ClientProxiedBy: BL0PR0102CA0060.prod.exchangelabs.com
+ (2603:10b6:208:25::37) To BL0PR12MB5506.namprd12.prod.outlook.com
+ (2603:10b6:208:1cb::22)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from mlx.ziepe.ca (142.162.113.129) by BL0PR0102CA0060.prod.exchangelabs.com (2603:10b6:208:25::37) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4457.20 via Frontend Transport; Thu, 26 Aug 2021 23:35:59 +0000
+Received: from jgg by mlx with local (Exim 4.94)        (envelope-from <jgg@nvidia.com>)        id 1mJOuc-005VBD-D0; Thu, 26 Aug 2021 20:35:58 -0300
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 7c7fd572-e99b-4583-9ee9-08d968ea4235
+X-MS-TrafficTypeDiagnostic: BL1PR12MB5256:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <BL1PR12MB5256D1DEA9B7F002D6F209BFC2C79@BL1PR12MB5256.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:8882;
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: JdqYphjxKgIn29Sopud+uZ01jR1NhxcAl6JmJvEdqD7MmoFnN5KqwLDfFnlUQrhDtW0OHPBqDHgnbRVOPSwgLgwghgjA2i2cr2SUimpr4ZZSWYJVVx5FD90z2xL0MKYYUfHfJbE7+aPMQvv/D5DhC9Nbl/t3AAoBPHkpabxgSr9wKaZSWV3yhj+pFNZHnB+c9yKicQTJ1N7RDI1RrcxQbsYu9Me84LBp94Z3U3lfsrQMYBUxCkEpCZAjZnxDfF4wYymnQTCm9yJwSNKMoZwDnlJcKKbiif9nc+O/kCH7G9CD2ucGNiK/0Ka1IlRZpQE0ZzzWLwysxAXJJ9PaiCeVDfVAg1sF2ZnRWdCqj7q6fVTycoMY6C3GlMe24Ph6VvbRxW5OUUyWJJBD3kvc2sH5oZGSAOuJGMtx9ExHMpcmZmO7CZ5qM9ZCccWxzmyoFNWwfffLmYPwjDQs0WdnES7InOjqbbrMHkXbzHAt36hQEqtFUB8yr8oV1+TT3bYyk7adsUafcmTk2opxUr4y0uL7vPkDAJ5aK5mkY53AbhRpzSLyIrP7p2Khj9neWiYJ9sHIg1ZEyoIkcfrPwGKlkarDgHAn95pghhsPBE+bu5e6gLy1t/qFjJPwH1wR+f9SK8faaClRXZjm9j8fIkMQ1KMwCA==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL0PR12MB5506.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(396003)(39850400004)(376002)(366004)(346002)(136003)(36756003)(83380400001)(2616005)(2906002)(9746002)(316002)(9786002)(54906003)(33656002)(426003)(8936002)(186003)(38100700002)(4326008)(478600001)(86362001)(26005)(66476007)(66556008)(1076003)(6916009)(5660300002)(66946007)(8676002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?w9fBjK1hV5CEWzWbfl5veMbyxEjKSqZ5UBRpBpmf0dvku3szFsLbhiNuGD0t?=
+ =?us-ascii?Q?sf4FGY5CEcRlVAhBvRZDMB1g/6FyHGqIssJcm/qukVtzUMhaCO7dDRGNqDol?=
+ =?us-ascii?Q?SbzkFvvMw9E83uTp1Cz8ZDay9yRXC6dMpW9saW+rEMvDGNkXPGTdxKQVckEt?=
+ =?us-ascii?Q?pwwROWVlqc5RHHjrRJkpHjXrE43quuM6H39s8Dr0bj/HYDwyWs358SyE68Tg?=
+ =?us-ascii?Q?IvGQdV1pIw46JumyQZXATHPQtmdBRBJEmc7c/1TY8H5S97JS+31PzQCGDqe3?=
+ =?us-ascii?Q?X24eSGKeN7TR7T5XddX+LuQbNjqjf+GkEhmHLdvNXsiyFjcCqZj5k8G+HqJH?=
+ =?us-ascii?Q?fIImUkGPCAi5MNPOpWQtQc4GLwVMIHm2eR5RVTssd3c3Nv6C5VfKhHxxTQnC?=
+ =?us-ascii?Q?lklsshyKciEvvxJkkKvW0EhM13IrBMMi8rr+wJW6NjWUsz0Sbsq3Cc4xr4DG?=
+ =?us-ascii?Q?W8kT1LXdeaBXXW3YC2Aezaz2yDHxK21uaRZnfGHvxtME00E/HuDkhAEm6+7W?=
+ =?us-ascii?Q?WJLpw5/yBij1gojkPgx7nBH9brWp0QsTwS7ARN7EkPoR0W6L73ZzCIfAYwRe?=
+ =?us-ascii?Q?BsnfN0SklKK+Fh+qurKH63mR53Ob1BiMQczRrbH0tgUWdKGTG2k4BR0Tu40p?=
+ =?us-ascii?Q?f4rBkLzRFcfalt5CLlOSTOKm0tp6KMe6N242P+z1/iY1XSF+2h9GwZQmrAnS?=
+ =?us-ascii?Q?xoD1CjOvgLJyhgsK6GJImNXEzygPfsuaqCt4FHDB2mvfp0p/7wHuf0v+W9mB?=
+ =?us-ascii?Q?yms2/GZ3qY658YMDhbMmSX2vIhXYlTw4r1i1VyZnYkRpSsJFxDIf/OlWZfqJ?=
+ =?us-ascii?Q?/XvKOm/Gas8e/X5HEkitgduRNY2xzmT1goOA0fV0zFvf+NpHJBZBhSip55pV?=
+ =?us-ascii?Q?ewpVIbiskNi/0xZYC50da0FboY8NlbulMZItBw3quLflDMra94WdN0sPr67w?=
+ =?us-ascii?Q?qkaKlO89xM2HU9uns3x2DiCY1wGDAykQ9mV+AxgbDAWuUMtU71IC8g7YfoLt?=
+ =?us-ascii?Q?DFUGpuMeQHtEM7Rc/r7VPzmD4lv+dN0XGxzgc0MZMKsPFZfZHwtCZHFv2eBE?=
+ =?us-ascii?Q?vJejTyWEdc1Txpq6HnG8MlGogCEv+u/gt8i1+5DJSW+4yPzqUgo5cPAZrHst?=
+ =?us-ascii?Q?EE2w8SRtEGVWFFeLFIGbvp1aF8tcykZl/0Pn0hJhT/O/LLuxUonhFhzfeVgp?=
+ =?us-ascii?Q?Arb7gyq/vUW5J9yaNrTsnbOPJcUMVX/0+nu7UPuxVg7V3uVn3gp+Y+a7Yauj?=
+ =?us-ascii?Q?zBImKoAZHRsh/QbNjvIuDuf+nAfT7fXtytAJrNtLtJvkyhIiwXmHq1QEz/ko?=
+ =?us-ascii?Q?TmSxk0AKMlk9sjXgSD4ghF9r?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 7c7fd572-e99b-4583-9ee9-08d968ea4235
+X-MS-Exchange-CrossTenant-AuthSource: BL0PR12MB5506.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 Aug 2021 23:35:59.3784
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: wTXIejXdsxs4Ko0XhQp/gvBZMBeoSIEvweyg8Lz+DcEjVmjua2Q4t0P2QatpIYIr
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL1PR12MB5256
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 26 Aug 2021 15:34:23 +0200
-Christoph Hellwig <hch@lst.de> wrote:
-
-> The external_domain concept rather misleading and not actually needed.
-> Replace it with a list of emulated groups in struct vfio_iommu and
-> document the purpose.
+On Thu, Aug 26, 2021 at 01:54:13PM -0600, Alex Williamson wrote:
+> On Thu, 26 Aug 2021 15:34:14 +0200
+> Christoph Hellwig <hch@lst.de> wrote:
 > 
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
-> Reviewed-by: Jason Gunthorpe <jgg@nvidia.com>
-> Reviewed-by: Kevin Tian <kevin.tian@intel.com>
-> ---
->  drivers/vfio/vfio_iommu_type1.c | 121 ++++++++++++++------------------
->  1 file changed, 54 insertions(+), 67 deletions(-)
+> > Factor out a helper to find or allocate the vfio_group to reduce the
+> > spagetthi code in vfio_register_group_dev a little.
+> > 
+> > Signed-off-by: Christoph Hellwig <hch@lst.de>
+> > Reviewed-by: Jason Gunthorpe <jgg@nvidia.com>
+> >  drivers/vfio/vfio.c | 59 ++++++++++++++++++++++++++-------------------
+> >  1 file changed, 34 insertions(+), 25 deletions(-)
+> > 
+> > diff --git a/drivers/vfio/vfio.c b/drivers/vfio/vfio.c
+> > index 18e4c7906d1b3f..852fe22125520d 100644
+> > +++ b/drivers/vfio/vfio.c
+> > @@ -823,10 +823,38 @@ void vfio_uninit_group_dev(struct vfio_device *device)
+> >  }
+> >  EXPORT_SYMBOL_GPL(vfio_uninit_group_dev);
+> >  
+> > +struct vfio_group *vfio_group_find_or_alloc(struct device *dev)
+> > +{
+> > +	struct iommu_group *iommu_group;
+> > +	struct vfio_group *group;
+> > +
+> > +	iommu_group = vfio_iommu_group_get(dev);
+> > +	if (!iommu_group)
+> > +		return ERR_PTR(-EINVAL);
+> > +
+> > +	/* a found vfio_group already holds a reference to the iommu_group */
+> > +	group = vfio_group_get_from_iommu(iommu_group);
+> > +	if (group)
+> > +		goto out_put;
+> > +
+> > +	/* a newly created vfio_group keeps the reference. */
+> > +	group = vfio_create_group(iommu_group);
+> > +	if (IS_ERR(group))
+> > +		goto out_put;
+> > +	return group;
+> > +
+> > +out_put:
+> > +#ifdef CONFIG_VFIO_NOIOMMU
+> > +	if (iommu_group_get_iommudata(iommu_group) == &noiommu)
+> > +		iommu_group_remove_device(dev);
+> > +#endif
 > 
-> diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
-> index ca3c995c84166f..1ef98d4e2abecf 100644
-> --- a/drivers/vfio/vfio_iommu_type1.c
-> +++ b/drivers/vfio/vfio_iommu_type1.c
-> @@ -65,7 +65,6 @@ MODULE_PARM_DESC(dma_entry_limit,
->  struct vfio_iommu {
->  	struct list_head	domain_list;
->  	struct list_head	iova_list;
-> -	struct vfio_domain	*external_domain; /* domain for external user */
->  	struct mutex		lock;
->  	struct rb_root		dma_list;
->  	struct blocking_notifier_head notifier;
-> @@ -78,6 +77,7 @@ struct vfio_iommu {
->  	bool			nesting;
->  	bool			dirty_page_tracking;
->  	bool			container_open;
-> +	struct list_head	emulated_iommu_groups;
->  };
->  
->  struct vfio_domain {
-> @@ -1892,8 +1892,8 @@ static struct vfio_iommu_group*
->  vfio_iommu_find_iommu_group(struct vfio_iommu *iommu,
->  			    struct iommu_group *iommu_group)
->  {
-> +	struct vfio_iommu_group *group;
->  	struct vfio_domain *domain;
-> -	struct vfio_iommu_group *group = NULL;
->  
->  	list_for_each_entry(domain, &iommu->domain_list, next) {
->  		group = find_iommu_group(domain, iommu_group);
-> @@ -1901,10 +1901,10 @@ vfio_iommu_find_iommu_group(struct vfio_iommu *iommu,
->  			return group;
->  	}
->  
-> -	if (iommu->external_domain)
-> -		group = find_iommu_group(iommu->external_domain, iommu_group);
-> -
-> -	return group;
-> +	list_for_each_entry(group, &iommu->emulated_iommu_groups, next)
-> +		if (group->iommu_group == iommu_group)
-> +			return group;
-> +	return NULL;
->  }
->  
->  static bool vfio_iommu_has_sw_msi(struct list_head *group_resv_regions,
-> @@ -2163,62 +2163,52 @@ static int vfio_iommu_type1_attach_group(void *iommu_data,
->  	struct vfio_iommu_group *group;
->  	struct vfio_domain *domain, *d;
->  	struct bus_type *bus = NULL;
-> -	int ret;
->  	bool resv_msi, msi_remap;
->  	phys_addr_t resv_msi_base = 0;
->  	struct iommu_domain_geometry *geo;
->  	LIST_HEAD(iova_copy);
->  	LIST_HEAD(group_resv_regions);
-> +	int ret = -EINVAL;
->  
->  	mutex_lock(&iommu->lock);
->  
->  	/* Check for duplicates */
-> -	if (vfio_iommu_find_iommu_group(iommu, iommu_group)) {
-> -		mutex_unlock(&iommu->lock);
-> -		return -EINVAL;
-> -	}
-> +	if (vfio_iommu_find_iommu_group(iommu, iommu_group))
-> +		goto out_unlock;
->  
-> +	ret = -ENOMEM;
->  	group = kzalloc(sizeof(*group), GFP_KERNEL);
-> -	domain = kzalloc(sizeof(*domain), GFP_KERNEL);
-> -	if (!group || !domain) {
-> -		ret = -ENOMEM;
-> -		goto out_free;
-> -	}
-> -
-> +	if (!group)
-> +		goto out_unlock;
->  	group->iommu_group = iommu_group;
->  
-> -	/* Determine bus_type in order to allocate a domain */
-> -	ret = iommu_group_for_each_dev(iommu_group, &bus, vfio_bus_type);
-> -	if (ret)
-> -		goto out_free;
-> -
->  	if (flags & VFIO_EMULATED_IOMMU) {
-> -		if (!iommu->external_domain) {
-> -			INIT_LIST_HEAD(&domain->group_list);
-> -			iommu->external_domain = domain;
-> -			vfio_update_pgsize_bitmap(iommu);
-> -		} else {
-> -			kfree(domain);
-> -		}
-> -
-> -		list_add(&group->next, &iommu->external_domain->group_list);
-> +		list_add(&group->next, &iommu->emulated_iommu_groups);
->  		/*
-> -		 * Non-iommu backed group cannot dirty memory directly, it can
-> +		 * An emulated IOMMU group cannot dirty memory directly, it can
->  		 * only use interfaces that provide dirty tracking.
->  		 * The iommu scope can only be promoted with the addition of a
->  		 * dirty tracking group.
->  		 */
+> When we get here via the first goto above, it doesn't match the code
+> we're removing below. 
 
+If we are in noiommu mode then the group is a new singleton group and
+vfio_group_get_from_iommu() cannot succeed, so the out_put cannot
+trigger for the noiommu path.
 
-I didn't actually spot the additional documentation noted in the commit
-log, is this it?  Thanks,
+This is all improved in patch 6 where the logic becomes clear:
 
-Alex
++	iommu_group = iommu_group_get(dev);
++#ifdef CONFIG_VFIO_NOIOMMU
++	if (!iommu_group && noiommu && !iommu_present(dev->bus)) {
++		/*
++		 * With noiommu enabled, create an IOMMU group for devices that
++		 * don't already have one and don't have an iommu_ops on their
++		 * bus.  Taint the kernel because we're about to give a DMA
++		 * capable device to a user without IOMMU protection.
++		 */
++		group = vfio_noiommu_group_alloc(dev);
++		if (group) {
++			add_taint(TAINT_USER, LOCKDEP_STILL_OK);
++			dev_warn(dev, "Adding kernel taint for vfio-noiommu group on device\n");
++		}
++		return group;
 
+Eg we never do a pointless vfio_group_get_from_iommu() on a no-iommu
+group in the first place, we just create everything directly.
 
->  		group->pinned_page_dirty_scope = true;
-> -		mutex_unlock(&iommu->lock);
-> -
-> -		return 0;
-> +		ret = 0;
-> +		goto out_unlock;
->  	}
->  
-> +	/* Determine bus_type in order to allocate a domain */
-> +	ret = iommu_group_for_each_dev(iommu_group, &bus, vfio_bus_type);
-> +	if (ret)
-> +		goto out_free_group;
-> +
-> +	ret = -ENOMEM;
-> +	domain = kzalloc(sizeof(*domain), GFP_KERNEL);
-> +	if (!domain)
-> +		goto out_free_group;
-> +
-> +	ret = -EIO;
->  	domain->domain = iommu_domain_alloc(bus);
-> -	if (!domain->domain) {
-> -		ret = -EIO;
-> -		goto out_free;
-> -	}
-> +	if (!domain->domain)
-> +		goto out_free_domain;
->  
->  	if (iommu->nesting) {
->  		ret = iommu_enable_nesting(domain->domain);
-> @@ -2345,9 +2335,11 @@ static int vfio_iommu_type1_attach_group(void *iommu_data,
->  	iommu_domain_free(domain->domain);
->  	vfio_iommu_iova_free(&iova_copy);
->  	vfio_iommu_resv_free(&group_resv_regions);
-> -out_free:
-> +out_free_domain:
->  	kfree(domain);
-> +out_free_group:
->  	kfree(group);
-> +out_unlock:
->  	mutex_unlock(&iommu->lock);
->  	return ret;
->  }
-> @@ -2472,25 +2464,19 @@ static void vfio_iommu_type1_detach_group(void *iommu_data,
->  	LIST_HEAD(iova_copy);
->  
->  	mutex_lock(&iommu->lock);
-> +	list_for_each_entry(group, &iommu->emulated_iommu_groups, next) {
-> +		if (group->iommu_group != iommu_group)
-> +			continue;
-> +		update_dirty_scope = !group->pinned_page_dirty_scope;
-> +		list_del(&group->next);
-> +		kfree(group);
->  
-> -	if (iommu->external_domain) {
-> -		group = find_iommu_group(iommu->external_domain, iommu_group);
-> -		if (group) {
-> -			update_dirty_scope = !group->pinned_page_dirty_scope;
-> -			list_del(&group->next);
-> -			kfree(group);
-> -
-> -			if (list_empty(&iommu->external_domain->group_list)) {
-> -				if (!IS_IOMMU_CAP_DOMAIN_IN_CONTAINER(iommu)) {
-> -					WARN_ON(iommu->notifier.head);
-> -					vfio_iommu_unmap_unpin_all(iommu);
-> -				}
-> -
-> -				kfree(iommu->external_domain);
-> -				iommu->external_domain = NULL;
-> -			}
-> -			goto detach_group_done;
-> +		if (list_empty(&iommu->emulated_iommu_groups) &&
-> +		    !IS_IOMMU_CAP_DOMAIN_IN_CONTAINER(iommu)) {
-> +			WARN_ON(iommu->notifier.head);
-> +			vfio_iommu_unmap_unpin_all(iommu);
->  		}
-> +		goto detach_group_done;
->  	}
->  
->  	/*
-> @@ -2518,7 +2504,7 @@ static void vfio_iommu_type1_detach_group(void *iommu_data,
->  		 */
->  		if (list_empty(&domain->group_list)) {
->  			if (list_is_singular(&iommu->domain_list)) {
-> -				if (!iommu->external_domain) {
-> +				if (list_empty(&iommu->emulated_iommu_groups)) {
->  					WARN_ON(iommu->notifier.head);
->  					vfio_iommu_unmap_unpin_all(iommu);
->  				} else {
-> @@ -2582,41 +2568,42 @@ static void *vfio_iommu_type1_open(unsigned long arg)
->  	mutex_init(&iommu->lock);
->  	BLOCKING_INIT_NOTIFIER_HEAD(&iommu->notifier);
->  	init_waitqueue_head(&iommu->vaddr_wait);
-> +	INIT_LIST_HEAD(&iommu->emulated_iommu_groups);
->  
->  	return iommu;
->  }
->  
-> -static void vfio_release_domain(struct vfio_domain *domain, bool external)
-> +static void vfio_release_domain(struct vfio_domain *domain)
->  {
->  	struct vfio_iommu_group *group, *group_tmp;
->  
->  	list_for_each_entry_safe(group, group_tmp,
->  				 &domain->group_list, next) {
-> -		if (!external)
-> -			iommu_detach_group(domain->domain, group->iommu_group);
-> +		iommu_detach_group(domain->domain, group->iommu_group);
->  		list_del(&group->next);
->  		kfree(group);
->  	}
->  
-> -	if (!external)
-> -		iommu_domain_free(domain->domain);
-> +	iommu_domain_free(domain->domain);
->  }
->  
->  static void vfio_iommu_type1_release(void *iommu_data)
->  {
->  	struct vfio_iommu *iommu = iommu_data;
->  	struct vfio_domain *domain, *domain_tmp;
-> +	struct vfio_iommu_group *group, *next_group;
->  
-> -	if (iommu->external_domain) {
-> -		vfio_release_domain(iommu->external_domain, true);
-> -		kfree(iommu->external_domain);
-> +	list_for_each_entry_safe(group, next_group,
-> +			&iommu->emulated_iommu_groups, next) {
-> +		list_del(&group->next);
-> +		kfree(group);
->  	}
->  
->  	vfio_iommu_unmap_unpin_all(iommu);
->  
->  	list_for_each_entry_safe(domain, domain_tmp,
->  				 &iommu->domain_list, next) {
-> -		vfio_release_domain(domain, false);
-> +		vfio_release_domain(domain);
->  		list_del(&domain->next);
->  		kfree(domain);
->  	}
+It would be fine to add an extra label and then remove it in patch 6,
+but it is also fine this way and properly cleaned by the end.
 
+Jason
