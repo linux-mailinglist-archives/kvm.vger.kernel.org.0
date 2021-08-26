@@ -2,54 +2,223 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A3F973F84AD
-	for <lists+kvm@lfdr.de>; Thu, 26 Aug 2021 11:39:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 14E0B3F84B7
+	for <lists+kvm@lfdr.de>; Thu, 26 Aug 2021 11:43:50 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234385AbhHZJjt (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 26 Aug 2021 05:39:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48256 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233249AbhHZJjs (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 26 Aug 2021 05:39:48 -0400
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E5E22C061757;
-        Thu, 26 Aug 2021 02:39:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=l2WBiCb5duYJRA9nKpihqrJOH1Qjg6utSrFiu8qAdtc=; b=M4KH4wNsCcMoGRKghOjgIkMql+
-        BjDxKoik6ADibt7XkwqXMhyR6vDqRJEiYeiUkv4vniB6uDlM9pbifImRwT1NcsjF/cHLhVjTcT3hs
-        AsCA2fLBflJGAXlQ8yTLXAq+/1yD12FnU+lJL05R29X9z3j5jZFzxbea1VERmx8SOD1LbuT9bRghs
-        wD9KSbl//44a0QkYxBvHZwaNGFvtFKgldz3fzWllVmKybGw9DhZhyTqyI7OdOGq1qgMuGzjToAYiS
-        7qoB5ZCPlPUHxIAEKkfkOzoLdwE/0TDVvhGvOojmkKgXeBZVsnbwmk2RvidIzEKCmgmZglBawguFd
-        QV5PV/6w==;
-Received: from hch by casper.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1mJBoh-00D9w0-OV; Thu, 26 Aug 2021 09:37:26 +0000
-Date:   Thu, 26 Aug 2021 10:36:59 +0100
-From:   Christoph Hellwig <hch@infradead.org>
-To:     Yishai Hadas <yishaih@nvidia.com>
-Cc:     bhelgaas@google.com, corbet@lwn.net, alex.williamson@redhat.com,
-        diana.craciun@oss.nxp.com, kwankhede@nvidia.com,
-        eric.auger@redhat.com, masahiroy@kernel.org,
-        michal.lkml@markovi.net, linux-pci@vger.kernel.org,
-        linux-doc@vger.kernel.org, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org, linux-kbuild@vger.kernel.org,
-        mgurtovoy@nvidia.com, jgg@nvidia.com, maorg@nvidia.com,
-        leonro@nvidia.com
-Subject: Re: [PATCH V4 08/13] vfio/pci: Move module parameters to vfio_pci.c
-Message-ID: <YSdguyEOqqOI/KQ3@infradead.org>
-References: <20210825135139.79034-1-yishaih@nvidia.com>
- <20210825135139.79034-9-yishaih@nvidia.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210825135139.79034-9-yishaih@nvidia.com>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
+        id S234216AbhHZJof (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 26 Aug 2021 05:44:35 -0400
+Received: from mail.kernel.org ([198.145.29.99]:40952 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S233249AbhHZJof (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 26 Aug 2021 05:44:35 -0400
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 4E3B760F44;
+        Thu, 26 Aug 2021 09:43:48 +0000 (UTC)
+Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94.2)
+        (envelope-from <maz@kernel.org>)
+        id 1mJBvG-007JiY-92; Thu, 26 Aug 2021 10:43:46 +0100
+Date:   Thu, 26 Aug 2021 10:43:45 +0100
+Message-ID: <874kbcpmlq.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Andrew Jones <drjones@redhat.com>
+Cc:     Oliver Upton <oupton@google.com>, kvmarm@lists.cs.columbia.edu,
+        pshier@google.com, ricarkol@google.com, rananta@google.com,
+        reijiw@google.com, jingzhangos@google.com, kvm@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, james.morse@arm.com,
+        Alexandru.Elisei@arm.com, suzuki.poulose@arm.com,
+        Peter Maydell <peter.maydell@linaro.org>
+Subject: Re: KVM/arm64: Guest ABI changes do not appear rollback-safe
+In-Reply-To: <20210826085429.b67fzkshhl3s2vfr@gator.home>
+References: <YSVhV+UIMY12u2PW@google.com>
+        <87mtp5q3gx.wl-maz@kernel.org>
+        <CAOQ_QshSaEm_cMYQfRTaXJwnVqeoN29rMLBej-snWd6_0HsgGw@mail.gmail.com>
+        <87fsuxq049.wl-maz@kernel.org>
+        <20210825150713.5rpwzm4grfn7akcw@gator.home>
+        <CAOQ_QsgWiw9-BuGTUFpHqBw3simUaM4Tweb9y5_oz1UHdr4ELg@mail.gmail.com>
+        <20210826084945.yknl64gklxtygwal@gator.home>
+        <20210826085429.b67fzkshhl3s2vfr@gator.home>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: drjones@redhat.com, oupton@google.com, kvmarm@lists.cs.columbia.edu, pshier@google.com, ricarkol@google.com, rananta@google.com, reijiw@google.com, jingzhangos@google.com, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, james.morse@arm.com, Alexandru.Elisei@arm.com, suzuki.poulose@arm.com, peter.maydell@linaro.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Looks good,
+On Thu, 26 Aug 2021 09:54:29 +0100,
+Andrew Jones <drjones@redhat.com> wrote:
 
-Reviewed-by: Christoph Hellwig <hch@lst.de>
+[...]
+
+> I see Marc just replied stating we'll probably just have a single
+> register. The KVM_GET_SUPPORTED_CPUID type of ioctl would be
+> overkill in that case (get-one_reg is enough). Anyway it can
+> always be added later if we expand into more registers.
+
+Here's what I propose for the KVM-specific hypercalls. Compile tested
+only, plenty of nits to sort out. But you'll get the general idea.
+Something similar could be implemented for ARM-architected hypercalls
+such as TRNG.
+
+	M.
+
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index f8be56d5342b..3fcca7cc9668 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -136,6 +136,9 @@ struct kvm_arch {
+ 
+ 	/* Memory Tagging Extension enabled for the guest */
+ 	bool mte_enabled;
++
++	/* Bitmap of enabled hypercalls */
++	unsigned long hc_bmap;
+ };
+ 
+ struct kvm_vcpu_fault_info {
+diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
+index b3edde68bc3e..8d7a1a93f12c 100644
+--- a/arch/arm64/include/uapi/asm/kvm.h
++++ b/arch/arm64/include/uapi/asm/kvm.h
+@@ -281,6 +281,9 @@ struct kvm_arm_copy_mte_tags {
+ #define KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2_NOT_REQUIRED	3
+ #define KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2_ENABLED     	(1U << 4)
+ 
++#define KVM_REG_ARM_KVM_SPECIFIC_HYPERCALLS_0	KVM_REG_ARM_FW_REG(3)
++#define KVM_REG_ARM_KVM_SPECIFIC_HYPERCALLS_1	KVM_REG_ARM_FW_REG(4)
++
+ /* SVE registers */
+ #define KVM_REG_ARM64_SVE		(0x15 << KVM_REG_ARM_COPROC_SHIFT)
+ 
+diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+index fe102cd2e518..dbc136675b02 100644
+--- a/arch/arm64/kvm/arm.c
++++ b/arch/arm64/kvm/arm.c
+@@ -130,6 +130,13 @@ static void set_default_spectre(struct kvm *kvm)
+ 		kvm->arch.pfr0_csv3 = 1;
+ }
+ 
++
++static void set_default_vendor_hypercalls(struct kvm *kvm)
++{
++	kvm->arch.hc_bmap = (BIT(ARM_SMCCC_KVM_FUNC_FEATURES) |
++			     BIT(ARM_SMCCC_KVM_FUNC_PTP));
++}
++
+ /**
+  * kvm_arch_init_vm - initializes a VM data structure
+  * @kvm:	pointer to the KVM struct
+@@ -156,6 +163,7 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
+ 	kvm->arch.max_vcpus = kvm_arm_default_max_vcpus();
+ 
+ 	set_default_spectre(kvm);
++	set_default_vendor_hypercalls(kvm);
+ 
+ 	return ret;
+ out_free_stage2_pgd:
+diff --git a/arch/arm64/kvm/hypercalls.c b/arch/arm64/kvm/hypercalls.c
+index 30da78f72b3b..11f79e790f7d 100644
+--- a/arch/arm64/kvm/hypercalls.c
++++ b/arch/arm64/kvm/hypercalls.c
+@@ -127,8 +127,7 @@ int kvm_hvc_call_handler(struct kvm_vcpu *vcpu)
+ 		val[3] = ARM_SMCCC_VENDOR_HYP_UID_KVM_REG_3;
+ 		break;
+ 	case ARM_SMCCC_VENDOR_HYP_KVM_FEATURES_FUNC_ID:
+-		val[0] = BIT(ARM_SMCCC_KVM_FUNC_FEATURES);
+-		val[0] |= BIT(ARM_SMCCC_KVM_FUNC_PTP);
++		val[0] = vcpu->kvm->arch.hc_bmap;
+ 		break;
+ 	case ARM_SMCCC_VENDOR_HYP_KVM_PTP_FUNC_ID:
+ 		kvm_ptp_get_time(vcpu, val);
+diff --git a/arch/arm64/kvm/psci.c b/arch/arm64/kvm/psci.c
+index 74c47d420253..ceef0c706d50 100644
+--- a/arch/arm64/kvm/psci.c
++++ b/arch/arm64/kvm/psci.c
+@@ -404,21 +404,26 @@ int kvm_psci_call(struct kvm_vcpu *vcpu)
+ 	};
+ }
+ 
++static const u64 fw_reg_ids[] = {
++	KVM_REG_ARM_PSCI_VERSION,
++	KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_1,
++	KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2,
++	KVM_REG_ARM_KVM_SPECIFIC_HYPERCALLS_0,
++};
++
+ int kvm_arm_get_fw_num_regs(struct kvm_vcpu *vcpu)
+ {
+-	return 3;		/* PSCI version and two workaround registers */
++	return ARRAY_SIZE(fw_reg_ids);
+ }
+ 
+ int kvm_arm_copy_fw_reg_indices(struct kvm_vcpu *vcpu, u64 __user *uindices)
+ {
+-	if (put_user(KVM_REG_ARM_PSCI_VERSION, uindices++))
+-		return -EFAULT;
+-
+-	if (put_user(KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_1, uindices++))
+-		return -EFAULT;
++	int i;
+ 
+-	if (put_user(KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2, uindices++))
+-		return -EFAULT;
++	for (i = 0; i < ARRAY_SIZE(fw_reg_ids); i++) {
++		if (put_user(fw_reg_ids[i], uindices++))
++			return -EFAULT;
++	}
+ 
+ 	return 0;
+ }
+@@ -477,6 +482,10 @@ int kvm_arm_get_fw_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
+ 	case KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2:
+ 		val = get_kernel_wa_level(reg->id) & KVM_REG_FEATURE_LEVEL_MASK;
+ 		break;
++	case KVM_REG_ARM_KVM_SPECIFIC_HYPERCALLS_0:
++		val = vcpu->kvm->arch.hc_bmap;
++		break;
++	case KVM_REG_ARM_KVM_SPECIFIC_HYPERCALLS_1:
+ 	default:
+ 		return -ENOENT;
+ 	}
+@@ -515,8 +524,9 @@ int kvm_arm_set_fw_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
+ 				return -EINVAL;
+ 			vcpu->kvm->arch.psci_version = val;
+ 			return 0;
++		default:
++			return -EINVAL;
+ 		}
+-		break;
+ 	}
+ 
+ 	case KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_1:
+@@ -563,9 +573,16 @@ int kvm_arm_set_fw_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
+ 			return -EINVAL;
+ 
+ 		return 0;
++	case KVM_REG_ARM_KVM_SPECIFIC_HYPERCALLS_0:
++		/* FIXME: no vcpu should have run */
++		/* Exclude any unknown bit */
++		if (val & ~(BIT(ARM_SMCCC_KVM_FUNC_FEATURES) |
++			    BIT(ARM_SMCCC_KVM_FUNC_PTP)))
++			return -EINVAL;
++		vcpu->kvm->arch.hc_bmap = val;
++		return 0;
++	case KVM_REG_ARM_KVM_SPECIFIC_HYPERCALLS_1:
+ 	default:
+ 		return -ENOENT;
+ 	}
+-
+-	return -EINVAL;
+ }
+
+-- 
+Without deviation from the norm, progress is not possible.
