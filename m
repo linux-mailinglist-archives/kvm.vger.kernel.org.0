@@ -2,240 +2,121 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4FF753F8CB7
-	for <lists+kvm@lfdr.de>; Thu, 26 Aug 2021 19:08:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9A1153F8CEC
+	for <lists+kvm@lfdr.de>; Thu, 26 Aug 2021 19:25:29 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232349AbhHZRIr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 26 Aug 2021 13:08:47 -0400
-Received: from foss.arm.com ([217.140.110.172]:50598 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S243152AbhHZRIq (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 26 Aug 2021 13:08:46 -0400
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id D36BD31B;
-        Thu, 26 Aug 2021 10:07:58 -0700 (PDT)
-Received: from [10.1.25.18] (e110479.cambridge.arm.com [10.1.25.18])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 4B5A83F5A1;
-        Thu, 26 Aug 2021 10:07:57 -0700 (PDT)
-Subject: Re: [PATCH][kvmtool] virtio/pci: Correctly handle MSI-X masking while
- MSI-X is disabled
-To:     Marc Zyngier <maz@kernel.org>
-Cc:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
-        kernel-team@android.com,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Will Deacon <will@kernel.org>
-References: <20210821120742.855712-1-maz@kernel.org>
- <20210823174833.05adee5d@slackpad.fritz.box> <87tujeq5ey.wl-maz@kernel.org>
- <87a6l5pmim.wl-maz@kernel.org> <878s0ppgff.wl-maz@kernel.org>
-From:   Andre Przywara <andre.przywara@arm.com>
-Message-ID: <7c2abc6a-164a-b07e-a39e-756b83a98f0c@arm.com>
-Date:   Thu, 26 Aug 2021 18:07:55 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.11.0
+        id S243172AbhHZRZN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 26 Aug 2021 13:25:13 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:43803 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S243062AbhHZRZM (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 26 Aug 2021 13:25:12 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1629998664;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=ZMjylM79luTHELT/FDTj+zPFB7h3I8bEsPI0WLSfY60=;
+        b=e25gtTS6NeBaEVa1Wpc7hQoxyrE3tHlDRjFq8B+cyBol3tjWrx7FCiunTiU/GzidQVBuC4
+        l0od/d9uSkzwZo7juRPF0ng3CczkAEBox2PfpH7TktJ576kL2uXrq2PtryQ1nMTBNxGuAW
+        J8skNv/Y7OPWwCLlO5Rgo5veJNVXFDs=
+Received: from mail-io1-f71.google.com (mail-io1-f71.google.com
+ [209.85.166.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-211-gl84PtTVN0SAGwodD8-0ig-1; Thu, 26 Aug 2021 13:24:20 -0400
+X-MC-Unique: gl84PtTVN0SAGwodD8-0ig-1
+Received: by mail-io1-f71.google.com with SMTP id k21-20020a5e93150000b02905b30d664397so2193459iom.0
+        for <kvm@vger.kernel.org>; Thu, 26 Aug 2021 10:24:20 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
+         :references:organization:mime-version:content-transfer-encoding;
+        bh=ZMjylM79luTHELT/FDTj+zPFB7h3I8bEsPI0WLSfY60=;
+        b=F8DUXMGXR2hbBELKOK2P6qgGuP3KfmwYqwYW9K+TAxKwjAkCiQrqztjTwgOqI/OUss
+         Y8Q7HQ8kwOtMkHu8d/b0le4TMygf6A1qOK67FJF3a4QEn9BemYUeWMl4/RpS5+5Zi4W1
+         IH7jTX63HaTabDxA0ukcORLM1U5ksc1i/avWyYfk5Qz5xZ6z98ZyBj1Z+5igJn+v5dKt
+         4Vza+TLupI/2j3NnQrHwcEbPc/xw1EaDJyDWIVZuVhOKZAhNNobuqrMSGGG3N/xRKnxt
+         dvPOaaSZUcx6kz7zO0GjWcPImCyaP/r273Bwygl/ZBltzGOqlDydF/rNt5CfPxccHHBG
+         svLg==
+X-Gm-Message-State: AOAM5325hRvHCSyHGCaA6uD8zVGrGPLmtphezAo+j1B7or7a6XV9E76D
+        V/N5t6g2KnsOelirAy9qw9LLtwWC/xmJfDHWL/hlFdY70ptlMTyPk6K0vV8v88kwnwL+CwhTAlI
+        JC8+8MCUtRYKS
+X-Received: by 2002:a92:cdac:: with SMTP id g12mr3438864ild.201.1629998659596;
+        Thu, 26 Aug 2021 10:24:19 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzoUmElZf+NHhHFtW0hh0EBVecM5cP3FrRANB0Q+0SPpFlTnFAGQJE6LSa6RUXG5FllrHcqeA==
+X-Received: by 2002:a92:cdac:: with SMTP id g12mr3438848ild.201.1629998659321;
+        Thu, 26 Aug 2021 10:24:19 -0700 (PDT)
+Received: from redhat.com ([198.99.80.109])
+        by smtp.gmail.com with ESMTPSA id p12sm2013202ilp.87.2021.08.26.10.24.18
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 26 Aug 2021 10:24:18 -0700 (PDT)
+Date:   Thu, 26 Aug 2021 11:24:17 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Diana Craciun <diana.craciun@oss.nxp.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Kirti Wankhede <kwankhede@nvidia.com>,
+        Eric Auger <eric.auger@redhat.com>,
+        Jason Gunthorpe <jgg@ziepe.ca>, kvm@vger.kernel.org,
+        Jason Gunthorpe <jgg@nvidia.com>,
+        Tony Krowiak <akrowiak@linux.ibm.com>
+Subject: Re: [PATCH 07/14] vfio: simplify iommu group allocation for
+ mediated devices
+Message-ID: <20210826112417.63a51327.alex.williamson@redhat.com>
+In-Reply-To: <20210826133424.3362-8-hch@lst.de>
+References: <20210826133424.3362-1-hch@lst.de>
+        <20210826133424.3362-8-hch@lst.de>
+Organization: Red Hat
+X-Mailer: Claws Mail 3.18.0 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-In-Reply-To: <878s0ppgff.wl-maz@kernel.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 8/25/21 6:44 PM, Marc Zyngier wrote:
+[Cc +Tony]
 
-Hi Marc,
+On Thu, 26 Aug 2021 15:34:17 +0200
+Christoph Hellwig <hch@lst.de> wrote:
 
-> On Wed, 25 Aug 2021 16:33:21 +0100,
-> Marc Zyngier <maz@kernel.org> wrote:
->>
->> On Tue, 24 Aug 2021 15:32:53 +0100,
->> Marc Zyngier <maz@kernel.org> wrote:
->>>
->>> Hi Andre,
->>>
->>> On Mon, 23 Aug 2021 17:48:33 +0100,
->>> Andre Przywara <andre.przywara@arm.com> wrote:
->>>>
->>>> On Sat, 21 Aug 2021 13:07:42 +0100
->>>> Marc Zyngier <maz@kernel.org> wrote:
->>>>
->>>> Hi Marc,
->>>>
->>>>> Since Linux commit 7d5ec3d36123 ("PCI/MSI: Mask all unused MSI-X
->>>>> entries"), kvmtool segfaults when the guest boots and tries to
->>>>> disable all the MSI-X entries of a virtio device while MSI-X itself
->>>>> is disabled.
->>>>>
->>>>> What Linux does is seems perfectly correct. However, kvmtool uses
->>>>> a different decoding depending on whether MSI-X is enabled for
->>>>> this device or not. Which seems pretty wrong.
->>>>
->>>> While I really wish this would be wrong, I think this is
->>>> indeed how this is supposed to work: The Virtio legacy spec makes the
->>>> existence of those two virtio config fields dependent on the
->>>> (dynamic!) enablement status of MSI-X. This is reflected in:
->>>> https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/include/uapi/linux/virtio_pci.h#n72
->>>> and explicitly mentioned as a footnote in the virtio 0.9.5 spec[1]:
->>>> "3) ie. once you enable MSI-X on the device, the other fields move. If
->>>> you turn it off again, they move back!"
->>>
->>> Madness! What was Rusty on at the time? I really hope the bitcoin
->>> thing is buying him better stuff...
->>>
->>>> I agree that this looks like a bad idea, but I am afraid we are stuck
->>>> with this. It looks like the Linux driver is at fault here, it should
->>>> not issue the config access when MSIs are disabled. Something like this
->>>> (untested):
->>>>
->>>> --- a/drivers/virtio/virtio_pci_legacy.c
->>>> +++ b/drivers/virtio/virtio_pci_legacy.c
->>>> @@ -103,6 +103,9 @@ static void vp_reset(struct virtio_device *vdev)
->>>>   
->>>>   static u16 vp_config_vector(struct virtio_pci_device *vp_dev, u16 vector)
->>>>   {
->>>> +       if (!vp_dev->msix_enabled)
->>>> +               return VIRTIO_MSI_NO_VECTOR;
->>>> +
->>>>          /* Setup the vector used for configuration events */
->>>>          iowrite16(vector, vp_dev->ioaddr + VIRTIO_MSI_CONFIG_VECTOR);
->>>>          /* Verify we had enough resources to assign the vector */
->>>>
->>>> This is just my first idea after looking at this, happy to stand
->>>> corrected or hear about a better solution.
->>>
->>> I don't think this works. It instead completely disables MSI-X, which
->>> is a total bore. I think the only way to deal with it is to quirk it
->>> to prevent the bulk masking to take effect before MSI-X is enabled.
->>
->> Actually, let me correct myself. I tested the wrong configuration (why
->> isn't --force-pci the bloody default in kvmtool?).
-
-I guess because there is no --force-mmio, and PCI on ARM was kind of 
-daunting back then ;-)
-
-
->> This patch doesn't
->> fix anything at all, and kvmtool just explodes.
->>
->> Having dug further, it isn't the config space that causes problems,
->> but the programming of the MSI-X vectors. I'm starting to suspect the
->> layout of the MSI-X bar in kvmtool.
+> Reuse the logic in vfio_noiommu_group_alloc to allocate a fake
+> single-device iommu group for mediated devices.  A new function is
+> exposed to create vfio_device for this emulated case and the noiommu
+> boolean field in struct vfio_group is replaced with a set of flags so
+> that devices with an emulated IOMMU can be distinguished from those
+> with no IOMMU at all.
 > 
-> OK, this is hilarious. Sort of. The MSI-X bar sizing is bonkers: you
-> can't fit 33 MSIs there (33 being the number of MSI-X that kvmtool
-> advertises), and you will have notionally overwritten the PBA as
-> well. Amusingly, the last write ends up being misdecoded as a config
-> space access...
-
-Ah, very good find indeed, many thanks for the debugging!
-
-I am only halfway through the code by now, but wouldn't you need to 
-adjust the PBA offset in the MSIX capability as well? This is still 
-stuck at that (misnamed) PCI_IO_SIZE, in 
-virtio/pci.c:virtio_pci__init(): vpci->pci_hdr.msix.pba_offset =
-And IIUC this has to match the decoding in virtio_pci__msix_mmio_callback().
-
-Cheers,
-Andre
-
-> 
-> "works for me".
-> 
-> 	M.
-> 
->  From a2b3a338aab535a1683cc5b424455ed7fd3a500a Mon Sep 17 00:00:00 2001
-> From: Marc Zyngier <maz@kernel.org>
-> Date: Wed, 25 Aug 2021 18:19:27 +0100
-> Subject: [PATCH] virtio/pci: Size the MSI-X bar according to the number of
->   MSI-X
-> 
-> Since 45d3b59e8c45 ("kvm tools: Increase amount of possible interrupts
-> per PCI device"), the number of MSI-S has gone from 4 to 33.
-> 
-> However, the corresponding storage hasn't been upgraded, and writing
-> to the MSI-X table is a pretty risky business. Now that the Linux
-> kernel writes to *all* MSI-X entries before doing anything else
-> with the device, kvmtool dies a horrible death.
-> 
-> Fix it by properly defining the size of the MSI-X bar, and make
-> Linux great again.
-> 
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> Reviewed-by: Jason Gunthorpe <jgg@nvidia.com>
 > ---
->   virtio/pci.c | 29 +++++++++++++++++++++--------
->   1 file changed, 21 insertions(+), 8 deletions(-)
-> 
-> diff --git a/virtio/pci.c b/virtio/pci.c
-> index eb91f512..726146fc 100644
-> --- a/virtio/pci.c
-> +++ b/virtio/pci.c
-> @@ -7,6 +7,7 @@
->   #include "kvm/irq.h"
->   #include "kvm/virtio.h"
->   #include "kvm/ioeventfd.h"
-> +#include "kvm/util.h"
->   
->   #include <sys/ioctl.h>
->   #include <linux/virtio_pci.h>
-> @@ -14,6 +15,13 @@
->   #include <assert.h>
->   #include <string.h>
->   
-> +#define ALIGN_UP(x, s)		ALIGN((x) + (s) - 1, (s))
-> +#define VIRTIO_NR_MSIX		(VIRTIO_PCI_MAX_VQ + VIRTIO_PCI_MAX_CONFIG)
-> +#define VIRTIO_MSIX_TABLE_SIZE	(VIRTIO_NR_MSIX * 16)
-> +#define VIRTIO_MSIX_PBA_SIZE	(ALIGN_UP(VIRTIO_MSIX_TABLE_SIZE, 64) / 8)
-> +#define VIRTIO_MSIX_BAR_SIZE	(1UL << fls_long(VIRTIO_MSIX_TABLE_SIZE + \
-> +						 VIRTIO_MSIX_PBA_SIZE))
-> +
->   static u16 virtio_pci__port_addr(struct virtio_pci *vpci)
->   {
->   	return pci__bar_address(&vpci->pci_hdr, 0);
-> @@ -336,15 +344,20 @@ static void virtio_pci__msix_mmio_callback(struct kvm_cpu *vcpu,
->   	int vecnum;
->   	size_t offset;
->   
-> -	if (addr > msix_io_addr + PCI_IO_SIZE) {
-> +	if (addr > msix_io_addr + VIRTIO_MSIX_TABLE_SIZE) {
-> +		/* Read access to PBA */
->   		if (is_write)
->   			return;
-> -		table  = (struct msix_table *)&vpci->msix_pba;
-> -		offset = addr - (msix_io_addr + PCI_IO_SIZE);
-> -	} else {
-> -		table  = vpci->msix_table;
-> -		offset = addr - msix_io_addr;
-> +		offset = addr - (msix_io_addr + VIRTIO_MSIX_TABLE_SIZE);
-> +		if ((offset + len) > sizeof (vpci->msix_pba))
-> +			return;
-> +		memcpy(data, (void *)&vpci->msix_pba + offset, len);
-> +		return;
->   	}
-> +
-> +	table  = vpci->msix_table;
-> +	offset = addr - msix_io_addr;
-> +
->   	vecnum = offset / sizeof(struct msix_table);
->   	offset = offset % sizeof(struct msix_table);
->   
-> @@ -520,7 +533,7 @@ int virtio_pci__init(struct kvm *kvm, void *dev, struct virtio_device *vdev,
->   
->   	port_addr = pci_get_io_port_block(PCI_IO_SIZE);
->   	mmio_addr = pci_get_mmio_block(PCI_IO_SIZE);
-> -	msix_io_block = pci_get_mmio_block(PCI_IO_SIZE * 2);
-> +	msix_io_block = pci_get_mmio_block(VIRTIO_MSIX_BAR_SIZE);
->   
->   	vpci->pci_hdr = (struct pci_device_header) {
->   		.vendor_id		= cpu_to_le16(PCI_VENDOR_ID_REDHAT_QUMRANET),
-> @@ -543,7 +556,7 @@ int virtio_pci__init(struct kvm *kvm, void *dev, struct virtio_device *vdev,
->   		.capabilities		= (void *)&vpci->pci_hdr.msix - (void *)&vpci->pci_hdr,
->   		.bar_size[0]		= cpu_to_le32(PCI_IO_SIZE),
->   		.bar_size[1]		= cpu_to_le32(PCI_IO_SIZE),
-> -		.bar_size[2]		= cpu_to_le32(PCI_IO_SIZE*2),
-> +		.bar_size[2]		= cpu_to_le32(VIRTIO_MSIX_BAR_SIZE),
->   	};
->   
->   	r = pci__register_bar_regions(kvm, &vpci->pci_hdr,
-> 
+>  drivers/vfio/mdev/mdev_driver.c | 46 ++----------------
+>  drivers/vfio/mdev/vfio_mdev.c   |  2 +-
+>  drivers/vfio/vfio.c             | 82 ++++++++++++++++++++++-----------
+>  include/linux/vfio.h            |  1 +
+>  samples/vfio-mdev/mbochs.c      |  2 +-
+>  samples/vfio-mdev/mdpy.c        |  2 +-
+>  samples/vfio-mdev/mtty.c        |  2 +-
+>  7 files changed, 65 insertions(+), 72 deletions(-)
+
+As Jason suggested, I'll apply this after
+0-v4-0203a4ab0596+f7-vfio_ap_jgg@nvidia.com and roll in the following:
+
+diff --git a/drivers/s390/crypto/vfio_ap_ops.c b/drivers/s390/crypto/vfio_ap_ops.c
+index 2347808fa3e4..f04fe1278f99 100644
+--- a/drivers/s390/crypto/vfio_ap_ops.c
++++ b/drivers/s390/crypto/vfio_ap_ops.c
+@@ -350,7 +350,7 @@ static int vfio_ap_mdev_probe(struct mdev_device *mdev)
+ 	list_add(&matrix_mdev->node, &matrix_dev->mdev_list);
+ 	mutex_unlock(&matrix_dev->lock);
+ 
+-	ret = vfio_register_group_dev(&matrix_mdev->vdev);
++	ret = vfio_register_emulated_iommu_dev(&matrix_mdev->vdev);
+ 	if (ret)
+ 		goto err_list;
+ 	dev_set_drvdata(&mdev->dev, matrix_mdev);
+
+Shout if this is incorrect.  Thanks,
+
+Alex
 
