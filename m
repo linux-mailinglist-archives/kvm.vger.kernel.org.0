@@ -2,66 +2,115 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 84C193F85D1
-	for <lists+kvm@lfdr.de>; Thu, 26 Aug 2021 12:50:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 25B553F85D8
+	for <lists+kvm@lfdr.de>; Thu, 26 Aug 2021 12:51:05 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241629AbhHZKur (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 26 Aug 2021 06:50:47 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:49191 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S240993AbhHZKuq (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 26 Aug 2021 06:50:46 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1629974999;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=7hrIlQItnvuwO65TqR8fUyINojxoylNX4yfInG5lI9c=;
-        b=Na5/uPl6mToWLBd4vx3X4jjIg14Jq9IfVzd3GlHo0lJA0lpTkV5Vck/J1DMX1sLo0/xQox
-        uL+zTOCHZcKnpC0BR9HAsar41cyZbBmXkTfxqOhrI9ayWz1nXIHroFIUhNND2lOAJcO+VF
-        reIuLeg6wPRIJUZQAc1rjDynwv3nuWs=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-318-8GB9qpiKO8ymFkOu5YBDWw-1; Thu, 26 Aug 2021 06:49:58 -0400
-X-MC-Unique: 8GB9qpiKO8ymFkOu5YBDWw-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        id S234327AbhHZKvu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 26 Aug 2021 06:51:50 -0400
+Received: from mail.kernel.org ([198.145.29.99]:51804 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S234055AbhHZKvu (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 26 Aug 2021 06:51:50 -0400
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id ADEEE801A92;
-        Thu, 26 Aug 2021 10:49:56 +0000 (UTC)
-Received: from sirius.home.kraxel.org (unknown [10.39.192.91])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id B8D122855F;
-        Thu, 26 Aug 2021 10:49:46 +0000 (UTC)
-Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
-        id BCDBD18003AA; Thu, 26 Aug 2021 12:49:44 +0200 (CEST)
-Date:   Thu, 26 Aug 2021 12:49:44 +0200
-From:   Gerd Hoffmann <kraxel@redhat.com>
-To:     isaku.yamahata@gmail.com
-Cc:     qemu-devel@nongnu.org, pbonzini@redhat.com, alistair@alistair23.me,
-        ehabkost@redhat.com, marcel.apfelbaum@gmail.com, mst@redhat.com,
-        cohuck@redhat.com, mtosatti@redhat.com, xiaoyao.li@intel.com,
-        seanjc@google.com, erdemaktas@google.com, kvm@vger.kernel.org,
-        isaku.yamahata@intel.com
-Subject: Re: [RFC PATCH v2 18/44] hw/i386: refactor e820_add_entry()
-Message-ID: <20210826104944.aapxf5nlrx25uvvc@sirius.home.kraxel.org>
-References: <cover.1625704980.git.isaku.yamahata@intel.com>
- <876d3849f5293e7902df6e6f1dc8e89662b42a6b.1625704981.git.isaku.yamahata@intel.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <876d3849f5293e7902df6e6f1dc8e89662b42a6b.1625704981.git.isaku.yamahata@intel.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+        by mail.kernel.org (Postfix) with ESMTPSA id 379C360ED5;
+        Thu, 26 Aug 2021 10:51:03 +0000 (UTC)
+Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94.2)
+        (envelope-from <maz@kernel.org>)
+        id 1mJCyL-007KSd-6a; Thu, 26 Aug 2021 11:51:01 +0100
+Date:   Thu, 26 Aug 2021 11:51:00 +0100
+Message-ID: <8735qwpjhn.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Oliver Upton <oupton@google.com>
+Cc:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
+        Peter Shier <pshier@google.com>,
+        Ricardo Koller <ricarkol@google.com>,
+        Jing Zhang <jingzhangos@google.com>,
+        Raghavendra Rao Anata <rananta@google.com>,
+        James Morse <james.morse@arm.com>,
+        Alexandru Elisei <Alexandru.Elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Andrew Jones <drjones@redhat.com>
+Subject: Re: [PATCH 0/6] KVM: arm64: Implement PSCI SYSTEM_SUSPEND support
+In-Reply-To: <CAOQ_QsgaACbcW276TAqrmq2E5ne-C2JiEDVGjVXg9-WRds8ZQA@mail.gmail.com>
+References: <20210819223640.3564975-1-oupton@google.com>
+        <CAOQ_QsgaACbcW276TAqrmq2E5ne-C2JiEDVGjVXg9-WRds8ZQA@mail.gmail.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: oupton@google.com, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, pshier@google.com, ricarkol@google.com, jingzhangos@google.com, rananta@google.com, james.morse@arm.com, Alexandru.Elisei@arm.com, suzuki.poulose@arm.com, drjones@redhat.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jul 07, 2021 at 05:54:48PM -0700, isaku.yamahata@gmail.com wrote:
-> From: Isaku Yamahata <isaku.yamahata@intel.com>
+On Sun, 22 Aug 2021 20:56:13 +0100,
+Oliver Upton <oupton@google.com> wrote:
 > 
-> The following patch will utilize this refactoring.
+> Marc,
+> 
+> On Thu, Aug 19, 2021 at 3:36 PM Oliver Upton <oupton@google.com> wrote:
+> >
+> > Certain VMMs/operators may wish to give their guests the ability to
+> > initiate a system suspend that could result in the VM being saved to
+> > persistent storage to be resumed at a later time. The PSCI v1.0
+> > specification describes an SMC, SYSTEM_SUSPEND, that allows a kernel to
+> > request a system suspend. This call is optional for v1.0, and KVM
+> > elected to not support the call in its v1.0 implementation.
+> >
+> > This series adds support for the SYSTEM_SUSPEND PSCI call to KVM/arm64.
+> > Since this is a system-scoped event, KVM cannot quiesce the VM on its
+> > own. We add a new system exit type in this series to clue in userspace
+> > that a suspend was requested. Per the KVM_EXIT_SYSTEM_EVENT ABI, a VMM
+> > that doesn't care about this event can simply resume the guest without
+> > issue (we set up the calling vCPU to come out of reset correctly on next
+> > KVM_RUN).
+> >
+> > Patch 1 is unrelated, and is a fix for "KVM: arm64: Enforce reserved
+> > bits for PSCI target affinities" on the kvmarm/next branch. Nothing
+> > particularly hairy, just an unused param.
+> 
+> Title line may not have been clear on this series, Patch 1 is a fix
+> for the PSCI CPU_ON series that's in kvmarm/next to suppress a
+> compiler warning.
 
-More verbose commit message please.
+I'm not getting this warning. What are you compiling with? In general,
+the compiler should shout about unused function parameters.
 
-thanks,
-  Gerd
+> 
+> > Patch 2 simplifies the function to check if KVM allows a particular PSCI
+> > function. We can generally disallow any PSCI function that sets the
+> > SMC64 bit in the PSCI function ID.
+> >
+> > Patch 3 wraps up the PSCI reset logic used for CPU_ON, which will be
+> > needed later to queue up a reset on the vCPU that requested the system
+> > suspend.
+> >
+> > Patch 4 brings in the new UAPI and PSCI call, guarded behind a VM
+> > capability for backwards compatibility.
+> >
+> > Patch 5 is indirectly related to this series, and avoids compiler
+> > reordering on PSCI calls in the selftest introduced by "selftests: KVM:
+> > Introduce psci_cpu_on_test".
+> 
+> This too is a fix for the PSCI CPU_ON series. Just wanted to raise it
+> to your attention beyond the new feature I'm working on here.
 
+I'm not sure this actually need fixing. The dependencies on the input
+and output will effectively prevent such reordering. That will
+definitely be a good cleanup though, but maybe not worth taking out of
+this series.
+
+Thanks,
+
+	M. (trying to find excuses to close the tree quickly).
+
+-- 
+Without deviation from the norm, progress is not possible.
