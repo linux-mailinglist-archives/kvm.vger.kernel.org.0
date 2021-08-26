@@ -2,110 +2,167 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0BBB93F8BA4
-	for <lists+kvm@lfdr.de>; Thu, 26 Aug 2021 18:18:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7C9EA3F8C06
+	for <lists+kvm@lfdr.de>; Thu, 26 Aug 2021 18:23:46 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243059AbhHZQSq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 26 Aug 2021 12:18:46 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:52313 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232855AbhHZQSp (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 26 Aug 2021 12:18:45 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1629994677;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=dc80C4dit3QwOZ5pXnhfczxS8gOs+rep9eS8mfVRLco=;
-        b=We54DdFMbVr6/Pw73QQRi0hmf6xRg6G12X1IXjpimt/CCHPG71KtN5NYjyqeCWVVEzcOCa
-        K6/fmuxyK1F1Pl1OKCAiBmsGVVQQT0BzCuYPR8E0cMF2wyXmWDA3dCzBIUKq9/jIeSh8px
-        ZntORrLw9zhlU+5azlYi/DjilNyiRP8=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-123-qbGM84NrOdmtem7DtN0L9A-1; Thu, 26 Aug 2021 12:17:54 -0400
-X-MC-Unique: qbGM84NrOdmtem7DtN0L9A-1
-Received: by mail-wr1-f70.google.com with SMTP id n10-20020a5d660a0000b02901551ef5616eso1000604wru.20
-        for <kvm@vger.kernel.org>; Thu, 26 Aug 2021 09:17:53 -0700 (PDT)
+        id S243083AbhHZQYW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 26 Aug 2021 12:24:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58250 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S243072AbhHZQYV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 26 Aug 2021 12:24:21 -0400
+Received: from mail-pg1-x533.google.com (mail-pg1-x533.google.com [IPv6:2607:f8b0:4864:20::533])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 12DA7C0613C1
+        for <kvm@vger.kernel.org>; Thu, 26 Aug 2021 09:23:34 -0700 (PDT)
+Received: by mail-pg1-x533.google.com with SMTP id 17so3532248pgp.4
+        for <kvm@vger.kernel.org>; Thu, 26 Aug 2021 09:23:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=Cr6/zwxvFT060RSzezsHpgYecFKnegANyyYpx1rGGgk=;
+        b=uNY4uwBlkIObxedN9T7czrSSQ8+WkGVy+7iyGhT2QeDpnuklcKX8rriKe6JkwQHEYH
+         R5RSvD+JfWj31OFDSZKcDqvcxL2bk12TnP46mH9tDqW2f4FPJTA/idWD1Fha49Mzkwz7
+         GkmSMPGe4APTTk4wRDKtLy0qWKpzUkE2cwMy6eBLQ7VuxvUQ+o9cPxgAV0xb6zh+ow3t
+         D6e4jkzKEpeKRgqP7Dvz8aEK9Kj599LEZEhdBA+TsMPsgqXralkZnR/sNlmchcSYX0Y8
+         nG5Ai0koCXynnxG62A8FxxdvewBzzD79RJ/wT5Zhtq+zBd1ujr5ctcYwq8Re4A3yPgjA
+         DJMw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
-         :message-id:mime-version;
-        bh=dc80C4dit3QwOZ5pXnhfczxS8gOs+rep9eS8mfVRLco=;
-        b=bYhOTWLV8ggQ+Ws63ngfjObnVAjMKnBqRG+KAEhIb6Jog9l68re9Lebp7wOIAsis5m
-         19dHAsiuzMF8Ufqoi+xjVNkRBLiiZu5/AYNLjESKEkO6r2MOa9dDc/o5vuBIEyLGUxxX
-         RTN0f+dwjBKUz0hTvEChlT9USFHeXmaZrorQqaFScB8fcP77cO89jQl6Dx3sgKiFt81B
-         KuECAC6D/cc1amyPNoBTtIziXsf0mjnGIi0lve4fUjMzguhlocY8icZrepdwqNQ31Dgp
-         xm9/oQi1GEVQWOAKjUxZGfuvMdjndMPcYSRE3C23i/zXe5zzVouEO+wuqg7lx+ISfmqQ
-         BwTA==
-X-Gm-Message-State: AOAM533LDu6TWcIk0D9FC0KgArSUXZ7w/nr5o/60Bsp5w9pGJTGh+GHi
-        /vXmYXNdxSsY7C9BJK2Y8pYG2H17VOQ4wNzsHiG11yranWju4YcZau0kz9JCN9l5ZsJMFVrI4n1
-        luQCxblOIbspA
-X-Received: by 2002:a7b:c7c3:: with SMTP id z3mr4474002wmk.96.1629994672907;
-        Thu, 26 Aug 2021 09:17:52 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyERgwCImWECf7qWig1zkLiUfQr++QiieKp+R0ZIoVmj3xDFRrIQEXTFDkgVFjgzSU79w72sg==
-X-Received: by 2002:a7b:c7c3:: with SMTP id z3mr4473979wmk.96.1629994672673;
-        Thu, 26 Aug 2021 09:17:52 -0700 (PDT)
-Received: from vitty.brq.redhat.com (g-server-2.ign.cz. [91.219.240.2])
-        by smtp.gmail.com with ESMTPSA id z13sm3715665wrs.71.2021.08.26.09.17.51
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=Cr6/zwxvFT060RSzezsHpgYecFKnegANyyYpx1rGGgk=;
+        b=gZS7b3ugcxkC0yBiJeHd3di6wUYTpZTWi9VxIedw58nEwSTVfIzoZckv7N9dAQnW2K
+         EZnNnxL2gf9a5c97aO9luj/INhF3vPnhx6BKjCv9T2j4XKBDLHgQqGSWHf6G9Sm1e50+
+         PQ/qYIHrg+W/5f9IpmLw602IE+x6VoAgYfiszP14leo0e3B4JdOdKWSqAzUTex7vdzSl
+         brPNawU8DPhF49U6397p0UEOZYL8lQHOsy3b5znzfeR028+30PMEVHzp/y0UxdgRzo6e
+         TieQyMsHk6cDGqF1mLWgI7C2Gnr+SvP+GaeD3Mqm5SssNj6IU0SORGiwaH1WqOGEAguJ
+         /M8w==
+X-Gm-Message-State: AOAM532tzcaQ0VluASsovE1Cq+e0f1GOwbx7PJBJYtrgzG03kv37+hGN
+        N7GqBfqOOZwEFMcIo8DxJQkwjQ==
+X-Google-Smtp-Source: ABdhPJzgUzoqaXbTLoNg7TkATbYE+7I5G/QVg9ZvB+a0/4dCbtt4U8oj73oQ/a1uhyE3aXxUmUkyWQ==
+X-Received: by 2002:a62:b414:0:b029:32e:3ef0:7735 with SMTP id h20-20020a62b4140000b029032e3ef07735mr4451329pfn.61.1629995013329;
+        Thu, 26 Aug 2021 09:23:33 -0700 (PDT)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id w14sm163145pge.40.2021.08.26.09.23.32
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 26 Aug 2021 09:17:52 -0700 (PDT)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+        Thu, 26 Aug 2021 09:23:32 -0700 (PDT)
+Date:   Thu, 26 Aug 2021 16:23:29 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Maxim Levitsky <mlevitsk@redhat.com>
+Cc:     kvm@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
         Wanpeng Li <wanpengli@tencent.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        "H. Peter Anvin" <hpa@zytor.com>,
         Jim Mattson <jmattson@google.com>,
-        "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
-        Nitesh Narayan Lal <nitesh@redhat.com>,
-        Lai Jiangshan <jiangshanlai@gmail.com>,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v3 3/4] KVM: Optimize kvm_make_vcpus_request_mask() a bit
-In-Reply-To: <YSeyV9cWQXCd+UKk@google.com>
-References: <20210826122442.966977-1-vkuznets@redhat.com>
- <20210826122442.966977-4-vkuznets@redhat.com>
- <YSeyV9cWQXCd+UKk@google.com>
-Date:   Thu, 26 Aug 2021 18:17:51 +0200
-Message-ID: <87fsuwi3io.fsf@vitty.brq.redhat.com>
+        Ingo Molnar <mingo@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
+        Borislav Petkov <bp@alien8.de>,
+        "open list:X86 ARCHITECTURE (32-BIT AND 64-BIT)" 
+        <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH 2/2] VMX: nSVM: enter protected mode prior to returning
+ to nested guest from SMM
+Message-ID: <YSfAAYN/Ng/L1IMa@google.com>
+References: <20210826095750.1650467-1-mlevitsk@redhat.com>
+ <20210826095750.1650467-3-mlevitsk@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210826095750.1650467-3-mlevitsk@redhat.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Sean Christopherson <seanjc@google.com> writes:
+On Thu, Aug 26, 2021, Maxim Levitsky wrote:
+> SMM return code switches CPU to real mode, and
+> then the nested_vmx_enter_non_root_mode first switches to vmcs02,
+> and then restores CR0 in the KVM register cache.
+> 
+> Unfortunately when it restores the CR0, this enables the protection mode
+> which leads us to "restore" the segment registers from
+> "real mode segment cache", which is not up to date vs L2 and trips
+> 'vmx_guest_state_valid check' later, when the
+> unrestricted guest mode is not enabled.
 
-> On Thu, Aug 26, 2021, Vitaly Kuznetsov wrote:
->> Iterating over set bits in 'vcpu_bitmap' should be faster than going
->> through all vCPUs, especially when just a few bits are set.
->> 
->> Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
->> ---
->
-> ...
->
->> +	if (vcpu_bitmap) {
->> +		for_each_set_bit(i, vcpu_bitmap, KVM_MAX_VCPUS) {
->> +			vcpu = kvm_get_vcpu(kvm, i);
->> +			if (!vcpu || vcpu == except)
->> +				continue;
->> +			kvm_make_vcpu_request(kvm, vcpu, req, tmp, me);
->> +		}
->> +	} else {
->> +		kvm_for_each_vcpu(i, vcpu, kvm) {
->> +			if (vcpu == except)
->> +				continue;
->> +			kvm_make_vcpu_request(kvm, vcpu, req, tmp, me);
->>  		}
->>  	}
->
-> Rather than feed kvm_make_all_cpus_request_except() into kvm_make_vcpus_request_mask(),
-> I think it would be better to move the kvm_for_each_vcpu() path into
-> kvm_make_all_cpus_request_except() (see bottom of the mail).  That eliminates the
-> silliness of calling a "mask" function without a mask, and also allows a follow-up
-> patch to drop @except from kvm_make_vcpus_request_mask(), which is truly nonsensical
-> as the caller can and should simply not set that vCPU in the mask. 
+I suspect this is slightly inaccurate.  When loading vmcs02, vmx_switch_vmcs()
+will do vmx_register_cache_reset(), which also causes the segment cache to be
+reset.  enter_pmode() will still load stale values, but they'll come from vmcs02,
+not KVM's segment register cache.
 
-Both make perfect sense, thanks! v4 is being prepared.
+> This happens to work otherwise, because after we enter the nested guest,
+> we restore its register state again from SMRAM with correct values
+> and that includes the segment values.
+> 
+> As a workaround to this if we enter protected mode first,
+> then setting CR0 won't cause this damage.
+> 
+> Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
+> ---
+>  arch/x86/kvm/vmx/vmx.c | 7 +++++++
+>  1 file changed, 7 insertions(+)
+> 
+> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+> index 0c2c0d5ae873..805c415494cf 100644
+> --- a/arch/x86/kvm/vmx/vmx.c
+> +++ b/arch/x86/kvm/vmx/vmx.c
+> @@ -7507,6 +7507,13 @@ static int vmx_leave_smm(struct kvm_vcpu *vcpu, const char *smstate)
+>  	}
+>  
+>  	if (vmx->nested.smm.guest_mode) {
+> +
+> +		/*
+> +		 * Enter protected mode to avoid clobbering L2's segment
+> +		 * registers during nested guest entry
+> +		 */
+> +		vmx_set_cr0(vcpu, vcpu->arch.cr0 | X86_CR0_PE);
 
--- 
-Vitaly
+I'd really, really, reaaaally like to avoid stuffing state.  All of the instances
+I've come across where KVM has stuffed state for something like this were just
+papering over one symptom of an underlying bug.
 
+For example, won't this now cause the same bad behavior if L2 is in Real Mode?
+
+Is the problem purely that emulation_required is stale?  If so, how is it stale?
+Every segment write as part of RSM emulation should reevaluate emulation_required
+via vmx_set_segment().
+
+Oooooh, or are you talking about the explicit vmx_guest_state_valid() in prepare_vmcs02()?
+If that's the case, then we likely should skip that check entirely.  The only part
+I'm not 100% clear on is whether or not it can/should be skipped for vmx_set_nested_state().
+
+diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+index bc6327950657..20bd84554c1f 100644
+--- a/arch/x86/kvm/vmx/nested.c
++++ b/arch/x86/kvm/vmx/nested.c
+@@ -2547,7 +2547,7 @@ static int prepare_vmcs02(struct kvm_vcpu *vcpu, struct vmcs12 *vmcs12,
+         * which means L1 attempted VMEntry to L2 with invalid state.
+         * Fail the VMEntry.
+         */
+-       if (CC(!vmx_guest_state_valid(vcpu))) {
++       if (from_vmentry && CC(!vmx_guest_state_valid(vcpu))) {
+                *entry_failure_code = ENTRY_FAIL_DEFAULT;
+                return -EINVAL;
+        }
+
+
+If we want to retain the check for the common vmx_set_nested_state() path, i.e.
+when the vCPU is truly being restored to guest mode, then we can simply exempt
+the smm.guest_mode case (which also exempts that case when its set via
+vmx_set_nested_state()).  The argument would be that RSM is going to restore L2
+state, so whatever happens to be in vmcs12/vmcs02 is stale.
+
+diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+index bc6327950657..ac30ba6a8592 100644
+--- a/arch/x86/kvm/vmx/nested.c
++++ b/arch/x86/kvm/vmx/nested.c
+@@ -2547,7 +2547,7 @@ static int prepare_vmcs02(struct kvm_vcpu *vcpu, struct vmcs12 *vmcs12,
+         * which means L1 attempted VMEntry to L2 with invalid state.
+         * Fail the VMEntry.
+         */
+-       if (CC(!vmx_guest_state_valid(vcpu))) {
++       if (!vmx->nested.smm.guest_mode && CC(!vmx_guest_state_valid(vcpu))) {
+                *entry_failure_code = ENTRY_FAIL_DEFAULT;
+                return -EINVAL;
+        }
