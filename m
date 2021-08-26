@@ -2,137 +2,105 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 98CA93F8FF6
-	for <lists+kvm@lfdr.de>; Thu, 26 Aug 2021 23:29:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3DF443F8FFB
+	for <lists+kvm@lfdr.de>; Thu, 26 Aug 2021 23:29:07 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243524AbhHZU75 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 26 Aug 2021 16:59:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37144 "EHLO
+        id S243597AbhHZVE7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 26 Aug 2021 17:04:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38384 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230125AbhHZU75 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 26 Aug 2021 16:59:57 -0400
-Received: from mail-qk1-x72e.google.com (mail-qk1-x72e.google.com [IPv6:2607:f8b0:4864:20::72e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7D37AC061757;
-        Thu, 26 Aug 2021 13:59:09 -0700 (PDT)
-Received: by mail-qk1-x72e.google.com with SMTP id e14so5004056qkg.3;
-        Thu, 26 Aug 2021 13:59:09 -0700 (PDT)
+        with ESMTP id S230125AbhHZVE7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 26 Aug 2021 17:04:59 -0400
+Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 58721C061757
+        for <kvm@vger.kernel.org>; Thu, 26 Aug 2021 14:04:11 -0700 (PDT)
+Received: by mail-yb1-xb49.google.com with SMTP id a62-20020a254d410000b0290592f360b0ccso4327972ybb.14
+        for <kvm@vger.kernel.org>; Thu, 26 Aug 2021 14:04:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=ldGhthI++t3w6986XDZba6Q1yZRX4odOpIMvkvePfHc=;
-        b=OheyBCur9wHxyJUrnhNfW2lfxtb3kQ6W+jYCnrD/Bu07QjycyF9xZlAaegudPBLJDn
-         8IasTBBZUwesaV7XZh07vNgJiN8jrvVWJ8J4rQc75VV7OjbAXUBZZFZl8OoOa9x+RkH8
-         a+zqgpivSYpVXoh3UyUiiRzKCsjGNKsVSvHCjBkgBRHXqUcBxnzpvPN+/JSNzmMgk/Pr
-         j+jFRlarz83iekoCTYuz3n8xJHqVv0TduhQ+s2z85F+z3T1p0x0PIlmLjvbdPN1sPfZ1
-         4W1CTRqSEXOju5Kpnsp28Ty9GYmqdRlmEeiFCGCnXrSo6Fyedw0U0GsFQSsblkbUZtjz
-         +7oA==
+        d=google.com; s=20161025;
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=i2sGDuRku/FYfLWUl/wbmgS2ELZI7EvwMuHHuh47tJM=;
+        b=XrEBuJb+Nfy2Qo6icEHSALmuN7GZvZRM4+JNX7C71uc8Sood823I44f90tbLlj46kB
+         NJwx2LUbyJJoxU+7S9mFsRF6y2TXr57Ds0uA1y9B7w1SwQaQlelG2LXJMnLX4n+cR84t
+         NAdIW0svtSj4i5WxOBrgt6OhVp00od9NJg0JQ6h5FH6YBd3RAb3RnTTqHlxIRaDXGAnN
+         Wo58OlI9onkLPU+ZKXAkgoR8YResf4yveCzIq4dFeQQO5MyIfyFxER8tyoDfFyeppTcw
+         MuD+noJc29zOqqV0ZvcSBIn0CH9xT0SxSAB5+a7xWBf/eH11vYYl3+sAzsvmBpT1OEUR
+         fEmQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=ldGhthI++t3w6986XDZba6Q1yZRX4odOpIMvkvePfHc=;
-        b=r42gHwmPFkI3T3XN4PkDiRDMkA9H+6Q05S0ADO0wdUWewxKFtlSnHm2BfPfL0WRkTN
-         hcKgPBCu1ea/wsG/PJ+M/cxbvZMLtBZGkLujRQIAPVJLXpSfb/owcv80Xn1TnZB7Wdht
-         8BGfZ8srZ6JKojPn7pZulchVGX/6Xrb3RqG/+dRB5XcFTbB5TpF6cDLS0kxBNarNWdY6
-         XyhcuanfgnKIVjXaOBr+UKFuJlf3wkxxwv3BMqemHp45O0oHCJ+K//eWtKvqF+JYFzQT
-         GrQL/HiZwz8eLPn42y4mRj2JDXushy50/ilbo/zcn6JvnvHx4yMhXdxskfPzTcpJR1+7
-         ZvUg==
-X-Gm-Message-State: AOAM533Mqiu0Cuyspej28MCPpbJmP9G910MRl54U2Bbdb6D3uAiOH2Nt
-        GR8+U3FtuAsY/tNRH3L6AGHSZHDA4h5Lqg==
-X-Google-Smtp-Source: ABdhPJxrD+K1ALRaZQSDKJ72hjbpCHhEic6Csz/W3OUeeXf3irJ5comsp24peI48bMJIZwCal3yxRA==
-X-Received: by 2002:a37:61d5:: with SMTP id v204mr5747644qkb.308.1630011547957;
-        Thu, 26 Aug 2021 13:59:07 -0700 (PDT)
-Received: from localhost ([12.28.44.171])
-        by smtp.gmail.com with ESMTPSA id p22sm3327691qkj.16.2021.08.26.13.59.07
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 26 Aug 2021 13:59:07 -0700 (PDT)
-Date:   Thu, 26 Aug 2021 13:59:06 -0700
-From:   Yury Norov <yury.norov@gmail.com>
-To:     Petr Mladek <pmladek@suse.com>
-Cc:     Andrew Morton <akpm@linux-foundation.org>,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        linux-arch@vger.kernel.org, linux-kselftest@vger.kernel.org,
-        linux-mmc@vger.kernel.org, linux-perf-users@vger.kernel.org,
-        kvm@vger.kernel.org,
-        "James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>,
-        Alexander Lobakin <alobakin@pm.me>,
-        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
-        Alexey Klimov <aklimov@redhat.com>,
-        Andrea Merello <andrea.merello@gmail.com>,
-        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-        Arnaldo Carvalho de Melo <acme@redhat.com>,
-        Arnd Bergmann <arnd@arndb.de>, Ben Gardon <bgardon@google.com>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        Brian Cain <bcain@codeaurora.org>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Christoph Lameter <cl@linux.com>,
-        Daniel Bristot de Oliveira <bristot@redhat.com>,
-        David Hildenbrand <david@redhat.com>,
-        Dennis Zhou <dennis@kernel.org>,
-        Geert Uytterhoeven <geert@linux-m68k.org>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Ian Rogers <irogers@google.com>,
-        Ingo Molnar <mingo@redhat.com>,
-        Jaegeuk Kim <jaegeuk@kernel.org>,
-        Jakub Kicinski <kuba@kernel.org>, Jiri Olsa <jolsa@redhat.com>,
-        Joe Perches <joe@perches.com>, Jonas Bonn <jonas@southpole.se>,
-        Leo Yan <leo.yan@linaro.org>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Namhyung Kim <namhyung@kernel.org>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Peter Xu <peterx@redhat.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Rasmus Villemoes <linux@rasmusvillemoes.dk>,
-        Rich Felker <dalias@libc.org>,
-        Samuel Mendoza-Jonas <sam@mendozajonas.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Sergey Senozhatsky <senozhatsky@chromium.org>,
-        Shuah Khan <shuah@kernel.org>,
-        Stefan Kristiansson <stefan.kristiansson@saunalahti.fi>,
-        Steven Rostedt <rostedt@goodmis.org>,
-        Tejun Heo <tj@kernel.org>,
-        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
-        Ulf Hansson <ulf.hansson@linaro.org>,
-        Will Deacon <will@kernel.org>,
-        Wolfram Sang <wsa+renesas@sang-engineering.com>,
-        Yoshinori Sato <ysato@users.sourceforge.jp>
-Subject: Re: [PATCH 17/17] vsprintf: rework bitmap_list_string
-Message-ID: <YSgAmjvwscaRb8PT@yury-ThinkPad>
-References: <20210814211713.180533-1-yury.norov@gmail.com>
- <20210814211713.180533-18-yury.norov@gmail.com>
- <YSeh7SrwoMhWb8CO@alley>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <YSeh7SrwoMhWb8CO@alley>
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=i2sGDuRku/FYfLWUl/wbmgS2ELZI7EvwMuHHuh47tJM=;
+        b=MkEAl230o32UVLv5Qiepd4qxGBbJ4X/BUp019mAKDZSuMts7+/B5JYTWojKz2CtLo1
+         snCxcsL+xH2olGKJzGjFIZOMKIOG9W1fMZfGOGtoEzlEuCzAJR9vFiF0r6lYLBTTil8t
+         NqtBMOs6rGySCxSr2lKUdrMxHWuPIWTE2QVH7woY88E6mzBQ5t06ADkeOKWoeH2g4nF3
+         gYCBopVyW5WP2G0IlEY8lomSJ+8iu0SbEt3EETxwROApYo4/VGDkGFAmRk/JDRD3BAJc
+         25oprNlCdmSELcLvze4h6oGGlArYx5+4Ie5Ol08JOrej5u7XsfsfyDJ3W0nanQHbAN5Z
+         +p1g==
+X-Gm-Message-State: AOAM533r6pC+EXEkCBUGPuWP5KcLw4CR9de+l+IZitu72BYBcVjm/0Z4
+        Q/S7xERuYIzVS2LAPoMKAnwtiPUe9fKjQrQQcVi5LNKHsS6lPgLrGnHuolP9KV3rvYzP5960q+b
+        LxsTI3dkioQtNZ4OzOgyFg9gOfxewfP+sxTdBENE9RlxUqrFpVcvqZA==
+X-Google-Smtp-Source: ABdhPJwvP7VXrWFcmqt4Z2OgNHxg1TA6Kh0r57f42DpXfHDXhLN+5DbhofG2lcpW1QQX69XfpImFI93TBw==
+X-Received: from fawn.svl.corp.google.com ([2620:15c:2cd:202:1b91:1659:2490:68a1])
+ (user=morbo job=sendgmr) by 2002:a25:c095:: with SMTP id c143mr920583ybf.179.1630011850572;
+ Thu, 26 Aug 2021 14:04:10 -0700 (PDT)
+Date:   Thu, 26 Aug 2021 14:04:06 -0700
+Message-Id: <20210826210406.18490-1-morbo@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.33.0.259.gc128427fd7-goog
+Subject: [PATCH] libcflag: define the "noinline" macro
+From:   Bill Wendling <morbo@google.com>
+To:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+        Roman Bolshakov <r.bolshakov@yadro.com>,
+        David Matlack <dmatlack@google.com>,
+        Sean Christopherson <seanjc@google.com>
+Cc:     Bill Wendling <morbo@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Aug 26, 2021 at 04:15:09PM +0200, Petr Mladek wrote:
-> On Sat 2021-08-14 14:17:13, Yury Norov wrote:
-> > bitmap_list_string() is very ineffective when printing bitmaps with long
-> > ranges of set bits because it calls find_next_bit for each bit in the
-> > bitmap.  We can do better by detecting ranges of set bits.
-> > 
-> > In my environment, before/after is 943008/31008 ns.
-> > 
-> > Signed-off-by: Yury Norov <yury.norov@gmail.com>
-> > Tested-by: Wolfram Sang <wsa+renesas@sang-engineering.com>
-> 
-> I like the patch. The new code is much easier to follow.
-> Feel free to use:
-> 
-> Reviewed-by: Petr Mladek <pmladek@suse.com>
-> 
-> Best Regards,
-> Petr
+Define "noline" macro to reduce the amount of typing for functions using
+the "noinline" attribute.
 
-Thanks Petr! The patch is already in the linux-next.
+Signed-off-by: Bill Wendling <morbo@google.com>
+---
+ lib/libcflat.h | 1 +
+ x86/pmu_lbr.c  | 4 ++--
+ 2 files changed, 3 insertions(+), 2 deletions(-)
 
-Andrew, Stephen, can you please append Petr's reviewed-by?
+diff --git a/lib/libcflat.h b/lib/libcflat.h
+index 97db9e3..a652c76 100644
+--- a/lib/libcflat.h
++++ b/lib/libcflat.h
+@@ -29,6 +29,7 @@
+ #include <stdbool.h>
+ 
+ #define __unused __attribute__((__unused__))
++#define noinline __attribute__((noinline))
+ 
+ #define xstr(s...) xxstr(s)
+ #define xxstr(s...) #s
+diff --git a/x86/pmu_lbr.c b/x86/pmu_lbr.c
+index 3bd9e9f..5ff805a 100644
+--- a/x86/pmu_lbr.c
++++ b/x86/pmu_lbr.c
+@@ -16,14 +16,14 @@
+ 
+ volatile int count;
+ 
+-static __attribute__((noinline)) int compute_flag(int i)
++static noinline int compute_flag(int i)
+ {
+ 	if (i % 10 < 4)
+ 		return i + 1;
+ 	return 0;
+ }
+ 
+-static __attribute__((noinline)) int lbr_test(void)
++static noinline int lbr_test(void)
+ {
+ 	int i;
+ 	int flag;
+-- 
+2.33.0.259.gc128427fd7-goog
 
-Thanks,
-Yury
