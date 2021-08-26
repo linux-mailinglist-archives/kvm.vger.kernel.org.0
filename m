@@ -2,165 +2,233 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3796F3F8B6E
-	for <lists+kvm@lfdr.de>; Thu, 26 Aug 2021 18:01:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 20CFC3F8D50
+	for <lists+kvm@lfdr.de>; Thu, 26 Aug 2021 19:50:52 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243014AbhHZQB7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 26 Aug 2021 12:01:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53076 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233548AbhHZQB6 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 26 Aug 2021 12:01:58 -0400
-Received: from mail-pg1-x530.google.com (mail-pg1-x530.google.com [IPv6:2607:f8b0:4864:20::530])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 30219C0613C1
-        for <kvm@vger.kernel.org>; Thu, 26 Aug 2021 09:01:11 -0700 (PDT)
-Received: by mail-pg1-x530.google.com with SMTP id y23so3452844pgi.7
-        for <kvm@vger.kernel.org>; Thu, 26 Aug 2021 09:01:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=I1bph11Wd0ZbjyAzIWa4mfAM/Oiqq+VnKfVLVM9GnTQ=;
-        b=cl1CixXlMCeneZwlE0PUc0DQwS9ypz/ka6GAIANMo+Lj11uONEBvtKdu0h40aMDBLK
-         41X6v49U06VxoJcLS31r19WsGKw38AdOBRj1Cutxpb4NOWPMpyg3TBiHhRWxSd5tAUL+
-         p7CokmWxRViGk5POtKIdg+H0NGjoD3RLFFtpWe3aia/+SNJLwY7Tj0P5msdE2ntwjyNd
-         Zq1tsI+CLUto2DQ97YMQjHgNrjBeM9F/LXX2UiRZTY1VD+bV7VzTXikIJdIYswyUM05F
-         LdmhCjOEyfnh0ixVqYZNLzDsl/YRun9tpZkZJXOezAgmLZupVOTXQKCWadTjag0KcK6j
-         dN6Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=I1bph11Wd0ZbjyAzIWa4mfAM/Oiqq+VnKfVLVM9GnTQ=;
-        b=T+VvKgv5Z840MS8/XA/79Q8dtUUwRiEXBASWWHCSnPL4V2h4TVpp16dC8x2apCAPWR
-         urYy046vdvbk8GBX7rSroYCNyuofOJLGaOsbXBBIakl21AA2mNuigYec5ZFpFatOHj80
-         aRcmvY97a0iigMSxAprh8y94LdGCq4eJ0oyGoTBtAhO74WM78dIURfSvV9LPDaq40ez3
-         2hDWj16VRcdUfhJRxgzNp/wCyuK933Z/RTXuSCxqKHXN5JH6C5g6QTAy3gqg12rUQsDb
-         Md+UTQAb/xgEmQ6ZOt7wcC3GtFTFUsjAINB9Kdr99zOa4QaCGCZE0u6tS/2EXfdXh88r
-         rGDg==
-X-Gm-Message-State: AOAM533os/JNzTF/dFwow7M/aoJV2L0WfceSKgPIe0jz0cGjJ0gV8+vK
-        x0Gs7Bxfosu5d3SDsg/+EOVaPQ==
-X-Google-Smtp-Source: ABdhPJxXWQqP2E26c8cgG68T7KQcAPfejUNZcRWq7HEkud5KhiFuKuvan24jNgscOC3rRnqF2L6Xcw==
-X-Received: by 2002:aa7:93b0:0:b0:3f1:bb85:a37d with SMTP id x16-20020aa793b0000000b003f1bb85a37dmr4539509pff.10.1629993670310;
-        Thu, 26 Aug 2021 09:01:10 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id gm5sm3095339pjb.32.2021.08.26.09.01.09
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 26 Aug 2021 09:01:09 -0700 (PDT)
-Date:   Thu, 26 Aug 2021 16:01:06 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Maxim Levitsky <mlevitsk@redhat.com>
-Cc:     kvm@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Jim Mattson <jmattson@google.com>,
-        Ingo Molnar <mingo@redhat.com>,
+        id S243082AbhHZRvf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 26 Aug 2021 13:51:35 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:35027 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S230306AbhHZRvb (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 26 Aug 2021 13:51:31 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1630000243;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=PvXsdXQQUMrVaAVuvdnDTnPGYLw11LK+qxHRVFWcVTM=;
+        b=XUtnGwckm2M2aTi4u3CuDYYCXCi2QYCG0CeB66B5tfiMKtDS69UrytRO0rFK/GsRbZikNM
+        bSDYtHzbCM7ZJqeDStfUOFqv+KBlmpHljtzmF9rh50OfyZsuDWz/L2+OVHtvT7upUlp9y5
+        p8ULoG/Gbi/YpRCIlflwdL9FOgxE/aw=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-304-QdMGh5PlPZ2sM6eQY6OdGA-1; Thu, 26 Aug 2021 13:50:42 -0400
+X-MC-Unique: QdMGh5PlPZ2sM6eQY6OdGA-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EC037800493;
+        Thu, 26 Aug 2021 17:50:39 +0000 (UTC)
+Received: from localhost (unknown [10.22.10.96])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 496746788F;
+        Thu, 26 Aug 2021 17:50:32 +0000 (UTC)
+Date:   Thu, 26 Aug 2021 10:52:10 -0400
+From:   Eduardo Habkost <ehabkost@redhat.com>
+To:     Vitaly Kuznetsov <vkuznets@redhat.com>
+Cc:     Maxim Levitsky <mlevitsk@redhat.com>, kvm@vger.kernel.org,
         Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
-        Borislav Petkov <bp@alien8.de>,
-        "open list:X86 ARCHITECTURE (32-BIT AND 64-BIT)" 
-        <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH 1/2] KVM: VMX: avoid running vmx_handle_exit_irqoff in
- case of emulation
-Message-ID: <YSe6wphK9b8KSkXW@google.com>
-References: <20210826095750.1650467-1-mlevitsk@redhat.com>
- <20210826095750.1650467-2-mlevitsk@redhat.com>
+        Sean Christopherson <seanjc@google.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+        Nitesh Narayan Lal <nitesh@redhat.com>,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 4/4] KVM: x86: Fix stack-out-of-bounds memory access
+ from ioapic_write_indirect()
+Message-ID: <20210826145210.gpfbiagntwoswrzp@habkost.net>
+References: <20210823185841.ov7ejn2thwebcwqk@habkost.net>
+ <87mtp7jowv.fsf@vitty.brq.redhat.com>
+ <CAOpTY_ot8teH5x5vVS2HvuMx5LSKLPtyen_ZUM1p7ncci4LFbA@mail.gmail.com>
+ <87k0kakip9.fsf@vitty.brq.redhat.com>
+ <2df0b6d18115fb7f2701587b7937d8ddae38e36a.camel@redhat.com>
+ <87h7fej5ov.fsf@vitty.brq.redhat.com>
+ <36b6656637d1e6aaa2ab5098f7ebc27644466294.camel@redhat.com>
+ <87bl5lkgfm.fsf@vitty.brq.redhat.com>
+ <CAOpTY_q=0cuxXAToJrcqCRERY_sUSB1HNVBVNiEpH6Dsy0-+yA@mail.gmail.com>
+ <87tujcidka.fsf@vitty.brq.redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20210826095750.1650467-2-mlevitsk@redhat.com>
+In-Reply-To: <87tujcidka.fsf@vitty.brq.redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Aug 26, 2021, Maxim Levitsky wrote:
-> If we are emulating an invalid guest state, we don't have a correct
-> exit reason, and thus we shouldn't do anything in this function.
+On Thu, Aug 26, 2021 at 02:40:53PM +0200, Vitaly Kuznetsov wrote:
+> Eduardo Habkost <ehabkost@redhat.com> writes:
 > 
-> Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
-
-This should have Cc: stable.  I believe userspace could fairly easily trick KVM
-into "handling" a spurious IRQ, e.g. trigger SIGALRM and stuff invalid state.
-For all those evil folks running CPUs that are almost old enough to drive :-)
-
-> ---
->  arch/x86/kvm/vmx/vmx.c | 3 +++
->  1 file changed, 3 insertions(+)
+> > On Wed, Aug 25, 2021 at 5:43 AM Vitaly Kuznetsov <vkuznets@redhat.com> wrote:
+> >>
+> >> Maxim Levitsky <mlevitsk@redhat.com> writes:
+> >>
+> >> > On Wed, 2021-08-25 at 10:21 +0200, Vitaly Kuznetsov wrote:
+> >> >> Maxim Levitsky <mlevitsk@redhat.com> writes:
+> >> >>
+> >> >> > On Tue, 2021-08-24 at 16:42 +0200, Vitaly Kuznetsov wrote:
+> >> >> ...
+> >> >> > Not a classical review but,
+> >> >> > I did some digital archaeology with this one, trying to understand what is going on:
+> >> >> >
+> >> >> >
+> >> >> > I think that 16 bit vcpu bitmap is due to the fact that IOAPIC spec states that
+> >> >> > it can address up to 16 cpus in physical destination mode.
+> >> >> >
+> >> >> > In logical destination mode, assuming flat addressing and that logical id = 1 << physical id
+> >> >> > which KVM hardcodes, it is also only possible to address 8 CPUs.
+> >> >> >
+> >> >> > However(!) in flat cluster mode, the logical apic id is split in two.
+> >> >> > We have 16 clusters and each have 4 CPUs, so it is possible to address 64 CPUs,
+> >> >> > and unlike the logical ID, the KVM does honour cluster ID,
+> >> >> > thus one can stick say cluster ID 0 to any vCPU.
+> >> >> >
+> >> >> >
+> >> >> > Let's look at ioapic_write_indirect.
+> >> >> > It does:
+> >> >> >
+> >> >> >     -> bitmap_zero(&vcpu_bitmap, 16);
+> >> >> >     -> kvm_bitmap_or_dest_vcpus(ioapic->kvm, &irq, &vcpu_bitmap);
+> >> >> >     -> kvm_make_scan_ioapic_request_mask(ioapic->kvm, &vcpu_bitmap); // use of the above bitmap
+> >> >> >
+> >> >> >
+> >> >> > When we call kvm_bitmap_or_dest_vcpus, we can already overflow the bitmap,
+> >> >> > since we pass all 8 bit of the destination even when it is physical.
+> >> >> >
+> >> >> >
+> >> >> > Lets examine the kvm_bitmap_or_dest_vcpus:
+> >> >> >
+> >> >> >   -> It calls the kvm_apic_map_get_dest_lapic which
+> >> >> >
+> >> >> >        -> for physical destinations, it just sets the bitmap, which can overflow
+> >> >> >           if we pass it 8 bit destination (which basically includes reserved bits + 4 bit destination).
+> >> >> >
+> >> >> >
+> >> >> >        -> For logical apic ID, it seems to truncate the result to 16 bit, which isn't correct as I explained
+> >> >> >           above, but should not overflow the result.
+> >> >> >
+> >> >> >
+> >> >> >    -> If call to kvm_apic_map_get_dest_lapic fails, it goes over all vcpus and tries to match the destination
+> >> >> >        This can overflow as well.
+> >> >> >
+> >> >> >
+> >> >> > I also don't like that ioapic_write_indirect calls the kvm_bitmap_or_dest_vcpus twice,
+> >> >> > and second time with 'old_dest_id'
+> >> >> >
+> >> >> > I am not 100%  sure why old_dest_id/old_dest_mode are needed as I don't see anything in the
+> >> >> > function changing them.
+> >> >> > I think only the guest can change them, so maybe the code deals with the guest changing them
+> >> >> > while the code is running from a different vcpu?
+> >> >> >
+> >> >> > The commit that introduced this code is 7ee30bc132c683d06a6d9e360e39e483e3990708
+> >> >> > Nitesh Narayan Lal, maybe you remember something about it?
+> >> >> >
+> >> >>
+> >> >> Before posting this patch I've contacted Nitesh privately, he's
+> >> >> currently on vacation but will take a look when he gets back.
+> >> >>
+> >> >> > Also I worry a lot about other callers of kvm_apic_map_get_dest_lapic
+> >> >> >
+> >> >> > It is also called from kvm_irq_delivery_to_apic_fast, and from kvm_intr_is_single_vcpu_fast
+> >> >> > and both seem to also use 'unsigned long' for bitmap, and then only use 16 bits of it.
+> >> >> >
+> >> >> > I haven't dug into them, but these don't seem to be IOAPIC related and I think
+> >> >> > can overwrite the stack as well.
+> >> >>
+> >> >> I'm no expert in this code but when writing the patch I somehow
+> >> >> convinced myself that a single unsigned long is always enough. I think
+> >> >> that for cluster mode 'bitmap' needs 64-bits (and it is *not* a
+> >> >> vcpu_bitmap, we need to convert). I may be completely wrong of course
+> >> >> but in any case this is a different issue. In ioapic_write_indirect() we
+> >> >> have 'vcpu_bitmap' which should certainly be longer than 64 bits.
+> >> >
+> >> >
+> >> > This code which I mentioned in 'other callers' as far as I see is not IOAPIC related.
+> >> > For regular local APIC all bets are off, any vCPU and apic ID are possible
+> >> > (xapic I think limits apic id to 255 but x2apic doesn't).
+> >> >
+> >> > I strongly suspect that this code can overflow as well.
+> >>
+> >> I've probably missed something but I don't see how
+> >> kvm_apic_map_get_dest_lapic() can set bits above 64 in 'bitmap'. If it
+> >> can, then we have a problem indeed.
+> >
+> > It would be nice if the compiler took care of validating bitmap sizes
+> > for us. Shouldn't we make the function prototypes explicit about the
+> > bitmap sizes they expect?
+> >
+> > I believe some `typedef DECLARE_BITMAP(...)` or `typedef struct {
+> > DECLARE_BITMAP(...) } ...` declarations would be very useful here.
 > 
-> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> index fada1055f325..0c2c0d5ae873 100644
-> --- a/arch/x86/kvm/vmx/vmx.c
-> +++ b/arch/x86/kvm/vmx/vmx.c
-> @@ -6382,6 +6382,9 @@ static void vmx_handle_exit_irqoff(struct kvm_vcpu *vcpu)
->  {
->  	struct vcpu_vmx *vmx = to_vmx(vcpu);
->  
-> +	if (vmx->emulation_required)
-> +		return;
+> The fundamental problem here is that bitmap in Linux has 'unsigned long
+> *' type, it's supposed to be accompanied with 'int len' parameter but
+> it's not always the case.
+> 
+> In KVM, we usually use 'vcpu_bitmap' (or 'dest_vcpu_bitmap') and these
+> are 'KVM_MAX_VCPUS' long. Just 'bitmap' or 'mask' case is a bit more
+> complicated. E.g. kvm_apic_map_get_logical_dest() uses 'u16 *mask' and
+> this means that only 16 bits in the destination are supposed to be
+> set. kvm_apic_map_get_dest_lapic() uses 'unsigned long *bitmap' - go
+> figure.
+> 
+> We could've probably used a declaration like you suggest to e.g. create
+> incompatible 'bitmap16','bitmap64',... types and make the compiler do
+> the checking but I'm slightly hesitant to introduce such helpers to KVM
+> and not the whole kernel. Alternatively, we could've just encoded the
+> length in parameters name, e.g. 
+> 
+> @@ -918,7 +918,7 @@ static bool kvm_apic_is_broadcast_dest(struct kvm *kvm, struct kvm_lapic **src,
+>  static inline bool kvm_apic_map_get_dest_lapic(struct kvm *kvm,
+>                 struct kvm_lapic **src, struct kvm_lapic_irq *irq,
+>                 struct kvm_apic_map *map, struct kvm_lapic ***dst,
+> -               unsigned long *bitmap)
+> +               unsigned long *bitmap64)
 
-Rather than play whack-a-mole with flows consuming stale state, I'd much prefer
-to synthesize a VM-Exit(INVALID_GUEST_STATE).  Alternatively, just skip ->run()
-entirely by adding hooks in vcpu_enter_guest(), but that's a much larger change
-and probably not worth the risk at this juncture.
+You can communicate the expected bitmap size to the compiler
+without typedefs if using DECLARE_BITMAP inside the function
+parameter list is acceptable coding style (is it?).
 
+For example, the following would have allowed the compiler to
+catch the bug you are fixing:
+
+Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 ---
- arch/x86/kvm/vmx/vmx.c | 17 ++++++++++++++---
- 1 file changed, 14 insertions(+), 3 deletions(-)
-
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index 32e3a8b35b13..12fe63800889 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -6618,10 +6618,21 @@ static fastpath_t vmx_vcpu_run(struct kvm_vcpu *vcpu)
- 		     vmx->loaded_vmcs->soft_vnmi_blocked))
- 		vmx->loaded_vmcs->entry_time = ktime_get();
+diff --git a/arch/x86/kvm/lapic.h b/arch/x86/kvm/lapic.h
+index d7c25d0c1354..e8c64747121a 100644
+--- a/arch/x86/kvm/lapic.h
++++ b/arch/x86/kvm/lapic.h
+@@ -236,7 +236,7 @@ bool kvm_apic_pending_eoi(struct kvm_vcpu *vcpu, int vector);
+ void kvm_wait_lapic_expire(struct kvm_vcpu *vcpu);
  
--	/* Don't enter VMX if guest state is invalid, let the exit handler
--	   start emulation until we arrive back to a valid state */
--	if (vmx->emulation_required)
-+	/*
-+	 * Don't enter VMX if guest state is invalid, let the exit handler
-+	 * start emulation until we arrive back to a valid state.  Synthesize a
-+	 * consistency check VM-Exit due to invalid guest state and bail.
-+	 */
-+	if (unlikely(vmx->emulation_required)) {
-+		vmx->fail = 0;
-+		vmx->exit_reason.full = EXIT_REASON_INVALID_STATE;
-+		vmx->exit_reason.failed_vmentry = 1;
-+		kvm_register_mark_available(vcpu, VCPU_EXREG_EXIT_INFO_1);
-+		vmx->exit_qualification = ENTRY_FAIL_DEFAULT;
-+		kvm_register_mark_available(vcpu, VCPU_EXREG_EXIT_INFO_2);
-+		vmx->exit_intr_info = 0;
- 		return EXIT_FASTPATH_NONE;
-+	}
+ void kvm_bitmap_or_dest_vcpus(struct kvm *kvm, struct kvm_lapic_irq *irq,
+-			      unsigned long *vcpu_bitmap);
++			      DECLARE_BITMAP(vcpu_bitmap, KVM_MAX_VCPUS));
  
- 	trace_kvm_entry(vcpu);
- 
---
+ bool kvm_intr_is_single_vcpu_fast(struct kvm *kvm, struct kvm_lapic_irq *irq,
+ 			struct kvm_vcpu **dest_vcpu);
+diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
+index 76fb00921203..1df113894cba 100644
+--- a/arch/x86/kvm/lapic.c
++++ b/arch/x86/kvm/lapic.c
+@@ -1166,7 +1166,7 @@ static int __apic_accept_irq(struct kvm_lapic *apic, int delivery_mode,
+  * each available vcpu to identify the same.
+  */
+ void kvm_bitmap_or_dest_vcpus(struct kvm *kvm, struct kvm_lapic_irq *irq,
+-			      unsigned long *vcpu_bitmap)
++			      DECLARE_BITMAP(vcpu_bitmap, KVM_MAX_VCPUS))
+ {
+ 	struct kvm_lapic **dest_vcpu = NULL;
+ 	struct kvm_lapic *src = NULL;
 
-or the beginnings of an aggressive refactor...
+-- 
+Eduardo
 
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index cf8fb6eb676a..a4fe0f78898a 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -9509,6 +9509,9 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
-                goto cancel_injection;
-        }
-
-+       if (unlikely(static_call(kvm_x86_emulation_required)(vcpu)))
-+               return static_call(kvm_x86_emulate_invalid_guest_state)(vcpu);
-+
-        preempt_disable();
-
-        static_call(kvm_x86_prepare_guest_switch)(vcpu);
-
-> +
->  	if (vmx->exit_reason.basic == EXIT_REASON_EXTERNAL_INTERRUPT)
->  		handle_external_interrupt_irqoff(vcpu);
->  	else if (vmx->exit_reason.basic == EXIT_REASON_EXCEPTION_NMI)
-> -- 
-> 2.26.3
-> 
