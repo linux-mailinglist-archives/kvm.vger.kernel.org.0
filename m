@@ -2,164 +2,523 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 76A273F9002
-	for <lists+kvm@lfdr.de>; Thu, 26 Aug 2021 23:29:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C7B873F9024
+	for <lists+kvm@lfdr.de>; Thu, 26 Aug 2021 23:29:19 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243645AbhHZVKr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 26 Aug 2021 17:10:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39658 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S243577AbhHZVKq (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 26 Aug 2021 17:10:46 -0400
-Received: from mail-qk1-x72d.google.com (mail-qk1-x72d.google.com [IPv6:2607:f8b0:4864:20::72d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 97356C061757;
-        Thu, 26 Aug 2021 14:09:58 -0700 (PDT)
-Received: by mail-qk1-x72d.google.com with SMTP id 22so5027623qkg.2;
-        Thu, 26 Aug 2021 14:09:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=ndtmO1/QxMT8WfX0l7kvhRXiSBeQRVJld2PoPckI1O0=;
-        b=rXkpoN+AxZC8JOkn4R8K9c+mS84OMQ1t83JbZhfjYcI75ANkLuquiypDrnp6s06y4I
-         NPluMkYca+r77CJWNzrc6f9U4ud4kyXphYA+f1Z5i3sj5A67I2KVW7XMYbANrSrvNeug
-         AXEO1RvjRD9vlxYBKA66P+G1lIN48rj840wiRhKemSqTzWsckMEASoZJXD1f/rAaSq+q
-         4EwzIgRtp08+jezv5v4uFoI2T4EFS19SAExLi8M3OLwn0bNz8oPOwq/p73iAAEyEo2/9
-         NFstchfvGDpACwhniUvMd14JxputDzfRaHh8vadNNfyRCFm09A2zMbDHXzY48P6KZLGQ
-         euLA==
+        id S243706AbhHZV1Q (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 26 Aug 2021 17:27:16 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:56154 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S230182AbhHZV1P (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 26 Aug 2021 17:27:15 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1630013187;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=BsnyWI3p28wRHpeU+PZ242f3/6NLAQAJP+SyEljvdwk=;
+        b=QcVHHN0+28HkDFTY1zvOTiGVcNzBHzTSjuKB9WvDk4JqxiJvY2bp/A51W9xv+4U0Wti56f
+        0OSCmjBOWW4/bGEzvqPADLb5Noz7s7NPNOOUVD0RrHbhGaDiI0gfF0CW1iWfr+Y5/KI7/f
+        3tmGRqpBnmYy6GXm9lis42KKqIg5bgk=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-36-cbWUju-bPJupOZdXm-Rj7w-1; Thu, 26 Aug 2021 17:26:26 -0400
+X-MC-Unique: cbWUju-bPJupOZdXm-Rj7w-1
+Received: by mail-wm1-f71.google.com with SMTP id v2-20020a7bcb420000b02902e6b108fcf1so4855585wmj.8
+        for <kvm@vger.kernel.org>; Thu, 26 Aug 2021 14:26:26 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=ndtmO1/QxMT8WfX0l7kvhRXiSBeQRVJld2PoPckI1O0=;
-        b=HMbCouOVtu2xaoA5Zhl/F7PHiJjgy0S0Ut4CFVm+qVWZySI4o1OY4w2sj1oaWvcU9o
-         VjjdDD5MaCB1Y+VDzw4JRgzp7DMi5bDP36ALVL1FBWRhBWMLy1EFw4/27UNlglEr15gB
-         2z7K06LAGUDEB8z7wyna0HbAPRqDC3tvn54ylwJYTfFtHM/A0XkWgEsXZcwL6qULrdQB
-         y2pHAa0Bew3JfLcqVMFJNep1ZAYZIiI0fxbT3b5yCt/Jv6eNgueyt4KUGKl+l1u/mGeG
-         qMcRRGoEAU7GZ2WV1eoS2s2qlRhKrkqdTV1OPv1vfdUPUK8Q8ZAO6WzltvO4xkegmDQr
-         9RBA==
-X-Gm-Message-State: AOAM530Rpjl3s7ehPbdfR8LW+nhDcIIu0aiWxaaxEcfKRc6OTvX2GWMp
-        YmOd5WngB+RdM+LzhI9ngmM=
-X-Google-Smtp-Source: ABdhPJyNBmR/3pzA2dXFXq9JJ0G8eGCHjShTKLd/3ctVIJ403sMS9vArXoGYUj4XusUtSX1cbXxkww==
-X-Received: by 2002:a37:de15:: with SMTP id h21mr5971229qkj.124.1630012197581;
-        Thu, 26 Aug 2021 14:09:57 -0700 (PDT)
-Received: from localhost ([12.28.44.171])
-        by smtp.gmail.com with ESMTPSA id r128sm3373281qke.98.2021.08.26.14.09.56
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 26 Aug 2021 14:09:56 -0700 (PDT)
-Date:   Thu, 26 Aug 2021 14:09:55 -0700
-From:   Yury Norov <yury.norov@gmail.com>
-To:     Petr Mladek <pmladek@suse.com>
-Cc:     Andrew Morton <akpm@linux-foundation.org>,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        linux-arch@vger.kernel.org, linux-kselftest@vger.kernel.org,
-        linux-mmc@vger.kernel.org, linux-perf-users@vger.kernel.org,
-        kvm@vger.kernel.org,
-        "James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>,
-        Alexander Lobakin <alobakin@pm.me>,
-        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
-        Alexey Klimov <aklimov@redhat.com>,
-        Andrea Merello <andrea.merello@gmail.com>,
-        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-        Arnaldo Carvalho de Melo <acme@redhat.com>,
-        Arnd Bergmann <arnd@arndb.de>, Ben Gardon <bgardon@google.com>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        Brian Cain <bcain@codeaurora.org>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Christoph Lameter <cl@linux.com>,
-        Daniel Bristot de Oliveira <bristot@redhat.com>,
-        David Hildenbrand <david@redhat.com>,
-        Dennis Zhou <dennis@kernel.org>,
-        Geert Uytterhoeven <geert@linux-m68k.org>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Ian Rogers <irogers@google.com>,
-        Ingo Molnar <mingo@redhat.com>,
-        Jaegeuk Kim <jaegeuk@kernel.org>,
-        Jakub Kicinski <kuba@kernel.org>, Jiri Olsa <jolsa@redhat.com>,
-        Joe Perches <joe@perches.com>, Jonas Bonn <jonas@southpole.se>,
-        Leo Yan <leo.yan@linaro.org>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Namhyung Kim <namhyung@kernel.org>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Peter Xu <peterx@redhat.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Rasmus Villemoes <linux@rasmusvillemoes.dk>,
-        Rich Felker <dalias@libc.org>,
-        Samuel Mendoza-Jonas <sam@mendozajonas.com>,
+        h=x-gm-message-state:to:cc:references:from:organization:subject
+         :message-id:date:user-agent:mime-version:in-reply-to
+         :content-language:content-transfer-encoding;
+        bh=BsnyWI3p28wRHpeU+PZ242f3/6NLAQAJP+SyEljvdwk=;
+        b=amnbPJp7BVMQtcHpIAco+l0gIBLaxlC/2A/kk3xPDuWln7J7RWv3AFefZBmGlAdRFe
+         9wiTIZVcBPWwIo8PUPedwFuIZ+2D2CjgCV3g+vFH37yakKbkLEaBgB71aLOrNnadwGcE
+         KyQeF9gJTVSIHM7j1L00Mrj52RsGZ9dkJkcQa5TQ7Tf9Eq1KWyUlE0yq7lQMe8KXXYG/
+         fp6aS/pqCgenyZq00h2s9PdECT+++ySzPOJhZd/CkfgS2UzcscJWm6n7uUS2m17Cak0N
+         FSXHAVAMcIN/zstrCNM4cWkhkh/CkEOPojKkX0VQ2KebgJ/cTStHH5mf1HfkexwTstWk
+         D3cg==
+X-Gm-Message-State: AOAM531tTO7LJF5DYfLCvNX1ZPhr1b0X5EdAMfqSiFAs1XENLKoaY1bv
+        +5ZBSka9OElooUhen0vGB7liUIRlmALjCqbskfdoRen+IyLKEnZZQ8n5PoPPp+ie1EU/697sHav
+        YgT0ko3C0Nopn
+X-Received: by 2002:a05:6000:1b8d:: with SMTP id r13mr6414321wru.230.1630013184901;
+        Thu, 26 Aug 2021 14:26:24 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzU/t5tVGMRsfrN41d2ez2mmo6cbEh/dbw1MZX3pf07YySqoRe8t0Iz/mdz6u9b8F3iqxaXXA==
+X-Received: by 2002:a05:6000:1b8d:: with SMTP id r13mr6414290wru.230.1630013184562;
+        Thu, 26 Aug 2021 14:26:24 -0700 (PDT)
+Received: from [192.168.3.132] (p4ff23dec.dip0.t-ipconnect.de. [79.242.61.236])
+        by smtp.gmail.com with ESMTPSA id f20sm3550064wml.38.2021.08.26.14.26.22
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 26 Aug 2021 14:26:24 -0700 (PDT)
+To:     Andy Lutomirski <luto@kernel.org>,
         Sean Christopherson <seanjc@google.com>,
-        Sergey Senozhatsky <senozhatsky@chromium.org>,
-        Shuah Khan <shuah@kernel.org>,
-        Stefan Kristiansson <stefan.kristiansson@saunalahti.fi>,
-        Steven Rostedt <rostedt@goodmis.org>,
-        Tejun Heo <tj@kernel.org>,
-        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
-        Ulf Hansson <ulf.hansson@linaro.org>,
-        Will Deacon <will@kernel.org>,
-        Wolfram Sang <wsa+renesas@sang-engineering.com>,
-        Yoshinori Sato <ysato@users.sourceforge.jp>
-Subject: Re: [PATCH 11/17] find: micro-optimize for_each_{set,clear}_bit()
-Message-ID: <YSgDI9NpC51GhB/2@yury-ThinkPad>
-References: <20210814211713.180533-1-yury.norov@gmail.com>
- <20210814211713.180533-12-yury.norov@gmail.com>
- <YSeduU41Ef568xhS@alley>
+        Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Borislav Petkov <bp@alien8.de>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Joerg Roedel <jroedel@suse.de>,
+        Andi Kleen <ak@linux.intel.com>,
+        David Rientjes <rientjes@google.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Ingo Molnar <mingo@redhat.com>,
+        Varad Gautam <varad.gautam@suse.com>,
+        Dario Faggioli <dfaggioli@suse.com>, x86@kernel.org,
+        linux-mm@kvack.org, linux-coco@lists.linux.dev,
+        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
+        "Kirill A . Shutemov" <kirill@shutemov.name>,
+        Kuppuswamy Sathyanarayanan 
+        <sathyanarayanan.kuppuswamy@linux.intel.com>,
+        Dave Hansen <dave.hansen@intel.com>,
+        Yu Zhang <yu.c.zhang@linux.intel.com>
+References: <20210824005248.200037-1-seanjc@google.com>
+ <307d385a-a263-276f-28eb-4bc8dd287e32@redhat.com>
+ <40af9d25-c854-8846-fdab-13fe70b3b279@kernel.org>
+From:   David Hildenbrand <david@redhat.com>
+Organization: Red Hat
+Subject: Re: [RFC] KVM: mm: fd-based approach for supporting KVM guest private
+ memory
+Message-ID: <cfe75e39-5927-c02a-b8bc-4de026bb7b3b@redhat.com>
+Date:   Thu, 26 Aug 2021 23:26:22 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.11.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <YSeduU41Ef568xhS@alley>
+In-Reply-To: <40af9d25-c854-8846-fdab-13fe70b3b279@kernel.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Aug 26, 2021 at 03:57:13PM +0200, Petr Mladek wrote:
-> On Sat 2021-08-14 14:17:07, Yury Norov wrote:
-> > The macros iterate thru all set/clear bits in a bitmap. They search a
-> > first bit using find_first_bit(), and the rest bits using find_next_bit().
-> > 
-> > Since find_next_bit() is called shortly after find_first_bit(), we can
-> > save few lines of I-cache by not using find_first_bit().
+On 26.08.21 19:05, Andy Lutomirski wrote:
+> On 8/26/21 3:15 AM, David Hildenbrand wrote:
+>> On 24.08.21 02:52, Sean Christopherson wrote:
+>>> The goal of this RFC is to try and align KVM, mm, and anyone else with
+>>> skin in the
+>>> game, on an acceptable direction for supporting guest private memory,
+>>> e.g. for
+>>> Intel's TDX.  The TDX architectural effectively allows KVM guests to
+>>> crash the
+>>> host if guest private memory is accessible to host userspace, and thus
+>>> does not
+>>> play nice with KVM's existing approach of pulling the pfn and mapping
+>>> level from
+>>> the host page tables.
+>>>
+>>> This is by no means a complete patch; it's a rough sketch of the KVM
+>>> changes that
+>>> would be needed.  The kernel side of things is completely omitted from
+>>> the patch;
+>>> the design concept is below.
+>>>
+>>> There's also fair bit of hand waving on implementation details that
+>>> shouldn't
+>>> fundamentally change the overall ABI, e.g. how the backing store will
+>>> ensure
+>>> there are no mappings when "converting" to guest private.
+>>>
+>>
+>> This is a lot of complexity and rather advanced approaches (not saying
+>> they are bad, just that we try to teach the whole stack something
+>> completely new).
+>>
+>>
+>> What I think would really help is a list of requirements, such that
+>> everybody is aware of what we actually want to achieve. Let me start:
+>>
+>> GFN: Guest Frame Number
+>> EPFN: Encrypted Physical Frame Number
+>>
+>>
+>> 1) An EPFN must not get mapped into more than one VM: it belongs exactly
+>> to one VM. It must neither be shared between VMs between processes nor
+>> between VMs within a processes.
+>>
+>>
+>> 2) User space (well, and actually the kernel) must never access an EPFN:
+>>
+>> - If we go for an fd, essentially all operations (read/write) have to
+>>    fail.
+>> - If we have to map an EPFN into user space page tables (e.g., to
+>>    simplify KVM), we could only allow fake swap entries such that "there
+>>    is something" but it cannot be  accessed and is flagged accordingly.
+>> - /proc/kcore and friends have to be careful as well and should not read
+>>    this memory. So there has to be a way to flag these pages.
+>>
+>> 3) We need a way to express the GFN<->EPFN mapping and essentially
+>> assign an EPFN to a GFN.
+>>
+>>
+>> 4) Once we assigned a EPFN to a GFN, that assignment must not longer
+>> change. Further, an EPFN must not get assigned to multiple GFNs.
+>>
+>>
+>> 5) There has to be a way to "replace" encrypted parts by "shared" parts
+>>     and the other way around.
+>>
+>> What else?
+>>
+>>
+>>
+>>> Background
+>>> ==========
+>>>
+>>> This is a loose continuation of Kirill's RFC[*] to support TDX guest
+>>> private
+>>> memory by tracking guest memory at the 'struct page' level.  This
+>>> proposal is the
+>>> result of several offline discussions that were prompted by Andy
+>>> Lutomirksi's
+>>> concerns with tracking via 'struct page':
+>>>
+>>>     1. The kernel wouldn't easily be able to enforce a 1:1 page:guest
+>>> association,
+>>>        let alone a 1:1 pfn:gfn mapping.
+>>
+>> Well, it could with some help on higher layers. Someone has to do the
+>> tracking. Marking EPFNs as EPFNs can actually be very helpful,  e.g.,
+>> allow /proc/kcore to just not touch such pages. If we want to do all the
+>> tracking in the struct page is a different story.
+>>
+>>>
+>>>     2. Does not work for memory that isn't backed by 'struct page',
+>>> e.g. if devices
+>>>        gain support for exposing encrypted memory regions to guests.
+>>
+>> Let's keep it simple. If a struct page is right now what we need to
+>> properly track it, so be it. If not, good. But let's not make this a
+>> requirement right from the start if it's stuff for the far future.
+>>
+>>>
+>>>     3. Does not help march toward page migration or swap support
+>>> (though it doesn't
+>>>        hurt either).
+>>
+>> "Does not help towards world peace, (though it doesn't hurt either)".
+>>
+>> Maybe let's ignore that for now, as it doesn't seem to be required to
+>> get something reasonable running.
+>>
+>>>
+>>> [*]
+>>> https://lkml.kernel.org/r/20210416154106.23721-1-kirill.shutemov@linux.intel.com
+>>>
+>>>
+>>> Concept
+>>> =======
+>>>
+>>> Guest private memory must be backed by an "enlightened" file
+>>> descriptor, where
+>>> "enlightened" means the implementing subsystem supports a one-way
+>>> "conversion" to
+>>> guest private memory and provides bi-directional hooks to communicate
+>>> directly
+>>> with KVM.  Creating a private fd doesn't necessarily have to be a
+>>> conversion, e.g. it
+>>> could also be a flag provided at file creation, a property of the file
+>>> system itself,
+>>> etc...
+>>
+>> Doesn't sound too crazy. Maybe even introducing memfd_encrypted() if
+>> extending the other ones turns out too complicated.
+>>
+>>>
+>>> Before a private fd can be mapped into a KVM guest, it must be paired
+>>> 1:1 with a
+>>> KVM guest, i.e. multiple guests cannot share a fd.  At pairing, KVM
+>>> and the fd's
+>>> subsystem exchange a set of function pointers to allow KVM to call
+>>> into the subsystem,
+>>> e.g. to translate gfn->pfn, and vice versa to allow the subsystem to
+>>> call into KVM,
+>>> e.g. to invalidate/move/swap a gfn range.
+>>>
+>>> Mapping a private fd in host userspace is disallowed, i.e. there is
+>>> never a host
+>>> virtual address associated with the fd and thus no userspace page
+>>> tables pointing
+>>> at the private memory.
+>>
+>> To keep the primary vs. secondary MMU thing working, I think it would
+>> actually be nice to go with special swap entries instead; it just keeps
+>> most things working as expected. But let's see where we end up.
+>>
+>>>
+>>> Pinning _from KVM_ is not required.  If the backing store supports
+>>> page migration
+>>> and/or swap, it can query the KVM-provided function pointers to see if
+>>> KVM supports
+>>> the operation.  If the operation is not supported (this will be the
+>>> case initially
+>>> in KVM), the backing store is responsible for ensuring correct
+>>> functionality.
+>>>
+>>> Unmapping guest memory, e.g. to prevent use-after-free, is handled via
+>>> a callback
+>>> from the backing store to KVM.  KVM will employ techniques similar to
+>>> those it uses
+>>> for mmu_notifiers to ensure the guest cannot access freed memory.
+>>>
+>>> A key point is that, unlike similar failed proposals of the past, e.g.
+>>> /dev/mktme,
+>>> existing backing stores can be englightened, a from-scratch
+>>> implementations is not
+>>> required (though would obviously be possible as well).
+>>
+>> Right. But if it's just a bad fit, let's do something new. Just like we
+>> did with memfd_secret.
+>>
+>>>
+>>> One idea for extending existing backing stores, e.g. HugeTLBFS and
+>>> tmpfs, is
+>>> to add F_SEAL_GUEST, which would convert the entire file to guest
+>>> private memory
+>>> and either fail if the current size is non-zero or truncate the size
+>>> to zero.
+>>
+>> While possible, I actually do have the feeling that we want eventually
+>> to have something new, as the semantics are just too different. But
+>> let's see.
+>>
+>>
+>>> KVM
+>>> ===
+>>>
+>>> Guest private memory is managed as a new address space, i.e. as a
+>>> different set of
+>>> memslots, similar to how KVM has a separate memory view for when a
+>>> guest vCPU is
+>>> executing in virtual SMM.  SMM is mutually exclusive with guest
+>>> private memory.
+>>>
+>>> The fd (the actual integer) is provided to KVM when a private memslot
+>>> is added
+>>> via KVM_SET_USER_MEMORY_REGION.  This is when the aforementioned
+>>> pairing occurs.
+>>>
+>>> By default, KVM memslot lookups will be "shared", only specific
+>>> touchpoints will
+>>> be modified to work with private memslots, e.g. guest page faults.
+>>> All host
+>>> accesses to guest memory, e.g. for emulation, will thus look for
+>>> shared memory
+>>> and naturally fail without attempting copy_to/from_user() if the guest
+>>> attempts
+>>> to coerce KVM into access private memory.  Note, avoiding
+>>> copy_to/from_user() and
+>>> friends isn't strictly necessary, it's more of a happy side effect.
+>>>
+>>> A new KVM exit reason, e.g. KVM_EXIT_MEMORY_ERROR, and data struct in
+>>> vcpu->run
+>>> is added to propagate illegal accesses (see above) and implicit
+>>> conversions
+>>> to userspace (see below).  Note, the new exit reason + struct can also
+>>> be to
+>>> support several other feature requests in KVM[1][2].
+>>>
+>>> The guest may explicitly or implicity request KVM to map a
+>>> shared/private variant
+>>> of a GFN.  An explicit map request is done via hypercall (out of scope
+>>> for this
+>>> proposal as both TDX and SNP ABIs define such a hypercall).  An
+>>> implicit map request
+>>> is triggered simply by the guest accessing the shared/private variant,
+>>> which KVM
+>>> sees as a guest page fault (EPT violation or #NPF).  Ideally only
+>>> explicit requests
+>>> would be supported, but neither TDX nor SNP require this in their
+>>> guest<->host ABIs.
+>>>
+>>> For implicit or explicit mappings, if a memslot is found that fully
+>>> covers the
+>>> requested range (which is a single gfn for implicit mappings), KVM's
+>>> normal guest
+>>> page fault handling works with minimal modification.
+>>>
+>>> If a memslot is not found, for explicit mappings, KVM will exit to
+>>> userspace with
+>>> the aforementioned dedicated exit reason.  For implict _private_
+>>> mappings, KVM will
+>>> also immediately exit with the same dedicated reason.  For implicit
+>>> shared mappings,
+>>> an additional check is required to differentiate between emulated MMIO
+>>> and an
+>>> implicit private->shared conversion[*].  If there is an existing
+>>> private memslot
+>>> for the gfn, KVM will exit to userspace, otherwise KVM will treat the
+>>> access as an
+>>> emulated MMIO access and handle the page fault accordingly.
+>>
+>> Do you mean some kind of overlay. "Ordinary" user memory regions overlay
+>> "private user memory regions"? So when marking something shared, you'd
+>> leave the private user memory region alone and only create a new
+>> "ordinary"user memory regions that references shared memory in QEMU
+>> (IOW, a different mapping)?
+>>
+>> Reading below, I think you were not actually thinking about an overlay,
+>> but maybe overlays might actually be a nice concept to have instead.
+>>
+>>
+>>> Punching Holes
+>>> ==============
+>>>
+>>> The expected userspace memory model is that mapping requests will be
+>>> handled as
+>>> conversions, e.g. on a shared mapping request, first unmap the private
+>>> gfn range,
+>>> then map the shared gfn range.  A new KVM ioctl() will likely be
+>>> needed to allow
+>>> userspace to punch a hole in a memslot, as expressing such an
+>>> operation isn't
+>>> possible with KVM_SET_USER_MEMORY_REGION.  While userspace could
+>>> delete the
+>>> memslot, then recreate three new memslots, doing so would be
+>>> destructive to guest
+>>> data as unmapping guest private memory (from the EPT/NPT tables) is
+>>> destructive
+>>> to the data for both TDX and SEV-SNP guests.
+>>
+>> If you'd treat it like an overlay, you'd not actually be punching holes.
+>> You'd only be creating/removing ordinary user memory regions when
+>> marking something shared/unshared.
+>>
+>>>
+>>> Pros (vs. struct page)
+>>> ======================
+>>>
+>>> Easy to enforce 1:1 fd:guest pairing, as well as 1:1 gfn:pfn mapping.
+>>>
+>>> Userspace page tables are not populated, e.g. reduced memory
+>>> footprint, lower
+>>> probability of making private memory accessible to userspace.
+>>
+>> Agreed to the first part, although I consider that a secondary concern.
+>> The second part, I'm not sure if that is really the case. Fake swap
+>> entries are just a marker.
+>>
+>>>
+>>> Provides line of sight to supporting page migration and swap.
+>>
+>> Again, let's leave that out for now. I think that's an kernel internal
+>> that will require quite some thought either way.
+>>
+>>>
+>>> Provides line of sight to mapping MMIO pages into guest private memory.
+>>
+>> That's an interesting thought. Would it work via overlays as well? Can
+>> you elaborate?
+>>
+>>>
+>>> Cons (vs. struct page)
+>>> ======================
+>>>
+>>> Significantly more churn in KVM, e.g. to plumb 'private' through where
+>>> needed,
+>>> support memslot hole punching, etc...
+>>>
+>>> KVM's MMU gets another method of retrieving host pfn and page size.
+>>>
+>>> Requires enabling in every backing store that someone wants to support.
+>>
+>> I think we will only care about anonymous memory eventually with
+>> huge/gigantic pages in the next years. Just to what memfd() is already
+>> limited. File-backed -- I don't know ... if at all, swapping ... in a
+>> couple of years ...
+>>
+>>>
+>>> Because the NUMA APIs work on virtual addresses, new syscalls
+>>> fmove_pages(),
+>>> fbind(), etc... would be required to provide equivalents to existing NUMA
+>>> functionality (though those syscalls would likely be useful
+>>> irrespective of guest
+>>> private memory).
+>>
+>> Right, that's because we don't have a VMA that describes all this. E.g.,
+>> mbind().
+>>
+>>>
+>>> Washes (vs. struct page)
+>>> ========================
+>>>
+>>> A misbehaving guest that triggers a large number of shared memory
+>>> mappings will
+>>> consume a large number of memslots.  But, this is likely a wash as
+>>> similar effect
+>>> would happen with VMAs in the struct page approach.
+>>
+>> Just cap it then to something sane. 32k which we have right now is crazy
+>> and only required in very special setups. You can just make QEMU
+>> override/set the KVM default.
+>>
+>>
+>>
+>>
+>>
+>> My wild idea after reading everything so far (full of flaws, just want
+>> to mention it, maybe it gives some ideas):
+>>
+>> Introduce memfd_encrypted().
+>>
+>> Similar to like memfd_secret()
+>> - Most system calls will just fail.
+>> - Allow MAP_SHARED only.
+>> - Enforce VM_DONTDUMP and skip during fork().
 > 
-> Is this only a speculation or does it fix a real performance problem?
+> This seems like it would work, but integrating it with the hugetlb
+> reserve mechanism might be rather messy.
+
+One step at a time.
+
 > 
-> The macro is used like:
+>> - File size can change exactly once, before any mmap. (IIRC)
 > 
-> 	for_each_set_bit(bit, addr, size) {
-> 		fn(bit);
-> 	}
+> Why is this needed?  Obviously if the file size can be reduced, then the
+> pages need to get removed safely, but this seems doable if there's a use
+> case.
+
+Right, but we usually don't resize memfd either.
+
 > 
-> IMHO, the micro-opimization does not help when fn() is non-trivial.
- 
-The effect is measurable:
+>>
+>> Different to memfd_secret(), allow mapping each page of the fd exactly
+>> one time via mmap() into a single process.
+> 
+> This doesn't solve the case of multiple memslots pointing at the same
+> address.  It also doesn't help with future operations that need to map
+> from a memfd_encrypted() backing page to the GPA that maps it.
 
-Start testing for_each_bit()
-for_each_set_bit:                15296 ns,   1000 iterations
-for_each_set_bit_from:           15225 ns,   1000 iterations
+That's trivial to enforce inside KVM when mapping. Encryted user memory 
+regions, just like such VMAs just have to be sticky until we can come up 
+with something different.
 
-Start testing for_each_bit() with cash flushing
-for_each_set_bit:               547626 ns,   1000 iterations
-for_each_set_bit_from:          497899 ns,   1000 iterations
+> 
+>> You'll end up with a VMA that corresponds to the whole file in a single
+>> process only, and that cannot vanish, not even in parts.
+>>
+>> Define "ordinary" user memory slots as overlay on top of "encrypted"
+>> memory slots.  Inside KVM, bail out if you encounter such a VMA inside a
+>> normal user memory slot. When creating a "encryped" user memory slot,
+>> require that the whole VMA is covered at creation time. You know the VMA
+>> can't change later.
+> 
+> Oof.  That's quite a requirement.  What's the point of the VMA once all
+> this is done?
 
-Refer this:
+You can keep using things like mbind(), madvise(), ... and the GUP code 
+with a special flag might mostly just do what you want. You won't have 
+to reinvent too many wheels on the page fault logic side at least.
 
-https://www.mail-archive.com/dri-devel@lists.freedesktop.org/msg356151.html
+Just a brain dump. Feel free to refine if you think any of this makes sense.
 
+-- 
 Thanks,
-Yury
- 
-> > --- a/include/linux/find.h
-> > +++ b/include/linux/find.h
-> > @@ -280,7 +280,7 @@ unsigned long find_next_bit_le(const void *addr, unsigned
-> >  #endif
-> >  
-> >  #define for_each_set_bit(bit, addr, size) \
-> > -	for ((bit) = find_first_bit((addr), (size));		\
-> > +	for ((bit) = find_next_bit((addr), (size), 0);		\
-> >  	     (bit) < (size);					\
-> >  	     (bit) = find_next_bit((addr), (size), (bit) + 1))
-> >  
-> 
-> It is not a big deal. I just think that the original code is slightly
-> more self-explaining.
-> 
-> Best Regards,
-> Petr
+
+David / dhildenb
+
