@@ -2,109 +2,193 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1F06F3F9754
-	for <lists+kvm@lfdr.de>; Fri, 27 Aug 2021 11:40:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2075E3F97F5
+	for <lists+kvm@lfdr.de>; Fri, 27 Aug 2021 12:18:31 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244800AbhH0Jkk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 27 Aug 2021 05:40:40 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:64624 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S244851AbhH0Jki (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 27 Aug 2021 05:40:38 -0400
-Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 17R9arJJ134419
-        for <kvm@vger.kernel.org>; Fri, 27 Aug 2021 05:39:49 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=IoCPv0M785LuAg27T7On72+jHLNyDcSPFxPdLOULCM8=;
- b=j0F3EggjZ0USkLdi22pRTpCv8YBJHmSDxIGZtkPvQCfocb43RknbNn/JaZcyCJ2VQXHE
- MMw+vZPYwRqc4rRz+zupMC2oIJJmp+8t3iCrK6GXF752hkb7wXTmznt7KeYpn/Rg2QxN
- C17banmniNKv6xeRRmbqPJr7okYPYmwVZ7m8cmWzjeeQcybfdqv42OjQIQ/VU8vVPtfM
- mFu98vY/NDsocfIXkoj9xYZvCaoUBK3Z9UheWY7IHv7m9UXrt0579NBOM8if6KSKhvY7
- RBdGJ8Jyc5X0hQgnH4WVXTNFUsrThuZJzH6eItksnbdLHiJNnmeaHwQqdgQiPaCpxCOa ug== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 3apvt7h98a-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Fri, 27 Aug 2021 05:39:49 -0400
-Received: from m0098420.ppops.net (m0098420.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 17R9dWPS151380
-        for <kvm@vger.kernel.org>; Fri, 27 Aug 2021 05:39:48 -0400
-Received: from ppma04fra.de.ibm.com (6a.4a.5195.ip4.static.sl-reverse.com [149.81.74.106])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 3apvt7h97m-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 27 Aug 2021 05:39:48 -0400
-Received: from pps.filterd (ppma04fra.de.ibm.com [127.0.0.1])
-        by ppma04fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 17R9dRi0020841;
-        Fri, 27 Aug 2021 09:39:47 GMT
-Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
-        by ppma04fra.de.ibm.com with ESMTP id 3ajs48sdkx-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 27 Aug 2021 09:39:46 +0000
-Received: from d06av24.portsmouth.uk.ibm.com (d06av24.portsmouth.uk.ibm.com [9.149.105.60])
-        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 17R9dh8b55706046
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 27 Aug 2021 09:39:43 GMT
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 35EDD4204C;
-        Fri, 27 Aug 2021 09:39:43 +0000 (GMT)
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id EBE8F4203F;
-        Fri, 27 Aug 2021 09:39:42 +0000 (GMT)
-Received: from oc3016276355.ibm.com (unknown [9.145.164.230])
-        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Fri, 27 Aug 2021 09:39:42 +0000 (GMT)
-Subject: Re: [kvm-unit-tests PATCH 2/2] s390x: fixing I/O memory allocation
-To:     Claudio Imbrenda <imbrenda@linux.ibm.com>
-Cc:     kvm@vger.kernel.org, frankja@linux.ibm.com, david@redhat.com,
-        thuth@redhat.com, cohuck@redhat.com
-References: <1629908421-8543-1-git-send-email-pmorel@linux.ibm.com>
- <1629908421-8543-3-git-send-email-pmorel@linux.ibm.com>
- <20210825183101.32d091f2@p-imbrenda>
-From:   Pierre Morel <pmorel@linux.ibm.com>
-Message-ID: <9b947b00-0623-cfa6-cb0b-2d0b638c0fa6@linux.ibm.com>
-Date:   Fri, 27 Aug 2021 11:39:42 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.13.0
-MIME-Version: 1.0
-In-Reply-To: <20210825183101.32d091f2@p-imbrenda>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: mhf4PRuN1s_8R_tD7LgxOaZUC_3hoPxT
-X-Proofpoint-ORIG-GUID: Dkule6OiMvum7vWqSPtueQ-vgLegaNbR
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.790
- definitions=2021-08-27_03:2021-08-26,2021-08-27 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- malwarescore=0 lowpriorityscore=0 impostorscore=0 bulkscore=0
- suspectscore=0 adultscore=0 mlxscore=0 mlxlogscore=999 clxscore=1015
- spamscore=0 phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2107140000 definitions=main-2108270060
+        id S244757AbhH0KRB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 27 Aug 2021 06:17:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47996 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S244492AbhH0KRA (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 27 Aug 2021 06:17:00 -0400
+Received: from mail-qv1-xf49.google.com (mail-qv1-xf49.google.com [IPv6:2607:f8b0:4864:20::f49])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 97489C061757
+        for <kvm@vger.kernel.org>; Fri, 27 Aug 2021 03:16:11 -0700 (PDT)
+Received: by mail-qv1-xf49.google.com with SMTP id q2-20020ad45ca2000000b00374fa0dbedfso2571510qvh.1
+        for <kvm@vger.kernel.org>; Fri, 27 Aug 2021 03:16:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=jsA6xT98EeA80UGER1WEqhvGsAPxq/3pPd3JQ9gufNk=;
+        b=VhFaBqIfTeTaY8WOw3nAg0JlzJztciYu4suzC598Ebz2q37OUD13vfp9lIwq5DIwyw
+         t2wAB2K4+11hk+25HeExvkyRPequRrvFhjWJRyh1JdbiFa0vwD4hj3hd/PqOLHgui/P9
+         YfWX7zFGKKu2ymeJI7D+6uyVNjR9Q1ctx4ZkLAHHHNITVKevtV5R9VMkYD6L5A/Z+L4C
+         ZGMuUGyptLkmSaYfLQsfqiQCk7FI2cDGRWLqlN4QQEGyvdUX+LtphSsnwi/HOo9KEcel
+         DYxqxTmSRwZnKtnJoQRVYbLs194cX3pj7jdEqAGWK+Rc5akusnV62oo28FJMS5/UkyRd
+         r7Cg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=jsA6xT98EeA80UGER1WEqhvGsAPxq/3pPd3JQ9gufNk=;
+        b=qALGT1s/dVaSo8tu1mkbVlzbJX7FaUQVE6FopWwtyiwXT7Cy+QImZ/ja3b1+CU0uFa
+         dcF4v2teFkhdQaJAyMNBkHj9EPYMCersPGSHcYVT4Gv71McYSn+Z8WtxBftuN8vvMUKe
+         qC2tEtJCWWK9Zdc/SbVLSwXpl1yrPi0puoFnBIPOvFYYbmFNkJUE3dVVAEpry8es2+2l
+         iKeWoGkFhG2CFlzufeNr0NORZBduHrV31dU2tVi3ADwLZkRvristT/IDpXqqRqp7r5vL
+         lx8WZvhZrpijpNr++4q4KWmHYkQsx2+pbViPcK1S/py3k5R+vqYZAhPktqvfiIz6kGs6
+         lgMA==
+X-Gm-Message-State: AOAM530IXIDDYcV/tvw6vxxY5kObq9zbQFYXBcjXuPJuKPwKYGCBC6z8
+        ps14ZJxRWigTJrjGP/VIjcIVkskioA==
+X-Google-Smtp-Source: ABdhPJzvFP8+CJjGjT4Q/qSS+1OA0tDxp3n9hoCOklGx1Uk6TnaXfxtcDrpuAdqzcwZSqvV+uAeQtEL0Zg==
+X-Received: from tabba.c.googlers.com ([fda3:e722:ac3:cc00:28:9cb1:c0a8:482])
+ (user=tabba job=sendgmr) by 2002:a0c:fbcf:: with SMTP id n15mr9011967qvp.49.1630059370831;
+ Fri, 27 Aug 2021 03:16:10 -0700 (PDT)
+Date:   Fri, 27 Aug 2021 11:16:01 +0100
+Message-Id: <20210827101609.2808181-1-tabba@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.33.0.259.gc128427fd7-goog
+Subject: [PATCH v5 0/8] KVM: arm64: Fixed features for protected VMs
+From:   Fuad Tabba <tabba@google.com>
+To:     kvmarm@lists.cs.columbia.edu
+Cc:     maz@kernel.org, will@kernel.org, james.morse@arm.com,
+        alexandru.elisei@arm.com, suzuki.poulose@arm.com,
+        mark.rutland@arm.com, christoffer.dall@arm.com,
+        pbonzini@redhat.com, drjones@redhat.com, oupton@google.com,
+        qperret@google.com, kvm@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, kernel-team@android.com,
+        tabba@google.com
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Hi,
+
+Changes since v4 [1]:
+- Calculating feature id register values takes into account features
+  supported/enabled in KVM.
+- Handle all AArch64 feature ID registers, with sanitized copies at EL2 if
+  necessary, rather than trusting the host, even if the value is the same.
+- Trap registers are set based on the exposed value of the feature id
+  registers, rather than the masks to allow/restrict.
+- Move code for settings trap registers for protected guests to EL2.
+- Refactoring and fixes.
+- Dropped Will's ack for "KVM: arm64: Trap access to pVM restricted features"
+- Rebase on Marc's pkvm-fixed-features branch [2].
+
+Changes since v3 [3]:
+- Redid calculating restricted values of feature register fields, ensuring that
+  the code distinguishes between unsigned and (potentially in the future)
+  signed fields (Will)
+- Refactoring and fixes (Drew, Will)
+- More documentation and comments (Oliver, Will)
+- Dropped patch "Restrict protected VM capabilities", since it should come with
+  or after the user ABI series for pKVM (Will)
+- Carried Will's acks
+
+Changes since v2 [4]:
+- Both trapping and setting of feature id registers are toggled by an allowed
+  features bitmap of the feature id registers (Will)
+- Documentation explaining the rationale behind allowed/blocked features (Drew)
+- Restrict protected VM features by checking and restricting VM capabilities
+- Misc small fixes and tidying up (mostly Will)
+- Remove dependency on Will's protected VM user ABI series [5]
+- Rebase on 5.14-rc2
+- Carried Will's acks
+
+Changes since v1 [6]:
+- Restrict protected VM features based on an allowed features rather than
+  rejected ones (Drew)
+- Add more background describing protected KVM to the cover letter (Alex)
+
+This patch series adds support for restricting CPU features for protected VMs
+in KVM (pKVM) [7].
+
+Various VM feature configurations are allowed in KVM/arm64, each requiring
+specific handling logic to deal with traps, context-switching and potentially
+emulation. Achieving feature parity in pKVM therefore requires either elevating
+this logic to EL2 (and substantially increasing the TCB) or continuing to trust
+the host handlers at EL1. Since neither of these options are especially
+appealing, pKVM instead limits the CPU features exposed to a guest to a fixed
+configuration based on the underlying hardware and which can mostly be provided
+straightforwardly by EL2.
+
+This series approaches that by restricting CPU features exposed to protected
+guests. Features advertised through feature registers are limited, which pKVM
+enforces by trapping register accesses and instructions associated with these
+features.
+
+This series is based on 5.14-rc2. You can find the applied series here [8].
+
+Cheers,
+/fuad
+
+[1] https://lore.kernel.org/kvmarm/20210817081134.2918285-1-tabba@google.com/
+
+[2] https://git.kernel.org/pub/scm/linux/kernel/git/maz/arm-platforms.git/log/?h=kvm-arm64/pkvm-fixed-features
+
+[3] https://lore.kernel.org/kvmarm/20210719160346.609914-1-tabba@google.com/
+
+[4] https://lore.kernel.org/kvmarm/20210615133950.693489-1-tabba@google.com/
+
+[5] https://lore.kernel.org/kvmarm/20210603183347.1695-1-will@kernel.org/
+
+[6] https://lore.kernel.org/kvmarm/20210608141141.997398-1-tabba@google.com/
+
+[7] Once complete, protected KVM adds the ability to create protected VMs.
+These protected VMs are protected from the host Linux kernel (and from other
+VMs), where the host does not have access to guest memory,even if compromised.
+Normal (nVHE) guests can still be created and run in parallel with protected
+VMs. Their functionality should not be affected.
+
+For protected VMs, the host should not even have access to a protected guest's
+state or anything that would enable it to manipulate it (e.g., vcpu register
+context and el2 system registers); only hyp would have that access. If the host
+could access that state, then it might be able to get around the protection
+provided.  Therefore, anything that is sensitive and that would require such
+access needs to happen at hyp, hence the code in nvhe running only at hyp.
+
+For more details about pKVM, please refer to Will's talk at KVM Forum 2020:
+https://mirrors.edge.kernel.org/pub/linux/kernel/people/will/slides/kvmforum-2020-edited.pdf
+https://www.youtube.com/watch?v=edqJSzsDRxk
+
+[8] https://android-kvm.googlesource.com/linux/+/refs/heads/tabba/el2_fixed_feature_v5
+
+Fuad Tabba (8):
+  KVM: arm64: Pass struct kvm to per-EC handlers
+  KVM: arm64: Add missing field descriptor for MDCR_EL2
+  KVM: arm64: Simplify masking out MTE in feature id reg
+  KVM: arm64: Add trap handlers for protected VMs
+  KVM: arm64: Initialize trap registers for protected VMs
+  KVM: arm64: Move sanitized copies of CPU features
+  KVM: arm64: Trap access to pVM restricted features
+  KVM: arm64: Handle protected guests at 32 bits
+
+ arch/arm64/include/asm/kvm_arm.h           |   1 +
+ arch/arm64/include/asm/kvm_asm.h           |   1 +
+ arch/arm64/include/asm/kvm_fixed_config.h  | 164 +++++++
+ arch/arm64/include/asm/kvm_host.h          |   2 +
+ arch/arm64/include/asm/kvm_hyp.h           |   5 +
+ arch/arm64/kvm/arm.c                       |  13 +
+ arch/arm64/kvm/hyp/include/hyp/switch.h    |  16 +-
+ arch/arm64/kvm/hyp/include/nvhe/pkvm.h     |  14 +
+ arch/arm64/kvm/hyp/include/nvhe/sys_regs.h |  29 ++
+ arch/arm64/kvm/hyp/nvhe/Makefile           |   2 +-
+ arch/arm64/kvm/hyp/nvhe/hyp-main.c         |  10 +
+ arch/arm64/kvm/hyp/nvhe/mem_protect.c      |   6 -
+ arch/arm64/kvm/hyp/nvhe/pkvm.c             | 186 ++++++++
+ arch/arm64/kvm/hyp/nvhe/switch.c           |  59 ++-
+ arch/arm64/kvm/hyp/nvhe/sys_regs.c         | 525 +++++++++++++++++++++
+ arch/arm64/kvm/hyp/vhe/switch.c            |   2 +-
+ arch/arm64/kvm/sys_regs.c                  |  10 +-
+ 17 files changed, 1020 insertions(+), 25 deletions(-)
+ create mode 100644 arch/arm64/include/asm/kvm_fixed_config.h
+ create mode 100644 arch/arm64/kvm/hyp/include/nvhe/pkvm.h
+ create mode 100644 arch/arm64/kvm/hyp/include/nvhe/sys_regs.h
+ create mode 100644 arch/arm64/kvm/hyp/nvhe/pkvm.c
+ create mode 100644 arch/arm64/kvm/hyp/nvhe/sys_regs.c
 
 
-On 8/25/21 6:31 PM, Claudio Imbrenda wrote:
-> On Wed, 25 Aug 2021 18:20:21 +0200
-> Pierre Morel <pmorel@linux.ibm.com> wrote:
-> 
->> The allocator allocate pages it follows the size must be rounded
->> to pages before the allocation.
->>
->> Fixes: b0fe3988 "s390x: define UV compatible I/O allocation"
->>
->> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
-> 
-> Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
-> 
-
-
-Thanks,
-Pierre
-
+base-commit: cc3ef75c796e58acec8f64a9acf47fc18645f194
 -- 
-Pierre Morel
-IBM Lab Boeblingen
+2.33.0.259.gc128427fd7-goog
+
