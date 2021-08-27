@@ -2,215 +2,102 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D098B3F9806
-	for <lists+kvm@lfdr.de>; Fri, 27 Aug 2021 12:18:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 534503F9810
+	for <lists+kvm@lfdr.de>; Fri, 27 Aug 2021 12:23:16 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244944AbhH0KSW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 27 Aug 2021 06:18:22 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:9282 "EHLO
-        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S244893AbhH0KSS (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 27 Aug 2021 06:18:18 -0400
-Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 17RA3k79015398
-        for <kvm@vger.kernel.org>; Fri, 27 Aug 2021 06:17:29 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : in-reply-to : references; s=pp1;
- bh=e/TFctog32ZuAw/9ZFT3YqSS8y99KOD43Gkj0ce7l2U=;
- b=r6L9wwG8SM+LHaN6uhBFRnrJuhpoLhiU1SFhSlX2ke0zzHCr2lSe8i0U5PtwJ611kEVD
- KQEFW1kPIsdDYG9jeGIPYCB8LMqkZe2P7i3kE7q/c3uarwaNtanQnOeq2s72IXb0Yq7D
- jawsSLO4NZcmUpEJi5xuqxLeiHOROvSyKAiGj/XsDstx1HUDeu8jPdyF1Df3gzPbxxcT
- arvTY8cubkKZzMVg5+LF7RRx5YqElN1aOyiblVNxM0942oqaLHoX/T2WckmXXWDJj4kD
- aD39+V6z8N16hzwpXaL4P/RVhOTMsu8AsKVZkOq7Ab8LJzgk5PWDSvorr8DtkoNt1adW dw== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3apws50n2q-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Fri, 27 Aug 2021 06:17:29 -0400
-Received: from m0098417.ppops.net (m0098417.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 17RABFC4057206
-        for <kvm@vger.kernel.org>; Fri, 27 Aug 2021 06:17:29 -0400
-Received: from ppma01fra.de.ibm.com (46.49.7a9f.ip4.static.sl-reverse.com [159.122.73.70])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3apws50n1x-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 27 Aug 2021 06:17:29 -0400
-Received: from pps.filterd (ppma01fra.de.ibm.com [127.0.0.1])
-        by ppma01fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 17RAD1Kg001860;
-        Fri, 27 Aug 2021 10:17:27 GMT
-Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
-        by ppma01fra.de.ibm.com with ESMTP id 3ajs48henc-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 27 Aug 2021 10:17:27 +0000
-Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
-        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 17RAHNxs30212426
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 27 Aug 2021 10:17:24 GMT
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id DE60C4C04A;
-        Fri, 27 Aug 2021 10:17:23 +0000 (GMT)
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 88AAE4C046;
-        Fri, 27 Aug 2021 10:17:23 +0000 (GMT)
-Received: from oc3016276355.ibm.com (unknown [9.145.164.230])
-        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Fri, 27 Aug 2021 10:17:23 +0000 (GMT)
-From:   Pierre Morel <pmorel@linux.ibm.com>
-To:     kvm@vger.kernel.org
-Cc:     frankja@linux.ibm.com, david@redhat.com, thuth@redhat.com,
-        cohuck@redhat.com, imbrenda@linux.ibm.com, drjones@redhat.com
-Subject: [kvm-unit-tests PATCH 7/7] s390x: virtio data transfer
-Date:   Fri, 27 Aug 2021 12:17:20 +0200
-Message-Id: <1630059440-15586-8-git-send-email-pmorel@linux.ibm.com>
-X-Mailer: git-send-email 1.8.3.1
-In-Reply-To: <1630059440-15586-1-git-send-email-pmorel@linux.ibm.com>
-References: <1630059440-15586-1-git-send-email-pmorel@linux.ibm.com>
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: QjccHXVGbIsylpDzqPCkfZgi9pzfRdkp
-X-Proofpoint-ORIG-GUID: EqEsT62DNVjMT4-FaXq8A2Y9MJrDnLz6
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.790
- definitions=2021-08-27_03:2021-08-26,2021-08-27 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- bulkscore=0 lowpriorityscore=0 spamscore=0 impostorscore=0 malwarescore=0
- clxscore=1015 mlxscore=0 mlxlogscore=999 adultscore=0 phishscore=0
- suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2107140000 definitions=main-2108270063
+        id S244975AbhH0KVB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 27 Aug 2021 06:21:01 -0400
+Received: from smtp-fw-9103.amazon.com ([207.171.188.200]:22544 "EHLO
+        smtp-fw-9103.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S233204AbhH0KVA (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 27 Aug 2021 06:21:00 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1630059612; x=1661595612;
+  h=subject:to:cc:references:from:message-id:date:
+   mime-version:in-reply-to:content-transfer-encoding;
+  bh=M6ipT9UYceu6gs4TdSIrUMHCcpovQTG+zQBp5mFUolc=;
+  b=KhzhbKQynbH5CVMOAi2xmig4jAkXmBI/U/KZX8VjmBO83QD2dmYDxDx8
+   Atg5y2dTbG9kWGQ4O7vqf0/yFgf+8n8DWKYhnewzLihdQEM+1COCuyzU2
+   EpaC0lDsORHBTD7qPdJaQFD489tT56XjqUVpzK27vaUJsvfgdFSzUD7Yk
+   E=;
+X-IronPort-AV: E=Sophos;i="5.84,356,1620691200"; 
+   d="scan'208";a="953489569"
+Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO email-inbound-relay-1d-5dd976cd.us-east-1.amazon.com) ([10.25.36.210])
+  by smtp-border-fw-9103.sea19.amazon.com with ESMTP; 27 Aug 2021 10:20:04 +0000
+Received: from EX13D16EUB003.ant.amazon.com (iad12-ws-svc-p26-lb9-vlan2.iad.amazon.com [10.40.163.34])
+        by email-inbound-relay-1d-5dd976cd.us-east-1.amazon.com (Postfix) with ESMTPS id D8FB9A2E3D;
+        Fri, 27 Aug 2021 10:20:00 +0000 (UTC)
+Received: from 38f9d34ed3b1.ant.amazon.com (10.43.162.216) by
+ EX13D16EUB003.ant.amazon.com (10.43.166.99) with Microsoft SMTP Server (TLS)
+ id 15.0.1497.23; Fri, 27 Aug 2021 10:19:55 +0000
+Subject: Re: [PATCH v1 1/3] nitro_enclaves: Enable Arm support
+To:     Greg KH <gregkh@linuxfoundation.org>
+CC:     linux-kernel <linux-kernel@vger.kernel.org>,
+        Alexandru Ciobotaru <alcioa@amazon.com>,
+        Kamal Mostafa <kamal@canonical.com>,
+        Alexandru Vasile <lexnv@amazon.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Stefano Garzarella <sgarzare@redhat.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        "Vitaly Kuznetsov" <vkuznets@redhat.com>,
+        kvm <kvm@vger.kernel.org>,
+        ne-devel-upstream <ne-devel-upstream@amazon.com>
+References: <20210826173451.93165-1-andraprs@amazon.com>
+ <20210826173451.93165-2-andraprs@amazon.com> <YSilmGyvEAc46ujH@kroah.com>
+From:   "Paraschiv, Andra-Irina" <andraprs@amazon.com>
+Message-ID: <7bed3e99-d69a-bf9b-b33a-acc3e3726fb0@amazon.com>
+Date:   Fri, 27 Aug 2021 13:19:46 +0300
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:78.0)
+ Gecko/20100101 Thunderbird/78.13.0
+MIME-Version: 1.0
+In-Reply-To: <YSilmGyvEAc46ujH@kroah.com>
+Content-Language: en-US
+X-Originating-IP: [10.43.162.216]
+X-ClientProxiedBy: EX13D40UWC002.ant.amazon.com (10.43.162.191) To
+ EX13D16EUB003.ant.amazon.com (10.43.166.99)
+Content-Type: text/plain; charset="utf-8"; format="flowed"
+Content-Transfer-Encoding: base64
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-We use a test device, "PONG" to transfer chunks of data of different
-size and alignment and compare a checksum calculated before the sending
-with the VIRTIO device checksum response.
-
-Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
----
- s390x/virtio_pong.c | 107 ++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 107 insertions(+)
-
-diff --git a/s390x/virtio_pong.c b/s390x/virtio_pong.c
-index 1e050a4d..94d6acdc 100644
---- a/s390x/virtio_pong.c
-+++ b/s390x/virtio_pong.c
-@@ -39,6 +39,112 @@ static struct virtio_ccw_device *vcdev;
- static struct virtqueue *out_vq;
- static struct virtqueue *in_vq;
- 
-+static bool virtio_read(struct virtqueue *q, char **buf, unsigned int *len)
-+{
-+	int ret;
-+	char *p;
-+
-+	ret = virtqueue_add_inbuf(q, *buf, *len);
-+	if (ret < 0)
-+		return false;
-+
-+	disable_io_irq();
-+	virtqueue_kick(q);
-+	wait_for_interrupt(PSW_MASK_IO);
-+
-+	do {
-+		p = virtqueue_get_buf(q, len);
-+	} while (!p);
-+
-+	*buf = (void *)p;
-+
-+	return true;
-+}
-+
-+static bool virtio_write(struct virtqueue *q, char *buf, unsigned int len)
-+{
-+	int ret;
-+
-+	ret = virtqueue_add_outbuf(q, buf, len);
-+	if (ret < 0)
-+		return false;
-+
-+	virtqueue_kick(q);
-+	while (!virtqueue_get_buf(q, &len))
-+		;
-+
-+	return true;
-+}
-+
-+static unsigned int simple_checksum(char *buf, unsigned int len)
-+{
-+	unsigned int sum = 0;
-+
-+	while (len--) {
-+		sum += *buf * *buf + 7 * *buf + 3;
-+		buf++;
-+	}
-+
-+	return sum;
-+}
-+
-+static void pong_write(char *buf, unsigned int len)
-+{
-+	unsigned int cksum;
-+	unsigned int cksum_ret;
-+	char *ret_ptr = (char *)&cksum_ret;
-+
-+	cksum = simple_checksum(buf, len);
-+	report(virtio_write(out_vq, buf, len), "Sending data: %08x", cksum);
-+
-+	len = sizeof(cksum_ret);
-+	report(virtio_read(in_vq, &ret_ptr, &len),
-+	       "Receiving checksum: %08x", cksum_ret);
-+
-+	report(cksum == cksum_ret, "Verifying checksum");
-+}
-+
-+static struct {
-+	const char *name;
-+	int size;
-+	int offset;
-+} chunks[] = {
-+	{ "Small buffer", 3, 0 },
-+	{ "Page aligned", 4096, 0 },
-+	{ "Large page aligned", 0x00100000, 0 },
-+	{ "Page unaligned", 4096, 0x107 },
-+	{ "Random data", 5119, 0x107 },
-+	{ NULL, 0, 0 }
-+};
-+
-+static void test_pong_data(void)
-+{
-+	char *buf;
-+	char *p;
-+	int len;
-+	int i;
-+
-+	if (vcdev->state != VCDEV_INIT) {
-+		report_skip("Device non initialized");
-+		return;
-+	}
-+
-+	for (i = 0; chunks[i].name; i++) {
-+		report_prefix_push(chunks[i].name);
-+
-+		len = chunks[i].size + chunks[i].offset;
-+		buf = alloc_io_mem(len, 0);
-+
-+		p = buf + chunks[i].offset;
-+		memset(p, 0xA5, chunks[i].size);
-+		pong_write(p, chunks[i].size);
-+
-+		free_io_mem(buf, len);
-+
-+		report_prefix_pop();
-+	}
-+}
-+
- static void test_find_vqs(void)
- {
- 	struct virtio_device *vdev = &vcdev->vdev;
-@@ -186,6 +292,7 @@ static struct {
- 	{ "CCW Bus", test_virtio_ccw_bus },
- 	{ "CCW Device", test_virtio_device_init },
- 	{ "Queues setup", test_find_vqs },
-+	{ "Data transfer", test_pong_data },
- 	{ NULL, NULL }
- };
- 
--- 
-2.25.1
+CgpPbiAyNy8wOC8yMDIxIDExOjQzLCBHcmVnIEtIIHdyb3RlOgo+IE9uIFRodSwgQXVnIDI2LCAy
+MDIxIGF0IDA4OjM0OjQ5UE0gKzAzMDAsIEFuZHJhIFBhcmFzY2hpdiB3cm90ZToKPj4gVXBkYXRl
+IHRoZSBrZXJuZWwgY29uZmlnIHRvIGVuYWJsZSB0aGUgTml0cm8gRW5jbGF2ZXMga2VybmVsIGRy
+aXZlciBmb3IKPj4gQXJtIHN1cHBvcnQuCj4+Cj4+IFNpZ25lZC1vZmYtYnk6IEFuZHJhIFBhcmFz
+Y2hpdiA8YW5kcmFwcnNAYW1hem9uLmNvbT4KPj4gLS0tCj4+ICAgZHJpdmVycy92aXJ0L25pdHJv
+X2VuY2xhdmVzL0tjb25maWcgfCA4ICsrLS0tLS0tCj4+ICAgMSBmaWxlIGNoYW5nZWQsIDIgaW5z
+ZXJ0aW9ucygrKSwgNiBkZWxldGlvbnMoLSkKPj4KPj4gZGlmZiAtLWdpdCBhL2RyaXZlcnMvdmly
+dC9uaXRyb19lbmNsYXZlcy9LY29uZmlnIGIvZHJpdmVycy92aXJ0L25pdHJvX2VuY2xhdmVzL0tj
+b25maWcKPj4gaW5kZXggOGM5Mzg3YTIzMmRmOC4uZjUzNzQwYjk0MWMwZiAxMDA2NDQKPj4gLS0t
+IGEvZHJpdmVycy92aXJ0L25pdHJvX2VuY2xhdmVzL0tjb25maWcKPj4gKysrIGIvZHJpdmVycy92
+aXJ0L25pdHJvX2VuY2xhdmVzL0tjb25maWcKPj4gQEAgLTEsMTcgKzEsMTMgQEAKPj4gICAjIFNQ
+RFgtTGljZW5zZS1JZGVudGlmaWVyOiBHUEwtMi4wCj4+ICAgIwo+PiAtIyBDb3B5cmlnaHQgMjAy
+MCBBbWF6b24uY29tLCBJbmMuIG9yIGl0cyBhZmZpbGlhdGVzLiBBbGwgUmlnaHRzIFJlc2VydmVk
+Lgo+PiArIyBDb3B5cmlnaHQgMjAyMC0yMDIxIEFtYXpvbi5jb20sIEluYy4gb3IgaXRzIGFmZmls
+aWF0ZXMuIEFsbCBSaWdodHMgUmVzZXJ2ZWQuCj4+Cj4+ICAgIyBBbWF6b24gTml0cm8gRW5jbGF2
+ZXMgKE5FKSBzdXBwb3J0Lgo+PiAgICMgTml0cm8gaXMgYSBoeXBlcnZpc29yIHRoYXQgaGFzIGJl
+ZW4gZGV2ZWxvcGVkIGJ5IEFtYXpvbi4KPj4KPj4gLSMgVE9ETzogQWRkIGRlcGVuZGVuY3kgZm9y
+IEFSTTY0IG9uY2UgTkUgaXMgc3VwcG9ydGVkIG9uIEFybSBwbGF0Zm9ybXMuIEZvciBub3csCj4+
+IC0jIHRoZSBORSBrZXJuZWwgZHJpdmVyIGNhbiBiZSBidWlsdCBmb3IgYWFyY2g2NCBhcmNoLgo+
+PiAtIyBkZXBlbmRzIG9uIChBUk02NCB8fCBYODYpICYmIEhPVFBMVUdfQ1BVICYmIFBDSSAmJiBT
+TVAKPj4gLQo+PiAgIGNvbmZpZyBOSVRST19FTkNMQVZFUwo+PiAgICAgICAgdHJpc3RhdGUgIk5p
+dHJvIEVuY2xhdmVzIFN1cHBvcnQiCj4+IC0gICAgIGRlcGVuZHMgb24gWDg2ICYmIEhPVFBMVUdf
+Q1BVICYmIFBDSSAmJiBTTVAKPj4gKyAgICAgZGVwZW5kcyBvbiAoQVJNNjQgfHwgWDg2KSAmJiBI
+T1RQTFVHX0NQVSAmJiBQQ0kgJiYgU01QCj4gU28gbm8gY29kZSBjaGFuZ2UgbmVlZGVkPyAgSWYg
+bm90LCB0aGV5IHdoeSBkbyB3ZSBoYXZlIGEgY3B1IHR5cGUgYXQgYWxsCj4gaGVyZT8KClllcywg
+bm8gY29kZWJhc2UgY2hhbmdlcyBuZWVkZWQgc28gZmFyLgoKSSd2ZSBsb29rZWQgZHVyaW5nIHRo
+ZSBpbml0aWFsIHBoYXNlIG9mIHRoZSB1cHN0cmVhbWluZyBwcm9jZXNzIHRvIGFsc28gCmNoZWNr
+IHRoZSBBUk02NCBidWlsZCBhbmQgdXNlIC8gaW1wbGVtZW50IGZ1bmN0aW9uYWxpdHkgdGhhdCB3
+b3VsZCBub3QgCmJlIHg4NiBzcGVjaWZpYywgaWYgcG9zc2libGUuIEFuZCBpdCB3b3JrZWQgZ29v
+ZCwgZm9yIG5vdyBubyBuZWNlc3NhcnkgCnVwZGF0ZXMuCgpUaGUgc3VwcG9ydGVkIGFyY2hpdGVj
+dHVyZXMgZm9yIHRoZSBOaXRybyBFbmNsYXZlcyBvdmVyYWxsIHByb2plY3Qgd2lsbCAKYmUgeDg2
+IGFuZCBBUk02NCAoeDg2IHN1cHBvcnQgaGFzIGJlZW4gcmVsZWFzZWQsIEFSTTY0IHN1cHBvcnQg
+aXMgdG8gYmUgCnJlbGVhc2VkKSwgc28gbWVudGlvbmluZyB0aGVzZSBleHBsaWNpdGx5IGhlcmUu
+IE5vIG90aGVyIGFyY2hpdGVjdHVyZXMgCmhhdmUgYmVlbiBjb25zaWRlcmVkIHNvIGZhci4KClRo
+YW5rcywKQW5kcmEKCgoKQW1hem9uIERldmVsb3BtZW50IENlbnRlciAoUm9tYW5pYSkgUy5SLkwu
+IHJlZ2lzdGVyZWQgb2ZmaWNlOiAyN0EgU2YuIExhemFyIFN0cmVldCwgVUJDNSwgZmxvb3IgMiwg
+SWFzaSwgSWFzaSBDb3VudHksIDcwMDA0NSwgUm9tYW5pYS4gUmVnaXN0ZXJlZCBpbiBSb21hbmlh
+LiBSZWdpc3RyYXRpb24gbnVtYmVyIEoyMi8yNjIxLzIwMDUuCg==
 
