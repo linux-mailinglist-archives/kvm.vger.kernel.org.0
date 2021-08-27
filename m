@@ -2,85 +2,121 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E61FF3F9500
-	for <lists+kvm@lfdr.de>; Fri, 27 Aug 2021 09:20:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E3F203F950B
+	for <lists+kvm@lfdr.de>; Fri, 27 Aug 2021 09:25:34 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244255AbhH0HU4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 27 Aug 2021 03:20:56 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:31844 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231592AbhH0HUz (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 27 Aug 2021 03:20:55 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1630048806;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=M8VasvezmSl84LxW/Gp2bxkUkiZuhYPO9+N7tbIG3zY=;
-        b=Ukft8AyyQdHvZsMsVfmAo5kK41gYoliekqjx+2/G9L9tZz1ynD87tDugwXmTWFSUBfG2X1
-        Bm/ZLd9URa6hmUUwKyXILm84FWteLpLHU+I2oN9bKC5CLsuCfCK9lokVr0Xo9ptkXG3q5s
-        ZcX+jrgwYLoxVvYalNCcxw+t4gQ2G9U=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-126-hN8eFI-YMSSsJy5a4Rgslw-1; Fri, 27 Aug 2021 03:20:05 -0400
-X-MC-Unique: hN8eFI-YMSSsJy5a4Rgslw-1
-Received: by mail-wr1-f71.google.com with SMTP id z15-20020adff74f000000b001577d70c98dso1580801wrp.12
-        for <kvm@vger.kernel.org>; Fri, 27 Aug 2021 00:20:05 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=M8VasvezmSl84LxW/Gp2bxkUkiZuhYPO9+N7tbIG3zY=;
-        b=FcJttW5z1uC2Ejx4sWhj9lXW3NyufEw6CFVwmVlrJmMUf54ge6IC0bJrlTfwKjn1Uv
-         dima6oBR0qpV6hEtc3AcQL5KDHMsNnvBO1RZc9nKTp0OHTwTF5LHhO7wV2lQwh+KWWgy
-         dTSmTncj6+3HDZOe4X2DEGEmsJ0XTRYFLU/ZIQBJJZRUu1CxLLGGlzZjbclyYXGiPK65
-         T/lWuypmt5CrsiNGXhEkEdwvu43JxiSevHmjmWyfoYTrKaNwwii9IaY0nGDHrL27E57R
-         kFN3mXrRAwrJlI6QOLpmVfDHNKSSoKY8M/OD8JGHcK/wb5q9YBv965c2iK26/HFT+PW7
-         wrXA==
-X-Gm-Message-State: AOAM530vnJmIIbOdMYMa297/U1L+SXC/sC85BJBDSktMDEvReteP+vSz
-        UJxFikD/Z4aiLst7HhD/TigP+AxATFbsTzYdzBEJmljVxDMg0qNQ3te2GwqerDneJVbivcB0ueV
-        nZAYVZrGF9fYY
-X-Received: by 2002:a5d:58e7:: with SMTP id f7mr8684511wrd.51.1630048804263;
-        Fri, 27 Aug 2021 00:20:04 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwTl9i5nBeoXpyrIICHyuDAVdEjoMlEzjsx5J+YiYXGLf74oC1sYlJ6u79cx1FXoWewoLtWBw==
-X-Received: by 2002:a5d:58e7:: with SMTP id f7mr8684494wrd.51.1630048804134;
-        Fri, 27 Aug 2021 00:20:04 -0700 (PDT)
-Received: from thuth.remote.csb (dynamic-046-114-148-182.46.114.pool.telefonica.de. [46.114.148.182])
-        by smtp.gmail.com with ESMTPSA id n20sm4115941wms.15.2021.08.27.00.20.03
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 27 Aug 2021 00:20:03 -0700 (PDT)
-Subject: Re: [kvm-unit-tests PATCH v2 3/3] lib: s390x: Control register
- constant cleanup
-To:     Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org
-Cc:     linux-s390@vger.kernel.org, imbrenda@linux.ibm.com,
-        david@redhat.com, cohuck@redhat.com
-References: <20210820114000.166527-1-frankja@linux.ibm.com>
- <20210820114000.166527-4-frankja@linux.ibm.com>
-From:   Thomas Huth <thuth@redhat.com>
-Message-ID: <a8302c3a-1bd6-7dbe-62d8-85601f28301e@redhat.com>
-Date:   Fri, 27 Aug 2021 09:20:02 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.12.0
+        id S244427AbhH0H0U (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 27 Aug 2021 03:26:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36274 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S244351AbhH0H0S (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 27 Aug 2021 03:26:18 -0400
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 16776C061757;
+        Fri, 27 Aug 2021 00:25:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=neG8mg28UHUzHJK70IF++gxfO1zx12p3aLda6nUX0F8=; b=AukJ9GkzIV3P3F+0ekocwQawBL
+        tFlCkXpct0NjVzxDAYN3qp6dW8DFOR5++b6oO+2oFghCLwWlQldR9xUKOxe6O9xGeZ3SF85D2ScKC
+        RFt1tMii/X4MA5Hvk4XKVnCAHMtwMT7KO94Zi39lswz81eHv7+EWswbpXCxLYyjwAhehjD4Pj9zhD
+        /QGUZAd7iD4iU9YTu64FgKEGL0luhMV0hc4vrnvpZFSqjXRBBxUSDax4g0UrRpI2dleksB66sSbSW
+        I8F5HQkpMUSSv+Lz7wFRfoB+E5euI/bbEB/SVUaXfnNNAHO9evgCgJrPXZXun2y+vLo5dnB1ozeVf
+        G62jQfjw==;
+Received: from j217100.upc-j.chello.nl ([24.132.217.100] helo=noisy.programming.kicks-ass.net)
+        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1mJWBM-00EFSX-VT; Fri, 27 Aug 2021 07:22:07 +0000
+Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits))
+        (Client did not present a certificate)
+        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id A41C630035D;
+        Fri, 27 Aug 2021 09:21:43 +0200 (CEST)
+Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
+        id 80EAF2C6670E9; Fri, 27 Aug 2021 09:21:43 +0200 (CEST)
+Date:   Fri, 27 Aug 2021 09:21:43 +0200
+From:   Peter Zijlstra <peterz@infradead.org>
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Will Deacon <will@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
+        Ingo Molnar <mingo@redhat.com>,
+        Arnaldo Carvalho de Melo <acme@kernel.org>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Marc Zyngier <maz@kernel.org>, Guo Ren <guoren@kernel.org>,
+        Nick Hu <nickhu@andestech.com>,
+        Greentime Hu <green.hu@gmail.com>,
+        Vincent Chen <deanbo422@gmail.com>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Albert Ou <aou@eecs.berkeley.edu>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Borislav Petkov <bp@alien8.de>, x86@kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
+        Juergen Gross <jgross@suse.com>,
+        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+        Jiri Olsa <jolsa@redhat.com>,
+        Namhyung Kim <namhyung@kernel.org>,
+        James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Stefano Stabellini <sstabellini@kernel.org>,
+        linux-perf-users@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        linux-csky@vger.kernel.org, linux-riscv@lists.infradead.org,
+        kvm@vger.kernel.org, xen-devel@lists.xenproject.org,
+        Artem Kashkanov <artem.kashkanov@intel.com>,
+        Like Xu <like.xu.linux@gmail.com>,
+        Zhu Lingshan <lingshan.zhu@intel.com>
+Subject: Re: [PATCH 06/15] KVM: x86: Register perf callbacks only when
+ actively handling interrupt
+Message-ID: <YSiShwJeBvAVPVKe@hirez.programming.kicks-ass.net>
+References: <20210827005718.585190-1-seanjc@google.com>
+ <20210827005718.585190-7-seanjc@google.com>
 MIME-Version: 1.0
-In-Reply-To: <20210820114000.166527-4-frankja@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210827005718.585190-7-seanjc@google.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 20/08/2021 13.40, Janosch Frank wrote:
-> We had bits and masks defined and don't necessarily need both.
-> 
-> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
-> ---
->   lib/s390x/asm/arch_def.h | 28 ++++++++++++----------------
->   lib/s390x/smp.c          |  3 ++-
->   s390x/skrf.c             |  3 ++-
->   3 files changed, 16 insertions(+), 18 deletions(-)
+On Thu, Aug 26, 2021 at 05:57:09PM -0700, Sean Christopherson wrote:
+> diff --git a/kernel/events/core.c b/kernel/events/core.c
+> index 9bc1375d6ed9..2f28d9d8dc94 100644
+> --- a/kernel/events/core.c
+> +++ b/kernel/events/core.c
+> @@ -6485,6 +6485,18 @@ static void perf_pending_event(struct irq_work *entry)
+>  #ifdef CONFIG_HAVE_GUEST_PERF_EVENTS
+>  DEFINE_PER_CPU(struct perf_guest_info_callbacks *, perf_guest_cbs);
+>  
+> +void __perf_register_guest_info_callbacks(struct perf_guest_info_callbacks *cbs)
+> +{
+> +	__this_cpu_write(perf_guest_cbs, cbs);
+> +}
+> +EXPORT_SYMBOL_GPL(__perf_register_guest_info_callbacks);
+> +
+> +void __perf_unregister_guest_info_callbacks(void)
+> +{
+> +	__this_cpu_write(perf_guest_cbs, NULL);
+> +}
+> +EXPORT_SYMBOL_GPL(__perf_unregister_guest_info_callbacks);
 
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+This is 100% broken, and a prime example of why I hate modules.
 
+It provides an interface for all modules, and completely fails to
+validate even the most basic usage.
+
+By using __this_cpu*() it omits the preemption checks, so you can call
+this with preemption enabled, no problem.
+
+By not checking the previous state, multiple modules can call this
+interleaved without issue.
+
+Basically assume any EXPORTed function is hostile, binary modules and
+out-of-tree modules *are* just that. It's a cesspit out there.
