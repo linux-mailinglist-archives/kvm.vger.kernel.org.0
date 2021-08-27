@@ -2,131 +2,94 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 987023FA120
-	for <lists+kvm@lfdr.de>; Fri, 27 Aug 2021 23:24:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0BEC53FA150
+	for <lists+kvm@lfdr.de>; Fri, 27 Aug 2021 23:58:45 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231949AbhH0VYo (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 27 Aug 2021 17:24:44 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:46570 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231908AbhH0VYo (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 27 Aug 2021 17:24:44 -0400
-Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 17RLE0gC130838;
-        Fri, 27 Aug 2021 17:23:54 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
- subject : message-id : in-reply-to : references : mime-version :
- content-type : content-transfer-encoding; s=pp1;
- bh=sCclVsG9zuQMWWDfdDhVlv7eQo2MGj647KbJjB0FvGE=;
- b=hkVIWSPLFnB26u8IfCDJ771Kt6FmU5P4x9xiZkHmQim7JtK+M5DSI+YgIapnK5MzFZtC
- 6wlgLa2Wresdm2ErcCeRyYsIatQPus+REUQmnA88ncXcnudKseiN+ogCejT0y20XC7E4
- OEsr8neJc/IG327OMF94W1PS7U7uIjGsqo0MkD4Ydt02wSXIzLqTqqu8aQvcwq8PnGYB
- fJLxcm90iiiXwgNrXJckd/vfQMgKCVc17fKcZJLRVLlWniwWg4wOiN68JkX8E/nPNPSW
- 4zult/UGt2QWipR50l9LEYXGS/f76i/8wKW18QEfnQcpSd3LrJ8rcvVdwJVxxdrFLJK2 9g== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3aq7sjr5ua-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 27 Aug 2021 17:23:54 -0400
-Received: from m0098409.ppops.net (m0098409.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 17RLFVgC139301;
-        Fri, 27 Aug 2021 17:23:54 -0400
-Received: from ppma04fra.de.ibm.com (6a.4a.5195.ip4.static.sl-reverse.com [149.81.74.106])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3aq7sjr5tk-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 27 Aug 2021 17:23:54 -0400
-Received: from pps.filterd (ppma04fra.de.ibm.com [127.0.0.1])
-        by ppma04fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 17RLHgWH016088;
-        Fri, 27 Aug 2021 21:23:51 GMT
-Received: from b06cxnps4074.portsmouth.uk.ibm.com (d06relay11.portsmouth.uk.ibm.com [9.149.109.196])
-        by ppma04fra.de.ibm.com with ESMTP id 3ajs48t8aa-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 27 Aug 2021 21:23:51 +0000
-Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
-        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 17RLNlRF55378226
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 27 Aug 2021 21:23:47 GMT
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id BABA411C050;
-        Fri, 27 Aug 2021 21:23:47 +0000 (GMT)
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id C933A11C01F;
-        Fri, 27 Aug 2021 21:23:46 +0000 (GMT)
-Received: from li-e979b1cc-23ba-11b2-a85c-dfd230f6cf82 (unknown [9.171.80.46])
-        by d06av25.portsmouth.uk.ibm.com (Postfix) with SMTP;
-        Fri, 27 Aug 2021 21:23:46 +0000 (GMT)
-Date:   Fri, 27 Aug 2021 23:23:44 +0200
-From:   Halil Pasic <pasic@linux.ibm.com>
-To:     Christian Borntraeger <borntraeger@de.ibm.com>
-Cc:     Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
-        stable@vger.kernel.org, Michael Mueller <mimu@linux.ibm.com>,
-        Halil Pasic <pasic@linux.ibm.com>
-Subject: Re: [PATCH 1/1] KVM: s390: index kvm->arch.idle_mask by vcpu_idx
-Message-ID: <20210827232344.431e3114.pasic@linux.ibm.com>
-In-Reply-To: <e9d2f79c-b784-bc6b-88dc-2d0f7cc08dbe@de.ibm.com>
-References: <20210827125429.1912577-1-pasic@linux.ibm.com>
-        <20210827160616.532d6699@p-imbrenda>
-        <e9d2f79c-b784-bc6b-88dc-2d0f7cc08dbe@de.ibm.com>
-Organization: IBM
-X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: oj0mOj90HEjTriSPPOKCL0y1FS6AXabX
-X-Proofpoint-GUID: e44dW4wEjmBWVeodvyoT24FHQg_SXFMh
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.790
- definitions=2021-08-27_06:2021-08-27,2021-08-27 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=999 spamscore=0
- malwarescore=0 priorityscore=1501 impostorscore=0 mlxscore=0
- suspectscore=0 clxscore=1015 adultscore=0 bulkscore=0 lowpriorityscore=0
- phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2107140000 definitions=main-2108270124
+        id S232110AbhH0V7Y (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 27 Aug 2021 17:59:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39396 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231947AbhH0V7X (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 27 Aug 2021 17:59:23 -0400
+Received: from mail-il1-x149.google.com (mail-il1-x149.google.com [IPv6:2607:f8b0:4864:20::149])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DE0CAC0613D9
+        for <kvm@vger.kernel.org>; Fri, 27 Aug 2021 14:58:33 -0700 (PDT)
+Received: by mail-il1-x149.google.com with SMTP id b13-20020a92dccd0000b0290223ea53d878so5023906ilr.19
+        for <kvm@vger.kernel.org>; Fri, 27 Aug 2021 14:58:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:in-reply-to:message-id:mime-version:references:subject:from:to
+         :cc;
+        bh=zEqo65HFDniYflruEifCzsGz9EVUlfE1N13W9ndiFw8=;
+        b=Kf5wvNW/F8mZENQSvB6E0t62gx2c13xS9fZ7bvLOY/uUK3eG29DV9WfFReAeHMMBM6
+         uUIfykSV6VJY80Hh2Z4401C4axUd3T1FM1WgeyixkrnoOfVlrFTia4IqSCo9VNRR2JSf
+         IhWdS3onWejDsQ+4rvGuHBdvmHdVj9gdHdOFTvU6U7r65c5ICMAFOZ9iMMmz9J93v5s7
+         PQ4TCjXWljFu7DI7EuSpYQwq/0P9KKzBuoy0lJw85BNlwCd+aVFGymOad//ol+aX/457
+         wiBbeBSWej8la76YXEOxRQqW5sP8X7MjRQXfoV5C2eReoKsOR2rdng0BFMInfbi6wV0h
+         iWfQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:in-reply-to:message-id:mime-version
+         :references:subject:from:to:cc;
+        bh=zEqo65HFDniYflruEifCzsGz9EVUlfE1N13W9ndiFw8=;
+        b=Imsm/wWxnjMKl3sqBZRfuPitgypfXJGeBPPxNNvgF9hj/OV3fJp+Vc0HzpbkAdGjQ3
+         0l1CobvVm6gm44+Y4eYvhaKjEXCP+kb7ygPVsZ7kSVn0jOw+9GnT2/riiGLe0vTcpIp8
+         gePpxGl9dhaxrKWolb0FJw9JjIb11QGbGu+DCGjTI2M9z9Lm8qPqOONMGpS0l3+wzbWE
+         FZ8qpMhWdpWFjqysocq+xyQGahT6rZwBA0vfTHaPd89MehkiIPBVMcrT79WZXCNHJ/Jw
+         szYLUSXtnQWU4ItmtiHQPXRCwA3gT3LYCkdcmToSY17l9X9cfzf6wsO+txhBKxZkScwF
+         VG7Q==
+X-Gm-Message-State: AOAM531725tDAjHGt2IKEdNPd19AGw05PIG14yh5iegREblOFFQ8Hly4
+        xmEqQ/8tbQBSwrHz+IxfwA6eWaephIXxmRGgMSpCQ87hZ6YNhDgyR55QDCPu76WifoxZv+WwCVe
+        Ls5v2IYHPAuacoxcrB1u8Bv8P/Vox7hjOv7ZT2xSpjLMg/qPxvGvq559GtQ==
+X-Google-Smtp-Source: ABdhPJwffoNQdD/D+ASti6AvwuymHnK3xqKzLwLel1ZYsRFrWbbSuNMVpIKrlgv4Bqgz/Bcn4un7QeXuqUQ=
+X-Received: from oupton.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:404])
+ (user=oupton job=sendgmr) by 2002:a02:cbb0:: with SMTP id v16mr10001890jap.114.1630101513235;
+ Fri, 27 Aug 2021 14:58:33 -0700 (PDT)
+Date:   Fri, 27 Aug 2021 21:58:25 +0000
+In-Reply-To: <20210819223640.3564975-1-oupton@google.com>
+Message-Id: <20210827215827.3774670-1-oupton@google.com>
+Mime-Version: 1.0
+References: <20210819223640.3564975-1-oupton@google.com>
+X-Mailer: git-send-email 2.33.0.259.gc128427fd7-goog
+Subject: [RFC kvmtool PATCH 0/2] PSCI SYSTEM_SUSPEND support
+From:   Oliver Upton <oupton@google.com>
+To:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
+Cc:     Marc Zyngier <maz@kernel.org>, Peter Shier <pshier@google.com>,
+        Ricardo Koller <ricarkol@google.com>,
+        Jing Zhang <jingzhangos@google.com>,
+        Raghavendra Rao Anata <rananta@google.com>,
+        James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>, reijiw@google.com,
+        Andrew Jones <drjones@redhat.com>,
+        Will Deacon <will@kernel.org>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Oliver Upton <oupton@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 27 Aug 2021 18:36:48 +0200
-Christian Borntraeger <borntraeger@de.ibm.com> wrote:
+This series was developed to test support for PSCI SYSTEM_SUSPEND
+currently proposed for KVM/arm64 [1]. Since there isn't much for kvmtool
+to do for a suspend (we don't have save/restore), just restart the guest
+immediately.
 
-> On 27.08.21 16:06, Claudio Imbrenda wrote:
-> > On Fri, 27 Aug 2021 14:54:29 +0200
-> > Halil Pasic <pasic@linux.ibm.com> wrote:
-> >   
-> >> While in practice vcpu->vcpu_idx ==  vcpu->vcp_id is often true,
+Tested on kvm-arm/next kernel with the aforementioned series applied.
 
-s/vcp_id/vcpu_id/
+[1] https://lore.kernel.org/r/20210819223640.3564975-1-oupton@google.com
 
-> >> it may not always be, and we must not rely on this.  
-> > 
-> > why?
-> > 
-> > maybe add a simple explanation of why vcpu_idx and vcpu_id can be
-> > different, namely:
-> > KVM decides the vcpu_idx, userspace decides the vcpu_id, thus the two
-> > might not match
-> >   
-> >>
-> >> Currently kvm->arch.idle_mask is indexed by vcpu_id, which implies
-> >> that code like
-> >> for_each_set_bit(vcpu_id, kvm->arch.idle_mask, online_vcpus) {
-> >>                  vcpu = kvm_get_vcpu(kvm, vcpu_id);  
-> > 
-> > you can also add a sentence to clarify that kvm_get_vcpu expects an
-> > vcpu_idx, not an vcpu_id.
-> >   
-> >> 		do_stuff(vcpu);  
-> 
-> I will modify the patch description accordingly before sending to Paolo.
-> Thanks for noticing.
+Oliver Upton (2):
+  TESTONLY: KVM: Update KVM headers
+  KVM/arm64: Add support for KVM_CAP_ARM_SYSTEM_SUSPEND
 
-Can you also please fix the typo I pointed out above (in the first line
-of the long description).
+ arm/kvm.c           |  12 ++
+ include/kvm/kvm.h   |   1 +
+ include/linux/kvm.h | 414 +++++++++++++++++++++++++++++++++++++++++++-
+ kvm-cpu.c           |   5 +
+ kvm.c               |   7 +
+ 5 files changed, 432 insertions(+), 7 deletions(-)
 
-Thanks!
-Halil
+-- 
+2.33.0.259.gc128427fd7-goog
+
