@@ -2,204 +2,142 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 77A973F96E8
-	for <lists+kvm@lfdr.de>; Fri, 27 Aug 2021 11:27:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8A8A23F96F1
+	for <lists+kvm@lfdr.de>; Fri, 27 Aug 2021 11:28:00 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244797AbhH0J0r (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 27 Aug 2021 05:26:47 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:52904 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S244771AbhH0J0p (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 27 Aug 2021 05:26:45 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1630056356;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=nEdDz4lJvfVQmKns+107BOpFRlx3QH8ZfZRuj0/cXvY=;
-        b=eLjvkooAmQwb0KrYikU32XouwZWI69qNhFOIrC2gcOYixkXN8Ezp7PZ4QXEC0G1sm9PV0y
-        G6JA3m8p6O3LjI2w4oKrtPGv0urfOXYk+XIH3JOF94HUkwtZvTr874M+MmgBGH6KJdejS+
-        w2r+aFX+gUTlLy9vUqTwpHFr7jbgZII=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-522-TotXXjUjPba4DS2jT4yxzQ-1; Fri, 27 Aug 2021 05:25:54 -0400
-X-MC-Unique: TotXXjUjPba4DS2jT4yxzQ-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B5C21800493;
-        Fri, 27 Aug 2021 09:25:53 +0000 (UTC)
-Received: from vitty.brq.redhat.com (unknown [10.40.193.235])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 42F8160C04;
-        Fri, 27 Aug 2021 09:25:51 +0000 (UTC)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
-        Nitesh Narayan Lal <nitesh@redhat.com>,
-        Lai Jiangshan <jiangshanlai@gmail.com>,
-        Maxim Levitsky <mlevitsk@redhat.com>,
-        Eduardo Habkost <ehabkost@redhat.com>,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH v4 8/8] KVM: Make kvm_make_vcpus_request_mask() use pre-allocated cpu_kick_mask
-Date:   Fri, 27 Aug 2021 11:25:16 +0200
-Message-Id: <20210827092516.1027264-9-vkuznets@redhat.com>
-In-Reply-To: <20210827092516.1027264-1-vkuznets@redhat.com>
-References: <20210827092516.1027264-1-vkuznets@redhat.com>
+        id S244829AbhH0J1k (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 27 Aug 2021 05:27:40 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:8480 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S244846AbhH0J1f (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 27 Aug 2021 05:27:35 -0400
+Received: from pps.filterd (m0187473.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 17R9EWTI118825
+        for <kvm@vger.kernel.org>; Fri, 27 Aug 2021 05:26:46 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=HVxrT06A059JG5/EG4EZfg7HX3zY2lLjVJ6cjyJfYwY=;
+ b=bM/eO/rMZASU7AmfW6H7uWxbWUSh6BkDCqrMcCYmtMT0AJR6CfZYo2t7GBxRGD1Q8xsL
+ yZ97WEJzhbYguLm4j2RYmdt+1dWGaTXsNV4LJR02rDip8KmT8yb52pJRF8hOWKvsYkAi
+ La5UqHwkMSKChrahxsa0Dd197bNmiV0RB220THP3dkCPpqrlDieF3rRU7mYXs1/3xZPP
+ jZuOPZ9P7+fwK4iaTeEQB7Q8j2oBkH8SZublf9qupqvZEkzyjBI4VG7UT7eQbSADUtht
+ SF+T2bNYDmD+I0uVzNgJ/4c3C7s0ZscUsaZIW/f698NiBch+iDu4PjQFWgOYU1rS3EZq BA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3apw88r80r-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Fri, 27 Aug 2021 05:26:45 -0400
+Received: from m0187473.ppops.net (m0187473.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 17R9FU8n128164
+        for <kvm@vger.kernel.org>; Fri, 27 Aug 2021 05:26:45 -0400
+Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3apw88r7yv-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 27 Aug 2021 05:26:45 -0400
+Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
+        by ppma03ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 17R9HHiw022165;
+        Fri, 27 Aug 2021 09:26:43 GMT
+Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
+        by ppma03ams.nl.ibm.com with ESMTP id 3ajs48k7qj-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 27 Aug 2021 09:26:42 +0000
+Received: from d06av24.portsmouth.uk.ibm.com (mk.ibm.com [9.149.105.60])
+        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 17R9Qd3c51249438
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 27 Aug 2021 09:26:39 GMT
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 6D79D4204F;
+        Fri, 27 Aug 2021 09:26:39 +0000 (GMT)
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 28CB542042;
+        Fri, 27 Aug 2021 09:26:39 +0000 (GMT)
+Received: from oc3016276355.ibm.com (unknown [9.145.164.230])
+        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Fri, 27 Aug 2021 09:26:39 +0000 (GMT)
+Subject: Re: [kvm-unit-tests PATCH 1/2] Makefile: Fix cscope
+To:     Thomas Huth <thuth@redhat.com>, kvm@vger.kernel.org
+Cc:     frankja@linux.ibm.com, david@redhat.com, cohuck@redhat.com,
+        imbrenda@linux.ibm.com, Paolo Bonzini <pbonzini@redhat.com>,
+        Andrew Jones <drjones@redhat.com>
+References: <1629908421-8543-1-git-send-email-pmorel@linux.ibm.com>
+ <1629908421-8543-2-git-send-email-pmorel@linux.ibm.com>
+ <1dd4c64e-3866-98c9-8178-dbff90dca55f@redhat.com>
+From:   Pierre Morel <pmorel@linux.ibm.com>
+Message-ID: <2aaffea2-0a20-1a6d-eebb-69b6cfe6e83c@linux.ibm.com>
+Date:   Fri, 27 Aug 2021 11:26:38 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.13.0
 MIME-Version: 1.0
+In-Reply-To: <1dd4c64e-3866-98c9-8178-dbff90dca55f@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: 6un9Ww1CVd8_F9SWCetbx4qclTo682Vk
+X-Proofpoint-GUID: 4rknLbCBE5L4R5Mmz5tv9HdAgFceRm0S
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.790
+ definitions=2021-08-27_03:2021-08-26,2021-08-27 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 adultscore=0
+ suspectscore=0 priorityscore=1501 impostorscore=0 malwarescore=0
+ spamscore=0 mlxlogscore=999 bulkscore=0 mlxscore=0 phishscore=0
+ lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2107140000 definitions=main-2108270058
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-kvm_make_vcpus_request_mask() already disables preemption so just like
-kvm_make_all_cpus_request_except() it can be switched to using
-pre-allocated per-cpu cpumasks. This allows for improvements for both
-users of the function: in Hyper-V emulation code 'tlb_flush' can now be
-dropped from 'struct kvm_vcpu_hv' and kvm_make_scan_ioapic_request_mask()
-gets rid of dynamic allocation.
 
-cpumask_available() check in kvm_make_vcpu_request() can now be dropped as
-it checks for an impossible condition: kvm_init() makes sure per-cpu masks
-are allocated.
 
-Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
----
- arch/x86/include/asm/kvm_host.h |  1 -
- arch/x86/kvm/hyperv.c           |  5 +----
- arch/x86/kvm/x86.c              |  8 +-------
- include/linux/kvm_host.h        |  2 +-
- virt/kvm/kvm_main.c             | 18 +++++++-----------
- 5 files changed, 10 insertions(+), 24 deletions(-)
+On 8/26/21 7:07 AM, Thomas Huth wrote:
+> On 25/08/2021 18.20, Pierre Morel wrote:
+>> In Linux, cscope uses a wrong directory.
+>> Simply search from the directory where the make is started.
+>>
+>> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
+>> ---
+>>   Makefile | 2 +-
+>>   1 file changed, 1 insertion(+), 1 deletion(-)
+>>
+>> diff --git a/Makefile b/Makefile
+>> index f7b9f28c..c8b0d74f 100644
+>> --- a/Makefile
+>> +++ b/Makefile
+>> @@ -119,7 +119,7 @@ cscope: cscope_dirs = lib lib/libfdt lib/linux 
+>> $(TEST_DIR) $(ARCH_LIBDIRS) lib/a
+>>   cscope:
+>>       $(RM) ./cscope.*
+>>       find -L $(cscope_dirs) -maxdepth 1 \
+>> -        -name '*.[chsS]' -exec realpath --relative-base=$(PWD) {} \; 
+>> | sort -u > ./cscope.files
+>> +        -name '*.[chsS]' -exec realpath --relative-base=. {} \; | 
+>> sort -u > ./cscope.files
+> 
+> Why is $PWD not pointing to the same location as "." ? Are you doing 
+> in-tree or out-of-tree builds?
+> 
+>   Thomas
+> 
 
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index 09b256db394a..846552fa2012 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -569,7 +569,6 @@ struct kvm_vcpu_hv {
- 	struct kvm_hyperv_exit exit;
- 	struct kvm_vcpu_hv_stimer stimer[HV_SYNIC_STIMER_COUNT];
- 	DECLARE_BITMAP(stimer_pending_bitmap, HV_SYNIC_STIMER_COUNT);
--	cpumask_t tlb_flush;
- 	bool enforce_cpuid;
- 	struct {
- 		u32 features_eax; /* HYPERV_CPUID_FEATURES.EAX */
-diff --git a/arch/x86/kvm/hyperv.c b/arch/x86/kvm/hyperv.c
-index 5704bfe53ee0..f76e7228f687 100644
---- a/arch/x86/kvm/hyperv.c
-+++ b/arch/x86/kvm/hyperv.c
-@@ -1755,7 +1755,6 @@ static u64 kvm_hv_flush_tlb(struct kvm_vcpu *vcpu, struct kvm_hv_hcall *hc, bool
- 	int i;
- 	gpa_t gpa;
- 	struct kvm *kvm = vcpu->kvm;
--	struct kvm_vcpu_hv *hv_vcpu = to_hv_vcpu(vcpu);
- 	struct hv_tlb_flush_ex flush_ex;
- 	struct hv_tlb_flush flush;
- 	u64 vp_bitmap[KVM_HV_MAX_SPARSE_VCPU_SET_BITS];
-@@ -1837,8 +1836,6 @@ static u64 kvm_hv_flush_tlb(struct kvm_vcpu *vcpu, struct kvm_hv_hcall *hc, bool
- 		}
- 	}
- 
--	cpumask_clear(&hv_vcpu->tlb_flush);
--
- 	/*
- 	 * vcpu->arch.cr3 may not be up-to-date for running vCPUs so we can't
- 	 * analyze it here, flush TLB regardless of the specified address space.
-@@ -1850,7 +1847,7 @@ static u64 kvm_hv_flush_tlb(struct kvm_vcpu *vcpu, struct kvm_hv_hcall *hc, bool
- 						    vp_bitmap, vcpu_bitmap);
- 
- 		kvm_make_vcpus_request_mask(kvm, KVM_REQ_TLB_FLUSH_GUEST,
--					    vcpu_mask, &hv_vcpu->tlb_flush);
-+					    vcpu_mask);
- 	}
- 
- ret_success:
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index a4752dcc2a75..91c1e6c98b0f 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -9224,14 +9224,8 @@ static void process_smi(struct kvm_vcpu *vcpu)
- void kvm_make_scan_ioapic_request_mask(struct kvm *kvm,
- 				       unsigned long *vcpu_bitmap)
- {
--	cpumask_var_t cpus;
--
--	zalloc_cpumask_var(&cpus, GFP_ATOMIC);
--
- 	kvm_make_vcpus_request_mask(kvm, KVM_REQ_SCAN_IOAPIC,
--				    vcpu_bitmap, cpus);
--
--	free_cpumask_var(cpus);
-+				    vcpu_bitmap);
- }
- 
- void kvm_make_scan_ioapic_request(struct kvm *kvm)
-diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-index 2f149ed140f7..1ee85de0bf74 100644
---- a/include/linux/kvm_host.h
-+++ b/include/linux/kvm_host.h
-@@ -160,7 +160,7 @@ static inline bool is_error_page(struct page *page)
- #define KVM_ARCH_REQ(nr)           KVM_ARCH_REQ_FLAGS(nr, 0)
- 
- bool kvm_make_vcpus_request_mask(struct kvm *kvm, unsigned int req,
--				 unsigned long *vcpu_bitmap, cpumask_var_t tmp);
-+				 unsigned long *vcpu_bitmap);
- bool kvm_make_all_cpus_request(struct kvm *kvm, unsigned int req);
- bool kvm_make_all_cpus_request_except(struct kvm *kvm, unsigned int req,
- 				      struct kvm_vcpu *except);
-diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index 2f5fe4f54a51..dc52a04f0586 100644
---- a/virt/kvm/kvm_main.c
-+++ b/virt/kvm/kvm_main.c
-@@ -274,14 +274,6 @@ static void kvm_make_vcpu_request(struct kvm *kvm, struct kvm_vcpu *vcpu,
- 	if (!(req & KVM_REQUEST_NO_WAKEUP) && kvm_vcpu_wake_up(vcpu))
- 		return;
- 
--	/*
--	 * tmp can be "unavailable" if cpumasks are allocated off stack as
--	 * allocation of the mask is deliberately not fatal and is handled by
--	 * falling back to kicking all online CPUs.
--	 */
--	if (!cpumask_available(tmp))
--		return;
--
- 	/*
- 	 * Note, the vCPU could get migrated to a different pCPU at any point
- 	 * after kvm_request_needs_ipi(), which could result in sending an IPI
-@@ -300,22 +292,26 @@ static void kvm_make_vcpu_request(struct kvm *kvm, struct kvm_vcpu *vcpu,
- }
- 
- bool kvm_make_vcpus_request_mask(struct kvm *kvm, unsigned int req,
--				 unsigned long *vcpu_bitmap, cpumask_var_t tmp)
-+				 unsigned long *vcpu_bitmap)
- {
- 	struct kvm_vcpu *vcpu;
-+	struct cpumask *cpus;
- 	int i, me;
- 	bool called;
- 
- 	me = get_cpu();
- 
-+	cpus = this_cpu_cpumask_var_ptr(cpu_kick_mask);
-+	cpumask_clear(cpus);
-+
- 	for_each_set_bit(i, vcpu_bitmap, KVM_MAX_VCPUS) {
- 		vcpu = kvm_get_vcpu(kvm, i);
- 		if (!vcpu)
- 			continue;
--		kvm_make_vcpu_request(kvm, vcpu, req, tmp, me);
-+		kvm_make_vcpu_request(kvm, vcpu, req, cpus, me);
- 	}
- 
--	called = kvm_kick_many_cpus(tmp, !!(req & KVM_REQUEST_WAIT));
-+	called = kvm_kick_many_cpus(cpus, !!(req & KVM_REQUEST_WAIT));
- 	put_cpu();
- 
- 	return called;
+In tree.
+That is the point, why is PWD indicating void ?
+I use a bash on s390x.
+inside bash PWD shows current directory
+GNU Make is 4.2.1 on Ubuntu 18.04
+
+This works on X with redhat and GNU make 3.82
+
+This happens on s390x since:
+51b8f0b1 2017-11-23 Andrew Jones Makefile: fix cscope target
+
+So I add Andrew as CC, I did forgot to do before.
+
+
+Regards,
+Pierre
+
+
+
+
 -- 
-2.31.1
-
+Pierre Morel
+IBM Lab Boeblingen
